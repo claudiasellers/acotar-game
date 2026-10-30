@@ -1,5 +1,6 @@
 ## Feyre: third-person movement, sprint with stamina, jumping, ledge
-## mantling, plus her gameplay components (systems/): the bow, interaction,
+## mantling, a mouse/stick camera that R recentres behind her, plus her
+## gameplay components (systems/): the bow, interaction,
 ## body state, element state, notice moments and wardrobe.
 ##
 ## The body is a capsule until her model exists at MODEL_SCENE; then that
@@ -14,6 +15,7 @@ signal bow_released(at: Vector3, loudness: float)
 
 const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
 
+const DEFAULT_PITCH := -0.2094  # -12 degrees
 const PLAYER_LAYER := 1 << 1
 const WORLD_MASK := 1 << 0
 
@@ -38,6 +40,12 @@ const WORLD_MASK := 1 << 0
 @export var max_quiver: int = 30
 @export var mouse_sensitivity: float = 0.0025
 @export var stick_sensitivity: float = 2.6
+## Recentre (R / right stick click) eases the camera behind her at this rate.
+@export var recenter_speed: float = 14.0
+## With "camera follows while running" on, the camera swings behind her after
+## this long without look input.
+@export var follow_delay: float = 0.6
+@export var follow_speed: float = 2.4
 
 var stamina: float = 100.0
 var is_aiming: bool = false
@@ -72,6 +80,12 @@ var _camera_pitch: Node3D
 var _spring_arm: SpringArm3D
 var _stamina_cooldown: float = 0.0
 var _exhausted: bool = false
+var _recentering: bool = false
+var _since_look: float = 0.0
+var _running: bool = false
+## Recent spots where she stood on open ground, newest last (wriggle free).
+var _safe_spots: Array[Vector3] = []
+var _safe_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -96,8 +110,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
 			and StoryControl.can_look():
-		_rotate_camera(-event.relative.x * mouse_sensitivity, -event.relative.y * mouse_sensitivity)
-		look_input_this_frame = true
+		var s := mouse_sensitivity * GameSettings.mouse_sensitivity
+		_look(event.relative.x * s, event.relative.y * s)
+	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
+		recenter_camera()
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
 		interactor.interact()
 
@@ -106,10 +122,13 @@ func _process(delta: float) -> void:
 	_camera_rig.global_position = global_position + Vector3.UP * 1.5
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
-		_rotate_camera(-look.x * stick_sensitivity * delta, -look.y * stick_sensitivity * delta)
-		look_input_this_frame = true
+		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
+		_look(look.x * s, look.y * s)
+	_since_look = 0.0 if look_input_this_frame else _since_look + delta
+	_update_recenter(delta)
+	_follow_behind(delta)
 	_drift_toward_focus(delta)
-	var shake := StoryControl.shake
+	var shake := StoryControl.shake * (0.0 if GameSettings.reduced_effects else 1.0)
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	var target_length := 1.7 if (is_aiming or is_drawing) else 3.6
@@ -132,6 +151,7 @@ func _physics_process(delta: float) -> void:
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
 			and not _exhausted and not is_drawing and not is_aiming
+	_running = sprinting
 	_update_stamina(delta, sprinting)
 
 	var speed := run_speed
@@ -167,11 +187,41 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
-	if not is_on_floor() and velocity.y < 2.0 and input.y < -0.3:
+	# Gentle Mode catches ledges whichever way she is pushing.
+	var reach_input := input.length() > 0.3 if GameSettings.gentle_mode else input.y < -0.3
+	if not is_on_floor() and velocity.y < 2.0 and reach_input:
 		_try_mantle()
 
 	_turn_model(direction, yaw, delta)
 	move_and_slide()
+	_remember_safe_spot(delta)
+
+
+## Swings the camera back behind her (R / right stick click).
+func recenter_camera() -> void:
+	_recentering = true
+
+
+## Pause menu "Wriggle free": hop to the nearest open ground. False if no spot was found.
+func wriggle_free() -> bool:
+	var spot: Variant = WriggleFree.find_spot(self, _safe_spots)
+	if spot == null:
+		return false
+	is_mantling = false
+	velocity = Vector3.ZERO
+	global_position = spot
+	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	recenter_camera()
+	Juice.burst(self, &"unlock")
+	return true
+
+
+func camera_yaw() -> float:
+	return _camera_rig.rotation.y
+
+
+func camera_pitch() -> float:
+	return _camera_pitch.rotation.x
 
 
 ## Root design doc §4.3: arrows are scarce, so stuck arrows can be collected.
@@ -218,7 +268,8 @@ func _gentle_mode() -> bool:
 
 func _update_stamina(delta: float, sprinting: bool) -> void:
 	if sprinting:
-		stamina = maxf(stamina - sprint_drain * delta, 0.0)
+		var drain := sprint_drain * (0.5 if GameSettings.gentle_mode else 1.0)
+		stamina = maxf(stamina - drain * delta, 0.0)
 		_stamina_cooldown = stamina_regen_delay
 		if stamina <= 0.0:
 			_exhausted = true
@@ -260,7 +311,7 @@ func _try_mantle() -> bool:
 	if not top or top.normal.dot(Vector3.UP) < 0.7:
 		return false
 	var rise: float = top.position.y - global_position.y
-	if rise < 0.6 or rise > 2.3:
+	if rise < 0.6 or rise > (2.8 if GameSettings.gentle_mode else 2.3):
 		return false
 	is_mantling = true
 	velocity = Vector3.ZERO
@@ -282,6 +333,44 @@ func _drift_toward_focus(delta: float) -> void:
 		return
 	var yaw := atan2(-to.x, -to.z)
 	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, yaw, 1.6 * delta)
+
+
+## Player look input (already scaled); applies the invert settings.
+func _look(x: float, y: float) -> void:
+	_rotate_camera(x * (1.0 if GameSettings.invert_x else -1.0), y * (1.0 if GameSettings.invert_y else -1.0))
+	look_input_this_frame = true
+	_recentering = false
+
+
+func _update_recenter(delta: float) -> void:
+	if not _recentering:
+		return
+	var t := minf(recenter_speed * delta, 1.0)
+	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, t)
+	_camera_pitch.rotation.x = lerpf(_camera_pitch.rotation.x, DEFAULT_PITCH, t)
+	if absf(angle_difference(_camera_rig.rotation.y, model.rotation.y)) < 0.01 \
+			and absf(_camera_pitch.rotation.x - DEFAULT_PITCH) < 0.01:
+		_recentering = false
+
+
+## "Camera follows behind while running": a lazy swing behind her once the
+## player stops steering the camera.
+func _follow_behind(delta: float) -> void:
+	if not GameSettings.camera_follow or not _running or _since_look < follow_delay \
+			or StoryControl.focus != null:
+		return
+	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, follow_speed * delta)
+
+
+func _remember_safe_spot(delta: float) -> void:
+	_safe_timer -= delta
+	if _safe_timer > 0.0 or not is_on_floor() or get_floor_normal().y < 0.8:
+		return
+	_safe_timer = 1.0
+	if _safe_spots.is_empty() or _safe_spots.back().distance_to(global_position) > 1.5:
+		_safe_spots.append(global_position)
+		if _safe_spots.size() > 12:
+			_safe_spots.pop_front()
 
 
 func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
@@ -426,7 +515,7 @@ func _build_camera() -> void:
 	_camera_rig.top_level = true
 	add_child(_camera_rig)
 	_camera_pitch = Node3D.new()
-	_camera_pitch.rotation.x = deg_to_rad(-12.0)
+	_camera_pitch.rotation.x = DEFAULT_PITCH
 	_camera_rig.add_child(_camera_pitch)
 	_spring_arm = SpringArm3D.new()
 	_spring_arm.spring_length = 3.6
