@@ -22,23 +22,15 @@ var found: Dictionary = {}
 ## entry ids not yet looked at in the book
 var fresh: Dictionary = {}
 
-var _inventory: Inventory
-var _journal: ProofJournal
-var _sketchbook: Sketchbook
-var _gallery: Gallery
-var _wardrobe: Wardrobe
 static var _truth_ids: Array[StringName] = []
 
 
 ## Connects to the state objects and quietly records what they already hold
-## (starting clothes, a loaded save), so only later finds show as new.
+## (starting clothes, a loaded save), so only later finds show as new. The book
+## keeps no references to them: their signals already hold the book, so that
+## would be a cycle that never frees. It reads them through Gameplay instead.
 func watch(inventory: Inventory, journal: ProofJournal, sketchbook: Sketchbook,
 		gallery: Gallery, wardrobe: Wardrobe) -> void:
-	_inventory = inventory
-	_journal = journal
-	_sketchbook = sketchbook
-	_gallery = gallery
-	_wardrobe = wardrobe
 	inventory.item_added.connect(func(id: StringName, _n: int, _c: StringName) -> void: mark(id))
 	journal.discovered.connect(func(entry: Dictionary) -> void: _on_recipe(String(entry.get("name", ""))))
 	sketchbook.sketch_added.connect(func(id: StringName, _t: String) -> void: mark(id, &"sketches"))
@@ -51,23 +43,23 @@ func watch(inventory: Inventory, journal: ProofJournal, sketchbook: Sketchbook,
 ## Records anything the watched state holds that the book has not, without
 ## "new" badges.
 func sync() -> void:
-	if _inventory:
+	if Gameplay.inventory:
 		for container: StringName in [&"satchel", &"forage_pouch", &"keepsakes"]:
-			for id: StringName in _inventory.contents(container):
+			for id: StringName in Gameplay.inventory.contents(container):
 				mark(id, &"", false)
-	if _journal:
-		for key: String in _journal.entries:
-			_on_recipe(String(_journal.entries[key].get("name", "")), false)
-		for t in _journal.truths:
+	if Gameplay.journal:
+		for key: String in Gameplay.journal.entries:
+			_on_recipe(String(Gameplay.journal.entries[key].get("name", "")), false)
+		for t in Gameplay.journal.truths:
 			mark(t, &"truths", false)
-	if _sketchbook:
-		for id: StringName in _sketchbook.sketches:
+	if Gameplay.sketchbook:
+		for id: StringName in Gameplay.sketchbook.sketches:
 			mark(id, &"sketches", false)
-	if _gallery:
-		for r in _gallery.paintings:
+	if Gameplay.gallery:
+		for r in Gameplay.gallery.paintings:
 			mark(StringName(r.get("id", "")), &"paintings", false)
-	if _wardrobe:
-		for id in _wardrobe.owned_pieces():
+	if Gameplay.wardrobe:
+		for id in Gameplay.wardrobe.owned_pieces():
 			mark(id, &"wardrobe", false)
 
 
@@ -140,12 +132,12 @@ func entries(tab: StringName) -> Array[Dictionary]:
 			for id in truth_ids():
 				out.append(_entry(id, String(id).capitalize(), Color(0.82, 0.76, 1.0), ""))
 		&"sketches":
-			if _sketchbook:
-				for id in _sketchbook.order:
-					out.append(_entry(id, String(_sketchbook.sketches[id].get("title", id)), Color(0.95, 0.93, 0.88), ""))
+			if Gameplay.sketchbook:
+				for id in Gameplay.sketchbook.order:
+					out.append(_entry(id, String(Gameplay.sketchbook.sketches[id].get("title", id)), Color(0.95, 0.93, 0.88), ""))
 		&"paintings":
-			if _gallery:
-				for r in _gallery.paintings:
+			if Gameplay.gallery:
+				for r in Gameplay.gallery.paintings:
 					out.append(_entry(StringName(r.id), String(r.title), Color(1.0, 0.9, 0.7), "", String(r.path)))
 		&"wardrobe":
 			for p in WardrobeCatalog.all_pieces():
