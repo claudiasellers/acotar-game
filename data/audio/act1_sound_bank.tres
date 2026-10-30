@@ -1,0 +1,595 @@
+[gd_resource type="Resource" script_class="SoundBank" load_steps=114 format=3]
+
+[ext_resource type="Script" path="res://systems/audio/sound_bank.gd" id="1"]
+[ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="2"]
+[ext_resource type="AudioStream" path="res://audio/amb/cottage_hearth.ogg" id="a0"]
+[ext_resource type="AudioStream" path="res://audio/amb/cottage_yard.ogg" id="a1"]
+[ext_resource type="AudioStream" path="res://audio/amb/dread.ogg" id="a2"]
+[ext_resource type="AudioStream" path="res://audio/amb/spring_arrival.ogg" id="a3"]
+[ext_resource type="AudioStream" path="res://audio/amb/village.ogg" id="a4"]
+[ext_resource type="AudioStream" path="res://audio/amb/wall_seam.ogg" id="a5"]
+[ext_resource type="AudioStream" path="res://audio/amb/winter_wood.ogg" id="a6"]
+[ext_resource type="AudioStream" path="res://audio/music/cottage.ogg" id="a7"]
+[ext_resource type="AudioStream" path="res://audio/music/spring_estate.ogg" id="a8"]
+[ext_resource type="AudioStream" path="res://audio/music/village.ogg" id="a9"]
+[ext_resource type="AudioStream" path="res://audio/music/winter_forest.ogg" id="a10"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/bellow_murderers.ogg" id="a11"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/bellow_who.ogg" id="a12"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/claws.ogg" id="a13"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/cottage_rattle.ogg" id="a14"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/door_smash.ogg" id="a15"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/footfall_1.ogg" id="a16"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/footfall_2.ogg" id="a17"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/footfall_3.ogg" id="a18"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/heartbeat.ogg" id="a19"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/huff.ogg" id="a20"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/roar.ogg" id="a21"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/snap_arrow.ogg" id="a22"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/snarl_loop.ogg" id="a23"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/break.ogg" id="a24"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/draw.ogg" id="a25"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_flesh.ogg" id="a26"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_snow.ogg" id="a27"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_wood.ogg" id="a28"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release.ogg" id="a29"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/whoosh.ogg" id="a30"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_1.ogg" id="a31"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_2.ogg" id="a32"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_3.ogg" id="a33"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_4.ogg" id="a34"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/jump.ogg" id="a35"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/land_snow.ogg" id="a36"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_1.ogg" id="a37"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_2.ogg" id="a38"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_3.ogg" id="a39"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_4.ogg" id="a40"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_5.ogg" id="a41"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_1.ogg" id="a42"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_2.ogg" id="a43"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_3.ogg" id="a44"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_4.ogg" id="a45"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_1.ogg" id="a46"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_2.ogg" id="a47"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_3.ogg" id="a48"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_4.ogg" id="a49"]
+[ext_resource type="AudioStream" path="res://audio/sfx/horror/wrong.ogg" id="a50"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/bark_pain.ogg" id="a51"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/death.ogg" id="a52"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/growl_low.ogg" id="a53"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/pack_growl.ogg" id="a54"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/seize.ogg" id="a55"]
+[ext_resource type="AudioStream" path="res://audio/ui/celebrate.ogg" id="a56"]
+[ext_resource type="AudioStream" path="res://audio/ui/click.ogg" id="a57"]
+[ext_resource type="AudioStream" path="res://audio/ui/close.ogg" id="a58"]
+[ext_resource type="AudioStream" path="res://audio/ui/deny.ogg" id="a59"]
+[ext_resource type="AudioStream" path="res://audio/ui/hover.ogg" id="a60"]
+[ext_resource type="AudioStream" path="res://audio/ui/open.ogg" id="a61"]
+[ext_resource type="AudioStream" path="res://audio/ui/satchel_pickup.ogg" id="a62"]
+
+[sub_resource type="Resource" id="c0"]
+script = ExtResource("2")
+id = &"amb_cottage_hearth"
+streams = Array[AudioStream]([ExtResource("a0")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c1"]
+script = ExtResource("2")
+id = &"amb_cottage_yard"
+streams = Array[AudioStream]([ExtResource("a1")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c2"]
+script = ExtResource("2")
+id = &"amb_dread"
+streams = Array[AudioStream]([ExtResource("a2")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c3"]
+script = ExtResource("2")
+id = &"amb_spring_arrival"
+streams = Array[AudioStream]([ExtResource("a3")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c4"]
+script = ExtResource("2")
+id = &"amb_village"
+streams = Array[AudioStream]([ExtResource("a4")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c5"]
+script = ExtResource("2")
+id = &"amb_wall_seam"
+streams = Array[AudioStream]([ExtResource("a5")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c6"]
+script = ExtResource("2")
+id = &"amb_winter_wood"
+streams = Array[AudioStream]([ExtResource("a6")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c7"]
+script = ExtResource("2")
+id = &"beast_bellow_murderers"
+streams = Array[AudioStream]([ExtResource("a11")])
+volume_db = 2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 150.0
+
+[sub_resource type="Resource" id="c8"]
+script = ExtResource("2")
+id = &"beast_bellow_who"
+streams = Array[AudioStream]([ExtResource("a12")])
+volume_db = 2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 150.0
+
+[sub_resource type="Resource" id="c9"]
+script = ExtResource("2")
+id = &"beast_claws"
+streams = Array[AudioStream]([ExtResource("a13")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c10"]
+script = ExtResource("2")
+id = &"beast_cottage_rattle"
+streams = Array[AudioStream]([ExtResource("a14")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c11"]
+script = ExtResource("2")
+id = &"beast_door_smash"
+streams = Array[AudioStream]([ExtResource("a15")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 120.0
+
+[sub_resource type="Resource" id="c12"]
+script = ExtResource("2")
+id = &"beast_footfall"
+streams = Array[AudioStream]([ExtResource("a16"), ExtResource("a17"), ExtResource("a18")])
+volume_db = -2.0
+pitch_jitter = 0.05
+loop = false
+music = false
+max_distance = 100.0
+
+[sub_resource type="Resource" id="c13"]
+script = ExtResource("2")
+id = &"beast_heartbeat"
+streams = Array[AudioStream]([ExtResource("a19")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c14"]
+script = ExtResource("2")
+id = &"beast_huff"
+streams = Array[AudioStream]([ExtResource("a20")])
+volume_db = -4.0
+pitch_jitter = 0.05
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c15"]
+script = ExtResource("2")
+id = &"beast_roar"
+streams = Array[AudioStream]([ExtResource("a21")])
+volume_db = 2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 150.0
+
+[sub_resource type="Resource" id="c16"]
+script = ExtResource("2")
+id = &"beast_snap_arrow"
+streams = Array[AudioStream]([ExtResource("a22")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c17"]
+script = ExtResource("2")
+id = &"beast_snarl"
+streams = Array[AudioStream]([ExtResource("a23")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c18"]
+script = ExtResource("2")
+id = &"bow_break"
+streams = Array[AudioStream]([ExtResource("a24")])
+volume_db = -4.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 50.0
+
+[sub_resource type="Resource" id="c19"]
+script = ExtResource("2")
+id = &"bow_draw"
+streams = Array[AudioStream]([ExtResource("a25")])
+volume_db = -6.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c20"]
+script = ExtResource("2")
+id = &"bow_hit_flesh"
+streams = Array[AudioStream]([ExtResource("a26")])
+volume_db = -2.0
+pitch_jitter = 0.06
+loop = false
+music = false
+max_distance = 80.0
+
+[sub_resource type="Resource" id="c21"]
+script = ExtResource("2")
+id = &"bow_hit_snow"
+streams = Array[AudioStream]([ExtResource("a27")])
+volume_db = -4.0
+pitch_jitter = 0.10
+loop = false
+music = false
+max_distance = 50.0
+
+[sub_resource type="Resource" id="c22"]
+script = ExtResource("2")
+id = &"bow_hit_wood"
+streams = Array[AudioStream]([ExtResource("a28")])
+volume_db = -2.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 80.0
+
+[sub_resource type="Resource" id="c23"]
+script = ExtResource("2")
+id = &"bow_release"
+streams = Array[AudioStream]([ExtResource("a29")])
+volume_db = -2.0
+pitch_jitter = 0.04
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c24"]
+script = ExtResource("2")
+id = &"bow_whoosh"
+streams = Array[AudioStream]([ExtResource("a30")])
+volume_db = -6.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c25"]
+script = ExtResource("2")
+id = &"foot_grass"
+streams = Array[AudioStream]([ExtResource("a31"), ExtResource("a32"), ExtResource("a33"), ExtResource("a34")])
+volume_db = -8.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c26"]
+script = ExtResource("2")
+id = &"foot_jump"
+streams = Array[AudioStream]([ExtResource("a35")])
+volume_db = -10.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c27"]
+script = ExtResource("2")
+id = &"foot_land_snow"
+streams = Array[AudioStream]([ExtResource("a36")])
+volume_db = -4.0
+pitch_jitter = 0.05
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c28"]
+script = ExtResource("2")
+id = &"foot_snow"
+streams = Array[AudioStream]([ExtResource("a37"), ExtResource("a38"), ExtResource("a39"), ExtResource("a40"), ExtResource("a41")])
+volume_db = -8.0
+pitch_jitter = 0.08
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c29"]
+script = ExtResource("2")
+id = &"foot_stone"
+streams = Array[AudioStream]([ExtResource("a42"), ExtResource("a43"), ExtResource("a44"), ExtResource("a45")])
+volume_db = -8.0
+pitch_jitter = 0.06
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c30"]
+script = ExtResource("2")
+id = &"foot_wood"
+streams = Array[AudioStream]([ExtResource("a46"), ExtResource("a47"), ExtResource("a48"), ExtResource("a49")])
+volume_db = -8.0
+pitch_jitter = 0.06
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c31"]
+script = ExtResource("2")
+id = &"horror_wrong"
+streams = Array[AudioStream]([ExtResource("a50")])
+volume_db = -6.0
+pitch_jitter = 0.05
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c32"]
+script = ExtResource("2")
+id = &"music_cottage"
+streams = Array[AudioStream]([ExtResource("a7")])
+volume_db = -6.0
+pitch_jitter = 0.00
+loop = true
+music = true
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c33"]
+script = ExtResource("2")
+id = &"music_spring_estate"
+streams = Array[AudioStream]([ExtResource("a8")])
+volume_db = -6.0
+pitch_jitter = 0.00
+loop = true
+music = true
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c34"]
+script = ExtResource("2")
+id = &"music_village"
+streams = Array[AudioStream]([ExtResource("a9")])
+volume_db = -6.0
+pitch_jitter = 0.00
+loop = true
+music = true
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c35"]
+script = ExtResource("2")
+id = &"music_winter_forest"
+streams = Array[AudioStream]([ExtResource("a10")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = true
+music = true
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c36"]
+script = ExtResource("2")
+id = &"ui_celebrate"
+streams = Array[AudioStream]([ExtResource("a56")])
+volume_db = -3.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c37"]
+script = ExtResource("2")
+id = &"ui_click"
+streams = Array[AudioStream]([ExtResource("a57")])
+volume_db = -4.0
+pitch_jitter = 0.02
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c38"]
+script = ExtResource("2")
+id = &"ui_close"
+streams = Array[AudioStream]([ExtResource("a58")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c39"]
+script = ExtResource("2")
+id = &"ui_deny"
+streams = Array[AudioStream]([ExtResource("a59")])
+volume_db = -6.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c40"]
+script = ExtResource("2")
+id = &"ui_hover"
+streams = Array[AudioStream]([ExtResource("a60")])
+volume_db = -6.0
+pitch_jitter = 0.03
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c41"]
+script = ExtResource("2")
+id = &"ui_open"
+streams = Array[AudioStream]([ExtResource("a61")])
+volume_db = -4.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c42"]
+script = ExtResource("2")
+id = &"ui_pickup"
+streams = Array[AudioStream]([ExtResource("a62")])
+volume_db = -4.0
+pitch_jitter = 0.03
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c43"]
+script = ExtResource("2")
+id = &"wolf_bark_pain"
+streams = Array[AudioStream]([ExtResource("a51")])
+volume_db = 0.0
+pitch_jitter = 0.04
+loop = false
+music = false
+max_distance = 120.0
+
+[sub_resource type="Resource" id="c44"]
+script = ExtResource("2")
+id = &"wolf_death"
+streams = Array[AudioStream]([ExtResource("a52")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c45"]
+script = ExtResource("2")
+id = &"wolf_growl_low"
+streams = Array[AudioStream]([ExtResource("a53")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 80.0
+
+[sub_resource type="Resource" id="c46"]
+script = ExtResource("2")
+id = &"wolf_pack_growl"
+streams = Array[AudioStream]([ExtResource("a54")])
+volume_db = -2.0
+pitch_jitter = 0.10
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c47"]
+script = ExtResource("2")
+id = &"wolf_seize"
+streams = Array[AudioStream]([ExtResource("a55")])
+volume_db = 0.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 120.0
+
+[resource]
+script = ExtResource("1")
+cues = Array[ExtResource("2")]([SubResource("c0"), SubResource("c1"), SubResource("c2"), SubResource("c3"), SubResource("c4"), SubResource("c5"), SubResource("c6"), SubResource("c7"), SubResource("c8"), SubResource("c9"), SubResource("c10"), SubResource("c11"), SubResource("c12"), SubResource("c13"), SubResource("c14"), SubResource("c15"), SubResource("c16"), SubResource("c17"), SubResource("c18"), SubResource("c19"), SubResource("c20"), SubResource("c21"), SubResource("c22"), SubResource("c23"), SubResource("c24"), SubResource("c25"), SubResource("c26"), SubResource("c27"), SubResource("c28"), SubResource("c29"), SubResource("c30"), SubResource("c31"), SubResource("c32"), SubResource("c33"), SubResource("c34"), SubResource("c35"), SubResource("c36"), SubResource("c37"), SubResource("c38"), SubResource("c39"), SubResource("c40"), SubResource("c41"), SubResource("c42"), SubResource("c43"), SubResource("c44"), SubResource("c45"), SubResource("c46"), SubResource("c47")])
+space_beds = {
+&"autumn_foothills": &"amb_spring_arrival",
+&"blighted_reaches": &"amb_spring_arrival",
+&"blossom_vale": &"amb_spring_arrival",
+&"border_woods": &"amb_spring_arrival",
+&"cottage": &"amb_cottage_yard",
+&"cottage_interior": &"amb_cottage_hearth",
+&"eastern_woods": &"amb_spring_arrival",
+&"fae_village": &"amb_spring_arrival",
+&"hill_of_the_rite": &"amb_spring_arrival",
+&"hunting_forest": &"amb_winter_wood",
+&"manor_estate": &"amb_spring_arrival",
+&"rosewild": &"amb_spring_arrival",
+&"solstice_meadow": &"amb_spring_arrival",
+&"starlight_glen": &"amb_spring_arrival",
+&"suriel_glade": &"amb_spring_arrival",
+&"village": &"amb_village",
+&"wall_seam": &"amb_wall_seam",
+&"western_fells": &"amb_spring_arrival",
+&"workshop": &"amb_winter_wood"
+}
+space_music = {
+&"cottage": &"music_cottage",
+&"cottage_interior": &"music_cottage",
+&"hunting_forest": &"music_winter_forest",
+&"village": &"music_village",
+&"workshop": &"music_winter_forest"
+}
+space_surfaces = {
+&"autumn_foothills": &"grass",
+&"blighted_reaches": &"grass",
+&"blossom_vale": &"grass",
+&"border_woods": &"grass",
+&"cottage_interior": &"wood",
+&"eastern_woods": &"grass",
+&"fae_village": &"grass",
+&"hill_of_the_rite": &"grass",
+&"manor_estate": &"grass",
+&"rosewild": &"grass",
+&"solstice_meadow": &"grass",
+&"starlight_glen": &"grass",
+&"suriel_glade": &"grass",
+&"western_fells": &"grass"
+}
