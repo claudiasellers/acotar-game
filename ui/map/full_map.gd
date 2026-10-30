@@ -12,6 +12,9 @@ const ZOOM_MAX := 4600.0
 const ZOOM_OPEN := 1500.0
 const PAN_SPEED := 0.9  # view widths per second
 const LANDMARK_NAMES_BELOW := 1700.0
+## Pixels: a click this close to the pin lifts it; a press that moves further is a drag.
+const PIN_HIT := 22.0
+const CLICK_SLOP := 6.0
 
 var hud: WorldMapHud
 var view_center: Vector2 = Vector2.ZERO
@@ -23,6 +26,10 @@ var _map: ColorRect
 var _overlay: Control
 var _stats: Label
 var _dragging: bool = false
+var _press_at: Vector2 = Vector2.ZERO
+var _dragged: float = 0.0
+## A pad was used last: show the reticle at the centre and pin there.
+var _pad: bool = false
 var _t: float = 0.0
 var _hover_id: String = ""
 
@@ -76,6 +83,26 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"camera_recenter"):
 		view_center = hud.player_xz
 		get_viewport().set_input_as_handled()
+	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
+		_pad = true
+		# Pad: A drops the pin under the reticle (or lifts it if it is there); X lifts it.
+		if event.is_action_pressed(&"jump"):
+			toggle_pin_at(view_center, _map.size * 0.5)
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed(&"interact"):
+			hud.clear_pin()
+			get_viewport().set_input_as_handled()
+	elif event is InputEventMouse:
+		_pad = false
+
+
+## A click or press on the map: on the pin lifts it, anywhere else drops it.
+func toggle_pin_at(world: Vector2, point: Vector2) -> void:
+	if hud.pin.active and to_map_point(hud.pin.xz).distance_to(point) < PIN_HIT:
+		hud.clear_pin()
+	else:
+		hud.set_pin(world)
+		Juice.bounce_control(_card, 0.015)
 
 
 func _process(delta: float) -> void:
@@ -122,6 +149,15 @@ func _on_map_input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
 		if mb.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT]:
 			_dragging = mb.pressed
+			if mb.pressed:
+				_press_at = mb.position
+				_dragged = 0.0
+			elif _dragged < CLICK_SLOP:
+				# A click, not a drag: left sets or lifts the pin, right lifts it.
+				if mb.button_index == MOUSE_BUTTON_LEFT:
+					toggle_pin_at(to_world(mb.position), mb.position)
+				elif mb.button_index == MOUSE_BUTTON_RIGHT:
+					hud.clear_pin()
 		elif mb.pressed and mb.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			# Zoom about the cursor.
 			var before := to_world(mb.position)
@@ -132,6 +168,7 @@ func _on_map_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion:
 		var mm := event as InputEventMouseMotion
 		if _dragging:
+			_dragged = maxf(_dragged, mm.position.distance_to(_press_at))
 			view_center -= mm.relative * (view_width / _map.size.x)
 			_clamp_view()
 		_hover_id = _landmark_near(mm.position)
@@ -208,7 +245,7 @@ func _build() -> void:
 	_overlay.gui_input.connect(_on_map_input)
 	frame.add_child(_overlay)
 
-	var foot := PauseStyle.note("Drag or move to look around  ·  Scroll or +/- to zoom  ·  R finds Feyre  ·  M closes")
+	var foot := PauseStyle.note("Drag to look around  ·  Scroll to zoom  ·  Click to set or lift your pin  ·  R finds Feyre  ·  M closes")
 	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	foot.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(foot)
@@ -239,8 +276,22 @@ func _draw_marks() -> void:
 			var at := p + Vector2(-w * 0.5, 30)
 			ci.draw_string_outline(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 6, Color(1.0, 0.97, 0.99, 0.95))
 			ci.draw_string(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, PauseStyle.PLUM_SOFT)
+	if hud.pin.active:
+		MapMarks.draw_pin(ci, to_map_point(hud.pin.xz), 13.0, _t)
 	MapMarks.draw_feyre(ci, to_map_point(hud.player_xz), hud.player_angle, 13.0, _t)
+	if _pad:
+		_draw_reticle(ci, _map.size * 0.5)
 	_draw_compass(ci, Vector2(_map.size.x - 64, 64))
+
+
+## The pad's cursor: a small gold ring with four petals.
+func _draw_reticle(ci: CanvasItem, at: Vector2) -> void:
+	var colours := MapMarks.pin_colours()
+	ci.draw_arc(at, 11.0, 0.0, TAU, 32, colours.line, 2.0, true)
+	for i in 4:
+		var d := Vector2(sin(TAU * i / 4.0), -cos(TAU * i / 4.0))
+		ci.draw_line(at + d * 14.0, at + d * 22.0, colours.line, 2.5, true)
+	ci.draw_circle(at, 2.5, colours.accent)
 
 
 func _draw_compass(ci: CanvasItem, at: Vector2) -> void:

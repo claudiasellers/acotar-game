@@ -23,6 +23,9 @@ const SKETCH_RADIUS := 28.0
 const WORLD_MASK := 1
 
 var reveal: MapReveal = MapReveal.new()
+## The one pin the player set on the full map (never the game's).
+var pin: MapPin = MapPin.new()
+var beacon: PinBeacon
 var places: MapPlaceSet
 ## id -> {label, kind, x, z}
 var seen_landmarks: Dictionary = {}
@@ -60,6 +63,8 @@ func _ready() -> void:
 	add_child(minimap)
 	full_map = FullMap.new(self)
 	add_child(full_map)
+	beacon = PinBeacon.new()
+	add_child(beacon)
 	_bind_textures()
 	minimap.visible = MapSettings.minimap_shown()
 	SaveSystem.register_provider(SAVE_KEY, self)
@@ -107,6 +112,8 @@ func _process(delta: float) -> void:
 		return
 	player_xz = Vector2(feyre.global_position.x, feyre.global_position.z)
 	player_angle = _facing(feyre)
+	MapMarks.pin_in_spring = WorldMap.is_in_prythian(feyre.global_position)
+	_update_pin()
 
 	_reveal_timer -= delta
 	if _reveal_timer <= 0.0:
@@ -124,6 +131,39 @@ func _process(delta: float) -> void:
 		_look_timer = LOOK_EVERY
 		_look_for_landmarks(feyre)
 	_upload_fog()
+
+
+# --- The player's pin -------------------------------------------------------------
+
+## Drops the pin at a world XZ point (the full map calls this).
+func set_pin(at: Vector2) -> void:
+	pin.place(at)
+	_sync_beacon()
+
+
+func clear_pin() -> void:
+	pin.clear()
+	_sync_beacon()
+
+
+func _update_pin() -> void:
+	if not pin.active:
+		return
+	if pin.check_arrival(player_xz):
+		minimap.sparkle()
+		beacon.burst()
+		return
+	beacon.set_distance(player_xz.distance_to(pin.xz))
+
+
+func _sync_beacon() -> void:
+	if not pin.active:
+		beacon.hide_beacon()
+		return
+	var colours := MapMarks.pin_colours()
+	beacon.set_colours(colours.accent, colours.glow)
+	beacon.show_at(Vector3(pin.xz.x, WorldHeight.height_at(pin.xz.x, pin.xz.y), pin.xz.y))
+	beacon.set_distance(player_xz.distance_to(pin.xz))
 
 
 func _facing(feyre: Node3D) -> float:
@@ -307,7 +347,8 @@ func _bind_textures() -> void:
 # --- Save --------------------------------------------------------------------------
 
 func save_state() -> Dictionary:
-	return {"reveal": reveal.save_state(), "landmarks": seen_landmarks.duplicate(true), "places": found.keys()}
+	return {"reveal": reveal.save_state(), "landmarks": seen_landmarks.duplicate(true), "places": found.keys(),
+		"pin": pin.save_state()}
 
 
 func load_state(data: Dictionary) -> void:
@@ -318,5 +359,7 @@ func load_state(data: Dictionary) -> void:
 		found[String(id)] = true
 	for id: String in seen_landmarks.keys():
 		_candidates.erase(id)
+	pin.load_state(data.get("pin"))
+	_sync_beacon()
 	_last_reveal = Vector2.INF
 	_upload_fog()
