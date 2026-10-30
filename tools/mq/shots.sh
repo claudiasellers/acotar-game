@@ -174,11 +174,16 @@ note() { echo "note $*" >>"$RES/result.txt"; }
 # touched: macOS Godot puts user:// under $HOME/Library/Application Support,
 # Linux under $XDG_DATA_HOME. The scratch is wiped before each run except for
 # shader caches, which only make later renders faster.
+# A windowed render's worker threads run above ordinary apps and, with the Metal
+# compiler, otherwise starve everything else on the Mac (T026). The clamp is
+# inherited, so take_shots.sh's Godot gets it too.
 godot_env() {
+	local clamp=""
+	[ -x /usr/sbin/taskpolicy ] && clamp="/usr/sbin/taskpolicy -c utility"
 	find "$SCRATCH" -type f ! -path '*shader_cache*' ! -path '*/Library/Caches/*' -exec rm -f {} + 2>/dev/null
 	mkdir -p "$SCRATCH/home" "$SCRATCH/config" "$SCRATCH/data" "$SCRATCH/cache"
 	HOME="$SCRATCH/home" XDG_CONFIG_HOME="$SCRATCH/config" XDG_DATA_HOME="$SCRATCH/data" \
-		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" SHOTS_QUALITY="$QUALITY" "$@"
+		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" SHOTS_QUALITY="$QUALITY" $clamp "$@"
 }
 
 # Linux without a display (the cloud self-test) renders through xvfb-run.
