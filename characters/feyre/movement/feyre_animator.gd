@@ -151,8 +151,10 @@ func loco_blend(speed: float) -> Vector2:
 	return Vector2(gait_points[last], clampf(speed / float(native_speeds[last]), 0.5, MAX_SCALE))
 
 
+## Take-off is already happening this frame, so jump 1 goes straight to the
+## rising pose (the crouch clip would read as a delay).
 func _on_jumped(index: int) -> void:
-	_go([&"jump_start", &"jump_double", &"jump_flourish"][clampi(index, 1, 3) - 1])
+	_go([&"jump_rise", &"jump_double", &"jump_flourish"][clampi(index, 1, 3) - 1])
 
 
 func _on_landed(impact: float, index: int) -> void:

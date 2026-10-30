@@ -1,7 +1,7 @@
 # Feyre move set (characters/feyre/anim/feyre_moves.glb), 30 fps.
 # name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
 idle 0.000 2.533 1
-walk 1.131 0.933 1
+walk 1.113 0.933 1
 run 4.451 0.800 1
 sprint 5.710 0.667 1
 jump_start - 0.233 0

@@ -26,6 +26,8 @@ const WORLD_MASK := 1 << 0
 @export var aim_speed: float = 2.2
 @export var acceleration: float = 14.0
 @export var air_control: float = 0.35
+## How far an air jump (2nd, 3rd) swings her drift toward the stick (0..1).
+@export var air_jump_redirect: float = 0.65
 @export var turn_speed: float = 12.0
 @export var max_stamina: float = 100.0
 @export var sprint_drain: float = 22.0
@@ -150,8 +152,11 @@ func _physics_process(delta: float) -> void:
 		jump_motor.consume_buffer()
 		return
 	jump_motor.forgiving = _gentle_mode()
+	var jumps_before := jump_motor.jumps_used
 	velocity.y = jump_motor.step(delta, is_on_floor(), velocity.y, pressed,
-			Input.is_action_pressed(&"jump"), horizontal.length(), can_jump)
+			Input.is_action_pressed(&"jump"), can_jump)
+	if jump_motor.jumps_used > maxi(jumps_before, 1) and direction != Vector3.ZERO:
+		horizontal = horizontal.lerp(direction * maxf(horizontal.length(), speed), air_jump_redirect)
 
 	var rate := acceleration * speed
 	if not is_on_floor():

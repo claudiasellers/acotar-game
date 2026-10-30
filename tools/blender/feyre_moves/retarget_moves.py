@@ -48,6 +48,10 @@ speed_scale = game_speed / native_speed the planted foot does not skate; a smoot
 fore-aft hips surge absorbs most of the source's stance-speed wobble first (hips drop a
 little where a locked leg would overstretch), and where her fuller thighs would make the
 narrow-track run pass knee through knee the swing leg is abducted at the hip.
+Posture pass (POSTURE): the performers hunch, so each gait clip's mean trunk lean is
+rotated upright to a target (spread over Spine/Chest/UpperChest, frame-to-frame motion
+kept), the head is levelled, clavicles go back and down, arms are abducted a little so
+the swing stays at her sides, and the pelvis rolls toward the swing leg (hip sway).
 Jaw, eyes, braid and Root stay at rest.  30 fps, every frame keyed, quaternions; loops end
 on a copy of their first frame.
 """
@@ -94,6 +98,20 @@ CLIPS = (
     ("land_hero", "addon", "Land_Three_Point", 13.25, 30.25, 18, "once", "ground"),
 )
 LOCOMOTION = tuple(c[0] for c in CLIPS if c[7] == "gait")
+
+# Posture pass (degrees): the mocap performers hunch, Feyre is a lean, confident
+# huntress.  lean = target forward trunk lean (hips -> neck, from vertical; the clip's
+# mean lean is rotated to this, frame-to-frame motion kept), head = target head pitch
+# (0 = level, eyes ahead), shoulders back/down at the clavicles, arms abducted so the
+# swing stays at her sides, hip_sway = pelvis roll toward the swing leg (lock_feet
+# re-solves the legs afterwards).
+POSTURE = {
+    "idle": dict(lean=0.0, head=0.0, back=6.0, down=4.0, arms=3.0, hip_sway=0.0),
+    "walk": dict(lean=1.0, head=0.0, back=8.0, down=5.0, arms=5.0, hip_sway=3.0),
+    "run": dict(lean=5.0, head=-2.0, back=8.0, down=5.0, arms=7.0, hip_sway=3.0),
+    "sprint": dict(lean=9.0, head=-4.0, back=6.0, down=4.0, arms=6.0, hip_sway=1.5),
+}
+UPPER_SPINE = (("Spine", 0.4), ("Chest", 0.35), ("UpperChest", 0.25))
 
 
 def bone_map() -> dict:
@@ -256,9 +274,58 @@ def sample_source(src: Rig, act: bpy.types.Action, times: list[float]) -> list[d
 # --------------------------------------------------------------------------
 # Retarget
 # --------------------------------------------------------------------------
-def retarget(src: Rig, tgt: Rig, frames: list[dict], cyclic: bool, placement: str) -> list:
+def lean_deg(v: Vector) -> float:
+    """Forward lean of an up-pointing vector from vertical (forward is -Y), degrees."""
+    return math.degrees(math.atan2(-v.y, v.z))
+
+
+def subtree(tgt: Rig, root: str) -> set:
+    out = {root}
+    for n in tgt.names:             # names are sorted by depth: parents come first
+        if tgt.parent[n] in out:
+            out.add(n)
+    return out
+
+
+def posture_rotations(src: Rig, tgt: Rig, frames: list[dict], spec: dict) -> dict:
+    """Constant per-bone armature-space corrections (bone -> 3x3) applied to the subtree."""
+    trunk = sum(lean_deg(fr["neck_01"].translation - fr["pelvis"].translation) for fr in frames)
+    head = sum(lean_deg(fr["head"].to_3x3() @ src.rest3["head"].inverted() @ Vector((0, 0, 1)))
+               for fr in frames)
+    trunk, head = trunk / len(frames), head / len(frames)
+    back = trunk - spec["lean"]
+    # Head pitch after the trunk fix, brought to the target (eyes ahead, chin up).
+    nod = (head - back) - spec["head"]
+    rx = lambda deg: Matrix.Rotation(math.radians(-deg), 3, "X")  # noqa: E731  (+deg pitches back)
+    rot = {name: rx(back * w) for name, w in UPPER_SPINE}
+    rot["Neck"] = rx(nod * 0.5)
+    rot["Head"] = rx(nod * 0.5)
+    for side, s in (("Left", 1.0), ("Right", -1.0)):
+        rot[side + "Shoulder"] = (Matrix.Rotation(math.radians(spec["back"] * s), 3, "Z")
+                                  @ Matrix.Rotation(math.radians(spec["down"] * s), 3, "Y"))
+        rot[side + "UpperArm"] = Matrix.Rotation(math.radians(-spec["arms"] * s), 3, "Y")
+    print("  posture: trunk lean %.1f -> %.1f deg, head %.1f -> %.1f deg"
+          % (trunk, spec["lean"], head, spec["head"]))
+    return rot
+
+
+def hip_sway(src: Rig, fr: dict, deg: float) -> Matrix:
+    """Pelvis roll toward the swing leg: the side whose foot is higher drops."""
+    lift = fr["foot_r"].translation.z - fr["foot_l"].translation.z
+    roll = deg * math.tanh(lift / 0.06)
+    # +roll about -Y (forward) drops her right hip when the right foot is up.
+    return Matrix.Rotation(math.radians(roll), 3, Vector((0.0, -1.0, 0.0)))
+
+
+def retarget(src: Rig, tgt: Rig, frames: list[dict], cyclic: bool, placement: str,
+             posture: dict | None = None) -> list:
     """Source pose frames -> per-frame (target local quaternions, Hips location)."""
     inv = {t: s for s, t in bone_map().items()}
+    fixes = []
+    if posture:
+        # Each correction rotates its bone's whole subtree rigidly (children follow).
+        for bone, m in posture_rotations(src, tgt, frames, posture).items():
+            fixes.append((bone, subtree(tgt, bone), m))
     offs = [fr["pelvis"].translation - src.rest["pelvis"].translation for fr in frames]
     n = len(offs)
     t = np.arange(n, dtype=float)
@@ -271,6 +338,12 @@ def retarget(src: Rig, tgt: Rig, frames: list[dict], cyclic: bool, placement: st
     for f, fr in enumerate(frames):
         world = {tn: fr[inv[tn]].to_3x3().normalized() @ src.rest3[inv[tn]].inverted() @ tgt.rest3[tn]
                  for tn in tgt.names if tn in inv}
+        for _, bones, m in fixes:
+            for b in bones:
+                if b in world:
+                    world[b] = m @ world[b]
+        if posture and posture["hip_sway"] > 0.0:
+            world["Hips"] = hip_sway(src, fr, posture["hip_sway"]) @ world["Hips"]
         quats, posed = {}, {}
         for tn in tgt.names:
             p = tgt.parent[tn]
@@ -630,7 +703,8 @@ def build(source_dir: str, clips=CLIPS) -> tuple[Rig, list]:
     for name, key, sact, t0, t1, nout, playback, placement in clips:
         cyclic = playback != "once"
         frames = sample_source(srcs[key], acts[key][sact], sample_times(t0, t1, nout, playback))
-        baked = retarget(srcs[key], tgt, frames, cyclic, placement)
+        print(name)
+        baked = retarget(srcs[key], tgt, frames, cyclic, placement, POSTURE.get(name))
         if cyclic:
             baked[-1] = baked[0]
         clamps = 0

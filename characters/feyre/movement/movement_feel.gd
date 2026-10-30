@@ -1,7 +1,7 @@
 ## The juice on top of Feyre's movement: squash and stretch on take-off and
 ## landing, a lean into turns and acceleration, a camera FOV kick while she
-## sprints, and the triple jump's flourish: a front flip with a glitter trail
-## and a sparkle burst (R3).
+## sprints, a pirouette on the second jump and the third jump's flourish: a
+## front flip with a glitter trail and a sparkle burst (R3).
 ##
 ## Purely presentational: it reads her velocity and JumpMotor signals and
 ## never changes how she moves.
@@ -12,7 +12,7 @@ extends Node
 const SPRINT_FOV := 9.0
 ## Max lean (radians) into a turn, and forward lean at full acceleration.
 const MAX_ROLL := 0.20
-const MAX_PITCH := 0.10
+const MAX_PITCH := 0.05
 const LEAN_SMOOTH := 8.0
 ## Landing squash per m/s of impact speed, capped.
 const LAND_SQUASH_PER_SPEED := 0.018
@@ -20,6 +20,8 @@ const MAX_LAND_SQUASH := 0.22
 ## The triple jump's front flip: seconds for the full turn, pivoting at her middle.
 const FLIP_TIME := 0.62
 const FLIP_PIVOT := Vector3(0.0, 0.95, 0.0)
+## The second jump's pirouette: one full turn about her vertical axis.
+const SPIN_TIME := 0.45
 
 ## Squash/stretch scale of her body (tweened).
 var squash_scale := Vector3.ONE
@@ -39,6 +41,8 @@ var _worn: Array[MeshInstance3D] = []
 var _skeleton: Skeleton3D
 ## Progress of the triple-jump flip, 0..1; negative when not flipping.
 var _flip: float = -1.0
+## Progress of the second-jump spin, 0..1; negative when not spinning.
+var _spin: float = -1.0
 
 
 func _ready() -> void:
@@ -82,7 +86,15 @@ func _process(delta: float) -> void:
 		if _flip >= 1.0 or not _feyre.jump_motor.airborne:
 			_flip = -1.0
 			flip_angle = 0.0
-	var turn := Basis(Vector3.RIGHT, flip_angle)
+	var spin_angle := 0.0
+	if _spin >= 0.0:
+		_spin = minf(_spin + delta / SPIN_TIME, 1.0)
+		# Fast start, soft finish, so she ends facing her heading.
+		spin_angle = TAU * (1.0 - pow(1.0 - _spin, 3.0))
+		if _spin >= 1.0 or not _feyre.jump_motor.airborne:
+			_spin = -1.0
+			spin_angle = 0.0
+	var turn := Basis(Vector3.RIGHT, flip_angle) * Basis(Vector3.UP, spin_angle)
 	var basis := turn * Basis.from_euler(Vector3(_pitch, 0.0, _roll)) * Basis.from_scale(squash_scale)
 	var body_xform := Transform3D(basis, FLIP_PIVOT - turn * FLIP_PIVOT)
 	if not body_xform.is_equal_approx(_body.transform):
@@ -113,14 +125,17 @@ func _pin_worn() -> void:
 
 
 func _on_jumped(index: int) -> void:
-	# Quick crouch-and-spring: squash, then stretch upward, then settle.
+	# She is already airborne this frame: stretch upward at once, then settle.
 	var stretch := 0.08 + 0.04 * index
 	_play_squash([
-		[Vector3(1.08, 0.88, 1.08), 0.05],
-		[Vector3(1.0 - stretch * 0.5, 1.0 + stretch, 1.0 - stretch * 0.5), 0.10],
-		[Vector3.ONE, 0.25],
+		[Vector3(1.0 - stretch * 0.5, 1.0 + stretch, 1.0 - stretch * 0.5), 0.06],
+		[Vector3.ONE, 0.3],
 	])
+	if index == 2:
+		_spin = 0.0
 	if index == 3:
+		# A fast third press replaces the spin rather than stacking on it.
+		_spin = -1.0
 		_flip = 0.0
 		Juice.burst(_feyre.model, &"unlock", Vector3.ZERO, 1.25)
 		if _trail:
