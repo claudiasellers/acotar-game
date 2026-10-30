@@ -121,7 +121,6 @@ func _build_species(cell: Node3D, species: StringName, buffer: PackedFloat32Arra
 	mmi.visibility_range_end = float(FloraLibrary.info(species).get("range", 70.0))
 	mmi.visibility_range_end_margin = 6.0
 	mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
-	mmi.set_instance_shader_parameter(&"wind_amount", 0.8)
 	cell.add_child(mmi)
 
 

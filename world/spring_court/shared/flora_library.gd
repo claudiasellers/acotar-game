@@ -3,16 +3,20 @@
 ##
 ## Each species has a near mesh and (for trees and big shrubs) a cheaper far
 ## mesh. `SPECIES` holds the placement rules the scatter uses.
-## Placeholder-quality but varied; the art lane can swap any species for a
-## Blender model by replacing its builder with a loaded mesh.
+## Trees come from Blender models (tools/woods/blender/woods_trees.py ->
+## models/<species>.glb); every other species is still procedural. Dropping
+## a <species>.glb into models/ swaps that species with no code change.
 class_name FloraLibrary
 extends RefCounted
 
 const FOLIAGE_SHADER := preload("res://world/spring_court/shared/woods_foliage.gdshader")
+## Blender models that replace a procedural builder (tools/woods/blender/).
+const MODELS := "res://world/spring_court/shared/models/%s.glb"
 
 ## layer: tree | shrub | ground | detail | find
 ## scale: random uniform scale range; radius: trunk collision radius (m) at
 ## scale 1, 0 for none; range: visibility end distance in metres.
+## shadow: false for small trees and props that skip the shadow pass.
 ## canon: "C" for flora the book names (lore 05-foraging-chemistry, "Canon
 ## flora named in the book"), "X" for everything invented (R7).
 const SPECIES := {
@@ -24,11 +28,15 @@ const SPECIES := {
 	&"willow": {"layer": "tree", "scale": Vector2(0.85, 1.15), "radius": 0.45, "range": 650.0, "canon": "C"},
 	&"alder": {"layer": "tree", "scale": Vector2(0.8, 1.1), "radius": 0.3, "range": 600.0, "canon": "X"},
 	&"elm": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.45, "range": 750.0, "canon": "C"},
-	&"hawthorn": {"layer": "tree", "scale": Vector2(0.8, 1.2), "radius": 0.25, "range": 500.0, "canon": "X"},
+	&"hawthorn": {"layer": "tree", "scale": Vector2(0.8, 1.2), "radius": 0.25, "range": 500.0, "canon": "X", "shadow": false},
 	&"wild_cherry": {"layer": "tree", "scale": Vector2(0.8, 1.15), "radius": 0.3, "range": 650.0, "canon": "X"},
-	&"elder": {"layer": "tree", "scale": Vector2(0.8, 1.1), "radius": 0.2, "range": 450.0, "canon": "X"},
+	&"elder": {"layer": "tree", "scale": Vector2(0.8, 1.1), "radius": 0.2, "range": 450.0, "canon": "X", "shadow": false},
 	&"twisted_dead": {"layer": "tree", "scale": Vector2(0.8, 1.3), "radius": 0.4, "range": 650.0, "canon": "X"},
 	&"blighted_tree": {"layer": "tree", "scale": Vector2(0.8, 1.15), "radius": 0.4, "range": 650.0, "canon": "X"},
+	&"crab_apple": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.3, "range": 650.0, "canon": "C"},
+	&"lilac_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.2, "range": 500.0, "canon": "C", "shadow": false},
+	&"yew": {"layer": "tree", "scale": Vector2(0.8, 1.25), "radius": 0.55, "range": 700.0, "canon": "X"},
+	&"leaning_trunk": {"layer": "tree", "scale": Vector2(0.8, 1.3), "radius": 0.4, "range": 500.0, "canon": "X"},
 	# Shrubs and big ground features
 	&"fern": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"bracken": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X"},
@@ -44,6 +52,7 @@ const SPECIES := {
 	&"boulder": {"layer": "shrub", "scale": Vector2(0.6, 2.2), "radius": 0.9, "range": 500.0, "canon": "X"},
 	&"mossy_rock": {"layer": "shrub", "scale": Vector2(0.6, 1.6), "radius": 0.5, "range": 300.0, "canon": "X"},
 	&"standing_stone": {"layer": "shrub", "scale": Vector2(0.9, 1.3), "radius": 0.45, "range": 600.0, "canon": "X"},
+	&"stump": {"layer": "shrub", "scale": Vector2(0.8, 1.4), "radius": 0.55, "range": 250.0, "canon": "X", "shadow": false},
 	&"fallen_log": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 300.0, "canon": "X"},
 	&"root_arch": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 300.0, "canon": "X"},
 	&"moss_mound": {"layer": "shrub", "scale": Vector2(0.6, 1.6), "radius": 0.0, "range": 160.0, "canon": "X"},
@@ -106,22 +115,21 @@ const SPECIES := {
 	&"rusted_iron": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 40.0, "canon": "X"},
 }
 
-# Palette (sRGB). Engineering rule R3: candy-bright storybook pastels with
-# oversized blooms (rose pink, blush, lilac, periwinkle, mint, butter yellow,
-# pearl, gold accents). Horror biomes use the GREY/dark entries instead.
-const BARK := Color(0.52, 0.36, 0.30)
-const BARK_DARK := Color(0.40, 0.27, 0.24)
-const BARK_GREY := Color(0.70, 0.66, 0.66)
-const LEAF := Color(0.42, 0.78, 0.46)
-const LEAF_GOLD := Color(0.70, 0.88, 0.48)
-const LEAF_DEEP := Color(0.26, 0.58, 0.40)
-const MOSS := Color(0.48, 0.80, 0.52)
-const ROSE := Color(0.98, 0.42, 0.62)
-const CREAM := Color(1.0, 0.96, 0.94)
-const LILAC := Color(0.80, 0.66, 0.98)
-const BLUEBELL := Color(0.56, 0.62, 1.0)
-const GOLD := Color(1.0, 0.86, 0.40)
-const GREY_LEAF := Color(0.52, 0.53, 0.50)
+# Palette (sRGB): plans/experience-bar.md §2.2 (no lime anywhere in the
+# court). Horror biomes use the GREY/dark entries instead.
+const BARK := Color("8E6A6E")
+const BARK_DARK := Color(0.40, 0.30, 0.31)
+const BARK_GREY := Color(0.78, 0.74, 0.76)
+const LEAF := Color("7CC29A")
+const LEAF_GOLD := Color("B5E3C0")
+const LEAF_DEEP := Color("4F9A82")
+const MOSS := Color("8DBF7A")
+const ROSE := Color("F4A6C0")
+const CREAM := Color("FBF7F2")
+const LILAC := Color("C8A8E9")
+const BLUEBELL := Color("A7B5F2")
+const GOLD := Color("F2D27A")
+const GREY_LEAF := Color("5A4F5E")
 const FAELIGHT := Color(0.85, 0.95, 1.0)
 
 ## Material looks: plain (trunks, rocks), bloom (flowers, leaves: a little
@@ -130,7 +138,7 @@ const FAELIGHT := Color(0.85, 0.95, 1.0)
 const MAGIC_SPECIES := [&"faelight_dandelion", &"glowcap", &"starmoss"]
 const DREAD_SPECIES := [&"twisted_dead", &"blighted_tree", &"pale_fungus", &"withered_bush",
 		&"grey_grass", &"dead_leaves", &"bone_charm", &"rusted_iron", &"blighted_bloom"]
-const PLAIN_SPECIES := [&"boulder", &"mossy_rock", &"standing_stone", &"fallen_log", &"root_arch",
+const PLAIN_SPECIES := [&"boulder", &"mossy_rock", &"standing_stone", &"fallen_log", &"root_arch", &"stump", &"leaning_trunk",
 		&"pebbles", &"odd_stone", &"silt_patch", &"old_arrowhead", &"trout_pool", &"bark_strip"]
 
 static var _near: Dictionary = {}
@@ -158,17 +166,21 @@ static func material(look: StringName = &"bloom") -> ShaderMaterial:
 		m.shader = FOLIAGE_SHADER
 		match look:
 			&"plain":
+				m.set_shader_parameter(&"wind_amount", 0.0)
 				m.set_shader_parameter(&"translucency", 0.05)
 				m.set_shader_parameter(&"roughness_value", 0.9)
 				m.set_shader_parameter(&"rim_strength", 0.3)
 			&"tree":
+				m.set_shader_parameter(&"wind_amount", 0.35)
 				m.set_shader_parameter(&"sparkle", 0.0)
 			&"bloom":
+				m.set_shader_parameter(&"wind_amount", 0.6)
 				m.set_shader_parameter(&"sparkle", 0.3)
 			&"magic":
 				m.set_shader_parameter(&"sparkle", 0.8)
 				m.set_shader_parameter(&"glow_energy", 3.5)
 			&"dread":
+				m.set_shader_parameter(&"wind_amount", 0.25)
 				m.set_shader_parameter(&"rim_strength", 0.0)
 				m.set_shader_parameter(&"saturation", 0.55)
 				m.set_shader_parameter(&"shade_tint", Color(0.30, 0.32, 0.36))
@@ -207,7 +219,8 @@ static func has_mesh(species: StringName) -> bool:
 
 
 ## Surface arrays for a species at a detail level. Safe on worker threads:
-## region builders call this off the main thread so mesh() is cheap later.
+## region builders call this off the main thread so mesh() is cheap later
+## (species with a Blender model return [] there; they load on the main thread).
 static func arrays_for(species: StringName, detail: int) -> Array:
 	var key := "%s:%d" % [species, detail]
 	_arrays_lock.lock()
@@ -215,15 +228,41 @@ static func arrays_for(species: StringName, detail: int) -> Array:
 	_arrays_lock.unlock()
 	if cached != null:
 		return cached
-	var kit := MeshKit.new(hash(species))
-	var builder := "_b_" + String(species)
-	assert(_has_builder(builder), "No mesh builder for %s" % species)
-	Callable(FloraLibrary, builder).call(kit, detail)
-	var arrays := kit.commit_arrays()
+	var arrays := []
+	if has_model(species):
+		# Loading a scene off the main thread deadlocks when the main thread
+		# is waiting on that worker, so models load on the main thread only
+		# (mesh() does it); a worker call is just a no-op warm-up.
+		if OS.get_thread_caller_id() != OS.get_main_thread_id():
+			return []
+		arrays = _model_arrays(species, detail)
+	if arrays.is_empty():
+		var kit := MeshKit.new(hash(species))
+		var builder := "_b_" + String(species)
+		assert(_has_builder(builder), "No mesh builder for %s" % species)
+		Callable(FloraLibrary, builder).call(kit, detail)
+		arrays = kit.commit_arrays()
 	_arrays_lock.lock()
 	_arrays[key] = arrays
 	_arrays_lock.unlock()
 	return arrays
+
+
+## Surface arrays from the species' Blender model (tools/woods/blender/),
+## mesh "near" for detail 1 and "far" for 0; empty when there is no model.
+static func _model_arrays(species: StringName, detail: int) -> Array:
+	var path := MODELS % species
+	if not ResourceLoader.exists(path):
+		return []
+	var root := (load(path) as PackedScene).instantiate()
+	var mi := root.find_child("near" if detail > 0 else "far", true, false) as MeshInstance3D
+	var arrays: Array = mi.mesh.surface_get_arrays(0) if mi != null else []
+	root.free()
+	return arrays
+
+
+static func has_model(species: StringName) -> bool:
+	return ResourceLoader.exists(MODELS % species)
 
 
 static func _to_mesh(species: StringName, arrays: Array) -> ArrayMesh:
@@ -334,8 +373,8 @@ static func _b_oak(kit: MeshKit, detail: int) -> void:
 static func _b_beech(kit: MeshKit, detail: int) -> void:
 	var top := _bent_trunk(kit, 9.0, 0.45, 0.25, BARK_GREY, BARK_GREY.lightened(0.1), detail, 0.08)
 	for tip in _branches(kit, top - Vector3.UP * 2.0, 5, 3.5, 0.2, 0.7, BARK_GREY, detail):
-		_canopy(kit, tip + Vector3.UP * 0.5, Vector3(1.4, 1.0, 1.4), 3, 2.0, Color(0.55, 0.70, 0.22), LEAF, detail)
-	_canopy(kit, top + Vector3.UP * 1.5, Vector3(1.8, 1.4, 1.8), 4, 2.4, Color(0.58, 0.72, 0.25), LEAF, detail)
+		_canopy(kit, tip + Vector3.UP * 0.5, Vector3(1.4, 1.0, 1.4), 3, 2.0, Color(0.49, 0.76, 0.60), LEAF, detail)
+	_canopy(kit, top + Vector3.UP * 1.5, Vector3(1.8, 1.4, 1.8), 4, 2.4, Color(0.49, 0.76, 0.60), LEAF, detail)
 
 
 static func _b_silver_birch(kit: MeshKit, detail: int) -> void:
@@ -349,14 +388,14 @@ static func _b_silver_birch(kit: MeshKit, detail: int) -> void:
 		kit.tube(p, next, lerpf(0.22, 0.08, float(i) / rings), lerpf(0.22, 0.08, float(i + 1) / rings),
 				6 if detail > 0 else 4, band, white, 0.0, 0.1 * i / rings)
 		p = next
-	_canopy(kit, p - Vector3.UP * 2.0, Vector3(1.2, 2.0, 1.2), 6, 1.4, Color(0.66, 0.78, 0.30), Color(0.40, 0.58, 0.20), detail, 0.6)
+	_canopy(kit, p - Vector3.UP * 2.0, Vector3(1.2, 2.0, 1.2), 6, 1.4, Color(0.71, 0.89, 0.75), Color(0.31, 0.60, 0.51), detail, 0.6)
 
 
 static func _b_willow(kit: MeshKit, detail: int) -> void:
 	var top := _bent_trunk(kit, 4.0, 0.5, 0.35, BARK, BARK, detail, 0.3)
 	var tips := _branches(kit, top, 5, 3.5, 0.22, 0.55, BARK, detail)
 	for tip in tips:
-		_canopy(kit, tip, Vector3(1.0, 0.5, 1.0), 2, 1.9, Color(0.60, 0.72, 0.32), LEAF, detail, 0.5)
+		_canopy(kit, tip, Vector3(1.0, 0.5, 1.0), 2, 1.9, Color(0.49, 0.76, 0.60), LEAF, detail, 0.5)
 		if detail > 0:
 			for j in 7:  # hanging fronds
 				var start := tip + Vector3(kit.rng.randf_range(-1.6, 1.6), -0.3, kit.rng.randf_range(-1.6, 1.6))
@@ -364,7 +403,7 @@ static func _b_willow(kit: MeshKit, detail: int) -> void:
 				var yaw := kit.rng.randf() * TAU
 				var right := Vector3(cos(yaw), 0, sin(yaw)) * 0.25
 				kit.quad(start - right + Vector3.DOWN * length, start + right + Vector3.DOWN * length,
-						start + right, start - right, Color(0.55, 0.70, 0.30), Color(0.45, 0.62, 0.25), 1.0, 0.3)
+						start + right, start - right, Color(0.49, 0.76, 0.60), Color(0.55, 0.75, 0.48), 1.0, 0.3)
 
 
 static func _b_alder(kit: MeshKit, detail: int) -> void:
@@ -439,8 +478,8 @@ static func _b_fern(kit: MeshKit, _detail: int) -> void:
 		var mid := out * length * 0.5 + Vector3.UP * length * 0.55
 		var tip := out * length + Vector3.UP * length * 0.25
 		var side := out.cross(Vector3.UP) * 0.16
-		var c0 := Color(0.24, 0.44, 0.14)
-		var c1 := Color(0.46, 0.66, 0.22)
+		var c0 := Color(0.24, 0.44, 0.47)
+		var c1 := Color(0.55, 0.75, 0.48)
 		kit.quad(Vector3.ZERO - side * 0.2, Vector3.ZERO + side * 0.2, mid + side, mid - side, c0, c1, 0.0, 0.6)
 		kit.quad(mid - side, mid + side, tip + side * 0.1, tip - side * 0.1, c1, c1.lightened(0.1), 0.6, 1.0)
 
@@ -449,14 +488,14 @@ static func _b_bracken(kit: MeshKit, _detail: int) -> void:
 	for i in 5:
 		var base := Vector3(kit.rng.randf_range(-0.3, 0.3), 0, kit.rng.randf_range(-0.3, 0.3))
 		var h := kit.rng.randf_range(0.9, 1.3)
-		kit.blade(base, h, 0.02, Vector3(kit.rng.randf_range(-0.1, 0.1), 0, 0.1), Color(0.40, 0.42, 0.16), Color(0.50, 0.56, 0.20))
+		kit.blade(base, h, 0.02, Vector3(kit.rng.randf_range(-0.1, 0.1), 0, 0.1), Color(0.40, 0.42, 0.16), Color(0.31, 0.60, 0.51))
 		var top := base + Vector3.UP * h
 		for j in 3:
 			var a := kit.rng.randf() * TAU
 			var out := Vector3(cos(a), -0.2, sin(a)) * 0.5
 			var side := Vector3(-sin(a), 0, cos(a)) * 0.18
 			kit.quad(top - side * 0.3, top + side * 0.3, top + out + side, top + out - side,
-					Color(0.44, 0.56, 0.20), Color(0.58, 0.66, 0.26), 0.7, 1.0)
+					Color(0.31, 0.60, 0.51), Color(0.49, 0.76, 0.60), 0.7, 1.0)
 
 
 static func _b_rose_bush_red(kit: MeshKit, detail: int) -> void:
@@ -468,7 +507,7 @@ static func _b_rose_bush_white(kit: MeshKit, detail: int) -> void:
 
 
 static func _b_bramble(kit: MeshKit, detail: int) -> void:
-	_bush(kit, 0.8, Color(0.24, 0.38, 0.14), CREAM.lerp(ROSE, 0.15), 8, 0.04, detail)
+	_bush(kit, 0.8, Color(0.24, 0.44, 0.47), CREAM.lerp(ROSE, 0.15), 8, 0.04, detail)
 	for i in 12:  # blackberries
 		var a := kit.rng.randf() * TAU
 		var p := Vector3(cos(a) * 0.6, kit.rng.randf_range(0.3, 0.8), sin(a) * 0.6)
@@ -523,7 +562,7 @@ static func _b_reed_clump(kit: MeshKit, _detail: int) -> void:
 	for i in 22:
 		var base := Vector3(kit.rng.randf_range(-0.5, 0.5), 0, kit.rng.randf_range(-0.5, 0.5))
 		kit.blade(base, kit.rng.randf_range(1.4, 2.4), 0.035, Vector3(kit.rng.randf_range(-0.3, 0.3), 0, kit.rng.randf_range(-0.3, 0.3)),
-				Color(0.30, 0.40, 0.18), Color(0.70, 0.66, 0.40))
+				Color(0.24, 0.44, 0.47), Color(0.70, 0.66, 0.40))
 
 
 static func _b_cattail(kit: MeshKit, _detail: int) -> void:
@@ -596,14 +635,14 @@ static func _b_grass_tuft(kit: MeshKit, _detail: int) -> void:
 	for i in 9:
 		var base := Vector3(kit.rng.randf_range(-0.15, 0.15), 0, kit.rng.randf_range(-0.15, 0.15))
 		kit.blade(base, kit.rng.randf_range(0.25, 0.45), 0.05, Vector3(kit.rng.randf_range(-0.1, 0.1), 0, kit.rng.randf_range(-0.1, 0.1)),
-				Color(0.26, 0.44, 0.14), Color(0.56, 0.70, 0.28))
+				Color(0.24, 0.44, 0.47), Color(0.49, 0.76, 0.60))
 
 
 static func _b_tall_grass(kit: MeshKit, _detail: int) -> void:
 	for i in 10:
 		var base := Vector3(kit.rng.randf_range(-0.2, 0.2), 0, kit.rng.randf_range(-0.2, 0.2))
 		kit.blade(base, kit.rng.randf_range(0.6, 0.95), 0.04, Vector3(kit.rng.randf_range(-0.2, 0.2), 0, kit.rng.randf_range(-0.2, 0.2)),
-				Color(0.30, 0.46, 0.16), Color(0.74, 0.74, 0.40))
+				Color(0.24, 0.44, 0.47), Color(0.74, 0.74, 0.40))
 
 
 static func _b_bluebell(kit: MeshKit, _detail: int) -> void:
@@ -679,7 +718,7 @@ static func _b_wild_garlic(kit: MeshKit, _detail: int) -> void:
 static func _b_clover(kit: MeshKit, _detail: int) -> void:
 	for i in 10:
 		var p := Vector3(kit.rng.randf_range(-0.2, 0.2), kit.rng.randf_range(0.02, 0.06), kit.rng.randf_range(-0.2, 0.2))
-		kit.flower(p, 3, 0.03, Color(0.30, 0.52, 0.20), Color(0.25, 0.45, 0.18), Vector3.UP, 0.4)
+		kit.flower(p, 3, 0.03, Color(0.31, 0.60, 0.51), Color(0.24, 0.44, 0.47), Vector3.UP, 0.4)
 	kit.flower(Vector3(0, 0.1, 0), 12, 0.02, Color(0.95, 0.80, 0.90), Color(0.9, 0.6, 0.75), Vector3.UP, 0.6)
 
 
@@ -725,7 +764,7 @@ static func _b_toadstools(kit: MeshKit, _detail: int) -> void:
 static func _b_lily_pad(kit: MeshKit, _detail: int) -> void:
 	for i in 4:
 		var c := Vector3(kit.rng.randf_range(-0.4, 0.4), 0.02, kit.rng.randf_range(-0.4, 0.4))
-		kit.flower(c, 8, 0.18, Color(0.22, 0.45, 0.20), Color(0.18, 0.38, 0.16), Vector3.UP, 0.2)
+		kit.flower(c, 8, 0.18, Color(0.24, 0.44, 0.47), Color(0.24, 0.44, 0.47), Vector3.UP, 0.2)
 	kit.flower(Vector3(0, 0.06, 0), 8, 0.08, Color(0.98, 0.86, 0.92), GOLD, Vector3.UP, 0.2)
 
 
@@ -922,7 +961,7 @@ static func _b_hazelnuts(kit: MeshKit, _detail: int) -> void:
 
 
 static func _b_rose_hips(kit: MeshKit, detail: int) -> void:
-	_bush(kit, 0.7, Color(0.36, 0.40, 0.22), CREAM, 0, 0.0, detail)
+	_bush(kit, 0.7, Color(0.24, 0.44, 0.47), CREAM, 0, 0.0, detail)
 	for i in 14:
 		var a := kit.rng.randf() * TAU
 		var y := kit.rng.randf_range(0.25, 0.85)
@@ -935,7 +974,7 @@ static func _b_blighted_bloom(kit: MeshKit, _detail: int) -> void:
 
 static func _b_wood_sorrel(kit: MeshKit, _detail: int) -> void:
 	for i in 8:
-		kit.flower(Vector3(kit.rng.randf_range(-0.12, 0.12), 0.06, kit.rng.randf_range(-0.12, 0.12)), 3, 0.03, Color(0.45, 0.70, 0.30), LEAF, Vector3.UP, 0.4)
+		kit.flower(Vector3(kit.rng.randf_range(-0.12, 0.12), 0.06, kit.rng.randf_range(-0.12, 0.12)), 3, 0.03, Color(0.49, 0.76, 0.60), LEAF, Vector3.UP, 0.4)
 	_stem_flowers(kit, 3, 0.08, Vector2(0.06, 0.1), Color(0.98, 0.92, 0.95), Color(0.8, 0.6, 0.8), 5, 0.018)
 
 

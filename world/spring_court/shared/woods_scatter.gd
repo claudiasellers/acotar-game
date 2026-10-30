@@ -109,12 +109,13 @@ static func layer_without_mesh(def: WoodsRegionDef, kind: String, id: StringName
 			layer.id = StringName("tree_" + String(id))
 			layer.draw_distance = TREE_DRAW
 			layer.impostor_distance = TREE_IMPOSTOR
-			layer.cast_shadow = true
+			# Small trees skip the shadow pass (one draw call per chunk saved).
+			layer.cast_shadow = info.get("shadow", true)
 			layer.wind = 0.35
 		"shrub":
 			layer.id = StringName("shrub_" + String(id))
 			layer.draw_distance = float(info.get("range", 140.0))
-			layer.cast_shadow = FloraLibrary.look_of(visual) == &"plain"
+			layer.cast_shadow = FloraLibrary.look_of(visual) == &"plain" and info.get("shadow", true)
 			layer.wind = 0.0 if FloraLibrary.look_of(visual) == &"plain" else 0.6
 		"forage":
 			layer.id = StringName("forage_" + String(id))
