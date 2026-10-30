@@ -99,6 +99,32 @@ func test_ground_cover_cells_build_from_worker_buffers() -> void:
 	cover.free()
 
 
+func test_ground_cover_survives_unloading_mid_build() -> void:
+	var def: WoodsRegionDef = load("res://data/regions/spring_court/suriel_glade_biomes.tres")
+	var cover := DetailScatter.new()
+	cover.def = def
+	cover.bounds = SurielGladeTerrain.BOUNDS
+	add_child(cover)
+	var p := SurielGladeTerrain.SNARE_SITE
+	var key := Vector2i(floori(p.x / DetailScatter.CELL), floori(p.y / DetailScatter.CELL))
+	# A cell's worker result arrives and queues its per-species jobs...
+	cover._generate(key)
+	cover._collect()
+	assert_gt(cover._jobs.size(), 0, "jobs queued for the cell")
+	# ...then a teleport unloads the cell before the jobs run.
+	for k: Vector2i in cover._cells.keys():
+		cover._cells[k].free()
+	cover._cells.clear()
+	while not cover._jobs.is_empty():
+		cover._jobs.pop_front().call()
+	assert_eq(cover.get_child_count(), 0, "nothing built for the freed cell")
+	# And the whole region unloads while a worker is still generating.
+	var other := key + Vector2i(1, 0)
+	cover._pending[other] = WorkerThreadPool.add_task(cover._generate.bind(other))
+	cover.free()
+	assert_engine_error_count(0, "no errors from work outliving its cell or region")
+
+
 func _test_fast(ran: Array[String]) -> void:
 	ran.append("fast")
 
