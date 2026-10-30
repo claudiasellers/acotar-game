@@ -18,6 +18,7 @@ var current: GradePreset
 ## be read back outside the editor).
 static var snow_cover_now := 1.0
 static var magic_now := 0.0
+static var _dread_preset: GradePreset
 var _from: GradePreset
 var _to: GradePreset
 var _t := 1.0
@@ -25,13 +26,15 @@ var _seconds := 0.0
 ## While a story swap is in effect, region grades don't override it.
 var _story_hold := false
 var _region_grade: StringName = &""
-## Story mood overlay (EventBus.mood_requested): "dread" darkens, chills and
-## thickens the fog; "enchanted_sleep" fades to a soft dark blur (the ride
+## Story mood overlay (EventBus.mood_requested): "dread" drops the light about
+## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft dark blur (the ride
 ## north); "calm" eases whatever is on back to 0.
 var mood: StringName = &"dread"
 var mood_amount := 0.0
 var _mood_target := 0.0
 var _mood_rate := 1.0
+## 0 at midday, 1 with the sun on the horizon: blends in the golden-hour sky.
+var golden := 0.0
 
 
 func _ready() -> void:
@@ -98,14 +101,20 @@ func apply(base: GradePreset) -> void:
 	var env := environment.environment
 	var sky_mat := env.sky.sky_material as ProceduralSkyMaterial if env.sky != null else null
 	if sky_mat != null:
-		sky_mat.sky_top_color = p.sky_top
-		sky_mat.sky_horizon_color = p.sky_horizon
+		sky_mat.sky_top_color = p.sky_top.lerp(p.golden_sky_top, golden)
+		sky_mat.sky_horizon_color = p.sky_horizon.lerp(p.golden_sky_horizon, golden)
 		sky_mat.ground_horizon_color = p.ground_horizon
 		sky_mat.ground_bottom_color = p.ground_bottom
 	env.ambient_light_color = p.ambient_color
 	env.ambient_light_energy = p.ambient_energy
 	env.fog_light_color = p.fog_color
 	env.fog_density = p.fog_density
+	env.fog_sky_affect = p.fog_sky_affect
+	env.fog_height = p.fog_height
+	env.fog_height_density = p.fog_height_density
+	env.fog_aerial_perspective = p.fog_aerial_perspective
+	env.volumetric_fog_anisotropy = p.volumetric_anisotropy
+	env.glow_hdr_threshold = p.glow_hdr_threshold
 	env.volumetric_fog_density = p.volumetric_density
 	env.volumetric_fog_albedo = p.volumetric_albedo
 	env.tonemap_exposure = p.exposure
@@ -117,7 +126,8 @@ func apply(base: GradePreset) -> void:
 	env.glow_intensity = p.glow_intensity
 	env.glow_bloom = p.glow_bloom
 	if sun != null:
-		sun.light_color = p.sun_color
+		sun.light_color = p.sun_color.lerp(p.golden_sun_color, golden)
+		sun.light_volumetric_fog_energy = p.volumetric_light_energy
 
 
 ## `p` with a story mood applied at `dread` (0..1) strength.
@@ -126,25 +136,15 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 		return p
 	if kind == &"enchanted_sleep":
 		return _sleepy(p, dread)
-	var cold := GradePreset.new()
+	# §1.5: the pink world leaves. Blend toward the dread preset (horror
+	# palette, ~2 stops down, saturation 0.4, dense low fog, no magic, no
+	# lilac shadows); snow stays where it lies.
+	if _dread_preset == null:
+		_dread_preset = load_preset(&"dread")
+	var cold := GradePreset.mix(p, _dread_preset, clampf(dread, 0.0, 1.0))
 	cold.id = p.id
-	for f in GradePreset._FLOATS:
-		cold.set(f, p.get(f))
-	for c in GradePreset._COLORS:
-		cold.set(c, p.get(c))
 	cold.lut = p.lut
-	cold.saturation = p.saturation * (1.0 - 0.55 * dread)
-	cold.exposure = p.exposure * (1.0 - 0.3 * dread)
-	cold.contrast = p.contrast * (1.0 + 0.15 * dread)
-	cold.fog_density = p.fog_density * (1.0 + 2.5 * dread)
-	cold.volumetric_density = p.volumetric_density * (1.0 + 2.0 * dread)
-	cold.glow_intensity = p.glow_intensity * (1.0 - 0.6 * dread)
-	cold.magic = p.magic * (1.0 - dread)
-	var chill := Color(0.42, 0.48, 0.62)
-	cold.ambient_color = p.ambient_color.lerp(chill, 0.5 * dread)
-	cold.fog_color = p.fog_color.lerp(chill, 0.6 * dread)
-	cold.sun_color = p.sun_color.lerp(chill, 0.4 * dread)
-	cold.sun_energy = p.sun_energy * (1.0 - 0.5 * dread)
+	cold.snow_cover = p.snow_cover
 	return cold
 
 
@@ -198,7 +198,18 @@ func _update_sun() -> void:
 		return
 	sun.rotation = sun_rotation(Clock.time_of_day)
 	var elevation := sin((Clock.time_of_day - 0.25) * TAU)
-	sun.light_energy = current.sun_energy * clampf(elevation * 3.0, 0.04, 1.0)
+	var g := golden_amount(elevation)
+	if absf(g - golden) > 0.01:
+		golden = g
+		apply(current)
+	var energy := lerpf(current.sun_energy, current.golden_sun_energy, golden)
+	sun.light_energy = energy * clampf(elevation * 3.0, 0.04, 1.0)
+
+
+## Golden-hour weight for a sun elevation (sin of its angle): full at the
+## horizon, gone by about 25° up, and fading out again once the sun is down.
+static func golden_amount(elevation: float) -> float:
+	return (1.0 - smoothstep(0.08, 0.42, elevation)) * smoothstep(-0.2, 0.0, elevation)
 
 
 ## Sun rises in the east at 06:00, highest at noon (tilted south), sets west.

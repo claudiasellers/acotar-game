@@ -115,6 +115,9 @@ func _build_landmarks(root: Node3D, b: HuntingForestBuilder) -> void:
 	_lm(lm, root, "HuntersHide", A % "hunters_hide", HuntingForestBuilder.HIDE, hide_yaw)
 	_marker(lm, root, "WaitingOakSeat", HumanRealmLayout.WAITING_OAK + Vector2(1.6, -0.8), hide_yaw, 1.4)
 	_marker(lm, root, "DoeClearing", HumanRealmLayout.DOE_CLEARING)
+	# Act I: Feyre at the thicket edge; the doe stands 22 m along -Z, the wolf
+	# comes from ~33 m (story anchor, world.md).
+	_marker(lm, root, "act1_wolf_clearing", HumanRealmLayout.DOE_CLEARING + Vector2(0.0, 22.0), 0.0)
 
 	# The old noble hunting lodge, its deer stand.
 	_lm(lm, root, "HuntingLodgeRuin", A % "lodge_ruin", HumanRealmLayout.HUNTING_LODGE, 0.35, 1.0, -0.1)

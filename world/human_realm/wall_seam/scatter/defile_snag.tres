@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_icmy2"]
+
+[resource]
+script = ExtResource("1_icmy2")
+id = &"defile_snag"
+mesh_path = "res://world/human_realm/shared/assets/flora/tree_dead_snag.glb"
+tags = PackedStringArray("set_piece", "canon:X")
+instances = PackedFloat32Array(-103.95673, -3.1208105, 1446.9, 1.3422222, 1.3386376, -85.70402, -2.1581388, 1446.9, -1.5838281, 1.1147603, -103.37469, -3.6422994, 1436.7, 1.4678168, 1.2246901, -88.56893, -3.2177303, 1436.7, -1.723738, 1.2714484, -102.98921, -3.905216, 1426.5, 1.4511173, 1.187237, -91.805, -3.801324, 1426.5, -1.4546483, 1.3551941, -102.802414, -3.4741375, 1416.3, 1.2768607, 1.2487504, -93.54424, -3.3545423, 1416.3, -1.4926705, 1.2155677, -103.27135, -2.8035064, 1406.1, 1.5720652, 1.3360634, -95.22595, -2.7313173, 1406.1, -1.3362159, 1.1553835)
+draw_distance = 160.0

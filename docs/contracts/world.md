@@ -53,6 +53,28 @@ world lane thread ("Build the human realm and the wall").
 - **Per-region grade:** add a `RegionGrade` node (`grade`, `bounds`, `blend_seconds`) to your region; `GradeDirector` blends to it while Feyre is inside. To get a region its own look, add a preset `world/shared/grades/<id>.tres` (copy `spring.tres`, set `lut` and colours) in your handoff and call it out.
 - Before/after story changes use the story lane's `StateVisibility` node.
 
+### 3.1 Grades in detail (experience bar §2.1)
+- `GradePreset` also carries `fog_sky_affect` (keep ≈0.1–0.3: at 1.0 distance fog paints the sky flat), height fog (`fog_height` is absolute world metres and the terrain sits at roughly 0–40 m, so keep it low), `fog_aerial_perspective`, `volumetric_anisotropy`, `volumetric_light_energy` (sun god-rays), `glow_hdr_threshold`, and golden-hour sky and sun colours that `GradeDirector` blends in as the sun nears the horizon.
+- `mood_requested(&"dread", w)` blends toward `grades/dread.tres` by `w` (horror palette, about 2 stops down, saturation 0.4, dense low fog, no magic, no lilac). `&"calm"` eases it back out.
+
+### 3.2 Act I anchors and authored frames (human realm)
+Each is a `Marker3D` in group `story_anchor` (the village one uses meta `anchor_id`):
+
+| Anchor | Region | Notes |
+|---|---|---|
+| `opening_cottage_dawn` | cottage | Feyre's start by the door; -Z faces up the fresh deer trail |
+| `first_deed_treeline` | cottage | end of the deer trail at the forest edge (the first deed) |
+| `act1_cottage_interior` | cottage | room centre at floor level; meta `size` = Vector3(10.5, 3, 6) |
+| `act1_cottage_door` | cottage | in the doorway, -Z into the room |
+| `act1_food_tally_beam` | cottage | on the beam where the notches go |
+| `act1_wolf_clearing` | hunting_forest | thicket edge; the doe clearing is 22 m along -Z and open for ~24 m around it |
+| `act1_fur_stall` | village | in front of the pelt trader's stall |
+| `wall_gate_north` | wall_seam | the gap |
+
+Composed camera frames are `Marker3D`s in group `shot_frame` with meta `shot` and `fov`: `opening_dawn` (cottage, dawn) and `wall_crossing` (just past the gap, aimed at the Border Woods' great oak). `tools/world_shot.gd` uses them.
+
+The **wall crossing** set piece: the human side is a thorn defile that narrows from 7.5 m to 2.4 m half-width over the last 46 m before the gap, with walls climbing as it narrows (`WallSeamGen.defile_half_width`). The release frame past the gap is composed in the Border Woods.
+
 ## 4. Scatter (forage, decoration, collectibles)
 
 - Each region has a generator script (committed with its output, R15) that writes `ScatterLayer` resources (`world/shared/scatter/scatter_layer.gd`), usually into `world/<realm>/<region_id>/scatter/<layer_id>.tres`:

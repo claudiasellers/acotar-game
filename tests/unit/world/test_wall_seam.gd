@@ -95,3 +95,13 @@ func test_scene_nodes() -> void:
 	assert_true(gate.is_in_group(&"story_anchor"))
 	assert_almost_eq(Vector2(gate.position.x, gate.position.z).distance_to(Vector2(-100, 1402)), 0.0, 1.0)
 	assert_almost_eq((-gate.global_basis.z).z, -1.0, 0.01, "faces north (-Z)")
+
+
+func test_defile_compresses_toward_the_gap() -> void:
+	var gen := load("res://world/human_realm/wall_seam/wall_seam_gen.gd")
+	assert_gt(gen.defile_half_width(1446.0), 7.0)
+	assert_lt(gen.defile_half_width(1401.0), 2.6)
+	var root: Node = (load("res://world/human_realm/wall_seam/wall_seam.tscn") as PackedScene).instantiate()
+	assert_not_null(root.find_child("wall_crossing_frame", true, false))
+	assert_not_null(root.find_child("DefileWalls", true, false))
+	root.free()

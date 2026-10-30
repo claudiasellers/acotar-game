@@ -25,3 +25,5 @@ glow_intensity = 0.45
 glow_bloom = 0.18
 snow_cover = 0.0
 magic = 0.15
+fog_sky_affect = 0.15
+fog_aerial_perspective = 0.55

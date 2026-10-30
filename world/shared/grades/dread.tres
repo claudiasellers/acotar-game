@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"dread"
+sky_top = Color(0.231, 0.137, 0.251, 1)
+sky_horizon = Color(0.353, 0.31, 0.369, 1)
+ground_horizon = Color(0.122, 0.169, 0.133, 1)
+ground_bottom = Color(0.055, 0.086, 0.071, 1)
+sun_color = Color(0.604, 0.639, 0.416, 1)
+sun_energy = 0.35
+ambient_color = Color(0.231, 0.137, 0.251, 1)
+ambient_energy = 0.3
+fog_color = Color(0.122, 0.169, 0.133, 1)
+fog_density = 0.012
+fog_sky_affect = 0.7
+fog_height = 12.0
+fog_height_density = 0.08
+fog_aerial_perspective = 0.15
+volumetric_density = 0.04
+volumetric_albedo = Color(0.35, 0.33, 0.37, 1)
+volumetric_anisotropy = 0.2
+volumetric_light_energy = 0.4
+exposure = 0.22
+saturation = 0.4
+contrast = 1.2
+brightness = 0.9
+glow_intensity = 0.05
+glow_bloom = 0.0
+glow_hdr_threshold = 1.2
+golden_sky_top = Color(0.231, 0.137, 0.251, 1)
+golden_sky_horizon = Color(0.353, 0.31, 0.369, 1)
+golden_sun_color = Color(0.604, 0.639, 0.416, 1)
+golden_sun_energy = 0.3
+snow_cover = 0.0
+magic = 0.0

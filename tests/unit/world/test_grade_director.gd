@@ -66,3 +66,25 @@ func test_enchanted_sleep_fades_down() -> void:
 	director._process(2.5)
 	var base := GradeDirector.load_preset(&"human_winter")
 	assert_lt(GradeDirector.with_mood(base, director.mood_amount, director.mood).exposure, base.exposure * 0.2)
+
+
+func test_spring_sky_is_not_eaten_by_fog() -> void:
+	var spring := GradeDirector.load_preset(&"spring")
+	assert_lte(spring.fog_sky_affect, 0.15, "distance fog must leave the sky gradient alone")
+	assert_gt(spring.fog_height_density, 0.0, "mist pools low instead")
+	assert_gt(spring.fog_aerial_perspective, 0.4, "far layers fade toward the sky")
+
+
+func test_golden_hour_peaks_at_the_horizon() -> void:
+	assert_almost_eq(GradeDirector.golden_amount(0.0), 1.0, 0.001)
+	assert_almost_eq(GradeDirector.golden_amount(0.9), 0.0, 0.001)
+	assert_almost_eq(GradeDirector.golden_amount(-0.5), 0.0, 0.001, "no golden sky at night")
+
+
+func test_dread_drains_the_world() -> void:
+	var base := GradeDirector.load_preset(&"spring")
+	var dark := GradeDirector.with_mood(base, 1.0, &"dread")
+	assert_almost_eq(dark.saturation, 0.4, 0.01, "§1.5 saturation")
+	assert_lt(dark.exposure, base.exposure * 0.25, "two stops down or more")
+	assert_eq(dark.magic, 0.0, "sparkles off")
+	assert_gt(dark.fog_height_density, 0.06, "dense low fog")

@@ -13,6 +13,10 @@ const SHOTS := {
 	"wall_seam": [Vector3(-110, 0, 1470), Vector3(-100, 0, 1380), 0.62, &"human_winter"],
 	"hunting_forest": [Vector3(-380, 0, 1690), Vector3(-420, 0, 1722), 0.35, &"human_winter"],
 	"burnt_estate": [Vector3(-590, 0, 2290), Vector3(-640, 0, 2332), 0.7, &"human_winter"],
+	# These two use the regions' authored shot_frame markers once loaded.
+	"opening_dawn": [Vector3(-142, 0, 2186), Vector3(-160, 0, 2120), 0.27, &"human_winter"],
+	"wall_defile": [Vector3(-95, 0, 1446), Vector3(-100, 0, 1396), 0.62, &"human_winter"],
+	"wall_crossing": [Vector3(-100, 0, 1362), Vector3(-150, 0, 1080), 0.62, &"spring"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
 }
 
@@ -50,6 +54,12 @@ func _run() -> void:
 			var scene: PackedScene = load(def.scene_path)
 			if scene != null:
 				world.regions.add_child(scene.instantiate())
+	await get_tree().process_frame
+	# Authored frames (cottage OpeningCamera, wall_crossing_frame) win.
+	for m in get_tree().get_nodes_in_group(&"shot_frame"):
+		if m.get_meta(&"shot", "") == id:
+			cam.global_transform = (m as Node3D).global_transform
+			cam.fov = (m as Node3D).get_meta(&"fov", 50.0)
 	for i in 30:
 		await get_tree().process_frame
 	var img := root.get_texture().get_image()

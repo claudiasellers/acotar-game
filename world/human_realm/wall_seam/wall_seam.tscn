@@ -1,165 +1,509 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://world/shared/scatter/scatter_field.gd" id="1_wwd68"]
-[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_auk2s"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wall_drift.tres" id="3_pgs6p"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tree_snag.tres" id="4_f86vb"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snow_mound.tres" id="5_ssimk"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/grass_tuft.tres" id="6_l04mm"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bracken.tres" id="7_r65mo"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_a.tres" id="8_6wx4s"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_c.tres" id="9_2plvo"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rock_flat.tres" id="10_bges3"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/stump.tres" id="11_rhnv7"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_filings.tres" id="12_gny2n"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/flint.tres" id="13_lbhao"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/chalk.tres" id="14_6rsrn"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/ice_moss.tres" id="15_ppwcj"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/juniper.tres" id="16_n5oh0"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rose_briar.tres" id="17_oiusg"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackberry.tres" id="18_jq1uk"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/hawthorn.tres" id="19_77m0l"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackthorn.tres" id="20_aqdlr"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tinder_fungus.tres" id="21_ihlxv"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snail_shells.tres" id="22_qahpf"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/red_ochre.tres" id="23_42kdj"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wintergreen.tres" id="24_jqdh6"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/charcoal.tres" id="25_skfmu"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/shed_antler.tres" id="26_8hne5"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snowdrop.tres" id="27_3aqlb"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/old_mans_beard.tres" id="28_0gnq3"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/offering_bundle.tres" id="29_6hyy3"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/frozen_ribbon.tres" id="30_20dmh"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/pamphlet.tres" id="31_c0old"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bone_token.tres" id="32_6sc7m"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/lost_boot.tres" id="33_j6uws"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/candle_stub.tres" id="34_dpv1y"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/child_mitten.tres" id="35_4rvu8"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tin_charm.tres" id="36_c47sn"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/warning_cairn.tres" id="37_m868r"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/deer_bones.tres" id="38_dnoks"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_stake.tres" id="39_o6a0w"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tracks_end.tres" id="40_tje0y"]
-[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/salt_ring.tres" id="41_186wu"]
-[ext_resource type="Script" path="res://world/human_realm/hunting_forest/trunk_collision.gd" id="42_65743"]
-[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_shimmer.gd" id="43_hrtmq"]
-[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_sense_volume.gd" id="44_m27bh"]
-[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/leaning_stone.glb" id="45_yoh8t"]
-[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/great_cairn.glb" id="46_uwip4"]
-[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/offering_post.glb" id="47_xfvby"]
-[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/iron_post.glb" id="48_dkmeb"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_field.gd" id="1_ssimk"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_l04mm"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wall_drift.tres" id="3_r65mo"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tree_snag.tres" id="4_6wx4s"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snow_mound.tres" id="5_2plvo"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/grass_tuft.tres" id="6_bges3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bracken.tres" id="7_rhnv7"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_a.tres" id="8_gny2n"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_c.tres" id="9_lbhao"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rock_flat.tres" id="10_6rsrn"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/stump.tres" id="11_ppwcj"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_filings.tres" id="12_n5oh0"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/flint.tres" id="13_oiusg"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/chalk.tres" id="14_jq1uk"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/ice_moss.tres" id="15_77m0l"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/juniper.tres" id="16_aqdlr"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rose_briar.tres" id="17_ihlxv"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackberry.tres" id="18_qahpf"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/hawthorn.tres" id="19_42kdj"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackthorn.tres" id="20_jqdh6"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tinder_fungus.tres" id="21_skfmu"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snail_shells.tres" id="22_8hne5"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/red_ochre.tres" id="23_3aqlb"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wintergreen.tres" id="24_0gnq3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/charcoal.tres" id="25_6hyy3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/shed_antler.tres" id="26_20dmh"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snowdrop.tres" id="27_c0old"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/old_mans_beard.tres" id="28_6sc7m"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/offering_bundle.tres" id="29_j6uws"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/frozen_ribbon.tres" id="30_dpv1y"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/pamphlet.tres" id="31_4rvu8"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bone_token.tres" id="32_c47sn"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/lost_boot.tres" id="33_m868r"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/candle_stub.tres" id="34_dnoks"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/child_mitten.tres" id="35_o6a0w"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tin_charm.tres" id="36_tje0y"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/warning_cairn.tres" id="37_186wu"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/deer_bones.tres" id="38_65743"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_stake.tres" id="39_hrtmq"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tracks_end.tres" id="40_m27bh"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/salt_ring.tres" id="41_yoh8t"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/defile_blackthorn.tres" id="42_uwip4"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/defile_briar.tres" id="43_xfvby"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/defile_rock.tres" id="44_dkmeb"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/defile_snag.tres" id="45_0sq1h"]
+[ext_resource type="Script" path="res://world/human_realm/hunting_forest/trunk_collision.gd" id="46_n0ldj"]
+[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_shimmer.gd" id="47_ldvab"]
+[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_sense_volume.gd" id="48_10whp"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/leaning_stone.glb" id="49_7ylal"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/great_cairn.glb" id="50_o4nxd"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/offering_post.glb" id="51_xqb0y"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/iron_post.glb" id="52_neggn"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_0sq1h"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_2unmu"]
 size = Vector3(1660, 400, 60)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_n0ldj"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_xns11"]
 size = Vector3(1.3, 4.2, 0.8)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ldvab"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_dfg8l"]
 size = Vector3(1.3, 4.2, 0.8)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_10whp"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_iw6bc"]
 size = Vector3(2.4, 2.4, 2.4)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7ylal"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_kg0qd"]
 size = Vector3(0.3, 3.2, 0.3)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_o4nxd"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_kwb2h"]
 size = Vector3(0.4, 2.4, 0.4)
 
-[sub_resource type="Curve3D" id="Curve3D_xqb0y"]
+[sub_resource type="Curve3D" id="Curve3D_ocvle"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -80, 1.2244421, 1500, 0, 0, 0, 0, 0, 0, -90, -2.6280625, 1450, 0, 0, 0, 0, 0, 0, -97, -3.2661586, 1415, 0, 0, 0, 0, 0, 0, -100, -2.2060053, 1400, 0, 0, 0, 0, 0, 0, -100, 1.6144414, 1350, 0, 0, 0, 0, 0, 0, -100, 7.0646043, 1300),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -80, 1.2244421, 1500, 0, 0, 0, 0, 0, 0, -90, -2.6280625, 1450, 0, 0, 0, 0, 0, 0, -97, -3.2661586, 1415, 0, 0, 0, 0, 0, 0, -100, -2.2060053, 1400, 0, 0, 0, 0, 0, 0, -100, 2.096322, 1350, 0, 0, 0, 0, 0, 0, -100, 6.36667, 1300),
 "tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
 }
 point_count = 6
 
-[sub_resource type="FogMaterial" id="FogMaterial_neggn"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_2nhvx"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fj4uf"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fb18c"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_au1tb"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2xry2"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kuc8v"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_atxuk"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i62mh"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_58uck"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i5k6e"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_70751"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nqrq4"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xus5m"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wq36p"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sutx8"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q2a2j"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ipc3i"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_matpr"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bckfw"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_34f3b"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jtj8c"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_od5w0"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_13ekc"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_iaxka"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sulnu"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ykqo8"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8sjko"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bu6ww"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4t2gt"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ljw6k"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bwba1"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7roqg"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d7vc4"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rp7tn"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jo4l0"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uor8f"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q84mr"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_avd3c"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qc1i3"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xgp33"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_px1dm"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1wotu"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4b7y2"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fak7c"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m8ejx"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d7cyw"]
+size = Vector3(1.2, 6, 2.2)
+
+[sub_resource type="FogMaterial" id="FogMaterial_l8j7s"]
+density = 0.08
+albedo = Color(0.62, 0.66, 0.72, 1)
+
+[sub_resource type="FogMaterial" id="FogMaterial_63w00"]
 density = 0.04
 albedo = Color(0.85, 0.9, 0.97, 1)
 
-[node name="WallSeam" type="Node3D" unique_id=1074519988]
+[node name="WallSeam" type="Node3D" unique_id=850740858]
 
-[node name="ScatterField" type="Node3D" parent="." unique_id=477877800]
-script = ExtResource("1_wwd68")
+[node name="ScatterField" type="Node3D" parent="." unique_id=659609030]
+script = ExtResource("1_ssimk")
 region_id = &"wall_seam"
-layers = Array[ExtResource("2_auk2s")]([ExtResource("3_pgs6p"), ExtResource("4_f86vb"), ExtResource("5_ssimk"), ExtResource("6_l04mm"), ExtResource("7_r65mo"), ExtResource("8_6wx4s"), ExtResource("9_2plvo"), ExtResource("10_bges3"), ExtResource("11_rhnv7"), ExtResource("12_gny2n"), ExtResource("13_lbhao"), ExtResource("14_6rsrn"), ExtResource("15_ppwcj"), ExtResource("16_n5oh0"), ExtResource("17_oiusg"), ExtResource("18_jq1uk"), ExtResource("19_77m0l"), ExtResource("20_aqdlr"), ExtResource("21_ihlxv"), ExtResource("22_qahpf"), ExtResource("23_42kdj"), ExtResource("24_jqdh6"), ExtResource("25_skfmu"), ExtResource("26_8hne5"), ExtResource("27_3aqlb"), ExtResource("28_0gnq3"), ExtResource("29_6hyy3"), ExtResource("30_20dmh"), ExtResource("31_c0old"), ExtResource("32_6sc7m"), ExtResource("33_j6uws"), ExtResource("34_dpv1y"), ExtResource("35_4rvu8"), ExtResource("36_c47sn"), ExtResource("37_m868r"), ExtResource("38_dnoks"), ExtResource("39_o6a0w"), ExtResource("40_tje0y"), ExtResource("41_186wu")])
+layers = Array[ExtResource("2_l04mm")]([ExtResource("3_r65mo"), ExtResource("4_6wx4s"), ExtResource("5_2plvo"), ExtResource("6_bges3"), ExtResource("7_rhnv7"), ExtResource("8_gny2n"), ExtResource("9_lbhao"), ExtResource("10_6rsrn"), ExtResource("11_ppwcj"), ExtResource("12_n5oh0"), ExtResource("13_oiusg"), ExtResource("14_jq1uk"), ExtResource("15_77m0l"), ExtResource("16_aqdlr"), ExtResource("17_ihlxv"), ExtResource("18_qahpf"), ExtResource("19_42kdj"), ExtResource("20_jqdh6"), ExtResource("21_skfmu"), ExtResource("22_8hne5"), ExtResource("23_3aqlb"), ExtResource("24_0gnq3"), ExtResource("25_6hyy3"), ExtResource("26_20dmh"), ExtResource("27_c0old"), ExtResource("28_6sc7m"), ExtResource("29_j6uws"), ExtResource("30_dpv1y"), ExtResource("31_4rvu8"), ExtResource("32_c47sn"), ExtResource("33_m868r"), ExtResource("34_dnoks"), ExtResource("35_o6a0w"), ExtResource("36_tje0y"), ExtResource("37_186wu"), ExtResource("38_65743"), ExtResource("39_hrtmq"), ExtResource("40_m27bh"), ExtResource("41_yoh8t"), ExtResource("42_uwip4"), ExtResource("43_xfvby"), ExtResource("44_dkmeb"), ExtResource("45_0sq1h")])
 
-[node name="TrunkCollision" type="Node3D" parent="." unique_id=65273931]
-script = ExtResource("42_65743")
-layers = Array[ExtResource("2_auk2s")]([ExtResource("4_f86vb")])
+[node name="TrunkCollision" type="Node3D" parent="." unique_id=2116368892]
+script = ExtResource("46_n0ldj")
+layers = Array[ExtResource("2_l04mm")]([ExtResource("4_6wx4s")])
 radii = PackedFloat32Array(0.3)
 heights = PackedFloat32Array(4)
 
-[node name="WallShimmer" type="Node3D" parent="." unique_id=2099689510]
-script = ExtResource("43_hrtmq")
+[node name="WallShimmer" type="Node3D" parent="." unique_id=240898227]
+script = ExtResource("47_ldvab")
 
-[node name="WallSenseVolume" type="Area3D" parent="." unique_id=801501782 groups=["no_birds_zone"]]
-script = ExtResource("44_m27bh")
+[node name="WallSenseVolume" type="Area3D" parent="." unique_id=163131822 groups=["no_birds_zone"]]
+script = ExtResource("48_10whp")
 
-[node name="Shape" type="CollisionShape3D" parent="WallSenseVolume" unique_id=1941116600]
+[node name="Shape" type="CollisionShape3D" parent="WallSenseVolume" unique_id=2039277736]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, 1400)
-shape = SubResource("BoxShape3D_0sq1h")
+shape = SubResource("BoxShape3D_2unmu")
 
-[node name="Landmarks" type="Node3D" parent="." unique_id=572654403]
+[node name="Landmarks" type="Node3D" parent="." unique_id=908837387]
 
-[node name="GapStoneWest" type="Node3D" parent="Landmarks" unique_id=2081162762 groups=["landmark"] instance=ExtResource("45_yoh8t")]
+[node name="GapStoneWest" type="Node3D" parent="Landmarks" unique_id=446378986 groups=["landmark"] instance=ExtResource("49_7ylal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -105, -2.4648242, 1402)
 
-[node name="GapStoneWestCollision" type="StaticBody3D" parent="Landmarks" unique_id=2003121404]
+[node name="GapStoneWestCollision" type="StaticBody3D" parent="Landmarks" unique_id=1779224620]
 collision_mask = 0
 
-[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Landmarks/GapStoneWestCollision" unique_id=697803322]
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Landmarks/GapStoneWestCollision" unique_id=886646620]
 transform = Transform3D(0.99875027, 0, 0.04997917, 0, 1, 0, -0.04997917, 0, 0.99875027, -105, -0.66482425, 1402)
-shape = SubResource("BoxShape3D_n0ldj")
+shape = SubResource("BoxShape3D_xns11")
 
-[node name="GapStoneEast" type="Node3D" parent="Landmarks" unique_id=195129614 groups=["landmark"] instance=ExtResource("45_yoh8t")]
+[node name="GapStoneEast" type="Node3D" parent="Landmarks" unique_id=1412633101 groups=["landmark"] instance=ExtResource("49_7ylal")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -95, -2.4013042, 1402)
 
-[node name="GapStoneEastCollision" type="StaticBody3D" parent="Landmarks" unique_id=1251959528]
+[node name="GapStoneEastCollision" type="StaticBody3D" parent="Landmarks" unique_id=136324320]
 collision_mask = 0
 
-[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Landmarks/GapStoneEastCollision" unique_id=1984562409]
+[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Landmarks/GapStoneEastCollision" unique_id=648364571]
 transform = Transform3D(-0.99875027, 0, -0.049979255, 0, 1, 0, 0.049979255, 0, -0.99875027, -95, -0.6013043, 1402)
-shape = SubResource("BoxShape3D_ldvab")
+shape = SubResource("BoxShape3D_dfg8l")
 
-[node name="GreatWarningCairn" type="Node3D" parent="Landmarks" unique_id=1642155388 groups=["landmark"] instance=ExtResource("46_uwip4")]
+[node name="GreatWarningCairn" type="Node3D" parent="Landmarks" unique_id=1594932941 groups=["landmark"] instance=ExtResource("50_o4nxd")]
 transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, -1.156374, 1456)
 
-[node name="GreatWarningCairnCollision" type="StaticBody3D" parent="Landmarks" unique_id=1837459696]
+[node name="GreatWarningCairnCollision" type="StaticBody3D" parent="Landmarks" unique_id=1158213997]
 collision_mask = 0
 
-[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="Landmarks/GreatWarningCairnCollision" unique_id=803881556]
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="Landmarks/GreatWarningCairnCollision" unique_id=81967566]
 transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, 0.04362607, 1456)
-shape = SubResource("BoxShape3D_10whp")
+shape = SubResource("BoxShape3D_iw6bc")
 
-[node name="OfferingPost" type="Node3D" parent="Landmarks" unique_id=1670148424 groups=["landmark"] instance=ExtResource("47_xfvby")]
+[node name="OfferingPost" type="Node3D" parent="Landmarks" unique_id=771358749 groups=["landmark"] instance=ExtResource("51_xqb0y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -3.2235675, 1424)
 
-[node name="OfferingPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=2112312900]
+[node name="OfferingPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=387858064]
 collision_mask = 0
 
-[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="Landmarks/OfferingPostCollision" unique_id=1567927485]
+[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="Landmarks/OfferingPostCollision" unique_id=1191435694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -1.6235675, 1424)
-shape = SubResource("BoxShape3D_7ylal")
+shape = SubResource("BoxShape3D_kg0qd")
 
-[node name="IronWardPost" type="Node3D" parent="Landmarks" unique_id=923695779 groups=["landmark"] instance=ExtResource("48_dkmeb")]
+[node name="IronWardPost" type="Node3D" parent="Landmarks" unique_id=1232649680 groups=["landmark"] instance=ExtResource("52_neggn")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -3.0450966, 1432)
 
-[node name="IronWardPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=508643596]
+[node name="IronWardPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=1319332101]
 collision_mask = 0
 
-[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Landmarks/IronWardPostCollision" unique_id=548226661]
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Landmarks/IronWardPostCollision" unique_id=1858232201]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -1.8450966, 1432)
-shape = SubResource("BoxShape3D_o4nxd")
+shape = SubResource("BoxShape3D_kwb2h")
 
-[node name="wall_gate_north" type="Marker3D" parent="." unique_id=691547268 groups=["story_anchor"]]
+[node name="wall_gate_north" type="Marker3D" parent="." unique_id=549146039 groups=["story_anchor"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.4767404, 1402)
 
-[node name="WallSeamPath" type="Path3D" parent="." unique_id=1855990364]
-curve = SubResource("Curve3D_xqb0y")
+[node name="WallSeamPath" type="Path3D" parent="." unique_id=1653644424]
+curve = SubResource("Curve3D_ocvle")
 
-[node name="LineMist" type="FogVolume" parent="." unique_id=952757078]
+[node name="WallCrossing" type="Node3D" parent="." unique_id=1447045648]
+
+[node name="DefileWalls" type="StaticBody3D" parent="WallCrossing" unique_id=1786202761]
+
+[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1905570734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.4, -0.1445399, 1446)
+shape = SubResource("BoxShape3D_2nhvx")
+
+[node name="@CollisionShape3D@8" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=193596111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.6, 0.70712656, 1446)
+shape = SubResource("BoxShape3D_fj4uf")
+
+[node name="@CollisionShape3D@9" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1702324649]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.183556, -0.22567865, 1444)
+shape = SubResource("BoxShape3D_fb18c")
+
+[node name="@CollisionShape3D@10" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1335670780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -87.25123, 0.55256325, 1444)
+shape = SubResource("BoxShape3D_au1tb")
+
+[node name="@CollisionShape3D@11" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1495186625]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.98639, -0.33923408, 1442)
+shape = SubResource("BoxShape3D_2xry2")
+
+[node name="@CollisionShape3D@12" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2119129190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -87.88318, 0.3258703, 1442)
+shape = SubResource("BoxShape3D_kuc8v")
+
+[node name="@CollisionShape3D@13" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1078270737]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.80851, -0.4651696, 1440)
+shape = SubResource("BoxShape3D_atxuk")
+
+[node name="@CollisionShape3D@14" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=448001783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -88.49584, 0.06063413, 1440)
+shape = SubResource("BoxShape3D_i62mh")
+
+[node name="@CollisionShape3D@15" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=581688134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.6499, -0.5731904, 1438)
+shape = SubResource("BoxShape3D_58uck")
+
+[node name="@CollisionShape3D@16" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1005915206]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -89.089226, -0.1958293, 1438)
+shape = SubResource("BoxShape3D_i5k6e")
+
+[node name="@CollisionShape3D@17" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=817311485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.51059, -0.65298927, 1436)
+shape = SubResource("BoxShape3D_70751")
+
+[node name="@CollisionShape3D@18" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=130982908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -89.66333, -0.41290712, 1436)
+shape = SubResource("BoxShape3D_nqrq4")
+
+[node name="@CollisionShape3D@19" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=751351417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.39055, -0.71626335, 1434)
+shape = SubResource("BoxShape3D_xus5m")
+
+[node name="@CollisionShape3D@20" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1565333796]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.21815, -0.58435655, 1434)
+shape = SubResource("BoxShape3D_wq36p")
+
+[node name="@CollisionShape3D@21" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=239844144]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.289795, -0.7804715, 1432)
+shape = SubResource("BoxShape3D_sutx8")
+
+[node name="@CollisionShape3D@22" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=559589371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.753685, -0.71236247, 1432)
+shape = SubResource("BoxShape3D_q2a2j")
+
+[node name="@CollisionShape3D@23" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1792922717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.20832, -0.85066545, 1430)
+shape = SubResource("BoxShape3D_ipc3i")
+
+[node name="@CollisionShape3D@24" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1806590392]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.26994, -0.7955559, 1430)
+shape = SubResource("BoxShape3D_matpr")
+
+[node name="@CollisionShape3D@25" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1196778991]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.146126, -0.9006214, 1428)
+shape = SubResource("BoxShape3D_bckfw")
+
+[node name="@CollisionShape3D@26" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1444579311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.76692, -0.8305597, 1428)
+shape = SubResource("BoxShape3D_34f3b")
+
+[node name="@CollisionShape3D@27" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1430781658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.10321, -0.90184844, 1426)
+shape = SubResource("BoxShape3D_jtj8c")
+
+[node name="@CollisionShape3D@28" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=80350410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92.24461, -0.82188725, 1426)
+shape = SubResource("BoxShape3D_od5w0")
+
+[node name="@CollisionShape3D@29" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=555653117]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.07958, -0.8495597, 1424)
+shape = SubResource("BoxShape3D_13ekc")
+
+[node name="@CollisionShape3D@30" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=158914058]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92.703026, -0.77602106, 1424)
+shape = SubResource("BoxShape3D_iaxka")
+
+[node name="@CollisionShape3D@31" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1245747389]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.07523, -0.7628237, 1422)
+shape = SubResource("BoxShape3D_sulnu")
+
+[node name="@CollisionShape3D@32" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=122042229]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.14216, -0.69993997, 1422)
+shape = SubResource("BoxShape3D_ykqo8")
+
+[node name="@CollisionShape3D@33" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1854900098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.09017, -0.66611576, 1420)
+shape = SubResource("BoxShape3D_8sjko")
+
+[node name="@CollisionShape3D@34" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1811745592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.562004, -0.6003752, 1420)
+shape = SubResource("BoxShape3D_bu6ww")
+
+[node name="@CollisionShape3D@35" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1604546599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.12438, -0.56716, 1418)
+shape = SubResource("BoxShape3D_4t2gt")
+
+[node name="@CollisionShape3D@36" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=796683555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.96257, -0.4864706, 1418)
+shape = SubResource("BoxShape3D_ljw6k")
+
+[node name="@CollisionShape3D@37" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=858589134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.17788, -0.4628978, 1416)
+shape = SubResource("BoxShape3D_bwba1")
+
+[node name="@CollisionShape3D@38" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2081120963]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.34386, -0.36623317, 1416)
+shape = SubResource("BoxShape3D_7roqg")
+
+[node name="@CollisionShape3D@39" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1719149708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.25066, -0.34723455, 1414)
+shape = SubResource("BoxShape3D_d7vc4")
+
+[node name="@CollisionShape3D@40" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=661901244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.70586, -0.24659544, 1414)
+shape = SubResource("BoxShape3D_rp7tn")
+
+[node name="@CollisionShape3D@41" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=253328579]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.34272, -0.21983218, 1412)
+shape = SubResource("BoxShape3D_jo4l0")
+
+[node name="@CollisionShape3D@42" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=740337020]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.048584, -0.12914585, 1412)
+shape = SubResource("BoxShape3D_uor8f")
+
+[node name="@CollisionShape3D@43" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=815263084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.45406, -0.08528918, 1410)
+shape = SubResource("BoxShape3D_q84mr")
+
+[node name="@CollisionShape3D@44" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=376980545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.372025, -0.00870647, 1410)
+shape = SubResource("BoxShape3D_avd3c")
+
+[node name="@CollisionShape3D@45" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1177490455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.58469, 0.05437998, 1408)
+shape = SubResource("BoxShape3D_qc1i3")
+
+[node name="@CollisionShape3D@46" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=897112975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.67618, 0.11961028, 1408)
+shape = SubResource("BoxShape3D_xgp33")
+
+[node name="@CollisionShape3D@47" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1604280479]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.7346, 0.20123303, 1406)
+shape = SubResource("BoxShape3D_px1dm")
+
+[node name="@CollisionShape3D@48" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=86357491]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.96106, 0.25828704, 1406)
+shape = SubResource("BoxShape3D_1wotu")
+
+[node name="@CollisionShape3D@49" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1048537157]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.90378, 0.35703003, 1404)
+shape = SubResource("BoxShape3D_4b7y2")
+
+[node name="@CollisionShape3D@50" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=225907192]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -96.226654, 0.4080366, 1404)
+shape = SubResource("BoxShape3D_fak7c")
+
+[node name="@CollisionShape3D@51" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=717871695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.09225, 0.520965, 1402)
+shape = SubResource("BoxShape3D_m8ejx")
+
+[node name="@CollisionShape3D@52" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=841677307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -96.47297, 0.56700397, 1402)
+shape = SubResource("BoxShape3D_d7cyw")
+
+[node name="DefileHaze" type="FogVolume" parent="WallCrossing" unique_id=662119714]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -97.5, -0.84598, 1423)
+size = Vector3(15, 7, 46)
+material = SubResource("FogMaterial_l8j7s")
+
+[node name="wall_crossing_frame" type="Marker3D" parent="WallCrossing" unique_id=1687500440 groups=["shot_frame"]]
+transform = Transform3D(0.9846426, 0.026350744, 0.17258193, 0, 0.9885435, -0.15093619, -0.17458202, 0.1486182, 0.9733621, -100, 2.8177912, 1362)
+metadata/fov = 55.0
+metadata/shot = "wall_crossing"
+
+[node name="LineMist" type="FogVolume" parent="." unique_id=2045020772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.2967708, 1406)
 size = Vector3(1600, 3, 14)
-material = SubResource("FogMaterial_neggn")
+material = SubResource("FogMaterial_63w00")

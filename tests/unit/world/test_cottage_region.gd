@@ -88,3 +88,16 @@ func _sample_layer() -> ScatterLayer:
 	var bld := Builder.new(&"cottage", rects, 1234)
 	bld.reserve(HumanRealmLayout.COTTAGE, 12.0)
 	return bld.add_layer({id = "t", mesh = "flint_nodule", ingredient = "ing_flint", count = 40})
+
+
+func test_act1_anchors_and_opening() -> void:
+	var root: Node = (load(SCENE) as PackedScene).instantiate()
+	var names := []
+	for n in root.find_children("*", "Marker3D", true, false):
+		if n.is_in_group(&"story_anchor"):
+			names.append(String(n.name))
+	for id in ["opening_cottage_dawn", "first_deed_treeline", "act1_cottage_interior", "act1_cottage_door", "act1_food_tally_beam"]:
+		assert_has(names, id)
+	var trail := root.find_child("DeerTrail", true, false) as MultiMeshInstance3D
+	assert_gt(trail.multimesh.instance_count, 80, "a readable trail of prints")
+	root.free()

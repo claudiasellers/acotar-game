@@ -453,4 +453,137 @@ func _build_scene() -> Node3D:
 	sc.add_to_group(&"landmark", true)
 	var hut := _glb(A + "shepherd_hut_ruin.glb", "ShepherdHutRuin", fields_n, root, ground(HUT, -0.2), 70.0)
 	hut.add_to_group(&"landmark", true)
+	_build_opening(root)
 	return root
+
+
+# --- The opening (experience bar §1.1) ------------------------------------------
+# Dawn at the cottage: the camera sits south-east, so the lit back window, the
+# smoking chimney and the dark treeline stack up in one frame. Feyre starts by
+# the door, where a fresh deer trail leads off to the treeline: the first deed.
+
+## Composed opening vantage (world): camera position and look-at point.
+static func opening_camera() -> Array[Vector3]:
+	var eye := _cottage_world(Vector3(-9.0, 0.0, 27.0))
+	var look := _cottage_world(Vector3(4.0, 0.0, -40.0))
+	return [ground(eye, 3.4), ground(look, 4.0)]
+
+
+## The deer trail, door to treeline (world XZ), a curve that slips out of sight
+## between the trees.
+static func deer_trail_points() -> PackedVector2Array:
+	var start := _cottage_world(Vector3(-1.9, 0.0, -8.0))
+	var end := Vector2(-205.0, 2088.0)
+	var bend := start.lerp(end, 0.5) + Vector2(18.0, -4.0)
+	var pts := PackedVector2Array()
+	var n := 56
+	for i in n + 1:
+		var t := float(i) / n
+		pts.append(start.lerp(bend, t).lerp(bend.lerp(end, t), t))
+	return pts
+
+
+func _build_opening(root: Node3D) -> void:
+	var op := _node(Node3D, "Opening", root, root)
+	var cam := opening_camera()
+	var shot := _node(Marker3D, "OpeningCamera", op, root)
+	shot.transform = Transform3D.IDENTITY.looking_at(cam[1] - cam[0], Vector3.UP).translated(cam[0])
+	shot.set_meta(&"fov", 50.0)
+	shot.set_meta(&"time_of_day", 0.27)
+	shot.set_meta(&"shot", "opening_dawn")
+	shot.add_to_group(&"shot_frame", true)
+	var trail := deer_trail_points()
+	# Where Feyre stands at the start: by the door, facing up the trail.
+	var start := _node(Marker3D, "opening_cottage_dawn", op, root)
+	var s0 := ground(trail[0], 0.0)
+	start.transform = Transform3D.IDENTITY.looking_at(ground(trail[4], 0.0) - s0, Vector3.UP).translated(s0)
+	start.add_to_group(&"story_anchor", true)
+	var end := _node(Marker3D, "first_deed_treeline", op, root)
+	var e0 := ground(trail[trail.size() - 1], 0.0)
+	end.transform = Transform3D.IDENTITY.looking_at(e0 - ground(trail[trail.size() - 4], 0.0), Vector3.UP).translated(e0)
+	end.add_to_group(&"story_anchor", true)
+	op.add_child(_trail_prints(trail))
+	op.get_child(op.get_child_count() - 1).owner = root
+	# Act I anchors inside (docs/contracts/world.md): -Z faces the action.
+	var cot := root.get_node("ArcheronCottage") as Node3D
+	var inside := cot.get_node("Interior") as Node3D
+	var room := _node(Marker3D, "act1_cottage_interior", inside, root, Vector3(-0.5, 0.0, 0.0), 0.0)
+	room.set_meta(&"size", Vector3(10.5, 3.0, 6.0))
+	room.add_to_group(&"story_anchor", true)
+	_node(Marker3D, "act1_cottage_door", inside, root, Vector3(-1.9, 0.0, -2.85), 180.0).add_to_group(&"story_anchor", true)
+	_node(Marker3D, "act1_food_tally_beam", inside, root, Vector3(-0.115, 2.56, 0.0), 90.0).add_to_group(&"story_anchor", true)
+	# Warmth only where Feyre makes it: the hearth behind the back window.
+	var glow := MeshInstance3D.new()
+	glow.name = "WindowGlow"
+	var q := QuadMesh.new()
+	q.size = Vector2(0.82, 0.78)
+	glow.mesh = q
+	var gm := StandardMaterial3D.new()
+	gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	gm.albedo_color = Color(1.0, 0.66, 0.34)
+	gm.emission_enabled = true
+	gm.emission = Color(1.0, 0.58, 0.26)
+	gm.emission_energy_multiplier = 3.0
+	glow.material_override = gm
+	glow.position = Vector3(-0.6, 1.3, 3.1)
+	cot.add_child(glow)
+	glow.owner = root
+	var spill := OmniLight3D.new()
+	spill.name = "WindowSpill"
+	spill.position = Vector3(-0.6, 1.2, 3.9)
+	spill.light_color = Color(1.0, 0.64, 0.34)
+	spill.light_energy = 1.4
+	spill.omni_range = 5.5
+	spill.set_script(load(DIR + "fire_flicker.gd"))
+	cot.add_child(spill)
+	spill.owner = root
+
+
+## Fresh hoof prints along the trail: pairs, alternating sides, as one MultiMesh.
+static func _trail_prints(trail: PackedVector2Array) -> MultiMeshInstance3D:
+	var mesh := ArrayMesh.new()
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for half in [-0.035, 0.035]:
+		var c := Vector3(half, 0.0, 0.0)
+		for k in 8:
+			var a0 := TAU * k / 8.0
+			var a1 := TAU * (k + 1) / 8.0
+			st.set_normal(Vector3.UP)
+			st.add_vertex(c)
+			st.add_vertex(c + Vector3(cos(a1) * 0.03, 0.0, sin(a1) * 0.06))
+			st.add_vertex(c + Vector3(cos(a0) * 0.03, 0.0, sin(a0) * 0.06))
+	st.commit(mesh)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.36, 0.42, 0.56)
+	mat.roughness = 1.0
+	mesh.surface_set_material(0, mat)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	var xforms: Array[Transform3D] = []
+	var walked := 0.0
+	var side := 1.0
+	for i in range(1, trail.size()):
+		var a := trail[i - 1]
+		var b2 := trail[i]
+		var seg := a.distance_to(b2)
+		var dir := (b2 - a) / maxf(seg, 0.001)
+		var right := Vector2(-dir.y, dir.x)
+		while walked <= seg:
+			var p := a + dir * walked + right * 0.13 * side
+			var yaw := atan2(-dir.x, -dir.y)
+			xforms.append(Transform3D(Basis(Vector3.UP, yaw), ground(p, 0.025)))
+			side = -side
+			walked += 0.7
+		walked -= seg
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.name = "DeerTrail"
+	mmi.multimesh = mm
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.add_to_group(&"track_trail", true)
+	mmi.set_meta(&"track_kind", "deer")
+	return mmi

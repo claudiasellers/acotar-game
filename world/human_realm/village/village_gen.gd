@@ -10,6 +10,10 @@ const SCENE := DIR + "/village.tscn"
 const REPORT := DIR + "/village_report.json"
 
 
+## Landmark markers that double as Act I story anchors (world.md).
+const VILLAGE_ANCHORS := {"PeltCustomerSpot": "act1_fur_stall"}
+
+
 func _initialize() -> void:
 	var plan_script: GDScript = load("res://world/human_realm/village/village_plan.gd")
 	if plan_script == null or not plan_script.can_instantiate():
@@ -95,6 +99,9 @@ func _build_scene(plan: VillagePlan, saved: Array[ScatterLayer]) -> Node3D:
 			mk.name = m
 			mk.transform = d.markers[m]
 			n.add_child(mk)
+			if VILLAGE_ANCHORS.has(m):
+				mk.set_meta(&"anchor_id", VILLAGE_ANCHORS[m])
+				mk.add_to_group(&"story_anchor", true)
 
 	var lights := Node3D.new()
 	lights.name = "Lights"
