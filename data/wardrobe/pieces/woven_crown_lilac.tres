@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"woven_crown_lilac"
+display_name = "Woven crown (lilac)"
+description = "Woven by her own hands from flowers she picked."
+slots = Array[StringName]([&"head"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/flower_crown.glb"
+color = Color(0.784, 0.659, 0.914, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"fae"
+source = &"woven"
+phase = 0
+canon = "X"

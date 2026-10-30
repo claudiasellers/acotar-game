@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.651, 0.353, 0.165, 1)
 regions = Array[StringName]([&"reg_greenmarch", &"reg_blossom_vale"])
 abundance = &"common"
+icon = &"feather"
+rarity = &"common"
+bound = &""
+hint = "The Greenmarch or the Blossom Vale"

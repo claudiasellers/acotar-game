@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.749, 0.682, 0.573, 1)
 regions = Array[StringName]([&"reg_western_fells", &"reg_old_temples"])
 abundance = &"uncommon"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "The western fells or the old temples"

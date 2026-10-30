@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.1
 food_days = 0.1
 pigment = &""
+icon = &"drop"
+rarity = &"common"
+bound = &""
+hint = "The Blossom Vale or the village"

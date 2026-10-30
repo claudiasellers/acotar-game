@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.961, 0.949, 0.918, 1)
 regions = Array[StringName]([&"reg_winter_forest", &"reg_wall_edge_mortal"])
 abundance = &"common"
+icon = &"feather"
+rarity = &"common"
+bound = &""
+hint = "The winter forest or the mortal side of the Wall"

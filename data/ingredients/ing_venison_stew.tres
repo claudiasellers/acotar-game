@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.4
 food_days = 1.0
 pigment = &""
+icon = &"meat"
+rarity = &"common"
+bound = &""
+hint = "Around the cottage"

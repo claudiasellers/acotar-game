@@ -23,3 +23,7 @@ edible = false
 nutrition = 0.05
 food_days = 0.0
 pigment = &""
+icon = &"twig"
+rarity = &"common"
+bound = &""
+hint = "The winter forest or the frozen river"

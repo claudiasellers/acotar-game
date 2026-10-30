@@ -23,3 +23,7 @@ edible = false
 nutrition = 0.0
 food_days = 0.0
 pigment = &"red"
+icon = &"leaf"
+rarity = &"common"
+bound = &""
+hint = "The Autumn border"

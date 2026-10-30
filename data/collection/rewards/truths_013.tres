@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CollectionReward" format=3]
+
+[ext_resource type="Script" path="res://data/collection/collection_reward.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tab = &"truths"
+need = 13
+kind = &"wardrobe"
+reward_id = &"ribbon_sash_periwinkle"
+label = "A periwinkle sash"

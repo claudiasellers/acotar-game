@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CollectionReward" format=3]
+
+[ext_resource type="Script" path="res://data/collection/collection_reward.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tab = &"wardrobe"
+need = 25
+kind = &"item"
+reward_id = &"pig_lilac"
+label = "A cake of lilac paint"

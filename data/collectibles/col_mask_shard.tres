@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.831, 0.686, 0.216, 1)
 regions = Array[StringName]([&"reg_calanmai_hills", &"reg_old_temples"])
 abundance = &"rare"
+icon = &"gem"
+rarity = &"shiny"
+bound = &"dusk"
+hint = "The Calanmai hills or the old temples, at dusk"

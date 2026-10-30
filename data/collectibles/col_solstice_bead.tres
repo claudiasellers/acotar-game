@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.910, 0.718, 0.188, 1)
 regions = Array[StringName]([&"reg_solstice_meadow", &"reg_manor_estate"])
 abundance = &"uncommon"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "The solstice meadow or the manor gardens"

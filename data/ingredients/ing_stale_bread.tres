@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.08
 food_days = 0.25
 pigment = &""
+icon = &"meat"
+rarity = &"common"
+bound = &""
+hint = "Around the cottage or the village"

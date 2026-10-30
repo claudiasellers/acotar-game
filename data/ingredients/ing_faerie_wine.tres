@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.0
 food_days = 0.0
 pigment = &""
+icon = &"drop"
+rarity = &"common"
+bound = &""
+hint = "The manor gardens or the Calanmai hills"

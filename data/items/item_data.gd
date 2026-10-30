@@ -28,10 +28,23 @@ const WEIGHT_UNITS := {
 @export var canon: String = "X"
 ## Placeholder colour for scatter meshes and icons until art arrives.
 @export var color: Color = Color(0.8, 0.8, 0.8)
+## Icon shape drawn by ItemIcon (flower, berry, leaf, mushroom, feather, gem,
+## drop, twig, shell, meat, pelt, trinket).
+@export var icon: StringName = &"leaf"
+## common, rare (bound to a window) or shiny (rare, and glimmers).
+@export var rarity: StringName = &"common"
+## When it can be found: "", dawn, dusk, night, rain, mist or snow.
+@export var bound: StringName = &""
+## Where to look, shown in the collection book before it is found.
+@export var hint: String = ""
 
 
 func weight_units() -> float:
 	return WEIGHT_UNITS[weight_class]
+
+
+func is_rare() -> bool:
+	return rarity != &"common"
 
 
 func has_craft_tag(tag: StringName) -> bool:

@@ -26,13 +26,28 @@ func _ready() -> void:
 	feyre = get_parent() as Feyre
 	Gameplay.listen(&"story_item_granted", _on_story_item_granted)
 	Gameplay.collection.discovered.connect(_on_discovered)
-	_ensure_collection_action()
+	Gameplay.collection.reward_earned.connect(_on_reward)
+	_ensure_actions()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"open_collection") and feyre:
 		get_viewport().set_input_as_handled()
 		COLLECTION_UI.open(feyre)
+	elif event.is_action_pressed(&"weave_crown") and feyre:
+		get_viewport().set_input_as_handled()
+		weave_crown()
+
+
+## Weaves a crown from picked blooms and puts it on (C / d-pad down).
+func weave_crown() -> StringName:
+	var piece := CrownWeaver.weave(Gameplay.inventory, Gameplay.wardrobe)
+	if piece == &"":
+		var missing := CrownWeaver.blooms_missing(Gameplay.inventory)
+		FindCard.note(get_tree(), "A crown needs five flowers, three of one colour. %d more to find." % missing)
+		return &""
+	Juice.burst(feyre, &"outfit")
+	return piece
 
 
 func interact() -> bool:
@@ -110,7 +125,8 @@ func _take(id: StringName, count: int, source: Node) -> bool:
 
 func _picked(id: StringName, count: int, source: Node) -> void:
 	picked.emit(id, count)
-	Juice.burst(source if source is Node3D else feyre, &"pickup")
+	var item := ItemCatalog.get_item(id)
+	Juice.pickup(source, feyre, item.color if item else Color(1, 0.9, 0.95), item != null and item.is_rare())
 
 
 func _nearest(nodes: Array) -> Node3D:
@@ -142,18 +158,26 @@ func _on_story_item_granted(item_id: StringName, count: int) -> void:
 
 
 func _on_discovered(entry_id: StringName, tab: StringName) -> void:
+	if is_inside_tree() and not COLLECTION_UI.is_open():
+		FindCard.show_find(get_tree(), entry_id, tab)
+
+
+func _on_reward(reward: CollectionReward) -> void:
 	if is_inside_tree():
-		COLLECTION_UI.toast(get_tree(), entry_id, tab)
+		FindCard.show_reward(get_tree(), reward)
+		Juice.burst(feyre, &"unlock")
 
 
-## J / gamepad Back opens the collection book (added in code, R14).
-func _ensure_collection_action() -> void:
-	if InputMap.has_action(&"open_collection"):
-		return
-	InputMap.add_action(&"open_collection")
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_J
-	InputMap.action_add_event(&"open_collection", key)
-	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_BACK
-	InputMap.action_add_event(&"open_collection", pad)
+## J / gamepad Back opens the collection book; C / d-pad down weaves a crown
+## (added in code, R14).
+func _ensure_actions() -> void:
+	for spec in [[&"open_collection", KEY_J, JOY_BUTTON_BACK], [&"weave_crown", KEY_C, JOY_BUTTON_DPAD_DOWN]]:
+		if InputMap.has_action(spec[0]):
+			continue
+		InputMap.add_action(spec[0])
+		var key := InputEventKey.new()
+		key.physical_keycode = spec[1]
+		InputMap.action_add_event(spec[0], key)
+		var pad := InputEventJoypadButton.new()
+		pad.button_index = spec[2]
+		InputMap.action_add_event(spec[0], pad)

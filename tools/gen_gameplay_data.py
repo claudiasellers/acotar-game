@@ -6,7 +6,9 @@ Edit the tables below, never the generated .tres by hand (R15).
 Sources: lore/05-foraging-chemistry/ingredients.md (ids, tags, canon), the
 world lanes' scatter requests, and lore/06-items/bows-and-arrows.md.
 """
+import colorsys
 import os
+import zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TINY, SMALL, MEDIUM, LARGE, HEAVY = range(5)
@@ -323,6 +325,7 @@ PIECES = [
 	("riding_boots", "Riding boots", ["feet"], ["feet"], {"": "6b4a33"}, 0.1, 0, 0.1, "rider", "stables", 2, "X", "riding_boots", ""),
 	("lace_gloves", "Lace gloves", ["hands"], ["hands"], {k: PASTELS[k] for k in ("ivory", "blush", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "gloves_lace", ""),
 	("flower_crown", "Flower crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "mint", "pearl")}, 0.0, 0, 0, "fae", "alis_gift", 2, "C?", "flower_crown", "Woven from the manor's own gardens."),
+	("woven_crown", "Woven crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "pearl", "sky")}, 0.0, 0, 0, "fae", "woven", 0, "X", "flower_crown", "Woven by her own hands from flowers she picked."),
 	("tiara", "Tiara", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3", "pearl": PASTELS["pearl"], "rose": "e8a3b8"}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 3, "X", "tiara", "A delicate band of gilt leaves and seed pearls."),
 	("circlet", "Circlet", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3"}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
 	("pearl_necklace", "Pearl necklace", ["neck"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_pearl", ""),
@@ -462,6 +465,130 @@ def clear_rec(dirname):
 	clear(dirname)
 
 
+# ---- Reward loop (plans/experience-bar.md 1.4) ----
+REGION_LABELS = {
+	W: "the winter forest", V: "the village", COT: "around the cottage", WALLH: "the mortal side of the Wall",
+	RIV: "the frozen river", OLD: "the old hunting grounds", BURNT: "the burnt estate",
+	MAN: "the manor gardens", WOODS: "the estate woods", MARCH: "the Wall marches", CAL: "the Calanmai hills",
+	ROSE: "the Rosewild", VALE: "the Blossom Vale", LAKES: "the mirror lakes", GREEN: "the Greenmarch",
+	HAM: "the mask villages", ASHG: "the ash grove", BLIGHT: "the blighted reach", SHRINE: "the old temples",
+	FELLS: "the western fells", "reg_autumn_border": "the Autumn border", "reg_solstice_meadow": "the solstice meadow",
+}
+WINTER_REGIONS = {W, V, COT, WALLH, RIV, OLD, BURNT}
+WINDOW_PHRASES = {"night": "at night", "dusk": "at dusk", "dawn": "at dawn", "rain": "after rain",
+	"mist": "on misty mornings", "snow": "in fresh snow"}
+SHINY_EXTRA = {"col_glass_bead", "col_fae_bell", "col_mask_shard", "col_stone_starglass", "col_beetle_jewel", "col_river_pearl"}
+# First keyword match wins (checked against id and name).
+ICON_RULES = [
+	("feather", ["feather", "down"]), ("pelt", ["pelt", "hide", "wool", "snake_skin"]),
+	("meat", ["venison", "hare", "rabbit", "boar", "trout", "sinew", "stew", "bread", "wine"]),
+	("mushroom", ["cap", "agaric", "chanterelle", "chaga", "fungus", "glowcap", "dreamcap"]),
+	("shell", ["shell", "spiral", "mussel", "egg"]),
+	("drop", ["water", "dew", "sap", "honey", "resin", "spring", "silt", "salt"]),
+	("gem", ["shard", "stone", "glass", "bead", "pearl", "amber", "garnet", "quartz", "obsidian", "fossil", "flint",
+		"chalk", "clay", "ochre", "charcoal", "filings", "lapis", "pebble"]),
+	("berry", ["berry", "haw", "sloe", "cherry", "hip", "apple", "plum", "quince", "fruit", "acorn", "hazelnut", "gall", "seed"]),
+	("flower", ["rose", "hyacinth", "foxglove", "lavender", "honeysuckle", "elderflower", "violet", "primrose",
+		"dandelion", "clover", "crocus", "lily", "poppy", "cornflower", "cowslip", "chamomile", "heather", "lilac",
+		"marigold", "meadowsweet", "moonflower", "snowdrop", "wisteria", "yarrow", "blossom", "bloom", "petal", "flowers"]),
+	("twig", ["bark", "wood", "rod", "root", "reed", "rush", "antler", "tine", "bone", "pinecone", "needles", "driftwood"]),
+	("trinket", ["coin", "bell", "ribbon", "charm", "carved", "tile", "chip", "horseshoe", "candle", "arrowhead", "packet", "mask"]),
+]
+
+
+ICON_OVERRIDES = {
+	"ing_honeysuckle": "flower", "ing_honeyplum": "berry", "ing_spring_apple": "berry", "ing_water_lily": "flower",
+	"ing_watermint": "leaf", "ing_cherry_blossom": "flower", "ing_wood_sorrel": "leaf", "ing_spider_silk": "drop",
+	"ing_madder": "twig", "ing_candied_flowers": "trinket", "ing_faerie_bread": "trinket", "ing_faerie_wine": "drop",
+	"col_acorn_cap": "berry", "col_acorn_carved": "trinket", "col_mural_chip": "trinket", "col_seed_packet": "trinket",
+	"col_beetle_jewel": "gem", "col_dandelion_clock": "flower", "col_carved_bird": "trinket", "col_bone_charm": "trinket",
+	"col_leaf_gilded": "leaf",
+}
+
+
+def icon_for(item_id, name):
+	if item_id in ICON_OVERRIDES:
+		return ICON_OVERRIDES[item_id]
+	key = (item_id + " " + name).lower()
+	for icon, words in ICON_RULES:
+		if any(w in key for w in words):
+			return icon
+	return "leaf"
+
+
+def bloom_family(hexs):
+	r, g, b = (int(hexs[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
+	h, l, sat = colorsys.rgb_to_hls(r, g, b)
+	h *= 360.0
+	if sat < 0.25 or l > 0.88:
+		return "pearl"
+	if h < 25 or h >= 320:
+		return "rose"
+	if h < 75:
+		return "butter"
+	if h < 255:
+		return "sky"
+	return "lilac"
+
+
+def window_for(item_id, regions, rare, night):
+	if night:
+		return "night"
+	if not rare:
+		return ""
+	winter = all(r in WINTER_REGIONS for r in regions)
+	choices = ["dawn", "dusk", "snow"] if winter else ["dawn", "dusk", "rain", "mist"]
+	return choices[zlib.crc32(item_id.encode()) % len(choices)]
+
+
+def hint_for(regions, window):
+	places = [REGION_LABELS.get(r, r.replace("reg_", "").replace("_", " ")) for r in regions[:2]]
+	text = " or ".join(places) if places else "somewhere unexpected"
+	text = text[0].upper() + text[1:]
+	return text + (", " + WINDOW_PHRASES[window] if window else "")
+
+
+def reward_fields(item_id, name, tags, regions, ab, night, hexs, craft):
+	"""icon, rarity, window, hint and craft tags (blooms) for an ingredient or keepsake."""
+	icon = icon_for(item_id, name)
+	rare = ab == "rare"
+	window = window_for(item_id, regions, rare, night)
+	rarity = "common"
+	if rare:
+		rarity = "shiny" if ("fae" in tags or "bright" in tags or item_id in SHINY_EXTRA) else "rare"
+	craft = list(craft)
+	if icon == "flower" and item_id.startswith("ing_") and "blighted" not in item_id and "ashen" not in item_id:
+		craft += ["bloom", "bloom_" + bloom_family(hexs)]
+	return ['icon = &"%s"' % icon, 'rarity = &"%s"' % rarity, 'bound = &"%s"' % window,
+		'hint = "%s"' % esc(hint_for(regions, window))], craft
+
+
+CROWN_FAMILIES = ["rose", "butter", "lilac", "pearl", "sky"]
+CROWN_RECIPES = [("weave_crown_%s" % f, "Woven crown (%s)" % f, {"tag:bloom_%s" % f: 3, "tag:bloom": 2}, "woven_crown_%s" % f)
+	for f in CROWN_FAMILIES]
+
+# Page rewards: tab, found count needed, kind (wardrobe / item / sketch), id, label.
+REWARDS = [
+	("ingredients", 10, "item", "pig_rose", "A cake of rose paint"),
+	("ingredients", 30, "wardrobe", "hair_ribbon_sky", "A sky-blue hair ribbon"),
+	("ingredients", 60, "wardrobe", "ribbon_sash_gold", "A gold ribbon sash"),
+	("ingredients", 117, "sketch", "sketch_reward_herbarium", "Sketch: the full herbarium"),
+	("keepsakes", 5, "sketch", "sketch_reward_keepsakes", "Sketch: a windowsill of treasures"),
+	("keepsakes", 15, "wardrobe", "ribbon_cuff_lilac", "A lilac ribbon cuff"),
+	("keepsakes", 30, "wardrobe", "circlet_silver", "A silver circlet"),
+	("keepsakes", 54, "wardrobe", "circlet_gold", "A gold circlet"),
+	("recipes", 3, "item", "pig_butter", "A cake of butter-yellow paint"),
+	("recipes", 6, "wardrobe", "ribbon_cuff_mint", "A mint ribbon cuff"),
+	("recipes", 12, "sketch", "sketch_reward_kitchen", "Sketch: the manor kitchen at dawn"),
+	("truths", 4, "sketch", "sketch_reward_truth", "Sketch: what she knows now"),
+	("truths", 8, "wardrobe", "hair_ribbon_pearl", "A pearl hair ribbon"),
+	("truths", 13, "wardrobe", "ribbon_sash_periwinkle", "A periwinkle sash"),
+	("wardrobe", 25, "item", "pig_lilac", "A cake of lilac paint"),
+	("wardrobe", 60, "sketch", "sketch_reward_mirror", "Sketch: herself, in the mirror"),
+	("wardrobe", 120, "wardrobe", "ribbon_cuff_sky", "A sky ribbon cuff"),
+]
+
+
 def main():
 	for d in ("data/ingredients", "data/collectibles", "data/arrows", "data/recipes", "data/stations", "data/dishes", "data/items"):
 		clear(d)
@@ -482,6 +609,10 @@ def main():
 			"edible = %s" % str(x["edible"]).lower(), "nutrition = %s" % float(x["nut"]),
 			"food_days = %s" % float(x["food"]), 'pigment = &"%s"' % x["pigment"],
 		]
+		extra, craft = reward_fields(x["id"], x["name"], x["tags"], x["regions"], x["ab"],
+			x["extra"].get("night_only", False), x["color"], x["craft"])
+		lines[4] = "craft_tags = %s" % sn_array(craft)
+		lines += extra
 		write("data/ingredients/%s.tres" % x["id"], "res://data/ingredients/ingredient_data.gd", "IngredientData", lines)
 	for m in MATERIALS:
 		lines = ['id = &"%s"' % m["id"], 'display_name = "%s"' % m["name"], 'description = "%s"' % esc(m["desc"]),
@@ -492,6 +623,7 @@ def main():
 		lines = ['id = &"%s"' % cid, 'display_name = "%s"' % esc(name), 'description = "%s"' % esc(desc),
 			"weight_class = 0", "color = %s" % color(col), "regions = %s" % sn_array(regions),
 			'abundance = &"%s"' % ab]
+		lines += reward_fields(cid, name, [], regions, ab, False, col, [])[0]
 		write("data/collectibles/%s.tres" % cid, "res://data/collectibles/collectible_data.gd", "CollectibleData", lines)
 	for a in ARROWS:
 		lines = ['id = &"%s"' % a["id"], 'item_id = &"%s"' % a["item_id"], 'display_name = "%s"' % a["name"],
@@ -509,6 +641,11 @@ def main():
 		dict_body = ", ".join('"%s": %d' % (k, v) for k, v in inputs.items())
 		lines = ['id = &"%s"' % rid, 'display_name = "%s"' % name, "inputs = {%s}" % dict_body,
 			'output = &"%s"' % out, "output_count = %d" % count]
+		write("data/recipes/%s.tres" % rid, "res://data/recipes/craft_recipe.gd", "CraftRecipe", lines)
+	for rid, name, inputs, piece in CROWN_RECIPES:
+		dict_body = ", ".join('"%s": %d' % (k, v) for k, v in inputs.items())
+		lines = ['id = &"%s"' % rid, 'display_name = "%s"' % name, "inputs = {%s}" % dict_body,
+			'output = &""', "output_count = 1", 'wardrobe_piece = &"%s"' % piece]
 		write("data/recipes/%s.tres" % rid, "res://data/recipes/craft_recipe.gd", "CraftRecipe", lines)
 	for sid, name, methods, phase, fae_safe, max_ing in STATIONS:
 		lines = ['id = &"%s"' % sid, 'display_name = "%s"' % name, "methods = %s" % sn_array(methods),
@@ -542,6 +679,17 @@ def main():
 		lines = ['id = &"%s"' % mid, 'display_name = "%s"' % esc(name), 'channel = &"%s"' % ch, "color = %s" % color(chex),
 			"amount = %s" % amt, "sheen = %s" % sheen]
 		write("data/wardrobe/makeup/%s.tres" % mid, "res://data/wardrobe/makeup_data.gd", "MakeupData", lines)
+	clear_rec("data/collection/rewards")
+	piece_ids = {pid if c == "" else "%s_%s" % (pid, c) for pid, _n, _s, _h, cols, *_rest in PIECES for c in cols}
+	for i, (tab, need, kind, rid, label) in enumerate(REWARDS):
+		assert kind != "wardrobe" or rid in piece_ids, rid
+		lines = ['tab = &"%s"' % tab, "need = %d" % need, 'kind = &"%s"' % kind, 'reward_id = &"%s"' % rid,
+			'label = "%s"' % esc(label)]
+		write("data/collection/rewards/%s_%03d.tres" % (tab, need), "res://data/collection/collection_reward.gd", "CollectionReward", lines)
+	rare = [x for x in I if x["ab"] == "rare"] + [c for c in C if c[5] == "rare"]
+	share = len(rare) / float(len(I) + len(C))
+	assert 0.10 <= share <= 0.15, share
+	print("rewards %d, rare %.0f%% of %d types" % (len(REWARDS), share * 100, len(I) + len(C)))
 	print("wardrobe pieces %d (from %d designs), hairstyles %d, makeup %d" % (n_pieces, len(PIECES), len(HAIR), len(MAKEUP)))
 	for pig, (name, hexs) in PIGMENTS.items():
 		lines = ['id = &"pig_%s"' % pig, 'display_name = "%s"' % name, 'description = "A cake of %s paint."' % name.lower(),

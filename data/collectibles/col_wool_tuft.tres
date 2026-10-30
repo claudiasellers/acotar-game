@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.937, 0.910, 0.863, 1)
 regions = Array[StringName]([&"reg_greenmarch"])
 abundance = &"common"
+icon = &"pelt"
+rarity = &"common"
+bound = &""
+hint = "The Greenmarch"

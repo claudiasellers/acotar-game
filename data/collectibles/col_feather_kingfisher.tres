@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.122, 0.561, 0.749, 1)
 regions = Array[StringName]([&"reg_mirror_lakes"])
 abundance = &"rare"
+icon = &"feather"
+rarity = &"rare"
+bound = &"dusk"
+hint = "The mirror lakes, at dusk"

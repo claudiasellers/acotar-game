@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3]
+
+[ext_resource type="Script" path="res://data/recipes/craft_recipe.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"weave_crown_pearl"
+display_name = "Woven crown (pearl)"
+inputs = {"tag:bloom_pearl": 3, "tag:bloom": 2}
+output = &""
+output_count = 1
+wardrobe_piece = &"woven_crown_pearl"

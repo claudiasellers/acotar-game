@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.03
 food_days = 0.02
 pigment = &""
+icon = &"berry"
+rarity = &"common"
+bound = &""
+hint = "The winter forest or the old hunting grounds"

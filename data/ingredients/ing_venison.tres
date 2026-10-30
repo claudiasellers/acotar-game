@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.35
 food_days = 1.5
 pigment = &""
+icon = &"meat"
+rarity = &"common"
+bound = &""
+hint = "The winter forest or the estate woods"

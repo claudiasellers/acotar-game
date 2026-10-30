@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.01
 food_days = 0.0
 pigment = &""
+icon = &"leaf"
+rarity = &"common"
+bound = &""
+hint = "The frozen river or the mortal side of the Wall"

@@ -20,3 +20,12 @@ Owner: gameplay lane. Written before the work. Three handoffs, each under ~1,500
 11. Wardrobe ≥150 pieces (more gowns and colour variants, tunics, cloaks, jewellery incl. new `ears` and `wrist` slots, ≥8 masks), ≥14 hairstyles, ≥50 makeup looks. Tested counts and slot validity.
 
 Checks per slice: `godot --headless --import` clean and only this lane's GUT dirs. No screenshots in A; one each at the end of B and C.
+
+## Slice D: reward loop (plans/experience-bar.md §1.4, lead designer)
+12. Pickup arc: a glowing token in the item's colour arcs from the pickup to Feyre's satchel in 0.25 s, with a sparkle and a bounce on arrival.
+13. Combo chime: pickups within 3 s of each other step up a pentatonic scale (8 steps, then hold); a 3 s gap resets it.
+14. First find of a type: a big card with an illustrated icon, the name in a script face and one flavour line, held 1.2 s; the game never pauses for it. Rare finds get a gold card and a bigger burst.
+15. Every item has an icon shape (flower, berry, leaf, mushroom, feather, gem, drop, twig, shell, meat, pelt, trinket) drawn procedurally. In the book an unfound entry shows that shape as a lilac silhouette plus a place hint ("Estate woods, at dusk"), never a bare "?". Every unfound ingredient and keepsake has a non-empty hint (tested).
+16. Each book page has rewards along its progress bar (≥3 per fixed page: outfit colours, sketches, pigments). The next reward shows on the page; reaching it grants it with an unlock burst. Tested.
+17. Rarity: 10–15% of ingredient and keepsake types are rare, each bound to a time or weather window (dawn, dusk, night, rain, mist, snow); about a third of those are shiny and glimmer in the book. `ForageRegistry.in_window(item, hour, weather)` lets region lanes gate spawns. Tested.
+18. Woven flower crown: C (or d-pad down) weaves a crown from 5 picked blooms, coloured by the blooms used (rose, butter, lilac, pearl, sky). It is put on at once with the outfit burst. Mesh: the existing flower_crown.glb tinted; per-colour meshes requested from the Blender thread. Tested.

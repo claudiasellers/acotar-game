@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.545, 0.420, 0.243, 1)
 regions = Array[StringName]([&"reg_mask_villages"])
 abundance = &"uncommon"
+icon = &"trinket"
+rarity = &"common"
+bound = &""
+hint = "The mask villages"

@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.753, 0.424, 0.518, 1)
 regions = Array[StringName]([&"reg_village", &"reg_archeron_cottage"])
 abundance = &"rare"
+icon = &"trinket"
+rarity = &"rare"
+bound = &"dawn"
+hint = "The village or around the cottage, at dawn"

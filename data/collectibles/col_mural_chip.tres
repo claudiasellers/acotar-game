@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.651, 0.482, 0.357, 1)
 regions = Array[StringName]([&"reg_old_temples"])
 abundance = &"rare"
+icon = &"trinket"
+rarity = &"rare"
+bound = &"mist"
+hint = "The old temples, on misty mornings"

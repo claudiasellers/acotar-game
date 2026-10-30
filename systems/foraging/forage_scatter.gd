@@ -20,6 +20,20 @@ func _ready() -> void:
 	var bus := Gameplay.autoload(&"EventBus")
 	if bus and bus.has_signal(&"day_started"):
 		bus.connect(&"day_started", func(_d: int) -> void: refresh())
+	var item := ItemCatalog.get_item(item_id)
+	if item and (item.bound != &"" or (item is IngredientData and (item as IngredientData).night_only)):
+		# Rare, windowed finds only show while their window is open.
+		var timer := Timer.new()
+		timer.wait_time = 4.0
+		timer.autostart = true
+		timer.timeout.connect(_update_window.bind(item))
+		add_child(timer)
+		_update_window(item)
+
+
+func _update_window(item: ItemData) -> void:
+	var now := ForageRegistry.current_conditions(get_tree())
+	visible = ForageRegistry.in_window(item, now.hour, now.weather)
 
 
 ## Picks the nearest unpicked instance within `radius` and returns its item id
@@ -65,10 +79,9 @@ static func pick_from(field: MultiMeshInstance3D, world_pos: Vector3, radius: fl
 	if best < 0:
 		return &""
 	var item := ItemCatalog.get_item(id)
-	if item is IngredientData and (item as IngredientData).night_only:
-		var clock := Gameplay.autoload(&"Clock")
-		if clock and not clock.call(&"is_night"):
-			return &""
+	var now := ForageRegistry.current_conditions(field.get_tree())
+	if not ForageRegistry.in_window(item, now.hour, now.weather):
+		return &""
 	Gameplay.forage.mark_picked(region, "%s:%d" % [field.name, best], respawn_days_for(id))
 	_hide(field, best)
 	return id

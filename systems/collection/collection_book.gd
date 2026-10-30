@@ -7,6 +7,7 @@ class_name CollectionBook
 extends RefCounted
 
 signal discovered(entry_id: StringName, tab: StringName)
+signal reward_earned(reward: CollectionReward)
 
 const TABS: Array[StringName] = [
 	&"ingredients", &"keepsakes", &"recipes", &"truths", &"sketches", &"paintings", &"wardrobe",
@@ -16,13 +17,23 @@ const TITLES := {
 	&"truths": "Truths", &"sketches": "Sketches", &"paintings": "Paintings", &"wardrobe": "Wardrobe",
 }
 const STORY_MOMENTS := "res://data/story/moments"
+const REWARD_DIR := "res://data/collection/rewards"
+const SOURCE_HINTS := {
+	&"cottage_chest": "In the cottage chest", &"manor_wardrobe": "The manor wardrobe, as the seasons turn",
+	&"alis": "Ask Alis", &"alis_gift": "A gift from Alis", &"calanmai": "Something for Calanmai night",
+	&"seamstress": "The manor seamstress", &"painting_room": "Left in the painting room",
+	&"stables": "Hanging in the stables", &"story": "It will come to her", &"woven": "Weave it from picked flowers (C)",
+}
 
 ## entry id -> {"tab": String, "day": int}
 var found: Dictionary = {}
 ## entry ids not yet looked at in the book
 var fresh: Dictionary = {}
+## "tab:need" of page rewards already granted
+var claimed: Dictionary = {}
 
 static var _truth_ids: Array[StringName] = []
+static var _rewards: Array[CollectionReward] = []
 
 
 ## Connects to the state objects and quietly records what they already hold
@@ -78,6 +89,7 @@ func mark(entry_id: StringName, tab: StringName = &"", is_new: bool = true) -> b
 		fresh[entry_id] = true
 		discovered.emit(entry_id, tab)
 		Gameplay.emit(&"collection_discovered", [entry_id])
+	check_rewards(tab, is_new)
 	return true
 
 
@@ -93,6 +105,14 @@ func new_count(tab: StringName = &"") -> int:
 	if tab == &"":
 		return fresh.size()
 	return fresh.keys().filter(func(id: StringName) -> bool: return String(found[id]["tab"]) == String(tab)).size()
+
+
+func found_count(tab: StringName) -> int:
+	var n := 0
+	for v: Dictionary in found.values():
+		if v.tab == String(tab):
+			n += 1
+	return n
 
 
 ## Clears the "new" badges of a tab once Feyre has looked at it.
@@ -119,18 +139,23 @@ func entries(tab: StringName) -> Array[Dictionary]:
 	match tab:
 		&"ingredients":
 			for i in ItemCatalog.ingredients():
-				out.append(_entry(i.id, i.display_name, i.color, i.description))
+				out.append(_item_entry(i))
 		&"keepsakes":
 			for id in ItemCatalog.all_ids():
 				var item := ItemCatalog.get_item(id)
 				if item is CollectibleData:
-					out.append(_entry(id, item.display_name, item.color, item.description))
+					out.append(_item_entry(item))
 		&"recipes":
 			for d in Chemistry.dishes():
-				out.append(_entry(d.id, d.display_name, Color(1.0, 0.86, 0.62), d.journal_note))
+				var e := _entry(d.id, d.display_name, Color(1.0, 0.86, 0.62), d.journal_note)
+				e.hint = "%s it, from %d thing%s she has gathered" % [String(d.method).capitalize(), d.required.size(),
+					"" if d.required.size() == 1 else "s"]
+				out.append(e)
 		&"truths":
 			for id in truth_ids():
-				out.append(_entry(id, String(id).capitalize(), Color(0.82, 0.76, 1.0), ""))
+				var e := _entry(id, String(id).capitalize(), Color(0.82, 0.76, 1.0), "")
+				e.hint = "Listen to the people around her"
+				out.append(e)
 		&"sketches":
 			if Gameplay.sketchbook:
 				for id in Gameplay.sketchbook.order:
@@ -141,7 +166,11 @@ func entries(tab: StringName) -> Array[Dictionary]:
 					out.append(_entry(StringName(r.id), String(r.title), Color(1.0, 0.9, 0.7), "", String(r.path)))
 		&"wardrobe":
 			for p in WardrobeCatalog.all_pieces():
-				out.append(_entry(p.id, p.display_name, p.color, p.description))
+				var e := _entry(p.id, p.display_name, p.color, p.description)
+				e.hint = SOURCE_HINTS.get(p.source, "Somewhere in the manor")
+				out.append(e)
+	for e in out:
+		e.shape = ItemIcon.shape_for(e.id, tab)
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return (a.found and not b.found) if a.found != b.found else String(a.name) < String(b.name))
 	return out
@@ -153,6 +182,49 @@ func progress(tab: StringName) -> Vector2i:
 		return Vector2i(found.values().filter(func(v: Dictionary) -> bool: return v.tab == String(tab)).size(), -1)
 	var list := entries(tab)
 	return Vector2i(list.filter(func(e: Dictionary) -> bool: return e.found).size(), list.size())
+
+
+## A page's rewards in the order they are reached.
+static func rewards(tab: StringName) -> Array[CollectionReward]:
+	if _rewards.is_empty() and DirAccess.dir_exists_absolute(REWARD_DIR):
+		for file in ResourceLoader.list_directory(REWARD_DIR):
+			if file.ends_with(".tres"):
+				var r := load(REWARD_DIR.path_join(file)) as CollectionReward
+				if r:
+					_rewards.append(r)
+		_rewards.sort_custom(func(a: CollectionReward, b: CollectionReward) -> bool: return a.need < b.need)
+	return _rewards.filter(func(r: CollectionReward) -> bool: return r.tab == tab)
+
+
+## The next reward on a page not yet earned, or null.
+func next_reward(tab: StringName) -> CollectionReward:
+	for r in rewards(tab):
+		if not claimed.has(_reward_key(r)):
+			return r
+	return null
+
+
+func is_claimed(r: CollectionReward) -> bool:
+	return claimed.has(_reward_key(r))
+
+
+## Grants every reward the page has reached. `announce` false (loading a save,
+## starting kit) grants silently.
+func check_rewards(tab: StringName, announce: bool = true) -> void:
+	var r := next_reward(tab)
+	while r != null and found_count(tab) >= r.need:
+		claimed[_reward_key(r)] = true
+		match r.kind:
+			&"wardrobe":
+				Gameplay.wardrobe.grant(r.reward_id)
+			&"item":
+				Gameplay.inventory.add(r.reward_id)
+			&"sketch":
+				Gameplay.sketchbook.add(r.reward_id, r.label.trim_prefix("Sketch: "))
+		if announce:
+			reward_earned.emit(r)
+			Gameplay.emit(&"collection_reward", [r.reward_id])
+		r = next_reward(tab)
 
 
 ## Story truths the story lane's moments can write, read from their steps.
@@ -177,7 +249,8 @@ static func truth_ids() -> Array[StringName]:
 
 
 func save_state() -> Dictionary:
-	return {"found": found.duplicate(true), "fresh": fresh.keys().map(func(k: StringName) -> String: return String(k))}
+	return {"found": found.duplicate(true), "fresh": fresh.keys().map(func(k: StringName) -> String: return String(k)),
+		"claimed": claimed.keys()}
 
 
 func load_state(data: Dictionary) -> void:
@@ -187,6 +260,9 @@ func load_state(data: Dictionary) -> void:
 	fresh.clear()
 	for key: Variant in data.get("fresh", []):
 		fresh[StringName(key)] = true
+	claimed.clear()
+	for key: Variant in data.get("claimed", []):
+		claimed[String(key)] = true
 	sync()
 
 
@@ -196,6 +272,19 @@ func _on_recipe(dish_name: String, is_new: bool = true) -> void:
 			mark(d.id, &"recipes", is_new)
 
 
+func _item_entry(item: ItemData) -> Dictionary:
+	var e := _entry(item.id, item.display_name, item.color, item.description)
+	e.hint = item.hint
+	e.rare = item.is_rare()
+	e.shiny = item.rarity == &"shiny"
+	return e
+
+
 func _entry(id: StringName, entry_name: String, color: Color, note: String, image: String = "") -> Dictionary:
 	return {"id": id, "name": entry_name, "color": color, "found": found.has(id),
-		"new": fresh.has(id), "note": note, "image": image}
+		"new": fresh.has(id), "note": note, "image": image, "hint": "", "shape": &"leaf",
+		"rare": false, "shiny": false}
+
+
+static func _reward_key(r: CollectionReward) -> String:
+	return "%s:%d" % [r.tab, r.need]

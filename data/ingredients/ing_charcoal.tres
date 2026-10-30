@@ -23,3 +23,7 @@ edible = false
 nutrition = 0.05
 food_days = 0.0
 pigment = &"black"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "The burnt estate or around the cottage"

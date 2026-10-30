@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.788, 0.702, 0.478, 1)
 regions = Array[StringName]([&"reg_archeron_cottage"])
 abundance = &"rare"
+icon = &"trinket"
+rarity = &"rare"
+bound = &"snow"
+hint = "Around the cottage, in fresh snow"

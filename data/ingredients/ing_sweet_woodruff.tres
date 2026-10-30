@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.04
 food_days = 0.0
 pigment = &""
+icon = &"twig"
+rarity = &"common"
+bound = &""
+hint = "The ash grove"

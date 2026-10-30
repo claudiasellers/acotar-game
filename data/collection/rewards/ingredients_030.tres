@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CollectionReward" format=3]
+
+[ext_resource type="Script" path="res://data/collection/collection_reward.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tab = &"ingredients"
+need = 30
+kind = &"wardrobe"
+reward_id = &"hair_ribbon_sky"
+label = "A sky-blue hair ribbon"

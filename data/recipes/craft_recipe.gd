@@ -13,3 +13,5 @@ extends Resource
 @export var output_count: int = 1
 ## Station id needed, or &"" for anywhere.
 @export var station: StringName = &""
+## When set, the recipe makes this wardrobe piece instead of an item.
+@export var wardrobe_piece: StringName = &""

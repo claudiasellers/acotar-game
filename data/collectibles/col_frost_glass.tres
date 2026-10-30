@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.902, 0.957, 0.984, 1)
 regions = Array[StringName]([&"reg_frozen_river", &"reg_wall_edge_mortal"])
 abundance = &"uncommon"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "The frozen river or the mortal side of the Wall"

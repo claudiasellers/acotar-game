@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.427, 0.353, 0.290, 1)
 regions = Array[StringName]([&"reg_estate_woods", &"reg_wall_marches"])
 abundance = &"uncommon"
+icon = &"trinket"
+rarity = &"common"
+bound = &""
+hint = "The estate woods or the Wall marches"

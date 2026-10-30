@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.2
 food_days = 0.4
 pigment = &""
+icon = &"trinket"
+rarity = &"common"
+bound = &""
+hint = "The manor gardens or the mask villages"

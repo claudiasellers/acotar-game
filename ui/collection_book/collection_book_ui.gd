@@ -3,11 +3,9 @@
 ## and clears when the tab is viewed. Pauses the game while open.
 extends RefCounted
 
-const TILE := Vector2(122, 118)
-const UNFOUND := Color(0.84, 0.82, 0.86)
+const TILE := Vector2(122, 132)
 
 static var _open: CanvasLayer = null
-static var _toasts: int = 0
 
 
 static func is_open() -> bool:
@@ -24,8 +22,7 @@ static func toggle(feyre: Feyre) -> void:
 static func open(feyre: Feyre) -> void:
 	if is_open():
 		return
-	for t in feyre.get_tree().get_nodes_in_group(&"collection_toast"):
-		t.queue_free()
+	FindCard.clear(feyre.get_tree())
 	var book := Gameplay.collection
 	var parts := UiStyle.modal("CollectionBook", 980.0)
 	var layer: CanvasLayer = parts[0]
@@ -50,8 +47,17 @@ static func open(feyre: Feyre) -> void:
 	bar.add_theme_stylebox_override(&"fill", _rounded(UiStyle.ACCENT))
 	bar.add_theme_stylebox_override(&"background", _rounded(Color(1, 1, 1, 0.8)))
 	box.add_child(bar)
+	var count_row := HBoxContainer.new()
+	box.add_child(count_row)
 	var count := UiStyle.label("", 16)
-	box.add_child(count)
+	count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	count.autowrap_mode = TextServer.AUTOWRAP_OFF
+	count_row.add_child(count)
+	var reward := UiStyle.label("", 16)
+	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	reward.autowrap_mode = TextServer.AUTOWRAP_OFF
+	reward.add_theme_color_override(&"font_color", Color(0.72, 0.52, 0.18))
+	count_row.add_child(reward)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, 470)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -79,6 +85,7 @@ static func open(feyre: Feyre) -> void:
 		else:
 			bar.visible = false
 			count.text = "%d so far" % p.x if p.x > 0 else "Nothing yet. Keep your eyes open."
+		reward.text = _reward_text(book, tab)
 		for e in book.entries(tab):
 			grid.add_child(_tile(e, detail))
 		book.seen(tab)
@@ -111,6 +118,18 @@ static func close(feyre: Feyre) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
+## "✦ Next: a gold ribbon sash at 60" plus how many of the page's rewards are earned.
+static func _reward_text(book: CollectionBook, tab: StringName) -> String:
+	var all := CollectionBook.rewards(tab)
+	if all.is_empty():
+		return ""
+	var earned := all.filter(func(r: CollectionReward) -> bool: return book.is_claimed(r)).size()
+	var next := book.next_reward(tab)
+	if next == null:
+		return "✦ Every reward on this page earned (%d)" % earned
+	return "✦ Next reward at %d: %s   (%d/%d earned)" % [next.need, next.label, earned, all.size()]
+
+
 static func _refresh_labels(buttons: Dictionary, book: CollectionBook) -> void:
 	for tab: StringName in buttons:
 		var p := book.progress(tab)
@@ -130,7 +149,8 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	style.set_corner_radius_all(16)
 	style.shadow_size = 4
 	style.bg_color = Color(1, 1, 1, 0.92) if e.found else Color(0.95, 0.94, 0.96, 0.85)
-	style.border_color = UiStyle.ACCENT if e.new else (UiStyle.BORDER if e.found else Color(UiStyle.BORDER, 0.3))
+	style.border_color = UiStyle.ACCENT if e.new else (ItemIcon.GOLD if e.found and e.rare \
+			else (UiStyle.BORDER if e.found else Color(UiStyle.BORDER, 0.3)))
 	panel.add_theme_stylebox_override(&"panel", style)
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -143,26 +163,14 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		swatch = tex
 	else:
-		var gem := Panel.new()
-		var round := StyleBoxFlat.new()
-		round.set_corner_radius_all(28)
-		round.bg_color = e.color if e.found else UNFOUND
-		round.border_color = Color(UiStyle.BORDER, 0.7) if e.found else Color(1, 1, 1, 0.9)
-		round.set_border_width_all(3)
-		gem.add_theme_stylebox_override(&"panel", round)
-		if not e.found:
-			var q := UiStyle.label("?", 26)
-			q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			q.set_anchors_preset(Control.PRESET_FULL_RECT)
-			q.add_theme_color_override(&"font_color", Color(1, 1, 1))
-			gem.add_child(q)
-		swatch = gem
+		swatch = ItemIcon.make(e.shape, e.color, not e.found, e.shiny)
 	swatch.custom_minimum_size = Vector2(56, 56)
 	swatch.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	col.add_child(swatch)
-	var name_label := UiStyle.label(String(e.name) if e.found else "· · ·", 13)
+	var name_label := UiStyle.label(String(e.name) if e.found else String(e.hint), 13 if e.found else 11)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if not e.found:
+		name_label.add_theme_color_override(&"font_color", Color(UiStyle.TEXT, 0.6))
 	col.add_child(name_label)
 	if e.new:
 		var badge := UiStyle.label("new!", 12)
@@ -172,7 +180,7 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 		panel.ready.connect(func() -> void: Juice.bounce_control(panel, 0.14), CONNECT_ONE_SHOT)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	panel.mouse_entered.connect(func() -> void:
-		detail.text = ("%s. %s" % [e.name, e.note]).strip_edges() if e.found else "Not found yet.")
+		detail.text = ("%s. %s" % [e.name, e.note]).strip_edges() if e.found else "Not found yet. %s." % e.hint)
 	return panel
 
 
@@ -200,44 +208,3 @@ static func _rounded(color: Color) -> StyleBoxFlat:
 	box.set_corner_radius_all(9)
 	return box
 
-
-## A little pastel card that rises from the bottom of the screen with a chime
-## when something new is logged in the book.
-static func toast(tree: SceneTree, entry_id: StringName, tab: StringName) -> void:
-	if tree == null or is_open():
-		return
-	var item := ItemCatalog.get_item(entry_id)
-	var piece := WardrobeCatalog.piece(entry_id)
-	var entry_name := item.display_name if item else (piece.display_name if piece else String(entry_id).capitalize())
-	var layer := CanvasLayer.new()
-	layer.layer = 15
-	layer.add_to_group(&"collection_toast")
-	var card := PanelContainer.new()
-	var style := UiStyle.panel_box()
-	style.set_content_margin_all(10)
-	card.add_theme_stylebox_override(&"panel", style)
-	const KIND := {&"ingredients": "ingredient", &"keepsakes": "keepsake", &"recipes": "recipe",
-		&"sketches": "sketch", &"paintings": "painting", &"wardrobe": "piece for the wardrobe"}
-	var text := "✦ New %s: %s" % [KIND.get(tab, "find"), entry_name]
-	if tab == &"truths":
-		text = "✦ A new truth in your journal"
-	var line := UiStyle.label(text + "   (J)", 17)
-	line.autowrap_mode = TextServer.AUTOWRAP_OFF
-	card.add_child(line)
-	card.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	card.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	# Finds logged together stack upwards instead of overlapping.
-	card.position.y -= 70.0 + 56.0 * (_toasts % 4)
-	_toasts += 1
-	layer.tree_exited.connect(func() -> void: _toasts = maxi(_toasts - 1, 0))
-	card.modulate.a = 0.0
-	layer.add_child(card)
-	tree.root.add_child(layer)
-	_chime(layer)
-	var tween := card.create_tween()
-	tween.tween_property(card, ^"modulate:a", 1.0, 0.25)
-	tween.parallel().tween_property(card, ^"position:y", card.position.y - 20.0, 0.35).set_trans(Tween.TRANS_BACK)
-	tween.tween_interval(2.2)
-	tween.tween_property(card, ^"modulate:a", 0.0, 0.5)
-	tween.tween_callback(layer.queue_free)

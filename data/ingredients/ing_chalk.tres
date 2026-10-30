@@ -23,3 +23,7 @@ edible = false
 nutrition = 0.05
 food_days = 0.0
 pigment = &"white"
+icon = &"gem"
+rarity = &"common"
+bound = &""
+hint = "The village or the frozen river"

@@ -16,6 +16,41 @@ static func now_days() -> float:
 	return float(clock.get(&"day")) + float(clock.get(&"time_of_day"))
 
 
+## Whether an item's window (ItemData.bound) is open at this hour (0-24) and
+## weather (&"rain", &"snow" or &"clear"). Region lanes gate rare spawns with it.
+static func in_window(item: ItemData, hour: float, weather: StringName = &"clear") -> bool:
+	if item == null:
+		return true
+	var bound := item.bound
+	if item is IngredientData and (item as IngredientData).night_only:
+		bound = &"night"
+	match bound:
+		&"dawn":
+			return hour >= 4.5 and hour < 7.5
+		&"dusk":
+			return hour >= 18.0 and hour < 21.0
+		&"night":
+			return hour >= 20.5 or hour < 5.5
+		&"mist":
+			return hour >= 4.0 and hour < 9.0
+		&"rain":
+			return weather == &"rain"
+		&"snow":
+			return weather == &"snow"
+	return true
+
+
+## The current hour and weather, for in_window.
+static func current_conditions(tree: SceneTree) -> Dictionary:
+	var clock := Gameplay.autoload(&"Clock")
+	var hour := float(clock.call(&"hour")) if clock and clock.has_method(&"hour") else 12.0
+	var weather := &"clear"
+	var w := Weather.find(tree) if tree else null
+	if w and w.precipitation > 0.2:
+		weather = w.precipitation_kind
+	return {"hour": hour, "weather": weather}
+
+
 func mark_picked(region_id: StringName, instance_key: String, respawn_days: float) -> void:
 	var deltas := Gameplay.autoload(&"WorldDeltas")
 	if deltas and deltas.has_method(&"mark_picked"):

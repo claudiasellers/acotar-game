@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.0
 food_days = 0.0
 pigment = &"green"
+icon = &"leaf"
+rarity = &"common"
+bound = &""
+hint = "The estate woods or the mirror lakes"

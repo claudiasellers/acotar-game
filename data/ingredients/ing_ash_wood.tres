@@ -23,3 +23,7 @@ edible = false
 nutrition = 0.0
 food_days = 0.0
 pigment = &""
+icon = &"twig"
+rarity = &"rare"
+bound = &"dusk"
+hint = "The winter forest or the old hunting grounds, at dusk"

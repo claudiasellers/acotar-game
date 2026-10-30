@@ -11,3 +11,7 @@ weight_class = 0
 color = Color(0.627, 0.541, 0.353, 1)
 regions = Array[StringName]([&"reg_greenmarch", &"reg_autumn_border"])
 abundance = &"common"
+icon = &"berry"
+rarity = &"common"
+bound = &""
+hint = "The Greenmarch or the Autumn border"

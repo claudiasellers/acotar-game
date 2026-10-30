@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.02
 food_days = 0.0
 pigment = &""
+icon = &"mushroom"
+rarity = &"common"
+bound = &""
+hint = "The estate woods"

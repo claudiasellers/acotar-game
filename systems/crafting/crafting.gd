@@ -60,6 +60,10 @@ static func craft(r: CraftRecipe, inventory: Inventory, station: StringName = &"
 	var plan := resolve(r, inventory)
 	for id: StringName in plan:
 		inventory.remove(id, int(plan[id]))
+	if r.wardrobe_piece != &"":
+		Gameplay.wardrobe.grant(r.wardrobe_piece)
+		Gameplay.emit(&"item_crafted", [r.wardrobe_piece, 1])
+		return 1
 	var made := inventory.add(r.output, r.output_count)
 	if made < r.output_count:
 		# No room for all of it: give the inputs back rather than lose them.

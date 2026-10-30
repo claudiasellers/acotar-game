@@ -23,3 +23,7 @@ edible = true
 nutrition = 0.15
 food_days = 0.3
 pigment = &""
+icon = &"berry"
+rarity = &"common"
+bound = &""
+hint = "The manor gardens"
