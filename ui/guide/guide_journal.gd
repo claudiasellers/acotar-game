@@ -15,6 +15,15 @@ const MARGIN := Vector2(28, 28)
 const SLIDE := 36.0
 const FADE_IN := 0.35
 const FADE_OUT := 0.6
+## The card's look: a gilt cameo cartouche in upright EB Garamond (R3).
+const FONT_PATH := "res://ui/title/fonts/EBGaramond-Medium.ttf"
+const INK := Color(0.29, 0.17, 0.29)
+const INK_SOFT := Color(0.61, 0.47, 0.56)
+const KEY_GOLD := Color(0.96, 0.86, 0.60)
+const KEY_EDGE := Color(0.78, 0.60, 0.24)
+const KEY_INK := Color(0.42, 0.29, 0.10)
+const MEDAL := 84.0
+const MEDAL_TOP := 18.0
 
 var director: GuideDirector
 var mode: GuideSettings.Mode = GuideSettings.Mode.AUTO
@@ -124,11 +133,11 @@ func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
 	_line.text = thread.line(tier)
 	_footer.visible = false
 	if not _taught_key:
-		_footer.text = "G   recall a thought"
+		_footer.text = "recall a thought"
 		_footer.visible = true
 		_taught_key = true
 	elif asked and tier + 1 < thread.tier_count():
-		_footer.text = "G   think harder"
+		_footer.text = "think harder"
 		_footer.visible = true
 	# The first card of a session stays longer: it's how players learn it exists.
 	_hold = (12.0 if first else 7.0) + 0.05 * _line.text.length()
@@ -160,8 +169,8 @@ func _update_tab(delta: float) -> void:
 	var waiting := want and director.shown_tier < 0
 	_pulse += delta
 	var glow := 0.5 + 0.5 * sin(_pulse * 2.4) if waiting else 0.0
-	_tab_icon.scale = Vector2.ONE * (1.0 + 0.06 * glow)
-	_tab_icon.self_modulate = Color(1, 1, 1, 0.8 + 0.2 * glow)
+	_tab_icon.scale = Vector2.ONE * (1.0 + 0.03 * glow)
+	_tab_icon.glow = glow
 
 
 func _on_tab_input(event: InputEvent) -> void:
@@ -234,21 +243,25 @@ func _build() -> void:
 	_card.name = "ThoughtCard"
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_card.position = MARGIN
-	_card.custom_minimum_size = Vector2(500, 0)
-	var box := UiStyle.panel_box()
-	box.set_corner_radius_all(28)
-	box.set_content_margin_all(14)
-	box.content_margin_right = 22
-	box.bg_color = Color(UiStyle.BG, 0.88)
+	_card.custom_minimum_size = Vector2(560, 0)
+	# The cameo sits over the plaque's left edge, where the tab rests.
+	var box := CartoucheStyleBox.new()
+	box.medal_inset = MEDAL * 0.5
+	box.content_margin_left = 0.0
+	box.content_margin_top = MEDAL_TOP
+	box.content_margin_bottom = 20.0
+	box.content_margin_right = 30.0
 	_card.add_theme_stylebox_override(&"panel", box)
 	_card.visible = false
 	add_child(_card)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 14)
+	row.add_theme_constant_override(&"separation", 30)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_card.add_child(row)
 	_vignette = GuideVignette.new()
+	_vignette.custom_minimum_size = Vector2(MEDAL, MEDAL)
+	_vignette.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_vignette.pivot_offset = _vignette.custom_minimum_size * 0.5
 	row.add_child(_vignette)
 
@@ -257,22 +270,36 @@ func _build() -> void:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.custom_minimum_size = Vector2(360, 0)
 	row.add_child(col)
-	_line = UiStyle.label("", 26)
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(FindCard.SCRIPT_FONTS)
-	font.font_italic = true
-	_line.add_theme_font_override(&"font", font)
+	var garamond := load(FONT_PATH) as Font
+	_line = UiStyle.label("", 30)
+	_line.add_theme_font_override(&"font", garamond)
+	_line.add_theme_color_override(&"font_color", INK)
+	_line.add_theme_constant_override(&"line_spacing", -2)
 	_line.custom_minimum_size = Vector2(360, 0)
 	col.add_child(_line)
-	_footer = UiStyle.label("", 13)
+	# Footer: letterspaced capitals after a gold G keycap (a child, so it
+	# shows and hides with the footer).
+	var caps := FontVariation.new()
+	caps.base_font = garamond
+	caps.spacing_glyph = 2
+	_footer = UiStyle.label("", 15)
 	_footer.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_footer.add_theme_color_override(&"font_color", Color(UiStyle.TEXT, 0.55))
+	_footer.uppercase = true
+	_footer.add_theme_font_override(&"font", caps)
+	_footer.add_theme_color_override(&"font_color", INK_SOFT)
+	var indent := StyleBoxEmpty.new()
+	indent.content_margin_left = 32.0
+	indent.content_margin_top = 4.0
+	_footer.add_theme_stylebox_override(&"normal", indent)
 	_footer.visible = false
 	col.add_child(_footer)
+	var key := _keycap(garamond)
+	key.position = Vector2(0, 2)
+	_footer.add_child(key)
 
 	_tab = VBoxContainer.new()
 	_tab.name = "ThoughtTab"
-	_tab.position = MARGIN + Vector2(14, 14)
+	_tab.position = MARGIN + Vector2(0, MEDAL_TOP)
 	_tab.mouse_filter = Control.MOUSE_FILTER_STOP
 	_tab.tooltip_text = "Feyre's thoughts (G)"
 	_tab.gui_input.connect(_on_tab_input)
@@ -280,17 +307,36 @@ func _build() -> void:
 	_tab.visible = false
 	add_child(_tab)
 	_tab_icon = GuideVignette.new()
-	_tab_icon.custom_minimum_size = Vector2(72, 72)
-	_tab_icon.pivot_offset = Vector2(36, 36)
+	_tab_icon.custom_minimum_size = Vector2(MEDAL, MEDAL)
+	_tab_icon.pivot_offset = Vector2(MEDAL, MEDAL) * 0.5
 	_tab.add_child(_tab_icon)
-	_tab_key = UiStyle.label("G", 15)
-	_tab_key.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_tab_key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_tab_key.add_theme_color_override(&"font_color", Color.WHITE)
-	_tab_key.add_theme_color_override(&"font_outline_color", Color(UiStyle.TEXT, 0.8))
-	_tab_key.add_theme_constant_override(&"outline_size", 5)
+	_tab_key = _keycap(garamond)
+	_tab_key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_tab.add_child(_tab_key)
 
 	_voice = AudioStreamPlayer.new()
 	_voice.bus = &"Master"
 	add_child(_voice)
+
+
+## A small gold "G" key, the card's one piece of control text.
+func _keycap(font: Font) -> Label:
+	var key := Label.new()
+	key.text = "G"
+	key.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	key.custom_minimum_size = Vector2(22, 22)
+	key.add_theme_font_override(&"font", font)
+	key.add_theme_font_size_override(&"font_size", 14)
+	key.add_theme_color_override(&"font_color", KEY_INK)
+	var cap := StyleBoxFlat.new()
+	cap.bg_color = KEY_GOLD
+	cap.border_color = KEY_EDGE
+	cap.set_border_width_all(1)
+	cap.set_corner_radius_all(5)
+	cap.shadow_color = Color(0.35, 0.14, 0.31, 0.25)
+	cap.shadow_size = 2
+	cap.shadow_offset = Vector2(0, 1)
+	key.add_theme_stylebox_override(&"normal", cap)
+	return key
