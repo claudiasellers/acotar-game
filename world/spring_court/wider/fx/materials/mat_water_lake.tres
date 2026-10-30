@@ -1,0 +1,31 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_water.gdshader" id="1_kovup"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_kovup")
+shader_parameter/blight = 0.0
+shader_parameter/shallow_color = null
+shader_parameter/deep_color = null
+shader_parameter/fresnel_color = null
+shader_parameter/foam_color = null
+shader_parameter/depth_scale = null
+shader_parameter/clarity = null
+shader_parameter/refraction_strength = null
+shader_parameter/ripple_scale = null
+shader_parameter/ripple_strength = null
+shader_parameter/flow_dir = null
+shader_parameter/flow_speed = null
+shader_parameter/ripple_speed = null
+shader_parameter/foam_width = null
+shader_parameter/foam_strength = null
+shader_parameter/fresnel_power = null
+shader_parameter/roughness_value = null
+shader_parameter/blight_affect = 1.0
+shader_parameter/starlight_mode = null
+shader_parameter/glitter_density = null
+shader_parameter/glitter_threshold = null
+shader_parameter/glitter_strength = null
+shader_parameter/glitter_color = null
+shader_parameter/sun_dir_hint = null

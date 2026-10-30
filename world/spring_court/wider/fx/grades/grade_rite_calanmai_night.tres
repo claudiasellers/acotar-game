@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="GradePreset" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_cyctl"]
+
+[sub_resource type="Gradient" id="Gradient_r58go"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.078431375, 0.05882353, 0.1882353, 1, 0.5411765, 0.30980393, 0.6117647, 1, 1, 0.84313726, 0.627451, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_c7kgm"]
+gradient = SubResource("Gradient_r58go")
+
+[resource]
+script = ExtResource("1_cyctl")
+id = &"grade_rite_calanmai_night"
+sky_top = Color(0.11764706, 0.10980392, 0.32156864, 1)
+sky_horizon = Color(0.41568628, 0.24705882, 0.56078434, 1)
+ground_horizon = Color(0.2901961, 0.18431373, 0.4, 1)
+ground_bottom = Color(0.10980392, 0.09411765, 0.15686275, 1)
+sun_color = Color(0.6627451, 0.65882355, 1, 1)
+sun_energy = 0.25
+ambient_color = Color(0.47843137, 0.38431373, 0.72156864, 1)
+ambient_energy = 0.55
+fog_color = Color(0.3529412, 0.24705882, 0.5019608, 1)
+volumetric_density = 0.03
+volumetric_albedo = Color(1, 0.7058824, 0.5411765, 1)
+exposure = 1.1
+saturation = 1.25
+contrast = 1.04
+brightness = 0.98
+glow_intensity = 1.6
+glow_bloom = 0.38
+lut = SubResource("GradientTexture1D_c7kgm")
+magic = 1.0

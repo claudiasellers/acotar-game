@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="GradePreset" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_nwd1y"]
+
+[sub_resource type="Gradient" id="Gradient_odamq"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.3647059, 0.3019608, 0.47843137, 1, 0.9490196, 0.76862746, 0.56078434, 1, 1, 0.9843137, 0.91764706, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lwgx3"]
+gradient = SubResource("Gradient_odamq")
+
+[resource]
+script = ExtResource("1_nwd1y")
+id = &"grade_solstice"
+sky_top = Color(0.5254902, 0.7137255, 1, 1)
+sky_horizon = Color(1, 0.9411765, 0.72156864, 1)
+ground_horizon = Color(1, 0.9137255, 0.76862746, 1)
+ground_bottom = Color(0.6509804, 0.8509804, 0.56078434, 1)
+sun_color = Color(1, 0.9411765, 0.76862746, 1)
+sun_energy = 1.55
+ambient_color = Color(1, 0.9411765, 0.8627451, 1)
+ambient_energy = 1.05
+fog_color = Color(1, 0.9529412, 0.8392157, 1)
+fog_density = 0.002
+volumetric_density = 0.011
+volumetric_albedo = Color(1, 0.972549, 0.9098039, 1)
+exposure = 1.1
+saturation = 1.36
+contrast = 0.95
+brightness = 1.07
+glow_intensity = 1.05
+glow_bloom = 0.22
+lut = SubResource("GradientTexture1D_lwgx3")
+magic = 1.0

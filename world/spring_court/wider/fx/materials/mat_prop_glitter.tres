@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_prop.gdshader" id="1_d7s4i"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_d7s4i")
+shader_parameter/albedo = null
+shader_parameter/vertex_color_srgb = null
+shader_parameter/saturation_boost = null
+shader_parameter/roughness_value = 0.3
+shader_parameter/metallic_value = null
+shader_parameter/wrap = null
+shader_parameter/shade_tint = null
+shader_parameter/rim_color = null
+shader_parameter/rim_strength = null
+shader_parameter/snow_catch = null
+shader_parameter/snow_color = null
+shader_parameter/emission_glow = 3.5
+shader_parameter/pearl_strength = 0.5
+shader_parameter/pearl_shift = null
+shader_parameter/glitter_strength = 4.0
+shader_parameter/glitter_density = null
+shader_parameter/glitter_threshold = null
+shader_parameter/glitter_color = null
+shader_parameter/blight = 0.0
+shader_parameter/blight_affect = 1.0

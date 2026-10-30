@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_foliage.gdshader" id="1_weuky"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_weuky")
+shader_parameter/albedo = null
+shader_parameter/vertex_color_srgb = null
+shader_parameter/saturation_boost = null
+shader_parameter/sway_height = null
+shader_parameter/flutter_amount = null
+shader_parameter/wrap = null
+shader_parameter/shade_tint = null
+shader_parameter/rim_color = null
+shader_parameter/rim_strength = 0.9
+shader_parameter/translucency = 0.6
+shader_parameter/backlight_strength = null
+shader_parameter/roughness_value = null
+shader_parameter/snow_catch = null
+shader_parameter/snow_color = null
+shader_parameter/sparkle = 0.6
+shader_parameter/sparkle_color = null
+shader_parameter/emission_glow = 4.0
+shader_parameter/blight = 0.0
+shader_parameter/blight_affect = 1.0

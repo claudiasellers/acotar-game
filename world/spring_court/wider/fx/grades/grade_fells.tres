@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="GradePreset" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_8lgp3"]
+
+[sub_resource type="Gradient" id="Gradient_annig"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.2901961, 0.30588236, 0.5019608, 1, 0.654902, 0.6627451, 0.8784314, 1, 0.9843137, 0.9764706, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_wn13p"]
+gradient = SubResource("Gradient_annig")
+
+[resource]
+script = ExtResource("1_8lgp3")
+id = &"grade_fells"
+sky_top = Color(0.49019608, 0.6117647, 0.9411765, 1)
+sky_horizon = Color(0.9019608, 0.8627451, 1, 1)
+ground_horizon = Color(0.9137255, 0.8862745, 0.9411765, 1)
+ground_bottom = Color(0.6156863, 0.72156864, 0.65882355, 1)
+sun_color = Color(1, 0.9490196, 0.9019608, 1)
+sun_energy = 1.3
+ambient_color = Color(0.8627451, 0.84705883, 1, 1)
+ambient_energy = 0.95
+fog_color = Color(0.89411765, 0.8784314, 1, 1)
+fog_density = 0.0035
+volumetric_density = 0.016
+volumetric_albedo = Color(0.9490196, 0.9411765, 1, 1)
+exposure = 1.04
+saturation = 1.22
+contrast = 0.97
+brightness = 1.03
+glow_intensity = 0.8
+glow_bloom = 0.14
+lut = SubResource("GradientTexture1D_wn13p")
+magic = 0.8

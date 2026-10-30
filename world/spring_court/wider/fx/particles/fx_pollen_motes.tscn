@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_particle_glow.gdshader" id="1_53b3m"]
+
+[sub_resource type="Gradient" id="Gradient_es1er"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.9490196, 0.65882355, 1, 1, 0.8980392, 0.5411765, 1, 1, 0.972549, 0.8392157, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_nff37"]
+gradient = SubResource("Gradient_es1er")
+width = 64
+
+[sub_resource type="Gradient" id="Gradient_g080l"]
+offsets = PackedFloat32Array(0, 0.15, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1mran"]
+gradient = SubResource("Gradient_g080l")
+width = 64
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_651ro"]
+emission_shape = 3
+emission_box_extents = Vector3(12, 2.5, 12)
+angle_max = 360.0
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 0.02
+initial_velocity_max = 0.12
+gravity = Vector3(0, 0.01, 0)
+scale_min = 0.5
+scale_max = 1.2
+color_ramp = SubResource("GradientTexture1D_1mran")
+color_initial_ramp = SubResource("GradientTexture1D_nff37")
+turbulence_enabled = true
+turbulence_noise_strength = 0.6
+turbulence_noise_scale = 3.0
+turbulence_influence_min = 0.05
+turbulence_influence_max = 0.15
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n2fbb"]
+render_priority = 0
+shader = ExtResource("1_53b3m")
+shader_parameter/shape = 0
+shader_parameter/intensity = 3.0
+shader_parameter/core_whiten = null
+shader_parameter/twinkle = 0.4
+shader_parameter/twinkle_speed = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_fbbkd"]
+material = SubResource("ShaderMaterial_n2fbb")
+size = Vector2(0.05, 0.05)
+
+[node name="FxPollenMotes" type="GPUParticles3D" unique_id=1943105388]
+cast_shadow = 0
+amount = 600
+lifetime = 7.0
+preprocess = 7.0
+randomness = 0.3
+visibility_aabb = AABB(-16, -6, -16, 32, 12, 32)
+process_material = SubResource("ParticleProcessMaterial_651ro")
+draw_pass_1 = SubResource("QuadMesh_fbbkd")
+metadata/court_fx_id = "fx_pollen_motes"

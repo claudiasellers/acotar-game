@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_particle_glow.gdshader" id="1_p4mg7"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_p4mg7")
+shader_parameter/shape = null
+shader_parameter/intensity = null
+shader_parameter/core_whiten = null
+shader_parameter/twinkle = null
+shader_parameter/twinkle_speed = null

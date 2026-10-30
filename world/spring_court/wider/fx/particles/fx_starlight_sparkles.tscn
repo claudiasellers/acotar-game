@@ -1,0 +1,67 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_particle_glow.gdshader" id="1_mqyyn"]
+
+[sub_resource type="Gradient" id="Gradient_lygjr"]
+offsets = PackedFloat32Array(0, 0.33333334, 0.6666667, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.95686275, 0.8156863, 1, 1, 0.9019608, 0.9647059, 1, 0.8784314, 0.9254902, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8i1xd"]
+gradient = SubResource("Gradient_lygjr")
+width = 64
+
+[sub_resource type="Gradient" id="Gradient_nxhhi"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_u5rq0"]
+gradient = SubResource("Gradient_nxhhi")
+width = 64
+
+[sub_resource type="Curve" id="Curve_t8n0t"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.4, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_iv0t1"]
+curve = SubResource("Curve_t8n0t")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_d2yeb"]
+emission_shape = 3
+emission_box_extents = Vector3(9, 0.04, 9)
+angle_max = 360.0
+direction = Vector3(0, 1, 0)
+spread = 0.0
+initial_velocity_max = 0.02
+angular_velocity_min = -30.0
+angular_velocity_max = 30.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 1.4
+scale_curve = SubResource("CurveTexture_iv0t1")
+color_ramp = SubResource("GradientTexture1D_u5rq0")
+color_initial_ramp = SubResource("GradientTexture1D_8i1xd")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_klrd2"]
+render_priority = 0
+shader = ExtResource("1_mqyyn")
+shader_parameter/shape = 1
+shader_parameter/intensity = 10.0
+shader_parameter/core_whiten = null
+shader_parameter/twinkle = 0.7
+shader_parameter/twinkle_speed = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_v6eah"]
+material = SubResource("ShaderMaterial_klrd2")
+size = Vector2(0.16, 0.16)
+
+[node name="FxStarlightSparkles" type="GPUParticles3D" unique_id=877083061]
+cast_shadow = 0
+amount = 500
+lifetime = 1.8
+preprocess = 1.8
+randomness = 0.3
+visibility_aabb = AABB(-11, -2, -11, 22, 4, 22)
+process_material = SubResource("ParticleProcessMaterial_d2yeb")
+draw_pass_1 = SubResource("QuadMesh_v6eah")
+metadata/court_fx_id = "fx_starlight_sparkles"

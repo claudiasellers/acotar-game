@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_butterfly.gdshader" id="1_b4jv7"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_b4jv7")
+shader_parameter/flap_speed = null
+shader_parameter/flap_angle = null
+shader_parameter/body_color = null
+shader_parameter/edge_color = null
+shader_parameter/shimmer = null

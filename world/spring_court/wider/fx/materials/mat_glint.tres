@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_glint.gdshader" id="1_bce03"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_bce03")
+shader_parameter/glint_color = null
+shader_parameter/glint_core = null
+shader_parameter/intensity = null
+shader_parameter/pulse_speed = null
+shader_parameter/spin_speed = null
+shader_parameter/bob_height = null
+shader_parameter/blight = 0.0

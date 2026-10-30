@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_particle.gdshader" id="1_qm0wt"]
+
+[sub_resource type="Gradient" id="Gradient_wqdv0"]
+offsets = PackedFloat32Array(0, 0.33333334, 0.6666667, 1)
+colors = PackedColorArray(0.22745098, 0.23137255, 0.23921569, 1, 0.2901961, 0.29411766, 0.3019608, 1, 0.16470589, 0.16862746, 0.17254902, 1, 0.3529412, 0.3529412, 0.3529412, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_l6lw6"]
+gradient = SubResource("Gradient_wqdv0")
+width = 64
+
+[sub_resource type="Gradient" id="Gradient_onunb"]
+offsets = PackedFloat32Array(0, 0.15, 0.8, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.85, 1, 1, 1, 0.85, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_0siir"]
+gradient = SubResource("Gradient_onunb")
+width = 64
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ku2mt"]
+emission_shape = 3
+emission_box_extents = Vector3(16, 4, 16)
+angle_max = 360.0
+direction = Vector3(0.3, -1, 0.1)
+spread = 30.0
+initial_velocity_min = 0.1
+initial_velocity_max = 0.4
+angular_velocity_min = -60.0
+angular_velocity_max = 60.0
+gravity = Vector3(0, -0.12, 0)
+scale_min = 0.6
+scale_max = 1.4
+color_ramp = SubResource("GradientTexture1D_0siir")
+color_initial_ramp = SubResource("GradientTexture1D_l6lw6")
+turbulence_enabled = true
+turbulence_noise_strength = 0.5
+turbulence_noise_scale = 8.0
+turbulence_influence_min = 0.05
+turbulence_influence_max = 0.15
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_87y4f"]
+render_priority = 0
+shader = ExtResource("1_qm0wt")
+shader_parameter/shape = 3
+shader_parameter/emission_boost = 0.0
+shader_parameter/shade_floor = null
+shader_parameter/edge_tint = 0.0
+shader_parameter/blight = null
+shader_parameter/blight_affect = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_fqmhi"]
+material = SubResource("ShaderMaterial_87y4f")
+size = Vector2(0.08, 0.08)
+
+[node name="FxBlightAsh" type="GPUParticles3D" unique_id=413409309]
+cast_shadow = 0
+amount = 500
+lifetime = 12.0
+preprocess = 12.0
+randomness = 0.3
+visibility_aabb = AABB(-22, -15, -22, 44, 24, 44)
+process_material = SubResource("ParticleProcessMaterial_ku2mt")
+draw_pass_1 = SubResource("QuadMesh_fqmhi")
+metadata/court_fx_id = "fx_blight_ash"

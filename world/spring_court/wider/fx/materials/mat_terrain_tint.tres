@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_terrain_tint.gdshader" id="1_gwmaf"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_gwmaf")
+shader_parameter/blight = 0.0
+shader_parameter/vertex_color_srgb = null
+shader_parameter/use_vertex_color = null
+shader_parameter/grass_a = null
+shader_parameter/grass_b = null
+shader_parameter/grass_c = null
+shader_parameter/blossom_speck = null
+shader_parameter/rock_color = null
+shader_parameter/noise_scale = null
+shader_parameter/speck_density = null
+shader_parameter/speck_amount = null
+shader_parameter/slope_start = null
+shader_parameter/slope_end = null
+shader_parameter/vertex_color_weight = null
+shader_parameter/blight_affect = 1.0

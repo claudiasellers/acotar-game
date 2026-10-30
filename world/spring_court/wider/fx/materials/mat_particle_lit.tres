@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://world/spring_court/wider/fx/shaders/court_particle.gdshader" id="1_pmgix"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_pmgix")
+shader_parameter/shape = null
+shader_parameter/emission_boost = null
+shader_parameter/shade_floor = null
+shader_parameter/edge_tint = null
+shader_parameter/blight = null
+shader_parameter/blight_affect = null
