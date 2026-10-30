@@ -74,6 +74,11 @@ func _build_beats() -> Array:
 
 func _break_door(_space: SceneSpace) -> void:
 	var door := get_node_or_null(^"Door") as Node3D
+	if door == null:
+		for anchor in get_tree().get_nodes_in_group(&"story_anchor"):
+			if StringName(anchor.get_meta(&"anchor_id", anchor.name)) == &"act1_cottage_door":
+				door = anchor
+				break
 	var where := door.global_transform if door else global_transform
 	beast = request_actor(&"tamlin_beast", where, StandIns.beast)
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")

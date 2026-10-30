@@ -30,3 +30,17 @@ The full list of anchors is generated: [story_anchors_table.md](story_anchors_ta
 ## Authoring
 
 `tools/story/gen_moments.py` writes every moment and the anchor table; edit the generator, not the `.tres`. Steps vocabulary: `story/framework/moment_space.gd`.
+
+## Act I anchors (human realm)
+
+Same rules (Marker3D, group `story_anchor`, named by id). The Act I spaces are built in code (`story/act1/act1_anchors.gd`):
+
+| Anchor | Region | What hangs there |
+|---|---|---|
+| `act1_cottage_interior` | cottage | The beast at the door: a box Entry centred on the marker, floor level (meta `size`, default 7 × 3 × 5.5 m) covering the room |
+| `act1_cottage_door` | cottage | Where the beast comes in; -Z facing into the room |
+| `act1_food_tally_beam` | cottage | The food tally notches |
+| `act1_wolf_clearing` | hunting_forest | The ch1 wolf kill (30 m Entry; the doe 22 m and the wolf ~33 m in front, along -Z) and the skinning |
+| `act1_fur_stall` | village | Selling the pelt to the mercenary |
+
+The ride north needs no anchor: it follows the world lane's `WallSeamPath`.

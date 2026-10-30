@@ -69,6 +69,7 @@ func attach_anchor(anchor: Node3D) -> Array[MomentSpace]:
 		var space := _space_for(moment)
 		anchor.add_child(space)
 		spaces.append(space)
+	Act1Anchors.attach(anchor, self)
 	if anchor_id == _pending_anchor:
 		_pending_anchor = &""
 		var p := get_tree().get_first_node_in_group(&"player") as Node3D
