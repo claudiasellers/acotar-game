@@ -20,6 +20,8 @@ const COMBO_WINDOW_MS := 3000
 const COMBO_STEPS: Array[float] = [1.0, 1.125, 1.25, 1.5, 1.6667, 2.0, 2.25, 2.5]
 const ARC_SECONDS := 0.25
 
+## Reduced effects (pause menu) lowers this: fewer sparkles, smaller bounces.
+static var effects_scale: float = 1.0
 static var _chimes: Dictionary = {}
 static var _combo: int = 0
 static var _last_pick_ms: int = -100000
@@ -111,6 +113,7 @@ static func arc_token(from: Vector3, collector: Node3D, color: Color) -> MeshIns
 
 
 static func bounce(node: Node3D, amount: float = 0.15) -> void:
+	amount *= effects_scale
 	var base := node.scale
 	var tween := node.create_tween()
 	tween.tween_property(node, ^"scale", base * (1.0 + amount), 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -118,6 +121,7 @@ static func bounce(node: Node3D, amount: float = 0.15) -> void:
 
 
 static func bounce_control(control: Control, amount: float = 0.12) -> void:
+	amount *= effects_scale
 	control.pivot_offset = control.size * 0.5
 	var tween := control.create_tween()
 	tween.tween_property(control, ^"scale", Vector2.ONE * (1.0 + amount), 0.08).set_trans(Tween.TRANS_BACK)
@@ -162,7 +166,7 @@ static func chime(kind: StringName) -> AudioStreamWAV:
 static func _sparkles(spec: Dictionary) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	p.one_shot = true
-	p.amount = int(spec.amount)
+	p.amount = maxi(int(float(spec.amount) * effects_scale), 1)
 	p.lifetime = 0.9
 	p.explosiveness = 0.85
 	var mat := ParticleProcessMaterial.new()
