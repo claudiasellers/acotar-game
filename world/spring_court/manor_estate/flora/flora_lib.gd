@@ -1,7 +1,7 @@
 ## Plant meshes for the estate by species id (roses, hedges, trees, flowers).
-## Owned by the props lane: replace the stand-in shapes with real stylized
-## procedural (or Blender) meshes using world/shared/shaders/stylized_foliage.gdshader.
-## Callers only use mesh(), height_of() and SPECIES, so the look can change freely.
+## Stylized procedural meshes (flora_shapes.gd) on the shared foliage shader
+## world/shared/shaders/stylized_foliage.gdshader; vertex red = wind flex.
+## Callers use mesh(), impostor(), height_of() and SPECIES. Meshes stand on y = 0.
 class_name FloraLib
 extends RefCounted
 
@@ -40,13 +40,28 @@ const SPECIES := {
 	&"vegetable_row": [&"flower", 0.5, Color(0.45, 0.78, 0.35)],
 	&"fern": [&"groundcover", 0.8, Color(0.35, 0.70, 0.38)],
 	&"mushroom_glowcap": [&"groundcover", 0.15, Color(0.70, 0.95, 1.0)],
+	# requested by the grounds lane
+	&"crocus": [&"flower", 0.2, Color(0.78, 0.62, 1.0)],
+	&"buttercup": [&"flower", 0.25, Color(1.0, 0.90, 0.40)],
+	&"iris": [&"flower", 0.75, Color(0.62, 0.40, 0.88)],
+	&"madder": [&"flower", 0.7, Color(0.45, 0.70, 0.38)],
+	&"crab_apple": [&"tree", 6.0, Color(1.0, 0.96, 0.95)],
+	&"orchid": [&"flower", 0.5, Color(0.96, 0.66, 0.90)],
 }
 
+## Distance past which scatter should swap trees to impostor().
+const IMPOSTOR_DISTANCE := 120.0
+
 static var _cache: Dictionary = {}
+static var _impostors: Dictionary = {}
 
 
 static func has(species: StringName) -> bool:
 	return SPECIES.has(species)
+
+
+static func kind_of(species: StringName) -> StringName:
+	return SPECIES.get(species, [&"bush", 1.0, Color.WHITE])[0]
 
 
 static func height_of(species: StringName) -> float:
@@ -58,30 +73,24 @@ static func mesh(species: StringName) -> Mesh:
 		return _cache[species]
 	var e: Array = SPECIES.get(species, [&"bush", 1.0, Color(1.0, 0.7, 0.8)])
 	var h: float = e[1]
-	var m: Mesh
-	match e[0]:
-		&"tree":
-			var s := SphereMesh.new()
-			s.radius = h * 0.32
-			s.height = h * 0.55
-			m = s
-		&"reed", &"flower":
-			var c := CylinderMesh.new()
-			c.top_radius = h * 0.25
-			c.bottom_radius = h * 0.12
-			c.height = h
-			m = c
-		&"groundcover", &"aquatic":
-			var c2 := CylinderMesh.new()
-			c2.top_radius = maxf(h * 3.0, 0.3)
-			c2.bottom_radius = maxf(h * 3.0, 0.3)
-			c2.height = maxf(h, 0.05)
-			m = c2
-		_:
-			var b := SphereMesh.new()
-			b.radius = h * 0.5
-			b.height = h
-			m = b
-	m.surface_set_material(0, EstateKit.mat(e[2], 0.6))
+	var k := PropMeshKit.new()
+	FloraShapes.build(k, species, e[0], h, e[2])
+	var m := k.to_mesh(Vector3.ZERO, h)
 	_cache[species] = m
+	return m
+
+
+## A crossed-card silhouette for trees seen from far away (null for non-trees).
+static func impostor(species: StringName) -> Mesh:
+	if kind_of(species) != &"tree":
+		return null
+	if _impostors.has(species):
+		return _impostors[species]
+	var e: Array = SPECIES[species]
+	var h: float = e[1]
+	var k := PropMeshKit.new()
+	var trunk := FloraShapes.BARK_PALE if species == &"birch" else FloraShapes.BARK
+	FloraShapes.impostor(k, h, e[2], trunk, species == &"willow")
+	var m := k.to_mesh(Vector3.ZERO, h)
+	_impostors[species] = m
 	return m
