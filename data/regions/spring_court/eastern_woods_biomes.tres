@@ -1,0 +1,175 @@
+[gd_resource type="Resource" script_class="WoodsRegionDef" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/shared/woods_region_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://world/spring_court/shared/woods_biome.gd" id="2_biome"]
+[ext_resource type="Script" path="res://world/spring_court/eastern_woods/eastern_woods_terrain.gd" id="3_provider"]
+
+[sub_resource type="Resource" id="b_deep_wood"]
+script = ExtResource("2_biome")
+id = &"deep_wood"
+notes = "Old mixed woods east of the manor: tall, green-gold, deceptive (book: lush and dangerous)."
+ground_color = Color(0.38, 0.6, 0.32, 1)
+ground_color_alt = Color(0.32, 0.52, 0.3, 1)
+tree_density = 0.013
+trees = {&"oak": 3.0, &"beech": 3.0, &"elm": 1.5, &"ancient_oak": 0.6, &"silver_birch": 1.0, &"hawthorn": 0.5}
+shrub_density = 0.05
+shrubs = {&"fern": 4.0, &"bracken": 1.0, &"hazel": 1.0, &"mossy_rock": 1.5, &"fallen_log": 0.8, &"moss_mound": 1.5, &"root_arch": 0.4, &"foxglove": 0.4}
+detail_density = 1.5
+detail = {&"leaf_litter": 3.0, &"moss_patch": 2.0, &"grass_tuft": 2.0, &"wood_anemone": 1.5, &"bluebell": 1.0, &"toadstools": 0.5, &"glowcap": 0.4, &"violet": 0.6}
+forage_per_hectare = 18.0
+forage = {&"ing_glowcap": 2.0, &"ing_hollow_root": 2.0, &"ing_oak_gall": 1.5, &"ing_wood_sorrel": 2.0, &"ing_hazelnut": 1.5, &"ing_moss": 1.5, &"ing_wild_hyacinth": 1.0, &"ing_owl_feather": 1.0, &"ing_honey": 0.5, &"ing_snail_shell": 1.0, &"col_acorn_caps": 1.5, &"col_jay_feather": 0.8, &"col_shed_antler": 0.4, &"col_odd_stone": 0.6}
+ambience = PackedStringArray("pollen", "songbirds", "faelights", "sparkles")
+
+[sub_resource type="Resource" id="b_beech_hall"]
+script = ExtResource("2_biome")
+id = &"beech_hall"
+notes = "[X] Cathedral-like beech stands with smooth grey trunks and a gold-green roof; open floor of leaf litter and anemones."
+ground_color = Color(0.56, 0.56, 0.34, 1)
+ground_color_alt = Color(0.62, 0.52, 0.32, 1)
+tree_density = 0.009
+trees = {&"beech": 6.0, &"oak": 1.0}
+shrub_density = 0.015
+shrubs = {&"mossy_rock": 1.0, &"fern": 1.0, &"fallen_log": 0.5}
+detail_density = 1.2
+detail = {&"leaf_litter": 5.0, &"wood_anemone": 3.0, &"moss_patch": 1.0, &"wild_garlic": 1.5}
+forage_per_hectare = 15.0
+forage = {&"ing_wild_garlic": 3.0, &"ing_wood_sorrel": 2.0, &"ing_hazelnut": 1.0, &"ing_glowcap": 0.8, &"col_acorn_caps": 1.0, &"col_jay_feather": 1.0, &"col_odd_stone": 0.6, &"col_painted_pebble": 0.3}
+ambience = PackedStringArray("pollen", "songbirds", "sparkles")
+
+[sub_resource type="Resource" id="b_fern_hollow"]
+script = ExtResource("2_biome")
+id = &"fern_hollow"
+notes = "[X] Damp hollows drowned in ferns and moss, glowcaps under the logs."
+ground_color = Color(0.3, 0.56, 0.34, 1)
+ground_color_alt = Color(0.34, 0.6, 0.4, 1)
+tree_density = 0.008
+trees = {&"alder": 2.0, &"silver_birch": 1.0, &"oak": 1.0}
+shrub_density = 0.09
+shrubs = {&"fern": 7.0, &"bracken": 2.0, &"moss_mound": 2.0, &"fallen_log": 1.0, &"mossy_rock": 1.0}
+detail_density = 1.6
+detail = {&"moss_patch": 4.0, &"glowcap": 2.0, &"toadstools": 1.0, &"leaf_litter": 2.0}
+forage_per_hectare = 20.0
+forage = {&"ing_glowcap": 3.0, &"ing_moss": 3.0, &"ing_hollow_root": 2.0, &"ing_snail_shell": 2.0, &"ing_wood_sorrel": 1.0, &"col_odd_stone": 0.6}
+ambience = PackedStringArray("fireflies", "faelights", "sparkles")
+
+[sub_resource type="Resource" id="b_stream_glen"]
+script = ExtResource("2_biome")
+id = &"stream_glen"
+notes = "[X] A quiet grassy glen by the stream, standing stones half sunk in the grass."
+ground_color = Color(0.52, 0.72, 0.4, 1)
+ground_color_alt = Color(0.58, 0.7, 0.44, 1)
+tree_density = 0.0008
+trees = {&"hawthorn": 1.0, &"elder": 1.0}
+shrub_density = 0.012
+shrubs = {&"standing_stone": 0.5, &"mossy_rock": 1.0, &"foxglove": 1.0}
+detail_density = 2.4
+detail = {&"tall_grass": 4.0, &"grass_tuft": 3.0, &"buttercup": 2.0, &"cowslip": 2.0, &"daisy": 1.0}
+forage_per_hectare = 14.0
+forage = {&"ing_wild_strawberry": 2.0, &"ing_elderflower": 2.0, &"ing_meadowsweet": 2.0, &"ing_foxglove": 1.0, &"col_odd_stone": 1.0, &"ing_hawk_feather": 0.6}
+ambience = PackedStringArray("butterflies", "pollen", "sparkles")
+
+[sub_resource type="Resource" id="b_stream_shallows"]
+script = ExtResource("2_biome")
+id = &"stream_shallows"
+notes = "[X] Clear shallows over pebbles: willows, mint, trout holding in the eddies, river glass."
+ground_color = Color(0.4, 0.6, 0.38, 1)
+ground_color_alt = Color(0.52, 0.52, 0.4, 1)
+tree_density = 0.006
+trees = {&"willow": 3.0, &"alder": 3.0}
+shrub_density = 0.06
+shrubs = {&"reed_clump": 1.5, &"cattail": 1.0, &"mossy_rock": 2.0, &"boulder": 0.5}
+detail_density = 2.0
+detail = {&"pebbles": 3.0, &"water_mint": 2.0, &"meadowsweet": 1.5, &"grass_tuft": 2.0, &"lily_pad": 1.0}
+forage_per_hectare = 26.0
+forage = {&"ing_trout": 3.0, &"ing_willow_bark": 2.5, &"ing_river_silt": 2.0, &"ing_water_mint": 2.0, &"ing_meadowsweet": 1.0, &"ing_snail_shell": 1.0, &"col_river_glass": 1.5, &"col_odd_stone": 1.0}
+ambience = PackedStringArray("dragonflies", "fish", "butterflies", "sparkles")
+
+[sub_resource type="Resource" id="b_reed_marsh"]
+script = ExtResource("2_biome")
+id = &"reed_marsh"
+notes = "[C?] naga ambush ground. Horror exception: dark water, tall reeds closing over your head, grey light, no sparkle, frogs then silence."
+ground_color = Color(0.26, 0.32, 0.24, 1)
+ground_color_alt = Color(0.22, 0.26, 0.22, 1)
+tree_density = 0.002
+trees = {&"twisted_dead": 1.0, &"alder": 1.0}
+shrub_density = 0.16
+shrubs = {&"reed_clump": 8.0, &"cattail": 4.0}
+detail_density = 1.6
+detail = {&"grey_grass": 3.0, &"lily_pad": 1.0, &"dead_leaves": 1.0}
+forage_per_hectare = 12.0
+forage = {&"ing_river_silt": 3.0, &"ing_willow_bark": 1.0, &"ing_hollow_root": 1.0, &"col_bone_charm": 0.5, &"col_old_arrowhead": 0.6}
+ambience = PackedStringArray("mist")
+
+[sub_resource type="Resource" id="b_dread_margin"]
+script = ExtResource("2_biome")
+id = &"dread_margin"
+notes = "The readable tip into Bogge territory: trees thin and go grey, flowers fade, birdsong stops."
+ground_color = Color(0.34, 0.4, 0.3, 1)
+ground_color_alt = Color(0.3, 0.32, 0.28, 1)
+tree_density = 0.012
+trees = {&"twisted_dead": 2.0, &"blighted_tree": 2.0, &"oak": 1.0}
+shrub_density = 0.03
+shrubs = {&"withered_bush": 2.0, &"pale_fungus": 1.0, &"mossy_rock": 1.0, &"fallen_log": 1.0}
+detail_density = 1.2
+detail = {&"grey_grass": 3.0, &"dead_leaves": 3.0, &"leaf_litter": 1.0}
+forage_per_hectare = 10.0
+forage = {&"ing_hollow_root": 2.0, &"ing_foxglove": 1.0, &"ing_owl_feather": 1.0, &"col_bone_charm": 0.6, &"col_shed_antler": 0.3}
+ambience = PackedStringArray("mist")
+
+[sub_resource type="Resource" id="b_bogge_territory"]
+script = ExtResource("2_biome")
+id = &"bogge_territory"
+notes = "[C] Horror exception. The Bogge's wood: black twisted trees, pale fungus, thick fog, silence. Do not look."
+ground_color = Color(0.18, 0.19, 0.18, 1)
+ground_color_alt = Color(0.14, 0.15, 0.15, 1)
+tree_density = 0.016
+trees = {&"twisted_dead": 5.0, &"blighted_tree": 1.0}
+shrub_density = 0.04
+shrubs = {&"pale_fungus": 3.0, &"withered_bush": 1.0, &"boulder": 1.0, &"fallen_log": 1.0}
+detail_density = 1.0
+detail = {&"dead_leaves": 4.0, &"grey_grass": 2.0}
+forage_per_hectare = 6.0
+forage = {&"ing_hollow_root": 2.0, &"ing_iron_filings": 1.0, &"col_bone_charm": 1.0}
+ambience = PackedStringArray("mist")
+
+[sub_resource type="Resource" id="b_woods_edge"]
+script = ExtResource("2_biome")
+id = &"woods_edge"
+notes = "[X] The woods' edge facing the estate: blossom, hedgerow and meadow. (Keeper: the puca is in the garden, not here.)"
+ground_color = Color(0.54, 0.76, 0.4, 1)
+ground_color_alt = Color(0.64, 0.78, 0.42, 1)
+tree_density = 0.004
+trees = {&"wild_cherry": 3.0, &"hawthorn": 2.0, &"elder": 1.0, &"oak": 1.0}
+shrub_density = 0.04
+shrubs = {&"honeysuckle_bush": 2.0, &"rose_bush_white": 1.0, &"rose_bush_red": 1.0, &"bramble": 1.5, &"foxglove": 1.0}
+detail_density = 2.6
+detail = {&"tall_grass": 4.0, &"grass_tuft": 3.0, &"buttercup": 2.0, &"daisy": 2.0, &"cowslip": 1.0, &"clover": 2.0}
+forage_per_hectare = 20.0
+forage = {&"ing_wild_strawberry": 3.0, &"ing_blackberry": 2.0, &"ing_honeysuckle": 2.0, &"ing_elderflower": 2.0, &"ing_rose_white": 1.0, &"ing_madder": 1.0, &"ing_violet": 1.0, &"ing_primrose": 1.0, &"col_painted_pebble": 0.5, &"col_robin_egg_shell": 0.6, &"col_mask_ribbon": 0.3}
+ambience = PackedStringArray("butterflies", "petals", "pollen", "songbirds", "sparkles")
+
+[sub_resource type="Resource" id="b_blight_edge"]
+script = ExtResource("2_biome")
+id = &"blight_edge"
+notes = "[C] blight / [X] expression: the eastern border where spring sickens: grey petals, rose hips (time moves here), thornbriar."
+ground_color = Color(0.44, 0.46, 0.38, 1)
+ground_color_alt = Color(0.4, 0.4, 0.36, 1)
+tree_density = 0.008
+trees = {&"blighted_tree": 4.0, &"oak": 1.0, &"hawthorn": 1.0}
+shrub_density = 0.05
+shrubs = {&"withered_bush": 3.0, &"thornbriar": 2.0, &"rose_bush_red": 0.5}
+detail_density = 1.4
+detail = {&"grey_grass": 4.0, &"grass_tuft": 1.0, &"dead_leaves": 2.0}
+forage_per_hectare = 16.0
+forage = {&"ing_rose_hip": 4.0, &"ing_blighted_petals": 4.0, &"ing_thornbriar_sap": 2.0, &"ing_blackberry": 1.0, &"col_bone_charm": 0.3, &"col_odd_stone": 0.5}
+ambience = PackedStringArray("ash_motes")
+
+[resource]
+script = ExtResource("1_def")
+region_id = &"eastern_woods"
+display_name = "The Eastern Woods"
+provider = ExtResource("3_provider")
+seed = 3100
+biomes = Array[ExtResource("2_biome")]([SubResource("b_deep_wood"), SubResource("b_beech_hall"), SubResource("b_fern_hollow"), SubResource("b_stream_glen"), SubResource("b_stream_shallows"), SubResource("b_reed_marsh"), SubResource("b_dread_margin"), SubResource("b_bogge_territory"), SubResource("b_woods_edge"), SubResource("b_blight_edge")])
+forage_visuals = {&"col_acorn_caps": &"acorn_caps", &"col_bone_charm": &"bone_charm", &"col_jay_feather": &"feather_jay", &"col_mask_ribbon": &"mask_ribbon", &"col_odd_stone": &"odd_stone", &"col_old_arrowhead": &"old_arrowhead", &"col_painted_pebble": &"painted_pebble", &"col_river_glass": &"river_glass", &"col_robin_egg_shell": &"egg_shell", &"col_shed_antler": &"shed_antler", &"ing_blackberry": &"bramble", &"ing_blighted_petals": &"blighted_bloom", &"ing_elderflower": &"elderflower_sprig", &"ing_foxglove": &"foxglove", &"ing_glowcap": &"glowcap", &"ing_hawk_feather": &"feather_hawk", &"ing_hazelnut": &"hazelnuts", &"ing_hollow_root": &"hollow_root", &"ing_honey": &"wild_hive", &"ing_honeysuckle": &"honeysuckle_bush", &"ing_iron_filings": &"rusted_iron", &"ing_madder": &"madder_root", &"ing_meadowsweet": &"meadowsweet", &"ing_moss": &"starmoss", &"ing_oak_gall": &"oak_gall_twig", &"ing_owl_feather": &"feather_owl", &"ing_primrose": &"primrose", &"ing_river_silt": &"silt_patch", &"ing_rose_hip": &"rose_hips", &"ing_rose_white": &"rose_bush_white", &"ing_snail_shell": &"snail_shell", &"ing_thornbriar_sap": &"sap_briar", &"ing_trout": &"trout_pool", &"ing_violet": &"violet", &"ing_water_mint": &"water_mint", &"ing_wild_garlic": &"wild_garlic", &"ing_wild_hyacinth": &"bluebell", &"ing_wild_strawberry": &"strawberry_patch", &"ing_willow_bark": &"bark_strip", &"ing_wood_sorrel": &"wood_sorrel"}
+respawn_days = {&"col_acorn_caps": 0.0, &"col_bone_charm": 0.0, &"col_jay_feather": 0.0, &"col_mask_ribbon": 0.0, &"col_odd_stone": 0.0, &"col_old_arrowhead": 0.0, &"col_painted_pebble": 0.0, &"col_river_glass": 0.0, &"col_robin_egg_shell": 0.0, &"col_shed_antler": 0.0, &"ing_blackberry": 2.0, &"ing_blighted_petals": 2.0, &"ing_elderflower": 2.0, &"ing_foxglove": 2.0, &"ing_glowcap": 1.0, &"ing_hawk_feather": 3.0, &"ing_hazelnut": 2.0, &"ing_hollow_root": 2.0, &"ing_honey": 4.0, &"ing_honeysuckle": 2.0, &"ing_iron_filings": 0.0, &"ing_madder": 2.0, &"ing_meadowsweet": 2.0, &"ing_moss": 2.0, &"ing_oak_gall": 2.0, &"ing_owl_feather": 3.0, &"ing_primrose": 2.0, &"ing_river_silt": 2.0, &"ing_rose_hip": 2.0, &"ing_rose_white": 2.0, &"ing_snail_shell": 2.0, &"ing_thornbriar_sap": 2.0, &"ing_trout": 1.0, &"ing_violet": 2.0, &"ing_water_mint": 2.0, &"ing_wild_garlic": 2.0, &"ing_wild_hyacinth": 2.0, &"ing_wild_strawberry": 2.0, &"ing_willow_bark": 2.0, &"ing_wood_sorrel": 2.0}

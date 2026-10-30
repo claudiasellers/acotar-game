@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_glade"
+scene_path = "res://world/spring_court/suriel_glade/suriel_glade.tscn"
+center = Vector3(-825, 0, 625)
+radius = 215.0
+neighbors = PackedStringArray("border_woods")
+report_path = "res://world/spring_court/suriel_glade/suriel_glade_report.json"

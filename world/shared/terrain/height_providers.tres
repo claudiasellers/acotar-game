@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider_set.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider.gd" id="2"]
 [ext_resource type="Script" path="res://world/spring_court/manor_estate/terrain/manor_terrain.gd" id="3_manor"]
+[ext_resource type="Script" path="res://world/spring_court/border_woods/border_woods_terrain.gd" id="4_border"]
+[ext_resource type="Script" path="res://world/spring_court/eastern_woods/eastern_woods_terrain.gd" id="5_eastern"]
+[ext_resource type="Script" path="res://world/spring_court/suriel_glade/suriel_glade_terrain.gd" id="6_glade"]
 
 [sub_resource type="Resource" id="Resource_manor"]
 script = ExtResource("2")
@@ -12,6 +15,30 @@ fade = 64.0
 height_script = ExtResource("3_manor")
 priority = 10
 
+[sub_resource type="Resource" id="p_border_woods"]
+script = ExtResource("2")
+id = &"border_woods"
+bounds = Rect2(-700, 300, 1200, 1100)
+fade = 64.0
+height_script = ExtResource("4_border")
+priority = 10
+
+[sub_resource type="Resource" id="p_eastern_woods"]
+script = ExtResource("2")
+id = &"eastern_woods"
+bounds = Rect2(650, -650, 1200, 1200)
+fade = 64.0
+height_script = ExtResource("5_eastern")
+priority = 10
+
+[sub_resource type="Resource" id="p_suriel_glade"]
+script = ExtResource("2")
+id = &"suriel_glade"
+bounds = Rect2(-950, 450, 250, 350)
+fade = 40.0
+height_script = ExtResource("6_glade")
+priority = 11
+
 [resource]
 script = ExtResource("1")
-providers = Array[Resource]([SubResource("Resource_manor")])
+providers = Array[Resource]([SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade")])

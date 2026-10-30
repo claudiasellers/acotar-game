@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/border_woods/border_woods.gd" id="1_region"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/border_woods_biomes.tres" id="2_def"]
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawner.gd" id="3_spawner"]
+[ext_resource type="Resource" path="res://data/creatures/spawn/border_woods.tres" id="4_table"]
+
+[node name="BorderWoods" type="Node3D"]
+script = ExtResource("1_region")
+def = ExtResource("2_def")
+
+[node name="CreatureSpawner" type="Node3D" parent="."]
+script = ExtResource("3_spawner")
+table = ExtResource("4_table")
+bounds = Rect2(-700, 300, 1200, 1100)

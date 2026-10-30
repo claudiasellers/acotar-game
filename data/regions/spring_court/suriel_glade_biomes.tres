@@ -1,0 +1,79 @@
+[gd_resource type="Resource" script_class="WoodsRegionDef" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/shared/woods_region_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://world/spring_court/shared/woods_biome.gd" id="2_biome"]
+[ext_resource type="Script" path="res://world/spring_court/suriel_glade/suriel_glade_terrain.gd" id="3_provider"]
+
+[sub_resource type="Resource" id="b_young_birches"]
+script = ExtResource("2_biome")
+id = &"young_birches"
+notes = "[C] Western woods (book text): wild, oaks, elms and beeches intertwined, moss underfoot, and a glen of young skinny birches by running water (ch. 13-15)."
+ground_color = Color(0.48, 0.7, 0.44, 1)
+ground_color_alt = Color(0.56, 0.72, 0.56, 1)
+tree_density = 0.02
+trees = {&"silver_birch": 8.0, &"oak": 1.0, &"elm": 1.0, &"beech": 0.8}
+shrub_density = 0.04
+shrubs = {&"hazel": 2.0, &"fern": 2.0, &"mossy_rock": 1.0, &"honeysuckle_bush": 1.0, &"bramble": 1.0}
+detail_density = 2.4
+detail = {&"bluebell": 5.0, &"wood_anemone": 3.0, &"grass_tuft": 3.0, &"primrose": 1.0, &"violet": 1.0, &"wild_garlic": 1.0}
+forage_per_hectare = 34.0
+forage = {&"ing_wild_hyacinth": 3.0, &"ing_violet": 2.0, &"ing_primrose": 2.0, &"ing_wood_sorrel": 2.0, &"ing_wild_garlic": 2.0, &"ing_hazelnut": 2.0, &"ing_honeysuckle": 1.0, &"ing_blackberry": 1.0, &"ing_owl_feather": 1.0, &"ing_hawk_feather": 1.0, &"ing_snail_shell": 1.0, &"ing_moss": 1.0, &"ing_glowcap": 0.6, &"col_robin_egg_shell": 1.0, &"col_jay_feather": 1.0, &"col_acorn_caps": 1.0, &"col_painted_pebble": 0.5, &"col_odd_stone": 0.8, &"col_shed_antler": 0.5}
+ambience = PackedStringArray("butterflies", "pollen", "songbirds", "sparkles")
+
+[sub_resource type="Resource" id="b_snare_glade"]
+script = ExtResource("2_biome")
+id = &"snare_glade"
+notes = "[X] The open patch where the snare goes: short grass, a waiting oak, wildflowers. Clear sight lines on purpose."
+ground_color = Color(0.56, 0.76, 0.44, 1)
+ground_color_alt = Color(0.62, 0.78, 0.48, 1)
+tree_density = 0.0
+trees = {}
+shrub_density = 0.01
+shrubs = {&"mossy_rock": 1.0, &"foxglove": 1.0}
+detail_density = 2.6
+detail = {&"grass_tuft": 5.0, &"buttercup": 2.0, &"daisy": 2.0, &"clover": 2.0, &"cowslip": 1.0}
+forage_per_hectare = 24.0
+forage = {&"ing_wild_strawberry": 3.0, &"ing_elderflower": 1.0, &"ing_foxglove": 1.0, &"ing_meadowsweet": 1.0, &"col_odd_stone": 1.0}
+ambience = PackedStringArray("butterflies", "pollen", "sparkles")
+
+[sub_resource type="Resource" id="b_thornwater_banks"]
+script = ExtResource("2_biome")
+id = &"thornwater_banks"
+notes = "[X] The Thornwater's banks: willow, alder, mint, pebbles and trout lies. Water does not stop the naga (ch. 15)."
+ground_color = Color(0.4, 0.62, 0.4, 1)
+ground_color_alt = Color(0.5, 0.54, 0.42, 1)
+tree_density = 0.012
+trees = {&"willow": 3.0, &"alder": 3.0, &"silver_birch": 1.0}
+shrub_density = 0.06
+shrubs = {&"reed_clump": 1.5, &"cattail": 1.0, &"mossy_rock": 2.0, &"fern": 1.0}
+detail_density = 2.0
+detail = {&"pebbles": 3.0, &"water_mint": 2.0, &"meadowsweet": 2.0, &"grass_tuft": 2.0, &"lily_pad": 0.5}
+forage_per_hectare = 34.0
+forage = {&"ing_willow_bark": 2.0, &"ing_water_mint": 2.0, &"ing_meadowsweet": 1.5, &"ing_river_silt": 2.0, &"ing_trout": 2.0, &"col_river_glass": 1.5, &"col_odd_stone": 1.0}
+ambience = PackedStringArray("dragonflies", "fish", "butterflies", "sparkles")
+
+[sub_resource type="Resource" id="b_naga_reeds"]
+script = ExtResource("2_biome")
+id = &"naga_reeds"
+notes = "[C?] Horror exception: the naga's backwater. Black still water, reeds over head height, grey light, frogs that stop. No sparkle."
+ground_color = Color(0.24, 0.3, 0.22, 1)
+ground_color_alt = Color(0.2, 0.24, 0.2, 1)
+tree_density = 0.004
+trees = {&"twisted_dead": 1.0, &"alder": 1.0}
+shrub_density = 0.2
+shrubs = {&"reed_clump": 8.0, &"cattail": 3.0}
+detail_density = 1.6
+detail = {&"grey_grass": 3.0, &"lily_pad": 1.0, &"dead_leaves": 1.0}
+forage_per_hectare = 20.0
+forage = {&"ing_river_silt": 2.0, &"ing_hollow_root": 2.0, &"col_bone_charm": 1.0, &"col_old_arrowhead": 1.0}
+ambience = PackedStringArray("mist")
+
+[resource]
+script = ExtResource("1_def")
+region_id = &"suriel_glade"
+display_name = "The Suriel's Glade"
+provider = ExtResource("3_provider")
+seed = 4100
+biomes = Array[ExtResource("2_biome")]([SubResource("b_young_birches"), SubResource("b_snare_glade"), SubResource("b_thornwater_banks"), SubResource("b_naga_reeds")])
+forage_visuals = {&"col_acorn_caps": &"acorn_caps", &"col_bone_charm": &"bone_charm", &"col_jay_feather": &"feather_jay", &"col_odd_stone": &"odd_stone", &"col_old_arrowhead": &"old_arrowhead", &"col_painted_pebble": &"painted_pebble", &"col_river_glass": &"river_glass", &"col_robin_egg_shell": &"egg_shell", &"col_shed_antler": &"shed_antler", &"ing_blackberry": &"bramble", &"ing_elderflower": &"elderflower_sprig", &"ing_foxglove": &"foxglove", &"ing_glowcap": &"glowcap", &"ing_hawk_feather": &"feather_hawk", &"ing_hazelnut": &"hazelnuts", &"ing_hollow_root": &"hollow_root", &"ing_honeysuckle": &"honeysuckle_bush", &"ing_meadowsweet": &"meadowsweet", &"ing_moss": &"starmoss", &"ing_owl_feather": &"feather_owl", &"ing_primrose": &"primrose", &"ing_river_silt": &"silt_patch", &"ing_snail_shell": &"snail_shell", &"ing_trout": &"trout_pool", &"ing_violet": &"violet", &"ing_water_mint": &"water_mint", &"ing_wild_garlic": &"wild_garlic", &"ing_wild_hyacinth": &"bluebell", &"ing_wild_strawberry": &"strawberry_patch", &"ing_willow_bark": &"bark_strip", &"ing_wood_sorrel": &"wood_sorrel"}
+respawn_days = {&"col_acorn_caps": 0.0, &"col_bone_charm": 0.0, &"col_jay_feather": 0.0, &"col_odd_stone": 0.0, &"col_old_arrowhead": 0.0, &"col_painted_pebble": 0.0, &"col_river_glass": 0.0, &"col_robin_egg_shell": 0.0, &"col_shed_antler": 0.0, &"ing_blackberry": 2.0, &"ing_elderflower": 2.0, &"ing_foxglove": 2.0, &"ing_glowcap": 1.0, &"ing_hawk_feather": 3.0, &"ing_hazelnut": 2.0, &"ing_hollow_root": 2.0, &"ing_honeysuckle": 2.0, &"ing_meadowsweet": 2.0, &"ing_moss": 2.0, &"ing_owl_feather": 3.0, &"ing_primrose": 2.0, &"ing_river_silt": 2.0, &"ing_snail_shell": 2.0, &"ing_trout": 1.0, &"ing_violet": 2.0, &"ing_water_mint": 2.0, &"ing_wild_garlic": 2.0, &"ing_wild_hyacinth": 2.0, &"ing_wild_strawberry": 2.0, &"ing_willow_bark": 2.0, &"ing_wood_sorrel": 2.0}

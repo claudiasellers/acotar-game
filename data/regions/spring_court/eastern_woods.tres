@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"eastern_woods"
+scene_path = "res://world/spring_court/eastern_woods/eastern_woods.tscn"
+center = Vector3(1250, 0, -50)
+radius = 850.0
+neighbors = PackedStringArray()
+report_path = "res://world/spring_court/eastern_woods/eastern_woods_report.json"

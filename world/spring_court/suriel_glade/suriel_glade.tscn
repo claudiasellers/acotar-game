@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/suriel_glade/suriel_glade.gd" id="1_region"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/suriel_glade_biomes.tres" id="2_def"]
+
+[node name="SurielGlade" type="Node3D"]
+script = ExtResource("1_region")
+def = ExtResource("2_def")
