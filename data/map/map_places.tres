@@ -1,0 +1,152 @@
+[gd_resource type="Resource" script_class="MapPlaceSet" load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://ui/map/map_place_set.gd" id="1"]
+[ext_resource type="Script" path="res://ui/map/map_place.gd" id="2"]
+
+[sub_resource type="Resource" id="p0"]
+script = ExtResource("2")
+id = &"cottage"
+label = "The Cottage"
+rect = Rect2(-350, 2050, 400, 250)
+label_at = Vector2(-150, 2190)
+canon = "C"
+
+[sub_resource type="Resource" id="p1"]
+script = ExtResource("2")
+id = &"village"
+label = "The Village"
+rect = Rect2(50, 2050, 650, 450)
+label_at = Vector2(375, 2290)
+canon = "C"
+
+[sub_resource type="Resource" id="p2"]
+script = ExtResource("2")
+id = &"workshop"
+label = "The Old Estate"
+rect = Rect2(-900, 2050, 550, 450)
+label_at = Vector2(-640, 2290)
+canon = "C"
+
+[sub_resource type="Resource" id="p3"]
+script = ExtResource("2")
+id = &"hunting_forest"
+label = "The Hunting Forest"
+rect = Rect2(-900, 1480, 1600, 570)
+label_at = Vector2(-100, 1760)
+canon = "C"
+
+[sub_resource type="Resource" id="p4"]
+script = ExtResource("2")
+id = &"wall_seam"
+label = "The Wall"
+rect = Rect2(-900, 1395, 1600, 85)
+label_at = Vector2(-100, 1440)
+canon = "C"
+
+[sub_resource type="Resource" id="p5"]
+script = ExtResource("2")
+id = &"border_woods"
+label = "The Border Woods"
+rect = Rect2(-700, 500, 1200, 900)
+label_at = Vector2(-100, 900)
+canon = "X"
+
+[sub_resource type="Resource" id="p6"]
+script = ExtResource("2")
+id = &"eastern_woods"
+label = "The Eastern Woods"
+rect = Rect2(650, -650, 1200, 1200)
+label_at = Vector2(1250, -50)
+canon = "X"
+
+[sub_resource type="Resource" id="p7"]
+script = ExtResource("2")
+id = &"manor_estate"
+label = "The Manor"
+rect = Rect2(-600, -500, 1200, 1000)
+label_at = Vector2(0, -60)
+canon = "C"
+
+[sub_resource type="Resource" id="p8"]
+script = ExtResource("2")
+id = &"suriel_glade"
+label = "Birch Glade"
+rect = Rect2(-950, 450, 250, 350)
+label_at = Vector2(-825, 620)
+canon = "X"
+
+[sub_resource type="Resource" id="p9"]
+script = ExtResource("2")
+id = &"western_fells"
+label = "Western Fells"
+rect = Rect2(-1800, -900, 300, 2300)
+label_at = Vector2(-1650, 250)
+canon = "X"
+
+[sub_resource type="Resource" id="p10"]
+script = ExtResource("2")
+id = &"starlight_glen"
+label = "Starlight Glen"
+rect = Rect2(-1500, -500, 900, 1100)
+label_at = Vector2(-1050, 50)
+canon = "X"
+
+[sub_resource type="Resource" id="p11"]
+script = ExtResource("2")
+id = &"fae_village"
+label = "Village of the Lesser Fae"
+rect = Rect2(-1500, -1250, 900, 750)
+label_at = Vector2(-1050, -875)
+canon = "X"
+
+[sub_resource type="Resource" id="p12"]
+script = ExtResource("2")
+id = &"autumn_foothills"
+label = "The Autumn Border"
+rect = Rect2(-1800, -1700, 1200, 450)
+label_at = Vector2(-1200, -1480)
+canon = "X"
+
+[sub_resource type="Resource" id="p13"]
+script = ExtResource("2")
+id = &"rosewild"
+label = "The Rosewild"
+rect = Rect2(-600, -800, 1100, 300)
+label_at = Vector2(-50, -650)
+canon = "X"
+
+[sub_resource type="Resource" id="p14"]
+script = ExtResource("2")
+id = &"solstice_meadow"
+label = "The Solstice Meadow"
+rect = Rect2(-600, -1350, 900, 550)
+label_at = Vector2(-150, -1075)
+canon = "X"
+
+[sub_resource type="Resource" id="p15"]
+script = ExtResource("2")
+id = &"hill_of_the_rite"
+label = "The Hill of the Rite"
+rect = Rect2(300, -1500, 1000, 800)
+label_at = Vector2(800, -1100)
+canon = "X"
+
+[sub_resource type="Resource" id="p16"]
+script = ExtResource("2")
+id = &"blighted_reaches"
+label = "The Blighted Reaches"
+rect = Rect2(-600, -1700, 2300, 200)
+label_at = Vector2(550, -1600)
+canon = "X"
+
+[sub_resource type="Resource" id="p17"]
+script = ExtResource("2")
+id = &"blossom_vale"
+label = "Blossom Vale"
+rect = Rect2(500, 500, 1000, 900)
+label_at = Vector2(1000, 950)
+canon = "X"
+
+[resource]
+script = ExtResource("1")
+places = Array[ExtResource("2")]([SubResource("p0"), SubResource("p1"), SubResource("p2"), SubResource("p3"), SubResource("p4"), SubResource("p5"), SubResource("p6"), SubResource("p7"), SubResource("p8"), SubResource("p9"), SubResource("p10"), SubResource("p11"), SubResource("p12"), SubResource("p13"), SubResource("p14"), SubResource("p15"), SubResource("p16"), SubResource("p17")])
