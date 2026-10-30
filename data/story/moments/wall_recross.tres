@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wall_recross"
+chapters = "31"
+anchor_id = &"wall_gate_north"
+region_id = &"wall_seam"
+require_flags = PackedStringArray("beddor_fire_learned")
+night_only = false
+trigger = &"enter"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "control", "mode": "LOOK"}, {"do": "grade", "to": "spring", "s": 2.0}, {"do": "raise", "flag": "wall_recrossed"}])
+notes = "She rides back alone; the manor beyond is silent."

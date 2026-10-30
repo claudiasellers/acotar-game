@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"first_dinner"
+chapters = "7"
+anchor_id = &"manor_dining_table"
+region_id = &"manor_house"
+require_flags = PackedStringArray("wall_crossed")
+night_only = false
+trigger = &"enter"
+entry_radius = 3.0
+steps = Array[Dictionary]([{"do": "control", "mode": "LOOK"}, {"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -2.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "lucien", "at": Vector3(2.0, 0.0, -1.2), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "wait", "s": 1.5}, {"do": "cue", "actor": "tamlin", "cue": "i_dont_keep_slaves"}, {"do": "control", "mode": "NONE", "focus": "tamlin", "allow": ["interact"]}, {"do": "interact", "n": 3, "r": 3.0}, {"do": "cue", "actor": "lucien", "cue": "presses_about_andras"}, {"do": "wait", "s": 3.0}, {"do": "raise", "flag": "first_dinner_eaten"}, {"do": "celebrate", "kind": "meal"}])
+notes = "Magic holds her at the table until she eats (three bites)."

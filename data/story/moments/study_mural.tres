@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"study_mural"
+chapters = "13"
+anchor_id = &"manor_study_mural"
+region_id = &"manor_house"
+require_flags = PackedStringArray("tamlin_wound_dressed")
+night_only = false
+trigger = &"enter"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "control", "mode": "WALK"}, {"do": "gaze_hold", "actor": "self", "s": 4.0, "cone": 30.0}, {"do": "journal", "entry": "prythian_history_mural"}, {"do": "spawn", "actor": "lucien", "at": Vector3(2.0, 0.0, 2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "lucien", "cue": "how_to_catch_a_suriel"}, {"do": "journal", "entry": "suriel_method"}, {"do": "raise", "flag": "fact.suriel_method_known"}, {"do": "raise", "flag": "study_mural_seen"}])
+notes = ""

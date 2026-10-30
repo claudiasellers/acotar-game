@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"paintings_shown"
+chapters = "22"
+anchor_id = &"manor_dining_table"
+region_id = &"manor_house"
+require_flags = PackedStringArray("bite_endured", "first_painting")
+night_only = false
+trigger = &"interact"
+entry_radius = 3.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -2.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "cue", "actor": "tamlin", "cue": "shrinks_the_table"}, {"do": "interact", "n": 1, "r": 3.0}, {"do": "cue", "actor": "tamlin", "cue": "keeps_the_snowy_forest"}, {"do": "raise", "flag": "fact.tamlin_kept_snowy_forest"}, {"do": "raise", "flag": "paintings_shown"}, {"do": "celebrate", "kind": "deed"}])
+notes = ""

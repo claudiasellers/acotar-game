@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"summer_faerie"
+chapters = "17"
+anchor_id = &"manor_infirmary"
+region_id = &"manor_house"
+require_flags = PackedStringArray("naga_survived")
+night_only = false
+trigger = &"enter"
+entry_radius = 4.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "summer_faerie", "at": Vector3(0.0, 0.0, -1.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "tamlin", "at": Vector3(1.0, 0.0, -1.6), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "mood", "mood": "dread", "i": 0.4, "s": 2.0, "shake": 0.0}, {"do": "cue", "actor": "lucien", "cue": "leaves_sick"}, {"do": "control", "mode": "WALK", "focus": "summer_faerie"}, {"do": "stay", "s": 25.0, "r": 2.5, "near": "summer_faerie", "strict": false}, {"do": "cue", "actor": "summer_faerie", "cue": "dies"}, {"do": "wait", "s": 2.0}, {"do": "raise", "flag": "summer_faerie_comforted"}, {"do": "cue", "actor": "tamlin", "cue": "prays"}])
+notes = "Unwinnable triage. The deed is staying with him until he dies."

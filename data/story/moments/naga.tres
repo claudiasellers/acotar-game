@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"naga"
+chapters = "15"
+anchor_id = &"suriel_snare"
+region_id = &"suriel_glade"
+require_flags = PackedStringArray("suriel_bound")
+night_only = false
+trigger = &"auto"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "mood", "mood": "dread", "i": 0.9, "s": 1.0, "shake": 0.0}, {"do": "spawn", "actor": "naga", "at": Vector3(6.0, 0.0, -6.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "naga_2", "at": Vector3(-6.0, 0.0, -5.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "naga_3", "at": Vector3(5.0, 0.0, 6.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "naga_4", "at": Vector3(-5.0, 0.0, 7.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "FULL"}, {"do": "cue", "actor": "naga", "cue": "attack"}, {"do": "until_killed", "kind": "naga", "n": 1}, {"do": "stay", "s": 6.0, "r": 30.0, "near": "self", "strict": false}, {"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -8.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "tamlin", "cue": "tears_a_throat"}, {"do": "mood", "mood": "dread", "i": 0.3, "s": 2.0, "shake": 0.0}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "wait", "s": 2.0}, {"do": "raise", "flag": "naga_survived"}])
+notes = "Four naga; she kills one, survives until Tamlin arrives."

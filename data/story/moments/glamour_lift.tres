@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"glamour_lift"
+chapters = "23"
+anchor_id = &"glamour_lift_glade"
+region_id = &"blossom_vale"
+require_flags = PackedStringArray("paintings_shown")
+night_only = false
+trigger = &"enter"
+entry_radius = 8.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -1.2), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "wait", "s": 2.0}, {"do": "cue", "actor": "tamlin", "cue": "kisses_her_eyelids"}, {"do": "raise", "flag": "glamour_lifted"}, {"do": "cue", "actor": "feyre", "cue": "smell_flowers"}, {"do": "celebrate", "kind": "glamour"}, {"do": "wait", "s": 3.0}])
+notes = "Magic smells of flowers now; true forms show (GlamourLayer)."

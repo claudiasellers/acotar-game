@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rhysand_visit"
+chapters = "26"
+anchor_id = &"manor_window_hide"
+region_id = &"manor_house"
+require_flags = PackedStringArray("solstice_danced")
+night_only = false
+trigger = &"enter"
+entry_radius = 3.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "lucien", "at": Vector3(1.0, 0.0, 0.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "lucien", "cue": "glamours_her"}, {"do": "spawn", "actor": "rhysand", "at": Vector3(0.0, 0.0, -6.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "tamlin", "at": Vector3(-2.0, 0.0, -5.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "mood", "mood": "dread", "i": 0.7, "s": 1.0, "shake": 0.0}, {"do": "control", "mode": "WALK", "focus": "rhysand"}, {"do": "cue", "actor": "rhysand", "cue": "mocks_tamlin"}, {"do": "stay", "s": 10.0, "r": 2.5, "near": "self", "strict": false}, {"do": "cue", "actor": "rhysand", "cue": "pries_into_her_mind"}, {"do": "mood", "mood": "dread", "i": 0.9, "s": 0.3, "shake": 0.25}, {"do": "decision", "options": [{"action": "interact", "fact": "fact.false_name_clare_beddor"}], "s": 6.0, "default": "fact.false_name_clare_beddor"}, {"do": "cue", "actor": "rhysand", "cue": "see_you_under_the_mountain"}, {"do": "mood", "mood": "dread", "i": 0.2, "s": 2.0, "shake": 0.0}, {"do": "raise", "flag": "rhysand_faced"}])
+notes = ""

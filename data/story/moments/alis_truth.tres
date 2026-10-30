@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"alis_truth"
+chapters = "32"
+anchor_id = &"manor_alis_hiding"
+region_id = &"manor_house"
+require_flags = PackedStringArray("wall_recrossed")
+night_only = false
+trigger = &"enter"
+entry_radius = 4.0
+steps = Array[Dictionary]([{"do": "mood", "mood": "dread", "i": 0.5, "s": 2.0, "shake": 0.0}, {"do": "spawn", "actor": "alis", "at": Vector3(0.0, 0.0, -1.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "alis"}, {"do": "wait", "s": 6.0}, {"do": "journal", "entry": "amarantha_and_the_curse"}, {"do": "journal", "entry": "andras_crossed_to_help"}, {"do": "raise", "flag": "alis_truth_heard"}])
+notes = "The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed)."

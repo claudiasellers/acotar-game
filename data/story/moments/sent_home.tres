@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sent_home"
+chapters = "27-28"
+anchor_id = &"manor_tamlin_room"
+region_id = &"manor_house"
+require_flags = PackedStringArray("rhysand_faced")
+night_only = false
+trigger = &"enter"
+entry_radius = 4.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -1.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "wait", "s": 4.0}, {"do": "cue", "actor": "tamlin", "cue": "sends_her_home"}, {"do": "grant", "item": "outfit_mortal_travel_dress", "n": 1}, {"do": "mood", "mood": "enchanted_sleep", "i": 1.0, "s": 2.5, "shake": 0.0}, {"do": "wait", "s": 3.0}, {"do": "raise", "flag": "sent_home"}, {"do": "grade", "to": "human_spring", "s": 2.0}, {"do": "travel", "region": "archeron_estate", "anchor": "arrival_archeron_estate"}, {"do": "mood", "mood": "calm", "i": 0.0, "s": 2.0, "shake": 0.0}])
+notes = ""

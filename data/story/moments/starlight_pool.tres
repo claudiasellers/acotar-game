@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"starlight_pool"
+chapters = "18"
+anchor_id = &"starlight_pool"
+region_id = &"starlight_glen"
+require_flags = PackedStringArray("summer_faerie_comforted")
+night_only = false
+trigger = &"enter"
+entry_radius = 10.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(2.0, 0.0, 2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "WALK"}, {"do": "cue", "actor": "tamlin", "cue": "shows_his_childhood_pool"}, {"do": "celebrate", "kind": "vista"}, {"do": "stay", "s": 6.0, "r": 8.0, "near": "self", "strict": false}, {"do": "raise", "flag": "starlight_pool_found"}, {"do": "celebrate", "kind": "deed"}, {"do": "journal", "entry": "lucien_autumn_history"}, {"do": "grant", "item": "obj_lucien_knife", "n": 1}])
+notes = "Picnic in the glen, swim in the pool; Lucien's story and his knife."

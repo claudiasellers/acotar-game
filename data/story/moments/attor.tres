@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"attor"
+chapters = "19"
+anchor_id = &"attor_hiding_spot"
+region_id = &"manor_grounds"
+require_flags = PackedStringArray("first_painting")
+night_only = false
+trigger = &"enter"
+entry_radius = 3.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(1.0, 0.0, -2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "tamlin", "cue": "hides_her"}, {"do": "control", "mode": "WALK"}, {"do": "mood", "mood": "dread", "i": 0.8, "s": 1.0, "shake": 0.0}, {"do": "spawn", "actor": "attor", "at": Vector3(0.0, 3.0, -12.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "attor", "cue": "speaks_of_her"}, {"do": "stay", "s": 18.0, "r": 2.5, "near": "self", "strict": true, "fail_fact": "fact.attor_detected"}, {"do": "mood", "mood": "dread", "i": 0.2, "s": 2.0, "shake": 0.0}, {"do": "despawn", "actor": "attor"}, {"do": "raise", "flag": "attor_evaded"}])
+notes = "Stay hidden; leaving the spot is detection (a permanent fact) and the scene ends."

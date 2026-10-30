@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cave_mouth"
+chapters = "20-21"
+anchor_id = &"calanmai_cave_mouth"
+region_id = &"hill_of_the_rite"
+require_flags = PackedStringArray("calanmai_attended")
+night_only = true
+trigger = &"enter"
+entry_radius = 5.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "high_fae_male", "at": Vector3(2.0, 0.0, -2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "high_fae_male_2", "at": Vector3(-2.0, 0.0, -2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "high_fae_male_3", "at": Vector3(0.0, 0.0, -3.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "WALK"}, {"do": "mood", "mood": "dread", "i": 0.9, "s": 0.8, "shake": 0.2}, {"do": "wait", "s": 4.0}, {"do": "spawn", "actor": "rhysand", "at": Vector3(0.0, 0.0, 2.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "rhysand", "cue": "steadies_her"}, {"do": "cue", "actor": "high_fae_male", "cue": "flee"}, {"do": "despawn", "actor": "high_fae_male"}, {"do": "despawn", "actor": "high_fae_male_2"}, {"do": "despawn", "actor": "high_fae_male_3"}, {"do": "mood", "mood": "dread", "i": 0.3, "s": 2.0, "shake": 0.0}, {"do": "control", "mode": "LOOK", "focus": "rhysand"}, {"do": "wait", "s": 4.0}, {"do": "journal", "entry": "stranger_violet_eyes"}, {"do": "raise", "flag": "stranger_met"}, {"do": "spawn", "actor": "lucien", "at": Vector3(3.0, 0.0, 3.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "lucien", "cue": "carries_her_home"}])
+notes = ""

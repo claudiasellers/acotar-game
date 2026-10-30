@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"manor_map"
+chapters = "12"
+anchor_id = &""
+region_id = &"manor_house"
+require_flags = PackedStringArray("puca_resisted")
+night_only = false
+trigger = &"auto"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "until_flag", "flag": "fact.hall_mark_1"}, {"do": "until_flag", "flag": "fact.hall_mark_2"}, {"do": "until_flag", "flag": "fact.hall_mark_3"}, {"do": "until_flag", "flag": "fact.hall_mark_4"}, {"do": "until_flag", "flag": "fact.hall_mark_5"}, {"do": "raise", "flag": "manor_map_drawn"}, {"do": "celebrate", "kind": "map"}])
+notes = "Global: the map is drawn once all five hall marks are made."

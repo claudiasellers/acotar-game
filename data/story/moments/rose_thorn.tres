@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rose_thorn"
+chapters = "19"
+anchor_id = &"rose_garden_bush"
+region_id = &"manor_grounds"
+require_flags = PackedStringArray("gallery_opened")
+night_only = false
+trigger = &"interact"
+entry_radius = 2.5
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(1.0, 0.0, 1.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "cue", "actor": "tamlin", "cue": "kisses_her_palm"}, {"do": "wait", "s": 2.0}, {"do": "raise", "flag": "fact.rose_thorn_healed"}, {"do": "celebrate", "kind": "rose"}])
+notes = "Optional: the mating-gift garden."

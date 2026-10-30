@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fountain_head"
+chapters = "24"
+anchor_id = &"manor_fountain"
+region_id = &"manor_grounds"
+require_flags = PackedStringArray("glamour_lifted")
+night_only = false
+trigger = &"enter"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "control", "mode": "LOOK", "focus": "self"}, {"do": "mood", "mood": "dread", "i": 0.7, "s": 1.0, "shake": 0.0}, {"do": "wait", "s": 3.0}, {"do": "journal", "entry": "night_court_mark"}, {"do": "raise", "flag": "fountain_head_found"}])
+notes = ""

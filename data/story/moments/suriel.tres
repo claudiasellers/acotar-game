@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel"
+chapters = "14"
+anchor_id = &"suriel_snare"
+region_id = &"suriel_glade"
+require_flags = PackedStringArray("fact.suriel_method_known")
+night_only = false
+trigger = &"interact"
+entry_radius = 3.0
+steps = Array[Dictionary]([{"do": "control", "mode": "WALK"}, {"do": "interact", "n": 2, "r": 3.0}, {"do": "cue", "actor": "feyre", "cue": "climbs_tree"}, {"do": "stay", "s": 20.0, "r": 12.0, "near": "self", "strict": false}, {"do": "spawn", "actor": "suriel", "at": Vector3(0.0, 0.0, -1.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "suriel", "cue": "caught"}, {"do": "control", "mode": "LOOK", "focus": "suriel"}, {"do": "wait", "s": 3.0}, {"do": "journal", "entry": "suriel_stay_with_the_high_lord"}, {"do": "journal", "entry": "suriel_hybern_and_the_blight"}, {"do": "wait", "s": 5.0}, {"do": "raise", "flag": "suriel_bound"}, {"do": "cue", "actor": "suriel", "cue": "naga_are_coming"}])
+notes = "Young birches, running water, a fresh chicken, a double-loop snare. Wait nearby."

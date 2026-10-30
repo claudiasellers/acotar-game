@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"curtain_trap"
+chapters = "7"
+anchor_id = &"feyre_bedroom_window"
+region_id = &"manor_house"
+require_flags = PackedStringArray("first_dinner_eaten")
+night_only = true
+trigger = &"interact"
+entry_radius = 2.5
+steps = Array[Dictionary]([{"do": "control", "mode": "LOOK", "focus": "self"}, {"do": "wait", "s": 1.0}, {"do": "control", "mode": "WALK"}, {"do": "interact", "n": 2, "r": 3.0}, {"do": "raise", "flag": "curtain_trap_set"}])
+notes = "Next morning it knocks over Alis."

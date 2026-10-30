@@ -58,3 +58,39 @@ static func horse() -> Node3D:
 	var root := Node3D.new()
 	root.name = "StandIn_horse"
 	return _mesh_body(Vector3(0.7, 1.6, 2.3), Color(0.94, 0.93, 0.90), root)
+
+
+## A person or fae for any story actor without a model yet: a capsule tinted
+## per actor (main characters stay placeholders until the Blender pass).
+static func figure(actor_id: String) -> Node3D:
+	var tints := {
+		"tamlin": Color(0.85, 0.70, 0.35), "lucien": Color(0.75, 0.30, 0.20),
+		"alis": Color(0.55, 0.45, 0.30), "rhysand": Color(0.15, 0.15, 0.25),
+		"nesta": Color(0.35, 0.40, 0.55), "elain": Color(0.80, 0.70, 0.55),
+		"father": Color(0.40, 0.36, 0.30), "suriel": Color(0.80, 0.78, 0.72),
+		"naga": Color(0.20, 0.30, 0.20), "attor": Color(0.25, 0.22, 0.28),
+		"bogge": Color(0.05, 0.05, 0.06), "puca": Color(0.40, 0.36, 0.30),
+		"summer_faerie": Color(0.30, 0.50, 0.85), "high_fae_male": Color(0.45, 0.35, 0.30),
+	}
+	# "naga_2" is the second naga: same kind, own actor id.
+	var base := actor_id
+	var parts := actor_id.rsplit("_", true, 1)
+	if parts.size() == 2 and parts[1].is_valid_int():
+		base = parts[0]
+	var root: Node3D
+	if base in ["naga", "high_fae_male"]:
+		root = creature(StringName(base), Vector3(0.6, 1.8, 0.6), tints.get(base, Color.GRAY))
+	else:
+		root = Node3D.new()
+		var mesh := MeshInstance3D.new()
+		var capsule := CapsuleMesh.new()
+		capsule.radius = 0.28
+		capsule.height = 1.85
+		mesh.mesh = capsule
+		mesh.position.y = 0.925
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = tints.get(base, Color(0.6, 0.6, 0.6))
+		mesh.material_override = mat
+		root.add_child(mesh)
+	root.name = "StandIn_%s" % actor_id
+	return root

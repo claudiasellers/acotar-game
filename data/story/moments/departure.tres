@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"departure"
+chapters = "32"
+anchor_id = &"the_pass_road"
+region_id = &"the_pass"
+require_flags = PackedStringArray("alis_truth_heard")
+night_only = false
+trigger = &"enter"
+entry_radius = 10.0
+steps = Array[Dictionary]([{"do": "control", "mode": "LOOK"}, {"do": "wait", "s": 3.0}, {"do": "raise", "flag": "departed_for_mountain"}])
+notes = ""

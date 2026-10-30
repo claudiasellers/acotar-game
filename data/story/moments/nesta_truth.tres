@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"nesta_truth"
+chapters = "29-30"
+anchor_id = &"archeron_estate_garden"
+region_id = &"archeron_estate"
+require_flags = PackedStringArray("sent_home")
+night_only = false
+trigger = &"enter"
+entry_radius = 6.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "elain", "at": Vector3(1.0, 0.0, -1.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "nesta", "at": Vector3(0.0, 0.0, -5.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "elain", "cue": "digs_the_garden"}, {"do": "stay", "s": 8.0, "r": 3.0, "near": "elain", "strict": false}, {"do": "raise", "flag": "fact.garden_dug_with_elain"}, {"do": "control", "mode": "WALK", "focus": "nesta"}, {"do": "stay", "s": 10.0, "r": 3.0, "near": "nesta", "strict": false}, {"do": "cue", "actor": "nesta", "cue": "tells_the_truth"}, {"do": "journal", "entry": "nesta_tried_the_wall"}, {"do": "raise", "flag": "nesta_truth_heard"}])
+notes = ""

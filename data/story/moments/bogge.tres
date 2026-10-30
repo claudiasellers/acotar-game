@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bogge"
+chapters = "9-10"
+anchor_id = &"bogge_hunt_path"
+region_id = &"border_woods"
+require_flags = PackedStringArray("first_dinner_eaten")
+night_only = false
+trigger = &"enter"
+entry_radius = 8.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "lucien", "at": Vector3(1.5, 0.0, 0.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "WALK"}, {"do": "cue", "actor": "lucien", "cue": "talks_of_andras"}, {"do": "wait", "s": 3.0}, {"do": "journal", "entry": "treaty_no_loophole"}, {"do": "journal", "entry": "masks_are_permanent"}, {"do": "cue", "actor": "lucien", "cue": "dont_move_look_ahead"}, {"do": "control", "mode": "LOOK"}, {"do": "mood", "mood": "dread", "i": 0.9, "s": 1.5, "shake": 0.15}, {"do": "spawn", "actor": "bogge", "at": Vector3(-6.0, 0.0, 4.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "bogge", "cue": "pass_behind"}, {"do": "gaze_avoid", "actor": "bogge", "s": 14.0, "cone": 40.0, "max": 0.8, "fail_fact": "fact.bogge_looked"}, {"do": "despawn", "actor": "bogge"}, {"do": "mood", "mood": "dread", "i": 0.2, "s": 3.0, "shake": 0.0}, {"do": "cue", "actor": "tamlin", "cue": "hunts_the_bogge"}, {"do": "raise", "flag": "bogge_survived"}])
+notes = "It is real only if acknowledged: looking at it for more than 0.8 s fails the scene."

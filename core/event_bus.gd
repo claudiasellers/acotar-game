@@ -50,3 +50,12 @@ signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName
 ## Story to world: change the weather now (&"snow_heavy", &"snow_slow",
 ## &"snow_pause", &"clear"), blended over `seconds`.
 signal weather_requested(weather: StringName, seconds: float)
+## Story to world/audio/VFX: a Spring Court deed or unlock lands. Sparkle and
+## chime (R3); never used for the horror beats.
+signal celebration_requested(kind: StringName, at: Vector3)
+## Story to StoryDirector/world: move Feyre to another region (the carriage
+## home, the ride back). anchor_id is a story anchor there, or empty.
+signal travel_requested(region_id: StringName, anchor_id: StringName)
+## Story to systems: a journal or map truth Feyre learned (Suriel answers,
+## the Treaty, Amarantha's terms).
+signal journal_entry_added(entry_id: StringName)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wound_dressing"
+chapters = "12"
+anchor_id = &"manor_infirmary"
+region_id = &"manor_house"
+require_flags = PackedStringArray("puca_resisted")
+night_only = true
+trigger = &"enter"
+entry_radius = 4.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -1.2), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "tamlin"}, {"do": "wait", "s": 1.5}, {"do": "control", "mode": "NONE", "focus": "tamlin", "allow": ["interact"]}, {"do": "interact", "n": 3, "r": 3.0}, {"do": "cue", "actor": "tamlin", "cue": "realizes_she_cannot_read"}, {"do": "wait", "s": 2.0}, {"do": "raise", "flag": "tamlin_wound_dressed"}])
+notes = "The Bogge's bite blocks his healing: clean, salve, bandage."

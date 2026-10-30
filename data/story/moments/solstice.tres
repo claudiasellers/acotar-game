@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"solstice"
+chapters = "25"
+anchor_id = &"solstice_dance_floor"
+region_id = &"solstice_meadow"
+require_flags = PackedStringArray("fountain_head_found")
+night_only = false
+trigger = &"enter"
+entry_radius = 12.0
+steps = Array[Dictionary]([{"do": "grant", "item": "outfit_solstice_blue_gown", "n": 1}, {"do": "grant", "item": "hair_loose_with_flowers", "n": 1}, {"do": "spawn", "actor": "lucien", "at": Vector3(2.0, 0.0, 0.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -6.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "cue", "actor": "tamlin", "cue": "plays_the_fiddle"}, {"do": "celebrate", "kind": "solstice"}, {"do": "stay", "s": 15.0, "r": 15.0, "near": "self", "strict": false}, {"do": "cue", "actor": "lucien", "cue": "warns_of_faerie_wine"}, {"do": "cue", "actor": "tamlin", "cue": "takes_her_to_the_wisps"}, {"do": "stay", "s": 12.0, "r": 3.0, "near": "tamlin", "strict": false}, {"do": "celebrate", "kind": "dance"}, {"do": "raise", "flag": "solstice_danced"}])
+notes = ""

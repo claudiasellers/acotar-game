@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bite"
+chapters = "21"
+anchor_id = &"manor_kitchen_hall"
+region_id = &"manor_house"
+require_flags = PackedStringArray("stranger_met")
+night_only = true
+trigger = &"enter"
+entry_radius = 4.0
+steps = Array[Dictionary]([{"do": "spawn", "actor": "tamlin", "at": Vector3(0.0, 0.0, -1.0), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "NONE", "focus": "tamlin", "allow": ["interact"]}, {"do": "mood", "mood": "dread", "i": 0.8, "s": 0.3, "shake": 0.3}, {"do": "cue", "actor": "tamlin", "cue": "pins_and_bites"}, {"do": "wait", "s": 2.5}, {"do": "decision", "options": [{"action": "interact", "fact": "fact.bite.slapped"}], "s": 4.0, "default": "fact.bite.slapped"}, {"do": "mood", "mood": "dread", "i": 0.0, "s": 2.0, "shake": 0.0}, {"do": "raise", "flag": "bite_endured"}, {"do": "grant", "item": "obj_white_roses", "n": 1}])
+notes = "She slaps him (canon); the next day he gives her white roses."

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StoryMoment" format=3]
+
+[ext_resource type="Script" path="res://story/framework/story_moment.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hall_mark_1"
+chapters = "12"
+anchor_id = &"hall_mark_1"
+region_id = &"manor_house"
+require_flags = PackedStringArray("puca_resisted")
+night_only = false
+trigger = &"interact"
+entry_radius = 2.0
+steps = Array[Dictionary]([{"do": "raise", "flag": "fact.hall_mark_1"}])
+notes = "An X mark on her map of the halls."

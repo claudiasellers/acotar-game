@@ -21,6 +21,7 @@ WorldDeltas="*res://core/world_deltas.gd"
 SaveSystem="*res://core/save_system.gd"
 WorldStreamer="*res://core/streaming/world_streamer.gd"
 StoryControl="*res://core/story_control.gd"
+StoryDirector="*res://story/story_director.gd"
 
 [display]
 
