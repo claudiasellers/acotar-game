@@ -3,9 +3,10 @@
 ## ScatterLayers (docs/contracts/world.md §4): one layer per tree or shrub
 ## species and one per gatherable id.
 ##
-## Points come from a jittered grid per layer kind; each point asks the
-## provider for its biome, keeps itself with probability density * cell area,
-## then picks a species by the biome's weights. Ground height comes from
+## Trees and shrubs are composed by LandscapeLayout (groves, edges, species
+## patches, clumps). Detail cover comes from a jittered grid: each point asks
+## the provider for its biome, keeps itself with probability density * cell
+## area, then picks a species by the biome's weights. Ground height comes from
 ## WorldHeight so placement matches the final Terrain3D bake.
 class_name WoodsScatter
 extends RefCounted
@@ -50,6 +51,8 @@ static func generate(def: WoodsRegionDef, bounds: Rect2) -> Array[ScatterLayer]:
 static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: int = 0) -> Dictionary:
 	if kind == "forage":
 		return _place_drifts(def, rect, seed_offset)
+	if kind == "tree" or kind == "shrub":
+		return _place_composed(def, rect, kind, seed_offset)
 	var provider: Variant = def.provider
 	var biomes := def.biome_map()
 	var tables := _tables(def, kind)
@@ -80,12 +83,7 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 			# Composition (WoodsComposition): clearings and vista cones stay
 			# open; clearing floors and path edges carpet in one-colour drifts.
 			var drift := &""
-			if kind == "tree" or kind == "shrub":
-				if WoodsComposition.in_vista(def, x, z):
-					continue
-				if not WoodsComposition.clearing_at(def, x, z, 1.0 if kind == "tree" else 0.7).is_empty():
-					continue
-			elif kind == "detail":
+			if kind == "detail":
 				var glade := WoodsComposition.clearing_at(def, x, z)
 				if not glade.is_empty() and sc < 0.7:
 					drift = glade["flower"]
@@ -100,11 +98,7 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 			var wet: bool = provider.is_water(x, z)
 			if wet and not (_visual(def, kind, id) in WATER_OK):
 				continue
-			if kind == "tree" and clear < 0.95:
-				continue
-			if kind == "shrub" and clear < 0.6 and not wet:
-				continue
-			if kind != "tree" and kind != "shrub" and clear < 0.15 and not wet:
+			if clear < 0.15 and not wet:
 				continue
 			var visual := _visual(def, kind, id)
 			var range_: Vector2 = FloraLibrary.info(visual).get("scale", Vector2.ONE)
@@ -114,6 +108,139 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 				out[id] = PackedFloat32Array()
 			out[id].append_array(PackedFloat32Array([x, y, z, yaw, s]))
 	return out
+
+
+## Trees and shrubs composed by LandscapeLayout (plans/landscape-brief.md):
+## groves and open meadow from the stand map at each biome's density, a
+## feathered edge of flowering pioneers and a shrub mantle, species in
+## patches, trunks kept TRUNK_SPACING apart, specimen clumps of odd numbers
+## in the open, a verge along paths and soft clearing rims. Each biome keeps
+## its expected count (density * area), so budgets stay where they were.
+static func _place_composed(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: int) -> Dictionary:
+	var provider: Variant = def.provider
+	var biomes := def.biome_map()
+	var tables := _tables(def, kind)
+	var edge_tables := {}
+	for bid in tables:
+		edge_tables[bid] = LandscapeLayout.edge_table(tables[bid])
+	var layout := LandscapeLayout.make(def.seed, provider.BOUNDS)
+	var trees := kind == "tree"
+	var classify := func(p: Vector2) -> StringName:
+		var bid: StringName = provider.biome_at(p.x, p.y)
+		return bid if tables.has(bid) else &""
+	var weigh := func(bid: StringName, p: Vector2) -> float:
+		var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), _open(biomes[bid]))
+		return LandscapeLayout.tree_weight(zn) if trees else LandscapeLayout.shrub_weight(layout, zn, p.x, p.y)
+	var means := LandscapeLayout.mean_weights(layout, provider.BOUNDS, classify, weigh)
+	var cell: float = LandscapeLayout.TREE_CELL if trees else CELL[kind]
+	var area := cell * cell
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([def.seed, kind, "composed", seed_offset, rect.position, rect.size])
+	var out := {}
+	if trees:
+		_place_clumps(def, rect, layout, tables, biomes, out)
+	var nx := ceili(rect.size.x / cell)
+	var nz := ceili(rect.size.y / cell)
+	for iz in nz:
+		for ix in nx:
+			# Always draw the same number of randoms per cell (determinism).
+			var jx := rng.randf()
+			var jz := rng.randf()
+			var roll := rng.randf()
+			var r1 := rng.randf()
+			var r2 := rng.randf()
+			var yaw := rng.randf() * TAU
+			var sc := rng.randf()
+			var x := rect.position.x + (ix + jx) * cell
+			var z := rect.position.y + (iz + jz) * cell
+			var biome_id: StringName = provider.biome_at(x, z)
+			var table: Array = tables.get(biome_id, [])
+			if table.is_empty():
+				continue
+			var b: WoodsBiome = biomes[biome_id]
+			var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, x, z), _open(b))
+			var w := LandscapeLayout.tree_weight(zn) if trees else LandscapeLayout.shrub_weight(layout, zn, x, z)
+			var p_keep := _density(b, kind) * area * w / float(means.get(biome_id, 1.0))
+			if trees:
+				p_keep *= LandscapeLayout.COUNT_MAKEUP
+			if roll >= p_keep:
+				continue
+			if WoodsComposition.in_vista(def, x, z):
+				continue
+			var glade := WoodsComposition.clearing_at(def, x, z, 1.4)
+			if not glade.is_empty():
+				var rim := LandscapeLayout.clearing_factor(Vector2(x, z).distance_to(glade["center"]), float(glade["radius"]) * (1.0 if trees else 0.7))
+				if roll >= p_keep * rim:
+					continue
+			var wet: bool = provider.is_water(x, z)
+			var clear: float = provider.clearance(x, z)
+			if trees:
+				if clear < 0.95 or roll >= p_keep * LandscapeLayout.path_factor(WoodsComposition.path_distance(def, x, z)):
+					continue
+			elif clear < 0.6 and not wet:
+				continue
+			var id: StringName
+			if trees:
+				id = LandscapeLayout.tree_species(layout, table, edge_tables[biome_id], x, z, zn["edge"], r1, r2)
+			else:
+				id = LandscapeLayout.shrub_species(layout, table, x, z, r1, r2)
+			if wet and not (_visual(def, kind, id) in WATER_OK):
+				continue
+			if trees:
+				if not LandscapeLayout.trunk_free(layout, Vector2(x, z), id):
+					continue
+				LandscapeLayout.add_trunk(layout, Vector2(x, z), id)
+				sc = LandscapeLayout.edge_scale(sc, zn)
+			_append(out, id, x, z, yaw, FloraLibrary.info(_visual(def, kind, id)).get("scale", Vector2.ONE), sc)
+	return out
+
+
+## Specimen clumps of 1/3/5/7 out in a biome's open ground, one species each,
+## the first member the largest (the parent).
+static func _place_clumps(def: WoodsRegionDef, rect: Rect2, layout: Dictionary, tables: Dictionary,
+		biomes: Dictionary, out: Dictionary) -> void:
+	var provider: Variant = def.provider
+	var open_at := func(p: Vector2) -> float:
+		var b: WoodsBiome = biomes.get(provider.biome_at(p.x, p.y))
+		if b == null or not tables.has(b.id):
+			return 0.0
+		return 1.0 - LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), _open(b))["grove"]
+	var rate_at := func(p: Vector2) -> float:
+		var b: WoodsBiome = biomes.get(provider.biome_at(p.x, p.y))
+		return clampf(b.tree_density * LandscapeLayout.CLUMP_CELL * LandscapeLayout.CLUMP_CELL * 0.05, 0.02, 0.22) if b != null else 0.0
+	for c in LandscapeLayout.clumps(layout, rect, open_at, rate_at):
+		var centre: Vector2 = c["center"]
+		var bid: StringName = provider.biome_at(centre.x, centre.y)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash([def.seed, "clump", centre])
+		var id := LandscapeLayout.pick(tables[bid], rng.randf())
+		var members: PackedVector2Array = c["members"]
+		for m in members.size():
+			var q := members[m]
+			if not rect.has_point(q) or provider.biome_at(q.x, q.y) != bid:
+				continue
+			if provider.clearance(q.x, q.y) < 0.95 or provider.is_water(q.x, q.y) or WoodsComposition.in_vista(def, q.x, q.y):
+				continue
+			if not WoodsComposition.clearing_at(def, q.x, q.y).is_empty():
+				continue
+			if WoodsComposition.path_distance(def, q.x, q.y) < LandscapeLayout.PATH_VERGE + 2.0:
+				continue
+			if not LandscapeLayout.trunk_free(layout, q, id):
+				continue
+			LandscapeLayout.add_trunk(layout, q, id)
+			var sc := 0.9 + rng.randf() * 0.1 if m == 0 else rng.randf() * 0.7
+			_append(out, id, q.x, q.y, rng.randf() * TAU, FloraLibrary.info(id).get("scale", Vector2.ONE), sc)
+
+
+static func _append(out: Dictionary, id: StringName, x: float, z: float, yaw: float, range_: Vector2, sc: float) -> void:
+	if not out.has(id):
+		out[id] = PackedFloat32Array()
+	out[id].append_array(PackedFloat32Array([x, WorldHeight.height_at(x, z), z, yaw, lerpf(range_.x, range_.y, sc)]))
+
+
+## Open share of a biome's ground (no grove), from its tree density.
+static func _open(b: WoodsBiome) -> float:
+	return LandscapeLayout.open_share(b.tree_density)
 
 
 ## Forage as drifts of 5-30 of one kind around a centre (finds alone or in
