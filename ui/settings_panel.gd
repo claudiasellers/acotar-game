@@ -13,6 +13,8 @@ const SAVE_SLOT := "slot_0"
 const CARD_WIDTH := 1000.0
 ## The guidance lane's "Feyre's thoughts" setting, shown once that lane lands.
 const GUIDE_SETTINGS := "res://ui/guide/guide_settings.gd"
+## The map lane's minimap switch and "open the map" (ui/map/).
+const MAP_SETTINGS := "res://ui/map/map_settings.gd"
 
 var _menu: Control
 var _card: PanelContainer
@@ -24,6 +26,8 @@ var _columns: HBoxContainer
 var _text_buttons: Array[Button] = []
 var _guide_buttons: Dictionary = {}
 var _guide: Script = null
+var _map: Script = null
+var _minimap_check: CheckBox
 var _controls: Dictionary = {}
 var _hint: ControlsHint
 var _sparkles: CPUParticles2D
@@ -144,6 +148,8 @@ func _sync() -> void:
 			s.set_value_no_signal(GameSettings.slider_from_sensitivity(v) if String(key).ends_with("sensitivity") else float(v))
 		elif c is CheckBox:
 			(c as CheckBox).set_pressed_no_signal(bool(v))
+	if _minimap_check:
+		_minimap_check.set_pressed_no_signal(bool(_map.call(&"minimap_shown")))
 	if _guide:
 		var mode: int = _guide.call(&"get_mode")
 		for m: int in _guide_buttons:
@@ -237,6 +243,7 @@ func _build() -> void:
 	var sound := _section(right, "Sound", Color(0.62, 0.90, 0.78))
 	_slider(sound, &"music_volume", "Music volume")
 	_slider(sound, &"sound_volume", "Sound volume")
+	_build_map(right)
 
 	var words := _section(right, "Text size", Color(1.0, 0.88, 0.55))
 	var sizes := HBoxContainer.new()
@@ -272,6 +279,10 @@ func _build() -> void:
 	actions.add_theme_constant_override(&"separation", 12)
 	col.add_child(actions)
 	_resume = _action(actions, "Resume", close)
+	if _map:
+		_action(actions, "Map", func() -> void:
+			close()
+			_map.call(&"open_map"))
 	_action(actions, "Return Home", _return_home)
 	_action(actions, "Save & Title", func() -> void: _save_then(_to_title))
 	_action(actions, "Save & Quit", func() -> void: _save_then(_quit))
@@ -305,6 +316,20 @@ func _build_guide(parent: Control) -> void:
 
 ## Sizes the settings area to its contents, or to what is left of the screen
 ## under the title and the buttons (large text sizes scroll).
+func _build_map(parent: Control) -> void:
+	if not ResourceLoader.exists(MAP_SETTINGS):
+		return
+	_map = load(MAP_SETTINGS) as Script
+	var box := _section(parent, "Map", PauseStyle.PERIWINKLE.lightened(0.2))
+	_minimap_check = CheckBox.new()
+	_minimap_check.text = "Show the minimap (N)  ·  M opens the map"
+	_minimap_check.focus_mode = Control.FOCUS_ALL
+	_minimap_check.toggled.connect(func(on: bool) -> void:
+		_map.call(&"set_minimap_shown", on)
+		Juice.bounce_control(_minimap_check, 0.05))
+	box.add_child(_minimap_check)
+
+
 func _fit_to_screen() -> void:
 	var screen := get_viewport().get_visible_rect().size.y / maxf(get_tree().root.content_scale_factor, 0.01)
 	var col := _scroll.get_parent() as VBoxContainer
