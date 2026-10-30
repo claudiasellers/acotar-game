@@ -3,6 +3,8 @@
 ## Never a list, a marker or a distance. GuideDirector decides when; this
 ## node reads WorldState, StoryControl and EventBus, and draws the card.
 ## G / pad Y shows the current thought; again while it shows, a plainer one.
+## Between thoughts a small medallion tab stays in the corner (always findable,
+## clickable), glowing softly when a thought is waiting unread.
 class_name GuideJournal
 extends CanvasLayer
 
@@ -31,6 +33,10 @@ var _dread: bool = false
 var _input_seen: bool = false
 var _last_pos: Vector3 = Vector3.INF
 var _taught_key: bool = false
+var _tab: Control
+var _tab_icon: GuideVignette
+var _tab_key: Label
+var _pulse: float = 0.0
 
 
 func _init(book: GuideBook = null) -> void:
@@ -98,6 +104,7 @@ func _process(delta: float) -> void:
 		_last_pos = feyre.global_position
 	var request := director.tick(delta, moved, _input_seen, can_show())
 	_input_seen = false
+	_update_tab(delta)
 	if not request.is_empty() and mode == GuideSettings.Mode.AUTO:
 		show_thought(request.thread, request.tier, false)
 	if showing:
@@ -107,6 +114,10 @@ func _process(delta: float) -> void:
 
 
 func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
+	var first := not _taught_key
+	# The card grows out of the tab: the tab steps aside at once.
+	_tab.modulate.a = 0.0
+	_tab.visible = false
 	shown_thread = thread
 	shown_tier = tier
 	_vignette.set_icon(thread.icon)
@@ -119,7 +130,8 @@ func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
 	elif asked and tier + 1 < thread.tier_count():
 		_footer.text = "G   think harder"
 		_footer.visible = true
-	_hold = 7.0 + 0.05 * _line.text.length()
+	# The first card of a session stays longer: it's how players learn it exists.
+	_hold = (12.0 if first else 7.0) + 0.05 * _line.text.length()
 	# Shrink-wrap to the new line (an autowrap label never shrinks a container).
 	_card.size = Vector2(500, 0)
 	_card.reset_size.call_deferred()
@@ -133,6 +145,30 @@ func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
 	_tween.tween_property(_card, ^"modulate:a", 1.0, FADE_IN)
 	_tween.tween_property(_card, ^"position", MARGIN, FADE_IN)
 	Juice.bounce_control(_vignette, 0.12)
+
+
+## The resting tab: visible whenever thoughts are on and Feyre is free; a
+## gentle breathing glow while the current need's thought hasn't been seen.
+func _update_tab(delta: float) -> void:
+	var want := mode != GuideSettings.Mode.OFF and can_show() and not showing \
+		and director.thread != null
+	if want and director.thread.icon != _tab_icon.icon:
+		_tab_icon.set_icon(director.thread.icon)
+	var target := 1.0 if want else 0.0
+	_tab.modulate.a = move_toward(_tab.modulate.a, target, delta * 3.0)
+	_tab.visible = _tab.modulate.a > 0.01
+	var waiting := want and director.shown_tier < 0
+	_pulse += delta
+	var glow := 0.5 + 0.5 * sin(_pulse * 2.4) if waiting else 0.0
+	_tab_icon.scale = Vector2.ONE * (1.0 + 0.06 * glow)
+	_tab_icon.self_modulate = Color(1, 1, 1, 0.8 + 0.2 * glow)
+
+
+func _on_tab_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
+			and mode != GuideSettings.Mode.OFF and can_show():
+		get_viewport().set_input_as_handled()
+		press()
 
 
 func hide_thought() -> void:
@@ -233,6 +269,27 @@ func _build() -> void:
 	_footer.add_theme_color_override(&"font_color", Color(UiStyle.TEXT, 0.55))
 	_footer.visible = false
 	col.add_child(_footer)
+
+	_tab = VBoxContainer.new()
+	_tab.name = "ThoughtTab"
+	_tab.position = MARGIN + Vector2(14, 14)
+	_tab.mouse_filter = Control.MOUSE_FILTER_STOP
+	_tab.tooltip_text = "Feyre's thoughts (G)"
+	_tab.gui_input.connect(_on_tab_input)
+	_tab.modulate.a = 0.0
+	_tab.visible = false
+	add_child(_tab)
+	_tab_icon = GuideVignette.new()
+	_tab_icon.custom_minimum_size = Vector2(72, 72)
+	_tab_icon.pivot_offset = Vector2(36, 36)
+	_tab.add_child(_tab_icon)
+	_tab_key = UiStyle.label("G", 15)
+	_tab_key.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_tab_key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tab_key.add_theme_color_override(&"font_color", Color.WHITE)
+	_tab_key.add_theme_color_override(&"font_outline_color", Color(UiStyle.TEXT, 0.8))
+	_tab_key.add_theme_constant_override(&"outline_size", 5)
+	_tab.add_child(_tab_key)
 
 	_voice = AudioStreamPlayer.new()
 	_voice.bus = &"Master"

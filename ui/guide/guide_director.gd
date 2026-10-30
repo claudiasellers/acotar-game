@@ -11,7 +11,7 @@
 class_name GuideDirector
 extends RefCounted
 
-const OPENING_DELAY := 20.0
+const OPENING_DELAY := 10.0
 const NEW_DELAY := 8.0
 const STALL := 240.0
 const COOLDOWN := 180.0
