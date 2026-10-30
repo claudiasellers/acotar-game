@@ -361,7 +361,7 @@ def willow(kit, near):
         for _ in range(count):
             start = Vector(t) + Vector((kit.rng.uniform(-1.8, 1.8), kit.rng.uniform(-1.8, 1.8), -0.2))
             length = kit.rng.uniform(3.0, 5.0)
-            kit.strand(start, length, 0.18 if near else 0.45, mix(LEAF, LEAF_GOLD, 0.35), mix(LEAF, LEAF_DEEP, 0.3), 0.4)
+            kit.strand(start, length, 0.09 if near else 0.3, mix(LEAF, LEAF_GOLD, 0.35), mix(LEAF, LEAF_DEEP, 0.3), 0.4)
 
 
 def hawthorn(kit, near):

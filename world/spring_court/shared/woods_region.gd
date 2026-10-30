@@ -342,7 +342,11 @@ func _job_terrain_root() -> void:
 	_terrain_mat = StandardMaterial3D.new()
 	_terrain_mat.vertex_color_use_as_albedo = true
 	_terrain_mat.vertex_color_is_srgb = true
-	_terrain_mat.roughness = 0.95
+	_terrain_mat.roughness = 1.0
+	# No specular: at the grazing angles you see ground from, Fresnel turned
+	# the pale sky into a white sheen over the whole floor.
+	_terrain_mat.metallic_specular = 0.0
+	_terrain_mat.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 
 
 func _job_terrain_chunk(chunk: Array) -> void:
