@@ -47,6 +47,32 @@ func configure_from_dir(dir_path: String, parent: Node3D) -> void:
 	configure(regions, parent)
 
 
+## Every RegionDef under a folder at any depth (res://data/regions for the
+## whole map). Other resources there (biome tables, layouts) are skipped by
+## their header, without loading them.
+func configure_from_tree(root_dir: String, parent: Node3D) -> void:
+	configure(find_region_defs(root_dir), parent)
+
+
+static func find_region_defs(root_dir: String) -> Array:
+	var regions: Array = []
+	if not DirAccess.dir_exists_absolute(root_dir):
+		return regions
+	for file in DirAccess.get_files_at(root_dir):
+		var clean := file.trim_suffix(".remap")
+		if not clean.ends_with(".tres"):
+			continue
+		var path := "%s/%s" % [root_dir, clean]
+		if not FileAccess.get_file_as_string(path).substr(0, 200).contains('script_class="RegionDef"'):
+			continue
+		var res := load(path)
+		if res is RegionDef:
+			regions.append(res)
+	for sub in DirAccess.get_directories_at(root_dir):
+		regions.append_array(find_region_defs("%s/%s" % [root_dir, sub]))
+	return regions
+
+
 func track(target: Node3D) -> void:
 	_target = target
 	_timer = 0.0

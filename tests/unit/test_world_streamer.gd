@@ -57,3 +57,11 @@ func test_unload_waits_for_the_hysteresis_margin() -> void:
 	assert_true(WorldStreamer.is_loaded(&"c"), "kept inside the hysteresis band")
 	WorldStreamer.update_for(Vector3(0, 0, 800))
 	assert_false(WorldStreamer.is_loaded(&"c"))
+
+
+func test_find_region_defs_walks_the_whole_tree() -> void:
+	var ids: Array = []
+	for region in WorldStreamer.find_region_defs("res://data/regions"):
+		ids.append(String(region.id))
+	assert_has(ids, "cottage", "human realm RegionDefs are found one folder down")
+	assert_eq(WorldStreamer.find_region_defs("res://no/such/dir").size(), 0)
