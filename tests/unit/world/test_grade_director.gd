@@ -90,3 +90,13 @@ func test_dread_drains_the_world() -> void:
 	assert_lt(dark.exposure, base.exposure * 0.25, "two stops down or more")
 	assert_eq(dark.magic, 0.0, "sparkles off")
 	assert_gt(dark.fog_height_density, 0.06, "dense low fog")
+
+
+func test_dread_keeps_silhouettes_readable_indoors() -> void:
+	# Interiors are lit mostly by ambient: its floor after exposure must stay
+	# above near-black (about 2 stops brighter than the first dread pass).
+	var dark := GradeDirector.with_mood(GradeDirector.load_preset(&"manor"), 1.0, &"dread")
+	var floor_light := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
+	assert_gt(floor_light, 0.035, "shapes still read in the dark")
+	assert_lt(floor_light, 0.12, "but it is still dark")
+	assert_lte(dark.contrast, 1.12, "no crushed blacks")
