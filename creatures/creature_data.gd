@@ -27,6 +27,9 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Replaces the code-built placeholder when the art lane (or the cloud
 ## Blender pipeline) delivers a model. Must face -Z with feet at y = 0.
 @export var model_scene: PackedScene
+## Uniform scale on the model scene, so one Blender mesh can serve a bigger cousin
+## (the songbird body as a hawk, the lamb as a ewe).
+@export var model_scale: float = 1.0
 
 @export_group("Movement")
 @export var walk_speed: float = 1.2

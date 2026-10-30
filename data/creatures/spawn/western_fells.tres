@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="7"]
+[ext_resource type="PackedScene" path="res://creatures/prey/deer.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/hawk.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/lamb.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/rabbit.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/sheep.tscn" id="6"]
+
+[sub_resource type="Resource" id="e0"]
+script = ExtResource("7")
+id = &"hares"
+scene = ExtResource("5")
+count = 2
+cluster_radius = 8.0
+groups = 4
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("7")
+id = &"hawks"
+scene = ExtResource("3")
+count = 1
+cluster_radius = 0.0
+groups = 2
+start_hour = 7.0
+end_hour = 19.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e2"]
+script = ExtResource("7")
+id = &"sheep"
+scene = ExtResource("6")
+count = 5
+cluster_radius = 10.0
+groups = 3
+start_hour = 6.0
+end_hour = 20.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e3"]
+script = ExtResource("7")
+id = &"lambs"
+scene = ExtResource("4")
+count = 2
+cluster_radius = 6.0
+groups = 3
+start_hour = 6.0
+end_hour = 20.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e4"]
+script = ExtResource("7")
+id = &"deer"
+scene = ExtResource("2")
+count = 3
+cluster_radius = 10.0
+groups = 2
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "C"
+
+[resource]
+script = ExtResource("1")
+region_id = &"western_fells"
+entries = Array[ExtResource("7")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4")])

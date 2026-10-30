@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/cat.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"cat"
+display_name = "Village cat"
+canon = "X"
+body_length = 0.62
+body_height = 0.3
+body_width = 0.17
+walk_speed = 0.6
+run_speed = 7.0
+zigzag = 0.3
+sight_range = 15.0
+hearing_range = 18.0
+scent_range = 10.0
+alert_threshold = 0.4
+startle_threshold = 0.9
+flee_distance = 8.0
+max_health = 4.0
+leaves_prints = false
+model_scene = ExtResource("2")

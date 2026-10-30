@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/ambient/ambient_swarm.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/faelight.gltf" id="2"]
+
+[node name="Fireflies" type="Node3D"]
+script = ExtResource("1")
+model_scene = ExtResource("2")
+count = 70
+radius = 14.0
+min_height = 0.2
+max_height = 2.2
+speed = 0.25
+scale_range = Vector2(0.45, 0.75)
+colors = PackedColorArray(0.85, 1, 0.35, 1, 0.95, 1, 0.45, 1, 0.75, 0.95, 0.3, 1)
+glow = 1.4
+flap_speed = 26.0
+wing_span = 0.028
+shy_distance = 0.8

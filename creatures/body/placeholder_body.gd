@@ -6,7 +6,9 @@ extends RefCounted
 
 static func build(data: CreatureData) -> Node3D:
 	if data.model_scene:
-		return data.model_scene.instantiate() as Node3D
+		var model := data.model_scene.instantiate() as Node3D
+		model.scale = Vector3.ONE * data.model_scale
+		return model
 	if data.body_plan == CreatureData.BodyPlan.BIRD:
 		return _bird(data)
 	return _quadruped(data)

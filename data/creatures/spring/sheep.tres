@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/lamb.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"sheep"
+display_name = "Sheep"
+canon = "X"
+body_length = 0.9
+body_height = 0.8
+body_width = 0.45
+walk_speed = 0.6
+run_speed = 3.5
+sight_range = 14.0
+hearing_range = 16.0
+scent_range = 10.0
+alert_threshold = 0.5
+startle_threshold = 0.95
+flee_distance = 6.0
+max_health = 12.0
+stride = 0.6
+print_size = 0.05
+twig_chance = 0.0
+leaves_prints = false
+model_scale = 1.35
+model_scene = ExtResource("2")

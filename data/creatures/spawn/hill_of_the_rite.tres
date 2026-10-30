@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/fireflies.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/lark.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/rabbit.tscn" id="4"]
+
+[sub_resource type="Resource" id="e0"]
+script = ExtResource("5")
+id = &"hares"
+scene = ExtResource("4")
+count = 2
+cluster_radius = 8.0
+groups = 3
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("5")
+id = &"larks"
+scene = ExtResource("3")
+count = 2
+cluster_radius = 6.0
+groups = 3
+start_hour = 5.0
+end_hour = 20.5
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e2"]
+script = ExtResource("5")
+id = &"fireflies"
+scene = ExtResource("2")
+count = 1
+cluster_radius = 0.0
+groups = 4
+start_hour = 19.5
+end_hour = 23.5
+on_water = false
+canon = "X"
+
+[resource]
+script = ExtResource("1")
+region_id = &"hill_of_the_rite"
+entries = Array[ExtResource("5")]([SubResource("e0"), SubResource("e1"), SubResource("e2")])

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="3"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/crow.tscn" id="2"]
+
+[sub_resource type="Resource" id="e0"]
+script = ExtResource("3")
+id = &"crows"
+scene = ExtResource("2")
+count = 2
+cluster_radius = 6.0
+groups = 2
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+
+[resource]
+script = ExtResource("1")
+region_id = &"blighted_reaches"
+entries = Array[ExtResource("3")]([SubResource("e0")])

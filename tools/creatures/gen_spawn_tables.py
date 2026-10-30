@@ -22,12 +22,16 @@ SCENES = {
     "swan": "res://creatures/ambient/scenes/swan.tscn",
     "deer": "res://creatures/prey/deer.tscn",
 }
+for _name in ("lark", "hen", "owl", "hawk", "crow", "fox", "cat", "squirrel", "sheep", "fireflies"):
+    SCENES[_name] = f"res://creatures/ambient/scenes/{_name}.tscn"
 
 # (entry id, scene, count per group, groups, cluster radius, start, end, on_water, canon)
 DAY = (7.0, 19.0)
 NIGHT = (20.0, 5.0)
 SONG = (5.0, 20.5)
 ALL = (0.0, 0.0)
+DUSK = (19.5, 23.5)
+OWL = (19.0, 5.5)
 
 
 def birds(groups):
@@ -76,6 +80,36 @@ TABLES = {
         ("butterflies_roses", "butterflies", 1, 6, 0.0, *DAY, False, "X"),
         ("faelights_roses", "faelights", 1, 3, 0.0, *NIGHT, False, "X"),
         ("rabbits", "rabbit", 2, 2, 5.0, *ALL, False, "C"),
+    ],
+    # The wider court (rabbit stands in for the brown spring hare).
+    "western_fells": [
+        ("hares", "rabbit", 2, 4, 8.0, *ALL, False, "X"),
+        ("hawks", "hawk", 1, 2, 0.0, *DAY, False, "X"),
+        ("sheep", "sheep", 5, 3, 10.0, 6.0, 20.0, False, "X"),
+        ("lambs", "lamb", 2, 3, 6.0, 6.0, 20.0, False, "X"),
+        ("deer", "deer", 3, 2, 10.0, *ALL, False, "C"),
+    ],
+    "fae_village": birds(3) + [
+        ("cats", "cat", 1, 4, 0.0, *ALL, False, "X"),
+        ("hens", "hen", 4, 2, 4.0, 6.0, 20.0, False, "X"),
+        ("butterflies_gardens", "butterflies", 1, 4, 0.0, *DAY, False, "X"),
+        ("faelights_lanes", "faelights", 1, 2, 0.0, *NIGHT, False, "X"),
+    ],
+    "autumn_foothills": [
+        ("foxes", "fox", 1, 2, 0.0, *ALL, False, "X"),
+        ("deer", "deer", 3, 2, 8.0, *ALL, False, "C"),
+        ("owls", "owl", 1, 2, 0.0, *OWL, False, "X"),
+        ("squirrels", "squirrel", 2, 4, 4.0, *DAY, False, "X"),
+        ("songbirds_gold", "songbird_gold", 3, 2, 5.0, *SONG, False, "X"),
+    ],
+    "hill_of_the_rite": [
+        ("hares", "rabbit", 2, 3, 8.0, *ALL, False, "X"),
+        ("larks", "lark", 2, 3, 6.0, *SONG, False, "X"),
+        ("fireflies", "fireflies", 1, 4, 0.0, *DUSK, False, "X"),
+    ],
+    # Silent and sparse: a handful of crows and nothing else.
+    "blighted_reaches": [
+        ("crows", "crow", 2, 2, 6.0, *ALL, False, "X"),
     ],
 }
 

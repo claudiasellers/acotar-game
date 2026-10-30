@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/squirrel.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"squirrel"
+display_name = "Red squirrel"
+canon = "X"
+body_length = 0.32
+body_height = 0.16
+body_width = 0.1
+walk_speed = 0.8
+run_speed = 6.0
+zigzag = 0.8
+sight_range = 20.0
+hearing_range = 25.0
+scent_range = 10.0
+startle_threshold = 0.5
+flee_distance = 12.0
+max_health = 2.0
+leaves_prints = false
+model_scene = ExtResource("2")

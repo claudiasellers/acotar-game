@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/hen.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"hen"
+display_name = "Hen"
+body_plan = 1
+canon = "X"
+body_length = 0.45
+body_height = 0.4
+body_width = 0.24
+walk_speed = 0.4
+run_speed = 3.5
+zigzag = 0.6
+sight_range = 10.0
+sight_fov_degrees = 300.0
+hearing_range = 12.0
+scent_range = 0.0
+alert_threshold = 0.45
+startle_threshold = 0.85
+flee_distance = 5.0
+max_health = 3.0
+model_scale = 1.5
+leaves_prints = false
+model_scene = ExtResource("2")
