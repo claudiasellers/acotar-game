@@ -60,6 +60,7 @@ func _ready() -> void:
 	add_child(KeyPrompts.new())
 	add_child(Act1Wayfinding.new())
 	add_child(WorldMapHud.new())
+	add_child(SatchelHud.new())
 
 
 func _process(delta: float) -> void:
