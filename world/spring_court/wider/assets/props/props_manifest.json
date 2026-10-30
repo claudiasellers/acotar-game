@@ -1,0 +1,2193 @@
+{
+ "assets": [
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_standing_stone_a.gltf",
+   "glows": false,
+   "id": "rite_standing_stone_a",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.048,
+    4.382,
+    1.366
+   ],
+   "tris": 1464,
+   "tris_lod1": 732
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_standing_stone_b.gltf",
+   "glows": false,
+   "id": "rite_standing_stone_b",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    1.853,
+    3.569,
+    1.327
+   ],
+   "tris": 936,
+   "tris_lod1": 468
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_standing_stone_c.gltf",
+   "glows": false,
+   "id": "rite_standing_stone_c",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.133,
+    5.17,
+    1.47
+   ],
+   "tris": 1464,
+   "tris_lod1": 732
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_standing_stone_d.gltf",
+   "glows": false,
+   "id": "rite_standing_stone_d",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.291,
+    3.179,
+    1.399
+   ],
+   "tris": 1112,
+   "tris_lod1": 556
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_standing_stone_e.gltf",
+   "glows": false,
+   "id": "rite_standing_stone_e",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    1.772,
+    4.888,
+    1.268
+   ],
+   "tris": 1288,
+   "tris_lod1": 644
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_altar_stone.gltf",
+   "glows": true,
+   "id": "rite_altar_stone",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.428,
+    1.36,
+    1.361
+   ],
+   "tris": 1420,
+   "tris_lod1": 710
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_mouth.gltf",
+   "glows": false,
+   "id": "rite_cave_mouth",
+   "kind": "landmark",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    13.749,
+    6.406,
+    4.673
+   ],
+   "tris": 2768,
+   "tris_lod1": 1384
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_wall_a.gltf",
+   "glows": true,
+   "id": "rite_cave_wall_a",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    7.89,
+    4.588,
+    2.232
+   ],
+   "tris": 1216,
+   "tris_lod1": 608
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_wall_b.gltf",
+   "glows": true,
+   "id": "rite_cave_wall_b",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    6.86,
+    5.769,
+    2.392
+   ],
+   "tris": 1216,
+   "tris_lod1": 608
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_wall_c.gltf",
+   "glows": true,
+   "id": "rite_cave_wall_c",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    8.935,
+    3.74,
+    2.247
+   ],
+   "tris": 1216,
+   "tris_lod1": 608
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_pillar.gltf",
+   "glows": false,
+   "id": "rite_cave_pillar",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.228,
+    5.0,
+    2.233
+   ],
+   "tris": 856,
+   "tris_lod1": 428
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_cave_pool_rim.gltf",
+   "glows": true,
+   "id": "rite_cave_pool_rim",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    4.654,
+    0.63,
+    3.9
+   ],
+   "tris": 934,
+   "tris_lod1": 466
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_bonfire.gltf",
+   "glows": true,
+   "id": "rite_bonfire",
+   "kind": "prop",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    2.952,
+    2.6,
+    2.976
+   ],
+   "tris": 924,
+   "tris_lod1": 462
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_drum.gltf",
+   "glows": false,
+   "id": "rite_drum",
+   "kind": "prop",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    1.54,
+    2.1,
+    0.903
+   ],
+   "tris": 1312,
+   "tris_lod1": 656
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_terrace_wall.gltf",
+   "glows": false,
+   "id": "rite_terrace_wall",
+   "kind": "structure",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    8.562,
+    1.549,
+    1.621
+   ],
+   "tris": 1692,
+   "tris_lod1": 846
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rite_ribbon_pole.gltf",
+   "glows": false,
+   "id": "rite_ribbon_pole",
+   "kind": "prop",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    1.6,
+    4.65,
+    1.6
+   ],
+   "tris": 960,
+   "tris_lod1": 480
+  },
+  {
+   "aabb_min": [
+    -3.995,
+    0.0,
+    -4.192
+   ],
+   "climbable": true,
+   "collision": true,
+   "file": "watchtower_base.gltf",
+   "glows": true,
+   "id": "watchtower_base",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    7.991,
+    13.0,
+    8.388
+   ],
+   "tris": 2668,
+   "tris_lod1": 1334
+  },
+  {
+   "aabb_min": [
+    -4.102,
+    0.438,
+    -4.215
+   ],
+   "climbable": false,
+   "collision": true,
+   "file": "watchtower_stair.gltf",
+   "glows": false,
+   "id": "watchtower_stair",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    8.432,
+    13.242,
+    7.843
+   ],
+   "stack_offset_y": 0.0,
+   "stack_on": "watchtower_base",
+   "tris": 1104,
+   "tris_lod1": 552
+  },
+  {
+   "aabb_min": [
+    -4.654,
+    0.0,
+    -4.838
+   ],
+   "climbable": true,
+   "collision": true,
+   "file": "watchtower_top.gltf",
+   "glows": true,
+   "id": "watchtower_top",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    9.065,
+    5.1,
+    8.589
+   ],
+   "stack_offset_y": 13.0,
+   "stack_on": "watchtower_base",
+   "tris": 1950,
+   "tris_lod1": 974
+  },
+  {
+   "aabb_min": [
+    -4.479,
+    0.0,
+    -4.953
+   ],
+   "climbable": true,
+   "collision": true,
+   "file": "watchtower_ruined.gltf",
+   "glows": false,
+   "id": "watchtower_ruined",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    9.917,
+    9.788,
+    8.581
+   ],
+   "tris": 2922,
+   "tris_lod1": 1460
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fells_cairn.gltf",
+   "glows": false,
+   "id": "fells_cairn",
+   "kind": "prop",
+   "region": "fells",
+   "size_m": [
+    1.844,
+    1.791,
+    1.714
+   ],
+   "tris": 678,
+   "tris_lod1": 338
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fells_sheepfold_wall.gltf",
+   "glows": false,
+   "id": "fells_sheepfold_wall",
+   "kind": "structure",
+   "region": "fells",
+   "size_m": [
+    6.109,
+    1.208,
+    0.71
+   ],
+   "tris": 1260,
+   "tris_lod1": 630
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fells_overlook_bench.gltf",
+   "glows": false,
+   "id": "fells_overlook_bench",
+   "kind": "prop",
+   "region": "fells",
+   "size_m": [
+    2.433,
+    1.34,
+    0.979
+   ],
+   "tris": 964,
+   "tris_lod1": 482
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "escarpment_rock_a.gltf",
+   "glows": false,
+   "id": "escarpment_rock_a",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    8.232,
+    5.582,
+    4.549
+   ],
+   "tris": 1248,
+   "tris_lod1": 624
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "escarpment_rock_b.gltf",
+   "glows": false,
+   "id": "escarpment_rock_b",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    10.182,
+    4.493,
+    5.899
+   ],
+   "tris": 1416,
+   "tris_lod1": 708
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "escarpment_rock_c.gltf",
+   "glows": false,
+   "id": "escarpment_rock_c",
+   "kind": "landmark",
+   "region": "fells",
+   "size_m": [
+    6.172,
+    7.693,
+    4.024
+   ],
+   "tris": 1080,
+   "tris_lod1": 540
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_cottage_a.gltf",
+   "glows": true,
+   "id": "fae_cottage_a",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    6.966,
+    6.89,
+    6.841
+   ],
+   "tris": 2796,
+   "tris_lod1": 1397
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_cottage_b.gltf",
+   "glows": true,
+   "id": "fae_cottage_b",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    6.21,
+    6.89,
+    6.104
+   ],
+   "tris": 2796,
+   "tris_lod1": 1397
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_cottage_c.gltf",
+   "glows": true,
+   "id": "fae_cottage_c",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    7.47,
+    7.46,
+    7.333
+   ],
+   "tris": 2872,
+   "tris_lod1": 1436
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_cottage_d.gltf",
+   "glows": true,
+   "id": "fae_cottage_d",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    6.72,
+    6.639,
+    6.72
+   ],
+   "tris": 2496,
+   "tris_lod1": 1248
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_seamstress_shop.gltf",
+   "glows": true,
+   "id": "fae_seamstress_shop",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    7.138,
+    7.21,
+    7.152
+   ],
+   "tris": 2860,
+   "tris_lod1": 1429
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_potion_house.gltf",
+   "glows": true,
+   "id": "fae_potion_house",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    5.614,
+    9.65,
+    5.94
+   ],
+   "tris": 2862,
+   "tris_lod1": 1430
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_market_stall_a.gltf",
+   "glows": false,
+   "id": "fae_market_stall_a",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    3.38,
+    3.15,
+    2.35
+   ],
+   "tris": 2488,
+   "tris_lod1": 1243
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_market_stall_b.gltf",
+   "glows": false,
+   "id": "fae_market_stall_b",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    3.38,
+    3.15,
+    2.35
+   ],
+   "tris": 1140,
+   "tris_lod1": 570
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_market_stall_c.gltf",
+   "glows": false,
+   "id": "fae_market_stall_c",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    3.38,
+    3.15,
+    2.35
+   ],
+   "tris": 1678,
+   "tris_lod1": 839
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_well.gltf",
+   "glows": false,
+   "id": "fae_well",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    3.098,
+    4.331,
+    3.098
+   ],
+   "tris": 1376,
+   "tris_lod1": 687
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_footbridge.gltf",
+   "glows": false,
+   "id": "fae_footbridge",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    9.3,
+    2.67,
+    2.49
+   ],
+   "tris": 2524,
+   "tris_lod1": 1262
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_lantern_post.gltf",
+   "glows": true,
+   "id": "fae_lantern_post",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    1.3,
+    3.33,
+    0.873
+   ],
+   "tris": 756,
+   "tris_lod1": 377
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "fae_bunting.gltf",
+   "glows": false,
+   "id": "fae_bunting",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    8.006,
+    1.085,
+    0.036
+   ],
+   "tris": 258,
+   "tris_lod1": 128
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_mill.gltf",
+   "glows": true,
+   "id": "fae_mill",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    8.05,
+    9.85,
+    7.357
+   ],
+   "tris": 2984,
+   "tris_lod1": 1492
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_bench.gltf",
+   "glows": false,
+   "id": "fae_bench",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    1.724,
+    1.172,
+    0.777
+   ],
+   "tris": 436,
+   "tris_lod1": 218
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_flower_cart.gltf",
+   "glows": false,
+   "id": "fae_flower_cart",
+   "kind": "prop",
+   "region": "fae_village",
+   "size_m": [
+    3.415,
+    1.474,
+    1.34
+   ],
+   "tris": 2328,
+   "tris_lod1": 1163
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fae_bakery.gltf",
+   "glows": true,
+   "id": "fae_bakery",
+   "kind": "structure",
+   "region": "fae_village",
+   "size_m": [
+    7.722,
+    8.95,
+    7.589
+   ],
+   "tris": 2886,
+   "tris_lod1": 1442
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "solstice_flower_arch.gltf",
+   "glows": false,
+   "id": "solstice_flower_arch",
+   "kind": "structure",
+   "region": "solstice_meadow",
+   "size_m": [
+    3.062,
+    3.801,
+    0.56
+   ],
+   "tris": 2920,
+   "tris_lod1": 1460
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "solstice_musicians_bower.gltf",
+   "glows": false,
+   "id": "solstice_musicians_bower",
+   "kind": "structure",
+   "region": "solstice_meadow",
+   "size_m": [
+    5.616,
+    4.239,
+    2.913
+   ],
+   "tris": 2812,
+   "tris_lod1": 1406
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "solstice_dance_ring_stone.gltf",
+   "glows": false,
+   "id": "solstice_dance_ring_stone",
+   "kind": "prop",
+   "region": "solstice_meadow",
+   "size_m": [
+    1.234,
+    0.376,
+    1.02
+   ],
+   "tris": 640,
+   "tris_lod1": 320
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "solstice_maypole.gltf",
+   "glows": false,
+   "id": "solstice_maypole",
+   "kind": "landmark",
+   "region": "solstice_meadow",
+   "size_m": [
+    6.186,
+    7.67,
+    5.895
+   ],
+   "tris": 2386,
+   "tris_lod1": 1192
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "solstice_long_table.gltf",
+   "glows": true,
+   "id": "solstice_long_table",
+   "kind": "prop",
+   "region": "solstice_meadow",
+   "size_m": [
+    6.1,
+    1.285,
+    1.29
+   ],
+   "tris": 2776,
+   "tris_lod1": 1387
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "solstice_lantern_string.gltf",
+   "glows": true,
+   "id": "solstice_lantern_string",
+   "kind": "prop",
+   "region": "solstice_meadow",
+   "size_m": [
+    10.007,
+    1.4,
+    0.34
+   ],
+   "tris": 1000,
+   "tris_lod1": 500
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_column.gltf",
+   "glows": false,
+   "id": "shrine_column",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    1.3,
+    4.6,
+    1.3
+   ],
+   "tris": 1486,
+   "tris_lod1": 743
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_column_broken.gltf",
+   "glows": false,
+   "id": "shrine_column_broken",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    3.443,
+    2.898,
+    2.129
+   ],
+   "tris": 1026,
+   "tris_lod1": 513
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_wall_mural.gltf",
+   "glows": false,
+   "id": "shrine_wall_mural",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    4.338,
+    3.312,
+    1.322
+   ],
+   "tris": 2268,
+   "tris_lod1": 1134
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_altar.gltf",
+   "glows": false,
+   "id": "shrine_altar",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    1.827,
+    1.33,
+    1.125
+   ],
+   "tris": 1106,
+   "tris_lod1": 552
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_arch.gltf",
+   "glows": false,
+   "id": "shrine_arch",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    4.1,
+    5.15,
+    0.877
+   ],
+   "tris": 1132,
+   "tris_lod1": 566
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "shrine_steps.gltf",
+   "glows": false,
+   "id": "shrine_steps",
+   "kind": "structure",
+   "region": "old_shrines",
+   "size_m": [
+    4.805,
+    0.879,
+    2.095
+   ],
+   "tris": 512,
+   "tris_lod1": 256
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "autumn_pass_gate.gltf",
+   "glows": true,
+   "id": "autumn_pass_gate",
+   "kind": "landmark",
+   "region": "autumn_border",
+   "size_m": [
+    9.283,
+    8.973,
+    3.167
+   ],
+   "tris": 2632,
+   "tris_lod1": 1316
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "autumn_border_marker.gltf",
+   "glows": true,
+   "id": "autumn_border_marker",
+   "kind": "prop",
+   "region": "autumn_border",
+   "size_m": [
+    1.4,
+    2.06,
+    1.4
+   ],
+   "tris": 384,
+   "tris_lod1": 192
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "autumn_fallen_log.gltf",
+   "glows": false,
+   "id": "autumn_fallen_log",
+   "kind": "prop",
+   "region": "autumn_border",
+   "size_m": [
+    4.123,
+    1.195,
+    1.991
+   ],
+   "tris": 630,
+   "tris_lod1": 314
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "blight_dead_stump.gltf",
+   "glows": false,
+   "id": "blight_dead_stump",
+   "kind": "prop",
+   "region": "blight",
+   "size_m": [
+    2.909,
+    2.036,
+    2.85
+   ],
+   "tris": 336,
+   "tris_lod1": 167
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "blight_broken_arbor.gltf",
+   "glows": false,
+   "id": "blight_broken_arbor",
+   "kind": "prop",
+   "region": "blight",
+   "size_m": [
+    3.339,
+    3.59,
+    1.323
+   ],
+   "tris": 422,
+   "tris_lod1": 210
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "blight_mask_pile.gltf",
+   "glows": false,
+   "id": "blight_mask_pile",
+   "kind": "prop",
+   "region": "blight",
+   "size_m": [
+    1.81,
+    0.999,
+    1.818
+   ],
+   "tris": 1072,
+   "tris_lod1": 536
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "blight_withered_fence.gltf",
+   "glows": false,
+   "id": "blight_withered_fence",
+   "kind": "prop",
+   "region": "blight",
+   "size_m": [
+    3.128,
+    1.176,
+    0.291
+   ],
+   "tris": 237,
+   "tris_lod1": 118
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "blight_bone_rock.gltf",
+   "glows": false,
+   "id": "blight_bone_rock",
+   "kind": "prop",
+   "region": "blight",
+   "size_m": [
+    2.597,
+    1.451,
+    1.967
+   ],
+   "tris": 606,
+   "tris_lod1": 302
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rock_mossy_a.gltf",
+   "glows": false,
+   "id": "rock_mossy_a",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    1.504,
+    1.004,
+    1.087
+   ],
+   "tris": 348,
+   "tris_lod1": 174
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rock_mossy_b.gltf",
+   "glows": false,
+   "id": "rock_mossy_b",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    0.849,
+    0.573,
+    0.677
+   ],
+   "tris": 312,
+   "tris_lod1": 156
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rock_mossy_c.gltf",
+   "glows": false,
+   "id": "rock_mossy_c",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    2.4,
+    1.577,
+    1.964
+   ],
+   "tris": 420,
+   "tris_lod1": 210
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "rock_mossy_d.gltf",
+   "glows": false,
+   "id": "rock_mossy_d",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    1.09,
+    0.789,
+    0.961
+   ],
+   "tris": 276,
+   "tris_lod1": 138
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "rock_pebble_cluster.gltf",
+   "glows": false,
+   "id": "rock_pebble_cluster",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    1.371,
+    0.16,
+    0.957
+   ],
+   "tris": 360,
+   "tris_lod1": 180
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "fence_rail.gltf",
+   "glows": false,
+   "id": "fence_rail",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    3.16,
+    1.22,
+    0.25
+   ],
+   "tris": 408,
+   "tris_lod1": 204
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "stepping_stones.gltf",
+   "glows": false,
+   "id": "stepping_stones",
+   "kind": "prop",
+   "region": "any",
+   "size_m": [
+    4.633,
+    0.191,
+    1.796
+   ],
+   "tris": 290,
+   "tris_lod1": 144
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "wooden_footbridge_small.gltf",
+   "glows": false,
+   "id": "wooden_footbridge_small",
+   "kind": "structure",
+   "region": "any",
+   "size_m": [
+    3.12,
+    1.056,
+    1.207
+   ],
+   "tris": 636,
+   "tris_lod1": 318
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "starlight_pool_rim_stone_a.gltf",
+   "glows": true,
+   "id": "starlight_pool_rim_stone_a",
+   "kind": "prop",
+   "region": "starlight_pool",
+   "size_m": [
+    1.558,
+    0.751,
+    1.032
+   ],
+   "tris": 426,
+   "tris_lod1": 213
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "starlight_pool_rim_stone_b.gltf",
+   "glows": true,
+   "id": "starlight_pool_rim_stone_b",
+   "kind": "prop",
+   "region": "starlight_pool",
+   "size_m": [
+    2.372,
+    1.125,
+    1.557
+   ],
+   "tris": 426,
+   "tris_lod1": 212
+  },
+  {
+   "climbable": false,
+   "collision": true,
+   "file": "starlight_pool_rim_stone_c.gltf",
+   "glows": true,
+   "id": "starlight_pool_rim_stone_c",
+   "kind": "prop",
+   "region": "starlight_pool",
+   "size_m": [
+    1.071,
+    0.526,
+    0.702
+   ],
+   "tris": 426,
+   "tris_lod1": 212
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "pool_glow_crystal.gltf",
+   "glows": true,
+   "id": "pool_glow_crystal",
+   "kind": "prop",
+   "region": "starlight_pool",
+   "size_m": [
+    0.714,
+    1.04,
+    0.671
+   ],
+   "tris": 320,
+   "tris_lod1": 159
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_shell_river_mussel.gltf",
+   "glows": false,
+   "id": "col_shell_river_mussel",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.266,
+    0.141,
+    0.137
+   ],
+   "tris": 508,
+   "tris_lod1": 254
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_snail_spiral.gltf",
+   "glows": false,
+   "id": "col_snail_spiral",
+   "kind": "collectible",
+   "region": "meadows",
+   "size_m": [
+    0.16,
+    0.144,
+    0.076
+   ],
+   "tris": 336,
+   "tris_lod1": 168
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_odd_stone.gltf",
+   "glows": false,
+   "id": "col_odd_stone",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.195,
+    0.1,
+    0.15
+   ],
+   "tris": 232,
+   "tris_lod1": 116
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_quartz.gltf",
+   "glows": false,
+   "id": "col_stone_quartz",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.075,
+    0.152,
+    0.073
+   ],
+   "tris": 168,
+   "tris_lod1": 84
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_amber.gltf",
+   "glows": false,
+   "id": "col_stone_amber",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.067,
+    0.046,
+    0.05
+   ],
+   "tris": 92,
+   "tris_lod1": 46
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_garnet.gltf",
+   "glows": false,
+   "id": "col_stone_garnet",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.07,
+    0.049,
+    0.07
+   ],
+   "tris": 40,
+   "tris_lod1": 20
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_obsidian.gltf",
+   "glows": true,
+   "id": "col_stone_obsidian",
+   "kind": "collectible",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    0.054,
+    0.075,
+    0.101
+   ],
+   "tris": 28,
+   "tris_lod1": 14
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_starglass.gltf",
+   "glows": true,
+   "id": "col_stone_starglass",
+   "kind": "collectible",
+   "region": "starlight_pool",
+   "size_m": [
+    0.079,
+    0.132,
+    0.073
+   ],
+   "tris": 146,
+   "tris_lod1": 72
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_stone_fossil.gltf",
+   "glows": false,
+   "id": "col_stone_fossil",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.106,
+    0.033,
+    0.09
+   ],
+   "tris": 274,
+   "tris_lod1": 136
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_painted_pebble.gltf",
+   "glows": false,
+   "id": "col_painted_pebble",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.087,
+    0.039,
+    0.068
+   ],
+   "tris": 248,
+   "tris_lod1": 124
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_mask_shard.gltf",
+   "glows": false,
+   "id": "col_mask_shard",
+   "kind": "collectible",
+   "region": "blight",
+   "size_m": [
+    0.127,
+    0.08,
+    0.035
+   ],
+   "tris": 34,
+   "tris_lod1": 16
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_mural_chip.gltf",
+   "glows": false,
+   "id": "col_mural_chip",
+   "kind": "collectible",
+   "region": "old_shrines",
+   "size_m": [
+    0.086,
+    0.021,
+    0.064
+   ],
+   "tris": 196,
+   "tris_lod1": 98
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_coin_old.gltf",
+   "glows": false,
+   "id": "col_coin_old",
+   "kind": "collectible",
+   "region": "old_shrines",
+   "size_m": [
+    0.061,
+    0.008,
+    0.059
+   ],
+   "tris": 172,
+   "tris_lod1": 86
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_calanmai_ribbon.gltf",
+   "glows": false,
+   "id": "col_calanmai_ribbon",
+   "kind": "collectible",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    0.292,
+    0.075,
+    0.105
+   ],
+   "tris": 64,
+   "tris_lod1": 32
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_solstice_bead.gltf",
+   "glows": true,
+   "id": "col_solstice_bead",
+   "kind": "collectible",
+   "region": "solstice_meadow",
+   "size_m": [
+    0.141,
+    0.05,
+    0.058
+   ],
+   "tris": 208,
+   "tris_lod1": 104
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_leaf_gilded.gltf",
+   "glows": false,
+   "id": "col_leaf_gilded",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.141,
+    0.017,
+    0.062
+   ],
+   "tris": 88,
+   "tris_lod1": 44
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_acorn_carved.gltf",
+   "glows": false,
+   "id": "col_acorn_carved",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.044,
+    0.044,
+    0.049
+   ],
+   "tris": 252,
+   "tris_lod1": 126
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_shed_antler.gltf",
+   "glows": false,
+   "id": "ing_shed_antler",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.528,
+    0.178,
+    0.122
+   ],
+   "tris": 128,
+   "tris_lod1": 64
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_wool_tuft.gltf",
+   "glows": false,
+   "id": "col_wool_tuft",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.13,
+    0.066,
+    0.09
+   ],
+   "tris": 324,
+   "tris_lod1": 162
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_glass_bead.gltf",
+   "glows": false,
+   "id": "col_glass_bead",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.042,
+    0.044,
+    0.042
+   ],
+   "tris": 118,
+   "tris_lod1": 58
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_candle_stub.gltf",
+   "glows": false,
+   "id": "col_candle_stub",
+   "kind": "collectible",
+   "region": "old_shrines",
+   "size_m": [
+    0.08,
+    0.062,
+    0.076
+   ],
+   "tris": 140,
+   "tris_lod1": 70
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_beetle_jewel.gltf",
+   "glows": false,
+   "id": "col_beetle_jewel",
+   "kind": "collectible",
+   "region": "meadows",
+   "size_m": [
+    0.061,
+    0.026,
+    0.052
+   ],
+   "tris": 190,
+   "tris_lod1": 94
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_snake_skin.gltf",
+   "glows": false,
+   "id": "col_snake_skin",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.286,
+    0.019,
+    0.082
+   ],
+   "tris": 188,
+   "tris_lod1": 94
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_driftwood.gltf",
+   "glows": false,
+   "id": "col_driftwood",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.365,
+    0.037,
+    0.091
+   ],
+   "tris": 92,
+   "tris_lod1": 46
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_robin_egg_shell.gltf",
+   "glows": false,
+   "id": "col_robin_egg_shell",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.108,
+    0.079,
+    0.059
+   ],
+   "tris": 110,
+   "tris_lod1": 55
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_seed_pod.gltf",
+   "glows": false,
+   "id": "col_seed_pod",
+   "kind": "collectible",
+   "region": "meadows",
+   "size_m": [
+    0.066,
+    0.07,
+    0.128
+   ],
+   "tris": 140,
+   "tris_lod1": 70
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_bone_bleached.gltf",
+   "glows": false,
+   "id": "col_bone_bleached",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.202,
+    0.032,
+    0.052
+   ],
+   "tris": 164,
+   "tris_lod1": 81
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_pinecone.gltf",
+   "glows": false,
+   "id": "col_pinecone",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.129,
+    0.079,
+    0.08
+   ],
+   "tris": 120,
+   "tris_lod1": 60
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_red_ochre.gltf",
+   "glows": false,
+   "id": "ing_red_ochre",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.102,
+    0.052,
+    0.085
+   ],
+   "tris": 160,
+   "tris_lod1": 80
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_chalk.gltf",
+   "glows": false,
+   "id": "ing_chalk",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.097,
+    0.046,
+    0.111
+   ],
+   "tris": 168,
+   "tris_lod1": 84
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_lapis_shard.gltf",
+   "glows": false,
+   "id": "ing_lapis_shard",
+   "kind": "collectible",
+   "region": "old_shrines",
+   "size_m": [
+    0.06,
+    0.036,
+    0.067
+   ],
+   "tris": 104,
+   "tris_lod1": 52
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_river_silt.gltf",
+   "glows": false,
+   "id": "ing_river_silt",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.159,
+    0.079,
+    0.191
+   ],
+   "tris": 216,
+   "tris_lod1": 108
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_salt.gltf",
+   "glows": false,
+   "id": "ing_salt",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.08,
+    0.037,
+    0.082
+   ],
+   "tris": 136,
+   "tris_lod1": 68
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_iron_filings.gltf",
+   "glows": false,
+   "id": "ing_iron_filings",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.1,
+    0.029,
+    0.1
+   ],
+   "tris": 190,
+   "tris_lod1": 94
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_starlight_water.gltf",
+   "glows": true,
+   "id": "ing_starlight_water",
+   "kind": "collectible",
+   "region": "starlight_pool",
+   "size_m": [
+    0.36,
+    0.126,
+    0.352
+   ],
+   "tris": 252,
+   "tris_lod1": 126
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_rite_spring.gltf",
+   "glows": true,
+   "id": "ing_rite_spring",
+   "kind": "collectible",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    0.428,
+    0.402,
+    0.494
+   ],
+   "tris": 400,
+   "tris_lod1": 200
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_rose_maze_dew.gltf",
+   "glows": true,
+   "id": "ing_rose_maze_dew",
+   "kind": "collectible",
+   "region": "rose_maze",
+   "size_m": [
+    0.201,
+    0.027,
+    0.085
+   ],
+   "tris": 388,
+   "tris_lod1": 194
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_honey.gltf",
+   "glows": false,
+   "id": "ing_honey",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.42,
+    0.26,
+    0.254
+   ],
+   "tris": 256,
+   "tris_lod1": 128
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_fae_bell.gltf",
+   "glows": false,
+   "id": "col_fae_bell",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.096,
+    0.09,
+    0.092
+   ],
+   "tris": 146,
+   "tris_lod1": 72
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_heart_stone.gltf",
+   "glows": false,
+   "id": "col_heart_stone",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.082,
+    0.06,
+    0.056
+   ],
+   "tris": 150,
+   "tris_lod1": 74
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_flint.gltf",
+   "glows": false,
+   "id": "ing_flint",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.106,
+    0.035,
+    0.063
+   ],
+   "tris": 72,
+   "tris_lod1": 36
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_charcoal.gltf",
+   "glows": false,
+   "id": "ing_charcoal",
+   "kind": "collectible",
+   "region": "hill_of_the_rite",
+   "size_m": [
+    0.081,
+    0.035,
+    0.08
+   ],
+   "tris": 216,
+   "tris_lod1": 108
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_river_pearl.gltf",
+   "glows": true,
+   "id": "col_river_pearl",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.12,
+    0.04,
+    0.114
+   ],
+   "tris": 166,
+   "tris_lod1": 82
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_horseshoe.gltf",
+   "glows": false,
+   "id": "col_horseshoe",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.128,
+    0.013,
+    0.124
+   ],
+   "tris": 152,
+   "tris_lod1": 76
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_carved_bird.gltf",
+   "glows": false,
+   "id": "col_carved_bird",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.124,
+    0.061,
+    0.057
+   ],
+   "tris": 226,
+   "tris_lod1": 113
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_seed_packet.gltf",
+   "glows": false,
+   "id": "col_seed_packet",
+   "kind": "collectible",
+   "region": "fae_village",
+   "size_m": [
+    0.117,
+    0.02,
+    0.113
+   ],
+   "tris": 176,
+   "tris_lod1": 88
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_ribbon_scrap.gltf",
+   "glows": false,
+   "id": "col_ribbon_scrap",
+   "kind": "collectible",
+   "region": "solstice_meadow",
+   "size_m": [
+    0.2,
+    0.019,
+    0.076
+   ],
+   "tris": 40,
+   "tris_lod1": 20
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_rose_petal_pressed.gltf",
+   "glows": false,
+   "id": "col_rose_petal_pressed",
+   "kind": "collectible",
+   "region": "rose_maze",
+   "size_m": [
+    0.123,
+    0.016,
+    0.138
+   ],
+   "tris": 172,
+   "tris_lod1": 86
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_antler_tine.gltf",
+   "glows": false,
+   "id": "col_antler_tine",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.245,
+    0.065,
+    0.06
+   ],
+   "tris": 96,
+   "tris_lod1": 48
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_snail_shell.gltf",
+   "glows": false,
+   "id": "ing_snail_shell",
+   "kind": "collectible",
+   "region": "meadows",
+   "size_m": [
+    0.16,
+    0.144,
+    0.076
+   ],
+   "tris": 336,
+   "tris_lod1": 168
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_clay.gltf",
+   "glows": false,
+   "id": "ing_clay",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.134,
+    0.055,
+    0.117
+   ],
+   "tris": 112,
+   "tris_lod1": 56
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_blue_jay_feather.gltf",
+   "glows": false,
+   "id": "col_blue_jay_feather",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.271,
+    0.027,
+    0.06
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_feather_kingfisher.gltf",
+   "glows": false,
+   "id": "col_feather_kingfisher",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.191,
+    0.026,
+    0.049
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_feather_pheasant.gltf",
+   "glows": false,
+   "id": "col_feather_pheasant",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.451,
+    0.026,
+    0.049
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_feather_swan.gltf",
+   "glows": false,
+   "id": "col_feather_swan",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.331,
+    0.029,
+    0.095
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_feather_heron.gltf",
+   "glows": false,
+   "id": "col_feather_heron",
+   "kind": "collectible",
+   "region": "riverbanks",
+   "size_m": [
+    0.351,
+    0.027,
+    0.066
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_crow_feather.gltf",
+   "glows": false,
+   "id": "ing_crow_feather",
+   "kind": "collectible",
+   "region": "blight",
+   "size_m": [
+    0.291,
+    0.028,
+    0.072
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "col_wren_feather.gltf",
+   "glows": false,
+   "id": "col_wren_feather",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.152,
+    0.026,
+    0.043
+   ],
+   "tris": 114,
+   "tris_lod1": 56
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_hawk_feather.gltf",
+   "glows": false,
+   "id": "ing_hawk_feather",
+   "kind": "collectible",
+   "region": "fells",
+   "size_m": [
+    0.331,
+    0.028,
+    0.072
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  },
+  {
+   "climbable": false,
+   "collision": false,
+   "file": "ing_owl_feather.gltf",
+   "glows": false,
+   "id": "ing_owl_feather",
+   "kind": "collectible",
+   "region": "woods",
+   "size_m": [
+    0.251,
+    0.029,
+    0.083
+   ],
+   "tris": 114,
+   "tris_lod1": 57
+  }
+ ],
+ "front": "+Z",
+ "generator": "tools/court/blender/props_build.py",
+ "units": "m",
+ "up": "+Y",
+ "version": 1
+}
