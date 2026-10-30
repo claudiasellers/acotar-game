@@ -87,26 +87,64 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_d1exj"]
 script = ExtResource("1_i5g5k")
+mesh_id = &"woods_yew"
+habitats = PackedStringArray("oak_hollow", "rowan_brake")
+density = 0.05
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_k0jo0"]
+script = ExtResource("1_i5g5k")
+mesh_id = &"woods_ancient_oak"
+habitats = PackedStringArray("oak_hollow")
+density = 0.006
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_kbhf1"]
+script = ExtResource("1_i5g5k")
+mesh_id = &"woods_fallen_log"
+habitats = PackedStringArray("ember_wood", "oak_hollow")
+density = 0.04
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_mh7y8"]
+script = ExtResource("1_i5g5k")
+mesh_id = &"woods_stump"
+habitats = PackedStringArray("ember_wood")
+density = 0.03
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_mymmj"]
+script = ExtResource("1_i5g5k")
 mesh_id = &"flora_fern_a"
 habitats = PackedStringArray("oak_hollow", "ember_wood")
 density = 1.5
 wind = 0.6
 
-[sub_resource type="Resource" id="Resource_k0jo0"]
+[sub_resource type="Resource" id="Resource_4wnry"]
 script = ExtResource("1_i5g5k")
 mesh_id = &"flora_fern_b"
 habitats = PackedStringArray("riverbank", "oak_hollow")
 density = 0.8
 wind = 0.6
 
-[sub_resource type="Resource" id="Resource_kbhf1"]
+[sub_resource type="Resource" id="Resource_rupio"]
 script = ExtResource("1_i5g5k")
 mesh_id = &"flora_toadstool_ring"
 habitats = PackedStringArray("oak_hollow")
 density = 0.04
 wind = 0.0
 
-[sub_resource type="Resource" id="Resource_mh7y8"]
+[sub_resource type="Resource" id="Resource_wwvrp"]
 script = ExtResource("1_i5g5k")
 mesh_id = &"autumn_fallen_log"
 habitats = PackedStringArray("ember_wood", "oak_hollow")
@@ -114,7 +152,7 @@ density = 0.02
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_mymmj"]
+[sub_resource type="Resource" id="Resource_cnblm"]
 script = ExtResource("1_i5g5k")
 mesh_id = &"rock_mossy_c"
 habitats = PackedStringArray("ember_ridge", "sealed_pass")
@@ -122,7 +160,7 @@ density = 0.1
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_4wnry"]
+[sub_resource type="Resource" id="Resource_lr0d1"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_ember_maple_leaf"
 habitats = PackedStringArray("ember_wood", "ember_ridge")
@@ -130,20 +168,20 @@ weight = 3.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_rupio"]
+[sub_resource type="Resource" id="Resource_bf20x"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_rowan_berry"
 habitats = PackedStringArray("rowan_brake", "ember_wood")
 weight = 2.0
 
-[sub_resource type="Resource" id="Resource_wwvrp"]
+[sub_resource type="Resource" id="Resource_y08qp"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_fly_agaric"
 habitats = PackedStringArray("oak_hollow", "ember_wood")
 weight = 1.5
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_cnblm"]
+[sub_resource type="Resource" id="Resource_0v5mo"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_chanterelle"
 habitats = PackedStringArray("oak_hollow", "ember_wood")
@@ -151,7 +189,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_lr0d1"]
+[sub_resource type="Resource" id="Resource_82wgp"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_hazelnut"
 habitats = PackedStringArray("ember_wood", "rowan_brake")
@@ -159,7 +197,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_bf20x"]
+[sub_resource type="Resource" id="Resource_glgpx"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_acorn"
 habitats = PackedStringArray("oak_hollow")
@@ -167,7 +205,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_y08qp"]
+[sub_resource type="Resource" id="Resource_c5iix"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_blackberry"
 habitats = PackedStringArray("ember_wood", "riverbank")
@@ -175,87 +213,87 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_0v5mo"]
+[sub_resource type="Resource" id="Resource_1rxma"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_sloe"
 habitats = PackedStringArray("rowan_brake")
 weight = 1.2
 
-[sub_resource type="Resource" id="Resource_82wgp"]
+[sub_resource type="Resource" id="Resource_t7t5t"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_chaga"
 habitats = PackedStringArray("ember_ridge", "oak_hollow")
 weight = 0.8
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_glgpx"]
+[sub_resource type="Resource" id="Resource_gdyg7"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_tinder_fungus"
 habitats = PackedStringArray("oak_hollow")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_c5iix"]
+[sub_resource type="Resource" id="Resource_6psir"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_old_mans_beard"
 habitats = PackedStringArray("rowan_brake", "sealed_pass")
 
-[sub_resource type="Resource" id="Resource_1rxma"]
+[sub_resource type="Resource" id="Resource_sesom"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_rose_hip"
 habitats = PackedStringArray("rowan_brake")
 weight = 0.8
 
-[sub_resource type="Resource" id="Resource_t7t5t"]
+[sub_resource type="Resource" id="Resource_6e4hw"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_pine_resin"
 habitats = PackedStringArray("ember_ridge", "sealed_pass")
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_gdyg7"]
+[sub_resource type="Resource" id="Resource_1anh5"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_spider_silk"
 habitats = PackedStringArray("oak_hollow", "ember_wood")
 weight = 0.8
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_6psir"]
+[sub_resource type="Resource" id="Resource_t3264"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_juniper_berry"
 habitats = PackedStringArray("sealed_pass", "ember_ridge")
 
-[sub_resource type="Resource" id="Resource_sesom"]
+[sub_resource type="Resource" id="Resource_7stvx"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_mistletoe"
 habitats = PackedStringArray("oak_hollow")
 weight = 0.6
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_6e4hw"]
+[sub_resource type="Resource" id="Resource_lnhj8"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_hawthorn_haw"
 habitats = PackedStringArray("rowan_brake")
 
-[sub_resource type="Resource" id="Resource_1anh5"]
+[sub_resource type="Resource" id="Resource_tv0l2"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_oak_gall"
 habitats = PackedStringArray("oak_hollow")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_t3264"]
+[sub_resource type="Resource" id="Resource_sjlr1"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_owl_feather"
 habitats = PackedStringArray("oak_hollow", "ember_wood")
 weight = 0.5
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_7stvx"]
+[sub_resource type="Resource" id="Resource_fpf8p"]
 script = ExtResource("2_pxpmq")
 item_id = &"ing_watermint"
 habitats = PackedStringArray("riverbank", "spring_head")
 weight = 1.2
 cluster_min = 2
 
-[sub_resource type="Resource" id="Resource_lnhj8"]
+[sub_resource type="Resource" id="Resource_d02og"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_leaf_gilded"
 habitats = PackedStringArray("ember_wood", "ember_ridge")
@@ -264,7 +302,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_tv0l2"]
+[sub_resource type="Resource" id="Resource_2lswp"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_silver_leaf"
 habitats = PackedStringArray("sealed_pass", "ember_ridge")
@@ -273,14 +311,14 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_sjlr1"]
+[sub_resource type="Resource" id="Resource_h2yvp"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_acorn_cap"
 habitats = PackedStringArray("oak_hollow")
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_fpf8p"]
+[sub_resource type="Resource" id="Resource_2y25g"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_feather_pheasant"
 habitats = PackedStringArray("ember_wood")
@@ -289,7 +327,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_d02og"]
+[sub_resource type="Resource" id="Resource_cro1w"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_pinecone"
 habitats = PackedStringArray("ember_ridge", "sealed_pass")
@@ -297,7 +335,7 @@ weight = 0.8
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_2lswp"]
+[sub_resource type="Resource" id="Resource_gtkvv"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_stone_amber"
 habitats = PackedStringArray("riverbank", "ember_ridge")
@@ -306,7 +344,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_h2yvp"]
+[sub_resource type="Resource" id="Resource_2hfnn"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_stone_garnet"
 habitats = PackedStringArray("sealed_pass")
@@ -315,7 +353,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_2y25g"]
+[sub_resource type="Resource" id="Resource_71uwb"]
 script = ExtResource("2_pxpmq")
 item_id = &"col_snail_spiral"
 habitats = PackedStringArray("oak_hollow", "riverbank")
@@ -324,7 +362,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_cro1w"]
+[sub_resource type="Resource" id="Resource_r8itj"]
 script = ExtResource("3_ebwbl")
 tag = &"river"
 shape = 3
@@ -332,7 +370,7 @@ band_max = 7.5
 priority = 9
 exclusive = true
 
-[sub_resource type="Resource" id="Resource_gtkvv"]
+[sub_resource type="Resource" id="Resource_1ueh5"]
 script = ExtResource("3_ebwbl")
 tag = &"riverbank"
 shape = 3
@@ -340,42 +378,42 @@ band_min = 8.0
 band_max = 22.0
 priority = 7
 
-[sub_resource type="Resource" id="Resource_2hfnn"]
+[sub_resource type="Resource" id="Resource_idd3u"]
 script = ExtResource("3_ebwbl")
 tag = &"sealed_pass"
 center = Vector2(-1650, -1620)
 radius = 70.0
 priority = 8
 
-[sub_resource type="Resource" id="Resource_71uwb"]
+[sub_resource type="Resource" id="Resource_s21nq"]
 script = ExtResource("3_ebwbl")
 tag = &"ember_ridge"
 center = Vector2(-1200, -1450)
 radius = 120.0
 priority = 5
 
-[sub_resource type="Resource" id="Resource_r8itj"]
+[sub_resource type="Resource" id="Resource_p2rvm"]
 script = ExtResource("3_ebwbl")
 tag = &"oak_hollow"
 center = Vector2(-850, -1400)
 radius = 140.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_1ueh5"]
+[sub_resource type="Resource" id="Resource_jeaut"]
 script = ExtResource("3_ebwbl")
 tag = &"rowan_brake"
 center = Vector2(-1650, -1100)
 radius = 110.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_idd3u"]
+[sub_resource type="Resource" id="Resource_skglk"]
 script = ExtResource("3_ebwbl")
 tag = &"spring_head"
 center = Vector2(-1700, -1550)
 radius = 40.0
 priority = 9
 
-[sub_resource type="Resource" id="Resource_s21nq"]
+[sub_resource type="Resource" id="Resource_uk1ym"]
 script = ExtResource("4_kdkq7")
 id = &"sealed_pass"
 display_name = "The Sealed Pass"
@@ -386,7 +424,7 @@ height_m = 14.0
 visible_from_m = 350.0
 notes = "A carved gateway choked with living thorn and ward-light: the road to the Autumn Court, shut for now."
 
-[sub_resource type="Resource" id="Resource_p2rvm"]
+[sub_resource type="Resource" id="Resource_nf038"]
 script = ExtResource("4_kdkq7")
 id = &"ember_crown"
 display_name = "The Ember Crown"
@@ -397,7 +435,7 @@ height_m = 26.0
 visible_from_m = 650.0
 notes = "A colossal crimson maple on the ridge, seen from the village and the fells."
 
-[sub_resource type="Resource" id="Resource_jeaut"]
+[sub_resource type="Resource" id="Resource_s2fel"]
 script = ExtResource("4_kdkq7")
 id = &"thornwater_spring"
 display_name = "Thornwater Spring"
@@ -408,7 +446,7 @@ height_m = 7.0
 visible_from_m = 200.0
 notes = "The river's source spilling from a rock face."
 
-[sub_resource type="Resource" id="Resource_skglk"]
+[sub_resource type="Resource" id="Resource_5ugo5"]
 script = ExtResource("4_kdkq7")
 id = &"border_markers"
 display_name = "The Border Stones"
@@ -428,10 +466,10 @@ bounds = Array[Rect2]([Rect2(-1800, -1700, 1200, 450), Rect2(-1800, -1250, 300, 
 skirts = Array[Rect2]([Rect2(-1950, -1900, 1350, 200), Rect2(-1950, -1700, 150, 800)])
 seed = 4404
 default_habitat = &"ember_wood"
-habitats = Array[ExtResource("3_ebwbl")]([SubResource("Resource_cro1w"), SubResource("Resource_gtkvv"), SubResource("Resource_2hfnn"), SubResource("Resource_71uwb"), SubResource("Resource_r8itj"), SubResource("Resource_1ueh5"), SubResource("Resource_idd3u")])
-forage = Array[ExtResource("2_pxpmq")]([SubResource("Resource_4wnry"), SubResource("Resource_rupio"), SubResource("Resource_wwvrp"), SubResource("Resource_cnblm"), SubResource("Resource_lr0d1"), SubResource("Resource_bf20x"), SubResource("Resource_y08qp"), SubResource("Resource_0v5mo"), SubResource("Resource_82wgp"), SubResource("Resource_glgpx"), SubResource("Resource_c5iix"), SubResource("Resource_1rxma"), SubResource("Resource_t7t5t"), SubResource("Resource_gdyg7"), SubResource("Resource_6psir"), SubResource("Resource_sesom"), SubResource("Resource_6e4hw"), SubResource("Resource_1anh5"), SubResource("Resource_t3264"), SubResource("Resource_7stvx"), SubResource("Resource_lnhj8"), SubResource("Resource_tv0l2"), SubResource("Resource_sjlr1"), SubResource("Resource_fpf8p"), SubResource("Resource_d02og"), SubResource("Resource_2lswp"), SubResource("Resource_h2yvp"), SubResource("Resource_2y25g")])
-decor = Array[ExtResource("1_i5g5k")]([SubResource("Resource_mrro8"), SubResource("Resource_27h0k"), SubResource("Resource_ojtim"), SubResource("Resource_vrltk"), SubResource("Resource_b6528"), SubResource("Resource_k6hn1"), SubResource("Resource_enqqp"), SubResource("Resource_46byj"), SubResource("Resource_d740w"), SubResource("Resource_d1exj"), SubResource("Resource_k0jo0"), SubResource("Resource_kbhf1"), SubResource("Resource_mh7y8"), SubResource("Resource_mymmj")])
-landmarks = Array[ExtResource("4_kdkq7")]([SubResource("Resource_s21nq"), SubResource("Resource_p2rvm"), SubResource("Resource_jeaut"), SubResource("Resource_skglk")])
+habitats = Array[ExtResource("3_ebwbl")]([SubResource("Resource_r8itj"), SubResource("Resource_1ueh5"), SubResource("Resource_idd3u"), SubResource("Resource_s21nq"), SubResource("Resource_p2rvm"), SubResource("Resource_jeaut"), SubResource("Resource_skglk")])
+forage = Array[ExtResource("2_pxpmq")]([SubResource("Resource_lr0d1"), SubResource("Resource_bf20x"), SubResource("Resource_y08qp"), SubResource("Resource_0v5mo"), SubResource("Resource_82wgp"), SubResource("Resource_glgpx"), SubResource("Resource_c5iix"), SubResource("Resource_1rxma"), SubResource("Resource_t7t5t"), SubResource("Resource_gdyg7"), SubResource("Resource_6psir"), SubResource("Resource_sesom"), SubResource("Resource_6e4hw"), SubResource("Resource_1anh5"), SubResource("Resource_t3264"), SubResource("Resource_7stvx"), SubResource("Resource_lnhj8"), SubResource("Resource_tv0l2"), SubResource("Resource_sjlr1"), SubResource("Resource_fpf8p"), SubResource("Resource_d02og"), SubResource("Resource_2lswp"), SubResource("Resource_h2yvp"), SubResource("Resource_2y25g"), SubResource("Resource_cro1w"), SubResource("Resource_gtkvv"), SubResource("Resource_2hfnn"), SubResource("Resource_71uwb")])
+decor = Array[ExtResource("1_i5g5k")]([SubResource("Resource_mrro8"), SubResource("Resource_27h0k"), SubResource("Resource_ojtim"), SubResource("Resource_vrltk"), SubResource("Resource_b6528"), SubResource("Resource_k6hn1"), SubResource("Resource_enqqp"), SubResource("Resource_46byj"), SubResource("Resource_d740w"), SubResource("Resource_d1exj"), SubResource("Resource_k0jo0"), SubResource("Resource_kbhf1"), SubResource("Resource_mh7y8"), SubResource("Resource_mymmj"), SubResource("Resource_4wnry"), SubResource("Resource_rupio"), SubResource("Resource_wwvrp"), SubResource("Resource_cnblm")])
+landmarks = Array[ExtResource("4_kdkq7")]([SubResource("Resource_uk1ym"), SubResource("Resource_nf038"), SubResource("Resource_s2fel"), SubResource("Resource_5ugo5")])
 grade = &"grade_autumn_foothills"
 ambient_fx = PackedStringArray("fx_autumn_leaves", "fx_pollen_motes")
 sealed = true

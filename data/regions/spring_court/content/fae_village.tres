@@ -45,21 +45,21 @@ wind = 0.0
 script = ExtResource("1_eetyr")
 mesh_id = &"flora_carpet_butter"
 habitats = PackedStringArray("village_meadow", "village_green")
-density = 2.2
+density = 1.4
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_2q2ib"]
 script = ExtResource("1_eetyr")
 mesh_id = &"flora_carpet_rose"
 habitats = PackedStringArray("cottage_gardens")
-density = 2.0
+density = 1.2
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_wxlov"]
 script = ExtResource("1_eetyr")
 mesh_id = &"flora_carpet_blush"
 habitats = PackedStringArray("cottage_gardens", "village_meadow")
-density = 1.6
+density = 5.5
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_dt5bk"]
@@ -88,7 +88,7 @@ cast_shadow = true
 
 [sub_resource type="Resource" id="Resource_vjm08"]
 script = ExtResource("1_eetyr")
-mesh_id = &"flora_tree_apple_blossom"
+mesh_id = &"woods_crab_apple"
 habitats = PackedStringArray("village_orchard")
 density = 0.35
 scale_max = 1.3
@@ -99,9 +99,9 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_ag7op"]
 script = ExtResource("1_eetyr")
-mesh_id = &"flora_tree_cherry_blossom"
+mesh_id = &"woods_wild_cherry"
 habitats = PackedStringArray("village_orchard", "village_meadow")
-density = 0.03
+density = 0.04
 scale_max = 1.3
 wind = 0.25
 cast_shadow = true
@@ -110,7 +110,7 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_l4oq7"]
 script = ExtResource("1_eetyr")
-mesh_id = &"flora_tree_spring_oak"
+mesh_id = &"woods_oak"
 habitats = PackedStringArray("hedgerow", "village_meadow")
 density = 0.03
 scale_max = 1.3
@@ -121,12 +121,53 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_67yos"]
 script = ExtResource("1_eetyr")
+mesh_id = &"woods_yew"
+habitats = PackedStringArray("hedgerow")
+density = 0.08
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_546at"]
+script = ExtResource("1_eetyr")
+mesh_id = &"woods_silver_birch"
+habitats = PackedStringArray("village_meadow")
+density = 0.02
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_1akns"]
+script = ExtResource("1_eetyr")
+mesh_id = &"woods_ancient_oak"
+habitats = PackedStringArray("village_green")
+density = 0.004
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_vsklh"]
+script = ExtResource("1_eetyr")
+mesh_id = &"woods_stump"
+habitats = PackedStringArray("hedgerow", "village_meadow")
+density = 0.01
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_eogss"]
+script = ExtResource("1_eetyr")
 mesh_id = &"flora_reeds_bulrush"
 habitats = PackedStringArray("riverbank")
 density = 2.0
 wind = 0.6
 
-[sub_resource type="Resource" id="Resource_546at"]
+[sub_resource type="Resource" id="Resource_wpag4"]
 script = ExtResource("1_eetyr")
 mesh_id = &"fence_rail"
 habitats = PackedStringArray("cottage_gardens")
@@ -134,7 +175,7 @@ density = 0.01
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_1akns"]
+[sub_resource type="Resource" id="Resource_nomx6"]
 script = ExtResource("1_eetyr")
 mesh_id = &"fae_lantern_post"
 habitats = PackedStringArray("village_green")
@@ -142,7 +183,7 @@ density = 0.06
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_vsklh"]
+[sub_resource type="Resource" id="Resource_oebxf"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_dandelion"
 habitats = PackedStringArray("village_meadow", "village_green")
@@ -150,7 +191,7 @@ weight = 2.5
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_eogss"]
+[sub_resource type="Resource" id="Resource_lbfyv"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_nettle"
 habitats = PackedStringArray("hedgerow", "village_meadow")
@@ -158,7 +199,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_wpag4"]
+[sub_resource type="Resource" id="Resource_0ftwn"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_clover"
 habitats = PackedStringArray("village_meadow", "village_green")
@@ -166,7 +207,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_nomx6"]
+[sub_resource type="Resource" id="Resource_dtld2"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_chamomile"
 habitats = PackedStringArray("cottage_gardens", "village_meadow")
@@ -174,7 +215,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_oebxf"]
+[sub_resource type="Resource" id="Resource_r7xto"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_lavender"
 habitats = PackedStringArray("cottage_gardens")
@@ -182,20 +223,20 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_lbfyv"]
+[sub_resource type="Resource" id="Resource_cun4w"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_honeysuckle"
 habitats = PackedStringArray("hedgerow", "cottage_gardens")
 weight = 1.5
 
-[sub_resource type="Resource" id="Resource_0ftwn"]
+[sub_resource type="Resource" id="Resource_p6lmy"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_elderflower"
 habitats = PackedStringArray("hedgerow")
 weight = 1.5
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_dtld2"]
+[sub_resource type="Resource" id="Resource_apxnf"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_wild_strawberry"
 habitats = PackedStringArray("village_meadow", "hedgerow")
@@ -203,7 +244,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_r7xto"]
+[sub_resource type="Resource" id="Resource_pbn53"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_blackberry"
 habitats = PackedStringArray("hedgerow")
@@ -211,26 +252,26 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_cun4w"]
+[sub_resource type="Resource" id="Resource_1rbh2"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_lilac"
 habitats = PackedStringArray("cottage_gardens")
 weight = 1.5
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_p6lmy"]
+[sub_resource type="Resource" id="Resource_2xbgt"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_wisteria"
 habitats = PackedStringArray("cottage_gardens")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_apxnf"]
+[sub_resource type="Resource" id="Resource_qf1e3"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_rose_red"
 habitats = PackedStringArray("cottage_gardens")
 canon = "C"
 
-[sub_resource type="Resource" id="Resource_pbn53"]
+[sub_resource type="Resource" id="Resource_0j42s"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_madder"
 habitats = PackedStringArray("dye_gardens")
@@ -238,7 +279,7 @@ weight = 3.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_1rbh2"]
+[sub_resource type="Resource" id="Resource_rf5ew"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_woad"
 habitats = PackedStringArray("dye_gardens")
@@ -246,14 +287,14 @@ weight = 3.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_2xbgt"]
+[sub_resource type="Resource" id="Resource_xaaht"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_honey"
 habitats = PackedStringArray("village_orchard", "cottage_gardens")
 weight = 0.6
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_qf1e3"]
+[sub_resource type="Resource" id="Resource_wb7a8"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_spring_apple"
 habitats = PackedStringArray("village_orchard")
@@ -261,7 +302,7 @@ weight = 3.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_0j42s"]
+[sub_resource type="Resource" id="Resource_uakvp"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_cherry"
 habitats = PackedStringArray("village_orchard")
@@ -269,7 +310,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_rf5ew"]
+[sub_resource type="Resource" id="Resource_xfdc0"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_watermint"
 habitats = PackedStringArray("riverbank", "mill_race")
@@ -277,26 +318,26 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_xaaht"]
+[sub_resource type="Resource" id="Resource_xbp2h"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_river_silt"
 habitats = PackedStringArray("riverbank", "mill_race")
 weight = 1.2
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_wb7a8"]
+[sub_resource type="Resource" id="Resource_2cdjt"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_snail_shell"
 habitats = PackedStringArray("riverbank", "hedgerow")
 
-[sub_resource type="Resource" id="Resource_uakvp"]
+[sub_resource type="Resource" id="Resource_ypsul"]
 script = ExtResource("2_l0vvn")
 item_id = &"ing_faerie_bread"
 habitats = PackedStringArray("village_green")
 weight = 0.4
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_xfdc0"]
+[sub_resource type="Resource" id="Resource_g3hlb"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_glass_bead"
 habitats = PackedStringArray("village_green", "cottage_gardens")
@@ -304,7 +345,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_xbp2h"]
+[sub_resource type="Resource" id="Resource_28qqj"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_painted_pebble"
 habitats = PackedStringArray("village_green", "riverbank")
@@ -313,7 +354,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_2cdjt"]
+[sub_resource type="Resource" id="Resource_1iawf"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_ribbon_scrap"
 habitats = PackedStringArray("village_green", "cottage_gardens")
@@ -321,7 +362,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_ypsul"]
+[sub_resource type="Resource" id="Resource_6ct7n"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_acorn_carved"
 habitats = PackedStringArray("village_green")
@@ -330,7 +371,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_g3hlb"]
+[sub_resource type="Resource" id="Resource_vkaoq"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_fae_bell"
 habitats = PackedStringArray("cottage_gardens", "village_green")
@@ -339,7 +380,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_28qqj"]
+[sub_resource type="Resource" id="Resource_mkaek"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_seed_packet"
 habitats = PackedStringArray("cottage_gardens", "dye_gardens")
@@ -348,7 +389,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_1iawf"]
+[sub_resource type="Resource" id="Resource_ekx1g"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_horseshoe"
 habitats = PackedStringArray("village_meadow", "village_green")
@@ -357,7 +398,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_6ct7n"]
+[sub_resource type="Resource" id="Resource_sxoim"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_robin_egg_shell"
 habitats = PackedStringArray("hedgerow", "village_orchard")
@@ -366,7 +407,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_vkaoq"]
+[sub_resource type="Resource" id="Resource_milgh"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_wren_feather"
 habitats = PackedStringArray("hedgerow")
@@ -375,7 +416,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_mkaek"]
+[sub_resource type="Resource" id="Resource_drehk"]
 script = ExtResource("2_l0vvn")
 item_id = &"col_shell_river_mussel"
 habitats = PackedStringArray("riverbank")
@@ -384,7 +425,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_ekx1g"]
+[sub_resource type="Resource" id="Resource_4uufv"]
 script = ExtResource("3_3f73p")
 tag = &"river"
 shape = 3
@@ -392,7 +433,7 @@ band_max = 7.5
 priority = 9
 exclusive = true
 
-[sub_resource type="Resource" id="Resource_sxoim"]
+[sub_resource type="Resource" id="Resource_4lf83"]
 script = ExtResource("3_3f73p")
 tag = &"riverbank"
 shape = 3
@@ -400,14 +441,14 @@ band_min = 8.0
 band_max = 24.0
 priority = 7
 
-[sub_resource type="Resource" id="Resource_milgh"]
+[sub_resource type="Resource" id="Resource_18p51"]
 script = ExtResource("3_3f73p")
 tag = &"village_green"
 center = Vector2(-990, -900)
 radius = 75.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_drehk"]
+[sub_resource type="Resource" id="Resource_dwtjv"]
 script = ExtResource("3_3f73p")
 tag = &"cottage_gardens"
 shape = 1
@@ -416,53 +457,53 @@ radius = 220.0
 inner_radius = 75.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_4uufv"]
+[sub_resource type="Resource" id="Resource_3usuw"]
 script = ExtResource("3_3f73p")
 tag = &"dye_gardens"
 center = Vector2(-900, -1030)
 radius = 60.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_4lf83"]
+[sub_resource type="Resource" id="Resource_p4ksk"]
 script = ExtResource("3_3f73p")
 tag = &"village_orchard"
 center = Vector2(-1320, -700)
 radius = 110.0
 priority = 5
 
-[sub_resource type="Resource" id="Resource_18p51"]
+[sub_resource type="Resource" id="Resource_ns54f"]
 script = ExtResource("3_3f73p")
 tag = &"mill_race"
 center = Vector2(-1150, -950)
 radius = 40.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_dwtjv"]
+[sub_resource type="Resource" id="Resource_fwyia"]
 script = ExtResource("3_3f73p")
 tag = &"hedgerow"
 center = Vector2(-700, -650)
 radius = 120.0
 priority = 3
 
-[sub_resource type="Resource" id="Resource_3usuw"]
+[sub_resource type="Resource" id="Resource_snwmn"]
 script = ExtResource("3_3f73p")
 tag = &"hedgerow"
 center = Vector2(-1420, -1150)
 radius = 100.0
 priority = 3
 
-[sub_resource type="Resource" id="Resource_p4ksk"]
+[sub_resource type="Resource" id="Resource_q2y8u"]
 script = ExtResource("4_gr0g5")
 id = &"great_lantern_tree"
 display_name = "The Great Lantern Tree"
 position = Vector2(-990, -905)
-asset_ids = PackedStringArray("flora_tree_lilac_fae", "fae_lantern_post", "fae_bunting")
+asset_ids = PackedStringArray("woods_lilac_tree", "fae_lantern_post", "fae_bunting")
 offsets = PackedVector2Array()
 height_m = 22.0
 visible_from_m = 550.0
 notes = "A huge lilac tree in the green hung with lanterns; visible glowing at dusk from the glen and the meadow."
 
-[sub_resource type="Resource" id="Resource_ns54f"]
+[sub_resource type="Resource" id="Resource_bsnuj"]
 script = ExtResource("4_gr0g5")
 id = &"lantern_bridge"
 display_name = "The Lantern Bridge"
@@ -473,7 +514,7 @@ height_m = 6.0
 visible_from_m = 200.0
 notes = "Arched footbridge over the Thornwater."
 
-[sub_resource type="Resource" id="Resource_fwyia"]
+[sub_resource type="Resource" id="Resource_yjo27"]
 script = ExtResource("4_gr0g5")
 id = &"village_mill"
 display_name = "The Mill"
@@ -484,7 +525,7 @@ height_m = 12.0
 visible_from_m = 300.0
 notes = "Waterwheel on the mill race."
 
-[sub_resource type="Resource" id="Resource_snwmn"]
+[sub_resource type="Resource" id="Resource_0g0dd"]
 script = ExtResource("4_gr0g5")
 id = &"seamstress"
 display_name = "The Seamstress's Shop"
@@ -496,7 +537,7 @@ visible_from_m = 225.0
 kind = &"station"
 notes = "Outfits and colour variants (systems lane wardrobe station)."
 
-[sub_resource type="Resource" id="Resource_q2y8u"]
+[sub_resource type="Resource" id="Resource_yigdh"]
 script = ExtResource("4_gr0g5")
 id = &"potion_house"
 display_name = "The Potion House"
@@ -506,7 +547,7 @@ offsets = PackedVector2Array()
 kind = &"station"
 notes = "Fae potion room station (P4)."
 
-[sub_resource type="Resource" id="Resource_bsnuj"]
+[sub_resource type="Resource" id="Resource_burwg"]
 script = ExtResource("4_gr0g5")
 id = &"market"
 display_name = "The Market Square"
@@ -518,7 +559,7 @@ visible_from_m = 200.0
 kind = &"station"
 notes = "Trade, rumours, faerie bread."
 
-[sub_resource type="Resource" id="Resource_yjo27"]
+[sub_resource type="Resource" id="Resource_h0nor"]
 script = ExtResource("4_gr0g5")
 id = &"cottages"
 display_name = "Cottage Row"
@@ -536,10 +577,10 @@ display_name = "Village of the Lesser Fae"
 bounds = Array[Rect2]([Rect2(-1500, -1250, 900, 750)])
 seed = 4303
 default_habitat = &"village_meadow"
-habitats = Array[ExtResource("3_3f73p")]([SubResource("Resource_ekx1g"), SubResource("Resource_sxoim"), SubResource("Resource_milgh"), SubResource("Resource_drehk"), SubResource("Resource_4uufv"), SubResource("Resource_4lf83"), SubResource("Resource_18p51"), SubResource("Resource_dwtjv"), SubResource("Resource_3usuw")])
-forage = Array[ExtResource("2_l0vvn")]([SubResource("Resource_vsklh"), SubResource("Resource_eogss"), SubResource("Resource_wpag4"), SubResource("Resource_nomx6"), SubResource("Resource_oebxf"), SubResource("Resource_lbfyv"), SubResource("Resource_0ftwn"), SubResource("Resource_dtld2"), SubResource("Resource_r7xto"), SubResource("Resource_cun4w"), SubResource("Resource_p6lmy"), SubResource("Resource_apxnf"), SubResource("Resource_pbn53"), SubResource("Resource_1rbh2"), SubResource("Resource_2xbgt"), SubResource("Resource_qf1e3"), SubResource("Resource_0j42s"), SubResource("Resource_rf5ew"), SubResource("Resource_xaaht"), SubResource("Resource_wb7a8"), SubResource("Resource_uakvp"), SubResource("Resource_xfdc0"), SubResource("Resource_xbp2h"), SubResource("Resource_2cdjt"), SubResource("Resource_ypsul"), SubResource("Resource_g3hlb"), SubResource("Resource_28qqj"), SubResource("Resource_1iawf"), SubResource("Resource_6ct7n"), SubResource("Resource_vkaoq"), SubResource("Resource_mkaek")])
-decor = Array[ExtResource("1_eetyr")]([SubResource("Resource_4cydj"), SubResource("Resource_8v3ws"), SubResource("Resource_andps"), SubResource("Resource_ciwi3"), SubResource("Resource_dmf42"), SubResource("Resource_1pyh5"), SubResource("Resource_2q2ib"), SubResource("Resource_wxlov"), SubResource("Resource_dt5bk"), SubResource("Resource_am2p5"), SubResource("Resource_gw2n4"), SubResource("Resource_vjm08"), SubResource("Resource_ag7op"), SubResource("Resource_l4oq7"), SubResource("Resource_67yos"), SubResource("Resource_546at"), SubResource("Resource_1akns")])
-landmarks = Array[ExtResource("4_gr0g5")]([SubResource("Resource_p4ksk"), SubResource("Resource_ns54f"), SubResource("Resource_fwyia"), SubResource("Resource_snwmn"), SubResource("Resource_q2y8u"), SubResource("Resource_bsnuj"), SubResource("Resource_yjo27")])
+habitats = Array[ExtResource("3_3f73p")]([SubResource("Resource_4uufv"), SubResource("Resource_4lf83"), SubResource("Resource_18p51"), SubResource("Resource_dwtjv"), SubResource("Resource_3usuw"), SubResource("Resource_p4ksk"), SubResource("Resource_ns54f"), SubResource("Resource_fwyia"), SubResource("Resource_snwmn")])
+forage = Array[ExtResource("2_l0vvn")]([SubResource("Resource_oebxf"), SubResource("Resource_lbfyv"), SubResource("Resource_0ftwn"), SubResource("Resource_dtld2"), SubResource("Resource_r7xto"), SubResource("Resource_cun4w"), SubResource("Resource_p6lmy"), SubResource("Resource_apxnf"), SubResource("Resource_pbn53"), SubResource("Resource_1rbh2"), SubResource("Resource_2xbgt"), SubResource("Resource_qf1e3"), SubResource("Resource_0j42s"), SubResource("Resource_rf5ew"), SubResource("Resource_xaaht"), SubResource("Resource_wb7a8"), SubResource("Resource_uakvp"), SubResource("Resource_xfdc0"), SubResource("Resource_xbp2h"), SubResource("Resource_2cdjt"), SubResource("Resource_ypsul"), SubResource("Resource_g3hlb"), SubResource("Resource_28qqj"), SubResource("Resource_1iawf"), SubResource("Resource_6ct7n"), SubResource("Resource_vkaoq"), SubResource("Resource_mkaek"), SubResource("Resource_ekx1g"), SubResource("Resource_sxoim"), SubResource("Resource_milgh"), SubResource("Resource_drehk")])
+decor = Array[ExtResource("1_eetyr")]([SubResource("Resource_4cydj"), SubResource("Resource_8v3ws"), SubResource("Resource_andps"), SubResource("Resource_ciwi3"), SubResource("Resource_dmf42"), SubResource("Resource_1pyh5"), SubResource("Resource_2q2ib"), SubResource("Resource_wxlov"), SubResource("Resource_dt5bk"), SubResource("Resource_am2p5"), SubResource("Resource_gw2n4"), SubResource("Resource_vjm08"), SubResource("Resource_ag7op"), SubResource("Resource_l4oq7"), SubResource("Resource_67yos"), SubResource("Resource_546at"), SubResource("Resource_1akns"), SubResource("Resource_vsklh"), SubResource("Resource_eogss"), SubResource("Resource_wpag4"), SubResource("Resource_nomx6")])
+landmarks = Array[ExtResource("4_gr0g5")]([SubResource("Resource_q2y8u"), SubResource("Resource_bsnuj"), SubResource("Resource_yjo27"), SubResource("Resource_0g0dd"), SubResource("Resource_yigdh"), SubResource("Resource_burwg"), SubResource("Resource_h0nor")])
 grade = &"grade_fae_village"
 ambient_fx = PackedStringArray("fx_lantern_glow_motes", "fx_butterflies", "fx_pollen_motes", "fx_rose_petals")
 notes = "Masked lesser-fae hamlet on the Thornwater: butter-yellow and mint cottages, lantern-lit. Residents cannot speak of the curse (C). Seamstress (outfits) and potion-maker (fae potion room station) live here."

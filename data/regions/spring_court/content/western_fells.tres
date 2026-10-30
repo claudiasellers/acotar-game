@@ -52,28 +52,27 @@ wind = 0.6
 script = ExtResource("1_x2tkd")
 mesh_id = &"flora_carpet_lilac"
 habitats = PackedStringArray("heather_moor")
-density = 1.5
+density = 5.5
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_xh2mq"]
 script = ExtResource("1_x2tkd")
 mesh_id = &"flora_carpet_butter"
 habitats = PackedStringArray("sheep_pasture", "fells_foot")
-density = 1.8
+density = 1.4
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_a3vwi"]
 script = ExtResource("1_x2tkd")
 mesh_id = &"flora_carpet_rose"
 habitats = PackedStringArray("fells_foot")
-density = 1.2
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_mtob0"]
 script = ExtResource("1_x2tkd")
-mesh_id = &"flora_tree_hawthorn"
+mesh_id = &"woods_hawthorn"
 habitats = PackedStringArray("heather_moor", "fells_foot")
-density = 0.04
+density = 0.05
 scale_max = 1.3
 wind = 0.25
 cast_shadow = true
@@ -82,7 +81,7 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_ab8i0"]
 script = ExtResource("1_x2tkd")
-mesh_id = &"flora_tree_rowan"
+mesh_id = &"woods_elder"
 habitats = PackedStringArray("heather_moor", "hazel_hedge")
 density = 0.03
 scale_max = 1.3
@@ -101,7 +100,7 @@ cast_shadow = true
 
 [sub_resource type="Resource" id="Resource_nvm1l"]
 script = ExtResource("1_x2tkd")
-mesh_id = &"flora_tree_spring_oak"
+mesh_id = &"woods_oak"
 habitats = PackedStringArray("fells_foot", "hazel_hedge")
 density = 0.05
 scale_max = 1.3
@@ -112,9 +111,9 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_ih7mh"]
 script = ExtResource("1_x2tkd")
-mesh_id = &"flora_tree_golden_birch"
+mesh_id = &"woods_silver_birch"
 habitats = PackedStringArray("silent_hollow")
-density = 0.02
+density = 0.08
 scale_max = 1.3
 wind = 0.25
 cast_shadow = true
@@ -123,13 +122,54 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_14ivs"]
 script = ExtResource("1_x2tkd")
+mesh_id = &"woods_yew"
+habitats = PackedStringArray("hazel_hedge", "silent_hollow")
+density = 0.04
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_n33tj"]
+script = ExtResource("1_x2tkd")
+mesh_id = &"woods_ancient_oak"
+habitats = PackedStringArray("fells_foot")
+density = 0.003
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_mg4dj"]
+script = ExtResource("1_x2tkd")
+mesh_id = &"woods_leaning_trunk"
+habitats = PackedStringArray("heather_moor", "silent_hollow")
+density = 0.01
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_vgt7i"]
+script = ExtResource("1_x2tkd")
+mesh_id = &"woods_fallen_log"
+habitats = PackedStringArray("fells_foot", "silent_hollow")
+density = 0.02
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_w70co"]
+script = ExtResource("1_x2tkd")
 mesh_id = &"fells_cairn"
 habitats = PackedStringArray("heather_moor")
 density = 0.004
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_n33tj"]
+[sub_resource type="Resource" id="Resource_ts7wy"]
 script = ExtResource("1_x2tkd")
 mesh_id = &"rock_mossy_b"
 habitats = PackedStringArray("heather_moor", "chalk_scar")
@@ -137,7 +177,7 @@ density = 0.08
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_mg4dj"]
+[sub_resource type="Resource" id="Resource_vry3e"]
 script = ExtResource("1_x2tkd")
 mesh_id = &"escarpment_rock_b"
 habitats = PackedStringArray("cliff_edge")
@@ -145,7 +185,7 @@ density = 0.0
 wind = 0.0
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_vgt7i"]
+[sub_resource type="Resource" id="Resource_mdyd8"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_heather"
 habitats = PackedStringArray("heather_moor", "tower_knoll")
@@ -153,7 +193,7 @@ weight = 4.0
 cluster_min = 3
 cluster_max = 7
 
-[sub_resource type="Resource" id="Resource_w70co"]
+[sub_resource type="Resource" id="Resource_xw6dv"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_bilberry"
 habitats = PackedStringArray("heather_moor")
@@ -161,7 +201,7 @@ weight = 2.5
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_ts7wy"]
+[sub_resource type="Resource" id="Resource_12m25"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_wild_thyme"
 habitats = PackedStringArray("heather_moor", "chalk_scar", "tower_knoll")
@@ -169,25 +209,25 @@ weight = 2.5
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_vry3e"]
+[sub_resource type="Resource" id="Resource_ni4hc"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_juniper_berry"
 habitats = PackedStringArray("heather_moor")
 weight = 1.5
 
-[sub_resource type="Resource" id="Resource_mdyd8"]
+[sub_resource type="Resource" id="Resource_mtvt7"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_chalk"
 habitats = PackedStringArray("chalk_scar")
 weight = 2.5
 
-[sub_resource type="Resource" id="Resource_xw6dv"]
+[sub_resource type="Resource" id="Resource_yfw30"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_red_ochre"
 habitats = PackedStringArray("chalk_scar", "old_shrines")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_12m25"]
+[sub_resource type="Resource" id="Resource_ayylk"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_cowslip"
 habitats = PackedStringArray("heather_moor", "sheep_pasture", "fells_foot")
@@ -195,7 +235,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_ni4hc"]
+[sub_resource type="Resource" id="Resource_ntp8n"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_yarrow"
 habitats = PackedStringArray("sheep_pasture", "fells_foot")
@@ -203,13 +243,13 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_mtvt7"]
+[sub_resource type="Resource" id="Resource_4gkqy"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_hawthorn_haw"
 habitats = PackedStringArray("heather_moor", "hazel_hedge")
 weight = 1.2
 
-[sub_resource type="Resource" id="Resource_yfw30"]
+[sub_resource type="Resource" id="Resource_0od6b"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_hazelnut"
 habitats = PackedStringArray("hazel_hedge", "fells_foot")
@@ -217,7 +257,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_ayylk"]
+[sub_resource type="Resource" id="Resource_xvycq"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_sweet_woodruff"
 habitats = PackedStringArray("silent_hollow")
@@ -225,7 +265,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_ntp8n"]
+[sub_resource type="Resource" id="Resource_hyo4c"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_wild_garlic"
 habitats = PackedStringArray("silent_hollow", "fells_foot")
@@ -233,7 +273,7 @@ weight = 1.2
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_4gkqy"]
+[sub_resource type="Resource" id="Resource_fsp2y"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_mugwort"
 habitats = PackedStringArray("old_shrines")
@@ -241,28 +281,28 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_0od6b"]
+[sub_resource type="Resource" id="Resource_d22dt"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_lapis_shard"
 habitats = PackedStringArray("old_shrines")
 weight = 0.5
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_xvycq"]
+[sub_resource type="Resource" id="Resource_ngat8"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_flint"
 habitats = PackedStringArray("chalk_scar", "heather_moor")
 weight = 0.8
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_hyo4c"]
+[sub_resource type="Resource" id="Resource_r62qc"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_honey"
 habitats = PackedStringArray("heather_moor")
 weight = 0.25
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_fsp2y"]
+[sub_resource type="Resource" id="Resource_r7vu4"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_primrose"
 habitats = PackedStringArray("fells_foot", "sheep_pasture")
@@ -270,7 +310,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_d22dt"]
+[sub_resource type="Resource" id="Resource_ygprd"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_clover"
 habitats = PackedStringArray("sheep_pasture", "fells_foot")
@@ -278,7 +318,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_ngat8"]
+[sub_resource type="Resource" id="Resource_6icrx"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_dandelion"
 habitats = PackedStringArray("sheep_pasture", "fells_foot")
@@ -286,21 +326,21 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_r62qc"]
+[sub_resource type="Resource" id="Resource_8vol0"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_hawk_feather"
 habitats = PackedStringArray("tower_knoll", "heather_moor")
 weight = 0.6
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_r7vu4"]
+[sub_resource type="Resource" id="Resource_egxw5"]
 script = ExtResource("2_eeemv")
 item_id = &"ing_shed_antler"
 habitats = PackedStringArray("heather_moor", "fells_foot")
 weight = 0.3
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_ygprd"]
+[sub_resource type="Resource" id="Resource_nvw36"]
 script = ExtResource("2_eeemv")
 item_id = &"col_mural_chip"
 habitats = PackedStringArray("old_shrines")
@@ -309,7 +349,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_6icrx"]
+[sub_resource type="Resource" id="Resource_v2a3n"]
 script = ExtResource("2_eeemv")
 item_id = &"col_coin_old"
 habitats = PackedStringArray("old_shrines", "silent_hollow")
@@ -318,7 +358,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_8vol0"]
+[sub_resource type="Resource" id="Resource_0ygyf"]
 script = ExtResource("2_eeemv")
 item_id = &"col_stone_fossil"
 habitats = PackedStringArray("chalk_scar")
@@ -326,7 +366,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_egxw5"]
+[sub_resource type="Resource" id="Resource_bypul"]
 script = ExtResource("2_eeemv")
 item_id = &"col_wool_tuft"
 habitats = PackedStringArray("sheep_pasture", "heather_moor")
@@ -334,7 +374,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_nvw36"]
+[sub_resource type="Resource" id="Resource_ivs84"]
 script = ExtResource("2_eeemv")
 item_id = &"col_feather_pheasant"
 habitats = PackedStringArray("heather_moor", "fells_foot")
@@ -343,7 +383,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_v2a3n"]
+[sub_resource type="Resource" id="Resource_mknts"]
 script = ExtResource("2_eeemv")
 item_id = &"col_antler_tine"
 habitats = PackedStringArray("heather_moor")
@@ -352,7 +392,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_0ygyf"]
+[sub_resource type="Resource" id="Resource_fre4l"]
 script = ExtResource("2_eeemv")
 item_id = &"col_pinecone"
 habitats = PackedStringArray("tower_knoll", "heather_moor")
@@ -360,7 +400,7 @@ weight = 0.5
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_bypul"]
+[sub_resource type="Resource" id="Resource_uo8u5"]
 script = ExtResource("2_eeemv")
 item_id = &"col_odd_stone"
 habitats = PackedStringArray("chalk_scar", "heather_moor")
@@ -369,7 +409,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_ivs84"]
+[sub_resource type="Resource" id="Resource_jsonr"]
 script = ExtResource("2_eeemv")
 item_id = &"col_heart_stone"
 habitats = PackedStringArray("cliff_edge", "heather_moor")
@@ -378,7 +418,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_mknts"]
+[sub_resource type="Resource" id="Resource_tueus"]
 script = ExtResource("2_eeemv")
 item_id = &"col_snake_skin"
 habitats = PackedStringArray("chalk_scar")
@@ -387,91 +427,91 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_fre4l"]
+[sub_resource type="Resource" id="Resource_62n0q"]
 script = ExtResource("3_exhdv")
 tag = &"cliff_edge"
 shape = 2
 rect = Rect2(-1800, -900, 55, 2300)
 priority = 6
 
-[sub_resource type="Resource" id="Resource_uo8u5"]
+[sub_resource type="Resource" id="Resource_douph"]
 script = ExtResource("3_exhdv")
 tag = &"fells_foot"
 center = Vector2(-1100, 1000)
 radius = 520.0
 priority = 2
 
-[sub_resource type="Resource" id="Resource_jsonr"]
+[sub_resource type="Resource" id="Resource_eqe5p"]
 script = ExtResource("3_exhdv")
 tag = &"silent_hollow"
 center = Vector2(-1250, 1100)
 radius = 95.0
 priority = 8
 
-[sub_resource type="Resource" id="Resource_tueus"]
+[sub_resource type="Resource" id="Resource_fhsww"]
 script = ExtResource("3_exhdv")
 tag = &"old_shrines"
 center = Vector2(-1640, 120)
 radius = 75.0
 priority = 8
 
-[sub_resource type="Resource" id="Resource_62n0q"]
+[sub_resource type="Resource" id="Resource_jqeqt"]
 script = ExtResource("3_exhdv")
 tag = &"chalk_scar"
 center = Vector2(-1620, -300)
 radius = 60.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_douph"]
+[sub_resource type="Resource" id="Resource_um388"]
 script = ExtResource("3_exhdv")
 tag = &"chalk_scar"
 center = Vector2(-1700, 800)
 radius = 55.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_eqe5p"]
+[sub_resource type="Resource" id="Resource_fc7u4"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
 center = Vector2(-1650, -650)
 radius = 45.0
 priority = 7
 
-[sub_resource type="Resource" id="Resource_fhsww"]
+[sub_resource type="Resource" id="Resource_x45rc"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
 center = Vector2(-1650, 350)
 radius = 45.0
 priority = 7
 
-[sub_resource type="Resource" id="Resource_jqeqt"]
+[sub_resource type="Resource" id="Resource_tnjbf"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
 center = Vector2(-1050, 1250)
 radius = 40.0
 priority = 7
 
-[sub_resource type="Resource" id="Resource_um388"]
+[sub_resource type="Resource" id="Resource_5p6ry"]
 script = ExtResource("3_exhdv")
 tag = &"hazel_hedge"
 center = Vector2(-900, 750)
 radius = 110.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_fc7u4"]
+[sub_resource type="Resource" id="Resource_s1hwb"]
 script = ExtResource("3_exhdv")
 tag = &"hazel_hedge"
 center = Vector2(-1400, 1300)
 radius = 90.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_x45rc"]
+[sub_resource type="Resource" id="Resource_l4ipm"]
 script = ExtResource("3_exhdv")
 tag = &"sheep_pasture"
 center = Vector2(-1650, 1050)
 radius = 120.0
 priority = 3
 
-[sub_resource type="Resource" id="Resource_tnjbf"]
+[sub_resource type="Resource" id="Resource_kcssj"]
 script = ExtResource("4_lw45t")
 id = &"north_watchtower"
 display_name = "The North Watchtower"
@@ -483,7 +523,7 @@ visible_from_m = 450.0
 kind = &"climbable"
 notes = "Sentry tower on a knoll; climb the ivy face to see the Autumn foothills and the village. Holds the sentry warbow chest (systems lane)."
 
-[sub_resource type="Resource" id="Resource_5p6ry"]
+[sub_resource type="Resource" id="Resource_75rwt"]
 script = ExtResource("4_lw45t")
 id = &"middle_watchtower"
 display_name = "The Middle Watchtower"
@@ -495,7 +535,7 @@ visible_from_m = 450.0
 kind = &"climbable"
 notes = "Looks over the Starlight Glen's lakes."
 
-[sub_resource type="Resource" id="Resource_s1hwb"]
+[sub_resource type="Resource" id="Resource_hdbt4"]
 script = ExtResource("4_lw45t")
 id = &"foot_watchtower"
 display_name = "The Ruined Tower"
@@ -507,7 +547,7 @@ visible_from_m = 350.0
 kind = &"climbable"
 notes = "Broken tower near the Wall; the first height Feyre can reach in the west."
 
-[sub_resource type="Resource" id="Resource_l4ipm"]
+[sub_resource type="Resource" id="Resource_k0cal"]
 script = ExtResource("4_lw45t")
 id = &"summers_window"
 display_name = "Summer's Window"
@@ -519,18 +559,18 @@ visible_from_m = 200.0
 kind = &"overlook"
 notes = "Bench and cairn at the escarpment edge; the Summer Court's coast shimmers far to the south-west."
 
-[sub_resource type="Resource" id="Resource_kcssj"]
+[sub_resource type="Resource" id="Resource_bkmhk"]
 script = ExtResource("4_lw45t")
 id = &"silent_hollow"
 display_name = "The Silent Hollow"
 position = Vector2(-1250, 1100)
-asset_ids = PackedStringArray("flora_tree_golden_birch", "shrine_column_broken")
+asset_ids = PackedStringArray("woods_silver_birch", "shrine_column_broken")
 offsets = PackedVector2Array()
 height_m = 20.0
 visible_from_m = 500.0
 notes = "A sunken grove of golden birches where no bird sings and the wind drops; a broken pillar marks an older age. (The canon Ash Grove is in the human realm, Keeper.)"
 
-[sub_resource type="Resource" id="Resource_75rwt"]
+[sub_resource type="Resource" id="Resource_repd3"]
 script = ExtResource("4_lw45t")
 id = &"rainbow_cascade"
 display_name = "The Rainbow Cascade"
@@ -543,7 +583,7 @@ kind = &"waterfall"
 canon = "C"
 notes = "Canon rainbow waterfall (Keeper): a fell spring spills off the escarpment in a ribbon of colour, seen from all along the fells."
 
-[sub_resource type="Resource" id="Resource_hdbt4"]
+[sub_resource type="Resource" id="Resource_y1pvj"]
 script = ExtResource("4_lw45t")
 id = &"old_shrines"
 display_name = "The Old Shrines"
@@ -564,10 +604,10 @@ holes = Array[Rect2]([Rect2(-950, 450, 250, 350)])
 skirts = Array[Rect2]([Rect2(-1950, -900, 150, 2300)])
 seed = 4202
 default_habitat = &"heather_moor"
-habitats = Array[ExtResource("3_exhdv")]([SubResource("Resource_fre4l"), SubResource("Resource_uo8u5"), SubResource("Resource_jsonr"), SubResource("Resource_tueus"), SubResource("Resource_62n0q"), SubResource("Resource_douph"), SubResource("Resource_eqe5p"), SubResource("Resource_fhsww"), SubResource("Resource_jqeqt"), SubResource("Resource_um388"), SubResource("Resource_fc7u4"), SubResource("Resource_x45rc")])
-forage = Array[ExtResource("2_eeemv")]([SubResource("Resource_vgt7i"), SubResource("Resource_w70co"), SubResource("Resource_ts7wy"), SubResource("Resource_vry3e"), SubResource("Resource_mdyd8"), SubResource("Resource_xw6dv"), SubResource("Resource_12m25"), SubResource("Resource_ni4hc"), SubResource("Resource_mtvt7"), SubResource("Resource_yfw30"), SubResource("Resource_ayylk"), SubResource("Resource_ntp8n"), SubResource("Resource_4gkqy"), SubResource("Resource_0od6b"), SubResource("Resource_xvycq"), SubResource("Resource_hyo4c"), SubResource("Resource_fsp2y"), SubResource("Resource_d22dt"), SubResource("Resource_ngat8"), SubResource("Resource_r62qc"), SubResource("Resource_r7vu4"), SubResource("Resource_ygprd"), SubResource("Resource_6icrx"), SubResource("Resource_8vol0"), SubResource("Resource_egxw5"), SubResource("Resource_nvw36"), SubResource("Resource_v2a3n"), SubResource("Resource_0ygyf"), SubResource("Resource_bypul"), SubResource("Resource_ivs84"), SubResource("Resource_mknts")])
-decor = Array[ExtResource("1_x2tkd")]([SubResource("Resource_n42g6"), SubResource("Resource_scws7"), SubResource("Resource_tm1as"), SubResource("Resource_85isp"), SubResource("Resource_n743b"), SubResource("Resource_w3b6d"), SubResource("Resource_4mmab"), SubResource("Resource_xh2mq"), SubResource("Resource_a3vwi"), SubResource("Resource_mtob0"), SubResource("Resource_ab8i0"), SubResource("Resource_a25mb"), SubResource("Resource_nvm1l"), SubResource("Resource_ih7mh"), SubResource("Resource_14ivs"), SubResource("Resource_n33tj"), SubResource("Resource_mg4dj")])
-landmarks = Array[ExtResource("4_lw45t")]([SubResource("Resource_tnjbf"), SubResource("Resource_5p6ry"), SubResource("Resource_s1hwb"), SubResource("Resource_l4ipm"), SubResource("Resource_kcssj"), SubResource("Resource_75rwt"), SubResource("Resource_hdbt4")])
+habitats = Array[ExtResource("3_exhdv")]([SubResource("Resource_62n0q"), SubResource("Resource_douph"), SubResource("Resource_eqe5p"), SubResource("Resource_fhsww"), SubResource("Resource_jqeqt"), SubResource("Resource_um388"), SubResource("Resource_fc7u4"), SubResource("Resource_x45rc"), SubResource("Resource_tnjbf"), SubResource("Resource_5p6ry"), SubResource("Resource_s1hwb"), SubResource("Resource_l4ipm")])
+forage = Array[ExtResource("2_eeemv")]([SubResource("Resource_mdyd8"), SubResource("Resource_xw6dv"), SubResource("Resource_12m25"), SubResource("Resource_ni4hc"), SubResource("Resource_mtvt7"), SubResource("Resource_yfw30"), SubResource("Resource_ayylk"), SubResource("Resource_ntp8n"), SubResource("Resource_4gkqy"), SubResource("Resource_0od6b"), SubResource("Resource_xvycq"), SubResource("Resource_hyo4c"), SubResource("Resource_fsp2y"), SubResource("Resource_d22dt"), SubResource("Resource_ngat8"), SubResource("Resource_r62qc"), SubResource("Resource_r7vu4"), SubResource("Resource_ygprd"), SubResource("Resource_6icrx"), SubResource("Resource_8vol0"), SubResource("Resource_egxw5"), SubResource("Resource_nvw36"), SubResource("Resource_v2a3n"), SubResource("Resource_0ygyf"), SubResource("Resource_bypul"), SubResource("Resource_ivs84"), SubResource("Resource_mknts"), SubResource("Resource_fre4l"), SubResource("Resource_uo8u5"), SubResource("Resource_jsonr"), SubResource("Resource_tueus")])
+decor = Array[ExtResource("1_x2tkd")]([SubResource("Resource_n42g6"), SubResource("Resource_scws7"), SubResource("Resource_tm1as"), SubResource("Resource_85isp"), SubResource("Resource_n743b"), SubResource("Resource_w3b6d"), SubResource("Resource_4mmab"), SubResource("Resource_xh2mq"), SubResource("Resource_a3vwi"), SubResource("Resource_mtob0"), SubResource("Resource_ab8i0"), SubResource("Resource_a25mb"), SubResource("Resource_nvm1l"), SubResource("Resource_ih7mh"), SubResource("Resource_14ivs"), SubResource("Resource_n33tj"), SubResource("Resource_mg4dj"), SubResource("Resource_vgt7i"), SubResource("Resource_w70co"), SubResource("Resource_ts7wy"), SubResource("Resource_vry3e")])
+landmarks = Array[ExtResource("4_lw45t")]([SubResource("Resource_kcssj"), SubResource("Resource_75rwt"), SubResource("Resource_hdbt4"), SubResource("Resource_k0cal"), SubResource("Resource_bkmhk"), SubResource("Resource_repd3"), SubResource("Resource_y1pvj")])
 grade = &"grade_fells"
 ambient_fx = PackedStringArray("fx_pollen_motes", "fx_butterflies", "fx_dandelion_seeds")
 notes = "High lilac-heather grassland west of the court ending at an escarpment that looks south-west to the Summer Court's coast (no sea cliffs in Spring; Keeper). Watchtowers of Tamlin's sentries. The fells foot holds the Silent Hollow and the Old Shrines (pre-Treaty ruins)."

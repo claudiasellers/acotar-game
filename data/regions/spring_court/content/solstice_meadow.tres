@@ -45,47 +45,46 @@ wind = 0.0
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_rose"
 habitats = PackedStringArray("flower_meadow", "dance_green")
-density = 2.6
+density = 1.2
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_hxocr"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_butter"
 habitats = PackedStringArray("flower_meadow", "crown_hill")
-density = 2.4
+density = 10.0
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_48xjq"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_periwinkle"
 habitats = PackedStringArray("cornflower_bank", "flower_meadow")
-density = 2.0
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_neihj"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_blush"
 habitats = PackedStringArray("poppy_field", "flower_meadow")
-density = 2.4
+density = 1.4
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_nvou2"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_lilac"
 habitats = PackedStringArray("wisp_hollow")
-density = 2.0
+density = 1.2
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_lrxiu"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_carpet_pearl"
 habitats = PackedStringArray("crown_hill")
-density = 1.4
+density = 0.8
 wind = 0.6
 
 [sub_resource type="Resource" id="Resource_o1372"]
 script = ExtResource("1_hhb8n")
-mesh_id = &"flora_tree_cherry_blossom"
+mesh_id = &"woods_wild_cherry"
 habitats = PackedStringArray("crown_hill", "flower_meadow")
 density = 0.03
 scale_max = 1.3
@@ -96,7 +95,7 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_rjf38"]
 script = ExtResource("1_hhb8n")
-mesh_id = &"flora_tree_spring_oak"
+mesh_id = &"woods_oak"
 habitats = PackedStringArray("crown_hill")
 density = 0.015
 scale_max = 1.3
@@ -107,20 +106,61 @@ max_slope = 30.0
 
 [sub_resource type="Resource" id="Resource_48w27"]
 script = ExtResource("1_hhb8n")
+mesh_id = &"woods_silver_birch"
+habitats = PackedStringArray("wisp_hollow", "cornflower_bank")
+density = 0.06
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_5u1c5"]
+script = ExtResource("1_hhb8n")
+mesh_id = &"woods_yew"
+habitats = PackedStringArray("wisp_hollow")
+density = 0.05
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_8onbx"]
+script = ExtResource("1_hhb8n")
+mesh_id = &"woods_lilac_tree"
+habitats = PackedStringArray("dance_green")
+density = 0.02
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_30mh8"]
+script = ExtResource("1_hhb8n")
+mesh_id = &"woods_fallen_log"
+habitats = PackedStringArray("wisp_hollow")
+density = 0.02
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_c1ovm"]
+script = ExtResource("1_hhb8n")
 mesh_id = &"flora_bush_hydrangea"
 habitats = PackedStringArray("dance_green")
 density = 0.15
 wind = 0.6
 cast_shadow = true
 
-[sub_resource type="Resource" id="Resource_5u1c5"]
+[sub_resource type="Resource" id="Resource_ojl8y"]
 script = ExtResource("1_hhb8n")
 mesh_id = &"flora_fern_b"
 habitats = PackedStringArray("wisp_hollow")
 density = 0.6
 wind = 0.6
 
-[sub_resource type="Resource" id="Resource_8onbx"]
+[sub_resource type="Resource" id="Resource_ccevv"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_red_poppy"
 habitats = PackedStringArray("poppy_field", "flower_meadow")
@@ -128,7 +168,7 @@ weight = 3.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_30mh8"]
+[sub_resource type="Resource" id="Resource_13bvy"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_cornflower"
 habitats = PackedStringArray("cornflower_bank", "flower_meadow")
@@ -136,7 +176,7 @@ weight = 3.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_c1ovm"]
+[sub_resource type="Resource" id="Resource_x2p73"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_cowslip"
 habitats = PackedStringArray("crown_hill", "flower_meadow")
@@ -144,7 +184,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_ojl8y"]
+[sub_resource type="Resource" id="Resource_qtcm4"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_chamomile"
 habitats = PackedStringArray("flower_meadow", "dance_green")
@@ -152,7 +192,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_ccevv"]
+[sub_resource type="Resource" id="Resource_dxrlc"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_yarrow"
 habitats = PackedStringArray("crown_hill", "flower_meadow")
@@ -160,7 +200,7 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_13bvy"]
+[sub_resource type="Resource" id="Resource_3q6xn"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_clover"
 habitats = PackedStringArray("dance_green", "flower_meadow")
@@ -168,7 +208,7 @@ weight = 2.0
 cluster_min = 3
 cluster_max = 6
 
-[sub_resource type="Resource" id="Resource_x2p73"]
+[sub_resource type="Resource" id="Resource_pt0l6"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_dandelion"
 habitats = PackedStringArray("flower_meadow")
@@ -176,7 +216,7 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_qtcm4"]
+[sub_resource type="Resource" id="Resource_iphyx"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_meadowsweet"
 habitats = PackedStringArray("wisp_hollow")
@@ -184,7 +224,7 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_dxrlc"]
+[sub_resource type="Resource" id="Resource_44pdc"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_wild_strawberry"
 habitats = PackedStringArray("crown_hill", "flower_meadow")
@@ -192,7 +232,7 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_3q6xn"]
+[sub_resource type="Resource" id="Resource_k4st1"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_primrose"
 habitats = PackedStringArray("wisp_hollow", "flower_meadow")
@@ -200,32 +240,32 @@ weight = 1.5
 cluster_min = 2
 cluster_max = 4
 
-[sub_resource type="Resource" id="Resource_pt0l6"]
+[sub_resource type="Resource" id="Resource_k40nu"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_cherry_blossom"
 habitats = PackedStringArray("crown_hill", "dance_green")
 weight = 1.2
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_iphyx"]
+[sub_resource type="Resource" id="Resource_ylg51"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_elderflower"
 habitats = PackedStringArray("wisp_hollow")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_44pdc"]
+[sub_resource type="Resource" id="Resource_6knqf"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_honeysuckle"
 habitats = PackedStringArray("dance_green")
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_k4st1"]
+[sub_resource type="Resource" id="Resource_6q4i8"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_lavender"
 habitats = PackedStringArray("crown_hill")
 cluster_min = 2
 
-[sub_resource type="Resource" id="Resource_k40nu"]
+[sub_resource type="Resource" id="Resource_8yc1g"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_faelight_dandelion"
 habitats = PackedStringArray("wisp_hollow", "flower_meadow")
@@ -233,21 +273,21 @@ weight = 2.0
 cluster_min = 2
 cluster_max = 5
 
-[sub_resource type="Resource" id="Resource_ylg51"]
+[sub_resource type="Resource" id="Resource_gvmel"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_moonflower"
 habitats = PackedStringArray("wisp_hollow")
 cluster_max = 2
 night_only = true
 
-[sub_resource type="Resource" id="Resource_6knqf"]
+[sub_resource type="Resource" id="Resource_a2qcr"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_honey"
 habitats = PackedStringArray("crown_hill")
 weight = 0.4
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_6q4i8"]
+[sub_resource type="Resource" id="Resource_b7qd4"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_faerie_wine"
 habitats = PackedStringArray("dance_green")
@@ -255,21 +295,21 @@ weight = 0.3
 cluster_max = 1
 canon = "C"
 
-[sub_resource type="Resource" id="Resource_8yc1g"]
+[sub_resource type="Resource" id="Resource_ywj8h"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_candied_flowers"
 habitats = PackedStringArray("dance_green")
 weight = 0.4
 cluster_max = 1
 
-[sub_resource type="Resource" id="Resource_gvmel"]
+[sub_resource type="Resource" id="Resource_aptpk"]
 script = ExtResource("2_qmtl8")
 item_id = &"ing_snail_shell"
 habitats = PackedStringArray("wisp_hollow")
 weight = 0.6
 cluster_max = 2
 
-[sub_resource type="Resource" id="Resource_a2qcr"]
+[sub_resource type="Resource" id="Resource_e33dn"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_solstice_bead"
 habitats = PackedStringArray("dance_green", "dance_ring")
@@ -278,7 +318,7 @@ cluster_max = 2
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_b7qd4"]
+[sub_resource type="Resource" id="Resource_60sob"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_ribbon_scrap"
 habitats = PackedStringArray("dance_green")
@@ -286,7 +326,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_ywj8h"]
+[sub_resource type="Resource" id="Resource_e46ni"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_fae_bell"
 habitats = PackedStringArray("dance_green", "wisp_hollow")
@@ -295,14 +335,14 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_aptpk"]
+[sub_resource type="Resource" id="Resource_u4wv5"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_dandelion_clock"
 habitats = PackedStringArray("flower_meadow", "wisp_hollow")
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_e33dn"]
+[sub_resource type="Resource" id="Resource_onq6d"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_robin_egg_shell"
 habitats = PackedStringArray("crown_hill")
@@ -311,7 +351,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_60sob"]
+[sub_resource type="Resource" id="Resource_1bgq8"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_wren_feather"
 habitats = PackedStringArray("crown_hill", "flower_meadow")
@@ -320,7 +360,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_e46ni"]
+[sub_resource type="Resource" id="Resource_tmp8t"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_feather_swan"
 habitats = PackedStringArray("wisp_hollow")
@@ -329,7 +369,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_u4wv5"]
+[sub_resource type="Resource" id="Resource_i6ufe"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_beetle_jewel"
 habitats = PackedStringArray("flower_meadow")
@@ -338,7 +378,7 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_onq6d"]
+[sub_resource type="Resource" id="Resource_poh0d"]
 script = ExtResource("2_qmtl8")
 item_id = &"col_glass_bead"
 habitats = PackedStringArray("dance_green")
@@ -347,14 +387,14 @@ cluster_max = 1
 cluster_radius = 1.5
 collectible = true
 
-[sub_resource type="Resource" id="Resource_1bgq8"]
+[sub_resource type="Resource" id="Resource_v7bse"]
 script = ExtResource("3_hno6l")
 tag = &"dance_ring"
 center = Vector2(-150, -1080)
 radius = 26.0
 priority = 9
 
-[sub_resource type="Resource" id="Resource_tmp8t"]
+[sub_resource type="Resource" id="Resource_3jlxd"]
 script = ExtResource("3_hno6l")
 tag = &"dance_green"
 shape = 1
@@ -363,35 +403,35 @@ radius = 80.0
 inner_radius = 26.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_i6ufe"]
+[sub_resource type="Resource" id="Resource_cg2ki"]
 script = ExtResource("3_hno6l")
 tag = &"crown_hill"
 center = Vector2(100, -1180)
 radius = 140.0
 priority = 4
 
-[sub_resource type="Resource" id="Resource_poh0d"]
+[sub_resource type="Resource" id="Resource_uad6c"]
 script = ExtResource("3_hno6l")
 tag = &"poppy_field"
 center = Vector2(150, -930)
 radius = 120.0
 priority = 5
 
-[sub_resource type="Resource" id="Resource_v7bse"]
+[sub_resource type="Resource" id="Resource_24856"]
 script = ExtResource("3_hno6l")
 tag = &"wisp_hollow"
 center = Vector2(-450, -950)
 radius = 85.0
 priority = 6
 
-[sub_resource type="Resource" id="Resource_3jlxd"]
+[sub_resource type="Resource" id="Resource_12tfx"]
 script = ExtResource("3_hno6l")
 tag = &"cornflower_bank"
 center = Vector2(-400, -1250)
 radius = 110.0
 priority = 5
 
-[sub_resource type="Resource" id="Resource_cg2ki"]
+[sub_resource type="Resource" id="Resource_va0uh"]
 script = ExtResource("4_l3ch1")
 id = &"dance_ring"
 display_name = "The Dance Ring"
@@ -404,7 +444,7 @@ kind = &"set_piece"
 canon = "C?"
 notes = "Ring of low flat stones around a ribboned maypole; the Solstice dance."
 
-[sub_resource type="Resource" id="Resource_uad6c"]
+[sub_resource type="Resource" id="Resource_66nhe"]
 script = ExtResource("4_l3ch1")
 id = &"musicians_bower"
 display_name = "The Musicians' Bower"
@@ -415,7 +455,7 @@ height_m = 6.0
 visible_from_m = 200.0
 notes = "Flowered bower for the players."
 
-[sub_resource type="Resource" id="Resource_24856"]
+[sub_resource type="Resource" id="Resource_n5muu"]
 script = ExtResource("4_l3ch1")
 id = &"arch_avenue"
 display_name = "The Arch Avenue"
@@ -426,18 +466,18 @@ height_m = 5.0
 visible_from_m = 200.0
 notes = "A line of flower arches leading up from the Rosewild to the ring."
 
-[sub_resource type="Resource" id="Resource_12tfx"]
+[sub_resource type="Resource" id="Resource_gqwpu"]
 script = ExtResource("4_l3ch1")
 id = &"crown_oak"
 display_name = "The Crown Oak"
 position = Vector2(100, -1180)
-asset_ids = PackedStringArray("flora_tree_spring_oak")
+asset_ids = PackedStringArray("woods_ancient_oak")
 offsets = PackedVector2Array()
 height_m = 24.0
 visible_from_m = 600.0
 notes = "One great oak on the crown of the hill, visible from the manor."
 
-[sub_resource type="Resource" id="Resource_va0uh"]
+[sub_resource type="Resource" id="Resource_lu8m0"]
 script = ExtResource("4_l3ch1")
 id = &"long_tables"
 display_name = "The Long Tables"
@@ -457,10 +497,10 @@ canon = "C?"
 bounds = Array[Rect2]([Rect2(-600, -1350, 900, 550)])
 seed = 4606
 default_habitat = &"flower_meadow"
-habitats = Array[ExtResource("3_hno6l")]([SubResource("Resource_1bgq8"), SubResource("Resource_tmp8t"), SubResource("Resource_i6ufe"), SubResource("Resource_poh0d"), SubResource("Resource_v7bse"), SubResource("Resource_3jlxd")])
-forage = Array[ExtResource("2_qmtl8")]([SubResource("Resource_8onbx"), SubResource("Resource_30mh8"), SubResource("Resource_c1ovm"), SubResource("Resource_ojl8y"), SubResource("Resource_ccevv"), SubResource("Resource_13bvy"), SubResource("Resource_x2p73"), SubResource("Resource_qtcm4"), SubResource("Resource_dxrlc"), SubResource("Resource_3q6xn"), SubResource("Resource_pt0l6"), SubResource("Resource_iphyx"), SubResource("Resource_44pdc"), SubResource("Resource_k4st1"), SubResource("Resource_k40nu"), SubResource("Resource_ylg51"), SubResource("Resource_6knqf"), SubResource("Resource_6q4i8"), SubResource("Resource_8yc1g"), SubResource("Resource_gvmel"), SubResource("Resource_a2qcr"), SubResource("Resource_b7qd4"), SubResource("Resource_ywj8h"), SubResource("Resource_aptpk"), SubResource("Resource_e33dn"), SubResource("Resource_60sob"), SubResource("Resource_e46ni"), SubResource("Resource_u4wv5"), SubResource("Resource_onq6d")])
-decor = Array[ExtResource("1_hhb8n")]([SubResource("Resource_7rtcf"), SubResource("Resource_616n2"), SubResource("Resource_062h2"), SubResource("Resource_i2887"), SubResource("Resource_1ro5g"), SubResource("Resource_ysrtn"), SubResource("Resource_hxocr"), SubResource("Resource_48xjq"), SubResource("Resource_neihj"), SubResource("Resource_nvou2"), SubResource("Resource_lrxiu"), SubResource("Resource_o1372"), SubResource("Resource_rjf38"), SubResource("Resource_48w27"), SubResource("Resource_5u1c5")])
-landmarks = Array[ExtResource("4_l3ch1")]([SubResource("Resource_cg2ki"), SubResource("Resource_uad6c"), SubResource("Resource_24856"), SubResource("Resource_12tfx"), SubResource("Resource_va0uh")])
+habitats = Array[ExtResource("3_hno6l")]([SubResource("Resource_v7bse"), SubResource("Resource_3jlxd"), SubResource("Resource_cg2ki"), SubResource("Resource_uad6c"), SubResource("Resource_24856"), SubResource("Resource_12tfx")])
+forage = Array[ExtResource("2_qmtl8")]([SubResource("Resource_ccevv"), SubResource("Resource_13bvy"), SubResource("Resource_x2p73"), SubResource("Resource_qtcm4"), SubResource("Resource_dxrlc"), SubResource("Resource_3q6xn"), SubResource("Resource_pt0l6"), SubResource("Resource_iphyx"), SubResource("Resource_44pdc"), SubResource("Resource_k4st1"), SubResource("Resource_k40nu"), SubResource("Resource_ylg51"), SubResource("Resource_6knqf"), SubResource("Resource_6q4i8"), SubResource("Resource_8yc1g"), SubResource("Resource_gvmel"), SubResource("Resource_a2qcr"), SubResource("Resource_b7qd4"), SubResource("Resource_ywj8h"), SubResource("Resource_aptpk"), SubResource("Resource_e33dn"), SubResource("Resource_60sob"), SubResource("Resource_e46ni"), SubResource("Resource_u4wv5"), SubResource("Resource_onq6d"), SubResource("Resource_1bgq8"), SubResource("Resource_tmp8t"), SubResource("Resource_i6ufe"), SubResource("Resource_poh0d")])
+decor = Array[ExtResource("1_hhb8n")]([SubResource("Resource_7rtcf"), SubResource("Resource_616n2"), SubResource("Resource_062h2"), SubResource("Resource_i2887"), SubResource("Resource_1ro5g"), SubResource("Resource_ysrtn"), SubResource("Resource_hxocr"), SubResource("Resource_48xjq"), SubResource("Resource_neihj"), SubResource("Resource_nvou2"), SubResource("Resource_lrxiu"), SubResource("Resource_o1372"), SubResource("Resource_rjf38"), SubResource("Resource_48w27"), SubResource("Resource_5u1c5"), SubResource("Resource_8onbx"), SubResource("Resource_30mh8"), SubResource("Resource_c1ovm"), SubResource("Resource_ojl8y")])
+landmarks = Array[ExtResource("4_l3ch1")]([SubResource("Resource_va0uh"), SubResource("Resource_66nhe"), SubResource("Resource_n5muu"), SubResource("Resource_gqwpu"), SubResource("Resource_lu8m0")])
 anchors = Array[Dictionary]([{
 "clear_radius": 14.0,
 "id": &"solstice_dance_floor",

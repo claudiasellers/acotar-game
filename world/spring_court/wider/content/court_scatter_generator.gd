@@ -9,6 +9,9 @@ const DECOR_CELL := 10.0
 const REPORT_CELL := 100.0
 const SMALL_CHUNK := 64.0
 const TREE_CHUNK := 256.0
+## Share of ground the drift mask keeps, and the noise cut that gives it.
+const DRIFT_KEEP := 0.35
+const DRIFT_CUT := 0.12
 const FORAGE_DRAW := 120.0
 const TREE_DRAW := 260.0
 const TREE_FAR := 600.0
@@ -52,6 +55,20 @@ static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	return out
 
 
+## Trees cluster into groves, flower carpets into drifts; grass, rocks and
+## props stay even.
+static func _drift_noise(e: CourtDecorEntry, seed_value: int) -> FastNoiseLite:
+	var s := String(e.mesh_id)
+	if not (e.is_tree or s.contains("carpet")):
+		return null
+	var n := FastNoiseLite.new()
+	n.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	n.seed = seed_value
+	n.frequency = 1.0 / (90.0 if e.is_tree else 45.0)
+	n.fractal_octaves = 2
+	return n
+
+
 static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	var out: Array[ScatterLayer] = []
 	var r := content.bounding_rect()
@@ -73,6 +90,12 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		# dense ones (grass, flowers) as several per cell.
 		var cell := DECOR_CELL if e.density >= 0.2 else 50.0
 		var lambda := e.density * cell * cell / 100.0
+		# Groves and one-colour drifts instead of an even sprinkle (experience
+		# bar 2.4): a low-frequency mask keeps about a third of the ground and
+		# triples the density there, so the total stays the same.
+		var drift := _drift_noise(e, content.seed + di)
+		if drift != null:
+			lambda *= 1.0 / DRIFT_KEEP
 		var cx := 0
 		var x := r.position.x
 		while x < r.end.x:
@@ -84,6 +107,8 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 				for _k in _poisson(rng, lambda):
 					var p := Vector2(x + rng.randf() * cell, z + rng.randf() * cell)
 					if not content.owns(p):
+						continue
+					if drift != null and drift.get_noise_2d(p.x, p.y) < DRIFT_CUT:
 						continue
 					var hab := content.habitat_at(p)
 					if not _fits(e.habitats, hab, content):

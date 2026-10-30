@@ -11,12 +11,13 @@ const CHUNK := 128.0
 const MATERIAL := "res://world/spring_court/wider/fx/materials/mat_terrain_tint.tres"
 
 ## WorldHeight.Tex slot -> ground colour (R3 pastels; the blight stays grey).
-## sRGB colours (mat_terrain_tint sets vertex_color_srgb).
+## sRGB colours from the experience-bar palette (mat_terrain_tint sets
+## vertex_color_srgb).
 const TEX_COLORS := {
-	0: Color(0.95, 0.96, 1.0), 1: Color(0.55, 0.50, 0.46), 2: Color(0.86, 0.80, 0.84),
-	3: Color(0.60, 0.66, 0.58), 4: Color(0.56, 0.86, 0.56), 5: Color(0.44, 0.76, 0.58),
-	6: Color(0.86, 0.56, 0.34), 7: Color(0.94, 0.84, 0.68), 8: Color(0.62, 0.72, 0.78),
-	9: Color(0.30, 0.29, 0.31),
+	0: Color(0.95, 0.96, 1.0), 1: Color(0.55, 0.50, 0.46), 2: Color("D9CBD0"),
+	3: Color(0.60, 0.66, 0.58), 4: Color("8DBF7A"), 5: Color("7CC29A"),
+	6: Color("C9A98A"), 7: Color("E3CDB4"), 8: Color("9FB7B0"),
+	9: Color("4A424D"),
 }
 
 
@@ -131,7 +132,7 @@ static func _chunk(content: CourtRegionContent, origin: Vector2) -> Dictionary:
 
 static func _color(x: float, z: float) -> Color:
 	var t := WorldHeight.texture_at(x, z)
-	var base: Color = TEX_COLORS.get(t.x, Color(0.56, 0.86, 0.56))
+	var base: Color = TEX_COLORS.get(t.x, Color("8DBF7A"))
 	var over: Color = TEX_COLORS.get(t.y, base)
 	var c := base.lerp(over, t.z / 255.0)
 	# Gentle mottling so meadows don't read flat.

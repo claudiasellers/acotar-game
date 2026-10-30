@@ -7,6 +7,7 @@ extends RefCounted
 const FLORA_DIR := "res://world/spring_court/wider/assets/flora/"
 const PROPS_DIR := "res://world/spring_court/wider/assets/props/"
 const MATERIAL_DIR := "res://world/spring_court/wider/fx/materials/"
+const WOODS_PREFIX := "woods_"
 
 const PASTELS := [
 	Color(0.98, 0.62, 0.76), Color(0.99, 0.80, 0.85), Color(0.80, 0.68, 0.95),
@@ -31,7 +32,17 @@ static func scene_path(id: StringName) -> String:
 
 
 static func has_model(id: StringName) -> bool:
-	return scene_path(id) != ""
+	return scene_path(id) != "" or woods_species(id) != &""
+
+
+## "woods_<species>" ids are the woods lane's Blender tree archetypes, used
+## through FloraLibrary (its meshes carry their own woods_foliage material).
+static func woods_species(id: StringName) -> StringName:
+	var s := String(id)
+	if not s.begins_with(WOODS_PREFIX):
+		return &""
+	var species := StringName(s.substr(WOODS_PREFIX.length()))
+	return species if FloraLibrary.has(species) else &""
 
 
 static func is_blight(id: StringName) -> bool:
@@ -53,6 +64,13 @@ static func _mesh_locked(id: StringName, lod: bool) -> Mesh:
 	var key := "%s%s" % [id, "_LOD1" if lod else ""]
 	if _meshes.has(key):
 		return _meshes[key]
+	var species := woods_species(id)
+	if species != &"":
+		var wm: Mesh = FloraLibrary.far_mesh(species) if lod else null
+		if wm == null:
+			wm = FloraLibrary.mesh(species)
+		_meshes[key] = wm
+		return wm
 	var m: Mesh = null
 	var path := scene_path(id)
 	if path != "":

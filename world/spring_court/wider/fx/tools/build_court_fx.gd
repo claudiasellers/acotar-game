@@ -6,17 +6,23 @@ extends SceneTree
 const FX := "res://world/spring_court/wider/fx/"
 const SH := FX + "shaders/"
 const GRADE_SCRIPT := "res://world/shared/grades/grade_preset.gd"
-## Tonal pass on the grade table, from the first real-GPU render: the table's raw
-## LUT ramps and bloom washed every frame out to white. Ramps are blended this far
-## from identity, bloom, glow, sun and ambient scaled, exposure and brightness capped. grade_blight
-## is horror and keeps its raw values.
+## Tonal pass on the grade table, to the experience bar's tested spring grade
+## (plans/experience-bar.md 2.1): LUT ramps blended this far from identity,
+## fog thin, bloom 0.12, contrast 1.08, sun up to 1.8, shadows tinted lilac.
+## grade_blight is horror (bar 1.5): it withdraws instead.
 const LUT_STRENGTH := 0.3
-const GLOW_SCALE := 0.7
-const BLOOM_SCALE := 0.25
-const AMBIENT_SCALE := 0.6
-const SUN_SCALE := 0.6
-const EXPOSURE_CAP := 0.98
+const FOG_CAP := 0.0012
+const BLOOM := 0.12
+const CONTRAST := 1.08
+const SUN_GAIN := 1.15
+const SUN_CAP := 1.8
+const AMBIENT_SCALE := 0.8
+const LILAC_SHADOW := Color("8C7FC4")
+const EXPOSURE_CAP := 1.0
 const BRIGHTNESS_CAP := 1.0
+## Blight: saturation about 0.4, light 2-3 stops under the spring grade.
+const BLIGHT_SATURATION := 0.4
+const BLIGHT_SUN := 0.3
 
 
 func _initialize() -> void:
@@ -119,12 +125,23 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	var identity := [Color(0, 0, 0), Color(0.5, 0.5, 0.5), Color(1, 1, 1)]
 	for i in ramp.size():
 		ramp[i] = (identity[i] as Color).lerp(ramp[i], LUT_STRENGTH)
-	p.set("glow_intensity", float(p.get("glow_intensity")) * GLOW_SCALE)
-	p.set("glow_bloom", float(p.get("glow_bloom")) * BLOOM_SCALE)
+	# Day skies toward the bar's #6B94FA top, golden-hour ones toward #7361D1.
+	var golden := float(p.get("sun_energy")) < 1.0
+	p.set("sky_top", (p.get("sky_top") as Color).lerp(Color("7361D1") if golden else Color("6B94FA"), 0.5))
+	p.set("fog_density", minf(float(p.get("fog_density")), FOG_CAP))
+	p.set("glow_intensity", clampf(float(p.get("glow_intensity")) * 0.9, 0.9, 1.3))
+	p.set("glow_bloom", BLOOM)
+	p.set("contrast", CONTRAST)
+	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
 	p.set("ambient_energy", float(p.get("ambient_energy")) * AMBIENT_SCALE)
-	p.set("sun_energy", float(p.get("sun_energy")) * SUN_SCALE)
+	p.set("ambient_color", (p.get("ambient_color") as Color).lerp(LILAC_SHADOW, 0.2))
 	p.set("exposure", minf(float(p.get("exposure")), EXPOSURE_CAP))
 	p.set("brightness", minf(float(p.get("brightness")), BRIGHTNESS_CAP))
+
+
+func _withdraw(p: Resource) -> void:
+	p.set("saturation", BLIGHT_SATURATION)
+	p.set("sun_energy", BLIGHT_SUN)
 
 
 func _build_grades() -> int:
@@ -157,6 +174,8 @@ func _build_grades() -> int:
 		var ramp := PackedColorArray([_c(lut_cols[0]), _c(lut_cols[1]), _c(lut_cols[2])])
 		if r["id"] != "grade_blight":
 			_tame(p, ramp)
+		else:
+			_withdraw(p)
 		var g := Gradient.new()
 		g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 		g.colors = ramp
@@ -166,9 +185,9 @@ func _build_grades() -> int:
 		p.set("lut", gt)
 		_save(p, FX + "grades/" + String(r["id"]) + ".tres")
 		md.append("| %s | %s | #%s / #%s | #%s, %.2f | #%s, %.4f, %.3f | %.2f | %.2f | %.2f | %.2f / %.2f | %.1f |" % [
-			r["id"], r["purpose"], r["sky_top"], r["sky_horizon"], r["sun_color"], r["sun_energy"],
-			r["fog_color"], r["fog_density"], r["volumetric_density"], p.get("exposure"), r["saturation"],
-			r["contrast"], p.get("glow_intensity"), p.get("glow_bloom"), r["magic"]])
+			r["id"], r["purpose"], r["sky_top"], r["sky_horizon"], r["sun_color"], p.get("sun_energy"),
+			r["fog_color"], p.get("fog_density"), r["volumetric_density"], p.get("exposure"), p.get("saturation"),
+			p.get("contrast"), p.get("glow_intensity"), p.get("glow_bloom"), r["magic"]])
 	md.append("\nSuggested region mapping: starlight_glen -> grade_starlight_glen_day (Starlight Pool area:")
 	md.append("grade_starlight_pool_sparkle, a daytime swim), western_fells -> grade_fells, fae_village ->")
 	md.append("grade_fae_village, solstice_meadow -> grade_solstice (story swap to grade_solstice_twilight for the")
@@ -203,7 +222,9 @@ func _build_materials() -> int:
 		"mat_water_river": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "flow_dir": Vector2(0.0, 1.0), "flow_speed": 0.6, "ripple_strength": 0.7, "foam_strength": 1.0, "clarity": 0.65}),
 		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.7, 0.95, 1.0), "deep_color": Color(0.62, 0.62, 1.0), "clarity": 0.75, "glitter_strength": 9.0}),
 		"mat_glint": _mat("court_glint.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
-		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true}),
+		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true,
+			"grass_a": Color("8DBF7A"), "grass_b": Color("B5E3C0"), "grass_c": Color("7CC29A"),
+			"blossom_speck": Color("F4A6C0"), "rock_color": Color("D9CBD0")}),
 		"mat_particle_lit": _mat("court_particle.gdshader", {}),
 		"mat_particle_glow": _mat("court_particle_glow.gdshader", {}),
 		"mat_butterfly": _mat("court_butterfly.gdshader", {}),

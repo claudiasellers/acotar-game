@@ -138,6 +138,8 @@ func _build_landmarks() -> void:
 			var world := lm.position + offset.rotated(-node.rotation.y)
 			var ground := WorldHeight.height_at(world.x, world.y)
 			var piece := _model(StringName(lm.asset_ids[i]))
+			if CourtAssets.woods_species(StringName(lm.asset_ids[i])) != &"":
+				_scale_to_height(piece, lm.height_m)
 			piece.position = Vector3(offset.x, ground - y, offset.y)
 			piece.rotation.y = atan2(-offset.x, -offset.y) if n > 4 and offset != Vector2.ZERO else 0.0
 			node.add_child(piece)
@@ -214,10 +216,31 @@ func _offset(lm: CourtLandmark, i: int, n: int) -> Vector2:
 	return Vector2(cos(a), sin(a)) * radius
 
 
+## Hero trees: the archetype grown to the landmark's height.
+func _scale_to_height(piece: Node3D, height: float) -> void:
+	var mi := piece.get_child(0) as MeshInstance3D
+	var h := mi.mesh.get_aabb().size.y if mi != null and mi.mesh != null else 0.0
+	if h > 0.1:
+		piece.scale = Vector3.ONE * (height / h)
+
+
 func _model(id: StringName) -> Node3D:
 	var packed := CourtAssets.scene(id)
 	var root: Node3D
-	if packed != null:
+	var species := CourtAssets.woods_species(id)
+	if species != &"":
+		root = Node3D.new()
+		var tree := MeshInstance3D.new()
+		tree.name = "near"
+		tree.mesh = CourtAssets.mesh(id)
+		root.add_child(tree)
+		var radius := float(FloraLibrary.info(species).get("radius", 0.0))
+		if radius > 0.0:
+			var shape := CylinderShape3D.new()
+			shape.radius = radius
+			shape.height = 6.0
+			_add_collision(root, shape, Transform3D(Basis(), Vector3(0, 3.0, 0)))
+	elif packed != null:
 		root = packed.instantiate() as Node3D
 		var lod := root.find_child("%s_LOD1" % id, true, false) as MeshInstance3D
 		if lod != null:
