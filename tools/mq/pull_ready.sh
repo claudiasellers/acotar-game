@@ -49,7 +49,7 @@ take_signal() { # ref key
 	fi
 	[ "$(git rev-parse "refs/mq/ready/$key^{commit}")" = "$sha" ] || return
 	state=queued; id=""; reason=""
-	if git merge-base --is-ancestor "$sha" main; then
+	if git merge-base --is-ancestor "$sha" "$MQ_MAIN"; then
 		:
 	elif entry=$(mq_queued_entry "$sha"); then
 		id=$(basename "$entry" .entry)

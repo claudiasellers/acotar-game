@@ -16,7 +16,7 @@ mkdir -p "$TASKS"
 highest() {
 	{
 		ls "$TASKS" 2>/dev/null
-		git log main --format=%s 2>/dev/null | sed -n 's/^\(T[0-9][0-9]*\).*/\1/p'
+		git log "$MQ_MAIN" --format=%s 2>/dev/null | sed -n 's/^\(T[0-9][0-9]*\).*/\1/p'
 	} | sed -n 's/^T0*\([0-9][0-9]*\)$/\1/p' | sort -n | tail -1
 }
 

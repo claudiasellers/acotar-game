@@ -1,5 +1,5 @@
 # ACOTAR: The Spring Court. For the Mac (Apple silicon, macOS).
-#   make update   pull the latest main, fetch art (LFS), make sure Godot is here, rebuild generated content
+#   make update   pull the latest origin/main, fetch art (LFS), make sure Godot is here, rebuild generated content
 #   make play     run the game (its output goes to .tools/play.log)
 #   make clean    free disk: delete Godot's import cache and generated content
 #
@@ -27,8 +27,9 @@ update: pull godot generate bake import
 pull:
 	@before=$$(git rev-parse HEAD); \
 	branch=$$(git rev-parse --abbrev-ref HEAD); \
-	if [ "$$branch" != "HEAD" ]; then echo "On branch '$$branch', not the detached play folder: skipping the pull."; exit 0; fi; \
-	git fetch --quiet origin main && git checkout --quiet --detach origin/main || { echo "Pull failed (local changes?). Nothing was changed."; exit 1; }; \
+	if [ "$$branch" != "main" ]; then echo "On '$$branch', not main: skipping the pull."; exit 0; fi; \
+	git fetch --quiet origin || { echo "Pull failed: could not reach origin. Nothing was changed."; exit 1; }; \
+	git merge --quiet --ff-only origin/main || { echo "Pull failed: local edits or commits are in the way of origin/main. Nothing was changed."; exit 1; }; \
 	if command -v git-lfs >/dev/null 2>&1; then git lfs pull >/dev/null; else echo "git-lfs is missing (brew install git-lfs): art files may be pointers."; fi; \
 	after=$$(git rev-parse HEAD); \
 	if [ "$$before" = "$$after" ]; then echo "No new changes."; \

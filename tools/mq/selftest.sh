@@ -34,6 +34,7 @@ while [ "$#" -gt 0 ]; do
 done
 case "${s:-}" in *parse_check.gd) exit 0 ;; esac
 [ -f slow ] && sleep 30
+[ "${t:-}" = a ] && [ -f race_me ] && [ -x "$(dirname "$0")/race.sh" ] && "$(dirname "$0")/race.sh" >/dev/null 2>&1
 [ -f fail_build ] && [ "${t:-}" = build ] && exit 1
 if [ "${t:-}" = a ] && [ -f flaky ]; then
 	c="$(dirname "$(git rev-parse --git-common-dir)")/../flaky.count"
@@ -97,11 +98,11 @@ start_lane() { tools/mq/setup_lanes.sh --start >/dev/null; }
 
 change() { # change name file...: a commit on a branch from main, printed
 	local name="$1" f; shift
-	git checkout -q -b "ch/$name" main 2>/dev/null || git checkout -q "ch/$name"
+	git checkout -q --no-track -b "ch/$name" origin/main 2>/dev/null || git checkout -q "ch/$name"
 	for f in "$@"; do echo "$name" >> "$f"; done
 	git add -A; git commit -q -m "$name"
 	git rev-parse HEAD
-	git checkout -q --detach main
+	git checkout -q --detach origin/main
 }
 
 queue() { # queue sha task
@@ -119,7 +120,7 @@ drain() { # wait for an empty queue
 	echo "  queue never drained"; tail -5 .git/mq/events.log; return 1
 }
 
-in_main() { git merge-base --is-ancestor "$1" main; }
+in_main() { git fetch -q origin; git merge-base --is-ancestor "$1" origin/main; }
 rejected() { grep -q "REJECTED $1 " .git/mq/events.log; }
 expect() { # description, then a command
 	local d="$1"; shift
@@ -200,12 +201,6 @@ case_clean() {
 	start_lane; drain
 	expect "first merged" in_main "$a"
 	expect "second merged" in_main "$b"
-	# The batch folder goes just before the push.
-	local i=0
-	while [ "$(git rev-parse main)" != "$(git ls-remote origin refs/heads/main | cut -f1)" ] && [ "$i" -lt 50 ]; do
-		perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
-	done
-	expect "pushed" test "$(git rev-parse main)" = "$(git ls-remote origin refs/heads/main | cut -f1)"
 }
 
 case_conflict() {
@@ -287,8 +282,8 @@ case_built_file() {
 	local a
 	a=$(change a sub/_generated/out.res 2>/dev/null || true)
 	mkdir -p sub/_generated
-	git checkout -q -b gen main; echo x > sub/_generated/out.res; git add -f sub; git commit -q -m gen
-	a=$(git rev-parse HEAD); git checkout -q --detach main
+	git checkout -q --no-track -b gen origin/main; echo x > sub/_generated/out.res; git add -f sub; git commit -q -m gen
+	a=$(git rev-parse HEAD); git checkout -q --detach origin/main
 	expect "submit refuses" not queue "$a" T1
 }
 
@@ -340,7 +335,7 @@ case_idle_gate() {
 	newrepo idle
 	local a b i=0
 	echo MQ_FULLGATE_MERGES=1 >> .git/mq/config
-	git checkout -q -B red main; echo x > fail_c; git add -A; git commit -q -m red
+	git checkout -q --no-track -B red origin/main; echo x > fail_c; git add -A; git commit -q -m red
 	a=$(change a one)
 	queue "$a" T1
 	start_lane; drain
@@ -355,7 +350,7 @@ case_idle_gate_red_and_killed() {
 	local a b i=0
 	echo MQ_FULLGATE_MERGES=1 >> .git/mq/config
 	sed -i '' 's/^c = /when:never\/* c = /' tools/mq/gate.conf
-	git add -A; git commit -q -m "c only on demand"; git push -q origin HEAD:main; git branch -f main HEAD 2>/dev/null
+	git add -A; git commit -q -m "c only on demand"; git push -q origin HEAD:main
 	git -C .lanes/build reset -q --hard origin/main
 	a=$(change a one fail_c)
 	queue "$a" T1
@@ -367,7 +362,7 @@ case_idle_gate_red_and_killed() {
 	stop_lane
 	echo slow > .git/mq/slow_marker
 	sed -i '' 's/^MQ_FULLGATE_MERGES=1/MQ_FULLGATE_MERGES=0/' .git/mq/config
-	git -C .lanes/build checkout -q -f main
+	git -C .lanes/build checkout -q -f --detach origin/main
 	touch .lanes/build/slow
 	start_lane
 	i=0
@@ -484,9 +479,126 @@ case_standing() {
 	expect "stop ends cleanup" not test -f .git/mq/cleanup.pid
 }
 
+wait_for() { # pattern: until it is in the events log
+	local i=0
+	while ! grep -q "$1" .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	grep -q "$1" .git/mq/events.log
+}
+
+in_lane() { # file: a commit on main's tip in the lane, printed
+	git -C .lanes/lane1 checkout -q --detach origin/main
+	echo "$1 $RANDOM" >> ".lanes/lane1/$1"
+	git -C .lanes/lane1 add -A; git -C .lanes/lane1 commit -q -m "$1"
+	git -C .lanes/lane1 rev-parse HEAD
+}
+
+# The play folder sits on main: a land leaves it alone until `make pull`.
+case_play_folder_on_main() {
+	newrepo onmain
+	local mk="$SRC/../../Makefile" before a b out
+	git checkout -q main
+	before=$(git rev-parse main)
+	a=$(in_lane shared); queue "$a" T1
+	start_lane; drain
+	expect "landed" in_main "$a"
+	expect "local main not moved" test "$(git rev-parse main)" = "$before"
+	expect "folder not touched" not test -f shared
+	expect "folder clean" test -z "$(git status --porcelain)"
+	out=$(make --no-print-directory -f "$mk" pull 2>&1)
+	expect "pull succeeds" test "$?" = 0
+	expect "pull brings the files" test -f shared
+	expect "main is at origin" test "$(git rev-parse main)" = "$(git rev-parse origin/main)"
+	expect "lists what's new" sh -c "printf '%s' \"\$1\" | grep -q 'New since last update'" _ "$out"
+	b=$(in_lane shared); queue "$b" T2; drain
+	echo local-edit >> shared
+	before=$(git rev-parse main)
+	make --no-print-directory -f "$mk" pull >/dev/null 2>&1
+	expect "refuses local edits" test "$?" != 0
+	expect "edit kept" grep -q local-edit shared
+	expect "main stayed" test "$(git rev-parse main)" = "$before"
+	git checkout -q shared
+	git commit -q --allow-empty -m diverged
+	make --no-print-directory -f "$mk" pull >/dev/null 2>&1
+	expect "refuses divergence" test "$?" != 0
+	git reset -q --hard "$before"
+	git checkout -q --detach
+	out=$(make --no-print-directory -f "$mk" pull 2>&1)
+	expect "skips off main" test "$?" = 0
+	expect "says why" sh -c "printf '%s' \"\$1\" | grep -q 'skipping'" _ "$out"
+}
+
+# Someone else's push gets in while the gate runs.
+case_lost_race() {
+	newrepo race
+	local other="$ROOT/race/other" a o
+	git -C "$ROOT/race/origin.git" config receive.denyNonFastForwards true
+	git clone -q "$ROOT/race/origin.git" "$other" 2>/dev/null
+	git -C "$other" config user.name x; git -C "$other" config user.email x@example.invalid
+	cat > "$ROOT/race.sh" <<EOF
+#!/bin/bash
+[ -f "$other.done" ] && exit 0
+touch "$other.done"
+cd "$other" && echo x > from_race && git add -A && git commit -q -m race && git push -q origin main
+EOF
+	chmod +x "$ROOT/race.sh"
+	a=$(change a one race_me)
+	queue "$a" T1
+	start_lane
+	expect "lost the race" wait_for 'RACE origin main moved'
+	drain
+	rm -f "$ROOT/race.sh"
+	expect "landed on the new main" in_main "$a"
+	o=$(git -C "$other" rev-parse HEAD)
+	expect "their work kept" in_main "$o"
+	expect "nobody rejected" not rejected T1
+	expect "no stall" not grep -q STALLED .git/mq/events.log
+	expect "no force on main" not grep -Eq 'git.* push .*(-f|--force)' "$SRC/buildlane.sh" "$SRC/pull_ready.sh"
+	expect "no local main written" not grep -Eq 'update-ref .*main|branch -f main|merge .*--ff-only' "$SRC/buildlane.sh"
+}
+
+case_network_failure() {
+	newrepo net
+	local a good
+	a=$(change a one)
+	queue "$a" T1
+	good=$(git remote get-url origin)
+	git remote set-url origin "$ROOT/net/nowhere.git"
+	start_lane
+	expect "fetch failure stalls" wait_for 'STALLED cannot fetch'
+	stop_lane
+	git remote set-url origin "$good"
+	git remote set-url --push origin "$ROOT/net/nowhere.git"
+	start_lane
+	expect "push failure stalls" wait_for 'STALLED could not push'
+	stop_lane
+	expect "not rejected" not rejected T1
+	expect "back in the queue" test -n "$(ls .git/mq/pending/*.entry .git/mq/batches/*/*.entry 2>/dev/null)"
+	git config --unset remote.origin.pushurl
+	start_lane; drain
+	expect "merged once it came back" in_main "$a"
+}
+
+case_push_off_holds() {
+	newrepo pushoff
+	local a
+	a=$(change a one)
+	queue "$a" T1
+	echo MQ_PUSH=0 >> .git/mq/config
+	start_lane
+	expect "says it is holding" wait_for 'HOLDING MQ_PUSH=0'
+	expect "status is loud" sh -c "tools/mq/status.sh | grep -q 'NOTHING CAN LAND'"
+	expect "still queued" test -n "$(ls .git/mq/pending/*.entry 2>/dev/null)"
+	expect "nothing landed" not in_main "$a"
+	stop_lane
+	sed -i '' '/^MQ_PUSH=0/d' .git/mq/config
+	start_lane; drain
+	expect "lands once it is back on" in_main "$a"
+}
+
 for c in bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
-		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing; do
+		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
+		network_failure push_off_holds; do
 	scenario "$c"
 done
 echo "selftest: $PASSED passed, $FAILED failed"

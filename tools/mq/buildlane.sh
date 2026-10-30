@@ -1,7 +1,7 @@
 #!/bin/bash
 # The build lane: a plain loop, on the home machine only. Takes everything
-# pending as one batch, merges it in a staging tree, gates it, and moves main.
-# Only ever moved by this script. The rules are in CLAUDE.md and the handoff.
+# pending as one batch, merges it on a detached HEAD, gates it, and pushes it to
+# origin's main. It never writes a local main. The rules are in CLAUDE.md.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/common.sh"
@@ -17,9 +17,8 @@ mq_lock_try "$MQ_DIR/lock" || { echo "mq: build lane already running" >&2; exit 
 
 STALL_SECS=$(mq_config_or MQ_STALL_SECS 300)
 POLL=$(mq_config_or MQ_POLL 2)
-REMOTE=$(mq_config MQ_REMOTE); : "${REMOTE:=origin}"
 FETCH_TIMEOUT=$(mq_config_or MQ_FETCH_TIMEOUT 120)
-stopping=0; gate_pid=""; caffeine=""; heart=""; stalled_until=0; last_ready=0
+stopping=0; gate_pid=""; caffeine=""; heart=""; stalled_until=0; last_ready=0; held=0
 idle_pid=""; idle_out="$MQ_DIR/idlegate"
 FULL_MERGES=$(mq_config_or MQ_FULLGATE_MERGES 10)
 FULL_SECS=$(mq_config_or MQ_FULLGATE_SECS 86400)
@@ -52,20 +51,6 @@ wt() { git -C "$MQ_BUILD" "$@"; }
 # Puts the build worktree exactly at a commit. Ignored caches stay.
 goto() {
 	wt checkout -q -f --detach "$1" && wt clean -fdq
-}
-
-push_main() {
-	[ "$(mq_config_or MQ_PUSH 1)" = 1 ] || return 0
-	git rev-parse -q --verify "refs/remotes/$REMOTE/main" >/dev/null || return 0
-	git merge-base --is-ancestor main "$REMOTE/main" && return 0
-	if mq_timeout "$FETCH_TIMEOUT" git -C "$MQ_BUILD" push -q "$REMOTE" main:main 2>>"$MQ_DIR/buildlane.log"; then
-		git fetch -q "$REMOTE" main:"refs/remotes/$REMOTE/main" 2>/dev/null
-		rm -f "$MQ_DIR/push-failing"
-		mq_event PUSHED "main $(git rev-parse --short main)"
-	elif [ ! -f "$MQ_DIR/push-failing" ]; then
-		touch "$MQ_DIR/push-failing"
-		mq_event PUSHFAIL "main $(git rev-parse --short main); retrying"
-	fi
 }
 
 kick_ready() {
@@ -104,14 +89,26 @@ stall() { # batch-dir reason
 	state "stalled: $2"
 }
 
+# Lost the race for main: go again on the new main. Nobody did anything wrong.
+rebatch() { # batch-dir
+	local b="$1" e
+	for e in "$b"/*.entry; do
+		[ -f "$e" ] && mv "$e" "$MQ_DIR/pending/"
+	done
+	rm -rf "$b"
+	mq_event RACE "origin main moved first; going again on the new main"
+	state idle
+}
+
 # A batch left by a stop. Anything already on main finishes; the rest requeues.
 recover() {
 	local b e
+	mq_fetch_main
 	for b in "$MQ_DIR"/batches/*; do
 		[ -d "$b" ] || continue
 		for e in "$b"/*.entry; do
 			[ -f "$e" ] || continue
-			if git merge-base --is-ancestor "$(kv_get "$e" sha)" main; then
+			if git merge-base --is-ancestor "$(kv_get "$e" sha)" "$MQ_MAIN"; then
 				done_merged "$e"
 			else
 				mv "$e" "$MQ_DIR/pending/"
@@ -194,12 +191,17 @@ narrow() { # name base known batch-dir
 	culprit=$hi
 }
 
+# Returns 5 if origin moved first, 3 if the push failed any other way.
 land() { # tip base batch-dir known
-	local tip="$1" base="$2" b="$3" known="$4" e old merged_to
-	old=$(git rev-parse main)
-	wt checkout -q -f main || return 3
-	wt merge -q --ff-only "$tip" || return 3
-	merged_to=$(git rev-parse --short main)
+	local tip="$1" base="$2" b="$3" known="$4" e merged_to
+	# No force: the push is the compare-and-swap.
+	if ! mq_timeout "$FETCH_TIMEOUT" git -C "$MQ_BUILD" push -q "$REMOTE" "$tip:refs/heads/main" 2>>"$MQ_DIR/buildlane.log"; then
+		mq_fetch_main || return 3
+		[ "$(git rev-parse "$MQ_MAIN")" != "$base" ] && return 5
+		return 3
+	fi
+	mq_fetch_main
+	merged_to=$(git rev-parse --short "$tip")
 	# Reds that are still red carry over; fixed ones drop off.
 	grep -E '^KNOWNRED ' "$b/gate/results.txt" 2>/dev/null | cut -d' ' -f2 > "$MQ_DIR/baseline/$tip"
 	for e in "$b"/*.entry; do
@@ -208,10 +210,10 @@ land() { # tip base batch-dir known
 	rm -rf "$b"
 	kv_set "$MQ_DIR/fullgate" merges $(( $(kv_get "$MQ_DIR/fullgate" merges | sed 's/^$/0/') + 1 ))
 	state idle
-	push_main
+	mq_event PUSHED "main $merged_to"
 	kick_ready
 	# A batch can change this very script. Take it on between batches.
-	if [ -n "$(git diff --name-only "$old" main -- tools/mq)" ]; then
+	if [ -n "$(git diff --name-only "$base" "$tip" -- tools/mq)" ]; then
 		( cd "$MQ_BUILD" && /bin/bash tools/mq/setup_lanes.sh --install )
 		mq_event RELOAD "build lane took in new tools/mq"
 		kill "$heart" 2>/dev/null
@@ -227,19 +229,8 @@ run_batch() {
 	for e in "$MQ_DIR"/pending/*.entry; do
 		[ -f "$e" ] && mv "$e" "$b/"
 	done
-	mq_timeout "$FETCH_TIMEOUT" git -C "$MQ_BUILD" fetch -q "$REMOTE" main:"refs/remotes/$REMOTE/main" 2>>"$MQ_DIR/buildlane.log" \
-		|| note "fetch failed; going on with the last known origin"
-	# Never fork from origin: its work goes in first and is tested with the rest.
-	base=$(git rev-parse main)
-	if git rev-parse -q --verify "refs/remotes/$REMOTE/main" >/dev/null && \
-			! git merge-base --is-ancestor "$REMOTE/main" main; then
-		goto "$base" || { stall "$b" "checkout failed"; return; }
-		if ! wt merge -q --no-edit -m "Take in origin/main" "$REMOTE/main" >>"$MQ_DIR/buildlane.log" 2>&1; then
-			wt merge --abort 2>/dev/null
-			stall "$b" "cannot merge origin/main into main"; return
-		fi
-		base=$(wt rev-parse HEAD)
-	fi
+	mq_fetch_main || { stall "$b" "cannot fetch origin/main"; return; }
+	base=$(git rev-parse "$MQ_MAIN")
 	ensure_baseline "$base" "$b"; rc=$?
 	[ "$rc" = 4 ] && return
 	[ "$rc" = 0 ] || { stall "$b" "cannot run the gate on main"; return; }
@@ -250,7 +241,7 @@ run_batch() {
 		build_chain "$base" "$b"; rc=$?
 		[ "$rc" = 0 ] || { stall "$b" "merge or checkout failed without a conflict"; return; }
 		if [ "${#chain[@]}" = 0 ]; then
-			if [ "$base" != "$(git rev-parse main)" ]; then land "$base" "$base" "$b" "$known"; else rm -rf "$b"; state idle; fi
+			rm -rf "$b"; state idle
 			return
 		fi
 		tip=${chain[$(( ${#chain[@]} - 1 ))]}
@@ -259,7 +250,14 @@ run_batch() {
 		rm -rf "$b/gate"
 		run_gate --out "$b/gate" --base "$base" --known "$known"; rc=$?
 		case "$rc" in
-			0) land "$tip" "$base" "$b" "$known" || stall "$b" "could not move main"; return ;;
+			0)
+				land "$tip" "$base" "$b" "$known"; rc=$?
+				case "$rc" in
+					0) ;;
+					5) rebatch "$b" ;;
+					*) stall "$b" "could not push main" ;;
+				esac
+				return ;;
 			1) ;;
 			4) return ;;
 			*) stall "$b" "the gate could not run"; return ;;
@@ -291,9 +289,9 @@ idle_gate_due() {
 
 idle_gate_start() {
 	local sha known
-	sha=$(git rev-parse main); known="$MQ_DIR/baseline/$sha"
+	sha=$(git rev-parse "$MQ_MAIN"); known="$MQ_DIR/baseline/$sha"
 	[ -f "$known" ] || known=/dev/null
-	wt checkout -q -f main || return
+	wt checkout -q -f --detach "$sha" || return
 	rm -rf "$idle_out"
 	echo "$sha" > "$MQ_DIR/idlegate.sha"
 	( cd "$MQ_BUILD" && exec nice -n 19 /bin/bash "$here/gate.sh" --out "$idle_out" --known "$known" --all ) >>"$MQ_DIR/buildlane.log" 2>&1 &
@@ -337,7 +335,7 @@ recover
 note "build lane up, pid $$"
 while [ "$stopping" = 0 ]; do
 	now=$(date +%s)
-	if [ $((now - last_ready)) -ge 60 ]; then kick_ready; push_main; last_ready=$now; fi
+	if [ $((now - last_ready)) -ge 60 ]; then kick_ready; last_ready=$now; fi
 	work=0
 	for e in "$MQ_DIR"/pending/*.entry; do
 		[ -f "$e" ] && { work=1; break; }
@@ -345,7 +343,15 @@ while [ "$stopping" = 0 ]; do
 	if [ -n "$idle_pid" ]; then
 		if [ "$work" = 1 ]; then idle_gate_kill; else idle_gate_reap; fi
 	fi
-	if [ "$work" = 1 ] && [ "$now" -ge "$stalled_until" ]; then
+	# Landing is a push, so with MQ_PUSH=0 nothing can land.
+	if [ "$work" = 1 ] && [ "$(mq_config_or MQ_PUSH 1)" != 1 ]; then
+		if [ "$held" = 0 ]; then
+			held=1
+			state "holding: MQ_PUSH=0, nothing can land"
+			mq_event HOLDING "MQ_PUSH=0: changes wait in the queue, nothing can land"
+		fi
+	elif [ "$work" = 1 ] && [ "$now" -ge "$stalled_until" ]; then
+		held=0
 		keep_awake
 		run_batch
 	elif [ "$work" = 0 ] && [ -z "$idle_pid" ] && idle_gate_due; then

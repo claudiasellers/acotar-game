@@ -9,7 +9,7 @@ Every lane (thread) follows these rules. The full plan is the project's build pl
 3. Every task starts with a written definition of done. Stop when it is met; do not keep retesting or polishing details.
 4. Screenshots only at milestones. Work in code and numbers otherwise.
 5. Hand off through the queue, never by hand. Lanes on the home machine run `tools/mq/submit.sh HEAD <task>`. Cloud sessions merge `origin/main` in, push `lead/ready-<TASK>-<n>` at the finished commit, and read the answer from the tag `merged/<TASK>-<n>` or `rejected/<TASK>-<n>`. A resubmission takes the next number. See `CLAUDE.md`.
-6. The build lane is a script on the home machine. It takes everything waiting as one batch, runs **the full gate** (it is the only thing that does) and moves `main`. If a change fails it is rejected with the reason; fix it and submit again.
+6. The build lane is a script on the home machine. It takes everything waiting as one batch, runs **the full gate** (it is the only thing that does) and pushes to `origin/main`, the only `main` the queue reads or moves. If a change fails it is rejected with the reason; fix it and submit again.
 
 ## Ownership
 

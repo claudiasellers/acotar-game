@@ -32,7 +32,7 @@ decision, end your turn to ask; don't wait silently.
 **Reports** are a few lines: what you did, what the owner will see and where, the
 best screenshot, the test result.
 
-**If your change is rejected:** rebase on `main`, fix it, re-test and submit again.
+**If your change is rejected:** rebase on `origin/main`, fix it, re-test and submit again.
 
 **Long tasks:** at a natural seam, leave a short handover note so a fresh worker
 can take over.

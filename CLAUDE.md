@@ -32,7 +32,7 @@ poll on a timer. On `REJECTED`, make a follow-up task and say so in one line.
 **Before saying anything is in the game,** check it's in `origin/main`:
 `git fetch origin && git merge-base --is-ancestor <sha> origin/main`.
 
-**Never:** edit code in the primary folder, check out `main`, push, or merge by
+**Never:** edit code in the primary folder, commit to `main`, push, or merge by
 hand.
 
 Use cheaper models for easy tasks and the lead's model only for shared or hard
@@ -65,12 +65,17 @@ Never move or reuse a ready name. A resubmission takes the next number.
 
 | Where | What |
 |---|---|
-| `.lanes/lane1..4` | one task at a time, on `laneN/<name>` from `main` |
-| `.lanes/build` | the only place `main` is checked out; only the build lane touches it |
-| `.lanes/cleanup` | where the cleanup loop runs, detached at `main`; nothing is built here |
+| `.lanes/lane1..4` | one task at a time, on `laneN/<name>` from `origin/main` |
+| `.lanes/build` | always a detached HEAD; only the build lane touches it |
+| `.lanes/cleanup` | where the cleanup loop runs, detached; nothing is built here |
 | `.lanes/shots-lane` | where the shot listener runs; `.lanes/shots` is its render worktree |
-| the repo folder | for playing, on a detached HEAD at `origin/main`; `make update` moves it |
+| the repo folder | for playing, on `main` tracking `origin/main`; only `make update` moves it |
 | `.git/mq/` | queue state, shared by every worktree, never committed |
+
+`origin/main` is the truth. The build lane lands a batch by pushing it, with no
+force: a rejected push means someone got there first, so the batch goes round
+again on the new `origin/main` and nobody is rejected. It never writes the local
+`main`, and with `MQ_PUSH=0` it holds the queue because nothing can land.
 
 The build lane and the cleanup loop run from `.git/mq/bin/`, a copy that changes
 only when a change to `tools/mq/` merges. No loop runs in the play folder.
