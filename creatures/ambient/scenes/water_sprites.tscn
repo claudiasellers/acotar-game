@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/ambient/ambient_swarm.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/water_sprite.gltf" id="2"]
+
+[node name="WaterSprites" type="Node3D"]
+script = ExtResource("1")
+model_scene = ExtResource("2")
+count = 24
+radius = 4.0
+min_height = 0.05
+max_height = 0.9
+speed = 0.5
+scale_range = Vector2(0.8, 1.2)
+colors = PackedColorArray(0.15, 0.75, 0.85, 1, 0.3, 0.55, 0.95, 1, 0.2, 0.85, 0.65, 1, 0.55, 0.85, 1, 1)
+glow = 0.5
+flap_speed = 9.0
+wing_span = 0.05
+shy_distance = 2.0

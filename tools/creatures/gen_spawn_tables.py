@@ -22,10 +22,12 @@ SCENES = {
     "swan": "res://creatures/ambient/scenes/swan.tscn",
     "deer": "res://creatures/prey/deer.tscn",
 }
-for _name in ("lark", "hen", "owl", "hawk", "crow", "fox", "cat", "squirrel", "sheep", "fireflies"):
+for _name in ("water_sprites", "unseen_shimmer", "lark", "hen", "owl", "hawk", "crow", "fox", "cat", "squirrel", "sheep", "fireflies"):
     SCENES[_name] = f"res://creatures/ambient/scenes/{_name}.tscn"
 
-# (entry id, scene, count per group, groups, cluster radius, start, end, on_water, canon)
+# (entry id, scene, count per group, groups, cluster radius, start, end, on_water, canon[, glamour])
+# glamour: 0 any, 1 only while glamoured, 2 only once it lifts.
+GLAMOURED = 1
 DAY = (7.0, 19.0)
 NIGHT = (20.0, 5.0)
 SONG = (5.0, 20.5)
@@ -48,22 +50,26 @@ TABLES = {
         ("faelights_gardens", "faelights", 1, 4, 0.0, *NIGHT, False, "X"),
         ("rabbits_lawns", "rabbit", 3, 3, 6.0, *ALL, False, "C"),
         ("swans_pond", "swan", 2, 1, 6.0, 6.0, 21.0, True, "X"),
+        ("unseen_court", "unseen_shimmer", 1, 4, 0.0, 6.0, 23.0, False, "X", GLAMOURED),
     ],
     "border_woods": birds(3) + [
         ("butterflies_glades", "butterflies", 1, 3, 0.0, *DAY, False, "X"),
         ("faelights_woods", "faelights", 1, 3, 0.0, *NIGHT, False, "X"),
         ("rabbits", "rabbit", 2, 4, 5.0, *ALL, False, "C"),
         ("deer", "deer", 3, 2, 8.0, *ALL, False, "C"),
+        ("water_sprites_pool", "water_sprites", 1, 1, 0.0, *ALL, True, "X"),
     ],
     "eastern_woods": birds(2) + [
         ("faelights_woods", "faelights", 1, 2, 0.0, *NIGHT, False, "X"),
         ("deer", "deer", 3, 2, 8.0, *ALL, False, "C"),
         ("rabbits", "rabbit", 2, 2, 5.0, *ALL, False, "C"),
+        ("water_sprites_marsh", "water_sprites", 1, 2, 0.0, *ALL, True, "X"),
     ],
     "starlight_glen": birds(2) + [
         ("faelights_pool", "faelights", 1, 6, 0.0, *NIGHT, False, "C?"),
         ("butterflies_glen", "butterflies", 1, 3, 0.0, *DAY, False, "X"),
         ("swans_pool", "swan", 2, 1, 5.0, 6.0, 21.0, True, "X"),
+        ("water_sprites_pool", "water_sprites", 1, 1, 0.0, *ALL, True, "X"),
     ],
     "solstice_meadow": birds(3) + [
         ("butterflies_meadow", "butterflies", 1, 8, 0.0, *DAY, False, "X"),
@@ -107,6 +113,11 @@ TABLES = {
         ("larks", "lark", 2, 3, 6.0, *SONG, False, "X"),
         ("fireflies", "fireflies", 1, 4, 0.0, *DUSK, False, "X"),
     ],
+    # Any lake, mere or river: one spawner per water with water_level + water_bounds.
+    "court_waters": [
+        ("water_sprites", "water_sprites", 1, 2, 0.0, *ALL, True, "X"),
+        ("swans", "swan", 2, 1, 6.0, 6.0, 21.0, True, "X"),
+    ],
     # Silent and sparse: a handful of crows and nothing else.
     "blighted_reaches": [
         ("crows", "crow", 2, 2, 6.0, *ALL, False, "X"),
@@ -124,7 +135,9 @@ def write(region, entries):
         lines.append(f'[ext_resource type="PackedScene" path="{SCENES[name]}" id="{ids[name]}"]')
     lines.append("")
     entry_script = len(used) + 2
-    for i, (eid, scene, count, groups, radius, start, end, water, canon) in enumerate(entries):
+    for i, entry in enumerate(entries):
+        eid, scene, count, groups, radius, start, end, water, canon = entry[:9]
+        glamour = entry[9] if len(entry) > 9 else 0
         lines += [
             f'[sub_resource type="Resource" id="e{i}"]',
             f'script = ExtResource("{entry_script}")',
@@ -137,6 +150,7 @@ def write(region, entries):
             f"end_hour = {end}",
             f"on_water = {'true' if water else 'false'}",
             f'canon = "{canon}"',
+            f"glamour = {glamour}",
             "",
         ]
     subs = ", ".join(f'SubResource("e{i}")' for i in range(len(entries)))

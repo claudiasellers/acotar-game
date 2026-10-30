@@ -1,16 +1,17 @@
-[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=15 format=3]
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
-[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="8"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="9"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/butterflies.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/faelights.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/swan.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/water_sprites.tscn" id="8"]
 
 [sub_resource type="Resource" id="e0"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"songbirds_blue"
 scene = ExtResource("4")
 count = 3
@@ -20,9 +21,10 @@ start_hour = 5.0
 end_hour = 20.5
 on_water = false
 canon = "C"
+glamour = 0
 
 [sub_resource type="Resource" id="e1"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"songbirds_rose"
 scene = ExtResource("6")
 count = 3
@@ -32,9 +34,10 @@ start_hour = 5.0
 end_hour = 20.5
 on_water = false
 canon = "C"
+glamour = 0
 
 [sub_resource type="Resource" id="e2"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"songbirds_gold"
 scene = ExtResource("5")
 count = 3
@@ -44,9 +47,10 @@ start_hour = 5.0
 end_hour = 20.5
 on_water = false
 canon = "C"
+glamour = 0
 
 [sub_resource type="Resource" id="e3"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"faelights_pool"
 scene = ExtResource("3")
 count = 1
@@ -56,9 +60,10 @@ start_hour = 20.0
 end_hour = 5.0
 on_water = false
 canon = "C?"
+glamour = 0
 
 [sub_resource type="Resource" id="e4"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"butterflies_glen"
 scene = ExtResource("2")
 count = 1
@@ -68,9 +73,10 @@ start_hour = 7.0
 end_hour = 19.0
 on_water = false
 canon = "X"
+glamour = 0
 
 [sub_resource type="Resource" id="e5"]
-script = ExtResource("8")
+script = ExtResource("9")
 id = &"swans_pool"
 scene = ExtResource("7")
 count = 2
@@ -80,8 +86,22 @@ start_hour = 6.0
 end_hour = 21.0
 on_water = true
 canon = "X"
+glamour = 0
+
+[sub_resource type="Resource" id="e6"]
+script = ExtResource("9")
+id = &"water_sprites_pool"
+scene = ExtResource("8")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = true
+canon = "X"
+glamour = 0
 
 [resource]
 script = ExtResource("1")
 region_id = &"starlight_glen"
-entries = Array[ExtResource("8")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5")])
+entries = Array[ExtResource("9")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6")])

@@ -16,6 +16,9 @@ const SCENES := {
 	&"bogge": preload("res://creatures/fae/bogge.tscn"),
 	&"attor": preload("res://creatures/fae/attor.tscn"),
 	&"white_horse": preload("res://creatures/fae/white_horse.tscn"),
+	&"puca": preload("res://creatures/fae/puca.tscn"),
+	&"summer_faerie": preload("res://creatures/fae/summer_faerie.tscn"),
+	&"high_fae_male": preload("res://creatures/fae/calanmai_faerie.tscn"),
 }
 
 

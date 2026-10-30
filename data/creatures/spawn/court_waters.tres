@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="4"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/swan.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/water_sprites.tscn" id="3"]
+
+[sub_resource type="Resource" id="e0"]
+script = ExtResource("4")
+id = &"water_sprites"
+scene = ExtResource("3")
+count = 1
+cluster_radius = 0.0
+groups = 2
+start_hour = 0.0
+end_hour = 0.0
+on_water = true
+canon = "X"
+glamour = 0
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("4")
+id = &"swans"
+scene = ExtResource("2")
+count = 2
+cluster_radius = 6.0
+groups = 1
+start_hour = 6.0
+end_hour = 21.0
+on_water = true
+canon = "X"
+glamour = 0
+
+[resource]
+script = ExtResource("1")
+region_id = &"court_waters"
+entries = Array[ExtResource("4")]([SubResource("e0"), SubResource("e1")])

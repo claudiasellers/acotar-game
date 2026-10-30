@@ -264,3 +264,6 @@ if __name__ == "__main__":
                         (0.055, -0.03), (0.04, -0.05), (0.015, -0.04), (0.0, -0.015)], 0.05, 0.005)
     # Faelight: a tiny moth of light, small round wings.
     flier("faelight", [(0.0, 0.012), (0.018, 0.02), (0.028, 0.006), (0.024, -0.012), (0.01, -0.018), (0.0, -0.008)], 0.02, 0.004)
+    # Water sprite: a slip of a body with long trailing fins, like a sea-sprite in a raindrop.
+    flier("water_sprite", [(0.0, 0.015), (0.02, 0.012), (0.045, -0.01), (0.05, -0.045), (0.03, -0.035),
+                           (0.012, -0.02), (0.0, -0.03)], 0.07, 0.007)

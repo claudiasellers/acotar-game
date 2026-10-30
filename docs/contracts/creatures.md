@@ -49,7 +49,10 @@ deer: `ing_venison` x3, `ing_hide`, `ing_sinew` x2 · hare: `ing_hare`, `ing_har
 - Ambient species scenes: `creatures/ambient/scenes/<name>.tscn` for songbird_blue/rose/gold, lark, hen, owl, hawk, crow, rabbit, lamb, sheep, fox, cat, squirrel, swan, butterflies, fireflies, faelights. `CreatureData.model_scale` lets one mesh serve a bigger cousin.
 
 ## Story actors (Spring Court)
-`StorySpawner` answers `bogge`, `suriel`, `naga` (+ `naga_2`..), `attor`, `white_horse` (plus the M1 ids). A numeric suffix spawns another of the base kind; the full id becomes the actor's `actor_id` / `creature_id`, so cues and kill reports address that one.
+`StorySpawner` answers `bogge`, `suriel`, `naga` (+ `naga_2`..), `attor`, `white_horse` (plus the M1 ids).
+- Slice 3 ids: `puca` (cues `looks_like_father`, `shift_image`: father → bow → supplies → sisters, its own shape flickering between), `summer_faerie` (cue `dies`; signal `died`), `high_fae_male`, `_2`, `_3` (the three Calanmai lesser faeries; cue `flee`, then they vanish). All are placeholder bodies (`PlaceholderFigure`) until the user's Blender pass.
+- `BeastPatrol` (`creatures/beast/beast_patrol.tscn`): region lanes add one with Marker3D children as the route. Tamlin's beast walks it 21:00 to 04:00 under actor id `tamlin_beast_patrol` (story cues never reach it); `forbid_flags` takes him off duty.
+- Glamour: `unseen_shimmer` entries (manor_grounds) are GLAMOURED_ONLY. Water sprites ride `on_water` in border_woods, eastern_woods, starlight_glen and the `court_waters` table (one spawner per lake). A numeric suffix spawns another of the base kind; the full id becomes the actor's `actor_id` / `creature_id`, so cues and kill reports address that one.
 - `suriel` (Suriel): cues `caught`, `naga_are_coming` (scream, heard by every creature in range); signal `screamed`.
 - `naga` (Naga, a Creature): lurks low; cue `attack` charges Feyre; signal `struck_player(naga)` and, if defined, `EventBus.player_struck(id, kind, amount)`. Two wood arrows kill; ash kills. Reports `creature_killed(id, &"naga", cause, pos)`.
 - `bogge` (Bogge): no model. Cue `pass_behind` keeps it behind the camera for `pass_seconds`, darkening a FogVolume; signals `begged(line_id)` (`bogge_beg_1..4`), `passed`. Its `global_position` is what the gaze check tests.

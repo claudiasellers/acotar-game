@@ -17,6 +17,7 @@ start_hour = 0.0
 end_hour = 0.0
 on_water = false
 canon = "X"
+glamour = 0
 
 [sub_resource type="Resource" id="e1"]
 script = ExtResource("5")
@@ -29,6 +30,7 @@ start_hour = 5.0
 end_hour = 20.5
 on_water = false
 canon = "X"
+glamour = 0
 
 [sub_resource type="Resource" id="e2"]
 script = ExtResource("5")
@@ -41,6 +43,7 @@ start_hour = 19.5
 end_hour = 23.5
 on_water = false
 canon = "X"
+glamour = 0
 
 [resource]
 script = ExtResource("1")

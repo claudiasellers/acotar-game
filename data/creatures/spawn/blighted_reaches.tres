@@ -15,6 +15,7 @@ start_hour = 0.0
 end_hour = 0.0
 on_water = false
 canon = "X"
+glamour = 0
 
 [resource]
 script = ExtResource("1")

@@ -10,7 +10,7 @@ extends Node3D
 
 signal stage_changed(stage: Stage)
 
-enum Stage { HIDDEN, APPROACH, BREAK, PRESENCE, LOOM, SPEAK, LEAD, WITHDRAW, GONE }
+enum Stage { HIDDEN, APPROACH, BREAK, PRESENCE, LOOM, SPEAK, LEAD, WITHDRAW, GONE, PATROL }
 
 const GROUP := &"beast"
 const LIGHT_GROUP := &"beast_affected_lights"
@@ -20,6 +20,8 @@ const RADIUS := 18.0
 const STAGE_INTENSITY := {
 	Stage.HIDDEN: 0.0, Stage.APPROACH: 0.35, Stage.BREAK: 1.0, Stage.PRESENCE: 0.7,
 	Stage.LOOM: 0.9, Stage.SPEAK: 0.8, Stage.LEAD: 0.25, Stage.WITHDRAW: 0.2, Stage.GONE: 0.0,
+	# Walking the borders at night: felt, not feared.
+	Stage.PATROL: 0.15,
 }
 
 @export var actor_id: StringName = &"tamlin_beast"
@@ -31,6 +33,8 @@ var intensity: float = 0.0
 var door: Node3D
 
 var _destination: Vector3
+var _route: PackedVector3Array = PackedVector3Array()
+var _route_index: int = 0
 var _lights: Dictionary = {}
 var _eye_mat: StandardMaterial3D
 var _breath: float = 0.0
@@ -101,6 +105,17 @@ func lead(toward: Vector3) -> void:
 	_set_stage(Stage.LEAD)
 
 
+## Night patrol (BeastPatrol): walks `points` in a loop until withdrawn.
+func patrol(points: PackedVector3Array) -> void:
+	if points.is_empty():
+		return
+	visible = true
+	_route = points
+	_route_index = 0
+	_destination = _route[0]
+	_set_stage(Stage.PATROL)
+
+
 func withdraw() -> void:
 	if door:
 		_destination = door.global_position + door.global_basis.z * 6.0
@@ -146,6 +161,9 @@ func _process(delta: float) -> void:
 	if to.length() > 0.05:
 		global_position += to.limit_length(walk_speed * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 4.0 * delta)
+	elif stage == Stage.PATROL:
+		_route_index = (_route_index + 1) % _route.size()
+		_destination = _route[_route_index]
 	elif stage == Stage.WITHDRAW:
 		_set_stage(Stage.GONE)
 		visible = false
