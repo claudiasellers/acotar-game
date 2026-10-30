@@ -122,7 +122,7 @@ check "a malformed request is answered with the reason" 'result D-1 | grep -qx "
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
 
 # 6 request.json route
-printf '{"id":"J"}' >"$T/req.json"
+printf '{"id":"J","quality":"full"}' >"$T/req.json"
 (cd "$T/cloud" && bash "$REQ" J 1 "$T/req.json") >>"$T/cloud.out" 2>&1
 mkdir -p "$T/cloud/tools/shots"
 cat >"$T/cloud/tools/shots/take_shots.sh" <<'W'

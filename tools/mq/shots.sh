@@ -548,8 +548,10 @@ handle() { # key sha
 	if [ -f "$WT/.shots/request.json" ]; then
 		echo "route request.json" >>"$RES/result.txt"
 		cp "$WT/.shots/request.json" "$RES/request.json"
-		QUALITY=look METHOD="" SIZE=1920x1080 PREPS=""
-		grep -Eq '"quality"[[:space:]]*:[[:space:]]*"layout"' "$WT/.shots/request.json" && QUALITY=layout
+		# shot_request.md: "quality":"full" is a look request, anything else is layout.
+		# The runner picks its own renderer, so no --rendering-method from here.
+		QUALITY=layout METHOD="" SIZE=1920x1080 PREPS=""
+		grep -Eq '"quality"[[:space:]]*:[[:space:]]*"full"' "$WT/.shots/request.json" && QUALITY=look
 		echo "quality $QUALITY" >>"$RES/result.txt"
 		if ! prepare; then status=error; err="prep failed"
 		elif ! run_json; then status=fail; fi

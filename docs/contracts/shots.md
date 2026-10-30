@@ -60,7 +60,7 @@ shot menu res://tools/pause_menu_shot.tscn menu {out}/menu.png
 - `layout` (positions, overlaps, "is the stair there"): any renderer or size. PNGs come back as JPEG, 1280 px wide at quality 80, which is about a tenth of the size.
   Most layout checks don't need the Mac at all. Run them in the cloud with the layout-shots runner (lavapipe), or print a number instead of taking a picture.
 
-A `request.json` is `look` unless it has `"quality": "layout"`.
+A `request.json` is `look` only with `"quality": "full"`, and `layout` otherwise (the runner then uses the Compatibility renderer itself).
 
 **Before the shots, nothing is rebuilt that doesn't need to be:**
 - Import: the render worktree starts from the play folder's `.godot` (a zero-copy APFS clone). `--import` runs only when an importable file (art, models, audio, fonts, `.import`) changed since the last import.
