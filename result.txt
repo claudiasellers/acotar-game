@@ -1,0 +1,11 @@
+status ok
+request feyre-t025-1
+commit 07d290fcec1e69736015bba53a0c37bac0b43401
+machine Claudias-Mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 6s: import 3s, generated content 3s (levels.sh)
+shot gait ok exit=0 8s files=17
+answered 2026-10-30T22:22:39Z after 15s
