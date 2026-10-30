@@ -11,6 +11,10 @@ extends Resource
 @export var radius: float = 200.0
 ## Regions to keep loaded while Feyre is in this one.
 @export var neighbors: PackedStringArray = []
+## JSON coverage report written by the region's generator (engineering rules
+## R1/R9), read by tools/world_smoke.gd. Keys: types, placements_per_km2,
+## empty_cells, landmarks, draw_calls.
+@export_file("*.json") var report_path: String
 
 
 ## Horizontal distance from a point to this region's edge (negative inside).

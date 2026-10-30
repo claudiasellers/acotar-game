@@ -46,3 +46,19 @@ Raised only through `ActionTrigger`. Names are the Keeper's
 (`lore/07-story/timeline-overview.md`). Act I: `food_secured` (P0);
 `wolf_killed`, `pelt_sold`, `beast_claim_accepted`, `wall_crossed` (P1).
 Minor facts use the `fact.` prefix (e.g. `fact.beast_door.raised_knife`).
+
+## World smoke (tools/world_smoke.gd)
+
+Run by the build lane on every merge: `godot --headless -s tools/world_smoke.gd`
+(or `-- human_realm` for one world). For every RegionDef in `data/regions/<world>/`
+it instances the region with its neighbors, runs 5 frames, and fails on any
+engine or script error. It then reads the region's coverage report
+(`RegionDef.report_path`, JSON written by the region's generator):
+
+```json
+{"types": 31, "placements_per_km2": 420, "empty_cells": 0, "landmarks": 4, "draw_calls": 1100}
+```
+
+Fails when `types < 25`, `placements_per_km2 < 300`, `empty_cells > 0`,
+`landmarks < 3`, or `draw_calls > 1500` (R1, R9). VRAM is not measurable
+headless and is checked at milestones. Exit code 0 = pass, 1 = fail.
