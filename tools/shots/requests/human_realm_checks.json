@@ -1,0 +1,43 @@
+{
+	"id": "human_realm_checks",
+	"scene": "world",
+	"checks": [
+		{
+			"name": "cottage_ground",
+			"kind": "height",
+			"at": [
+				-150,
+				2161
+			],
+			"near": [
+				-150,
+				0,
+				2161
+			]
+		},
+		{
+			"name": "wall_seam_ground",
+			"kind": "height",
+			"at": [
+				-100,
+				1380
+			]
+		},
+		{
+			"name": "landmarks_near_cottage",
+			"kind": "count",
+			"group": "landmark",
+			"center": [
+				-150,
+				0,
+				2161
+			],
+			"radius": 400
+		},
+		{
+			"name": "feyre_start_mark",
+			"kind": "position",
+			"node": "name:opening_cottage_dawn"
+		}
+	]
+}

@@ -1,6 +1,8 @@
 ## Milestone screenshots and render stats for the world (needs a GPU or
 ## lavapipe; not headless):
-##   xvfb-run godot --rendering-driver vulkan res://tools/world_shot.tscn -- <shot_id> [out.png]
+##   xvfb-run godot --rendering-driver vulkan res://tools/world_shot.tscn -- <shot_id> [out.png] [layout]
+## `layout` = cheap 640x360 layout render (ShotQuality). For many shots in one
+## run, or numeric checks, use tools/shots/take_shots.sh instead.
 ## Loads the World scene plus the regions near the viewpoint, sets the clock
 ## and grade, waits for things to settle, saves a PNG and prints draw calls and
 ## primitives (hardware-independent budget numbers).
@@ -36,6 +38,7 @@ func _run() -> void:
 	root.size = Vector2i(1920, 1080)
 	var world: World = load("res://world/shared/world/world.tscn").instantiate()
 	root.add_child(world)
+	ShotQuality.guard_software_renderer(root, world)
 	var cam := Camera3D.new()
 	var eye: Vector3 = shot[0]
 	var at: Vector3 = shot[1]
@@ -48,6 +51,8 @@ func _run() -> void:
 	cam.look_at(at)
 	cam.make_current()
 	world.grade.swap_to(shot[3], 0.0)
+	if args.has("layout"):
+		RenderingServer.render_loop_enabled = false
 	var with_regions := not args.has("noregions")
 	for def in (_region_defs() if with_regions else []):
 		if Vector2(def.center.x - eye.x, def.center.z - eye.z).length() < def.radius + 400.0:
@@ -69,8 +74,14 @@ func _run() -> void:
 				var feyre: Node3D = load("res://characters/feyre/model/feyre_model.tscn").instantiate()
 				world.add_child(feyre)
 				feyre.global_transform = (a as Node3D).global_transform
-	for i in 30:
+	if args.has("layout"):
 		await get_tree().process_frame
+		ShotQuality.apply(ShotQuality.LAYOUT, root, world, ShotQuality.LAYOUT_SIZE)
+		await get_tree().process_frame
+		RenderingServer.force_draw(true, 0.0)
+	else:
+		for i in 30:
+			await get_tree().process_frame
 	var img := root.get_texture().get_image()
 	img.save_png(out)
 	var draw := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)

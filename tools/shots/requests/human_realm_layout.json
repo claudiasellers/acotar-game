@@ -1,0 +1,112 @@
+{
+	"id": "human_realm_layout",
+	"scene": "world",
+	"quality": "layout",
+	"grade": "human_winter",
+	"shots": [
+		{
+			"name": "cottage_snow",
+			"eye": [
+				-112,
+				1.7,
+				2152
+			],
+			"at": [
+				-150,
+				1.2,
+				2161
+			],
+			"time_of_day": 0.42
+		},
+		{
+			"name": "village_market",
+			"eye": [
+				345,
+				1.7,
+				2210
+			],
+			"at": [
+				385,
+				1.2,
+				2252
+			],
+			"time_of_day": 0.5
+		},
+		{
+			"name": "wall_seam",
+			"eye": [
+				-110,
+				1.7,
+				1470
+			],
+			"at": [
+				-100,
+				1.2,
+				1380
+			],
+			"time_of_day": 0.62
+		},
+		{
+			"name": "hunting_forest",
+			"eye": [
+				-380,
+				1.7,
+				1690
+			],
+			"at": [
+				-420,
+				1.2,
+				1722
+			],
+			"time_of_day": 0.35
+		},
+		{
+			"name": "burnt_estate",
+			"eye": [
+				-590,
+				1.7,
+				2290
+			],
+			"at": [
+				-640,
+				1.2,
+				2332
+			],
+			"time_of_day": 0.7
+		}
+	],
+	"checks": [
+		{
+			"name": "cottage_ground",
+			"kind": "height",
+			"at": [
+				-150,
+				2161
+			]
+		},
+		{
+			"name": "wall_seam_ground",
+			"kind": "height",
+			"at": [
+				-100,
+				1380
+			]
+		},
+		{
+			"name": "landmarks_near_cottage",
+			"kind": "count",
+			"group": "landmark",
+			"center": [
+				-150,
+				0,
+				2161
+			],
+			"radius": 400
+		},
+		{
+			"name": "feyre_start_mark",
+			"kind": "position",
+			"node": "name:opening_cottage_dawn"
+		}
+	]
+}
