@@ -77,9 +77,10 @@ func play_locomotion(speed: float, on_floor: bool, delta: float = 0.0) -> void:
 	var clip := &"idle"
 	if speed > MOVE_THRESHOLD and on_floor:
 		clip = &"walk"
-		if speed > (GAIT_SPEEDS[&"walk"] + GAIT_SPEEDS[&"run"]) * 0.5:
+		var gaits := _mover_gaits()
+		if speed > (gaits[&"walk"] + gaits[&"run"]) * 0.5:
 			clip = &"run"
-		if speed > (GAIT_SPEEDS[&"run"] + GAIT_SPEEDS[&"sprint"]) * 0.5:
+		if speed > (gaits[&"run"] + gaits[&"sprint"]) * 0.5:
 			clip = &"sprint"
 	if clip == &"idle":
 		_idle_time += delta
@@ -96,6 +97,15 @@ func play_locomotion(speed: float, on_floor: bool, delta: float = 0.0) -> void:
 		anim.speed_scale = clampf(speed / GAIT_SPEEDS[clip], 0.5, 1.6)
 	if anim.current_animation != clip and anim.has_animation(clip):
 		anim.play(clip, CLIP_BLEND)
+
+
+## Ground speeds the gait is picked against: the mover's real walk/run/sprint when it
+## has them (Feyre), else the speeds the clips were authored for.
+func _mover_gaits() -> Dictionary:
+	if _mover is Feyre:
+		var f := _mover as Feyre
+		return {&"walk": f.walk_speed, &"run": f.run_speed, &"sprint": f.sprint_speed}
+	return GAIT_SPEEDS
 
 
 ## Plays a one-shot clip (e.g. "turn_left"), then returns to locomotion.

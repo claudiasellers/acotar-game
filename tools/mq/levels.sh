@@ -90,6 +90,11 @@ ensure_one() {
 	done
 	rm -f "$stamp"
 	mq_event BUILD "$name $fp"
+	# One plain line on stderr, so a person at make play sees why it is busy.
+	case "$name" in
+		terrain) echo "Building $name (no saved copy yet; this takes about 14 minutes)..." >&2 ;;
+		*) echo "Building $name (no saved copy yet; this can take a few minutes)..." >&2 ;;
+	esac
 	log="$MQ_DIR/logs/build-$name-$fp.log"
 	mkdir -p "$MQ_DIR/logs"
 	mq_timeout "$BUILD_TIMEOUT" /bin/bash -c "$cmd" > "$log" 2>&1

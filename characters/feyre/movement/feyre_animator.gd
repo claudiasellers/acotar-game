@@ -24,7 +24,7 @@ const SLOW_WALK := 0.6
 ## Game speed (m/s) where the walk clip plays pure; slower is a slower stride.
 const SLOW_WALK_POINT := 1.6
 ## Fastest playback beyond the sprint clip before the cadence looks frantic.
-const MAX_SCALE := 1.6
+const MAX_SCALE := 2.3
 ## Above this ground speed a landing goes straight back to running.
 const LAND_RUN_THROUGH := 2.0
 ## Landing impact (m/s) worth a landing clip at all.
