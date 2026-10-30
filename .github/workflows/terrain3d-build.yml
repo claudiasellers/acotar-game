@@ -1,0 +1,46 @@
+name: Build Terrain3D binaries
+
+# Builds the Terrain3D GDExtension from its pinned release tag for the
+# platforms we ship (macOS universal for the user's Mac, Linux x86_64 for CI),
+# so the binaries are built from source rather than downloaded.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["lane/world-**"]
+    paths: [".github/workflows/terrain3d-build.yml"]
+
+env:
+  TERRAIN3D_TAG: "v1.1.0-rc1"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x86_64
+          - os: macos-latest
+            platform: macos
+            arch: universal
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: TokisanGames/Terrain3D
+          ref: ${{ env.TERRAIN3D_TAG }}
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: python -m pip install scons==4.10.1
+      - name: Build debug and release
+        run: |
+          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_debug debug_symbols=no -j4
+          scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=template_release debug_symbols=no -j4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: terrain3d-${{ matrix.platform }}
+          path: project/addons/terrain_3d/bin/
+          retention-days: 3
