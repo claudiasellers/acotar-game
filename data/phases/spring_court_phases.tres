@@ -1,0 +1,130 @@
+[gd_resource type="Resource" script_class="PhaseSet" format=3]
+
+[ext_resource type="Script" path="res://data/phases/phase_def.gd" id="1_cae22"]
+[ext_resource type="Script" path="res://data/phases/exit_condition.gd" id="2_1vgil"]
+[ext_resource type="Script" path="res://data/phases/phase_set.gd" id="3_ox3ey"]
+
+[sub_resource type="Resource" id="Resource_j6ci3"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("food_tally_empty")
+
+[sub_resource type="Resource" id="Resource_oty66"]
+script = ExtResource("1_cae22")
+id = &"p0_winter"
+display_name = "Winter and the cottage"
+notes = "Proposed gate: the food tally runs out and Feyre hunts the deep woods."
+unlocked_regions = PackedStringArray("human_realm_winter", "cottage", "hunting_forest", "village")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_j6ci3")
+next_phase = &"p1_wolf_and_crossing"
+
+[sub_resource type="Resource" id="Resource_3t2xh"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("wolf_killed", "wall_crossed")
+
+[sub_resource type="Resource" id="Resource_u4qal"]
+script = ExtResource("1_cae22")
+id = &"p1_wolf_and_crossing"
+display_name = "The wolf and the crossing"
+notes = "Wolf kill, the beast at the door, the ride north through the wall."
+unlocked_regions = PackedStringArray("border_woods")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_3t2xh")
+next_phase = &"p2_grounds"
+
+[sub_resource type="Resource" id="Resource_ip116"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("manor_trust_earned")
+
+[sub_resource type="Resource" id="Resource_mxb7s"]
+script = ExtResource("1_cae22")
+id = &"p2_grounds"
+display_name = "The grounds"
+notes = "Proposed gate: trust from observed deeds opens the house."
+unlocked_regions = PackedStringArray("manor_grounds")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_ip116")
+next_phase = &"p3_house_and_eastern_woods"
+
+[sub_resource type="Resource" id="Resource_b8mrs"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("suriel_bound", "naga_cleared")
+
+[sub_resource type="Resource" id="Resource_ck0ix"]
+script = ExtResource("1_cae22")
+id = &"p3_house_and_eastern_woods"
+display_name = "The house and the eastern woods"
+unlocked_regions = PackedStringArray("manor_house", "eastern_woods", "blighted_reaches")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_b8mrs")
+next_phase = &"p4_wider_court"
+
+[sub_resource type="Resource" id="Resource_p6i23"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("painting_finished")
+
+[sub_resource type="Resource" id="Resource_03yt5"]
+script = ExtResource("1_cae22")
+id = &"p4_wider_court"
+display_name = "The wider court"
+notes = "Plus the root doc's other exit conditions as they are defined."
+unlocked_regions = PackedStringArray("starlight_glen", "fae_village", "western_fells")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_p6i23")
+next_phase = &"p5_calanmai"
+
+[sub_resource type="Resource" id="Resource_g0ul0"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("rite_survived")
+
+[sub_resource type="Resource" id="Resource_dmf1q"]
+script = ExtResource("1_cae22")
+id = &"p5_calanmai"
+display_name = "Calanmai"
+notes = "Includes Rhysand's rescue at the bonfires."
+unlocked_regions = PackedStringArray("hill_of_the_rite")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_g0ul0")
+next_phase = &"p6_blight_tightens"
+
+[sub_resource type="Resource" id="Resource_0rkdp"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("sent_home")
+
+[sub_resource type="Resource" id="Resource_t52pk"]
+script = ExtResource("1_cae22")
+id = &"p6_blight_tightens"
+display_name = "The blight tightens"
+notes = "The Attor, Rhysand at the manor, the Tithe, the solstice. Proposed gate."
+unlocked_regions = PackedStringArray("solstice_meadow")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_0rkdp")
+next_phase = &"p7_return_home"
+
+[sub_resource type="Resource" id="Resource_0obeo"]
+script = ExtResource("2_1vgil")
+flags = PackedStringArray("chose_to_return")
+
+[sub_resource type="Resource" id="Resource_uy1bw"]
+script = ExtResource("1_cae22")
+id = &"p7_return_home"
+display_name = "Return to the human realm"
+notes = "Nesta's confession breaks the glamour. Proposed gate."
+unlocked_regions = PackedStringArray("human_realm_spring", "archeron_estate")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_0obeo")
+next_phase = &"p8_the_pass"
+
+[sub_resource type="Resource" id="Resource_8vyud"]
+script = ExtResource("1_cae22")
+id = &"p8_the_pass"
+display_name = "The pass"
+notes = "The empty manor, Alis, the road toward Under the Mountain (world 2)."
+unlocked_regions = PackedStringArray("the_pass")
+locked_regions = PackedStringArray()
+
+[resource]
+script = ExtResource("3_ox3ey")
+world_id = &"spring_court"
+start_phase = &"p0_winter"
+phases = Array[ExtResource("1_cae22")]([SubResource("Resource_oty66"), SubResource("Resource_u4qal"), SubResource("Resource_mxb7s"), SubResource("Resource_ck0ix"), SubResource("Resource_03yt5"), SubResource("Resource_dmf1q"), SubResource("Resource_t52pk"), SubResource("Resource_uy1bw"), SubResource("Resource_8vyud")])

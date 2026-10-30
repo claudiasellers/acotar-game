@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="PhaseSet" format=3]
+
+[ext_resource type="Script" path="res://data/phases/phase_def.gd" id="1_iq058"]
+[ext_resource type="Script" path="res://data/phases/exit_condition.gd" id="2_nu4vr"]
+[ext_resource type="Script" path="res://data/phases/phase_set.gd" id="3_3mgue"]
+
+[sub_resource type="Resource" id="Resource_dc3tb"]
+script = ExtResource("2_nu4vr")
+flags = PackedStringArray("fact.test.reached_summit")
+
+[sub_resource type="Resource" id="Resource_nilmn"]
+script = ExtResource("1_iq058")
+id = &"m0_explore"
+display_name = "Explore the hill"
+notes = "Climb to the summit."
+unlocked_regions = PackedStringArray("test_hill")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_dc3tb")
+next_phase = &"m0_summit"
+
+[sub_resource type="Resource" id="Resource_bk4bu"]
+script = ExtResource("2_nu4vr")
+flags = PackedStringArray("fact.test.target_hit")
+
+[sub_resource type="Resource" id="Resource_w0lyg"]
+script = ExtResource("1_iq058")
+id = &"m0_summit"
+display_name = "The thorns open"
+notes = "Reaching the summit opens the thorn wall. Hit the target next."
+unlocked_regions = PackedStringArray("test_meadow")
+locked_regions = PackedStringArray()
+exit_condition = SubResource("Resource_bk4bu")
+next_phase = &"m0_marksman"
+
+[sub_resource type="Resource" id="Resource_ym5gc"]
+script = ExtResource("1_iq058")
+id = &"m0_marksman"
+display_name = "Marksman"
+notes = "End of the M0 test ladder."
+unlocked_regions = PackedStringArray()
+locked_regions = PackedStringArray()
+
+[resource]
+script = ExtResource("3_3mgue")
+world_id = &"m0_test"
+start_phase = &"m0_explore"
+phases = Array[ExtResource("1_iq058")]([SubResource("Resource_nilmn"), SubResource("Resource_w0lyg"), SubResource("Resource_ym5gc")])

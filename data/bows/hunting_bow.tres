@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BowData" format=3]
+
+[ext_resource type="Script" path="res://data/bows/bow_data.gd" id="1_bow"]
+
+[resource]
+script = ExtResource("1_bow")
+id = &"hunting_bow"
+display_name = "Hunting bow"
+draw_time = 0.8
+min_speed = 15.0
+max_speed = 48.0
+sway_degrees = 1.5
