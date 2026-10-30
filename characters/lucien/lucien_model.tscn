@@ -1,0 +1,35 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://characters/cast/cast_model.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://characters/lucien/model/lucien.glb" id="2_glb"]
+[ext_resource type="Shader" path="res://characters/feyre/feyre_skin.gdshader" id="3_skin"]
+[ext_resource type="Texture2D" path="res://characters/lucien/model/makeup_mask_a.png" id="4_mask_a"]
+[ext_resource type="Texture2D" path="res://characters/lucien/model/makeup_mask_b.png" id="5_mask_b"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_head"]
+resource_name = "skin_head"
+resource_local_to_scene = true
+shader = ExtResource("3_skin")
+shader_parameter/albedo = Color(0.933, 0.776, 0.659, 1.0)
+shader_parameter/makeup_mask_a = ExtResource("4_mask_a")
+shader_parameter/makeup_mask_b = ExtResource("5_mask_b")
+shader_parameter/brows_color = Color(0.659, 0.212, 0.110, 1.0)
+shader_parameter/lips_color = Color(0.725, 0.471, 0.416, 1.0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
+resource_name = "skin"
+shader = ExtResource("3_skin")
+shader_parameter/albedo = Color(0.933, 0.776, 0.659, 1.0)
+shader_parameter/brows_amount = 0.0
+shader_parameter/lips_amount = 0.0
+
+[node name="LucienModel" type="Node3D"]
+script = ExtResource("1_script")
+skin_head_material = SubResource("ShaderMaterial_head")
+skin_body_material = SubResource("ShaderMaterial_body")
+hair_path = "res://characters/lucien/hair/lucien_half_up.glb"
+outfit = PackedStringArray("res://characters/lucien/wardrobe/lucien_boots.glb", "res://characters/lucien/wardrobe/lucien_doublet.glb", "res://characters/lucien/wardrobe/lucien_knife.glb", "res://characters/lucien/wardrobe/lucien_mask.glb", "res://characters/lucien/wardrobe/lucien_trousers.glb", "res://characters/lucien/wardrobe/lucien_tunic.glb")
+held_props = PackedStringArray()
+
+[node name="lucien" parent="." instance=ExtResource("2_glb")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)

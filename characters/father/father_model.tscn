@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://characters/cast/cast_model.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://characters/father/model/father.glb" id="2_glb"]
+[ext_resource type="Shader" path="res://characters/feyre/feyre_skin.gdshader" id="3_skin"]
+[ext_resource type="Texture2D" path="res://characters/father/model/makeup_mask_a.png" id="4_mask_a"]
+[ext_resource type="Texture2D" path="res://characters/father/model/makeup_mask_b.png" id="5_mask_b"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_head"]
+resource_name = "skin_head"
+resource_local_to_scene = true
+shader = ExtResource("3_skin")
+shader_parameter/albedo = Color(0.898, 0.741, 0.651, 1.0)
+shader_parameter/makeup_mask_a = ExtResource("4_mask_a")
+shader_parameter/makeup_mask_b = ExtResource("5_mask_b")
+shader_parameter/brows_color = Color(0.482, 0.420, 0.365, 1.0)
+shader_parameter/lips_color = Color(0.706, 0.518, 0.471, 1.0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
+resource_name = "skin"
+shader = ExtResource("3_skin")
+shader_parameter/albedo = Color(0.898, 0.741, 0.651, 1.0)
+shader_parameter/brows_amount = 0.0
+shader_parameter/lips_amount = 0.0
+
+[node name="FatherModel" type="Node3D"]
+script = ExtResource("1_script")
+skin_head_material = SubResource("ShaderMaterial_head")
+skin_body_material = SubResource("ShaderMaterial_body")
+hair_path = "res://characters/father/hair/father_greying.glb"
+outfit = PackedStringArray("res://characters/father/wardrobe/father_shirt.glb", "res://characters/father/wardrobe/father_waistcoat.glb", "res://characters/father/wardrobe/father_coat.glb", "res://characters/father/wardrobe/father_trousers.glb", "res://characters/father/wardrobe/father_shoes.glb")
+held_props = PackedStringArray("res://characters/father/model/father_cane.glb@LeftHand@0.00513,0.07954,-0.02723,-0.57495,-0.29195,-0.74888,0.15289")
+idle_clip = &"idle_cane"
+walk_clip = &"walk_limp"
+
+[node name="father" parent="." instance=ExtResource("2_glb")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
