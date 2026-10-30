@@ -739,5 +739,25 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		build_known_red needs_nothing marker_check; do
 	scenario "$c"
 done
+# A finished run leaves nothing running from its temp root, by command or cwd.
+leftovers() {
+	ps -axo pid=,command= | grep -F "$ROOT" | grep -v "grep -F" | awk -v me="$$" '$1 != me'
+	lsof -a -d cwd -Fpn 2>/dev/null | awk -v r="$ROOT" -v me="$$" '
+		/^p/ { pid = substr($0, 2) }
+		/^n/ { if (index(substr($0, 2), r) == 1 && pid != me) print pid " cwd " substr($0, 2) }'
+}
+if [ -z "$ONLY" ]; then
+	cd "$ROOT" || exit 1
+	left=""; i=0
+	while [ "$i" -lt 20 ]; do
+		left=$(leftovers | grep -v "^$$ ")
+		[ -z "$left" ] && break
+		perl -e 'select(undef,undef,undef,0.5)'; i=$((i + 1))
+	done
+	if [ -n "$left" ]; then
+		echo "FAIL leftover processes under $ROOT:"; echo "$left"
+		FAILED=$((FAILED + 1))
+	fi
+fi
 echo "selftest: $PASSED passed, $FAILED failed"
 [ "$FAILED" = 0 ]
