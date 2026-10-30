@@ -157,3 +157,34 @@ func test_collection_book_opens_on_j_and_closes() -> void:
 	ui.close(feyre)
 	assert_false(ui.is_open())
 	assert_false(feyre.get_tree().paused)
+
+
+func test_e_at_a_carcass_skins_before_pulling_arrows() -> void:
+	var script := GDScript.new()
+	script.source_code = "extends Node3D\nvar done := false\nfunc harvest() -> Array:\n\tif done:\n\t\treturn []\n\tdone = true\n\treturn [{\"item_id\": &\"ing_hare_pelt\", \"qty\": 1}]\n"
+	script.reload()
+	var carcass := Node3D.new()
+	carcass.set_script(script)
+	carcass.add_to_group(&"harvestable")
+	hill.add_child(carcass)
+	carcass.global_position = feyre.global_position + Vector3(1, 0, 0)
+	var arrow := Arrow.create()
+	hill.add_child(arrow)
+	arrow.global_position = carcass.global_position
+	arrow.add_to_group(Arrow.STUCK_GROUP)
+	var arrows_before := Gameplay.inventory.arrow_count()
+	assert_true(feyre.interactor.interact())
+	assert_eq(Gameplay.inventory.count(&"ing_hare_pelt"), 1, "first E skins")
+	assert_eq(Gameplay.inventory.arrow_count(), arrows_before, "arrows wait")
+	assert_true(feyre.interactor.interact())
+	assert_eq(Gameplay.inventory.arrow_count(), arrows_before + 1, "then E pulls the arrow")
+
+
+func test_reticle_follows_the_predicted_impact() -> void:
+	var reticle := feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
+	assert_not_null(reticle)
+	var guess := feyre.bow_controller.predict_impact(1.0)
+	assert_true(guess.has("point"))
+	var aim := feyre.aim_point()
+	assert_lt(guess.point.distance_to(feyre.bow_controller.muzzle()), aim.distance_to(feyre.bow_controller.muzzle()) + 0.5,
+		"the arrow never lands beyond the aim point")

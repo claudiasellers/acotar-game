@@ -1,6 +1,6 @@
 ## Feyre's one "interact" (E / gamepad X): the nearest thing in reach, in this
-## order: a stuck arrow, a forage spot, a forage field instance, a carcass to
-## harvest, a station (hearth, wardrobe, mirror...).
+## order: a carcass to harvest, a stuck arrow, a forage spot, a forage field
+## instance, a station (hearth, wardrobe, mirror...).
 ##
 ## Pickup shapes other lanes implement (no class dependency):
 ## - group "forage": harvest() -> StringName
@@ -50,8 +50,9 @@ func weave_crown() -> StringName:
 	return piece
 
 
+## A carcass in reach is skinned before the arrows in it are pulled (F6).
 func interact() -> bool:
-	return pick_up_arrow() or _forage() or _field() or _harvest() or _station()
+	return _harvest() or pick_up_arrow() or _forage() or _field() or _station()
 
 
 func pick_up_arrow() -> bool:

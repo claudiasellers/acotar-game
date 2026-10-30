@@ -24,6 +24,8 @@ var wet: bool = false
 var rng := RandomNumberGenerator.new()
 
 var _wind_source: Node = null
+## Where the arrow was last physics frame, for the swept ray check.
+var _last_pos: Vector3 = Vector3.INF
 
 
 static func create(arrow_data: ArrowData = null) -> Arrow:
@@ -78,6 +80,7 @@ func launch(from: Vector3, direction: Vector3, speed: float, is_wet: bool = fals
 	if wet:
 		speed *= data.wet_speed_multiplier
 	global_position = from
+	_last_pos = from
 	_face(direction)
 	linear_velocity = direction.normalized() * speed
 
@@ -103,8 +106,33 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if not stuck and global_position.y < KILL_DEPTH:
+	if stuck:
+		return
+	if global_position.y < KILL_DEPTH:
 		queue_free()
+		return
+	_sweep()
+
+
+## A ray from last frame's position to the tip now, so a fast arrow can't
+## skip through thin colliders or a terrain heightfield (F4) between steps.
+func _sweep() -> void:
+	var tip := global_position + linear_velocity.normalized() * LENGTH * 0.5
+	if _last_pos == Vector3.INF or not is_inside_tree():
+		_last_pos = global_position
+		return
+	var exclude: Array[RID] = [get_rid()]
+	for body in get_collision_exceptions():
+		exclude.append(body.get_rid())
+	var query := PhysicsRayQueryParameters3D.create(_last_pos, tip, collision_mask, exclude)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	_last_pos = global_position
+	if hit.is_empty():
+		return
+	var dir := linear_velocity.normalized()
+	global_position = hit.position - dir * LENGTH * 0.35
+	linear_velocity = Vector3.ZERO
+	_on_body_entered(hit.collider as Node)
 
 
 func _on_body_entered(body: Node) -> void:
@@ -112,7 +140,7 @@ func _on_body_entered(body: Node) -> void:
 		return
 	stuck = true
 	hit.emit(body, global_position)
-	if body.has_method(&"on_arrow_hit"):
+	if body != null and body.has_method(&"on_arrow_hit"):
 		body.on_arrow_hit(self)
 	if Arrow.is_stone(body) and rng.randf() < data.stone_break_chance:
 		broke.emit(global_position)
