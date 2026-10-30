@@ -14,6 +14,7 @@ static func build(parent: Node3D) -> Node3D:
 	root.name = "Grounds"
 	parent.add_child(root)
 	ManorForecourt.build(root)
+	ManorWardVeil.build(root)
 	ManorTerraceBuilder.build(root)
 	ManorRoseGarden.build(root)
 	ManorHedgeMaze.build(root)
