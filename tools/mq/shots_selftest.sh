@@ -4,7 +4,9 @@
 #   tools/mq/shots_selftest.sh            (prints PASS/FAIL per scenario)
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd -P)
-T=$(mktemp -d "${TMPDIR:-/tmp}/shots-selftest.XXXXXX")
+# Physical path: on a Mac $TMPDIR is /var/... but git reports /private/var/...
+T=$(cd "$(mktemp -d "${TMPDIR:-/tmp}/shots-selftest.XXXXXX")" && pwd -P)
+TAG="selftest-game-$$"
 trap 'pkill -f "$T" 2>/dev/null; rm -rf "$T"' EXIT
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
@@ -13,6 +15,14 @@ FAILS=0 PASSES=0
 pass() { echo "PASS $*"; PASSES=$((PASSES + 1)); }
 fail() { echo "FAIL $*"; FAILS=$((FAILS + 1)); }
 check() { if eval "$2"; then pass "$1"; else fail "$1"; fi; }
+jpeg_is_1280_wide() { # stdin
+	cat >"$T/check.jpg"
+	if command -v sips >/dev/null 2>&1; then
+		[ "$(sips -g pixelWidth "$T/check.jpg" | awk '/pixelWidth/ {print $2}')" = 1280 ]
+	else
+		python3 -I -c "import sys; from PIL import Image; sys.exit(Image.open(sys.argv[1]).size != (1280, 26))" "$T/check.jpg"
+	fi
+}
 
 # ---- stand-in Godot: logs every call; user args choose what a probe does
 mkdir -p "$T/bin"
@@ -33,10 +43,10 @@ for a in "$@"; do [ "$seen" = 1 ] && user+=("$a"); [ "$a" = -- ] && seen=1; done
 mkdir -p "$XDG_DATA_HOME/godot/app_userdata/game/shader_cache" && echo save >"$XDG_DATA_HOME/godot/app_userdata/game/save.cfg"
 echo c >>"$XDG_DATA_HOME/godot/app_userdata/game/shader_cache/c"
 case "${user[0]:-}" in
-ok) base64 --decode <"$FAKE_PNG" >"${user[1]}"; echo "SHOT ok draw_calls 12" ;;
+ok) { base64 --decode <"$FAKE_PNG" 2>/dev/null || base64 -D <"$FAKE_PNG"; } >"${user[1]}"; echo "SHOT ok draw_calls 12" ;;
 two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.png"; echo '{"n":2}' >"${user[1]}/stats.json" ;;
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
-hang) sleep 300 ;;
+hang) exec sleep 300 ;;
 esac
 exit 0
 G
@@ -64,7 +74,7 @@ git clone -q "$T/origin.git" "$T/mac"
 git clone -q "$T/origin.git" "$T/cloud"
 git clone -q "$T/origin.git" "$T/other"
 mkdir -p "$T/mac/.git/mq"
-printf 'MQ_HOME_MACHINE=1\nSHOTS_GODOT=%s\nMQ_CAFFEINATE=0\nSHOTS_POLL=10\n' "$T/bin/godot" >"$T/mac/.git/mq/config"
+printf 'MQ_HOME_MACHINE=1\nSHOTS_GODOT=%s\nMQ_CAFFEINATE=0\nSHOTS_POLL=10\nSHOTS_PLAY_PATTERN=%s\n' "$T/bin/godot" "$TAG" >"$T/mac/.git/mq/config"
 MAC="$T/mac/tools/mq/shots.sh"
 REQ="$T/cloud/tools/mq/shots_request.sh"
 FETCH="$T/cloud/tools/mq/shots_fetch.sh"
@@ -93,7 +103,7 @@ check "renders windowed in the corner, Dummy audio, request size" 'grep "probe/s
 check "script probes run with -s, args after --" 'grep -q -- "-s res://probe/check.gd -- two" "$FAKE_LOG"'
 check "generators and import ran before the shots" 'grep -q -- "--headless --audio-driver Dummy --path .* -s res://tools/generators/gen.gd" "$FAKE_LOG" && grep -q -- "--import" "$FAKE_LOG"'
 check "generated content is adopted from the play folder, not rebuilt" '! grep -q "res://gen/make.gd" "$FAKE_LOG" && result A-1 | grep -q "gen cached" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v1 ]'
-check "quality layout pictures come back as JPEG, 1280 wide" '! echo "$files" | grep -qx out/cottage/cottage.png && git --git-dir="$T/origin.git" show refs/heads/shots/res-A-1:out/cottage/cottage.jpg | python3 -I -c "import sys; from PIL import Image; sys.exit(Image.open(sys.stdin.buffer).size != (1280, 26))"'
+check "quality layout pictures come back as JPEG, 1280 wide" '! echo "$files" | grep -qx out/cottage/cottage.png && git --git-dir="$T/origin.git" show refs/heads/shots/res-A-1:out/cottage/cottage.jpg | jpeg_is_1280_wide'
 check "user:// is a scratch folder, never the owner's" '! grep "probe/" "$FAKE_LOG" | grep -v "HOME=$T/mac/.git/mq/shots/userdir/" | grep -q . && [ ! -d "$HOME/.local/share/godot/app_userdata/game" ] && [ ! -d "$T/mac/.git/mq/shots/work/A-1" ]'
 check "each run starts with an empty user:// but keeps the shader cache" '[ "$(wc -l <"$T/mac/.git/mq/shots/userdir/data/godot/app_userdata/game/shader_cache/c")" -ge 2 ]'
 check "the play folder stays on main, untouched" '[ "$(git -C "$T/mac" rev-parse --abbrev-ref HEAD)" = main ] && [ -z "$(git -C "$T/mac" status --porcelain)" ]'
@@ -149,7 +159,7 @@ check "a branch not named <ID>-<n> is ignored" '! res junk && grep -q "IGNORED s
 check "the listener never pushed anything but result branches" '[ -z "$(git --git-dir="$T/origin.git" for-each-ref --format="%(refname)" refs/heads | grep -v -e "^refs/heads/main$" -e "^refs/heads/lane/x$" -e "^refs/heads/shots/req-" -e "^refs/heads/shots/res-")" ] && [ "$(git --git-dir="$T/origin.git" rev-parse main)" = "$(git -C "$T/src" rev-parse main)" ]'
 
 # 8 the owner's game comes first
-bash -c 'exec -a "/Applications/Godot.app/Contents/MacOS/Godot --path /Users/me/acotar-game" sleep 60' &
+bash -c "exec -a '/Applications/Godot.app/Contents/MacOS/Godot --path /Users/me/acotar-game $TAG' sleep 60" &
 gp=$!
 sleep 1
 request W 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'

@@ -48,6 +48,7 @@ REMOTE=$(conf SHOTS_REMOTE origin)
 POLL=$(conf SHOTS_POLL 60)
 POSITION=$(conf SHOTS_POSITION 40,40)
 WAIT_FOR_PLAY=$(conf SHOTS_WAIT_FOR_PLAY 1)
+PLAY_PATTERN=$(conf SHOTS_PLAY_PATTERN '(--path|--remote-debug)')
 PUSH=$(conf SHOTS_PUSH 1)
 KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 1)
 LAYOUT_WIDTH=$(conf SHOTS_LAYOUT_WIDTH 1280)
@@ -126,7 +127,7 @@ keep_awake() {
 owner_playing() {
 	[ "$WAIT_FOR_PLAY" = 1 ] || return 1
 	ps -A -o command= 2>/dev/null | grep -i 'godot' | grep -v grep | grep -v "$WT" |
-		grep -Ev -- '(--editor| -e( |$))' | grep -Eq -- '(--path|--remote-debug)'
+		grep -Ev -- '(--editor| -e( |$))' | grep -Eq -- "$PLAY_PATTERN"
 }
 
 # ---- the worktree that renders ----------------------------------------------
