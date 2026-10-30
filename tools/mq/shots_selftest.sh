@@ -170,7 +170,18 @@ once
 check "and are rendered once it closes" 'result W-1 | grep -qx "status ok"'
 
 # 9 background start, answer, stop
+git -C "$T/mac" worktree add -q --detach "$T/mac/.lanes/shots-lane" HEAD >>"$T/mac.out" 2>&1
+mkdir -p "$T/mac/.git/mq/bin" && cp "$T/mac/tools/mq/shots.sh" "$T/mac/tools/mq/shots_common.sh" "$T/mac/.git/mq/bin/"
 (cd "$T/mac" && bash "$MAC" --start) >>"$T/mac.out" 2>&1
+lp=$(cat "$T/mac/.git/mq/shots/lock/pid" 2>/dev/null)
+check "the listener's cwd is .lanes/shots-lane, not the play folder" '[ "$(lsof -a -d cwd -p "$lp" -Fn 2>/dev/null | sed -n "s/^n//p")" = "$T/mac/.lanes/shots-lane" ]'
+echo "# play folder edit" >>"$T/mac/tools/mq/shots.sh"
+sleep 13
+check "a change to the play folder's copy does not restart it" '! grep -q RESTARTING "$T/mac/.git/mq/shots/events.log"'
+echo "# installed copy updated" >>"$T/mac/.git/mq/bin/shots.sh"
+i=0; while [ $i -lt 30 ] && ! grep -q RESTARTING "$T/mac/.git/mq/shots/events.log"; do sleep 1; i=$((i + 1)); done
+check "a change to the installed copy restarts it, still in .lanes/shots-lane" 'grep -q RESTARTING "$T/mac/.git/mq/shots/events.log" && sleep 2 && [ "$(lsof -a -d cwd -p "$(cat "$T/mac/.git/mq/shots/lock/pid")" -Fn 2>/dev/null | sed -n "s/^n//p")" = "$T/mac/.lanes/shots-lane" ]'
+git -C "$T/mac" checkout -q tools/mq/shots.sh
 request S 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 i=0; while [ $i -lt 40 ] && ! res S-1; do sleep 1; i=$((i + 1)); done
 check "the background listener answers new requests" 'res S-1'

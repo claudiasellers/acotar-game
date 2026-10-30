@@ -616,13 +616,19 @@ setup_run() {
 	refuse_unless_home
 	GODOT=$(find_godot) || { event "STALLED no Godot found (set SHOTS_GODOT in $CONF)"; shots_die "no Godot found; set SHOTS_GODOT=/path/to/Godot in $CONF"; }
 	GODOT_VERSION=$("$GODOT" --version 2>/dev/null | head -1)
-	cd "$REPO" || exit 1
+	cd_lane
 }
 
+# The listener's cwd is its own standing lane, never the play folder (that is for
+# playing only). Without the lane (a bare repo, a selftest) it stays where it is.
+LANE="$REPO/.lanes/shots-lane"
+cd_lane() { if [ -d "$LANE" ]; then cd "$LANE" || exit 1; fi; }
+
 # The loop runs from a copy of these scripts, so `make update` can rewrite the
-# originals safely; it re-execs onto the new copy when they change.
+# installed ones in .git/mq/bin (which only change when tools/mq merges, never the
+# play folder's copy) can be updated safely; it re-execs onto the new copy when they change.
 SRC_SUM=""
-src_sum() { cat "$REPO/tools/mq/shots.sh" "$REPO/tools/mq/shots_common.sh" 2>/dev/null | cksum; }
+src_sum() { cat "$MQ/bin/shots.sh" "$MQ/bin/shots_common.sh" 2>/dev/null | cksum; }
 
 loop() {
 	setup_run
@@ -638,7 +644,7 @@ loop() {
 		if [ "$(src_sum)" != "$SRC_SUM" ]; then
 			event "RESTARTING onto updated listener scripts"
 			mkdir -p "$S/bin"
-			cp "$REPO/tools/mq/shots.sh" "$REPO/tools/mq/shots_common.sh" "$S/bin/"
+			cp "$MQ/bin/shots.sh" "$MQ/bin/shots_common.sh" "$S/bin/"
 			exec bash "$S/bin/shots.sh" --loop-here
 		fi
 		local n=0
@@ -652,7 +658,7 @@ start() {
 	if listener_running; then echo "Shot listener already running (pid $(lock_pid))."; return 0; fi
 	mkdir -p "$S/bin"
 	cp "$SHOTS_SELF_DIR/shots.sh" "$SHOTS_SELF_DIR/shots_common.sh" "$S/bin/"
-	nohup bash "$S/bin/shots.sh" --loop-here </dev/null >>"$S/listener.log" 2>&1 &
+	(cd_lane && nohup bash "$S/bin/shots.sh" --loop-here </dev/null >>"$S/listener.log" 2>&1 &)
 	local i=0
 	while [ "$i" -lt 10 ] && ! listener_running; do sleep 1; i=$((i + 1)); done
 	listener_running && echo "Shot listener started (pid $(lock_pid)). Log: $EVENTS" || shots_die "listener did not start; see $S/listener.log"
