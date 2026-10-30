@@ -6,9 +6,9 @@
 script = ExtResource("1")
 id = &"ing_ash_wood"
 display_name = "Ash wood"
-description = "Pale, straight-grained ash. The one wood the fae fear. Carve it into an arrow and keep it close."
+description = "Pale, straight-grained ash. The one wood the fae fear."
 weight_class = 2
-craft_tags = Array[StringName]([&"ash_shaft"])
+craft_tags = Array[StringName]([])
 base_price = 0
 canon = "C"
 color = Color(0.851, 0.796, 0.690, 1)

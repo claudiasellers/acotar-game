@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"woods_leathers"
+display_name = "Woods leathers"
+description = "Green-brown, cut for moving quietly."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"arms", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/woods_leathers.glb"
+color = Color(0.365, 0.420, 0.290, 1)
+warmth = 0.1
+stealth = 0.35
+swift = 0.05
+reaction_tag = &"hunter"
+source = &"seamstress"
+phase = 4
+canon = "X"

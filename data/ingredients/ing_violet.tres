@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_violet"
+display_name = "Sweet violet"
+description = "Shy purple flowers in the glen."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.482, 0.310, 0.690, 1)
+tags = Array[StringName]([&"quiet", &"cool"])
+regions = Array[StringName]([&"reg_mirror_lakes", &"reg_estate_woods"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"common"
+edible = false
+nutrition = 0.0
+food_days = 0.0
+pigment = &"violet"

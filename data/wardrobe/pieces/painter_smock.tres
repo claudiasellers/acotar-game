@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"painter_smock"
+display_name = "Painter's smock"
+description = "Already smudged, and she loves it."
+slots = Array[StringName]([&"top"])
+hides_body_regions = Array[StringName]([&"torso", &"arms"])
+mesh_path = "res://characters/feyre/wardrobe/painter_smock.glb"
+color = Color(0.914, 0.878, 0.812, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"painter"
+source = &"painting_room"
+phase = 4
+canon = "X"

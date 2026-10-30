@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"solstice_gown_blush"
+display_name = "Solstice gown (blush)"
+description = "Made for dancing under the longest day."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"arms", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_solstice.glb"
+color = Color(0.969, 0.812, 0.847, 1)
+warmth = 0.0
+stealth = -0.3
+swift = 0.0
+reaction_tag = &"fae"
+source = &"alis_gift"
+phase = 6
+canon = "C?"

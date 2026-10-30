@@ -39,9 +39,14 @@ func _process(delta: float) -> void:
 	if feyre:
 		lines.append("Arrows: %d   Stamina: %d" % [feyre.quiver, roundi(feyre.stamina)])
 		lines.append("Draw: %d%%" % roundi(feyre.draw_amount * 100.0))
+		if feyre.body_state:
+			lines.append("Hunger %d%%  Cold %d%%  Coin %d  Sketches %d  Journal %d  Family food %.1f d" % [
+				roundi(feyre.body_state.hunger * 100.0), roundi(feyre.body_state.cold * 100.0),
+				Gameplay.inventory.coin, Gameplay.sketchbook.count(), Gameplay.journal.count(),
+				Gameplay.food_tally.days_of_food])
 		_crosshair.visible = feyre.is_aiming or feyre.is_drawing
 	lines.append("Flags: %s" % ", ".join(PackedStringArray(WorldState.all_flags().keys())))
-	lines.append("WASD move, Shift sprint, Space jump/climb, hold LMB draw, RMB aim, E pick up arrow")
+	lines.append("WASD move, Shift sprint, Space jump/climb, hold LMB draw, RMB aim, E interact, Q arrow type, R craft arrow")
 	_info.text = "\n".join(lines)
 	_deed_timer -= delta
 	_deed.visible = _deed_timer > 0.0

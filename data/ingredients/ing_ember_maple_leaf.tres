@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_ember_maple_leaf"
+display_name = "Ember maple leaf"
+description = "A leaf from over the Autumn border, warm to touch."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.784, 0.251, 0.118, 1)
+tags = Array[StringName]([&"warm", &"fae"])
+regions = Array[StringName]([&"reg_autumn_border"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"common"
+edible = false
+nutrition = 0.0
+food_days = 0.0
+pigment = &"red"

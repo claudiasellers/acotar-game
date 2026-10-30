@@ -11,3 +11,4 @@ weight_class = 0
 craft_tags = Array[StringName]([&"shaft"])
 base_price = 0
 color = Color(0.690, 0.541, 0.353, 1)
+canon = "X"

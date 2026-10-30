@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MakeupData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/makeup_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"eyes_smoke"
+display_name = "Soft smoke"
+channel = &"eyeshadow"
+color = Color(0.431, 0.400, 0.463, 1)
+amount = 0.5
+sheen = 0.1

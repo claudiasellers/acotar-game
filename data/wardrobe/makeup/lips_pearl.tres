@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MakeupData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/makeup_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lips_pearl"
+display_name = "Pearl gloss"
+channel = &"lips"
+color = Color(0.949, 0.851, 0.871, 1)
+amount = 0.4
+sheen = 0.9

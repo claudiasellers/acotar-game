@@ -51,7 +51,7 @@ ing("ing_moonflower", "Moonflower", ["bright", "fae"], [LAKES], "spring", TINY, 
 ing("ing_glowcap", "Glowcap", ["bright"], [WOODS], "spring", SMALL, nut=0.02, color="9fe3c4", desc="A mushroom that gives off a soft green light.")
 ing("ing_hollow_root", "Hollow-root", ["quiet", "bind"], [WOODS], "spring", SMALL, nut=0.02, ab="uncommon", color="8c7b65", desc="A pale root that swallows sound and scent.")
 ing("ing_faelight_dandelion", "Faelight dandelion", ["swift", "fae"], [WOODS, MARCH, GREEN], "spring", TINY, nut=0.0, color="fff4b0", desc="Its seeds drift off as little lights.")
-ing("ing_ash_wood", "Ash wood", ["ash"], [W, OLD, ASHG], "any", MEDIUM, edible=False, nut=0.0, respawn=30, ab="rare", price=0, canon="C", color="d9cbb0", craft=["ash_shaft"], desc="Pale, straight-grained ash. The one wood the fae fear. Carve it into an arrow and keep it close.")
+ing("ing_ash_wood", "Ash wood", ["ash"], [W, OLD, ASHG], "any", MEDIUM, edible=False, nut=0.0, respawn=30, ab="rare", price=0, canon="C", color="d9cbb0", desc="Pale, straight-grained ash. The one wood the fae fear.")
 ing("ing_oak_gall", "Oak gall", ["bind", "bitter"], [W, OLD], "any", TINY, edible=False, respawn=6, color="8a6d45", pigment="black", desc="Hard little galls; good for ink.")
 ing("ing_woad", "Woad", ["steady"], [V, W, COT], "any", SMALL, edible=False, respawn=5, ab="uncommon", price=2, color="2f4f8f", pigment="blue", desc="Dried leaves that make a deep blue.")
 ing("ing_madder", "Madder root", ["warm"], [V, W, VALE], "any", SMALL, edible=False, respawn=5, ab="uncommon", price=2, color="a83226", pigment="red", desc="A root that bleeds red dye.")
@@ -65,22 +65,22 @@ ing("ing_blighted_petals", "Blighted petals", ["bitter", "fae"], [BLIGHT], "spri
 
 # ---- Flora and finds: human-realm winter additions (world lane request) ----
 ing("ing_holly_berry", "Holly berries", ["bitter", "warm"], [W, COT], "winter", TINY, edible=False, respawn=5, color="c1121f", pigment="red", desc="Bright and poisonous. The red is worth crushing for paint.")
-ing("ing_juniper_berry", "Juniper berries", ["warm", "keen"], [W, WALLH], "winter", TINY, nut=0.02, respawn=4, color="3d4f7a", desc="Resinous blue berries that clear the head.")
-ing("ing_sloe", "Sloes", ["bitter", "bind"], [W, V], "winter", TINY, nut=0.02, respawn=4, color="2e3047", desc="Frost-sweetened, still mouth-puckering.")
+ing("ing_juniper_berry", "Juniper berries", ["warm", "keen"], [W, WALLH, FELLS], "any", TINY, nut=0.02, respawn=4, color="3d4f7a", desc="Resinous blue berries that clear the head.")
+ing("ing_sloe", "Sloes", ["bitter", "bind"], [W, V, ROSE], "any", TINY, nut=0.02, respawn=4, color="2e3047", desc="Frost-sweetened, still mouth-puckering.")
 ing("ing_hawthorn_haw", "Hawthorn haws", ["vital", "steady"], [W, V, COT], "winter", TINY, nut=0.03, food=0.03, respawn=3, color="9b1d20", desc="Mealy red haws left on the hedge for the birds.")
-ing("ing_birch_bark", "Birch bark", ["bind"], [W, RIV], "any", SMALL, edible=False, respawn=6, color="eae7df", craft=["tinder"], desc="Papery bark that lights even when damp.")
+ing("ing_birch_bark", "Birch bark", ["vital", "bind"], [W, RIV, LAKES, FELLS], "any", SMALL, edible=False, respawn=6, color="eae7df", craft=["tinder"], desc="Papery bark that lights even when damp.")
 ing("ing_chaga", "Chaga", ["vital", "warm"], [W, OLD], "winter", SMALL, nut=0.0, respawn=10, ab="rare", price=3, color="3a2a1e", desc="A charred-looking growth on birch; makes a warming tea.")
 ing("ing_tinder_fungus", "Tinder fungus", ["warm"], [W, OLD], "any", SMALL, edible=False, respawn=8, ab="uncommon", color="7a5a3a", craft=["tinder"], desc="Hoof-shaped bracket that holds an ember for hours.")
 ing("ing_old_mans_beard", "Old man's beard", ["vital", "bind"], [W, WALLH], "winter", TINY, edible=False, respawn=6, color="b8c4a8", desc="Grey-green lichen streaming from old branches; packs a wound.")
 ing("ing_acorn", "Acorns", ["strong", "bitter"], [W, OLD], "any", TINY, nut=0.03, food=0.02, respawn=4, color="8b6b3e", desc="Bitter until leached. The hungry eat them anyway.")
-ing("ing_hazelnut", "Hazelnuts", ["vital", "strong"], [W, V], "winter", TINY, nut=0.05, food=0.05, respawn=5, ab="uncommon", color="a0743f", desc="A squirrel's cache, found under the snow.")
+ing("ing_hazelnut", "Hazelnuts", ["vital", "strong"], [W, V, FELLS, "reg_autumn_border"], "any", TINY, nut=0.05, food=0.05, respawn=5, ab="uncommon", color="a0743f", desc="A squirrel's cache, found under the snow.")
 ing("ing_pine_needles", "Pine needles", ["warm", "keen"], [W, OLD, WALLH], "any", TINY, nut=0.0, respawn=1, color="2f5233", desc="A bitter, bright tea against the cold.")
 ing("ing_frozen_reed", "Frozen reeds", ["quiet"], [RIV], "winter", SMALL, edible=False, respawn=5, color="b5a77a", desc="Hollow reeds locked in the river ice; good for snare work and whistles.")
 ing("ing_mistletoe", "Mistletoe", ["bitter", "fae"], [W, OLD], "winter", TINY, edible=False, respawn=8, ab="rare", color="d7e2c0", desc="Villagers say the fae love it. Feyre leaves it where it grows, mostly.")
 ing("ing_wintergreen", "Wintergreen", ["cool", "vital"], [W], "winter", TINY, nut=0.01, respawn=3, color="2e6b4f", desc="Glossy leaves under the snow, with a sharp minty bite.")
 ing("ing_shed_antler", "Shed antler", [], [W, OLD], "winter", MEDIUM, edible=False, respawn=20, ab="rare", price=3, color="d8cbb2", craft=["arrowhead_blank", "handle"], desc="Dropped by a stag. Carves into toggles, handles, even points.")
 ing("ing_flint", "Flint", [], [W, RIV, BURNT], "any", SMALL, edible=False, respawn=10, ab="uncommon", price=1, color="4a4a52", craft=["knappable"], desc="Knaps into arrowheads, and strikes sparks.")
-ing("ing_chalk", "Chalk", [], [V, RIV], "any", SMALL, edible=False, respawn=10, color="f2f0e8", pigment="white", desc="Soft white stone; a white for painting.")
+ing("ing_chalk", "Chalk", ["steady"], [V, RIV, FELLS], "any", SMALL, edible=False, respawn=10, color="f2f0e8", pigment="white", desc="Soft white stone; a white for painting.")
 ing("ing_red_ochre", "Red ochre", [], [RIV, BURNT], "any", SMALL, edible=False, respawn=10, ab="uncommon", price=2, color="a4472d", pigment="ochre_red", desc="Earth red from the riverbank cut.")
 ing("ing_charcoal", "Charcoal", ["warm"], [BURNT, COT], "any", SMALL, edible=False, respawn=7, color="1c1c1c", pigment="black", craft=["tinder"], desc="From the burnt estate's beams. Draws, and burns again.")
 ing("ing_clay", "Clay", ["bind"], [RIV], "any", SMALL, edible=False, respawn=6, color="9c8770", desc="Riverbank clay for sealing and for binding pigment.")
@@ -110,7 +110,7 @@ ing("ing_rose_maze_dew", "Rose-maze dew", ["vital", "quiet"], [MAN], "spring", S
 ing("ing_rite_spring", "Rite spring water", ["strong", "fae"], [CAL], "spring", SMALL, nut=0.0, respawn=3, ab="rare", color="a9c9d6", desc="From the spring in the cave of the Rite.")
 ing("ing_river_silt", "River silt", ["bind"], [LAKES, RIV], "any", SMALL, edible=False, respawn=3, color="9a7b4f", pigment="ochre", desc="Fine silt; an ochre pigment and a binder.")
 ing("ing_salt", "Salt", ["preserve"], [V], "any", SMALL, nut=0.0, respawn=0, price=2, color="f4f4f4", desc="Bought dear at the market. Keeps meat through the winter.")
-ing("ing_iron_filings", "Iron filings", ["iron"], [V], "any", SMALL, edible=False, respawn=0, price=3, canon="C?", color="5b5b60", desc="Village folk-protection against the fae. Applied, never eaten.")
+ing("ing_iron_filings", "Iron filings", [], [V], "any", SMALL, edible=False, respawn=0, price=3, canon="C", color="5b5b60", desc="Villagers swear iron wards off faeries. It doesn't; only humans believe it.")
 
 # ---- Prepared foods ----
 ing("ing_manor_fruit", "Manor fruit", ["vital"], [MAN], "spring", SMALL, nut=0.15, food=0.3, respawn=1, canon="C", color="f0a04b", desc="Platters of impossible fruit at every meal.")
@@ -120,9 +120,57 @@ ing("ing_candied_flowers", "Candied flowers", ["swift", "fae"], [MAN, HAM], "spr
 ing("ing_stale_bread", "Stale bread", ["vital"], [COT, V], "any", SMALL, nut=0.08, food=0.25, respawn=0, price=1, canon="C", color="b89a6a", desc="Thin porridge and stale bread: the cottage's usual.")
 ing("ing_venison_stew", "Venison stew", ["vital", "warm"], [COT], "any", MEDIUM, nut=0.4, food=1.0, respawn=0, canon="C", color="6b3a26", desc="Her kills feed the family.")
 
+
+# ---- Wider Spring Court additions (wider-court lane request, all [X]) ----
+for _id, _name, _tags, _pig, _regions, _color, _desc in [
+	("ing_watermint", "Water mint", ["cool", "keen"], "", [LAKES, WOODS], "4f9a6a", "Crushed underfoot at the stream's edge."),
+	("ing_meadowsweet", "Meadowsweet", ["vital", "quiet"], "", [GREEN, LAKES], "f4ecd2", "Frothy cream flowers in damp meadows."),
+	("ing_cowslip", "Cowslip", ["bright", "swift"], "", [GREEN, CAL], "f2d24b", "Nodding yellow bells on the downs."),
+	("ing_heather", "Heather", ["steady", "warm"], "", [FELLS], "9b5a8c", "Purple across the fells."),
+	("ing_bilberry", "Bilberry", ["vital", "keen"], "", [FELLS], "3b3f78", "Dusky berries that stain the fingers."),
+	("ing_wild_thyme", "Wild thyme", ["warm", "strong"], "", [FELLS, GREEN], "8f7fb0", "Tiny and fierce-scented."),
+	("ing_yarrow", "Yarrow", ["vital", "bind"], "", [GREEN, VALE], "efe9dc", "Feathery leaves for wounds."),
+	("ing_chamomile", "Chamomile", ["quiet", "steady"], "", [GREEN, VALE], "fbf5d6", "Apple-scented daisies."),
+	("ing_red_poppy", "Red poppy", ["quiet", "bitter"], "red", ["reg_solstice_meadow", GREEN], "d62828", "Papery red, a drowsy sap."),
+	("ing_cornflower", "Cornflower", ["keen", "cool"], "blue", [GREEN, VALE], "4f74d9", "The bluest blue in the meadows."),
+	("ing_water_lily", "Water lily", ["cool", "fae"], "", [LAKES], "f6e3ef", "Opens on the still pools."),
+	("ing_marsh_marigold", "Marsh marigold", ["bright", "warm"], "yellow", [LAKES], "f6c12b", "Gold cups at the lake margins."),
+	("ing_bulrush_root", "Bulrush root", ["bind", "vital"], "", [LAKES], "c9b38a", "Starchy root from the shallows."),
+	("ing_mirror_reed", "Mirror reed", ["keen", "cool"], "", [LAKES], "bcd6d0", "Reeds that hold a reflection a moment too long."),
+	("ing_chanterelle", "Chanterelle", ["vital", "warm"], "", [WOODS, "reg_autumn_border"], "f0a830", "Apricot-scented gold mushrooms."),
+	("ing_fly_agaric", "Fly agaric", ["bitter", "fae"], "", ["reg_autumn_border"], "d7263d", "Red cap, white spots. No."),
+	("ing_rowan_berry", "Rowan berry", ["bitter", "steady"], "", ["reg_autumn_border"], "e0521b", "Bright clusters at the autumn edge."),
+	("ing_ember_maple_leaf", "Ember maple leaf", ["warm", "fae"], "red", ["reg_autumn_border"], "c8401e", "A leaf from over the Autumn border, warm to touch."),
+	("ing_spring_apple", "Spring apple", ["vital", "swift"], "", [VALE], "9cc94a", "Crisp, always in season."),
+	("ing_honeyplum", "Honeyplum", ["vital", "bright"], "", [VALE], "c25a8a", "Plums that taste of honey."),
+	("ing_quince", "Quince", ["bind", "warm"], "", [VALE], "e8cf55", "Hard and fragrant; sets jellies."),
+	("ing_cherry", "Cherry", ["vital", "bright"], "", [VALE, MAN], "a31621", "Dark sweet cherries."),
+	("ing_fire_lily", "Fire lily", ["warm", "strong"], "orange", [CAL], "f26a1b", "Blooms around the bonfire fields."),
+	("ing_ochre_clay", "Ochre clay", ["bind"], "ochre", [CAL, FELLS], "c58b3a", "Yellow-brown earth pigment."),
+	("ing_lapis_shard", "Lapis shard", ["keen"], "blue", [SHRINE], "26619c", "Ultramarine, the rarest blue."),
+	("ing_grey_lichen", "Grey lichen", ["bitter", "quiet"], "", [BLIGHT], "8a8c84", "Creeps over everything in the blight."),
+	("ing_ashen_rose", "Ashen rose", ["bitter", "fae"], "grey", [BLIGHT], "8d8a86", "A rose drained of colour."),
+	("ing_nightshade", "Nightshade", ["bitter", "strong"], "", [BLIGHT], "4b2a5c", "Purple berries at the blight's edge."),
+	("ing_violet", "Sweet violet", ["quiet", "cool"], "violet", [LAKES, WOODS], "7b4fb0", "Shy purple flowers in the glen."),
+	("ing_primrose", "Primrose", ["bright", "vital"], "", [WOODS, GREEN, VALE, MAN, MARCH], "f6e58d", "Pale yellow, everywhere in Spring."),
+	("ing_wood_sorrel", "Wood sorrel", ["cool", "keen"], "", [WOODS, LAKES], "b7e08f", "Lemony clover-leaves."),
+	("ing_nettle", "Nettle", ["strong", "bitter"], "", [HAM, V], "3f6b35", "Stings, then feeds."),
+	("ing_dandelion", "Dandelion", ["vital"], "", [GREEN, HAM], "f7d038", "Bitter greens, bright heads."),
+	("ing_clover", "Clover", ["vital", "swift"], "", [GREEN, VALE], "e4a5c0", "Sweet pink heads in the grass."),
+	("ing_dreamcap", "Dreamcap", ["quiet", "fae"], "", [LAKES], "a9a2e8", "A pale mushroom that only shows at night."),
+	("ing_spider_silk", "Spider silk", ["bind"], "", [ROSE, "reg_autumn_border"], "f1f1f1", "Dewy silk from the thorn brakes."),
+	("ing_wild_garlic", "Wild garlic", ["strong", "keen"], "", [LAKES, ASHG], "e9f2df", "Carpets the shade; smells for miles."),
+	("ing_sweet_woodruff", "Sweet woodruff", ["quiet", "steady"], "", [ASHG], "d5ead0", "Smells of new hay once dried."),
+	("ing_mugwort", "Mugwort", ["keen", "bitter"], "", [SHRINE], "8fa38a", "Grows thick around the old shrines."),
+]:
+	_night = _id == "ing_dreamcap"
+	_edible = not _pig and _id not in ("ing_fly_agaric", "ing_nightshade", "ing_spider_silk", "ing_ochre_clay", "ing_lapis_shard", "ing_grey_lichen", "ing_ashen_rose")
+	ing(_id, _name, _tags, _regions, "spring", TINY, edible=_edible, nut=0.04 if _edible else 0.0, ab="uncommon" if _id in ("ing_lapis_shard", "ing_fly_agaric", "ing_dreamcap") else "common", color=_color, pigment=_pig, desc=_desc, night_only=_night)
+
 # ---- Crafting materials (not foraged; made or bought) ----
 MATERIALS = [
 	dict(id="mat_shaft", name="Arrow shaft", wc=TINY, craft=["shaft"], price=0, color="b08a5a", desc="A straight, scraped hazel shaft."),
+	dict(id="obj_wolf_pelt", name="The great wolf's pelt", wc=LARGE, craft=[], price=40, color="8d8a84", canon="C", desc="Too big for any wolf. It sells for more than she's seen in years."),
 	dict(id="mat_arrowhead", name="Arrowhead", wc=TINY, craft=["arrowhead"], price=1, color="55555c", desc="Knapped flint or a cheap iron head from the market."),
 ]
 
@@ -153,6 +201,30 @@ C = [
 	("col_heart_stone", "Heart-shaped stone", [RIV, LAKES, GREEN], "She'd scoff at it. She keeps it.", "a09080", "uncommon"),
 	("col_blighted_bloom", "Petrified bloom", [BLIGHT], "A rose turned to grey stone. It's cold.", "6e6a5f", "uncommon"),
 	("col_horseshoe", "Old horseshoe", [V, MARCH], "Iron. Villagers nail these over doors.", "5b5b60", "uncommon"),
+	("col_feather_kingfisher", "Kingfisher feather", [LAKES], "A flash of impossible blue.", "1f8fbf", "rare"),
+	("col_feather_pheasant", "Pheasant feather", [GREEN, VALE], "Copper and black bars.", "a65a2a", "common"),
+	("col_feather_swan", "Swan feather", [LAKES], "Long, white, perfect.", "f7f7f2", "uncommon"),
+	("col_feather_heron", "Heron feather", [LAKES], "Slate grey and soft.", "8a96a0", "uncommon"),
+	("col_shell_river_mussel", "Mussel shell", [LAKES, RIV], "Mother-of-pearl inside.", "4a5a6a", "common"),
+	("col_stone_quartz", "Quartz", [FELLS, SHRINE], "Clear as frozen water.", "eef0f2", "uncommon"),
+	("col_stone_amber", "Amber", [WOODS, FELLS], "A gnat caught in gold.", "e0952b", "rare"),
+	("col_stone_garnet", "Garnet", [FELLS], "A drop of dark red.", "7b1e2b", "rare"),
+	("col_stone_obsidian", "Obsidian", [CAL], "Black glass from the Rite hills.", "1b1b22", "uncommon"),
+	("col_stone_starglass", "Starglass", [LAKES], "Glows faintly at night.", "cfe0ff", "rare"),
+	("col_stone_fossil", "Fossil", [FELLS, SHRINE], "A shell from before the sea left.", "bfae92", "uncommon"),
+	("col_shrine_tile", "Shrine tile", [SHRINE], "A glazed tile with a faded eye.", "3f7a8c", "uncommon"),
+	("col_calanmai_ribbon", "Calanmai ribbon", [CAL], "Singed at one end.", "c0392b", "uncommon"),
+	("col_solstice_bead", "Solstice bead", ["reg_solstice_meadow", MAN], "Gold glass, warm in the hand.", "e8b730", "uncommon"),
+	("col_leaf_gilded", "Gilded leaf", [MAN, WOODS], "Real gold leaf, or a glamour.", "d4af37", "rare"),
+	("col_acorn_carved", "Carved acorn", [HAM], "A tiny face carved into it.", "8b6b3e", "uncommon"),
+	("col_wool_tuft", "Wool tuft", [GREEN], "Caught on a thorn by the shepherds' path.", "efe8dc", "common"),
+	("col_candle_stub", "Candle stub", [SHRINE, HAM], "Beeswax, still faintly sweet.", "e9d8a6", "common"),
+	("col_beetle_jewel", "Jewel beetle wing", [VALE, WOODS], "Iridescent green.", "2e8b57", "uncommon"),
+	("col_snake_skin", "Shed snake skin", [FELLS, LAKES], "Whole, papery, patterned.", "cbbf9a", "uncommon"),
+	("col_driftwood", "Driftwood", [LAKES], "Silver and smooth.", "b9b2a4", "common"),
+	("col_seed_pod", "Seed pod", [GREEN, "reg_autumn_border"], "Rattles when shaken.", "a08a5a", "common"),
+	("col_bone_bleached", "Bleached bone", [BLIGHT, FELLS], "Small, white, unsettling.", "eae5d8", "uncommon"),
+	("col_pinecone", "Pinecone", [W, FELLS], "Perfectly whole.", "6b4b2a", "common"),
 	("col_snow_owl_down", "Owl down", [W, WALLH], "A wisp of white down caught on bark.", "f5f2ea", "common"),
 ]
 
@@ -162,7 +234,7 @@ ARROWS = [
 	     desc="Hazel shaft, feather fletching, a flint or iron head."),
 	dict(id="ash", item_id="arrow_ash", name="Ash arrow", mass=0.034, drag=0.0020, wet=1.6, wspeed=0.93,
 	     brk=0.2, fae=True, dmg=1.5, shaft="e3d6bd", fletch="8b5a2b", price=0,
-	     desc="Carved whole from ash wood. The one thing the fae truly fear."),
+	     desc="Mountain-ash shaft, iron head, bought from a travelling peddler. The one thing the fae truly fear. She keeps it for faeries."),
 ]
 
 # id, name, inputs{key:count}, output, count
@@ -171,7 +243,6 @@ RECIPES = [
 	("knap_arrowhead", "Knap arrowheads", {"ing_flint": 1}, "mat_arrowhead", 2),
 	("antler_arrowhead", "Carve antler points", {"ing_shed_antler": 1}, "mat_arrowhead", 4),
 	("arrow_wood", "Wood arrow", {"mat_shaft": 1, "tag:fletching": 1, "mat_arrowhead": 1}, "arrow_wood", 1),
-	("arrow_ash", "Ash arrow", {"ing_ash_wood": 1, "tag:fletching": 1}, "arrow_ash", 1),
 ]
 
 STATIONS = [
@@ -198,6 +269,68 @@ DISHES = [
 	("blackberry_tea", "Blackberry tea", "infuse", ["ing_blackberry"], ""),
 	("hedgerow_porridge", "Hedgerow porridge", "stew", ["ing_stale_bread", "ing_hawthorn_haw"], "Stale bread stretched with haws. It's food."),
 	("trout_roast", "Roast trout", "roast", ["ing_trout"], ""),
+]
+
+
+# ---- Wardrobe (R3: dress-up is a headline feature) ----
+# Palettes: candy-bright pastels with gold accents (engineering-rules R3).
+PASTELS = {"rose": "f4a6c0", "blush": "f7cfd8", "lilac": "c8a8e9", "periwinkle": "a7b8f2",
+	"mint": "b5ead7", "butter": "fbe7a1", "pearl": "f6f1ea", "gold": "e6c06a", "sage": "b7c9a8",
+	"cream": "f3ead6", "ivory": "fbf6ea", "sky": "b9dcf5", "peach": "f9c9a8", "emerald": "4fae86"}
+# id, name, slots, hides, colours (None = single), warmth, stealth, swift, reaction, source, phase, canon, mesh, desc
+PIECES = [
+	("hunter_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"": "6f6a63"}, 0.2, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_tunic", "Worn soft, patched at both elbows."),
+	("hunter_trousers", "Hunting trousers", ["bottom"], ["legs"], {"": "5a5146"}, 0.1, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_trousers", ""),
+	("hunter_cloak", "Heavy patched cloak", ["outer"], [], {"": "4b4f57"}, 0.4, 0.2, 0, "hunter", "cottage_chest", 0, "C", "hunter_cloak", "Hood up, she disappears into the snow."),
+	("hunter_boots", "Old boots", ["feet"], ["feet"], {"": "4a3a2c"}, 0.1, 0.1, 0, "", "cottage_chest", 0, "C", "hunter_boots", ""),
+	("spring_tunic", "Fine tunic", ["top"], ["torso", "arms"], {k: PASTELS[k] for k in ("sage", "cream", "rose", "lilac", "sky")}, 0.0, 0, 0.05, "", "manor_wardrobe", 2, "C", "spring_tunic", "She chooses tunics over gowns whenever she can."),
+	("spring_trousers", "Fine trousers", ["bottom"], ["legs"], {k: PASTELS[k] for k in ("cream", "sage", "pearl")}, 0.0, 0, 0.05, "", "manor_wardrobe", 2, "C", "spring_trousers", ""),
+	("riding_leathers", "Riding leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8a5a3c", "rose": "b9707f"}, 0.1, 0.1, 0.15, "rider", "stables", 2, "X", "riding_leathers", ""),
+	("woods_leathers", "Woods leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "5d6b4a", "mint": "7fa58f"}, 0.1, 0.35, 0.05, "hunter", "seamstress", 4, "X", "woods_leathers", "Green-brown, cut for moving quietly."),
+	("dinner_gown", "Dinner gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "lilac", "ivory", "periwinkle", "blush")}, 0.0, -0.3, 0, "formal", "alis", 2, "C", "gown_dinner", "Flowing, light as breath. Alis insists."),
+	("solstice_gown", "Solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {k: PASTELS[k] for k in ("butter", "mint", "blush", "gold")}, 0.0, -0.3, 0, "fae", "alis_gift", 6, "C?", "gown_solstice", "Made for dancing under the longest day."),
+	("ball_gown", "Ball gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "periwinkle", "pearl", "lilac", "emerald")}, 0.0, -0.5, -0.1, "formal", "manor_wardrobe", 3, "X", "gown_ball", "Layers of tulle, a bodice stitched with tiny roses."),
+	("garden_dress", "Garden tea dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("mint", "butter", "peach", "sky")}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 2, "X", "gown_garden", "Short sleeves and a skirt that swishes."),
+	("starlight_gown", "Starlight gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "c9d6ff", "lilac": "d8c8f4"}, 0.0, -0.4, 0, "fae", "seamstress", 4, "X", "gown_starlight", "It holds a little light of its own after dark."),
+	("rose_petal_gown", "Rose-petal gown", ["top", "bottom"], ["torso", "legs"], {"": "f08aa8", "gold": "f2c879", "pearl": "f7e8ef"}, 0.0, -0.4, 0, "formal", "manor_wardrobe", 4, "X", "gown_rose_petal", "A skirt of layered silk petals."),
+	("painter_smock", "Painter's smock", ["top"], ["torso", "arms"], {"": "e9e0cf", "blush": "f3d6db"}, 0.0, 0, 0, "painter", "painting_room", 4, "X", "painter_smock", "Already smudged, and she loves it."),
+	("velvet_cloak", "Velvet cloak", ["outer"], [], {k: PASTELS[k] for k in ("rose", "lilac", "emerald", "periwinkle")}, 0.3, 0.0, 0, "formal", "manor_wardrobe", 3, "X", "velvet_cloak", ""),
+	("satin_slippers", "Satin slippers", ["feet"], ["feet"], {k: PASTELS[k] for k in ("blush", "pearl", "lilac", "gold", "mint")}, 0.0, 0.1, 0, "formal", "manor_wardrobe", 2, "X", "slippers", ""),
+	("riding_boots", "Riding boots", ["feet"], ["feet"], {"": "6b4a33"}, 0.1, 0, 0.1, "rider", "stables", 2, "X", "riding_boots", ""),
+	("lace_gloves", "Lace gloves", ["hands"], ["hands"], {k: PASTELS[k] for k in ("ivory", "blush", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "gloves_lace", ""),
+	("flower_crown", "Flower crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "mint", "pearl")}, 0.0, 0, 0, "fae", "alis_gift", 2, "C?", "flower_crown", "Woven from the manor's own gardens."),
+	("tiara", "Tiara", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3", "pearl": PASTELS["pearl"], "rose": "e8a3b8"}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 3, "X", "tiara", "A delicate band of gilt leaves and seed pearls."),
+	("circlet", "Circlet", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3"}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
+	("pearl_necklace", "Pearl necklace", ["neck"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_pearl", ""),
+	("gold_locket", "Gold locket", ["neck"], [], {"": PASTELS["gold"]}, 0.0, 0, 0, "", "manor_wardrobe", 3, "X", "necklace_locket", ""),
+	("emerald_pendant", "Emerald pendant", ["neck"], [], {"": PASTELS["emerald"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 4, "X", "necklace_pendant", "Spring's green, on a fine chain."),
+	("rose_choker", "Rose choker", ["neck"], [], {k: PASTELS[k] for k in ("rose", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_choker", ""),
+	("butterfly_mask", "Butterfly mask", ["mask"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_butterfly", "Every revel needs a mask. She isn't cursed to wear one."),
+	("gilded_leaf_mask", "Gilded-leaf mask", ["mask"], [], {"": PASTELS["gold"], "emerald": PASTELS["emerald"]}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_leaf", ""),
+	("fox_mask", "Fox mask", ["mask"], [], {"": "d9773b"}, 0.0, 0.1, 0, "fae", "calanmai", 5, "C?", "mask_fox", "Like Lucien's, which may be the point."),
+]
+HAIR = [
+	("braid", "Hunter's braid", "C", False), ("loose", "Loose", "C", False), ("hunters_knot", "Hunter's knot", "X", False),
+	("crown_braid", "Crown braid", "X", False), ("flower_crown_hair", "Solstice flowers", "C?", True), ("half_up", "Half up, ribboned", "X", False),
+	("soft_curls", "Soft curls", "X", False), ("high_ponytail", "High ponytail", "X", False), ("wet", "Wet from the pool", "X", False),
+]
+# id, name, channel, colour, amount, sheen
+MAKEUP = [
+	("lips_rosebud", "Rosebud", "lips", "e26d8a", 0.7, 0.2), ("lips_berry", "Berry stain", "lips", "a3324f", 0.6, 0.1),
+	("lips_peach", "Peach gloss", "lips", "f2a38a", 0.6, 0.6), ("lips_coral", "Coral", "lips", "f0776a", 0.7, 0.3),
+	("lips_plum", "Plum", "lips", "7f3b63", 0.6, 0.1), ("lips_nude", "Petal nude", "lips", "d39a8e", 0.5, 0.3),
+	("lips_ruby", "Rose-garden red", "lips", "c21d3a", 0.8, 0.2), ("lips_pearl", "Pearl gloss", "lips", "f2d9de", 0.4, 0.9),
+	("eyes_lilac", "Lilac haze", "eyeshadow", "b79ad9", 0.6, 0.4), ("eyes_gold", "Gold leaf", "eyeshadow", "e3bc5c", 0.6, 0.9),
+	("eyes_rose", "Rose dust", "eyeshadow", "e9a0b4", 0.6, 0.5), ("eyes_mint", "Spring mint", "eyeshadow", "a8e0c6", 0.5, 0.4),
+	("eyes_periwinkle", "Periwinkle", "eyeshadow", "9fb1ee", 0.6, 0.4), ("eyes_smoke", "Soft smoke", "eyeshadow", "6e6676", 0.5, 0.1),
+	("eyes_champagne", "Champagne", "eyeshadow", "f1dcc0", 0.5, 0.8), ("eyes_emerald", "Emerald", "eyeshadow", "3f9b78", 0.5, 0.5),
+	("liner_kohl", "Kohl", "liner", "1f1a1e", 0.8, 0.0), ("liner_brown", "Soft brown", "liner", "4a3328", 0.7, 0.0),
+	("liner_gold", "Gold line", "liner", "e3bc5c", 0.8, 0.9),
+	("blush_rose", "Rose blush", "blush", "f08aa0", 0.4, 0.1), ("blush_peach", "Peach blush", "blush", "f4a98a", 0.4, 0.1),
+	("blush_berry", "Berry flush", "blush", "c7577a", 0.35, 0.0), ("blush_glow", "Dewy glow", "blush", "f7c6c6", 0.3, 0.7),
+	("brows_soft", "Soft brows", "brows", "6b4a32", 0.5, 0.0), ("brows_defined", "Defined brows", "brows", "4a3122", 0.7, 0.0),
+	("paint_gold_freckles", "Gold freckles", "face_paint", "e6c06a", 0.6, 1.0), ("paint_silver_dust", "Silver dust", "face_paint", "dfe5ee", 0.5, 1.0),
+	("paint_calanmai_swirl", "Calanmai swirl", "face_paint", "3a5fae", 0.7, 0.2), ("paint_petal_glitter", "Petal glitter", "face_paint", "f4a6c0", 0.5, 1.0),
 ]
 
 
@@ -232,6 +365,12 @@ def clear(dirname):
 			os.remove(os.path.join(d, name))
 
 
+def clear_rec(dirname):
+	d = os.path.join(ROOT, dirname)
+	os.makedirs(d, exist_ok=True)
+	clear(dirname)
+
+
 def main():
 	for d in ("data/ingredients", "data/collectibles", "data/arrows", "data/recipes", "data/stations", "data/dishes", "data/items"):
 		clear(d)
@@ -256,7 +395,7 @@ def main():
 	for m in MATERIALS:
 		lines = ['id = &"%s"' % m["id"], 'display_name = "%s"' % m["name"], 'description = "%s"' % esc(m["desc"]),
 			"weight_class = %d" % m["wc"], "craft_tags = %s" % sn_array(m["craft"]), "base_price = %d" % m["price"],
-			"color = %s" % color(m["color"])]
+			"color = %s" % color(m["color"]), 'canon = "%s"' % m.get("canon", "X")]
 		write("data/items/%s.tres" % m["id"], "res://data/items/item_data.gd", "ItemData", lines)
 	for cid, name, regions, desc, col, ab in C:
 		lines = ['id = &"%s"' % cid, 'display_name = "%s"' % esc(name), 'description = "%s"' % esc(desc),
@@ -288,6 +427,29 @@ def main():
 		lines = ['id = &"%s"' % did, 'display_name = "%s"' % name, 'method = &"%s"' % method,
 			"required = %s" % sn_array(req), 'journal_note = "%s"' % esc(note)]
 		write("data/dishes/%s.tres" % did, "res://data/dishes/dish_data.gd", "DishData", lines)
+
+	clear_rec("data/wardrobe/pieces"); clear_rec("data/wardrobe/hair"); clear_rec("data/wardrobe/makeup")
+	n_pieces = 0
+	for pid, name, slots, hides, colours, warmth, stealth, swift, reaction, source, phase, canon, mesh, desc in PIECES:
+		for cname, chex in colours.items():
+			vid = pid if cname == "" else "%s_%s" % (pid, cname)
+			vname = name if cname == "" else "%s (%s)" % (name, cname)
+			lines = ['id = &"%s"' % vid, 'display_name = "%s"' % esc(vname), 'description = "%s"' % esc(desc),
+				"slots = %s" % sn_array(slots), "hides_body_regions = %s" % sn_array(hides),
+				'mesh_path = "res://characters/feyre/wardrobe/%s.glb"' % mesh, "color = %s" % color(chex),
+				"warmth = %s" % float(warmth), "stealth = %s" % float(stealth), "swift = %s" % float(swift),
+				'reaction_tag = &"%s"' % reaction, 'source = &"%s"' % source, "phase = %d" % phase, 'canon = "%s"' % canon]
+			write("data/wardrobe/pieces/%s.tres" % vid, "res://data/wardrobe/wardrobe_piece.gd", "WardrobePiece", lines)
+			n_pieces += 1
+	for hid, name, canon, occ in HAIR:
+		lines = ['id = &"%s"' % hid, 'display_name = "%s"' % esc(name), 'mesh_path = "res://characters/feyre/hair/%s.glb"' % hid,
+			"occupies_head = %s" % str(occ).lower(), 'canon = "%s"' % canon]
+		write("data/wardrobe/hair/%s.tres" % hid, "res://data/wardrobe/hairstyle_data.gd", "HairstyleData", lines)
+	for mid, name, ch, chex, amt, sheen in MAKEUP:
+		lines = ['id = &"%s"' % mid, 'display_name = "%s"' % esc(name), 'channel = &"%s"' % ch, "color = %s" % color(chex),
+			"amount = %s" % amt, "sheen = %s" % sheen]
+		write("data/wardrobe/makeup/%s.tres" % mid, "res://data/wardrobe/makeup_data.gd", "MakeupData", lines)
+	print("wardrobe pieces %d (from %d designs), hairstyles %d, makeup %d" % (n_pieces, len(PIECES), len(HAIR), len(MAKEUP)))
 	print("ingredients %d, collectibles %d, materials %d, arrows %d, recipes %d, stations %d, dishes %d" % (
 		len(I), len(C), len(MATERIALS), len(ARROWS), len(RECIPES), len(STATIONS), len(DISHES)))
 

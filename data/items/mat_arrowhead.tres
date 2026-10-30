@@ -11,3 +11,4 @@ weight_class = 0
 craft_tags = Array[StringName]([&"arrowhead"])
 base_price = 1
 color = Color(0.333, 0.333, 0.361, 1)
+canon = "X"

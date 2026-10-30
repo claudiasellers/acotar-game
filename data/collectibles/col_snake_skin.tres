@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_snake_skin"
+display_name = "Shed snake skin"
+description = "Whole, papery, patterned."
+weight_class = 0
+color = Color(0.796, 0.749, 0.604, 1)
+regions = Array[StringName]([&"reg_western_fells", &"reg_mirror_lakes"])
+abundance = &"uncommon"

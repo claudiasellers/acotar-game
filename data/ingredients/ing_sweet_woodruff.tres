@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_sweet_woodruff"
+display_name = "Sweet woodruff"
+description = "Smells of new hay once dried."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.835, 0.918, 0.816, 1)
+tags = Array[StringName]([&"quiet", &"steady"])
+regions = Array[StringName]([&"reg_ash_grove"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"common"
+edible = true
+nutrition = 0.04
+food_days = 0.0
+pigment = &""

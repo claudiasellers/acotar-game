@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flower_crown_rose"
+display_name = "Flower crown (rose)"
+description = "Woven from the manor's own gardens."
+slots = Array[StringName]([&"head"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/flower_crown.glb"
+color = Color(0.957, 0.651, 0.753, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"fae"
+source = &"alis_gift"
+phase = 2
+canon = "C?"

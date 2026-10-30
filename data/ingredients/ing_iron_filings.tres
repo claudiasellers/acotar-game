@@ -6,13 +6,13 @@
 script = ExtResource("1")
 id = &"ing_iron_filings"
 display_name = "Iron filings"
-description = "Village folk-protection against the fae. Applied, never eaten."
+description = "Villagers swear iron wards off faeries. It doesn't; only humans believe it."
 weight_class = 1
 craft_tags = Array[StringName]([])
 base_price = 3
-canon = "C?"
+canon = "C"
 color = Color(0.357, 0.357, 0.376, 1)
-tags = Array[StringName]([&"iron"])
+tags = Array[StringName]([])
 regions = Array[StringName]([&"reg_village"])
 season = &"any"
 night_only = false

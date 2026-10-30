@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_calanmai_ribbon"
+display_name = "Calanmai ribbon"
+description = "Singed at one end."
+weight_class = 0
+color = Color(0.753, 0.224, 0.169, 1)
+regions = Array[StringName]([&"reg_calanmai_hills"])
+abundance = &"uncommon"

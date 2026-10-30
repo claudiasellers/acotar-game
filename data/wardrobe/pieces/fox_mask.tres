@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fox_mask"
+display_name = "Fox mask"
+description = "Like Lucien's, which may be the point."
+slots = Array[StringName]([&"mask"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/mask_fox.glb"
+color = Color(0.851, 0.467, 0.231, 1)
+warmth = 0.0
+stealth = 0.1
+swift = 0.0
+reaction_tag = &"fae"
+source = &"calanmai"
+phase = 5
+canon = "C?"

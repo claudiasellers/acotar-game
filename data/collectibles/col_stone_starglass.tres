@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_stone_starglass"
+display_name = "Starglass"
+description = "Glows faintly at night."
+weight_class = 0
+color = Color(0.812, 0.878, 1.000, 1)
+regions = Array[StringName]([&"reg_mirror_lakes"])
+abundance = &"rare"

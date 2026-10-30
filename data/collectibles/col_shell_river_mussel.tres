@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_shell_river_mussel"
+display_name = "Mussel shell"
+description = "Mother-of-pearl inside."
+weight_class = 0
+color = Color(0.290, 0.353, 0.416, 1)
+regions = Array[StringName]([&"reg_mirror_lakes", &"reg_frozen_river"])
+abundance = &"common"

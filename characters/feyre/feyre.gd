@@ -1,13 +1,18 @@
-## Placeholder Feyre for M0: third-person movement, sprint with stamina,
-## jumping, ledge mantling, and a bow that fires real arrows.
+## Feyre: third-person movement, sprint with stamina, jumping, ledge
+## mantling, plus her gameplay components (systems/): the bow, interaction,
+## body state, element state, notice moments and wardrobe.
 ##
-## The body is a capsule until the art lane delivers her model; everything
-## here is built in code so the art can be swapped in under `model` later.
+## The body is a capsule until her model exists at MODEL_SCENE; then that
+## scene is instanced under `model` instead, with no other code changes.
 class_name Feyre
 extends CharacterBody3D
 
 signal arrow_fired(arrow: Arrow)
 signal quiver_changed(count: int)
+## For creature hearing: where the bow was released and how loud (0..1).
+signal bow_released(at: Vector3, loudness: float)
+
+const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
 
 const PLAYER_LAYER := 1 << 1
 const WORLD_MASK := 1 << 0
@@ -25,15 +30,33 @@ const WORLD_MASK := 1 << 0
 @export var sprint_drain: float = 22.0
 @export var stamina_regen: float = 16.0
 @export var stamina_regen_delay: float = 0.8
-@export var quiver: int = 12
+## Wood arrows in the quiver at the start if it is empty.
+@export var starting_arrows: int = 12
 @export var max_quiver: int = 30
 @export var mouse_sensitivity: float = 0.0025
 @export var stick_sensitivity: float = 2.6
 
 var stamina: float = 100.0
-var draw_amount: float = 0.0
-var is_drawing: bool = false
 var is_aiming: bool = false
+## True on frames where the player moved the camera (cancels notice drifts).
+var look_input_this_frame: bool = false
+
+var quiver: int:
+	get:
+		return Gameplay.inventory.arrow_count()
+var draw_amount: float:
+	get:
+		return bow_controller.draw_amount if bow_controller else 0.0
+var is_drawing: bool:
+	get:
+		return bow_controller.is_drawing if bow_controller else false
+
+var bow_controller: BowController
+var interactor: Interactor
+var body_state: BodyState
+var element_state: ElementState
+var notice_director: NoticeDirector
+var wardrobe_applier: WardrobeApplier
 var is_mantling: bool = false
 
 var model: Node3D
@@ -56,6 +79,7 @@ func _ready() -> void:
 	stamina = max_stamina
 	_build_body()
 	_build_camera()
+	_build_components()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -69,8 +93,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
 			and StoryControl.can_look():
 		_rotate_camera(-event.relative.x * mouse_sensitivity, -event.relative.y * mouse_sensitivity)
+		look_input_this_frame = true
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
-		pick_up_nearest_arrow()
+		interactor.interact()
 
 
 func _process(delta: float) -> void:
@@ -78,6 +103,7 @@ func _process(delta: float) -> void:
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
 		_rotate_camera(-look.x * stick_sensitivity * delta, -look.y * stick_sensitivity * delta)
+		look_input_this_frame = true
 	_drift_toward_focus(delta)
 	var shake := StoryControl.shake
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
@@ -86,13 +112,14 @@ func _process(delta: float) -> void:
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
 	_spring_arm.position.x = lerpf(_spring_arm.position.x, shoulder, 10.0 * delta)
+	_update_breath(delta)
+	look_input_this_frame = false
 
 
 func _physics_process(delta: float) -> void:
 	if is_mantling:
 		return
 	is_aiming = Input.is_action_pressed(&"aim")
-	_update_bow(delta)
 
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	if not StoryControl.can_move():
@@ -110,6 +137,9 @@ func _physics_process(delta: float) -> void:
 		speed = sprint_speed
 	elif input.length() < 0.5:
 		speed = walk_speed
+	speed *= Gameplay.inventory.speed_multiplier() * (1.0 + Gameplay.wardrobe.swift() * 0.5)
+	if body_state:
+		body_state.exertion = 1.0 if sprinting else (0.6 if is_drawing else 0.0)
 
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
@@ -131,26 +161,29 @@ func _physics_process(delta: float) -> void:
 
 
 ## Root design doc §4.3: arrows are scarce, so stuck arrows can be collected.
-func pick_up_nearest_arrow(reach: float = 2.5) -> bool:
-	if quiver >= max_quiver:
-		return false
-	var nearest: Node3D = null
-	var best := reach
-	for arrow in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
-		var d := global_position.distance_to((arrow as Node3D).global_position)
-		if d < best:
-			best = d
-			nearest = arrow
-	if nearest == null:
-		return false
-	nearest.queue_free()
-	add_arrows(1)
-	return true
+func pick_up_nearest_arrow() -> bool:
+	return interactor.pick_up_arrow()
 
 
+## Adds (or with a negative count removes) wood arrows.
 func add_arrows(count: int) -> void:
-	quiver = clampi(quiver + count, 0, max_quiver)
+	if count > 0:
+		Gameplay.inventory.add(&"arrow_wood", count)
+	elif count < 0:
+		Gameplay.inventory.remove(&"arrow_wood", -count)
 	quiver_changed.emit(quiver)
+
+
+func drain_stamina(amount: float) -> void:
+	stamina = maxf(stamina - amount, 0.0)
+	_stamina_cooldown = stamina_regen_delay
+	if stamina <= 0.0:
+		_exhausted = true
+
+
+## Small camera turn from gameplay (notice moments), in radians.
+func nudge_camera(yaw_delta: float, pitch_delta: float) -> void:
+	_rotate_camera(yaw_delta, pitch_delta)
 
 
 func aim_point(max_distance: float = 250.0) -> Vector3:
@@ -163,29 +196,6 @@ func aim_point(max_distance: float = 250.0) -> Vector3:
 	return to
 
 
-func _update_bow(delta: float) -> void:
-	if Input.is_action_pressed(&"fire") and quiver > 0:
-		is_drawing = true
-		draw_amount = minf(draw_amount + delta / bow.draw_time, 1.0)
-	elif is_drawing:
-		_release_arrow()
-		is_drawing = false
-		draw_amount = 0.0
-
-
-func _release_arrow() -> void:
-	if quiver <= 0:
-		return
-	var muzzle := global_position + Vector3.UP * 1.45 - model.global_basis.z * 0.45
-	var direction := (aim_point() - muzzle).normalized()
-	var arrow := Arrow.create()
-	get_tree().current_scene.add_child(arrow)
-	arrow.add_collision_exception_with(self)
-	arrow.launch(muzzle, direction, lerpf(bow.min_speed, bow.max_speed, draw_amount))
-	add_arrows(-1)
-	arrow_fired.emit(arrow)
-
-
 func _update_stamina(delta: float, sprinting: bool) -> void:
 	if sprinting:
 		stamina = maxf(stamina - sprint_drain * delta, 0.0)
@@ -195,7 +205,8 @@ func _update_stamina(delta: float, sprinting: bool) -> void:
 	elif _stamina_cooldown > 0.0:
 		_stamina_cooldown -= delta
 	else:
-		stamina = minf(stamina + stamina_regen * delta, max_stamina)
+		var regen := stamina_regen * (body_state.stamina_regen_multiplier() if body_state else 1.0)
+		stamina = minf(stamina + regen * delta, max_stamina)
 	# Feyre has to catch her breath before sprinting again.
 	if _exhausted and stamina >= max_stamina * 0.35:
 		_exhausted = false
@@ -258,6 +269,85 @@ func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
 	_camera_pitch.rotation.x = clampf(_camera_pitch.rotation.x + pitch_delta, deg_to_rad(-70.0), deg_to_rad(55.0))
 
 
+func _build_components() -> void:
+	if Gameplay.inventory.arrow_count() == 0 and starting_arrows > 0:
+		Gameplay.inventory.add(&"arrow_wood", starting_arrows)
+	Gameplay.register_save_providers()
+	element_state = ElementState.new()
+	element_state.name = "ElementState"
+	element_state.insulation = Gameplay.wardrobe.warmth()
+	add_child(element_state)
+	Gameplay.wardrobe.changed.connect(func() -> void: element_state.insulation = Gameplay.wardrobe.warmth())
+	body_state = BodyState.new()
+	body_state.name = "BodyState"
+	body_state.element_state = element_state
+	add_child(body_state)
+	bow_controller = BowController.new()
+	bow_controller.name = "BowController"
+	add_child(bow_controller)
+	interactor = Interactor.new()
+	interactor.name = "Interactor"
+	add_child(interactor)
+	notice_director = NoticeDirector.new()
+	notice_director.name = "NoticeDirector"
+	add_child(notice_director)
+	wardrobe_applier = WardrobeApplier.new()
+	wardrobe_applier.name = "WardrobeApplier"
+	add_child(wardrobe_applier)
+	_build_breath()
+
+
+var _breath: GPUParticles3D
+var _breath_phase: float = 0.0
+
+
+## Visible breath in the cold (root doc §4.8): faster and bigger when she is
+## cold, hungry or working hard.
+func _build_breath() -> void:
+	_breath = GPUParticles3D.new()
+	_breath.name = "Breath"
+	_breath.amount = 10
+	_breath.lifetime = 1.4
+	_breath.emitting = false
+	_breath.position = Vector3(0, 1.55, -0.16)
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3(0, 0.2, -1)
+	mat.spread = 18.0
+	mat.initial_velocity_min = 0.25
+	mat.initial_velocity_max = 0.45
+	mat.gravity = Vector3(0, 0.08, 0)
+	mat.scale_min = 0.6
+	mat.scale_max = 1.4
+	var grad := Gradient.new()
+	grad.set_color(0, Color(1, 1, 1, 0.35))
+	grad.set_color(1, Color(1, 1, 1, 0))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = grad
+	mat.color_ramp = ramp
+	_breath.process_material = mat
+	var puff := QuadMesh.new()
+	puff.size = Vector2(0.12, 0.12)
+	var pm := StandardMaterial3D.new()
+	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pm.vertex_color_use_as_albedo = true
+	pm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	puff.material = pm
+	_breath.draw_pass_1 = puff
+	model.add_child(_breath)
+
+
+func _update_breath(delta: float) -> void:
+	if _breath == null or body_state == null:
+		return
+	var weather := Weather.find(get_tree())
+	var visible_breath := weather != null and weather.is_breath_visible()
+	_breath_phase = fmod(_breath_phase + delta * body_state.breath_rate(), 1.0)
+	# Exhale for the first 40% of each breath.
+	_breath.emitting = visible_breath and _breath_phase < 0.4
+	_breath.amount_ratio = body_state.breath_intensity()
+
+
 func _build_body() -> void:
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
@@ -270,6 +360,9 @@ func _build_body() -> void:
 	model = Node3D.new()
 	model.name = "Model"
 	add_child(model)
+	if ResourceLoader.exists(MODEL_SCENE):
+		model.add_child((load(MODEL_SCENE) as PackedScene).instantiate())
+		return
 
 	var cloak := StandardMaterial3D.new()
 	cloak.albedo_color = Color(0.36, 0.30, 0.24)

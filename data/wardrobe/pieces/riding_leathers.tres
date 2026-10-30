@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"riding_leathers"
+display_name = "Riding leathers"
+description = ""
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"arms", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/riding_leathers.glb"
+color = Color(0.541, 0.353, 0.235, 1)
+warmth = 0.1
+stealth = 0.1
+swift = 0.15
+reaction_tag = &"rider"
+source = &"stables"
+phase = 2
+canon = "X"

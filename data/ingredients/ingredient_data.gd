@@ -6,7 +6,8 @@ class_name IngredientData
 extends ItemData
 
 ## Chemistry tags: vital warm cool bright quiet swift strong steady keen
-## bitter bind fae ash iron, plus non-chemical "pigment" and "preserve".
+## bitter bind fae ash, plus non-chemical "preserve". (Iron does nothing to
+## fae in canon; only humans believe it does.)
 @export var tags: Array[StringName] = []
 ## Region ids (lore/01-world) where it grows or is found.
 @export var regions: Array[StringName] = []
@@ -34,6 +35,6 @@ func has_tag(tag: StringName) -> bool:
 	return tags.has(tag)
 
 
-## Ash and iron harm fae: they are applied (arrow coatings, wards), never eaten.
+## Ash harms fae: it is applied (arrows, ward-breaking), never eaten.
 func is_apply_only() -> bool:
-	return tags.has(&"ash") or tags.has(&"iron")
+	return tags.has(&"ash")

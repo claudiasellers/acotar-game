@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_dreamcap"
+display_name = "Dreamcap"
+description = "A pale mushroom that only shows at night."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.663, 0.635, 0.910, 1)
+tags = Array[StringName]([&"quiet", &"fae"])
+regions = Array[StringName]([&"reg_mirror_lakes"])
+season = &"spring"
+night_only = true
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"uncommon"
+edible = true
+nutrition = 0.04
+food_days = 0.0
+pigment = &""

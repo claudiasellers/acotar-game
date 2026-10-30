@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"circlet_silver"
+display_name = "Circlet (silver)"
+description = ""
+slots = Array[StringName]([&"head"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/circlet.glb"
+color = Color(0.851, 0.867, 0.890, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"formal"
+source = &"manor_wardrobe"
+phase = 3
+canon = "X"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hunter_cloak"
+display_name = "Heavy patched cloak"
+description = "Hood up, she disappears into the snow."
+slots = Array[StringName]([&"outer"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/hunter_cloak.glb"
+color = Color(0.294, 0.310, 0.341, 1)
+warmth = 0.4
+stealth = 0.2
+swift = 0.0
+reaction_tag = &"hunter"
+source = &"cottage_chest"
+phase = 0
+canon = "C"

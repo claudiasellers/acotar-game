@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"dinner_gown_rose"
+display_name = "Dinner gown (rose)"
+description = "Flowing, light as breath. Alis insists."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_dinner.glb"
+color = Color(0.957, 0.651, 0.753, 1)
+warmth = 0.0
+stealth = -0.3
+swift = 0.0
+reaction_tag = &"formal"
+source = &"alis"
+phase = 2
+canon = "C"

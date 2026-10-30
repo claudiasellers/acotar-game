@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_shrine_tile"
+display_name = "Shrine tile"
+description = "A glazed tile with a faded eye."
+weight_class = 0
+color = Color(0.247, 0.478, 0.549, 1)
+regions = Array[StringName]([&"reg_old_temples"])
+abundance = &"uncommon"

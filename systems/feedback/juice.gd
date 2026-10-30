@@ -1,0 +1,130 @@
+## The one reusable feedback effect (R3): a sparkle burst, a soft chime and a
+## little bounce for every pickup, craft, unlock and outfit change.
+##
+##   Juice.burst(node_or_null, &"pickup")      # in the world, at a Node3D
+##   Juice.bounce_control(button)              # in UI
+class_name Juice
+extends RefCounted
+
+## kind -> sparkle colours, chime notes (Hz), particle count
+const KINDS := {
+	&"pickup": {"colors": [Color(1.0, 0.85, 0.95), Color(1.0, 0.95, 0.7)], "notes": [1318.5, 1760.0], "amount": 18},
+	&"craft": {"colors": [Color(1.0, 0.9, 0.6), Color(0.85, 0.95, 1.0)], "notes": [1046.5, 1318.5, 1568.0], "amount": 26},
+	&"unlock": {"colors": [Color(0.85, 0.75, 1.0), Color(1.0, 0.8, 0.9)], "notes": [1174.7, 1480.0, 1760.0], "amount": 32},
+	&"outfit": {"colors": [Color(1.0, 0.7, 0.85), Color(1.0, 0.92, 0.6), Color(0.8, 0.85, 1.0)], "notes": [1046.5, 1318.5, 1568.0, 2093.0], "amount": 60},
+}
+
+static var _chimes: Dictionary = {}
+static var _sparkle_mesh: QuadMesh = null
+
+
+## Sparkles + chime + bounce at a Node3D (or at `at` when no node is given).
+static func burst(target: Node, kind: StringName = &"pickup", at: Vector3 = Vector3.ZERO) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var spec: Dictionary = KINDS.get(kind, KINDS[&"pickup"])
+	var pos := at
+	if target is Node3D and target.is_inside_tree():
+		pos = (target as Node3D).global_position + Vector3.UP * 1.0
+	var root: Node = tree.current_scene if tree.current_scene else tree.root
+	var fx := _sparkles(spec)
+	root.add_child(fx)
+	fx.global_position = pos
+	fx.emitting = true
+	fx.finished.connect(fx.queue_free)
+	var player := AudioStreamPlayer3D.new()
+	player.stream = chime(kind)
+	player.volume_db = -8.0
+	root.add_child(player)
+	player.global_position = pos
+	player.play()
+	player.finished.connect(player.queue_free)
+	if target is Node3D and target.is_inside_tree():
+		bounce(target as Node3D)
+
+
+static func bounce(node: Node3D, amount: float = 0.15) -> void:
+	var base := node.scale
+	var tween := node.create_tween()
+	tween.tween_property(node, ^"scale", base * (1.0 + amount), 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(node, ^"scale", base, 0.22).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+
+static func bounce_control(control: Control, amount: float = 0.12) -> void:
+	control.pivot_offset = control.size * 0.5
+	var tween := control.create_tween()
+	tween.tween_property(control, ^"scale", Vector2.ONE * (1.0 + amount), 0.08).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(control, ^"scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+
+## A soft bell chime synthesised once per kind (no audio files needed).
+static func chime(kind: StringName) -> AudioStreamWAV:
+	if _chimes.has(kind):
+		return _chimes[kind]
+	var spec: Dictionary = KINDS.get(kind, KINDS[&"pickup"])
+	var rate := 22050
+	var note_gap := 0.07
+	var notes: Array = spec.notes
+	var length: float = 0.9 + note_gap * notes.size()
+	var frames := int(rate * length)
+	var data := PackedByteArray()
+	data.resize(frames * 2)
+	for i in frames:
+		var t := float(i) / rate
+		var s := 0.0
+		for n in notes.size():
+			var start: float = n * note_gap
+			if t < start:
+				continue
+			var lt: float = t - start
+			var f: float = notes[n]
+			# Bell: fundamental plus a soft inharmonic partial, fast attack, long decay.
+			s += (sin(TAU * f * lt) + 0.35 * sin(TAU * f * 2.76 * lt) * exp(-lt * 6.0)) \
+					* exp(-lt * 4.5) * minf(lt * 200.0, 1.0)
+		var v := clampi(int(s * 0.22 * 32767.0), -32768, 32767)
+		data.encode_s16(i * 2, v)
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.stereo = false
+	wav.data = data
+	_chimes[kind] = wav
+	return wav
+
+
+static func _sparkles(spec: Dictionary) -> GPUParticles3D:
+	var p := GPUParticles3D.new()
+	p.one_shot = true
+	p.amount = int(spec.amount)
+	p.lifetime = 0.9
+	p.explosiveness = 0.85
+	var mat := ParticleProcessMaterial.new()
+	mat.direction = Vector3.UP
+	mat.spread = 180.0
+	mat.initial_velocity_min = 0.6
+	mat.initial_velocity_max = 2.0
+	mat.gravity = Vector3(0, -0.6, 0)
+	mat.scale_min = 0.5
+	mat.scale_max = 1.2
+	var grad := Gradient.new()
+	var colors: Array = spec.colors
+	grad.set_color(0, colors[0])
+	grad.set_color(1, Color(colors[colors.size() - 1], 0.0))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = grad
+	mat.color_ramp = ramp
+	p.process_material = mat
+	if _sparkle_mesh == null:
+		_sparkle_mesh = QuadMesh.new()
+		_sparkle_mesh.size = Vector2(0.05, 0.05)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		m.vertex_color_use_as_albedo = true
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		m.emission_enabled = true
+		m.emission = Color(1, 0.9, 1)
+		_sparkle_mesh.material = m
+	p.draw_pass_1 = _sparkle_mesh
+	return p

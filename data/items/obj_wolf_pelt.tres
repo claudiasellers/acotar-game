@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"obj_wolf_pelt"
+display_name = "The great wolf's pelt"
+description = "Too big for any wolf. It sells for more than she's seen in years."
+weight_class = 3
+craft_tags = Array[StringName]([])
+base_price = 40
+color = Color(0.553, 0.541, 0.518, 1)
+canon = "C"

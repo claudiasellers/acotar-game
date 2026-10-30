@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_mugwort"
+display_name = "Mugwort"
+description = "Grows thick around the old shrines."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.561, 0.639, 0.541, 1)
+tags = Array[StringName]([&"keen", &"bitter"])
+regions = Array[StringName]([&"reg_old_temples"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"common"
+edible = true
+nutrition = 0.04
+food_days = 0.0
+pigment = &""

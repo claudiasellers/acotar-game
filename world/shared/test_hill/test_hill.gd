@@ -27,6 +27,10 @@ func _ready() -> void:
 	_build_summit_trigger()
 	_build_thorn_gate()
 	_build_target()
+	var sandbox := GameplaySandbox.new()
+	sandbox.name = "GameplaySandbox"
+	sandbox.height_at = height_at
+	add_child(sandbox)
 	feyre = FEYRE_SCENE.instantiate()
 	feyre.position = Vector3(SPAWN.x, height_at(SPAWN.x, SPAWN.y) + 0.2, SPAWN.y)
 	add_child(feyre)

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ball_gown_periwinkle"
+display_name = "Ball gown (periwinkle)"
+description = "Layers of tulle, a bodice stitched with tiny roses."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_ball.glb"
+color = Color(0.655, 0.722, 0.949, 1)
+warmth = 0.0
+stealth = -0.5
+swift = -0.1
+reaction_tag = &"formal"
+source = &"manor_wardrobe"
+phase = 3
+canon = "X"

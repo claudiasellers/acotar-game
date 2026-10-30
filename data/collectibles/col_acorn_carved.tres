@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_acorn_carved"
+display_name = "Carved acorn"
+description = "A tiny face carved into it."
+weight_class = 0
+color = Color(0.545, 0.420, 0.243, 1)
+regions = Array[StringName]([&"reg_mask_villages"])
+abundance = &"uncommon"

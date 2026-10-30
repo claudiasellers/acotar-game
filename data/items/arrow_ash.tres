@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"arrow_ash"
 display_name = "Ash arrow"
-description = "Carved whole from ash wood. The one thing the fae truly fear."
+description = "Mountain-ash shaft, iron head, bought from a travelling peddler. The one thing the fae truly fear. She keeps it for faeries."
 weight_class = 0
 craft_tags = Array[StringName]([&"arrow"])
 base_price = 0

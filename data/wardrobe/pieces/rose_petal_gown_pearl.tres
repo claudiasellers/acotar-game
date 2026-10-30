@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rose_petal_gown_pearl"
+display_name = "Rose-petal gown (pearl)"
+description = "A skirt of layered silk petals."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_rose_petal.glb"
+color = Color(0.969, 0.910, 0.937, 1)
+warmth = 0.0
+stealth = -0.4
+swift = 0.0
+reaction_tag = &"formal"
+source = &"manor_wardrobe"
+phase = 4
+canon = "X"
