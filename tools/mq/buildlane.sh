@@ -11,6 +11,8 @@ if ! mq_is_home; then
 	mq_event REFUSED "build lane: not the home machine"
 	exit 3
 fi
+# The primary folder is for playing only. A reload's exec keeps the old cwd.
+cd "$MQ_BUILD" || exit 1
 mq_lock_try "$MQ_DIR/lock" || { echo "mq: build lane already running" >&2; exit 0; }
 
 STALL_SECS=$(mq_config_or MQ_STALL_SECS 300)
@@ -69,7 +71,7 @@ push_main() {
 kick_ready() {
 	[ "$(mq_config MQ_CLOUD)" = 1 ] || return 0
 	[ -x "$here/pull_ready.sh" ] || return 0
-	( cd "$MQ_REPO" && mq_timeout 600 /bin/bash "$here/pull_ready.sh" >>"$MQ_DIR/buildlane.log" 2>&1 ) &
+	( cd "$MQ_BUILD" && mq_timeout 600 /bin/bash "$here/pull_ready.sh" >>"$MQ_DIR/buildlane.log" 2>&1 ) &
 }
 
 done_merged() { # entry-file
@@ -213,6 +215,7 @@ land() { # tip base batch-dir known
 		( cd "$MQ_BUILD" && /bin/bash tools/mq/setup_lanes.sh --install )
 		mq_event RELOAD "build lane took in new tools/mq"
 		kill "$heart" 2>/dev/null
+		[ -n "$caffeine" ] && kill "$caffeine" 2>/dev/null
 		mq_lock_release "$MQ_DIR/lock"
 		exec /bin/bash "$MQ_BIN/buildlane.sh"
 	fi

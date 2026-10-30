@@ -10,7 +10,10 @@ SRC=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(mktemp -d "${TMPDIR:-/tmp}/mq-selftest.XXXXXX")
 PASSED=0; FAILED=0; ONLY="${1:-}"
 cleanup_all() {
-	[ -f "$REPO/.git/mq/lock/pid" ] 2>/dev/null && kill "$(cat "$REPO/.git/mq/lock/pid")" 2>/dev/null
+	local f
+	for f in lock/pid cleanup.pid shots/lock/pid; do
+		[ -f "$REPO/.git/mq/$f" ] 2>/dev/null && kill "$(cat "$REPO/.git/mq/$f")" 2>/dev/null
+	done
 	rm -rf "$ROOT"
 }
 REPO=""
@@ -53,7 +56,7 @@ newrepo() { # a fresh origin, repo and queue
 	git config user.name selftest; git config user.email selftest@example.invalid
 	mkdir -p tools/mq
 	cp "$SRC"/* "$SRC"/.gdignore tools/mq/
-	rm -f tools/mq/generated.conf
+	rm -f tools/mq/generated.conf tools/mq/shots*
 	cat > tools/mq/gate.conf <<'EOF'
 first: parse = "$MQ_BIN/parse.sh"
 a = "$MQ_BIN/godot.sh" check a
@@ -197,6 +200,11 @@ case_clean() {
 	start_lane; drain
 	expect "first merged" in_main "$a"
 	expect "second merged" in_main "$b"
+	# The batch folder goes just before the push.
+	local i=0
+	while [ "$(git rev-parse main)" != "$(git ls-remote origin refs/heads/main | cut -f1)" ] && [ "$i" -lt 50 ]; do
+		perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
+	done
 	expect "pushed" test "$(git rev-parse main)" = "$(git ls-remote origin refs/heads/main | cut -f1)"
 }
 
@@ -399,9 +407,86 @@ case_cleanup() {
 	rm -f .git/mq/pending/busy
 }
 
+# Stands in for tools/mq/shots.sh: the same --start and --stop.
+fake_shots() { # file marker
+	cat > "$1" <<EOF
+#!/bin/bash
+# $2
+SELF=\$(cd "\$(dirname "\$0")" && pwd -P)
+G=\$(git rev-parse --path-format=absolute --git-common-dir); S="\$G/mq/shots"
+case "\$1" in
+--start)
+	mkdir -p "\$S/bin"; cp "\$SELF/shots.sh" "\$SELF/shots_common.sh" "\$S/bin/"
+	nohup bash "\$S/bin/shots.sh" --loop-here </dev/null >/dev/null 2>&1 &
+	sleep 1 ;;
+--stop)
+	p=\$(cat "\$S/lock/pid" 2>/dev/null); [ -n "\$p" ] && kill "\$p"; sleep 1 ;;
+--loop-here)
+	mkdir -p "\$S/lock"; echo \$\$ > "\$S/lock/pid"
+	trap 'rm -rf "\$S/lock"; exit 0' TERM
+	while :; do sleep 1 & wait \$!; done ;;
+esac
+EOF
+	: > "$(dirname "$1")/shots_common.sh"
+}
+
+sits_in() { # pid-file worktree
+	[ "$(lsof -a -p "$(cat "$1")" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')" = "$(cd "$2" && pwd -P)" ]
+}
+
+status_says() { tools/mq/status.sh | sed -n '/-- standing/,/-- recent/p' | grep -q "$1"; }
+
+# Each standing lane has its own folder, and a start moves one to new code.
+case_standing() {
+	newrepo standing
+	local old stray
+	sed -i '' '/^MQ_CLEANUP_OFF=/d' .git/mq/config
+	start_lane; sleep 1
+	expect "status: waiting for L05" status_says 'shots .*waiting for L05'
+	expect "shots worktree ready" test -e .lanes/shots-lane/.git
+	expect "build lane in .lanes/build" sits_in .git/mq/lock/pid .lanes/build
+	expect "cleanup in .lanes/cleanup" sits_in .git/mq/cleanup.pid .lanes/cleanup
+	expect "cleanup worktree locked" test -f .git/worktrees/cleanup/locked
+	expect "shots worktree locked" test -f .git/worktrees/shots-lane/locked
+	expect "status: build" status_says 'build .*running'
+	expect "status: cleanup" status_says 'cleanup .*running.*\.lanes/cleanup'
+	old=$(cat .git/mq/cleanup.pid)
+	start_lane
+	expect "a second start leaves cleanup alone" test "$(cat .git/mq/cleanup.pid)" = "$old"
+	# A reload: new code in bin/, then the start the build lane makes.
+	echo '# new' >> .git/mq/bin/cleanup.sh
+	start_lane
+	expect "cleanup took new code" test "$(cat .git/mq/cleanup.pid)" != "$old"
+	expect "cleanup on bin's copy" sits_in .git/mq/cleanup.pid .lanes/cleanup
+	# A loop left in the play folder is moved.
+	old=$(cat .git/mq/cleanup.pid); kill "$old"; sleep 1
+	nohup /bin/bash .git/mq/bin/cleanup.sh --loop </dev/null >/dev/null 2>&1 &
+	stray=$!; sleep 1
+	start_lane
+	expect "stray cleanup gone" not kill -0 "$stray"
+	expect "replaced in .lanes/cleanup" sits_in .git/mq/cleanup.pid .lanes/cleanup
+	# shots.sh reaches main: the start a reload makes runs it, then moves it on.
+	fake_shots .git/mq/bin/shots.sh first-copy
+	start_lane
+	expect "bin's listener running" grep -q first-copy .git/mq/shots/bin/shots.sh
+	expect "status: shots" status_says 'shots .*running'
+	old=$(cat .git/mq/shots/lock/pid)
+	fake_shots .git/mq/bin/shots.sh newer-copy
+	start_lane
+	expect "listener replaced" test "$(cat .git/mq/shots/lock/pid)" != "$old"
+	expect "on the newer copy" grep -q newer-copy .git/mq/shots/bin/shots.sh
+	echo MQ_PUSH=0 >> .git/mq/config
+	start_lane
+	expect "MQ_PUSH=0 keeps shots off" not test -f .git/mq/shots/lock/pid
+	expect "status: shots stopped" status_says 'shots .*STOPPED'
+	tools/mq/setup_lanes.sh --stop >/dev/null
+	sleep 1
+	expect "stop ends cleanup" not test -f .git/mq/cleanup.pid
+}
+
 for c in bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
-		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup; do
+		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing; do
 	scenario "$c"
 done
 echo "selftest: $PASSED passed, $FAILED failed"

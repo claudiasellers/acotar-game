@@ -67,13 +67,17 @@ Never move or reuse a ready name. A resubmission takes the next number.
 |---|---|
 | `.lanes/lane1..4` | one task at a time, on `laneN/<name>` from `main` |
 | `.lanes/build` | the only place `main` is checked out; only the build lane touches it |
+| `.lanes/cleanup` | where the cleanup loop runs, detached at `main`; nothing is built here |
+| `.lanes/shots-lane` | where the shot listener runs; `.lanes/shots` is its render worktree |
 | the repo folder | for playing, on a detached HEAD at `origin/main`; `make update` moves it |
 | `.git/mq/` | queue state, shared by every worktree, never committed |
 
 The build lane and the cleanup loop run from `.git/mq/bin/`, a copy that changes
-only when a change to `tools/mq/` merges. See `tools/mq/` and
-`tools/mq/selftest.sh` for the rules they keep. `.git/mq/config` holds
-`MQ_HOME_MACHINE=1`, which exists only on the Mac mini.
+only when a change to `tools/mq/` merges. No loop runs in the play folder.
+`setup_lanes.sh --start` starts all three and moves any on old code or in the
+wrong folder. The shots listener starts once `shots.sh` is on `main`.
+See `tools/mq/` and `tools/mq/selftest.sh` for the rules they keep.
+`.git/mq/config` holds `MQ_HOME_MACHINE=1`, which exists only on the Mac mini.
 
 ## Things that are true about this project
 

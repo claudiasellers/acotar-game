@@ -1,7 +1,9 @@
 #!/bin/bash
-# Creates anything missing and starts the build lane. Safe to run any time.
+# Creates anything missing and starts the standing lanes: build, cleanup, shots.
+# Safe to run any time.
 #   tools/mq/setup_lanes.sh           create what's missing, start everything
-#   tools/mq/setup_lanes.sh --start   just start the loops
+#   tools/mq/setup_lanes.sh --start   start the loops, replacing any on old code or in
+#                                     the wrong folder
 #   tools/mq/setup_lanes.sh --stop    stop the loops (a batch under test goes
 #                                     back in the queue on the next start)
 #   tools/mq/setup_lanes.sh --home    mark this computer as the home machine
@@ -11,17 +13,10 @@ here=$(cd "$(dirname "$0")" && pwd)
 
 NLANES=$(mq_config_or MQ_LANES 4)
 
-# Shots listener hook: tools/mq/shots.sh (docs/SHOTS.md) renders cloud screenshot
-# requests on this GPU. It keeps its own lock and state in .git/mq/shots/.
-# Does nothing until that file has reached bin/.
-shots_listener() {
-	local s="$MQ_BIN/shots.sh"
-	[ -f "$s" ] || return 0
-	# The listener pushes its results, so MQ_PUSH=0 keeps it off. Stopping always works.
-	if [ "$1" = --start ] && [ "$(mq_config_or MQ_PUSH 1)" != 1 ]; then return 0; fi
-	/bin/bash "$s" "$1"
-	return 0
-}
+# Standing lanes: a long-running loop keeps a folder of its own, never the play
+# folder. Worktrees only because git needs one to run in; nothing is built there.
+CLEANUP_WT="$MQ_LANES_DIR/cleanup"
+SHOTS_WT="$MQ_LANES_DIR/shots-lane"  # shots.sh renders in .lanes/shots
 
 install_bin() {
 	# Replaces each file with mv, so a running script keeps its old copy.
@@ -85,29 +80,95 @@ make_worktrees() {
 	done
 }
 
+standing_worktree() { # path commit name
+	if [ ! -e "$1/.git" ]; then
+		git -C "$MQ_REPO" worktree add -q --detach "$1" "$2" || return 1
+	fi
+	git -C "$MQ_REPO" worktree lock --reason "mq: $3" "$1" 2>/dev/null
+	return 0
+}
+
+standing_worktrees() {
+	standing_worktree "$CLEANUP_WT" main cleanup
+	standing_worktree "$SHOTS_WT" main shots
+}
+
+# True unless the pid is known to sit in another folder.
+in_folder() { # pid folder
+	local cwd; cwd=$(mq_pid_cwd "$1")
+	[ -z "$cwd" ] || [ "$cwd" = "$(cd "$2" 2>/dev/null && pwd -P)" ]
+}
+
+# cleanup.sh only re-execs on its hourly wake, so a start replaces a loop on old
+# code or in the wrong folder. Waits for it to go, so its exit can't remove the
+# pid file of the one that replaces it; one still busy is left for the next start.
+start_cleanup() {
+	local pid sum i=0
+	[ "$(mq_config MQ_CLEANUP_OFF)" = 1 ] && return 0
+	[ -e "$CLEANUP_WT/.git" ] || { echo "mq: no $CLEANUP_WT; cleanup stays off" >&2; return 0; }
+	sum=$(cat "$MQ_BIN/common.sh" "$MQ_BIN/cleanup.sh" | cksum)
+	if pid=$(mq_cleanup_pid); then
+		[ "$sum" = "$(cat "$MQ_DIR/cleanup.sum" 2>/dev/null)" ] && in_folder "$pid" "$CLEANUP_WT" && return 0
+		kill "$pid" 2>/dev/null
+		while mq_cleanup_pid >/dev/null && [ "$i" -lt 150 ]; do
+			perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
+		done
+		mq_cleanup_pid >/dev/null && return 0
+	fi
+	rm -f "$MQ_DIR/cleanup.pid"
+	echo "$sum" > "$MQ_DIR/cleanup.sum"
+	mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$CLEANUP_WT' && exec /bin/bash '$MQ_BIN/cleanup.sh' --loop"
+	i=0
+	while [ ! -s "$MQ_DIR/cleanup.pid" ] && [ "$i" -lt 50 ]; do
+		perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
+	done
+}
+
+shots_stop() {
+	local s="$MQ_DIR/shots/bin/shots.sh"
+	[ -f "$s" ] || return 0
+	( cd "$MQ_BUILD" && /bin/bash "$s" --stop )
+	return 0
+}
+
+# Shots listener hook: shots.sh (docs/SHOTS.md) renders cloud screenshot requests
+# on this GPU. It keeps its own lock and state in .git/mq/shots/. Does nothing
+# until that file has reached bin/; a reload then starts it, and a start moves a
+# running listener onto a newer bin/ copy.
+shots_start() {
+	# The listener pushes its results, so MQ_PUSH=0 keeps it off.
+	if [ "$(mq_config_or MQ_PUSH 1)" != 1 ]; then shots_stop; return 0; fi
+	[ -f "$MQ_BIN/shots.sh" ] && [ -d "$SHOTS_WT" ] || return 0
+	if mq_shots_pid >/dev/null; then
+		cmp -s "$MQ_BIN/shots.sh" "$MQ_DIR/shots/bin/shots.sh" &&
+			cmp -s "$MQ_BIN/shots_common.sh" "$MQ_DIR/shots/bin/shots_common.sh" && return 0
+		shots_stop
+	fi
+	( cd "$SHOTS_WT" && /bin/bash "$MQ_BIN/shots.sh" --start )
+	return 0
+}
+
 start_loops() {
-	local pid
 	mq_is_home || { echo "mq: not the home machine; the build lane stays off here." >&2; return 0; }
 	# Only a first install. After that bin/ changes only from merged main, so a
 	# lane's unmerged tools/mq can never become the running build lane.
 	[ -f "$MQ_BIN/buildlane.sh" ] || install_bin
+	# The build lane runs this too as it comes up: one start at a time.
+	mq_short_lock start || return 0
+	standing_worktrees
 	if ! mq_buildlane_pid >/dev/null; then
-		mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$MQ_REPO' && exec /bin/bash '$MQ_BIN/buildlane.sh'"
+		mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$MQ_BUILD' && exec /bin/bash '$MQ_BIN/buildlane.sh'"
 		mq_event START "build lane started"
 	fi
-	pid=$(cat "$MQ_DIR/cleanup.pid" 2>/dev/null)
-	# Never `kill -0` an empty or zero pid: 0 means our own group and always succeeds.
-	if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
-		mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$MQ_REPO' && exec /bin/bash '$MQ_BIN/cleanup.sh' --loop"
-	fi
-	shots_listener --start
+	start_cleanup
+	shots_start
+	mq_lock_release "$MQ_DIR/locks/start"
 }
 
 stop_loops() {
 	local pid
-	shots_listener --stop
-	pid=$(cat "$MQ_DIR/cleanup.pid" 2>/dev/null)
-	[ -n "$pid" ] && kill "$pid" 2>/dev/null
+	shots_stop
+	pid=$(mq_cleanup_pid) && kill "$pid" 2>/dev/null
 	rm -f "$MQ_DIR/cleanup.pid"
 	pid=$(mq_buildlane_pid) && kill "$pid" 2>/dev/null
 	mq_event STOP "build lane stopped by setup_lanes"
