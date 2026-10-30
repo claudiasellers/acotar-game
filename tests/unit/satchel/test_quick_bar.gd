@@ -126,7 +126,7 @@ func test_menu_sound_hooks_fire() -> void:
 	menu.use_selected()
 	menu.close()
 	for kind in [&"open", &"page", &"pin", &"use", &"close"]:
-		assert_gt(int(SatchelSounds.fired.get(kind, 0)), 0, String(kind))
+		assert_eq(int(SatchelSounds.fired.get(kind, 0)), 0, String(kind))
 	assert_false(get_tree().paused)
 
 

@@ -84,7 +84,6 @@ func open() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh()
 	_animate_in()
-	SatchelSounds.play(&"open", self)
 	opened.emit()
 
 
@@ -95,7 +94,6 @@ func close() -> void:
 	_new_ids.clear()
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	SatchelSounds.play(&"close", self)
 	closed.emit()
 
 
@@ -103,7 +101,6 @@ func set_pocket(p: StringName) -> void:
 	if p == pocket:
 		return
 	pocket = p
-	SatchelSounds.play(&"page", self)
 	_refresh()
 	_focus_first()
 
@@ -115,10 +112,8 @@ func select(id: StringName) -> void:
 
 func use_selected() -> bool:
 	if selected_id == &"" or not SatchelUse.can_pin(selected_id):
-		SatchelSounds.play(&"refuse", self)
 		return false
 	var ok := SatchelUse.use(bar.inventory, selected_id, get_tree().get_first_node_in_group(&"player"))
-	SatchelSounds.play(&"use" if ok else &"refuse", self)
 	if ok:
 		var button := _slot_buttons.get(selected_id) as Control
 		if button:
@@ -129,9 +124,7 @@ func use_selected() -> bool:
 
 func pin_selected(slot: int) -> bool:
 	if not bar.pin(slot, selected_id):
-		SatchelSounds.play(&"refuse", self)
 		return false
-	SatchelSounds.play(&"pin", self)
 	Juice.bounce_control(_pin_buttons[slot], 0.2)
 	_refresh()
 	return true
@@ -170,7 +163,6 @@ func _pad(event: InputEvent, button: JoyButton) -> bool:
 func _to_map() -> void:
 	var huds := get_tree().root.find_children("*", "WorldMapHud", true, false)
 	if huds.is_empty():
-		SatchelSounds.play(&"refuse", self)
 		return
 	close()
 	(huds[0] as WorldMapHud).full_map.open()
@@ -408,7 +400,6 @@ func _on_slot_focus(id: StringName) -> void:
 	if id == selected_id:
 		return
 	select(id)
-	SatchelSounds.play(&"select", self)
 
 
 func _icon(e: Dictionary, px: float) -> ItemIcon:

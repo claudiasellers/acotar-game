@@ -103,8 +103,6 @@ static func open(feyre: Feyre) -> void:
 		if book.new_count(tab) > 0:
 			first = tab
 			break
-	if book.new_count() > 0:
-		_chime(layer)
 	show_tab.call(first)
 	feyre.get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -182,15 +180,6 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	panel.mouse_entered.connect(func() -> void:
 		detail.text = ("%s. %s" % [e.name, e.note]).strip_edges() if e.found else "Not found yet. %s." % e.hint)
 	return panel
-
-
-static func _chime(layer: CanvasLayer) -> void:
-	var player := AudioStreamPlayer.new()
-	player.stream = Juice.chime(&"unlock")
-	player.volume_db = -8.0
-	player.autoplay = true
-	player.finished.connect(player.queue_free)
-	layer.add_child(player)
 
 
 static func _shortcut(actions: Array[StringName]) -> Shortcut:

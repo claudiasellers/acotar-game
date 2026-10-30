@@ -1,17 +1,13 @@
-## Sound hooks for the satchel and quick bar. Plays res://audio/ui/satchel_<kind>.ogg
+## Sound hook for items landing in the satchel (the menu and quick bar are silent). Plays res://audio/ui/satchel_<kind>.ogg
 ## when the sound lane has added it, else a synthesised Juice chime, so every
 ## hook makes a sound today. `fired` counts plays for tests.
 class_name SatchelSounds
 extends RefCounted
 
-const KINDS: Array[StringName] = [&"open", &"close", &"page", &"select", &"use", &"pin", &"pickup", &"refuse"]
+const KINDS: Array[StringName] = [&"pickup"]
 const PATH := "res://audio/ui/satchel_%s.ogg"
 ## Fallback: Juice chime kind and pitch per hook.
-const FALLBACK := {
-	&"open": [&"craft", 0.8], &"close": [&"pickup", 0.7], &"page": [&"pickup", 1.25],
-	&"select": [&"pickup", 1.6], &"use": [&"craft", 1.1], &"pin": [&"unlock", 1.2],
-	&"pickup": [&"pickup", 1.0], &"refuse": [&"pickup", 0.5],
-}
+const FALLBACK := {&"pickup": [&"pickup", 1.0]}
 
 static var fired: Dictionary = {}
 
