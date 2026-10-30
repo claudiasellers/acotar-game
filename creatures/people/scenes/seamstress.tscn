@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/people/seamstress.gltf" id="2"]
+[ext_resource type="PackedScene" path="res://creatures/models/people/seamstress_true.gltf" id="3"]
+
+[node name="Seamstress" type="Node3D"]
+script = ExtResource("1")
+npc_id = &"seamstress"
+display_name = "Seamstress"
+canon = "C?"
+model_scene = ExtResource("2")
+true_model_scene = ExtResource("3")
+wander_radius = 1.5

@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/people/human_elder.gltf" id="2"]
+
+[node name="HumanElder" type="Node3D"]
+script = ExtResource("1")
+npc_id = &"human_elder"
+display_name = "Old villager"
+canon = "C?"
+model_scene = ExtResource("2")
+wander_radius = 2.0

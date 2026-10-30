@@ -80,8 +80,9 @@ func _spawn_entry(entry: SpawnEntry, index: int) -> Array:
 		var node := entry.scene.instantiate() as Node3D
 		if entry.on_water and &"water_level" in node:
 			node.set(&"water_level", water_level)
-		add_child(node)
-		node.global_position = p
+		# Placed before entering the tree, so _ready() sees its real home.
+		node.position = to_local(p) if is_inside_tree() else p
 		node.rotation.y = rng.randf() * TAU
+		add_child(node)
 		nodes.append(node)
 	return nodes

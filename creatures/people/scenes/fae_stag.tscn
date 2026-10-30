@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/people/fae_stag.gltf" id="2"]
+
+[node name="FaeStag" type="Node3D"]
+script = ExtResource("1")
+npc_id = &"fae_stag"
+display_name = "Stag faerie"
+canon = "X"
+model_scene = ExtResource("2")
+wander_radius = 4.0
