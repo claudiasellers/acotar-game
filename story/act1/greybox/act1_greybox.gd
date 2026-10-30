@@ -68,6 +68,7 @@ func _ready() -> void:
 	var hud := CanvasLayer.new()
 	hud.set_script(HUD_SCRIPT)
 	add_child(hud)
+	add_child(SettingsPanel.new())
 	EventBus.grade_swap_requested.connect(_on_grade_swap)
 	EventBus.mood_requested.connect(_on_mood)
 	EventBus.creature_killed.connect(_stub_on_creature_killed)

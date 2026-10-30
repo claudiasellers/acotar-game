@@ -55,6 +55,7 @@ func _ready() -> void:
 	var hud := CanvasLayer.new()
 	hud.set_script(HUD_SCRIPT)
 	add_child(hud)
+	add_child(SettingsPanel.new())
 
 
 func _process(delta: float) -> void:
