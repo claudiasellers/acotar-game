@@ -72,7 +72,9 @@ func test_spring_sky_is_not_eaten_by_fog() -> void:
 	var spring := GradeDirector.load_preset(&"spring")
 	assert_lte(spring.fog_sky_affect, 0.15, "distance fog must leave the sky gradient alone")
 	assert_gt(spring.fog_height_density, 0.0, "mist pools low instead")
-	assert_gt(spring.fog_aerial_perspective, 0.4, "far layers fade toward the sky")
+	assert_between(spring.fog_aerial_perspective, 0.3, 0.6, "far layers fade toward the sky, not into it")
+	# The weenie (Great Oak, ~285 m from the wall-crossing frame) stays readable.
+	assert_lt(1.0 - exp(-spring.fog_density * 285.0), 0.2, "≤20% depth fog at the weenie's distance")
 
 
 func test_golden_hour_peaks_at_the_horizon() -> void:
