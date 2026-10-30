@@ -91,7 +91,14 @@ static func _make_spray(width: float) -> Array:
 	pm.initial_velocity_min = 1.0
 	pm.initial_velocity_max = 3.0
 	pm.gravity = Vector3(0, -1.2, 0)
-	pm.color = Color(0.95, 0.97, 1.0, 0.35)
+	# Pastel rainbow mist (R3): each droplet takes a hue from rose to lilac.
+	var hues := Gradient.new()
+	hues.offsets = PackedFloat32Array([0.0, 0.25, 0.5, 0.75, 1.0])
+	hues.colors = PackedColorArray([Color(1.0, 0.78, 0.86, 0.5), Color(1.0, 0.94, 0.72, 0.5),
+			Color(0.76, 0.96, 0.86, 0.5), Color(0.74, 0.86, 1.0, 0.5), Color(0.88, 0.78, 1.0, 0.5)])
+	var hue_tex := GradientTexture1D.new()
+	hue_tex.gradient = hues
+	pm.color_initial_ramp = hue_tex
 	pm.scale_min = 6.0
 	pm.scale_max = 14.0
 	var quad := QuadMesh.new()

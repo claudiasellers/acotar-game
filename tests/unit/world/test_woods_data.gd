@@ -44,6 +44,16 @@ func test_every_species_and_forage_visual_builds_a_mesh() -> void:
 				assert_true(FloraLibrary.has(k), "%s species %s" % [id, k])
 
 
+func test_every_species_is_tagged_canon_or_invented() -> void:
+	# R7 + canon corrections: only the book's flora is "C"; the book's trees
+	# are oak, elm, beech, birch, weeping willow and ash.
+	for species in FloraLibrary.SPECIES:
+		assert_has(["C", "X"], FloraLibrary.info(species).get("canon", ""), "canon tag on %s" % species)
+	for tree in [&"oak", &"elm", &"beech", &"silver_birch", &"willow"]:
+		assert_eq(FloraLibrary.info(tree)["canon"], "C", String(tree))
+	assert_eq(FloraLibrary.info(&"alder")["canon"], "X")
+
+
 func test_providers_are_finite_and_keep_the_thornwater_carved() -> void:
 	for x in range(-700, 500, 97):
 		for z in range(300, 1400, 89):
