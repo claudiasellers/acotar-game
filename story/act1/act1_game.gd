@@ -57,6 +57,8 @@ func _ready() -> void:
 	add_child(hud)
 	add_child(SettingsPanel.new())
 	add_child(GuideJournal.new())
+	add_child(KeyPrompts.new())
+	add_child(Act1Wayfinding.new())
 
 
 func _process(delta: float) -> void:
@@ -102,5 +104,17 @@ func _play_opening_shot() -> void:
 		get_tree().create_timer(opening_shot_seconds).timeout.connect(func() -> void:
 			feyre.camera.current = true
 			cam.queue_free()
-			StoryControl.release())
+			StoryControl.release()
+			_first_thought.call_deferred())
 		return
+	_first_thought.call_deferred()
+
+
+## A new game opens with Feyre's first thought on screen; its footer teaches G
+## (the guidance card's own first-card behaviour). Loaded games skip it.
+func _first_thought() -> void:
+	if not WorldState.all_flags().is_empty():
+		return
+	for child in get_children():
+		if child is GuideJournal and (child as GuideJournal).can_show() and not (child as GuideJournal).showing:
+			(child as GuideJournal).press()
