@@ -73,3 +73,20 @@ func test_airborne_arms_never_hold_the_t_pose() -> void:
 				var q: Quaternion = anim.track_get_key_value(track, k)
 				least = minf(least, rad_to_deg(q.get_angle()))
 			assert_gt(least, 35.0, "%s keeps the %s arm down from the T (%.0f deg)" % [clip, side, least])
+
+
+## Contract (T025): her fast gaits get their speed from stride, not cadence. At her
+## real run and sprint speeds the clips play well under the cadence cap, the sprint
+## no faster than the run, and the rate is exactly ground speed over native speed
+## (feet planted, no slide).
+func test_fast_gaits_take_speed_from_stride_not_cadence() -> void:
+	var feyre := (load("res://characters/feyre/feyre.tscn") as PackedScene).instantiate() as Feyre
+	add_child_autofree(feyre)
+	var a := feyre.model.find_child("FeyreAnimator", true, false) as FeyreAnimator
+	var run := a.loco_blend(feyre.run_speed)
+	var sprint := a.loco_blend(feyre.sprint_speed)
+	assert_lte(run.y, 1.55, "run cadence x%.2f" % run.y)
+	assert_lte(sprint.y, run.y, "sprint cadence x%.2f no faster than the run's" % sprint.y)
+	assert_lt(sprint.y, FeyreAnimator.MAX_SCALE)
+	assert_almost_eq(run.y, feyre.run_speed / float(a.native_speeds[&"run"]), 0.001, "run feet planted")
+	assert_almost_eq(sprint.y, feyre.sprint_speed / float(a.native_speeds[&"sprint"]), 0.001, "sprint feet planted")

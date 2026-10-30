@@ -20,8 +20,8 @@ the worst per-step foot-slide residual at that speed; --speeds writes them to a 
 Clip mapping (source frames are on the 30 fps timeline; the CLIPS table is authoritative):
     idle          <- Idle_Subtle       1.25-77.5   76 f  loop
     walk          <- Walk_Female       1.25-41.25  28 f  loop  (x1.43: brisker cadence)
-    run           <- Run_Female        1.25-25.0   24 f  loop
-    sprint        <- Sprint            0-25.0      20 f  loop  (x1.25)
+    run           <- Run_Female        1.25-25.0   24 f  loop  (stride warp x1.25)
+    sprint        <- Sprint            0-25.0      20 f  loop  (x1.25, stride warp x1.38)
     jump_start    <- Jump_Start        1.25-8.25   crouch, push, takeoff (0.23 s)
     jump_rise     <- Jump_air          0-24        ping-pong loop, 1.6 s (airborne, knee up)
     jump_fall     <- Jump_air          24-48       ping-pong loop, 1.6 s (airborne, legs reaching down)
@@ -104,12 +104,14 @@ LOCOMOTION = tuple(c[0] for c in CLIPS if c[7] == "gait")
 # mean lean is rotated to this, frame-to-frame motion kept), head = target head pitch
 # (0 = level, eyes ahead), shoulders back/down at the clavicles, arms abducted so the
 # swing stays at her sides, hip_sway = pelvis roll toward the swing leg (lock_feet
-# re-solves the legs afterwards).
+# re-solves the legs afterwards), stride = stride_warp factor: her run and sprint are
+# far faster than the performers', so they get their speed from a longer stride at
+# the captured cadence rather than from playing the clip faster.
 POSTURE = {
     "idle": dict(lean=0.0, head=0.0, back=6.0, down=4.0, arms=3.0, hip_sway=0.0),
     "walk": dict(lean=1.0, head=0.0, back=8.0, down=5.0, arms=5.0, hip_sway=3.0),
-    "run": dict(lean=5.0, head=-2.0, back=8.0, down=5.0, arms=7.0, hip_sway=3.0),
-    "sprint": dict(lean=9.0, head=-4.0, back=6.0, down=4.0, arms=6.0, hip_sway=1.5),
+    "run": dict(lean=5.0, head=-2.0, back=8.0, down=5.0, arms=7.0, hip_sway=3.0, stride=1.25),
+    "sprint": dict(lean=9.0, head=-4.0, back=6.0, down=4.0, arms=6.0, hip_sway=1.5, stride=1.38),
     # Airborne: the source flings both arms out level (a scarecrow T in the game). Drop
     # them toward her sides with soft elbows, chest lifted, chin up.
     "jump_rise": dict(lean=-2.0, head=2.0, back=10.0, down=6.0, arms=-46.0, elbow=12.0, swing=22.0, hip_sway=0.0),
@@ -346,8 +348,8 @@ def retarget(src: Rig, tgt: Rig, frames: list[dict], cyclic: bool, placement: st
     else:
         fits = [np.polyfit(t, [o[i] for o in offs], 1) for i in range(2)]
     hips_inv = tgt.rest3["Hips"].inverted()
-    out = []
-    for f, fr in enumerate(frames):
+    worlds = []
+    for fr in frames:
         world = {tn: fr[inv[tn]].to_3x3().normalized() @ src.rest3[inv[tn]].inverted() @ tgt.rest3[tn]
                  for tn in tgt.names if tn in inv}
         for _, bones, m in fixes:
@@ -356,6 +358,9 @@ def retarget(src: Rig, tgt: Rig, frames: list[dict], cyclic: bool, placement: st
                     world[b] = m @ world[b]
         if posture and posture["hip_sway"] > 0.0:
             world["Hips"] = hip_sway(src, fr, posture["hip_sway"]) @ world["Hips"]
+        worlds.append(world)
+    out = []
+    for f, (fr, world) in enumerate(zip(frames, worlds)):
         quats, posed = {}, {}
         for tn in tgt.names:
             p = tgt.parent[tn]
@@ -450,6 +455,25 @@ def solve_leg(tgt: Rig, quats: dict, loc: Vector, side: str, offset: Vector) -> 
     quats[lo] = ((w_up @ tgt.rel[lo].to_3x3()).inverted() @ w_lo).to_quaternion().normalized()
     quats[ft] = ((w_lo @ tgt.rel[ft].to_3x3()).inverted() @ w_ft).to_quaternion().normalized()
     return ok
+
+
+def stride_warp(tgt: Rig, baked: list, k: float) -> int:
+    """Longer stride at the same cadence (stride warping, looped gait clips): each
+    ankle's fore-aft distance from its clip mean, relative to the hips, is scaled by k
+    and the leg re-solved with IK (foot orientation kept).  The stance foot sweeps
+    further in the same time, so the clip's native speed grows while its cycle time is
+    unchanged; lock_feet re-plants it afterwards.  Returns clamp count."""
+    n = len(baked) - 1
+    poses = [tgt.fk(*baked[f]) for f in range(n)]
+    clamps = 0
+    for _, side in SIDES:
+        ys = [p[side + "Foot"].translation.y - p["Hips"].translation.y for p in poses]
+        mean = sum(ys) / n
+        for f in range(n):
+            quats, loc = baked[f]
+            clamps += not solve_leg(tgt, quats, loc, side, Vector((0.0, (k - 1.0) * (ys[f] - mean), 0.0)))
+    baked[-1] = (dict(baked[0][0]), baked[0][1].copy())
+    return clamps
 
 
 def surge_hips(tgt: Rig, baked: list, cyclic: bool) -> None:
@@ -721,6 +745,9 @@ def build(source_dir: str, clips=CLIPS) -> tuple[Rig, list]:
             baked[-1] = baked[0]
         clamps = 0
         if placement == "gait":
+            k = POSTURE.get(name, {}).get("stride", 1.0)
+            if k != 1.0:
+                stride_warp(tgt, baked, k)
             clamps = lock_feet(tgt, baked, cyclic)
             leg_clearance(tgt, baked, cyclic)
         if cyclic:
