@@ -55,26 +55,28 @@ static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	return out
 
 
-## Trees cluster into groves, flower carpets into drifts; grass, rocks and
-## props stay even.
+## Flower carpets gather into drifts; grass, rocks and props stay even.
+## (Trees are composed separately by _tree_layers.)
 static func _drift_noise(e: CourtDecorEntry, seed_value: int) -> FastNoiseLite:
 	var s := String(e.mesh_id)
-	if not (e.is_tree or s.contains("carpet")):
+	if not s.contains("carpet"):
 		return null
 	var n := FastNoiseLite.new()
 	n.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	n.seed = seed_value
-	n.frequency = 1.0 / (90.0 if e.is_tree else 45.0)
+	n.frequency = 1.0 / 45.0
 	n.fractal_octaves = 2
 	return n
 
 
 static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
-	var out: Array[ScatterLayer] = []
+	var all: Array[ScatterLayer] = []
+	var trees := {}
 	var r := content.bounding_rect()
 	for di in content.decor.size():
 		var e := content.decor[di]
 		var layer := ScatterLayer.new()
+		all.append(layer)
 		layer.id = StringName("decor_%02d_%s" % [di, e.mesh_id])
 		layer.mesh = CourtAssets.mesh(e.mesh_id)
 		layer.wind = e.wind
@@ -84,9 +86,10 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 			layer.impostor_mesh = CourtAssets.mesh(e.mesh_id, true)
 			layer.impostor_distance = TREE_FAR
 			layer.tags = PackedStringArray(["tree"])
-		else:
-			layer.draw_distance = e.draw_distance
-		# Sparse things (trees, rocks) are placed per 100 m² cell with a probability;
+			trees[di] = layer
+			continue
+		layer.draw_distance = e.draw_distance
+		# Sparse things (rocks, logs) are placed per 100 m² cell with a probability;
 		# dense ones (grass, flowers) as several per cell.
 		var cell := DECOR_CELL if e.density >= 0.2 else 50.0
 		var lambda := e.density * cell * cell / 100.0
@@ -115,9 +118,9 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 						continue
 					if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
 						continue
-					if (e.is_tree or e.cast_shadow) and content.in_anchor_clearing(p):
+					if e.cast_shadow and content.in_anchor_clearing(p):
 						continue
-					if e.max_slope < 90.0 and (e.is_tree or e.cast_shadow) and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
+					if e.max_slope < 90.0 and e.cast_shadow and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
 						continue
 					var y := _ground_y(content, hab, p)
 					layer.add(Vector3(p.x, y, p.y), rng.randf() * TAU, rng.randf_range(e.scale_min, e.scale_max))
@@ -125,9 +128,157 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 				cz += 1
 			x += cell
 			cx += 1
+	if not trees.is_empty():
+		_tree_layers(content, trees)
+	var out: Array[ScatterLayer] = []
+	for layer in all:
 		if layer.count() > 0:
 			out.append(layer)
 	return out
+
+
+## Trees for every is_tree entry together (plans/landscape-brief.md): planted
+## habitats (orchards, rows, walks) in rows; elsewhere groves and open meadow
+## from LandscapeLayout's stand map at each habitat's summed density, species
+## in patches weighted by density, flowering pioneers at the edges, trunks
+## kept apart, and specimen clumps of odd numbers in the open. Each habitat
+## keeps its expected count, so budgets stay where they were.
+## Returns { entry index: ScatterLayer }.
+static func _tree_layers(content: CourtRegionContent, layers: Dictionary) -> void:
+	var r := content.bounding_rect()
+	var layout := LandscapeLayout.make(content.seed, r)
+	# habitat -> {table: [[cum, "idx"]], edge: [...], density: per m2}
+	var habs := {}
+	var hab_of := func(tag: StringName) -> Dictionary:
+		if habs.has(tag):
+			return habs[tag]
+		var total := 0.0
+		var fits: Array = []
+		for di: int in layers:
+			var e := content.decor[di]
+			if _fits(e.habitats, tag, content):
+				fits.append(di)
+				total += e.density
+		var table: Array = []
+		var acc := 0.0
+		for di: int in fits:
+			acc += content.decor[di].density / total
+			table.append([acc, StringName(str(di))])
+		var edge_ids: Array = []
+		for entry in table:
+			edge_ids.append([entry[0], content.decor[int(String(entry[1]))].mesh_id])
+		var edge: Array = []
+		for entry in LandscapeLayout.edge_table(edge_ids):
+			for t in table:
+				if content.decor[int(String(t[1]))].mesh_id == entry[1]:
+					edge.append([entry[0], t[1]])
+					break
+		var info := {"table": table, "edge": edge, "density": total / 100.0}
+		habs[tag] = info
+		return info
+	var classify := func(p: Vector2) -> StringName:
+		if not content.owns(p):
+			return &""
+		var tag := content.habitat_at(p)
+		var h: Dictionary = hab_of.call(tag)
+		return tag if not h["table"].is_empty() and not LandscapeLayout.is_formal(tag) else &""
+	var weigh := func(tag: StringName, p: Vector2) -> float:
+		var h: Dictionary = hab_of.call(tag)
+		var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))
+		return LandscapeLayout.tree_weight(zn)
+	var means := LandscapeLayout.mean_weights(layout, r, classify, weigh)
+	# Planted rows first: a block of rows per habitat, one fruit per row patch.
+	var formal_done := {}
+	for h in content.habitats:
+		if not LandscapeLayout.is_formal(h.tag) or formal_done.has(h.tag):
+			continue
+		formal_done[h.tag] = true
+		var info: Dictionary = hab_of.call(h.tag)
+		if info["table"].is_empty():
+			continue
+		for p in LandscapeLayout.rows(content.seed, h.tag, r, info["density"]):
+			if content.owns(p) and content.habitat_at(p) == h.tag:
+				var di := int(String(LandscapeLayout.pick(info["table"], clampf((layout["patch"] as FastNoiseLite).get_noise_2d(p.x, p.y) * 0.5 + 0.5, 0.0, 0.9999))))
+				_add_tree(content, layers, layout, di, p, hash([content.seed, "row", p]), 0.6)
+	if content.default_habitat != &"" and LandscapeLayout.is_formal(content.default_habitat) and not formal_done.has(content.default_habitat):
+		var info: Dictionary = hab_of.call(content.default_habitat)
+		if not info["table"].is_empty():
+			# Default ground that is planted: rows in parcels (the stand map's
+			# groves), meadow strips between them.
+			var open := LandscapeLayout.open_share(info["density"])
+			for p in LandscapeLayout.rows(content.seed, content.default_habitat, r, info["density"] / (1.0 - open)):
+				if content.owns(p) and content.habitat_at(p) == content.default_habitat \
+						and LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), open)["grove"] > 0.5:
+					var di := int(String(LandscapeLayout.pick(info["table"], clampf((layout["patch"] as FastNoiseLite).get_noise_2d(p.x, p.y) * 0.5 + 0.5, 0.0, 0.9999))))
+					_add_tree(content, layers, layout, di, p, hash([content.seed, "row", p]), 0.6)
+	# Specimen clumps in the open.
+	var open_at := func(p: Vector2) -> float:
+		var tag: StringName = classify.call(p)
+		if tag == &"":
+			return 0.0
+		var h: Dictionary = hab_of.call(tag)
+		return 1.0 - LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))["grove"]
+	var rate_at := func(p: Vector2) -> float:
+		var tag: StringName = classify.call(p)
+		if tag == &"":
+			return 0.0
+		var h: Dictionary = hab_of.call(tag)
+		return clampf(h["density"] * LandscapeLayout.CLUMP_CELL * LandscapeLayout.CLUMP_CELL * 0.05, 0.02, 0.22)
+	for c in LandscapeLayout.clumps(layout, r, open_at, rate_at):
+		var centre: Vector2 = c["center"]
+		var tag: StringName = classify.call(centre)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash([content.seed, "clump", centre])
+		var di := int(String(LandscapeLayout.pick(hab_of.call(tag)["table"], rng.randf())))
+		var members: PackedVector2Array = c["members"]
+		for m in members.size():
+			if classify.call(members[m]) == tag:
+				_add_tree(content, layers, layout, di, members[m], rng.randi(), 1.0 if m == 0 else 0.6)
+	# Groves and meadow.
+	var cell := LandscapeLayout.TREE_CELL
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([content.seed, "groves"])
+	var nx := ceili(r.size.x / cell)
+	var nz := ceili(r.size.y / cell)
+	for iz in nz:
+		for ix in nx:
+			var jx := rng.randf()
+			var jz := rng.randf()
+			var roll := rng.randf()
+			var r1 := rng.randf()
+			var r2 := rng.randf()
+			var tree_seed := rng.randi()
+			var p := Vector2(r.position.x + (ix + jx) * cell, r.position.y + (iz + jz) * cell)
+			var tag: StringName = classify.call(p)
+			if tag == &"":
+				continue
+			var h: Dictionary = hab_of.call(tag)
+			var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))
+			if roll >= h["density"] * cell * cell * LandscapeLayout.tree_weight(zn) / float(means.get(tag, 1.0)):
+				continue
+			var di := int(String(LandscapeLayout.tree_species(layout, h["table"], h["edge"], p.x, p.y, zn["edge"], r1, r2)))
+			_add_tree(content, layers, layout, di, p, tree_seed, lerpf(0.35, 1.0, zn["core"]))
+
+
+## One tree of entry `di` at p if the ground and spacing allow; `size` < 1
+## skews its scale towards the entry's minimum.
+static func _add_tree(content: CourtRegionContent, layers: Dictionary, layout: Dictionary, di: int, p: Vector2,
+		tree_seed: int, size: float) -> void:
+	var e := content.decor[di]
+	if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
+		return
+	if content.in_anchor_clearing(p):
+		return
+	if e.max_slope < 90.0 and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
+		return
+	if not LandscapeLayout.trunk_free(layout, p, e.mesh_id):
+		return
+	LandscapeLayout.add_trunk(layout, p, e.mesh_id)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = tree_seed
+	var hab := content.habitat_at(p)
+	var layer: ScatterLayer = layers[di]
+	layer.add(Vector3(p.x, _ground_y(content, hab, p), p.y), rng.randf() * TAU, lerpf(e.scale_min, e.scale_max, rng.randf() * size))
 
 
 ## Report in the keys tools/world_smoke.gd reads, over the region's own cells.
