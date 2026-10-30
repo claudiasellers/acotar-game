@@ -101,3 +101,18 @@ common/physics_ticks_per_second=60
 renderer/rendering_method="forward_plus"
 anti_aliasing/quality/msaa_3d=2
 lights_and_shadows/directional_shadow/size=4096
+
+[shader_globals]
+
+wind_direction={
+"type": "vec3",
+"value": Vector3(1, 0, 0.3)
+}
+wind_strength={
+"type": "float",
+"value": 0.4
+}
+snow_cover={
+"type": "float",
+"value": 1.0
+}
