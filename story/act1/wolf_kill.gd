@@ -17,11 +17,16 @@ extends SceneSpace
 ## The doe grazes at her spot once Feyre is this close, well before the 30 m
 ## line where the scene starts, so she is seen first and the hunt has a target.
 @export var doe_preview_radius: float = 110.0
+## Seconds with no ash arrow in her quiver or in the world (it broke on stone
+## or fell through the ground) before one is quietly given back, so wolf_killed
+## can always rise.
+@export var ash_regrant_seconds: float = 4.0
 
 var doe: Node3D
 var wolf: Node3D
 var ash_struck: bool = false
 var wolf_dead: bool = false
+var _ash_gone_for: float = 0.0
 
 
 func _init() -> void:
@@ -64,6 +69,8 @@ func _build_beats() -> Array:
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
+	if running and not ash_struck and not wolf_dead:
+		_keep_an_ash_arrow(delta)
 	if not auto_tick or running or is_instance_valid(doe) or WorldState.has_flag("wolf_killed"):
 		return
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
@@ -82,14 +89,44 @@ func _spawn_wolf(_space: SceneSpace) -> void:
 	EventBus.story_actor_cue.emit(&"great_wolf", &"seize_doe")
 
 
-## A transform at `offset` from the space, facing `look_offset`.
+## A transform at `offset` from the space, facing `look_offset`, standing on
+## the ground: the clearing slopes, so the anchor's own height can be metres
+## off at the doe's and the wolf's spots.
 func _at(offset: Vector3, look_offset: Vector3 = Vector3.ZERO) -> Transform3D:
 	var origin := global_transform * offset
 	var target := global_transform * look_offset
+	origin.y = ground_y(origin)
 	var xform := Transform3D(Basis.IDENTITY, origin)
 	if not origin.is_equal_approx(target):
 		xform = xform.looking_at(Vector3(target.x, origin.y, target.z), Vector3.UP)
 	return xform
+
+
+## The terrain height under `point` when the space sits on the shared map's
+## terrain (the anchor is on WorldHeight's ground), else the point's own height
+## (greybox and test scenes have their own flat ground).
+func ground_y(point: Vector3) -> float:
+	var here := global_position
+	if absf(WorldHeight.height_at(here.x, here.z) - here.y) > 3.0:
+		return point.y
+	return WorldHeight.height_at(point.x, point.z) + 0.05
+
+
+func _keep_an_ash_arrow(delta: float) -> void:
+	if Gameplay.inventory.count(&"arrow_ash") > 0 or _ash_in_world():
+		_ash_gone_for = 0.0
+		return
+	_ash_gone_for += delta
+	if _ash_gone_for >= ash_regrant_seconds:
+		_ash_gone_for = 0.0
+		EventBus.story_item_granted.emit(&"arrow_ash", 1)
+
+
+func _ash_in_world() -> bool:
+	for arrow in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
+		if StringName(arrow.get_meta(&"arrow_id", &"")) == &"ash":
+			return true
+	return false
 
 
 func _on_creature_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:

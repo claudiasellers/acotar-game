@@ -5,9 +5,20 @@
 ## RidePath child). She can only look. She smells metal (magic, under the
 ## glamour) and falls into an enchanted sleep; she wakes as they pass through
 ## a gate at the seam, into spring: the cold-to-spring grade swap (2 s, the
-## single most important visual beat) and wall_crossed.
+## single most important visual beat) and wall_crossed. Past the seam the
+## horse's road fades out and in again at the manor's sentry gate (canon: she
+## arrives at the manor), and they ride up the drive to where the house first
+## shows (ManorSitePlan.SPAWN) before she gets down. Without a manor_estate
+## region (greybox, tests) she gets down at the end of the path.
 class_name RideNorth
 extends SceneSpace
+
+const GROUP := &"ride_north"
+const MANOR := &"manor_estate"
+## Just inside the sentry gate, on the drive, and how long to wait in the dark
+## for the estate to stream in.
+const GATE_INSIDE := 8.0
+const LOAD_WAIT_SECONDS := 20.0
 
 @export var ride_speed: float = 6.0
 ## Metres along the path where the wall is. Negative: use a "Seam" child
@@ -16,6 +27,9 @@ extends SceneSpace
 @export var grade_seconds: float = 2.0
 ## Fraction of the way to the seam where the magic sleep takes her.
 @export var sleep_at: float = 0.45
+@export var fade_seconds: float = 1.2
+
+var veil: ColorRect
 
 var path: Path3D
 var horse: Node3D
@@ -28,6 +42,7 @@ func _init() -> void:
 	require_flags = PackedStringArray(["beast_claim_accepted"])
 	done_flags = PackedStringArray(["wall_crossed"])
 	auto_start = true
+	add_to_group(GROUP)
 
 
 func path_length() -> float:
@@ -61,9 +76,80 @@ func _build_beats() -> Array:
 		Beats.control(StoryControl.Mode.LOOK, null),
 		Beats.raise("wall_crossed"),
 		RideBeat.new(func() -> float: return path_length()),
+	] + _to_the_manor() + [
 		Beats.run(_dismount, "dismount"),
 		Beats.cue(&"tamlin_beast", &"leave"),
 	]
+
+
+## Fade, move horse and rider to the sentry gate, wait for the estate's ground,
+## fade in, ride up the drive. Nothing when there's no manor region.
+func _to_the_manor() -> Array:
+	if WorldStreamer.get_region(MANOR) == null:
+		return []
+	var deadline := [0.0]
+	return [
+		Beats.run(func(_s: SceneSpace) -> void: _fade(1.0), "fade out"),
+		Beats.wait(fade_seconds),
+		Beats.run(func(_s: SceneSpace) -> void:
+			path = drive_path()
+			progress = 0.0
+			_place(0.0)
+			WorldStreamer.update_for(path.global_transform * path.curve.get_point_position(0))
+			# Game time (physics frames), not wall time: fixed-fps runs go faster.
+			deadline[0] = Engine.get_physics_frames() + LOAD_WAIT_SECONDS * Engine.physics_ticks_per_second, "the sentry gate"),
+		Beats.until(func() -> bool:
+			return (WorldStreamer.is_loaded(MANOR) and _ground_under(_rider)) \
+					or Engine.get_physics_frames() > deadline[0], "until the estate is there"),
+		Beats.run(func(_s: SceneSpace) -> void: _fade(0.0), "fade in"),
+		RideBeat.new(func() -> float: return path_length()),
+	]
+
+
+## The drive from just inside the sentry gate to where the house first shows,
+## on the estate's ground. Added under this space.
+func drive_path() -> Path3D:
+	var drive := get_node_or_null(^"Drive") as Path3D
+	if drive == null:
+		drive = Path3D.new()
+		drive.name = "Drive"
+		add_child(drive)
+		drive.global_transform = Transform3D.IDENTITY
+	var curve := Curve3D.new()
+	var from := ManorSitePlan.SENTRY_GATE + Vector2(0.0, -GATE_INSIDE)
+	var to := Vector2(ManorSitePlan.SPAWN.x, ManorSitePlan.SPAWN.z)
+	var steps := maxi(2, ceili(from.distance_to(to) / 8.0))
+	for i in steps + 1:
+		var p := from.lerp(to, float(i) / steps)
+		curve.add_point(Vector3(p.x, WorldHeight.height_at(p.x, p.y), p.y))
+	drive.curve = curve
+	return drive
+
+
+func _ground_under(node: Node3D) -> bool:
+	if node == null or not is_instance_valid(node):
+		return true
+	var from := node.global_position + Vector3.UP
+	return not node.get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 6.0, 1)).is_empty()
+
+
+func _fade(alpha: float) -> void:
+	if veil == null or not is_instance_valid(veil):
+		var layer := CanvasLayer.new()
+		layer.name = "RideVeil"
+		layer.layer = 30
+		veil = ColorRect.new()
+		veil.color = Color(0.03, 0.02, 0.05)
+		veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+		veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		veil.modulate.a = 0.0
+		layer.add_child(veil)
+		add_child(layer)
+	var tween := veil.create_tween()
+	tween.tween_property(veil, ^"modulate:a", alpha, fade_seconds)
+	if alpha == 0.0:
+		tween.tween_callback(veil.get_parent().queue_free)
 
 
 func _find_path() -> Path3D:

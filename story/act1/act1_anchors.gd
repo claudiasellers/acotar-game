@@ -77,9 +77,17 @@ static func _add_keepsakes(anchor: Node3D) -> void:
 
 
 ## The ride north follows the world lane's WallSeamPath; one per game.
+## Matched by type: the hunting forest has a landmark group named "RideNorth" too.
 static func _ensure_ride(director: Node) -> void:
-	if director.get_node_or_null(^"RideNorth") or director.get_tree().root.find_child("RideNorth", true, false):
+	if find_ride(director.get_tree()):
 		return
 	var ride := RideNorth.new()
 	ride.name = "RideNorth"
 	director.add_child(ride)
+
+
+static func find_ride(tree: SceneTree) -> RideNorth:
+	for node in tree.get_nodes_in_group(RideNorth.GROUP):
+		if node is RideNorth:
+			return node
+	return null
