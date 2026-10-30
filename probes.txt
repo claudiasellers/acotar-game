@@ -1,0 +1,4 @@
+from map-lane
+quality look
+timeout 900
+shot pin res://tools/map_shot.tscn {out} pin
