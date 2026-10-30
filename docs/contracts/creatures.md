@@ -58,3 +58,6 @@ deer: `ing_venison` x3, `ing_hide`, `ing_sinew` x2 · hare: `ing_hare`, `ing_har
 - `bogge` (Bogge): no model. Cue `pass_behind` keeps it behind the camera for `pass_seconds`, darkening a FogVolume; signals `begged(line_id)` (`bogge_beg_1..4`), `passed`. Its `global_position` is what the gaze check tests.
 - `attor` (Attor): model in a `GlamourLayer` TRUE_FORM child (invisible until `glamour_lifted`); cue `speaks_of_her`; signals `spoke`, `breathed(pos)` for audio.
 - `white_horse` (WhiteHorse): `mount_point` Marker3D at 1.55 m, group `mount`; cues `walk`/`lead`, `stop`; `walk_to(pos)`.
+
+## Special arrows (gameplay lane's Arrow.arrow_effect)
+- `Creature.on_arrow_effect(effect, arrow)`: `sleep` drops it where it stands for 25 s (fae 5 s); `barbed` bleeds (blood trail) and slows to 55% for 15 s; `lure` draws every calm creature within 35 m to the arrow (`Creature.lure(tree, at)`; prey walk over, fleeing prey ignore it). Lure arrows that hit the ground work through the arrow's `hit` signal. Fire and frost are left to the gameplay lane's ElementState.

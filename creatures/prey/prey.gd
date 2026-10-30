@@ -53,6 +53,15 @@ func _on_wounded(from: Vector3, _cause: StringName) -> void:
 	_start_flee(from)
 
 
+## Calm prey wander over to the lure's scent; frightened ones ignore it.
+func _on_lured(at: Vector3) -> void:
+	if state == State.FLEE:
+		return
+	state = State.GRAZE
+	_wander_target = at
+	_graze_timer = 0.0
+
+
 func _start_flee(threat: Vector3) -> void:
 	state = State.FLEE
 	_flee_from = threat

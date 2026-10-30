@@ -12,6 +12,12 @@ signal died(cause: StringName)
 const TARGET_LAYER := 1 << 3
 const WORLD_MASK := 1 << 0
 const GROUP := &"creatures"
+## Special arrows (gameplay lane, Arrow.arrow_effect): how long each lasts.
+const SLEEP_TIME := 25.0
+const SLOW_TIME := 15.0
+const SLOW_FACTOR := 0.55
+## How far a lure arrow's scent carries.
+const LURE_RADIUS := 35.0
 
 @export var data: CreatureData
 ## Stable id for saves and story events. Defaults to the node name.
@@ -32,6 +38,9 @@ var move_direction: Vector3 = Vector3.ZERO
 var move_speed: float = 0.0
 ## While true, scenes drive the creature and its brain is paused.
 var scripted: bool = false
+## Seconds left asleep (sleep arrow) and slowed (barbed arrow).
+var asleep_left: float = 0.0
+var slowed_left: float = 0.0
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _stride_left: float = 0.0
@@ -69,8 +78,16 @@ func _physics_process(delta: float) -> void:
 		if _mortal_left <= 0.0:
 			die(mortal_cause)
 			return
-	if not scripted:
+	if asleep_left > 0.0:
+		asleep_left -= delta
+		senses.awareness = 0.0
+		move_speed = 0.0
+		move_direction = Vector3.ZERO
+	elif not scripted:
 		_think(delta)
+	if slowed_left > 0.0:
+		slowed_left -= delta
+		move_speed *= SLOW_FACTOR
 	_move(delta)
 	_leave_tracks(delta)
 
@@ -124,6 +141,38 @@ func on_arrow_hit(arrow: Node3D) -> void:
 	bleeding = maxf(bleeding, 40.0)
 	wounded.emit(cause)
 	_on_wounded(arrow.global_position, cause)
+
+
+## Called by Arrow for special heads. Sleep drops it where it stands (fae
+## shrug most of it off), barbed bleeds and slows, lure draws everything near.
+func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
+	if not alive:
+		return
+	match effect:
+		&"sleep":
+			asleep_left = SLEEP_TIME * (0.2 if data.fae else 1.0)
+			velocity = Vector3.ZERO
+		&"barbed":
+			bleeding = maxf(bleeding, 120.0)
+			slowed_left = SLOW_TIME
+		&"lure":
+			if is_inside_tree():
+				Creature.lure(get_tree(), arrow.global_position)
+
+
+## A lure arrow landed at `at`: every living creature in reach is drawn to it.
+static func lure(tree: SceneTree, at: Vector3, radius: float = LURE_RADIUS) -> void:
+	if tree == null:
+		return
+	for node in tree.get_nodes_in_group(GROUP):
+		var c := node as Creature
+		if c and c.alive and c.global_position.distance_to(at) <= radius:
+			c._on_lured(at)
+
+
+## Brain hook for a lure. Default: ignore it.
+func _on_lured(_at: Vector3) -> void:
+	pass
 
 
 ## Where an arrow landed, for story beats that care (no hit zones yet).
