@@ -44,3 +44,9 @@ signal grade_swap_requested(to_grade: StringName, seconds: float)
 ## silence the ambience, gutter the fire, cold low light; &"calm" restores.
 ## intensity 0..1, blended over `seconds`.
 signal mood_requested(mood: StringName, intensity: float, seconds: float)
+## Creatures: an arrow or blade struck a creature without (yet) killing it.
+## part: &"side", &"eye", &"leg"... as the creatures lane resolves it.
+signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName, part: StringName)
+## Story to world: change the weather now (&"snow_heavy", &"snow_slow",
+## &"snow_pause", &"clear"), blended over `seconds`.
+signal weather_requested(weather: StringName, seconds: float)

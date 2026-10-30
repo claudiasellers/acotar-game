@@ -80,18 +80,16 @@ func _on_grade(to_grade: StringName, seconds: float) -> void:
 func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(PhaseManager.current_phase, &"p0_winter")
 
-	# P0: the systems lane reports food; not enough, then enough.
+	# The food tally is a deed but no longer gates P0 (Keeper's mapping).
 	EventBus.food_stock_changed.emit(3.0)
 	assert_false(tally.running)
 	assert_eq(tally.notch_count(), 3)
 	EventBus.food_stock_changed.emit(7.5)
-	assert_true(tally.running)
-	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
 	_run(tally, 5.0)
-	assert_eq(PhaseManager.current_phase, &"p1_wolf_and_crossing")
-	assert_true(PhaseManager.is_region_unlocked(&"border_woods"))
+	assert_true(WorldState.has_flag("food_secured"))
+	assert_eq(PhaseManager.current_phase, &"p0_winter")
 
-	# The wolf: the ash arrow is granted, a wood arrow does not kill him.
+	# The wolf (ch1): wood alone never kills him; ash in the side, then the eye.
 	watch_signals(EventBus)
 	assert_true(wolf.start())
 	assert_signal_emitted_with_parameters(EventBus, "story_item_granted", [&"arrow_ash", 1])
@@ -100,9 +98,12 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL, "free to take the shot")
 	EventBus.creature_killed.emit(&"andras", &"great_wolf", &"arrow_wood", Vector3.ZERO)
 	_run(wolf, 1.0)
-	assert_false(WorldState.has_flag("wolf_killed"), "wood does not kill a High Fae")
-	EventBus.creature_killed.emit(&"andras", &"great_wolf", &"arrow_ash", Vector3.ZERO)
-	_run(wolf, 5.0)
+	assert_false(WorldState.has_flag("wolf_killed"), "wood alone does not kill a High Fae")
+	EventBus.creature_hit.emit(&"andras", &"great_wolf", &"arrow_ash", &"side")
+	_run(wolf, 1.0)
+	assert_true(cues.has([&"great_wolf", &"look_at_feyre"]))
+	EventBus.creature_killed.emit(&"andras", &"great_wolf", &"arrow_wood", Vector3.ZERO)
+	_run(wolf, 6.0)
 	assert_true(WorldState.has_flag("wolf_killed"))
 	assert_false(wolf.running)
 
@@ -115,6 +116,8 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	EventBus.item_sold.emit(&"obj_wolf_pelt", 40)
 	_run(sale, 5.0)
 	assert_true(WorldState.has_flag("pelt_sold"))
+	assert_eq(PhaseManager.current_phase, &"p1_wolf_and_crossing")
+	assert_true(PhaseManager.is_region_unlocked(&"border_woods"))
 
 	# The beast: only at night, only with Feyre home.
 	beast.set_player_inside(true)
@@ -129,13 +132,14 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_true(beast.current_beat_label().begins_with("decision"))
 	beast.choose(&"interact")
 	_run(beast, 10.0)
-	assert_eq(beast.chosen_fact, "fact.beast_door.raised_knife")
+	assert_eq(beast.chosen_fact, "fact.beast_door.threw_knife")
 	assert_true(WorldState.has_flag("beast_claim_accepted"))
 
 	# The ride and the wall.
 	assert_true(ride.start())
 	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
 	_run(ride, 60.0)
+	assert_true(cues.has([&"feyre", &"smell_metal"]))
 	assert_eq(grade_requests, [[&"spring", 2.0]])
 	assert_true(WorldState.has_flag("wall_crossed"))
 	assert_false(ride.running)

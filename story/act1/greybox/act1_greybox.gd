@@ -56,6 +56,12 @@ func _ready() -> void:
 	_build_village()
 	_build_wall_and_border_woods()
 	_build_spaces()
+	# Real wolf, doe, beast and family from the creatures lane, once merged.
+	if ResourceLoader.exists("res://creatures/story_spawner.gd"):
+		var spawner := Node3D.new()
+		spawner.name = "StorySpawner"
+		spawner.set_script(load("res://creatures/story_spawner.gd"))
+		add_child(spawner)
 	feyre = FEYRE_SCENE.instantiate()
 	feyre.position = Vector3(0, 0.2, 8)
 	add_child(feyre)
@@ -118,6 +124,8 @@ func _on_grade_swap(to_grade: StringName, seconds: float) -> void:
 
 func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	var target := intensity if mood == &"dread" else 0.0
+	if mood == &"enchanted_sleep":
+		target = 0.95 * intensity
 	create_tween().tween_property(self, ^"_dread", target, maxf(seconds, 0.05))
 
 

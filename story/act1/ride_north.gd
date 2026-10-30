@@ -1,10 +1,11 @@
-## The ride north and the wall crossing (lore: the-wall.md).
+## The ride north and the wall crossing, ch5 (Keeper's chapter spine).
 ##
-## Straight after the claim: Feyre rides with the beast along the ride line
-## (the world lane's WallSeamPath, or this space's own RidePath child). She
-## can only look. At the seam the story asks for the cold-to-spring grade
-## swap (2 s, the single most important visual beat) and raises
-## wall_crossed. She rides on into the Border Woods and gets down.
+## Straight after the claim: Feyre rides the beast's white horse through the
+## woods along the ride line (the world lane's WallSeamPath, or this space's
+## RidePath child). She can only look. She smells metal (magic, under the
+## glamour) and falls into an enchanted sleep; she wakes as they pass through
+## a gate at the seam, into spring: the cold-to-spring grade swap (2 s, the
+## single most important visual beat) and wall_crossed.
 class_name RideNorth
 extends SceneSpace
 
@@ -13,6 +14,8 @@ extends SceneSpace
 ## Marker3D, or the middle of the path.
 @export var seam_offset: float = -1.0
 @export var grade_seconds: float = 2.0
+## Fraction of the way to the seam where the magic sleep takes her.
+@export var sleep_at: float = 0.45
 
 var path: Path3D
 var horse: Node3D
@@ -47,9 +50,15 @@ func _build_beats() -> Array:
 		Beats.run(_mount, "mount"),
 		Beats.cue(&"tamlin_beast", &"lead"),
 		Beats.control(StoryControl.Mode.LOOK, null),
+		RideBeat.new(func() -> float: return seam_at() * sleep_at),
+		Beats.cue(&"feyre", &"smell_metal"),
+		Beats.mood(&"enchanted_sleep", 1.0, 2.5),
+		Beats.control(StoryControl.Mode.NONE, null),
 		RideBeat.new(func() -> float: return seam_at()),
 		Beats.run(func(_s: SceneSpace) -> void:
-			EventBus.grade_swap_requested.emit(&"spring", grade_seconds), "grade swap"),
+			EventBus.grade_swap_requested.emit(&"spring", grade_seconds)
+			EventBus.mood_requested.emit(&"calm", 0.0, grade_seconds), "she wakes at the gate"),
+		Beats.control(StoryControl.Mode.LOOK, null),
 		Beats.raise("wall_crossed"),
 		RideBeat.new(func() -> float: return path_length()),
 		Beats.run(_dismount, "dismount"),
@@ -71,7 +80,7 @@ func _mount(_space: SceneSpace) -> void:
 	_rider = player()
 	if _rider:
 		_rider.set_physics_process(false)
-	horse = request_actor(&"horse", _pose_at(0.0), StandIns.horse)
+	horse = request_actor(&"white_horse", _pose_at(0.0), StandIns.horse)
 
 
 func _dismount(_space: SceneSpace) -> void:

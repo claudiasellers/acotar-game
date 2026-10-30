@@ -37,11 +37,25 @@ func test_spring_court_ladder_matches_root_doc() -> void:
 	assert_eq(set.start_phase, &"p0_winter")
 
 
-## Flag names are the Keeper's (lore/07-story/timeline-overview.md).
-func test_act_one_gates_use_keeper_flags() -> void:
+## Flag names and gates are the Keeper's chapter mapping
+## (lore/07-story/timeline-overview.md, "Mapped to the plan's phase ladder").
+func test_gates_follow_the_keeper_mapping() -> void:
 	var set := load("res://data/phases/spring_court_phases.tres") as PhaseSet
-	assert_eq(Array(set.get_phase(&"p0_winter").exit_condition.flags), ["food_secured"])
-	assert_eq(Array(set.get_phase(&"p1_wolf_and_crossing").exit_condition.flags),
-			["wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_crossed"])
-	assert_eq(set.get_phase(&"p1_wolf_and_crossing").exit_condition.mode, ExitCondition.Mode.ALL)
+	var expected := {
+		&"p0_winter": ["wolf_killed", "pelt_sold"],
+		&"p1_wolf_and_crossing": ["beast_claim_accepted", "wall_crossed"],
+		&"p2_grounds": ["first_dinner_eaten", "curtain_trap_set", "bogge_survived", "puca_resisted"],
+		&"p3_house_and_woods": ["tamlin_wound_dressed", "manor_map_drawn", "study_mural_seen",
+				"suriel_bound", "naga_survived", "summer_faerie_comforted"],
+		&"p4_wider_court": ["starlight_pool_found", "gallery_opened", "first_painting", "attor_evaded"],
+		&"p5_calanmai": ["calanmai_attended", "stranger_met", "bite_endured", "paintings_shown"],
+		&"p6_blight_tightens": ["glamour_lifted", "fountain_head_found", "solstice_danced", "rhysand_faced", "sent_home"],
+		&"p7_return_home": ["nesta_truth_heard", "beddor_fire_learned", "wall_recrossed"],
+		&"p8_the_pass": ["alis_truth_heard", "departed_for_mountain"],
+	}
+	for id in expected:
+		var phase := set.get_phase(id)
+		assert_not_null(phase, "missing %s" % id)
+		assert_eq(Array(phase.exit_condition.flags), expected[id], String(id))
+		assert_eq(phase.exit_condition.mode, ExitCondition.Mode.ALL)
 	assert_true(set.get_phase(&"p1_wolf_and_crossing").unlocked_regions.has("border_woods"))

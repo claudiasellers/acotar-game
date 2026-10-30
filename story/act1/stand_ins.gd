@@ -57,4 +57,4 @@ static func beast() -> Node3D:
 static func horse() -> Node3D:
 	var root := Node3D.new()
 	root.name = "StandIn_horse"
-	return _mesh_body(Vector3(0.7, 1.6, 2.3), Color(0.30, 0.22, 0.16), root)
+	return _mesh_body(Vector3(0.7, 1.6, 2.3), Color(0.94, 0.93, 0.90), root)

@@ -1,11 +1,11 @@
-## The beast at the door (lore: book-scene-spaces.md, tamlin.md#beast-form-cc,
-## prythian-overview.md#the-treatys-rule-that-drives-the-plot).
+## The beast at the door, ch3-4 (Keeper's chapter spine).
 ##
-## The night after the pelt is sold, with Feyre inside the cottage: wind, the
-## fire, then the door breaks. The beast fills the room. One physical decision
-## window: raise the knife (interact), loose an arrow (fire, it does nothing),
-## or stand still. Then the demand, a life for a life, and she goes. The door
-## stays broken (fact.cottage_door_broken, for StateVisibility).
+## The night after the pelt is sold, with Feyre home: wind, the fire, then the
+## door bursts. The beast (golden, horse-sized, elk-like horns) roars
+## "Murderer". One physical decision window: throw her knife (interact) or her
+## sisters' iron bracelets (fire); both are useless against it. Or freeze.
+## Then life for a life: die, or live in Prythian forever. Father begs. She
+## goes. The door stays broken (fact.cottage_door_broken, for StateVisibility).
 class_name BeastDoor
 extends SceneSpace
 
@@ -56,15 +56,16 @@ func _build_beats() -> Array:
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
 			StoryControl.set_focus(beast), "it fills the room"),
 		Beats.wait(2.5),
-		Beats.cue(&"tamlin_beast", &"loom"),
+		Beats.cue(&"tamlin_beast", &"accuse"),
 		Beats.mood(&"dread", 1.0, 0.5, 0.35),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact", "fire"])), "window"),
+			StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact", "fire"])), "window"),
 		Beats.decision([
-			{"action": &"interact", "fact": "fact.beast_door.raised_knife"},
-			{"action": &"fire", "fact": "fact.beast_door.shot_at_beast"},
-		], decision_seconds, "fact.beast_door.stood_still"),
+			{"action": &"interact", "fact": "fact.beast_door.threw_knife"},
+			{"action": &"fire", "fact": "fact.beast_door.threw_bracelets"},
+		], decision_seconds, "fact.beast_door.froze"),
 		Beats.cue(&"tamlin_beast", &"speak"),
+		Beats.cue(&"father", &"plead"),
 		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_mode(StoryControl.Mode.LOOK), "a life for a life"),
 		Beats.wait(4.0),
 		Beats.raise("beast_claim_accepted"),
