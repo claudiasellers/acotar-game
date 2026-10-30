@@ -11,6 +11,10 @@ Every lane (thread) follows these rules. The full plan is the project's build pl
 5. Hand off through the queue, never by hand. Lanes on the home machine run `tools/mq/submit.sh HEAD <task>`. Cloud sessions merge `origin/main` in, push `lead/ready-<TASK>-<n>` at the finished commit, and read the answer from the tag `merged/<TASK>-<n>` or `rejected/<TASK>-<n>`. A resubmission takes the next number. See `CLAUDE.md`.
 6. The build lane is a script on the home machine. It takes everything waiting as one batch, runs **the full gate** (it is the only thing that does) and moves `main`. If a change fails it is rejected with the reason; fix it and submit again.
 
+## Screenshots
+
+Heavy renders go to the Mac's GPU, not the cloud's software renderer: push a request with `tools/mq/shots_request.sh` and read the pictures with `tools/mq/shots_fetch.sh`. How-to: [SHOTS.md](SHOTS.md); contract: [contracts/shots.md](contracts/shots.md).
+
 ## Ownership
 
 Each lane owns its folders (core/, world/, systems/ + data/, creatures/, characters/ + art/, dialogue and audio). Change another lane's files only through a handoff to that lane, except for small fixes you call out in your summary.
