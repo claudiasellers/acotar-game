@@ -23,8 +23,11 @@ const STAND_SPEED := 0.25
 const SLOW_WALK := 0.6
 ## Game speed (m/s) where the walk clip plays pure; slower is a slower stride.
 const SLOW_WALK_POINT := 1.6
-## Fastest playback beyond the sprint clip before the cadence looks frantic.
-const MAX_SCALE := 2.3
+## Cadence cap: the fastest the gait clips play before her legs look frantic.
+## Her fast gaits get their speed from stride instead (the run and sprint clips
+## are stride-warped in the retarget to about 5.5 and 10.1 m/s), so at her run
+## and sprint speeds they play at about 1.5x and 1.3x, under this cap.
+const MAX_SCALE := 1.6
 ## Above this ground speed a landing goes straight back to running.
 const LAND_RUN_THROUGH := 2.0
 ## Landing impact (m/s) worth a landing clip at all.
