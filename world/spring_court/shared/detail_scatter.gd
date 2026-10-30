@@ -103,11 +103,14 @@ func _collect() -> void:
 		add_child(cell)
 		_cells[key] = cell
 		for species: StringName in done[key]:
-			_jobs.append(_build_species.bind(cell, species, done[key][species]))
+			# By id, not reference: a teleport can free the cell before its
+			# jobs run, and a freed Node3D can't even be passed as an argument.
+			_jobs.append(_build_species.bind(cell.get_instance_id(), species, done[key][species]))
 
 
-func _build_species(cell: Node3D, species: StringName, buffer: PackedFloat32Array) -> void:
-	if not is_instance_valid(cell) or cell.is_queued_for_deletion():
+func _build_species(cell_id: int, species: StringName, buffer: PackedFloat32Array) -> void:
+	var cell := instance_from_id(cell_id) as Node3D
+	if cell == null or cell.is_queued_for_deletion():
 		return
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
