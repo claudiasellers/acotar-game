@@ -12,3 +12,4 @@ extends Resource
 @export var stations: Array[ManorStationDef] = []
 @export var secrets: Array[ManorSecretDef] = []
 @export var roofs: Array[ManorRoofDef] = []
+@export var anchors: Array[ManorAnchorDef] = []

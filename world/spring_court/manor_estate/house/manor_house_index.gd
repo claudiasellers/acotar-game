@@ -9,6 +9,7 @@ var stairs: Array[ManorStairDef] = []
 var stations: Array[ManorStationDef] = []
 var secrets: Array[ManorSecretDef] = []
 var roofs: Array[ManorRoofDef] = []
+var anchors: Array[ManorAnchorDef] = []
 
 
 func _init(layouts: Array[ManorHouseLayout]) -> void:
@@ -19,6 +20,7 @@ func _init(layouts: Array[ManorHouseLayout]) -> void:
 		stations.append_array(l.stations)
 		secrets.append_array(l.secrets)
 		roofs.append_array(l.roofs)
+		anchors.append_array(l.anchors)
 
 
 ## Real rooms (not exterior dressing).

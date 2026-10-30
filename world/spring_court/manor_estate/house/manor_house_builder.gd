@@ -74,6 +74,14 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		_build_secret(house, secret)
 	for roof in all.roofs:
 		_build_roof(house, roof)
+	for anchor in all.anchors:
+		var m := Marker3D.new()
+		m.name = String(anchor.anchor_id)
+		m.set_meta(&"anchor_id", anchor.anchor_id)
+		m.add_to_group(&"story_anchor")
+		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
+		m.rotation.y = deg_to_rad(anchor.yaw_deg)
+		house.add_child(m)
 	return house
 
 

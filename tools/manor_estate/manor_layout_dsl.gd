@@ -123,6 +123,16 @@ func roof(rect: Rect2, base_level: int, style: StringName = &"hip", height: floa
 	return r
 
 
+func anchor(anchor_id: StringName, level: int, at: Vector3, yaw_deg: float = 0.0) -> ManorAnchorDef:
+	var a := ManorAnchorDef.new()
+	a.anchor_id = anchor_id
+	a.level = level
+	a.position = at
+	a.yaw_deg = yaw_deg
+	layout.anchors.append(a)
+	return a
+
+
 func save() -> Error:
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 	var path := OUT_DIR + "%s.tres" % layout.part_id
