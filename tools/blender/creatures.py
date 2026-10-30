@@ -159,7 +159,7 @@ def tris(objs):
     return total
 
 
-def export(name, objs):
+def export(name, objs, vertex_colors=False):
     os.makedirs(OUT, exist_ok=True)
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
@@ -167,7 +167,8 @@ def export(name, objs):
     path = os.path.abspath(os.path.join(OUT, f"{name}.gltf"))
     glb = path[:-5] + ".tmp.glb"
     bpy.ops.export_scene.gltf(filepath=glb, use_selection=True, export_format="GLB", export_yup=True,
-                              export_apply=True, export_materials="EXPORT")
+                              export_apply=True, export_materials="EXPORT",
+                              export_vertex_color="ACTIVE" if vertex_colors else "MATERIAL")
     glb_to_embedded_gltf(glb, path)
     os.remove(glb)
     print(f"{name}: {tris(objs)} tris -> {path}")

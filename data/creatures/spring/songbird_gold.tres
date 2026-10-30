@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/songbird_gold.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"songbird"
+display_name = "Goldfinch"
+body_plan = 1
+canon = "C"
+body_length = 0.3
+body_height = 0.25
+body_width = 0.16
+walk_speed = 0.5
+run_speed = 8.0
+sight_range = 18.0
+sight_fov_degrees = 320.0
+hearing_range = 22.0
+scent_range = 0.0
+startle_threshold = 0.45
+flee_distance = 30.0
+max_health = 2.0
+leaves_prints = false
+model_scene = ExtResource("2")

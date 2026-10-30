@@ -57,6 +57,8 @@ enum BodyPlan { QUADRUPED, BIRD }
 @export var only_lethal_kills: bool = false
 
 @export_group("Tracks")
+## Prints and twigs belong to the winter forest; spring creatures leave none.
+@export var leaves_prints: bool = true
 ## Distance walked between two prints.
 @export var stride: float = 0.8
 @export var print_size: float = 0.09

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/lamb.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"lamb"
+display_name = "Lamb"
+body_length = 0.65
+body_height = 0.6
+body_width = 0.35
+walk_speed = 0.6
+run_speed = 3.0
+sight_range = 12.0
+hearing_range = 15.0
+scent_range = 10.0
+alert_threshold = 0.5
+startle_threshold = 0.95
+flee_distance = 6.0
+max_health = 10.0
+stride = 0.5
+print_size = 0.04
+twig_chance = 0.0
+leaves_prints = false
+model_scene = ExtResource("2")

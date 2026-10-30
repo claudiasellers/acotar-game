@@ -200,7 +200,7 @@ func _leave_tracks(delta: float) -> void:
 		if _blood_left <= 0.0 and is_inside_tree():
 			_blood_left = 1.5
 			TrackLayer.leave(get_tree(), &"blood", global_position, rotation.y, data.print_size * 1.5)
-	if data.body_plan == CreatureData.BodyPlan.BIRD or not is_on_floor():
+	if data.body_plan == CreatureData.BodyPlan.BIRD or not data.leaves_prints or not is_on_floor():
 		return
 	_stride_left -= step
 	if _stride_left > 0.0 or not is_inside_tree():

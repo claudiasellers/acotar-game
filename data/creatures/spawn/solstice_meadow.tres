@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/butterflies.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/faelights.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/rabbit.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="7"]
+
+[sub_resource type="Resource" id="e0"]
+script = ExtResource("8")
+id = &"songbirds_blue"
+scene = ExtResource("5")
+count = 3
+cluster_radius = 5.0
+groups = 3
+start_hour = 5.0
+end_hour = 20.5
+on_water = false
+canon = "C"
+
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("8")
+id = &"songbirds_rose"
+scene = ExtResource("7")
+count = 3
+cluster_radius = 5.0
+groups = 3
+start_hour = 5.0
+end_hour = 20.5
+on_water = false
+canon = "C"
+
+[sub_resource type="Resource" id="e2"]
+script = ExtResource("8")
+id = &"songbirds_gold"
+scene = ExtResource("6")
+count = 3
+cluster_radius = 5.0
+groups = 2
+start_hour = 5.0
+end_hour = 20.5
+on_water = false
+canon = "C"
+
+[sub_resource type="Resource" id="e3"]
+script = ExtResource("8")
+id = &"butterflies_meadow"
+scene = ExtResource("2")
+count = 1
+cluster_radius = 0.0
+groups = 8
+start_hour = 7.0
+end_hour = 19.0
+on_water = false
+canon = "X"
+
+[sub_resource type="Resource" id="e4"]
+script = ExtResource("8")
+id = &"faelights_meadow"
+scene = ExtResource("3")
+count = 1
+cluster_radius = 0.0
+groups = 5
+start_hour = 20.0
+end_hour = 5.0
+on_water = false
+canon = "C"
+
+[sub_resource type="Resource" id="e5"]
+script = ExtResource("8")
+id = &"rabbits"
+scene = ExtResource("4")
+count = 3
+cluster_radius = 6.0
+groups = 3
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "C"
+
+[resource]
+script = ExtResource("1")
+region_id = &"solstice_meadow"
+entries = Array[ExtResource("8")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5")])

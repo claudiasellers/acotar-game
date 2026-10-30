@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/spring/swan.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"swan"
+display_name = "Swan"
+canon = "X"
+body_length = 0.95
+body_height = 0.75
+body_width = 0.45
+walk_speed = 0.35
+run_speed = 0.9
+sight_range = 20.0
+hearing_range = 20.0
+scent_range = 0.0
+max_health = 8.0
+leaves_prints = false
+model_scene = ExtResource("2")

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/prey/bird.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/spring/songbird_blue.tres" id="2"]
+
+[node name="SongbirdBlue" type="CharacterBody3D"]
+script = ExtResource("1")
+data = ExtResource("2")
