@@ -21,6 +21,8 @@ var focus: Node3D = null
 ## Optional actions that stay available in WALK/LOOK, e.g. &"interact" during
 ## a decision window.
 var allowed_actions: PackedStringArray = []
+## Camera shake 0..1 for frightening moments (the beast in the room).
+var shake: float = 0.0
 
 
 func set_mode(new_mode: Mode, allowed: PackedStringArray = PackedStringArray()) -> void:
@@ -39,6 +41,7 @@ func set_focus(target: Node3D) -> void:
 
 
 func release() -> void:
+	shake = 0.0
 	set_focus(null)
 	set_mode(Mode.FULL)
 

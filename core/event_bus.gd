@@ -40,3 +40,7 @@ signal scene_space_started(space_id: StringName)
 signal scene_space_finished(space_id: StringName)
 ## Story to world: blend the colour grade (the wall crossing, cold to spring).
 signal grade_swap_requested(to_grade: StringName, seconds: float)
+## Story to world/audio: set a scene mood. &"dread" (the wolf, the beast) means
+## silence the ambience, gutter the fire, cold low light; &"calm" restores.
+## intensity 0..1, blended over `seconds`.
+signal mood_requested(mood: StringName, intensity: float, seconds: float)

@@ -79,6 +79,9 @@ func _process(delta: float) -> void:
 	if look != Vector2.ZERO and StoryControl.can_look():
 		_rotate_camera(-look.x * stick_sensitivity * delta, -look.y * stick_sensitivity * delta)
 	_drift_toward_focus(delta)
+	var shake := StoryControl.shake
+	camera.h_offset = randf_range(-0.04, 0.04) * shake
+	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	var target_length := 1.7 if (is_aiming or is_drawing) else 3.6
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
