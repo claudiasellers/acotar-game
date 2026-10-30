@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_fe0h5"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_gdyca"]
+
+[resource]
+script = ExtResource("2_gdyca")
+id = &"rock_boulder_b"
+mesh_path = "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(9.022888, -3.5641181, 2299.67, 4.927095, 0.99565494, -260.70007, 2.3998852, 2294.0085, 5.0228653, 1.0672169, -191.02225, 5.042531, 2212.8845, 3.474241, 1.2524784, -338.5729, 10.128329, 2088.8403, 0.3865317, 0.9597339, -322.04434, 5.2601895, 2211.412, 4.753573, 1.2248757, -144.57397, 2.5820014, 2081.1367, 3.1758978, 0.8662829, -33.557983, -8.490546, 2247.403, 3.1483862, 1.3960513, -218.7283, 7.4665704, 2121.6858, 5.996793, 1.2964082, -330.53384, 8.548404, 2092.2014, 2.0530221, 0.842574, -68.94986, -7.310122, 2191.908, 1.3441513, 1.1535492, -199.35236, 4.463878, 2208.06, 4.7876267, 1.053806, -23.566376, -5.526454, 2294.9053, 3.3107061, 1.3606428)
+material = ExtResource("1_fe0h5")

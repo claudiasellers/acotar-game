@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_1g4qg"]
+
+[resource]
+script = ExtResource("1_1g4qg")
+id = &"hare_tracks"
+mesh_path = "res://world/human_realm/cottage/assets/small/hare_tracks.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-109.335464, -2.6414711, 2499.5137, 4.792236, 1, -146.31421, -1.5781996, 2336.559, 6.0653067, 1, -320.4064, -5.7988405, 2437.021, 1.8056195, 1, -1.736023, -8.083755, 2245.168, 2.472266, 1, -297.45447, -4.145953, 2326.9268, 1.5716995, 1, -154.9168, 1.1859751, 2304.2754, 3.9691143, 1, -22.805115, -1.486378, 2451.437, 1.7803384, 1, -100.86351, -4.286082, 2380.0305, 5.5480256, 1, 21.41272, 1.0081329, 2322.8665, 1.3258668, 1, -235.32059, -1.3337849, 2402.305, 0.11562764, 1, -191.80098, 0.7931017, 2452.7244, 5.1212955, 1, 32.500854, -0.62658286, 2439.8684, 4.878196, 1)
+draw_distance = 90.0

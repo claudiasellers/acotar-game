@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_clqic"]
+
+[resource]
+script = ExtResource("1_clqic")
+id = &"wall_seam"
+scene_path = "res://world/human_realm/wall_seam/wall_seam.tscn"
+center = Vector3(-100, -3.4693022, 1440)
+radius = 800.9994
+neighbors = PackedStringArray("hunting_forest")
+report_path = "res://world/human_realm/wall_seam/wall_seam_report.json"

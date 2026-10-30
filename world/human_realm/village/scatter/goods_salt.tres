@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_kt1ce"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_1r46y"]
+
+[resource]
+script = ExtResource("2_1r46y")
+id = &"goods_salt"
+mesh_path = "res://world/human_realm/village/assets/village_goods_salt.glb"
+tags = PackedStringArray("canon:C")
+instances = PackedFloat32Array(382.09058, 3.0976639, 2269.8904, -3.0368721, 1)
+cast_shadow = false
+material = ExtResource("1_kt1ce")

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_7hmhg"]
+
+[resource]
+script = ExtResource("1_7hmhg")
+id = &"robin_post"
+mesh_path = "res://world/human_realm/cottage/assets/small/robin_post.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-783.13464, -3.9392755, 2197.5842, 1.6838248, 1, -714.4864, 10.882682, 2390.13, 1.7749244, 1, -793.49225, -5.4881077, 2147.1104, 3.4188375, 1, -795.21967, -3.550072, 2199.9587, 2.4249399, 1, -826.79004, -1.0659512, 2151.191, 0.5614748, 1, -766.6067, -7.099763, 2173.9956, 1.7057072, 1, -811.49255, -3.7953758, 2171.6924, 4.726166, 1)
+draw_distance = 90.0

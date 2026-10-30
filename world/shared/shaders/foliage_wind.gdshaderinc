@@ -2,13 +2,13 @@
 // Globals are set from project.godot [shader_globals] and driven at runtime by
 // the World scene from Weather.wind_at() and Clock. Include in a spatial shader:
 //   #include "res://world/shared/shaders/foliage_wind.gdshaderinc"
-//   void vertex() { VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, COLOR.r); }
-// COLOR.r (vertex colour red) = how free that vertex is to move, 0 at the root.
+//   void vertex() { VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.0, flex_height, VERTEX.y)); }
+// The flex argument is how free that vertex is to move: 0 at the root, 1 at the tip.
 
 global uniform vec3 wind_direction;
 global uniform float wind_strength;
 global uniform float snow_cover;
-instance uniform float wind_amount = 0.5;
+uniform float wind_amount : hint_range(0.0, 1.0) = 0.5;
 
 vec3 foliage_wind(vec3 vertex, mat4 model, float flex) {
 	vec3 world_origin = model[3].xyz;

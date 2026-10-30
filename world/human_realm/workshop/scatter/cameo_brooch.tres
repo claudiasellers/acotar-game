@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_vl2l8"]
+
+[resource]
+script = ExtResource("1_vl2l8")
+id = &"cameo_brooch"
+mesh_path = "res://world/human_realm/workshop/assets/small/cameo_brooch.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-693.7113, 5.8529, 2357.5498, 4.866822, 1, -686.29004, -5.1652803, 2327.915, 4.380182, 1, -651.3299, 6.743924, 2423.4573, 2.1686897, 1)
+cast_shadow = false
+draw_distance = 60.0

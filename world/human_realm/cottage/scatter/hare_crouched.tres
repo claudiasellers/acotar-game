@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_km24t"]
+
+[resource]
+script = ExtResource("1_km24t")
+id = &"hare_crouched"
+mesh_path = "res://world/human_realm/cottage/assets/small/hare_crouched.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(25.161041, 0.8773026, 2313.5996, 3.6880205, 1, -226.70782, -0.58473355, 2389.543, 2.5559669, 1, -180.57095, -1.2271239, 2445.2007, 4.194114, 1, -152.45184, -3.8869262, 2413.6975, 1.3621889, 1, -191.3241, 0.49348032, 2469.2188, 0.16089483, 1, -61.582855, -0.7018703, 2396.2969, 4.9413376, 1)
+draw_distance = 90.0

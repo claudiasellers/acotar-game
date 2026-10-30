@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="HeightProvider" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://world/shared/terrain/height_provider.gd" id="1"]
+[ext_resource type="Script" path="res://world/human_realm/shared/human_realm_height.gd" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"human_realm"
+bounds = Rect2(-900, 1400, 1600, 1100)
+fade = 64.0
+height_script = ExtResource("2")
+priority = 0

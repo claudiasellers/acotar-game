@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_00why"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_u8ltl"]
+
+[resource]
+script = ExtResource("2_u8ltl")
+id = &"tree_field_oak"
+mesh_path = "res://world/human_realm/shared/assets/flora/tree_oak_bare.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-40, -1.053137, 2330, 0.04243686, 1.453796, -330, -4.169723, 2318, 6.0441227, 1.3684238, 20, -1.201397, 2470, 1.1992418, 1.2101953, -190, -0.08011109, 2440, 3.0719628, 1.2853882)
+draw_distance = 200.0
+material = ExtResource("1_00why")
+impostor_path = "res://world/human_realm/shared/assets/flora/tree_oak_bare_far.glb"

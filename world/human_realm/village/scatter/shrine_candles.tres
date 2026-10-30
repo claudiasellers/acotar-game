@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_6pe2s"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_jc5bx"]
+
+[resource]
+script = ExtResource("2_jc5bx")
+id = &"shrine_candles"
+mesh_path = "res://world/human_realm/village/assets/village_candle_offering.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(322.8446, 2.0785642, 2146.4138, -1.0191438, 1)
+cast_shadow = false
+draw_distance = 30.0
+material = ExtResource("1_6pe2s")

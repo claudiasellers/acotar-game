@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_bhyk2"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_akfnt"]
+
+[resource]
+script = ExtResource("2_akfnt")
+id = &"tree_willow_pollard"
+mesh_path = "res://world/human_realm/shared/assets/flora/tree_willow_pollard.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-265.41858, -2.096697, 2343.3184, 3.1541693, 1.094217, -301.16055, -8.037699, 2364.323, 6.053443, 1.0924078, -288.27484, -7.331416, 2378.988, 2.9635882, 1.0954293, -299.3359, -8.248832, 2372.0183, 3.1647122, 1.0977817, -300.7598, -6.886549, 2348.7927, 3.5807185, 1.146663, -270.90027, -5.0696793, 2379.538, 6.215487, 1.0752786, -279.54968, -5.8799877, 2383.2275, 0.57989955, 1.02749, -282.38123, -3.8578792, 2337.6191, 4.0630136, 0.9486865, -260.6833, -1.7019196, 2350.446, 5.4997616, 0.99922216)
+wind = 0.2
+draw_distance = 160.0
+material = ExtResource("1_bhyk2")
+impostor_path = "res://world/human_realm/shared/assets/flora/tree_willow_pollard_far.glb"

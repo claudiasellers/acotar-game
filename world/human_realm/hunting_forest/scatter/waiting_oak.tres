@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_nuk33"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_7ceep"]
+
+[resource]
+script = ExtResource("2_7ceep")
+id = &"waiting_oak"
+mesh_path = "res://world/human_realm/shared/assets/flora/tree_waiting_oak.glb"
+tags = PackedStringArray("tree", "canon:X", "landmark")
+instances = PackedFloat32Array(-420, 1.5789043, 1720, 2.4, 1)
+wind = 0.15
+draw_distance = 400.0
+material = ExtResource("1_nuk33")
+impostor_path = "res://world/human_realm/shared/assets/flora/tree_waiting_oak_far.glb"
+impostor_distance = 900.0

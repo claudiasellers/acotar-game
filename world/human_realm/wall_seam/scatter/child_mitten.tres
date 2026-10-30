@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_u474u"]
+
+[resource]
+script = ExtResource("1_u474u")
+id = &"child_mitten"
+mesh_path = "res://world/human_realm/wall_seam/assets/props/child_mitten.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(381.23132, -3.3569763, 1402.3384, 0.062204447, 0.92688054, -564.3861, 8.36083, 1404.0344, 3.1015792, 0.86728156, 58.255554, 8.444969, 1424.7698, 5.6712995, 1.0843464)

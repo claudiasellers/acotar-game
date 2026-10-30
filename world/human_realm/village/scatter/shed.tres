@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_nc13u"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_r33xo"]
+
+[resource]
+script = ExtResource("2_r33xo")
+id = &"shed"
+mesh_path = "res://world/human_realm/village/assets/village_shed.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(327.8003, 3.0976639, 2227.9612, -0.011608998, 1, 326.46835, 3.0976639, 2263.7073, 3.0372593, 1, 419.58096, 3.0976639, 2248.169, -2.6578977, 1, 332.9533, 3.0976639, 2205.689, 2.0515912, 1, 305.98, 3.0976639, 2227.6875, -0.038036317, 1, 287.66058, 3.0976639, 2258.184, 2.999415, 1, 287.7428, 3.0976639, 2224.963, -0.10865317, 1)
+draw_distance = 500.0
+material = ExtResource("1_nc13u")

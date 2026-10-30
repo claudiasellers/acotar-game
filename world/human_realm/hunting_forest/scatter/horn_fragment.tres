@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_hpepn"]
+
+[resource]
+script = ExtResource("1_hpepn")
+id = &"horn_fragment"
+mesh_path = "res://world/human_realm/hunting_forest/assets/props/horn_fragment.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(468.1067, -6.4769936, 1666.242, 1.8588318, 1.1593511, 340.56238, 4.5257115, 1518.4103, 3.4073904, 0.89423776, 351.62317, 2.112428, 1863.974, 0.46347323, 0.9168856, 579.8716, -3.3206825, 1957.8551, 1.6037736, 0.94881904, 324.9275, 3.7443926, 1989.7598, 3.298292, 1.117422, 515.6044, -7.087011, 1645.4653, 3.3527117, 1.1950088, 696.3037, -1.5150054, 1924.1489, 4.644419, 0.8879838, 474.82446, 2.5400143, 1885.3235, 3.0631135, 1.1078147)

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_lqt3l"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_ms4s3"]
+
+[resource]
+script = ExtResource("2_ms4s3")
+id = &"trough"
+mesh_path = "res://world/human_realm/village/assets/village_trough.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(380.50586, 2.9455898, 2256.9778, 1.9707963, 1)
+draw_distance = 90.0
+material = ExtResource("1_lqt3l")

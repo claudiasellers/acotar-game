@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider_set.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider.gd" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://world/spring_court/border_woods/border_woods_terrain.gd" id="4_border"]
 [ext_resource type="Script" path="res://world/spring_court/eastern_woods/eastern_woods_terrain.gd" id="5_eastern"]
 [ext_resource type="Script" path="res://world/spring_court/suriel_glade/suriel_glade_terrain.gd" id="6_glade"]
+[ext_resource type="Resource" path="res://world/human_realm/shared/human_realm_height_provider.tres" id="7_human_realm"]
 
 [sub_resource type="Resource" id="Resource_manor"]
 script = ExtResource("2")
@@ -41,4 +42,4 @@ priority = 11
 
 [resource]
 script = ExtResource("1")
-providers = Array[Resource]([SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade")])
+providers = Array[Resource]([ExtResource("7_human_realm"), SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade")])

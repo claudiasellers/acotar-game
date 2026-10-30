@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_n1ms1"]
+
+[resource]
+script = ExtResource("1_n1ms1")
+id = &"porcelain_shard"
+mesh_path = "res://world/human_realm/workshop/assets/small/porcelain_shard.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-652.3923, -5.2976556, 2339.7905, 2.1295524, 1, -645.62213, -5.2976556, 2308.0784, 2.1672022, 1, -637.83606, -5.2976556, 2346.5146, 1.9501274, 1, -628.51184, -5.2976556, 2328.772, 6.074366, 1, -651.10846, -5.2976556, 2331.46, 3.1885524, 1, -666.7634, -5.2976556, 2332.1455, 0.6961802, 1, -616.3614, -5.2976556, 2328.7688, 3.6178904, 1, -658.50525, -5.2976556, 2309.925, 2.5731528, 1, -644.87286, -5.2976556, 2341.0066, 3.8834648, 1)
+cast_shadow = false
+draw_distance = 60.0

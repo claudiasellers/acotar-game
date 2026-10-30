@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_0ehkl"]
+
+[resource]
+script = ExtResource("1_0ehkl")
+id = &"cottage"
+scene_path = "res://world/human_realm/cottage/cottage.tscn"
+center = Vector3(-150, 2.3599186, 2275)
+radius = 301.03986
+neighbors = PackedStringArray("workshop", "hunting_forest", "village")
+report_path = "res://world/human_realm/cottage/cottage_report.json"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_kudgi"]
+
+[resource]
+script = ExtResource("1_kudgi")
+id = &"village"
+scene_path = "res://world/human_realm/village/village.tscn"
+center = Vector3(375, 3.1776638, 2275)
+radius = 395.2847
+neighbors = PackedStringArray("cottage", "hunting_forest")
+report_path = "res://world/human_realm/village/village_report.json"

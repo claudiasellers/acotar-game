@@ -12,6 +12,8 @@ global uniform float magic_amount;
 uniform vec4 albedo : source_color = vec4(1.0);
 uniform sampler2D albedo_texture : source_color, filter_linear_mipmap, hint_default_white;
 uniform bool use_vertex_color = true;
+// Height (mesh units) at which a vertex sways fully in the wind; 0 at the base.
+uniform float flex_height = 1.0;
 uniform float alpha_scissor : hint_range(0.0, 1.0) = 0.4;
 uniform float wrap : hint_range(0.0, 1.0) = 0.5;
 uniform vec4 shade_tint : source_color = vec4(0.62, 0.55, 0.78, 1.0);
@@ -31,7 +33,7 @@ varying vec3 world_normal;
 varying vec3 world_pos;
 
 void vertex() {
-	VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, COLOR.r);
+	VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.0, max(flex_height, 0.001), VERTEX.y));
 	world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
@@ -44,7 +46,7 @@ void fragment() {
 	vec4 tex = texture(albedo_texture, UV);
 	vec3 col = albedo.rgb * tex.rgb;
 	if (use_vertex_color) {
-		col *= mix(vec3(1.0), COLOR.rgb, step(0.001, COLOR.g + COLOR.b));
+		col *= COLOR.rgb;
 	}
 	float up = clamp(world_normal.y, 0.0, 1.0);
 	float snow = smoothstep(0.35, 0.8, up) * snow_cover * snow_catch;

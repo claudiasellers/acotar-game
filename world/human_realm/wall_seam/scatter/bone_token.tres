@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_bmd1q"]
+
+[resource]
+script = ExtResource("1_bmd1q")
+id = &"bone_token"
+mesh_path = "res://world/human_realm/hunting_forest/assets/props/bone_token.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(510.87537, -9.453271, 1440.0673, 6.1875563, 1.0840024, -604.36664, 6.79643, 1463.2367, 1.4343134, 0.9059147, 86.99658, 8.559526, 1407.5626, 1.4973419, 0.99596167, 219.9657, 3.2355876, 1449.6698, 2.0942376, 1.1438903, -733.74835, 9.8850355, 1469.9794, 4.126009, 0.92627525, -340.43066, 7.02664, 1428.729, 5.418982, 0.85222447, -117.995544, -3.398803, 1424.1283, 1.5102676, 1.1220495, -850.8519, 14.720508, 1472.1725, 1.6231601, 1.1170689)

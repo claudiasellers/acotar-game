@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_j5f62"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_u3gyt"]
+
+[resource]
+script = ExtResource("2_u3gyt")
+id = &"boulders"
+mesh_path = "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(119.97019, -4.8250723, 2232.7544, 0.50717854, 0.8263023, 121.296684, -2.9565856, 2280.7947, 6.161572, 0.96296805, 199.13016, 3.399706, 2103.801, 6.009057, 0.7120539, 194.1658, -0.6471014, 2183.842, 3.5810764, 0.8200322, 466.56155, -1.6932366, 2416.1921, 1.362013, 0.840081)
+draw_distance = 200.0
+material = ExtResource("1_j5f62")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_aqpms"]
+
+[resource]
+script = ExtResource("1_aqpms")
+id = &"lost_boot"
+mesh_path = "res://world/human_realm/wall_seam/assets/props/lost_boot.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(663.8513, -2.3746986, 1402.3405, 5.4293976, 0.94048524, 537.55347, -6.7865844, 1403.2753, 4.990877, 0.9757344, -334.09393, 7.2264357, 1414.8225, 4.4506526, 0.8894487, 173.39417, 5.4419427, 1407.7451, 3.2031126, 1.1038369)

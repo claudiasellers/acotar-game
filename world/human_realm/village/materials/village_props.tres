@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://world/shared/shaders/stylized_foliage.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/use_vertex_color = true
+shader_parameter/flex_height = 100.0
+shader_parameter/alpha_scissor = 0.0
+shader_parameter/wrap = 0.35
+shader_parameter/rim_strength = 0.35
+shader_parameter/translucency = 0.0
+shader_parameter/roughness_value = 0.85
+shader_parameter/snow_catch = 0.45
+shader_parameter/sparkle = 0.0
+shader_parameter/emission_glow = 0.0

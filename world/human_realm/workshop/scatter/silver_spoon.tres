@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_8pss8"]
+
+[resource]
+script = ExtResource("1_8pss8")
+id = &"silver_spoon"
+mesh_path = "res://world/human_realm/workshop/assets/small/silver_spoon.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-635.93634, -5.1676555, 2336.199, 5.025899, 1, -642.03174, -5.3020673, 2333.8457, 1.6253332, 1, -632.21466, -5.2622175, 2328.7478, 4.8786826, 1, -647.46466, -5.1676555, 2325.9333, 2.490168, 1, -644.60046, -5.1676555, 2323.0847, 4.22507, 1)
+cast_shadow = false
+draw_distance = 60.0

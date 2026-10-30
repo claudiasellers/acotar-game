@@ -31,7 +31,7 @@ world lane thread ("Build the human realm and the wall").
 
 ## 2. Terrain
 
-- One **Terrain3D** node (v1.1.0-rc1, vendored in `addons/terrain_3d/`) for the whole map, in the persistent World scene `world/shared/world/world.tscn`. Region size 1024, vertex spacing 1 m, 20 regions.
+- One **Terrain3D** node (v1.1.0-rc1, vendored in `addons/terrain_3d/`) for the whole map, in the persistent World scene `world/shared/world/world.tscn`. Terrain3D region size 256 (its default), vertex spacing 1 m, 320 regions; the bake works in 1024 m tiles. Baked data is ~72 MB and takes ~2.5 min on 4 cores.
 - **Height is code, not committed binaries.** `WorldHeight.height_at(x, z)` = `MacroHeight` blended with every registered `HeightProvider`, in priority order. A provider's height wins inside its `bounds` and fades back to macro over its outer `fade` metres (default 64), so neighbours always meet.
 - **To add your terrain:** write a script with
   ```gdscript
@@ -39,7 +39,7 @@ world lane thread ("Build the human realm and the wall").
   static func texture_at(x: float, z: float) -> Vector3i    # optional: (base slot, overlay slot, blend 0-255)
   ```
   and append a `HeightProvider` (id, bounds as `Rect2(min_x, min_z, width, depth)`, fade, height_script, priority) to `world/shared/terrain/height_providers.tres` in your own handoff. Build on `MacroHeight.height_at` / `land_height_at` so the river and hills carry through.
-- **Texture slots** (`WorldHeight.Tex`): 0 SNOW, 1 FROZEN_EARTH, 2 ROCK, 3 WINTER_GRASS, 4 SPRING_GRASS, 5 MOSS, 6 FOREST_FLOOR, 7 PATH, 8 RIVERBED, 9 BLIGHT. Ask the world lane for new slots.
+- **Texture slots** (`WorldHeight.Tex`): 0 SNOW, 1 FROZEN_EARTH, 2 ROCK, 3 WINTER_GRASS, 4 SPRING_GRASS, 5 MOSS, 6 FOREST_FLOOR, 7 PATH, 8 RIVERBED, 9 BLIGHT, 10 ICE. Ask the world lane for new slots.
 - **Bake:** `godot --headless -s world/shared/terrain/bake_terrain.gd` writes Terrain3D data to `world/shared/terrain/data/` (gitignored). The build lane bakes before export. The World scene bakes in memory if the data is missing (slow first load, logs a warning).
 - **Before Terrain3D lands on main**, lanes may build stand-in chunk meshes + `HeightMapShape3D`, but under a child named `TerrainFallback`; the World scene disables every `TerrainFallback` when Terrain3D is active. Sample `WorldHeight.height_at` (not your own function) when placing things, so placement matches the final terrain.
 - **Collision layer 1** = static world (terrain, buildings, rocks). Feyre's `WORLD_MASK` expects it.
@@ -60,18 +60,20 @@ world lane thread ("Build the human realm and the wall").
   | Field | Meaning |
   |---|---|
   | `id` | unique in the region; forage keys are `"<id>:<index>"` |
-  | `mesh` | the Mesh (from a cloud-Blender `.glb` or a generated mesh) |
+  | `mesh` or `mesh_path` | the Mesh, or a path to a cloud-Blender `.glb` (first MeshInstance3D; export one joined mesh per asset) or mesh `.tres` |
   | `ingredient_id` | `ing_*` id from `data/ingredients/` (lore ids); empty = decoration |
   | `tags` | `landmark`, `collectible`, `look` (a notice-moment subject), ... |
   | `instances` | `PackedFloat32Array`, 5 floats each: x, y, z (world), yaw (rad), scale |
-  | `cast_shadow`, `wind` (0-1 GPU sway), `draw_distance` (default 120 m) | |
-  | `impostor_mesh`, `impostor_distance` (default 600 m) | camera-facing card past `draw_distance` |
+  | `material` | material_override for all instances (stylized_flora.tres or a variant) |
+| `cast_shadow`, `wind` (0-1 GPU sway; set `wind_amount` on the material, never per-instance shader params), `draw_distance` (default 120 m) | |
+  | `impostor_mesh` / `impostor_path`, `impostor_distance` (default 600 m) | low-poly far LOD or card drawn past `draw_distance` |
 
+- **glb import:** set `import_script/path="res://world/shared/import/vertex_color_import.gd"` in every cloud-Blender `.glb.import` (Godot's glTF importer doesn't turn on albedo-from-vertex-colour by itself).
 - A `ScatterField` node (`region_id`, `layers`, `chunk_size` 64 m) in the region builds them into chunked `MultiMeshInstance3D`s. **No per-instance nodes** (R16).
 - **Streaming without hitches (optional, owned by the woods lane):** `SlicedScatterField` (`world/shared/scatter/sliced_scatter_field.gd`) is a `ScatterField` whose chunks are prepared on a worker thread (`SlicedScatterField.prepare(layer, chunk_size)` → ready MultiMesh buffers) and added one per job with `add_chunk()`; chunks carry the same groups and metas as above. Main-thread build work goes through `FrameBudget.run(queue)` (`world/shared/scatter/frame_budget.gd`), a 4 ms per-frame budget shared by every region builder. Bake slow generation into a git-ignored `_generated/` cache from `tools/generators/` (R15) so runtime only loads.
 - **Forage hookup for the systems lane:** every forage chunk is in group `forage_field` with metas `ingredient_id`, `scatter_id`, `region_id`, `instance_ids` (layer index per multimesh instance) and `layer`. Use `ScatterField.instance_position(chunk, i)` to find instance `i`, `ScatterField.set_instance_hidden(chunk, i, true)` to hide it, and the key `"<scatter_id>:<instance_ids[i]>"` with `WorldDeltas.mark_picked(region_id, key, respawn_days)`.
-- **Shared stylized material (art direction R3):** use `world/shared/shaders/stylized_foliage.gdshader` as a `ShaderMaterial` for flora and soft props. Soft wrapped light with a lilac shade tint, warm rim, leaf translucency, GPU wind, automatic snow on upward faces when `snow_cover` is on (human realm), and `sparkle` glints scaled by `magic_amount` (Spring Court). Tune per species with `albedo`/`albedo_texture`, `rim_strength`, `sparkle`, `emission_glow`, `snow_catch`. Vertex colour red = wind flex; green/blue non-zero = tint by vertex colour.
-- **GPU wind**: include `world/shared/shaders/foliage_wind.gdshaderinc` and call `foliage_wind(VERTEX, MODEL_MATRIX, COLOR.r)` (vertex red = flex, 0 at the root). Globals `wind_direction`, `wind_strength`, `snow_cover`, `magic_amount` are in `project.godot` and driven by the World scene from `Weather.wind_at()`.
+- **Shared stylized material (art direction R3):** use `world/shared/shaders/stylized_foliage.gdshader` as a `ShaderMaterial` for flora and soft props. Soft wrapped light with a lilac shade tint, warm rim, leaf translucency, GPU wind, automatic snow on upward faces when `snow_cover` is on (human realm), and `sparkle` glints scaled by `magic_amount` (Spring Court). Tune per species with `albedo`/`albedo_texture`, `rim_strength`, `sparkle`, `emission_glow`, `snow_catch`. Vertex colour (glTF COLOR_0) tints the albedo when `use_vertex_color` is on; wind flex comes from vertex height up to `flex_height`. `world/shared/materials/stylized_flora.tres` is the default; make per-species variants beside your assets. Set it as the layer's `material`.
+- **GPU wind**: include `world/shared/shaders/foliage_wind.gdshaderinc` and call `foliage_wind(VERTEX, MODEL_MATRIX, flex)` (flex 0 at the root, 1 at the tip). Globals `wind_direction`, `wind_strength`, `snow_cover`, `magic_amount` are in `project.godot` and driven by the World scene from `Weather.wind_at()`.
 
 ## 5. Coverage report (R1, world smoke)
 

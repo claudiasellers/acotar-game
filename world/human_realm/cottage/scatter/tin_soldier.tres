@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_e28ko"]
+
+[resource]
+script = ExtResource("1_e28ko")
+id = &"tin_soldier"
+mesh_path = "res://world/human_realm/cottage/assets/small/tin_soldier.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-180.66376, 4.7962947, 2228.1484, 3.7340925, 1, -133.69801, 5.156725, 2173.5557, 1.077711, 1, -172.20882, 3.2146728, 2284.2695, 3.8891747, 1, -293.93677, 3.3680496, 2255.8198, 1.737263, 1)
+cast_shadow = false
+draw_distance = 60.0

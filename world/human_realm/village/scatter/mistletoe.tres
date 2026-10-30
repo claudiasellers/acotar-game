@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_axuwc"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_b0pk4"]
+
+[resource]
+script = ExtResource("2_b0pk4")
+id = &"mistletoe"
+mesh_path = "res://world/human_realm/shared/assets/flora/mistletoe_clump.glb"
+ingredient_id = &"ing_mistletoe"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(63.02062, -0.38299632, 2299.8872, 5.7805653, 1, 64.70683, 3.9344046, 2350.7976, 1.5922465, 1, 159.75212, -2.9157343, 2219.5918, 5.8179264, 1, 254.6007, 10.287777, 2435.2275, 5.661513, 1, 507.64487, 3.5818915, 2195.1924, 1.0047584, 1, 589.2352, 4.981485, 2201.2483, 4.352496, 1, 589.3749, 7.5817027, 2350.5212, 4.421523, 1, 89.70282, -1.5482428, 2095.654, 2.4348965, 1, 615.42944, -2.372492, 2097.994, 1.6531436, 1, 195.67857, -0.18106128, 2173.1055, 2.275064, 1, 189.83109, 0.6430111, 2240.1248, 3.91941, 1, 572.86755, 2.882909, 2239.5562, 0.6584039, 1, 363.59192, 3.0248742, 2388.2397, 0.078296356, 1)
+cast_shadow = false
+wind = 0.1
+draw_distance = 50.0
+material = ExtResource("1_axuwc")

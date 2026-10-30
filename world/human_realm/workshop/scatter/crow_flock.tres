@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_0nnm5"]
+
+[resource]
+script = ExtResource("1_0nnm5")
+id = &"crow_flock"
+mesh_path = "res://world/human_realm/cottage/assets/small/crow_flock.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-780.54193, 3.2400658, 2392.0313, 3.0595963, 1, -593.6022, 4.275101, 2161.2778, 1.9728899, 1, -701.4148, -2.7379205, 2151.375, 3.9872603, 1, -541.3592, 4.2491384, 2124.1611, 4.787384, 1, -512.96136, -0.39816776, 2245.4758, 3.8165247, 1, -545.19543, 1.5025972, 2323.056, 4.39873, 1)
+draw_distance = 90.0

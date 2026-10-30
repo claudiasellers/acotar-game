@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_23rta"]
+
+[resource]
+script = ExtResource("1_23rta")
+id = &"bone_token"
+mesh_path = "res://world/human_realm/cottage/assets/small/bone_token.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-25.821869, -1.1590405, 2492.351, 3.1995833, 1, -135.11295, -1.9193716, 2361.5193, 5.2232137, 1, -317.34637, -8.3043165, 2357.7212, 1.9283404, 1, -50.98047, 0.61212945, 2483.2488, 5.6831045, 1, -329.20407, 3.8494413, 2253.4854, 0.31525788, 1, -2.1043396, 1.251024, 2100.4692, 0.16817349, 1)
+cast_shadow = false
+draw_distance = 60.0

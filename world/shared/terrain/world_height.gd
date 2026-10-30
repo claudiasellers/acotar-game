@@ -7,7 +7,7 @@ extends RefCounted
 const PROVIDER_SET_PATH := "res://world/shared/terrain/height_providers.tres"
 
 ## Terrain3D texture slots (see docs/contracts/world.md).
-enum Tex { SNOW, FROZEN_EARTH, ROCK, WINTER_GRASS, SPRING_GRASS, MOSS, FOREST_FLOOR, PATH, RIVERBED, BLIGHT }
+enum Tex { SNOW, FROZEN_EARTH, ROCK, WINTER_GRASS, SPRING_GRASS, MOSS, FOREST_FLOOR, PATH, RIVERBED, BLIGHT, ICE }
 
 static var _providers: Array[HeightProvider] = []
 static var _loaded := false
@@ -58,6 +58,17 @@ static func texture_at(x: float, z: float) -> Vector3i:
 	if slope > 26.0:
 		return Vector3i(ground, Tex.ROCK, int(remap(slope, 26.0, 38.0, 0.0, 255.0)))
 	return Vector3i(ground, Tex.FROZEN_EARTH if winter else Tex.MOSS, 0)
+
+
+## Initialise every lazily-built noise before sampling from threads.
+static func warm_up() -> void:
+	_ensure_loaded()
+	MacroHeight.height_at(0.0, 0.0)
+	for p in _providers:
+		var c := p.bounds.get_center()
+		p.height_at(c.x, c.y)
+		if p.has_texture_rule():
+			p.texture_at(c.x, c.y)
 
 
 static func providers() -> Array[HeightProvider]:

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_rwh3s"]
+
+[resource]
+script = ExtResource("1_rwh3s")
+id = &"figurehead_fragment"
+mesh_path = "res://world/human_realm/workshop/assets/small/figurehead_fragment.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-645.43384, -5.2976556, 2335.2402, 1.5054437, 1, -645.2595, -5.1676555, 2325.7292, 5.9742985, 1, -648.61096, -5.2976556, 2335.0232, 3.2827945, 1)
+cast_shadow = false
+draw_distance = 60.0

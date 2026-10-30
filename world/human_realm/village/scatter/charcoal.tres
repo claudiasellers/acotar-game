@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_pwmbc"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_tay2c"]
+
+[resource]
+script = ExtResource("2_tay2c")
+id = &"charcoal"
+mesh_path = "res://world/human_realm/shared/assets/flora/charcoal_lump.glb"
+ingredient_id = &"ing_charcoal"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(294.2615, 3.1776638, 2269.1023, 4.5553617, 1.1333421, 295.42862, 3.1776638, 2269.282, 1.599315, 0.9801722, 295.75412, 3.1776638, 2268.9617, 1.8938583, 0.9034121, 295.374, 3.1776638, 2268.3032, 3.96864, 0.9811444, 295.63818, 3.1776638, 2268.1975, 3.0185902, 1.0587169, 297.20004, 3.1776638, 2268.6367, 1.7403243, 1.0952777, 295.78748, 3.1776638, 2269.3225, 1.6289147, 1.0159628, 296.27435, 3.1776638, 2268.1912, 2.0557985, 1.1043913, 344.64078, 3.1776638, 2257.1152, 4.3197203, 1, 323.59183, 3.1776638, 2234.8086, 5.583017, 1, 331.30786, 3.1776638, 2256.3247, 1.141461, 1, 303.69293, 3.1776638, 2233.7905, 2.0426679, 1, 456.44046, 3.1776638, 2200.7693, 0.4475451, 1, 479.7667, 3.1776638, 2211.4492, 3.214714, 1, 318.3234, 3.1776638, 2171.454, 4.0030365, 1, 290.9676, 3.1776638, 2250.9343, 3.3662672, 1, 444.89703, 3.1776638, 2320.9626, 4.4583745, 1, 426.94354, 3.1776638, 2279.937, 4.549888, 1)
+cast_shadow = false
+draw_distance = 40.0
+material = ExtResource("1_pwmbc")

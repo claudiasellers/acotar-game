@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_pxfch"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_b6hpy"]
+
+[resource]
+script = ExtResource("2_b6hpy")
+id = &"owl_feathers"
+mesh_path = "res://world/human_realm/shared/assets/flora/feather_owl.glb"
+ingredient_id = &"ing_owl_feather"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(602.0687, 2.694717, 2146.4832, 5.9258313, 1, 601.8424, 2.7390213, 2148.1108, 5.412465, 1, 600.7103, 3.5845723, 2154.629, 3.880274, 1, 603.7475, 2.8287401, 2148.258, 0.9908256, 1)
+cast_shadow = false
+wind = 0.2
+draw_distance = 30.0
+material = ExtResource("1_pxfch")

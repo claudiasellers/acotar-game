@@ -10,18 +10,27 @@ const STRIDE := 5
 ## Unique within the region. Forage keys are "<id>:<index>" (WorldDeltas).
 @export var id: StringName
 @export var mesh: Mesh
+## Alternative to `mesh`: a .glb/.tscn (first MeshInstance3D's mesh is used)
+## or a mesh .tres/.res. Lets generators reference assets that are made later.
+@export_file("*.glb", "*.tscn", "*.tres", "*.res") var mesh_path: String
 ## Ingredient id from data/ingredients (lore ing_* ids). Empty = decoration.
 @export var ingredient_id: StringName
 ## Free-form labels, e.g. "landmark", "collectible", "look".
 @export var tags: PackedStringArray = []
 @export var instances: PackedFloat32Array = []
 @export var cast_shadow := true
-## Sway amount for the shared GPU wind (0 = rigid, e.g. rocks).
+## Sway amount for the shared GPU wind (0 = rigid, e.g. rocks). Informational:
+## set `wind_amount` on the layer's material (instance uniforms would overflow
+## the global instance buffer with thousands of chunks).
 @export_range(0.0, 1.0) var wind := 0.0
 ## Fully drawn up to this distance (metres).
 @export var draw_distance := 120.0
 ## Optional camera-facing impostor drawn from draw_distance to impostor_distance.
+## Optional material_override for every instance, usually a ShaderMaterial on
+## world/shared/shaders/stylized_foliage.gdshader (default: the mesh's own).
+@export var material: Material
 @export var impostor_mesh: Mesh
+@export_file("*.glb", "*.tscn", "*.tres", "*.res") var impostor_path: String
 @export var impostor_distance := 600.0
 
 
@@ -48,3 +57,37 @@ func transform_of(index: int) -> Transform3D:
 
 func is_forage() -> bool:
 	return ingredient_id != &""
+
+
+## The mesh to draw: `mesh`, else loaded from `mesh_path`. Null if missing.
+func resolve_mesh() -> Mesh:
+	if mesh == null and mesh_path != "":
+		mesh = _load_mesh(mesh_path)
+	return mesh
+
+
+func resolve_impostor() -> Mesh:
+	if impostor_mesh == null and impostor_path != "":
+		impostor_mesh = _load_mesh(impostor_path)
+	return impostor_mesh
+
+
+static func _load_mesh(path: String) -> Mesh:
+	if not ResourceLoader.exists(path):
+		push_warning("ScatterLayer: missing mesh %s" % path)
+		return null
+	var res := load(path)
+	if res is Mesh:
+		return res
+	if res is PackedScene:
+		var root: Node = (res as PackedScene).instantiate()
+		var found: Mesh = null
+		var nodes: Array[Node] = [root]
+		nodes.append_array(root.find_children("*", "MeshInstance3D", true, false))
+		for n in nodes:
+			if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+				found = (n as MeshInstance3D).mesh
+				break
+		root.free()
+		return found
+	return null

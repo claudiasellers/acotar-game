@@ -45,3 +45,24 @@ func test_sun_is_up_at_noon_and_down_at_midnight() -> void:
 	# A DirectionalLight3D shines along -Z of its basis; light pointing down = sun up.
 	assert_lt((-noon.z).y, -0.5)
 	assert_gt((-midnight.z).y, 0.0)
+
+
+func test_dread_darkens_and_desaturates_then_calm_restores() -> void:
+	director._on_mood_requested(&"dread", 1.0, 1.0)
+	director._process(1.0)
+	assert_almost_eq(director.mood_amount, 1.0, 0.001)
+	var base := GradeDirector.load_preset(&"human_winter")
+	var dark := GradeDirector.with_mood(base, director.mood_amount)
+	assert_lt(dark.saturation, base.saturation)
+	assert_lt(dark.exposure, base.exposure)
+	assert_gt(dark.fog_density, base.fog_density)
+	director._on_mood_requested(&"calm", 0.0, 0.5)
+	director._process(0.5)
+	assert_almost_eq(director.mood_amount, 0.0, 0.001)
+
+
+func test_enchanted_sleep_fades_down() -> void:
+	director._on_mood_requested(&"enchanted_sleep", 1.0, 2.5)
+	director._process(2.5)
+	var base := GradeDirector.load_preset(&"human_winter")
+	assert_lt(GradeDirector.with_mood(base, director.mood_amount, director.mood).exposure, base.exposure * 0.2)

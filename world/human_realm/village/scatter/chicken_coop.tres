@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_c6pjy"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_usuwu"]
+
+[resource]
+script = ExtResource("2_usuwu")
+id = &"chicken_coop"
+mesh_path = "res://world/human_realm/village/assets/village_chicken_coop.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(348.8508, 3.0976639, 2270.34, 3.002732, 1, 379.00977, 2.764071, 2204.9001, -1.081385, 1, 348.78452, 3.0976639, 2225.103, -0.113732, 1, 397.54056, 3.0976639, 2298.317, 2.3557618, 1, 439.33383, 3.0976639, 2194.968, 0.50234765, 1, 440.62845, 3.0976639, 2335.6436, 2.4122598, 1, 437.455, 3.0976639, 2270.816, -0.74086463, 1, 411.4042, 3.0976639, 2308.194, 2.3443701, 1)
+material = ExtResource("1_c6pjy")

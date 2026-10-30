@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_wh68k"]
+
+[resource]
+script = ExtResource("1_wh68k")
+id = &"lost_button"
+mesh_path = "res://world/human_realm/hunting_forest/assets/props/lost_button.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-328.5173, 9.495095, 1848.9557, 5.4298186, 1.0814399, 111.85411, 3.9333062, 1877.3485, 6.09248, 0.99738204, -69.44038, 3.2287967, 1539.5507, 1.8489258, 0.87323153, -388.12314, 6.559558, 1773.4108, 4.0991435, 0.92711234, -305.06622, 8.245077, 1900.3163, 0.34599492, 0.8133578, 154.47548, 2.8517053, 1948.693, 0.47240332, 1.0633584, -60.89259, 2.3224294, 1534.8744, 1.6392281, 1.1101621, -271.99277, 6.3148413, 1950.5853, 5.7148514, 0.9446213, 74.39207, 4.3436747, 1817.6895, 3.17443, 1.0190144, 177.9323, 2.5888627, 1987.8766, 4.084452, 0.8871198)

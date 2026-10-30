@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_j5q4d"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_vugat"]
+
+[resource]
+script = ExtResource("2_vugat")
+id = &"ing_owl_feather"
+mesh_path = "res://world/human_realm/shared/assets/flora/feather_owl.glb"
+ingredient_id = &"ing_owl_feather"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-333.8077, 4.5966454, 2168.2795, 0.50851905, 1.0837238, -349.5141, 7.145901, 2148.8745, 5.6110053, 1.0149676, -2.4761658, 1.2823029, 2099.2178, 2.2540214, 1.0045094, -213.60231, 7.347657, 2128.6467, 4.8178196, 0.9587341, 21.64389, 2.4379532, 2065.8516, 0.97007364, 1.0533831, -340.4055, 5.3042903, 2182.1812, 0.4473295, 0.9489936, -336.20343, 5.7554526, 2144.1294, 1.9949865, 0.903612, -173.13568, 5.184481, 2065.8916, 4.755461, 1.096352, -323.2116, 8.261294, 2075.2407, 5.3913975, 0.9198441, -262.61026, 5.7859993, 2139.5974, 2.7203212, 0.99330586, -348.86688, 6.173766, 2166.9521, 4.336057, 0.9836805, -15.069305, 1.253343, 2091.7166, 5.9475822, 0.90973145, 4.0512695, 1.0237594, 2085.9785, 4.831332, 0.9234538, -313.1254, 7.600916, 2068.1755, 2.4824305, 1.0603476)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_j5q4d")

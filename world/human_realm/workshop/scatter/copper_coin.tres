@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_aiy2u"]
+
+[resource]
+script = ExtResource("1_aiy2u")
+id = &"copper_coin"
+mesh_path = "res://world/human_realm/cottage/assets/small/copper_coin.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-437.07895, -5.476496, 2358.0068, 3.143981, 1, -586.8977, 6.5423565, 2240.3313, 1.5025876, 1, -658.8394, 5.082223, 2186.8394, 1.7965988, 1, -497.4645, -4.1548963, 2379.2861, 5.0468893, 1, -602.1907, -11.405305, 2499.6777, 5.3453693, 1, -664.14185, 3.6910558, 2179.774, 5.874025, 1)
+cast_shadow = false
+draw_distance = 60.0

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_tu7ff"]
+
+[resource]
+script = ExtResource("1_tu7ff")
+id = &"brass_key"
+mesh_path = "res://world/human_realm/workshop/assets/small/brass_key.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-670.24347, 15.285839, 2255.604, 4.1129436, 1, -671.2055, -2.2020712, 2288.4954, 2.3036048, 1, -732.0131, 11.105812, 2337.5625, 5.281318, 1, -592.7826, 3.9617808, 2369.414, 5.2905135, 1)
+cast_shadow = false
+draw_distance = 60.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_gdbi5"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_6o1fc"]
+
+[resource]
+script = ExtResource("2_6o1fc")
+id = &"iron_charm"
+mesh_path = "res://world/human_realm/village/assets/village_iron_charm.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(323.29337, 1.9318397, 2147.4294, 3.249157, 1, 347.146, 3.1776638, 2255.2083, 2.873117, 1, 342.26657, 3.1776638, 2202.7861, 4.898822, 1, 308.5397, 3.1776638, 2236.391, 2.753067, 1, 421.53116, 3.169988, 2295.449, 2.850744, 1, 323.86633, 3.1120467, 2250.2683, 6.083334, 1, 424.11942, 2.5914357, 2235.0854, 0.37584534, 1, 518.04364, -0.2164093, 2373.4648, 0.49418122, 1, 428.59583, 3.144931, 2285.6284, 5.677267, 1)
+cast_shadow = false
+draw_distance = 30.0
+material = ExtResource("1_gdbi5")

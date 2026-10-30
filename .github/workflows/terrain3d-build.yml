@@ -12,6 +12,9 @@ on:
 env:
   TERRAIN3D_TAG: "v1.1.0-rc1"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -44,3 +47,24 @@ jobs:
           name: terrain3d-${{ matrix.platform }}
           path: project/addons/terrain_3d/bin/
           retention-days: 3
+
+  # Commit the binaries (plain git: the cloud sessions can't reach LFS) to a side branch so lanes can fetch them;
+  # the world lane copies them into addons/terrain_3d/bin/ on its own branch.
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: bin
+          merge-multiple: true
+      - name: Commit to vendor/terrain3d-bin
+        run: |
+          git init -q out && cd out
+          git checkout -q -b vendor/terrain3d-bin
+          mkdir -p bin && cp -r ../bin/* bin/
+          echo "bin/** -text" > .gitattributes
+          echo "Terrain3D ${TERRAIN3D_TAG} built from source by ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID}" > README.md
+          git add -A
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Terrain3D ${TERRAIN3D_TAG} binaries"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" vendor/terrain3d-bin

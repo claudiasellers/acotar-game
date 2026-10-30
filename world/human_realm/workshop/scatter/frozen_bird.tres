@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_wfy6q"]
+
+[resource]
+script = ExtResource("1_wfy6q")
+id = &"frozen_bird"
+mesh_path = "res://world/human_realm/cottage/assets/small/frozen_bird.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-766.897, -7.6899557, 2146.1719, 2.6828442, 1, -581.01465, 2.4839563, 2309.6624, 4.2098017, 1, -652.3766, -5.2976556, 2298.4758, 2.883029, 1, -556.6931, 2.3373504, 2287.4802, 3.6031115, 1, -698.85297, 12.970187, 2383.0327, 5.4343057, 1, -645.89624, 13.892064, 2254.5862, 5.6887975, 1)
+draw_distance = 90.0

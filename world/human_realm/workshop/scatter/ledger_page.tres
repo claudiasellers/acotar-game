@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_vh6y6"]
+
+[resource]
+script = ExtResource("1_vh6y6")
+id = &"ledger_page"
+mesh_path = "res://world/human_realm/workshop/assets/small/ledger_page.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-628.0559, -5.2976556, 2333.7974, 4.0326686, 1, -604.23535, -5.2976556, 2347.465, 1.947907, 1, -669.72064, -5.2976556, 2322.6829, 2.919138, 1, -648.46136, -5.2976556, 2334.3257, 4.3820295, 1, -634.4471, -5.343903, 2329.2922, 1.0019104, 1, -634.1326, -5.2976556, 2313.2556, 1.1096258, 1)
+cast_shadow = false
+draw_distance = 60.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_y7tfh"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_wtdlj"]
+
+[resource]
+script = ExtResource("2_wtdlj")
+id = &"robin_on_post"
+mesh_path = "res://world/human_realm/village/assets/village_robin.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(350.2416, 4.427664, 2271.948, 0.10516017, 1, 347.35373, 4.427664, 2223.5305, 2.8824859, 1, 397.68106, 4.427664, 2300.4382, 2.61234, 1, 485.44016, 4.427664, 2224.7126, 3.8327577, 1, 310.84464, 4.427664, 2184.8552, 2.1377044, 1, 437.21927, 4.427664, 2268.703, 5.4844766, 1, 411.52054, 4.427664, 2310.317, 1.2759337, 1, 231.5, 7.1007056, 2054.8098, 2.149822, 1, 264.5, 3.6352057, 2057.0044, 3.433695, 1, 399.5, 0.51435745, 2057.3982, 3.8149955, 1, 429.5, 0.05292135, 2056.6404, 5.8882704, 1, 582.5, 0.9921466, 2054.8015, 4.943012, 1)
+cast_shadow = false
+draw_distance = 40.0
+material = ExtResource("1_y7tfh")

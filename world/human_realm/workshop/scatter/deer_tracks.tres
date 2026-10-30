@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_6o6fa"]
+
+[resource]
+script = ExtResource("1_6o6fa")
+id = &"deer_tracks"
+mesh_path = "res://world/human_realm/cottage/assets/small/deer_tracks.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-436.57162, 1.0292941, 2213.678, 4.177708, 1, -386.6964, -4.983552, 2424.9897, 3.6624322, 1, -600.85803, -11.84758, 2490.7246, 6.029119, 1, -537.6147, -12.1661825, 2498.787, 0.9131407, 1, -774.9724, 1.9000502, 2355.984, 5.200544, 1, -769.2579, -2.052571, 2483.4417, 3.6552608, 1, -400.89166, 0.61549985, 2254.9084, 3.2472935, 1, -732.56177, 2.4570785, 2234.7495, 2.2004044, 1, -728.1726, -1.7331178, 2058.7598, 0.30976892, 1, -371.24542, -6.016444, 2438.471, 0.43917736, 1, -659.1421, 1.196633, 2147.8513, 5.6465454, 1, -366.758, -7.377545, 2363.337, 1.3186707, 1)
+cast_shadow = false
+draw_distance = 90.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_d3hvo"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_flunx"]
+
+[resource]
+script = ExtResource("2_flunx")
+id = &"lost_button"
+mesh_path = "res://world/human_realm/village/assets/village_lost_button.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(302.50085, -1.0689056, 2114.049, 2.8566818, 1, 345.5353, 3.041928, 2251.0264, 1.9405776, 1, 293.99844, -0.4550839, 2118.1382, 0.65014464, 1, 474.6151, 3.1975048, 2324.196, 0.22224954, 1, 347.20654, 3.0549817, 2188.6643, 4.863315, 1, 453.50854, 2.988455, 2216.7705, 2.515931, 1, 409.56183, 3.1445696, 2228.9016, 4.557315, 1, 350.15427, 3.0700798, 2242.9292, 2.5983317, 1, 389.87433, 3.1976638, 2236.8, 1.6857779, 1)
+cast_shadow = false
+draw_distance = 25.0
+material = ExtResource("1_d3hvo")

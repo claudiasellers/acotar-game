@@ -29,7 +29,7 @@ func build() -> void:
 	for child in get_children():
 		child.free()
 	for layer in layers:
-		if layer != null and layer.mesh != null and layer.count() > 0:
+		if layer != null and layer.count() > 0 and layer.resolve_mesh() != null:
 			_build_layer(layer)
 
 
@@ -91,7 +91,7 @@ func _build_layer(layer: ScatterLayer) -> void:
 			node.set_meta(&"region_id", region_id)
 			node.set_meta(&"instance_ids", ids)
 			node.set_meta(&"layer", layer)
-		if layer.impostor_mesh != null:
+		if layer.resolve_impostor() != null:
 			var far_mm := MultiMesh.new()
 			far_mm.transform_format = MultiMesh.TRANSFORM_3D
 			far_mm.mesh = layer.impostor_mesh
@@ -111,6 +111,7 @@ func _make_instance(layer: ScatterLayer, node_name: String, mm: MultiMesh, origi
 	node.multimesh = mm
 	node.position = origin
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if layer.cast_shadow else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	node.set_instance_shader_parameter(&"wind_amount", layer.wind)
+	if layer.material != null:
+		node.material_override = layer.material
 	add_child(node)
 	return node

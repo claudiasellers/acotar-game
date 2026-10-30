@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_gapfi"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_6iks0"]
+
+[resource]
+script = ExtResource("2_6iks0")
+id = &"haystack"
+mesh_path = "res://world/human_realm/village/assets/village_haystack.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(129.95871, -2.4253616, 2103.9353, 3.2799296, 1, 106.4503, -1.0297043, 2308.8884, 2.466326, 1, 135.18243, 2.118107, 2326.8325, 0.74416363, 1, 178.14664, -2.273208, 2180.3064, 5.313669, 1, 188.43217, 0.23420191, 2255.231, 4.3489733, 1, 213.77916, 6.2471867, 2368.6038, 2.6322944, 1, 183.71687, 8.304172, 2418.5735, 4.445741, 1, 355.7167, 2.3002188, 2393.5618, 0.3390159, 1, 576.1652, 0.6611619, 2122.128, 4.246743, 1, 513.7682, 1.8398353, 2309.7117, 5.3560038, 1, 612.8451, -2.3624294, 2101.0208, 0.93013865, 1, 659.6426, 6.6948733, 2361.9172, 3.6631873, 1)
+draw_distance = 300.0
+material = ExtResource("1_gapfi")

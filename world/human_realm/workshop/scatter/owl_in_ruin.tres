@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_rbm4q"]
+
+[resource]
+script = ExtResource("1_rbm4q")
+id = &"owl_in_ruin"
+mesh_path = "res://world/human_realm/cottage/assets/small/owl_perched.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-646.489, -5.1676555, 2328.299, 0.48178262, 1)
+draw_distance = 90.0

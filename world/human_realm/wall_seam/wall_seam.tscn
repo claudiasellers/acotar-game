@@ -1,0 +1,165 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_field.gd" id="1_wwd68"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_auk2s"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wall_drift.tres" id="3_pgs6p"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tree_snag.tres" id="4_f86vb"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snow_mound.tres" id="5_ssimk"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/grass_tuft.tres" id="6_l04mm"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bracken.tres" id="7_r65mo"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_a.tres" id="8_6wx4s"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/boulder_c.tres" id="9_2plvo"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rock_flat.tres" id="10_bges3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/stump.tres" id="11_rhnv7"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_filings.tres" id="12_gny2n"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/flint.tres" id="13_lbhao"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/chalk.tres" id="14_6rsrn"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/ice_moss.tres" id="15_ppwcj"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/juniper.tres" id="16_n5oh0"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/rose_briar.tres" id="17_oiusg"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackberry.tres" id="18_jq1uk"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/hawthorn.tres" id="19_77m0l"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/blackthorn.tres" id="20_aqdlr"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tinder_fungus.tres" id="21_ihlxv"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snail_shells.tres" id="22_qahpf"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/red_ochre.tres" id="23_42kdj"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/wintergreen.tres" id="24_jqdh6"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/charcoal.tres" id="25_skfmu"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/shed_antler.tres" id="26_8hne5"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/snowdrop.tres" id="27_3aqlb"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/old_mans_beard.tres" id="28_0gnq3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/offering_bundle.tres" id="29_6hyy3"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/frozen_ribbon.tres" id="30_20dmh"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/pamphlet.tres" id="31_c0old"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/bone_token.tres" id="32_6sc7m"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/lost_boot.tres" id="33_j6uws"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/candle_stub.tres" id="34_dpv1y"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/child_mitten.tres" id="35_4rvu8"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tin_charm.tres" id="36_c47sn"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/warning_cairn.tres" id="37_m868r"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/deer_bones.tres" id="38_dnoks"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/iron_stake.tres" id="39_o6a0w"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/tracks_end.tres" id="40_tje0y"]
+[ext_resource type="Resource" path="res://world/human_realm/wall_seam/scatter/salt_ring.tres" id="41_186wu"]
+[ext_resource type="Script" path="res://world/human_realm/hunting_forest/trunk_collision.gd" id="42_65743"]
+[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_shimmer.gd" id="43_hrtmq"]
+[ext_resource type="Script" path="res://world/human_realm/wall_seam/wall_sense_volume.gd" id="44_m27bh"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/leaning_stone.glb" id="45_yoh8t"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/great_cairn.glb" id="46_uwip4"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/offering_post.glb" id="47_xfvby"]
+[ext_resource type="PackedScene" path="res://world/human_realm/wall_seam/assets/iron_post.glb" id="48_dkmeb"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0sq1h"]
+size = Vector3(1660, 400, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n0ldj"]
+size = Vector3(1.3, 4.2, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ldvab"]
+size = Vector3(1.3, 4.2, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_10whp"]
+size = Vector3(2.4, 2.4, 2.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7ylal"]
+size = Vector3(0.3, 3.2, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o4nxd"]
+size = Vector3(0.4, 2.4, 0.4)
+
+[sub_resource type="Curve3D" id="Curve3D_xqb0y"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -80, 1.2244421, 1500, 0, 0, 0, 0, 0, 0, -90, -2.6280625, 1450, 0, 0, 0, 0, 0, 0, -97, -3.2661586, 1415, 0, 0, 0, 0, 0, 0, -100, -2.2060053, 1400, 0, 0, 0, 0, 0, 0, -100, 1.6144414, 1350, 0, 0, 0, 0, 0, 0, -100, 7.0646043, 1300),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
+
+[sub_resource type="FogMaterial" id="FogMaterial_neggn"]
+density = 0.04
+albedo = Color(0.85, 0.9, 0.97, 1)
+
+[node name="WallSeam" type="Node3D" unique_id=1074519988]
+
+[node name="ScatterField" type="Node3D" parent="." unique_id=477877800]
+script = ExtResource("1_wwd68")
+region_id = &"wall_seam"
+layers = Array[ExtResource("2_auk2s")]([ExtResource("3_pgs6p"), ExtResource("4_f86vb"), ExtResource("5_ssimk"), ExtResource("6_l04mm"), ExtResource("7_r65mo"), ExtResource("8_6wx4s"), ExtResource("9_2plvo"), ExtResource("10_bges3"), ExtResource("11_rhnv7"), ExtResource("12_gny2n"), ExtResource("13_lbhao"), ExtResource("14_6rsrn"), ExtResource("15_ppwcj"), ExtResource("16_n5oh0"), ExtResource("17_oiusg"), ExtResource("18_jq1uk"), ExtResource("19_77m0l"), ExtResource("20_aqdlr"), ExtResource("21_ihlxv"), ExtResource("22_qahpf"), ExtResource("23_42kdj"), ExtResource("24_jqdh6"), ExtResource("25_skfmu"), ExtResource("26_8hne5"), ExtResource("27_3aqlb"), ExtResource("28_0gnq3"), ExtResource("29_6hyy3"), ExtResource("30_20dmh"), ExtResource("31_c0old"), ExtResource("32_6sc7m"), ExtResource("33_j6uws"), ExtResource("34_dpv1y"), ExtResource("35_4rvu8"), ExtResource("36_c47sn"), ExtResource("37_m868r"), ExtResource("38_dnoks"), ExtResource("39_o6a0w"), ExtResource("40_tje0y"), ExtResource("41_186wu")])
+
+[node name="TrunkCollision" type="Node3D" parent="." unique_id=65273931]
+script = ExtResource("42_65743")
+layers = Array[ExtResource("2_auk2s")]([ExtResource("4_f86vb")])
+radii = PackedFloat32Array(0.3)
+heights = PackedFloat32Array(4)
+
+[node name="WallShimmer" type="Node3D" parent="." unique_id=2099689510]
+script = ExtResource("43_hrtmq")
+
+[node name="WallSenseVolume" type="Area3D" parent="." unique_id=801501782 groups=["no_birds_zone"]]
+script = ExtResource("44_m27bh")
+
+[node name="Shape" type="CollisionShape3D" parent="WallSenseVolume" unique_id=1941116600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, 1400)
+shape = SubResource("BoxShape3D_0sq1h")
+
+[node name="Landmarks" type="Node3D" parent="." unique_id=572654403]
+
+[node name="GapStoneWest" type="Node3D" parent="Landmarks" unique_id=2081162762 groups=["landmark"] instance=ExtResource("45_yoh8t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -105, -2.4648242, 1402)
+
+[node name="GapStoneWestCollision" type="StaticBody3D" parent="Landmarks" unique_id=2003121404]
+collision_mask = 0
+
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Landmarks/GapStoneWestCollision" unique_id=697803322]
+transform = Transform3D(0.99875027, 0, 0.04997917, 0, 1, 0, -0.04997917, 0, 0.99875027, -105, -0.66482425, 1402)
+shape = SubResource("BoxShape3D_n0ldj")
+
+[node name="GapStoneEast" type="Node3D" parent="Landmarks" unique_id=195129614 groups=["landmark"] instance=ExtResource("45_yoh8t")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -95, -2.4013042, 1402)
+
+[node name="GapStoneEastCollision" type="StaticBody3D" parent="Landmarks" unique_id=1251959528]
+collision_mask = 0
+
+[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Landmarks/GapStoneEastCollision" unique_id=1984562409]
+transform = Transform3D(-0.99875027, 0, -0.049979255, 0, 1, 0, 0.049979255, 0, -0.99875027, -95, -0.6013043, 1402)
+shape = SubResource("BoxShape3D_ldvab")
+
+[node name="GreatWarningCairn" type="Node3D" parent="Landmarks" unique_id=1642155388 groups=["landmark"] instance=ExtResource("46_uwip4")]
+transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, -1.156374, 1456)
+
+[node name="GreatWarningCairnCollision" type="StaticBody3D" parent="Landmarks" unique_id=1837459696]
+collision_mask = 0
+
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="Landmarks/GreatWarningCairnCollision" unique_id=803881556]
+transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, 0.04362607, 1456)
+shape = SubResource("BoxShape3D_10whp")
+
+[node name="OfferingPost" type="Node3D" parent="Landmarks" unique_id=1670148424 groups=["landmark"] instance=ExtResource("47_xfvby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -3.2235675, 1424)
+
+[node name="OfferingPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=2112312900]
+collision_mask = 0
+
+[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="Landmarks/OfferingPostCollision" unique_id=1567927485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -1.6235675, 1424)
+shape = SubResource("BoxShape3D_7ylal")
+
+[node name="IronWardPost" type="Node3D" parent="Landmarks" unique_id=923695779 groups=["landmark"] instance=ExtResource("48_dkmeb")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -3.0450966, 1432)
+
+[node name="IronWardPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=508643596]
+collision_mask = 0
+
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Landmarks/IronWardPostCollision" unique_id=548226661]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -1.8450966, 1432)
+shape = SubResource("BoxShape3D_o4nxd")
+
+[node name="wall_gate_north" type="Marker3D" parent="." unique_id=691547268 groups=["story_anchor"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.4767404, 1402)
+
+[node name="WallSeamPath" type="Path3D" parent="." unique_id=1855990364]
+curve = SubResource("Curve3D_xqb0y")
+
+[node name="LineMist" type="FogVolume" parent="." unique_id=952757078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.2967708, 1406)
+size = Vector3(1600, 3, 14)
+material = SubResource("FogMaterial_neggn")

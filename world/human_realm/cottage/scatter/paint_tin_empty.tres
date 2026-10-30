@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_phxn0"]
+
+[resource]
+script = ExtResource("1_phxn0")
+id = &"paint_tin_empty"
+mesh_path = "res://world/human_realm/cottage/assets/small/paint_tin_empty.glb"
+tags = PackedStringArray("collectible", "canon:C")
+instances = PackedFloat32Array(-116.60748, -0.9788493, 2179.0967, 0.9775201, 1, -110.007126, -1.866169, 2166.8896, 3.708411, 1, -168.53738, 7.7946815, 2129.32, 1.06161, 1, -153.67076, 5.0253444, 2166.1462, 5.285507, 1)
+cast_shadow = false
+draw_distance = 60.0

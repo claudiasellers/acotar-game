@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_mktpe"]
+
+[resource]
+script = ExtResource("1_mktpe")
+id = &"crow_on_post"
+mesh_path = "res://world/human_realm/cottage/assets/small/crow_on_post.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(-566.44214, -2.903435, 2425.4407, 6.1083636, 1, -689.9594, 7.890727, 2423.6094, 0.19192712, 1, -534.135, 0.11459527, 2324.0447, 1.5465108, 1, -409.07394, -4.5951815, 2343.0056, 2.013565, 1, -616.4314, 5.5676656, 2204.229, 5.982551, 1, -496.4187, -6.2111354, 2406.4917, 5.500496, 1)
+draw_distance = 90.0

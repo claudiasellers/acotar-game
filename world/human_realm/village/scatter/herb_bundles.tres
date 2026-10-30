@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_1o1wd"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_200ry"]
+
+[resource]
+script = ExtResource("2_200ry")
+id = &"herb_bundles"
+mesh_path = "res://world/human_realm/village/assets/village_herb_bundle.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(389.9633, 4.727664, 2268.3938, 2.4500377, 1, 381.25424, 4.727664, 2270.8833, 5.9139786, 1, 374.4802, 4.727664, 2270.1636, 4.6017046, 1, 369.22876, 4.727664, 2267.9448, 3.5203743, 1, 363.64432, 4.727664, 2263.0454, 2.0410147, 1, 359.744, 4.727664, 2255.183, 5.9449906, 1)
+cast_shadow = false
+draw_distance = 40.0
+material = ExtResource("1_1o1wd")

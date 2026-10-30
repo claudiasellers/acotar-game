@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_agytv"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_wajnd"]
+
+[resource]
+script = ExtResource("2_wajnd")
+id = &"blessed_pamphlet"
+mesh_path = "res://world/human_realm/village/assets/village_pamphlet.glb"
+tags = PackedStringArray("collectible", "canon:C")
+instances = PackedFloat32Array(383.99597, 3.1776638, 2237.405, 3.3910592, 1, 389.38016, 2.9873693, 2262.961, 1.0815667, 1, 387.99823, 2.9936192, 2242.026, 3.2579467, 1, 381.44852, 3.1709054, 2259.8396, 1.2165378, 1, 370.27032, 3.0283437, 2242.033, 0.9209965, 1, 374.24997, 3.1776638, 2272.2163, 2.69608, 1, 336.39285, 3.1776638, 2295.3867, 0.7481608, 1, 333.8433, 3.1776638, 2294.7576, 4.8964567, 1, 334.63364, 3.1776638, 2292.8108, 5.6571608, 1, 337.03, 3.1776638, 2295.3938, 2.2246962, 1, 390.03345, 3.129212, 2251.6873, 5.9031854, 1, 330.10965, 3.1976638, 2182.1082, 4.971958, 1, 287.1886, 3.0764973, 2246.508, 3.4830022, 1, 495.37708, 3.2609594, 2199.0112, 5.251244, 1, 309.6731, 3.1976638, 2236.743, 4.7613883, 1, 517.5181, -0.15237895, 2371.2905, 0.41807175, 1)
+cast_shadow = false
+draw_distance = 30.0
+material = ExtResource("1_agytv")

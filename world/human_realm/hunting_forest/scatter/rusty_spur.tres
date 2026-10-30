@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_50gm5"]
+
+[resource]
+script = ExtResource("1_50gm5")
+id = &"rusty_spur"
+mesh_path = "res://world/human_realm/hunting_forest/assets/props/rusty_spur.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(581.81036, -5.214988, 1612.0459, 3.1446571, 1.0778221, 566.54596, -4.011138, 1611.6335, 5.53969, 0.95418507, 471.32822, -6.4769936, 1669.1145, 5.168485, 1.1057595, 581.0891, -6.9648023, 1651.9502, 3.2470953, 0.8380075, 458.21042, -6.1758366, 1622.7012, 6.207399, 1.149281, 560.479, -4.453827, 1616.8652, 4.952327, 1.0270133, 473.69855, -6.5017385, 1676.5062, 5.062647, 0.929834, 494.39603, -6.4769936, 1658.9778, 4.6132464, 1.0629427)

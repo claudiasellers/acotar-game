@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_yoy5f"]
+
+[resource]
+script = ExtResource("1_yoy5f")
+id = &"scorched_page"
+mesh_path = "res://world/human_realm/workshop/assets/small/scorched_page.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-634.76196, -5.2976556, 2310.1487, 2.9101708, 1, -645.66833, -5.2976556, 2313.7668, 1.4399039, 1, -664.3315, -5.2976556, 2335.3062, 3.4120855, 1, -657.9115, -5.2976556, 2313.2166, 4.43611, 1, -651.7169, -5.2976556, 2307.9766, 3.621906, 1, -626.22845, -5.3120613, 2323.9438, 4.942324, 1, -659.3702, -5.2976556, 2319.2432, 1.0457655, 1, -640.5831, -5.2046585, 2321.7634, 3.829363, 1)
+cast_shadow = false
+draw_distance = 60.0

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_2dg6g"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_r8d6i"]
+
+[resource]
+script = ExtResource("2_r8d6i")
+id = &"ash_wall_slump"
+mesh_path = "res://world/human_realm/hunting_forest/assets/ash_wall_slump.glb"
+tags = PackedStringArray("wall", "canon:X")
+instances = PackedFloat32Array(-725.7115, 4.157591, 1549.3583, 0.69813174, 1, -722.94305, 4.1673026, 1547.2339, 0.61086524, 1, -720, 4.0310025, 1545.359, 0.5235988, 1)
+draw_distance = 350.0
+material = ExtResource("1_2dg6g")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_3xfuj"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_w7kvp"]
+
+[resource]
+script = ExtResource("2_w7kvp")
+id = &"old_mans_beard"
+mesh_path = "res://world/human_realm/shared/assets/flora/old_mans_beard.glb"
+ingredient_id = &"ing_old_mans_beard"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-281.5622, 4.606501, 1434.9519, 0.103395, 1.1262753, -433.34802, 5.493992, 1479.0868, 4.1336017, 0.9206915, -260.1598, 3.9202101, 1465.0969, 0.77274007, 1.0688156, 622.892, -4.9493394, 1457.1783, 3.7999377, 0.94117486, -324.24106, 6.2234163, 1426.798, 4.3737025, 0.9690229, -77.54653, -1.4920523, 1461.9214, 1.5840881, 0.9938406, -261.02054, 4.1050124, 1465.8016, 4.2062025, 1.0444906, -877.6645, 17.925978, 1446.5728, 1.6380081, 1.0668036, 527.36743, -9.273574, 1475.9509, 2.5608218, 1.0324366, 640.6927, -2.5799608, 1462.6189, 5.4057193, 1.0316521, 345.8324, 0.28279218, 1478.1749, 2.7884285, 1.0936359, 344.44174, 0.53263646, 1479.401, 0.52492976, 0.8645968, -425.86584, 5.513758, 1466.7671, 3.9599392, 0.8665807, -713.6752, 11.335812, 1449.7119, 2.38823, 1.146086)
+material = ExtResource("1_3xfuj")

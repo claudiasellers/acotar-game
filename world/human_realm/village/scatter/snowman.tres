@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_7k0p6"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_wyffc"]
+
+[resource]
+script = ExtResource("2_wyffc")
+id = &"snowman"
+mesh_path = "res://world/human_realm/village/assets/village_snowman.glb"
+tags = PackedStringArray("look", "canon:X")
+instances = PackedFloat32Array(421.21857, 3.1776638, 2277.177, 3.199815, 0.9170918, 327.46182, 3.166283, 2176.6802, 5.2603292, 1.0656549, 462.48767, 3.0059614, 2327.9153, 3.427919, 1, 474.20648, 3.1976638, 2210.7385, 4.145617, 1, 313.32202, 3.1976638, 2251.2073, 3.1740549, 1)
+material = ExtResource("1_7k0p6")

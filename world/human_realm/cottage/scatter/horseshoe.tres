@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_ylo2m"]
+
+[resource]
+script = ExtResource("1_ylo2m")
+id = &"horseshoe"
+mesh_path = "res://world/human_realm/cottage/assets/small/horseshoe.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-138.93234, -4.1569114, 2448.8416, 2.1402032, 1, -20.584259, -0.30200753, 2384.663, 6.2635674, 1, -25.732788, -0.37487376, 2385.0313, 5.228207, 1, -204.49756, 1.4809128, 2452.1807, 4.497774, 1, -98.99397, -2.085456, 2428.9446, 3.9193776, 1, -92.40585, -3.9870677, 2184.3623, 2.404589, 1)
+cast_shadow = false
+draw_distance = 60.0

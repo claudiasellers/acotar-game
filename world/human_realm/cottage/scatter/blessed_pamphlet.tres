@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_c0mh8"]
+
+[resource]
+script = ExtResource("1_c0mh8")
+id = &"blessed_pamphlet"
+mesh_path = "res://world/human_realm/cottage/assets/small/blessed_pamphlet.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-207.13788, 4.641816, 2277.3774, 2.255863, 1, -189.87962, 4.282204, 2233.0662, 2.9597135, 1, 38.300873, -7.165839, 2261.4988, 0.6803554, 1, -17.239075, -6.964379, 2154.1838, 4.1634536, 1, -271.7674, 5.3799796, 2233.9963, 0.4762788, 1, -190.8646, 5.7853017, 2161.479, 4.231746, 1)
+cast_shadow = false
+draw_distance = 60.0

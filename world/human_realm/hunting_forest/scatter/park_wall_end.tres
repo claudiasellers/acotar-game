@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_6s224"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_7qae8"]
+
+[resource]
+script = ExtResource("2_7qae8")
+id = &"park_wall_end"
+mesh_path = "res://world/human_realm/hunting_forest/assets/boundary_wall_end.glb"
+tags = PackedStringArray("wall", "canon:X")
+instances = PackedFloat32Array(300, 2.231901, 1984, -1.5707964, 1, 300, 2.7369335, 1972, 1.5707964, 1, 300, 0.41051042, 1876, -1.5707964, 1, 300, -0.10158429, 1864, 1.5707964, 1, 300, -0.26434147, 1840, -1.5707964, 1, 300, -0.74151397, 1816, 1.5707964, 1, 300, -0.047352407, 1768, -1.5707964, 1, 300, 1.0410935, 1756, 1.5707964, 1, 300, 4.5000334, 1660, -1.5707964, 1, 300, 4.9893064, 1648, 1.5707964, 1, 300, 5.4544215, 1636, -1.5707964, 1, 300, 5.613323, 1624, 1.5707964, 1, 300, 5.0459633, 1552, -1.5707964, 1, 300, 4.736131, 1540, 1.5707964, 1, 360, 1.5580659, 1495, 3.1415927, 1, 372, 1.1354842, 1495, 0, 1, 468, -7.011516, 1495, 3.1415927, 1, 480, -6.5763206, 1495, 0, 1, 576, -5.901609, 1495, 3.1415927, 1, 588, -4.555455, 1495, 0, 1, 648, -1.8403393, 1495, 3.1415927, 1, 660, -1.8821466, 1495, 0, 1, 684, -0.55160195, 1495, 3.1415927, 1)
+draw_distance = 350.0
+material = ExtResource("1_6s224")

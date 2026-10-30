@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_oxg0i"]
+
+[resource]
+script = ExtResource("1_oxg0i")
+id = &"lost_button"
+mesh_path = "res://world/human_realm/cottage/assets/small/lost_button.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-313.64996, 7.448, 2085.097, 5.5636415, 1, -333.6254, 6.5749583, 2213.148, 5.2066293, 1, -76.67862, -0.86139405, 2427.5896, 4.7399554, 1, -201.32791, 2.174239, 2309.4429, 4.592136, 1, -52.632843, -6.7807827, 2229.6736, 6.090107, 1, -291.1097, -6.3709455, 2385.5781, 1.1787181, 1, -174.3205, 8.228514, 2113.2263, 1.5485164, 1, -229.83087, -0.2715735, 2411.0076, 5.1870594, 1)
+cast_shadow = false
+draw_distance = 60.0

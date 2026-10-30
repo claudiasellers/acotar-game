@@ -12,11 +12,13 @@ const WALL_GAP_X := -100.0
 const WALL_SEAM_HALF_DEPTH := 5.0
 
 ## The whole playable map in XZ (position = min x, min z). Terrain3D covers
-## exactly this rectangle in 1024 m regions.
+## exactly this rectangle (320 regions of 256 m).
 const MAP_RECT := Rect2(-2048.0, -2048.0, 4096.0, 5120.0)
 ## Terrain3D settings shared by the bake and the runtime World scene.
-const TERRAIN_REGION_SIZE := 1024
+const TERRAIN_REGION_SIZE := 256
 const TERRAIN_VERTEX_SPACING := 1.0
+## The bake works in 1024 m tiles (each imports as 16 Terrain3D regions).
+const BAKE_TILE := 1024
 
 ## The human realm (world lane), south of the Wall.
 const HUMAN_REALM_RECT := Rect2(-900.0, 1400.0, 1600.0, 1100.0)

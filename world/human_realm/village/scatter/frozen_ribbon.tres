@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_tqeng"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_hb0ry"]
+
+[resource]
+script = ExtResource("2_hb0ry")
+id = &"frozen_ribbon"
+mesh_path = "res://world/human_realm/village/assets/village_ribbon.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(477.54074, 3.1776638, 2222.599, 0.17102732, 1, 603.20874, 2.8119326, 2148.3525, 6.0206275, 1, 363.87387, 3.178574, 2211.9756, 1.5627754, 1, 430.4038, 3.1976638, 2285.5134, 4.647595, 1, 291.58548, -0.23939316, 2118.9854, 4.759403, 1, 391.211, 3.1435785, 2250.694, 5.3812757, 1)
+cast_shadow = false
+draw_distance = 30.0
+material = ExtResource("1_tqeng")

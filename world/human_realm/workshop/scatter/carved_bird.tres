@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_4g4dv"]
+
+[resource]
+script = ExtResource("1_4g4dv")
+id = &"carved_bird"
+mesh_path = "res://world/human_realm/workshop/assets/small/carved_bird.glb"
+tags = PackedStringArray("collectible", "canon:X")
+instances = PackedFloat32Array(-583.3312, 5.507341, 2212.1646, 2.3446147, 1, -556.93317, 5.047732, 2201.919, 3.745586, 1, -558.37225, 4.5803785, 2194.6746, 6.077453, 1, -546.47455, 3.8160157, 2245.2007, 0.37174603, 1, -553.3523, 5.0352135, 2202.2896, 5.379898, 1)
+cast_shadow = false
+draw_distance = 60.0

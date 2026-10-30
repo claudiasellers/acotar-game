@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_ar3wb"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_y3w06"]
+
+[resource]
+script = ExtResource("2_y3w06")
+id = &"house_timber"
+mesh_path = "res://world/human_realm/village/assets/village_house_timber.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(328.40192, 3.0976639, 2233.9685, -0.011608998, 1, 326.34167, 3.0976639, 2257.6611, 3.0372593, 1, 418.26105, 3.0976639, 2242.0847, -2.6578977, 1, 403.87387, 3.0976639, 2287.4653, 2.3557618, 1, 475.698, 3.0976639, 2214.1423, -2.7373939, 1, 431.61584, 3.0976639, 2281.941, -0.74086463, 1, 417.86072, 3.0976639, 2297.4155, 2.3443701, 1)
+draw_distance = 500.0
+material = ExtResource("1_ar3wb")

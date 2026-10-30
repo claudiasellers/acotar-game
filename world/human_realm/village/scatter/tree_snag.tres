@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_r83np"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_e82pf"]
+
+[resource]
+script = ExtResource("2_e82pf")
+id = &"tree_snag"
+mesh_path = "res://world/human_realm/shared/assets/flora/tree_dead_snag.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(601.7719, 4.3321457, 2161.494, 6.086906, 1.1)
+draw_distance = 250.0
+material = ExtResource("1_r83np")
+impostor_path = "res://world/human_realm/shared/assets/flora/tree_dead_snag_far.glb"

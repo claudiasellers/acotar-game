@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_gl0ux"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_l4juw"]
+
+[resource]
+script = ExtResource("2_l4juw")
+id = &"goods_pelts"
+mesh_path = "res://world/human_realm/village/assets/village_goods_pelts.glb"
+tags = PackedStringArray("landmark", "canon:C")
+instances = PackedFloat32Array(375.16156, 3.0976639, 2269.406, 2.8972476, 1)
+cast_shadow = false
+material = ExtResource("1_gl0ux")

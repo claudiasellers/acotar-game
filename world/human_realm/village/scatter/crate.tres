@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="1_srlon"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_8vd5b"]
+
+[resource]
+script = ExtResource("2_8vd5b")
+id = &"crate"
+mesh_path = "res://world/human_realm/village/assets/village_crate.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(386.7983, 3.0976639, 2269.4338, 1.6527767, 1, 384.2993, 3.0976639, 2270.0303, 1.2773888, 1, 372.84598, 3.0976639, 2268.8872, 2.9087458, 1, 370.36935, 3.0976639, 2268.2214, 0.4788849, 1, 362.097, 3.0976639, 2260.0872, 5.000232, 1, 361.35175, 3.0976639, 2258.0515, 5.5909023, 1)
+draw_distance = 90.0
+material = ExtResource("1_srlon")

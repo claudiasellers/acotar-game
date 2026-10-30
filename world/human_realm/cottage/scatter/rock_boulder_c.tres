@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_mtfc1"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_7j36v"]
+
+[resource]
+script = ExtResource("2_7j36v")
+id = &"rock_boulder_c"
+mesh_path = "res://world/human_realm/shared/assets/flora/rock_boulder_c.glb"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-138.84206, -1.9106724, 2361.6272, 6.2799397, 0.77860564, -67.93085, 0.7774047, 2474.6091, 4.984015, 1.1613346, -101.60132, -3.449045, 2370.3896, 0.8563314, 0.8969611, -293.93234, -6.384183, 2410.3115, 5.5910254, 0.74787474, -135.24924, -3.0506315, 2406.0938, 4.61247, 0.8126814, 2.573883, -0.07752582, 2379.7139, 1.8151287, 1.1947408, -142.96951, -1.2488558, 2330.943, 3.852252, 1.053314, -220.38368, -0.91231096, 2491.563, 1.5024694, 0.75200194, -103.42407, -2.557105, 2358.364, 0.8472293, 0.8568716, -179.41167, -1.2884281, 2327.1245, 4.2257533, 0.7628702)
+material = ExtResource("1_mtfc1")
