@@ -20,8 +20,10 @@ proves your change: a long suite here wastes time and tokens.
 **Anything visual:** take a screenshot and look at it. Keep screenshots out of the
 repo, in `/tmp/acotar-game-<lane>/<task>/`.
 
-**Tests:** don't write new tests unless the owner asks. If a test hard-codes
-something you moved, edit that value and say so.
+**Tests:** each new system gets one contract test: a small test of what the system
+promises the rest of the game, so a later lane can't break it unnoticed. Beyond
+that, don't write new tests unless the owner asks. If a test hard-codes something
+you moved, edit that value and say so.
 
 **Questions:** if the request is ambiguous in a way that matters, ask the lead one
 short question and carry on with the most reasonable reading. If you need a

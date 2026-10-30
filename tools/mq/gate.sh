@@ -35,6 +35,7 @@ mq_engine >/dev/null || { echo "gate: no engine" >&2; exit 3; }
 
 changed=""
 [ -n "$base" ] && changed=$(git diff --name-only "$base" HEAD)
+export MQ_GATE_BASE="$base"
 
 slug() { printf '%s' "$1" | tr '/: ' '___'; }
 

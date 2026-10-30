@@ -18,6 +18,9 @@ POLL=$(mq_config_or MQ_POLL 2)
 REMOTE=$(mq_config MQ_REMOTE); : "${REMOTE:=origin}"
 FETCH_TIMEOUT=$(mq_config_or MQ_FETCH_TIMEOUT 120)
 stopping=0; gate_pid=""; caffeine=""; heart=""; stalled_until=0; last_ready=0
+idle_pid=""; idle_out="$MQ_DIR/idlegate"
+FULL_MERGES=$(mq_config_or MQ_FULLGATE_MERGES 10)
+FULL_SECS=$(mq_config_or MQ_FULLGATE_SECS 86400)
 
 note() { echo "$(mq_now) $*"; }
 state() { echo "$*" > "$MQ_DIR/state"; }
@@ -29,7 +32,7 @@ cleanup_exit() {
 	state stopped
 	mq_lock_release "$MQ_DIR/lock"
 }
-trap 'stopping=1; [ -n "$gate_pid" ] && kill "$gate_pid" 2>/dev/null' TERM INT
+trap 'stopping=1; [ -n "$gate_pid" ] && kill "$gate_pid" 2>/dev/null; [ -n "$idle_pid" ] && kill "$idle_pid" 2>/dev/null' TERM INT
 trap cleanup_exit EXIT
 
 ( while kill -0 $$ 2>/dev/null; do touch "$MQ_DIR/lock/heartbeat" 2>/dev/null; sleep 10; done ) &
@@ -201,6 +204,7 @@ land() { # tip base batch-dir known
 		[ -f "$e" ] && done_merged "$e" "$merged_to"
 	done
 	rm -rf "$b"
+	kv_set "$MQ_DIR/fullgate" merges $(( $(kv_get "$MQ_DIR/fullgate" merges | sed 's/^$/0/') + 1 ))
 	state idle
 	push_main
 	kick_ready
@@ -270,6 +274,59 @@ run_batch() {
 	done
 }
 
+# The full gate on main, the safety net for when: lines. Only while the queue is
+# empty, at low priority. Killed with no result the moment anything is
+# submitted. A failure blocks nothing: it becomes known red and a task.
+idle_gate_due() {
+	local at merges
+	[ "$(mq_config MQ_FULLGATE_OFF)" = 1 ] && return 1
+	at=$(kv_get "$MQ_DIR/fullgate" at)
+	if [ -z "$at" ]; then kv_set "$MQ_DIR/fullgate" at "$(date +%s)"; return 1; fi
+	merges=$(kv_get "$MQ_DIR/fullgate" merges)
+	[ "${merges:-0}" -ge "$FULL_MERGES" ] || [ $(( $(date +%s) - at )) -ge "$FULL_SECS" ]
+}
+
+idle_gate_start() {
+	local sha known
+	sha=$(git rev-parse main); known="$MQ_DIR/baseline/$sha"
+	[ -f "$known" ] || known=/dev/null
+	wt checkout -q -f main || return
+	rm -rf "$idle_out"
+	echo "$sha" > "$MQ_DIR/idlegate.sha"
+	( cd "$MQ_BUILD" && exec nice -n 19 /bin/bash "$here/gate.sh" --out "$idle_out" --known "$known" --all ) >>"$MQ_DIR/buildlane.log" 2>&1 &
+	idle_pid=$!
+	state "full gate on main ${sha:0:9}"
+	mq_event FULLGATE "started on ${sha:0:9}"
+}
+
+idle_gate_kill() {
+	kill "$idle_pid" 2>/dev/null
+	wait "$idle_pid" 2>/dev/null
+	idle_pid=""
+	state idle
+	mq_event FULLGATE "stopped: work arrived"
+}
+
+idle_gate_reap() {
+	local rc sha name
+	kill -0 "$idle_pid" 2>/dev/null && return 0
+	wait "$idle_pid"; rc=$?
+	idle_pid=""; state idle
+	sha=$(cat "$MQ_DIR/idlegate.sha")
+	case "$rc" in
+		0|1) ;;
+		*) mq_event FULLGATE "could not run; will try again"; return 0 ;;
+	esac
+	kv_set "$MQ_DIR/fullgate" at "$(date +%s)"
+	kv_set "$MQ_DIR/fullgate" merges 0
+	if [ "$rc" = 0 ]; then mq_event FULLGATE "passed on ${sha:0:9}"; return 0; fi
+	while IFS= read -r name; do
+		echo "$name" >> "$MQ_DIR/baseline/$sha"
+		"$here/task.sh" add "Full gate on main found $name red at ${sha:0:9}; log in .git/mq/idlegate/logs" >/dev/null
+		mq_event FULLGATE "$name is red on ${sha:0:9}; task made"
+	done < "$idle_out/failed"
+}
+
 keep_awake
 state idle
 recover
@@ -278,14 +335,19 @@ note "build lane up, pid $$"
 while [ "$stopping" = 0 ]; do
 	now=$(date +%s)
 	if [ $((now - last_ready)) -ge 60 ]; then kick_ready; push_main; last_ready=$now; fi
-	if [ "$now" -ge "$stalled_until" ]; then
-		for e in "$MQ_DIR"/pending/*.entry; do
-			if [ -f "$e" ]; then
-				keep_awake
-				run_batch
-				break
-			fi
-		done
+	work=0
+	for e in "$MQ_DIR"/pending/*.entry; do
+		[ -f "$e" ] && { work=1; break; }
+	done
+	if [ -n "$idle_pid" ]; then
+		if [ "$work" = 1 ]; then idle_gate_kill; else idle_gate_reap; fi
+	fi
+	if [ "$work" = 1 ] && [ "$now" -ge "$stalled_until" ]; then
+		keep_awake
+		run_batch
+	elif [ "$work" = 0 ] && [ -z "$idle_pid" ] && idle_gate_due; then
+		keep_awake
+		idle_gate_start
 	fi
 	sleep "$POLL"
 done
