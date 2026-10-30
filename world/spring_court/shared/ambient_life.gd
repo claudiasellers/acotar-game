@@ -6,7 +6,14 @@
 ##
 ## Effects: pollen, petals, sparkles, faelights (dusk/night), fireflies
 ## (night), ash_motes (blight), mist. Creatures: butterflies, songbirds,
-## dragonflies, fish, moths (night).
+## dragonflies, fish, moths (night). Motes are soft round sprites, never
+## square quads (experience-bar §2.4); the dense sparkle lives in the
+## clearings' light shafts (WoodsRegion.make_shaft_motes), so out here it is
+## sparse.
+##
+## Near horror (a provider with dread_at), the dread mood follows Feyre's
+## distance: the light drops, colour drains and fog pools as she walks in
+## (§1.5), and lifts again as she walks out.
 class_name AmbientLife
 extends Node3D
 
@@ -25,11 +32,17 @@ const VISIBILITY := AABB(Vector3(-40, -10, -40), Vector3(80, 40, 80))
 
 ## effect id -> [process material, draw mesh, amount, lifetime], shared.
 static var _kits: Dictionary = {}
+static var _soft: Texture2D
+static var _petal: Texture2D
+## Dread mood steps this fine are sent on; finer changes wait.
+const DREAD_STEP := 0.05
 
 var _systems: Dictionary = {}
 var _biomes: Dictionary = {}
 var _timer := 0.0
 var current_biome: StringName
+## The dread mood last requested (0 = none sent / calm).
+var dread_sent := 0.0
 
 
 func _ready() -> void:
@@ -76,6 +89,27 @@ func _process(delta: float) -> void:
 	global_position = focus
 	var clock := get_node_or_null(^"/root/Clock")
 	refresh(def.provider.biome_at(focus.x, focus.z), clock.hour() if clock != null else 12.0)
+	update_dread(focus.x, focus.z)
+
+
+## Sends the dread mood for (x, z) when it has moved a step (public for
+## tests). Returns the amount now requested.
+func update_dread(x: float, z: float) -> float:
+	if not def.provider.has_method(&"dread_at"):
+		return 0.0
+	var d: float = snappedf(def.provider.dread_at(x, z), DREAD_STEP)
+	if is_equal_approx(d, dread_sent):
+		return d
+	# By path, not the autoload name, so tool scripts (-s) still compile.
+	var bus := get_node_or_null(^"/root/EventBus")
+	if bus == null:
+		return d
+	if d <= 0.0:
+		bus.mood_requested.emit(&"calm", 0.0, 3.0)
+	else:
+		bus.mood_requested.emit(&"dread", d, 1.5)
+	dread_sent = d
+	return d
 
 
 ## Switches effects for a biome and hour (public for tests).
@@ -109,16 +143,12 @@ func _make(id: String) -> GPUParticles3D:
 	p.process_material = mat
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.06, 0.06)
-	var draw := StandardMaterial3D.new()
-	draw.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	draw.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	draw.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	draw.vertex_color_use_as_albedo = true
+	var draw := soft_sprite_material()
 	quad.material = draw
 	p.draw_pass_1 = quad
 	match id:
 		"pollen":
-			_cloud(p, mat, 300, 8.0, Vector3(18, 4, 18), Color(1.0, 0.94, 0.62, 0.8), 0.04, 0.25)
+			_cloud(p, mat, 180, 8.0, Vector3(18, 4, 18), Color(1.0, 0.94, 0.62, 0.7), 0.05, 0.25)
 		"petals":
 			_cloud(p, mat, 160, 9.0, Vector3(16, 6, 16), Color(1.0, 0.72, 0.84, 0.95), 0.09, 0.6)
 			mat.gravity = Vector3(0.3, -0.25, 0.1)
@@ -126,16 +156,19 @@ func _make(id: String) -> GPUParticles3D:
 			mat.angular_velocity_max = 90.0
 			draw.billboard_mode = BaseMaterial3D.BILLBOARD_DISABLED
 			draw.cull_mode = BaseMaterial3D.CULL_DISABLED
+			draw.albedo_texture = petal_texture()
+			quad.size = Vector2(0.06, 0.09)
 		"sparkles":
-			_cloud(p, mat, 220, 2.5, Vector3(14, 3, 14), Color(1.0, 0.96, 0.85, 1.0), 0.05, 0.1)
+			_cloud(p, mat, 50, 2.5, Vector3(14, 3, 14), Color(1.0, 0.96, 0.85, 1.0), 0.05, 0.1)
 			draw.emission_enabled = true
 			draw.emission = Color(1.0, 0.9, 0.95)
 			draw.emission_energy_multiplier = 4.0
 		"faelights":
-			_cloud(p, mat, 120, 10.0, Vector3(20, 3, 20), Color(0.78, 0.95, 1.0, 1.0), 0.12, 0.4)
+			# Warm, soft-edged, round (§2.4).
+			_cloud(p, mat, 120, 10.0, Vector3(20, 3, 20), Color(1.0, 0.86, 0.66, 1.0), 0.14, 0.4)
 			mat.gravity = Vector3(0, 0.08, 0)
 			draw.emission_enabled = true
-			draw.emission = Color(0.7, 0.92, 1.0)
+			draw.emission = Color(1.0, 0.82, 0.58)
 			draw.emission_energy_multiplier = 6.0
 		"fireflies":
 			_cloud(p, mat, 160, 6.0, Vector3(18, 2, 18), Color(1.0, 0.95, 0.55, 1.0), 0.06, 0.8)
@@ -156,6 +189,53 @@ func _make(id: String) -> GPUParticles3D:
 		"moths":
 			_creatures(p, mat, 14, Vector3(12, 2, 12), _wing_mesh(Color(0.92, 0.90, 0.82), 0.06), 1.5, 1.4)
 	return p
+
+
+## An unshaded billboard sprite tinted by particle colour, with a soft
+## round falloff (shared by every mote effect, the falls' spray and the
+## clearings' shaft motes).
+static func soft_sprite_material() -> StandardMaterial3D:
+	var draw := StandardMaterial3D.new()
+	draw.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	draw.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	draw.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	draw.vertex_color_use_as_albedo = true
+	draw.albedo_texture = soft_texture()
+	return draw
+
+
+## A round sprite: opaque core, smooth falloff to a clear edge.
+static func soft_texture() -> Texture2D:
+	if _soft == null:
+		var g := Gradient.new()
+		g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+		g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0)])
+		var t := GradientTexture2D.new()
+		t.gradient = g
+		t.fill = GradientTexture2D.FILL_RADIAL
+		t.fill_from = Vector2(0.5, 0.5)
+		t.fill_to = Vector2(0.5, 0.0)
+		t.width = 32
+		t.height = 32
+		_soft = t
+	return _soft
+
+
+## A petal: an oval with a soft rim, slightly pointed by the quad's aspect.
+static func petal_texture() -> Texture2D:
+	if _petal == null:
+		var g := Gradient.new()
+		g.offsets = PackedFloat32Array([0.0, 0.7, 1.0])
+		g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.9), Color(1, 1, 1, 0)])
+		var t := GradientTexture2D.new()
+		t.gradient = g
+		t.fill = GradientTexture2D.FILL_RADIAL
+		t.fill_from = Vector2(0.5, 0.5)
+		t.fill_to = Vector2(0.5, 0.0)
+		t.width = 32
+		t.height = 32
+		_petal = t
+	return _petal
 
 
 func _cloud(p: GPUParticles3D, mat: ParticleProcessMaterial, amount: int, lifetime: float, box: Vector3,

@@ -51,3 +51,24 @@ func test_ambient_life_goes_silent_in_the_naga_reeds() -> void:
 	assert_does_not_have(life.active_effects(), "songbirds")
 	life.refresh(&"thornwater_banks", 22.0)
 	assert_does_not_have(life.active_effects(), "dragonflies", "dragonflies are a day thing")
+
+
+func test_dread_mood_follows_distance_to_the_naga() -> void:
+	var life := region.get_node("AmbientLife") as AmbientLife
+	var moods: Array = []
+	var log_mood := func(mood: StringName, amount: float, _s: float) -> void: moods.append([mood, amount])
+	EventBus.mood_requested.connect(log_mood)
+	var n := SurielGladeTerrain.NAGA_BACKWATER
+	life.update_dread(SurielGladeTerrain.SNARE_SITE.x, SurielGladeTerrain.SNARE_SITE.y)
+	assert_eq(moods.size(), 0, "no mood in the birches")
+	life.update_dread(n.x, n.y + n.z + 35.0)
+	assert_eq(moods.back()[0], &"dread", "the margin tips toward dread")
+	assert_between(float(moods.back()[1]), 0.2, 0.8, "partway in, partway dark")
+	life.update_dread(n.x, n.y)
+	assert_almost_eq(float(moods.back()[1]), 1.0, 0.01, "full dread at the water")
+	var sent := moods.size()
+	life.update_dread(n.x + 0.5, n.y)
+	assert_eq(moods.size(), sent, "no resend for a step smaller than DREAD_STEP")
+	life.update_dread(SurielGladeTerrain.SNARE_SITE.x, SurielGladeTerrain.SNARE_SITE.y)
+	assert_eq(moods.back()[0], &"calm", "walking out lifts it")
+	EventBus.mood_requested.disconnect(log_mood)

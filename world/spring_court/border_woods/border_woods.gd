@@ -105,12 +105,7 @@ static func _make_spray(width: float) -> Array:
 	pm.scale_max = 14.0
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.1, 0.1)
-	var dm := StandardMaterial3D.new()
-	dm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	dm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	dm.vertex_color_use_as_albedo = true
-	quad.material = dm
+	quad.material = AmbientLife.soft_sprite_material()
 	return [pm, quad]
 
 

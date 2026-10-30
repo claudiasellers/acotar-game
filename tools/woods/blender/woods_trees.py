@@ -411,9 +411,24 @@ def twisted_dead(kit, near):
 
 
 def blighted_tree(kit, near):
-    crowned_tree(kit, near, dict(height=5.5, r0=0.45, r1=0.28, bark0=shade(BLIGHT, 0.6), bark1=BLIGHT,
-                                 lean=0.22, limbs=4, limb=3.5, rise=0.4, leaf=1.25, crown=0.9, squash=0.55,
-                                 leaf_top=shade(LICHEN, 0.8), leaf_bottom=BRUISE))
+    # The blight and the Bogge margin: tall, vertical and jagged where the
+    # court is rounded (§1.5). Spiky limbs clawing upward, hung with a few
+    # tatters of sick lichen instead of a crown.
+    trunk = trunk_line(kit, 7.5, 5 if near else 2, 0.18)
+    kit.tube(trunk, taper(len(trunk), 0.42, 0.12), 7 if near else 4, shade(BLIGHT, 0.6), BLIGHT, 0.0, 0.05,
+             flare=0.45 if near else 0.0)
+    for i in range(7 if near else 3):
+        a = math.tau * i / 7 + kit.rng.uniform(-0.4, 0.4)
+        start = trunk[kit.rng.randint(len(trunk) // 3, len(trunk) - 1)]
+        d = Vector((math.cos(a) * 0.55, math.sin(a) * 0.55, 1.0))
+        line = branch_line(kit, start, d, kit.rng.uniform(1.8, 3.4), 3 if near else 1)
+        kit.tube(line, taper(len(line), 0.13, 0.01), 4 if near else 3, BLIGHT, shade(BLIGHT, 0.8), 0.05, 0.15)
+        if near:
+            for _ in range(2):  # thorn spurs
+                sp = branch_line(kit, line[1], d + Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.4)), 0.9, 1)
+                kit.tube(sp, [0.04, 0.005], 3, BLIGHT, BLIGHT, 0.1, 0.2)
+            if i % 2 == 0:
+                kit.blob(line[-2], 0.3, 2.3, shade(LICHEN, 0.8), BRUISE, 1, 0.3, lump=0.6)
 
 
 def crab_apple(kit, near):

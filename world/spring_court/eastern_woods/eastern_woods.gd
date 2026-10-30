@@ -88,16 +88,5 @@ func _build_landmarks(parent: Node3D) -> void:
 			Vector3(T.BOGGE_HEART.z * 2.6, 40.0, T.BOGGE_HEART.z * 2.6), 0.08, Color(0.22, 0.23, 0.24))
 	place_fog(parent, "MarshFog", Vector3(marsh.x, WorldHeight.height_at(marsh.x, marsh.y) + 3.0, marsh.y),
 			Vector3(T.REED_MARSH.z * 2.2, 14.0, T.REED_MARSH.z * 2.2), 0.05, Color(0.30, 0.34, 0.30))
-	var grade := RegionGrade.new()
-	grade.name = "BoggeGrade"
-	grade.grade = &"bogge"
-	var r := T.BOGGE_HEART.z + T.DREAD_BAND * 0.5
-	grade.bounds = Rect2(bogge.x - r, bogge.y - r, r * 2.0, r * 2.0)
-	grade.blend_seconds = 6.0
-	parent.add_child(grade)
-	var marsh_grade := RegionGrade.new()
-	marsh_grade.name = "MarshGrade"
-	marsh_grade.grade = &"bogge"
-	marsh_grade.bounds = Rect2(marsh.x - T.REED_MARSH.z, marsh.y - T.REED_MARSH.z, T.REED_MARSH.z * 2.0, T.REED_MARSH.z * 2.0)
-	marsh_grade.blend_seconds = 5.0
-	parent.add_child(marsh_grade)
+	# The light, colour and fog follow dread_at() through AmbientLife's dread
+	# mood, so walking out of the Bogge lifts them again.

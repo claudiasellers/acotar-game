@@ -58,6 +58,9 @@ var is_built := false
 ## True when this load came from the baked cache.
 var used_cache := false
 
+## Shared shaft-mote kit [process material, draw mesh] (a new process
+## material compiles its shader, ~4 ms; reusing one costs nothing).
+static var _mote_kit: Array = []
 var _task_id := -1
 var _fingerprint := ""
 var _prepared: Dictionary = {}
@@ -97,12 +100,12 @@ func _exit_tree() -> void:
 
 ## The coverage report for tools/world_smoke.gd (contract §5). Needs build.
 func coverage_report() -> Dictionary:
-	# Clearing heroes: a glade's casts a shadow (2 calls) plus its shaft, a
-	# beacon's is shadowless plus a thin shaft.
+	# Clearing heroes: a glade's casts a shadow (2 calls) plus its shaft and
+	# motes, a beacon's is shadowless plus a thin shaft.
 	var props := PackedVector3Array()
 	for c: Dictionary in WoodsComposition.clearings(def):
 		var center: Vector2 = c["center"]
-		props.append(Vector3(center.x, center.y, 3.0 if not c["beacon"] else (1.0 if c["dread"] else 2.0)))
+		props.append(Vector3(center.x, center.y, 4.0 if not c["beacon"] else (1.0 if c["dread"] else 2.0)))
 	return ScatterReport.compute(layers, bounds, landmark_count,
 			WoodsScatter.estimate_draw_calls(layers, bounds, EXTRA_DRAW_CALLS, props, CLEARING_DRAW_DISTANCE))
 
@@ -472,8 +475,61 @@ func _job_clearing(glade: Dictionary) -> void:
 	var shaft := make_light_shaft(3.0, 20.0, 0.09) if glade["beacon"] else make_light_shaft(float(glade["radius"]) * 0.45, 30.0, 0.14)
 	shaft.name = node.name + "_Light"
 	_fade_out(shaft)
+	if not glade["beacon"]:
+		# The glade's dense sparkle: gold motes drifting in the beam
+		# (§2.4: concentrate particles in light shafts and glades).
+		var motes := make_shaft_motes()
+		motes.name = node.name + "_Motes"
+		motes.position = node.position + Vector3.UP * 3.0
+		motes.visibility_range_end = 120.0
+		root.add_child(motes)
 	shaft.position += node.position
 	root.add_child(shaft)
+
+
+## Soft gold motes hanging in a clearing's shaft (shared kit; the box fits
+## the narrowest glade's beam, 14 m x 0.45).
+static func make_shaft_motes() -> GPUParticles3D:
+	if _mote_kit.is_empty():
+		var pm := ParticleProcessMaterial.new()
+		pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+		pm.emission_box_extents = Vector3(6, 3, 6)
+		pm.gravity = Vector3(0, 0.03, 0)
+		pm.direction = Vector3(0.2, 1, 0.1)
+		pm.spread = 180.0
+		pm.initial_velocity_min = 0.02
+		pm.initial_velocity_max = 0.12
+		pm.turbulence_enabled = true
+		pm.turbulence_noise_strength = 0.15
+		pm.turbulence_noise_scale = 2.0
+		pm.color = Color(1.0, 0.9, 0.66, 0.85)
+		pm.scale_min = 0.7
+		pm.scale_max = 1.5
+		var fade := Curve.new()
+		fade.add_point(Vector2(0.0, 0.0))
+		fade.add_point(Vector2(0.2, 1.0))
+		fade.add_point(Vector2(0.8, 1.0))
+		fade.add_point(Vector2(1.0, 0.0))
+		var fade_tex := CurveTexture.new()
+		fade_tex.curve = fade
+		pm.scale_curve = fade_tex
+		var quad := QuadMesh.new()
+		quad.size = Vector2(0.07, 0.07)
+		var draw := AmbientLife.soft_sprite_material()
+		draw.emission_enabled = true
+		draw.emission = Color(1.0, 0.86, 0.6)
+		draw.emission_energy_multiplier = 3.0
+		quad.material = draw
+		_mote_kit = [pm, quad]
+	var p := GPUParticles3D.new()
+	p.process_material = _mote_kit[0]
+	p.draw_pass_1 = _mote_kit[1]
+	p.amount = 60
+	p.lifetime = 7.0
+	p.preprocess = 7.0
+	p.visibility_aabb = AABB(Vector3(-8, -4, -8), Vector3(16, 9, 16))
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return p
 
 
 ## A slanted shaft of warm light standing on the node's origin.
