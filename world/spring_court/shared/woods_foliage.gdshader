@@ -22,6 +22,10 @@ uniform float glow_energy : hint_range(0.0, 6.0) = 2.5;
 uniform float saturation : hint_range(0.0, 2.0) = 1.0;
 // 0 = eternal spring; 1 = colour drained (dread margin, blight).
 uniform float drain : hint_range(0.0, 1.0) = 0.0;
+// No lime (experience-bar §2.2): green-dominant albedo loses this much
+// chroma and leans teal, so sunlight and the spring grade's saturation
+// boost can't push it into #00FF00-#7FFF00.
+uniform float lime_guard : hint_range(0.0, 1.0) = 0.6;
 
 varying vec3 world_pos;
 varying float v_glow;
@@ -41,6 +45,9 @@ void fragment() {
 	float grey = dot(col, vec3(0.3, 0.59, 0.11));
 	col = mix(vec3(grey), col, saturation);
 	col = mix(col, vec3(grey) * vec3(0.80, 0.80, 0.84), drain);
+	float greenness = clamp((col.g - max(col.r, col.b)) / max(col.g, 0.001), 0.0, 1.0) * lime_guard;
+	col = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), greenness);
+	col.b += greenness * col.g * 0.35;
 	ALBEDO = col;
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.35;

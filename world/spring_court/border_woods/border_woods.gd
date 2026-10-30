@@ -119,7 +119,20 @@ static func thornwater_level(x: float, z: float) -> float:
 func _build_landmarks(parent: Node3D) -> void:
 	var T := BorderWoodsTerrain
 	var oak := Vector2(T.GREAT_OAK.x, T.GREAT_OAK.y)
-	place_landmark(parent, "GreatOak", FloraLibrary.mesh(&"ancient_oak"), oak, 0.7, 2.3, 1.5)
+	var great := place_landmark(parent, "GreatOak", FloraLibrary.mesh(&"ancient_oak"), oak, 0.7, 3.2, 1.5)
+	# The weenie of the wall-crossing reveal: the brightest thing in frame,
+	# its crown rim-lit gold and glinting where the others are plain.
+	var lit := FloraLibrary.material(&"tree").duplicate() as ShaderMaterial
+	lit.set_shader_parameter(&"rim_strength", 1.6)
+	lit.set_shader_parameter(&"rim_color", Color(1.0, 0.86, 0.6))
+	lit.set_shader_parameter(&"translucency", 0.8)
+	lit.set_shader_parameter(&"sparkle", 0.6)
+	(great.find_children("*", "MeshInstance3D", false, false)[0] as MeshInstance3D).material_override = lit
+	var oak_light := make_light_shaft(20.0, 90.0, 0.32)
+	oak_light.name = "GreatOakLight"
+	oak_light.position += Vector3(oak.x, WorldHeight.height_at(oak.x, oak.y), oak.y)
+	parent.add_child(oak_light)
+	defer(_build_wall_frame.bind(parent))
 	# Each group is its own frame-budget job (see WoodsRegion.defer).
 	defer(_build_moonstone_ring.bind(parent))
 	defer(_build_crocus_knoll.bind(parent))
@@ -135,6 +148,22 @@ func _build_landmarks(parent: Node3D) -> void:
 	hunt.look_at(Vector3(T.BOGGE_HUNT_LOOK.x, hunt.position.y, T.BOGGE_HUNT_LOOK.y), Vector3.UP)
 	place_anchor(parent, "WallCrossingArrival", T.WALL_GAP + Vector2(0.0, -30.0), 30.0,
 			"Where the ride north comes out of the Wall into the Spring Court (wall_crossed).")
+
+
+## Blossom boughs framing the first view past the Wall: crab apples either
+## side of the frame, just ahead, leaving the cone to the Great Oak open.
+func _build_wall_frame(parent: Node3D) -> void:
+	var T := BorderWoodsTerrain
+	var dir := (Vector2(T.GREAT_OAK.x, T.GREAT_OAK.y) - T.WALL_FRAME).normalized()
+	var side := Vector2(-dir.y, dir.x)
+	var frame := Node3D.new()
+	frame.name = "WallCrossingBoughs"
+	parent.add_child(frame)
+	for k in [-1.0, 1.0]:
+		for i in 2:
+			var at: Vector2 = T.WALL_FRAME + dir * (5.0 + i * 6.0) + side * k * (8.0 + i * 3.0)
+			place_prop(frame, "Bough%d_%d" % [int(k), i], FloraLibrary.mesh(&"crab_apple"), at,
+					k * 0.8 + i, 1.25 - i * 0.15, 0.3)
 
 
 ## The moonstone ring: nine standing stones on a low rise.

@@ -22,6 +22,15 @@ const FORAGE_DRAW := 90.0
 const CHUNK_TREE := 256.0
 const CHUNK_SHRUB := 128.0
 const CHUNK_FORAGE := 64.0
+## Forage comes in drifts (experience-bar §1.3.5): up to DRIFT_TRIES drifts
+## per DRIFT_CELL square, and every 100 m block gets at least one.
+const DRIFT_CELL := 50.0
+const DRIFT_TRIES := 4
+const DRIFT_SIZE := Vector2i(5, 30)
+## Finds that lie alone or in pairs rather than in drifts.
+const LONE_VISUALS := [&"feather_hawk", &"feather_owl", &"feather_jay", &"snail_shell", &"shed_antler",
+		&"egg_shell", &"wild_hive", &"trout_pool", &"odd_stone", &"painted_pebble", &"river_glass",
+		&"old_arrowhead", &"mask_ribbon", &"bone_charm", &"rusted_iron", &"acorn_caps", &"silt_patch"]
 
 
 ## Every scatter layer for a region (trees, shrubs, forage), sorted by id.
@@ -39,6 +48,8 @@ static func generate(def: WoodsRegionDef, bounds: Rect2) -> Array[ScatterLayer]:
 ## Raw placements for one kind inside `rect`: { id: PackedFloat32Array of
 ## x, y, z, yaw, scale }. "detail" is the near-player ground cover.
 static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: int = 0) -> Dictionary:
+	if kind == "forage":
+		return _place_drifts(def, rect, seed_offset)
 	var provider: Variant = def.provider
 	var biomes := def.biome_map()
 	var tables := _tables(def, kind)
@@ -66,9 +77,25 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 				continue
 			var b: WoodsBiome = biomes[biome_id]
 			var density := _density(b, kind)
+			# Composition (WoodsComposition): clearings and vista cones stay
+			# open; clearing floors and path edges carpet in one-colour drifts.
+			var drift := &""
+			if kind == "tree" or kind == "shrub":
+				if WoodsComposition.in_vista(def, x, z):
+					continue
+				if not WoodsComposition.clearing_at(def, x, z, 1.0 if kind == "tree" else 0.7).is_empty():
+					continue
+			elif kind == "detail":
+				var glade := WoodsComposition.clearing_at(def, x, z)
+				if not glade.is_empty() and sc < 0.7:
+					drift = glade["flower"]
+				elif sc < 0.75:
+					drift = WoodsComposition.path_drift(def, x, z, biome_id)
+				if drift != &"":
+					density *= 2.0
 			if roll >= density * area:
 				continue
-			var id: StringName = _pick(table, pick)
+			var id: StringName = drift if drift != &"" else _pick(table, pick)
 			var clear: float = provider.clearance(x, z)
 			var wet: bool = provider.is_water(x, z)
 			if wet and not (_visual(def, kind, id) in WATER_OK):
@@ -87,6 +114,100 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 				out[id] = PackedFloat32Array()
 			out[id].append_array(PackedFloat32Array([x, y, z, yaw, s]))
 	return out
+
+
+## Forage as drifts of 5-30 of one kind around a centre (finds alone or in
+## pairs), with gaps between. Same randoms per cell and try (determinism).
+static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) -> Dictionary:
+	var provider: Variant = def.provider
+	var biomes := def.biome_map()
+	var tables := _tables(def, "forage")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([def.seed, "drifts", seed_offset, rect.position, rect.size])
+	var out := {}
+	var nx := ceili(rect.size.x / DRIFT_CELL)
+	var nz := ceili(rect.size.y / DRIFT_CELL)
+	var counters := {}  # biome id -> drifts tried
+	var mean_size := 7.0  # mix of lone finds and drifts
+	for iz in nz:
+		for ix in nx:
+			for t in DRIFT_TRIES:
+				var jx := rng.randf()
+				var jz := rng.randf()
+				var keep := rng.randf()
+				var pick := rng.randf()
+				var size_roll := rng.randf()
+				var drift_seed := rng.randi()
+				var c := Vector2(rect.position.x + (ix + jx) * DRIFT_CELL, rect.position.y + (iz + jz) * DRIFT_CELL)
+				var b: WoodsBiome = biomes.get(provider.biome_at(c.x, c.y))
+				if b == null or not tables.has(b.id):
+					continue
+				var expected := b.forage_per_hectare / 10000.0 * DRIFT_CELL * DRIFT_CELL
+				if keep >= expected / (DRIFT_TRIES * mean_size):
+					continue
+				# Stratified picks (golden-ratio sequence per biome) so even a
+				# small region shows every kind its table lists.
+				var n: int = counters.get(b.id, 0)
+				counters[b.id] = n + 1
+				pick = fposmod(n * 0.6180339887 + pick * 0.05, 1.0)
+				_drift(def, out, tables[b.id], c, pick, size_roll, drift_seed)
+	# R1 floor: every 100 m block holds at least one drift.
+	var filled := {}
+	for id: StringName in out:
+		var inst: PackedFloat32Array = out[id]
+		for o in range(0, inst.size(), ScatterLayer.STRIDE):
+			filled[Vector2i(floori((inst[o] - rect.position.x) / 100.0), floori((inst[o + 2] - rect.position.y) / 100.0))] = true
+	for bz in ceili(rect.size.y / 100.0):
+		for bx in ceili(rect.size.x / 100.0):
+			var block := Vector2i(bx, bz)
+			if filled.has(block):
+				continue
+			var brng := RandomNumberGenerator.new()
+			brng.seed = hash([def.seed, "forced", seed_offset, block])
+			var area := Rect2(rect.position + Vector2(block) * 100.0, Vector2.ONE * 100.0).intersection(rect)
+			for attempt in 24:
+				var c := area.position + Vector2(brng.randf(), brng.randf()) * area.size
+				var pick := brng.randf()
+				var size_roll := brng.randf()
+				var drift_seed := brng.randi()
+				var b: WoodsBiome = biomes.get(provider.biome_at(c.x, c.y))
+				if b != null and tables.has(b.id) and _drift(def, out, tables[b.id], c, pick, size_roll, drift_seed, area) > 0:
+					break
+	return out
+
+
+## Places one drift around `c`; returns how many instances landed.
+static func _drift(def: WoodsRegionDef, out: Dictionary, table: Array, c: Vector2, pick: float,
+		size_roll: float, drift_seed: int, clip := Rect2()) -> int:
+	var provider: Variant = def.provider
+	var id: StringName = _pick(table, pick)
+	var visual := _visual(def, "forage", id)
+	var lone := visual in LONE_VISUALS or String(id).begins_with("col_")
+	# Mostly small drifts, the odd big carpet.
+	var size := 1 + int(size_roll * 1.99) if lone else DRIFT_SIZE.x + int(size_roll * size_roll * (DRIFT_SIZE.y - DRIFT_SIZE.x))
+	var spread := 1.5 if lone else 1.0 + sqrt(float(size)) * 0.9
+	var range_: Vector2 = FloraLibrary.info(visual).get("scale", Vector2.ONE)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = drift_seed
+	var placed := 0
+	for i in size:
+		var off := Vector2(rng.randfn(0.0, spread), rng.randfn(0.0, spread))
+		var yaw := rng.randf() * TAU
+		var sc := rng.randf()
+		var x := c.x + off.x
+		var z := c.y + off.y
+		if clip.has_area() and not clip.has_point(Vector2(x, z)):
+			continue
+		var wet: bool = provider.is_water(x, z)
+		if wet and not (visual in WATER_OK):
+			continue
+		if not wet and provider.clearance(x, z) < 0.15:
+			continue
+		if not out.has(id):
+			out[id] = PackedFloat32Array()
+		out[id].append_array(PackedFloat32Array([x, WorldHeight.height_at(x, z), z, yaw, lerpf(range_.x, range_.y, sc)]))
+		placed += 1
+	return placed
 
 
 static func _make_layer(def: WoodsRegionDef, kind: String, id: StringName, instances: PackedFloat32Array) -> ScatterLayer:
@@ -198,8 +319,10 @@ static func _pick(table: Array, r: float) -> StringName:
 ## of a few viewpoints, counting each chunk/layer pair within its draw range
 ## (and impostor range), plus a shadow pass for shadow casters.
 ## `extra` covers what isn't a ScatterLayer (ground cover cells, particles,
-## water, landmarks).
-static func estimate_draw_calls(layers: Array[ScatterLayer], bounds: Rect2, extra: int = 0) -> int:
+## water, landmarks); `props` are single placed props as (x, z, calls each)
+## drawn within `prop_range`.
+static func estimate_draw_calls(layers: Array[ScatterLayer], bounds: Rect2, extra: int = 0,
+		props := PackedVector3Array(), prop_range := 0.0) -> int:
 	var views := [bounds.get_center(), bounds.position + bounds.size * 0.25, bounds.end - bounds.size * 0.25,
 			Vector2(bounds.position.x + bounds.size.x * 0.25, bounds.end.y - bounds.size.y * 0.25),
 			Vector2(bounds.end.x - bounds.size.x * 0.25, bounds.position.y + bounds.size.y * 0.25)]
@@ -220,5 +343,8 @@ static func estimate_draw_calls(layers: Array[ScatterLayer], bounds: Rect2, extr
 					far[key] = true
 			var per := 2 if layer.cast_shadow else 1
 			calls += near.size() * per + far.size()
+		for p in props:
+			if Vector2(p.x, p.y).distance_to(v) < prop_range:
+				calls += int(p.z)
 		worst = maxi(worst, calls)
 	return worst + extra

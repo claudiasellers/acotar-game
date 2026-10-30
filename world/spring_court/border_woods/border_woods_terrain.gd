@@ -24,6 +24,11 @@ const FAELIGHT_HOLLOW := Vector3(210.0, 720.0, 95.0)
 const BLUEBELL_DELL := Vector3(-300.0, 680.0, 110.0)
 const MOONSTONE_RING := Vector3(290.0, 1230.0, 30.0)
 const GREAT_OAK := Vector3(-150.0, 1080.0, 40.0)
+## The wall-crossing release (experience-bar §1.2): the world lane's frame
+## marker wall_crossing_frame looks from here to the Great Oak.
+const WALL_FRAME := Vector2(-100, 1362)
+## View cones kept clear of trees and shrubs: [from, to, half angle deg, length m].
+const VISTAS := [[Vector2(-100, 1362), Vector2(-150, 1080), 20.0, 300.0]]
 const WALL_GAP := Vector2(-100.0, 1400.0)
 ## Story contract anchor bogge_hunt_path (ch. 9-10): on the root path through
 ## the ancient oaks, looking west down a long clear sightline.

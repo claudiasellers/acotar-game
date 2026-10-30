@@ -25,13 +25,22 @@ const CHUNK_FORAGE := WoodsScatter.CHUNK_FORAGE
 ## Draw calls outside the scatter layers: ground cover (25 cells x ~6
 ## species), particles, water, landmarks, terrain stand-in.
 const EXTRA_DRAW_CALLS := 260
+## Clearing heroes and their shafts draw out to here (past the sightline
+## checker's 150 m magnet range), fading over the last stretch.
+const CLEARING_DRAW_DISTANCE := 240.0
 const TERRAIN_STEP := 2.0
 const TERRAIN_CHUNK := 64.0
 const KINDS := ["tree", "shrub", "forage"]
 const COLLIDER_BATCH := 16
 ## Meshes landmarks and props use; warmed on the worker with the scatter's.
-const PROP_SPECIES: Array[StringName] = [&"ancient_oak", &"oak", &"beech", &"willow", &"silver_birch",
+const PROP_SPECIES: Array[StringName] = [&"ancient_oak", &"oak", &"beech", &"willow", &"silver_birch", &"standing_stone",
+		&"crab_apple", &"lilac_tree", &"hawthorn", &"fallen_log",
 		&"standing_stone", &"boulder", &"root_arch", &"twisted_dead", &"pale_fungus", &"bone_charm", &"thornbriar"]
+const SHAFT_SHADER := preload("res://world/spring_court/shared/woods_light_shaft.gdshader")
+## Clearing heroes: [scale, trunk collider radius] (collider 0 = none).
+const HERO_STYLE := {&"ancient_oak": [0.75, 1.2], &"crab_apple": [1.35, 0.3], &"lilac_tree": [1.35, 0.2],
+		&"hawthorn": [1.4, 0.25], &"standing_stone": [1.5, 0.6], &"fallen_log": [1.0, 0.0],
+		&"twisted_dead": [1.3, 0.4]}
 const WATER_SHADER := preload("res://world/spring_court/shared/woods_water.gdshader")
 
 @export var def: WoodsRegionDef
@@ -88,8 +97,37 @@ func _exit_tree() -> void:
 
 ## The coverage report for tools/world_smoke.gd (contract §5). Needs build.
 func coverage_report() -> Dictionary:
+	# Clearing heroes: a glade's casts a shadow (2 calls) plus its shaft, a
+	# beacon's is shadowless plus a thin shaft.
+	var props := PackedVector3Array()
+	for c: Dictionary in WoodsComposition.clearings(def):
+		var center: Vector2 = c["center"]
+		props.append(Vector3(center.x, center.y, 3.0 if not c["beacon"] else (1.0 if c["dread"] else 2.0)))
 	return ScatterReport.compute(layers, bounds, landmark_count,
-			WoodsScatter.estimate_draw_calls(layers, bounds, EXTRA_DRAW_CALLS))
+			WoodsScatter.estimate_draw_calls(layers, bounds, EXTRA_DRAW_CALLS, props, CLEARING_DRAW_DISTANCE))
+
+
+## Walkable lines for tools/sightline_check.gd: every road and path.
+func sightline_paths() -> Array[PackedVector2Array]:
+	var out: Array[PackedVector2Array] = []
+	var f: WoodsFeatures = def.provider.features()
+	for kind in WoodsComposition.PATH_KINDS:
+		var line := PackedVector2Array()
+		for seg: Array in f.segments(kind):
+			if not line.is_empty() and line[line.size() - 1] != seg[0]:
+				out.append(line)
+				line = PackedVector2Array()
+			if line.is_empty():
+				line.append(seg[0])
+			line.append(seg[1])
+		if line.size() > 1:
+			out.append(line)
+	return out
+
+
+## Horror biomes withdraw on purpose: the sightline check leaves them out.
+func sightline_skip(x: float, z: float) -> bool:
+	return WoodsComposition.of(def)["horror"].has(def.provider.biome_at(x, z))
 
 
 ## Builds synchronously, ignoring the frame budget (tests and tools).
@@ -162,6 +200,7 @@ func _prepare() -> void:
 		_grid = cache.grid
 		out["terrain"] = _terrain_chunks(cache)
 	out["ribbons"] = _water_ribbons()
+	WoodsComposition.of(def)
 	_prepare_extra()
 	_prepared = out
 
@@ -283,6 +322,9 @@ func _queue_jobs() -> void:
 		for b in range(0, entries.size(), COLLIDER_BATCH):
 			_jobs.append(_job_colliders.bind("Trunks_%d_%d_%d" % [key.x, key.y, b / COLLIDER_BATCH],
 					entries.slice(b, b + COLLIDER_BATCH)))
+	_jobs.append(_job_clearing_root)
+	for glade: Dictionary in WoodsComposition.clearings(def):
+		_jobs.append(_job_clearing.bind(glade))
 	_jobs.append(_job_water)
 	for ribbon in _prepared["ribbons"]:
 		_jobs.append(_job_ribbon.bind(ribbon))
@@ -398,6 +440,64 @@ func _job_colliders(body_name: String, entries: Array) -> void:
 			cyl.height = 5.0
 			shapes[r] = cyl
 		PhysicsServer3D.body_add_shape(body.get_rid(), shapes[r].get_rid(), Transform3D(Basis(), e[1] + Vector3.UP * 2.3))
+
+
+func _job_clearing_root() -> void:
+	var root := Node3D.new()
+	root.name = "Clearings"
+	add_child(root)
+
+
+## A clearing's stage: its hero object in a shaft of warm light. Heroes are
+## in group "clearing_hero" (magnets for tools/sightline_check.gd).
+func _job_clearing(glade: Dictionary) -> void:
+	var root := get_node("Clearings")
+	var c: Vector2 = glade["center"]
+	var hero: StringName = glade["hero"]
+	var style: Array = HERO_STYLE.get(hero, [1.0, 0.0])
+	var node := place_prop(root, "Clearing_%d_%d" % [roundi(c.x), roundi(c.y)], FloraLibrary.mesh(hero), c,
+			glade["yaw"], style[0], style[1])
+	node.add_to_group(&"clearing_hero")
+	var mi: MeshInstance3D = node.find_children("*", "MeshInstance3D", false, false)[0]
+	_fade_out(mi)
+	if glade["beacon"]:
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	node.set_meta(&"hero", hero)
+	node.set_meta(&"magnet_height", 14.0 if not glade["beacon"] else 9.0)  # the shaft reads from afar
+	if glade["dread"]:
+		return  # no light where the Bogge is
+	node.set_meta(&"radius", glade["radius"])
+	# The shaft hangs off the clearing root so the hero's scale and yaw
+	# don't tilt it.
+	var shaft := make_light_shaft(3.0, 20.0, 0.09) if glade["beacon"] else make_light_shaft(float(glade["radius"]) * 0.45, 30.0, 0.14)
+	shaft.name = node.name + "_Light"
+	_fade_out(shaft)
+	shaft.position += node.position
+	root.add_child(shaft)
+
+
+## A slanted shaft of warm light standing on the node's origin.
+static func make_light_shaft(radius: float, height: float, strength: float) -> MeshInstance3D:
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = radius * 0.7
+	cyl.bottom_radius = radius
+	cyl.height = height
+	cyl.radial_segments = 16
+	cyl.rings = 1
+	cyl.cap_top = false
+	cyl.cap_bottom = false
+	var mat := ShaderMaterial.new()
+	mat.shader = SHAFT_SHADER
+	mat.set_shader_parameter(&"strength", strength)
+	cyl.material = mat
+	var mi := MeshInstance3D.new()
+	mi.name = "LightShaft"
+	mi.mesh = cyl
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Lean toward the afternoon sun (south-west, high) so it reads as a beam.
+	mi.rotation = Vector3(deg_to_rad(-14.0), 0.0, deg_to_rad(12.0))
+	mi.position = Vector3(-height * 0.5 * sin(deg_to_rad(12.0)), height * 0.5, -height * 0.5 * sin(deg_to_rad(14.0)))
+	return mi
 
 
 func _job_water() -> void:
@@ -596,6 +696,12 @@ func place_prop(parent: Node3D, prop_name: String, mesh: Mesh, at: Vector2, yaw:
 	node.scale = Vector3.ONE * scale_by
 	parent.add_child(node)
 	return node
+
+
+static func _fade_out(gi: GeometryInstance3D) -> void:
+	gi.visibility_range_end = CLEARING_DRAW_DISTANCE
+	gi.visibility_range_end_margin = 30.0
+	gi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 
 
 ## A named landmark (counted for the coverage report).

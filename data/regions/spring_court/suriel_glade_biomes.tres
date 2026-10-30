@@ -16,7 +16,7 @@ shrub_density = 0.04
 shrubs = {&"hazel": 2.0, &"fern": 2.0, &"mossy_rock": 1.0, &"honeysuckle_bush": 1.0, &"bramble": 1.0}
 detail_density = 2.4
 detail = {&"bluebell": 5.0, &"wood_anemone": 3.0, &"grass_tuft": 3.0, &"primrose": 1.0, &"violet": 1.0, &"wild_garlic": 1.0}
-forage_per_hectare = 34.0
+forage_per_hectare = 60.0
 forage = {&"ing_wild_hyacinth": 3.0, &"ing_violet": 2.0, &"ing_primrose": 2.0, &"ing_wood_sorrel": 2.0, &"ing_wild_garlic": 2.0, &"ing_hazelnut": 2.0, &"ing_honeysuckle": 1.0, &"ing_blackberry": 1.0, &"ing_owl_feather": 1.0, &"ing_hawk_feather": 1.0, &"ing_snail_shell": 1.0, &"ing_moss": 1.0, &"ing_glowcap": 0.6, &"col_robin_egg_shell": 1.0, &"col_jay_feather": 1.0, &"col_acorn_caps": 1.0, &"col_painted_pebble": 0.5, &"col_odd_stone": 0.8, &"col_shed_antler": 0.5}
 ambience = PackedStringArray("butterflies", "pollen", "songbirds", "sparkles")
 
@@ -48,7 +48,7 @@ shrub_density = 0.06
 shrubs = {&"reed_clump": 1.5, &"cattail": 1.0, &"mossy_rock": 2.0, &"fern": 1.0}
 detail_density = 2.0
 detail = {&"pebbles": 3.0, &"water_mint": 2.0, &"meadowsweet": 2.0, &"grass_tuft": 2.0, &"lily_pad": 0.5}
-forage_per_hectare = 34.0
+forage_per_hectare = 50.0
 forage = {&"ing_willow_bark": 2.0, &"ing_water_mint": 2.0, &"ing_meadowsweet": 1.5, &"ing_river_silt": 2.0, &"ing_trout": 2.0, &"col_river_glass": 1.5, &"col_odd_stone": 1.0}
 ambience = PackedStringArray("dragonflies", "fish", "butterflies", "sparkles")
 

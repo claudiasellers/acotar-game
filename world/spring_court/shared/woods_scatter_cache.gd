@@ -6,7 +6,7 @@ class_name WoodsScatterCache
 extends Resource
 
 ## Bump when the generator's output format or placement rules change.
-const GENERATOR_VERSION := 2
+const GENERATOR_VERSION := 3
 
 @export var fingerprint: String
 ## kind ("tree", "shrub", "forage") -> { id: PackedFloat32Array (x, y, z, yaw, scale) }

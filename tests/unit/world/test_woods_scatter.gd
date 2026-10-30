@@ -53,3 +53,46 @@ func test_committed_reports_meet_the_world_smoke_bar() -> void:
 		assert_eq(int(r["empty_cells"]), 0, "%s empty cells" % id)
 		assert_gte(int(r["landmarks"]), 3, "%s landmarks" % id)
 		assert_lte(int(r["draw_calls"]), 1500, "%s draw calls" % id)
+
+
+func test_composition_spaces_clearings_and_keeps_vistas_open() -> void:
+	for id in REGIONS:
+		var def := _def(id)
+		var glades := 0
+		var beacons := 0
+		for c: Dictionary in WoodsComposition.clearings(def):
+			var center: Vector2 = c["center"]
+			if c["beacon"]:
+				beacons += 1
+			else:
+				glades += 1
+				assert_false(c["dread"], "%s: no clearing in a horror biome" % id)
+			assert_false(WoodsComposition.in_vista(def, center.x, center.y), "%s: hero at %s blocks a vista" % [id, center])
+		assert_gte(glades, 1, "%s has clearings" % id)
+		assert_gte(beacons, 2, "%s has beacons between them" % id)
+	# The border's paths run ~4 km: a clearing every 150-250 m is 15+.
+	var border_glades := 0
+	for c: Dictionary in WoodsComposition.clearings(_def(&"border_woods")):
+		if not c["beacon"]:
+			border_glades += 1
+	assert_gte(border_glades, 15, "border woods clearings")
+
+
+func test_forage_comes_in_drifts() -> void:
+	var def := _def(&"border_woods")
+	var forage := WoodsScatter.place(def, Rect2(-300, 900, 200, 200), "forage")
+	var drifted := 0
+	var total := 0
+	var s := ScatterLayer.STRIDE
+	for k in forage:
+		var inst: PackedFloat32Array = forage[k]
+		var n := inst.size() / s
+		total += n
+		for i in n:
+			# A drift member has a same-kind neighbour within 6 m.
+			for j in n:
+				if i != j and Vector2(inst[i * s], inst[i * s + 2]).distance_to(Vector2(inst[j * s], inst[j * s + 2])) < 6.0:
+					drifted += 1
+					break
+	assert_gt(total, 0)
+	assert_gte(float(drifted) / total, 0.8, "most forage grows in drifts, not alone")
