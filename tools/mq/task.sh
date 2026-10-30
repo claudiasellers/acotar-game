@@ -6,6 +6,8 @@
 #   task.sh set <id> <key> <val>  status, deps, branch, model (sonnet|opus)...
 #   task.sh next-lane             prints a free lane, or nothing
 #   task.sh list                  open tasks; `list all` for everything
+#   task.sh unmet <id>            the deps of <id> not yet merged or dropped
+#   task.sh ready                 open tasks whose deps are all met, one id per line
 set -u
 . "$(dirname "$0")/common.sh"
 
@@ -18,6 +20,15 @@ highest() {
 		ls "$TASKS" 2>/dev/null
 		git log "$MQ_MAIN" --format=%s 2>/dev/null | sed -n 's/^\(T[0-9][0-9]*\).*/\1/p'
 	} | sed -n 's/^T0*\([0-9][0-9]*\)$/\1/p' | sort -n | tail -1
+}
+
+# Deps of a task (meta `deps=T006 T008`) that are not merged or dropped.
+unmet() {
+	local d s
+	for d in $(kv_get "$TASKS/$1/meta" deps); do
+		s=$(kv_get "$TASKS/$d/meta" status)
+		case "$s" in merged|dropped) ;; *) printf '%s ' "$d" ;; esac
+	done
 }
 
 case "${1:-}" in
@@ -49,6 +60,16 @@ case "${1:-}" in
 			case "$busy" in *" lane$i "*) ;; *) echo "lane$i"; exit 0 ;; esac
 			i=$((i + 1))
 		done ;;
+	unmet)
+		[ -d "$TASKS/${2:-}" ] || { echo "mq: no task ${2:-}" >&2; exit 1; }
+		u=$(unmet "$2"); [ -z "$u" ] || echo "${u% }" ;;
+	ready)
+		for m in "$TASKS"/*/meta; do
+			[ -f "$m" ] || continue
+			[ "$(kv_get "$m" status)" = open ] || continue
+			id=$(kv_get "$m" id)
+			[ -z "$(unmet "$id")" ] && echo "$id"
+		done ;;
 	list)
 		for m in "$TASKS"/*/meta; do
 			[ -f "$m" ] || continue
@@ -60,5 +81,5 @@ case "${1:-}" in
 			printf '%-6s %-10s %-7s %-7s %s\n' "$id" "$s" "$(kv_get "$m" lane)" "$(kv_get "$m" model)" \
 				"$(head -1 "$TASKS/$id/request" | cut -c1-70)"
 		done ;;
-	*) echo "usage: task.sh add|start|set|next-lane|list" >&2; exit 2 ;;
+	*) echo "usage: task.sh add|start|set|next-lane|list|unmet|ready" >&2; exit 2 ;;
 esac
