@@ -51,7 +51,11 @@ import sdf  # noqa: E402
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 OUT_DIR = os.path.join(REPO, "characters", "tamlin", "beast")
 LINEUP = "/mnt/project-files/art/cast/tamlin_beast_lineup.png"
-GRID_H = 0.0065
+GRID_H = 0.0050
+# Final size: the sculpt is authored at a 1.6 m shoulder; the export is scaled up so his back is level
+# with Tamlin's head (shoulder ~1.95 m, horns ~2.6 m) and a touch broader.  Authored gait speeds scale too.
+BEAST_SCALE = 1.23
+BEAST_WIDEN = 1.10
 TRI_BUDGET = 15000
 DETAIL_TRIS = 4300          # head share of the body triangles
 LOD1_RATIO = 0.5
@@ -282,7 +286,7 @@ def clump(S, base, direction, length, r0, curl=(0, 0, -0.25), tag="clump", k=0.0
     mid = base + d * length * 0.55
     tip = base + d * length + np.asarray(curl) * length * 0.35
     S.add(rc(base, mid, r0, r0 * 0.55), k, tag)
-    S.add(rc(mid, tip, r0 * 0.55, max(0.0045, r0 * 0.10)), 0.004, tag)
+    S.add(rc(mid, tip, r0 * 0.55, max(0.0075, r0 * 0.16)), 0.008, tag)   # rounded tips survive decimation unfaceted
 
 
 def jit(n=3, a=0.25):
@@ -486,7 +490,7 @@ def build_body(S, max_tris):
     bm.free()
     body = link(bpy.data.objects.new("Body", me))
     smod = body.modifiers.new("Smooth", "SMOOTH")
-    smod.iterations = 3
+    smod.iterations = 5
     smod.factor = 0.5
     bake_modifiers(body)
     print("surface nets tris:", tri_count(body))
@@ -1518,9 +1522,11 @@ def render_lineup(arm, body, path):
         for o in human:
             o.hide_render = hl is None
             if hl is not None:
-                o.location.x, o.location.y = hl[0], o["by"] + hl[1]
+                o.location.x, o.location.y = hl[0], o["by"] + hl[1] * BEAST_SCALE
         scene.render.resolution_x, scene.render.resolution_y = res
         scene.render.resolution_percentage = 100
+        K = BEAST_SCALE
+        cl, tgt, rl = tuple(c * K for c in cl), tuple(c * K for c in tgt), tuple(c * K for c in rl)
         cam.location = cl
         look_at(cam, tgt)
         cam_d.lens = lens
@@ -1559,6 +1565,42 @@ def render_lineup(arm, body, path):
 
 
 # --------------------------------------------------------------------------
+def scale_up(arm, meshes, k, widen):
+    """Scale the finished, animated beast: meshes and bones by (k*widen, k, k), clip translations by k."""
+    f = np.array([k * widen, k, k])
+    for o in meshes:
+        me = o.data
+        if me.shape_keys:
+            for kb in me.shape_keys.key_blocks:
+                a = np.empty(len(kb.data) * 3)
+                kb.data.foreach_get("co", a)
+                kb.data.foreach_set("co", (a.reshape(-1, 3) * f).ravel())
+        P = verts_np(me) * f
+        me.vertices.foreach_set("co", P.ravel())
+        me.update()
+    select_only([arm], arm)
+    bpy.ops.object.mode_set(mode="EDIT")
+    for b in arm.data.edit_bones:
+        b.use_connect = False
+    for b in arm.data.edit_bones:
+        roll = b.roll
+        b.head = Vector(np.array(b.head) * f)
+        b.tail = Vector(np.array(b.tail) * f)
+        b.roll = roll
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for act in bpy.data.actions:
+        for layer in act.layers:
+            for strip in layer.strips:
+                for bag in strip.channelbags:
+                    for fc in bag.fcurves:
+                        if fc.data_path.endswith(".location"):
+                            for kp in fc.keyframe_points:
+                                kp.co.y *= k
+                                kp.handle_left.y *= k
+                                kp.handle_right.y *= k
+    print("scaled x%.2f (width x%.2f): shoulder %.2f m" % (k, widen, arm.data.bones["Spine3"].head_local.z))
+
+
 def export_glb(path, objs, arm):
     select_only([arm] + objs, arm)
     bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", use_selection=True, export_apply=False,
@@ -1633,6 +1675,7 @@ def main():
     names = add_actions(arm)
     for line in pose_check(arm, body, names):
         print(line)
+    scale_up(arm, [body, lod], BEAST_SCALE, BEAST_WIDEN)
     export_glb(os.path.join(OUT_DIR, "tamlin_beast.glb"), [body, lod], arm)
     lod.hide_set(True)
     lod.hide_render = True

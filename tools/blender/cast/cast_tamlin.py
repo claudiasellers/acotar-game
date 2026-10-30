@@ -168,12 +168,12 @@ def build_mask(B, ctx):
 # ---------------------------------------------------------------------------
 def style_loose(st):
     bh = cc.bh()
-    st.cap(thick=0.009, back_extra=0.006)
-    st.cap_locks(math.radians(6), n=24, off=0.011, r=0.0088, front_sweep=True)
+    st.cap(thick=0.0065, back_extra=0.004)
+    st.cap_locks(math.radians(6), n=24, off=0.0085, r=0.0075, front_sweep=True)
     for s in (1, -1):                                        # swept back off the mask at the temples
         st.skull_lock(s * math.radians(10), math.radians(62), s * math.radians(75), math.radians(16), 0.012, 0.0085,
                       n=11, sag=math.radians(4))
-    st.back_mass(1.315, n=14, spread=0.040, r=0.016, wave=0.004)
-    st.front_locks(1.335, n=1, r=0.011, wave=0.003)
+    st.back_mass(1.315, n=14, spread=0.022, r=0.0135, wave=0.004, arc=(112, 248))
+    st.front_locks(1.345, n=1, r=0.0085, wave=0.003)
     cc.tuck_behind_ears(st)
     del bh

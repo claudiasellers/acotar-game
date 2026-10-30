@@ -7,12 +7,16 @@ little wooden figures there.  Passive, defeated, gentle.
 [X]: 1.75 m, thin and stooped (the stoop lives in his clips; the rest pose is
 the T-pose); the RIGHT knee is the broken one (cast_shape knee_scar); greying
 brown hair, thinning and receding, with a short greying beard; hazel eyes;
-a once-fine merchant's long coat in faded dove grey with mismatched patched
-elbows, a faded periwinkle waistcoat with one button missing, cream shirt and
-a soft butter cravat, taupe trousers darned at the bad knee, worn buckled
-shoes.  Tarnished gold buttons are all that is left of the money.
-Props (unskinned, origin = grip): the cane he carved himself (a whittled bird
-for a handle, leaves round the collar) held in the LEFT hand, opposite the bad
+two outfits (keeper, lore 03-characters/archeron-family.md).  Cottage years
+(default): the dove-grey merchant's coat is the one thing left of the old life,
+faded, patched at the elbows in mismatched wool and too big on him now, horn
+buttons with one gone; a greyed, yellowed shirt open at the throat, a drab
+darned wool vest, dun trousers darned at the bad knee, scuffed cracked shoes
+tied with thongs (the buckles were sold).  FINE_OUTFIT (ch 30-31, the wealth
+back): the merchant again, cream shirt and butter cravat, fresh periwinkle
+waistcoat, gold buttons, buckled shoes.
+Props (unskinned, origin = grip): the cane he carved himself ("simply carved":
+a plain faceted crook, worn smooth at the grip) held in the LEFT hand, opposite the bad
 knee; a small carving knife (RightHand) and a half-carved wooden bird
 (LeftHand) for the fireside.
 Clips: idle_cane (stooped, weight off the right leg, cane at his left side),
@@ -56,7 +60,9 @@ BEARD_RGB = cc.srgb("ACA49C")      # greyer in the beard
 BROWS_SRGB = "7B6B5D"
 LIPS_SRGB = "B48478"
 
-DEFAULT_OUTFIT = ["father_shirt", "father_waistcoat", "father_coat", "father_trousers", "father_shoes"]
+DEFAULT_OUTFIT = ["father_shirt", "father_vest", "father_coat", "father_trousers", "father_shoes"]
+FINE_OUTFIT = ["father_fine_shirt", "father_fine_waistcoat", "father_fine_coat", "father_fine_trousers",
+               "father_fine_shoes"]   # ch 30-31, the wealth restored
 DEFAULT_HAIR = "father_greying"
 # (prop, bone, glTF bone-local grip transform: tx, ty, tz, qx, qy, qz, qw), read back from an export
 HELD_PROPS = [("father_cane", "LeftHand", (0.00513, 0.07954, -0.02723, -0.57495, -0.29195, -0.74888, 0.15289))]
@@ -70,152 +76,27 @@ PAL = {"fabric": (DOVE, 0.72, 0.0), "lining": (LILAC, 0.55, 0.0), "trim": (DOVE_
        "thread": (CREAM, 0.8, 0.0), "cord": (CREAM, 0.7, 0.0)}
 
 
+# cottage years: faded, greyed, darned; horn buttons; mismatched wool patches
+GREYED, DRAB, DRAB_D, HORN, DUN, WOOL_B, WOOL_G = "D6CEBB", "6E695C", "5A564B", "5B4636", "7A7262", "7B6A5A", "8C887D"
+POOR = dict(shirt=GREYED, vest=(DRAB, 0.9, 0.0), vest_trim=(DRAB_D, 0.9, 0.0), trousers=(DUN, 0.85, 0.0),
+            shoe=("5A4C44", 0.75, 0.0),
+            pal={"fabric": ("9C98A3", 0.82, 0.0), "lining": ("857E72", 0.85, 0.0), "trim": ("858091", 0.82, 0.0),
+                 "chain": (HORN, 0.55, 0.0), "patch_a": (WOOL_B, 0.9, 0.0), "patch_b": (WOOL_G, 0.9, 0.0),
+                 "thread": ("B9B09C", 0.85, 0.0)})
+FINE = dict(shirt=CREAM, vest=(PERI, 0.62, 0.0), vest_trim=(BUTTER, 0.6, 0.0), trousers=(TAUPE, 0.78, 0.0),
+            shoe=(SHOE, 0.55, 0.0), pal={"chain": ("C9A85A", 0.32, 0.8)})
+
+
 # ---------------------------------------------------------------------------
 # Garments (Feyre space)
 # ---------------------------------------------------------------------------
 def build(ctx):
-    bw, bg, probe, sh = ctx.bw, ctx.bg, ctx.probe, ctx.sh
     rep = []
-
-    # -- shirt + soft cravat
-    B = ctx.builder("father_shirt", {**PAL, "fabric": (CREAM, 0.7, 0.0), "cravat": (BUTTER, 0.6, 0.0)})
-    hole = bw.neckline(0.02, 0.055, 1.345)
-    bm = sh.make(lambda r, c: r in ("torso", "arms") and not hole(c),
-                 lambda c: 0.005, [bw.z_below(0.90)] + bw.x_beyond(0.603), max_tris=2600)
-    bw.add_bm(B, bm, "fabric", "shell", fit=0.005)
-    bw.bind(B, bm, 0.0042, "fabric", where=lambda p: abs(p[0]) > 0.5, squash=1.5, fit=0.005)    # cuffs
-    bm.free()
-    i0 = len(B.bm.verts)                                    # stand collar wrapped by the cravat
-    ring = bw.neck_ring(probe, lambda a: 1.352 + 0.006 * math.cos(a), 0.007, n=36)
-    B.tube(ring, 0.0042, 5, "cravat", up=V((0, 0, 1)), squash=2.6, cap=False)
-    ring = bw.neck_ring(probe, lambda a: 1.335 + 0.004 * math.cos(a), 0.010, n=36)
-    B.tube(ring, 0.0040, 5, "cravat", up=V((0, 0, 1)), squash=2.0, cap=False)
-    B.mark("near", i0, fit=0.006)
-    i0 = len(B.bm.verts)                                    # the soft knot and its falls
-    p, n = probe.on_torso(1.315, 0.0, 0.012)
-    B.ellipsoid(p, V((0.014, 0, 0)), n * 0.008, V((0, 0, 0.011)), "cravat", 7, 4)
-    for k, (dx, dz, rx, rz, sk) in enumerate(((-0.010, -0.030, 0.013, 0.026, -0.25), (0.009, -0.034, 0.012, 0.028, 0.2),
-                                              (0.0, -0.052, 0.011, 0.020, 0.0))):
-        q, nq = probe.on_torso(1.315 + dz, math.degrees(math.atan2(dx, 0.08)), 0.010 + 0.002 * k)
-        up = V((sk, 0, 1)).normalized()
-        side = nq.cross(up).normalized()
-        B.ellipsoid(q, side * rx, nq * 0.0045, up * rz, "cravat", 7, 4)
-    B.mark("near", i0, fit=0.008)
-    rep.append(cc.tris_line(ctx.cloth(B, "father_shirt")))
-
-    # -- waistcoat: faded periwinkle, butter piping, one button gone
-    B = ctx.builder("father_waistcoat", {**PAL, "fabric": (PERI, 0.62, 0.0), "trim": (BUTTER, 0.6, 0.0)})
-
-    def vhole(c):
-        if c.z > 1.335:
-            return True
-        return c.y < -0.01 and c.z > 1.15 + 2.3 * abs(c.x)
-    bm = sh.make(lambda r, c: r == "torso" and not vhole(c) and c.z > 0.89, lambda c: 0.011,
-                 [bw.z_below(0.905)], max_tris=2600)
-    bw.add_bm(B, bm, "fabric", "shell", fit=0.011)
-    bw.bind(B, bm, 0.0030, "trim", fit=0.011)
-    bm.free()
-    zs = np.linspace(0.955, 1.135, 5)
-    bw.buttons(B, probe, [z for k, z in enumerate(zs) if k != 2], 0.014, r=0.0042, mat="chain")
-    i0 = len(B.bm.verts)                                    # the missing one: a frayed thread end
-    p, n = probe.on_torso(float(zs[2]), 0.0, 0.0135)
-    for dx in (-0.0015, 0.0015):
-        B.tube(np.array([p + V((dx, 0, 0)), p + n * 0.004 + V((dx * 2, 0, -0.004)), p + n * 0.006 + V((dx * 3, 0, -0.010))]),
-               0.0006, 3, "thread", cap=False)
-    for s in (1, -1):                                       # welt pockets
-        q, nq = probe.on_torso(1.005, s * 38, 0.0135)
-        t = nq.cross(V((0, 0, 1))).normalized()
-        B.ellipsoid(q, t * 0.022, nq * 0.002, V((0, 0, 0.0035)), "trim", 6, 3)
-    B.mark("near", i0, fit=0.012)
-    rep.append(cc.tris_line(ctx.cloth(B, "father_waistcoat")))
-
-    # -- the long coat: open front, turned cuffs, skirts to the knee, patched elbows
-    B = ctx.builder("father_coat", PAL)
-
-    def coat_hole(c):
-        if c.z > 1.338:
-            return True
-        w = 0.040 + max(0.0, c.z - 1.10) * 0.26
-        return c.y < -0.015 and abs(c.x) < w
-    bm = sh.make(lambda r, c: r in ("torso", "arms") and not coat_hole(c),
-                 lambda c: 0.017, [bw.z_below(0.895)] + bw.x_beyond(0.588), max_tris=1900)
-    bw.add_bm(B, bm, "fabric", "shell", fit=0.017)
-    bw.bind(B, bm, 0.0085, "trim", where=lambda p: abs(p[0]) > 0.5, squash=1.7, fit=0.017)       # turned cuffs
-    bw.bind(B, bm, 0.0036, "lining", where=lambda p: abs(p[0]) < 0.3, squash=2.2, fit=0.017)      # faced fronts
-    bm.free()
-    i0 = len(B.bm.verts)                                    # fall-down collar at the back of the neck
-    ring = bw.neck_ring(probe, lambda a: 1.338 - 0.010 * math.cos(a), 0.024, n=48)
-    arc = np.array([p for p, a in zip(ring, np.linspace(0, 2 * math.pi, len(ring))) if 0.75 < a < 2 * math.pi - 0.75])
-    B.tube(arc, 0.0055, 5, "fabric", up=V((0, 0, 1)), squash=2.8, cap=True)
-    B.mark("near", i0, fit=0.020)
-    rings = open_skirt(B, probe, 0.925, 0.43, 0.075, gap_deg=17, rows=6, cols=32, mats=["fabric"] * 5 + ["trim"],
-                       off=0.024, fold=0.03)
-    i0 = len(B.bm.verts)                                    # pocket flaps
-    for s in (1, -1):
-        r = rings[1]
-        c = V(r[len(r) // 2 + s * 10])
-        out = V((c.x, c.y - 0.01, 0)).normalized()
-        side = out.cross(V((0, 0, 1))).normalized()
-        B.ellipsoid(c + out * 0.004 - V((0, 0, 0.010)), side * 0.040, out * 0.003, V((0, 0, 0.016)), "trim", 6, 3)
-    B.mark("skirt", i0, lmax=0.6)
-    i0 = len(B.bm.verts)                                    # tarnished buttons down his left front edge
-    for z in (1.02, 1.10, 1.18):
-        w = 0.040 + max(0.0, z - 1.10) * 0.26 + 0.012
-        loc = probe.bvh.ray_cast(V((w, -0.2, z)), V((0, 1, 0)), 0.4)
-        if loc[0] is not None:
-            B.ellipsoid(loc[0] + loc[1] * 0.021, V((0.0048, 0, 0)), loc[1] * 0.0022, V((0, 0, 0.0048)), "chain", 6, 3)
-    for s in (1, -1):                                       # cuff buttons
-        B.ellipsoid(V((s * 0.565, 0.033, 1.286)), V((0.0035, 0, 0)), V((0, 0.0018, 0)), V((0, 0, 0.0035)), "chain", 5, 3)
-    B.mark("near", i0, fit=0.019)
-    i0 = len(B.bm.verts)                                    # elbow patches: lilac on the left, butter on the right
-    for s, mat in ((1, "patch_a"), (-1, "patch_b")):
-        hit = probe.bvh.ray_cast(V((s * 0.405, 0.25, 1.287)), V((0, -1, 0)), 0.4)
-        if hit[0] is None:
-            continue
-        c = hit[0] + V((0, 0.0205, 0))
-        B.ellipsoid(c, V((0.034, 0, 0)), V((0, 0.0020, 0)), V((0, 0, 0.026)), mat, 8, 4)
-        stitch = [c + V((0.036 * math.cos(a), 0.0024, 0.028 * math.sin(a))) for a in np.linspace(0, 2 * math.pi, 15)]
-        B.tube(np.array(stitch), 0.0008, 3, "thread", cap=False)
-    B.mark("near", i0, fit=0.019)
-    rep.append(cc.tris_line(ctx.cloth(B, "father_coat")))
-
-    # -- trousers, darned over the bad right knee
-    B = ctx.builder("father_trousers", {**PAL, "fabric": (TAUPE, 0.78, 0.0)})
-    bm = sh.make(lambda r, c: r == "legs" or (r == "torso" and c.z < 1.0),
-                 lambda c: 0.006 + 0.006 * float(np.clip((0.40 - c.z) / 0.25, 0, 1)),
-                 [bw.z_above(0.99), bw.z_below(0.075)], max_tris=3400)
-    bw.add_bm(B, bm, "fabric", "shell", fit=0.006)
-    bw.bind(B, bm, 0.0035, "fabric", where=lambda p: p[2] < 0.3, squash=1.4)
-    bm.free()
-    i0 = len(B.bm.verts)
-    hit = probe.bvh.ray_cast(V((-0.090, -0.25, 0.47)), V((0, 1, 0)), 0.4)
-    if hit[0] is not None:
-        c = hit[0] + hit[1] * 0.0085
-        B.ellipsoid(c, V((0.028, 0, 0)), hit[1] * 0.002, V((0, 0, 0.034)), "patch_b", 8, 4)
-        stitch = [c + hit[1] * 0.0006 + V((0.030 * math.cos(a), 0, 0.036 * math.sin(a))) for a in np.linspace(0, 2 * math.pi, 15)]
-        B.tube(np.array(stitch), 0.0008, 3, "thread", cap=False)
-    B.mark("near", i0, fit=0.008)
-    rep.append(cc.tris_line(ctx.cloth(B, "father_trousers")))
-
-    # -- worn buckled shoes
-    B = ctx.builder("father_shoes", {**PAL, "fabric": (SHOE, 0.55, 0.0), "sole": (SOLE, 0.8, 0.0)})
-    bm = sh.make(lambda r, c: r == "feet" or (r == "legs" and c.z < 0.10),
-                 lambda c: 0.007, [bw.z_above(0.092)], max_tris=2200)
-    i0 = len(B.bm.verts)
-    bw.add_bm(B, bm, "fabric", "shell", fit=0.007)
-    bw.flat_sole(B, i0)
-    bw.bind(B, bm, 0.003, "sole", where=lambda p: p[2] > 0.05, fit=0.008)
-    bm.free()
-    i0 = len(B.bm.verts)
-    for s in (1, -1):
-        B.ellipsoid(V((s * 0.090, 0.040, 0.010)), V((0.024, 0, 0)), V((0, 0.022, 0)), V((0, 0, 0.010)), "sole", 8, 4)
-        hit = probe.bvh.ray_cast(V((s * 0.091, -0.075, 0.20)), V((0, 0, -1)), 0.3)
-        if hit[0] is not None:
-            c = hit[0] + hit[1] * 0.010
-            B.ellipsoid(c, V((0.013, 0, 0)), hit[1] * 0.0025, (hit[1].cross(V((1, 0, 0)))).normalized() * 0.010,
-                        "chain", 6, 3)
-    B.mark("shell", i0, fit=0.008)
-    rep.append(cc.tris_line(ctx.cloth(B, "father_shoes")))
+    # The cottage years (default): everything fine was sold long ago.  Only the dove-grey coat is left from
+    # the old life, faded, patched and too big on him now; greyed shirt, drab darned vest, horn buttons.
+    rep += build_outfit(ctx, POOR, "father_")
+    # Late Act III (ch 30-31), the wealth back: the merchant again, cravat, fresh waistcoat, gold buttons.
+    rep += build_outfit(ctx, FINE, "father_fine_")
 
     # -- hair and beard (one mesh; all on the Head bone)
     obj, clear = ctx.hair_style("father_greying", style_greying, HAIR_RGB)
@@ -233,6 +114,187 @@ def build(ctx):
             gj.add([i], float(w), "REPLACE")
     rep.append(cc.tris_line(obj) + " crown_clear=%.4f" % clear)
     return rep
+
+
+def build_outfit(ctx, o, pre):
+    bw, bg, probe, sh = ctx.bw, ctx.bg, ctx.probe, ctx.sh
+    fine = o is FINE
+    pal = {**PAL, **o["pal"]}
+    rep = []
+
+    # -- shirt: fine has a stand collar and a soft cravat; poor is greyed linen open at the throat
+    B = ctx.builder(pre + "shirt", {**pal, "fabric": (o["shirt"], 0.7 if fine else 0.85, 0.0), "cravat": (BUTTER, 0.6, 0.0)})
+    hole = bw.neckline(0.02, 0.055, 1.345) if fine else bw.neckline(0.045, 0.050, 1.338)
+    bm = sh.make(lambda r, c: r in ("torso", "arms") and not hole(c),
+                 lambda c: 0.005, [bw.z_below(0.90)] + bw.x_beyond(0.603), max_tris=2600)
+    bw.add_bm(B, bm, "fabric", "shell", fit=0.005)
+    bw.bind(B, bm, 0.0042, "fabric", where=lambda p: abs(p[0]) > 0.5, squash=1.5, fit=0.005)    # cuffs
+    bm.free()
+    if fine:
+        i0 = len(B.bm.verts)                                    # stand collar wrapped by the cravat
+        ring = bw.neck_ring(probe, lambda a: 1.352 + 0.006 * math.cos(a), 0.007, n=36)
+        B.tube(ring, 0.0042, 5, "cravat", up=V((0, 0, 1)), squash=2.6, cap=False)
+        ring = bw.neck_ring(probe, lambda a: 1.335 + 0.004 * math.cos(a), 0.010, n=36)
+        B.tube(ring, 0.0040, 5, "cravat", up=V((0, 0, 1)), squash=2.0, cap=False)
+        B.mark("near", i0, fit=0.006)
+        i0 = len(B.bm.verts)                                    # the soft knot and its falls
+        p, n = probe.on_torso(1.315, 0.0, 0.012)
+        B.ellipsoid(p, V((0.014, 0, 0)), n * 0.008, V((0, 0, 0.011)), "cravat", 7, 4)
+        for k, (dx, dz, rx, rz, sk) in enumerate(((-0.010, -0.030, 0.013, 0.026, -0.25), (0.009, -0.034, 0.012, 0.028, 0.2),
+                                                  (0.0, -0.052, 0.011, 0.020, 0.0))):
+            q, nq = probe.on_torso(1.315 + dz, math.degrees(math.atan2(dx, 0.08)), 0.010 + 0.002 * k)
+            up = V((sk, 0, 1)).normalized()
+            side = nq.cross(up).normalized()
+            B.ellipsoid(q, side * rx, nq * 0.0045, up * rz, "cravat", 7, 4)
+        B.mark("near", i0, fit=0.008)
+    else:
+        i0 = len(B.bm.verts)                                # a limp turned-down collar, frayed at the points
+        ring = bw.neck_ring(probe, lambda a: 1.342 + 0.010 * math.cos(a), 0.008, n=36)
+        arc = np.array([q for q, a in zip(ring, np.linspace(0, 2 * math.pi, len(ring))) if 0.55 < a < 2 * math.pi - 0.55])
+        B.tube(arc, 0.0040, 5, "fabric", up=V((0, 0, 1)), squash=2.4, cap=True)
+        B.mark("near", i0, fit=0.006)
+    rep.append(cc.tris_line(ctx.cloth(B, pre + "shirt")))
+
+    # -- waistcoat (fine: periwinkle, butter piping, gold buttons) / vest (poor: drab darned wool, horn buttons, one gone)
+    wname = pre + ("waistcoat" if fine else "vest")
+    B = ctx.builder(wname, {**pal, "fabric": o["vest"], "trim": o["vest_trim"]})
+
+    def vhole(c):
+        if c.z > 1.335:
+            return True
+        return c.y < -0.01 and c.z > 1.15 + 2.3 * abs(c.x)
+    bm = sh.make(lambda r, c: r == "torso" and not vhole(c) and c.z > 0.89, lambda c: 0.011,
+                 [bw.z_below(0.905)], max_tris=2600)
+    bw.add_bm(B, bm, "fabric", "shell", fit=0.011)
+    bw.bind(B, bm, 0.0030, "trim", fit=0.011)
+    bm.free()
+    zs = np.linspace(0.955, 1.135, 5)
+    bw.buttons(B, probe, [z for k, z in enumerate(zs) if fine or k != 2], 0.014, r=0.0042, mat="chain")
+    i0 = len(B.bm.verts)
+    if not fine:                                            # the missing one: a frayed thread end
+        p, n = probe.on_torso(float(zs[2]), 0.0, 0.0135)
+        for dx in (-0.0015, 0.0015):
+            B.tube(np.array([p + V((dx, 0, 0)), p + n * 0.004 + V((dx * 2, 0, -0.004)), p + n * 0.006 + V((dx * 3, 0, -0.010))]),
+                   0.0006, 3, "thread", cap=False)
+        darn(B, probe.on_torso(0.985, -42, 0.0135), 0.016, 0.012, "patch_b")    # darned over the left pocket
+    for s in (1, -1):                                       # welt pockets
+        q, nq = probe.on_torso(1.005, s * 38, 0.0135)
+        t = nq.cross(V((0, 0, 1))).normalized()
+        B.ellipsoid(q, t * 0.022, nq * 0.002, V((0, 0, 0.0035)), "trim", 6, 3)
+    B.mark("near", i0, fit=0.012)
+    rep.append(cc.tris_line(ctx.cloth(B, wname)))
+
+    # -- the long coat: open front, turned cuffs, skirts to the knee (poor: patched elbows, hangs loose on him)
+    B = ctx.builder(pre + "coat", pal)
+    cf = 0.017 if fine else 0.021
+
+    def coat_hole(c):
+        if c.z > 1.338:
+            return True
+        w = 0.040 + max(0.0, c.z - 1.10) * 0.26
+        return c.y < -0.015 and abs(c.x) < w
+    bm = sh.make(lambda r, c: r in ("torso", "arms") and not coat_hole(c),
+                 lambda c: cf, [bw.z_below(0.895)] + bw.x_beyond(0.588 if fine else 0.594), max_tris=1900)
+    bw.add_bm(B, bm, "fabric", "shell", fit=cf)
+    bw.bind(B, bm, 0.0085, "trim", where=lambda p: abs(p[0]) > 0.5, squash=1.7, fit=cf)       # turned cuffs
+    bw.bind(B, bm, 0.0036, "lining", where=lambda p: abs(p[0]) < 0.3, squash=2.2, fit=cf)      # faced fronts
+    bm.free()
+    i0 = len(B.bm.verts)                                    # fall-down collar at the back of the neck
+    ring = bw.neck_ring(probe, lambda a: 1.338 - 0.010 * math.cos(a), 0.024, n=48)
+    arc = np.array([p for p, a in zip(ring, np.linspace(0, 2 * math.pi, len(ring))) if 0.75 < a < 2 * math.pi - 0.75])
+    B.tube(arc, 0.0055, 5, "fabric", up=V((0, 0, 1)), squash=2.8, cap=True)
+    B.mark("near", i0, fit=0.020)
+    rings = open_skirt(B, probe, 0.925, 0.43, 0.075, gap_deg=17, rows=6, cols=32, mats=["fabric"] * 5 + ["trim"],
+                       off=0.024, fold=0.03)
+    i0 = len(B.bm.verts)                                    # pocket flaps
+    for s in (1, -1):
+        r = rings[1]
+        c = V(r[len(r) // 2 + s * 10])
+        out = V((c.x, c.y - 0.01, 0)).normalized()
+        side = out.cross(V((0, 0, 1))).normalized()
+        B.ellipsoid(c + out * 0.004 - V((0, 0, 0.010)), side * 0.040, out * 0.003, V((0, 0, 0.016)), "trim", 6, 3)
+    B.mark("skirt", i0, lmax=0.6)
+    i0 = len(B.bm.verts)                                    # buttons down his left front edge (poor: one gone)
+    for z in ((1.02, 1.10, 1.18) if fine else (1.02, 1.18)):
+        w = 0.040 + max(0.0, z - 1.10) * 0.26 + 0.012
+        loc = probe.bvh.ray_cast(V((w, -0.2, z)), V((0, 1, 0)), 0.4)
+        if loc[0] is not None:
+            B.ellipsoid(loc[0] + loc[1] * 0.021, V((0.0048, 0, 0)), loc[1] * 0.0022, V((0, 0, 0.0048)), "chain", 6, 3)
+    for s in (1, -1):                                       # cuff buttons
+        B.ellipsoid(V((s * 0.565, 0.033, 1.286)), V((0.0035, 0, 0)), V((0, 0.0018, 0)), V((0, 0, 0.0035)), "chain", 5, 3)
+    B.mark("near", i0, fit=0.019)
+    i0 = len(B.bm.verts)                                    # elbow patches, mismatched wool
+    for s, mat in (() if fine else ((1, "patch_a"), (-1, "patch_b"))):
+        hit = probe.bvh.ray_cast(V((s * 0.405, 0.25, 1.287)), V((0, -1, 0)), 0.4)
+        if hit[0] is None:
+            continue
+        c = hit[0] + V((0, 0.0205, 0))
+        B.ellipsoid(c, V((0.034, 0, 0)), V((0, 0.0020, 0)), V((0, 0, 0.026)), mat, 8, 4)
+        stitch = [c + V((0.036 * math.cos(a), 0.0024, 0.028 * math.sin(a))) for a in np.linspace(0, 2 * math.pi, 15)]
+        B.tube(np.array(stitch), 0.0008, 3, "thread", cap=False)
+    B.mark("near", i0, fit=0.019)
+    rep.append(cc.tris_line(ctx.cloth(B, pre + "coat")))
+
+    # -- trousers (poor: darned over the bad right knee)
+    B = ctx.builder(pre + "trousers", {**pal, "fabric": o["trousers"]})
+    bm = sh.make(lambda r, c: r == "legs" or (r == "torso" and c.z < 1.0),
+                 lambda c: 0.006 + 0.006 * float(np.clip((0.40 - c.z) / 0.25, 0, 1)),
+                 [bw.z_above(0.99), bw.z_below(0.075)], max_tris=3400)
+    bw.add_bm(B, bm, "fabric", "shell", fit=0.006)
+    bw.bind(B, bm, 0.0035, "fabric", where=lambda p: p[2] < 0.3, squash=1.4)
+    bm.free()
+    i0 = len(B.bm.verts)
+    hit = probe.bvh.ray_cast(V((-0.090, -0.25, 0.47)), V((0, 1, 0)), 0.4)
+    if hit[0] is not None and not fine:
+        c = hit[0] + hit[1] * 0.0085
+        B.ellipsoid(c, V((0.028, 0, 0)), hit[1] * 0.002, V((0, 0, 0.034)), "patch_b", 8, 4)
+        stitch = [c + hit[1] * 0.0006 + V((0.030 * math.cos(a), 0, 0.036 * math.sin(a))) for a in np.linspace(0, 2 * math.pi, 15)]
+        B.tube(np.array(stitch), 0.0008, 3, "thread", cap=False)
+    B.mark("near", i0, fit=0.008)
+    rep.append(cc.tris_line(ctx.cloth(B, pre + "trousers")))
+
+    # -- shoes (fine: buckled; poor: scuffed and cracked, the buckles sold, tied with thongs)
+    B = ctx.builder(pre + "shoes", {**pal, "fabric": o["shoe"], "sole": (SOLE, 0.8, 0.0)})
+    bm = sh.make(lambda r, c: r == "feet" or (r == "legs" and c.z < 0.10),
+                 lambda c: 0.007, [bw.z_above(0.092)], max_tris=2200)
+    i0 = len(B.bm.verts)
+    bw.add_bm(B, bm, "fabric", "shell", fit=0.007)
+    bw.flat_sole(B, i0)
+    bw.bind(B, bm, 0.003, "sole", where=lambda p: p[2] > 0.05, fit=0.008)
+    bm.free()
+    i0 = len(B.bm.verts)
+    for s in (1, -1):
+        B.ellipsoid(V((s * 0.090, 0.040, 0.010)), V((0.024, 0, 0)), V((0, 0.022, 0)), V((0, 0, 0.010)), "sole", 8, 4)
+        hit = probe.bvh.ray_cast(V((s * 0.091, -0.075, 0.20)), V((0, 0, -1)), 0.3)
+        if hit[0] is not None:
+            c = hit[0] + hit[1] * 0.010
+            if fine:
+                B.ellipsoid(c, V((0.013, 0, 0)), hit[1] * 0.0025, (hit[1].cross(V((1, 0, 0)))).normalized() * 0.010,
+                            "chain", 6, 3)
+            else:                                    # leather thong knotted over the instep
+                B.tube(np.array([c + V((-0.016, 0, -0.004)), c + V((0, 0, 0.001)), c + V((0.016, 0, -0.004))]),
+                       0.0016, 4, "sole", cap=True)
+                B.ellipsoid(c + V((0, 0, 0.002)), V((0.004, 0, 0)), hit[1] * 0.003, V((0, 0, 0.0035)), "sole", 5, 3)
+                for k in range(3):                   # cracks across the toe
+                    q = V((s * 0.090 + 0.008 * (k - 1), -0.080 + 0.006 * k, 0.040 - 0.004 * k))
+                    h2 = probe.bvh.ray_cast(q + V((0, -0.05, 0.02)), V((0, 1, -0.3)).normalized(), 0.2)
+                    if h2[0] is not None:
+                        B.ellipsoid(h2[0] + h2[1] * 0.0072, V((0.006, 0, 0)), h2[1] * 0.0008, V((0, 0.0008, 0.0012)),
+                                    "sole", 4, 2)
+    B.mark("shell", i0, fit=0.008)
+    rep.append(cc.tris_line(ctx.cloth(B, pre + "shoes")))
+    return rep
+
+
+def darn(B, hit, rx, rz, mat):
+    """A darned square: a flat wool patch with a running stitch round it."""
+    p, n = hit
+    up = V((0, 0, 1))
+    side = n.cross(up).normalized()
+    up = side.cross(n).normalized() * -1
+    B.ellipsoid(p + n * 0.001, side * rx, n * 0.0016, up * rz, mat, 6, 3)
+    stitch = [p + n * 0.0022 + side * (rx * 1.08 * math.cos(a)) + up * (rz * 1.08 * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 13)]
+    B.tube(np.array(stitch), 0.0007, 3, "thread", cap=False)
 
 
 def open_skirt(B, probe, z0, z1, flare, gap_deg, rows, cols, mats, off, fold):
@@ -559,23 +621,14 @@ def build_cane(ctx, L):
     for z in (-0.33, -0.61):                          # knots left in the ash
         B.ellipsoid(V((0.009, sx, z)), V((0.004, 0, 0)), V((0, 0.006, 0)), V((0, 0, 0.008)), "dark", 5, 3)
     B.tube(np.array([(0, sx, -L + 0.026), (0, sx, -L + 0.004)]), 0.0102, 8, "chain", cap=True)   # brass ferrule
-    B.tube(np.array([(0, sx, -0.040), (0, sx, -0.026)]), 0.0128, 8, "dark", cap=False)           # collar
-    for k in range(4):                                # carved leaves round the collar
-        a = k * math.pi / 2 + 0.4
-        c = V((0.013 * math.cos(a), sx + 0.013 * math.sin(a), -0.050))
-        B.leaf(c, V((0, 0, -1)), V((math.cos(a), math.sin(a), 0)), 0.014, 0.006, "light")
-    # handle: a little bird, head forward over the shaft, body in the fist, tail behind
-    hp = np.array([(0, sx, -0.022), (0, sx + 0.004, -0.004), (0, -0.012, 0.004), (0, 0.012, 0.004), (0, 0.034, 0.000),
-                   (0, 0.050, -0.006)])
-    hp = ctx.bg.smooth_curve(hp, 16)
-    B.tube(hp, np.interp(np.linspace(0, 1, 16), [0, 0.3, 0.7, 1.0], [0.0118, 0.0125, 0.0120, 0.0075]), 8, "fabric")
-    head = V((0, sx - 0.006, 0.006))
-    B.ellipsoid(head, V((0.0115, 0, 0)), V((0, 0.0135, 0)), V((0, 0, 0.0115)), "light", 8, 5)
-    B.ellipsoid(head + V((0, -0.016, -0.001)), V((0.0032, 0, 0)), V((0, 0.0075, 0)), V((0, 0, 0.0028)), "dark", 6, 3)  # beak
-    for s in (1, -1):
-        B.bead(head + V((s * 0.0105, -0.005, 0.003)), 0.0016, "eye", 5, 3)
-        B.leaf(V((s * 0.011, 0.004, 0.004)), V((0, 1, -0.15)), V((s, 0, 0.3)), 0.020, 0.008, "light")   # folded wings
-    B.leaf(V((0, 0.056, -0.007)), V((0, 1, -0.35)), V((0, 0, 1)), 0.018, 0.010, "light")             # tail
+    # handle: a plain crook, knife-faceted, the top worn pale and smooth where his hand sits ("simply carved")
+    hp = np.array([(0, sx, -0.030), (0, sx + 0.002, -0.006), (0, -0.016, 0.006), (0, 0.008, 0.008), (0, 0.030, 0.002),
+                   (0, 0.042, -0.012)])
+    hp = ctx.bg.smooth_curve(hp, 18)
+    hr = np.interp(np.linspace(0, 1, 18), [0, 0.4, 0.85, 1.0], [0.0116, 0.0122, 0.0112, 0.0100])
+    hr = hr * (1.0 + 0.05 * rng.standard_normal(18).clip(-1.5, 1.5))
+    B.tube(hp[:7], hr[:7], 8, "fabric", cap=False)
+    B.tube(hp[6:], hr[6:], 8, "light", cap=True)                 # the worn grip
     return _prop(ctx, B, "father_cane")
 
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://byhap4w8ybriu"
-path="res://.godot/imported/father_waistcoat.glb-52dadf11b5963c92d9c67689230dae99.scn"
+uid="uid://kyywaaik2bo7"
+path="res://.godot/imported/father_fine_shirt.glb-8a68ef8529bf8d0c14326df9dd8cbb2d.scn"
 
 [deps]
 
-source_file="res://characters/father/wardrobe/father_waistcoat.glb"
-dest_files=["res://.godot/imported/father_waistcoat.glb-52dadf11b5963c92d9c67689230dae99.scn"]
+source_file="res://characters/father/wardrobe/father_fine_shirt.glb"
+dest_files=["res://.godot/imported/father_fine_shirt.glb-8a68ef8529bf8d0c14326df9dd8cbb2d.scn"]
 
 [params]
 

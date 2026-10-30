@@ -2,13 +2,13 @@
 ##
 ## Instances tamlin_beast.glb turned to face -Z, marks the looping clips, plays
 ## `idle`, and hands the far view over to Body_LOD1 by visibility range.
-## Clips: idle, prowl (1.2 m/s), run (7 m/s), snarl (once, ends held),
+## Clips: idle, prowl (1.48 m/s), run (8.6 m/s), snarl (once, ends held),
 ## snarl_hold (loop), roar (once). Gait clips are foot-locked at those ground
 ## speeds with no root motion: scale playback by actual_speed / authored speed.
 extends Node3D
 
 const LOOPING_CLIPS: Array[StringName] = [&"idle", &"prowl", &"run", &"snarl_hold"]
-const GAIT_SPEEDS := {&"prowl": 1.2, &"run": 7.0}
+const GAIT_SPEEDS := {&"prowl": 1.48, &"run": 8.6}  # authored 1.2 / 7.0 m/s, scaled x1.23 with the model
 ## Distance (m) where the full mesh hands over to Body_LOD1.
 const LOD1_DISTANCE := 18.0
 
