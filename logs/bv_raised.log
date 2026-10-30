@@ -1,0 +1,179 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Metal 4.0 - Forward+ - Using Device #0: Apple - Apple M4 (Apple9)
+
+WARNING: World: no baked terrain in res://world/shared/terrain/data; baking nearby regions in memory (run bake_terrain.gd)
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _ready (res://world/shared/world/world.gd:36)
+         [1] _run (res://tools/landscape/landscape_shot.gd:35)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:149)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "layout" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:149)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:171)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:184)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:187)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:187)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:187)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "zn" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:187)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:188)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:189)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "means" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:189)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:193)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:199)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:201)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:203)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:208)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "open" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:208)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:209)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:211)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:211)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:212)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:220)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:220)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:220)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:226)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:226)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:227)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:232)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:238)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "cell" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:238)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:256)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:256)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:256)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "zn" variable because the value doesn't have a set type.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:256)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:257)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:259)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:274)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Parse Error: Identifier "LandscapeLayout" not declared in the current scope.
+          at: GDScript::reload (res://world/spring_court/wider/content/court_scatter_generator.gd:276)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+          at: GDScript::reload (res://world/spring_court/wider/court_region.gd:0)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tools/landscape/landscape_shot.gd:59)
+ERROR: Failed to load script "res://world/spring_court/wider/court_region.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] _run (res://tools/landscape/landscape_shot.gd:59)
+SCRIPT ERROR: Invalid call. Nonexistent function 'forage_layers' in base 'GDScript'.
+          at: CourtRegion._generate (res://world/spring_court/wider/court_region.gd:185)
+          GDScript backtrace (most recent call first):
+              [0] _generate (res://world/spring_court/wider/court_region.gd:185)
+SCRIPT ERROR: Invalid access to property or key 'forage' on a base object of type 'Dictionary'.
+          at: CourtRegion._finish (res://world/spring_court/wider/court_region.gd:193)
+          GDScript backtrace (most recent call first):
+              [0] _finish (res://world/spring_court/wider/court_region.gd:193)
+              [1] build_now (res://world/spring_court/wider/court_region.gd:133)
+              [2] _run (res://tools/landscape/landscape_shot.gd:66)
+SHOT bv_raised -> /Users/claudiasellers/Documents/acotar-game/.git/mq/shots/work/L09-2/out/bv_raised/bv_raised.png | draw_calls 67
