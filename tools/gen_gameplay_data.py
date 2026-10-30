@@ -325,7 +325,7 @@ PIECES = [
 	("riding_boots", "Riding boots", ["feet"], ["feet"], {"": "6b4a33"}, 0.1, 0, 0.1, "rider", "stables", 2, "X", "riding_boots", ""),
 	("lace_gloves", "Lace gloves", ["hands"], ["hands"], {k: PASTELS[k] for k in ("ivory", "blush", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "gloves_lace", ""),
 	("flower_crown", "Flower crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "mint", "pearl")}, 0.0, 0, 0, "fae", "alis_gift", 2, "C?", "flower_crown", "Woven from the manor's own gardens."),
-	("woven_crown", "Woven crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "pearl", "sky")}, 0.0, 0, 0, "fae", "woven", 0, "X", "flower_crown", "Woven by her own hands from flowers she picked."),
+	("woven_crown", "Woven crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "pearl", "sky")}, 0.0, 0, 0, "fae", "woven", 0, "X", "woven_crown", "Woven by her own hands from flowers she picked."),
 	("tiara", "Tiara", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3", "pearl": PASTELS["pearl"], "rose": "e8a3b8"}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 3, "X", "tiara", "A delicate band of gilt leaves and seed pearls."),
 	("circlet", "Circlet", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3"}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
 	("pearl_necklace", "Pearl necklace", ["neck"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_pearl", ""),

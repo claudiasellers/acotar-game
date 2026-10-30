@@ -80,3 +80,9 @@ func test_save_round_trip() -> void:
 	copy.load_state(data)
 	assert_true(copy.is_found(&"ing_acorn"))
 	assert_true(copy.is_new(&"ing_acorn"))
+
+
+func test_woven_crowns_use_the_woven_mesh() -> void:
+	for c in [&"rose", &"butter", &"lilac", &"pearl", &"sky"]:
+		var p := WardrobeCatalog.piece(StringName("woven_crown_%s" % c))
+		assert_eq(p.mesh_path, "res://characters/feyre/wardrobe/woven_crown.glb")

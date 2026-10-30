@@ -39,6 +39,21 @@ func apply() -> void:
 			_attach_placeholder(p)
 	_hide_regions(hidden)
 	_apply_makeup()
+	_apply_hair()
+
+
+## Her chosen hairstyle on the FeyreModel. Until a style's glb exists she
+## keeps the hair she has (the model's default braid).
+func _apply_hair() -> void:
+	var body: Node = null
+	for c in feyre.model.get_children():
+		if c.has_method(&"set_hair"):
+			body = c
+	var style := WardrobeCatalog.hair(Gameplay.wardrobe.hair)
+	if style and body and ResourceLoader.exists(style.mesh_path) \
+			and body.get_meta(&"hair_path", "") != style.mesh_path:
+		body.call(&"set_hair", style.mesh_path)
+		body.set_meta(&"hair_path", style.mesh_path)
 
 
 func _skeleton() -> Skeleton3D:
