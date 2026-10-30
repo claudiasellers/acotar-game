@@ -4,6 +4,9 @@
 class_name CourtScatterGenerator
 extends RefCounted
 
+## Tree and shrub composition (loaded by path: a new global class isn't
+## registered until the editor rescans, so no class_name).
+const LandscapeLayout := preload("res://world/spring_court/shared/landscape_layout.gd")
 const FORAGE_CELL := 25.0
 const DECOR_CELL := 10.0
 const REPORT_CELL := 100.0

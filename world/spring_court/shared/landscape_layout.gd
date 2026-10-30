@@ -8,7 +8,6 @@
 ##
 ## A layout is a Dictionary from make(): its noises, the stand map's
 ## percentile table and the spacing hash of trees placed so far.
-class_name LandscapeLayout
 extends RefCounted
 
 ## Candidate grid for trees (m); one jittered candidate per cell.
