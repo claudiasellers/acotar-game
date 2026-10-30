@@ -1,20 +1,25 @@
 * text=auto eol=lf
 
-# Binary art and audio live in Git LFS
-*.glb filter=lfs diff=lfs merge=lfs -text
-*.gltf.bin filter=lfs diff=lfs merge=lfs -text
-*.blend filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-*.jpeg filter=lfs diff=lfs merge=lfs -text
-*.exr filter=lfs diff=lfs merge=lfs -text
-*.hdr filter=lfs diff=lfs merge=lfs -text
-*.ktx2 filter=lfs diff=lfs merge=lfs -text
-*.wav filter=lfs diff=lfs merge=lfs -text
-*.ogg filter=lfs diff=lfs merge=lfs -text
-*.mp3 filter=lfs diff=lfs merge=lfs -text
-*.fbx filter=lfs diff=lfs merge=lfs -text
-*.res filter=lfs diff=lfs merge=lfs -text
-
-# Vendored addons keep their small binaries in plain git
-addons/**/*.png !filter !diff !merge -text
+# All assets are stored in plain git, not Git LFS: cloud lanes cannot upload
+# to the LFS endpoint (lfs.github.com returns 403). Keep every file under
+# 50 MB (GitHub rejects files over 100 MB); large reproducible outputs stay
+# out of git and are rebuilt by generators (engineering rule R15).
+*.glb binary
+*.gltf.bin binary
+*.blend binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.exr binary
+*.hdr binary
+*.ktx2 binary
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.fbx binary
+*.res binary
+*.scn binary
+*.mesh binary
+*.ttf binary
+*.otf binary
