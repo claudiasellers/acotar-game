@@ -3,10 +3,11 @@
 ## and clears when the tab is viewed. Pauses the game while open.
 extends RefCounted
 
-const TILE := Vector2(132, 118)
+const TILE := Vector2(122, 118)
 const UNFOUND := Color(0.84, 0.82, 0.86)
 
 static var _open: CanvasLayer = null
+static var _toasts: int = 0
 
 
 static func is_open() -> bool:
@@ -23,6 +24,8 @@ static func toggle(feyre: Feyre) -> void:
 static func open(feyre: Feyre) -> void:
 	if is_open():
 		return
+	for t in feyre.get_tree().get_nodes_in_group(&"collection_toast"):
+		t.queue_free()
 	var book := Gameplay.collection
 	var parts := UiStyle.modal("CollectionBook", 980.0)
 	var layer: CanvasLayer = parts[0]
@@ -54,7 +57,7 @@ static func open(feyre: Feyre) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	var grid := GridContainer.new()
-	grid.columns = 6
+	grid.columns = 7
 	grid.add_theme_constant_override(&"h_separation", 10)
 	grid.add_theme_constant_override(&"v_separation", 10)
 	scroll.add_child(grid)
@@ -144,7 +147,7 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 		var round := StyleBoxFlat.new()
 		round.set_corner_radius_all(28)
 		round.bg_color = e.color if e.found else UNFOUND
-		round.border_color = Color(1, 1, 1, 0.9)
+		round.border_color = Color(UiStyle.BORDER, 0.7) if e.found else Color(1, 1, 1, 0.9)
 		round.set_border_width_all(3)
 		gem.add_theme_stylebox_override(&"panel", round)
 		if not e.found:
@@ -208,6 +211,7 @@ static func toast(tree: SceneTree, entry_id: StringName, tab: StringName) -> voi
 	var entry_name := item.display_name if item else (piece.display_name if piece else String(entry_id).capitalize())
 	var layer := CanvasLayer.new()
 	layer.layer = 15
+	layer.add_to_group(&"collection_toast")
 	var card := PanelContainer.new()
 	var style := UiStyle.panel_box()
 	style.set_content_margin_all(10)
@@ -217,10 +221,16 @@ static func toast(tree: SceneTree, entry_id: StringName, tab: StringName) -> voi
 	var text := "✦ New %s: %s" % [KIND.get(tab, "find"), entry_name]
 	if tab == &"truths":
 		text = "✦ A new truth in your journal"
-	card.add_child(UiStyle.label(text + "   (J)", 17))
+	var line := UiStyle.label(text + "   (J)", 17)
+	line.autowrap_mode = TextServer.AUTOWRAP_OFF
+	card.add_child(line)
 	card.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	card.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	card.position.y -= 90.0
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	# Finds logged together stack upwards instead of overlapping.
+	card.position.y -= 70.0 + 56.0 * (_toasts % 4)
+	_toasts += 1
+	layer.tree_exited.connect(func() -> void: _toasts = maxi(_toasts - 1, 0))
 	card.modulate.a = 0.0
 	layer.add_child(card)
 	tree.root.add_child(layer)
