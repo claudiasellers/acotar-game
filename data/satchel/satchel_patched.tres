@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SatchelTier" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/satchel/satchel_tier.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"satchel_patched"
+display_name = "Patched satchel"
+description = "Worn leather on a cross-body strap, mended more times than she can count. The wolf hide went to market in it."
+mesh_path = "res://characters/feyre/satchel/satchel_patched.glb"
+canon = "C"

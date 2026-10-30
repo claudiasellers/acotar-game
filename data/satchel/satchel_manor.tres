@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SatchelTier" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/satchel/satchel_tier.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"satchel_manor"
+display_name = "Armoire satchel"
+description = "Soft, fine leather from the armoire in her manor room, stitched in gold. Nobody has ever patched it."
+mesh_path = "res://characters/feyre/satchel/satchel_manor.glb"
+canon = "C?"
