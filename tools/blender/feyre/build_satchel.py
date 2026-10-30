@@ -7,7 +7,7 @@ plain patched leather in Act I, a finer armoire one later.
 Reproducible build (needs characters/feyre/model/feyre.blend from build_feyre.py):
     /opt/bpyenv/bin/python tools/blender/feyre/build_satchel.py [satchel_patched|satchel_manor]
 
-Writes characters/feyre/satchel/<name>.glb, skinned to the 60-bone armature of feyre.blend.
+Writes characters/feyre/satchel/<tier>.glb and <tier>_cloak.glb (worn over the Act I cloak), skinned to the 60-bone armature of feyre.blend.
 The strap takes the body's weights (fit 18 mm, clear of the leathers belt at 14-16 mm); the bag rides
 85% Hips / 15% LeftUpperLeg so it sways with her stride without tearing.  Seeded; <= 3k tris each.
 """
@@ -56,15 +56,50 @@ PAL = {
 }
 
 
+# The Act I cloak (wardrobe piece hunter_cloak): a second build of each tier wears the satchel over it,
+# strap on the cloak's shoulder and back, bag outside its hem at the hip, so it shows from behind.
+CLOAK = "hunter_cloak"
+
+
+def garment_bvh(obj):
+    if obj is None:
+        return None
+    from mathutils.bvhtree import BVHTree
+    ev = obj.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    bm = bmesh.new()
+    bm.from_mesh(ev.to_mesh())
+    bm.transform(obj.matrix_world)
+    tree = BVHTree.FromBMesh(bm)
+    bm.free()
+    return tree
+
+
 # --------------------------------------------------------------------------
 # Strap: a flat ribbon traced over the body, front and back, over the right shoulder.
 # --------------------------------------------------------------------------
-def _hit(probe: BodyProbe, origin: Vector, d: Vector):
-    loc, nrm, _, _ = probe.bvh.ray_cast(origin, d, 2.0)
-    return loc, nrm
+def __init__(self, probe: BodyProbe, outer=None):
+        self.probe, self.outer = probe, outer
+
+    def out_from(self, o: Vector, d: Vector):
+        """Outermost surface along the ray from `o` (inside the body) in direction `d`."""
+        loc, nrm = self.probe.bvh.ray_cast(o, d, 1.0)[:2]
+        if self.outer is not None:
+            hit = self.outer.ray_cast(o + d * 1.0, -d, 1.0)[:2]
+            if hit[0] is not None and (loc is None or (hit[0] - o).length > (loc - o).length):
+                loc, nrm = hit[0], (hit[1] if hit[1].dot(d) > 0 else -hit[1])
+        return loc, nrm
+
+    def down_onto(self, x: float, y: float, z: float):
+        """Highest surface below (x, y, z)."""
+        best = self.probe.bvh.ray_cast(V((x, y, z)), V((0, 0, -1)), 1.0)[:2]
+        if self.outer is not None:
+            hit = self.outer.ray_cast(V((x, y, z + 0.15)), V((0, 0, -1)), 1.0)[:2]
+            if hit[0] is not None and (best[0] is None or hit[0].z > best[0].z):
+                best = (hit[0], hit[1] if hit[1].z > 0 else -hit[1])
+        return best
 
 
-def strap_path(probe: BodyProbe) -> List[tuple]:
+def strap_path(probe: BodyProbe, surf: Surface) -> List[tuple]:
     """(point, normal) from the bag's front ring, up the chest, over the right shoulder, down the back.
 
     The strap is a tilted loop round the torso: lowest at the left hip, highest at the right shoulder,
@@ -76,7 +111,7 @@ def strap_path(probe: BodyProbe) -> List[tuple]:
         out = []
         for a in angles:
             z = z_mid - amp * math.sin(a)
-            loc, nrm = probe.bvh.ray_cast(V((0, probe.cy(z), z)), V((math.sin(a), -math.cos(a), 0)), 1.0)[:2]
+            loc, nrm = surf.out_from(V((0, probe.cy(z), z)), V((math.sin(a), -math.cos(a), 0)))
             if loc is not None:
                 out.append((V(loc), V(nrm)))
         return out
@@ -88,7 +123,7 @@ def strap_path(probe: BodyProbe) -> List[tuple]:
     xs = min((front[-1][0].x + back[0][0].x) / 2, -0.13)   # on the shoulder, clear of the head
     cap_pts = []
     for y in np.linspace(front[-1][0].y, back[0][0].y, 9)[1:-1]:
-        loc, nrm = probe.bvh.ray_cast(V((xs, y, 1.47)), V((0, 0, -1)), 1.0)[:2]
+        loc, nrm = surf.down_onto(xs, y, 1.47)
         if loc is not None:
             cap_pts.append((V(loc), V(nrm)))
     pts = front + cap_pts + back
@@ -133,9 +168,9 @@ def rbox(B: Builder, centre: Vector, size: Vector, mat: str, bevel: float, kind:
     bm.free()
 
 
-def build_bag(B: Builder, probe: BodyProbe, manor: bool, rng, ends) -> None:
-    # Outside of the left hip at BAG_Z.
-    side, _ = _hit(probe, V((0.5, BAG_Y, BAG_Z)), V((-1, 0, 0)))
+def build_bag(B: Builder, surf: Surface, manor: bool, rng, ends) -> None:
+    # Outside of the left hip (or the cloak over it) at BAG_Z.
+    side, _ = surf.out_from(V((0, BAG_Y, BAG_Z)), V((1, 0, 0)))
     x0 = side.x + 0.012
     c = V((x0 + BAG_D * 0.5, BAG_Y, BAG_Z))
     rbox(B, c, V((BAG_D, BAG_W, BAG_H)), "fabric", 0.02, taper=0.12)
@@ -187,25 +222,23 @@ def bag_weights(obj, B: Builder) -> None:
         g.add(idx, w, "REPLACE")
 
 
-def build(name: str, probe: BodyProbe, arm, spec) -> bpy.types.Object:
-    manor = name == "satchel_manor"
-    rng = np.random.default_rng(SEED + len(name))
-    B = Builder(name, "fabric", {**bw.PAL, **PAL[name]})
-    i_bag = len(B.bm.verts)
-    path = strap_path(probe)
-    build_bag(B, probe, manor, rng, (path[0][0], path[-1][0]))
-    bag_parts = [(k, a, b, p) for k, a, b, p in B.parts]
-    # Everything built in build_bag that wasn't marked by a helper is bag too.
-    B.parts = [("bag", i_bag, len(B.bm.verts), {})]
-    del bag_parts
+def build(name: str, tier: str, surf: Surface, arm, spec) -> bpy.types.Object:
+    manor = tier == "satchel_manor"
+    rng = np.random.default_rng(SEED + len(tier))
+    B = Builder(name, "fabric", {**bw.PAL, **PAL[tier]})
+    path = strap_path(surf.probe, surf)
+    build_bag(B, surf, manor, rng, (path[0][0], path[-1][0]))
+    # Everything build_bag made is the bag (one weighting for all of it).
+    B.parts = [("bag", 0, len(B.bm.verts), {})]
     ribbon(B, path, STRAP_W, STRAP_T, "fabric")
-    obj = bw.finalize(B, name, probe, arm, spec)
+    obj = bw.finalize(B, name, surf.probe, arm, spec)
     bag_weights(obj, B)
     return obj
 
 
 def main(only=()) -> None:
     bpy.ops.wm.open_mainfile(filepath=os.path.join(MODEL_DIR, "feyre.blend"))
+    cloak = garment_bvh(bpy.data.objects.get(CLOAK))
     for n in [o.name for o in bpy.data.objects if o.name.startswith("hunter_") or o.name == "Body_LOD1"]:
         bpy.data.objects.remove(bpy.data.objects[n])
     body, arm = bpy.data.objects["Body"], bpy.data.objects["Armature"]
@@ -213,10 +246,11 @@ def main(only=()) -> None:
     probe = BodyProbe(body)
     os.makedirs(OUT_DIR, exist_ok=True)
     lines = []
-    for name in PAL:
-        if only and name not in only:
+    builds = [(t, t, Surface(probe)) for t in PAL] + [(t + "_cloak", t, Surface(probe, cloak)) for t in PAL]
+    for name, tier, surf in builds:
+        if only and tier not in only:
             continue
-        obj = build(name, probe, arm, spec)
+        obj = build(name, tier, surf, arm, spec)
         t = bf.tri_count(obj)
         lines.append("%-16s tris=%4d/%d%s" % (name, t, TRI_BUDGET, " OVER" if t > TRI_BUDGET else ""))
         bpy.context.view_layer.update()

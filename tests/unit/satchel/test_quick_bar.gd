@@ -146,3 +146,11 @@ func test_a_bar_on_a_stocked_inventory_fills_from_it() -> void:
 	var fresh := QuickBar.new(stocked)
 	assert_eq(fresh.entry(0), &"arrow_wood", "arrows first")
 	assert_eq(fresh.entry(1), &"ing_bilberry")
+
+
+func test_over_the_cloak_build_is_chosen_with_the_act_one_cloak() -> void:
+	var t := load(SatchelWorn.TIERS[&"satchel_patched"]) as SatchelTier
+	var cloak := WardrobePiece.new()
+	cloak.id = &"hunter_cloak"
+	assert_eq(SatchelWorn.mesh_for(t, [] as Array[WardrobePiece]), t.mesh_path)
+	assert_string_ends_with(SatchelWorn.mesh_for(t, [cloak] as Array[WardrobePiece]), "satchel_patched_cloak.glb")
