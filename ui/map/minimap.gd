@@ -144,10 +144,7 @@ func to_local_point(xz: Vector2) -> Vector2:
 func celebrate(text: String, landmark_id: String = "", big: bool = false) -> void:
 	if not landmark_id.is_empty():
 		_glow[landmark_id] = 1.0
-	if visible:
-		_sparkles.amount = 12 if GameSettings.reduced_effects else 40
-		_sparkles.restart()
-		Juice.bounce_control(self, 0.03 if GameSettings.reduced_effects else 0.07)
+	sparkle()
 	_toast.text = "✦  %s  ✦" % text
 	_toast.add_theme_font_size_override(&"font_size", 24 if big else 18)
 	if _toast_tween:
@@ -156,6 +153,14 @@ func celebrate(text: String, landmark_id: String = "", big: bool = false) -> voi
 	_toast_tween.tween_property(_toast, ^"modulate:a", 1.0, 0.35)
 	_toast_tween.tween_interval(3.2 if big else 2.4)
 	_toast_tween.tween_property(_toast, ^"modulate:a", 0.0, 0.9)
+
+
+## Sparkles round the rim and a bounce (a find, or arriving at her pin).
+func sparkle() -> void:
+	if visible:
+		_sparkles.amount = 12 if GameSettings.reduced_effects else 40
+		_sparkles.restart()
+		Juice.bounce_control(self, 0.03 if GameSettings.reduced_effects else 0.07)
 
 
 func _on_click(event: InputEvent) -> void:
@@ -188,4 +193,19 @@ func _draw_marks() -> void:
 		var p := to_local_point(Vector2(lm.x, lm.z))
 		if p.distance_to(c) <= inner:
 			MapMarks.draw_landmark(ci, p, StringName(lm.kind), 9.0, float(_glow.get(id, 0.0)))
+	_draw_pin(ci, c, inner)
 	MapMarks.draw_feyre(ci, c, hud.player_angle, 10.0, _t)
+
+
+## Her pin: on the map when it is near, else riding the rim, leaning the way to go.
+func _draw_pin(ci: CanvasItem, c: Vector2, inner: float) -> void:
+	if not hud.pin.active:
+		return
+	var p := to_local_point(hud.pin.xz)
+	if p.distance_to(c) <= inner:
+		MapMarks.draw_pin(ci, p, 11.0, _t)
+		return
+	var bearing := hud.pin.bearing_from(hud.player_xz)
+	var dir := Vector2(sin(bearing), -cos(bearing))
+	# The tip sits on the ring, the head outside it, pointing the way.
+	MapMarks.draw_pin(ci, c + dir * (DIAMETER * 0.5 - RING * 0.5), 11.0, _t, bearing)

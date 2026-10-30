@@ -9,6 +9,8 @@
 class_name BeastDoor
 extends SceneSpace
 
+const GROUP := &"beast_door"
+
 @export var decision_seconds: float = 6.0
 
 var beast: Node3D
@@ -18,6 +20,7 @@ var _player_inside: bool = false
 
 func _init() -> void:
 	space_id = &"beast_door"
+	add_to_group(GROUP)
 	require_flags = PackedStringArray(["wolf_killed", "pelt_sold"])
 	done_flags = PackedStringArray(["beast_claim_accepted"])
 	night_only = true
