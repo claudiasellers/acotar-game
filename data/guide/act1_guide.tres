@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="GuideBook" format=3]
+
+[ext_resource type="Script" path="res://ui/guide/guide_book.gd" id="1_r43ay"]
+[ext_resource type="Script" path="res://ui/guide/guide_thread.gd" id="2_cij3k"]
+
+[sub_resource type="Resource" id="thread_hunt"]
+script = ExtResource("2_cij3k")
+id = &"hunt"
+require_flags = PackedStringArray()
+done_flags = PackedStringArray("wolf_killed")
+priority = 40
+lines = PackedStringArray("Last loaf\'s gone. If I come back with nothing, we don\'t eat.", "Deer come down the trail past our door at first light. Quiet feet. Patience.", "Up the deer trail from the door and into the trees, before the snow fills the tracks.")
+voice_ids = PackedStringArray("H1_hunger", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "wolf", "wall", "mercenary", "village")
+
+[sub_resource type="Resource" id="thread_skin"]
+script = ExtResource("2_cij3k")
+id = &"skin"
+require_flags = PackedStringArray("wolf_killed")
+done_flags = PackedStringArray("fact.wolf_skinned")
+priority = 30
+icon = &"knife"
+lines = PackedStringArray("I can\'t leave a pelt like that to the snow.", "My knife, before the cold sets it stiff.", "Kneel by the kill and take the pelt.")
+voice_ids = PackedStringArray("", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "wall", "mercenary")
+
+[sub_resource type="Resource" id="thread_sell"]
+script = ExtResource("2_cij3k")
+id = &"sell"
+require_flags = PackedStringArray("wolf_killed", "fact.wolf_skinned")
+done_flags = PackedStringArray("pelt_sold")
+priority = 20
+icon = &"coins"
+lines = PackedStringArray("A pelt that size is worth more at market than on our floor.", "The road runs down to the village. Someone at the market always buys furs.", "Take the pelt to the fur stall in the village square.")
+voice_ids = PackedStringArray("H1_pelt", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "wall", "mercenary", "scars")
+
+[sub_resource type="Resource" id="thread_home"]
+script = ExtResource("2_cij3k")
+id = &"home"
+require_flags = PackedStringArray("pelt_sold")
+done_flags = PackedStringArray("beast_claim_accepted")
+priority = 10
+icon = &"hearth"
+lines = PackedStringArray("Stay together. Look after them.", "They\'ll be by the fire tonight, waiting on what I bring home.", "Home to the cottage before dark, and stay the night with them.")
+voice_ids = PackedStringArray("H1_promise", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "door", "wall", "bracelet", "claim")
+canon = "V"
+
+[sub_resource type="Resource" id="thread_quiet"]
+script = ExtResource("2_cij3k")
+id = &"quiet"
+require_flags = PackedStringArray("wall_crossed")
+done_flags = PackedStringArray("first_dinner_eaten")
+priority = 10
+icon = &"rose"
+lines = PackedStringArray("Too much quiet for a place this beautiful.", "Learn the grounds. Every path and every gate, before I need them.", "The great house is the only place with its lamps lit. Someone there will expect me.")
+voice_ids = PackedStringArray("H1_quiet", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "mask", "alis", "curse", "amarantha", "andras")
+canon = "A"
+
+[resource]
+script = ExtResource("1_r43ay")
+threads = Array[ExtResource("2_cij3k")]([SubResource("thread_hunt"), SubResource("thread_skin"), SubResource("thread_sell"), SubResource("thread_home"), SubResource("thread_quiet")])
