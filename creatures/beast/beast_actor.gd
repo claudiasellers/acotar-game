@@ -44,6 +44,8 @@ var _model: Node3D
 ## The cast lane's beast (tamlin_beast_model.gd: play(clip, ground_speed)), or
 ## null while the placeholder stands in.
 var _cast: Node3D
+## Blocks Feyre (world layer) while he is visible.
+var body: AnimatableBody3D
 var _moving: bool = false
 
 
@@ -57,6 +59,7 @@ func _ready() -> void:
 	else:
 		_model = _build_placeholder()
 	add_child(_model)
+	_build_body()
 	visible = false
 	if EventBus.has_signal(&"story_actor_cue"):
 		EventBus.connect(&"story_actor_cue", _on_cue)
@@ -239,6 +242,38 @@ func _apply_field() -> void:
 		shake = shake * shake * 0.04
 		camera.h_offset = sin(_breath * 31.0) * shake
 		camera.v_offset = cos(_breath * 27.0) * shake
+
+
+## A solid body so Feyre can't walk through him: a box fitted to the model's
+## meshes (horse-sized: about 1.95 m at the withers, 0.9 m wide), the horns
+## left out. Moves with him (AnimatableBody3D) and only blocks while he's seen.
+func _build_body() -> void:
+	var bounds := AABB()
+	var first := true
+	for mi in _model.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var b := _model.global_transform.affine_inverse() * m.global_transform * m.get_aabb() \
+				if _model.is_inside_tree() else m.transform * m.get_aabb()
+		bounds = b if first else bounds.merge(b)
+		first = false
+	if first:
+		bounds = AABB(Vector3(-0.45, 0, -1.5), Vector3(0.9, 1.95, 3.0))
+	var size := Vector3(minf(bounds.size.x, 1.2), minf(bounds.size.y * 0.82, 2.1), bounds.size.z * 0.9)
+	body = AnimatableBody3D.new()
+	body.name = "Body"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	shape.shape = box
+	shape.position = Vector3(bounds.get_center().x, size.y * 0.5, bounds.get_center().z)
+	body.add_child(shape)
+	add_child(body)
+	visibility_changed.connect(func() -> void:
+		shape.set_deferred(&"disabled", not visible))
 
 
 func _build_placeholder() -> Node3D:

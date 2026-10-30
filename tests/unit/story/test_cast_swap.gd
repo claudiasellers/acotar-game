@@ -36,3 +36,13 @@ func test_the_beast_roars_as_the_door_breaks() -> void:
 	var standin := StandIns.beast()
 	assert_true(standin.has_method(&"play"))
 	standin.free()
+
+
+func test_the_beast_is_solid_while_seen() -> void:
+	var beast := BeastActor.new()
+	add_child_autofree(beast)
+	assert_not_null(beast.body)
+	var box := (beast.body.get_child(0) as CollisionShape3D).shape as BoxShape3D
+	assert_between(box.size.y, 1.2, 2.1, "about withers height, horns left out")
+	assert_gt(box.size.z, box.size.x, "longer than wide, like a horse")
+	assert_eq(beast.body.collision_layer, 1, "the world layer Feyre collides with")

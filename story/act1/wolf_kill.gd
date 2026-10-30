@@ -14,6 +14,9 @@ extends SceneSpace
 
 @export var doe_offset: Vector3 = Vector3(0, 0, -22)
 @export var wolf_offset: Vector3 = Vector3(14, 0, -30)
+## The doe grazes at her spot once Feyre is this close, well before the 30 m
+## line where the scene starts, so she is seen first and the hunt has a target.
+@export var doe_preview_radius: float = 110.0
 
 var doe: Node3D
 var wolf: Node3D
@@ -57,6 +60,15 @@ func _build_beats() -> Array:
 		Beats.raise("wolf_killed"),
 		Beats.mood(&"dread", 0.2, 4.0),
 	]
+
+
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	if not auto_tick or running or is_instance_valid(doe) or WorldState.has_flag("wolf_killed"):
+		return
+	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
+	if feyre and feyre.global_position.distance_to(global_transform * doe_offset) <= doe_preview_radius:
+		doe = request_actor(&"doe", _at(doe_offset), StandIns.doe)
 
 
 func _spawn_doe(_space: SceneSpace) -> void:
