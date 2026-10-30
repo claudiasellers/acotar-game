@@ -58,8 +58,10 @@ func _build_beats() -> Array:
 		Beats.wait(2.5),
 		Beats.cue(&"tamlin_beast", &"accuse"),
 		Beats.mood(&"dread", 1.0, 0.5, 0.35),
+		# The knife is the interact press, which the space reads itself; leaving
+		# interact out keeps E from also using the bed behind her.
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact", "fire"])), "window"),
+			StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["fire"])), "window"),
 		Beats.decision([
 			{"action": &"interact", "fact": "fact.beast_door.threw_knife"},
 			{"action": &"fire", "fact": "fact.beast_door.threw_bracelets"},
