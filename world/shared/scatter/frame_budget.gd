@@ -22,6 +22,11 @@ static var late_starts := 0
 ## a job escapes the accounting).
 static var queued_jobs_started := 0
 static var jobs_accounted := 0
+## Test-only clock: when > 0, every job is estimated and accounted at this
+## many microseconds instead of its measured time, so scheduling (and so the
+## frame count) is deterministic. Measured times still feed the profiling
+## stats (max_job_usec, slowest_job).
+static var fixed_cost_usec := 0
 
 static var _frames := PackedInt32Array()
 
@@ -47,7 +52,7 @@ static func spend(usec: int) -> void:
 ## Returns how many jobs are still queued.
 static func run(queue: Array[Callable]) -> int:
 	while not queue.is_empty() and has_time():
-		if _spent > 0 and _spent + int(job_max.get(queue[0].get_method(), BUDGET_USEC)) > BUDGET_USEC:
+		if _spent > 0 and _spent + _estimate(queue[0].get_method()) > BUDGET_USEC:
 			break
 		if _spent >= BUDGET_USEC:
 			late_starts += 1
@@ -55,14 +60,23 @@ static func run(queue: Array[Callable]) -> int:
 		queued_jobs_started += 1
 		var t := Time.get_ticks_usec()
 		job.call()
-		var cost := Time.get_ticks_usec() - t
-		job_max[job.get_method()] = maxi(job_max.get(job.get_method(), 0), cost)
-		if cost > max_job_usec:
-			max_job_usec = cost
+		var measured := Time.get_ticks_usec() - t
+		if measured > max_job_usec:
+			max_job_usec = measured
 			slowest_job = job.get_method()
+		var cost := fixed_cost_usec if fixed_cost_usec > 0 else measured
+		job_max[job.get_method()] = maxi(job_max.get(job.get_method(), 0), cost)
 		spend(cost)
 		jobs_accounted += 1
 	return queue.size()
+
+
+## What a job of this kind is expected to cost: its worst so far, the whole
+## budget for a kind never seen, or the test clock's fixed cost.
+static func _estimate(method: StringName) -> int:
+	if fixed_cost_usec > 0:
+		return fixed_cost_usec
+	return int(job_max.get(method, BUDGET_USEC))
 
 
 static func reset_stats() -> void:
@@ -73,13 +87,16 @@ static func reset_stats() -> void:
 	queued_jobs_started = 0
 	jobs_accounted = 0
 	_frames.clear()
+	# Work already spent this frame belongs to before the reset.
+	_frame = Engine.get_process_frames()
+	_spent = 0
 
 
 ## Main-thread cost of every frame that ran jobs since reset_stats(),
 ## including the current one.
 static func frame_costs() -> PackedInt32Array:
 	var out := _frames.duplicate()
-	if _frame == Engine.get_process_frames() and _spent > 0:
+	if _spent > 0:  # the latest frame with work, not yet rolled over
 		out.append(_spent)
 	return out
 

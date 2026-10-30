@@ -8,6 +8,7 @@ extends GutTest
 ## spread over frames. Wall clock depends on the machine (shared CI runners
 ## blow any fixed bar), so frame timings are logged here, and real frame
 ## timing is R9's milestone profiling.
+const JOBS_PER_FRAME := 4
 const SCENE := "res://world/spring_court/suriel_glade/suriel_glade.tscn"
 
 
@@ -20,23 +21,31 @@ func _stream_in() -> WoodsRegion:
 
 func test_async_build_is_scheduled_in_the_frame_budget() -> void:
 	# The first build warms the engine once per session (particle shaders,
-	# job cost estimates); streaming is what has to stay smooth.
+	# caches) on the real clock.
 	var warm := await _stream_in()
 	warm.free()
+	# Then stream on the test clock: every job costs a quarter of the budget,
+	# so scheduling no longer depends on how fast this machine is.
 	FrameBudget.reset_stats()
+	FrameBudget.fixed_cost_usec = FrameBudget.BUDGET_USEC / JOBS_PER_FRAME
 	var start := Engine.get_process_frames()
 	var region := await _stream_in()
 	var frames := Engine.get_process_frames() - start
-	var median := FrameBudget.frame_quantile(0.5)
-	var p90 := FrameBudget.frame_quantile(0.9)
-	gut.p("suriel_glade streamed in %d frames: median %d us, p90 %d us, worst %d us (slowest job %s, %d us), cache %s" % [
-			frames, median, p90, FrameBudget.max_frame_usec, FrameBudget.slowest_job, FrameBudget.max_job_usec,
-			region.used_cache])
+	FrameBudget.fixed_cost_usec = 0
+	var costs := FrameBudget.frame_costs()
+	var jobs := FrameBudget.jobs_accounted
+	gut.p("suriel_glade streamed in %d frames, %d jobs on %d of them; measured slowest job %s, %d us; cache %s" % [
+			frames, jobs, costs.size(), FrameBudget.slowest_job, FrameBudget.max_job_usec, region.used_cache])
 	assert_true(region.is_built)
-	assert_gt(frames, 10, "the build is spread over many frames")
 	assert_eq(FrameBudget.late_starts, 0, "no job starts after the frame's budget is spent")
-	assert_gte(FrameBudget.frame_costs().size(), 10, "jobs run across 10+ frames")
-	assert_eq(FrameBudget.queued_jobs_started, FrameBudget.jobs_accounted, "every job's cost is accounted")
+	assert_eq(FrameBudget.queued_jobs_started, jobs, "every job's cost is accounted")
+	assert_gt(jobs, 40, "the build is many small jobs")
+	assert_eq(costs.size(), ceili(float(jobs) / JOBS_PER_FRAME),
+			"frames with work = ceil(accounted cost / budget): every frame but the last is full")
+	for i in costs.size() - 1:
+		if costs[i] != FrameBudget.BUDGET_USEC:
+			assert_eq(costs[i], FrameBudget.BUDGET_USEC, "frame %d is filled to the budget" % i)
+			break
 	assert_gte(region.landmark_count, 3)
 	assert_gt(get_tree().get_nodes_in_group(&"forage_field").size(), 20)
 	region.free()
