@@ -1,9 +1,10 @@
 ## The great wolf of chapter one: Andras, a High Fae sentry in wolf form,
 ## though nothing here says so. Pony-sized, unnaturally quiet for his size.
-## He never notices Feyre: he creeps downwind of the doe, bursts out and seizes
-## her neck. The ash arrow in his side makes him drop her, whirl and look at
-## Feyre with eerie awareness; he does not run, and her next arrow kills him.
-## He dies slowly, his eye on the sky. (Keeper, from the chapter 1 text.)
+## He never notices Feyre before the shot: he creeps downwind of the doe in
+## falling snow, bursts out and seizes her neck. The ash arrow in his side
+## makes him drop her and turn to look at Feyre once, briefly; he does not
+## run, and her next arrow goes through his eye. He dies slowly, eye on the
+## sky. (Story beat on main, canon-corrections.)
 class_name GreatWolf
 extends Creature
 
@@ -17,8 +18,8 @@ enum State { STALK, RUSH, HOLD_PREY, STARE, RETREAT, DYING }
 ## Raised through an ActionTrigger when he dies with ash in him. Empty in the
 ## real game: the story lane's wolf scene owns `wolf_killed`. The demo sets it.
 @export var kill_flag: String = ""
-## How long he holds Feyre's eye after the ash goes in.
-@export var stare_duration: float = 4.0
+## How long his one brief look at Feyre lasts after the ash goes in.
+@export var stare_duration: float = 1.5
 @export var strike_distance: float = 9.0
 ## How long he waits at strike distance before he bursts out: the player's window.
 @export var hold_before_rush: float = 8.0
