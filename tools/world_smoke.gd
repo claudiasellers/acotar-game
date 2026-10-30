@@ -1,7 +1,11 @@
 ## World smoke test, run by the build lane on every merge (engineering rules R16).
 ##
-##   godot --headless -s tools/world_smoke.gd            # every world in data/regions/
-##   godot --headless -s tools/world_smoke.gd -- human_realm
+##   godot --headless -s tools/world_smoke.gd            # every region
+##   godot --headless -s tools/world_smoke.gd -- spring_court
+##
+## Finds every RegionDef under data/regions/ at any depth, and every region
+## scene on the contract path world/<realm>/<id>/<id>.tscn. A scene with no
+## RegionDef fails (WorldStreamer could never stream it).
 ##
 ## For each region: instance it with its neighbors, let it run a few frames,
 ## and fail on any engine error or script error. Then check the region's
@@ -46,67 +50,117 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var worlds := _worlds_to_check()
+	var only := OS.get_cmdline_user_args()
+	var regions := _discover_regions(only)
+	var orphans := _orphan_scenes(regions, only)
 	var failures := 0
-	var checked := 0
-	for world in worlds:
-		var regions := _load_regions("%s/%s" % [REGIONS_ROOT, world])
-		for id in regions:
-			checked += 1
-			var problems := await _check_region(regions, id)
-			if problems.is_empty():
-				print("PASS %s/%s" % [world, id])
-			else:
-				failures += 1
-				print("FAIL %s/%s: %s" % [world, id, "; ".join(problems)])
-	print("world_smoke: %d regions, %d failed" % [checked, failures])
+	for id in regions:
+		var problems := await _check_region(regions, id)
+		failures += _report(regions[id].get_meta(&"realm", "?"), id, problems)
+	# Region scenes on the contract path with no RegionDef: still load them,
+	# and fail them, because WorldStreamer can never stream them.
+	for scene_path in orphans:
+		var problems := PackedStringArray(["no RegionDef in data/regions/ for %s" % scene_path])
+		problems.append_array(await _load_scenes([scene_path]))
+		failures += _report(scene_path.get_base_dir().get_base_dir().get_file(), scene_path.get_file().get_basename(), problems)
+	print("world_smoke: %d regions, %d failed" % [regions.size() + orphans.size(), failures])
 	quit(1 if failures > 0 else 0)
 
 
-func _worlds_to_check() -> PackedStringArray:
-	var args := OS.get_cmdline_user_args()
-	if not args.is_empty():
-		return args
-	if not DirAccess.dir_exists_absolute(REGIONS_ROOT):
-		return PackedStringArray()
-	return DirAccess.get_directories_at(REGIONS_ROOT)
+func _report(realm: String, id: String, problems: PackedStringArray) -> int:
+	if problems.is_empty():
+		print("PASS %s/%s" % [realm, id])
+		return 0
+	print("FAIL %s/%s: %s" % [realm, id, "; ".join(problems)])
+	return 1
 
 
-func _load_regions(dir_path: String) -> Dictionary:
+## Every RegionDef anywhere under data/regions/ (any depth), keyed by id.
+## `only` limits to realms (first folder under data/regions/) when given.
+func _discover_regions(only: PackedStringArray) -> Dictionary:
 	var regions := {}
-	for file in DirAccess.get_files_at(dir_path):
-		var clean := file.trim_suffix(".remap")
-		if clean.ends_with(".tres"):
-			var res := load("%s/%s" % [dir_path, clean])
-			if res is RegionDef:
-				regions[String(res.id)] = res
+	for path in _files_under(REGIONS_ROOT, ".tres"):
+		var realm := path.trim_prefix(REGIONS_ROOT + "/").get_slice("/", 0)
+		if not only.is_empty() and not only.has(realm):
+			continue
+		# Cheap header check: data/regions also holds big layout resources.
+		var head := FileAccess.get_file_as_string(path).substr(0, 200)
+		if not head.contains('script_class="RegionDef"'):
+			continue
+		var res := load(path)
+		if res is RegionDef:
+			if regions.has(String(res.id)):
+				print("FAIL %s: duplicate region id '%s'" % [path, res.id])
+			res.set_meta(&"realm", realm)
+			regions[String(res.id)] = res
 	return regions
 
 
-func _check_region(regions: Dictionary, id: String) -> PackedStringArray:
-	var problems := PackedStringArray()
-	var region: RegionDef = regions[id]
-	_errors.clear()
+## Region scenes on the contract path world/<realm>/<id>/<id>.tscn that no
+## RegionDef points at.
+func _orphan_scenes(regions: Dictionary, only: PackedStringArray) -> PackedStringArray:
+	var claimed := {}
+	for region: RegionDef in regions.values():
+		claimed[region.scene_path] = true
+	var orphans := PackedStringArray()
+	for realm in ["human_realm", "spring_court"]:
+		if not only.is_empty() and not only.has(realm):
+			continue
+		var realm_dir := "res://world/%s" % realm
+		if not DirAccess.dir_exists_absolute(realm_dir):
+			continue
+		for id in DirAccess.get_directories_at(realm_dir):
+			var scene_path := "%s/%s/%s.tscn" % [realm_dir, id, id]
+			if FileAccess.file_exists(scene_path) and not claimed.has(scene_path):
+				orphans.append(scene_path)
+	return orphans
 
+
+func _files_under(dir_path: String, suffix: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	if not DirAccess.dir_exists_absolute(dir_path):
+		return out
+	for file in DirAccess.get_files_at(dir_path):
+		var clean := file.trim_suffix(".remap")
+		if clean.ends_with(suffix):
+			out.append("%s/%s" % [dir_path, clean])
+	for sub in DirAccess.get_directories_at(dir_path):
+		out.append_array(_files_under("%s/%s" % [dir_path, sub], suffix))
+	return out
+
+
+## Instances scenes together for a few frames; returns the errors raised.
+func _load_scenes(paths: Array) -> PackedStringArray:
+	var problems := PackedStringArray()
+	_errors.clear()
 	var holder := Node3D.new()
 	root.add_child(holder)
-	for load_id in [id] + Array(region.neighbors):
-		var def: RegionDef = regions.get(load_id)
-		if def == null:
-			problems.append("neighbor '%s' has no RegionDef" % load_id)
-			continue
-		var scene := load(def.scene_path) as PackedScene
+	for path in paths:
+		var scene := load(path) as PackedScene
 		if scene == null:
-			problems.append("cannot load %s" % def.scene_path)
+			problems.append("cannot load %s" % path)
 			continue
 		holder.add_child(scene.instantiate())
 	for _i in FRAMES_PER_REGION:
 		await process_frame
 	holder.queue_free()
 	await process_frame
-
 	for error in _errors:
 		problems.append("error: %s" % error)
+	return problems
+
+
+func _check_region(regions: Dictionary, id: String) -> PackedStringArray:
+	var problems := PackedStringArray()
+	var region: RegionDef = regions[id]
+	var paths: Array = []
+	for load_id in [id] + Array(region.neighbors):
+		var def: RegionDef = regions.get(load_id)
+		if def == null:
+			problems.append("neighbor '%s' has no RegionDef" % load_id)
+		else:
+			paths.append(def.scene_path)
+	problems.append_array(await _load_scenes(paths))
 	problems.append_array(_check_report(region))
 	return problems
 
