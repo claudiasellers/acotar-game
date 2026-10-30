@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_region"]
+
+[resource]
+script = ExtResource("1_region")
+id = &"manor_estate"
+scene_path = "res://world/spring_court/manor_estate/manor_estate.tscn"
+center = Vector3(0, 0, -100)
+radius = 721.0
+neighbors = PackedStringArray("border_woods", "eastern_woods", "rosewild")
+report_path = "res://world/spring_court/manor_estate/manor_estate_report.json"

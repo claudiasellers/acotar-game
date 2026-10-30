@@ -15,9 +15,13 @@ const FEYRE_SCENE := "res://characters/feyre/feyre.tscn"
 @export var preview_phase: StringName = &"p3_house_and_eastern_woods"
 @export var build_terrain: bool = true
 @export var build_house: bool = true
+@export var build_grounds: bool = true
+@export var build_scatter: bool = true
 
 var feyre: Node3D
 var house: Node3D
+var grounds: Node3D
+var scatter: ScatterField
 var standalone: bool = false
 
 
@@ -29,9 +33,29 @@ func _ready() -> void:
 		ManorTerrain.build_fallback(self)
 	if build_house:
 		house = ManorHouseBuilder.build(self)
+	if build_grounds:
+		grounds = ManorGrounds.build(self)
+	if build_scatter:
+		scatter = ManorScatter.add_field(self)
+	_add_creatures()
 	if standalone:
 		_add_preview_environment()
 		_spawn_feyre()
+
+
+## The creatures lane's spawn table brings the grounds to life: songbirds,
+## butterflies over the roses, faelights at night, rabbits, swans on the pond.
+func _add_creatures() -> void:
+	const TABLE := "res://data/creatures/spawn/manor_grounds.tres"
+	if not ResourceLoader.exists(TABLE):
+		return
+	var spawner := CreatureSpawner.new()
+	spawner.name = "CreatureSpawner"
+	spawner.table = load(TABLE)
+	spawner.bounds = ManorSitePlan.BOUNDS
+	spawner.water_level = ManorTerrain.pond_level()
+	spawner.water_bounds = Rect2(ManorSitePlan.POND_CENTER - ManorSitePlan.POND_RADII * 0.8, ManorSitePlan.POND_RADII * 1.6)
+	add_child(spawner)
 
 
 func _spawn_feyre() -> void:

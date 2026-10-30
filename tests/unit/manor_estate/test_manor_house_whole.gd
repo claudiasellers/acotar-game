@@ -65,3 +65,18 @@ func test_whole_house_builds() -> void:
 	var house := ManorHouseBuilder.build(root)
 	gut.p("house built in %d ms, %d nodes" % [Time.get_ticks_msec() - t, house.get_child_count()])
 	assert_eq(get_tree().get_nodes_in_group(&"story_anchor").size(), ANCHORS.size())
+
+
+func test_house_draws_are_batched() -> void:
+	var root := Node3D.new()
+	add_child_autofree(root)
+	var house := ManorHouseBuilder.build(root)
+	var shell := 0
+	var props := 0
+	for mi in house.find_children("*", "MeshInstance3D", true, false):
+		if mi.visibility_range_end > 0.0:
+			props += 1
+		else:
+			shell += 1
+	gut.p("house mesh instances: shell %d (always drawn), props %d (within %d m)" % [shell, props, ManorHouseBuilder.PROP_DRAW])
+	assert_lt(shell, 400, "shell draws")

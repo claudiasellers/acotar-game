@@ -82,7 +82,34 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
+	_merge_meshes(house, all)
 	return house
+
+
+## Props merge per room (drawn within PROP_DRAW m), the shell (walls, floors,
+## stairs, roofs) per level. Doors that open, stations and pickups stay apart.
+const PROP_DRAW := 45.0
+
+static func _merge_meshes(house: Node3D, all: ManorHouseIndex) -> void:
+	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, ActionTrigger]
+	for room in all.rooms:
+		var node := house.get_node_or_null(NodePath(String(room.id))) as Node3D
+		if node == null:
+			continue
+		var props := _PropsMarker.new()
+		props.name = "Props"
+		node.add_child(props)
+		var sources: Array = node.get_children().filter(func(c: Node) -> bool: return c.get_node_or_null("Look") != null)
+		ManorMeshMerger.merge_sources(sources, props, PROP_DRAW, keep_apart)
+	var shell := Node3D.new()
+	shell.name = "Shell"
+	house.add_child(shell)
+	ManorMeshMerger.merge(house, shell, 0.0, keep_apart + [_PropsMarker])
+
+
+## Nodes named "Props" hold already-merged prop meshes; the shell pass skips them.
+class _PropsMarker extends Node3D:
+	pass
 
 
 # --- Rooms -----------------------------------------------------------------

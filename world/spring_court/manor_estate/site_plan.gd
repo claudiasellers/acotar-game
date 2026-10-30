@@ -70,6 +70,23 @@ const DEER_PARK := Rect2(-170.0, -440.0, 340.0, 230.0)
 const NORTH_HILLS := Rect2(-540.0, -495.0, 1080.0, 150.0)
 const BELVEDERE_HILL := Vector2(400.0, -400.0)
 
+# --- Grounds sub-areas (grounds lane; added, nothing above moved) ------------
+## Parkland south-east and south-west of the lawns, and the glade between the
+## glass houses and the east meadow, so every 100 m cell has something.
+const SOUTHEAST_PARK := Rect2(330.0, -20.0, 210.0, 315.0)
+const SOUTHWEST_PARK := Rect2(-540.0, -20.0, 210.0, 315.0)
+const EAST_GLADE := Rect2(175.0, -330.0, 65.0, 310.0)
+## The sentry gate across the drive (RegionGate "manor_grounds").
+const SENTRY_GATE := Vector2(0.0, 280.0)
+## Where the puca shows itself at night, by the rose-garden hedges under Feyre's window.
+const PUCA_GARDEN_SPOT := Vector2(-62.0, -106.0)
+## Glass houses inside GLASS_HOUSES: the domed palm house (north) and the orchid house.
+const PALM_HOUSE := Rect2(114.0, -192.0, 52.0, 34.0)
+const ORCHID_HOUSE := Rect2(118.0, -140.0, 44.0, 26.0)
+## Little island and islet in the pond (structures, not terrain).
+const POND_ISLAND := Vector2(205.0, 95.0)
+const POND_ISLET := Vector2(226.0, 97.0)
+
 
 ## Flat building pads: [Rect2 area, pad height, blend distance in metres].
 ## The terrain eases from the natural ground to the pad height over the blend.

@@ -10,3 +10,6 @@ builds/
 # Local tools (Godot for make play) and generated content (rebuilt by make update)
 .tools/
 _generated/
+# Manor estate scatter layers: rebuilt by tools/manor_estate/gen_grounds.tscn (R15)
+world/spring_court/manor_estate/scatter/*.tres
+world/spring_court/manor_estate/scatter/layers.txt

@@ -145,4 +145,9 @@ func test_builds_alone() -> void:
 	var levers := layout.secrets.filter(func(s: ManorSecretDef) -> bool: return s.kind == &"lever").size()
 	assert_eq(get_tree().get_nodes_in_group(ManorStation.GROUP).size(), layout.stations.size() + levers,
 			"stations and levers are usable")
-	assert_gt(house.find_children("*", "MeshInstance3D", true, false).size(), 500, "a densely built wing")
+	# Meshes are merged per material after building, so count geometry, not nodes.
+	var verts := 0
+	for mi in house.find_children("*", "MeshInstance3D", true, false):
+		for s in mi.mesh.get_surface_count():
+			verts += (mi.mesh.surface_get_arrays(s)[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()
+	assert_gt(verts, 20000, "a densely built wing")

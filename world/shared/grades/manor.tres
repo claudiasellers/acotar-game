@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"manor"
+sky_top = Color(0.55, 0.68, 0.98, 1)
+sky_horizon = Color(1.0, 0.78, 0.86, 1)
+ground_horizon = Color(0.98, 0.86, 0.8, 1)
+ground_bottom = Color(0.55, 0.7, 0.45, 1)
+sun_color = Color(1.0, 0.86, 0.78, 1)
+sun_energy = 1.35
+ambient_color = Color(1.0, 0.78, 0.88, 1)
+ambient_energy = 0.95
+fog_color = Color(1.0, 0.82, 0.9, 1)
+fog_density = 0.0025
+volumetric_density = 0.012
+volumetric_albedo = Color(1.0, 0.9, 0.95, 1)
+exposure = 1.08
+saturation = 1.4
+contrast = 0.96
+brightness = 1.06
+glow_intensity = 1.0
+glow_bloom = 0.22
+snow_cover = 0.0
+magic = 1.0
