@@ -11,7 +11,7 @@
 class_name ManorScatter
 extends RefCounted
 
-const DIR := "res://world/spring_court/manor_estate/scatter/"
+const DIR := "res://world/spring_court/manor_estate/scatter/_generated/"
 const REGION_ID := &"manor_estate"
 const REPORT_PATH := "res://world/spring_court/manor_estate/manor_estate_report.json"
 
@@ -400,6 +400,7 @@ static func load_or_build() -> Array[ScatterLayer]:
 
 
 static func save_all(list: Array[ScatterLayer]) -> void:
+	DirAccess.make_dir_recursive_absolute(DIR)
 	var ids := PackedStringArray()
 	for l in list:
 		var copy := l.duplicate() as ScatterLayer
