@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="FamilySchedule" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://creatures/family/family_schedule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+start_hours = PackedFloat32Array(0, 7, 11, 12, 13, 17, 18, 19, 22)
+activities = PackedStringArray("sleep", "garden", "cook", "eat", "garden", "cook", "eat", "mend", "sleep")
+spots = PackedStringArray("bed_sisters", "garden", "hearth", "table", "garden", "hearth", "table", "hearth", "bed_sisters")
+canon = "X"

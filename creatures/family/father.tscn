@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/family/family_member.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/family/father.tres" id="2"]
+
+[node name="Father" type="Node3D"]
+script = ExtResource("1")
+member_id = &"father"
+schedule = ExtResource("2")
+height = 1.78
+color = Color(0.42, 0.36, 0.3, 1)
+walk_speed = 0.55
+gather_offset = Vector3(0.9, 0, 0.6)
