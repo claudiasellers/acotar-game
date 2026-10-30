@@ -22,7 +22,7 @@ const WORLD_MASK := 1 << 0
 @export var bow: BowData = preload("res://data/bows/hunting_bow.tres")
 @export var walk_speed: float = 4.78
 @export var run_speed: float = 8.01
-@export var sprint_speed: float = 10.08
+@export var sprint_speed: float = 13.10
 ## Ground acceleration (m/s²) while winding up into a sprint, so it reads as effort.
 @export var sprint_acceleration: float = 11.0
 @export var aim_speed: float = 2.2
