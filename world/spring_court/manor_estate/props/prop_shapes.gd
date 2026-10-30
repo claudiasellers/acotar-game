@@ -1,6 +1,7 @@
-## The look of each prop: one cached procedural ArrayMesh per id (a few surfaces,
-## one per material), built by the category builders under props/shapes/.
-## Blender models can replace any id later without touching a layout.
+## The look of each prop: the Blender model for its id when one exists
+## (PropModels, made by tools/blender/manor_props.py), otherwise one cached
+## procedural ArrayMesh built by the category builders under props/shapes/.
+## Both fit the catalogue size, so layouts and colliders never change.
 class_name PropShapes
 extends RefCounted
 
@@ -29,6 +30,8 @@ static func build(id: StringName, size: Vector3, color: Color) -> Node3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Mesh"
 	mi.mesh = mesh(id, size, color)
+	if is_model(id):
+		mi.transform = fit(mi.mesh.get_aabb(), size)
 	mi.visibility_range_end = 90.0 if maxf(size.x, maxf(size.y, size.z)) < 3.5 else 220.0
 	root.add_child(mi)
 	if LIGHTS.has(id):
@@ -52,6 +55,11 @@ static func mesh(id: StringName, size: Vector3, color: Color) -> ArrayMesh:
 	var key := "%s|%s|%s" % [id, size, color.to_html()]
 	if _cache.has(key):
 		return _cache[key]
+	var model := PropModels.prop(id)
+	if not model.is_empty():
+		_tris[id] = PropModels.tri_count(model[0])
+		_cache[key] = model[0]
+		return model[0]
 	var k := PropMeshKit.new()
 	var ok := _dispatch(k, id, size, color)
 	if not ok or k.tri_count() == 0:
@@ -66,6 +74,19 @@ static func mesh(id: StringName, size: Vector3, color: Color) -> ArrayMesh:
 
 static func tri_count(id: StringName) -> int:
 	return int(_tris.get(id, 0))
+
+
+## True when the id draws its Blender model rather than the procedural mesh.
+static func is_model(id: StringName) -> bool:
+	return not PropModels.prop(id).is_empty()
+
+
+## Scales and moves a model's bounds onto the catalogue box: base centre at the
+## origin, (w, h, d) = size. The generator already fits, so this is ~identity.
+static func fit(aabb: AABB, size: Vector3) -> Transform3D:
+	var s := Vector3(size.x / maxf(aabb.size.x, 0.001), size.y / maxf(aabb.size.y, 0.001), size.z / maxf(aabb.size.z, 0.001))
+	var base := Vector3(aabb.position.x + aabb.size.x * 0.5, aabb.position.y, aabb.position.z + aabb.size.z * 0.5)
+	return Transform3D(Basis.from_scale(s), -base * s)
 
 
 static func _dispatch(k: PropMeshKit, id: StringName, s: Vector3, c: Color) -> bool:

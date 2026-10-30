@@ -134,6 +134,7 @@ func anchor(anchor_id: StringName, level: int, at: Vector3, yaw_deg: float = 0.0
 
 
 func save() -> Error:
+	face_walls()
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 	var path := OUT_DIR + "%s.tres" % layout.part_id
 	var err := ResourceSaver.save(layout, path)
@@ -141,3 +142,60 @@ func save() -> Error:
 		path, layout.rooms.size(), layout.doors.size(), layout.stairs.size(),
 		layout.stations.size(), layout.secrets.size(), err])
 	return err
+
+
+## Props and stations standing against a wall with a square-on yaw are turned
+## to face into the room, and chairs drawn up to a table turn to face it.
+## Catalogue convention: a prop's front faces -Z at yaw 0
+## (PropLib), so the north wall gets 180, south 0, west -90, east 90. Hand
+## layouts mixed conventions while props were boxes; the Blender models have
+## fronts, so this keeps every wardrobe, bookcase and fireplace the right way round.
+const WALL_REACH := 0.6
+
+func face_walls() -> void:
+	for r in layout.rooms:
+		for p in r.props:
+			p.yaw_deg = _wall_yaw(r, p.prop_id, p.position.x, p.position.z, p.yaw_deg)
+			if String(p.prop_id).begins_with("chair"):
+				p.yaw_deg = _table_yaw(r, p)
+	for s in layout.stations:
+		for r in layout.rooms:
+			if r.level == s.level and r.rect.has_point(Vector2(s.position.x, s.position.z)):
+				s.yaw_deg = _wall_yaw(r, s.prop_id, s.position.x - r.rect.position.x, s.position.z - r.rect.position.y, s.yaw_deg)
+				break
+
+
+static func _wall_yaw(r: ManorRoomDef, prop_id: StringName, x: float, z: float, yaw: float) -> float:
+	var q := fposmod(yaw, 90.0)
+	if q > 1.0 and q < 89.0:
+		return yaw
+	var size := PropLib.size_of(prop_id)
+	var dist := [z, r.rect.size.y - z, x, r.rect.size.x - x]        # n, s, w, e
+	var facing := [180.0, 0.0, -90.0, 90.0]
+	var k := 0
+	for i in 4:
+		if dist[i] < dist[k]:
+			k = i
+	# along-wall props are their depth from the wall; turned ones their width
+	var turned := absf(fposmod(yaw, 180.0) - 90.0) < 1.0
+	var reach := (size.x if (k < 2) == turned else size.z) * 0.5 + WALL_REACH
+	return facing[k] if dist[k] <= reach else yaw
+
+
+## Chairs within reach of a table or desk face its nearest edge point.
+static func _table_yaw(r: ManorRoomDef, chair: ManorPropPlacement) -> float:
+	var best := 2.5
+	var yaw := chair.yaw_deg
+	for t in r.props:
+		var tid := String(t.prop_id)
+		if not (tid.begins_with("table") or tid.begins_with("desk")):
+			continue
+		var half := PropLib.size_of(t.prop_id) * 0.5 * t.scale
+		var local := Basis(Vector3.UP, deg_to_rad(-t.yaw_deg)) * (chair.position - t.position)
+		var near := Vector3(clampf(local.x, -half.x, half.x), 0.0, clampf(local.z, -half.z, half.z))
+		var to := Basis(Vector3.UP, deg_to_rad(t.yaw_deg)) * (near - local)
+		to.y = 0.0
+		if to.length() < best and to.length() > 0.01:
+			best = to.length()
+			yaw = rad_to_deg(atan2(-to.x, -to.z))
+	return yaw

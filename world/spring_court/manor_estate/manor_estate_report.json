@@ -3,7 +3,7 @@
   "placements_per_km2": 9274,
   "empty_cells": 0,
   "landmarks": 4,
-  "draw_calls": 557,
+  "draw_calls": 931,
   "placements": 8903,
   "ing_types": 30,
   "col_types": 12,
@@ -19,11 +19,11 @@
     "scatter_chunks_loaded": 1209,
     "scatter_chunks_visible_max": 260,
     "worst_view": "50,-100",
-    "grounds": 201,
-    "house": 0,
+    "grounds": 216,
+    "house": 359,
     "terrain": 96,
-    "all_loaded": 1506,
-    "total": 557
+    "all_loaded": 1880,
+    "total": 931
   },
   "zones_per_type": {
     "col_gilt_acorn": 4,
@@ -69,5 +69,5 @@
     "ing_rose_white": 7,
     "ing_rose_red": 7
   },
-  "scatter_build_ms": 361
+  "scatter_build_ms": 399
 }

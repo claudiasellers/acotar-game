@@ -1,6 +1,8 @@
 ## Plant meshes for the estate by species id (roses, hedges, trees, flowers).
-## Stylized procedural meshes (flora_shapes.gd) on the shared foliage shader
-## world/shared/shaders/stylized_foliage.gdshader; vertex red = wind flex.
+## The Blender model for a species when one exists (tools/blender/manor_flora.py,
+## vertex-coloured, base at the origin, species height tall), otherwise the
+## stylized procedural mesh (flora_shapes.gd). Both draw with the shared foliage
+## shader world/shared/shaders/stylized_foliage.gdshader.
 ## Callers use mesh(), impostor(), height_of() and SPECIES. Meshes stand on y = 0.
 class_name FloraLib
 extends RefCounted
@@ -49,6 +51,11 @@ const SPECIES := {
 	&"orchid": [&"flower", 0.5, Color(0.96, 0.66, 0.90)],
 }
 
+const FOLIAGE_SHADER := preload("res://world/shared/shaders/stylized_foliage.gdshader")
+## Magical species glow softly and sparkle (R3); the rest get a gentle glint.
+const GLOW := {&"faelight_dandelion": 1.2, &"mushroom_glowcap": 1.4, &"starmoss": 0.6}
+const SPARKLE := {&"faelight_dandelion": 0.9, &"mushroom_glowcap": 0.7, &"starmoss": 0.8, &"rose_gold": 0.3, &"water_lily": 0.3}
+
 ## Distance past which scatter should swap trees to impostor().
 const IMPOSTOR_DISTANCE := 120.0
 
@@ -71,6 +78,10 @@ static func height_of(species: StringName) -> float:
 static func mesh(species: StringName) -> Mesh:
 	if _cache.has(species):
 		return _cache[species]
+	var model := PropModels.pair(PropModels.FLORA_DIR + String(species) + ".glb", String(species), foliage_material(species))
+	if not model.is_empty():
+		_cache[species] = model[0]
+		return model[0]
 	var e: Array = SPECIES.get(species, [&"bush", 1.0, Color(1.0, 0.7, 0.8)])
 	var h: float = e[1]
 	var k := PropMeshKit.new()
@@ -93,4 +104,25 @@ static func impostor(species: StringName) -> Mesh:
 	FloraShapes.impostor(k, h, e[2], trunk, species == &"willow")
 	var m := k.to_mesh(Vector3.ZERO, h)
 	_impostors[species] = m
+	return m
+
+
+## True when the species draws its Blender model rather than the procedural mesh.
+static func is_model(species: StringName) -> bool:
+	return ResourceLoader.exists(PropModels.FLORA_DIR + String(species) + ".glb")
+
+
+## One stylized_foliage material per modelled species (colour from vertex colours,
+## sway from height).
+static func foliage_material(species: StringName) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = FOLIAGE_SHADER
+	m.set_shader_parameter(&"use_vertex_color", true)
+	m.set_shader_parameter(&"alpha_scissor", 0.0)
+	m.set_shader_parameter(&"flex_height", height_of(species))
+	m.set_shader_parameter(&"emission_glow", GLOW.get(species, 0.0))
+	m.set_shader_parameter(&"sparkle", SPARKLE.get(species, 0.1))
+	var kind := kind_of(species)
+	m.set_shader_parameter(&"translucency", 0.45 if kind in [&"flower", &"climber", &"reed"] else 0.3)
+	m.resource_name = "flora_" + String(species)
 	return m

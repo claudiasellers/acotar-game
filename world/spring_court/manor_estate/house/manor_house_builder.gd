@@ -83,6 +83,9 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
 	_merge_meshes(house, all)
+	var mood := ManorMoodLights.new()
+	mood.name = "MoodLights"
+	house.add_child(mood)
 	return house
 
 
@@ -121,11 +124,11 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 	var y := floor_y(room.level)
 	if room.kind != &"exterior":
 		var fc: Color = room.floor_color if room.floor_color.a > 0.0 else FLOOR_COLORS.get(room.floor_kind, FLOOR_COLORS[&"wood"])
-		var floor_mat := EstateKit.pearl(fc) if room.floor_kind == &"marble" else EstateKit.mat(fc, 0.7)
+		var floor_mat := ManorRoomLook.floor_material(room, EstateKit.pearl(fc) if room.floor_kind == &"marble" else EstateKit.mat(fc, 0.7))
 		for r in _subtract(room.rect, all.stair_holes_on(room.level)):
 			EstateKit.box(node, Vector3(r.get_center().x, y - SLAB * 0.5, r.get_center().y),
 					Vector3(r.size.x, SLAB, r.size.y), floor_mat)
-		var ceil_mat := EstateKit.mat(room.wall_color.lightened(0.25), 0.9)
+		var ceil_mat := ManorRoomLook.ceiling_material(room, EstateKit.mat(room.wall_color.lightened(0.25), 0.9))
 		var ch := ceiling_of(room)
 		for r in _subtract(room.rect, all.stair_holes_on(room.level + 1) if ch < storey_height(room.level) else []):
 			EstateKit.box(node, Vector3(r.get_center().x, y + ch + 0.05, r.get_center().y),
@@ -139,11 +142,13 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 		if p.scale != 1.0:
 			prop.scale = Vector3.ONE * p.scale
 		node.add_child(prop)
+	if room.kind != &"exterior":
+		ManorRoomLook.add_hero_light(node, room, origin, ceiling_of(room))
 
 
 static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> void:
 	var r := room.rect
-	var mat := EstateKit.mat(room.wall_color, 0.9)
+	var mat := ManorRoomLook.wall_material(room)
 	var skin := EstateKit.mat(FACADE, 0.8, 0.0, "facade")
 	var glass := EstateKit.mat(EstateKit.GLASS, 0.05, 0.0, "glass")
 	var frame := EstateKit.mat(EstateKit.CREAM, 0.6, 0.0, "window_frame")
