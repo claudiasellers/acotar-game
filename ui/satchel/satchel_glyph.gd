@@ -5,6 +5,12 @@ extends Control
 
 const ICON_PATH := "res://ui/theme/icons/satchel.png"
 
+## How full she is, 0..1; the drawn bag bulges with it.
+var fill: float = 0.0:
+	set(v):
+		fill = clampf(v, 0.0, 1.0)
+		queue_redraw()
+
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -26,9 +32,17 @@ func _draw() -> void:
 	var h := size.y
 	# Strap, body, flap, buckle.
 	draw_arc(Vector2(w * 0.5, h * 0.42), w * 0.30, PI, TAU, 16, ink, 2.0, true)
-	var body := Rect2(w * 0.12, h * 0.40, w * 0.76, h * 0.54)
-	draw_rect(body, Color(accent, 0.85))
-	draw_rect(body, ink, false, 2.0)
+	# Body: a rounded sack whose sides push out as it fills.
+	var bulge := w * 0.08 * fill
+	var body := PackedVector2Array()
+	for i in 13:
+		var t := float(i) / 12.0
+		body.append(Vector2(w * 0.12 - bulge * sin(t * PI), lerpf(h * 0.40, h * 0.94, t)))
+	for i in 13:
+		var t := 1.0 - float(i) / 12.0
+		body.append(Vector2(w * 0.88 + bulge * sin(t * PI), lerpf(h * 0.40, h * 0.94, t)))
+	draw_colored_polygon(body, Color(accent, 0.85))
+	draw_polyline(body + PackedVector2Array([body[0]]), ink, 2.0, true)
 	var flap := PackedVector2Array([Vector2(w * 0.12, h * 0.40), Vector2(w * 0.88, h * 0.40),
 			Vector2(w * 0.80, h * 0.68), Vector2(w * 0.20, h * 0.68)])
 	draw_colored_polygon(flap, Color(accent.lightened(0.25), 0.95))

@@ -32,6 +32,13 @@ func _run() -> void:
 		hud.menu.open()
 		for i in 30:
 			await get_tree().process_frame
+	elif id == "bar" or id == "chord":
+		# Wake the bar (it dims when idle); "chord" shows it with LB held.
+		if id == "chord":
+			hud.call(&"_set_chord", true)
+		for i in 40:
+			hud.set(&"_idle", 0.0)
+			await get_tree().process_frame
 	elif id == "worn" and feyre:
 		var cam := Camera3D.new()
 		feyre.add_child(cam)

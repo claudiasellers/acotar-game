@@ -56,7 +56,8 @@ static func is_final() -> bool:
 static func _fallback_colors() -> Dictionary:
 	return {
 		&"ink": PauseStyle.PLUM, &"accent": PauseStyle.ROSE, &"glow": PauseStyle.GOLD_LIGHT,
-		&"rare": PauseStyle.LILAC, &"scrim": Color(0.10, 0.06, 0.10, 0.55),
+		&"rare": PauseStyle.LILAC, &"line": PauseStyle.GOLD,
+		&"paper": PauseStyle.PEARL, &"ink_soft": PauseStyle.PLUM_SOFT, &"scrim": Color(0.10, 0.06, 0.10, 0.55),
 	}
 
 
