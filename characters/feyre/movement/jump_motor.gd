@@ -21,6 +21,8 @@ signal landed(impact_speed: float, index: int)
 ## Apex heights (m) of jump 1, 2 (spin) and 3 (flip).
 const HEIGHTS: Array[float] = [3.1, 2.8, 3.35]
 const MAX_JUMPS := 3
+## Extra height the held apex hang can add to each jump (m), for max_chain_rise().
+const HANG_BONUS := 0.1
 
 var rise_gravity: float = 22.0
 var fall_gravity: float = 34.0
@@ -52,6 +54,15 @@ var _buffer: float = 0.0
 var _cut_done: bool = false
 ## Last airborne vertical velocity (the floor zeroes it before we see the landing).
 var _air_vy: float = 0.0
+
+
+## The most height a full chain can gain above where it starts (m). RegionGate
+## builds every lock taller than this.
+static func max_chain_rise() -> float:
+	var total := 0.0
+	for h in HEIGHTS:
+		total += h + HANG_BONUS
+	return total
 
 
 func launch_speed(index: int) -> float:

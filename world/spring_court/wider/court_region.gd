@@ -560,14 +560,15 @@ func _build_gates() -> void:
 		gate.position = Vector3(p.x, WorldHeight.height_at(p.x, p.y), p.y)
 		gate.rotation.y = deg_to_rad(float(g["yaw_degrees"]))
 		var width: float = g["width"]
+		var height := RegionGate.min_height()
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		body.collision_mask = 0
 		var cs := CollisionShape3D.new()
 		var box := BoxShape3D.new()
-		box.size = Vector3(width, 6.0, 3.0)
+		box.size = Vector3(width, height, 3.0)
 		cs.shape = box
-		cs.position.y = 3.0
+		cs.position.y = height * 0.5
 		body.add_child(cs)
 		gate.add_child(body)
 		var n := maxi(2, int(width / 3.5))
@@ -576,7 +577,9 @@ func _build_gates() -> void:
 			var piece := _model(GATE_MODEL)
 			piece.position = Vector3(x, 0.0, 0.0)
 			piece.rotation.y = float(i) * 1.7
-			piece.scale = Vector3.ONE * (1.3 + 0.25 * sin(i * 2.1))
+			# Grown at least as tall as the lock, crowns arching over the way.
+			_scale_to_height(piece, height * (1.04 + 0.08 * absf(sin(i * 2.1))))
+			piece.rotation.x = 0.12 * sin(i * 1.3)
 			gate.add_child(piece)
 		add_child(gate)
 

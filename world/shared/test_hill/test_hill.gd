@@ -210,9 +210,10 @@ func _build_thorn_gate() -> void:
 	var thorn := StandardMaterial3D.new()
 	thorn.albedo_color = Color(0.20, 0.24, 0.14)
 	var x := -40.0
+	var h := RegionGate.min_height()
 	for i in 9:
 		var z := 10.0 + i * 3.0
-		var box := _add_box(Vector3(x, height_at(x, z) + 1.6, z), Vector3(2.2, 3.6, 3.2), thorn, gate)
+		var box := _add_box(Vector3(x, height_at(x, z) + h * 0.5 - 0.2, z), Vector3(2.2, h, 3.2), thorn, gate)
 		box.rotation.y = 0.3 * sin(i * 1.3)
 
 

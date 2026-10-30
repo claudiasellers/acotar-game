@@ -143,14 +143,17 @@ static func _sentry_gate(parent: Node3D) -> void:
 	var marble := ManorGrounds.marble()
 	var gold := ManorGrounds.gold()
 	# piers: inner pair carries the gates, outer pair carries the hedges
+	# The gate piers rise as tall as the lock itself (RegionGate.min_height).
+	var tall := RegionGate.min_height()
 	for side: float in [-1.0, 1.0]:
 		for px: float in [PIER_X, PIER_X + 8.0]:
 			var x: float = side * px
 			var y := ManorGrounds.ground(x, g.y)
-			b.box(Vector3(x, y + 2.4, g.y), Vector3(1.5, 4.8, 1.5), stone)
-			b.box(Vector3(x, y + 4.95, g.y), Vector3(1.8, 0.3, 1.8), marble, false)
-			b.sphere(Vector3(x, y + 5.5, g.y), 0.5, gold)
-			b.cone(Vector3(x, y + 5.9, g.y), 0.15, 0.8, gold, 8)
+			var ph := tall + 0.6 if px == PIER_X else 4.8
+			b.box(Vector3(x, y + ph * 0.5, g.y), Vector3(1.5, ph, 1.5), stone)
+			b.box(Vector3(x, y + ph + 0.15, g.y), Vector3(1.8, 0.3, 1.8), marble, false)
+			b.sphere(Vector3(x, y + ph + 0.7, g.y), 0.5, gold)
+			b.cone(Vector3(x, y + ph + 1.1, g.y), 0.15, 0.8, gold, 8)
 		# railing between inner and outer piers: low wall + gilt railings
 		var xa: float = side * (PIER_X + 0.75)
 		var xb: float = side * (PIER_X + 7.25)
@@ -183,15 +186,19 @@ static func _sentry_gate(parent: Node3D) -> void:
 	var y0 := ManorGrounds.ground(0.0, g.y)
 	var w := PIER_X * 2.0 - 1.5
 	var iron := ManorGrounds.iron_gold()
+	# Tall gilt leaves with an arched crest, at least as high as the lock.
 	for k in 25:
 		var x := -w * 0.5 + (k + 0.5) * w / 25.0
-		var h := 3.2 + 0.6 * sin(PI * (k + 0.5) / 25.0)     # arched crest
+		var h := tall + 0.8 * sin(PI * (k + 0.5) / 25.0)     # arched crest
 		leaves.box(Vector3(x, y0 + h * 0.5, g.y), Vector3(0.07, h, 0.07), iron, false)
 		leaves.cone(Vector3(x, y0 + h, g.y), 0.06, 0.25, gold, 6)
-	for hy: float in [0.3, 1.6, 2.9]:
+	var rails := 7
+	for i in rails:
+		var hy := 0.3 + (tall - 0.6) * float(i) / float(rails - 1)
 		leaves.box(Vector3(0, y0 + hy, g.y), Vector3(w, 0.1, 0.1), iron, false)
 	for side: float in [-1.0, 1.0]:
 		leaves.torus(Vector3(side * w * 0.25, y0 + 2.25, g.y), 0.5, 0.62, gold, Basis(Vector3.RIGHT, PI * 0.5))
-	leaves.add_box_shape(Transform3D(Basis(), Vector3(0, y0 + 2.0, g.y)), Vector3(w, 4.0, 0.4))
+		leaves.torus(Vector3(side * w * 0.25, y0 + tall * 0.6, g.y), 0.5, 0.62, gold, Basis(Vector3.RIGHT, PI * 0.5))
+	leaves.add_box_shape(Transform3D(Basis(), Vector3(0, y0 + tall * 0.5, g.y)), Vector3(w, tall, 0.4))
 	leaves.flush()
 	gate.refresh()
