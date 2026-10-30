@@ -116,3 +116,7 @@ snow_cover={
 "type": "float",
 "value": 1.0
 }
+magic_amount={
+"type": "float",
+"value": 0.0
+}

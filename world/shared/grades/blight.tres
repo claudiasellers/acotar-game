@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"blight"
+sky_top = Color(0.45, 0.46, 0.5, 1)
+sky_horizon = Color(0.62, 0.6, 0.6, 1)
+ground_horizon = Color(0.5, 0.49, 0.48, 1)
+ground_bottom = Color(0.25, 0.24, 0.24, 1)
+sun_color = Color(0.8, 0.78, 0.74, 1)
+sun_energy = 0.65
+ambient_color = Color(0.5, 0.5, 0.52, 1)
+ambient_energy = 0.5
+fog_color = Color(0.52, 0.52, 0.52, 1)
+fog_density = 0.009
+volumetric_density = 0.03
+volumetric_albedo = Color(0.6, 0.6, 0.6, 1)
+exposure = 0.9
+saturation = 0.35
+contrast = 1.12
+brightness = 0.92
+glow_intensity = 0.15
+glow_bloom = 0.0
+snow_cover = 0.0
+magic = 0.0

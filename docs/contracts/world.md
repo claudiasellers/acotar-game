@@ -16,6 +16,7 @@ world lane thread ("Build the human realm and the wall").
 | Woods | border_woods | -700..500 | 300..1400 |
 | Woods | eastern_woods | 650..1850 | -650..550 |
 | Manor | manor_estate (manor_grounds, manor_house) | -600..600 | -500..500 (edge with Border Woods at z 300..500 agreed between those lanes) |
+| Woods | suriel_glade (young birches, the Thornwater runs through it) | -950..-700 | 450..800 (reserved out of the fells foot / starlight glen) |
 | Wider court | western_fells | -1800..-1500 / foot -1500..-700 | -900..1400 / 600..1400 |
 | Wider court | starlight_glen | -1500..-600 | -500..600 |
 | Wider court | fae_village | -1500..-600 | -1250..-500 |
@@ -48,7 +49,8 @@ world lane thread ("Build the human realm and the wall").
 - `world/<realm>/<region_id>/<region_id>.tscn`, realm = `human_realm` or `spring_court`. Root is a `Node3D` whose transform puts it in world coordinates; children are positioned in world space under it.
 - One `RegionDef` (`core/streaming/region_def.gd`) per region in `data/regions/<realm>/<region_id>.tres`: `id`, `scene_path`, `center`, `radius`, `neighbors`, `report_path`. `WorldStreamer` streams regions around Feyre (load 120 m, unload 220 m) under a parent the World scene gives it. The World scene itself is never streamed.
 - **Regions contain content only:** no `WorldEnvironment`, no sun `DirectionalLight3D`, no sky. The World scene's `GradeDirector` owns sky, sun (driven by `Clock`), fog and colour grade. Local mood goes in `FogVolume`s and `ReflectionProbe`s inside the region.
-- **Grades** are `GradePreset` resources in `world/shared/grades/`: `human_winter`, `spring`, `blight` to start. The story lane switches them with `EventBus.grade_swap_requested(to_grade, seconds)`; `spring` over 2.0 s at the wall. Ask the world lane for new presets (e.g. Bogge fog).
+- **Grades** are `GradePreset` resources in `world/shared/grades/`: `human_winter`, `spring`, `blight` to start. Each holds sky gradient, sun, ambient, fog, exposure/saturation/contrast, bloom, the **LUT slot** (`lut`, a Texture3D or gradient), and the shader globals `snow_cover` and `magic_amount`. The story lane switches them with `EventBus.grade_swap_requested(to_grade, seconds)`; `spring` over 2.0 s at the wall is the big reveal (grey snow to candy-pastel bloom and sparkle). Story swaps hold until released.
+- **Per-region grade:** add a `RegionGrade` node (`grade`, `bounds`, `blend_seconds`) to your region; `GradeDirector` blends to it while Feyre is inside. To get a region its own look, add a preset `world/shared/grades/<id>.tres` (copy `spring.tres`, set `lut` and colours) in your handoff and call it out.
 - Before/after story changes use the story lane's `StateVisibility` node.
 
 ## 4. Scatter (forage, decoration, collectibles)
@@ -67,7 +69,8 @@ world lane thread ("Build the human realm and the wall").
 
 - A `ScatterField` node (`region_id`, `layers`, `chunk_size` 64 m) in the region builds them into chunked `MultiMeshInstance3D`s. **No per-instance nodes** (R16).
 - **Forage hookup for the systems lane:** every forage chunk is in group `forage_field` with metas `ingredient_id`, `scatter_id`, `region_id`, `instance_ids` (layer index per multimesh instance) and `layer`. Use `ScatterField.instance_position(chunk, i)` to find instance `i`, `ScatterField.set_instance_hidden(chunk, i, true)` to hide it, and the key `"<scatter_id>:<instance_ids[i]>"` with `WorldDeltas.mark_picked(region_id, key, respawn_days)`.
-- **GPU wind**: include `world/shared/shaders/foliage_wind.gdshaderinc` and call `foliage_wind(VERTEX, MODEL_MATRIX, COLOR.r)` (vertex red = flex, 0 at the root). Globals `wind_direction`, `wind_strength`, `snow_cover` are in `project.godot` and driven by the World scene from `Weather.wind_at()`.
+- **Shared stylized material (art direction R3):** use `world/shared/shaders/stylized_foliage.gdshader` as a `ShaderMaterial` for flora and soft props. Soft wrapped light with a lilac shade tint, warm rim, leaf translucency, GPU wind, automatic snow on upward faces when `snow_cover` is on (human realm), and `sparkle` glints scaled by `magic_amount` (Spring Court). Tune per species with `albedo`/`albedo_texture`, `rim_strength`, `sparkle`, `emission_glow`, `snow_catch`. Vertex colour red = wind flex; green/blue non-zero = tint by vertex colour.
+- **GPU wind**: include `world/shared/shaders/foliage_wind.gdshaderinc` and call `foliage_wind(VERTEX, MODEL_MATRIX, COLOR.r)` (vertex red = flex, 0 at the root). Globals `wind_direction`, `wind_strength`, `snow_cover`, `magic_amount` are in `project.godot` and driven by the World scene from `Weather.wind_at()`.
 
 ## 5. Coverage report (R1, world smoke)
 
