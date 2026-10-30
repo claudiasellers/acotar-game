@@ -31,6 +31,8 @@ var hair: Node3D
 var anim: AnimationPlayer
 var _mover: CharacterBody3D
 var _idle_time := 0.0
+## The mocap AnimationTree (characters/feyre/movement/); null keeps the procedural clips.
+var _animator: FeyreAnimator
 
 
 func _ready() -> void:
@@ -56,10 +58,12 @@ func _ready() -> void:
 	while n != null and not (n is CharacterBody3D):
 		n = n.get_parent()
 	_mover = n as CharacterBody3D
+	if _mover != null:
+		_animator = FeyreAnimator.attach(self, anim, _mover)
 
 
 func _process(delta: float) -> void:
-	if anim == null or _mover == null:
+	if anim == null or _mover == null or _animator != null:
 		return
 	var v := _mover.velocity
 	var speed := Vector2(v.x, v.z).length()

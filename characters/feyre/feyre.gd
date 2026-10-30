@@ -20,9 +20,10 @@ const WORLD_MASK := 1 << 0
 @export var bow: BowData = preload("res://data/bows/hunting_bow.tres")
 @export var walk_speed: float = 3.2
 @export var run_speed: float = 5.5
-@export var sprint_speed: float = 8.0
+@export var sprint_speed: float = 9.0
+## Ground acceleration (m/s²) while winding up into a sprint, so it reads as effort.
+@export var sprint_acceleration: float = 11.0
 @export var aim_speed: float = 2.2
-@export var jump_velocity: float = 4.6
 @export var acceleration: float = 14.0
 @export var air_control: float = 0.35
 @export var turn_speed: float = 12.0
@@ -57,6 +58,8 @@ var body_state: BodyState
 var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
+var jump_motor := JumpMotor.new()
+var movement_feel: MovementFeel
 var is_mantling: bool = false
 
 var model: Node3D
@@ -65,7 +68,6 @@ var camera: Camera3D
 var _camera_rig: Node3D
 var _camera_pitch: Node3D
 var _spring_arm: SpringArm3D
-var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _stamina_cooldown: float = 0.0
 var _exhausted: bool = false
 
@@ -141,15 +143,22 @@ func _physics_process(delta: float) -> void:
 	if body_state:
 		body_state.exertion = 1.0 if sprinting else (0.6 if is_drawing else 0.0)
 
-	if not is_on_floor():
-		velocity.y -= _gravity * delta
-	elif Input.is_action_just_pressed(&"jump") and StoryControl.can_move():
-		if not _try_mantle():
-			velocity.y = jump_velocity
-
-	var control := acceleration if is_on_floor() else acceleration * air_control
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
-	horizontal = horizontal.move_toward(direction * speed, control * speed * delta)
+	var can_jump := StoryControl.can_move()
+	var pressed := Input.is_action_just_pressed(&"jump") and can_jump
+	if pressed and is_on_floor() and _try_mantle():
+		jump_motor.consume_buffer()
+		return
+	jump_motor.forgiving = _gentle_mode()
+	velocity.y = jump_motor.step(delta, is_on_floor(), velocity.y, pressed,
+			Input.is_action_pressed(&"jump"), horizontal.length(), can_jump)
+
+	var rate := acceleration * speed
+	if not is_on_floor():
+		rate *= air_control
+	elif sprinting and horizontal.length() < speed:
+		rate = minf(rate, sprint_acceleration)
+	horizontal = horizontal.move_toward(direction * speed, rate * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
@@ -194,6 +203,12 @@ func aim_point(max_distance: float = 250.0) -> Vector3:
 	if result:
 		return result.position
 	return to
+
+
+## Gentle Mode (pause menu setting) makes jumps more forgiving.
+func _gentle_mode() -> bool:
+	var settings := get_node_or_null(^"/root/GameSettings")
+	return settings != null and bool(settings.get(&"gentle_mode"))
 
 
 func _update_stamina(delta: float, sprinting: bool) -> void:
@@ -294,6 +309,9 @@ func _build_components() -> void:
 	wardrobe_applier = WardrobeApplier.new()
 	wardrobe_applier.name = "WardrobeApplier"
 	add_child(wardrobe_applier)
+	movement_feel = MovementFeel.new()
+	movement_feel.name = "MovementFeel"
+	add_child(movement_feel)
 	_build_breath()
 
 
