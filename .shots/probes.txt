@@ -1,0 +1,5 @@
+from feyre-lane T025
+quality look
+size 1920x1080
+timeout 300
+shot gait res://tools/feyre_gait_shot.tscn {out}
