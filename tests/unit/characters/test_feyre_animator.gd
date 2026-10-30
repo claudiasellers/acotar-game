@@ -57,3 +57,19 @@ func test_feyre_gets_the_tree_and_animator() -> void:
 	assert_not_null(a.tree)
 	assert_true(a.tree.active)
 	assert_almost_eq(float(a.gait_points[&"sprint"]), feyre.sprint_speed, 0.001)
+
+
+## Her rig rests in a T; an airborne clip that leaves the arms near rest reads as
+## a scarecrow mid-jump.
+func test_airborne_arms_never_hold_the_t_pose() -> void:
+	var lib := FeyreAnimator.load_library()
+	for clip in [&"jump_rise", &"jump_fall", &"jump_double", &"jump_flourish", &"jump_land"]:
+		var anim := lib.get_animation(clip)
+		for side in ["Left", "Right"]:
+			var track := anim.find_track(NodePath("Armature/Skeleton3D:%sUpperArm" % side), Animation.TYPE_ROTATION_3D)
+			assert_gt(track, -1, "%s has a %s upper arm track" % [clip, side])
+			var least := 180.0
+			for k in anim.track_get_key_count(track):
+				var q: Quaternion = anim.track_get_key_value(track, k)
+				least = minf(least, rad_to_deg(q.get_angle()))
+			assert_gt(least, 35.0, "%s keeps the %s arm down from the T (%.0f deg)" % [clip, side, least])

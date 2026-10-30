@@ -110,6 +110,12 @@ POSTURE = {
     "walk": dict(lean=1.0, head=0.0, back=8.0, down=5.0, arms=5.0, hip_sway=3.0),
     "run": dict(lean=5.0, head=-2.0, back=8.0, down=5.0, arms=7.0, hip_sway=3.0),
     "sprint": dict(lean=9.0, head=-4.0, back=6.0, down=4.0, arms=6.0, hip_sway=1.5),
+    # Airborne: the source flings both arms out level (a scarecrow T in the game). Drop
+    # them toward her sides with soft elbows, chest lifted, chin up.
+    "jump_rise": dict(lean=-2.0, head=2.0, back=10.0, down=6.0, arms=-46.0, elbow=12.0, swing=22.0, hip_sway=0.0),
+    "jump_fall": dict(lean=3.0, head=0.0, back=8.0, down=5.0, arms=-38.0, elbow=14.0, hip_sway=0.0),
+    # Landing squat: trunk and head as captured (lean=None), arms in from the flail.
+    "jump_land": dict(lean=None, head=0.0, back=6.0, down=4.0, arms=-30.0, elbow=10.0, hip_sway=0.0),
 }
 UPPER_SPINE = (("Spine", 0.4), ("Chest", 0.35), ("UpperChest", 0.25))
 
@@ -293,9 +299,10 @@ def posture_rotations(src: Rig, tgt: Rig, frames: list[dict], spec: dict) -> dic
     head = sum(lean_deg(fr["head"].to_3x3() @ src.rest3["head"].inverted() @ Vector((0, 0, 1)))
                for fr in frames)
     trunk, head = trunk / len(frames), head / len(frames)
-    back = trunk - spec["lean"]
+    keep = spec["lean"] is None
+    back = 0.0 if keep else trunk - spec["lean"]
     # Head pitch after the trunk fix, brought to the target (eyes ahead, chin up).
-    nod = (head - back) - spec["head"]
+    nod = 0.0 if keep else (head - back) - spec["head"]
     rx = lambda deg: Matrix.Rotation(math.radians(-deg), 3, "X")  # noqa: E731  (+deg pitches back)
     rot = {name: rx(back * w) for name, w in UPPER_SPINE}
     rot["Neck"] = rx(nod * 0.5)
@@ -303,9 +310,14 @@ def posture_rotations(src: Rig, tgt: Rig, frames: list[dict], spec: dict) -> dic
     for side, s in (("Left", 1.0), ("Right", -1.0)):
         rot[side + "Shoulder"] = (Matrix.Rotation(math.radians(spec["back"] * s), 3, "Z")
                                   @ Matrix.Rotation(math.radians(spec["down"] * s), 3, "Y"))
-        rot[side + "UpperArm"] = Matrix.Rotation(math.radians(-spec["arms"] * s), 3, "Y")
-    print("  posture: trunk lean %.1f -> %.1f deg, head %.1f -> %.1f deg"
-          % (trunk, spec["lean"], head, spec["head"]))
+        # swing > 0: right arm forward, left arm back (opposite her raised left knee).
+        rot[side + "UpperArm"] = (Matrix.Rotation(math.radians(spec.get("swing", 0.0) * s), 3, "X")
+                                  @ Matrix.Rotation(math.radians(-spec["arms"] * s), 3, "Y"))
+        if spec.get("elbow"):       # bends the forearm forward at the elbow
+            rot[side + "LowerArm"] = Matrix.Rotation(math.radians(-spec["elbow"]), 3, "X")
+    if not keep:
+        print("  posture: trunk lean %.1f -> %.1f deg, head %.1f -> %.1f deg"
+              % (trunk, spec["lean"], head, spec["head"]))
     return rot
 
 

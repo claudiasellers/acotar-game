@@ -24,9 +24,9 @@ Source frame ranges are on a 30 fps timeline (the sources are keyed at 24 fps).
 | `run`           | addon       | `Run_Female`       | 1.25-25      | loop, 0.80 s |
 | `sprint`        | base        | `Sprint`           | 0-25         | loop, played x1.25 (0.67 s) |
 | `jump_start`    | base        | `Jump_Start`       | 1.25-8.25    | crouch and push-off, 0.23 s |
-| `jump_rise`     | base        | `Jump_air`         | 0-24         | ping-pong loop, 1.6 s |
-| `jump_fall`     | base        | `Jump_air`         | 24-48        | airborne, legs reaching down, ping-pong loop, 1.6 s |
-| `jump_land`     | base        | `Jump_Land`        | 1-12         | impact and absorb, 0.37 s |
+| `jump_rise`     | base        | `Jump_air`         | 0-24         | ping-pong loop, 1.6 s; arms lowered from the source's level T to her sides, soft elbows, opposite arm swing |
+| `jump_fall`     | base        | `Jump_air`         | 24-48        | airborne, legs reaching down, ping-pong loop, 1.6 s; arms lowered to a balance pose |
+| `jump_land`     | base        | `Jump_Land`        | 1-12         | impact and absorb, 0.37 s; arms brought in from the flail |
 | `jump_double`   | addon       | `Jump_2`           | 3.25-17.25   | tucked second jump, x1.27, 0.37 s |
 | `jump_flourish` | addon       | `Jump_2`           | 3.25-17.25   | tucked pose under the game's procedural front flip, 0.6 s |
 | `land_hero`     | addon       | `Land_Three_Point` | 13.25-30.25  | impact to three-point kneel, 0.57 s |

@@ -40,8 +40,12 @@ const WORLD_MASK := 1 << 0
 @export var max_quiver: int = 30
 @export var mouse_sensitivity: float = 0.0025
 @export var stick_sensitivity: float = 2.6
-## Recentre (R / right stick click) eases the camera behind her at this rate.
-@export var recenter_speed: float = 14.0
+## Recentre (R / right stick click) eases the camera toward behind her over
+## this many seconds (ease in-out), always the short way round.
+@export var recenter_time: float = 0.3
+## Most a single R press turns the camera (degrees): a tap is a gentle shift,
+## not a swing round to her back while she runs sideways. Tap again for more.
+@export var recenter_max_turn: float = 50.0
 ## With "camera follows while running" on, the camera swings behind her after
 ## this long without look input.
 @export var follow_delay: float = 0.6
@@ -81,6 +85,9 @@ var _spring_arm: SpringArm3D
 var _stamina_cooldown: float = 0.0
 var _exhausted: bool = false
 var _recentering: bool = false
+var _recenter_t: float = 0.0
+var _recenter_from := Vector2.ZERO
+var _recenter_to := Vector2.ZERO
 var _since_look: float = 0.0
 var _running: bool = false
 ## Recent spots where she stood on open ground, newest last (wriggle free).
@@ -113,7 +120,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var s := mouse_sensitivity * GameSettings.mouse_sensitivity
 		_look(event.relative.x * s, event.relative.y * s)
 	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
-		recenter_camera()
+		recenter_camera(deg_to_rad(recenter_max_turn))
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
 		interactor.interact()
 
@@ -197,8 +204,14 @@ func _physics_process(delta: float) -> void:
 	_remember_safe_spot(delta)
 
 
-## Swings the camera back behind her (R / right stick click).
-func recenter_camera() -> void:
+## Eases the camera toward behind her, turning at most `max_turn` radians
+## (R / right stick click caps it; teleports recentre fully).
+func recenter_camera(max_turn: float = PI) -> void:
+	var yaw := _camera_rig.rotation.y
+	var turn := clampf(angle_difference(yaw, model.rotation.y), -max_turn, max_turn)
+	_recenter_from = Vector2(yaw, _camera_pitch.rotation.x)
+	_recenter_to = Vector2(yaw + turn, DEFAULT_PITCH)
+	_recenter_t = 0.0
 	_recentering = true
 
 
@@ -347,11 +360,11 @@ func _look(x: float, y: float) -> void:
 func _update_recenter(delta: float) -> void:
 	if not _recentering:
 		return
-	var t := minf(recenter_speed * delta, 1.0)
-	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, t)
-	_camera_pitch.rotation.x = lerpf(_camera_pitch.rotation.x, DEFAULT_PITCH, t)
-	if absf(angle_difference(_camera_rig.rotation.y, model.rotation.y)) < 0.01 \
-			and absf(_camera_pitch.rotation.x - DEFAULT_PITCH) < 0.01:
+	_recenter_t = minf(_recenter_t + delta / maxf(recenter_time, 0.01), 1.0)
+	var k := smoothstep(0.0, 1.0, _recenter_t)
+	_camera_rig.rotation.y = wrapf(lerpf(_recenter_from.x, _recenter_to.x, k), -PI, PI)
+	_camera_pitch.rotation.x = lerpf(_recenter_from.y, _recenter_to.y, k)
+	if _recenter_t >= 1.0:
 		_recentering = false
 
 
