@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_trout"
+display_name = "Trout"
+description = "Speckled trout from the streams, or through the river ice."
+weight_class = 2
+craft_tags = Array[StringName]([])
+base_price = 2
+canon = "X"
+color = Color(0.604, 0.663, 0.627, 1)
+tags = Array[StringName]([&"vital", &"cool"])
+regions = Array[StringName]([&"reg_mirror_lakes", &"reg_frozen_river"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 1.0
+abundance = &"common"
+edible = true
+nutrition = 0.2
+food_days = 0.5
+pigment = &""

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_mask_shard"
+display_name = "Mask shard"
+description = "A chip of gilded mask from the revels."
+weight_class = 0
+color = Color(0.831, 0.686, 0.216, 1)
+regions = Array[StringName]([&"reg_calanmai_hills", &"reg_old_temples"])
+abundance = &"rare"

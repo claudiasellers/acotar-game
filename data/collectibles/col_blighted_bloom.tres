@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_blighted_bloom"
+display_name = "Petrified bloom"
+description = "A rose turned to grey stone. It's cold."
+weight_class = 0
+color = Color(0.431, 0.416, 0.373, 1)
+regions = Array[StringName]([&"reg_blighted_reach"])
+abundance = &"uncommon"

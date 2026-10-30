@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_moonflower"
+display_name = "Moonflower"
+description = "Opens only at night by the Starlight Pool."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 4
+canon = "X"
+color = Color(0.933, 0.949, 1.000, 1)
+tags = Array[StringName]([&"bright", &"fae"])
+regions = Array[StringName]([&"reg_mirror_lakes"])
+season = &"spring"
+night_only = true
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"uncommon"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

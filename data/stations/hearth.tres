@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationData" format=3]
+
+[ext_resource type="Script" path="res://data/stations/station_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hearth"
+display_name = "Hearth"
+methods = Array[StringName]([&"roast", &"stew", &"infuse"])
+phase = 0
+fae_safe = false
+max_ingredients = 4

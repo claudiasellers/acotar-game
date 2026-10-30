@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_starlight_water"
+display_name = "Starlight water"
+description = "Water from the pool at night. Gone flat and ordinary by dawn."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.812, 0.878, 1.000, 1)
+tags = Array[StringName]([&"bright", &"fae"])
+regions = Array[StringName]([&"reg_mirror_lakes"])
+season = &"spring"
+night_only = true
+perishes_at_dawn = true
+respawn_days = 1.0
+abundance = &"uncommon"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

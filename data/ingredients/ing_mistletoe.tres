@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_mistletoe"
+display_name = "Mistletoe"
+description = "Villagers say the fae love it. Feyre leaves it where it grows, mostly."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.843, 0.886, 0.753, 1)
+tags = Array[StringName]([&"bitter", &"fae"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 8.0
+abundance = &"rare"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &""

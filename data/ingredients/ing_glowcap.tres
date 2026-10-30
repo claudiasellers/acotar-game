@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_glowcap"
+display_name = "Glowcap"
+description = "A mushroom that gives off a soft green light."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.624, 0.890, 0.769, 1)
+tags = Array[StringName]([&"bright"])
+regions = Array[StringName]([&"reg_estate_woods"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 2.0
+abundance = &"common"
+edible = true
+nutrition = 0.02
+food_days = 0.0
+pigment = &""

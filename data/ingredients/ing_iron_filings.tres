@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_iron_filings"
+display_name = "Iron filings"
+description = "Village folk-protection against the fae. Applied, never eaten."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 3
+canon = "C?"
+color = Color(0.357, 0.357, 0.376, 1)
+tags = Array[StringName]([&"iron"])
+regions = Array[StringName]([&"reg_village"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 0.0
+abundance = &"common"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &""

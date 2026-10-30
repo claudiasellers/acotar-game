@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationData" format=3]
+
+[ext_resource type="Script" path="res://data/stations/station_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rite_cave_fire"
+display_name = "Rite cave fire"
+methods = Array[StringName]([&"stew"])
+phase = 5
+fae_safe = true
+max_ingredients = 4

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_shed_antler"
+display_name = "Shed antler"
+description = "Dropped by a stag. Carves into toggles, handles, even points."
+weight_class = 2
+craft_tags = Array[StringName]([&"arrowhead_blank", &"handle"])
+base_price = 3
+canon = "X"
+color = Color(0.847, 0.796, 0.698, 1)
+tags = Array[StringName]([])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 20.0
+abundance = &"rare"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &""

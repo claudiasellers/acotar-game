@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DishData" format=3]
+
+[ext_resource type="Script" path="res://data/dishes/dish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hare_stew"
+display_name = "Hare stew"
+method = &"stew"
+required = Array[StringName]([&"ing_hare"])
+journal_note = "Thin, but hot."

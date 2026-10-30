@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mat_shaft"
+display_name = "Arrow shaft"
+description = "A straight, scraped hazel shaft."
+weight_class = 0
+craft_tags = Array[StringName]([&"shaft"])
+base_price = 0
+color = Color(0.690, 0.541, 0.353, 1)

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_salt"
+display_name = "Salt"
+description = "Bought dear at the market. Keeps meat through the winter."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 2
+canon = "X"
+color = Color(0.957, 0.957, 0.957, 1)
+tags = Array[StringName]([&"preserve"])
+regions = Array[StringName]([&"reg_village"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 0.0
+abundance = &"common"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

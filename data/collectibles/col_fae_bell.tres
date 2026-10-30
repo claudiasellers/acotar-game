@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_fae_bell"
+display_name = "Tiny bell"
+description = "Rings without being touched, sometimes."
+weight_class = 0
+color = Color(0.890, 0.769, 0.420, 1)
+regions = Array[StringName]([&"reg_mask_villages", &"reg_calanmai_hills"])
+abundance = &"rare"

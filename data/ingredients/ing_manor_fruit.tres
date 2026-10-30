@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_manor_fruit"
+display_name = "Manor fruit"
+description = "Platters of impossible fruit at every meal."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "C"
+color = Color(0.941, 0.627, 0.294, 1)
+tags = Array[StringName]([&"vital"])
+regions = Array[StringName]([&"reg_manor_estate"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 1.0
+abundance = &"common"
+edible = true
+nutrition = 0.15
+food_days = 0.3
+pigment = &""

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3]
+
+[ext_resource type="Script" path="res://data/recipes/craft_recipe.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"carve_shaft"
+display_name = "Carve shafts"
+inputs = {"ing_hazel_rod": 1}
+output = &"mat_shaft"
+output_count = 2

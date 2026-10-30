@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_faerie_wine"
+display_name = "Faerie wine"
+description = "Loosens everything. Careful."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "C"
+color = Color(0.557, 0.173, 0.282, 1)
+tags = Array[StringName]([&"fae", &"strong"])
+regions = Array[StringName]([&"reg_manor_estate", &"reg_calanmai_hills"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 0.0
+abundance = &"common"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

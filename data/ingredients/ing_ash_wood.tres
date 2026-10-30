@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_ash_wood"
+display_name = "Ash wood"
+description = "Pale, straight-grained ash. The one wood the fae fear. Carve it into an arrow and keep it close."
+weight_class = 2
+craft_tags = Array[StringName]([&"ash_shaft"])
+base_price = 0
+canon = "C"
+color = Color(0.851, 0.796, 0.690, 1)
+tags = Array[StringName]([&"ash"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds", &"reg_ash_grove"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 30.0
+abundance = &"rare"
+edible = false
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

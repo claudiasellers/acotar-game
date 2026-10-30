@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_acorn"
+display_name = "Acorns"
+description = "Bitter until leached. The hungry eat them anyway."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.545, 0.420, 0.243, 1)
+tags = Array[StringName]([&"strong", &"bitter"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 4.0
+abundance = &"common"
+edible = true
+nutrition = 0.03
+food_days = 0.02
+pigment = &""

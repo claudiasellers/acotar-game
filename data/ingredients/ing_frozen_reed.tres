@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_frozen_reed"
+display_name = "Frozen reeds"
+description = "Hollow reeds locked in the river ice; good for snare work and whistles."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.710, 0.655, 0.478, 1)
+tags = Array[StringName]([&"quiet"])
+regions = Array[StringName]([&"reg_frozen_river"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 5.0
+abundance = &"common"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &""

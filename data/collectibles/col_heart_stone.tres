@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_heart_stone"
+display_name = "Heart-shaped stone"
+description = "She'd scoff at it. She keeps it."
+weight_class = 0
+color = Color(0.627, 0.565, 0.502, 1)
+regions = Array[StringName]([&"reg_frozen_river", &"reg_mirror_lakes", &"reg_greenmarch"])
+abundance = &"uncommon"

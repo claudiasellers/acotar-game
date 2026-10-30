@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationData" format=3]
+
+[ext_resource type="Script" path="res://data/stations/station_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"campfire"
+display_name = "Campfire"
+methods = Array[StringName]([&"roast", &"infuse"])
+phase = 0
+fae_safe = false
+max_ingredients = 3

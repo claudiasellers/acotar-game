@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_snail_spiral"
+display_name = "Spiral shell"
+description = "A perfect spiral, pink at the lip."
+weight_class = 0
+color = Color(0.925, 0.812, 0.753, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_mirror_lakes", &"reg_manor_estate"])
+abundance = &"common"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DishData" format=3]
+
+[ext_resource type="Script" path="res://data/dishes/dish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pine_needle_tea"
+display_name = "Pine-needle tea"
+method = &"infuse"
+required = Array[StringName]([&"ing_pine_needles"])
+journal_note = "Bitter and bright. Warms from the inside."

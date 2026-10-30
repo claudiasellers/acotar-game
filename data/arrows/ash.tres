@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArrowData" format=3]
+
+[ext_resource type="Script" path="res://data/arrows/arrow_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ash"
+item_id = &"arrow_ash"
+display_name = "Ash arrow"
+mass = 0.034
+drag = 0.002
+wet_drag_multiplier = 1.6
+wet_speed_multiplier = 0.93
+stone_break_chance = 0.2
+fae_lethal = true
+damage = 1.5
+shaft_color = Color(0.890, 0.839, 0.741, 1)
+fletching_color = Color(0.545, 0.353, 0.169, 1)

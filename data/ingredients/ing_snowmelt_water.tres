@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_snowmelt_water"
+display_name = "Snowmelt water"
+description = "Melted over the fire, it is the base of every stew."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.875, 0.933, 0.969, 1)
+tags = Array[StringName]([&"cool", &"vital"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_archeron_cottage", &"reg_wall_edge_mortal"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 0.25
+abundance = &"common"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

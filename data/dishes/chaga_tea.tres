@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DishData" format=3]
+
+[ext_resource type="Script" path="res://data/dishes/dish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"chaga_tea"
+display_name = "Chaga tea"
+method = &"infuse"
+required = Array[StringName]([&"ing_chaga"])
+journal_note = "Dark as earth and twice as warming."

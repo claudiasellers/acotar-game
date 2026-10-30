@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_blue_jay_feather"
+display_name = "Blue jay feather"
+description = "Blue on one side, grey on the other."
+weight_class = 0
+color = Color(0.247, 0.435, 0.710, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_blossom_vale"])
+abundance = &"uncommon"

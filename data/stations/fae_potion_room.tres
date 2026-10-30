@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StationData" format=3]
+
+[ext_resource type="Script" path="res://data/stations/station_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fae_potion_room"
+display_name = "Fae potion room"
+methods = Array[StringName]([&"infuse", &"tincture", &"salve", &"steep"])
+phase = 4
+fae_safe = true
+max_ingredients = 5

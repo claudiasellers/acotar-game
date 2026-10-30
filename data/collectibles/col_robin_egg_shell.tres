@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_robin_egg_shell"
+display_name = "Robin's egg shell"
+description = "The exact blue she can never mix."
+weight_class = 0
+color = Color(0.624, 0.827, 0.902, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_blossom_vale"])
+abundance = &"uncommon"

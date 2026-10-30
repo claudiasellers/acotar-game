@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DishData" format=3]
+
+[ext_resource type="Script" path="res://data/dishes/dish_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"willow_bark_tea"
+display_name = "Willow-bark tea"
+method = &"infuse"
+required = Array[StringName]([&"ing_willow_bark"])
+journal_note = "Takes the ache out of cold fingers."

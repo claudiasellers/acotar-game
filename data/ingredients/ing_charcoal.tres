@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_charcoal"
+display_name = "Charcoal"
+description = "From the burnt estate's beams. Draws, and burns again."
+weight_class = 1
+craft_tags = Array[StringName]([&"tinder"])
+base_price = 1
+canon = "X"
+color = Color(0.110, 0.110, 0.110, 1)
+tags = Array[StringName]([&"warm"])
+regions = Array[StringName]([&"reg_burnt_estate", &"reg_archeron_cottage"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 7.0
+abundance = &"common"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &"black"

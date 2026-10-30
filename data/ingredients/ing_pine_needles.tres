@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_pine_needles"
+display_name = "Pine needles"
+description = "A bitter, bright tea against the cold."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.184, 0.322, 0.200, 1)
+tags = Array[StringName]([&"warm", &"keen"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds", &"reg_wall_edge_mortal"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 1.0
+abundance = &"common"
+edible = true
+nutrition = 0.0
+food_days = 0.0
+pigment = &""

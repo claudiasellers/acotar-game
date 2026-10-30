@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_pine_resin"
+display_name = "Pine resin"
+description = "Amber resin for fletching glue and torches."
+weight_class = 1
+craft_tags = Array[StringName]([&"glue"])
+base_price = 1
+canon = "X"
+color = Color(0.788, 0.553, 0.173, 1)
+tags = Array[StringName]([&"bind", &"warm"])
+regions = Array[StringName]([&"reg_winter_forest", &"reg_old_hunting_grounds"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 4.0
+abundance = &"common"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &""

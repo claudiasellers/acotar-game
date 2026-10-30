@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arrow_wood"
+display_name = "Wood arrow"
+description = "Hazel shaft, feather fletching, a flint or iron head."
+weight_class = 0
+craft_tags = Array[StringName]([&"arrow"])
+base_price = 1
+canon = "X"
+color = Color(0.549, 0.416, 0.271, 1)

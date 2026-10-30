@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_red_ochre"
+display_name = "Red ochre"
+description = "Earth red from the riverbank cut."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 2
+canon = "X"
+color = Color(0.643, 0.278, 0.176, 1)
+tags = Array[StringName]([])
+regions = Array[StringName]([&"reg_frozen_river", &"reg_burnt_estate"])
+season = &"any"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 10.0
+abundance = &"uncommon"
+edible = false
+nutrition = 0.05
+food_days = 0.0
+pigment = &"ochre_red"

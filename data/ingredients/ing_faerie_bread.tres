@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_faerie_bread"
+display_name = "Faerie bread"
+description = "Light as air and gone too soon."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.910, 0.812, 0.604, 1)
+tags = Array[StringName]([&"vital", &"fae"])
+regions = Array[StringName]([&"reg_manor_estate", &"reg_mask_villages"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 1.0
+abundance = &"common"
+edible = true
+nutrition = 0.2
+food_days = 0.4
+pigment = &""

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_river_pearl"
+display_name = "River pearl"
+description = "Lumpy and lovely."
+weight_class = 0
+color = Color(0.937, 0.914, 0.875, 1)
+regions = Array[StringName]([&"reg_mirror_lakes"])
+abundance = &"rare"

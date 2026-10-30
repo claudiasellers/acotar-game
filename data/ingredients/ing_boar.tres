@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_boar"
+display_name = "Boar"
+description = "Rich, dark meat."
+weight_class = 2
+craft_tags = Array[StringName]([])
+base_price = 4
+canon = "X"
+color = Color(0.353, 0.243, 0.169, 1)
+tags = Array[StringName]([&"strong"])
+regions = Array[StringName]([&"reg_estate_woods", &"reg_western_fells"])
+season = &"spring"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 0.0
+abundance = &"common"
+edible = true
+nutrition = 0.35
+food_days = 1.5
+pigment = &""

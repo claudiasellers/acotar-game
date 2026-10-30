@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_ribbon_scrap"
+display_name = "Ribbon scrap"
+description = "A bit of Nesta's ribbon. She'd never admit it was hers."
+weight_class = 0
+color = Color(0.753, 0.424, 0.518, 1)
+regions = Array[StringName]([&"reg_village", &"reg_archeron_cottage"])
+abundance = &"rare"

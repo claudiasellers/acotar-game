@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientData" format=3]
+
+[ext_resource type="Script" path="res://data/ingredients/ingredient_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_wintergreen"
+display_name = "Wintergreen"
+description = "Glossy leaves under the snow, with a sharp minty bite."
+weight_class = 0
+craft_tags = Array[StringName]([])
+base_price = 1
+canon = "X"
+color = Color(0.180, 0.420, 0.310, 1)
+tags = Array[StringName]([&"cool", &"vital"])
+regions = Array[StringName]([&"reg_winter_forest"])
+season = &"winter"
+night_only = false
+perishes_at_dawn = false
+respawn_days = 3.0
+abundance = &"common"
+edible = true
+nutrition = 0.01
+food_days = 0.0
+pigment = &""

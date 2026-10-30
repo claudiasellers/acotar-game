@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_dandelion_clock"
+display_name = "Faelight seed head"
+description = "Held carefully, it glows for a day."
+weight_class = 0
+color = Color(1.000, 0.957, 0.690, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_greenmarch"])
+abundance = &"common"
