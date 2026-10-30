@@ -1,6 +1,11 @@
 ## M0 debug overlay: phase, flags, quiver, stamina, time, and a crosshair.
 ## Replaced by the real (mostly diegetic) UI later.
+##
+## The debug text is off by default and toggled with F3 (action
+## "toggle_debug_hud"). The crosshair still shows while aiming.
 extends CanvasLayer
+
+var debug_visible: bool = false
 
 var _info: Label
 var _crosshair: Label
@@ -13,6 +18,7 @@ func _ready() -> void:
 	_info.position = Vector2(24, 20)
 	_info.add_theme_font_size_override(&"font_size", 18)
 	_info.add_theme_color_override(&"font_shadow_color", Color(0, 0, 0, 0.7))
+	_info.visible = debug_visible
 	add_child(_info)
 	_crosshair = Label.new()
 	_crosshair.text = "+"
@@ -29,7 +35,14 @@ func _ready() -> void:
 	EventBus.deed_performed.connect(func(flag: String) -> void: _show("Deed: %s" % flag))
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"toggle_debug_hud"):
+		debug_visible = not debug_visible
+		get_viewport().set_input_as_handled()
+
+
 func _process(delta: float) -> void:
+	_info.visible = debug_visible
 	var feyre := get_tree().get_first_node_in_group(&"player") as Feyre
 	var phase := PhaseManager.current()
 	var lines := PackedStringArray([
@@ -49,7 +62,7 @@ func _process(delta: float) -> void:
 	lines.append("WASD move, Shift sprint, Space jump/climb, hold LMB draw, RMB aim, E interact, Q arrow type, R craft arrow")
 	_info.text = "\n".join(lines)
 	_deed_timer -= delta
-	_deed.visible = _deed_timer > 0.0
+	_deed.visible = debug_visible and _deed_timer > 0.0
 
 
 func _show(text: String) -> void:

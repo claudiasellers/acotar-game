@@ -35,7 +35,7 @@ Phase ladders are data: `data/phases/spring_court_phases.tres` is the root doc's
 
 ## Running
 
-The main scene is the Act I greybox (`story/act1/greybox/`): phases 0 and 1 on stand-ins. Hunt hares to fill the food tally, meet the doe and the wolf in the clearing north of the cottage, E on the dead wolf to skin it, E at the fur stall (east) to sell the pelt, E on the bed to sleep until night. The M0 test hill is `world/shared/test_hill/test_hill.tscn`. Controls: WASD move, Shift sprint, Space jump (and climb ledges), hold left mouse to draw and release to shoot, right mouse to aim, E to pick up a stuck arrow, Esc to free the mouse. Gamepad is mapped too.
+The main scene is the Act I greybox (`story/act1/greybox/`): phases 0 and 1 on stand-ins. Hunt hares to fill the food tally, meet the doe and the wolf in the clearing north of the cottage, E on the dead wolf to skin it, E at the fur stall (east) to sell the pelt, E on the bed to sleep until night. The M0 test hill is `world/shared/test_hill/test_hill.tscn`. Controls: WASD move, Shift sprint, Space jump (and climb ledges), hold left mouse to draw and release to shoot, right mouse to aim, E to pick up a stuck arrow, F3 for the debug overlay (off by default), Esc to free the mouse. Gamepad is mapped too.
 
 Tests (headless):
 
