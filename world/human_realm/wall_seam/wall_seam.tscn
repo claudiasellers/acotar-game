@@ -220,290 +220,321 @@ size = Vector3(1.2, 6, 2.2)
 density = 0.08
 albedo = Color(0.62, 0.66, 0.72, 1)
 
-[sub_resource type="FogMaterial" id="FogMaterial_63w00"]
+[sub_resource type="Gradient" id="Gradient_63w00"]
+offsets = PackedFloat32Array(0, 1, 0.55)
+colors = PackedColorArray(1, 0.86, 0.42, 1, 0.45, 0.8, 0.42, 0, 0.62, 0.9, 0.4, 0.9)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_f6d4c"]
+gradient = SubResource("Gradient_63w00")
+fill = 1
+fill_from = Vector2(0.5, 0.6)
+fill_to = Vector2(1, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xjkqp"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_texture = SubResource("GradientTexture2D_f6d4c")
+
+[sub_resource type="QuadMesh" id="QuadMesh_h3tn5"]
+size = Vector2(10, 9)
+
+[sub_resource type="FogMaterial" id="FogMaterial_scqpd"]
 density = 0.04
 albedo = Color(0.85, 0.9, 0.97, 1)
 
-[node name="WallSeam" type="Node3D" unique_id=850740858]
+[node name="WallSeam" type="Node3D" unique_id=1375320253]
 
-[node name="ScatterField" type="Node3D" parent="." unique_id=659609030]
+[node name="ScatterField" type="Node3D" parent="." unique_id=1515329585]
 script = ExtResource("1_ssimk")
 region_id = &"wall_seam"
 layers = Array[ExtResource("2_l04mm")]([ExtResource("3_r65mo"), ExtResource("4_6wx4s"), ExtResource("5_2plvo"), ExtResource("6_bges3"), ExtResource("7_rhnv7"), ExtResource("8_gny2n"), ExtResource("9_lbhao"), ExtResource("10_6rsrn"), ExtResource("11_ppwcj"), ExtResource("12_n5oh0"), ExtResource("13_oiusg"), ExtResource("14_jq1uk"), ExtResource("15_77m0l"), ExtResource("16_aqdlr"), ExtResource("17_ihlxv"), ExtResource("18_qahpf"), ExtResource("19_42kdj"), ExtResource("20_jqdh6"), ExtResource("21_skfmu"), ExtResource("22_8hne5"), ExtResource("23_3aqlb"), ExtResource("24_0gnq3"), ExtResource("25_6hyy3"), ExtResource("26_20dmh"), ExtResource("27_c0old"), ExtResource("28_6sc7m"), ExtResource("29_j6uws"), ExtResource("30_dpv1y"), ExtResource("31_4rvu8"), ExtResource("32_c47sn"), ExtResource("33_m868r"), ExtResource("34_dnoks"), ExtResource("35_o6a0w"), ExtResource("36_tje0y"), ExtResource("37_186wu"), ExtResource("38_65743"), ExtResource("39_hrtmq"), ExtResource("40_m27bh"), ExtResource("41_yoh8t"), ExtResource("42_uwip4"), ExtResource("43_xfvby"), ExtResource("44_dkmeb"), ExtResource("45_0sq1h")])
 
-[node name="TrunkCollision" type="Node3D" parent="." unique_id=2116368892]
+[node name="TrunkCollision" type="Node3D" parent="." unique_id=1821284420]
 script = ExtResource("46_n0ldj")
 layers = Array[ExtResource("2_l04mm")]([ExtResource("4_6wx4s")])
 radii = PackedFloat32Array(0.3)
 heights = PackedFloat32Array(4)
 
-[node name="WallShimmer" type="Node3D" parent="." unique_id=240898227]
+[node name="WallShimmer" type="Node3D" parent="." unique_id=2033160859]
 script = ExtResource("47_ldvab")
 
-[node name="WallSenseVolume" type="Area3D" parent="." unique_id=163131822 groups=["no_birds_zone"]]
+[node name="WallSenseVolume" type="Area3D" parent="." unique_id=1554003115 groups=["no_birds_zone"]]
 script = ExtResource("48_10whp")
 
-[node name="Shape" type="CollisionShape3D" parent="WallSenseVolume" unique_id=2039277736]
+[node name="Shape" type="CollisionShape3D" parent="WallSenseVolume" unique_id=305461383]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0, 1400)
 shape = SubResource("BoxShape3D_2unmu")
 
-[node name="Landmarks" type="Node3D" parent="." unique_id=908837387]
+[node name="Landmarks" type="Node3D" parent="." unique_id=598107345]
 
 [node name="GapStoneWest" type="Node3D" parent="Landmarks" unique_id=446378986 groups=["landmark"] instance=ExtResource("49_7ylal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -105, -2.4648242, 1402)
 
-[node name="GapStoneWestCollision" type="StaticBody3D" parent="Landmarks" unique_id=1779224620]
+[node name="GapStoneWestCollision" type="StaticBody3D" parent="Landmarks" unique_id=494058785]
 collision_mask = 0
 
-[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Landmarks/GapStoneWestCollision" unique_id=886646620]
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="Landmarks/GapStoneWestCollision" unique_id=1369455978]
 transform = Transform3D(0.99875027, 0, 0.04997917, 0, 1, 0, -0.04997917, 0, 0.99875027, -105, -0.66482425, 1402)
 shape = SubResource("BoxShape3D_xns11")
 
-[node name="GapStoneEast" type="Node3D" parent="Landmarks" unique_id=1412633101 groups=["landmark"] instance=ExtResource("49_7ylal")]
+[node name="GapStoneEast" type="Node3D" parent="Landmarks" unique_id=1060342163 groups=["landmark"] instance=ExtResource("49_7ylal")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -95, -2.4013042, 1402)
 
-[node name="GapStoneEastCollision" type="StaticBody3D" parent="Landmarks" unique_id=136324320]
+[node name="GapStoneEastCollision" type="StaticBody3D" parent="Landmarks" unique_id=1466949607]
 collision_mask = 0
 
-[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Landmarks/GapStoneEastCollision" unique_id=648364571]
+[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="Landmarks/GapStoneEastCollision" unique_id=1332047361]
 transform = Transform3D(-0.99875027, 0, -0.049979255, 0, 1, 0, 0.049979255, 0, -0.99875027, -95, -0.6013043, 1402)
 shape = SubResource("BoxShape3D_dfg8l")
 
 [node name="GreatWarningCairn" type="Node3D" parent="Landmarks" unique_id=1594932941 groups=["landmark"] instance=ExtResource("50_o4nxd")]
 transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, -1.156374, 1456)
 
-[node name="GreatWarningCairnCollision" type="StaticBody3D" parent="Landmarks" unique_id=1158213997]
+[node name="GreatWarningCairnCollision" type="StaticBody3D" parent="Landmarks" unique_id=651020473]
 collision_mask = 0
 
-[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="Landmarks/GreatWarningCairnCollision" unique_id=81967566]
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="Landmarks/GreatWarningCairnCollision" unique_id=5742233]
 transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -72, 0.04362607, 1456)
 shape = SubResource("BoxShape3D_iw6bc")
 
 [node name="OfferingPost" type="Node3D" parent="Landmarks" unique_id=771358749 groups=["landmark"] instance=ExtResource("51_xqb0y")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -3.2235675, 1424)
 
-[node name="OfferingPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=387858064]
+[node name="OfferingPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=656646463]
 collision_mask = 0
 
-[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="Landmarks/OfferingPostCollision" unique_id=1191435694]
+[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="Landmarks/OfferingPostCollision" unique_id=236275466]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121, -1.6235675, 1424)
 shape = SubResource("BoxShape3D_kg0qd")
 
 [node name="IronWardPost" type="Node3D" parent="Landmarks" unique_id=1232649680 groups=["landmark"] instance=ExtResource("52_neggn")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -3.0450966, 1432)
 
-[node name="IronWardPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=1319332101]
+[node name="IronWardPostCollision" type="StaticBody3D" parent="Landmarks" unique_id=2053656577]
 collision_mask = 0
 
-[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Landmarks/IronWardPostCollision" unique_id=1858232201]
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Landmarks/IronWardPostCollision" unique_id=1199712701]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -86, -1.8450966, 1432)
 shape = SubResource("BoxShape3D_kwb2h")
 
-[node name="wall_gate_north" type="Marker3D" parent="." unique_id=549146039 groups=["story_anchor"]]
+[node name="wall_gate_north" type="Marker3D" parent="." unique_id=67982081 groups=["story_anchor"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.4767404, 1402)
 
-[node name="WallSeamPath" type="Path3D" parent="." unique_id=1653644424]
+[node name="WallSeamPath" type="Path3D" parent="." unique_id=1001329691]
 curve = SubResource("Curve3D_ocvle")
 
-[node name="WallCrossing" type="Node3D" parent="." unique_id=1447045648]
+[node name="WallCrossing" type="Node3D" parent="." unique_id=1206821421]
 
-[node name="DefileWalls" type="StaticBody3D" parent="WallCrossing" unique_id=1786202761]
+[node name="DefileWalls" type="StaticBody3D" parent="WallCrossing" unique_id=1340125829]
 
-[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1905570734]
+[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1716424768]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.4, -0.1445399, 1446)
 shape = SubResource("BoxShape3D_2nhvx")
 
-[node name="@CollisionShape3D@8" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=193596111]
+[node name="@CollisionShape3D@8" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=23428969]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.6, 0.70712656, 1446)
 shape = SubResource("BoxShape3D_fj4uf")
 
-[node name="@CollisionShape3D@9" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1702324649]
+[node name="@CollisionShape3D@9" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1292970638]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.183556, -0.22567865, 1444)
 shape = SubResource("BoxShape3D_fb18c")
 
-[node name="@CollisionShape3D@10" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1335670780]
+[node name="@CollisionShape3D@10" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1461499249]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -87.25123, 0.55256325, 1444)
 shape = SubResource("BoxShape3D_au1tb")
 
-[node name="@CollisionShape3D@11" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1495186625]
+[node name="@CollisionShape3D@11" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1007948237]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.98639, -0.33923408, 1442)
 shape = SubResource("BoxShape3D_2xry2")
 
-[node name="@CollisionShape3D@12" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2119129190]
+[node name="@CollisionShape3D@12" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1531436085]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -87.88318, 0.3258703, 1442)
 shape = SubResource("BoxShape3D_kuc8v")
 
-[node name="@CollisionShape3D@13" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1078270737]
+[node name="@CollisionShape3D@13" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1488289204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.80851, -0.4651696, 1440)
 shape = SubResource("BoxShape3D_atxuk")
 
-[node name="@CollisionShape3D@14" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=448001783]
+[node name="@CollisionShape3D@14" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=296049633]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -88.49584, 0.06063413, 1440)
 shape = SubResource("BoxShape3D_i62mh")
 
-[node name="@CollisionShape3D@15" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=581688134]
+[node name="@CollisionShape3D@15" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=14737898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.6499, -0.5731904, 1438)
 shape = SubResource("BoxShape3D_58uck")
 
-[node name="@CollisionShape3D@16" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1005915206]
+[node name="@CollisionShape3D@16" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1793977685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -89.089226, -0.1958293, 1438)
 shape = SubResource("BoxShape3D_i5k6e")
 
-[node name="@CollisionShape3D@17" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=817311485]
+[node name="@CollisionShape3D@17" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2024686738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.51059, -0.65298927, 1436)
 shape = SubResource("BoxShape3D_70751")
 
-[node name="@CollisionShape3D@18" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=130982908]
+[node name="@CollisionShape3D@18" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1742472272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -89.66333, -0.41290712, 1436)
 shape = SubResource("BoxShape3D_nqrq4")
 
-[node name="@CollisionShape3D@19" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=751351417]
+[node name="@CollisionShape3D@19" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1745938717]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.39055, -0.71626335, 1434)
 shape = SubResource("BoxShape3D_xus5m")
 
-[node name="@CollisionShape3D@20" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1565333796]
+[node name="@CollisionShape3D@20" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=585992916]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.21815, -0.58435655, 1434)
 shape = SubResource("BoxShape3D_wq36p")
 
-[node name="@CollisionShape3D@21" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=239844144]
+[node name="@CollisionShape3D@21" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1687581726]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.289795, -0.7804715, 1432)
 shape = SubResource("BoxShape3D_sutx8")
 
-[node name="@CollisionShape3D@22" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=559589371]
+[node name="@CollisionShape3D@22" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=44806751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90.753685, -0.71236247, 1432)
 shape = SubResource("BoxShape3D_q2a2j")
 
-[node name="@CollisionShape3D@23" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1792922717]
+[node name="@CollisionShape3D@23" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=915293868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.20832, -0.85066545, 1430)
 shape = SubResource("BoxShape3D_ipc3i")
 
-[node name="@CollisionShape3D@24" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1806590392]
+[node name="@CollisionShape3D@24" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=553702560]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.26994, -0.7955559, 1430)
 shape = SubResource("BoxShape3D_matpr")
 
-[node name="@CollisionShape3D@25" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1196778991]
+[node name="@CollisionShape3D@25" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1008308645]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.146126, -0.9006214, 1428)
 shape = SubResource("BoxShape3D_bckfw")
 
-[node name="@CollisionShape3D@26" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1444579311]
+[node name="@CollisionShape3D@26" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=417133793]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.76692, -0.8305597, 1428)
 shape = SubResource("BoxShape3D_34f3b")
 
-[node name="@CollisionShape3D@27" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1430781658]
+[node name="@CollisionShape3D@27" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2007431946]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.10321, -0.90184844, 1426)
 shape = SubResource("BoxShape3D_jtj8c")
 
-[node name="@CollisionShape3D@28" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=80350410]
+[node name="@CollisionShape3D@28" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=986487596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92.24461, -0.82188725, 1426)
 shape = SubResource("BoxShape3D_od5w0")
 
-[node name="@CollisionShape3D@29" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=555653117]
+[node name="@CollisionShape3D@29" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=118909996]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.07958, -0.8495597, 1424)
 shape = SubResource("BoxShape3D_13ekc")
 
-[node name="@CollisionShape3D@30" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=158914058]
+[node name="@CollisionShape3D@30" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1505168038]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92.703026, -0.77602106, 1424)
 shape = SubResource("BoxShape3D_iaxka")
 
-[node name="@CollisionShape3D@31" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1245747389]
+[node name="@CollisionShape3D@31" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=772609971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.07523, -0.7628237, 1422)
 shape = SubResource("BoxShape3D_sulnu")
 
-[node name="@CollisionShape3D@32" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=122042229]
+[node name="@CollisionShape3D@32" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2069932841]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.14216, -0.69993997, 1422)
 shape = SubResource("BoxShape3D_ykqo8")
 
-[node name="@CollisionShape3D@33" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1854900098]
+[node name="@CollisionShape3D@33" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=54289359]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.09017, -0.66611576, 1420)
 shape = SubResource("BoxShape3D_8sjko")
 
-[node name="@CollisionShape3D@34" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1811745592]
+[node name="@CollisionShape3D@34" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=607376344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.562004, -0.6003752, 1420)
 shape = SubResource("BoxShape3D_bu6ww")
 
-[node name="@CollisionShape3D@35" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1604546599]
+[node name="@CollisionShape3D@35" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=61793028]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.12438, -0.56716, 1418)
 shape = SubResource("BoxShape3D_4t2gt")
 
-[node name="@CollisionShape3D@36" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=796683555]
+[node name="@CollisionShape3D@36" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2045918264]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.96257, -0.4864706, 1418)
 shape = SubResource("BoxShape3D_ljw6k")
 
-[node name="@CollisionShape3D@37" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=858589134]
+[node name="@CollisionShape3D@37" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1182365790]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.17788, -0.4628978, 1416)
 shape = SubResource("BoxShape3D_bwba1")
 
-[node name="@CollisionShape3D@38" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2081120963]
+[node name="@CollisionShape3D@38" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1371273228]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.34386, -0.36623317, 1416)
 shape = SubResource("BoxShape3D_7roqg")
 
-[node name="@CollisionShape3D@39" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1719149708]
+[node name="@CollisionShape3D@39" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=451397225]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.25066, -0.34723455, 1414)
 shape = SubResource("BoxShape3D_d7vc4")
 
-[node name="@CollisionShape3D@40" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=661901244]
+[node name="@CollisionShape3D@40" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=603680720]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.70586, -0.24659544, 1414)
 shape = SubResource("BoxShape3D_rp7tn")
 
-[node name="@CollisionShape3D@41" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=253328579]
+[node name="@CollisionShape3D@41" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=541625475]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.34272, -0.21983218, 1412)
 shape = SubResource("BoxShape3D_jo4l0")
 
-[node name="@CollisionShape3D@42" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=740337020]
+[node name="@CollisionShape3D@42" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1212515570]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.048584, -0.12914585, 1412)
 shape = SubResource("BoxShape3D_uor8f")
 
-[node name="@CollisionShape3D@43" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=815263084]
+[node name="@CollisionShape3D@43" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1306107145]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.45406, -0.08528918, 1410)
 shape = SubResource("BoxShape3D_q84mr")
 
-[node name="@CollisionShape3D@44" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=376980545]
+[node name="@CollisionShape3D@44" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1757669590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.372025, -0.00870647, 1410)
 shape = SubResource("BoxShape3D_avd3c")
 
-[node name="@CollisionShape3D@45" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1177490455]
+[node name="@CollisionShape3D@45" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1465808610]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.58469, 0.05437998, 1408)
 shape = SubResource("BoxShape3D_qc1i3")
 
-[node name="@CollisionShape3D@46" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=897112975]
+[node name="@CollisionShape3D@46" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1976402013]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.67618, 0.11961028, 1408)
 shape = SubResource("BoxShape3D_xgp33")
 
-[node name="@CollisionShape3D@47" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1604280479]
+[node name="@CollisionShape3D@47" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=420129488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.7346, 0.20123303, 1406)
 shape = SubResource("BoxShape3D_px1dm")
 
-[node name="@CollisionShape3D@48" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=86357491]
+[node name="@CollisionShape3D@48" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=2039706227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.96106, 0.25828704, 1406)
 shape = SubResource("BoxShape3D_1wotu")
 
-[node name="@CollisionShape3D@49" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1048537157]
+[node name="@CollisionShape3D@49" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=358099173]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.90378, 0.35703003, 1404)
 shape = SubResource("BoxShape3D_4b7y2")
 
-[node name="@CollisionShape3D@50" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=225907192]
+[node name="@CollisionShape3D@50" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1770246770]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -96.226654, 0.4080366, 1404)
 shape = SubResource("BoxShape3D_fak7c")
 
-[node name="@CollisionShape3D@51" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=717871695]
+[node name="@CollisionShape3D@51" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1582300009]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.09225, 0.520965, 1402)
 shape = SubResource("BoxShape3D_m8ejx")
 
-[node name="@CollisionShape3D@52" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=841677307]
+[node name="@CollisionShape3D@52" type="CollisionShape3D" parent="WallCrossing/DefileWalls" unique_id=1019098431]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -96.47297, 0.56700397, 1402)
 shape = SubResource("BoxShape3D_d7cyw")
 
-[node name="DefileHaze" type="FogVolume" parent="WallCrossing" unique_id=662119714]
+[node name="DefileHaze" type="FogVolume" parent="WallCrossing" unique_id=482011207]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -97.5, -0.84598, 1423)
 size = Vector3(15, 7, 46)
 material = SubResource("FogMaterial_l8j7s")
 
-[node name="wall_crossing_frame" type="Marker3D" parent="WallCrossing" unique_id=1687500440 groups=["shot_frame"]]
+[node name="SpringLure" type="OmniLight3D" parent="WallCrossing" unique_id=83844248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 0.74870056, 1394)
+light_color = Color(1, 0.88, 0.55, 1)
+light_energy = 6.0
+omni_range = 18.0
+
+[node name="SpringGlow" type="MeshInstance3D" parent="WallCrossing" unique_id=703984947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 1.3629348, 1397)
+material_override = SubResource("StandardMaterial3D_xjkqp")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_h3tn5")
+
+[node name="wall_crossing_frame" type="Marker3D" parent="WallCrossing" unique_id=2116310104 groups=["shot_frame"]]
 transform = Transform3D(0.9846426, 0.026350744, 0.17258193, 0, 0.9885435, -0.15093619, -0.17458202, 0.1486182, 0.9733621, -100, 2.8177912, 1362)
 metadata/fov = 55.0
 metadata/shot = "wall_crossing"
 
-[node name="LineMist" type="FogVolume" parent="." unique_id=2045020772]
+[node name="LineMist" type="FogVolume" parent="." unique_id=1872160089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, -2.2967708, 1406)
 size = Vector3(1600, 3, 14)
-material = SubResource("FogMaterial_63w00")
+material = SubResource("FogMaterial_scqpd")

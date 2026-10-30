@@ -179,6 +179,15 @@ static func defile_layers() -> Array[ScatterLayer]:
 				ForestGenUtil.put(snag, x + side * 0.8, z, (0.5 * PI if side < 0.0 else -0.5 * PI) + rng.randf_range(-0.3, 0.3), rng.randf_range(1.1, 1.4))
 		z -= 1.7
 		i += 1
+	# Lichen-and-frost stone, not flat grey (R3).
+	var stone := (ForestGenUtil.FLORA_MAT as ShaderMaterial).duplicate() as ShaderMaterial
+	stone.set_shader_parameter(&"use_vertex_color", false)
+	stone.set_shader_parameter(&"albedo", Color(0.66, 0.63, 0.56))
+	stone.set_shader_parameter(&"translucency", 0.0)
+	stone.set_shader_parameter(&"flex_height", 100.0)
+	stone.set_shader_parameter(&"wind_amount", 0.0)
+	stone.set_shader_parameter(&"snow_catch", 0.9)
+	rock.material = stone
 	for l in [thorn, briar, rock, snag]:
 		l.draw_distance = 160.0
 	return [thorn, briar, rock, snag]
@@ -218,6 +227,44 @@ func _build_crossing(root: Node3D, layers: Array[ScatterLayer]) -> void:
 	haze.position = Vector3(defile_centre_x(mid_z), WorldHeight.height_at(-98.0, mid_z) + 3.0, mid_z)
 	sp.add_child(haze)
 	haze.owner = root
+	# The lure: past the neck, spring glows green-gold through the gap, the
+	# brightest and warmest thing in the grey.
+	var lure := OmniLight3D.new()
+	lure.name = "SpringLure"
+	lure.light_color = Color(1.0, 0.88, 0.55)
+	lure.light_energy = 6.0
+	lure.omni_range = 18.0
+	lure.position = Vector3(WorldMap.WALL_GAP_X, WorldHeight.height_at(WorldMap.WALL_GAP_X, WorldMap.WALL_Z - 6.0) + 2.5, WorldMap.WALL_Z - 6.0)
+	sp.add_child(lure)
+	lure.owner = root
+	var veil := MeshInstance3D.new()
+	veil.name = "SpringGlow"
+	var q := QuadMesh.new()
+	q.size = Vector2(10.0, 9.0)
+	veil.mesh = q
+	var vm := StandardMaterial3D.new()
+	vm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	vm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var gg := Gradient.new()
+	gg.set_color(0, Color(1.0, 0.86, 0.42, 1.0))
+	gg.set_color(1, Color(0.45, 0.8, 0.42, 0.0))
+	gg.add_point(0.55, Color(0.62, 0.9, 0.4, 0.9))
+	var gt := GradientTexture2D.new()
+	gt.gradient = gg
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.5, 0.6)
+	gt.fill_to = Vector2(1.0, 0.6)
+	vm.albedo_texture = gt
+	vm.emission_enabled = true
+	vm.emission = Color(1.0, 0.9, 0.55)
+	vm.emission_energy_multiplier = 4.0
+	vm.cull_mode = BaseMaterial3D.CULL_DISABLED
+	veil.material_override = vm
+	veil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	veil.position = Vector3(WorldMap.WALL_GAP_X, WorldHeight.height_at(WorldMap.WALL_GAP_X, WorldMap.WALL_Z - 3.0) + 3.4, WorldMap.WALL_Z - 3.0)
+	sp.add_child(veil)
+	veil.owner = root
+
 	# Where the release view is composed from: just past the gap, looking at
 	# the weenie (-Z faces it).
 	var frame := Marker3D.new()

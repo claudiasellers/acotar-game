@@ -464,15 +464,15 @@ func _build_scene() -> Node3D:
 
 ## Composed opening vantage (world): camera position and look-at point.
 static func opening_camera() -> Array[Vector3]:
-	var eye := _cottage_world(Vector3(-9.0, 0.0, 27.0))
-	var look := _cottage_world(Vector3(4.0, 0.0, -40.0))
-	return [ground(eye, 3.4), ground(look, 4.0)]
+	var eye := _cottage_world(Vector3(-12.0, 0.0, 19.0))
+	var look := _cottage_world(Vector3(-1.0, 0.0, -30.0))
+	return [ground(eye, 1.5), ground(look, 3.2)]
 
 
 ## The deer trail, door to treeline (world XZ), a curve that slips out of sight
 ## between the trees.
 static func deer_trail_points() -> PackedVector2Array:
-	var start := _cottage_world(Vector3(-1.9, 0.0, -8.0))
+	var start := _cottage_world(Vector3(-7.5, 0.0, 3.5))
 	var end := Vector2(-205.0, 2088.0)
 	var bend := start.lerp(end, 0.5) + Vector2(18.0, -4.0)
 	var pts := PackedVector2Array()
@@ -489,11 +489,12 @@ func _build_opening(root: Node3D) -> void:
 	var shot := _node(Marker3D, "OpeningCamera", op, root)
 	shot.transform = Transform3D.IDENTITY.looking_at(cam[1] - cam[0], Vector3.UP).translated(cam[0])
 	shot.set_meta(&"fov", 50.0)
-	shot.set_meta(&"time_of_day", 0.27)
+	shot.set_meta(&"time_of_day", 0.262)
 	shot.set_meta(&"shot", "opening_dawn")
 	shot.add_to_group(&"shot_frame", true)
 	var trail := deer_trail_points()
-	# Where Feyre stands at the start: by the door, facing up the trail.
+	# Where Feyre stands at the start: in the yard by the woodpile, in the
+	# opening frame, facing up the trail.
 	var start := _node(Marker3D, "opening_cottage_dawn", op, root)
 	var s0 := ground(trail[0], 0.0)
 	start.transform = Transform3D.IDENTITY.looking_at(ground(trail[4], 0.0) - s0, Vector3.UP).translated(s0)
@@ -523,7 +524,7 @@ func _build_opening(root: Node3D) -> void:
 	gm.albedo_color = Color(1.0, 0.66, 0.34)
 	gm.emission_enabled = true
 	gm.emission = Color(1.0, 0.58, 0.26)
-	gm.emission_energy_multiplier = 3.0
+	gm.emission_energy_multiplier = 9.0
 	glow.material_override = gm
 	glow.position = Vector3(-0.6, 1.3, 3.1)
 	cot.add_child(glow)
@@ -532,11 +533,21 @@ func _build_opening(root: Node3D) -> void:
 	spill.name = "WindowSpill"
 	spill.position = Vector3(-0.6, 1.2, 3.9)
 	spill.light_color = Color(1.0, 0.64, 0.34)
-	spill.light_energy = 1.4
-	spill.omni_range = 5.5
+	spill.light_energy = 4.2
+	spill.omni_range = 9.0
 	spill.set_script(load(DIR + "fire_flicker.gd"))
 	cot.add_child(spill)
 	spill.owner = root
+	# Feyre's vines climb out round the back window and over the door.
+	var ext := _node(Node3D, "PaintedOutside", cot, root)
+	_glb(AI + "motif_wall_vines.glb", "VinesWindowLeft", ext, root, Vector3(-1.1, 0.0, 3.2), 180.0)
+	_glb(AI + "motif_wall_vines.glb", "VinesWindowRight", ext, root, Vector3(1.0, 0.0, 3.2), 180.0)
+	_glb(AI + "motif_wall_vines.glb", "VinesDoor", ext, root, Vector3(-1.4, 0.2, -3.2), 0.0)
+	# A bare branch in the foreground of the opening frame.
+	var eye_local := Vector3(-12.0, 0.0, 19.0)
+	var branch := _glb("res://world/human_realm/shared/assets/flora/tree_dead_snag.glb", "OpeningFrameBranch", op, root,
+		ground(_cottage_world(eye_local + Vector3(-3.4, 0.0, -4.6)), -0.2), 30.0)
+	branch.scale = Vector3.ONE * 1.3
 
 
 ## Fresh hoof prints along the trail: pairs, alternating sides, as one MultiMesh.

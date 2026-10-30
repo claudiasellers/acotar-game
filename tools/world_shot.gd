@@ -60,6 +60,15 @@ func _run() -> void:
 		if m.get_meta(&"shot", "") == id:
 			cam.global_transform = (m as Node3D).global_transform
 			cam.fov = (m as Node3D).get_meta(&"fov", 50.0)
+			if m.has_meta(&"time_of_day"):
+				Clock.time_of_day = m.get_meta(&"time_of_day")
+	if id == "opening_dawn":
+		# Feyre (placeholder model) at her start mark.
+		for a in get_tree().get_nodes_in_group(&"story_anchor"):
+			if a.name == &"opening_cottage_dawn":
+				var feyre: Node3D = load("res://characters/feyre/model/feyre_model.tscn").instantiate()
+				world.add_child(feyre)
+				feyre.global_transform = (a as Node3D).global_transform
 	for i in 30:
 		await get_tree().process_frame
 	var img := root.get_texture().get_image()

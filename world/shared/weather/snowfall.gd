@@ -28,8 +28,21 @@ func _ready() -> void:
 	pm.scale_max = 1.4
 	process_material = pm
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.05, 0.05)
+	quad.size = Vector2(0.06, 0.06)
+	# Round, soft-edged flakes (a radial falloff), never squares.
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	g.add_point(0.45, Color(1, 1, 1, 0.8))
+	var flake := GradientTexture2D.new()
+	flake.gradient = g
+	flake.fill = GradientTexture2D.FILL_RADIAL
+	flake.fill_from = Vector2(0.5, 0.5)
+	flake.fill_to = Vector2(1.0, 0.5)
+	flake.width = 32
+	flake.height = 32
 	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = flake
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

@@ -1,11 +1,33 @@
 [gd_resource type="Resource" script_class="ScatterLayer" format=3]
 
-[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_xmw13"]
+[ext_resource type="Shader" path="res://world/shared/shaders/stylized_foliage.gdshader" id="1_v42ja"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_17xbw"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vo7cy"]
+render_priority = 0
+shader = ExtResource("1_v42ja")
+shader_parameter/wind_amount = 0.0
+shader_parameter/albedo = Color(0.66, 0.63, 0.56, 1)
+shader_parameter/use_vertex_color = false
+shader_parameter/flex_height = 100.0
+shader_parameter/alpha_scissor = 0.4
+shader_parameter/wrap = 0.5
+shader_parameter/shade_tint = null
+shader_parameter/rim_color = null
+shader_parameter/rim_strength = 0.6
+shader_parameter/translucency = 0.0
+shader_parameter/roughness_value = 0.75
+shader_parameter/snow_catch = 0.9
+shader_parameter/snow_color = null
+shader_parameter/sparkle = 0.0
+shader_parameter/sparkle_color = null
+shader_parameter/emission_glow = 0.0
 
 [resource]
-script = ExtResource("1_xmw13")
+script = ExtResource("2_17xbw")
 id = &"defile_rock"
 mesh_path = "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb"
 tags = PackedStringArray("set_piece", "canon:X")
 instances = PackedFloat32Array(-104.645134, -3.3975046, 1448.6, 4.982855, 1.6318041, -85.42423, -2.4319453, 1448.6, 5.0831695, 2.0838947, -103.804665, -3.6531343, 1441.8, 5.4663067, 2.3325498, -86.95028, -2.862037, 1441.8, 4.351517, 1.7519691, -103.3611, -3.9961345, 1435, 1.8671271, 2.0892067, -89.23429, -3.7089195, 1435, 2.0838838, 2.3795478, -103.36964, -4.194858, 1428.2, 5.983649, 1.9848573, -90.99811, -4.0592227, 1428.2, 0.59973043, 1.9298248, -102.956116, -4.0260887, 1421.4, 6.0520306, 2.044083, -92.03619, -3.904307, 1421.4, 3.171568, 1.8285936, -103.06376, -3.6782157, 1414.6, 0.077988245, 1.9701449, -93.47912, -3.5374038, 1414.6, 0.72231674, 2.3094587, -103.654396, -3.2254336, 1407.8, 5.8963685, 2.0965176, -94.52302, -3.1343648, 1407.8, 5.621484, 2.016447)
 draw_distance = 160.0
+material = SubResource("ShaderMaterial_vo7cy")
