@@ -1,19 +1,34 @@
-## Headless Act I playthrough (status.md item 2): loads the real game scene and
-## plays it the way a player would, by pressing actions only (move, sprint,
+## Headless Act I playthrough: loads the real game scene (story/act1/act1_game.tscn)
+## and plays it the way a player would, by pressing actions only (move, sprint,
 ## jump, aim, fire, cycle_arrow, interact). It never writes a flag (R2): every
 ## deed has to come out of the game's own ActionTriggers.
 ##
-## Walking is stick input steered toward the next landmark. When Feyre is stuck
-## (no progress for STUCK_SECONDS) the walker hops her a few metres forward and
-## counts it as an assist, so the run can go on and the report shows where.
-##
+## Run (from the repo, built files in place: tools/mq/levels.sh ensure):
 ##   tools/mq/godot.sh --fixed-fps 60 res://tools/playtest/act1_playtest.tscn -- --out=/tmp/act1.json
-##     [--stop-after=<beat id>] [--max-wall=<seconds, default 900>]
+##     [--stop-after=<beat id>] [--max-wall=<seconds, default 900>] [--settle=<seconds, default 180>]
 ##
-## Exit codes: 0 every beat passed with no workaround, 1 a beat failed or needed
-## a workaround, 3 the wall-clock cap hit. The process always ends: after
-## quit() a watchdog thread kills it if engine shutdown takes over EXIT_GRACE.
-## Without baked terrain the first load bakes in memory (~3 min in the cloud).
+## Acceptance (Act I playable, status.md item 2). The run passes when ALL hold:
+##   1. The process exit code is 0. Not 137: that is the shutdown watchdog
+##      below, and the log then names what held shutdown ("shutdown suspects").
+##   2. The log has "PLAYTEST exit 0", and the report lists these nine beats,
+##      each "pass": spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale,
+##      sleep, beast_door, crossing, manor_arrival.
+##   3. "workarounds" in the report is empty (a workaround patches a game bug).
+##   4. final_phase is p2_grounds, and after the ride she stands on the
+##      manor estate and walks (manor_arrival checks both).
+## Assists ("stuck at ..." lines, "assists" and "assist_causes" in the report)
+## are not failures: the walker steers in straight lines and hops 6 m when it
+## stalls for 3 s, where a player would steer round. Each names its cause
+## (prop <name>, terrain-slope, air, nothing pressing). Watch the count; on
+## c552d58 a run takes about 9-10.
+##
+## Exit codes: 0 pass; 1 a beat failed or needed a workaround; 3 the wall-clock
+## cap hit. Before quitting it waits (up to --settle) for region builds,
+## streaming loads and the map paint to finish, because their _exit_tree joins
+## those tasks. If shutdown still stalls past EXIT_GRACE, a watchdog thread
+## kills the process (exit 137) after the report is written.
+## Without baked terrain the first load bakes in memory (~3 min in the cloud),
+## and she falls through the unbaked manor terrain after the ride.
 extends Node
 
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
@@ -21,6 +36,7 @@ const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
 const WALK_SPEED_GUESS := 4.0
 const EXIT_GRACE := 15.0
+const SETTLE_LIMIT := 180.0
 
 var game: Node
 var feyre: Feyre
@@ -30,6 +46,7 @@ var out_path: String = "user://act1_playtest.json"
 ## Ends the run after this beat (for quick checks), e.g. --stop-after=spawn.
 var stop_after: String = ""
 var max_wall: float = 900.0
+var settle_limit: float = SETTLE_LIMIT
 var _started_at: float = 0.0
 var _finished: bool = false
 var _exit_watchdog: Thread
@@ -42,6 +59,8 @@ var _shots: int = 0
 var _blocked_shots: int = 0
 var _last_landing: Vector3 = Vector3.INF
 var _load_seconds: float = 0.0
+var _hop_causes: Dictionary = {}
+var _shutdown_suspects: PackedStringArray = []
 
 
 func _ready() -> void:
@@ -50,6 +69,8 @@ func _ready() -> void:
 			out_path = arg.trim_prefix("--out=")
 		elif arg.begins_with("--stop-after="):
 			stop_after = arg.trim_prefix("--stop-after=")
+		elif arg.begins_with("--settle="):
+			settle_limit = float(arg.trim_prefix("--settle="))
 		elif arg.begins_with("--max-wall="):
 			max_wall = float(arg.trim_prefix("--max-wall="))
 	_started_at = Time.get_unix_time_from_system()
@@ -76,6 +97,9 @@ func _run() -> void:
 	_log("game scene loaded in %.1f s (wall)" % _load_seconds)
 	await _play()
 	if not _finished:
+		_release_all()
+		_note_shutdown_suspects()
+		await _settle(settle_limit)
 		_finish(0 if beats.all(func(b: Dictionary) -> bool: return b.status == "pass") else 1)
 
 
@@ -91,11 +115,62 @@ func _physics_process(_delta: float) -> void:
 func _finish(code: int) -> void:
 	_finished = true
 	_release_all()
+	_note_shutdown_suspects()
 	_write_report()
 	_exit_watchdog = Thread.new()
 	_exit_watchdog.start(_kill_if_still_running.bind(code))
 	print("PLAYTEST exit %d" % code)
 	get_tree().quit(code)
+
+
+## Background work that would make shutdown wait, logged so a slow exit
+## names its cause even when only the Mac saw it.
+func _note_shutdown_suspects() -> void:
+	var suspects: PackedStringArray = []
+	if _map_painting():
+		suspects.append("WorldMapHud: map paint thread still running (ui/map not baked?)")
+	for node in _building_regions():
+		suspects.append("%s: region build task still running" % node.name)
+	var pending: Variant = WorldStreamer.get(&"_pending")
+	if pending is Dictionary and not (pending as Dictionary).is_empty():
+		suspects.append("WorldStreamer: %d region loads in flight" % (pending as Dictionary).size())
+	_shutdown_suspects = suspects
+	_log("shutdown suspects: %s" % (", ".join(suspects) if not suspects.is_empty() else "none"))
+
+
+func _map_painting() -> bool:
+	for node in get_tree().root.find_children("*", "", true, false):
+		var thread: Variant = node.get(&"_paint_thread")
+		if thread is Thread and (thread as Thread).is_alive():
+			return true
+	return false
+
+
+## Regions whose WorkerThreadPool build is still running. Their _exit_tree
+## joins that task, so quitting now would make shutdown wait for it.
+func _building_regions() -> Array[Node]:
+	var out: Array[Node] = []
+	for node in get_tree().root.find_children("*", "", true, false):
+		for key: StringName in [&"_task", &"_task_id"]:
+			var id: Variant = node.get(key)
+			if id is int and id >= 0 and not WorkerThreadPool.is_task_completed(id):
+				out.append(node)
+	return out
+
+
+## Lets in-flight region builds and loads finish before quitting, so shutdown
+## has nothing to join. Bounded; whatever is left is named in the report.
+func _settle(limit: float) -> void:
+	var t0 := Time.get_unix_time_from_system()
+	var busy := func() -> bool:
+		var pending: Variant = WorldStreamer.get(&"_pending")
+		return not _building_regions().is_empty() or _map_painting() \
+				or (pending is Dictionary and not (pending as Dictionary).is_empty())
+	if not busy.call():
+		return
+	while busy.call() and Time.get_unix_time_from_system() - t0 < limit:
+		await get_tree().process_frame
+	_log("waited %.1f s for region builds to finish before quitting" % (Time.get_unix_time_from_system() - t0))
 
 
 ## Runs off the main thread: if engine shutdown hangs, end the process anyway.
@@ -476,13 +551,15 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 		if t - last_check >= STUCK_SECONDS:
 			var progress := Vector2(last_pos.x, last_pos.z).distance_to(Vector2(feyre.global_position.x, feyre.global_position.z))
 			if progress < 1.0:
+				var why := _blocker()
 				await _press(&"jump")
 				var hop := Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target))
 				var p := feyre.global_position + hop
 				p.y = _ground_at(p, 2.5) + 0.3
 				feyre.global_position = p
 				feyre.velocity = Vector3.ZERO
-				_log("    stuck at %s in %s, hopping %.0f m" % [_v(p - hop), _region(), hop.length()])
+				_log("    stuck at %s in %s (%s), hopping %.0f m" % [_v(p - hop), _region(), why, hop.length()])
+				_hop_causes[why.get_slice(" ", 0)] = int(_hop_causes.get(why.get_slice(" ", 0), 0)) + 1
 				hops += 1
 				assists += 1
 				assisted_metres += hop.length()
@@ -498,6 +575,25 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 	if hops > 0:
 		_beat["hops"] = int(_beat.get("hops", 0)) + hops
 	return arrived
+
+
+## What stopped her: the body she's pressing against, or the slope under her.
+## The first word is the kind (prop, terrain-slope, terrain, air, nothing).
+func _blocker() -> String:
+	var floor_deg := rad_to_deg(feyre.get_floor_normal().angle_to(Vector3.UP)) if feyre.is_on_floor() else -1.0
+	for i in feyre.get_slide_collision_count():
+		var c := feyre.get_slide_collision(i)
+		var n := c.get_normal()
+		if n.y > 0.7:
+			continue  # the floor itself
+		var body := c.get_collider() as Node
+		var body_name := String(body.name) if body else "?"
+		if body and body.get_class() == "Terrain3D":
+			return "terrain-slope %.0f deg wall, floor %.0f deg" % [rad_to_deg(n.angle_to(Vector3.UP)), floor_deg]
+		return "prop %s (%s)" % [body_name, String(body.get_parent().name) if body and body.get_parent() else "-"]
+	if not feyre.is_on_floor():
+		return "air"
+	return "nothing pressing, floor %.0f deg" % floor_deg
 
 
 func _walk_region(id: StringName) -> void:
@@ -635,6 +731,8 @@ func _write_report() -> void:
 		"assists": assists,
 		"workarounds": workarounds,
 		"assisted_metres": snappedf(assisted_metres, 0.1),
+		"assist_causes": _hop_causes,
+		"shutdown_suspects": _shutdown_suspects,
 		"final_phase": String(PhaseManager.current_phase),
 		"flags": WorldState._flags.keys(),
 		"events": events,
