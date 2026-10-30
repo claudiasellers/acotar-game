@@ -86,6 +86,7 @@ make_worktrees() {
 }
 
 start_loops() {
+	local pid
 	mq_is_home || { echo "mq: not the home machine; the build lane stays off here." >&2; return 0; }
 	# Only a first install. After that bin/ changes only from merged main, so a
 	# lane's unmerged tools/mq can never become the running build lane.
@@ -94,7 +95,9 @@ start_loops() {
 		mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$MQ_REPO' && exec /bin/bash '$MQ_BIN/buildlane.sh'"
 		mq_event START "build lane started"
 	fi
-	if ! kill -0 "$(cat "$MQ_DIR/cleanup.pid" 2>/dev/null || echo 0)" 2>/dev/null; then
+	pid=$(cat "$MQ_DIR/cleanup.pid" 2>/dev/null)
+	# Never `kill -0` an empty or zero pid: 0 means our own group and always succeeds.
+	if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
 		mq_detach "$MQ_DIR/buildlane.log" /bin/bash -c "cd '$MQ_REPO' && exec /bin/bash '$MQ_BIN/cleanup.sh' --loop"
 	fi
 	shots_listener --start

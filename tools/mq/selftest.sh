@@ -72,10 +72,14 @@ MQ_POLL=1
 MQ_STALL_SECS=2
 MQ_JOBS=2
 MQ_CLEANUP_OFF=1
+MQ_SUBMIT_NO_START=1
 MQ_CLOUD=1
 MQ_FETCH_TIMEOUT=20
 EOF
 	tools/mq/setup_lanes.sh >/dev/null
+	# The lane starts detached: wait for its lock, or the stop can miss it.
+	local i=0
+	while [ ! -f .git/mq/lock/pid ] && [ "$i" -lt 100 ]; do perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1)); done
 	stop_lane
 }
 
@@ -324,6 +328,52 @@ case_not_home() {
 	cd "$REPO" || return
 }
 
+case_idle_gate() {
+	newrepo idle
+	local a b i=0
+	echo MQ_FULLGATE_MERGES=1 >> .git/mq/config
+	git checkout -q -B red main; echo x > fail_c; git add -A; git commit -q -m red
+	a=$(change a one)
+	queue "$a" T1
+	start_lane; drain
+	while ! grep -q 'FULLGATE passed' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	expect "full gate ran" grep -q 'FULLGATE passed' .git/mq/events.log
+	stop_lane
+	git worktree list >/dev/null
+}
+
+case_idle_gate_red_and_killed() {
+	newrepo idlered
+	local a b i=0
+	echo MQ_FULLGATE_MERGES=1 >> .git/mq/config
+	sed -i '' 's/^c = /when:never\/* c = /' tools/mq/gate.conf
+	git add -A; git commit -q -m "c only on demand"; git push -q origin HEAD:main; git branch -f main HEAD 2>/dev/null
+	git -C .lanes/build reset -q --hard origin/main
+	a=$(change a one fail_c)
+	queue "$a" T1
+	start_lane; drain
+	expect "when: skipped it in the batch" in_main "$a"
+	while ! grep -q 'c is red' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	expect "full gate found it" grep -q 'c is red' .git/mq/events.log
+	expect "task made" sh -c "tools/mq/task.sh list | grep -q 'found c red'"
+	stop_lane
+	echo slow > .git/mq/slow_marker
+	sed -i '' 's/^MQ_FULLGATE_MERGES=1/MQ_FULLGATE_MERGES=0/' .git/mq/config
+	git -C .lanes/build checkout -q -f main
+	touch .lanes/build/slow
+	start_lane
+	i=0
+	while ! grep -q 'FULLGATE started' .git/mq/events.log && [ "$i" -lt 40 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	rm -f .lanes/build/slow
+	b=$(change b two)
+	queue "$b" T2
+	i=0
+	while ! grep -q 'FULLGATE stopped' .git/mq/events.log && [ "$i" -lt 60 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	expect "killed when work arrived" grep -q 'FULLGATE stopped' .git/mq/events.log
+	drain
+	expect "the work merged" in_main "$b"
+}
+
 case_cleanup() {
 	newrepo clean2
 	local a b
@@ -351,7 +401,7 @@ case_cleanup() {
 
 for c in bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
-		ready_tag_and_moved not_home cleanup; do
+		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup; do
 	scenario "$c"
 done
 echo "selftest: $PASSED passed, $FAILED failed"
