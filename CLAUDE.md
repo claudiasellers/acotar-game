@@ -14,6 +14,12 @@ the lane workers as an agent team if that's available, otherwise as named
 background subagents (`.claude/agents/lane-worker.md`). Put any open tasks from
 `tools/mq/task.sh list` back on the list.
 
+**Standing rule from the owner:** whenever a lane is free and an open T task has
+its deps met, dispatch it immediately, Sonnet for routine, Opus for hard, without
+waiting for the owner. Check on every monitor event and whenever a worker
+finishes. Only stop to ask the owner for permission denials, destructive steps, or
+design choices.
+
 **For every request:**
 - Make one task per separate change with `tools/mq/task.sh add "<request>"`, in
   the owner's words plus what you know: where it is, which files, what done
@@ -35,8 +41,9 @@ poll on a timer. On `REJECTED`, make a follow-up task and say so in one line.
 **Never:** edit code in the primary folder, commit to `main`, push, or merge by
 hand.
 
-Use cheaper models for easy tasks and the lead's model only for shared or hard
-work. Start fresh workers at natural seams, with a short handover note. A message
+Routine lane workers use Sonnet; only hard tasks use Opus. Record the choice
+with `tools/mq/task.sh set <id> model sonnet|opus`. The build, cleanup and shots
+lanes are plain bash and use no model. Start fresh workers at natural seams, with a short handover note. A message
 to a busy worker queues until its turn ends, so don't say a worker has heard
 something until you've checked. A worker waiting silently looks exactly like a
 worker working: workers end their turn to ask for a decision.
