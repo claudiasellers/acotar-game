@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/great_wolf.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"great_wolf"
+display_name = "Great wolf"
+fae = true
+canon = "C"
+body_length = 2.4
+body_height = 1.25
+body_width = 0.55
+coat_color = Color(0.16, 0.16, 0.18, 1)
+belly_color = Color(0.78, 0.75, 0.68, 1)
+eye_color = Color(0.95, 0.78, 0.2, 1)
+eye_glow = 0.6
+walk_speed = 1.4
+run_speed = 12.0
+turn_speed = 4.0
+sight_range = 70.0
+hearing_range = 80.0
+scent_range = 150.0
+max_health = 40.0
+arrow_damage = 10.0
+lethal_arrow_ids = Array[StringName]([&"ash"])
+lethal_delay = 25.0
+only_lethal_kills = true
+stride = 1.3
+print_size = 0.13
+harvest_items = PackedStringArray("obj_wolf_pelt")
+harvest_counts = PackedInt32Array(1)
+model_scene = ExtResource("2")

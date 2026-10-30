@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/wolves/great_wolf.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/great_wolf.tres" id="2"]
+
+[node name="GreatWolf" type="CharacterBody3D"]
+script = ExtResource("1")
+data = ExtResource("2")

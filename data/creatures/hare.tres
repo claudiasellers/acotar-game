@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/hare.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"hare"
+display_name = "Hare"
+canon = "C"
+body_length = 0.5
+body_height = 0.32
+body_width = 0.18
+coat_color = Color(0.78, 0.76, 0.72, 1)
+belly_color = Color(0.92, 0.9, 0.86, 1)
+walk_speed = 0.8
+run_speed = 12.0
+zigzag = 0.9
+sight_range = 30.0
+hearing_range = 40.0
+scent_range = 40.0
+flee_distance = 35.0
+max_health = 4.0
+arrow_damage = 8.0
+stride = 0.5
+print_size = 0.05
+twig_chance = 0.02
+harvest_items = PackedStringArray("ing_hare", "ing_hare_pelt")
+harvest_counts = PackedInt32Array(1, 1)
+model_scene = ExtResource("2")

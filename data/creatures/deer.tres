@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/deer.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"deer"
+display_name = "Deer"
+canon = "C"
+body_length = 1.6
+body_height = 1.0
+body_width = 0.42
+coat_color = Color(0.52, 0.38, 0.25, 1)
+belly_color = Color(0.85, 0.78, 0.66, 1)
+walk_speed = 1.1
+run_speed = 11.0
+sight_range = 50.0
+sight_fov_degrees = 300.0
+hearing_range = 45.0
+scent_range = 80.0
+flee_distance = 70.0
+max_health = 12.0
+arrow_damage = 8.0
+stride = 0.9
+print_size = 0.07
+harvest_items = PackedStringArray("ing_venison", "ing_hide", "ing_sinew")
+harvest_counts = PackedInt32Array(3, 1, 2)
+model_scene = ExtResource("2")

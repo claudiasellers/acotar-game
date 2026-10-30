@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/bird.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"bird"
+display_name = "Winter bird"
+body_plan = 1
+body_length = 0.3
+body_height = 0.25
+body_width = 0.15
+coat_color = Color(0.35, 0.3, 0.26, 1)
+belly_color = Color(0.78, 0.46, 0.32, 1)
+walk_speed = 0.5
+run_speed = 9.0
+sight_range = 25.0
+sight_fov_degrees = 320.0
+hearing_range = 30.0
+scent_range = 0.0
+startle_threshold = 0.35
+flee_distance = 45.0
+max_health = 2.0
+arrow_damage = 8.0
+model_scene = ExtResource("2")

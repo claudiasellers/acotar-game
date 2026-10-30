@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/prey/bird.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/bird.tres" id="2"]
+
+[node name="Bird" type="CharacterBody3D"]
+script = ExtResource("1")
+data = ExtResource("2")

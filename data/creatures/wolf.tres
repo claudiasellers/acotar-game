@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/wolf.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"wolf"
+display_name = "Wolf"
+body_length = 1.5
+body_height = 0.8
+body_width = 0.35
+coat_color = Color(0.45, 0.43, 0.4, 1)
+belly_color = Color(0.7, 0.68, 0.62, 1)
+eye_color = Color(0.75, 0.6, 0.25, 1)
+walk_speed = 1.6
+run_speed = 10.0
+sight_range = 50.0
+hearing_range = 60.0
+scent_range = 120.0
+alert_threshold = 0.2
+startle_threshold = 0.45
+max_health = 20.0
+arrow_damage = 10.0
+stride = 1.0
+print_size = 0.1
+harvest_items = PackedStringArray("ing_wolf_pelt", "ing_sinew")
+harvest_counts = PackedInt32Array(1, 1)
+model_scene = ExtResource("2")
