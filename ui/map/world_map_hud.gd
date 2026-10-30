@@ -9,6 +9,10 @@ class_name WorldMapHud
 extends CanvasLayer
 
 const SAVE_KEY := "world_map"
+# Preloaded rather than global classes, so a stale class cache (an un-imported
+# checkout) still runs.
+const MapPin := preload("res://ui/map/map_pin.gd")
+const PinBeacon := preload("res://ui/map/pin_beacon.gd")
 const PLACES_PATH := "res://data/map/map_places.tres"
 const REVEAL_EVERY := 0.2
 const LOOK_EVERY := 0.25
@@ -23,6 +27,9 @@ const SKETCH_RADIUS := 28.0
 const WORLD_MASK := 1
 
 var reveal: MapReveal = MapReveal.new()
+## The one pin the player set on the full map (never the game's).
+var pin: MapPin = MapPin.new()
+var beacon: PinBeacon
 var places: MapPlaceSet
 ## id -> {label, kind, x, z}
 var seen_landmarks: Dictionary = {}
@@ -45,6 +52,8 @@ var _look_timer: float = 0.0
 var _nodes_timer: float = 0.0
 var _look_cursor: int = 0
 var _paint_thread: Thread
+## Shared with the fallback paint thread: set to stop it on quit.
+var _paint_cancel: Array = [false]
 
 
 func _ready() -> void:
@@ -60,6 +69,8 @@ func _ready() -> void:
 	add_child(minimap)
 	full_map = FullMap.new(self)
 	add_child(full_map)
+	beacon = PinBeacon.new()
+	add_child(beacon)
 	_bind_textures()
 	minimap.visible = MapSettings.minimap_shown()
 	SaveSystem.register_provider(SAVE_KEY, self)
@@ -68,6 +79,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	SaveSystem.unregister_provider(SAVE_KEY)
 	if _paint_thread and _paint_thread.is_started():
+		_paint_cancel[0] = true  # it stops after its current row
 		_paint_thread.wait_to_finish()
 
 
@@ -107,6 +119,13 @@ func _process(delta: float) -> void:
 		return
 	player_xz = Vector2(feyre.global_position.x, feyre.global_position.z)
 	player_angle = _facing(feyre)
+	var in_spring := WorldMap.is_in_prythian(feyre.global_position)
+	if in_spring != MapMarks.pin_in_spring:
+		# Crossing the wall: the beacon takes the new realm's colours.
+		MapMarks.pin_in_spring = in_spring
+		if pin.active:
+			beacon.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
+	_update_pin()
 
 	_reveal_timer -= delta
 	if _reveal_timer <= 0.0:
@@ -124,6 +143,39 @@ func _process(delta: float) -> void:
 		_look_timer = LOOK_EVERY
 		_look_for_landmarks(feyre)
 	_upload_fog()
+
+
+# --- The player's pin -------------------------------------------------------------
+
+## Drops the pin at a world XZ point (the full map calls this).
+func set_pin(at: Vector2) -> void:
+	pin.place(at)
+	_sync_beacon()
+
+
+func clear_pin() -> void:
+	pin.clear()
+	_sync_beacon()
+
+
+func _update_pin() -> void:
+	if not pin.active:
+		return
+	if pin.check_arrival(player_xz):
+		minimap.sparkle()
+		beacon.burst()
+		return
+	beacon.set_distance(player_xz.distance_to(pin.xz))
+
+
+func _sync_beacon() -> void:
+	if not pin.active:
+		beacon.hide_beacon()
+		return
+	var colours := MapMarks.beacon_colours()
+	beacon.set_colours(colours.accent, colours.glow)
+	beacon.show_at(Vector3(pin.xz.x, WorldHeight.height_at(pin.xz.x, pin.xz.y), pin.xz.y))
+	beacon.set_distance(player_xz.distance_to(pin.xz))
 
 
 func _facing(feyre: Node3D) -> float:
@@ -283,7 +335,7 @@ func _load_bake() -> void:
 	blank.fill(MapArt.PAPER)
 	map_texture = ImageTexture.create_from_image(blank)
 	_paint_thread = Thread.new()
-	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false))
+	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false, _paint_cancel))
 	_wait_for_paint.call_deferred()
 	_add_baked_landmarks(MapArt.scatter_landmarks())
 
@@ -307,7 +359,8 @@ func _bind_textures() -> void:
 # --- Save --------------------------------------------------------------------------
 
 func save_state() -> Dictionary:
-	return {"reveal": reveal.save_state(), "landmarks": seen_landmarks.duplicate(true), "places": found.keys()}
+	return {"reveal": reveal.save_state(), "landmarks": seen_landmarks.duplicate(true), "places": found.keys(),
+		"pin": pin.save_state()}
 
 
 func load_state(data: Dictionary) -> void:
@@ -318,5 +371,7 @@ func load_state(data: Dictionary) -> void:
 		found[String(id)] = true
 	for id: String in seen_landmarks.keys():
 		_candidates.erase(id)
+	pin.load_state(data.get("pin"))
+	_sync_beacon()
 	_last_reveal = Vector2.INF
 	_upload_fog()
