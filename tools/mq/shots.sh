@@ -202,8 +202,9 @@ godot_headless() { # log limit godot-args...
 # through the build queue's own levels.sh: the same recipes (generated.conf) and
 # the same machine-wide cache (.git/levelcache) the gate uses, so anything the
 # build lane or an earlier request built is copied in, never rebuilt. Then the
-# request's own prep lines.
-IMPORTABLE='\.(png|jpe?g|webp|svg|tga|bmp|exr|hdr|glb|gltf|bin|obj|fbx|blend|dae|wav|ogg|mp3|ttf|otf|woff2?|import|csv|ktx2?|dds)$'
+# request's own prep lines. Scripts count: a new class_name only reaches the
+# class cache through an import, and without it the scripts using it fail to parse.
+IMPORTABLE='\.(png|jpe?g|webp|svg|tga|bmp|exr|hdr|glb|gltf|bin|obj|fbx|blend|dae|wav|ogg|mp3|ttf|otf|woff2?|import|csv|ktx2?|dds|gd)$'
 prepare() {
 	local log=$RES/logs/prep.log t0 t1 rc g sha last steps="" gens=""
 	t0=$(shots_epoch)

@@ -5,8 +5,10 @@
 #   levels.sh check                           every builder listed, every output ignored
 #   levels.sh fingerprint <name>
 #   levels.sh seed <name> <folder-with-outputs>   put an existing build in the cache
-# ensure, in order: same fingerprint here, nothing to do; in the cache, copy it
-# in; otherwise build it once for the machine, while other worktrees wait.
+# ensure, in order: same fingerprint here with every output on disk, nothing to
+# do; in the cache, copy it in; otherwise build it once for the machine, while
+# other worktrees wait. The stamp lives in the git dir, so a git clean or a
+# deleted output leaves it behind: it only counts if the outputs are still there.
 # MQ_LEVELS_SKIP=name leaves one out, for the gate to build as its own line. It's
 # an environment setting so that a gate.conf using it still works under an older
 # installed copy of this script, which just builds everything.
@@ -69,11 +71,16 @@ store() {
 	mv "$tmp" "$MQ_LEVELCACHE/$name/$fp"
 }
 
+outputs_present() {
+	local o
+	for o in $1; do [ -e "$o" ] || return 1; done
+}
+
 ensure_one() {
 	local name="$1" outs="$2" cmd="$3" inputs="$4" fp stamp lockd log rc
 	fp=$(fingerprint_of "$cmd" "$inputs")
 	stamp="$GITDIR/mq-levels/$name"
-	[ "$(cat "$stamp" 2>/dev/null)" = "$fp" ] && return 0
+	[ "$(cat "$stamp" 2>/dev/null)" = "$fp" ] && outputs_present "$outs" && return 0
 	mkdir -p "$MQ_LEVELCACHE/$name" "$GITDIR/mq-levels"
 	lockd="$MQ_LEVELCACHE/$name/$fp.lock"
 	while :; do

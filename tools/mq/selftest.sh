@@ -755,11 +755,27 @@ case_miss_message() {
 	expect "stdout stays empty on a hit" test ! -s "$ROOT/hit.out"
 }
 
+case_stamp_without_output() {
+	bake_repo restore
+	echo 0 > bake_secs
+	tools/mq/levels.sh ensure 2>/dev/null
+	rm -rf built
+	touch fail_bake
+	tools/mq/levels.sh ensure >"$ROOT/restore.out" 2>"$ROOT/restore.err"
+	expect "a stamped build with its output gone comes back from the cache" cmp built/content bake_input
+	expect "and is not rebuilt" not grep -q '^Building ' "$ROOT/restore.err"
+	rm -rf built "$REPO/.git/levelcache/terrain"
+	rm -f fail_bake
+	tools/mq/levels.sh ensure >"$ROOT/gone.out" 2>"$ROOT/gone.err"
+	expect "gone from the cache too is a true miss, so it builds" grep -q '^Building terrain ' "$ROOT/gone.err"
+	expect "and the output is back" cmp built/content bake_input
+}
+
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check script_uid miss_message; do
+		build_known_red needs_nothing marker_check script_uid miss_message stamp_without_output; do
 	scenario "$c"
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.

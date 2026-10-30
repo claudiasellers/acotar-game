@@ -214,6 +214,10 @@ check "changed art: import runs" 'result G-1 | grep -q "prep ok .*: import [0-9]
 request G 2 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 n=$(grep -c "probe/shot.tscn" "$FAKE_LOG"); once
 check "same code and request: the earlier answer is resent, nothing rendered" 'result G-2 | grep -q "reused from G-1" && result G-2 | grep -qx "request G-2" && [ "$(grep -c "probe/shot.tscn" "$FAKE_LOG")" = "$n" ]'
+(cd "$T/cloud" && echo 'class_name Fresh' >probe/fresh.gd && git add -A && git commit -qm "new class" && git push -q origin HEAD:refs/heads/lane/x) >>"$T/cloud.out" 2>&1
+request K 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
+once
+check "a new script: import runs, so its class_name is known" 'result K-1 | grep -q "prep ok .*: import [0-9]"'
 (cd "$T/cloud" && git rm -q tools/mq/levels.sh && git commit -qm "no queue" && git push -q origin HEAD:refs/heads/lane/x) >>"$T/cloud.out" 2>&1
 request G 3 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
