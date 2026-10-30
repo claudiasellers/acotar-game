@@ -26,6 +26,16 @@ files=$(git diff --name-only --diff-filter=ACMR "$base" "$sha")
 markers=$(git diff "$base" "$sha" --diff-filter=ACMR -- . | grep -E '^\+(<<<<<<< |>>>>>>> |=======$)' | head -3)
 [ -z "$markers" ] || refuse "merge-conflict markers in the change"
 
+# Godot gives every .gd, .gdshader and .gdshaderinc a .uid sidecar on import, and
+# the sidecar is tracked. A script that lands without one makes every later import
+# create an untracked file, and lane.sh then refuses the lane. Checked against the
+# commit's tree, not the disk: cloud commits aren't checked out.
+nouid=""
+for f in $(git diff --no-renames --name-only --diff-filter=A "$base" "$sha" | grep -E '\.(gd|gdshader|gdshaderinc)$' | grep -vE '^(tools/mq/|addons/)'); do
+	git cat-file -e "$sha:$f.uid" 2>/dev/null || nouid="$nouid $f"
+done
+[ -z "$nouid" ] || refuse "new script without its .uid file:$nouid. Run tools/mq/godot.sh --import (or open the project in Godot) so it writes <script>.uid next to each new script, then commit those .uid files with the scripts. Never write a uid by hand."
+
 conf="$MQ_BIN/generated.conf"
 [ -f tools/mq/generated.conf ] && conf=tools/mq/generated.conf
 hits=$(printf '%s\n' "$files" | mq_generated_hits "$conf")

@@ -732,6 +732,18 @@ case_marker_check() {
 	expect "marked is fine" tools/mq/levels.sh check
 }
 
+case_script_uid() {
+	newrepo uid
+	local a b
+	git checkout -q --no-track -b ch/nouid origin/main
+	mkdir sub; echo 'extends Node' > sub/s.gd; git add -A; git commit -q -m nouid
+	a=$(git rev-parse HEAD)
+	echo 'uid://b1234567890ab' > sub/s.gd.uid; git add -A; git commit -q --amend -m withuid
+	b=$(git rev-parse HEAD); git checkout -q --detach origin/main
+	expect "a new script with no .uid is refused" not queue "$a" T1
+	expect "a new script with its .uid is accepted" queue "$b" T2
+}
+
 case_miss_message() {
 	bake_repo missmsg
 	echo 0 > bake_secs
@@ -747,7 +759,7 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check miss_message; do
+		build_known_red needs_nothing marker_check script_uid miss_message; do
 	scenario "$c"
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
