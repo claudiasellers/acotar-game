@@ -114,6 +114,16 @@ func _nearest(nodes: Array) -> Node3D:
 	return best
 
 
+## Story gifts: outfits go to the wardrobe, hairstyles are simply known
+## (all are available), everything else goes in the bags.
 func _on_story_item_granted(item_id: StringName, count: int) -> void:
-	Gameplay.inventory.add(item_id, count)
+	if WardrobeCatalog.piece(item_id):
+		if Gameplay.wardrobe.grant(item_id):
+			Juice.burst(feyre, &"outfit")
+		return
+	if WardrobeCatalog.hair(item_id):
+		Juice.burst(feyre, &"unlock")
+		return
+	if Gameplay.inventory.add(item_id, count) > 0:
+		Juice.burst(feyre, &"unlock")
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())

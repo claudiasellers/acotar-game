@@ -11,6 +11,19 @@ var entries: Dictionary = {}
 ## ingredient id -> Array of learned tag names
 var learned_tags: Dictionary = {}
 var order: Array[String] = []
+## Story truths Feyre has learned (story lane's journal_entry_added), in order.
+var truths: Array[StringName] = []
+
+
+func _init() -> void:
+	Gameplay.listen(&"journal_entry_added", add_truth)
+
+
+func add_truth(entry_id: StringName) -> bool:
+	if truths.has(entry_id):
+		return false
+	truths.append(entry_id)
+	return true
 
 
 ## Records a successful result. Returns true the first time it is made.
@@ -54,7 +67,8 @@ func known_tags(ingredient_id: StringName) -> Array:
 
 
 func save_state() -> Dictionary:
-	return {"entries": entries.duplicate(true), "learned_tags": learned_tags.duplicate(true), "order": order.duplicate()}
+	return {"entries": entries.duplicate(true), "learned_tags": learned_tags.duplicate(true), "order": order.duplicate(),
+		"truths": truths.map(func(t: StringName) -> String: return String(t))}
 
 
 func load_state(data: Dictionary) -> void:
@@ -63,3 +77,6 @@ func load_state(data: Dictionary) -> void:
 	order.clear()
 	for key in data.get("order", []):
 		order.append(String(key))
+	truths.clear()
+	for t in data.get("truths", []):
+		truths.append(StringName(t))

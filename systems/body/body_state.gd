@@ -22,6 +22,22 @@ var cold: float = 0.0
 var exertion: float = 0.0
 
 var element_state: ElementState
+## What magic smells like to her: &"metal" before the glamour lifts (ch5),
+## &"flowers" after (ch23). Senses and forage hints read this.
+var magic_scent: StringName = &""
+
+
+func _ready() -> void:
+	Gameplay.listen(&"story_actor_cue", _on_story_cue)
+
+
+func _on_story_cue(actor: StringName, cue: StringName) -> void:
+	if actor != &"feyre":
+		return
+	if cue == &"smell_metal":
+		magic_scent = &"metal"
+	elif cue == &"smell_flowers":
+		magic_scent = &"flowers"
 
 
 func _physics_process(delta: float) -> void:
@@ -91,13 +107,15 @@ func breath_intensity() -> float:
 
 
 func save_state() -> Dictionary:
-	return {"hunger": hunger, "health": health, "fae_toll": fae_toll, "effects": effects.duplicate(true)}
+	return {"hunger": hunger, "health": health, "fae_toll": fae_toll, "effects": effects.duplicate(true),
+		"magic_scent": String(magic_scent)}
 
 
 func load_state(data: Dictionary) -> void:
 	hunger = float(data.get("hunger", 0.55))
 	health = float(data.get("health", 1.0))
 	fae_toll = float(data.get("fae_toll", 0.0))
+	magic_scent = StringName(data.get("magic_scent", ""))
 	effects.clear()
 	var saved: Dictionary = data.get("effects", {})
 	for tag in saved:

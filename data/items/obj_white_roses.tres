@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"obj_white_roses"
+display_name = "White roses"
+description = "A bundle of white roses."
+weight_class = 1
+craft_tags = Array[StringName]([])
+base_price = 0
+color = Color(0.965, 0.953, 0.925, 1)
+canon = "C?"

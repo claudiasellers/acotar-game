@@ -79,3 +79,20 @@ func test_moving_resets_the_hold() -> void:
 	for i in 8:
 		director.update(0.1, cam, [point], true)
 	assert_false(Gameplay.sketchbook.has(&"sketch_hands"))
+
+
+func test_story_gift_ids_exist() -> void:
+	for id in [&"outfit_solstice_blue_gown", &"outfit_mortal_travel_dress"]:
+		assert_not_null(WardrobeCatalog.piece(id), String(id))
+	assert_not_null(WardrobeCatalog.hair(&"hair_loose_with_flowers"))
+	assert_true(ItemCatalog.has(&"obj_lucien_knife"))
+	assert_true(ItemCatalog.has(&"obj_white_roses"))
+
+
+func test_journal_truths_once_and_saved() -> void:
+	var j := ProofJournal.new()
+	assert_true(j.add_truth(&"treaty_no_loophole"))
+	assert_false(j.add_truth(&"treaty_no_loophole"))
+	var copy := ProofJournal.new()
+	copy.load_state(JSON.parse_string(JSON.stringify(j.save_state())))
+	assert_eq(copy.truths, [&"treaty_no_loophole"] as Array[StringName])

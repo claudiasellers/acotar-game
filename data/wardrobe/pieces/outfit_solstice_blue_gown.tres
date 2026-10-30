@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"outfit_solstice_blue_gown"
+display_name = "Blue solstice gown"
+description = "The gown for the longest day."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"arms", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_solstice.glb"
+color = Color(0.663, 0.776, 0.941, 1)
+warmth = 0.0
+stealth = -0.3
+swift = 0.0
+reaction_tag = &"fae"
+source = &"story"
+phase = 6
+canon = "C?"

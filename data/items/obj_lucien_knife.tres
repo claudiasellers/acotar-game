@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"obj_lucien_knife"
+display_name = "Lucien's knife"
+description = "A fine fae blade, lent and not asked back."
+weight_class = 1
+craft_tags = Array[StringName]([&"blade"])
+base_price = 0
+color = Color(0.722, 0.722, 0.753, 1)
+canon = "C?"

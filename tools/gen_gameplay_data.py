@@ -171,6 +171,8 @@ for _id, _name, _tags, _pig, _regions, _color, _desc in [
 MATERIALS = [
 	dict(id="mat_shaft", name="Arrow shaft", wc=TINY, craft=["shaft"], price=0, color="b08a5a", desc="A straight, scraped hazel shaft."),
 	dict(id="obj_wolf_pelt", name="The great wolf's pelt", wc=LARGE, craft=[], price=40, color="8d8a84", canon="C", desc="Too big for any wolf. It sells for more than she's seen in years."),
+	dict(id="obj_lucien_knife", name="Lucien's knife", wc=SMALL, craft=["blade"], price=0, color="b8b8c0", canon="C?", desc="A fine fae blade, lent and not asked back."),
+	dict(id="obj_white_roses", name="White roses", wc=SMALL, craft=[], price=0, color="f6f3ec", canon="C?", desc="A bundle of white roses."),
 	dict(id="mat_arrowhead", name="Arrowhead", wc=TINY, craft=["arrowhead"], price=1, color="55555c", desc="Knapped flint or a cheap iron head from the market."),
 ]
 
@@ -307,12 +309,14 @@ PIECES = [
 	("rose_choker", "Rose choker", ["neck"], [], {k: PASTELS[k] for k in ("rose", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_choker", ""),
 	("butterfly_mask", "Butterfly mask", ["mask"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_butterfly", "Every revel needs a mask. She isn't cursed to wear one."),
 	("gilded_leaf_mask", "Gilded-leaf mask", ["mask"], [], {"": PASTELS["gold"], "emerald": PASTELS["emerald"]}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_leaf", ""),
+	("outfit_solstice_blue_gown", "Blue solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "a9c6f0"}, 0.0, -0.3, 0, "fae", "story", 6, "C?", "gown_solstice", "The gown for the longest day."),
+	("outfit_mortal_travel_dress", "Travelling dress", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8f8a9e"}, 0.2, 0.0, 0, "formal", "story", 7, "C?", "gown_garden", "A mortal dress for the road home."),
 	("fox_mask", "Fox mask", ["mask"], [], {"": "d9773b"}, 0.0, 0.1, 0, "fae", "calanmai", 5, "C?", "mask_fox", "Like Lucien's, which may be the point."),
 ]
 HAIR = [
 	("braid", "Hunter's braid", "C", False), ("loose", "Loose", "C", False), ("hunters_knot", "Hunter's knot", "X", False),
 	("crown_braid", "Crown braid", "X", False), ("flower_crown_hair", "Solstice flowers", "C?", True), ("half_up", "Half up, ribboned", "X", False),
-	("soft_curls", "Soft curls", "X", False), ("high_ponytail", "High ponytail", "X", False), ("wet", "Wet from the pool", "X", False),
+	("soft_curls", "Soft curls", "X", False), ("hair_loose_with_flowers", "Loose, with flowers", "C?", True), ("high_ponytail", "High ponytail", "X", False), ("wet", "Wet from the pool", "X", False),
 ]
 # id, name, channel, colour, amount, sheen
 MAKEUP = [
