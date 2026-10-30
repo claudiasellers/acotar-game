@@ -50,5 +50,23 @@ while [ "$i" -le "$(mq_config_or MQ_LANES 4)" ]; do
 	i=$((i + 1))
 done
 
+echo "-- standing lanes"
+standing() { # name pid-or-empty worktree
+	local cwd
+	if [ -n "$2" ]; then
+		cwd=$(mq_pid_cwd "$2")
+		printf '  %-8s running  pid %-6s %s\n' "$1" "$2" "${cwd:-$3}"
+	else
+		printf '  %-8s STOPPED  %-10s %s\n' "$1" - "$3"
+	fi
+}
+standing build "$(mq_buildlane_pid)" "$MQ_BUILD"
+standing cleanup "$(mq_cleanup_pid)" "$MQ_LANES_DIR/cleanup"
+if [ -f "$MQ_BIN/shots.sh" ]; then
+	standing shots "$(mq_shots_pid)" "$MQ_LANES_DIR/shots-lane"
+else
+	printf '  %-8s waiting for L05 (shots.sh not on main yet)\n' shots
+fi
+
 echo "-- recent"
 tail -8 "$MQ_DIR/events.log" 2>/dev/null | cut -c1-100

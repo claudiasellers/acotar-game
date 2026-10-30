@@ -141,6 +141,21 @@ mq_buildlane_pid() {
 	[ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && echo "$pid"
 }
 
+# A loop's pid, checked by name because a stale pid can be reused. Never `kill -0`
+# an empty or zero pid: 0 means our own group and always succeeds.
+mq_loop_pid() { # pid-file command-glob
+	local pid
+	pid=$(cat "$1" 2>/dev/null) || return 1
+	[ -n "$pid" ] && [ "$pid" != 0 ] && kill -0 "$pid" 2>/dev/null || return 1
+	case "$(ps -o command= -p "$pid" 2>/dev/null)" in $2) echo "$pid" ;; *) return 1 ;; esac
+}
+
+mq_cleanup_pid() { mq_loop_pid "$MQ_DIR/cleanup.pid" '*cleanup.sh*--loop*'; }
+mq_shots_pid() { mq_loop_pid "$MQ_DIR/shots/lock/pid" '*shots.sh*--loop-here*'; }
+
+# The folder a process is sitting in.
+mq_pid_cwd() { lsof -a -p "$1" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p'; }
+
 # mq_queued_entry SHA: prints the entry file holding SHA, if any.
 mq_queued_entry() {
 	local f
