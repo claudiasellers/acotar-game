@@ -21,8 +21,8 @@ Source frame ranges are on a 30 fps timeline (the sources are keyed at 24 fps).
 |-----------------|-------------|--------------------|--------------|-------|
 | `idle`          | addon       | `Idle_Subtle`      | 1.25-77.5    | loop, 2.53 s |
 | `walk`          | addon       | `Walk_Female`      | 1.25-41.25   | loop, played x1.43 (0.93 s) |
-| `run`           | addon       | `Run_Female`       | 1.25-25      | loop, 0.80 s |
-| `sprint`        | base        | `Sprint`           | 0-25         | loop, played x1.25 (0.67 s) |
+| `run`           | addon       | `Run_Female`       | 1.25-25      | loop, 0.80 s, stride-warped x1.25 (native 5.5 m/s) |
+| `sprint`        | base        | `Sprint`           | 0-25         | loop, played x1.25 (0.67 s), stride-warped x1.38 (native 10.1 m/s) |
 | `jump_start`    | base        | `Jump_Start`       | 1.25-8.25    | crouch and push-off, 0.23 s |
 | `jump_rise`     | base        | `Jump_air`         | 0-24         | ping-pong loop, 1.6 s; arms lowered from the source's level T to her sides, soft elbows, opposite arm swing |
 | `jump_fall`     | base        | `Jump_air`         | 24-48        | airborne, legs reaching down, ping-pong loop, 1.6 s; arms lowered to a balance pose |
