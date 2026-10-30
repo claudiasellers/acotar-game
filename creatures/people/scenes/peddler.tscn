@@ -7,6 +7,6 @@
 script = ExtResource("1")
 npc_id = &"peddler"
 display_name = "Peddler"
-canon = "C?"
+canon = "X"
 model_scene = ExtResource("2")
 wander_radius = 0.0

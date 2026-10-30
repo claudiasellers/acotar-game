@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cik6k0h3efdv3"
-path="res://.godot/imported/sentry_1_true.gltf-612fe364b3f31502b54d680ae7aeb263.scn"
+uid="uid://qvophnx26a6c"
+path="res://.godot/imported/fae_greenbrown_true.gltf-3f48e44daac2f98bd6cf763fdd1bdb70.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/sentry_1_true.gltf"
-dest_files=["res://.godot/imported/sentry_1_true.gltf-612fe364b3f31502b54d680ae7aeb263.scn"]
+source_file="res://creatures/models/people/fae_greenbrown_true.gltf"
+dest_files=["res://.godot/imported/fae_greenbrown_true.gltf-3f48e44daac2f98bd6cf763fdd1bdb70.scn"]
 
 [params]
 

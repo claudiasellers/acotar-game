@@ -7,6 +7,6 @@
 script = ExtResource("1")
 npc_id = &"human_elder"
 display_name = "Old villager"
-canon = "C?"
+canon = "X"
 model_scene = ExtResource("2")
 wander_radius = 2.0

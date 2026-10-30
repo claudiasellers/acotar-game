@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://85wnmls32xui"
-path="res://.godot/imported/servant_maid.gltf-9446a3b62c12c9739d72f376fa3d2d94.scn"
+uid="uid://cds11ijq2fdwr"
+path="res://.godot/imported/reveler_2.gltf-fb85c5283694205553e99bffa6842eb7.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/servant_maid.gltf"
-dest_files=["res://.godot/imported/servant_maid.gltf-9446a3b62c12c9739d72f376fa3d2d94.scn"]
+source_file="res://creatures/models/people/reveler_2.gltf"
+dest_files=["res://.godot/imported/reveler_2.gltf-fb85c5283694205553e99bffa6842eb7.scn"]
 
 [params]
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b42qwnws3abds"
-path="res://.godot/imported/potion_maker.gltf-be8f7e520ce348b0437979bef38555bd.scn"
+uid="uid://bw3gpxud8djw3"
+path="res://.godot/imported/reveler_3.gltf-a6fe2c7dbf911d52ca1640fb1bcac9e7.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/potion_maker.gltf"
-dest_files=["res://.godot/imported/potion_maker.gltf-be8f7e520ce348b0437979bef38555bd.scn"]
+source_file="res://creatures/models/people/reveler_3.gltf"
+dest_files=["res://.godot/imported/reveler_3.gltf-a6fe2c7dbf911d52ca1640fb1bcac9e7.scn"]
 
 [params]
 

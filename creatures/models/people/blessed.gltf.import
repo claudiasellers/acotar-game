@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c1xbo6wv0o7mp"
-path="res://.godot/imported/servant_cook.gltf-d2d35ae558fa94cab09f3ad70b20cc33.scn"
+uid="uid://cgp2dtr34ntvo"
+path="res://.godot/imported/blessed.gltf-8c7743d13ba985aea5040078e59c7344.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/servant_cook.gltf"
-dest_files=["res://.godot/imported/servant_cook.gltf-d2d35ae558fa94cab09f3ad70b20cc33.scn"]
+source_file="res://creatures/models/people/blessed.gltf"
+dest_files=["res://.godot/imported/blessed.gltf-8c7743d13ba985aea5040078e59c7344.scn"]
 
 [params]
 

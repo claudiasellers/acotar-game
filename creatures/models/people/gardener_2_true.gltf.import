@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://yokxst2ftxgw"
-path="res://.godot/imported/sentry_2_true.gltf-b0ba8ef5ee1cb114ab1a918c471d0342.scn"
+uid="uid://7t1w8f2v3vy3"
+path="res://.godot/imported/gardener_2_true.gltf-610c60d09d1b389b4397deb86c06c4fe.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/sentry_2_true.gltf"
-dest_files=["res://.godot/imported/sentry_2_true.gltf-b0ba8ef5ee1cb114ab1a918c471d0342.scn"]
+source_file="res://creatures/models/people/gardener_2_true.gltf"
+dest_files=["res://.godot/imported/gardener_2_true.gltf-610c60d09d1b389b4397deb86c06c4fe.scn"]
 
 [params]
 

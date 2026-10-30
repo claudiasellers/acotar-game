@@ -243,6 +243,23 @@ def mask(head, hr, p, parts):
     if not p.get("mask"):
         return
     gold = mat("Mask", p["mask"], 0.3, metal=0.85)
+    style = p.get("mask_style", "leaves")
+    if style == "bird":
+        # Alis's brass bird mask (keeper, ch24): a beaked half-face.
+        parts.append(blob("Mask", head + Vector((0, hr * 0.66, hr * 0.14)), hr * 0.8, gold, (0.98, 0.42, 0.36), 14))
+        parts.append(base.cone("Beak", head + Vector((0, hr * 0.98, hr * 0.02)), head + Vector((0, hr * 1.45, -hr * 0.12)), hr * 0.16, gold, 8))
+        for side in (-1, 1):
+            parts.append(blob(f"Crest{side}", head + Vector((side * hr * 0.35, hr * 0.5, hr * 0.55)), hr * 0.22, gold, (0.4, 0.3, 1.0), 8))
+        return
+    if style == "insect":
+        # The gardeners' insect masks: glossy compound eyes and antennae.
+        eye = mat("CompoundEye", p.get("mask_eye", (0.25, 0.55, 0.45)), 0.15, metal=0.4)
+        parts.append(blob("Mask", head + Vector((0, hr * 0.66, hr * 0.14)), hr * 0.8, gold, (0.98, 0.42, 0.4), 14))
+        for side in (-1, 1):
+            parts.append(blob(f"CompoundEye{side}", head + Vector((side * hr * 0.42, hr * 0.92, hr * 0.12)), hr * 0.3, eye, (1.0, 0.7, 1.0), 10))
+            parts.append(base.cone(f"Antenna{side}", head + Vector((side * hr * 0.25, hr * 0.7, hr * 0.6)),
+                                   head + Vector((side * hr * 0.6, hr * 0.9, hr * 1.6)), hr * 0.05, gold, 5))
+        return
     parts.append(blob("Mask", head + Vector((0, hr * 0.66, hr * 0.14)), hr * 0.8, gold, (0.98, 0.42, 0.36), 14))
     for side in (-1, 1):
         for i in range(2):
@@ -377,6 +394,21 @@ def extras(head, hr, H, p, parts):
             x = 0.3 * s
             parts.append(base.cone("Shaft", (x, 0.12 * s, 0.0), (x, 0.12 * s, H * 1.12), 0.018 * s, wood, 6))
             parts.append(base.cone("Blade", (x, 0.12 * s, H * 1.08), (x, 0.12 * s, H * 1.22), 0.035 * s, steel, 6))
+        elif kind == "blur":
+            # Glamoured faces blur into colour when Feyre tries to focus (ch20).
+            haze = mat("Blur", p.get("blur", (0.95, 0.75, 0.85)), 0.2, emit=0.4)
+            haze.blend_method = "BLEND"
+            haze.node_tree.nodes["Principled BSDF"].inputs["Alpha"].default_value = 0.55
+            parts.append(blob("Blur", head + Vector((0, hr * 0.25, 0)), hr * 1.35, haze, (1.0, 1.0, 1.05), 12))
+        elif kind == "bells":
+            silver = mat("Silver", (0.85, 0.86, 0.9), 0.2, metal=1.0)
+            for i in range(5):
+                a = -0.8 + i * 0.4
+                parts.append(base.sphere(f"Bell{i}", (math.sin(a) * 0.17 * s, math.cos(a) * 0.12 * s, H * 0.58), 0.02 * s, silver, 8))
+            parts.append(lathe("Circlet", [(H * 0.08 * 0.62, H * 0.93), (H * 0.08 * 0.66, H * 0.94)], silver, 16))
+        elif kind == "iron_charm":
+            iron = mat("Iron", (0.3, 0.3, 0.32), 0.5, metal=0.8)
+            parts.append(base.sphere("Charm", (0, 0.13 * s, H * 0.72), 0.022 * s, iron, 8))
         elif kind == "basket":
             wicker = mat("Wicker", (0.72, 0.56, 0.32), 0.9)
             parts.append(lathe("Basket", [(0.07 * s, H * 0.4), (0.12 * s, H * 0.48), (0.12 * s, H * 0.5)], wicker, 14))
@@ -414,12 +446,13 @@ def look(design, **overrides):
 # looks are what Feyre sees before the glamour lifts (keeper: lifted ch23).
 
 SPRING_MASK = (0.92, 0.78, 0.42)
+BRASS = (0.78, 0.6, 0.3)
 
 CAST = {
     # --- the manor household
-    "alis": {"height": 1.62, "skin": (0.56, 0.40, 0.27), "skin_rough": 0.95, "cloth": (0.42, 0.52, 0.34),
+    "alis": {"mask_style": "bird", "build": 1.3, "height": 1.42, "skin": (0.56, 0.40, 0.27), "skin_rough": 0.95, "cloth": (0.42, 0.52, 0.34),
              "apron": (0.93, 0.9, 0.82), "outfit": "dress", "hair": (0.32, 0.22, 0.13), "hair_style": "bun",
-             "eyes": (0.45, 0.3, 0.15), "extras": ["bark", "leaves"], "leaf": (0.5, 0.65, 0.32), "mask": SPRING_MASK,
+             "eyes": (0.45, 0.3, 0.15), "extras": ["bark", "leaves"], "leaf": (0.5, 0.65, 0.32), "mask": BRASS,
              "cheeks": False},
     "servant_maid": {"height": 1.66, "skin": (0.62, 0.78, 0.60), "cloth": (0.55, 0.68, 0.82), "apron": (0.97, 0.95, 0.9),
                      "outfit": "dress", "hair": (0.95, 0.88, 0.62), "hair_style": "braid", "ears": "long",
@@ -437,14 +470,39 @@ CAST = {
     "potion_maker": {"height": 1.6, "skin": (0.75, 0.66, 0.52), "cloth": (0.32, 0.36, 0.52), "trim": (0.85, 0.7, 0.4),
                      "outfit": "robe", "hair": (0.68, 0.6, 0.5), "hair_style": "tall", "eyes": (0.95, 0.75, 0.25),
                      "eye_glow": 0.4, "extras": ["feathers", "vials"], "mask": SPRING_MASK},
-    # --- the sentries [X]: Tamlin's warriors at the borders
-    "sentry_1": {"height": 1.92, "build": 1.15, "skin": (0.82, 0.68, 0.55), "cloth": (0.55, 0.62, 0.48), "trim": (0.75, 0.62, 0.38),
+    # --- the sentries [X]: High Fae of the court, masked; only Tamlin shifts
+    # shape (keeper), so no beast features. Mostly away at the border.
+    "sentry_1": {"height": 1.92, "build": 1.15, "skin": (0.88, 0.74, 0.62), "cloth": (0.55, 0.62, 0.48), "trim": (0.75, 0.62, 0.38),
                  "outfit": "armor", "cloak": (0.3, 0.42, 0.26), "legs": (0.3, 0.28, 0.22), "hair": (0.3, 0.18, 0.1),
-                 "hair_style": "short", "extras": ["spear", "horns"], "horn": (0.4, 0.35, 0.3), "mask": (0.5, 0.55, 0.4)},
+                 "hair_style": "short", "extras": ["spear"], "mask": (0.5, 0.55, 0.4)},
     "sentry_2": {"height": 1.88, "build": 1.1, "skin": (0.92, 0.84, 0.74), "cloth": (0.6, 0.6, 0.58), "trim": (0.85, 0.75, 0.45),
                  "outfit": "armor", "cloak": (0.45, 0.25, 0.2), "legs": (0.3, 0.28, 0.22), "hair": (0.85, 0.5, 0.25),
-                 "hair_style": "short", "ears": "fox", "extras": ["spear", "tail"], "tail_tip": (0.98, 0.96, 0.92),
-                 "mask": (0.5, 0.55, 0.4)},
+                 "hair_style": "braid", "extras": ["spear"], "mask": (0.5, 0.55, 0.4)},
+    # --- the gardeners (keeper, ch24): insect masks, iridescent buzzing wings
+    "gardener_1": {"height": 1.7, "skin": (0.55, 0.62, 0.42), "cloth": (0.42, 0.5, 0.36), "apron": (0.62, 0.5, 0.36),
+                   "outfit": "tunic", "legs": (0.38, 0.32, 0.24), "hair": (0.3, 0.25, 0.15), "hair_style": "short",
+                   "mask": (0.3, 0.45, 0.32), "mask_style": "insect", "mask_eye": (0.3, 0.75, 0.6),
+                   "extras": ["wings", "basket"], "wing": (0.75, 0.95, 0.9)},
+    "gardener_2": {"height": 1.58, "skin": (0.5, 0.42, 0.3), "cloth": (0.6, 0.5, 0.3), "outfit": "dress",
+                   "apron": (0.85, 0.8, 0.6), "hair": (0.4, 0.5, 0.25), "hair_style": "bun",
+                   "mask": (0.55, 0.42, 0.2), "mask_style": "insect", "mask_eye": (0.75, 0.45, 0.85),
+                   "extras": ["wings"], "wing": (0.9, 0.82, 1.0)},
+    # --- the green-and-brown, long-limbed kinds Feyre sees in the halls (unnamed)
+    "fae_greenbrown": {"height": 1.85, "build": 0.85, "limb": 0.8, "hands": 1.5, "skin": (0.45, 0.55, 0.32), "skin_rough": 0.9,
+                       "cloth": (0.5, 0.38, 0.24), "outfit": "robe", "hair": (0.32, 0.24, 0.14), "hair_style": "long",
+                       "ears": "long", "mask": SPRING_MASK, "extras": ["leaves"], "leaf": (0.55, 0.62, 0.3)},
+    "fae_longlimb": {"height": 2.15, "build": 0.75, "limb": 0.75, "hands": 1.8, "skin": (0.52, 0.42, 0.3), "skin_rough": 0.9,
+                     "cloth": (0.36, 0.48, 0.34), "outfit": "tunic", "legs": (0.3, 0.26, 0.2), "hair": (0.2, 0.3, 0.16),
+                     "hair_style": "tall", "mask": SPRING_MASK},
+    # --- the Calanmai crowd (keeper, ch20): masked Spring High Fae whose faces
+    # blur into colour when Feyre tries to focus
+    "reveler_1": {"height": 1.8, "skin": (0.95, 0.85, 0.78), "cloth": (0.96, 0.66, 0.75), "outfit": "gown", "hair": (0.55, 0.3, 0.2),
+                  "hair_style": "long", "mask": SPRING_MASK, "extras": ["blur", "flowers"], "blur": (0.98, 0.7, 0.8)},
+    "reveler_2": {"height": 1.9, "skin": (0.88, 0.74, 0.62), "cloth": (0.4, 0.58, 0.45), "trim": (0.92, 0.8, 0.45), "outfit": "tunic",
+                  "legs": (0.85, 0.82, 0.74), "hair": (0.2, 0.15, 0.1), "hair_style": "short", "mask": (0.75, 0.82, 0.9),
+                  "mask_style": "bird", "extras": ["blur"], "blur": (0.75, 0.8, 1.0)},
+    "reveler_3": {"height": 1.76, "skin": (0.8, 0.64, 0.5), "cloth": (0.78, 0.66, 0.92), "outfit": "gown", "hair": (0.95, 0.88, 0.6),
+                  "hair_style": "braid", "mask": SPRING_MASK, "extras": ["blur"], "blur": (0.85, 0.75, 1.0)},
     # --- Calanmai's three (story ids high_fae_male, _2, _3): lesser faeries,
     # beautiful and wrong. Black eyes, pointed teeth, too-long pale hands.
     "calanmai_1": {"height": 2.08, "build": 0.85, "skin": (0.88, 0.88, 0.9), "cloth": (0.14, 0.16, 0.22), "trim": (0.6, 0.62, 0.7),
@@ -488,30 +546,32 @@ CAST = {
     "human_woman": {"height": 1.62, "skin": (0.93, 0.80, 0.70), "cloth": (0.45, 0.38, 0.32), "outfit": "dress",
                     "shawl": (0.55, 0.3, 0.25), "hair": (0.4, 0.28, 0.18), "hair_style": "bun", "ears": "round"},
     "human_man": {"height": 1.75, "skin": (0.88, 0.74, 0.62), "cloth": (0.38, 0.36, 0.32), "outfit": "tunic", "legs": (0.3, 0.27, 0.24),
-                  "hair": (0.3, 0.22, 0.15), "hair_style": "short", "beard": True, "ears": "round", "extras": ["hat"]},
+                  "hair": (0.3, 0.22, 0.15), "hair_style": "short", "beard": True, "ears": "round", "extras": ["hat", "iron_charm"]},
     "human_elder": {"height": 1.55, "build": 0.95, "skin": (0.9, 0.78, 0.7), "cloth": (0.32, 0.3, 0.35), "outfit": "dress",
                     "shawl": (0.4, 0.42, 0.5), "hair": (0.85, 0.85, 0.85), "hair_style": "bun", "ears": "round",
-                    "extras": ["hood", "basket"], "hood": (0.4, 0.42, 0.5)},
+                    "extras": ["hood", "basket", "iron_charm"], "hood": (0.4, 0.42, 0.5)},
     "human_youth": {"height": 1.7, "build": 0.9, "skin": (0.78, 0.6, 0.48), "cloth": (0.42, 0.45, 0.38), "outfit": "tunic",
                     "legs": (0.32, 0.28, 0.24), "hair": (0.12, 0.1, 0.08), "hair_style": "short", "ears": "round"},
+    # The Children of the Blessed (keeper): pale blue robes, silver jewellery and
+    # bells, moon-white hands.
+    "blessed": {"height": 1.72, "skin": (0.97, 0.95, 0.94), "cloth": (0.68, 0.78, 0.92), "trim": (0.85, 0.86, 0.9),
+                "trim_metal": 1.0, "outfit": "robe", "hair": (0.75, 0.72, 0.68), "hair_style": "long", "ears": "round",
+                "extras": ["bells", "hood"], "hood": (0.7, 0.8, 0.94), "cheeks": False},
     "peddler": {"height": 1.7, "build": 1.05, "skin": (0.86, 0.72, 0.6), "cloth": (0.45, 0.32, 0.4), "trim": (0.85, 0.7, 0.35),
                 "outfit": "robe", "hair": (0.5, 0.45, 0.4), "hair_style": "short", "beard": True, "ears": "round",
                 "extras": ["pack", "hat"], "hat": (0.35, 0.25, 0.3)},
 }
 
-# What Feyre sees before the glamour lifts: the household as masked,
-# High-Fae-smooth figures with no bark, horns, wings or caps. [X] pending keeper.
+# What Feyre sees before the glamour lifts (keeper, ch24): Alis fair, plump
+# and High-Fae-like in the same brass bird mask; the rest of the household is
+# simply not there (the house seems near-empty), so they get only a true form.
 GLAMOUR_HIDES = ("bark", "leaves", "horns", "antlers", "wings", "tail", "mushroom", "quills", "scales", "feathers", "thorns")
 GLAMOURED = {
-    "alis": {"skin": (0.9, 0.78, 0.66), "skin_rough": 0.6, "cheeks": True},
-    "servant_maid": {"skin": (0.94, 0.82, 0.74), "ears": "pointed"},
-    "servant_footman": {"skin": (0.9, 0.78, 0.7)},
-    "servant_cook": {"skin": (0.9, 0.76, 0.66), "hair_style": "bun"},
-    "seamstress": {"skin": (0.94, 0.84, 0.8)},
-    "potion_maker": {"skin": (0.88, 0.76, 0.64), "eye_glow": 0.0, "eyes": (0.35, 0.3, 0.2)},
-    "sentry_1": {},
-    "sentry_2": {"ears": "pointed"},
+    "alis": {"height": 1.6, "build": 1.3, "skin": (0.95, 0.84, 0.76), "skin_rough": 0.6, "cheeks": True,
+             "hair": (0.75, 0.55, 0.32)},
 }
+UNSEEN = ("servant_maid", "servant_footman", "servant_cook", "seamstress", "potion_maker", "gardener_1", "gardener_2",
+          "fae_greenbrown", "fae_longlimb")
 
 
 def glamoured(name):
@@ -527,6 +587,8 @@ if __name__ == "__main__":
             continue
         if name in GLAMOURED:
             build(name, glamoured(name))
+            build(f"{name}_true", design)
+        elif name in UNSEEN:
             build(f"{name}_true", design)
         else:
             build(name, design)

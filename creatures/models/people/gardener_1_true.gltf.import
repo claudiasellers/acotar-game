@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cdwiryo11p0v8"
-path="res://.godot/imported/servant_footman.gltf-ba3addd70db4a3618329bda5e723af67.scn"
+uid="uid://3ntu352krvmr"
+path="res://.godot/imported/gardener_1_true.gltf-5695871e6f9175db94d558dec6720d72.scn"
 
 [deps]
 
-source_file="res://creatures/models/people/servant_footman.gltf"
-dest_files=["res://.godot/imported/servant_footman.gltf-ba3addd70db4a3618329bda5e723af67.scn"]
+source_file="res://creatures/models/people/gardener_1_true.gltf"
+dest_files=["res://.godot/imported/gardener_1_true.gltf-5695871e6f9175db94d558dec6720d72.scn"]
 
 [params]
 

@@ -13,13 +13,21 @@ OUT = os.path.join(ROOT, "creatures", "people", "scenes")
 # id: (display name, canon, wander radius)
 PEOPLE = {
     "alis": ("Alis", "C", 0.0),
+    # Unseen until the glamour lifts (keeper, ch24): true form only.
     "servant_maid": ("Maid", "C?", 3.0),
     "servant_footman": ("Footman", "C?", 0.0),
     "servant_cook": ("Cook", "C?", 2.0),
-    "seamstress": ("Seamstress", "C?", 1.5),
-    "potion_maker": ("Potion-maker", "C?", 1.5),
-    "sentry_1": ("Sentry", "X", 0.0),
-    "sentry_2": ("Sentry", "X", 0.0),
+    "gardener_1": ("Gardener", "C", 4.0),
+    "gardener_2": ("Gardener", "C", 4.0),
+    "fae_greenbrown": ("Faerie", "C?", 3.0),
+    "fae_longlimb": ("Faerie", "C?", 3.0),
+    "seamstress": ("Seamstress", "X", 1.5),
+    "potion_maker": ("Potion-maker", "X", 1.5),
+    "sentry_1": ("Sentry", "C?", 0.0),
+    "sentry_2": ("Sentry", "C?", 0.0),
+    "reveler_1": ("Reveller", "C", 2.0),
+    "reveler_2": ("Reveller", "C", 2.0),
+    "reveler_3": ("Reveller", "C", 2.0),
     "fae_dryad": ("Dryad", "X", 4.0),
     "fae_mushroom": ("Toadstool faerie", "X", 3.0),
     "fae_moth": ("Moth faerie", "X", 4.0),
@@ -32,25 +40,30 @@ PEOPLE = {
     "fae_satyr": ("Satyr", "X", 4.0),
     "fae_rose": ("Rose faerie", "X", 3.0),
     "fae_owl": ("Owl faerie", "X", 2.0),
-    "human_woman": ("Villager", "C?", 4.0),
-    "human_man": ("Villager", "C?", 4.0),
-    "human_elder": ("Old villager", "C?", 2.0),
-    "human_youth": ("Villager", "C?", 5.0),
-    "peddler": ("Peddler", "C?", 0.0),
+    "human_woman": ("Villager", "X", 4.0),
+    "human_man": ("Villager", "X", 4.0),
+    "human_elder": ("Old villager", "X", 2.0),
+    "human_youth": ("Villager", "X", 5.0),
+    "blessed": ("Child of the Blessed", "C", 1.0),
+    "peddler": ("Peddler", "X", 0.0),
 }
 
 
 def scene(pid, name, canon, wander):
     true = os.path.exists(os.path.join(MODELS, f"{pid}_true.gltf"))
-    steps = 4 if true else 3
+    seen = os.path.exists(os.path.join(MODELS, f"{pid}.gltf"))
+    steps = 2 + int(true) + int(seen)
     lines = [f"[gd_scene load_steps={steps} format=3]", "",
-             '[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]',
-             f'[ext_resource type="PackedScene" path="res://creatures/models/people/{pid}.gltf" id="2"]']
+             '[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]']
+    if seen:
+        lines.append(f'[ext_resource type="PackedScene" path="res://creatures/models/people/{pid}.gltf" id="2"]')
     if true:
         lines.append(f'[ext_resource type="PackedScene" path="res://creatures/models/people/{pid}_true.gltf" id="3"]')
     node = "".join(w.capitalize() for w in pid.split("_"))
     lines += ["", f'[node name="{node}" type="Node3D"]', 'script = ExtResource("1")', f'npc_id = &"{pid}"',
-              f'display_name = "{name}"', f'canon = "{canon}"', 'model_scene = ExtResource("2")']
+              f'display_name = "{name}"', f'canon = "{canon}"']
+    if seen:
+        lines.append('model_scene = ExtResource("2")')
     if true:
         lines.append('true_model_scene = ExtResource("3")')
     lines.append(f"wander_radius = {wander}")

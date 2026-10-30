@@ -3,12 +3,14 @@ extends GutTest
 ## models; those with a hidden shape swap to it when the glamour lifts;
 ## 12 distinct lesser-fae designs; spawned NPCs keep their placed home.
 
-const IDS := ["alis", "servant_maid", "servant_footman", "servant_cook", "seamstress", "potion_maker",
-	"sentry_1", "sentry_2", "fae_dryad", "fae_mushroom", "fae_moth", "fae_fox", "fae_stag", "fae_nymph",
-	"fae_birch", "fae_hedgehog", "fae_pixie", "fae_satyr", "fae_rose", "fae_owl",
-	"human_woman", "human_man", "human_elder", "human_youth", "peddler"]
-const GLAMOURED := ["alis", "servant_maid", "servant_footman", "servant_cook", "seamstress", "potion_maker",
-	"sentry_1", "sentry_2"]
+const IDS := ["alis", "servant_maid", "servant_footman", "servant_cook", "gardener_1", "gardener_2",
+	"fae_greenbrown", "fae_longlimb", "seamstress", "potion_maker", "sentry_1", "sentry_2",
+	"reveler_1", "reveler_2", "reveler_3", "fae_dryad", "fae_mushroom", "fae_moth", "fae_fox", "fae_stag",
+	"fae_nymph", "fae_birch", "fae_hedgehog", "fae_pixie", "fae_satyr", "fae_rose", "fae_owl",
+	"human_woman", "human_man", "human_elder", "human_youth", "blessed", "peddler"]
+## Keeper, ch24: before the glamour lifts the house seems near-empty.
+const UNSEEN := ["servant_maid", "servant_footman", "servant_cook", "gardener_1", "gardener_2",
+	"fae_greenbrown", "fae_longlimb", "seamstress", "potion_maker"]
 
 
 func before_each() -> void:
@@ -21,27 +23,35 @@ func _npc(id: String) -> CourtNpc:
 	return npc
 
 
-func test_every_person_loads_a_model() -> void:
+func test_every_person_has_a_model_once_the_glamour_lifts() -> void:
+	WorldState.set_flag(GlamourLayer.FLAG, true)
 	for id in IDS:
 		var npc := _npc(id)
 		assert_not_null(npc.current_model(), id)
 		assert_eq(npc.npc_id, StringName(id))
 
 
-func test_twelve_lesser_fae_designs() -> void:
-	assert_eq(IDS.filter(func(i: String) -> bool: return i.begins_with("fae_")).size(), 12)
+func test_twelve_village_fae_designs() -> void:
+	var village := ["fae_dryad", "fae_mushroom", "fae_moth", "fae_fox", "fae_stag", "fae_nymph",
+		"fae_birch", "fae_hedgehog", "fae_pixie", "fae_satyr", "fae_rose", "fae_owl"]
+	for id in village:
+		assert_has(IDS, id)
+	assert_eq(village.size(), 12)
 
 
-func test_glamour_lift_swaps_to_the_true_form() -> void:
-	for id in GLAMOURED:
+func test_household_is_unseen_until_the_glamour_lifts() -> void:
+	for id in UNSEEN:
 		var npc := _npc(id)
-		assert_not_null(npc.true_layer, "%s has a true form" % id)
-		assert_eq(npc.current_model().get_parent(), npc.glamoured_layer)
+		assert_null(npc.current_model(), "%s is not seen yet" % id)
+	var alis := _npc("alis")
+	var before := alis.current_model()
+	assert_not_null(before, "Alis is seen from the start")
 	WorldState.set_flag(GlamourLayer.FLAG, true)
+	assert_ne(alis.current_model(), before, "her bark-skinned true form")
 	for node in get_tree().get_nodes_in_group(CourtNpc.GROUP):
 		var npc := node as CourtNpc
-		if npc.true_layer:
-			assert_eq(npc.current_model().get_parent(), npc.true_layer, "%s shows its true form" % npc.npc_id)
+		if String(npc.npc_id) in UNSEEN:
+			assert_not_null(npc.current_model(), "%s appears" % npc.npc_id)
 
 
 func test_spawned_npc_wanders_round_its_placed_home() -> void:

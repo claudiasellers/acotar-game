@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/people/court_npc.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/people/fae_longlimb_true.gltf" id="3"]
+
+[node name="FaeLonglimb" type="Node3D"]
+script = ExtResource("1")
+npc_id = &"fae_longlimb"
+display_name = "Faerie"
+canon = "C?"
+true_model_scene = ExtResource("3")
+wander_radius = 3.0

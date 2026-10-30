@@ -12,6 +12,7 @@ const GROUP := &"court_npc"
 @export var display_name: String = ""
 @export var canon: String = "X"
 ## What Feyre sees (before the glamour lifts, if there is a true form).
+## Empty with a true form: unseen until the glamour lifts, only a ripple.
 @export var model_scene: PackedScene
 ## The shape under the glamour. Empty: the same either way.
 @export var true_model_scene: PackedScene
@@ -53,6 +54,22 @@ func _layer(which: GlamourLayer.Layer, scene: PackedScene) -> GlamourLayer:
 		var m := scene.instantiate() as Node3D
 		m.name = "Model"
 		layer.add_child(m)
+	elif which == GlamourLayer.Layer.GLAMOURED:
+		# Unseen before the glamour lifts (the house seems near-empty): at most
+		# a ripple in the air at the edge of sight.
+		var ripple := MeshInstance3D.new()
+		ripple.name = "Ripple"
+		var capsule := CapsuleMesh.new()
+		capsule.radius = 0.28
+		capsule.height = 1.75
+		ripple.mesh = capsule
+		ripple.position.y = 0.9
+		var mat := ShaderMaterial.new()
+		mat.shader = preload("res://creatures/ambient/unseen_shimmer.gdshader")
+		mat.set_shader_parameter(&"strength", 0.18)
+		ripple.material_override = mat
+		ripple.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		layer.add_child(ripple)
 	add_child(layer)
 	return layer
 
