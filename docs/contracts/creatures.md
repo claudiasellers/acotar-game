@@ -28,7 +28,7 @@ Owner: creatures lane (`creatures/`, `data/creatures/`, `tools/blender/creatures
 - `Creature.on_arrow_hit(arrow)`, `Creature.die(cause)`, signals `wounded(cause)`, `died(cause)`. `scripted = true` pauses the brain.
 - `Harvestable.harvest() -> Array[{item_id: StringName, qty: int}]` (once), `Harvestable.nearest(tree, pos, reach)`.
 - `TrackLayer.leave(tree, kind, pos, heading, size)`; `marks_near(pos, radius)`.
-- `GreatWolf`: `looked_at_player`, `took_prey(prey)`; export `kill_flag` (empty in the game; the story lane owns `wolf_killed`).
+- `GreatWolf`: `took_prey(prey)` (he never notices Feyre; `look_at_feyre` is ignored); export `kill_flag` (empty in the game; the story lane owns `wolf_killed`).
 - `BeastActor`: `begin_approach(door)`, `break_door()`, `hold_presence()`, `loom(pos)`, `speak()`, `lead(pos)`, `withdraw()`, `pressure_at(pos) -> float` (0 beyond 18 m).
 - `FamilyMember.set_scripted(bool)`, `go_to(pos)`.
 - `StorySpawner` (add one to any scene hosting a story beat) answers `story_spawn_requested` for `great_wolf`, `doe`, `deer`, `hare`, `wolf`, `tamlin_beast`.
