@@ -101,7 +101,13 @@ See `tools/mq/` and `tools/mq/selftest.sh` for the rules they keep.
 - World smoke: `tools/mq/godot.sh -s tools/world_smoke.gd`, about 3.5 minutes. The
   build lane runs it; a lane shouldn't.
 - The gate is `tools/mq/gate.conf`. Test files are found at run time, so adding
-  one needs no gate edit. The whole gate takes about 4 minutes at 4 jobs.
+  one needs no gate edit. A batch that skips world_smoke takes about 30 seconds;
+  one that runs it takes about 4 minutes. world_smoke runs when `world/` or
+  `data/regions/` change. The idle full gate runs everything.
+- A test that loads World (`world.tscn` or `act1_game.tscn`) carries a
+  `# gate: needs:terrain` comment, so it waits for the terrain bake.
+  `levels.sh check` catches a direct reference. A test that reaches World
+  indirectly is not caught: its writer has to mark it.
 - Built files are recipes in `tools/mq/generated.conf`, rebuilt by
   `tools/mq/levels.sh ensure`. The terrain bake takes about 14 minutes and is
   cached in `.git/levelcache/`. Never commit or hand-edit built files, including
