@@ -1,0 +1,100 @@
+[gd_resource type="Resource" script_class="ManorHouseLayout" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_anchor_def.gd" id="1_5s0ho"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_door_def.gd" id="2_rt5gq"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_roof_def.gd" id="3_tstf1"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_room_def.gd" id="4_wurfe"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_house_layout.gd" id="5_ax1b4"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_secret_def.gd" id="6_toevd"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_stair_def.gd" id="7_j50p1"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_station_def.gd" id="8_v0mxj"]
+
+[sub_resource type="Resource" id="Resource_vcxrc"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"feyre_bedroom_window"
+level = 1
+position = Vector3(23, 0, -70.4)
+
+[sub_resource type="Resource" id="Resource_wgh2y"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_dining_table"
+position = Vector3(21, 0, -31.5)
+
+[sub_resource type="Resource" id="Resource_r4qno"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_gallery"
+position = Vector3(13, 0, -56)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_ok1e1"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_infirmary"
+position = Vector3(65.5, 0, -37.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_jjg17"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_kitchen_hall"
+position = Vector3(46, 0, -51)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_bhcsb"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_study_mural"
+position = Vector3(-15, 0, -61)
+
+[sub_resource type="Resource" id="Resource_l83hx"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_tamlin_room"
+level = 1
+position = Vector3(33, 0, -39)
+
+[sub_resource type="Resource" id="Resource_xnv8d"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_window_hide"
+position = Vector3(7, 0, -30.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_vcvo1"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"painting_room_easel"
+level = 1
+position = Vector3(16, 0, -30.3)
+
+[sub_resource type="Resource" id="Resource_77poq"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"manor_alis_hiding"
+position = Vector3(50, 0, -57)
+
+[sub_resource type="Resource" id="Resource_lgnci"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"hall_mark_1"
+position = Vector3(4, 0, -31)
+
+[sub_resource type="Resource" id="Resource_i4ofx"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"hall_mark_2"
+position = Vector3(7, 0, -38)
+
+[sub_resource type="Resource" id="Resource_upbd2"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"hall_mark_3"
+position = Vector3(7, 0, -56)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_imxvf"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"hall_mark_4"
+position = Vector3(52, 0, -51)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_h8gjn"]
+script = ExtResource("1_5s0ho")
+anchor_id = &"hall_mark_5"
+position = Vector3(62, 0, -51)
+yaw_deg = -90.0
+
+[resource]
+script = ExtResource("5_ax1b4")
+part_id = &"anchors"
+anchors = Array[ExtResource("1_5s0ho")]([SubResource("Resource_vcxrc"), SubResource("Resource_wgh2y"), SubResource("Resource_r4qno"), SubResource("Resource_ok1e1"), SubResource("Resource_jjg17"), SubResource("Resource_bhcsb"), SubResource("Resource_l83hx"), SubResource("Resource_xnv8d"), SubResource("Resource_vcvo1"), SubResource("Resource_77poq"), SubResource("Resource_lgnci"), SubResource("Resource_i4ofx"), SubResource("Resource_upbd2"), SubResource("Resource_imxvf"), SubResource("Resource_h8gjn")])

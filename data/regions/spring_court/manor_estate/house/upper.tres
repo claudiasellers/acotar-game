@@ -1,0 +1,4431 @@
+[gd_resource type="Resource" script_class="ManorHouseLayout" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_door_def.gd" id="1_ktsxu"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_roof_def.gd" id="2_mi00i"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_room_def.gd" id="3_aa53f"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_prop_placement.gd" id="4_lkcle"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_house_layout.gd" id="5_3s14m"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_secret_def.gd" id="6_igwsw"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_stair_def.gd" id="7_odi2x"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_station_def.gd" id="8_7cfpy"]
+
+[sub_resource type="Resource" id="Resource_qn044"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(42, -50)
+width = 2.0
+
+[sub_resource type="Resource" id="Resource_bj3a1"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-42, -50)
+width = 2.4
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_pmegs"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(0, -62)
+width = 3.0
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_kioro"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(0, -38)
+width = 2.4
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_7yhkj"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-8, -50)
+width = 2.4
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_4k1lx"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(8, -50)
+width = 2.4
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_gg8nl"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-8, -68)
+width = 2.0
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_12j1i"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(8, -67)
+
+[sub_resource type="Resource" id="Resource_c2p6l"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(16, -67)
+
+[sub_resource type="Resource" id="Resource_f3ule"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(15, -62)
+
+[sub_resource type="Resource" id="Resource_33vob"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(15, -52)
+
+[sub_resource type="Resource" id="Resource_us8x7"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(23, -52)
+
+[sub_resource type="Resource" id="Resource_bpbtd"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(30, -66)
+
+[sub_resource type="Resource" id="Resource_xkc0g"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(30, -56)
+
+[sub_resource type="Resource" id="Resource_8uqaf"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(39, -60)
+width = 1.4
+height = 2.6
+kind = &"secret"
+secret_id = &"jewel_closet"
+disguise = &"mirror"
+
+[sub_resource type="Resource" id="Resource_yscd7"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(16, -48)
+
+[sub_resource type="Resource" id="Resource_04dh7"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(33, -48)
+
+[sub_resource type="Resource" id="Resource_dxxry"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(33, -36)
+
+[sub_resource type="Resource" id="Resource_ouuvs"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(8, -33)
+
+[sub_resource type="Resource" id="Resource_qxike"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-8, -33)
+
+[sub_resource type="Resource" id="Resource_ficwd"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-17, -38)
+
+[sub_resource type="Resource" id="Resource_v4qhf"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-17, -48)
+
+[sub_resource type="Resource" id="Resource_4q2hi"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-34, -48)
+
+[sub_resource type="Resource" id="Resource_hqqbd"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-36, -52)
+
+[sub_resource type="Resource" id="Resource_a4av1"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-16, -52)
+
+[sub_resource type="Resource" id="Resource_xuss1"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-12, -64)
+
+[sub_resource type="Resource" id="Resource_viel7"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-36, -64)
+
+[sub_resource type="Resource" id="Resource_0l1ea"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-24, -58)
+width = 1.4
+height = 2.6
+kind = &"secret"
+secret_id = &"lucien_cabinet"
+disguise = &"panel"
+
+[sub_resource type="Resource" id="Resource_ia8ea"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-50, -54)
+
+[sub_resource type="Resource" id="Resource_6yxeh"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-58, -61)
+
+[sub_resource type="Resource" id="Resource_q5ki3"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-58, -50)
+
+[sub_resource type="Resource" id="Resource_yd66o"]
+script = ExtResource("1_ktsxu")
+level = 1
+at = Vector2(-50, -46)
+width = 2.4
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_tbicb"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(12, -54)
+width = 4.2
+kind = &"open"
+
+[sub_resource type="Resource" id="Resource_b1wxx"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-22, -54)
+
+[sub_resource type="Resource" id="Resource_8jafy"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-2, -54)
+
+[sub_resource type="Resource" id="Resource_3rr4c"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(24, -54)
+
+[sub_resource type="Resource" id="Resource_uajge"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-21, -46)
+
+[sub_resource type="Resource" id="Resource_iswd3"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(0, -46)
+
+[sub_resource type="Resource" id="Resource_bhn0w"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(21, -46)
+
+[sub_resource type="Resource" id="Resource_b3op2"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-32, -50)
+
+[sub_resource type="Resource" id="Resource_ewtxr"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(32, -50)
+
+[sub_resource type="Resource" id="Resource_0kxjj"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-37, -62)
+
+[sub_resource type="Resource" id="Resource_onxtp"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-32, -67)
+
+[sub_resource type="Resource" id="Resource_alllr"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(-37, -38)
+
+[sub_resource type="Resource" id="Resource_0ju5a"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(37, -62)
+
+[sub_resource type="Resource" id="Resource_y3k5r"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(32, -67)
+
+[sub_resource type="Resource" id="Resource_x6ks4"]
+script = ExtResource("1_ktsxu")
+level = 2
+at = Vector2(37, -38)
+width = 1.4
+height = 2.6
+kind = &"secret"
+secret_id = &"moon_tower"
+disguise = &"panel"
+
+[sub_resource type="Resource" id="Resource_61qch"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-32, -72, 64, 44)
+base_level = 2
+style = &"gable_x"
+height = 8.0
+
+[sub_resource type="Resource" id="Resource_a0nj4"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-42, -62, 10, 24)
+base_level = 2
+style = &"gable_z"
+height = 5.0
+
+[sub_resource type="Resource" id="Resource_v3wrk"]
+script = ExtResource("2_mi00i")
+rect = Rect2(32, -62, 10, 24)
+base_level = 2
+style = &"gable_z"
+height = 5.0
+
+[sub_resource type="Resource" id="Resource_k1lev"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-74, -68, 32, 34)
+height = 7.0
+
+[sub_resource type="Resource" id="Resource_15h4f"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-42, -72, 10, 10)
+base_level = 3
+style = &"dome"
+height = 5.5
+color = Color(1, 0.88, 0.62, 1)
+
+[sub_resource type="Resource" id="Resource_mgn65"]
+script = ExtResource("2_mi00i")
+rect = Rect2(32, -72, 10, 10)
+base_level = 3
+style = &"cone"
+height = 11.0
+
+[sub_resource type="Resource" id="Resource_yu0ly"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-42, -38, 10, 10)
+base_level = 3
+style = &"cone"
+height = 11.0
+
+[sub_resource type="Resource" id="Resource_qc66c"]
+script = ExtResource("2_mi00i")
+rect = Rect2(32, -38, 10, 10)
+base_level = 3
+style = &"cone"
+height = 11.0
+
+[sub_resource type="Resource" id="Resource_p8g0i"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-37.5, -67.5, 1, 1)
+base_level = 3
+style = &"cone"
+height = 8.5
+color = Color(1, 0.8, 0.38, 1)
+
+[sub_resource type="Resource" id="Resource_nkgjs"]
+script = ExtResource("2_mi00i")
+rect = Rect2(36.5, -67.5, 1, 1)
+base_level = 3
+style = &"cone"
+height = 13.5
+color = Color(1, 0.8, 0.38, 1)
+
+[sub_resource type="Resource" id="Resource_ok0ux"]
+script = ExtResource("2_mi00i")
+rect = Rect2(-37.5, -33.5, 1, 1)
+base_level = 3
+style = &"cone"
+height = 13.5
+color = Color(1, 0.8, 0.38, 1)
+
+[sub_resource type="Resource" id="Resource_rdp50"]
+script = ExtResource("2_mi00i")
+rect = Rect2(36.5, -33.5, 1, 1)
+base_level = 3
+style = &"cone"
+height = 13.5
+color = Color(1, 0.8, 0.38, 1)
+
+[sub_resource type="Resource" id="Resource_n8ec6"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 5)
+
+[sub_resource type="Resource" id="Resource_sqvih"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 16)
+
+[sub_resource type="Resource" id="Resource_2wrp4"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(2.6, 0, 16)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_50asw"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(13.4, 0, 16)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_j4244"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(8, 0, 9.6)
+
+[sub_resource type="Resource" id="Resource_1hogm"]
+script = ExtResource("4_lkcle")
+prop_id = &"statue_maiden"
+position = Vector3(1.4, 0, 2.5)
+
+[sub_resource type="Resource" id="Resource_w4t80"]
+script = ExtResource("4_lkcle")
+prop_id = &"statue_maiden"
+position = Vector3(14.6, 0, 2.5)
+
+[sub_resource type="Resource" id="Resource_fuceb"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(3.5, 1.2, 0.2)
+
+[sub_resource type="Resource" id="Resource_k866w"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(12.5, 1.2, 0.2)
+
+[sub_resource type="Resource" id="Resource_fv7gy"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(0.15, 1.4, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_nlfrh"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(15.85, 1.4, 7)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_a1qs8"]
+script = ExtResource("4_lkcle")
+prop_id = &"urn_flowers"
+position = Vector3(1.4, 0, 9)
+
+[sub_resource type="Resource" id="Resource_ngldj"]
+script = ExtResource("4_lkcle")
+prop_id = &"urn_flowers"
+position = Vector3(14.6, 0, 9)
+
+[sub_resource type="Resource" id="Resource_dkusn"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(1.2, 0, 22.6)
+
+[sub_resource type="Resource" id="Resource_0r7cq"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(14.8, 0, 22.6)
+
+[sub_resource type="Resource" id="Resource_rg5ia"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(8, 0, 5)
+
+[sub_resource type="Resource" id="Resource_w7q7p"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(1, 0, 17)
+
+[sub_resource type="Resource" id="Resource_ic6j5"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(1, 0.7, 17)
+
+[sub_resource type="Resource" id="Resource_wud1x"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(0.15, 1.9, 14)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_iu7eh"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(15.85, 1.9, 14)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_5ijqn"]
+script = ExtResource("4_lkcle")
+prop_id = &"clock_grandfather"
+position = Vector3(15.4, 0, 18)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_ft3yy"]
+script = ExtResource("3_aa53f")
+id = &"upper_hall"
+display_name = "Upper Hall"
+canon = "C"
+level = 1
+rect = Rect2(-8, -62, 16, 24)
+floor_kind = &"marble"
+wall_color = Color(0.99, 0.96, 0.94, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_n8ec6"), SubResource("Resource_sqvih"), SubResource("Resource_2wrp4"), SubResource("Resource_50asw"), SubResource("Resource_j4244"), SubResource("Resource_1hogm"), SubResource("Resource_w4t80"), SubResource("Resource_fuceb"), SubResource("Resource_k866w"), SubResource("Resource_fv7gy"), SubResource("Resource_nlfrh"), SubResource("Resource_a1qs8"), SubResource("Resource_ngldj"), SubResource("Resource_dkusn"), SubResource("Resource_0r7cq"), SubResource("Resource_rg5ia"), SubResource("Resource_w7q7p"), SubResource("Resource_ic6j5"), SubResource("Resource_wud1x"), SubResource("Resource_iu7eh"), SubResource("Resource_5ijqn")])
+notes = "Halls of gold and silver; the grand stair arrives here. Hall paintings (still life of a green glass vase) per ch7."
+
+[sub_resource type="Resource" id="Resource_5le8i"]
+script = ExtResource("4_lkcle")
+prop_id = &"column_marble"
+position = Vector3(2, 0, 1.2)
+
+[sub_resource type="Resource" id="Resource_kqwfv"]
+script = ExtResource("4_lkcle")
+prop_id = &"column_marble"
+position = Vector3(6, 0, 1.2)
+
+[sub_resource type="Resource" id="Resource_k7w4i"]
+script = ExtResource("4_lkcle")
+prop_id = &"column_marble"
+position = Vector3(10, 0, 1.2)
+
+[sub_resource type="Resource" id="Resource_41hiy"]
+script = ExtResource("4_lkcle")
+prop_id = &"column_marble"
+position = Vector3(14, 0, 1.2)
+
+[sub_resource type="Resource" id="Resource_t4v13"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(1, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_hancr"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(15, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_ntxtc"]
+script = ExtResource("4_lkcle")
+prop_id = &"orange_tree_tub"
+position = Vector3(4, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_jmjdh"]
+script = ExtResource("4_lkcle")
+prop_id = &"orange_tree_tub"
+position = Vector3(12, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_ymu6g"]
+script = ExtResource("4_lkcle")
+prop_id = &"garden_bench"
+position = Vector3(5, 0, 4.5)
+
+[sub_resource type="Resource" id="Resource_wms23"]
+script = ExtResource("4_lkcle")
+prop_id = &"garden_bench"
+position = Vector3(11, 0, 4.5)
+
+[sub_resource type="Resource" id="Resource_2ob6y"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(8, 0, 5.5)
+
+[sub_resource type="Resource" id="Resource_sa2dv"]
+script = ExtResource("4_lkcle")
+prop_id = &"cake_stand"
+position = Vector3(8, 0.5, 5.5)
+
+[sub_resource type="Resource" id="Resource_0eoyq"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(8, 3.4, 3)
+
+[sub_resource type="Resource" id="Resource_14gn6"]
+script = ExtResource("4_lkcle")
+prop_id = &"flower_garland"
+position = Vector3(8, 3.4, 0.3)
+
+[sub_resource type="Resource" id="Resource_63l52"]
+script = ExtResource("4_lkcle")
+prop_id = &"birdcage_gilt"
+position = Vector3(1.2, 0, 4)
+
+[sub_resource type="Resource" id="Resource_4yyga"]
+script = ExtResource("3_aa53f")
+id = &"garden_loggia"
+display_name = "Garden Loggia"
+level = 1
+rect = Rect2(-8, -72, 16, 10)
+floor_kind = &"marble"
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_5le8i"), SubResource("Resource_kqwfv"), SubResource("Resource_k7w4i"), SubResource("Resource_41hiy"), SubResource("Resource_t4v13"), SubResource("Resource_hancr"), SubResource("Resource_ntxtc"), SubResource("Resource_jmjdh"), SubResource("Resource_ymu6g"), SubResource("Resource_wms23"), SubResource("Resource_2ob6y"), SubResource("Resource_sa2dv"), SubResource("Resource_0eoyq"), SubResource("Resource_14gn6"), SubResource("Resource_63l52")])
+notes = "Open-feeling garden room over the terrace; tall windows onto the rose gardens."
+
+[sub_resource type="Resource" id="Resource_qn5yv"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(5, 0, 9.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_cyq6q"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(11, 0, 9.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_8nnb1"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(8, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_wovp2"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(0.4, 0, 1.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_xwiew"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(15.6, 0, 1.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_fkfga"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(0.4, 0, 8.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_bgd8o"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(15.6, 0, 8.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_6eudb"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(5, 0, 5)
+yaw_deg = 30.0
+
+[sub_resource type="Resource" id="Resource_qdwtd"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(11, 0, 5)
+yaw_deg = -30.0
+
+[sub_resource type="Resource" id="Resource_qbscg"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(8, 0, 5)
+
+[sub_resource type="Resource" id="Resource_7oxkb"]
+script = ExtResource("4_lkcle")
+prop_id = &"book_stack"
+position = Vector3(8, 0.5, 5)
+
+[sub_resource type="Resource" id="Resource_e5t7t"]
+script = ExtResource("4_lkcle")
+prop_id = &"reading_lectern"
+position = Vector3(3, 0, 2)
+
+[sub_resource type="Resource" id="Resource_n8kw5"]
+script = ExtResource("4_lkcle")
+prop_id = &"floor_candlestand"
+position = Vector3(13, 0, 2)
+
+[sub_resource type="Resource" id="Resource_lli8t"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(8, 0, 5)
+
+[sub_resource type="Resource" id="Resource_eag5e"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(8, 3.3, 5)
+
+[sub_resource type="Resource" id="Resource_c3djb"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(8, 0.6, 9.4)
+
+[sub_resource type="Resource" id="Resource_p6wr5"]
+script = ExtResource("3_aa53f")
+id = &"front_reading_nook"
+display_name = "Front Reading Nook"
+level = 1
+rect = Rect2(-8, -38, 16, 10)
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_qn5yv"), SubResource("Resource_cyq6q"), SubResource("Resource_8nnb1"), SubResource("Resource_wovp2"), SubResource("Resource_xwiew"), SubResource("Resource_fkfga"), SubResource("Resource_bgd8o"), SubResource("Resource_6eudb"), SubResource("Resource_qdwtd"), SubResource("Resource_qbscg"), SubResource("Resource_7oxkb"), SubResource("Resource_e5t7t"), SubResource("Resource_n8kw5"), SubResource("Resource_lli8t"), SubResource("Resource_eag5e"), SubResource("Resource_c3djb")])
+
+[sub_resource type="Resource" id="Resource_3lkd1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(6, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_4u0x1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(17, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_g5qw1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(28, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_2e1hm"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(10, 1.5, 0.15)
+
+[sub_resource type="Resource" id="Resource_dlxae"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(28, 1.4, 0.15)
+
+[sub_resource type="Resource" id="Resource_m0ldx"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(3, 1.4, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_odw3h"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(20, 1.5, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ghl5y"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(30, 1.4, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_spkca"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(12.5, 1.9, 0.15)
+
+[sub_resource type="Resource" id="Resource_b0yjw"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(21, 1.9, 0.15)
+
+[sub_resource type="Resource" id="Resource_5qisi"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(12, 1.9, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ddj5p"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(32.5, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_t0mhp"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_tall"
+position = Vector3(32.5, 0.7, 0.5)
+
+[sub_resource type="Resource" id="Resource_kfa0c"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(33.2, 0, 3.2)
+
+[sub_resource type="Resource" id="Resource_0edrl"]
+script = ExtResource("3_aa53f")
+id = &"east_corridor"
+display_name = "East Gallery Corridor"
+canon = "C?"
+level = 1
+rect = Rect2(8, -52, 34, 4)
+kind = &"corridor"
+floor_kind = &"carpet"
+wall_color = Color(0.99, 0.96, 0.94, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_3lkd1"), SubResource("Resource_4u0x1"), SubResource("Resource_g5qw1"), SubResource("Resource_2e1hm"), SubResource("Resource_dlxae"), SubResource("Resource_m0ldx"), SubResource("Resource_odw3h"), SubResource("Resource_ghl5y"), SubResource("Resource_spkca"), SubResource("Resource_b0yjw"), SubResource("Resource_5qisi"), SubResource("Resource_ddj5p"), SubResource("Resource_t0mhp"), SubResource("Resource_kfa0c")])
+
+[sub_resource type="Resource" id="Resource_pnkmf"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(6, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_3skfl"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(17, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_omgw1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(28, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_rj2j3"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(12, 1.4, 0.15)
+
+[sub_resource type="Resource" id="Resource_kx0ao"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(19, 1.2, 0.15)
+
+[sub_resource type="Resource" id="Resource_qirsd"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(3, 1.4, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_7d0lm"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(14, 1.5, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_6y688"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(30, 1.4, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_8ni7w"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(2, 1.9, 0.15)
+
+[sub_resource type="Resource" id="Resource_53qxf"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(31, 1.9, 0.15)
+
+[sub_resource type="Resource" id="Resource_yt7r4"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(19, 1.9, 3.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_jmeja"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(22.5, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_svvq6"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(1, 0, 3.3)
+
+[sub_resource type="Resource" id="Resource_la1su"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(1, 0.7, 3.3)
+
+[sub_resource type="Resource" id="Resource_ew5e5"]
+script = ExtResource("3_aa53f")
+id = &"west_corridor"
+display_name = "West Gallery Corridor"
+canon = "C?"
+level = 1
+rect = Rect2(-42, -52, 34, 4)
+kind = &"corridor"
+floor_kind = &"carpet"
+wall_color = Color(1, 0.86, 0.89, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_pnkmf"), SubResource("Resource_3skfl"), SubResource("Resource_omgw1"), SubResource("Resource_rj2j3"), SubResource("Resource_kx0ao"), SubResource("Resource_qirsd"), SubResource("Resource_7d0lm"), SubResource("Resource_6y688"), SubResource("Resource_8ni7w"), SubResource("Resource_53qxf"), SubResource("Resource_yt7r4"), SubResource("Resource_jmeja"), SubResource("Resource_svvq6"), SubResource("Resource_la1su")])
+notes = "Hall paintings Feyre studies on her first exploration (ch7)."
+
+[sub_resource type="Resource" id="Resource_nskl8"]
+script = ExtResource("4_lkcle")
+prop_id = &"coat_rack"
+position = Vector3(0.8, 0, 9.2)
+
+[sub_resource type="Resource" id="Resource_vk5jp"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(7, 3.4, 5)
+
+[sub_resource type="Resource" id="Resource_bg2uy"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(0.15, 1.9, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_uu7ki"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(7.85, 1.9, 5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_8ymi1"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(0.15, 1.5, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_hxthp"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(0.8, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_i8k1j"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(7.3, 0, 5.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_4whdq"]
+script = ExtResource("4_lkcle")
+prop_id = &"stool"
+position = Vector3(0.9, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_gp6r4"]
+script = ExtResource("3_aa53f")
+id = &"attic_stair_hall"
+display_name = "Attic Stair Hall"
+level = 1
+rect = Rect2(8, -62, 8, 10)
+kind = &"stair_hall"
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_nskl8"), SubResource("Resource_vk5jp"), SubResource("Resource_bg2uy"), SubResource("Resource_uu7ki"), SubResource("Resource_8ymi1"), SubResource("Resource_hxthp"), SubResource("Resource_i8k1j"), SubResource("Resource_4whdq")])
+
+[sub_resource type="Resource" id="Resource_y2mh2"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(4, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_d073w"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(4, 0.6, 0.9)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_e0xfd"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(5.5, 0, 5)
+yaw_deg = -45.0
+
+[sub_resource type="Resource" id="Resource_jcuti"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(4.2, 0, 5.5)
+
+[sub_resource type="Resource" id="Resource_slcch"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(4.2, 0.7, 5.5)
+
+[sub_resource type="Resource" id="Resource_0t4aj"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(0.6, 0, 8.6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_41e5b"]
+script = ExtResource("4_lkcle")
+prop_id = &"inkstand"
+position = Vector3(0.6, 0.8, 8.6)
+
+[sub_resource type="Resource" id="Resource_yht05"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(7.5, 0, 8.8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_oot5i"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(7.3, 0, 1)
+
+[sub_resource type="Resource" id="Resource_s6h3d"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(4, 0, 5)
+scale = 0.8
+
+[sub_resource type="Resource" id="Resource_5n4ll"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(4, 3.3, 5)
+
+[sub_resource type="Resource" id="Resource_i6tw2"]
+script = ExtResource("3_aa53f")
+id = &"feyre_morning_room"
+display_name = "Feyre's Morning Room"
+level = 1
+rect = Rect2(8, -72, 8, 10)
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_y2mh2"), SubResource("Resource_d073w"), SubResource("Resource_e0xfd"), SubResource("Resource_jcuti"), SubResource("Resource_slcch"), SubResource("Resource_0t4aj"), SubResource("Resource_41e5b"), SubResource("Resource_yht05"), SubResource("Resource_oot5i"), SubResource("Resource_s6h3d"), SubResource("Resource_5n4ll")])
+notes = "A small sunny reading nook off Feyre's bedroom, looking over the gardens."
+
+[sub_resource type="Resource" id="Resource_ampsm"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(4, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_bxk2p"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(10, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_dnnx8"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(4, 0.6, 0.9)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_nnt2g"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(10, 0.6, 0.9)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_2hr0b"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_sobkx"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 14.4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_hmoks"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(0.4, 0.7, 10)
+
+[sub_resource type="Resource" id="Resource_pql72"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(0.4, 0.7, 14.4)
+
+[sub_resource type="Resource" id="Resource_2hk03"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(6, 0, 12.2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_oyyd0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(6.5, 0, 16.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ydfyc"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(10.5, 0, 9)
+yaw_deg = 60.0
+
+[sub_resource type="Resource" id="Resource_jc8d0"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(10.5, 0, 13)
+yaw_deg = 120.0
+
+[sub_resource type="Resource" id="Resource_d6uxj"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(11, 0, 11)
+
+[sub_resource type="Resource" id="Resource_67jv0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(7, 2.6, 10)
+
+[sub_resource type="Resource" id="Resource_awdjc"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(13.85, 1.9, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_421se"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(0.15, 1.9, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_jroi6"]
+script = ExtResource("4_lkcle")
+prop_id = &"dresser"
+position = Vector3(3, 0, 19.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_iu4ik"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(11, 1.4, 19.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_8udln"]
+script = ExtResource("4_lkcle")
+prop_id = &"mirror_gilt"
+position = Vector3(3, 1.5, 19.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_m536d"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(13.3, 0, 1)
+
+[sub_resource type="Resource" id="Resource_i4pm2"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(0.7, 0, 1)
+
+[sub_resource type="Resource" id="Resource_gl5fl"]
+script = ExtResource("4_lkcle")
+prop_id = &"floor_candlestand"
+position = Vector3(13.3, 0, 18.8)
+
+[sub_resource type="Resource" id="Resource_m6d88"]
+script = ExtResource("3_aa53f")
+id = &"feyre_bedroom"
+display_name = "Feyre's Bedroom"
+canon = "C"
+level = 1
+rect = Rect2(16, -72, 14, 20)
+wall_color = Color(1, 0.86, 0.89, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_ampsm"), SubResource("Resource_bxk2p"), SubResource("Resource_dnnx8"), SubResource("Resource_nnt2g"), SubResource("Resource_2hr0b"), SubResource("Resource_sobkx"), SubResource("Resource_hmoks"), SubResource("Resource_pql72"), SubResource("Resource_2hk03"), SubResource("Resource_oyyd0"), SubResource("Resource_ydfyc"), SubResource("Resource_jc8d0"), SubResource("Resource_d6uxj"), SubResource("Resource_67jv0"), SubResource("Resource_awdjc"), SubResource("Resource_421se"), SubResource("Resource_jroi6"), SubResource("Resource_iu4ik"), SubResource("Resource_8udln"), SubResource("Resource_m536d"), SubResource("Resource_i4pm2"), SubResource("Resource_gl5fl")])
+notes = "Second level, attached bathing chamber, windows over the garden with a wisteria trellis below (ch7, ch11)."
+
+[sub_resource type="Resource" id="Resource_57xuj"]
+script = ExtResource("4_lkcle")
+prop_id = &"gown_rack"
+position = Vector3(5.6, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_psexn"]
+script = ExtResource("4_lkcle")
+prop_id = &"gown_rack"
+position = Vector3(9.2, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_plm7b"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(11, 0, 2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_r4qp7"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(4.2, 0, 5.6)
+
+[sub_resource type="Resource" id="Resource_2yivl"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(6, 0, 7.4)
+
+[sub_resource type="Resource" id="Resource_4h0n7"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(7.8, 0, 5.6)
+
+[sub_resource type="Resource" id="Resource_528k4"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(6, 0, 6.2)
+
+[sub_resource type="Resource" id="Resource_0al8c"]
+script = ExtResource("4_lkcle")
+prop_id = &"shoe_shelf"
+position = Vector3(0.3, 0, 2.6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ii3b5"]
+script = ExtResource("4_lkcle")
+prop_id = &"shoe_shelf"
+position = Vector3(0.3, 0, 9.6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_xi5wc"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(1, 0, 11.2)
+
+[sub_resource type="Resource" id="Resource_fx1h7"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(2.6, 0, 11.2)
+
+[sub_resource type="Resource" id="Resource_2177p"]
+script = ExtResource("4_lkcle")
+prop_id = &"dressing_screen"
+position = Vector3(4.2, 0, 10.4)
+yaw_deg = 20.0
+
+[sub_resource type="Resource" id="Resource_s3nbu"]
+script = ExtResource("4_lkcle")
+prop_id = &"cheval_mirror"
+position = Vector3(6.4, 0, 11.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_xgy4f"]
+script = ExtResource("4_lkcle")
+prop_id = &"cheval_mirror"
+position = Vector3(11.4, 0, 10.4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_hq8cs"]
+script = ExtResource("4_lkcle")
+prop_id = &"vanity_table"
+position = Vector3(11.6, 0, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_fqyw1"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(10.6, 0, 6)
+
+[sub_resource type="Resource" id="Resource_ru40o"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(6, 0, 3.6)
+
+[sub_resource type="Resource" id="Resource_nwprs"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(8.6, 0, 9.6)
+
+[sub_resource type="Resource" id="Resource_r5r84"]
+script = ExtResource("4_lkcle")
+prop_id = &"jewelry_box"
+position = Vector3(11.6, 0.8, 5.4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_f6jrs"]
+script = ExtResource("4_lkcle")
+prop_id = &"perfume_tray"
+position = Vector3(11.6, 0.8, 6.6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_d1jos"]
+script = ExtResource("4_lkcle")
+prop_id = &"makeup_palette"
+position = Vector3(11.4, 0.8, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_wfsms"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(6, 2.6, 6)
+
+[sub_resource type="Resource" id="Resource_bg5um"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(11.85, 1.9, 4.4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_1p6ry"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(11.85, 1.9, 7.6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_qs4bv"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(11.6, 0.8, 4.6)
+
+[sub_resource type="Resource" id="Resource_bmtc5"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(2.2, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_byxfp"]
+script = ExtResource("3_aa53f")
+id = &"dressing_room"
+display_name = "Feyre's Dressing Room"
+level = 1
+rect = Rect2(30, -72, 12, 12)
+floor_kind = &"carpet"
+wall_color = Color(0.99, 0.75, 0.83, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_57xuj"), SubResource("Resource_psexn"), SubResource("Resource_plm7b"), SubResource("Resource_r4qp7"), SubResource("Resource_2yivl"), SubResource("Resource_4h0n7"), SubResource("Resource_528k4"), SubResource("Resource_0al8c"), SubResource("Resource_ii3b5"), SubResource("Resource_xi5wc"), SubResource("Resource_fx1h7"), SubResource("Resource_2177p"), SubResource("Resource_s3nbu"), SubResource("Resource_xgy4f"), SubResource("Resource_hq8cs"), SubResource("Resource_fqyw1"), SubResource("Resource_ru40o"), SubResource("Resource_nwprs"), SubResource("Resource_r5r84"), SubResource("Resource_f6jrs"), SubResource("Resource_d1jos"), SubResource("Resource_wfsms"), SubResource("Resource_bg5um"), SubResource("Resource_1p6ry"), SubResource("Resource_qs4bv"), SubResource("Resource_bmtc5")])
+notes = "Outfits (wardrobe station) and makeup/hair (dressing_mirror station). A mirror door hides the jewellery closet."
+
+[sub_resource type="Resource" id="Resource_v5n0i"]
+script = ExtResource("4_lkcle")
+prop_id = &"cabinet_curio"
+position = Vector3(0.4, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_pw3wk"]
+script = ExtResource("4_lkcle")
+prop_id = &"cabinet_curio"
+position = Vector3(5.6, 0, 4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_4x8nn"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(3, 0, 6.5)
+
+[sub_resource type="Resource" id="Resource_cdnwj"]
+script = ExtResource("4_lkcle")
+prop_id = &"jewelry_box"
+position = Vector3(3, 0.7, 6.5)
+
+[sub_resource type="Resource" id="Resource_fj4gd"]
+script = ExtResource("4_lkcle")
+prop_id = &"jewelry_box"
+position = Vector3(0.4, 1, 4)
+
+[sub_resource type="Resource" id="Resource_cbddh"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(3, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_hb2qb"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(5.3, 0, 7.2)
+
+[sub_resource type="Resource" id="Resource_4wqhr"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(3, 3.3, 4)
+
+[sub_resource type="Resource" id="Resource_xrr3l"]
+script = ExtResource("4_lkcle")
+prop_id = &"mirror_gilt"
+position = Vector3(5.85, 1.4, 1.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_lejta"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(2.2, 0, 4.5)
+
+[sub_resource type="Resource" id="Resource_o6upw"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(3, 0, 4)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_5ctxk"]
+script = ExtResource("3_aa53f")
+id = &"jewel_closet"
+display_name = "Hidden Jewellery Closet"
+level = 1
+rect = Rect2(36, -60, 6, 8)
+floor_kind = &"carpet"
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_v5n0i"), SubResource("Resource_pw3wk"), SubResource("Resource_4x8nn"), SubResource("Resource_cdnwj"), SubResource("Resource_fj4gd"), SubResource("Resource_cbddh"), SubResource("Resource_hb2qb"), SubResource("Resource_4wqhr"), SubResource("Resource_xrr3l"), SubResource("Resource_lejta"), SubResource("Resource_o6upw")])
+notes = "Behind the dressing room's mirror door."
+
+[sub_resource type="Resource" id="Resource_4if7f"]
+script = ExtResource("4_lkcle")
+prop_id = &"soap_shelf"
+position = Vector3(5.8, 0.9, 4.2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_0wv44"]
+script = ExtResource("4_lkcle")
+prop_id = &"towel_rack"
+position = Vector3(5.6, 0, 6.8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_wxvtk"]
+script = ExtResource("4_lkcle")
+prop_id = &"washstand"
+position = Vector3(3.2, 0, 7.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_utgq0"]
+script = ExtResource("4_lkcle")
+prop_id = &"perfume_tray"
+position = Vector3(3.2, 0.9, 7.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_00fks"]
+script = ExtResource("4_lkcle")
+prop_id = &"mirror_gilt"
+position = Vector3(3.2, 1.5, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_dqyw3"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(0.6, 0, 1)
+
+[sub_resource type="Resource" id="Resource_y2cua"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(5.4, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_g65ng"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(0.6, 0, 7.4)
+
+[sub_resource type="Resource" id="Resource_swcur"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(3, 3.3, 3)
+
+[sub_resource type="Resource" id="Resource_257hq"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_bank"
+position = Vector3(5.6, 0, 2.2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_rjuc2"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(2.4, 0, 5.2)
+scale = 0.5
+
+[sub_resource type="Resource" id="Resource_x0yw3"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(3.5, 2.6, 2)
+
+[sub_resource type="Resource" id="Resource_elot7"]
+script = ExtResource("3_aa53f")
+id = &"feyre_bath"
+display_name = "Feyre's Bathing Chamber"
+canon = "C"
+level = 1
+rect = Rect2(30, -60, 6, 8)
+floor_kind = &"tile"
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_4if7f"), SubResource("Resource_0wv44"), SubResource("Resource_wxvtk"), SubResource("Resource_utgq0"), SubResource("Resource_00fks"), SubResource("Resource_dqyw3"), SubResource("Resource_y2cua"), SubResource("Resource_g65ng"), SubResource("Resource_swcur"), SubResource("Resource_257hq"), SubResource("Resource_rjuc2"), SubResource("Resource_x0yw3")])
+notes = "Hot water, scented baths; Alis attends (ch6-7)."
+
+[sub_resource type="Resource" id="Resource_qy4yt"]
+script = ExtResource("4_lkcle")
+prop_id = &"easel"
+position = Vector3(4, 0, 15.5)
+yaw_deg = 10.0
+
+[sub_resource type="Resource" id="Resource_e7l7e"]
+script = ExtResource("4_lkcle")
+prop_id = &"easel"
+position = Vector3(12, 0, 15.5)
+yaw_deg = -10.0
+
+[sub_resource type="Resource" id="Resource_t2bio"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(0.6, 0, 3)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_0qidq"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(0.6, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_615jl"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(15.4, 0, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_km0w7"]
+script = ExtResource("4_lkcle")
+prop_id = &"paint_table"
+position = Vector3(8, 0, 10.5)
+
+[sub_resource type="Resource" id="Resource_jajvj"]
+script = ExtResource("4_lkcle")
+prop_id = &"pigment_jars"
+position = Vector3(8, 0.9, 10.5)
+
+[sub_resource type="Resource" id="Resource_w2isf"]
+script = ExtResource("4_lkcle")
+prop_id = &"pigment_jars"
+position = Vector3(14.6, 0.9, 9.5)
+
+[sub_resource type="Resource" id="Resource_0my7e"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_work"
+position = Vector3(14.6, 0, 9.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_jueix"]
+script = ExtResource("4_lkcle")
+prop_id = &"stool"
+position = Vector3(4.5, 0, 14)
+
+[sub_resource type="Resource" id="Resource_thfat"]
+script = ExtResource("4_lkcle")
+prop_id = &"stool"
+position = Vector3(11.5, 0, 14)
+
+[sub_resource type="Resource" id="Resource_dk5tm"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_tall"
+position = Vector3(7.2, 0.9, 10.2)
+scale = 0.5
+
+[sub_resource type="Resource" id="Resource_np3np"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(12.5, 0, 3.5)
+
+[sub_resource type="Resource" id="Resource_wv3dm"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(10.5, 0, 3.5)
+
+[sub_resource type="Resource" id="Resource_p0jxe"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(0.15, 1.5, 12)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_tqxhg"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(15.85, 1.2, 15)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_x3250"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(4, 1.6, 0.15)
+
+[sub_resource type="Resource" id="Resource_r6y1y"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(8, 0, 13)
+
+[sub_resource type="Resource" id="Resource_7lpea"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 8)
+
+[sub_resource type="Resource" id="Resource_c8gp1"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(1, 0, 19)
+
+[sub_resource type="Resource" id="Resource_bjbkv"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(15, 0, 19)
+
+[sub_resource type="Resource" id="Resource_gstin"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(8, 2.4, 15.5)
+
+[sub_resource type="Resource" id="Resource_1d1k6"]
+script = ExtResource("3_aa53f")
+id = &"painting_room"
+display_name = "Painting Room"
+canon = "C"
+level = 1
+rect = Rect2(8, -48, 16, 20)
+wall_color = Color(0.99, 0.96, 0.94, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_qy4yt"), SubResource("Resource_e7l7e"), SubResource("Resource_t2bio"), SubResource("Resource_0qidq"), SubResource("Resource_615jl"), SubResource("Resource_km0w7"), SubResource("Resource_jajvj"), SubResource("Resource_w2isf"), SubResource("Resource_0my7e"), SubResource("Resource_jueix"), SubResource("Resource_thfat"), SubResource("Resource_dk5tm"), SubResource("Resource_np3np"), SubResource("Resource_wv3dm"), SubResource("Resource_p0jxe"), SubResource("Resource_tqxhg"), SubResource("Resource_x3250"), SubResource("Resource_r6y1y"), SubResource("Resource_7lpea"), SubResource("Resource_c8gp1"), SubResource("Resource_bjbkv"), SubResource("Resource_gstin")])
+notes = "Stocked with canvases, paints and brushes; Alis shows her (ch19); Tamlin first sees her work here (ch22). South light."
+
+[sub_resource type="Resource" id="Resource_htkud"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_canopy"
+position = Vector3(1.5, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_qck10"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 3.6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_rle5i"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 8.4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_g35g8"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(0.4, 0.7, 3.6)
+
+[sub_resource type="Resource" id="Resource_lvwg8"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(4.3, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_5tl07"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(9, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_titfm"]
+script = ExtResource("4_lkcle")
+prop_id = &"wingback_chair"
+position = Vector3(14.5, 0, 4)
+yaw_deg = 120.0
+
+[sub_resource type="Resource" id="Resource_hlxl6"]
+script = ExtResource("4_lkcle")
+prop_id = &"wingback_chair"
+position = Vector3(14.5, 0, 8)
+yaw_deg = 60.0
+
+[sub_resource type="Resource" id="Resource_61dad"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(15, 0, 6)
+
+[sub_resource type="Resource" id="Resource_0vrpb"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(9, 1.4, 11.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ifrtg"]
+script = ExtResource("4_lkcle")
+prop_id = &"weapon_rack"
+position = Vector3(4, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_xxeb7"]
+script = ExtResource("4_lkcle")
+prop_id = &"armor_stand"
+position = Vector3(13, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_axpim"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(13, 0, 10.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_s2sqp"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(5, 0, 11.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_u6kxy"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(9, 2.6, 6)
+
+[sub_resource type="Resource" id="Resource_8g06q"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(0.8, 0, 11.2)
+
+[sub_resource type="Resource" id="Resource_t5y51"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(17.85, 1.9, 2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_hsl0n"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(17.85, 1.9, 10)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_qira0"]
+script = ExtResource("3_aa53f")
+id = &"tamlin_bedchamber"
+display_name = "Tamlin's Bedchamber"
+canon = "C"
+level = 1
+rect = Rect2(24, -48, 18, 12)
+wall_color = Color(0.84, 0.93, 0.8, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_htkud"), SubResource("Resource_qck10"), SubResource("Resource_rle5i"), SubResource("Resource_g35g8"), SubResource("Resource_lvwg8"), SubResource("Resource_5tl07"), SubResource("Resource_titfm"), SubResource("Resource_hlxl6"), SubResource("Resource_61dad"), SubResource("Resource_0vrpb"), SubResource("Resource_ifrtg"), SubResource("Resource_xxeb7"), SubResource("Resource_axpim"), SubResource("Resource_s2sqp"), SubResource("Resource_u6kxy"), SubResource("Resource_8g06q"), SubResource("Resource_t5y51"), SubResource("Resource_hsl0n")])
+
+[sub_resource type="Resource" id="Resource_kvuvn"]
+script = ExtResource("4_lkcle")
+prop_id = &"bath_sunken"
+position = Vector3(12, 0, 4.5)
+
+[sub_resource type="Resource" id="Resource_rvgh8"]
+script = ExtResource("4_lkcle")
+prop_id = &"towel_rack"
+position = Vector3(16, 0, 7.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_7vy21"]
+script = ExtResource("4_lkcle")
+prop_id = &"soap_shelf"
+position = Vector3(17.8, 0.9, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_jh364"]
+script = ExtResource("4_lkcle")
+prop_id = &"washstand"
+position = Vector3(4, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_o6yt4"]
+script = ExtResource("4_lkcle")
+prop_id = &"mirror_gilt"
+position = Vector3(4, 1.5, 0.15)
+
+[sub_resource type="Resource" id="Resource_bpkp5"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(1.2, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_eysr2"]
+script = ExtResource("4_lkcle")
+prop_id = &"coat_rack"
+position = Vector3(7, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_u52ie"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1.2, 0, 7.2)
+
+[sub_resource type="Resource" id="Resource_xn43t"]
+script = ExtResource("4_lkcle")
+prop_id = &"bench_settle"
+position = Vector3(7, 0, 6.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_obmjh"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(17, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_qpnta"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(12, 3.3, 4)
+
+[sub_resource type="Resource" id="Resource_da5nm"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_bank"
+position = Vector3(17.6, 0, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_4des8"]
+script = ExtResource("3_aa53f")
+id = &"tamlin_bath"
+display_name = "Tamlin's Bathing & Dressing Room"
+level = 1
+rect = Rect2(24, -36, 18, 8)
+floor_kind = &"marble"
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_kvuvn"), SubResource("Resource_rvgh8"), SubResource("Resource_7vy21"), SubResource("Resource_jh364"), SubResource("Resource_o6yt4"), SubResource("Resource_bpkp5"), SubResource("Resource_eysr2"), SubResource("Resource_u52ie"), SubResource("Resource_xn43t"), SubResource("Resource_obmjh"), SubResource("Resource_qpnta"), SubResource("Resource_da5nm")])
+
+[sub_resource type="Resource" id="Resource_rtlha"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(11, 0, 4)
+
+[sub_resource type="Resource" id="Resource_5s6ak"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(23, 0, 4)
+
+[sub_resource type="Resource" id="Resource_0ihh7"]
+script = ExtResource("4_lkcle")
+prop_id = &"statue_maiden"
+position = Vector3(1.2, 0, 4)
+
+[sub_resource type="Resource" id="Resource_i0tkd"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_tall"
+position = Vector3(32.8, 0, 6.8)
+
+[sub_resource type="Resource" id="Resource_hfxjp"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(3, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_axgxn"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(10, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_gcbda"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(14, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_0r2wh"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(18, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_omi6d"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(22, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_krcnr"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(26, 1.4, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_dhfnl"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(5, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_olpg8"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(13, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_b2gne"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(21, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_fx6gx"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(29, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_7xstw"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(6, 2.6, 4)
+
+[sub_resource type="Resource" id="Resource_cn2cj"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(17, 2.6, 4)
+
+[sub_resource type="Resource" id="Resource_4fhoi"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(28, 2.6, 4)
+
+[sub_resource type="Resource" id="Resource_bkl7j"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(8.5, 0, 1)
+
+[sub_resource type="Resource" id="Resource_x8tq7"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(16.5, 0, 1)
+
+[sub_resource type="Resource" id="Resource_ou8f7"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(25, 0, 1)
+
+[sub_resource type="Resource" id="Resource_66hs7"]
+script = ExtResource("3_aa53f")
+id = &"portrait_gallery"
+display_name = "Long Portrait Gallery"
+level = 1
+rect = Rect2(-42, -72, 34, 8)
+floor_kind = &"marble"
+wall_color = Color(0.99, 0.75, 0.83, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_rtlha"), SubResource("Resource_5s6ak"), SubResource("Resource_0ihh7"), SubResource("Resource_i0tkd"), SubResource("Resource_hfxjp"), SubResource("Resource_axgxn"), SubResource("Resource_gcbda"), SubResource("Resource_0r2wh"), SubResource("Resource_omi6d"), SubResource("Resource_krcnr"), SubResource("Resource_dhfnl"), SubResource("Resource_olpg8"), SubResource("Resource_b2gne"), SubResource("Resource_fx6gx"), SubResource("Resource_7xstw"), SubResource("Resource_cn2cj"), SubResource("Resource_4fhoi"), SubResource("Resource_bkl7j"), SubResource("Resource_x8tq7"), SubResource("Resource_ou8f7")])
+notes = "Masked portraits of the court's past; tall windows onto the gardens."
+
+[sub_resource type="Resource" id="Resource_rggwi"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_canopy"
+position = Vector3(1.5, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_do7bq"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 3.8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_qgcan"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 8.2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_3hbqx"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(0.4, 0.7, 3.8)
+
+[sub_resource type="Resource" id="Resource_lctp6"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(11.6, 0, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_bbdh2"]
+script = ExtResource("4_lkcle")
+prop_id = &"dresser"
+position = Vector3(11.6, 0, 9)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_xqcw1"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(8, 0, 9.5)
+yaw_deg = -150.0
+
+[sub_resource type="Resource" id="Resource_1qgms"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(9, 0, 10.6)
+
+[sub_resource type="Resource" id="Resource_0ybs1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(6, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_pnmqt"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(6, 3.3, 6)
+
+[sub_resource type="Resource" id="Resource_6ck16"]
+script = ExtResource("4_lkcle")
+prop_id = &"washstand"
+position = Vector3(2, 0, 11.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_vv80n"]
+script = ExtResource("4_lkcle")
+prop_id = &"dressing_screen"
+position = Vector3(10, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_2r57p"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(0.15, 1.5, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_h0hv8"]
+script = ExtResource("4_lkcle")
+prop_id = &"fireplace_small"
+position = Vector3(11.7, 0, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_xxaoi"]
+script = ExtResource("3_aa53f")
+id = &"guest_suite_periwinkle"
+display_name = "Periwinkle Guest Suite"
+level = 1
+rect = Rect2(-42, -64, 12, 12)
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_rggwi"), SubResource("Resource_do7bq"), SubResource("Resource_qgcan"), SubResource("Resource_3hbqx"), SubResource("Resource_lctp6"), SubResource("Resource_bbdh2"), SubResource("Resource_xqcw1"), SubResource("Resource_1qgms"), SubResource("Resource_0ybs1"), SubResource("Resource_pnmqt"), SubResource("Resource_6ck16"), SubResource("Resource_vv80n"), SubResource("Resource_2r57p"), SubResource("Resource_h0hv8")])
+
+[sub_resource type="Resource" id="Resource_s1rh6"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(3, 0, 1)
+
+[sub_resource type="Resource" id="Resource_bpehm"]
+script = ExtResource("4_lkcle")
+prop_id = &"inkstand"
+position = Vector3(3, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_hcjr5"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(3, 0, 2.2)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_n638k"]
+script = ExtResource("4_lkcle")
+prop_id = &"map_wall"
+position = Vector3(0.1, 1.2, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ce4io"]
+script = ExtResource("4_lkcle")
+prop_id = &"scroll_rack"
+position = Vector3(5.6, 0, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_t2iim"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1, 0, 11)
+
+[sub_resource type="Resource" id="Resource_eguvj"]
+script = ExtResource("4_lkcle")
+prop_id = &"weapon_rack"
+position = Vector3(5.6, 0, 9)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_m4hm3"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_bank"
+position = Vector3(0.6, 0, 3)
+
+[sub_resource type="Resource" id="Resource_nwbnd"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(0.4, 0, 9)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_a3dja"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(3, 1.4, 11.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_hj7wy"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(3, 3.4, 6)
+
+[sub_resource type="Resource" id="Resource_ek7pf"]
+script = ExtResource("3_aa53f")
+id = &"lucien_cabinet"
+display_name = "Lucien's Hidden Cabinet"
+level = 1
+rect = Rect2(-30, -64, 6, 12)
+wall_color = Color(1, 0.87, 0.78, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_s1rh6"), SubResource("Resource_bpehm"), SubResource("Resource_hcjr5"), SubResource("Resource_n638k"), SubResource("Resource_ce4io"), SubResource("Resource_t2iim"), SubResource("Resource_eguvj"), SubResource("Resource_m4hm3"), SubResource("Resource_nwbnd"), SubResource("Resource_a3dja"), SubResource("Resource_hj7wy")])
+notes = "Behind a panel in Lucien's chambers: the emissary's maps, letters and fox masks."
+
+[sub_resource type="Resource" id="Resource_6pjif"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_canopy"
+position = Vector3(14.5, 0, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_3c0qu"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(15.6, 0, 3.8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_er12q"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(15.6, 0, 8.2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_18mkd"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(15.6, 0.7, 3.8)
+
+[sub_resource type="Resource" id="Resource_qf1tr"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(4, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_p6bnb"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(2, 0, 10.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_4vr8k"]
+script = ExtResource("4_lkcle")
+prop_id = &"inkstand"
+position = Vector3(2, 0.8, 10.8)
+
+[sub_resource type="Resource" id="Resource_djri7"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(0.4, 0, 2.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_b1uv1"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(6, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_2xe0d"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(8, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_8rk43"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(8, 3.3, 6)
+
+[sub_resource type="Resource" id="Resource_6bpma"]
+script = ExtResource("4_lkcle")
+prop_id = &"weapon_rack"
+position = Vector3(9, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_86rv0"]
+script = ExtResource("4_lkcle")
+prop_id = &"globe_stand"
+position = Vector3(4.5, 0, 9.5)
+
+[sub_resource type="Resource" id="Resource_8v52c"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(15, 0, 11)
+
+[sub_resource type="Resource" id="Resource_7jolq"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(15.85, 1.4, 10)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_e1p07"]
+script = ExtResource("4_lkcle")
+prop_id = &"loose_panel"
+position = Vector3(0.1, 0.8, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ph8xp"]
+script = ExtResource("3_aa53f")
+id = &"lucien_chambers"
+display_name = "Lucien's Chambers"
+canon = "C"
+level = 1
+rect = Rect2(-24, -64, 16, 12)
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_6pjif"), SubResource("Resource_3c0qu"), SubResource("Resource_er12q"), SubResource("Resource_18mkd"), SubResource("Resource_qf1tr"), SubResource("Resource_p6bnb"), SubResource("Resource_4vr8k"), SubResource("Resource_djri7"), SubResource("Resource_b1uv1"), SubResource("Resource_2xe0d"), SubResource("Resource_8rk43"), SubResource("Resource_6bpma"), SubResource("Resource_86rv0"), SubResource("Resource_8v52c"), SubResource("Resource_7jolq"), SubResource("Resource_e1p07")])
+
+[sub_resource type="Resource" id="Resource_qx4sn"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_canopy"
+position = Vector3(1.5, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_uv1yp"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 7.8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_2hq3o"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 12.2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_lystr"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(0.4, 0.7, 7.8)
+
+[sub_resource type="Resource" id="Resource_58o88"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(15.6, 0, 4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_q0k66"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(8, 0, 17.5)
+
+[sub_resource type="Resource" id="Resource_25o6m"]
+script = ExtResource("4_lkcle")
+prop_id = &"vanity_table"
+position = Vector3(15.6, 0, 12)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_p2ct4"]
+script = ExtResource("4_lkcle")
+prop_id = &"vanity_mirror"
+position = Vector3(15.9, 0.9, 12)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_64ma8"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(14.6, 0, 12)
+
+[sub_resource type="Resource" id="Resource_ubksv"]
+script = ExtResource("4_lkcle")
+prop_id = &"cheval_mirror"
+position = Vector3(15.2, 0, 16.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_8qrnx"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(7, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_dr0uj"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 10)
+
+[sub_resource type="Resource" id="Resource_gtx3t"]
+script = ExtResource("4_lkcle")
+prop_id = &"fireplace_small"
+position = Vector3(3, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_ry4st"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(2, 0, 2.6)
+yaw_deg = 160.0
+
+[sub_resource type="Resource" id="Resource_d48bl"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(4.5, 0, 2.6)
+yaw_deg = -160.0
+
+[sub_resource type="Resource" id="Resource_7a4iu"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(3.2, 0, 3.2)
+
+[sub_resource type="Resource" id="Resource_evjy0"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(15, 0, 19)
+
+[sub_resource type="Resource" id="Resource_042i0"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(0.15, 1.2, 16)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ofyi7"]
+script = ExtResource("3_aa53f")
+id = &"guest_suite_lilac"
+display_name = "Lilac Guest Suite"
+level = 1
+rect = Rect2(-42, -48, 16, 20)
+wall_color = Color(0.88, 0.8, 0.98, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_qx4sn"), SubResource("Resource_uv1yp"), SubResource("Resource_2hq3o"), SubResource("Resource_lystr"), SubResource("Resource_58o88"), SubResource("Resource_q0k66"), SubResource("Resource_25o6m"), SubResource("Resource_p2ct4"), SubResource("Resource_64ma8"), SubResource("Resource_ubksv"), SubResource("Resource_8qrnx"), SubResource("Resource_dr0uj"), SubResource("Resource_gtx3t"), SubResource("Resource_ry4st"), SubResource("Resource_d48bl"), SubResource("Resource_7a4iu"), SubResource("Resource_evjy0"), SubResource("Resource_042i0")])
+
+[sub_resource type="Resource" id="Resource_q5jan"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_work"
+position = Vector3(9, 0, 5)
+
+[sub_resource type="Resource" id="Resource_rwj3n"]
+script = ExtResource("4_lkcle")
+prop_id = &"spinning_wheel"
+position = Vector3(2, 0, 2)
+
+[sub_resource type="Resource" id="Resource_bv3va"]
+script = ExtResource("4_lkcle")
+prop_id = &"embroidery_frame"
+position = Vector3(4, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_plpwp"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(15, 0, 2)
+
+[sub_resource type="Resource" id="Resource_x62ou"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(16.6, 0, 4)
+
+[sub_resource type="Resource" id="Resource_r6w47"]
+script = ExtResource("4_lkcle")
+prop_id = &"ironing_table"
+position = Vector3(14, 0, 8.6)
+
+[sub_resource type="Resource" id="Resource_v1y8e"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(8, 0, 6.2)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_gvay1"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(10, 0, 6.2)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_w6el8"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(3.4, 0, 8.4)
+
+[sub_resource type="Resource" id="Resource_seqqr"]
+script = ExtResource("4_lkcle")
+prop_id = &"linen_press"
+position = Vector3(0.4, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_7xxxm"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(6, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_7h6kj"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(12, 0, 0.3)
+
+[sub_resource type="Resource" id="Resource_aolcl"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(9, 3.3, 5)
+
+[sub_resource type="Resource" id="Resource_82i5r"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(9, 0.9, 4.6)
+
+[sub_resource type="Resource" id="Resource_tjw0t"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(4, 2.3, 7.5)
+
+[sub_resource type="Resource" id="Resource_hqq3c"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(9, 0, 5)
+yaw_deg = 90.0
+scale = 0.8
+
+[sub_resource type="Resource" id="Resource_q8veu"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(17.4, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_qam3t"]
+script = ExtResource("3_aa53f")
+id = &"sewing_room"
+display_name = "Sewing & Needlework Room"
+level = 1
+rect = Rect2(-26, -48, 18, 10)
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_q5jan"), SubResource("Resource_rwj3n"), SubResource("Resource_bv3va"), SubResource("Resource_plpwp"), SubResource("Resource_x62ou"), SubResource("Resource_r6w47"), SubResource("Resource_v1y8e"), SubResource("Resource_gvay1"), SubResource("Resource_w6el8"), SubResource("Resource_seqqr"), SubResource("Resource_7xxxm"), SubResource("Resource_7h6kj"), SubResource("Resource_aolcl"), SubResource("Resource_82i5r"), SubResource("Resource_tjw0t"), SubResource("Resource_hqq3c"), SubResource("Resource_q8veu")])
+
+[sub_resource type="Resource" id="Resource_j0o32"]
+script = ExtResource("4_lkcle")
+prop_id = &"sofa"
+position = Vector3(7, 0, 6.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_n8lvj"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(4, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_wvxxx"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(10, 0, 4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_rer73"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(7, 0, 4.5)
+
+[sub_resource type="Resource" id="Resource_ieheb"]
+script = ExtResource("4_lkcle")
+prop_id = &"cake_stand"
+position = Vector3(7, 0.5, 4.5)
+
+[sub_resource type="Resource" id="Resource_uayea"]
+script = ExtResource("4_lkcle")
+prop_id = &"harp_gilt"
+position = Vector3(15.5, 0, 2)
+
+[sub_resource type="Resource" id="Resource_ltfse"]
+script = ExtResource("4_lkcle")
+prop_id = &"birdcage_gilt"
+position = Vector3(16.8, 0, 8.6)
+
+[sub_resource type="Resource" id="Resource_wnh4o"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(12.5, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_kdxv7"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(7, 0, 5)
+
+[sub_resource type="Resource" id="Resource_64q5n"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 5)
+
+[sub_resource type="Resource" id="Resource_3ne4w"]
+script = ExtResource("4_lkcle")
+prop_id = &"cabinet_curio"
+position = Vector3(10, 0, 0.3)
+
+[sub_resource type="Resource" id="Resource_poi4o"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(1, 0, 9)
+
+[sub_resource type="Resource" id="Resource_1pm54"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(7, 1.6, 0.15)
+
+[sub_resource type="Resource" id="Resource_qgree"]
+script = ExtResource("3_aa53f")
+id = &"rose_parlour"
+display_name = "Rose Parlour"
+level = 1
+rect = Rect2(-26, -38, 18, 10)
+floor_kind = &"carpet"
+wall_color = Color(0.99, 0.75, 0.83, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_j0o32"), SubResource("Resource_n8lvj"), SubResource("Resource_wvxxx"), SubResource("Resource_rer73"), SubResource("Resource_ieheb"), SubResource("Resource_uayea"), SubResource("Resource_ltfse"), SubResource("Resource_wnh4o"), SubResource("Resource_kdxv7"), SubResource("Resource_64q5n"), SubResource("Resource_3ne4w"), SubResource("Resource_poi4o"), SubResource("Resource_1pm54")])
+
+[sub_resource type="Resource" id="Resource_ep4w3"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(8, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_yxqcl"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(4, 3.3, 4)
+
+[sub_resource type="Resource" id="Resource_cmbpe"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(12, 3.3, 4)
+
+[sub_resource type="Resource" id="Resource_ix454"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(2, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_1roi3"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(14, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_f0yiq"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(3, 1.2, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_1w2xv"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(13, 1.2, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_18bi0"]
+script = ExtResource("4_lkcle")
+prop_id = &"urn_flowers"
+position = Vector3(1, 0, 7)
+
+[sub_resource type="Resource" id="Resource_ucdlu"]
+script = ExtResource("4_lkcle")
+prop_id = &"urn_flowers"
+position = Vector3(15, 0, 7)
+
+[sub_resource type="Resource" id="Resource_fb88u"]
+script = ExtResource("4_lkcle")
+prop_id = &"clock_grandfather"
+position = Vector3(11, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_wdevf"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(5, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_tjfwl"]
+script = ExtResource("3_aa53f")
+id = &"west_wing_hall"
+display_name = "West Wing Hall"
+level = 1
+rect = Rect2(-58, -54, 16, 8)
+floor_kind = &"marble"
+wall_color = Color(0.99, 0.96, 0.94, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_ep4w3"), SubResource("Resource_yxqcl"), SubResource("Resource_cmbpe"), SubResource("Resource_ix454"), SubResource("Resource_1roi3"), SubResource("Resource_f0yiq"), SubResource("Resource_1w2xv"), SubResource("Resource_18bi0"), SubResource("Resource_ucdlu"), SubResource("Resource_fb88u"), SubResource("Resource_wdevf")])
+
+[sub_resource type="Resource" id="Resource_iox4j"]
+script = ExtResource("4_lkcle")
+prop_id = &"cradle_chest"
+position = Vector3(8, 0, 7)
+
+[sub_resource type="Resource" id="Resource_jaj5b"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_single"
+position = Vector3(1, 0, 3)
+
+[sub_resource type="Resource" id="Resource_ue67w"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_single"
+position = Vector3(15, 0, 3)
+
+[sub_resource type="Resource" id="Resource_rqcj0"]
+script = ExtResource("4_lkcle")
+prop_id = &"rocking_horse"
+position = Vector3(4, 0, 9)
+
+[sub_resource type="Resource" id="Resource_vod2n"]
+script = ExtResource("4_lkcle")
+prop_id = &"dollhouse"
+position = Vector3(13, 0, 12.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_17r3h"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(2, 0, 12.8)
+
+[sub_resource type="Resource" id="Resource_2p32w"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(8, 0, 7)
+
+[sub_resource type="Resource" id="Resource_vhet4"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(8, 3.3, 7)
+
+[sub_resource type="Resource" id="Resource_yeo60"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(8, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_h4oml"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(15.6, 0, 8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_pcdn3"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_round"
+position = Vector3(11, 0, 9)
+
+[sub_resource type="Resource" id="Resource_c0btl"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(10, 0, 9.8)
+yaw_deg = 160.0
+
+[sub_resource type="Resource" id="Resource_toh7x"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(12, 0, 9.8)
+yaw_deg = -160.0
+
+[sub_resource type="Resource" id="Resource_ngdrv"]
+script = ExtResource("4_lkcle")
+prop_id = &"cake_stand"
+position = Vector3(11, 0.75, 9)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_sbuhp"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(5, 0, 1.2)
+
+[sub_resource type="Resource" id="Resource_5upxo"]
+script = ExtResource("3_aa53f")
+id = &"old_nursery"
+display_name = "Old Nursery"
+level = 1
+rect = Rect2(-58, -68, 16, 14)
+floor_kind = &"carpet"
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_iox4j"), SubResource("Resource_jaj5b"), SubResource("Resource_ue67w"), SubResource("Resource_rqcj0"), SubResource("Resource_vod2n"), SubResource("Resource_17r3h"), SubResource("Resource_2p32w"), SubResource("Resource_vhet4"), SubResource("Resource_yeo60"), SubResource("Resource_h4oml"), SubResource("Resource_pcdn3"), SubResource("Resource_c0btl"), SubResource("Resource_toh7x"), SubResource("Resource_ngdrv"), SubResource("Resource_sbuhp")])
+notes = "Dust sheets and a rocking horse: a court that has had no children for a long time."
+
+[sub_resource type="Resource" id="Resource_tsgqq"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_work"
+position = Vector3(8, 0, 7)
+
+[sub_resource type="Resource" id="Resource_e70fc"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_rack_herbs"
+position = Vector3(0.6, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_rc1ro"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(6, 3.2, 4)
+
+[sub_resource type="Resource" id="Resource_ao6ka"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(10, 3.2, 4)
+
+[sub_resource type="Resource" id="Resource_k47ch"]
+script = ExtResource("4_lkcle")
+prop_id = &"cabinet_curio"
+position = Vector3(0.4, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_0i0j2"]
+script = ExtResource("4_lkcle")
+prop_id = &"cabinet_curio"
+position = Vector3(3, 0, 13.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_pjrkv"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(12, 0, 12.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_sub4n"]
+script = ExtResource("4_lkcle")
+prop_id = &"inkstand"
+position = Vector3(12, 0.8, 12.8)
+
+[sub_resource type="Resource" id="Resource_3vuh4"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(1, 0, 1)
+
+[sub_resource type="Resource" id="Resource_03217"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(15, 0, 1)
+
+[sub_resource type="Resource" id="Resource_pkydt"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(15, 0, 10)
+
+[sub_resource type="Resource" id="Resource_2e1uy"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(8, 0, 0.5)
+
+[sub_resource type="Resource" id="Resource_530tx"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_small"
+position = Vector3(8, 3.3, 7)
+
+[sub_resource type="Resource" id="Resource_2bg11"]
+script = ExtResource("4_lkcle")
+prop_id = &"book_stack"
+position = Vector3(8, 0.9, 7)
+
+[sub_resource type="Resource" id="Resource_yklcn"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(13, 0, 9)
+yaw_deg = -120.0
+
+[sub_resource type="Resource" id="Resource_8h5vu"]
+script = ExtResource("4_lkcle")
+prop_id = &"vial_rack"
+position = Vector3(7, 0, 13.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_pqsri"]
+script = ExtResource("3_aa53f")
+id = &"pressed_flower_study"
+display_name = "Pressed-Flower Study"
+level = 1
+rect = Rect2(-74, -68, 16, 14)
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_tsgqq"), SubResource("Resource_e70fc"), SubResource("Resource_rc1ro"), SubResource("Resource_ao6ka"), SubResource("Resource_k47ch"), SubResource("Resource_0i0j2"), SubResource("Resource_pjrkv"), SubResource("Resource_sub4n"), SubResource("Resource_3vuh4"), SubResource("Resource_03217"), SubResource("Resource_pkydt"), SubResource("Resource_2e1uy"), SubResource("Resource_530tx"), SubResource("Resource_2bg11"), SubResource("Resource_yklcn"), SubResource("Resource_8h5vu")])
+
+[sub_resource type="Resource" id="Resource_j1di2"]
+script = ExtResource("4_lkcle")
+prop_id = &"bed_canopy"
+position = Vector3(1.5, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_bdpb1"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 7.8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_g7xi4"]
+script = ExtResource("4_lkcle")
+prop_id = &"nightstand"
+position = Vector3(0.4, 0, 12.2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_hfiv1"]
+script = ExtResource("4_lkcle")
+prop_id = &"candelabra"
+position = Vector3(0.4, 0.7, 12.2)
+
+[sub_resource type="Resource" id="Resource_jxqmv"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(8, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_nhn1c"]
+script = ExtResource("4_lkcle")
+prop_id = &"dresser"
+position = Vector3(12, 0, 19.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_2igkp"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(8, 0, 15)
+
+[sub_resource type="Resource" id="Resource_mit41"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(7, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_x11kf"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 10)
+
+[sub_resource type="Resource" id="Resource_5r2vn"]
+script = ExtResource("4_lkcle")
+prop_id = &"fireplace_small"
+position = Vector3(15.7, 0, 15)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_0yiy4"]
+script = ExtResource("4_lkcle")
+prop_id = &"vanity_table"
+position = Vector3(3, 0, 19.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_s0vi8"]
+script = ExtResource("4_lkcle")
+prop_id = &"pouf_stool"
+position = Vector3(3, 0, 18.6)
+
+[sub_resource type="Resource" id="Resource_vvmfl"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(15, 0, 1)
+
+[sub_resource type="Resource" id="Resource_hq5hi"]
+script = ExtResource("4_lkcle")
+prop_id = &"washstand"
+position = Vector3(4, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_2mtc7"]
+script = ExtResource("4_lkcle")
+prop_id = &"dressing_screen"
+position = Vector3(13, 0, 1)
+
+[sub_resource type="Resource" id="Resource_sgtoo"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_medium"
+position = Vector3(0.15, 1.5, 16)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_b5whm"]
+script = ExtResource("3_aa53f")
+id = &"guest_suite_wisteria"
+display_name = "Wisteria Guest Suite"
+level = 1
+rect = Rect2(-74, -54, 16, 20)
+wall_color = Color(0.88, 0.8, 0.98, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_j1di2"), SubResource("Resource_bdpb1"), SubResource("Resource_g7xi4"), SubResource("Resource_hfiv1"), SubResource("Resource_jxqmv"), SubResource("Resource_nhn1c"), SubResource("Resource_2igkp"), SubResource("Resource_mit41"), SubResource("Resource_x11kf"), SubResource("Resource_5r2vn"), SubResource("Resource_0yiy4"), SubResource("Resource_s0vi8"), SubResource("Resource_vvmfl"), SubResource("Resource_hq5hi"), SubResource("Resource_2mtc7"), SubResource("Resource_sgtoo")])
+
+[sub_resource type="Resource" id="Resource_70jvr"]
+script = ExtResource("4_lkcle")
+prop_id = &"harp_gilt"
+position = Vector3(3, 0, 3)
+
+[sub_resource type="Resource" id="Resource_hiqyj"]
+script = ExtResource("4_lkcle")
+prop_id = &"lute_on_stand"
+position = Vector3(5, 0, 1.5)
+
+[sub_resource type="Resource" id="Resource_pdpld"]
+script = ExtResource("4_lkcle")
+prop_id = &"music_stand"
+position = Vector3(4, 0, 5)
+
+[sub_resource type="Resource" id="Resource_ymn5u"]
+script = ExtResource("4_lkcle")
+prop_id = &"music_stand"
+position = Vector3(6, 0, 4)
+
+[sub_resource type="Resource" id="Resource_hfub8"]
+script = ExtResource("4_lkcle")
+prop_id = &"sofa"
+position = Vector3(10, 0, 10.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_wwn2r"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(13.5, 0, 7)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_3vgn5"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(7, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_xrrdw"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(10, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_m1wa6"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(10, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_4sjwh"]
+script = ExtResource("4_lkcle")
+prop_id = &"chandelier_crystal"
+position = Vector3(8, 2.6, 6)
+
+[sub_resource type="Resource" id="Resource_l5epv"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(1, 0, 11)
+
+[sub_resource type="Resource" id="Resource_k22vc"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_palm"
+position = Vector3(15, 0, 1)
+
+[sub_resource type="Resource" id="Resource_evir1"]
+script = ExtResource("4_lkcle")
+prop_id = &"birdcage_gilt"
+position = Vector3(15, 0, 11)
+
+[sub_resource type="Resource" id="Resource_rr1e1"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(10, 0.5, 7.5)
+
+[sub_resource type="Resource" id="Resource_12yuy"]
+script = ExtResource("3_aa53f")
+id = &"wisteria_salon"
+display_name = "Wisteria Music Salon"
+level = 1
+rect = Rect2(-58, -46, 16, 12)
+floor_kind = &"marble"
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_70jvr"), SubResource("Resource_hiqyj"), SubResource("Resource_pdpld"), SubResource("Resource_ymn5u"), SubResource("Resource_hfub8"), SubResource("Resource_wwn2r"), SubResource("Resource_3vgn5"), SubResource("Resource_xrrdw"), SubResource("Resource_m1wa6"), SubResource("Resource_4sjwh"), SubResource("Resource_l5epv"), SubResource("Resource_k22vc"), SubResource("Resource_evir1"), SubResource("Resource_rr1e1")])
+
+[sub_resource type="Resource" id="Resource_g4t57"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(4, 0, 7.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_jqvl0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(30, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_2ec1l"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(58, 0, 7.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ebmyd"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(16, 0, 0.7)
+
+[sub_resource type="Resource" id="Resource_4fdo4"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(52, 0, 0.7)
+
+[sub_resource type="Resource" id="Resource_3guyc"]
+script = ExtResource("4_lkcle")
+prop_id = &"coat_rack"
+position = Vector3(63, 0, 7)
+
+[sub_resource type="Resource" id="Resource_tmvhu"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(40, 1.5, 7.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_hwqg5"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(8, 1.5, 0.15)
+
+[sub_resource type="Resource" id="Resource_lh56h"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(4, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_xjb8w"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(15, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_5le8k"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(26, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_h18sv"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(37, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_7jytb"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(48, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_mltkf"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_runner"
+position = Vector3(59, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_hqxox"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(8, 3.4, 4)
+
+[sub_resource type="Resource" id="Resource_rx75i"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(24, 3.4, 4)
+
+[sub_resource type="Resource" id="Resource_u5fp5"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(40, 3.4, 4)
+
+[sub_resource type="Resource" id="Resource_ecsbi"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(56, 3.4, 4)
+
+[sub_resource type="Resource" id="Resource_vrd5w"]
+script = ExtResource("3_aa53f")
+id = &"attic_long_hall"
+display_name = "Attic Long Hall"
+level = 2
+rect = Rect2(-32, -54, 64, 8)
+kind = &"corridor"
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_g4t57"), SubResource("Resource_jqvl0"), SubResource("Resource_2ec1l"), SubResource("Resource_ebmyd"), SubResource("Resource_4fdo4"), SubResource("Resource_3guyc"), SubResource("Resource_tmvhu"), SubResource("Resource_hwqg5"), SubResource("Resource_lh56h"), SubResource("Resource_xjb8w"), SubResource("Resource_5le8k"), SubResource("Resource_h18sv"), SubResource("Resource_7jytb"), SubResource("Resource_mltkf"), SubResource("Resource_hqxox"), SubResource("Resource_rx75i"), SubResource("Resource_u5fp5"), SubResource("Resource_ecsbi")])
+
+[sub_resource type="Resource" id="Resource_trjvq"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(1.6, 0, 4.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_isgfc"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(6.4, 0, 4.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_5a52y"]
+script = ExtResource("4_lkcle")
+prop_id = &"balustrade"
+position = Vector3(4, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_dclw7"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(4, 3.4, 4.5)
+
+[sub_resource type="Resource" id="Resource_56mde"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(7.2, 0, 3)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_a0bmx"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(0.8, 0, 6.8)
+
+[sub_resource type="Resource" id="Resource_dv8at"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(7.3, 0, 7.2)
+
+[sub_resource type="Resource" id="Resource_6nwfb"]
+script = ExtResource("3_aa53f")
+id = &"attic_stair_well"
+display_name = "Attic Stair Well"
+level = 2
+rect = Rect2(8, -62, 8, 8)
+kind = &"stair_hall"
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_trjvq"), SubResource("Resource_isgfc"), SubResource("Resource_5a52y"), SubResource("Resource_dclw7"), SubResource("Resource_56mde"), SubResource("Resource_a0bmx"), SubResource("Resource_dv8at")])
+
+[sub_resource type="Resource" id="Resource_8gmxq"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(2, 0, 2)
+
+[sub_resource type="Resource" id="Resource_gs6dk"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(2, 0, 5)
+
+[sub_resource type="Resource" id="Resource_hasp5"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(5, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_vgcse"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(18, 0, 14)
+
+[sub_resource type="Resource" id="Resource_w6am1"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(18, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ew2vl"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(9, 0, 1)
+
+[sub_resource type="Resource" id="Resource_5icrd"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(10.5, 0, 1)
+
+[sub_resource type="Resource" id="Resource_vutqv"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(9.7, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_lnjml"]
+script = ExtResource("4_lkcle")
+prop_id = &"barrel"
+position = Vector3(15, 0, 1)
+
+[sub_resource type="Resource" id="Resource_73m04"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(19.6, 0, 4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_mdpwo"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(0.4, 0, 12)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_crqtl"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(6, 0, 9)
+
+[sub_resource type="Resource" id="Resource_5u2hj"]
+script = ExtResource("4_lkcle")
+prop_id = &"coat_rack"
+position = Vector3(7, 0, 10)
+
+[sub_resource type="Resource" id="Resource_kn2uj"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(12, 0, 8)
+
+[sub_resource type="Resource" id="Resource_yp3cf"]
+script = ExtResource("4_lkcle")
+prop_id = &"cheval_mirror"
+position = Vector3(13.5, 0, 9)
+yaw_deg = -30.0
+
+[sub_resource type="Resource" id="Resource_jqe5e"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3.4, 6)
+
+[sub_resource type="Resource" id="Resource_vp3xr"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(14, 3.4, 12)
+
+[sub_resource type="Resource" id="Resource_3r2f0"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(10, 0, 9)
+
+[sub_resource type="Resource" id="Resource_xbjku"]
+script = ExtResource("3_aa53f")
+id = &"attic_trunk_room"
+display_name = "Attic Trunk Room"
+level = 2
+rect = Rect2(-32, -72, 20, 18)
+wall_color = Color(1, 0.87, 0.78, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_8gmxq"), SubResource("Resource_gs6dk"), SubResource("Resource_hasp5"), SubResource("Resource_vgcse"), SubResource("Resource_w6am1"), SubResource("Resource_ew2vl"), SubResource("Resource_5icrd"), SubResource("Resource_vutqv"), SubResource("Resource_lnjml"), SubResource("Resource_73m04"), SubResource("Resource_mdpwo"), SubResource("Resource_crqtl"), SubResource("Resource_5u2hj"), SubResource("Resource_kn2uj"), SubResource("Resource_yp3cf"), SubResource("Resource_jqe5e"), SubResource("Resource_vp3xr"), SubResource("Resource_3r2f0")])
+notes = "Attic storeroom: travel trunks, old gowns and coats."
+
+[sub_resource type="Resource" id="Resource_jaris"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(1, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_gyjlu"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(1, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_xt1ej"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(19, 0, 2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_4kfxy"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(19, 0, 8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_q65i1"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(6, 0, 0.6)
+yaw_deg = 10.0
+
+[sub_resource type="Resource" id="Resource_ji2jy"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_large"
+position = Vector3(13, 0, 0.6)
+yaw_deg = -10.0
+
+[sub_resource type="Resource" id="Resource_nmvhl"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(3, 0, 16.6)
+yaw_deg = 170.0
+
+[sub_resource type="Resource" id="Resource_nr1gb"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(17, 0, 16.6)
+yaw_deg = -170.0
+
+[sub_resource type="Resource" id="Resource_ieakc"]
+script = ExtResource("4_lkcle")
+prop_id = &"easel"
+position = Vector3(9, 0, 9)
+
+[sub_resource type="Resource" id="Resource_6rqde"]
+script = ExtResource("4_lkcle")
+prop_id = &"easel"
+position = Vector3(11, 0, 10)
+yaw_deg = 30.0
+
+[sub_resource type="Resource" id="Resource_wfccq"]
+script = ExtResource("4_lkcle")
+prop_id = &"bust_pedestal"
+position = Vector3(6, 0, 12)
+
+[sub_resource type="Resource" id="Resource_fr0pf"]
+script = ExtResource("4_lkcle")
+prop_id = &"statue_maiden"
+position = Vector3(15, 0, 12)
+
+[sub_resource type="Resource" id="Resource_fmxvu"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(4, 0, 9)
+
+[sub_resource type="Resource" id="Resource_qfl24"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(16, 0, 5)
+
+[sub_resource type="Resource" id="Resource_tanat"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3.4, 8)
+
+[sub_resource type="Resource" id="Resource_7qkmg"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(14, 3.4, 8)
+
+[sub_resource type="Resource" id="Resource_faf4p"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(10, 0, 16.8)
+
+[sub_resource type="Resource" id="Resource_om2v4"]
+script = ExtResource("3_aa53f")
+id = &"attic_painting_loft"
+display_name = "Covered-Painting Loft"
+level = 2
+rect = Rect2(-12, -72, 20, 18)
+wall_color = Color(0.88, 0.8, 0.98, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_jaris"), SubResource("Resource_gyjlu"), SubResource("Resource_xt1ej"), SubResource("Resource_4kfxy"), SubResource("Resource_q65i1"), SubResource("Resource_ji2jy"), SubResource("Resource_nmvhl"), SubResource("Resource_nr1gb"), SubResource("Resource_ieakc"), SubResource("Resource_6rqde"), SubResource("Resource_wfccq"), SubResource("Resource_fr0pf"), SubResource("Resource_fmxvu"), SubResource("Resource_qfl24"), SubResource("Resource_tanat"), SubResource("Resource_7qkmg"), SubResource("Resource_faf4p")])
+notes = "Attic storeroom: dust-sheeted paintings and statues waiting for the gallery to reopen."
+
+[sub_resource type="Resource" id="Resource_yqrug"]
+script = ExtResource("4_lkcle")
+prop_id = &"linen_press"
+position = Vector3(0.4, 0, 3)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_iqvg5"]
+script = ExtResource("4_lkcle")
+prop_id = &"linen_press"
+position = Vector3(0.4, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ul203"]
+script = ExtResource("4_lkcle")
+prop_id = &"linen_press"
+position = Vector3(0.4, 0, 11)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ibpda"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(6, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_smm0x"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(10, 0, 0.4)
+
+[sub_resource type="Resource" id="Resource_mff5y"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(15.85, 1.4, 10)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_xp3lg"]
+script = ExtResource("4_lkcle")
+prop_id = &"mask_display"
+position = Vector3(15.85, 1.4, 14)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_jpk0q"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(6, 0, 8)
+
+[sub_resource type="Resource" id="Resource_22nit"]
+script = ExtResource("4_lkcle")
+prop_id = &"mannequin_gown"
+position = Vector3(9, 0, 8)
+
+[sub_resource type="Resource" id="Resource_an6g0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(12, 0, 16.8)
+
+[sub_resource type="Resource" id="Resource_4iwmo"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(3, 0, 16.8)
+
+[sub_resource type="Resource" id="Resource_uh12d"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_line"
+position = Vector3(8, 0, 12)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_peabo"]
+script = ExtResource("4_lkcle")
+prop_id = &"ironing_table"
+position = Vector3(12, 0, 11)
+
+[sub_resource type="Resource" id="Resource_0vhcp"]
+script = ExtResource("4_lkcle")
+prop_id = &"hat_stand"
+position = Vector3(14.5, 0, 2)
+
+[sub_resource type="Resource" id="Resource_p0pmi"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(8, 3.4, 8)
+
+[sub_resource type="Resource" id="Resource_b0c2i"]
+script = ExtResource("4_lkcle")
+prop_id = &"loose_panel"
+position = Vector3(15.9, 0.6, 6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_l6iwy"]
+script = ExtResource("3_aa53f")
+id = &"attic_costume_store"
+display_name = "Linen & Costume Store"
+level = 2
+rect = Rect2(16, -72, 16, 18)
+wall_color = Color(1, 0.86, 0.89, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_yqrug"), SubResource("Resource_iqvg5"), SubResource("Resource_ul203"), SubResource("Resource_ibpda"), SubResource("Resource_smm0x"), SubResource("Resource_mff5y"), SubResource("Resource_xp3lg"), SubResource("Resource_jpk0q"), SubResource("Resource_22nit"), SubResource("Resource_an6g0"), SubResource("Resource_4iwmo"), SubResource("Resource_uh12d"), SubResource("Resource_peabo"), SubResource("Resource_0vhcp"), SubResource("Resource_p0pmi"), SubResource("Resource_b0c2i")])
+notes = "Old Calanmai and Solstice masks and costumes. A loose board hides the lever to the Moon Tower stair."
+
+[sub_resource type="Resource" id="Resource_h86xl"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_rack_herbs"
+position = Vector3(0.6, 0, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_5foka"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_rack_herbs"
+position = Vector3(0.6, 0, 11)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_cmenp"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_rack_herbs"
+position = Vector3(21.4, 0, 8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_1ru71"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_line"
+position = Vector3(8, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_eq0f2"]
+script = ExtResource("4_lkcle")
+prop_id = &"drying_line"
+position = Vector3(14, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_mu0r5"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_work"
+position = Vector3(11, 0, 12)
+
+[sub_resource type="Resource" id="Resource_t24yj"]
+script = ExtResource("4_lkcle")
+prop_id = &"basket_produce"
+position = Vector3(10, 0, 13.6)
+
+[sub_resource type="Resource" id="Resource_vfngd"]
+script = ExtResource("4_lkcle")
+prop_id = &"basket_produce"
+position = Vector3(12.5, 0, 10.6)
+
+[sub_resource type="Resource" id="Resource_7ufs0"]
+script = ExtResource("4_lkcle")
+prop_id = &"stool"
+position = Vector3(11, 0, 10.4)
+
+[sub_resource type="Resource" id="Resource_qi05i"]
+script = ExtResource("4_lkcle")
+prop_id = &"barrel"
+position = Vector3(20, 0, 16.6)
+
+[sub_resource type="Resource" id="Resource_hi3ij"]
+script = ExtResource("4_lkcle")
+prop_id = &"vial_rack"
+position = Vector3(6, 0, 17.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_qh1k0"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3.4, 12)
+
+[sub_resource type="Resource" id="Resource_o1xl5"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(16, 3.4, 12)
+
+[sub_resource type="Resource" id="Resource_nyxls"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(4, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_pdmq0"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(7, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_pal57"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(10, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_oy6ul"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(13, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_dtbyi"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(16, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_habhp"]
+script = ExtResource("4_lkcle")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(19, 3.2, 3.5)
+
+[sub_resource type="Resource" id="Resource_1cqyq"]
+script = ExtResource("3_aa53f")
+id = &"attic_herb_loft"
+display_name = "Herb-Drying Loft"
+level = 2
+rect = Rect2(-32, -46, 22, 18)
+wall_color = Color(0.84, 0.93, 0.8, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_h86xl"), SubResource("Resource_5foka"), SubResource("Resource_cmenp"), SubResource("Resource_1ru71"), SubResource("Resource_eq0f2"), SubResource("Resource_mu0r5"), SubResource("Resource_t24yj"), SubResource("Resource_vfngd"), SubResource("Resource_7ufs0"), SubResource("Resource_qi05i"), SubResource("Resource_hi3ij"), SubResource("Resource_qh1k0"), SubResource("Resource_o1xl5"), SubResource("Resource_nyxls"), SubResource("Resource_pdmq0"), SubResource("Resource_pal57"), SubResource("Resource_oy6ul"), SubResource("Resource_dtbyi"), SubResource("Resource_habhp")])
+
+[sub_resource type="Resource" id="Resource_l6t41"]
+script = ExtResource("4_lkcle")
+prop_id = &"rocking_horse"
+position = Vector3(4, 0, 6)
+
+[sub_resource type="Resource" id="Resource_ow3iv"]
+script = ExtResource("4_lkcle")
+prop_id = &"dollhouse"
+position = Vector3(16, 0, 4)
+
+[sub_resource type="Resource" id="Resource_b0j57"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1.2, 0, 12)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_pwbw2"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(6, 0, 14)
+
+[sub_resource type="Resource" id="Resource_e8bwb"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(8, 0, 15)
+
+[sub_resource type="Resource" id="Resource_s23l5"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_round"
+position = Vector3(12, 0, 12)
+
+[sub_resource type="Resource" id="Resource_0i413"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(11, 0, 13)
+yaw_deg = 160.0
+
+[sub_resource type="Resource" id="Resource_bqdms"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(13, 0, 13)
+yaw_deg = -160.0
+
+[sub_resource type="Resource" id="Resource_rqjdx"]
+script = ExtResource("4_lkcle")
+prop_id = &"cake_stand"
+position = Vector3(12, 0.75, 12)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_yqulg"]
+script = ExtResource("4_lkcle")
+prop_id = &"birdcage_gilt"
+position = Vector3(18.8, 0, 9)
+
+[sub_resource type="Resource" id="Resource_jv6us"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(0.4, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_j6mvn"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(10, 0, 10)
+
+[sub_resource type="Resource" id="Resource_mllso"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(10, 0, 17.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_5a5v7"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(10, 3.4, 9)
+
+[sub_resource type="Resource" id="Resource_pn88l"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(16, 2.2, 4)
+
+[sub_resource type="Resource" id="Resource_ogu67"]
+script = ExtResource("3_aa53f")
+id = &"attic_playroom"
+display_name = "Forgotten Playroom"
+level = 2
+rect = Rect2(-10, -46, 20, 18)
+floor_kind = &"carpet"
+wall_color = Color(0.99, 0.75, 0.83, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_l6t41"), SubResource("Resource_ow3iv"), SubResource("Resource_b0j57"), SubResource("Resource_pwbw2"), SubResource("Resource_e8bwb"), SubResource("Resource_s23l5"), SubResource("Resource_0i413"), SubResource("Resource_bqdms"), SubResource("Resource_rqjdx"), SubResource("Resource_yqulg"), SubResource("Resource_jv6us"), SubResource("Resource_j6mvn"), SubResource("Resource_mllso"), SubResource("Resource_5a5v7"), SubResource("Resource_pn88l")])
+notes = "A secret-feeling attic playroom: dollhouse, rocking horse, a doll's tea party under the eaves."
+
+[sub_resource type="Resource" id="Resource_562sy"]
+script = ExtResource("4_lkcle")
+prop_id = &"loom_upright"
+position = Vector3(4, 0, 3)
+
+[sub_resource type="Resource" id="Resource_xvnqf"]
+script = ExtResource("4_lkcle")
+prop_id = &"loom_upright"
+position = Vector3(10, 0, 3)
+
+[sub_resource type="Resource" id="Resource_t6n4k"]
+script = ExtResource("4_lkcle")
+prop_id = &"spinning_wheel"
+position = Vector3(16, 0, 4)
+
+[sub_resource type="Resource" id="Resource_1opqd"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(20.8, 0, 10)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_2sxxr"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(20.8, 0, 14)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_rjey4"]
+script = ExtResource("4_lkcle")
+prop_id = &"basket_produce"
+position = Vector3(15, 0, 7)
+
+[sub_resource type="Resource" id="Resource_vemdx"]
+script = ExtResource("4_lkcle")
+prop_id = &"basket_produce"
+position = Vector3(6, 0, 7)
+
+[sub_resource type="Resource" id="Resource_2tfk6"]
+script = ExtResource("4_lkcle")
+prop_id = &"bench_settle"
+position = Vector3(7, 0, 6)
+
+[sub_resource type="Resource" id="Resource_dxudm"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_work"
+position = Vector3(11, 0, 12)
+
+[sub_resource type="Resource" id="Resource_suvts"]
+script = ExtResource("4_lkcle")
+prop_id = &"tapestry_roses"
+position = Vector3(11, 1, 17.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ogp31"]
+script = ExtResource("4_lkcle")
+prop_id = &"stool"
+position = Vector3(11, 0, 10.6)
+
+[sub_resource type="Resource" id="Resource_2wvbq"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3.4, 9)
+
+[sub_resource type="Resource" id="Resource_5ufpb"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(16, 3.4, 9)
+
+[sub_resource type="Resource" id="Resource_3xpqg"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_large"
+position = Vector3(11, 0, 12)
+
+[sub_resource type="Resource" id="Resource_ogwm3"]
+script = ExtResource("3_aa53f")
+id = &"attic_weaving_loft"
+display_name = "Weaving Loft"
+level = 2
+rect = Rect2(10, -46, 22, 18)
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_562sy"), SubResource("Resource_xvnqf"), SubResource("Resource_t6n4k"), SubResource("Resource_1opqd"), SubResource("Resource_2sxxr"), SubResource("Resource_rjey4"), SubResource("Resource_vemdx"), SubResource("Resource_2tfk6"), SubResource("Resource_dxudm"), SubResource("Resource_suvts"), SubResource("Resource_ogp31"), SubResource("Resource_2wvbq"), SubResource("Resource_5ufpb"), SubResource("Resource_3xpqg")])
+
+[sub_resource type="Resource" id="Resource_53gq5"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1, 0, 3)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_et7b0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_ljxx3"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(9, 0, 18)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_kdnux"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(1, 0, 15)
+
+[sub_resource type="Resource" id="Resource_fvx2o"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(1, 0, 16.4)
+
+[sub_resource type="Resource" id="Resource_u5uib"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(8.6, 0, 3)
+
+[sub_resource type="Resource" id="Resource_f1t14"]
+script = ExtResource("4_lkcle")
+prop_id = &"wardrobe_tall"
+position = Vector3(0.4, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_j32ys"]
+script = ExtResource("4_lkcle")
+prop_id = &"dressing_screen"
+position = Vector3(8, 0, 21)
+yaw_deg = 70.0
+
+[sub_resource type="Resource" id="Resource_iug20"]
+script = ExtResource("4_lkcle")
+prop_id = &"mirror_gilt"
+position = Vector3(9.6, 0, 7)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_04n0j"]
+script = ExtResource("4_lkcle")
+prop_id = &"canvas_stack"
+position = Vector3(9.4, 0, 15)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_h0hml"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(5, 0, 18)
+yaw_deg = 30.0
+
+[sub_resource type="Resource" id="Resource_b50yy"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(5, 3.4, 6)
+
+[sub_resource type="Resource" id="Resource_erfgt"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(5, 3.4, 18)
+
+[sub_resource type="Resource" id="Resource_oq2ek"]
+script = ExtResource("3_aa53f")
+id = &"attic_west_gable"
+display_name = "West Gable Storeroom"
+level = 2
+rect = Rect2(-42, -62, 10, 24)
+wall_color = Color(0.99, 0.96, 0.94, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_53gq5"), SubResource("Resource_et7b0"), SubResource("Resource_ljxx3"), SubResource("Resource_kdnux"), SubResource("Resource_fvx2o"), SubResource("Resource_u5uib"), SubResource("Resource_f1t14"), SubResource("Resource_j32ys"), SubResource("Resource_iug20"), SubResource("Resource_04n0j"), SubResource("Resource_h0hml"), SubResource("Resource_b50yy"), SubResource("Resource_erfgt")])
+
+[sub_resource type="Resource" id="Resource_mupgn"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(3, 0, 7)
+
+[sub_resource type="Resource" id="Resource_qvppv"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(7, 0, 7)
+
+[sub_resource type="Resource" id="Resource_xtued"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(3, 0, 11)
+
+[sub_resource type="Resource" id="Resource_mqlwk"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(7, 0, 11)
+
+[sub_resource type="Resource" id="Resource_wpuh7"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(3, 0, 8)
+
+[sub_resource type="Resource" id="Resource_m3f3m"]
+script = ExtResource("4_lkcle")
+prop_id = &"chair_simple"
+position = Vector3(7, 0, 8)
+
+[sub_resource type="Resource" id="Resource_hgc4a"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_large"
+position = Vector3(5, 0, 3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_bum7c"]
+script = ExtResource("4_lkcle")
+prop_id = &"globe_stand"
+position = Vector3(1, 0, 17)
+
+[sub_resource type="Resource" id="Resource_rc3qe"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_tall"
+position = Vector3(9.6, 0, 16)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_iaofi"]
+script = ExtResource("4_lkcle")
+prop_id = &"map_wall"
+position = Vector3(5, 1.2, 0.1)
+
+[sub_resource type="Resource" id="Resource_i1t77"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(5, 3.4, 9)
+
+[sub_resource type="Resource" id="Resource_k5l0t"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(5, 3.4, 18)
+
+[sub_resource type="Resource" id="Resource_8fajv"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1.2, 0, 21)
+
+[sub_resource type="Resource" id="Resource_t6qsb"]
+script = ExtResource("3_aa53f")
+id = &"attic_schoolroom"
+display_name = "Old Schoolroom"
+level = 2
+rect = Rect2(32, -62, 10, 24)
+wall_color = Color(0.8, 0.96, 0.88, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_mupgn"), SubResource("Resource_qvppv"), SubResource("Resource_xtued"), SubResource("Resource_mqlwk"), SubResource("Resource_wpuh7"), SubResource("Resource_m3f3m"), SubResource("Resource_hgc4a"), SubResource("Resource_bum7c"), SubResource("Resource_rc3qe"), SubResource("Resource_iaofi"), SubResource("Resource_i1t77"), SubResource("Resource_k5l0t"), SubResource("Resource_8fajv")])
+
+[sub_resource type="Resource" id="Resource_bw3yv"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(7, 0, 1)
+
+[sub_resource type="Resource" id="Resource_5ug18"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(8.6, 0, 3)
+
+[sub_resource type="Resource" id="Resource_6e44n"]
+script = ExtResource("4_lkcle")
+prop_id = &"globe_stand"
+position = Vector3(7, 0, 5)
+
+[sub_resource type="Resource" id="Resource_2s3l5"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(9.6, 0, 7)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_a2gtu"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(7, 3.4, 5)
+
+[sub_resource type="Resource" id="Resource_jto45"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(9.85, 1.9, 2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_400k8"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(7, 0, 6)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_tdj6u"]
+script = ExtResource("3_aa53f")
+id = &"observatory_stair"
+display_name = "Observatory Tower Stair"
+level = 2
+rect = Rect2(-42, -72, 10, 10)
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_bw3yv"), SubResource("Resource_5ug18"), SubResource("Resource_6e44n"), SubResource("Resource_2s3l5"), SubResource("Resource_a2gtu"), SubResource("Resource_jto45"), SubResource("Resource_400k8")])
+
+[sub_resource type="Resource" id="Resource_k7xjv"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(1, 0, 1)
+
+[sub_resource type="Resource" id="Resource_u4n1l"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(5, 0, 1)
+
+[sub_resource type="Resource" id="Resource_3qmfe"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(1.2, 0, 8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_jdav6"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(3, 0, 4)
+
+[sub_resource type="Resource" id="Resource_unyd2"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(3, 3.4, 5)
+
+[sub_resource type="Resource" id="Resource_2a81k"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(0.15, 1.9, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_vqmu1"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(3, 0, 6)
+
+[sub_resource type="Resource" id="Resource_ht226"]
+script = ExtResource("3_aa53f")
+id = &"rose_tower_stair"
+display_name = "Rose Tower Stair"
+level = 2
+rect = Rect2(32, -72, 10, 10)
+wall_color = Color(0.99, 0.75, 0.83, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_k7xjv"), SubResource("Resource_u4n1l"), SubResource("Resource_3qmfe"), SubResource("Resource_jdav6"), SubResource("Resource_unyd2"), SubResource("Resource_2a81k"), SubResource("Resource_vqmu1")])
+
+[sub_resource type="Resource" id="Resource_3xt45"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(7, 3.4, 5)
+
+[sub_resource type="Resource" id="Resource_janff"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(7, 2.6, 8)
+
+[sub_resource type="Resource" id="Resource_pskjp"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(7, 0, 9.2)
+
+[sub_resource type="Resource" id="Resource_7cbtf"]
+script = ExtResource("4_lkcle")
+prop_id = &"crate"
+position = Vector3(9, 0, 6)
+
+[sub_resource type="Resource" id="Resource_qbdem"]
+script = ExtResource("4_lkcle")
+prop_id = &"coat_rack"
+position = Vector3(9, 0, 1)
+
+[sub_resource type="Resource" id="Resource_21ve6"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_sconce"
+position = Vector3(9.85, 1.9, 4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_otarl"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(5, 0, 9)
+
+[sub_resource type="Resource" id="Resource_k5xv7"]
+script = ExtResource("3_aa53f")
+id = &"lantern_tower_stair"
+display_name = "Lantern Tower Stair"
+level = 2
+rect = Rect2(-42, -38, 10, 10)
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_3xt45"), SubResource("Resource_janff"), SubResource("Resource_pskjp"), SubResource("Resource_7cbtf"), SubResource("Resource_qbdem"), SubResource("Resource_21ve6"), SubResource("Resource_otarl")])
+
+[sub_resource type="Resource" id="Resource_q01id"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(2, 0, 2)
+
+[sub_resource type="Resource" id="Resource_ik3ai"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(3, 0, 4)
+
+[sub_resource type="Resource" id="Resource_b88au"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_bank"
+position = Vector3(1, 0, 8)
+
+[sub_resource type="Resource" id="Resource_scpn0"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(3, 0, 9.2)
+
+[sub_resource type="Resource" id="Resource_hqhav"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(3, 0, 5)
+scale = 0.7
+
+[sub_resource type="Resource" id="Resource_bu82p"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(3, 2.6, 5)
+
+[sub_resource type="Resource" id="Resource_71v2y"]
+script = ExtResource("4_lkcle")
+prop_id = &"painting_small"
+position = Vector3(0.15, 1.5, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_8w5o1"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(0.4, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_sihas"]
+script = ExtResource("3_aa53f")
+id = &"moon_tower_hidden"
+display_name = "Hidden Moon-Tower Room"
+level = 2
+rect = Rect2(32, -38, 10, 10)
+floor_kind = &"carpet"
+wall_color = Color(0.88, 0.8, 0.98, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_q01id"), SubResource("Resource_ik3ai"), SubResource("Resource_b88au"), SubResource("Resource_scpn0"), SubResource("Resource_hqhav"), SubResource("Resource_bu82p"), SubResource("Resource_71v2y"), SubResource("Resource_8w5o1")])
+notes = "The attic secret room: behind a panel in the Old Schoolroom, opened by a lever in the Linen & Costume Store."
+
+[sub_resource type="Resource" id="Resource_wa3lk"]
+script = ExtResource("4_lkcle")
+prop_id = &"telescope_brass"
+position = Vector3(7, 0, 3)
+yaw_deg = 30.0
+
+[sub_resource type="Resource" id="Resource_6jl6r"]
+script = ExtResource("4_lkcle")
+prop_id = &"globe_stand"
+position = Vector3(8.5, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_8adq7"]
+script = ExtResource("4_lkcle")
+prop_id = &"map_table"
+position = Vector3(7, 0, 5.5)
+yaw_deg = 90.0
+scale = 0.7
+
+[sub_resource type="Resource" id="Resource_2vdra"]
+script = ExtResource("4_lkcle")
+prop_id = &"map_wall"
+position = Vector3(5, 1.2, 9.85)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_s5fmc"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(5.5, 0, 8.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_lpibu"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(9.6, 0, 1.2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_ju6q2"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(2.5, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_vcrsl"]
+script = ExtResource("4_lkcle")
+prop_id = &"inkstand"
+position = Vector3(2.5, 0.8, 0.6)
+
+[sub_resource type="Resource" id="Resource_7crdw"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(5, 3, 2)
+
+[sub_resource type="Resource" id="Resource_lovhk"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(8, 3.2, 8)
+
+[sub_resource type="Resource" id="Resource_mbhb6"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(3, 3.4, 9)
+
+[sub_resource type="Resource" id="Resource_e33f1"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(7, 0, 5)
+scale = 0.8
+
+[sub_resource type="Resource" id="Resource_yepww"]
+script = ExtResource("3_aa53f")
+id = &"observatory"
+display_name = "Star Observatory"
+level = 3
+rect = Rect2(-42, -72, 10, 10)
+wall_color = Color(0.82, 0.85, 1, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_wa3lk"), SubResource("Resource_6jl6r"), SubResource("Resource_8adq7"), SubResource("Resource_2vdra"), SubResource("Resource_s5fmc"), SubResource("Resource_lpibu"), SubResource("Resource_ju6q2"), SubResource("Resource_vcrsl"), SubResource("Resource_7crdw"), SubResource("Resource_lovhk"), SubResource("Resource_mbhb6"), SubResource("Resource_e33f1")])
+notes = "Under the gold dome: a brass telescope and star charts."
+
+[sub_resource type="Resource" id="Resource_7f74k"]
+script = ExtResource("4_lkcle")
+prop_id = &"rose_arbor"
+position = Vector3(3, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_qveqy"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(0.8, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_asla3"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(5.2, 0, 0.8)
+
+[sub_resource type="Resource" id="Resource_raqmx"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(0.8, 0, 9.2)
+
+[sub_resource type="Resource" id="Resource_bja45"]
+script = ExtResource("4_lkcle")
+prop_id = &"potted_roses"
+position = Vector3(5.2, 0, 9.2)
+
+[sub_resource type="Resource" id="Resource_xxlra"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(2.5, 0, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_wquhj"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(4, 0, 7.5)
+
+[sub_resource type="Resource" id="Resource_o8pe8"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(4.2, 0, 3)
+
+[sub_resource type="Resource" id="Resource_nwjuy"]
+script = ExtResource("4_lkcle")
+prop_id = &"vase_roses"
+position = Vector3(2.5, 0, 8)
+
+[sub_resource type="Resource" id="Resource_wawvt"]
+script = ExtResource("4_lkcle")
+prop_id = &"flower_garland"
+position = Vector3(3, 3, 0.2)
+
+[sub_resource type="Resource" id="Resource_067k3"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_tea"
+position = Vector3(4.5, 0, 5)
+
+[sub_resource type="Resource" id="Resource_slpvu"]
+script = ExtResource("4_lkcle")
+prop_id = &"birdcage_gilt"
+position = Vector3(1, 0, 7)
+
+[sub_resource type="Resource" id="Resource_roedj"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(3, 3, 5)
+
+[sub_resource type="Resource" id="Resource_ghygh"]
+script = ExtResource("3_aa53f")
+id = &"rose_bower"
+display_name = "Rose-Tower Bower"
+level = 3
+rect = Rect2(32, -72, 10, 10)
+floor_kind = &"carpet"
+wall_color = Color(1, 0.86, 0.89, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_7f74k"), SubResource("Resource_qveqy"), SubResource("Resource_asla3"), SubResource("Resource_raqmx"), SubResource("Resource_bja45"), SubResource("Resource_xxlra"), SubResource("Resource_wquhj"), SubResource("Resource_o8pe8"), SubResource("Resource_nwjuy"), SubResource("Resource_wawvt"), SubResource("Resource_067k3"), SubResource("Resource_slpvu"), SubResource("Resource_roedj")])
+notes = "A flower-filled lookout: climbing roses inside the tower and a view over the whole court."
+
+[sub_resource type="Resource" id="Resource_ky8o7"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(7, 0, 9.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_fqs1w"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(9.5, 0, 5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_qaxdb"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3.4, 3)
+
+[sub_resource type="Resource" id="Resource_xaxiq"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(8, 3.4, 6)
+
+[sub_resource type="Resource" id="Resource_b6shk"]
+script = ExtResource("4_lkcle")
+prop_id = &"lantern_hanging"
+position = Vector3(6, 3, 8)
+
+[sub_resource type="Resource" id="Resource_dqyem"]
+script = ExtResource("4_lkcle")
+prop_id = &"armchair"
+position = Vector3(6.5, 0, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_j5rr1"]
+script = ExtResource("4_lkcle")
+prop_id = &"table_side"
+position = Vector3(7.5, 0, 3.5)
+
+[sub_resource type="Resource" id="Resource_yjie3"]
+script = ExtResource("4_lkcle")
+prop_id = &"map_wall"
+position = Vector3(6, 1.2, 0.1)
+
+[sub_resource type="Resource" id="Resource_fo75q"]
+script = ExtResource("4_lkcle")
+prop_id = &"chest_trunk"
+position = Vector3(8.6, 0, 1)
+
+[sub_resource type="Resource" id="Resource_308fe"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(7, 0, 6)
+scale = 0.6
+
+[sub_resource type="Resource" id="Resource_khxrv"]
+script = ExtResource("4_lkcle")
+prop_id = &"fern_pot"
+position = Vector3(5, 0, 9.3)
+
+[sub_resource type="Resource" id="Resource_gdrw2"]
+script = ExtResource("3_aa53f")
+id = &"lantern_lookout"
+display_name = "Lantern Tower Lookout"
+level = 3
+rect = Rect2(-42, -38, 10, 10)
+wall_color = Color(1, 0.95, 0.76, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_ky8o7"), SubResource("Resource_fqs1w"), SubResource("Resource_qaxdb"), SubResource("Resource_xaxiq"), SubResource("Resource_b6shk"), SubResource("Resource_dqyem"), SubResource("Resource_j5rr1"), SubResource("Resource_yjie3"), SubResource("Resource_fo75q"), SubResource("Resource_308fe"), SubResource("Resource_khxrv")])
+
+[sub_resource type="Resource" id="Resource_1fhq8"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(2, 0, 2)
+
+[sub_resource type="Resource" id="Resource_0xj54"]
+script = ExtResource("4_lkcle")
+prop_id = &"cushion_pile"
+position = Vector3(3.5, 0, 3)
+
+[sub_resource type="Resource" id="Resource_j87y1"]
+script = ExtResource("4_lkcle")
+prop_id = &"chaise_longue"
+position = Vector3(2.5, 0, 6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_3jfrd"]
+script = ExtResource("4_lkcle")
+prop_id = &"window_seat"
+position = Vector3(3, 0, 9.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_7gowc"]
+script = ExtResource("4_lkcle")
+prop_id = &"portrait_masked"
+position = Vector3(0.15, 1.4, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_spc3f"]
+script = ExtResource("4_lkcle")
+prop_id = &"candle_bank"
+position = Vector3(5, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_v4k5s"]
+script = ExtResource("4_lkcle")
+prop_id = &"bookcase_low"
+position = Vector3(0.4, 0, 8.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_7dj5y"]
+script = ExtResource("4_lkcle")
+prop_id = &"desk_writing"
+position = Vector3(3, 0, 0.6)
+
+[sub_resource type="Resource" id="Resource_j62ht"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(2, 3, 5)
+
+[sub_resource type="Resource" id="Resource_lfx8n"]
+script = ExtResource("4_lkcle")
+prop_id = &"faelight_orb"
+position = Vector3(4, 2.6, 8)
+
+[sub_resource type="Resource" id="Resource_vy48v"]
+script = ExtResource("4_lkcle")
+prop_id = &"rug_round"
+position = Vector3(3, 0, 5)
+scale = 0.7
+
+[sub_resource type="Resource" id="Resource_xxs2w"]
+script = ExtResource("4_lkcle")
+prop_id = &"harp_gilt"
+position = Vector3(5, 0, 8.8)
+
+[sub_resource type="Resource" id="Resource_nnbwt"]
+script = ExtResource("3_aa53f")
+id = &"moon_tower"
+display_name = "Moon Tower Hideaway"
+level = 3
+rect = Rect2(32, -38, 10, 10)
+floor_kind = &"carpet"
+wall_color = Color(0.88, 0.8, 0.98, 1)
+props = Array[ExtResource("4_lkcle")]([SubResource("Resource_1fhq8"), SubResource("Resource_0xj54"), SubResource("Resource_j87y1"), SubResource("Resource_3jfrd"), SubResource("Resource_7gowc"), SubResource("Resource_spc3f"), SubResource("Resource_v4k5s"), SubResource("Resource_7dj5y"), SubResource("Resource_j62ht"), SubResource("Resource_lfx8n"), SubResource("Resource_vy48v"), SubResource("Resource_xxs2w")])
+notes = "Reached only through the hidden tower room: moonlit cushions and a forgotten portrait."
+
+[sub_resource type="Resource" id="Resource_jtag8"]
+script = ExtResource("6_igwsw")
+secret_id = &"jewel_closet"
+kind = &"lever"
+level = 1
+position = Vector3(41.6, 0.85, -64.6)
+prop_id = &"secret_lever"
+notes = "Catch inside the vanity's jewellery drawer; the cheval-style mirror panel swings open."
+
+[sub_resource type="Resource" id="Resource_q46un"]
+script = ExtResource("6_igwsw")
+secret_id = &"lucien_cabinet"
+kind = &"lever"
+level = 1
+position = Vector3(-23.8, 0.8, -56.5)
+prop_id = &"loose_panel"
+notes = "A loose panel by the wainscot opens into his hidden cabinet."
+
+[sub_resource type="Resource" id="Resource_ajqu2"]
+script = ExtResource("6_igwsw")
+secret_id = &"moon_tower"
+kind = &"lever"
+level = 2
+position = Vector3(31.6, 0.6, -64.5)
+prop_id = &"secret_lever"
+notes = "Under a loose board in the costume store; opens the panel in the Old Schoolroom."
+
+[sub_resource type="Resource" id="Resource_1xw4q"]
+script = ExtResource("6_igwsw")
+secret_id = &"pressed_violet"
+level = 1
+position = Vector3(20, 0.65, -71.4)
+item_id = &"col_pressed_violet"
+notes = "Tucked under the window-seat cushion in Feyre's bedroom."
+
+[sub_resource type="Resource" id="Resource_w2x7t"]
+script = ExtResource("6_igwsw")
+secret_id = &"pearl_hairpin"
+level = 1
+position = Vector3(39, 0.75, -53.5)
+item_id = &"col_pearl_hairpin"
+notes = "In the hidden jewellery closet."
+
+[sub_resource type="Resource" id="Resource_5mkj0"]
+script = ExtResource("6_igwsw")
+secret_id = &"fox_charm"
+level = 1
+position = Vector3(-27, 0.8, -63)
+item_id = &"col_fox_mask_charm"
+notes = "On Lucien's hidden desk."
+
+[sub_resource type="Resource" id="Resource_s5oe4"]
+script = ExtResource("6_igwsw")
+secret_id = &"silver_thimble"
+level = 1
+position = Vector3(-25.5, 0.1, -47.5)
+item_id = &"col_silver_thimble"
+notes = "Rolled under the linen press in the sewing room."
+
+[sub_resource type="Resource" id="Resource_bm17s"]
+script = ExtResource("6_igwsw")
+secret_id = &"painted_pebble"
+level = 2
+position = Vector3(-8.8, 0.7, -34)
+item_id = &"col_painted_pebble"
+notes = "In the playroom toy chest."
+
+[sub_resource type="Resource" id="Resource_cj5oc"]
+script = ExtResource("6_igwsw")
+secret_id = &"moonstone"
+level = 3
+position = Vector3(34, 0.1, -35)
+item_id = &"col_moonstone_ring"
+notes = "Among the cushions of the Moon Tower hideaway."
+
+[sub_resource type="Resource" id="Resource_q3goy"]
+script = ExtResource("6_igwsw")
+secret_id = &"rose_bower_view"
+kind = &"discovery"
+level = 3
+position = Vector3(37, 1, -67)
+notes = "Discovering the bower raises a flag (view over the whole court)."
+
+[sub_resource type="Resource" id="Resource_bawrx"]
+script = ExtResource("7_odi2x")
+id = &"attic"
+level_from = 1
+rect = Rect2(10, -61, 4, 7)
+rise_toward = &"south"
+style = &"service"
+
+[sub_resource type="Resource" id="Resource_r5p4b"]
+script = ExtResource("7_odi2x")
+id = &"tower_nw"
+level_from = 2
+rect = Rect2(-41, -70.5, 3, 7)
+style = &"spiral_tower"
+
+[sub_resource type="Resource" id="Resource_prnc6"]
+script = ExtResource("7_odi2x")
+id = &"tower_ne"
+level_from = 2
+rect = Rect2(38.5, -70.5, 3, 7)
+style = &"spiral_tower"
+
+[sub_resource type="Resource" id="Resource_r6hvg"]
+script = ExtResource("7_odi2x")
+id = &"tower_sw"
+level_from = 2
+rect = Rect2(-41, -36.5, 3, 7)
+rise_toward = &"south"
+style = &"spiral_tower"
+
+[sub_resource type="Resource" id="Resource_jvmvx"]
+script = ExtResource("7_odi2x")
+id = &"tower_se"
+level_from = 2
+rect = Rect2(38.5, -36.5, 3, 7)
+rise_toward = &"south"
+style = &"spiral_tower"
+
+[sub_resource type="Resource" id="Resource_4ekwk"]
+script = ExtResource("8_7cfpy")
+station_id = &"bed"
+display_name = "Feyre's Canopy Bed"
+level = 1
+position = Vector3(17.6, 0, -60)
+yaw_deg = 90.0
+prop_id = &"bed_canopy"
+canon = "C"
+
+[sub_resource type="Resource" id="Resource_em0qx"]
+script = ExtResource("8_7cfpy")
+station_id = &"bath"
+display_name = "Scented Bath"
+level = 1
+position = Vector3(32.4, 0, -57.8)
+yaw_deg = 90.0
+prop_id = &"bathtub_clawfoot"
+canon = "C"
+
+[sub_resource type="Resource" id="Resource_4iake"]
+script = ExtResource("8_7cfpy")
+station_id = &"wardrobe"
+display_name = "Feyre's Wardrobe"
+level = 1
+position = Vector3(32.2, 0, -71.4)
+prop_id = &"wardrobe_tall"
+canon = "C?"
+
+[sub_resource type="Resource" id="Resource_khhdu"]
+script = ExtResource("8_7cfpy")
+station_id = &"dressing_mirror"
+display_name = "Vanity Mirror"
+level = 1
+position = Vector3(41.85, 0.9, -66)
+yaw_deg = -90.0
+prop_id = &"vanity_mirror"
+
+[sub_resource type="Resource" id="Resource_2ywub"]
+script = ExtResource("8_7cfpy")
+station_id = &"easel"
+display_name = "Feyre's Easel"
+level = 1
+position = Vector3(16, 0, -32.5)
+yaw_deg = 180.0
+prop_id = &"easel"
+canon = "C"
+
+[sub_resource type="Resource" id="Resource_xdbhv"]
+script = ExtResource("8_7cfpy")
+station_id = &"hearth"
+display_name = "Bedroom Hearth"
+level = 1
+position = Vector3(29.6, 0, -61)
+yaw_deg = -90.0
+prop_id = &"fireplace_small"
+
+[sub_resource type="Resource" id="Resource_vdduu"]
+script = ExtResource("8_7cfpy")
+station_id = &"hearth"
+display_name = "Tamlin's Hearth"
+level = 1
+position = Vector3(41.5, 0, -42)
+yaw_deg = -90.0
+prop_id = &"fireplace_grand"
+
+[sub_resource type="Resource" id="Resource_1hb4j"]
+script = ExtResource("8_7cfpy")
+station_id = &"hearth"
+display_name = "Rose Parlour Hearth"
+level = 1
+position = Vector3(-25.6, 0, -33)
+yaw_deg = 90.0
+prop_id = &"fireplace_small"
+
+[resource]
+script = ExtResource("5_3s14m")
+part_id = &"upper"
+rooms = Array[ExtResource("3_aa53f")]([SubResource("Resource_ft3yy"), SubResource("Resource_4yyga"), SubResource("Resource_p6wr5"), SubResource("Resource_0edrl"), SubResource("Resource_ew5e5"), SubResource("Resource_gp6r4"), SubResource("Resource_i6tw2"), SubResource("Resource_m6d88"), SubResource("Resource_byxfp"), SubResource("Resource_5ctxk"), SubResource("Resource_elot7"), SubResource("Resource_1d1k6"), SubResource("Resource_qira0"), SubResource("Resource_4des8"), SubResource("Resource_66hs7"), SubResource("Resource_xxaoi"), SubResource("Resource_ek7pf"), SubResource("Resource_ph8xp"), SubResource("Resource_ofyi7"), SubResource("Resource_qam3t"), SubResource("Resource_qgree"), SubResource("Resource_tjfwl"), SubResource("Resource_5upxo"), SubResource("Resource_pqsri"), SubResource("Resource_b5whm"), SubResource("Resource_12yuy"), SubResource("Resource_vrd5w"), SubResource("Resource_6nwfb"), SubResource("Resource_xbjku"), SubResource("Resource_om2v4"), SubResource("Resource_l6iwy"), SubResource("Resource_1cqyq"), SubResource("Resource_ogu67"), SubResource("Resource_ogwm3"), SubResource("Resource_oq2ek"), SubResource("Resource_t6qsb"), SubResource("Resource_tdj6u"), SubResource("Resource_ht226"), SubResource("Resource_k5xv7"), SubResource("Resource_sihas"), SubResource("Resource_yepww"), SubResource("Resource_ghygh"), SubResource("Resource_gdrw2"), SubResource("Resource_nnbwt")])
+doors = Array[ExtResource("1_ktsxu")]([SubResource("Resource_qn044"), SubResource("Resource_bj3a1"), SubResource("Resource_pmegs"), SubResource("Resource_kioro"), SubResource("Resource_7yhkj"), SubResource("Resource_4k1lx"), SubResource("Resource_gg8nl"), SubResource("Resource_12j1i"), SubResource("Resource_c2p6l"), SubResource("Resource_f3ule"), SubResource("Resource_33vob"), SubResource("Resource_us8x7"), SubResource("Resource_bpbtd"), SubResource("Resource_xkc0g"), SubResource("Resource_8uqaf"), SubResource("Resource_yscd7"), SubResource("Resource_04dh7"), SubResource("Resource_dxxry"), SubResource("Resource_ouuvs"), SubResource("Resource_qxike"), SubResource("Resource_ficwd"), SubResource("Resource_v4qhf"), SubResource("Resource_4q2hi"), SubResource("Resource_hqqbd"), SubResource("Resource_a4av1"), SubResource("Resource_xuss1"), SubResource("Resource_viel7"), SubResource("Resource_0l1ea"), SubResource("Resource_ia8ea"), SubResource("Resource_6yxeh"), SubResource("Resource_q5ki3"), SubResource("Resource_yd66o"), SubResource("Resource_tbicb"), SubResource("Resource_b1wxx"), SubResource("Resource_8jafy"), SubResource("Resource_3rr4c"), SubResource("Resource_uajge"), SubResource("Resource_iswd3"), SubResource("Resource_bhn0w"), SubResource("Resource_b3op2"), SubResource("Resource_ewtxr"), SubResource("Resource_0kxjj"), SubResource("Resource_onxtp"), SubResource("Resource_alllr"), SubResource("Resource_0ju5a"), SubResource("Resource_y3k5r"), SubResource("Resource_x6ks4")])
+stairs = Array[ExtResource("7_odi2x")]([SubResource("Resource_bawrx"), SubResource("Resource_r5p4b"), SubResource("Resource_prnc6"), SubResource("Resource_r6hvg"), SubResource("Resource_jvmvx")])
+stations = Array[ExtResource("8_7cfpy")]([SubResource("Resource_4ekwk"), SubResource("Resource_em0qx"), SubResource("Resource_4iake"), SubResource("Resource_khhdu"), SubResource("Resource_2ywub"), SubResource("Resource_xdbhv"), SubResource("Resource_vdduu"), SubResource("Resource_1hb4j")])
+secrets = Array[ExtResource("6_igwsw")]([SubResource("Resource_jtag8"), SubResource("Resource_q46un"), SubResource("Resource_ajqu2"), SubResource("Resource_1xw4q"), SubResource("Resource_w2x7t"), SubResource("Resource_5mkj0"), SubResource("Resource_s5oe4"), SubResource("Resource_bm17s"), SubResource("Resource_cj5oc"), SubResource("Resource_q3goy")])
+roofs = Array[ExtResource("2_mi00i")]([SubResource("Resource_61qch"), SubResource("Resource_a0nj4"), SubResource("Resource_v3wrk"), SubResource("Resource_k1lev"), SubResource("Resource_15h4f"), SubResource("Resource_mgn65"), SubResource("Resource_yu0ly"), SubResource("Resource_qc66c"), SubResource("Resource_p8g0i"), SubResource("Resource_nkgjs"), SubResource("Resource_ok0ux"), SubResource("Resource_rdp50")])
