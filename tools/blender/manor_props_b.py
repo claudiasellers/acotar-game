@@ -204,6 +204,7 @@ def balustrade(p, size, c):
     w = 3.0
     p.add(box(w, 0.3, 0.12, bevel=0.02), c, "pearl", T(0, 0, 0.06))
     p.add(box(w, 0.34, 0.1, bevel=0.03), c, "pearl", T(0, 0, 0.95))
+    p.add(box(w - 0.1, 0.36, 0.03), BLUSH, "satin", T(0, 0, 0.92))      # blush band under the rail
     for i in range(9):
         x = -w / 2 + 0.17 + i * (w - 0.34) / 8
         p.add(lathe([(0.07, 0), (0.06, 0.08), (0.1, 0.3), (0.06, 0.6), (0.05, 0.66), (0.08, 0.78)], 8), c, "pearl", T(x, 0, 0.12))
