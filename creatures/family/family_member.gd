@@ -1,6 +1,6 @@
-## Nesta, Elain or their father: a coloured placeholder (engineering rule R4:
-## main characters stay mannequins until the user designs them) that walks a
-## daily routine from its FamilySchedule, so the cottage feels lived in.
+## Nesta, Elain or their father: their cast model (characters/<id>/<id>_model.tscn,
+## a coloured capsule if it is missing) that walks a daily routine from its
+## FamilySchedule, so the cottage feels lived in.
 ##
 ## Story cues: (&"family", &"gather") sends everyone to the hearth and freezes
 ## their routines; (&"family", &"release") lets them go back to their day.
@@ -9,6 +9,7 @@ extends Node3D
 
 const GROUP := &"family"
 const SPOT_GROUP := &"family_spot"
+const MODEL_SCENE := "res://characters/%s/%s_model.tscn"
 
 @export var member_id: StringName = &"nesta"
 @export var schedule: FamilySchedule
@@ -22,8 +23,10 @@ var scripted: bool = false
 var activity: StringName = &"idle"
 var target_spot: StringName = &""
 
-var _body: MeshInstance3D
+var _body: Node3D
 var _destination: Vector3
+## The cast model when there is one; it plays idle/walk from our ground speed.
+var _model: Node3D
 
 
 func _ready() -> void:
@@ -46,9 +49,13 @@ func _process(delta: float) -> void:
 				_destination = node.global_position
 	var to := _destination - global_position
 	to.y = 0.0
+	var speed := 0.0
 	if to.length() > 0.05:
 		global_position += to.limit_length(walk_speed * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 8.0 * delta)
+		speed = walk_speed if delta > 0.0 else 0.0
+	if _model and _model.has_method(&"play_locomotion"):
+		_model.play_locomotion(speed, true, delta)
 	_pose()
 
 
@@ -93,10 +100,16 @@ static func find_spot(tree: SceneTree, spot_id: StringName) -> Node3D:
 
 
 ## Sleeping lies down, sitting activities lower the body, away hides it.
+## The cast models have no sit or kneel clips yet: they lie down to sleep,
+## bow their head to plead and otherwise stand on their feet.
 func _pose() -> void:
 	if _body == null:
 		return
 	visible = activity != &"away"
+	if _model:
+		_body.rotation.x = -PI * 0.5 if activity == &"sleep" else (0.2 if activity == &"plead" else 0.0)
+		_body.position.y = 0.55 if activity == &"sleep" else 0.0
+		return
 	match activity:
 		&"sleep":
 			_body.rotation.x = -PI * 0.5
@@ -113,15 +126,23 @@ func _pose() -> void:
 
 
 func _build_body() -> void:
-	_body = MeshInstance3D.new()
+	var path := MODEL_SCENE % [member_id, member_id]
+	if ResourceLoader.exists(path):
+		_model = (load(path) as PackedScene).instantiate() as Node3D
+		_model.name = "Body"
+		_body = _model
+		add_child(_model)
+		return
+	var capsule_body := MeshInstance3D.new()
+	_body = capsule_body
 	_body.name = "Body"
 	var capsule := CapsuleMesh.new()
 	capsule.radius = 0.2
 	capsule.height = height
-	_body.mesh = capsule
+	capsule_body.mesh = capsule
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = color
-	_body.material_override = mat
+	capsule_body.material_override = mat
 	_body.position.y = height * 0.5
 	add_child(_body)
 	var label := Label3D.new()

@@ -3,8 +3,9 @@
 ## trembles and the room feels smaller. The story lane drives him with cues;
 ## he never raises story flags himself.
 ##
-## Placeholder until the user designs him with the art lane: a gold, horned
-## composite of wolf, great cat and bear, with green eyes (R4).
+## The cast lane's model (characters/tamlin/beast/): it prowls or runs while he
+## moves, roars as the door breaks and on "Murderer", and holds a snarl in the
+## room. The gold, horned composite placeholder stays as a fallback.
 class_name BeastActor
 extends Node3D
 
@@ -13,6 +14,7 @@ signal stage_changed(stage: Stage)
 enum Stage { HIDDEN, APPROACH, BREAK, PRESENCE, LOOM, SPEAK, LEAD, WITHDRAW, GONE, PATROL }
 
 const GROUP := &"beast"
+const MODEL_SCENE := "res://characters/tamlin/beast/tamlin_beast_model.tscn"
 const LIGHT_GROUP := &"beast_affected_lights"
 ## Pressure falls to nothing at this distance (metres).
 const RADIUS := 18.0
@@ -39,12 +41,21 @@ var _lights: Dictionary = {}
 var _eye_mat: StandardMaterial3D
 var _breath: float = 0.0
 var _model: Node3D
+## The cast lane's beast (tamlin_beast_model.gd: play(clip, ground_speed)), or
+## null while the placeholder stands in.
+var _cast: Node3D
+var _moving: bool = false
 
 
 func _ready() -> void:
 	add_to_group(GROUP)
 	_destination = global_position if is_inside_tree() else position
-	_model = _build_placeholder()
+	if ResourceLoader.exists(MODEL_SCENE):
+		_cast = (load(MODEL_SCENE) as PackedScene).instantiate() as Node3D
+		_cast.name = "Model"
+		_model = _cast
+	else:
+		_model = _build_placeholder()
 	add_child(_model)
 	visible = false
 	if EventBus.has_signal(&"story_actor_cue"):
@@ -136,9 +147,12 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 			if cue == &"accuse":
 				# "Murderer": the roar is the loudest thing in the house.
 				speak()
+				_play_once(&"roar")
 				CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
 		&"speak":
 			speak()
+		&"snap_ash_arrow":
+			_play_once(&"snarl")
 		&"leave":
 			withdraw()
 		&"lead":
@@ -148,6 +162,37 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 func _set_stage(next: Stage) -> void:
 	stage = next
 	stage_changed.emit(next)
+	match next:
+		Stage.BREAK:
+			_play_once(&"roar")
+		Stage.SPEAK:
+			_play_once(&"snarl")
+
+
+func _play_once(clip: StringName) -> void:
+	if _cast:
+		_cast.call(&"play", clip)
+
+
+## Gait while he moves; at rest a held snarl while he is in the room, else idle.
+## Never cuts off a roar or snarl that is still playing.
+func _animate(moving: bool) -> void:
+	if _cast == null:
+		return
+	var anim: AnimationPlayer = _cast.get(&"anim")
+	if anim == null:
+		return
+	var current := anim.current_animation
+	if not moving and anim.is_playing() and (current == &"roar" or current == &"snarl"):
+		return
+	var clip := &"idle"
+	if moving:
+		clip = &"run" if walk_speed > 4.0 else &"prowl"
+	elif stage in [Stage.PRESENCE, Stage.LOOM, Stage.SPEAK, Stage.BREAK]:
+		clip = &"snarl_hold"
+	if current != clip or moving != _moving:
+		_cast.call(&"play", clip, walk_speed if moving else -1.0)
+	_moving = moving
 
 
 func _process(delta: float) -> void:
@@ -158,6 +203,7 @@ func _process(delta: float) -> void:
 		stage = Stage.PRESENCE
 	var to := _destination - global_position
 	to.y = 0.0
+	_animate(to.length() > 0.05 and visible)
 	if to.length() > 0.05:
 		global_position += to.limit_length(walk_speed * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 4.0 * delta)

@@ -6,6 +6,8 @@ class_name StandIns
 extends RefCounted
 
 const TARGET_LAYER := 1 << 3
+const CAST_MODEL := "res://characters/%s/%s_model.tscn"
+const BEAST_MODEL := "res://characters/tamlin/beast/tamlin_beast_model.tscn"
 
 
 static func _mesh_body(size: Vector3, color: Color, body: Node3D) -> Node3D:
@@ -49,6 +51,10 @@ static func doe() -> Node3D:
 
 
 static func beast() -> Node3D:
+	if ResourceLoader.exists(BEAST_MODEL):
+		var model := (load(BEAST_MODEL) as PackedScene).instantiate() as Node3D
+		model.name = "StandIn_tamlin_beast"
+		return model
 	var root := Node3D.new()
 	root.name = "StandIn_tamlin_beast"
 	return _mesh_body(Vector3(1.4, 2.4, 3.0), Color(0.78, 0.62, 0.30), root)
@@ -60,8 +66,9 @@ static func horse() -> Node3D:
 	return _mesh_body(Vector3(0.7, 1.6, 2.3), Color(0.94, 0.93, 0.90), root)
 
 
-## A person or fae for any story actor without a model yet: a capsule tinted
-## per actor (main characters stay placeholders until the Blender pass).
+## A person or fae for any story actor without a lane of its own: the cast
+## model when one exists (characters/<id>/<id>_model.tscn), otherwise a capsule
+## tinted per actor.
 static func figure(actor_id: String) -> Node3D:
 	var tints := {
 		"tamlin": Color(0.85, 0.70, 0.35), "lucien": Color(0.75, 0.30, 0.20),
@@ -78,7 +85,10 @@ static func figure(actor_id: String) -> Node3D:
 	if parts.size() == 2 and parts[1].is_valid_int():
 		base = parts[0]
 	var root: Node3D
-	if base in ["naga", "high_fae_male"]:
+	var model_path := CAST_MODEL % [base, base]
+	if ResourceLoader.exists(model_path):
+		root = (load(model_path) as PackedScene).instantiate() as Node3D
+	elif base in ["naga", "high_fae_male"]:
 		root = creature(StringName(base), Vector3(0.6, 1.8, 0.6), tints.get(base, Color.GRAY))
 	else:
 		root = Node3D.new()
