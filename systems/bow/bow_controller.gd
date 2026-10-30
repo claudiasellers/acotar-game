@@ -214,7 +214,7 @@ func _apply_sway(direction: Vector3, degrees: float) -> Vector3:
 
 
 func _ensure_actions() -> void:
-	for pair in [[&"cycle_arrow", KEY_Q, JOY_BUTTON_DPAD_RIGHT], [&"craft_arrow", KEY_R, JOY_BUTTON_DPAD_UP],
+	for pair in [[&"cycle_arrow", KEY_Q, JOY_BUTTON_DPAD_RIGHT], [&"craft_arrow", KEY_F, JOY_BUTTON_DPAD_UP],
 			[&"cycle_bow", KEY_B, JOY_BUTTON_DPAD_LEFT]]:
 		if InputMap.has_action(pair[0]):
 			continue

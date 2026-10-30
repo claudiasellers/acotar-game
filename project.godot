@@ -23,6 +23,7 @@ WorldStreamer="*res://core/streaming/world_streamer.gd"
 StoryControl="*res://core/story_control.gd"
 StoryDirector="*res://story/story_director.gd"
 InputSettings="*res://core/input_settings.gd"
+GameSettings="*res://systems/settings/game_settings.gd"
 
 [display]
 
@@ -91,6 +92,10 @@ interact={
 toggle_debug_hud={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194334)]
+}
+camera_recenter={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":82), Object(InputEventJoypadButton,"device":-1,"button_index":8)]
 }
 pause={
 "deadzone": 0.2,
