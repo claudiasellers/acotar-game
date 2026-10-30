@@ -18,7 +18,9 @@ GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_
 
 play: godot bake
 	@test -d .godot || $(MAKE) --no-print-directory import
-	@"$(GODOT)" --path . >.tools/play.log 2>&1
+	@echo "Starting the game. This terminal stays busy until you quit the game. Log: .tools/play.log"
+	@"$(GODOT)" --path . >.tools/play.log 2>&1; rc=$$?; \
+	if [ $$rc -ne 0 ]; then echo "The game stopped with exit code $$rc. Log: .tools/play.log"; fi; exit $$rc
 
 update: pull godot generate bake import
 	@echo "Up to date. Godot $(GODOT_VERSION) in $(GODOT_DIR)."
