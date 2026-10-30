@@ -8,5 +8,5 @@ id = &"manor_estate"
 scene_path = "res://world/spring_court/manor_estate/manor_estate.tscn"
 center = Vector3(0, 0, -100)
 radius = 721.0
-neighbors = PackedStringArray("border_woods", "eastern_woods", "rosewild")
+neighbors = PackedStringArray("border_woods", "eastern_woods")
 report_path = "res://world/spring_court/manor_estate/manor_estate_report.json"
