@@ -64,3 +64,36 @@ func test_keepsakes_sit_by_the_hearth_and_the_bed() -> void:
 	assert_true(WorldState.has_flag("fact.mother_bed_seen"))
 	at_hearth.use(null)
 	assert_true(WorldState.has_flag("fact.father_hearth_sat"))
+
+
+func test_the_fur_stall_sells_andras_pelt() -> void:
+	var stall_anchor := _anchor("act1_fur_stall", Vector3(150, 0, 0))
+	StoryDirector.attach_anchor(stall_anchor)
+	var stall := stall_anchor.get_node_or_null(^"FurStall") as FurStall
+	assert_not_null(stall)
+	assert_true(stall.is_in_group(&"station"))
+	Gameplay.inventory.remove(&"obj_wolf_pelt", Gameplay.inventory.count(&"obj_wolf_pelt"))
+	watch_signals(EventBus)
+	stall.use(null)
+	assert_signal_not_emitted(EventBus, "item_sold", "nothing to sell")
+	Gameplay.inventory.add(&"obj_wolf_pelt", 1)
+	stall.use(null)
+	assert_signal_emitted_with_parameters(EventBus, "item_sold", [&"obj_wolf_pelt", 40])
+	assert_eq(Gameplay.inventory.count(&"obj_wolf_pelt"), 0)
+
+
+func test_the_bed_sleeps_to_night_only_after_the_sale() -> void:
+	WorldState.clear()
+	var saved := Clock.to_dict()
+	var bed := CottageBed.new()
+	bed.fact = "fact.mother_bed_seen"
+	add_child_autofree(bed)
+	Clock.from_dict({"time_of_day": 0.5, "day": 3})
+	assert_false(bed.can_sleep(), "not before the pelt is sold")
+	WorldState.set_flag("pelt_sold")
+	assert_true(bed.can_sleep())
+	CottageBed.skip_to_night()
+	assert_true(Clock.is_night())
+	assert_eq(Clock.day, 3, "the same night, not the next day")
+	assert_false(bed.can_sleep(), "already night")
+	Clock.from_dict(saved)

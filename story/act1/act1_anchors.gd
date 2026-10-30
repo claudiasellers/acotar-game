@@ -26,6 +26,11 @@ static func attach(anchor: Node3D, director: Node) -> Array[SceneSpace]:
 			spaces.append(_add(anchor, "WolfSkinning", WolfSkinning.new()))
 		&"act1_fur_stall":
 			spaces.append(_add(anchor, "PeltSale", PeltSale.new()))
+			if anchor.get_node_or_null(^"FurStall") == null:
+				var stall := FurStall.new()
+				stall.name = "FurStall"
+				stall.station_id = &"fur_stall"
+				anchor.add_child(stall)
 	_ensure_ride(director)
 	return spaces
 
@@ -52,8 +57,8 @@ static func _add(anchor: Node3D, node_name: String, space: SceneSpace, entry_siz
 	return space
 
 
-## The hearth by her father and the ironwood bed, beside the human-realm
-## lane's props (Interior/Hearth/HearthSpot, Interior/SistersBed).
+## The hearth by her father and the ironwood bed (where she sleeps to night),
+## beside the human-realm lane's props (Interior/Hearth/HearthSpot, Interior/SistersBed).
 static func _add_keepsakes(anchor: Node3D) -> void:
 	var interior := anchor.get_parent()
 	for spec in [["HearthKeepsake", ^"Hearth/HearthSpot", &"cottage_hearth", "fact.father_hearth_sat"],
@@ -63,7 +68,7 @@ static func _add_keepsakes(anchor: Node3D) -> void:
 		var target := interior.get_node_or_null(spec[1]) as Node3D if interior else null
 		if target == null:
 			continue
-		var station := KeepsakeStation.new()
+		var station: KeepsakeStation = CottageBed.new() if spec[0] == "BedKeepsake" else KeepsakeStation.new()
 		station.name = spec[0]
 		station.station_id = spec[2]
 		station.fact = spec[3]
