@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BowData" format=3]
+
+[ext_resource type="Script" path="res://data/bows/bow_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sentry_warbow"
+display_name = "Sentry warbow"
+draw_time = 1.4
+min_speed = 22.0
+max_speed = 70.0
+sway_degrees = 1.8
+loudness = 0.7

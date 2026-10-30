@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_bone_charm"
+display_name = "Bone charm"
+description = "A carved knot of bone on a thong."
+weight_class = 0
+color = Color(0.910, 0.878, 0.800, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_old_temples"])
+abundance = &"rare"

@@ -21,3 +21,5 @@ extends Resource
 @export var damage: float = 1.0
 @export var shaft_color: Color = Color(0.55, 0.42, 0.28)
 @export var fletching_color: Color = Color(0.85, 0.82, 0.75)
+## What happens on hit: "", barbed, rope, signal, sleep, lure, fire, frost, light.
+@export var effect: StringName = &""

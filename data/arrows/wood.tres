@@ -14,5 +14,6 @@ wet_speed_multiplier = 0.92
 stone_break_chance = 0.35
 fae_lethal = false
 damage = 1.0
+effect = &""
 shaft_color = Color(0.549, 0.416, 0.271, 1)
 fletching_color = Color(0.851, 0.824, 0.765, 1)

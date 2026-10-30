@@ -6,9 +6,9 @@
 script = ExtResource("1")
 id = &"ing_spider_silk"
 display_name = "Spider silk"
-description = "Dewy silk from the thorn brakes."
+description = "Dewy silk from the thorn brakes. Twisted, it makes a fine strong line."
 weight_class = 0
-craft_tags = Array[StringName]([])
+craft_tags = Array[StringName]([&"cordage"])
 base_price = 1
 canon = "X"
 color = Color(0.945, 0.945, 0.945, 1)

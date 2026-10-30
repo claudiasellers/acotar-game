@@ -10,3 +10,5 @@ methods = Array[StringName]([&"steep"])
 phase = 4
 fae_safe = true
 max_ingredients = 3
+night_only = true
+required_flag = ""

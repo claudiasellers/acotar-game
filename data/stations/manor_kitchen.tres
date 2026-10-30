@@ -10,3 +10,5 @@ methods = Array[StringName]([&"roast", &"stew", &"infuse", &"cook", &"preserve",
 phase = 2
 fae_safe = false
 max_ingredients = 5
+night_only = false
+required_flag = ""

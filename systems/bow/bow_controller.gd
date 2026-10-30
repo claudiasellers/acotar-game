@@ -7,6 +7,7 @@ class_name BowController
 extends Node
 
 signal arrow_type_changed(arrow_item_id: StringName)
+signal bow_changed(bow: BowData)
 
 ## Time scale while drawing and aiming with stamina left.
 const SLOW_TIME_SCALE := 0.4
@@ -14,13 +15,14 @@ const SLOW_TIME_SCALE := 0.4
 const SLOW_TIME_DRAIN := 28.0
 ## Draw needed before time slows.
 const SLOW_TIME_MIN_DRAW := 0.35
-const ARROW_TYPES: Array[StringName] = [&"arrow_wood", &"arrow_ash"]
-const ARROW_DATA := {
-	&"arrow_wood": preload("res://data/arrows/wood.tres"),
-	&"arrow_ash": preload("res://data/arrows/ash.tres"),
-}
-## Noise a release makes, for creature hearing (0..1).
-const RELEASE_LOUDNESS := 0.45
+const ARROW_DIR := "res://data/arrows"
+const BOW_DIR := "res://data/bows"
+## The only type drawn automatically when the chosen one runs out. Special
+## arrows (ash above all) are never spent by accident.
+const FALLBACK_ARROW := &"arrow_wood"
+
+## item id -> ArrowData, from data/arrows (adding an arrow needs no code).
+static var _arrow_data: Dictionary = {}
 
 var feyre: Feyre
 var bow: BowData
@@ -36,6 +38,8 @@ func _ready() -> void:
 	feyre = get_parent() as Feyre
 	bow = feyre.bow
 	_ensure_actions()
+	if Gameplay.inventory.count(&"bow_%s" % bow.id) == 0:
+		Gameplay.inventory.add(&"bow_%s" % bow.id)
 
 
 func _exit_tree() -> void:
@@ -46,6 +50,8 @@ func _exit_tree() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"cycle_arrow"):
 		cycle_arrow()
+	elif event.is_action_pressed(&"cycle_bow"):
+		cycle_bow()
 	elif event.is_action_pressed(&"craft_arrow"):
 		craft_selected()
 
@@ -91,10 +97,61 @@ func _update_slow_time(delta: float, aiming: bool) -> void:
 		Engine.time_scale = scale
 
 
+static func arrow_data() -> Dictionary:
+	if _arrow_data.is_empty():
+		for file in ResourceLoader.list_directory(ARROW_DIR):
+			if file.ends_with(".tres") or file.ends_with(".res"):
+				var d := load(ARROW_DIR.path_join(file)) as ArrowData
+				if d:
+					_arrow_data[d.item_id] = d
+	return _arrow_data
+
+
+static func arrow_types() -> Array[StringName]:
+	var types: Array[StringName] = []
+	for id: StringName in arrow_data():
+		types.append(id)
+	types.sort()
+	types.erase(FALLBACK_ARROW)
+	types.push_front(FALLBACK_ARROW)
+	return types
+
+
+## Bows Feyre owns (inventory items "bow_<id>"), as BowData.
+func owned_bows() -> Array[BowData]:
+	var out: Array[BowData] = []
+	for item_id: StringName in Gameplay.inventory.contents(Inventory.BOWS):
+		var path := BOW_DIR.path_join(String(item_id).trim_prefix("bow_") + ".tres")
+		if ResourceLoader.exists(path):
+			out.append(load(path) as BowData)
+	out.sort_custom(func(a: BowData, b: BowData) -> bool: return String(a.id) < String(b.id))
+	return out
+
+
+func equip_bow(bow_id: StringName) -> bool:
+	for b in owned_bows():
+		if b.id == bow_id:
+			bow = b
+			feyre.bow = b
+			bow_changed.emit(b)
+			return true
+	return false
+
+
+func cycle_bow() -> void:
+	var bows := owned_bows()
+	if bows.size() < 2:
+		return
+	var i := bows.map(func(b: BowData) -> StringName: return b.id).find(bow.id)
+	equip_bow(bows[(i + 1) % bows.size()].id)
+	Juice.burst(feyre, &"pickup")
+
+
 func cycle_arrow() -> void:
-	var i := ARROW_TYPES.find(selected)
-	for step in range(1, ARROW_TYPES.size() + 1):
-		var next := ARROW_TYPES[(i + step) % ARROW_TYPES.size()]
+	var types := arrow_types()
+	var i := types.find(selected)
+	for step in range(1, types.size() + 1):
+		var next := types[(i + step) % types.size()]
 		if Gameplay.inventory.arrow_count(next) > 0:
 			selected = next
 			break
@@ -103,7 +160,10 @@ func cycle_arrow() -> void:
 
 ## Crafts one of the selected arrow type if Feyre has the materials.
 func craft_selected() -> bool:
-	var made := Crafting.craft(Crafting.recipe(selected), Gameplay.inventory) > 0
+	var recipe := Crafting.recipe(selected)
+	if recipe == null:
+		return false
+	var made := Crafting.craft(recipe, Gameplay.inventory) > 0
 	if made:
 		Juice.burst(feyre, &"craft")
 	return made
@@ -124,25 +184,23 @@ func release() -> Arrow:
 	var muzzle := feyre.global_position + Vector3.UP * 1.45 - feyre.model.global_basis.z * 0.45
 	var direction := (feyre.aim_point() - muzzle).normalized()
 	direction = _apply_sway(direction, sway_degrees())
-	var arrow := Arrow.create(ARROW_DATA[arrow_item])
+	var arrow := Arrow.create(arrow_data()[arrow_item])
 	feyre.get_parent().add_child(arrow)
 	arrow.add_collision_exception_with(feyre)
 	var wet := feyre.element_state != null and feyre.element_state.is_wet()
 	arrow.launch(muzzle, direction, lerpf(bow.min_speed, bow.max_speed, draw_amount), wet)
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
 	feyre.arrow_fired.emit(arrow)
-	feyre.bow_released.emit(muzzle, RELEASE_LOUDNESS)
+	feyre.bow_released.emit(muzzle, bow.loudness)
 	return arrow
 
 
 func _available() -> StringName:
 	if Gameplay.inventory.arrow_count(selected) > 0:
 		return selected
-	for t in ARROW_TYPES:
-		# Never fall through to the ash arrow by accident: it is precious.
-		if t != &"arrow_ash" and Gameplay.inventory.arrow_count(t) > 0:
-			selected = t
-			return t
+	if Gameplay.inventory.arrow_count(FALLBACK_ARROW) > 0:
+		selected = FALLBACK_ARROW
+		return FALLBACK_ARROW
 	return &""
 
 
@@ -156,7 +214,8 @@ func _apply_sway(direction: Vector3, degrees: float) -> Vector3:
 
 
 func _ensure_actions() -> void:
-	for pair in [[&"cycle_arrow", KEY_Q, JOY_BUTTON_DPAD_RIGHT], [&"craft_arrow", KEY_R, JOY_BUTTON_DPAD_UP]]:
+	for pair in [[&"cycle_arrow", KEY_Q, JOY_BUTTON_DPAD_RIGHT], [&"craft_arrow", KEY_R, JOY_BUTTON_DPAD_UP],
+			[&"cycle_bow", KEY_B, JOY_BUTTON_DPAD_LEFT]]:
 		if InputMap.has_action(pair[0]):
 			continue
 		InputMap.add_action(pair[0])

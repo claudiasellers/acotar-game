@@ -116,8 +116,10 @@ func _on_body_entered(body: Node) -> void:
 		body.on_arrow_hit(self)
 	if Arrow.is_stone(body) and rng.randf() < data.stone_break_chance:
 		broke.emit(global_position)
+		ArrowEffects.apply(self, body, global_position)
 		queue_free.call_deferred()
 		return
+	ArrowEffects.apply(self, body, global_position)
 	_stick.call_deferred(body)
 
 

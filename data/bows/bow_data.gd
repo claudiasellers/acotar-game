@@ -11,3 +11,5 @@ extends Resource
 @export var max_speed: float = 48.0
 ## Degrees of aim sway at full draw before body state modifies it.
 @export var sway_degrees: float = 1.5
+## Noise of a release, 0..1, for creature hearing.
+@export var loudness: float = 0.45

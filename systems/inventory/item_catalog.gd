@@ -13,6 +13,8 @@ const ALIASES := {
 	&"hare_meat": &"ing_hare", &"hare_pelt": &"ing_hare_pelt", &"wolf_pelt": &"ing_wolf_pelt",
 	&"wolf_sinew": &"ing_sinew", &"great_wolf_pelt": &"obj_wolf_pelt",
 	&"wood": &"arrow_wood", &"ash": &"arrow_ash",
+	&"ing_water_mint": &"ing_watermint", &"col_jay_feather": &"col_blue_jay_feather",
+	&"col_shed_antler": &"ing_shed_antler", &"col_acorn_caps": &"col_acorn_cap",
 }
 
 static var _cache: Dictionary = {}

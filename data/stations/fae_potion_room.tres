@@ -10,3 +10,5 @@ methods = Array[StringName]([&"infuse", &"tincture", &"salve", &"steep"])
 phase = 4
 fae_safe = true
 max_ingredients = 5
+night_only = false
+required_flag = ""

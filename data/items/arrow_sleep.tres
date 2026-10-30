@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arrow_sleep"
+display_name = "Sleep arrow"
+description = "Steeped in something quiet. The prey just... lies down."
+weight_class = 0
+craft_tags = Array[StringName]([&"arrow"])
+base_price = 4
+canon = "X"
+color = Color(0.604, 0.514, 0.788, 1)

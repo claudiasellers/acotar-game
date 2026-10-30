@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArrowData" format=3]
+
+[ext_resource type="Script" path="res://data/arrows/arrow_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rope"
+item_id = &"arrow_rope"
+display_name = "Rope arrow"
+mass = 0.05
+drag = 0.0034
+wet_drag_multiplier = 1.7
+wet_speed_multiplier = 0.92
+stone_break_chance = 0.15
+fae_lethal = false
+damage = 0.3
+effect = &"rope"
+shaft_color = Color(0.549, 0.416, 0.271, 1)
+fletching_color = Color(0.788, 0.702, 0.541, 1)

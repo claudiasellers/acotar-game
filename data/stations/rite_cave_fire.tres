@@ -10,3 +10,5 @@ methods = Array[StringName]([&"stew"])
 phase = 5
 fae_safe = true
 max_ingredients = 4
+night_only = false
+required_flag = "calanmai_attended"

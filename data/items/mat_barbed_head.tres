@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mat_barbed_head"
+display_name = "Barbed head"
+description = "An antler point with a backward hook."
+weight_class = 0
+craft_tags = Array[StringName]([&"arrowhead"])
+base_price = 2
+color = Color(0.847, 0.796, 0.698, 1)
+canon = "X"

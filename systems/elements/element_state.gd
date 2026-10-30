@@ -71,6 +71,12 @@ func soak(amount: float = 1.0) -> void:
 	changed.emit()
 
 
+func chill(amount: float = 0.5) -> void:
+	cold = clampf(cold + amount, 0.0, 1.0)
+	fire = maxf(fire - amount, 0.0)
+	changed.emit()
+
+
 func is_wet() -> bool:
 	return wet >= 0.5
 

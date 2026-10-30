@@ -12,3 +12,7 @@ extends Resource
 ## Safe to combine fae ingredients here (halves fae toll).
 @export var fae_safe: bool = false
 @export var max_ingredients: int = 4
+## Only works at night (the starlight pool).
+@export var night_only: bool = false
+## WorldState flag needed before it can be used ("" = none).
+@export var required_flag: String = ""

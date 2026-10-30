@@ -90,7 +90,7 @@ ing("ing_hazel_rod", "Hazel rod", [], [W, V], "any", SMALL, edible=False, respaw
 
 # ---- Fauna products ----
 ing("ing_venison", "Venison", ["vital", "strong", "warm"], [W, WOODS], "any", MEDIUM, nut=0.35, food=1.5, respawn=0, price=4, canon="C", color="7a2e2e", desc="A deer means days of food. Venison is life.")
-ing("ing_sinew", "Sinew", ["bind"], [W, WOODS], "any", TINY, edible=False, respawn=0, price=1, color="d9c9a8", craft=["binding"], desc="Dried tendon for bowstrings and binding.")
+ing("ing_sinew", "Sinew", ["bind"], [W, WOODS], "any", TINY, edible=False, respawn=0, price=1, color="d9c9a8", craft=["binding", "cordage"], desc="Dried tendon for bowstrings and binding.")
 ing("ing_hide", "Deer hide", [], [W, WOODS], "any", LARGE, edible=False, respawn=0, price=6, canon="C", color="8a6a4a", desc="Scraped and sold, or kept against the cold.")
 ing("ing_rabbit", "Rabbit", ["vital"], [W, WOODS, GREEN], "any", MEDIUM, nut=0.2, food=0.5, respawn=0, price=1, canon="C", color="8f7d6b", desc="A snared rabbit: one thin meal.")
 ing("ing_hare", "Hare", ["vital"], [W, WOODS, GREEN], "any", MEDIUM, nut=0.25, food=0.6, respawn=0, price=2, canon="C", color="8a7a62", desc="Leaner than a deer, kinder than nothing.")
@@ -158,14 +158,15 @@ for _id, _name, _tags, _pig, _regions, _color, _desc in [
 	("ing_dandelion", "Dandelion", ["vital"], "", [GREEN, HAM], "f7d038", "Bitter greens, bright heads."),
 	("ing_clover", "Clover", ["vital", "swift"], "", [GREEN, VALE], "e4a5c0", "Sweet pink heads in the grass."),
 	("ing_dreamcap", "Dreamcap", ["quiet", "fae"], "", [LAKES], "a9a2e8", "A pale mushroom that only shows at night."),
-	("ing_spider_silk", "Spider silk", ["bind"], "", [ROSE, "reg_autumn_border"], "f1f1f1", "Dewy silk from the thorn brakes."),
+	("ing_spider_silk", "Spider silk", ["bind"], "", [ROSE, "reg_autumn_border"], "f1f1f1", "Dewy silk from the thorn brakes. Twisted, it makes a fine strong line."),
 	("ing_wild_garlic", "Wild garlic", ["strong", "keen"], "", [LAKES, ASHG], "e9f2df", "Carpets the shade; smells for miles."),
 	("ing_sweet_woodruff", "Sweet woodruff", ["quiet", "steady"], "", [ASHG], "d5ead0", "Smells of new hay once dried."),
+	("ing_crocus", "Crocus", ["bright", "swift"], "", [WOODS, MARCH, GREEN], "a58fe0", "The first purple through the leaf litter."),
 	("ing_mugwort", "Mugwort", ["keen", "bitter"], "", [SHRINE], "8fa38a", "Grows thick around the old shrines."),
 ]:
 	_night = _id == "ing_dreamcap"
 	_edible = not _pig and _id not in ("ing_fly_agaric", "ing_nightshade", "ing_spider_silk", "ing_ochre_clay", "ing_lapis_shard", "ing_grey_lichen", "ing_ashen_rose")
-	ing(_id, _name, _tags, _regions, "spring", TINY, edible=_edible, nut=0.04 if _edible else 0.0, ab="uncommon" if _id in ("ing_lapis_shard", "ing_fly_agaric", "ing_dreamcap") else "common", color=_color, pigment=_pig, desc=_desc, night_only=_night)
+	ing(_id, _name, _tags, _regions, "spring", TINY, edible=_edible, craft=["cordage"] if _id == "ing_spider_silk" else [], nut=0.04 if _edible else 0.0, ab="uncommon" if _id in ("ing_lapis_shard", "ing_fly_agaric", "ing_dreamcap") else "common", color=_color, pigment=_pig, desc=_desc, night_only=_night)
 
 # ---- Crafting materials (not foraged; made or bought) ----
 MATERIALS = [
@@ -173,6 +174,7 @@ MATERIALS = [
 	dict(id="obj_wolf_pelt", name="The great wolf's pelt", wc=LARGE, craft=[], price=40, color="8d8a84", canon="C", desc="Too big for any wolf. It sells for more than she's seen in years."),
 	dict(id="obj_lucien_knife", name="Lucien's knife", wc=SMALL, craft=["blade"], price=0, color="b8b8c0", canon="C?", desc="A fine fae blade, lent and not asked back."),
 	dict(id="obj_white_roses", name="White roses", wc=SMALL, craft=[], price=0, color="f6f3ec", canon="C?", desc="A bundle of white roses."),
+	dict(id="mat_barbed_head", name="Barbed head", wc=TINY, craft=["arrowhead"], price=2, color="d8cbb2", desc="An antler point with a backward hook."),
 	dict(id="mat_arrowhead", name="Arrowhead", wc=TINY, craft=["arrowhead"], price=1, color="55555c", desc="Knapped flint or a cheap iron head from the market."),
 ]
 
@@ -227,16 +229,29 @@ C = [
 	("col_seed_pod", "Seed pod", [GREEN, "reg_autumn_border"], "Rattles when shaken.", "a08a5a", "common"),
 	("col_bone_bleached", "Bleached bone", [BLIGHT, FELLS], "Small, white, unsettling.", "eae5d8", "uncommon"),
 	("col_pinecone", "Pinecone", [W, FELLS], "Perfectly whole.", "6b4b2a", "common"),
+	("col_old_arrowhead", "Old arrowhead", [WOODS, MARCH], "Iron, rusted, from some hunt long ago.", "6d5a4a", "uncommon"),
+	("col_mask_ribbon", "Mask ribbon", [WOODS, HAM, CAL], "A silk tie from someone's mask.", "c89ad8", "uncommon"),
+	("col_river_glass", "River glass", [LAKES, WOODS], "Frosted green glass, smooth as soap.", "9fd8c0", "common"),
+	("col_bone_charm", "Bone charm", [WOODS, SHRINE], "A carved knot of bone on a thong.", "e8e0cc", "rare"),
 	("col_snow_owl_down", "Owl down", [W, WALLH], "A wisp of white down caught on bark.", "f5f2ea", "common"),
 ]
 
+def _arrow(id, name, effect="", drag=0.0022, brk=0.35, dmg=1.0, shaft="8c6a45", fletch="d9d2c3", price=1, fae=False, mass=0.03, desc="", canon="X"):
+	return dict(id=id, item_id="arrow_" + id, name=name, effect=effect, mass=mass, drag=drag, wet=1.7, wspeed=0.92,
+		brk=brk, fae=fae, dmg=dmg, shaft=shaft, fletch=fletch, price=price, desc=desc, canon=canon)
+
 ARROWS = [
-	dict(id="wood", item_id="arrow_wood", name="Wood arrow", mass=0.03, drag=0.0022, wet=1.7, wspeed=0.92,
-	     brk=0.35, fae=False, dmg=1.0, shaft="8c6a45", fletch="d9d2c3", price=1,
-	     desc="Hazel shaft, feather fletching, a flint or iron head."),
-	dict(id="ash", item_id="arrow_ash", name="Ash arrow", mass=0.034, drag=0.0020, wet=1.6, wspeed=0.93,
-	     brk=0.2, fae=True, dmg=1.5, shaft="e3d6bd", fletch="8b5a2b", price=0,
-	     desc="Mountain-ash shaft, iron head, bought from a travelling peddler. The one thing the fae truly fear. She keeps it for faeries."),
+	_arrow("wood", "Wood arrow", desc="Hazel shaft, feather fletching, a flint or iron head."),
+	_arrow("ash", "Ash arrow", drag=0.0020, brk=0.2, dmg=1.5, shaft="e3d6bd", fletch="8b5a2b", price=0, fae=True, mass=0.034, canon="C",
+		desc="Mountain-ash shaft, iron head, bought from a travelling peddler. The one thing the fae truly fear. She keeps it for faeries."),
+	_arrow("barbed", "Barbed arrow", "barbed", drag=0.0024, brk=0.3, dmg=1.4, fletch="7a5a3a", price=2, desc="Antler barbs that don't pull free."),
+	_arrow("rope", "Rope arrow", "rope", drag=0.0034, brk=0.15, dmg=0.3, fletch="c9b38a", price=2, mass=0.05, desc="Trails a line of sinew and silk; it holds when it bites into wood or stone."),
+	_arrow("signal", "Signal arrow", "signal", drag=0.0026, brk=0.5, dmg=0.3, fletch="e85d3a", price=2, desc="A resin-and-charcoal head that flares on impact."),
+	_arrow("sleep", "Sleep arrow", "sleep", dmg=0.4, fletch="9a83c9", price=4, desc="Steeped in something quiet. The prey just... lies down."),
+	_arrow("lure", "Lure arrow", "lure", dmg=0.2, fletch="f2b5d4", price=3, desc="Steeped sweet. Whatever smells it comes to look."),
+	_arrow("fire", "Fire arrow", "fire", dmg=1.0, fletch="f26a1b", price=4, desc="Steeped hot. It catches as it lands."),
+	_arrow("frost", "Frost arrow", "frost", dmg=0.8, fletch="a7d8f2", price=4, desc="Steeped cold. Rime spreads from where it strikes."),
+	_arrow("light", "Light arrow", "light", dmg=0.3, fletch="fff4b0", price=3, desc="Steeped bright. It glows where it sticks, for a long while."),
 ]
 
 # id, name, inputs{key:count}, output, count
@@ -245,6 +260,10 @@ RECIPES = [
 	("knap_arrowhead", "Knap arrowheads", {"ing_flint": 1}, "mat_arrowhead", 2),
 	("antler_arrowhead", "Carve antler points", {"ing_shed_antler": 1}, "mat_arrowhead", 4),
 	("arrow_wood", "Wood arrow", {"mat_shaft": 1, "tag:fletching": 1, "mat_arrowhead": 1}, "arrow_wood", 1),
+	("barbed_heads", "Carve barbed heads", {"ing_shed_antler": 1}, "mat_barbed_head", 2),
+	("arrow_barbed", "Barbed arrow", {"mat_shaft": 1, "tag:fletching": 1, "mat_barbed_head": 1}, "arrow_barbed", 1),
+	("arrow_rope", "Rope arrow", {"arrow_wood": 1, "tag:cordage": 2}, "arrow_rope", 1),
+	("arrow_signal", "Signal arrow", {"arrow_wood": 1, "ing_pine_resin": 1, "ing_charcoal": 1}, "arrow_signal", 1),
 ]
 
 STATIONS = [
@@ -255,6 +274,9 @@ STATIONS = [
 	("fae_potion_room", "Fae potion room", ["infuse", "tincture", "salve", "steep"], 4, True, 5),
 	("starlight_pool", "Starlight pool", ["steep"], 4, True, 3),
 	("rite_cave_fire", "Rite cave fire", ["stew"], 5, True, 4),
+]
+STATION_RULES = {"starlight_pool": {"night_only": True}, "rite_cave_fire": {"required_flag": "calanmai_attended"}}
+STATIONS = STATIONS + [
 ]
 
 # id, name, method, required ids, journal note
@@ -338,6 +360,15 @@ MAKEUP = [
 ]
 
 
+# id, name, draw_time, min_speed, max_speed, sway, loudness, canon, desc
+BOWS = [
+	("yew_longbow", "Yew longbow", 1.1, 18.0, 60.0, 1.3, 0.5, "X", "From the manor armory. A long, honest draw."),
+	("fae_recurve", "Fae recurve", 0.55, 16.0, 54.0, 1.1, 0.25, "X", "Quick and nearly silent. The limbs curl like fern fronds."),
+	("sentry_warbow", "Sentry warbow", 1.4, 22.0, 70.0, 1.8, 0.7, "X", "A sentry's bow from the fells tower. Heavy, brutal, far."),
+	("gilded_bow", "Gilded bow", 0.6, 20.0, 62.0, 0.8, 0.35, "X", "Gold-leafed and impossibly balanced. A gift."),
+]
+
+
 def sn_array(values):
 	return "Array[StringName]([%s])" % ", ".join('&"%s"' % v for v in values)
 
@@ -410,13 +441,13 @@ def main():
 		lines = ['id = &"%s"' % a["id"], 'item_id = &"%s"' % a["item_id"], 'display_name = "%s"' % a["name"],
 			"mass = %s" % a["mass"], "drag = %s" % a["drag"], "wet_drag_multiplier = %s" % a["wet"],
 			"wet_speed_multiplier = %s" % a["wspeed"], "stone_break_chance = %s" % a["brk"],
-			"fae_lethal = %s" % str(a["fae"]).lower(), "damage = %s" % a["dmg"],
+			"fae_lethal = %s" % str(a["fae"]).lower(), "damage = %s" % a["dmg"], 'effect = &"%s"' % a["effect"],
 			"shaft_color = %s" % color(a["shaft"]), "fletching_color = %s" % color(a["fletch"])]
 		write("data/arrows/%s.tres" % a["id"], "res://data/arrows/arrow_data.gd", "ArrowData", lines)
 		# The arrow as an inventory item.
 		item = ['id = &"%s"' % a["item_id"], 'display_name = "%s"' % a["name"], 'description = "%s"' % esc(a["desc"]),
 			"weight_class = 0", 'craft_tags = Array[StringName]([&"arrow"])', "base_price = %d" % a["price"],
-			'canon = "%s"' % ("C" if a["fae"] else "X"), "color = %s" % color(a["shaft"])]
+			'canon = "%s"' % a["canon"], "color = %s" % color(a["fletch"])]
 		write("data/items/%s.tres" % a["item_id"], "res://data/items/item_data.gd", "ItemData", item)
 	for rid, name, inputs, out, count in RECIPES:
 		dict_body = ", ".join('"%s": %d' % (k, v) for k, v in inputs.items())
@@ -425,7 +456,9 @@ def main():
 		write("data/recipes/%s.tres" % rid, "res://data/recipes/craft_recipe.gd", "CraftRecipe", lines)
 	for sid, name, methods, phase, fae_safe, max_ing in STATIONS:
 		lines = ['id = &"%s"' % sid, 'display_name = "%s"' % name, "methods = %s" % sn_array(methods),
-			"phase = %d" % phase, "fae_safe = %s" % str(fae_safe).lower(), "max_ingredients = %d" % max_ing]
+			"phase = %d" % phase, "fae_safe = %s" % str(fae_safe).lower(), "max_ingredients = %d" % max_ing,
+			"night_only = %s" % str(STATION_RULES.get(sid, {}).get("night_only", False)).lower(),
+			'required_flag = "%s"' % STATION_RULES.get(sid, {}).get("required_flag", "")]
 		write("data/stations/%s.tres" % sid, "res://data/stations/station_data.gd", "StationData", lines)
 	for did, name, method, req, note in DISHES:
 		lines = ['id = &"%s"' % did, 'display_name = "%s"' % name, 'method = &"%s"' % method,
@@ -454,6 +487,14 @@ def main():
 			"amount = %s" % amt, "sheen = %s" % sheen]
 		write("data/wardrobe/makeup/%s.tres" % mid, "res://data/wardrobe/makeup_data.gd", "MakeupData", lines)
 	print("wardrobe pieces %d (from %d designs), hairstyles %d, makeup %d" % (n_pieces, len(PIECES), len(HAIR), len(MAKEUP)))
+	for bid, name, draw, vmin, vmax, sway, loud, canon, desc in BOWS:
+		lines = ['id = &"%s"' % bid, 'display_name = "%s"' % name, "draw_time = %s" % draw, "min_speed = %s" % vmin,
+			"max_speed = %s" % vmax, "sway_degrees = %s" % sway, "loudness = %s" % loud]
+		write("data/bows/%s.tres" % bid, "res://data/bows/bow_data.gd", "BowData", lines)
+	for bid, name, canon, desc in [("hunting_bow", "Hunting bow", "C", "Plain, worn, a poor girl's bow.")] + [(b[0], b[1], b[7], b[8]) for b in BOWS]:
+		lines = ['id = &"bow_%s"' % bid, 'display_name = "%s"' % name, 'description = "%s"' % esc(desc), "weight_class = 3",
+			'craft_tags = Array[StringName]([&"bow"])', 'canon = "%s"' % canon, "color = %s" % color("b08a5a")]
+		write("data/items/bow_%s.tres" % bid, "res://data/items/item_data.gd", "ItemData", lines)
 	print("ingredients %d, collectibles %d, materials %d, arrows %d, recipes %d, stations %d, dishes %d" % (
 		len(I), len(C), len(MATERIALS), len(ARROWS), len(RECIPES), len(STATIONS), len(DISHES)))
 

@@ -125,3 +125,19 @@ func test_campfire_opens_the_hearth_panel() -> void:
 	assert_not_null(get_tree().root.get_node_or_null("HearthPanel"))
 	load("res://ui/hearth_panel.gd")._close(feyre)
 	assert_false(get_tree().paused)
+
+
+func test_rope_arrow_leaves_an_anchor_and_bows_switch() -> void:
+	var boulder := hill.get_node("GameplaySandbox/Boulder") as Node3D
+	var data := (load("res://data/arrows/rope.tres") as ArrowData).duplicate() as ArrowData
+	data.stone_break_chance = 0.0
+	var a := Arrow.create(data)
+	hill.add_child(a)
+	var from := boulder.global_position + Vector3(0, 0.3, 6)
+	a.launch(from, boulder.global_position + Vector3(0, 0.3, 0) - from, 40.0)
+	await wait_physics_frames(30)
+	assert_eq(get_tree().get_nodes_in_group(ArrowEffects.ROPE_GROUP).size(), 1)
+	assert_eq(feyre.bow_controller.owned_bows().size(), 1)
+	Gameplay.inventory.add(&"bow_fae_recurve")
+	feyre.bow_controller.cycle_bow()
+	assert_eq(feyre.bow.id, &"fae_recurve")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arrow_fire"
+display_name = "Fire arrow"
+description = "Steeped hot. It catches as it lands."
+weight_class = 0
+craft_tags = Array[StringName]([&"arrow"])
+base_price = 4
+canon = "X"
+color = Color(0.949, 0.416, 0.106, 1)

@@ -15,9 +15,10 @@ const QUIVER := &"quiver"
 const SATCHEL := &"satchel"
 const POUCH := &"forage_pouch"
 const KEEPSAKES := &"keepsakes"
+const BOWS := &"bows"
 
 ## Weight units each container holds (quiver counts arrows, keepsakes count items).
-const CAPACITY := {QUIVER: 30.0, SATCHEL: 40.0, POUCH: 12.0, KEEPSAKES: 60.0}
+const CAPACITY := {QUIVER: 30.0, SATCHEL: 40.0, POUCH: 12.0, KEEPSAKES: 60.0, BOWS: 5.0}
 ## Total carried weight units before Feyre slows down, and the floor.
 const ENCUMBRANCE_START := 30.0
 const ENCUMBRANCE_FULL := 60.0
@@ -25,7 +26,7 @@ const MIN_SPEED_MULTIPLIER := 0.7
 
 var coin: int = 0
 ## container -> {item_id: count}
-var _contents: Dictionary = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}}
+var _contents: Dictionary = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}, BOWS: {}}
 ## Cooked results: Array of Dictionary (see Chemistry.combine).
 var dishes: Array[Dictionary] = []
 
@@ -54,7 +55,7 @@ func add(item_id: StringName, count: int = 1) -> int:
 func remove(item_id: StringName, count: int = 1) -> int:
 	item_id = ItemCatalog.canonical(item_id)
 	var removed := 0
-	for container: StringName in [QUIVER, POUCH, SATCHEL, KEEPSAKES]:
+	for container: StringName in [QUIVER, POUCH, SATCHEL, KEEPSAKES, BOWS]:
 		var bucket: Dictionary = _contents[container]
 		while removed < count and int(bucket.get(item_id, 0)) > 0:
 			bucket[item_id] = int(bucket[item_id]) - 1
@@ -192,7 +193,7 @@ func save_state() -> Dictionary:
 
 func load_state(data: Dictionary) -> void:
 	coin = int(data.get("coin", 0))
-	_contents = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}}
+	_contents = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}, BOWS: {}}
 	var saved: Dictionary = data.get("contents", {})
 	for container in saved:
 		var key := StringName(container)
@@ -221,6 +222,8 @@ func _preferred(item_id: StringName, item: ItemData) -> StringName:
 	var id := String(item_id)
 	if id.begins_with("arrow_"):
 		return QUIVER
+	if id.begins_with("bow_"):
+		return BOWS
 	if id.begins_with("col_"):
 		return KEEPSAKES
 	if item is IngredientData and item.weight_class <= ItemData.WeightClass.SMALL:
@@ -229,7 +232,7 @@ func _preferred(item_id: StringName, item: ItemData) -> StringName:
 
 
 func _units(item_id: StringName, container: StringName) -> float:
-	if container == QUIVER or container == KEEPSAKES:
+	if container == QUIVER or container == KEEPSAKES or container == BOWS:
 		return 1.0
 	var item := ItemCatalog.get_item(item_id)
 	return item.weight_units() if item else 1.0

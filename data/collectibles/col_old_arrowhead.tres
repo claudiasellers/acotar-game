@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CollectibleData" format=3]
+
+[ext_resource type="Script" path="res://data/collectibles/collectible_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"col_old_arrowhead"
+display_name = "Old arrowhead"
+description = "Iron, rusted, from some hunt long ago."
+weight_class = 0
+color = Color(0.427, 0.353, 0.290, 1)
+regions = Array[StringName]([&"reg_estate_woods", &"reg_wall_marches"])
+abundance = &"uncommon"

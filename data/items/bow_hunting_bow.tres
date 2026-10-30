@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bow_hunting_bow"
+display_name = "Hunting bow"
+description = "Plain, worn, a poor girl's bow."
+weight_class = 3
+craft_tags = Array[StringName]([&"bow"])
+canon = "C"
+color = Color(0.690, 0.541, 0.353, 1)

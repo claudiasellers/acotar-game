@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3]
+
+[ext_resource type="Script" path="res://data/recipes/craft_recipe.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arrow_rope"
+display_name = "Rope arrow"
+inputs = {"arrow_wood": 1, "tag:cordage": 2}
+output = &"arrow_rope"
+output_count = 1

@@ -11,4 +11,4 @@ weight_class = 0
 craft_tags = Array[StringName]([&"arrow"])
 base_price = 0
 canon = "C"
-color = Color(0.890, 0.839, 0.741, 1)
+color = Color(0.545, 0.353, 0.169, 1)

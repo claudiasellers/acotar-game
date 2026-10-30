@@ -14,6 +14,14 @@ const PANEL := preload("res://ui/hearth_panel.gd")
 @export var heat_radius: float = 5.0
 @export var lit: bool = true
 
+## Steep strongest tag -> steeped arrow item (docs/GAMEPLAY_M2.md item 2).
+const STEEP_ARROWS := {
+	&"quiet": &"arrow_sleep", &"warm": &"arrow_fire", &"cool": &"arrow_frost", &"bright": &"arrow_light",
+}
+const LURE_ARROW := &"arrow_lure"
+## Wood arrows one steep can coat.
+const ARROWS_PER_STEEP := 5
+
 var station_id: StringName:
 	get:
 		return station.id if station else &""
@@ -37,6 +45,21 @@ func use(user: Node) -> void:
 		PANEL.open(user as Feyre, self)
 
 
+## Why the station can't be used right now, or "" when it can.
+func unavailable_reason() -> String:
+	if station == null:
+		return "nothing here"
+	if station.night_only:
+		var clock := Gameplay.autoload(&"Clock")
+		if clock and not clock.call(&"is_night"):
+			return "it only answers at night"
+	if station.required_flag != "":
+		var state := Gameplay.autoload(&"WorldState")
+		if state and not state.call(&"has_flag", station.required_flag):
+			return "not yet"
+	return ""
+
+
 ## Cooks from Gameplay.inventory. On success the ingredients are used up, the
 ## journal records it and the dish goes in the satchel.
 func cook(ids: Array[StringName], method: StringName) -> Dictionary:
@@ -51,14 +74,56 @@ func cook(ids: Array[StringName], method: StringName) -> Dictionary:
 	for id: StringName in needed:
 		if Gameplay.inventory.count(id) < int(needed[id]):
 			return {"ok": false, "reason": "not enough %s" % id}
+	var blocked := unavailable_reason()
+	if blocked != "":
+		return {"ok": false, "reason": blocked}
 	var result := Chemistry.combine(ingredients, station, method)
 	if not result.ok:
 		return result
+	if method == &"steep":
+		return _steep_arrows(result, ingredients, needed)
 	for id: StringName in needed:
 		Gameplay.inventory.remove(id, int(needed[id]))
 	var first := Gameplay.journal.record(result, ingredients)
 	result["first_time"] = first
 	Gameplay.inventory.add_dish(result)
+	Juice.burst(self, &"unlock" if first else &"craft")
+	cooked.emit(result)
+	return result
+
+
+## The steeped arrow type a steep result makes.
+static func steeped_arrow_for(result: Dictionary) -> StringName:
+	var effects: Dictionary = result.get("effects", {})
+	var best := &""
+	var best_v := 0.0
+	for tag: StringName in STEEP_ARROWS:
+		var v := float(effects.get(tag, 0.0))
+		if v > best_v:
+			best_v = v
+			best = tag
+	if best != &"":
+		return STEEP_ARROWS[best]
+	if float(result.get("fae_toll", 0.0)) > 0.0 or float(result.get("heal", 0.0)) > 0.0:
+		return LURE_ARROW
+	return &""
+
+
+func _steep_arrows(result: Dictionary, ingredients: Array[IngredientData], needed: Dictionary) -> Dictionary:
+	var arrow := steeped_arrow_for(result)
+	if arrow == &"":
+		return {"ok": false, "reason": "the steep has nothing in it to carry"}
+	var count := mini(Gameplay.inventory.arrow_count(&"arrow_wood"), ARROWS_PER_STEEP)
+	if count == 0:
+		return {"ok": false, "reason": "no wood arrows to steep"}
+	for id: StringName in needed:
+		Gameplay.inventory.remove(id, int(needed[id]))
+	Gameplay.inventory.remove(&"arrow_wood", count)
+	Gameplay.inventory.add(arrow, count)
+	var first := Gameplay.journal.record(result, ingredients)
+	result["first_time"] = first
+	result["arrows"] = {"item_id": arrow, "count": count}
+	result["name"] = "%s (%d)" % [ItemCatalog.get_item(arrow).display_name, count]
 	Juice.burst(self, &"unlock" if first else &"craft")
 	cooked.emit(result)
 	return result

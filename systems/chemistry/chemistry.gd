@@ -7,7 +7,7 @@
 ## - Fae multiplies every other effect and adds to the fae toll (halved at a
 ##   fae-safe station). It reads as faerie-wine giddiness, not poison.
 ## - Bind is required for salves and steeps; it is structural, not an effect.
-## - Ash is apply-only: never in food, only in steeps (with bind).
+## - Ash is apply-only: it never goes into the pot (arrows only).
 class_name Chemistry
 extends RefCounted
 
@@ -56,8 +56,8 @@ static func combine(ingredients: Array[IngredientData], station: StationData, me
 	if method == &"infuse" and all_pigment and any_pigment:
 		return _pigment(ingredients)
 	for i in ingredients:
-		if i.is_apply_only() and method != &"steep":
-			return fail.call("%s is never eaten" % i.display_name)
+		if i.is_apply_only():
+			return fail.call("%s never goes in the pot" % i.display_name)
 		if not i.edible and FOOD_METHODS.has(method):
 			return fail.call("%s isn't food" % i.display_name)
 		if not i.edible and method == &"infuse" and not i.has_tag(&"bind") and i.pigment == &"":

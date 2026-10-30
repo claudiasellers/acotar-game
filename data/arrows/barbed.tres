@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ArrowData" format=3]
+
+[ext_resource type="Script" path="res://data/arrows/arrow_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"barbed"
+item_id = &"arrow_barbed"
+display_name = "Barbed arrow"
+mass = 0.03
+drag = 0.0024
+wet_drag_multiplier = 1.7
+wet_speed_multiplier = 0.92
+stone_break_chance = 0.3
+fae_lethal = false
+damage = 1.4
+effect = &"barbed"
+shaft_color = Color(0.549, 0.416, 0.271, 1)
+fletching_color = Color(0.478, 0.353, 0.227, 1)
