@@ -7,35 +7,52 @@
 ## (no progress for STUCK_SECONDS) the walker hops her a few metres forward and
 ## counts it as an assist, so the run can go on and the report shows where.
 ##
-##   godot --headless --fixed-fps 60 --path . res://tools/playtest/act1_playtest.tscn -- --out=/tmp/act1.json
+##   tools/mq/godot.sh --fixed-fps 60 res://tools/playtest/act1_playtest.tscn -- --out=/tmp/act1.json
+##     [--stop-after=<beat id>] [--max-wall=<seconds, default 900>]
+##
+## Exit codes: 0 every beat passed with no workaround, 1 a beat failed or needed
+## a workaround, 3 the wall-clock cap hit. The process always ends: after
+## quit() a watchdog thread kills it if engine shutdown takes over EXIT_GRACE.
+## Without baked terrain the first load bakes in memory (~3 min in the cloud).
 extends Node
 
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
 const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
 const WALK_SPEED_GUESS := 4.0
+const EXIT_GRACE := 15.0
 
 var game: Node
 var feyre: Feyre
 var beats: Array[Dictionary] = []
 var events: Array[String] = []
 var out_path: String = "user://act1_playtest.json"
+## Ends the run after this beat (for quick checks), e.g. --stop-after=spawn.
+var stop_after: String = ""
+var max_wall: float = 900.0
+var _started_at: float = 0.0
+var _finished: bool = false
+var _exit_watchdog: Thread
 var assists: int = 0
 var workarounds: Array[String] = []
 var assisted_metres: float = 0.0
 var _beat: Dictionary = {}
 var _hits: Array = []
-## How far above the target's chest the player holds (learned from misses).
-var _hold_over: float = 0.0
 var _shots: int = 0
 var _blocked_shots: int = 0
 var _last_landing: Vector3 = Vector3.INF
+var _load_seconds: float = 0.0
 
 
 func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out_path = arg.trim_prefix("--out=")
+		elif arg.begins_with("--stop-after="):
+			stop_after = arg.trim_prefix("--stop-after=")
+		elif arg.begins_with("--max-wall="):
+			max_wall = float(arg.trim_prefix("--max-wall="))
+	_started_at = Time.get_unix_time_from_system()
 	EventBus.deed_performed.connect(func(flag: String) -> void: _log("deed %s" % flag))
 	EventBus.phase_changed.connect(func(a: StringName, b: StringName) -> void: _log("phase %s -> %s" % [a, b]))
 	EventBus.scene_space_started.connect(func(id: StringName) -> void: _log("space start %s" % id))
@@ -55,15 +72,44 @@ func _ready() -> void:
 func _run() -> void:
 	game = (load(GAME_SCENE) as PackedScene).instantiate()
 	add_child(game)
+	_load_seconds = Time.get_unix_time_from_system() - _started_at
+	_log("game scene loaded in %.1f s (wall)" % _load_seconds)
 	await _play()
+	if not _finished:
+		_finish(0 if beats.all(func(b: Dictionary) -> bool: return b.status == "pass") else 1)
+
+
+## Wall-clock cap: a stuck run still writes its report and exits.
+func _physics_process(_delta: float) -> void:
+	if _finished or Time.get_unix_time_from_system() - _started_at < max_wall:
+		return
+	if not _beat.is_empty() and _beat.status == "running":
+		_fail("wall-clock cap of %.0f s hit" % max_wall)
+	_finish(3)
+
+
+func _finish(code: int) -> void:
+	_finished = true
 	_release_all()
 	_write_report()
-	get_tree().quit(0 if beats.all(func(b: Dictionary) -> bool: return b.status == "pass") else 1)
+	_exit_watchdog = Thread.new()
+	_exit_watchdog.start(_kill_if_still_running.bind(code))
+	print("PLAYTEST exit %d" % code)
+	get_tree().quit(code)
+
+
+## Runs off the main thread: if engine shutdown hangs, end the process anyway.
+static func _kill_if_still_running(code: int) -> void:
+	OS.delay_msec(int(EXIT_GRACE * 1000.0))
+	printerr("PLAYTEST shutdown took over %.0f s; killing the process (run exit code was %d)" % [EXIT_GRACE, code])
+	OS.kill(OS.get_process_id())
 
 
 func _play() -> void:
 	# 1. Wake at the cottage.
 	_begin("spawn", "Feyre stands at the cottage at dawn, controllable")
+	if not &"spawned" in game:
+		return _fail("%s didn't load as the Act I game (script error?)" % GAME_SCENE)
 	if not await _until(func() -> bool: return game.spawned, 30.0):
 		return _fail("never spawned")
 	feyre = game.feyre
@@ -80,6 +126,8 @@ func _play() -> void:
 	await _until(func() -> bool: return StoryControl.mode == StoryControl.Mode.FULL, 10.0)
 	_note("at %s in %s, phase %s, control %s" % [_v(feyre.global_position), _region(), PhaseManager.current_phase, _mode()])
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 2. The hunt: walk into the wolf clearing (WolfKill's Entry).
 	_begin("hunt_to_clearing", "walk from the cottage into the wolf clearing; WolfKill starts")
@@ -97,6 +145,8 @@ func _play() -> void:
 	if not await _until(func() -> bool: return wolf_kill.running or WorldState.has_flag("wolf_killed"), 5.0):
 		return _fail("stood in the clearing; WolfKill never started (Entry area never fired)")
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 3. The wolf: ash arrow first, then anything.
 	_begin("wolf_kill", "wolf appears; ash arrow in the side, second arrow kills; wolf_killed")
@@ -143,6 +193,8 @@ func _play() -> void:
 	if not await _until(func() -> bool: return WorldState.has_flag("wolf_killed"), 8.0):
 		return _fail("wolf not dead after shooting; hits: %s, beat '%s'" % [_hits, wolf_kill.current_beat_label()])
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 4. Skin him: walk to the carcass, press E.
 	_begin("skin", "walk to the wolf and press interact; the pelt comes off (fact.wolf_skinned)")
@@ -159,6 +211,8 @@ func _play() -> void:
 		return _fail("pressed interact at the wolf; no pelt (harvestables in reach: %d)" % _in_reach(&"harvestable", 2.5))
 	await _until(func() -> bool: return WorldState.has_flag("fact.wolf_skinned"), 6.0)
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 5. Sell it at the fur stall in the village.
 	_begin("pelt_sale", "walk to the village fur stall, press interact; pelt_sold, phase p1")
@@ -177,6 +231,8 @@ func _play() -> void:
 	await _until(func() -> bool: return PhaseManager.current_phase == &"p1_wolf_and_crossing", 3.0)
 	_note("phase %s" % PhaseManager.current_phase)
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 6. Home to sleep the day away.
 	_begin("sleep", "walk home, press interact at the ironwood bed; night falls")
@@ -205,6 +261,8 @@ func _play() -> void:
 		return _fail("pressed interact at the bed (%.1f m); still day (%.2f)" % [_flat(bed.global_position), Clock.time_of_day])
 	_note("time of day %.2f" % Clock.time_of_day)
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 7. The beast at the door: choose (interact = throw the knife).
 	_begin("beast_door", "the beast breaks in; choose; beast_claim_accepted")
@@ -219,6 +277,8 @@ func _play() -> void:
 		return _fail("stuck at beat '%s'" % door.current_beat_label())
 	_note("choice: %s" % door.chosen_fact)
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 8. The ride north and the wall.
 	_begin("crossing", "ride starts by itself; wall_crossed; phase p2_grounds")
@@ -248,6 +308,8 @@ func _play() -> void:
 	if PhaseManager.current_phase != &"p2_grounds":
 		return _fail("wall crossed but phase is %s" % PhaseManager.current_phase)
 	_pass()
+	if _beat.id == stop_after:
+		return
 
 	# 9. Arrival at the manor.
 	_begin("manor_arrival", "after the ride Feyre is on the manor estate, free to walk")
@@ -262,6 +324,16 @@ func _play() -> void:
 		if not walked_in:
 			return _fail("couldn't reach the manor estate on foot from the ride's end (now in %s, %.0f m off)" % [_region(), _flat(manor.center)])
 	_note("on the manor estate at %s" % _v(feyre.global_position))
+	await _wait(1.0)
+	var ground := _ground_at(feyre.global_position + Vector3.UP * 3.0, 3.0)
+	if not feyre.is_on_floor() or feyre.global_position.y < ground - 1.0:
+		var baked := DirAccess.get_files_at("res://world/shared/terrain/data").size() > 0 \
+				if DirAccess.dir_exists_absolute("res://world/shared/terrain/data") else false
+		return _fail("not standing after the ride: y %.1f, ground %.1f, on floor %s%s" % [feyre.global_position.y, ground,
+			feyre.is_on_floor(), "" if baked else " (no baked terrain here: run tools/mq/levels.sh ensure)"])
+	var start := feyre.global_position
+	await _walk_to(start + feyre.model.global_basis.z * -15.0, 2.0, Callable(), 10.0)
+	_note("walked %.1f m on the estate" % feyre.global_position.distance_to(start))
 	_pass()
 
 
@@ -319,24 +391,24 @@ func _shoot_at(target: Node3D) -> bool:
 	await _until(func() -> bool: return _last_landing != Vector3.INF, 2.0)
 	var chest := target.global_position + Vector3.UP * 0.9
 	if _last_landing == Vector3.INF:
-		_note("shot at %.0f m (hold-over %.1f m): the arrow never landed" % [_flat(target.global_position), _hold_over])
+		_note("shot at %.0f m: the arrow never landed" % _flat(target.global_position))
 	else:
 		var low := chest.y - _last_landing.y
-		_note("shot at %.0f m (hold-over %.1f m): landed %.1f m from his chest, %.1f m low" % [_flat(target.global_position),
-			_hold_over, _last_landing.distance_to(chest), low])
+		_note("shot at %.0f m: landed %.1f m from his chest, %.1f m low" % [_flat(target.global_position),
+			_last_landing.distance_to(chest), low])
 
 	return true
 
 
-## Where a practised archer holds: the chest, led for his movement, raised
-## for the drop over the flight time, plus what the misses taught.
+## Where a practised archer holds: the chest, led for his movement and
+## raised for the drop over the flight time.
 func _lead(target: Node3D) -> Vector3:
 	var chest := target.global_position + Vector3.UP * 0.9
 	var speed := float(feyre.bow_controller.bow.max_speed)
 	var t := chest.distance_to(feyre.global_position) / maxf(speed, 1.0)
 	var vel: Vector3 = target.velocity if target is CharacterBody3D else Vector3.ZERO
 	var g := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-	return chest + Vector3(vel.x, 0, vel.z) * t + Vector3.UP * (0.5 * g * t * t + _hold_over)
+	return chest + Vector3(vel.x, 0, vel.z) * t + Vector3.UP * (0.5 * g * t * t)
 
 
 ## Returns the remaining aim error in degrees.
@@ -526,7 +598,7 @@ func _log(line: String) -> void:
 
 func _begin(id: String, goal: String) -> void:
 	_beat = {"id": id, "goal": goal, "status": "running", "notes": [],
-		"sim_start": _sim_seconds(), "wall_start": Time.get_ticks_msec()}
+		"sim_start": _sim_seconds(), "wall_start": Time.get_unix_time_from_system()}
 	beats.append(_beat)
 	_log("BEAT %s: %s" % [id, goal])
 
@@ -539,7 +611,7 @@ func _note(text: String) -> void:
 func _close(status: String) -> void:
 	_beat.status = status
 	_beat["sim_seconds"] = snappedf(_sim_seconds() - _beat.sim_start, 0.1)
-	_beat["wall_seconds"] = snappedf((Time.get_ticks_msec() - _beat.wall_start) / 1000.0, 0.1)
+	_beat["wall_seconds"] = snappedf(Time.get_unix_time_from_system() - _beat.wall_start, 0.1)
 	_beat.erase("sim_start")
 	_beat.erase("wall_start")
 	_log("BEAT %s %s (%.1f s game, %.1f s wall)" % [_beat.id, status.to_upper(), _beat.sim_seconds, _beat.wall_seconds])
@@ -557,6 +629,8 @@ func _fail(why: String) -> void:
 func _write_report() -> void:
 	var report := {
 		"commit": OS.get_environment("PLAYTEST_COMMIT"),
+		"load_seconds": snappedf(_load_seconds, 0.1),
+		"total_wall_seconds": snappedf(Time.get_unix_time_from_system() - _started_at, 0.1),
 		"beats": beats,
 		"assists": assists,
 		"workarounds": workarounds,
