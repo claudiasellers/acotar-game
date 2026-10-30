@@ -265,6 +265,57 @@ func _build_crossing(root: Node3D, layers: Array[ScatterLayer]) -> void:
 	sp.add_child(veil)
 	veil.owner = root
 
+	# Geometry for the lure: sunlit blossom boughs arching over the far side
+	# of the gap, a warm pool on the snow for the last ~10 m, and petals
+	# drifting back through the neck toward the player.
+	var gy := WorldHeight.height_at(WorldMap.WALL_GAP_X, WorldMap.WALL_Z - 3.0)
+	for side in [-1.0, 1.0]:
+		var bough := MeshInstance3D.new()
+		bough.name = "BlossomBough" + ("West" if side < 0.0 else "East")
+		bough.mesh = blossom_bough_mesh(side, 0xB10550 + int(side > 0.0))
+		bough.position = Vector3(WorldMap.WALL_GAP_X, gy + 1.5, WorldMap.WALL_Z - 3.0)
+		bough.scale = Vector3.ONE * 1.9
+		bough.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		sp.add_child(bough)
+		bough.owner = root
+	var pool := SpotLight3D.new()
+	pool.name = "WarmPool"
+	pool.light_color = Color(1.0, 0.82, 0.5)
+	pool.light_energy = 5.0
+	pool.spot_range = 16.0
+	pool.spot_angle = 32.0
+	pool.position = Vector3(WorldMap.WALL_GAP_X, WorldHeight.height_at(WorldMap.WALL_GAP_X, WorldMap.WALL_Z + 5.0) + 9.0, WorldMap.WALL_Z + 5.0)
+	pool.rotation = Vector3(-PI * 0.5, 0.0, 0.0)
+	sp.add_child(pool)
+	pool.owner = root
+	var petals := CPUParticles3D.new()
+	petals.name = "DriftingPetals"
+	petals.amount = 40
+	petals.lifetime = 9.0
+	petals.preprocess = 9.0
+	petals.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	petals.emission_box_extents = Vector3(3.0, 1.5, 1.0)
+	petals.direction = Vector3(0.0, -0.15, 1.0)
+	petals.spread = 25.0
+	petals.initial_velocity_min = 0.8
+	petals.initial_velocity_max = 1.4
+	petals.gravity = Vector3(0.0, -0.12, 0.0)
+	petals.angular_velocity_min = -90.0
+	petals.angular_velocity_max = 90.0
+	petals.color = Color(1.0, 0.78, 0.86)
+	var pq := QuadMesh.new()
+	pq.size = Vector2(0.06, 0.045)
+	var pmat := StandardMaterial3D.new()
+	pmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	pmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	pmat.vertex_color_use_as_albedo = true
+	pmat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	pq.material = pmat
+	petals.mesh = pq
+	petals.position = Vector3(WorldMap.WALL_GAP_X, gy + 2.5, WorldMap.WALL_Z - 2.0)
+	sp.add_child(petals)
+	petals.owner = root
+
 	# Where the release view is composed from: just past the gap, looking at
 	# the weenie (-Z faces it).
 	var frame := Marker3D.new()
@@ -280,3 +331,61 @@ func _build_crossing(root: Node3D, layers: Array[ScatterLayer]) -> void:
 	for l in layers:
 		if l.id == &"defile_rock":
 			ForestGenUtil.layer_collision(sp, root, "DefileRocks", l, "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb")
+
+
+## One bough reaching in over the gap from `side` (-1 west, 1 east), local to
+## the gap: a curved limb with pink and white blossom clusters, one mesh.
+static func blossom_bough_mesh(side: float, seed: int) -> ArrayMesh:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var bark := Color(0.43, 0.32, 0.33)
+	var pts: Array[Vector3] = []
+	for i in 9:
+		var t := i / 8.0
+		pts.append(Vector3(side * lerpf(6.5, 0.6, t), lerpf(0.0, 4.6, sqrt(t)) - 0.8 * t * t, lerpf(0.0, -1.5, t)))
+	for i in pts.size() - 1:
+		_limb(st, pts[i], pts[i + 1], lerpf(0.22, 0.05, float(i) / 8.0), bark)
+	var pinks := [Color(0.96, 0.65, 0.75), Color(0.98, 0.83, 0.86), Color(0.98, 0.97, 0.95)]
+	for i in range(3, pts.size()):
+		for k in 3:
+			var c: Vector3 = pts[i] + Vector3(rng.randf_range(-0.7, 0.7), rng.randf_range(-0.3, 0.6), rng.randf_range(-0.6, 0.6))
+			_puff(st, c, rng.randf_range(0.45, 0.8), pinks[rng.randi() % pinks.size()])
+	st.generate_normals()
+	var m := st.commit()
+	var mat := StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.roughness = 0.8
+	mat.emission_enabled = true
+	mat.emission = Color(1.0, 0.8, 0.82)
+	mat.emission_energy_multiplier = 0.35
+	m.surface_set_material(0, mat)
+	return m
+
+
+static func _limb(st: SurfaceTool, a: Vector3, b: Vector3, r: float, col: Color) -> void:
+	var d := (b - a).normalized()
+	var u := d.cross(Vector3.FORWARD if absf(d.z) < 0.9 else Vector3.RIGHT).normalized()
+	var v := d.cross(u)
+	for k in 6:
+		var a0 := TAU * k / 6.0
+		var a1 := TAU * (k + 1) / 6.0
+		var o0 := (u * cos(a0) + v * sin(a0)) * r
+		var o1 := (u * cos(a1) + v * sin(a1)) * r
+		for p in [a + o0, b + o0 * 0.8, b + o1 * 0.8, a + o0, b + o1 * 0.8, a + o1]:
+			st.set_color(col)
+			st.add_vertex(p)
+
+
+## A faceted blossom cluster (octahedron squashed a little).
+static func _puff(st: SurfaceTool, c: Vector3, r: float, col: Color) -> void:
+	var px := [Vector3(r, 0, 0), Vector3(0, 0, r), Vector3(-r, 0, 0), Vector3(0, 0, -r)]
+	var top := c + Vector3(0, r * 0.75, 0)
+	var bot := c - Vector3(0, r * 0.6, 0)
+	for k in 4:
+		var p0: Vector3 = c + px[k]
+		var p1: Vector3 = c + px[(k + 1) % 4]
+		for p in [top, p1, p0, bot, p0, p1]:
+			st.set_color(col)
+			st.add_vertex(p)
