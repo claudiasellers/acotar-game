@@ -44,7 +44,6 @@ var _reveal_timer: float = 0.0
 var _look_timer: float = 0.0
 var _nodes_timer: float = 0.0
 var _look_cursor: int = 0
-var _chime: AudioStreamPlayer
 var _paint_thread: Thread
 
 
@@ -61,10 +60,6 @@ func _ready() -> void:
 	add_child(minimap)
 	full_map = FullMap.new(self)
 	add_child(full_map)
-	_chime = AudioStreamPlayer.new()
-	_chime.bus = &"Master"
-	_chime.volume_db = -6.0
-	add_child(_chime)
 	_bind_textures()
 	minimap.visible = MapSettings.minimap_shown()
 	SaveSystem.register_provider(SAVE_KEY, self)
@@ -263,9 +258,6 @@ func _mark_seen(id: String, c: Dictionary, from_afar: bool) -> void:
 
 func _celebrate(text: String, landmark_id: String, big: bool) -> void:
 	minimap.celebrate(text, landmark_id, big)
-	_chime.stream = Juice.chime(&"unlock" if big else &"pickup")
-	_chime.pitch_scale = 0.9 if big else 1.2
-	_chime.play()
 
 
 # --- Stats -----------------------------------------------------------------------
