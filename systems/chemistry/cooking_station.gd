@@ -86,7 +86,13 @@ func cook(ids: Array[StringName], method: StringName) -> Dictionary:
 		Gameplay.inventory.remove(id, int(needed[id]))
 	var first := Gameplay.journal.record(result, ingredients)
 	result["first_time"] = first
-	Gameplay.inventory.add_dish(result)
+	if result.kind == &"pigment":
+		# One cake of paint per pigment ingredient used.
+		for i in ingredients:
+			if i.pigment != &"":
+				Gameplay.inventory.add(StringName("pig_%s" % i.pigment))
+	else:
+		Gameplay.inventory.add_dish(result)
 	Juice.burst(self, &"unlock" if first else &"craft")
 	cooked.emit(result)
 	return result

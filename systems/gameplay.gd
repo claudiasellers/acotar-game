@@ -13,6 +13,7 @@ static var sketchbook: Sketchbook = Sketchbook.new()
 static var food_tally: FamilyLarder = FamilyLarder.new()
 static var wardrobe: Wardrobe = Wardrobe.new()
 static var forage: ForageRegistry = ForageRegistry.new()
+static var gallery: Gallery = Gallery.new()
 
 static var _registered: bool = false
 
@@ -25,6 +26,7 @@ static func reset() -> void:
 	food_tally = FamilyLarder.new()
 	wardrobe = Wardrobe.new()
 	forage = ForageRegistry.new()
+	gallery = Gallery.new()
 	_registered = false
 	register_save_providers()
 
@@ -43,6 +45,7 @@ static func register_save_providers() -> void:
 	save.register_provider("food_tally", food_tally)
 	save.register_provider("wardrobe", wardrobe)
 	save.register_provider("forage", forage)
+	save.register_provider("gallery", gallery)
 	_registered = true
 
 

@@ -22,4 +22,4 @@ abundance = &"common"
 edible = true
 nutrition = 0.0
 food_days = 0.0
-pigment = &""
+pigment = &"green"

@@ -30,6 +30,14 @@ func _ready() -> void:
 	_stone(Vector2(24.0, 31.0))
 	_station(&"wardrobe", Vector2(-14.0, 64.0), Color(0.96, 0.75, 0.85), Vector3(1.4, 2.2, 0.6))
 	_station(&"dressing_mirror", Vector2(-17.0, 64.0), Color(0.95, 0.88, 0.6), Vector3(0.9, 1.9, 0.2))
+	_station(&"easel", Vector2(-20.0, 58.0), Color(0.75, 0.6, 0.45), Vector3(0.8, 1.6, 0.15))
+	for i in 2:
+		var hook := Node3D.new()
+		hook.name = "PaintingHook%d" % i
+		hook.add_to_group(PaintingObject.HOOK_GROUP)
+		var x := -14.0 - 3.0 * i
+		hook.position = Vector3(x, _y(x, 63.6) + 2.6, 63.6)
+		add_child(hook)
 
 
 func _y(x: float, z: float) -> float:

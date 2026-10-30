@@ -58,9 +58,9 @@ ing("ing_madder", "Madder root", ["warm"], [V, W, VALE], "any", SMALL, edible=Fa
 ing("ing_snowdrop", "Snowdrop", ["cool", "steady"], [W, COT, WALLH], "winter", TINY, nut=0.0, respawn=4, ab="uncommon", color="f5f8fa", desc="The only flower in the winter forest. Feyre always notices them.")
 ing("ing_pine_resin", "Pine resin", ["bind", "warm"], [W, OLD], "winter", SMALL, edible=False, respawn=4, color="c98d2c", craft=["glue"], desc="Amber resin for fletching glue and torches.")
 ing("ing_wisteria", "Wisteria", ["quiet", "fae"], [MAN], "spring", TINY, nut=0.0, color="b9a0e0", desc="Lilac drapes over the manor walls.")
-ing("ing_cherry_blossom", "Orchard blossom", ["swift"], [VALE, MAN], "spring", TINY, nut=0.0, color="f7c6d4", desc="Blossom that never quite falls.")
+ing("ing_cherry_blossom", "Orchard blossom", ["swift"], [VALE, MAN], "spring", TINY, nut=0.0, color="f7c6d4", pigment="pink", desc="Blossom that never quite falls.")
 ing("ing_lilac", "Lilac", ["keen"], [MAN], "spring", TINY, nut=0.0, ab="uncommon", color="c8a2c8", desc="The scent sharpens everything.")
-ing("ing_moss", "Starmoss", ["bright", "cool"], [WOODS, LAKES], "spring", TINY, nut=0.0, color="7fbf9a", desc="Moss flecked with pinprick lights.")
+ing("ing_moss", "Starmoss", ["bright", "cool"], [WOODS, LAKES], "spring", TINY, nut=0.0, color="7fbf9a", pigment="green", desc="Moss flecked with pinprick lights.")
 ing("ing_blighted_petals", "Blighted petals", ["bitter", "fae"], [BLIGHT], "spring", TINY, edible=False, ab="uncommon", color="6e6a5f", desc="Grey petals that crumble like ash.")
 
 # ---- Flora and finds: human-realm winter additions (world lane request) ----
@@ -369,6 +369,15 @@ BOWS = [
 ]
 
 
+# Paints for the painting system: pigment name -> (display name, colour).
+PIGMENTS = {
+	"black": ("Ink black", "1d1a1f"), "blue": ("Woad blue", "2f4f8f"), "red": ("Madder red", "b02a2e"),
+	"white": ("Chalk white", "f4f1ea"), "ochre_red": ("Red ochre", "a4472d"), "ochre": ("Yellow ochre", "c58b3a"),
+	"yellow": ("Marigold yellow", "f4c430"), "orange": ("Fire-lily orange", "f26a1b"), "violet": ("Violet", "7b4fb0"),
+	"grey": ("Ash grey", "8d8a86"), "pink": ("Blossom pink", "f4a6c0"), "green": ("Moss green", "4f8f5a"),
+}
+
+
 def sn_array(values):
 	return "Array[StringName]([%s])" % ", ".join('&"%s"' % v for v in values)
 
@@ -487,6 +496,12 @@ def main():
 			"amount = %s" % amt, "sheen = %s" % sheen]
 		write("data/wardrobe/makeup/%s.tres" % mid, "res://data/wardrobe/makeup_data.gd", "MakeupData", lines)
 	print("wardrobe pieces %d (from %d designs), hairstyles %d, makeup %d" % (n_pieces, len(PIECES), len(HAIR), len(MAKEUP)))
+	for pig, (name, hexs) in PIGMENTS.items():
+		lines = ['id = &"pig_%s"' % pig, 'display_name = "%s"' % name, 'description = "A cake of %s paint."' % name.lower(),
+			"weight_class = 0", 'craft_tags = Array[StringName]([&"pigment"])', "base_price = 2", "color = %s" % color(hexs)]
+		write("data/items/pig_%s.tres" % pig, "res://data/items/item_data.gd", "ItemData", lines)
+	used = {x["pigment"] for x in I if x["pigment"]}
+	assert used <= set(PIGMENTS), used - set(PIGMENTS)
 	for bid, name, draw, vmin, vmax, sway, loud, canon, desc in BOWS:
 		lines = ['id = &"%s"' % bid, 'display_name = "%s"' % name, "draw_time = %s" % draw, "min_speed = %s" % vmin,
 			"max_speed = %s" % vmax, "sway_degrees = %s" % sway, "loudness = %s" % loud]

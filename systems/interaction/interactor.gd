@@ -16,6 +16,7 @@ signal station_used(station_id: StringName)
 const REACH := 2.5
 const DRESSING_STATIONS: Array[StringName] = [&"wardrobe", &"dressing_mirror"]
 const DRESSING_ROOM := preload("res://ui/dressing_room/dressing_room.gd")
+const PAINTING_UI := preload("res://ui/painting/painting_ui.gd")
 
 var feyre: Feyre
 
@@ -83,6 +84,8 @@ func _station() -> bool:
 		station.use(feyre)
 	if DRESSING_STATIONS.has(id):
 		DRESSING_ROOM.open(feyre, id)
+	elif id == &"easel":
+		PAINTING_UI.open(feyre, station)
 	station_used.emit(id)
 	return true
 
