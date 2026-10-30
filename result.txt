@@ -1,0 +1,14 @@
+status partial
+request L09-3
+commit dcdcbe9e11fae2c455195a194d050ec2f5230a89
+machine Claudias-Mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 98s: import skipped (no art changed), generated content 98s (levels.sh)
+shot bw_walk ok exit=0 168s files=1
+shot bw_raised ok exit=0 165s files=1
+shot bv_walk fail exit=143 61s files=0
+shot bv_raised ok exit=0 154s files=1
+answered 2026-10-30T23:00:02Z after 654s
