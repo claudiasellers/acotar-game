@@ -20,6 +20,7 @@ const PAINTING_UI := preload("res://ui/painting/painting_ui.gd")
 const COLLECTION_UI := preload("res://ui/collection_book/collection_book_ui.gd")
 
 var feyre: Feyre
+var forage_focus: ForageFocus
 
 
 func _ready() -> void:
@@ -28,6 +29,15 @@ func _ready() -> void:
 	Gameplay.collection.discovered.connect(_on_discovered)
 	Gameplay.collection.reward_earned.connect(_on_reward)
 	_ensure_actions()
+	var windows := Timer.new()
+	windows.name = "ForageWindows"
+	windows.wait_time = 4.0
+	windows.autostart = true
+	windows.timeout.connect(update_forage_windows)
+	add_child(windows)
+	update_forage_windows.call_deferred()
+	forage_focus = ForageFocus.new(self)
+	add_child(forage_focus)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -48,6 +58,27 @@ func weave_crown() -> StringName:
 		return &""
 	Juice.burst(feyre, &"outfit")
 	return piece
+
+
+## Windowed finds (dawn, dusk, night, rain, mist, snow) in any lane's forage
+## fields show only while their window is open, so nothing visible ever
+## refuses E. Returns how many fields are hidden.
+func update_forage_windows() -> int:
+	if not is_inside_tree():
+		return 0
+	var now := ForageRegistry.current_conditions(get_tree())
+	var hidden := 0
+	for field in get_tree().get_nodes_in_group(ForageScatter.GROUP):
+		if not field is Node3D or not field.has_meta(&"ingredient_id"):
+			continue
+		var item := ItemCatalog.get_item(StringName(field.get_meta(&"ingredient_id")))
+		if item == null or (item.bound == &"" and not (item is IngredientData and (item as IngredientData).night_only)):
+			continue
+		var open := ForageRegistry.in_window(item, now.hour, now.weather)
+		(field as Node3D).visible = open
+		if not open:
+			hidden += 1
+	return hidden
 
 
 ## A carcass in reach is skinned before the arrows in it are pulled (F6).
@@ -79,12 +110,18 @@ func _forage() -> bool:
 
 func _field() -> bool:
 	var pos := feyre.global_position + Vector3.UP * 0.3
+	var radius := REACH
+	# Pick exactly what the "E  pick ..." card names when there is one.
+	var target := forage_focus.nearest(feyre.global_position, REACH) if forage_focus else {}
+	if not target.is_empty():
+		pos = target.position
+		radius = 0.25
 	for field in get_tree().get_nodes_in_group(ForageScatter.GROUP):
 		var id := &""
 		if field.has_method(&"pick_nearest"):
-			id = StringName(field.pick_nearest(pos, REACH))
+			id = StringName(field.pick_nearest(pos, radius))
 		elif field is MultiMeshInstance3D and field.has_meta(&"ingredient_id"):
-			id = ForageScatter.pick_from(field, pos, REACH)
+			id = ForageScatter.pick_from(field, pos, radius)
 		if id != &"":
 			return _take(id, 1, null)
 	return false

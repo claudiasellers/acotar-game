@@ -188,3 +188,34 @@ func test_reticle_follows_the_predicted_impact() -> void:
 	var aim := feyre.aim_point()
 	assert_lt(guess.point.distance_to(feyre.bow_controller.muzzle()), aim.distance_to(feyre.bow_controller.muzzle()) + 0.5,
 		"the arrow never lands beyond the aim point")
+
+
+func test_nearest_find_glints_and_names_itself() -> void:
+	var field := hill.get_node("GameplaySandbox/Forage_ing_snowdrop") as ForageScatter
+	var spot := field.global_transform * field.multimesh.get_instance_transform(0).origin
+	feyre.global_position = spot + Vector3(0.8, 0, 0)
+	var focus := feyre.interactor.forage_focus
+	var near := focus.nearest(feyre.global_position, ForageFocus.GLINT_RADIUS)
+	assert_false(near.is_empty())
+	await wait_seconds(ForageFocus.REFRESH * 2.0 + 0.05)
+	assert_false(focus.focus.is_empty(), "something glints nearby")
+	assert_true(focus._card.visible, "a pick card shows in reach")
+	assert_string_contains(focus._label.text, "pick")
+	var id: StringName = focus.focus.id
+	var before := Gameplay.inventory.count(id)
+	assert_true(feyre.interactor.interact())
+	assert_eq(Gameplay.inventory.count(id), before + 1, "E picks exactly what the card names")
+
+
+func test_windowed_finds_hide_outside_their_window() -> void:
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = MultiMesh.new()
+	mmi.add_to_group(ForageScatter.GROUP)
+	mmi.set_meta(&"ingredient_id", &"ing_chaga")
+	hill.add_child(mmi)
+	Clock.time_of_day = 12.0 / 24.0
+	feyre.interactor.update_forage_windows()
+	assert_false(mmi.visible, "chaga is a dusk find")
+	Clock.time_of_day = 19.0 / 24.0
+	feyre.interactor.update_forage_windows()
+	assert_true(mmi.visible)
