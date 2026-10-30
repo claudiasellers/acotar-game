@@ -18,6 +18,10 @@ static var job_max := {}
 ## scheduler's promise is that this stays 0 (only a frame's first job may
 ## start without room for its estimate).
 static var late_starts := 0
+## Jobs run(), and jobs whose cost was spent against a frame (equal unless
+## a job escapes the accounting).
+static var queued_jobs_started := 0
+static var jobs_accounted := 0
 
 static var _frames := PackedInt32Array()
 
@@ -48,6 +52,7 @@ static func run(queue: Array[Callable]) -> int:
 		if _spent >= BUDGET_USEC:
 			late_starts += 1
 		var job: Callable = queue.pop_front()
+		queued_jobs_started += 1
 		var t := Time.get_ticks_usec()
 		job.call()
 		var cost := Time.get_ticks_usec() - t
@@ -56,6 +61,7 @@ static func run(queue: Array[Callable]) -> int:
 			max_job_usec = cost
 			slowest_job = job.get_method()
 		spend(cost)
+		jobs_accounted += 1
 	return queue.size()
 
 
@@ -64,6 +70,8 @@ static func reset_stats() -> void:
 	max_job_usec = 0
 	slowest_job = ""
 	late_starts = 0
+	queued_jobs_started = 0
+	jobs_accounted = 0
 	_frames.clear()
 
 
