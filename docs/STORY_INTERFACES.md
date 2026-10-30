@@ -52,7 +52,9 @@ Minor facts use the `fact.` prefix (e.g. `fact.beast_door.raised_knife`).
 Run by the build lane on every merge: `godot --headless -s tools/world_smoke.gd`
 (or `-- spring_court` for one realm). It finds every RegionDef under
 `data/regions/` at any depth, and every region scene on the contract path
-`world/<realm>/<id>/<id>.tscn`; a scene no RegionDef points at fails. For each
+`world/<realm>/<id>/<id>.tscn`; a scene no RegionDef points at fails. With
+`-- --changed-since=origin/main` only regions the branch adds or changes can fail;
+the rest print WARN. For each
 RegionDef it instances the region with its neighbors, runs 5 frames, and fails on any
 engine or script error. It then reads the region's coverage report
 (`RegionDef.report_path`, JSON written by the region's generator):

@@ -2,6 +2,10 @@
 ##
 ##   godot --headless -s tools/world_smoke.gd            # every region
 ##   godot --headless -s tools/world_smoke.gd -- spring_court
+##   godot --headless -s tools/world_smoke.gd -- --changed-since=origin/main
+##     strict only for regions this branch adds or changes (their RegionDef,
+##     scene folder or report differ from the ref); others print WARN and do
+##     not fail the run.
 ##
 ## Finds every RegionDef under data/regions/ at any depth, and every region
 ## scene on the contract path world/<realm>/<id>/<id>.tscn. A scene with no
@@ -49,30 +53,71 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 
+var _changed: PackedStringArray = []
+var _scoped: bool = false
+
+
 func _run() -> void:
-	var only := OS.get_cmdline_user_args()
+	var only := PackedStringArray()
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--changed-since="):
+			_scoped = true
+			_changed = _changed_paths(arg.trim_prefix("--changed-since="))
+		else:
+			only.append(arg)
 	var regions := _discover_regions(only)
 	var orphans := _orphan_scenes(regions, only)
 	var failures := 0
 	for id in regions:
 		var problems := await _check_region(regions, id)
-		failures += _report(regions[id].get_meta(&"realm", "?"), id, problems)
+		var region: RegionDef = regions[id]
+		var touched := _touched([region.resource_path, region.scene_path.get_base_dir(), region.report_path])
+		failures += _report(region.get_meta(&"realm", "?"), id, problems, touched)
 	# Region scenes on the contract path with no RegionDef: still load them,
 	# and fail them, because WorldStreamer can never stream them.
 	for scene_path in orphans:
 		var problems := PackedStringArray(["no RegionDef in data/regions/ for %s" % scene_path])
 		problems.append_array(await _load_scenes([scene_path]))
-		failures += _report(scene_path.get_base_dir().get_base_dir().get_file(), scene_path.get_file().get_basename(), problems)
+		failures += _report(scene_path.get_base_dir().get_base_dir().get_file(), scene_path.get_file().get_basename(),
+				problems, _touched([scene_path.get_base_dir()]))
 	print("world_smoke: %d regions, %d failed" % [regions.size() + orphans.size(), failures])
 	quit(1 if failures > 0 else 0)
 
 
-func _report(realm: String, id: String, problems: PackedStringArray) -> int:
+func _report(realm: String, id: String, problems: PackedStringArray, touched: bool = true) -> int:
 	if problems.is_empty():
 		print("PASS %s/%s" % [realm, id])
 		return 0
+	if not touched:
+		print("WARN %s/%s (not changed on this branch): %s" % [realm, id, "; ".join(problems)])
+		return 0
 	print("FAIL %s/%s: %s" % [realm, id, "; ".join(problems)])
 	return 1
+
+
+## Repo paths (res://...) changed between `ref` and HEAD.
+func _changed_paths(ref: String) -> PackedStringArray:
+	var out: Array = []
+	var code := OS.execute("git", ["-C", ProjectSettings.globalize_path("res://"), "diff", "--name-only", "%s...HEAD" % ref], out)
+	var paths := PackedStringArray()
+	if code != 0:
+		print("WARN cannot diff against %s; checking every region strictly" % ref)
+		_scoped = false
+		return paths
+	for line in String(out[0]).split("\n", false):
+		paths.append("res://" + line.strip_edges())
+	return paths
+
+
+## True when the run is not scoped, or any changed file is one of `paths` or under it.
+func _touched(paths: Array) -> bool:
+	if not _scoped:
+		return true
+	for changed in _changed:
+		for path: String in paths:
+			if path != "" and (changed == path or changed.begins_with(path + "/")):
+				return true
+	return false
 
 
 ## Every RegionDef anywhere under data/regions/ (any depth), keyed by id.
