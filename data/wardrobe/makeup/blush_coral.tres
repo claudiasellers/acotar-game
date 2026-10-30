@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MakeupData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/makeup_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"blush_coral"
+display_name = "Coral blush"
+channel = &"blush"
+color = Color(0.949, 0.549, 0.471, 1)
+amount = 0.4
+sheen = 0.1

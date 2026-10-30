@@ -14,6 +14,15 @@ static var food_tally: FamilyLarder = FamilyLarder.new()
 static var wardrobe: Wardrobe = Wardrobe.new()
 static var forage: ForageRegistry = ForageRegistry.new()
 static var gallery: Gallery = Gallery.new()
+## Created on first use, once the state it watches exists.
+static var collection: CollectionBook:
+	get:
+		if _collection == null:
+			_collection = CollectionBook.new()
+			_collection.watch(inventory, journal, sketchbook, gallery, wardrobe)
+		return _collection
+
+static var _collection: CollectionBook = null
 
 static var _registered: bool = false
 
@@ -27,6 +36,7 @@ static func reset() -> void:
 	wardrobe = Wardrobe.new()
 	forage = ForageRegistry.new()
 	gallery = Gallery.new()
+	_collection = null
 	_registered = false
 	register_save_providers()
 
@@ -46,6 +56,7 @@ static func register_save_providers() -> void:
 	save.register_provider("wardrobe", wardrobe)
 	save.register_provider("forage", forage)
 	save.register_provider("gallery", gallery)
+	save.register_provider("collection", collection)
 	_registered = true
 
 

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"picnic_dress_mint"
+display_name = "Picnic dress (mint)"
+description = "Gingham-light, made for orchards."
+slots = Array[StringName]([&"top", &"bottom"])
+hides_body_regions = Array[StringName]([&"torso", &"legs"])
+mesh_path = "res://characters/feyre/wardrobe/gown_garden.glb"
+color = Color(0.710, 0.918, 0.843, 1)
+warmth = 0.0
+stealth = -0.1
+swift = 0.05
+reaction_tag = &""
+source = &"manor_wardrobe"
+phase = 2
+canon = "X"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ribbon_sash_periwinkle"
+display_name = "Satin sash (periwinkle)"
+description = ""
+slots = Array[StringName]([&"neck"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/.glb"
+color = Color(0.655, 0.722, 0.949, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"formal"
+source = &"manor_wardrobe"
+phase = 3
+canon = "X"

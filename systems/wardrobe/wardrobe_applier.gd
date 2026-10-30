@@ -115,6 +115,16 @@ func _attach_placeholder(p: WardrobePiece) -> void:
 				_shape(neck, Vector3(0, 1.43, 0), mat)
 			&"mask":
 				_shape(_box(Vector3(0.22, 0.08, 0.04)), Vector3(0, 1.61, -0.13), mat)
+			&"ears":
+				for x in [-0.1, 0.1]:
+					_shape(_sphere(0.018), Vector3(x, 1.55, 0), mat)
+			&"wrist":
+				var band := TorusMesh.new()
+				band.inner_radius = 0.035
+				band.outer_radius = 0.048
+				_shape(band, Vector3(-0.3, 0.88, 0), mat)
+			&"legs_wear":
+				pass  # Stockings sit under the skirt; only the skinned mesh shows them.
 
 
 func _shape(mesh: Mesh, at: Vector3, mat: Material) -> void:

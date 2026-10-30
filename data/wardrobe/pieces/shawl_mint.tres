@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"shawl_mint"
+display_name = "Lace shawl (mint)"
+description = ""
+slots = Array[StringName]([&"outer"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/capelet.glb"
+color = Color(0.710, 0.918, 0.843, 1)
+warmth = 0.15
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"formal"
+source = &"manor_wardrobe"
+phase = 2
+canon = "X"

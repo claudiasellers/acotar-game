@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MakeupData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/makeup_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lips_lilac"
+display_name = "Lilac tint"
+channel = &"lips"
+color = Color(0.706, 0.541, 0.780, 1)
+amount = 0.5
+sheen = 0.4

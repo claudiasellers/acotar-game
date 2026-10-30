@@ -8,6 +8,7 @@ extends Resource
 ## Slots a piece can occupy. A gown fills TOP and BOTTOM at once.
 const SLOTS: Array[StringName] = [
 	&"top", &"bottom", &"outer", &"feet", &"hands", &"head", &"neck", &"mask",
+	&"ears", &"wrist", &"legs_wear",
 ]
 
 @export var id: StringName

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MakeupData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/makeup_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"eyes_rose_gold"
+display_name = "Rose gold"
+channel = &"eyeshadow"
+color = Color(0.863, 0.631, 0.557, 1)
+amount = 0.6
+sheen = 0.9

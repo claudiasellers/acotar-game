@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"butterfly_clips_sky"
+display_name = "Butterfly clips (sky)"
+description = ""
+slots = Array[StringName]([&"head"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/.glb"
+color = Color(0.725, 0.863, 0.961, 1)
+warmth = 0.0
+stealth = 0.0
+swift = 0.0
+reaction_tag = &"fae"
+source = &"seamstress"
+phase = 4
+canon = "X"

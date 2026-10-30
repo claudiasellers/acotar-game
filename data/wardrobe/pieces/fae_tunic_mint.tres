@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fae_tunic_mint"
+display_name = "Fae silk tunic (mint)"
+description = "Silk that moves like water."
+slots = Array[StringName]([&"top"])
+hides_body_regions = Array[StringName]([&"torso", &"arms"])
+mesh_path = "res://characters/feyre/wardrobe/spring_tunic.glb"
+color = Color(0.710, 0.918, 0.843, 1)
+warmth = 0.0
+stealth = 0.05
+swift = 0.05
+reaction_tag = &"fae"
+source = &"seamstress"
+phase = 4
+canon = "X"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"moth_mask"
+display_name = "Moon-moth mask"
+description = ""
+slots = Array[StringName]([&"mask"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/mask_butterfly.glb"
+color = Color(0.875, 0.910, 0.941, 1)
+warmth = 0.0
+stealth = 0.15
+swift = 0.0
+reaction_tag = &"fae"
+source = &"calanmai"
+phase = 5
+canon = "X"

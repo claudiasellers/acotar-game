@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HairstyleData" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/hairstyle_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"twin_braids"
+display_name = "Twin braids"
+mesh_path = "res://characters/feyre/hair/twin_braids.glb"
+occupies_head = false
+canon = "X"

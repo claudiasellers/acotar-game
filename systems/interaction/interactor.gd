@@ -17,6 +17,7 @@ const REACH := 2.5
 const DRESSING_STATIONS: Array[StringName] = [&"wardrobe", &"dressing_mirror"]
 const DRESSING_ROOM := preload("res://ui/dressing_room/dressing_room.gd")
 const PAINTING_UI := preload("res://ui/painting/painting_ui.gd")
+const COLLECTION_UI := preload("res://ui/collection_book/collection_book_ui.gd")
 
 var feyre: Feyre
 
@@ -24,6 +25,14 @@ var feyre: Feyre
 func _ready() -> void:
 	feyre = get_parent() as Feyre
 	Gameplay.listen(&"story_item_granted", _on_story_item_granted)
+	Gameplay.collection.discovered.connect(_on_discovered)
+	_ensure_collection_action()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"open_collection") and feyre:
+		get_viewport().set_input_as_handled()
+		COLLECTION_UI.open(feyre)
 
 
 func interact() -> bool:
@@ -130,3 +139,21 @@ func _on_story_item_granted(item_id: StringName, count: int) -> void:
 	if Gameplay.inventory.add(item_id, count) > 0:
 		Juice.burst(feyre, &"unlock")
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
+
+
+func _on_discovered(entry_id: StringName, tab: StringName) -> void:
+	if is_inside_tree():
+		COLLECTION_UI.toast(get_tree(), entry_id, tab)
+
+
+## J / gamepad Back opens the collection book (added in code, R14).
+func _ensure_collection_action() -> void:
+	if InputMap.has_action(&"open_collection"):
+		return
+	InputMap.add_action(&"open_collection")
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_J
+	InputMap.action_add_event(&"open_collection", key)
+	var pad := InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_BACK
+	InputMap.action_add_event(&"open_collection", pad)

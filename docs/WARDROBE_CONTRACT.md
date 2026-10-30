@@ -3,7 +3,7 @@
 Owner: gameplay lane (`data/wardrobe/`, `systems/wardrobe/`). Feyre's model and the dressing-room UI build against this.
 
 ## Data (all `.tres`, `canon` "C", "C?" or "X")
-- `WardrobePiece` (`data/wardrobe/pieces/*.tres`): `id`, `display_name`, `slots` (any of `top bottom outer feet hands head neck mask`; a gown is `[top, bottom]`), `hides_body_regions` (`torso arms legs feet hands`), `mesh_path` (glTF skinned to Feyre's skeleton), `color`, `warmth`, `stealth`, `swift`, `reaction_tag`, `source`, `phase`.
+- `WardrobePiece` (`data/wardrobe/pieces/*.tres`): `id`, `display_name`, `slots` (any of `top bottom outer feet hands head neck mask ears wrist legs_wear`; a gown is `[top, bottom]`), `hides_body_regions` (`torso arms legs feet hands`), `mesh_path` (glTF skinned to Feyre's skeleton), `color`, `warmth`, `stealth`, `swift`, `reaction_tag`, `source`, `phase`.
 - `HairstyleData` (`data/wardrobe/hair/*.tres`): `id`, `display_name`, `mesh_path`, `occupies_head`.
 - `MakeupData` (`data/wardrobe/makeup/*.tres`): `id`, `display_name`, `channel` (one of `lips eyeshadow liner blush brows face_paint`), `color`, `amount` 0..1, `sheen`, `source`, `phase`.
 

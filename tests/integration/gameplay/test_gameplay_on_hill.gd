@@ -141,3 +141,19 @@ func test_rope_arrow_leaves_an_anchor_and_bows_switch() -> void:
 	Gameplay.inventory.add(&"bow_fae_recurve")
 	feyre.bow_controller.cycle_bow()
 	assert_eq(feyre.bow.id, &"fae_recurve")
+
+
+func test_collection_book_opens_on_j_and_closes() -> void:
+	var ui := load("res://ui/collection_book/collection_book_ui.gd")
+	Gameplay.inventory.add(&"ing_acorn")
+	var press := InputEventAction.new()
+	press.action = &"open_collection"
+	press.pressed = true
+	feyre.interactor._unhandled_input(press)
+	assert_true(ui.is_open(), "J opens the book")
+	assert_true(feyre.get_tree().paused)
+	await wait_frames(2)
+	assert_false(Gameplay.collection.is_new(&"ing_acorn"), "the opened tab clears its badges")
+	ui.close(feyre)
+	assert_false(ui.is_open())
+	assert_false(feyre.get_tree().paused)
