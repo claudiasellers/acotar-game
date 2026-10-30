@@ -1,7 +1,17 @@
-[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider_set.gd" id="1"]
+[ext_resource type="Script" path="res://world/shared/terrain/height_provider.gd" id="2"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/terrain/manor_terrain.gd" id="3_manor"]
+
+[sub_resource type="Resource" id="Resource_manor"]
+script = ExtResource("2")
+id = &"manor_estate"
+bounds = Rect2(-600, -500, 1200, 800)
+fade = 64.0
+height_script = ExtResource("3_manor")
+priority = 10
 
 [resource]
 script = ExtResource("1")
-providers = Array[Resource]([])
+providers = Array[Resource]([SubResource("Resource_manor")])

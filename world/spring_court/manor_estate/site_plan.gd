@@ -28,6 +28,11 @@ const FORECOURT_RADIUS := 26.0
 const HOUSE_MAIN := Rect2(-42.0, -72.0, 84.0, 44.0)
 ## Service wing (kitchens, servants' hall, stillroom) off the east side.
 const HOUSE_SERVICE := Rect2(42.0, -68.0, 32.0, 34.0)
+## West wing (ballroom, conservatory, chapel) off the west side, mirroring the service wing.
+const HOUSE_WEST := Rect2(-74.0, -68.0, 32.0, 34.0)
+## Cellar rooms must stay inside these (3 m in from the outer walls), so the
+## ground-floor slab hides where the terrain drops into the cellar pit.
+const CELLAR_ZONES: Array[Rect2] = [Rect2(-39.0, -69.0, 78.0, 38.0), Rect2(45.0, -65.0, 26.0, 28.0), Rect2(-71.0, -65.0, 26.0, 28.0)]
 ## Garden terrace along the north facade, steps down into the rose garden.
 const TERRACE := Rect2(-48.0, -88.0, 96.0, 16.0)
 const FRONT_DOOR := Vector3(0.0, 0.0, -28.0)
@@ -48,6 +53,8 @@ const PADDOCK := Rect2(-310.0, -90.0, 125.0, 130.0)
 const POND_CENTER := Vector2(190.0, 110.0)
 const POND_RADII := Vector2(58.0, 40.0)
 const POND_DEPTH := 2.6
+## Pad height of the ground round the pond (relative to base_y).
+const POND_PAD := -0.6
 const WALLED_ORCHARD := Rect2(-300.0, 95.0, 115.0, 115.0)
 ## The drive runs from the forecourt south to the Border Woods road.
 const DRIVE_START := Vector2(0.0, 26.0)
@@ -66,15 +73,32 @@ const BELVEDERE_HILL := Vector2(400.0, -400.0)
 
 ## Flat building pads: [Rect2 area, pad height, blend distance in metres].
 ## The terrain eases from the natural ground to the pad height over the blend.
+static var _base_y: float = NAN
+
+
+## Height of the estate's reference level (pad height 0) above world zero:
+## the macro land height at the forecourt, so the estate sits in the shared map.
+static func base_y() -> float:
+	if is_nan(_base_y):
+		_base_y = MacroHeight.land_height_at(FORECOURT_CENTER.x, FORECOURT_CENTER.y)
+	return _base_y
+
+
+## Pad heights below are relative to base_y().
 static func pads() -> Array:
+	# Later pads win where blends overlap, so the house pad comes last.
 	return [
-		[Rect2(-90.0, -96.0, 260.0, 132.0), 0.0, 40.0],   # house, terrace, service yard, kitchen garden
-		[Rect2(-30.0, -30.0, 60.0, 60.0), 0.0, 20.0],      # forecourt
-		[ROSE_GARDEN.grow(6.0), -1.8, 30.0],               # rose garden sits one flight below the terrace
+		[ROSE_GARDEN.grow(2.0), -1.8, 30.0],               # rose garden sits one flight below the terrace
 		[HEDGE_MAZE.grow(8.0), -1.0, 30.0],
 		[GLASS_HOUSES.grow(6.0), -1.2, 26.0],
 		[STABLES.grow(10.0), 0.4, 30.0],
 		[WALLED_ORCHARD.grow(6.0), 1.6, 34.0],
+		[Rect2(POND_CENTER - POND_RADII * 1.45, POND_RADII * 2.9), POND_PAD, 40.0],   # level ground round the pond
+		[Rect2(-30.0, -30.0, 60.0, 60.0), 0.0, 20.0],      # forecourt
+		[Rect2(-100.0, -90.0, 270.0, 126.0), 0.0, 12.0],    # house, terrace, service yard, kitchen garden
+		[HOUSE_MAIN.grow(-1.0), -CELLAR_DEPTH - 0.6, 1.0],  # cellar pit under the house (hidden by its floor)
+		[HOUSE_SERVICE.grow(-1.0), -CELLAR_DEPTH - 0.6, 1.0],
+		[HOUSE_WEST.grow(-1.0), -CELLAR_DEPTH - 0.6, 1.0],
 	]
 
 
@@ -112,7 +136,7 @@ static func zones() -> Dictionary:
 ## Areas where scatter (trees, forage, life) must not land: buildings, paths, water.
 static func keep_out() -> Array[Rect2]:
 	return [
-		HOUSE_MAIN.grow(4.0), HOUSE_SERVICE.grow(4.0), TERRACE,
+		HOUSE_MAIN.grow(4.0), HOUSE_SERVICE.grow(4.0), HOUSE_WEST.grow(4.0), TERRACE,
 		Rect2(FORECOURT_CENTER - Vector2.ONE * FORECOURT_RADIUS, Vector2.ONE * FORECOURT_RADIUS * 2.0),
 		STABLES, Rect2(DRIVE_START.x - DRIVE_WIDTH, DRIVE_START.y, DRIVE_WIDTH * 2.0, DRIVE_END.y - DRIVE_START.y),
 	]
@@ -124,6 +148,15 @@ static func is_kept_out(x: float, z: float) -> bool:
 		if area.has_point(p):
 			return true
 	return in_pond(x, z, 1.0)
+
+
+## Gravel: the drive, the forecourt and the terrace. Garden paths are meshes.
+static func is_on_path(x: float, z: float) -> bool:
+	if absf(x - DRIVE_START.x) < DRIVE_WIDTH * 0.5 and z > DRIVE_START.y and z < DRIVE_END.y:
+		return true
+	if Vector2(x, z).distance_to(FORECOURT_CENTER) < FORECOURT_RADIUS:
+		return true
+	return TERRACE.has_point(Vector2(x, z))
 
 
 ## True inside the pond's water ellipse (scale > 1 grows it).

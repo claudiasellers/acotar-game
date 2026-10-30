@@ -39,7 +39,7 @@ func _spawn_feyre() -> void:
 		return
 	feyre = (load(FEYRE_SCENE) as PackedScene).instantiate()
 	var s := ManorSitePlan.SPAWN
-	feyre.position = Vector3(s.x, ManorTerrain.height_at(s.x, s.z) + 0.3, s.z)
+	feyre.position = Vector3(s.x, WorldHeight.height_at(s.x, s.z) + 0.3, s.z)
 	feyre.rotation.y = deg_to_rad(ManorSitePlan.SPAWN_FACING_DEG)
 	add_child(feyre)
 	var interactor := ManorPreviewInteractor.new()

@@ -1,9 +1,10 @@
 ## Ground of the Manor Estate as a pure height function plus a fallback mesh.
 ##
-## height_at() takes WORLD coordinates. It is the provider the World lane
-## registers with world/shared/terrain/world_height.gd and bakes into Terrain3D.
-## Until then build_fallback() makes chunked meshes and one HeightMapShape3D under
-## a node named TerrainFallback, which the World scene disables when Terrain3D is on.
+## height_at() takes WORLD coordinates and is registered as the "manor_estate"
+## HeightProvider in world/shared/terrain/height_providers.tres (world contract §2).
+## Placement samples WorldHeight.height_at (the blended map height), never this
+## directly. build_fallback() makes chunk meshes and one HeightMapShape3D under
+## TerrainFallback, which the World scene disables when Terrain3D is active.
 class_name ManorTerrain
 extends RefCounted
 
@@ -12,15 +13,14 @@ const MESH_STEP := 2.0
 const COLLISION_STEP := 2.0
 
 
-## Ground height in metres at a world x/z position. Once the World lane's
-## MacroHeight is on main, natural_height() builds on MacroHeight.land_height_at.
+## Ground height in metres at a world x/z position.
 static func height_at(x: float, z: float) -> float:
 	var h := natural_height(x, z)
 	for pad in ManorSitePlan.pads():
 		var area: Rect2 = pad[0]
 		var w := _pad_weight(area, float(pad[2]), x, z)
 		if w > 0.0:
-			h = lerpf(h, float(pad[1]), w)
+			h = lerpf(h, ManorSitePlan.base_y() + float(pad[1]), w)
 	h -= _pond_carve(x, z)
 	return h
 
@@ -29,17 +29,32 @@ static func height_at(x: float, z: float) -> float:
 ## Border Woods, rising to wooded hills and the Rosewild in the north.
 static func natural_height(x: float, z: float) -> float:
 	var b := ManorSitePlan.BOUNDS
-	var nx := (x - b.get_center().x) / (b.size.x * 0.5)
-	var nz := (z - b.get_center().y) / (b.size.y * 0.5)
 	var north := clampf((-z - 240.0) / 260.0, 0.0, 1.0)
-	var h := 0.012 * -z * 0.35                       # gentle fall to the south
-	h += 22.0 * north * north                        # hills toward the Rosewild
+	var h := ManorSitePlan.base_y()
+	h += 0.012 * -z * 0.35                           # gentle fall to the south
+	h += 14.0 * north * north                        # wooded hills toward the Rosewild
 	h += 3.2 * sin(x * 0.0091 + 0.7) * cos(z * 0.0077 - 0.4)
 	h += 1.3 * sin(x * 0.027 + z * 0.019) + 0.55 * sin(x * 0.071 - z * 0.053)
 	var belvedere := ManorSitePlan.BELVEDERE_HILL
-	h += 16.0 * exp(-(pow(x - belvedere.x, 2) + pow(z - belvedere.y, 2)) / (2.0 * 70.0 * 70.0))
-	var edge := clampf((maxf(absf(nx), absf(nz)) - 0.82) / 0.18, 0.0, 1.0)
-	return h + edge * edge * 10.0
+	h += 16.0 * exp(-(pow(x - belvedere.x, 2) + pow(z - belvedere.y, 2)) / (2.0 * 60.0 * 60.0))
+	# Ease toward the shared macro height over the outer 160 m, so the
+	# provider's own 64 m fade only has a small step left to blend.
+	var edge := minf(minf(x - b.position.x, b.end.x - x), minf(z - b.position.y, b.end.y - z))
+	var t := 1.0 - smoothstep(64.0, 224.0, edge)
+	return lerpf(h, MacroHeight.land_height_at(x, z), t)
+
+
+## Terrain3D texture slots (WorldHeight.Tex): spring grass, gravel paths,
+## forest floor at the wooded edges, riverbed in the pond.
+static func texture_at(x: float, z: float) -> Vector3i:
+	if ManorSitePlan.in_pond(x, z, 1.1):
+		return Vector3i(WorldHeight.Tex.RIVERBED, WorldHeight.Tex.MOSS, 60)
+	if ManorSitePlan.is_on_path(x, z):
+		return Vector3i(WorldHeight.Tex.PATH, WorldHeight.Tex.SPRING_GRASS, 30)
+	var b := ManorSitePlan.BOUNDS
+	var edge := minf(minf(x - b.position.x, b.end.x - x), minf(z - b.position.y, b.end.y - z))
+	var woods := int(clampf(1.0 - (edge - 40.0) / 80.0, 0.0, 1.0) * 255.0)
+	return Vector3i(WorldHeight.Tex.SPRING_GRASS, WorldHeight.Tex.FOREST_FLOOR, woods)
 
 
 static func _pad_weight(area: Rect2, blend: float, x: float, z: float) -> float:
@@ -61,15 +76,7 @@ static func _pond_carve(x: float, z: float) -> float:
 
 ## Water surface height of the pond.
 static func pond_level() -> float:
-	var c := ManorSitePlan.POND_CENTER
-	return natural_height(c.x + ManorSitePlan.POND_RADII.x * 1.3, c.y) - 0.35
-
-
-static func normal_at(x: float, z: float) -> Vector3:
-	var e := 0.5
-	var hx := height_at(x + e, z) - height_at(x - e, z)
-	var hz := height_at(x, z + e) - height_at(x, z - e)
-	return Vector3(-hx, 2.0 * e, -hz).normalized()
+	return ManorSitePlan.base_y() + ManorSitePlan.POND_PAD - 0.35
 
 
 ## Builds TerrainFallback: visual chunks plus a single heightmap collider.
@@ -100,7 +107,7 @@ static func _chunk_mesh(origin: Vector2, material: Material) -> ArrayMesh:
 		for xi in n:
 			var x := origin.x + xi * MESH_STEP
 			var z := origin.y + zi * MESH_STEP
-			var h := height_at(x, z)
+			var h := WorldHeight.height_at(x, z)
 			st.set_color(ground_color(x, z, h))
 			st.set_uv(Vector2(x, z) / 6.0)
 			st.add_vertex(Vector3(x, h, z))
@@ -126,7 +133,7 @@ static func _collider() -> StaticBody3D:
 	heights.resize(w * d)
 	for zi in d:
 		for xi in w:
-			heights[zi * w + xi] = height_at(b.position.x + xi * COLLISION_STEP, b.position.y + zi * COLLISION_STEP)
+			heights[zi * w + xi] = WorldHeight.height_at(b.position.x + xi * COLLISION_STEP, b.position.y + zi * COLLISION_STEP)
 	var shape := HeightMapShape3D.new()
 	shape.map_width = w
 	shape.map_depth = d

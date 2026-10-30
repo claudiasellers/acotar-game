@@ -24,10 +24,12 @@ const FLOOR_COLORS := {
 const FACADE := Color(0.99, 0.94, 0.94)
 
 
+## World height of a level's finished floor.
 static func floor_y(level: int) -> float:
+	var base := ManorSitePlan.base_y() + ManorSitePlan.HOUSE_FLOOR_Y
 	if level < 0:
-		return ManorSitePlan.HOUSE_FLOOR_Y - ManorSitePlan.CELLAR_DEPTH * -level
-	return ManorSitePlan.HOUSE_FLOOR_Y + ManorSitePlan.HOUSE_STOREY * level
+		return base - ManorSitePlan.CELLAR_DEPTH * -level
+	return base + ManorSitePlan.HOUSE_STOREY * level
 
 
 static func storey_height(level: int) -> float:

@@ -184,7 +184,7 @@ static func multimesh(parent: Node, mesh: Mesh, transforms: Array[Transform3D],
 ## A transform standing on the estate ground at x/z with yaw and uniform scale.
 static func on_ground(x: float, z: float, yaw: float = 0.0, scale: float = 1.0, lift: float = 0.0) -> Transform3D:
 	var basis := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale)
-	return Transform3D(basis, Vector3(x, ManorTerrain.height_at(x, z) + lift, z))
+	return Transform3D(basis, Vector3(x, WorldHeight.height_at(x, z) + lift, z))
 
 
 ## Deterministic RNG for a named generator, so the estate is identical every load.
