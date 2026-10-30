@@ -31,6 +31,8 @@ static func compute(content: CourtRegionContent) -> Array[Dictionary]:
 	while cx < r.end.x:
 		var cz := z0
 		while cz < r.end.y:
+			if BuildCancel.requested(content.region_id):
+				return out
 			var chunk := _chunk(content, Vector2(cx, cz))
 			if not chunk.is_empty():
 				out.append(chunk)

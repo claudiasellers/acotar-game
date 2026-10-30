@@ -67,6 +67,8 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 	var nx := ceili(rect.size.x / cell)
 	var nz := ceili(rect.size.y / cell)
 	for iz in nz:
+		if BuildCancel.requested(def.region_id):
+			return out
 		for ix in nx:
 			# Always draw the same number of randoms per cell (determinism).
 			var jx := rng.randf()
@@ -145,6 +147,8 @@ static func _place_composed(def: WoodsRegionDef, rect: Rect2, kind: String, seed
 	var nx := ceili(rect.size.x / cell)
 	var nz := ceili(rect.size.y / cell)
 	for iz in nz:
+		if BuildCancel.requested(def.region_id):
+			return out
 		for ix in nx:
 			# Always draw the same number of randoms per cell (determinism).
 			var jx := rng.randf()
@@ -260,6 +264,8 @@ static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) ->
 	var counters := {}  # biome id -> drifts tried
 	var mean_size := 7.0  # mix of lone finds and drifts
 	for iz in nz:
+		if BuildCancel.requested(def.region_id):
+			return out
 		for ix in nx:
 			for t in DRIFT_TRIES:
 				var jx := rng.randf()
@@ -288,6 +294,8 @@ static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) ->
 		for o in range(0, inst.size(), ScatterLayer.STRIDE):
 			filled[Vector2i(floori((inst[o] - rect.position.x) / 100.0), floori((inst[o + 2] - rect.position.y) / 100.0))] = true
 	for bz in ceili(rect.size.y / 100.0):
+		if BuildCancel.requested(def.region_id):
+			return out
 		for bx in ceili(rect.size.x / 100.0):
 			var block := Vector2i(bx, bz)
 			if filled.has(block):

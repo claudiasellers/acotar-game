@@ -78,7 +78,19 @@ func _ready() -> void:
 	# Warm the static noise/feature caches here before the worker reads them,
 	# and fingerprint the inputs so a stale cache is never trusted.
 	_fingerprint = WoodsScatterCache.fingerprint_for(def)
+	_start()
+
+
+func _start() -> void:
+	BuildCancel.clear(def.region_id)
 	_task_id = WorkerThreadPool.add_task(_prepare, false, "woods:%s" % def.region_id)
+
+
+## Back in the tree after leaving mid-build (the cancelled worker's partial
+## result was dropped): start the build again.
+func _enter_tree() -> void:
+	if is_node_ready() and def != null and not is_built and _task_id < 0 and _jobs.is_empty() and _prepared.is_empty():
+		_start()
 
 
 func _process(_delta: float) -> void:
@@ -94,8 +106,11 @@ func _process(_delta: float) -> void:
 
 func _exit_tree() -> void:
 	if _task_id >= 0:
+		# Leaving mid-build (quit, teleport): stop the worker early, then join.
+		BuildCancel.request(def.region_id)
 		WorkerThreadPool.wait_for_task_completion(_task_id)
 		_task_id = -1
+		_prepared.clear()
 
 
 ## The coverage report for tools/world_smoke.gd (contract §5). Needs build.
@@ -143,6 +158,7 @@ func build_now() -> void:
 	elif _prepared.is_empty():
 		if _fingerprint.is_empty():
 			_fingerprint = WoodsScatterCache.fingerprint_for(def)
+		BuildCancel.clear(def.region_id)
 		_prepare()
 	if _jobs.is_empty():
 		_queue_jobs()
@@ -157,6 +173,8 @@ static func generate_cache(region_def: WoodsRegionDef, fingerprint: String, with
 	cache.fingerprint = fingerprint
 	var rect: Rect2 = region_def.provider.BOUNDS
 	for kind in KINDS:
+		if BuildCancel.requested(region_def.region_id):
+			return cache
 		cache.placements[kind] = WoodsScatter.place(region_def, rect, kind)
 	if with_terrain:
 		_sample_terrain(region_def, rect, cache)
@@ -175,6 +193,8 @@ func _prepare() -> void:
 	used_cache = cache != null
 	if cache == null:
 		cache = generate_cache(def, _fingerprint, build_terrain_fallback)
+	if BuildCancel.requested(def.region_id):
+		return
 	var out := {"layers": [], "chunks": [], "terrain": [], "colliders": {}}
 	var species := {}
 	for kind in KINDS:
@@ -182,6 +202,8 @@ func _prepare() -> void:
 		var ids := points.keys()
 		ids.sort()
 		for id: StringName in ids:
+			if BuildCancel.requested(def.region_id):
+				return
 			var layer := WoodsScatter.layer_without_mesh(def, kind, id, points[id])
 			var visual := WoodsScatter.visual_of(def, kind, id)
 			species[visual] = kind
@@ -196,6 +218,8 @@ func _prepare() -> void:
 		if FloraLibrary.has(visual) and not species.has(visual):
 			species[visual] = FloraLibrary.info(visual).get("layer", "")
 	for visual: StringName in species:
+		if BuildCancel.requested(def.region_id):
+			return
 		FloraLibrary.arrays_for(visual, 1)
 		if species[visual] == "tree":
 			FloraLibrary.arrays_for(visual, 0)
@@ -216,6 +240,8 @@ static func _sample_terrain(region_def: WoodsRegionDef, rect: Rect2, cache: Wood
 	var biomes := region_def.biome_map()
 	var provider: Variant = region_def.provider
 	for iz in grid.y:
+		if BuildCancel.requested(region_def.region_id):
+			return
 		for ix in grid.x:
 			var x := rect.position.x + ix * TERRAIN_STEP
 			var z := rect.position.y + iz * TERRAIN_STEP

@@ -35,6 +35,8 @@ static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	var cx := 0
 	var x := r.position.x
 	while x < r.end.x:
+		if BuildCancel.requested(content.region_id):
+			return []
 		var cz := 0
 		var z := r.position.y
 		while z < r.end.y:
@@ -105,6 +107,8 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		var cx := 0
 		var x := r.position.x
 		while x < r.end.x:
+			if BuildCancel.requested(content.region_id):
+				return []
 			var cz := 0
 			var z := r.position.y
 			while z < r.end.y:
@@ -131,7 +135,7 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 				cz += 1
 			x += cell
 			cx += 1
-	if not trees.is_empty():
+	if not trees.is_empty() and not BuildCancel.requested(content.region_id):
 		_tree_layers(content, trees)
 	var out: Array[ScatterLayer] = []
 	for layer in all:
@@ -244,6 +248,8 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary) -> voi
 	var nx := ceili(r.size.x / cell)
 	var nz := ceili(r.size.y / cell)
 	for iz in nz:
+		if BuildCancel.requested(content.region_id):
+			return
 		for ix in nx:
 			var jx := rng.randf()
 			var jz := rng.randf()
