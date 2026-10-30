@@ -111,6 +111,8 @@ func on_arrow_hit(arrow: Node3D) -> void:
 	var result := resolve_arrow(data, health, arrow_id, mortally_wounded)
 	health = result.health
 	var cause := StringName("arrow_%s" % arrow_id)
+	if EventBus.has_signal(&"creature_hit"):
+		EventBus.emit_signal(&"creature_hit", creature_id, data.kind, cause, _hit_part(result.killed))
 	if result.killed:
 		# The lethal arrow is what killed it, whatever finished it.
 		die(mortal_cause if mortally_wounded else cause)
@@ -122,6 +124,11 @@ func on_arrow_hit(arrow: Node3D) -> void:
 	bleeding = maxf(bleeding, 40.0)
 	wounded.emit(cause)
 	_on_wounded(arrow.global_position, cause)
+
+
+## Where an arrow landed, for story beats that care (no hit zones yet).
+func _hit_part(_killing: bool) -> StringName:
+	return &"body"
 
 
 ## Brain hook for a non-lethal hit.

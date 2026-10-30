@@ -90,3 +90,13 @@ func test_pack_breaks_after_two_losses() -> void:
 	assert_ne(pack.phase, WolfPack.Phase.BREAK)
 	wolves[1].die(&"arrow_wood")
 	assert_eq(pack.phase, WolfPack.Phase.BREAK)
+
+
+func test_story_cues_drive_andras() -> void:
+	var wolf := GREAT_WOLF.instantiate() as GreatWolf
+	add_child_autofree(wolf)
+	wolf._on_cue(&"great_wolf", &"seize_doe")
+	assert_eq(wolf.state, GreatWolf.State.RUSH)
+	wolf._on_cue(&"great_wolf", &"look_at_feyre")
+	assert_eq(wolf.state, GreatWolf.State.STARE)
+	assert_eq(wolf._hit_part(false), &"side")

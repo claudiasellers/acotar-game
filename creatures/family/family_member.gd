@@ -71,6 +71,13 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 			var hearth := get_tree().get_first_node_in_group(&"hearth") as Node3D
 			if hearth:
 				go_to(hearth.global_position + gather_offset)
+		&"plead":
+			# The father limps toward the beast and goes down on his knees.
+			set_scripted(true)
+			activity = &"plead"
+			var beast := get_tree().get_first_node_in_group(&"beast") as Node3D
+			if beast:
+				go_to(beast.global_position + Creature.away_from(beast.global_position, global_position) * -2.5)
 		&"release":
 			set_scripted(false)
 			target_spot = &""
@@ -94,6 +101,9 @@ func _pose() -> void:
 		&"sleep":
 			_body.rotation.x = -PI * 0.5
 			_body.position.y = 0.55
+		&"plead":
+			_body.rotation.x = 0.25
+			_body.position.y = height * 0.5 - 0.55
 		&"carve", &"sit", &"mend", &"eat", &"window":
 			_body.rotation.x = 0.0
 			_body.position.y = height * 0.5 - 0.35

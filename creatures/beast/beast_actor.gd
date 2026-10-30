@@ -115,9 +115,13 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 			if stage == Stage.HIDDEN or stage == Stage.GONE:
 				begin_approach(door)
 			break_door()
-		&"loom":
+		&"loom", &"accuse":
 			var player := get_tree().get_first_node_in_group(&"player") as Node3D
 			loom(player.global_position if player else global_position)
+			if cue == &"accuse":
+				# "Murderer": the roar is the loudest thing in the house.
+				speak()
+				CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
 		&"speak":
 			speak()
 		&"leave":

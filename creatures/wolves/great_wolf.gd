@@ -49,11 +49,29 @@ func _ready() -> void:
 		EventBus.connect(&"story_actor_cue", _on_cue)
 
 
-## Story cue `stalk`: (re)start creeping on the nearest doe.
+## Story cues: `stalk` creeps on the nearest doe, `seize_doe` bursts out at
+## her, `look_at_feyre` turns him to her (the scene plays it after the ash).
 func _on_cue(actor: StringName, cue: StringName) -> void:
-	if actor == &"great_wolf" and cue == &"stalk" and alive:
-		prey = _find_prey()
-		state = State.STALK
+	if actor != &"great_wolf" or not alive:
+		return
+	match cue:
+		&"stalk":
+			prey = _find_prey()
+			state = State.STALK
+		&"seize_doe":
+			prey = _find_prey()
+			state = State.RUSH
+		&"look_at_feyre":
+			if state != State.STARE:
+				state = State.STARE
+				_timer = stare_duration
+				_set_eye_glow(2.4)
+				looked_at_player.emit()
+
+
+## The ash goes into his side; the arrow that finishes him goes through the eye.
+func _hit_part(killing: bool) -> StringName:
+	return &"eye" if killing else &"side"
 
 
 func _on_wounded(from: Vector3, _cause: StringName) -> void:
