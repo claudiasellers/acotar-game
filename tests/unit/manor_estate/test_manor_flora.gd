@@ -1,5 +1,6 @@
-## Every flora species has a stylized mesh on the shared foliage shader with wind
-## flex in vertex red, within its triangle budget and height, plus tree impostors.
+## Every flora species has a mesh (Blender model, else procedural) on the shared
+## foliage shader, swaying from the base, within its triangle budget and height,
+## plus tree impostors.
 extends GutTest
 
 const SHADER_PATH := "res://world/shared/shaders/stylized_foliage.gdshader"
@@ -42,6 +43,11 @@ func test_meshes_use_the_shared_shader_with_wind_flex() -> void:
 			var sm := m.surface_get_material(i) as ShaderMaterial
 			if sm == null or sm.shader == null or sm.shader.resource_path != SHADER_PATH:
 				bad.append("%s surface %d not on the foliage shader" % [id, i])
+			if FloraLib.is_model(id):
+				if sm != null and absf(float(sm.get_shader_parameter(&"flex_height")) - FloraLib.height_of(id)) > 0.01:
+					bad.append("%s flex_height is not its height" % id)
+				max_flex = 1.0
+				continue
 			var arr := m.surface_get_arrays(i)
 			var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
 			var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
