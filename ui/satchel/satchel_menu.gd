@@ -1,5 +1,7 @@
 ## The satchel page: her satchel tipped out onto her spread cloak, beside the
-## map as one menu. Her things lie in a loose flat-lay (sized by weight, each
+## map as one menu. The cloak is a lit 3D surface seen at an angle
+## (SatchelTable); her things lie on it as painted cut-outs with real shadows,
+## and this 2D layer keeps the layout, focus and labels. Her things lie in a loose flat-lay (sized by weight, each
 ## at its own fixed tilt); the one in focus lifts and a paper tag on twine
 ## swings in, in its own column. Pockets are flaps along the top edge, and the map is the
 ## last flap.
@@ -15,14 +17,18 @@ signal opened
 signal closed
 
 const MARGIN := Vector2(96, 64)
-const CELL := 156.0
+const CELL := 220.0
 ## Icon size by weight class (TINY..HEAVY); dishes use MEDIUM.
-const SIZES: Array[float] = [60.0, 72.0, 88.0, 112.0, 124.0]
+const SIZES: Array[float] = [120.0, 140.0, 160.0, 190.0, 210.0]
 const TILT_DEG := 4.0
 const JITTER := 10.0
-const HERO_SCALE := 1.25
+const HERO_SCALE := 1.12
 const HERO_LIFT := 10.0
-const REST_ALPHA := 0.8
+## The hero rises this far off the cloth (metres) and turns this much of the
+## way up toward the eye; a dropped-in item falls from DROP_HEIGHT.
+const HERO_RISE := 0.16
+const HERO_FACE := 0.55
+const DROP_HEIGHT := 0.9
 ## Lazy tween: each frame (at 60 fps) a value moves this share of the way to its target.
 const EASE := 0.3
 const OPEN_STAGGER := 0.02
@@ -37,13 +43,13 @@ var selected_id: StringName = &""
 
 var _root: Control
 var _cloth: PanelContainer
+var _table: SatchelTable
 var _flaps: HBoxContainer
 var _pocket_buttons: Dictionary = {}
 var _map_flap: Button
 var _purse: Label
 var _lay: Control
 var _empty: Label
-var _shadow: TextureRect
 var _items: Array[Dictionary] = []
 var _tag: PanelContainer
 var _tag_name: Label
@@ -217,7 +223,7 @@ func _on_item_added(id: StringName, _n: int, _c: StringName) -> void:
 func _apply_theme() -> void:
 	_root.theme = SatchelTheme.theme()
 	_twine.default_color = SatchelTheme.color(&"line")
-	_shadow.texture = _shadow_texture()
+	_table.apply_theme()
 	_load_glyph.queue_redraw()
 
 
@@ -232,6 +238,8 @@ func _build() -> void:
 	_cloth.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_cloth.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(_cloth)
+	_table = SatchelTable.new()
+	_root.add_child(_table)
 	_root.add_child(_vignette())
 
 	_flaps = HBoxContainer.new()
@@ -265,10 +273,6 @@ func _build() -> void:
 	_lay.offset_bottom = -(MARGIN.y + 72)
 	_lay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(_lay)
-	_shadow = TextureRect.new()
-	_shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_shadow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_lay.add_child(_shadow)
 	_empty = _label("Nothing in this pocket yet.", &"SatchelBody")
 	_empty.set_anchors_preset(Control.PRESET_CENTER)
 	_lay.add_child(_empty)
@@ -379,19 +383,20 @@ func _refresh(settle: bool = false) -> void:
 		old.erase(e.id)
 		if it.is_empty() or settle:
 			if not it.is_empty():
-				(it.node as Node).queue_free()
+				_free_item(it)
 			it = _make_item(e)
 		it.home = layout[i]
 		it.entry = e
 		_update_count(it, e)
 		if settle:
-			(it.node as Control).modulate.a = 0.0
-			it.at = it.home + Vector2(_lay_slide, -14.0)
-			it.rot = it.tilt + deg_to_rad(2.0)
+			it.at = it.home + Vector2(_lay_slide, 0.0)
+			it.rot = it.tilt + deg_to_rad(10.0 * _seeded(e.id).x)
+			it.lift = DROP_HEIGHT
 			it.delay = OPEN_STAGGER * i
+			(it.card as Node3D).visible = false
 		fresh.append(it)
 	for id in old:
-		(old[id].node as Node).queue_free()
+		_free_item(old[id])
 	_items = fresh
 	_empty.visible = entries.is_empty()
 	if not entries.any(func(e: Dictionary) -> bool: return e.id == selected_id):
@@ -415,7 +420,12 @@ func _layout(entries: Array[Dictionary]) -> Array[Vector2]:
 	var n := entries.size()
 	# A block about as wide as the area is, not one long row.
 	var max_cols := maxi(1, int(area.x / CELL))
-	var cols := clampi(ceili(sqrt(n * area.x / area.y)), 1, max_cols)
+	var base := clampi(ceili(sqrt(n * area.x / area.y)), 1, max_cols)
+	# Of the nearby widths, take the one that leaves the last row fullest.
+	var cols := base
+	for c in [base, base - 1, base + 1]:
+		if c >= 1 and c <= max_cols and ceili(float(n) / c) * c - n < ceili(float(n) / cols) * cols - n:
+			cols = c
 	var rows := ceili(float(n) / cols)
 	var top := maxf(0.0, (area.y - rows * CELL) * 0.42)
 	var out: Array[Vector2] = []
@@ -453,15 +463,17 @@ func _make_item(e: Dictionary) -> Dictionary:
 	b.pivot_offset = Vector2(px, px) * 0.5
 	b.focus_mode = Control.FOCUS_ALL
 	b.tooltip_text = e.name
-	b.add_child(SatchelIcon.make(e, px))
+	# The button is only the hit area and focus; the picture is the cut-out
+	# on the cloth underneath.
 	var count := _label("", &"SatchelCount")
-	count.position = Vector2(px * 0.62, px * 0.72)
+	count.position = Vector2(px * 0.66, px * 0.66)
 	b.add_child(count)
 	var pin := _label("", &"QuickBarKey")
-	pin.position = Vector2(-2, px * 0.70)
+	pin.position = Vector2(px * 0.12, px * 0.70)
 	b.add_child(pin)
 	_lay.add_child(b)
 	var it := {"id": e.id, "node": b, "px": px, "count": count, "pin": pin, "entry": e,
+		"card": _table.add_card(e), "lift": 0.0, "face": 0.0,
 		"tilt": deg_to_rad(_seeded(e.id).z * TILT_DEG), "at": Vector2.ZERO, "rot": 0.0, "scale": 1.0,
 		"delay": 0.0, "home": Vector2.ZERO}
 	b.focus_entered.connect(select.bind(e.id))
@@ -472,10 +484,15 @@ func _make_item(e: Dictionary) -> Dictionary:
 	return it
 
 
+func _free_item(it: Dictionary) -> void:
+	(it.node as Node).queue_free()
+	(it.card as Node).queue_free()
+
+
 func _update_count(it: Dictionary, e: Dictionary) -> void:
-	(it.count as Label).text = str(e.count) if int(e.count) > 1 else ""
+	(it.count as Label).text = "×%d" % e.count if int(e.count) > 1 else ""
 	var at := bar.slot_of(e.id)
-	(it.pin as Label).text = "◦%d" % (at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
+	(it.pin as Label).text = "ring %d" % (at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
 
 
 func _process(delta: float) -> void:
@@ -486,18 +503,22 @@ func _process(delta: float) -> void:
 	var hero: Dictionary = {}
 	for it in _items:
 		var node := it.node as Control
+		var card := it.card as Node3D
 		if it.delay > 0.0:
 			it.delay -= delta
 			continue
+		card.visible = true
 		var is_hero: bool = it.id == selected_id
 		var target_at: Vector2 = it.home + (Vector2(0, -HERO_LIFT) if is_hero else Vector2.ZERO)
 		it.at = (it.at as Vector2).lerp(target_at, k)
 		it.rot = lerpf(it.rot, it.tilt, k)
 		it.scale = lerpf(it.scale, HERO_SCALE if is_hero else 1.0, k)
+		it.lift = lerpf(it.lift, HERO_RISE if is_hero else 0.0, k)
+		it.face = lerpf(it.face, HERO_FACE if is_hero else 0.0, k)
 		node.position = it.at - Vector2(it.px, it.px) * 0.5
 		node.rotation = it.rot
 		node.scale = Vector2.ONE * it.scale
-		node.modulate.a = lerpf(node.modulate.a, 1.0 if is_hero else REST_ALPHA, k)
+		_table.place(card, _lay.position + it.at, it.px * it.scale, it.rot, it.lift, it.face)
 		if is_hero:
 			hero = it
 	_place_tag(hero, delta, k)
@@ -508,13 +529,10 @@ func _process(delta: float) -> void:
 func _place_tag(hero: Dictionary, delta: float, k: float) -> void:
 	_tag.visible = not hero.is_empty()
 	_twine.visible = _tag.visible
-	_shadow.visible = _tag.visible
 	if hero.is_empty():
 		return
 	var px: float = hero.px * HERO_SCALE
 	var centre: Vector2 = _lay.position + hero.at
-	_shadow.size = Vector2(px * 1.1, px * 0.45)
-	_shadow.position = hero.at + Vector2(-px * 0.55, px * 0.42 + HERO_LIFT)
 	# The tag keeps its column and only drifts up or down to sit level with
 	# the hero, so the eye always finds it in the same place.
 	var x := _root.size.x - MARGIN.x - TAG_WIDTH
@@ -612,21 +630,6 @@ func _vignette() -> TextureRect:
 	r.set_anchors_preset(Control.PRESET_FULL_RECT)
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return r
-
-
-func _shadow_texture() -> GradientTexture2D:
-	var g := Gradient.new()
-	var ink := SatchelTheme.color(&"ink")
-	g.set_color(0, Color(ink, 0.28))
-	g.set_color(1, Color(ink, 0.0))
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill = GradientTexture2D.FILL_RADIAL
-	t.fill_from = Vector2(0.5, 0.5)
-	t.fill_to = Vector2(0.5, 0.0)
-	t.width = 64
-	t.height = 64
-	return t
 
 
 func _units(v: float) -> String:
