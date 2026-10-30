@@ -10,7 +10,7 @@ extends RefCounted
 static var inventory: Inventory = Inventory.new()
 static var journal: ProofJournal = ProofJournal.new()
 static var sketchbook: Sketchbook = Sketchbook.new()
-static var food_tally: FoodTally = FoodTally.new()
+static var food_tally: FamilyLarder = FamilyLarder.new()
 static var wardrobe: Wardrobe = Wardrobe.new()
 static var forage: ForageRegistry = ForageRegistry.new()
 
@@ -22,7 +22,7 @@ static func reset() -> void:
 	inventory = Inventory.new()
 	journal = ProofJournal.new()
 	sketchbook = Sketchbook.new()
-	food_tally = FoodTally.new()
+	food_tally = FamilyLarder.new()
 	wardrobe = Wardrobe.new()
 	forage = ForageRegistry.new()
 	_registered = false

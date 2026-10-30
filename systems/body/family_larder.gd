@@ -1,7 +1,7 @@
-## The family's food, counted in days (the cottage's scratched tally). The
+## The family's food, counted in days (the larder behind the cottage's tally). The
 ## story lane listens to food_stock_changed and raises food_secured through an
 ## ActionTrigger once it is high enough.
-class_name FoodTally
+class_name FamilyLarder
 extends RefCounted
 
 signal stock_changed(days_of_food: float)

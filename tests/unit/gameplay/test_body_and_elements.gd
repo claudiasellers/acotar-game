@@ -68,7 +68,7 @@ func test_hunger_and_cold_widen_sway_food_and_steady_help() -> void:
 
 
 func test_food_tally() -> void:
-	var t := FoodTally.new()
+	var t := FamilyLarder.new()
 	var seen := []
 	t.stock_changed.connect(func(d: float) -> void: seen.append(d))
 	var inv := Inventory.new()
