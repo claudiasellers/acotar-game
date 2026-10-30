@@ -14,6 +14,12 @@ static var max_job_usec := 0
 static var slowest_job := ""
 ## Worst cost per job method name, in microseconds (for profiling).
 static var job_max := {}
+## Jobs started after this frame's accounted budget was spent: the
+## scheduler's promise is that this stays 0 (only a frame's first job may
+## start without room for its estimate).
+static var late_starts := 0
+
+static var _frames := PackedInt32Array()
 
 static var _frame := -1
 static var _spent := 0
@@ -39,6 +45,8 @@ static func run(queue: Array[Callable]) -> int:
 	while not queue.is_empty() and has_time():
 		if _spent > 0 and _spent + int(job_max.get(queue[0].get_method(), BUDGET_USEC)) > BUDGET_USEC:
 			break
+		if _spent >= BUDGET_USEC:
+			late_starts += 1
 		var job: Callable = queue.pop_front()
 		var t := Time.get_ticks_usec()
 		job.call()
@@ -55,10 +63,32 @@ static func reset_stats() -> void:
 	max_frame_usec = 0
 	max_job_usec = 0
 	slowest_job = ""
+	late_starts = 0
+	_frames.clear()
+
+
+## Main-thread cost of every frame that ran jobs since reset_stats(),
+## including the current one.
+static func frame_costs() -> PackedInt32Array:
+	var out := _frames.duplicate()
+	if _frame == Engine.get_process_frames() and _spent > 0:
+		out.append(_spent)
+	return out
+
+
+## The `q` quantile (0..1) of frame_costs().
+static func frame_quantile(q: float) -> int:
+	var costs := frame_costs()
+	if costs.is_empty():
+		return 0
+	costs.sort()
+	return costs[clampi(int(ceil(q * costs.size())) - 1, 0, costs.size() - 1)]
 
 
 static func _roll() -> void:
 	var f := Engine.get_process_frames()
 	if f != _frame:
+		if _spent > 0:
+			_frames.append(_spent)
 		_frame = f
 		_spent = 0
