@@ -1,178 +1,179 @@
 [gd_resource type="Resource" script_class="ManorHouseLayout" format=3]
 
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_door_def.gd" id="1_rn3s5"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_roof_def.gd" id="2_wuqm6"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_room_def.gd" id="3_o18lv"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_prop_placement.gd" id="4_uier2"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_house_layout.gd" id="5_5p3pq"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_secret_def.gd" id="6_d7hx6"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_stair_def.gd" id="7_gcuhb"]
-[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_station_def.gd" id="8_8w3jn"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_anchor_def.gd" id="1_wuqm6"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_door_def.gd" id="2_o18lv"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_roof_def.gd" id="3_uier2"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_room_def.gd" id="4_5p3pq"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_prop_placement.gd" id="5_d7hx6"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_house_layout.gd" id="6_gcuhb"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_secret_def.gd" id="7_8w3jn"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_stair_def.gd" id="8_c4mby"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/house/defs/manor_station_def.gd" id="9_agin8"]
 
-[sub_resource type="Resource" id="Resource_c4mby"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_ayy0x"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(53, -51)
 
-[sub_resource type="Resource" id="Resource_agin8"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_slsqu"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(66, -51)
 
-[sub_resource type="Resource" id="Resource_ayy0x"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_c2iif"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(62, -58)
 
-[sub_resource type="Resource" id="Resource_slsqu"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_jqn65"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(49.5, -47)
 
-[sub_resource type="Resource" id="Resource_c2iif"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_t3dx0"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(58.5, -47)
 
-[sub_resource type="Resource" id="Resource_jqn65"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_fnc5e"]
+script = ExtResource("2_o18lv")
 at = Vector2(52, -54)
 width = 2.4
 kind = &"open"
 
-[sub_resource type="Resource" id="Resource_t3dx0"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_a7nav"]
+script = ExtResource("2_o18lv")
 at = Vector2(59, -54)
 
-[sub_resource type="Resource" id="Resource_fnc5e"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_umj03"]
+script = ExtResource("2_o18lv")
 at = Vector2(65, -54)
 
-[sub_resource type="Resource" id="Resource_a7nav"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_i8cin"]
+script = ExtResource("2_o18lv")
 at = Vector2(71, -54)
 
-[sub_resource type="Resource" id="Resource_umj03"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_4go5y"]
+script = ExtResource("2_o18lv")
 at = Vector2(60, -48)
 
-[sub_resource type="Resource" id="Resource_i8cin"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_vpl0u"]
+script = ExtResource("2_o18lv")
 at = Vector2(69, -48)
 
-[sub_resource type="Resource" id="Resource_4go5y"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_gyaxe"]
+script = ExtResource("2_o18lv")
 at = Vector2(56, -64.5)
 
-[sub_resource type="Resource" id="Resource_vpl0u"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_hv5fd"]
+script = ExtResource("2_o18lv")
 at = Vector2(56, -57.5)
 
-[sub_resource type="Resource" id="Resource_gyaxe"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_1v0d4"]
+script = ExtResource("2_o18lv")
 at = Vector2(59, -61)
 
-[sub_resource type="Resource" id="Resource_hv5fd"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_8oo43"]
+script = ExtResource("2_o18lv")
 at = Vector2(56, -37.5)
 
-[sub_resource type="Resource" id="Resource_1v0d4"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_1x5il"]
+script = ExtResource("2_o18lv")
 at = Vector2(64, -37.5)
 
-[sub_resource type="Resource" id="Resource_8oo43"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_qewuu"]
+script = ExtResource("2_o18lv")
 at = Vector2(69, -41)
 
-[sub_resource type="Resource" id="Resource_1x5il"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_r3ubv"]
+script = ExtResource("2_o18lv")
 at = Vector2(49, -48)
 width = 2.4
 kind = &"open"
 
-[sub_resource type="Resource" id="Resource_qewuu"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_cdc3b"]
+script = ExtResource("2_o18lv")
 at = Vector2(74, -51)
 width = 2.0
 notes = "Kitchen-yard door: steps and covered porch outside."
 
-[sub_resource type="Resource" id="Resource_r3ubv"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_0lq42"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(48, -54)
 
-[sub_resource type="Resource" id="Resource_cdc3b"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_b022s"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(58, -54)
 
-[sub_resource type="Resource" id="Resource_0lq42"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_vjyrb"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(65, -54)
 
-[sub_resource type="Resource" id="Resource_b022s"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_vvmca"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(71, -54)
 
-[sub_resource type="Resource" id="Resource_vjyrb"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_j5hge"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(47, -48)
 
-[sub_resource type="Resource" id="Resource_vvmca"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_0xjqd"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(57.5, -48)
 
-[sub_resource type="Resource" id="Resource_j5hge"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_rvy5o"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(68.5, -48)
 
-[sub_resource type="Resource" id="Resource_0xjqd"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_rehlw"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(68.5, -41)
 
-[sub_resource type="Resource" id="Resource_rvy5o"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_0jp5a"]
+script = ExtResource("2_o18lv")
 level = 1
 at = Vector2(54, -61)
 
-[sub_resource type="Resource" id="Resource_rehlw"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_d7kmv"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(47, -54)
 
-[sub_resource type="Resource" id="Resource_0jp5a"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_lt2v7"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(57, -54)
 
-[sub_resource type="Resource" id="Resource_d7kmv"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_1sqo0"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(65, -54)
 
-[sub_resource type="Resource" id="Resource_lt2v7"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_6e1yf"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(71, -54)
 
-[sub_resource type="Resource" id="Resource_1sqo0"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_kmj3r"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(50, -48)
 
-[sub_resource type="Resource" id="Resource_6e1yf"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_4p66x"]
+script = ExtResource("2_o18lv")
 level = 2
 at = Vector2(66, -48)
 
-[sub_resource type="Resource" id="Resource_kmj3r"]
-script = ExtResource("1_rn3s5")
+[sub_resource type="Resource" id="Resource_lkvkc"]
+script = ExtResource("2_o18lv")
 level = -1
 at = Vector2(63, -42)
 width = 1.4
@@ -181,1497 +182,1525 @@ kind = &"secret"
 secret_id = &"smugglers_run"
 disguise = &"bookcase"
 
-[sub_resource type="Resource" id="Resource_4p66x"]
-script = ExtResource("2_wuqm6")
+[sub_resource type="Resource" id="Resource_ekteh"]
+script = ExtResource("3_uier2")
 rect = Rect2(42, -68, 32, 34)
 base_level = 2
 
-[sub_resource type="Resource" id="Resource_lkvkc"]
-script = ExtResource("2_wuqm6")
+[sub_resource type="Resource" id="Resource_jwome"]
+script = ExtResource("3_uier2")
 rect = Rect2(74, -57, 4, 12)
 base_level = 0
 style = &"flat"
 height = 0.6
 
-[sub_resource type="Resource" id="Resource_ekteh"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_iisue"]
+script = ExtResource("5_d7hx6")
 prop_id = &"wine_rack"
 position = Vector3(2, 0, 0.6)
-
-[sub_resource type="Resource" id="Resource_jwome"]
-script = ExtResource("4_uier2")
-prop_id = &"wine_rack"
-position = Vector3(4.5, 0, 0.6)
-
-[sub_resource type="Resource" id="Resource_iisue"]
-script = ExtResource("4_uier2")
-prop_id = &"wine_rack"
-position = Vector3(7, 0, 0.6)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_wiq48"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"wine_rack"
-position = Vector3(9.5, 0, 0.6)
+position = Vector3(4.5, 0, 0.6)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_ygla3"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"wine_rack"
-position = Vector3(12, 0, 0.6)
+position = Vector3(7, 0, 0.6)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_6rr4r"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"wine_rack"
-position = Vector3(14.5, 0, 0.6)
+position = Vector3(9.5, 0, 0.6)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_21vvx"]
-script = ExtResource("4_uier2")
-prop_id = &"barrel_rack"
-position = Vector3(3, 0, 13.2)
+script = ExtResource("5_d7hx6")
+prop_id = &"wine_rack"
+position = Vector3(12, 0, 0.6)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_exhy8"]
-script = ExtResource("4_uier2")
-prop_id = &"barrel_rack"
-position = Vector3(13.5, 0, 13.2)
+script = ExtResource("5_d7hx6")
+prop_id = &"wine_rack"
+position = Vector3(14.5, 0, 0.6)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_w1j1f"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"barrel_rack"
+position = Vector3(3, 0, 13.2)
+
+[sub_resource type="Resource" id="Resource_56ld2"]
+script = ExtResource("5_d7hx6")
+prop_id = &"barrel_rack"
+position = Vector3(13.5, 0, 13.2)
+
+[sub_resource type="Resource" id="Resource_6o7cd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(8.5, 0, 7)
 
-[sub_resource type="Resource" id="Resource_56ld2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nbbbq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(8, 0, 8)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_6o7cd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0jkwc"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(9.2, 0, 6)
+yaw_deg = -180.0
 
-[sub_resource type="Resource" id="Resource_nbbbq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_w46iq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candelabra"
 position = Vector3(8.5, 0.9, 7)
 
-[sub_resource type="Resource" id="Resource_0jkwc"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2bej1"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(8.5, 2.9, 7)
 
-[sub_resource type="Resource" id="Resource_w46iq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sl33m"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.4, 1.8, 7)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_2bej1"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0fbp7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1.2, 0, 11.5)
 
-[sub_resource type="Resource" id="Resource_sl33m"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bhy2e"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1.2, 0, 10.6)
 yaw_deg = 15.0
 
-[sub_resource type="Resource" id="Resource_0fbp7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_osoxn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(15.8, 0, 9)
 
-[sub_resource type="Resource" id="Resource_bhy2e"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_kywfu"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(15.8, 0, 10)
 
-[sub_resource type="Resource" id="Resource_osoxn"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_xqgcc"]
+script = ExtResource("4_5p3pq")
 id = &"svc_wine_cellar"
 display_name = "Wine Cellar"
 level = -1
 rect = Rect2(45, -65, 17, 14)
 floor_kind = &"flagstone"
 wall_color = Color(0.98, 0.88, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_ekteh"), SubResource("Resource_jwome"), SubResource("Resource_iisue"), SubResource("Resource_wiq48"), SubResource("Resource_ygla3"), SubResource("Resource_6rr4r"), SubResource("Resource_21vvx"), SubResource("Resource_exhy8"), SubResource("Resource_w1j1f"), SubResource("Resource_56ld2"), SubResource("Resource_6o7cd"), SubResource("Resource_nbbbq"), SubResource("Resource_0jkwc"), SubResource("Resource_w46iq"), SubResource("Resource_2bej1"), SubResource("Resource_sl33m"), SubResource("Resource_0fbp7"), SubResource("Resource_bhy2e")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_iisue"), SubResource("Resource_wiq48"), SubResource("Resource_ygla3"), SubResource("Resource_6rr4r"), SubResource("Resource_21vvx"), SubResource("Resource_exhy8"), SubResource("Resource_w1j1f"), SubResource("Resource_56ld2"), SubResource("Resource_6o7cd"), SubResource("Resource_nbbbq"), SubResource("Resource_0jkwc"), SubResource("Resource_w46iq"), SubResource("Resource_2bej1"), SubResource("Resource_sl33m"), SubResource("Resource_0fbp7"), SubResource("Resource_bhy2e"), SubResource("Resource_osoxn"), SubResource("Resource_kywfu")])
 notes = "Vaulted racks of faerie wine; a tasting table under a lantern."
 
-[sub_resource type="Resource" id="Resource_kywfu"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7odrn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(1.6, 2.8, 7)
 
-[sub_resource type="Resource" id="Resource_xqgcc"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_q5o68"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.4, 1.8, 4)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_7odrn"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(8.6, 1.8, 4)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_q5o68"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7yaco"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(8.6, 1.8, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_x26tm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(7.6, 0, 2)
 
-[sub_resource type="Resource" id="Resource_7yaco"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_afxn5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(7.6, 0, 3)
 yaw_deg = 10.0
 
-[sub_resource type="Resource" id="Resource_x26tm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_fkdep"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1.2, 0, 2)
 
-[sub_resource type="Resource" id="Resource_afxn5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qcoyd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(7.6, 0, 11)
 
-[sub_resource type="Resource" id="Resource_fkdep"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1rvvk"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(8.1, 0, 11.6)
 
-[sub_resource type="Resource" id="Resource_qcoyd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1imc0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(1, 0, 12.4)
 
-[sub_resource type="Resource" id="Resource_1rvvk"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cj86x"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2.2, 0, 12.8)
 
-[sub_resource type="Resource" id="Resource_1imc0"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_we2iq"]
+script = ExtResource("4_5p3pq")
 id = &"svc_cellar_stair_hall"
 display_name = "Cellar Stair Hall"
 level = -1
 rect = Rect2(62, -65, 9, 14)
 floor_kind = &"flagstone"
 wall_color = Color(1, 0.86, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_kywfu"), SubResource("Resource_xqgcc"), SubResource("Resource_7odrn"), SubResource("Resource_q5o68"), SubResource("Resource_7yaco"), SubResource("Resource_x26tm"), SubResource("Resource_afxn5"), SubResource("Resource_fkdep"), SubResource("Resource_qcoyd"), SubResource("Resource_1rvvk")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_7odrn"), SubResource("Resource_q5o68"), SubResource("Resource_7yaco"), SubResource("Resource_x26tm"), SubResource("Resource_afxn5"), SubResource("Resource_fkdep"), SubResource("Resource_qcoyd"), SubResource("Resource_1rvvk"), SubResource("Resource_1imc0"), SubResource("Resource_cj86x")])
 notes = "Foot of the service cellar stair; stores waiting to go up."
 
-[sub_resource type="Resource" id="Resource_cj86x"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_8lvux"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(5, 2.8, 2)
 
-[sub_resource type="Resource" id="Resource_we2iq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_djibs"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(13, 2.8, 2)
 
-[sub_resource type="Resource" id="Resource_8lvux"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2yyun"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(21, 2.8, 2)
 
-[sub_resource type="Resource" id="Resource_djibs"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qwd1u"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.4, 1.8, 2)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_2yyun"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(25.6, 1.8, 2)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_qwd1u"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_17mix"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(25.6, 1.8, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_8yynv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1, 0, 1)
 
-[sub_resource type="Resource" id="Resource_17mix"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_46ana"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(25, 0, 3.2)
 
-[sub_resource type="Resource" id="Resource_8yynv"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0584e"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(17.5, 0, 3.4)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_46ana"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_4sx3u"]
+script = ExtResource("4_5p3pq")
 id = &"svc_cellar_passage"
 display_name = "Cellar Passage"
 level = -1
 rect = Rect2(45, -51, 26, 4)
 floor_kind = &"flagstone"
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_cj86x"), SubResource("Resource_we2iq"), SubResource("Resource_8lvux"), SubResource("Resource_djibs"), SubResource("Resource_2yyun"), SubResource("Resource_qwd1u"), SubResource("Resource_17mix"), SubResource("Resource_8yynv")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_8lvux"), SubResource("Resource_djibs"), SubResource("Resource_2yyun"), SubResource("Resource_qwd1u"), SubResource("Resource_17mix"), SubResource("Resource_8yynv"), SubResource("Resource_46ana"), SubResource("Resource_0584e")])
 notes = "Lantern-lit passage linking the cellars."
 
-[sub_resource type="Resource" id="Resource_0584e"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tr0v5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pantry_shelf"
 position = Vector3(0.5, 0, 4)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_4sx3u"]
-script = ExtResource("4_uier2")
-prop_id = &"pantry_shelf"
-position = Vector3(8.5, 0, 5)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_tr0v5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cw7wu"]
+script = ExtResource("5_d7hx6")
+prop_id = &"pantry_shelf"
+position = Vector3(8.5, 0, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_8lbqj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2, 0, 8.8)
 
-[sub_resource type="Resource" id="Resource_cw7wu"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_i4sg2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2.8, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_8lbqj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_or0ge"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(6, 0, 9)
 
-[sub_resource type="Resource" id="Resource_i4sg2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_s5yn0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(4.5, 0, 5)
 
-[sub_resource type="Resource" id="Resource_or0ge"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_if5ex"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(7.6, 0, 1)
 
-[sub_resource type="Resource" id="Resource_s5yn0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_rhcb0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(8, 0, 1.6)
 
-[sub_resource type="Resource" id="Resource_if5ex"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_wv4og"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(1, 0, 1)
 
-[sub_resource type="Resource" id="Resource_rhcb0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eoe3k"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(4.5, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_wv4og"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_teg02"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(7.2, 0, 9)
 yaw_deg = 20.0
 
-[sub_resource type="Resource" id="Resource_eoe3k"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nkn3r"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1.2, 0, 8.2)
 
-[sub_resource type="Resource" id="Resource_teg02"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_gojrq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4.5, 2.8, 5)
 
-[sub_resource type="Resource" id="Resource_nkn3r"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6mgdy"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(4.5, 2.4, 9.7)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_gojrq"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_rl60u"]
+script = ExtResource("4_5p3pq")
 id = &"svc_root_cellar"
 display_name = "Root Cellar"
 level = -1
 rect = Rect2(45, -47, 9, 10)
 floor_kind = &"flagstone"
 wall_color = Color(0.98, 0.88, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_0584e"), SubResource("Resource_4sx3u"), SubResource("Resource_tr0v5"), SubResource("Resource_cw7wu"), SubResource("Resource_8lbqj"), SubResource("Resource_i4sg2"), SubResource("Resource_or0ge"), SubResource("Resource_s5yn0"), SubResource("Resource_if5ex"), SubResource("Resource_rhcb0"), SubResource("Resource_wv4og"), SubResource("Resource_eoe3k"), SubResource("Resource_teg02"), SubResource("Resource_nkn3r")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_tr0v5"), SubResource("Resource_cw7wu"), SubResource("Resource_8lbqj"), SubResource("Resource_i4sg2"), SubResource("Resource_or0ge"), SubResource("Resource_s5yn0"), SubResource("Resource_if5ex"), SubResource("Resource_rhcb0"), SubResource("Resource_wv4og"), SubResource("Resource_eoe3k"), SubResource("Resource_teg02"), SubResource("Resource_nkn3r"), SubResource("Resource_gojrq"), SubResource("Resource_6mgdy")])
 notes = "Bins of roots and apples from the kitchen garden."
 
-[sub_resource type="Resource" id="Resource_6mgdy"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_l0wr0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cheese_shelf"
 position = Vector3(0.5, 0, 3)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_rl60u"]
-script = ExtResource("4_uier2")
-prop_id = &"cheese_shelf"
-position = Vector3(0.5, 0, 7)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_l0wr0"]
-script = ExtResource("4_uier2")
-prop_id = &"pantry_shelf"
-position = Vector3(4.5, 0, 9.5)
-yaw_deg = 180.0
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_a2b3f"]
-script = ExtResource("4_uier2")
-prop_id = &"pantry_shelf"
-position = Vector3(8.5, 0, 2)
+script = ExtResource("5_d7hx6")
+prop_id = &"cheese_shelf"
+position = Vector3(0.5, 0, 7)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_ytpt8"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"pantry_shelf"
+position = Vector3(4.5, 0, 9.5)
+
+[sub_resource type="Resource" id="Resource_n46c1"]
+script = ExtResource("5_d7hx6")
+prop_id = &"pantry_shelf"
+position = Vector3(8.5, 0, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_obxkd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(7.8, 0, 8.6)
 
-[sub_resource type="Resource" id="Resource_n46c1"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7v4su"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(7, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_obxkd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xs71y"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(2, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_7v4su"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1j1e2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(4.5, 0, 5)
 
-[sub_resource type="Resource" id="Resource_xs71y"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eoq6p"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(4, 0.9, 5)
 
-[sub_resource type="Resource" id="Resource_1j1e2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eb1tt"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cake_stand"
 position = Vector3(5.2, 0.9, 5)
 
-[sub_resource type="Resource" id="Resource_eoq6p"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_j03lp"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4.5, 2.8, 5)
 
-[sub_resource type="Resource" id="Resource_eb1tt"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_h4cac"]
+script = ExtResource("5_d7hx6")
 prop_id = &"faelight_orb"
 position = Vector3(6.5, 2.6, 0.5)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_j03lp"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_tmsj6"]
+script = ExtResource("4_5p3pq")
 id = &"svc_cold_store"
 display_name = "Cold Store"
 level = -1
 rect = Rect2(54, -47, 9, 10)
 floor_kind = &"stone"
 wall_color = Color(0.78, 0.82, 1, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_6mgdy"), SubResource("Resource_rl60u"), SubResource("Resource_l0wr0"), SubResource("Resource_a2b3f"), SubResource("Resource_ytpt8"), SubResource("Resource_n46c1"), SubResource("Resource_obxkd"), SubResource("Resource_7v4su"), SubResource("Resource_xs71y"), SubResource("Resource_1j1e2"), SubResource("Resource_eoq6p"), SubResource("Resource_eb1tt")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_l0wr0"), SubResource("Resource_a2b3f"), SubResource("Resource_ytpt8"), SubResource("Resource_n46c1"), SubResource("Resource_obxkd"), SubResource("Resource_7v4su"), SubResource("Resource_xs71y"), SubResource("Resource_1j1e2"), SubResource("Resource_eoq6p"), SubResource("Resource_eb1tt"), SubResource("Resource_j03lp"), SubResource("Resource_h4cac")])
 notes = "Frost-charmed larder: cheeses, butter crocks, game. One jar on the south shelf is loose..."
 
-[sub_resource type="Resource" id="Resource_h4cac"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6t0wj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1, 0, 1)
 
-[sub_resource type="Resource" id="Resource_tmsj6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_kehrt"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1, 0, 1.8)
 yaw_deg = 25.0
 
-[sub_resource type="Resource" id="Resource_6t0wj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2jw2n"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(6.8, 0, 9)
 
-[sub_resource type="Resource" id="Resource_kehrt"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1cvjf"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(7, 0, 1.2)
 
-[sub_resource type="Resource" id="Resource_2jw2n"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qteac"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(6.2, 0, 1.2)
 
-[sub_resource type="Resource" id="Resource_1cvjf"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nlpo7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(4, 0, 9.3)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_qteac"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_464s6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4, 2.8, 5)
 
-[sub_resource type="Resource" id="Resource_nlpo7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_awtqm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(7.6, 1.6, 5)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_464s6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_t2egf"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(1, 0, 8.8)
 
-[sub_resource type="Resource" id="Resource_awtqm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sbk7q"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(7.2, 0, 6.8)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_t2egf"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_t3vdg"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(4, 0, 0.6)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_sbk7q"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_x8ga5"]
+script = ExtResource("4_5p3pq")
 id = &"svc_smugglers_passage"
 display_name = "Smugglers' Passage"
 level = -1
 rect = Rect2(63, -47, 8, 10)
 floor_kind = &"flagstone"
 wall_color = Color(0.98, 0.88, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_h4cac"), SubResource("Resource_tmsj6"), SubResource("Resource_6t0wj"), SubResource("Resource_kehrt"), SubResource("Resource_2jw2n"), SubResource("Resource_1cvjf"), SubResource("Resource_qteac"), SubResource("Resource_nlpo7"), SubResource("Resource_464s6"), SubResource("Resource_awtqm"), SubResource("Resource_t2egf")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_6t0wj"), SubResource("Resource_kehrt"), SubResource("Resource_2jw2n"), SubResource("Resource_1cvjf"), SubResource("Resource_qteac"), SubResource("Resource_nlpo7"), SubResource("Resource_464s6"), SubResource("Resource_awtqm"), SubResource("Resource_t2egf"), SubResource("Resource_sbk7q"), SubResource("Resource_t3vdg")])
 notes = "Behind the cold-store shelf: an old run used by long-gone smugglers. Hidden."
 
-[sub_resource type="Resource" id="Resource_t3vdg"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cd5hn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(8, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_x8ga5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ha0hl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(22, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_cd5hn"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_h0t73"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(3, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_ha0hl"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(14, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_h0t73"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(20, 1.8, 0.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_mgm1f"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
-position = Vector3(26, 1.8, 0.4)
+position = Vector3(14, 1.8, 0.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_5bi4r"]
-script = ExtResource("4_uier2")
-prop_id = &"clock_grandfather"
-position = Vector3(3.5, 0, 5.5)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(20, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_tuyt2"]
-script = ExtResource("4_uier2")
-prop_id = &"bench_settle"
-position = Vector3(12.5, 0, 5.5)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(26, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_tb3el"]
-script = ExtResource("4_uier2")
-prop_id = &"painting_small"
-position = Vector3(6.5, 1.6, 0.3)
+script = ExtResource("5_d7hx6")
+prop_id = &"clock_grandfather"
+position = Vector3(3.5, 0, 5.5)
 
 [sub_resource type="Resource" id="Resource_cdhk5"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"bench_settle"
+position = Vector3(12.5, 0, 5.5)
+
+[sub_resource type="Resource" id="Resource_2um7j"]
+script = ExtResource("5_d7hx6")
+prop_id = &"painting_small"
+position = Vector3(6.5, 1.6, 0.3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ieah3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(16, 3.4, 3)
 
-[sub_resource type="Resource" id="Resource_2um7j"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_j5jb6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(31.2, 0, 0.9)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ieah3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oo5ej"]
+script = ExtResource("5_d7hx6")
 prop_id = &"hat_stand"
 position = Vector3(31.2, 0, 5.2)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_j5jb6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1n3rm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(23, 0, 5.4)
 
-[sub_resource type="Resource" id="Resource_oo5ej"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_regnl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(1, 0, 0.9)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_1n3rm"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_giywa"]
+script = ExtResource("4_5p3pq")
 id = &"svc_passage_0"
 display_name = "Service Passage"
 canon = "C?"
 rect = Rect2(42, -54, 32, 6)
 floor_kind = &"tile"
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_t3vdg"), SubResource("Resource_x8ga5"), SubResource("Resource_cd5hn"), SubResource("Resource_ha0hl"), SubResource("Resource_h0t73"), SubResource("Resource_mgm1f"), SubResource("Resource_5bi4r"), SubResource("Resource_tuyt2"), SubResource("Resource_tb3el"), SubResource("Resource_cdhk5"), SubResource("Resource_2um7j"), SubResource("Resource_ieah3"), SubResource("Resource_j5jb6"), SubResource("Resource_oo5ej")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_cd5hn"), SubResource("Resource_ha0hl"), SubResource("Resource_h0t73"), SubResource("Resource_mgm1f"), SubResource("Resource_5bi4r"), SubResource("Resource_tuyt2"), SubResource("Resource_tb3el"), SubResource("Resource_cdhk5"), SubResource("Resource_2um7j"), SubResource("Resource_ieah3"), SubResource("Resource_j5jb6"), SubResource("Resource_oo5ej"), SubResource("Resource_1n3rm"), SubResource("Resource_regnl")])
 notes = "From the main-block door (42,-50) to the kitchen-yard door (74,-51)."
 
-[sub_resource type="Resource" id="Resource_regnl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_wrm0c"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_kitchen"
 position = Vector3(5.5, 0, 8)
 
-[sub_resource type="Resource" id="Resource_giywa"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_g2o1j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_kitchen"
 position = Vector3(9, 0, 8)
 
-[sub_resource type="Resource" id="Resource_wrm0c"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_8bcw5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(5.5, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_g2o1j"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0mn1d"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(9, 0, 9.2)
 
-[sub_resource type="Resource" id="Resource_8bcw5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_y5kp6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(5.5, 0, 6.8)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_0mn1d"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_k0ck7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(9, 0, 6.8)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_y5kp6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_47ty8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dresser_crockery"
 position = Vector3(3, 0, 13.4)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_k0ck7"]
-script = ExtResource("4_uier2")
-prop_id = &"dresser_crockery"
-position = Vector3(13.4, 0, 7)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_47ty8"]
-script = ExtResource("4_uier2")
-prop_id = &"copper_pots"
-position = Vector3(3.5, 1.7, 0.3)
 
 [sub_resource type="Resource" id="Resource_8dawx"]
-script = ExtResource("4_uier2")
-prop_id = &"copper_pots"
-position = Vector3(10.5, 1.7, 0.3)
+script = ExtResource("5_d7hx6")
+prop_id = &"dresser_crockery"
+position = Vector3(13.4, 0, 7)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_ruk1i"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"copper_pots"
+position = Vector3(3.5, 1.7, 0.3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_iju6w"]
+script = ExtResource("5_d7hx6")
+prop_id = &"copper_pots"
+position = Vector3(10.5, 1.7, 0.3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_uhw3k"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pot_rack_hanging"
 position = Vector3(7.2, 3, 8)
 
-[sub_resource type="Resource" id="Resource_iju6w"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_me4jh"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(12.2, 2.2, 0.4)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_uhw3k"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_pvj4i"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(5, 0.9, 8)
 
-[sub_resource type="Resource" id="Resource_me4jh"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ounqe"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cake_stand"
 position = Vector3(9.6, 0.9, 8)
 
-[sub_resource type="Resource" id="Resource_pvj4i"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_d0fol"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(7.2, 0.9, 8)
 
-[sub_resource type="Resource" id="Resource_ounqe"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_x43oo"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chandelier_small"
 position = Vector3(7, 3.4, 4)
 
-[sub_resource type="Resource" id="Resource_d0fol"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_p5fpg"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.9, 2.5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_x43oo"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.9, 11.5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_p5fpg"]
-script = ExtResource("4_uier2")
-prop_id = &"sack_flour"
-position = Vector3(13.2, 0, 12.6)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_jukdj"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.9, 11.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_fsm2n"]
+script = ExtResource("5_d7hx6")
+prop_id = &"sack_flour"
+position = Vector3(13.2, 0, 12.6)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_f1ou5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(12.6, 0, 13)
 
-[sub_resource type="Resource" id="Resource_fsm2n"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_svkgd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(13, 0, 1.4)
 
-[sub_resource type="Resource" id="Resource_f1ou5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4lx5n"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(2.4, 0, 5)
 
-[sub_resource type="Resource" id="Resource_svkgd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_o267m"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(2.4, 0, 9)
 
-[sub_resource type="Resource" id="Resource_4lx5n"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cids6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(0.8, 0, 13.2)
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_o267m"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_hs1d0"]
+script = ExtResource("4_5p3pq")
 id = &"svc_kitchen"
 display_name = "Kitchens"
 canon = "C?"
 rect = Rect2(42, -68, 14, 14)
 floor_kind = &"tile"
 wall_color = Color(0.78, 0.96, 0.87, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_regnl"), SubResource("Resource_giywa"), SubResource("Resource_wrm0c"), SubResource("Resource_g2o1j"), SubResource("Resource_8bcw5"), SubResource("Resource_0mn1d"), SubResource("Resource_y5kp6"), SubResource("Resource_k0ck7"), SubResource("Resource_47ty8"), SubResource("Resource_8dawx"), SubResource("Resource_ruk1i"), SubResource("Resource_iju6w"), SubResource("Resource_uhw3k"), SubResource("Resource_me4jh"), SubResource("Resource_pvj4i"), SubResource("Resource_ounqe"), SubResource("Resource_d0fol"), SubResource("Resource_x43oo"), SubResource("Resource_p5fpg"), SubResource("Resource_jukdj"), SubResource("Resource_fsm2n"), SubResource("Resource_f1ou5"), SubResource("Resource_svkgd"), SubResource("Resource_4lx5n")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_wrm0c"), SubResource("Resource_g2o1j"), SubResource("Resource_8bcw5"), SubResource("Resource_0mn1d"), SubResource("Resource_y5kp6"), SubResource("Resource_k0ck7"), SubResource("Resource_47ty8"), SubResource("Resource_8dawx"), SubResource("Resource_ruk1i"), SubResource("Resource_iju6w"), SubResource("Resource_uhw3k"), SubResource("Resource_me4jh"), SubResource("Resource_pvj4i"), SubResource("Resource_ounqe"), SubResource("Resource_d0fol"), SubResource("Resource_x43oo"), SubResource("Resource_p5fpg"), SubResource("Resource_jukdj"), SubResource("Resource_fsm2n"), SubResource("Resource_f1ou5"), SubResource("Resource_svkgd"), SubResource("Resource_4lx5n"), SubResource("Resource_o267m"), SubResource("Resource_cids6")])
 notes = "Cozy and bright: iron range, big hearth, copper pots, long scrubbed tables, crockery dresser. Feyre comes here hungry on Calanmai night (ch21)."
 
-[sub_resource type="Resource" id="Resource_cids6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_utint"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(3, 0, 4)
 
-[sub_resource type="Resource" id="Resource_hs1d0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4pac0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2.4, 0.9, 4)
 
-[sub_resource type="Resource" id="Resource_utint"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ondne"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cake_stand"
 position = Vector3(3.8, 0.9, 4)
 
-[sub_resource type="Resource" id="Resource_4pac0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_8gql0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(5.2, 0, 1.4)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ondne"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ud636"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(5.4, 0, 2.2)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_8gql0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dgitw"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(5.2, 0, 6.2)
 
-[sub_resource type="Resource" id="Resource_ud636"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_srxu0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pantry_shelf"
 position = Vector3(5.6, 0, 4.2)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_dgitw"]
-script = ExtResource("4_uier2")
-prop_id = &"stool"
-position = Vector3(1, 0, 6.2)
-
-[sub_resource type="Resource" id="Resource_srxu0"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 1.6)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_c10nw"]
-script = ExtResource("4_uier2")
-prop_id = &"copper_pots"
-position = Vector3(0.3, 1.5, 5.4)
-yaw_deg = 90.0
+script = ExtResource("5_d7hx6")
+prop_id = &"stool"
+position = Vector3(1, 0, 6.2)
 
 [sub_resource type="Resource" id="Resource_2sgr5"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 1.6)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_7ywun"]
+script = ExtResource("5_d7hx6")
+prop_id = &"copper_pots"
+position = Vector3(0.3, 1.5, 5.4)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_y0ahm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(3, 3.2, 3.5)
 
-[sub_resource type="Resource" id="Resource_7ywun"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_we8mo"]
+script = ExtResource("4_5p3pq")
 id = &"svc_bakery"
 display_name = "Bakery Corner"
 rect = Rect2(56, -68, 6, 7)
 floor_kind = &"tile"
 wall_color = Color(1, 0.86, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_cids6"), SubResource("Resource_hs1d0"), SubResource("Resource_utint"), SubResource("Resource_4pac0"), SubResource("Resource_ondne"), SubResource("Resource_8gql0"), SubResource("Resource_ud636"), SubResource("Resource_dgitw"), SubResource("Resource_srxu0"), SubResource("Resource_c10nw"), SubResource("Resource_2sgr5")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_utint"), SubResource("Resource_4pac0"), SubResource("Resource_ondne"), SubResource("Resource_8gql0"), SubResource("Resource_ud636"), SubResource("Resource_dgitw"), SubResource("Resource_srxu0"), SubResource("Resource_c10nw"), SubResource("Resource_2sgr5"), SubResource("Resource_7ywun"), SubResource("Resource_y0ahm")])
 notes = "Bread oven, flour sacks and proving baskets."
 
-[sub_resource type="Resource" id="Resource_y0ahm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tq87q"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sink_stone"
 position = Vector3(5.4, 0, 2)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_we8mo"]
-script = ExtResource("4_uier2")
-prop_id = &"sink_stone"
-position = Vector3(5.4, 0, 5)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_tq87q"]
-script = ExtResource("4_uier2")
-prop_id = &"barrel"
-position = Vector3(0.8, 0, 1)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_2xqst"]
-script = ExtResource("4_uier2")
-prop_id = &"barrel"
-position = Vector3(0.8, 0, 6.2)
+script = ExtResource("5_d7hx6")
+prop_id = &"sink_stone"
+position = Vector3(5.4, 0, 5)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_jsaim"]
-script = ExtResource("4_uier2")
-prop_id = &"copper_pots"
-position = Vector3(5.7, 1.6, 3.5)
+script = ExtResource("5_d7hx6")
+prop_id = &"barrel"
+position = Vector3(0.8, 0, 1)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_se7vq"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"barrel"
+position = Vector3(0.8, 0, 6.2)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_0xsln"]
+script = ExtResource("5_d7hx6")
+prop_id = &"copper_pots"
+position = Vector3(5.7, 1.6, 3.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_4hd3a"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(4.3, 0, 3.5)
 
-[sub_resource type="Resource" id="Resource_0xsln"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ruks8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(1.8, 0, 0.8)
 
-[sub_resource type="Resource" id="Resource_4hd3a"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qn3yo"]
+script = ExtResource("5_d7hx6")
 prop_id = &"towel_rack"
 position = Vector3(4.4, 0, 0.4)
-
-[sub_resource type="Resource" id="Resource_ruks8"]
-script = ExtResource("4_uier2")
-prop_id = &"soap_shelf"
-position = Vector3(5.7, 1.2, 6.4)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_qn3yo"]
-script = ExtResource("4_uier2")
-prop_id = &"crate"
-position = Vector3(4.8, 0, 6.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_rvd6c"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 1.5)
+script = ExtResource("5_d7hx6")
+prop_id = &"soap_shelf"
+position = Vector3(5.7, 1.2, 6.4)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_cuayp"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"crate"
+position = Vector3(4.8, 0, 6.4)
+
+[sub_resource type="Resource" id="Resource_rrlf2"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 1.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_j1u2l"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(3, 3.2, 3.5)
 
-[sub_resource type="Resource" id="Resource_rrlf2"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_6aoaa"]
+script = ExtResource("4_5p3pq")
 id = &"svc_scullery"
 display_name = "Scullery"
 canon = "C?"
 rect = Rect2(56, -61, 6, 7)
 floor_kind = &"tile"
 wall_color = Color(0.78, 0.82, 1, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_y0ahm"), SubResource("Resource_we8mo"), SubResource("Resource_tq87q"), SubResource("Resource_2xqst"), SubResource("Resource_jsaim"), SubResource("Resource_se7vq"), SubResource("Resource_0xsln"), SubResource("Resource_4hd3a"), SubResource("Resource_ruks8"), SubResource("Resource_qn3yo"), SubResource("Resource_rvd6c"), SubResource("Resource_cuayp")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_tq87q"), SubResource("Resource_2xqst"), SubResource("Resource_jsaim"), SubResource("Resource_se7vq"), SubResource("Resource_0xsln"), SubResource("Resource_4hd3a"), SubResource("Resource_ruks8"), SubResource("Resource_qn3yo"), SubResource("Resource_rvd6c"), SubResource("Resource_cuayp"), SubResource("Resource_rrlf2"), SubResource("Resource_j1u2l")])
 notes = "Stone sinks, soap, buckets: where the dishes go."
 
-[sub_resource type="Resource" id="Resource_j1u2l"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_068jn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(5.7, 1.8, 2)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_6aoaa"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(5.7, 1.8, 13)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_068jn"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 12.8)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_i46dr"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(5.7, 1.8, 13)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_yh2vj"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 12.8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_0jqdd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4.4, 3.6, 2)
 
-[sub_resource type="Resource" id="Resource_yh2vj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_og7nt"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(5.4, 0, 0.6)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_0jqdd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_r7l1j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(4.5, 1.6, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_og7nt"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3qnry"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(5.3, 0, 13.3)
 
-[sub_resource type="Resource" id="Resource_r7l1j"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_j20a6"]
+script = ExtResource("4_5p3pq")
 id = &"svc_back_stair_0"
 display_name = "Back Stairs (Ground)"
 rect = Rect2(62, -68, 6, 14)
 wall_color = Color(1, 0.86, 0.88, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_j1u2l"), SubResource("Resource_6aoaa"), SubResource("Resource_068jn"), SubResource("Resource_i46dr"), SubResource("Resource_yh2vj"), SubResource("Resource_0jqdd"), SubResource("Resource_og7nt")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_068jn"), SubResource("Resource_i46dr"), SubResource("Resource_yh2vj"), SubResource("Resource_0jqdd"), SubResource("Resource_og7nt"), SubResource("Resource_r7l1j"), SubResource("Resource_3qnry")])
 notes = "Service stair up (west) and the cellar stair coming up (east)."
 
-[sub_resource type="Resource" id="Resource_3qnry"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_w1qb4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cheese_shelf"
 position = Vector3(3, 0, 0.5)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_j20a6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5ovao"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1, 0, 3)
 
-[sub_resource type="Resource" id="Resource_w1qb4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_gsydo"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1, 0, 4)
 
-[sub_resource type="Resource" id="Resource_5ovao"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qlk56"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1, 0, 5)
 
-[sub_resource type="Resource" id="Resource_gsydo"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_a42fj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(3.5, 0, 7)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_qlk56"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_m5kob"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(3.5, 0.9, 6.4)
 
-[sub_resource type="Resource" id="Resource_a42fj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nohdc"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cake_stand"
 position = Vector3(3.5, 0.9, 7.6)
 
-[sub_resource type="Resource" id="Resource_m5kob"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3jttb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pantry_shelf"
 position = Vector3(0.5, 0, 10)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_nohdc"]
-script = ExtResource("4_uier2")
-prop_id = &"sink_stone"
-position = Vector3(5.4, 0, 10)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_3jttb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ds1c7"]
+script = ExtResource("5_d7hx6")
+prop_id = &"sink_stone"
+position = Vector3(5.4, 0, 10)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_u2g0p"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(2.4, 0, 9)
 
-[sub_resource type="Resource" id="Resource_ds1c7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_npu2l"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(3, 3.2, 7)
 
-[sub_resource type="Resource" id="Resource_u2g0p"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ww2jg"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.8, 7)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_npu2l"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xds4j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(5.3, 0, 13.3)
 
-[sub_resource type="Resource" id="Resource_ww2jg"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xh15s"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(5.4, 0, 1)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_xds4j"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_qq3px"]
+script = ExtResource("4_5p3pq")
 id = &"svc_dairy"
 display_name = "Dairy"
 rect = Rect2(68, -68, 6, 14)
 floor_kind = &"tile"
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_3qnry"), SubResource("Resource_j20a6"), SubResource("Resource_w1qb4"), SubResource("Resource_5ovao"), SubResource("Resource_gsydo"), SubResource("Resource_qlk56"), SubResource("Resource_a42fj"), SubResource("Resource_m5kob"), SubResource("Resource_nohdc"), SubResource("Resource_3jttb"), SubResource("Resource_ds1c7"), SubResource("Resource_u2g0p"), SubResource("Resource_npu2l"), SubResource("Resource_ww2jg")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_w1qb4"), SubResource("Resource_5ovao"), SubResource("Resource_gsydo"), SubResource("Resource_qlk56"), SubResource("Resource_a42fj"), SubResource("Resource_m5kob"), SubResource("Resource_nohdc"), SubResource("Resource_3jttb"), SubResource("Resource_ds1c7"), SubResource("Resource_u2g0p"), SubResource("Resource_npu2l"), SubResource("Resource_ww2jg"), SubResource("Resource_xds4j"), SubResource("Resource_xh15s")])
 notes = "Cool white dairy: churns, cream pans, cheese shelf."
 
-[sub_resource type="Resource" id="Resource_xh15s"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_hg5ht"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_dining_long"
 position = Vector3(7.5, 0, 7)
 
-[sub_resource type="Resource" id="Resource_qq3px"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_gp3ec"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(5, 0, 6)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_hg5ht"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_48ohl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(9.6, 0, 6)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_gp3ec"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_lu50j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(5, 0, 8)
 
-[sub_resource type="Resource" id="Resource_48ohl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_f374v"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bench_settle"
 position = Vector3(9.6, 0, 8)
 
-[sub_resource type="Resource" id="Resource_lu50j"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_rellb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_dining"
 position = Vector3(3, 0, 7)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_f374v"]
-script = ExtResource("4_uier2")
-prop_id = &"chair_dining"
-position = Vector3(12, 0, 7)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_rellb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ieiny"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chair_dining"
+position = Vector3(12, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_flnwl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chandelier_small"
 position = Vector3(5, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_ieiny"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0taxy"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chandelier_small"
 position = Vector3(10, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_flnwl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ua1f2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dresser_crockery"
 position = Vector3(13.4, 0, 3)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_0taxy"]
-script = ExtResource("4_uier2")
-prop_id = &"sideboard"
-position = Vector3(7, 0, 13.4)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_ua1f2"]
-script = ExtResource("4_uier2")
-prop_id = &"clock_grandfather"
-position = Vector3(13.4, 0, 13)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_2xgyy"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"sideboard"
+position = Vector3(7, 0, 13.4)
+
+[sub_resource type="Resource" id="Resource_drlop"]
+script = ExtResource("5_d7hx6")
+prop_id = &"clock_grandfather"
+position = Vector3(13.4, 0, 13)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_4nu3r"]
+script = ExtResource("5_d7hx6")
 prop_id = &"armchair"
 position = Vector3(2, 0, 3.6)
 yaw_deg = 45.0
 
-[sub_resource type="Resource" id="Resource_drlop"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oeyj0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"armchair"
 position = Vector3(2, 0, 10.4)
 yaw_deg = 135.0
 
-[sub_resource type="Resource" id="Resource_4nu3r"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eltn3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_large"
 position = Vector3(2.6, 0, 7)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_oeyj0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_mq7se"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_medium"
 position = Vector3(11, 1.8, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_eltn3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ffeia"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(1, 0, 13)
 
-[sub_resource type="Resource" id="Resource_mq7se"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_44w21"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(7.5, 0.8, 7)
 
-[sub_resource type="Resource" id="Resource_ffeia"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_o76xr"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.9, 3)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_44w21"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2qjyw"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.9, 11)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_o76xr"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_qyb71"]
+script = ExtResource("4_5p3pq")
 id = &"svc_servants_hall"
 display_name = "Servants' Hall"
 rect = Rect2(42, -48, 14, 14)
 wall_color = Color(1, 0.86, 0.88, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_xh15s"), SubResource("Resource_qq3px"), SubResource("Resource_hg5ht"), SubResource("Resource_gp3ec"), SubResource("Resource_48ohl"), SubResource("Resource_lu50j"), SubResource("Resource_f374v"), SubResource("Resource_rellb"), SubResource("Resource_ieiny"), SubResource("Resource_flnwl"), SubResource("Resource_0taxy"), SubResource("Resource_ua1f2"), SubResource("Resource_2xgyy"), SubResource("Resource_drlop"), SubResource("Resource_4nu3r"), SubResource("Resource_oeyj0"), SubResource("Resource_eltn3"), SubResource("Resource_mq7se"), SubResource("Resource_ffeia"), SubResource("Resource_44w21")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_hg5ht"), SubResource("Resource_gp3ec"), SubResource("Resource_48ohl"), SubResource("Resource_lu50j"), SubResource("Resource_f374v"), SubResource("Resource_rellb"), SubResource("Resource_ieiny"), SubResource("Resource_flnwl"), SubResource("Resource_0taxy"), SubResource("Resource_ua1f2"), SubResource("Resource_2xgyy"), SubResource("Resource_drlop"), SubResource("Resource_4nu3r"), SubResource("Resource_oeyj0"), SubResource("Resource_eltn3"), SubResource("Resource_mq7se"), SubResource("Resource_ffeia"), SubResource("Resource_44w21"), SubResource("Resource_o76xr"), SubResource("Resource_2qjyw")])
 notes = "Long table and a warm hearth where the masked staff eat together."
 
-[sub_resource type="Resource" id="Resource_2qjyw"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_g2bre"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pantry_shelf"
 position = Vector3(0.5, 0, 3.5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_qyb71"]
-script = ExtResource("4_uier2")
-prop_id = &"pantry_shelf"
-position = Vector3(7.5, 0, 3.5)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_g2bre"]
-script = ExtResource("4_uier2")
-prop_id = &"pantry_shelf"
-position = Vector3(2, 0, 6.5)
-yaw_deg = 180.0
-
 [sub_resource type="Resource" id="Resource_imt06"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"pantry_shelf"
-position = Vector3(6, 0, 6.5)
-yaw_deg = 180.0
+position = Vector3(7.5, 0, 3.5)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_xpls0"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"pantry_shelf"
+position = Vector3(2, 0, 6.5)
+
+[sub_resource type="Resource" id="Resource_ado61"]
+script = ExtResource("5_d7hx6")
+prop_id = &"pantry_shelf"
+position = Vector3(6, 0, 6.5)
+
+[sub_resource type="Resource" id="Resource_ifn63"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(1, 0, 0.8)
 
-[sub_resource type="Resource" id="Resource_ado61"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xux2p"]
+script = ExtResource("5_d7hx6")
 prop_id = &"sack_flour"
 position = Vector3(1.6, 0, 0.8)
 
-[sub_resource type="Resource" id="Resource_ifn63"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_jylq4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(7, 0, 0.9)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_xux2p"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_frcol"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(6, 0, 0.9)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_jylq4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0y6vq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(4, 0, 3.5)
 
-[sub_resource type="Resource" id="Resource_frcol"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_62nb2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(3.5, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_0y6vq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5yk5a"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cake_stand"
 position = Vector3(4.6, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_62nb2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_x21q2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(4, 2.6, 3.5)
 
-[sub_resource type="Resource" id="Resource_5yk5a"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bpnts"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4, 3.2, 2)
 
-[sub_resource type="Resource" id="Resource_x21q2"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_epfbh"]
+script = ExtResource("4_5p3pq")
 id = &"svc_pantry"
 display_name = "Pantry"
 canon = "C?"
 rect = Rect2(56, -48, 8, 7)
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_2qjyw"), SubResource("Resource_qyb71"), SubResource("Resource_g2bre"), SubResource("Resource_imt06"), SubResource("Resource_xpls0"), SubResource("Resource_ado61"), SubResource("Resource_ifn63"), SubResource("Resource_xux2p"), SubResource("Resource_jylq4"), SubResource("Resource_frcol"), SubResource("Resource_0y6vq"), SubResource("Resource_62nb2"), SubResource("Resource_5yk5a")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_g2bre"), SubResource("Resource_imt06"), SubResource("Resource_xpls0"), SubResource("Resource_ado61"), SubResource("Resource_ifn63"), SubResource("Resource_xux2p"), SubResource("Resource_jylq4"), SubResource("Resource_frcol"), SubResource("Resource_0y6vq"), SubResource("Resource_62nb2"), SubResource("Resource_5yk5a"), SubResource("Resource_x21q2"), SubResource("Resource_bpnts")])
 notes = "Dry goods, preserves, honey and jams in jewel jars."
 
-[sub_resource type="Resource" id="Resource_bpnts"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_i7vyx"]
+script = ExtResource("5_d7hx6")
 prop_id = &"desk_writing"
 position = Vector3(4, 0, 1.2)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_epfbh"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2531l"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(4, 0, 2.2)
-yaw_deg = 180.0
+yaw_deg = 5.008956135492784e-06
 
-[sub_resource type="Resource" id="Resource_i7vyx"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_vsnbq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"inkstand"
 position = Vector3(3.6, 0.8, 1.2)
 
-[sub_resource type="Resource" id="Resource_2531l"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_vsciv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candelabra"
 position = Vector3(4.8, 0.8, 1.2)
 
-[sub_resource type="Resource" id="Resource_vsnbq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ogxp1"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bookcase_low"
 position = Vector3(0.5, 0, 1.5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_vsciv"]
-script = ExtResource("4_uier2")
-prop_id = &"scroll_rack"
-position = Vector3(2, 0, 6.5)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_ogxp1"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(5, 0, 6.5)
-yaw_deg = 180.0
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_6exlh"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"scroll_rack"
+position = Vector3(2, 0, 6.5)
+
+[sub_resource type="Resource" id="Resource_nq77k"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(5, 0, 6.5)
+
+[sub_resource type="Resource" id="Resource_3d78k"]
+script = ExtResource("5_d7hx6")
 prop_id = &"armchair"
 position = Vector3(6.2, 0, 5.2)
 yaw_deg = -135.0
 
-[sub_resource type="Resource" id="Resource_nq77k"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_jxxyn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_round"
 position = Vector3(4, 0, 4)
 
-[sub_resource type="Resource" id="Resource_3d78k"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_r0icj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_side"
 position = Vector3(7, 0, 6.2)
 
-[sub_resource type="Resource" id="Resource_jxxyn"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4por4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(7, 0.7, 6.2)
 
-[sub_resource type="Resource" id="Resource_r0icj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0wryn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(7.7, 1.6, 1.2)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_4por4"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 5.5)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_0wryn"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_4qtit"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 5.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_ue5ej"]
+script = ExtResource("4_5p3pq")
 id = &"svc_housekeeper"
 display_name = "Housekeeper's Office"
 rect = Rect2(56, -41, 8, 7)
 floor_kind = &"carpet"
 wall_color = Color(0.86, 0.78, 0.98, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_bpnts"), SubResource("Resource_epfbh"), SubResource("Resource_i7vyx"), SubResource("Resource_2531l"), SubResource("Resource_vsnbq"), SubResource("Resource_vsciv"), SubResource("Resource_ogxp1"), SubResource("Resource_6exlh"), SubResource("Resource_nq77k"), SubResource("Resource_3d78k"), SubResource("Resource_jxxyn"), SubResource("Resource_r0icj"), SubResource("Resource_4por4")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_i7vyx"), SubResource("Resource_2531l"), SubResource("Resource_vsnbq"), SubResource("Resource_vsciv"), SubResource("Resource_ogxp1"), SubResource("Resource_6exlh"), SubResource("Resource_nq77k"), SubResource("Resource_3d78k"), SubResource("Resource_jxxyn"), SubResource("Resource_r0icj"), SubResource("Resource_4por4"), SubResource("Resource_0wryn"), SubResource("Resource_4qtit")])
 notes = "Ledgers, keys and menus; where Alis plans the household."
 
-[sub_resource type="Resource" id="Resource_4qtit"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4gjkb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_rack_herbs"
 position = Vector3(0.5, 0, 2)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_ue5ej"]
-script = ExtResource("4_uier2")
-prop_id = &"drying_rack_herbs"
-position = Vector3(0.5, 0, 5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_4gjkb"]
-script = ExtResource("4_uier2")
-prop_id = &"apothecary_cabinet"
-position = Vector3(2, 0, 0.4)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_w27kx"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"drying_rack_herbs"
+position = Vector3(0.5, 0, 5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_8mwub"]
+script = ExtResource("5_d7hx6")
+prop_id = &"apothecary_cabinet"
+position = Vector3(2, 0, 0.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_y8osv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(4, 0, 3.5)
 
-[sub_resource type="Resource" id="Resource_8mwub"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sfxkm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"alembic"
 position = Vector3(3.4, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_y8osv"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tvp5s"]
+script = ExtResource("5_d7hx6")
 prop_id = &"alembic"
 position = Vector3(4.6, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_sfxkm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_u6aa3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vial_rack"
 position = Vector3(9.3, 0.95, 2)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_tvp5s"]
-script = ExtResource("4_uier2")
-prop_id = &"mortar_pestle"
-position = Vector3(9.3, 0.95, 5)
-
-[sub_resource type="Resource" id="Resource_u6aa3"]
-script = ExtResource("4_uier2")
-prop_id = &"herb_bundle_hanging"
-position = Vector3(7.6, 2.2, 0.4)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_7scxu"]
-script = ExtResource("4_uier2")
-prop_id = &"herb_bundle_hanging"
-position = Vector3(2, 2.2, 6.6)
-yaw_deg = 180.0
+script = ExtResource("5_d7hx6")
+prop_id = &"mortar_pestle"
+position = Vector3(9.3, 0.95, 5)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_4ngr7"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(7.6, 2.2, 0.4)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_4ss4o"]
+script = ExtResource("5_d7hx6")
+prop_id = &"herb_bundle_hanging"
+position = Vector3(2, 2.2, 6.6)
+
+[sub_resource type="Resource" id="Resource_6n5xb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(7.8, 0, 3.5)
 
-[sub_resource type="Resource" id="Resource_4ss4o"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ig22i"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(5, 3.4, 3.5)
 
-[sub_resource type="Resource" id="Resource_6n5xb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_kla6n"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(8.6, 0, 6.3)
 
-[sub_resource type="Resource" id="Resource_ig22i"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_hvk03"]
+script = ExtResource("5_d7hx6")
 prop_id = &"pigment_jars"
 position = Vector3(4, 0.9, 3.9)
 
-[sub_resource type="Resource" id="Resource_kla6n"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_ou7oj"]
+script = ExtResource("4_5p3pq")
 id = &"svc_stillroom"
 display_name = "Stillroom"
 rect = Rect2(64, -48, 10, 7)
 floor_kind = &"tile"
 wall_color = Color(0.78, 0.96, 0.87, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_4qtit"), SubResource("Resource_ue5ej"), SubResource("Resource_4gjkb"), SubResource("Resource_w27kx"), SubResource("Resource_8mwub"), SubResource("Resource_y8osv"), SubResource("Resource_sfxkm"), SubResource("Resource_tvp5s"), SubResource("Resource_u6aa3"), SubResource("Resource_7scxu"), SubResource("Resource_4ngr7"), SubResource("Resource_4ss4o"), SubResource("Resource_6n5xb"), SubResource("Resource_ig22i")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_4gjkb"), SubResource("Resource_w27kx"), SubResource("Resource_8mwub"), SubResource("Resource_y8osv"), SubResource("Resource_sfxkm"), SubResource("Resource_tvp5s"), SubResource("Resource_u6aa3"), SubResource("Resource_7scxu"), SubResource("Resource_4ngr7"), SubResource("Resource_4ss4o"), SubResource("Resource_6n5xb"), SubResource("Resource_ig22i"), SubResource("Resource_kla6n"), SubResource("Resource_hvk03")])
 notes = "Drying racks, alembics and the apothecary cabinet: tinctures, salves and cordials."
 
-[sub_resource type="Resource" id="Resource_hvk03"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6iprs"]
+script = ExtResource("5_d7hx6")
 prop_id = &"infirmary_cot"
 position = Vector3(4.5, 0, 4.5)
 
-[sub_resource type="Resource" id="Resource_ou7oj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_lvg6x"]
+script = ExtResource("5_d7hx6")
 prop_id = &"infirmary_cot"
 position = Vector3(6.5, 0, 4.5)
 
-[sub_resource type="Resource" id="Resource_6iprs"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_chvk5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bandage_shelf"
 position = Vector3(2, 0, 0.4)
-
-[sub_resource type="Resource" id="Resource_lvg6x"]
-script = ExtResource("4_uier2")
-prop_id = &"bandage_shelf"
-position = Vector3(8, 0, 0.4)
-
-[sub_resource type="Resource" id="Resource_chvk5"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(2, 0, 6.6)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_1l2u5"]
-script = ExtResource("4_uier2")
-prop_id = &"towel_rack"
-position = Vector3(3.4, 0, 6.7)
+script = ExtResource("5_d7hx6")
+prop_id = &"bandage_shelf"
+position = Vector3(8, 0, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_4uh08"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(2, 0, 6.6)
+
+[sub_resource type="Resource" id="Resource_03ugy"]
+script = ExtResource("5_d7hx6")
+prop_id = &"towel_rack"
+position = Vector3(3.4, 0, 6.7)
+
+[sub_resource type="Resource" id="Resource_obker"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(5.5, 0, 6.2)
 
-[sub_resource type="Resource" id="Resource_03ugy"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2vpt0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vial_rack"
 position = Vector3(5.5, 0.7, 6.2)
 
-[sub_resource type="Resource" id="Resource_obker"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_68nsl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_side"
 position = Vector3(2.6, 0, 2.6)
 
-[sub_resource type="Resource" id="Resource_2vpt0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_drq48"]
+script = ExtResource("5_d7hx6")
 prop_id = &"mortar_pestle"
 position = Vector3(2.6, 0.7, 2.6)
 
-[sub_resource type="Resource" id="Resource_68nsl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_wmpvq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(9.2, 0, 2.4)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_drq48"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_lgj30"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(9.7, 1.8, 1)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_wmpvq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nyhpt"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(5, 3.4, 3.5)
 
-[sub_resource type="Resource" id="Resource_lgj30"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3rde5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(5.2, 0.7, 6.2)
 
-[sub_resource type="Resource" id="Resource_nyhpt"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_komib"]
+script = ExtResource("4_5p3pq")
 id = &"svc_infirmary"
 display_name = "Infirmary"
 canon = "C"
 rect = Rect2(64, -41, 10, 7)
 wall_color = Color(0.99, 0.96, 0.94, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_hvk03"), SubResource("Resource_ou7oj"), SubResource("Resource_6iprs"), SubResource("Resource_lvg6x"), SubResource("Resource_chvk5"), SubResource("Resource_1l2u5"), SubResource("Resource_4uh08"), SubResource("Resource_03ugy"), SubResource("Resource_obker"), SubResource("Resource_2vpt0"), SubResource("Resource_68nsl"), SubResource("Resource_drq48"), SubResource("Resource_wmpvq"), SubResource("Resource_lgj30")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_6iprs"), SubResource("Resource_lvg6x"), SubResource("Resource_chvk5"), SubResource("Resource_1l2u5"), SubResource("Resource_4uh08"), SubResource("Resource_03ugy"), SubResource("Resource_obker"), SubResource("Resource_2vpt0"), SubResource("Resource_68nsl"), SubResource("Resource_drq48"), SubResource("Resource_wmpvq"), SubResource("Resource_lgj30"), SubResource("Resource_nyhpt"), SubResource("Resource_3rde5")])
 notes = "Small infirmary: cots and bandage shelves. Feyre dresses Tamlin's Bogge-bitten hand here (ch12)."
 
-[sub_resource type="Resource" id="Resource_3rde5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_urnuh"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stone_steps"
 position = Vector3(1.8, -0.9, 5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_komib"]
-script = ExtResource("4_uier2")
-prop_id = &"column_marble"
-position = Vector3(0.4, -0.9, 0.5)
-scale = 1.28
-
-[sub_resource type="Resource" id="Resource_urnuh"]
-script = ExtResource("4_uier2")
-prop_id = &"column_marble"
-position = Vector3(3.6, -0.9, 0.5)
-scale = 1.28
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_410at"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"column_marble"
-position = Vector3(0.4, -0.9, 9.5)
+position = Vector3(0.4, -0.9, 0.5)
+yaw_deg = -90.0
 scale = 1.28
 
 [sub_resource type="Resource" id="Resource_ai8k6"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"column_marble"
+position = Vector3(3.6, -0.9, 0.5)
+yaw_deg = 180.0
+scale = 1.28
+
+[sub_resource type="Resource" id="Resource_5a7g3"]
+script = ExtResource("5_d7hx6")
+prop_id = &"column_marble"
+position = Vector3(0.4, -0.9, 9.5)
+yaw_deg = -90.0
+scale = 1.28
+
+[sub_resource type="Resource" id="Resource_t81f7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"column_marble"
 position = Vector3(3.6, -0.9, 9.5)
 scale = 1.28
 
-[sub_resource type="Resource" id="Resource_5a7g3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bkb6n"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(2, 3.4, 5)
 
-[sub_resource type="Resource" id="Resource_t81f7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_phx8j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(3.6, -0.9, 1.6)
 
-[sub_resource type="Resource" id="Resource_bkb6n"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_p2cb4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(3.6, -0.9, 8.4)
 
-[sub_resource type="Resource" id="Resource_phx8j"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bvijw"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(5, -0.9, 1)
 
-[sub_resource type="Resource" id="Resource_p2cb4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_vfgke"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(5.3, -0.9, 1.9)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_bvijw"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eykwr"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(5, -0.9, 9)
 
-[sub_resource type="Resource" id="Resource_vfgke"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_isqhm"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(5.2, -0.9, 8.2)
-
-[sub_resource type="Resource" id="Resource_eykwr"]
-script = ExtResource("4_uier2")
-prop_id = &"garden_bench"
-position = Vector3(5.4, -0.9, 5)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_isqhm"]
-script = ExtResource("4_uier2")
-prop_id = &"flower_garland"
-position = Vector3(2, 3.6, 0.5)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_7dgib"]
-script = ExtResource("3_o18lv")
+script = ExtResource("5_d7hx6")
+prop_id = &"garden_bench"
+position = Vector3(5.4, -0.9, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_8ka3m"]
+script = ExtResource("5_d7hx6")
+prop_id = &"flower_garland"
+position = Vector3(2, 3.6, 0.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_et23n"]
+script = ExtResource("4_5p3pq")
 id = &"svc_kitchen_yard_porch"
 display_name = "Kitchen-Yard Porch"
 rect = Rect2(74, -56, 6, 10)
@@ -1679,1305 +1708,1322 @@ kind = &"exterior"
 floor_kind = &"stone"
 wall_color = Color(0.99, 0.96, 0.94, 1)
 windows = false
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_3rde5"), SubResource("Resource_komib"), SubResource("Resource_urnuh"), SubResource("Resource_410at"), SubResource("Resource_ai8k6"), SubResource("Resource_5a7g3"), SubResource("Resource_t81f7"), SubResource("Resource_bkb6n"), SubResource("Resource_phx8j"), SubResource("Resource_p2cb4"), SubResource("Resource_bvijw"), SubResource("Resource_vfgke"), SubResource("Resource_eykwr"), SubResource("Resource_isqhm")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_urnuh"), SubResource("Resource_410at"), SubResource("Resource_ai8k6"), SubResource("Resource_5a7g3"), SubResource("Resource_t81f7"), SubResource("Resource_bkb6n"), SubResource("Resource_phx8j"), SubResource("Resource_p2cb4"), SubResource("Resource_bvijw"), SubResource("Resource_vfgke"), SubResource("Resource_eykwr"), SubResource("Resource_isqhm"), SubResource("Resource_7dgib"), SubResource("Resource_8ka3m")])
 notes = "Covered porch with steps down to the kitchen yard; deliveries and herb pots."
 
-[sub_resource type="Resource" id="Resource_8ka3m"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ap411"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(8, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_et23n"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xmh5u"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(23, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ap411"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eb250"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(3, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_xmh5u"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(11, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_eb250"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(19.5, 1.8, 0.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_i00hf"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
-position = Vector3(26, 1.8, 0.4)
+position = Vector3(11, 1.8, 0.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_lgt41"]
-script = ExtResource("4_uier2")
-prop_id = &"painting_small"
-position = Vector3(10, 1.6, 5.7)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(19.5, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_kcqgj"]
-script = ExtResource("4_uier2")
-prop_id = &"painting_small"
-position = Vector3(21, 1.6, 5.7)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(26, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_1mnl2"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(12, 0, 5.4)
-yaw_deg = 180.0
+script = ExtResource("5_d7hx6")
+prop_id = &"painting_small"
+position = Vector3(10, 1.6, 5.7)
 
 [sub_resource type="Resource" id="Resource_4lcdh"]
-script = ExtResource("4_uier2")
-prop_id = &"fern_pot"
-position = Vector3(31.2, 0, 0.8)
+script = ExtResource("5_d7hx6")
+prop_id = &"painting_small"
+position = Vector3(21, 1.6, 5.7)
 
 [sub_resource type="Resource" id="Resource_8axup"]
-script = ExtResource("4_uier2")
-prop_id = &"bench_settle"
-position = Vector3(31.2, 0, 3.2)
-yaw_deg = -90.0
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(12, 0, 5.4)
 
 [sub_resource type="Resource" id="Resource_hg7jm"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"fern_pot"
+position = Vector3(31.2, 0, 0.8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_wrn1b"]
+script = ExtResource("5_d7hx6")
+prop_id = &"bench_settle"
+position = Vector3(31.2, 0, 3.2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_lberg"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(16, 3.4, 3)
 
-[sub_resource type="Resource" id="Resource_wrn1b"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_rplj1"]
+script = ExtResource("4_5p3pq")
 id = &"svc_passage_1"
 display_name = "Upper Service Passage"
 level = 1
 rect = Rect2(42, -54, 32, 6)
 wall_color = Color(0.99, 0.74, 0.82, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_8ka3m"), SubResource("Resource_et23n"), SubResource("Resource_ap411"), SubResource("Resource_xmh5u"), SubResource("Resource_eb250"), SubResource("Resource_i00hf"), SubResource("Resource_lgt41"), SubResource("Resource_kcqgj"), SubResource("Resource_1mnl2"), SubResource("Resource_4lcdh"), SubResource("Resource_8axup"), SubResource("Resource_hg7jm")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_ap411"), SubResource("Resource_xmh5u"), SubResource("Resource_eb250"), SubResource("Resource_i00hf"), SubResource("Resource_lgt41"), SubResource("Resource_kcqgj"), SubResource("Resource_1mnl2"), SubResource("Resource_4lcdh"), SubResource("Resource_8axup"), SubResource("Resource_hg7jm"), SubResource("Resource_wrn1b"), SubResource("Resource_lberg")])
 notes = "Links the main block's first floor (42,-50) to the staff rooms."
 
-[sub_resource type="Resource" id="Resource_lberg"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_x8g6t"]
+script = ExtResource("5_d7hx6")
 prop_id = &"laundry_tub"
 position = Vector3(2, 0, 1)
-
-[sub_resource type="Resource" id="Resource_rplj1"]
-script = ExtResource("4_uier2")
-prop_id = &"laundry_tub"
-position = Vector3(4, 0, 1)
-
-[sub_resource type="Resource" id="Resource_x8g6t"]
-script = ExtResource("4_uier2")
-prop_id = &"laundry_tub"
-position = Vector3(6, 0, 1)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_wca4n"]
-script = ExtResource("4_uier2")
-prop_id = &"sink_stone"
-position = Vector3(9, 0, 0.8)
+script = ExtResource("5_d7hx6")
+prop_id = &"laundry_tub"
+position = Vector3(4, 0, 1)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_7wu6l"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"laundry_tub"
+position = Vector3(6, 0, 1)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ok6vb"]
+script = ExtResource("5_d7hx6")
+prop_id = &"sink_stone"
+position = Vector3(9, 0, 0.8)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_gpuin"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_line"
 position = Vector3(4, 0, 6)
 
-[sub_resource type="Resource" id="Resource_ok6vb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ts7l5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_line"
 position = Vector3(4, 0, 9)
 
-[sub_resource type="Resource" id="Resource_gpuin"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ja707"]
+script = ExtResource("5_d7hx6")
 prop_id = &"ironing_table"
 position = Vector3(9.5, 0, 6)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ts7l5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bjv3b"]
+script = ExtResource("5_d7hx6")
 prop_id = &"ironing_table"
 position = Vector3(9.5, 0, 9.5)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ja707"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5var6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2, 0, 11.5)
 
-[sub_resource type="Resource" id="Resource_bjv3b"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ojm1m"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(6.5, 0, 11.8)
 
-[sub_resource type="Resource" id="Resource_5var6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_btjjj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"soap_shelf"
 position = Vector3(0.3, 1.2, 4)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_ojm1m"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5o73j"]
+script = ExtResource("5_d7hx6")
 prop_id = &"towel_rack"
 position = Vector3(0.4, 0, 7.5)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_btjjj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_nwpxh"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(8.4, 0, 6)
 
-[sub_resource type="Resource" id="Resource_5o73j"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xbwme"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(6, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_nwpxh"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_m31ym"]
+script = ExtResource("5_d7hx6")
 prop_id = &"copper_pots"
 position = Vector3(11.7, 1.5, 3)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_xbwme"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_g1pkw"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(2, 0, 13.3)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_m31ym"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_d776h"]
+script = ExtResource("4_5p3pq")
 id = &"svc_laundry"
 display_name = "Laundry"
 level = 1
 rect = Rect2(42, -68, 12, 14)
 floor_kind = &"tile"
 wall_color = Color(0.78, 0.96, 0.87, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_lberg"), SubResource("Resource_rplj1"), SubResource("Resource_x8g6t"), SubResource("Resource_wca4n"), SubResource("Resource_7wu6l"), SubResource("Resource_ok6vb"), SubResource("Resource_gpuin"), SubResource("Resource_ts7l5"), SubResource("Resource_ja707"), SubResource("Resource_bjv3b"), SubResource("Resource_5var6"), SubResource("Resource_ojm1m"), SubResource("Resource_btjjj"), SubResource("Resource_5o73j"), SubResource("Resource_nwpxh"), SubResource("Resource_xbwme")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_x8g6t"), SubResource("Resource_wca4n"), SubResource("Resource_7wu6l"), SubResource("Resource_ok6vb"), SubResource("Resource_gpuin"), SubResource("Resource_ts7l5"), SubResource("Resource_ja707"), SubResource("Resource_bjv3b"), SubResource("Resource_5var6"), SubResource("Resource_ojm1m"), SubResource("Resource_btjjj"), SubResource("Resource_5o73j"), SubResource("Resource_nwpxh"), SubResource("Resource_xbwme"), SubResource("Resource_m31ym"), SubResource("Resource_g1pkw")])
 notes = "Copper tubs, drying lines heavy with linens, ironing tables."
 
-[sub_resource type="Resource" id="Resource_g1pkw"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_l7p2u"]
+script = ExtResource("5_d7hx6")
 prop_id = &"linen_press"
 position = Vector3(0.6, 0, 3)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_d776h"]
-script = ExtResource("4_uier2")
-prop_id = &"linen_press"
-position = Vector3(0.6, 0, 11)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_l7p2u"]
-script = ExtResource("4_uier2")
-prop_id = &"linen_press"
-position = Vector3(7.4, 0, 3)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_oourp"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"linen_press"
-position = Vector3(7.4, 0, 7)
+position = Vector3(0.6, 0, 11)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_l1a1b"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"linen_press"
-position = Vector3(7.4, 0, 11)
-yaw_deg = -90.0
+position = Vector3(7.4, 0, 3)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_tygn5"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"linen_press"
+position = Vector3(7.4, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_14pvo"]
+script = ExtResource("5_d7hx6")
+prop_id = &"linen_press"
+position = Vector3(7.4, 0, 11)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_l5d57"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(4, 0, 6)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_14pvo"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cyv7e"]
+script = ExtResource("5_d7hx6")
 prop_id = &"ironing_table"
 position = Vector3(4, 0, 9)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_l5d57"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_g67yl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(4, 0.9, 5.6)
 
-[sub_resource type="Resource" id="Resource_cyv7e"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_qsqdo"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2, 0, 1)
 
-[sub_resource type="Resource" id="Resource_g67yl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_v1mff"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(4, 0, 0.6)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_qsqdo"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_c33u7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cushion_pile"
 position = Vector3(2, 0, 12.5)
 
-[sub_resource type="Resource" id="Resource_v1mff"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_k58uv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(4, 2.4, 0.4)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_c33u7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_n5b4k"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_k58uv"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_d8r3r"]
+script = ExtResource("4_5p3pq")
 id = &"svc_linen_room"
 display_name = "Linen Room"
 level = 1
 rect = Rect2(54, -68, 8, 14)
 wall_color = Color(0.86, 0.78, 0.98, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_g1pkw"), SubResource("Resource_d776h"), SubResource("Resource_l7p2u"), SubResource("Resource_oourp"), SubResource("Resource_l1a1b"), SubResource("Resource_tygn5"), SubResource("Resource_14pvo"), SubResource("Resource_l5d57"), SubResource("Resource_cyv7e"), SubResource("Resource_g67yl"), SubResource("Resource_qsqdo"), SubResource("Resource_v1mff"), SubResource("Resource_c33u7")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_l7p2u"), SubResource("Resource_oourp"), SubResource("Resource_l1a1b"), SubResource("Resource_tygn5"), SubResource("Resource_14pvo"), SubResource("Resource_l5d57"), SubResource("Resource_cyv7e"), SubResource("Resource_g67yl"), SubResource("Resource_qsqdo"), SubResource("Resource_v1mff"), SubResource("Resource_c33u7"), SubResource("Resource_k58uv"), SubResource("Resource_n5b4k")])
 notes = "Presses of lavender-scented sheets, towels and table linen."
 
-[sub_resource type="Resource" id="Resource_n5b4k"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_gf1o8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(3, 3.6, 1)
 
-[sub_resource type="Resource" id="Resource_d8r3r"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oi0kc"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(4.5, 1.6, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_gf1o8"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xofht"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(5.3, 0, 13.3)
 
-[sub_resource type="Resource" id="Resource_oi0kc"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_0kbmj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(0.6, 0, 13.3)
-
-[sub_resource type="Resource" id="Resource_xofht"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.6, 12.5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_0kbmj"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(5.7, 1.6, 12.5)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_6emtc"]
-script = ExtResource("4_uier2")
-prop_id = &"basket_produce"
-position = Vector3(5.3, 0, 0.8)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.6, 12.5)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_hcrb4"]
-script = ExtResource("3_o18lv")
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(5.7, 1.6, 12.5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_q3akl"]
+script = ExtResource("5_d7hx6")
+prop_id = &"basket_produce"
+position = Vector3(5.3, 0, 0.8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_kblho"]
+script = ExtResource("4_5p3pq")
 id = &"svc_back_stair_1"
 display_name = "Back Stairs (First Floor)"
 level = 1
 rect = Rect2(62, -68, 6, 14)
 wall_color = Color(1, 0.86, 0.76, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_n5b4k"), SubResource("Resource_d8r3r"), SubResource("Resource_gf1o8"), SubResource("Resource_oi0kc"), SubResource("Resource_xofht"), SubResource("Resource_0kbmj"), SubResource("Resource_6emtc")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_gf1o8"), SubResource("Resource_oi0kc"), SubResource("Resource_xofht"), SubResource("Resource_0kbmj"), SubResource("Resource_6emtc"), SubResource("Resource_hcrb4"), SubResource("Resource_q3akl")])
 notes = "Service stair continues up to the attic (east flight)."
 
-[sub_resource type="Resource" id="Resource_q3akl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6sqc3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bathtub_clawfoot"
 position = Vector3(3, 0, 2)
 
-[sub_resource type="Resource" id="Resource_kblho"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bkwt0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bathtub_clawfoot"
 position = Vector3(3, 0, 5.4)
 
-[sub_resource type="Resource" id="Resource_6sqc3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_hbv6t"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dressing_screen"
 position = Vector3(3, 0, 7.6)
 
-[sub_resource type="Resource" id="Resource_bkwt0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_fxpef"]
+script = ExtResource("5_d7hx6")
 prop_id = &"washstand"
 position = Vector3(0.6, 0, 9)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_hbv6t"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(0.6, 0, 11)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_fxpef"]
-script = ExtResource("4_uier2")
-prop_id = &"mirror_gilt"
-position = Vector3(0.3, 1.4, 10)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_an3my"]
-script = ExtResource("4_uier2")
-prop_id = &"towel_rack"
-position = Vector3(5.6, 0, 9)
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(0.6, 0, 11)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_3n6yp"]
-script = ExtResource("4_uier2")
-prop_id = &"soap_shelf"
-position = Vector3(5.7, 1.2, 11)
+script = ExtResource("5_d7hx6")
+prop_id = &"mirror_gilt"
+position = Vector3(0.3, 1.4, 10)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_uywje"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"towel_rack"
+position = Vector3(5.6, 0, 9)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_dhui8"]
+script = ExtResource("5_d7hx6")
+prop_id = &"soap_shelf"
+position = Vector3(5.7, 1.2, 11)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_fljp6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(2, 0, 12.4)
 
-[sub_resource type="Resource" id="Resource_dhui8"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_i72wj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(5.3, 0, 13.3)
 
-[sub_resource type="Resource" id="Resource_fljp6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sjai5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.8, 4)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_i72wj"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_vcgx5"]
+script = ExtResource("4_5p3pq")
 id = &"svc_servants_wash"
 display_name = "Servants' Washroom"
 level = 1
 rect = Rect2(68, -68, 6, 14)
 floor_kind = &"tile"
 wall_color = Color(0.78, 0.82, 1, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_q3akl"), SubResource("Resource_kblho"), SubResource("Resource_6sqc3"), SubResource("Resource_bkwt0"), SubResource("Resource_hbv6t"), SubResource("Resource_fxpef"), SubResource("Resource_an3my"), SubResource("Resource_3n6yp"), SubResource("Resource_uywje"), SubResource("Resource_dhui8"), SubResource("Resource_fljp6")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_6sqc3"), SubResource("Resource_bkwt0"), SubResource("Resource_hbv6t"), SubResource("Resource_fxpef"), SubResource("Resource_an3my"), SubResource("Resource_3n6yp"), SubResource("Resource_uywje"), SubResource("Resource_dhui8"), SubResource("Resource_fljp6"), SubResource("Resource_i72wj"), SubResource("Resource_sjai5")])
 notes = "Two copper tubs behind a screen, washstands and warm towels."
 
-[sub_resource type="Resource" id="Resource_sjai5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_art8t"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_single"
 position = Vector3(1.2, 0, 11)
 
-[sub_resource type="Resource" id="Resource_vcgx5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_je7bn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2.6, 0, 12.8)
 
-[sub_resource type="Resource" id="Resource_art8t"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4ykum"]
+script = ExtResource("5_d7hx6")
 prop_id = &"wardrobe_tall"
 position = Vector3(0.5, 0, 4)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_je7bn"]
-script = ExtResource("4_uier2")
-prop_id = &"dresser"
-position = Vector3(9.5, 0, 4)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_4ykum"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(9.5, 0, 8)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_no8rb"]
-script = ExtResource("4_uier2")
-prop_id = &"mirror_gilt"
-position = Vector3(9.7, 1.3, 8)
-yaw_deg = -90.0
+script = ExtResource("5_d7hx6")
+prop_id = &"dresser"
+position = Vector3(9.5, 0, 4)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_m2rmp"]
-script = ExtResource("4_uier2")
-prop_id = &"table_round"
-position = Vector3(5, 0, 7)
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(9.5, 0, 8)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_vup1e"]
-script = ExtResource("4_uier2")
-prop_id = &"chair_simple"
-position = Vector3(4, 0, 7)
+script = ExtResource("5_d7hx6")
+prop_id = &"mirror_gilt"
+position = Vector3(9.7, 1.3, 8)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_3e5lo"]
-script = ExtResource("4_uier2")
-prop_id = &"chair_simple"
-position = Vector3(6, 0, 7)
-yaw_deg = -90.0
+script = ExtResource("5_d7hx6")
+prop_id = &"table_round"
+position = Vector3(5, 0, 7)
 
 [sub_resource type="Resource" id="Resource_tpx5v"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"chair_simple"
+position = Vector3(4, 0, 7)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_ivo44"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chair_simple"
+position = Vector3(6, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_gxt00"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_round"
 position = Vector3(5, 0, 7)
 
-[sub_resource type="Resource" id="Resource_ivo44"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_s4yyf"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candelabra"
 position = Vector3(5, 0.75, 7)
 
-[sub_resource type="Resource" id="Resource_gxt00"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_bfbvu"]
+script = ExtResource("5_d7hx6")
 prop_id = &"book_stack"
 position = Vector3(5.4, 0.75, 6.7)
 
-[sub_resource type="Resource" id="Resource_s4yyf"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_08qbi"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cradle_chest"
 position = Vector3(7, 0, 12.8)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_bfbvu"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dbt3q"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(4.5, 0, 12.8)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_08qbi"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4m20w"]
+script = ExtResource("5_d7hx6")
 prop_id = &"toy_wooden_horse"
 position = Vector3(4.5, 0, 12)
 yaw_deg = 30.0
 
-[sub_resource type="Resource" id="Resource_dbt3q"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_8c41f"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(2, 1.5, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_4m20w"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_j5njl"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(8, 1.5, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_8c41f"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_midfd"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(8.8, 0, 1)
 
-[sub_resource type="Resource" id="Resource_j5njl"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_g03c8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(3, 0, 8.8)
 
-[sub_resource type="Resource" id="Resource_midfd"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tpivc"]
+script = ExtResource("5_d7hx6")
 prop_id = &"potted_roses"
 position = Vector3(9.2, 0, 13)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_g03c8"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_6urx5"]
+script = ExtResource("4_5p3pq")
 id = &"svc_alis_room"
 display_name = "Alis's Room"
 canon = "C?"
 level = 1
 rect = Rect2(42, -48, 10, 14)
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_sjai5"), SubResource("Resource_vcgx5"), SubResource("Resource_art8t"), SubResource("Resource_je7bn"), SubResource("Resource_4ykum"), SubResource("Resource_no8rb"), SubResource("Resource_m2rmp"), SubResource("Resource_vup1e"), SubResource("Resource_3e5lo"), SubResource("Resource_tpx5v"), SubResource("Resource_ivo44"), SubResource("Resource_gxt00"), SubResource("Resource_s4yyf"), SubResource("Resource_bfbvu"), SubResource("Resource_08qbi"), SubResource("Resource_dbt3q"), SubResource("Resource_4m20w"), SubResource("Resource_8c41f"), SubResource("Resource_j5njl"), SubResource("Resource_midfd")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_art8t"), SubResource("Resource_je7bn"), SubResource("Resource_4ykum"), SubResource("Resource_no8rb"), SubResource("Resource_m2rmp"), SubResource("Resource_vup1e"), SubResource("Resource_3e5lo"), SubResource("Resource_tpx5v"), SubResource("Resource_ivo44"), SubResource("Resource_gxt00"), SubResource("Resource_s4yyf"), SubResource("Resource_bfbvu"), SubResource("Resource_08qbi"), SubResource("Resource_dbt3q"), SubResource("Resource_4m20w"), SubResource("Resource_8c41f"), SubResource("Resource_j5njl"), SubResource("Resource_midfd"), SubResource("Resource_g03c8"), SubResource("Resource_tpivc")])
 notes = "Practical and warm: her nephews' drawings pinned up, their toys in a chest, an old cradle."
 
-[sub_resource type="Resource" id="Resource_tpivc"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ai28m"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(1.5, 0, 12.6)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_6urx5"]
-script = ExtResource("4_uier2")
-prop_id = &"bed_servant"
-position = Vector3(4, 0, 12.6)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_ai28m"]
-script = ExtResource("4_uier2")
-prop_id = &"bed_servant"
-position = Vector3(7, 0, 12.6)
-yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_yswne"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
-position = Vector3(9.5, 0, 12.6)
-yaw_deg = 180.0
+position = Vector3(4, 0, 12.6)
 
 [sub_resource type="Resource" id="Resource_020n1"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"bed_servant"
+position = Vector3(7, 0, 12.6)
+
+[sub_resource type="Resource" id="Resource_sf5iq"]
+script = ExtResource("5_d7hx6")
+prop_id = &"bed_servant"
+position = Vector3(9.5, 0, 12.6)
+
+[sub_resource type="Resource" id="Resource_0ue7u"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2.75, 0, 13.2)
 
-[sub_resource type="Resource" id="Resource_sf5iq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_pc7dv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(8.25, 0, 13.2)
 
-[sub_resource type="Resource" id="Resource_0ue7u"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3kw57"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(1.5, 0, 10.8)
 
-[sub_resource type="Resource" id="Resource_pc7dv"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_elxy7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(9.5, 0, 10.8)
 
-[sub_resource type="Resource" id="Resource_3kw57"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4x3fu"]
+script = ExtResource("5_d7hx6")
 prop_id = &"wardrobe_tall"
 position = Vector3(0.5, 0, 5)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_elxy7"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(10.5, 0, 5)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_4x3fu"]
-script = ExtResource("4_uier2")
-prop_id = &"mirror_gilt"
-position = Vector3(10.7, 1.4, 7)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_yix65"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(10.5, 0, 5)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_0tmuv"]
+script = ExtResource("5_d7hx6")
+prop_id = &"mirror_gilt"
+position = Vector3(10.7, 1.4, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_qtenq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_large"
 position = Vector3(5.5, 0, 7)
 
-[sub_resource type="Resource" id="Resource_0tmuv"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_13xjy"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(8, 0, 3)
 
-[sub_resource type="Resource" id="Resource_qtenq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ogaix"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dressing_screen"
 position = Vector3(2.2, 0, 2)
 
-[sub_resource type="Resource" id="Resource_13xjy"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_r0bmb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(0.3, 1.8, 8)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_ogaix"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(10.7, 1.8, 2)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_r0bmb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_o24eb"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(10.7, 1.8, 2)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_waqi7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(2.75, 0.7, 13.2)
 
-[sub_resource type="Resource" id="Resource_o24eb"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_ivgyj"]
+script = ExtResource("4_5p3pq")
 id = &"svc_maids_dorm"
 display_name = "Maids' Dormitory"
 level = 1
 rect = Rect2(52, -48, 11, 14)
 wall_color = Color(1, 0.86, 0.88, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_tpivc"), SubResource("Resource_6urx5"), SubResource("Resource_ai28m"), SubResource("Resource_yswne"), SubResource("Resource_020n1"), SubResource("Resource_sf5iq"), SubResource("Resource_0ue7u"), SubResource("Resource_pc7dv"), SubResource("Resource_3kw57"), SubResource("Resource_elxy7"), SubResource("Resource_4x3fu"), SubResource("Resource_yix65"), SubResource("Resource_0tmuv"), SubResource("Resource_qtenq"), SubResource("Resource_13xjy"), SubResource("Resource_ogaix"), SubResource("Resource_r0bmb")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_ai28m"), SubResource("Resource_yswne"), SubResource("Resource_020n1"), SubResource("Resource_sf5iq"), SubResource("Resource_0ue7u"), SubResource("Resource_pc7dv"), SubResource("Resource_3kw57"), SubResource("Resource_elxy7"), SubResource("Resource_4x3fu"), SubResource("Resource_yix65"), SubResource("Resource_0tmuv"), SubResource("Resource_qtenq"), SubResource("Resource_13xjy"), SubResource("Resource_ogaix"), SubResource("Resource_r0bmb"), SubResource("Resource_o24eb"), SubResource("Resource_waqi7")])
 notes = "Four neat beds with rose quilts, a shared wardrobe and mirror."
 
-[sub_resource type="Resource" id="Resource_waqi7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_okpi2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(1.2, 0, 4.5)
 
-[sub_resource type="Resource" id="Resource_ivgyj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_w84w4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(9.8, 0, 4.5)
 
-[sub_resource type="Resource" id="Resource_okpi2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oi2u8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"wardrobe_tall"
 position = Vector3(1.5, 0, 0.5)
-
-[sub_resource type="Resource" id="Resource_w84w4"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(1.2, 0, 6.3)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_oi2u8"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(9.8, 0, 6.3)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_ril0f"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(1.2, 0, 6.3)
+
+[sub_resource type="Resource" id="Resource_2a1q4"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(9.8, 0, 6.3)
+
+[sub_resource type="Resource" id="Resource_1q1w8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2.6, 0, 5)
 
-[sub_resource type="Resource" id="Resource_2a1q4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_kwjst"]
+script = ExtResource("5_d7hx6")
 prop_id = &"washstand"
 position = Vector3(8.6, 0, 0.5)
-
-[sub_resource type="Resource" id="Resource_1q1w8"]
-script = ExtResource("4_uier2")
-prop_id = &"coat_rack"
-position = Vector3(10.5, 0, 2)
-
-[sub_resource type="Resource" id="Resource_kwjst"]
-script = ExtResource("4_uier2")
-prop_id = &"mirror_gilt"
-position = Vector3(10.7, 1.4, 2.8)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_e5033"]
-script = ExtResource("4_uier2")
-prop_id = &"shoe_shelf"
-position = Vector3(3, 0, 6.6)
 yaw_deg = 180.0
 
+[sub_resource type="Resource" id="Resource_e5033"]
+script = ExtResource("5_d7hx6")
+prop_id = &"coat_rack"
+position = Vector3(10.5, 0, 2)
+yaw_deg = 90.0
+
 [sub_resource type="Resource" id="Resource_r4nlc"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 2.5)
+script = ExtResource("5_d7hx6")
+prop_id = &"mirror_gilt"
+position = Vector3(10.7, 1.4, 2.8)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_qjkug"]
-script = ExtResource("3_o18lv")
+script = ExtResource("5_d7hx6")
+prop_id = &"shoe_shelf"
+position = Vector3(3, 0, 6.6)
+
+[sub_resource type="Resource" id="Resource_tmn8w"]
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 2.5)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_nspoy"]
+script = ExtResource("4_5p3pq")
 id = &"svc_footmen_room"
 display_name = "Footmen's Room"
 level = 1
 rect = Rect2(63, -48, 11, 7)
 wall_color = Color(0.78, 0.82, 1, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_waqi7"), SubResource("Resource_ivgyj"), SubResource("Resource_okpi2"), SubResource("Resource_w84w4"), SubResource("Resource_oi2u8"), SubResource("Resource_ril0f"), SubResource("Resource_2a1q4"), SubResource("Resource_1q1w8"), SubResource("Resource_kwjst"), SubResource("Resource_e5033"), SubResource("Resource_r4nlc")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_okpi2"), SubResource("Resource_w84w4"), SubResource("Resource_oi2u8"), SubResource("Resource_ril0f"), SubResource("Resource_2a1q4"), SubResource("Resource_1q1w8"), SubResource("Resource_kwjst"), SubResource("Resource_e5033"), SubResource("Resource_r4nlc"), SubResource("Resource_qjkug"), SubResource("Resource_tmn8w")])
 notes = "Two beds for the masked footmen, boots lined up, livery on the rack."
 
-[sub_resource type="Resource" id="Resource_tmn8w"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_52dxf"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(5.5, 0, 3.5)
 
-[sub_resource type="Resource" id="Resource_nspoy"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_yuvqx"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(5, 0, 4.6)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_52dxf"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sejp6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(6.2, 0, 2.4)
+yaw_deg = -180.0
 
-[sub_resource type="Resource" id="Resource_yuvqx"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3j2bj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"mannequin_gown"
 position = Vector3(1, 0, 1.4)
 
-[sub_resource type="Resource" id="Resource_sejp6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_m02m8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"mannequin_gown"
 position = Vector3(2.4, 0, 1.4)
 yaw_deg = 20.0
 
-[sub_resource type="Resource" id="Resource_3j2bj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7vnv4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"gown_rack"
 position = Vector3(7, 0, 6.3)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_m02m8"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tmq2t"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(5, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_7vnv4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_hkxft"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(1, 0, 6.2)
 
-[sub_resource type="Resource" id="Resource_tmq2t"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xrvk8"]
+script = ExtResource("5_d7hx6")
 prop_id = &"window_seat"
 position = Vector3(10.4, 0, 3.5)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_hkxft"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_okvq0"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cushion_pile"
 position = Vector3(10, 0.6, 3.5)
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_xrvk8"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xqkkq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candelabra"
 position = Vector3(6.2, 0.9, 3.5)
 
-[sub_resource type="Resource" id="Resource_okvq0"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_tjlhr"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(3, 0, 6.4)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_xqkkq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ernog"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(5.5, 3.4, 3.5)
 
-[sub_resource type="Resource" id="Resource_tjlhr"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_ldvo5"]
+script = ExtResource("4_5p3pq")
 id = &"svc_sewing_room"
 display_name = "Sewing Room"
 level = 1
 rect = Rect2(63, -41, 11, 7)
 wall_color = Color(0.99, 0.74, 0.82, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_tmn8w"), SubResource("Resource_nspoy"), SubResource("Resource_52dxf"), SubResource("Resource_yuvqx"), SubResource("Resource_sejp6"), SubResource("Resource_3j2bj"), SubResource("Resource_m02m8"), SubResource("Resource_7vnv4"), SubResource("Resource_tmq2t"), SubResource("Resource_hkxft"), SubResource("Resource_xrvk8"), SubResource("Resource_okvq0"), SubResource("Resource_xqkkq")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_52dxf"), SubResource("Resource_yuvqx"), SubResource("Resource_sejp6"), SubResource("Resource_3j2bj"), SubResource("Resource_m02m8"), SubResource("Resource_7vnv4"), SubResource("Resource_tmq2t"), SubResource("Resource_hkxft"), SubResource("Resource_xrvk8"), SubResource("Resource_okvq0"), SubResource("Resource_xqkkq"), SubResource("Resource_tjlhr"), SubResource("Resource_ernog")])
 notes = "Mending and gown alterations: dress forms, bolts of silk, a sunny window seat."
 
-[sub_resource type="Resource" id="Resource_ernog"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_t6gwe"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(9, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ldvo5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_uck54"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_runner"
 position = Vector3(21, 0, 3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_t6gwe"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7m1h2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(2, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_uck54"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(11, 1.8, 0.4)
-
-[sub_resource type="Resource" id="Resource_7m1h2"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(26, 1.8, 0.4)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_ebaw5"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(3, 0, 5.4)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(11, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_g73ap"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(14, 0, 5.4)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(26, 1.8, 0.4)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_quc6p"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(3, 0, 5.4)
+
+[sub_resource type="Resource" id="Resource_d1srp"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(14, 0, 5.4)
+
+[sub_resource type="Resource" id="Resource_saqc1"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(31, 0, 1)
 
-[sub_resource type="Resource" id="Resource_d1srp"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_jp6yk"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(8, 3.4, 3)
 
-[sub_resource type="Resource" id="Resource_saqc1"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1nx8y"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(24, 3.4, 3)
 
-[sub_resource type="Resource" id="Resource_jp6yk"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_naka5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"fern_pot"
 position = Vector3(31, 0, 5.2)
 
-[sub_resource type="Resource" id="Resource_1nx8y"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_fvcb1"]
+script = ExtResource("4_5p3pq")
 id = &"svc_passage_2"
 display_name = "Attic Passage"
 level = 2
 rect = Rect2(42, -54, 32, 6)
 wall_color = Color(0.99, 0.96, 0.94, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_ernog"), SubResource("Resource_ldvo5"), SubResource("Resource_t6gwe"), SubResource("Resource_uck54"), SubResource("Resource_7m1h2"), SubResource("Resource_ebaw5"), SubResource("Resource_g73ap"), SubResource("Resource_quc6p"), SubResource("Resource_d1srp"), SubResource("Resource_saqc1"), SubResource("Resource_jp6yk")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_t6gwe"), SubResource("Resource_uck54"), SubResource("Resource_7m1h2"), SubResource("Resource_ebaw5"), SubResource("Resource_g73ap"), SubResource("Resource_quc6p"), SubResource("Resource_d1srp"), SubResource("Resource_saqc1"), SubResource("Resource_jp6yk"), SubResource("Resource_1nx8y"), SubResource("Resource_naka5")])
 notes = "Sloped-ceiling attic corridor under the lilac slates."
 
-[sub_resource type="Resource" id="Resource_naka5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_uqetn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(1.5, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_fvcb1"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_eq1ok"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1, 0, 2)
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_uqetn"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dsm53"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(1, 0, 10)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_eq1ok"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_b3t1k"]
+script = ExtResource("5_d7hx6")
 prop_id = &"coat_rack"
 position = Vector3(0.6, 0, 12.6)
-
-[sub_resource type="Resource" id="Resource_dsm53"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 4)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_b3t1k"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 8)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_n0g37"]
-script = ExtResource("4_uier2")
-prop_id = &"painting_small"
-position = Vector3(1.5, 1.6, 0.3)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 4)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_m1nbg"]
-script = ExtResource("3_o18lv")
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_exglb"]
+script = ExtResource("5_d7hx6")
+prop_id = &"painting_small"
+position = Vector3(1.5, 1.6, 0.3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_ixhp7"]
+script = ExtResource("4_5p3pq")
 id = &"svc_back_stair_2"
 display_name = "Back Stairs (Attic)"
 level = 2
 rect = Rect2(62, -68, 6, 14)
 wall_color = Color(0.78, 0.96, 0.87, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_naka5"), SubResource("Resource_fvcb1"), SubResource("Resource_uqetn"), SubResource("Resource_eq1ok"), SubResource("Resource_dsm53"), SubResource("Resource_b3t1k"), SubResource("Resource_n0g37")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_uqetn"), SubResource("Resource_eq1ok"), SubResource("Resource_dsm53"), SubResource("Resource_b3t1k"), SubResource("Resource_n0g37"), SubResource("Resource_m1nbg"), SubResource("Resource_exglb")])
 notes = "Top of the back stairs."
 
-[sub_resource type="Resource" id="Resource_exglb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_01ijp"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(1.2, 0, 2)
 
-[sub_resource type="Resource" id="Resource_ixhp7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3ha6s"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(8.8, 0, 2)
 
-[sub_resource type="Resource" id="Resource_01ijp"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_sddd4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2.5, 0, 1)
 
-[sub_resource type="Resource" id="Resource_3ha6s"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_trewo"]
+script = ExtResource("5_d7hx6")
 prop_id = &"wardrobe_tall"
 position = Vector3(0.5, 0, 8)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_sddd4"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(9.5, 0, 8)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_trewo"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_kkdyp"]
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(9.5, 0, 8)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_i4tio"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(7, 0, 10)
 
-[sub_resource type="Resource" id="Resource_kkdyp"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_o72by"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_round"
 position = Vector3(5, 0, 6)
 
-[sub_resource type="Resource" id="Resource_i4tio"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_r3kqv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"mirror_gilt"
 position = Vector3(9.7, 1.4, 9.5)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_o72by"]
-script = ExtResource("4_uier2")
-prop_id = &"potted_roses"
-position = Vector3(1, 0, 13)
-
-[sub_resource type="Resource" id="Resource_r3kqv"]
-script = ExtResource("4_uier2")
-prop_id = &"candle_sconce"
-position = Vector3(0.3, 1.8, 5)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_80cci"]
-script = ExtResource("4_uier2")
-prop_id = &"chest_trunk"
-position = Vector3(5, 0, 0.6)
+script = ExtResource("5_d7hx6")
+prop_id = &"potted_roses"
+position = Vector3(1, 0, 13)
 
 [sub_resource type="Resource" id="Resource_wsche"]
-script = ExtResource("4_uier2")
-prop_id = &"painting_small"
-position = Vector3(5, 1.8, 0.3)
+script = ExtResource("5_d7hx6")
+prop_id = &"candle_sconce"
+position = Vector3(0.3, 1.8, 5)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_40vky"]
-script = ExtResource("3_o18lv")
+script = ExtResource("5_d7hx6")
+prop_id = &"chest_trunk"
+position = Vector3(5, 0, 0.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_su5po"]
+script = ExtResource("5_d7hx6")
+prop_id = &"painting_small"
+position = Vector3(5, 1.8, 0.3)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_0ybf2"]
+script = ExtResource("4_5p3pq")
 id = &"svc_maid_bedroom_a"
 display_name = "Attic Bedroom (Rose)"
 level = 2
 rect = Rect2(42, -68, 10, 14)
 wall_color = Color(1, 0.86, 0.88, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_exglb"), SubResource("Resource_ixhp7"), SubResource("Resource_01ijp"), SubResource("Resource_3ha6s"), SubResource("Resource_sddd4"), SubResource("Resource_trewo"), SubResource("Resource_kkdyp"), SubResource("Resource_i4tio"), SubResource("Resource_o72by"), SubResource("Resource_r3kqv"), SubResource("Resource_80cci"), SubResource("Resource_wsche")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_01ijp"), SubResource("Resource_3ha6s"), SubResource("Resource_sddd4"), SubResource("Resource_trewo"), SubResource("Resource_kkdyp"), SubResource("Resource_i4tio"), SubResource("Resource_o72by"), SubResource("Resource_r3kqv"), SubResource("Resource_80cci"), SubResource("Resource_wsche"), SubResource("Resource_40vky"), SubResource("Resource_su5po")])
 notes = "Two beds under the eaves, rose quilts and pressed flowers."
 
-[sub_resource type="Resource" id="Resource_su5po"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7ja44"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_servant"
 position = Vector3(1.2, 0, 2)
 
-[sub_resource type="Resource" id="Resource_0ybf2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cx85d"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_single"
 position = Vector3(8.6, 0, 2.2)
 
-[sub_resource type="Resource" id="Resource_7ja44"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_v8lm4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2.5, 0, 1)
 
-[sub_resource type="Resource" id="Resource_cx85d"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6qma6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dresser"
 position = Vector3(9.5, 0, 7)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_v8lm4"]
-script = ExtResource("4_uier2")
-prop_id = &"washstand"
-position = Vector3(0.5, 0, 8)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_6qma6"]
-script = ExtResource("4_uier2")
-prop_id = &"window_seat"
-position = Vector3(5, 0, 0.5)
-
 [sub_resource type="Resource" id="Resource_eg6v2"]
-script = ExtResource("4_uier2")
-prop_id = &"cushion_pile"
-position = Vector3(5, 0.6, 0.6)
+script = ExtResource("5_d7hx6")
+prop_id = &"washstand"
+position = Vector3(0.5, 0, 8)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_bpo2a"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"window_seat"
+position = Vector3(5, 0, 0.5)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_plljh"]
+script = ExtResource("5_d7hx6")
+prop_id = &"cushion_pile"
+position = Vector3(5, 0.6, 0.6)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_efn6p"]
+script = ExtResource("5_d7hx6")
 prop_id = &"birdcage_gilt"
 position = Vector3(8.6, 0, 11)
 
-[sub_resource type="Resource" id="Resource_plljh"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_xbt4x"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_round"
 position = Vector3(5, 0, 7)
 
-[sub_resource type="Resource" id="Resource_efn6p"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4omo5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(3, 0, 11)
 
-[sub_resource type="Resource" id="Resource_xbt4x"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_pdnu6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"candle_sconce"
 position = Vector3(9.7, 1.8, 4)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_4omo5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1gb4v"]
+script = ExtResource("5_d7hx6")
 prop_id = &"vase_roses"
 position = Vector3(2.5, 0.7, 1)
 
-[sub_resource type="Resource" id="Resource_pdnu6"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_mqekm"]
+script = ExtResource("4_5p3pq")
 id = &"svc_maid_bedroom_b"
 display_name = "Attic Bedroom (Lilac)"
 level = 2
 rect = Rect2(52, -68, 10, 14)
 wall_color = Color(0.86, 0.78, 0.98, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_su5po"), SubResource("Resource_0ybf2"), SubResource("Resource_7ja44"), SubResource("Resource_cx85d"), SubResource("Resource_v8lm4"), SubResource("Resource_6qma6"), SubResource("Resource_eg6v2"), SubResource("Resource_bpo2a"), SubResource("Resource_plljh"), SubResource("Resource_efn6p"), SubResource("Resource_xbt4x"), SubResource("Resource_4omo5")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_7ja44"), SubResource("Resource_cx85d"), SubResource("Resource_v8lm4"), SubResource("Resource_6qma6"), SubResource("Resource_eg6v2"), SubResource("Resource_bpo2a"), SubResource("Resource_plljh"), SubResource("Resource_efn6p"), SubResource("Resource_xbt4x"), SubResource("Resource_4omo5"), SubResource("Resource_pdnu6"), SubResource("Resource_1gb4v")])
 notes = "A bright attic room with a window seat and a birdcage."
 
-[sub_resource type="Resource" id="Resource_1gb4v"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_lu7kq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1, 0, 3)
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_mqekm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dq5qj"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1, 0, 3.8)
 yaw_deg = 15.0
 
-[sub_resource type="Resource" id="Resource_lu7kq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_hrv6c"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(1.8, 0, 3.2)
 yaw_deg = 40.0
 
-[sub_resource type="Resource" id="Resource_dq5qj"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_87qkb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"crate"
 position = Vector3(4.8, 0, 12.6)
 
-[sub_resource type="Resource" id="Resource_hrv6c"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_w8j6i"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(1, 0, 7)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_87qkb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dndoa"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(5, 0, 7)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_w8j6i"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5n7n2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"barrel"
 position = Vector3(1, 0, 12.6)
 
-[sub_resource type="Resource" id="Resource_dndoa"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_788u4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"canvas_stack"
 position = Vector3(3, 0, 13.4)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_5n7n2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_adc26"]
+script = ExtResource("5_d7hx6")
 prop_id = &"clock_grandfather"
 position = Vector3(0.5, 0, 10)
-yaw_deg = 90.0
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_788u4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_vvx5t"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dressing_screen"
 position = Vector3(3, 0, 9.6)
 
-[sub_resource type="Resource" id="Resource_adc26"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4mv7p"]
+script = ExtResource("5_d7hx6")
 prop_id = &"birdcage_gilt"
 position = Vector3(4.8, 0, 10.6)
 
-[sub_resource type="Resource" id="Resource_vvx5t"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_smmdu"]
+script = ExtResource("5_d7hx6")
 prop_id = &"dumbwaiter"
 position = Vector3(5.4, 0, 1)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_4mv7p"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_7cqg4"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(3, 3.4, 6)
 
-[sub_resource type="Resource" id="Resource_smmdu"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_kfkxa"]
+script = ExtResource("4_5p3pq")
 id = &"svc_box_room"
 display_name = "Box Room"
 level = 2
 rect = Rect2(68, -68, 6, 14)
 wall_color = Color(1, 0.95, 0.72, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_1gb4v"), SubResource("Resource_mqekm"), SubResource("Resource_lu7kq"), SubResource("Resource_dq5qj"), SubResource("Resource_hrv6c"), SubResource("Resource_87qkb"), SubResource("Resource_w8j6i"), SubResource("Resource_dndoa"), SubResource("Resource_5n7n2"), SubResource("Resource_788u4"), SubResource("Resource_adc26"), SubResource("Resource_vvx5t"), SubResource("Resource_4mv7p")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_lu7kq"), SubResource("Resource_dq5qj"), SubResource("Resource_hrv6c"), SubResource("Resource_87qkb"), SubResource("Resource_w8j6i"), SubResource("Resource_dndoa"), SubResource("Resource_5n7n2"), SubResource("Resource_788u4"), SubResource("Resource_adc26"), SubResource("Resource_vvx5t"), SubResource("Resource_4mv7p"), SubResource("Resource_smmdu"), SubResource("Resource_7cqg4")])
 notes = "Old trunks, a stopped clock, rolled canvases and the top of the dumbwaiter shaft."
 
-[sub_resource type="Resource" id="Resource_7cqg4"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ad0sf"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_rack_herbs"
 position = Vector3(0.5, 0, 3)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_kfkxa"]
-script = ExtResource("4_uier2")
-prop_id = &"drying_rack_herbs"
-position = Vector3(0.5, 0, 7)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_ad0sf"]
-script = ExtResource("4_uier2")
-prop_id = &"drying_rack_herbs"
-position = Vector3(15.5, 0, 3)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_pf5cv"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_rack_herbs"
-position = Vector3(15.5, 0, 7)
+position = Vector3(0.5, 0, 7)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_hnp82"]
-script = ExtResource("4_uier2")
+script = ExtResource("5_d7hx6")
+prop_id = &"drying_rack_herbs"
+position = Vector3(15.5, 0, 3)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_w6sps"]
+script = ExtResource("5_d7hx6")
+prop_id = &"drying_rack_herbs"
+position = Vector3(15.5, 0, 7)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_2xwol"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(4, 2.6, 5)
 
-[sub_resource type="Resource" id="Resource_w6sps"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_6y032"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(8, 2.6, 5)
 
-[sub_resource type="Resource" id="Resource_2xwol"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_efcc3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(12, 2.6, 5)
 
-[sub_resource type="Resource" id="Resource_6y032"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_4hgh1"]
+script = ExtResource("5_d7hx6")
 prop_id = &"herb_bundle_hanging"
 position = Vector3(8, 2.6, 9)
 
-[sub_resource type="Resource" id="Resource_efcc3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_lay8f"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_line"
 position = Vector3(5, 0, 11)
 
-[sub_resource type="Resource" id="Resource_4hgh1"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_dm1j7"]
+script = ExtResource("5_d7hx6")
 prop_id = &"drying_line"
 position = Vector3(11, 0, 11)
 
-[sub_resource type="Resource" id="Resource_lay8f"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oy7qv"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_work"
 position = Vector3(8, 0, 7)
 
-[sub_resource type="Resource" id="Resource_dm1j7"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_f51w6"]
+script = ExtResource("5_d7hx6")
 prop_id = &"mortar_pestle"
 position = Vector3(7.4, 0.9, 7)
 
-[sub_resource type="Resource" id="Resource_oy7qv"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_fqnvb"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(8.6, 0.9, 7)
 
-[sub_resource type="Resource" id="Resource_f51w6"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_t6iph"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(2, 0, 13)
 
-[sub_resource type="Resource" id="Resource_fqnvb"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_v2tr3"]
+script = ExtResource("5_d7hx6")
 prop_id = &"basket_produce"
 position = Vector3(14, 0, 13)
 
-[sub_resource type="Resource" id="Resource_t6iph"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_5ligw"]
+script = ExtResource("5_d7hx6")
 prop_id = &"stool"
 position = Vector3(8, 0, 8.2)
 
-[sub_resource type="Resource" id="Resource_v2tr3"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_ym4wp"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(4, 3.4, 9)
 
-[sub_resource type="Resource" id="Resource_5ligw"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_058qk"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(12, 3.4, 9)
 
-[sub_resource type="Resource" id="Resource_ym4wp"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_djqii"]
+script = ExtResource("4_5p3pq")
 id = &"svc_drying_loft"
 display_name = "Herb Drying Loft"
 level = 2
 rect = Rect2(42, -48, 16, 14)
 wall_color = Color(0.78, 0.96, 0.87, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_7cqg4"), SubResource("Resource_kfkxa"), SubResource("Resource_ad0sf"), SubResource("Resource_pf5cv"), SubResource("Resource_hnp82"), SubResource("Resource_w6sps"), SubResource("Resource_2xwol"), SubResource("Resource_6y032"), SubResource("Resource_efcc3"), SubResource("Resource_4hgh1"), SubResource("Resource_lay8f"), SubResource("Resource_dm1j7"), SubResource("Resource_oy7qv"), SubResource("Resource_f51w6"), SubResource("Resource_fqnvb"), SubResource("Resource_t6iph"), SubResource("Resource_v2tr3"), SubResource("Resource_5ligw")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_ad0sf"), SubResource("Resource_pf5cv"), SubResource("Resource_hnp82"), SubResource("Resource_w6sps"), SubResource("Resource_2xwol"), SubResource("Resource_6y032"), SubResource("Resource_efcc3"), SubResource("Resource_4hgh1"), SubResource("Resource_lay8f"), SubResource("Resource_dm1j7"), SubResource("Resource_oy7qv"), SubResource("Resource_f51w6"), SubResource("Resource_fqnvb"), SubResource("Resource_t6iph"), SubResource("Resource_v2tr3"), SubResource("Resource_5ligw"), SubResource("Resource_ym4wp"), SubResource("Resource_058qk")])
 notes = "Warm loft where stillroom herbs and flowers hang to dry."
 
-[sub_resource type="Resource" id="Resource_058qk"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_3ua2s"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_single"
 position = Vector3(1, 0, 11)
+yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_djqii"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_iomjt"]
+script = ExtResource("5_d7hx6")
 prop_id = &"bed_single"
 position = Vector3(3, 0, 11)
 
-[sub_resource type="Resource" id="Resource_3ua2s"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_oed35"]
+script = ExtResource("5_d7hx6")
 prop_id = &"nightstand"
 position = Vector3(2, 0, 12.8)
 
-[sub_resource type="Resource" id="Resource_iomjt"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_vc6wq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chest_trunk"
 position = Vector3(6, 0, 13.2)
-yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_oed35"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_h0ith"]
+script = ExtResource("5_d7hx6")
 prop_id = &"toy_wooden_horse"
 position = Vector3(8, 0, 7)
 yaw_deg = 45.0
 
-[sub_resource type="Resource" id="Resource_vc6wq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_1khbc"]
+script = ExtResource("5_d7hx6")
 prop_id = &"rug_round"
 position = Vector3(8, 0, 7)
 
-[sub_resource type="Resource" id="Resource_h0ith"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_n7i60"]
+script = ExtResource("5_d7hx6")
 prop_id = &"table_round"
 position = Vector3(12, 0, 4)
 
-[sub_resource type="Resource" id="Resource_1khbc"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_2iefa"]
+script = ExtResource("5_d7hx6")
 prop_id = &"chair_simple"
 position = Vector3(11, 0, 4)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_n7i60"]
-script = ExtResource("4_uier2")
-prop_id = &"chair_simple"
-position = Vector3(13, 0, 4)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_2iefa"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_smkdm"]
+script = ExtResource("5_d7hx6")
+prop_id = &"chair_simple"
+position = Vector3(13, 0, 4)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_esfmq"]
+script = ExtResource("5_d7hx6")
 prop_id = &"book_stack"
 position = Vector3(12, 0.75, 4)
 
-[sub_resource type="Resource" id="Resource_smkdm"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_a2y15"]
+script = ExtResource("5_d7hx6")
 prop_id = &"globe_stand"
 position = Vector3(14.6, 0, 10)
 
-[sub_resource type="Resource" id="Resource_esfmq"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_cbin5"]
+script = ExtResource("5_d7hx6")
 prop_id = &"cushion_pile"
 position = Vector3(13, 0, 12.6)
 
-[sub_resource type="Resource" id="Resource_a2y15"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_yowxn"]
+script = ExtResource("5_d7hx6")
 prop_id = &"window_seat"
 position = Vector3(15.4, 0, 7)
-yaw_deg = -90.0
+yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_cbin5"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_8xsx2"]
+script = ExtResource("5_d7hx6")
 prop_id = &"painting_small"
 position = Vector3(4, 1.6, 0.3)
+yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_yowxn"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_52pso"]
+script = ExtResource("5_d7hx6")
 prop_id = &"birdcage_gilt"
 position = Vector3(1, 0, 2)
 
-[sub_resource type="Resource" id="Resource_8xsx2"]
-script = ExtResource("4_uier2")
+[sub_resource type="Resource" id="Resource_gve0c"]
+script = ExtResource("5_d7hx6")
 prop_id = &"lantern_hanging"
 position = Vector3(8, 3.4, 7)
 
-[sub_resource type="Resource" id="Resource_52pso"]
-script = ExtResource("3_o18lv")
+[sub_resource type="Resource" id="Resource_nswbk"]
+script = ExtResource("4_5p3pq")
 id = &"svc_attic_playroom"
 display_name = "Attic Playroom"
 level = 2
 rect = Rect2(58, -48, 16, 14)
 floor_kind = &"carpet"
 wall_color = Color(0.78, 0.82, 1, 1)
-props = Array[ExtResource("4_uier2")]([SubResource("Resource_058qk"), SubResource("Resource_djqii"), SubResource("Resource_3ua2s"), SubResource("Resource_iomjt"), SubResource("Resource_oed35"), SubResource("Resource_vc6wq"), SubResource("Resource_h0ith"), SubResource("Resource_1khbc"), SubResource("Resource_n7i60"), SubResource("Resource_2iefa"), SubResource("Resource_smkdm"), SubResource("Resource_esfmq"), SubResource("Resource_a2y15"), SubResource("Resource_cbin5"), SubResource("Resource_yowxn"), SubResource("Resource_8xsx2")])
+props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_3ua2s"), SubResource("Resource_iomjt"), SubResource("Resource_oed35"), SubResource("Resource_vc6wq"), SubResource("Resource_h0ith"), SubResource("Resource_1khbc"), SubResource("Resource_n7i60"), SubResource("Resource_2iefa"), SubResource("Resource_smkdm"), SubResource("Resource_esfmq"), SubResource("Resource_a2y15"), SubResource("Resource_cbin5"), SubResource("Resource_yowxn"), SubResource("Resource_8xsx2"), SubResource("Resource_52pso"), SubResource("Resource_gve0c")])
 notes = "Where Alis's nephews sleep and play when they visit: two beds, toys, a globe."
 
-[sub_resource type="Resource" id="Resource_gve0c"]
-script = ExtResource("6_d7hx6")
+[sub_resource type="Resource" id="Resource_8uojk"]
+script = ExtResource("7_8w3jn")
 secret_id = &"smugglers_run"
 kind = &"lever"
 level = -1
@@ -2985,16 +3031,16 @@ position = Vector3(58.5, 1.4, -37.7)
 prop_id = &"loose_jar"
 notes = "A jar of plum preserves that will not lift: tilt it and the east shelf swings away."
 
-[sub_resource type="Resource" id="Resource_nswbk"]
-script = ExtResource("6_d7hx6")
+[sub_resource type="Resource" id="Resource_2wp3o"]
+script = ExtResource("7_8w3jn")
 secret_id = &"smugglers_coin"
 level = -1
 position = Vector3(69.5, 0.1, -38.4)
 item_id = &"col_smugglers_coin"
 notes = "An old gold coin wedged behind the smugglers' chest."
 
-[sub_resource type="Resource" id="Resource_8uojk"]
-script = ExtResource("6_d7hx6")
+[sub_resource type="Resource" id="Resource_i8i6f"]
+script = ExtResource("7_8w3jn")
 secret_id = &"dumbwaiter_shaft"
 kind = &"discovery"
 level = 2
@@ -3002,8 +3048,8 @@ position = Vector3(72.6, 1, -66.8)
 prop_id = &"dumbwaiter"
 notes = "The dumbwaiter shaft is just wide enough to hide in: a child's chalk marks inside."
 
-[sub_resource type="Resource" id="Resource_2wp3o"]
-script = ExtResource("6_d7hx6")
+[sub_resource type="Resource" id="Resource_dtofg"]
+script = ExtResource("7_8w3jn")
 secret_id = &"alis_floorboard"
 level = 1
 position = Vector3(43.4, 0.05, -35.6)
@@ -3011,75 +3057,77 @@ item_id = &"col_carved_wooden_bird"
 prop_id = &"loose_panel"
 notes = "Under a loose floorboard: a little wooden bird one of Alis's nephews carved."
 
-[sub_resource type="Resource" id="Resource_i8i6f"]
-script = ExtResource("6_d7hx6")
+[sub_resource type="Resource" id="Resource_x73e3"]
+script = ExtResource("7_8w3jn")
 secret_id = &"pantry_honey"
 position = Vector3(63.4, 2, -44.5)
 item_id = &"col_honeycomb_charm"
 notes = "Tucked on the top pantry shelf: a honeycomb charm left for the house brownie."
 
-[sub_resource type="Resource" id="Resource_dtofg"]
-script = ExtResource("7_gcuhb")
+[sub_resource type="Resource" id="Resource_k48s4"]
+script = ExtResource("8_c4mby")
 id = &"svc_cellar"
 level_from = -1
 rect = Rect2(65.2, -64, 2.4, 8)
 style = &"cellar"
 
-[sub_resource type="Resource" id="Resource_x73e3"]
-script = ExtResource("7_gcuhb")
+[sub_resource type="Resource" id="Resource_lyate"]
+script = ExtResource("8_c4mby")
 id = &"svc_back_0"
 rect = Rect2(62.5, -66, 2.4, 9)
 style = &"service"
 
-[sub_resource type="Resource" id="Resource_k48s4"]
-script = ExtResource("7_gcuhb")
+[sub_resource type="Resource" id="Resource_48dp5"]
+script = ExtResource("8_c4mby")
 id = &"svc_back_1"
 level_from = 1
 rect = Rect2(65.2, -66, 2.4, 9)
 style = &"service"
 
-[sub_resource type="Resource" id="Resource_lyate"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_0y7wq"]
+script = ExtResource("9_agin8")
 station_id = &"kitchen"
 display_name = "Kitchen Range"
 position = Vector3(49, 0, -67.2)
+yaw_deg = 180.0
 prop_id = &"range_iron"
 canon = "C"
 
-[sub_resource type="Resource" id="Resource_48dp5"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_xj4lk"]
+script = ExtResource("9_agin8")
 station_id = &"hearth"
 display_name = "Kitchen Hearth"
 position = Vector3(42.7, 0, -61)
-yaw_deg = 90.0
+yaw_deg = -90.0
 prop_id = &"hearth_kitchen"
 canon = "C?"
 
-[sub_resource type="Resource" id="Resource_0y7wq"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_li4hb"]
+script = ExtResource("9_agin8")
 station_id = &"hearth"
 display_name = "Servants' Hall Fire"
 position = Vector3(42.5, 0, -41)
-yaw_deg = 90.0
+yaw_deg = -90.0
 prop_id = &"fireplace_small"
 
-[sub_resource type="Resource" id="Resource_xj4lk"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_tqd0g"]
+script = ExtResource("9_agin8")
 station_id = &"bread_oven"
 display_name = "Bread Oven"
 position = Vector3(59, 0, -67.2)
+yaw_deg = 180.0
 prop_id = &"bread_oven"
 
-[sub_resource type="Resource" id="Resource_li4hb"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_420u3"]
+script = ExtResource("9_agin8")
 station_id = &"stillroom"
 display_name = "Stillroom Bench"
 position = Vector3(73.3, 0, -44.5)
-yaw_deg = -90.0
+yaw_deg = 90.0
 prop_id = &"stillroom_bench"
 
-[sub_resource type="Resource" id="Resource_tqd0g"]
-script = ExtResource("8_8w3jn")
+[sub_resource type="Resource" id="Resource_dqtm4"]
+script = ExtResource("9_agin8")
 station_id = &"infirmary"
 display_name = "Infirmary Cot"
 position = Vector3(72.5, 0, -36.5)
@@ -3087,11 +3135,11 @@ prop_id = &"infirmary_cot"
 canon = "C"
 
 [resource]
-script = ExtResource("5_5p3pq")
+script = ExtResource("6_gcuhb")
 part_id = &"service"
-rooms = Array[ExtResource("3_o18lv")]([SubResource("Resource_osoxn"), SubResource("Resource_1imc0"), SubResource("Resource_46ana"), SubResource("Resource_gojrq"), SubResource("Resource_j03lp"), SubResource("Resource_sbk7q"), SubResource("Resource_1n3rm"), SubResource("Resource_o267m"), SubResource("Resource_7ywun"), SubResource("Resource_rrlf2"), SubResource("Resource_r7l1j"), SubResource("Resource_xds4j"), SubResource("Resource_o76xr"), SubResource("Resource_x21q2"), SubResource("Resource_0wryn"), SubResource("Resource_kla6n"), SubResource("Resource_nyhpt"), SubResource("Resource_7dgib"), SubResource("Resource_wrn1b"), SubResource("Resource_m31ym"), SubResource("Resource_k58uv"), SubResource("Resource_hcrb4"), SubResource("Resource_i72wj"), SubResource("Resource_g03c8"), SubResource("Resource_o24eb"), SubResource("Resource_qjkug"), SubResource("Resource_tjlhr"), SubResource("Resource_1nx8y"), SubResource("Resource_m1nbg"), SubResource("Resource_40vky"), SubResource("Resource_pdnu6"), SubResource("Resource_smmdu"), SubResource("Resource_ym4wp"), SubResource("Resource_52pso")])
-doors = Array[ExtResource("1_rn3s5")]([SubResource("Resource_c4mby"), SubResource("Resource_agin8"), SubResource("Resource_ayy0x"), SubResource("Resource_slsqu"), SubResource("Resource_c2iif"), SubResource("Resource_jqn65"), SubResource("Resource_t3dx0"), SubResource("Resource_fnc5e"), SubResource("Resource_a7nav"), SubResource("Resource_umj03"), SubResource("Resource_i8cin"), SubResource("Resource_4go5y"), SubResource("Resource_vpl0u"), SubResource("Resource_gyaxe"), SubResource("Resource_hv5fd"), SubResource("Resource_1v0d4"), SubResource("Resource_8oo43"), SubResource("Resource_1x5il"), SubResource("Resource_qewuu"), SubResource("Resource_r3ubv"), SubResource("Resource_cdc3b"), SubResource("Resource_0lq42"), SubResource("Resource_b022s"), SubResource("Resource_vjyrb"), SubResource("Resource_vvmca"), SubResource("Resource_j5hge"), SubResource("Resource_0xjqd"), SubResource("Resource_rvy5o"), SubResource("Resource_rehlw"), SubResource("Resource_0jp5a"), SubResource("Resource_d7kmv"), SubResource("Resource_lt2v7"), SubResource("Resource_1sqo0"), SubResource("Resource_6e1yf"), SubResource("Resource_kmj3r")])
-stairs = Array[ExtResource("7_gcuhb")]([SubResource("Resource_dtofg"), SubResource("Resource_x73e3"), SubResource("Resource_k48s4")])
-stations = Array[ExtResource("8_8w3jn")]([SubResource("Resource_lyate"), SubResource("Resource_48dp5"), SubResource("Resource_0y7wq"), SubResource("Resource_xj4lk"), SubResource("Resource_li4hb"), SubResource("Resource_tqd0g")])
-secrets = Array[ExtResource("6_d7hx6")]([SubResource("Resource_gve0c"), SubResource("Resource_nswbk"), SubResource("Resource_8uojk"), SubResource("Resource_2wp3o"), SubResource("Resource_i8i6f")])
-roofs = Array[ExtResource("2_wuqm6")]([SubResource("Resource_4p66x"), SubResource("Resource_lkvkc")])
+rooms = Array[ExtResource("4_5p3pq")]([SubResource("Resource_xqgcc"), SubResource("Resource_we2iq"), SubResource("Resource_4sx3u"), SubResource("Resource_rl60u"), SubResource("Resource_tmsj6"), SubResource("Resource_x8ga5"), SubResource("Resource_giywa"), SubResource("Resource_hs1d0"), SubResource("Resource_we8mo"), SubResource("Resource_6aoaa"), SubResource("Resource_j20a6"), SubResource("Resource_qq3px"), SubResource("Resource_qyb71"), SubResource("Resource_epfbh"), SubResource("Resource_ue5ej"), SubResource("Resource_ou7oj"), SubResource("Resource_komib"), SubResource("Resource_et23n"), SubResource("Resource_rplj1"), SubResource("Resource_d776h"), SubResource("Resource_d8r3r"), SubResource("Resource_kblho"), SubResource("Resource_vcgx5"), SubResource("Resource_6urx5"), SubResource("Resource_ivgyj"), SubResource("Resource_nspoy"), SubResource("Resource_ldvo5"), SubResource("Resource_fvcb1"), SubResource("Resource_ixhp7"), SubResource("Resource_0ybf2"), SubResource("Resource_mqekm"), SubResource("Resource_kfkxa"), SubResource("Resource_djqii"), SubResource("Resource_nswbk")])
+doors = Array[ExtResource("2_o18lv")]([SubResource("Resource_ayy0x"), SubResource("Resource_slsqu"), SubResource("Resource_c2iif"), SubResource("Resource_jqn65"), SubResource("Resource_t3dx0"), SubResource("Resource_fnc5e"), SubResource("Resource_a7nav"), SubResource("Resource_umj03"), SubResource("Resource_i8cin"), SubResource("Resource_4go5y"), SubResource("Resource_vpl0u"), SubResource("Resource_gyaxe"), SubResource("Resource_hv5fd"), SubResource("Resource_1v0d4"), SubResource("Resource_8oo43"), SubResource("Resource_1x5il"), SubResource("Resource_qewuu"), SubResource("Resource_r3ubv"), SubResource("Resource_cdc3b"), SubResource("Resource_0lq42"), SubResource("Resource_b022s"), SubResource("Resource_vjyrb"), SubResource("Resource_vvmca"), SubResource("Resource_j5hge"), SubResource("Resource_0xjqd"), SubResource("Resource_rvy5o"), SubResource("Resource_rehlw"), SubResource("Resource_0jp5a"), SubResource("Resource_d7kmv"), SubResource("Resource_lt2v7"), SubResource("Resource_1sqo0"), SubResource("Resource_6e1yf"), SubResource("Resource_kmj3r"), SubResource("Resource_4p66x"), SubResource("Resource_lkvkc")])
+stairs = Array[ExtResource("8_c4mby")]([SubResource("Resource_k48s4"), SubResource("Resource_lyate"), SubResource("Resource_48dp5")])
+stations = Array[ExtResource("9_agin8")]([SubResource("Resource_0y7wq"), SubResource("Resource_xj4lk"), SubResource("Resource_li4hb"), SubResource("Resource_tqd0g"), SubResource("Resource_420u3"), SubResource("Resource_dqtm4")])
+secrets = Array[ExtResource("7_8w3jn")]([SubResource("Resource_8uojk"), SubResource("Resource_2wp3o"), SubResource("Resource_i8i6f"), SubResource("Resource_dtofg"), SubResource("Resource_x73e3")])
+roofs = Array[ExtResource("3_uier2")]([SubResource("Resource_ekteh"), SubResource("Resource_jwome")])
