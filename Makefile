@@ -3,17 +3,16 @@
 #   make play     run the game (its output goes to .tools/play.log)
 #   make clean    free disk: delete Godot's import cache and generated content
 #
-# Godot lives in .tools/ (git-ignored). Generators are tools/generators/*.gd;
-# they write into _generated/ folders (git-ignored, engineering rule R15).
-# Terrain is baked to world/shared/terrain/data/ (git-ignored) only when the
-# height or terrain scripts change: a full bake takes about 15 minutes.
+# Godot lives in .tools/ (git-ignored). Generated content is built by
+# tools/mq/levels.sh from tools/mq/generated.conf into git-ignored folders
+# (engineering rule R15) and cached in .git/levelcache, so a build the gate
+# already made is copied, not rebuilt. A full terrain bake takes about 15
+# minutes, only on a cache miss.
 
 GODOT_VERSION := 4.7.2
 GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
-TERRAIN_DIR   := world/shared/terrain/data
-TERRAIN_STAMP := .tools/terrain-baked.stamp
 
 .PHONY: play update clean godot pull generate bake import
 
@@ -47,20 +46,12 @@ godot:
 	"$(GODOT)" --version | grep -q '^$(GODOT_VERSION)\.stable' || { echo "Godot download failed."; exit 1; }; \
 	echo "Godot $(GODOT_VERSION) ready."
 
+# Without baked terrain the game bakes at launch and looks frozen for minutes,
+# so play runs this too. Fast when the cache has the build.
 generate: godot
-	@n=0; for g in tools/generators/*.gd; do \
-		[ -f "$$g" ] || continue; n=$$((n + 1)); \
-		"$(GODOT)" --headless --path . -s "$$g" >/dev/null 2>&1 || { echo "Generator failed: $$g"; exit 1; }; \
-	done; \
-	[ "$$n" = "0" ] || echo "Regenerated content ($$n generators)."
+	@tools/mq/levels.sh ensure
 
-# Without baked data the game bakes at launch and looks frozen for minutes.
-bake: godot
-	@stale=$$(find world \( -name '*height*.gd' -o -name '*terrain*.gd' -o -name 'world_map.gd' \) -newer "$(TERRAIN_STAMP)" 2>/dev/null | head -1); \
-	if [ -f "$(TERRAIN_STAMP)" ] && [ -z "$$stale" ] && [ -n "$$(ls -A "$(TERRAIN_DIR)" 2>/dev/null)" ]; then exit 0; fi; \
-	echo "Baking terrain (about 15 minutes, only when the terrain changes)..."; \
-	"$(GODOT)" --headless --path . -s world/shared/terrain/bake_terrain.gd >/dev/null 2>&1 || { echo "Terrain bake failed."; exit 1; }; \
-	touch "$(TERRAIN_STAMP)"; echo "Terrain baked."
+bake: generate
 
 import: godot
 	@"$(GODOT)" --headless --path . --import >/dev/null 2>&1 || true

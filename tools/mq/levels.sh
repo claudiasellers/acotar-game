@@ -10,6 +10,8 @@
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/common.sh"
+# A tree without the .git/mq/bin copy (a fresh play folder) uses its own scripts.
+[ -x "$MQ_BIN/godot.sh" ] || { MQ_BIN="$here"; export MQ_BIN; }
 
 CONF=tools/mq/generated.conf
 [ -f "$CONF" ] || CONF="$MQ_BIN/generated.conf"
