@@ -16,3 +16,27 @@ signal day_started(day: int)
 ## A save was written or loaded.
 signal game_saved(slot: String)
 signal game_loaded(slot: String)
+
+# --- Cross-lane seams (docs/STORY_INTERFACES.md). Story code listens to these;
+# it never calls into systems/ or creatures/ directly.
+
+## Systems: the family's food changed (P0 gate).
+signal food_stock_changed(days_of_food: float)
+## Systems: something entered Feyre's inventory, or was sold at a market.
+signal item_acquired(item_id: StringName, count: int)
+signal item_sold(item_id: StringName, coin: int)
+## Creatures: an animal or fae died, or was skinned and butchered.
+signal creature_killed(creature_id: StringName, kind: StringName, cause: StringName, position: Vector3)
+signal creature_harvested(creature_id: StringName, kind: StringName, items: PackedStringArray)
+
+## Story: hand Feyre an item the scene needs (the one ash arrow).
+signal story_item_granted(item_id: StringName, count: int)
+## Story: ask the owning lane to place an actor (great_wolf, doe, tamlin_beast).
+signal story_spawn_requested(spawn_id: StringName, where: Transform3D)
+## Story: a staging cue for an actor or group ("family", "gather").
+signal story_actor_cue(actor: StringName, cue: StringName)
+## Story: an anchored scene space began or ended.
+signal scene_space_started(space_id: StringName)
+signal scene_space_finished(space_id: StringName)
+## Story to world: blend the colour grade (the wall crossing, cold to spring).
+signal grade_swap_requested(to_grade: StringName, seconds: float)

@@ -36,3 +36,35 @@ func test_file_round_trip_restores_everything() -> void:
 
 func test_missing_slot_reports_not_found() -> void:
 	assert_eq(SaveSystem.load_game("no_such_slot"), ERR_FILE_NOT_FOUND)
+
+
+class FakeProvider:
+	extends RefCounted
+	var state: Dictionary = {}
+
+	func save_state() -> Dictionary:
+		return state.duplicate(true)
+
+	func load_state(data: Dictionary) -> void:
+		state = data.duplicate(true)
+
+
+func test_providers_and_world_deltas_round_trip() -> void:
+	WorldDeltas.clear()
+	var inventory := FakeProvider.new()
+	inventory.state = {"arrow_ash": 1, "obj_wolf_pelt": 1}
+	SaveSystem.register_provider("inventory", inventory)
+	WorldDeltas.mark_picked(&"hunting_forest", "scatter_a:12", 2.0)
+	WorldDeltas.set_container("cottage_chest", {"wardrobe_hunting_cloak": 1})
+	WorldDeltas.set_region_value(&"cottage", "door", "broken")
+	assert_eq(SaveSystem.save_game(SLOT), OK)
+
+	inventory.state = {}
+	WorldDeltas.clear()
+	assert_eq(SaveSystem.load_game(SLOT), OK)
+	assert_eq(int(inventory.state.get("arrow_ash", 0)), 1)
+	assert_true(WorldDeltas.is_picked(&"hunting_forest", "scatter_a:12"))
+	assert_eq(int(WorldDeltas.get_container("cottage_chest").get("wardrobe_hunting_cloak", 0)), 1)
+	assert_eq(WorldDeltas.get_region_value(&"cottage", "door"), "broken")
+	SaveSystem.unregister_provider("inventory")
+	WorldDeltas.clear()

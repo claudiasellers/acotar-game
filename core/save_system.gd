@@ -2,7 +2,22 @@
 extends Node
 
 const SAVE_DIR := "user://saves"
-const FORMAT_VERSION := 1
+const FORMAT_VERSION := 2
+
+## Other lanes' state (inventory, journal, body state...), by key. A provider
+## implements save_state() -> Dictionary and load_state(data: Dictionary).
+var _providers: Dictionary = {}
+
+
+func register_provider(key: String, provider: Object) -> void:
+	if not (provider.has_method("save_state") and provider.has_method("load_state")):
+		push_error("SaveSystem: provider '%s' needs save_state() and load_state()" % key)
+		return
+	_providers[key] = provider
+
+
+func unregister_provider(key: String) -> void:
+	_providers.erase(key)
 
 
 func snapshot() -> Dictionary:
@@ -11,13 +26,32 @@ func snapshot() -> Dictionary:
 		"world_state": WorldState.to_dict(),
 		"phase": PhaseManager.to_dict(),
 		"clock": Clock.to_dict(),
+		"world_deltas": WorldDeltas.to_dict(),
+		"providers": _provider_states(),
 	}
 
 
 func apply(data: Dictionary) -> void:
 	WorldState.from_dict(data.get("world_state", {}))
 	Clock.from_dict(data.get("clock", {}))
+	WorldDeltas.from_dict(data.get("world_deltas", {}))
 	PhaseManager.from_dict(data.get("phase", {}))
+	var states: Dictionary = data.get("providers", {})
+	for key in _providers:
+		var provider: Object = _providers[key]
+		if is_instance_valid(provider) and states.has(key):
+			provider.load_state(states[key])
+
+
+func _provider_states() -> Dictionary:
+	var states := {}
+	for key in _providers.keys():
+		var provider: Object = _providers[key]
+		if is_instance_valid(provider):
+			states[key] = provider.save_state()
+		else:
+			_providers.erase(key)
+	return states
 
 
 func save_game(slot: String = "slot_0") -> Error:

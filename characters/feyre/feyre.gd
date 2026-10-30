@@ -66,17 +66,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"pause"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
+			and StoryControl.can_look():
 		_rotate_camera(-event.relative.x * mouse_sensitivity, -event.relative.y * mouse_sensitivity)
-	if event.is_action_pressed(&"interact"):
+	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
 		pick_up_nearest_arrow()
 
 
 func _process(delta: float) -> void:
 	_camera_rig.global_position = global_position + Vector3.UP * 1.5
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
-	if look != Vector2.ZERO:
+	if look != Vector2.ZERO and StoryControl.can_look():
 		_rotate_camera(-look.x * stick_sensitivity * delta, -look.y * stick_sensitivity * delta)
+	_drift_toward_focus(delta)
 	var target_length := 1.7 if (is_aiming or is_drawing) else 3.6
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
@@ -90,6 +92,8 @@ func _physics_process(delta: float) -> void:
 	_update_bow(delta)
 
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
+	if not StoryControl.can_move():
+		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
@@ -106,7 +110,7 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
-	elif Input.is_action_just_pressed(&"jump"):
+	elif Input.is_action_just_pressed(&"jump") and StoryControl.can_move():
 		if not _try_mantle():
 			velocity.y = jump_velocity
 
@@ -232,6 +236,18 @@ func _try_mantle() -> bool:
 	tween.tween_property(self, ^"global_position", landing, 0.16)
 	tween.finished.connect(func() -> void: is_mantling = false)
 	return true
+
+
+## During anchored moments the camera eases toward what the scene is about.
+func _drift_toward_focus(delta: float) -> void:
+	var focus := StoryControl.focus
+	if focus == null or not is_instance_valid(focus):
+		return
+	var to := focus.global_position - _camera_rig.global_position
+	if Vector2(to.x, to.z).length() < 0.5:
+		return
+	var yaw := atan2(-to.x, -to.z)
+	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, yaw, 1.6 * delta)
 
 
 func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:

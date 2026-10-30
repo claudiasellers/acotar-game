@@ -17,7 +17,10 @@ EventBus="*res://core/event_bus.gd"
 WorldState="*res://core/world_state.gd"
 Clock="*res://core/clock.gd"
 PhaseManager="*res://core/phase_manager.gd"
+WorldDeltas="*res://core/world_deltas.gd"
 SaveSystem="*res://core/save_system.gd"
+WorldStreamer="*res://core/streaming/world_streamer.gd"
+StoryControl="*res://core/story_control.gd"
 
 [display]
 

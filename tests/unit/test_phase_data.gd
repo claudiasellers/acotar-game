@@ -35,3 +35,13 @@ func test_spring_court_ladder_matches_root_doc() -> void:
 	var set := load("res://data/phases/spring_court_phases.tres") as PhaseSet
 	assert_eq(set.phases.size(), 9, "root design doc §4.1 has phases 0 to 8")
 	assert_eq(set.start_phase, &"p0_winter")
+
+
+## Flag names are the Keeper's (lore/07-story/timeline-overview.md).
+func test_act_one_gates_use_keeper_flags() -> void:
+	var set := load("res://data/phases/spring_court_phases.tres") as PhaseSet
+	assert_eq(Array(set.get_phase(&"p0_winter").exit_condition.flags), ["food_secured"])
+	assert_eq(Array(set.get_phase(&"p1_wolf_and_crossing").exit_condition.flags),
+			["wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_crossed"])
+	assert_eq(set.get_phase(&"p1_wolf_and_crossing").exit_condition.mode, ExitCondition.Mode.ALL)
+	assert_true(set.get_phase(&"p1_wolf_and_crossing").unlocked_regions.has("border_woods"))

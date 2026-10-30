@@ -6,13 +6,13 @@
 
 [sub_resource type="Resource" id="Resource_j6ci3"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("food_tally_empty")
+flags = PackedStringArray("food_secured")
 
 [sub_resource type="Resource" id="Resource_oty66"]
 script = ExtResource("1_cae22")
 id = &"p0_winter"
 display_name = "Winter and the cottage"
-notes = "Proposed gate: the food tally runs out and Feyre hunts the deep woods."
+notes = "Starvation winter. Feyre hunts, counts the food and secures enough to keep the family alive (the food tally)."
 unlocked_regions = PackedStringArray("human_realm_winter", "cottage", "hunting_forest", "village")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_j6ci3")
@@ -20,13 +20,13 @@ next_phase = &"p1_wolf_and_crossing"
 
 [sub_resource type="Resource" id="Resource_3t2xh"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("wolf_killed", "wall_crossed")
+flags = PackedStringArray("wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_crossed")
 
 [sub_resource type="Resource" id="Resource_u4qal"]
 script = ExtResource("1_cae22")
 id = &"p1_wolf_and_crossing"
 display_name = "The wolf and the crossing"
-notes = "Wolf kill, the beast at the door, the ride north through the wall."
+notes = "Wolf kill with the one ash arrow, skinning, selling the pelt, the beast at the door (life for a life), the ride north through the wall."
 unlocked_regions = PackedStringArray("border_woods")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_3t2xh")
@@ -34,13 +34,13 @@ next_phase = &"p2_grounds"
 
 [sub_resource type="Resource" id="Resource_ip116"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("manor_trust_earned")
+flags = PackedStringArray("first_dinner_eaten", "grounds_explored")
 
 [sub_resource type="Resource" id="Resource_mxb7s"]
 script = ExtResource("1_cae22")
 id = &"p2_grounds"
 display_name = "The grounds"
-notes = "Proposed gate: trust from observed deeds opens the house."
+notes = "Arrival, Alis, the first dinner (fae cannot lie), free to roam the grounds."
 unlocked_regions = PackedStringArray("manor_grounds")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_ip116")
@@ -48,7 +48,7 @@ next_phase = &"p3_house_and_eastern_woods"
 
 [sub_resource type="Resource" id="Resource_b8mrs"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("suriel_bound", "naga_cleared")
+flags = PackedStringArray("gallery_found", "suriel_bound", "naga_survived", "bogge_survived")
 
 [sub_resource type="Resource" id="Resource_ck0ix"]
 script = ExtResource("1_cae22")
@@ -61,13 +61,13 @@ next_phase = &"p4_wider_court"
 
 [sub_resource type="Resource" id="Resource_p6i23"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("painting_finished")
+flags = PackedStringArray("first_painting", "pool_found")
 
 [sub_resource type="Resource" id="Resource_03yt5"]
 script = ExtResource("1_cae22")
 id = &"p4_wider_court"
 display_name = "The wider court"
-notes = "Plus the root doc's other exit conditions as they are defined."
+notes = "Paints from Tamlin, the first painting, the night lights on the pool, Lucien's story."
 unlocked_regions = PackedStringArray("starlight_glen", "fae_village", "western_fells")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_p6i23")
@@ -75,7 +75,7 @@ next_phase = &"p5_calanmai"
 
 [sub_resource type="Resource" id="Resource_g0ul0"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("rite_survived")
+flags = PackedStringArray("calanmai_attended", "rhysand_met")
 
 [sub_resource type="Resource" id="Resource_dmf1q"]
 script = ExtResource("1_cae22")
@@ -89,13 +89,13 @@ next_phase = &"p6_blight_tightens"
 
 [sub_resource type="Resource" id="Resource_0rkdp"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("sent_home")
+flags = PackedStringArray("attor_evaded", "solstice_danced")
 
 [sub_resource type="Resource" id="Resource_t52pk"]
 script = ExtResource("1_cae22")
 id = &"p6_blight_tightens"
 display_name = "The blight tightens"
-notes = "The Attor, Rhysand at the manor, the Tithe, the solstice. Proposed gate."
+notes = "Rhysand at the manor, the Attor in the gardens, the Summer Solstice; Tamlin sends her home."
 unlocked_regions = PackedStringArray("solstice_meadow")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_0rkdp")
@@ -103,13 +103,13 @@ next_phase = &"p7_return_home"
 
 [sub_resource type="Resource" id="Resource_0obeo"]
 script = ExtResource("2_1vgil")
-flags = PackedStringArray("chose_to_return")
+flags = PackedStringArray("nesta_truth_heard", "wall_recrossed")
 
 [sub_resource type="Resource" id="Resource_uy1bw"]
 script = ExtResource("1_cae22")
 id = &"p7_return_home"
 display_name = "Return to the human realm"
-notes = "Nesta's confession breaks the glamour. Proposed gate."
+notes = "The family's new wealth; Nesta tells Feyre she knew and went to the Wall; Feyre crosses back alone."
 unlocked_regions = PackedStringArray("human_realm_spring", "archeron_estate")
 locked_regions = PackedStringArray()
 exit_condition = SubResource("Resource_0obeo")
@@ -119,7 +119,7 @@ next_phase = &"p8_the_pass"
 script = ExtResource("1_cae22")
 id = &"p8_the_pass"
 display_name = "The pass"
-notes = "The empty manor, Alis, the road toward Under the Mountain (world 2)."
+notes = "The empty manor, Alis tells her everything, the road toward Under the Mountain (world 2). Ends on alis_truth_heard and departed_for_mountain."
 unlocked_regions = PackedStringArray("the_pass")
 locked_regions = PackedStringArray()
 
