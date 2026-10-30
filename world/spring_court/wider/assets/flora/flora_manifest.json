@@ -1,0 +1,1619 @@
+{
+ "assets": [
+  {
+   "archetype": "rose_plant",
+   "biome_tags": [
+    "rosewild",
+    "garden"
+   ],
+   "file": "ing_rose_red.gltf",
+   "glows": false,
+   "height_m": 0.632,
+   "id": "ing_rose_red",
+   "kind": "forage",
+   "radius_m": 0.256,
+   "tris": 2182,
+   "tris_lod1": 1091
+  },
+  {
+   "archetype": "rose_plant",
+   "biome_tags": [
+    "rosewild",
+    "garden"
+   ],
+   "file": "ing_rose_white.gltf",
+   "glows": false,
+   "height_m": 0.641,
+   "id": "ing_rose_white",
+   "kind": "forage",
+   "radius_m": 0.268,
+   "tris": 2182,
+   "tris_lod1": 1091
+  },
+  {
+   "archetype": "rose_plant",
+   "biome_tags": [
+    "rosewild",
+    "garden"
+   ],
+   "file": "ing_rose_gold.gltf",
+   "glows": false,
+   "height_m": 0.574,
+   "id": "ing_rose_gold",
+   "kind": "forage",
+   "radius_m": 0.255,
+   "tris": 1780,
+   "tris_lod1": 890
+  },
+  {
+   "archetype": "rose_hip",
+   "biome_tags": [
+    "rosewild",
+    "meadow"
+   ],
+   "file": "ing_rose_hip.gltf",
+   "glows": false,
+   "height_m": 0.29,
+   "id": "ing_rose_hip",
+   "kind": "forage",
+   "radius_m": 0.392,
+   "tris": 1146,
+   "tris_lod1": 573
+  },
+  {
+   "archetype": "thicket",
+   "biome_tags": [
+    "rosewild"
+   ],
+   "file": "ing_thornbriar_sap.gltf",
+   "glows": false,
+   "height_m": 0.686,
+   "id": "ing_thornbriar_sap",
+   "kind": "forage",
+   "radius_m": 0.369,
+   "tris": 1707,
+   "tris_lod1": 853
+  },
+  {
+   "archetype": "rose_plant",
+   "biome_tags": [
+    "blight"
+   ],
+   "file": "ing_ashen_rose.gltf",
+   "glows": false,
+   "height_m": 0.65,
+   "id": "ing_ashen_rose",
+   "kind": "forage",
+   "radius_m": 0.225,
+   "tris": 1536,
+   "tris_lod1": 768
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "woodland",
+    "meadow"
+   ],
+   "file": "ing_wild_hyacinth.gltf",
+   "glows": false,
+   "height_m": 0.249,
+   "id": "ing_wild_hyacinth",
+   "kind": "forage",
+   "radius_m": 0.191,
+   "tris": 1806,
+   "tris_lod1": 902
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "woodland",
+    "garden"
+   ],
+   "file": "ing_foxglove.gltf",
+   "glows": false,
+   "height_m": 0.886,
+   "id": "ing_foxglove",
+   "kind": "forage",
+   "radius_m": 0.238,
+   "tris": 1676,
+   "tris_lod1": 838
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "garden",
+    "meadow"
+   ],
+   "file": "ing_lavender.gltf",
+   "glows": false,
+   "height_m": 0.446,
+   "id": "ing_lavender",
+   "kind": "forage",
+   "radius_m": 0.297,
+   "tris": 2950,
+   "tris_lod1": 1447
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "fells"
+   ],
+   "file": "ing_heather.gltf",
+   "glows": false,
+   "height_m": 0.38,
+   "id": "ing_heather",
+   "kind": "forage",
+   "radius_m": 0.291,
+   "tris": 2950,
+   "tris_lod1": 1474
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow",
+    "fells"
+   ],
+   "file": "ing_woad.gltf",
+   "glows": false,
+   "height_m": 0.553,
+   "id": "ing_woad",
+   "kind": "forage",
+   "radius_m": 0.231,
+   "tris": 1770,
+   "tris_lod1": 884
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "meadow",
+    "riverbank"
+   ],
+   "file": "ing_mugwort.gltf",
+   "glows": false,
+   "height_m": 0.757,
+   "id": "ing_mugwort",
+   "kind": "forage",
+   "radius_m": 0.237,
+   "tris": 2070,
+   "tris_lod1": 1034
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "meadow",
+    "garden"
+   ],
+   "file": "ing_chamomile.gltf",
+   "glows": false,
+   "height_m": 0.25,
+   "id": "ing_chamomile",
+   "kind": "forage",
+   "radius_m": 0.182,
+   "tris": 2942,
+   "tris_lod1": 1470
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_red_poppy.gltf",
+   "glows": false,
+   "height_m": 0.541,
+   "id": "ing_red_poppy",
+   "kind": "forage",
+   "radius_m": 0.24,
+   "tris": 682,
+   "tris_lod1": 341
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_cornflower.gltf",
+   "glows": false,
+   "height_m": 0.491,
+   "id": "ing_cornflower",
+   "kind": "forage",
+   "radius_m": 0.215,
+   "tris": 2256,
+   "tris_lod1": 1128
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_cowslip.gltf",
+   "glows": false,
+   "height_m": 0.204,
+   "id": "ing_cowslip",
+   "kind": "forage",
+   "radius_m": 0.193,
+   "tris": 1416,
+   "tris_lod1": 708
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "woodland",
+    "meadow"
+   ],
+   "file": "ing_primrose.gltf",
+   "glows": false,
+   "height_m": 0.124,
+   "id": "ing_primrose",
+   "kind": "forage",
+   "radius_m": 0.169,
+   "tris": 1316,
+   "tris_lod1": 658
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_violet.gltf",
+   "glows": false,
+   "height_m": 0.126,
+   "id": "ing_violet",
+   "kind": "forage",
+   "radius_m": 0.201,
+   "tris": 1102,
+   "tris_lod1": 551
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_dandelion.gltf",
+   "glows": false,
+   "height_m": 0.194,
+   "id": "ing_dandelion",
+   "kind": "forage",
+   "radius_m": 0.181,
+   "tris": 1866,
+   "tris_lod1": 932
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "riverbank",
+    "lake"
+   ],
+   "file": "ing_marsh_marigold.gltf",
+   "glows": false,
+   "height_m": 0.269,
+   "id": "ing_marsh_marigold",
+   "kind": "forage",
+   "radius_m": 0.213,
+   "tris": 1166,
+   "tris_lod1": 583
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "autumn_foothills"
+   ],
+   "file": "ing_fire_lily.gltf",
+   "glows": false,
+   "height_m": 0.66,
+   "id": "ing_fire_lily",
+   "kind": "forage",
+   "radius_m": 0.241,
+   "tris": 414,
+   "tris_lod1": 206
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "night",
+    "meadow",
+    "garden"
+   ],
+   "file": "ing_moonflower.gltf",
+   "glows": true,
+   "height_m": 0.507,
+   "id": "ing_moonflower",
+   "kind": "forage",
+   "radius_m": 0.279,
+   "tris": 382,
+   "tris_lod1": 190
+  },
+  {
+   "archetype": "vine",
+   "biome_tags": [
+    "woodland",
+    "garden"
+   ],
+   "file": "ing_honeysuckle.gltf",
+   "glows": false,
+   "height_m": 0.835,
+   "id": "ing_honeysuckle",
+   "kind": "forage",
+   "radius_m": 0.115,
+   "tris": 1983,
+   "tris_lod1": 991
+  },
+  {
+   "archetype": "vine",
+   "biome_tags": [
+    "garden",
+    "manor"
+   ],
+   "file": "ing_wisteria.gltf",
+   "glows": false,
+   "height_m": 1.101,
+   "id": "ing_wisteria",
+   "kind": "forage",
+   "radius_m": 0.299,
+   "tris": 2256,
+   "tris_lod1": 1128
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "garden",
+    "manor"
+   ],
+   "file": "ing_lilac.gltf",
+   "glows": false,
+   "height_m": 0.805,
+   "id": "ing_lilac",
+   "kind": "forage",
+   "radius_m": 0.222,
+   "tris": 1602,
+   "tris_lod1": 800
+  },
+  {
+   "archetype": "vine",
+   "biome_tags": [
+    "orchard",
+    "garden"
+   ],
+   "file": "ing_cherry_blossom.gltf",
+   "glows": false,
+   "height_m": 0.533,
+   "id": "ing_cherry_blossom",
+   "kind": "forage",
+   "radius_m": 0.085,
+   "tris": 1887,
+   "tris_lod1": 943
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "woodland",
+    "riverbank"
+   ],
+   "file": "ing_elderflower.gltf",
+   "glows": false,
+   "height_m": 0.578,
+   "id": "ing_elderflower",
+   "kind": "forage",
+   "radius_m": 0.203,
+   "tris": 2322,
+   "tris_lod1": 1160
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "riverbank",
+    "meadow"
+   ],
+   "file": "ing_meadowsweet.gltf",
+   "glows": false,
+   "height_m": 0.679,
+   "id": "ing_meadowsweet",
+   "kind": "forage",
+   "radius_m": 0.227,
+   "tris": 2392,
+   "tris_lod1": 1196
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow",
+    "fells"
+   ],
+   "file": "ing_yarrow.gltf",
+   "glows": false,
+   "height_m": 0.441,
+   "id": "ing_yarrow",
+   "kind": "forage",
+   "radius_m": 0.251,
+   "tris": 2136,
+   "tris_lod1": 1068
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_madder.gltf",
+   "glows": false,
+   "height_m": 0.503,
+   "id": "ing_madder",
+   "kind": "forage",
+   "radius_m": 0.232,
+   "tris": 2408,
+   "tris_lod1": 1204
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_sweet_woodruff.gltf",
+   "glows": false,
+   "height_m": 0.247,
+   "id": "ing_sweet_woodruff",
+   "kind": "forage",
+   "radius_m": 0.213,
+   "tris": 2950,
+   "tris_lod1": 1474
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "fells",
+    "meadow"
+   ],
+   "file": "ing_wild_thyme.gltf",
+   "glows": false,
+   "height_m": 0.148,
+   "id": "ing_wild_thyme",
+   "kind": "forage",
+   "radius_m": 0.388,
+   "tris": 2949,
+   "tris_lod1": 1418
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "ing_clover.gltf",
+   "glows": false,
+   "height_m": 0.154,
+   "id": "ing_clover",
+   "kind": "forage",
+   "radius_m": 0.12,
+   "tris": 2112,
+   "tris_lod1": 1056
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_wood_sorrel.gltf",
+   "glows": false,
+   "height_m": 0.104,
+   "id": "ing_wood_sorrel",
+   "kind": "forage",
+   "radius_m": 0.123,
+   "tris": 1244,
+   "tris_lod1": 622
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "riverbank"
+   ],
+   "file": "ing_watermint.gltf",
+   "glows": false,
+   "height_m": 0.462,
+   "id": "ing_watermint",
+   "kind": "forage",
+   "radius_m": 0.218,
+   "tris": 1688,
+   "tris_lod1": 844
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "woodland",
+    "riverbank"
+   ],
+   "file": "ing_nettle.gltf",
+   "glows": false,
+   "height_m": 0.455,
+   "id": "ing_nettle",
+   "kind": "forage",
+   "radius_m": 0.255,
+   "tris": 790,
+   "tris_lod1": 395
+  },
+  {
+   "archetype": "herb",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_wild_garlic.gltf",
+   "glows": false,
+   "height_m": 0.315,
+   "id": "ing_wild_garlic",
+   "kind": "forage",
+   "radius_m": 0.101,
+   "tris": 1020,
+   "tris_lod1": 510
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow",
+    "night"
+   ],
+   "file": "ing_faelight_dandelion.gltf",
+   "glows": true,
+   "height_m": 0.327,
+   "id": "ing_faelight_dandelion",
+   "kind": "forage",
+   "radius_m": 0.211,
+   "tris": 1738,
+   "tris_lod1": 763
+  },
+  {
+   "archetype": "water_lily",
+   "biome_tags": [
+    "lake",
+    "riverbank"
+   ],
+   "file": "ing_water_lily.gltf",
+   "glows": false,
+   "height_m": 0.082,
+   "id": "ing_water_lily",
+   "kind": "forage",
+   "radius_m": 0.357,
+   "tris": 468,
+   "tris_lod1": 234
+  },
+  {
+   "archetype": "reed",
+   "biome_tags": [
+    "lake",
+    "riverbank"
+   ],
+   "file": "ing_bulrush_root.gltf",
+   "glows": false,
+   "height_m": 0.593,
+   "id": "ing_bulrush_root",
+   "kind": "forage",
+   "radius_m": 0.158,
+   "tris": 256,
+   "tris_lod1": 127
+  },
+  {
+   "archetype": "reed",
+   "biome_tags": [
+    "lake",
+    "riverbank"
+   ],
+   "file": "ing_mirror_reed.gltf",
+   "glows": false,
+   "height_m": 1.008,
+   "id": "ing_mirror_reed",
+   "kind": "forage",
+   "radius_m": 0.099,
+   "tris": 192,
+   "tris_lod1": 96
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "meadow",
+    "woodland"
+   ],
+   "file": "ing_wild_strawberry.gltf",
+   "glows": false,
+   "height_m": 0.085,
+   "id": "ing_wild_strawberry",
+   "kind": "forage",
+   "radius_m": 0.208,
+   "tris": 1998,
+   "tris_lod1": 999
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "woodland",
+    "rosewild"
+   ],
+   "file": "ing_blackberry.gltf",
+   "glows": false,
+   "height_m": 0.577,
+   "id": "ing_blackberry",
+   "kind": "forage",
+   "radius_m": 0.326,
+   "tris": 1632,
+   "tris_lod1": 815
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "fells",
+    "woodland"
+   ],
+   "file": "ing_bilberry.gltf",
+   "glows": false,
+   "height_m": 0.315,
+   "id": "ing_bilberry",
+   "kind": "forage",
+   "radius_m": 0.249,
+   "tris": 2304,
+   "tris_lod1": 1152
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "fells"
+   ],
+   "file": "ing_juniper_berry.gltf",
+   "glows": false,
+   "height_m": 0.63,
+   "id": "ing_juniper_berry",
+   "kind": "forage",
+   "radius_m": 0.294,
+   "tris": 2534,
+   "tris_lod1": 1266
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "blight",
+    "woodland"
+   ],
+   "file": "ing_nightshade.gltf",
+   "glows": false,
+   "height_m": 0.472,
+   "id": "ing_nightshade",
+   "kind": "forage",
+   "radius_m": 0.26,
+   "tris": 2406,
+   "tris_lod1": 1203
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "fells",
+    "autumn_foothills"
+   ],
+   "file": "ing_rowan_berry.gltf",
+   "glows": false,
+   "height_m": 0.033,
+   "id": "ing_rowan_berry",
+   "kind": "forage",
+   "radius_m": 0.043,
+   "tris": 965,
+   "tris_lod1": 481
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "fells"
+   ],
+   "file": "ing_hawthorn_haw.gltf",
+   "glows": false,
+   "height_m": 0.031,
+   "id": "ing_hawthorn_haw",
+   "kind": "forage",
+   "radius_m": 0.048,
+   "tris": 956,
+   "tris_lod1": 478
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "woodland",
+    "orchard"
+   ],
+   "file": "ing_mistletoe.gltf",
+   "glows": false,
+   "height_m": 0.262,
+   "id": "ing_mistletoe",
+   "kind": "forage",
+   "radius_m": 0.164,
+   "tris": 1566,
+   "tris_lod1": 782
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "fells",
+    "autumn_foothills"
+   ],
+   "file": "ing_sloe.gltf",
+   "glows": false,
+   "height_m": 0.042,
+   "id": "ing_sloe",
+   "kind": "forage",
+   "radius_m": 0.049,
+   "tris": 650,
+   "tris_lod1": 324
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "orchard"
+   ],
+   "file": "ing_spring_apple.gltf",
+   "glows": false,
+   "height_m": 0.089,
+   "id": "ing_spring_apple",
+   "kind": "forage",
+   "radius_m": 0.121,
+   "tris": 563,
+   "tris_lod1": 280
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "orchard"
+   ],
+   "file": "ing_honeyplum.gltf",
+   "glows": false,
+   "height_m": 0.09,
+   "id": "ing_honeyplum",
+   "kind": "forage",
+   "radius_m": 0.116,
+   "tris": 503,
+   "tris_lod1": 251
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "orchard"
+   ],
+   "file": "ing_quince.gltf",
+   "glows": false,
+   "height_m": 0.109,
+   "id": "ing_quince",
+   "kind": "forage",
+   "radius_m": 0.163,
+   "tris": 310,
+   "tris_lod1": 155
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "orchard"
+   ],
+   "file": "ing_cherry.gltf",
+   "glows": false,
+   "height_m": 0.042,
+   "id": "ing_cherry",
+   "kind": "forage",
+   "radius_m": 0.049,
+   "tris": 408,
+   "tris_lod1": 204
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "woodland",
+    "autumn_foothills"
+   ],
+   "file": "ing_hazelnut.gltf",
+   "glows": false,
+   "height_m": 0.039,
+   "id": "ing_hazelnut",
+   "kind": "forage",
+   "radius_m": 0.05,
+   "tris": 656,
+   "tris_lod1": 327
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "woodland",
+    "autumn_foothills"
+   ],
+   "file": "ing_acorn.gltf",
+   "glows": false,
+   "height_m": 0.036,
+   "id": "ing_acorn",
+   "kind": "forage",
+   "radius_m": 0.044,
+   "tris": 736,
+   "tris_lod1": 368
+  },
+  {
+   "archetype": "fruit_drop",
+   "biome_tags": [
+    "woodland",
+    "autumn_foothills"
+   ],
+   "file": "col_acorn_cap.gltf",
+   "glows": false,
+   "height_m": 0.046,
+   "id": "col_acorn_cap",
+   "kind": "forage",
+   "radius_m": 0.028,
+   "tris": 159,
+   "tris_lod1": 79
+  },
+  {
+   "archetype": "leaf_drop",
+   "biome_tags": [
+    "autumn_foothills"
+   ],
+   "file": "ing_ember_maple_leaf.gltf",
+   "glows": false,
+   "height_m": 0.048,
+   "id": "ing_ember_maple_leaf",
+   "kind": "forage",
+   "radius_m": 0.18,
+   "tris": 356,
+   "tris_lod1": 178
+  },
+  {
+   "archetype": "mushrooms",
+   "biome_tags": [
+    "woodland",
+    "night"
+   ],
+   "file": "ing_glowcap.gltf",
+   "glows": true,
+   "height_m": 0.149,
+   "id": "ing_glowcap",
+   "kind": "forage",
+   "radius_m": 0.12,
+   "tris": 512,
+   "tris_lod1": 256
+  },
+  {
+   "archetype": "mushrooms",
+   "biome_tags": [
+    "woodland",
+    "night"
+   ],
+   "file": "ing_dreamcap.gltf",
+   "glows": true,
+   "height_m": 0.201,
+   "id": "ing_dreamcap",
+   "kind": "forage",
+   "radius_m": 0.126,
+   "tris": 924,
+   "tris_lod1": 462
+  },
+  {
+   "archetype": "mushrooms",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_chanterelle.gltf",
+   "glows": false,
+   "height_m": 0.086,
+   "id": "ing_chanterelle",
+   "kind": "forage",
+   "radius_m": 0.119,
+   "tris": 480,
+   "tris_lod1": 239
+  },
+  {
+   "archetype": "mushrooms",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_fly_agaric.gltf",
+   "glows": false,
+   "height_m": 0.238,
+   "id": "ing_fly_agaric",
+   "kind": "forage",
+   "radius_m": 0.155,
+   "tris": 688,
+   "tris_lod1": 344
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_tinder_fungus.gltf",
+   "glows": false,
+   "height_m": 0.4,
+   "id": "ing_tinder_fungus",
+   "kind": "forage",
+   "radius_m": 0.3,
+   "tris": 428,
+   "tris_lod1": 214
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland",
+    "fells"
+   ],
+   "file": "ing_chaga.gltf",
+   "glows": false,
+   "height_m": 0.45,
+   "id": "ing_chaga",
+   "kind": "forage",
+   "radius_m": 0.234,
+   "tris": 220,
+   "tris_lod1": 104
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "riverbank"
+   ],
+   "file": "ing_willow_bark.gltf",
+   "glows": false,
+   "height_m": 0.097,
+   "id": "ing_willow_bark",
+   "kind": "forage",
+   "radius_m": 0.15,
+   "tris": 216,
+   "tris_lod1": 108
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland",
+    "autumn_foothills"
+   ],
+   "file": "ing_birch_bark.gltf",
+   "glows": false,
+   "height_m": 0.097,
+   "id": "ing_birch_bark",
+   "kind": "forage",
+   "radius_m": 0.15,
+   "tris": 216,
+   "tris_lod1": 108
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_ash_wood.gltf",
+   "glows": false,
+   "height_m": 0.163,
+   "id": "ing_ash_wood",
+   "kind": "forage",
+   "radius_m": 0.521,
+   "tris": 133,
+   "tris_lod1": 65
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_oak_gall.gltf",
+   "glows": false,
+   "height_m": 0.061,
+   "id": "ing_oak_gall",
+   "kind": "forage",
+   "radius_m": 0.207,
+   "tris": 343,
+   "tris_lod1": 168
+  },
+  {
+   "archetype": "wood",
+   "biome_tags": [
+    "woodland",
+    "night"
+   ],
+   "file": "ing_hollow_root.gltf",
+   "glows": true,
+   "height_m": 0.146,
+   "id": "ing_hollow_root",
+   "kind": "forage",
+   "radius_m": 0.293,
+   "tris": 170,
+   "tris_lod1": 84
+  },
+  {
+   "archetype": "moss_cushion",
+   "biome_tags": [
+    "woodland",
+    "riverbank",
+    "night"
+   ],
+   "file": "ing_moss.gltf",
+   "glows": true,
+   "height_m": 0.098,
+   "id": "ing_moss",
+   "kind": "forage",
+   "radius_m": 0.208,
+   "tris": 1020,
+   "tris_lod1": 510
+  },
+  {
+   "archetype": "lichen_rock",
+   "biome_tags": [
+    "blight",
+    "fells"
+   ],
+   "file": "ing_grey_lichen.gltf",
+   "glows": false,
+   "height_m": 0.207,
+   "id": "ing_grey_lichen",
+   "kind": "forage",
+   "radius_m": 0.211,
+   "tris": 436,
+   "tris_lod1": 218
+  },
+  {
+   "archetype": "lichen_rock",
+   "biome_tags": [
+    "woodland",
+    "fells"
+   ],
+   "file": "ing_old_mans_beard.gltf",
+   "glows": false,
+   "height_m": 0.205,
+   "id": "ing_old_mans_beard",
+   "kind": "forage",
+   "radius_m": 0.202,
+   "tris": 610,
+   "tris_lod1": 304
+  },
+  {
+   "archetype": "blighted_petals",
+   "biome_tags": [
+    "blight"
+   ],
+   "file": "ing_blighted_petals.gltf",
+   "glows": false,
+   "height_m": 0.183,
+   "id": "ing_blighted_petals",
+   "kind": "forage",
+   "radius_m": 0.182,
+   "tris": 388,
+   "tris_lod1": 194
+  },
+  {
+   "archetype": "rose_plant",
+   "biome_tags": [
+    "blight"
+   ],
+   "file": "col_blighted_bloom.gltf",
+   "glows": false,
+   "height_m": 0.398,
+   "id": "col_blighted_bloom",
+   "kind": "forage",
+   "radius_m": 0.097,
+   "tris": 646,
+   "tris_lod1": 323
+  },
+  {
+   "archetype": "web",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "ing_spider_silk.gltf",
+   "glows": false,
+   "height_m": 0.388,
+   "id": "ing_spider_silk",
+   "kind": "forage",
+   "radius_m": 0.252,
+   "tris": 482,
+   "tris_lod1": 266
+  },
+  {
+   "archetype": "flower",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "col_dandelion_clock.gltf",
+   "glows": false,
+   "height_m": 0.276,
+   "id": "col_dandelion_clock",
+   "kind": "forage",
+   "radius_m": 0.098,
+   "tris": 566,
+   "tris_lod1": 252
+  },
+  {
+   "archetype": "leaf_drop",
+   "biome_tags": [
+    "woodland",
+    "riverbank"
+   ],
+   "file": "col_silver_leaf.gltf",
+   "glows": false,
+   "height_m": 0.054,
+   "id": "col_silver_leaf",
+   "kind": "forage",
+   "radius_m": 0.205,
+   "tris": 99,
+   "tris_lod1": 49
+  },
+  {
+   "archetype": "grass",
+   "biome_tags": [
+    "meadow",
+    "all"
+   ],
+   "file": "flora_grass_clump_a.gltf",
+   "glows": false,
+   "height_m": 0.397,
+   "id": "flora_grass_clump_a",
+   "kind": "decor",
+   "radius_m": 0.152,
+   "tris": 312,
+   "tris_lod1": 156
+  },
+  {
+   "archetype": "grass",
+   "biome_tags": [
+    "meadow",
+    "fells"
+   ],
+   "file": "flora_grass_clump_b.gltf",
+   "glows": false,
+   "height_m": 0.718,
+   "id": "flora_grass_clump_b",
+   "kind": "decor",
+   "radius_m": 0.204,
+   "tris": 440,
+   "tris_lod1": 220
+  },
+  {
+   "archetype": "grass",
+   "biome_tags": [
+    "meadow",
+    "garden",
+    "riverbank"
+   ],
+   "file": "flora_grass_clump_c.gltf",
+   "glows": false,
+   "height_m": 0.255,
+   "id": "flora_grass_clump_c",
+   "kind": "decor",
+   "radius_m": 0.207,
+   "tris": 360,
+   "tris_lod1": 180
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow",
+    "rosewild"
+   ],
+   "file": "flora_carpet_rose.gltf",
+   "glows": false,
+   "height_m": 0.146,
+   "id": "flora_carpet_rose",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2949,
+   "tris_lod1": 1455
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow",
+    "orchard"
+   ],
+   "file": "flora_carpet_blush.gltf",
+   "glows": false,
+   "height_m": 0.145,
+   "id": "flora_carpet_blush",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2950,
+   "tris_lod1": 1456
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow",
+    "garden"
+   ],
+   "file": "flora_carpet_lilac.gltf",
+   "glows": false,
+   "height_m": 0.154,
+   "id": "flora_carpet_lilac",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2949,
+   "tris_lod1": 1374
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow"
+   ],
+   "file": "flora_carpet_butter.gltf",
+   "glows": false,
+   "height_m": 0.144,
+   "id": "flora_carpet_butter",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2950,
+   "tris_lod1": 1449
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow",
+    "woodland"
+   ],
+   "file": "flora_carpet_pearl.gltf",
+   "glows": false,
+   "height_m": 0.149,
+   "id": "flora_carpet_pearl",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2936,
+   "tris_lod1": 1456
+  },
+  {
+   "archetype": "carpet",
+   "biome_tags": [
+    "meadow",
+    "riverbank"
+   ],
+   "file": "flora_carpet_periwinkle.gltf",
+   "glows": false,
+   "height_m": 0.163,
+   "id": "flora_carpet_periwinkle",
+   "kind": "decor",
+   "radius_m": 0.991,
+   "tris": 2949,
+   "tris_lod1": 1448
+  },
+  {
+   "archetype": "fern",
+   "biome_tags": [
+    "woodland"
+   ],
+   "file": "flora_fern_a.gltf",
+   "glows": false,
+   "height_m": 0.282,
+   "id": "flora_fern_a",
+   "kind": "decor",
+   "radius_m": 0.539,
+   "tris": 794,
+   "tris_lod1": 397
+  },
+  {
+   "archetype": "fern",
+   "biome_tags": [
+    "woodland",
+    "riverbank"
+   ],
+   "file": "flora_fern_b.gltf",
+   "glows": false,
+   "height_m": 0.491,
+   "id": "flora_fern_b",
+   "kind": "decor",
+   "radius_m": 0.728,
+   "tris": 1014,
+   "tris_lod1": 506
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "garden",
+    "rosewild"
+   ],
+   "file": "flora_bush_rose.gltf",
+   "glows": false,
+   "height_m": 1.155,
+   "id": "flora_bush_rose",
+   "kind": "decor",
+   "radius_m": 0.65,
+   "tris": 2802,
+   "tris_lod1": 1401
+  },
+  {
+   "archetype": "hydrangea",
+   "biome_tags": [
+    "garden",
+    "manor"
+   ],
+   "file": "flora_bush_hydrangea.gltf",
+   "glows": false,
+   "height_m": 1.217,
+   "id": "flora_bush_hydrangea",
+   "kind": "decor",
+   "radius_m": 0.683,
+   "tris": 2950,
+   "tris_lod1": 1469
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "garden",
+    "manor"
+   ],
+   "file": "flora_bush_boxwood.gltf",
+   "glows": false,
+   "height_m": 0.945,
+   "id": "flora_bush_boxwood",
+   "kind": "decor",
+   "radius_m": 0.344,
+   "tris": 90,
+   "tris_lod1": 44
+  },
+  {
+   "archetype": "berry_shrub",
+   "biome_tags": [
+    "fells"
+   ],
+   "file": "flora_heather_mound.gltf",
+   "glows": false,
+   "height_m": 0.537,
+   "id": "flora_heather_mound",
+   "kind": "decor",
+   "radius_m": 0.54,
+   "tris": 2950,
+   "tris_lod1": 1474
+  },
+  {
+   "archetype": "reed",
+   "biome_tags": [
+    "lake",
+    "riverbank"
+   ],
+   "file": "flora_reeds_bulrush.gltf",
+   "glows": false,
+   "height_m": 1.846,
+   "id": "flora_reeds_bulrush",
+   "kind": "decor",
+   "radius_m": 0.218,
+   "tris": 727,
+   "tris_lod1": 362
+  },
+  {
+   "archetype": "water_lily",
+   "biome_tags": [
+    "lake"
+   ],
+   "file": "flora_lily_pads.gltf",
+   "glows": false,
+   "height_m": 0.1,
+   "id": "flora_lily_pads",
+   "kind": "decor",
+   "radius_m": 0.495,
+   "tris": 1008,
+   "tris_lod1": 504
+  },
+  {
+   "archetype": "ivy_curtain",
+   "biome_tags": [
+    "manor",
+    "woodland",
+    "garden"
+   ],
+   "file": "flora_ivy_curtain.gltf",
+   "glows": false,
+   "height_m": 2.274,
+   "id": "flora_ivy_curtain",
+   "kind": "decor",
+   "radius_m": 0.834,
+   "tris": 2922,
+   "tris_lod1": 1456
+  },
+  {
+   "archetype": "toadstool_ring",
+   "biome_tags": [
+    "woodland",
+    "meadow"
+   ],
+   "file": "flora_toadstool_ring.gltf",
+   "glows": false,
+   "height_m": 0.217,
+   "id": "flora_toadstool_ring",
+   "kind": "decor",
+   "radius_m": 0.803,
+   "tris": 2950,
+   "tris_lod1": 1469
+  },
+  {
+   "archetype": "thicket",
+   "biome_tags": [
+    "rosewild"
+   ],
+   "file": "flora_rose_thorn_brake.gltf",
+   "glows": false,
+   "height_m": 4.25,
+   "id": "flora_rose_thorn_brake",
+   "kind": "decor",
+   "radius_m": 2.657,
+   "tris": 2950,
+   "tris_lod1": 1453
+  },
+  {
+   "archetype": "thicket",
+   "biome_tags": [
+    "blight"
+   ],
+   "file": "flora_blighted_thicket.gltf",
+   "glows": false,
+   "height_m": 1.995,
+   "id": "flora_blighted_thicket",
+   "kind": "decor",
+   "radius_m": 1.44,
+   "tris": 2214,
+   "tris_lod1": 1098
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "orchard",
+    "garden",
+    "meadow"
+   ],
+   "file": "flora_tree_cherry_blossom.gltf",
+   "glows": false,
+   "height_m": 7.308,
+   "id": "flora_tree_cherry_blossom",
+   "kind": "tree",
+   "radius_m": 3.63,
+   "tris": 2309,
+   "tris_lod1": 1128
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "orchard"
+   ],
+   "file": "flora_tree_apple_blossom.gltf",
+   "glows": false,
+   "height_m": 5.895,
+   "id": "flora_tree_apple_blossom",
+   "kind": "tree",
+   "radius_m": 3.103,
+   "tris": 2097,
+   "tris_lod1": 1023
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "woodland",
+    "meadow"
+   ],
+   "file": "flora_tree_spring_oak.gltf",
+   "glows": false,
+   "height_m": 12.521,
+   "id": "flora_tree_spring_oak",
+   "kind": "tree",
+   "radius_m": 5.462,
+   "tris": 1376,
+   "tris_lod1": 688
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "woodland",
+    "riverbank"
+   ],
+   "file": "flora_tree_silver_birch.gltf",
+   "glows": false,
+   "height_m": 10.359,
+   "id": "flora_tree_silver_birch",
+   "kind": "tree",
+   "radius_m": 3.099,
+   "tris": 1130,
+   "tris_lod1": 550
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "riverbank",
+    "lake"
+   ],
+   "file": "flora_tree_weeping_willow.gltf",
+   "glows": false,
+   "height_m": 9.981,
+   "id": "flora_tree_weeping_willow",
+   "kind": "tree",
+   "radius_m": 4.424,
+   "tris": 1057,
+   "tris_lod1": 528
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "garden",
+    "manor",
+    "woodland"
+   ],
+   "file": "flora_tree_lilac_fae.gltf",
+   "glows": false,
+   "height_m": 8.333,
+   "id": "flora_tree_lilac_fae",
+   "kind": "tree",
+   "radius_m": 3.788,
+   "tris": 2169,
+   "tris_lod1": 1056
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "fells"
+   ],
+   "file": "flora_tree_hawthorn.gltf",
+   "glows": false,
+   "height_m": 4.731,
+   "id": "flora_tree_hawthorn",
+   "kind": "tree",
+   "radius_m": 2.444,
+   "tris": 2025,
+   "tris_lod1": 1001
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "fells",
+    "woodland"
+   ],
+   "file": "flora_tree_rowan.gltf",
+   "glows": false,
+   "height_m": 6.874,
+   "id": "flora_tree_rowan",
+   "kind": "tree",
+   "radius_m": 2.636,
+   "tris": 1517,
+   "tris_lod1": 752
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "autumn_foothills"
+   ],
+   "file": "flora_tree_autumn_maple.gltf",
+   "glows": false,
+   "height_m": 9.384,
+   "id": "flora_tree_autumn_maple",
+   "kind": "tree",
+   "radius_m": 4.413,
+   "tris": 1889,
+   "tris_lod1": 914
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "autumn_foothills"
+   ],
+   "file": "flora_tree_autumn_oak.gltf",
+   "glows": false,
+   "height_m": 11.47,
+   "id": "flora_tree_autumn_oak",
+   "kind": "tree",
+   "radius_m": 5.313,
+   "tris": 1556,
+   "tris_lod1": 760
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "autumn_foothills"
+   ],
+   "file": "flora_tree_golden_birch.gltf",
+   "glows": false,
+   "height_m": 9.933,
+   "id": "flora_tree_golden_birch",
+   "kind": "tree",
+   "radius_m": 2.52,
+   "tris": 1130,
+   "tris_lod1": 551
+  },
+  {
+   "archetype": "tree",
+   "biome_tags": [
+    "blight"
+   ],
+   "file": "flora_tree_blighted_dead.gltf",
+   "glows": false,
+   "height_m": 7.915,
+   "id": "flora_tree_blighted_dead",
+   "kind": "tree",
+   "radius_m": 3.658,
+   "tris": 1381,
+   "tris_lod1": 689
+  }
+ ],
+ "generator": "tools/court/blender/flora_generate.py",
+ "notes": "Base mesh <id>, decimated <id>_LOD1. RGB in COLOR_0; COLOR_0 alpha = emissive strength (1 on glowing parts).",
+ "tri_budget": 3000
+}
