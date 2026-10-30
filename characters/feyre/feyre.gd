@@ -259,6 +259,8 @@ func _try_mantle() -> bool:
 			probe, probe + Vector3.DOWN * 2.4, WORLD_MASK, [get_rid()]))
 	if not top or top.normal.dot(Vector3.UP) < 0.7:
 		return false
+	if RegionGate.owns(wall.collider) or RegionGate.owns(top.collider):
+		return false
 	var rise: float = top.position.y - global_position.y
 	if rise < 0.6 or rise > 2.3:
 		return false
