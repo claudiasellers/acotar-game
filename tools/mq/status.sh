@@ -10,10 +10,10 @@ if pid=$(mq_buildlane_pid); then
 else
 	echo "build lane: STOPPED"
 fi
-echo "main: $(git log -1 --format='%h %s' main | cut -c1-70)"
-ahead=$(git rev-list --count origin/main..main 2>/dev/null)
-behind=$(git rev-list --count main..origin/main 2>/dev/null)
-echo "origin/main: $ahead to push, $behind to take in (as of the last fetch)"
+echo "origin/main: $(git log -1 --format='%h %s' "$MQ_MAIN" | cut -c1-70) (as of the last fetch)"
+if [ "$(mq_config_or MQ_PUSH 1)" != 1 ]; then
+	echo "!!! MQ_PUSH=0: NOTHING CAN LAND. The queue holds every change until it is back on."
+fi
 
 echo; echo "-- under test"
 n=0

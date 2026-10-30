@@ -135,6 +135,15 @@ mq_age() {
 
 # --- the queue ---------------------------------------------------------------
 
+# origin's main is the truth. Nothing here reads or writes the local branch, so
+# the play folder can sit on it and only `make pull` moves it.
+REMOTE=$(mq_config MQ_REMOTE); : "${REMOTE:=origin}"
+MQ_MAIN="refs/remotes/$REMOTE/main"
+
+mq_fetch_main() {
+	mq_timeout "$(mq_config_or MQ_FETCH_TIMEOUT 120)" git fetch -q "$REMOTE" "+main:$MQ_MAIN" 2>/dev/null
+}
+
 mq_buildlane_pid() {
 	local pid
 	pid=$(cat "$MQ_DIR/lock/pid" 2>/dev/null) || return 1

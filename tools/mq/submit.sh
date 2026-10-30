@@ -13,13 +13,13 @@ task="$2"
 source="${MQ_SUBMIT_SOURCE:-lane}"
 refuse() { echo "mq: REFUSED: $*" >&2; mq_event REFUSED "$task ${sha:0:9} $*"; exit 1; }
 
-if git merge-base --is-ancestor "$sha" main 2>/dev/null; then
+if git merge-base --is-ancestor "$sha" "$MQ_MAIN" 2>/dev/null; then
 	refuse "commit is already in main"
 fi
 if entry=$(mq_queued_entry "$sha"); then
 	refuse "commit is already queued as $(basename "$entry")"
 fi
-base=$(git merge-base "$sha" main)
+base=$(git merge-base "$sha" "$MQ_MAIN")
 files=$(git diff --name-only --diff-filter=ACMR "$base" "$sha")
 
 # Conflict markers in the commit's own version of any text file it changed.

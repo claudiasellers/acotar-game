@@ -57,14 +57,8 @@ seed_worktree() {
 
 make_worktrees() {
 	local i wt
-	if ! git -C "$MQ_REPO" symbolic-ref -q HEAD >/dev/null || \
-			[ "$(git -C "$MQ_REPO" symbolic-ref -q --short HEAD)" != "main" ]; then
-		:
-	else
-		git -C "$MQ_REPO" checkout -q --detach
-	fi
 	if [ ! -d "$MQ_BUILD" ]; then
-		git -C "$MQ_REPO" worktree add -q "$MQ_BUILD" main
+		git -C "$MQ_REPO" worktree add -q --detach "$MQ_BUILD" "$MQ_MAIN"
 		git -C "$MQ_REPO" worktree lock --reason "mq: build lane" "$MQ_BUILD"
 		seed_worktree "$MQ_BUILD"
 	fi
@@ -72,7 +66,7 @@ make_worktrees() {
 	while [ "$i" -le "$NLANES" ]; do
 		wt="$MQ_LANES_DIR/lane$i"
 		if [ ! -d "$wt" ]; then
-			git -C "$MQ_REPO" worktree add -q --detach "$wt" main
+			git -C "$MQ_REPO" worktree add -q --detach "$wt" "$MQ_MAIN"
 		fi
 		git -C "$MQ_REPO" worktree lock --reason "mq: lane$i" "$wt" 2>/dev/null
 		seed_worktree "$wt"
@@ -89,8 +83,8 @@ standing_worktree() { # path commit name
 }
 
 standing_worktrees() {
-	standing_worktree "$CLEANUP_WT" main cleanup
-	standing_worktree "$SHOTS_WT" main shots
+	standing_worktree "$CLEANUP_WT" "$MQ_MAIN" cleanup
+	standing_worktree "$SHOTS_WT" "$MQ_MAIN" shots
 }
 
 # True unless the pid is known to sit in another folder.
