@@ -7,3 +7,6 @@ builds/
 .DS_Store
 *.tmp
 *.blend1
+# Local tools (Godot for make play) and generated content (rebuilt by make update)
+.tools/
+_generated/

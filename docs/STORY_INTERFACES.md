@@ -62,3 +62,16 @@ engine or script error. It then reads the region's coverage report
 Fails when `types < 25`, `placements_per_km2 < 300`, `empty_cells > 0`,
 `landmarks < 3`, or `draw_calls > 1500` (R1, R9). VRAM is not measurable
 headless and is checked at milestones. Exit code 0 = pass, 1 = fail.
+
+## Scene spaces (story/framework/)
+
+`SceneSpace` runs a list of beats (`Beats.wait`, `control`, `mood`, `cue`,
+`until_flag`, `decision`, `raise`, `run`). Story flags come from the space's
+own ActionTriggers. `StateVisibility` shows or hides children by flag (the
+broken door). `GlamourLayer` is the glamour swap (docs/contracts/glamour.md).
+Act I spaces live in `story/act1/`; the greybox (`story/act1/greybox/`) is the
+main scene until real regions land.
+
+`EventBus.mood_requested(mood, intensity, seconds)`: `dread` for the wolf and
+the beast (silence, guttering fire, cold low light, camera shake through
+`StoryControl.shake`), `calm` when a scene ends. World and audio listen.

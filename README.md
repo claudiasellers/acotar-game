@@ -25,9 +25,17 @@ Gameplay never calls story code. An `ActionTrigger` raises a flag in `WorldState
 
 Phase ladders are data: `data/phases/spring_court_phases.tres` is the root doc's phases 0 to 8; `data/phases/m0_test_phases.tres` drives the test hill.
 
+## On the Mac
+
+- `make update` pulls the latest `main`, fetches the art (Git LFS), downloads Godot 4.7.2 into `.tools/` if it is missing, rebuilds generated content, and lists what changed.
+- `make play` runs the game.
+- `make clean` deletes Godot's import cache and generated content to free disk (Godot itself stays in `.tools/`).
+- Needs `git-lfs` (`brew install git-lfs`). Nothing is installed outside this folder.
+- Generators live in `tools/generators/*.gd` and write into git-ignored `_generated/` folders.
+
 ## Running
 
-The main scene is the M0 test hill. Controls: WASD move, Shift sprint, Space jump (and climb ledges), hold left mouse to draw and release to shoot, right mouse to aim, E to pick up a stuck arrow, Esc to free the mouse. Gamepad is mapped too.
+The main scene is the Act I greybox (`story/act1/greybox/`): phases 0 and 1 on stand-ins. Hunt hares to fill the food tally, meet the doe and the wolf in the clearing north of the cottage, E on the dead wolf to skin it, E at the fur stall (east) to sell the pelt, E on the bed to sleep until night. The M0 test hill is `world/shared/test_hill/test_hill.tscn`. Controls: WASD move, Shift sprint, Space jump (and climb ledges), hold left mouse to draw and release to shoot, right mouse to aim, E to pick up a stuck arrow, Esc to free the mouse. Gamepad is mapped too.
 
 Tests (headless):
 

@@ -7,7 +7,7 @@ config_version=5
 
 config/name="ACOTAR: The Spring Court"
 config/description="Open-world adventure in Prythian. Play as Feyre."
-run/main_scene="res://world/shared/test_hill/test_hill.tscn"
+run/main_scene="res://story/act1/greybox/act1_greybox.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
