@@ -28,6 +28,10 @@ var forage_field: ScatterField
 var decor_field: ScatterField
 var tree_field: ScatterField
 
+const MAGNET_STEP := 75.0
+const MAGNET_OFFSET := 18.0
+const MAGNET_HEIGHT := 14.0
+
 var _task := -1
 var _layers := {}
 
@@ -71,6 +75,112 @@ func build() -> void:
 	_finish()
 
 
+## Hero trees along the walks, one about every MAGNET_STEP m, so a magnet is
+## always in view ahead (experience bar 1.3): the region's signature blossom
+## tree, alternating with ancient oaks. Deterministic from the content.
+func _build_magnets() -> void:
+	if content.blight:
+		return
+	var blossom: StringName = &"woods_ancient_oak"
+	for d in content.decor:
+		if String(d.mesh_id) in ["woods_wild_cherry", "woods_lilac_tree", "woods_crab_apple", "woods_hawthorn"]:
+			blossom = d.mesh_id
+			break
+	var holder := Node3D.new()
+	holder.name = "Magnets"
+	add_child(holder)
+	var placed: Array[Vector2] = []
+	for lm in content.landmarks:
+		placed.append(lm.position)
+	var n := 0
+	for line in sightline_paths():
+		var walked := MAGNET_STEP * 0.5
+		for i in range(1, line.size()):
+			walked += line[i].distance_to(line[i - 1])
+			if walked < MAGNET_STEP:
+				continue
+			var dir := (line[i] - line[i - 1]).normalized()
+			var side := Vector2(-dir.y, dir.x) * (MAGNET_OFFSET if n % 2 == 0 else -MAGNET_OFFSET)
+			var p := line[i] + dir * 45.0 + side
+			if not content.owns(p) or content.in_anchor_clearing(p):
+				continue
+			var crowded := false
+			for q in placed:
+				crowded = crowded or q.distance_to(p) < MAGNET_STEP * 0.4
+			if crowded:
+				continue
+			var id := blossom if n % 2 == 0 else &"woods_ancient_oak"
+			var piece := _model(id)
+			_scale_to_height(piece, MAGNET_HEIGHT)
+			piece.name = "magnet_%02d" % n
+			piece.position = Vector3(p.x, WorldHeight.height_at(p.x, p.y), p.y)
+			piece.rotation.y = float(n) * 2.39
+			piece.add_to_group(&"magnet")
+			piece.set_meta(&"magnet_height", MAGNET_HEIGHT * 0.8)
+			holder.add_child(piece)
+			placed.append(p)
+			walked = 0.0
+			n += 1
+
+
+## Sightline checker hook (tools/sightline_check.gd): finish a pending build now.
+func build_now() -> void:
+	if is_built:
+		return
+	if _task >= 0:
+		WorkerThreadPool.wait_for_task_completion(_task)
+		_task = -1
+		_finish()
+	else:
+		build()
+
+
+## The walks a player takes here, for the sightline checker: a nearest-first
+## tour of the region's landmarks, story anchors and gates, cut where it
+## leaves our ground.
+func sightline_paths() -> Array[PackedVector2Array]:
+	var stops: Array[Vector2] = []
+	for lm in content.landmarks:
+		stops.append(lm.position)
+	for a in content.anchors:
+		stops.append(a["position"])
+	for g in content.gates:
+		stops.append(g["position"])
+	var out: Array[PackedVector2Array] = []
+	if stops.size() < 2:
+		return out
+	var tour: Array[Vector2] = [stops.pop_front()]
+	while not stops.is_empty():
+		var last: Vector2 = tour[-1]
+		var best := 0
+		for i in stops.size():
+			if stops[i].distance_to(last) < stops[best].distance_to(last):
+				best = i
+		tour.append(stops.pop_at(best))
+	var line := PackedVector2Array()
+	for i in tour.size() - 1:
+		var a: Vector2 = tour[i]
+		var b: Vector2 = tour[i + 1]
+		var steps := maxi(1, int(a.distance_to(b) / 10.0))
+		for k in steps:
+			var p := a.lerp(b, float(k) / steps)
+			if content.owns(p):
+				line.append(p)
+			elif line.size() > 1:
+				out.append(line)
+				line = PackedVector2Array()
+			else:
+				line.clear()
+	if line.size() > 1:
+		out.append(line)
+	return out
+
+
+## Horror zones are measured by their own bar (withdrawal), not by magnets.
+func sightline_skip(_x: float, _z: float) -> bool:
+	return content.blight
+
+
 func _generate() -> void:
 	_layers = {
 		"forage": CourtScatterGenerator.forage_layers(content),
@@ -95,6 +205,7 @@ func _finish() -> void:
 	decor_field = _field("Decor", small, SMALL_CHUNK)
 	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
 	_build_landmarks()
+	_build_magnets()
 	_build_anchors()
 	_build_water()
 	_build_fx()
