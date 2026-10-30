@@ -3,7 +3,7 @@
 # `meta` and the owner's words in `request`.
 #   task.sh add "<request>"       prints the next id
 #   task.sh start <id> <lane>     mark it being worked on
-#   task.sh set <id> <key> <val>  status, deps, branch...
+#   task.sh set <id> <key> <val>  status, deps, branch, model (sonnet|opus)...
 #   task.sh next-lane             prints a free lane, or nothing
 #   task.sh list                  open tasks; `list all` for everything
 set -u
@@ -57,7 +57,7 @@ case "${1:-}" in
 				case "$s" in merged|dropped) continue ;; esac
 			fi
 			id=$(kv_get "$m" id)
-			printf '%-6s %-10s %-7s %s\n' "$id" "$s" "$(kv_get "$m" lane)" \
+			printf '%-6s %-10s %-7s %-7s %s\n' "$id" "$s" "$(kv_get "$m" lane)" "$(kv_get "$m" model)" \
 				"$(head -1 "$TASKS/$id/request" | cut -c1-70)"
 		done ;;
 	*) echo "usage: task.sh add|start|set|next-lane|list" >&2; exit 2 ;;
