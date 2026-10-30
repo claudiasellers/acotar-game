@@ -56,6 +56,7 @@ func _ready() -> void:
 	hud.set_script(HUD_SCRIPT)
 	add_child(hud)
 	add_child(SettingsPanel.new())
+	add_child(GuideJournal.new())
 
 
 func _process(delta: float) -> void:
