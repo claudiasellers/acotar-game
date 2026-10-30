@@ -38,6 +38,10 @@ func _ready() -> void:
 	feyre = get_parent() as Feyre
 	bow = feyre.bow
 	_ensure_actions()
+	var reticle_layer := CanvasLayer.new()
+	reticle_layer.name = "AimReticle"
+	reticle_layer.add_child(AimReticle.new(self))
+	add_child(reticle_layer)
 	if Gameplay.inventory.count(&"bow_%s" % bow.id) == 0:
 		Gameplay.inventory.add(&"bow_%s" % bow.id)
 
@@ -177,11 +181,60 @@ func sway_degrees() -> float:
 	return bow.sway_degrees * draw_amount * mult + tremor
 
 
+## Where the muzzle sits right now.
+func muzzle() -> Vector3:
+	return feyre.global_position + Vector3.UP * 1.45 - feyre.model.global_basis.z * 0.45
+
+
+## Where an arrow released now would land (F5): the same gravity, drag and
+## wind as the real flight, stepped and ray-checked, before sway. `draw` < 0
+## uses the current draw, or a full draw when only aiming. The flight itself
+## stays real physics; this only shows the drop.
+func predict_impact(draw: float = -1.0) -> Dictionary:
+	if draw < 0.0:
+		draw = draw_amount if is_drawing else 1.0
+	var item := _available()
+	var d: ArrowData = arrow_data().get(item if item != &"" else FALLBACK_ARROW)
+	var wet := feyre.element_state != null and feyre.element_state.is_wet()
+	var speed := lerpf(bow.min_speed, bow.max_speed, draw) * (d.wet_speed_multiplier if wet and d else 1.0)
+	var drag := (d.drag * (d.wet_drag_multiplier if wet else 1.0)) if d else 0.0022
+	var from := muzzle()
+	var wind := get_tree().get_first_node_in_group(&"wind_source")
+	return BowController.predict_path(from, (feyre.aim_point() - from).normalized() * speed, drag,
+		feyre.get_world_3d().direct_space_state, [feyre.get_rid()], wind)
+
+
+## Steps a shot through the world until it hits something (or `max_time`).
+## Returns {"point", "hit": bool, "time", "collider"}.
+static func predict_path(from: Vector3, velocity: Vector3, drag: float, space: PhysicsDirectSpaceState3D,
+		exclude: Array[RID] = [], wind_source: Node = null, max_time: float = 3.0, dt: float = 1.0 / 60.0) -> Dictionary:
+	var gravity := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+	var p := from
+	var v := velocity
+	var t := 0.0
+	while t < max_time:
+		var wind := Vector3.ZERO
+		if wind_source and wind_source.has_method(&"wind_at"):
+			wind = wind_source.wind_at(p)
+		v = Ballistics.step(v, wind, drag, gravity, dt)
+		var next := p + v * dt
+		if space:
+			var query := PhysicsRayQueryParameters3D.create(p, next, Arrow.MASK_WORLD_AND_TARGETS, exclude)
+			var hit := space.intersect_ray(query)
+			if hit:
+				return {"point": hit.position, "hit": true, "time": t, "collider": hit.collider}
+		p = next
+		t += dt
+		if p.y < Arrow.KILL_DEPTH:
+			break
+	return {"point": p, "hit": false, "time": t, "collider": null}
+
+
 func release() -> Arrow:
 	var arrow_item := _available()
 	if arrow_item == &"" or Gameplay.inventory.remove(arrow_item, 1) == 0:
 		return null
-	var muzzle := feyre.global_position + Vector3.UP * 1.45 - feyre.model.global_basis.z * 0.45
+	var muzzle := muzzle()
 	var direction := (feyre.aim_point() - muzzle).normalized()
 	direction = _apply_sway(direction, sway_degrees())
 	var arrow := Arrow.create(arrow_data()[arrow_item])
