@@ -1,5 +1,6 @@
 ## Before/after shots for the landscape composition pass (needs a GPU or
-## lavapipe; not headless):
+## lavapipe; not headless; the Mac shot service runs it as a probe, see
+## docs/contracts/shots.md):
 ##   xvfb-run godot --rendering-driver vulkan res://tools/landscape/landscape_shot.tscn -- <shot_id> [out.png]
 ## Same set-up as tools/world_shot.gd, with fixed Spring Court cameras: eye
 ## level, raised (canopy massing) and straight down (plan view of the layout).
@@ -33,9 +34,10 @@ func _run() -> void:
 	var world: World = load("res://world/shared/world/world.tscn").instantiate()
 	root.add_child(world)
 	world.grade.swap_to(&"spring", 0.0)
-	# lavapipe turns bloom into white blobs with black specks; layout shots skip it.
-	var env: Environment = (world.get_node("WorldEnvironment") as WorldEnvironment).environment
-	env.glow_enabled = false
+	# lavapipe turns bloom into white blobs with black specks; only there is it switched off.
+	if RenderingServer.get_video_adapter_name().containsn("llvmpipe"):
+		var env: Environment = (world.get_node("WorldEnvironment") as WorldEnvironment).environment
+		env.glow_enabled = false
 	var eye_xz: Vector2 = shot[0]
 	var at_xz: Vector2 = shot[1]
 	var plan: float = shot[4]
@@ -64,6 +66,9 @@ func _run() -> void:
 			region.build_now()
 	for i in 60:
 		await get_tree().process_frame
+	# Look-tier shots on the Mac: let TAA, GI and streaming settle.
+	if OS.get_environment("SHOTS_QUALITY") == "look":
+		await get_tree().create_timer(4.0).timeout
 	root.get_texture().get_image().save_png(out)
 	var draw := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 	print("SHOT %s -> %s | draw_calls %d" % [id, out, draw])
