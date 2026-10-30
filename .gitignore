@@ -14,3 +14,4 @@ _generated/
 # Manor estate scatter layers: rebuilt by tools/manor_estate/gen_grounds.tscn (R15)
 world/spring_court/manor_estate/scatter/*.tres
 world/spring_court/manor_estate/scatter/layers.txt
+__pycache__/
