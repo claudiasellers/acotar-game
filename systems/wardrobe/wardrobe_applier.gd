@@ -64,12 +64,17 @@ func _attach_skinned(p: WardrobePiece, skeleton: Skeleton3D) -> void:
 	inst.free()
 
 
+## Tints the main fabric with the variant colour: the surface named "fabric",
+## else the first surface. Trims, pearls and belts keep their own colours.
 func _tint(mi: MeshInstance3D, color: Color) -> void:
-	for s in mi.get_surface_override_material_count():
-		var base := mi.mesh.surface_get_material(s)
-		var m: StandardMaterial3D = base.duplicate() if base is StandardMaterial3D else StandardMaterial3D.new()
-		m.albedo_color = color
-		mi.set_surface_override_material(s, m)
+	var target := 0
+	for s in mi.mesh.get_surface_count():
+		if (mi.mesh as ArrayMesh) and (mi.mesh as ArrayMesh).surface_get_name(s) == "fabric":
+			target = s
+	var base := mi.mesh.surface_get_material(target)
+	var m: BaseMaterial3D = base.duplicate() if base is BaseMaterial3D else StandardMaterial3D.new()
+	m.albedo_color = color
+	mi.set_surface_override_material(target, m)
 
 
 ## Simple shapes in the piece's colour on the placeholder capsule.
