@@ -1,3 +1,4 @@
+# gate: needs:terrain
 extends GutTest
 
 const WORLD := preload("res://world/shared/world/world.tscn")

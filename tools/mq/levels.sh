@@ -7,6 +7,9 @@
 #   levels.sh seed <name> <folder-with-outputs>   put an existing build in the cache
 # ensure, in order: same fingerprint here, nothing to do; in the cache, copy it
 # in; otherwise build it once for the machine, while other worktrees wait.
+# MQ_LEVELS_SKIP=name leaves one out, for the gate to build as its own line. It's
+# an environment setting so that a gate.conf using it still works under an older
+# installed copy of this script, which just builds everything.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/common.sh"
@@ -75,6 +78,8 @@ ensure_one() {
 	lockd="$MQ_LEVELCACHE/$name/$fp.lock"
 	while :; do
 		if [ -d "$MQ_LEVELCACHE/$name/$fp" ]; then
+			# No stamp until it's whole: a gate can kill this part way through.
+			rm -f "$stamp"
 			copy_in "$MQ_LEVELCACHE/$name/$fp" "$outs"
 			echo "$fp" > "$stamp"
 			return 0
@@ -83,6 +88,7 @@ ensure_one() {
 		if mq_lock_try "$lockd"; then break; fi
 		sleep 5
 	done
+	rm -f "$stamp"
 	mq_event BUILD "$name $fp"
 	log="$MQ_DIR/logs/build-$name-$fp.log"
 	mkdir -p "$MQ_DIR/logs"
@@ -119,7 +125,11 @@ case "${1:-}" in
 		for a in "$@"; do
 			case "$a" in --cached-only) CACHED_ONLY=1 ;; *) only="$a" ;; esac
 		done
-		visit() { [ -z "$only" ] || [ "$only" = "$1" ] || return 0; ensure_one "$@"; }
+		visit() {
+			[ -z "$only" ] || [ "$only" = "$1" ] || return 0
+			[ "${MQ_LEVELS_SKIP:-}" = "$1" ] && return 0
+			ensure_one "$@"
+		}
 		each_line visit ;;
 	check)
 		CHECK_FAILED=0
@@ -127,6 +137,10 @@ case "${1:-}" in
 		for g in tools/generators/*.gd; do
 			[ -f "$g" ] || continue
 			grep -q "$g" "$CONF" || { echo "levels: builder $g is not in generated.conf" >&2; CHECK_FAILED=1; }
+		done
+		# Only World loads the bake, so a test that loads it must wait for the build.
+		for t in $(grep -rlE 'world/shared/world/world\.tscn|load.*act1_game\.tscn' tests 2>/dev/null); do
+			grep -qE '^#* *gate: needs:terrain' "$t" || { echo "levels: $t loads the world: add a '# gate: needs:terrain' line" >&2; CHECK_FAILED=1; }
 		done
 		[ "$CHECK_FAILED" = 0 ] ;;
 	fingerprint)

@@ -595,10 +595,127 @@ case_push_off_holds() {
 	expect "lands once it is back on" in_main "$a"
 }
 
+# A slow build as a gate line. `late` passes only on the build of this very
+# commit; bake_secs is an input, so a slow build is a new one.
+bake_repo() { # name [file-on-base]
+	newrepo "$1" "${2:-}"
+	cat > tools/bake.sh <<'EOF'
+#!/bin/bash
+[ -f fail_bake ] && exit 1
+mkdir -p built; echo partial > built/content; echo $$ > built/pid
+sleep "$(cat bake_secs)"
+cat bake_input > built/content
+EOF
+	cat > tools/mq/gate.conf <<'EOF'
+first: parse = "$MQ_BIN/parse.sh"
+first: levels = MQ_LEVELS_SKIP=terrain "$MQ_BIN/levels.sh" ensure
+terrain = "$MQ_BIN/levels.sh" ensure terrain
+needs:terrain late = cmp built/content bake_input
+early = "$MQ_BIN/godot.sh" check a
+b = "$MQ_BIN/godot.sh" check b
+EOF
+	echo 'terrain | built | bash tools/bake.sh | tools/bake.sh bake_input bake_secs fail_bake' > tools/mq/generated.conf
+	echo 4 > bake_secs; echo one > bake_input; echo built/ > .gitignore
+	git add -A; git commit -q -m bake; git push -q origin HEAD:main
+	git checkout -q --detach origin/main
+	git -C "$REPO/.lanes/build" checkout -q --detach origin/main
+}
+
+in_build() { ( cd "$REPO/.lanes/build" && "$@" ); }
+commit_build() { in_build sh -c "$1; git add -A; git -c user.name=s -c user.email=s@example.invalid commit -q -m step"; }
+gate() { # out-name gate-args: the installed gate, in the build worktree
+	GATE_OUT="$ROOT/gate-$1"; shift
+	in_build /bin/bash "$REPO/.git/mq/bin/gate.sh" --out "$GATE_OUT" "$@"
+}
+said() { grep -q "^$1 $2 " "$GATE_OUT/results.txt"; }
+ran() { grep -q " $1 " "$GATE_OUT/results.txt"; }
+before() { # a b: a finished first
+	[ "$(grep -n " $1 " "$GATE_OUT/results.txt" | cut -d: -f1)" -lt "$(grep -n " $2 " "$GATE_OUT/results.txt" | cut -d: -f1)" ]
+}
+
+case_build_line_order() {
+	bake_repo order
+	commit_build 'mkdir tests; echo "# gate: needs:terrain" > tests/test_w.gd; : > tests/test_u.gd; echo "@gut tests" >> tools/mq/gate.conf'
+	gate cold; expect "gate passes" test "$?" = 0
+	expect "unmarked line doesn't wait" before b terrain
+	expect "unmarked gut test doesn't wait" before gut:tests/test_u.gd terrain
+	expect "marked line waits" before terrain late
+	expect "marked gut test waits" before terrain gut:tests/test_w.gd
+	# The old bake is still in the worktree: late has to see the new one.
+	commit_build 'echo two > bake_input'
+	gate stale; expect "a stale bake never reaches a marked line" test "$?" = 0
+	expect "unmarked still goes first" before b terrain
+	commit_build 'echo three > bake_input'
+	gate only --only late; expect "--only a marked line" test "$?" = 0
+	expect "builds first" before terrain late
+	expect "and runs nothing else" not ran b
+	commit_build 'echo four > bake_input'
+	gate bake --only terrain; expect "--only the build" test "$?" = 0
+	expect "just the build" not ran late
+	gate cached --only b; expect "--only an unmarked line" test "$?" = 0
+	expect "skips the build" not ran terrain
+}
+
+case_build_fail_fast() {
+	bake_repo fast
+	gate good; expect "base passes" test "$?" = 0
+	local good t0 secs
+	good=$(in_build git rev-parse HEAD)
+	commit_build 'echo two > bake_input; echo 30 > bake_secs; touch fail_a'
+	t0=$(date +%s)
+	gate bad; expect "a red test fails the gate" test "$?" = 1
+	secs=$(( $(date +%s) - t0 ))
+	expect "without waiting for the build (${secs}s)" test "$secs" -lt 15
+	expect "the build was stopped" not kill -0 "$(cat "$REPO/.lanes/build/built/pid")"
+	expect "named" grep -qx early "$GATE_OUT/failed"
+	# The killed build left half its output: the old commit mustn't trust it.
+	in_build git checkout -q --detach "$good"
+	gate back; expect "a killed build isn't taken for a good one" test "$?" = 0
+}
+
+case_build_fail_narrowed() {
+	bake_repo narrow
+	local a b c
+	a=$(change a file1); b=$(change b fail_bake); c=$(change c file3)
+	queue "$a" T1; queue "$b" T2; queue "$c" T3
+	start_lane; drain
+	expect "good one before it lands" in_main "$a"
+	expect "good one after it lands" in_main "$c"
+	expect "bad build rejected, as the build" grep -q 'REJECTED T2 failed terrain' .git/mq/events.log
+	expect "not landed" not in_main "$b"
+}
+
+case_build_known_red() {
+	bake_repo redbuild fail_bake
+	gate red --all; expect "red build fails" test "$?" = 1
+	expect "what needs it can't run" said BLOCKED late
+	expect "and isn't counted as red" not grep -qx late "$GATE_OUT/failed"
+	expect "the rest run" said PASS b
+	cp "$GATE_OUT/failed" "$ROOT/known"
+	gate known --known "$ROOT/known"; expect "known red doesn't fail" test "$?" = 0
+	expect "and still doesn't let it run" said BLOCKED late
+}
+
+case_needs_nothing() {
+	bake_repo typo
+	in_build sh -c 'echo "needs:terain x = true" >> tools/mq/gate.conf'
+	gate typo; expect "a need naming no line can't test" test "$?" = 3
+}
+
+case_marker_check() {
+	bake_repo marker
+	mkdir tests
+	echo 'preload("res://world/shared/world/world.tscn")' > tests/test_w.gd
+	expect "a test loading the world needs the mark" not tools/mq/levels.sh check
+	echo '# gate: needs:terrain' >> tests/test_w.gd
+	expect "marked is fine" tools/mq/levels.sh check
+}
+
 for c in bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
-		network_failure push_off_holds; do
+		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
+		build_known_red needs_nothing marker_check; do
 	scenario "$c"
 done
 echo "selftest: $PASSED passed, $FAILED failed"
