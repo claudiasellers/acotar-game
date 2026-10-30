@@ -12,6 +12,11 @@ branch="$lane/$name"
 
 [ -d "$wt" ] || { echo "mq: no worktree $wt (run setup_lanes.sh)" >&2; exit 1; }
 [ -d "$MQ_DIR/tasks/$task" ] || { echo "mq: no task $task" >&2; exit 1; }
+unmet=$("$here/task.sh" unmet "$task")
+if [ -n "$unmet" ]; then
+	echo "mq: REFUSED: $task waits on unmet deps: $unmet" >&2
+	exit 1
+fi
 if [ -n "$(git -C "$wt" status --porcelain)" ]; then
 	echo "mq: REFUSED: $lane has uncommitted work:" >&2
 	git -C "$wt" status --short >&2

@@ -556,6 +556,27 @@ EOF
 	expect "no local main written" not grep -Eq 'update-ref .*main|branch -f main|merge .*--ff-only' "$SRC/buildlane.sh"
 }
 
+case_task_deps() {
+	newrepo deps
+	local d1 d2 d3 before
+	d1=$(tools/mq/task.sh add "first"); d2=$(tools/mq/task.sh add "second"); d3=$(tools/mq/task.sh add "third")
+	tools/mq/task.sh set "$d2" deps "$d1 T999"
+	tools/mq/task.sh set "$d3" deps "$d1"
+	before=$(git -C .lanes/lane1 rev-parse HEAD)
+	expect "unmet dep refused" not tools/mq/lane.sh lane1 second "$d2"
+	expect "refusal names the dep" sh -c "tools/mq/lane.sh lane1 second $d2 2>&1 | grep -q $d1"
+	expect "task still open" grep -q '^status=open' ".git/mq/tasks/$d2/meta"
+	expect "no branch made" not git -C .lanes/lane1 rev-parse -q --verify refs/heads/lane1/second
+	expect "lane head unmoved" test "$(git -C .lanes/lane1 rev-parse HEAD)" = "$before"
+	expect "ready lists only eligible" test "$(tools/mq/task.sh ready | tr '\n' ' ')" = "$d1 "
+	tools/mq/task.sh set "$d1" status merged
+	expect "d3 ready after merge" test "$(tools/mq/task.sh ready | tr '\n' ' ')" = "$d3 "
+	expect "d3 starts" tools/mq/lane.sh lane1 third "$d3"
+	tools/mq/task.sh set "$d2" deps "$d1"
+	tools/mq/task.sh set "$d3" status dropped
+	expect "dropped counts as met" test "$(tools/mq/task.sh unmet "$d2")" = ""
+}
+
 case_network_failure() {
 	newrepo net
 	local a good
@@ -711,7 +732,7 @@ case_marker_check() {
 	expect "marked is fine" tools/mq/levels.sh check
 }
 
-for c in bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
+for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
