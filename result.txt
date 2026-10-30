@@ -1,0 +1,15 @@
+status ok
+request L09-5
+commit 9f041421e4544bc0730de3ef4c6769fbdb79dc26
+machine Claudias-Mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 6s: import 3s, generated content 3s (levels.sh)
+shot trail_opening ok exit=0 152s files=1
+shot trail_start ok exit=0 152s files=1
+shot trail_treeline ok exit=0 148s files=1
+shot doe_mid ok exit=0 152s files=1
+shot doe_raised ok exit=0 152s files=1
+answered 2026-10-30T23:29:27Z after 763s
