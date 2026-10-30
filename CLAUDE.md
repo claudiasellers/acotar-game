@@ -1,0 +1,96 @@
+# ACOTAR: The Spring Court
+
+The owner plays the game, types what they want changed, and keeps typing. Lane
+workers make the changes side by side and a script merges them. Nobody merges by
+hand, and `main` always passes its gate.
+
+## If you're the session the owner is typing to, you're the lead
+
+You never do the work and never wait for it.
+
+**At the start:** check whether another lead session is already open; only one
+owns the lanes. Run `tools/mq/setup_lanes.sh`, then `tools/mq/status.sh`. Spawn
+the lane workers as an agent team if that's available, otherwise as named
+background subagents (`.claude/agents/lane-worker.md`). Put any open tasks from
+`tools/mq/task.sh list` back on the list.
+
+**For every request:**
+- Make one task per separate change with `tools/mq/task.sh add "<request>"`, in
+  the owner's words plus what you know: where it is, which files, what done
+  looks like.
+- Reply in a line or two right away so they can keep going.
+- Things touching the same character, screen or file go in one task or get a
+  dependency, so two workers never edit one file.
+- If it's a question, just answer it. Don't act on it: "why isn't this on main?"
+  isn't "put it on main."
+- If it's unclear and costly to guess wrong, ask one short question.
+
+**While the team works:** tell the owner each thing submitted and each thing
+merged, unprompted, as it lands. Watch `.git/mq/events.log` for events; don't
+poll on a timer. On `REJECTED`, make a follow-up task and say so in one line.
+
+**Before saying anything is in the game,** check it's in `origin/main`:
+`git fetch origin && git merge-base --is-ancestor <sha> origin/main`.
+
+**Never:** edit code in the primary folder, check out `main`, push, or merge by
+hand.
+
+Use cheaper models for easy tasks and the lead's model only for shared or hard
+work. Start fresh workers at natural seams, with a short handover note. A message
+to a busy worker queues until its turn ends, so don't say a worker has heard
+something until you've checked. A worker waiting silently looks exactly like a
+worker working: workers end their turn to ask for a decision.
+
+## If you're a lane worker
+
+Follow `.claude/agents/lane-worker.md`.
+
+## If you're a cloud session
+
+You can't reach the home machine, so git carries the messages. Never run
+`submit.sh` or start a build lane.
+
+1. Finish on your own branch with `origin/main` merged in, and push.
+2. Push a branch at that exact commit: `git push origin <commit>:refs/heads/lead/ready-<TASK-ID>-<n>`.
+   This is the main form. Tags can also work (`ready/<TASK-ID>-<n>`), but tags
+   pushed from the cloud don't land reliably.
+3. Fetch the answer, a tag on the same commit:
+   `merged/<TASK-ID>-<n>` means it's in `origin/main`; `rejected/<TASK-ID>-<n>` is
+   annotated with why, what to do and the end of the failing log. Neither yet
+   means it's waiting or the machine is off. Nothing is lost.
+
+Never move or reuse a ready name. A resubmission takes the next number.
+
+## How the layout works
+
+| Where | What |
+|---|---|
+| `.lanes/lane1..4` | one task at a time, on `laneN/<name>` from `main` |
+| `.lanes/build` | the only place `main` is checked out; only the build lane touches it |
+| the repo folder | for playing, on a detached HEAD at `origin/main`; `make update` moves it |
+| `.git/mq/` | queue state, shared by every worktree, never committed |
+
+The build lane and the cleanup loop run from `.git/mq/bin/`, a copy that changes
+only when a change to `tools/mq/` merges. See `tools/mq/` and
+`tools/mq/selftest.sh` for the rules they keep. `.git/mq/config` holds
+`MQ_HOME_MACHINE=1`, which exists only on the Mac mini.
+
+## Things that are true about this project
+
+- Godot 4.7.2, typed GDScript. Run it through `tools/mq/godot.sh <args>`, never
+  the bare engine: that gives it a scratch data folder, no window and no audio.
+  Godot is not on PATH in scripts; `godot` is only a zsh alias.
+- Parse check: `tools/mq/parse.sh [files]`.
+- One test: `tools/mq/godot.sh -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://tests/unit/test_clock.gd`.
+- World smoke: `tools/mq/godot.sh -s tools/world_smoke.gd`, about 3.5 minutes. The
+  build lane runs it; a lane shouldn't.
+- The gate is `tools/mq/gate.conf`. Test files are found at run time, so adding
+  one needs no gate edit. The whole gate takes about 4 minutes at 4 jobs.
+- Built files are recipes in `tools/mq/generated.conf`, rebuilt by
+  `tools/mq/levels.sh ensure`. The terrain bake takes about 14 minutes and is
+  cached in `.git/levelcache/`. Never commit or hand-edit built files, including
+  anything under `_generated/` or `world/shared/terrain/data/`.
+- No Git LFS. Binaries go in plain git, because cloud sessions can't upload to the
+  LFS endpoint (see `.gitattributes`). Keep each file under 50 MB.
+- Heavy screenshots from the cloud go to the Mac's GPU: `docs/SHOTS.md`.
+- Style and lane rules: `docs/LANES.md`, `docs/contracts/`.

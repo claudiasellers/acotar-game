@@ -23,8 +23,8 @@ update: pull godot generate import
 pull:
 	@before=$$(git rev-parse HEAD); \
 	branch=$$(git rev-parse --abbrev-ref HEAD); \
-	if [ "$$branch" != "main" ]; then echo "On branch '$$branch', not main: skipping the pull."; exit 0; fi; \
-	git pull --rebase --quiet origin main || { echo "Pull failed (local changes?). Nothing was changed."; exit 1; }; \
+	if [ "$$branch" != "HEAD" ]; then echo "On branch '$$branch', not the detached play folder: skipping the pull."; exit 0; fi; \
+	git fetch --quiet origin main && git checkout --quiet --detach origin/main || { echo "Pull failed (local changes?). Nothing was changed."; exit 1; }; \
 	if command -v git-lfs >/dev/null 2>&1; then git lfs pull >/dev/null; else echo "git-lfs is missing (brew install git-lfs): art files may be pointers."; fi; \
 	after=$$(git rev-parse HEAD); \
 	if [ "$$before" = "$$after" ]; then echo "No new changes."; \

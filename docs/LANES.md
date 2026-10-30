@@ -4,12 +4,12 @@ Every lane (thread) follows these rules. The full plan is the project's build pl
 
 ## Branches and the build lane
 
-1. Work on your own branch, `lane/<topic>` (for example `lane/chemistry-hearth`). Never commit to `main`.
+1. Work on your own branch: `laneN/<topic>` on the home machine, `lane/<topic>` in the cloud. Never commit to `main`.
 2. Before handing off, run the import headless and **only the tests directly related to what you changed** (for example `godot --headless -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://tests/unit/test_phase_data.gd`). Never run the full suite in a feature lane.
 3. Every task starts with a written definition of done. Stop when it is met; do not keep retesting or polishing details.
 4. Screenshots only at milestones. Work in code and numbers otherwise.
-5. Message the build lane thread ("Build and merge game changes") with the branch name and a one-line summary.
-6. The build lane imports the project, runs **the full test suite** (it is the only lane that does) and an export build. If everything passes it merges to `main` and tells you. If anything fails it sends back what failed and why; fix it on the same branch and hand it back.
+5. Hand off through the queue, never by hand. Lanes on the home machine run `tools/mq/submit.sh HEAD <task>`. Cloud sessions merge `origin/main` in, push `lead/ready-<TASK>-<n>` at the finished commit, and read the answer from the tag `merged/<TASK>-<n>` or `rejected/<TASK>-<n>`. A resubmission takes the next number. See `CLAUDE.md`.
+6. The build lane is a script on the home machine. It takes everything waiting as one batch, runs **the full gate** (it is the only thing that does) and moves `main`. If a change fails it is rejected with the reason; fix it and submit again.
 
 ## Ownership
 
