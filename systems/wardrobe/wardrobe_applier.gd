@@ -74,6 +74,9 @@ func _attach_skinned(p: WardrobePiece, skeleton: Skeleton3D) -> void:
 		copy.name = "%s_%s" % [p.id, mesh_instance.name]
 		copy.set_meta(&"wardrobe", true)
 		_worn.add_child(copy)
+		# A skinned mesh draws in its own node's space, so it must sit where the
+		# skeleton does (her glTF root is turned 180° inside the model scene).
+		copy.global_transform = skeleton.global_transform
 		copy.skeleton = copy.get_path_to(skeleton)
 		_tint(copy, p.color)
 	inst.free()
