@@ -63,6 +63,6 @@ mv "$tmp" "$MQ_DIR/pending/$id.entry"
 mq_event SUBMITTED "$task ${sha:0:9} $(git log -1 --format=%s "$sha" | cut -c1-70)"
 echo "$id"
 
-if ! mq_buildlane_pid >/dev/null; then
+if ! mq_buildlane_pid >/dev/null && [ "$(mq_config MQ_SUBMIT_NO_START)" != 1 ]; then
 	"$here/setup_lanes.sh" --start
 fi
