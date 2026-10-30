@@ -58,8 +58,11 @@ func positions_for(entry: SpawnEntry, index: int) -> Array[Vector3]:
 	rng.seed = hash([seed, index, String(entry.id)])
 	var area := water_bounds if entry.on_water and water_bounds.has_area() else bounds
 	var out: Array[Vector3] = []
+	var anchors := _anchors(entry.near_group, area)
 	for g in entry.groups:
 		var c := Vector2(rng.randf_range(area.position.x, area.end.x), rng.randf_range(area.position.y, area.end.y))
+		if not anchors.is_empty():
+			c = anchors[(g + rng.randi()) % anchors.size()]
 		for n in entry.count:
 			var a := rng.randf() * TAU
 			var r := sqrt(rng.randf()) * entry.cluster_radius
@@ -67,6 +70,21 @@ func positions_for(entry: SpawnEntry, index: int) -> Array[Vector3]:
 			p = Vector2(clampf(p.x, area.position.x, area.end.x), clampf(p.y, area.position.y, area.end.y))
 			var y := water_level if entry.on_water else float(height_func.call(p.x, p.y)) + 0.2
 			out.append(Vector3(p.x, y, p.y))
+	return out
+
+
+## World x/z of the nodes in `group` inside `area`, sorted so placement stays seeded.
+func _anchors(group: StringName, area: Rect2) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	if group == &"" or not is_inside_tree():
+		return out
+	for node in get_tree().get_nodes_in_group(group):
+		var n := node as Node3D
+		if n:
+			var p := Vector2(n.global_position.x, n.global_position.z)
+			if area.has_point(p):
+				out.append(p)
+	out.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x or (a.x == b.x and a.y < b.y))
 	return out
 
 

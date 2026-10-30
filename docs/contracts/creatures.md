@@ -68,3 +68,9 @@ deer: `ing_venison` x3, `ing_hide`, `ing_sinew` x2 · hare: `ing_hare`, `ing_har
 - Glamour: household NPCs carry two GlamourLayers and swap to their true form when `glamour_lifted` rises. `wander_radius` > 0 strolls round the placed spot; dialogue and schedules belong to other lanes.
 - The Calanmai three (`high_fae_male`, `_2`, `_3`) use `calanmai_1..3`.
 - `CreatureSpawner` now positions nodes before they enter the tree, so `_ready()` sees the real home.
+
+## Horror contrast and beauty (experience bar §1.5, §2.4)
+- `DreadField` (`creatures/horror/dread_field.gd`, group `dread_field`) rides on the Bogge (45 m), naga (30 m), Attor (25 m) and wolves (40 m); world lanes drop `dread_field.tscn` at blighted places. As Feyre nears it sends `EventBus.mood_requested(&"dread", 0..1, 1.5)` (the strongest field wins) and `&"calm"` when she leaves; once inside, one `wrong_sound(at)` per visit (optional `wrong_sound_stream`). The grade itself (saturation ~0.4, 2-3 stops down, low fog) is the grade director's.
+- Ambient life withdraws by itself: swarms ease to zero and songbirds vanish within radius × 1.6 (`DreadField.withdrawal_at`). Crows stay. Box `no_birds_zone` volumes (the wall) count as full withdrawal.
+- Faelights and fireflies are soft round warm motes (`round_glow`, `ambient_glow.gdshader`), never squares. Swarm spawn entries cluster at nodes in group `landmark` (`SpawnEntry.near_group`) instead of sprinkling.
+- `tools/creatures/palette_check.py` fails on any lime-family material in the court creature/people models or swarm colours.

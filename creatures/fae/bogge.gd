@@ -29,6 +29,8 @@ func _ready() -> void:
 	if actor_id == &"":
 		actor_id = &"bogge"
 	super._ready()
+	# The Bogge's wood is the darkest place in the court (bible §1.5).
+	DreadField.attach(self, 45.0, 14.0)
 	_fog = FogVolume.new()
 	_fog.name = "Dark"
 	_fog.size = Vector3(5, 3, 5)

@@ -15,6 +15,7 @@ var _roam_timer: float = 0.0
 
 func _ready() -> void:
 	super._ready()
+	DreadField.attach(self, 40.0, 12.0)
 	if not pack_path.is_empty():
 		pack = get_node_or_null(pack_path) as WolfPack
 	if pack == null and get_parent() is WolfPack:

@@ -6,14 +6,16 @@
 [node name="Faelights" type="Node3D"]
 script = ExtResource("1")
 model_scene = ExtResource("2")
-count = 60
+count = 36
 radius = 12.0
 min_height = 0.4
-max_height = 4.0
+max_height = 2.6
 speed = 0.35
 scale_range = Vector2(0.8, 1.6)
-colors = PackedColorArray(1, 0.88, 0.55, 1, 0.75, 0.95, 1, 1, 0.95, 0.75, 1, 1, 0.8, 1, 0.85, 1)
+colors = PackedColorArray(0.988, 0.914, 0.651, 1, 0.949, 0.824, 0.478, 1, 0.98, 0.831, 0.863, 1, 0.984, 0.969, 0.949, 1)
 glow = 1.0
+round_glow = true
+glow_size = 0.32
 flap_speed = 22.0
 wing_span = 0.028
 shy_distance = 1.0

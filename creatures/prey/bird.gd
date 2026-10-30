@@ -13,6 +13,9 @@ var state: State = State.PECK
 var flight_target: Vector3
 
 var _peck_timer: float = 0.0
+## Near horror (DreadField) songbirds are simply gone; crows stay.
+var hushed: bool = false
+var _dread_left: float = 0.0
 var _flap: float = 0.0
 
 
@@ -43,6 +46,12 @@ func flush(threat: Vector3) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_dread_left -= delta
+	if _dread_left <= 0.0 and alive and data.kind != &"crow":
+		_dread_left = 1.0
+		hush(DreadField.withdrawal_at(get_tree(), global_position) > 0.5)
+	if hushed:
+		return
 	if not alive:
 		# Fall to the ground when shot out of the air.
 		if not is_on_floor():
@@ -54,6 +63,12 @@ func _physics_process(delta: float) -> void:
 			super._physics_process(delta)
 		State.FLY, State.LAND:
 			_fly(delta)
+
+
+func hush(on: bool) -> void:
+	hushed = on
+	visible = not on
+	collision_layer = 0 if on else Creature.TARGET_LAYER
 
 
 func _think(delta: float) -> void:

@@ -21,6 +21,7 @@ var _timer: float = 0.0
 
 func _ready() -> void:
 	super._ready()
+	DreadField.attach(self, 30.0, 10.0)
 	senses.sensed.connect(func(_k: StringName, _a: Vector3, _s: float) -> void:
 		if state == State.LURK and senses.awareness >= ambush_awareness:
 			attack())

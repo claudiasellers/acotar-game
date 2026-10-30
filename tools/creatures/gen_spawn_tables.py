@@ -138,6 +138,8 @@ def write(region, entries):
     for i, entry in enumerate(entries):
         eid, scene, count, groups, radius, start, end, water, canon = entry[:9]
         glamour = entry[9] if len(entry) > 9 else 0
+        # Swarms gather at landmarks (glades, follies, hero trees), not evenly.
+        near = "landmark" if scene in ("butterflies", "faelights", "fireflies") else ""
         lines += [
             f'[sub_resource type="Resource" id="e{i}"]',
             f'script = ExtResource("{entry_script}")',
@@ -151,6 +153,7 @@ def write(region, entries):
             f"on_water = {'true' if water else 'false'}",
             f'canon = "{canon}"',
             f"glamour = {glamour}",
+            f'near_group = &"{near}"',
             "",
         ]
     subs = ", ".join(f'SubResource("e{i}")' for i in range(len(entries)))

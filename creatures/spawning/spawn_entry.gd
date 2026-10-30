@@ -19,6 +19,10 @@ enum Glamour { ANY, GLAMOURED_ONLY, TRUE_FORM_ONLY }
 @export var glamour: Glamour = Glamour.ANY
 ## Spawn on the spawner's water surface (swans, sprites) instead of the ground.
 @export var on_water: bool = false
+## Cluster round nodes in this group inside the bounds (e.g. "landmark":
+## butterflies at the glades, not sprinkled evenly; bible §2.4). Falls back
+## to random points when none are there.
+@export var near_group: StringName = &""
 ## Lore confidence: "C", "C?" or "X" (engineering rule R7).
 @export var canon: String = "X"
 

@@ -21,6 +21,7 @@ end_hour = 20.5
 on_water = false
 canon = "C"
 glamour = 0
+near_group = &""
 
 [sub_resource type="Resource" id="e1"]
 script = ExtResource("8")
@@ -34,6 +35,7 @@ end_hour = 20.5
 on_water = false
 canon = "C"
 glamour = 0
+near_group = &""
 
 [sub_resource type="Resource" id="e2"]
 script = ExtResource("8")
@@ -47,6 +49,7 @@ end_hour = 20.5
 on_water = false
 canon = "C"
 glamour = 0
+near_group = &""
 
 [sub_resource type="Resource" id="e3"]
 script = ExtResource("8")
@@ -60,6 +63,7 @@ end_hour = 19.0
 on_water = false
 canon = "X"
 glamour = 0
+near_group = &"landmark"
 
 [sub_resource type="Resource" id="e4"]
 script = ExtResource("8")
@@ -73,6 +77,7 @@ end_hour = 5.0
 on_water = false
 canon = "X"
 glamour = 0
+near_group = &"landmark"
 
 [sub_resource type="Resource" id="e5"]
 script = ExtResource("8")
@@ -86,6 +91,7 @@ end_hour = 0.0
 on_water = false
 canon = "C"
 glamour = 0
+near_group = &""
 
 [resource]
 script = ExtResource("1")

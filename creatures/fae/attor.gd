@@ -21,6 +21,7 @@ func _ready() -> void:
 	if actor_id == &"":
 		actor_id = &"attor"
 	super._ready()
+	DreadField.attach(self, 25.0, 8.0)
 
 
 func _mount_model(m: Node3D) -> void:

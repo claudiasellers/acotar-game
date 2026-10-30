@@ -6,6 +6,8 @@ class_name AmbientSwarm
 extends Node3D
 
 const FLUTTER := preload("res://creatures/ambient/ambient_flutter.gdshader")
+const GLOW := preload("res://creatures/ambient/ambient_glow.gdshader")
+const GROUP := &"ambient_swarm"
 
 ## A model whose first mesh is one flier: body along Z, wings out along X.
 @export var model_scene: PackedScene
@@ -24,6 +26,13 @@ const FLUTTER := preload("res://creatures/ambient/ambient_flutter.gdshader")
 @export var shy_distance: float = 1.6
 ## Beyond this distance from the camera the swarm stops updating and hides.
 @export var active_distance: float = 90.0
+## Draw each flier as a soft round mote of light instead of a winged mesh
+## (faelights, fireflies: warm, soft-edged, never square; bible §2.4).
+@export var round_glow: bool = false
+@export var glow_size: float = 0.09
+
+## 0 normal, 1 fully withdrawn near horror (DreadField); eased.
+var withdrawn: float = 0.0
 
 var multimesh: MultiMesh
 
@@ -31,9 +40,12 @@ var _instance: MultiMeshInstance3D
 var _seeds: PackedFloat32Array = PackedFloat32Array()
 var _time: float = 0.0
 var _update_left: float = 0.0
+var _dread_left: float = 0.0
+var _withdrawn_target: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	multimesh = MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.use_colors = true
@@ -45,10 +57,14 @@ func _ready() -> void:
 	_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_instance.visibility_range_end = active_distance
 	var mat := ShaderMaterial.new()
-	mat.shader = FLUTTER
-	mat.set_shader_parameter(&"glow", glow)
-	mat.set_shader_parameter(&"flap_speed", flap_speed)
-	mat.set_shader_parameter(&"wing_span", wing_span)
+	if round_glow:
+		mat.shader = GLOW
+		mat.set_shader_parameter(&"glow", maxf(glow, 0.5))
+	else:
+		mat.shader = FLUTTER
+		mat.set_shader_parameter(&"glow", glow)
+		mat.set_shader_parameter(&"flap_speed", flap_speed)
+		mat.set_shader_parameter(&"wing_span", wing_span)
 	_instance.material_override = mat
 	add_child(_instance)
 	var rng := RandomNumberGenerator.new()
@@ -64,6 +80,13 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	_dread_left -= delta
+	if _dread_left <= 0.0:
+		_dread_left = 1.0
+		set_withdrawn_target(DreadField.withdrawal_at(get_tree(), global_position))
+	if not is_equal_approx(withdrawn, _withdrawn_target):
+		withdrawn = move_toward(withdrawn, _withdrawn_target, delta * 0.5)
+		multimesh.visible_instance_count = int(round(count * (1.0 - withdrawn)))
 	_update_left -= delta
 	if _update_left > 0.0:
 		return
@@ -72,6 +95,11 @@ func _process(delta: float) -> void:
 	if camera and camera.global_position.distance_to(global_position) > active_distance:
 		return
 	_layout(_time)
+
+
+## Near horror the fliers thin out and are gone (they never pop: eased).
+func set_withdrawn_target(amount: float) -> void:
+	_withdrawn_target = clampf(amount, 0.0, 1.0)
 
 
 ## Where flier `i` is at time `t`, relative to the swarm. Smooth Lissajous
@@ -109,6 +137,10 @@ func _layout(t: float) -> void:
 
 
 func _flier_mesh() -> Mesh:
+	if round_glow:
+		var mote := QuadMesh.new()
+		mote.size = Vector2.ONE * glow_size
+		return mote
 	if model_scene:
 		var root := model_scene.instantiate()
 		var found := root.find_children("*", "MeshInstance3D", true, false)
