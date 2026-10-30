@@ -1,0 +1,8 @@
+from L09-landscape
+quality look
+size 1920x1080
+timeout 900
+shot bw_walk res://tools/landscape/landscape_shot.tscn bw_walk {out}/bw_walk.png
+shot bw_raised res://tools/landscape/landscape_shot.tscn bw_raised {out}/bw_raised.png
+shot bv_walk res://tools/landscape/landscape_shot.tscn bv_walk {out}/bv_walk.png
+shot bv_raised res://tools/landscape/landscape_shot.tscn bv_raised {out}/bv_raised.png
