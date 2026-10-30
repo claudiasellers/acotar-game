@@ -111,6 +111,23 @@ func test_r_recentres_the_camera_behind_her_quickly() -> void:
 	assert_almost_eq(f.camera_pitch(), Feyre.DEFAULT_PITCH, 0.02)
 
 
+func test_r_press_is_a_short_shift_the_short_way_round() -> void:
+	var f := _feyre()
+	f.model.rotation.y = 0.0
+	f.nudge_camera(-2.6, 0.0)
+	var start := f.camera_yaw()
+	var ev := InputEventAction.new()
+	ev.action = &"camera_recenter"
+	ev.pressed = true
+	f._unhandled_input(ev)
+	for i in 30:
+		f._process(1.0 / 60.0)
+	var turned := angle_difference(start, f.camera_yaw())
+	assert_almost_eq(absf(turned), deg_to_rad(f.recenter_max_turn), 0.02, "one press turns at most the cap")
+	assert_lt(absf(angle_difference(f.camera_yaw(), 0.0)), absf(angle_difference(start, 0.0)),
+			"and toward behind her, the short way")
+
+
 func test_recenter_is_bound_to_r_and_right_stick() -> void:
 	var keys := []
 	var buttons := []
