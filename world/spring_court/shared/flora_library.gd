@@ -134,6 +134,8 @@ const PLAIN_SPECIES := [&"boulder", &"mossy_rock", &"standing_stone", &"fallen_l
 static var _near: Dictionary = {}
 static var _far: Dictionary = {}
 static var _materials: Dictionary = {}
+static var _arrays: Dictionary = {}
+static var _arrays_lock := Mutex.new()
 
 
 static func look_of(species: StringName) -> StringName:
@@ -181,10 +183,10 @@ static func info(species: StringName) -> Dictionary:
 	return SPECIES.get(species, {})
 
 
-## The full-detail mesh for a species.
+## The full-detail mesh for a species. Main thread (creates GPU resources).
 static func mesh(species: StringName) -> Mesh:
 	if not _near.has(species):
-		_near[species] = _build(species, 1)
+		_near[species] = _to_mesh(species, arrays_for(species, 1))
 	return _near[species]
 
 
@@ -193,16 +195,38 @@ static func far_mesh(species: StringName) -> Mesh:
 	if info(species).get("layer", "") != "tree":
 		return null
 	if not _far.has(species):
-		_far[species] = _build(species, 0)
+		_far[species] = _to_mesh(species, arrays_for(species, 0))
 	return _far[species]
 
 
-static func _build(species: StringName, detail: int) -> ArrayMesh:
+## True once mesh() for this species costs no more than an ArrayMesh upload.
+static func has_mesh(species: StringName) -> bool:
+	return _near.has(species)
+
+
+## Surface arrays for a species at a detail level. Safe on worker threads:
+## region builders call this off the main thread so mesh() is cheap later.
+static func arrays_for(species: StringName, detail: int) -> Array:
+	var key := "%s:%d" % [species, detail]
+	_arrays_lock.lock()
+	var cached: Variant = _arrays.get(key)
+	_arrays_lock.unlock()
+	if cached != null:
+		return cached
 	var kit := MeshKit.new(hash(species))
 	var builder := "_b_" + String(species)
 	assert(_has_builder(builder), "No mesh builder for %s" % species)
 	Callable(FloraLibrary, builder).call(kit, detail)
-	var m := kit.commit()
+	var arrays := kit.commit_arrays()
+	_arrays_lock.lock()
+	_arrays[key] = arrays
+	_arrays_lock.unlock()
+	return arrays
+
+
+static func _to_mesh(species: StringName, arrays: Array) -> ArrayMesh:
+	var m := ArrayMesh.new()
+	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	m.surface_set_material(0, material(look_of(species)))
 	return m
 

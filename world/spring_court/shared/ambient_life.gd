@@ -18,6 +18,13 @@ const DAY_ONLY := ["butterflies", "songbirds", "dragonflies"]
 
 var def: WoodsRegionDef
 var bounds: Rect2
+## False when a region builder adds the effects one per job (add_effect).
+var build_effects := true
+
+const VISIBILITY := AABB(Vector3(-40, -10, -40), Vector3(80, 40, 80))
+
+## effect id -> [process material, draw mesh, amount, lifetime], shared.
+static var _kits: Dictionary = {}
 
 var _systems: Dictionary = {}
 var _biomes: Dictionary = {}
@@ -27,12 +34,31 @@ var current_biome: StringName
 
 func _ready() -> void:
 	_biomes = def.biome_map()
-	for id in EFFECTS:
-		var p := _make(id)
-		p.name = id.capitalize().replace(" ", "")
-		p.emitting = false
-		add_child(p)
-		_systems[id] = p
+	if build_effects:
+		for id in EFFECTS:
+			add_effect(id)
+
+
+func add_effect(id: String) -> void:
+	# Materials are shared across regions: binding a new particle process
+	# material compiles its shader (~4 ms), reusing one costs nothing.
+	if not _kits.has(id):
+		var made := _make(id)
+		_kits[id] = [made.process_material, made.draw_pass_1, made.amount, made.lifetime]
+		made.free()
+	var kit: Array = _kits[id]
+	var p := GPUParticles3D.new()
+	p.process_material = kit[0]
+	p.draw_pass_1 = kit[1]
+	p.amount = kit[2]
+	p.lifetime = kit[3]
+	p.preprocess = kit[3]
+	p.local_coords = false
+	p.visibility_aabb = VISIBILITY
+	p.name = id.capitalize().replace(" ", "")
+	p.emitting = false
+	add_child(p)
+	_systems[id] = p
 
 
 func _process(delta: float) -> void:
@@ -81,8 +107,6 @@ func _make(id: String) -> GPUParticles3D:
 	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	mat.gravity = Vector3.ZERO
 	p.process_material = mat
-	p.local_coords = false
-	p.visibility_aabb = AABB(Vector3(-40, -10, -40), Vector3(80, 40, 80))
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.06, 0.06)
 	var draw := StandardMaterial3D.new()

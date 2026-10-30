@@ -1,19 +1,29 @@
 ## The Border Woods: the first sight of the Spring Court past the Wall.
 extends WoodsRegion
 
+static var _spray: Array = []
+
+var _ford := Vector2.ZERO
+
+
+func _prepare_extra() -> void:
+	_ford = _ford_point()
+
+
+func _water_ribbons() -> Array:
+	var river := resample(clip_to_bounds(MacroHeight.THORNWATER, 40.0), 4.0)
+	if river.size() < 2:
+		return []
+	return [["Thornwater", ribbon_arrays(river, MacroHeight.RIVER_HALF_WIDTH + 12.0, thornwater_level), false]]
+
 
 func _build_water(parent: Node3D) -> void:
-	var river := resample(clip_to_bounds(MacroHeight.THORNWATER, 40.0), 4.0)
-	if river.size() > 1:
-		var ribbon := make_water_ribbon(river, MacroHeight.RIVER_HALF_WIDTH + 12.0, thornwater_level)
-		ribbon.name = "Thornwater"
-		parent.add_child(ribbon)
 	var hollow := Vector2(BorderWoodsTerrain.FAELIGHT_HOLLOW.x, BorderWoodsTerrain.FAELIGHT_HOLLOW.y)
 	var pool_level := WorldHeight.height_at(hollow.x, hollow.y) + 0.8
 	var pool := make_pond(Vector3(hollow.x, pool_level, hollow.y - 12.0), 24.0)
 	pool.name = "FaelightPool"
 	parent.add_child(pool)
-	_build_rainbow_falls(parent, pool_level)
+	defer(_build_rainbow_falls.bind(parent, pool_level))
 
 
 ## Canon rainbow falls (ch. 23): a sheet of water off the bluff's lip into
@@ -62,6 +72,17 @@ func _build_rainbow_falls(parent: Node3D, pool_level: float) -> void:
 	spray.name = "Spray"
 	spray.amount = 160
 	spray.lifetime = 2.5
+	if _spray.is_empty():
+		_spray = _make_spray(width)
+	spray.process_material = _spray[0]
+	spray.draw_pass_1 = _spray[1]
+	spray.position = Vector3(lip.x, pool_level + 0.3, lip.y + 4.0)
+	falls.add_child(spray)
+
+
+## [process material, draw mesh] for the falls' spray, shared across loads:
+## binding a fresh process material compiles its shader (~4 ms).
+static func _make_spray(width: float) -> Array:
 	var pm := ParticleProcessMaterial.new()
 	pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	pm.emission_box_extents = Vector3(width * 0.6, 0.5, 1.5)
@@ -73,7 +94,6 @@ func _build_rainbow_falls(parent: Node3D, pool_level: float) -> void:
 	pm.color = Color(0.95, 0.97, 1.0, 0.35)
 	pm.scale_min = 6.0
 	pm.scale_max = 14.0
-	spray.process_material = pm
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.1, 0.1)
 	var dm := StandardMaterial3D.new()
@@ -82,9 +102,7 @@ func _build_rainbow_falls(parent: Node3D, pool_level: float) -> void:
 	dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	dm.vertex_color_use_as_albedo = true
 	quad.material = dm
-	spray.draw_pass_1 = quad
-	spray.position = Vector3(lip.x, pool_level + 0.3, lip.y + 4.0)
-	falls.add_child(spray)
+	return [pm, quad]
 
 
 static func thornwater_level(x: float, z: float) -> float:
@@ -95,7 +113,26 @@ func _build_landmarks(parent: Node3D) -> void:
 	var T := BorderWoodsTerrain
 	var oak := Vector2(T.GREAT_OAK.x, T.GREAT_OAK.y)
 	place_landmark(parent, "GreatOak", FloraLibrary.mesh(&"ancient_oak"), oak, 0.7, 2.3, 1.5)
-	# The moonstone ring: nine standing stones on a low rise.
+	# Each group is its own frame-budget job (see WoodsRegion.defer).
+	defer(_build_moonstone_ring.bind(parent))
+	defer(_build_crocus_knoll.bind(parent))
+	# The willow glen (ch. 23 flavour; the glamour-lift scene itself is
+	# anchored in blossom_vale by the story lane).
+	place_landmark(parent, "GreatWillow", FloraLibrary.mesh(&"willow"), T.WILLOW_GLEN, 0.4, 2.4, 1.0)
+	defer(_build_ford.bind(parent))
+	# A waystone where the ride north comes through the Wall.
+	place_landmark(parent, "WallGapWaystone", FloraLibrary.mesh(&"standing_stone"), T.WALL_GAP + Vector2(14.0, -40.0), 0.3, 1.6, 0.5)
+	defer(_build_hollow_roots.bind(parent))
+	var hunt := place_anchor(parent, "bogge_hunt_path", T.BOGGE_HUNT, 12.0,
+			"ch. 9-10: hunting with Lucien. 'Don't move, look straight ahead.' The Bogge passes behind them (bogge_survived).")
+	hunt.look_at(Vector3(T.BOGGE_HUNT_LOOK.x, hunt.position.y, T.BOGGE_HUNT_LOOK.y), Vector3.UP)
+	place_anchor(parent, "WallCrossingArrival", T.WALL_GAP + Vector2(0.0, -30.0), 30.0,
+			"Where the ride north comes out of the Wall into the Spring Court (wall_crossed).")
+
+
+## The moonstone ring: nine standing stones on a low rise.
+func _build_moonstone_ring(parent: Node3D) -> void:
+	var T := BorderWoodsTerrain
 	var ring_center := Vector2(T.MOONSTONE_RING.x, T.MOONSTONE_RING.y)
 	var ring := Node3D.new()
 	ring.name = "MoonstoneRing"
@@ -106,7 +143,11 @@ func _build_landmarks(parent: Node3D) -> void:
 		var a := TAU * i / 9.0
 		place_prop(ring, "Stone%d" % i, FloraLibrary.mesh(&"standing_stone"), ring_center + Vector2(cos(a), sin(a)) * 14.0,
 				a + PI * 0.5, 1.3 + 0.25 * sin(i * 2.1), 0.5)
-	# The crocus knoll: a sunny rise ringed by oaks "as tall as castle spires".
+
+
+## The crocus knoll: a sunny rise ringed by oaks "as tall as castle spires".
+func _build_crocus_knoll(parent: Node3D) -> void:
+	var T := BorderWoodsTerrain
 	var knoll := Vector2(T.CROCUS_KNOLL.x, T.CROCUS_KNOLL.y)
 	var oaks := Node3D.new()
 	oaks.name = "CrocusKnollOaks"
@@ -116,11 +157,11 @@ func _build_landmarks(parent: Node3D) -> void:
 	for i in 5:
 		var a := TAU * i / 5.0 + 0.3
 		place_prop(oaks, "Oak%d" % i, FloraLibrary.mesh(&"oak"), knoll + Vector2(cos(a), sin(a)) * 48.0, a, 2.0, 1.0)
-	# The willow glen (ch. 23 flavour; the glamour-lift scene itself is
-	# anchored in blossom_vale by the story lane).
-	place_landmark(parent, "GreatWillow", FloraLibrary.mesh(&"willow"), T.WILLOW_GLEN, 0.4, 2.4, 1.0)
-	# The ford: stepping stones where the woods road crosses the Thornwater.
-	var ford := _ford_point()
+
+
+## The ford: stepping stones where the woods road crosses the Thornwater.
+func _build_ford(parent: Node3D) -> void:
+	var ford := _ford
 	var stones := Node3D.new()
 	stones.name = "ThornwaterFord"
 	stones.add_to_group(&"landmark")
@@ -129,9 +170,11 @@ func _build_landmarks(parent: Node3D) -> void:
 	for i in 7:
 		var p := ford + Vector2(-12.0 + i * 4.0, (i % 2) * 1.2 - 0.6)
 		place_prop(stones, "Step%d" % i, FloraLibrary.mesh(&"boulder"), p, i * 0.9, 0.9, 0.0)
-	# A waystone where the ride north comes through the Wall.
-	place_landmark(parent, "WallGapWaystone", FloraLibrary.mesh(&"standing_stone"), T.WALL_GAP + Vector2(14.0, -40.0), 0.3, 1.6, 0.5)
-	# Faelight hollow: a ring of old roots around the pool.
+
+
+## Faelight hollow: a ring of old roots around the pool.
+func _build_hollow_roots(parent: Node3D) -> void:
+	var T := BorderWoodsTerrain
 	var hollow := Vector2(T.FAELIGHT_HOLLOW.x, T.FAELIGHT_HOLLOW.y)
 	var roots := Node3D.new()
 	roots.name = "FaelightHollowRoots"
@@ -141,11 +184,6 @@ func _build_landmarks(parent: Node3D) -> void:
 	for i in 6:
 		var a := TAU * i / 6.0
 		place_prop(roots, "Root%d" % i, FloraLibrary.mesh(&"root_arch"), hollow + Vector2(cos(a), sin(a)) * 22.0, a, 1.4)
-	var hunt := place_anchor(parent, "bogge_hunt_path", T.BOGGE_HUNT, 12.0,
-			"ch. 9-10: hunting with Lucien. 'Don't move, look straight ahead.' The Bogge passes behind them (bogge_survived).")
-	hunt.look_at(Vector3(T.BOGGE_HUNT_LOOK.x, hunt.position.y, T.BOGGE_HUNT_LOOK.y), Vector3.UP)
-	place_anchor(parent, "WallCrossingArrival", T.WALL_GAP + Vector2(0.0, -30.0), 30.0,
-			"Where the ride north comes out of the Wall into the Spring Court (wall_crossed).")
 
 
 func _ford_point() -> Vector2:

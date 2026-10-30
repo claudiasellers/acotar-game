@@ -22,11 +22,20 @@ eastern_woods,suriel_glade}*.tres` and `tools/woods/`. Built on
 - `WoodsScatter`: deterministic jittered-grid placement into `ScatterLayer`s.
   Nothing generated is committed except the small coverage reports
   (`tools/woods/write_woods_reports.gd` rewrites them).
-- `WoodsRegion`: generates on a worker thread, then builds three
-  `ScatterField`s (trees 256 m chunks with low-poly impostors, shrubs 128 m,
-  forage 64 m with the contract's forage metas), trunk colliders on the
-  physics server, water, landmarks, story anchors, `TerrainFallback`,
-  `DetailScatter` ground cover near Feyre and `AmbientLife`.
+- `WoodsRegion`: loads the baked cache (or generates) and prepares every
+  buffer, mesh array and heightmap on a worker thread, then builds in small
+  jobs under `FrameBudget` (4 ms of main-thread work per frame): three
+  `SlicedScatterField`s (trees 256 m chunks with low-poly impostors, shrubs
+  128 m, forage 64 m with the contract's forage metas), trunk colliders on
+  the physics server, water, landmarks, story anchors, `TerrainFallback`,
+  `DetailScatter` ground cover near Feyre and `AmbientLife`. Subclasses hand
+  slow parts to the budget with `defer()` and precompute on the worker in
+  `_water_ribbons()` / `_prepare_extra()`.
+- `tools/generators/woods_scatter.gd` (run by `make update`) bakes
+  `world/spring_court/<id>/_generated/woods_cache.res` (git-ignored). The
+  cache carries a fingerprint of the generator version, biome data and
+  terrain, so a stale cache is regenerated instead of trusted. Streaming a
+  region in with the cache takes ~2 s over ~300 frames instead of ~16 s.
 - `FloraLibrary`: ~80 procedural species and finds in the R3 storybook
   pastel look (oversized blooms), drawn with `woods_foliage.gdshader`
   (shared wind include, `magic_amount` sparkle, dread drain).
@@ -59,8 +68,8 @@ glade's naga backwater.
    `tests/integration/test_woods_region.gd`, `tools/world_smoke.gd -- spring_court`.
 
 ## Follow-ups
-- Bake scatter to a cache at export: a big region takes ~16 s to generate on
-  its worker thread (fine for streaming at 120 m margins, slow for a cold start).
+- The first GPU particle material of each kind compiles its shader once per
+  session (~4-10 ms in the dummy renderer); warm them on the loading screen.
 - CreatureSpawner per region once the creatures lane's spawner is on main.
 - Glamour layers (`glamour_lifted`) for the woods' fae once docs/contracts/glamour.md lands.
 - Swap any species for a Blender model by replacing its FloraLibrary builder.

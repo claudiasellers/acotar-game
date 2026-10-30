@@ -90,16 +90,24 @@ static func place(def: WoodsRegionDef, rect: Rect2, kind: String, seed_offset: i
 
 
 static func _make_layer(def: WoodsRegionDef, kind: String, id: StringName, instances: PackedFloat32Array) -> ScatterLayer:
+	var layer := layer_without_mesh(def, kind, id, instances)
+	var visual := _visual(def, kind, id)
+	layer.mesh = FloraLibrary.mesh(visual)
+	if kind == "tree":
+		layer.impostor_mesh = FloraLibrary.far_mesh(visual)
+	return layer
+
+
+## The layer's settings and instances, without GPU resources (thread-safe).
+static func layer_without_mesh(def: WoodsRegionDef, kind: String, id: StringName, instances: PackedFloat32Array) -> ScatterLayer:
 	var layer := ScatterLayer.new()
 	layer.instances = instances
 	var visual := _visual(def, kind, id)
-	layer.mesh = FloraLibrary.mesh(visual)
 	var info := FloraLibrary.info(visual)
 	match kind:
 		"tree":
 			layer.id = StringName("tree_" + String(id))
 			layer.draw_distance = TREE_DRAW
-			layer.impostor_mesh = FloraLibrary.far_mesh(visual)
 			layer.impostor_distance = TREE_IMPOSTOR
 			layer.cast_shadow = true
 			layer.wind = 0.35
@@ -120,6 +128,10 @@ static func _make_layer(def: WoodsRegionDef, kind: String, id: StringName, insta
 
 
 ## The FloraLibrary species that draws `id`.
+static func visual_of(def: WoodsRegionDef, kind: String, id: StringName) -> StringName:
+	return _visual(def, kind, id)
+
+
 static func _visual(def: WoodsRegionDef, kind: String, id: StringName) -> StringName:
 	if kind == "forage":
 		return def.forage_visuals.get(id, &"odd_stone")

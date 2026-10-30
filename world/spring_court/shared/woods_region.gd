@@ -1,17 +1,19 @@
 ## Root of a woods region scene (docs/contracts/world.md §3): positioned at
 ## world coordinates, content only (no sky, sun or environment).
 ##
-## Everything is generated from the region's WoodsRegionDef and height
-## provider with fixed seeds (R15): the heavy point placement runs on a
-## worker thread, then the node tree is built on the main thread:
+## Streaming cost (no hitches): everything heavy happens on a worker thread:
+## loading the baked cache from `make update` (WoodsScatterCache) or, if it is
+## missing or stale, generating placements with fixed seeds (R15); building
+## mesh arrays, MultiMesh buffers, terrain chunk arrays and collider lists.
+## The main thread then only turns prepared data into nodes, one small job at
+## a time under FrameBudget (4 ms per frame, shared by all builders):
 ##   TerrainFallback   stand-in chunk meshes + collision until Terrain3D lands
-##   Trees/Shrubs/Forage   ScatterFields (chunked MultiMeshes; forage chunks
-##                     carry the contract's forage_field metas)
+##   Trees/Shrubs/Forage   SlicedScatterFields (forage chunks carry the
+##                     contract's forage_field metas)
 ##   TrunkColliders    one static body per chunk, shapes added on the server
-##   Water             river/stream ribbons and pond surfaces
+##   Water, Landmarks  rivers, ponds, falls; named places and story anchors
 ##   GroundCover       DetailScatter: dense flowers and grass near Feyre
 ##   AmbientLife       particles and small creatures driven by the biome
-##   Landmarks         named places, built by the subclass
 class_name WoodsRegion
 extends Node3D
 
@@ -25,6 +27,11 @@ const CHUNK_FORAGE := WoodsScatter.CHUNK_FORAGE
 const EXTRA_DRAW_CALLS := 260
 const TERRAIN_STEP := 2.0
 const TERRAIN_CHUNK := 64.0
+const KINDS := ["tree", "shrub", "forage"]
+const COLLIDER_BATCH := 16
+## Meshes landmarks and props use; warmed on the worker with the scatter's.
+const PROP_SPECIES: Array[StringName] = [&"ancient_oak", &"oak", &"beech", &"willow", &"silver_birch",
+		&"standing_stone", &"boulder", &"root_arch", &"twisted_dead", &"pale_fungus", &"bone_charm", &"thornbriar"]
 const WATER_SHADER := preload("res://world/spring_court/shared/woods_water.gdshader")
 
 @export var def: WoodsRegionDef
@@ -32,16 +39,22 @@ const WATER_SHADER := preload("res://world/spring_court/shared/woods_water.gdsha
 @export var build_terrain_fallback := true
 @export var build_ground_cover := true
 @export var build_ambient_life := true
+## Use the baked cache from `make update` when it matches.
+@export var use_cache := true
 
 var bounds: Rect2
 var layers: Array[ScatterLayer] = []
 var landmark_count := 0
 var is_built := false
+## True when this load came from the baked cache.
+var used_cache := false
 
 var _task_id := -1
-var _placements: Dictionary = {}
-var _heights := PackedFloat32Array()
-var _colors := PackedColorArray()
+var _fingerprint := ""
+var _prepared: Dictionary = {}
+var _jobs: Array[Callable] = []
+var _fields: Dictionary = {}
+var _terrain_mat: StandardMaterial3D
 var _grid := Vector2i.ZERO
 
 
@@ -50,19 +63,21 @@ func _ready() -> void:
 		push_error("WoodsRegion '%s' has no def" % name)
 		return
 	bounds = def.provider.BOUNDS
-	# Warm the static noise/feature caches on this thread before the worker
-	# reads them.
-	WorldHeight.height_at(bounds.get_center().x, bounds.get_center().y)
-	def.provider.biome_at(bounds.get_center().x, bounds.get_center().y)
-	_task_id = WorkerThreadPool.add_task(_generate, false, "woods:%s" % def.region_id)
-	set_process(true)
+	# Warm the static noise/feature caches here before the worker reads them,
+	# and fingerprint the inputs so a stale cache is never trusted.
+	_fingerprint = WoodsScatterCache.fingerprint_for(def)
+	_task_id = WorkerThreadPool.add_task(_prepare, false, "woods:%s" % def.region_id)
 
 
 func _process(_delta: float) -> void:
-	if _task_id >= 0 and WorkerThreadPool.is_task_completed(_task_id):
+	if _task_id >= 0:
+		if not WorkerThreadPool.is_task_completed(_task_id):
+			return
 		WorkerThreadPool.wait_for_task_completion(_task_id)
 		_task_id = -1
-		_build()
+		_queue_jobs()
+	if not _jobs.is_empty() and FrameBudget.run(_jobs) == 0:
+		_finish()
 
 
 func _exit_tree() -> void:
@@ -77,70 +92,358 @@ func coverage_report() -> Dictionary:
 			WoodsScatter.estimate_draw_calls(layers, bounds, EXTRA_DRAW_CALLS))
 
 
-## Builds synchronously (tests and tools).
+## Builds synchronously, ignoring the frame budget (tests and tools).
 func build_now() -> void:
 	if is_built:
 		return
 	if _task_id >= 0:
 		WorkerThreadPool.wait_for_task_completion(_task_id)
 		_task_id = -1
-	elif _placements.is_empty():
-		_generate()
-	_build()
+	elif _prepared.is_empty():
+		if _fingerprint.is_empty():
+			_fingerprint = WoodsScatterCache.fingerprint_for(def)
+		_prepare()
+	if _jobs.is_empty():
+		_queue_jobs()
+	while not _jobs.is_empty():
+		_jobs.pop_front().call()
+	_finish()
 
 
-func _generate() -> void:
-	for kind in ["tree", "shrub", "forage"]:
-		_placements[kind] = WoodsScatter.place(def, bounds, kind)
-	if build_terrain_fallback:
-		_sample_terrain()
+## Generates everything the generator bakes (pure data; any thread).
+static func generate_cache(region_def: WoodsRegionDef, fingerprint: String, with_terrain: bool = true) -> WoodsScatterCache:
+	var cache := WoodsScatterCache.new()
+	cache.fingerprint = fingerprint
+	var rect: Rect2 = region_def.provider.BOUNDS
+	for kind in KINDS:
+		cache.placements[kind] = WoodsScatter.place(region_def, rect, kind)
+	if with_terrain:
+		_sample_terrain(region_def, rect, cache)
+	return cache
 
 
-func _build() -> void:
-	if is_built:
-		return
-	set_process(false)
-	layers.clear()
-	var fields := {"tree": [], "shrub": [], "forage": []}
-	for kind in ["tree", "shrub", "forage"]:
-		var points: Dictionary = _placements[kind]
+# ------------------------------------------------------------ worker side --
+
+func _prepare() -> void:
+	var cache: WoodsScatterCache = null
+	var path := WoodsScatterCache.path_for(def.region_id)
+	if use_cache and ResourceLoader.exists(path):
+		cache = ResourceLoader.load(path) as WoodsScatterCache
+		if cache != null and (cache.fingerprint != _fingerprint or (build_terrain_fallback and cache.heights.is_empty())):
+			cache = null
+	used_cache = cache != null
+	if cache == null:
+		cache = generate_cache(def, _fingerprint, build_terrain_fallback)
+	var out := {"layers": [], "chunks": [], "terrain": [], "colliders": {}}
+	var species := {}
+	for kind in KINDS:
+		var points: Dictionary = cache.placements[kind]
 		var ids := points.keys()
 		ids.sort()
 		for id: StringName in ids:
-			var layer := WoodsScatter._make_layer(def, kind, id, points[id])
-			layers.append(layer)
-			fields[kind].append(layer)
+			var layer := WoodsScatter.layer_without_mesh(def, kind, id, points[id])
+			var visual := WoodsScatter.visual_of(def, kind, id)
+			species[visual] = kind
+			out["layers"].append([kind, layer, visual])
+			var size: float = {"tree": CHUNK_TREE, "shrub": CHUNK_SHRUB, "forage": CHUNK_FORAGE}[kind]
+			for chunk in SlicedScatterField.prepare(layer, size):
+				out["chunks"].append([kind, layer, chunk])
+			if kind != "forage":
+				_collect_colliders(layer, visual, out["colliders"])
+	# Mesh arrays now, so mesh() on the main thread is only an upload.
+	for visual in PROP_SPECIES:
+		if FloraLibrary.has(visual) and not species.has(visual):
+			species[visual] = FloraLibrary.info(visual).get("layer", "")
+	for visual: StringName in species:
+		FloraLibrary.arrays_for(visual, 1)
+		if species[visual] == "tree":
+			FloraLibrary.arrays_for(visual, 0)
 	if build_terrain_fallback:
-		_build_terrain()
-	_add_field("Trees", fields["tree"], CHUNK_TREE)
-	_add_field("Shrubs", fields["shrub"], CHUNK_SHRUB)
-	_add_field("Forage", fields["forage"], CHUNK_FORAGE)
-	_build_trunk_colliders(fields["tree"] + fields["shrub"])
+		_grid = cache.grid
+		out["terrain"] = _terrain_chunks(cache)
+	out["ribbons"] = _water_ribbons()
+	_prepare_extra()
+	_prepared = out
+
+
+static func _sample_terrain(region_def: WoodsRegionDef, rect: Rect2, cache: WoodsScatterCache) -> void:
+	var grid := Vector2i(int(rect.size.x / TERRAIN_STEP) + 1, int(rect.size.y / TERRAIN_STEP) + 1)
+	cache.grid = grid
+	cache.heights.resize(grid.x * grid.y)
+	cache.colors.resize(grid.x * grid.y * 3)
+	var biomes := region_def.biome_map()
+	var provider: Variant = region_def.provider
+	for iz in grid.y:
+		for ix in grid.x:
+			var x := rect.position.x + ix * TERRAIN_STEP
+			var z := rect.position.y + iz * TERRAIN_STEP
+			var i := iz * grid.x + ix
+			cache.heights[i] = WorldHeight.height_at(x, z)
+			var b: WoodsBiome = biomes.get(provider.biome_at(x, z))
+			var col := Color(0.45, 0.66, 0.36) if b == null else b.ground_color.lerp(b.ground_color_alt, 0.5 + 0.5 * sin(x * 0.05) * cos(z * 0.043))
+			if provider.clearance(x, z) < 0.2:
+				col = col.lerp(Color(0.72, 0.62, 0.50), 0.55)
+			if provider.is_water(x, z):
+				col = Color(0.42, 0.40, 0.34)
+			col = col.darkened(0.22)
+			cache.colors[i * 3] = col.r8
+			cache.colors[i * 3 + 1] = col.g8
+			cache.colors[i * 3 + 2] = col.b8
+
+
+## Terrain chunk arrays + per-chunk height maps: Array of
+## [name, mesh arrays, heightmap data, width, depth, centre].
+func _terrain_chunks(cache: WoodsScatterCache) -> Array:
+	var out := []
+	var per := int(TERRAIN_CHUNK / TERRAIN_STEP)
+	for cz in range(0, _grid.y - 1, per):
+		for cx in range(0, _grid.x - 1, per):
+			var w := mini(per, _grid.x - 1 - cx)
+			var d := mini(per, _grid.y - 1 - cz)
+			var verts := PackedVector3Array()
+			var normals := PackedVector3Array()
+			var colors := PackedColorArray()
+			var indices := PackedInt32Array()
+			var hmap := PackedFloat32Array()
+			for iz in d + 1:
+				for ix in w + 1:
+					var gx := cx + ix
+					var gz := cz + iz
+					var h := _h(cache.heights, gx, gz)
+					hmap.append(h)
+					verts.append(Vector3(bounds.position.x + gx * TERRAIN_STEP, h, bounds.position.y + gz * TERRAIN_STEP))
+					var nx := _h(cache.heights, gx - 1, gz) - _h(cache.heights, gx + 1, gz)
+					var nz := _h(cache.heights, gx, gz - 1) - _h(cache.heights, gx, gz + 1)
+					normals.append(Vector3(nx, 2.0 * TERRAIN_STEP, nz).normalized())
+					var ci := (gz * _grid.x + gx) * 3
+					colors.append(Color8(cache.colors[ci], cache.colors[ci + 1], cache.colors[ci + 2]))
+			for iz in d:
+				for ix in w:
+					var i := iz * (w + 1) + ix
+					indices.append_array(PackedInt32Array([i, i + 1, i + w + 1, i + 1, i + w + 2, i + w + 1]))
+			var arrays := []
+			arrays.resize(Mesh.ARRAY_MAX)
+			arrays[Mesh.ARRAY_VERTEX] = verts
+			arrays[Mesh.ARRAY_NORMAL] = normals
+			arrays[Mesh.ARRAY_COLOR] = colors
+			arrays[Mesh.ARRAY_INDEX] = indices
+			var centre := Vector3(bounds.position.x + (cx + w * 0.5) * TERRAIN_STEP, 0.0,
+					bounds.position.y + (cz + d * 0.5) * TERRAIN_STEP)
+			out.append(["Chunk_%d_%d" % [cx / per, cz / per], arrays, hmap, w + 1, d + 1, centre])
+	return out
+
+
+func _h(heights: PackedFloat32Array, gx: int, gz: int) -> float:
+	return heights[clampi(gz, 0, _grid.y - 1) * _grid.x + clampi(gx, 0, _grid.x - 1)]
+
+
+## Trunk and rock colliders grouped by chunk: { key: [[radius, position], ...] }.
+static func _collect_colliders(layer: ScatterLayer, visual: StringName, into: Dictionary) -> void:
+	var radius: float = FloraLibrary.info(visual).get("radius", 0.0)
+	if radius <= 0.0:
+		return
+	for i in layer.count():
+		var o := i * ScatterLayer.STRIDE
+		var p := Vector3(layer.instances[o], layer.instances[o + 1], layer.instances[o + 2])
+		var key := Vector2i(floori(p.x / CHUNK_SHRUB), floori(p.z / CHUNK_SHRUB))
+		if not into.has(key):
+			into[key] = []
+		into[key].append([snappedf(radius * layer.instances[o + 4], 0.1), p])
+
+
+# -------------------------------------------------------------- main side --
+
+## Turns prepared data into small jobs for FrameBudget.
+func _queue_jobs() -> void:
+	_jobs.clear()
+	layers.clear()
+	var visuals := {}
+	for entry in _prepared["layers"]:
+		layers.append(entry[1])
+		visuals[entry[2]] = entry[0]
+	for visual in PROP_SPECIES:
+		if FloraLibrary.has(visual) and not visuals.has(visual):
+			visuals[visual] = FloraLibrary.info(visual).get("layer", "")
+	for visual: StringName in visuals:
+		_jobs.append(_job_mesh.bind(visual, visuals[visual] == "tree"))
+	for entry in _prepared["layers"]:
+		_jobs.append(_job_assign_mesh.bind(entry[1], entry[2], entry[0] == "tree"))
+	if build_terrain_fallback:
+		_jobs.append(_job_terrain_root)
+		for chunk in _prepared["terrain"]:
+			_jobs.append(_job_terrain_chunk.bind(chunk))
+	_jobs.append(_job_fields)
+	for entry in _prepared["chunks"]:
+		_jobs.append(_job_scatter_chunk.bind(entry[0], entry[1], entry[2]))
+	_jobs.append(_job_collider_root)
+	for key: Vector2i in _prepared["colliders"]:
+		var entries: Array = _prepared["colliders"][key]
+		# Small bodies: Jolt rebuilds a body's compound shape on every add,
+		# so one big body per chunk costs tens of ms.
+		for b in range(0, entries.size(), COLLIDER_BATCH):
+			_jobs.append(_job_colliders.bind("Trunks_%d_%d_%d" % [key.x, key.y, b / COLLIDER_BATCH],
+					entries.slice(b, b + COLLIDER_BATCH)))
+	_jobs.append(_job_water)
+	for ribbon in _prepared["ribbons"]:
+		_jobs.append(_job_ribbon.bind(ribbon))
+	_jobs.append(_job_landmarks)
+	if build_ground_cover:
+		_jobs.append(_job_ground_cover)
+	if build_ambient_life:
+		_jobs.append(_job_ambient)
+		for id in AmbientLife.EFFECTS:
+			_jobs.append(_job_ambient_effect.bind(id))
+
+
+func _finish() -> void:
+	if is_built:
+		return
+	_prepared.clear()
+	is_built = true
+	set_process(false)
+	built.emit()
+
+
+func _job_mesh(visual: StringName, tree: bool) -> void:
+	FloraLibrary.mesh(visual)
+	if tree:
+		FloraLibrary.far_mesh(visual)
+
+
+func _job_assign_mesh(layer: ScatterLayer, visual: StringName, tree: bool) -> void:
+	layer.mesh = FloraLibrary.mesh(visual)
+	if tree:
+		layer.impostor_mesh = FloraLibrary.far_mesh(visual)
+
+
+func _job_fields() -> void:
+	for kind in KINDS:
+		var field := SlicedScatterField.new()
+		field.name = {"tree": "Trees", "shrub": "Shrubs", "forage": "Forage"}[kind]
+		field.region_id = def.region_id
+		field.chunk_size = {"tree": CHUNK_TREE, "shrub": CHUNK_SHRUB, "forage": CHUNK_FORAGE}[kind]
+		var typed: Array[ScatterLayer] = []
+		for l in layers:
+			if l.id.begins_with(kind + "_"):
+				typed.append(l)
+		field.layers = typed
+		add_child(field)
+		_fields[kind] = field
+
+
+func _job_scatter_chunk(kind: String, layer: ScatterLayer, chunk: Array) -> void:
+	(_fields[kind] as SlicedScatterField).add_chunk(layer, chunk[0], chunk[1], chunk[2])
+
+
+func _job_terrain_root() -> void:
+	var root := Node3D.new()
+	root.name = "TerrainFallback"
+	add_child(root)
+	_terrain_mat = StandardMaterial3D.new()
+	_terrain_mat.vertex_color_use_as_albedo = true
+	_terrain_mat.vertex_color_is_srgb = true
+	_terrain_mat.roughness = 0.95
+
+
+func _job_terrain_chunk(chunk: Array) -> void:
+	var root := get_node("TerrainFallback")
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, chunk[1])
+	mesh.surface_set_material(0, _terrain_mat)
+	var mi := MeshInstance3D.new()
+	mi.name = chunk[0]
+	mi.mesh = mesh
+	root.add_child(mi)
+	var body := StaticBody3D.new()
+	body.name = String(chunk[0]) + "_Collision"
+	body.collision_layer = 1
+	var shape := HeightMapShape3D.new()
+	shape.map_width = chunk[3]
+	shape.map_depth = chunk[4]
+	shape.map_data = chunk[2]
+	var cs := CollisionShape3D.new()
+	cs.shape = shape
+	cs.scale = Vector3(TERRAIN_STEP, 1.0, TERRAIN_STEP)
+	cs.position = chunk[5]
+	body.add_child(cs)
+	root.add_child(body)
+
+
+func _job_collider_root() -> void:
+	var root := Node3D.new()
+	root.name = "TrunkColliders"
+	root.set_meta(&"shapes", {})
+	add_child(root)
+
+
+## Trunks and big rocks block Feyre. One static body per chunk; shapes go
+## straight to the physics server (no per-instance nodes, R16).
+func _job_colliders(body_name: String, entries: Array) -> void:
+	var root := get_node("TrunkColliders")
+	var shapes: Dictionary = root.get_meta(&"shapes")
+	var body := StaticBody3D.new()
+	body.name = body_name
+	body.collision_layer = 1
+	body.collision_mask = 0
+	root.add_child(body)
+	for e in entries:
+		var r: float = e[0]
+		if not shapes.has(r):
+			var cyl := CylinderShape3D.new()
+			cyl.radius = r
+			cyl.height = 5.0
+			shapes[r] = cyl
+		PhysicsServer3D.body_add_shape(body.get_rid(), shapes[r].get_rid(), Transform3D(Basis(), e[1] + Vector3.UP * 2.3))
+
+
+func _job_water() -> void:
 	var water := Node3D.new()
 	water.name = "Water"
 	add_child(water)
 	_build_water(water)
+
+
+func _job_ribbon(ribbon: Array) -> void:
+	var mi := ribbon_instance(ribbon[1], ribbon[2])
+	mi.name = ribbon[0]
+	get_node("Water").add_child(mi)
+
+
+func _job_landmarks() -> void:
 	var landmarks := Node3D.new()
 	landmarks.name = "Landmarks"
 	add_child(landmarks)
 	_build_landmarks(landmarks)
-	if build_ground_cover:
-		var cover := DetailScatter.new()
-		cover.name = "GroundCover"
-		cover.def = def
-		cover.bounds = bounds
-		add_child(cover)
-	if build_ambient_life:
-		var life := AmbientLife.new()
-		life.name = "AmbientLife"
-		life.def = def
-		life.bounds = bounds
-		add_child(life)
-	_placements.clear()
-	_heights = PackedFloat32Array()
-	_colors = PackedColorArray()
-	is_built = true
-	built.emit()
+
+
+func _job_ground_cover() -> void:
+	var cover := DetailScatter.new()
+	cover.name = "GroundCover"
+	cover.def = def
+	cover.bounds = bounds
+	add_child(cover)
+
+
+func _job_ambient() -> void:
+	var life := AmbientLife.new()
+	life.name = "AmbientLife"
+	life.def = def
+	life.bounds = bounds
+	life.build_effects = false
+	add_child(life)
+
+
+func _job_ambient_effect(id: String) -> void:
+	(get_node("AmbientLife") as AmbientLife).add_effect(id)
+
+
+## Subclass builders hand slow parts to the frame budget with this; outside
+## a build it runs the job at once.
+func defer(job: Callable) -> void:
+	if is_built:
+		job.call()
+	else:
+		_jobs.append(job)
 
 
 ## Subclasses add their named places here (and bump landmark_count).
@@ -149,148 +452,20 @@ func _build_landmarks(_parent: Node3D) -> void:
 
 
 ## Subclasses add rivers, streams and ponds here.
-func _build_water(_parent: Node3D) -> void:
+## Worker side: subclasses precompute anything slow their builders need.
+## Pure: no nodes.
+func _prepare_extra() -> void:
 	pass
 
 
-func _add_field(field_name: String, field_layers: Array, chunk: float) -> void:
-	var field := ScatterField.new()
-	field.name = field_name
-	field.region_id = def.region_id
-	field.chunk_size = chunk
-	var typed: Array[ScatterLayer] = []
-	for l in field_layers:
-		typed.append(l)
-	field.layers = typed
-	add_child(field)
+## Worker side: polyline water as [name, surface arrays, dread], so the
+## main thread only uploads it (see ribbon_arrays). Pure: no nodes.
+func _water_ribbons() -> Array:
+	return []
 
 
-# ---------------------------------------------------------------- terrain --
-
-func _sample_terrain() -> void:
-	_grid = Vector2i(int(bounds.size.x / TERRAIN_STEP) + 1, int(bounds.size.y / TERRAIN_STEP) + 1)
-	_heights.resize(_grid.x * _grid.y)
-	_colors.resize(_grid.x * _grid.y)
-	var biomes := def.biome_map()
-	var provider: Variant = def.provider
-	for iz in _grid.y:
-		for ix in _grid.x:
-			var x := bounds.position.x + ix * TERRAIN_STEP
-			var z := bounds.position.y + iz * TERRAIN_STEP
-			var i := iz * _grid.x + ix
-			_heights[i] = WorldHeight.height_at(x, z)
-			var b: WoodsBiome = biomes.get(provider.biome_at(x, z))
-			var col := Color(0.45, 0.66, 0.36) if b == null else b.ground_color.lerp(b.ground_color_alt, 0.5 + 0.5 * sin(x * 0.05) * cos(z * 0.043))
-			if provider.clearance(x, z) < 0.2:
-				col = col.lerp(Color(0.72, 0.62, 0.50), 0.55)
-			if provider.is_water(x, z):
-				col = Color(0.42, 0.40, 0.34)
-			_colors[i] = col.darkened(0.22)
-
-
-func _build_terrain() -> void:
-	var root := Node3D.new()
-	root.name = "TerrainFallback"
-	add_child(root)
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.vertex_color_is_srgb = true
-	mat.roughness = 0.95
-	var per := int(TERRAIN_CHUNK / TERRAIN_STEP)
-	for cz in range(0, _grid.y - 1, per):
-		for cx in range(0, _grid.x - 1, per):
-			var mesh := _chunk_mesh(cx, cz, mini(per, _grid.x - 1 - cx), mini(per, _grid.y - 1 - cz))
-			mesh.surface_set_material(0, mat)
-			var mi := MeshInstance3D.new()
-			mi.mesh = mesh
-			mi.name = "Chunk_%d_%d" % [cx / per, cz / per]
-			root.add_child(mi)
-	var body := StaticBody3D.new()
-	body.name = "Collision"
-	body.collision_layer = 1
-	var shape := HeightMapShape3D.new()
-	shape.map_width = _grid.x
-	shape.map_depth = _grid.y
-	shape.map_data = _heights
-	var cs := CollisionShape3D.new()
-	cs.shape = shape
-	cs.scale = Vector3(TERRAIN_STEP, 1.0, TERRAIN_STEP)
-	cs.position = Vector3(bounds.position.x + bounds.size.x * 0.5, 0.0, bounds.position.y + bounds.size.y * 0.5)
-	body.add_child(cs)
-	root.add_child(body)
-
-
-func _chunk_mesh(x0: int, z0: int, w: int, d: int) -> ArrayMesh:
-	var verts := PackedVector3Array()
-	var normals := PackedVector3Array()
-	var colors := PackedColorArray()
-	var indices := PackedInt32Array()
-	for iz in d + 1:
-		for ix in w + 1:
-			var gx := x0 + ix
-			var gz := z0 + iz
-			var h := _h(gx, gz)
-			verts.append(Vector3(bounds.position.x + gx * TERRAIN_STEP, h, bounds.position.y + gz * TERRAIN_STEP))
-			var nx := _h(gx - 1, gz) - _h(gx + 1, gz)
-			var nz := _h(gx, gz - 1) - _h(gx, gz + 1)
-			normals.append(Vector3(nx, 2.0 * TERRAIN_STEP, nz).normalized())
-			colors.append(_colors[gz * _grid.x + gx])
-	for iz in d:
-		for ix in w:
-			var i := iz * (w + 1) + ix
-			indices.append_array(PackedInt32Array([i, i + 1, i + w + 1, i + 1, i + w + 2, i + w + 1]))
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = verts
-	arrays[Mesh.ARRAY_NORMAL] = normals
-	arrays[Mesh.ARRAY_COLOR] = colors
-	arrays[Mesh.ARRAY_INDEX] = indices
-	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	return mesh
-
-
-func _h(gx: int, gz: int) -> float:
-	return _heights[clampi(gz, 0, _grid.y - 1) * _grid.x + clampi(gx, 0, _grid.x - 1)]
-
-
-# -------------------------------------------------------------- colliders --
-
-## Trunks and big rocks block Feyre. One static body per chunk; shapes go
-## straight to the physics server (no per-instance nodes, R16).
-func _build_trunk_colliders(solid_layers: Array) -> void:
-	var root := Node3D.new()
-	root.name = "TrunkColliders"
-	add_child(root)
-	var bodies := {}
-	var shapes := {}
-	for layer: ScatterLayer in solid_layers:
-		var species := StringName(String(layer.id).split("_", true, 1)[1])
-		var radius: float = FloraLibrary.info(species).get("radius", 0.0)
-		if radius <= 0.0:
-			continue
-		for i in layer.count():
-			var o := i * ScatterLayer.STRIDE
-			var p := Vector3(layer.instances[o], layer.instances[o + 1], layer.instances[o + 2])
-			var s := layer.instances[o + 4]
-			var r := snappedf(radius * s, 0.1)
-			if not shapes.has(r):
-				var cyl := CylinderShape3D.new()
-				cyl.radius = r
-				cyl.height = 5.0
-				shapes[r] = cyl
-			var key := Vector2i(floori(p.x / CHUNK_SHRUB), floori(p.z / CHUNK_SHRUB))
-			if not bodies.has(key):
-				var body := StaticBody3D.new()
-				body.name = "Trunks_%d_%d" % [key.x, key.y]
-				body.collision_layer = 1
-				body.collision_mask = 0
-				root.add_child(body)
-				bodies[key] = body
-			var b: StaticBody3D = bodies[key]
-			PhysicsServer3D.body_add_shape(b.get_rid(), shapes[r].get_rid(), Transform3D(Basis(), p + Vector3.UP * 2.3))
-	# Keep the shape resources alive as long as the region.
-	root.set_meta(&"shapes", shapes.values())
+func _build_water(_parent: Node3D) -> void:
+	pass
 
 
 # ------------------------------------------------------------------ water --
@@ -298,6 +473,12 @@ func _build_trunk_colliders(solid_layers: Array) -> void:
 ## A ribbon of water following a polyline; `level` gives the surface height
 ## at a point.
 func make_water_ribbon(points: PackedVector2Array, half_width: float, level: Callable, dread := false) -> MeshInstance3D:
+	return ribbon_instance(ribbon_arrays(points, half_width, level), dread)
+
+
+## Surface arrays for a ribbon of water following a polyline; `level` gives
+## the surface height at a point. Pure, so it runs on worker threads.
+static func ribbon_arrays(points: PackedVector2Array, half_width: float, level: Callable) -> Array:
 	var verts := PackedVector3Array()
 	var uvs := PackedVector2Array()
 	var indices := PackedInt32Array()
@@ -321,6 +502,10 @@ func make_water_ribbon(points: PackedVector2Array, half_width: float, level: Cal
 	arrays[Mesh.ARRAY_VERTEX] = verts
 	arrays[Mesh.ARRAY_TEX_UV] = uvs
 	arrays[Mesh.ARRAY_INDEX] = indices
+	return arrays
+
+
+static func ribbon_instance(arrays: Array, dread: bool) -> MeshInstance3D:
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh.surface_set_material(0, water_material(dread))

@@ -158,6 +158,12 @@ func commit() -> ArrayMesh:
 	return st.commit()
 
 
+## The mesh as surface arrays (no RenderingServer: safe on worker threads).
+func commit_arrays() -> Array:
+	st.index()
+	return st.commit_to_arrays()
+
+
 func _vert(p: Vector3, n: Vector3, c: Color, sway: float) -> void:
 	st.set_normal(n)
 	st.set_color(c)

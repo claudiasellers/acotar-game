@@ -3,15 +3,16 @@
 extends WoodsRegion
 
 
-func _build_water(parent: Node3D) -> void:
+func _water_ribbons() -> Array:
 	var river := resample(clip_to_bounds(MacroHeight.THORNWATER, 60.0), 4.0)
 	if river.size() < 2:
 		# The glade is short: take the two Thornwater points around it.
 		river = resample(PackedVector2Array([Vector2(-950.0, 150.0), Vector2(-820.0, 520.0), Vector2(-700.0, 800.0)]), 4.0)
-	var ribbon := make_water_ribbon(river, MacroHeight.RIVER_HALF_WIDTH + 12.0, func(x: float, z: float) -> float:
-		return MacroHeight.land_height_at(x, z) - MacroHeight.RIVER_DEPTH + 1.4)
-	ribbon.name = "Thornwater"
-	parent.add_child(ribbon)
+	return [["Thornwater", ribbon_arrays(river, MacroHeight.RIVER_HALF_WIDTH + 12.0, func(x: float, z: float) -> float:
+		return MacroHeight.land_height_at(x, z) - MacroHeight.RIVER_DEPTH + 1.4), false]]
+
+
+func _build_water(parent: Node3D) -> void:
 	var bw := SurielGladeTerrain.NAGA_BACKWATER
 	var pond := make_pond(Vector3(bw.x, WorldHeight.height_at(bw.x, bw.y) + 1.6, bw.y), bw.z * 0.7, true)
 	pond.name = "NagaBackwater"

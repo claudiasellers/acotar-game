@@ -3,15 +3,16 @@
 extends WoodsRegion
 
 
+func _water_ribbons() -> Array:
+	var out := []
+	for seg_group in _stream_lines():
+		out.append(["Stream%d" % out.size(), ribbon_arrays(seg_group[0], seg_group[1], func(x: float, z: float) -> float:
+			return WorldHeight.height_at(x, z) + 0.9), seg_group[2]])
+	return out
+
+
 func _build_water(parent: Node3D) -> void:
 	var T := EasternWoodsTerrain
-	var i := 0
-	for seg_group in _stream_lines():
-		var ribbon := make_water_ribbon(seg_group[0], seg_group[1], func(x: float, z: float) -> float:
-			return WorldHeight.height_at(x, z) + 0.9, seg_group[2])
-		ribbon.name = "Stream%d" % i
-		parent.add_child(ribbon)
-		i += 1
 	var marsh := Vector2(T.REED_MARSH.x, T.REED_MARSH.y)
 	var pond := make_pond(Vector3(marsh.x, WorldHeight.height_at(marsh.x, marsh.y) + 2.5, marsh.y), T.REED_MARSH.z * 0.6, true)
 	pond.name = "MarshWater"

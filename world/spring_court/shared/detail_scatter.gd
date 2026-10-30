@@ -1,6 +1,8 @@
 ## Dense ground cover (grass, bluebells, anemones, moss...) built only around
 ## Feyre, in square cells generated on a worker thread from the region's
 ## biomes. Far cells are freed; the same cell always regenerates identically.
+## Workers produce ready MultiMesh buffers; the main thread only creates one
+## MultiMeshInstance per species per frame slot, under FrameBudget.
 class_name DetailScatter
 extends Node3D
 
@@ -15,9 +17,11 @@ var _pending: Dictionary = {}     # Vector2i -> task id
 var _results: Dictionary = {}     # Vector2i -> Dictionary of placements
 var _mutex := Mutex.new()
 var _timer := 0.0
+var _jobs: Array[Callable] = []
 
 
 func _process(delta: float) -> void:
+	FrameBudget.run(_jobs)
 	_timer -= delta
 	if _timer > 0.0:
 		return
@@ -59,8 +63,26 @@ func placements_for(key: Vector2i) -> Dictionary:
 	return WoodsScatter.place(def, rect, "detail", key.x * 7919 + key.y)
 
 
-func _generate(key: Vector2i) -> void:
+## Worker: { species: transform buffer } relative to the cell centre.
+func buffers_for(key: Vector2i) -> Dictionary:
 	var data := placements_for(key)
+	var origin := Vector3((key.x + 0.5) * CELL, 0.0, (key.y + 0.5) * CELL)
+	var out := {}
+	for species: StringName in data:
+		var inst: PackedFloat32Array = data[species]
+		var n := inst.size() / ScatterLayer.STRIDE
+		var ids := PackedInt32Array()
+		ids.resize(n)
+		for i in n:
+			ids[i] = i
+		out[species] = SlicedScatterField.transforms_buffer(inst, ids, origin)
+		if not FloraLibrary.has_mesh(species):
+			FloraLibrary.arrays_for(species, 1)
+	return out
+
+
+func _generate(key: Vector2i) -> void:
+	var data := buffers_for(key)
 	_mutex.lock()
 	_results[key] = data
 	_mutex.unlock()
@@ -75,37 +97,45 @@ func _collect() -> void:
 		if _pending.has(key):
 			WorkerThreadPool.wait_for_task_completion(_pending[key])
 			_pending.erase(key)
-		_cells[key] = _build_cell(key, done[key])
+		var cell := Node3D.new()
+		cell.name = "Cell_%d_%d" % [key.x, key.y]
+		cell.position = Vector3((key.x + 0.5) * CELL, 0.0, (key.y + 0.5) * CELL)
+		add_child(cell)
+		_cells[key] = cell
+		for species: StringName in done[key]:
+			_jobs.append(_build_species.bind(cell, species, done[key][species]))
 
 
-func _build_cell(key: Vector2i, data: Dictionary) -> Node3D:
-	var cell := Node3D.new()
-	cell.name = "Cell_%d_%d" % [key.x, key.y]
-	var origin := Vector3((key.x + 0.5) * CELL, 0.0, (key.y + 0.5) * CELL)
-	cell.position = origin
-	for species: StringName in data:
-		var inst: PackedFloat32Array = data[species]
-		var n := inst.size() / ScatterLayer.STRIDE
-		var mm := MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = FloraLibrary.mesh(species)
-		mm.instance_count = n
-		for i in n:
-			var o := i * ScatterLayer.STRIDE
-			var s := inst[o + 4]
-			var t := Transform3D(Basis(Vector3.UP, inst[o + 3]).scaled(Vector3(s, s, s)),
-					Vector3(inst[o], inst[o + 1], inst[o + 2]) - origin)
-			mm.set_instance_transform(i, t)
-		var mmi := MultiMeshInstance3D.new()
-		mmi.multimesh = mm
-		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		mmi.visibility_range_end = float(FloraLibrary.info(species).get("range", 70.0))
-		mmi.visibility_range_end_margin = 6.0
-		mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
-		mmi.set_instance_shader_parameter(&"wind_amount", 0.8)
-		cell.add_child(mmi)
-	add_child(cell)
-	return cell
+func _build_species(cell: Node3D, species: StringName, buffer: PackedFloat32Array) -> void:
+	if not is_instance_valid(cell) or cell.is_queued_for_deletion():
+		return
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = FloraLibrary.mesh(species)
+	mm.instance_count = buffer.size() / 12
+	if mm.instance_count > 0:
+		mm.buffer = buffer
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.visibility_range_end = float(FloraLibrary.info(species).get("range", 70.0))
+	mmi.visibility_range_end_margin = 6.0
+	mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	mmi.set_instance_shader_parameter(&"wind_amount", 0.8)
+	cell.add_child(mmi)
+
+
+## Builds every cell around `focus` synchronously (tools and tests).
+func build_around(focus: Vector3) -> void:
+	var here := Vector2i(floori(focus.x / CELL), floori(focus.z / CELL))
+	for dz in range(-RADIUS_CELLS, RADIUS_CELLS + 1):
+		for dx in range(-RADIUS_CELLS, RADIUS_CELLS + 1):
+			var key := here + Vector2i(dx, dz)
+			if Rect2(key.x * CELL, key.y * CELL, CELL, CELL).intersects(bounds) and not _cells.has(key):
+				_generate(key)
+	_collect()
+	while not _jobs.is_empty():
+		_jobs.pop_front().call()
 
 
 func _focus() -> Variant:
