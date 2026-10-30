@@ -1,23 +1,27 @@
 # ACOTAR: The Spring Court. For the Mac (Apple silicon, macOS).
 #   make update   pull the latest main, fetch art (LFS), make sure Godot is here, rebuild generated content
-#   make play     run the game
+#   make play     run the game (its output goes to .tools/play.log)
 #   make clean    free disk: delete Godot's import cache and generated content
 #
 # Godot lives in .tools/ (git-ignored). Generators are tools/generators/*.gd;
 # they write into _generated/ folders (git-ignored, engineering rule R15).
+# Terrain is baked to world/shared/terrain/data/ (git-ignored) only when the
+# height or terrain scripts change: a full bake takes about 15 minutes.
 
 GODOT_VERSION := 4.7.2
 GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
+TERRAIN_DIR   := world/shared/terrain/data
+TERRAIN_STAMP := .tools/terrain-baked.stamp
 
-.PHONY: play update clean godot pull generate import
+.PHONY: play update clean godot pull generate bake import
 
-play: godot
+play: godot bake
 	@test -d .godot || $(MAKE) --no-print-directory import
-	@"$(GODOT)" --path . >/dev/null 2>&1
+	@"$(GODOT)" --path . >.tools/play.log 2>&1
 
-update: pull godot generate import
+update: pull godot generate bake import
 	@echo "Up to date. Godot $(GODOT_VERSION) in $(GODOT_DIR)."
 
 pull:
@@ -48,6 +52,14 @@ generate: godot
 		"$(GODOT)" --headless --path . -s "$$g" >/dev/null 2>&1 || { echo "Generator failed: $$g"; exit 1; }; \
 	done; \
 	[ "$$n" = "0" ] || echo "Regenerated content ($$n generators)."
+
+# Without baked data the game bakes at launch and looks frozen for minutes.
+bake: godot
+	@stale=$$(find world \( -name '*height*.gd' -o -name '*terrain*.gd' -o -name 'world_map.gd' \) -newer "$(TERRAIN_STAMP)" 2>/dev/null | head -1); \
+	if [ -f "$(TERRAIN_STAMP)" ] && [ -z "$$stale" ] && [ -n "$$(ls -A "$(TERRAIN_DIR)" 2>/dev/null)" ]; then exit 0; fi; \
+	echo "Baking terrain (about 15 minutes, only when the terrain changes)..."; \
+	"$(GODOT)" --headless --path . -s world/shared/terrain/bake_terrain.gd >/dev/null 2>&1 || { echo "Terrain bake failed."; exit 1; }; \
+	touch "$(TERRAIN_STAMP)"; echo "Terrain baked."
 
 import: godot
 	@"$(GODOT)" --headless --path . --import >/dev/null 2>&1 || true
