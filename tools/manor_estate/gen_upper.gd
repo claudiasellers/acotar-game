@@ -149,6 +149,12 @@ func _level_1_main() -> void:
 		[&"jewelry_box", 11.6, 5.4, -90, 0.8], [&"perfume_tray", 11.6, 6.6, -90, 0.8], [&"makeup_palette", 11.4, 6.0, -90, 0.8],
 		[&"chandelier_crystal", 6, 6, 0, 2.6], [&"candle_sconce", 11.85, 4.4, -90, 1.9], [&"candle_sconce", 11.85, 7.6, -90, 1.9],
 		[&"vase_roses", 11.6, 4.6, 0, 0.8], [&"chaise_longue", 2.2, 6.0, 90],
+		# jewel box (experience bar §2.6): the vanity under the bulb-lit mirror
+		# station is the hero; a wall of gilt mirrors over the shoe shelves
+		# multiplies the light.
+		[&"mirror_gilt", 0.3, 2.4, 90, 1.45], [&"mirror_gilt", 0.3, 3.6, 90, 1.45], [&"mirror_gilt", 0.3, 4.8, 90, 1.45],
+		[&"mirror_gilt", 0.3, 6.0, 90, 1.45], [&"mirror_gilt", 0.3, 7.2, 90, 1.45], [&"mirror_gilt", 0.3, 8.4, 90, 1.45],
+		[&"mirror_gilt", 0.3, 9.6, 90, 1.45],
 	])
 
 	var closet := dsl.room(&"jewel_closet", "Hidden Jewellery Closet", 1, Rect2(36, -60, 6, 8), "X", &"carpet", BUTTER)

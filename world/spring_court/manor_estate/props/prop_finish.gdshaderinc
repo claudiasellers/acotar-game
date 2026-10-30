@@ -5,6 +5,9 @@
 // 0 matte, 1 satin, 2 fabric, 3 gold, 4 pearl, 5 glass, 6 mirror, 7 glow, 8 water, 9 leaf.
 
 uniform float glow_energy : hint_range(0.0, 8.0) = 2.4;
+// 1 in the court, 0 under dread (GradeDirector): the gilt and pearl sparkle
+// and the glow of flames and faelights withdraw with it (experience bar §1.5).
+global uniform float magic_amount;
 
 varying flat int finish;
 
@@ -31,6 +34,10 @@ void fragment() {
 	else if (finish == 7) { rough = 0.5; emit = c * glow_energy; }                         // flames, faelights
 	else if (finish == 8) { rough = 0.04; metal = 0.2; }                                   // water
 	else if (finish == 9) { rough = 0.7; rim = 0.35; rim_tint = 0.6; }                     // leaves
+	float magic = clamp(magic_amount, 0.0, 1.0);
+	rim *= mix(0.2, 1.0, magic);
+	coat *= mix(0.3, 1.0, magic);
+	emit *= mix(0.7, 1.0, magic);    // candle flames stay as points in the dark
 	ALBEDO = c;
 	ROUGHNESS = rough;
 	METALLIC = metal;
