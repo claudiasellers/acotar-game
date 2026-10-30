@@ -69,3 +69,20 @@ func test_gowns_have_tintable_fabric() -> void:
 			found = found or (mat != null and mat.resource_name == "fabric")
 		assert_true(found, id)
 		inst.free()
+
+
+const EVERYDAY := ["spring_tunic", "spring_trousers", "painter_smock", "riding_leathers", "woods_leathers", "vest",
+		"capelet", "velvet_cloak", "riding_boots", "slippers", "gloves_lace", "stockings", "mask_butterfly", "mask_fox",
+		"mask_leaf", "circlet", "butterfly_clips", "hair_ribbon", "pearl_pins", "earrings_drop", "earrings_hoop",
+		"earrings_pearl", "earrings_rose", "earrings_star", "necklace_choker", "necklace_locket", "necklace_pearl",
+		"necklace_pendant", "ribbon_sash", "charm_bracelet", "flower_wristlet", "bangle", "ribbon_cuff"]
+
+
+func test_everyday_wardrobe_is_skinned_with_fabric_first() -> void:
+	for id in EVERYDAY:
+		var inst := (load(WARDROBE_DIR + id + ".glb") as PackedScene).instantiate()
+		var mi := inst.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
+		assert_not_null(mi.skin, id)
+		var mat := mi.mesh.surface_get_material(0)
+		assert_eq(mat.resource_name if mat else "", "fabric", id)
+		inst.free()
