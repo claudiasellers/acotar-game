@@ -1,6 +1,7 @@
 extends GutTest
 
 const SETTINGS_PATH := "user://test_map_settings.cfg"
+const MapPin := preload("res://ui/map/map_pin.gd")
 
 
 func before_each() -> void:
@@ -158,3 +159,65 @@ func test_facing_angle_points_north_when_looking_north() -> void:
 	assert_almost_eq(hud._facing(feyre), 0.0, 0.01, "-Z forward is map north")
 	feyre.rotation.y = -PI * 0.5  # facing +X, east
 	assert_almost_eq(hud._facing(feyre), PI * 0.5, 0.01)
+
+
+# --- The player's pin --------------------------------------------------------------
+
+func test_pin_places_clamps_and_saves() -> void:
+	var pin := MapPin.new()
+	assert_false(pin.active)
+	assert_null(pin.save_state())
+	pin.place(Vector2(9000.0, -100.0))
+	assert_true(pin.active)
+	assert_eq(pin.xz.x, WorldMap.MAP_RECT.end.x, "kept on the map")
+	var back := MapPin.new()
+	back.load_state(JSON.parse_string(JSON.stringify(pin.save_state())))
+	assert_true(back.active)
+	assert_eq(back.xz, pin.xz)
+	back.load_state(null)
+	assert_false(back.active)
+
+
+func test_pin_bearing_and_arrival() -> void:
+	var pin := MapPin.new()
+	pin.place(Vector2(100.0, 0.0))
+	assert_almost_eq(pin.bearing_from(Vector2.ZERO), PI * 0.5, 0.001, "east")
+	pin.place(Vector2(0.0, -100.0))
+	assert_almost_eq(pin.bearing_from(Vector2.ZERO), 0.0, 0.001, "north")
+	assert_false(pin.check_arrival(Vector2(0.0, -50.0)))
+	assert_true(pin.check_arrival(Vector2(0.0, -90.0)), "arrives inside ARRIVE")
+	assert_false(pin.active, "and clears itself")
+	assert_false(pin.check_arrival(Vector2(0.0, -100.0)), "only once")
+
+
+func test_hud_pin_clicks_save_and_arrival() -> void:
+	var feyre := Node3D.new()
+	feyre.add_to_group(&"player")
+	add_child_autofree(feyre)
+	feyre.global_position = Vector3(-150.0, 0.0, 2160.0)
+	var hud := WorldMapHud.new()
+	add_child_autofree(hud)
+	await wait_physics_frames(2)
+	var map := hud.full_map
+	map.view_center = Vector2(-150.0, 2160.0)
+	var target := Vector2(-150.0, 1900.0)
+	map.toggle_pin_at(target, map.to_map_point(target))
+	assert_true(hud.pin.active, "a click sets it")
+	assert_true(hud.beacon.visible, "the beam stands in the world")
+	assert_eq(hud.save_state().pin, [-150.0, 1900.0])
+	map.toggle_pin_at(target, map.to_map_point(target))
+	assert_false(hud.pin.active, "clicking it again lifts it")
+	assert_false(hud.beacon.visible)
+	hud.set_pin(Vector2(-150.0, 2150.0))
+	await wait_seconds(0.2)
+	assert_false(hud.pin.active, "arriving clears it")
+	var other := WorldMapHud.new()
+	add_child_autofree(other)
+	other.load_state({"pin": [10.0, 20.0]})
+	assert_eq(other.pin.xz, Vector2(10.0, 20.0))
+	assert_true(other.beacon.visible)
+
+
+func test_build_stops_when_cancelled() -> void:
+	var cancel := [true]
+	assert_null(MapArt.build(64.0, false, cancel), "a cancelled paint returns nothing at once")

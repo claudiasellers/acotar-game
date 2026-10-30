@@ -13,6 +13,9 @@ const MINT := Color(0.50, 0.80, 0.66)
 const WATER := Color(0.55, 0.68, 0.98)
 const LILAC := Color(0.72, 0.62, 0.92)
 
+## WorldMapHud sets this each frame from where Feyre is (pin colours).
+static var pin_in_spring: bool = true
+
 ## Label words -> icon kind, first match wins.
 const KIND_WORDS := [
 	["water", ["fall", "pool", "pond", "spring", "weir", "well", "creek", "river", "lake", "bridge"]],
@@ -93,3 +96,45 @@ static func draw_landmark(ci: CanvasItem, at: Vector2, kind: StringName, s: floa
 				var r := k * (0.85 if i % 2 == 0 else 0.38)
 				pts.append(at + Vector2(sin(a), -cos(a)) * r)
 			ci.draw_colored_polygon(pts, GOLD)
+
+
+## The player's pin: a teardrop standing on `at` (its tip), filled with the
+## act's accent, gold-ringed, a pearl heart, and a soft pulse on the ground.
+## `angle` tilts it (0 = upright); the rim pin leans outward this way.
+static func draw_pin(ci: CanvasItem, at: Vector2, s: float, t: float, angle: float = 0.0) -> void:
+	var colours := pin_colours()
+	var pulse := fmod(t * 0.7, 1.0)
+	ci.draw_arc(at, s * (0.4 + pulse * 1.1), 0.0, TAU, 32, Color(colours.line, 0.8 * (1.0 - pulse)), 2.0, true)
+	var up := Vector2(sin(angle), -cos(angle))
+	var side := Vector2(-up.y, up.x)
+	var centre := at + up * s * 1.55
+	var r := s * 0.72
+	# A pearly halo so it reads over landmarks and the busy forest.
+	ci.draw_circle(centre, r * 1.45, Color(PEARL, 0.75))
+	var pts := PackedVector2Array([at])
+	for i in 21:
+		var a := lerpf(-PI * 0.75, PI * 0.75, i / 20.0)
+		pts.append(centre + (side * sin(a) + up * cos(a)) * r)
+	ci.draw_colored_polygon(pts, colours.accent)
+	pts.append(at)
+	ci.draw_polyline(pts, colours.line, maxf(1.5, s * 0.16), true)
+	ci.draw_circle(centre, r * 0.42, PEARL)
+	ci.draw_circle(centre - side * r * 0.3 + up * r * 0.3, r * 0.14, Color(1, 1, 1, 0.9))
+
+
+## Pin colours on the map, from the shared ACOTAR theme (L13). The map is a
+## pastel keepsake in both realms, so its pin is always the Spring rose-gold.
+static func pin_colours() -> Dictionary:
+	return _theme(AcotarPalette.Act.SPRING)
+
+
+## The world beacon's colours follow the realm she stands in (muted gold
+## among the mortals, rose and gold in Spring).
+static func beacon_colours() -> Dictionary:
+	return _theme(AcotarPalette.Act.SPRING if pin_in_spring else AcotarPalette.Act.HUMAN)
+
+
+static func _theme(act: AcotarPalette.Act) -> Dictionary:
+	var c := AcotarPalette.colours(act)
+	return {"accent": c.get("accent", ROSE), "line": c.get("line", GOLD), "glow": c.get("glow", GOLD_LIGHT)}
+

@@ -1,7 +1,8 @@
 ## Milestone screenshots of the map in the real game (needs a GPU or
 ## lavapipe; not headless):
-##   xvfb-run godot --rendering-driver vulkan res://tools/map_shot.tscn -- [out_dir] [no3d]
-## no3d leaves the world undrawn (HUD only) for slow software renderers.
+##   xvfb-run godot --rendering-driver vulkan res://tools/map_shot.tscn -- [out_dir] [no3d] [pin]
+## no3d leaves the world undrawn (HUD only) for slow software renderers;
+## pin sets the player's map pin by the village before the shots.
 ## Runs act1_game, walks Feyre along ROUTE (teleporting between stops and
 ## uncovering the ground between them the way her walking would), lets each
 ## stop stream in so she can notice landmarks, then saves minimap.png (play
@@ -59,6 +60,9 @@ func _run() -> void:
 		WorldStreamer.update_for(feyre.global_position)
 		await get_tree().create_timer(STOP_SECONDS).timeout
 		print("MAPSHOT stop %d/%d" % [i + 1, ROUTE.size()])
+	if args.has("pin"):
+		# A pin by the village, beyond the minimap's reach: it rides the rim.
+		hud.set_pin(Vector2(375, 2250))
 	get_viewport().disable_3d = args.has("no3d")
 	await get_tree().create_timer(2.0).timeout
 	await _save(out_dir.path_join("minimap.png"))
