@@ -12,22 +12,22 @@ RegionGrade  grade = &"grade_rosewild"  bounds = Rect2(-600, -800, 1100, 300)  b
 
 `lut` is an embedded GradientTexture1D (dark, mid, light): a gentle pastel colour-correction ramp,
 no image files. Recommended GradeDirector Environment for all of these: tonemap AgX, glow on
-(soft-light blend, hdr threshold ~0.9), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.
+(hdr threshold 1.4 by day, 1.1 at dusk/night, no bloom wash by day), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.
 grade_blight is horror: keep it grey and silent, never tone it down.
 
 | id | purpose | sky top / horizon | sun colour, energy | fog colour, density, volumetric | exposure | saturation | contrast | glow int / bloom | magic |
 |---|---|---|---|---|---|---|---|---|---|
-| grade_starlight_glen_day | Starlight Glen by day: lilac-blue sky, mint meadows, butter sun | #8fb4ff / #ffd6ec | #fff0d8, 1.61 | #fde3f4, 0.0012, 0.012 | 1.00 | 1.38 | 1.08 | 0.90 / 0.12 | 1.0 |
-| grade_starlight_pool_sparkle | Starlight Pool daytime swim: bright sun-glitter, pearly, pastel | #7fb0ff / #ffe0f2 | #fff6e2, 1.80 | #f6eaff, 0.0012, 0.008 | 1.00 | 1.40 | 1.08 | 1.12 / 0.12 | 1.0 |
-| grade_fells | Western Fells: airy periwinkle heights, cool pearl haze | #7d9cf0 / #e6dcff | #fff2e6, 1.49 | #e4e0ff, 0.0012, 0.016 | 1.00 | 1.22 | 1.08 | 0.90 / 0.12 | 0.8 |
-| grade_fae_village | Fae village at lantern-lit dusk: rose-gold sky, warm lanterns | #6f5fb8 / #ffb38f | #ffbf8a, 0.86 | #f1b7c8, 0.0012, 0.020 | 1.00 | 1.32 | 1.08 | 1.17 / 0.12 | 1.0 |
-| grade_solstice | Solstice Meadow midsummer day: butter-gold, golden bloom | #86b6ff / #fff0b8 | #fff0c4, 1.78 | #fff3d6, 0.0012, 0.011 | 1.00 | 1.36 | 1.08 | 0.95 / 0.12 | 1.0 |
-| grade_solstice_twilight | Solstice Meadow twilight: violet-peach sky, will-o'-the-wisps | #4f4aa8 / #ff9fb8 | #ffaa9a, 0.52 | #c8a6e6, 0.0012, 0.024 | 1.00 | 1.30 | 1.08 | 1.30 / 0.12 | 1.0 |
-| grade_hill_of_the_rite_dusk | Hill of the Rite at dusk: deep rose sunset, ember gold | #5a4aa0 / #ff8f7a | #ff9c70, 0.80 | #e5939e, 0.0012, 0.022 | 1.00 | 1.28 | 1.08 | 1.08 / 0.12 | 0.9 |
-| grade_rite_calanmai_night | Calanmai night: indigo sky, bonfire gold, heavy glow | #1e1c52 / #6a3f8f | #a9a8ff, 0.29 | #5a3f80, 0.0012, 0.030 | 1.00 | 1.25 | 1.08 | 1.30 / 0.12 | 1.0 |
-| grade_rosewild | Rosewild: rose-pink haze, blush light, oversized blooms | #9aa8ff / #ffc6dc | #ffe8e0, 1.61 | #ffcfe2, 0.0012, 0.016 | 1.00 | 1.42 | 1.08 | 0.95 / 0.12 | 1.0 |
-| grade_blossom_vale | Blossom Vale: cherry-blossom white-pink, pearl sky | #a4c0ff / #ffe4f0 | #fff4ec, 1.67 | #ffeaf4, 0.0012, 0.013 | 1.00 | 1.30 | 1.08 | 0.90 / 0.12 | 1.0 |
-| grade_autumn_foothills | Autumn Foothills (sealed): amber-crimson glow, honey haze | #8a9ae8 / #ffcc9a | #ffd2a0, 1.44 | #f6c8a8, 0.0012, 0.016 | 1.00 | 1.30 | 1.08 | 0.90 / 0.12 | 0.8 |
+| grade_starlight_glen_day | Starlight Glen by day: lilac-blue sky, mint meadows, butter sun | #8fb4ff / #ffd6ec | #fff0d8, 1.61 | #fde3f4, 0.0012, 0.012 | 1.00 | 1.38 | 1.12 | 0.30 / 0.00 | 1.0 |
+| grade_starlight_pool_sparkle | Starlight Pool daytime swim: bright sun-glitter, pearly, pastel | #7fb0ff / #ffe0f2 | #fff6e2, 1.80 | #f6eaff, 0.0012, 0.008 | 1.00 | 1.40 | 1.12 | 0.30 / 0.00 | 1.0 |
+| grade_fells | Western Fells: airy periwinkle heights, cool pearl haze | #7d9cf0 / #e6dcff | #fff2e6, 1.49 | #e4e0ff, 0.0012, 0.016 | 1.00 | 1.22 | 1.12 | 0.30 / 0.00 | 0.8 |
+| grade_fae_village | Fae village at lantern-lit dusk: rose-gold sky, warm lanterns | #6f5fb8 / #ffb38f | #ffbf8a, 0.86 | #f1b7c8, 0.0012, 0.020 | 1.00 | 1.32 | 1.12 | 0.70 / 0.04 | 1.0 |
+| grade_solstice | Solstice Meadow midsummer day: butter-gold, golden bloom | #86b6ff / #fff0b8 | #fff0c4, 1.78 | #fff3d6, 0.0012, 0.011 | 1.00 | 1.36 | 1.12 | 0.30 / 0.00 | 1.0 |
+| grade_solstice_twilight | Solstice Meadow twilight: violet-peach sky, will-o'-the-wisps | #4f4aa8 / #ff9fb8 | #ffaa9a, 0.52 | #c8a6e6, 0.0012, 0.024 | 1.00 | 1.30 | 1.12 | 0.70 / 0.04 | 1.0 |
+| grade_hill_of_the_rite_dusk | Hill of the Rite at dusk: deep rose sunset, ember gold | #5a4aa0 / #ff8f7a | #ff9c70, 0.80 | #e5939e, 0.0012, 0.022 | 1.00 | 1.28 | 1.12 | 0.70 / 0.04 | 0.9 |
+| grade_rite_calanmai_night | Calanmai night: indigo sky, bonfire gold, heavy glow | #1e1c52 / #6a3f8f | #a9a8ff, 0.29 | #5a3f80, 0.0012, 0.030 | 1.00 | 1.25 | 1.12 | 0.70 / 0.04 | 1.0 |
+| grade_rosewild | Rosewild: rose-pink haze, blush light, oversized blooms | #9aa8ff / #ffc6dc | #ffe8e0, 1.61 | #ffcfe2, 0.0012, 0.016 | 1.00 | 1.42 | 1.12 | 0.30 / 0.00 | 1.0 |
+| grade_blossom_vale | Blossom Vale: cherry-blossom white-pink, pearl sky | #a4c0ff / #ffe4f0 | #fff4ec, 1.67 | #ffeaf4, 0.0012, 0.013 | 1.00 | 1.30 | 1.12 | 0.30 / 0.00 | 1.0 |
+| grade_autumn_foothills | Autumn Foothills (sealed): amber-crimson glow, honey haze | #8a9ae8 / #ffcc9a | #ffd2a0, 1.44 | #f6c8a8, 0.0012, 0.016 | 1.00 | 1.30 | 1.12 | 0.30 / 0.00 | 0.8 |
 | grade_blight | Blighted Reaches (HORROR): grey, desaturated, heavy fog, near-dark, low glow | #3e4044 / #55575a | #a8a6a0, 0.30 | #4c4e50, 0.0140, 0.050 | 0.82 | 0.40 | 1.18 | 0.08 / 0.00 | 0.0 |
 
 Suggested region mapping: starlight_glen -> grade_starlight_glen_day (Starlight Pool area:
