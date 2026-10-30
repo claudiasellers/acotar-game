@@ -112,7 +112,6 @@ func _player() -> Feyre:
 func use_slot(i: int) -> bool:
 	var ok := bar.use(i, _player())
 	if not ok:
-		SatchelSounds.play(&"refuse", self)
 		_shake(i)
 	return ok
 
@@ -299,7 +298,6 @@ func _refresh() -> void:
 
 func _on_used(slot: int, _id: StringName) -> void:
 	_idle = 0.0
-	SatchelSounds.play(&"use", self)
 	_pop(slot, 0.25)
 	_sparkle(_slot_panels[slot])
 

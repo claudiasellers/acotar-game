@@ -101,7 +101,6 @@ func _enter_game() -> void:
 		return
 	_leaving = true
 	Juice.bounce_control(_menu, 0.04)
-	_chime(&"unlock", -6.0)
 	var fade := create_tween().set_parallel()
 	fade.tween_property(_menu, ^"modulate:a", 0.0, 0.5)
 	fade.tween_property(_heading, ^"modulate:a", 0.0, 0.9)
@@ -250,8 +249,6 @@ func _on_focus(b: Button) -> void:
 	if not is_inside_tree():
 		return
 	_place_marker.call_deferred(b)
-	if _veil.color.a < 0.5 and not _leaving:
-		_chime(&"pickup", -22.0, 1.5)
 
 
 func _place_marker(b: Button) -> void:
@@ -317,16 +314,6 @@ func _vignette() -> GradientTexture2D:
 	t.width = 256
 	t.height = 256
 	return t
-
-
-func _chime(kind: StringName, db: float, pitch: float = 1.0) -> void:
-	var p := AudioStreamPlayer.new()
-	p.stream = Juice.chime(kind)
-	p.volume_db = db
-	p.pitch_scale = pitch
-	add_child(p)
-	p.play()
-	p.finished.connect(p.queue_free)
 
 
 ## Wind over snow: a looping band of soft filtered noise (no audio files).
