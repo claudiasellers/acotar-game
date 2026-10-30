@@ -59,7 +59,8 @@ func _process(delta: float) -> void:
 				Gameplay.food_tally.days_of_food])
 		_crosshair.visible = feyre.is_aiming or feyre.is_drawing
 	lines.append("Flags: %s" % ", ".join(PackedStringArray(WorldState.all_flags().keys())))
-	lines.append("WASD move, Shift sprint, Space jump/climb, hold LMB draw, RMB aim, E interact, Q arrow type, R craft arrow")
+	lines.append("%s move, Shift sprint, Space jump/climb, hold LMB draw, RMB aim, E interact, Q arrow type, F craft arrow, R recenter camera" \
+			% InputSettings.SCHEME_NAMES[InputSettings.scheme])
 	_info.text = "\n".join(lines)
 	_deed_timer -= delta
 	_deed.visible = debug_visible and _deed_timer > 0.0
