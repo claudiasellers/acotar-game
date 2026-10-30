@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/models/fae/naga.gltf" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"naga"
+display_name = "Naga"
+fae = true
+canon = "C"
+body_length = 0.6
+body_height = 1.95
+body_width = 0.55
+walk_speed = 1.4
+run_speed = 6.5
+turn_speed = 8.0
+sight_range = 35.0
+hearing_range = 50.0
+scent_range = 90.0
+max_health = 16.0
+arrow_damage = 8.0
+lethal_arrow_ids = Array[StringName]([&"ash"])
+leaves_prints = true
+stride = 0.9
+print_size = 0.12
+model_scene = ExtResource("2")

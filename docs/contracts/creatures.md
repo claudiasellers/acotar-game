@@ -46,3 +46,11 @@ deer: `ing_venison` x3, `ing_hide`, `ing_sinew` x2 · hare: `ing_hare`, `ing_har
 - Region lanes add one `CreatureSpawner` (`creatures/spawning/creature_spawner.gd`) to their region scene with `table`, `bounds` (world Rect2 x/z), and for ponds `water_level` + `water_bounds`. Heights come from `WorldHeight.height_at`. Placement is seeded (`seed`).
 - Swarms (`AmbientSwarm`: butterflies by day, faelights by night) are one MultiMesh each; nothing ambient is a per-instance node.
 - Tables shipped: manor_grounds, border_woods, eastern_woods, starlight_glen, solstice_meadow, blossom_vale, rosewild.
+
+## Story actors (Spring Court)
+`StorySpawner` answers `bogge`, `suriel`, `naga` (+ `naga_2`..), `attor`, `white_horse` (plus the M1 ids). A numeric suffix spawns another of the base kind; the full id becomes the actor's `actor_id` / `creature_id`, so cues and kill reports address that one.
+- `suriel` (Suriel): cues `caught`, `naga_are_coming` (scream, heard by every creature in range); signal `screamed`.
+- `naga` (Naga, a Creature): lurks low; cue `attack` charges Feyre; signal `struck_player(naga)` and, if defined, `EventBus.player_struck(id, kind, amount)`. Two wood arrows kill; ash kills. Reports `creature_killed(id, &"naga", cause, pos)`.
+- `bogge` (Bogge): no model. Cue `pass_behind` keeps it behind the camera for `pass_seconds`, darkening a FogVolume; signals `begged(line_id)` (`bogge_beg_1..4`), `passed`. Its `global_position` is what the gaze check tests.
+- `attor` (Attor): model in a `GlamourLayer` TRUE_FORM child (invisible until `glamour_lifted`); cue `speaks_of_her`; signals `spoke`, `breathed(pos)` for audio.
+- `white_horse` (WhiteHorse): `mount_point` Marker3D at 1.55 m, group `mount`; cues `walk`/`lead`, `stop`; `walk_to(pos)`.

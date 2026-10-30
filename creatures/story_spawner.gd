@@ -11,7 +11,20 @@ const SCENES := {
 	&"hare": preload("res://creatures/prey/hare.tscn"),
 	&"wolf": preload("res://creatures/wolves/wolf.tscn"),
 	&"tamlin_beast": preload("res://creatures/beast/beast_actor.tscn"),
+	&"suriel": preload("res://creatures/fae/suriel.tscn"),
+	&"naga": preload("res://creatures/fae/naga.tscn"),
+	&"bogge": preload("res://creatures/fae/bogge.tscn"),
+	&"attor": preload("res://creatures/fae/attor.tscn"),
+	&"white_horse": preload("res://creatures/fae/white_horse.tscn"),
 }
+
+
+## "naga_3" -> "naga": a numeric suffix is another of the same kind.
+static func base_kind(spawn_id: StringName) -> StringName:
+	var parts := String(spawn_id).rsplit("_", true, 1)
+	if parts.size() == 2 and parts[1].is_valid_int():
+		return StringName(parts[0])
+	return spawn_id
 
 var spawned: Dictionary = {}
 
@@ -23,15 +36,21 @@ func _ready() -> void:
 
 ## Spawns (or moves, if already present) the actor for `spawn_id`.
 func spawn(spawn_id: StringName, at: Transform3D) -> Node3D:
-	if not SCENES.has(spawn_id):
+	var kind := base_kind(spawn_id)
+	if not SCENES.has(kind):
 		return null
 	var existing := spawned.get(spawn_id) as Node3D
 	if existing and is_instance_valid(existing):
 		existing.global_transform = at
 		existing.add_to_group(StringName("story_actor_%s" % spawn_id))
 		return existing
-	var actor := (SCENES[spawn_id] as PackedScene).instantiate() as Node3D
+	var actor := (SCENES[kind] as PackedScene).instantiate() as Node3D
 	actor.name = String(spawn_id).to_pascal_case()
+	# Cues and kill reports address the actor by its full id (naga_2).
+	if &"actor_id" in actor:
+		actor.set(&"actor_id", spawn_id)
+	if &"creature_id" in actor:
+		actor.set(&"creature_id", spawn_id)
 	if spawn_id == &"doe":
 		actor.add_to_group(&"doe")
 	# The story lane checks this group right after its emit to know we answered.
