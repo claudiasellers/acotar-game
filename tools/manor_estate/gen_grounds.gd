@@ -1,7 +1,7 @@
 ## Generates the Manor Estate grounds scatter and its coverage report (R1/R15).
 ##   godot --headless res://tools/manor_estate/gen_grounds.tscn
 ## (a scene, not -s: the estate's scripts use autoloads, which -s does not load).
-## Writes world/spring_court/manor_estate/scatter/<layer>.tres (gitignored, the
+## Writes world/spring_court/manor_estate/scatter/_generated/<layer>.tres (gitignored, the
 ## estate rebuilds them in memory when missing) and the committed report
 ## world/spring_court/manor_estate/manor_estate_report.json.
 extends Node
