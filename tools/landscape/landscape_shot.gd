@@ -33,7 +33,7 @@ func _run() -> void:
 	root.size = Vector2i(1920, 1080)
 	var world: World = load("res://world/shared/world/world.tscn").instantiate()
 	root.add_child(world)
-	world.grade.swap_to(&"spring", 0.0)
+	world.grade.swap_to(StringName(args[2]) if args.size() > 2 else &"spring", 0.0)
 	# lavapipe turns bloom into white blobs with black specks; only there is it switched off.
 	if RenderingServer.get_video_adapter_name().containsn("llvmpipe"):
 		var env: Environment = (world.get_node("WorldEnvironment") as WorldEnvironment).environment

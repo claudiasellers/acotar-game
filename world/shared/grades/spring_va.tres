@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"spring_va"
+sky_top = Color(0.420, 0.580, 0.980, 1)
+sky_horizon = Color(1.000, 0.820, 0.859, 1)
+ground_horizon = Color(0.98, 0.86, 0.8, 1)
+ground_bottom = Color(0.55, 0.7, 0.45, 1)
+sun_color = Color(1.0, 0.9, 0.8, 1)
+sun_energy = 1.5
+ambient_color = Color(0.91, 0.756, 0.874, 1)
+ambient_energy = 0.65
+fog_color = Color(1.0, 0.86, 0.92, 1)
+fog_density = 0.0005
+volumetric_density = 0.0015
+volumetric_albedo = Color(1.0, 0.9, 0.95, 1)
+exposure = 0.85
+saturation = 1.35
+contrast = 1.15
+brightness = 1.0
+glow_intensity = 0.3
+glow_bloom = 0.0
+snow_cover = 0.0
+magic = 0.35
+golden_sky_top = Color(0.451, 0.380, 0.820, 1)
+golden_sky_horizon = Color(1.000, 0.659, 0.522, 1)
+golden_sun_color = Color(1, 0.78, 0.58, 1)
+golden_sun_energy = 1.4
+fog_sky_affect = 0.12
+fog_height = -4.0
+fog_height_density = 0.025
+fog_aerial_perspective = 0.4
+volumetric_anisotropy = 0.7
+volumetric_light_energy = 1.6
+glow_hdr_threshold = 1.4
