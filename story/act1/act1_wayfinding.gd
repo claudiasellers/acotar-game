@@ -15,12 +15,19 @@ extends Node3D
 const TRAIL_END := Vector2(-205.0, 2088.0)
 const TRACK_STEP := 1.3
 const COTTAGE_GEN := preload("res://world/human_realm/cottage/cottage_gen.gd")
-## Trodden snow: a cool shadow-blue, darker than the drifts round it.
-const TRODDEN := Color(0.55, 0.62, 0.76)
-const DEER_TRAIL_WIDTH := 1.0
+## Trodden snow reads by value, not by markers: a cool shadow-blue band
+## darker than the drifts, with a deeper rut down the middle where the hooves
+## go, so it reads as a groove that leads the eye into the trees.
+const TRODDEN := Color(0.58, 0.65, 0.80)
+const RUT := Color(0.40, 0.47, 0.64)
+const DEER_TRAIL_WIDTH := 1.1
 const DOE_FURROW_WIDTH := 0.6
-const BAND_STEP := 1.0
-const BAND_LIFT := 0.04
+## The doe's line is one fresh pass, not a path: fainter than the deer trail.
+const DOE_STRENGTH := 0.7
+## The band fades in over this many metres from the yard (no hard start).
+const BAND_FADE_IN := 4.0
+const BAND_STEP := 0.75
+const BAND_LIFT := 0.05
 const CROWS := 6
 const CROW_HEIGHT := 38.0
 const LANTERN_STEP := 32.0
@@ -37,8 +44,8 @@ var _t: float = 0.0
 
 func _ready() -> void:
 	name = "Act1Wayfinding"
-	_build_band(COTTAGE_GEN.deer_trail_points(), DEER_TRAIL_WIDTH, "DeerTrailBand")
-	_build_band(track_points(), DOE_FURROW_WIDTH, "DoeFurrow")
+	_build_band(COTTAGE_GEN.deer_trail_points(), DEER_TRAIL_WIDTH, "DeerTrailBand", 1.0, BAND_FADE_IN)
+	_build_band(track_points(), DOE_FURROW_WIDTH, "DoeFurrow", DOE_STRENGTH, 0.0)
 	_build_tracks()
 	_build_crows()
 	_build_smoke()
@@ -105,16 +112,18 @@ func _build_tracks() -> void:
 
 
 ## A soft-edged ribbon of trodden snow along `line` (world XZ), following the
-## ground across its width; opaque down the middle, fading out at the edges.
-func _build_band(line: PackedVector2Array, width: float, band_name: String) -> void:
+## ground across its width: clear at the edges, trodden blue, a darker rut in
+## the middle. `strength` scales its opacity; it fades in over `fade_in` m.
+func _build_band(line: PackedVector2Array, width: float, band_name: String, strength: float, fade_in: float) -> void:
 	var pts := _resample(line, BAND_STEP)
 	if pts.size() < 2:
 		return
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	# Across the band: edge, inner, inner, edge (the inner pair is the trodden floor).
-	var across := [-0.5, -0.22, 0.22, 0.5]
-	var alpha := [0.0, 0.85, 0.85, 0.0]
+	# Across the band: edge, trodden, rut, rut, trodden, edge.
+	var across := [-0.5, -0.3, -0.1, 0.1, 0.3, 0.5]
+	var alpha := [0.0, 0.7, 0.9, 0.9, 0.7, 0.0]
+	var tone := [TRODDEN, TRODDEN, RUT, RUT, TRODDEN, TRODDEN]
 	var rows: Array = []
 	for i in pts.size():
 		var ahead := pts[mini(i + 1, pts.size() - 1)] - pts[maxi(i - 1, 0)]
@@ -127,11 +136,12 @@ func _build_band(line: PackedVector2Array, width: float, band_name: String) -> v
 			row.append(Vector3(q.x, WorldHeight.height_at(q.x, q.y) + BAND_LIFT, q.y))
 		rows.append(row)
 	for i in rows.size() - 1:
-		for k in 3:
+		for k in across.size() - 1:
 			var quad := [[i, k], [i, k + 1], [i + 1, k + 1], [i, k], [i + 1, k + 1], [i + 1, k]]
 			for v: Array in quad:
-				var c := TRODDEN
-				c.a = alpha[v[1]]
+				var c: Color = tone[v[1]]
+				var fade := clampf(v[0] * BAND_STEP / fade_in, 0.0, 1.0) if fade_in > 0.0 else 1.0
+				c.a = alpha[v[1]] * strength * fade
 				st.set_color(c)
 				st.set_normal(Vector3.UP)
 				st.add_vertex(rows[v[0]][v[1]])
