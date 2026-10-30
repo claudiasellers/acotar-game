@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_4h66p"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_aho37"]
+
+[resource]
+script = ExtResource("2_aho37")
+id = &"crow_feathers_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/feather_crow.glb"
+ingredient_id = &"ing_crow_feather"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(347.67743, 3.1776638, 2269.616, 3.9655945, 1, 377.49377, 3.1776638, 2206.083, 5.067572, 1)
+cast_shadow = false
+wind = 0.2
+draw_distance = 30.0
+material = ExtResource("1_4h66p")

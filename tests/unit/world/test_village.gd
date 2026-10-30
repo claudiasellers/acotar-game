@@ -90,3 +90,13 @@ func test_scene_has_story_markers() -> void:
 	for n in ["Tavern", "MeetingHall", "DebtFamilyHouse", "AbandonedBarn", "Mill", "CreekBridge"]:
 		assert_not_null(root.find_child(n, true, false), n)
 	root.free()
+
+
+func test_village_is_a_market_not_a_forage_ground() -> void:
+	var finds := 0
+	for layer in _plan.layer_list():
+		if not layer.is_forage() or VillagePlan.MARKET_GOODS.has(layer.id):
+			continue
+		assert_true(String(layer.id).ends_with("_find"), "%s is pickable outside a garden" % layer.id)
+		finds += layer.count()
+	assert_between(finds, 5, 30, "a handful of garden finds, no more")

@@ -144,7 +144,7 @@ func generate() -> void:
 	rect = HumanRealmLayout.REGION_RECTS[REGION_ID]
 	_define_layers()
 	for step in ["_place_landmarks", "_place_square", "_place_houses", "_place_fence_line",
-			"_place_fields", "_place_creek", "_place_village_finds", "_fill_empty_cells"]:
+			"_place_fields", "_place_creek", "_place_village_finds", "_settle_finds", "_fill_empty_cells"]:
 		var t0 := Time.get_ticks_msec()
 		call(step)
 		if verbose:
@@ -1053,9 +1053,65 @@ func _place_village_finds() -> void:
 			put(&"bramble" if k % 2 == 0 else &"wintergreen", p, rng.randf() * TAU, rng.randf_range(0.7, 1.1))
 
 
-## Every 100 m cell of the rect gets at least one forage/collectible/look find.
+## Canon (lore/02-locations/human-village.md, Keeper): the village is a
+## market in a hungry winter, not a foraging ground. Every plant and found
+## material above stays as dressing but can't be picked, except a handful in
+## the cottage gardens and their coop yards. Those move to <layer>_find
+## layers. Salt and iron filings are market goods and stay.
+const GARDEN_FINDS := {
+	&"woad": 4, &"madder": 4, &"snowdrops": 4, &"holly": 2,
+	&"crow_feathers": 2, &"hawk_feathers": 1,
+}
+const MARKET_GOODS := [&"salt_sacks", &"iron_filings"]
+## How far from a garden a coop's feathers or a corner holly still count.
+const GARDEN_REACH := 18.0
+
+
+func _settle_finds() -> void:
+	for id: StringName in layers.keys():
+		var l: ScatterLayer = layers[id]
+		if not l.is_forage() or MARKET_GOODS.has(id):
+			continue
+		var ingredient := l.ingredient_id
+		l.ingredient_id = &""
+		var want: int = GARDEN_FINDS.get(id, 0)
+		if want == 0:
+			continue
+		# At most one per garden, so the few there are spread down the lanes.
+		var used := {}
+		var picked := PackedFloat32Array()
+		var kept := PackedFloat32Array()
+		for i in l.count():
+			var o := i * ScatterLayer.STRIDE
+			var row := l.instances.slice(o, o + ScatterLayer.STRIDE)
+			var p := l.position_of(i)
+			var g := _garden_of(Vector2(p.x, p.z))
+			if used.size() < want and g >= 0 and not used.has(g):
+				used[g] = true
+				picked.append_array(row)
+			else:
+				kept.append_array(row)
+		if picked.is_empty():
+			continue
+		l.instances = kept
+		var find_id := StringName(String(id) + "_find")
+		_def(find_id, l.mesh_path, ingredient, [], "X", l.draw_distance, l.cast_shadow, l.wind, true)
+		var f: ScatterLayer = layers[find_id]
+		f.tags = l.tags
+		f.instances = picked
+
+
+func _garden_of(p: Vector2) -> int:
+	for i in _gardens.size():
+		if _gardens[i].grow(GARDEN_REACH).has_point(p):
+			return i
+	return -1
+
+
+## Every 100 m cell of the rect gets at least one collectible/look/landmark
+## moment: tracks and crows in the fields, not forage (see _settle_finds).
 func _fill_empty_cells() -> void:
-	var fill := [&"wintergreen", &"flint", &"crow_feathers", &"snail_shells"]
+	var fill := [&"fox_tracks", &"crow_perched", &"fox_tracks", &"crow_perched"]
 	var cols := ceili(rect.size.x / ScatterReport.CELL)
 	var rows := ceili(rect.size.y / ScatterReport.CELL)
 	for cx in cols:
