@@ -1,0 +1,9 @@
+from L09-trail
+quality look
+size 1920x1080
+timeout 900
+shot trail_opening res://tools/landscape/trail_shot.tscn trail_opening {out}/trail_opening.png
+shot trail_start res://tools/landscape/trail_shot.tscn trail_start {out}/trail_start.png
+shot trail_treeline res://tools/landscape/trail_shot.tscn trail_treeline {out}/trail_treeline.png
+shot doe_mid res://tools/landscape/trail_shot.tscn doe_mid {out}/doe_mid.png
+shot doe_raised res://tools/landscape/trail_shot.tscn doe_raised {out}/doe_raised.png
