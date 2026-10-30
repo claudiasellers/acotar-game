@@ -11,6 +11,9 @@
 class_name WoodsScatter
 extends RefCounted
 
+## Tree and shrub composition (loaded by path: a new global class isn't
+## registered until the editor rescans, so no class_name).
+const LandscapeLayout := preload("res://world/spring_court/shared/landscape_layout.gd")
 ## Grid cell (m) per kind. Smaller cells for denser layers.
 const CELL := {"tree": 4.0, "shrub": 2.5, "forage": 5.0, "detail": 0.9}
 ## Species allowed on water (everything else is skipped there).
