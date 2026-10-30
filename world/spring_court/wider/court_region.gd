@@ -51,9 +51,21 @@ func _ready() -> void:
 			CourtAssets.mesh(d.mesh_id)
 			if d.is_tree:
 				CourtAssets.mesh(d.mesh_id, true)
-		_task = WorkerThreadPool.add_task(_generate, false, "court_region_%s" % content.region_id)
+		_start()
 	else:
 		build()
+
+
+func _start() -> void:
+	BuildCancel.clear(content.region_id)
+	_task = WorkerThreadPool.add_task(_generate, false, "court_region_%s" % content.region_id)
+
+
+## Back in the tree after leaving mid-build (the cancelled worker's partial
+## layers were dropped): generate again.
+func _enter_tree() -> void:
+	if is_node_ready() and content != null and threaded and not is_built and _task < 0 and _layers.is_empty():
+		_start()
 
 
 func _process(_delta: float) -> void:
@@ -65,12 +77,16 @@ func _process(_delta: float) -> void:
 
 func _exit_tree() -> void:
 	if _task >= 0:
+		# Leaving mid-build (quit, teleport): stop the worker early, then join.
+		BuildCancel.request(content.region_id)
 		WorkerThreadPool.wait_for_task_completion(_task)
 		_task = -1
+		_layers.clear()
 
 
 ## Builds everything now, on the calling thread (tools and tests).
 func build() -> void:
+	BuildCancel.clear(content.region_id)
 	_generate()
 	_finish()
 
@@ -182,11 +198,12 @@ func sightline_skip(_x: float, _z: float) -> bool:
 
 
 func _generate() -> void:
-	_layers = {
-		"forage": CourtScatterGenerator.forage_layers(content),
-		"decor": CourtScatterGenerator.decor_layers(content),
-		"terrain": CourtTerrainFallback.compute(content),
-	}
+	var forage := CourtScatterGenerator.forage_layers(content)
+	var decor := CourtScatterGenerator.decor_layers(content)
+	var terrain := CourtTerrainFallback.compute(content)
+	if BuildCancel.requested(content.region_id):
+		return  # partial; _exit_tree drops it
+	_layers = {"forage": forage, "decor": decor, "terrain": terrain}
 
 
 func _finish() -> void:
