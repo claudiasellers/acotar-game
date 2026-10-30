@@ -18,10 +18,11 @@ import bpy  # noqa: E402,I001
 import prop_kit as K  # noqa: E402
 import manor_props_a as A  # noqa: E402
 import manor_props_b as B  # noqa: E402
+import manor_props_c as C  # noqa: E402
 
 OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/props/models")
 MAX_TRIS = 3000
-BUILDERS = {**A.BUILDERS, **B.BUILDERS}
+BUILDERS = {**A.BUILDERS, **B.BUILDERS, **C.BUILDERS}
 
 
 def build(pid, entry):

@@ -33,9 +33,18 @@ static func pair(path: String, node_name: String, finish_override: Material = nu
 	return out
 
 
+## The importer turns name suffixes into node types ("spinning_wheel" becomes a
+## VehicleWheel3D holding the mesh), so match MeshInstance3Ds by their own name
+## or, failing that, by the name of the node that wraps them.
 static func _mesh(scene: Node, node_name: String) -> Mesh:
-	var n := scene.find_child(node_name, true, false) as MeshInstance3D
-	return n.mesh if n != null else null
+	var lod1 := node_name.ends_with("_lod1")
+	for n: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
+		if n.name == node_name:
+			return n.mesh
+	for n: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
+		if String(n.name).ends_with("_lod1") == lod1 and n.get_parent() != scene:
+			return n.mesh
+	return null
 
 
 ## Puts every surface of `mesh` on its shared finish material (in place: the
