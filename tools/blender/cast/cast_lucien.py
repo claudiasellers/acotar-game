@@ -361,8 +361,8 @@ def style_half_up(st):
     import sdf
     bh = cc.bh()
     bh.RIBBON_RGB = cc.srgb(BRONZE)          # the tie is a bronze cuff
-    st.cap(thick=0.009, back_extra=0.006, line=lucien_hairline)
-    st.cap_locks(math.radians(-14), n=22, off=0.011, r=0.0086, front_sweep=False)
+    st.cap(thick=0.0065, back_extra=0.004, line=lucien_hairline)
+    st.cap_locks(math.radians(-14), n=22, off=0.0085, r=0.0075, front_sweep=False)
     tie = np.array([0.0, 0.112, 1.545])
     for s in (1, -1):                        # the top half swept back from the temples to the tie
         for k, (ph0, th0) in enumerate(((52, 32), (38, 52), (24, 70))):
@@ -371,10 +371,10 @@ def style_half_up(st):
                                  0.011 + 0.003 * t) for t in np.linspace(0, 0.88, 9)]
             pts.append(tie + np.array([s * 0.006, 0.0, 0.0]))
             st.lock(pts, 0.0095 - 0.0008 * k, 0.0065)
-    st.back_mass(1.16, n=17, spread=0.036, r=0.0175, wave=0.004)       # loose lengths past the shoulders
+    st.back_mass(1.16, n=17, spread=0.020, r=0.0145, wave=0.004, arc=(112, 248))       # loose lengths past the shoulders
     for s in (1, -1):                        # a long lock either side, in front of the shoulder
         start = st.head.scalp(s * math.radians(80), math.radians(4), 0.006)
-        st.hang(start, start[2] - 1.22, 0.030, 0.0140, r1=0.0060, wave=0.003, front=True)
+        st.hang(start, start[2] - 1.22, 0.018, 0.0110, r1=0.0050, wave=0.003, front=True)
     st.tie(tie, (0, 1.0, -0.25), 0.0105)
     tail = [tie + np.array([0, 0.008, 0.0]), tie + np.array([0.0, 0.030, -0.04]),
             tie + np.array([0.004, 0.036, -0.12]), tie + np.array([-0.004, 0.034, -0.20])]
