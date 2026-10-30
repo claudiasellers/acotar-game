@@ -13,7 +13,7 @@ extends RefCounted
 
 const DIR := "res://world/spring_court/manor_estate/scatter/_generated/"
 const REGION_ID := &"manor_estate"
-const REPORT_PATH := "res://world/spring_court/manor_estate/manor_estate_report.json"
+const REPORT_PATH := "res://world/spring_court/manor_estate/scatter/_generated/manor_estate_report.json"
 
 ## Item colours.
 const C_FEATHER_HAWK := Color(0.78, 0.52, 0.36)
