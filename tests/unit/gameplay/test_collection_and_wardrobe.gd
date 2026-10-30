@@ -86,3 +86,9 @@ func test_woven_crowns_use_the_woven_mesh() -> void:
 	for c in [&"rose", &"butter", &"lilac", &"pearl", &"sky"]:
 		var p := WardrobeCatalog.piece(StringName("woven_crown_%s" % c))
 		assert_eq(p.mesh_path, "res://characters/feyre/wardrobe/woven_crown.glb")
+
+
+func test_every_piece_names_a_mesh() -> void:
+	for p in WardrobeCatalog.all_pieces():
+		assert_true(p.mesh_path.begins_with("res://characters/feyre/wardrobe/") and not p.mesh_path.ends_with("/.glb"),
+			"%s mesh %s" % [p.id, p.mesh_path])

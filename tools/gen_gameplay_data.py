@@ -303,6 +303,15 @@ DISHES = [
 PASTELS = {"rose": "f4a6c0", "blush": "f7cfd8", "lilac": "c8a8e9", "periwinkle": "a7b8f2",
 	"mint": "b5ead7", "butter": "fbe7a1", "pearl": "f6f1ea", "gold": "e6c06a", "sage": "b7c9a8",
 	"cream": "f3ead6", "ivory": "fbf6ea", "sky": "b9dcf5", "peach": "f9c9a8", "emerald": "4fae86"}
+# Meshes for designs whose table row leaves the mesh empty (made later by the
+# Feyre wardrobe thread). Each glb's surface 0 is "fabric", tinted per variant.
+MESH_FOR = {
+	"emerald_drops": "earrings_drop", "gold_hoops": "earrings_hoop", "pearl_earrings": "earrings_pearl",
+	"rose_earrings": "earrings_rose", "star_studs": "earrings_star", "butterfly_clips": "butterfly_clips",
+	"hair_ribbon": "hair_ribbon", "pearl_pins": "pearl_pins", "ribbon_sash": "ribbon_sash", "stockings": "stockings",
+	"charm_bracelet": "charm_bracelet", "flower_wristlet": "flower_wristlet", "gold_bangle": "bangle",
+	"ribbon_cuff": "ribbon_cuff",
+}
 # id, name, slots, hides, colours (None = single), warmth, stealth, swift, reaction, source, phase, canon, mesh, desc
 PIECES = [
 	("hunter_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"": "6f6a63"}, 0.2, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_tunic", "Worn soft, patched at both elbows."),
@@ -661,12 +670,14 @@ def main():
 	clear_rec("data/wardrobe/pieces"); clear_rec("data/wardrobe/hair"); clear_rec("data/wardrobe/makeup")
 	n_pieces = 0
 	for pid, name, slots, hides, colours, warmth, stealth, swift, reaction, source, phase, canon, mesh, desc in PIECES:
+		mesh = mesh or MESH_FOR.get(pid, "")
+		mesh_path = "res://characters/feyre/wardrobe/%s.glb" % mesh if mesh else ""
 		for cname, chex in colours.items():
 			vid = pid if cname == "" else "%s_%s" % (pid, cname)
 			vname = name if cname == "" else "%s (%s)" % (name, cname)
 			lines = ['id = &"%s"' % vid, 'display_name = "%s"' % esc(vname), 'description = "%s"' % esc(desc),
 				"slots = %s" % sn_array(slots), "hides_body_regions = %s" % sn_array(hides),
-				'mesh_path = "res://characters/feyre/wardrobe/%s.glb"' % mesh, "color = %s" % color(chex),
+				'mesh_path = "%s"' % mesh_path, "color = %s" % color(chex),
 				"warmth = %s" % float(warmth), "stealth = %s" % float(stealth), "swift = %s" % float(swift),
 				'reaction_tag = &"%s"' % reaction, 'source = &"%s"' % source, "phase = %d" % phase, 'canon = "%s"' % canon]
 			write("data/wardrobe/pieces/%s.tres" % vid, "res://data/wardrobe/wardrobe_piece.gd", "WardrobePiece", lines)
