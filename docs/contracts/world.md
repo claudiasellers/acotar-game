@@ -53,6 +53,7 @@ world lane thread ("Build the human realm and the wall").
 - **Per-region grade:** add a `RegionGrade` node (`grade`, `bounds`, `blend_seconds`) to your region; `GradeDirector` blends to it while Feyre is inside. To get a region its own look, add a preset `world/shared/grades/<id>.tres` (copy `spring.tres`, set `lut` and colours) in your handoff and call it out.
 - Before/after story changes use the story lane's `StateVisibility` node.
 - **Region gates:** every outdoor `RegionGate` lock is at least `RegionGate.min_height()` tall (Feyre's highest triple-jump chain + 1.5 m, about 11 m), in both collision and visible mesh, and is never mantleable (`RegionGate.owns`). Indoor gates are bounded by their ceiling.
+- **Manor ward veil:** `ManorWardVeil` (a `RegionGate` for manor_grounds) runs a visible rose-gold glamour veil, ground to `min_height()`, along every estate edge facing a neighbour that opens in an earlier phase (from `manor_estate.tres` neighbours + the phase table); on the gate side it follows the sentry gate line, leaving the gate as the front door. It fades out on unlock.
 
 ### 3.1 Grades in detail (experience bar §2.1)
 - `GradePreset` also carries `fog_sky_affect` (keep ≈0.1–0.3: at 1.0 distance fog paints the sky flat), height fog (`fog_height` is absolute world metres and the terrain sits at roughly 0–40 m, so keep it low), `fog_aerial_perspective`, `volumetric_anisotropy`, `volumetric_light_energy` (sun god-rays), `glow_hdr_threshold`, and golden-hour sky and sun colours that `GradeDirector` blends in as the sun nears the horizon.
