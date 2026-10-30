@@ -732,11 +732,22 @@ case_marker_check() {
 	expect "marked is fine" tools/mq/levels.sh check
 }
 
+case_miss_message() {
+	bake_repo missmsg
+	echo 0 > bake_secs
+	tools/mq/levels.sh ensure >"$ROOT/miss.out" 2>"$ROOT/miss.err"
+	expect "a cache miss says it is building" grep -q '^Building terrain ' "$ROOT/miss.err"
+	expect "stdout stays empty on a miss" test ! -s "$ROOT/miss.out"
+	tools/mq/levels.sh ensure >"$ROOT/hit.out" 2>"$ROOT/hit.err"
+	expect "nothing printed when it is already built" test ! -s "$ROOT/hit.err"
+	expect "stdout stays empty on a hit" test ! -s "$ROOT/hit.out"
+}
+
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check; do
+		build_known_red needs_nothing marker_check miss_message; do
 	scenario "$c"
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
