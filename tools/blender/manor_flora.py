@@ -202,14 +202,61 @@ def dandelion(p, h, col, rng):
 def strawberry(p, h, col, rng):
     for i in range(7):
         a = 2 * math.pi * i / 7
-        p.add(leaf(h * 1.4, h * 0.9), LEAF if i % 2 else LEAF_DARK, F, R("Z", math.degrees(a)) @ R("Y", -15) @ T(0, 0, h * 0.25))
+        p.add(leaf(h * 1.1, h * 0.75), LEAF if i % 2 else LEAF_DARK, F, R("Z", math.degrees(a)) @ R("Y", -35) @ T(0, 0, h * 0.2))
     for i in range(5):
-        a = rng.uniform(0, 2 * math.pi)
-        x, y = h * 0.9 * math.cos(a), h * 0.9 * math.sin(a)
-        if i % 2:
-            p.add(lathe([(0, 0), (h * 0.18, h * 0.08), (h * 0.12, h * 0.25), (0, h * 0.3)], 6), col, F, T(x, y, h * 0.2) @ R("X", 180) @ T(0, 0, -h * 0.3))
+        a = 2 * math.pi * i / 5 + rng.uniform(-0.3, 0.3)
+        x, y = h * 0.55 * math.cos(a), h * 0.55 * math.sin(a)
+        top = h * rng.uniform(0.85, 1.0)
+        stem(p, (0, 0, 0), (x, y, top), 0.004)
+        if i % 2:   # a berry hanging from the stem tip
+            p.add(lathe([(0, 0), (h * 0.18, h * 0.08), (h * 0.12, h * 0.25), (0, h * 0.3)], 6), col, F, T(x, y, top) @ R("X", 180))
         else:
-            star_flower(p, (x, y, h * 0.55), h * 0.2, WHITE, 5, finish=F)
+            star_flower(p, (x, y, top), h * 0.2, WHITE, 5, finish=F)
+
+
+def iris(p, h, col, rng):
+    """Sword leaves and three tall stems, each with falls and standards."""
+    clump_leaves(p, h, 7, rng, length=0.85)
+    for i in range(3):
+        a = 2 * math.pi * i / 3 + rng.uniform(-0.3, 0.3)
+        x, y, top = h * 0.12 * math.cos(a), h * 0.12 * math.sin(a), h * rng.uniform(0.85, 1.0)
+        stem(p, (0, 0, 0), (x, y, top - h * 0.08), 0.006)
+        for k in range(3):
+            p.add(petal(h * 0.18, h * 0.1, cup=0.2, curl=0.25), col, F, T(x, y, top - h * 0.1) @ R("Z", 120 * k) @ R("Y", 55))
+            p.add(petal(h * 0.15, h * 0.08, cup=0.35, curl=-0.15), lighter(col, 0.3), F, T(x, y, top - h * 0.1) @ R("Z", 120 * k + 60) @ R("Y", -20))
+        p.add(ico(h * 0.025, 0), BUTTER, F, T(x, y, top - h * 0.08))
+
+
+def madder(p, h, col, rng):
+    """Whorled scrambling stems topped with tiny pale-yellow flower clusters."""
+    for i in range(6):
+        a = 2 * math.pi * i / 6 + rng.uniform(-0.3, 0.3)
+        top = h * rng.uniform(0.75, 1.0)
+        x, y = h * 0.25 * math.cos(a), h * 0.25 * math.sin(a)
+        stem(p, (0, 0, 0), (x, y, top), 0.005, col)
+        for t in (0.35, 0.6, 0.85):
+            for k in range(4):
+                p.add(leaf(h * 0.12, h * 0.03), col if k % 2 else LEAF_DARK, F,
+                      T(x * t, y * t, top * t) @ R("Z", 90 * k + 45 * t) @ R("Y", -60))
+        for k in range(3):
+            p.add(ico(h * 0.025, 0), BUTTER, F, T(x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.02, 0.02), top + h * 0.03 * k))
+
+
+def orchid(p, h, col, rng):
+    """Broad basal leaves and two arching sprays of moth-orchid blooms."""
+    for i in range(4):
+        a = 2 * math.pi * i / 4 + 0.3
+        p.add(leaf(h * 0.45, h * 0.18), LEAF if i % 2 else LEAF_DARK, F, R("Z", math.degrees(a)) @ R("Y", -65))
+    for s_i in range(2):
+        a = math.pi * s_i + 0.4
+        pts = [(0, 0, 0), (h * 0.08 * math.cos(a), h * 0.08 * math.sin(a), h * 0.6), (h * 0.3 * math.cos(a), h * 0.3 * math.sin(a), h * 0.95)]
+        p.add(tube(pts, [0.005, 0.004, 0.003], 3, caps=False), LEAF_DARK, F)
+        for k in range(4):
+            t = 0.45 + k * 0.17
+            x, y = h * 0.3 * t * math.cos(a), h * 0.3 * t * math.sin(a)
+            z = h * (0.62 + 0.33 * t)
+            star_flower(p, (x, y, z), h * 0.12, col if k % 2 else lighter(col, 0.3), 5, finish=F, heart=(0.95, 0.55, 0.7),
+                        facing=R("Z", math.degrees(a)) @ R("Y", 70))
 
 
 def herb_patch(p, h, col, rng):
@@ -331,7 +378,7 @@ def tree(p, h, col, rng, kind):
         a = 2 * math.pi * k / 3 + 0.5
         p.add(tube([(0, 0, 0.0), (h * 0.04 * math.cos(a), h * 0.04 * math.sin(a), -h * 0.01)], [h * 0.025, h * 0.01], 4), bark, F)
     crown_c = (lean, 0, trunk_h + h * 0.28)
-    blossom = kind in ("cherry_blossom", "apple_blossom")
+    blossom = kind in ("cherry_blossom", "apple_blossom", "crab_apple")
     if kind == "willow":
         for i in range(5):
             a = 2 * math.pi * i / 5
@@ -410,6 +457,16 @@ def build_species(sid, kind, h, col, rng):
         small_stars(p, h, c, rng, 6, BUTTER, 5)
     elif sid == "faelight_dandelion":
         dandelion(p, h, c, rng)
+    elif sid == "crocus":
+        tulip(p, h, c, rng)
+    elif sid == "buttercup":
+        small_stars(p, h, c, rng, 6, (1.0, 0.95, 0.6), 5)
+    elif sid == "iris":
+        iris(p, h, c, rng)
+    elif sid == "madder":
+        madder(p, h, c, rng)
+    elif sid == "orchid":
+        orchid(p, h, c, rng)
     elif sid == "wild_strawberry":
         strawberry(p, h, c, rng)
     elif sid == "herb_patch":
@@ -427,7 +484,7 @@ def build_species(sid, kind, h, col, rng):
     elif sid == "water_lily":
         water_lily(p, h, c, rng)
     elif kind == "tree":
-        foliage = c if sid in ("cherry_blossom", "apple_blossom") else mix(c, (0.49, 0.76, 0.6), 0.6)   # pull toward sage
+        foliage = c if sid in ("cherry_blossom", "apple_blossom", "crab_apple") else mix(c, (0.49, 0.76, 0.6), 0.6)   # pull toward sage
         tree(p, h, foliage, rng, sid)
     else:
         rose_bush(p, h, c, rng)
