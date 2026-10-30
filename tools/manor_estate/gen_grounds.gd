@@ -2,8 +2,9 @@
 ##   godot --headless res://tools/manor_estate/gen_grounds.tscn
 ## (a scene, not -s: the estate's scripts use autoloads, which -s does not load).
 ## Writes world/spring_court/manor_estate/scatter/_generated/<layer>.tres (gitignored, the
-## estate rebuilds them in memory when missing) and the committed report
-## world/spring_court/manor_estate/manor_estate_report.json.
+## estate rebuilds them in memory when missing) and the coverage report
+## world/spring_court/manor_estate/scatter/_generated/manor_estate_report.json, also generated
+## and uncommitted: world_smoke reads the freshly built numbers.
 extends Node
 
 
