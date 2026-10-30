@@ -1,6 +1,8 @@
 ## The Border Woods: the first sight of the Spring Court past the Wall.
 extends WoodsRegion
 
+const HERO_FOLIAGE := preload("res://world/spring_court/shared/woods_foliage_hero.gdshader")
+
 static var _spray: Array = []
 
 var _ford := Vector2.ZERO
@@ -121,8 +123,9 @@ func _build_landmarks(parent: Node3D) -> void:
 	var oak := Vector2(T.GREAT_OAK.x, T.GREAT_OAK.y)
 	var great := place_landmark(parent, "GreatOak", FloraLibrary.mesh(&"ancient_oak"), oak, 0.7, 3.2, 1.5)
 	# The weenie of the wall-crossing reveal: the brightest thing in frame,
-	# its crown rim-lit gold and glinting where the others are plain.
+	# its crown rim-lit gold, glinting and unfogged where the others are plain.
 	var lit := FloraLibrary.material(&"tree").duplicate() as ShaderMaterial
+	lit.shader = HERO_FOLIAGE
 	lit.set_shader_parameter(&"rim_strength", 1.6)
 	lit.set_shader_parameter(&"rim_color", Color(1.0, 0.86, 0.6))
 	lit.set_shader_parameter(&"translucency", 0.8)
