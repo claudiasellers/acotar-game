@@ -41,6 +41,8 @@ Same rules (Marker3D, group `story_anchor`, named by id). The Act I spaces are b
 | `act1_cottage_door` | cottage | Where the beast comes in; -Z facing into the room |
 | `act1_food_tally_beam` | cottage | The food tally notches |
 | `act1_wolf_clearing` | hunting_forest | The ch1 wolf kill (30 m Entry; the doe 22 m and the wolf ~33 m in front, along -Z) and the skinning |
-| `act1_fur_stall` | village | Selling the pelt to the mercenary |
+| `act1_fur_stall` | village | Selling the pelt to the mercenary (a woman, night-dark eyes) |
 
 The ride north needs no anchor: it follows the world lane's `WallSeamPath`.
+
+`act1_cottage_interior` also hangs two keepsake stations (E) on the human-realm props it finds beside it: `Hearth/HearthSpot` raises `fact.father_hearth_sat` and `SistersBed` (the unpainted ironwood bed) raises `fact.mother_bed_seen`.

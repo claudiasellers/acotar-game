@@ -44,6 +44,7 @@ func _build_beats() -> Array:
 		Beats.run(_spawn_wolf, "he takes the doe"),
 		Beats.control(StoryControl.Mode.FULL, null),
 		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(wolf), "his eyes"),
+		Beats.raise("fact.wolf_spotted"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			EventBus.weather_requested.emit(&"snow_pause", 0.5), "the snow holds"),
 		Beats.wait(1.2),

@@ -18,6 +18,7 @@ static func attach(anchor: Node3D, director: Node) -> Array[SceneSpace]:
 		&"act1_cottage_interior":
 			var size: Vector3 = anchor.get_meta(&"size", Vector3(7.0, 3.0, 5.5))
 			spaces.append(_add(anchor, "BeastDoor", BeastDoor.new(), size))
+			_add_keepsakes(anchor)
 		&"act1_food_tally_beam":
 			spaces.append(_add(anchor, "FoodTally", FoodTally.new()))
 		&"act1_wolf_clearing":
@@ -49,6 +50,25 @@ static func _add(anchor: Node3D, node_name: String, space: SceneSpace, entry_siz
 		space.add_child(area)
 	anchor.add_child(space)
 	return space
+
+
+## The hearth by her father and the ironwood bed, beside the human-realm
+## lane's props (Interior/Hearth/HearthSpot, Interior/SistersBed).
+static func _add_keepsakes(anchor: Node3D) -> void:
+	var interior := anchor.get_parent()
+	for spec in [["HearthKeepsake", ^"Hearth/HearthSpot", &"cottage_hearth", "fact.father_hearth_sat"],
+			["BedKeepsake", ^"SistersBed", &"cottage_ironwood_bed", "fact.mother_bed_seen"]]:
+		if anchor.get_node_or_null(NodePath(spec[0])):
+			continue
+		var target := interior.get_node_or_null(spec[1]) as Node3D if interior else null
+		if target == null:
+			continue
+		var station := KeepsakeStation.new()
+		station.name = spec[0]
+		station.station_id = spec[2]
+		station.fact = spec[3]
+		anchor.add_child(station)
+		station.global_position = target.global_position + Vector3.UP * 0.5
 
 
 ## The ride north follows the world lane's WallSeamPath; one per game.

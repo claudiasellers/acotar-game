@@ -47,6 +47,8 @@ Raised only through `ActionTrigger`. Names are the Keeper's
 `wolf_killed`, `pelt_sold`, `beast_claim_accepted`, `wall_crossed` (P1).
 Minor facts use the `fact.` prefix (e.g. `fact.beast_door.raised_knife`).
 
+Act I voice-line hooks (plans/voice-lines-act1.md): `fact.wolf_spotted` (the wolf's eyes, before the shot), `fact.father_hearth_sat` and `fact.mother_bed_seen` (cottage keepsakes), `fact.cottage_door_broken` (the Keeper's `beast_door_broken`), `fact.ash_arrow_burned` (after `beast_claim_accepted`, once he snaps the ash arrow into the fire, cue `snap_ash_arrow`), and `fact.first_dinner_seen` (the first step of the first dinner).
+
 ## World smoke (tools/world_smoke.gd)
 
 Run by the build lane on every merge: `godot --headless -s tools/world_smoke.gd`

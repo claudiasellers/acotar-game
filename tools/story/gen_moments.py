@@ -39,7 +39,7 @@ def moment(id, ch, anchor, region, req, steps, trigger="enter", r=6.0, night=Fal
 
 # --- P2 The grounds (ch 6-11) ------------------------------------------------
 moment("first_dinner", "7", "manor_dining_table", "manor_house", ["wall_crossed"], [
-    C("LOOK"), SP("tamlin", V(0, 0, -2.5)), SP("lucien", V(2, 0, -1.2)), W(1.5),
+    R("fact.first_dinner_seen"), C("LOOK"), SP("tamlin", V(0, 0, -2.5)), SP("lucien", V(2, 0, -1.2)), W(1.5),
     CU("tamlin", "i_dont_keep_slaves"), C("NONE", "tamlin", ["interact"]),
     IN(3, 3.0), CU("lucien", "presses_about_andras"), W(3.0), R("first_dinner_eaten"), CEL("meal"),
 ], r=3.0, notes="Magic holds her at the table until she eats (three bites).")

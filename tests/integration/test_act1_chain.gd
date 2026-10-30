@@ -96,6 +96,7 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	_run(wolf, 6.0)
 	assert_not_null(wolf.wolf, "a wolf (stand-in) is in the clearing")
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL, "free to take the shot")
+	assert_true(WorldState.has_flag("fact.wolf_spotted"), "voice A1_01 hook")
 	EventBus.creature_killed.emit(&"andras", &"great_wolf", &"arrow_wood", Vector3.ZERO)
 	_run(wolf, 1.0)
 	assert_false(WorldState.has_flag("wolf_killed"), "wood alone does not kill a High Fae")
@@ -130,10 +131,14 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_true(cues.has([&"family", &"gather"]))
 	assert_true(cues.has([&"tamlin_beast", &"enter"]))
 	assert_true(beast.current_beat_label().begins_with("decision"))
+	Gameplay.inventory.add(&"arrow_ash", 1)
 	beast.choose(&"interact")
 	_run(beast, 10.0)
 	assert_eq(beast.chosen_fact, "fact.beast_door.threw_knife")
 	assert_true(WorldState.has_flag("beast_claim_accepted"))
+	assert_true(cues.has([&"tamlin_beast", &"snap_ash_arrow"]))
+	assert_true(WorldState.has_flag("fact.ash_arrow_burned"))
+	assert_eq(Gameplay.inventory.count(&"arrow_ash"), 0, "he burns her ash arrow")
 
 	# The ride and the wall.
 	assert_true(ride.start())

@@ -5,7 +5,7 @@
 ## "Murderer". One physical decision window: throw her knife (interact) or her
 ## sisters' iron bracelets (fire); both are useless against it. Or freeze.
 ## Then life for a life: die, or live in Prythian forever. Father begs. She
-## goes. The door stays broken (fact.cottage_door_broken, for StateVisibility).
+## goes; he snaps her ash arrow into the fire. The door stays broken (fact.cottage_door_broken, for StateVisibility).
 class_name BeastDoor
 extends SceneSpace
 
@@ -69,7 +69,18 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_mode(StoryControl.Mode.LOOK), "a life for a life"),
 		Beats.wait(4.0),
 		Beats.raise("beast_claim_accepted"),
+		Beats.cue(&"tamlin_beast", &"snap_ash_arrow"),
+		Beats.wait(1.5),
+		Beats.run(_burn_ash_arrows, "into the fire"),
+		Beats.raise("fact.ash_arrow_burned"),
 	]
+
+
+## Canon: he snaps her ash arrow and throws it in the fire before they go.
+func _burn_ash_arrows(_space: SceneSpace) -> void:
+	var count := Gameplay.inventory.count(&"arrow_ash")
+	if count > 0:
+		Gameplay.inventory.remove(&"arrow_ash", count)
 
 
 func _break_door(_space: SceneSpace) -> void:
