@@ -9,7 +9,7 @@ autoloads below.
 
 | Autoload | Use |
 |---|---|
-| `WorldStreamer` | `configure(regions, parent)` or `configure_from_dir("res://data/regions/human_realm", parent)`, then `track(feyre)`. Loads the region she stands in, its `neighbors`, and anything within `load_margin` (120 m); unloads past `unload_margin` (220 m). Signals `region_loaded(id, root)`, `region_unloaded(id)`. Streams region content only; the persistent World scene (terrain, sky, GradeDirector) is never streamed. |
+| `WorldStreamer` | `configure(regions, parent)` or `configure_from_dir("res://data/regions/human_realm", parent)`, then `track(feyre)`. Loads the region she stands in, its `neighbors`, and anything within `load_margin` (300 m); unloads past `unload_margin` (450 m). Signals `region_loaded(id, root)`, `region_unloaded(id)`. Streams region content only; the persistent World scene (terrain, sky, GradeDirector) is never streamed. |
 | `WorldDeltas` | `mark_picked(region_id, "<scatter>:<index>", respawn_days)`, `is_picked(...)`, `set_container(id, dict)`, `get_container(id)`, `set_region_value(region_id, key, value)`, `get_region_value(...)`. Saved automatically. Times are in-game days. |
 | `SaveSystem` | `register_provider(key, obj)` where `obj` has `save_state() -> Dictionary` and `load_state(data)`. Keys in use: `inventory`, `proof_journal`, `body_state`, `sketchbook`, `food_tally`. |
 | `StoryControl` | `mode` is FULL / WALK / LOOK / NONE during anchored moments. Ask `can_move()`, `can_look()`, `can_shoot()`, `can_interact()` before acting. `focus` is a Node3D the camera drifts toward. |

@@ -12,8 +12,8 @@ extends Node
 signal region_loaded(region_id: StringName, root: Node3D)
 signal region_unloaded(region_id: StringName)
 
-@export var load_margin: float = 120.0
-@export var unload_margin: float = 220.0
+@export var load_margin: float = 300.0
+@export var unload_margin: float = 450.0
 @export var update_interval: float = 0.5
 var synchronous: bool = false
 
