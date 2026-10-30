@@ -1,0 +1,11 @@
+status ok
+request map-1
+commit b5c60fe0d5b8ce12f5cf7578b444646dd140e3d0
+machine Claudias-Mini
+godot 4.7.2.stable.official.ed1daf0bf
+quality look
+size 1920x1080
+renderer project default
+prep ok 59s: import skipped (no art changed), generated content 59s (levels.sh)
+shot pin ok exit=0 303s files=0
+answered 2026-10-30T22:22:22Z after 364s
