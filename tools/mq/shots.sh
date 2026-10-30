@@ -16,12 +16,14 @@
 #
 # Runs only where .git/mq/config has the line MQ_HOME_MACHINE=1.
 # Optional lines in .git/mq/config (defaults shown):
-#   SHOTS_POLL=90            seconds between polls of origin
+#   SHOTS_POLL=60            seconds between polls of origin (git ls-remote only)
 #   SHOTS_GODOT=             Godot binary (else .tools/godot-*/ from make, PATH, /Applications)
 #   SHOTS_POSITION=40,40     corner the render window opens at
 #   SHOTS_WAIT_FOR_PLAY=1    hold requests while the owner's game is running
 #   SHOTS_PUSH=1             0 = render and keep results locally only
-#   SHOTS_KEEP_DAYS=3        delete this machine's own result branches after this
+#   SHOTS_KEEP_DAYS=1        delete this machine's own result branches after this
+#   SHOTS_LAYOUT_WIDTH=1280  "quality layout" pictures: JPEG this wide ...
+#   SHOTS_LAYOUT_JPEG=80     ... at this JPEG quality ("quality look" stays lossless PNG)
 #   SHOTS_REMOTE=origin
 
 set -u
@@ -43,11 +45,14 @@ SHOTS_CHILD_FILE="$S/child.pid"
 conf() { shots_conf_get "$CONF" "$1" "$2"; }
 
 REMOTE=$(conf SHOTS_REMOTE origin)
-POLL=$(conf SHOTS_POLL 90)
+POLL=$(conf SHOTS_POLL 60)
 POSITION=$(conf SHOTS_POSITION 40,40)
 WAIT_FOR_PLAY=$(conf SHOTS_WAIT_FOR_PLAY 1)
 PUSH=$(conf SHOTS_PUSH 1)
-KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 3)
+KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 1)
+LAYOUT_WIDTH=$(conf SHOTS_LAYOUT_WIDTH 1280)
+LAYOUT_JPEG=$(conf SHOTS_LAYOUT_JPEG 80)
+GENCACHE="$S/gencache"
 
 event() {
 	mkdir -p "$S"
@@ -92,14 +97,14 @@ take_lock() {
 	mkdir -p "$S"
 	if mkdir "$LOCK" 2>/dev/null; then echo $$ >"$LOCK/pid"; return 0; fi
 	if listener_running && [ "$(lock_pid)" != $$ ]; then return 1; fi
-	rm -rf "$LOCK"
+	rm -rf "${LOCK:?}"
 	mkdir "$LOCK" 2>/dev/null || return 1
 	echo $$ >"$LOCK/pid"
 }
 
 heartbeat() { [ -d "$LOCK" ] && touch "$LOCK/heartbeat"; }
 
-release_lock() { [ "$(lock_pid)" = $$ ] && rm -rf "$LOCK"; }
+release_lock() { [ "$(lock_pid)" = $$ ] && rm -rf "${LOCK:?}"; }
 
 # ---- keep the Mac awake ----------------------------------------------------
 
@@ -133,8 +138,19 @@ ensure_worktree() {
 	if [ ! -e "$WT/.git" ]; then
 		git -C "$REPO" worktree add -q --detach "$WT" "$1" >>"$S/listener.log" 2>&1 || return 1
 		git -C "$REPO" worktree lock --reason "shot listener" "$WT" >/dev/null 2>&1
+		# Start from the play folder's import cache instead of importing everything.
+		if [ -d "$REPO/.godot" ]; then
+			clone_copy "$REPO/.godot" "$WT/.godot" && event "SEEDED the render worktree's import cache from the play folder"
+		fi
 	fi
 	return 0
+}
+
+# Copy that costs no disk on a Mac (APFS clone), a plain copy elsewhere.
+clone_copy() { # src dest
+	mkdir -p "$(dirname "$2")"
+	if [ "$(uname -s)" = Darwin ]; then cp -cR "$1" "$2" 2>/dev/null && return 0; fi
+	cp -R "$1" "$2"
 }
 
 checkout_request() { # sha
@@ -162,7 +178,7 @@ godot_env() {
 	find "$SCRATCH" -type f ! -path '*shader_cache*' ! -path '*/Library/Caches/*' -exec rm -f {} + 2>/dev/null
 	mkdir -p "$SCRATCH/home" "$SCRATCH/config" "$SCRATCH/data" "$SCRATCH/cache"
 	HOME="$SCRATCH/home" XDG_CONFIG_HOME="$SCRATCH/config" XDG_DATA_HOME="$SCRATCH/data" \
-		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" "$@"
+		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" SHOTS_QUALITY="$QUALITY" "$@"
 }
 
 # Linux without a display (the cloud self-test) renders through xvfb-run.
@@ -171,36 +187,153 @@ if [ "$(uname -s)" != Darwin ] && [ -z "${DISPLAY:-}" ] && command -v xvfb-run >
 	DISP=(xvfb-run -a -s "-screen 0 1920x1080x24")
 fi
 
-prepare() { # import + generators, once per lane commit (parent of the request commit)
-	local key log=$RES/logs/prep.log t0 rc g
+# ---- generated content, cached by the git ids of its inputs -----------------
+
+# Lines of tools/mq/shots_generated.conf as "name|run|outputs|inputs".
+gen_lines() { # conf file
+	sed -e 's/#.*//' -e 's/[[:space:]]*|[[:space:]]*/|/g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$1" 2>/dev/null | grep '|'
+}
+
+gen_key() { # commit run inputs-regex
+	{
+		echo "$2|$3|$GODOT_VERSION"
+		git ls-tree -r --full-tree "$1" | RE="$3" awk -F'\t' '$2 ~ ENVIRON["RE"] && $2 !~ /^\.shots\//'
+	} | git hash-object --stdin
+}
+
+# Git-ignored files under the output folders, relative to the checkout root.
+gen_files() { # root outputs
+	(cd "$1" && git ls-files -o -i --exclude-standard -- $2 2>/dev/null)
+}
+
+gen_store() { # root name key outputs
+	local d="$GENCACHE/$2/$3" f
+	[ -d "$d" ] && return 0
+	mkdir -p "$d.tmp"
+	gen_files "$1" "$4" | while read -r f; do clone_copy "$1/$f" "$d.tmp/$f"; done
+	mv "$d.tmp" "$d"
+	# Keep the three most recently used builds per generator.
+	ls -t "$GENCACHE/$2" 2>/dev/null | tail -n +4 | while read -r f; do rm -rf "${GENCACHE:?}/${2:?}/${f:?}"; done
+}
+
+gen_restore() { # name key outputs -> worktree
+	local d="$GENCACHE/$1/$2" o f
+	[ -d "$d" ] || return 1
+	for o in $3; do
+		gen_files "$WT" "$o" | while read -r f; do rm -f "$WT/$f"; done
+		[ -d "$d/$o" ] || continue
+		(cd "$d/$o" && find . -type f | sed 's#^\./##') | while read -r f; do clone_copy "$d/$o/$f" "$WT/$o/$f"; done
+	done
+	touch "$d"
+	return 0
+}
+
+# Adopts what `make update` already built in the play folder (read only), so a
+# request whose inputs match the play folder's never rebuilds it.
+seed_from_play() {
+	local c name run outs ins key conf
+	c=$(git -C "$REPO" rev-parse -q --verify HEAD) || return 0
+	[ "$(cat "$S/seeded_from" 2>/dev/null)" = "$c" ] && return 0
+	conf=$(mktemp "${TMPDIR:-/tmp}/shots-gen.XXXXXX")
+	git -C "$REPO" show "$c:tools/mq/shots_generated.conf" >"$conf" 2>/dev/null
+	gen_lines "$conf" | while IFS='|' read -r name run outs ins; do
+		[ -n "$(gen_files "$REPO" "$outs" | head -1)" ] || continue
+		git -C "$REPO" status --porcelain --untracked-files=no | cut -c4- | grep -Eq "$ins" && continue
+		key=$(gen_key "$c" "$run" "$ins")
+		[ -d "$GENCACHE/$name/$key" ] && continue
+		gen_store "$REPO" "$name" "$key" "$outs" && event "SEEDED $name from the play folder"
+	done
+	rm -f "$conf"
+	echo "$c" >"$S/seeded_from"
+}
+
+godot_headless() { # log limit godot-args...
+	local log="$1" limit="$2"
+	shift 2
+	shots_run_limited "$limit" "$log" godot_env "$GODOT" --headless --audio-driver Dummy --path "$WT" "$@"
+}
+
+# Import (only when art changed since the last import), generated content
+# (from the cache when its inputs are unchanged), then the request's prep lines.
+IMPORTABLE='\.(png|jpe?g|webp|svg|tga|bmp|exr|hdr|glb|gltf|bin|obj|fbx|blend|dae|wav|ogg|mp3|ttf|otf|woff2?|import|csv|ktx2?|dds)$'
+prepare() {
+	local log=$RES/logs/prep.log t0 t1 rc g sha last name run outs ins key listed=" " steps="" genl
 	t0=$(shots_epoch)
-	key=$(git -C "$WT" rev-parse HEAD^ 2>/dev/null)
-	echo "== import" >>"$log"
-	shots_run_limited 1800 "$log" godot_env "$GODOT" --headless --audio-driver Dummy --path "$WT" --import
-	rc=$?
-	if [ "$rc" = 124 ]; then echo "prep timeout import $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; fi
+	sha=$(git -C "$WT" rev-parse HEAD)
+	last=$(cat "$S/imported_commit" 2>/dev/null)
+	if [ -d "$WT/.godot" ] && [ -n "$last" ] && git cat-file -e "$last^{commit}" 2>/dev/null &&
+		! git diff --name-only "$last" "$sha" | grep -Eq "$IMPORTABLE"; then
+		steps="import skipped (no art changed)"
+	else
+		t1=$(shots_epoch)
+		echo "== import" >>"$log"
+		godot_headless "$log" 1800 --import
+		rc=$?
+		[ "$rc" = 124 ] && { echo "prep timeout import $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; }
+		echo "$sha" >"$S/imported_commit"
+		steps="import $(($(shots_epoch) - t1))s"
+	fi
+	genl="$RES/gen.lines"
+	gen_lines "$WT/tools/mq/shots_generated.conf" >"$genl"
+	while IFS='|' read -r name run outs ins; do
+		[ -n "$name" ] || continue
+		listed="$listed${run#-s } "
+		key=$(gen_key "$sha" "$run" "$ins")
+		if gen_restore "$name" "$key" "$outs"; then
+			steps="$steps, $name cached"
+			continue
+		fi
+		t1=$(shots_epoch)
+		echo "== $name: $run" >>"$log"
+		godot_headless "$log" 1800 $run
+		rc=$?
+		[ "$rc" = 0 ] || { echo "prep fail $name exit=$rc $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; }
+		gen_store "$WT" "$name" "$key" "$outs"
+		steps="$steps, $name built $(($(shots_epoch) - t1))s"
+	done <"$genl"
+	rm -f "$genl"
 	for g in "$WT"/tools/generators/*.gd $PREPS; do
 		case "$g" in "$WT"/*) g="res://${g#"$WT"/}" ;; esac
 		[ -f "$WT/${g#res://}" ] || continue
+		case "$listed" in *" $g "*) continue ;; esac
+		t1=$(shots_epoch)
 		echo "== $g" >>"$log"
-		if [ "${g%.gd}" != "$g" ]; then
-			shots_run_limited 900 "$log" godot_env "$GODOT" --headless --audio-driver Dummy --path "$WT" -s "$g"
-		else
-			shots_run_limited 900 "$log" godot_env "$GODOT" --headless --audio-driver Dummy --path "$WT" "$g"
-		fi
+		if [ "${g%.gd}" != "$g" ]; then godot_headless "$log" 900 -s "$g"; else godot_headless "$log" 900 "$g"; fi
 		rc=$?
-		if [ "$rc" != 0 ]; then
-			echo "prep fail $g exit=$rc $(($(shots_epoch) - t0))s" >>"$RES/result.txt"
-			return 1
-		fi
+		[ "$rc" = 0 ] || { echo "prep fail $g exit=$rc $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; }
+		steps="$steps, $(basename "$g") ran $(($(shots_epoch) - t1))s"
 	done
-	echo "prep ok $(($(shots_epoch) - t0))s ($key)" >>"$RES/result.txt"
+	echo "prep ok $(($(shots_epoch) - t0))s: $steps" >>"$RES/result.txt"
 }
 
 render_args() { # common windowed args for a render run
 	local a="--audio-driver Dummy --windowed --resolution $SIZE --position $POSITION --always-on-top"
 	[ -n "$METHOD" ] && a="$a --rendering-method $METHOD"
 	echo "$a"
+}
+
+# "quality layout": a lossy JPEG about LAYOUT_WIDTH wide. Returns 1 when no
+# converter is available, and the PNG is kept as it is.
+to_jpeg() { # in out
+	if command -v sips >/dev/null 2>&1; then
+		local w
+		w=$(sips -g pixelWidth "$1" 2>/dev/null | awk '/pixelWidth/ {print $2}')
+		if [ -n "$w" ] && [ "$w" -gt "$LAYOUT_WIDTH" ]; then
+			sips -s format jpeg -s formatOptions "$LAYOUT_JPEG" --resampleWidth "$LAYOUT_WIDTH" "$1" --out "$2" >/dev/null 2>&1 && return 0
+		else
+			sips -s format jpeg -s formatOptions "$LAYOUT_JPEG" "$1" --out "$2" >/dev/null 2>&1 && return 0
+		fi
+	fi
+	command -v python3 >/dev/null 2>&1 && python3 -I - "$1" "$2" "$LAYOUT_WIDTH" "$LAYOUT_JPEG" >/dev/null 2>&1 <<'PY' && return 0
+import sys
+from PIL import Image
+im = Image.open(sys.argv[1]).convert("RGB")
+w = int(sys.argv[3])
+if im.width > w:
+    im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
+im.save(sys.argv[2], "JPEG", quality=int(sys.argv[4]), optimize=True)
+PY
+	return 1
 }
 
 collect() { # label dir -> RES/out/label, skipping big or unknown files
@@ -213,7 +346,11 @@ collect() { # label dir -> RES/out/label, skipping big or unknown files
 		if [ "$sz" -gt 15728640 ]; then note "skipped $label/$f: over 15 MB"; continue; fi
 		if [ $((total + sz / 1024)) -gt 61440 ]; then note "skipped $label/$f: result over 60 MB"; continue; fi
 		mkdir -p "$RES/out/$label/$(dirname "$f")"
-		cp "$dir/$f" "$RES/out/$label/$f"
+		if [ "$QUALITY" = layout ] && [ "${f%.png}" != "$f" ] && to_jpeg "$dir/$f" "$RES/out/$label/${f%.png}.jpg"; then
+			sz=$(shots_size "$RES/out/$label/${f%.png}.jpg")
+		else
+			cp "$dir/$f" "$RES/out/$label/$f"
+		fi
 		total=$((total + sz / 1024))
 		n=$((n + 1))
 	done
@@ -269,13 +406,14 @@ run_json() { # the layout-shots runner owns request.json; we just run its wrappe
 # Parses .shots/probes.txt into globals and $RES/plan.txt; prints the first
 # problem and returns 1 when the request is malformed.
 SIZE=1920x1080
+QUALITY=look
 METHOD=""
 TIMEOUT=300
 JSON_TIMEOUT=1800
 PREPS=""
 parse_probes() {
 	local f="$WT/.shots/probes.txt" kw a b n=0 labels=" " line
-	SIZE=1920x1080 METHOD="" TIMEOUT=300 PREPS=""
+	SIZE=1920x1080 METHOD="" TIMEOUT=300 PREPS="" QUALITY=look
 	: >"$RES/plan.txt"
 	while IFS= read -r line || [ -n "$line" ]; do
 		line=$(echo "$line" | sed 's/[[:space:]]*$//')
@@ -287,6 +425,8 @@ parse_probes() {
 		kw="$1"; shift
 		case "$kw" in
 		from) ;;
+		quality)
+			case "${1:-}" in look | layout) QUALITY="$1" ;; *) echo "bad quality: ${1:-} (look or layout)"; return 1 ;; esac ;;
 		size)
 			echo "$1" | grep -Eq '^[0-9]{3,4}x[0-9]{3,4}$' || { echo "bad size: $1"; return 1; } ;;
 		renderer)
@@ -317,6 +457,12 @@ parse_probes() {
 	done <"$f"
 	[ "$n" -ge 1 ] || { echo "no shot lines"; return 1; }
 	[ "$n" -le 40 ] || { echo "more than 40 shot lines"; return 1; }
+	# A look shot is the real thing: the project's own Forward+, at 1080p or more.
+	if [ "$QUALITY" = look ]; then
+		[ -n "$METHOD" ] && [ "$METHOD" != forward_plus ] && { echo "quality look renders with the project's Forward+; drop the renderer line or use quality layout"; return 1; }
+		METHOD=""
+		[ "${SIZE%x*}" -lt 1920 ] && { echo "quality look renders at 1920x1080 or larger; use quality layout for small shots"; return 1; }
+	fi
 	return 0
 }
 
@@ -375,7 +521,7 @@ handle() { # key sha
 	RES="$S/work/$key/res"
 	OUT="$S/work/$key/out"
 	SCRATCH="$S/userdir"
-	rm -rf "$S/work/$key"
+	rm -rf "${S:?}/work/${key:?}"
 	mkdir -p "$RES/logs" "$OUT"
 	{
 		echo "status PENDING"
@@ -384,6 +530,17 @@ handle() { # key sha
 		echo "machine $(hostname -s 2>/dev/null || echo mac)"
 		echo "godot $GODOT_VERSION"
 	} >"$RES/result.txt"
+	# The same code and the same request were answered before: send that again.
+	local tree prev
+	tree=$(git rev-parse "$sha^{tree}")
+	prev=$(cat "$S/bytree/$tree" 2>/dev/null)
+	if [ -n "$prev" ] && git rev-parse -q --verify "refs/mq/shots/res/$prev" >/dev/null && republish "$key" "$sha" "$prev"; then
+		mkdir -p "$S/done"
+		echo "$sha reused $(shots_epoch)" >"$S/done/$key"
+		rm -rf "${S:?}/work/${key:?}"
+		event "ANSWERED $key from $prev (same code and request)"
+		return 0
+	fi
 	if ! checkout_request "$sha"; then
 		stalled "$key" "$sha" "checkout failed"
 		return 1
@@ -391,12 +548,16 @@ handle() { # key sha
 	if [ -f "$WT/.shots/request.json" ]; then
 		echo "route request.json" >>"$RES/result.txt"
 		cp "$WT/.shots/request.json" "$RES/request.json"
+		QUALITY=look METHOD="" SIZE=1920x1080 PREPS=""
+		grep -Eq '"quality"[[:space:]]*:[[:space:]]*"layout"' "$WT/.shots/request.json" && QUALITY=layout
+		echo "quality $QUALITY" >>"$RES/result.txt"
 		if ! prepare; then status=error; err="prep failed"
 		elif ! run_json; then status=fail; fi
 	elif [ -f "$WT/.shots/probes.txt" ]; then
 		cp "$WT/.shots/probes.txt" "$RES/probes.txt"
 		if ! parse_probes >"$RES/parse.err"; then status=error; err=$(cat "$RES/parse.err")
 		else
+			echo "quality $QUALITY" >>"$RES/result.txt"
 			echo "size $SIZE" >>"$RES/result.txt"
 			echo "renderer ${METHOD:-project default}" >>"$RES/result.txt"
 			if ! prepare; then status=error; err="prep failed"
@@ -424,11 +585,32 @@ handle() { # key sha
 		stalled "$key" "$sha" "could not push the answer"
 		return 1
 	fi
-	mkdir -p "$S/done"
+	mkdir -p "$S/done" "$S/bytree"
 	echo "$sha $status $(shots_epoch)" >"$S/done/$key"
-	rm -rf "$S/work/$key"
+	[ "$status" = ok ] && echo "$key" >"$S/bytree/$tree"
+	rm -rf "${S:?}/work/${key:?}"
 	event "ANSWERED $key $status in $(($(shots_epoch) - t0))s"
 	return 0
+}
+
+# Answers <key> with the pictures of an earlier answer <prev>; only result.txt changes.
+republish() { # key sha prev
+	local idx tree blob commit
+	idx=$(mktemp "${TMPDIR:-/tmp}/shots-idx.XXXXXX")
+	rm -f "$idx"
+	GIT_INDEX_FILE="$idx" git read-tree "refs/mq/shots/res/$3" || return 1
+	blob=$(git show "refs/mq/shots/res/$3:result.txt" |
+		sed -e "s/^request .*/request $1/" -e "s/^commit .*/commit $2/" -e "s/^answered .*/answered $(shots_now), reused from $3 (same code and request)/" |
+		git hash-object -w --stdin) || return 1
+	GIT_INDEX_FILE="$idx" git update-index --cacheinfo "100644,$blob,result.txt" || return 1
+	tree=$(GIT_INDEX_FILE="$idx" git write-tree)
+	rm -f "$idx"
+	commit=$(GIT_AUTHOR_NAME="ACOTAR shot listener" GIT_AUTHOR_EMAIL="shots@localhost" \
+		GIT_COMMITTER_NAME="ACOTAR shot listener" GIT_COMMITTER_EMAIL="shots@localhost" \
+		git commit-tree "$tree" -m "shots res $1: reused $3") || return 1
+	git update-ref "refs/mq/shots/res/$1" "$commit"
+	[ "$PUSH" = 1 ] || return 0
+	shots_git_retry push -q "$REMOTE" "$commit:${SHOTS_RES_PREFIX}$1" >>"$S/listener.log" 2>&1
 }
 
 # One poll: answer every new request, oldest first seen first.
@@ -443,6 +625,7 @@ poll() {
 	fi
 	grep "	${SHOTS_RES_PREFIX}" "$reqs" | sed "s#.*	${SHOTS_RES_PREFIX}##" >"$ress"
 	mkdir -p "$S/seen" "$S/done" "$S/ignored"
+	seed_from_play
 	grep "	${SHOTS_REQ_PREFIX}" "$reqs" | while read -r sha ref; do
 		key="${ref#"$SHOTS_REQ_PREFIX"}"
 		if ! shots_valid_key "$key"; then
@@ -544,13 +727,13 @@ start() {
 stop() {
 	local p c
 	p=$(lock_pid)
-	if [ -z "$p" ] || ! kill -0 "$p" 2>/dev/null; then echo "Shot listener is not running."; rm -rf "$LOCK"; return 0; fi
+	if [ -z "$p" ] || ! kill -0 "$p" 2>/dev/null; then echo "Shot listener is not running."; rm -rf "${LOCK:?}"; return 0; fi
 	c=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
 	[ -n "$c" ] && kill -TERM "$c" 2>/dev/null
 	kill -TERM "$p"
 	local i=0
 	while [ "$i" -lt 20 ] && kill -0 "$p" 2>/dev/null; do sleep 1; i=$((i + 1)); done
-	kill -0 "$p" 2>/dev/null && { kill -KILL "$p"; rm -rf "$LOCK"; }
+	kill -0 "$p" 2>/dev/null && { kill -KILL "$p"; rm -rf "${LOCK:?}"; }
 	echo "Shot listener stopped (pid $p)."
 }
 

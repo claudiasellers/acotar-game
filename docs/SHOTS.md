@@ -12,9 +12,13 @@ Send it to the Mac instead, where it takes seconds. The contract is
    ```
    # /tmp/shots.txt
    from woods-lane
-   size 1920x1080
+   quality look
    shot falls res://tools/world_shot.tscn border_falls {out}/falls.png
    ```
+
+   `quality look` (the default) is the real game look, as full-size lossless PNG. Use it for anything you judge by eye.
+   `quality layout` is for "is it in the right place". It returns small JPEGs and allows `size 640x360` and `renderer compatibility`,
+   but most layout checks are cheaper in the cloud with the layout-shots runner, or as a printed number.
 
 3. Send it with a new number each time:
 
@@ -38,8 +42,9 @@ Tips:
   The probe's output comes back in `logs/<label>.log`.
 - No answer usually means the Mac is asleep or the owner is playing. Keep working.
   Don't resubmit the same request; nothing is lost.
-- Manor scatter is built by `tools/manor_estate/gen_grounds.tscn`, outside `tools/generators/`.
-  Add `prep res://tools/manor_estate/gen_grounds.tscn` for manor grounds shots.
+- Terrain bake, woods cache and manor scatter are reused from a cache and rebuilt only when their inputs change
+  (`tools/mq/shots_generated.conf`). If you add a generator, add a line there.
+- Sending the identical commit and request twice costs nothing: the Mac resends the first answer.
 
 ## On the Mac (owner, once)
 
