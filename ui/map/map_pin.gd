@@ -1,6 +1,5 @@
 ## The one pin the player sets on the full map: a spot she chose to head for.
 ## Never set by the game or the story (R2). Clears itself when she arrives.
-class_name MapPin
 extends RefCounted
 
 ## Within this many metres she has arrived.

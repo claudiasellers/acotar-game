@@ -1,8 +1,7 @@
 ## The player's map pin standing in the world: a soft, sparkly faelight beam
-## and a glowing ring on the ground, so she can steer by eye. It fades as she
+## with rising glints, so she can steer by eye. It fades as she
 ## draws near and bursts into sparkles when she arrives (R3). Lives under
 ## WorldMapHud; follows its MapPin.
-class_name PinBeacon
 extends Node3D
 
 const HEIGHT := 70.0

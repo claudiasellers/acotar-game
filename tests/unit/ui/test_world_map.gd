@@ -1,6 +1,7 @@
 extends GutTest
 
 const SETTINGS_PATH := "user://test_map_settings.cfg"
+const MapPin := preload("res://ui/map/map_pin.gd")
 
 
 func before_each() -> void:
@@ -215,3 +216,8 @@ func test_hud_pin_clicks_save_and_arrival() -> void:
 	other.load_state({"pin": [10.0, 20.0]})
 	assert_eq(other.pin.xz, Vector2(10.0, 20.0))
 	assert_true(other.beacon.visible)
+
+
+func test_build_stops_when_cancelled() -> void:
+	var cancel := [true]
+	assert_null(MapArt.build(64.0, false, cancel), "a cancelled paint returns nothing at once")

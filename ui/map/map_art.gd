@@ -78,7 +78,9 @@ static func uv_to_world(uv: Vector2) -> Vector2:
 
 
 ## Paints the whole map. threaded = false for callers already on a thread.
-static func build(metres_per_pixel: float, threaded: bool = true) -> Image:
+## `cancel` is a shared [bool]: set cancel[0] = true from another thread and
+## build stops after the current row and returns null.
+static func build(metres_per_pixel: float, threaded: bool = true, cancel: Array = [false]) -> Image:
 	var size := image_size(metres_per_pixel)
 	var w := size.x
 	var h := size.y
@@ -97,7 +99,9 @@ static func build(metres_per_pixel: float, threaded: bool = true) -> Image:
 		for col in w:
 			line[col] = WorldHeight.height_at(origin.x + (col + 0.5) * step, z)
 		rows[row] = line
-	_run_rows(height_task, h, threaded, "map heights")
+	_run_rows(height_task, h, threaded, "map heights", cancel)
+	if cancel[0]:
+		return null
 	var heights := PackedFloat32Array()
 	for line: PackedFloat32Array in rows:
 		heights.append_array(line)
@@ -115,10 +119,14 @@ static func build(metres_per_pixel: float, threaded: bool = true) -> Image:
 			line[col * 3 + 1] = t.y
 			line[col * 3 + 2] = t.z
 		trows[row] = line
-	_run_rows(texture_task, h, threaded, "map ground")
+	_run_rows(texture_task, h, threaded, "map ground", cancel)
+	if cancel[0]:
+		return null
 
 	# 2. Tree canopy density from scatter, softened.
 	var canopy := _canopy_density(w, h, step)
+	if cancel[0]:
+		return null
 
 	# 3. Paint.
 	var paper := _noise(SEED, 0.004 * step, 3)
@@ -139,7 +147,9 @@ static func build(metres_per_pixel: float, threaded: bool = true) -> Image:
 			line[col * 3 + 1] = c.g8
 			line[col * 3 + 2] = c.b8
 		crows[row] = line
-	_run_rows(paint_task, h, threaded, "map paint")
+	_run_rows(paint_task, h, threaded, "map paint", cancel)
+	if cancel[0]:
+		return null
 	var bytes := PackedByteArray()
 	for line: PackedByteArray in crows:
 		bytes.append_array(line)
@@ -258,12 +268,17 @@ static func _hash(a: int, b: int) -> int:
 	return (hsh ^ (hsh >> 16)) & 0x7fffffff
 
 
-static func _run_rows(task: Callable, count: int, threaded: bool, label: String) -> void:
+static func _run_rows(task: Callable, count: int, threaded: bool, label: String, cancel: Array) -> void:
+	var guarded := func(row: int) -> void:
+		if not cancel[0]:
+			task.call(row)
 	if threaded:
-		var id := WorkerThreadPool.add_group_task(task, count, -1, true, label)
+		var id := WorkerThreadPool.add_group_task(guarded, count, -1, true, label)
 		WorkerThreadPool.wait_for_group_task_completion(id)
 	else:
 		for row in count:
+			if cancel[0]:
+				return
 			task.call(row)
 
 

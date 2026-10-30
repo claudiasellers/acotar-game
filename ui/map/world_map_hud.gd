@@ -9,6 +9,10 @@ class_name WorldMapHud
 extends CanvasLayer
 
 const SAVE_KEY := "world_map"
+# Preloaded rather than global classes, so a stale class cache (an un-imported
+# checkout) still runs.
+const MapPin := preload("res://ui/map/map_pin.gd")
+const PinBeacon := preload("res://ui/map/pin_beacon.gd")
 const PLACES_PATH := "res://data/map/map_places.tres"
 const REVEAL_EVERY := 0.2
 const LOOK_EVERY := 0.25
@@ -48,6 +52,8 @@ var _look_timer: float = 0.0
 var _nodes_timer: float = 0.0
 var _look_cursor: int = 0
 var _paint_thread: Thread
+## Shared with the fallback paint thread: set to stop it on quit.
+var _paint_cancel: Array = [false]
 
 
 func _ready() -> void:
@@ -73,6 +79,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	SaveSystem.unregister_provider(SAVE_KEY)
 	if _paint_thread and _paint_thread.is_started():
+		_paint_cancel[0] = true  # it stops after its current row
 		_paint_thread.wait_to_finish()
 
 
@@ -323,7 +330,7 @@ func _load_bake() -> void:
 	blank.fill(MapArt.PAPER)
 	map_texture = ImageTexture.create_from_image(blank)
 	_paint_thread = Thread.new()
-	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false))
+	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false, _paint_cancel))
 	_wait_for_paint.call_deferred()
 	_add_baked_landmarks(MapArt.scatter_landmarks())
 
