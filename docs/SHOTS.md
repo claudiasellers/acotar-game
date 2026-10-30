@@ -42,8 +42,9 @@ Tips:
   The probe's output comes back in `logs/<label>.log`.
 - No answer usually means the Mac is asleep or the owner is playing. Keep working.
   Don't resubmit the same request; nothing is lost.
-- Terrain bake, woods cache and manor scatter are reused from a cache and rebuilt only when their inputs change
-  (`tools/mq/shots_generated.conf`). If you add a generator, add a line there.
+- Generated content (terrain bake, woods cache) comes from the build queue's cache (`tools/mq/levels.sh`, `generated.conf`)
+  and is rebuilt only when its inputs change. If you add a generator, add a line to `generated.conf`. Generators not listed there,
+  such as the manor scatter today, need a `prep` line.
 - Sending the identical commit and request twice costs nothing: the Mac resends the first answer.
 
 ## On the Mac (owner, once)

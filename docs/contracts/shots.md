@@ -64,10 +64,9 @@ A `request.json` is `look` only with `"quality": "full"`, and `layout` otherwise
 
 **Before the shots, nothing is rebuilt that doesn't need to be:**
 - Import: the render worktree starts from the play folder's `.godot` (a zero-copy APFS clone). `--import` runs only when an importable file (art, models, audio, fonts, `.import`) changed since the last import.
-- Generated content (`tools/mq/shots_generated.conf`: terrain bake, woods cache, manor scatter) is cached by the git ids of each generator's input files.
-  A build that `make update` already made in the play folder is adopted read-only, so a lane whose change doesn't touch those inputs never rebuilds them.
-  A change to an input rebuilds that one generator once; the last three builds per generator are kept.
-  **Add your generator to that file when you add one**, with its inputs regex. An unlisted `tools/generators/*.gd` still runs, uncached, on every request.
+- Generated content (terrain bake, woods cache, ...) comes from the build queue's own `tools/mq/levels.sh ensure`, with the same recipes (`tools/mq/generated.conf`) and the same machine-wide cache (`.git/levelcache`) the gate uses.
+  Anything the build lane or an earlier request already built for those inputs is copied in (APFS clone), never rebuilt. A change to a generator's inputs builds it once, for the gate and for shots alike.
+  **Add your generator to `generated.conf` when you add one.** In a commit without `levels.sh` (older than the queue), `tools/generators/*.gd` run uncached.
 - `prep` lines run every time.
 - **Same code and same request** (the request commit's tree) already answered `ok`: the earlier answer is sent again with nothing rendered.
 
@@ -130,5 +129,5 @@ answered <UTC time> after 52s
 
 - **Fetches only the delta.** The Mac's clone already has `main`, so a request fetch brings only the lane's new commits. The worktree checkout rewrites only the changed files.
 
-State lives in `.git/mq/shots/`: `events.log`, `listener.log`, `seen/`, `done/`, `bytree/`, `gencache/`, `lock/`, `userdir/`, `work/`.
+State lives in `.git/mq/shots/`: `events.log`, `listener.log`, `seen/`, `done/`, `bytree/`, `lock/`, `userdir/`, `work/`.
 `tools/mq/shots_selftest.sh` checks all of the above in throwaway repos with a stand-in Godot.

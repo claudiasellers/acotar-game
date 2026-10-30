@@ -33,9 +33,6 @@ echo "CALL $* | HOME=$HOME XDG_DATA_HOME=${XDG_DATA_HOME:-}" >>"$FAKE_LOG"
 path="" prev=""
 for a in "$@"; do [ "$prev" = --path ] && path="$a"; prev="$a"; done
 for a in "$@"; do [ "$a" = --import ] && { mkdir -p "$path/.godot"; exit 0; }; done
-for a in "$@"; do
-	[ "$a" = res://gen/make.gd ] && { mkdir -p "$path/gen/_generated"; cat "$path/gen/input.txt" >"$path/gen/_generated/out.res"; exit 0; }
-done
 user=() seen=0
 for a in "$@"; do [ "$seen" = 1 ] && user+=("$a"); [ "$a" = -- ] && seen=1; done
 [ "$seen" = 0 ] && exit 0   # generator / prep run
@@ -64,7 +61,11 @@ echo '[application]' >"$T/src/project.godot"
 echo 'extends SceneTree' >"$T/src/tools/generators/gen.gd"
 mkdir -p "$T/src/gen" && echo v1 >"$T/src/gen/input.txt" && echo 'extends SceneTree' >"$T/src/gen/make.gd"
 echo '_generated/' >"$T/src/.gitignore"
-echo 'gen | -s res://gen/make.gd | gen/_generated | ^gen/' >"$T/src/tools/mq/shots_generated.conf"
+# Stand-in for the build queue's levels.sh (its own selftest covers the cache).
+cat >"$T/src/tools/mq/levels.sh" <<'L'
+echo "LEVELS ensure in $PWD" >>"$FAKE_LOG"
+mkdir -p gen/_generated && cat gen/input.txt >gen/_generated/out.res
+L
 echo png >"$T/src/probe/art.png"
 echo '[gd_scene format=3]' >"$T/src/probe/shot.tscn"
 echo 'extends SceneTree' >"$T/src/probe/check.gd"
@@ -91,8 +92,6 @@ out=$(cd "$T/other" && MQ_HOME_MACHINE=1 bash tools/mq/shots.sh --once 2>&1); rc
 check "refuses without MQ_HOME_MACHINE=1 in .git/mq/config" '[ $rc = 2 ] && echo "$out" | grep -q REFUSED'
 
 # 2 a good request is answered with pictures on an orphan branch
-# the play folder already built gen/_generated at main (as make update does)
-mkdir -p "$T/mac/gen/_generated" && echo v1 >"$T/mac/gen/_generated/out.res"
 request A 1 'from selftest\nquality layout\nsize 640x360\nshot cottage res://probe/shot.tscn ok {out}/cottage.png\nshot many res://probe/check.gd two {out}\n'
 once
 check "answers a good request with status ok" 'result A-1 | grep -qx "status ok"'
@@ -101,8 +100,9 @@ check "result holds every picture and stats file" 'echo "$files" | grep -qx out/
 check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/origin.git" rev-list --parents -1 refs/heads/shots/res-A-1 | cut -s -d" " -f2)" ] && ! echo "$files" | grep -q project.godot'
 check "renders windowed in the corner, Dummy audio, request size" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40 --always-on-top"'
 check "script probes run with -s, args after --" 'grep -q -- "-s res://probe/check.gd -- two" "$FAKE_LOG"'
-check "generators and import ran before the shots" 'grep -q -- "--headless --audio-driver Dummy --path .* -s res://tools/generators/gen.gd" "$FAKE_LOG" && grep -q -- "--import" "$FAKE_LOG"'
-check "generated content is adopted from the play folder, not rebuilt" '! grep -q "res://gen/make.gd" "$FAKE_LOG" && result A-1 | grep -q "gen cached" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v1 ]'
+check "the import ran headless before the shots" 'grep -q -- "--headless --audio-driver Dummy --path .* --import" "$FAKE_LOG"'
+check "generated content comes from the queue's levels.sh, run in the render worktree" 'grep -q "LEVELS ensure in $T/mac/.lanes/shots$" "$FAKE_LOG" && result A-1 | grep -q "generated content .*(levels.sh)" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v1 ]'
+check "with levels.sh, tools/generators are not run a second time" '! grep -q "res://tools/generators/gen.gd" "$FAKE_LOG"'
 check "quality layout pictures come back as JPEG, 1280 wide" '! echo "$files" | grep -qx out/cottage/cottage.png && git --git-dir="$T/origin.git" show refs/heads/shots/res-A-1:out/cottage/cottage.jpg | jpeg_is_1280_wide'
 check "user:// is a scratch folder, never the owner's" '! grep "probe/" "$FAKE_LOG" | grep -v "HOME=$T/mac/.git/mq/shots/userdir/" | grep -q . && [ ! -d "$HOME/.local/share/godot/app_userdata/game" ] && [ ! -d "$T/mac/.git/mq/shots/work/A-1" ]'
 check "each run starts with an empty user:// but keeps the shader cache" '[ "$(wc -l <"$T/mac/.git/mq/shots/userdir/data/godot/app_userdata/game/shader_cache/c")" -ge 2 ]'
@@ -194,20 +194,20 @@ request L 3 'size 2560x1440\nshot x res://probe/shot.tscn ok {out}/x.png\n'
 once
 check "quality look refuses a small or cheap render" 'result L-1 | grep -q "note quality look renders at 1920x1080 or larger" && result L-2 | grep -q "note quality look renders with the project"'
 check "quality look keeps the lossless PNG at full size" 'result L-3 | grep -qx "quality look" && git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-L-3 | grep -qx out/x/x.png && grep "L-3" "$FAKE_LOG" >/dev/null; grep -q -- "--resolution 2560x1440" "$FAKE_LOG"'
-check "unchanged inputs: generated content restored from the cache" 'result L-3 | grep -q "gen cached" && ! grep -q "res://gen/make.gd" "$FAKE_LOG"'
 check "no art changed since the last import: import skipped" 'result L-3 | grep -q "import skipped"'
 (cd "$T/cloud" && echo v2 >gen/input.txt && echo png2 >probe/art.png && git commit -qam "gen input and art" && git push -q origin HEAD:refs/heads/lane/x) >>"$T/cloud.out" 2>&1
 request G 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
-check "changed inputs: generated content rebuilt, then cached" 'result G-1 | grep -q "gen built" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v2 ] && [ "$(ls "$T/mac/.git/mq/shots/gencache/gen" | wc -l | tr -d " ")" = 2 ]'
+check "the request's own inputs reach levels.sh" '[ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v2 ]'
 check "changed art: import runs" 'result G-1 | grep -q "prep ok .*: import [0-9]"'
 request G 2 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 n=$(grep -c "probe/shot.tscn" "$FAKE_LOG"); once
 check "same code and request: the earlier answer is resent, nothing rendered" 'result G-2 | grep -q "reused from G-1" && result G-2 | grep -qx "request G-2" && [ "$(grep -c "probe/shot.tscn" "$FAKE_LOG")" = "$n" ]'
-(cd "$T/cloud" && git checkout -q main 2>/dev/null; git -C "$T/cloud" reset -q --hard origin/main) >>"$T/cloud.out" 2>&1
+(cd "$T/cloud" && git rm -q tools/mq/levels.sh && git commit -qm "no queue" && git push -q origin HEAD:refs/heads/lane/x) >>"$T/cloud.out" 2>&1
 request G 3 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
-check "back on main's inputs: the v1 build comes back from the cache" 'result G-3 | grep -q "gen cached" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v1 ]'
+check "a commit without levels.sh still runs tools/generators" 'result G-3 | grep -q "gen.gd ran"'
+
 
 echo "---"
 echo "$PASSES passed, $FAILS failed"

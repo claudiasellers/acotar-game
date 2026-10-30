@@ -53,7 +53,6 @@ PUSH=$(conf SHOTS_PUSH 1)
 KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 1)
 LAYOUT_WIDTH=$(conf SHOTS_LAYOUT_WIDTH 1280)
 LAYOUT_JPEG=$(conf SHOTS_LAYOUT_JPEG 80)
-GENCACHE="$S/gencache"
 
 event() {
 	mkdir -p "$S"
@@ -188,77 +187,20 @@ if [ "$(uname -s)" != Darwin ] && [ -z "${DISPLAY:-}" ] && command -v xvfb-run >
 	DISP=(xvfb-run -a -s "-screen 0 1920x1080x24")
 fi
 
-# ---- generated content, cached by the git ids of its inputs -----------------
-
-# Lines of tools/mq/shots_generated.conf as "name|run|outputs|inputs".
-gen_lines() { # conf file
-	sed -e 's/#.*//' -e 's/[[:space:]]*|[[:space:]]*/|/g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$1" 2>/dev/null | grep '|'
-}
-
-gen_key() { # commit run inputs-regex
-	{
-		echo "$2|$3|$GODOT_VERSION"
-		git ls-tree -r --full-tree "$1" | RE="$3" awk -F'\t' '$2 ~ ENVIRON["RE"] && $2 !~ /^\.shots\//'
-	} | git hash-object --stdin
-}
-
-# Git-ignored files under the output folders, relative to the checkout root.
-gen_files() { # root outputs
-	(cd "$1" && git ls-files -o -i --exclude-standard -- $2 2>/dev/null)
-}
-
-gen_store() { # root name key outputs
-	local d="$GENCACHE/$2/$3" f
-	[ -d "$d" ] && return 0
-	mkdir -p "$d.tmp"
-	gen_files "$1" "$4" | while read -r f; do clone_copy "$1/$f" "$d.tmp/$f"; done
-	mv "$d.tmp" "$d"
-	# Keep the three most recently used builds per generator.
-	ls -t "$GENCACHE/$2" 2>/dev/null | tail -n +4 | while read -r f; do rm -rf "${GENCACHE:?}/${2:?}/${f:?}"; done
-}
-
-gen_restore() { # name key outputs -> worktree
-	local d="$GENCACHE/$1/$2" o f
-	[ -d "$d" ] || return 1
-	for o in $3; do
-		gen_files "$WT" "$o" | while read -r f; do rm -f "$WT/$f"; done
-		[ -d "$d/$o" ] || continue
-		(cd "$d/$o" && find . -type f | sed 's#^\./##') | while read -r f; do clone_copy "$d/$o/$f" "$WT/$o/$f"; done
-	done
-	touch "$d"
-	return 0
-}
-
-# Adopts what `make update` already built in the play folder (read only), so a
-# request whose inputs match the play folder's never rebuilds it.
-seed_from_play() {
-	local c name run outs ins key conf
-	c=$(git -C "$REPO" rev-parse -q --verify HEAD) || return 0
-	[ "$(cat "$S/seeded_from" 2>/dev/null)" = "$c" ] && return 0
-	conf=$(mktemp "${TMPDIR:-/tmp}/shots-gen.XXXXXX")
-	git -C "$REPO" show "$c:tools/mq/shots_generated.conf" >"$conf" 2>/dev/null
-	gen_lines "$conf" | while IFS='|' read -r name run outs ins; do
-		[ -n "$(gen_files "$REPO" "$outs" | head -1)" ] || continue
-		git -C "$REPO" status --porcelain --untracked-files=no | cut -c4- | grep -Eq "$ins" && continue
-		key=$(gen_key "$c" "$run" "$ins")
-		[ -d "$GENCACHE/$name/$key" ] && continue
-		gen_store "$REPO" "$name" "$key" "$outs" && event "SEEDED $name from the play folder"
-	done
-	rm -f "$conf"
-	echo "$c" >"$S/seeded_from"
-}
-
 godot_headless() { # log limit godot-args...
 	local log="$1" limit="$2"
 	shift 2
 	shots_run_limited "$limit" "$log" godot_env "$GODOT" --headless --audio-driver Dummy --path "$WT" "$@"
 }
 
-# Import (only when art changed since the last import), generated content
-# (from the cache when its inputs are unchanged), then the request's prep lines.
+# Import (only when art changed since the last import), then generated content
+# through the build queue's own levels.sh: the same recipes (generated.conf) and
+# the same machine-wide cache (.git/levelcache) the gate uses, so anything the
+# build lane or an earlier request built is copied in, never rebuilt. Then the
+# request's own prep lines.
 IMPORTABLE='\.(png|jpe?g|webp|svg|tga|bmp|exr|hdr|glb|gltf|bin|obj|fbx|blend|dae|wav|ogg|mp3|ttf|otf|woff2?|import|csv|ktx2?|dds)$'
 prepare() {
-	local log=$RES/logs/prep.log t0 t1 rc g sha last name run outs ins key listed=" " steps="" genl
+	local log=$RES/logs/prep.log t0 t1 rc g sha last steps="" gens=""
 	t0=$(shots_epoch)
 	sha=$(git -C "$WT" rev-parse HEAD)
 	last=$(cat "$S/imported_commit" 2>/dev/null)
@@ -274,29 +216,19 @@ prepare() {
 		echo "$sha" >"$S/imported_commit"
 		steps="import $(($(shots_epoch) - t1))s"
 	fi
-	genl="$RES/gen.lines"
-	gen_lines "$WT/tools/mq/shots_generated.conf" >"$genl"
-	while IFS='|' read -r name run outs ins; do
-		[ -n "$name" ] || continue
-		listed="$listed${run#-s } "
-		key=$(gen_key "$sha" "$run" "$ins")
-		if gen_restore "$name" "$key" "$outs"; then
-			steps="$steps, $name cached"
-			continue
-		fi
+	if [ -f "$WT/tools/mq/levels.sh" ]; then
 		t1=$(shots_epoch)
-		echo "== $name: $run" >>"$log"
-		godot_headless "$log" 1800 $run
+		echo "== levels.sh ensure" >>"$log"
+		(cd "$WT" && shots_run_limited 3600 "$log" bash tools/mq/levels.sh ensure)
 		rc=$?
-		[ "$rc" = 0 ] || { echo "prep fail $name exit=$rc $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; }
-		gen_store "$WT" "$name" "$key" "$outs"
-		steps="$steps, $name built $(($(shots_epoch) - t1))s"
-	done <"$genl"
-	rm -f "$genl"
-	for g in "$WT"/tools/generators/*.gd $PREPS; do
+		[ "$rc" = 0 ] || { echo "prep fail levels.sh ensure exit=$rc $(($(shots_epoch) - t0))s" >>"$RES/result.txt"; return 1; }
+		steps="$steps, generated content $(($(shots_epoch) - t1))s (levels.sh)"
+	else
+		gens="$WT/tools/generators/*.gd" # an older commit without the queue: build uncached
+	fi
+	for g in $gens $PREPS; do
 		case "$g" in "$WT"/*) g="res://${g#"$WT"/}" ;; esac
 		[ -f "$WT/${g#res://}" ] || continue
-		case "$listed" in *" $g "*) continue ;; esac
 		t1=$(shots_epoch)
 		echo "== $g" >>"$log"
 		if [ "${g%.gd}" != "$g" ]; then godot_headless "$log" 900 -s "$g"; else godot_headless "$log" 900 "$g"; fi
@@ -628,7 +560,6 @@ poll() {
 	fi
 	grep "	${SHOTS_RES_PREFIX}" "$reqs" | sed "s#.*	${SHOTS_RES_PREFIX}##" >"$ress"
 	mkdir -p "$S/seen" "$S/done" "$S/ignored"
-	seed_from_play
 	grep "	${SHOTS_REQ_PREFIX}" "$reqs" | while read -r sha ref; do
 		key="${ref#"$SHOTS_REQ_PREFIX"}"
 		if ! shots_valid_key "$key"; then
