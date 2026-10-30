@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="HeightProviderSet" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="HeightProviderSet" format=3]
 
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider_set.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/terrain/height_provider.gd" id="2"]
@@ -7,12 +7,12 @@
 [ext_resource type="Script" path="res://world/spring_court/eastern_woods/eastern_woods_terrain.gd" id="5_eastern"]
 [ext_resource type="Script" path="res://world/spring_court/suriel_glade/suriel_glade_terrain.gd" id="6_glade"]
 [ext_resource type="Resource" path="res://world/human_realm/shared/human_realm_height_provider.tres" id="7_human_realm"]
+[ext_resource type="Script" path="res://world/spring_court/wider/court_height.gd" id="7_jxvtp"]
 
 [sub_resource type="Resource" id="Resource_manor"]
 script = ExtResource("2")
 id = &"manor_estate"
 bounds = Rect2(-600, -500, 1200, 800)
-fade = 64.0
 height_script = ExtResource("3_manor")
 priority = 10
 
@@ -20,7 +20,6 @@ priority = 10
 script = ExtResource("2")
 id = &"border_woods"
 bounds = Rect2(-700, 300, 1200, 1100)
-fade = 64.0
 height_script = ExtResource("4_border")
 priority = 10
 
@@ -28,7 +27,6 @@ priority = 10
 script = ExtResource("2")
 id = &"eastern_woods"
 bounds = Rect2(650, -650, 1200, 1200)
-fade = 64.0
 height_script = ExtResource("5_eastern")
 priority = 10
 
@@ -40,6 +38,83 @@ fade = 40.0
 height_script = ExtResource("6_glade")
 priority = 11
 
+[sub_resource type="Resource" id="Resource_jxvtp"]
+script = ExtResource("2")
+id = &"court_hill_of_the_rite"
+bounds = Rect2(300, -1500, 1000, 800)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_jww5m"]
+script = ExtResource("2")
+id = &"court_solstice_meadow"
+bounds = Rect2(-600, -1350, 900, 550)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_riann"]
+script = ExtResource("2")
+id = &"court_starlight_glen"
+bounds = Rect2(-1500, -500, 540, 1100)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_dq75o"]
+script = ExtResource("2")
+id = &"court_fae_village"
+bounds = Rect2(-1500, -1250, 900, 750)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_bnv7d"]
+script = ExtResource("2")
+id = &"court_western_fells"
+bounds = Rect2(-2048, -900, 548, 2300)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_h70or"]
+script = ExtResource("2")
+id = &"court_fells_foot"
+bounds = Rect2(-1500, 600, 540, 800)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_kfhkr"]
+script = ExtResource("2")
+id = &"court_autumn_foothills"
+bounds = Rect2(-2048, -2048, 1448, 798)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_6s3et"]
+script = ExtResource("2")
+id = &"court_autumn_west"
+bounds = Rect2(-2048, -1250, 548, 350)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_mo44j"]
+script = ExtResource("2")
+id = &"court_blight_north"
+bounds = Rect2(-600, -2048, 2300, 548)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_l0187"]
+script = ExtResource("2")
+id = &"court_blight_west"
+bounds = Rect2(-600, -1500, 900, 150)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
+[sub_resource type="Resource" id="Resource_6tbfw"]
+script = ExtResource("2")
+id = &"court_blight_east"
+bounds = Rect2(1300, -1500, 748, 850)
+height_script = ExtResource("7_jxvtp")
+priority = 10
+
 [resource]
 script = ExtResource("1")
-providers = Array[Resource]([ExtResource("7_human_realm"), SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade")])
+providers = Array[ExtResource("2")]([ExtResource("7_human_realm"), SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade"), SubResource("Resource_jxvtp"), SubResource("Resource_jww5m"), SubResource("Resource_riann"), SubResource("Resource_dq75o"), SubResource("Resource_bnv7d"), SubResource("Resource_h70or"), SubResource("Resource_kfhkr"), SubResource("Resource_6s3et"), SubResource("Resource_mo44j"), SubResource("Resource_l0187"), SubResource("Resource_6tbfw")])

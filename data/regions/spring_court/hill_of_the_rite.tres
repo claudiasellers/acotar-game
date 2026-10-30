@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_box7p"]
+
+[resource]
+script = ExtResource("1_box7p")
+id = &"hill_of_the_rite"
+scene_path = "res://world/spring_court/hill_of_the_rite/hill_of_the_rite.tscn"
+center = Vector3(800, 99.17714, -1075)
+radius = 656.2202
+neighbors = PackedStringArray("rosewild", "solstice_meadow", "blighted_reaches")
+report_path = "res://world/spring_court/hill_of_the_rite/hill_of_the_rite_report.json"

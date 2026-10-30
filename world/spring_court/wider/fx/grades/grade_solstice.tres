@@ -4,7 +4,7 @@
 
 [sub_resource type="Gradient" id="Gradient_odamq"]
 offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(0.3647059, 0.3019608, 0.47843137, 1, 0.9490196, 0.76862746, 0.56078434, 1, 1, 0.9843137, 0.91764706, 1)
+colors = PackedColorArray(0.10941177, 0.09058824, 0.14352942, 1, 0.6347059, 0.5805882, 0.5182353, 1, 1, 0.9952941, 0.9752941, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_lwgx3"]
 gradient = SubResource("Gradient_odamq")
@@ -17,18 +17,17 @@ sky_horizon = Color(1, 0.9411765, 0.72156864, 1)
 ground_horizon = Color(1, 0.9137255, 0.76862746, 1)
 ground_bottom = Color(0.6509804, 0.8509804, 0.56078434, 1)
 sun_color = Color(1, 0.9411765, 0.76862746, 1)
-sun_energy = 1.55
+sun_energy = 0.9299999999999999
 ambient_color = Color(1, 0.9411765, 0.8627451, 1)
-ambient_energy = 1.05
+ambient_energy = 0.63
 fog_color = Color(1, 0.9529412, 0.8392157, 1)
 fog_density = 0.002
 volumetric_density = 0.011
 volumetric_albedo = Color(1, 0.972549, 0.9098039, 1)
-exposure = 1.1
+exposure = 0.98
 saturation = 1.36
 contrast = 0.95
-brightness = 1.07
-glow_intensity = 1.05
-glow_bloom = 0.22
+glow_intensity = 0.735
+glow_bloom = 0.055
 lut = SubResource("GradientTexture1D_lwgx3")
 magic = 1.0

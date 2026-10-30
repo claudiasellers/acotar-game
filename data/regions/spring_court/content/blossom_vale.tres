@@ -1,0 +1,508 @@
+[gd_resource type="Resource" script_class="CourtRegionContent" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_decor_entry.gd" id="1_rf4gq"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_forage_entry.gd" id="2_go5vv"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_habitat.gd" id="3_r6le2"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_landmark.gd" id="4_ofly2"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_region_content.gd" id="5_u6y0t"]
+
+[sub_resource type="Resource" id="Resource_yihdj"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_grass_clump_a"
+habitats = PackedStringArray("orchard", "riverbank", "blossom_cathedral", "bee_meadow", "plum_rows", "quince_walk", "cider_mill", "lift_glade")
+density = 2.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_5ce5s"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_grass_clump_b"
+habitats = PackedStringArray("orchard", "riverbank", "blossom_cathedral", "bee_meadow", "plum_rows", "quince_walk", "cider_mill", "lift_glade")
+density = 1.6
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_xanyn"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_grass_clump_c"
+habitats = PackedStringArray("orchard", "riverbank", "blossom_cathedral", "bee_meadow", "plum_rows", "quince_walk", "cider_mill", "lift_glade")
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_jpfw2"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"rock_mossy_a"
+habitats = PackedStringArray("orchard", "riverbank", "blossom_cathedral", "bee_meadow", "plum_rows", "quince_walk", "cider_mill", "lift_glade")
+density = 0.03
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_unbr5"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"rock_pebble_cluster"
+habitats = PackedStringArray("orchard", "riverbank", "blossom_cathedral", "bee_meadow", "plum_rows", "quince_walk", "cider_mill", "lift_glade")
+density = 0.08
+wind = 0.0
+
+[sub_resource type="Resource" id="Resource_6cmc5"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_tree_apple_blossom"
+habitats = PackedStringArray("orchard", "cider_mill")
+density = 0.4
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_kh0oa"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_tree_cherry_blossom"
+habitats = PackedStringArray("blossom_cathedral")
+density = 0.7
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_44tfg"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_tree_cherry_blossom"
+habitats = PackedStringArray("orchard", "plum_rows")
+density = 0.08
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_qam36"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_tree_lilac_fae"
+habitats = PackedStringArray("quince_walk")
+density = 0.1
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_1l2hr"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_tree_weeping_willow"
+habitats = PackedStringArray("riverbank")
+density = 0.05
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_xf6gy"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_blush"
+habitats = PackedStringArray("orchard", "blossom_cathedral")
+density = 2.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_e0cnn"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_butter"
+habitats = PackedStringArray("bee_meadow")
+density = 2.4
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_oyilo"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_pearl"
+habitats = PackedStringArray("lift_glade")
+density = 3.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_0wgxr"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_lilac"
+habitats = PackedStringArray("lift_glade")
+density = 2.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_b8bdb"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_pearl"
+habitats = PackedStringArray("orchard", "quince_walk")
+density = 1.6
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_n0kj7"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_carpet_rose"
+habitats = PackedStringArray("plum_rows")
+density = 1.6
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_i77kw"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"flora_reeds_bulrush"
+habitats = PackedStringArray("riverbank")
+density = 2.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_yk67f"]
+script = ExtResource("1_rf4gq")
+mesh_id = &"fence_rail"
+habitats = PackedStringArray("orchard")
+density = 0.008
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_o07cu"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_spring_apple"
+habitats = PackedStringArray("orchard", "cider_mill")
+weight = 3.5
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_ty0gu"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_honeyplum"
+habitats = PackedStringArray("plum_rows", "orchard")
+weight = 3.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_kajlo"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_quince"
+habitats = PackedStringArray("quince_walk")
+weight = 3.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_44wxe"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_cherry"
+habitats = PackedStringArray("blossom_cathedral", "orchard")
+weight = 3.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_4bmnl"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_cherry_blossom"
+habitats = PackedStringArray("blossom_cathedral")
+weight = 2.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_hsp1l"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_elderflower"
+habitats = PackedStringArray("orchard", "riverbank")
+weight = 1.2
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_tj4eq"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_honey"
+habitats = PackedStringArray("bee_meadow")
+weight = 2.5
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_kelt5"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_wild_strawberry"
+habitats = PackedStringArray("orchard", "bee_meadow")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_mk83g"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_clover"
+habitats = PackedStringArray("bee_meadow", "orchard")
+weight = 2.0
+cluster_min = 3
+cluster_max = 6
+
+[sub_resource type="Resource" id="Resource_f41hv"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_dandelion"
+habitats = PackedStringArray("bee_meadow", "orchard")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_1o5ed"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_primrose"
+habitats = PackedStringArray("orchard", "quince_walk", "lift_glade")
+weight = 1.5
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_at184"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_chamomile"
+habitats = PackedStringArray("bee_meadow", "lift_glade")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_csf3x"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_meadowsweet"
+habitats = PackedStringArray("riverbank")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_hud87"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_watermint"
+habitats = PackedStringArray("riverbank")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_ghejw"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_willow_bark"
+habitats = PackedStringArray("riverbank")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_8vu4n"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_marsh_marigold"
+habitats = PackedStringArray("riverbank")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_reop3"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_bulrush_root"
+habitats = PackedStringArray("riverbank")
+cluster_min = 2
+
+[sub_resource type="Resource" id="Resource_1raih"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_river_silt"
+habitats = PackedStringArray("riverbank")
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_xuang"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_snail_shell"
+habitats = PackedStringArray("riverbank", "orchard")
+weight = 0.8
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_iarpb"]
+script = ExtResource("2_go5vv")
+item_id = &"ing_lavender"
+habitats = PackedStringArray("quince_walk", "bee_meadow")
+weight = 1.2
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_dmlio"]
+script = ExtResource("2_go5vv")
+item_id = &"col_robin_egg_shell"
+habitats = PackedStringArray("orchard", "blossom_cathedral")
+weight = 0.8
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_48cq0"]
+script = ExtResource("2_go5vv")
+item_id = &"col_blue_jay_feather"
+habitats = PackedStringArray("orchard")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_uge2n"]
+script = ExtResource("2_go5vv")
+item_id = &"col_wren_feather"
+habitats = PackedStringArray("plum_rows", "quince_walk")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_alngd"]
+script = ExtResource("2_go5vv")
+item_id = &"col_seed_packet"
+habitats = PackedStringArray("cider_mill")
+weight = 0.8
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_j4ev3"]
+script = ExtResource("2_go5vv")
+item_id = &"col_beetle_jewel"
+habitats = PackedStringArray("bee_meadow", "orchard")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_tia8v"]
+script = ExtResource("2_go5vv")
+item_id = &"col_river_pearl"
+habitats = PackedStringArray("riverbank")
+weight = 0.25
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_8etqy"]
+script = ExtResource("2_go5vv")
+item_id = &"col_shell_river_mussel"
+habitats = PackedStringArray("riverbank")
+weight = 0.8
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_u0fxy"]
+script = ExtResource("2_go5vv")
+item_id = &"col_feather_kingfisher"
+habitats = PackedStringArray("riverbank")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_xhq72"]
+script = ExtResource("2_go5vv")
+item_id = &"col_carved_bird"
+habitats = PackedStringArray("cider_mill")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_4wfcd"]
+script = ExtResource("3_r6le2")
+tag = &"river"
+shape = 3
+band_max = 7.5
+priority = 9
+exclusive = true
+
+[sub_resource type="Resource" id="Resource_pnk1v"]
+script = ExtResource("3_r6le2")
+tag = &"riverbank"
+shape = 3
+band_min = 8.0
+band_max = 26.0
+priority = 7
+
+[sub_resource type="Resource" id="Resource_0c0dn"]
+script = ExtResource("3_r6le2")
+tag = &"blossom_cathedral"
+center = Vector2(900, 750)
+radius = 120.0
+priority = 5
+
+[sub_resource type="Resource" id="Resource_cadkq"]
+script = ExtResource("3_r6le2")
+tag = &"bee_meadow"
+center = Vector2(1250, 900)
+radius = 110.0
+priority = 5
+
+[sub_resource type="Resource" id="Resource_tjel6"]
+script = ExtResource("3_r6le2")
+tag = &"plum_rows"
+center = Vector2(1300, 1250)
+radius = 140.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_a330h"]
+script = ExtResource("3_r6le2")
+tag = &"quince_walk"
+center = Vector2(650, 1250)
+radius = 110.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_frvvd"]
+script = ExtResource("3_r6le2")
+tag = &"cider_mill"
+center = Vector2(1050, 1060)
+radius = 45.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_md72x"]
+script = ExtResource("3_r6le2")
+tag = &"lift_glade"
+center = Vector2(1150, 650)
+radius = 35.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_xa1rc"]
+script = ExtResource("4_ofly2")
+id = &"blossom_cathedral"
+display_name = "The Blossom Cathedral"
+position = Vector2(900, 750)
+asset_ids = PackedStringArray("flora_tree_cherry_blossom", "flora_tree_cherry_blossom", "flora_tree_cherry_blossom", "flora_tree_cherry_blossom")
+offsets = PackedVector2Array()
+height_m = 14.0
+visible_from_m = 350.0
+notes = "An avenue of huge cherries whose pink canopies meet overhead."
+
+[sub_resource type="Resource" id="Resource_mowes"]
+script = ExtResource("4_ofly2")
+id = &"cider_mill"
+display_name = "The Old Cider Mill"
+position = Vector2(1050, 1060)
+asset_ids = PackedStringArray("fae_mill", "fae_market_stall_b")
+offsets = PackedVector2Array()
+height_m = 12.0
+visible_from_m = 300.0
+notes = "A tenants' mill on the river, wheel still turning."
+
+[sub_resource type="Resource" id="Resource_sukgk"]
+script = ExtResource("4_ofly2")
+id = &"bee_tower"
+display_name = "The Bee Tower"
+position = Vector2(1250, 900)
+asset_ids = PackedStringArray("watchtower_ruined")
+offsets = PackedVector2Array()
+notes = "A ruined tower gone to the bees; honeycomb in its walls."
+
+[sub_resource type="Resource" id="Resource_xbq6n"]
+script = ExtResource("4_ofly2")
+id = &"vale_weir"
+display_name = "The Weir"
+position = Vector2(1350, 1150)
+asset_ids = PackedStringArray("stepping_stones", "wooden_footbridge_small")
+offsets = PackedVector2Array()
+height_m = 4.0
+visible_from_m = 200.0
+notes = "Stepping stones and a little bridge over the Thornwater's weir."
+
+[resource]
+script = ExtResource("5_u6y0t")
+region_id = &"blossom_vale"
+display_name = "Blossom Vale"
+bounds = Array[Rect2]([Rect2(500, 500, 1000, 900)])
+holes = Array[Rect2]([Rect2(650, -650, 1200, 1200)])
+seed = 4909
+default_habitat = &"orchard"
+habitats = Array[ExtResource("3_r6le2")]([SubResource("Resource_4wfcd"), SubResource("Resource_pnk1v"), SubResource("Resource_0c0dn"), SubResource("Resource_cadkq"), SubResource("Resource_tjel6"), SubResource("Resource_a330h"), SubResource("Resource_frvvd"), SubResource("Resource_md72x")])
+forage = Array[ExtResource("2_go5vv")]([SubResource("Resource_o07cu"), SubResource("Resource_ty0gu"), SubResource("Resource_kajlo"), SubResource("Resource_44wxe"), SubResource("Resource_4bmnl"), SubResource("Resource_hsp1l"), SubResource("Resource_tj4eq"), SubResource("Resource_kelt5"), SubResource("Resource_mk83g"), SubResource("Resource_f41hv"), SubResource("Resource_1o5ed"), SubResource("Resource_at184"), SubResource("Resource_csf3x"), SubResource("Resource_hud87"), SubResource("Resource_ghejw"), SubResource("Resource_8vu4n"), SubResource("Resource_reop3"), SubResource("Resource_1raih"), SubResource("Resource_xuang"), SubResource("Resource_iarpb"), SubResource("Resource_dmlio"), SubResource("Resource_48cq0"), SubResource("Resource_uge2n"), SubResource("Resource_alngd"), SubResource("Resource_j4ev3"), SubResource("Resource_tia8v"), SubResource("Resource_8etqy"), SubResource("Resource_u0fxy"), SubResource("Resource_xhq72")])
+decor = Array[ExtResource("1_rf4gq")]([SubResource("Resource_yihdj"), SubResource("Resource_5ce5s"), SubResource("Resource_xanyn"), SubResource("Resource_jpfw2"), SubResource("Resource_unbr5"), SubResource("Resource_6cmc5"), SubResource("Resource_kh0oa"), SubResource("Resource_44tfg"), SubResource("Resource_qam36"), SubResource("Resource_1l2hr"), SubResource("Resource_xf6gy"), SubResource("Resource_e0cnn"), SubResource("Resource_oyilo"), SubResource("Resource_0wgxr"), SubResource("Resource_b8bdb"), SubResource("Resource_n0kj7"), SubResource("Resource_i77kw"), SubResource("Resource_yk67f")])
+landmarks = Array[ExtResource("4_ofly2")]([SubResource("Resource_xa1rc"), SubResource("Resource_mowes"), SubResource("Resource_sukgk"), SubResource("Resource_xbq6n")])
+anchors = Array[Dictionary]([{
+"clear_radius": 12.0,
+"id": &"glamour_lift_glade",
+"position": Vector2(1150, 660),
+"yaw_degrees": 0.0
+}])
+grade = &"grade_blossom_vale"
+ambient_fx = PackedStringArray("fx_cherry_petals", "fx_butterflies", "fx_pollen_motes", "fx_dandelion_seeds")
+notes = "Orchard valley of ever-blooming fruit trees on the Thornwater south-east of the manor; the court's breadbasket, tended by masked tenants (Keeper expansion region)."

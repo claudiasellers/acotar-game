@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_5qvh8"]
+
+[resource]
+script = ExtResource("1_5qvh8")
+id = &"western_fells"
+scene_path = "res://world/spring_court/western_fells/western_fells.tscn"
+center = Vector3(-1250, 82.15258, 250)
+radius = 1274.7549
+neighbors = PackedStringArray("starlight_glen", "fae_village", "autumn_foothills")
+report_path = "res://world/spring_court/western_fells/western_fells_report.json"

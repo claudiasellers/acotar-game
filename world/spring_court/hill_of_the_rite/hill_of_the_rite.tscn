@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_vkvck"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/hill_of_the_rite.tres" id="2_67y5s"]
+
+[node name="HillOfTheRite" type="Node3D" unique_id=1089408853]
+script = ExtResource("1_vkvck")
+content = ExtResource("2_67y5s")

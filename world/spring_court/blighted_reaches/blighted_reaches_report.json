@@ -1,0 +1,12 @@
+{
+  "region": "blighted_reaches",
+  "types": 26,
+  "placements": 742,
+  "placements_per_km2": 811,
+  "empty_cells": 0,
+  "cells": 96,
+  "landmarks": 4,
+  "draw_calls": 178,
+  "decor_instances": 27628,
+  "area_km2": 0.915
+}

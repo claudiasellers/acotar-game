@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_7o3fh"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/starlight_glen.tres" id="2_enxmu"]
+
+[node name="StarlightGlen" type="Node3D" unique_id=1412010882]
+script = ExtResource("1_7o3fh")
+content = ExtResource("2_enxmu")

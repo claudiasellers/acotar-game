@@ -6,7 +6,7 @@
 render_priority = 0
 shader = ExtResource("1_gwmaf")
 shader_parameter/blight = 0.0
-shader_parameter/vertex_color_srgb = null
+shader_parameter/vertex_color_srgb = true
 shader_parameter/use_vertex_color = null
 shader_parameter/grass_a = null
 shader_parameter/grass_b = null

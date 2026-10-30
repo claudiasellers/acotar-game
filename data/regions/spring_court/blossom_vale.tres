@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_sxsmn"]
+
+[resource]
+script = ExtResource("1_sxsmn")
+id = &"blossom_vale"
+scene_path = "res://world/spring_court/blossom_vale/blossom_vale.tscn"
+center = Vector3(1000, 15.659533, 950)
+radius = 672.6812
+neighbors = PackedStringArray()
+report_path = "res://world/spring_court/blossom_vale/blossom_vale_report.json"

@@ -1,0 +1,389 @@
+[gd_resource type="Resource" script_class="CourtRegionContent" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_decor_entry.gd" id="1_0kv5k"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_forage_entry.gd" id="2_lo8qq"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_habitat.gd" id="3_tm4tm"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_landmark.gd" id="4_mpksk"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_region_content.gd" id="5_dlpa7"]
+
+[sub_resource type="Resource" id="Resource_dg2wf"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"flora_grass_clump_c"
+habitats = PackedStringArray("blight_waste", "blight_edge", "dead_wood", "grey_briar")
+density = 3.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_upabs"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"flora_tree_blighted_dead"
+habitats = PackedStringArray("dead_wood")
+density = 0.2
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_8lq0f"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"flora_tree_blighted_dead"
+habitats = PackedStringArray("blight_waste", "blight_heart")
+density = 0.03
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_4wfy2"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"flora_blighted_thicket"
+habitats = PackedStringArray("grey_briar")
+density = 0.4
+wind = 0.6
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_b5buc"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"flora_blighted_thicket"
+habitats = PackedStringArray("blight_waste")
+density = 0.05
+wind = 0.6
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_i521d"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"blight_dead_stump"
+habitats = PackedStringArray("blight_waste", "dead_wood")
+density = 0.06
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_w4m8i"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"blight_withered_fence"
+habitats = PackedStringArray("hollow_steading")
+density = 0.05
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_43pjp"]
+script = ExtResource("1_0kv5k")
+mesh_id = &"blight_bone_rock"
+habitats = PackedStringArray("blight_heart", "blight_waste")
+density = 0.03
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_5ug2q"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_blighted_petals"
+habitats = PackedStringArray("blight_waste", "grey_briar", "blight_heart")
+weight = 4.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_t1316"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_ashen_rose"
+habitats = PackedStringArray("grey_briar")
+weight = 2.5
+
+[sub_resource type="Resource" id="Resource_0vtcx"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_grey_lichen"
+habitats = PackedStringArray("dead_wood", "blight_waste")
+weight = 3.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_nshyv"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_nightshade"
+habitats = PackedStringArray("blight_edge", "dead_wood")
+weight = 1.5
+
+[sub_resource type="Resource" id="Resource_xo4dn"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_rose_hip"
+habitats = PackedStringArray("blight_edge")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_kx5bw"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_crow_feather"
+habitats = PackedStringArray("blight_waste", "dead_wood")
+weight = 1.2
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_n5vyd"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_foxglove"
+habitats = PackedStringArray("blight_edge")
+
+[sub_resource type="Resource" id="Resource_1wcq8"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_chaga"
+habitats = PackedStringArray("dead_wood")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_d40pc"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_tinder_fungus"
+habitats = PackedStringArray("dead_wood")
+weight = 1.2
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_dl4b1"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_old_mans_beard"
+habitats = PackedStringArray("dead_wood", "grey_briar")
+weight = 1.2
+
+[sub_resource type="Resource" id="Resource_a0i4q"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_iron_filings"
+habitats = PackedStringArray("hollow_steading")
+weight = 1.5
+cluster_max = 1
+canon = "C?"
+
+[sub_resource type="Resource" id="Resource_y65yd"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_salt"
+habitats = PackedStringArray("hollow_steading")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_pi7li"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_charcoal"
+habitats = PackedStringArray("hollow_steading", "blight_heart")
+weight = 1.2
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_72wcl"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_flint"
+habitats = PackedStringArray("blight_waste")
+weight = 0.8
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_rg0k0"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_oak_gall"
+habitats = PackedStringArray("dead_wood")
+weight = 0.8
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_ayd66"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_nettle"
+habitats = PackedStringArray("hollow_steading", "blight_edge")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_75t3p"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_thornbriar_sap"
+habitats = PackedStringArray("grey_briar")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_uvm6p"]
+script = ExtResource("2_lo8qq")
+item_id = &"ing_spider_silk"
+habitats = PackedStringArray("dead_wood", "grey_briar")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_bnxly"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_bone_bleached"
+habitats = PackedStringArray("blight_waste", "blight_heart")
+weight = 1.5
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_rw3xm"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_mask_shard"
+habitats = PackedStringArray("blight_heart", "hollow_steading", "blight_waste")
+weight = 1.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_minab"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_blighted_bloom"
+habitats = PackedStringArray("blight_waste", "grey_briar")
+weight = 1.5
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_mh31e"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_horseshoe"
+habitats = PackedStringArray("hollow_steading")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_shjpe"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_coin_old"
+habitats = PackedStringArray("hollow_steading")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_ug5un"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_snake_skin"
+habitats = PackedStringArray("blight_waste")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_j8pql"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_odd_stone"
+habitats = PackedStringArray("blight_waste")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_jurdy"]
+script = ExtResource("2_lo8qq")
+item_id = &"col_carved_bird"
+habitats = PackedStringArray("hollow_steading")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_oqc3t"]
+script = ExtResource("3_tm4tm")
+tag = &"dead_wood"
+center = Vector2(900, -1600)
+radius = 160.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_0ijnb"]
+script = ExtResource("3_tm4tm")
+tag = &"dead_wood"
+center = Vector2(1500, -1100)
+radius = 150.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_dunj2"]
+script = ExtResource("3_tm4tm")
+tag = &"grey_briar"
+center = Vector2(-200, -1550)
+radius = 140.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_wxkj5"]
+script = ExtResource("3_tm4tm")
+tag = &"hollow_steading"
+center = Vector2(300, -1600)
+radius = 70.0
+priority = 7
+
+[sub_resource type="Resource" id="Resource_wqqi7"]
+script = ExtResource("3_tm4tm")
+tag = &"blight_heart"
+center = Vector2(1500, -1600)
+radius = 110.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_dknnf"]
+script = ExtResource("3_tm4tm")
+tag = &"blight_edge"
+center = Vector2(1450, -800)
+radius = 120.0
+priority = 5
+
+[sub_resource type="Resource" id="Resource_gw2om"]
+script = ExtResource("3_tm4tm")
+tag = &"blight_edge"
+center = Vector2(-450, -1400)
+radius = 110.0
+priority = 5
+
+[sub_resource type="Resource" id="Resource_uw77x"]
+script = ExtResource("4_mpksk")
+id = &"hollow_steading"
+display_name = "The Hollow Steading"
+position = Vector2(300, -1600)
+asset_ids = PackedStringArray("fae_cottage_c", "blight_withered_fence", "blight_broken_arbor", "blight_dead_stump")
+offsets = PackedVector2Array()
+height_m = 8.0
+visible_from_m = 200.0
+notes = "An abandoned tenant farm, masks left on the step."
+
+[sub_resource type="Resource" id="Resource_4fy1x"]
+script = ExtResource("4_mpksk")
+id = &"dead_sentinel"
+display_name = "The Dead Sentinel"
+position = Vector2(900, -1600)
+asset_ids = PackedStringArray("flora_tree_blighted_dead")
+offsets = PackedVector2Array()
+height_m = 26.0
+visible_from_m = 650.0
+notes = "A colossal grey oak, silhouetted against the pale sky from the Hill of the Rite."
+
+[sub_resource type="Resource" id="Resource_id0k3"]
+script = ExtResource("4_mpksk")
+id = &"grey_briar_wall"
+display_name = "The Grey Briar"
+position = Vector2(-200, -1550)
+asset_ids = PackedStringArray("flora_blighted_thicket", "flora_blighted_thicket", "flora_blighted_thicket")
+offsets = PackedVector2Array()
+height_m = 6.0
+visible_from_m = 200.0
+notes = "Roses gone to ash-coloured thorn."
+
+[sub_resource type="Resource" id="Resource_7hsn5"]
+script = ExtResource("4_mpksk")
+id = &"blight_heart"
+display_name = "The Heart of the Blight"
+position = Vector2(1500, -1600)
+asset_ids = PackedStringArray("blight_mask_pile", "blight_bone_rock", "flora_tree_blighted_dead")
+offsets = PackedVector2Array()
+notes = "A sunken grey hollow where nothing grows and no bird sings."
+
+[resource]
+script = ExtResource("5_dlpa7")
+region_id = &"blighted_reaches"
+display_name = "The Blighted Reaches"
+canon = "C"
+bounds = Array[Rect2]([Rect2(-600, -1700, 2300, 200), Rect2(-600, -1500, 900, 150), Rect2(1300, -1500, 400, 800)])
+skirts = Array[Rect2]([Rect2(-600, -1900, 2450, 200), Rect2(1700, -1700, 150, 1050)])
+seed = 4808
+default_habitat = &"blight_waste"
+habitats = Array[ExtResource("3_tm4tm")]([SubResource("Resource_oqc3t"), SubResource("Resource_0ijnb"), SubResource("Resource_dunj2"), SubResource("Resource_wxkj5"), SubResource("Resource_wqqi7"), SubResource("Resource_dknnf"), SubResource("Resource_gw2om")])
+forage = Array[ExtResource("2_lo8qq")]([SubResource("Resource_5ug2q"), SubResource("Resource_t1316"), SubResource("Resource_0vtcx"), SubResource("Resource_nshyv"), SubResource("Resource_xo4dn"), SubResource("Resource_kx5bw"), SubResource("Resource_n5vyd"), SubResource("Resource_1wcq8"), SubResource("Resource_d40pc"), SubResource("Resource_dl4b1"), SubResource("Resource_a0i4q"), SubResource("Resource_y65yd"), SubResource("Resource_pi7li"), SubResource("Resource_72wcl"), SubResource("Resource_rg0k0"), SubResource("Resource_ayd66"), SubResource("Resource_75t3p"), SubResource("Resource_uvm6p"), SubResource("Resource_bnxly"), SubResource("Resource_rw3xm"), SubResource("Resource_minab"), SubResource("Resource_mh31e"), SubResource("Resource_shjpe"), SubResource("Resource_ug5un"), SubResource("Resource_j8pql"), SubResource("Resource_jurdy")])
+decor = Array[ExtResource("1_0kv5k")]([SubResource("Resource_dg2wf"), SubResource("Resource_upabs"), SubResource("Resource_8lq0f"), SubResource("Resource_4wfy2"), SubResource("Resource_b5buc"), SubResource("Resource_i521d"), SubResource("Resource_w4m8i"), SubResource("Resource_43pjp")])
+landmarks = Array[ExtResource("4_mpksk")]([SubResource("Resource_uw77x"), SubResource("Resource_4fy1x"), SubResource("Resource_id0k3"), SubResource("Resource_7hsn5")])
+anchors = Array[Dictionary]([{
+"clear_radius": 12.0,
+"id": &"the_pass_road",
+"position": Vector2(300, -1680),
+"yaw_degrees": 0.0
+}])
+gates = Array[Dictionary]([{
+"position": Vector2(300, -1694),
+"region_id": &"the_pass",
+"width": 34.0,
+"yaw_degrees": 0.0
+}])
+grade = &"grade_blight"
+ambient_fx = PackedStringArray("fx_blight_ash")
+blight = 0.85
+notes = "Where the blight (C) is worst: grey petals, dead glamours, silent birds. Horror region: genuinely dark, never pastel. The blight value spreads toward the court as phases advance (story lane drives it)."

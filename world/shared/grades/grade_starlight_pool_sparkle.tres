@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="GradePreset" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_vt3ur"]
+
+[sub_resource type="Gradient" id="Gradient_js3gu"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.09176471, 0.10588236, 0.18117648, 1, 0.54882354, 0.5852941, 0.6347059, 1, 1, 0.99764705, 0.9894118, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_es8qs"]
+gradient = SubResource("Gradient_js3gu")
+
+[resource]
+script = ExtResource("1_vt3ur")
+id = &"grade_starlight_pool_sparkle"
+sky_top = Color(0.49803922, 0.6901961, 1, 1)
+sky_horizon = Color(1, 0.8784314, 0.9490196, 1)
+ground_horizon = Color(1, 0.9411765, 0.8784314, 1)
+ground_bottom = Color(0.65882355, 0.8901961, 0.76862746, 1)
+sun_color = Color(1, 0.9647059, 0.8862745, 1)
+sun_energy = 0.96
+ambient_color = Color(0.9098039, 0.89411765, 1, 1)
+ambient_energy = 0.66
+fog_color = Color(0.9647059, 0.91764706, 1, 1)
+fog_density = 0.0016
+volumetric_density = 0.008
+volumetric_albedo = Color(1, 1, 1, 1)
+exposure = 0.98
+saturation = 1.4
+contrast = 0.94
+glow_intensity = 0.875
+glow_bloom = 0.07
+lut = SubResource("GradientTexture1D_es8qs")
+magic = 1.0

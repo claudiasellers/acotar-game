@@ -1,0 +1,461 @@
+[gd_resource type="Resource" script_class="CourtRegionContent" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_decor_entry.gd" id="1_tmlaj"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_forage_entry.gd" id="2_h5jpe"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_habitat.gd" id="3_o3hjj"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_landmark.gd" id="4_iwq2n"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_region_content.gd" id="5_lfl8l"]
+
+[sub_resource type="Resource" id="Resource_1tkkl"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_grass_clump_a"
+habitats = PackedStringArray("hill_grass", "stone_ring", "bonfire_terraces", "drum_field", "cave_mouth", "fire_lily_slope", "thorn_scrub")
+density = 2.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_6ga4x"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_grass_clump_b"
+habitats = PackedStringArray("hill_grass", "stone_ring", "bonfire_terraces", "drum_field", "cave_mouth", "fire_lily_slope", "thorn_scrub")
+density = 1.6
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_6qumo"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_grass_clump_c"
+habitats = PackedStringArray("hill_grass", "stone_ring", "bonfire_terraces", "drum_field", "cave_mouth", "fire_lily_slope", "thorn_scrub")
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_us3uy"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"rock_mossy_a"
+habitats = PackedStringArray("hill_grass", "stone_ring", "bonfire_terraces", "drum_field", "cave_mouth", "fire_lily_slope", "thorn_scrub")
+density = 0.03
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_pjc1u"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"rock_pebble_cluster"
+habitats = PackedStringArray("hill_grass", "stone_ring", "bonfire_terraces", "drum_field", "cave_mouth", "fire_lily_slope", "thorn_scrub")
+density = 0.08
+wind = 0.0
+
+[sub_resource type="Resource" id="Resource_lqy31"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_carpet_butter"
+habitats = PackedStringArray("hill_grass", "fire_lily_slope")
+density = 2.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_b2sgg"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_carpet_rose"
+habitats = PackedStringArray("hill_grass")
+density = 1.4
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_sr4y2"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_carpet_pearl"
+habitats = PackedStringArray("bonfire_terraces")
+density = 1.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_haf7y"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_heather_mound"
+habitats = PackedStringArray("thorn_scrub", "hill_grass")
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_navwk"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_tree_hawthorn"
+habitats = PackedStringArray("thorn_scrub")
+density = 0.08
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_wvefm"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"flora_tree_rowan"
+habitats = PackedStringArray("thorn_scrub", "hill_grass")
+density = 0.015
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_670jf"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"rite_terrace_wall"
+habitats = PackedStringArray("bonfire_terraces")
+density = 0.006
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_1u4cv"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"rite_ribbon_pole"
+habitats = PackedStringArray("drum_field", "bonfire_terraces")
+density = 0.01
+wind = 0.6
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_0lyne"]
+script = ExtResource("1_tmlaj")
+mesh_id = &"rock_mossy_d"
+habitats = PackedStringArray("hill_grass")
+density = 0.04
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_23tsd"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_fire_lily"
+habitats = PackedStringArray("fire_lily_slope", "bonfire_terraces")
+weight = 3.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_s82vs"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_red_ochre"
+habitats = PackedStringArray("bonfire_terraces", "cave_mouth")
+weight = 1.2
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_kksia"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_charcoal"
+habitats = PackedStringArray("bonfire_terraces", "drum_field")
+weight = 1.2
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_tsu1q"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_rite_spring"
+habitats = PackedStringArray("cave_mouth")
+weight = 3.0
+cluster_max = 1
+canon = "C"
+
+[sub_resource type="Resource" id="Resource_21bnf"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_flint"
+habitats = PackedStringArray("hill_grass", "stone_ring")
+weight = 0.8
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_e2l8a"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_wild_thyme"
+habitats = PackedStringArray("hill_grass", "bonfire_terraces")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_46wdl"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_heather"
+habitats = PackedStringArray("hill_grass", "thorn_scrub")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_4fti2"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_cowslip"
+habitats = PackedStringArray("hill_grass")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_cgvad"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_yarrow"
+habitats = PackedStringArray("hill_grass", "drum_field")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_vj0hp"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_clover"
+habitats = PackedStringArray("drum_field", "hill_grass")
+weight = 1.5
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_cv7ox"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_juniper_berry"
+habitats = PackedStringArray("thorn_scrub")
+weight = 1.2
+
+[sub_resource type="Resource" id="Resource_m1f1j"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_hawthorn_haw"
+habitats = PackedStringArray("thorn_scrub")
+weight = 1.2
+
+[sub_resource type="Resource" id="Resource_n58nq"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_primrose"
+habitats = PackedStringArray("hill_grass")
+weight = 1.2
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_5hfpm"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_moss"
+habitats = PackedStringArray("cave_mouth", "stone_ring")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_627mc"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_honey"
+habitats = PackedStringArray("thorn_scrub")
+weight = 0.3
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_ibqip"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_hawk_feather"
+habitats = PackedStringArray("stone_ring", "hill_grass")
+weight = 0.6
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_80ftb"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_owl_feather"
+habitats = PackedStringArray("thorn_scrub")
+weight = 0.5
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_kx1vd"]
+script = ExtResource("2_h5jpe")
+item_id = &"ing_faerie_wine"
+habitats = PackedStringArray("bonfire_terraces")
+weight = 0.3
+cluster_max = 1
+canon = "C"
+
+[sub_resource type="Resource" id="Resource_y1m6b"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_calanmai_ribbon"
+habitats = PackedStringArray("bonfire_terraces", "drum_field", "stone_ring")
+weight = 2.0
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_vt0nr"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_candle_stub"
+habitats = PackedStringArray("cave_mouth", "stone_ring")
+weight = 1.5
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_crjl3"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_stone_obsidian"
+habitats = PackedStringArray("stone_ring", "bonfire_terraces")
+weight = 0.8
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_s5ti5"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_odd_stone"
+habitats = PackedStringArray("stone_ring")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_ke417"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_heart_stone"
+habitats = PackedStringArray("hill_grass")
+weight = 0.3
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_5eadp"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_antler_tine"
+habitats = PackedStringArray("thorn_scrub")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_b1aap"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_feather_pheasant"
+habitats = PackedStringArray("hill_grass")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_xhipi"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_snake_skin"
+habitats = PackedStringArray("thorn_scrub")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_kiw2p"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_stone_quartz"
+habitats = PackedStringArray("stone_ring", "cave_mouth")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_6a7y3"]
+script = ExtResource("2_h5jpe")
+item_id = &"col_fae_bell"
+habitats = PackedStringArray("drum_field")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_qf1q6"]
+script = ExtResource("3_o3hjj")
+tag = &"stone_ring"
+center = Vector2(800, -1100)
+radius = 45.0
+priority = 9
+
+[sub_resource type="Resource" id="Resource_lrex2"]
+script = ExtResource("3_o3hjj")
+tag = &"bonfire_terraces"
+shape = 1
+center = Vector2(800, -1100)
+radius = 230.0
+inner_radius = 70.0
+priority = 5
+
+[sub_resource type="Resource" id="Resource_q06ni"]
+script = ExtResource("3_o3hjj")
+tag = &"drum_field"
+center = Vector2(560, -860)
+radius = 60.0
+priority = 7
+
+[sub_resource type="Resource" id="Resource_8wenr"]
+script = ExtResource("3_o3hjj")
+tag = &"cave_mouth"
+center = Vector2(690, -1000)
+radius = 26.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_jnysb"]
+script = ExtResource("3_o3hjj")
+tag = &"fire_lily_slope"
+shape = 1
+center = Vector2(800, -1100)
+radius = 320.0
+inner_radius = 150.0
+priority = 3
+
+[sub_resource type="Resource" id="Resource_fm2e7"]
+script = ExtResource("3_o3hjj")
+tag = &"thorn_scrub"
+center = Vector2(1150, -800)
+radius = 120.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_podie"]
+script = ExtResource("4_iwq2n")
+id = &"stone_ring"
+display_name = "The Ring of Stones"
+position = Vector2(800, -1100)
+asset_ids = PackedStringArray("rite_standing_stone_a", "rite_standing_stone_b", "rite_standing_stone_c", "rite_standing_stone_d", "rite_standing_stone_e", "rite_standing_stone_a", "rite_standing_stone_b", "rite_standing_stone_c", "rite_altar_stone")
+offsets = PackedVector2Array()
+height_m = 5.0
+visible_from_m = 200.0
+notes = "Nine carved stones on the flat crown; the hill itself (95 m) is the landmark from everywhere in the court."
+
+[sub_resource type="Resource" id="Resource_clm55"]
+script = ExtResource("4_iwq2n")
+id = &"cave_of_the_rite"
+display_name = "The Cave of the Rite"
+position = Vector2(690, -1000)
+asset_ids = PackedStringArray("rite_cave_mouth", "rite_cave_wall_a", "rite_cave_wall_b", "rite_cave_wall_c", "rite_cave_pillar", "rite_cave_pool_rim")
+offsets = PackedVector2Array()
+height_m = 7.0
+visible_from_m = 200.0
+kind = &"set_piece"
+canon = "C"
+notes = "Where the High Lord performs the Great Rite on Calanmai. Spring water pool inside."
+
+[sub_resource type="Resource" id="Resource_v0cs7"]
+script = ExtResource("4_iwq2n")
+id = &"bonfire_terraces"
+display_name = "The Bonfire Terraces"
+position = Vector2(620, -1080)
+asset_ids = PackedStringArray("rite_bonfire", "rite_bonfire", "rite_bonfire", "rite_bonfire", "rite_bonfire")
+offsets = PackedVector2Array()
+height_m = 8.0
+visible_from_m = 200.0
+canon = "C"
+notes = "Stepped terraces down the south-west face, a bonfire on each; where the three males corner Feyre and Rhysand intervenes."
+
+[sub_resource type="Resource" id="Resource_txd1r"]
+script = ExtResource("4_iwq2n")
+id = &"drum_field"
+display_name = "The Drumming Field"
+position = Vector2(560, -860)
+asset_ids = PackedStringArray("rite_drum", "rite_drum", "rite_drum", "rite_ribbon_pole", "rite_ribbon_pole")
+offsets = PackedVector2Array()
+height_m = 4.0
+visible_from_m = 200.0
+canon = "C"
+notes = "Flat field of great drums at the foot of the hill."
+
+[resource]
+script = ExtResource("5_lfl8l")
+region_id = &"hill_of_the_rite"
+display_name = "The Hill of the Rite"
+canon = "C"
+bounds = Array[Rect2]([Rect2(300, -1500, 1000, 800), Rect2(650, -700, 650, 50)])
+holes = Array[Rect2]([Rect2(300, -800, 200, 100)])
+seed = 4707
+default_habitat = &"hill_grass"
+habitats = Array[ExtResource("3_o3hjj")]([SubResource("Resource_qf1q6"), SubResource("Resource_lrex2"), SubResource("Resource_q06ni"), SubResource("Resource_8wenr"), SubResource("Resource_jnysb"), SubResource("Resource_fm2e7")])
+forage = Array[ExtResource("2_h5jpe")]([SubResource("Resource_23tsd"), SubResource("Resource_s82vs"), SubResource("Resource_kksia"), SubResource("Resource_tsu1q"), SubResource("Resource_21bnf"), SubResource("Resource_e2l8a"), SubResource("Resource_46wdl"), SubResource("Resource_4fti2"), SubResource("Resource_cgvad"), SubResource("Resource_vj0hp"), SubResource("Resource_cv7ox"), SubResource("Resource_m1f1j"), SubResource("Resource_n58nq"), SubResource("Resource_5hfpm"), SubResource("Resource_627mc"), SubResource("Resource_ibqip"), SubResource("Resource_80ftb"), SubResource("Resource_kx1vd"), SubResource("Resource_y1m6b"), SubResource("Resource_vt0nr"), SubResource("Resource_crjl3"), SubResource("Resource_s5ti5"), SubResource("Resource_ke417"), SubResource("Resource_5eadp"), SubResource("Resource_b1aap"), SubResource("Resource_xhipi"), SubResource("Resource_kiw2p"), SubResource("Resource_6a7y3")])
+decor = Array[ExtResource("1_tmlaj")]([SubResource("Resource_1tkkl"), SubResource("Resource_6ga4x"), SubResource("Resource_6qumo"), SubResource("Resource_us3uy"), SubResource("Resource_pjc1u"), SubResource("Resource_lqy31"), SubResource("Resource_b2sgg"), SubResource("Resource_sr4y2"), SubResource("Resource_haf7y"), SubResource("Resource_navwk"), SubResource("Resource_wvefm"), SubResource("Resource_670jf"), SubResource("Resource_1u4cv"), SubResource("Resource_0lyne")])
+landmarks = Array[ExtResource("4_iwq2n")]([SubResource("Resource_podie"), SubResource("Resource_clm55"), SubResource("Resource_v0cs7"), SubResource("Resource_txd1r")])
+anchors = Array[Dictionary]([{
+"clear_radius": 25.0,
+"id": &"calanmai_bonfires",
+"position": Vector2(620, -1055),
+"yaw_degrees": 0.0
+}, {
+"clear_radius": 12.0,
+"id": &"calanmai_cave_mouth",
+"position": Vector2(690, -982),
+"yaw_degrees": 0.0
+}])
+grade = &"grade_hill_of_the_rite_dusk"
+ambient_fx = PackedStringArray("fx_pollen_motes", "fx_bonfire_embers", "fx_bonfire_flame", "fx_bonfire_smoke", "fx_fireflies")
+notes = "Calanmai (Fire Night, C): bonfires on the hill, drums, the Great Rite in a cave. Rhysand meets Feyre near the bonfires (C). Stones on the summit are [X]. After Calanmai the hill permanently changes (story lane StateVisibility): burnt-out fires, scattered ribbons."

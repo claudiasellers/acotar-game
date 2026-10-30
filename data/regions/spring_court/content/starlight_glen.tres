@@ -1,0 +1,598 @@
+[gd_resource type="Resource" script_class="CourtRegionContent" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_decor_entry.gd" id="1_oiwpk"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_forage_entry.gd" id="2_vbhtm"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_habitat.gd" id="3_k1sbk"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_landmark.gd" id="4_kqskx"]
+[ext_resource type="Script" path="res://world/spring_court/wider/content/court_region_content.gd" id="5_t25h7"]
+
+[sub_resource type="Resource" id="Resource_256q4"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_grass_clump_a"
+habitats = PackedStringArray("glen_meadow", "pool_rim", "glimmer_hollow", "lakeshore", "riverbank", "birch_copse", "violet_dell")
+density = 2.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_of3fl"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_grass_clump_b"
+habitats = PackedStringArray("glen_meadow", "pool_rim", "glimmer_hollow", "lakeshore", "riverbank", "birch_copse", "violet_dell")
+density = 1.6
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_fp6ta"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_grass_clump_c"
+habitats = PackedStringArray("glen_meadow", "pool_rim", "glimmer_hollow", "lakeshore", "riverbank", "birch_copse", "violet_dell")
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_jakkf"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"rock_mossy_a"
+habitats = PackedStringArray("glen_meadow", "pool_rim", "glimmer_hollow", "lakeshore", "riverbank", "birch_copse", "violet_dell")
+density = 0.03
+wind = 0.0
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_qqnbl"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"rock_pebble_cluster"
+habitats = PackedStringArray("glen_meadow", "pool_rim", "glimmer_hollow", "lakeshore", "riverbank", "birch_copse", "violet_dell")
+density = 0.08
+wind = 0.0
+
+[sub_resource type="Resource" id="Resource_6qnw5"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_tree_silver_birch"
+habitats = PackedStringArray("birch_copse")
+density = 0.5
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_rwajs"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_tree_silver_birch"
+habitats = PackedStringArray("glen_meadow", "glimmer_hollow")
+density = 0.05
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_abg7d"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_tree_weeping_willow"
+habitats = PackedStringArray("lakeshore")
+density = 0.12
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_yxf01"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_tree_lilac_fae"
+habitats = PackedStringArray("glimmer_hollow", "glen_meadow")
+density = 0.03
+scale_max = 1.3
+wind = 0.25
+cast_shadow = true
+is_tree = true
+max_slope = 30.0
+
+[sub_resource type="Resource" id="Resource_ouidx"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_carpet_periwinkle"
+habitats = PackedStringArray("glen_meadow", "violet_dell")
+density = 2.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_3kvh2"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_carpet_pearl"
+habitats = PackedStringArray("glen_meadow", "glimmer_hollow")
+density = 1.5
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_tmmfi"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_carpet_lilac"
+habitats = PackedStringArray("violet_dell", "birch_copse")
+density = 1.8
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_t3emv"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_fern_a"
+habitats = PackedStringArray("birch_copse", "glimmer_hollow")
+density = 1.2
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_qarbo"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_fern_b"
+habitats = PackedStringArray("glimmer_hollow", "pool_rim")
+density = 0.8
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_iskvp"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_reeds_bulrush"
+habitats = PackedStringArray("lakeshore", "riverbank")
+density = 3.0
+wind = 0.6
+
+[sub_resource type="Resource" id="Resource_ghrk0"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_lily_pads"
+habitats = PackedStringArray("looking_lake", "willow_mere")
+density = 1.2
+wind = 0.0
+
+[sub_resource type="Resource" id="Resource_cuqvb"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_bush_hydrangea"
+habitats = PackedStringArray("glen_meadow")
+density = 0.08
+wind = 0.6
+cast_shadow = true
+
+[sub_resource type="Resource" id="Resource_qei10"]
+script = ExtResource("1_oiwpk")
+mesh_id = &"flora_toadstool_ring"
+habitats = PackedStringArray("birch_copse")
+density = 0.03
+wind = 0.0
+
+[sub_resource type="Resource" id="Resource_06yvy"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_violet"
+habitats = PackedStringArray("glen_meadow", "violet_dell", "birch_copse")
+weight = 3.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_3snx4"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_primrose"
+habitats = PackedStringArray("glen_meadow", "violet_dell")
+weight = 3.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_pi8md"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_wood_sorrel"
+habitats = PackedStringArray("birch_copse", "violet_dell")
+weight = 2.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_ikvtr"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_wild_garlic"
+habitats = PackedStringArray("birch_copse", "riverbank")
+weight = 2.0
+cluster_min = 3
+cluster_max = 6
+
+[sub_resource type="Resource" id="Resource_wtxrh"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_birch_bark"
+habitats = PackedStringArray("birch_copse")
+weight = 1.5
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_miqwk"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_dreamcap"
+habitats = PackedStringArray("birch_copse", "glimmer_hollow")
+cluster_min = 2
+cluster_max = 4
+night_only = true
+
+[sub_resource type="Resource" id="Resource_m4i1n"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_moonflower"
+habitats = PackedStringArray("glimmer_hollow", "pool_rim")
+night_only = true
+
+[sub_resource type="Resource" id="Resource_3agiu"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_mirror_reed"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 2.5
+cluster_min = 3
+cluster_max = 6
+
+[sub_resource type="Resource" id="Resource_v70b7"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_watermint"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 2.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_vdp75"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_water_lily"
+habitats = PackedStringArray("looking_lake", "willow_mere")
+weight = 3.0
+
+[sub_resource type="Resource" id="Resource_lqdfm"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_marsh_marigold"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 2.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_r80uc"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_bulrush_root"
+habitats = PackedStringArray("lakeshore")
+weight = 1.5
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_3tq8n"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_meadowsweet"
+habitats = PackedStringArray("glen_meadow", "lakeshore")
+weight = 2.0
+cluster_min = 2
+cluster_max = 4
+
+[sub_resource type="Resource" id="Resource_3ylqt"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_wild_hyacinth"
+habitats = PackedStringArray("violet_dell", "birch_copse", "glen_meadow")
+weight = 2.5
+cluster_min = 4
+cluster_max = 8
+
+[sub_resource type="Resource" id="Resource_8j51g"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_moss"
+habitats = PackedStringArray("glimmer_hollow", "pool_rim", "birch_copse")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_75uuf"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_glowcap"
+habitats = PackedStringArray("glimmer_hollow", "birch_copse")
+weight = 1.2
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_atntu"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_faelight_dandelion"
+habitats = PackedStringArray("glen_meadow")
+weight = 1.5
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_kfjp7"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_elderflower"
+habitats = PackedStringArray("glen_meadow", "birch_copse")
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_j4h6t"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_wild_strawberry"
+habitats = PackedStringArray("glen_meadow")
+weight = 2.0
+cluster_min = 2
+cluster_max = 5
+
+[sub_resource type="Resource" id="Resource_akso5"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_honeysuckle"
+habitats = PackedStringArray("birch_copse", "glimmer_hollow")
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_o8lcf"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_willow_bark"
+habitats = PackedStringArray("lakeshore")
+cluster_max = 1
+
+[sub_resource type="Resource" id="Resource_m6jut"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_starlight_water"
+habitats = PackedStringArray("starlight_pool")
+weight = 4.0
+canon = "C?"
+
+[sub_resource type="Resource" id="Resource_7kmj2"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_river_silt"
+habitats = PackedStringArray("riverbank")
+cluster_max = 2
+
+[sub_resource type="Resource" id="Resource_nk3rc"]
+script = ExtResource("2_vbhtm")
+item_id = &"ing_snail_shell"
+habitats = PackedStringArray("lakeshore", "riverbank")
+
+[sub_resource type="Resource" id="Resource_oca8i"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_feather_kingfisher"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_lwn0x"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_feather_heron"
+habitats = PackedStringArray("lakeshore")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_4apk3"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_shell_river_mussel"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 0.8
+cluster_max = 2
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_cr4jo"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_river_pearl"
+habitats = PackedStringArray("lakeshore")
+weight = 0.25
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_8tx7a"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_stone_starglass"
+habitats = PackedStringArray("pool_rim")
+weight = 1.2
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_w1ifl"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_stone_quartz"
+habitats = PackedStringArray("glen_meadow", "pool_rim")
+weight = 0.5
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_rm43i"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_driftwood"
+habitats = PackedStringArray("lakeshore", "riverbank")
+weight = 0.6
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_u6aj7"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_dandelion_clock"
+habitats = PackedStringArray("glen_meadow")
+weight = 0.8
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_quouw"]
+script = ExtResource("2_vbhtm")
+item_id = &"col_beetle_jewel"
+habitats = PackedStringArray("birch_copse", "glen_meadow")
+weight = 0.4
+cluster_max = 1
+cluster_radius = 1.5
+collectible = true
+
+[sub_resource type="Resource" id="Resource_jtvjn"]
+script = ExtResource("3_k1sbk")
+tag = &"looking_lake"
+center = Vector2(-1230, -170)
+radius = 112.0
+priority = 10
+exclusive = true
+
+[sub_resource type="Resource" id="Resource_dx7mo"]
+script = ExtResource("3_k1sbk")
+tag = &"willow_mere"
+center = Vector2(-1120, 400)
+radius = 55.0
+priority = 10
+exclusive = true
+
+[sub_resource type="Resource" id="Resource_5jo17"]
+script = ExtResource("3_k1sbk")
+tag = &"starlight_pool"
+center = Vector2(-1300, 262)
+radius = 18.0
+priority = 12
+exclusive = true
+
+[sub_resource type="Resource" id="Resource_y3ucc"]
+script = ExtResource("3_k1sbk")
+tag = &"pool_rim"
+shape = 1
+center = Vector2(-1300, 262)
+radius = 42.0
+inner_radius = 18.0
+priority = 11
+
+[sub_resource type="Resource" id="Resource_bsiu2"]
+script = ExtResource("3_k1sbk")
+tag = &"glimmer_hollow"
+shape = 1
+center = Vector2(-1300, 250)
+radius = 120.0
+inner_radius = 42.0
+priority = 6
+
+[sub_resource type="Resource" id="Resource_hqygx"]
+script = ExtResource("3_k1sbk")
+tag = &"lakeshore"
+shape = 1
+center = Vector2(-1230, -170)
+radius = 150.0
+inner_radius = 112.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_650tr"]
+script = ExtResource("3_k1sbk")
+tag = &"lakeshore"
+shape = 1
+center = Vector2(-1120, 400)
+radius = 85.0
+inner_radius = 55.0
+priority = 8
+
+[sub_resource type="Resource" id="Resource_0dnwv"]
+script = ExtResource("3_k1sbk")
+tag = &"riverbank"
+shape = 3
+band_min = 8.0
+band_max = 26.0
+priority = 7
+
+[sub_resource type="Resource" id="Resource_d0468"]
+script = ExtResource("3_k1sbk")
+tag = &"river"
+shape = 3
+band_max = 7.5
+priority = 9
+exclusive = true
+
+[sub_resource type="Resource" id="Resource_mmrcp"]
+script = ExtResource("3_k1sbk")
+tag = &"birch_copse"
+center = Vector2(-1420, -380)
+radius = 90.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_qn7su"]
+script = ExtResource("3_k1sbk")
+tag = &"birch_copse"
+center = Vector2(-800, -420)
+radius = 110.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_ngxra"]
+script = ExtResource("3_k1sbk")
+tag = &"birch_copse"
+center = Vector2(-1420, 480)
+radius = 90.0
+priority = 4
+
+[sub_resource type="Resource" id="Resource_i0g73"]
+script = ExtResource("3_k1sbk")
+tag = &"violet_dell"
+center = Vector2(-1000, 0)
+radius = 120.0
+priority = 3
+
+[sub_resource type="Resource" id="Resource_n3ugn"]
+script = ExtResource("3_k1sbk")
+tag = &"violet_dell"
+center = Vector2(-1440, 40)
+radius = 70.0
+priority = 3
+
+[sub_resource type="Resource" id="Resource_w441x"]
+script = ExtResource("4_kqskx")
+id = &"starlight_pool"
+display_name = "The Starlight Pool"
+position = Vector2(-1300, 262)
+asset_ids = PackedStringArray("starlight_pool_rim_stone_a", "starlight_pool_rim_stone_b", "starlight_pool_rim_stone_c", "pool_glow_crystal")
+offsets = PackedVector2Array()
+height_m = 4.0
+visible_from_m = 200.0
+kind = &"set_piece"
+canon = "C?"
+notes = "Hidden pool where Tamlin brings Feyre to swim; glitters in sunlight. Bathing here is the pool_found deed."
+
+[sub_resource type="Resource" id="Resource_te6ek"]
+script = ExtResource("4_kqskx")
+id = &"glimmerfall"
+display_name = "The Rainbow Falls of the Glen"
+position = Vector2(-1300, 212)
+asset_ids = PackedStringArray("escarpment_rock_a", "pool_glow_crystal")
+offsets = PackedVector2Array(0, 40)
+height_m = 22.0
+visible_from_m = 550.0
+kind = &"waterfall"
+canon = "C"
+notes = "Canon rainbow waterfall (Keeper): a cascade of coloured water off a crystal-veined crag into the Starlight Pool; its rainbow mist is visible from the lake."
+
+[sub_resource type="Resource" id="Resource_efxyg"]
+script = ExtResource("4_kqskx")
+id = &"looking_lake_isle"
+display_name = "The Isle of the Looking Lake"
+position = Vector2(-1235, -175)
+asset_ids = PackedStringArray("flora_tree_lilac_fae", "rock_mossy_b")
+offsets = PackedVector2Array()
+height_m = 24.0
+visible_from_m = 600.0
+notes = "One great lilac tree on an islet; its reflection gives the lake its name."
+
+[sub_resource type="Resource" id="Resource_5exor"]
+script = ExtResource("4_kqskx")
+id = &"heron_stones"
+display_name = "The Heron Stones"
+position = Vector2(-1105, -40)
+asset_ids = PackedStringArray("rock_mossy_c", "rock_mossy_d", "rock_mossy_c")
+offsets = PackedVector2Array()
+height_m = 9.0
+visible_from_m = 225.0
+notes = "Three tall mossy stones on the eastern shore; herons stand on them at dawn."
+
+[sub_resource type="Resource" id="Resource_bh1nw"]
+script = ExtResource("4_kqskx")
+id = &"weeping_lady"
+display_name = "The Weeping Lady"
+position = Vector2(-1100, 345)
+asset_ids = PackedStringArray("flora_tree_weeping_willow")
+offsets = PackedVector2Array()
+height_m = 16.0
+visible_from_m = 400.0
+notes = "Giant willow trailing into Willow Mere."
+
+[resource]
+script = ExtResource("5_t25h7")
+region_id = &"starlight_glen"
+display_name = "Starlight Glen"
+canon = "C?"
+bounds = Array[Rect2]([Rect2(-1500, -500, 900, 1100)])
+holes = Array[Rect2]([Rect2(-950, 450, 250, 350), Rect2(-700, 300, 1200, 1100)])
+seed = 4101
+default_habitat = &"glen_meadow"
+habitats = Array[ExtResource("3_k1sbk")]([SubResource("Resource_jtvjn"), SubResource("Resource_dx7mo"), SubResource("Resource_5jo17"), SubResource("Resource_y3ucc"), SubResource("Resource_bsiu2"), SubResource("Resource_hqygx"), SubResource("Resource_650tr"), SubResource("Resource_0dnwv"), SubResource("Resource_d0468"), SubResource("Resource_mmrcp"), SubResource("Resource_qn7su"), SubResource("Resource_ngxra"), SubResource("Resource_i0g73"), SubResource("Resource_n3ugn")])
+forage = Array[ExtResource("2_vbhtm")]([SubResource("Resource_06yvy"), SubResource("Resource_3snx4"), SubResource("Resource_pi8md"), SubResource("Resource_ikvtr"), SubResource("Resource_wtxrh"), SubResource("Resource_miqwk"), SubResource("Resource_m4i1n"), SubResource("Resource_3agiu"), SubResource("Resource_v70b7"), SubResource("Resource_vdp75"), SubResource("Resource_lqdfm"), SubResource("Resource_r80uc"), SubResource("Resource_3tq8n"), SubResource("Resource_3ylqt"), SubResource("Resource_8j51g"), SubResource("Resource_75uuf"), SubResource("Resource_atntu"), SubResource("Resource_kfjp7"), SubResource("Resource_j4h6t"), SubResource("Resource_akso5"), SubResource("Resource_o8lcf"), SubResource("Resource_m6jut"), SubResource("Resource_7kmj2"), SubResource("Resource_nk3rc"), SubResource("Resource_oca8i"), SubResource("Resource_lwn0x"), SubResource("Resource_4apk3"), SubResource("Resource_cr4jo"), SubResource("Resource_8tx7a"), SubResource("Resource_w1ifl"), SubResource("Resource_rm43i"), SubResource("Resource_u6aj7"), SubResource("Resource_quouw")])
+decor = Array[ExtResource("1_oiwpk")]([SubResource("Resource_256q4"), SubResource("Resource_of3fl"), SubResource("Resource_fp6ta"), SubResource("Resource_jakkf"), SubResource("Resource_qqnbl"), SubResource("Resource_6qnw5"), SubResource("Resource_rwajs"), SubResource("Resource_abg7d"), SubResource("Resource_yxf01"), SubResource("Resource_ouidx"), SubResource("Resource_3kvh2"), SubResource("Resource_tmmfi"), SubResource("Resource_t3emv"), SubResource("Resource_qarbo"), SubResource("Resource_iskvp"), SubResource("Resource_ghrk0"), SubResource("Resource_cuqvb"), SubResource("Resource_qei10")])
+landmarks = Array[ExtResource("4_kqskx")]([SubResource("Resource_w441x"), SubResource("Resource_te6ek"), SubResource("Resource_efxyg"), SubResource("Resource_5exor"), SubResource("Resource_bh1nw")])
+anchors = Array[Dictionary]([{
+"clear_radius": 14.0,
+"id": &"starlight_pool",
+"position": Vector2(-1300, 292),
+"yaw_degrees": 0.0
+}])
+grade = &"grade_starlight_glen_day"
+ambient_fx = PackedStringArray("fx_pollen_motes", "fx_butterflies", "fx_water_mist", "fx_starlight_sparkles", "fx_dandelion_seeds")
+notes = "Mirror lakes on the Thornwater west of the manor. The Starlight Pool is a daytime swim Tamlin shows Feyre: it glitters in sunlight (Keeper, chapter-verified). The pool hides under the Glimmerfall."

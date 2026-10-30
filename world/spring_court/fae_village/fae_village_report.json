@@ -1,0 +1,12 @@
+{
+  "region": "fae_village",
+  "types": 31,
+  "placements": 741,
+  "placements_per_km2": 1098,
+  "empty_cells": 0,
+  "cells": 72,
+  "landmarks": 7,
+  "draw_calls": 471,
+  "decor_instances": 53553,
+  "area_km2": 0.675
+}

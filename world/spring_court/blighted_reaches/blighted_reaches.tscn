@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_0qvth"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/blighted_reaches.tres" id="2_lixhy"]
+
+[node name="BlightedReaches" type="Node3D" unique_id=1890451082]
+script = ExtResource("1_0qvth")
+content = ExtResource("2_lixhy")

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_345xb"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/fae_village.tres" id="2_jonob"]
+
+[node name="FaeVillage" type="Node3D" unique_id=313044362]
+script = ExtResource("1_345xb")
+content = ExtResource("2_jonob")

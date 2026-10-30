@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_uwxh3"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/western_fells.tres" id="2_8peyp"]
+
+[node name="WesternFells" type="Node3D" unique_id=886012423]
+script = ExtResource("1_uwxh3")
+content = ExtResource("2_8peyp")

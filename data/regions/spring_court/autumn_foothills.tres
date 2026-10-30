@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionDef" format=3]
+
+[ext_resource type="Script" path="res://core/streaming/region_def.gd" id="1_0c2u4"]
+
+[resource]
+script = ExtResource("1_0c2u4")
+id = &"autumn_foothills"
+scene_path = "res://world/spring_court/autumn_foothills/autumn_foothills.tscn"
+center = Vector3(-1200, 70.881546, -1300)
+radius = 721.1102
+neighbors = PackedStringArray("western_fells", "fae_village", "solstice_meadow", "blighted_reaches")
+report_path = "res://world/spring_court/autumn_foothills/autumn_foothills_report.json"

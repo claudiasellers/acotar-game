@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/wider/court_region.gd" id="1_hi31c"]
+[ext_resource type="Resource" path="res://data/regions/spring_court/content/autumn_foothills.tres" id="2_xtp7w"]
+
+[node name="AutumnFoothills" type="Node3D" unique_id=1069690353]
+script = ExtResource("1_hi31c")
+content = ExtResource("2_xtp7w")

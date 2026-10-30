@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="GradePreset" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_kn6v2"]
+
+[sub_resource type="Gradient" id="Gradient_1vafr"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.06352942, 0.04941177, 0.103529416, 1, 0.6052941, 0.4935294, 0.5076471, 1, 1, 0.96588236, 0.93529415, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ej2ue"]
+gradient = SubResource("Gradient_1vafr")
+
+[resource]
+script = ExtResource("1_kn6v2")
+id = &"grade_hill_of_the_rite_dusk"
+sky_top = Color(0.3529412, 0.2901961, 0.627451, 1)
+sky_horizon = Color(1, 0.56078434, 0.47843137, 1)
+ground_horizon = Color(0.8784314, 0.5137255, 0.5568628, 1)
+ground_bottom = Color(0.2901961, 0.24313726, 0.34509805, 1)
+sun_color = Color(1, 0.6117647, 0.4392157, 1)
+sun_energy = 0.42
+ambient_color = Color(0.8156863, 0.54901963, 0.72156864, 1)
+ambient_energy = 0.44999999999999996
+fog_color = Color(0.8980392, 0.5764706, 0.61960787, 1)
+fog_density = 0.0032
+volumetric_density = 0.022
+volumetric_albedo = Color(1, 0.7882353, 0.72156864, 1)
+exposure = 0.98
+saturation = 1.28
+glow_intensity = 0.84
+glow_bloom = 0.065
+lut = SubResource("GradientTexture1D_ej2ue")
+magic = 0.9
