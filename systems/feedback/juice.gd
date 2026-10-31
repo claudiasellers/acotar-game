@@ -40,6 +40,8 @@ static func burst(target: Node, kind: StringName = &"pickup", at: Vector3 = Vect
 		pos = (target as Node3D).global_position + Vector3.UP * 1.0
 	var root: Node = tree.current_scene if tree.current_scene else tree.root
 	var fx := _sparkles(spec)
+	# Sparkles and chimes play on under a paused game (the dressing room).
+	fx.process_mode = Node.PROCESS_MODE_ALWAYS
 	root.add_child(fx)
 	fx.global_position = pos
 	fx.emitting = true
@@ -48,6 +50,7 @@ static func burst(target: Node, kind: StringName = &"pickup", at: Vector3 = Vect
 	player.stream = chime(kind)
 	player.volume_db = -8.0
 	player.pitch_scale = pitch
+	player.process_mode = Node.PROCESS_MODE_ALWAYS
 	root.add_child(player)
 	player.global_position = pos
 	player.play()
@@ -187,14 +190,33 @@ static func _sparkles(spec: Dictionary) -> GPUParticles3D:
 	p.process_material = mat
 	if _sparkle_mesh == null:
 		_sparkle_mesh = QuadMesh.new()
-		_sparkle_mesh.size = Vector2(0.05, 0.05)
+		_sparkle_mesh.size = Vector2(0.09, 0.09)
 		var m := StandardMaterial3D.new()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 		m.vertex_color_use_as_albedo = true
 		m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-		m.emission_enabled = true
-		m.emission = Color(1, 0.9, 1)
+		m.albedo_texture = _star_texture()
+		m.albedo_color = Color(1.6, 1.5, 1.6)
 		_sparkle_mesh.material = m
 	p.draw_pass_1 = _sparkle_mesh
 	return p
+
+
+## A soft four-point twinkle (glow core + cross rays), so sparkles read as
+## stars, not squares.
+static func _star_texture() -> ImageTexture:
+	const N := 32
+	var img := Image.create(N, N, false, Image.FORMAT_RGBA8)
+	for y in N:
+		for x in N:
+			var u := (x + 0.5) / N * 2.0 - 1.0
+			var v := (y + 0.5) / N * 2.0 - 1.0
+			var core := exp(-(u * u + v * v) * 14.0)
+			var rays := maxf(0.0, 1.0 - absf(u) * 9.0) * (1.0 - absf(v)) \
+					+ maxf(0.0, 1.0 - absf(v) * 9.0) * (1.0 - absf(u))
+			# Fade to nothing well inside the quad's edge: no square halo.
+			var window := pow(clampf(1.0 - sqrt(u * u + v * v), 0.0, 1.0), 1.5)
+			var a := clampf(core + rays * 0.7, 0.0, 1.0) * window
+			img.set_pixel(x, y, Color(a, a, a, a))
+	return ImageTexture.create_from_image(img)
