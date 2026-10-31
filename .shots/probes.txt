@@ -1,0 +1,5 @@
+from dressing-room
+quality look
+size 1920x1080
+timeout 600
+shot dressing res://tools/dressing_room_shot.tscn all {out}
