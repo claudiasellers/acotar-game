@@ -316,6 +316,7 @@ static func build_all() -> Array[ScatterLayer]:
 	var sb := ManorScatter.new()
 	# Structures plant first: beds, borders, walls, hives, avenue, orchard rows.
 	ManorForecourt.plant(sb)
+	ManorForecourt.plant_borders(sb)
 	ManorTerraceBuilder.plant(sb)
 	ManorRoseGarden.plant(sb)
 	ManorHedgeMaze.plant(sb)

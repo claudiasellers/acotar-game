@@ -10,6 +10,12 @@ const AVENUE_X := 10.5
 const AVENUE_STEP := 15.0
 const HEDGE_HALF_LENGTH := 75.0
 const PIER_X := 5.4
+const BORDER_STEP := 1.7
+const BORDER_BLOOMS: Array[StringName] = [&"deco_rose_pink", &"deco_peony", &"deco_forget_me_not", &"deco_rose_pink", &"deco_daisy", &"deco_tulip_bed"]
+const BORDER_FINDS: Array[StringName] = [&"ing_rose_red", &"ing_crocus", &"ing_buttercup", &"ing_rose_white"]
+const DRIVE_GRAVEL := preload("res://world/spring_court/manor_estate/grounds/drive_gravel.gdshader")
+
+static var _gravel: ShaderMaterial = null
 
 
 static func footprints() -> Array[Rect2]:
@@ -54,6 +60,47 @@ static func plant(sb: ManorScatter) -> void:
 	for i in 12:
 		var a := TAU * i / 12.0 + 0.13
 		sb.put(&"ing_rose_white", cos(a) * (FOUNTAIN_RADIUS + 2.2), sin(a) * (FOUNTAIN_RADIUS + 2.2), a, 0.8)
+
+
+## Blush-and-pearl gravel with gold grit and fallen petals (shared by the
+## drive and the forecourt ring).
+static func drive_gravel() -> Material:
+	if _gravel == null:
+		_gravel = ShaderMaterial.new()
+		_gravel.shader = DRIVE_GRAVEL
+	return _gravel
+
+
+## The drive's flower borders, between the pearl kerb and the blossom avenue:
+## two staggered rows of roses, peonies and spring flowers along the kerb,
+## with forage among them so the walk up to the house is something to do.
+## Clear of the lamps; stops short of the sentry gate's hedges.
+static func plant_borders(sb: ManorScatter) -> void:
+	var rng := EstateKit.rng("drive_borders")
+	var lamp_z: Array[float] = []
+	var lz := ManorSitePlan.DRIVE_START.y + 23.5
+	while lz < ManorSitePlan.SENTRY_GATE.y - 10.0:
+		lamp_z.append(lz)
+		lz += 30.0
+	var edge := ManorSitePlan.DRIVE_WIDTH * 0.5
+	var z := ManorSitePlan.DRIVE_START.y + 8.0
+	var i := 0
+	while z < ManorSitePlan.SENTRY_GATE.y - 16.0:
+		var by_lamp := lamp_z.any(func(l: float) -> bool: return absf(l - z) < 1.6)
+		for side: float in [-1.0, 1.0]:
+			# two staggered rows of blooms, the front row clear of the lamps
+			for row in 2:
+				if row == 0 and by_lamp:
+					continue
+				var bloom: StringName = BORDER_BLOOMS[(i + row * 3 + (0 if side < 0 else 2)) % BORDER_BLOOMS.size()]
+				var off := edge + 0.9 + row * 1.1 + rng.randf_range(-0.2, 0.3)
+				sb.put(bloom, side * off, z + row * BORDER_STEP * 0.5 + rng.randf_range(-0.4, 0.4),
+						rng.randf() * TAU, rng.randf_range(1.1, 1.5))
+			if i % 4 == 1:
+				var find: StringName = BORDER_FINDS[rng.randi() % BORDER_FINDS.size()]
+				sb.put(find, side * (edge + rng.randf_range(2.6, 3.2)), z + rng.randf_range(-0.6, 0.6), rng.randf() * TAU)
+		z += BORDER_STEP
+		i += 1
 
 
 static func build(parent: Node3D) -> void:
@@ -103,13 +150,14 @@ static func _fountain(b: GroundsBatch) -> void:
 static func _drive(b: GroundsBatch) -> void:
 	var s := ManorSitePlan.DRIVE_START
 	var e := ManorSitePlan.DRIVE_END
-	b.drape_path(PackedVector2Array([s, e]), ManorSitePlan.DRIVE_WIDTH, ManorGrounds.gravel(), 0.04, 3.0)
+	var gravel := drive_gravel()
+	b.drape_path(PackedVector2Array([s, e]), ManorSitePlan.DRIVE_WIDTH, gravel, 0.04, 3.0)
 	# forecourt ring of gravel round the fountain
 	var pts := PackedVector2Array()
 	for i in 33:
 		var a := TAU * i / 32.0
 		pts.append(Vector2(cos(a), sin(a)) * (ManorSitePlan.FORECOURT_RADIUS - 6.0))
-	b.drape_path(pts, 10.0, ManorGrounds.gravel(), 0.035, 3.0)
+	b.drape_path(pts, 10.0, gravel, 0.035, 3.0)
 	# pearl kerbs along the drive
 	var z := s.y + 4.0
 	while z < e.y - 4.0:
