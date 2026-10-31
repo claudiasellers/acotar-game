@@ -455,16 +455,16 @@ def style_fishtail_braid(st):
 
 
 def style_crown_braid(st):
+    """Milkmaid crown: all the length braided and pinned in one thick band right round her head, higher
+    over the brow and lower at the nape, sitting proud of the smooth swept-back cap."""
     swept_back(st, fringe=False)
     st.fringe(PART, 1, n=2)
-    c = np.array([0.0, 0.012, 1.585])
     pts = []
-    for i in range(25):
-        a = math.radians(-150 + 300 * i / 24)
-        p = st.outer(a, math.radians(36), 0.004)
+    for i in range(37):
+        a = math.radians(-180 + 360 * i / 36)
+        p = st.outer(a, math.radians(25 + 9 * math.cos(a)), 0.009)
         pts.append(p)
-    st.braid(pts, width=0.024, lobes=18)
-    del c
+    st.braid(pts, width=0.034, lobes=30)
 
 
 def style_waterfall_braid(st):
