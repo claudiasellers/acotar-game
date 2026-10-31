@@ -8,17 +8,27 @@ const SH := FX + "shaders/"
 const GRADE_SCRIPT := "res://world/shared/grades/grade_preset.gd"
 ## Tonal pass on the grade table, to the experience bar's tested spring grade
 ## (plans/experience-bar.md 2.1): LUT ramps blended this far from identity,
-## fog thin, bloom 0.12, contrast 1.08, sun up to 1.8, shadows tinted lilac.
+## fog thin, contrast 1.12, sun up to 1.8, shadows tinted lilac; glow per the
+## book's light (see _tame).
 ## grade_blight is horror (bar 1.5): it withdraws instead.
 const LUT_STRENGTH := 0.3
 const FOG_CAP := 0.0012
-const BLOOM := 0.12
-const CONTRAST := 1.08
+const CONTRAST := 1.12
+## Glow: daylight blooms only real highlights (threshold above white, no
+## bloom wash); golden hour and night keep a soft glow for fire and lanterns.
+const DAY_GLOW := 0.3
+const DAY_THRESHOLD := 1.4
+const NIGHT_GLOW := 0.7
+const NIGHT_BLOOM := 0.04
+const NIGHT_THRESHOLD := 1.1
+## Foliage rim shimmer by day: faint before the glamour lifts (ch 23).
+const DAY_MAGIC := 0.35
+const VOLUMETRIC_CAP := 0.008
 const SUN_GAIN := 1.15
 const SUN_CAP := 1.8
-const AMBIENT_SCALE := 0.8
+const AMBIENT_SCALE := 0.75
 const LILAC_SHADOW := Color("8C7FC4")
-const EXPOSURE_CAP := 1.0
+const EXPOSURE_CAP := 0.8
 const BRIGHTNESS_CAP := 1.0
 ## Blight: saturation about 0.4, light 2-3 stops under the spring grade.
 const BLIGHT_SATURATION := 0.4
@@ -129,8 +139,19 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	var golden := float(p.get("sun_energy")) < 1.0
 	p.set("sky_top", (p.get("sky_top") as Color).lerp(Color("7361D1") if golden else Color("6B94FA"), 0.5))
 	p.set("fog_density", minf(float(p.get("fog_density")), FOG_CAP))
-	p.set("glow_intensity", clampf(float(p.get("glow_intensity")) * 0.9, 0.9, 1.3))
-	p.set("glow_bloom", BLOOM)
+	# Book light (Keeper, lore/08-aesthetic/tone-and-palette.md): rich, warm and
+	# "thick", never glaring. Daylight has no glow but true highlights; dusk and
+	# night keep a soft glow for fires and lanterns. Vibrancy is colour contrast.
+	if golden:
+		p.set("glow_intensity", NIGHT_GLOW)
+		p.set("glow_bloom", NIGHT_BLOOM)
+		p.set("glow_hdr_threshold", NIGHT_THRESHOLD)
+	else:
+		p.set("glow_intensity", DAY_GLOW)
+		p.set("glow_bloom", 0.0)
+		p.set("glow_hdr_threshold", DAY_THRESHOLD)
+		p.set("magic", minf(float(p.get("magic")), DAY_MAGIC))
+	p.set("volumetric_density", minf(float(p.get("volumetric_density")), VOLUMETRIC_CAP))
 	p.set("contrast", CONTRAST)
 	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
 	p.set("ambient_energy", float(p.get("ambient_energy")) * AMBIENT_SCALE)
@@ -158,7 +179,7 @@ func _build_grades() -> int:
 	md.append("```\n")
 	md.append("`lut` is an embedded GradientTexture1D (dark, mid, light): a gentle pastel colour-correction ramp,")
 	md.append("no image files. Recommended GradeDirector Environment for all of these: tonemap AgX, glow on")
-	md.append("(soft-light blend, hdr threshold ~0.9), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.")
+	md.append("(hdr threshold 1.4 by day, 1.1 at dusk/night, no bloom wash by day), fog + volumetric fog on, SDFGI on, SSAO on at intensity ~0.8.")
 	md.append("grade_blight is horror: keep it grey and silent, never tone it down.\n")
 	md.append("| id | purpose | sky top / horizon | sun colour, energy | fog colour, density, volumetric | exposure | saturation | contrast | glow int / bloom | magic |")
 	md.append("|---|---|---|---|---|---|---|---|---|---|")
