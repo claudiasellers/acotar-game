@@ -1,0 +1,10 @@
+from L09-light-variants
+quality look
+size 1920x1080
+timeout 900
+shot bw_raised_a res://tools/landscape/landscape_shot.tscn bw_raised {out}/bw_raised_a.png spring_va
+shot bw_raised_b res://tools/landscape/landscape_shot.tscn bw_raised {out}/bw_raised_b.png spring_vb
+shot bw_raised_c res://tools/landscape/landscape_shot.tscn bw_raised {out}/bw_raised_c.png spring_vc
+shot bv_walk_a res://tools/landscape/landscape_shot.tscn bv_walk {out}/bv_walk_a.png spring_va
+shot bv_walk_b res://tools/landscape/landscape_shot.tscn bv_walk {out}/bv_walk_b.png spring_vb
+shot bv_walk_c res://tools/landscape/landscape_shot.tscn bv_walk {out}/bv_walk_c.png spring_vc
