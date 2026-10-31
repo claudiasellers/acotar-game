@@ -40,33 +40,54 @@ shots_mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || ec
 
 shots_size() { wc -c <"$1" 2>/dev/null | tr -d ' '; }
 
+# Any live process left in this process group? A zombie doesn't count.
+shots_group_alive() { # pgid
+	ps -A -o pgid=,stat= 2>/dev/null | awk -v g="$1" '$1 == g && $2 !~ /^Z/ { f = 1 } END { exit !f }'
+}
+
+# TERM to a whole process group, KILL for anything still there after 5 seconds.
+shots_stop_group() { # pgid
+	local i=0
+	shots_group_alive "$1" || return 0
+	kill -TERM -- "-$1" 2>/dev/null
+	while [ "$i" -lt 25 ] && shots_group_alive "$1"; do sleep 0.2; i=$((i + 1)); done
+	kill -KILL -- "-$1" 2>/dev/null
+	return 0
+}
+
 # Run "$@" with a time limit, output appended to a log. Returns the command's
-# exit code, or 124 when it was stopped for running too long.
+# exit code, or 124 when it was stopped for running too long. The command gets
+# its own process group (set -m), so Godot goes down with the shell that started
+# it and nothing is left running afterwards, however the command ended.
 # shots_run_limited <seconds> <logfile> <cmd...>
 shots_run_limited() {
-	local secs="$1" log="$2" pid w rc start
+	local secs="$1" log="$2" pid w rc wrc
 	shift 2
-	start=$(shots_epoch)
+	set -m
 	"$@" >>"$log" 2>&1 </dev/null &
 	pid=$!
+	set +m
 	[ -n "${SHOTS_CHILD_FILE:-}" ] && echo "$pid" >"$SHOTS_CHILD_FILE"
 	(
-		trap 'exit 0' TERM
+		fired=0
+		trap 'exit $fired' TERM
 		n=0
 		while [ "$n" -lt "$secs" ]; do sleep 1; n=$((n + 1)); done
-		kill -TERM "$pid" 2>/dev/null
+		fired=124
+		kill -TERM -- "-$pid" 2>/dev/null
 		sleep 5
-		kill -KILL "$pid" 2>/dev/null
+		kill -KILL -- "-$pid" 2>/dev/null
+		exit 124
 	) >/dev/null 2>&1 &
 	w=$!
 	wait "$pid"
 	rc=$?
 	kill -TERM "$w" 2>/dev/null
 	wait "$w" 2>/dev/null
+	wrc=$?
+	shots_stop_group "$pid"
 	[ -n "${SHOTS_CHILD_FILE:-}" ] && rm -f "$SHOTS_CHILD_FILE"
-	if [ "$rc" -ge 128 ] && [ $(($(shots_epoch) - start)) -ge "$secs" ]; then
-		return 124
-	fi
+	[ "$wrc" = 124 ] && return 124
 	return "$rc"
 }
 

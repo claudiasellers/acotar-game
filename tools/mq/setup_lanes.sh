@@ -3,7 +3,7 @@
 # Safe to run any time.
 #   tools/mq/setup_lanes.sh           create what's missing, start everything
 #   tools/mq/setup_lanes.sh --start   start the loops, replacing any on old code or in
-#                                     the wrong folder
+#                                     the wrong folder (shots reloads itself)
 #   tools/mq/setup_lanes.sh --stop    stop the loops (a batch under test goes
 #                                     back in the queue on the next start)
 #   tools/mq/setup_lanes.sh --home    mark this computer as the home machine
@@ -127,17 +127,14 @@ shots_stop() {
 
 # Shots listener hook: shots.sh (docs/SHOTS.md) renders cloud screenshot requests
 # on this GPU. It keeps its own lock and state in .git/mq/shots/. Does nothing
-# until that file has reached bin/; a reload then starts it, and a start moves a
-# running listener onto a newer bin/ copy.
+# until that file has reached bin/; a reload then starts it. A running listener
+# is left alone: it moves onto a newer bin/ copy by itself between renders, and
+# stopping it here would kill a render or run two at once.
 shots_start() {
 	# The listener pushes its results, so MQ_PUSH=0 keeps it off.
 	if [ "$(mq_config_or MQ_PUSH 1)" != 1 ]; then shots_stop; return 0; fi
 	[ -f "$MQ_BIN/shots.sh" ] && [ -d "$SHOTS_WT" ] || return 0
-	if mq_shots_pid >/dev/null; then
-		cmp -s "$MQ_BIN/shots.sh" "$MQ_DIR/shots/bin/shots.sh" &&
-			cmp -s "$MQ_BIN/shots_common.sh" "$MQ_DIR/shots/bin/shots_common.sh" && return 0
-		shots_stop
-	fi
+	mq_shots_pid >/dev/null && return 0
 	( cd "$SHOTS_WT" && /bin/bash "$MQ_BIN/shots.sh" --start )
 	return 0
 }

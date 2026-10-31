@@ -460,7 +460,8 @@ case_standing() {
 	start_lane
 	expect "stray cleanup gone" not kill -0 "$stray"
 	expect "replaced in .lanes/cleanup" sits_in .git/mq/cleanup.pid .lanes/cleanup
-	# shots.sh reaches main: the start a reload makes runs it, then moves it on.
+	# shots.sh reaches main: the start a reload makes runs it; after that it moves
+	# itself between renders, so a start must leave it running.
 	fake_shots .git/mq/bin/shots.sh first-copy
 	start_lane
 	expect "bin's listener running" grep -q first-copy .git/mq/shots/bin/shots.sh
@@ -468,8 +469,8 @@ case_standing() {
 	old=$(cat .git/mq/shots/lock/pid)
 	fake_shots .git/mq/bin/shots.sh newer-copy
 	start_lane
-	expect "listener replaced" test "$(cat .git/mq/shots/lock/pid)" != "$old"
-	expect "on the newer copy" grep -q newer-copy .git/mq/shots/bin/shots.sh
+	expect "a running listener is not stopped" test "$(cat .git/mq/shots/lock/pid)" = "$old"
+	expect "and still on its own copy" grep -q first-copy .git/mq/shots/bin/shots.sh
 	echo MQ_PUSH=0 >> .git/mq/config
 	start_lane
 	expect "MQ_PUSH=0 keeps shots off" not test -f .git/mq/shots/lock/pid

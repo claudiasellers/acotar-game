@@ -3,7 +3,7 @@
 # machine's real GPU and pushes the pictures back. A plain script, no AI.
 #
 #   tools/mq/shots.sh --start    start the listener in the background
-#   tools/mq/shots.sh --stop     stop it (and any render it is running)
+#   tools/mq/shots.sh --stop     stop it now, and any render, whoever started it
 #   tools/mq/shots.sh --status   one-screen picture
 #   tools/mq/shots.sh --check    is this machine ready (mark, Godot, push access)?
 #   tools/mq/shots.sh --once     one poll and every waiting request, in the foreground
@@ -48,7 +48,6 @@ REMOTE=$(conf SHOTS_REMOTE origin)
 POLL=$(conf SHOTS_POLL 60)
 POSITION=$(conf SHOTS_POSITION 40,40)
 WAIT_FOR_PLAY=$(conf SHOTS_WAIT_FOR_PLAY 1)
-PLAY_PATTERN=$(conf SHOTS_PLAY_PATTERN '(--path|--remote-debug)')
 PUSH=$(conf SHOTS_PUSH 1)
 KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 1)
 LAYOUT_WIDTH=$(conf SHOTS_LAYOUT_WIDTH 1280)
@@ -121,12 +120,44 @@ keep_awake() {
 
 # ---- the owner's game comes first -----------------------------------------
 
-# True when a Godot game the listener didn't start is running (make play, or
-# Play from the editor). The editor or project manager alone doesn't count.
+# True when the owner's game is running: a Godot on the play folder (make play
+# uses --path ., Play from the editor the full path). The editor or project
+# manager alone doesn't count, nor do lanes, the gate or anything headless.
 owner_playing() {
 	[ "$WAIT_FOR_PLAY" = 1 ] || return 1
-	ps -A -o command= 2>/dev/null | grep -i 'godot' | grep -v grep | grep -v "$WT" |
-		grep -Ev -- '(--editor| -e( |$))' | grep -Eq -- "$PLAY_PATTERN"
+	ps -A -o pid=,command= 2>/dev/null | grep -i 'godot' | grep -v grep |
+		grep -Ev -- '(--editor| -e( |$)|--headless)' | (
+		while read -r pid cmd; do
+			p=$(echo "$cmd" | sed -n 's/.* --path \([^ ]*\).*/\1/p')
+			[ -n "$p" ] || continue
+			case "$p" in
+			/*) ;;
+			*) p="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')/$p" ;;
+			esac
+			[ "$(cd "$p" 2>/dev/null && pwd -P)" = "$REPO" ] && exit 0
+		done
+		exit 1
+	)
+}
+
+# Every Godot running in the render worktree, whoever started it.
+render_pids() {
+	ps -A -o pid=,command= 2>/dev/null | grep -F -- "--path $WT " | grep -v grep | awk '{print $1}'
+}
+
+# Stops the render step this listener started, if there is one.
+stop_render() {
+	local p
+	p=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
+	[ -n "$p" ] && shots_stop_group "$p"
+	rm -f "$SHOTS_CHILD_FILE"
+}
+
+on_stop() {
+	stop_render
+	release_lock
+	event "STOPPED listener $$"
+	exit 0
 }
 
 # ---- the worktree that renders ----------------------------------------------
@@ -450,6 +481,13 @@ handle() { # key sha
 		return 75
 	fi
 	rm -f "$S/deferring"
+	# One worktree, one render: a render nobody here owns has to finish first.
+	if [ -n "$(render_pids)" ]; then
+		[ -f "$S/render_held" ] || event "WAITING a render is already running in $WT; $key and later requests wait"
+		touch "$S/render_held"
+		return 75
+	fi
+	rm -f "$S/render_held"
 	t0=$(shots_epoch)
 	event "RENDERING $key ${sha:0:9}"
 	shots_run_limited 900 "$S/listener.log" git fetch -q "$REMOTE" "+${SHOTS_REQ_PREFIX}$key:refs/mq/shots/req/$key"
@@ -556,12 +594,13 @@ republish() { # key sha prev
 
 # One poll: answer every new request, oldest first seen first.
 poll() {
-	local reqs ress key sha pinned rc
+	local reqs ress queue key sha pinned rc
 	reqs=$(mktemp "${TMPDIR:-/tmp}/shots-ls.XXXXXX")
 	ress=$(mktemp "${TMPDIR:-/tmp}/shots-ls.XXXXXX")
+	queue=$(mktemp "${TMPDIR:-/tmp}/shots-ls.XXXXXX")
 	if ! shots_run_limited 60 "$reqs" git ls-remote "$REMOTE" "${SHOTS_REQ_PREFIX}*" "${SHOTS_RES_PREFIX}*"; then
 		event "OFFLINE ls-remote failed; next poll in ${POLL}s"
-		rm -f "$reqs" "$ress"
+		rm -f "$reqs" "$ress" "$queue"
 		return 1
 	fi
 	grep "	${SHOTS_RES_PREFIX}" "$reqs" | sed "s#.*	${SHOTS_RES_PREFIX}##" >"$ress"
@@ -586,14 +625,18 @@ poll() {
 			continue
 		fi
 		echo "$(cut -d' ' -f2 "$S/seen/$key") $key $sha"
-	done | sort -n | while read -r _ key sha; do
+	done | sort -n >"$queue"
+	# In this shell, not a pipeline's: a subshell would outlive a stop and carry on
+	# rendering, and the listener's trap couldn't run until the render ended.
+	while read -r _ key sha; do
 		handle "$key" "$sha"
 		rc=$?
 		[ "$rc" = 75 ] && break
 		keep_awake
 		heartbeat
-	done
-	rm -f "$reqs" "$ress"
+		scripts_changed && break
+	done <"$queue"
+	rm -f "$reqs" "$ress" "$queue"
 	return 0
 }
 
@@ -632,14 +675,16 @@ cd_lane() { if [ -d "$LANE" ]; then cd "$LANE" || exit 1; fi; }
 
 # The loop runs from a copy of these scripts, so `make update` can rewrite the
 # installed ones in .git/mq/bin (which only change when tools/mq merges, never the
-# play folder's copy) can be updated safely; it re-execs onto the new copy when they change.
+# play folder's copy) can be updated safely; it re-execs onto the new copy when they
+# change. That only happens between renders, so a merge never has to stop it.
 SRC_SUM=""
 src_sum() { cat "$MQ/bin/shots.sh" "$MQ/bin/shots_common.sh" 2>/dev/null | cksum; }
+scripts_changed() { [ -n "$SRC_SUM" ] && [ "$(src_sum)" != "$SRC_SUM" ]; }
 
 loop() {
 	setup_run
 	take_lock || shots_die "another listener is running (pid $(lock_pid))"
-	trap 'p=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null); [ -n "$p" ] && kill -TERM "$p" 2>/dev/null; release_lock; event "STOPPED listener $$"; exit 0' TERM INT
+	trap on_stop TERM INT
 	event "STARTED listener $$ ($GODOT_VERSION, poll ${POLL}s)"
 	SRC_SUM=$(src_sum)
 	while :; do
@@ -647,7 +692,7 @@ loop() {
 		keep_awake
 		poll
 		prune_results
-		if [ "$(src_sum)" != "$SRC_SUM" ]; then
+		if scripts_changed; then
 			event "RESTARTING onto updated listener scripts"
 			mkdir -p "$S/bin"
 			cp "$MQ/bin/shots.sh" "$MQ/bin/shots_common.sh" "$S/bin/"
@@ -671,16 +716,31 @@ start() {
 }
 
 stop() {
-	local p c
+	local p c i=0 left
 	p=$(lock_pid)
-	if [ -z "$p" ] || ! kill -0 "$p" 2>/dev/null; then echo "Shot listener is not running."; rm -rf "${LOCK:?}"; return 0; fi
-	c=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
-	[ -n "$c" ] && kill -TERM "$c" 2>/dev/null
-	kill -TERM "$p"
-	local i=0
-	while [ "$i" -lt 20 ] && kill -0 "$p" 2>/dev/null; do sleep 1; i=$((i + 1)); done
-	kill -0 "$p" 2>/dev/null && { kill -KILL "$p"; rm -rf "${LOCK:?}"; }
-	echo "Shot listener stopped (pid $p)."
+	if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then
+		c=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
+		kill -TERM "$p"
+		[ -n "$c" ] && shots_stop_group "$c"
+		while [ "$i" -lt 20 ] && kill -0 "$p" 2>/dev/null; do sleep 1; i=$((i + 1)); done
+		kill -0 "$p" 2>/dev/null && kill -KILL "$p"
+		echo "Shot listener stopped (pid $p)."
+	else
+		echo "Shot listener is not running."
+	fi
+	rm -rf "${LOCK:?}"
+	stop_render
+	# Whatever is still in the render worktree, a killed listener's for one.
+	left=$(render_pids)
+	if [ -n "$left" ]; then
+		event "STOPPED leftover render:" $left
+		echo "Stopped a leftover render: $left"
+		kill -TERM $left 2>/dev/null
+		sleep 5
+		left=$(render_pids)
+		[ -z "$left" ] || kill -KILL $left 2>/dev/null
+	fi
+	return 0
 }
 
 status() {
@@ -715,6 +775,7 @@ case "${1:-}" in
 --once)
 	setup_run
 	take_lock || shots_die "the listener is running (pid $(lock_pid)); use --stop first"
+	trap on_stop TERM INT
 	SHOTS_VERBOSE=1
 	poll
 	rm -f "$S/last_prune"

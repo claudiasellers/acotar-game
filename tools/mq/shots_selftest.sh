@@ -6,7 +6,6 @@ set -u
 HERE=$(cd "$(dirname "$0")" && pwd -P)
 # Physical path: on a Mac $TMPDIR is /var/... but git reports /private/var/...
 T=$(cd "$(mktemp -d "${TMPDIR:-/tmp}/shots-selftest.XXXXXX")" && pwd -P)
-TAG="selftest-game-$$"
 trap 'pkill -f "$T" 2>/dev/null; rm -rf "$T"' EXIT
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
@@ -43,12 +42,16 @@ case "${user[0]:-}" in
 ok) { base64 --decode <"$FAKE_PNG" 2>/dev/null || base64 -D <"$FAKE_PNG"; } >"${user[1]}"; echo "SHOT ok draw_calls 12" ;;
 two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.png"; echo '{"n":2}' >"${user[1]}/stats.json" ;;
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
-hang) exec sleep 300 ;;
+hang) echo $$ >"$FAKE_HANG"; exec sleep 300 ;;
+stubborn) trap '' TERM; sleep 300 & echo $! >"$FAKE_HANG"; wait ;;
+slow) # true for ever more than one at a time, as two listeners would be
+	mkdir "$FAKE_BUSY" 2>/dev/null || echo "COLLISION" >>"$FAKE_LOG"
+	echo $$ >"$FAKE_HANG"; sleep "${user[1]}"; rmdir "$FAKE_BUSY" 2>/dev/null ;;
 esac
 exit 0
 G
 chmod +x "$T/bin/godot"
-export FAKE_LOG="$T/fake.log" FAKE_PNG="$T/fake.png.b64"
+export FAKE_LOG="$T/fake.log" FAKE_PNG="$T/fake.png.b64" FAKE_HANG="$T/hang.pid" FAKE_BUSY="$T/busy"
 echo "iVBORw0KGgoAAAANSUhEUgAAB9AAAAAoCAIAAAApPPbUAAABY0lEQVR42u3YQQEAEADAQPSPI4lChLDnXYQ9N+8+AwAAAAAA+LMkAAAAAACAf4Y7AAAAAAAEDHcAAAAAAAgY7gAAAAAAEDDcAQAAAAAgYLgDAAAAAEDAcAcAAAAAgIDhDgAAAAAAAcMdAAAAAAAChjsAAAAAAAQMdwAAAAAACBjuAAAAAAAQMNwBAAAAACBguAMAAAAAQMBwBwAAAACAgOEOAAAAAAABwx0AAAAAAAKGOwAAAAAABAx3AAAAAAAIGO4AAAAAABAw3AEAAAAAIGC4AwAAAABAwHAHAAAAAICA4Q4AAAAAAAHDHQAAAAAAAoY7AAAAAAAEDHcAAAAAAAgY7gAAAAAAEDDcAQAAAAAgYLgDAAAAAEDAcAcAAAAAgIDhDgAAAAAAAcMdAAAAAAAChjsAAAAAAAQMdwAAAAAACBjuAAAAAAAQMNwBAAAAACBguAMAAAAAQMBwBwAAAACAwAMukgLVabod5gAAAABJRU5ErkJggg==" >"$FAKE_PNG"   # a real 2000x40 PNG
 : >"$FAKE_LOG"
 
@@ -75,7 +78,7 @@ git clone -q "$T/origin.git" "$T/mac"
 git clone -q "$T/origin.git" "$T/cloud"
 git clone -q "$T/origin.git" "$T/other"
 mkdir -p "$T/mac/.git/mq"
-printf 'MQ_HOME_MACHINE=1\nSHOTS_GODOT=%s\nMQ_CAFFEINATE=0\nSHOTS_POLL=10\nSHOTS_PLAY_PATTERN=%s\n' "$T/bin/godot" "$TAG" >"$T/mac/.git/mq/config"
+printf 'MQ_HOME_MACHINE=1\nSHOTS_GODOT=%s\nMQ_CAFFEINATE=0\nSHOTS_POLL=10\n' "$T/bin/godot" >"$T/mac/.git/mq/config"
 MAC="$T/mac/tools/mq/shots.sh"
 REQ="$T/cloud/tools/mq/shots_request.sh"
 FETCH="$T/cloud/tools/mq/shots_fetch.sh"
@@ -122,12 +125,14 @@ check "request names are never reused" '! (cd "$T/cloud" && bash "$REQ" A 1 "$T/
 # 5 partial, timeout, malformed
 request B 1 'shot good res://probe/shot.tscn ok {out}/g.png\nshot bad res://probe/shot.tscn fail\n'
 request C 1 'timeout 2\nshot slow res://probe/shot.tscn hang\n'
+request C 2 'timeout 2\nsize 1920x1080\nshot stuck res://probe/shot.tscn stubborn\n'
 request D 1 'shot x res://probe/shot.tscn ok\nexplode now\n'
 request E 1 'shot x res://probe/missing.tscn ok\n'
-t0=$(date +%s); once; t1=$(date +%s)
+once
 check "one failing probe gives status partial with its exit code" 'result B-1 | grep -qx "status partial" && result B-1 | grep -q "^shot bad fail exit=1"'
 check "the failing probe's log is in the answer" 'git --git-dir="$T/origin.git" show refs/heads/shots/res-B-1:logs/bad.log | grep -q "SCRIPT ERROR"'
-check "a hung probe is stopped at its timeout" 'result C-1 | grep -q "^shot slow timeout exit=124" && [ $((t1 - t0)) -lt 60 ]'
+check "a hung probe is stopped at its timeout" 'result C-1 | grep -q "^shot slow timeout exit=124"'
+check "a child that ignores TERM is reported as a timeout and is gone" 'result C-2 | grep -q "^shot stuck timeout exit=124" && ! kill -0 "$(cat "$FAKE_HANG")" 2>/dev/null'
 check "a malformed request is answered with the reason" 'result D-1 | grep -qx "status error" && result D-1 | grep -q "note unknown line: explode"'
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
 
@@ -158,13 +163,31 @@ check "a request that moved after it was seen is ignored, not rendered" '! res P
 check "a branch not named <ID>-<n> is ignored" '! res junk && grep -q "IGNORED shots/req-junk" "$T/mac/.git/mq/shots/events.log"'
 check "the listener never pushed anything but result branches" '[ -z "$(git --git-dir="$T/origin.git" for-each-ref --format="%(refname)" refs/heads | grep -v -e "^refs/heads/main$" -e "^refs/heads/lane/x$" -e "^refs/heads/shots/req-" -e "^refs/heads/shots/res-")" ] && [ "$(git --git-dir="$T/origin.git" rev-parse main)" = "$(git -C "$T/src" rev-parse main)" ]'
 
-# 8 the owner's game comes first
-bash -c "exec -a '/Applications/Godot.app/Contents/MacOS/Godot --path /Users/me/acotar-game $TAG' sleep 60" &
-gp=$!
-sleep 1
-request W 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
+# 8 the owner's game comes first; a Godot anywhere else doesn't count
+fake_game() { # cwd args...: a process that looks like Godot on the outside
+	local d="$1"; shift
+	(cd "$d" && exec bash -c "exec -a '/Applications/Godot.app/Contents/MacOS/Godot $*' sleep 60") &
+	gp=$!
+	sleep 1
+}
+fake_game "$T/other" --path "$T/other" --remote-debug tcp://127.0.0.1:6007
+request O 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
-check "requests wait while the owner's game is running" '! res W-1 && grep -q "WAITING" "$T/mac/.git/mq/shots/events.log"'
+kill $gp; wait $gp 2>/dev/null
+check "a Godot in another folder doesn't hold requests" 'result O-1 | grep -qx "status ok"'
+fake_game "$T/mac" --path . --headless
+request O 2 'shot y res://probe/shot.tscn ok {out}/y.png\n'
+once
+kill $gp; wait $gp 2>/dev/null
+check "nor does a headless one in the play folder" 'result O-2 | grep -qx "status ok"'
+fake_game "$T/mac" --path .
+request W 1 'shot x res://probe/shot.tscn ok {out}/w.png\n'
+once
+check "requests wait while the owner's game is running (make play)" '! res W-1 && grep -q "WAITING the owner" "$T/mac/.git/mq/shots/events.log"'
+kill $gp; wait $gp 2>/dev/null
+fake_game "$T" --path "$T/mac" --remote-debug tcp://127.0.0.1:6007
+once
+check "and for Play from the editor" '! res W-1'
 kill $gp; wait $gp 2>/dev/null
 once
 check "and are rendered once it closes" 'result W-1 | grep -qx "status ok"'
@@ -187,8 +210,34 @@ i=0; while [ $i -lt 40 ] && ! res S-1; do sleep 1; i=$((i + 1)); done
 check "the background listener answers new requests" 'res S-1'
 out=$(cd "$T/mac" && bash "$MAC" --status 2>&1)
 check "--status shows it running" 'echo "$out" | grep -q "running, pid"'
+# a merge arrives mid-render: the render finishes, then the listener moves
+request R 1 'size 1920x1080\nshot long res://probe/shot.tscn slow 8\n'
+i=0; while [ $i -lt 40 ] && ! grep -q "RENDERING R-1" "$T/mac/.git/mq/shots/events.log"; do sleep 1; i=$((i + 1)); done
+i=0; while [ $i -lt 20 ] && [ ! -d "$FAKE_BUSY" ]; do sleep 1; i=$((i + 1)); done
+n=$(grep -c RESTARTING "$T/mac/.git/mq/shots/events.log")
+echo "# a merge" >>"$T/mac/.git/mq/bin/shots.sh"
+sleep 2
+check "a merge mid-render doesn't restart the listener" '[ -d "$FAKE_BUSY" ] && [ "$(grep -c RESTARTING "$T/mac/.git/mq/shots/events.log")" = "$n" ]'
+i=0; while [ $i -lt 40 ] && [ "$(grep -c RESTARTING "$T/mac/.git/mq/shots/events.log")" = "$n" ]; do sleep 1; i=$((i + 1)); done
+check "it finishes that render, then restarts, with one render at a time" 'result R-1 | grep -q "^shot long ok" && [ "$(grep -c RESTARTING "$T/mac/.git/mq/shots/events.log")" -gt "$n" ] && ! grep -q COLLISION "$FAKE_LOG"'
+# --stop mid-render: the listener, its render and the child all go at once
+request Q 1 'size 1920x1080\nshot long res://probe/shot.tscn slow 120\n'
+i=0; while [ $i -lt 40 ] && [ ! -d "$FAKE_BUSY" ]; do sleep 1; i=$((i + 1)); done
+hp=$(cat "$FAKE_HANG"); t0=$(date +%s)
 (cd "$T/mac" && bash "$MAC" --stop) >>"$T/mac.out" 2>&1
+rmdir "$FAKE_BUSY" 2>/dev/null
 check "--stop stops it and frees the lock" '[ ! -d "$T/mac/.git/mq/shots/lock" ]'
+check "--stop runs the listener's trap, not a kill -9" '[ $(($(date +%s) - t0)) -lt 15 ] && grep -q "STOPPED listener" "$T/mac/.git/mq/shots/events.log"'
+check "--stop leaves no render behind" '! kill -0 "$hp" 2>/dev/null && [ -z "$(ps -A -o command= | grep -F -- "--path $T/mac/.lanes/shots " | grep -v grep)" ]'
+# a render nobody owns (a listener killed outright) holds the queue, then --stop clears it
+(exec bash -c "exec -a 'Godot --path $T/mac/.lanes/shots --windowed' sleep 120") &
+gp=$!
+sleep 1
+once
+check "a new listener won't render beside a render it doesn't own" '! res Q-1 && grep -q "WAITING a render is already running" "$T/mac/.git/mq/shots/events.log"'
+out=$(cd "$T/mac" && bash "$MAC" --stop 2>&1)
+wait $gp 2>/dev/null
+check "--stop finds that leftover render and says so" '! kill -0 "$gp" 2>/dev/null && echo "$out" | grep -q "leftover render" && grep -q "STOPPED leftover render" "$T/mac/.git/mq/shots/events.log"'
 
 # 10 cleanup: --done from the cloud, and the Mac prunes its own old answers
 (cd "$T/cloud" && bash "$FETCH" A 1 "$T/got" --done) >/dev/null 2>&1
