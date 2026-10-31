@@ -12,7 +12,7 @@ const COTTAGE_GEN := preload("res://world/human_realm/cottage/cottage_gen.gd")
 const SHOTS := {
 	"trail_opening": ["opening", 0, 0, 0.0, 0.262],
 	"trail_start": ["trail", 0, 24, 1.6, 0.3],
-	"trail_treeline": ["doe", 4, 40, 1.6, 0.3],
+	"trail_treeline": ["trail", -16, -1, 1.6, 0.3],
 	"doe_mid": ["doe", 180, 215, 1.6, 0.35],
 	"doe_raised": ["doe", 0, 120, 30.0, 0.35],
 }

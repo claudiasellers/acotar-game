@@ -18,12 +18,12 @@ const COTTAGE_GEN := preload("res://world/human_realm/cottage/cottage_gen.gd")
 ## Trodden snow reads by value, not by markers: a cool shadow-blue band
 ## darker than the drifts, with a deeper rut down the middle where the hooves
 ## go, so it reads as a groove that leads the eye into the trees.
-const TRODDEN := Color(0.58, 0.65, 0.80)
-const RUT := Color(0.40, 0.47, 0.64)
+const TRODDEN := Color(0.50, 0.57, 0.72)
+const RUT := Color(0.31, 0.37, 0.53)
 const DEER_TRAIL_WIDTH := 1.1
 const DOE_FURROW_WIDTH := 0.6
 ## The doe's line is one fresh pass, not a path: fainter than the deer trail.
-const DOE_STRENGTH := 0.7
+const DOE_STRENGTH := 0.85
 ## The band fades in over this many metres from the yard (no hard start).
 const BAND_FADE_IN := 4.0
 const BAND_STEP := 0.75
@@ -122,7 +122,7 @@ func _build_band(line: PackedVector2Array, width: float, band_name: String, stre
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Across the band: edge, trodden, rut, rut, trodden, edge.
 	var across := [-0.5, -0.3, -0.1, 0.1, 0.3, 0.5]
-	var alpha := [0.0, 0.7, 0.9, 0.9, 0.7, 0.0]
+	var alpha := [0.0, 0.85, 1.0, 1.0, 0.85, 0.0]
 	var tone := [TRODDEN, TRODDEN, RUT, RUT, TRODDEN, TRODDEN]
 	var rows: Array = []
 	for i in pts.size():
