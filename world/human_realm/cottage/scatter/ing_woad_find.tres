@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ep0m7"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_4xcgc"]
+
+[resource]
+script = ExtResource("2_4xcgc")
+id = &"ing_woad_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/woad_rosette.glb"
+ingredient_id = &"ing_woad"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-51.85855, -0.47073963, 2413.2842, 1.3115782, 1.0187266, 32.382965, -2.1801612, 2406.7966, 2.01334, 0.96911377, -293.18115, -6.3598576, 2409.9292, 1.156729, 0.8274565, -141.15521, -1.8516712, 2352.6404, 4.4936213, 0.9256761, -45.88855, -5.516967, 2144.2273, 6.2393117, 0.94068646, 13.684204, 1.0887245, 2373.5164, 2.5749164, 0.87371814, -225.67525, 1.4730396, 2322.9915, 0.1340836, 1.0781559, -307.4138, -8.445355, 2369.3958, 4.614151, 0.9721743)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_ep0m7")

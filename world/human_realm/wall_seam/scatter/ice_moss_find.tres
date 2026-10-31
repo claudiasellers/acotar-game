@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_fts1d"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_6xoyj"]
+
+[resource]
+script = ExtResource("2_6xoyj")
+id = &"ice_moss_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/ice_moss.glb"
+ingredient_id = &"ing_ice_moss"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-867.4142, 19.250902, 1427.807, 4.3516254, 1.0430303, 575.849, -7.248475, 1418.6813, 5.2319584, 1.0673097, 196.20288, 5.4007, 1410.7478, 5.119673, 1.0845248, -721.1221, 15.317941, 1409.2501, 2.4546444, 1.1365538, -389.85406, 7.1214557, 1450.0024, 1.3102354, 0.8504559, -8.500305, 0.033698723, 1451.6041, 5.911005, 1.091506)
+material = ExtResource("1_fts1d")

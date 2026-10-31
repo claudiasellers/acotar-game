@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_2yps0"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_5xinr"]
+
+[resource]
+script = ExtResource("2_5xinr")
+id = &"ing_snowdrop_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/snowdrop_cluster.glb"
+ingredient_id = &"ing_snowdrop"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-666.4352, 9.902619, 2392.06, 1.22116, 0.8665421, -681.26843, 12.788555, 2391.9697, 3.1319263, 0.8850619, -647.8054, -5.2976556, 2292.357, 0.479511, 0.85850847, -579.45825, 2.665016, 2346.9922, 3.2609181, 0.8585069, -650.7467, -5.2976556, 2314.3774, 6.0852346, 1.112296, -656.87134, -3.4302478, 2282.615, 4.39154, 1.1286204, -818.2828, -2.5157094, 2165.9653, 1.1177373, 0.94077337, -625.9647, -5.3866596, 2306.57, 2.9945776, 1.1394897, -714.7264, 13.1827, 2287.3687, 6.106741, 1.0079424, -723.58276, 13.40354, 2349.6152, 2.9930294, 0.9050665, -697.1184, 7.416931, 2353.2651, 2.827982, 1.0233412, -683.6648, -5.2976556, 2340.0308, 0.9417976, 1.1005998)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_2yps0")

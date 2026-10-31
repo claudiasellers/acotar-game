@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ilare"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_y6ixu"]
+
+[resource]
+script = ExtResource("2_y6ixu")
+id = &"ing_old_mans_beard_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/old_mans_beard.glb"
+ingredient_id = &"ing_old_mans_beard"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-877.52545, 4.767879, 2055.0637, 4.453164, 0.96482074, -379.42096, 13.614725, 2101.1084, 3.9926276, 0.99872136, -850.90826, 2.7445886, 2086.1086, 0.41060403, 0.96742904, -804.48364, -4.787811, 2175.8518, 3.102631, 1.0804834, -850.58734, 0.38839975, 2120.2175, 0.7626536, 1.1267083, -782.3958, -5.6514583, 2182.6707, 1.9139364, 1.0389392)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_ilare")

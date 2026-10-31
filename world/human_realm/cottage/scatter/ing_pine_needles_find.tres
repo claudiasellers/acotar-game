@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_nb30i"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_61ho8"]
+
+[resource]
+script = ExtResource("2_61ho8")
+id = &"ing_pine_needles_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/pine_cone_scatter.glb"
+ingredient_id = &"ing_pine_needles"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-98.518234, 4.779881, 2055.3655, 0.47287968, 1.0899578, 41.36081, 0.45032197, 2097.3635, 1.7930207, 1.0310442, -295.20166, 10.122178, 2051.4075, 4.583089, 0.9665763, -335.65298, 6.289066, 2204.5967, 0.15051901, 0.9305368, -300.9234, 8.228042, 2074.4417, 0.6686206, 0.9906557, -62.129913, -2.7133875, 2113.3167, 1.8397275, 0.93219584, 17.125275, 0.6428076, 2087.1472, 5.9595346, 1.0210042, -322.7757, 6.0480556, 2129.9263, 5.0798154, 1.1489636)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_nb30i")

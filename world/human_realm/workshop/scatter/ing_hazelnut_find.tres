@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_fch4b"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_8drqp"]
+
+[resource]
+script = ExtResource("2_8drqp")
+id = &"ing_hazelnut_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/hazelnut_scatter.glb"
+ingredient_id = &"ing_hazelnut"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-570.14496, 4.1390305, 2110.3308, 6.0549426, 0.9961375, -432.17255, 7.9943476, 2134.433, 4.471146, 0.98718923, -722.4701, -0.42823952, 2050.3625, 5.389127, 1.0669554, -369.8542, 10.771471, 2131.73, 2.839928, 1.1092906, -438.4134, 6.94375, 2146.6438, 2.018387, 0.99786824, -602.83264, 4.8930206, 2067.3625, 0.31624657, 1.0288962)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_fch4b")

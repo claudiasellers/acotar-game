@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_nm2v7"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_ng5qd"]
+
+[resource]
+script = ExtResource("2_ng5qd")
+id = &"shed_antler_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/shed_antler.glb"
+ingredient_id = &"ing_shed_antler"
+tags = PackedStringArray("canon:C")
+instances = PackedFloat32Array(-31.001587, -0.38101465, 1426.225, 3.2271073, 1.1151953, 557.94836, -7.597322, 1432.3168, 0.5260723, 0.9548009)
+material = ExtResource("1_nm2v7")

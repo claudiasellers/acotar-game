@@ -247,7 +247,8 @@ func build_colliders(parent: Node3D, owner: Node) -> int:
 	var chunks := {}
 	var shapes := 0
 	for layer in layers:
-		var spec: Dictionary = specs[layer.id]
+		# A thinned layer's `<id>_find` half collides like the layer it came from.
+		var spec: Dictionary = specs.get(layer.id, specs.get(StringName(String(layer.id).trim_suffix(ForageThinning.SUFFIX)), {}))
 		if not spec.has("collider"):
 			continue
 		var col: Dictionary = spec.collider

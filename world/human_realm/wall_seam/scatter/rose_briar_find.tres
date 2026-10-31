@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_dx8ex"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_4hjh7"]
+
+[resource]
+script = ExtResource("2_4hjh7")
+id = &"rose_briar_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/wild_rose_briar.glb"
+ingredient_id = &"ing_rose_hip"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-144.3097, 0.12600312, 1467.1222, 4.2429624, 1.0094419, -665.39166, 11.0703535, 1438.6699, 6.257789, 1.0456684, -299.14734, 6.1238413, 1451.3397, 2.2527177, 0.8958771, -867.09814, 15.7615185, 1463.5244, 5.3266244, 0.9973336)
+wind = 0.15
+material = ExtResource("1_dx8ex")

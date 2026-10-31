@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_su1kg"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_77v7u"]
+
+[resource]
+script = ExtResource("2_77v7u")
+id = &"ing_sloe_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/blackthorn_sloe.glb"
+ingredient_id = &"ing_sloe"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-512.4719, -3.1113386, 2282.4678, 5.065975, 0.94009036, -494.5855, -3.7030892, 2332.9412, 4.029586, 0.71098524, -747.1325, -1.1346626, 2220.7603, 0.34750137, 0.81600547, -531.2263, -0.22429699, 2303.9817, 6.1622286, 0.7383207, -839.57355, -5.005554, 2288.1157, 0.90009046, 0.8341651, -614.72064, 7.054415, 2216.3936, 1.1964597, 0.9243808)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_su1kg")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_3refn"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_5if0q"]
+
+[resource]
+script = ExtResource("2_5if0q")
+id = &"ing_pine_resin_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/pine_resin_blob.glb"
+ingredient_id = &"ing_pine_resin"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-805.1227, -4.633839, 2053.1782, 6.069165, 1.1241388, -840.802, -3.6434963, 2318.5386, 0.49941042, 1.0850475, -772.4716, -6.2238207, 2061.123, 4.92997, 1.0513563, -370.2428, 13.937181, 2105.6755, 4.229956, 0.99485916, -629.755, 5.7423058, 2063.611, 1.9638364, 1.0423572, -424.31775, 10.962698, 2085.376, 4.4486747, 1.1248391)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_3refn")

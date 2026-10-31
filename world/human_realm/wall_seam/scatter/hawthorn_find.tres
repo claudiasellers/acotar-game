@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_g71xq"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_idl1u"]
+
+[resource]
+script = ExtResource("2_idl1u")
+id = &"hawthorn_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/hawthorn.glb"
+ingredient_id = &"ing_hawthorn_haw"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(439.01648, -6.212298, 1435.8756, 6.268733, 0.899324, 177.31006, 6.9879584, 1460.0991, 5.592417, 0.8715072, -675.0701, 11.074127, 1430.8429, 3.456148, 1.0534253, -782.12726, 16.666046, 1413.5221, 3.4533515, 1.0093447, -589.2862, 6.577829, 1463.9967, 5.314979, 0.98775697, 246.44983, 2.2399952, 1451.573, 5.6576767, 1.1153767)
+wind = 0.15
+material = ExtResource("1_g71xq")

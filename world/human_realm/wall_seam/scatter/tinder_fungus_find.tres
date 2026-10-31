@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_w75fw"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_snqv2"]
+
+[resource]
+script = ExtResource("2_snqv2")
+id = &"tinder_fungus_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/tinder_fungus.glb"
+ingredient_id = &"ing_tinder_fungus"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-324.8245, 6.3598733, 1424.5599, 3.686285, 1.0451809, 475.90015, -5.8755226, 1469.8076, 5.589843, 1.0147309, -713.49475, 11.281698, 1450.053, 0.7257453, 1.1161823, 197.9093, 5.3335667, 1422.6736, 2.3833282, 1.034999)
+material = ExtResource("1_w75fw")

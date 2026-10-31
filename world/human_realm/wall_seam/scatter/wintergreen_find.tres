@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_5uxrb"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_7imcm"]
+
+[resource]
+script = ExtResource("2_7imcm")
+id = &"wintergreen_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/wintergreen_patch.glb"
+ingredient_id = &"ing_wintergreen"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(527.2594, -7.2140255, 1410.3788, 3.3867712, 1.0628422, -331.60358, 5.4843397, 1460.857, 0.21545951, 1.075564, -309.05402, 5.247713, 1419.0447, 4.949272, 0.8957189, -577.7179, 6.699348, 1446.8691, 0.9293684, 0.8539593)
+material = ExtResource("1_5uxrb")

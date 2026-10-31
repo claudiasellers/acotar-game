@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_vusjw"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_oe667"]
+
+[resource]
+script = ExtResource("2_oe667")
+id = &"chalk_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/chalk_lump.glb"
+ingredient_id = &"ing_chalk"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-680.7277, 6.7401676, 1972.6539, 2.1380455, 1.14983, -135.23993, 1.5489783, 1685.947, 2.1016347, 1.0088332, -529.6809, 4.062282, 1566.4066, 5.529503, 1.0357884, -524.84955, 3.6358807, 1559.4084, 2.4959903, 0.85732186, 260.94202, 4.167567, 1595.9865, 0.037712242, 1.1002874, 581.5625, -2.8815718, 1521.8301, 6.2643957, 0.9235468, -504.76318, 0.40391284, 1658.0491, 1.0117503, 0.8823152, -620.15, 8.535892, 1922.2174, 1.375462, 1.0350235, 36.741455, 0.69276905, 1506.7311, 0.1685346, 1.0186434, -372.9613, 11.830614, 1875.9601, 1.4485114, 0.9078998, 681.5432, -0.2922922, 1504.2194, 1.277885, 1.1914108, -519.22626, 14.727147, 1959.2158, 3.54846, 0.9615534, -744.45544, -1.1487763, 1978.5775, 0.53728026, 1.092438, -166.8689, 4.7826304, 1609.7761, 5.292096, 0.9998845)
+material = ExtResource("1_vusjw")

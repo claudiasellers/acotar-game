@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_uy8jt"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_01b0k"]
+
+[resource]
+script = ExtResource("2_01b0k")
+id = &"ing_frozen_reed_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/frozen_reeds.glb"
+ingredient_id = &"ing_frozen_reed"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-282.3556, -3.9187844, 2339.4448, 0.05147468, 0.9912965, -296.49432, -7.409747, 2360.0073, 3.2802093, 1.2920313, -262.19522, -3.598077, 2372.1167, 1.5722802, 1.0128133, -261.75952, -1.9699197, 2352.0015, 4.255866, 1.0000356, -283.5771, -4.1355004, 2341.0295, 4.542595, 1.2930324, -264.102, -3.7669907, 2370.705, 2.2968051, 1.1857183, -301.45023, -7.832428, 2362.7212, 5.1380816, 0.9589314, -292.14896, -7.680341, 2377.7966, 5.5470467, 0.9936241)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_uy8jt")

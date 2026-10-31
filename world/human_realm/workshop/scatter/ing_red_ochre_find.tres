@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_vr436"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_6f0nj"]
+
+[resource]
+script = ExtResource("2_6f0nj")
+id = &"ing_red_ochre_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/red_ochre_rock.glb"
+ingredient_id = &"ing_red_ochre"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-777.21765, 0.1525041, 2458.3684, 1.7974772, 1.0745704, -700.0439, -3.5756211, 2125.8625, 3.2562113, 1.1131636, -739.8613, 9.894106, 2371.639, 0.06118594, 0.9188265, -439.41254, -6.3556943, 2396.3088, 4.95354, 1.0237963)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_vr436")

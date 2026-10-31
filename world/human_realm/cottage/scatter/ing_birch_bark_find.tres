@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_2yp7k"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_pkwr2"]
+
+[resource]
+script = ExtResource("2_pkwr2")
+id = &"ing_birch_bark_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/log_fallen.glb"
+ingredient_id = &"ing_birch_bark"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-106.91766, 2.9119537, 2109.1814, 1.072792, 0.54886585, -51.544556, -3.3592036, 2114.7036, 4.8311877, 0.53174955, -5.0620728, 1.9512085, 2087.7095, 5.1534047, 0.50784206, -106.62964, 3.0246196, 2113.4343, 5.6905465, 0.5740541, -259.64804, 8.297006, 2080.2688, 3.7850676, 0.67973477)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_2yp7k")

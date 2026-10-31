@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_cdmb2"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_q0vyw"]
+
+[resource]
+script = ExtResource("2_q0vyw")
+id = &"ing_madder_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/madder_patch.glb"
+ingredient_id = &"ing_madder"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(16.145111, -1.9291385, 2418.7454, 0.29243314, 0.9477061, 27.842346, -2.8517814, 2171.9922, 1.5416262, 0.848627, -243.17462, -0.04075365, 2442.635, 3.249047, 0.91051066, -237.0219, 0.17224492, 2449.1436, 5.7684865, 1.0256864, -260.43182, -1.4635997, 2345.1306, 5.4862347, 1.0026317, -7.080017, -1.7688593, 2412.0242, 2.0818534, 1.1412951, -263.27133, -1.7904874, 2324.976, 5.4784226, 1.078742)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_cdmb2")

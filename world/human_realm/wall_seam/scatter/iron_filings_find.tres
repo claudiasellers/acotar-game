@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_0g1qu"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_jdjyp"]
+
+[resource]
+script = ExtResource("2_jdjyp")
+id = &"iron_filings_find"
+mesh_path = "res://world/human_realm/wall_seam/assets/props/iron_stake.glb"
+ingredient_id = &"ing_iron_filings"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-32.31433, -0.70666015, 1437.9176, 5.3237877, 1.0303934, 338.2057, -1.1145104, 1425.7258, 0.29376543, 1.0120573, -204.16704, 0.4339514, 1435.0083, 0.96812147, 0.85946095, -66.613304, -0.95190233, 1435.8843, 0.6184793, 0.96244025, 98.056114, 10.001871, 1436.1783, 3.285981, 1.121598, -227.07477, 0.6238712, 1436.2391, 2.422104, 0.9356717, -212.85, 0.34120843, 1436.0785, 5.222757, 1.1093342, -24.799492, -0.36728337, 1435.0057, 0.11176825, 1.0093386)
+material = ExtResource("1_0g1qu")

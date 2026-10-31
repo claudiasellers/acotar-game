@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_5lfjc"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_6ladf"]
+
+[resource]
+script = ExtResource("2_6ladf")
+id = &"ing_hawk_feather_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/feather_hawk.glb"
+ingredient_id = &"ing_hawk_feather"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-387.2354, -5.493335, 2413.5068, 0.88064355, 0.91492796, -724.2742, -4.5832987, 2178.8115, 6.171809, 1.0161309, -714.76654, 10.842084, 2389.2063, 0.8471217, 0.9776434, -779.0354, -0.37219772, 2310.6106, 1.4775378, 1.0614369)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_5lfjc")

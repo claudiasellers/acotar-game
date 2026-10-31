@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_wy6tc"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_bh681"]
+
+[resource]
+script = ExtResource("2_bh681")
+id = &"ing_chaga_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/chaga_growth.glb"
+ingredient_id = &"ing_chaga"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-694.95544, -1.6511687, 2081.4246, 5.088992, 1.0150524, -891.8398, 6.1082153, 2056.7917, 2.3932421, 1.0540993, -381.64948, 10.606109, 2136.1958, 0.41942406, 1.033361, -718.2894, -2.1520145, 2071.4946, 2.9079132, 1.1945648, -847.3501, 1.7449968, 2064.4705, 5.0923533, 0.92448753)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_wy6tc")

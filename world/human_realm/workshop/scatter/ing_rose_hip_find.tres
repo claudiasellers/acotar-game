@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_btlfg"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_0qd5q"]
+
+[resource]
+script = ExtResource("2_0qd5q")
+id = &"ing_rose_hip_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/wild_rose_briar.glb"
+ingredient_id = &"ing_rose_hip"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-678.4161, -5.2976556, 2339.605, 2.4946258, 0.8674297, -682.05524, -5.297655, 2346.018, 2.624418, 0.9542785, -679.6682, -4.69669, 2356.9653, 0.5136057, 1.1033963, -659.1584, -5.2976556, 2336.9246, 3.8090215, 0.95648783, -683.86224, -3.4810686, 2354.5278, 3.7298017, 0.9011785, -669.45654, -5.2976556, 2334.5178, 0.046616603, 1.0673637, -676.74207, -5.2976556, 2349.7915, 2.638801, 0.93134254, -639.64026, -5.2976556, 2360.0842, 2.9403741, 0.9992856, -679.22186, -5.2976556, 2351.373, 0.68328464, 1.0114521, -672.2882, -5.2976556, 2334.111, 1.9526008, 1.1458507, -659.0095, -5.2976556, 2331.7764, 0.43742797, 0.9785632)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_btlfg")

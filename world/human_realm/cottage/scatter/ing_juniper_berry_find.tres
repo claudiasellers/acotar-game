@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_se8vt"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_oa8id"]
+
+[resource]
+script = ExtResource("2_oa8id")
+id = &"ing_juniper_berry_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/juniper_shrub.glb"
+ingredient_id = &"ing_juniper_berry"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-163.13031, 3.866847, 2231.7454, 4.576232, 0.87881905, -83.04059, -5.5358586, 2206.6616, 4.0523806, 0.9199219, -24.41333, -5.529599, 2143.016, 1.3241899, 0.9530839, -328.82974, 9.001497, 2078.0261, 3.3154898, 1.0198213, -179.51297, 4.5403705, 2058.8894, 5.145295, 1.0383797, -142.2679, 2.8244586, 2244.3787, 4.460209, 1.1059043, -68.5025, -3.8454797, 2296.154, 4.537673, 0.99677944)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_se8vt")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ygg7h"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_g8tf1"]
+
+[resource]
+script = ExtResource("2_g8tf1")
+id = &"flint_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/flint_nodule.glb"
+ingredient_id = &"ing_flint"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-429.00696, 7.7236943, 1422.5377, 1.3820937, 1.0713235, 253.70691, 3.3289745, 1463.5244, 3.6572387, 0.93935, -882.12067, 16.700895, 1458.5323, 5.7103906, 0.9525054, -349.1037, 7.096923, 1436.0782, 5.9700994, 0.86663795, 384.4812, -4.3747034, 1439.9203, 5.6690297, 0.9018308, -564.2073, 6.2363224, 1433.0415, 0.5930544, 1.0322988)
+material = ExtResource("1_ygg7h")
