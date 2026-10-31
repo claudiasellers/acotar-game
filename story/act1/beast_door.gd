@@ -33,13 +33,15 @@ func _ready() -> void:
 	if entry:
 		entry.body_exited.connect(func(body: Node3D) -> void:
 			if body.is_in_group(&"player"):
-				_player_inside = false)
+				_player_inside = false
+				player_present = false)
 	decision_made.connect(func(fact: String) -> void: chosen_fact = fact)
 
 
 ## Tests and the greybox can say Feyre is home without an Entry area.
 func set_player_inside(inside: bool) -> void:
 	_player_inside = inside
+	player_present = inside
 
 
 func can_start() -> bool:
@@ -101,6 +103,9 @@ func _break_door(_space: SceneSpace) -> void:
 	WorldDeltas.set_region_value(&"cottage", "door", "broken")
 
 
+## Home after the sale by day: the evening falls for her (TimeShift) and the
+## beast comes; at night it starts straight away (auto_start).
 func _on_entry_body_entered(body: Node3D) -> void:
 	if body.is_in_group(&"player"):
 		_player_inside = true
+		player_present = true

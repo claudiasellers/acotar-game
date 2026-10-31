@@ -1,6 +1,7 @@
 ## Act I's contextual key prompts (no objectives, no markers; R2): a small card
 ## at the bottom of the screen that names a key only while it matters.
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
+##   RMB aim / LMB draw  prey is near or the hunt is on, until her first shot
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
@@ -14,6 +15,8 @@ const NEAR_PREY := 90.0
 const REACH := 3.5
 const PROMPTS := {
 	&"ash": ["Q", "ash arrow"],
+	&"aim": ["Right mouse", "hold to aim the bow"],
+	&"draw": ["Left mouse", "hold to draw, let go to loose"],
 	&"skin": ["E", "skin"],
 	&"sell": ["E", "sell the pelt"],
 	&"sleep": ["E", "sleep until night"],
@@ -27,6 +30,8 @@ var _card: PanelContainer
 var _key: Label
 var _text: Label
 var _alpha: float = 0.0
+var _hunting: bool = false
+var _fire_hooked: bool = false
 
 
 func _ready() -> void:
@@ -36,6 +41,12 @@ func _ready() -> void:
 	EventBus.creature_harvested.connect(func(_id: StringName, kind: StringName, _items: PackedStringArray) -> void:
 		if kind == &"great_wolf":
 			teach(&"skin"))
+	EventBus.scene_space_started.connect(func(id: StringName) -> void:
+		if id == &"wolf_kill":
+			_hunting = true)
+	EventBus.scene_space_finished.connect(func(id: StringName) -> void:
+		if id == &"wolf_kill":
+			_hunting = false)
 	EventBus.item_sold.connect(func(item_id: StringName, _coin: int) -> void:
 		if item_id == FurStall.PELT:
 			teach(&"sell"))
@@ -69,6 +80,11 @@ func want() -> StringName:
 	if feyre == null or StoryControl.mode == StoryControl.Mode.NONE:
 		return &""
 	var at := feyre.global_position
+	if not _fire_hooked:
+		_fire_hooked = true
+		feyre.arrow_fired.connect(func(_a: Node) -> void:
+			teach(&"aim")
+			teach(&"draw"))
 	if not taught.get(&"sell", false):
 		for stall in get_tree().get_nodes_in_group(&"station"):
 			if stall is FurStall and (stall as FurStall).has_pelt() and _near(stall, at, REACH):
@@ -92,7 +108,18 @@ func want() -> StringName:
 				for prey in get_tree().get_nodes_in_group(group):
 					if _near(prey, at, NEAR_PREY):
 						return &"ash"
+	if not taught.get(&"draw", false) and feyre.bow_controller and StoryControl.can_shoot() \
+			and Gameplay.inventory.arrow_count() > 0 and (_hunting or _prey_near(at)):
+		return &"draw" if feyre.is_aiming or feyre.is_drawing else &"aim"
 	return &""
+
+
+func _prey_near(at: Vector3) -> bool:
+	for group in [&"story_actor_doe", &"story_actor_great_wolf"]:
+		for prey in get_tree().get_nodes_in_group(group):
+			if _near(prey, at, NEAR_PREY):
+				return true
+	return false
 
 
 func _near(node: Node, at: Vector3, radius: float) -> bool:
@@ -122,7 +149,8 @@ func _build() -> void:
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_card.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_card.position = Vector2(-110, -140)
+	# Above the satchel's quick bar (bottom centre).
+	_card.position = Vector2(-110, -215)
 	anchor.add_child(_card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)

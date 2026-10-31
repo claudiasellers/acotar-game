@@ -23,6 +23,16 @@ signal decision_made(fact: String)
 @export var auto_start: bool = false
 ## Only at night by the Clock (the beast comes at night).
 @export var night_only: bool = false
+## Only by day (the hunt is in daylight, in falling snow).
+@export var day_only: bool = false
+## When Feyre arrives and only the hour is wrong, the hour comes to her: a soft
+## fade, the Clock moves on to the scene's time, and the scene starts. A scene
+## always starts when she walks into it, whatever time she gets there.
+@export var shift_time_on_arrival: bool = true
+## Also counts as arriving: Feyre within this many metres on the ground (flat
+## distance, any height) of `arrive_offset`. 0 = only the Entry area.
+@export var arrive_radius: float = 0.0
+@export var arrive_offset: Vector3 = Vector3.ZERO
 ## Tick from _physics_process. Tests turn this off and call tick() directly.
 @export var auto_tick: bool = true
 
@@ -33,6 +43,12 @@ var beat_index: int = -1
 var _choice: StringName = &""
 var _triggers: Dictionary = {}
 var _mood_set: bool = false
+## Feyre is inside the Entry area (or the arrive radius) right now.
+var player_present: bool = false
+## A time shift is fading in; the scene starts when it ends.
+var shifting_time: bool = false
+## After the scene ends or fails she has to step out before it can start again.
+var _must_leave: bool = false
 
 
 ## Called by mood beats so the scene restores calm when it ends.
@@ -44,6 +60,7 @@ func _ready() -> void:
 	var entry := get_node_or_null(^"Entry") as Area3D
 	if entry:
 		entry.body_entered.connect(_on_entry_body_entered)
+		entry.body_exited.connect(_on_entry_body_exited)
 
 
 func _physics_process(delta: float) -> void:
@@ -51,8 +68,73 @@ func _physics_process(delta: float) -> void:
 		return
 	if running:
 		tick(delta)
-	elif auto_start and can_start():
+		return
+	if shifting_time:
+		return
+	var here := _player_here()
+	if not here:
+		_must_leave = false
+	if auto_start and can_start():
 		start()
+	elif here and not _must_leave:
+		arrive()
+
+
+## Feyre has arrived: start now, or bring the scene's hour to her and then
+## start. Returns true when the scene started or the hour is on its way.
+func arrive() -> bool:
+	if running or shifting_time:
+		return running or shifting_time
+	if can_start():
+		return start()
+	if shift_time_on_arrival and waits_only_for_time():
+		shift_time()
+		return true
+	return false
+
+
+## Everything is ready but the hour (a night scene by day, a day scene by night).
+func waits_only_for_time() -> bool:
+	if not (night_only or day_only) or running:
+		return false
+	var was_night := night_only
+	var was_day := day_only
+	night_only = false
+	day_only = false
+	var ok := can_start()
+	night_only = was_night
+	day_only = was_day
+	return ok and not _hour_ok()
+
+
+func _hour_ok() -> bool:
+	if night_only and not Clock.is_night():
+		return false
+	if day_only and Clock.is_night():
+		return false
+	return true
+
+
+## Fades out, moves the Clock to the scene's hour, fades in and starts.
+func shift_time() -> void:
+	shifting_time = true
+	var to := TimeShift.NIGHT if night_only else TimeShift.MORNING
+	TimeShift.fade_to(self, to, func() -> void:
+		shifting_time = false
+		if not start():
+			StoryControl.release())
+
+
+func _player_here() -> bool:
+	if player_present:
+		return true
+	if arrive_radius <= 0.0:
+		return false
+	var p := player()
+	if p == null:
+		return false
+	var at := global_transform * arrive_offset
+	return Vector2(p.global_position.x - at.x, p.global_position.z - at.z).length() <= arrive_radius
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -72,7 +154,7 @@ func can_start() -> bool:
 	for flag in done_flags:
 		if WorldState.has_flag(flag):
 			return false
-	if night_only and not Clock.is_night():
+	if not _hour_ok():
 		return false
 	return true
 
@@ -165,6 +247,7 @@ func _build_beats() -> Array:
 
 func _finish() -> void:
 	running = false
+	_must_leave = true
 	if _mood_set:
 		EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
 	StoryControl.release()
@@ -182,4 +265,11 @@ func _advance() -> void:
 
 func _on_entry_body_entered(body: Node3D) -> void:
 	if body.is_in_group(&"player"):
-		start()
+		player_present = true
+		_must_leave = false
+		arrive()
+
+
+func _on_entry_body_exited(body: Node3D) -> void:
+	if body.is_in_group(&"player"):
+		player_present = false
