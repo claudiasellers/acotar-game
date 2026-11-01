@@ -234,3 +234,22 @@ func test_anchor_hangs_both_spaces_once_and_the_moment_raises_comforted() -> voi
 	var moment := StoryDirector.get_moment(&"summer_faerie")
 	assert_eq(moment.anchor_id, &"")
 	assert_eq(String(moment.trigger), "auto")
+
+
+func test_with_nothing_to_dress_she_thinks_of_the_infirmary_shelves() -> void:
+	WorldState.set_flag("naga_survived")
+	Clock.from_dict({"time_of_day": 0.95, "day": Clock.day})
+	var t := _space()
+	assert_true(t.start())
+	feyre.global_position = t.global_position + Vector3(0, 0, -2)
+	for _i in 50:
+		t.tick(STEP)
+	assert_true(t.hinted)
+	assert_eq(t.caption.showing, SummerFaerieTriage.SHELF_HINT, "she thinks of the shelves")
+	var defs := load("res://data/regions/spring_court/manor_estate/house/service.tres")
+	var found := []
+	for d in defs.get(&"secrets"):
+		if d.kind == &"larder" and String(d.secret_id).begins_with("infirmary_"):
+			found.append(d.item_id)
+			assert_gt(TriageMath.rate_ingredient(ItemCatalog.get_item(d.item_id) as IngredientData), 0.2, "%s staunches" % d.item_id)
+	assert_eq(found.size(), 2, "two wound herbs on the infirmary shelves, one per stump")
