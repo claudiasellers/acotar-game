@@ -73,6 +73,17 @@ func _run() -> void:
 		for i in 5:
 			await get_tree().process_frame
 		_save("%s_terrainonly.png" % prefix)
+	if args.size() > 2 and args[2] == "children":
+		# One frame per region child hidden: which node draws a surface.
+		for region in world.regions.get_children():
+			for child in region.get_children():
+				if not (child is Node3D) or not (child as Node3D).visible:
+					continue
+				(child as Node3D).visible = false
+				for i in 3:
+					await get_tree().process_frame
+				_save("%s_no_%s.png" % [prefix, child.name])
+				(child as Node3D).visible = true
 	get_tree().quit(0)
 
 
