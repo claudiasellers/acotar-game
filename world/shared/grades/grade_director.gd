@@ -151,10 +151,13 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
 	var s := GradePreset.mix(p, p, 0.0)
 	s.lut = p.lut
-	s.exposure = p.exposure * (1.0 - 0.9 * amount)
-	s.saturation = p.saturation * (1.0 - 0.4 * amount)
-	s.glow_intensity = p.glow_intensity + 1.2 * amount
-	s.glow_bloom = p.glow_bloom + 0.3 * amount
+	# A dreamy fade, not a dropout: about 1.3 stops down at full sleep, colour
+	# drained and a soft bloom haze, so horse, rider and path still read.
+	s.exposure = p.exposure * (1.0 - 0.6 * amount)
+	s.saturation = p.saturation * (1.0 - 0.5 * amount)
+	s.glow_intensity = p.glow_intensity + 0.9 * amount
+	s.glow_bloom = p.glow_bloom + 0.18 * amount
+	s.glow_hdr_threshold = lerpf(p.glow_hdr_threshold, 0.7, amount)
 	s.fog_density = p.fog_density * (1.0 + 1.5 * amount)
 	return s
 

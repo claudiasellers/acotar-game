@@ -67,7 +67,9 @@ func test_enchanted_sleep_fades_down() -> void:
 	director._on_mood_requested(&"enchanted_sleep", 1.0, 2.5)
 	director._process(2.5)
 	var base := GradeDirector.load_preset(&"human_winter")
-	assert_lt(GradeDirector.with_mood(base, director.mood_amount, director.mood).exposure, base.exposure * 0.2)
+	var sleepy := GradeDirector.with_mood(base, director.mood_amount, director.mood)
+	assert_lt(sleepy.exposure, base.exposure * 0.5, "she drifts off: over a stop down")
+	assert_gt(sleepy.exposure, base.exposure * 0.3, "a dreamy fade, not a dropout to black")
 
 
 func test_spring_sky_is_not_eaten_by_fog() -> void:
