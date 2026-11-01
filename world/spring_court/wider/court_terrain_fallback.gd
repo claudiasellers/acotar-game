@@ -11,11 +11,12 @@ const CHUNK := 128.0
 const MATERIAL := "res://world/spring_court/wider/fx/materials/mat_terrain_tint.tres"
 
 ## WorldHeight.Tex slot -> ground colour (R3 pastels; the blight stays grey).
-## sRGB colours from the experience-bar palette (mat_terrain_tint sets
+## Spring grass and moss match the Terrain3D textures (gen_terrain_textures.gd:
+## lush meadow greens, not pale mint). sRGB colours from the experience-bar palette (mat_terrain_tint sets
 ## vertex_color_srgb).
 const TEX_COLORS := {
 	0: Color(0.95, 0.96, 1.0), 1: Color(0.55, 0.50, 0.46), 2: Color("D9CBD0"),
-	3: Color(0.60, 0.66, 0.58), 4: Color("8DBF7A"), 5: Color("7CC29A"),
+	3: Color(0.60, 0.66, 0.58), 4: Color(0.33, 0.56, 0.25), 5: Color(0.26, 0.47, 0.29),
 	6: Color("C9A98A"), 7: Color("E3CDB4"), 8: Color("9FB7B0"),
 	9: Color("4A424D"),
 }
