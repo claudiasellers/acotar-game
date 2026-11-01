@@ -78,6 +78,7 @@ func test_registered_with_its_stage_and_gate() -> void:
 	assert_not_null(space.stage)
 	assert_eq(space.require_flags, PackedStringArray(["first_dinner_eaten"]))
 	assert_eq(space.done_flags, PackedStringArray(["bogge_survived"]))
+	assert_true(space.day_only, "a day hunt: dusk brings the morning to her")
 	assert_false(space.can_start())
 	for id in space.stage.invented:
 		assert_true(space.stage.lines.has(id), "invented line %s exists" % id)
