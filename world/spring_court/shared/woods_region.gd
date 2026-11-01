@@ -199,9 +199,7 @@ func _prepare() -> void:
 	var species := {}
 	for kind in KINDS:
 		var points: Dictionary = cache.placements[kind]
-		var ids := points.keys()
-		ids.sort()
-		for id: StringName in ids:
+		for id: StringName in WoodsScatter.sorted_ids(points):
 			if BuildCancel.requested(def.region_id):
 				return
 			var layer := WoodsScatter.layer_without_mesh(def, kind, id, points[id])
