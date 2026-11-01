@@ -1,0 +1,5 @@
+from L29
+quality look
+size 1920x1080
+timeout 900
+shot faerie res://tools/playtest/p3_faerie_clip.tscn {out}
