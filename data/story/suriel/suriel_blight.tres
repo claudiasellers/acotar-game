@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = &"suriel_blight"
 order = 5
-asked = "What is the sickness in the magic? Where did it come from?"
-said = "It came over the sea, from Hybern. Its king hated the Treaty and sent his servants into every court. One of them, the one called the Deceiver, turned on him fifty years ago, and since then the sickness has spread."
-said_cut = "It came over the sea, from Hybern. Its king hated the Treaty and sent his servants into every court. One of them, the one called the Deceiver...\n\nWe are not alone."
-map_place = &"blighted_reaches"
+asked = "Where did the blight come from?"
+said = "So the High Lord's human comes to trap a Suriel. Across the western sea lies Hybern, whose king sits on a throne of human bones and hates the Treaty. For fifty years he sent his commanders into the courts as spies and courtiers and lovers. Nearly five decades ago one of them disobeyed him. The Deceiver. And the sickness spread from what the Deceiver did."
+said_cut = "So the High Lord's human comes to trap a Suriel. Across the western sea lies Hybern, whose king sits on a throne of human bones and hates the Treaty. For fifty years he sent his commanders into the courts as spies and courtiers and lovers. Nearly five decades ago one of them disobeyed him. The Deceiver. And—\n\nWe are not alone."
+map_place = &""
 canon = "C"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurielAnswer" format=3]
+
+[ext_resource type="Script" path="res://story/act3/suriel/suriel_answer.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_stay"
+order = 4
+asked = "What can be done about the blight? Where did it come from?"
+said = "Stay with the High Lord, human. Do not meddle, and do not go hunting for answers after today, or the shadow over Prythian will swallow you. He will shield you. Stay close to him and all will be set right."
+said_cut = ""
+map_place = &"blighted_reaches"
+canon = "C"

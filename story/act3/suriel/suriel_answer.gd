@@ -15,4 +15,6 @@ extends Resource
 @export_multiline var said_cut: String
 ## data/map/map_places.tres id sketched in when she hears it, or empty.
 @export var map_place: StringName
+## "C" for the book's answers; the uncut blight answer's ending is "X"
+## (canon breaks off at "The Deceiver. And—").
 @export var canon: String = "C"

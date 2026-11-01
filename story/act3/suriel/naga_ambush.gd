@@ -10,8 +10,8 @@
 ##   - An arrow into the snare's tether frees the Suriel; it bursts out and
 ##     staggers every naga near it (canon: she shoots the snare).
 ##   - After her first kill, a second kill, running 28 m from the snare, or
-##     holding on 15 s (and never before 15 s of fighting) brings Tamlin out of the trees: he tears one's throat
-##     and the rest flee. Then fact.naga_escaped; the naga moment raises
+##     holding on 15 s (and never before 15 s of fighting) brings Tamlin out of the trees: he kills the last two
+##     (High Fae form, ch 15) and any others flee. Then fact.naga_escaped; the naga moment raises
 ##     naga_survived.
 class_name NagaAmbush
 extends SceneSpace
@@ -251,13 +251,15 @@ func _tamlin() -> void:
 	var at := (p.global_position if p else snare_at) + Vector3(0.0, 0.0, -4.0)
 	request_actor(&"tamlin", Transform3D(Basis.IDENTITY, at), func() -> Node3D: return StandIns.figure("tamlin"))
 	EventBus.story_actor_cue.emit(&"tamlin", &"tears_a_throat")
-	var torn := false
+	# Canon (ch 15): he shreds one's neck and brings down the last; any
+	# others left slide back to the reeds.
+	var torn := 0
 	for id: StringName in naga:
 		var c := naga[id] as Creature
 		if c == null or not is_instance_valid(c) or not c.alive:
 			continue
-		if not torn:
-			torn = true
+		if torn < 2:
+			torn += 1
 			c.die(&"tamlin")
 		else:
 			EventBus.story_actor_cue.emit(id, &"flee")
