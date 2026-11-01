@@ -70,3 +70,16 @@ func test_pickable_layers_draw_the_model_and_decor_keeps_its_mesh() -> void:
 	unknown.ingredient_id = &"ing_not_modelled"
 	unknown.mesh = BoxMesh.new()
 	assert_eq(unknown.draw_mesh(), unknown.mesh, "no model: the layer's own mesh")
+
+
+func test_larder_chicken_is_a_small_table_find() -> void:
+	# Suriel bait (LarderPickup): lies on the kitchen table, about 0.35 m long.
+	var mesh := ScatterLayer.forage_model(&"ing_dead_chicken")
+	assert_not_null(mesh, "art/forage/ing_dead_chicken.glb")
+	if mesh == null:
+		return
+	assert_lt(_tris(mesh), 3001)
+	var box := mesh.get_aabb()
+	assert_almost_eq(box.position.y, 0.0, 0.03, "rests on the table top")
+	assert_almost_eq(maxf(box.size.x, box.size.z), 0.35, 0.05, "about 0.35 m long")
+	assert_lt(box.size.y, 0.15, "lies flat")
