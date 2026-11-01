@@ -2,9 +2,10 @@
 ## presses only, same report and exit codes. Starts from the dev jump
 ## (story/act3/summer/dev/faerie_jump.tscn) at night in the entrance hall.
 ##   tools/mq/godot.sh --fixed-fps 60 res://tools/playtest/p3_faerie_playtest.tscn -- --out=/tmp/p3f.json [--scenario=alone]
-## held (default) passes with beats: spawn, carried_in, triage, words, hand,
-##   held. She reads, cleans, dresses (yarrow) and binds both stumps, hears
-##   him, takes his hand and stays; summer_faerie_comforted.
+## held (default) passes with beats: spawn, carried_in, shelves, triage, words,
+##   hand, held. She runs to the infirmary for the honey and willow bark on the
+##   bandage shelves (they restock daily), then reads, cleans, dresses and binds
+##   both stumps, hears him, takes his hand and stays; summer_faerie_comforted.
 ## alone passes with beats: spawn, carried_in, left_him, died_alone. She runs
 ##   for the stillroom and he dies alone: no comforted, the grave is dug.
 ##   (The daytime vigil is in tests/unit/story/test_summer_faerie_triage.gd.)
@@ -13,6 +14,8 @@ extends "res://tools/playtest/act1_playtest.gd"
 const JUMP_SCENE := "res://story/act3/summer/dev/faerie_jump.tscn"
 ## The stillroom bench, through the service passage (gen_service).
 const STILLROOM := Vector3(73.3, 0.0, -44.5)
+## The infirmary's bandage shelves (gen_service.gd, larders infirmary_*).
+const SHELVES := [Vector3(66.0, 0.0, -39.4), Vector3(72.0, 0.0, -39.4)]
 
 var jump: Node
 var triage: SummerFaerieTriage
@@ -64,7 +67,21 @@ func _play() -> void:
 		await _play_alone()
 		return
 
-	_begin("triage", "read, clean, dress and bind both stumps from the bowl and her pouch")
+	_begin("shelves", "she runs to the infirmary for the wound herbs on the bandage shelves")
+	if not triage.hinted and not await _until(func() -> bool: return triage.hinted, 6.0):
+		return _fail("no hint about the shelves")
+	for at: Vector3 in SHELVES:
+		await _walk_to(at, 0.8, Callable(), 90.0)
+		await _press(&"interact")
+		await _wait(0.3)
+	var herbs := Gameplay.inventory.count(&"ing_honey") + Gameplay.inventory.count(&"ing_willow_bark")
+	_note("herbs %d, at %s, blood %.1f after %.1f s" % [herbs, _v(feyre.global_position), triage.state.blood, triage.state.elapsed])
+	if herbs < 2:
+		return _fail("took %d herbs from the shelves" % herbs)
+	await _walk_to(_at(Vector3(2.3, 0, -1.4)), 0.8, Callable(), 90.0)
+	_pass()
+
+	_begin("triage", "read, clean, dress and bind both stumps from the bowl and the shelf herbs")
 	var t0 := _sim_seconds()
 	await _walk_to(_at(Vector3(2.3, 0, -1.4)), 0.5)
 	for i in 2:
@@ -85,8 +102,8 @@ func _play() -> void:
 		if not await _do_wound("bind %d" % i):
 			return
 	var all_bound := triage.state.wounds.all(func(w: TriageWound) -> bool: return w.bound and w.dressed and w.cleaned and w.read)
-	_note("triage in %.1f s, blood %.1f, rate %.3f/s, yarrow left %d" % [_sim_seconds() - t0,
-		triage.state.blood, triage.state.bleed_rate(), Gameplay.inventory.count(&"ing_yarrow")])
+	_note("triage in %.1f s, blood %.1f, rate %.3f/s, fire lily kept %d" % [_sim_seconds() - t0,
+		triage.state.blood, triage.state.bleed_rate(), Gameplay.inventory.count(&"ing_fire_lily")])
 	if not all_bound:
 		return _fail("not every stump read, cleaned, dressed and bound")
 	_pass()

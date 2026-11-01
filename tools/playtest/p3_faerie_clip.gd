@@ -40,6 +40,8 @@ func _every() -> float:
 	match String(_beat.id):
 		"carried_in", "words", "hand":
 			return 0.4
+		"shelves":
+			return 2.5
 		"triage":
 			return 0.8
 		"held":

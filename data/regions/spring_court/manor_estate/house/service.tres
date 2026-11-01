@@ -3073,26 +3073,42 @@ item_id = &"ing_dead_chicken"
 notes = "A plucked chicken on the kitchen table, waiting for the range; nobody minds if it goes."
 
 [sub_resource type="Resource" id="Resource_lyate"]
+script = ExtResource("7_8w3jn")
+secret_id = &"infirmary_honey"
+kind = &"larder"
+position = Vector3(66, 1.1, -40.4)
+item_id = &"ing_honey"
+notes = "A crock of wound honey on the bandage shelf; Alis keeps it filled."
+
+[sub_resource type="Resource" id="Resource_48dp5"]
+script = ExtResource("7_8w3jn")
+secret_id = &"infirmary_willow_bark"
+kind = &"larder"
+position = Vector3(72, 1.1, -40.4)
+item_id = &"ing_willow_bark"
+notes = "A bundle of willow bark strips on the bandage shelf, for binding and the bleeding."
+
+[sub_resource type="Resource" id="Resource_0y7wq"]
 script = ExtResource("8_c4mby")
 id = &"svc_cellar"
 level_from = -1
 rect = Rect2(65.2, -64, 2.4, 8)
 style = &"cellar"
 
-[sub_resource type="Resource" id="Resource_48dp5"]
+[sub_resource type="Resource" id="Resource_xj4lk"]
 script = ExtResource("8_c4mby")
 id = &"svc_back_0"
 rect = Rect2(62.5, -66, 2.4, 9)
 style = &"service"
 
-[sub_resource type="Resource" id="Resource_0y7wq"]
+[sub_resource type="Resource" id="Resource_li4hb"]
 script = ExtResource("8_c4mby")
 id = &"svc_back_1"
 level_from = 1
 rect = Rect2(65.2, -66, 2.4, 9)
 style = &"service"
 
-[sub_resource type="Resource" id="Resource_xj4lk"]
+[sub_resource type="Resource" id="Resource_tqd0g"]
 script = ExtResource("9_agin8")
 station_id = &"kitchen"
 display_name = "Kitchen Range"
@@ -3101,7 +3117,7 @@ yaw_deg = 180.0
 prop_id = &"range_iron"
 canon = "C"
 
-[sub_resource type="Resource" id="Resource_li4hb"]
+[sub_resource type="Resource" id="Resource_420u3"]
 script = ExtResource("9_agin8")
 station_id = &"hearth"
 display_name = "Kitchen Hearth"
@@ -3110,7 +3126,7 @@ yaw_deg = -90.0
 prop_id = &"hearth_kitchen"
 canon = "C?"
 
-[sub_resource type="Resource" id="Resource_tqd0g"]
+[sub_resource type="Resource" id="Resource_dqtm4"]
 script = ExtResource("9_agin8")
 station_id = &"hearth"
 display_name = "Servants' Hall Fire"
@@ -3118,7 +3134,7 @@ position = Vector3(42.5, 0, -41)
 yaw_deg = -90.0
 prop_id = &"fireplace_small"
 
-[sub_resource type="Resource" id="Resource_420u3"]
+[sub_resource type="Resource" id="Resource_vyyel"]
 script = ExtResource("9_agin8")
 station_id = &"bread_oven"
 display_name = "Bread Oven"
@@ -3126,7 +3142,7 @@ position = Vector3(59, 0, -67.2)
 yaw_deg = 180.0
 prop_id = &"bread_oven"
 
-[sub_resource type="Resource" id="Resource_dqtm4"]
+[sub_resource type="Resource" id="Resource_71rdj"]
 script = ExtResource("9_agin8")
 station_id = &"stillroom"
 display_name = "Stillroom Bench"
@@ -3134,7 +3150,7 @@ position = Vector3(73.3, 0, -44.5)
 yaw_deg = 90.0
 prop_id = &"stillroom_bench"
 
-[sub_resource type="Resource" id="Resource_vyyel"]
+[sub_resource type="Resource" id="Resource_jknin"]
 script = ExtResource("9_agin8")
 station_id = &"infirmary"
 display_name = "Infirmary Cot"
@@ -3147,7 +3163,7 @@ script = ExtResource("6_gcuhb")
 part_id = &"service"
 rooms = Array[ExtResource("4_5p3pq")]([SubResource("Resource_xqgcc"), SubResource("Resource_we2iq"), SubResource("Resource_4sx3u"), SubResource("Resource_rl60u"), SubResource("Resource_tmsj6"), SubResource("Resource_x8ga5"), SubResource("Resource_giywa"), SubResource("Resource_hs1d0"), SubResource("Resource_we8mo"), SubResource("Resource_6aoaa"), SubResource("Resource_j20a6"), SubResource("Resource_qq3px"), SubResource("Resource_qyb71"), SubResource("Resource_epfbh"), SubResource("Resource_ue5ej"), SubResource("Resource_ou7oj"), SubResource("Resource_komib"), SubResource("Resource_et23n"), SubResource("Resource_rplj1"), SubResource("Resource_d776h"), SubResource("Resource_d8r3r"), SubResource("Resource_kblho"), SubResource("Resource_vcgx5"), SubResource("Resource_6urx5"), SubResource("Resource_ivgyj"), SubResource("Resource_nspoy"), SubResource("Resource_ldvo5"), SubResource("Resource_fvcb1"), SubResource("Resource_ixhp7"), SubResource("Resource_0ybf2"), SubResource("Resource_mqekm"), SubResource("Resource_kfkxa"), SubResource("Resource_djqii"), SubResource("Resource_nswbk")])
 doors = Array[ExtResource("2_o18lv")]([SubResource("Resource_ayy0x"), SubResource("Resource_slsqu"), SubResource("Resource_c2iif"), SubResource("Resource_jqn65"), SubResource("Resource_t3dx0"), SubResource("Resource_fnc5e"), SubResource("Resource_a7nav"), SubResource("Resource_umj03"), SubResource("Resource_i8cin"), SubResource("Resource_4go5y"), SubResource("Resource_vpl0u"), SubResource("Resource_gyaxe"), SubResource("Resource_hv5fd"), SubResource("Resource_1v0d4"), SubResource("Resource_8oo43"), SubResource("Resource_1x5il"), SubResource("Resource_qewuu"), SubResource("Resource_r3ubv"), SubResource("Resource_cdc3b"), SubResource("Resource_0lq42"), SubResource("Resource_b022s"), SubResource("Resource_vjyrb"), SubResource("Resource_vvmca"), SubResource("Resource_j5hge"), SubResource("Resource_0xjqd"), SubResource("Resource_rvy5o"), SubResource("Resource_rehlw"), SubResource("Resource_0jp5a"), SubResource("Resource_d7kmv"), SubResource("Resource_lt2v7"), SubResource("Resource_1sqo0"), SubResource("Resource_6e1yf"), SubResource("Resource_kmj3r"), SubResource("Resource_4p66x"), SubResource("Resource_lkvkc")])
-stairs = Array[ExtResource("8_c4mby")]([SubResource("Resource_lyate"), SubResource("Resource_48dp5"), SubResource("Resource_0y7wq")])
-stations = Array[ExtResource("9_agin8")]([SubResource("Resource_xj4lk"), SubResource("Resource_li4hb"), SubResource("Resource_tqd0g"), SubResource("Resource_420u3"), SubResource("Resource_dqtm4"), SubResource("Resource_vyyel")])
-secrets = Array[ExtResource("7_8w3jn")]([SubResource("Resource_8uojk"), SubResource("Resource_2wp3o"), SubResource("Resource_i8i6f"), SubResource("Resource_dtofg"), SubResource("Resource_x73e3"), SubResource("Resource_k48s4")])
+stairs = Array[ExtResource("8_c4mby")]([SubResource("Resource_0y7wq"), SubResource("Resource_xj4lk"), SubResource("Resource_li4hb")])
+stations = Array[ExtResource("9_agin8")]([SubResource("Resource_tqd0g"), SubResource("Resource_420u3"), SubResource("Resource_dqtm4"), SubResource("Resource_vyyel"), SubResource("Resource_71rdj"), SubResource("Resource_jknin")])
+secrets = Array[ExtResource("7_8w3jn")]([SubResource("Resource_8uojk"), SubResource("Resource_2wp3o"), SubResource("Resource_i8i6f"), SubResource("Resource_dtofg"), SubResource("Resource_x73e3"), SubResource("Resource_k48s4"), SubResource("Resource_lyate"), SubResource("Resource_48dp5")])
 roofs = Array[ExtResource("3_uier2")]([SubResource("Resource_ekteh"), SubResource("Resource_jwome")])
