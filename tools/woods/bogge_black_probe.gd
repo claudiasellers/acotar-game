@@ -46,72 +46,25 @@ func _run() -> void:
 			world.regions.add_child((load(def.scene_path) as PackedScene).instantiate())
 	await _wait_built(180.0)
 	await _frames(90)
-	var env: Environment = world.grade.environment.environment
-	var sun := world.find_child("Sun", true, false) as DirectionalLight3D
-	var vp := get_viewport()
 	await _shot("baseline", true)
-	var toggles := {
-		"no_sdfgi": "sdfgi_enabled", "no_ssao": "ssao_enabled", "no_ssil": "ssil_enabled",
-		"no_ssr": "ssr_enabled", "no_glow": "glow_enabled", "no_volfog": "volumetric_fog_enabled",
-		"no_fog": "fog_enabled", "no_adjust": "adjustment_enabled",
+	print("PROBE mood ", world.grade.mood, " ", world.grade.mood_amount)
+	# Dread preset candidates, applied to the live director.
+	var base: GradePreset = GradeDirector.load_preset(&"dread")
+	var variants := {
+		"fog_low": {"fog_height": -1.0},
+		"fog_low_grey": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44)},
+		"fog_low_grey_vol": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58)},
+		"fog_low_grey_vol_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "exposure": 0.30},
+		"fog_low_grey_exp30_hd05": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "exposure": 0.30, "fog_height_density": 0.05},
 	}
-	for label: String in toggles:
-		var prop: String = toggles[label]
-		var was: Variant = env.get(prop)
-		env.set(prop, false)
-		await _shot(label)
-		env.set(prop, was)
-	var attrs := world.find_children("*", "WorldEnvironment", true, false)[0].camera_attributes as CameraAttributesPractical
-	if attrs:
-		var ae := attrs.auto_exposure_enabled
-		attrs.auto_exposure_enabled = false
-		await _shot("no_auto_exposure")
-		attrs.auto_exposure_enabled = ae
-	var msaa := vp.msaa_3d
-	vp.msaa_3d = Viewport.MSAA_DISABLED
-	await _shot("no_msaa")
-	vp.msaa_3d = msaa
-	var taa := vp.use_taa
-	vp.use_taa = false
-	await _shot("no_taa")
-	vp.use_taa = taa
-	var shadowed: Array[Light3D] = []
-	for l in root.find_children("*", "Light3D", true, false):
-		if (l as Light3D).shadow_enabled:
-			shadowed.append(l)
-			(l as Light3D).shadow_enabled = false
-	await _shot("no_shadows")
-	for l in shadowed:
-		l.shadow_enabled = true
-	if sun:
-		sun.visible = false
-		await _shot("no_sun")
-		sun.visible = true
-	var particles := root.find_children("*", "GPUParticles3D", true, false)
-	for p in particles:
-		(p as Node3D).visible = false
-	await _shot("no_particles")
-	for p in particles:
-		(p as Node3D).visible = true
-	if world.terrain:
-		world.terrain.visible = false
-		await _shot("no_terrain3d")
-		world.terrain.visible = true
-	for region in world.regions.get_children():
-		for child in region.get_children():
-			if child is Node3D and (child as Node3D).visible:
-				(child as Node3D).visible = false
-				await _shot("hide_%s_%s" % [region.name, child.name])
-				(child as Node3D).visible = true
-	for region in world.regions.get_children():
-		var field := region.get_node_or_null(^"Trees")
-		if field == null:
-			continue
-		for chunk_layer in _layer_names(region):
-			var hidden := _set_layer_visible(region, chunk_layer, false)
-			if hidden > 0:
-				await _shot("hide_layer_%s_%s" % [region.name, chunk_layer])
-			_set_layer_visible(region, chunk_layer, true)
+	for label: String in variants:
+		var p := base.duplicate() as GradePreset
+		for k: String in variants[label]:
+			p.set(k, variants[label][k])
+		GradeDirector._dread_preset = p
+		world.grade.apply(world.grade.current)
+		await _shot(label, true)
+	GradeDirector._dread_preset = base
 	FileAccess.open(out_dir.path_join("luma.txt"), FileAccess.WRITE).store_string("\n".join(lines) + "\n")
 	get_tree().quit(0)
 
