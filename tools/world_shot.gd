@@ -80,6 +80,7 @@ func _run() -> void:
 		await get_tree().process_frame
 		RenderingServer.force_draw(true, 0.0)
 	else:
+		await _wait_regions_built(world, 180.0)
 		for i in 30:
 			await get_tree().process_frame
 	var img := root.get_texture().get_image()
@@ -103,3 +104,19 @@ func _region_defs() -> Array[RegionDef]:
 				if def != null:
 					out.append(def)
 	return out
+
+
+
+## Woods and court regions build over several seconds; wait until every region
+## child that has `is_built` reports true (capped), then settle as before.
+func _wait_regions_built(world: World, cap_s: float) -> void:
+	var start := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - start < int(cap_s * 1000.0):
+		var pending := 0
+		for r in world.regions.get_children():
+			if &"is_built" in r and not bool(r.get(&"is_built")):
+				pending += 1
+		if pending == 0:
+			return
+		await get_tree().process_frame
+	push_warning("world_shot: regions still building after %d s" % int(cap_s))
