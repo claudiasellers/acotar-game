@@ -1,0 +1,6 @@
+from L22 natural-motion
+quality look
+size 1920x1080
+timeout 900
+shot wolffilm res://tools/creatures/wolf_kill_film_shot.tscn {out}
+shot people res://tools/creatures/people_motion_shot.tscn {out}
