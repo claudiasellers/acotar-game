@@ -67,6 +67,7 @@ func test_the_beast_bursts_through_into_the_room() -> void:
 	add_child_autofree(beast)
 	beast.global_position = latch.global_position + latch.global_basis.z * BeastDoor.OUTSIDE
 	beast.door = latch
+	feyre.global_position = latch.global_position - latch.global_basis.z * 6.0  # across the room
 	var shut := _free_edge()
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
 	for i in 120:
@@ -78,3 +79,22 @@ func test_the_beast_bursts_through_into_the_room() -> void:
 	assert_true(latch.broken, "the latch let go")
 	await wait_seconds(0.4)
 	assert_gt(_free_edge().z - shut.z, 0.8, "the leaf flew in")
+
+
+func test_he_towers_over_her_never_through_her() -> void:
+	var latch := anchor.get_node(^"CottageDoorLatch") as CottageDoorLatch
+	# Feyre standing right where the break would carry him.
+	feyre.global_position = latch.global_position - latch.global_basis.z * 2.6
+	var beast := (load("res://creatures/beast/beast_actor.tscn") as PackedScene).instantiate() as BeastActor
+	add_child_autofree(beast)
+	beast.global_position = latch.global_position + latch.global_basis.z * BeastDoor.OUTSIDE
+	beast.door = latch
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
+	for i in 120:
+		beast._process(1.0 / 30.0)
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"accuse")
+	for i in 120:
+		beast._process(1.0 / 30.0)
+	var gap := Vector2(beast.global_position.x, beast.global_position.z).distance_to(Vector2(feyre.global_position.x, feyre.global_position.z))
+	assert_gt(gap, beast.keep_clear - 0.1, "%.2f m from her" % gap)
+	assert_lt(gap, beast.keep_clear + 0.6, "but close enough to loom")
