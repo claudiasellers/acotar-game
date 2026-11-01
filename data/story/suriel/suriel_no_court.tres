@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurielAnswer" format=3]
+
+[ext_resource type="Script" path="res://story/act3/suriel/suriel_answer.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_no_court"
+order = 3
+asked = "Everyone here wears a mask, and you don't. Are you not of the Court?"
+said = "I belong to no Court. I am older than the High Lords, older than Prythian, older than the bones of this world."
+said_cut = ""
+map_place = &""
+canon = "C"

@@ -15,16 +15,15 @@ Keeper answers 2026-11-01 (ch 13-15).
 ## Facts written (WorldState)
 | fact | when |
 |---|---|
-| `fact.suriel_<id>` / `fact.suriel_blight_cut` | each answer heard |
+| `fact.suriel_<id>` / `fact.suriel_blight_cut` | each answer heard (no_way_home, tamlin, no_court, stay, blight) |
 | `fact.suriel_answered` | the Suriel says "We are not alone." |
 | `fact.suriel_snare_quality` (float 0-1) | same moment (SnarePlan.score) |
 | `fact.suriel_scouted` (bool) | she reached the stream before the Suriel came |
 | `fact.naga_escaped` | Tamlin arrives |
 
 Journal: `EventBus.journal_entry_added(id)` per answer, ids as above. Map: each
-answer with a `map_place` sketches that place into WorldMapHud's fog
-(`SurielSnare.sketch_place`). A dedicated `WorldMapHud.reveal_place(id)` from
-the map lane would replace that call.
+answer with a `map_place` calls `WorldMapHud.reveal_place(id, false)` (L07):
+the place is sketched and named, with no celebration (horror beat).
 
 ## Inputs read
 - Inventory: items with craft tag `cordage` (loops, max 2), any ingredient as

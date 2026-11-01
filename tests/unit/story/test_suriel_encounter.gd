@@ -145,7 +145,7 @@ func test_canon_hunt_answers_in_book_order_then_the_naga_come() -> void:
 	_run(s, 60.0)
 	assert_true(WorldState.has_flag("fact.suriel_answered"))
 	assert_false(s.running)
-	var order: Array[StringName] = [&"suriel_no_way_home", &"suriel_tamlin", &"suriel_high_lord", &"suriel_lucien", &"suriel_blight_cut"]
+	var order: Array[StringName] = [&"suriel_no_way_home", &"suriel_tamlin", &"suriel_no_court", &"suriel_stay", &"suriel_blight_cut"]
 	assert_eq(SnarePlan.answers_for(s.quality), 5)
 	assert_eq(journal, order, "five answers in book order, the blight cut short")
 	assert_true(float(WorldState.get_flag("fact.suriel_snare_quality", 0.0)) > 0.8)
