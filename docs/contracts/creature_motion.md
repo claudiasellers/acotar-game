@@ -143,3 +143,28 @@ every Cine shot.
 
 Probe: `tools/creatures/beast_door_film_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/story/test_staging.gd`.
+
+Ownership: a staging calls `cine.claim(self)` before each move and ends with
+`cine.drop(self, blend)`. That releases only if it still holds the camera.
+A staging that is freed mid-shot is dropped automatically, with no calls into
+it after that.
+
+`Cine.rig(subject, offset, look, fov)` carries the camera with a moving
+subject, given in the subject's frame. A jump of more than 25 m is a cut.
+Trees pull the camera in, and it never goes below the terrain.
+
+`RideNorthStaging` is a child of the RideNorth space, added by one line in
+the `_ready` of `ride_north.gd`. It is camera only:
+
+- On the `lead` cue: a tracking shot ahead of the horse, then her own view
+  (`follow(58°)`, half bars).
+- On `enchanted_sleep`: a slow rise behind and above.
+- On the spring grade swap: ahead on the path looking back as they pass the
+  wall, then her view.
+- When the veil is dark: her own camera, which goes with her to the gate.
+- On the fade in: behind and above up the drive.
+- On the `leave` cue (the dismount) or the space finishing: drop. It never
+  holds past the dismount.
+
+Probe: `tools/creatures/ride_north_film_shot.tscn -- <out> [numbers]`.
+Test: `tests/unit/story/test_ride_staging.gd`.
