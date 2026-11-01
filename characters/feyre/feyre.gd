@@ -460,6 +460,10 @@ func _build_components() -> void:
 	movement_feel = MovementFeel.new()
 	movement_feel.name = "MovementFeel"
 	add_child(movement_feel)
+	# Props with no collision (tables, beams) fade when a lens comes right up to them.
+	var fade := CameraFade.new()
+	fade.name = "CameraFade"
+	add_child(fade)
 	_build_breath()
 
 
