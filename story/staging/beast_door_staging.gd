@@ -23,6 +23,8 @@ const WINDOW_FOV := 55.0
 const TWO_SHOT_FOV := 44.0
 const CLOSE_FOV := 30.0
 const PLEAD_DELAY := 0.8
+## Longest wait for him to stand still before the low shot.
+const SETTLE_MAX := 1.6
 const RELEASE := 1.6
 
 var space: Node
@@ -139,11 +141,27 @@ func _door_bursts() -> void:
 
 
 func _low() -> void:
+	shot_name = &"low"
+	# He is still bursting in when the scene turns to him: hold the door shot
+	# (it tracks him through) until he stands, then cut low in front of him.
+	var waited := 0.0
+	var still := 0.0
 	var beast := _beast()
+	while beast and waited < SETTLE_MAX:
+		var was := beast.global_position
+		await get_tree().process_frame
+		var dt := get_process_delta_time()
+		waited += dt
+		beast = _beast()
+		if beast == null or shot_name != &"low":
+			return
+		# Still for a quarter second, and not before he has had time to start.
+		still = still + dt if beast.global_position.distance_to(was) < 0.01 else 0.0
+		if still >= 0.25 and waited >= 0.5:
+			break
 	var feyre := _feyre()
 	if beast == null or feyre == null:
 		return
-	shot_name = &"low"
 	var head := func() -> Vector3: return _head(beast)
 	var to := Vector3(beast.global_position.x - feyre.global_position.x, 0.0, beast.global_position.z - feyre.global_position.z)
 	var dir := to.normalized() if to.length() > 0.01 else Vector3.FORWARD

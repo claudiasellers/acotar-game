@@ -86,7 +86,8 @@ func _run() -> void:
 	StoryControl.shake = 0.0
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(beast)
-	await _settle(1.6)
+	# The low angle waits for him to stop after the break (up to 1.6 s), then blends.
+	await _settle(2.4)
 	await _grab("fills the room")
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"accuse")
 	StoryControl.shake = 0.35
