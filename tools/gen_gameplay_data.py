@@ -312,6 +312,21 @@ MESH_FOR = {
 	"charm_bracelet": "charm_bracelet", "flower_wristlet": "flower_wristlet", "gold_bangle": "bangle",
 	"ribbon_cuff": "ribbon_cuff",
 }
+# Gowns cover the torso only from the bodice down, so hiding Feyre's whole torso
+# surface (it runs up to the neck) left the chest above every open neckline
+# see-through. Gown meshes therefore never hide "torso"; the sheer-sleeved
+# starlight gown and the short-sleeved garden cut leave the forearms bare, so
+# they don't hide "arms" either. The solstice cut's bell sleeves keep them hidden.
+GOWN_BARE_ARMS = {"gown_starlight", "gown_garden"}
+
+
+def body_hides(mesh, hides):
+	if not mesh.startswith("gown_"):
+		return hides
+	drop = {"torso", "arms"} if mesh in GOWN_BARE_ARMS else {"torso"}
+	return [h for h in hides if h not in drop]
+
+
 # id, name, slots, hides, colours (None = single), warmth, stealth, swift, reaction, source, phase, canon, mesh, desc
 PIECES = [
 	("hunter_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"": "6f6a63"}, 0.2, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_tunic", "Worn soft, patched at both elbows."),
@@ -676,7 +691,7 @@ def main():
 			vid = pid if cname == "" else "%s_%s" % (pid, cname)
 			vname = name if cname == "" else "%s (%s)" % (name, cname)
 			lines = ['id = &"%s"' % vid, 'display_name = "%s"' % esc(vname), 'description = "%s"' % esc(desc),
-				"slots = %s" % sn_array(slots), "hides_body_regions = %s" % sn_array(hides),
+				"slots = %s" % sn_array(slots), "hides_body_regions = %s" % sn_array(body_hides(mesh, hides)),
 				'mesh_path = "%s"' % mesh_path, "color = %s" % color(chex),
 				"warmth = %s" % float(warmth), "stealth = %s" % float(stealth), "swift = %s" % float(swift),
 				'reaction_tag = &"%s"' % reaction, 'source = &"%s"' % source, "phase = %d" % phase, 'canon = "%s"' % canon]
