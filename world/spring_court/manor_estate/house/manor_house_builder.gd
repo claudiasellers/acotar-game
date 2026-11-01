@@ -56,6 +56,8 @@ static func load_layouts(dir: String = LAYOUT_DIR) -> Array[ManorHouseLayout]:
 
 ## Builds the whole house under a node named "House".
 static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node3D:
+	# The shipped layouts build the same house every time: reuse its merges.
+	var cache := layouts.is_empty()
 	if layouts.is_empty():
 		layouts = load_layouts()
 	var house := Node3D.new()
@@ -82,7 +84,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
-	_merge_meshes(house, all)
+	_merge_meshes(house, all, cache)
 	var mood := ManorMoodLights.new()
 	mood.name = "MoodLights"
 	house.add_child(mood)
@@ -93,7 +95,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 ## stairs, roofs) per level. Doors that open, stations and pickups stay apart.
 const PROP_DRAW := 45.0
 
-static func _merge_meshes(house: Node3D, all: ManorHouseIndex) -> void:
+static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool = false) -> void:
 	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, LarderPickup, ActionTrigger]
 	for room in all.rooms:
 		var node := house.get_node_or_null(NodePath(String(room.id))) as Node3D
@@ -103,11 +105,11 @@ static func _merge_meshes(house: Node3D, all: ManorHouseIndex) -> void:
 		props.name = "Props"
 		node.add_child(props)
 		var sources: Array = node.get_children().filter(func(c: Node) -> bool: return c.get_node_or_null("Look") != null)
-		ManorMeshMerger.merge_sources(sources, props, PROP_DRAW, keep_apart)
+		ManorMeshMerger.merge_sources(sources, props, PROP_DRAW, keep_apart, "house_props_%s" % room.id if cache else "")
 	var shell := Node3D.new()
 	shell.name = "Shell"
 	house.add_child(shell)
-	ManorMeshMerger.merge(house, shell, 0.0, keep_apart + [_PropsMarker])
+	ManorMeshMerger.merge_sources([house], shell, 0.0, keep_apart + [_PropsMarker], "house_shell" if cache else "")
 
 
 ## Nodes named "Props" hold already-merged prop meshes; the shell pass skips them.

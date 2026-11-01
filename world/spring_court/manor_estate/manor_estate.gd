@@ -29,7 +29,7 @@ func _ready() -> void:
 	standalone = get_tree().current_scene == self
 	if standalone and PhaseManager.phase_set == null and ResourceLoader.exists(PHASES_PATH):
 		PhaseManager.start(load(PHASES_PATH), preview_phase)
-	if build_terrain:
+	if build_terrain and not ManorTerrain.world_terrain_active(get_tree()):
 		ManorTerrain.build_fallback(self)
 	if build_house:
 		house = ManorHouseBuilder.build(self)
