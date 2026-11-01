@@ -86,6 +86,20 @@ Regenerate with `ONLY=a,b /opt/bpyenv/bin/python tools/blender/fae_people.py`.
 Proof probe: `tools/creatures/people_motion_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/creatures/test_person_animator.gd`.
 
+### Cast cues (`creatures/anim/cast_cues.gd`)
+
+Every main-cast model (`cast_model.gd`) carries a `CastCues` node, `cues`.
+It acts out a story cue on its own when the model is the story actor, that
+is, when it is in the group `story_actor_<id>`, as `StandIns.figure` makes
+it. `HunchModifier` is the forward bend on top of any clip; its `amount`
+runs from 0 to 1.
+
+- `leaves_sick` (Lucien, ch17): he backs off about 1.4 m from the sight,
+  retches twice bent double, takes a breath, turns, and walks out at 1.6 m/s.
+  He goes to the `exit_to` meta if the scene sets one. Otherwise he leaves by
+  the manor's front doors when he is within 16 m of them, or walks 9 m on,
+  away from the sight. Then he is hidden but not freed. It takes about 9 s.
+
 ## Staging (`story/staging/`, lane L22)
 
 `Cine` (`story/staging/cine.gd`) is the film camera for anchored moments.
