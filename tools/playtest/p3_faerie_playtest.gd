@@ -114,7 +114,7 @@ func _play() -> void:
 	_pass()
 
 	_begin("hand", "she takes his hand and promises")
-	await _walk_to(_at(Vector3(-1.4, 0, -1.15)), 0.3)
+	await _walk_to(_at(Vector3(-1.4, 0, -1.05)), 0.25)
 	await _press(&"interact")
 	await _wait(0.3)
 	if not (triage.state.holding and triage.state.promised):

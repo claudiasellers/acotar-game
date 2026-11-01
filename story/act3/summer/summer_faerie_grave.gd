@@ -98,12 +98,14 @@ func step_vigil(delta: float) -> void:
 	_last = pos
 	var d := Vector2(pos.x - global_position.x, pos.z - global_position.z).length()
 	if d <= VIGIL_RADIUS and speed <= STILL_SPEED:
+		var before := vigil
 		vigil += delta
+		# Her thought comes near the end of the vigil, while the scene still owns the caption.
+		if before < VIGIL_SECONDS - 5.0 and vigil >= VIGIL_SECONDS - 5.0:
+			Act2Caption.find_or_make(self).say("", "Someone should have held his hand. I should have.", 4.5)
 
 
 func _mourned(_s: SceneSpace = null) -> void:
-	var caption := Act2Caption.find_or_make(self)
-	caption.say("", "Someone should have held his hand. I should have.", 4.0)
 	EventBus.journal_entry_added.emit(&"summer_faerie_grave")
 	raise("fact.summer_faerie_mourned")
 	raise("fact.summer_faerie_farewell")

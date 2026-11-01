@@ -184,6 +184,8 @@ func test_hall_space_held_to_the_end_raises_the_deed() -> void:
 	assert_false(WorldState.has_flag("fact.summer_faerie_died_alone"))
 	assert_has(journal, &"summer_faerie_wings")
 	assert_false(t.can_start(), "it never plays twice")
+	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
+	assert_eq(caption.showing, "", "no triage text remains after he dies (L30's p4 house showed the herbs hint)")
 
 
 func test_leaving_him_he_dies_alone_and_the_grave_vigil_mends_it_by_day() -> void:
@@ -197,6 +199,8 @@ func test_leaving_him_he_dies_alone_and_the_grave_vigil_mends_it_by_day() -> voi
 			break
 		t.tick(STEP)
 	assert_eq(t.outcome, &"alone")
+	assert_eq((get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption).showing, "",
+		"the shelves hint is gone once he is dead")
 	assert_true(WorldState.has_flag("fact.summer_faerie_died_alone"))
 	assert_false(WorldState.has_flag("fact.summer_faerie_farewell"), "the deed is lost here")
 	assert_has(journal, &"summer_faerie_alone")
@@ -261,18 +265,33 @@ func test_lucien_backs_away_retches_and_leaves_and_the_blood_shows() -> void:
 	var t := _space()
 	assert_true(t.start())
 	feyre.global_position = t.global_position + Vector3(0, 0, -2)
-	var exit := t.lucien_exit
-	assert_not_null(exit)
+	var lucien := get_tree().get_first_node_in_group(&"story_actor_lucien") as Node3D
+	if t.lucien_exit == null:
+		assert_not_null(lucien.find_child("CastCues", true, false), "the cast model acts leaves_sick itself (L22)")
+	# The stand-in fallback: a bare figure backs away, retches and walks out.
+	var stand_in := Node3D.new()
+	root.add_child(stand_in)
+	stand_in.global_position = t.global_position + Vector3(2.4, 0, 1.6)
+	var exit := LucienExit.new(stand_in, t.global_position, Vector3(1.2, 0, -28.6))
 	var seen := {}
 	for _i in 300:
 		t.tick(STEP)
+		exit.tick(STEP)
 		seen[exit.stage] = true
 		if exit.gone():
 			break
 	assert_true(seen.has(LucienExit.Stage.RETCH), "he doubles over first")
 	assert_true(exit.gone(), "then he is gone through the front doors")
-	assert_false(exit.lucien.visible)
+	assert_false(stand_in.visible)
 	var pool := t.props.get_node(^"BloodPool")
 	assert_true((pool.get_node(^"TableSlick") as Node3D).visible, "blood on the table")
 	assert_true((pool.get_node(^"FloorPool") as Node3D).visible, "and on the floor")
 	assert_true((pool.get_node(^"Drips") as Node3D).visible)
+
+
+func test_e_beside_the_wounds_never_takes_his_hand() -> void:
+	var t := _space()
+	for x in [-0.45, -0.15, 0.15]:
+		var at := t.to_global(Vector3(x, 0, -1.15))
+		assert_eq(t.target_at(at), SummerFaerieTriage.Target.WOUNDS, "at x %.2f (the Mac walker stopped 0.3 m off)" % x)
+	assert_eq(t.target_at(t.to_global(Vector3(-1.4, 0, -1.05))), SummerFaerieTriage.Target.HAND)

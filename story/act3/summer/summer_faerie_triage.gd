@@ -26,7 +26,9 @@ enum Target { NONE, WOUNDS, SUPPLIES, HAND }
 ## World XZ of the table's centre: the middle of the entrance hall, between the
 ## front doors (z -28) and the grand stair (z -40) (site_plan, gen_ground).
 const TABLE_CENTER := Vector2(0.0, -35.0)
-const REACH := {Target.WOUNDS: 1.5, Target.SUPPLIES: 1.3, Target.HAND: 1.3}
+## His hand only answers up close, so E beside the wounds never grabs it by
+## mistake (the Mac clip's walker stopped 0.3 m off and took his hand).
+const REACH := {Target.WOUNDS: 1.5, Target.SUPPLIES: 1.3, Target.HAND: 0.9}
 ## She must stay this close to the wounds while a step lasts.
 const WORK_REACH := 1.8
 ## Beside him when he dies (flat metres from the table's centre line).
@@ -125,8 +127,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open(_s: SceneSpace = null) -> void:
 	note_mood()
 	EventBus.mood_requested.emit(&"dread", 0.55, 1.5)
-	caption = Act2Caption.find_or_make(self)
-	caption.say("Tamlin", "The table. Clear it off!")
+	say("Tamlin", "The table. Clear it off!")
 	# Lucien shoves the vase off; glass and petals across the marble.
 	if _vase:
 		_vase.visible = false
@@ -147,9 +148,19 @@ func _open(_s: SceneSpace = null) -> void:
 	var lucien := request_actor(&"lucien", Transform3D(Basis.IDENTITY, to_global(Vector3(2.4, 0.0, 1.6))),
 		func() -> Node3D: return StandIns.figure("lucien"))
 	EventBus.story_actor_cue.emit(&"lucien", &"leaves_sick")
-	lucien.visible = true
-	lucien_exit = LucienExit.new(lucien, global_position,
-		Vector3(FRONT_DOORS.x + 1.2, global_position.y, FRONT_DOORS.y))
+	# A cast model answers leaves_sick itself (CastCues, L22-13); a stand-in needs us.
+	lucien_exit = null
+	if lucien.find_child("CastCues", true, false) == null:
+		lucien.visible = true
+		lucien_exit = LucienExit.new(lucien, global_position,
+			Vector3(FRONT_DOORS.x + 1.2, global_position.y, FRONT_DOORS.y))
+
+
+## Every line goes through the shared caption with this scene as its owner,
+## so it clears when the scene ends or the phase changes (Act2Caption, L24-10).
+func say(who: String, text: String, seconds: float = -1.0) -> void:
+	caption = Act2Caption.find_or_make(self)
+	caption.say(who, text, seconds)
 
 
 # --- Presses ----------------------------------------------------------------
@@ -212,12 +223,10 @@ func press_interact() -> void:
 
 
 func _read_line(wound: int) -> void:
-	if caption == null:
-		return
 	if wound == 0:
-		caption.say("", "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.")
+		say("", "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.")
 	else:
-		caption.say("", "A tourniquet. But there is nothing to tie it to, and no time.")
+		say("", "A tourniquet. But there is nothing to tie it to, and no time.")
 
 
 func _take_hand() -> void:
@@ -225,8 +234,8 @@ func _take_hand() -> void:
 	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(faerie)
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"hand_held")
-	if can_hear and caption:
-		caption.say("Feyre", "You'll get your wings back. I promise.")
+	if can_hear:
+		say("Feyre", "You'll get your wings back. I promise.")
 
 
 func _let_go() -> void:
@@ -252,8 +261,7 @@ func _take_linen_strip() -> void:
 func _on_came_round() -> void:
 	spoke = true
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"speaks")
-	if caption:
-		caption.say("Summer faerie", TriageState.SPOKEN_LINE, 3.5)
+	say("Summer faerie", TriageState.SPOKEN_LINE, 3.5)
 
 
 ## Runs the clock one tick: steps she's working, the bleeding, the puddle.
@@ -265,8 +273,8 @@ func step_clock(delta: float) -> void:
 		_let_go()
 	if not hinted and state.elapsed >= HINT_AFTER:
 		hinted = true
-		if float(TriageMath.best_dressing(inventory).rating) <= 0.0 and caption:
-			caption.say("", SHELF_HINT, 4.0)
+		if float(TriageMath.best_dressing(inventory).rating) <= 0.0:
+			say("", SHELF_HINT, 4.0)
 	if lucien_exit:
 		lucien_exit.tick(delta)
 	var was_rag := state.has_rag
@@ -297,6 +305,8 @@ func _at_death(_s: SceneSpace = null) -> void:
 		StoryControl.set_mode(StoryControl.Mode.NONE)
 		StoryControl.set_focus(faerie)
 		EventBus.story_actor_cue.emit(&"tamlin", &"holds_other_hand")
+		# Said while she still holds his hand ("awhile after"): it ends with the scene.
+		say("Feyre", "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.", AFTER_SECONDS)
 	else:
 		EventBus.story_actor_cue.emit(&"tamlin", &"holds_him_alone")
 
@@ -305,8 +315,6 @@ func _close(_s: SceneSpace = null) -> void:
 	StoryControl.release()
 	EventBus.story_actor_cue.emit(&"tamlin", &"prays")
 	if outcome == &"held":
-		if caption:
-			caption.say("Feyre", "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.", 6.0)
 		EventBus.journal_entry_added.emit(&"summer_faerie_wings" if spoke else &"summer_faerie_held")
 		raise("fact.summer_faerie_held")
 		raise("fact.summer_faerie_farewell")
