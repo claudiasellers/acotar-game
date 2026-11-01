@@ -15,7 +15,7 @@ Keeper answers 2026-11-01 (ch 13-15).
 ## Facts written (WorldState)
 | fact | when |
 |---|---|
-| `fact.suriel_<id>` / `fact.suriel_blight_cut` | each answer heard |
+| `fact.suriel_<id>` / `fact.suriel_blight_cut` | each answer heard (no_way_home, tamlin, no_court, stay, blight) |
 | `fact.suriel_answered` | the Suriel says "We are not alone." |
 | `fact.suriel_snare_quality` (float 0-1) | same moment (SnarePlan.score) |
 | `fact.suriel_scouted` (bool) | she reached the stream before the Suriel came |

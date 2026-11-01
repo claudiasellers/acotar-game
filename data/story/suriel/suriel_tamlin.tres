@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = &"suriel_tamlin"
 order = 2
-asked = "What do you know of Tamlin?"
-said = "Stay with him. Stay at his side, in his house, and you will be safe."
+asked = "What do you know about Tamlin?"
+said = "Ask better, human. I know a great many things about the High Lord of the Spring Court.\n\nYou did not know. Interesting. Seven courts, seven High Lords: Spring, Summer, Autumn, Winter, Dawn, Day and Night. They are not merely powerful. They are power."
 said_cut = ""
 map_place = &"manor_estate"
 canon = "C"

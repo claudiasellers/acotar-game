@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = &"suriel_no_way_home"
 order = 1
-asked = "Is there truly no way home?"
-said = "There is no road around the Treaty, girl. Go back over the wall and your family pays your debt."
+asked = "Is there truly no way for me to go home?"
+said = "Not unless you want death, for yourself and for your family with you. You stay here."
 said_cut = ""
 map_place = &"wall_seam"
 canon = "C"
