@@ -113,7 +113,7 @@ owns.
 `WolfKillStaging` is a child of the WolfKill space, added by one line in
 `wolf_kill.gd`. It only listens (focus, `creature_hit`, `creature_killed`):
 
-- His eyes: `follow(48°)` with half bars.
+- His eyes: `follow(36°)` with half bars.
 - The ash: a hit-stop, a jolt (`StoryControl.shake`), then `follow(54°)` for his look.
 - The kill:
   1. Slow motion, with `StoryControl.Mode.NONE` held, even across the scene's own finish.
@@ -121,5 +121,25 @@ owns.
   3. Cut over Feyre's shoulder for the last breaths.
   4. Release, about 10 s in all. Interact skips once 1.5 s have passed.
 
+If another space starts during the kill shots, it cuts back to her camera
+and leaves `StoryControl` alone.
+
 Probe: `tools/creatures/wolf_kill_film_shot.tscn -- <out> [numbers]`.
+
+`BeastDoorStaging` is a child of the BeastDoor space, added by one line in
+`beast_door.gd`. It is camera only and never calls `set_mode` or touches
+`allowed_actions`:
+
+- On the door bursting: over her shoulder at the doorway, with full bars.
+- On "it fills the room" (focus on him): low at her side, looking up, with a push.
+- While the throw window is open (LOOK with `fire` allowed): her own view through a 55° lens with half bars.
+- On the father's plea: a two-shot of the beast and her father, both checked in sight.
+- On the arrow snapping: close on his head.
+- On the scene ending: release.
+
+Each shot tries spots that see past walls and beams, and falls back to her
+own view through a tighter lens. The scene's `StoryControl.shake` carries into
+every Cine shot.
+
+Probe: `tools/creatures/beast_door_film_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/story/test_staging.gd`.

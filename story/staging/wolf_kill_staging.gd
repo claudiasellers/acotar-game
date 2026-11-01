@@ -16,14 +16,14 @@
 class_name WolfKillStaging
 extends Node
 
-const NOTICE_FOV := 48.0
+const NOTICE_FOV := 36.0
 const NOTICE_BARS := 0.5
 const ASH_LOOK_FOV := 54.0
 const ASH_LOOK := 1.8
 const DEATH_FOV := 34.0
 const DEATH_DIST := 6.0
 const DEATH_HEIGHT := 0.85
-const SHOULDER_FOV := 30.0
+const SHOULDER_FOV := 20.0
 ## Real seconds for each piece of the kill.
 const BEAT_IN := 0.3
 const FALL_HOLD := 4.2
@@ -38,6 +38,8 @@ var stage: StringName = &""
 var _noticing: bool = false
 var _skip: bool = false
 var _since: float = 0.0
+## Another scene took over during the kill shots.
+var _yielded: bool = false
 
 
 func _ready() -> void:
@@ -45,6 +47,7 @@ func _ready() -> void:
 	EventBus.creature_hit.connect(_on_hit)
 	EventBus.creature_killed.connect(_on_killed)
 	EventBus.scene_space_finished.connect(_on_space_finished)
+	EventBus.scene_space_started.connect(_on_space_started)
 	StoryControl.focus_changed.connect(_on_focus)
 
 
@@ -100,9 +103,22 @@ func _on_killed(_id: StringName, kind: StringName, _cause: StringName, _at: Vect
 
 
 ## The scene may end (and release her controls) while the kill still plays.
-func _on_space_finished(_space_id: StringName) -> void:
-	if stage == &"fall" or stage == &"breaths":
+func _on_space_finished(space_id: StringName) -> void:
+	if (stage == &"fall" or stage == &"breaths") and not _yielded and space_id == _own_id():
 		StoryControl.set_mode(StoryControl.Mode.NONE)
+
+
+## Another scene starting owns her controls: the kill cuts back to her camera
+## and leaves StoryControl alone.
+func _on_space_started(space_id: StringName) -> void:
+	if (stage == &"fall" or stage == &"breaths") and space_id != _own_id():
+		_yielded = true
+		_end()
+
+
+func _own_id() -> StringName:
+	var id: Variant = space.get(&"space_id") if space else null
+	return StringName(id) if id != null else &"wolf_kill"
 
 
 func _kill() -> void:
@@ -117,6 +133,8 @@ func _kill() -> void:
 	if anim:
 		anim.slow(0.3, 0.45, 1.2)
 	await _real(BEAT_IN)
+	if stage != &"fall" or not is_instance_valid(wolf):
+		return
 	var cine := Cine.of(get_tree())
 	cine.bars_to(1.0, 0.35)
 	var chest := func() -> Vector3: return _chest(wolf)
@@ -141,7 +159,8 @@ func _end() -> void:
 	var cine := Cine.of(get_tree())
 	cine.release(RELEASE)
 	cine.bars_to(0.0, RELEASE)
-	StoryControl.release()
+	if not _yielded:
+		StoryControl.release()
 	await _real(RELEASE)
 	stage = &"done"
 
@@ -185,7 +204,8 @@ func _shoulder_spot(wolf: Node3D) -> Vector3:
 		return Vector3.INF
 	var dir := to.normalized()
 	var right := dir.cross(Vector3.UP).normalized()
-	var spot := feyre.global_position - dir * 1.5 + right * 0.55 + Vector3.UP * 1.75
+	# Well back with a long lens: her shoulder a dark edge of frame, him large.
+	var spot := feyre.global_position - dir * 3.5 + right * 0.8 + Vector3.UP * 1.95
 	var q := PhysicsRayQueryParameters3D.create(spot, _chest(wolf))
 	var exclude := _rids(wolf)
 	if feyre is CollisionObject3D:

@@ -180,6 +180,10 @@ func _process(_delta: float) -> void:
 	var q := Quaternion(_from.basis.orthonormalized()).slerp(Quaternion(aim[0].basis.orthonormalized()), k)
 	camera.global_transform = Transform3D(Basis(q), _from.origin.lerp(aim[0].origin, k))
 	camera.fov = lerpf(_from_fov, aim[1], k)
+	# The scene's tremble (StoryControl.shake) carries into every shot, as on hers.
+	var shake := 0.0 if _reduced_effects() else StoryControl.shake
+	camera.h_offset = randf_range(-0.04, 0.04) * shake
+	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	if target_kind == &"release" and _t >= 1.0:
 		_finish()
 
@@ -277,3 +281,33 @@ static func _ground_clear(a: Vector3, b: Vector3) -> bool:
 		if WorldHeight.height_at(p.x, p.z) > p.y - 0.15:
 			return false
 	return true
+
+
+## True when nothing solid stands between `from` and `to`.
+static func sees(world: World3D, from: Vector3, to: Vector3, exclude: Array[RID] = []) -> bool:
+	var q := PhysicsRayQueryParameters3D.create(from, to)
+	q.exclude = exclude
+	return world.direct_space_state.intersect_ray(q).is_empty()
+
+
+## Behind and beside someone at `who` (feet), looking toward `at`: `back`
+## metres behind, `side` metres to their right, `up` above their feet.
+static func over_shoulder(who: Vector3, at: Vector3, back: float, side: float, up: float) -> Vector3:
+	var dir := Vector3(at.x - who.x, 0.0, at.z - who.z)
+	dir = dir.normalized() if dir.length() > 0.01 else Vector3.FORWARD
+	var right := dir.cross(Vector3.UP).normalized()
+	return who - dir * back + right * side + Vector3.UP * up
+
+
+## A spot that frames `a` and `b` side by side from the `side` (+1 right of
+## the line a to b, -1 left), far enough back for both to fit a `fov` lens
+## with some air, `height` above the lower of them.
+static func two_shot(a: Vector3, b: Vector3, side: float, fov: float, height: float) -> Vector3:
+	var mid := (a + b) * 0.5
+	var line := Vector3(b.x - a.x, 0.0, b.z - a.z)
+	var span := maxf(line.length(), 0.5)
+	var right := line.normalized().cross(Vector3.UP).normalized() if line.length() > 0.01 else Vector3.RIGHT
+	var dist := (span * 0.5 + 0.8) / (tan(deg_to_rad(fov) * 0.5) * 16.0 / 9.0)  # 16:9 frame
+	var spot := mid + right * side * dist
+	spot.y = minf(a.y, b.y) + height
+	return spot

@@ -9,6 +9,18 @@ class FakeSpace:
 	var wolf: Node3D
 
 
+class FakeBeastSpace:
+	extends Node3D
+	var running: bool = true
+	var space_id: StringName = &"beast_door"
+	var beast: Node3D
+
+
+class FakeFamily:
+	extends Node3D
+	var member_id: StringName = &"father"
+
+
 var _player: Node3D
 var _player_cam: Camera3D
 
@@ -166,3 +178,101 @@ func test_staging_ignores_other_kills_and_idle_scenes() -> void:
 	await wait_process_frames(2)
 	assert_eq(staging.stage, &"")
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL)
+
+
+func test_kill_shots_yield_to_a_new_scene() -> void:
+	var space := FakeSpace.new()
+	add_child_autofree(space)
+	var wolf := (load("res://creatures/wolves/great_wolf.tscn") as PackedScene).instantiate() as Creature
+	space.add_child(wolf)
+	wolf.global_position = Vector3(0, 500, -20)
+	space.wolf = wolf
+	var staging := WolfKillStaging.new()
+	space.add_child(staging)
+	await wait_process_frames(2)
+	EventBus.creature_killed.emit(&"gw", &"great_wolf", &"arrow_wood", wolf.global_position)
+	await wait_process_frames(2)
+	assert_eq(staging.stage, &"fall")
+	# The next scene starts and takes her controls.
+	StoryControl.set_mode(StoryControl.Mode.LOOK)
+	EventBus.scene_space_started.emit(&"wolf_skinning")
+	assert_eq(staging.stage, &"release", "cuts back to her camera")
+	EventBus.scene_space_finished.emit(&"wolf_kill")
+	await wait_seconds(WolfKillStaging.RELEASE + 0.3)
+	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK, "the new scene keeps its control")
+	assert_true(_player_cam.current)
+
+
+func test_beast_door_staging_moves_only_the_camera() -> void:
+	var space := FakeBeastSpace.new()
+	add_child_autofree(space)
+	var floor_y := 500.0
+	_player.global_position = Vector3(0, floor_y, 0)
+	var beast := Node3D.new()
+	beast.add_to_group(&"beast")
+	space.add_child(beast)
+	beast.global_position = Vector3(0, floor_y, -4)
+	space.beast = beast
+	var father := FakeFamily.new()
+	father.add_to_group(&"family")
+	space.add_child(father)
+	father.global_position = Vector3(-1.5, floor_y, -2.2)
+	var staging := BeastDoorStaging.new()
+	space.add_child(staging)
+	await wait_process_frames(1)
+	var cine := Cine.of(get_tree())
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
+	await wait_process_frames(2)
+	assert_eq(staging.shot_name, &"door")
+	assert_eq(cine.target_kind, &"shot")
+	StoryControl.set_mode(StoryControl.Mode.LOOK)
+	StoryControl.set_focus(beast)
+	assert_eq(staging.shot_name, &"low", "it fills the room")
+	await wait_process_frames(2)
+	assert_lt(cine.camera.global_position.y, floor_y + 1.0, "looking up at him")
+	# The decision window: her own view, and the scene's control untouched.
+	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["fire"]))
+	await wait_process_frames(2)
+	assert_eq(staging.shot_name, &"window")
+	assert_eq(cine.target_kind, &"follow")
+	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
+	assert_eq(StoryControl.allowed_actions, PackedStringArray(["fire"]))
+	# The father pleads: both in frame.
+	EventBus.story_actor_cue.emit(&"father", &"plead")
+	await wait_seconds(BeastDoorStaging.PLEAD_DELAY + 1.0)
+	assert_eq(staging.shot_name, &"plead")
+	assert_true(cine.camera.is_position_in_frustum(father.global_position + Vector3.UP * 1.2), "father in frame")
+	assert_true(cine.camera.is_position_in_frustum(beast.global_position + Vector3.UP * 2.0), "beast in frame")
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"snap_ash_arrow")
+	assert_eq(staging.shot_name, &"close")
+	EventBus.scene_space_finished.emit(&"beast_door")
+	await wait_seconds(BeastDoorStaging.RELEASE + 0.3)
+	assert_eq(staging.shot_name, &"released")
+	assert_true(_player_cam.current, "her camera again")
+	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK, "never touched her controls")
+
+
+func test_beast_door_shot_through_a_wall_falls_back_to_her_view() -> void:
+	var space := FakeBeastSpace.new()
+	add_child_autofree(space)
+	_player.global_position = Vector3(0, 500, 0)
+	var beast := Node3D.new()
+	space.add_child(beast)
+	beast.global_position = Vector3(0, 500, -4)
+	space.beast = beast
+	# A wall between her and him: no spot on her side sees him.
+	var wall := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(6, 6, 0.3)
+	shape.shape = box
+	wall.add_child(shape)
+	space.add_child(wall)
+	wall.global_position = Vector3(0, 501, -2.0)
+	var staging := BeastDoorStaging.new()
+	space.add_child(staging)
+	await wait_physics_frames(2)
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
+	await wait_process_frames(2)
+	assert_eq(staging.shot_name, &"door")
+	assert_eq(Cine.of(get_tree()).target_kind, &"follow", "her own view through a tighter lens")
