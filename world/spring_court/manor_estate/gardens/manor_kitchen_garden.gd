@@ -116,6 +116,13 @@ static func build(parent: Node3D) -> void:
 	b.prop_on_ground(&"garden_bench", 96.0, -24.0, PI)
 	b.prop_on_ground(&"sundial", 126.0, -50.0)
 	b.flush()
+	# The gardener's twine on the shed's work table: the cordage for the Suriel's
+	# double-loop snare (L26). A fresh coil each morning, like the larder.
+	var kit := LarderPickup.new()
+	kit.name = "SnareTwine"
+	kit.item_id = &"mat_snare_twine"
+	parent.add_child(kit)
+	kit.position = Vector3(SHED.get_center().x, sy + 0.1 + 0.92, SHED.position.y + 1.2)
 
 
 static func _wall(b: GroundsBatch, a: Vector2, c: Vector2, m: Material, cap: Material, gate: Vector2) -> void:

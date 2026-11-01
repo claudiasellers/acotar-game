@@ -94,6 +94,34 @@ func test_no_snare_without_cordage_or_outside_the_birches() -> void:
 	assert_eq(s.snare_at, Vector3.INF, "too far from the young birches")
 
 
+func test_the_gardeners_twine_ties_both_loops() -> void:
+	WorldState.set_flag("fact.suriel_method_known")
+	var s := _snare()
+	inv.add(&"mat_snare_twine", 1)
+	inv.add(&"ing_dead_chicken", 1)
+	assert_eq(SnarePlan.loops_from(inv), 2, "one coil is enough for both loops")
+	assert_false(SnarePlan.baits_in(inv).has(&"mat_snare_twine"), "twine is not bait")
+	s.start()
+	feyre.global_position = Vector3(104, 0, 100)
+	s.press_interact()
+	assert_eq(s.loops, 2)
+	assert_eq(inv.count(&"mat_snare_twine"), 0, "the coil is used up")
+	assert_eq(s.bait_id, &"ing_dead_chicken")
+
+
+func test_the_twine_waits_on_the_potting_shed_table() -> void:
+	var garden := Node3D.new()
+	add_child_autofree(garden)
+	ManorKitchenGarden.build(garden)
+	var kit := garden.get_node_or_null(^"SnareTwine") as LarderPickup
+	assert_not_null(kit, "a twine pickup in the kitchen garden")
+	if kit:
+		assert_true(kit.is_in_group(LarderPickup.GROUP))
+		assert_eq(kit.harvest(), &"mat_snare_twine")
+		assert_false(kit.stocked(), "gone until tomorrow")
+	assert_eq(SnareKitThought.think(get_tree(), 0), false, "no card in tests")
+
+
 func test_bait_presses_swap_and_return_the_last_one() -> void:
 	WorldState.set_flag("fact.suriel_method_known")
 	var s := _snare()
