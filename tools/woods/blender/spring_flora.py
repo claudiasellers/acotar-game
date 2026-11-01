@@ -241,7 +241,7 @@ def raceme(kit, top, length, radius, c_top, c_tip, flex, sides=5, segs=6):
     bunch that tapers to a soft tip, with speckled florets in the colour."""
     t = Vector(top)
     drift = Vector((kit.rng.uniform(-0.12, 0.12), kit.rng.uniform(-0.12, 0.12), 0.0))
-    prof = [0.15, 0.85, 1.0, 0.9, 0.72, 0.5, 0.28][:segs + 1] if segs >= 4 else [0.15, 1.0, 0.55]
+    prof = [0.15, 0.85, 1.0, 0.95, 0.82, 0.64, 0.42][:segs + 1] if segs >= 4 else [0.15, 1.0, 0.6]
     n = len(prof)
     rings = []
     for i in range(n):
@@ -253,7 +253,7 @@ def raceme(kit, top, length, radius, c_top, c_tip, flex, sides=5, segs=6):
             ring.append((kit.add_vert(p + Vector((math.cos(a), math.sin(a), 0)) * radius * prof[i]),
                          shade(mix(c_top, c_tip, k), kit.rng.uniform(0.94, 1.08))))
         rings.append((ring, flex + 0.5 * k))
-    tip = kit.add_vert(t + Vector((0, 0, -length * 1.06)) + drift)
+    tip = kit.add_vert(t + Vector((0, 0, -length - radius * 0.2)) + drift)  # a blunt, rounded end
     for i in range(n - 1):
         (r0, f0), (r1, f1) = rings[i], rings[i + 1]
         for sd in range(sides):
@@ -481,6 +481,18 @@ def lupin_clump(kit, near):
         b = scatter_disc(kit, 0.2)
         c0, c1 = kit.rng.choice([(HOT_PINK, BLUSH), (AMETHYST, LILAC), (PERI_DEEP, PERI), (ROSE, PEARL), (APRICOT, BUTTER)])
         spike(kit, b, kit.rng.uniform(0.7, 1.0), 0.075, 4 if near else 2, c0, c1, 0.0)
+
+
+def spire_bed(kit, near):
+    """A mixed bed of flower spires (lupins, goldenrod and lavender in one
+    clump): the look of three species for one draw call per chunk."""
+    kit.blob(Vector((0, 0, 0.1)), 0.42, 0.45, SAGE, BUSH_DEEP, 1, 0.2, lump=0.2)
+    mix_ = [(HOT_PINK, BLUSH, 0.075, 0.95), (AMETHYST, LILAC, 0.06, 0.7), (GOLD, BUTTER, 0.065, 0.85),
+            (PERI_DEEP, PERI, 0.075, 0.95), (ROSE, PEARL, 0.075, 0.9), (AMETHYST, LILAC, 0.06, 0.65),
+            (GOLD, BUTTER, 0.065, 0.8)]
+    for c0, c1, r, h in (mix_ if near else mix_[::2]):
+        b = scatter_disc(kit, 0.32)
+        spike(kit, b, h * kit.rng.uniform(0.85, 1.1), r, 4 if near else 2, c0, c1, 0.0)
 
 
 def sugarberry_bush(kit, near):
@@ -825,6 +837,7 @@ SPECIES = {
     "goldenrod": (goldenrod, SHRUB),
     "lupin_clump": (lupin_clump, SHRUB),
     "sugarberry_bush": (sugarberry_bush, SHRUB),
+    "spire_bed": (spire_bed, SHRUB),
     # Blender versions of procedural shrubs
     "rose_bush_red": (rose_bush_red, SHRUB),
     "rose_bush_white": (rose_bush_white, SHRUB),

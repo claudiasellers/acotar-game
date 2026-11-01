@@ -66,14 +66,15 @@ const SPECIES := {
 	&"pale_fungus": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"withered_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 200.0, "canon": "X"},
 	# L21 flowering shrubs
-	&"peony_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "C"},
-	&"hydrangea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "X"},
-	&"azalea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "X"},
-	&"lavender_mound": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X", "shadow": false},
-	&"iris_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "C", "shadow": false},
-	&"goldenrod": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "C", "shadow": false},
-	&"lupin_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 150.0, "canon": "X", "shadow": false},
-	&"sugarberry_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 160.0, "canon": "X"},
+	&"peony_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 125.0, "canon": "C"},
+	&"hydrangea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 125.0, "canon": "X"},
+	&"azalea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 125.0, "canon": "X"},
+	&"lavender_mound": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 110.0, "canon": "X", "shadow": false},
+	&"iris_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 110.0, "canon": "C", "shadow": false},
+	&"goldenrod": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 110.0, "canon": "C", "shadow": false},
+	&"lupin_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 120.0, "canon": "X", "shadow": false},
+	&"sugarberry_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 120.0, "canon": "X"},
+	&"spire_bed": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 120.0, "canon": "C", "shadow": false},
 	# Ground cover (near the player only, see DetailScatter)
 	&"grass_tuft": {"layer": "detail", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 70.0, "canon": "X"},
 	&"tall_grass": {"layer": "detail", "scale": Vector2(0.8, 1.4), "radius": 0.0, "range": 70.0, "canon": "X"},
@@ -199,6 +200,9 @@ static func material(look: StringName = &"bloom") -> ShaderMaterial:
 			&"bloom":
 				m.set_shader_parameter(&"wind_amount", 0.6)
 				m.set_shader_parameter(&"sparkle", 0.3)
+				# L21: the default lime guard pushes every green toward teal; the
+				# Blender flora already avoids lime, so let its greens stay lush.
+				m.set_shader_parameter(&"lime_guard", 0.2)
 			&"magic":
 				m.set_shader_parameter(&"sparkle", 0.8)
 				m.set_shader_parameter(&"glow_energy", 3.5)

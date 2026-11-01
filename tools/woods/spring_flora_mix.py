@@ -30,12 +30,12 @@ MIX = {
         },
         "foxglove_clearing": {
             "trees": {"golden_chain": 0.8, "magnolia": 0.6},
-            "shrubs": {"lupin_clump": 1.0, "peony_bush": 0.6, "goldenrod": 0.6, "lavender_mound": 0.6},
+            "shrubs": {"spire_bed": 2.2, "lupin_clump": 0, "goldenrod": 0, "lavender_mound": 0, "peony_bush": 0.6},
             "detail": {"tulip_patch": 1.2, "daffodil": 0.8, "maidens_lace": 1.0, "pansy_patch": 0.5},
         },
         "rose_brake": {
             "trees": {"wisteria_tree": 1.0, "candyfloss_tree": 0.8},
-            "shrubs": {"peony_bush": 1.0, "azalea": 0.6, "sugarberry_bush": 0.6},
+            "shrubs": {"peony_bush": 1.3, "azalea": 0.9, "sugarberry_bush": 0},
             "detail": {"tulip_patch": 0.8, "forget_me_not": 0.6},
         },
         "faelight_hollow": {
@@ -47,7 +47,7 @@ MIX = {
             "detail": {"forget_me_not": 1.0},
         },
         "wall_verge": {
-            "shrubs": {"goldenrod": 0.8, "lupin_clump": 0.6, "lavender_mound": 0.4},
+            "shrubs": {"spire_bed": 1.8, "goldenrod": 0, "lupin_clump": 0, "lavender_mound": 0},
             "detail": {"daffodil": 0.6, "maidens_lace": 0.6},
         },
         "crocus_knoll": {
@@ -109,7 +109,10 @@ def set_weights(line, key, weights):
     items = [] if not body else [tuple(p.split(": ")) for p in re.split(r", (?=&\")", body)]
     d = {k: v for k, v in items}
     for sp, w in weights.items():
-        d['&"%s"' % sp] = fmt(w)
+        if w == 0:  # 0 removes a species (L21-4 merged some into spire_bed)
+            d.pop('&"%s"' % sp, None)
+        else:
+            d['&"%s"' % sp] = fmt(w)
     return "%s = {%s}" % (key, ", ".join("%s: %s" % kv for kv in d.items()))
 
 

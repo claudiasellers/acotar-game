@@ -8,7 +8,7 @@ const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
 const NEW := [
 	&"candyfloss_tree", &"wisteria_tree", &"golden_chain", &"magnolia",
 	&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump", &"goldenrod",
-	&"lupin_clump", &"sugarberry_bush",
+	&"lupin_clump", &"sugarberry_bush", &"spire_bed",
 	&"tulip_patch", &"daffodil", &"maidens_lace", &"forget_me_not", &"allium", &"pansy_patch",
 ]
 const REMADE := [
