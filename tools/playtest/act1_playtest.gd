@@ -532,6 +532,7 @@ func _act2_grounds_then_chain() -> void:
 func _jump_to_manor() -> void:
 	_begin("dev_jump_manor", "DEV JUMP: Act I deeds set directly; start on the manor drive")
 	_beat["dev_jump"] = true
+	Act2Caption.clear_all(get_tree())
 	for flag in ["wolf_killed", "pelt_sold", "wall_crossed", "beast_claim_accepted"]:
 		WorldState.raise_deed(flag)
 	var s := ManorSitePlan.SPAWN
