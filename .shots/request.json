@@ -1,0 +1,51 @@
+{
+ "id": "wayside_l23_look",
+ "scene": "res://tools/wayside/wayside_probe.tscn",
+ "quality": "full",
+ "time_of_day": 0.45,
+ "grade": "spring",
+ "shots": [
+  {
+   "name": "pond_faeries",
+   "eye": [
+    -950,
+    3.0,
+    118
+   ],
+   "at": [
+    -965,
+    1.8,
+    100
+   ],
+   "fov": 50
+  },
+  {
+   "name": "rest_bench",
+   "eye": [
+    431,
+    1.9,
+    362
+   ],
+   "at": [
+    440,
+    0.6,
+    372
+   ],
+   "fov": 60
+  },
+  {
+   "name": "stepping_stones",
+   "eye": [
+    -50,
+    3.5,
+    1034
+   ],
+   "at": [
+    -67,
+    0.5,
+    1030
+   ],
+   "fov": 60
+  }
+ ]
+}
