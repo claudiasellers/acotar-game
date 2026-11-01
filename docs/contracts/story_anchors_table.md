@@ -20,7 +20,7 @@
 | manor_house | `manor_alis_hiding` | alis_truth (ch 32) |
 | manor_house | `manor_dining_table` | first_dinner (ch 7), paintings_shown (ch 22) |
 | manor_house | `manor_gallery` | gallery (ch 19) |
-| manor_house | `manor_infirmary` | wound_dressing (ch 12), summer_faerie (ch 17) |
+| manor_house | `manor_infirmary` | wound_dressing (ch 12) |
 | manor_house | `manor_kitchen_hall` | bite (ch 21) |
 | manor_house | `manor_study_mural` | study_mural (ch 13) |
 | manor_house | `manor_tamlin_room` | sent_home (ch 27-28) |

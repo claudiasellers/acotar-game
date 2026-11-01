@@ -19,10 +19,14 @@ func test_family_members_wear_their_cast_models() -> void:
 func test_story_figures_use_cast_models_and_others_stay_capsules() -> void:
 	var lucien := StandIns.figure("lucien")
 	assert_true(lucien.has_method(&"play_locomotion"))
-	var alis := StandIns.figure("alis")
-	assert_false(alis.has_method(&"play_locomotion"), "no model for Alis yet")
+	var alis := Act2Cast.build("alis")
+	assert_true(alis.has_method(&"play_locomotion"), "Alis is her cast model in Act II, not a capsule")
+	assert_eq(alis.name, &"StandIn_alis", "story still finds her by name")
+	var nobody := StandIns.figure("summer_faerie")
+	assert_false(nobody.has_method(&"play_locomotion"), "no model yet: the capsule")
 	lucien.free()
 	alis.free()
+	nobody.free()
 
 
 func test_the_beast_roars_as_the_door_breaks() -> void:

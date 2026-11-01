@@ -1,9 +1,33 @@
 ## Places the p3 deed spaces at the Spring Court lanes' anchors, the way
 ## Act1Anchors does for Act I. StoryDirector calls attach() for every anchor.
 ## suriel_snare (the Suriel's glade, ch 14-15): SurielSnare and NagaAmbush.
+## Every other scene is a row in ROWS (L28 the house, L29 the Summer faerie):
+## one node per row, named as given, built from its script. Safe to call twice.
 class_name Act3Anchors
 extends RefCounted
 
+## Anchor id -> [{"name": node name, "script": res path}]. Lanes add their own rows.
+const ROWS := {
+	# L28: the house in p3 (ch12-13).
+	&"hall_mark_1": [
+		{"name": "HallMap", "script": "res://story/act3/house/hall_map.gd"},
+		{"name": "HallMark", "script": "res://story/act3/house/hall_mark.gd"},
+	],
+	&"hall_mark_2": [{"name": "HallMark", "script": "res://story/act3/house/hall_mark.gd"}],
+	&"hall_mark_3": [{"name": "HallMark", "script": "res://story/act3/house/hall_mark.gd"}],
+	&"hall_mark_4": [{"name": "HallMark", "script": "res://story/act3/house/hall_mark.gd"}],
+	&"hall_mark_5": [{"name": "HallMark", "script": "res://story/act3/house/hall_mark.gd"}],
+	&"manor_infirmary": [
+		{"name": "InfirmaryWorktable", "script": "res://story/act3/house/infirmary_worktable.gd"},
+		{"name": "WoundDressing", "script": "res://story/act3/house/wound_dressing.gd"},
+	],
+	&"manor_study_mural": [{"name": "StudyMural", "script": "res://story/act3/house/study_mural.gd"}],
+	# L29: the Summer faerie (ch17) on the entrance-hall table, and his grave in the fields.
+	&"manor_window_hide": [
+		{"name": "SummerFaerieTriage", "script": "res://story/act3/summer/summer_faerie_triage.gd"},
+		{"name": "SummerFaerieGrave", "script": "res://story/act3/summer/summer_faerie_grave.gd"},
+	],
+}
 const ANCHORS := [&"suriel_snare"]
 
 
@@ -11,6 +35,18 @@ const ANCHORS := [&"suriel_snare"]
 static func attach(anchor: Node3D) -> Array[SceneSpace]:
 	var spaces: Array[SceneSpace] = []
 	var anchor_id := StringName(anchor.get_meta(&"anchor_id", anchor.name))
+	for row: Dictionary in ROWS.get(anchor_id, []):
+		var node := anchor.get_node_or_null(NodePath(String(row["name"])))
+		if node == null:
+			var script := load(String(row["script"])) as Script
+			if script == null:
+				push_error("Act3Anchors: can't load %s" % row["script"])
+				continue
+			node = script.new() as Node
+			node.name = String(row["name"])
+			anchor.add_child(node)
+		if node is SceneSpace:
+			spaces.append(node as SceneSpace)
 	if not ANCHORS.has(anchor_id):
 		return spaces
 	match anchor_id:

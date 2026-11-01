@@ -23,6 +23,8 @@ const WINDOW_FOV := 55.0
 const TWO_SHOT_FOV := 44.0
 const CLOSE_FOV := 30.0
 const PLEAD_DELAY := 0.8
+## Longest wait for him to stand still before the low shot.
+const SETTLE_MAX := 1.6
 const RELEASE := 1.6
 
 var space: Node
@@ -139,11 +141,27 @@ func _door_bursts() -> void:
 
 
 func _low() -> void:
+	shot_name = &"low"
+	# He is still bursting in when the scene turns to him: hold the door shot
+	# (it tracks him through) until he stands, then cut low in front of him.
+	var waited := 0.0
+	var still := 0.0
 	var beast := _beast()
+	while beast and waited < SETTLE_MAX:
+		var was := beast.global_position
+		await get_tree().process_frame
+		var dt := get_process_delta_time()
+		waited += dt
+		beast = _beast()
+		if beast == null or shot_name != &"low":
+			return
+		# Still for a quarter second, and not before he has had time to start.
+		still = still + dt if beast.global_position.distance_to(was) < 0.01 else 0.0
+		if still >= 0.25 and waited >= 0.5:
+			break
 	var feyre := _feyre()
 	if beast == null or feyre == null:
 		return
-	shot_name = &"low"
 	var head := func() -> Vector3: return _head(beast)
 	var to := Vector3(beast.global_position.x - feyre.global_position.x, 0.0, beast.global_position.z - feyre.global_position.z)
 	var dir := to.normalized() if to.length() > 0.01 else Vector3.FORWARD
@@ -186,13 +204,27 @@ func _plead() -> void:
 	var mid := func() -> Vector3: return (_head(beast) + father.global_position + Vector3.UP * 1.2) * 0.5
 	var cine := _cine()
 	cine.bars_to(1.0, 0.4)
-	for s in [-side, side]:
-		var spot := Cine.two_shot(a, head, s, TWO_SHOT_FOV, 1.4)
-		if _clear(spot, head, [beast, father, feyre]) and _clear(spot, a, [beast, father, feyre]) \
-				and _free_at(spot, [beast, father, feyre], beast):
-			cine.shot(_look(spot, mid.call()), TWO_SHOT_FOV, 0.0, mid, 0.3, 4.0)
+	var ignore := [beast, father, feyre]
+	# The full two-shot from either side, then nearer with a wider lens (the
+	# cottage is small), then from behind her: the first that sees both faces.
+	var centre := (a + head) * 0.5
+	for k: float in [1.0, 0.75, 0.55]:
+		var fov: float = rad_to_deg(2.0 * atan(tan(deg_to_rad(TWO_SHOT_FOV) * 0.5) / k))
+		for s in [-side, side]:
+			var full := Cine.two_shot(a, head, float(s), TWO_SHOT_FOV, 1.4)
+			var spot: Vector3 = Vector3(centre.x, full.y, centre.z) + (full - Vector3(centre.x, full.y, centre.z)) * k
+			if _sees_both(spot, a, head, ignore, beast):
+				cine.shot(_look(spot, mid.call()), fov, 0.0, mid, 0.3, 4.0)
+				return
+	for spot in _eyeline(feyre, beast, 1.1, 1.7):
+		if _sees_both(spot, a, head, ignore, beast):
+			cine.shot(_look(spot, mid.call()), TWO_SHOT_FOV + 8.0, 0.0, mid, 0.3, 4.0)
 			return
 	cine.follow(TWO_SHOT_FOV + 6.0, 0.5)
+
+
+func _sees_both(spot: Vector3, a: Vector3, b: Vector3, ignore: Array, beast: Node3D) -> bool:
+	return _clear(spot, a, ignore) and _clear(spot, b, ignore) and _free_at(spot, ignore, beast)
 
 
 func _close() -> void:

@@ -4,12 +4,14 @@
 ## He stands over the dead doe, head down. The ash arrow takes him in the right
 ## side (hit.png: the flinch), he turns to the shooter, the second arrow takes
 ## him in the eye, and he dies. fall_sheet.png is eight frames of the death
-## (left to right, top row then bottom; times printed), lying.png where he ends.
-## Prints his spine height and the bone each arrow rode.
+## (left to right, top row then bottom; times printed; the last two are his
+## first and last breath), lying.png where he ends.
+## Prints his spine height, each last breath (the rib cage's swell) and the
+## bone each arrow rode.
 extends Node
 
 const CLEARING := Vector2(-360.0, 1660.0)  # HumanRealmLayout.DOE_CLEARING
-const SHEET_TIMES: Array[float] = [0.2, 0.6, 1.1, 1.6, 2.1, 2.6, 3.4, 6.0]
+const SHEET_TIMES: Array[float] = [0.2, 0.6, 1.1, 1.6, 2.1, 2.6, 4.0, 8.9]
 const TILE := Vector2i(960, 540)
 
 var _out := "user://creature_motion"
@@ -18,6 +20,12 @@ var _cam: Camera3D
 var _wolf: GreatWolf
 ## `numbers` (second arg): no pictures, only the printed heights (headless dry run).
 var _numbers := false
+## The last breaths, counted from the swell of his rib cage.
+var _watch_t0 := -1
+var _low := 1.0
+var _high := 1.0
+var _rising := false
+var _breaths := 0
 
 
 func _ready() -> void:
@@ -82,6 +90,7 @@ func _run() -> void:
 	var eye := _wolf.global_transform * Vector3(0.18, 1.72, -1.55)
 	_shoot(eye, shooter, &"wood")
 	var t0 := Time.get_ticks_msec()
+	_watch_t0 = t0
 	var sheet := Image.create(TILE.x * 4, TILE.y * 2, false, Image.FORMAT_RGB8)
 	for i in SHEET_TIMES.size():
 		while (Time.get_ticks_msec() - t0) / 1000.0 < SHEET_TIMES[i]:
@@ -97,11 +106,32 @@ func _run() -> void:
 		sheet.save_png(_out + "/fall_sheet.png")
 	while (Time.get_ticks_msec() - t0) / 1000.0 < _wolf.animator.death_length() + 0.5:
 		await get_tree().process_frame
+	print("death %.1f s long, %d breaths after he went down" % [_wolf.animator.death_length(), _breaths])
 	await _save(_out + "/lying.png")
 	print("lying: spine %.2f m above ground, fell to %s flank" % [_spine_height(), "left" if _wolf.animator.fell_to < 0 else "right"])
 	for pin in _wolf.find_children("Pin_*", "BoneAttachment3D", true, false):
 		print("arrow rides bone ", (pin as BoneAttachment3D).bone_name)
 	get_tree().quit(0)
+
+
+func _process(_delta: float) -> void:
+	if _watch_t0 < 0 or _wolf == null:
+		return
+	var t := (Time.get_ticks_msec() - _watch_t0) / 1000.0
+	var sk := _wolf.animator.skeleton
+	var swell := sk.get_bone_pose_scale(sk.find_bone("ribs")).x
+	if not _rising and swell > _low + 0.01:
+		_rising = true
+		_high = swell
+	elif _rising:
+		_high = maxf(_high, swell)
+		if swell < _high - 0.01:
+			_rising = false
+			_low = swell
+			_breaths += 1
+			print("breath %d at %.2f s: ribs swell %.1f%%" % [_breaths, t, (_high - 1.0) * 100.0])
+	if not _rising:
+		_low = minf(_low, swell)
 
 
 ## Camera at his right front, low, so the fall (onto his left flank) shows his

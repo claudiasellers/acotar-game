@@ -60,21 +60,24 @@ moment("puca", "10-11", "garden_gate", "manor_grounds", ["bogge_survived"], [
 ], r=5.0, night=True, notes="She climbs down the trellis toward 'Father'; Tamlin stops her at the gate.")
 
 # --- P3 The house and the woods (ch 12-17) -----------------------------------
-moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["puca_resisted"], [
-    SP("tamlin", V(0, 0, -1.2)), C("LOOK", "tamlin"), W(1.5), C("NONE", "tamlin", ["interact"]),
-    IN(3, 3.0), CU("tamlin", "realizes_she_cannot_read"), W(2.0), R("tamlin_wound_dressed"),
-], r=4.0, night=True, notes="The Bogge's bite blocks his healing: clean, salve, bandage.")
+# The house beats are deeds played by story/act3/house (L28): HallMark (her X
+# marks), HallMap (rooms on her page), WoundDressing (the night of the Bogge:
+# the map on the foyer table, the beast, the infirmary) and StudyMural (her
+# painter's eye). These moments only turn their facts into the phase deeds.
 for i in range(1, 6):
     moment("hall_mark_%d" % i, "12", "hall_mark_%d" % i, "manor_house", ["puca_resisted"], [
-        R("fact.hall_mark_%d" % i)], trigger="interact", r=2.0, notes="An X mark on her map of the halls.")
+        UF("fact.hall_x_%d" % i), R("fact.hall_mark_%d" % i)], trigger="auto",
+        notes="Played by HallMark: an X or a circle on her map of the halls.")
 moment("manor_map", "12", "", "manor_house", ["puca_resisted"],
-    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [R("manor_map_drawn"), CEL("map")],
-    trigger="auto", notes="Global: the map is drawn once all five hall marks are made.")
+    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [UF("fact.hall_map_set_down"), R("manor_map_drawn"), CEL("map")],
+    trigger="auto", notes="Global: all five marks made and the map set down on the foyer table (WoundDressing).")
+moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["manor_map_drawn"], [
+    UF("fact.tamlin_hand_bound"), R("tamlin_wound_dressed"),
+], trigger="auto", notes="Played by WoundDressing: clean, bind and wrap his Bogge-bitten hand in the small infirmary.")
 moment("study_mural", "13", "manor_study_mural", "manor_house", ["tamlin_wound_dressed"], [
-    C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 4.0, "cone": 30.0},
-    J("prythian_history_mural"), SP("lucien", V(2, 0, 2)), CU("lucien", "how_to_catch_a_suriel"),
+    UF("fact.mural_studied"), J("prythian_history_mural"), SP("lucien", V(2, 0, 2)), CU("lucien", "how_to_catch_a_suriel"),
     J("suriel_method"), R("fact.suriel_method_known"), R("study_mural_seen"),
-], r=6.0)
+], trigger="auto", notes="Played by StudyMural: three details of the mural studied with a painter's eye.")
 # The Suriel and the naga are deeds played by story/act3/suriel (L26):
 # SurielSnare (snare, bait, downwind wait, answers) and NagaAmbush (the fight).
 # These moments only turn their facts into the phase deeds.
@@ -84,12 +87,12 @@ moment("suriel", "14", "suriel_snare", "suriel_glade", ["fact.suriel_method_know
 moment("naga", "15", "suriel_snare", "suriel_glade", ["suriel_bound"], [
     UF("fact.naga_escaped"), R("naga_survived"),
 ], trigger="auto", notes="Played by NagaAmbush: four naga; she kills one, survives until Tamlin arrives.")
-moment("summer_faerie", "17", "manor_infirmary", "manor_house", ["naga_survived"], [
-    SP("summer_faerie", V(0, 0, -1)), SP("tamlin", V(1, 0, -1.6)), MO("dread", 0.4, 2.0),
-    CU("lucien", "leaves_sick"), C("WALK", "summer_faerie"),
-    ST(25.0, 2.5, "summer_faerie"), CU("summer_faerie", "dies"), W(2.0),
-    R("summer_faerie_comforted"), CU("tamlin", "prays"),
-], r=4.0, notes="Unwinnable triage. The deed is staying with him until he dies.")
+# The Summer faerie is played by story/act3/summer (L29): SummerFaerieTriage on
+# the hall table (holding his hand when he dies) or, if he died alone, the
+# daytime vigil at his grave (SummerFaerieGrave). Either raises the farewell.
+moment("summer_faerie", "17", "", "manor_house", ["naga_survived"], [
+    UF("fact.summer_faerie_farewell"), R("summer_faerie_comforted"),
+], trigger="auto", notes="Unwinnable triage on the entrance-hall table; the deed is holding his hand until he dies.")
 
 # --- P4 The wider court (ch 18-19) -------------------------------------------
 moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faerie_comforted"], [
@@ -97,13 +100,13 @@ moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faer
     ST(6.0, 8.0), R("starlight_pool_found"), CEL("deed"), J("lucien_autumn_history"),
     G("obj_lucien_knife"),
 ], r=10.0, notes="Picnic in the glen, swim in the pool; Lucien's story and his knife.")
-moment("gallery", "19", "manor_gallery", "manor_house", ["starlight_pool_found"], [
+moment("gallery", "19", "manor_gallery", "manor_house", ["gallery_opened"], [
     C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 3.0, "cone": 35.0}, CEL("gallery"),
-    R("gallery_opened"),
-], r=6.0)
+    R("fact.gallery_seen"),
+], r=6.0, notes="L30: gallery_opened is her deed (first P4 stroke at the easel, systems/studio/studio_deeds.gd); this is her first look inside.")
 moment("first_painting", "19-20", "painting_room_easel", "manor_house", ["gallery_opened"], [
-    C("LOOK", "self"), IN(4, 2.5), W(1.5), R("first_painting"), CEL("painting"),
-], trigger="interact", r=2.5)
+    UF("first_painting"), R("first_painting"), CEL("painting"),
+], trigger="interact", r=2.5, notes="L30: the studio (ui/studio) raises first_painting when her first canvas is finished.")
 moment("rose_thorn", "19", "rose_garden_bush", "manor_grounds", ["gallery_opened"], [
     SP("tamlin", V(1, 0, 1)), C("LOOK", "tamlin"), CU("tamlin", "kisses_her_palm"), W(2.0),
     R("fact.rose_thorn_healed"), CEL("rose"),

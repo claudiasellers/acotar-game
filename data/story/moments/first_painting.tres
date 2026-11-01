@@ -12,5 +12,5 @@ require_flags = PackedStringArray("gallery_opened")
 night_only = false
 trigger = &"interact"
 entry_radius = 2.5
-steps = Array[Dictionary]([{"do": "control", "mode": "LOOK", "focus": "self"}, {"do": "interact", "n": 4, "r": 2.5}, {"do": "wait", "s": 1.5}, {"do": "raise", "flag": "first_painting"}, {"do": "celebrate", "kind": "painting"}])
-notes = ""
+steps = Array[Dictionary]([{"do": "until_flag", "flag": "first_painting"}, {"do": "raise", "flag": "first_painting"}, {"do": "celebrate", "kind": "painting"}])
+notes = "L30: the studio (ui/studio) raises first_painting when her first canvas is finished."

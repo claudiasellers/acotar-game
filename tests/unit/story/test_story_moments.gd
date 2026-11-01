@@ -6,8 +6,8 @@ const PHASES := preload("res://data/phases/spring_court_phases.tres")
 const STEP := 0.1
 const BOOK_ORDER := [
 	"first_dinner", "curtain_trap", "bogge", "puca",
-	"wound_dressing", "hall_mark_1", "hall_mark_2", "hall_mark_3", "hall_mark_4", "hall_mark_5",
-	"manor_map", "study_mural", "suriel", "naga", "summer_faerie",
+	"hall_mark_1", "hall_mark_2", "hall_mark_3", "hall_mark_4", "hall_mark_5",
+	"manor_map", "wound_dressing", "study_mural", "suriel", "naga", "summer_faerie",
 	"starlight_pool", "gallery", "first_painting", "attor",
 	"calanmai_fires", "cave_mouth", "bite", "paintings_shown",
 	"glamour_lift", "fountain_head", "solstice", "rhysand_visit", "sent_home",
@@ -144,15 +144,18 @@ func test_director_hangs_moments_on_anchors() -> void:
 	anchor.add_to_group(&"story_anchor")
 	root.add_child(anchor)
 	var spaces := StoryDirector.attach_anchor(anchor)
-	assert_eq(spaces.size(), 2, "the bandaging and the Summer faerie share the infirmary")
+	assert_eq(spaces.size(), 2, "the wound_dressing moment and WoundDressing (L28); the Summer faerie is in the hall (L29)")
 	assert_eq(StoryDirector.attach_anchor(anchor).size(), 2)
-	assert_eq(anchor.get_child_count(), 2, "attaching twice adds nothing")
+	assert_eq(anchor.get_child_count(), 3, "plus the InfirmaryWorktable; attaching twice adds nothing")
 
 
 func test_moments_chain_from_the_grounds_to_the_pass() -> void:
 	PhaseManager.start(PHASES, &"p2_grounds")
 	WorldState.set_flag("wall_crossed")
 	for id in BOOK_ORDER:
+		if id == "gallery":
+			# Not a moment: her first P4 stroke at the easel (StudioDeeds, L30).
+			WorldState.raise_deed("gallery_opened")
 		var moment := StoryDirector.get_moment(StringName(id))
 		var space := _space(moment)
 		assert_true(space.can_start(), "%s is open after the moments before it" % id)

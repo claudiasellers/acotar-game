@@ -83,7 +83,11 @@ func _run() -> void:
 
 func _grab(label: String) -> void:
 	var cam := get_viewport().get_camera_3d()
-	print("  frame %d (%s): fov %.1f, cam at %s" % [_frame, label, cam.fov, cam.global_position])
+	var rider := get_tree().get_first_node_in_group(&"player") as Node3D
+	var aim := rider.global_position + Vector3.UP * 1.2 if rider else Vector3.ZERO
+	print("  frame %d (%s): fov %.1f, cam at %s, rider at %s, rider in frame %s" % [_frame, label,
+			cam.fov, cam.global_position, aim, not cam.is_position_behind(aim) and
+			Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).has_point(cam.unproject_position(aim))])
 	if not _numbers:
 		await RenderingServer.frame_post_draw
 		var img := get_viewport().get_texture().get_image()

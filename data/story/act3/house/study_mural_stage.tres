@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"mural": Vector3(4.62, 2, 0),
+"view": Vector3(2.2, 0, 0),
+"mural_yaw": Vector3(0, -90, 0),
+"spot_crocuses": Vector3(0.449, 0.676, 0),
+"spot_lambs": Vector3(0.515, 0.7, 0),
+"spot_mountain": Vector3(0.508, 0.432, 0),
+"spot_roses": Vector3(0.576, 0.684, 0),
+"spot_wall": Vector3(0.508, 0.788, 0)
+}
+lines = {
+"painter_eye": {"text": "Prythian, all of it, painted across the wall.", "who": ""},
+"spot_crocuses": {"text": "Crocuses for Spring. Whoever painted these knew violet from lilac.", "who": ""},
+"spot_lambs": {"text": "Lambs, three dabs of white each. So little paint, and they're soft.", "who": ""},
+"spot_mountain": {"text": "The mountain in the middle. It belongs to no court.", "who": ""},
+"spot_roses": {"text": "Roses, of course. The pink laid over a darker red so they glow.", "who": ""},
+"spot_wall": {"text": "The Wall. Just a dark smear, as if the painter couldn't bear to look.", "who": ""},
+"whole": {"text": "If I had paints like these.", "who": ""}
+}
+invented = PackedStringArray("painter_eye", "spot_crocuses", "spot_lambs", "spot_roses", "spot_wall", "whole")
+canon = "Ch13 [C]: the study, candles lit by magic, a mural of Prythian's history: the War, the seven courts, the mountain in the middle that belongs to no court; Spring painted with crocuses, lambs and roses (Keeper correction); the Wall a dark smear. Her thoughts on the brushwork: X."

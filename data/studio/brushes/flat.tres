@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StudioBrushData" format=3]
+
+[ext_resource type="Script" path="res://data/studio/studio_brush_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flat"
+display_name = "Flat"
+shape = 1
+opacity = 0.9
+pickup = 0.18
+spacing = 0.18
+size_scale = 1.1
+oriented = true
+canon = "X"
