@@ -8,6 +8,9 @@
 ## Passes when the log has "PLAYTEST exit 0" and these beats pass: spawn,
 ## scout_stream, set_snare, hide_downwind, suriel_caught, answers, naga.
 ## final_phase stays p3_house_and_woods with suriel_bound and naga_survived.
+## --bait=<item id> (default: whatever she carries) lays that bait: the F21 A/B runs
+## it with ing_dead_chicken, the full-blight snare, and the fight must still
+## be won.
 extends "res://tools/playtest/act1_playtest.gd"
 
 const JUMP_SCENE := "res://story/act3/dev/p3_jump.tscn"
@@ -16,9 +19,13 @@ var jump: Node
 var snare: SurielSnare
 var ambush: NagaAmbush
 var journal_seen: int = 0
+var bait_want: StringName = &""
 
 
 func _run() -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--bait="):
+			bait_want = StringName(arg.trim_prefix("--bait="))
 	EventBus.journal_entry_added.connect(func(id: StringName) -> void:
 		journal_seen += 1
 		_log("journal %s" % id))
@@ -63,18 +70,27 @@ func _play() -> void:
 		return _fail("scouted never set (running %s, river %.0f m)" % [snare.running, MacroHeight.distance_to_river(feyre.global_position.x, feyre.global_position.z)])
 	_pass()
 
-	_begin("set_snare", "in the young birches: E rigs the double loop and lays the rabbit")
+	_begin("set_snare", "in the young birches: E rigs the double loop and lays the %s" % (bait_want if bait_want != &"" else &"bait"))
+	if bait_want != &"" and Gameplay.inventory.count(bait_want) == 0:
+		Gameplay.inventory.add(bait_want, 1)
 	await _walk_to(snare.birch_center, 3.0)
 	await _press(&"interact")
 	await _wait(0.3)
+	for i in 6:
+		if bait_want == &"" or snare.bait_id == bait_want or snare.snare_at == Vector3.INF:
+			break
+		await _press(&"interact")
+		await _wait(0.3)
 	if snare.snare_at == Vector3.INF:
 		return _fail("E in the birches didn't rig the snare (loops %d, %.0f m from the ring)" % [
 			SnarePlan.loops_from(Gameplay.inventory), _flat(snare.birch_center)])
 	_note("snare with %d loops, bait %s (%.2f)" % [snare.loops, snare.bait_id, snare.bait])
-	# Any bait at least as good as the jump's rabbit: the canon chicken from the
-	# kitchen larder (the chained full run) or the rabbit (the dev jump).
-	if snare.loops != 2 or SnarePlan.bait_score(snare.bait_id) < SnarePlan.bait_score(&"ing_rabbit"):
-		return _fail("expected a double loop baited at least as well as with the rabbit")
+	# --bait: exactly that bait (the F21 A/B). Otherwise any bait at least as
+	# good as the jump's rabbit: the canon chicken from the kitchen larder (the
+	# chained full run) or the rabbit (the dev jump).
+	if snare.loops != 2 or (bait_want != &"" and snare.bait_id != bait_want) \
+			or SnarePlan.bait_score(snare.bait_id) < SnarePlan.bait_score(&"ing_rabbit"):
+		return _fail("expected a double loop baited at least as well as with the rabbit (wanted %s)" % bait_want)
 	_pass()
 
 	_begin("hide_downwind", "16 m downwind, still, until the Suriel comes")
@@ -130,7 +146,7 @@ func _play() -> void:
 			await _wait(0.2)  # out of a sure shot: let it come
 		elif not await _shoot_at(target):
 			await _wait(0.3)
-	_note("strikes %d, falls %d, kills %d, Tamlin %s" % [ambush.strikes, ambush.falls, ambush.kills, ambush.tamlin_came])
+	_note("bait %s, quality %.2f: strikes %d, falls %d, kills %d, Tamlin %s" % [bait_want, snare.quality, ambush.strikes, ambush.falls, ambush.kills, ambush.tamlin_came])
 	if not WorldState.has_flag("naga_survived"):
 		return _fail("naga_survived never raised")
 	_pass()

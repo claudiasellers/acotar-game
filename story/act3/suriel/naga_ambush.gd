@@ -1,18 +1,23 @@
 ## The naga (ch 15, L26): the first fight that can kill her.
 ##
 ## Four come out of the backwater, drawn by the Suriel's scream and her scent,
-## one after another. Closer after a poor snare, farther if she scouted the
-## stream first (SnarePlan.naga_distance). Running water does not stop them.
+## one after another, farther off if she scouted the stream first
+## (SnarePlan.naga_distance). The snare's quality never changes the fight: a
+## better snare buys more answers, not more naga (F21). Running water does not
+## stop them.
 ##   - Five strikes and she falls: black, then she wakes by the waiting oak
 ##     and the naga are back in the reeds. Try again (the answers are kept).
 ##   - Arrows: two wood arrows or one ash arrow kill (naga data).
 ##   - E with a naga in reach: her boot knife (canon, ch 15).
 ##   - An arrow into the snare's tether frees the Suriel; it bursts out and
 ##     staggers every naga near it (canon: she shoots the snare).
-##   - After her first kill, a second kill, running 28 m from the snare, or
-##     holding on 15 s (and never before 15 s of fighting) brings Tamlin out of the trees: he kills the last two
-##     (High Fae form, ch 15) and any others flee. Then fact.naga_escaped; the naga moment raises
-##     naga_survived.
+##   - Once she has fought back (a knife or arrow into a naga), Tamlin comes
+##     out of the trees at her second kill (never before 8 s), her third
+##     strike, or 15 s after her first kill, whichever is first: he kills the
+##     last two (High Fae form, ch 15) and any others flee. Then
+##     fact.naga_escaped; the naga moment raises naga_survived.
+##   - If she never fights back, or runs, nobody comes: they chase her down
+##     and five strikes fell her.
 class_name NagaAmbush
 extends SceneSpace
 
@@ -32,10 +37,11 @@ const KNIFE_COOLDOWN := 0.7
 const TETHER_REACH := 2.0
 const STAGGER_RADIUS := 14.0
 const STAGGER_SECONDS := 2.5
-const RUN_CLEAR := 28.0
 const HOLD_SECONDS := 15.0
-## Tamlin is never there sooner than this after the first naga moves.
-const TAMLIN_EARLIEST := 12.0
+## Tamlin is never there sooner than this after the first naga moves (by kills).
+const TAMLIN_EARLIEST := 8.0
+## Strikes that bring Tamlin, once she has fought back.
+const TAMLIN_STRIKES := 3
 const FALL_SECONDS := 2.5
 
 var snare_at: Vector3 = Vector3.INF
@@ -51,6 +57,8 @@ var kills: int = 0
 var falls: int = 0
 var freed: bool = false
 var tamlin_came: bool = false
+## She has hurt a naga (knife or arrow). Until then Tamlin does not come.
+var fought_back: bool = false
 
 var _t: float = 0.0
 var _cued: int = 0
@@ -77,6 +85,7 @@ func _init() -> void:
 func _ready() -> void:
 	super._ready()
 	EventBus.creature_killed.connect(_on_killed)
+	EventBus.creature_hit.connect(_on_hit)
 
 
 func can_start() -> bool:
@@ -93,6 +102,7 @@ func _build_beats() -> Array:
 	kills = 0
 	freed = false
 	tamlin_came = false
+	fought_back = false
 	_t = 0.0
 	_last_join = 0.0
 	_knife_cd = 0.0
@@ -114,8 +124,7 @@ func _build_beats() -> Array:
 
 
 func _spawn_naga() -> void:
-	var q := float(WorldState.get_flag("fact.suriel_snare_quality", 0.5))
-	var d := SnarePlan.naga_distance(q, bool(WorldState.get_flag("fact.suriel_scouted", false)))
+	var d := SnarePlan.naga_distance(bool(WorldState.get_flag("fact.suriel_scouted", false)))
 	var base := Vector3(backwater_dir.x, 0.0, backwater_dir.z).normalized()
 	if base == Vector3.ZERO:
 		base = Vector3.BACK
@@ -211,8 +220,14 @@ func _fall() -> void:
 	EventBus.mood_requested.emit(&"dread", 1.0, 0.6)
 
 
-func _on_killed(_id: StringName, kind: StringName, _cause: StringName, _at: Vector3) -> void:
-	if running and kind == &"naga":
+func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:
+	if running and kind == &"naga" and cause != &"tamlin":
+		fought_back = true
+
+
+func _on_killed(_id: StringName, kind: StringName, cause: StringName, _at: Vector3) -> void:
+	if running and kind == &"naga" and cause != &"tamlin":
+		fought_back = true
 		kills += 1
 		if _since_kill < 0.0:
 			_since_kill = 0.0
@@ -237,12 +252,20 @@ func _fight(delta: float) -> bool:
 			_last_join = _t
 	if _since_kill >= 0.0:
 		_since_kill += delta
-		var p := player()
-		var ran := p != null and SurielSnare._flat(p.global_position, snare_at) >= RUN_CLEAR
-		if _t >= TAMLIN_EARLIEST and (kills >= 2 or ran or _since_kill >= HOLD_SECONDS):
-			_tamlin()
-			return true
+	if tamlin_due():
+		_tamlin()
+		return true
 	return false
+
+
+## Whether Tamlin comes now: only once she has fought back, then at her
+## second kill (not in the first seconds), her third strike, or holding on
+## after a kill, whichever is first.
+func tamlin_due() -> bool:
+	if not fought_back or tamlin_came:
+		return false
+	return (kills >= 2 and _t >= TAMLIN_EARLIEST) or strikes >= TAMLIN_STRIKES \
+			or _since_kill >= HOLD_SECONDS
 
 
 func _tamlin() -> void:
