@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"bread": Vector3(3.72, 0.83, -6.62),
+"chicken": Vector3(3.6, 0.83, -6.45),
+"feyre_chair": Vector3(4.95, 0, -6.5),
+"lucien_goblet": Vector3(-3.4, 0.8, -7.15),
+"lucien_seat": Vector3(-3.4, 0, -8.0),
+"plate": Vector3(3.65, 0.8, -6.5),
+"sauce_peas": Vector3(3.58, 0.83, -6.5),
+"table": Vector3(0, 0, -6.5),
+"tamlin_goblet": Vector3(-3.75, 0.8, -6.75),
+"tamlin_seat": Vector3(-4.75, 0, -6.5),
+"torte": Vector3(2.9, 0.8, -6.25),
+"wine": Vector3(3.5, 0.8, -6.88)
+}
+lines = {
+"best_food": {"text": "The best food I had ever tasted.", "who": ""},
+"feyre_dress": {"text": "I'd prefer not to wear that dress.", "who": "Feyre"},
+"held": {"text": "Invisible hands clapped on my arms and shoved me back into the seat.", "who": ""},
+"held_again": {"text": "The tang of magic. I couldn't get up until I'd eaten.", "who": ""},
+"lucien_andras": {"text": "So. How does a scrawny human girl bring down a wolf like that?", "who": "Lucien"},
+"lucien_tunic": {"text": "The tunic isn't as pretty as a dress.", "who": "Lucien"},
+"no_slaves": {"text": "I don't keep slaves.", "who": "Tamlin"},
+"sit": {"text": "Sit.", "who": "Tamlin"},
+"sniff": {"text": "No metallic stench of magic. And faeries can't lie.", "who": ""},
+"vanished": {"text": "I reached for another slice of torte, and the food vanished.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("sit", "lucien_andras", "held_again")
+canon = "Ch7 (Keeper 2026-11-01, [C]): same dining room as ch6; men have eaten, gold goblets; Tamlin seats her at the far end, meat and sauce and bread, pale sparkling wine; invisible hands shove her back into the seat, she can't rise until she eats; she sniffs (no metallic stench, faeries can't lie), chicken first, clears the plate; reaching for more chocolate torte, the food vanishes. Lucien: the tunic isn't as pretty as a dress. Feyre: I'd prefer not to wear that dress. Tamlin: I don't keep slaves (timeline ch7). Invented (X): 'Sit.' for ch7, Lucien's wording about Andras, 'held_again'."

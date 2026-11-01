@@ -9,6 +9,7 @@ extends RefCounted
 
 ## Moment id -> {"script": scene script, "stage": Act2Stage .tres}.
 const CODED := {
+	&"first_dinner": {"script": "res://story/act2/first_dinner.gd", "stage": "res://data/story/act2/first_dinner_stage.tres"},
 }
 
 ## Anchor id -> list of {"name", "script", "stage"}: scenes with no moment.
