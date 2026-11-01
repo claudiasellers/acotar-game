@@ -85,7 +85,7 @@ func _build_landmarks(parent: Node3D) -> void:
 	place_anchor(parent, "BoggeTerritory", bogge, T.BOGGE_HEART.z, "The Bogge's wood: do not look. Tamlin hunts and kills it (ch. 11-12).")
 	place_anchor(parent, "NagaMarsh", marsh, T.REED_MARSH.z, "Naga roam Spring under the blight; dark water, reeds over head height.")
 	place_fog(parent, "BoggeFog", Vector3(bogge.x, WorldHeight.height_at(bogge.x, bogge.y) + 6.0, bogge.y),
-			Vector3(T.BOGGE_HEART.z * 2.6, 40.0, T.BOGGE_HEART.z * 2.6), 0.08, Color(0.22, 0.23, 0.24))
+			Vector3(T.BOGGE_HEART.z * 2.6, 40.0, T.BOGGE_HEART.z * 2.6), 0.02, Color(0.50, 0.52, 0.52))
 	place_fog(parent, "MarshFog", Vector3(marsh.x, WorldHeight.height_at(marsh.x, marsh.y) + 3.0, marsh.y),
 			Vector3(T.REED_MARSH.z * 2.2, 14.0, T.REED_MARSH.z * 2.2), 0.05, Color(0.30, 0.34, 0.30))
 	# The light, colour and fog follow dread_at() through AmbientLife's dread
