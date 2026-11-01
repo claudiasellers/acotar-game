@@ -1,0 +1,1 @@
+{"id": "wayside_l23_look4", "scene": "res://tools/wayside/wayside_probe.tscn", "quality": "full", "time_of_day": 0.45, "grade": "spring", "warmup_s": 5, "shots": [{"name": "pond_faeries", "eye": [-950, 28.5, 122], "at": [-965, 21.6, 100], "fov": 45, "ground": false}, {"name": "stepping_stones", "eye": [-46, 20.5, 1040], "at": [-67, 12.6, 1030], "fov": 50, "ground": false}]}
