@@ -40,6 +40,11 @@ func _ready() -> void:
 	if has_node(^"/root/WorldStreamer") and WorldStreamer.has_signal(&"region_loaded"):
 		WorldStreamer.region_loaded.connect(_on_region_loaded)
 	_disable_fallbacks(self)
+	# Regions build their stand-in ground on worker jobs, often after
+	# region_loaded has fired; catch those too, or the 4 m vertex-colour chunks
+	# z-fight Terrain3D and read as hard triangular colour patches.
+	if terrain != null:
+		get_tree().node_added.connect(_on_node_added)
 
 
 func _process(_delta: float) -> void:
@@ -70,6 +75,19 @@ func _focus_position() -> Vector3:
 
 func _on_region_loaded(_id: StringName, root: Node) -> void:
 	_disable_fallbacks(root)
+
+
+func _on_node_added(node: Node) -> void:
+	if node.name == &"TerrainFallback" and node is Node3D and is_ancestor_of(node):
+		_silence_fallback(node as Node3D)
+
+
+## A builder may still be adding chunks under a fallback it just created, so a
+## late one is hidden and taken out of physics rather than freed (children
+## added later inherit both).
+static func _silence_fallback(node: Node3D) -> void:
+	node.visible = false
+	node.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 ## Stand-in terrain meshes (contract §2) go away once Terrain3D is active.
