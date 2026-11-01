@@ -32,7 +32,9 @@ func test_looking_down_indoors_keeps_the_camera_under_the_beams() -> void:
 	var f := _feyre(5.0)
 	await wait_process_frames(5)
 	f.nudge_camera(0.0, deg_to_rad(-60.0))
-	await wait_process_frames(40)
+	# Time, not frames: the indoor blend and arm length ease over seconds, and a fast
+	# headless loop can run 40 frames in well under the 0.3 s blend.
+	await wait_seconds(1.0)
 	assert_lte(f.camera_rise(), Feyre.INDOOR_RISE + 0.05, "camera %.2f m above her head" % f.camera_rise())
 
 
@@ -40,7 +42,9 @@ func test_a_low_ceiling_pulls_the_camera_lower_still() -> void:
 	var f := _feyre(2.4)
 	await wait_process_frames(5)
 	f.nudge_camera(0.0, deg_to_rad(-60.0))
-	await wait_process_frames(40)
+	# Time, not frames: the indoor blend and arm length ease over seconds, and a fast
+	# headless loop can run 40 frames in well under the 0.3 s blend.
+	await wait_seconds(1.0)
 	var ceiling_gap := (2.4 - 0.15) - f.camera.global_position.y
 	assert_gte(ceiling_gap, Feyre.INDOOR_CEILING_GAP - 0.05, "camera %.2f m under the ceiling" % ceiling_gap)
 
@@ -49,5 +53,7 @@ func test_outdoors_the_camera_still_orbits_high() -> void:
 	var f := _feyre(0.0)
 	await wait_process_frames(5)
 	f.nudge_camera(0.0, deg_to_rad(-60.0))
-	await wait_process_frames(40)
+	# Time, not frames: the indoor blend and arm length ease over seconds, and a fast
+	# headless loop can run 40 frames in well under the 0.3 s blend.
+	await wait_seconds(1.0)
 	assert_gt(f.camera_rise(), 2.0, "outdoors a steep look still lifts the camera")
