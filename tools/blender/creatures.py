@@ -300,12 +300,79 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat, motion=N
                     rigid.append((parts[-1], f"paw_{key}_{'l' if side < 0 else 'r'}"))
     if spec.get("antlers"):
         pass  # The M1 deer is a doe herd; stags come with the Spring Court lanes.
+    if spec.get("horror"):
+        horror_parts(spec, g, head, snout, coat, ivory, parts, rigid)
     for part, bone in rigid:
         creature_rig.weight_rigid(part, bone)
     model = join(parts, name)
     model.name = name
     creature_rig.animate(name, model, arm, g, spec, **(motion or {}))
     export(name, [model, arm])
+
+
+def horror_parts(spec, g, head, snout, coat, ivory, parts, rigid):
+    """Breaks the smooth skin-tube silhouette (experience bar §1.5: jagged and
+    vertical where the court is rounded): ragged guard hair along the spine
+    and ruff, gaunt rib ridges, a brow that shades the eyes, a full row of
+    teeth. Every part rides a bone, so the rig and clips are untouched."""
+    L, r = spec["length"], spec["girth"]
+    head_r = spec["head"]
+    P = lambda n: Vector(g.points[g.names[n]])
+    guard = material("GuardHair", tuple(c * 0.8 for c in spec["horror"]["hair_rgb"]), 0.95)
+    # Hackles: dense, uneven tufts raked back toward the tail from hip to
+    # shoulder, longest and most bristling over the shoulders. BACK is the
+    # tailward direction in this generator's space.
+    BACK = 1.0
+    RISE = {"hip": 0.62, "mid": 0.5, "chest": 0.95, "shoulder": 1.2}
+    path = [("hip", "hips"), ("mid", "spine"), ("chest", "chest"), ("shoulder", "chest")]
+    n = 0
+    for (a, bone_a), (b, _) in zip(path, path[1:]):
+        for k in range(8):
+            t = (k + 0.5 * ((n * 5) % 3) / 2.0) / 8.0
+            base = P(a).lerp(P(b), t)
+            jit = ((n * 7) % 5) / 4.0
+            # Body radius follows the pinched waist and the shoulder hump.
+            rise = r * (RISE[a] + (RISE[b] - RISE[a]) * t + 0.05 * math.sin(n * 2.3))
+            length = r * (0.22 + 0.3 * jit) * (1.6 if a in ("chest", "shoulder") else 1.0)
+            for side in (-1, 1):
+                spread = 0.1 + 0.25 * ((n + (side > 0)) % 3) / 2.0
+                root = base + Vector((side * r * spread, 0, rise))
+                tip = root + Vector((side * r * spread * 0.9, BACK * length * 1.1, length * 0.55))
+                parts.append(cone(f"Guard{n}{side}", root, tip, r * 0.09, guard, 4))
+                rigid.append((parts[-1], bone_a))
+            n += 1
+    # Ruff: a ragged collar flaring off the neck and raked back.
+    neck = P("neck")
+    for i in range(14):
+        a = -2.5 + i * 0.385
+        ln = 0.45 + 0.25 * ((i * 3) % 4) / 3.0
+        root = neck.lerp(P("shoulder"), 0.45) + Vector((math.sin(a) * r * 0.75, 0, math.cos(a) * r * 0.75))
+        tip = root + Vector((math.sin(a) * r * ln * 0.7, BACK * r * ln, math.cos(a) * r * ln * 0.6))
+        parts.append(cone(f"Ruff{i}", root, tip, r * 0.13, guard, 4))
+        rigid.append((parts[-1], "neck"))
+    # Gaunt: rib ridges pressing through the flank.
+    rib_mat = material("RibShadow", tuple(c * 0.55 for c in spec["horror"]["hair_rgb"]), 0.95)
+    chest, mid = P("chest"), P("mid")
+    for side in (-1, 1):
+        for i in range(4):
+            c = chest.lerp(mid, 0.15 + i * 0.2) + Vector((side * r * 0.86, 0, -r * 0.15))
+            o = sphere(f"Rib{side}{i}", c, r * 0.32, rib_mat, 8)
+            o.scale = (0.12, 0.22, 1.0)
+            parts.append(o)
+            rigid.append((o, "ribs"))
+    # A heavy brow shading the eyes.
+    for side in (-1, 1):
+        c = head + Vector((side * head_r * 0.55, head_r * 0.55, head_r * 0.55))
+        o = sphere(f"Brow{side}", c, head_r * 0.3, coat, 8)
+        o.scale = (1.0, 0.6, 0.35)
+        parts.append(o)
+        rigid.append((o, "head"))
+    # A full row of teeth along the bared muzzle.
+    for side in (-1, 1):
+        for i in range(4):
+            up = snout.lerp(head, 0.15 + i * 0.17) + Vector((side * head_r * 0.24, 0, -head_r * 0.28))
+            parts.append(cone(f"Tooth{side}{i}", up, up + Vector((0, 0.005, -head_r * 0.16)), head_r * 0.035, ivory, 4))
+            rigid.append((parts[-1], "muzzle"))
 
 
 WOLF = {
@@ -322,12 +389,20 @@ WOLF = {
 
 
 def wolf(name, scale, coat_rgb, belly_rgb, eye_rgb, glow, teeth_rgb=(0.86, 0.80, 0.62), paw=1.0, coat_rough=0.95,
-         death_breaths=2):
+         death_breaths=2, horror=False):
     reset()
     spec = dict(WOLF)
     for k in ("length", "height", "width", "girth", "head", "snout", "ear", "leg", "neck"):
         spec[k] = WOLF[k] * scale
     spec["leg"] *= paw
+    if horror:
+        # Gaunt and hunched: pinched waist, high shoulders, head carried low
+        # on a long neck, a longer narrower muzzle.
+        spec.update({"waist": 0.58, "waist_drop": 0.06 * scale, "hunch": 0.13 * scale, "ruff": 1.3,
+                     "neck_angle": math.radians(-4), "snout_r": 0.36, "snout_drop": 0.36,
+                     "horror": {"hair_rgb": coat_rgb}})
+        spec["snout"] *= 1.15
+        spec["neck"] *= 1.15
     coat = material("Coat", coat_rgb, coat_rough)
     belly = material("Belly", belly_rgb, 0.95)
     eyes = material("Eyes", eye_rgb, 0.2, emission=eye_rgb, strength=glow)
@@ -425,7 +500,8 @@ if __name__ == "__main__":
         for fn in only:
             {"wolf": lambda: wolf("wolf", 1.0, (0.36, 0.34, 0.32), (0.58, 0.55, 0.50), (0.78, 0.62, 0.22), 0.0),
              "great_wolf": lambda: wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.2,
-                                        teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.55, death_breaths=4),
+                                        teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.82, death_breaths=4,
+                                        horror=True),
              "deer": deer, "hare": hare, "bird": bird}[fn]()
         sys.exit(0)
     wolf("wolf", 1.0, (0.36, 0.34, 0.32), (0.58, 0.55, 0.50), (0.78, 0.62, 0.22), 0.0)
@@ -433,7 +509,7 @@ if __name__ == "__main__":
     # charcoal and obsidian with ivory, reading silver at a distance; golden
     # eyes, yellow fangs.
     wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.2,
-         teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.55, death_breaths=4)
+         teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.82, death_breaths=4, horror=True)
     deer()
     hare()
     bird()
