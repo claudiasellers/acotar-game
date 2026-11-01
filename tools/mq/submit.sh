@@ -30,11 +30,8 @@ markers=$(git diff "$base" "$sha" --diff-filter=ACMR -- . | grep -E '^\+(<<<<<<<
 # the sidecar is tracked. A script that lands without one makes every later import
 # create an untracked file, and lane.sh then refuses the lane. Checked against the
 # commit's tree, not the disk: cloud commits aren't checked out.
-nouid=""
-for f in $(git diff --no-renames --name-only --diff-filter=A "$base" "$sha" | grep -E '\.(gd|gdshader|gdshaderinc)$' | grep -vE '^(tools/mq/|addons/)'); do
-	git cat-file -e "$sha:$f.uid" 2>/dev/null || nouid="$nouid $f"
-done
-[ -z "$nouid" ] || refuse "new script without its .uid file:$nouid. Run tools/mq/godot.sh --import (or open the project in Godot) so it writes <script>.uid next to each new script, then commit those .uid files with the scripts. Never write a uid by hand."
+nouid=$("$here/check_uids.sh" --added-since "$base" "$sha" 2>/dev/null | sed 's/^missing \.uid: //')
+[ -z "$nouid" ] || refuse "missing .uid file for each of these (one path per line): $(printf '%s' "$nouid" | tr '\n' ' '). Run tools/mq/godot.sh --import (or open the project in Godot) so it writes <path>.uid next to each, then commit the .uid files with the scripts. Never write a uid by hand."
 
 conf="$MQ_BIN/generated.conf"
 [ -f tools/mq/generated.conf ] && conf=tools/mq/generated.conf
