@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"beast_stop": Vector3(-15.5, 0, 72),
+"exit": Vector3(-0, 0, 7.5),
+"feyre_work": Vector3(0.1, 0, -4.9),
+"foyer_map": Vector3(-9.5, 0.71, 73.5),
+"foyer_table": Vector3(-9.5, 0, 73.5),
+"garden_doors": Vector3(-33, 0, 65.5),
+"hall_door": Vector3(-21.5, 0, 66.5),
+"hand": Vector3(-1.1, 0.95, -5.1),
+"r1": Vector3(-17.5, 0, 63.5),
+"r10": Vector3(-0, 0, 2.5),
+"r2": Vector3(-12.5, 0, 56.5),
+"r3": Vector3(-12.5, 0, 53.5),
+"r4": Vector3(-12.5, 0, 25.5),
+"r5": Vector3(-13, 0, 21.5),
+"r6": Vector3(-13, 0, 16.5),
+"r7": Vector3(-9.5, 0, 16.5),
+"r8": Vector3(-9, 0, 10.7),
+"r9": Vector3(-0.5, 0, 10.7),
+"saloon_in": Vector3(-25, 0, 67.3),
+"saloon_mid": Vector3(-30, 0, 67.3),
+"sink": Vector3(1.9, 0, -8.05),
+"src_bandage": Vector3(-2.7, 1, -6.5),
+"src_bowl": Vector3(2.8, 0.9, -0.5),
+"src_linen": Vector3(-2.7, 1, -0.5),
+"table": Vector3(-1.7, 0, -5.8),
+"tamlin_lean": Vector3(-0.8, 0, -4.7),
+"foyer_table_yaw": Vector3(0, 90, 0),
+"sink_yaw": Vector3(0, 180, 0),
+"table_yaw": Vector3(0, 270, 0)
+}
+lines = {
+"beast_sounds": {"text": "The scrape of claw, a huff of uneven breathing, the dripping of blood.", "who": ""},
+"breeze": {"text": "A breeze. The glass garden doors stand open.", "who": ""},
+"carry": {"text": "The water's red now. To the sink with it.", "who": ""},
+"cuts": {"text": "A few vicious cuts. None of them need stitching.", "who": ""},
+"drip": {"text": "His hand is bleeding. Drip, drip, onto the marble.", "who": ""},
+"feyre_bogge": {"text": "Did you kill the Bogge?", "who": "Feyre"},
+"feyre_hurt": {"text": "You're hurt.", "who": "Feyre"},
+"feyre_where": {"text": "Where can we clean up your hand?", "who": "Feyre"},
+"fill": {"text": "Water first. The deep sink at the back.", "who": ""},
+"inferno": {"text": "The heat of his skin, like an inferno.", "who": ""},
+"set_down": {"text": "Xs and circles. The doors, the windows, the marble stairs.", "who": ""},
+"shift": {"text": "Between one step and the next, he changed forms. She squeezes her eyes shut at the blinding flash.", "who": ""},
+"supplies": {"text": "Cabinets and drawers. A bowl, clean linen, a bandage.", "who": ""},
+"tamlin_adept": {"text": "No wonder you became so adept at other things.", "who": "Tamlin"},
+"tamlin_cant_write": {"text": "You can't write, can you.", "who": "Tamlin"},
+"tamlin_infirmary": {"text": "There's a small infirmary.", "who": "Tamlin"},
+"tamlin_yes": {"text": "Yes.", "who": "Tamlin"}
+}
+invented = PackedStringArray("breeze", "carry", "drip", "fill", "set_down", "supplies")
+canon = "Ch12 (Keeper 2026-11-01, [C]): sleepless, she creeps barefoot down the moonlit stairs to the foyer, sets her little map on the foyer table and draws a few Xs and circles for the doors, the windows, the marble stairs. A breeze; he comes in through the open glass garden doors in beast form, eyes glowing, limping, dark shining stains on the marble; the beast fills the hall like a cage. Between one step and the next he changes forms (blinding flash, her eyes shut); fae, still and weary, no glow, clothes in shreds, only the hand bleeds. Lines as given. The infirmary: more of a supply closet with a worktable, cabinets, drawers, a deep sink at the back; she sorts supplies, cleans the blood and dirt in a bowl of water, binds and wraps his hand (a few vicious cuts, none needing stitches), carries the bowl of bloody water to the sink; he is silent, claws retracted. No salve in the book (dropped). Foyer table spot, route and props: X."

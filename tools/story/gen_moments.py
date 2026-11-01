@@ -60,21 +60,24 @@ moment("puca", "10-11", "garden_gate", "manor_grounds", ["bogge_survived"], [
 ], r=5.0, night=True, notes="She climbs down the trellis toward 'Father'; Tamlin stops her at the gate.")
 
 # --- P3 The house and the woods (ch 12-17) -----------------------------------
-moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["puca_resisted"], [
-    SP("tamlin", V(0, 0, -1.2)), C("LOOK", "tamlin"), W(1.5), C("NONE", "tamlin", ["interact"]),
-    IN(3, 3.0), CU("tamlin", "realizes_she_cannot_read"), W(2.0), R("tamlin_wound_dressed"),
-], r=4.0, night=True, notes="The Bogge's bite blocks his healing: clean, salve, bandage.")
+# The house beats are deeds played by story/act3/house (L28): HallMark (her X
+# marks), HallMap (rooms on her page), WoundDressing (the night of the Bogge:
+# the map on the foyer table, the beast, the infirmary) and StudyMural (her
+# painter's eye). These moments only turn their facts into the phase deeds.
 for i in range(1, 6):
     moment("hall_mark_%d" % i, "12", "hall_mark_%d" % i, "manor_house", ["puca_resisted"], [
-        R("fact.hall_mark_%d" % i)], trigger="interact", r=2.0, notes="An X mark on her map of the halls.")
+        UF("fact.hall_x_%d" % i), R("fact.hall_mark_%d" % i)], trigger="auto",
+        notes="Played by HallMark: an X or a circle on her map of the halls.")
 moment("manor_map", "12", "", "manor_house", ["puca_resisted"],
-    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [R("manor_map_drawn"), CEL("map")],
-    trigger="auto", notes="Global: the map is drawn once all five hall marks are made.")
+    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [UF("fact.hall_map_set_down"), R("manor_map_drawn"), CEL("map")],
+    trigger="auto", notes="Global: all five marks made and the map set down on the foyer table (WoundDressing).")
+moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["manor_map_drawn"], [
+    UF("fact.tamlin_hand_bound"), R("tamlin_wound_dressed"),
+], trigger="auto", notes="Played by WoundDressing: clean, bind and wrap his Bogge-bitten hand in the small infirmary.")
 moment("study_mural", "13", "manor_study_mural", "manor_house", ["tamlin_wound_dressed"], [
-    C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 4.0, "cone": 30.0},
-    J("prythian_history_mural"), SP("lucien", V(2, 0, 2)), CU("lucien", "how_to_catch_a_suriel"),
+    UF("fact.mural_studied"), J("prythian_history_mural"), SP("lucien", V(2, 0, 2)), CU("lucien", "how_to_catch_a_suriel"),
     J("suriel_method"), R("fact.suriel_method_known"), R("study_mural_seen"),
-], r=6.0)
+], trigger="auto", notes="Played by StudyMural: three details of the mural studied with a painter's eye.")
 # The Suriel and the naga are deeds played by story/act3/suriel (L26):
 # SurielSnare (snare, bait, downwind wait, answers) and NagaAmbush (the fight).
 # These moments only turn their facts into the phase deeds.
