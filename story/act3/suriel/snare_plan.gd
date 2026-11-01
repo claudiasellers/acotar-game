@@ -20,6 +20,8 @@ const WATER_FADE := 60.0
 ## alone" unless the setup was near perfect.
 const MAX_ANSWERS := 5
 const FULL_BLIGHT_QUALITY := 0.92
+## Metres from the snare the naga lie when the fight opens (unscouted).
+const NAGA_OPEN := 11.0
 ## Seconds of hidden, unsmelled waiting before the Suriel comes, by bait.
 const WAIT_WORST := 60.0
 const WAIT_BEST := 20.0
@@ -62,11 +64,11 @@ static func wait_seconds(bait: float) -> float:
 	return lerpf(WAIT_WORST, WAIT_BEST, clampf(bait, 0.0, 1.0))
 
 
-## How the naga open: farther off when she scouted the stream first (canon:
-## she scouts "several different routes to the stream"), closer after a
-## poor snare (more thrashing, more scent).
-static func naga_distance(quality: float, scouted: bool) -> float:
-	return lerpf(9.0, 13.0, quality) + (4.0 if scouted else 0.0)
+## How far off the naga open: farther if she scouted the stream first (canon:
+## she scouts "several different routes to the stream"). Not the snare's quality: a better snare
+## buys more answers, never a harder fight (F21).
+static func naga_distance(scouted: bool) -> float:
+	return NAGA_OPEN + (4.0 if scouted else 0.0)
 
 
 ## A bait's pull, 0-1, from what the item is. Fresh meat is what the book

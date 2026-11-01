@@ -64,7 +64,7 @@ func test_canon_setup_buys_five_answers_cut_short() -> void:
 	assert_true(SnarePlan.blight_full(perfect.quality))
 	var poor := SnarePlan.score({"birch_distance": 80.0, "water_distance": 120.0, "loops": 1, "bait": 0.0, "smelled_seconds": 30.0})
 	assert_eq(SnarePlan.answers_for(poor.quality), 1)
-	assert_lt(SnarePlan.naga_distance(poor.quality, false), SnarePlan.naga_distance(canon.quality, true))
+	assert_lt(SnarePlan.naga_distance(false), SnarePlan.naga_distance(true), "scouting the stream buys room")
 	assert_gt(SnarePlan.wait_seconds(0.0), SnarePlan.wait_seconds(0.9))
 
 
@@ -242,6 +242,70 @@ func test_a_kill_then_holding_on_brings_tamlin() -> void:
 	_run(a, 1.5)
 	assert_true(a.tamlin_came)
 	assert_true(WorldState.has_flag("fact.naga_escaped"))
+
+
+func test_fighting_back_then_three_strikes_brings_tamlin() -> void:
+	var a := _ambush()
+	a.start()
+	_run(a, 2.0)
+	EventBus.creature_hit.emit(&"naga", &"naga", &"arrow_wood", &"body")
+	assert_true(a.fought_back)
+	for i in NagaAmbush.TAMLIN_STRIKES:
+		a.strike()
+		_run(a, NagaAmbush.STRIKE_GRACE + 0.1)
+	assert_true(a.tamlin_came, "he comes at her third strike, even before 8 s")
+	assert_eq(a.falls, 0)
+	assert_true(WorldState.has_flag("fact.naga_escaped"))
+
+
+func test_running_or_never_fighting_back_is_still_lethal() -> void:
+	var a := _ambush()
+	a.start()
+	feyre.global_position = Vector3(60, 0, 0)  # ran
+	_run(a, NagaAmbush.HOLD_SECONDS + 5.0)
+	assert_false(a.tamlin_came, "nobody comes for a girl who runs")
+	for i in NagaAmbush.STRIKES_TO_FALL:
+		a.strike()
+		_run(a, NagaAmbush.STRIKE_GRACE + 0.1)
+	_run(a, NagaAmbush.FALL_SECONDS + 0.5)
+	assert_false(a.tamlin_came)
+	assert_eq(a.falls, 1, "five strikes fell her")
+
+
+## F21 A/B: the chicken (the full blight answer) is a better snare than the
+## rabbit, yet both get the same naga, as far off, and the same Tamlin.
+func test_better_bait_buys_answers_not_a_harder_fight() -> void:
+	var out := {}
+	for bait: StringName in [&"ing_dead_chicken", &"ing_rabbit"]:
+		WorldState.clear()
+		var q := float(SnarePlan.score({"birch_distance": 4.0, "water_distance": 20.0, "loops": 2,
+				"bait": SnarePlan.bait_score(bait), "elevated": true}).quality)
+		var a := _ambush()
+		WorldState.set_flag("fact.suriel_snare_quality", q)
+		a.start()
+		var spots: Array[Vector3] = []
+		for id: StringName in NagaAmbush.NAGA_IDS:
+			spots.append((a.naga[id] as Node3D).global_position)
+		_run(a, 3.0)
+		EventBus.creature_killed.emit(&"naga", &"naga", &"knife", Vector3.ZERO)
+		var t := 0.0
+		while not a.tamlin_came and t < 40.0:
+			if t > 2.0 and t < 2.2:
+				EventBus.creature_killed.emit(&"naga_2", &"naga", &"arrow_wood", Vector3.ZERO)
+			_run(a, STEP)
+			t += STEP
+		out[bait] = {"q": q, "answers": SnarePlan.answers_for(q), "full": SnarePlan.blight_full(q),
+				"spots": spots, "tamlin_at": a._t, "falls": a.falls}
+		a.queue_free()
+	var c: Dictionary = out[&"ing_dead_chicken"]
+	var r: Dictionary = out[&"ing_rabbit"]
+	assert_gt(float(c.q), float(r.q), "the chicken is the better bait")
+	assert_true(c.full, "the chicken up a tree earns the whole blight answer")
+	assert_gte(int(c.answers), int(r.answers))
+	assert_eq(c.spots, r.spots, "same naga, same distance")
+	assert_almost_eq(float(c.tamlin_at), float(r.tamlin_at), 0.01, "Tamlin comes just as soon")
+	assert_eq(c.falls, 0)
+	assert_eq(r.falls, 0)
 
 
 func test_tether_shot_frees_the_suriel_and_the_knife_kills() -> void:

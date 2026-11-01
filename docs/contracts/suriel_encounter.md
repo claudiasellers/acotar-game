@@ -41,6 +41,15 @@ the place is sketched and named, with no celebration (horror beat).
 - Input: `interact` (rig, bait, knife). Arrows through Feyre's `arrow_fired` ->
   `Arrow.hit` (tether shot).
 
+## The fight (NagaAmbush)
+- The snare's quality decides the answers only, never the fight (F21): the
+  same four naga open `SnarePlan.naga_distance(scouted)` away (11 m, 15 m if
+  she scouted the stream), and attack the same way.
+- Tamlin comes only once she has fought back (`creature_hit` or a kill on a
+  naga by her): at her second kill (never before `TAMLIN_EARLIEST`, 8 s), her
+  third strike (`TAMLIN_STRIKES`), or 15 s after her first kill, whichever is
+  first. Running off or never fighting back stays lethal: five strikes fell her.
+
 ## Creature cues (story_actor_cue)
 - `suriel`: `stalk`, `snared`, `caught`, `naga_are_coming`, `freed`.
 - `naga`..`naga_4`: `attack`, `stagger`, `flee`. Strikes via `Naga.struck_player`.
@@ -49,4 +58,5 @@ the place is sketched and named, with no celebration (horror beat).
 ## Dev jump
 `story/act3/dev/p3_jump.tscn`: p3 afternoon in the glade with sinew x2, a
 rabbit, salt, 14 wood arrows and an ash arrow. Playtest:
-`tools/playtest/p3_suriel_playtest.tscn` (extends the Act I playtest).
+`tools/playtest/p3_suriel_playtest.tscn` (extends the Act I playtest);
+`--bait=ing_dead_chicken` runs the F21 A/B with the full-blight snare.
