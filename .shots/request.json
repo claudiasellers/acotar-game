@@ -1,0 +1,1 @@
+{"id": "wayside_l23_look5", "scene": "res://tools/wayside/wayside_probe.tscn", "quality": "full", "time_of_day": 0.45, "grade": "spring", "warmup_s": 5, "shots": [{"name": "pond_faeries", "eye": [-952, 25.0, 116], "at": [-965, 21.6, 100], "fov": 40, "ground": false}]}
