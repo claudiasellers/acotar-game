@@ -1,6 +1,7 @@
 # ACOTAR: The Spring Court. For the Mac (Apple silicon, macOS).
 #   make update   pull the latest origin/main, fetch art (LFS), make sure Godot is here, rebuild generated content
 #   make play     run the game (its output goes to .tools/play.log)
+#   make setup    install the git pre-push hook (checks lead/ready-* pushes for missing .uid files)
 #   make clean    free disk: delete Godot's import cache and generated content
 #
 # Godot lives in .tools/ (git-ignored). Generated content is built by
@@ -14,7 +15,10 @@ GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
 
-.PHONY: play update clean godot pull generate bake import
+.PHONY: setup play update clean godot pull generate bake import
+
+setup:
+	@tools/mq/install_hooks.sh
 
 play: godot bake
 	@test -d .godot || $(MAKE) --no-print-directory import

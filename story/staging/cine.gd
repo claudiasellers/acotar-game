@@ -61,6 +61,10 @@ var _rig_subject: Callable
 var _rig_offset: Vector3
 var _rig_pos: Vector3
 var _rig_lag: float = 3.0
+## Carried: the lens moves with the subject (a camera car), so the lag only
+## smooths his turns and never lets him pull away, whatever his speed.
+var _rig_carried: bool = false
+var _rig_from: Vector3
 var _last_usec: int = 0
 
 
@@ -161,8 +165,9 @@ func shot(xform: Transform3D, fov: float, blend: float = 0.0, track: Callable = 
 ## teleport) is a cut. Trees and walls between the subject and the camera
 ## pull it in, like a spring arm.
 func rig(subject: Callable, offset: Vector3, look: Callable, fov: float, blend: float = 0.0,
-		lag: float = 3.0) -> void:
+		lag: float = 3.0, carried: bool = false) -> void:
 	_begin(blend)
+	_rig_carried = carried
 	target_kind = &"rig"
 	_rig_subject = subject
 	_rig_offset = offset
@@ -170,6 +175,7 @@ func rig(subject: Callable, offset: Vector3, look: Callable, fov: float, blend: 
 	_shot_fov = fov
 	_rig_lag = lag
 	_rig_pos = _rig_want()
+	_rig_from = (subject.call() as Transform3D).origin
 	_look = (Vector3(look.call()) - _rig_pos).normalized()
 
 
@@ -274,6 +280,10 @@ func _target_pose(dt: float) -> Array:
 		return [camera.global_transform, camera.fov]
 	if target_kind == &"rig":
 		var want := _rig_want()
+		var at := (_rig_subject.call() as Transform3D).origin
+		if _rig_carried:
+			_rig_pos += at - _rig_from
+		_rig_from = at
 		if want.distance_to(_rig_pos) > CUT_JUMP:
 			_rig_pos = want
 			_look = (Vector3(_track.call()) - want).normalized()

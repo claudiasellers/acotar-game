@@ -113,3 +113,25 @@ func test_freed_veil_is_left_alone() -> void:
 	assert_eq(staging.shot_name, &"drive", "quietly holds until released")
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"leave")
 	assert_eq(staging.shot_name, &"released")
+
+
+## A carried rig keeps its distance however fast the subject goes; a loose one
+## falls behind.
+func test_carried_rig_never_lets_the_horse_pull_away() -> void:
+	var horse := Node3D.new()
+	add_child_autofree(horse)
+	var carrier := func() -> Transform3D: return horse.global_transform
+	var aim := func() -> Vector3: return horse.global_position + Vector3.UP * 2.0
+	var gaps: Array[float] = []
+	for carried in [false, true]:
+		horse.global_position = Vector3.ZERO
+		var cine := Cine.of(get_tree())
+		cine.claim(self)
+		cine.rig(carrier, Vector3(0.4, 3.6, 5.0), aim, 46.0, 0.0, 2.0, carried)
+		for i in 60:
+			horse.global_position += Vector3(0, 0, -12.0) * (1.0 / 60.0)
+			await wait_process_frames(1)
+		gaps.append(cine.camera.global_position.distance_to(horse.global_position))
+		cine.drop(self, 0.0)
+	assert_gt(gaps[0], 9.0, "loose: the horse at 12 m/s pulls away")
+	assert_almost_eq(gaps[1], Vector3(0.4, 3.6, 5.0).length(), 0.6, "carried: the lens keeps its place")
