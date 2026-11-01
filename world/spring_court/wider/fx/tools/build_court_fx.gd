@@ -31,7 +31,7 @@ const SUN_CAP := 1.8
 ## and saturation capped so pastel albedos never go neon.
 const AMBIENT_SCALE := 0.6
 const SHADOW_TINT := 0.32
-const SATURATION_CAP := 1.3
+const SATURATION_CAP := 1.2
 const LILAC_SHADOW := Color("8C7FC4")
 const EXPOSURE_CAP := 0.8
 const BRIGHTNESS_CAP := 1.0
@@ -250,7 +250,7 @@ func _build_materials() -> int:
 		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.7, 0.95, 1.0), "deep_color": Color(0.62, 0.62, 1.0), "clarity": 0.75, "glitter_strength": 9.0}),
 		"mat_glint": _mat("court_glint.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true,
-			"grass_a": Color("5A8F45"), "grass_b": Color("8AAE4C"), "grass_c": Color("4E8A5E"),
+			"grass_a": Color("458045"), "grass_b": Color("789F4D"), "grass_c": Color("3F7F5A"),
 			"blossom_speck": Color("F4A6C0"), "rock_color": Color("D9CBD0")}),
 		"mat_particle_lit": _mat("court_particle.gdshader", {}),
 		"mat_particle_glow": _mat("court_particle_glow.gdshader", {}),
