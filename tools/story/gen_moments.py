@@ -87,12 +87,12 @@ moment("suriel", "14", "suriel_snare", "suriel_glade", ["fact.suriel_method_know
 moment("naga", "15", "suriel_snare", "suriel_glade", ["suriel_bound"], [
     UF("fact.naga_escaped"), R("naga_survived"),
 ], trigger="auto", notes="Played by NagaAmbush: four naga; she kills one, survives until Tamlin arrives.")
-moment("summer_faerie", "17", "manor_infirmary", "manor_house", ["naga_survived"], [
-    SP("summer_faerie", V(0, 0, -1)), SP("tamlin", V(1, 0, -1.6)), MO("dread", 0.4, 2.0),
-    CU("lucien", "leaves_sick"), C("WALK", "summer_faerie"),
-    ST(25.0, 2.5, "summer_faerie"), CU("summer_faerie", "dies"), W(2.0),
-    R("summer_faerie_comforted"), CU("tamlin", "prays"),
-], r=4.0, notes="Unwinnable triage. The deed is staying with him until he dies.")
+# The Summer faerie is played by story/act3/summer (L29): SummerFaerieTriage on
+# the hall table (holding his hand when he dies) or, if he died alone, the
+# daytime vigil at his grave (SummerFaerieGrave). Either raises the farewell.
+moment("summer_faerie", "17", "", "manor_house", ["naga_survived"], [
+    UF("fact.summer_faerie_farewell"), R("summer_faerie_comforted"),
+], trigger="auto", notes="Unwinnable triage on the entrance-hall table; the deed is holding his hand until he dies.")
 
 # --- P4 The wider court (ch 18-19) -------------------------------------------
 moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faerie_comforted"], [

@@ -22,6 +22,11 @@ const ROWS := {
 		{"name": "WoundDressing", "script": "res://story/act3/house/wound_dressing.gd"},
 	],
 	&"manor_study_mural": [{"name": "StudyMural", "script": "res://story/act3/house/study_mural.gd"}],
+	# L29: the Summer faerie (ch17) on the entrance-hall table, and his grave in the fields.
+	&"manor_window_hide": [
+		{"name": "SummerFaerieTriage", "script": "res://story/act3/summer/summer_faerie_triage.gd"},
+		{"name": "SummerFaerieGrave", "script": "res://story/act3/summer/summer_faerie_grave.gd"},
+	],
 }
 const ANCHORS := [&"suriel_snare"]
 

@@ -144,9 +144,9 @@ func test_director_hangs_moments_on_anchors() -> void:
 	anchor.add_to_group(&"story_anchor")
 	root.add_child(anchor)
 	var spaces := StoryDirector.attach_anchor(anchor)
-	assert_eq(spaces.size(), 3, "the wound_dressing and summer_faerie moments and WoundDressing (L28)")
-	assert_eq(StoryDirector.attach_anchor(anchor).size(), 3)
-	assert_eq(anchor.get_child_count(), 4, "plus the InfirmaryWorktable; attaching twice adds nothing")
+	assert_eq(spaces.size(), 2, "the wound_dressing moment and WoundDressing (L28); the Summer faerie is in the hall (L29)")
+	assert_eq(StoryDirector.attach_anchor(anchor).size(), 2)
+	assert_eq(anchor.get_child_count(), 3, "plus the InfirmaryWorktable; attaching twice adds nothing")
 
 
 func test_moments_chain_from_the_grounds_to_the_pass() -> void:
