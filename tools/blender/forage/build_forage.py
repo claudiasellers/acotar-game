@@ -945,6 +945,33 @@ def b_old_arrowhead(k):
     del tip
 
 
+def b_dead_chicken(k):
+    # Suriel bait from the manor larder: a plucked hen lying on her side, neck limp, legs tied with twine.
+    SKIN, SKIN_HI, LEG, RED = "#EBC9AE", "#F7E2D0", "#E8B444", "#D23A30"
+    k.ell((0, 0, 0.048), (0.085, 0.062, 0.048), SKIN, seg=(14, 9), squash_bottom=0.75, grad=(SKIN_HI, 0.02, 0.09))
+    k.ell((0.035, -0.005, 0.052), (0.05, 0.05, 0.038), SKIN_HI, seg=(10, 7), squash_bottom=0.8)
+    k.ell((-0.088, 0, 0.06), (0.018, 0.016, 0.014), SKIN, seg=(8, 5))
+    k.ell((-0.005, 0.005, 0.088), (0.06, 0.034, 0.012), "#E0B89A", seg=(10, 6))
+    neck = [V((0.07, 0, 0.05)), V((0.1, 0.012, 0.035)), V((0.125, 0.028, 0.02)), V((0.14, 0.035, 0.016))]
+    k.tube(neck, [0.02, 0.016, 0.013, 0.012], "#E6BDA4", 7)
+    k.ell((0.152, 0.036, 0.017), (0.022, 0.016, 0.016), "#E6BDA4", seg=(9, 6))
+    k.cone((0.17, 0.036, 0.016), (1, 0.15, -0.1), 0.016, 0.006, 0.001, "#E2A838", sides=5)
+    for j in range(4):
+        k.ell((0.138 + 0.011 * j, 0.036, 0.033 + 0.004 * math.sin(j * 1.7)), (0.007, 0.004, 0.009), RED, seg=(6, 4))
+    k.ell((0.168, 0.036, 0.002), (0.006, 0.004, 0.008), RED, seg=(6, 4))
+    k.ell((0.158, 0.05, 0.022), (0.004, 0.002, 0.0015), INK, seg=(5, 3))
+    for y, z in ((0.03, 0.06), (-0.02, 0.035)):
+        k.ell((-0.055, y, z), (0.04, 0.026, 0.026), SKIN, seg=(9, 6), rot=(1, 0.1, 0.3))
+        a, b = V((-0.085, y, z + 0.004)), V((-0.135, y + 0.01, z - 0.005))
+        k.tube([a, b], [0.007, 0.006], LEG, 5)
+        for t in (-0.5, 0, 0.5):
+            k.stem(b, b + V((-0.025, 0.02 * t, -0.008)), 0.003, LEG, bend=(0, 0, -0.004), n=3, sides=4, tip=0.0015)
+    k.tube(k.curve((-0.115, 0.045, 0.06), (-0.11, -0.03, 0.03), bend=(0.0, 0.0, 0.03), n=5), 0.003, "#9A7A4E", 4)
+    k.tube(k.curve((-0.11, -0.03, 0.03), (-0.12, 0.04, 0.052), bend=(0.0, 0.0, -0.025), n=5), 0.003, "#9A7A4E", 4)
+    for v in k.bm.verts:  # drawn at 0.55 m nose to toe; L12 wants about 0.35 m after the small-find x1.6
+        v.co *= 0.64
+
+
 def b_trout(k):
     k.ell((0, 0, 0.008), (0.16, 0.12, 0.008), "#7EB8D8", seg=(12, 4), grad=("#B8E2F2", 0, 0.016))
     c = V((0, 0, 0.035))
@@ -962,7 +989,7 @@ def b_trout(k):
 # ------------------------------------------------------------------ the list
 ITEMS = {
     # human realm finds
-    "ing_acorn": b_acorn, "ing_ash_wood": b_ash_wood, "ing_birch_bark": b_birch_bark, "ing_blackberry": b_blackberry,
+    "ing_acorn": b_acorn, "ing_dead_chicken": b_dead_chicken, "ing_ash_wood": b_ash_wood, "ing_birch_bark": b_birch_bark, "ing_blackberry": b_blackberry,
     "ing_chaga": b_chaga, "ing_chalk": b_chalk, "ing_charcoal": b_charcoal, "ing_clay": b_clay,
     "ing_crow_feather": b_crow_feather, "ing_flint": b_flint, "ing_frozen_reed": b_frozen_reed,
     "ing_hawk_feather": b_hawk_feather, "ing_hawthorn_haw": b_hawthorn, "ing_hazelnut": b_hazelnut,
