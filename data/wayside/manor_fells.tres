@@ -33,10 +33,11 @@ line = "Dry boots, mostly."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"model": "autumn_fallen_log",
-"repeat": false,
-"unit_length": 3.2,
-"water_y": 9.842675905471634
+"model": "stepping_stones",
+"repeat": true,
+"unit_length": 4.4,
+"water_y": 10.042675905471633,
+"yaw_offset": 1.5707963267948966
 }
 source = "ch 14 (a stream that takes a running leap)"
 
