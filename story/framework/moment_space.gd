@@ -56,7 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if running:
 			_presses += 1
 		elif moment and moment.trigger == &"interact" and player_within(moment.entry_radius):
-			start()
+			arrive()
 
 
 ## Counts an interaction (input or tests).
@@ -111,6 +111,7 @@ func abort(fail_fact: String = "") -> void:
 		raise(fail_fact)
 	failed.emit(fail_fact)
 	running = false
+	_must_leave = true
 	StoryControl.release()
 	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)

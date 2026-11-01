@@ -30,6 +30,9 @@ var draw_amount: float = 0.0
 var is_drawing: bool = false
 var selected: StringName = &"arrow_wood"
 var slowing: bool = false
+## The bow you can see (on her back, up in her hands) and the arrow card.
+var visual: BowVisual
+var quiver_card: QuiverCard
 
 var _time: float = 0.0
 
@@ -42,6 +45,10 @@ func _ready() -> void:
 	reticle_layer.name = "AimReticle"
 	reticle_layer.add_child(AimReticle.new(self))
 	add_child(reticle_layer)
+	visual = BowVisual.new(self)
+	add_child(visual)
+	quiver_card = QuiverCard.new(self)
+	add_child(quiver_card)
 	if Gameplay.inventory.count(&"bow_%s" % bow.id) == 0:
 		Gameplay.inventory.add(&"bow_%s" % bow.id)
 
@@ -58,6 +65,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		cycle_bow()
 	elif event.is_action_pressed(&"craft_arrow"):
 		craft_selected()
+		arrow_type_changed.emit(selected)
 
 
 func _physics_process(delta: float) -> void:

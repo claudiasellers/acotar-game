@@ -14,9 +14,14 @@ extends SceneSpace
 
 @export var doe_offset: Vector3 = Vector3(0, 0, -22)
 @export var wolf_offset: Vector3 = Vector3(14, 0, -30)
-## The doe grazes at her spot once Feyre is this close, well before the 30 m
-## line where the scene starts, so she is seen first and the hunt has a target.
-@export var doe_preview_radius: float = 110.0
+## The doe grazes at her spot once Feyre is this close, just before the scene
+## starts, so she is seen first and the hunt has a target.
+@export var doe_preview_radius: float = 62.0
+## The hunt starts when Feyre is this close (flat) to the doe's spot, right
+## as the "Into the brambles. Stay downwind." thought comes. Kept inside the
+## terrain's 64 m collision ring round her: farther out, the doe and the wolf
+## would drop through ground that has no collision yet.
+@export var start_radius: float = 58.0
 ## Seconds with no ash arrow in her quiver or in the world (it broke on stone
 ## or fell through the ground) before one is quietly given back, so wolf_killed
 ## can always rise.
@@ -32,6 +37,12 @@ var _ash_gone_for: float = 0.0
 func _init() -> void:
 	space_id = &"wolf_kill"
 	done_flags = PackedStringArray(["wolf_killed"])
+	# The hunt starts as she comes within sight of the doe's spot, from any
+	# side and at any height (the Entry box is only 6 m tall on a slope), and
+	# by day: arriving at night brings the morning (TimeShift).
+	day_only = true
+	arrive_offset = doe_offset
+	arrive_radius = start_radius
 
 
 func _ready() -> void:

@@ -20,7 +20,7 @@ const LANDMARKS := [
 	[&"ice", "H1_ice", "A", &"trail", "Holes in the brook ice. Something still drinks here.",
 			Vector2.INF, 15.0],  # where the tracks cross the frozen creek, by _route()
 	[&"downwind", "H1_downwind", "A", &"trail", "Into the brambles. Stay downwind. One shot.",
-			HumanRealmLayout.DOE_CLEARING, 120.0],
+			HumanRealmLayout.DOE_CLEARING, 62.0],  # as the hunt starts (WolfKill.start_radius)
 ]
 const WRONG_WAY := [&"wrong_way", "H1_wrong_way", "A", &"trail",
 		"Nothing out here. Whatever's left has pulled in deeper."]

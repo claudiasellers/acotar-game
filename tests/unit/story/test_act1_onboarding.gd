@@ -43,10 +43,10 @@ func test_the_doe_grazes_before_the_scene_starts() -> void:
 	feyre.global_position = Vector3(0, 0, 200)
 	kill._physics_process(0.1)
 	assert_null(kill.doe, "too far")
-	feyre.global_position = Vector3(0, 0, 60)
+	feyre.global_position = Vector3(0, 0, 38.5)
 	kill._physics_process(0.1)
-	assert_not_null(kill.doe, "she is grazing, 82 m off")
-	assert_false(kill.running, "the scene waits for the 30 m line")
+	assert_not_null(kill.doe, "she is grazing, 60.5 m off")
+	assert_false(kill.running, "the scene waits for the 58 m line")
 
 
 func test_prompts_show_only_when_relevant_and_are_taught_once() -> void:

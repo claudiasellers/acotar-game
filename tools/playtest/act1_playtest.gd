@@ -310,7 +310,7 @@ func _play() -> void:
 		return
 
 	# 6. Home to sleep the day away.
-	_begin("sleep", "walk home, press interact at the ironwood bed; night falls")
+	_begin("sleep", "walk home; night falls (coming home after the sale brings the evening, else the ironwood bed)")
 	var bed := _find_named(&"BedKeepsake")
 	if bed == null:
 		await _walk_region(&"cottage")
@@ -324,10 +324,14 @@ func _play() -> void:
 		var out := door_anchor.global_position - room.global_position
 		out.y = 0.0
 		await _walk_to(door_anchor.global_position + out.normalized() * 3.0, 1.0)
-		await _walk_to(door_anchor.global_position, 0.6, Callable(), 15.0)
-	await _walk_to(bed.global_position, 2.0, Callable(), 20.0)
-	await _until(func() -> bool: return StoryControl.can_interact(), 5.0)
-	await _press(&"interact")
+		await _walk_to(door_anchor.global_position, 0.6, _evening_falling, 15.0)
+	if not _evening_falling.call():
+		await _walk_to(bed.global_position, 2.0, _evening_falling, 20.0)
+	if _evening_falling.call():
+		_note("home: the evening fell as she came in (no bed needed)")
+	else:
+		await _until(func() -> bool: return StoryControl.can_interact(), 5.0)
+		await _press(&"interact")
 	_note("feyre %s on floor %s; interior anchor %s; bed %s; ground under bed %.1f" % [_v(feyre.global_position), feyre.is_on_floor(),
 		_v(room.global_position) if room else "none", _v(bed.global_position), _ground_at(bed.global_position)])
 	_note("bed: can_sleep %s, sleeping %s, control %s, %.1f m (3D)" % [bed.call(&"can_sleep"), bed.get(&"sleeping"), _mode(),
@@ -413,6 +417,16 @@ func _play() -> void:
 
 
 # --- input ------------------------------------------------------------------
+
+## Night has come, or is fading in, or the beast's scene has begun.
+func _evening_falling() -> bool:
+	if Clock.is_night():
+		return true
+	for space in get_tree().get_nodes_in_group(BeastDoor.GROUP):
+		if (space as SceneSpace).shifting_time or (space as SceneSpace).running:
+			return true
+	return false
+
 
 func _press(action: StringName) -> void:
 	var down := InputEventAction.new()
