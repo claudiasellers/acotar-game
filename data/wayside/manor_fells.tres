@@ -1,0 +1,150 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_ontcw"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_w16l4"]
+
+[sub_resource type="Resource" id="Resource_f1qp6"]
+script = ExtResource("2_w16l4")
+kind = &"nook"
+id = &"manor_fells_lilac"
+position = Vector3(-330, 0.9202187, 260)
+yaw = 2.1793063
+target = Vector3(-330, 0.9202187, 260)
+items = PackedStringArray("ing_lilac", "col_odd_stone")
+line = "Lilac, brushing my cheek. Behind it, a good place to hide."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_a",
+"shell_scale": 1.0555283
+}
+canon = "C?"
+source = "ch 9"
+
+[sub_resource type="Resource" id="Resource_i30b4"]
+script = ExtResource("2_w16l4")
+kind = &"crossing"
+id = &"manor_fells_crossing_0"
+position = Vector3(-743.69196, 7.7096267, 667.014)
+target = Vector3(-762.6879, 10.196195, 684.76654)
+items = PackedStringArray()
+line = "Dry boots, mostly."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"model": "autumn_fallen_log",
+"repeat": false,
+"unit_length": 3.2,
+"water_y": 9.842675905471634
+}
+source = "ch 14 (a stream that takes a running leap)"
+
+[sub_resource type="Resource" id="Resource_vqkcn"]
+script = ExtResource("2_w16l4")
+kind = &"rest"
+id = &"manor_fells_00_rest"
+position = Vector3(-245.9027, 9.306556, 220.2096)
+yaw = -0.830851299941359
+target = Vector3(-1099.5731, 45.879894, 999.6011)
+items = PackedStringArray()
+line = "Butter yellow on the hill. Periwinkle in the distance."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to fells"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_b3ssw"]
+script = ExtResource("2_w16l4")
+kind = &"vignette"
+id = &"manor_fells_01_vignette"
+position = Vector3(-408.02042, 6.839707, 372.59564)
+target = Vector3(-408.02042, 6.839707, 372.59564)
+items = PackedStringArray()
+line = "Birds that colour have no business being real."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
+"sketch": "Watching songbird blue"
+}
+
+[sub_resource type="Resource" id="Resource_cqww0"]
+script = ExtResource("2_w16l4")
+kind = &"nook"
+id = &"manor_fells_02_nook"
+position = Vector3(-509.63318, 4.273396, 462.82898)
+yaw = -1.9490808
+target = Vector3(-509.63318, 4.273396, 462.82898)
+items = PackedStringArray("ing_woad")
+line = "Woad. Blue, if I'm patient with it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_c",
+"shell_scale": 1.1316699
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_qpwnj"]
+script = ExtResource("2_w16l4")
+kind = &"shimmer"
+id = &"manor_fells_03_shimmer"
+position = Vector3(-649.0919, 7.2875357, 560.221)
+target = Vector3(-649.0919, 9.696037, 520.221)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_7hxfg"]
+script = ExtResource("2_w16l4")
+kind = &"rest"
+id = &"manor_fells_04_rest"
+position = Vector3(-857.9787, 12.843851, 769.93146)
+yaw = -0.8106966364538685
+target = Vector3(-1099.5731, 45.879894, 999.6011)
+items = PackedStringArray()
+line = "If I had paints, I'd start with the sky and never finish."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to fells"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_a5tdq"]
+script = ExtResource("2_w16l4")
+kind = &"shimmer"
+id = &"manor_fells_05_shimmer"
+position = Vector3(-974.1298, 28.059738, 866.4929)
+target = Vector3(-1012.76685, 31.2025, 876.8457)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[resource]
+script = ExtResource("1_ontcw")
+id = &"manor_fells"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, -1100, 1000)
+spots = Array[ExtResource("2_w16l4")]([SubResource("Resource_f1qp6"), SubResource("Resource_i30b4"), SubResource("Resource_vqkcn"), SubResource("Resource_b3ssw"), SubResource("Resource_cqww0"), SubResource("Resource_qpwnj"), SubResource("Resource_7hxfg"), SubResource("Resource_a5tdq")])

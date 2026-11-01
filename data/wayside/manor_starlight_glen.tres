@@ -1,0 +1,113 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_mi6xy"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_40lib"]
+
+[sub_resource type="Resource" id="Resource_vy84i"]
+script = ExtResource("2_40lib")
+kind = &"pond_faeries"
+id = &"manor_starlight_glen_pond_faeries"
+position = Vector3(-965, 21.070719, 100)
+target = Vector3(-965, 19.67072, 100)
+items = PackedStringArray()
+line = "Four heads in the water, watching me. I didn't go any closer."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"spread": 2.4,
+"water_y": 21.0707194842295
+}
+canon = "C"
+source = "ch 14"
+
+[sub_resource type="Resource" id="Resource_vtglj"]
+script = ExtResource("2_40lib")
+kind = &"crossing"
+id = &"manor_starlight_glen_crossing_0"
+position = Vector3(-968.56165, 18.441578, 43.95029)
+target = Vector3(-994.49023, 20.572968, 45.876415)
+items = PackedStringArray()
+line = "Dry boots, mostly."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"model": "autumn_fallen_log",
+"repeat": false,
+"unit_length": 3.2,
+"water_y": 20.456509170513677
+}
+source = "ch 14 (a stream that takes a running leap)"
+
+[sub_resource type="Resource" id="Resource_xajtr"]
+script = ExtResource("2_40lib")
+kind = &"shimmer"
+id = &"manor_starlight_glen_00_shimmer"
+position = Vector3(-320.05847, 5.1725154, -14.223013)
+target = Vector3(-354.6995, 8.166174, -34.223015)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_1tm5m"]
+script = ExtResource("2_40lib")
+kind = &"rest"
+id = &"manor_starlight_glen_01_rest"
+position = Vector3(-446.06284, 7.5609317, -7.851948)
+yaw = -1.475264904750833
+target = Vector3(-1049.1093, 39.775864, 49.93383)
+items = PackedStringArray()
+line = "Ochre in the grass, and a cool green where it turns to shade."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to starlight glen"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_cgyp5"]
+script = ExtResource("2_40lib")
+kind = &"vignette"
+id = &"manor_starlight_glen_02_vignette"
+position = Vector3(-625.4819, 5.3727684, 32.304905)
+target = Vector3(-625.4819, 5.3727684, 32.304905)
+items = PackedStringArray()
+line = "Squirrels, scolding me from the oak."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 2,
+"scene": "res://creatures/ambient/scenes/squirrel.tscn",
+"sketch": "Watching squirrel"
+}
+
+[sub_resource type="Resource" id="Resource_0nabm"]
+script = ExtResource("2_40lib")
+kind = &"rest"
+id = &"manor_starlight_glen_03_rest"
+position = Vector3(-805.8057, 7.4155025, 29.092737)
+yaw = -1.4853460946925536
+target = Vector3(-1049.1093, 39.775864, 49.93383)
+items = PackedStringArray()
+line = "If I had paints, I'd start with the sky and never finish."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fells_overlook_bench",
+"sketch": "A view on the way to starlight glen"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[resource]
+script = ExtResource("1_mi6xy")
+id = &"manor_starlight_glen"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, -1050, 50)
+spots = Array[ExtResource("2_40lib")]([SubResource("Resource_vy84i"), SubResource("Resource_vtglj"), SubResource("Resource_xajtr"), SubResource("Resource_1tm5m"), SubResource("Resource_cgyp5"), SubResource("Resource_0nabm")])

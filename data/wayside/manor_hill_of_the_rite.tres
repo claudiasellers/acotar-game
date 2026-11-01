@@ -1,0 +1,148 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_o05fc"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_d1b64"]
+
+[sub_resource type="Resource" id="Resource_w2nwd"]
+script = ExtResource("2_d1b64")
+kind = &"nook"
+id = &"manor_hill_of_the_rite_00_nook"
+position = Vector3(93.06363, 6.849342, -136.97308)
+yaw = -1.0358799
+target = Vector3(93.06363, 6.849342, -136.97308)
+items = PackedStringArray("col_stone_quartz")
+line = "A stone with the light caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "bunting",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.0348904
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_646es"]
+script = ExtResource("2_d1b64")
+kind = &"shimmer"
+id = &"manor_hill_of_the_rite_01_shimmer"
+position = Vector3(170.55229, 7.1471257, -279.13925)
+target = Vector3(170.55229, 9.226777, -319.13925)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_g5w0w"]
+script = ExtResource("2_d1b64")
+kind = &"nook"
+id = &"manor_hill_of_the_rite_02_nook"
+position = Vector3(284.2512, 17.450304, -392.46082)
+yaw = -1.3045449
+target = Vector3(284.2512, 17.450304, -392.46082)
+items = PackedStringArray("col_snail_spiral")
+line = "A snail shell, a perfect spiral."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "rock_mossy_c",
+"shell_scale": 0.93052775
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_rm8k0"]
+script = ExtResource("2_d1b64")
+kind = &"vignette"
+id = &"manor_hill_of_the_rite_03_vignette"
+position = Vector3(352.2633, 18.635586, -518.2425)
+target = Vector3(352.2633, 18.635586, -518.2425)
+items = PackedStringArray()
+line = "A fox. It looked at me like it knew the way."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"scene": "res://creatures/ambient/scenes/fox.tscn",
+"sketch": "Watching fox"
+}
+
+[sub_resource type="Resource" id="Resource_1tk86"]
+script = ExtResource("2_d1b64")
+kind = &"vignette"
+id = &"manor_hill_of_the_rite_04_vignette"
+position = Vector3(475.40845, 17.466988, -640.41724)
+target = Vector3(475.40845, 17.466988, -640.41724)
+items = PackedStringArray()
+line = "Birds that colour have no business being real."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
+"sketch": "Watching songbird blue"
+}
+
+[sub_resource type="Resource" id="Resource_tcg1e"]
+script = ExtResource("2_d1b64")
+kind = &"nook"
+id = &"manor_hill_of_the_rite_05_nook"
+position = Vector3(546.5124, 22.00976, -783.1063)
+yaw = 0.6528287
+target = Vector3(546.5124, 22.00976, -783.1063)
+items = PackedStringArray("col_old_arrowhead")
+line = "An arrowhead. Someone hunted here, long ago."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.1538247
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_3auk8"]
+script = ExtResource("2_d1b64")
+kind = &"rest"
+id = &"manor_hill_of_the_rite_06_rest"
+position = Vector3(668.9183, 50.25265, -899.85846)
+yaw = 2.5619036729325053
+target = Vector3(799.63885, 111.17714, -1099.516)
+items = PackedStringArray()
+line = "Pearl in the clouds. Moss, and rust, and that pink again."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to hill of the rite"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_i6exk"]
+script = ExtResource("2_d1b64")
+kind = &"shimmer"
+id = &"manor_hill_of_the_rite_07_shimmer"
+position = Vector3(725.469, 84.5, -1021.3694)
+target = Vector3(760.11, 96.354225, -1041.3694)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[resource]
+script = ExtResource("1_o05fc")
+id = &"manor_hill_of_the_rite"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, 800, -1100)
+spots = Array[ExtResource("2_d1b64")]([SubResource("Resource_w2nwd"), SubResource("Resource_646es"), SubResource("Resource_g5w0w"), SubResource("Resource_rm8k0"), SubResource("Resource_1tk86"), SubResource("Resource_tcg1e"), SubResource("Resource_3auk8"), SubResource("Resource_i6exk")])

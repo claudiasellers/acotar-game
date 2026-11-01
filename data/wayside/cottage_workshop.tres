@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_3owea"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_ybac5"]
+
+[sub_resource type="Resource" id="Resource_b0df8"]
+script = ExtResource("2_ybac5")
+kind = &"vignette"
+id = &"cottage_workshop_00_vignette"
+position = Vector3(-276.61707, 3.5136344, 2200.7607)
+target = Vector3(-276.61707, 3.5136344, 2200.7607)
+items = PackedStringArray()
+line = "A deer. Too far, and the wind's wrong."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"graze": true,
+"scale": 0.9,
+"scene": "res://creatures/models/deer.gltf",
+"sketch": "Watching deer"
+}
+
+[sub_resource type="Resource" id="Resource_6nlw5"]
+script = ExtResource("2_ybac5")
+kind = &"nook"
+id = &"cottage_workshop_01_nook"
+position = Vector3(-413.79788, -0.10019743, 2244.1755)
+yaw = 0.62035775
+target = Vector3(-413.79788, -0.10019743, 2244.1755)
+items = PackedStringArray("ing_crow_feather")
+line = "A crow's feather. Fletching, or a quill."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb",
+"shell_scale": 1.1818825
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[resource]
+script = ExtResource("1_3owea")
+id = &"cottage_workshop"
+realm = &"human_realm"
+waypoints = PackedVector2Array(-150, 2160, -330, 2230, -560, 2240)
+spots = Array[ExtResource("2_ybac5")]([SubResource("Resource_b0df8"), SubResource("Resource_6nlw5")])
