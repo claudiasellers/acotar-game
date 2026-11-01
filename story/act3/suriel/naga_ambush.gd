@@ -11,9 +11,9 @@
 ##   - E with a naga in reach: her boot knife (canon, ch 15).
 ##   - An arrow into the snare's tether frees the Suriel; it bursts out and
 ##     staggers every naga near it (canon: she shoots the snare).
-##   - Once she has fought back (a knife or arrow into a naga), Tamlin comes
-##     out of the trees at her second kill (never before 8 s), her third
-##     strike, or 15 s after her first kill, whichever is first: he kills the
+##   - Once she has killed one herself, Tamlin comes out of the trees at her
+##     second kill (never before 8 s), her third strike, or 15 s after her
+##     first kill, whichever is first: he kills the
 ##     last two (High Fae form, ch 15) and any others flee. Then
 ##     fact.naga_escaped; the naga moment raises naga_survived.
 ##   - If she never fights back, or runs, nobody comes: they chase her down
@@ -22,16 +22,18 @@ class_name NagaAmbush
 extends SceneSpace
 
 const NAGA_IDS: Array[StringName] = [&"naga", &"naga_2", &"naga_3", &"naga_4"]
-const ATTACK_GAP := 2.0
+## Seconds between the first two naga moving (one to meet, then the second).
+const ATTACK_GAP := 4.0
 ## Two come at her first; the others hang back in the reeds and join one by
 ## one (a kill, or this long since the last joined). A hunt, not a swarm.
 const FIRST_WAVE := 2
 const JOIN_EVERY := 7.0
 const STRIKES_TO_FALL := 5
 ## After a blow lands she has this long before the next can (a stagger, not a stun-lock).
-const STRIKE_GRACE := 1.2
+const STRIKE_GRACE := 1.8
 const KNIFE_REACH := 2.4
-const KNIFE_DAMAGE := 6.0
+## Two stabs kill a naga (16 health): close work, but it finishes them.
+const KNIFE_DAMAGE := 8.0
 ## A boot knife is close and slow: one stab per this many seconds.
 const KNIFE_COOLDOWN := 0.7
 const TETHER_REACH := 2.0
@@ -57,7 +59,7 @@ var kills: int = 0
 var falls: int = 0
 var freed: bool = false
 var tamlin_came: bool = false
-## She has hurt a naga (knife or arrow). Until then Tamlin does not come.
+## She has hurt a naga (knife or arrow).
 var fought_back: bool = false
 
 var _t: float = 0.0
@@ -171,18 +173,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		knife()
 
 
-## Her boot knife, into the nearest naga in reach. Returns true on a hit.
+## Her boot knife, into the naga in reach she has already cut (finish what
+## she started), else the nearest. Returns true on a hit.
 func knife() -> bool:
 	var p := player()
 	if p == null or not running:
 		return false
 	var best: Creature = null
-	var best_d := KNIFE_REACH
+	var best_key := INF
 	for id: StringName in naga:
 		var c := naga[id] as Creature
-		if c and is_instance_valid(c) and c.alive and c.global_position.distance_to(p.global_position) <= best_d:
+		if c == null or not is_instance_valid(c) or not c.alive:
+			continue
+		var d := c.global_position.distance_to(p.global_position)
+		if d > KNIFE_REACH:
+			continue
+		# Health first, distance to break ties: the wounded one dies first.
+		var key := c.health * 10.0 + d
+		if key < best_key:
 			best = c
-			best_d = c.global_position.distance_to(p.global_position)
+			best_key = key
 	if best == null or _knife_cd > 0.0:
 		return false
 	_knife_cd = KNIFE_COOLDOWN
@@ -258,11 +268,11 @@ func _fight(delta: float) -> bool:
 	return false
 
 
-## Whether Tamlin comes now: only once she has fought back, then at her
-## second kill (not in the first seconds), her third strike, or holding on
-## after a kill, whichever is first.
+## Whether Tamlin comes now: only once she has killed one herself (canon:
+## she kills two), then at her second kill (not in the first seconds), her
+## third strike, or holding on after a kill, whichever is first.
 func tamlin_due() -> bool:
-	if not fought_back or tamlin_came:
+	if kills < 1 or tamlin_came:
 		return false
 	return (kills >= 2 and _t >= TAMLIN_EARLIEST) or strikes >= TAMLIN_STRIKES \
 			or _since_kill >= HOLD_SECONDS

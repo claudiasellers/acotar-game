@@ -244,7 +244,7 @@ func test_a_kill_then_holding_on_brings_tamlin() -> void:
 	assert_true(WorldState.has_flag("fact.naga_escaped"))
 
 
-func test_fighting_back_then_three_strikes_brings_tamlin() -> void:
+func test_strikes_bring_tamlin_only_after_her_first_kill() -> void:
 	var a := _ambush()
 	a.start()
 	_run(a, 2.0)
@@ -253,9 +253,32 @@ func test_fighting_back_then_three_strikes_brings_tamlin() -> void:
 	for i in NagaAmbush.TAMLIN_STRIKES:
 		a.strike()
 		_run(a, NagaAmbush.STRIKE_GRACE + 0.1)
-	assert_true(a.tamlin_came, "he comes at her third strike, even before 8 s")
+	assert_false(a.tamlin_came, "a wound is not a kill: she must kill one herself first")
+	EventBus.creature_killed.emit(&"naga", &"naga", &"knife", Vector3.ZERO)
+	_run(a, STEP * 2)
+	assert_true(a.tamlin_came, "after her first kill, three strikes bring him, even before 8 s")
 	assert_eq(a.falls, 0)
 	assert_true(WorldState.has_flag("fact.naga_escaped"))
+
+
+func test_the_knife_finishes_the_wounded_naga() -> void:
+	var a := _ambush()
+	a.start()
+	var near := NAGA.instantiate() as Naga
+	near.creature_id = &"naga_near"
+	root.add_child(near)
+	near.global_position = Vector3(1.5, 0, 0)
+	var cut := NAGA.instantiate() as Naga
+	cut.creature_id = &"naga_cut"
+	root.add_child(cut)
+	cut.global_position = Vector3(3.0, 0, 0)
+	cut.health -= NagaAmbush.KNIFE_DAMAGE
+	a.naga[&"naga_near"] = near
+	a.naga[&"naga_cut"] = cut
+	var before := near.health
+	assert_true(a.knife())
+	assert_lt(cut.health, 16.0 - NagaAmbush.KNIFE_DAMAGE, "the wounded one takes the blade")
+	assert_eq(near.health, before, "not the fresh one, though it is nearer")
 
 
 func test_running_or_never_fighting_back_is_still_lethal() -> void:
@@ -322,10 +345,8 @@ func test_tether_shot_frees_the_suriel_and_the_knife_kills() -> void:
 	assert_false(a.knife(), "one stab at a time")
 	assert_true(n.alive, "one stab wounds")
 	_run(a, 1.0)
-	a.knife()
-	_run(a, 1.0)
 	assert_true(a.knife())
-	assert_false(n.alive, "three stabs kill (16 health)")
+	assert_false(n.alive, "two stabs kill (16 health)")
 
 
 func test_the_glade_anchor_gets_both_spaces() -> void:

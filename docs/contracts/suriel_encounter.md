@@ -45,10 +45,15 @@ the place is sketched and named, with no celebration (horror beat).
 - The snare's quality decides the answers only, never the fight (F21): the
   same four naga open `SnarePlan.naga_distance(scouted)` away (11 m, 15 m if
   she scouted the stream), and attack the same way.
-- Tamlin comes only once she has fought back (`creature_hit` or a kill on a
-  naga by her): at her second kill (never before `TAMLIN_EARLIEST`, 8 s), her
+- Tamlin comes only once she has killed a naga herself (canon: she kills
+  two): at her second kill (never before `TAMLIN_EARLIEST`, 8 s), her
   third strike (`TAMLIN_STRIKES`), or 15 s after her first kill, whichever is
   first. Running off or never fighting back stays lethal: five strikes fell her.
+- Pressure: the first naga moves alone, the second `ATTACK_GAP` (4 s) later,
+  the rest join at a kill or every `JOIN_EVERY` s. Her knife goes into the
+  naga in reach she has already cut, so a fighter finishes one instead of
+  spreading wounds (16 health, 8 a stab: two stabs kill). After a blow lands
+  on her, the next can't for `STRIKE_GRACE` (1.8 s).
 
 ## Creature cues (story_actor_cue)
 - `suriel`: `stalk`, `snared`, `caught`, `naga_are_coming`, `freed`.
