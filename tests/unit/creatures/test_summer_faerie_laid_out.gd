@@ -42,3 +42,34 @@ func test_standing_death_still_falls() -> void:
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"dies")
 	await wait_seconds(0.3)
 	assert_gt((f.get_child(0) as Node3D).rotation.x, 0.5)
+
+
+func test_laid_out_plays_the_lying_clip_and_death_goes_limp() -> void:
+	var f := SummerFaerie.new()
+	f.death_time = 0.2
+	add_child_autofree(f)
+	var anim: AnimationPlayer = f.body.get(&"anim")
+	EventBus.story_actor_cue.emit(&"summer_faerie", &"laid_out")
+	assert_eq(anim.current_animation, "laid_out", "face down on the table, breathing")
+	EventBus.story_actor_cue.emit(&"summer_faerie", &"dies")
+	assert_eq(anim.current_animation, "laid_out_dead")
+
+
+func test_gold_veins_shimmer_while_he_lives() -> void:
+	var f := SummerFaerie.new()
+	add_child_autofree(f)
+	assert_not_null(f._vein_mat, "the vein overlay is gilded")
+	var peak := 0.0
+	for i in 40:
+		f._process(0.1)
+		peak = maxf(peak, f._vein_mat.emission_energy_multiplier)
+	assert_gt(peak, 0.6, "they flare as he trembles")
+
+
+func test_binding_goes_on_when_the_stumps_are_bound() -> void:
+	var f := SummerFaerie.new()
+	add_child_autofree(f)
+	var worn := f.body.get(&"worn") as Dictionary
+	assert_false(worn.has(SummerFaerie.BINDING))
+	EventBus.story_actor_cue.emit(&"summer_faerie", &"wounds_bound")
+	assert_true(worn.has(SummerFaerie.BINDING))

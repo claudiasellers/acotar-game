@@ -45,7 +45,9 @@ func test_puca_keeps_out_of_reach() -> void:
 func test_summer_faerie_dies_on_cue() -> void:
 	var f := SummerFaerie.new()
 	add_child_autofree(f)
-	assert_eq(f.find_children("WingStump*", "", true, false).size(), 2, "wings cut to stumps")
+	assert_true(f.body.has_method(&"play_locomotion"), "L02's cast model, not the placeholder")
+	assert_true((f.body.get(&"worn") as Dictionary).has(
+		"res://characters/summer_faerie/wardrobe/summer_faerie_wounds.glb"), "wings cut to stumps")
 	watch_signals(f)
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"dies")
 	assert_false(f.alive)

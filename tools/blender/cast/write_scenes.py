@@ -19,7 +19,7 @@ import bpy  # noqa: F401  (the cast modules import mathutils)
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, HERE)
-CAST = ("tamlin", "lucien", "nesta", "elain", "father", "alis")
+CAST = ("tamlin", "lucien", "nesta", "elain", "father", "alis", "summer_faerie")
 
 
 def col(hexstr, a=1.0):
