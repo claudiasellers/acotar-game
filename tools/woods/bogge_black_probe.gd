@@ -51,11 +51,13 @@ func _run() -> void:
 	# Dread preset candidates, applied to the live director.
 	var base: GradePreset = GradeDirector.load_preset(&"dread")
 	var variants := {
-		"fog_low": {"fog_height": -1.0},
-		"fog_low_grey": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44)},
-		"fog_low_grey_vol": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58)},
-		"fog_low_grey_vol_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "exposure": 0.30},
-		"fog_low_grey_exp30_hd05": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "exposure": 0.30, "fog_height_density": 0.05},
+		"vol012_exp19": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012},
+		"vol012_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30},
+		"vol020_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.020, "exposure": 0.30},
+		"vol012_exp30_vlight1": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30, "volumetric_light_energy": 1.0},
+		"vol012_exp30_amb12": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30, "ambient_energy": 1.2},
+		"vol012_exp40_amb12": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40, "ambient_energy": 1.2},
+		"novol_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.0, "exposure": 0.30},
 	}
 	for label: String in variants:
 		var p := base.duplicate() as GradePreset
