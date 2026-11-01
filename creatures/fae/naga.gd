@@ -2,12 +2,14 @@
 ## low in reeds and strike when prey comes close; story cue `attack` sends
 ## them at Feyre. Ordinary arrows and a knife kill them (canon); kills report
 ## kind `naga` with the actor id (naga, naga_2...) as creature_id.
+## Cues: attack, stagger (the freed Suriel bursts past: reel back, L26),
+## flee (Tamlin is here: back to the reeds, then gone).
 class_name Naga
 extends Creature
 
 signal struck_player(naga: Node3D)
 
-enum State { LURK, CHARGE, STRIKE, RECOVER }
+enum State { LURK, CHARGE, STRIKE, RECOVER, STAGGER, FLEE }
 
 @export var strike_reach: float = 1.7
 @export var strike_cooldown: float = 1.4
@@ -31,8 +33,32 @@ func _ready() -> void:
 
 
 func _on_cue(actor: StringName, cue: StringName) -> void:
-	if actor == creature_id and cue == &"attack":
-		attack()
+	if actor != creature_id:
+		return
+	match cue:
+		&"attack":
+			attack()
+		&"stagger":
+			stagger(2.5 if state != State.STRIKE and state != State.RECOVER else 1.2)
+		&"flee":
+			flee()
+
+
+## Reels back, hissing, then comes again.
+func stagger(seconds: float) -> void:
+	if not alive or state == State.FLEE:
+		return
+	state = State.STAGGER
+	_timer = seconds
+	_crouch(false)
+
+
+## Slides back toward the water and is gone.
+func flee() -> void:
+	if not alive:
+		return
+	state = State.FLEE
+	_timer = 6.0
 
 
 func attack() -> void:
@@ -65,6 +91,24 @@ func _think(delta: float) -> void:
 				_strike(player)
 				state = State.RECOVER
 				_timer = strike_cooldown
+		State.STAGGER:
+			if player:
+				move_direction = Creature.away_from(global_position, player.global_position)
+			move_speed = data.walk_speed
+			if model:
+				model.rotation.x = -0.35 + sin(_timer * 30.0) * 0.08
+			_timer -= delta
+			if _timer <= 0.0:
+				if model:
+					model.rotation.x = 0.0
+				state = State.CHARGE
+		State.FLEE:
+			if player:
+				move_direction = Creature.away_from(global_position, player.global_position)
+			move_speed = data.run_speed
+			_timer -= delta
+			if _timer <= 0.0:
+				queue_free()
 		State.RECOVER:
 			# Weave back a step, then come again.
 			if player:

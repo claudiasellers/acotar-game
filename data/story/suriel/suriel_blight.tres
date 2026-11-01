@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurielAnswer" format=3]
+
+[ext_resource type="Script" path="res://story/act3/suriel/suriel_answer.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_blight"
+order = 5
+asked = "What is the sickness in the magic? Where did it come from?"
+said = "It came over the sea, from Hybern. Its king hated the Treaty and sent his servants into every court. One of them, the one called the Deceiver, turned on him fifty years ago, and since then the sickness has spread."
+said_cut = "It came over the sea, from Hybern. Its king hated the Treaty and sent his servants into every court. One of them, the one called the Deceiver...\n\nWe are not alone."
+map_place = &"blighted_reaches"
+canon = "C"
