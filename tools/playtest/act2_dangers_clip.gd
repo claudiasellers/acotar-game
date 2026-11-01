@@ -1,7 +1,7 @@
 ## R17 proof clip for L25 (the Bogge and the puca), from the real game scene
 ## through Feyre's own camera. Needs a GPU (Mac shots, docs/contracts/shots.md):
 ##   shot dangers res://tools/playtest/act2_dangers_clip.tscn -- --out={out}/report.json
-## Writes {out}/bogge_####.jpg and {out}/puca_####.jpg at 10 fps (1280x720,
+## Writes {out}/bogge_####.jpg and {out}/puca_####.jpg at 5 fps (1280x720,
 ## from a 1920x1080 render) plus the playtest-style report.json.
 ##
 ## The clip only exists to be looked at, so it jumps ahead: it raises the
@@ -14,7 +14,7 @@
 ##          Tamlin; look again until it darts.
 extends "res://tools/playtest/act1_playtest.gd"
 
-const FPS := 10.0
+const FPS := 5.0
 const SAVE_SIZE := Vector2i(1280, 720)
 ## Deeds before the Bogge (dev jump, pictures only).
 const JUMP := ["wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_crossed",
@@ -68,8 +68,16 @@ func _play() -> void:
 	if not await _jump_near(&"bogge_hunt_path", hunt + Vector3(0, 0, 30).rotated(Vector3.UP, atan2(-(BorderWoodsTerrain.BOGGE_HUNT_LOOK.x - hunt.x), -(BorderWoodsTerrain.BOGGE_HUNT_LOOK.y - hunt.z)))):
 		return _fail("no bogge_hunt_path anchor after the jump")
 	_pass()
-	await _bogge_clip()
-	await _puca_clip()
+	# One scene per Godot run keeps each answer under the 200-file cap:
+	# --only=bogge or --only=puca (both when absent).
+	var only := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--only="):
+			only = arg.trim_prefix("--only=")
+	if only != "puca":
+		await _bogge_clip()
+	if only != "bogge":
+		await _puca_clip()
 
 
 ## Puts her well short of an anchor and waits for the region to stream in.

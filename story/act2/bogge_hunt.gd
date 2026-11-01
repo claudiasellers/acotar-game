@@ -206,7 +206,7 @@ func _update_elm(delta: float) -> void:
 	var on_elm := view_angle_to(mark(&"elm") + Vector3.UP * 3.0) <= 12.0
 	_elm_hold = _elm_hold + delta if on_elm else 0.0
 	if _elm_light:
-		_elm_light.light_energy = move_toward(_elm_light.light_energy, 2.2 if on_elm else 0.6, delta * 2.0)
+		_elm_light.light_energy = move_toward(_elm_light.light_energy, 5.0 if on_elm else 2.0, delta * 3.0)
 	if _elm_hold >= 3.0 and _thought_index < THOUGHTS.size():
 		_elm_hold = 0.0
 		var id := THOUGHTS[_thought_index]
@@ -301,7 +301,9 @@ func _ensure_fog() -> void:
 	_fog.size = Vector3(36.0, 8.0, 36.0)
 	_fog.shape = RenderingServer.FOG_VOLUME_SHAPE_ELLIPSOID
 	var mat := FogMaterial.new()
-	mat.albedo = Color(0.16, 0.17, 0.19)
+	# Pale, cold mist: it swallows the wood but stays light enough that the
+	# thing in it reads as a darker shape (its own fog is near-black).
+	mat.albedo = Color(0.62, 0.66, 0.70)
 	mat.density = fog_density()
 	mat.edge_fade = 0.6
 	_fog.material = mat
@@ -320,7 +322,7 @@ func _elm_marker() -> Node3D:
 	elm.global_position = mark(&"elm") + Vector3.UP * 3.0
 	_elm_light = OmniLight3D.new()
 	_elm_light.light_color = Color(1.0, 0.82, 0.62)
-	_elm_light.light_energy = 0.6
-	_elm_light.omni_range = 7.0
+	_elm_light.light_energy = 2.0
+	_elm_light.omni_range = 12.0
 	elm.add_child(_elm_light)
 	return elm
