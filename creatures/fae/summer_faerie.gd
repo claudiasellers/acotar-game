@@ -3,7 +3,8 @@
 ## hair, glossy black eyes, his wings cut off to black stumps that bleed down
 ## his back. "She took my wings." Tamlin's magic cannot stop it, and he dies.
 ##
-## Cue: dies. Placeholder body until the user's pass (R4).
+## Cues: laid_out (story has laid him on the table; the actor root carries the
+## pose), dies. Placeholder body until the user's pass (R4).
 class_name SummerFaerie
 extends StoryActor
 
@@ -12,6 +13,9 @@ signal died
 @export var death_time: float = 3.0
 
 var alive: bool = true
+## Story has laid him out (face down on the hall table, the root carrying the
+## pose): his death then goes slack where he lies, with no turn of the body.
+var laid_out: bool = false
 
 var _figure: Node3D
 var _t: float = 0.0
@@ -46,7 +50,9 @@ func _ready() -> void:
 
 
 func play_cue(cue: StringName) -> void:
-	if cue == &"dies":
+	if cue == &"laid_out":
+		laid_out = true
+	elif cue == &"dies":
 		die()
 
 
@@ -55,13 +61,29 @@ func die() -> void:
 		return
 	alive = false
 	died.emit()
+	if laid_out:
+		_go_slack()
+		return
 	if not is_inside_tree():
 		_figure.rotation.x = PI * 0.5
 		return
-	# Already laid out on the table: the last breath leaves and he goes slack.
 	var tween := create_tween().set_trans(Tween.TRANS_SINE)
 	tween.tween_property(_figure, ^"rotation:x", PI * 0.5, death_time * 0.3)
 	tween.tween_property(_figure, ^"scale", Vector3(1.0, 0.97, 1.0), death_time * 0.7)
+
+
+## Where he lies: one last long breath out, the chest settles a little flatter
+## and he sinks a touch onto the table (his front, -Z, is down when laid face
+## down). No turn of the body.
+func _go_slack() -> void:
+	var rest := _figure.position
+	if not is_inside_tree():
+		_figure.scale = Vector3(0.985, 1.0, 0.985)
+		return
+	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_figure, ^"scale", Vector3(1.02, 1.0, 1.02), death_time * 0.15)
+	tween.tween_property(_figure, ^"scale", Vector3(0.985, 1.0, 0.985), death_time * 0.85)
+	tween.parallel().tween_property(_figure, ^"position", rest + Vector3(0.0, 0.0, -0.015), death_time * 0.85)
 
 
 func _process(delta: float) -> void:
