@@ -94,7 +94,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 const PROP_DRAW := 45.0
 
 static func _merge_meshes(house: Node3D, all: ManorHouseIndex) -> void:
-	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, ActionTrigger]
+	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, LarderPickup, ActionTrigger]
 	for room in all.rooms:
 		var node := house.get_node_or_null(NodePath(String(room.id))) as Node3D
 		if node == null:
@@ -408,6 +408,12 @@ static func _build_secret(house: Node3D, def: ManorSecretDef) -> void:
 			k.position = at
 			house.add_child(k)
 			k.add_child(PropLib.build(def.prop_id if def.prop_id != &"" else &"keepsake_glint"))
+		&"larder":
+			var l := LarderPickup.new()
+			l.name = "Larder_%s" % def.secret_id
+			l.item_id = def.item_id
+			l.position = at
+			house.add_child(l)
 		&"discovery":
 			var t := ActionTrigger.new()
 			t.name = "Discovery_%s" % def.secret_id

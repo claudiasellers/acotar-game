@@ -3,6 +3,7 @@
 ## kind "lever": using it raises fact.manor.secret_<secret_id>, which opens every
 ## ManorDoorDef with that secret_id. kind "keepsake": a hidden collectible
 ## (item_id col_... or ing_...). kind "discovery": walking in raises the flag.
+## kind "larder": a LarderPickup that gives item_id once a day (not a secret).
 class_name ManorSecretDef
 extends Resource
 

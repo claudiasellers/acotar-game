@@ -425,3 +425,6 @@ func _secrets() -> void:
 		"Under a loose floorboard: a little wooden bird one of Alis's nephews carved.")
 	dsl.secret(&"pantry_honey", &"keepsake", 0, Vector3(63.4, 2.0, -44.5), &"col_honeycomb_charm", &"",
 		"Tucked on the top pantry shelf: a honeycomb charm left for the house brownie.")
+	# Canon: the Suriel's bait is a dead chicken from the kitchen. One a day on the table.
+	dsl.secret(&"kitchen_chicken", &"larder", 0, Vector3(51.0, 0.92, -60.0), &"ing_dead_chicken", &"",
+		"A plucked chicken on the kitchen table, waiting for the range; nobody minds if it goes.")
