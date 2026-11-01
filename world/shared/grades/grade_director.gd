@@ -144,6 +144,10 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 		return p
 	if kind == &"enchanted_sleep":
 		return _sleepy(p, dread)
+	# A grade that already is the horror look takes less (or none) of it.
+	dread *= p.dread_headroom
+	if dread <= 0.0:
+		return p
 	# §1.5: the pink world leaves. Blend toward the dread preset (horror
 	# palette, ~2 stops down, saturation 0.4, dense low fog, no magic, no
 	# lilac shadows); snow stays where it lies.

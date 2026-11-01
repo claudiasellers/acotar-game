@@ -118,3 +118,15 @@ func test_moderate_dread_bites_indoors() -> void:
 	var dark_floor := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
 	assert_lt(dark_floor, calm_floor * 0.25, "ambient fill at least two stops down")
 	assert_lt(dark.saturation, calm.saturation * 0.6, "the pink world leaves")
+
+
+func test_the_bogge_grade_takes_no_more_dread() -> void:
+	# The Bogge grade is already the horror look; the woods' dread on top of
+	# it went two stops further and the heart rendered pure black (L04-11).
+	var bogge := GradeDirector.load_preset(&"bogge")
+	var moody := GradeDirector.with_mood(bogge, 1.0)
+	assert_almost_eq(moody.exposure, bogge.exposure, 0.0001)
+	assert_almost_eq(moody.fog_height_density, bogge.fog_height_density, 0.0001)
+	var spring := GradeDirector.load_preset(&"spring")
+	assert_lt(GradeDirector.with_mood(spring, 1.0).exposure, spring.exposure * 0.5,
+		"other grades still take the full dread")
