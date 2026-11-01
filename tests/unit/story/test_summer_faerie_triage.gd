@@ -374,3 +374,13 @@ func test_bowl_linen_and_rag_sit_past_his_feet() -> void:
 	assert_lt(absf(rag.position.z) + 0.05, TriageProps.TABLE_SIZE.z * 0.5 + 0.001)
 	rag.free()
 	s.free()
+
+
+func test_table_slick_stays_on_the_table() -> void:
+	var pool := TriageProps.pool()
+	TriageProps.set_pool(pool, 100.0)
+	var slick := pool.get_node(^"TableSlick") as Node3D
+	var half := TriageProps.TABLE_SIZE * 0.5
+	assert_lt(absf(slick.position.x) + slick.scale.x, half.x + 0.001, "no overhang at the ends")
+	assert_lt(absf(slick.position.z) + slick.scale.z, half.z + 0.001, "or the sides")
+	pool.free()

@@ -247,8 +247,10 @@ static func set_pool(pool_node: Node3D, lost: float) -> void:
 	var slick := pool_node.get_node_or_null(^"TableSlick") as Node3D
 	if slick:
 		# Already soaked when he's laid down; spreads to the table's edges.
+		# Long along him, never past the table's head end (it would hang in air).
 		var r := clampf(0.3 + 1.6 * sqrt(f), 0.3, 0.48)
-		slick.scale = Vector3(r * 2.2, 1.0, r)
+		var reach := TABLE_SIZE.x * 0.5 - absf(slick.position.x) - 0.02
+		slick.scale = Vector3(minf(r * 2.2, reach), 1.0, r)
 		slick.visible = lost > 0.2
 	var floor_pool := pool_node.get_node_or_null(^"FloorPool") as Node3D
 	if floor_pool:
