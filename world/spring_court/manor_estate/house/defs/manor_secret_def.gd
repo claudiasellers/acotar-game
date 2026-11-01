@@ -16,3 +16,5 @@ extends Resource
 ## Look of the lever or hiding place (PropLib id). Empty = small, subtle default.
 @export var prop_id: StringName
 @export_multiline var notes: String
+## kind "larder": stocked only once this WorldState flag is set ("" = always).
+@export var required_flag: String = ""

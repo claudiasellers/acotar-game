@@ -430,7 +430,8 @@ func _secrets() -> void:
 		"A plucked chicken on the kitchen table, waiting for the range; nobody minds if it goes.")
 	# L29 (ch17): the infirmary's bandage shelves keep wound herbs, restocked each day,
 	# for the night Tamlin carries the Summer faerie into the hall (canon "X").
+	# Stocked from naga_survived on, so they can't be taken during the wound dressing (L28) a scene early.
 	dsl.secret(&"infirmary_honey", &"larder", 0, Vector3(66.0, 1.1, -40.4), &"ing_honey", &"",
-		"A crock of wound honey on the bandage shelf; Alis keeps it filled.")
+		"A crock of wound honey on the bandage shelf; Alis keeps it filled.").required_flag = "naga_survived"
 	dsl.secret(&"infirmary_willow_bark", &"larder", 0, Vector3(72.0, 1.1, -40.4), &"ing_willow_bark", &"",
-		"A bundle of willow bark strips on the bandage shelf, for binding and the bleeding.")
+		"A bundle of willow bark strips on the bandage shelf, for binding and the bleeding.").required_flag = "naga_survived"

@@ -3079,6 +3079,7 @@ kind = &"larder"
 position = Vector3(66, 1.1, -40.4)
 item_id = &"ing_honey"
 notes = "A crock of wound honey on the bandage shelf; Alis keeps it filled."
+required_flag = "naga_survived"
 
 [sub_resource type="Resource" id="Resource_48dp5"]
 script = ExtResource("7_8w3jn")
@@ -3087,6 +3088,7 @@ kind = &"larder"
 position = Vector3(72, 1.1, -40.4)
 item_id = &"ing_willow_bark"
 notes = "A bundle of willow bark strips on the bandage shelf, for binding and the bleeding."
+required_flag = "naga_survived"
 
 [sub_resource type="Resource" id="Resource_0y7wq"]
 script = ExtResource("8_c4mby")

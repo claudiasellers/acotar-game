@@ -415,6 +415,7 @@ static func _build_secret(house: Node3D, def: ManorSecretDef) -> void:
 			var l := LarderPickup.new()
 			l.name = "Larder_%s" % def.secret_id
 			l.item_id = def.item_id
+			l.required_flag = def.required_flag
 			l.position = at
 			house.add_child(l)
 		&"discovery":

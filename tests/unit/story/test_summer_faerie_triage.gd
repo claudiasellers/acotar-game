@@ -295,3 +295,27 @@ func test_e_beside_the_wounds_never_takes_his_hand() -> void:
 		var at := t.to_global(Vector3(x, 0, -1.15))
 		assert_eq(t.target_at(at), SummerFaerieTriage.Target.WOUNDS, "at x %.2f (the Mac walker stopped 0.3 m off)" % x)
 	assert_eq(t.target_at(t.to_global(Vector3(-1.4, 0, -1.05))), SummerFaerieTriage.Target.HAND)
+
+
+func test_the_infirmary_herbs_cant_be_taken_during_the_wound_dressing() -> void:
+	var defs := load("res://data/regions/spring_court/manor_estate/house/service.tres")
+	var shelves: Array[LarderPickup] = []
+	for d in defs.get(&"secrets"):
+		if d.kind == &"larder" and String(d.secret_id).begins_with("infirmary_"):
+			assert_eq(d.required_flag, "naga_survived", "%s waits for the faerie's night" % d.secret_id)
+			var l := LarderPickup.new()
+			l.item_id = d.item_id
+			l.required_flag = d.required_flag
+			root.add_child(l)
+			shelves.append(l)
+	assert_eq(shelves.size(), 2)
+	WorldState.set_flag("puca_resisted")  # wound_dressing (L28) is open, the naga still ahead
+	for l in shelves:
+		l._refresh()
+		assert_false(l.stocked() or l.visible or l.is_in_group(LarderPickup.GROUP), "no herbs on the shelf yet")
+		assert_eq(l.harvest(), &"", "E takes nothing")
+	WorldState.set_flag("naga_survived")
+	for l in shelves:
+		l._refresh()
+		assert_true(l.visible and l.is_in_group(LarderPickup.GROUP), "the night the faerie comes, they're there")
+		assert_ne(l.harvest(), &"")
