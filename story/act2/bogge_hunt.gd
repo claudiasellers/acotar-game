@@ -51,6 +51,9 @@ var _following: bool = false
 
 func _ready() -> void:
 	super._ready()
+	# A day hunt (ch9-10). Arriving at dusk brings the morning to her; at
+	# night the bogge grade and the dread take the wood to black.
+	day_only = true
 	if arrive_radius <= 0.0:
 		arrive_radius = 8.0
 
@@ -121,7 +124,7 @@ func _freeze() -> void:
 	note_mood()
 	StoryControl.shake = 0.08
 	# Dread, but not black: she has to see the wood to keep her eyes on the elm.
-	EventBus.mood_requested.emit(&"dread", 0.55, 2.5)
+	EventBus.mood_requested.emit(&"dread", 0.45, 2.5)
 	EventBus.grade_swap_requested.emit(&"bogge", 4.0)
 	# Her eyes go to the elm at first; after that, holding them there is hers.
 	StoryControl.set_focus(_elm_marker())
