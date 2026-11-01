@@ -25,11 +25,11 @@ glow_intensity = 0.2
 glow_bloom = 0.0
 snow_cover = 0.0
 magic = 0.0
-# Already the horror grade: the woods' dread mood would stack two stops
-# more on top and turn the Bogge heart black.
+; Already the horror grade: the woods dread mood would stack two stops
+; more on top and turn the Bogge heart black.
 dread_headroom = 0.0
-# Dread through fog and desaturation, not darkness: low pooled fog
-# hides the wood beyond ~60 m while the near ground and the Bogge read.
+; Dread through fog and desaturation, not darkness: low pooled fog
+; hides the wood beyond ~60 m while the near ground and the Bogge read.
 fog_sky_affect = 0.6
 fog_height = -1.0
 fog_height_density = 0.07
