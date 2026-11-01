@@ -6,8 +6,17 @@
 ##
 ## Only meshes no bigger than MAX_SIZE fade (never a room shell, terrain or a
 ## scatter field) and never Feyre herself. Purely presentational.
+##
+## With no rendering device (headless: tests, world_smoke, the gate) it does
+## nothing at all, unless a test sets `headless_opt_in` before Feyre enters the
+## tree; then it looks only at meshes in PROBE_GROUP, never a tree walk.
 class_name CameraFade
 extends Node
+
+## Tests set this (and clear it after) to run the fade headless.
+static var headless_opt_in := false
+## Headless opt-in only: the meshes a test offers as candidates.
+const PROBE_GROUP := &"camera_fade_probe"
 
 const RADIUS := 0.5
 ## Largest mesh (longest world AABB side, m) that may fade.
@@ -23,6 +32,12 @@ var _owner_root: Node
 
 func _ready() -> void:
 	_owner_root = get_parent()
+	if _headless() and not headless_opt_in:
+		set_process(false)
+
+
+static func _headless() -> bool:
+	return DisplayServer.get_name() == "headless"
 
 
 func _process(delta: float) -> void:
@@ -70,14 +85,16 @@ func near_meshes(at: Vector3) -> Array[GeometryInstance3D]:
 
 func _candidates(at: Vector3) -> Array[GeometryInstance3D]:
 	var out: Array[GeometryInstance3D] = []
-	var world := get_viewport().world_3d
-	if DisplayServer.get_name() != "headless":
-		for id in RenderingServer.instances_cull_aabb(AABB(at - Vector3.ONE * RADIUS, Vector3.ONE * RADIUS * 2.0), world.scenario):
-			var g := instance_from_id(id) as GeometryInstance3D
-			if g:
-				out.append(g)
+	if _headless():
+		# The rendering server keeps no spatial index headless; tests name their meshes.
+		for n in get_tree().get_nodes_in_group(PROBE_GROUP):
+			if n is GeometryInstance3D:
+				out.append(n as GeometryInstance3D)
 		return out
-	# Headless (tests): the rendering server keeps no spatial index, so walk the tree.
-	for n in get_tree().root.find_children("*", "GeometryInstance3D", true, false):
-		out.append(n as GeometryInstance3D)
+	# The scenario's BVH: a 1 m box query, a handful of hits.
+	var box := AABB(at - Vector3.ONE * RADIUS, Vector3.ONE * RADIUS * 2.0)
+	for id in RenderingServer.instances_cull_aabb(box, get_viewport().world_3d.scenario):
+		var g := instance_from_id(id) as GeometryInstance3D
+		if g:
+			out.append(g)
 	return out
