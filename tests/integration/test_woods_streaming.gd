@@ -56,9 +56,10 @@ func test_frame_budget_defers_a_job_that_will_not_fit() -> void:
 	FrameBudget.job_max[&"_test_slow"] = FrameBudget.BUDGET_USEC
 	var ran: Array[String] = []
 	var queue: Array[Callable] = [_test_fast.bind(ran), _test_slow.bind(ran)]
-	await wait_frames(1)
+	# Process frames: the budget rolls on them, and one can hold several physics ticks.
+	await wait_process_frames(1)
 	assert_eq(FrameBudget.run(queue), 1, "the slow job waits for a fresh frame")
-	await wait_frames(1)
+	await wait_process_frames(1)
 	assert_eq(FrameBudget.run(queue), 0)
 	assert_eq(ran, ["fast", "slow"])
 	assert_eq(FrameBudget.late_starts, 0)
@@ -121,6 +122,9 @@ func test_ground_cover_survives_unloading_mid_build() -> void:
 	# And the whole region unloads while a worker is still generating.
 	var other := key + Vector2i(1, 0)
 	cover._pending[other] = WorkerThreadPool.add_task(cover._generate.bind(other))
+	# Leaving the tree joins the worker: free() alone refuses an object a thread
+	# is inside. The game's queue_free() joins the same way.
+	remove_child(cover)
 	cover.free()
 	assert_engine_error_count(0, "no errors from work outliving its cell or region")
 
