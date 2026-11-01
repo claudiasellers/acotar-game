@@ -65,3 +65,18 @@ func test_find_region_defs_walks_the_whole_tree() -> void:
 		ids.append(String(region.id))
 	assert_has(ids, "cottage", "human realm RegionDefs are found one folder down")
 	assert_eq(WorldStreamer.find_region_defs("res://no/such/dir").size(), 0)
+
+
+func test_threaded_loads_hold_neighbors_until_the_current_region_lands() -> void:
+	WorldStreamer.synchronous = false
+	var feyre := Node3D.new()
+	add_child_autofree(feyre)
+	feyre.position = Vector3(10, 0, 10)
+	WorldStreamer.update_for(feyre.position)
+	assert_eq(WorldStreamer._pending.keys(), ["a"], "only her region is requested")
+	WorldStreamer.track(feyre)
+	await wait_until(func() -> bool: return WorldStreamer.is_loaded(&"a"), 10.0)
+	assert_false(WorldStreamer.is_loaded(&"b"), "the neighbor waited")
+	await wait_until(func() -> bool: return WorldStreamer.is_loaded(&"b"), 10.0)
+	assert_true(WorldStreamer.is_loaded(&"b"), "then the neighbor follows")
+	WorldStreamer.track(null)
