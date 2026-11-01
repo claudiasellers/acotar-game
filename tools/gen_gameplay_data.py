@@ -232,7 +232,6 @@ C = [
 	("col_bone_bleached", "Bleached bone", [BLIGHT, FELLS], "Small, white, unsettling.", "eae5d8", "uncommon"),
 	("col_pinecone", "Pinecone", [W, FELLS], "Perfectly whole.", "6b4b2a", "common"),
 	("col_old_arrowhead", "Old arrowhead", [WOODS, MARCH], "Iron, rusted, from some hunt long ago.", "6d5a4a", "uncommon"),
-	("col_mask_ribbon", "Mask ribbon", [WOODS, HAM, CAL], "A silk tie from someone's mask.", "c89ad8", "uncommon"),
 	("col_river_glass", "River glass", [LAKES, WOODS], "Frosted green glass, smooth as soap.", "9fd8c0", "common"),
 	("col_bone_charm", "Bone charm", [WOODS, SHRINE], "A carved knot of bone on a thong.", "e8e0cc", "rare"),
 	("col_snow_owl_down", "Owl down", [W, WALLH], "A wisp of white down caught on bark.", "f5f2ea", "common"),

@@ -46,3 +46,11 @@ func test_wardrobe_variety() -> void:
 	assert_gte(WardrobeCatalog.all_hair().size(), 8)
 	for m in WardrobeCatalog.all_makeup():
 		assert_true(MakeupData.CHANNELS.has(m.channel), "%s channel" % m.id)
+
+
+func test_no_mask_ribbons_to_find() -> void:
+	# Keeper canon: the court's masks are fused to their faces; nobody drops a ribbon.
+	assert_null(ItemCatalog.get_item(&"col_mask_ribbon"))
+	for f in DirAccess.get_files_at("res://data/regions/spring_court"):
+		if f.ends_with("_biomes.tres"):
+			assert_false(FileAccess.get_file_as_string("res://data/regions/spring_court/" + f).contains("mask_ribbon"), f)

@@ -34,7 +34,7 @@ const DRIFT_SIZE := Vector2i(5, 30)
 ## Finds that lie alone or in pairs rather than in drifts.
 const LONE_VISUALS := [&"feather_hawk", &"feather_owl", &"feather_jay", &"snail_shell", &"shed_antler",
 		&"egg_shell", &"wild_hive", &"trout_pool", &"odd_stone", &"painted_pebble", &"river_glass",
-		&"old_arrowhead", &"mask_ribbon", &"bone_charm", &"rusted_iron", &"acorn_caps", &"silt_patch"]
+		&"old_arrowhead", &"bone_charm", &"rusted_iron", &"acorn_caps", &"silt_patch"]
 
 
 ## Every scatter layer for a region (trees, shrubs, forage), sorted by id.
