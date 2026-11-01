@@ -226,6 +226,13 @@ static func soften_control(raw: PackedInt32Array, e: int, margin: int, corner: V
 	return out
 
 
+## One unsoftened control pixel, encoded (ui/map/map_art.gd paints the map
+## from this).
+static func _control_at(x: float, z: float, heights: PackedFloat32Array, res: int, row: int, col: int, step: float) -> float:
+	var t := _raw_control_at(x, z, heights, res, row, col, step)
+	return encode_control(t.x, t.y, t.z)
+
+
 static func _raw_control_at(x: float, z: float, heights: PackedFloat32Array, res: int, row: int, col: int, step: float) -> Vector3i:
 	# Lane texture rules win where a provider has one.
 	for p in WorldHeight.providers():
