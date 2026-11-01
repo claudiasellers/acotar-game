@@ -56,12 +56,11 @@ func _run() -> void:
 	var a0 := bm.albedo
 	# [bogge fog density, albedo, dread overrides]
 	var variants := {
-		"bogfog_off": [0.0, a0, {}],
-		"bogfog_020_a50": [0.02, Color(0.5, 0.51, 0.52), {}],
-		"bogfog_020_a50_dreadfix": [0.02, Color(0.5, 0.51, 0.52), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
-		"bogfog_030_a55_dreadfix": [0.03, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
-		"bogfog_015_a50_dreadfix": [0.015, Color(0.5, 0.51, 0.52), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
-		"bogfog_off_dreadfix": [0.0, a0, {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bf006_e30": [0.006, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bf010_e30": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bf006_e40": [0.006, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
+		"bf010_e40": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
+		"bf000_e40": [0.0, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
 	}
 	for label: String in variants:
 		var v: Array = variants[label]
