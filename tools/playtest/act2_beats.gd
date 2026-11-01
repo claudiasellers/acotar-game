@@ -44,6 +44,14 @@ func _arrival() -> bool:
 	t._begin("act2_arrival", "walk up to the front door; follow the beast to the table; he becomes Tamlin; fact.manor_arrived")
 	var arrival := _space("ManorArrival") as ManorArrival
 	if arrival == null:
+		# The ride can now land before the house has streamed in (F16): stand
+		# on the drive and wait for it, as a player would, and log the wait.
+		var t0: float = t._sim_seconds()
+		await t._until(func() -> bool: return _space("ManorArrival") != null, 180.0)
+		arrival = _space("ManorArrival") as ManorArrival
+		if arrival:
+			t._note("waited %.0f s on the drive for the house to stream in" % [t._sim_seconds() - t0])
+	if arrival == null:
 		return _fail("no ManorArrival under manor_dining_table (is manor_house loaded? region %s)" % t._region())
 	var door := arrival.mark(&"front_door")
 	await t._walk_to(door + Vector3(0, 0, 4), 2.0, func() -> bool: return arrival.running, 600.0)
