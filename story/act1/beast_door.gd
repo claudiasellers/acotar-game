@@ -10,6 +10,8 @@ class_name BeastDoor
 extends SceneSpace
 
 const GROUP := &"beast_door"
+## Where he waits, outside the door, before it breaks.
+const OUTSIDE := 3.0
 
 @export var decision_seconds: float = 6.0
 
@@ -99,8 +101,16 @@ func _break_door(_space: SceneSpace) -> void:
 			if StringName(anchor.get_meta(&"anchor_id", anchor.name)) == &"act1_cottage_door":
 				door = anchor
 				break
+	# He comes from outside: a few metres beyond the door (its +Z), facing in,
+	# and the break carries him through it into the room (BeastActor.enter_depth).
 	var where := door.global_transform if door else global_transform
+	if door:
+		where.origin += door.global_basis.z * OUTSIDE
 	beast = request_actor(&"tamlin_beast", where, StandIns.beast)
+	if beast is BeastActor and door:
+		# The latch on the door anchor swings the real leaf (break_open).
+		var latch := door.get_node_or_null(^"CottageDoorLatch") as Node3D
+		(beast as BeastActor).door = latch if latch else door
 	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
 	WorldDeltas.set_region_value(&"cottage", "door", "broken")
 

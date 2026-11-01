@@ -19,6 +19,8 @@ const HINGE := Vector3(-0.474, 0.0, -0.06)
 
 var leaf: Node3D
 var is_open: bool = false
+## Once the beast breaks it the latch lets go (the broken door shows instead).
+var broken: bool = false
 var _closed_xform: Transform3D
 var _far_for: float = 0.0
 var _tween: Tween
@@ -38,7 +40,7 @@ static func find_leaf(anchor: Node) -> Node3D:
 
 
 func _physics_process(delta: float) -> void:
-	if leaf == null or not is_instance_valid(leaf):
+	if leaf == null or not is_instance_valid(leaf) or broken:
 		return
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	var beast_here := false
@@ -58,10 +60,21 @@ func _physics_process(delta: float) -> void:
 			set_open(false)
 
 
+## BeastActor.break_door: the leaf flies in on its hinge and stays.
+func break_open() -> void:
+	broken = true
+	is_open = false
+	_swing(true, 0.2)
+
+
 func set_open(open: bool) -> void:
 	if open == is_open or leaf == null:
 		return
 	is_open = open
+	_swing(open, SWING_SECONDS)
+
+
+func _swing(open: bool, seconds: float) -> void:
 	var target := _closed_xform
 	if open:
 		var pivot := _closed_xform * HINGE
@@ -70,4 +83,4 @@ func set_open(open: bool) -> void:
 	if _tween and _tween.is_valid():
 		_tween.kill()
 	_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(leaf, ^"transform", target, SWING_SECONDS)
+	_tween.tween_property(leaf, ^"transform", target, seconds)
