@@ -1,0 +1,5 @@
+from grade-fixes lane
+quality look
+shot ride res://tools/creatures/ride_north_film_shot.tscn {out}
+shot bogge res://tools/world_shot.tscn eastern_bogge {out}/eastern_bogge.png
+shot bogge_dusk res://tools/world_shot.tscn eastern_bogge_dusk {out}/eastern_bogge_dusk.png
