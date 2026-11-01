@@ -1,0 +1,4 @@
+from lane/camera-fade-perf
+quality layout
+timeout 300
+shot bench res://tools/camera_fade_bench.tscn {out}
