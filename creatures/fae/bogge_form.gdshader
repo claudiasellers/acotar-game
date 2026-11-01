@@ -10,7 +10,7 @@ uniform vec4 albedo : source_color = vec4(0.03, 0.028, 0.026, 1.0);
 uniform float roughness : hint_range(0.0, 1.0) = 0.6;
 uniform bool is_eye = false;
 uniform vec3 eye_color : source_color = vec3(0.86, 0.9, 0.62);
-uniform float eye_energy = 5.0;
+uniform float eye_energy = 1.4;
 // Size of the shadow fragments it forms from, in metres.
 uniform float grain = 0.35;
 
@@ -45,16 +45,21 @@ void fragment() {
 	float c = reveal * 1.35 - core;
 	float edge = c - n;
 	if (is_eye) {
-		float on = clamp(reveal * 1.6 - 0.2, 0.0, 1.0);
+		// Only once it is nearly real: on a glance there are no eyes yet, and
+		// even then they are a dull wet glint, not lamps (Mac shot L27-1 bloomed).
+		float on = clamp(reveal * 2.5 - 1.5, 0.0, 1.0);
 		ALBEDO = eye_color;
 		EMISSION = eye_color * eye_energy * on;
 		ALPHA = on;
 	} else {
 		ALBEDO = albedo.rgb * mix(0.25, 1.0, smoothstep(0.0, 0.25, edge));
 		ROUGHNESS = roughness;
-		METALLIC = 0.3;
-		RIM = 0.9 * reveal;
-		RIM_TINT = 0.2;
+		METALLIC = 0.0;
+		SPECULAR = 0.2;
+		// A thin cold rim so the silhouette registers against the dark,
+		// never a sheen that reads as pale fur.
+		RIM = 0.35 * reveal;
+		RIM_TINT = 0.6;
 		// Unformed: a barely darker patch. Forming: ragged, smoky edges.
 		ALPHA = edge > 0.0 ? mix(0.55, 0.97, smoothstep(0.0, 0.2, edge)) : 0.04 * (1.0 - smoothstep(-0.3, 0.0, edge)) + 0.04;
 	}
