@@ -16,6 +16,11 @@ extends SceneSpace
 
 ## Actor id -> Node3D, for every actor this scene has asked for.
 var actors: Dictionary = {}
+## With > 0, arriving also needs Feyre within this many metres in height
+## (rooms stack: the bedroom is over the gallery).
+@export var arrive_height: float = 2.5
+## Tests set this: fades and time shifts happen at once (no tweens to wait on).
+var instant_fades: bool = false
 ## E presses while the scene runs (input, or press_interact() in tests).
 var _presses: int = 0
 ## Movement presses while the scene runs (input, or nudge() in tests).
@@ -61,6 +66,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		for action: StringName in [&"move_forward", &"move_back", &"move_left", &"move_right"]:
 			if event.is_action_pressed(action):
 				_nudges += 1
+
+
+func _player_here() -> bool:
+	if not super._player_here():
+		return false
+	if player_present or arrive_height <= 0.0:
+		return true
+	var p := player()
+	return p != null and absf(p.global_position.y - (global_transform * arrive_offset).y) <= arrive_height
 
 
 func press_interact() -> void:
@@ -139,6 +153,110 @@ func delight(kind: StringName, at_mark: StringName = &"", target: Node3D = null)
 	if not is_inside_tree():
 		return
 	Juice.burst(target, kind, mark(at_mark) if target == null else Vector3.ZERO)
+
+
+## A line that doesn't hold the scene up (thoughts while she acts).
+func aside(line_id: StringName) -> void:
+	var spoken: Dictionary = stage.line(line_id) if stage else {}
+	if spoken.is_empty() or not is_inside_tree():
+		return
+	Act2Caption.find_or_make(self).say(String(spoken.get("who", "")), String(spoken.get("text", "")))
+
+
+## Beats: fade to dark, move the Clock to `to` (fraction of the day), run
+## `then` in the dark (move Feyre, change her clothes), fade back, go on.
+func fade_time(to: float, then: Callable = Callable(), label: String = "fade") -> Array:
+	var done := [false]
+	return [
+		Beats.run(func(_s: SceneSpace) -> void:
+			done[0] = false
+			var finish := func() -> void:
+				if then.is_valid():
+					then.call()
+				done[0] = true
+			if instant_fades or not is_inside_tree():
+				TimeShift.advance_to(to)
+				finish.call()
+			else:
+				TimeShift.fade_to(self, to, finish), label),
+		Beats.until(func() -> bool: return done[0], "until %s ends" % label),
+	]
+
+
+## Moves Feyre to a world point (on her feet, stopped).
+func place_feyre(at: Vector3) -> void:
+	var p := player()
+	if p == null:
+		return
+	if p is CharacterBody3D:
+		(p as CharacterBody3D).velocity = Vector3.ZERO
+	p.global_position = at + Vector3.UP * 0.1
+
+
+## The first story anchor with this id in the tree (another room's scene).
+func find_anchor(anchor_id: StringName) -> Node3D:
+	if not is_inside_tree():
+		return null
+	for node in get_tree().get_nodes_in_group(&"story_anchor"):
+		if node is Node3D and StringName(node.get_meta(&"anchor_id", node.name)) == anchor_id:
+			return node
+	return null
+
+
+## An actor walks a list of marks; with `wait_for` > 0 it waits at each mark
+## until Feyre is that close (she follows it). Uses the actor's own lead()
+## when it has one (BeastActor), otherwise slides it at `speed`.
+func lead_along(actor_id: StringName, route: Array, wait_for: float = 0.0, speed: float = 2.2) -> SceneBeat:
+	return LeadBeat.new(actor_id, route, wait_for, speed)
+
+
+class LeadBeat:
+	extends SceneBeat
+	var actor_id: StringName
+	var route: Array
+	var wait_for: float
+	var speed: float
+	var index: int = 0
+	var _asked: int = -1
+
+	func consumes_time() -> bool:
+		return true
+
+	func _init(id: StringName, r: Array, w: float, s: float) -> void:
+		actor_id = id
+		route = r
+		wait_for = w
+		speed = s
+		label = "lead %s" % id
+
+	func enter(_space: SceneSpace) -> void:
+		index = 0
+		_asked = -1
+
+	func tick(space: SceneSpace, delta: float) -> bool:
+		var s := space as Act2Space
+		var who := s.actor(actor_id)
+		if who == null or index >= route.size():
+			return true
+		var target := s.mark(StringName(route[index]))
+		target.y = who.global_position.y
+		if who.has_method(&"lead"):
+			if _asked != index:
+				who.call(&"lead", target)
+				_asked = index
+		else:
+			var to := target - who.global_position
+			if to.length() > 0.05:
+				who.global_position += to.limit_length(speed * delta)
+				var flat := Vector3(target.x, who.global_position.y, target.z)
+				if not flat.is_equal_approx(who.global_position):
+					who.look_at(flat, Vector3.UP)
+		if who.global_position.distance_to(target) > 0.6:
+			return false
+		if wait_for > 0.0 and not s.player_within(wait_for, who.global_position):
+			return false
+		index += 1
+		return index >= route.size()
 
 
 class SayBeat:

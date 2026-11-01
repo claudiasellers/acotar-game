@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"alis_door": Vector3(0, 0, 18),
+"alis_heap": Vector3(0, 0, 17),
+"alis_up": Vector3(0.3, 0, 16.2),
+"coil": Vector3(3, 0.55, -1),
+"curtains": Vector3(0, 1.8, -1.4),
+"curtains_floor": Vector3(0, 0, -0.6),
+"door_inside": Vector3(0, 0, 17.2),
+"feyre_bed": Vector3(-4.2, 0, 10.4),
+"fixture": Vector3(0.5, 3, 17.6)
+}
+lines = {
+"alis_bones": {"text": "You think a bit of rope snapping in my face will keep me from breaking your bones?", "who": "Alis"},
+"alis_cauldron": {"text": "What in the bottomless depths of the Cauldron is—", "who": "Alis"},
+"alis_curtains": {"text": "But did you have to wreck those lovely curtains?", "who": "Alis"},
+"alis_fight": {"text": "At least you're willing to put up a fight.", "who": "Alis"},
+"alis_word": {"text": "The master gave his word you'd live.", "who": "Alis"},
+"dawn": {"text": "She threw the curtains open on a periwinkle sky, splashed with hues of pumpkin and magenta.", "who": ""},
+"feyre_bell": {"text": "It's a warning bell to give me time to run. Not a trap.", "who": "Feyre"},
+"feyre_sorry": {"text": "I'm sorry. I'm so sorry, I didn't—", "who": "Feyre"},
+"locked": {"text": "Then I locked the door.", "who": ""},
+"rig_prompt": {"text": "Up to the light fixture, rigged to snap into anyone's face.", "who": ""},
+"screech_thud": {"text": "A screech, and a thud.", "who": ""},
+"trimmings": {"text": "The curtain trimmings. Braided, they'd make a length of rope.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("alis_word", "feyre_sorry", "locked", "rig_prompt", "trimmings")
+canon = "Ch7 (Keeper 2026-11-01, [C]): the length of rope I'd made from the curtain trimmings, hanging from the light fixture, rigged to snap into anyone's face when the door opens; she locks her door. Alis unlocks it before dawn: a screech and a thud, Alis in a heap; up at once, hissing, brushing her apron; the Cauldron line; Feyre babbles apologies; the breaking-bones sneer; warning bell, not a trap; a barked laugh; the master gave his word she'd live (paraphrase, X wording); the lovely curtains; curtains thrown open on a periwinkle dawn splashed with pumpkin and magenta; at least you're willing to put up a fight. Ch8: Tamlin asks if the trip wire was for him."

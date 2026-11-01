@@ -77,7 +77,7 @@ func _build_beats() -> Array:
 		say(&"stay_for_wine"),
 		say(&"go_rest"),
 		Beats.until(func() -> bool: return not player_within(9.0, mark(&"table")), "until she leaves the table"),
-		Beats.run(func(_s: SceneSpace) -> void: _aside(&"laugh_growl"), "a laugh, cut off by a growl"),
+		Beats.run(func(_s: SceneSpace) -> void: aside(&"laugh_growl"), "a laugh, cut off by a growl"),
 		Beats.run(_clear_the_scene, "clear the scene"),
 	]
 
@@ -138,7 +138,7 @@ func tick(delta: float) -> void:
 		_seen_presses = presses()
 		if not _refused:
 			_refused = true
-			_aside(&"first_rule")
+			aside(&"first_rule")
 	if _shake_left > 0.0:
 		_shake_left -= delta
 		StoryControl.shake = 0.25 if _shake_left > 0.0 else 0.0
@@ -158,7 +158,7 @@ func _take_a_bite() -> void:
 	if bites < BITES_TO_CLEAR:
 		var piece: StringName = [&"chicken", &"bread", &"sauce_peas"][bites]
 		if bites == 0:
-			_aside(&"sniff")
+			aside(&"sniff")
 		bites += 1
 		var d := table.dish(piece) if table else null
 		if d and is_inside_tree():
@@ -175,14 +175,6 @@ func _take_a_bite() -> void:
 				if d:
 					Juice.burst(d, &"craft")
 				table.take(mark_name)
-
-
-## A line that doesn't hold the scene up (her thoughts while she's held).
-func _aside(line_id: StringName) -> void:
-	var spoken: Dictionary = stage.line(line_id) if stage else {}
-	if spoken.is_empty() or not is_inside_tree():
-		return
-	Act2Caption.find_or_make(self).say(String(spoken.get("who", "")), String(spoken.get("text", "")))
 
 
 func _clear_the_scene(_s: SceneSpace) -> void:

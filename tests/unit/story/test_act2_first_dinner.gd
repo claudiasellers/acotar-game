@@ -49,6 +49,7 @@ func _until(label_prefix: String, seconds: float = 30.0) -> bool:
 
 func _seat() -> void:
 	WorldState.set_flag("wall_crossed")
+	WorldState.set_flag("fact.alis_bathed")
 	assert_true(space.start())
 	assert_true(WorldState.has_flag("fact.first_dinner_seen"))
 	assert_not_null(space.actor(&"tamlin"), "Tamlin at the head of the table")
@@ -68,6 +69,8 @@ func test_the_director_hangs_the_coded_dinner() -> void:
 	assert_true(space is FirstDinner)
 	assert_false(space.can_start(), "not before the wall")
 	WorldState.set_flag("wall_crossed")
+	assert_false(space.can_start(), "not before Alis's bath")
+	WorldState.set_flag("fact.alis_bathed")
 	assert_true(space.can_start())
 
 

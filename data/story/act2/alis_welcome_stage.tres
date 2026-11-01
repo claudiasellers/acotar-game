@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"after_bath": Vector3(5, 0, 11),
+"alis_spot": Vector3(3, 0, 10),
+"bath": Vector3(8.6, 0, 13),
+"feyre_start": Vector3(0, 0, 12)
+}
+lines = {
+"alis_bath_drawn": {"text": "Your bath's drawn. In with you, and mind the hot water.", "who": "Alis"},
+"alis_dinner": {"text": "Dinner. Don't keep him waiting.", "who": "Alis"},
+"alis_dress": {"text": "I've laid out a dress for you.", "who": "Alis"},
+"alis_tunic": {"text": "Trousers and a tunic, then. Your old things fell apart in the wash.", "who": "Alis"},
+"bath_prompt": {"text": "Hot, scented water. More than I'd had in years.", "who": ""},
+"bath_thought": {"text": "Alis scrubbed me raw and cut my hair. I sat in a white dressing gown.", "who": ""},
+"feyre_no_dress": {"text": "I don't want the dress.", "who": "Feyre"},
+"tunic_thought": {"text": "A white shirt, and a dark blue tunic with scratchy golden thread on the lapels.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("alis_bath_drawn", "alis_dinner", "alis_dress", "alis_tunic", "bath_prompt", "feyre_no_dress")
+canon = "Ch6 (Keeper 2026-11-01, [C]): Alis (brass bird mask) bathes her and cuts her hair; she sits in a white dressing gown; refuses the velvet turquoise dress; her old shirt and pants fell apart in the wash; Alis brings trousers and a tunic that fit: white shirt, dark blue tunic, scratchy golden thread on the lapels. Wording of the spoken lines is invented (X). Marks are in feyre_bedroom_window's frame (anchor at world 23, level 1, -70.4); the bath station is at world (32.4, -57.8). Outfit: closest wardrobe pieces spring_tunic_sky + spring_trousers_cream until a navy-and-gold tunic piece exists."

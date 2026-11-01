@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"alis_door": Vector3(-11.5, 0, -6.5),
+"beast_start": Vector3(-21, 0, -2),
+"dining_door": Vector3(-11, 0, -6.5),
+"dining_inside": Vector3(-8.5, 0, -6.5),
+"feyre_wall": Vector3(-10.3, 0, -5),
+"front_door": Vector3(-21, 0, 3.5),
+"front_door_glow": Vector3(-21, 1.8, 3.5),
+"hall_east": Vector3(-14, 0, -6.5),
+"hall_mid": Vector3(-21, 0, -6.5),
+"head_chair": Vector3(-5.6, 0, -6.5),
+"lucien_seat": Vector3(-3.4, 0, -8),
+"table": Vector3(0, 0, -6.5),
+"tamlin_seat": Vector3(-4.75, 0, -6.5)
+}
+lines = {
+"alis_bath": {"text": "Come along, then. You'll want a bath.", "who": "Alis"},
+"doors": {"text": "The doors swung open on silent hinges. A faint, metallic smell: magic.", "who": ""},
+"first_rule": {"text": "Faerie food. The first rule: never eat their food.", "who": ""},
+"lucien_andras": {"text": "So this is the girl who killed Andras.", "who": "Lucien"},
+"sit_eat": {"text": "Sit. Eat.", "who": "Tamlin"},
+"transform": {"text": "He plopped into the chair, the wood groaning, and in a flash of white light turned into a golden-haired man.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("alis_bath", "lucien_andras")
+canon = "Ch6 (Keeper 2026-11-01, [C]): doors on silent hinges, a faint metallic smell of magic; the beast pads down a long hall, through polished wooden doors, to the long table laden with steaming food; plops into the oversized head chair, the wood groaning, and in a flash of white light turns into a golden-haired man (green tunic, baldric, gold mask). She presses against the panelled wall by the door. Sit. Eat. She refuses (first rule). Lucien strides in past her to the head of the table, furious a scrawny girl killed Andras. Alis takes her off to bathe. Invented (X): Lucien's and Alis's wording. Marks are in manor_dining_table's frame (anchor at world 21, floor, -31.5)."

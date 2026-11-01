@@ -10,10 +10,17 @@ extends RefCounted
 ## Moment id -> {"script": scene script, "stage": Act2Stage .tres}.
 const CODED := {
 	&"first_dinner": {"script": "res://story/act2/first_dinner.gd", "stage": "res://data/story/act2/first_dinner_stage.tres"},
+	&"curtain_trap": {"script": "res://story/act2/curtain_trap.gd", "stage": "res://data/story/act2/curtain_trap_stage.tres"},
 }
 
 ## Anchor id -> list of {"name", "script", "stage"}: scenes with no moment.
 const EXTRA := {
+	&"manor_dining_table": [
+		{"name": "ManorArrival", "script": "res://story/act2/manor_arrival.gd", "stage": "res://data/story/act2/manor_arrival_stage.tres"},
+	],
+	&"feyre_bedroom_window": [
+		{"name": "AlisWelcome", "script": "res://story/act2/alis_welcome.gd", "stage": "res://data/story/act2/alis_welcome_stage.tres"},
+	],
 }
 
 
