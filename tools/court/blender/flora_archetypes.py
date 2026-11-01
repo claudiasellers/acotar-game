@@ -545,14 +545,12 @@ def grass(m: Mesh, rng: random.Random, count: int = 26, height: float = 0.35, co
 
 def carpet(m: Mesh, rng: random.Random, r: float = 0.9, color: str = "rose", color2: str | None = None,
 		flowers: int = 26, base: str = "leaf", petals: int = 5, head: str = "daisy") -> None:
-	"""Flat patch of ground cover studded with little oversized-for-their-size blooms."""
-	ring = []
-	for k in range(16):
-		a = TAU * k / 16
-		rr = r * (1.0 + 0.12 * math.sin(a * 3 + 1.0))
-		ring.append(V((math.cos(a) * rr, math.sin(a) * rr, 0.01)))
-	m.fan_cap(ring, V((0, 0, 0.015)), _c(base))
-	L.tuft(m, V((0, 0, 0)), 18, 0.12, 0.012, L.mix(_c(base), P["leaf_light"], 0.3), rng, radius=r * 0.85, spread=0.7)
+	"""Patch of low leafy ground cover studded with little oversized-for-their-size blooms.
+	No flat base disc: scaled up and overlapped in drifts, its hard 16-gon edge read as
+	faceted green polygons on the ground. The terrain carries the ground colour; the
+	carpet is leaves and blooms only, thinning out toward its rim."""
+	L.tuft(m, V((0, 0, 0)), 26, 0.12, 0.012, L.mix(_c(base), P["leaf_light"], 0.3), rng, radius=r * 0.55, spread=0.7)
+	L.tuft(m, V((0, 0, 0)), 18, 0.09, 0.010, L.mix(_c(base), P["leaf_light"], 0.5), rng, radius=r * 0.95, spread=0.8)
 	for i in range(flowers):
 		a = i * 2.39996323
 		rr = r * 0.9 * math.sqrt((i + 0.5) / flowers)

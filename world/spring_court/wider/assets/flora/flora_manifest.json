@@ -1179,12 +1179,12 @@
    ],
    "file": "flora_carpet_rose.gltf",
    "glows": false,
-   "height_m": 0.146,
+   "height_m": 0.145,
    "id": "flora_carpet_rose",
    "kind": "decor",
-   "radius_m": 0.991,
-   "tris": 2949,
-   "tris_lod1": 1455
+   "radius_m": 0.794,
+   "tris": 2950,
+   "tris_lod1": 1453
   },
   {
    "archetype": "carpet",
@@ -1194,12 +1194,12 @@
    ],
    "file": "flora_carpet_blush.gltf",
    "glows": false,
-   "height_m": 0.145,
+   "height_m": 0.134,
    "id": "flora_carpet_blush",
    "kind": "decor",
-   "radius_m": 0.991,
+   "radius_m": 0.797,
    "tris": 2950,
-   "tris_lod1": 1456
+   "tris_lod1": 1455
   },
   {
    "archetype": "carpet",
@@ -1209,12 +1209,12 @@
    ],
    "file": "flora_carpet_lilac.gltf",
    "glows": false,
-   "height_m": 0.154,
+   "height_m": 0.159,
    "id": "flora_carpet_lilac",
    "kind": "decor",
-   "radius_m": 0.991,
-   "tris": 2949,
-   "tris_lod1": 1374
+   "radius_m": 0.818,
+   "tris": 2948,
+   "tris_lod1": 1371
   },
   {
    "archetype": "carpet",
@@ -1223,10 +1223,10 @@
    ],
    "file": "flora_carpet_butter.gltf",
    "glows": false,
-   "height_m": 0.144,
+   "height_m": 0.152,
    "id": "flora_carpet_butter",
    "kind": "decor",
-   "radius_m": 0.991,
+   "radius_m": 0.793,
    "tris": 2950,
    "tris_lod1": 1449
   },
@@ -1238,11 +1238,11 @@
    ],
    "file": "flora_carpet_pearl.gltf",
    "glows": false,
-   "height_m": 0.149,
+   "height_m": 0.151,
    "id": "flora_carpet_pearl",
    "kind": "decor",
-   "radius_m": 0.991,
-   "tris": 2936,
+   "radius_m": 0.802,
+   "tris": 2935,
    "tris_lod1": 1456
   },
   {
@@ -1253,12 +1253,12 @@
    ],
    "file": "flora_carpet_periwinkle.gltf",
    "glows": false,
-   "height_m": 0.163,
+   "height_m": 0.168,
    "id": "flora_carpet_periwinkle",
    "kind": "decor",
-   "radius_m": 0.991,
-   "tris": 2949,
-   "tris_lod1": 1448
+   "radius_m": 0.782,
+   "tris": 2950,
+   "tris_lod1": 1449
   },
   {
    "archetype": "fern",
