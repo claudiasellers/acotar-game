@@ -120,7 +120,8 @@ func _freeze() -> void:
 		lucien.look_at(Vector3(mark(&"elm").x, lucien.global_position.y, mark(&"elm").z), Vector3.UP)
 	note_mood()
 	StoryControl.shake = 0.08
-	EventBus.mood_requested.emit(&"dread", 0.9, 2.5)
+	# Dread, but not black: she has to see the wood to keep her eyes on the elm.
+	EventBus.mood_requested.emit(&"dread", 0.55, 2.5)
 	EventBus.grade_swap_requested.emit(&"bogge", 4.0)
 	# Her eyes go to the elm at first; after that, holding them there is hers.
 	StoryControl.set_focus(_elm_marker())

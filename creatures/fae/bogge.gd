@@ -22,7 +22,8 @@ const BEG_LINES: Array[StringName] = [&"bogge_beg_1", &"bogge_beg_2", &"bogge_be
 const SHADOW := Color(0.015, 0.012, 0.02)
 const EYE := Color(0.86, 0.9, 0.62)
 
-@export var distance: float = 4.5
+## Far enough behind her that the follow camera is never inside its dark.
+@export var distance: float = 7.0
 @export var pass_seconds: float = 16.0
 @export var beg_interval: float = 3.5
 ## How far round her back it sweeps during the pass (radians, centred behind).
@@ -57,8 +58,8 @@ func _ready() -> void:
 	DreadField.attach(self, 45.0, 14.0)
 	_fog = FogVolume.new()
 	_fog.name = "Dark"
-	_fog.size = Vector3(6, 4, 6)
-	_fog.position.y = 1.5
+	_fog.size = Vector3(3.5, 3.5, 3.5)
+	_fog.position.y = 1.8
 	var mat := FogMaterial.new()
 	mat.density = 0.0
 	mat.albedo = Color(0.02, 0.02, 0.03)
