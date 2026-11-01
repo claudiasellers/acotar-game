@@ -53,6 +53,11 @@ extends Resource
 @export_range(0.0, 1.0) var snow_cover := 0.0
 ## Sparkle, glints and bloom tint on stylized materials (Spring Court magic).
 @export_range(0.0, 1.0) var magic := 0.0
+@export_group("Mood")
+## How much of a dread mood this grade still takes (0..1). A grade that is
+## already the horror look (the Bogge) sets 0: stacking dread on top of it
+## doubles the darkening and the frame goes black.
+@export_range(0.0, 1.0) var dread_headroom := 1.0
 
 
 const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric_density", &"exposure",
