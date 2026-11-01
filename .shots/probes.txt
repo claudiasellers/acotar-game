@@ -1,0 +1,5 @@
+from L30 painting
+quality look
+size 1920x1080
+timeout 1200
+shot painting res://tools/playtest/p4_painting_clip.tscn {out}
