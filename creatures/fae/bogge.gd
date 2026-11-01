@@ -19,8 +19,9 @@ signal passed
 signal manifested
 
 const BEG_LINES: Array[StringName] = [&"bogge_beg_1", &"bogge_beg_2", &"bogge_beg_3", &"bogge_beg_4"]
-const SHADOW := Color(0.015, 0.012, 0.02)
 const EYE := Color(0.86, 0.9, 0.62)
+const MODEL := "res://creatures/models/fae/bogge.gltf"
+const FORM_SHADER := preload("res://creatures/fae/bogge_form.gdshader")
 
 ## Far enough behind her that the follow camera is never inside its dark.
 @export var distance: float = 7.0
@@ -41,8 +42,8 @@ var _beg_left: float = 1.5
 var _beg_index: int = 0
 var _fog: FogVolume
 var _form: Node3D
-var _form_mat: StandardMaterial3D
-var _eye_mat: StandardMaterial3D
+var _mats: Array[ShaderMaterial] = []
+var _anim: AnimationPlayer
 var _centre: Vector3
 var _ahead: Vector3 = Vector3.FORWARD
 var _follow: Node3D
@@ -118,6 +119,8 @@ func manifest(at: Vector3) -> void:
 	_lunge_to = at
 	mode = Mode.LUNGE
 	set_reveal(1.0)
+	if _anim and _anim.has_animation(&"lunge"):
+		_anim.play(&"lunge")
 	manifested.emit()
 
 
@@ -211,144 +214,35 @@ func _face(point: Vector3) -> void:
 
 
 func _apply_reveal() -> void:
-	if _form_mat:
-		# Even unseen there is something: a darker patch the eye slides off.
-		_form_mat.albedo_color.a = lerpf(0.04, 0.97, reveal)
-		_form_mat.rim = lerpf(0.0, 0.9, reveal)
-	if _eye_mat:
-		_eye_mat.albedo_color.a = clampf(reveal * 1.6 - 0.2, 0.0, 1.0)
-		_eye_mat.emission_energy_multiplier = lerpf(0.0, 5.0, reveal)
+	for mat in _mats:
+		mat.set_shader_parameter(&"reveal", reveal)
 
 
-## Its shape, should she make it real: hunched, three metres if it stood,
-## arms long enough to walk on, claws like split kindling, and too many eyes
-## clustered where a face should be. One oily near-black, wet-rimmed.
+## Its shape, should she make it real (tools/blender/bogge.py, canon:"X"):
+## bark-hided and gaunt, three metres if it stood, double-jointed arms long
+## enough to walk on, legs that fold backwards, claws like split kindling, a
+## long jaw of needle teeth and a cluster of lamp-pale eyes. Every surface is
+## swapped for the bogge_form shader, which dissolves it by `reveal`.
 func _build_form() -> Node3D:
-	var root := Node3D.new()
+	var root := (load(MODEL) as PackedScene).instantiate() as Node3D
 	root.name = "Form"
-	_form_mat = StandardMaterial3D.new()
-	_form_mat.albedo_color = Color(SHADOW, 0.04)
-	_form_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_form_mat.roughness = 0.25
-	_form_mat.metallic = 0.4
-	_form_mat.rim_enabled = true
-	_form_mat.rim_tint = 0.2
-	_form_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_eye_mat = StandardMaterial3D.new()
-	_eye_mat.albedo_color = Color(EYE, 0.0)
-	_eye_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_eye_mat.emission_enabled = true
-	_eye_mat.emission = EYE
-	_eye_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	# Body: a long torso pitched forward, a hump of shoulder over it.
-	var torso := _capsule(0.42, 2.3)
-	torso.position = Vector3(0.0, 1.75, -0.35)
-	torso.rotation_degrees.x = -38.0
-	root.add_child(torso)
-	var hump := _sphere(0.55)
-	hump.scale = Vector3(1.25, 0.8, 1.0)
-	hump.position = Vector3(0.0, 2.55, -0.55)
-	root.add_child(hump)
-	# Head: small, low and forward, a slit of jaw.
-	var head := _sphere(0.24)
-	head.name = "Head"
-	head.scale = Vector3(0.9, 0.8, 1.3)
-	head.position = Vector3(0.0, 2.25, -1.25)
-	root.add_child(head)
-	var jaw := _box(Vector3(0.36, 0.05, 0.3))
-	jaw.position = Vector3(0.0, 2.1, -1.38)
-	root.add_child(jaw)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 13
-	for i in 9:
-		var eye := MeshInstance3D.new()
-		var m := SphereMesh.new()
-		var r := rng.randf_range(0.018, 0.04)
-		m.radius = r
-		m.height = r * 2.0
-		m.radial_segments = 8
-		m.rings = 4
-		eye.mesh = m
-		eye.material_override = _eye_mat
-		eye.position = Vector3(rng.randf_range(-0.16, 0.16), 2.28 + rng.randf_range(-0.08, 0.12), -1.5 + rng.randf_range(0.0, 0.08))
-		root.add_child(eye)
-	# Arms: shoulder to elbow up and out, forearm down to the ground ahead.
-	for side in [-1.0, 1.0]:
-		var upper := _limb(Vector3(side * 0.5, 2.5, -0.6), Vector3(side * 1.05, 1.9, -1.2), 0.09)
-		root.add_child(upper)
-		var fore := _limb(Vector3(side * 1.05, 1.9, -1.2), Vector3(side * 0.85, 0.1, -1.7), 0.07)
-		root.add_child(fore)
-		for f in 4:
-			var spread := deg_to_rad(-30.0 + f * 20.0)
-			var tip := Vector3(side * 0.85, 0.0, -1.7) + Vector3(sin(spread) * 0.5, 0.0, -cos(spread) * 0.5)
-			root.add_child(_limb(Vector3(side * 0.85, 0.12, -1.7), tip, 0.018))
-		# Legs: folded back like a hare's, thin as stakes.
-		var thigh := _limb(Vector3(side * 0.3, 1.0, 0.3), Vector3(side * 0.45, 0.9, 0.95), 0.1)
-		root.add_child(thigh)
-		var shin := _limb(Vector3(side * 0.45, 0.9, 0.95), Vector3(side * 0.4, 0.0, 0.7), 0.06)
-		root.add_child(shin)
-	# Rags of itself trailing off into the fog.
-	for i in 6:
-		var rag := _sphere(0.4)
-		rag.scale = Vector3(1.2, 0.25, 1.6)
-		rag.position = Vector3(rng.randf_range(-0.7, 0.7), rng.randf_range(0.6, 2.2), rng.randf_range(-0.3, 0.9))
-		rag.rotation = Vector3(rng.randf_range(-0.5, 0.5), rng.randf(), rng.randf_range(-0.5, 0.5))
-		root.add_child(rag)
+	for node in root.find_children("*", "MeshInstance3D", true, false):
+		var mi := node as MeshInstance3D
+		for i in mi.mesh.get_surface_count():
+			var src := mi.mesh.surface_get_material(i)
+			var mat := ShaderMaterial.new()
+			mat.shader = FORM_SHADER
+			var tag := src.resource_name if src else ""
+			if tag == "BoggeEyes":
+				mat.set_shader_parameter(&"is_eye", true)
+				mat.set_shader_parameter(&"eye_color", EYE)
+			elif src is BaseMaterial3D:
+				mat.set_shader_parameter(&"albedo", (src as BaseMaterial3D).albedo_color)
+				mat.set_shader_parameter(&"roughness", (src as BaseMaterial3D).roughness)
+			mi.set_surface_override_material(i, mat)
+			_mats.append(mat)
+	_anim = root.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	if _anim and _anim.has_animation(&"idle"):
+		_anim.get_animation(&"idle").loop_mode = Animation.LOOP_LINEAR
+		_anim.play(&"idle")
 	return root
-
-
-func _capsule(radius: float, height: float) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	var m := CapsuleMesh.new()
-	m.radius = radius
-	m.height = height
-	m.radial_segments = 12
-	m.rings = 4
-	mi.mesh = m
-	mi.material_override = _form_mat
-	return mi
-
-
-func _sphere(radius: float) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	var m := SphereMesh.new()
-	m.radius = radius
-	m.height = radius * 2.0
-	m.radial_segments = 12
-	m.rings = 6
-	mi.mesh = m
-	mi.material_override = _form_mat
-	return mi
-
-
-func _box(size: Vector3) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	var m := BoxMesh.new()
-	m.size = size
-	mi.mesh = m
-	mi.material_override = _form_mat
-	return mi
-
-
-## A tapering limb from a to b.
-func _limb(a: Vector3, b: Vector3, radius: float) -> MeshInstance3D:
-	var mi := MeshInstance3D.new()
-	var m := CylinderMesh.new()
-	m.top_radius = radius
-	m.bottom_radius = radius * 0.45
-	m.height = a.distance_to(b)
-	m.radial_segments = 6
-	m.rings = 1
-	mi.mesh = m
-	mi.material_override = _form_mat
-	var mid := (a + b) * 0.5
-	var dir := (b - a).normalized()
-	var basis := Basis.IDENTITY
-	if absf(dir.dot(Vector3.UP)) < 0.999:
-		var axis := Vector3.UP.cross(dir).normalized()
-		basis = Basis(axis, Vector3.UP.angle_to(dir))
-	else:
-		basis = Basis.IDENTITY if dir.y > 0.0 else Basis(Vector3.RIGHT, PI)
-	# Cylinder's +Y runs a->b with the thick end at top: flip so it tapers outward.
-	mi.transform = Transform3D(basis * Basis(Vector3.RIGHT, PI), mid)
-	return mi
