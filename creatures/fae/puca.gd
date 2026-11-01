@@ -10,8 +10,12 @@
 ## scenes drive it with lure_to() (walk her to the open gate, facing her,
 ## always just ahead) and dart() (it shimmers and is gone, fast as lightning).
 ##
-## Every image is a placeholder (R4); the father and sisters stay so until
-## the user designs the main cast.
+## The images wear the real things: her father is his cast model (brown eyes,
+## cane, limping on walk_limp, waiting on idle_cane), her sisters are Nesta's
+## and Elain's, her bow is the ash bow and quiver from the cottage wall, and the
+## supplies are sacks of flour and salt, a basket of food and a crate. A stripped build without
+## those falls back to placeholders. Its own shape (canon X) is the father's
+## body stretched tall and thin and gone pale as a peeled branch.
 class_name Puca
 extends StoryActor
 
@@ -20,6 +24,17 @@ signal darted
 
 const IMAGES: Array[StringName] = [&"father", &"bow", &"supplies", &"sisters"]
 const TRUE_FORM := &"true_form"
+const CAST := "res://characters/%s/%s_model.tscn"
+const BOW := "res://world/human_realm/cottage/assets/interior/bow_quiver.glb"
+## Supplies for home: what the cottage never had enough of.
+const SUPPLIES: Array[Array] = [
+	["res://world/human_realm/village/assets/village_crate.glb", Vector3(0.45, 0.0, 0.2), 0.15],
+	["res://world/spring_court/manor_estate/props/models/sack_flour.glb", Vector3(-0.4, 0.0, 0.1), -0.3],
+	["res://world/human_realm/village/assets/village_salt_sack.glb", Vector3(0.0, 0.0, -0.3), 0.4],
+	["res://world/spring_court/manor_estate/props/models/basket_produce.glb", Vector3(-0.45, 0.0, -0.5), 0.2],
+	["res://world/human_realm/village/assets/village_herb_bundle.glb", Vector3(0.45, 0.79, 0.2), 1.1],
+]
+const PEELED := Color(0.80, 0.82, 0.74)
 
 ## How far ahead of Feyre it keeps, and how fast it drifts.
 @export var lure_distance: float = 9.0
@@ -47,6 +62,8 @@ var _t: float = 0.0
 var _dart_dir: Vector3
 var _dart_left: float = 0.0
 var _flash: OmniLight3D
+## The father image's cast model (null on the placeholder): it limps itself.
+var _father_body: Node3D
 
 
 func _ready() -> void:
@@ -223,66 +240,112 @@ func _build_image(id: StringName) -> Node3D:
 	match id:
 		&"father":
 			# Patrick Archeron, as she left him: stooped on his cane by the fire.
+			var dad := _cast(&"father")
+			if dad:
+				_father_body = dad
+				var root := Node3D.new()
+				root.add_child(dad)
+				return root
 			return PlaceholderFigure.build({"height": 1.78, "clothes": Color(0.42, 0.36, 0.30),
 				"hair": Color(0.55, 0.50, 0.45), "pointed_ears": false, "stoop": 12.0, "cane": true})
 		&"bow":
+			# Her own ash bow and quiver, the ones from the cottage wall.
 			var root := Node3D.new()
-			var wood := PlaceholderBody._mat(Color(0.48, 0.32, 0.18))
-			# An ash bow standing upright: an arc of segments and its string.
-			var centre := Vector3(-0.6, 0.85, 0.0)
-			var r := 0.9
-			for s in 7:
-				var a := deg_to_rad(-48.0 + s * 16.0)
-				var seg := PlaceholderBody._cylinder(0.02, 0.26, wood)
-				seg.position = centre + Vector3(cos(a), sin(a), 0.0) * r
-				seg.rotation.z = a
-				root.add_child(seg)
-			var string := PlaceholderBody._cylinder(0.004, 2.0 * r * sin(deg_to_rad(50.0)), PlaceholderBody._mat(Color(0.9, 0.88, 0.8)))
-			string.position = centre + Vector3(r * cos(deg_to_rad(50.0)), 0.0, 0.0)
-			root.add_child(string)
-			var quiver := PlaceholderBody._cylinder(0.06, 0.6, PlaceholderBody._mat(Color(0.36, 0.24, 0.14)))
-			quiver.position = Vector3(0.4, 0.06, 0.25)
-			quiver.rotation_degrees.z = 85.0
-			root.add_child(quiver)
-			return root
+			var bow := _glb(BOW)
+			if bow:
+				# Stood on its tip, leaning a little, as if set down for her.
+				bow.position.x = -0.25
+				bow.rotation.z = -0.08
+				root.add_child(bow)
+				return root
+			return _placeholder_bow()
 		&"supplies":
 			var root := Node3D.new()
-			var sack := PlaceholderBody._mat(Color(0.78, 0.70, 0.52))
-			for i in 3:
-				var s := PlaceholderBody._sphere(0.28, sack)
-				s.scale = Vector3(1.0, 1.25, 0.9)
-				s.position = Vector3(-0.5 + i * 0.5, 0.33, 0.1 * i)
-				root.add_child(s)
-			var crate := PlaceholderBody._box(Vector3(0.7, 0.5, 0.5), PlaceholderBody._mat(Color(0.55, 0.40, 0.25)))
-			crate.position = Vector3(0.2, 0.25, -0.55)
-			root.add_child(crate)
+			for entry in SUPPLIES:
+				var prop := _glb(String(entry[0]))
+				if prop:
+					prop.position = entry[1]
+					prop.rotation.y = entry[2]
+					root.add_child(prop)
+			if root.get_child_count() == 0:
+				root.free()
+				return _placeholder_supplies()
 			return root
 		_:
 			var root := Node3D.new()
-			var nesta := PlaceholderFigure.build({"height": 1.72, "clothes": Color(0.45, 0.48, 0.62),
-				"hair": Color(0.55, 0.38, 0.22), "pointed_ears": false, "robe": true})
-			nesta.position.x = -0.45
-			root.add_child(nesta)
-			var elain := PlaceholderFigure.build({"height": 1.66, "clothes": Color(0.86, 0.72, 0.62),
-				"hair": Color(0.85, 0.68, 0.38), "pointed_ears": false, "robe": true})
-			elain.position.x = 0.45
-			root.add_child(elain)
+			for pair in [[&"nesta", -0.45], [&"elain", 0.45]]:
+				var sister := _cast(pair[0])
+				if sister == null:
+					sister = PlaceholderFigure.build({"height": 1.72 if pair[0] == &"nesta" else 1.66,
+						"clothes": Color(0.45, 0.48, 0.62) if pair[0] == &"nesta" else Color(0.86, 0.72, 0.62),
+						"hair": Color(0.55, 0.38, 0.22) if pair[0] == &"nesta" else Color(0.85, 0.68, 0.38),
+						"pointed_ears": false, "robe": true})
+				sister.position.x = pair[1]
+				root.add_child(sister)
 			return root
 
 
+## A main-cast model, or null in a stripped build.
+func _cast(id: StringName) -> Node3D:
+	var path := CAST % [id, id]
+	if not ResourceLoader.exists(path):
+		return null
+	var body := (load(path) as PackedScene).instantiate() as Node3D
+	body.name = "Body"
+	return body
+
+
+func _glb(path: String) -> Node3D:
+	if not ResourceLoader.exists(path):
+		return null
+	return (load(path) as PackedScene).instantiate() as Node3D
+
+
+func _placeholder_bow() -> Node3D:
+	var root := Node3D.new()
+	var wood := PlaceholderBody._mat(Color(0.48, 0.32, 0.18))
+	var centre := Vector3(-0.6, 0.85, 0.0)
+	var r := 0.9
+	for s in 7:
+		var a := deg_to_rad(-48.0 + s * 16.0)
+		var seg := PlaceholderBody._cylinder(0.02, 0.26, wood)
+		seg.position = centre + Vector3(cos(a), sin(a), 0.0) * r
+		seg.rotation.z = a
+		root.add_child(seg)
+	return root
+
+
+func _placeholder_supplies() -> Node3D:
+	var root := Node3D.new()
+	var sack := PlaceholderBody._mat(Color(0.78, 0.70, 0.52))
+	for i in 3:
+		var s := PlaceholderBody._sphere(0.28, sack)
+		s.scale = Vector3(1.0, 1.25, 0.9)
+		s.position = Vector3(-0.5 + i * 0.5, 0.33, 0.1 * i)
+		root.add_child(s)
+	return root
+
+
 ## Its own shape, glimpsed: too tall, too thin, pale as a peeled branch, with
-## eyes like wet coins. Canon X.
+## a faint light of its own. Canon X. Built on the father's body, stretched.
 func _build_true_form() -> Node3D:
-	var root := PlaceholderFigure.build({"height": 2.3, "skin": Color(0.78, 0.80, 0.74),
-		"clothes": Color(0.62, 0.64, 0.58), "hair": Color(0.2, 0.22, 0.2), "stoop": 25.0})
-	var eye := StandardMaterial3D.new()
-	eye.albedo_color = Color(0.85, 0.85, 0.7)
-	eye.emission_enabled = true
-	eye.emission = Color(0.9, 0.9, 0.6)
-	eye.emission_energy_multiplier = 2.5
-	var head := root.find_child("Head", true, false) as Node3D
-	for side in [-1.0, 1.0]:
-		var e := PlaceholderBody._sphere(0.035, eye)
-		e.position = Vector3(side * 0.06, 0.02, -0.13)
-		head.add_child(e)
+	var body := _cast(&"father")
+	if body == null:
+		return PlaceholderFigure.build({"height": 2.3, "skin": PEELED,
+			"clothes": Color(0.62, 0.64, 0.58), "hair": Color(0.2, 0.22, 0.2), "stoop": 25.0})
+	var root := Node3D.new()
+	body.scale = Vector3(0.78, 1.28, 0.78)
+	root.add_child(body)
+	var pale := StandardMaterial3D.new()
+	pale.albedo_color = PEELED
+	pale.roughness = 0.35
+	pale.emission_enabled = true
+	pale.emission = Color(0.78, 0.84, 0.70)
+	pale.emission_energy_multiplier = 0.35
+	body.ready.connect(func() -> void:
+		var n: Variant = body.get(&"notice")
+		if n is NoticePlayer:
+			(n as NoticePlayer).enabled = false
+		for mi in body.find_children("*", "MeshInstance3D", true, false):
+			(mi as MeshInstance3D).material_override = pale, CONNECT_ONE_SHOT)
 	return root
