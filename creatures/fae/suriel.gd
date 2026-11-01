@@ -3,13 +3,15 @@
 ## comes down from the tree. When the naga are near it screams, and the scream
 ## carries (it is what draws them, ch15).
 ##
-## Cues: caught, naga_are_coming. The story lane owns `suriel_bound`.
+## Cues: stalk (creeps in to the bait), snared (the loops take it: thrash and
+## scream), caught, naga_are_coming, freed (her arrow cuts the tether: it
+## bursts free and is gone). The story lane owns `suriel_bound`.
 class_name Suriel
 extends StoryActor
 
 signal screamed
 
-enum State { SNARED, CAUGHT, SCREAMING }
+enum State { SNARED, CAUGHT, SCREAMING, STALKING, FREED }
 
 var state: State = State.SNARED
 
@@ -24,8 +26,18 @@ func _ready() -> void:
 
 func play_cue(cue: StringName) -> void:
 	match cue:
+		&"stalk":
+			state = State.STALKING
+			_t = 0.0
+			set_glow(0.8)
+		&"snared":
+			scream()
 		&"caught":
 			state = State.CAUGHT
+		&"freed":
+			scream()
+			state = State.FREED
+			_t = 0.0
 		&"naga_are_coming":
 			scream()
 
@@ -56,6 +68,16 @@ func _process(delta: float) -> void:
 			if player:
 				_turn_towards(player.global_position, delta * 2.0)
 			set_glow(1.5 + 0.6 * sin(_t * 2.2))
+		State.STALKING:
+			# Hunched, sniffing, a wrong rolling gait.
+			model.rotation.x = 0.35 + sin(_t * 3.1) * 0.08
+			model.rotation.z = sin(_t * 1.7) * 0.1
+			model.position.y = absf(sin(_t * 3.1)) * 0.06
+		State.FREED:
+			model.position.y += delta * 3.0
+			model.rotation.y += delta * 9.0
+			if _t > 1.5:
+				visible = false
 		State.SCREAMING:
 			model.rotation.x = -0.25 + sin(_t * 40.0) * 0.02
 			if _t > 2.5:

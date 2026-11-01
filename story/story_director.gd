@@ -74,6 +74,7 @@ func attach_anchor(anchor: Node3D) -> Array[SceneSpace]:
 		spaces.append(space)
 	Act1Anchors.attach(anchor, self)
 	spaces.append_array(Act2Spaces.attach(anchor))
+	spaces.append_array(Act3Anchors.attach(anchor))
 	if anchor_id == _pending_anchor:
 		_pending_anchor = &""
 		var p := get_tree().get_first_node_in_group(&"player") as Node3D

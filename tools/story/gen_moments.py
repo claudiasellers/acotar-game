@@ -75,18 +75,15 @@ moment("study_mural", "13", "manor_study_mural", "manor_house", ["tamlin_wound_d
     J("prythian_history_mural"), SP("lucien", V(2, 0, 2)), CU("lucien", "how_to_catch_a_suriel"),
     J("suriel_method"), R("fact.suriel_method_known"), R("study_mural_seen"),
 ], r=6.0)
+# The Suriel and the naga are deeds played by story/act3/suriel (L26):
+# SurielSnare (snare, bait, downwind wait, answers) and NagaAmbush (the fight).
+# These moments only turn their facts into the phase deeds.
 moment("suriel", "14", "suriel_snare", "suriel_glade", ["fact.suriel_method_known"], [
-    C("WALK"), IN(2, 3.0), CU("feyre", "climbs_tree"), ST(20.0, 12.0),
-    SP("suriel", V(0, 0, -1)), CU("suriel", "caught"), C("LOOK", "suriel"), W(3.0),
-    J("suriel_stay_with_the_high_lord"), J("suriel_hybern_and_the_blight"), W(5.0),
-    R("suriel_bound"), CU("suriel", "naga_are_coming"),
-], trigger="interact", r=3.0, notes="Young birches, running water, a fresh chicken, a double-loop snare. Wait nearby.")
+    UF("fact.suriel_answered"), R("suriel_bound"),
+], trigger="auto", notes="Played by SurielSnare: young birches, running water, bait, a double-loop snare, wait downwind.")
 moment("naga", "15", "suriel_snare", "suriel_glade", ["suriel_bound"], [
-    MO("dread", 0.9, 1.0), SP("naga", V(6, 0, -6)), SP("naga_2", V(-6, 0, -5)),
-    SP("naga_3", V(5, 0, 6)), SP("naga_4", V(-5, 0, 7)), C("FULL"), CU("naga", "attack"),
-    UK("naga", 1), ST(6.0, 30.0), SP("tamlin", V(0, 0, -8)), CU("tamlin", "tears_a_throat"),
-    MO("dread", 0.3, 2.0), C("LOOK", "tamlin"), W(2.0), R("naga_survived"),
-], trigger="auto", notes="Four naga; she kills one, survives until Tamlin arrives.")
+    UF("fact.naga_escaped"), R("naga_survived"),
+], trigger="auto", notes="Played by NagaAmbush: four naga; she kills one, survives until Tamlin arrives.")
 moment("summer_faerie", "17", "manor_infirmary", "manor_house", ["naga_survived"], [
     SP("summer_faerie", V(0, 0, -1)), SP("tamlin", V(1, 0, -1.6)), MO("dread", 0.4, 2.0),
     CU("lucien", "leaves_sick"), C("WALK", "summer_faerie"),
