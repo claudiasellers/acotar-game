@@ -1,0 +1,4 @@
+quality look
+timeout 900
+shot dinner res://tools/act2_dinner_shot.tscn {out}
+shot ceilings res://tools/act2_ceiling_shot.tscn {out}
