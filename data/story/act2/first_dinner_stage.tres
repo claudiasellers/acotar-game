@@ -19,17 +19,22 @@ marks = {
 "wine": Vector3(3.5, 0.8, -6.88)
 }
 lines = {
-"best_food": {"text": "The best food I had ever tasted.", "who": ""},
+"contemplating": {"text": "Do not do whatever it was you were contemplating.", "who": "Tamlin"},
 "feyre_dress": {"text": "I'd prefer not to wear that dress.", "who": "Feyre"},
-"held": {"text": "Invisible hands clapped on my arms and shoved me back into the seat.", "who": ""},
-"held_again": {"text": "The tang of magic. I couldn't get up until I'd eaten.", "who": ""},
-"lucien_andras": {"text": "So. How does a scrawny human girl bring down a wolf like that?", "who": "Lucien"},
+"first_rule": {"text": "Never eat their food. My hands stayed pinned under my thighs.", "who": ""},
+"go_rest": {"text": "Go rest. Ask the staff for anything you need.", "who": "Tamlin"},
+"held": {"text": "Invisible hands clapped on my arms and shoved me back into the seat. The tang of magic seared my nose.", "who": ""},
+"laugh_growl": {"text": "Behind me, Lucien's barking laugh, cut off by a growl.", "who": ""},
 "lucien_tunic": {"text": "The tunic isn't as pretty as a dress.", "who": "Lucien"},
+"no_bite": {"text": "We're not going to bite.", "who": "Lucien"},
 "no_slaves": {"text": "I don't keep slaves.", "who": "Tamlin"},
+"not_enchanted": {"text": "The food is not enchanted, or drugged. You're going to sit at this table and eat, Feyre. And Lucien will do his best to be polite.", "who": "Tamlin"},
 "sit": {"text": "Sit.", "who": "Tamlin"},
-"sniff": {"text": "No metallic stench of magic. And faeries can't lie.", "who": ""},
-"vanished": {"text": "I reached for another slice of torte, and the food vanished.", "who": ""}
+"sniff": {"text": "No metallic stench of magic. And faeries couldn't lie.", "who": ""},
+"stay_for_wine": {"text": "Won't you stay for wine?", "who": "Lucien"},
+"thanks": {"text": "Thank you for the meal.", "who": "Feyre"},
+"vanished": {"text": "I reached for a second helping of torte, and the food vanished.", "who": ""}
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("sit", "lucien_andras", "held_again")
-canon = "Ch7 (Keeper 2026-11-01, [C]): same dining room as ch6; men have eaten, gold goblets; Tamlin seats her at the far end, meat and sauce and bread, pale sparkling wine; invisible hands shove her back into the seat, she can't rise until she eats; she sniffs (no metallic stench, faeries can't lie), chicken first, clears the plate; reaching for more chocolate torte, the food vanishes. Lucien: the tunic isn't as pretty as a dress. Feyre: I'd prefer not to wear that dress. Tamlin: I don't keep slaves (timeline ch7). Invented (X): 'Sit.' for ch7, Lucien's wording about Andras, 'held_again'."
+invented = PackedStringArray("sit", "go_rest")
+canon = "Ch7 (Keeper 2026-11-01, [C]): same dining room as ch6; the men have eaten, gold goblets; Tamlin seats her at the far end, meat and sauce and bread, pale sparkling wine. She won't eat (first rule, hands under her thighs). She shoots up; invisible hands shove her back once (the tang of magic, nothing visible); Tamlin: Do not do whatever it was you were contemplating; legs and middle stay bound until she eats. She sniffs, faeries can't lie, chicken first, eats the plate in silence; reaching for seconds of torte the food vanishes and the bonds loosen. Thank you for the meal; Lucien: Won't you stay for wine?; Tamlin: Go rest... ask the staff; she backs out; Lucien's laugh cut off by a growl. Invented (X): Sit. for ch7; the middle of go_rest."

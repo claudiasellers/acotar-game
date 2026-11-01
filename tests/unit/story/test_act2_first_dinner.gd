@@ -55,6 +55,12 @@ func _seat() -> void:
 	assert_not_null(space.actor(&"lucien"))
 	assert_true(_until("reach feyre_chair"))
 	feyre.global_position = space.mark(&"feyre_chair")
+	assert_true(_until("until she rises"))
+
+
+func _held() -> void:
+	_seat()
+	space.nudge()
 	assert_true(_until("until her first bite"))
 
 
@@ -65,26 +71,44 @@ func test_the_director_hangs_the_coded_dinner() -> void:
 	assert_true(space.can_start())
 
 
-func test_she_is_held_until_she_eats() -> void:
+func test_she_wont_eat_until_the_hold_then_one_shove_holds_her() -> void:
 	_seat()
-	assert_true(space.held)
+	assert_true(space.seated)
+	assert_false(space.held)
 	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
-	assert_true(StoryControl.can_interact(), "E takes a bite")
+	assert_true(StoryControl.can_interact(), "E is live at the table")
+	space.press_interact()
+	space.tick(STEP)
+	assert_eq(space.bites, 0, "the first rule: she won't touch it before the hold")
 	var seat := space.mark(&"feyre_chair")
+	feyre.global_position += Vector3(1.5, 0, 0)
+	space.nudge()
+	space.tick(STEP)
+	assert_eq(space.shoves, 1)
+	assert_true(space.held)
+	assert_almost_eq(Vector2(feyre.global_position.x, feyre.global_position.z).distance_to(Vector2(seat.x, seat.z)), 0.0, 0.01,
+			"shoved back into the seat")
+	assert_true(_until("until her first bite"))
 	for _i in 3:
 		feyre.global_position += Vector3(1.5, 0, 0)
 		space.nudge()
 		space.tick(STEP)
-	assert_eq(space.shoves, 3, "every try to rise is a shove")
-	assert_almost_eq(Vector2(feyre.global_position.x, feyre.global_position.z).distance_to(Vector2(seat.x, seat.z)), 0.0, 0.01,
-			"shoved back into the seat")
+	assert_eq(space.shoves, 1, "the hands come once; after that she simply can't rise")
+	assert_almost_eq(Vector2(feyre.global_position.x, feyre.global_position.z).distance_to(Vector2(seat.x, seat.z)), 0.0, 0.01)
 	_run(20.0)
 	assert_false(WorldState.has_flag("first_dinner_eaten"), "no deed without eating")
 	assert_true(space.running)
 
 
-func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
+func test_her_temper_brings_the_hold_if_the_player_sits_still() -> void:
 	_seat()
+	_run(FirstDinner.RISE_AFTER + 1.0)
+	assert_eq(space.shoves, 1, "she shoots up on her own")
+	assert_true(space.held)
+
+
+func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
+	_held()
 	assert_not_null(space.table.dish(&"chicken"))
 	for mark_name: StringName in [&"plate", &"chicken", &"torte", &"tamlin_goblet"]:
 		assert_false((space.table.dish(mark_name) as MeshInstance3D).mesh is SphereMesh, "%s is the Blender model" % mark_name)
@@ -93,9 +117,8 @@ func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
 	assert_eq(space.bites, 1)
 	assert_null(space.table.dish(&"chicken"), "chicken first")
 	assert_not_null(space.table.dish(&"bread"))
-	assert_true(_until("until a second bite"), "Lucien's tease plays out")
-	space.press_interact()
 	assert_true(_until("until the plate is clear"))
+	space.press_interact()
 	space.press_interact()
 	space.tick(STEP)
 	assert_eq(space.bites, 3)
@@ -108,7 +131,7 @@ func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
 	assert_true(WorldState.has_flag("first_dinner_eaten"))
 	assert_not_null(space.get_node_or_null(^"Raise_first_dinner_eaten") as ActionTrigger)
 	assert_false(space.held)
-	assert_eq(StoryControl.mode, StoryControl.Mode.FULL, "free again")
+	assert_eq(StoryControl.mode, StoryControl.Mode.FULL, "the bonds loosen")
 	feyre.global_position = space.mark(&"table") + Vector3(0, 0, 20)
 	space.tick(STEP)
 	assert_false(space.running)
@@ -117,7 +140,8 @@ func test_three_bites_then_the_torte_vanishes_and_the_deed() -> void:
 
 
 func test_lines_come_from_the_stage_and_tag_inventions() -> void:
-	for id in [&"sit", &"no_slaves", &"held", &"sniff", &"lucien_tunic", &"feyre_dress", &"lucien_andras", &"vanished"]:
+	for id in [&"sit", &"no_slaves", &"not_enchanted", &"held", &"contemplating", &"sniff", &"lucien_tunic",
+			&"feyre_dress", &"first_rule", &"vanished", &"thanks", &"stay_for_wine", &"go_rest", &"laugh_growl"]:
 		assert_false(space.stage.line(id).is_empty(), "line %s" % id)
 	for id in space.stage.invented:
 		assert_true(space.stage.lines.has(id), "invented %s is a real line" % id)

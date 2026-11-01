@@ -1,18 +1,23 @@
 ## The first dinner, ch7 (Keeper, [C]): back in the dining room after Alis's
 ## bath. Tamlin and Lucien have eaten and sip from gold goblets. Tamlin seats
 ## her at the far end with meat and sauce and bread and pale sparkling wine.
-## When she tries to rise, invisible hands clap on her arms and shove her back:
-## she can't get up until she's eaten. She sniffs (no metallic stench; faeries
-## can't lie), stabs a piece of chicken first, clears the plate, reaches for
-## more torte, and the food vanishes. Deed: first_dinner_eaten.
+## She won't touch it (the first rule). When she shoots up, invisible hands
+## clap on her arms and shove her back, once; her legs and middle stay bound
+## until she eats. She sniffs (no metallic stench; faeries can't lie), stabs
+## chicken first, clears the plate in silence, reaches for seconds of torte,
+## and the food vanishes; the bonds loosen. Deed: first_dinner_eaten.
+## (Keeper canon checks 2026-11-01; plans/canon-corrections.md.)
 ##
-## Play: walk to her chair; seated, the camera is hers and E takes a bite.
-## Any move press is the magic holding her (a gold shimmer, a shove, the seat).
+## Play: walk to her chair. Seated, the camera is hers. A move press (or her
+## temper, after a few seconds) brings the one invisible shove; from then on
+## E takes a bite and moving does nothing until the plate is clear.
 class_name FirstDinner
 extends Act2Space
 
 ## Seconds a shove shakes the camera.
 const SHOVE_SECONDS := 0.35
+## She shoots up on her own this long after sitting, if the player hasn't tried.
+const RISE_AFTER := 4.0
 ## Chicken, bread, then the sauce and peas: then the plate is clear.
 const BITES_TO_CLEAR := 3
 
@@ -21,6 +26,11 @@ var held: bool = false
 var bites: int = 0
 var shoves: int = 0
 var torte_gone: bool = false
+## In her chair (the hold comes a moment later).
+var seated: bool = false
+
+var _seated_for: float = 0.0
+var _refused: bool = false
 
 var _seen_presses: int = 0
 var _seen_nudges: int = 0
@@ -32,6 +42,7 @@ func _build_beats() -> Array:
 	shoves = 0
 	held = false
 	torte_gone = false
+	_seated_for = 0.0
 	return [
 		Beats.raise("fact.first_dinner_seen"),
 		Beats.run(_set_the_scene, "set the scene"),
@@ -41,22 +52,32 @@ func _build_beats() -> Array:
 		say(&"sit"),
 		reach(&"feyre_chair", 1.3),
 		Beats.run(_sit, "she sits"),
-		say(&"no_slaves"),
-		Beats.until(func() -> bool: return bites >= 1, "until her first bite"),
-		say(&"best_food"),
 		say(&"lucien_tunic"),
 		say(&"feyre_dress"),
-		Beats.until(func() -> bool: return bites >= 2, "until a second bite"),
-		say(&"lucien_andras"),
+		say(&"no_slaves"),
+		say(&"not_enchanted"),
+		# She shoots up in anger (or the player tries to leave first).
+		Beats.run(func(_s: SceneSpace) -> void: _seated_for = 0.0, "her temper rises"),
+		Beats.until(func() -> bool: return nudges() > _seen_nudges or _seated_for >= RISE_AFTER, "until she rises"),
+		Beats.run(func(_s: SceneSpace) -> void: _shove(), "invisible hands"),
+		say(&"held"),
+		say(&"contemplating"),
+		say(&"no_bite"),
+		Beats.until(func() -> bool: return bites >= 1, "until her first bite"),
 		Beats.until(func() -> bool: return bites >= BITES_TO_CLEAR, "until the plate is clear"),
 		Beats.until(func() -> bool: return torte_gone, "until she reaches for the torte"),
 		say(&"vanished"),
 		Beats.raise("first_dinner_eaten"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			held = false
+			seated = false
 			EventBus.celebration_requested.emit(&"meal", mark(&"plate"))
-			StoryControl.release(), "released"),
+			StoryControl.release(), "the bonds loosen"),
+		say(&"thanks"),
+		say(&"stay_for_wine"),
+		say(&"go_rest"),
 		Beats.until(func() -> bool: return not player_within(9.0, mark(&"table")), "until she leaves the table"),
+		Beats.run(func(_s: SceneSpace) -> void: _aside(&"laugh_growl"), "a laugh, cut off by a growl"),
 		Beats.run(_clear_the_scene, "clear the scene"),
 	]
 
@@ -81,7 +102,7 @@ func _set_the_scene(_s: SceneSpace) -> void:
 
 func _sit(_s: SceneSpace) -> void:
 	_seat_her()
-	held = true
+	seated = true
 	_seen_presses = presses()
 	_seen_nudges = nudges()
 	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
@@ -101,31 +122,36 @@ func _seat_her() -> void:
 
 func tick(delta: float) -> void:
 	super.tick(delta)
-	if not running or not held:
+	if not running or not seated:
 		return
-	while _seen_nudges < nudges():
-		_seen_nudges += 1
-		_shove()
-	while _seen_presses < presses():
-		_seen_presses += 1
-		_take_a_bite()
+	_seated_for += delta
+	if held:
+		# Her legs and middle stay bound until she has eaten: she stays put.
+		if _seen_nudges < nudges():
+			_seen_nudges = nudges()
+			_seat_her()
+		while _seen_presses < presses():
+			_seen_presses += 1
+			_take_a_bite()
+	elif _seen_presses < presses():
+		# Before the hold: hands pinned under her thighs. The first rule.
+		_seen_presses = presses()
+		if not _refused:
+			_refused = true
+			_aside(&"first_rule")
 	if _shake_left > 0.0:
 		_shake_left -= delta
 		StoryControl.shake = 0.25 if _shake_left > 0.0 else 0.0
 
 
-## Invisible hands: a gold shimmer at her arms, a little shake, back in the seat.
+## Invisible hands (Keeper: nothing to see, only the tang of magic): a jolt
+## of the camera and she is back in the seat, held there until she eats.
 func _shove() -> void:
 	shoves += 1
 	_seat_her()
+	_seen_nudges = nudges()
 	_shake_left = SHOVE_SECONDS
-	var p := player()
-	if p and is_inside_tree():
-		Juice.burst(null, &"unlock", p.global_position + Vector3.UP * 1.2, 0.8)
-	if shoves == 1:
-		_aside(&"held")
-	elif shoves == 3:
-		_aside(&"held_again")
+	held = true
 
 
 func _take_a_bite() -> void:
@@ -169,5 +195,6 @@ func _clear_the_scene(_s: SceneSpace) -> void:
 
 func _finish() -> void:
 	held = false
+	seated = false
 	StoryControl.shake = 0.0
 	super._finish()
