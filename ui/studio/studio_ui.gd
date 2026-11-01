@@ -43,6 +43,9 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title_label)
 	var found := UiStyle.label("", 18)
+	# One line: a wrapping label in a row gets no width and stacks its letters.
+	found.autowrap_mode = TextServer.AUTOWRAP_OFF
+	found.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(found)
 
 	var row := HBoxContainer.new()
