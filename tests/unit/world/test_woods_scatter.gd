@@ -1,4 +1,4 @@
-## Woods lane: the scatter generator and the committed coverage reports.
+## Woods lane: the scatter generator and the generated coverage reports.
 extends GutTest
 
 const REGIONS := [&"border_woods", &"eastern_woods", &"suriel_glade"]
@@ -44,9 +44,9 @@ func test_forage_sits_on_world_height() -> void:
 		break
 
 
-func test_committed_reports_meet_the_world_smoke_bar() -> void:
+func test_generated_reports_meet_the_world_smoke_bar() -> void:
 	for id in REGIONS:
-		var text := FileAccess.get_file_as_string("res://world/spring_court/%s/%s_report.json" % [id, id])
+		var text := FileAccess.get_file_as_string("res://world/spring_court/%s/_generated/%s_report.json" % [id, id])
 		var r: Dictionary = JSON.parse_string(text)
 		assert_gte(int(r["types"]), 25, "%s types" % id)
 		assert_gte(int(r["placements_per_km2"]), 300, "%s density" % id)

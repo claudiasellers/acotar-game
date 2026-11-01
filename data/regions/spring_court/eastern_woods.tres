@@ -9,4 +9,4 @@ scene_path = "res://world/spring_court/eastern_woods/eastern_woods.tscn"
 center = Vector3(1250, 0, -50)
 radius = 850.0
 neighbors = PackedStringArray()
-report_path = "res://world/spring_court/eastern_woods/eastern_woods_report.json"
+report_path = "res://world/spring_court/eastern_woods/_generated/eastern_woods_report.json"

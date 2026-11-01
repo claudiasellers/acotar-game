@@ -20,8 +20,10 @@ eastern_woods,suriel_glade}*.tres` and `tools/woods/`. Built on
   densities, ambience ids, forage visuals and respawn days. Content changes
   are data edits.
 - `WoodsScatter`: deterministic jittered-grid placement into `ScatterLayer`s.
-  Nothing generated is committed except the small coverage reports
-  (`tools/woods/write_woods_reports.gd` rewrites them).
+  Nothing generated is committed: the coverage reports
+  (`<id>/_generated/<id>_report.json`) are written by
+  `tools/woods/write_woods_reports.gd`, the `woods_reports` recipe in
+  `generated.conf`, listed after `woods_scatter` because it reads that cache.
 - `WoodsRegion`: loads the baked cache (or generates) and prepares every
   buffer, mesh array and heightmap on a worker thread, then builds in small
   jobs under `FrameBudget` (4 ms of main-thread work per frame): three

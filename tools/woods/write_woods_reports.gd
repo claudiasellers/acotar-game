@@ -1,5 +1,8 @@
 ## Regenerates the woods regions' coverage reports (docs/contracts/world.md §5):
 ##   godot --headless -s tools/woods/write_woods_reports.gd
+## Writes world/spring_court/<id>/_generated/<id>_report.json (git-ignored; the
+## woods_reports recipe in tools/mq/generated.conf runs it after woods_scatter,
+## so world_smoke reads numbers from the merged tree).
 ## Prints one line per region. Deterministic: same seeds, same numbers, in
 ## any build order. `-- --dry-run [region ...]` builds those regions in that
 ## order and only prints (tests/integration/test_woods_build_order.gd).
@@ -29,7 +32,8 @@ func _run() -> void:
 		region.build_now()
 		var report := region.coverage_report()
 		if not dry:
-			ScatterReport.save(report, "res://world/spring_court/%s/%s_report.json" % [id, id])
+			DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://world/spring_court/%s/_generated" % id))
+			ScatterReport.save(report, "res://world/spring_court/%s/_generated/%s_report.json" % [id, id])
 		print("%s %s" % [id, JSON.stringify(report)])
 		region.free()
 	quit()

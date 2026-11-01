@@ -9,4 +9,4 @@ scene_path = "res://world/spring_court/suriel_glade/suriel_glade.tscn"
 center = Vector3(-825, 0, 625)
 radius = 215.0
 neighbors = PackedStringArray("border_woods")
-report_path = "res://world/spring_court/suriel_glade/suriel_glade_report.json"
+report_path = "res://world/spring_court/suriel_glade/_generated/suriel_glade_report.json"
