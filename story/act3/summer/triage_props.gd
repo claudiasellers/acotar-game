@@ -5,7 +5,8 @@
 ##   Table: "the long table in the center of the hall" [C], gilded rosewood [X].
 ##   Vase: Lucien shoves it off; glass and petals on the marble [C].
 ##   Bowl and linen: "steaming water and bandages just appeared" [C].
-##   Blood: the puddle she stands in "until it grew cold" [C].
+##   Blood: on the table, dripping, and the puddle she stands in "until it
+##   grew cold" [C].
 class_name TriageProps
 extends RefCounted
 
@@ -159,26 +160,57 @@ static func supplies() -> Node3D:
 	return n
 
 
-## The puddle under the table. Grow it with set_pool().
-static func pool() -> MeshInstance3D:
+## The blood: a spreading slick on the tabletop round the stumps, drips off
+## Feyre's edge of the table, and the puddle on the marble she stands in.
+## Grow it all with set_pool(); it shows from the first seconds (R3: horror is
+## never toned down).
+static func pool() -> Node3D:
+	var n := Node3D.new()
+	n.name = "BloodPool"
+	var wet := mat(BLOOD, 0.05, 0.25)
+	n.add_child(_disc("TableSlick", wet, Vector3(WOUNDS_AT.x, TABLE_SIZE.y + 0.004, 0.0)))
+	n.add_child(_disc("FloorPool", wet, Vector3(WOUNDS_AT.x - 0.1, 0.004, -0.55)))
+	var drips := Node3D.new()
+	drips.name = "Drips"
+	for i in 3:
+		var d := cylinder(0.008, 0.008, TABLE_SIZE.y - 0.02, wet, Vector3(WOUNDS_AT.x - 0.25 + 0.22 * i, (TABLE_SIZE.y - 0.02) * 0.5, -TABLE_SIZE.z * 0.5 - 0.01))
+		drips.add_child(d)
+	n.add_child(drips)
+	set_pool(n, 0.0)
+	return n
+
+
+static func _disc(disc_name: String, m: Material, at: Vector3) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
-	mi.name = "BloodPool"
+	mi.name = disc_name
 	var mesh := CylinderMesh.new()
 	mesh.top_radius = 1.0
 	mesh.bottom_radius = 1.0
 	mesh.height = 0.004
 	mesh.radial_segments = 24
 	mi.mesh = mesh
-	mi.material_override = mat(BLOOD, 0.08)
-	mi.position = Vector3(-0.2, 0.003, 0.0)
-	mi.scale = Vector3(0.01, 1.0, 0.01)
+	mi.material_override = m
+	mi.position = at
 	return mi
 
 
+## lost: blood lost so far, 0..100.
 static func set_pool(pool_node: Node3D, lost: float) -> void:
-	var r := maxf(POOL_MAX * sqrt(clampf(lost / 100.0, 0.0, 1.0)), 0.01)
-	pool_node.scale = Vector3(r, 1.0, r * 0.8)
-	pool_node.visible = lost > 0.5
+	var f := clampf(lost / 100.0, 0.0, 1.0)
+	var slick := pool_node.get_node_or_null(^"TableSlick") as Node3D
+	if slick:
+		# Soaks across the table fast, then stops at its edges.
+		var r := clampf(0.15 + 1.6 * sqrt(f), 0.15, 0.48)
+		slick.scale = Vector3(r * 1.6, 1.0, r)
+		slick.visible = lost > 0.2
+	var floor_pool := pool_node.get_node_or_null(^"FloorPool") as Node3D
+	if floor_pool:
+		var fr := maxf(POOL_MAX * sqrt(f), 0.01)
+		floor_pool.scale = Vector3(fr, 1.0, fr * 0.8)
+		floor_pool.visible = lost > 2.0
+	var drips := pool_node.get_node_or_null(^"Drips") as Node3D
+	if drips:
+		drips.visible = lost > 1.0
 
 
 ## A rag she has wet, shown in her hand's place on the table edge.

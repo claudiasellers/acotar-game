@@ -253,3 +253,26 @@ func test_with_nothing_to_dress_she_thinks_of_the_infirmary_shelves() -> void:
 			found.append(d.item_id)
 			assert_gt(TriageMath.rate_ingredient(ItemCatalog.get_item(d.item_id) as IngredientData), 0.2, "%s staunches" % d.item_id)
 	assert_eq(found.size(), 2, "two wound herbs on the infirmary shelves, one per stump")
+
+
+func test_lucien_backs_away_retches_and_leaves_and_the_blood_shows() -> void:
+	WorldState.set_flag("naga_survived")
+	Clock.from_dict({"time_of_day": 0.95, "day": Clock.day})
+	var t := _space()
+	assert_true(t.start())
+	feyre.global_position = t.global_position + Vector3(0, 0, -2)
+	var exit := t.lucien_exit
+	assert_not_null(exit)
+	var seen := {}
+	for _i in 300:
+		t.tick(STEP)
+		seen[exit.stage] = true
+		if exit.gone():
+			break
+	assert_true(seen.has(LucienExit.Stage.RETCH), "he doubles over first")
+	assert_true(exit.gone(), "then he is gone through the front doors")
+	assert_false(exit.lucien.visible)
+	var pool := t.props.get_node(^"BloodPool")
+	assert_true((pool.get_node(^"TableSlick") as Node3D).visible, "blood on the table")
+	assert_true((pool.get_node(^"FloorPool") as Node3D).visible, "and on the floor")
+	assert_true((pool.get_node(^"Drips") as Node3D).visible)
