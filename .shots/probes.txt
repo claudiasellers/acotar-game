@@ -1,0 +1,5 @@
+from L22 natural-motion
+quality look
+size 1920x1080
+timeout 600
+shot wolfdeath res://tools/creatures/creature_motion_shot.tscn {out}
