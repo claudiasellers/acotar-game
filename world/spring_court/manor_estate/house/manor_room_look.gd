@@ -14,14 +14,15 @@ const MARBLE := preload("res://world/spring_court/manor_estate/house/marble_floo
 const PLAIN := [&"map_stairwell", &"armory", &"conservatory", &"flower_room", &"lantern_lookout"]
 
 ## Grand rooms whose ceilings are painted as an open sky.
-const SKY_ROOMS := [&"entrance_hall", &"garden_saloon", &"ballroom", &"drawing_room", &"music_room",
+const SKY_ROOMS := [&"garden_saloon", &"ballroom", &"drawing_room", &"music_room",
 		&"gallery", &"morning_room", &"shrine", &"upper_hall", &"portrait_gallery", &"dressing_room",
 		&"rose_parlour", &"wisteria_salon", &"rose_bower", &"garden_loggia"]
 
-## Rooms where Act II plays at eye level under a lowered camera: a painted sky
-## there reads as the roof missing, so they get a coffered ceiling instead,
-## pearl beams with a gilt fillet over a blush field.
-const COFFERED := [&"dining_hall", &"feyre_bedroom", &"feyre_bath"]
+## Rooms where story scenes play at eye level, several of them at night (the
+## entrance hall: Rhysand at Calanmai, the hall marks, the Summer faerie): a
+## painted sky there reads as the roof missing, so they get a coffered ceiling
+## instead, pearl beams with a gilt fillet over a blush field.
+const COFFERED := [&"dining_hall", &"feyre_bedroom", &"feyre_bath", &"entrance_hall"]
 const COFFER_PITCH := 2.4
 const BEAM_WIDTH := 0.26
 const BEAM_DEPTH := 0.24
@@ -133,26 +134,42 @@ static func is_coffered(room: ManorRoomDef) -> bool:
 
 ## Coffering under a coffered room's ceiling: a perimeter cornice and a grid of
 ## beams about COFFER_PITCH apart, each with a gilt fillet along its underside.
-## One mesh (two surfaces) per room, no collision. Returns it, or null.
-static func add_coffers(node: Node3D, room: ManorRoomDef, origin: Vector3, ceiling: float) -> MeshInstance3D:
+## `holes` are the stairwell openings cut from the ceiling (world XZ rects):
+## beams stop at them and a beam frames each opening. One mesh (two surfaces)
+## per room, no collision. Returns it, or null.
+static func add_coffers(node: Node3D, room: ManorRoomDef, origin: Vector3, ceiling: float, holes: Array = []) -> MeshInstance3D:
 	if not is_coffered(room):
 		return null
-	var size := room.rect.size
+	var rect := room.rect
+	var size := rect.size
 	var y := origin.y + ceiling - BEAM_DEPTH * 0.5
 	var beams := SurfaceTool.new()
 	var gilt := SurfaceTool.new()
 	beams.begin(Mesh.PRIMITIVE_TRIANGLES)
 	gilt.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var lines_x := _grid_lines(size.x)
-	var lines_z := _grid_lines(size.y)
-	for x in lines_x:
+	var runs: Array[Rect2] = []
+	for x in _grid_lines(size.x):
 		var w := BEAM_WIDTH * (1.4 if x == 0.0 or x == size.x else 1.0)
 		var cx := clampf(x, w * 0.5, size.x - w * 0.5)
-		_beam(beams, gilt, Vector3(origin.x + cx, y, origin.z + size.y * 0.5), Vector3(w, BEAM_DEPTH, size.y))
-	for z in lines_z:
+		runs.append(Rect2(rect.position.x + cx - w * 0.5, rect.position.y, w, size.y))
+	for z in _grid_lines(size.y):
 		var w := BEAM_WIDTH * (1.4 if z == 0.0 or z == size.y else 1.0)
 		var cz := clampf(z, w * 0.5, size.y - w * 0.5)
-		_beam(beams, gilt, Vector3(origin.x + size.x * 0.5, y, origin.z + cz), Vector3(size.x, BEAM_DEPTH, w))
+		runs.append(Rect2(rect.position.x, rect.position.y + cz - w * 0.5, size.x, w))
+	var open: Array = holes.filter(func(h: Rect2) -> bool: return h.intersects(rect))
+	for run in runs:
+		for piece in ManorHouseBuilder._subtract(run, open):
+			_beam(beams, gilt, piece, y)
+	# Frame each opening with a beam on its edges inside the room.
+	for h: Rect2 in open:
+		var w := BEAM_WIDTH
+		for edge in [Rect2(h.position.x - w, h.position.y - w, h.size.x + 2.0 * w, w),
+				Rect2(h.position.x - w, h.end.y, h.size.x + 2.0 * w, w),
+				Rect2(h.position.x - w, h.position.y, w, h.size.y),
+				Rect2(h.end.x, h.position.y, w, h.size.y)]:
+			var inside := (edge as Rect2).intersection(rect)
+			if inside.size.x > 0.01 and inside.size.y > 0.01:
+				_beam(beams, gilt, inside, y)
 	var mesh := beams.commit()
 	mesh = gilt.commit(mesh)
 	mesh.surface_set_material(0, _coffer_mat(&"beam", EstateKit.PEARL, 0.6, 0.0))
@@ -174,14 +191,17 @@ static func _grid_lines(span: float) -> Array[float]:
 	return out
 
 
-static func _beam(beams: SurfaceTool, gilt: SurfaceTool, center: Vector3, size: Vector3) -> void:
+static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> void:
+	if r.size.x < 0.05 or r.size.y < 0.05:
+		return
+	var center := Vector3(r.get_center().x, y, r.get_center().y)
 	var box := BoxMesh.new()
-	box.size = size
+	box.size = Vector3(r.size.x, BEAM_DEPTH, r.size.y)
 	beams.append_from(box, 0, Transform3D(Basis(), center))
 	var strip := BoxMesh.new()
-	var along_x := size.x > size.z
-	strip.size = Vector3(size.x if along_x else FILLET_WIDTH, 0.03, FILLET_WIDTH if along_x else size.z)
-	gilt.append_from(strip, 0, Transform3D(Basis(), center - Vector3(0.0, size.y * 0.5 + 0.005, 0.0)))
+	var along_x := r.size.x > r.size.y
+	strip.size = Vector3(r.size.x if along_x else FILLET_WIDTH, 0.03, FILLET_WIDTH if along_x else r.size.y)
+	gilt.append_from(strip, 0, Transform3D(Basis(), center - Vector3(0.0, BEAM_DEPTH * 0.5 + 0.005, 0.0)))
 
 
 ## Coffer materials glow a little of their own colour: ambient from below is the

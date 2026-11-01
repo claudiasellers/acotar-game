@@ -123,3 +123,24 @@ func test_act2_rooms_have_coffered_ceilings_not_open_sky() -> void:
 		assert_almost_eq(aabb.size.z, r.rect.size.y, 0.01, "%s spans the room" % id)
 		node.free()
 	assert_null(ManorRoomLook.add_coffers(Node3D.new(), _find(&"ballroom")[0], Vector3.ZERO, 6.0), "skies elsewhere")
+
+
+func test_coffers_stop_at_a_stairwell_and_frame_it() -> void:
+	var r: ManorRoomDef = _find(&"entrance_hall")[0]
+	assert_true(ManorRoomLook.is_coffered(r), "the entrance hall is coffered (night scenes)")
+	var hole := Rect2(r.rect.get_center() - Vector2(2.0, 3.0), Vector2(4.0, 6.0))
+	var node := Node3D.new()
+	var mi := ManorRoomLook.add_coffers(node, r, Vector3(0, 0, 0), 5.0, [hole])
+	var inside := 0
+	var near_edge := 0
+	for surface in mi.mesh.get_surface_count():
+		var verts: PackedVector3Array = mi.mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+		for v in verts:
+			var p := Vector2(v.x, v.z)
+			if hole.grow(-0.01).has_point(p):
+				inside += 1
+			if hole.grow(ManorRoomLook.BEAM_WIDTH + 0.01).has_point(p) and not hole.grow(-0.01).has_point(p):
+				near_edge += 1
+	assert_eq(inside, 0, "no beam crosses the open stairwell")
+	assert_gt(near_edge, 0, "a beam frames the opening")
+	node.free()
