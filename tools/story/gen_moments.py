@@ -102,8 +102,8 @@ moment("gallery", "19", "manor_gallery", "manor_house", ["starlight_pool_found"]
     R("gallery_opened"),
 ], r=6.0)
 moment("first_painting", "19-20", "painting_room_easel", "manor_house", ["gallery_opened"], [
-    C("LOOK", "self"), IN(4, 2.5), W(1.5), R("first_painting"), CEL("painting"),
-], trigger="interact", r=2.5)
+    UF("first_painting"), R("first_painting"), CEL("painting"),
+], trigger="interact", r=2.5, notes="L30: the studio (ui/studio) raises first_painting when her first canvas is finished.")
 moment("rose_thorn", "19", "rose_garden_bush", "manor_grounds", ["gallery_opened"], [
     SP("tamlin", V(1, 0, 1)), C("LOOK", "tamlin"), CU("tamlin", "kisses_her_palm"), W(2.0),
     R("fact.rose_thorn_healed"), CEL("rose"),

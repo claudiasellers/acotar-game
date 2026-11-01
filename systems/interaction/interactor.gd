@@ -16,7 +16,7 @@ signal station_used(station_id: StringName)
 const REACH := 2.5
 const DRESSING_STATIONS: Array[StringName] = [&"wardrobe", &"dressing_mirror"]
 const DRESSING_ROOM := preload("res://ui/dressing_room/dressing_room.gd")
-const PAINTING_UI := preload("res://ui/painting/painting_ui.gd")
+const PAINTING_UI := preload("res://ui/studio/studio_ui.gd")
 const COLLECTION_UI := preload("res://ui/collection_book/collection_book_ui.gd")
 
 var feyre: Feyre
