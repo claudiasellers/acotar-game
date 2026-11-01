@@ -125,7 +125,8 @@ func _freeze() -> void:
 	StoryControl.shake = 0.08
 	# Dread, but not black: she has to see the wood to keep her eyes on the elm.
 	EventBus.mood_requested.emit(&"dread", 0.45, 2.5)
-	EventBus.grade_swap_requested.emit(&"bogge", 4.0)
+	# No grade swap: the shared "bogge" grade's volumetrics (0.06, 60x spring)
+	# black the screen out. The dread mood and this scene's own mist do it.
 	# Her eyes go to the elm at first; after that, holding them there is hers.
 	StoryControl.set_focus(_elm_marker())
 	sound(&"drone", -14.0)
@@ -172,7 +173,6 @@ func _safe() -> void:
 	sound(&"heartbeat", -18.0, 0.8)
 	sound(&"drone", -24.0)
 	EventBus.mood_requested.emit(&"dread", 0.2, 3.0)
-	EventBus.grade_swap_requested.emit(&"spring", 6.0)
 
 
 ## Per frame: how real the Bogge is, the fog, the elm, Lucien's walk.
@@ -291,7 +291,6 @@ func _reset_after_fail() -> void:
 	_swell = 0.0
 	if _fog:
 		(_fog.material as FogMaterial).density = 0.0
-	EventBus.grade_swap_requested.emit(&"spring", 2.0)
 	veil(0.0, 1.6)
 	_caption(&"lucien_told_you")
 	abort("fact.bogge_looked")
