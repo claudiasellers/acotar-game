@@ -63,6 +63,7 @@ func _ready() -> void:
 	EventBus.flag_changed.connect(_on_flag_changed)
 	EventBus.deed_performed.connect(_on_deed)
 	EventBus.mood_requested.connect(_on_mood)
+	CelebrationGate.watch()
 	StoryControl.mode_changed.connect(_on_control_changed)
 	director.refresh(WorldState.has_flag)
 
