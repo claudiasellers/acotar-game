@@ -5,16 +5,18 @@
 ##
 ## Run (from the repo, built files in place: tools/mq/levels.sh ensure):
 ##   tools/mq/godot.sh --fixed-fps 60 res://tools/playtest/act1_playtest.tscn -- --out=/tmp/act1.json
-##     [--stop-after=<beat id>] [--max-wall=<seconds, default 900>] [--settle=<seconds, default 180>]
+##     [--stop-after=<beat id>] [--max-wall=<seconds, default 1500>] [--settle=<seconds, default 180>]
 ##
 ## Acceptance (Act I playable, status.md item 2). The run passes when ALL hold:
 ##   1. The process exit code is 0. Not 137: that is the shutdown watchdog
 ##      below, and the log then names what held shutdown ("shutdown suspects").
 ##   2. The log has "PLAYTEST exit 0", and the report lists these beats,
 ##      each "pass": spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale,
-##      sleep, beast_door, crossing, manor_arrival, then Act II's grounds
-##      (tools/playtest/act2_grounds_beats.gd): first_dinner, bogge_hunt,
-##      puca_gate. Act I alone: --stop-after=manor_arrival.
+##      sleep, beast_door, crossing, manor_arrival; then Act II's first
+##      evening (tools/playtest/act2_beats.gd, L24): act2_arrival, act2_bath,
+##      act2_dinner, curtain_trap; then the grounds
+##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
+##      eaten), bogge_hunt, puca_gate. Act I alone: --stop-after=manor_arrival.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
 ##   4. final_phase is p2_grounds, and after the ride she stands on the
 ##      manor estate and walks (manor_arrival checks both).
@@ -47,7 +49,7 @@ var events: Array[String] = []
 var out_path: String = "user://act1_playtest.json"
 ## Ends the run after this beat (for quick checks), e.g. --stop-after=spawn.
 var stop_after: String = ""
-var max_wall: float = 900.0
+var max_wall: float = 1500.0
 var settle_limit: float = SETTLE_LIMIT
 var _started_at: float = 0.0
 var _finished: bool = false
@@ -419,7 +421,10 @@ func _play() -> void:
 	if _beat.id == stop_after:
 		return
 
-	# 10-12. Act II on the grounds: the first dinner, the Bogge, the puca.
+	# 10-13. Act II's first evening at the manor (L24): arrival, bath, dinner, curtain trap.
+	if not await Act2PlaytestBeats.new().play(self):
+		return
+	# 14-16. Act II on the grounds (L25): the first dinner is already eaten, the Bogge, the puca.
 	await Act2GroundsBeats.new(self).play()
 
 
