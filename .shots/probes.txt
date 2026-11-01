@@ -1,0 +1,5 @@
+from grade lane probe 4
+quality look
+shot center res://tools/world_shot.tscn probe_ew_center {out}/center.png
+shot lay res://tools/world_shot.tscn eastern_bogge {out}/lay.png layout
+shot hi res://tools/world_shot.tscn probe_ew_high {out}/hi.png
