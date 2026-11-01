@@ -95,6 +95,7 @@ ing("ing_venison", "Venison", ["vital", "strong", "warm"], [W, WOODS], "any", ME
 ing("ing_sinew", "Sinew", ["bind"], [W, WOODS], "any", TINY, edible=False, respawn=0, price=1, color="d9c9a8", craft=["binding", "cordage"], desc="Dried tendon for bowstrings and binding.")
 ing("ing_hide", "Deer hide", [], [W, WOODS], "any", LARGE, edible=False, respawn=0, price=6, canon="C", color="8a6a4a", desc="Scraped and sold, or kept against the cold.")
 ing("ing_rabbit", "Rabbit", ["vital"], [W, WOODS, GREEN], "any", MEDIUM, nut=0.2, food=0.5, respawn=0, price=1, canon="C", color="8f7d6b", desc="A snared rabbit: one thin meal.")
+ing("ing_dead_chicken", "Dead chicken", ["vital"], [MAN], "any", MEDIUM, nut=0.2, food=0.5, respawn=0, price=1, canon="C", color="e9dcc4", desc="From the manor kitchen's larder. Bait for something that can't resist fresh meat.")
 ing("ing_hare", "Hare", ["vital"], [W, WOODS, GREEN], "any", MEDIUM, nut=0.25, food=0.6, respawn=0, price=2, canon="C", color="8a7a62", desc="Leaner than a deer, kinder than nothing.")
 ing("ing_hare_pelt", "Hare pelt", [], [W, WOODS], "any", SMALL, edible=False, respawn=0, price=1, color="b3a48a", desc="A soft pelt; lines a glove.")
 ing("ing_wolf_pelt", "Wolf pelt", [], [W], "winter", LARGE, edible=False, respawn=0, price=8, color="6b6b6b", desc="A grey winter pelt. Worth good coin at the market.")
@@ -504,7 +505,7 @@ SHINY_EXTRA = {"col_glass_bead", "col_fae_bell", "col_mask_shard", "col_stone_st
 # First keyword match wins (checked against id and name).
 ICON_RULES = [
 	("feather", ["feather", "down"]), ("pelt", ["pelt", "hide", "wool", "snake_skin"]),
-	("meat", ["venison", "hare", "rabbit", "boar", "trout", "sinew", "stew", "bread", "wine"]),
+	("meat", ["venison", "hare", "rabbit", "chicken", "boar", "trout", "sinew", "stew", "bread", "wine"]),
 	("mushroom", ["cap", "agaric", "chanterelle", "chaga", "fungus", "glowcap", "dreamcap"]),
 	("shell", ["shell", "spiral", "mussel", "egg"]),
 	("drop", ["water", "dew", "sap", "honey", "resin", "spring", "silt", "salt"]),
