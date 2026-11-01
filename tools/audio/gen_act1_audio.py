@@ -911,6 +911,11 @@ CUES = {
     "music_village": (["music/village"], -6, 0, True, True, 0),
     "music_spring_estate": (["music/spring_estate"], -6, 0, True, True, 0),
 }
+import horrors  # noqa: E402  (the court's horrors, Acts II-III)
+
+SOUNDS.update(horrors.SOUNDS)
+CUES.update(horrors.CUES)
+
 SPRING = ["border_woods", "manor_estate", "eastern_woods", "suriel_glade", "blossom_vale", "rosewild",
           "solstice_meadow", "starlight_glen", "western_fells", "autumn_foothills", "hill_of_the_rite",
           "fae_village", "blighted_reaches"]

@@ -31,6 +31,11 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/beast/roar.ogg | The beast's roar at the door | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snap_arrow.ogg | The beast snaps the ash arrow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snarl_loop.ogg | The beast's continuous snarl (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bogge/passed.ogg | The Bogge passes: the cold lets go | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bogge/presence.ogg | The Bogge near: sub throb, icy whine, chattering teeth (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bogge/whisper_1.ogg | The Bogge begs inside her head, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bogge/whisper_2.ogg | The Bogge begs inside her head, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bogge/whisper_3.ogg | The Bogge begs inside her head, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/break.ogg | Arrow snaps | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/draw.ogg | Bow draw: wood and string creak | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_flesh.ogg | Arrow hits flesh | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
@@ -58,6 +63,25 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/foot/wood_3.ogg | Footstep on wood, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/wood_4.ogg | Footstep on wood, variant 4 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/horror/wrong.ogg | Horror: the single wrong sound when the world withdraws | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/attack.ogg | A naga comes at her through the leaves | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/death.ogg | A naga dies: gurgling hiss, thrashing | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/hiss_1.ogg | Naga hiss, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/hiss_2.ogg | Naga hiss, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/hiss_3.ogg | Naga hiss, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/hurt.ogg | A naga's hissing shriek when hit | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/strike.ogg | Naga talons rake her | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/naga/throat_tear.ogg | Tamlin tears out a naga's throat | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/puca/dart.ogg | The puca darts away in a shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/puca/ripple.ogg | The puca's image ripples like water | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/scream.ogg | The Suriel screams as the snare takes it | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/snare_creak.ogg | The snare straining under a struggling thing (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/snare_release.ogg | The tether cut, the Suriel bolts | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/snare_snap.ogg | The double-loop snare jerks tight | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/sniff.ogg | The Suriel's wheezing sniffing as it nears | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/voice_1.ogg | The Suriel answers (wordless rasp), variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/voice_2.ogg | The Suriel answers (wordless rasp), variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/voice_3.ogg | The Suriel answers (wordless rasp), variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/suriel/warning.ogg | The Suriel: 'We are not alone', a hiss far off | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/bark_pain.ogg | The great wolf barks in pain (ash arrow) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/death.ogg | The great wolf dies: whine, whimper, slowing breaths | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/growl_low.ogg | The great wolf's low reverberating growl | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

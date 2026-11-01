@@ -166,3 +166,37 @@ func test_feyre_gets_feet_and_a_bow_voice_when_she_enters() -> void:
 	assert_not_null(d._feet)
 	assert_true(feyre.arrow_fired.is_connected(d._on_arrow_fired))
 	assert_true(feyre.jump_motor.landed.is_connected(d._on_landed))
+
+
+func test_the_suriel_screams_once_when_snared_and_the_snare_holds_it() -> void:
+	var d := _director()
+	EventBus.story_actor_cue.emit(&"suriel", &"stalk")
+	EventBus.story_actor_cue.emit(&"suriel", &"snared")
+	EventBus.story_actor_cue.emit(&"suriel", &"caught")
+	assert_eq(int(d.played.get(&"suriel_sniff", 0)), 1)
+	assert_eq(int(d.played.get(&"suriel_scream", 0)), 1, "one scream, however many announce it")
+	assert_true(d._loops.has(&"snare_creak"))
+	EventBus.journal_entry_added.emit(&"fact.suriel_home")
+	assert_eq(int(d.played.get(&"suriel_voice", 0)), 1)
+	EventBus.story_actor_cue.emit(&"suriel", &"freed")
+	assert_false(d._loops.has(&"snare_creak"))
+	assert_eq(int(d.played.get(&"snare_release", 0)), 1)
+
+
+func test_the_naga_hiss_strike_hurt_and_die() -> void:
+	var d := _director()
+	EventBus.story_actor_cue.emit(&"naga_2", &"attack")
+	EventBus.story_actor_cue.emit(&"naga_3", &"flee")
+	EventBus.creature_hit.emit(&"naga_2", &"naga", &"knife", &"body")
+	EventBus.creature_killed.emit(&"naga_2", &"naga", &"knife", Vector3.ZERO)
+	EventBus.story_actor_cue.emit(&"tamlin", &"tears_a_throat")
+	for cue_id in [&"naga_attack", &"naga_hiss", &"naga_hurt", &"naga_death", &"tamlin_throat_tear"]:
+		assert_eq(int(d.played.get(cue_id, 0)), 1, cue_id)
+
+
+func test_every_horror_cue_exists() -> void:
+	for cue_id in [&"suriel_sniff", &"suriel_scream", &"suriel_voice", &"suriel_warning", &"snare_snap",
+			&"snare_creak", &"snare_release", &"naga_hiss", &"naga_attack", &"naga_strike", &"naga_hurt",
+			&"naga_death", &"tamlin_throat_tear", &"bogge_presence", &"bogge_whisper", &"bogge_passed",
+			&"puca_ripple", &"puca_dart"]:
+		assert_true(bank.has_cue(cue_id), "missing cue %s" % cue_id)
