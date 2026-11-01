@@ -50,22 +50,31 @@ func _run() -> void:
 	print("PROBE mood ", world.grade.mood, " ", world.grade.mood_amount)
 	# Dread preset candidates, applied to the live director.
 	var base: GradePreset = GradeDirector.load_preset(&"dread")
+	var bf := world.find_child("BoggeFog", true, false) as FogVolume
+	var bm := bf.material as FogMaterial
+	var d0 := bm.density
+	var a0 := bm.albedo
+	# [bogge fog density, albedo, dread overrides]
 	var variants := {
-		"vol012_exp19": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012},
-		"vol012_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30},
-		"vol020_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.020, "exposure": 0.30},
-		"vol012_exp30_vlight1": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30, "volumetric_light_energy": 1.0},
-		"vol012_exp30_amb12": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30, "ambient_energy": 1.2},
-		"vol012_exp40_amb12": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40, "ambient_energy": 1.2},
-		"novol_exp30": {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.0, "exposure": 0.30},
+		"bogfog_off": [0.0, a0, {}],
+		"bogfog_020_a50": [0.02, Color(0.5, 0.51, 0.52), {}],
+		"bogfog_020_a50_dreadfix": [0.02, Color(0.5, 0.51, 0.52), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bogfog_030_a55_dreadfix": [0.03, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bogfog_015_a50_dreadfix": [0.015, Color(0.5, 0.51, 0.52), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
+		"bogfog_off_dreadfix": [0.0, a0, {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
 	}
 	for label: String in variants:
+		var v: Array = variants[label]
+		bm.density = v[0]
+		bm.albedo = v[1]
 		var p := base.duplicate() as GradePreset
-		for k: String in variants[label]:
-			p.set(k, variants[label][k])
+		for k: String in v[2]:
+			p.set(k, v[2][k])
 		GradeDirector._dread_preset = p
 		world.grade.apply(world.grade.current)
 		await _shot(label, true)
+	bm.density = d0
+	bm.albedo = a0
 	GradeDirector._dread_preset = base
 	FileAccess.open(out_dir.path_join("luma.txt"), FileAccess.WRITE).store_string("\n".join(lines) + "\n")
 	get_tree().quit(0)
