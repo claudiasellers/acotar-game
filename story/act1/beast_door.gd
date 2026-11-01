@@ -36,6 +36,8 @@ func _ready() -> void:
 				_player_inside = false
 				player_present = false)
 	decision_made.connect(func(fact: String) -> void: chosen_fact = fact)
+	# Camera and lens for the scene, camera only (lane L22, story/staging/).
+	add_child(BeastDoorStaging.new())
 
 
 ## Tests and the greybox can say Feyre is home without an Entry area.

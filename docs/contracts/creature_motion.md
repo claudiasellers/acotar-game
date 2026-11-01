@@ -85,3 +85,61 @@ Regenerate with `ONLY=a,b /opt/bpyenv/bin/python tools/blender/fae_people.py`.
 
 Proof probe: `tools/creatures/people_motion_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/creatures/test_person_animator.gd`.
+
+## Staging (`story/staging/`, lane L22)
+
+`Cine` (`story/staging/cine.gd`) is the film camera for anchored moments.
+There is one per scene tree, made on demand with `Cine.of(get_tree())`. Its
+timing is in real seconds.
+
+- `follow(fov, blend)`: rides Feyre's own camera with another lens. She keeps
+  full control (aim, look) and the frame only tightens.
+- `shot(xform, fov, blend, track, push, push_time)`: an authored angle.
+  `blend` 0 is a cut. `track` is a Callable giving a world point to keep
+  framed, followed with a little lag. `push` is metres of slow dolly. There is
+  a faint handheld breath unless `GameSettings.reduced_effects` is on.
+- `release(blend)`: eases back into Feyre's camera and makes it current.
+- `bars_to(k, seconds)`: letterbox, with 1 = 2.39:1 and 0 = none.
+- `Cine.clear_view(world, subject, dirs, dist, height)`: a camera spot that
+  sees the subject past trees and terrain.
+
+Cine never changes `StoryControl`. Scenes hold and release control
+themselves.
+
+`CreatureAnimator.slow(scale, hold, ramp)` slows one creature's body (hit-stop,
+slow motion) without touching `Engine.time_scale`, which the bow's slow draw
+owns.
+
+`WolfKillStaging` is a child of the WolfKill space, added by one line in
+`wolf_kill.gd`. It only listens (focus, `creature_hit`, `creature_killed`):
+
+- His eyes: `follow(36°)` with half bars.
+- The ash: a hit-stop, a jolt (`StoryControl.shake`), then `follow(54°)` for his look.
+- The kill:
+  1. Slow motion, with `StoryControl.Mode.NONE` held, even across the scene's own finish.
+  2. Cut to a low 34° angle on the side he falls toward.
+  3. Cut over Feyre's shoulder for the last breaths.
+  4. Release, about 10 s in all. Interact skips once 1.5 s have passed.
+
+If another space starts during the kill shots, it cuts back to her camera
+and leaves `StoryControl` alone.
+
+Probe: `tools/creatures/wolf_kill_film_shot.tscn -- <out> [numbers]`.
+
+`BeastDoorStaging` is a child of the BeastDoor space, added by one line in
+`beast_door.gd`. It is camera only and never calls `set_mode` or touches
+`allowed_actions`:
+
+- On the door bursting: over her shoulder at the doorway, with full bars.
+- On "it fills the room" (focus on him): low at her side, looking up, with a push.
+- While the throw window is open (LOOK with `fire` allowed): her own view through a 55° lens with half bars.
+- On the father's plea: a two-shot of the beast and her father, both checked in sight.
+- On the arrow snapping: close on his head.
+- On the scene ending: release.
+
+Each shot tries spots that see past walls and beams, and falls back to her
+own view through a tighter lens. The scene's `StoryControl.shake` carries into
+every Cine shot.
+
+Probe: `tools/creatures/beast_door_film_shot.tscn -- <out> [numbers]`.
+Test: `tests/unit/story/test_staging.gd`.
