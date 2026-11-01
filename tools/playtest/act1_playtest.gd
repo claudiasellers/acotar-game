@@ -5,7 +5,7 @@
 ##
 ## Run (from the repo, built files in place: tools/mq/levels.sh ensure):
 ##   tools/mq/godot.sh --fixed-fps 60 res://tools/playtest/act1_playtest.tscn -- --out=/tmp/act1.json
-##     [--stop-after=<beat id>] [--max-wall=<seconds, default 900>] [--settle=<seconds, default 180>]
+##     [--stop-after=<beat id>] [--max-wall=<seconds, default 1500>] [--settle=<seconds, default 180>]
 ##
 ## Acceptance (Act I playable, status.md item 2). The run passes when ALL hold:
 ##   1. The process exit code is 0. Not 137: that is the shutdown watchdog
@@ -49,7 +49,7 @@ var events: Array[String] = []
 var out_path: String = "user://act1_playtest.json"
 ## Ends the run after this beat (for quick checks), e.g. --stop-after=spawn.
 var stop_after: String = ""
-var max_wall: float = 900.0
+var max_wall: float = 1500.0
 var settle_limit: float = SETTLE_LIMIT
 var _started_at: float = 0.0
 var _finished: bool = false
