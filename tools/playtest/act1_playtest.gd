@@ -30,7 +30,10 @@
 ##      means no spawner answered for that actor, and the player would see a
 ##      grey box. The log names it, where and during which beat ("STAND-IN
 ##      placeholder"), and the run exits 1. A stand-in that wraps a cast model
-##      is logged, not failed.
+##      is logged, not failed. Likewise any visible primitive mesh (box,
+##      capsule, cylinder, sphere, prism) under a character, creature or story
+##      actor ("PRIMITIVE mesh on an actor", with its node path), unless its
+##      name is on PRIMITIVE_ALLOW (intentional props).
 ## Assists ("stuck at ..." lines, "assists" and "assist_causes" in the report)
 ## are not failures: the walker steers in straight lines and hops 6 m when it
 ## stalls for 3 s, where a player would steer round. Each names its cause
@@ -51,6 +54,14 @@ const GAME_SCENE := "res://story/act1/act1_game.tscn"
 const ACCEPTANCE_BEATS: Array[String] = ["spawn", "hunt_to_clearing", "wolf_kill", "skin", "pelt_sale",
 	"sleep", "beast_door", "crossing", "manor_arrival", "act2_arrival", "act2_bath", "act2_dinner",
 	"curtain_trap", "first_dinner", "bogge_hunt", "puca_gate"] + P3P4Chain.BEATS
+## Meshes that count as code-built placeholders when they sit on an actor.
+const PRIMITIVE_MESHES: Array[String] = ["BoxMesh", "CapsuleMesh", "CylinderMesh", "SphereMesh", "PrismMesh"]
+## Intentional primitive props on an actor, by node name (lower case, substring).
+## Feyre's bow and quiver (BowVisual), arrows stuck in a creature (Arrow),
+## and blood beads (Blood) are code-built on purpose.
+const PRIMITIVE_ALLOW: Array[String] = ["bowvisual", "arrow", "blood"]
+## Physics frames between scans of the actors' meshes (2 s at 60 fps).
+const PRIMITIVE_SCAN_FRAMES := 120
 const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
 const WALK_SPEED_GUESS := 4.0
@@ -90,6 +101,11 @@ var _shutdown_suspects: PackedStringArray = []
 var chained: bool = false
 ## StandIns nodes seen this run: {name, placeholder, at, region, beat}.
 var _stand_ins: Array[Dictionary] = []
+## Characters, creatures and story actors seen this run (instance id -> node),
+## and the primitive meshes found on them: {path, mesh, actor, at, region, beat}.
+var _actor_roots: Dictionary = {}
+var _primitives: Array[Dictionary] = []
+var _primitive_paths: Dictionary = {}
 
 
 func _ready() -> void:
@@ -140,7 +156,10 @@ func _run() -> void:
 		var boxes := _stand_ins.filter(func(e: Dictionary) -> bool: return e.placeholder)
 		for e: Dictionary in boxes:
 			_log("STAND-IN placeholder shown: %s at %s in %s, during %s (no spawner answered)" % [e.name, e.at, e.region, e.beat])
-		var ok := missing.is_empty() and boxes.is_empty() \
+		_scan_primitives()
+		for e: Dictionary in _primitives:
+			_log("PRIMITIVE meshes on an actor: %s %s, first %s, at %s in %s, during %s" % [e.actor_path, e.meshes, e.path, e.at, e.region, e.beat])
+		var ok := missing.is_empty() and boxes.is_empty() and _primitives.is_empty() \
 				and beats.all(func(b: Dictionary) -> bool: return b.status == "pass")
 		_finish(0 if ok else 1)
 
@@ -149,8 +168,75 @@ func _run() -> void:
 ## entered the tree: no lane's spawner answered for that actor. Checked a frame
 ## later, once it is placed.
 func _on_node_added(node: Node) -> void:
-	if node is Node3D and node.name.begins_with("StandIn_") and not _finished:
+	if _finished or not node is Node3D:
+		return
+	if node.name.begins_with("StandIn_"):
 		_check_stand_in.call_deferred(node)
+	if node is Creature or node.name.begins_with("StandIn_"):
+		_actor_roots[node.get_instance_id()] = node
+	else:
+		_maybe_story_actor.call_deferred(node)
+
+
+## Spawners answer story_spawn_requested by joining "story_actor_<id>", which
+## can happen just after the node enters the tree.
+func _maybe_story_actor(node: Node) -> void:
+	if not is_instance_valid(node):
+		return
+	for g: StringName in node.get_groups():
+		if String(g).begins_with("story_actor_"):
+			_actor_roots[node.get_instance_id()] = node
+			return
+
+
+## Every visible primitive mesh (box, capsule, cylinder, sphere, prism) under a
+## character, creature or story actor, not on PRIMITIVE_ALLOW: code-built
+## geometry a player would read as a grey box. Each path is logged once.
+func _scan_primitives() -> void:
+	var roots: Array = _actor_roots.values()
+	if feyre and is_instance_valid(feyre):
+		roots.append(feyre)
+	for root: Variant in roots:
+		if not is_instance_valid(root) or not (root as Node).is_inside_tree():
+			continue
+		var r := root as Node3D
+		for n in r.find_children("*", "MeshInstance3D", true, false):
+			var mi := n as MeshInstance3D
+			if mi.mesh == null or not mi.is_visible_in_tree() or not (mi.mesh.get_class() in PRIMITIVE_MESHES):
+				continue
+			var path := String(mi.get_path())
+			if _primitive_paths.has(path) or _primitive_allowed(mi, r):
+				continue
+			_primitive_paths[path] = true
+			# One entry per actor: the first mesh's path, then a count by type.
+			var key := String(r.get_path())
+			var e: Dictionary = {}
+			for x: Dictionary in _primitives:
+				if x.actor_path == key:
+					e = x
+			if e.is_empty():
+				e = {"actor": String(r.name), "actor_path": key, "path": path, "mesh": mi.mesh.get_class(),
+					"meshes": {}, "at": _v(mi.global_position), "region": _region() if feyre else "none",
+					"beat": _current_beat_id()}
+				_primitives.append(e)
+				_log("PRIMITIVE mesh on an actor: %s (%s) on %s at %s" % [path, e.mesh, e.actor, e.at])
+			e.meshes[mi.mesh.get_class()] = int(e.meshes.get(mi.mesh.get_class(), 0)) + 1
+
+
+## The beat running now (a chained segment's beats land in the shared list).
+func _current_beat_id() -> String:
+	return String(beats[beats.size() - 1].id) if not beats.is_empty() else ""
+
+
+func _primitive_allowed(mi: MeshInstance3D, root: Node) -> bool:
+	var n: Node = mi
+	while n and n != root:
+		var low := String(n.name).to_lower()
+		for word: String in PRIMITIVE_ALLOW:
+			if low.contains(word):
+				return true
+		n = n.get_parent()
+	return false
 
 
 func _check_stand_in(node: Node3D) -> void:
@@ -194,6 +280,8 @@ func _missing_beats() -> PackedStringArray:
 
 ## Wall-clock cap: a stuck run still writes its report and exits.
 func _physics_process(_delta: float) -> void:
+	if not chained and not _finished and Engine.get_physics_frames() % PRIMITIVE_SCAN_FRAMES == 0:
+		_scan_primitives()
 	if _finished or Time.get_unix_time_from_system() - _started_at < max_wall:
 		return
 	if not _beat.is_empty() and _beat.status == "running":
@@ -600,6 +688,9 @@ func _select_arrow(id: StringName) -> void:
 func _shoot_at(target: Node3D) -> bool:
 	Input.action_press(&"aim")
 	for i in 180:
+		if not is_instance_valid(target):
+			Input.action_release(&"aim")
+			return false
 		if _turn_camera_to(_lead(target)) < 0.3 and i > 20:
 			break
 		await get_tree().physics_frame
@@ -608,7 +699,8 @@ func _shoot_at(target: Node3D) -> bool:
 		return false
 	Input.action_press(&"fire")
 	for i in 75:
-		_turn_camera_to(_lead(target))
+		if is_instance_valid(target):
+			_turn_camera_to(_lead(target))
 		await get_tree().physics_frame
 	_last_landing = Vector3.INF
 	_shots += 1
@@ -616,6 +708,8 @@ func _shoot_at(target: Node3D) -> bool:
 	await get_tree().physics_frame
 	Input.action_release(&"aim")
 	await _until(func() -> bool: return _last_landing != Vector3.INF, 2.0)
+	if not is_instance_valid(target):
+		return true  # it died (or its scene reset) while the arrow flew
 	var chest := target.global_position + Vector3.UP * 0.9
 	if _last_landing == Vector3.INF:
 		_note("shot at %.0f m: the arrow never landed" % _flat(target.global_position))
@@ -936,6 +1030,7 @@ func _write_report() -> void:
 		"assist_causes": _hop_causes,
 		"shutdown_suspects": _shutdown_suspects,
 		"stand_ins": _stand_ins,
+		"primitives": _primitives,
 		"final_phase": String(PhaseManager.current_phase),
 		"flags": WorldState._flags.keys(),
 		"events": events,
