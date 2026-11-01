@@ -72,8 +72,10 @@ func _bogge_hunt() -> bool:
 	if not await pt._walk_to(anchor.global_position, 3.0, func() -> bool: return space.running, 300.0):
 		pt._fail("never reached the hunt path (can_start %s)" % space.can_start())
 		return false
-	# Walk with Lucien to where he freezes.
-	await pt._walk_to(space.mark(&"freeze"), 2.0, func() -> bool: return space.current_beat_label() != "reach freeze" or not space.running, 60.0)
+	# Walk with Lucien to where he freezes. The scene's first beats (setting
+	# out, his line, the journal) come before "reach freeze", so stop on the
+	# freeze itself (control drops to LOOK), not on the label changing.
+	await pt._walk_to(space.mark(&"freeze"), 2.0, func() -> bool: return not space.running or StoryControl.mode == StoryControl.Mode.LOOK, 60.0)
 	# Frozen: stare at the elm, whatever begs behind her.
 	var elm := space.mark(&"elm") + Vector3.UP * 3.0
 	var t := 0.0
@@ -144,7 +146,26 @@ func _find_anchor(id: StringName, near: Vector3) -> Node3D:
 	if a:
 		return a
 	await pt._walk_to(near, 60.0, func() -> bool: return pt._anchor(id) != null, 600.0)
-	return pt._anchor(id)
+	a = pt._anchor(id)
+	if a == null:
+		# Her region can still be streaming in (it was unloaded while she was
+		# away); stand and wait for it as a player would, and log how long.
+		var t0: float = pt._sim_seconds()
+		await pt._until(func() -> bool: return pt._anchor(id) != null, 180.0)
+		a = pt._anchor(id)
+		if a:
+			pt._note("waited %.0f s at the edge for '%s' to stream in" % [pt._sim_seconds() - t0, id])
+	if a == null:
+		var seen: PackedStringArray = []
+		for n in pt.get_tree().get_nodes_in_group(&"story_anchor"):
+			var m := n as Node3D
+			if m and m.global_position.distance_to(near) < 300.0:
+				seen.append("%s %s" % [m.get_meta(&"anchor_id", m.name), m.get_path()])
+		pt._note("anchors within 300 m of %s: %s; loaded %s, pending %s" % [near, ", ".join(seen) if seen else "none", WorldStreamer.loaded_ids(), WorldStreamer._pending.keys()])
+		var mr := WorldStreamer.loaded_root(&"manor_estate")
+		if mr:
+			pt._note("manor root %s children %s" % [mr.get_path(), mr.get_children().map(func(c: Node) -> String: return c.name)])
+	return a
 
 
 ## The scene StoryDirector hangs on an anchor (attached a frame or so after

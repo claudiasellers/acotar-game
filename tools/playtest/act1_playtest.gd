@@ -36,6 +36,10 @@
 extends Node
 
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
+## Header, acceptance item 2, in play order.
+const ACCEPTANCE_BEATS: Array[String] = ["spawn", "hunt_to_clearing", "wolf_kill", "skin", "pelt_sale",
+	"sleep", "beast_door", "crossing", "manor_arrival", "act2_arrival", "act2_bath", "act2_dinner",
+	"curtain_trap", "first_dinner", "bogge_hunt", "puca_gate"]
 const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
 const WALK_SPEED_GUESS := 4.0
@@ -111,7 +115,28 @@ func _run() -> void:
 		_release_all()
 		_note_shutdown_suspects()
 		await _settle(settle_limit)
-		_finish(0 if beats.all(func(b: Dictionary) -> bool: return b.status == "pass") else 1)
+		var missing := _missing_beats()
+		if not missing.is_empty():
+			_log("MISSING beats (never ran; a beat script failed to load?): %s" % ", ".join(missing))
+		var ok := missing.is_empty() and beats.all(func(b: Dictionary) -> bool: return b.status == "pass")
+		_finish(0 if ok else 1)
+
+
+## The acceptance beats (header, item 2) this run should have played, given
+## --from and --stop-after, that aren't in the report. A beat file that fails
+## to parse skips its beats silently; this turns that into a failure.
+func _missing_beats() -> PackedStringArray:
+	var want := ACCEPTANCE_BEATS.duplicate()
+	if from_beat == "manor":
+		want = want.slice(want.find("act2_arrival"))
+	if stop_after != "" and want.has(stop_after):
+		want = want.slice(0, want.find(stop_after) + 1)
+	var have := beats.map(func(b: Dictionary) -> String: return String(b.id))
+	var out: PackedStringArray = []
+	for id: String in want:
+		if not have.has(id):
+			out.append(id)
+	return out
 
 
 ## Wall-clock cap: a stuck run still writes its report and exits.
