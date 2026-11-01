@@ -61,19 +61,37 @@ func _play() -> void:
 	easel = _studio_easel(stand.global_position)
 	if easel == null:
 		return _fail("no easel station within 3 m of painting_room_easel")
-	feyre.global_position = stand.global_position + Vector3.UP * 0.2
-	feyre.velocity = Vector3.ZERO
-	feyre.set_physics_process(true)
-	if not await _until(func() -> bool: return feyre.is_on_floor(), 10.0):
-		return _fail("not standing in the painting room: %s" % _v(feyre.global_position))
+	# The house builds its floors over a few frames after it streams in (fast
+	# on the Mac): set her down until she stays on the upstairs floor by the
+	# easel for 1.5 s, instead of falling through to the ground floor.
+	var settled := false
+	var tries := 0
+	var end := Time.get_unix_time_from_system() + 60.0
+	while not settled and Time.get_unix_time_from_system() < end:
+		tries += 1
+		feyre.global_position = stand.global_position + Vector3.UP * 0.2
+		feyre.velocity = Vector3.ZERO
+		feyre.set_physics_process(true)
+		await _wait(0.3)
+		settled = await _until(func() -> bool: return not _by_easel(), 1.5) == false
+		if not settled:
+			await _wait(1.0)
+	if not settled:
+		return _fail("never stayed on the painting-room floor (%d tries, at %s, %.1f m from the easel)" % [
+			tries, _v(feyre.global_position), feyre.global_position.distance_to(easel.global_position)])
+	if tries > 1:
+		_note("set down %d times before the floor held" % tries)
 	_note("at the easel %.1f m away, phase %s" % [feyre.global_position.distance_to(easel.global_position), PhaseManager.current_phase])
 	_pass()
 
 	_begin("studio_open", "E at the easel opens the studio, paused, with charcoal at least")
-	_turn_camera_to(easel.global_position + Vector3.UP)
+	for i in 45:
+		_turn_camera_to(easel.global_position + Vector3.UP)
+		await get_tree().physics_frame
 	await _press(&"interact")
 	if not await _until_wall(func() -> bool: return StudioUi.is_open(), 3.0):
-		return _fail("E didn't open the studio (nearest station within %.1f m)" % Interactor.REACH)
+		return _fail("E didn't open the studio (%.1f m from the easel, on floor %s, reach %.1f)" % [
+			feyre.global_position.distance_to(easel.global_position), feyre.is_on_floor(), Interactor.REACH])
 	var session := StudioUi.session()
 	_note("%d paints, stocked %s, paused %s" % [session.supply.paints().size(), StudioSupply.stocked(), get_tree().paused])
 	if StudioSupply.stocked():
@@ -204,6 +222,10 @@ func _curve(a: Vector2, b: Vector2, bow: float) -> Array[Vector2]:
 		var t := i / 24.0
 		out.append(a.lerp(b, t) + n * sin(t * PI) * bow)
 	return out
+
+
+func _by_easel() -> bool:
+	return feyre.is_on_floor() and feyre.global_position.distance_to(easel.global_position) < Interactor.REACH - 0.1
 
 
 func _studio_easel(near: Vector3) -> Node3D:
