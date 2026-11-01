@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StudioPaintSet" format=3]
+
+[ext_resource type="Script" path="res://data/studio/studio_paint_set.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"colour_book"
+names = PackedStringArray("Rose", "Blush", "Lilac", "Periwinkle", "Mint", "Butter", "Pearl", "Spring green", "Moss", "Forest", "Sky", "Twilight", "Plum", "Coral", "Apricot", "Honey", "Fawn", "Bark", "Slate", "Dove grey", "Snow shadow", "Ember", "Wine", "Starlit teal", "Lavender", "Seafoam")
+colors = PackedColorArray(0.914, 0.541, 0.647, 1, 0.969, 0.776, 0.816, 1, 0.804, 0.706, 0.941, 1, 0.624, 0.698, 0.949, 1, 0.718, 0.925, 0.824, 1, 0.984, 0.906, 0.631, 1, 0.953, 0.925, 0.957, 1, 0.486, 0.765, 0.416, 1, 0.369, 0.478, 0.227, 1, 0.184, 0.353, 0.227, 1, 0.549, 0.769, 0.925, 1, 0.353, 0.310, 0.561, 1, 0.478, 0.239, 0.416, 1, 0.941, 0.541, 0.439, 1, 0.965, 0.714, 0.478, 1, 0.890, 0.659, 0.227, 1, 0.722, 0.573, 0.416, 1, 0.369, 0.267, 0.200, 1, 0.365, 0.416, 0.478, 1, 0.725, 0.706, 0.741, 1, 0.780, 0.827, 0.902, 1, 0.769, 0.278, 0.173, 1, 0.494, 0.133, 0.220, 1, 0.247, 0.561, 0.596, 1, 0.702, 0.604, 0.847, 1, 0.624, 0.847, 0.769, 1)
+canon = "X"
+notes = "Shades Feyre can discover by mixing [X]."

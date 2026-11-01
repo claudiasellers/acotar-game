@@ -36,6 +36,8 @@ func _run() -> void:
 	var def := load("res://data/regions/human_realm/wall_seam.tres") as RegionDef
 	world.regions.add_child((load(def.scene_path) as PackedScene).instantiate())
 	await _settle(1.5)
+	# The story spawner puts the real white horse down for the ride.
+	world.add_child(StorySpawner.new())
 	var path := get_tree().root.find_child("WallSeamPath", true, false) as Path3D
 	if path == null:
 		push_error("no WallSeamPath")
@@ -64,7 +66,7 @@ func _run() -> void:
 			if ride.path:
 				print("  path %.0f m, seam at %.0f m, at %.0f m" % [ride.path_length(), ride.seam_at(), ride.progress])
 			print("%.1f s: shot %s, beat '%s', control %d" % [now, last, ride.current_beat_label(), StoryControl.mode])
-			grab_at = now + (0.4 if last == &"released" else 1.2)
+			grab_at = now + (0.4 if last == &"released" else (2.6 if last == &"sleep" else 1.2))
 		if grab_at > 0.0 and now >= grab_at and _frame < 6 and last != &"dark":
 			grab_at = -1.0
 			await _grab(String(last))

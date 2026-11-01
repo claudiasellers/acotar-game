@@ -15,6 +15,8 @@ const SCRIPT_FONTS: Array[String] = ["Snell Roundhand", "Apple Chancery", "Brush
 static var _queue: Array[Dictionary] = []
 static var _showing: bool = false
 static var _font: SystemFont = null
+## Bumped per held recheck (and by clear) so only the newest one acts.
+static var _held: int = 0
 
 
 ## The first time something lands in the book.
@@ -70,6 +72,7 @@ static func note(tree: SceneTree, text: String) -> void:
 static func clear(tree: SceneTree) -> void:
 	_queue.clear()
 	_showing = false
+	_held += 1
 	if tree:
 		for n in tree.get_nodes_in_group(GROUP):
 			n.queue_free()
@@ -82,6 +85,7 @@ static func pending() -> int:
 static func _push(tree: SceneTree, card: Dictionary) -> void:
 	if tree == null:
 		return
+	CelebrationGate.watch()
 	_queue.append(card)
 	if not _showing:
 		_next(tree)
@@ -90,6 +94,16 @@ static func _push(tree: SceneTree, card: Dictionary) -> void:
 static func _next(tree: SceneTree) -> void:
 	if _queue.is_empty() or tree == null or tree.root == null:
 		_showing = false
+		return
+	# Under dread or a staged moment the card waits its turn (R3). Only the
+	# newest recheck acts, so a push while held never starts a second chain.
+	if CelebrationGate.hushed():
+		_showing = false
+		_held += 1
+		var ticket := _held
+		tree.create_timer(CelebrationGate.RECHECK).timeout.connect(func() -> void:
+			if ticket == _held and not _showing:
+				_next(tree))
 		return
 	_showing = true
 	var card: Dictionary = _queue.pop_front()

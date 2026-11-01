@@ -65,3 +65,25 @@ func test_find_region_defs_walks_the_whole_tree() -> void:
 		ids.append(String(region.id))
 	assert_has(ids, "cottage", "human realm RegionDefs are found one folder down")
 	assert_eq(WorldStreamer.find_region_defs("res://no/such/dir").size(), 0)
+
+
+func test_threaded_loads_hold_neighbors_until_the_current_region_lands() -> void:
+	WorldStreamer.synchronous = false
+	var feyre := Node3D.new()
+	add_child_autofree(feyre)
+	feyre.position = Vector3(10, 0, 10)
+	# Checked the moment a lands, not a frame later: a fast machine can load the
+	# tiny neighbor fixture before the test looks again.
+	var seen := {}
+	var on_loaded := func(id: StringName, _root: Node3D) -> void:
+		seen[id] = {"b_loaded": WorldStreamer.is_loaded(&"b"), "b_pending": WorldStreamer._pending.has("b")}
+	WorldStreamer.region_loaded.connect(on_loaded)
+	WorldStreamer.update_for(feyre.position)
+	assert_eq(WorldStreamer._pending.keys(), ["a"], "only her region is requested")
+	WorldStreamer.track(feyre)
+	await wait_until(func() -> bool: return WorldStreamer.is_loaded(&"b"), 10.0)
+	WorldStreamer.region_loaded.disconnect(on_loaded)
+	WorldStreamer.track(null)
+	assert_true(seen.has(&"a"), "her region landed")
+	assert_eq(seen.get(&"a", {}), {"b_loaded": false, "b_pending": false}, "the neighbor waited for it")
+	assert_true(WorldStreamer.is_loaded(&"b"), "then the neighbor follows")

@@ -43,7 +43,7 @@ func _running() -> bool:
 
 func _beast() -> Node3D:
 	var b: Variant = space.get(&"beast") if space else null
-	if b is Node3D and is_instance_valid(b):
+	if is_instance_valid(b) and b is Node3D:
 		return b
 	return get_tree().get_first_node_in_group(&"beast") as Node3D
 
@@ -83,8 +83,18 @@ func _process(_delta: float) -> void:
 			and StoryControl.allowed_actions.has("fire"):
 		shot_name = &"window"
 		var cine := _cine()
-		cine.follow(WINDOW_FOV, 0.4)
 		cine.bars_to(0.5, 0.4)
+		var beast := _beast()
+		var feyre := _feyre()
+		var spot := Vector3.INF
+		if beast and feyre:
+			spot = _spot(_eyeline(feyre, beast, 1.3, 1.6), _head(beast), [beast, feyre], beast)
+		if spot != Vector3.INF:
+			# Over her shoulder at him: her hands, his face.
+			var head := func() -> Vector3: return _head(beast)
+			cine.shot(_look(spot, head.call()), WINDOW_FOV, 0.4, head)
+		else:
+			cine.follow(WINDOW_FOV, 0.4)
 
 
 func _on_space_finished(space_id: StringName) -> void:
@@ -104,9 +114,26 @@ func _door_bursts() -> void:
 	var cine := _cine()
 	cine.bars_to(1.0, 0.25)
 	var head := func() -> Vector3: return _head(beast)
-	var spot := _spot(_eyeline(feyre, beast, 1.1, 1.55), head.call(), [beast, feyre])
+	# Inside the room, facing the door he comes through.
+	var door_v: Variant = beast.get(&"door") if &"door" in beast else null
+	var door: Node3D = door_v if is_instance_valid(door_v) and door_v is Node3D else null
+	var spots: Array[Vector3] = []
+	var at := head.call() as Vector3
+	if door:
+		var inward := -door.global_basis.z
+		inward.y = 0.0
+		inward = inward.normalized()
+		var right := inward.cross(Vector3.UP).normalized()
+		var floor_y := feyre.global_position.y
+		at = Vector3(door.global_position.x, floor_y + 1.3, door.global_position.z)
+		for d in [4.2, 3.4, 2.6]:
+			for sd in [0.9, -0.9, 0.0]:
+				var p: Vector3 = door.global_position + inward * d + right * sd
+				spots.append(Vector3(p.x, floor_y + 1.35, p.z))
+	spots.append_array(_eyeline(feyre, beast, 1.1, 1.55))
+	var spot := _spot(spots, at, [beast, feyre], beast)
 	if spot != Vector3.INF:
-		cine.shot(_look(spot, head.call()), DOOR_FOV, 0.0, head)
+		cine.shot(_look(spot, at), DOOR_FOV, 0.0, head)
 	else:
 		cine.follow(DOOR_FOV, 0.2)
 
@@ -121,9 +148,19 @@ func _low() -> void:
 	var to := Vector3(beast.global_position.x - feyre.global_position.x, 0.0, beast.global_position.z - feyre.global_position.z)
 	var dir := to.normalized() if to.length() > 0.01 else Vector3.FORWARD
 	var right := dir.cross(Vector3.UP).normalized()
-	var low := feyre.global_position + Vector3.UP * 0.7
-	var spot := _spot([low + dir * 0.8 + right * 0.9, low + dir * 0.8 - right * 0.9, low + dir * 1.6,
-			beast.global_position - dir * 2.2 + Vector3.UP * 0.6], head.call(), [beast, feyre])
+	var floor_y := feyre.global_position.y
+	var fwd := -beast.global_basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized() if fwd.length() > 0.01 else -dir
+	var side := fwd.cross(Vector3.UP).normalized()
+	var spots: Array[Vector3] = []
+	# In front of him and low, looking up into his face; then her side of him.
+	for sd in [1.1, -1.1, 0.5]:
+		var p: Vector3 = beast.global_position + fwd * 2.4 + side * sd
+		spots.append(Vector3(p.x, floor_y + 0.6, p.z))
+	var low := feyre.global_position + Vector3.UP * 0.6
+	spots.append_array([low + dir * 0.6 + right * 0.9, low + dir * 0.6 - right * 0.9, low - dir * 0.5])
+	var spot := _spot(spots, head.call(), [beast, feyre], beast)
 	var cine := _cine()
 	if spot != Vector3.INF:
 		cine.shot(_look(spot, head.call()), LOW_FOV, 0.0, head, 0.5, 2.5)
@@ -151,7 +188,8 @@ func _plead() -> void:
 	cine.bars_to(1.0, 0.4)
 	for s in [-side, side]:
 		var spot := Cine.two_shot(a, head, s, TWO_SHOT_FOV, 1.4)
-		if _clear(spot, head, [beast, father, feyre]) and _clear(spot, a, [beast, father, feyre]):
+		if _clear(spot, head, [beast, father, feyre]) and _clear(spot, a, [beast, father, feyre]) \
+				and _free_at(spot, [beast, father, feyre], beast):
 			cine.shot(_look(spot, mid.call()), TWO_SHOT_FOV, 0.0, mid, 0.3, 4.0)
 			return
 	cine.follow(TWO_SHOT_FOV + 6.0, 0.5)
@@ -164,7 +202,15 @@ func _close() -> void:
 		return
 	shot_name = &"close"
 	var head := func() -> Vector3: return _head(beast)
-	var spot := _spot(_eyeline(feyre, beast, 0.5, 1.6), head.call(), [beast, feyre])
+	var h := head.call() as Vector3
+	var fwd := -beast.global_basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized() if fwd.length() > 0.01 else Vector3.FORWARD
+	var side := fwd.cross(Vector3.UP).normalized()
+	# Close on his face, a little off his eye line; then over her shoulder.
+	var spots: Array[Vector3] = [h + fwd * 1.8 + side * 0.5, h + fwd * 1.8 - side * 0.5, h + fwd * 2.4]
+	spots.append_array(_eyeline(feyre, beast, 0.9, 1.6))
+	var spot := _spot(spots, h, [beast, feyre], beast)
 	var cine := _cine()
 	cine.bars_to(1.0, 0.3)
 	if spot != Vector3.INF:
@@ -184,12 +230,35 @@ func _eyeline(feyre: Node3D, beast: Node3D, back: float, up: float) -> Array[Vec
 			f + Vector3.UP * up, Vector3(b.x, f.y, b.z) - dir * minf(2.4, flat.length() * 0.6) + Vector3.UP * up]
 
 
-## The first of `spots` that sees `target` past walls and beams; INF for none.
-func _spot(spots: Array[Vector3], target: Vector3, ignore: Array) -> Vector3:
+## The first of `spots` that sees `target` past walls and beams, has room for
+## the lens (not inside a wall, a beam or him); INF for none.
+func _spot(spots: Array[Vector3], target: Vector3, ignore: Array, beast: Node3D) -> Vector3:
 	for s in spots:
-		if _clear(s, target, ignore):
+		if _clear(s, target, ignore) and _free_at(s, ignore, beast):
 			return s
 	return Vector3.INF
+
+
+## Room for the camera at `spot`: no collider within a hand's breadth, and
+## out of his body (his collision is excluded from the rays, his mesh is not).
+func _free_at(spot: Vector3, ignore: Array, beast: Node3D) -> bool:
+	if beast:
+		var b := beast.global_position
+		if Vector2(spot.x - b.x, spot.z - b.z).length() < 1.4 or spot.distance_to(_head(beast)) < 1.3:
+			return false
+	var q := PhysicsShapeQueryParameters3D.new()
+	var ball := SphereShape3D.new()
+	ball.radius = 0.25
+	q.shape = ball
+	q.transform = Transform3D(Basis.IDENTITY, spot)
+	var exclude: Array[RID] = []
+	for n in ignore:
+		if n is CollisionObject3D:
+			exclude.append((n as CollisionObject3D).get_rid())
+		for body in (n as Node).find_children("*", "CollisionObject3D", true, false):
+			exclude.append((body as CollisionObject3D).get_rid())
+	q.exclude = exclude
+	return (ignore[0] as Node3D).get_world_3d().direct_space_state.intersect_shape(q, 1).is_empty()
 
 
 func _look(from: Vector3, at: Vector3) -> Transform3D:

@@ -57,7 +57,7 @@ func _running() -> bool:
 
 func _wolf() -> Node3D:
 	var w: Variant = space.get(&"wolf") if space else null
-	return w as Node3D if w is Node3D and is_instance_valid(w) else null
+	return w as Node3D if is_instance_valid(w) and w is Node3D else null
 
 
 func _animator() -> CreatureAnimator:

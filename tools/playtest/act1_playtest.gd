@@ -18,8 +18,15 @@
 ##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
 ##      eaten), bogge_hunt, puca_gate. Act I alone: --stop-after=manor_arrival.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
-##   4. final_phase is p2_grounds, and after the ride she stands on the
-##      manor estate and walks (manor_arrival checks both).
+##   4. The phase is p2_grounds on arrival, and after the ride she stands on
+##      the manor estate and walks (manor_arrival checks both). After the
+##      puca, final_phase in the report is p3_house_and_woods.
+##   5. No "SCRIPT ERROR" lines in the log (not checked by the exit code).
+##   6. No StandIns placeholder (box or capsule) entered the tree: each one
+##      means no spawner answered for that actor, and the player would see a
+##      grey box. The log names it, where and during which beat ("STAND-IN
+##      placeholder"), and the run exits 1. A stand-in that wraps a cast model
+##      is logged, not failed.
 ## Assists ("stuck at ..." lines, "assists" and "assist_causes" in the report)
 ## are not failures: the walker steers in straight lines and hops 6 m when it
 ## stalls for 3 s, where a player would steer round. Each names its cause
@@ -74,6 +81,8 @@ var _hop_causes: Dictionary = {}
 var _under_noted: bool = false
 var _last_floor: String = ""
 var _shutdown_suspects: PackedStringArray = []
+## StandIns nodes seen this run: {name, placeholder, at, region, beat}.
+var _stand_ins: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -102,6 +111,7 @@ func _ready() -> void:
 		_log("harvested %s -> %s" % [k, items]))
 	EventBus.item_sold.connect(func(id: StringName, coin: int) -> void: _log("sold %s for %d" % [id, coin]))
 	EventBus.story_actor_cue.connect(func(a: StringName, c: StringName) -> void: _log("cue %s %s" % [a, c]))
+	get_tree().node_added.connect(_on_node_added)
 	_run.call_deferred()
 
 
@@ -118,8 +128,42 @@ func _run() -> void:
 		var missing := _missing_beats()
 		if not missing.is_empty():
 			_log("MISSING beats (never ran; a beat script failed to load?): %s" % ", ".join(missing))
-		var ok := missing.is_empty() and beats.all(func(b: Dictionary) -> bool: return b.status == "pass")
+		var boxes := _stand_ins.filter(func(e: Dictionary) -> bool: return e.placeholder)
+		for e: Dictionary in boxes:
+			_log("STAND-IN placeholder shown: %s at %s in %s, during %s (no spawner answered)" % [e.name, e.at, e.region, e.beat])
+		var ok := missing.is_empty() and boxes.is_empty() \
+				and beats.all(func(b: Dictionary) -> bool: return b.status == "pass")
 		_finish(0 if ok else 1)
+
+
+## A StandIns node (story/act1/stand_ins.gd names them all "StandIn_<id>")
+## entered the tree: no lane's spawner answered for that actor. Checked a frame
+## later, once it is placed.
+func _on_node_added(node: Node) -> void:
+	if node is Node3D and node.name.begins_with("StandIn_") and not _finished:
+		_check_stand_in.call_deferred(node)
+
+
+func _check_stand_in(node: Node3D) -> void:
+	if not is_instance_valid(node) or not node.is_inside_tree():
+		return
+	var e := {"name": String(node.name), "placeholder": _is_placeholder(node),
+		"at": _v(node.global_position), "region": _region() if feyre else "none",
+		"beat": String(_beat.get("id", ""))}
+	_stand_ins.append(e)
+	_log("%s %s at %s (%s)" % ["STAND-IN placeholder" if e.placeholder else "stand-in with its cast model:",
+		e.name, e.at, e.region])
+
+
+## Box or capsule geometry built by StandIns itself, as opposed to a cast
+## model it loaded and renamed (StandIns.figure / beast with a model on disk).
+func _is_placeholder(node: Node3D) -> bool:
+	if node.scene_file_path != "":
+		return false
+	for c in node.get_children():
+		if c is MeshInstance3D and ((c as MeshInstance3D).mesh is BoxMesh or (c as MeshInstance3D).mesh is CapsuleMesh):
+			return true
+	return false
 
 
 ## The acceptance beats (header, item 2) this run should have played, given
@@ -764,6 +808,17 @@ func _until(cond: Callable, seconds: float) -> bool:
 	return bool(cond.call())
 
 
+## Like _until, but the limit is wall-clock seconds: streaming loads run on
+## threads in real time, and under --fixed-fps game time can race ahead of it.
+func _until_wall(cond: Callable, wall_seconds: float) -> bool:
+	var end := Time.get_unix_time_from_system() + wall_seconds
+	while Time.get_unix_time_from_system() < end:
+		if cond.call():
+			return true
+		await get_tree().physics_frame
+	return bool(cond.call())
+
+
 func _anchor(id: StringName) -> Node3D:
 	for a in get_tree().get_nodes_in_group(&"story_anchor"):
 		if StringName(a.get_meta(&"anchor_id", a.name)) == id:
@@ -860,6 +915,7 @@ func _write_report() -> void:
 		"assisted_metres": snappedf(assisted_metres, 0.1),
 		"assist_causes": _hop_causes,
 		"shutdown_suspects": _shutdown_suspects,
+		"stand_ins": _stand_ins,
 		"final_phase": String(PhaseManager.current_phase),
 		"flags": WorldState._flags.keys(),
 		"events": events,
