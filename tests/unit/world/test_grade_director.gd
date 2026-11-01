@@ -130,3 +130,16 @@ func test_the_bogge_grade_takes_no_more_dread() -> void:
 	var spring := GradeDirector.load_preset(&"spring")
 	assert_lt(GradeDirector.with_mood(spring, 1.0).exposure, spring.exposure * 0.5,
 		"other grades still take the full dread")
+
+
+func test_a_blend_into_the_bogge_carries_its_dread_headroom() -> void:
+	# Mid-swap the preset is a mix; if headroom snapped back to 1 the woods
+	# dread would stack fully and flash the black frame during the blend.
+	var spring := GradeDirector.load_preset(&"spring")
+	var bogge := GradeDirector.load_preset(&"bogge")
+	var mid := GradePreset.mix(spring, bogge, 0.5)
+	assert_almost_eq(mid.dread_headroom, 0.5, 0.0001)
+	var spring_moody := GradeDirector.with_mood(spring, 1.0).exposure
+	var mid_moody := GradeDirector.with_mood(mid, 1.0).exposure
+	assert_gt(mid_moody / mid.exposure, spring_moody / spring.exposure,
+		"half-way into the Bogge takes less of the dread than spring does")

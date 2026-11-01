@@ -63,7 +63,8 @@ extends Resource
 const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric_density", &"exposure",
 	&"saturation", &"contrast", &"brightness", &"glow_intensity", &"glow_bloom", &"snow_cover", &"magic",
 	&"volumetric_anisotropy", &"volumetric_light_energy", &"fog_sky_affect", &"fog_height",
-	&"fog_height_density", &"fog_aerial_perspective", &"glow_hdr_threshold", &"golden_sun_energy"]
+	&"fog_height_density", &"fog_aerial_perspective", &"glow_hdr_threshold", &"golden_sun_energy",
+	&"dread_headroom"]
 const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom", &"sun_color",
 	&"ambient_color", &"fog_color", &"volumetric_albedo", &"golden_sky_top", &"golden_sky_horizon",
 	&"golden_sun_color"]
