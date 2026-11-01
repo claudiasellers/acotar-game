@@ -46,6 +46,7 @@ func _run() -> void:
 	for piece in [AlisWelcome.TUNIC, AlisWelcome.TROUSERS]:
 		Gameplay.wardrobe.grant(piece)
 		Gameplay.wardrobe.equip(piece)
+	Gameplay.wardrobe.unequip_slot(&"outer")
 	feyre.global_position = anchor.global_position + Vector3.UP * 0.2
 	print("probe: estate up, dinner can_start=%s running=%s" % [dinner.can_start(), dinner.running])
 	await _seconds(settle)

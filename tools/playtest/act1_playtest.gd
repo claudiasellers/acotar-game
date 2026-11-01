@@ -49,6 +49,9 @@ var events: Array[String] = []
 var out_path: String = "user://act1_playtest.json"
 ## Ends the run after this beat (for quick checks), e.g. --stop-after=spawn.
 var stop_after: String = ""
+## Dev jump (not an acceptance run): --from=manor skips Act I by writing its
+## deeds and starts at the manor drive with Act II's beats. Reported as "dev_jump".
+var from_beat: String = ""
 var max_wall: float = 1500.0
 var settle_limit: float = SETTLE_LIMIT
 var _started_at: float = 0.0
@@ -77,6 +80,8 @@ func _ready() -> void:
 			settle_limit = float(arg.trim_prefix("--settle="))
 		elif arg.begins_with("--max-wall="):
 			max_wall = float(arg.trim_prefix("--max-wall="))
+		elif arg.begins_with("--from="):
+			from_beat = arg.trim_prefix("--from=")
 	_started_at = Time.get_unix_time_from_system()
 	EventBus.deed_performed.connect(func(flag: String) -> void: _log("deed %s" % flag))
 	EventBus.phase_changed.connect(func(a: StringName, b: StringName) -> void: _log("phase %s -> %s" % [a, b]))
@@ -192,6 +197,10 @@ func _play() -> void:
 	if not await _until(func() -> bool: return game.spawned, 30.0):
 		return _fail("never spawned")
 	feyre = game.feyre
+	if from_beat == "manor":
+		_pass()
+		await _jump_to_manor()
+		return
 	feyre.interactor.picked.connect(func(id: StringName, n: int) -> void: _log("picked up %s x%d" % [id, n]))
 	feyre.interactor.station_used.connect(func(id: StringName) -> void: _log("used station %s" % id))
 	feyre.arrow_fired.connect(func(arrow: Node) -> void:
@@ -425,6 +434,32 @@ func _play() -> void:
 	if not await Act2PlaytestBeats.new().play(self):
 		return
 	# 14-16. Act II on the grounds (L25): the first dinner is already eaten, the Bogge, the puca.
+	await Act2GroundsBeats.new(self).play()
+
+
+## --from=manor: Act I's deeds written directly (the only flag writes in this
+## file, and only on this dev path), then the Act II beats from the drive.
+func _jump_to_manor() -> void:
+	_begin("dev_jump_manor", "DEV JUMP: Act I deeds set directly; start on the manor drive")
+	_beat["dev_jump"] = true
+	for flag in ["wolf_killed", "pelt_sold", "wall_crossed", "beast_claim_accepted"]:
+		WorldState.raise_deed(flag)
+	var s := ManorSitePlan.SPAWN
+	feyre.global_position = Vector3(s.x, WorldHeight.height_at(s.x, s.z) + 1.0, s.z)
+	feyre.velocity = Vector3.ZERO
+	WorldStreamer.update_for(feyre.global_position)
+	feyre.set_physics_process(false)
+	if not await _until(func() -> bool: return WorldStreamer.is_loaded(&"manor_estate"), 300.0):
+		return _fail("the manor estate never loaded")
+	await _wait(3.0)
+	feyre.global_position = Vector3(s.x, WorldHeight.height_at(s.x, s.z) + 1.0, s.z)
+	feyre.set_physics_process(true)
+	if not await _until(func() -> bool: return feyre.is_on_floor(), 20.0):
+		return _fail("not standing on the drive: %s" % _v(feyre.global_position))
+	_note("on the drive at %s, phase %s, region %s" % [_v(feyre.global_position), PhaseManager.current_phase, _region()])
+	_pass()
+	if not await Act2PlaytestBeats.new().play(self):
+		return
 	await Act2GroundsBeats.new(self).play()
 
 

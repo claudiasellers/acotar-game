@@ -124,6 +124,7 @@ func test_alis_bathes_her_and_dresses_her_in_the_tunic() -> void:
 	assert_true(welcome().bathed)
 	assert_true(WorldState.has_flag("fact.alis_bathed"))
 	assert_true(Gameplay.wardrobe.equipped().values().has(AlisWelcome.TUNIC), "the tunic, not the dress")
+	assert_eq(Gameplay.wardrobe.equipped_in(&"outer"), &"", "Alis has taken the hunting cloak")
 	assert_true(dinner().player_within(1.0, dining.global_position), "down to dinner")
 	assert_true(dinner().running or dinner().can_start(), "the dinner opens")
 

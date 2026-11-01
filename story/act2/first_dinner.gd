@@ -22,6 +22,10 @@ const RISE_AFTER := 4.0
 const BITES_TO_CLEAR := 3
 
 var table: DinnerTable
+## While she's held: an over-the-shoulder view down the table to Tamlin, with
+## her plate in the foreground (the follow camera sits too far back at a 9 m table).
+var seat_camera: Camera3D
+var _player_camera: Camera3D
 var held: bool = false
 var bites: int = 0
 var shoves: int = 0
@@ -72,6 +76,7 @@ func _build_beats() -> Array:
 			held = false
 			seated = false
 			EventBus.celebration_requested.emit(&"meal", mark(&"plate"))
+			_use_seat_camera(false)
 			StoryControl.release(), "the bonds loosen"),
 		say(&"thanks"),
 		say(&"stay_for_wine"),
@@ -108,6 +113,28 @@ func _sit(_s: SceneSpace) -> void:
 	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(actor(&"tamlin"))
 	EventBus.mood_requested.emit(&"calm", 0.0, 1.0)
+	_use_seat_camera(true)
+
+
+func _use_seat_camera(on: bool) -> void:
+	if not is_inside_tree() or stage == null or not stage.has_mark(&"seat_camera"):
+		return
+	if on:
+		_player_camera = get_viewport().get_camera_3d()
+		if seat_camera == null or not is_instance_valid(seat_camera):
+			seat_camera = Camera3D.new()
+			seat_camera.name = "SeatCamera"
+			seat_camera.fov = 42.0
+			add_child(seat_camera)
+		seat_camera.global_position = mark(&"seat_camera")
+		seat_camera.look_at(mark(&"seat_look"), Vector3.UP)
+		seat_camera.make_current()
+	elif seat_camera and is_instance_valid(seat_camera):
+		seat_camera.clear_current(false)
+		if _player_camera and is_instance_valid(_player_camera):
+			_player_camera.make_current()
+		seat_camera.queue_free()
+		seat_camera = null
 
 
 func _seat_her() -> void:
@@ -188,5 +215,6 @@ func _clear_the_scene(_s: SceneSpace) -> void:
 func _finish() -> void:
 	held = false
 	seated = false
+	_use_seat_camera(false)
 	StoryControl.shake = 0.0
 	super._finish()

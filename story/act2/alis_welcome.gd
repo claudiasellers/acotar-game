@@ -78,6 +78,8 @@ func _dress(_s: SceneSpace) -> void:
 	for piece in [TUNIC, TROUSERS]:
 		wardrobe.grant(piece)
 		wardrobe.equip(piece)
+	# Alis takes the hunting cloak; it waits in her wardrobe (dress-up keeps it).
+	wardrobe.unequip_slot(&"outer")
 	var p := player()
 	if p and is_inside_tree():
 		Juice.burst(p, &"outfit")
