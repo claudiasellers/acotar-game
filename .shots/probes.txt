@@ -1,0 +1,5 @@
+from grade lane bogge probe
+quality look
+shot noreg res://tools/world_shot.tscn eastern_bogge {out}/noreg.png noregions
+shot far res://tools/world_shot.tscn bogge_probe_far {out}/far.png
+shot spring res://tools/world_shot.tscn bogge_probe_spring {out}/spring.png
