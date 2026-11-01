@@ -202,6 +202,27 @@ func found_places() -> Array[MapPlace]:
 	return out
 
 
+## Sketches a named place onto the map without her walking there (the Suriel's
+## answers, L26): uncovers its area, writes its name, and by default celebrates
+## on the minimap. Ids are MapPlace ids in data/map/map_places.tres. Returns
+## false for an unknown id; true otherwise, even if it was already sketched.
+func reveal_place(id: StringName, celebrate: bool = true) -> bool:
+	var place: MapPlace = null
+	for p in places.places:
+		if p.id == id:
+			place = p
+			break
+	if place == null:
+		push_warning("WorldMapHud.reveal_place: no map place '%s'" % id)
+		return false
+	reveal.reveal_rect(place.rect)
+	if not found.has(String(id)):
+		found[String(id)] = true
+		if celebrate:
+			_celebrate(place.label, "", true)
+	return true
+
+
 func _check_place() -> void:
 	var place := places.place_at(player_xz.x, player_xz.y)
 	if place == null or found.has(String(place.id)):

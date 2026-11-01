@@ -52,6 +52,37 @@ func reveal(x: float, z: float, radius: float = RADIUS, edge: float = EDGE) -> i
 	return opened
 
 
+## Uncovers a world XZ rectangle (a named place), melting out over `edge`
+## metres beyond it. Returns how many cells became fully seen.
+func reveal_rect(rect: Rect2, edge: float = EDGE) -> int:
+	var origin := WorldMap.MAP_RECT.position
+	var c0 := maxi(int((rect.position.x - edge - origin.x) / CELL), 0)
+	var c1 := mini(int((rect.end.x + edge - origin.x) / CELL), width - 1)
+	var r0 := maxi(int((rect.position.y - edge - origin.y) / CELL), 0)
+	var r1 := mini(int((rect.end.y + edge - origin.y) / CELL), height - 1)
+	var opened := 0
+	var changed := false
+	for row in range(r0, r1 + 1):
+		var cz := origin.y + (row + 0.5) * CELL
+		for col in range(c0, c1 + 1):
+			var cx := origin.x + (col + 0.5) * CELL
+			var dx := maxf(maxf(rect.position.x - cx, cx - rect.end.x), 0.0)
+			var dz := maxf(maxf(rect.position.y - cz, cz - rect.end.y), 0.0)
+			var d := Vector2(dx, dz).length()
+			if d > edge:
+				continue
+			var v := 255 if d <= 0.0 else int(255.0 * (1.0 - d / edge))
+			var i := row * width + col
+			if v > cells[i]:
+				if v == 255:
+					opened += 1
+				cells[i] = v
+				changed = true
+	if changed:
+		version += 1
+	return opened
+
+
 func value_at(x: float, z: float) -> int:
 	var origin := WorldMap.MAP_RECT.position
 	var col := int((x - origin.x) / CELL)
