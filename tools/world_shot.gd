@@ -83,6 +83,13 @@ func _run() -> void:
 		RenderingServer.force_draw(true, 0.0)
 	else:
 		await _wait_regions_built(world, 180.0)
+		# Regions can register height providers while they build: re-seat the
+		# camera on the final ground (unless an authored frame placed it).
+		if cam.position == eye:
+			eye.y = WorldHeight.height_at(eye.x, eye.z) + 1.7
+			at.y = WorldHeight.height_at(at.x, at.z) + 1.2
+			cam.position = eye
+			cam.look_at(at)
 		for i in 30:
 			await get_tree().process_frame
 	var img := root.get_texture().get_image()
