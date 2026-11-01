@@ -1,0 +1,5 @@
+from spring-lush lane after
+quality look
+shot bv_walk res://tools/landscape/landscape_shot.tscn bv_walk {out}/bv_walk.png
+shot bw_walk res://tools/landscape/landscape_shot.tscn bw_walk {out}/bw_walk.png
+shot bv_raised res://tools/landscape/landscape_shot.tscn bv_raised {out}/bv_raised.png
