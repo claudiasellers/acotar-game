@@ -1,0 +1,5 @@
+from woods-L04
+quality look
+size 1920x1080
+timeout 1200
+shot bogge res://tools/woods/bogge_black_probe.tscn {out}
