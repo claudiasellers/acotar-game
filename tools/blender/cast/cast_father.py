@@ -6,7 +6,8 @@ damp; he walks with a cane, keeps the leg stretched to the fire and whittles
 little wooden figures there.  Passive, defeated, gentle.
 [X]: 1.75 m, thin and stooped (the stoop lives in his clips; the rest pose is
 the T-pose); the RIGHT knee is the broken one (cast_shape knee_scar); greying
-brown hair, thinning and receding, with a short greying beard; hazel eyes;
+brown hair, thinning and receding, with a short greying beard; dark warm
+brown eyes (ch 11: the puca's copy has "brown eyes");
 two outfits (keeper, lore 03-characters/archeron-family.md).  Cottage years
 (default): the dove-grey merchant's coat is the one thing left of the old life,
 faded, patched at the elbows in mismatched wool and too big on him now, horn
@@ -51,7 +52,7 @@ WARP = dict(height=HEIGHT, head=1.04, legs=1.01, arm_len=1.0, arm_thick=0.96,
 GAIT = "male"
 SKIN_LINEAR = cc.srgb("E5BDA6")
 SKIN_SRGB = "E5BDA6"
-IRIS = ((0.24, 0.30, 0.14), (0.52, 0.40, 0.18), (0.62, 0.52, 0.22))   # hazel: green-brown rim, amber-brown centre
+IRIS = ((0.10, 0.06, 0.035), (0.22, 0.13, 0.07), (0.34, 0.22, 0.11))   # dark warm brown: deep rim, chestnut centre
 IRIS_FLECKS = 0.7
 LASH = 0.5
 LASH_LINEAR = cc.srgb("6A5C50")
