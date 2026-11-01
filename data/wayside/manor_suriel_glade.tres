@@ -1,0 +1,132 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_uarud"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_f0tli"]
+
+[sub_resource type="Resource" id="Resource_47xdw"]
+script = ExtResource("2_f0tli")
+kind = &"shimmer"
+id = &"manor_suriel_glade_sycamore"
+position = Vector3(-536, 16.782312, 338.03848)
+target = Vector3(-550, 17.548458, 328.03848)
+items = PackedStringArray()
+line = "Only the wind, fluttering the leaves of a lone sycamore."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small and quick, and gone.",
+"tree": "flora_tree_spring_oak",
+"tree_scale": 1.1
+}
+canon = "C"
+source = "ch 14"
+
+[sub_resource type="Resource" id="Resource_vrfiy"]
+script = ExtResource("2_f0tli")
+kind = &"crossing"
+id = &"manor_suriel_glade_crossing_0"
+position = Vector3(-777.4715, 6.011832, 587.3805)
+target = Vector3(-797.8582, 8.024997, 603.51685)
+items = PackedStringArray()
+line = "Dry boots, mostly."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"model": "stepping_stones",
+"repeat": true,
+"unit_length": 3.2,
+"water_y": 7.819177284262178
+}
+source = "ch 14 (a stream that takes a running leap)"
+
+[sub_resource type="Resource" id="Resource_l8d16"]
+script = ExtResource("2_f0tli")
+kind = &"shimmer"
+id = &"manor_suriel_glade_00_shimmer"
+position = Vector3(-91.26406, 8, 33.531265)
+target = Vector3(-119.54833, 8.4, 5.246994)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_26qp8"]
+script = ExtResource("2_f0tli")
+kind = &"rest"
+id = &"manor_suriel_glade_01_rest"
+position = Vector3(-293.98602, 9.1050415, 221.04117)
+yaw = -0.9204671574391375
+target = Vector3(-824.877, 23.965794, 624.90265)
+items = PackedStringArray()
+line = "Ochre in the grass, and a cool green where it turns to shade."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to suriel glade"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_af1em"]
+script = ExtResource("2_f0tli")
+kind = &"shimmer"
+id = &"manor_suriel_glade_02_shimmer"
+position = Vector3(-429.982, 10.52077, 322.361)
+target = Vector3(-468.61902, 12.552229, 332.71375)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_5ijfw"]
+script = ExtResource("2_f0tli")
+kind = &"vignette"
+id = &"manor_suriel_glade_03_vignette"
+position = Vector3(-558.70557, 13.779681, 395.20422)
+target = Vector3(-558.70557, 13.779681, 395.20422)
+items = PackedStringArray()
+line = "Birds that colour have no business being real."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
+"sketch": "Watching songbird blue"
+}
+
+[sub_resource type="Resource" id="Resource_47oh3"]
+script = ExtResource("2_f0tli")
+kind = &"nook"
+id = &"manor_suriel_glade_04_nook"
+position = Vector3(-672.5898, 10.65364, 513.81415)
+yaw = 0.49343705
+target = Vector3(-672.5898, 10.65364, 513.81415)
+items = PackedStringArray("col_snail_spiral")
+line = "A snail shell, a perfect spiral."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_c",
+"shell_scale": 0.9959781
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[resource]
+script = ExtResource("1_uarud")
+id = &"manor_suriel_glade"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, -825, 625)
+spots = Array[ExtResource("2_f0tli")]([SubResource("Resource_47xdw"), SubResource("Resource_vrfiy"), SubResource("Resource_l8d16"), SubResource("Resource_26qp8"), SubResource("Resource_af1em"), SubResource("Resource_5ijfw"), SubResource("Resource_47oh3")])

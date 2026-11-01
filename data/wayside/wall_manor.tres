@@ -1,0 +1,124 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_p4xkq"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_ga2li"]
+
+[sub_resource type="Resource" id="Resource_8s2gw"]
+script = ExtResource("2_ga2li")
+kind = &"sentry"
+id = &"wall_manor_sentry_0"
+position = Vector3(-71, 15.997587, 1176)
+yaw = 3.141592653589793
+target = Vector3(-71, 15.997587, 1176)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"variant": 0
+}
+source = "ch 9 (sentries patrol in shifts)"
+
+[sub_resource type="Resource" id="Resource_ysvfy"]
+script = ExtResource("2_ga2li")
+kind = &"sentry"
+id = &"wall_manor_sentry_1"
+position = Vector3(-61, 15.567038, 862.4)
+target = Vector3(-61, 15.567038, 862.4)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"variant": 1
+}
+source = "ch 9 (sentries patrol in shifts)"
+
+[sub_resource type="Resource" id="Resource_ioklj"]
+script = ExtResource("2_ga2li")
+kind = &"sentry"
+id = &"wall_manor_sentry_2"
+position = Vector3(-15, 6.2319922, 548.8)
+yaw = 3.141592653589793
+target = Vector3(-15, 6.2319922, 548.8)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"variant": 2
+}
+source = "ch 9 (sentries patrol in shifts)"
+
+[sub_resource type="Resource" id="Resource_wr0rv"]
+script = ExtResource("2_ga2li")
+kind = &"crossing"
+id = &"wall_manor_crossing_0"
+position = Vector3(-68.1483, 12.4110985, 1043.261)
+target = Vector3(-65.836075, 12.675378, 1017.364)
+items = PackedStringArray()
+line = "Dry boots, mostly."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"model": "stepping_stones",
+"repeat": true,
+"unit_length": 3.2,
+"water_y": 12.879389929771424
+}
+source = "ch 14 (a stream that takes a running leap)"
+
+[sub_resource type="Resource" id="Resource_1n0mm"]
+script = ExtResource("2_ga2li")
+kind = &"vignette"
+id = &"wall_manor_00_vignette"
+position = Vector3(-80.93419, 8.629694, 1294.4344)
+target = Vector3(-80.93419, 8.629694, 1294.4344)
+items = PackedStringArray()
+line = "A lark going up and up."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 2,
+"scene": "res://creatures/ambient/scenes/lark.tscn",
+"sketch": "Watching lark"
+}
+
+[sub_resource type="Resource" id="Resource_12co6"]
+script = ExtResource("2_ga2li")
+kind = &"nook"
+id = &"wall_manor_01_nook"
+position = Vector3(-47.921864, 13.50304, 699.8904)
+yaw = -0.6669178
+target = Vector3(-47.921864, 13.50304, 699.8904)
+items = PackedStringArray("col_stone_quartz")
+line = "A stone with the light caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_c",
+"shell_scale": 1.173666
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_ikhuh"]
+script = ExtResource("2_ga2li")
+kind = &"shimmer"
+id = &"wall_manor_02_shimmer"
+position = Vector3(-2.6435957, -0.30730742, 395.589)
+target = Vector3(35.993435, 5.3009486, 405.94174)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[resource]
+script = ExtResource("1_p4xkq")
+id = &"wall_manor"
+realm = &"spring_court"
+waypoints = PackedVector2Array(-100, 1400, 0, 280)
+spots = Array[ExtResource("2_ga2li")]([SubResource("Resource_8s2gw"), SubResource("Resource_ysvfy"), SubResource("Resource_ioklj"), SubResource("Resource_wr0rv"), SubResource("Resource_1n0mm"), SubResource("Resource_12co6"), SubResource("Resource_ikhuh")])

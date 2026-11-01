@@ -1,0 +1,101 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_42jox"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_ptpml"]
+
+[sub_resource type="Resource" id="Resource_k80xy"]
+script = ExtResource("2_ptpml")
+kind = &"vignette"
+id = &"manor_rosewild_doe"
+position = Vector3(30, 10.024796, -330)
+target = Vector3(30, 10.024796, -330)
+items = PackedStringArray()
+line = "A doe. I let her wander on."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"graze": true,
+"scene": "res://creatures/models/deer.gltf",
+"sketch": "The doe in the deer park"
+}
+canon = "C"
+source = "ch 11"
+
+[sub_resource type="Resource" id="Resource_kn8hw"]
+script = ExtResource("2_ptpml")
+kind = &"nook"
+id = &"manor_rosewild_bunting"
+position = Vector3(-40, 8.4591, -250)
+yaw = 2.8801324
+target = Vector3(-40, 8.4591, -250)
+items = PackedStringArray("col_wren_feather")
+line = "Followed the bunting. It left me a feather."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "bunting",
+"shell": "rock_mossy_d",
+"shell_scale": 1.0731637
+}
+canon = "C?"
+source = "ch 7 (the chirping of a bunting, hyacinth on the breeze)"
+
+[sub_resource type="Resource" id="Resource_wqt78"]
+script = ExtResource("2_ptpml")
+kind = &"shimmer"
+id = &"manor_rosewild_00_shimmer"
+position = Vector3(-10.427225, 6.7140093, -210.53474)
+target = Vector3(-45.068237, 9.466771, -230.53474)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_3h7nj"]
+script = ExtResource("2_ptpml")
+kind = &"nook"
+id = &"manor_rosewild_01_nook"
+position = Vector3(-12.110983, 11.850336, -376.15247)
+yaw = -0.08290076
+target = Vector3(-12.110983, 11.850336, -376.15247)
+items = PackedStringArray("col_stone_garnet")
+line = "A garnet in the moss. Like a drop of wine."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "rock_mossy_d",
+"shell_scale": 0.9338139
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_y85v5"]
+script = ExtResource("2_ptpml")
+kind = &"rest"
+id = &"manor_rosewild_02_rest"
+position = Vector3(20.216978, 12.954087, -519.1979)
+yaw = -3.030236966204362
+target = Vector3(0, 14.27338, -700)
+items = PackedStringArray()
+line = "If I had paints, I'd start with the sky and never finish."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fells_overlook_bench",
+"sketch": "A view on the way to rosewild"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[resource]
+script = ExtResource("1_42jox")
+id = &"manor_rosewild"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, 0, -700)
+spots = Array[ExtResource("2_ptpml")]([SubResource("Resource_k80xy"), SubResource("Resource_kn8hw"), SubResource("Resource_wqt78"), SubResource("Resource_3h7nj"), SubResource("Resource_y85v5")])

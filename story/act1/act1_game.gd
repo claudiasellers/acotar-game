@@ -64,6 +64,7 @@ func _ready() -> void:
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 	add_child(SoundDirector.new())
+	add_child(Wayside.new())
 
 
 func _process(delta: float) -> void:

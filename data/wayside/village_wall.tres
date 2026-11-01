@@ -1,0 +1,96 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_8vr0n"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_liuet"]
+
+[sub_resource type="Resource" id="Resource_t445d"]
+script = ExtResource("2_liuet")
+kind = &"nook"
+id = &"village_wall_00_nook"
+position = Vector3(317.77164, 1.0734861, 2123.2195)
+yaw = 2.043554
+target = Vector3(317.77164, 1.0734861, 2123.2195)
+items = PackedStringArray("col_snow_owl_down")
+line = "Owl down. Softer than anything we own."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/log_fallen.glb",
+"shell_scale": 1.1684499
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_op650"]
+script = ExtResource("2_liuet")
+kind = &"rest"
+id = &"village_wall_01_rest"
+position = Vector3(116.89496, 3.181026, 1919.5638)
+yaw = -2.746026594616136
+target = Vector3(-99.94241, 9.669405, 1400.288)
+items = PackedStringArray()
+line = "Pewter sky. The snow has blue in it, if you look."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "res://world/human_realm/shared/assets/flora/stump.glb",
+"sketch": "A view on the way to wall"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_duy75"]
+script = ExtResource("2_liuet")
+kind = &"vignette"
+id = &"village_wall_02_vignette"
+position = Vector3(36.85939, 5.19769, 1773.1743)
+target = Vector3(36.85939, 5.19769, 1773.1743)
+items = PackedStringArray()
+line = "A deer. Too far, and the wind's wrong."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"graze": true,
+"scale": 0.9,
+"scene": "res://creatures/models/deer.gltf",
+"sketch": "Watching deer"
+}
+
+[sub_resource type="Resource" id="Resource_qu077"]
+script = ExtResource("2_liuet")
+kind = &"nook"
+id = &"village_wall_03_nook"
+position = Vector3(-27.474728, 2.6405852, 1609.8856)
+yaw = -0.5199444
+target = Vector3(-27.474728, 2.6405852, 1609.8856)
+items = PackedStringArray("ing_red_ochre")
+line = "Red ochre in the bank cut. Paint, if I had oil."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/log_fallen.glb",
+"shell_scale": 0.9122428
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_fio2p"]
+script = ExtResource("2_liuet")
+kind = &"vignette"
+id = &"village_wall_04_vignette"
+position = Vector3(-97.377174, 0.22036631, 1488.0349)
+target = Vector3(-97.377174, 0.22036631, 1488.0349)
+items = PackedStringArray()
+line = "Crows. They always know where the dead things are."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/crow.tscn",
+"sketch": "Watching crow"
+}
+
+[resource]
+script = ExtResource("1_8vr0n")
+id = &"village_wall"
+realm = &"human_realm"
+waypoints = PackedVector2Array(380, 2250, 300, 2120, 150, 1950, 0, 1700, -80, 1500, -100, 1400)
+spots = Array[ExtResource("2_liuet")]([SubResource("Resource_t445d"), SubResource("Resource_op650"), SubResource("Resource_duy75"), SubResource("Resource_qu077"), SubResource("Resource_fio2p")])

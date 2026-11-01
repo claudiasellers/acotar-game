@@ -1,0 +1,97 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_oa7mx"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_obxbj"]
+
+[sub_resource type="Resource" id="Resource_8joyx"]
+script = ExtResource("2_obxbj")
+kind = &"rest"
+id = &"manor_solstice_meadow_00_rest"
+position = Vector3(-63.148605, 11.233451, -378.2522)
+yaw = -3.017597765564865
+target = Vector3(-149.90208, 29.480362, -1074.3165)
+items = PackedStringArray()
+line = "Butter yellow on the hill. Periwinkle in the distance."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to solstice meadow"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_03ts2"]
+script = ExtResource("2_obxbj")
+kind = &"nook"
+id = &"manor_solstice_meadow_01_nook"
+position = Vector3(-64.732155, 8.856813, -538.46765)
+yaw = 2.9407103
+target = Vector3(-64.732155, 8.856813, -538.46765)
+items = PackedStringArray("col_river_glass")
+line = "River glass. Green as the light under the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_a",
+"shell_scale": 1.1995926
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_x48h7"]
+script = ExtResource("2_obxbj")
+kind = &"vignette"
+id = &"manor_solstice_meadow_02_vignette"
+position = Vector3(-104.5855, -1.51651, -678.40485)
+target = Vector3(-104.5855, -1.51651, -678.40485)
+items = PackedStringArray()
+line = "A bunting, somewhere. The air smells of hyacinth."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_rose.tscn",
+"sketch": "Watching songbird rose"
+}
+
+[sub_resource type="Resource" id="Resource_enyg3"]
+script = ExtResource("2_obxbj")
+kind = &"shimmer"
+id = &"manor_solstice_meadow_03_shimmer"
+position = Vector3(-105.707985, 1.1595591, -827.65735)
+target = Vector3(-133.99225, 7.29548, -855.94165)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_kx08x"]
+script = ExtResource("2_obxbj")
+kind = &"nook"
+id = &"manor_solstice_meadow_04_nook"
+position = Vector3(-145.60164, 15.565377, -974.52997)
+yaw = 2.8583815
+target = Vector3(-145.60164, 15.565377, -974.52997)
+items = PackedStringArray("col_robin_egg_shell")
+line = "A robin's egg, empty. That colour, though."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "bunting",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.0180953
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[resource]
+script = ExtResource("1_oa7mx")
+id = &"manor_solstice_meadow"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, -150, -1075)
+spots = Array[ExtResource("2_obxbj")]([SubResource("Resource_8joyx"), SubResource("Resource_03ts2"), SubResource("Resource_x48h7"), SubResource("Resource_enyg3"), SubResource("Resource_kx08x")])

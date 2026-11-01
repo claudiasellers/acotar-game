@@ -1,0 +1,130 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_div8f"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_vfw2c"]
+
+[sub_resource type="Resource" id="Resource_q5sih"]
+script = ExtResource("2_vfw2c")
+kind = &"rest"
+id = &"manor_eastern_woods_00_rest"
+position = Vector3(182.68896, 9.225858, -29.541342)
+yaw = 1.589962677458105
+target = Vector3(1249.8064, 16.551105, -49.996593)
+items = PackedStringArray()
+line = "Butter yellow on the hill. Periwinkle in the distance."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fells_overlook_bench",
+"sketch": "A view on the way to eastern woods"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_c5nyt"]
+script = ExtResource("2_vfw2c")
+kind = &"nook"
+id = &"manor_eastern_woods_01_nook"
+position = Vector3(336.69125, 8.64454, -48.63161)
+yaw = 0.7674837
+target = Vector3(336.69125, 8.64454, -48.63161)
+items = PackedStringArray("col_stone_quartz")
+line = "A stone with the light caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "rock_mossy_c",
+"shell_scale": 1.0084294
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_s6y28"]
+script = ExtResource("2_vfw2c")
+kind = &"rest"
+id = &"manor_eastern_woods_02_rest"
+position = Vector3(485.52808, 13.780162, -30.028254)
+yaw = 1.5969174369117984
+target = Vector3(1249.8064, 16.551105, -49.996593)
+items = PackedStringArray()
+line = "Sap green, and gold where the light comes through. Cerulean above it all."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fells_overlook_bench",
+"sketch": "A view on the way to eastern woods"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_uiy5i"]
+script = ExtResource("2_vfw2c")
+kind = &"vignette"
+id = &"manor_eastern_woods_03_vignette"
+position = Vector3(617.7476, 13.533645, -50.077538)
+target = Vector3(617.7476, 13.533645, -50.077538)
+items = PackedStringArray()
+line = "A lark going up and up."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 2,
+"scene": "res://creatures/ambient/scenes/lark.tscn",
+"sketch": "Watching lark"
+}
+
+[sub_resource type="Resource" id="Resource_8vah5"]
+script = ExtResource("2_vfw2c")
+kind = &"nook"
+id = &"manor_eastern_woods_04_nook"
+position = Vector3(789.6639, 12.155301, -31.149155)
+yaw = -2.3922367
+target = Vector3(789.6639, 12.155301, -31.149155)
+items = PackedStringArray("col_coin_old")
+line = "An old coin, worn smooth. No face left on it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.0637556
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_fgc87"]
+script = ExtResource("2_vfw2c")
+kind = &"shimmer"
+id = &"manor_eastern_woods_05_shimmer"
+position = Vector3(942.6931, 13.171127, -52.925323)
+target = Vector3(981.33014, 15.023319, -63.278084)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_6xeaa"]
+script = ExtResource("2_vfw2c")
+kind = &"vignette"
+id = &"manor_eastern_woods_06_vignette"
+position = Vector3(1097.5287, 11.285084, -33.63346)
+target = Vector3(1097.5287, 11.285084, -33.63346)
+items = PackedStringArray()
+line = "A lark going up and up."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 2,
+"scene": "res://creatures/ambient/scenes/lark.tscn",
+"sketch": "Watching lark"
+}
+
+[resource]
+script = ExtResource("1_div8f")
+id = &"manor_eastern_woods"
+realm = &"spring_court"
+waypoints = PackedVector2Array(0, -28, 1250, -50)
+spots = Array[ExtResource("2_vfw2c")]([SubResource("Resource_q5sih"), SubResource("Resource_c5nyt"), SubResource("Resource_s6y28"), SubResource("Resource_uiy5i"), SubResource("Resource_8vah5"), SubResource("Resource_fgc87"), SubResource("Resource_6xeaa")])

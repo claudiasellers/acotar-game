@@ -1,0 +1,112 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_08440"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_1vcef"]
+
+[sub_resource type="Resource" id="Resource_pu8xt"]
+script = ExtResource("2_1vcef")
+kind = &"snare"
+id = &"clearing_village_snare_0"
+position = Vector3(40, 0.055447068, 1590)
+target = Vector3(40, 0.055447068, 1590)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+source = "ch 3 (a brace of rabbits)"
+
+[sub_resource type="Resource" id="Resource_nijxm"]
+script = ExtResource("2_1vcef")
+kind = &"snare"
+id = &"clearing_village_snare_1"
+position = Vector3(100, 3.158598, 1604)
+target = Vector3(100, 3.158598, 1604)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+source = "ch 3 (a brace of rabbits)"
+
+[sub_resource type="Resource" id="Resource_poqnk"]
+script = ExtResource("2_1vcef")
+kind = &"nook"
+id = &"clearing_village_00_nook"
+position = Vector3(-235.42764, 3.5723884, 1656.6967)
+yaw = -2.6515613
+target = Vector3(-235.42764, 3.5723884, 1656.6967)
+items = PackedStringArray("ing_clay")
+line = "Good clay under the snow."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/rock_boulder_b.glb",
+"shell_scale": 0.94292563
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_f6cs7"]
+script = ExtResource("2_1vcef")
+kind = &"vignette"
+id = &"clearing_village_01_vignette"
+position = Vector3(-84.41541, 3.498798, 1612.1545)
+target = Vector3(-84.41541, 3.498798, 1612.1545)
+items = PackedStringArray()
+line = "A deer. Too far, and the wind's wrong."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"graze": true,
+"scale": 0.9,
+"scene": "res://creatures/models/deer.gltf",
+"sketch": "Watching deer"
+}
+
+[sub_resource type="Resource" id="Resource_31024"]
+script = ExtResource("2_1vcef")
+kind = &"snare"
+id = &"clearing_village_02_snare"
+position = Vector3(110.61355, 4.76937, 1755.0908)
+target = Vector3(110.61355, 4.76937, 1755.0908)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+source = "ch 3 (a brace of rabbits)"
+
+[sub_resource type="Resource" id="Resource_60i67"]
+script = ExtResource("2_1vcef")
+kind = &"rest"
+id = &"clearing_village_03_rest"
+position = Vector3(149.99232, 6.8995185, 1897.4315)
+yaw = 0.5780955205734535
+target = Vector3(379.57416, 14.927664, 2249.308)
+items = PackedStringArray()
+line = "Ash and iron. The only colour is the smoke from the village."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "res://world/human_realm/shared/assets/flora/rock_flat.glb",
+"sketch": "A view on the way to village"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_yghos"]
+script = ExtResource("2_1vcef")
+kind = &"vignette"
+id = &"clearing_village_04_vignette"
+position = Vector3(229.57306, 5.3657074, 2050.5828)
+target = Vector3(229.57306, 5.3657074, 2050.5828)
+items = PackedStringArray()
+line = "A fox, thin as we are."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"scene": "res://creatures/ambient/scenes/fox.tscn",
+"sketch": "Watching fox"
+}
+
+[resource]
+script = ExtResource("1_08440")
+id = &"clearing_village"
+realm = &"human_realm"
+waypoints = PackedVector2Array(-360, 1660, -200, 1640, 100, 1600, 150, 1950, 300, 2120, 380, 2250)
+spots = Array[ExtResource("2_1vcef")]([SubResource("Resource_pu8xt"), SubResource("Resource_nijxm"), SubResource("Resource_poqnk"), SubResource("Resource_f6cs7"), SubResource("Resource_31024"), SubResource("Resource_60i67"), SubResource("Resource_yghos")])

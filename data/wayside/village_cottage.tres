@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_qxpnj"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_nmu2n"]
+
+[sub_resource type="Resource" id="Resource_rc262"]
+script = ExtResource("2_nmu2n")
+kind = &"snare"
+id = &"village_cottage_00_snare"
+position = Vector3(239.52492, 3.405298, 2251.8025)
+target = Vector3(239.52492, 3.405298, 2251.8025)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+source = "ch 3 (a brace of rabbits)"
+
+[sub_resource type="Resource" id="Resource_o4kmf"]
+script = ExtResource("2_nmu2n")
+kind = &"nook"
+id = &"village_cottage_01_nook"
+position = Vector3(105.86318, -5.613234, 2214.5076)
+yaw = -1.1230311
+target = Vector3(105.86318, -5.613234, 2214.5076)
+items = PackedStringArray("ing_crow_feather")
+line = "A crow's feather. Fletching, or a quill."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/rock_boulder_a.glb",
+"shell_scale": 1.1489824
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_bgtr0"]
+script = ExtResource("2_nmu2n")
+kind = &"rest"
+id = &"village_cottage_02_rest"
+position = Vector3(-17.024557, -6.4035296, 2211.5208)
+yaw = -1.940687554548898
+target = Vector3(-149.5131, 16.906725, 2160.15)
+items = PackedStringArray()
+line = "Pewter sky. The snow has blue in it, if you look."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "res://world/human_realm/shared/assets/flora/rock_flat.glb",
+"sketch": "A view on the way to cottage"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[resource]
+script = ExtResource("1_qxpnj")
+id = &"village_cottage"
+realm = &"human_realm"
+waypoints = PackedVector2Array(380, 2250, 150, 2230, -20, 2200, -150, 2160)
+spots = Array[ExtResource("2_nmu2n")]([SubResource("Resource_rc262"), SubResource("Resource_o4kmf"), SubResource("Resource_bgtr0")])

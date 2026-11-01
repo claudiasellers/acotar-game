@@ -1,0 +1,120 @@
+[gd_resource type="Resource" script_class="WaysideRoute" format=3]
+
+[ext_resource type="Script" path="res://systems/wayside/wayside_route.gd" id="1_vs2wg"]
+[ext_resource type="Script" path="res://systems/wayside/wayside_spot.gd" id="2_5yuah"]
+
+[sub_resource type="Resource" id="Resource_3d1ee"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_0"
+position = Vector3(-233.74739, 7.4138255, 1920.0275)
+target = Vector3(-233.74739, 7.4138255, 1920.0275)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"set_line": "South of the creek bend. The rabbits make their warrens here."
+}
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_287c8"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_1"
+position = Vector3(-246.51857, 7.5810094, 1930.3097)
+target = Vector3(-246.51857, 7.5810094, 1930.3097)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_ry2xn"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_2"
+position = Vector3(-257.3553, 7.536385, 1921.8137)
+target = Vector3(-257.3553, 7.536385, 1921.8137)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_asc8e"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_3"
+position = Vector3(-265.5097, 7.482066, 1910.2023)
+target = Vector3(-265.5097, 7.482066, 1910.2023)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_5cur4"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_4"
+position = Vector3(-254.39523, 7.0323443, 1895.6719)
+target = Vector3(-254.39523, 7.0323443, 1895.6719)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_io4hu"]
+script = ExtResource("2_5yuah")
+kind = &"snare"
+id = &"cottage_clearing_snare_5"
+position = Vector3(-240.44577, 6.7612953, 1906.1492)
+target = Vector3(-240.44577, 6.7612953, 1906.1492)
+items = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+canon = "C?"
+source = "ch 5 (the grove south of the big bend in Silverspring Creek)"
+
+[sub_resource type="Resource" id="Resource_01xkq"]
+script = ExtResource("2_5yuah")
+kind = &"vignette"
+id = &"cottage_clearing_00_vignette"
+position = Vector3(-202.97911, 5.7398314, 2028.8092)
+target = Vector3(-202.97911, 5.7398314, 2028.8092)
+items = PackedStringArray()
+line = "A hare, white already. Too far for the bow."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"graze": true,
+"scene": "res://creatures/models/hare.gltf",
+"sketch": "Watching hare"
+}
+
+[sub_resource type="Resource" id="Resource_mxai4"]
+script = ExtResource("2_5yuah")
+kind = &"nook"
+id = &"cottage_clearing_01_nook"
+position = Vector3(-376.68643, 9.020053, 1805.6151)
+yaw = 0.110753775
+target = Vector3(-376.68643, 9.020053, 1805.6151)
+items = PackedStringArray("col_frost_glass")
+line = "Ice like glass, with a leaf caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/stump.glb",
+"shell_scale": 1.1560915
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[resource]
+script = ExtResource("1_vs2wg")
+id = &"cottage_clearing"
+realm = &"human_realm"
+waypoints = PackedVector2Array(-150, 2160, -200, 2050, -300, 1900, -380, 1780, -360, 1660)
+spots = Array[ExtResource("2_5yuah")]([SubResource("Resource_3d1ee"), SubResource("Resource_287c8"), SubResource("Resource_ry2xn"), SubResource("Resource_asc8e"), SubResource("Resource_5cur4"), SubResource("Resource_io4hu"), SubResource("Resource_01xkq"), SubResource("Resource_mxai4")])
