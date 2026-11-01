@@ -48,6 +48,13 @@ func _play() -> void:
 
 	_begin("dev_jump_p4", "DEV JUMP: deeds through starlight_pool_found; set down at the painting-room easel")
 	_beat["dev_jump"] = true
+	# The p3 house facts that the real path writes before manor_map_drawn;
+	# without them the five hall-mark moments start (auto) once the house
+	# streams in, and the run would be testing a p3 state no player has.
+	for i in range(1, 6):
+		WorldState.set_flag("fact.hall_x_%d" % i)
+		WorldState.set_flag("fact.hall_mark_%d" % i)
+	WorldState.set_flag("fact.hall_map_set_down")
 	for flag in DEV_DEEDS:
 		WorldState.raise_deed(flag)
 	_note("phase %s" % PhaseManager.current_phase)
@@ -90,8 +97,9 @@ func _play() -> void:
 		await get_tree().physics_frame
 	await _press(&"interact")
 	if not await _until_wall(func() -> bool: return StudioUi.is_open(), 3.0):
-		return _fail("E didn't open the studio (%.1f m from the easel, on floor %s, reach %.1f)" % [
-			feyre.global_position.distance_to(easel.global_position), feyre.is_on_floor(), Interactor.REACH])
+		return _fail("E didn't open the studio (%.1f m from the easel, on floor %s, reach %.1f, control %s)" % [
+			feyre.global_position.distance_to(easel.global_position), feyre.is_on_floor(), Interactor.REACH,
+			StoryControl.Mode.keys()[StoryControl.mode]])
 	var session := StudioUi.session()
 	_note("%d paints, stocked %s, paused %s" % [session.supply.paints().size(), StudioSupply.stocked(), get_tree().paused])
 	if StudioSupply.stocked():
