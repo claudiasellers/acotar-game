@@ -1,0 +1,6 @@
+from L25 grounds-dangers
+quality look
+size 1920x1080
+timeout 1200
+shot bogge res://tools/playtest/act2_dangers_clip.tscn -- --only=bogge --out={out}/report.json --settle=30 --max-wall=1100
+shot puca res://tools/playtest/act2_dangers_clip.tscn -- --only=puca --out={out}/report.json --settle=30 --max-wall=1100
