@@ -1,0 +1,3 @@
+quality look
+timeout 900
+shot ceilings res://tools/act2_ceiling_shot.tscn {out}
