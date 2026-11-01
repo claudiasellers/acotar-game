@@ -228,7 +228,8 @@ func test_beast_door_staging_moves_only_the_camera() -> void:
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(beast)
 	assert_eq(staging.shot_name, &"low", "it fills the room")
-	await wait_process_frames(2)
+	# He has stopped by now (he never moves here): the low angle is taken once he is still.
+	await wait_seconds(0.9)
 	assert_lt(cine.camera.global_position.y, floor_y + 1.0, "looking up at him")
 	# The decision window: over her shoulder at him, the scene's control untouched.
 	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["fire"]))
