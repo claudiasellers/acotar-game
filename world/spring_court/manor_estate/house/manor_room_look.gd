@@ -204,8 +204,10 @@ static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> 
 	gilt.append_from(strip, 0, Transform3D(Basis(), center - Vector3(0.0, BEAM_DEPTH * 0.5 + 0.005, 0.0)))
 
 
-## Coffer materials glow a little of their own colour: ambient from below is the
-## lawn green (see sky_ceiling.gdshader), which would muddy a plain ceiling.
+## Coffer materials ignore ambient light, which from below is the lawn green
+## (see sky_ceiling.gdshader) and would muddy them, and glow only faintly of
+## their own colour: the room's lights carry them, so at night, with the
+## lights down, the ceiling goes dark with the hall instead of glowing.
 static func _coffer_mat(kind: StringName, color: Color, roughness: float, metallic: float) -> StandardMaterial3D:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _coffer_mats.has(key):
@@ -215,9 +217,10 @@ static func _coffer_mat(kind: StringName, color: Color, roughness: float, metall
 	m.albedo_color = color
 	m.roughness = roughness
 	m.metallic = metallic
+	m.disable_ambient_light = true
 	m.emission_enabled = true
 	m.emission = color
-	m.emission_energy_multiplier = 0.22 if kind != &"gilt" else 0.35
+	m.emission_energy_multiplier = 0.08 if kind != &"gilt" else 0.15
 	_coffer_mats[key] = m
 	return m
 
