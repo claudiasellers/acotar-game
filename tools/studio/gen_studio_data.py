@@ -40,7 +40,7 @@ BOOK = [
 ]
 BRUSHES = [
     # id, name, shape, opacity, pickup, spacing, size_scale, oriented
-    ("round", "Round sable", "ROUND", 0.8, 0.22, 0.22, 1.0, False),
+    ("round", "Round sable", "ROUND", 0.8, 0.08, 0.22, 1.0, False),
     ("flat", "Flat", "FLAT", 0.9, 0.18, 0.18, 1.1, True),
     ("bristle", "Bristle", "BRISTLE", 0.85, 0.35, 0.15, 1.2, True),
     ("wash", "Wash", "WASH", 0.22, 0.08, 0.2, 1.8, False),

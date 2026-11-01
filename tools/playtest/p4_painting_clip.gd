@@ -6,9 +6,9 @@
 ## Frames: <out>/frame_000.png ... (at most MAX_FRAMES).
 extends "res://tools/playtest/p4_painting_playtest.gd"
 
-const MAX_FRAMES := 110
+const MAX_FRAMES := 150
 ## Drags between frames while a stroke is being painted.
-const DRAGS_PER_FRAME := 6
+const DRAGS_PER_FRAME := 12
 
 var frames_dir: String = ""
 var frame: int = 0
@@ -43,7 +43,6 @@ func _stroke(session: StudioSession, points: Array[Vector2]) -> String:
 			await _grab()
 	session.end_stroke()
 	session.tick()
-	await _grab()
 	return ""
 
 
