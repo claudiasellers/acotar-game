@@ -18,6 +18,15 @@ const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
 const DEFAULT_PITCH := -0.2094  # -12 degrees
 const PLAYER_LAYER := 1 << 1
 const WORLD_MASK := 1 << 0
+## Indoors (a roof or ceiling above her head) the camera stays in the room: it may
+## rise at most this far above its pivot (her head height, 1.5 m), which keeps it
+## under rafters and low beams that have no collision of their own, and never
+## within INDOOR_CEILING_GAP of the ceiling it does hit. The arm is shorter too.
+const INDOOR_RISE := 0.7
+const INDOOR_CEILING_GAP := 0.35
+const INDOOR_ARM := 2.8
+## How far up (m) a roof still counts as "indoors".
+const INDOOR_PROBE := 9.0
 
 @export var bow: BowData = preload("res://data/bows/hunting_bow.tres")
 @export var walk_speed: float = 3.2
@@ -84,6 +93,10 @@ var _spring_arm: SpringArm3D
 var _stamina_cooldown: float = 0.0
 var _exhausted: bool = false
 var _recentering: bool = false
+## 0 outdoors .. 1 indoors, eased so doorways don't pop the camera.
+var _indoor: float = 0.0
+## Highest the camera may sit above its pivot right now (m).
+var _indoor_rise: float = INDOOR_RISE
 var _recenter_t: float = 0.0
 var _recenter_from := Vector2.ZERO
 var _recenter_to := Vector2.ZERO
@@ -137,8 +150,10 @@ func _process(delta: float) -> void:
 	var shake := StoryControl.shake * (0.0 if GameSettings.reduced_effects else 1.0)
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
-	var target_length := 1.7 if (is_aiming or is_drawing) else 3.6
+	_update_indoor(delta)
+	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6, INDOOR_ARM, _indoor)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
+	_clamp_indoor_pitch()
 	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
 	_spring_arm.position.x = lerpf(_spring_arm.position.x, shoulder, 10.0 * delta)
 	_update_breath(delta)
@@ -381,6 +396,35 @@ func _remember_safe_spot(delta: float) -> void:
 		_safe_spots.append(global_position)
 		if _safe_spots.size() > 12:
 			_safe_spots.pop_front()
+
+
+## Is there a roof over her? Reads the ceiling height straight above the camera pivot.
+func _update_indoor(delta: float) -> void:
+	var from := _camera_rig.global_position
+	var hit := get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(
+			from, from + Vector3.UP * INDOOR_PROBE, WORLD_MASK, [get_rid()]))
+	var roofed := not hit.is_empty()
+	if roofed:
+		_indoor_rise = clampf((hit.position as Vector3).y - from.y - INDOOR_CEILING_GAP, 0.0, INDOOR_RISE)
+	_indoor = move_toward(_indoor, 1.0 if roofed else 0.0, delta / 0.3)
+
+
+## Indoors, the downward look is limited so the camera (pivot + arm * sin(pitch))
+## never rises past `_indoor_rise`: under the beams, never up in the rafters.
+func _clamp_indoor_pitch() -> void:
+	if _indoor <= 0.0:
+		return
+	var arm := maxf(_spring_arm.spring_length, 0.1)
+	var limit := -asin(clampf(_indoor_rise / arm, 0.0, 1.0))
+	# Eased with _indoor: outdoors the usual -70 degree limit applies.
+	limit = lerpf(deg_to_rad(-70.0), limit, _indoor)
+	if _camera_pitch.rotation.x < limit:
+		_camera_pitch.rotation.x = limit
+
+
+## Camera height above its pivot (m), for tests and tools.
+func camera_rise() -> float:
+	return camera.global_position.y - _camera_rig.global_position.y
 
 
 func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
