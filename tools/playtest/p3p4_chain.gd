@@ -10,9 +10,9 @@
 ## game, Feyre, beats and log, so its _run (which loads a dev jump) never runs.
 ## Its beats are renamed "<segment>:<beat>". Before each one the chain walks her
 ## to where that lane's jump would have set her down, and lets the clock run
-## when the beat needs night. Where the game gives her no way to carry what the
-## jump hands her (the Suriel's snare kit, the faerie's herbs), the chain grants
-## it as a WORKAROUND, so the run says what is missing instead of stalling.
+## when the beat needs night. She fetches the Suriel's snare kit herself (the
+## kitchen larder's chicken, the potting shed's twine); the faerie's herbs are
+## L29's "shelves" beat. Nothing is granted.
 ## painting:dev_jump_p4 and painting:gallery_seen keep L30's two set-downs (the
 ## walker can't take stairs); in the chain every deed its jump writes is
 ## already earned, which painting:travel checks.
@@ -24,10 +24,22 @@ const HOUSE := "res://tools/playtest/p3_house_playtest.gd"
 const SURIEL := "res://tools/playtest/p3_suriel_playtest.gd"
 const FAERIE := "res://tools/playtest/p3_faerie_playtest.gd"
 const PAINTING := "res://tools/playtest/p4_painting_playtest.gd"
-## What each lane's dev jump hands her (story/act3/dev/p3_jump.gd,
-## story/act3/summer/dev/faerie_jump.gd).
-const SURIEL_KIT := {&"ing_sinew": 2, &"ing_rabbit": 1, &"ing_salt": 1, &"arrow_ash": 1}
-const FAERIE_KIT := {&"ing_yarrow": 2, &"ing_honey": 1, &"ing_fire_lily": 1}
+## The snare kit from the house and grounds (L26-4): a fresh-killed chicken
+## from the kitchen larder for the bait, the gardener's twine on the potting
+## shed's work table for both loops. Both restock daily.
+const CHICKEN := &"ing_dead_chicken"
+const TWINE := &"mat_snare_twine"
+## House-space walks (x, z; the house sits at the world origin), from the
+## study to the kitchen and from the kitchen back to the front doors, along
+## L28's door-to-door routes (p3_house_playtest.gd).
+const STUDY_TO_KITCHEN := [Vector2(-12.8, -61.5), Vector2(-12, -66), Vector2(-9, -66), Vector2(-9, -67.5),
+		Vector2(-1.8, -67.5), Vector2(-1.8, -62.5), Vector2(-1, -59), Vector2(7, -55), Vector2(9, -50),
+		Vector2(12, -50), Vector2(40, -50), Vector2(44, -51), Vector2(52, -51), Vector2(52, -57)]
+const KITCHEN_TO_DOORS := [Vector2(52, -51), Vector2(44, -51), Vector2(40, -50), Vector2(12, -50),
+		Vector2(9, -50), Vector2(7, -54), Vector2(7, -38)]
+## Round the east side of the house to the kitchen garden's potting shed
+## (Rect2(148, -77, 10, 7), door on its south side, the table at its north end).
+const TO_SHED := [Vector2(0, 14), Vector2(100, 14), Vector2(153, -50), Vector2(153, -66), Vector2(153, -71)]
 
 ## In play order; the header's acceptance list appends these.
 const BEATS: Array[String] = [
@@ -35,7 +47,7 @@ const BEATS: Array[String] = [
 	"house:to_the_infirmary", "house:wound_dressed", "house:mural",
 	"suriel:travel", "suriel:spawn", "suriel:scout_stream", "suriel:set_snare", "suriel:hide_downwind",
 	"suriel:suriel_caught", "suriel:answers", "suriel:naga",
-	"faerie:travel", "faerie:spawn", "faerie:carried_in", "faerie:triage", "faerie:words", "faerie:hand", "faerie:held",
+	"faerie:travel", "faerie:spawn", "faerie:carried_in", "faerie:shelves", "faerie:triage", "faerie:words", "faerie:hand", "faerie:held",
 	"starlight_pool",
 	"painting:travel", "painting:spawn", "painting:dev_jump_p4", "painting:studio_open",
 	"painting:gallery_opened", "painting:first_painting", "painting:gallery_seen"]
@@ -76,8 +88,9 @@ func _house() -> bool:
 
 
 func _suriel() -> bool:
-	pt._begin("suriel:travel", "out to the Suriel's glade with what she'd carry from the manor")
-	_provide(SURIEL_KIT, "the Suriel snare kit")
+	pt._begin("suriel:travel", "a chicken from the kitchen larder, twine from the potting shed, then out to the Suriel's glade")
+	if not await _gather_snare_kit():
+		return false
 	var a: Node3D = await _reach_anchor(&"suriel_snare", _region_center(&"suriel_glade"))
 	if a == null:
 		return false
@@ -92,7 +105,6 @@ func _suriel() -> bool:
 
 func _faerie() -> bool:
 	pt._begin("faerie:travel", "home to the entrance hall (manor_window_hide) and wait there for the night")
-	_provide(FAERIE_KIT, "the faerie's herbs")
 	var a: Node3D = await _reach_anchor(&"manor_window_hide", Vector3(0, 0, -45))
 	if a == null:
 		return false
@@ -240,22 +252,53 @@ func _region_center(id: StringName) -> Vector3:
 	return r.center if r else Vector3.ZERO
 
 
-## Tops her up to what the lane's dev jump gives, as a workaround naming what
-## the game never handed her on the way.
-func _provide(kit: Dictionary, what: String) -> void:
-	var short: PackedStringArray = []
-	for id: StringName in kit:
-		var have := Gameplay.inventory.count(id)
-		if have < int(kit[id]):
-			short.append("%s %d/%d" % [id, have, kit[id]])
-	if short.is_empty():
-		pt._note("carrying %s already" % what)
-		return
-	pt._workaround("no in-game source on the way for %s (%s); granted" % [what, ", ".join(short)], func() -> void:
-		for id: StringName in kit:
-			var have := Gameplay.inventory.count(id)
-			if have < int(kit[id]):
-				Gameplay.inventory.add(id, int(kit[id]) - have))
+## The kit the way a player gets it: E at the kitchen's chicken larder, then
+## E at the twine on the potting shed's table. Fails the beat (naming what
+## was missing) if either pickup isn't there or doesn't land in her bag.
+func _gather_snare_kit() -> bool:
+	await _walk_house(STUDY_TO_KITCHEN)
+	if not await _pick_up(_larder_with(CHICKEN), CHICKEN, "the kitchen's chicken larder"):
+		return false
+	await _walk_house(KITCHEN_TO_DOORS)
+	await pt._walk_to(PORTICO, 2.0)
+	await _walk_house(TO_SHED, 2.0)
+	if not await _pick_up(pt._find_named(&"SnareTwine"), TWINE, "the potting shed's twine"):
+		return false
+	pt._note("snare kit: %d loops, baits %s" % [SnarePlan.loops_from(Gameplay.inventory), SnarePlan.baits_in(Gameplay.inventory)])
+	return true
+
+
+func _walk_house(route: Array, radius: float = 1.0) -> void:
+	for q: Vector2 in route:
+		await pt._walk_to(Vector3(q.x, pt.feyre.global_position.y, q.y), radius)
+
+
+func _larder_with(item: StringName) -> Node3D:
+	var best: Node3D = null
+	for n in pt.get_tree().get_nodes_in_group(LarderPickup.GROUP):
+		if n is LarderPickup and (n as LarderPickup).item_id == item and (best == null or
+				pt._flat((n as Node3D).global_position) < pt._flat(best.global_position)):
+			best = n
+	return best
+
+
+func _pick_up(node: Node3D, item: StringName, where: String) -> bool:
+	if node == null:
+		pt._fail("%s isn't in the world" % where)
+		return false
+	var before := Gameplay.inventory.count(item)
+	var at := node.global_position
+	await pt._walk_to(Vector3(at.x, pt.feyre.global_position.y, at.z), 1.2)
+	for i in 30:
+		pt._turn_camera_to(at)
+		await pt.get_tree().physics_frame
+	for attempt in 3:
+		await pt._press(&"interact")
+		if await pt._until(func() -> bool: return Gameplay.inventory.count(item) > before, 1.5):
+			pt._note("took %s from %s at %s" % [item, where, pt._v(at)])
+			return true
+	pt._fail("E at %s gave no %s (%.1f m from it, at %s)" % [where, item, pt._flat(at), pt._v(pt.feyre.global_position)])
+	return false
 
 
 func _clock() -> String:

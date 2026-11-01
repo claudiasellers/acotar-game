@@ -71,8 +71,10 @@ func _play() -> void:
 		return _fail("E in the birches didn't rig the snare (loops %d, %.0f m from the ring)" % [
 			SnarePlan.loops_from(Gameplay.inventory), _flat(snare.birch_center)])
 	_note("snare with %d loops, bait %s (%.2f)" % [snare.loops, snare.bait_id, snare.bait])
-	if snare.loops != 2 or snare.bait_id != &"ing_rabbit":
-		return _fail("expected a double loop baited with the rabbit")
+	# Any bait at least as good as the jump's rabbit: the canon chicken from the
+	# kitchen larder (the chained full run) or the rabbit (the dev jump).
+	if snare.loops != 2 or SnarePlan.bait_score(snare.bait_id) < SnarePlan.bait_score(&"ing_rabbit"):
+		return _fail("expected a double loop baited at least as well as with the rabbit")
 	_pass()
 
 	_begin("hide_downwind", "16 m downwind, still, until the Suriel comes")
