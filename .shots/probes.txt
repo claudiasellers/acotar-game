@@ -1,0 +1,4 @@
+from grade lane bogge probe 2
+quality look
+shot bogge res://tools/world_shot.tscn eastern_bogge {out}/bogge.png
+shot dusk res://tools/world_shot.tscn eastern_bogge_dusk {out}/dusk.png
