@@ -38,6 +38,7 @@ Later scenes may read `held` / `died_alone` for their own lines.
 | `summer_faerie` | `laid_out` | spawned lying face down on the table (head toward -X); please pose for it |
 | `summer_faerie` | `speaks` | he comes round: "She took my wings." |
 | `summer_faerie` | `hand_held` | Feyre takes his hand |
+| `summer_faerie` | `wounds_bound` | both stumps bound: the bloody linen goes on (once) |
 | `summer_faerie` | `dies` | last breath. Must not stand or rotate the body: he stays on the table |
 | `tamlin` | `tends_the_faerie`, `holds_other_hand`, `holds_him_alone`, `prays` | |
 | `lucien` | `leaves_sick` | backs away, sick, and leaves |

@@ -336,3 +336,41 @@ func test_blood_reads_off_the_runner_from_the_first_seconds() -> void:
 	assert_true(m.emission_enabled, "reads in the dark hall")
 	assert_gt(m.albedo_color.r, 0.4)
 	pool.free()
+
+
+func test_wounds_bound_cue_once_both_stumps_are_bound() -> void:
+	WorldState.set_flag("naga_survived")
+	Clock.from_dict({"time_of_day": 0.95, "day": Clock.day})
+	var t := _space()
+	assert_true(t.start())
+	var cues: Array[StringName] = []
+	var on_cue := func(id: StringName, cue: StringName) -> void:
+		if id == &"summer_faerie" and cue == &"wounds_bound":
+			cues.append(cue)
+	EventBus.story_actor_cue.connect(on_cue)
+	inv.add(&"ing_yarrow", 2)
+	for i in 2:
+		_work(t)  # read
+		_press_at(t, SummerFaerieTriage.Target.SUPPLIES)  # rag
+		_work(t)  # clean
+		_work(t)  # dress
+		_press_at(t, SummerFaerieTriage.Target.SUPPLIES)  # linen
+		_work(t)  # bind
+		assert_eq(cues.size(), i, "only once both stumps are bound")
+	EventBus.story_actor_cue.disconnect(on_cue)
+
+
+func test_bowl_linen_and_rag_sit_past_his_feet() -> void:
+	var s := TriageProps.supplies()
+	var half := TriageProps.TABLE_SIZE.x * 0.5
+	for mi in s.find_children("*", "MeshInstance3D", true, false):
+		var aabb := (mi as MeshInstance3D).get_aabb()
+		var lo := (mi as Node3D).position.x + aabb.position.x
+		var hi := lo + aabb.size.x
+		assert_gt(lo, TriageProps.FEET_X, "%s clear of his feet" % mi.name)
+		assert_lt(hi, half + 0.001, "%s on the table" % mi.name)
+	var rag := TriageProps.rag()
+	assert_gt(rag.position.x - 0.07, TriageProps.FEET_X)
+	assert_lt(absf(rag.position.z) + 0.05, TriageProps.TABLE_SIZE.z * 0.5 + 0.001)
+	rag.free()
+	s.free()
