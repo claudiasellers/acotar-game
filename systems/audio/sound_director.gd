@@ -52,6 +52,9 @@ var _story_spaces: int = 0
 var _wolf_hits: int = 0
 var _beast: Node3D
 var _great_wolf: Node3D
+var _suriel: Node3D
+## Naga in the tree; their creature_id is the actor id (naga, naga_2...).
+var _naga: Array = []
 var _once_ms: Dictionary = {}
 var _interior: Node3D
 
@@ -77,6 +80,7 @@ func _ready() -> void:
 	EventBus.creature_hit.connect(_on_creature_hit)
 	EventBus.creature_killed.connect(_on_creature_killed)
 	EventBus.celebration_requested.connect(_on_celebration)
+	EventBus.journal_entry_added.connect(_on_journal_entry)
 	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _story_spaces += 1)
 	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _story_spaces = maxi(_story_spaces - 1, 0))
 	get_tree().node_added.connect(_on_node_added)
@@ -385,6 +389,21 @@ func _on_node_added(node: Node) -> void:
 	elif node is BeastActor:
 		_beast = node as BeastActor
 		(node as BeastActor).stage_changed.connect(_on_beast_stage)
+	elif node is Suriel:
+		_suriel = node as Suriel
+		(node as Suriel).screamed.connect(func() -> void: play_once(&"suriel_scream", _actor_position(&"suriel")))
+	elif node is Naga:
+		var naga := node as Naga
+		_naga.append(naga)
+		naga.struck_player.connect(func(n: Node3D) -> void: play(&"naga_strike", n.global_position))
+	elif node is Bogge:
+		_attach_bogge(node as Bogge)
+	elif node is Puca:
+		var puca := node as Puca
+		puca.image_changed.connect(func(_i: StringName) -> void: play(&"puca_ripple", puca.global_position))
+		puca.darted.connect(func() -> void: play(&"puca_dart", puca.global_position))
+	elif node is DreadField:
+		(node as DreadField).wrong_sound.connect(func(at: Vector3) -> void: play_once(&"horror_wrong", at))
 	elif node is WolfPack:
 		var pack := node as WolfPack
 		pack.target_acquired.connect(func(_t: Node3D) -> void: play(&"wolf_pack_growl", pack.global_position))
@@ -409,6 +428,26 @@ func _on_actor_cue(actor: StringName, cue_name: StringName) -> void:
 		[&"tamlin_beast", &"leave"], [&"tamlin_beast", &"lead"]:
 			_stop_loop(&"beast_snarl", 3.0)
 			_stop_loop(&"beast_heartbeat", 4.0)
+		[&"suriel", &"stalk"]:
+			play(&"suriel_sniff", at)
+		[&"suriel", &"snared"], [&"suriel", &"caught"]:
+			# Canon: the snare scream is unavoidable; then the rope holds it.
+			play_once(&"snare_snap", at)
+			play_once(&"suriel_scream", at)
+			_loop(&"snare_creak", at)
+		[&"suriel", &"naga_are_coming"]:
+			play(&"suriel_warning", at)
+		[&"suriel", &"freed"]:
+			_stop_loop(&"snare_creak", 0.3)
+			play(&"snare_release", at)
+		[&"tamlin", &"tears_a_throat"]:
+			play(&"tamlin_throat_tear", at)
+		_ when String(actor).begins_with("naga"):
+			match cue_name:
+				&"attack":
+					play(&"naga_attack", at)
+				&"stagger", &"flee":
+					play(&"naga_hiss", at)
 
 
 func _on_beast_stage(stage: BeastActor.Stage) -> void:
@@ -440,7 +479,10 @@ func _beast_bursts_in(at: Vector3) -> void:
 	_later(0.6, func() -> void: _loop(&"beast_heartbeat"))
 
 
-func _on_creature_hit(_id: StringName, kind: StringName, _cause: StringName, _part: StringName) -> void:
+func _on_creature_hit(id: StringName, kind: StringName, _cause: StringName, _part: StringName) -> void:
+	if kind == &"naga":
+		play(&"naga_hurt", _actor_position(id))
+		return
 	if kind != &"great_wolf":
 		return
 	var at := _kind_position(kind)
@@ -456,6 +498,25 @@ func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, 
 	if kind == &"great_wolf":
 		_wolf_hits = 0
 		play(&"wolf_death", at)
+	elif kind == &"naga":
+		play(&"naga_death", at)
+
+
+## The Suriel answers each question aloud (ids `fact.suriel_<id>`).
+func _on_journal_entry(entry_id: StringName) -> void:
+	if String(entry_id).begins_with("fact.suriel_"):
+		play(&"suriel_voice", _actor_position(&"suriel"))
+
+
+## Canon: never seen; a leeching cold, chattering teeth, and a voice begging
+## inside her head. Flat, not positional: it is in her head.
+func _attach_bogge(bogge: Bogge) -> void:
+	bogge.manifested.connect(func() -> void: _loop(&"bogge_presence"))
+	bogge.begged.connect(func(_line: StringName) -> void: play(&"bogge_whisper"))
+	bogge.passed.connect(func() -> void:
+		_stop_loop(&"bogge_presence", 4.0)
+		play(&"bogge_passed"))
+	bogge.tree_exiting.connect(func() -> void: _stop_loop(&"bogge_presence", 2.0))
 
 
 func _on_celebration(_kind: StringName, _at: Vector3) -> void:
@@ -495,6 +556,11 @@ func _actor_position(actor: StringName) -> Vector3:
 		return _beast.global_position
 	if actor == &"great_wolf":
 		return _kind_position(actor)
+	if actor == &"suriel" and is_instance_valid(_suriel):
+		return _suriel.global_position
+	for naga: Variant in _naga:
+		if is_instance_valid(naga) and (naga as Naga).creature_id == actor:
+			return (naga as Naga).global_position
 	return _feyre.global_position if is_instance_valid(_feyre) else Vector3.INF
 
 

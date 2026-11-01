@@ -25,6 +25,15 @@ gets sound by emitting what it already emits. Files are self-made and CC0
 | `tamlin_beast` `accuse` / `speak` / `snap_ash_arrow` | MURDERERS bellow + claws in the table / WHO KILLED HIM bellow + plates rattling / the arrow snaps |
 | `tamlin_beast` `lead`, `leave`; stages `LEAD`, `WITHDRAW`, `GONE`; dread below 0.3 | snarl and heartbeat fade out |
 | `BeastActor` `APPROACH` / `PRESENCE` / `LOOM` | huff and footfalls |
+| `story_actor_cue(&"suriel", ...)`: `stalk` / `snared`, `caught` / `naga_are_coming` / `freed` (L26) | wheezing sniffing / the snare snaps and the Suriel screams once, then a rope-creak loop / urgent rasp with a far hiss / the creak stops, the tether goes, it bolts |
+| `Suriel.screamed` | the same scream (once per 1.5 s) |
+| `EventBus.journal_entry_added("fact.suriel_<id>")` | the Suriel answers: a wordless rasp (voice lane may layer words) |
+| `story_actor_cue(&"naga*", &"attack")`, `stagger`/`flee` | scales through leaves then a rearing hiss; hiss |
+| `Naga.struck_player`; `creature_hit` / `creature_killed` kind `naga` | talons raking; hissing shriek; gurgling death and thrashing |
+| `story_actor_cue(&"tamlin", &"tears_a_throat")` | a wet rip under a roar |
+| `Bogge.manifested` / `begged` / `passed` (L25) | flat (in her head): sub throb, icy whine and chattering teeth loop / whispers circling her / the cold lets go |
+| `Puca.image_changed` / `darted` | a quiet watery shimmer / a shimmer whoosh (canon: it is silent) |
+| `DreadField.wrong_sound(at)` | the wrong sound at that spot (once per 1.5 s) |
 | `EventBus.celebration_requested` | harp sweep, bell chord, glitter (once per 1.5 s) |
 | Any `BaseButton` (hover, focus, press) | glass tick, soft bell. Set meta `silent` = true to opt out |
 | `get_tree().paused` turns on / off | harp rise / fall; the bed ducks 6 dB while paused |
