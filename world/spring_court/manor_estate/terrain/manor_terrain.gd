@@ -4,7 +4,8 @@
 ## HeightProvider in world/shared/terrain/height_providers.tres (world contract §2).
 ## Placement samples WorldHeight.height_at (the blended map height), never this
 ## directly. build_fallback() makes chunk meshes and one HeightMapShape3D under
-## TerrainFallback, which the World scene disables when Terrain3D is active.
+## TerrainFallback, which the World scene disables when Terrain3D is active;
+## the estate skips building it then (world_terrain_active).
 class_name ManorTerrain
 extends RefCounted
 
@@ -79,21 +80,38 @@ static func pond_level() -> float:
 	return ManorSitePlan.base_y() + ManorSitePlan.POND_PAD - 0.35
 
 
+## Chunk meshes and the collider shape, built on the first stream-in and
+## reused after (heights never change): rebuilding cost ~11 s each time.
+static var _chunk_meshes: Dictionary = {}  # Vector2i -> ArrayMesh
+static var _collider_shape: HeightMapShape3D
+
+
+## True when the World's Terrain3D is up: it frees every TerrainFallback, so
+## building one is wasted (act1-fixlist F16: 11.5 s per manor stream-in).
+static func world_terrain_active(tree: SceneTree) -> bool:
+	var world := tree.get_first_node_in_group(World.GROUP) if tree else null
+	return world != null and world.get(&"terrain") != null
+
+
 ## Builds TerrainFallback: visual chunks plus a single heightmap collider.
 static func build_fallback(parent: Node3D) -> Node3D:
 	var root := Node3D.new()
 	root.name = "TerrainFallback"
 	parent.add_child(root)
 	var b := ManorSitePlan.BOUNDS
-	var material := ground_material()
+	var material: Material = null
 	var cx := int(ceil(b.size.x / CHUNK))
 	var cz := int(ceil(b.size.y / CHUNK))
 	for iz in cz:
 		for ix in cx:
-			var origin := Vector2(b.position.x + ix * CHUNK, b.position.y + iz * CHUNK)
+			var key := Vector2i(ix, iz)
+			if not _chunk_meshes.has(key):
+				if material == null:
+					material = ground_material()
+				_chunk_meshes[key] = _chunk_mesh(Vector2(b.position.x + ix * CHUNK, b.position.y + iz * CHUNK), material)
 			var chunk := MeshInstance3D.new()
 			chunk.name = "Chunk_%d_%d" % [ix, iz]
-			chunk.mesh = _chunk_mesh(origin, material)
+			chunk.mesh = _chunk_meshes[key]
 			root.add_child(chunk)
 	root.add_child(_collider())
 	return root
@@ -127,17 +145,19 @@ static func _chunk_mesh(origin: Vector2, material: Material) -> ArrayMesh:
 
 static func _collider() -> StaticBody3D:
 	var b := ManorSitePlan.BOUNDS
-	var w := int(b.size.x / COLLISION_STEP) + 1
-	var d := int(b.size.y / COLLISION_STEP) + 1
-	var heights := PackedFloat32Array()
-	heights.resize(w * d)
-	for zi in d:
-		for xi in w:
-			heights[zi * w + xi] = WorldHeight.height_at(b.position.x + xi * COLLISION_STEP, b.position.y + zi * COLLISION_STEP)
-	var shape := HeightMapShape3D.new()
-	shape.map_width = w
-	shape.map_depth = d
-	shape.map_data = heights
+	if _collider_shape == null:
+		var w := int(b.size.x / COLLISION_STEP) + 1
+		var d := int(b.size.y / COLLISION_STEP) + 1
+		var heights := PackedFloat32Array()
+		heights.resize(w * d)
+		for zi in d:
+			for xi in w:
+				heights[zi * w + xi] = WorldHeight.height_at(b.position.x + xi * COLLISION_STEP, b.position.y + zi * COLLISION_STEP)
+		_collider_shape = HeightMapShape3D.new()
+		_collider_shape.map_width = w
+		_collider_shape.map_depth = d
+		_collider_shape.map_data = heights
+	var shape := _collider_shape
 	var body := StaticBody3D.new()
 	body.name = "Collider"
 	body.collision_layer = 1

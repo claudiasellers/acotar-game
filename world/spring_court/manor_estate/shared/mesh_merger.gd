@@ -12,16 +12,44 @@ static func merge(source: Node, target: Node3D, vis_end: float = 0.0, skip: Arra
 	return merge_sources([source], target, vis_end, skip)
 
 
+## Merged meshes by cache key, for builds that come out the same every time
+## (the house on each stream-in): the merge itself cost ~2 s per stream-in.
+static var _merged_cache: Dictionary = {}
+
+
 ## Same as merge() over several source subtrees at once (e.g. all props of a room).
-static func merge_sources(sources: Array, target: Node3D, vis_end: float = 0.0, skip: Array = []) -> int:
+## With a `cache_key`, the meshes merged the first time are reused after; the
+## caller promises the sources are identical each time.
+static func merge_sources(sources: Array, target: Node3D, vis_end: float = 0.0, skip: Array = [],
+		cache_key: String = "") -> int:
 	var candidates: Array[MeshInstance3D] = []
 	for source in sources:
 		for node in (source as Node).find_children("*", "MeshInstance3D", true, false):
 			var m := node as MeshInstance3D
 			if m.mesh != null and not _under_skipped(m, source, skip):
 				candidates.append(m)
+	var meshes: Array = _merged_cache.get(cache_key, []) if cache_key != "" else []
+	if meshes.is_empty():
+		meshes = _merge_arrays(candidates, target)
+		if cache_key != "":
+			_merged_cache[cache_key] = meshes
+	for mesh: ArrayMesh in meshes:
+		var out := MeshInstance3D.new()
+		out.name = "Merged"
+		out.mesh = mesh
+		if vis_end > 0.0:
+			out.visibility_range_end = vis_end
+			out.visibility_range_end_margin = 5.0
+		target.add_child(out)
+	for mi in candidates:
+		mi.get_parent().remove_child(mi)
+		mi.free()
+	return candidates.size()
+
+
+## One ArrayMesh per material bucket from `candidates`, in `target`'s space.
+static func _merge_arrays(candidates: Array[MeshInstance3D], target: Node3D) -> Array:
 	var buckets: Dictionary = {}   # key -> [material, verts, normals, colors, uvs, indices]
-	var merged: Array[MeshInstance3D] = []
 	var inv := target.global_transform.affine_inverse() if target.is_inside_tree() else _global_xform(target, target).affine_inverse()
 	for mi in candidates:
 		var xform := inv * _global_xform(mi, target)
@@ -64,7 +92,7 @@ static func merge_sources(sources: Array, target: Node3D, vis_end: float = 0.0, 
 			else:
 				for i in idx:
 					b[5].append(base + i)
-		merged.append(mi)
+	var meshes: Array = []
 	for key in buckets:
 		var b: Array = buckets[key]
 		if (b[1] as PackedVector3Array).is_empty():
@@ -79,17 +107,8 @@ static func merge_sources(sources: Array, target: Node3D, vis_end: float = 0.0, 
 		var mesh := ArrayMesh.new()
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 		mesh.surface_set_material(0, b[0])
-		var out := MeshInstance3D.new()
-		out.name = "Merged"
-		out.mesh = mesh
-		if vis_end > 0.0:
-			out.visibility_range_end = vis_end
-			out.visibility_range_end_margin = 5.0
-		target.add_child(out)
-	for mi in merged:
-		mi.get_parent().remove_child(mi)
-		mi.free()
-	return merged.size()
+		meshes.append(mesh)
+	return meshes
 
 
 ## Plain colour materials fold into one shared vertex-colour material.
