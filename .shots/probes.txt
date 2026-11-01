@@ -1,0 +1,5 @@
+from grade lane bogge probe 5
+quality look
+shot bogge res://tools/world_shot.tscn eastern_bogge {out}/bogge.png
+shot dusk res://tools/world_shot.tscn eastern_bogge_dusk {out}/dusk.png
+shot faerie res://tools/playtest/p3_faerie_clip.tscn {out}
