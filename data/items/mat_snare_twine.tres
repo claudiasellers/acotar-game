@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/items/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mat_snare_twine"
+display_name = "Gardener's twine"
+description = "A waxed coil from the potting shed, long enough for two loops of a snare."
+weight_class = 0
+craft_tags = Array[StringName]([&"cordage", &"snare_kit"])
+base_price = 0
+color = Color(0.780, 0.690, 0.490, 1)
+canon = "X"

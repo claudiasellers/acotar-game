@@ -135,10 +135,19 @@ func _try_build(at: Vector3) -> void:
 		return
 	loops = SnarePlan.loops_from(inventory)
 	if loops == 0:
+		SnareKitThought.think(get_tree(), 1)
 		return
-	for id in inventory.ids_with_craft_tag(&"cordage"):
-		inventory.remove(id, mini(inventory.count(id), loops))
-		break
+	var kits := inventory.ids_with_craft_tag(&"snare_kit")
+	if not kits.is_empty():
+		inventory.remove(kits[0], 1)
+	else:
+		var left := loops
+		for id in inventory.ids_with_craft_tag(&"cordage"):
+			var n := mini(inventory.count(id), left)
+			inventory.remove(id, n)
+			left -= n
+			if left <= 0:
+				break
 	snare_at = at
 	_bait_choices = SnarePlan.baits_in(inventory)
 	_build_snare_node()

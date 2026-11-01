@@ -28,6 +28,14 @@ the place is sketched and named, with no celebration (horror beat).
 ## Inputs read
 - Inventory: items with craft tag `cordage` (loops, max 2), any ingredient as
   bait (`SnarePlan.bait_score`; an item id containing `chicken` scores 0.85).
+- Story-path cordage: `mat_snare_twine` (tags `cordage`, `snare_kit`), a
+  `LarderPickup` named `SnareTwine` on the potting-shed work table in the
+  manor kitchen garden (about (153, ground+1.0, -75.8)), restocked daily. A
+  `snare_kit` item ties both loops on its own and is used up whole.
+- Hint: `SnareKitThought` on the `manor_study_mural` anchor shows tier 0 of
+  `data/story/suriel/snare_kit_thought.tres` on Feyre's card when
+  `fact.suriel_method_known` is set without two loops' cordage, and tier 1 if
+  she tries to rig the snare with none.
 - Wind: group `wind_source` `wind_at(pos)`; calm air falls back to the glade
   breeze `SurielSnare.GLADE_BREEZE`.
 - Input: `interact` (rig, bait, knife). Arrows through Feyre's `arrow_fired` ->

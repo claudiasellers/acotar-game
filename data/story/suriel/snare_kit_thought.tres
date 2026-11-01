@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GuideThread" format=3]
+
+[ext_resource type="Script" path="res://ui/guide/guide_thread.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_snare_kit"
+require_flags = PackedStringArray("fact.suriel_method_known")
+done_flags = PackedStringArray("fact.suriel_answered")
+priority = 30
+icon = &"knife"
+lines = PackedStringArray("A double-loop snare, Lucien said. I'll need good cord for two loops.", "A gardener always keeps twine. The potting shed in the kitchen garden.", "The work table in the kitchen garden's potting shed: a coil of twine. A chicken from the kitchen for bait.")
+voice_ids = PackedStringArray("", "", "")
+canon = "X"

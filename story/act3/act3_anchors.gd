@@ -1,6 +1,7 @@
 ## Places the p3 deed spaces at the Spring Court lanes' anchors, the way
 ## Act1Anchors does for Act I. StoryDirector calls attach() for every anchor.
 ## suriel_snare (the Suriel's glade, ch 14-15): SurielSnare and NagaAmbush.
+## manor_study_mural (ch 13): SnareKitThought, the twine hint.
 ## Every other scene is a row in ROWS (L28 the house, L29 the Summer faerie):
 ## one node per row, named as given, built from its script. Safe to call twice.
 class_name Act3Anchors
@@ -28,7 +29,7 @@ const ROWS := {
 		{"name": "SummerFaerieGrave", "script": "res://story/act3/summer/summer_faerie_grave.gd"},
 	],
 }
-const ANCHORS := [&"suriel_snare"]
+const ANCHORS := [&"suriel_snare", &"manor_study_mural"]
 
 
 ## Hangs the p3 spaces for one anchor under it. Safe to call twice.
@@ -50,6 +51,12 @@ static func attach(anchor: Node3D) -> Array[SceneSpace]:
 	if not ANCHORS.has(anchor_id):
 		return spaces
 	match anchor_id:
+		&"manor_study_mural":
+			# Lucien explains the Suriel here; her thought about the twine follows.
+			if anchor.get_node_or_null(^"SnareKitThought") == null:
+				var thought := SnareKitThought.new()
+				thought.name = "SnareKitThought"
+				anchor.add_child(thought)
 		&"suriel_snare":
 			var snare := anchor.get_node_or_null(^"SurielSnare") as SurielSnare
 			if snare == null:

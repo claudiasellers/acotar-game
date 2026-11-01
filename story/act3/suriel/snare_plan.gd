@@ -106,8 +106,11 @@ static func baits_in(inventory: Inventory) -> Array[StringName]:
 	return out
 
 
-## Cordage she carries for the loops (sinew, spider silk...), up to two.
+## Cordage she carries for the loops (sinew, spider silk...), up to two. A
+## snare kit (the gardener's twine) is enough for both loops on its own.
 static func loops_from(inventory: Inventory) -> int:
+	if not inventory.ids_with_craft_tag(&"snare_kit").is_empty():
+		return 2
 	var n := 0
 	for id in inventory.ids_with_craft_tag(&"cordage"):
 		n += inventory.count(id)
