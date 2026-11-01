@@ -305,7 +305,7 @@ func _target_pose(dt: float) -> Array:
 func _finish() -> void:
 	active = false
 	target_kind = &""
-	if player_camera and is_instance_valid(player_camera):
+	if is_instance_valid(player_camera):
 		player_camera.current = true
 
 
