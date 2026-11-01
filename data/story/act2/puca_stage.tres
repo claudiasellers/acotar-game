@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Act2Stage" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"beyond": Vector3(0, 0, -26),
+"gate": Vector3(0, 0, -6),
+"hedge": Vector3(-62, 0, 88),
+"house": Vector3(-62, 0, 100)
+}
+lines = {
+"tamlin_going": {
+"text": "Going somewhere?",
+"who": "Tamlin"
+},
+"tamlin_look_again": {
+"text": "Why don't you look again?",
+"who": "Tamlin"
+},
+"tamlin_puca": {
+"text": "A puca. It shows you what you want and lures you somewhere remote. Then it eats you, slowly.",
+"who": "Tamlin"
+}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("tamlin_puca")
+canon = "Ch10-11 (keeper, 2026-11-01, 04-creatures/puca.md). Silent and visual: the father never speaks; he limps on his cane, beckoning, to the open gates. Tamlin: 'Going somewhere?' then 'Why don't you look again?' It shifts: a pale bow and quiver, a laden pack, her sisters huddled weeping, her father again; it shimmers and darts away. tamlin_puca paraphrases what he tells her (X wording). The sobbing sound and the glimpsed true form are X. Hedge mark = SitePlan.PUCA_GARDEN_SPOT relative to the garden_gate anchor."

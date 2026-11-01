@@ -47,4 +47,29 @@ adds nothing.
 | `FirstDinner` (ch7) | moment `first_dinner` | `wall_crossed` + `fact.alis_bathed` → `first_dinner_eaten` |
 | `CurtainTrap` (ch7–8) | moment `curtain_trap` | `first_dinner_eaten`, night → `curtain_trap_set`, then `fact.alis_tripped` at dawn |
 
-L25 adds `bogge` and `puca` rows to `CODED` the same way.
+## Act II scenes (L25: the grounds' dangers)
+
+| Scene | Hangs on | Gate → deed |
+|---|---|---|
+| `BoggeHunt` (ch9–10) | moment `bogge` (`bogge_hunt_path`) | `first_dinner_eaten` → `bogge_survived`; a failed attempt raises `fact.bogge_looked` and can be retried |
+| `PucaLure` (ch10–11) | moment `puca` (`garden_gate`, opens across the garden under her window) | `bogge_survived`, night → `puca_resisted` |
+
+Both extend `Act2DreadSpace` (`story/act2/act2_dread_space.gd`): view and
+gaze helpers (`view()`, `looking_at()`, `gaze_override` for tests),
+`summon()` (the real creature through `request_actor`, its own scene as the
+fallback), `place_player()`, `veil()`, looping `sound()`s from
+`Act2DreadAudio`, and `abort()` (ends without the deed). The Bogge's pleas go
+through `Act2Whisper` (a voice in her head, not the caption card).
+
+Creature calls they use (creature files owned by L25's behaviour work, never
+`creature.gd` or clips):
+- `Bogge.pass_behind_frame(centre, ahead, seconds)`, `follow_behind(node, ahead)`,
+  `set_reveal(0..1)`, `manifest(at)`, `withdraw()`; signals `begged`, `passed`.
+- `Puca.lure_to(point)`, `arrived()`, `dart(away)`; cues `looks_like_father`,
+  `shift_image`, `dart`; signals `image_changed`, `darted`.
+
+Rules: the Bogge is real only while looked at. Each second in a 40° cone
+makes it more real (fades at 0.3/s when she looks away); 0.8 s fails. The fog
+a look raises stays for the attempt. The puca changes shape only while she
+holds it in a 25° cone (1.4 s each, four times: bow, supplies, sisters,
+father). Walking more than 45 m from it ends the lure with no deed.

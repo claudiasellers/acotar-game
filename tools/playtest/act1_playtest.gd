@@ -10,9 +10,11 @@
 ## Acceptance (Act I playable, status.md item 2). The run passes when ALL hold:
 ##   1. The process exit code is 0. Not 137: that is the shutdown watchdog
 ##      below, and the log then names what held shutdown ("shutdown suspects").
-##   2. The log has "PLAYTEST exit 0", and the report lists these nine beats,
+##   2. The log has "PLAYTEST exit 0", and the report lists these beats,
 ##      each "pass": spawn, hunt_to_clearing, wolf_kill, skin, pelt_sale,
-##      sleep, beast_door, crossing, manor_arrival.
+##      sleep, beast_door, crossing, manor_arrival, then Act II's grounds
+##      (tools/playtest/act2_grounds_beats.gd): first_dinner, bogge_hunt,
+##      puca_gate. Act I alone: --stop-after=manor_arrival.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
 ##   4. final_phase is p2_grounds, and after the ride she stands on the
 ##      manor estate and walks (manor_arrival checks both).
@@ -414,6 +416,11 @@ func _play() -> void:
 	await _walk_to(start + feyre.model.global_basis.z * -15.0, 2.0, Callable(), 10.0)
 	_note("walked %.1f m on the estate" % feyre.global_position.distance_to(start))
 	_pass()
+	if _beat.id == stop_after:
+		return
+
+	# 10-12. Act II on the grounds: the first dinner, the Bogge, the puca.
+	await Act2GroundsBeats.new(self).play()
 
 
 # --- input ------------------------------------------------------------------

@@ -1,0 +1,81 @@
+[gd_resource type="Resource" script_class="Act2Stage" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"bogge_from": Vector3(-4.5, 0, -6),
+"elm": Vector3(0, 0, -80),
+"freeze": Vector3(0, 0, -10),
+"lucien_freeze": Vector3(1.2, 0, -10.6),
+"lucien_safety": Vector3(1.2, 0, -39),
+"lucien_start": Vector3(1.5, 0, 0),
+"retry": Vector3(0, 0, 14),
+"safety": Vector3(0, 0, -38)
+}
+lines = {
+"beg_belly": {
+"text": "I will fill my belly with you.",
+"who": ""
+},
+"beg_devour": {
+"text": "I will devour you. Look at me.",
+"who": ""
+},
+"beg_fear": {
+"text": "I am what you fear; I am what you dread…",
+"who": ""
+},
+"beg_grind": {
+"text": "I will grind your bones between my claws;",
+"who": ""
+},
+"beg_look": {
+"text": "Look at me. Look at me.",
+"who": ""
+},
+"beg_marrow": {
+"text": "I will drink your marrow; I will feast on your flesh.",
+"who": ""
+},
+"lucien_bow_down": {
+"text": "Put your bow down… Put your damned bow down, human, and look straight ahead.",
+"who": "Lucien"
+},
+"lucien_dont_react": {
+"text": "Don't react. No matter what you feel or see, don't react. Don't look. Just stare ahead.",
+"who": "Lucien"
+},
+"lucien_gone": {
+"text": "It's gone. Breathe, human.",
+"who": "Lucien"
+},
+"lucien_quiet": {
+"text": "Quieter. You walk these woods like they owe you supper.",
+"who": "Lucien"
+},
+"lucien_told_you": {
+"text": "I told you not to look.",
+"who": "Lucien"
+},
+"lucien_walk": {
+"text": "Now walk. Slowly. Keep your eyes on that elm.",
+"who": "Lucien"
+},
+"thought_bread": {
+"text": "Hot bread.",
+"who": ""
+},
+"thought_stars": {
+"text": "A starry sky.",
+"who": ""
+},
+"thought_sunrise": {
+"text": "A summer sunrise.",
+"who": ""
+}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("lucien_quiet", "lucien_walk", "lucien_gone", "lucien_told_you")
+canon = "Ch9-10 (keeper, 2026-11-01, 04-creatures/bogge.md). Lucien's warning and the Bogge's pleas are the book's words; she fixes on a distant elm and thinks of hot bread, a starry sky, a summer sunrise. In the book they are on horseback; staged on foot here (X). The failure (it becomes real, she wakes back up the path) is game design (X): in the book she never looks."

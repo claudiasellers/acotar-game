@@ -1,0 +1,184 @@
+## The puca (ch10–11, moment `puca`, anchor garden_gate). At night, by the
+## hedges under her window, Feyre sees her father: under-dressed for winter,
+## stooped on his cane, eyes clear for once, beckoning. He never speaks and
+## makes no sound on the gravel. He limps ahead of her toward the open gates
+## and the dark beyond them, always just out of reach: the garden itself
+## becomes the trap, drawing her off the paths and out.
+##
+## At the gate Tamlin catches her: "Going somewhere?" ... "Why don't you look
+## again?" Only if she does look does it shift: a pale bow and quiver, a
+## laden pack, her sisters huddled weeping, her father again, a flawless
+## rendering. Tamlin snarls; it shimmers and darts away. Looking is the deed
+## (puca_resisted, an ActionTrigger, R2). Walk away from it instead (>45 m)
+## and the lure lets her go without the deed; it will be there again.
+class_name PucaLure
+extends Act2DreadSpace
+
+const PUCA_SCENE := "res://creatures/fae/puca.tscn"
+## Seconds of her looking at it for each change of shape.
+const LOOK_PER_SHIFT := 1.4
+const LOOK_CONE := 25.0
+const SHIFTS := 4
+const STRAY := 45.0
+const GATE_RADIUS := 4.0
+
+var shifts_seen: Array[StringName] = []
+var lost_count: int = 0
+
+var _luring: bool = false
+var _looked: float = 0.0
+
+
+func _ready() -> void:
+	super._ready()
+	# She sees it from her window: the scene opens across the garden below
+	# the house, not only at the gate.
+	if stage and stage.has_mark(&"hedge"):
+		arrive_offset = stage.mark(&"hedge")
+		arrive_radius = 22.0
+
+
+func _build_beats() -> Array:
+	shifts_seen.clear()
+	_looked = 0.0
+	return [
+		Beats.run(func(_s: SceneSpace) -> void: _father_appears(), "father by the hedge"),
+		Beats.control(StoryControl.Mode.WALK),
+		Beats.until(func() -> bool: return player_within(GATE_RADIUS, mark(&"gate")), "follow him to the gate"),
+		Beats.run(func(_s: SceneSpace) -> void: _caught(), "Tamlin catches her"),
+		Beats.control(StoryControl.Mode.NONE),
+		say(&"tamlin_going"),
+		Beats.control(StoryControl.Mode.LOOK),
+		say(&"tamlin_look_again"),
+		LookAgainBeat.new(),
+		Beats.wait(1.2),
+		Beats.run(func(_s: SceneSpace) -> void: _snarl(), "Tamlin snarls; it darts"),
+		Beats.wait(1.0),
+		say(&"tamlin_puca"),
+		Beats.run(func(_s: SceneSpace) -> void: _after(), "quiet again"),
+		Beats.raise("puca_resisted"),
+	]
+
+
+func tick(delta: float) -> void:
+	if running and _luring:
+		var p := puca()
+		var feyre := player()
+		if p and feyre and Vector2(p.global_position.x - feyre.global_position.x,
+				p.global_position.z - feyre.global_position.z).length() > STRAY:
+			_lost()
+			return
+		if p and p.arrived() and p.lure_target.is_equal_approx(mark(&"gate")):
+			p.lure_to(mark(&"beyond"))
+	super.tick(delta)
+
+
+func puca() -> Puca:
+	return actor(&"puca") as Puca
+
+
+func _father_appears() -> void:
+	var p := summon(&"puca", PUCA_SCENE, &"hedge", &"house") as Puca
+	EventBus.story_actor_cue.emit(&"puca", &"looks_like_father")
+	if p:
+		if not p.visible:
+			p.play_cue(&"looks_like_father")
+		# Through the open gate, the only way out of the walled garden.
+		p.lure_to(mark(&"gate"))
+		if not p.image_changed.is_connected(_on_image):
+			p.image_changed.connect(_on_image)
+	_luring = true
+	# The garden hushes: no crickets, no fountain, only her boots.
+	note_mood()
+	EventBus.mood_requested.emit(&"dread", 0.35, 4.0)
+	sound(&"drone", -30.0, 0.8)
+
+
+func _caught() -> void:
+	_luring = false
+	var feyre := player()
+	var t := cast(&"tamlin", &"gate", &"beyond")
+	if t and feyre:
+		var side := feyre.global_basis.x if feyre.global_basis.x.length() > 0.1 else Vector3.RIGHT
+		t.global_position = feyre.global_position + side * 0.9 + feyre.global_basis.z * 0.4
+	EventBus.story_actor_cue.emit(&"tamlin", &"stops_her")
+	StoryControl.shake = 0.15
+	EventBus.mood_requested.emit(&"dread", 0.6, 0.6)
+
+
+func _on_image(image: StringName) -> void:
+	if running and not _luring:
+		shifts_seen.append(image)
+	# Her sisters, huddled together, weeping (the sound is canon:"X").
+	sound(&"sob", -18.0 if image == &"sisters" else -80.0)
+
+
+func _snarl() -> void:
+	StoryControl.shake = 0.45
+	EventBus.mood_requested.emit(&"dread", 0.8, 0.2)
+	EventBus.story_actor_cue.emit(&"tamlin", &"snarls")
+	var p := puca()
+	if p:
+		p.dart(mark(&"beyond") - mark(&"gate"))
+	sound(&"sob", -80.0)
+
+
+func _after() -> void:
+	StoryControl.shake = 0.0
+	sound(&"drone", -80.0)
+	EventBus.mood_requested.emit(&"calm", 0.0, 4.0)
+	_let_go()
+
+
+## She walked away from it: it lets her go, no deed; it will come again.
+func _lost() -> void:
+	_luring = false
+	lost_count += 1
+	var p := puca()
+	if p:
+		p.dart(p.global_position - mark(&"gate"))
+	_let_go()
+	abort("")
+
+
+## Frees the puca once its dart is over (at once if it isn't darting).
+func _let_go() -> void:
+	var p := puca()
+	if p and p.darting and is_inside_tree():
+		p.remove_from_group(&"story_actor_puca")
+		p.darted.connect(func() -> void: release_actor(&"puca"), CONNECT_ONE_SHOT)
+	else:
+		release_actor(&"puca")
+
+
+## Tamlin: "look again". Each spell of her looking peels one image off it.
+class LookAgainBeat:
+	extends SceneBeat
+
+	var _shifts: int = 0
+	var _held: float = 0.0
+
+	func _init() -> void:
+		label = "look again"
+
+	func consumes_time() -> bool:
+		return true
+
+	func enter(_space: SceneSpace) -> void:
+		_shifts = 0
+		_held = 0.0
+
+	func tick(space: SceneSpace, delta: float) -> bool:
+		var s := space as PucaLure
+		var p := s.puca()
+		if p == null:
+			return true
+		if s.looking_at(p, PucaLure.LOOK_CONE):
+			_held += delta
+		if _held >= PucaLure.LOOK_PER_SHIFT:
+			_held = 0.0
+			_shifts += 1
+			EventBus.story_actor_cue.emit(&"puca", &"shift_image")
+			if p.actor_id != &"puca":
+				p.play_cue(&"shift_image")
+		return _shifts >= PucaLure.SHIFTS

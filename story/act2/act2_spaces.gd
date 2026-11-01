@@ -11,6 +11,9 @@ extends RefCounted
 const CODED := {
 	&"first_dinner": {"script": "res://story/act2/first_dinner.gd", "stage": "res://data/story/act2/first_dinner_stage.tres"},
 	&"curtain_trap": {"script": "res://story/act2/curtain_trap.gd", "stage": "res://data/story/act2/curtain_trap_stage.tres"},
+	# L25: the grounds' dangers (ch9-11).
+	&"bogge": {"script": "res://story/act2/bogge_hunt.gd", "stage": "res://data/story/act2/bogge_stage.tres"},
+	&"puca": {"script": "res://story/act2/puca_lure.gd", "stage": "res://data/story/act2/puca_stage.tres"},
 }
 
 ## Anchor id -> list of {"name", "script", "stage"}: scenes with no moment.
