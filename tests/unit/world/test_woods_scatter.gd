@@ -96,3 +96,21 @@ func test_forage_comes_in_drifts() -> void:
 					break
 	assert_gt(total, 0)
 	assert_gte(float(drifted) / total, 0.8, "most forage grows in drifts, not alone")
+
+
+## Horror woods close in: no meadow gaps, so the ground around the Bogge's
+## heart is thick with dead trees (the grade shot looked at bare ground).
+func test_the_bogge_wood_is_dense_around_its_heart() -> void:
+	var def := _def(&"eastern_woods")
+	var heart := Vector2(EasternWoodsTerrain.BOGGE_HEART.x, EasternWoodsTerrain.BOGGE_HEART.y)
+	var trees := WoodsScatter.place(def, def.provider.BOUNDS, "tree")
+	var n := 0
+	for id: StringName in trees:
+		var a: PackedFloat32Array = trees[id]
+		for o in range(0, a.size(), ScatterLayer.STRIDE):
+			var d := Vector2(a[o], a[o + 2]).distance_to(heart)
+			if d >= 40.0 and d < 120.0:
+				n += 1
+	var per_ha := n / (PI * (120.0 * 120.0 - 40.0 * 40.0) / 10000.0)
+	gut.p("trees 40-120 m from the Bogge's heart: %.0f per ha" % per_ha)
+	assert_gt(per_ha, 140.0)
