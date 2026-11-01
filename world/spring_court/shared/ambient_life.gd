@@ -36,6 +36,10 @@ static var _soft: Texture2D
 static var _petal: Texture2D
 ## Dread mood steps this fine are sent on; finer changes wait.
 const DREAD_STEP := 0.05
+## Mood strength at full dread_at. The woods' horror is fog and silence, not
+## darkness: full dread (two stops down) on the low Bogge ground read as a
+## pure black frame; 0.45 leaves dark grey murk the dead wood fades into.
+const WOODS_DREAD := 0.45
 
 var _systems: Dictionary = {}
 var _biomes: Dictionary = {}
@@ -107,7 +111,7 @@ func update_dread(x: float, z: float) -> float:
 	if d <= 0.0:
 		bus.mood_requested.emit(&"calm", 0.0, 3.0)
 	else:
-		bus.mood_requested.emit(&"dread", d, 1.5)
+		bus.mood_requested.emit(&"dread", d * WOODS_DREAD, 1.5)
 	dread_sent = d
 	return d
 

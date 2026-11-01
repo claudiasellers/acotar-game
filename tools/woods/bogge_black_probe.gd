@@ -48,28 +48,6 @@ func _run() -> void:
 	await _frames(90)
 	await _shot("baseline", true)
 	print("PROBE mood ", world.grade.mood, " ", world.grade.mood_amount)
-	# Dread preset candidates, applied to the live director.
-	var base: GradePreset = GradeDirector.load_preset(&"dread")
-	var bf := world.find_child("BoggeFog", true, false) as FogVolume
-	var bm := bf.material as FogMaterial
-	var d0 := bm.density
-	var a0 := bm.albedo
-	# [bogge fog density, albedo, dread overrides]
-	var fixed := {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012}
-	var p := base.duplicate() as GradePreset
-	for k: String in fixed:
-		p.set(k, fixed[k])
-	GradeDirector._dread_preset = p
-	bm.density = 0.010
-	bm.albedo = Color(0.55, 0.56, 0.57)
-	for m in [1.0, 0.6, 0.5, 0.45, 0.4]:
-		world.grade.mood_amount = m
-		world.grade._mood_target = m
-		world.grade.apply(world.grade.current)
-		await _shot("mood_%02d" % int(m * 100), true)
-	bm.density = d0
-	bm.albedo = a0
-	GradeDirector._dread_preset = base
 	FileAccess.open(out_dir.path_join("luma.txt"), FileAccess.WRITE).store_string("\n".join(lines) + "\n")
 	get_tree().quit(0)
 
