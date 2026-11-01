@@ -42,6 +42,7 @@ func lunge(at: Vector3) -> void:
 
 
 func _think(delta: float) -> void:
+	gait_hint = &""
 	if _lunge_time > 0.0:
 		_lunge_time -= delta
 		var toward := _lunge_target - global_position
@@ -61,6 +62,8 @@ func _think(delta: float) -> void:
 		return
 	move_direction = to
 	move_speed = data.run_speed if order.run else data.walk_speed * 1.6
+	# Stalking and flanking orders creep; running orders run.
+	gait_hint = &"" if order.run else &"stalk"
 
 
 func _roam(delta: float) -> void:

@@ -1,0 +1,11 @@
+# hare clips (creatures/models/hare.gltf), 30 fps. Written by tools/blender/creature_rig.py.
+# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
+idle 0.000 2.530 1
+walk 0.546 0.506 1
+trot 1.899 0.285 1
+gallop 6.867 0.190 1
+graze - 2.530 1
+hit_l - 0.506 0
+hit_r - 0.506 0
+death_l - 2.767 0
+death_r - 2.767 0

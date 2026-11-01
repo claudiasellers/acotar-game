@@ -38,6 +38,12 @@ var move_direction: Vector3 = Vector3.ZERO
 var move_speed: float = 0.0
 ## While true, scenes drive the creature and its brain is paused.
 var scripted: bool = false
+## What the brain is doing, for the body's clips: &"stalk" (belly-low creep),
+## &"graze" (head down: grazing, feeding, holding a kill) or &"" (plain gait).
+var gait_hint: StringName = &""
+## Clips, flinches, death and ground conform for a rigged model; null for an
+## unrigged one (docs/contracts/creature_motion.md).
+var animator: CreatureAnimator
 ## Seconds left asleep (sleep arrow) and slowed (barbed arrow).
 var asleep_left: float = 0.0
 var slowed_left: float = 0.0
@@ -60,6 +66,7 @@ func _ready() -> void:
 	_build_collision()
 	model = PlaceholderBody.build(data)
 	add_child(model)
+	animator = CreatureAnimator.attach(self)
 	senses = CreatureSenses.new()
 	senses.name = "Senses"
 	senses.sight_range = data.sight_range
@@ -130,6 +137,8 @@ func on_arrow_hit(arrow: Node3D) -> void:
 	var cause := StringName("arrow_%s" % arrow_id)
 	if EventBus.has_signal(&"creature_hit"):
 		EventBus.emit_signal(&"creature_hit", creature_id, data.kind, cause, _hit_part(result.killed))
+	if animator:
+		animator.hit(arrow.global_position)
 	if result.killed:
 		# The lethal arrow is what killed it, whatever finished it.
 		die(mortal_cause if mortally_wounded else cause)
@@ -191,7 +200,10 @@ func die(cause: StringName) -> void:
 	alive = false
 	health = 0.0
 	velocity = Vector3.ZERO
-	_topple()
+	if animator:
+		animator.die()
+	else:
+		_topple()
 	harvestable = Harvestable.new()
 	harvestable.name = "Harvestable"
 	harvestable.setup(creature_id, data.kind, data.harvest_yield())

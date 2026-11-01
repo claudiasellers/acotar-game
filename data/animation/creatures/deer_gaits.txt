@@ -1,0 +1,11 @@
+# deer clips (creatures/models/deer.gltf), 30 fps. Written by tools/blender/creature_rig.py.
+# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
+idle 0.000 4.472 1
+walk 0.797 1.118 1
+trot 2.518 0.671 1
+gallop 8.114 0.402 1
+graze - 4.472 1
+hit_l - 0.894 0
+hit_r - 0.894 0
+death_l - 6.133 0
+death_r - 6.133 0

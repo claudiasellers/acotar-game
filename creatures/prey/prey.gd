@@ -70,6 +70,8 @@ func _start_flee(threat: Vector3) -> void:
 
 
 func _think(delta: float) -> void:
+	# Head down while grazing in place; up and alert otherwise.
+	gait_hint = &"graze" if state == State.GRAZE and move_speed == 0.0 else &""
 	match state:
 		State.GRAZE:
 			_graze(delta)
