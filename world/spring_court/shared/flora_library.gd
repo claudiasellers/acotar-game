@@ -4,7 +4,9 @@
 ## Each species has a near mesh and (for trees and big shrubs) a cheaper far
 ## mesh. `SPECIES` holds the placement rules the scatter uses.
 ## Trees come from Blender models (tools/woods/blender/woods_trees.py ->
-## models/<species>.glb); every other species is still procedural. Dropping
+## models/<species>.glb), and so do the L21 flowering trees, shrubs and
+## ground flowers (tools/woods/blender/spring_flora.py); the rest is still
+## procedural. Dropping
 ## a <species>.glb into models/ swaps that species with no code change.
 class_name FloraLibrary
 extends RefCounted
@@ -37,6 +39,11 @@ const SPECIES := {
 	&"lilac_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.2, "range": 500.0, "canon": "C", "shadow": false},
 	&"yew": {"layer": "tree", "scale": Vector2(0.8, 1.25), "radius": 0.55, "range": 700.0, "canon": "X"},
 	&"leaning_trunk": {"layer": "tree", "scale": Vector2(0.8, 1.3), "radius": 0.4, "range": 500.0, "canon": "X"},
+	# L21 Blender flora (tools/woods/blender/spring_flora.py): candy flowering trees
+	&"candyfloss_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.35, "range": 650.0, "canon": "X"},
+	&"wisteria_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.35, "range": 600.0, "canon": "C", "shadow": false},
+	&"golden_chain": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.3, "range": 600.0, "canon": "X", "shadow": false},
+	&"magnolia": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.25, "range": 550.0, "canon": "X", "shadow": false},
 	# Shrubs and big ground features
 	&"fern": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"bracken": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X"},
@@ -58,6 +65,15 @@ const SPECIES := {
 	&"moss_mound": {"layer": "shrub", "scale": Vector2(0.6, 1.6), "radius": 0.0, "range": 160.0, "canon": "X"},
 	&"pale_fungus": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"withered_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 200.0, "canon": "X"},
+	# L21 flowering shrubs
+	&"peony_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "C"},
+	&"hydrangea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "X"},
+	&"azalea": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 180.0, "canon": "X"},
+	&"lavender_mound": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X", "shadow": false},
+	&"iris_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "C", "shadow": false},
+	&"goldenrod": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "C", "shadow": false},
+	&"lupin_clump": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 150.0, "canon": "X", "shadow": false},
+	&"sugarberry_bush": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 160.0, "canon": "X"},
 	# Ground cover (near the player only, see DetailScatter)
 	&"grass_tuft": {"layer": "detail", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 70.0, "canon": "X"},
 	&"tall_grass": {"layer": "detail", "scale": Vector2(0.8, 1.4), "radius": 0.0, "range": 70.0, "canon": "X"},
@@ -83,6 +99,13 @@ const SPECIES := {
 	&"dead_leaves": {"layer": "detail", "scale": Vector2(0.7, 1.6), "radius": 0.0, "range": 50.0, "canon": "X"},
 	&"meadowsweet": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 70.0, "canon": "X"},
 	&"water_mint": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 60.0, "canon": "X"},
+	# L21 ground flowers
+	&"tulip_patch": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 70.0, "canon": "C"},
+	&"daffodil": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 70.0, "canon": "C"},
+	&"maidens_lace": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 70.0, "canon": "C"},
+	&"forget_me_not": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 60.0, "canon": "X"},
+	&"allium": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 80.0, "canon": "X"},
+	&"pansy_patch": {"layer": "detail", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 60.0, "canon": "X"},
 	# Finds (forage visuals that are not plants)
 	&"feather_hawk": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 60.0, "canon": "X"},
 	&"feather_owl": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 60.0, "canon": "X"},
