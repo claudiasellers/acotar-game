@@ -67,6 +67,8 @@ var _blocked_shots: int = 0
 var _last_landing: Vector3 = Vector3.INF
 var _load_seconds: float = 0.0
 var _hop_causes: Dictionary = {}
+var _under_noted: bool = false
+var _last_floor: String = ""
 var _shutdown_suspects: PackedStringArray = []
 
 
@@ -614,18 +616,29 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 			if progress < 1.0:
 				var why := _blocker()
 				await _press(&"jump")
-				var hop := Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target))
-				var p := feyre.global_position + hop
-				p.y = _ground_at(p, 2.5) + 0.3
+				var from := feyre.global_position
+				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)))
+				var hop := p - from
+				hop.y = 0.0
 				feyre.global_position = p
 				feyre.velocity = Vector3.ZERO
-				_log("    stuck at %s in %s (%s), hopping %.0f m" % [_v(p - hop), _region(), why, hop.length()])
+				_log("    stuck at %s in %s (%s), hopping %.0f m to %s" % [_v(from), _region(), why, hop.length(), _v(p)])
 				_hop_causes[why.get_slice(" ", 0)] = int(_hop_causes.get(why.get_slice(" ", 0), 0)) + 1
 				hops += 1
 				assists += 1
 				assisted_metres += hop.length()
 			last_pos = feyre.global_position
 			last_check = t
+		var fp := feyre.global_position
+		if not _under_noted and fp.y < WorldHeight.height_at(fp.x, fp.z) - 2.0:
+			_under_noted = true
+			var hit := feyre.get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(
+					fp + Vector3.UP * 60.0, fp + Vector3.DOWN * 60.0, 1, [feyre.get_rid()]))
+			_note("below the terrain at %s in %s (height %.1f); collision under her: %s; last floor %s" % [_v(fp), _region(),
+				WorldHeight.height_at(fp.x, fp.z), String(hit.collider.name) if hit else "none", _last_floor])
+		if feyre.is_on_floor():
+			_last_floor = "%s at %s" % [String(feyre.get_last_slide_collision().get_collider().name) \
+					if feyre.get_slide_collision_count() > 0 and feyre.get_last_slide_collision().get_collider() else "?", _v(fp)]
 		if feyre.global_position.y < -200.0:
 			_note("fell out of the world at %s" % _v(feyre.global_position))
 			break
@@ -655,6 +668,34 @@ func _blocker() -> String:
 	if not feyre.is_on_floor():
 		return "air"
 	return "nothing pressing, floor %.0f deg" % floor_deg
+
+
+## Where an assist hop may land: ahead if that's open ground, else turned
+## 45/90/135 degrees either way. Never inside a building or prop (a body
+## placed inside a collider is pushed out below the ground) and never under
+## the terrain.
+func _hop_spot(from: Vector3, ahead: Vector3) -> Vector3:
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.45
+	capsule.height = 1.7
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = capsule
+	query.collision_mask = 1
+	query.exclude = [feyre.get_rid()]
+	var space := feyre.get_world_3d().direct_space_state
+	for degrees in [0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0, 180.0]:
+		var p := from + ahead.rotated(Vector3.UP, deg_to_rad(degrees))
+		p.y = maxf(_ground_at(p, 2.5), WorldHeight.height_at(p.x, p.z)) + 0.3
+		query.transform = Transform3D(Basis.IDENTITY, p + Vector3.UP * (capsule.height * 0.5 + 0.15))
+		var clear := true
+		for hit in space.intersect_shape(query, 8):
+			var body := hit.collider as Node
+			if body and body.get_class() != "Terrain3D":
+				clear = false
+				break
+		if clear:
+			return p
+	return from + Vector3.UP * 0.5
 
 
 func _walk_region(id: StringName) -> void:
