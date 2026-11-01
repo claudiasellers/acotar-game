@@ -1,7 +1,7 @@
 ## Villagers walking and noticing Feyre in the real village square, for judging
 ## the motion by eye (lane L22). Needs a GPU (Mac shots, docs/SHOTS.md):
 ##   godot res://tools/creatures/people_motion_shot.tscn -- <out_dir> [numbers]
-## walk_sheet.png: eight frames across one stride of a village woman walking
+## walk_sheet.png: eight frames across one stride of a village man walking
 ## past side-on (left to right, top row then bottom). notice_before.png and
 ## notice.png: three villagers and Tamlin, then Feyre steps in among them and
 ## the heads come round to her. Prints each head's turn toward her.
@@ -53,10 +53,10 @@ func _run() -> void:
 
 ## A woman walks along +X past the camera at her own walking speed.
 func _walk_sheet() -> void:
-	var walker := _npc("human_woman", _sq + Vector3(-3.0, 0.0, 0.0), -PI * 0.5)
+	var walker := _npc("human_man", _sq + Vector3(-3.0, 0.0, 0.0), -PI * 0.5)
 	var a: PersonAnimator = walker.animators[0]
 	var speed := a.native_walk
-	var dur: float = CreatureAnimator.read_gaits(PersonAnimator.GAITS_FILE % "human_woman")[&"walk"][1]
+	var dur: float = CreatureAnimator.read_gaits(PersonAnimator.GAITS_FILE % "human_man")[&"walk"][1]
 	print("walker native speed %.2f m/s" % speed)
 	_cam.global_position = _sq + Vector3(0.0, 1.0, 4.2)
 	_cam.look_at(_sq + Vector3(0.0, 0.85, 0.0))
@@ -105,15 +105,12 @@ func _notice() -> void:
 	_cam.look_at(c + Vector3(0.3, 1.25, 0.6))
 	await _settle(2.0)
 	await _save(_out + "/notice_before.png")
-	var feyre := (load("res://characters/feyre/model/feyre_model.tscn") as PackedScene).instantiate() as Node3D
-	var holder := Node3D.new()
-	holder.name = "FeyreStandIn"
-	holder.add_to_group(&"player")
-	_world.add_child(holder)
-	holder.add_child(feyre)
-	# She comes up at their front left, facing in.
-	holder.global_position = _ground(c + Vector3(-0.4, 0.0, 2.6))
-	holder.rotation.y = atan2(-0.4, 2.6)
+	# Feyre herself (dressed by her wardrobe), coming up at their front left.
+	var feyre := (load("res://characters/feyre/feyre.tscn") as PackedScene).instantiate() as Feyre
+	_world.add_child(feyre)
+	feyre.global_position = _ground(c + Vector3(-0.4, 0.0, 2.6)) + Vector3.UP * 0.1
+	feyre.model.rotation.y = atan2(-0.4, 2.6)
+	_cam.make_current()
 	await _settle(2.5)
 	for p in people:
 		var n: NoticePlayer = _notice_of(p)
