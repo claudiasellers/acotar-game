@@ -18,8 +18,10 @@
 ##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
 ##      eaten), bogge_hunt, puca_gate. Act I alone: --stop-after=manor_arrival.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
-##   4. final_phase is p2_grounds, and after the ride she stands on the
-##      manor estate and walks (manor_arrival checks both).
+##   4. The phase is p2_grounds on arrival, and after the ride she stands on
+##      the manor estate and walks (manor_arrival checks both). After the
+##      puca, final_phase in the report is p3_house_and_woods.
+##   5. No "SCRIPT ERROR" lines in the log (not checked by the exit code).
 ## Assists ("stuck at ..." lines, "assists" and "assist_causes" in the report)
 ## are not failures: the walker steers in straight lines and hops 6 m when it
 ## stalls for 3 s, where a player would steer round. Each names its cause
