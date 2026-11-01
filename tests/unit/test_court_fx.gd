@@ -109,6 +109,13 @@ func test_grades_are_presets_with_fog_and_blight_is_greyest() -> void:
 			blight_sat = g.saturation
 		else:
 			min_other = minf(min_other, g.saturation)
-			assert_gt(g.glow_intensity, 0.5, id + " strong glow")
+			# Book light: daylight never blooms (only true highlights glow);
+			# golden hour and night keep a soft glow for fires and lanterns.
+			if g.sun_energy < 1.0:
+				assert_gt(g.glow_intensity, 0.5, id + " night/dusk glow")
+			else:
+				assert_eq(g.glow_bloom, 0.0, id + " no daytime bloom wash")
+				assert_gte(g.glow_hdr_threshold, 1.2, id + " daytime glow only on highlights")
+			assert_lte(g.saturation, 1.3, id + " pastels never go neon")
 	assert_lt(blight_sat, min_other, "blight is the least saturated")
 	assert_true(FileAccess.file_exists(FX + "grades/grades_readme.md"))

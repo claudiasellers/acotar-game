@@ -16,7 +16,9 @@ func test_presets_load_with_expected_mood() -> void:
 	assert_lt(winter.saturation, 0.7, "the human realm is desaturated")
 	assert_gt(spring.saturation, 1.2, "the Spring Court is candy-bright")
 	assert_eq(winter.snow_cover, 1.0)
-	assert_eq(spring.magic, 1.0)
+	# Book light (Keeper): nothing glows by day before the glamour lifts (ch 23),
+	# so daytime Spring keeps only a faint rim shimmer.
+	assert_between(spring.magic, 0.2, 0.5, "faint daytime shimmer, not a glow")
 	assert_not_null(GradeDirector.load_preset(&"blight"))
 
 

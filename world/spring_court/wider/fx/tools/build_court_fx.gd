@@ -26,7 +26,12 @@ const DAY_MAGIC := 0.35
 const VOLUMETRIC_CAP := 0.008
 const SUN_GAIN := 1.15
 const SUN_CAP := 1.8
-const AMBIENT_SCALE := 0.75
+## Lush, not washed out (user, 2026-10-31): less flat ambient fill so shade
+## gives the meadow depth, shade leaning lilac so sunlit greens read warm,
+## and saturation capped so pastel albedos never go neon.
+const AMBIENT_SCALE := 0.6
+const SHADOW_TINT := 0.32
+const SATURATION_CAP := 1.3
 const LILAC_SHADOW := Color("8C7FC4")
 const EXPOSURE_CAP := 0.8
 const BRIGHTNESS_CAP := 1.0
@@ -155,7 +160,8 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	p.set("contrast", CONTRAST)
 	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
 	p.set("ambient_energy", float(p.get("ambient_energy")) * AMBIENT_SCALE)
-	p.set("ambient_color", (p.get("ambient_color") as Color).lerp(LILAC_SHADOW, 0.2))
+	p.set("ambient_color", (p.get("ambient_color") as Color).lerp(LILAC_SHADOW, SHADOW_TINT))
+	p.set("saturation", minf(float(p.get("saturation")), SATURATION_CAP))
 	p.set("exposure", minf(float(p.get("exposure")), EXPOSURE_CAP))
 	p.set("brightness", minf(float(p.get("brightness")), BRIGHTNESS_CAP))
 
@@ -244,7 +250,7 @@ func _build_materials() -> int:
 		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.7, 0.95, 1.0), "deep_color": Color(0.62, 0.62, 1.0), "clarity": 0.75, "glitter_strength": 9.0}),
 		"mat_glint": _mat("court_glint.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true,
-			"grass_a": Color("8DBF7A"), "grass_b": Color("B5E3C0"), "grass_c": Color("7CC29A"),
+			"grass_a": Color("5A8F45"), "grass_b": Color("8AAE4C"), "grass_c": Color("4E8A5E"),
 			"blossom_speck": Color("F4A6C0"), "rock_color": Color("D9CBD0")}),
 		"mat_particle_lit": _mat("court_particle.gdshader", {}),
 		"mat_particle_glow": _mat("court_particle_glow.gdshader", {}),
