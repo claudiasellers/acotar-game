@@ -1,0 +1,5 @@
+from ground-blend-lane
+quality look
+shot bv_walk res://tools/ground/ground_shot.tscn bv_walk {out}/bv_walk
+shot bw_ground res://tools/ground/ground_shot.tscn bw_ground {out}/bw_ground
+shot bv_raised res://tools/ground/ground_shot.tscn bv_raised {out}/bv_raised
