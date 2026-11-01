@@ -51,8 +51,10 @@ func _run() -> void:
 		return
 	var feyre := (load(FEYRE) as PackedScene).instantiate() as Feyre
 	world.add_child(feyre)
-	feyre.global_position = inside.global_position + Vector3.UP * 0.1
-	var to_door := door.global_position - inside.global_position
+	# Across the room from the door, toward the hearth.
+	var room := inside.get_parent() as Node3D
+	feyre.global_position = room.to_global(Vector3(1.4, 0.0, 0.4)) + Vector3.UP * 0.1
+	var to_door := door.global_position - feyre.global_position
 	feyre.model.rotation.y = atan2(-to_door.x, -to_door.z)
 	var rig := feyre.camera.get_parent().get_parent().get_parent() as Node3D
 	rig.rotation.y = feyre.model.rotation.y
