@@ -32,7 +32,6 @@ const WORLD_MASK := 1 << 0
 @export var air_jump_redirect: float = 0.65
 @export var turn_speed: float = 12.0
 @export var max_stamina: float = 100.0
-@export var sprint_drain: float = 22.0
 @export var stamina_regen: float = 16.0
 @export var stamina_regen_delay: float = 0.8
 ## Wood arrows in the quiver at the start if it is empty.
@@ -156,10 +155,11 @@ func _physics_process(delta: float) -> void:
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
+	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
-			and not _exhausted and not is_drawing and not is_aiming
+			and not is_drawing and not is_aiming
 	_running = sprinting
-	_update_stamina(delta, sprinting)
+	_update_stamina(delta)
 
 	var speed := run_speed
 	if is_aiming or is_drawing:
@@ -279,19 +279,14 @@ func _gentle_mode() -> bool:
 	return settings != null and bool(settings.get(&"gentle_mode"))
 
 
-func _update_stamina(delta: float, sprinting: bool) -> void:
-	if sprinting:
-		var drain := sprint_drain * (0.5 if GameSettings.gentle_mode else 1.0)
-		stamina = maxf(stamina - drain * delta, 0.0)
-		_stamina_cooldown = stamina_regen_delay
-		if stamina <= 0.0:
-			_exhausted = true
-	elif _stamina_cooldown > 0.0:
+## Stamina now only pays for slow-time aiming (drain_stamina); sprinting is free.
+func _update_stamina(delta: float) -> void:
+	if _stamina_cooldown > 0.0:
 		_stamina_cooldown -= delta
 	else:
 		var regen := stamina_regen * (body_state.stamina_regen_multiplier() if body_state else 1.0)
 		stamina = minf(stamina + regen * delta, max_stamina)
-	# Feyre has to catch her breath before sprinting again.
+	# After running dry aiming, slow time waits until she has caught her breath.
 	if _exhausted and stamina >= max_stamina * 0.35:
 		_exhausted = false
 
