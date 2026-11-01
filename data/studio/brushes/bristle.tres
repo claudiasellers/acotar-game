@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StudioBrushData" format=3]
+
+[ext_resource type="Script" path="res://data/studio/studio_brush_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bristle"
+display_name = "Bristle"
+shape = 2
+opacity = 0.85
+pickup = 0.35
+spacing = 0.15
+size_scale = 1.2
+oriented = true
+canon = "X"

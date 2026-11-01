@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StudioBrushData" format=3]
+
+[ext_resource type="Script" path="res://data/studio/studio_brush_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wash"
+display_name = "Wash"
+shape = 3
+opacity = 0.22
+pickup = 0.08
+spacing = 0.2
+size_scale = 1.8
+oriented = false
+canon = "X"
