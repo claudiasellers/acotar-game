@@ -1,0 +1,8 @@
+from L22 natural-motion
+quality look
+size 1920x1080
+timeout 900
+shot motion res://tools/creatures/creature_motion_shot.tscn {out}
+shot wolffilm res://tools/creatures/wolf_kill_film_shot.tscn {out}
+shot beastfilm res://tools/creatures/beast_door_film_shot.tscn {out}
+shot ridefilm res://tools/creatures/ride_north_film_shot.tscn {out}
