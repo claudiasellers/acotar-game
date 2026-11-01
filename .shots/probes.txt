@@ -1,0 +1,5 @@
+from L25 grounds-dangers
+quality look
+size 1920x1080
+timeout 1200
+shot dangers res://tools/playtest/act2_dangers_clip.tscn -- --out={out}/report.json --settle=30 --max-wall=1150
