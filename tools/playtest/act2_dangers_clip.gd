@@ -27,7 +27,7 @@ var _frames_dir: String = ""
 
 
 func _process(delta: float) -> void:
-	if _rec_prefix == "":
+	if _rec_prefix == "" or DisplayServer.get_name() == "headless":
 		return
 	_rec_left -= delta
 	if _rec_left > 0.0:
@@ -64,7 +64,8 @@ func _play() -> void:
 	await _wait(1.0)
 	_note("phase %s" % PhaseManager.current_phase)
 	var hunt := Vector3(BorderWoodsTerrain.BOGGE_HUNT.x, 0.0, BorderWoodsTerrain.BOGGE_HUNT.y)
-	if not await _jump_near(&"bogge_hunt_path", hunt):
+	# Land back up the path (the stage's retry mark), outside the scene's reach.
+	if not await _jump_near(&"bogge_hunt_path", hunt + Vector3(0, 0, 30).rotated(Vector3.UP, atan2(-(BorderWoodsTerrain.BOGGE_HUNT_LOOK.x - hunt.x), -(BorderWoodsTerrain.BOGGE_HUNT_LOOK.y - hunt.z)))):
 		return _fail("no bogge_hunt_path anchor after the jump")
 	_pass()
 	await _bogge_clip()
@@ -75,9 +76,13 @@ func _play() -> void:
 func _jump_near(anchor_id: StringName, at: Vector3) -> bool:
 	feyre.global_position = at + Vector3.UP * 40.0
 	feyre.velocity = Vector3.ZERO
-	await _until(func() -> bool: return _anchor(anchor_id) != null, 90.0)
+	# Streaming runs on wall time; the game clock runs fixed-fps fast.
+	var wall := Time.get_ticks_msec()
+	while _anchor(anchor_id) == null and Time.get_ticks_msec() - wall < 400000:
+		await get_tree().physics_frame
 	var anchor := _anchor(anchor_id)
 	if anchor == null:
+		_note("in %s; loaded %s" % [_region(), WorldStreamer.loaded_ids()])
 		return false
 	await _wait(4.0)
 	return true
@@ -95,7 +100,7 @@ func _place(p: Vector3, face: Vector3) -> void:
 
 func _bogge_clip() -> void:
 	_begin("bogge_clip", "Lucien freezes; eyes on the elm; a glance; then she lingers and it comes")
-	var space := _find_named(&"Moment_bogge") as BoggeHunt
+	var space := await _scene_at(&"bogge_hunt_path", &"Moment_bogge") as BoggeHunt
 	if space == null:
 		return _fail("the bogge moment isn't the coded BoggeHunt")
 	await _place(space.mark(&"retry"), space.mark(&"freeze"))
@@ -129,9 +134,9 @@ func _puca_clip() -> void:
 	WorldState.raise_deed("curtain_trap_set")
 	WorldState.raise_deed("bogge_survived")
 	Clock.from_dict({"time_of_day": 0.93, "day": Clock.day})
-	if not await _jump_near(&"garden_gate", Vector3(0.0, 0.0, -194.0)):
+	if not await _jump_near(&"garden_gate", Vector3(-62.0, 0.0, -80.0)):
 		return _fail("no garden_gate anchor after the jump")
-	var space := _find_named(&"Moment_puca") as PucaLure
+	var space := await _scene_at(&"garden_gate", &"Moment_puca") as PucaLure
 	if space == null:
 		return _fail("the puca moment isn't the coded PucaLure")
 	await _place(space.mark(&"house") + (space.mark(&"house") - space.mark(&"hedge")).normalized() * 6.0, space.mark(&"hedge"))
@@ -164,3 +169,18 @@ func _hold_view(point: Callable, until: Callable, seconds: float) -> void:
 		_turn_camera_to(point.call())
 		await get_tree().physics_frame
 		t += get_physics_process_delta_time()
+
+
+## The scene hung on an anchor (logs what is there when it isn't).
+func _scene_at(anchor_id: StringName, node_name: StringName) -> Node:
+	var anchor := _anchor(anchor_id)
+	if anchor == null:
+		_note("no %s anchor" % anchor_id)
+		return null
+	await _until(func() -> bool: return anchor.get_node_or_null(NodePath(String(node_name))) != null, 10.0)
+	var node := anchor.get_node_or_null(NodePath(String(node_name)))
+	if node == null:
+		_note("%s at %s has %s" % [anchor_id, _v(anchor.global_position), anchor.get_children().map(func(c: Node) -> String: return "%s(%s)" % [c.name, c.get_class()])])
+	else:
+		_note("%s is a %s" % [node_name, (node.get_script() as Script).get_global_name() if node.get_script() else node.get_class()])
+	return node

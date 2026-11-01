@@ -64,13 +64,21 @@ func tick(delta: float) -> void:
 	if running and _luring:
 		var p := puca()
 		var feyre := player()
-		if p and feyre and Vector2(p.global_position.x - feyre.global_position.x,
-				p.global_position.z - feyre.global_position.z).length() > STRAY:
+		if p and feyre and _strayed(p, feyre):
 			_lost()
 			return
 		if p and p.arrived() and p.lure_target.is_equal_approx(mark(&"gate")):
 			p.lure_to(mark(&"beyond"))
 	super.tick(delta)
+
+
+## She has walked away from it (not merely run on ahead toward the gate).
+func _strayed(p: Node3D, feyre: Node3D) -> bool:
+	var gate := mark(&"gate")
+	var apart := Vector2(p.global_position.x - feyre.global_position.x, p.global_position.z - feyre.global_position.z).length()
+	var hers := Vector2(gate.x - feyre.global_position.x, gate.z - feyre.global_position.z).length()
+	var its := Vector2(gate.x - p.global_position.x, gate.z - p.global_position.z).length()
+	return apart > STRAY and hers > its
 
 
 func puca() -> Puca:
