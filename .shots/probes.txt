@@ -1,0 +1,4 @@
+from lane/act2-arrival-dinner
+quality look
+timeout 900
+shot dinner res://tools/act2_dinner_shot.tscn {out}
