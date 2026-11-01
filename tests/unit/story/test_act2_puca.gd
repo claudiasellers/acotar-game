@@ -142,3 +142,14 @@ func test_walking_away_lets_her_go_without_the_deed() -> void:
 	assert_eq(space.lost_count, 1)
 	assert_false(WorldState.has_flag("puca_resisted"))
 	assert_true(space.can_start(), "it will come again")
+
+
+func test_running_on_ahead_is_not_walking_away() -> void:
+	_night()
+	assert_true(space.start())
+	_step(1.0)
+	var gate := space.mark(&"gate")
+	feyre.global_position = gate + (space.mark(&"hedge") - gate).normalized() * 6.0
+	_step(0.5)
+	assert_true(space.running, "she sprinted for the gate; the lure holds")
+	assert_eq(space.lost_count, 0)

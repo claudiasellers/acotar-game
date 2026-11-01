@@ -155,8 +155,9 @@ func _lure(delta: float, gap: float) -> void:
 	var hers := (lure_target - player.global_position) if player else to
 	hers.y = 0.0
 	if hers.length() < left + 2.0:
-		# She has got level with it or past it: it slips ahead again.
-		speed = lure_speed * 3.0
+		# She has got level with it or past it: it slips ahead again,
+		# faster than she can run, without seeming to hurry.
+		speed = maxf(lure_speed * 3.0, 9.0)
 	elif gap < lure_distance * 0.6:
 		speed = lure_speed * 2.2
 	elif gap < lure_distance + 2.0:

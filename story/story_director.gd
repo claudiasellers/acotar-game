@@ -20,6 +20,9 @@ func _ready() -> void:
 	load_moments(MOMENTS_DIR)
 	WorldStreamer.region_loaded.connect(_on_region_loaded)
 	EventBus.travel_requested.connect(_on_travel_requested)
+	# Regions that build in jobs (the woods) add anchors after region_loaded.
+	if not get_tree().node_added.is_connected(_on_node_added):
+		get_tree().node_added.connect(_on_node_added)
 
 
 func load_moments(dir_path: String) -> void:
@@ -103,6 +106,23 @@ func _space_for(moment: StoryMoment) -> SceneSpace:
 
 func _on_region_loaded(_region_id: StringName, root: Node3D) -> void:
 	attach_all(root)
+
+
+## Fires for every node entering the tree: the group test comes first and
+## nothing else happens for anything that isn't a story anchor.
+func _on_node_added(node: Node) -> void:
+	if node.is_in_group(&"story_anchor") and node is Node3D:
+		_attach_late.call_deferred(node)
+
+
+func _attach_late(anchor: Node3D) -> void:
+	if is_instance_valid(anchor) and anchor.is_inside_tree():
+		attach_anchor(anchor)
+
+
+func _exit_tree() -> void:
+	if get_tree().node_added.is_connected(_on_node_added):
+		get_tree().node_added.disconnect(_on_node_added)
 
 
 ## Carriage home, ride back: move Feyre into the region and stream it in.
