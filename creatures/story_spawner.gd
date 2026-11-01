@@ -42,8 +42,10 @@ func spawn(spawn_id: StringName, at: Transform3D) -> Node3D:
 	var kind := base_kind(spawn_id)
 	if not SCENES.has(kind):
 		return null
-	var existing := spawned.get(spawn_id) as Node3D
-	if existing and is_instance_valid(existing):
+	# A freed actor (a fled or reset naga) can't be cast; spawn a fresh one.
+	var held: Variant = spawned.get(spawn_id)
+	var existing := held as Node3D if is_instance_valid(held) else null
+	if existing and not existing.is_queued_for_deletion():
 		existing.global_transform = at
 		existing.add_to_group(StringName("story_actor_%s" % spawn_id))
 		return existing

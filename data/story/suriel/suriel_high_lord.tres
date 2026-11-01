@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SurielAnswer" format=3]
+
+[ext_resource type="Script" path="res://story/act3/suriel/suriel_answer.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suriel_high_lord"
+order = 3
+asked = "Tamlin is a High Lord?"
+said = "He is High Lord of the Spring Court. All this green, from the wall to the mountains, answers to him."
+said_cut = ""
+map_place = &"blossom_vale"
+canon = "C"
