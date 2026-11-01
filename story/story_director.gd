@@ -116,9 +116,11 @@ func _on_node_added(node: Node) -> void:
 		_attach_late.call_deferred(node)
 
 
-func _attach_late(anchor: Node3D) -> void:
-	if is_instance_valid(anchor) and anchor.is_inside_tree():
-		attach_anchor(anchor)
+## Untyped: the anchor may be freed before the deferred call lands (a typed
+## parameter fails the call before is_instance_valid can say so).
+func _attach_late(anchor: Variant) -> void:
+	if is_instance_valid(anchor) and anchor is Node3D and (anchor as Node3D).is_inside_tree():
+		attach_anchor(anchor as Node3D)
 
 
 func _exit_tree() -> void:

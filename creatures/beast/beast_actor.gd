@@ -28,11 +28,16 @@ const STAGE_INTENSITY := {
 
 @export var actor_id: StringName = &"tamlin_beast"
 @export var walk_speed: float = 1.4
+## How far into the room the break carries him past the door (canon: he
+## bursts in and fills the room), and how fast.
+@export var enter_depth: float = 2.6
+@export var burst_speed: float = 4.5
 
 var stage: Stage = Stage.HIDDEN
 ## Current strength of the field (0 to 1), eased toward the stage's level.
 var intensity: float = 0.0
 var door: Node3D
+var _bursting: bool = false
 
 var _destination: Vector3
 var _route: PackedVector3Array = PackedVector3Array()
@@ -94,7 +99,8 @@ func break_door() -> void:
 			door.call(&"break_open")
 		else:
 			create_tween().tween_property(door, ^"rotation:y", door.rotation.y + deg_to_rad(105.0), 0.25)
-		_destination = door.global_position - door.global_basis.z * 1.2
+		_destination = door.global_position - door.global_basis.z * enter_depth
+		_bursting = true
 	if is_inside_tree():
 		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
 
@@ -208,8 +214,10 @@ func _process(delta: float) -> void:
 	to.y = 0.0
 	_animate(to.length() > 0.05 and visible)
 	if to.length() > 0.05:
-		global_position += to.limit_length(walk_speed * delta)
+		global_position += to.limit_length((burst_speed if _bursting else walk_speed) * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 4.0 * delta)
+	elif _bursting:
+		_bursting = false
 	elif stage == Stage.PATROL:
 		_route_index = (_route_index + 1) % _route.size()
 		_destination = _route[_route_index]

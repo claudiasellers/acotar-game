@@ -24,6 +24,7 @@ func before_each() -> void:
 	anchor = Marker3D.new()
 	anchor.name = "act1_cottage_door"
 	anchor.position = Vector3(-1.9, 0.0, -2.85)
+	anchor.rotation_degrees.y = 180.0  # as cottage_gen places it: -Z into the room
 	anchor.add_to_group(&"story_anchor")
 	interior.add_child(anchor)
 	feyre = Node3D.new()
@@ -58,3 +59,22 @@ func test_the_door_opens_into_the_room_and_shuts_behind_her() -> void:
 func test_attaching_twice_hangs_one_latch() -> void:
 	StoryDirector.attach_anchor(anchor)
 	assert_eq(anchor.get_child_count(), 1)
+
+
+func test_the_beast_bursts_through_into_the_room() -> void:
+	var latch := anchor.get_node(^"CottageDoorLatch") as CottageDoorLatch
+	var beast := (load("res://creatures/beast/beast_actor.tscn") as PackedScene).instantiate() as BeastActor
+	add_child_autofree(beast)
+	beast.global_position = latch.global_position + latch.global_basis.z * BeastDoor.OUTSIDE
+	beast.door = latch
+	var shut := _free_edge()
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"enter")
+	for i in 120:
+		beast._process(1.0 / 30.0)
+	var inside := latch.global_position - latch.global_basis.z * beast.enter_depth
+	assert_almost_eq(Vector2(beast.global_position.x, beast.global_position.z).distance_to(Vector2(inside.x, inside.z)), 0.0, 0.1,
+			"in the room, %.1f m past the door" % beast.enter_depth)
+	assert_true(beast.global_position.z > latch.global_position.z, "on the room side (+Z of the cottage)")
+	assert_true(latch.broken, "the latch let go")
+	await wait_seconds(0.4)
+	assert_gt(_free_edge().z - shut.z, 0.8, "the leaf flew in")
