@@ -22,9 +22,8 @@ Keeper answers 2026-11-01 (ch 13-15).
 | `fact.naga_escaped` | Tamlin arrives |
 
 Journal: `EventBus.journal_entry_added(id)` per answer, ids as above. Map: each
-answer with a `map_place` sketches that place into WorldMapHud's fog
-(`SurielSnare.sketch_place`). A dedicated `WorldMapHud.reveal_place(id)` from
-the map lane would replace that call.
+answer with a `map_place` calls `WorldMapHud.reveal_place(id, false)` (L07):
+the place is sketched and named, with no celebration (horror beat).
 
 ## Inputs read
 - Inventory: items with craft tag `cordage` (loops, max 2), any ingredient as

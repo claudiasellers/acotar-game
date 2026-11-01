@@ -183,6 +183,9 @@ func _hunt(delta: float) -> bool:
 			if _flat(pos, snare_at) <= CATCH_RADIUS:
 				_settle_quality()
 				EventBus.story_actor_cue.emit(&"suriel", &"caught")
+				# Hold the camera on it while it talks (she can still move).
+				if suriel and is_instance_valid(suriel):
+					StoryControl.set_focus(suriel)
 				stage = Stage.ANSWERS
 				_answer_t = 0.0
 				if answers_due > 0:
@@ -294,31 +297,23 @@ func _say_next() -> void:
 
 func _finish_answers() -> void:
 	stage = Stage.DONE
+	StoryControl.set_focus(null)
 	WorldState.set_flag("fact.suriel_snare_quality", quality)
 	WorldState.set_flag("fact.suriel_scouted", scouted)
 	if voice:
 		voice.hide_voice()
 
 
-## Sketches a map place onto Feyre's map (the L07 HUD's fog). Returns true if
-## a map was there to draw on.
+## Sketches a map place onto Feyre's map (WorldMapHud.reveal_place, L07).
+## No celebration: this is the Suriel talking, not a pastel unlock (R3).
+## Returns true if a map was there to draw on.
 static func sketch_place(tree: SceneTree, place_id: StringName) -> bool:
 	if tree == null:
 		return false
-	var places := load("res://data/map/map_places.tres") as MapPlaceSet
-	var place: MapPlace = null
-	for pl in (places.places if places else []):
-		if pl.id == place_id:
-			place = pl
-	if place == null:
-		return false
-	var c := place.rect.get_center()
-	var r := minf(place.rect.size.x, place.rect.size.y) * 0.5
 	var drew := false
 	for node in tree.get_nodes_in_group(MapSettings.GROUP):
 		if node is WorldMapHud:
-			(node as WorldMapHud).reveal.reveal(c.x, c.y, r, 14.0)
-			drew = true
+			drew = (node as WorldMapHud).reveal_place(place_id, false) or drew
 	return drew
 
 
