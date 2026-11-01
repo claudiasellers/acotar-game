@@ -55,23 +55,18 @@ func _run() -> void:
 	var d0 := bm.density
 	var a0 := bm.albedo
 	# [bogge fog density, albedo, dread overrides]
-	var variants := {
-		"a16_f42": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.42, 0.42), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 1.6}],
-		"a22_f42": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.42, 0.42), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.2}],
-		"a16_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 1.6}],
-		"a22_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.2}],
-		"a28_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.8}],
-	}
-	for label: String in variants:
-		var v: Array = variants[label]
-		bm.density = v[0]
-		bm.albedo = v[1]
-		var p := base.duplicate() as GradePreset
-		for k: String in v[2]:
-			p.set(k, v[2][k])
-		GradeDirector._dread_preset = p
+	var fixed := {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012}
+	var p := base.duplicate() as GradePreset
+	for k: String in fixed:
+		p.set(k, fixed[k])
+	GradeDirector._dread_preset = p
+	bm.density = 0.010
+	bm.albedo = Color(0.55, 0.56, 0.57)
+	for m in [1.0, 0.6, 0.5, 0.45, 0.4]:
+		world.grade.mood_amount = m
+		world.grade._mood_target = m
 		world.grade.apply(world.grade.current)
-		await _shot(label, true)
+		await _shot("mood_%02d" % int(m * 100), true)
 	bm.density = d0
 	bm.albedo = a0
 	GradeDirector._dread_preset = base
