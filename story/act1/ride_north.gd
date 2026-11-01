@@ -45,6 +45,12 @@ func _init() -> void:
 	add_to_group(GROUP)
 
 
+func _ready() -> void:
+	super._ready()
+	# Camera and lens for the ride, camera only (lane L22, story/staging/).
+	add_child(RideNorthStaging.new())
+
+
 func path_length() -> float:
 	return path.curve.get_baked_length() if path and path.curve else 0.0
 
