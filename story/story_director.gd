@@ -58,11 +58,11 @@ func anchor_ids() -> PackedStringArray:
 
 
 ## Hangs the moments for one anchor under it. Safe to call twice.
-func attach_anchor(anchor: Node3D) -> Array[MomentSpace]:
-	var spaces: Array[MomentSpace] = []
+func attach_anchor(anchor: Node3D) -> Array[SceneSpace]:
+	var spaces: Array[SceneSpace] = []
 	var anchor_id := StringName(anchor.get_meta(&"anchor_id", anchor.name))
 	for moment: StoryMoment in _by_anchor.get(anchor_id, []):
-		var existing := anchor.get_node_or_null(NodePath("Moment_%s" % moment.id)) as MomentSpace
+		var existing := anchor.get_node_or_null(NodePath("Moment_%s" % moment.id)) as SceneSpace
 		if existing:
 			spaces.append(existing)
 			continue
@@ -70,6 +70,7 @@ func attach_anchor(anchor: Node3D) -> Array[MomentSpace]:
 		anchor.add_child(space)
 		spaces.append(space)
 	Act1Anchors.attach(anchor, self)
+	spaces.append_array(Act2Spaces.attach(anchor))
 	if anchor_id == _pending_anchor:
 		_pending_anchor = &""
 		var p := get_tree().get_first_node_in_group(&"player") as Node3D
@@ -87,7 +88,13 @@ func attach_all(root: Node) -> int:
 	return count
 
 
-func _space_for(moment: StoryMoment) -> MomentSpace:
+## Act II's coded scene for the moment when there is one (story/act2/),
+## otherwise the generic data-driven MomentSpace.
+func _space_for(moment: StoryMoment) -> SceneSpace:
+	var coded := Act2Spaces.space_for(moment)
+	if coded:
+		coded.name = "Moment_%s" % moment.id
+		return coded
 	var space := MomentSpace.new()
 	space.name = "Moment_%s" % moment.id
 	space.moment = moment
