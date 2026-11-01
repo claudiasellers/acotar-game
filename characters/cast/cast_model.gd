@@ -22,6 +22,9 @@ var worn: Dictionary = {}   # path -> Node3D
 ## Turns the head to Feyre when she is near (lane L22, creatures/anim/notice_player.gd).
 ## Scenes that stage a look elsewhere set `notice.enabled = false`.
 var notice: NoticePlayer
+## Story cues the model acts out itself, e.g. Lucien's leaves_sick (lane L22,
+## creatures/anim/cast_cues.gd).
+var cues: CastCues
 
 
 func _ready() -> void:
@@ -43,6 +46,7 @@ func _ready() -> void:
 		if anim.has_animation(&"idle"):
 			anim.play(&"idle")
 	notice = NoticePlayer.attach(skeleton, self)
+	cues = CastCues.attach(self, skeleton)
 
 
 ## Puts on a garment or accessory glb skinned to this rig.  Wearing it again does nothing.
