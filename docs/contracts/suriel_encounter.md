@@ -46,7 +46,7 @@ the place is sketched and named, with no celebration (horror beat).
   same four naga open `SnarePlan.naga_distance(scouted)` away (11 m, 15 m if
   she scouted the stream), and attack the same way.
 - Tamlin comes only once she has killed a naga herself (canon: she kills
-  two): at her second kill (never before `TAMLIN_EARLIEST`, 8 s), her
+  two): at her second kill (never before `TAMLIN_EARLIEST`, 5 s), her
   third strike (`TAMLIN_STRIKES`), or 15 s after her first kill, whichever is
   first. Running off or never fighting back stays lethal: five strikes fell her.
 - Pressure: the first naga moves alone, the second `ATTACK_GAP` (4 s) later,

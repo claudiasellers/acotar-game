@@ -12,7 +12,7 @@
 ##   - An arrow into the snare's tether frees the Suriel; it bursts out and
 ##     staggers every naga near it (canon: she shoots the snare).
 ##   - Once she has killed one herself, Tamlin comes out of the trees at her
-##     second kill (never before 8 s), her third strike, or 15 s after her
+##     second kill (never before 5 s), her third strike, or 15 s after her
 ##     first kill, whichever is first: he kills the
 ##     last two (High Fae form, ch 15) and any others flee. Then
 ##     fact.naga_escaped; the naga moment raises naga_survived.
@@ -41,7 +41,7 @@ const STAGGER_RADIUS := 14.0
 const STAGGER_SECONDS := 2.5
 const HOLD_SECONDS := 15.0
 ## Tamlin is never there sooner than this after the first naga moves (by kills).
-const TAMLIN_EARLIEST := 8.0
+const TAMLIN_EARLIEST := 5.0
 ## Strikes that bring Tamlin, once she has fought back.
 const TAMLIN_STRIKES := 3
 const FALL_SECONDS := 2.5

@@ -256,7 +256,7 @@ func test_strikes_bring_tamlin_only_after_her_first_kill() -> void:
 	assert_false(a.tamlin_came, "a wound is not a kill: she must kill one herself first")
 	EventBus.creature_killed.emit(&"naga", &"naga", &"knife", Vector3.ZERO)
 	_run(a, STEP * 2)
-	assert_true(a.tamlin_came, "after her first kill, three strikes bring him, even before 8 s")
+	assert_true(a.tamlin_came, "after her first kill, three strikes bring him, even before 5 s")
 	assert_eq(a.falls, 0)
 	assert_true(WorldState.has_flag("fact.naga_escaped"))
 
