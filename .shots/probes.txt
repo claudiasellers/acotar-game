@@ -1,0 +1,5 @@
+from L28 house beats
+quality look
+size 1920x1080
+timeout 1200
+shot house res://tools/playtest/p3_house_clip.tscn {out}
