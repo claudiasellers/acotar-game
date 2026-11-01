@@ -21,6 +21,7 @@ from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(__file__))
 import creatures as base  # noqa: E402  (shared helpers)
+import person_rig  # noqa: E402
 
 base.OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "..", "creatures", "models", "people")
 
@@ -115,7 +116,7 @@ def body(p, skin, cloth, legs_mat, boots, sleeves):
         if c.z < H * 0.1 and abs(c.x) <= sh_x * 1.15:
             slot = 3
         poly.material_index = slot
-    return obj, head, hr
+    return obj, head, hr, g
 
 
 def face(head, hr, p, parts):
@@ -421,7 +422,7 @@ def build(name, p):
     cloth = mat("Top", p.get("top", p["cloth"]), 0.85)
     legs = mat("Legs", p.get("legs", tuple(c * 0.6 for c in p["cloth"])), 0.85)
     boots = mat("Boots", p.get("boots", (0.32, 0.22, 0.14)), 0.7)
-    obj, head, hr = body(p, skin, cloth, legs, boots, p.get("sleeves", (True, True)))
+    obj, head, hr, g = body(p, skin, cloth, legs, boots, p.get("sleeves", (True, True)))
     parts = [obj]
     face(head, hr, p, parts)
     ears(head, hr, p, parts, skin)
@@ -432,7 +433,12 @@ def build(name, p):
     joined = base.join(parts, name)
     n = base.tris([joined])
     assert n <= BUDGET, f"{name}: {n} tris over the R4 budget"
-    base.export(name, [joined])
+    # A skeleton and clips (tools/blender/person_rig.py): they walk, shift
+    # their weight, talk with their hands, flinch and bow.
+    arm = person_rig.build_armature(g, H, hr)
+    person_rig.weight(joined, arm, H, g.points[g.names["neck"]][2] + hr * 0.25)
+    person_rig.animate(name, joined, arm, g, H)
+    base.export(name, [joined, arm])
 
 
 def look(design, **overrides):

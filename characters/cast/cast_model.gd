@@ -19,6 +19,9 @@ extends "res://characters/feyre/model/feyre_model.gd"
 @export var walk_clip: StringName = &""
 
 var worn: Dictionary = {}   # path -> Node3D
+## Turns the head to Feyre when she is near (lane L22, creatures/anim/notice_player.gd).
+## Scenes that stage a look elsewhere set `notice.enabled = false`.
+var notice: NoticePlayer
 
 
 func _ready() -> void:
@@ -39,6 +42,7 @@ func _ready() -> void:
 		_alias(walk_clip, &"walk")
 		if anim.has_animation(&"idle"):
 			anim.play(&"idle")
+	notice = NoticePlayer.attach(skeleton, self)
 
 
 ## Puts on a garment or accessory glb skinned to this rig.  Wearing it again does nothing.

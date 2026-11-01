@@ -218,8 +218,12 @@ class Rig:
     """Rest data plus a pose solver: armature-space matrices from a pose spec,
     then each bone's local (matrix_basis) transform."""
 
-    def __init__(self, arm, spec, g):
+    def __init__(self, arm, spec, g, legs=LEGS, pole=None, leg_len=None):
         self.arm = arm
+        self.legs = tuple(legs)
+        # The side each leg's middle joint bends toward: an animal's elbow and
+        # hock point back, a person's knee points forward.
+        self.pole = pole or {leg: Vector((0, -1, 0)) for leg in self.legs}
         self.spec = spec
         bones = arm.data.bones
         self.rest = {b.name: b.matrix_local.copy() for b in bones}
@@ -237,11 +241,11 @@ class Rig:
         self.L, self.H, self.W = spec["length"], spec["height"], spec["width"]
         self.r_body = spec["girth"]
         self.mid = bones["body"].head_local.copy()
-        self.foot = {leg: bones[f"lower_{leg}"].tail_local.copy() for leg in LEGS}
-        self.paw_vec = {leg: bones[f"paw_{leg}"].tail_local - bones[f"paw_{leg}"].head_local for leg in LEGS}
+        self.foot = {leg: bones[f"lower_{leg}"].tail_local.copy() for leg in self.legs}
+        self.paw_vec = {leg: bones[f"paw_{leg}"].tail_local - bones[f"paw_{leg}"].head_local for leg in self.legs}
         # Claws reach past the toe joint (creatures.py: base +0.6 leg, tip +1.5 leg).
         self.claw = Vector((0, 1.5 * spec["leg"], -0.012)) if spec.get("claws") else Vector()
-        self.leg_len = bones["hips"].tail_local.z
+        self.leg_len = leg_len if leg_len is not None else bones["hips"].tail_local.z
         self.has_jaw = "jaw" in bones
         self.tail_bones = [b.name for b in bones if b.name.startswith("tail")]
         # Height-based time scale (dynamic similarity): a bigger animal moves
@@ -274,7 +278,7 @@ class Rig:
                       @ Matrix.Translation(-head) @ self.rest["body"])
                 Md = (M[p] @ self.rest[p].inverted()) @ Md if p else Md
                 Lb = base.inverted() @ Md
-            elif name.startswith("upper_"):
+            elif name.startswith("upper_") and name[len("upper_"):] in self.legs:
                 leg = name[len("upper_"):]
                 self._leg(leg, base, M, out, feet.get(leg), ik.get(leg, 1.0 if leg in feet else 0.0),
                           limp.get(leg), p)
@@ -301,7 +305,7 @@ class Rig:
             target, paw_pitch = foot
             # Parent's rotation since rest: the pole and the paw follow the body's yaw.
             R = (M[parent].to_3x3() @ self.rest[parent].to_3x3().inverted()).normalized()
-            back = R @ Vector((0, -1, 0))
+            back = R @ self.pole[leg]
             A = base_u.translation
             l1, l2 = self.length[u], self.length[lo]
             to = target - A
@@ -597,7 +601,7 @@ def gait_clip(rig, name, g, style):
 
 def _standing_feet(rig, shift=None):
     shift = shift or {}
-    return {leg: (rig.foot[leg] + shift.get(leg, Vector()), 0.0) for leg in LEGS}
+    return {leg: (rig.foot[leg] + shift.get(leg, Vector()), 0.0) for leg in rig.legs}
 
 
 def idle_clip(rig, menace):
@@ -907,11 +911,14 @@ def animate(name, mesh, arm, g, spec, style="walk", menace=False, stalk=False, d
 SPEEDS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "animation", "creatures")
 
 
-def write_speeds(name, rows):
-    os.makedirs(SPEEDS_DIR, exist_ok=True)
-    path = os.path.abspath(os.path.join(SPEEDS_DIR, f"{name}_gaits.txt"))
+def write_speeds(name, rows, subdir=None):
+    """data/animation/creatures/<name>_gaits.txt (or data/animation/<subdir>/)."""
+    folder = SPEEDS_DIR if subdir is None else os.path.join(SPEEDS_DIR, "..", subdir)
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.abspath(os.path.join(folder, f"{name}_gaits.txt"))
+    model = f"creatures/models/{name}.gltf" if subdir is None else f"creatures/models/{subdir}/{name}.gltf"
     with open(path, "w") as f:
-        f.write(f"# {name} clips (creatures/models/{name}.gltf), 30 fps. Written by tools/blender/creature_rig.py.\n")
+        f.write(f"# {name} clips ({model}), 30 fps. Written by tools/blender/creature_rig.py.\n")
         f.write("# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)\n")
         for clip, v, T, loop in rows:
             speed = "-" if v is None else f"{v:.3f}"

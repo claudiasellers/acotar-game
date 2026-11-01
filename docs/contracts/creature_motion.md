@@ -49,3 +49,39 @@ unrigged model, which keeps the old `_topple`. With an animator:
 
 Proof probe: `tools/creatures/creature_motion_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/creatures/test_creature_animator.gd`.
+
+## People (`tools/blender/fae_people.py` + `tools/blender/person_rig.py`)
+
+Every villager and court figure built by `fae_people.py` (not the main cast,
+which is on Feyre's rig) is exported with a biped skeleton:
+
+`root`, `body` (carriers), `pelvis`, `spine`, `chest`, `neck`, `head`,
+`clav_l|r`, `arm_l|r`, `forearm_l|r`, `hand_l|r`, and per leg (`leg_l`,
+`leg_r`) `upper_<leg>`, `lower_<leg>`, `paw_<leg>` (the foot).
+
+| clip | loops | what |
+|---|---|---|
+| `idle` | yes | breath, weight shift, glances |
+| `walk` | yes | heel strike and toe roll, pelvis sway, arm swing; feet planted by IK |
+| `talk` | yes | idle with the hands and head at work |
+| `flinch` | no | startle back from a fright |
+| `bow` | no | a bow from the waist |
+
+Speeds and lengths: `data/animation/people/<model>_gaits.txt` (same format).
+Regenerate with `ONLY=a,b /opt/bpyenv/bin/python tools/blender/fae_people.py`.
+
+## Game side for people
+
+- `CourtNpc` attaches `PersonAnimator.attach(model, npc, model_name)` to each
+  model (both glamour layers; only the visible one runs). Ground speed drives
+  idle↔walk, with playback matched to the speed. A rigged model is never
+  y-scaled to breathe.
+- `CourtNpc.set_talking(on)` blends in `talk`; `CourtNpc.gesture(&"flinch"|&"bow")`.
+- `NoticePlayer` (`creatures/anim/notice_player.gd`): a `LookAtModifier3D` on
+  the head turns it to the "player" group's eyes when she is within 7 m and
+  not behind them, easing in and out. Villagers get one from their animator.
+  The main cast get one in `characters/cast/cast_model.gd` (`model.notice`).
+  A scene that stages a look elsewhere sets `notice.enabled = false`.
+
+Proof probe: `tools/creatures/people_motion_shot.tscn -- <out> [numbers]`.
+Test: `tests/unit/creatures/test_person_animator.gd`.

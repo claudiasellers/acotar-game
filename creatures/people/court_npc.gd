@@ -23,6 +23,8 @@ const GROUP := &"court_npc"
 var glamoured_layer: GlamourLayer
 var true_layer: GlamourLayer
 var home: Vector3
+## One per rigged model (both glamour layers).
+var animators: Array[PersonAnimator] = []
 
 var _target: Vector3
 var _pause: float = 0.0
@@ -44,6 +46,7 @@ func _ready() -> void:
 		var m := model_scene.instantiate() as Node3D
 		m.name = "Model"
 		add_child(m)
+		_animate(m, model_scene)
 
 
 func _layer(which: GlamourLayer.Layer, scene: PackedScene) -> GlamourLayer:
@@ -54,6 +57,7 @@ func _layer(which: GlamourLayer.Layer, scene: PackedScene) -> GlamourLayer:
 		var m := scene.instantiate() as Node3D
 		m.name = "Model"
 		layer.add_child(m)
+		_animate(m, scene)
 	elif which == GlamourLayer.Layer.GLAMOURED:
 		# Unseen before the glamour lifts (the house seems near-empty): at most
 		# a ripple in the air at the edge of sight.
@@ -74,6 +78,27 @@ func _layer(which: GlamourLayer.Layer, scene: PackedScene) -> GlamourLayer:
 	return layer
 
 
+## A rigged model walks, idles, talks and turns its head to Feyre
+## (PersonAnimator, lane L22). An unrigged one keeps the breathing below.
+func _animate(model: Node3D, scene: PackedScene) -> void:
+	var a := PersonAnimator.attach(model, self, scene.resource_path.get_file().get_basename())
+	if a:
+		animators.append(a)
+
+
+## Plays a one-off gesture on the visible model: &"flinch" or &"bow".
+func gesture(clip: StringName) -> void:
+	for a in animators:
+		if a.get_parent() == current_model():
+			a.gesture(clip)
+
+
+## The hands talk while true (dialogue sets it).
+func set_talking(on: bool) -> void:
+	for a in animators:
+		a.talking = on
+
+
 ## The model on screen right now.
 func current_model() -> Node3D:
 	for layer in [glamoured_layer, true_layer]:
@@ -85,7 +110,7 @@ func current_model() -> Node3D:
 func _process(delta: float) -> void:
 	_t += delta
 	var model := current_model()
-	if model:
+	if model and animators.is_empty():
 		# Breathing: alive, never a mannequin.
 		model.scale = Vector3(1.0, 1.0 + sin(_t * 1.6 + float(_rng.seed % 7)) * 0.006, 1.0)
 	if wander_radius <= 0.0:
