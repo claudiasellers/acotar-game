@@ -221,3 +221,27 @@ func test_hud_pin_clicks_save_and_arrival() -> void:
 func test_build_stops_when_cancelled() -> void:
 	var cancel := [true]
 	assert_null(MapArt.build(64.0, false, cancel), "a cancelled paint returns nothing at once")
+
+
+func test_reveal_rect_clears_inside_and_melts_out() -> void:
+	var r := MapReveal.new()
+	var rect := Rect2(-950, 450, 250, 350)
+	assert_gt(r.reveal_rect(rect), 0)
+	assert_eq(r.value_at(-825, 620), 255, "middle of the place")
+	assert_eq(r.value_at(-948, 452), 255, "its corner")
+	assert_eq(r.value_at(-950 - MapReveal.EDGE - 20.0, 620), 0, "well beyond the edge")
+
+
+func test_hud_reveal_place_sketches_saves_and_rejects_unknown() -> void:
+	var hud := WorldMapHud.new()
+	add_child_autofree(hud)
+	assert_true(hud.reveal_place(&"suriel_glade", false))
+	assert_true(hud.found.has("suriel_glade"))
+	assert_true(hud.reveal.is_seen(-825, 620))
+	assert_true(hud.reveal_place(&"suriel_glade"), "again is fine")
+	assert_false(hud.reveal_place(&"nowhere_at_all"))
+	var other := WorldMapHud.new()
+	add_child_autofree(other)
+	other.load_state(JSON.parse_string(JSON.stringify(hud.save_state())))
+	assert_true(other.found.has("suriel_glade"))
+	assert_true(other.reveal.is_seen(-825, 620))
