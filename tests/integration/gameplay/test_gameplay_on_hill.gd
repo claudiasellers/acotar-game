@@ -159,7 +159,7 @@ func test_collection_book_opens_on_j_and_closes() -> void:
 	assert_false(feyre.get_tree().paused)
 
 
-func test_e_at_a_carcass_skins_before_pulling_arrows() -> void:
+func _carcass(at: Vector3) -> Node3D:
 	var script := GDScript.new()
 	script.source_code = "extends Node3D\nvar done := false\nfunc harvest() -> Array:\n\tif done:\n\t\treturn []\n\tdone = true\n\treturn [{\"item_id\": &\"ing_hare_pelt\", \"qty\": 1}]\n"
 	script.reload()
@@ -167,17 +167,34 @@ func test_e_at_a_carcass_skins_before_pulling_arrows() -> void:
 	carcass.set_script(script)
 	carcass.add_to_group(&"harvestable")
 	hill.add_child(carcass)
-	carcass.global_position = feyre.global_position + Vector3(1, 0, 0)
-	var arrow := Arrow.create()
+	carcass.global_position = at
+	return carcass
+
+
+func _stuck_arrow(at: Vector3, data: ArrowData = null) -> Arrow:
+	var arrow := Arrow.create(data)
 	hill.add_child(arrow)
-	arrow.global_position = carcass.global_position
+	arrow.global_position = at
 	arrow.add_to_group(Arrow.STUCK_GROUP)
+	return arrow
+
+
+## F26: an ash arrow beside the wolf was lost to the skinning and soft-locked
+## the chain. The arrow now wins; skinning then pulls any others in the body.
+func test_e_by_a_carcass_pulls_the_arrow_first_and_skinning_keeps_the_rest() -> void:
+	var carcass := _carcass(feyre.global_position + Vector3(1, 0, 0))
+	_stuck_arrow(carcass.global_position + Vector3(0, 0.3, 0.2), load("res://data/arrows/ash.tres"))
+	var deep := _stuck_arrow(carcass.global_position + Vector3(1.8, 0.2, 0))
+	assert_gt(feyre.global_position.distance_to(deep.global_position), Interactor.REACH, "second arrow out of Feyre's reach")
+	var ash_before := Gameplay.inventory.count(&"arrow_ash")
 	var arrows_before := Gameplay.inventory.arrow_count()
 	assert_true(feyre.interactor.interact())
-	assert_eq(Gameplay.inventory.count(&"ing_hare_pelt"), 1, "first E skins")
-	assert_eq(Gameplay.inventory.arrow_count(), arrows_before, "arrows wait")
+	assert_eq(Gameplay.inventory.count(&"arrow_ash"), ash_before + 1, "first E takes the ash arrow back")
+	assert_eq(Gameplay.inventory.count(&"ing_hare_pelt"), 0, "carcass waits")
 	assert_true(feyre.interactor.interact())
-	assert_eq(Gameplay.inventory.arrow_count(), arrows_before + 1, "then E pulls the arrow")
+	assert_eq(Gameplay.inventory.count(&"ing_hare_pelt"), 1, "then E skins")
+	assert_eq(Gameplay.inventory.arrow_count(), arrows_before + 2, "and pulls the arrow left in the body")
+	assert_eq(get_tree().get_nodes_in_group(Arrow.STUCK_GROUP).size(), 0)
 
 
 func test_reticle_follows_the_predicted_impact() -> void:

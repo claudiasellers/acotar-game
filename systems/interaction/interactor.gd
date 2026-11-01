@@ -14,6 +14,8 @@ signal picked(item_id: StringName, count: int)
 signal station_used(station_id: StringName)
 
 const REACH := 2.5
+## Stuck arrows this close to a carcass come back when it is harvested.
+const CARCASS_ARROWS := 2.0
 const DRESSING_STATIONS: Array[StringName] = [&"wardrobe", &"dressing_mirror"]
 const DRESSING_ROOM := preload("res://ui/dressing_room/dressing_room.gd")
 const PAINTING_UI := preload("res://ui/studio/studio_ui.gd")
@@ -82,19 +84,24 @@ func update_forage_windows() -> int:
 
 
 ## A carcass in reach is skinned before the arrows in it are pulled (F6).
+## A stuck arrow wins over the carcass it sits in or beside (F26: an ash
+## arrow by the wolf was lost to the skinning and soft-locked the chain).
 func interact() -> bool:
-	return _harvest() or pick_up_arrow() or _forage() or _field() or _station()
+	return pick_up_arrow() or _harvest() or _forage() or _field() or _station()
 
 
 func pick_up_arrow() -> bool:
 	var nearest := _nearest(get_tree().get_nodes_in_group(Arrow.STUCK_GROUP))
-	if nearest == null:
-		return false
-	var arrow := nearest as Arrow
+	return nearest != null and _collect_arrow(nearest)
+
+
+func _collect_arrow(node: Node) -> bool:
+	var arrow := node as Arrow
 	var item := arrow.data.item_id if arrow and arrow.data else &"arrow_wood"
 	if Gameplay.inventory.add(item, 1) == 0:
 		return false
-	nearest.queue_free()
+	node.remove_from_group(Arrow.STUCK_GROUP)
+	node.queue_free()
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
 	_picked(item, 1, null)
 	return true
@@ -134,6 +141,10 @@ func _harvest() -> bool:
 	var got := false
 	for entry: Dictionary in carcass.harvest():
 		got = _take(StringName(entry.get("item_id", &"")), int(entry.get("qty", 1)), null) or got
+	# Skinning it, she pulls her arrows out of it too, so none leave with the body.
+	for a in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
+		if a is Node3D and (a as Node3D).global_position.distance_to(carcass.global_position) <= CARCASS_ARROWS:
+			got = _collect_arrow(a) or got
 	return got
 
 
