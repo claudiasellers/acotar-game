@@ -104,3 +104,17 @@ func test_dread_keeps_silhouettes_readable_indoors() -> void:
 	assert_gt(floor_light, 0.035, "shapes still read in the dark")
 	assert_lt(floor_light, 0.12, "but it is still dark")
 	assert_lte(dark.contrast, 1.12, "no crushed blacks")
+
+
+func test_moderate_dread_bites_indoors() -> void:
+	# The Summer faerie triage asks for dread 0.55 in the night hall: it must
+	# frighten (experience bar §1.5), not stay a pale lavender evening.
+	assert_almost_eq(GradeDirector.dread_weight(0.0), 0.0, 0.0001)
+	assert_almost_eq(GradeDirector.dread_weight(1.0), 1.0, 0.0001)
+	assert_gt(GradeDirector.dread_weight(0.55), 0.75, "moderate dread lands most of the way")
+	var calm := GradeDirector.load_preset(&"manor")
+	var dark := GradeDirector.with_mood(calm, 0.55, &"dread")
+	var calm_floor := calm.ambient_color.get_luminance() * calm.ambient_energy * calm.exposure
+	var dark_floor := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
+	assert_lt(dark_floor, calm_floor * 0.25, "ambient fill at least two stops down")
+	assert_lt(dark.saturation, calm.saturation * 0.6, "the pink world leaves")

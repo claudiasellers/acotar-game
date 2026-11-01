@@ -130,6 +130,14 @@ func apply(base: GradePreset) -> void:
 		sun.light_volumetric_fog_energy = p.volumetric_light_energy
 
 
+## How far a dread request moves the grade: eased out, so a scene asking for
+## moderate dread (0.5-0.6) already lands most of the way (about 0.8) and
+## bites like full dread does; 0 and 1 are unchanged.
+static func dread_weight(dread: float) -> float:
+	var d := clampf(dread, 0.0, 1.0)
+	return 1.0 - (1.0 - d) * (1.0 - d)
+
+
 ## `p` with a story mood applied at `dread` (0..1) strength.
 static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread") -> GradePreset:
 	if dread <= 0.0:
@@ -141,7 +149,7 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	# lilac shadows); snow stays where it lies.
 	if _dread_preset == null:
 		_dread_preset = load_preset(&"dread")
-	var cold := GradePreset.mix(p, _dread_preset, clampf(dread, 0.0, 1.0))
+	var cold := GradePreset.mix(p, _dread_preset, dread_weight(dread))
 	cold.id = p.id
 	cold.lut = p.lut
 	cold.snow_cover = p.snow_cover
