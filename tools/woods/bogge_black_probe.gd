@@ -48,6 +48,13 @@ func _run() -> void:
 	await _frames(90)
 	await _shot("baseline", true)
 	print("PROBE mood ", world.grade.mood, " ", world.grade.mood_amount)
+	world.grade.swap_to(&"bogge", 0.0)
+	await _frames(5)
+	for m in [0.0, 0.2, 0.3, 0.45]:
+		world.grade.mood_amount = m
+		world.grade._mood_target = m
+		world.grade.apply(world.grade.current)
+		await _shot("bogge_mood_%02d" % int(m * 100), true)
 	FileAccess.open(out_dir.path_join("luma.txt"), FileAccess.WRITE).store_string("\n".join(lines) + "\n")
 	get_tree().quit(0)
 
