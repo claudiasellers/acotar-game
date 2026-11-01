@@ -91,6 +91,8 @@ func _on_wounded(from: Vector3, _cause: StringName) -> void:
 func _think(delta: float) -> void:
 	if prey == null or not is_instance_valid(prey):
 		prey = _find_prey()
+	# Head down over the doe while he holds her; a plain gait otherwise.
+	gait_hint = &"graze" if state == State.HOLD_PREY else &""
 	match state:
 		State.STALK:
 			_stalk(delta)
@@ -140,12 +142,14 @@ func _stalk(delta: float) -> void:
 	if not prey.get(&"alive"):
 		state = State.RUSH
 		return
+	gait_hint = &"stalk"
 	if to.length() > strike_distance:
 		_timer = hold_before_rush
 		move_direction = to
 		# Belly-low creep: slower than a walk, and silent.
 		move_speed = data.walk_speed * 0.7
 	else:
+		# Frozen mid-step at strike distance, waiting.
 		move_speed = 0.0
 		face_towards(prey.global_position, delta)
 		_timer -= delta
@@ -160,6 +164,14 @@ func die(cause: StringName) -> void:
 	state = State.DYING
 	if _trigger and cause == &"arrow_ash":
 		_trigger.fire()
+	if animator:
+		# The death clip carries the fall (creature_rig.py: stagger, front
+		# buckles, rolls onto his flank, slow breaths); the gold goes out of his
+		# eyes over the same time.
+		super.die(cause)
+		var tween := create_tween()
+		tween.tween_method(_set_eye_glow, 2.4, 0.0, animator.death_length())
+		return
 	var keep := model
 	model = null
 	super.die(cause)

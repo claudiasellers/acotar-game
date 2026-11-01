@@ -1,0 +1,12 @@
+# great_wolf clips (creatures/models/great_wolf.gltf), 30 fps. Written by tools/blender/creature_rig.py.
+# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
+idle 0.000 5.138 1
+walk 0.829 1.285 1
+trot 2.619 0.771 1
+gallop 8.439 0.462 1
+stalk 0.835 1.541 1
+graze - 5.138 1
+hit_l - 1.028 0
+hit_r - 1.028 0
+death_l - 10.667 0
+death_r - 10.667 0

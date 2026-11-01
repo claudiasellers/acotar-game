@@ -24,6 +24,9 @@ import bpy  # noqa: I001  (bpy must load before bmesh)
 import bmesh
 from mathutils import Vector
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import creature_rig  # noqa: E402
+
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "..", "creatures", "models")
 
 
@@ -152,6 +155,8 @@ def set_origin(obj, point):
 def tris(objs):
     total = 0
     for o in objs:
+        if o.type != "MESH":
+            continue
         bm = bmesh.new()
         bm.from_mesh(o.data)
         total += sum(len(f.verts) - 2 for f in bm.faces)
@@ -166,9 +171,12 @@ def export(name, objs, vertex_colors=False):
         o.select_set(True)
     path = os.path.abspath(os.path.join(OUT, f"{name}.gltf"))
     glb = path[:-5] + ".tmp.glb"
+    animated = any(o.type == "ARMATURE" for o in objs)
+    extra = dict(export_animations=True, export_animation_mode="NLA_TRACKS", export_skins=True,
+                 export_force_sampling=True, export_optimize_animation_size=True) if animated else {}
     bpy.ops.export_scene.gltf(filepath=glb, use_selection=True, export_format="GLB", export_yup=True,
                               export_apply=True, export_materials="EXPORT",
-                              export_vertex_color="ACTIVE" if vertex_colors else "MATERIAL")
+                              export_vertex_color="ACTIVE" if vertex_colors else "MATERIAL", **extra)
     glb_to_embedded_gltf(glb, path)
     os.remove(glb)
     print(f"{name}: {tris(objs)} tris -> {path}")
@@ -253,8 +261,13 @@ def quadruped(spec):
     return obj, g, head, snout
 
 
-def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat):
+def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat, motion=None):
+    """`motion`: keyword args for creature_rig.animate (style, menace, stalk,
+    death_breaths). Every quadruped gets a skeleton and its clips."""
     body, g, head, snout = quadruped(spec)
+    arm = creature_rig.build_armature(g, spec)
+    creature_rig.weight_body(body, arm)
+    rigid = []
     belly_below = spec["height"] * spec.get("belly_line", 0.8)
     assign_regions(body, [coat, belly], belly_below, belly_y=(-0.3 * spec["length"], 0.3 * spec["length"]),
                    belly_x=spec["width"] * 0.22)
@@ -264,15 +277,19 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat):
     eye_fwd = spec.get("eye_fwd", 0.5)
     for side in (-1, 1):
         parts.append(sphere(f"Eye{side}", head + Vector((side * head_r * 0.62, head_r * eye_fwd, head_r * 0.28)), eye_r, eye_mat, 8))
+        rigid.append((parts[-1], "head"))
     parts.append(sphere("Nose", snout + Vector((0, head_r * spec.get("snout_r", 0.42) * 0.35, head_r * 0.08)), head_r * 0.15, nose_mat, 8))
+    rigid.append((parts[-1], "muzzle"))
     if spec.get("jaw_open"):
         jaw = Vector(g.points[g.names["jaw"]])
         for side in (-1, 1):
             # Upper and lower fangs, bared.
             up = snout + Vector((side * head_r * 0.18, -head_r * 0.05, -head_r * 0.25))
             parts.append(cone(f"FangU{side}", up, up + Vector((0, 0.01, -head_r * 0.42)), head_r * 0.06, ivory))
+            rigid.append((parts[-1], "muzzle"))
             lo = jaw + Vector((side * head_r * 0.14, -head_r * 0.1, head_r * 0.1))
             parts.append(cone(f"FangL{side}", lo, lo + Vector((0, 0.01, head_r * 0.3)), head_r * 0.05, ivory))
+            rigid.append((parts[-1], "jaw"))
     if spec.get("claws"):
         for key in ("fl", "hl"):
             for side in (-1, 1):
@@ -280,11 +297,15 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat):
                 for c in (-1, 0, 1):
                     base = paw + Vector((c * spec["leg"] * 0.5, spec["leg"] * 0.6, 0.01))
                     parts.append(cone(f"Claw{key}{side}{c}", base, base + Vector((0, spec["leg"] * 0.9, -0.012)), spec["leg"] * 0.16, ivory, 4))
+                    rigid.append((parts[-1], f"paw_{key}_{'l' if side < 0 else 'r'}"))
     if spec.get("antlers"):
         pass  # The M1 deer is a doe herd; stags come with the Spring Court lanes.
+    for part, bone in rigid:
+        creature_rig.weight_rigid(part, bone)
     model = join(parts, name)
     model.name = name
-    export(name, [model])
+    creature_rig.animate(name, model, arm, g, spec, **(motion or {}))
+    export(name, [model, arm])
 
 
 WOLF = {
@@ -300,7 +321,8 @@ WOLF = {
 }
 
 
-def wolf(name, scale, coat_rgb, belly_rgb, eye_rgb, glow, teeth_rgb=(0.86, 0.80, 0.62), paw=1.0, coat_rough=0.95):
+def wolf(name, scale, coat_rgb, belly_rgb, eye_rgb, glow, teeth_rgb=(0.86, 0.80, 0.62), paw=1.0, coat_rough=0.95,
+         death_breaths=2):
     reset()
     spec = dict(WOLF)
     for k in ("length", "height", "width", "girth", "head", "snout", "ear", "leg", "neck"):
@@ -311,7 +333,8 @@ def wolf(name, scale, coat_rgb, belly_rgb, eye_rgb, glow, teeth_rgb=(0.86, 0.80,
     eyes = material("Eyes", eye_rgb, 0.2, emission=eye_rgb, strength=glow)
     ivory = material("Teeth", teeth_rgb, 0.4)
     nose = material("Nose", (0.03, 0.03, 0.03), 0.3)
-    finish_quadruped(name, spec, coat, belly, eyes, ivory, nose)
+    finish_quadruped(name, spec, coat, belly, eyes, ivory, nose,
+                     motion=dict(menace=True, stalk=True, death_breaths=death_breaths))
 
 
 def deer():
@@ -331,7 +354,7 @@ def deer():
     eyes = material("Eyes", (0.03, 0.02, 0.02), 0.1)
     ivory = material("Hoof", (0.15, 0.12, 0.1), 0.6)
     nose = material("Nose", (0.06, 0.05, 0.05), 0.3)
-    finish_quadruped("deer", spec, coat, belly, eyes, ivory, nose)
+    finish_quadruped("deer", spec, coat, belly, eyes, ivory, nose, motion=dict(death_breaths=2))
 
 
 def hare():
@@ -351,7 +374,7 @@ def hare():
     eyes = material("Eyes", (0.12, 0.07, 0.03), 0.1)
     ivory = material("Claws", (0.3, 0.27, 0.24), 0.6)
     nose = material("Nose", (0.45, 0.33, 0.32), 0.4)
-    finish_quadruped("hare", spec, coat, belly, eyes, ivory, nose)
+    finish_quadruped("hare", spec, coat, belly, eyes, ivory, nose, motion=dict(style="hop", death_breaths=1))
 
 
 def bird():
@@ -396,12 +419,21 @@ def bird():
 
 
 if __name__ == "__main__":
+    only = set(sys.argv[2:])
+    if only:
+        # Partial run: tools/blender/creatures.py <out_dir> great_wolf deer
+        for fn in only:
+            {"wolf": lambda: wolf("wolf", 1.0, (0.36, 0.34, 0.32), (0.58, 0.55, 0.50), (0.78, 0.62, 0.22), 0.0),
+             "great_wolf": lambda: wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.2,
+                                        teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.55, death_breaths=4),
+             "deer": deer, "hare": hare, "bird": bird}[fn]()
+        sys.exit(0)
     wolf("wolf", 1.0, (0.36, 0.34, 0.32), (0.58, 0.55, 0.50), (0.78, 0.62, 0.22), 0.0)
     # Andras (chapter 1 text via the keeper): pony-sized, paws bigger than a hand;
     # charcoal and obsidian with ivory, reading silver at a distance; golden
     # eyes, yellow fangs.
     wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.2,
-         teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.55)
+         teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.55, death_breaths=4)
     deer()
     hare()
     bird()
