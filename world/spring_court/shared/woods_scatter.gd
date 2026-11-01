@@ -42,9 +42,7 @@ static func generate(def: WoodsRegionDef, bounds: Rect2) -> Array[ScatterLayer]:
 	var layers: Array[ScatterLayer] = []
 	for kind in ["tree", "shrub", "forage"]:
 		var points := place(def, bounds, kind)
-		var ids := points.keys()
-		ids.sort()
-		for id: StringName in ids:
+		for id: StringName in sorted_ids(points):
 			layers.append(_make_layer(def, kind, id, points[id]))
 	return layers
 
@@ -434,9 +432,7 @@ static func _tables(def: WoodsRegionDef, kind: String) -> Dictionary:
 			continue
 		var acc := 0.0
 		var table: Array = []
-		var keys := w.keys()
-		keys.sort()
-		for k in keys:
+		for k in sorted_ids(w):
 			var v := maxf(float(w[k]), 0.0)
 			if v <= 0.0:
 				continue
@@ -444,6 +440,15 @@ static func _tables(def: WoodsRegionDef, kind: String) -> Dictionary:
 			table.append([acc, StringName(k)])
 		out[b.id] = table
 	return out
+
+
+## `dict`'s keys in alphabetical order. A plain sort() orders StringNames by
+## when they were first interned, so it changes with whatever loaded first
+## (another region built earlier in the run) and would reshuffle the tables.
+static func sorted_ids(dict: Dictionary) -> Array:
+	var keys := dict.keys()
+	keys.sort_custom(func(a: Variant, b: Variant) -> bool: return String(a) < String(b))
+	return keys
 
 
 static func _pick(table: Array, r: float) -> StringName:
