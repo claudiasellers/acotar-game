@@ -99,3 +99,27 @@ func test_lights_dim_and_cool_under_dread_then_recover() -> void:
 	mood._process(0.5)
 	assert_almost_eq(lamp.light_energy, 2.0, 0.001)
 	house.free()
+
+
+func test_act2_rooms_have_coffered_ceilings_not_open_sky() -> void:
+	for id: StringName in ManorRoomLook.COFFERED:
+		var found := _find(id)
+		assert_false(found.is_empty(), "coffered room %s exists" % id)
+		var r: ManorRoomDef = found[0]
+		assert_false(ManorRoomLook.has_sky(r), "%s has no painted sky" % id)
+		var plain := StandardMaterial3D.new()
+		var field := ManorRoomLook.ceiling_material(r, plain)
+		assert_true(field is StandardMaterial3D and field != plain, "%s gets the coffer field" % id)
+		var node := Node3D.new()
+		var origin := Vector3(r.rect.position.x, 0.0, r.rect.position.y)
+		var ch := ManorHouseBuilder.ceiling_of(r)
+		var mi := ManorRoomLook.add_coffers(node, r, origin, ch)
+		assert_not_null(mi, "%s coffers" % id)
+		assert_eq(mi.mesh.get_surface_count(), 2, "beams and gilt fillets")
+		var aabb := mi.get_aabb()
+		assert_almost_eq(aabb.end.y, ch, 0.01, "%s beams sit against the ceiling" % id)
+		assert_gt(aabb.position.y, ch - 0.4, "%s beams stay shallow" % id)
+		assert_almost_eq(aabb.size.x, r.rect.size.x, 0.01, "%s spans the room" % id)
+		assert_almost_eq(aabb.size.z, r.rect.size.y, 0.01, "%s spans the room" % id)
+		node.free()
+	assert_null(ManorRoomLook.add_coffers(Node3D.new(), _find(&"ballroom")[0], Vector3.ZERO, 6.0), "skies elsewhere")
