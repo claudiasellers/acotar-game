@@ -153,6 +153,9 @@ func test_moments_chain_from_the_grounds_to_the_pass() -> void:
 	PhaseManager.start(PHASES, &"p2_grounds")
 	WorldState.set_flag("wall_crossed")
 	for id in BOOK_ORDER:
+		if id == "gallery":
+			# Not a moment: her first P4 stroke at the easel (StudioDeeds, L30).
+			WorldState.raise_deed("gallery_opened")
 		var moment := StoryDirector.get_moment(StringName(id))
 		var space := _space(moment)
 		assert_true(space.can_start(), "%s is open after the moments before it" % id)

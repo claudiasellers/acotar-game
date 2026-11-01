@@ -191,8 +191,15 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 			status.text = "Nothing on it yet."
 			Juice.bounce_control(finish, 0.12)
 			return
-		StudioFx.burst(frame, frame.size * 0.5, &"outfit", Color(1, 0.85, 0.95), frame, 70)
+		finish.disabled = true
+		leave.disabled = true
+		var done: Image = s.canvas.image.duplicate()
 		s.finish(title.text)
+		# Hold the finished canvas on screen a moment while it sparkles.
+		(tex.texture as ImageTexture).update(done)
+		StudioFx.burst(frame, frame.size * 0.5, &"outfit", Color(1, 0.85, 0.95), frame, 70)
+		status.text = "Finished."
+		await tree.create_timer(0.8, true).timeout
 		close())
 	leave.pressed.connect(func() -> void: close())
 

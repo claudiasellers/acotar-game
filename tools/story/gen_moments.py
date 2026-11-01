@@ -97,10 +97,10 @@ moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faer
     ST(6.0, 8.0), R("starlight_pool_found"), CEL("deed"), J("lucien_autumn_history"),
     G("obj_lucien_knife"),
 ], r=10.0, notes="Picnic in the glen, swim in the pool; Lucien's story and his knife.")
-moment("gallery", "19", "manor_gallery", "manor_house", ["starlight_pool_found"], [
+moment("gallery", "19", "manor_gallery", "manor_house", ["gallery_opened"], [
     C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 3.0, "cone": 35.0}, CEL("gallery"),
-    R("gallery_opened"),
-], r=6.0)
+    R("fact.gallery_seen"),
+], r=6.0, notes="L30: gallery_opened is her deed (first P4 stroke at the easel, systems/studio/studio_deeds.gd); this is her first look inside.")
 moment("first_painting", "19-20", "painting_room_easel", "manor_house", ["gallery_opened"], [
     UF("first_painting"), R("first_painting"), CEL("painting"),
 ], trigger="interact", r=2.5, notes="L30: the studio (ui/studio) raises first_painting when her first canvas is finished.")
