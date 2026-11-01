@@ -1,0 +1,5 @@
+from L27 bogge-model
+quality look
+size 1920x1080
+timeout 1200
+shot bogge res://tools/playtest/act2_dangers_clip.tscn -- --only=bogge --out={out}/report.json --settle=30 --max-wall=1100
