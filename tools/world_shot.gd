@@ -19,6 +19,8 @@ const SHOTS := {
 	"opening_dawn": [Vector3(-142, 0, 2186), Vector3(-160, 0, 2120), 0.27, &"human_winter"],
 	"wall_defile": [Vector3(-95, 0, 1446), Vector3(-100, 0, 1396), 0.62, &"human_winter"],
 	"wall_crossing": [Vector3(-100, 0, 1362), Vector3(-150, 0, 1080), 0.62, &"spring"],
+	"eastern_bogge": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.45, &"bogge"],
+	"eastern_bogge_dusk": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.74, &"bogge"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
 }
 
