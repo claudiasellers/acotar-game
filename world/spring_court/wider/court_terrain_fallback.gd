@@ -16,7 +16,7 @@ const MATERIAL := "res://world/spring_court/wider/fx/materials/mat_terrain_tint.
 ## vertex_color_srgb).
 const TEX_COLORS := {
 	0: Color(0.95, 0.96, 1.0), 1: Color(0.55, 0.50, 0.46), 2: Color("D9CBD0"),
-	3: Color(0.60, 0.66, 0.58), 4: Color(0.33, 0.56, 0.25), 5: Color(0.26, 0.47, 0.29),
+	3: Color(0.60, 0.66, 0.58), 4: Color(0.27, 0.50, 0.27), 5: Color(0.22, 0.43, 0.30),
 	6: Color("C9A98A"), 7: Color("E3CDB4"), 8: Color("9FB7B0"),
 	9: Color("4A424D"),
 }
