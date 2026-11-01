@@ -16,10 +16,11 @@ const PASTELS := [
 ]
 const BLIGHT_WORDS := ["blight", "ashen", "grey_lichen", "bone", "mask", "crow", "nightshade"]
 
+## Regions generate scatter and landmarks on worker threads; every read or
+## write of these caches holds _lock (Mutex is recursive).
 static var _meshes := {}
 static var _scenes := {}
 static var _materials := {}
-## Regions generate scatter on worker threads; the caches are shared.
 static var _lock := Mutex.new()
 
 
@@ -91,12 +92,23 @@ static func _mesh_locked(id: StringName, lod: bool) -> Mesh:
 
 
 ## The whole model scene (landmarks: mesh + `<id>_col` collision mesh).
+## F27: region builds call this while workers fill the mesh cache. Unguarded,
+## two model loads ran at once and crashed with signal 11 (parallel loads of
+## .gltf files race on creating their GPU resources), so the cache and the
+## load sit under the same _lock as mesh() and material_for(). Workers must
+## only ever hit warm caches (CourtRegion._ready prewarms on the main thread):
+## a load on a worker can need the main thread, and the main thread may be
+## waiting on this lock.
 static func scene(id: StringName) -> PackedScene:
+	_lock.lock()
+	var packed: PackedScene
 	if _scenes.has(id):
-		return _scenes[id]
-	var path := scene_path(id)
-	var packed: PackedScene = load(path) as PackedScene if path != "" else null
-	_scenes[id] = packed
+		packed = _scenes[id]
+	else:
+		var path := scene_path(id)
+		packed = load(path) as PackedScene if path != "" else null
+		_scenes[id] = packed
+	_lock.unlock()
 	return packed
 
 
