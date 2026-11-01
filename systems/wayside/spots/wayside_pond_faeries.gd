@@ -6,6 +6,9 @@ class_name WaysidePondFaeries
 extends WaysideSpotNode
 
 const MODEL := "res://creatures/models/people/fae_nymph.gltf"
+## Their own still pool, so the heads always sit in water even where no
+## region lays the river's surface.
+const POOL_MATERIAL := "res://world/spring_court/wider/fx/materials/mat_water_lake.tres"
 const COUNT := 4
 ## They sink when she comes this near.
 const SINK_RADIUS := 13.0
@@ -21,6 +24,19 @@ var _sunk := 0.0
 func build() -> void:
 	var scene := load(MODEL) as PackedScene
 	var water_y := float(spot.param("water_y", spot.position.y))
+	var pool := MeshInstance3D.new()
+	var disc := CylinderMesh.new()
+	disc.top_radius = float(spot.param("pool_radius", 8.0))
+	disc.bottom_radius = disc.top_radius
+	disc.height = 0.05
+	disc.radial_segments = 32
+	disc.rings = 1
+	pool.mesh = disc
+	pool.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if ResourceLoader.exists(POOL_MATERIAL):
+		pool.material_override = load(POOL_MATERIAL)
+	pool.position.y = water_y - spot.position.y
+	add_child(pool)
 	for i in COUNT:
 		var a := TAU * float(i) / COUNT + 0.4
 		var pivot := Node3D.new()

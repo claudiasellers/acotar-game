@@ -60,8 +60,9 @@ forbid_flags = PackedStringArray()
 params = {
 "model": "stepping_stones",
 "repeat": true,
-"unit_length": 3.2,
-"water_y": 12.879389929771424
+"unit_length": 4.4,
+"water_y": 13.079389929771423,
+"yaw_offset": 1.5707963267948966
 }
 source = "ch 14 (a stream that takes a running leap)"
 

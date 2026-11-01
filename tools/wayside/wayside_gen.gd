@@ -176,7 +176,7 @@ func _authored(route: WaysideRoute) -> Array[WaysideSpot]:
 			# bright water. Here, a still pool of the Thornwater below the glen.
 			var pond := Vector2(-965.0, 100.0)
 			var pf := _spot(&"pond_faeries", "%s_pond_faeries" % route.id, pond, "C", "ch 14")
-			pf.params = {"water_y": _river_water(pond), "spread": 2.4}
+			pf.params = {"water_y": _river_water(pond), "spread": 2.4, "pool_radius": 9.0}
 			pf.position.y = _river_water(pond)
 			pf.line = "Four heads in the water, watching me. I didn't go any closer."
 			out.append(pf)
@@ -208,7 +208,6 @@ func _crossings(route: WaysideRoute) -> Array[WaysideSpot]:
 	if route.realm != &"spring_court":
 		return out
 	var river := MacroHeight.THORNWATER
-	var models := ["stepping_stones", "autumn_fallen_log", "wooden_footbridge_small"]
 	var n := 0
 	for i in route.waypoints.size() - 1:
 		var a := route.waypoints[i]
@@ -221,8 +220,9 @@ func _crossings(route: WaysideRoute) -> Array[WaysideSpot]:
 			var dir := (b - a).normalized()
 			var s := _spot(&"crossing", "%s_crossing_%d" % [route.id, n], at - dir * 13.0, "X", "ch 14 (a stream that takes a running leap)")
 			s.target = _ground3(at + dir * 13.0)
-			var model: String = models[(hash(String(route.id)) + n) % models.size()]
-			s.params = {"model": model, "water_y": _river_water(at), "repeat": model == "stepping_stones", "unit_length": 3.2}
+			# The court's stepping-stone row is 4.6 m long on its X axis; chained
+			# end to end across the channel and turned to run along the crossing.
+			s.params = {"model": "stepping_stones", "water_y": _river_water(at), "repeat": true, "unit_length": 4.4, "yaw_offset": PI * 0.5}
 			s.line = ["Dry boots, mostly.", "Better than wading.", "A running leap would have done it. This is nicer."][n % 3]
 			out.append(s)
 			n += 1
@@ -421,8 +421,9 @@ func _highest_near(p: Vector2, radius: float) -> Vector2:
 	return best
 
 
+## The Thornwater's surface where the court lays it (CourtHeight.river_level_at).
 func _river_water(p: Vector2) -> float:
-	return MacroHeight.land_height_at(p.x, p.y) - MacroHeight.RIVER_DEPTH + 1.4
+	return MacroHeight.land_height_at(p.x, p.y) - 1.0
 
 
 func _ground3(p: Vector2) -> Vector3:

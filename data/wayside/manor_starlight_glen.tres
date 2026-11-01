@@ -7,15 +7,16 @@
 script = ExtResource("2_40lib")
 kind = &"pond_faeries"
 id = &"manor_starlight_glen_pond_faeries"
-position = Vector3(-965, 21.070719, 100)
+position = Vector3(-965, 21.27072, 100)
 target = Vector3(-965, 19.67072, 100)
 items = PackedStringArray()
 line = "Four heads in the water, watching me. I didn't go any closer."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
+"pool_radius": 9.0,
 "spread": 2.4,
-"water_y": 21.0707194842295
+"water_y": 21.270719484229502
 }
 canon = "C"
 source = "ch 14"
@@ -31,10 +32,11 @@ line = "Dry boots, mostly."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"model": "autumn_fallen_log",
-"repeat": false,
-"unit_length": 3.2,
-"water_y": 20.456509170513677
+"model": "stepping_stones",
+"repeat": true,
+"unit_length": 4.4,
+"water_y": 20.65650917051368,
+"yaw_offset": 1.5707963267948966
 }
 source = "ch 14 (a stream that takes a running leap)"
 
