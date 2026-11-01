@@ -37,6 +37,24 @@ func build() -> void:
 		pool.material_override = load(POOL_MATERIAL)
 	pool.position.y = water_y - spot.position.y
 	add_child(pool)
+	# The lake material is translucent, so without a floor the bodies under
+	# the surface show through. An opaque dark disc just under it reads as
+	# deep water and leaves only the heads.
+	var floor_mi := MeshInstance3D.new()
+	var floor_disc := CylinderMesh.new()
+	floor_disc.top_radius = disc.top_radius - 0.05
+	floor_disc.bottom_radius = floor_disc.top_radius
+	floor_disc.height = 0.02
+	floor_disc.radial_segments = 32
+	floor_disc.rings = 1
+	floor_mi.mesh = floor_disc
+	floor_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var deep := StandardMaterial3D.new()
+	deep.albedo_color = Color(0.06, 0.16, 0.18)
+	deep.roughness = 0.9
+	floor_mi.material_override = deep
+	floor_mi.position.y = pool.position.y - 0.1
+	add_child(floor_mi)
 	for i in COUNT:
 		var a := TAU * float(i) / COUNT + 0.4
 		var pivot := Node3D.new()

@@ -150,11 +150,11 @@ func _find_anchor(id: StringName, near: Vector3) -> Node3D:
 	if a == null:
 		# Her region can still be streaming in (it was unloaded while she was
 		# away); stand and wait for it as a player would, and log how long.
-		var t0: float = pt._sim_seconds()
-		await pt._until(func() -> bool: return pt._anchor(id) != null, 180.0)
+		var t0: float = Time.get_unix_time_from_system()
+		await pt._until_wall(func() -> bool: return pt._anchor(id) != null, 300.0)
 		a = pt._anchor(id)
 		if a:
-			pt._note("waited %.0f s at the edge for '%s' to stream in" % [pt._sim_seconds() - t0, id])
+			pt._note("waited %.0f s (wall) at the edge for '%s' to stream in" % [Time.get_unix_time_from_system() - t0, id])
 	if a == null:
 		var seen: PackedStringArray = []
 		for n in pt.get_tree().get_nodes_in_group(&"story_anchor"):

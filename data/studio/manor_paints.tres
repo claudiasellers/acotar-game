@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StudioPaintSet" format=3]
+
+[ext_resource type="Script" path="res://data/studio/studio_paint_set.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"manor_paints"
+names = PackedStringArray("Vermilion", "Chrome yellow", "Ultramarine", "Lead white", "Lamp black", "Rose madder", "Sap green", "Yellow ochre", "Burnt umber", "Cerulean", "Viridian", "Violet", "Blush", "Lilac", "Periwinkle", "Mint", "Butter", "Pearl", "Gold leaf", "Starlight silver")
+colors = PackedColorArray(0.847, 0.251, 0.180, 1, 0.949, 0.761, 0.188, 1, 0.184, 0.310, 0.690, 1, 0.965, 0.949, 0.918, 1, 0.141, 0.125, 0.165, 1, 0.878, 0.376, 0.494, 1, 0.310, 0.541, 0.235, 1, 0.788, 0.604, 0.271, 1, 0.420, 0.275, 0.188, 1, 0.353, 0.651, 0.839, 1, 0.184, 0.561, 0.478, 1, 0.490, 0.333, 0.710, 1, 0.969, 0.776, 0.816, 1, 0.804, 0.706, 0.941, 1, 0.624, 0.698, 0.949, 1, 0.718, 0.925, 0.824, 1, 0.984, 0.906, 0.631, 1, 0.953, 0.925, 0.957, 1, 0.902, 0.753, 0.416, 1, 0.843, 0.859, 0.910, 1)
+canon = "X"
+notes = "The painting room's stock (ch19, [C] that it is stocked; the colours are [X])."

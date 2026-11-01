@@ -55,7 +55,10 @@ func _ready() -> void:
 		actor_id = &"bogge"
 	super._ready()
 	# The Bogge's wood is the darkest place in the court (bible §1.5).
-	DreadField.attach(self, 45.0, 14.0)
+	var field := DreadField.attach(self, 45.0, 14.0)
+	# Full dread here takes the wood to black (Mac clip L25-6): she must still
+	# see the elm she stares at. Just over 0.5 so the one wrong sound plays.
+	field.max_intensity = 0.55
 	_fog = FogVolume.new()
 	_fog.name = "Dark"
 	_fog.size = Vector3(3.5, 3.5, 3.5)
