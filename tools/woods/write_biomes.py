@@ -158,7 +158,7 @@ EASTERN=[
   fh=10,f={"ing_hollow_root":2,"ing_foxglove":1,"ing_owl_feather":1,"col_bone_charm":0.6,"col_shed_antler":0.3},
   amb=["mist"]),
  dict(id="bogge_territory",notes="[C] Horror exception. The Bogge's wood: black twisted trees, pale fungus, thick fog, silence. Do not look.",
-  g=(0.18,0.19,0.18),g2=(0.14,0.15,0.15),td=0.016,t={"twisted_dead":5,"blighted_tree":1},
+  g=(0.18,0.19,0.18),g2=(0.14,0.15,0.15),td=0.022,t={"twisted_dead":5,"blighted_tree":1},
   sd=0.04,s={"pale_fungus":3,"withered_bush":1},
   dd=1.0,dt={"dead_leaves":4,"grey_grass":2},
   fh=6,f={"ing_hollow_root":2,"ing_iron_filings":1,"col_bone_charm":1},

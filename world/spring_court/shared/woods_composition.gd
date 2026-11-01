@@ -110,14 +110,21 @@ static func path_drift(def: WoodsRegionDef, x: float, z: float, biome_id: String
 	return DRIFTS[absi(hash([def.seed, cell])) % DRIFTS.size()]
 
 
+## A horror biome (the Bogge's wood, the naga's reeds): its ambience is mist or ash.
+static func is_horror(b: WoodsBiome) -> bool:
+	for a in HORROR_AMBIENCE:
+		if a in b.ambience:
+			return true
+	return false
+
+
 static func _build(def: WoodsRegionDef) -> Dictionary:
 	var provider: Variant = def.provider
 	var bounds: Rect2 = provider.BOUNDS
 	var horror := {}
 	for b in def.biomes:
-		for a in HORROR_AMBIENCE:
-			if a in b.ambience:
-				horror[b.id] = true
+		if is_horror(b):
+			horror[b.id] = true
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash([def.seed, "clearings"])
 	var f: WoodsFeatures = provider.features()

@@ -243,9 +243,13 @@ static func _append(out: Dictionary, id: StringName, x: float, z: float, yaw: fl
 	out[id].append_array(PackedFloat32Array([x, WorldHeight.height_at(x, z), z, yaw, lerpf(range_.x, range_.y, sc)]))
 
 
+## Horror woods have next to no meadow gaps: the wood closes in.
+const HORROR_OPEN := 0.05
+
+
 ## Open share of a biome's ground (no grove), from its tree density.
 static func _open(b: WoodsBiome) -> float:
-	return LandscapeLayout.open_share(b.tree_density)
+	return HORROR_OPEN if WoodsComposition.is_horror(b) else LandscapeLayout.open_share(b.tree_density)
 
 
 ## Forage as drifts of 5-30 of one kind around a centre (finds alone or in
