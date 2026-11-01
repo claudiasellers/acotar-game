@@ -230,11 +230,12 @@ func test_beast_door_staging_moves_only_the_camera() -> void:
 	assert_eq(staging.shot_name, &"low", "it fills the room")
 	await wait_process_frames(2)
 	assert_lt(cine.camera.global_position.y, floor_y + 1.0, "looking up at him")
-	# The decision window: her own view, and the scene's control untouched.
+	# The decision window: over her shoulder at him, the scene's control untouched.
 	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["fire"]))
 	await wait_process_frames(2)
 	assert_eq(staging.shot_name, &"window")
-	assert_eq(cine.target_kind, &"follow")
+	assert_eq(cine.target_kind, &"shot")
+	assert_gt(cine.camera.global_position.distance_to(beast.global_position + Vector3.UP * 2.0), 1.3, "not inside him")
 	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
 	assert_eq(StoryControl.allowed_actions, PackedStringArray(["fire"]))
 	# The father pleads: both in frame.
