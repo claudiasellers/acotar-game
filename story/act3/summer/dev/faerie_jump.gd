@@ -1,6 +1,6 @@
 ## Dev jump to ch 17 (L29 testing): the real game at night in the manor's
-## entrance hall, right after the naga, with what Feyre would carry home (a
-## little yarrow and honey from the woods, a fire lily). Earlier deeds are set
+## entrance hall, right after the naga, carrying only a fire lily (no use on a
+## wound): the herbs are on the infirmary's bandage shelves (gen_service.gd). Earlier deeds are set
 ## the way a save would hold them; nothing after naga_survived is set, so the
 ## Summer faerie is carried in as soon as she stands in the hall.
 ##   tools/mq/godot.sh res://story/act3/summer/dev/faerie_jump.tscn
@@ -13,7 +13,7 @@ const DONE_BEFORE := ["wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_
 		"first_dinner_eaten", "curtain_trap_set", "bogge_survived", "puca_resisted",
 		"tamlin_wound_dressed", "manor_map_drawn", "study_mural_seen", "fact.suriel_method_known",
 		"fact.suriel_answered", "suriel_bound", "fact.naga_escaped", "naga_survived"]
-const KIT := {&"ing_yarrow": 2, &"ing_honey": 1, &"ing_fire_lily": 1}
+const KIT := {&"ing_fire_lily": 1}
 ## Late at night: she is woken by the screams (ch 17).
 const NIGHT := 0.96
 const ANCHOR := &"manor_window_hide"

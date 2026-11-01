@@ -16,11 +16,15 @@
 ##      evening (tools/playtest/act2_beats.gd, L24): act2_arrival, act2_bath,
 ##      act2_dinner, curtain_trap; then the grounds
 ##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
-##      eaten), bogge_hunt, puca_gate. Act I alone: --stop-after=manor_arrival.
+##      eaten), bogge_hunt, puca_gate; then p3 and p4's painting in the same
+##      run (tools/playtest/p3p4_chain.gd, P3P4Chain.BEATS: house:*, suriel:*,
+##      faerie:*, starlight_pool, painting:*). Act I alone:
+##      --stop-after=manor_arrival; Acts I-II: --stop-after=puca_gate.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
 ##   4. The phase is p2_grounds on arrival, and after the ride she stands on
-##      the manor estate and walks (manor_arrival checks both). After the
-##      puca, final_phase in the report is p3_house_and_woods.
+##      the manor estate and walks (manor_arrival checks both). At the end of
+##      the full chain, final_phase in the report is p4_wider_court
+##      (p3_house_and_woods with --stop-after=puca_gate).
 ##   5. No "SCRIPT ERROR" lines in the log (not checked by the exit code).
 ##   6. No StandIns placeholder (box or capsule) entered the tree: each one
 ##      means no spawner answered for that actor, and the player would see a
@@ -46,7 +50,7 @@ const GAME_SCENE := "res://story/act1/act1_game.tscn"
 ## Header, acceptance item 2, in play order.
 const ACCEPTANCE_BEATS: Array[String] = ["spawn", "hunt_to_clearing", "wolf_kill", "skin", "pelt_sale",
 	"sleep", "beast_door", "crossing", "manor_arrival", "act2_arrival", "act2_bath", "act2_dinner",
-	"curtain_trap", "first_dinner", "bogge_hunt", "puca_gate"]
+	"curtain_trap", "first_dinner", "bogge_hunt", "puca_gate"] + P3P4Chain.BEATS
 const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
 const WALK_SPEED_GUESS := 4.0
@@ -81,11 +85,16 @@ var _hop_causes: Dictionary = {}
 var _under_noted: bool = false
 var _last_floor: String = ""
 var _shutdown_suspects: PackedStringArray = []
+## Set before add_child by P3P4Chain: this node is a segment of a running
+## playtest and shares its state, so _ready neither parses args nor runs.
+var chained: bool = false
 ## StandIns nodes seen this run: {name, placeholder, at, region, beat}.
 var _stand_ins: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	if chained:
+		return
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out_path = arg.trim_prefix("--out=")
@@ -505,7 +514,17 @@ func _play() -> void:
 	if not await Act2PlaytestBeats.new().play(self):
 		return
 	# 14-16. Act II on the grounds (L25): the first dinner is already eaten, the Bogge, the puca.
-	await Act2GroundsBeats.new(self).play()
+	await _act2_grounds_then_chain()
+
+
+## 14-16 (L25), then p3 and p4's painting in the same run (P3P4Chain).
+func _act2_grounds_then_chain() -> void:
+	var ok: bool = await Act2GroundsBeats.new(self).play()
+	if not ok or _beat.status != "pass" or _beat.id == stop_after:
+		return
+	if stop_after != "" and ACCEPTANCE_BEATS.find(stop_after) <= ACCEPTANCE_BEATS.find("puca_gate"):
+		return
+	await P3P4Chain.new(self).play()
 
 
 ## --from=manor: Act I's deeds written directly (the only flag writes in this
@@ -531,7 +550,7 @@ func _jump_to_manor() -> void:
 	_pass()
 	if not await Act2PlaytestBeats.new().play(self):
 		return
-	await Act2GroundsBeats.new(self).play()
+	await _act2_grounds_then_chain()
 
 
 # --- input ------------------------------------------------------------------

@@ -34,6 +34,10 @@ const NEAR := 2.5
 ## "...until the end, and awhile after that."
 const AFTER_SECONDS := 6.0
 const ARRIVE := 45.0
+## With nothing to dress the stumps, she thinks of the infirmary shelves this
+## long after he is laid down (the herbs restock daily, gen_service.gd).
+const HINT_AFTER := 3.5
+const SHELF_HINT := "Herbs. The infirmary shelves, past the kitchens. If I run."
 
 var state: TriageState
 var faerie: Node3D
@@ -49,6 +53,7 @@ var _vase: Node3D
 var _rag: Node3D
 var _supplies: Node3D
 var _after: float = 0.0
+var hinted: bool = false
 
 
 func _init() -> void:
@@ -95,6 +100,7 @@ func _build_beats() -> Array:
 	outcome = &""
 	spoke = false
 	_after = 0.0
+	hinted = false
 	state.came_round.connect(_on_came_round)
 	return [
 		Beats.run(_open, "carried in"),
@@ -251,6 +257,10 @@ func step_clock(delta: float) -> void:
 		state.interrupt()
 	if state.holding and p and _flat_to(p.global_position, target_point(Target.HAND)) > NEAR:
 		_let_go()
+	if not hinted and state.elapsed >= HINT_AFTER:
+		hinted = true
+		if float(TriageMath.best_dressing(inventory).rating) <= 0.0 and caption:
+			caption.say("", SHELF_HINT, 4.0)
 	var was_rag := state.has_rag
 	state.tick(delta)
 	if was_rag and not state.has_rag:
