@@ -100,6 +100,12 @@ func _build_props() -> void:
 	TriageProps.set_pool(_pool, 0.0)
 
 
+## Both stumps bound: the bloody linen goes on his model (L02-9's wounds_bound).
+func _on_step_done(_wound: int, step: TriageWound.Step) -> void:
+	if step == TriageWound.Step.BIND and state.wounds.all(func(w: TriageWound) -> bool: return w.bound):
+		EventBus.story_actor_cue.emit(&"summer_faerie", &"wounds_bound")
+
+
 func _build_beats() -> Array:
 	state = TriageState.new()
 	outcome = &""
@@ -107,6 +113,7 @@ func _build_beats() -> Array:
 	_after = 0.0
 	hinted = false
 	state.came_round.connect(_on_came_round)
+	state.step_done.connect(_on_step_done)
 	return [
 		Beats.run(_open, "carried in"),
 		TriageBeat.new(),
@@ -136,7 +143,7 @@ func _open(_s: SceneSpace = null) -> void:
 	_supplies = TriageProps.supplies()
 	props.add_child(_supplies)
 	var lay := Transform3D(Basis(Vector3(0, 0, -1), Vector3(-1, 0, 0), Vector3(0, 1, 0)),
-		to_global(Vector3(1.0, TriageProps.TABLE_SIZE.y + 0.12, 0.0)))
+		to_global(Vector3(TriageProps.FEET_X, TriageProps.TABLE_SIZE.y + 0.12, 0.0)))
 	faerie = request_actor(&"summer_faerie", lay, func() -> Node3D: return StandIns.figure("summer_faerie"))
 	faerie.global_transform = lay
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"laid_out")

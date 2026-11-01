@@ -18,9 +18,13 @@ const SILVER := Color(0.82, 0.84, 0.88)
 const BLOOD := Color(0.46, 0.0, 0.02)
 const BLOOD_GLOW := Color(0.32, 0.0, 0.015)
 const PETALS: Array[Color] = [Color(0.98, 0.70, 0.78), Color(0.86, 0.74, 0.96), Color(0.99, 0.93, 0.70)]
-## Where the bowl, the linen, his hand and the stumps sit, table-local.
-const BOWL_AT := Vector3(0.95, 0.8, -0.28)
-const LINEN_AT := Vector3(1.25, 0.8, -0.2)
+## Where the bowl, the linen, his hand and the stumps sit, table-local. He
+## lies head to -X with his soles at x 1.0, so the bowl and linen sit past his
+## feet on the last 0.4 m of the table, the bowl on Feyre's side.
+const BOWL_AT := Vector3(1.2, 0.8, -0.26)
+const LINEN_AT := Vector3(1.24, 0.8, 0.14)
+## Where story lays his root: his soles (table-local x; height above the top).
+const FEET_X := 1.0
 const HAND_AT := Vector3(-1.35, 0.72, -0.5)
 const WOUNDS_AT := Vector3(-0.35, 1.0, 0.0)
 ## The puddle's radius (m) as soon as it shows, and when he has bled out.
@@ -258,6 +262,6 @@ static func set_pool(pool_node: Node3D, lost: float) -> void:
 
 ## A rag she has wet, shown in her hand's place on the table edge.
 static func rag() -> MeshInstance3D:
-	var r := box(Vector3(0.14, 0.02, 0.1), mat(Color(0.93, 0.88, 0.85), 0.9), BOWL_AT + Vector3(-0.25, 0.01, 0))
+	var r := box(Vector3(0.14, 0.02, 0.1), mat(Color(0.93, 0.88, 0.85), 0.9), BOWL_AT + Vector3(0, 0.01, -0.18))
 	r.name = "Rag"
 	return r
