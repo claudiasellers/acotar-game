@@ -130,6 +130,7 @@ func test_ground_cover_survives_unloading_mid_build() -> void:
 
 
 func _test_fast(ran: Array[String]) -> void:
+	OS.delay_usec(10)  # A job that measures 0 us leaves the frame looking unstarted.
 	ran.append("fast")
 
 
