@@ -32,6 +32,9 @@ const STAGE_INTENSITY := {
 ## bursts in and fills the room), and how fast.
 @export var enter_depth: float = 2.6
 @export var burst_speed: float = 4.5
+## He towers over Feyre, never through her: the break and the loom stop this
+## far from her.
+@export var keep_clear: float = 2.0
 
 var stage: Stage = Stage.HIDDEN
 ## Current strength of the field (0 to 1), eased toward the stage's level.
@@ -99,7 +102,11 @@ func break_door() -> void:
 			door.call(&"break_open")
 		else:
 			create_tween().tween_property(door, ^"rotation:y", door.rotation.y + deg_to_rad(105.0), 0.25)
-		_destination = door.global_position - door.global_basis.z * enter_depth
+		var depth := enter_depth
+		var player := _player()
+		while player and depth > 0.5 and _flat_distance(door.global_position - door.global_basis.z * depth, player.global_position) < keep_clear:
+			depth -= 0.1
+		_destination = door.global_position - door.global_basis.z * depth
 		_bursting = true
 	if is_inside_tree():
 		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
@@ -110,8 +117,19 @@ func hold_presence() -> void:
 
 
 func loom(toward: Vector3) -> void:
-	_destination = global_position + (toward - global_position).limit_length(1.5)
+	var gap := toward - global_position
+	gap.y = 0.0
+	var step := clampf(gap.length() - keep_clear, 0.0, 1.5)
+	_destination = global_position + gap.normalized() * step if gap.length() > 0.001 else global_position
 	_set_stage(Stage.LOOM)
+
+
+func _player() -> Node3D:
+	return get_tree().get_first_node_in_group(&"player") as Node3D if is_inside_tree() else null
+
+
+static func _flat_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
 
 
 func speak() -> void:
