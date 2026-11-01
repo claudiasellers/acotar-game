@@ -34,6 +34,8 @@ const NEAR := 2.5
 ## "...until the end, and awhile after that."
 const AFTER_SECONDS := 6.0
 const ARRIVE := 45.0
+## The front doors, where Lucien leaves (site_plan FRONT_DOOR, z -28).
+const FRONT_DOORS := Vector2(0.0, -28.6)
 ## With nothing to dress the stumps, she thinks of the infirmary shelves this
 ## long after he is laid down (the herbs restock daily, gen_service.gd).
 const HINT_AFTER := 3.5
@@ -54,6 +56,7 @@ var _rag: Node3D
 var _supplies: Node3D
 var _after: float = 0.0
 var hinted: bool = false
+var lucien_exit: LucienExit
 
 
 func _init() -> void:
@@ -141,9 +144,12 @@ func _open(_s: SceneSpace = null) -> void:
 	if tamlin.is_inside_tree():
 		tamlin.look_at(Vector3(tamlin_at.x, tamlin_at.y, global_position.z), Vector3.UP)
 	EventBus.story_actor_cue.emit(&"tamlin", &"tends_the_faerie")
-	request_actor(&"lucien", Transform3D(Basis.IDENTITY, to_global(Vector3(2.4, 0.0, 1.6))),
+	var lucien := request_actor(&"lucien", Transform3D(Basis.IDENTITY, to_global(Vector3(2.4, 0.0, 1.6))),
 		func() -> Node3D: return StandIns.figure("lucien"))
 	EventBus.story_actor_cue.emit(&"lucien", &"leaves_sick")
+	lucien.visible = true
+	lucien_exit = LucienExit.new(lucien, global_position,
+		Vector3(FRONT_DOORS.x + 1.2, global_position.y, FRONT_DOORS.y))
 
 
 # --- Presses ----------------------------------------------------------------
@@ -261,6 +267,8 @@ func step_clock(delta: float) -> void:
 		hinted = true
 		if float(TriageMath.best_dressing(inventory).rating) <= 0.0 and caption:
 			caption.say("", SHELF_HINT, 4.0)
+	if lucien_exit:
+		lucien_exit.tick(delta)
 	var was_rag := state.has_rag
 	state.tick(delta)
 	if was_rag and not state.has_rag:
