@@ -1,0 +1,3 @@
+from interior-dread lane
+quality look
+shot faerie res://tools/playtest/p3_faerie_clip.tscn {out}
