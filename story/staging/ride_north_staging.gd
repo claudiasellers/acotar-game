@@ -40,7 +40,7 @@ func _running() -> bool:
 
 func _horse() -> Node3D:
 	var h: Variant = space.get(&"horse") if space else null
-	return h as Node3D if h is Node3D and is_instance_valid(h) else null
+	return h as Node3D if is_instance_valid(h) and h is Node3D else null
 
 
 func _rider() -> Node3D:
@@ -58,7 +58,7 @@ func _carrier() -> Transform3D:
 
 func _rider_point() -> Vector3:
 	var r := _rider()
-	return r.global_position + Vector3.UP * 0.6 if r else _carrier().origin + Vector3.UP * 1.8
+	return r.global_position + Vector3.UP * 1.2 if r else _carrier().origin + Vector3.UP * 2.3
 
 
 func _on_cue(actor: StringName, cue: StringName) -> void:
@@ -121,7 +121,7 @@ func _process(_delta: float) -> void:
 	if not _running() or shot_name in [&"", &"released"]:
 		return
 	var veil: Variant = space.get(&"veil")
-	if not (veil is ColorRect and is_instance_valid(veil)):
+	if not (is_instance_valid(veil) and veil is ColorRect):
 		return
 	var a: float = (veil as ColorRect).modulate.a
 	if a > 0.9 and not _dark_seen:

@@ -84,3 +84,32 @@ func test_ride_north_staging_follows_the_rider_through_the_teleport() -> void:
 	await wait_seconds(1.5)
 	assert_true(_player_cam.current)
 	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK, "camera only")
+
+
+## F18: the ride's veil is freed after the fade in; the staging must not test
+## the freed node (GUT fails a test on any engine error).
+func test_freed_veil_is_left_alone() -> void:
+	var space := FakeRideSpace.new()
+	add_child_autofree(space)
+	var horse := Node3D.new()
+	space.add_child(horse)
+	horse.global_position = Vector3(0, 500, 0)
+	space.horse = horse
+	var staging := RideNorthStaging.new()
+	space.add_child(staging)
+	await wait_process_frames(1)
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"lead")
+	var veil := ColorRect.new()
+	veil.modulate.a = 1.0
+	space.add_child(veil)
+	space.veil = veil
+	await wait_process_frames(2)
+	veil.modulate.a = 0.5
+	await wait_process_frames(2)
+	assert_eq(staging.shot_name, &"drive")
+	veil.free()
+	horse.free()
+	await wait_process_frames(5)
+	assert_eq(staging.shot_name, &"drive", "quietly holds until released")
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"leave")
+	assert_eq(staging.shot_name, &"released")

@@ -43,7 +43,7 @@ func _running() -> bool:
 
 func _beast() -> Node3D:
 	var b: Variant = space.get(&"beast") if space else null
-	if b is Node3D and is_instance_valid(b):
+	if is_instance_valid(b) and b is Node3D:
 		return b
 	return get_tree().get_first_node_in_group(&"beast") as Node3D
 
@@ -115,7 +115,8 @@ func _door_bursts() -> void:
 	cine.bars_to(1.0, 0.25)
 	var head := func() -> Vector3: return _head(beast)
 	# Inside the room, facing the door he comes through.
-	var door := beast.get(&"door") as Node3D if &"door" in beast else null
+	var door_v: Variant = beast.get(&"door") if &"door" in beast else null
+	var door: Node3D = door_v if is_instance_valid(door_v) and door_v is Node3D else null
 	var spots: Array[Vector3] = []
 	var at := head.call() as Vector3
 	if door:
