@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_o0fse"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_s2kvm"]
+
+[resource]
+script = ExtResource("2_s2kvm")
+id = &"ing_willow_bark_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/willow_withies.glb"
+ingredient_id = &"ing_willow_bark"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-692.38934, 10.393966, 2371.134, 2.8353007, 1.2227428, -679.7068, -5.0176554, 2355.1328, 5.767878, 1.223966, -682.63074, -3.6883905, 2356.0232, 1.2686737, 1.0748632, -673.0484, 9.915192, 2388.0554, 6.2369957, 1.1638184)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_o0fse")

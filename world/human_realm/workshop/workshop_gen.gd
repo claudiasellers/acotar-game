@@ -91,6 +91,7 @@ func _initialize() -> void:
 	_reserve()
 	_layers()
 	var added := b.cover_empty([&"ing_flint", &"ing_crow_feather", &"fox_tracks", &"ing_ice_moss"])
+	b.layers = ForageThinning.split(b.layers, b.area)
 	b.save_layers(DIR + "scatter")
 	var root := _build_scene()
 	var draw_calls := b.estimate_draw_calls(Builder.count_meshes(root))

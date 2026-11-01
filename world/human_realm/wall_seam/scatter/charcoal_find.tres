@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_h77aq"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_hxu8a"]
+
+[resource]
+script = ExtResource("2_hxu8a")
+id = &"charcoal_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/charcoal_lump.glb"
+ingredient_id = &"ing_charcoal"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-769.1616, 12.413244, 1465.9739, 5.4910293, 0.90545475, -767.2263, 12.313274, 1465.6827, 3.4697933, 0.9978887, -500.85468, 7.903769, 1463.9296, 3.9076338, 0.92328966, 30.927935, 4.834582, 1465.3657, 4.060869, 0.96775687, 567.06647, -8.219468, 1463.6641, 5.5474873, 1.015544)
+material = ExtResource("1_h77aq")

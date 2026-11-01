@@ -52,7 +52,7 @@ func build(seed: int = SEED, area: Rect2 = Rect2()) -> Array[ScatterLayer]:
 	for l in layers:
 		if l.count() > 0:
 			out.append(l)
-	return out
+	return ForageThinning.split(out, rect)
 
 
 func free_ground(p: Vector2, road := 1.0) -> bool:

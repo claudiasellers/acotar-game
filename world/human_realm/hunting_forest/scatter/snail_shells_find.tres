@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_iw5eh"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_ylnok"]
+
+[resource]
+script = ExtResource("2_ylnok")
+id = &"snail_shells_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/snail_shells.glb"
+ingredient_id = &"ing_snail_shell"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-837.29724, 12.74946, 1522.8175, 2.5003278, 1.146522, -286.3623, 8.24814, 1814.4993, 2.4271357, 0.8221108, -694.00793, -4.0191107, 1627.7185, 0.67696345, 0.9870489, -522.03094, 0.55857176, 1695.0205, 0.13079678, 1.0330317, -500.91614, 0.21251693, 1704.5377, 5.5171175, 1.1154989, 77.45262, 0.765433, 2004.468, 0.4778236, 0.81979823, -823.33746, 11.282901, 1532.8678, 3.9620678, 1.0740719, -494.30063, 0.12847929, 1707.3755, 2.0228755, 1.0797672, 28.616467, 4.883838, 1978.8038, 1.700803, 1.1276091, 67.539696, 1.6300774, 1999.2303, 0.38222218, 0.91050446, -324.4837, 8.802379, 1789.7535, 2.8657968, 1.0022438, 142.34868, -2.1302776, 2038.324, 5.1411057, 0.9677219)
+material = ExtResource("1_iw5eh")

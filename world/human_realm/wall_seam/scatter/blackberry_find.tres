@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_x6wh4"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_jtk3x"]
+
+[resource]
+script = ExtResource("2_jtk3x")
+id = &"blackberry_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/blackberry_bramble.glb"
+ingredient_id = &"ing_blackberry"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(329.7008, -0.7335992, 1451.2627, 2.5307312, 1.0644109, -688.4393, 8.644172, 1476.6088, 1.8104264, 0.96388245, -478.8711, 9.002396, 1431.4703, 5.9754667, 1.0865583, -587.38403, 7.1054363, 1425.0309, 0.42879787, 1.0072144)
+wind = 0.15
+material = ExtResource("1_x6wh4")

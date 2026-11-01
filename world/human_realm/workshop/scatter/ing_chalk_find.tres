@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ggm8b"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_1w4uh"]
+
+[resource]
+script = ExtResource("2_1w4uh")
+id = &"ing_chalk_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/chalk_lump.glb"
+ingredient_id = &"ing_chalk"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-516.9835, -2.166178, 2329.9731, 1.5238833, 1.2583874, -675.61945, 6.297505, 2207.844, 5.522714, 1.0472533, -773.62823, -7.3342423, 2138.2988, 4.1773624, 0.98996514, -439.91806, 7.72095, 2134.1133, 2.6831763, 1.058266, -538.76483, 0.38684464, 2301.599, 5.560558, 0.9594583, -452.38406, 2.436324, 2203.5635, 2.9386628, 1.0838586, -693.34595, -2.0228078, 2459.4639, 5.336954, 1.2403103)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_ggm8b")

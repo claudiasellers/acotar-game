@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_wkm80"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_u3dc2"]
+
+[resource]
+script = ExtResource("2_u3dc2")
+id = &"ing_clay_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/clay_lump.glb"
+ingredient_id = &"ing_clay"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-285.219, -7.008046, 2379.749, 6.271744, 1.0897967, -271.90747, -2.673106, 2341.2961, 1.8787104, 1.0604829, -287.80698, -7.436605, 2377.5652, 4.4368753, 1.1302702, -264.67746, -1.9478447, 2344.6172, 3.091575, 1.1043112, -264.18506, -4.0072427, 2375.1965, 2.719714, 1.1510025)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_wkm80")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_l05d2"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_kxr3k"]
+
+[resource]
+script = ExtResource("2_kxr3k")
+id = &"ing_flint_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/flint_nodule.glb"
+ingredient_id = &"ing_flint"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-3.818573, -1.3536088, 2465.8716, 5.30446, 0.9392885, -262.9848, -4.247994, 2380.959, 5.8604045, 1.0663335, -200.38466, 3.292329, 2301.9607, 0.94193405, 1.1364218, -250.29514, -4.9000964, 2496.5054, 6.1950884, 1.2531044, -205.28311, 0.74520355, 2394.9753, 3.1629546, 1.2911394, -97.43573, -1.4561895, 2459.9456, 4.5777297, 1.1460291, -281.13873, -5.615734, 2388.8594, 5.5021186, 1.1038967, -297.96655, -6.4810224, 2346.4675, 4.605319, 1.2531914, -258.10333, -5.060252, 2483.7131, 3.9534013, 1.0304298, -81.02289, -2.6793673, 2404.6382, 2.843155, 0.95959103)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_l05d2")

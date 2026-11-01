@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_83qbm"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_pq0lw"]
+
+[resource]
+script = ExtResource("2_pq0lw")
+id = &"woad_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/woad_rosette.glb"
+ingredient_id = &"ing_woad"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(491.6576, -6.228853, 1699.0131, 4.748797, 0.8221457, 616.2964, 2.0538516, 2040.6174, 2.1549935, 1.191061, 554.6644, -4.8589706, 1696.3914, 2.4722302, 1.1750956, 651.07886, -4.232956, 1839.3337, 0.4000355, 1.1299951, 490.01697, -5.956484, 1540.5856, 4.272805, 0.8717897, 476.28333, -6.5920186, 1511.5707, 4.352805, 0.97652304, 375.35974, 0.66465604, 1695.6754, 0.67714226, 1.0159452, 529.63745, 0.8871651, 1908.309, 6.0697393, 0.95661694, 533.17126, -7.2899137, 1761.1432, 0.25787625, 0.8858639, 575.286, -3.6253076, 1978.699, 5.184414, 0.87901276, 307.17932, 6.699337, 1607.1361, 2.8568661, 1.0475671, 456.46313, -6.806658, 1609.2649, 3.3176515, 0.9313912, 674.1146, -9.078356, 1708.3818, 4.872783, 0.99232805, 577.61475, -2.658948, 1892.5281, 0.23719995, 1.1456823)
+wind = 0.2
+material = ExtResource("1_83qbm")

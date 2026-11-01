@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_hqcwl"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_4y3us"]
+
+[resource]
+script = ExtResource("2_4y3us")
+id = &"ing_acorn_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/acorn_scatter.glb"
+ingredient_id = &"ing_acorn"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-513.65735, -2.6678393, 2356.2605, 4.283623, 1.1122546, -843.7797, -3.4964736, 2322.4102, 2.2430909, 0.9639927, -467.57614, 0.32095692, 2215.7297, 2.3909585, 0.97307837, -483.52512, -3.4707756, 2338.998, 2.7011333, 1.0612899, -492.16367, -10.965998, 2471.3613, 1.463882, 1.0935278, -801.33563, -3.162494, 2340.3357, 1.5587025, 1.0873204, -820.4033, -2.789987, 2374.6455, 4.5304313, 1.0619223, -868.5937, 3.1500156, 2111.7917, 5.862235, 0.972535)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_hqcwl")

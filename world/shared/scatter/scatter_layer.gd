@@ -6,6 +6,12 @@ class_name ScatterLayer
 extends Resource
 
 const STRIDE := 5
+## The pickable model for an ingredient/keepsake id (tools/blender/forage/build_forage.py).
+## When it exists it replaces the mesh of any layer carrying that ingredient_id,
+## so what can be picked reads apart from the decor around it.
+const FORAGE_MODELS := "res://art/forage/%s.glb"
+
+static var _forage_models: Dictionary = {}
 
 ## Unique within the region. Forage keys are "<id>:<index>" (WorldDeltas).
 @export var id: StringName
@@ -57,6 +63,23 @@ func transform_of(index: int) -> Transform3D:
 
 func is_forage() -> bool:
 	return ingredient_id != &""
+
+
+## The mesh the fields draw: the forage model for `ingredient_id` when there
+## is one, else resolve_mesh().
+func draw_mesh() -> Mesh:
+	var model := forage_model(ingredient_id)
+	return model if model != null else resolve_mesh()
+
+
+## art/forage/<id>.glb's model mesh (cached), or null.
+static func forage_model(item_id: StringName) -> Mesh:
+	if item_id == &"":
+		return null
+	if not _forage_models.has(item_id):
+		var path := FORAGE_MODELS % item_id
+		_forage_models[item_id] = _load_mesh(path) if ResourceLoader.exists(path) else null
+	return _forage_models[item_id]
 
 
 ## The mesh to draw: `mesh`, else loaded from `mesh_path`. Null if missing.

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ioiut"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_txeus"]
+
+[resource]
+script = ExtResource("2_txeus")
+id = &"ing_oak_gall_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/oak_gall_twig.glb"
+ingredient_id = &"ing_oak_gall"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-17.18277, 1.4806068, 2089.347, 4.80914, 1.0160463, -346.7223, 11.172498, 2086.4404, 3.5976965, 1.0201732, -89.8111, 4.399459, 2058.4224, 6.145558, 0.91468614, -283.53107, 10.371755, 2057.3386, 5.617522, 1.0533907, -52.29019, 2.5305052, 2077.5435, 2.369437, 0.9577023, -311.096, 5.652556, 2129.2368, 1.2364506, 0.9333219)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_ioiut")

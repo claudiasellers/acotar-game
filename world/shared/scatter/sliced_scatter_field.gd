@@ -61,7 +61,7 @@ static func transforms_buffer(instances: PackedFloat32Array, ids: PackedInt32Arr
 ## Builds one chunk of `layer` (and its impostor chunk) from prepared data.
 func add_chunk(layer: ScatterLayer, key: Vector2i, ids: PackedInt32Array, buffer: PackedFloat32Array) -> void:
 	var origin := Vector3((key.x + 0.5) * chunk_size, 0.0, (key.y + 0.5) * chunk_size)
-	var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], _multimesh(layer.mesh, ids.size(), buffer), origin)
+	var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], _multimesh(layer.draw_mesh(), ids.size(), buffer), origin)
 	node.visibility_range_end = layer.draw_distance
 	node.visibility_range_end_margin = 8.0
 	if layer.is_forage():

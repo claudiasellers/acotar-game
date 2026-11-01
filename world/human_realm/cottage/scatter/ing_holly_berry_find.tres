@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_h1r7l"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_ykhb7"]
+
+[resource]
+script = ExtResource("2_ykhb7")
+id = &"ing_holly_berry_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/holly_bush.glb"
+ingredient_id = &"ing_holly_berry"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-66.36337, 3.1101258, 2070.3884, 2.4423945, 0.7578941, -103.40729, 3.3068037, 2071.807, 1.9952941, 0.84342873, -301.19186, 2.3533106, 2191.3079, 2.066883, 0.7915842, -349.4204, 11.419629, 2077.7178, 1.264888, 0.93915856, -337.75934, 4.9817605, 2185.3914, 1.6268481, 0.8446213, -243.58702, 5.634584, 2130.077, 2.4125912, 0.92776465, -83.91092, 4.2031045, 2059.159, 1.7897303, 0.88486004)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_h1r7l")

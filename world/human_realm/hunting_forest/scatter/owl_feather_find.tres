@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ojekc"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_4822j"]
+
+[resource]
+script = ExtResource("2_4822j")
+id = &"owl_feather_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/feather_owl.glb"
+ingredient_id = &"ing_owl_feather"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(509.47604, 0.5364881, 1972.2555, 0.57714653, 1.1029961, -184.74232, 5.1237974, 1997.6975, 2.4260304, 0.9588657, 661.72296, 4.0743504, 2035.6475, 4.987369, 1.0636188, -671.0301, -0.7515762, 1786.2174, 4.9525065, 0.9251358, 562.7288, -0.66320086, 1912.0848, 0.35951874, 0.85111725, -162.1687, 5.6924787, 1534.0807, 4.8967996, 0.95230645, -386.66415, 6.4336414, 1781.0055, 5.2302074, 0.9924314, 378.1452, 2.8927224, 1770.6235, 5.083141, 0.8790639, 361.33536, 0.6886938, 1635.3788, 3.9054675, 1.1451303)
+material = ExtResource("1_ojekc")

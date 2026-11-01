@@ -1,7 +1,7 @@
 {
   "types": 30,
-  "placements_per_km2": 6586,
+  "placements_per_km2": 4313,
   "empty_cells": 0,
   "landmarks": 6,
-  "draw_calls": 160
+  "draw_calls": 169
 }

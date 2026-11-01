@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_oqiv7"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_hfsqj"]
+
+[resource]
+script = ExtResource("2_hfsqj")
+id = &"ing_snowmelt_water_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/icicle_cluster.glb"
+ingredient_id = &"ing_snowmelt_water"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-327.06607, 5.289648, 2202.28, 2.6891928, 1.1652756, -58.828156, -1.9371313, 2348.4692, 3.4384067, 1.2465315, -257.58395, 5.7014356, 2146.7842, 5.106476, 1.1341882, -143.30414, 3.5428274, 2093.8525, 3.2408078, 1.0162349, -109.42561, 2.651119, 2080.1538, 2.4735084, 1.2341843, -194.0555, 8.753089, 2086.6506, 4.2084727, 1.0377582)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_oqiv7")

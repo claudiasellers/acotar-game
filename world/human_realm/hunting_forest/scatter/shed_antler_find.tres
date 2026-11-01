@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_gmt63"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_nci0g"]
+
+[resource]
+script = ExtResource("2_nci0g")
+id = &"shed_antler_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/shed_antler.glb"
+ingredient_id = &"ing_shed_antler"
+tags = PackedStringArray("canon:C")
+instances = PackedFloat32Array(406.19263, -1.8055229, 1714.2476, 0.08399704, 1.0367333, 584.81946, 0.3759603, 2002.6638, 0.4696254, 0.8953959, 338.0243, 2.9624536, 1877.401, 2.7607684, 1.1469142, 485.8009, 4.216713, 1938.2904, 5.103004, 0.95890915, 440.11743, -6.158267, 1618.0588, 4.800911, 0.8352595, 448.31458, -5.1847286, 1582.7418, 1.160557, 0.8924974, -306.16006, 4.4151177, 1523.0548, 2.030381, 1.0879691, 30.133198, 0.0561026, 1605.7861, 0.62028056, 0.90545005, -469.3049, 10.428511, 1800.9907, 2.999015, 0.82083505, -433.32013, 2.4852903, 1717.3916, 1.2749541, 1.0901415, 504.2875, -5.9575014, 1622.4083, 5.954952, 0.8091409)
+material = ExtResource("1_gmt63")

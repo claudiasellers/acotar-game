@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_8nxnn"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_kq8qo"]
+
+[resource]
+script = ExtResource("2_kq8qo")
+id = &"ash_deadfall_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/ash_deadfall.glb"
+ingredient_id = &"ing_ash_wood"
+tags = PackedStringArray("canon:C")
+instances = PackedFloat32Array(-706.5753, -0.6824223, 1585.888, 0.52815586, 1.0802057, -690.53314, -2.0981457, 1588.1069, 3.6662946, 0.8896551, -718.262, -1.9323419, 1602.367, 3.723814, 1.0648549, -717.6266, 0.2061859, 1577.794, 5.46275, 1.140201, -698.21844, -0.9003081, 1586.6062, 3.9802291, 1.1125256, -729.51074, 1.8413682, 1571.7047, 2.5677242, 0.8553161, -699.56213, -0.9830244, 1589.3545, 2.4173458, 0.9678936, -692.95233, -0.82150614, 1577.3634, 0.3318547, 1.1877546, -686.34674, 1.1832883, 1553.2053, 5.8718295, 1.0024163, -706.0329, 0.30009156, 1573.5353, 4.0820355, 0.9455589)
+material = ExtResource("1_8nxnn")

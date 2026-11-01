@@ -29,7 +29,7 @@ func build() -> void:
 	for child in get_children():
 		child.free()
 	for layer in layers:
-		if layer != null and layer.count() > 0 and layer.resolve_mesh() != null:
+		if layer != null and layer.count() > 0 and layer.draw_mesh() != null:
 			_build_layer(layer)
 
 
@@ -75,7 +75,7 @@ func _build_layer(layer: ScatterLayer) -> void:
 		var origin := Vector3((key.x + 0.5) * chunk_size, 0.0, (key.y + 0.5) * chunk_size)
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = layer.mesh
+		mm.mesh = layer.draw_mesh()
 		mm.instance_count = ids.size()
 		for j in ids.size():
 			var t := layer.transform_of(ids[j])

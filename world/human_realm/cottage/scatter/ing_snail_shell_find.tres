@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_ambr6"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_oecwx"]
+
+[resource]
+script = ExtResource("2_oecwx")
+id = &"ing_snail_shell_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/snail_shells.glb"
+ingredient_id = &"ing_snail_shell"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-250.4885, 3.708601, 2287.195, 3.9323394, 0.9443981, -12.345856, -1.3754168, 2410.9202, 0.36877894, 1.091387, -220.6855, 1.3339167, 2456.1118, 1.0916946, 1.1849478, -112.70145, -1.0998561, 2302.546, 0.60454935, 1.0860285, 43.871307, -0.82573444, 2438.2292, 1.3519183, 0.9914353, -275.16806, 0.099776216, 2303.6755, 1.40079, 0.97546613, -275.82614, -5.330839, 2412.185, 2.5908287, 1.0659547, -58.619232, -1.1217256, 2343.245, 0.62174314, 1.1075121)
+wind = 0.2
+draw_distance = 90.0
+material = ExtResource("1_ambr6")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScatterLayer" format=3]
+
+[ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="1_47vqj"]
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_mi42x"]
+
+[resource]
+script = ExtResource("2_mi42x")
+id = &"blackthorn_find"
+mesh_path = "res://world/human_realm/shared/assets/flora/blackthorn_sloe.glb"
+ingredient_id = &"ing_sloe"
+tags = PackedStringArray("canon:X")
+instances = PackedFloat32Array(-531.3012, 6.6425447, 1448.1196, 0.15688239, 0.96520835, 331.16125, -0.34271517, 1417.4012, 0.24854444, 0.8643266, -693.75525, 10.422475, 1445.9691, 5.3351183, 0.9706452, -659.4783, 11.301624, 1428.4976, 6.1000752, 1.1345308)
+wind = 0.15
+material = ExtResource("1_47vqj")
