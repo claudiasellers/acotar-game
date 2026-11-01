@@ -751,9 +751,20 @@ func _retrieve_arrow(arrow_id: StringName) -> bool:
 		var at := (stuck as Node3D).global_position
 		_note("going to pick up the %s arrow %.0f m away" % [arrow_id, _flat(at)])
 		await _walk_to(at, 1.0, Callable(), 30.0)
-		await _press(&"interact")
-		await _wait(0.3)
-		var got := Gameplay.inventory.count(StringName("arrow_%s" % arrow_id)) > 0
+		# A player presses E again when the first press takes something else
+		# lying there (the doe's carcass, which the wolf drops by the arrow).
+		var item := StringName("arrow_%s" % arrow_id)
+		var got := false
+		for press in 4:
+			if not is_instance_valid(stuck):
+				break
+			await _walk_to((stuck as Node3D).global_position, 0.8, Callable(), 5.0)
+			await _press(&"interact")
+			await _wait(0.3)
+			got = Gameplay.inventory.count(item) > 0
+			if got:
+				break
+			_note("E %d took something else; pressing again" % (press + 1))
 		_note("picked it up: %s" % got)
 		return got
 	_note("no stuck %s arrow in the world (%d stuck arrows)" % [arrow_id, get_tree().get_nodes_in_group(Arrow.STUCK_GROUP).size()])
