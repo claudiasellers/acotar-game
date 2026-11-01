@@ -76,10 +76,9 @@ func _on_mood(mood: StringName, _intensity: float, _seconds: float) -> void:
 		var cine := _cine()
 		cine.bars_to(1.0, 2.0)
 		# Rising slowly behind and above as she drifts off (the rise is the 3 s
-		# blend). Close enough, and tight enough (lag 2.5), that the horse never
-		# pulls away from the lens and the brambles along the path never come
-		# between.
-		cine.rig(_carrier, Vector3(1.0, 4.5, 5.5), _rider_point, 46.0, 3.0, 2.5)
+		# blend). Carried with the horse, close over the path and above the
+		# brambles that line it, so they never come between.
+		cine.rig(_carrier, Vector3(0.4, 3.6, 5.0), _rider_point, 46.0, 3.0, 2.0, true)
 
 
 func _on_grade(to_grade: StringName, _seconds: float) -> void:
@@ -146,7 +145,7 @@ func _drive() -> void:
 	var ahead := func() -> Vector3:
 		var x := _carrier()
 		return x.origin - x.basis.z * 30.0 + Vector3.UP * 4.0
-	cine.rig(_carrier, Vector3(-0.9, 3.2, 6.5), ahead, 44.0, 0.0, 1.5)
+	cine.rig(_carrier, Vector3(-0.9, 3.2, 6.5), ahead, 44.0, 0.0, 1.5, true)
 
 
 func _release(blend: float) -> void:

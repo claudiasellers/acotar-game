@@ -149,9 +149,13 @@ Ownership: a staging calls `cine.claim(self)` before each move and ends with
 A staging that is freed mid-shot is dropped automatically, with no calls into
 it after that.
 
-`Cine.rig(subject, offset, look, fov)` carries the camera with a moving
-subject, given in the subject's frame. A jump of more than 25 m is a cut.
-Trees pull the camera in, and it never goes below the terrain.
+`Cine.rig(subject, offset, look, fov, blend, lag, carried)` carries the
+camera with a moving subject, given in the subject's frame. A jump of more
+than 25 m is a cut. Trees with collision pull the camera in, and it never goes
+below the terrain. With `lag` alone the lens trails a fast subject by about
+speed/lag metres. With `carried` it moves with the subject like a camera car,
+so the lag only smooths turns. Use `carried` for shots from behind, where
+trailing would let foliage with no collision come between.
 
 `RideNorthStaging` is a child of the RideNorth space, added by one line in
 the `_ready` of `ride_north.gd`. It is camera only:
