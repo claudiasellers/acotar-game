@@ -144,6 +144,7 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 		node.add_child(prop)
 	if room.kind != &"exterior":
 		ManorRoomLook.add_hero_light(node, room, origin, ceiling_of(room))
+		ManorRoomLook.add_coffers(node, room, origin, ceiling_of(room))
 
 
 static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> void:
