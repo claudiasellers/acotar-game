@@ -56,11 +56,11 @@ func _run() -> void:
 	var a0 := bm.albedo
 	# [bogge fog density, albedo, dread overrides]
 	var variants := {
-		"bf006_e30": [0.006, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
-		"bf010_e30": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.30}],
-		"bf006_e40": [0.006, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
-		"bf010_e40": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
-		"bf000_e40": [0.0, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.44, 0.44), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "exposure": 0.40}],
+		"a16_f42": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.42, 0.42), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 1.6}],
+		"a22_f42": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.42, 0.42, 0.42), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.2}],
+		"a16_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 1.6}],
+		"a22_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.2}],
+		"a28_f60": [0.010, Color(0.55, 0.56, 0.57), {"fog_height": -1.0, "fog_color": Color(0.60, 0.60, 0.60), "volumetric_albedo": Color(0.55, 0.56, 0.58), "volumetric_density": 0.012, "ambient_energy": 2.8}],
 	}
 	for label: String in variants:
 		var v: Array = variants[label]
