@@ -82,7 +82,7 @@ func _process(_delta: float) -> void:
 	if shot_name in [&"door", &"low"] and _running() and StoryControl.mode == StoryControl.Mode.LOOK \
 			and StoryControl.allowed_actions.has("fire"):
 		shot_name = &"window"
-		var cine := Cine.of(get_tree())
+		var cine := _cine()
 		cine.follow(WINDOW_FOV, 0.4)
 		cine.bars_to(0.5, 0.4)
 
@@ -92,9 +92,7 @@ func _on_space_finished(space_id: StringName) -> void:
 	if shot_name == &"" or shot_name == &"released" or (own != null and StringName(own) != space_id):
 		return
 	shot_name = &"released"
-	var cine := Cine.of(get_tree())
-	cine.release(RELEASE)
-	cine.bars_to(0.0, RELEASE)
+	Cine.of(get_tree()).drop(self, RELEASE)
 
 
 func _door_bursts() -> void:
@@ -103,7 +101,7 @@ func _door_bursts() -> void:
 	if beast == null or feyre == null:
 		return
 	shot_name = &"door"
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	cine.bars_to(1.0, 0.25)
 	var head := func() -> Vector3: return _head(beast)
 	var spot := _spot(_eyeline(feyre, beast, 1.1, 1.55), head.call(), [beast, feyre])
@@ -126,7 +124,7 @@ func _low() -> void:
 	var low := feyre.global_position + Vector3.UP * 0.7
 	var spot := _spot([low + dir * 0.8 + right * 0.9, low + dir * 0.8 - right * 0.9, low + dir * 1.6,
 			beast.global_position - dir * 2.2 + Vector3.UP * 0.6], head.call(), [beast, feyre])
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	if spot != Vector3.INF:
 		cine.shot(_look(spot, head.call()), LOW_FOV, 0.0, head, 0.5, 2.5)
 	else:
@@ -149,7 +147,7 @@ func _plead() -> void:
 	var side := signf((feyre.global_position - beast.global_position).cross(father.global_position - beast.global_position).y)
 	side = side if side != 0.0 else 1.0
 	var mid := func() -> Vector3: return (_head(beast) + father.global_position + Vector3.UP * 1.2) * 0.5
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	cine.bars_to(1.0, 0.4)
 	for s in [-side, side]:
 		var spot := Cine.two_shot(a, head, s, TWO_SHOT_FOV, 1.4)
@@ -167,7 +165,7 @@ func _close() -> void:
 	shot_name = &"close"
 	var head := func() -> Vector3: return _head(beast)
 	var spot := _spot(_eyeline(feyre, beast, 0.5, 1.6), head.call(), [beast, feyre])
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	cine.bars_to(1.0, 0.3)
 	if spot != Vector3.INF:
 		cine.shot(_look(spot, head.call()), CLOSE_FOV, 0.0, head, 0.2, 1.5)
@@ -219,3 +217,10 @@ func _head(beast: Node3D) -> Vector3:
 				return skel.global_transform * skel.get_bone_global_pose(i).origin
 	return beast.global_position + Vector3.UP * 2.0
 
+
+
+## The film camera, taken for this scene's next move.
+func _cine() -> Cine:
+	var cine := Cine.of(get_tree())
+	cine.claim(self)
+	return cine

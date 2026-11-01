@@ -21,6 +21,9 @@ const BAR_ASPECT := 2.39
 const HAND_DEG := 0.18
 const HAND_HZ := 0.23
 
+## Who is directing right now (a staging node). When it leaves the tree or is
+## freed mid-shot, Cine drops its track and hands the view back.
+var owner_node: Node
 ## The camera Cine renders through while active.
 var camera: Camera3D
 ## Feyre's camera (or whichever camera was current when Cine took over).
@@ -53,6 +56,11 @@ var _push: float = 0.0
 var _push_time: float = 0.0
 var _push_t: float = 0.0
 var _hand_t: float = 0.0
+const CUT_JUMP := 25.0
+var _rig_subject: Callable
+var _rig_offset: Vector3
+var _rig_pos: Vector3
+var _rig_lag: float = 3.0
 var _last_usec: int = 0
 
 
@@ -90,6 +98,36 @@ func _bar() -> ColorRect:
 	return r
 
 
+## `director` takes the camera: its moves are dropped and the view handed
+## back if it is freed or leaves the tree. Stagings call this before a move.
+func claim(director: Node) -> void:
+	owner_node = director
+	if not director.tree_exiting.is_connected(_on_director_exiting):
+		director.tree_exiting.connect(_on_director_exiting.bind(director), CONNECT_ONE_SHOT)
+
+
+## Gives the view back now if `director` holds the camera (its scene ended).
+func drop(director: Node, blend: float = 0.8) -> void:
+	if owner_node != director:
+		return
+	_orphan(blend)
+
+
+func _on_director_exiting(director: Node) -> void:
+	if owner_node == director:
+		_orphan(0.8)
+
+
+## The director is gone: no more calls into it, ease back to her camera.
+func _orphan(blend: float) -> void:
+	owner_node = null
+	_track = Callable()
+	_rig_subject = Callable()
+	if active:
+		release(blend)
+	bars_to(0.0, blend)
+
+
 ## Rides Feyre's camera with a `fov` lens, easing in over `blend` seconds.
 func follow(fov: float, blend: float = 0.8) -> void:
 	_begin(blend)
@@ -114,6 +152,40 @@ func shot(xform: Transform3D, fov: float, blend: float = 0.0, track: Callable = 
 	_push = push
 	_push_time = push_time
 	_push_t = 0.0
+
+
+## A camera carried along with a moving subject: `subject` (a Callable giving
+## its Transform3D, facing -Z) carries the camera at `offset` in the
+## subject's frame, eased with a little lag, looking at `look` (a Callable
+## giving a world point). A jump of more than CUT_JUMP metres (a fade and a
+## teleport) is a cut. Trees and walls between the subject and the camera
+## pull it in, like a spring arm.
+func rig(subject: Callable, offset: Vector3, look: Callable, fov: float, blend: float = 0.0,
+		lag: float = 3.0) -> void:
+	_begin(blend)
+	target_kind = &"rig"
+	_rig_subject = subject
+	_rig_offset = offset
+	_track = look
+	_shot_fov = fov
+	_rig_lag = lag
+	_rig_pos = _rig_want()
+	_look = (Vector3(look.call()) - _rig_pos).normalized()
+
+
+func _rig_want() -> Vector3:
+	var x: Transform3D = _rig_subject.call()
+	var want := x * _rig_offset
+	var pivot := x.origin + Vector3.UP * 1.5
+	if is_inside_tree():
+		var q := PhysicsRayQueryParameters3D.create(pivot, want, 1)
+		var hit := get_viewport().world_3d.direct_space_state.intersect_ray(q)
+		if not hit.is_empty():
+			want = (hit.position as Vector3) + (pivot - want).normalized() * 0.3
+	# Never under the shared terrain (a slope the subject is not on).
+	if absf(WorldHeight.height_at(x.origin.x, x.origin.z) - x.origin.y) < 3.0:
+		want.y = maxf(want.y, WorldHeight.height_at(want.x, want.z) + 0.5)
+	return want
 
 
 ## Eases back into Feyre's camera over `blend` seconds and gives her the view.
@@ -173,6 +245,8 @@ func _process(_delta: float) -> void:
 	if player_camera == null or not is_instance_valid(player_camera):
 		_finish()
 		return
+	if owner_node != null and not is_instance_valid(owner_node):
+		_orphan(0.8)
 	if _blend > 0.0:
 		_t = minf(_t + dt / _blend, 1.0)
 	var aim := _target_pose(dt)
@@ -195,6 +269,19 @@ func _target_pose(dt: float) -> Array:
 			return [player_camera.global_transform, _follow_fov]
 		&"release":
 			return [player_camera.global_transform, player_camera.fov]
+	if target_kind == &"rig" and not (_rig_subject.is_valid() and _track.is_valid()):
+		# Lost its subject: hold where it is until released.
+		return [camera.global_transform, camera.fov]
+	if target_kind == &"rig":
+		var want := _rig_want()
+		if want.distance_to(_rig_pos) > CUT_JUMP:
+			_rig_pos = want
+			_look = (Vector3(_track.call()) - want).normalized()
+		else:
+			_rig_pos = _rig_pos.lerp(want, 1.0 - exp(-_rig_lag * dt))
+		var to := (Vector3(_track.call()) - _rig_pos).normalized()
+		_look = _look.slerp(to, 1.0 - exp(-_track_lag * dt)).normalized()
+		return [Transform3D(Basis.looking_at(_look, Vector3.UP), _rig_pos), _shot_fov]
 	# An authored shot.
 	var origin := _shot.origin
 	var forward := -_shot.basis.z

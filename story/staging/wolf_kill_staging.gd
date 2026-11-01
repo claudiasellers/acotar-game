@@ -68,15 +68,14 @@ func _animator() -> CreatureAnimator:
 func _on_focus(target: Node3D) -> void:
 	if not _running() or stage != &"":
 		return
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	if target != null and target == _wolf():
 		_noticing = true
 		cine.follow(NOTICE_FOV, 0.9)
 		cine.bars_to(NOTICE_BARS, 0.9)
 	elif target == null and _noticing:
 		_noticing = false
-		cine.release(1.4)
-		cine.bars_to(0.0, 1.4)
+		cine.drop(self, 1.4)
 
 
 func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:
@@ -87,13 +86,12 @@ func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: String
 		anim.slow(0.06, 0.12, 0.3)
 	_jolt(0.35, 0.35)
 	# He whirls and looks at her once: the lens closes on his face for the look.
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	cine.follow(ASH_LOOK_FOV, 0.35)
 	cine.bars_to(NOTICE_BARS, 0.35)
 	await _real(ASH_LOOK)
 	if stage == &"" and cine.target_kind == &"follow":
-		cine.release(1.0)
-		cine.bars_to(0.0, 1.0)
+		cine.drop(self, 1.0)
 
 
 func _on_killed(_id: StringName, kind: StringName, _cause: StringName, _at: Vector3) -> void:
@@ -135,7 +133,7 @@ func _kill() -> void:
 	await _real(BEAT_IN)
 	if stage != &"fall" or not is_instance_valid(wolf):
 		return
-	var cine := Cine.of(get_tree())
+	var cine := _cine()
 	cine.bars_to(1.0, 0.35)
 	var chest := func() -> Vector3: return _chest(wolf)
 	var spot := _death_spot(wolf)
@@ -156,9 +154,7 @@ func _end() -> void:
 	if stage == &"release" or stage == &"done":
 		return
 	stage = &"release"
-	var cine := Cine.of(get_tree())
-	cine.release(RELEASE)
-	cine.bars_to(0.0, RELEASE)
+	Cine.of(get_tree()).drop(self, RELEASE)
 	if not _yielded:
 		StoryControl.release()
 	await _real(RELEASE)
@@ -244,3 +240,10 @@ func _jolt(amount: float, seconds: float) -> void:
 
 func _real(seconds: float) -> void:
 	await get_tree().create_timer(seconds, true, false, true).timeout
+
+
+## The film camera, taken for this scene's next move.
+func _cine() -> Cine:
+	var cine := Cine.of(get_tree())
+	cine.claim(self)
+	return cine

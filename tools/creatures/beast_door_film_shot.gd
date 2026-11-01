@@ -22,6 +22,7 @@ var _out := "user://beast_door_film"
 var _numbers := false
 var _sheet: Image
 var _frame := 0
+var _staging: BeastDoorStaging
 
 
 func _ready() -> void:
@@ -63,10 +64,15 @@ func _run() -> void:
 	space.global_transform = inside.global_transform
 	var beast := (load("res://creatures/beast/beast_actor.tscn") as PackedScene).instantiate() as Node3D
 	world.add_child(beast)
+	# As BeastDoor places him (L01-9): outside, facing in; the break carries him in.
 	beast.global_transform = door.global_transform
+	beast.global_position += door.global_basis.z * 3.0
+	var latch := door.get_node_or_null(^"CottageDoorLatch") as Node3D
+	(beast as BeastActor).door = latch if latch else door
 	space.beast = beast
 	var staging := BeastDoorStaging.new()
 	space.add_child(staging)
+	_staging = staging
 	_sheet = Image.create(TILE.x * 3, TILE.y * 2, false, Image.FORMAT_RGB8)
 	await _settle(2.5)
 	# The beats as BeastDoor plays them.
@@ -108,11 +114,11 @@ func _run() -> void:
 func _grab(label: String) -> void:
 	var cine := Cine.of(get_tree())
 	var cam := get_viewport().get_camera_3d()
-	var b := (get_tree().root.find_children("*", "BeastDoorStaging", true, false)[0] as BeastDoorStaging)
+	var b := _staging
 	var beast := b._beast()
 	print("  beast at %s facing %s head %s; feyre %s" % [beast.global_position, -beast.global_basis.z, b._head(beast), b._feyre().global_position])
 	print("frame %d %s: shot %s, cine %s (%s), bars %.2f, fov %.1f, cam at %s" % [_frame, label,
-			(get_tree().root.find_children("*", "BeastDoorStaging", true, false)[0] as BeastDoorStaging).shot_name,
+			_staging.shot_name,
 			cine.active, cine.target_kind, cine.bars, cam.fov, cam.global_position])
 	if not _numbers:
 		await RenderingServer.frame_post_draw

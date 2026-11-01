@@ -51,6 +51,10 @@ func _run() -> void:
 			if scene != null:
 				_world.regions.add_child(scene.instantiate())
 	await _settle(2.0)
+	# The clearing's own WolfKill space would start for her and put stand-ins
+	# down; this probe plays the scene itself.
+	for wk in get_tree().root.find_children("*", "WolfKill", true, false):
+		wk.queue_free()
 	var doe := (load("res://creatures/prey/deer.tscn") as PackedScene).instantiate() as Creature
 	_world.add_child(doe)
 	doe.global_position = _ground(at + Vector3(0.0, 0.0, -1.9))
@@ -106,6 +110,11 @@ func _run() -> void:
 			cine.bars, get_viewport().get_camera_3d().fov, StoryControl.mode, _wolf.animator.time_scale])
 	if not _numbers:
 		sheet.save_png(_out + "/film_sheet.png")
+	if OS.has_environment("L22_DEBUG"):
+		for mi in get_tree().root.find_children("*", "MeshInstance3D", true, false):
+			var m := mi as MeshInstance3D
+			if m.mesh is BoxMesh and m.is_visible_in_tree() and m.global_position.distance_to(_wolf.global_position) < 30.0:
+				print("box ", m.get_path(), " size ", (m.mesh as BoxMesh).size, " at ", m.global_position)
 	print("camera back to Feyre: ", get_viewport().get_camera_3d() == _feyre.camera)
 	get_tree().quit(0)
 

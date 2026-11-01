@@ -276,3 +276,49 @@ func test_beast_door_shot_through_a_wall_falls_back_to_her_view() -> void:
 	await wait_process_frames(2)
 	assert_eq(staging.shot_name, &"door")
 	assert_eq(Cine.of(get_tree()).target_kind, &"follow", "her own view through a tighter lens")
+
+
+## F17: the scene freed mid-shot (its region unloaded) must not leave the
+## camera calling into a dead staging, and her view comes back.
+func test_staging_freed_mid_track_gives_the_view_back() -> void:
+	var space := FakeBeastSpace.new()
+	add_child(space)
+	_player.global_position = Vector3(0, 500, 0)
+	var beast := Node3D.new()
+	space.add_child(beast)
+	beast.global_position = Vector3(0, 500, -4)
+	space.beast = beast
+	var staging := BeastDoorStaging.new()
+	space.add_child(staging)
+	await wait_process_frames(1)
+	EventBus.story_actor_cue.emit(&"tamlin_beast", &"snap_ash_arrow")
+	var cine := Cine.of(get_tree())
+	assert_eq(staging.shot_name, &"close")
+	assert_eq(cine.target_kind, &"shot")
+	assert_eq(cine.owner_node, staging)
+	await wait_process_frames(2)
+	space.free()
+	await wait_process_frames(3)
+	assert_null(cine.owner_node, "dropped")
+	assert_false(cine._track.is_valid(), "no track into the freed scene")
+	await wait_seconds(1.1)
+	assert_false(cine.active)
+	assert_true(_player_cam.current, "her camera again")
+	assert_eq(cine.bars, 0.0)
+
+
+func test_a_finished_scene_does_not_take_the_camera_from_the_next() -> void:
+	var a := Node.new()
+	var b := Node.new()
+	add_child_autofree(a)
+	add_child_autofree(b)
+	var cine := Cine.of(get_tree())
+	cine.claim(a)
+	cine.follow(50.0, 0.0)
+	cine.claim(b)
+	cine.shot(Transform3D(Basis.IDENTITY, Vector3(0, 1, 0)), 40.0)
+	cine.drop(a)
+	assert_eq(cine.target_kind, &"shot", "the next scene keeps its shot")
+	cine.drop(b, 0.1)
+	await wait_seconds(0.3)
+	assert_false(cine.active)
