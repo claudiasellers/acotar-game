@@ -319,3 +319,20 @@ func test_the_infirmary_herbs_cant_be_taken_during_the_wound_dressing() -> void:
 		l._refresh()
 		assert_true(l.visible and l.is_in_group(LarderPickup.GROUP), "the night the faerie comes, they're there")
 		assert_ne(l.harvest(), &"")
+
+
+func test_blood_reads_off_the_runner_from_the_first_seconds() -> void:
+	var pool := TriageProps.pool()
+	TriageProps.set_pool(pool, 1.0)
+	var floor_pool := pool.get_node(^"FloorPool") as Node3D
+	assert_true(floor_pool.visible, "a puddle as soon as he bleeds")
+	assert_gt(floor_pool.scale.x, 0.3, "big enough to see across the hall")
+	assert_gt(absf(floor_pool.position.x), TriageProps.RUNNER_HALF, "its centre is on the marble, not the rose runner")
+	var trail := pool.get_node(^"Trail") as Node3D
+	assert_gt(trail.get_child_count(), 10, "a trail from the front doors")
+	for d in trail.get_children():
+		assert_gt(absf((d as Node3D).position.x), TriageProps.RUNNER_HALF - 0.2)
+	var m := (floor_pool as MeshInstance3D).material_override as StandardMaterial3D
+	assert_true(m.emission_enabled, "reads in the dark hall")
+	assert_gt(m.albedo_color.r, 0.4)
+	pool.free()
