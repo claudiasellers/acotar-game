@@ -5,11 +5,13 @@
 class_name ManorMoodLights
 extends Node
 
-## Share of each light's energy left at full dread. The dread grade already
-## takes the exposure down about two stops; the candles only gutter on top.
-const DIM := 0.6
-## Colour the warm lights cool toward at full dread.
-const COLD := Color(0.72, 0.74, 0.95)
+## Share of each light's energy left at full dread. The dread grade crushes
+## the ambient and takes the exposure down about two stops; the candles and
+## hearths only gutter a little, so the house shrinks to warm pools of light
+## with deep dark between them (experience bar §1.5: interiors must frighten).
+const DIM := 0.85
+## Colour the lights burn toward at full dread: low candle and ember orange.
+const EMBER := Color(1.0, 0.58, 0.30)
 
 var amount := 0.0
 var _target := 0.0
@@ -48,7 +50,7 @@ func apply() -> void:
 		if not is_instance_valid(l):
 			continue
 		l.light_energy = float(_base[i][0]) * lerpf(1.0, DIM, amount)
-		l.light_color = (_base[i][1] as Color).lerp(COLD, amount * 0.6)
+		l.light_color = (_base[i][1] as Color).lerp(EMBER, amount * 0.6)
 
 
 func _process(delta: float) -> void:
@@ -59,6 +61,6 @@ func _process(delta: float) -> void:
 
 
 func _on_mood_requested(mood: StringName, intensity: float, seconds: float) -> void:
-	_target = clampf(intensity, 0.0, 1.0) if mood == &"dread" else 0.0
+	_target = GradeDirector.dread_weight(intensity) if mood == &"dread" else 0.0
 	_rate = absf(_target - amount) / maxf(seconds, 0.001)
 	set_process(true)

@@ -94,7 +94,7 @@ func test_lights_dim_and_cool_under_dread_then_recover() -> void:
 	mood._on_mood_requested(&"dread", 1.0, 1.0)
 	mood._process(1.0)
 	assert_almost_eq(lamp.light_energy, 2.0 * ManorMoodLights.DIM, 0.001)
-	assert_lt(lamp.light_color.r, 0.95, "cools")
+	assert_lt(lamp.light_color.b, lamp.light_color.r * 0.8, "burns down to ember-warm candle pools")
 	mood._on_mood_requested(&"calm", 0.0, 0.5)
 	mood._process(0.5)
 	assert_almost_eq(lamp.light_energy, 2.0, 0.001)
