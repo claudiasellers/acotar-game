@@ -65,7 +65,7 @@ func _bogge_hunt() -> bool:
 	if anchor == null:
 		pt._fail("no bogge_hunt_path anchor")
 		return false
-	var space := pt._find_named(&"Moment_bogge") as BoggeHunt
+	var space := await _scene_on(anchor, &"Moment_bogge") as BoggeHunt
 	if space == null:
 		pt._fail("the bogge moment isn't the coded BoggeHunt")
 		return false
@@ -102,7 +102,7 @@ func _puca_gate() -> bool:
 	if anchor == null:
 		pt._fail("no garden_gate anchor")
 		return false
-	var space := pt._find_named(&"Moment_puca") as PucaLure
+	var space := await _scene_on(anchor, &"Moment_puca") as PucaLure
 	if space == null:
 		pt._fail("the puca moment isn't the coded PucaLure")
 		return false
@@ -145,3 +145,14 @@ func _find_anchor(id: StringName, near: Vector3) -> Node3D:
 		return a
 	await pt._walk_to(near, 60.0, func() -> bool: return pt._anchor(id) != null, 600.0)
 	return pt._anchor(id)
+
+
+## The scene StoryDirector hangs on an anchor (attached a frame or so after
+## the anchor appears; woods regions place anchors in late build jobs).
+func _scene_on(anchor: Node3D, node_name: StringName) -> Node:
+	var path := NodePath(String(node_name))
+	await pt._until(func() -> bool: return is_instance_valid(anchor) and anchor.get_node_or_null(path) != null, 10.0)
+	var node: Node = anchor.get_node_or_null(path) if is_instance_valid(anchor) else null
+	if node == null:
+		pt._note("%s has no %s (children %s)" % [anchor.name, node_name, anchor.get_children().map(func(c: Node) -> String: return String(c.name))])
+	return node
