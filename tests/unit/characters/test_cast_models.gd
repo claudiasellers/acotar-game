@@ -2,7 +2,7 @@ extends GutTest
 ## The main cast built by tools/blender/cast/build_cast.py on Feyre's rig.
 
 const CAST := {
-	"tamlin": 1.93, "lucien": 1.85, "nesta": 1.70, "elain": 1.63, "father": 1.75, "alis": 1.60,
+	"tamlin": 1.93, "lucien": 1.85, "nesta": 1.70, "elain": 1.63, "father": 1.75, "alis": 1.60, "summer_faerie": 1.90,
 }
 const CLIPS: Array[StringName] = [&"idle", &"walk", &"run"]
 const SHAPES := ["blink_L", "jaw_open", "smile", "vis_AA"]
