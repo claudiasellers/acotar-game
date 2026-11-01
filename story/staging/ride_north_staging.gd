@@ -75,8 +75,11 @@ func _on_mood(mood: StringName, _intensity: float, _seconds: float) -> void:
 		shot_name = &"sleep"
 		var cine := _cine()
 		cine.bars_to(1.0, 2.0)
-		# Rising slowly behind and above as she drifts off.
-		cine.rig(_carrier, Vector3(1.2, 6.5, 7.5), _rider_point, 46.0, 3.0, 0.6)
+		# Rising slowly behind and above as she drifts off (the rise is the 3 s
+		# blend). Close enough, and tight enough (lag 2.5), that the horse never
+		# pulls away from the lens and the brambles along the path never come
+		# between.
+		cine.rig(_carrier, Vector3(1.0, 4.5, 5.5), _rider_point, 46.0, 3.0, 2.5)
 
 
 func _on_grade(to_grade: StringName, _seconds: float) -> void:

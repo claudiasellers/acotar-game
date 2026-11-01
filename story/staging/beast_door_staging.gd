@@ -204,13 +204,27 @@ func _plead() -> void:
 	var mid := func() -> Vector3: return (_head(beast) + father.global_position + Vector3.UP * 1.2) * 0.5
 	var cine := _cine()
 	cine.bars_to(1.0, 0.4)
-	for s in [-side, side]:
-		var spot := Cine.two_shot(a, head, s, TWO_SHOT_FOV, 1.4)
-		if _clear(spot, head, [beast, father, feyre]) and _clear(spot, a, [beast, father, feyre]) \
-				and _free_at(spot, [beast, father, feyre], beast):
-			cine.shot(_look(spot, mid.call()), TWO_SHOT_FOV, 0.0, mid, 0.3, 4.0)
+	var ignore := [beast, father, feyre]
+	# The full two-shot from either side, then nearer with a wider lens (the
+	# cottage is small), then from behind her: the first that sees both faces.
+	var centre := (a + head) * 0.5
+	for k: float in [1.0, 0.75, 0.55]:
+		var fov: float = rad_to_deg(2.0 * atan(tan(deg_to_rad(TWO_SHOT_FOV) * 0.5) / k))
+		for s in [-side, side]:
+			var full := Cine.two_shot(a, head, float(s), TWO_SHOT_FOV, 1.4)
+			var spot: Vector3 = Vector3(centre.x, full.y, centre.z) + (full - Vector3(centre.x, full.y, centre.z)) * k
+			if _sees_both(spot, a, head, ignore, beast):
+				cine.shot(_look(spot, mid.call()), fov, 0.0, mid, 0.3, 4.0)
+				return
+	for spot in _eyeline(feyre, beast, 1.1, 1.7):
+		if _sees_both(spot, a, head, ignore, beast):
+			cine.shot(_look(spot, mid.call()), TWO_SHOT_FOV + 8.0, 0.0, mid, 0.3, 4.0)
 			return
 	cine.follow(TWO_SHOT_FOV + 6.0, 0.5)
+
+
+func _sees_both(spot: Vector3, a: Vector3, b: Vector3, ignore: Array, beast: Node3D) -> bool:
+	return _clear(spot, a, ignore) and _clear(spot, b, ignore) and _free_at(spot, ignore, beast)
 
 
 func _close() -> void:
