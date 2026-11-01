@@ -915,18 +915,6 @@ def b_bone_charm(k):
     k.tube([V((0.045, 0.0, 0.03)), V((0.08, -0.04, 0.01)), V((0.1, 0.01, 0.006))], 0.0025, "#8A5A3A", 4)
 
 
-def b_mask_ribbon(k):
-    k.pebble((0, 0, -0.004), (0.12, 0.09, 0.012), "#6E9E4A", seed_jit=0.1, seg=(10, 5), flat=0.2)
-    for s in (1, -1):
-        pts = [V((0, 0, 0.03)), V((s * 0.04, 0.02, 0.05)), V((s * 0.07, 0.0, 0.035)), V((s * 0.04, -0.02, 0.03)),
-               V((0, 0, 0.03))]
-        k.tube(pts, 0.013, "#E86A9A", 8, cap=False)
-        k.stem(V((0, 0, 0.025)), V((s * 0.08, -0.07, 0.012)), 0.007, "#E86A9A", bend=(s * 0.0, -0.01, 0.01), n=5,
-               tip=0.006, sides=4)
-    k.ell((0, 0, 0.032), 0.012, "#D2507E", seg=(8, 5))
-    k.ell((0, 0.004, 0.044), 0.005, "#F2D27A", seg=(5, 3))
-
-
 def b_odd_stone(k):
     pts = [V((math.cos(t) * 0.05, 0, 0.065 + math.sin(t) * 0.05)) for t in (2 * math.pi * j / 18 for j in range(19))]
     k.tube(pts, 0.026, "#9A9AA8", 9, cap=False, grad=("#C8C8D4", 0.0, 0.12))
@@ -996,7 +984,7 @@ ITEMS = {
     "ing_wild_strawberry": b_wild_strawberry, "ing_wood_sorrel": b_wood_sorrel,
     # spring court keepsakes
     "col_acorn_caps": b_acorn_caps, "col_bone_charm": b_bone_charm, "col_jay_feather": b_jay_feather,
-    "col_mask_ribbon": b_mask_ribbon, "col_odd_stone": b_odd_stone, "col_old_arrowhead": b_old_arrowhead,
+    "col_odd_stone": b_odd_stone, "col_old_arrowhead": b_old_arrowhead,
     "col_painted_pebble": b_painted_pebble, "col_river_glass": b_river_glass, "col_robin_egg_shell": b_robin_egg,
     "col_shed_antler": b_shed_antler,
 }

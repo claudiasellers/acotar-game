@@ -119,7 +119,6 @@ const SPECIES := {
 	&"egg_shell": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 40.0, "canon": "X"},
 	&"acorn_caps": {"layer": "find", "scale": Vector2(1.0, 1.3), "radius": 0.0, "range": 40.0, "canon": "X"},
 	&"old_arrowhead": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 40.0, "canon": "X"},
-	&"mask_ribbon": {"layer": "find", "scale": Vector2(1.0, 1.2), "radius": 0.0, "range": 60.0, "canon": "X"},
 	&"wild_hive": {"layer": "find", "scale": Vector2(0.9, 1.2), "radius": 0.0, "range": 90.0, "canon": "X"},
 	&"bark_strip": {"layer": "find", "scale": Vector2(0.9, 1.2), "radius": 0.0, "range": 60.0, "canon": "X"},
 	&"oak_gall_twig": {"layer": "find", "scale": Vector2(1.0, 1.3), "radius": 0.0, "range": 60.0, "canon": "X"},
@@ -912,17 +911,6 @@ static func _b_old_arrowhead(kit: MeshKit, _detail: int) -> void:
 	var iron := Color(0.36, 0.32, 0.30)
 	kit.tri(Vector3(-0.03, 0.01, -0.02), Vector3(0.05, 0.01, 0), Vector3(-0.03, 0.01, 0.02), iron, iron.lightened(0.2), iron)
 	kit.tube(Vector3(-0.03, 0.01, 0), Vector3(-0.2, 0.012, 0.01), 0.005, 0.005, 3, BARK, BARK)
-
-
-static func _b_mask_ribbon(kit: MeshKit, _detail: int) -> void:
-	# A strip of court ribbon caught on a twig: the masked court's trace.
-	var green := Color(0.15, 0.55, 0.38)
-	kit.tube(Vector3(0, 0, 0), Vector3(0.05, 0.4, 0.02), 0.01, 0.006, 3, BARK, BARK)
-	var p := Vector3(0.04, 0.35, 0.02)
-	for i in 4:
-		var q := p + Vector3(0.08, -0.05 - 0.03 * i, 0.02 * sin(i))
-		kit.quad(p, q, q + Vector3(0, 0.025, 0), p + Vector3(0, 0.025, 0), green, GOLD.lerp(green, 0.6), 0.5, 1.0)
-		p = q
 
 
 static func _b_wild_hive(kit: MeshKit, _detail: int) -> void:
