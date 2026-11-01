@@ -37,6 +37,10 @@ var clip_lengths: Dictionary = {}
 var dead: bool = false
 ## The flank it fell onto: -1 left, +1 right (0 while alive).
 var fell_to: int = 0
+## Playback rate of the whole body (staging slows it; see slow()).
+var time_scale: float = 1.0
+var _manual: bool = false
+var _slow_tween: Tween
 ## Which side the last arrow struck: -1 left, +1 right (0 none yet).
 var last_hit_side: int = 0
 
@@ -221,6 +225,36 @@ func die() -> void:
 ## Seconds the death clip runs before the body is still.
 func death_length() -> float:
 	return float(clip_lengths.get(&"death_l" if fell_to <= 0 else &"death_r", 3.0))
+
+
+## Slows this body's motion for staging (a hit-stop, the kill in slow
+## motion): `scale` at once, held `hold` real seconds, eased back to 1 over
+## `ramp`. Only this creature slows; the world keeps time.
+func slow(scale: float, hold: float, ramp: float) -> void:
+	if tree == null:
+		return
+	if _slow_tween:
+		_slow_tween.kill()
+	time_scale = scale
+	_slow_tween = create_tween()
+	_slow_tween.set_ignore_time_scale(true)
+	_slow_tween.tween_interval(hold)
+	_slow_tween.tween_property(self, ^"time_scale", 1.0, ramp).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _process(delta: float) -> void:
+	if tree == null:
+		return
+	# The tree runs itself at 1x; while slowed it is advanced here.
+	var slowed := not is_equal_approx(time_scale, 1.0)
+	if slowed and not _manual:
+		_manual = true
+		tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	elif not slowed and _manual:
+		_manual = false
+		tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_IDLE
+	if _manual:
+		tree.advance(delta * time_scale)
 
 
 func _physics_process(delta: float) -> void:

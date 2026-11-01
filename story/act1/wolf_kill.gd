@@ -49,6 +49,8 @@ func _ready() -> void:
 	super._ready()
 	EventBus.creature_hit.connect(_on_creature_hit)
 	EventBus.creature_killed.connect(_on_creature_killed)
+	# Camera, lens and timing for the hunt (lane L22, story/staging/).
+	add_child(WolfKillStaging.new())
 
 
 func _build_beats() -> Array:
