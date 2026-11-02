@@ -9,14 +9,14 @@ sky_top = Color(0.30, 0.32, 0.36, 1)
 sky_horizon = Color(0.40, 0.41, 0.42, 1)
 ground_horizon = Color(0.30, 0.30, 0.30, 1)
 ground_bottom = Color(0.12, 0.13, 0.12, 1)
-sun_color = Color(0.80, 0.82, 0.86, 1)
+sun_color = Color(0.72, 0.80, 0.94, 1)
 sun_energy = 0.45
-ambient_color = Color(0.55, 0.58, 0.62, 1)
-ambient_energy = 0.6
-fog_color = Color(0.46, 0.48, 0.48, 1)
+ambient_color = Color(0.52, 0.58, 0.68, 1)
+ambient_energy = 0.7
+fog_color = Color(0.52, 0.56, 0.60, 1)
 fog_density = 0.012
-volumetric_density = 0.012
-volumetric_albedo = Color(0.62, 0.64, 0.64, 1)
+volumetric_density = 0.008
+volumetric_albedo = Color(0.70, 0.74, 0.78, 1)
 exposure = 0.85
 saturation = 0.35
 contrast = 1.12
@@ -34,3 +34,6 @@ fog_sky_affect = 0.6
 fog_height = -1.0
 fog_height_density = 0.07
 fog_aerial_perspective = 0.5
+; The volumetric fog takes the cold ambient, so it reads as pale grey murk
+; behind black trunks instead of a black wall that eats the sky (audit D8).
+volumetric_ambient_inject = 1.0
