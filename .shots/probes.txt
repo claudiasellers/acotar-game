@@ -1,0 +1,4 @@
+from feyre-face
+quality look
+shot dawn res://tools/world_shot.tscn opening_dawn {out}/opening_dawn.png
+shot face res://tools/feyre_face_shot.tscn {out}
