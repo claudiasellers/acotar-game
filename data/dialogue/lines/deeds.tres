@@ -1,0 +1,563 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"d_first_dinner"
+speaker = &"feyre"
+who = ""
+text = "I ate their food. I'm still me. I think."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"first_dinner_eaten"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"d_curtain"
+speaker = &"feyre"
+who = ""
+text = "Anything that comes through that door gets a faceful of velvet."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"curtain_trap_set"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"d_bogge"
+speaker = &"feyre"
+who = ""
+text = "My hands won't stop shaking. I didn't look. I didn't look."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"bogge_survived"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, shaking"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"d_puca"
+speaker = &"feyre"
+who = ""
+text = "It wore Father's face. It knew his face."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"puca_resisted"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, sick"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"d_wound"
+speaker = &"feyre"
+who = ""
+text = "His blood on my hands, and he thanked me for it."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"tamlin_wound_dressed"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"d_map"
+speaker = &"feyre"
+who = ""
+text = "Every hall on one page. Now I know every way out."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"manor_map_drawn"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"d_mural"
+speaker = &"feyre"
+who = ""
+text = "Seven courts, a war, a mountain in the middle. And us, at the edge of it."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"study_mural_seen"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"d_suriel"
+speaker = &"feyre"
+who = ""
+text = "It told me the truth. I wish it hadn't."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"suriel_bound"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"d_naga"
+speaker = &"feyre"
+who = ""
+text = "I'm alive. I'm alive. Stop shaking."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"naga_survived"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"d_faerie"
+speaker = &"feyre"
+who = ""
+text = "\"It will be all right,\" I told him. I hope he couldn't smell the lie."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"summer_faerie_comforted"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, hollow"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"d_pool"
+speaker = &"feyre"
+who = ""
+text = "Warm as silk, that water. Like floating in light."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"starlight_pool_found"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"d_gallery"
+speaker = &"feyre"
+who = ""
+text = "All of it. He opened all of it for me."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"gallery_opened"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"d_painting"
+speaker = &"feyre"
+who = ""
+text = "My first painting in years. It's terrible. I love it."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"first_painting"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"d_attor"
+speaker = &"feyre"
+who = ""
+text = "That voice. Like nails drawn slow down my spine."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"attor_evaded"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, frozen"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"d_calanmai"
+speaker = &"feyre"
+who = ""
+text = "I should have stayed in my room."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"calanmai_attended"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"d_bite"
+speaker = &"feyre"
+who = ""
+text = "He bit me. I can still feel it."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"bite_endured"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, furious, a little proud"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"d_shown"
+speaker = &"feyre"
+who = ""
+text = "He kept the snowy forest. The one I hated painting."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"paintings_shown"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"d_glamour"
+speaker = &"feyre"
+who = ""
+text = "Magic smells like flowers now. Not metal. Flowers."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"glamour_lifted"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("1")
+id = &"d_fountain"
+speaker = &"feyre"
+who = ""
+text = "A head in the fountain. A mark on its brow. Don't scream."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fountain_head_found"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, a breath from screaming"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("1")
+id = &"d_solstice"
+speaker = &"feyre"
+who = ""
+text = "I watched the sun come up in his arms. I didn't want it to."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"solstice_danced"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("1")
+id = &"d_rhysand"
+speaker = &"feyre"
+who = ""
+text = "See you Under the Mountain, he said. As if I'd ever go."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"rhysand_faced"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L21"]
+script = ExtResource("1")
+id = &"d_sent_home"
+speaker = &"feyre"
+who = ""
+text = "He's sending me home. I should be glad."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"sent_home"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L22"]
+script = ExtResource("1")
+id = &"d_nesta_truth"
+speaker = &"feyre"
+who = ""
+text = "Nesta went to the Wall for me. Nesta."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"nesta_truth_heard"
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L23"]
+script = ExtResource("1")
+id = &"d_beddor"
+speaker = &"feyre"
+who = ""
+text = "Clare Beddor. I gave him her name."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"beddor_fire_learned"
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, the floor dropping away"
+emotion = &"guarded"
+
+[resource]
+script = ExtResource("3")
+area = &"deeds"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23")])
+places = Array[ExtResource("2")]([])

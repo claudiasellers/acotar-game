@@ -58,6 +58,10 @@ C = {
 }
 
 
+def shade_col(c, k):
+    return tuple(min(1.0, max(0.0, v * k)) for v in c[:3])
+
+
 class Asset:
     """One asset under construction: a single bmesh with a Col layer."""
 
@@ -147,10 +151,49 @@ class Asset:
         self._paint(n0, col, snow)
 
     # --- architectural kit ----------------------------------------------
+    def bend_since(self, n0, amount, half, x0=0.0, cuts=5):
+        """Sag everything built since mark `n0` along X: split the long edges,
+        then drop each vertex by a parabola (0 at x0 +- half, `amount` at x0),
+        so a ridge and its slabs dip in the middle like old rafters."""
+        faces = self._new_faces(n0)
+        edges = {e for f in faces for e in f.edges
+                 if abs((e.verts[1].co - e.verts[0].co).normalized().x) > 0.8}
+        if edges:
+            bmesh.ops.subdivide_edges(self.bm, edges=list(edges), cuts=cuts, use_grid_fill=True)
+        self.bm.faces.ensure_lookup_table()
+        verts = {v for f in self._new_faces(n0) for v in f.verts}
+        for v in verts:
+            k = max(0.0, 1.0 - ((v.co.x - x0) / half) ** 2)
+            v.co.z -= amount * k
+
+    def roof_patch(self, d, z0, h, overhang, thick, snow_depth, x, t, side, size, col, x0=0.0, y0=0.0):
+        """A patch of bare thatch or boards lying on a gable_roof slope over
+        its snow (where the snow slid off or the roof was mended): `t` 0 at
+        the ridge .. 1 at the eave, `side` -1 front, 1 back."""
+        half = d * 0.5
+        run = half + overhang
+        pitch = math.atan2(h, half)
+        rise = run * math.tan(pitch)
+        rx = -side * pitch
+        n = Vector((0, -math.sin(rx), math.cos(rx)))
+        p = Vector((x0 + x, y0 + side * run * t, z0 + h - rise * t)) + n * (thick + snow_depth + 0.015)
+        along = Vector((0, side * math.cos(pitch), -math.sin(pitch)))  # down the slope
+        # A ragged cluster of overlapping bundles, not one square tile: the
+        # middle one largest, the others smaller, skewed and offset.
+        for k in range(4):
+            sx = size[0] * (1.0 if k == 0 else self.rng.uniform(0.35, 0.6))
+            sy = size[1] * (1.0 if k == 0 else self.rng.uniform(0.35, 0.6))
+            off = (Vector((self.rng.uniform(-0.5, 0.5) * size[0], 0, 0)) + along * self.rng.uniform(-0.45, 0.45) * size[1]
+                   if k else Vector((0, 0, 0)))
+            self.box((sx, sy, 0.05 + 0.02 * k), tuple(p + off + n * 0.012 * k), shade_col(col, self.rng.uniform(0.85, 1.12)),
+                     rot=(rx, 0, self.rng.uniform(-0.3, 0.3)), bevel=0.02, jitter=0.1)
+
     def gable_roof(self, w, d, z0, h, col, overhang=0.45, thick=0.22, snow_depth=0.16,
-                   sag=0.0, bevel=0.06, x0=0.0, y0=0.0, bare_back=False):
+                   sag=0.0, bevel=0.06, x0=0.0, y0=0.0, bare_back=False, sway=0.0):
         """Two slanted slabs from the eaves (z0) to the ridge (z0 + h) along X,
-        with a chunky snow layer on top of each and a snow bolster on the ridge."""
+        with a chunky snow layer on top of each and a snow bolster on the ridge.
+        `sway` > 0 sags the ridge that much in the middle (an old roof)."""
+        nr = self._mark()
         half = d * 0.5
         run = half + overhang
         pitch = math.atan2(h, half)
@@ -169,6 +212,8 @@ class Asset:
             self.box((size[0] - 0.15, slab * 0.9, snow_depth), tuple(sloc), SNOW, rot=(rx, 0, 0), bevel=0.06, jitter=0.02)
         ln = w + 2 * overhang - 0.2
         self.cyl(0.2, ln, (x0 - ln / 2, y0, z0 + h + thick * 0.7 - sag), SNOW, rot=(0, math.pi / 2, 0), segs=8)
+        if sway > 0.0:
+            self.bend_since(nr, sway, w * 0.5 + overhang + 0.05, x0)
 
     def gable_fill(self, w, d, z0, h, col, x0=0.0, y0=0.0):
         half = d * 0.5

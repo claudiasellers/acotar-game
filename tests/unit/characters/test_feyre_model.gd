@@ -56,7 +56,7 @@ func test_every_hairstyle_binds() -> void:
 			var mi := m.hair.get_child(0) as MeshInstance3D
 			assert_not_null(mi.skin, f)
 			count += 1
-	assert_eq(count, 16)
+	assert_eq(count, 17, "16 + the Calanmai crown braid (L45)")
 
 
 func test_gowns_have_tintable_fabric() -> void:

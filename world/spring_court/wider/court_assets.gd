@@ -71,7 +71,8 @@ static func _mesh_locked(id: StringName, lod: bool) -> Mesh:
 		var wm: Mesh = FloraLibrary.far_mesh(species) if lod else null
 		if wm == null:
 			wm = FloraLibrary.mesh(species)
-		_meshes[key] = wm
+		if wm.get_surface_count() > 0:  # an off-main-thread stand-in is not kept (FloraLibrary.mesh)
+			_meshes[key] = wm
 		return wm
 	var m: Mesh = null
 	var path := scene_path(id)

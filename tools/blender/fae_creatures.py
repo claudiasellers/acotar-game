@@ -381,4 +381,4 @@ if __name__ == "__main__":
     suriel()
     naga()
     attor()
-    white_horse()
+    # white_horse() moved to tools/blender/white_mare.py (L47: one rigged horse for the ride north and the mount)

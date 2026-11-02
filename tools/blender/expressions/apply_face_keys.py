@@ -103,8 +103,10 @@ def run(char):
             riders.append(o.name)
     for o in bpy.data.objects:
         # strand lashes (L37, L41) ride the lids: blinks, wide eyes and squints carry them
-        if o.type == "MESH" and o.name.startswith("Lashes") and o.data.shape_keys is None:
-            face_keys.transfer_keys(body, f, o, names=LASH_KEYS, force=True)
+        if o.type == "MESH" and o.name.startswith("Lashes"):
+            keyed = o.data.shape_keys is not None and "blink_L" in o.data.shape_keys.key_blocks
+            # lashes built with their own blinks (Feyre, L41) keep them and gain the rest
+            face_keys.transfer_keys(body, f, o, names=LASH_KEYS, force=not keyed)
             riders.append(o.name)
     for name, rel in FACE_RIDERS.get(char, {}).items():
         o = bpy.data.objects[name]

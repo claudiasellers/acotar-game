@@ -63,8 +63,11 @@ func _ready() -> void:
 	add_child(Act1LandmarkThoughts.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
+	add_child(CastPresence.new())
+	add_child(DialogueDirector.new())
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
+	add_child(MountDirector.new())
 
 
 func _process(delta: float) -> void:

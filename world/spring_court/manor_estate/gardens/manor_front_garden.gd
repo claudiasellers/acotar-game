@@ -69,6 +69,10 @@ static func build(parent: Node3D) -> void:
 		b.prop(&"urn_overflowing", Vector3(c.x, y + 0.7, c.y))
 		# cones at the four outer corners, standard roses mid-side
 		for corner: Vector2 in [p.position, Vector2(p.end.x, p.position.y), p.end, Vector2(p.position.x, p.end.y)]:
+			# not the corner by the house's front corner: people cut across it
+			# from the facade to the stables and the kitchen lawn
+			if corner.y == p.position.y and absf(corner.x) < absf(c.x):
+				continue
 			b.prop_on_ground(&"topiary_cone", corner.x + signf(c.x - corner.x) * 0.9, corner.y + signf(c.y - corner.y) * 0.9)
 		for side: float in [-1.0, 1.0]:
 			b.prop_on_ground(&"rose_standard_white", c.x + side * (p.size.x * 0.25 + WALK * 0.25), p.position.y + 1.2)

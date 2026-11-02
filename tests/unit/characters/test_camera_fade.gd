@@ -59,7 +59,8 @@ func test_a_prop_against_the_lens_fades_and_comes_back() -> void:
 func test_a_prop_further_off_stays_solid() -> void:
 	var f := _feyre()
 	await wait_seconds(1.0)
-	var prop := _box(Vector3(0.6, 0.6, 0.6), _in_front_of_lens(f, 1.2, 0.3))
+	# Off to the side: neither at the lens nor between the lens and her.
+	var prop := _box(Vector3(0.6, 0.6, 0.6), _in_front_of_lens(f, 1.2, 0.3) + f.camera.global_basis.x * 1.5)
 	await wait_seconds(0.4)
 	assert_eq(prop.transparency, 0.0)
 

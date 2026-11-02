@@ -189,6 +189,34 @@ PROFILES = {
                  "pained": "wince", "weary": "worried", "pleading": "cower"},
         tics=[("smile", 7.0, 14.0, 0.8, 0.4)],
     ),
+    # ------------------------------------------------------------------
+    "feyre": dict(
+        canon="Unmasked, human; guarded by default [C]. The glare and the clamped jaw [C]; a willed blank face "
+              "[C]; the bland mask-smile she wears for others [C]; silent tears [C]; awe at Prythian's beauty [C]. "
+              "Our reading [X]: terror held behind a steady jaw ('no tremble'), a defiant chin, and a real smile "
+              "that reaches her eyes only later. First pass for the user's co-design review.",
+        masked=False,
+        rest="guarded",
+        blink=(2.8, 6.0),
+        presets={
+            "guarded": {"lip_press": 0.2, "squint": 0.12, "brow_down": 0.12},
+            "glare": {"brow_down": 0.75, "squint": 0.55, "jaw_clench": 0.7, "lip_press": 0.5},
+            "blank": {"blink_L": 0.12, "blink_R": 0.12},
+            "mask_smile": {"smile": 0.4, "lip_press": 0.2},
+            "smile": {"smile": 0.75, "cheek_raise": 0.45, "squint": 0.25},
+            "silent_tears": {"brow_inner_up": 0.8, "chin_raise": 0.5, "lip_press": 0.45, "squint": 0.3, "frown": 0.3},
+            "awe": {"eyes_wide_L": 0.45, "eyes_wide_R": 0.45, "brow_up": 0.5, "lips_part": 0.4, "jaw_open": 0.12},
+            "fear_held": {"eyes_wide_L": 0.5, "eyes_wide_R": 0.5, "brow_inner_up": 0.4, "jaw_clench": 0.5,
+                          "lip_press": 0.4},
+            "defiant": {"chin_raise": 0.4, "brow_down": 0.3, "jaw_clench": 0.4, "squint": 0.2},
+        },
+        aliases={"neutral": "guarded", "guarded": "guarded", "happy": "smile", "laugh": "smile",
+                 "smirk": "mask_smile", "tender": "smile", "angry": "glare", "fury": "glare", "contempt": "defiant",
+                 "disgust": "glare", "sad": "silent_tears", "grief": "silent_tears", "afraid": "fear_held",
+                 "terror": "fear_held", "surprise": "awe", "pained": "silent_tears", "weary": "blank",
+                 "pleading": "silent_tears"},
+        tics=[("defiant", 9.0, 18.0, 0.6, 0.35)],
+    ),
 }
 
 

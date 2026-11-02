@@ -35,6 +35,8 @@ var _mover: CharacterBody3D
 var _idle_time := 0.0
 ## The mocap AnimationTree (characters/feyre/movement/); null keeps the procedural clips.
 var _animator: FeyreAnimator
+## Her expressions (lane L36, docs/contracts/faces.md); cast models attach theirs in cast_model.gd.
+var face: FaceDriver
 
 
 func _ready() -> void:
@@ -63,6 +65,8 @@ func _ready() -> void:
 	_mover = n as CharacterBody3D
 	if _mover != null:
 		_animator = FeyreAnimator.attach(self, anim, _mover)
+	if (get_script() as Script).resource_path == "res://characters/feyre/model/feyre_model.gd":
+		face = FaceDriver.attach(self, &"feyre")
 
 
 func _process(delta: float) -> void:

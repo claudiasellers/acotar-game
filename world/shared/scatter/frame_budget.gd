@@ -27,6 +27,17 @@ static var jobs_accounted := 0
 ## frame count) is deterministic. Measured times still feed the profiling
 ## stats (max_job_usec, slowest_job).
 static var fixed_cost_usec := 0
+## How fast a kind's estimate forgets a spike (per job of that kind).
+const ESTIMATE_DECAY := 0.5
+## A kind's estimate never drops below this share of its worst, so a kind
+## with mixed costs (a model load after a cheap one) still waits for room.
+const WORST_SHARE := 0.25
+
+## Recent cost per job kind: the last cost, or a decaying earlier spike if
+## that was higher. One hitch (a first shader compile, a GC pause) used to
+## pin a kind's estimate at its all-time worst, so every later job of that
+## kind ran alone in its frame: border_woods' 3,700 jobs took ~2,000 frames.
+static var _recent := {}
 
 static var _frames := PackedInt32Array()
 
@@ -66,16 +77,20 @@ static func run(queue: Array[Callable]) -> int:
 			slowest_job = job.get_method()
 		var cost := fixed_cost_usec if fixed_cost_usec > 0 else measured
 		job_max[job.get_method()] = maxi(job_max.get(job.get_method(), 0), cost)
+		_recent[job.get_method()] = maxi(cost, int(_recent.get(job.get_method(), 0) * ESTIMATE_DECAY))
 		spend(cost)
 		jobs_accounted += 1
 	return queue.size()
 
 
-## What a job of this kind is expected to cost: its worst so far, the whole
-## budget for a kind never seen, or the test clock's fixed cost.
+## What a job of this kind is expected to cost: its recent cost (spikes
+## decay), the whole budget for a kind never seen, or the test clock's fixed
+## cost.
 static func _estimate(method: StringName) -> int:
 	if fixed_cost_usec > 0:
 		return fixed_cost_usec
+	if _recent.has(method):
+		return maxi(int(_recent[method]), int(job_max.get(method, 0) * WORST_SHARE))
 	return int(job_max.get(method, BUDGET_USEC))
 
 
