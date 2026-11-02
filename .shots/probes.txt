@@ -1,0 +1,6 @@
+from manor sunny lane main baseline
+quality look
+shot rose res://tools/world_shot.tscn manor_rose_garden {out}/rose.png
+shot parterre res://tools/world_shot.tscn manor_parterre {out}/parterre.png
+shot drive res://tools/world_shot.tscn manor_drive {out}/drive.png
+shot preview res://tools/manor_estate/garden_shot.tscn {out}/preview.png
