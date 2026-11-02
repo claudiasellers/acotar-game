@@ -147,6 +147,9 @@ def add_clips(arm):
              ("talk", [talk_frame(f / 120) for f in range(120)], True, None),
              ("flinch", [flinch_frame(f / 36) for f in range(37)], False, None),
              ("bow", [bow_frame(f / 72) for f in range(73)], False, None)]
+    pose = getattr(C, "pose_frame", None)      # a design's own carriage (L52: the elder's stoop)
+    if pose is not None:
+        clips = [(n, [pose(n, fr) for fr in frames], loop, speed) for n, frames, loop, speed in clips]
     gaits = []
     for name, frames, loop, speed in clips:
         fa.reset_pose(arm)
@@ -187,6 +190,7 @@ def bake_face(body):
               (a[..., 2], "3A2420" if not C.BLACK_EYES else "141018", 0.55 if female else 0.30),   # liner
               (b[..., 0], C.BROWS_SRGB, 0.85),                                                # brows
               (a[..., 0], C.LIPS_SRGB, 0.85 if female else 0.55)]                             # lips
+    layers = getattr(C, "face_layers", lambda L: L)(layers)    # L52: plainer village faces
     for m, hexc, amt in layers:
         k = np.clip(m * amt, 0, 1)[..., None]
         col = col * (1 - k) + _srgb01(hexc) * k

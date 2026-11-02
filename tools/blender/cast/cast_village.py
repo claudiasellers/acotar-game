@@ -35,87 +35,122 @@ import cast_common as cc
 _HUMAN = dict(fae_ears=0.0)
 
 
+def _m(base, *parts, **kw):
+    out = dict(base)
+    for p in parts:
+        out.update(p)
+    out.update(kw)
+    return out
+
+
 def shapes(cm):
-    """cast_shape parameters per body kind, built on cast_minor's FEMALE/MALE/ROUND/BROAD."""
-    lean_f = dict(cm.FEMALE, **_HUMAN, cheeks=0.75, cheekbones=0.6, waist=0.94, belly=0.9, thigh=0.96, arm=0.96)
-    lean_m = dict(cm.MALE, **_HUMAN, gaunt=0.18, ribs=1.02, waist=1.02, belly=0.85, arm=1.02, forearm=1.02)
-    elder = dict(cm.ROUND, **_HUMAN, cheeks=1.0, bust=1.05, waist=1.18, belly=1.2, eye_open_up=33.0, eye_open_lo=28.0)
-    stout_m = dict(cm.BROAD, **_HUMAN, belly=1.05, waist=1.16)
-    # "a mountain of a woman": a woman's face on a big, heavy frame; strong jaw, no softness
-    mountain = dict(cm.FEMALE, **_HUMAN, eye_r=0.0190, eye_open_up=31.0, eye_open_lo=28.0, eye_tilt=2.0,
-                    cheeks=0.25, cheekbones=0.9, jaw=0.6, jaw_w=1.04, chin=1.12, nose=1.05, nose_bridge=0.7,
-                    lips=1.0, lip_w=1.05, face_w=1.04, neck=1.18,
-                    bust=1.05, ribs=1.16, waist=1.20, belly=1.0, pelvis=1.08, seat=1.06, lats=1.15,
-                    thigh=1.18, calf=1.12, arm=1.20, forearm=1.18, deltoid=1.15, hand=1.12)
-    return {"v_female": lean_f, "v_male": lean_m, "v_elder": elder, "v_stout": stout_m, "v_mountain": mountain}
+    """cast_shape parameters per body kind, built on cast_minor's FEMALE/MALE/ROUND/BROAD.  Human
+    faces, not the court's: smaller eyes with the upper lid over the top of the iris."""
+    hf = dict(eye_r=0.0182, eye_open_up=30.0, eye_open_lo=27.0, eye_tilt=1.0)
+    hm = dict(eye_r=0.0160, eye_open_up=23.0, eye_open_lo=22.0, eye_tilt=2.0)
+    lean_f = _m(cm.FEMALE, _HUMAN, hf, cheeks=0.75, cheekbones=0.6, waist=0.94, belly=0.9, thigh=0.96, arm=0.96)
+    plump_f = _m(cm.ROUND, _HUMAN, hf, cheeks=1.25, bust=1.2, waist=1.22, belly=1.25, seat=1.15, thigh=1.12)
+    lean_m = _m(cm.MALE, _HUMAN, hm, gaunt=0.30, cheekbones=1.1, ribs=0.98, waist=0.98, belly=0.80, arm=0.96,
+                  forearm=0.96, deltoid=0.98, thigh=0.88, calf=0.92)
+    slight_m = _m(cm.MALE, _HUMAN, hm, eye_r=0.0168, gaunt=0.12, jaw=0.7, jaw_w=0.86, chin=1.05,
+                    pecs=0.6, ribs=0.94, waist=0.96, lats=1.0, deltoid=0.9, arm=0.90, forearm=0.90, thigh=0.86,
+                    calf=0.9, neck=0.98, adams_apple=0.3)
+    elder = _m(cm.ROUND, _HUMAN, hf, eye_r=0.0172, eye_open_up=26.0, cheeks=1.0, bust=1.0, waist=1.15,
+                 belly=1.15, gaunt=0.15)
+    stout_m = _m(cm.BROAD, _HUMAN, hm, belly=1.15, waist=1.20)
+    # "a mountain of a woman": tall and heavy, a woman's frame (hips, bust, a softer jaw) and a hard,
+    # weathered face; big through the arms and thighs rather than the shoulders
+    mountain = dict(cm.FEMALE, **_HUMAN, eye_r=0.0178, eye_open_up=27.0, eye_open_lo=25.0, eye_tilt=3.0,
+                    cheeks=0.45, cheekbones=1.0, chin=1.0, jaw_w=0.96, nose=1.0, nose_bridge=0.6,
+                    lips=1.08, lip_w=1.04, face_w=1.0, neck=1.08,
+                    bust=1.12, ribs=1.08, waist=1.06, belly=0.98, pelvis=1.12, seat=1.12,
+                    thigh=1.18, calf=1.12, arm=1.12, forearm=1.10, hand=1.06)
+    return {"v_female": lean_f, "v_plump": plump_f, "v_male": lean_m, "v_slight": slight_m, "v_elder": elder,
+            "v_stout": stout_m, "v_mountain": mountain}
 
 
 def warp(cm, kind, height):
     if kind == "v_mountain":
-        return dict(height=height, head=1.0, legs=1.02, arm_len=1.02, arm_thick=1.12,
-                    wx=((0.0, 1.06), (0.45, 1.06), (0.85, 1.06), (1.00, 1.10), (1.15, 1.18), (1.285, 1.22),
-                        (1.37, 1.08), (1.47, 1.0)),
-                    wy=((0.0, 1.04), (0.85, 1.06), (1.05, 1.10), (1.25, 1.10), (1.40, 1.04), (1.47, 1.0)))
-    base = {"v_female": "female", "v_male": "male", "v_elder": "round", "v_stout": "broad"}[kind]
+        return dict(height=height, head=0.99, legs=1.02, arm_len=1.0, arm_thick=1.08,
+                    wx=((0.0, 1.06), (0.45, 1.08), (0.85, 1.10), (1.00, 1.08), (1.15, 1.08), (1.285, 1.06),
+                        (1.37, 1.02), (1.47, 1.0)),
+                    wy=((0.0, 1.04), (0.85, 1.08), (1.05, 1.08), (1.25, 1.08), (1.40, 1.02), (1.47, 1.0)))
+    if kind == "v_slight":
+        return dict(height=height, head=1.03, legs=1.0, arm_len=1.0, arm_thick=0.92,
+                    wx=((0.0, 0.96), (0.85, 0.94), (1.15, 0.96), (1.285, 0.98), (1.47, 1.0)),
+                    wy=((0.0, 0.96), (0.85, 0.94), (1.25, 0.96), (1.47, 1.0)))
+    base = {"v_female": "female", "v_plump": "round", "v_male": "male", "v_elder": "round",
+            "v_stout": "broad"}[kind]
     return cm.warp(height, base)
 
 
 # ---------------------------------------------------------------------------
-# Palette: winter-poor wool, faded pastels (rose, lilac, periwinkle, butter, mint) under grey and dun.
+# Palette: winter-poor humans in undyed wool, oatmeal, peat brown, slate, rust and faded madder,
+# with one muted accent each (the Spring Court's lilac, mint, sky and blush stay over the Wall).
+# Only the Children of the Blessed wear a clean pale blue.
 # ---------------------------------------------------------------------------
-OAT, DUN, DUN_D, BARK, SLATE = "C9BFAE", "7C7466", "625B50", "5A4A3E", "6E7078"
-ROSE_F, LILAC_F, PERI_F, BUTTER_F, MINT_F = "A8868A", "9A8EA8", "8790A8", "C2B48A", "8E9E8E"
+UNDYED, OAT, PEAT, PEAT_D, SLATE, SLATE_D = "C4B8A2", "B3A68E", "5A4636", "463628", "5E636B", "4A4E56"
+RUST, MADDER, DUN, MOSS_F, ASH = "8E5638", "8E5258", "7A6E5C", "6E7258", "8A847A"
 IRON = "4A4C51"
 SILVER = "C8CCD6"
+BLESSED_BLUE, BLESSED_PALE = "A9BCD8", "C9D6E8"
+
 
 # Men's layers on the father's cut (cast_father.build_outfit: shirt, vest, long coat, trousers, shoes;
-# patched elbows, a darned knee, a missing button).  o = shirt hex, vest, vest trim, trousers, shoes,
-# and the coat's palette.
+# patched elbows, a darned knee, a missing button).  The patches are a different, lighter cloth so they
+# read as sewn patches, not holes.
 def _men(shirt, vest, trim, trousers, shoe, coat, lining, patch_a, patch_b):
     return dict(shirt=shirt, vest=(vest, 0.9, 0.0), vest_trim=(trim, 0.9, 0.0), trousers=(trousers, 0.85, 0.0),
                 shoe=(shoe, 0.75, 0.0),
                 pal={"fabric": (coat, 0.85, 0.0), "lining": (lining, 0.85, 0.0), "trim": (coat, 0.85, 0.0),
                      "chain": ("5B4636", 0.55, 0.0), "patch_a": (patch_a, 0.9, 0.0), "patch_b": (patch_b, 0.9, 0.0),
-                     "thread": ("B9B09C", 0.85, 0.0)})
+                     "thread": ("D8CDB6", 0.85, 0.0)})
 
 
 DESIGNS = {
-    # -- the egg seller at the market stall: dress, apron, a hooded shawl, a cheap iron bangle
-    "human_woman": dict(canon="X", body="v_female", height=1.63, skin="EBC6AE", iris="5E6A48", hair="6B4A30",
-                        brows="4E3626", lips="B07468", style=("alis", "style_bun"),
-                        outfit=[("dress", ROSE_F, "86686A"), ("apron",), ("slippers", "4E3A2E"),
-                                ("shawl", LILAC_F, "7E7490"), ("iron_bangle", 1, "band")]),
-    # -- the man by the well: the father's layered cut in dun and faded periwinkle, an iron charm
-    "human_man": dict(canon="X", body="v_male", height=1.77, skin="E0B494", iris="4A3A28", hair="5A4030",
-                      brows="3E2C1E", lips="A8786A", style=("rhysand", "style_short"),
-                      outfit=[("layers", _men("D6CEBB", PERI_F, "6E7690", "6A6258", "4E4038", DUN, OAT, BUTTER_F, ROSE_F)),
+    # -- a plump, pretty farmer's wife selling eggs, wealthy enough for "a full necklace of braided iron"
+    #    (ch 3): peat-brown dress, undyed apron, a faded-madder capelet
+    "human_woman": dict(canon="C", body="v_plump", height=1.60, skin="EDC6AC", iris="6A5A3A", hair="7A5634",
+                        brows="5A3E28", lips="B98078", style=("alis", "style_bun"),
+                        outfit=[("dress", PEAT, PEAT_D), ("apron",), ("slippers", "3E3028"),
+                                ("shawl", MADDER, "74424A"), ("iron_braid",)]),
+    # -- a thin, hungry man by the well: undyed shirt, slate vest, peat coat with rust elbow patches
+    "human_man": dict(canon="X", body="v_male", height=1.78, skin="DDB294", iris="5A4A34", hair="4E3828",
+                      brows="3A2A1E", lips="B08A7C", style=("rhysand", "style_short"),
+                      outfit=[("layers", _men(UNDYED, SLATE, SLATE_D, DUN, "3E3430", PEAT, OAT, RUST, OAT)),
                               ("iron_charm",)]),
-    # -- the old woman at the notice board: a full hooded cloak and the braided iron necklace (status)
-    "human_elder": dict(canon="C", body="v_elder", height=1.55, skin="EBCDBC", iris="6A7A8A", hair="D2CEC8",
-                        brows="A8A29A", lips="B08478", style=("alis", "style_bun"),
-                        outfit=[("dress", SLATE, "585A62"), ("apron",), ("slippers", "4A3C34"),
-                                ("cloak_worn", PERI_F, "6E7690", 0.36), ("iron_braid",)]),
-    # -- the young man by the tavern: a belted wool tunic, a short hooded cape, boots
-    "human_youth": dict(canon="X", body="v_male", height=1.74, skin="D9A888", iris="5A4630", hair="3A2A20",
-                        brows="2E2018", lips="A87868", style=("village", "style_bob"),
-                        outfit=[("tunic_wool", MINT_F, "6E7C6E"), ("trousers", "5E564C"), ("boots", "4A3A2E"),
-                                ("cloak_worn", BARK, "6A584A", 0.46)]),
-    # -- the travelling peddler: greying beard, a plum coat gone soft with road dust, a long cloak
+    # -- the old woman at the notice board, stooped: slate dress, oatmeal hooded cloak, a cheap charm
+    "human_elder": dict(canon="X", body="v_elder", height=1.54, skin="EBCDBC", iris="6A7480", hair="CFCAC2",
+                        brows="A29C94", lips="C09A90", style=("alis", "style_bun"), stoop=1.8,
+                        outfit=[("dress", SLATE, SLATE_D), ("apron",), ("slippers", "3E342E"),
+                                ("cloak_worn", ASH, ASH, 0.36), ("iron_charm",)]),
+    # -- the young man by the tavern, shorter and slighter: undyed shirt, rust vest, a slate cape
+    "human_youth": dict(canon="X", body="v_slight", height=1.64, skin="E2B494", iris="5A4630", hair="4A3626",
+                        brows="3A2A1E", lips="B48A7C", style=("village", "style_bob"),
+                        outfit=[("layers", dict(_men(UNDYED, RUST, "6E4230", PEAT, "3E3028", PEAT, OAT, OAT, OAT),
+                                                no_coat=True)),
+                                ("cloak_worn", SLATE, SLATE, 0.50)]),
+    # -- the travelling peddler, stout, greying beard: a rust coat gone soft with road dust, peat cloak
     "peddler": dict(canon="X", body="v_stout", height=1.71, skin="D8AE90", iris="4A3A2A", hair="8E8478",
-                    brows="6E665C", lips="A47C70", style=("father", "style_greying"),
-                    outfit=[("layers", _men("CFC6B2", BUTTER_F, "8C8064", "5A5048", "3E3430", "7A6474", "9A8EA8", MINT_F, OAT)),
-                            ("cloak_worn", "6A5A50", "54483E", 0.40), ("iron_charm",)]),
-    # -- a Child of the Blessed: spotless pale blue robes, silver, silver bells, unbound dark hair
-    "blessed": dict(canon="C", body="v_female", height=1.68, skin="F4E2DA", iris="5E7290", hair="2E2420",
-                    brows="2A201C", lips="D08A94", style=("feyre", "loose"),
-                    outfit=[("gown", "gown_garden", "BCCDE6", "E6ECF4"), ("slippers", "DCE4F0"),
-                            ("robe_cloak", "A9BFE0"), ("silver", "charm_bracelet"), ("silver", "necklace_pendant"),
-                            ("silver", "earrings_drop")]),
-    # -- the mercenary at the broken fountain: heavy coat, trousers, boots, a sword and a long knife
-    "mercenary": dict(canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="2A1A12", hair="241A16",
-                      brows="1E1612", lips="9E6C5E", style=("village", "style_bob"),
-                      outfit=[("layers", _men("BDB2A0", "4E4A44", "3A3632", "3E3A36", "2E2622", "4A3A30", "6E3A36",
-                                              "5A4A3E", "4E443A")),
+                    brows="6E665C", lips="A88274", style=("father", "style_greying"),
+                    outfit=[("layers", _men(UNDYED, OAT, DUN, "5A5048", "3E3430", RUST, OAT, MOSS_F, UNDYED)),
+                            ("cloak_worn", PEAT, PEAT, 0.40), ("iron_charm",)]),
+    # -- the Children of the Blessed (ch 3): plain floor-length pale blue robes, cord belt, real silver,
+    #    bells at the wrist, long uncut hair, bare heads; spotless.  The speaker is a young woman with
+    #    brown eyes and a clean, glowing face; five acolytes behind her, young men and women both.
+    "blessed": dict(canon="C", body="v_female", height=1.68, skin="F4E6E0", iris="6A4A30", hair="2E2420",
+                    brows="2A201C", lips="D4949C", style=("feyre", "loose"), face="glow",
+                    outfit=[("robe", BLESSED_BLUE), ("slippers", BLESSED_PALE), ("cord_belt",),
+                            ("silver", "charm_bracelet"), ("silver", "necklace_pendant")]),
+    "blessed_2": dict(canon="C", body="v_slight", height=1.76, skin="F2E2D8", iris="4E5E70", hair="6A4A30",
+                      brows="4E3626", lips="C49088", style=("tamlin", "style_loose"), face="glow",
+                      outfit=[("robe", BLESSED_PALE), ("slippers", BLESSED_PALE), ("cord_belt",),
+                              ("silver", "charm_bracelet")]),
+    # -- the mercenary at the broken fountain: heavy peat coat with a rust lining, sword and long knife
+    "mercenary": dict(canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="3A2418", hair="241A16",
+                      brows="1E1612", lips="A8705E", style=("village", "style_bob"),
+                      outfit=[("layers", _men("BDB2A0", "3E3A36", "2E2A26", "3A3632", "2A2420", PEAT_D, RUST,
+                                              "5A4A3E", "6A5A4A")),
                               ("weapons",)]),
 }
 
@@ -130,8 +165,14 @@ def _cm():
 
 def layers(ctx, o):
     """Shirt, vest, long coat, trousers and shoes on the father's cut, in this figure's wool."""
+    import bpy
     import cast_father
     rep = cast_father.build_outfit(ctx, o, _cm().ID + "_")
+    if o.get("no_coat"):                      # shirt and vest only: the youth goes without a coat
+        coat = bpy.data.objects[_cm().ID + "_coat"]
+        ctx.wardrobe[:] = [(ob, k) for ob, k in ctx.wardrobe if ob is not coat]
+        bpy.data.objects.remove(coat)
+        rep = [r for r in rep if "_coat" not in r]
     print("\n".join(rep))
     return None
 
@@ -149,7 +190,7 @@ def cloak_worn(ctx, colour, edge, hem):
     # the lining takes the outer colour: after decimation it pokes through the thin shell in places,
     # and a darker lining reads as holes in the cloak (seen in the L52 cloud shots)
     del edge
-    pal = {"fabric": (colour, 0.88, 0.0), "lining": (colour, 0.9, 0.0), "patch": (ROSE_F, 0.9, 0.0),
+    pal = {"fabric": (colour, 0.88, 0.0), "lining": (colour, 0.9, 0.0), "patch": (UNDYED, 0.9, 0.0),
            "cord": (OAT, 0.85, 0.0), "clasp": (IRON, 0.6, 0.7)}
     return cast_nesta.worn_cloak(ctx, _cm().ID + "_cloak", pal, hem=hem, hood=True)
 
@@ -165,7 +206,7 @@ def robe_cloak(ctx, colour):
 def tunic_wool(ctx, fabric, trim):
     """A belted long-sleeved wool tunic: cast_minor's livery tunic, rough and matt, horn buttons."""
     cm = _cm()
-    obj = cm.tunic(ctx, fabric, trim, True)
+    obj = cm.tunic(ctx, fabric, trim, False)    # the straight cut: a flared peplum read as a skirt
     for m in obj.data.materials:
         b = m.node_tree.nodes.get("Principled BSDF") if m and m.node_tree else None
         if b is None:
@@ -252,7 +293,41 @@ def style_bob(st):
     st.front_locks(1.50, n=2, r=0.0085, wave=0.003)
 
 
-OUTFIT = {"layers": layers, "shawl": shawl, "cloak_worn": cloak_worn, "robe_cloak": robe_cloak,
+def apron(ctx):
+    """Alis's apron in undyed linen gone grey with wear; the pocket the same cloth."""
+    import cast_alis
+    cast_alis.PAL = {**cast_alis.PAL, "apron": ("CFC5B2", 0.85, 0.0), "apron_d": ("C2B8A4", 0.85, 0.0),
+                     "cord": ("B3A68E", 0.85, 0.0)}
+    obj = cast_alis.build_apron(ctx)
+    obj.name = _cm().ID + "_apron"
+    return obj
+
+
+def robe(ctx, colour):
+    """The Blessed's plain floor-length robe: Alis's long-sleeved dress cut in clean pale blue wool,
+    the long cloak over it with the hood thrown back."""
+    cm = _cm()
+    obj = cm.dress(ctx, colour, colour)
+    rep = robe_cloak(ctx, colour)
+    del rep
+    return obj
+
+
+def cord_belt(ctx):
+    """A plain white cord tied at the waist, the ends hanging."""
+    bw, probe = ctx.bw, ctx.probe
+    B = ctx.builder(_cm().ID + "_cord", {"fabric": ("E8E6E0", 0.7, 0.0)})
+    bw.belt(B, probe, 0.975, 0.008, "fabric", off=0.022, buckle=None)
+    i0 = len(B.bm.verts)
+    p, n = probe.on_torso(0.975, -20, 0.030)
+    for dx, L in ((-0.008, 0.30), (0.010, 0.26)):
+        path = np.array([tuple(V(p) + V((dx, -0.004 * t, -L * t))) for t in np.linspace(0, 1, 7)])
+        B.tube(path, 0.0045, 5, "fabric")
+    B.mark("near", i0, fit=0.03)
+    return ctx.cloth(B, _cm().ID + "_cord")
+
+
+OUTFIT = {"apron": apron, "robe": robe, "cord_belt": cord_belt, "layers": layers, "shawl": shawl, "cloak_worn": cloak_worn, "robe_cloak": robe_cloak,
           "tunic_wool": tunic_wool, "iron_bangle": iron_bangle, "iron_charm": iron_charm, "iron_braid": iron_braid,
           "silver": silver, "weapons": weapons}
 
@@ -268,8 +343,8 @@ def install(cm, vid):
     cm.D = D
     body = D["body"]
     # cast_minor's kind names, which build_minor_fae keys the face bake and the stroll on
-    cm.KIND = {"v_female": "female", "v_elder": "round", "v_mountain": "female", "v_male": "male",
-               "v_stout": "broad"}[body]
+    cm.KIND = {"v_female": "female", "v_plump": "round", "v_elder": "round", "v_mountain": "female",
+               "v_male": "male", "v_slight": "male", "v_stout": "broad"}[body]
     cm.HEIGHT = D["height"]
     cm.SHAPE = shapes(cm)[body]
     cm.WARP = warp(cm, body, cm.HEIGHT)
@@ -280,11 +355,43 @@ def install(cm, vid):
     _i = np.array(cc.srgb(D["iris"]))
     cm.IRIS = (tuple(_i * 0.45), tuple(_i), tuple(np.minimum(_i * 1.6 + 0.05, 1.0)))
     cm.IRIS_FLECKS = 0.5
-    cm.LASH = {"v_female": 1.1, "v_elder": 0.8, "v_mountain": 0.8}.get(body, 0.6)
+    cm.LASH = {"v_female": 0.9, "v_plump": 0.9, "v_elder": 0.7, "v_mountain": 0.7}.get(body, 0.55)
     cm.LASH_LINEAR = cc.srgb("1A1210")
     cm.HAIR_RGB = cc.srgb(D["hair"])
     cm.BROWS_SRGB = D["brows"]
     cm.LIPS_SRGB = D["lips"]
     cm.CANON = D["canon"]
     cm.SKIN_TEX = ""
+    cm.face_layers = lambda layers: face_layers(D, cm, layers)
+    cm.pose_frame = (lambda name, fr: stoop(fr, D["stoop"])) if D.get("stoop") else None
     return D
+
+
+def face_layers(D, cm, layers):
+    """build_minor_fae's face bake layers (blush, lid wash, liner, brows, lips) for a village face:
+    no court makeup.  Cold-pink cheeks, no lid colour, a whisper of lash line, natural lips.  The
+    Blessed glow a little more ("a clean, fresh face", ch 3)."""
+    glow = D.get("face") == "glow"
+    female = cm.KIND in ("female", "round")
+    amts = {"blush": (0.30 if glow else 0.20) if female else 0.14, "lid": 0.0, "liner": 0.22 if female else 0.12,
+            "brows": 0.75, "lips": (0.55 if glow else 0.42) if female else 0.30}
+    keys = ["blush", "lid", "liner", "brows", "lips"]
+    out = []
+    for k, (m, hexc, _amt) in zip(keys, layers):
+        if k == "blush":
+            hexc = "E39A94"
+        if k == "liner":
+            hexc = "5A4034"
+        out.append((m, hexc, amts[k]))
+    return out
+
+
+def stoop(fr, amt):
+    """An old woman's carriage on every clip: rounded back, head forward, knees soft (the father's
+    stoop, cast_father._stoop, made deeper)."""
+    import cast_father
+    import feyre_anims as fa
+    cast_father._stoop(fr, amt)
+    fr.add("Hips", fa.qx(4.0 * amt))
+    fr.hips += V((0.0, 0.010 * amt, -0.012 * amt))
+    return fr

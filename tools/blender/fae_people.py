@@ -591,7 +591,7 @@ def glamoured(name):
 MAIN_BODY = ("reveler_1", "reveler_2", "reveler_3", "calanmai_1", "calanmai_2", "calanmai_3", "servant_maid",
              "servant_footman", "servant_cook", "sentry_1", "sentry_2", "fae_rose", "fae_nymph", "fae_longlimb",
              # the human village, rebuilt by tools/blender/cast/build_village_people.py (lane L52)
-             "human_woman", "human_man", "human_elder", "human_youth", "blessed", "peddler")
+             "human_woman", "human_man", "human_elder", "human_youth", "blessed", "peddler", "blessed_2", "mercenary")
 
 
 if __name__ == "__main__":
