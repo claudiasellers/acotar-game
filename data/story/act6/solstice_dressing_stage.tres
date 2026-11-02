@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"alis_gown": Vector3(1.4, 0, 12.6),
+"alis_tray": Vector3(2.6, 0, 10.4),
+"bath": Vector3(8.6, 0, 13),
+"bed_side": Vector3(0, 0, 12),
+"gown": Vector3(1.4, 0, 12.6),
+"plateau_arrive": Vector3(6, 0, 8)
+}
+lines = {
+"alis_go_on": {"text": "Go on, then.", "who": "Alis"},
+"alis_solstice": {"text": "Summer Solstice. The main celebration used to be at the Summer Court... You're going.", "who": "Alis"},
+"alis_upstairs": {"text": "Up. Now. You'll not go down looking like a stable hand.", "who": "Alis"},
+"garland_thought": {"text": "My hair unbound, a garland of pink, white and blue wildflowers around the crown.", "who": ""},
+"gown_prompt": {"text": "Cornflower-blue chiffon, light as breath.", "who": ""},
+"lucien_cauldron": {"text": "Cauldron boil me.", "who": "Lucien"},
+"plateau_thought": {"text": "The sun was beginning its final descent when we reached the plateau.", "who": ""},
+"ribbons_thought": {"text": "Beyond the window the garden was bedecked in ribbons and streamers.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("alis_go_on", "alis_upstairs")
+canon = "Ch25 [C] (Keeper): that morning the garden is bedecked in ribbons and streamers; Alis: \"Summer Solstice. The main celebration used to be at the Summer Court... You're going.\" In late afternoon Alis yanked her upstairs: a cornflower-blue chiffon gown, hair unbound, a garland of pink, white and blue wildflowers around the crown. Downstairs Lucien: \"Cauldron boil me.\" Through the garden into the fields; the sun beginning its final descent when they reach the plateau. plateau_arrive is in solstice_dance_floor's frame."

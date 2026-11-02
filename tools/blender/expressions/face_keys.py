@@ -98,6 +98,7 @@ class Face:
             raise RuntimeError("%s lacks base keys %s" % (obj.name, missing))
         self.P = _co(me, kb["Basis"])
         self.N = _vnormals(me)
+        self.mouth_half = float(obj.get("mouth_half", 0.0))   # the cut slit's half-width (mouth.cut)
         self.d = {k: _co(me, kb[k]) - self.P for k in BASE_KEYS if k in kb}
         P = self.P
         mag = {k: np.linalg.norm(v, axis=1) for k, v in self.d.items()}
@@ -206,14 +207,19 @@ def deltas(f):
         d = np.zeros_like(P)
         d[:, 0] += 0.0055 * sh * s * f.g((0, 0, mz), (1.7 * hw, 1, 0.014 * sv))
         out["mouth_side_" + suf] = d
+    # the lips' own M/B/P closure, but only along the slit: past its ends the skin is one piece and
+    # pressing it together folds the corners into a pale crease (F35)
+    half = f.mouth_half or 0.86 * hw
+    seal = (1.0 - np.clip((np.abs(P[:, 0]) - 0.7 * half) / (0.5 * half), 0.0, 1.0))[:, None]
+    mbp = f.d["vis_MBP"] * seal
     # lip press: the lips' own M/B/P closure, harder, rolled in and narrowed
-    d = 1.6 * f.d["vis_MBP"]
+    d = 1.6 * mbp
     band = f.g((0, 0, mz), (1.3 * hw, 1, 0.010 * sv))
     d[:, 1] += 0.0024 * sh * band
     d[:, 0] -= 0.12 * (P[:, 0]) * f.g((0, 0, mz), (1.4 * hw, 1, 0.009 * sv))
     out["lip_press"] = d
     # jaw clench: jaw shut past rest, masseters swell, lips set
-    d = -0.10 * f.d["jaw_open"] + 0.35 * f.d["vis_MBP"]
+    d = -0.10 * f.d["jaw_open"] * seal + 0.35 * mbp
     for s in (1, -1):
         m = _gauss(P, (s * f.cheek_x, f.cheek_y - 0.006 * sh, mz - 0.006 * sv), (0.013 * sh, 0.02 * sh, 0.016 * sv))
         d += f.N * (0.0034 * sh * m * f.head)[:, None]
