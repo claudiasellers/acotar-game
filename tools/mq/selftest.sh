@@ -842,7 +842,6 @@ case_parse_error_fails_fast() {
 	expect "and the hung builder isn't left running" not pgrep -f 'bash tools/bake.sh'
 }
 
-for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky flaky_last \
 case_test_when() {
 	bake_repo testwhen
 	commit_build 'mkdir tests zone; echo "# gate: when:zone/*,*.x" > tests/test_s.gd; : > tests/test_u.gd; echo "@gut tests" >> tools/mq/gate.conf'
@@ -867,6 +866,7 @@ case_test_when() {
 	gate full; expect "an idle gate (no --base) runs everything" ran gut:tests/test_s.gd
 }
 
+for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky flaky_last \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
