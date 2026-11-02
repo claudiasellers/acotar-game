@@ -433,12 +433,14 @@ func _update_recenter(delta: float) -> void:
 
 
 ## "Camera follows behind while running": a lazy swing behind her once the
-## player stops steering the camera.
+## player stops steering the camera. Not under a roof: each fresh press of a move
+## key steers from the swung camera (SteerFrame), so in a house of short runs and
+## corners the swings stack up and the camera spins with no look input.
 func _follow_behind(delta: float) -> void:
 	if not GameSettings.camera_follow or not _running or _since_look < follow_delay \
 			or StoryControl.focus != null:
 		return
-	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, follow_speed * delta)
+	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, follow_speed * (1.0 - _indoor) * delta)
 
 
 func _remember_safe_spot(delta: float) -> void:
