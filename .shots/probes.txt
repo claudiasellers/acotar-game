@@ -1,0 +1,5 @@
+from L47 white mare
+quality look
+size 1920x1080
+timeout 900
+shot mare res://tools/playtest/mount_ride_clip.tscn -- --out={out}/report.json
