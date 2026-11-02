@@ -919,6 +919,10 @@ import film  # noqa: E402  (the opening film's score, L33)
 
 SOUNDS.update(film.SOUNDS)
 CUES.update(film.CUES)
+import cutscenes  # noqa: E402  (L33's three cutscene scores)
+
+SOUNDS.update(cutscenes.SOUNDS)
+CUES.update(cutscenes.CUES)
 
 SPRING = ["border_woods", "manor_estate", "eastern_woods", "suriel_glade", "blossom_vale", "rosewild",
           "solstice_meadow", "starlight_glen", "western_fells", "autumn_foothills", "hill_of_the_rite",
