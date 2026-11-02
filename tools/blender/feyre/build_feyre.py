@@ -954,12 +954,18 @@ def bake_makeup_masks(P, tris, uv, size=1024):
     across = 1.0 - smoothstep(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.25, np.abs(eax))
     if not CAST:
         across = np.where(eax >= 0.0, across, 1.0 - smoothstep(fs.EYE_OPEN_W * 0.80, fs.EYE_OPEN_W * 0.97, -eax))
-    shadow = smoothstep(-2 * deg, 3 * deg, over) * (1.0 - smoothstep(22 * deg, 46 * deg, over)) * across * near_eye
-    liner = smoothstep(-1.5 * deg, 0.5 * deg, over) * (1.0 - smoothstep(4 * deg, 8 * deg, over)) * across * near_eye
+    near_lid, near_lid_line = near_eye, near_eye
+    if not CAST:
+        # only skin close to the eyeball: the bridge and brow sit at the same angles
+        # but further out (and the bigger eyes put them inside the old 22 mm reach)
+        near_lid = near_eye * (1.0 - smoothstep(EYE_R + 0.011, EYE_R + 0.017, edist))
+        near_lid_line = near_eye * (1.0 - smoothstep(EYE_R + 0.006, EYE_R + 0.010, edist))
+    shadow = smoothstep(-2 * deg, 3 * deg, over) * (1.0 - smoothstep(22 * deg, 46 * deg, over)) * across * near_lid
+    liner = smoothstep(-1.5 * deg, 0.5 * deg, over) * (1.0 - smoothstep(4 * deg, 8 * deg, over)) * across * near_lid_line
     # wing: continues the upper rim past the outer corner, flicking up
     wt = np.clip((eax - fs.EYE_OPEN_W * 0.92) / (24 * deg), 0, 1)
     wing_az = fs.EYE_TILT + wt * 14 * deg
-    wing = np.exp(-((eaz - wing_az) / ((3.5 - 2.5 * wt) * deg)) ** 2) * (eax > fs.EYE_OPEN_W * 0.9) * (wt < 1) * near_eye
+    wing = np.exp(-((eaz - wing_az) / ((3.5 - 2.5 * wt) * deg)) ** 2) * (eax > fs.EYE_OPEN_W * 0.9) * (wt < 1) * near_lid
     liner = np.maximum(liner, wing)
     blush = ell(0.046, 1.476, 0.017, 0.012, 0.9)
     # brows: tapered, gently arched
