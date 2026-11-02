@@ -10,7 +10,9 @@
 ## black while her eyes are closed. Points are in the anchor's frame.
 extends CutsceneDirector
 
-const WILLOW := "res://world/spring_court/wider/assets/flora/flora_tree_weeping_willow.gltf"
+## The vale's own willow, coloured the way the world's flora are (CourtAssets:
+## the raw glTF has its colour in COLOR_0 and loads white).
+const WILLOW := &"flora_tree_weeping_willow"
 const BROOK_SHADER := preload("res://story/film/cutscenes/brook.gdshader")
 const NOON := 0.5
 
@@ -61,9 +63,11 @@ func _quiet(who: Node3D) -> void:
 
 ## The willow and the brook stay after the film: play resumes in the same glen.
 func _build_set() -> void:
-	var willow := load_prop(WILLOW, ground(WILLOW_AT), 35.0, 1.0, true)
-	if willow:
-		willow.name = "FilmWillow"
+	var willow := MeshInstance3D.new()
+	willow.name = "FilmWillow"
+	willow.mesh = CourtAssets.mesh(WILLOW)
+	add_set(willow, ground(WILLOW_AT))
+	willow.rotation_degrees.y = 35.0
 	brook_mat = ShaderMaterial.new()
 	brook_mat.shader = BROOK_SHADER
 	var brook := MeshInstance3D.new()
@@ -165,7 +169,8 @@ func _b_kneel() -> void:
 	pose(tamlin, &"kneel", 0.0)
 	pose(feyre_model(), &"kneel", 0.0)
 	var mid := (TAMLIN_KNEEL + FEYRE_KNEEL) * 0.5
-	shot(mid + Vector3(0.15, 0.95, 2.6), mid + Vector3(0.0, 0.95, 0.0), 32.0, 0.35, 5.0)
+	# Low and wide enough to see them on their knees in the grass.
+	shot(mid + Vector3(0.35, 1.3, 3.3), mid + Vector3(0.0, 0.55, 0.0), 36.0, 0.35, 5.0)
 
 
 ## Close on her face (over his shoulder): "Close your eyes."
@@ -204,7 +209,7 @@ func _b_open_eyes() -> void:
 	var away := (f - at(TAMLIN_KNEEL)).normalized()
 	var across := away.cross(Vector3.UP)
 	# Low behind her shoulder, out over the glen to the willow and the brook.
-	shot_world(head_of(feyre) - across * 0.5 + away * 0.35 + Vector3.UP * 0.05,
+	shot_world(head_of(feyre) - across * 0.5 + away * 0.35 + Vector3.UP * 0.22,
 			at(WILLOW_AT * 0.55 + Vector3(0.0, 1.2, 4.5)), 44.0, -0.8, 7.0)
 	player.veil_to(0.0, 2.2)
 	grade.to_param(&"bloom", 1.0, 3.5)

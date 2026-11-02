@@ -49,13 +49,93 @@ def _line(f):
     return float(z), y
 
 
+# The opening's half-width never passes this (m, times the face's horizontal scale): wide painted lips
+# (Feyre L41-3, corner_x 0.0175) must not carry the slit, the bag and the teeth out past the visible lip
+# into the cheek, where the dark inside shows at the corners as a dimple (F35).
+SEAM_HALF_MAX = 0.0105
+
+
+def smooth_corners(body, f, iters=14):
+    """Relax the skin around the two mouth corners before the cut.  A surface-nets sculpt can leave tiny
+    pits and folds there (Feyre L41-3) that read as pale flecks at rest and a dark dimple once a smile
+    or a pressed lip deepens them (F35).  Every shape key moves by the same amount as the basis, so the
+    keys keep their shapes.  Returns the number of vertices touched."""
+    me = body.data
+    n = len(me.vertices)
+    z_line, _ = _line(f)
+    P = f.P.copy()
+    w = np.zeros(n)
+    for sx in (-1.0, 1.0):
+        c = np.array([sx * f.corner_x, f.mouth[1], z_line])
+        d2 = ((P - c) / np.array([0.0075 * f.sh, 0.008 * f.sh, 0.0045 * f.sv])) ** 2
+        w = np.maximum(w, np.exp(-0.5 * d2.sum(1)))
+    w *= f.front > 0.2
+    w[w < 0.05] = 0.0
+    nbr = [[] for _ in range(n)]
+    for e in me.edges:
+        a, b = e.vertices
+        nbr[a].append(b)
+        nbr[b].append(a)
+    idx = np.where(w > 0)[0]
+    Q = P.copy()
+    for _ in range(iters):
+        R = Q.copy()
+        for i in idx:
+            if nbr[i]:
+                R[i] = Q[i] + 0.5 * w[i] * (Q[nbr[i]].mean(0) - Q[i])
+        Q = R
+    # folded triangles (facing into the head) survive a gentle relax: pull their corners fully onto
+    # their neighbours' mean until the surface faces out again
+    polys = [list(p.vertices) for p in me.polygons if any(w[v] > 0 for v in p.vertices)]
+    for _ in range(12):
+        flipped = set()
+        for vs in polys:
+            a, b, c = Q[vs[0]], Q[vs[1]], Q[vs[2]]
+            if np.cross(b - a, c - a)[1] > 0.0:
+                flipped.update(vs)
+        if not flipped:
+            break
+        for i in flipped:
+            if nbr[i] and w[i] > 0:
+                Q[i] = Q[nbr[i]].mean(0)
+    shift = Q - P
+    for k in me.shape_keys.key_blocks:
+        c = np.empty(n * 3)
+        k.data.foreach_get("co", c)
+        k.data.foreach_set("co", (c.reshape(-1, 3) + shift).ravel())
+    me.vertices.foreach_set("co", Q.ravel())
+    me.update()
+    # what collapsed to nothing goes: merge the slivers (shape-key layers merge with them)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bm.verts.ensure_lookup_table()
+    region = {bm.verts[i] for i in idx}
+    edges = [e for e in bm.edges if e.verts[0] in region or e.verts[1] in region]
+    bmesh.ops.dissolve_degenerate(bm, dist=0.00035 * f.sh, edges=edges)
+    bmesh.ops.triangulate(bm, faces=[fc for fc in bm.faces if len(fc.verts) > 4])
+    bm.to_mesh(me)
+    bm.free()
+    me.update()
+    return int(len(idx))
+
+
+def mouth_hw(f):
+    """Half-width of the mouth's inside (bag and teeth): the lip corners, capped."""
+    return min(f.corner_x, SEAM_HALF_MAX * f.sh / 0.86)
+
+
+def seam_half(f):
+    """Half-width of the lip seam that is cut open."""
+    return 0.86 * mouth_hw(f)
+
+
 def cut(body, f):
     """Open the lips.  Returns the number of seam vertices (each now two)."""
     if body.get("mouth_cut"):
         return 0
     me = body.data
     z_line, _ = _line(f)
-    half = 0.86 * f.corner_x
+    half = seam_half(f)
     bm = bmesh.new()
     bm.from_mesh(me)
     bm.verts.ensure_lookup_table()
@@ -89,6 +169,7 @@ def cut(body, f):
     me.update()
     body["mouth_cut"] = True
     body["mouth_z"] = z_line
+    body["mouth_half"] = half
     return len(seam)
 
 
@@ -120,6 +201,12 @@ def fix_seam_keys(body, z_line):
             side[i], plan[i] = 1, ups
         elif los and not ups:
             side[i], plan[i] = -1, los
+    half = float(body.get("mouth_half", np.abs(P[on, 0]).max() if on.any() else 0.01))
+    by_pos = {}
+    for i in plan:
+        by_pos.setdefault((round(P[i, 0], 6), round(P[i, 1], 6)), []).append(i)
+    pairs = [(a, b) if side[a] > 0 else (b, a) for a, b in (v for v in by_pos.values() if len(v) == 2)
+             if side[a] != side[b]]
     att = me.attributes.get("mouth_side") or me.attributes.new("mouth_side", "INT", "POINT")
     att.data.foreach_set("value", side.astype(np.int32))
     for k in kb[1:]:
@@ -127,8 +214,17 @@ def fix_seam_keys(body, z_line):
         k.data.foreach_get("co", c)
         c = c.reshape(-1, 3)
         d = c - base
-        for i, js in plan.items():
-            c[i] = base[i] + d[js].mean(0)
+        own = {i: d[js].mean(0) for i, js in plan.items()}
+        for i in own:
+            c[i] = base[i] + own[i]
+        # toward the corners the two lips' copies share one delta, so the slit's ends stay sealed and the
+        # inside never shows as a dark dimple there (F35); the middle parts freely
+        for u, lo in pairs:
+            t = min(max((abs(P[u, 0]) - 0.5 * half) / (0.5 * half), 0.0), 1.0)
+            if t > 0.0:
+                m = 0.5 * (own[u] + own[lo])
+                c[u] = base[u] + own[u] + t * (m - own[u])
+                c[lo] = base[lo] + own[lo] + t * (m - own[lo])
         k.data.foreach_set("co", c.ravel())
     return side
 
@@ -191,7 +287,14 @@ def rejaw(body, z_line):
     f = fk.Face(body)
     piv, ang, chin, ref = _jaw(f, z_line)
     rigid = _rotate(f.P, piv, ang) - f.P
-    w = f.below * _gaussian(f.P, (0, 0, z_line), (1.5 * f.corner_x, 1, 0.016 * f.sv)) * (f.front > 0.2)
+    # past the slit's ends the skin is one piece: there the jaw's share fades smoothly across the lip line
+    # instead of stepping at it, or every key with a jaw share (jaw_open, the visemes, lip_press,
+    # jaw_clench) folds the cheek along the line into a pale crease (F35)
+    half = float(body.get("mouth_half", 0.86 * f.corner_x))
+    t = np.clip((np.abs(f.P[:, 0]) - 0.6 * half) / (0.4 * half), 0.0, 1.0)
+    soft = np.clip(0.5 + (z_line - f.P[:, 2]) / (0.010 * f.sv), 0.0, 1.0)
+    below = (1.0 - t) * f.below + t * soft
+    w = below * _gaussian(f.P, (0, 0, z_line), (1.5 * f.corner_x, 1, 0.016 * f.sv)) * (f.front > 0.2)
     w = np.clip(1.6 * w, 0.0, 1.0)[:, None]
     old = f.d["jaw_open"]
     new = (1 - w) * old + w * rigid
@@ -246,7 +349,7 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
     if old is not None:
         bpy.data.objects.remove(old, do_unlink=True)
     sh, sv = f.sh, f.sv
-    hw = f.corner_x
+    hw = mouth_hw(f)
     me = bpy.data.meshes.new("Mouth")
     bm = bmesh.new()
     mats = [_material("mouth_inside", DARK, 0.6), _material("teeth", teeth_rgb, 0.25),
@@ -325,6 +428,9 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
 
 def open_mouth(body, f, arm, fangs=0.0, teeth_rgb=(0.97, 0.95, 0.92)):
     """Cut, fix keys, roll the lips and build the Mouth.  Returns (seam vertices, Mouth object)."""
+    if not body.get("mouth_cut"):
+        smooth_corners(body, f)
+        f = fk.Face(body)
     z_line, y_line = _line(f)
     n = cut(body, f)
     if n:

@@ -306,15 +306,15 @@ for i, (title, rooms, sit, back) in enumerate(PORTRAITS):
 
 # Full-length portraits (portrait_masked hung at scale ~1.5 in the long gallery).
 FULLS = [
-    ("The High Lady in the Rose Garden", sitter("nesta", "full", turn=-15, hair="elain", hair_col=H_GOLD, garment=ROSE, hide=["nesta_cloak"], light="soft"), "garden", "Tamlin's mother, before the curse [X]; companion to the rose-garden painting."),
-    ("A Lady in Mint Silk", sitter("elain", "full", turn=12, hair_col=H_HONEY, garment=MINT, hide=["elain_garden_hat"], light="soft"), "garden", "Ch19: the gallery holds portraits of the court; a lady of Spring before the curse. Sitter invented [X]."),
-    ("A Lord of Spring in Hunting Dress", sitter("tamlin", "full", turn=-12, mask="none", hair_col=H_CHESTNUT, garment=[0.4, 0.55, 0.45], light="rembrandt"), "column", "Ch19: gallery portraits. Before the curse: an unmasked lord dressed for the hunt. Sitter invented [X]."),
-    ("A Masked Lady at the Ball", sitter("nesta", "full", turn=10, mask="tamlin", mask_col=GOLDC, hair_col=H_BLACK, garment=LILAC, hide=["nesta_cloak"], light="rim"), "drape", "Ch19: gallery portraits. After the curse: a lady masked like the rest of the court. Sitter invented [X]."),
-    ("A Lady in Butter Silk", sitter("alis", "full", turn=-8, mask="none", hair="nesta", hair_col=H_COPPER, skin=SK_GOLD, garment=BUTTER, hide=["alis_apron"], light="soft"), "garden", "Ch19: the gallery holds portraits of the court; a lady in spring silks, unmasked. Sitter invented [X]."),
-    ("A Masked Lord in Blue", sitter("lucien", "full", turn=14, mask="keep", mask_col=SILVER, hair_col=H_BLACK, garment=PERI, hide=["EyeOrb"], light="soft"), "column", "Ch19: gallery portraits. After the curse: a lord masked like the rest of the court. Sitter invented [X]."),
+    ("The High Lady in the Rose Garden", sitter("nesta", "full", turn=-15, hair="elain", hair_col=H_GOLD, garment=ROSE, hide=["nesta_cloak"], light="soft"), ("arbour", dict(time="dusk", stand=(0.5, 0.78))), "Tamlin's mother, before the curse [X]; companion to the rose-garden painting."),
+    ("A Lady in Mint Silk", sitter("elain", "full", turn=12, hair_col=H_HONEY, garment=MINT, hide=["elain_garden_hat"], light="soft"), ("terrace", dict(time="dusk", drape_col="#4e7a6a", stand=(0.56, 0.8))), "Ch19: the gallery holds portraits of the court; a lady of Spring before the curse. Sitter invented [X]."),
+    ("A Lord of Spring in Hunting Dress", sitter("tamlin", "full", turn=-12, mask="none", hair_col=H_CHESTNUT, garment=[0.4, 0.55, 0.45], light="rembrandt"), ("column_curtain", dict(time="dusk", wall="#4a3a34", drape_col="#6a2a34", stand=(0.44, 0.82))), "Ch19: gallery portraits. Before the curse: an unmasked lord dressed for the hunt. Sitter invented [X]."),
+    ("A Masked Lady at the Ball", sitter("nesta", "full", turn=10, mask="tamlin", mask_col=GOLDC, hair_col=H_BLACK, garment=LILAC, hide=["nesta_cloak"], light="rim"), ("niche", dict(wall="#4a3048", drape_col="#5a2a4a", floor="#6a5060", stand=(0.5, 0.78))), "Ch19: gallery portraits. After the curse: a lady masked like the rest of the court. Sitter invented [X]."),
+    ("A Lady in Butter Silk", sitter("alis", "full", turn=-8, mask="none", hair="nesta", hair_col=H_COPPER, skin=SK_GOLD, garment=BUTTER, hide=["alis_apron"], light="soft"), ("column_curtain", dict(time="golden", wall="#3e4a48", drape_col="#2e5a54", stand=(0.42, 0.8))), "Ch19: the gallery holds portraits of the court; a lady in spring silks, unmasked. Sitter invented [X]."),
+    ("A Masked Lord in Blue", sitter("lucien", "full", turn=14, mask="keep", mask_col=SILVER, hair_col=H_BLACK, garment=PERI, hide=["EyeOrb"], light="soft"), ("niche", dict(wall="#5a4038", drape_col="#7a3a2e", stand=(0.5, 0.8))), "Ch19: gallery portraits. After the curse: a lord masked like the rest of the court. Sitter invented [X]."),
 ]
-for i, (title, sit, back, ref) in enumerate(FULLS):
-    w("full_%02d" % (i + 1), title, "portrait", "port", ["portrait_full", "portrait", "gallery"], "X", ref, major=True, back=back, sitter=sit, age=0.1 * (i % 3))
+for i, (title, sit, (back, setting), ref) in enumerate(FULLS):
+    w("full_%02d" % (i + 1), title, "portrait", "port", ["portrait_full", "portrait", "gallery"], "X", ref, major=True, back=back, sitter=sit, age=0.1 * (i % 3), **setting)
 
 # Pairs
 w("pair_mated", "A Mated Pair of the Spring Court", "portrait", "land", ["gallery", "portrait"], "X",

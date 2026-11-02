@@ -312,6 +312,8 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat, motion=N
         nose.scale = (1.35, 0.85, 0.7)
         painted[nose] = (0.0, 0.0, 1.0, 1.0)
         if spec.get("horror"):
+            creature_fur.wedge_nose(nose, nose_r)
+        if spec.get("horror"):
             # Nostrils: matte black commas in the wet leather.
             tip = snout + Vector((0, head_r * spec.get("snout_r", 0.42) * 0.35 + nose_r * 0.8, head_r * 0.06))
             for side in (-1, 1):
@@ -423,10 +425,17 @@ def wolf_mouth(spec, g, head, snout, coat, ivory, parts, rigid, painted):
             canine = i == 1
             base = upper(t, side)
             ln = (0.14, 0.42, 0.13, 0.11, 0.09)[i] * hr
-            parts.append(cone(f"ToothU{side}{i}", base, base + Vector((side * 0.03 * hr, 0.02 * hr if canine else 0.0, -ln)),
-                              (0.06 if canine else 0.035) * hr, ivory, 5 if canine else 4))
+            tip = base + Vector((side * 0.03 * hr, 0.0, -ln))
+            if canine:
+                # Seated outside the lower lip, ending at the chin line, not tusks.
+                jt = 0.04
+                chin = jaw.lerp(head, jt).z - hr * (sh["jaw_rz"] + (0.5 - sh["jaw_rz"]) * jt) * 0.85
+                base.x = side * max(abs(base.x), hr * (sh["jaw_rx"] + 0.1) * 0.62 + 0.04 * hr)
+                tip = Vector((base.x + side * 0.01 * hr, base.y + 0.02 * hr, max(chin, base.z - ln)))
+            parts.append(cone(f"ToothU{side}{i}", base, tip, (0.06 if canine else 0.035) * hr, ivory, 5 if canine else 4))
             rigid.append((parts[-1], "muzzle"))
-            base = lower(t, side)
+            # The lower canine rises in front of the upper one.
+            base = lower(0.0 if canine else t, side)
             ln = (0.11, 0.32, 0.1, 0.09, 0.08)[i] * hr
             parts.append(cone(f"ToothL{side}{i}", base, base + Vector((side * 0.02 * hr, -0.03 * hr if canine else 0.0, ln)),
                               (0.05 if canine else 0.032) * hr, ivory, 5 if canine else 4))

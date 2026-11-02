@@ -110,3 +110,38 @@ func test_every_beat_of_every_director_runs_and_the_props_go() -> void:
 			assert_false(is_instance_valid(n) and (n as Node).is_inside_tree() and not (n as Node).is_queued_for_deletion(),
 					"%s took its prop %s away" % [id, n])
 		p.free()
+
+
+## The house builds its floors at their world height: a film staged in its
+## layout frame stands on the ground floor, not under it (the Mac run had
+## the dining hall played on the terrain below the house).
+func test_the_house_frame_stands_on_the_ground_floor() -> void:
+	var house := Node3D.new()
+	house.position = Vector3(5.0, 0.0, -3.0)
+	root.add_child(house)
+	var anchor := Marker3D.new()
+	anchor.add_to_group(&"story_anchor")
+	house.add_child(anchor)
+	var space := Node3D.new()
+	anchor.add_child(space)
+	var d := CutsceneDirector.new()
+	d.space = space
+	assert_true(d.use_house(), "the anchor's parent is the house")
+	var p := d.at(Vector3(7.0, 0.0, -30.5))
+	assert_almost_eq(p.y, ManorHouseBuilder.floor_y(0), 0.001, "on the ground floor")
+	assert_almost_eq(p.x, 12.0, 0.001)
+	d.free()
+
+
+## Shots frame a head where the pose draws it: sat in the grass, a head is
+## low, not where the walking animation would have it.
+func test_a_posed_head_is_where_the_pose_draws_it() -> void:
+	var who := (load("res://characters/tamlin/tamlin_model.tscn") as PackedScene).instantiate() as Node3D
+	root.add_child(who)
+	await wait_process_frames(3)
+	var standing := CutsceneDirector.head_of(who).y
+	FilmPose.on(who).to(&"sit_ground", 0.0)
+	await wait_process_frames(3)
+	var sitting := CutsceneDirector.head_of(who).y
+	assert_gt(standing, 1.5, "standing head")
+	assert_lt(sitting, standing - 0.5, "sat in the grass, the head is low (%.2f)" % sitting)

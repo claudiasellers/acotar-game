@@ -81,7 +81,13 @@ is skipped, or can't play (headless: every fact is written at once).
   the film's director, `story/film/cutscenes/<id>.gd`, a `CutsceneDirector`.
 - `CutsceneDirector` (`story/film/cutscene_director.gd`): one `_b_<beat>()`
   per beat. Points are in the moment's frame (`at`), or the manor house's
-  layout frame after `use_house()`. It owns Cine, poses (`FilmPose`), a
+  layout frame after `use_house()` (lifted onto the ground floor:
+  `ManorHouseBuilder.floor_y(0)`; `ground()` there finds the floor through
+  furniture). Face shots (`close`, `over`, `shot_on`) frame the head where
+  `FilmPose` draws it, swing round until no one else stands in front of the
+  face (`clear_view`), and stay inside the room. Feyre's bow and quiver are
+  hidden while a film plays (they hang off her controller, not her
+  skeleton). It owns Cine, poses (`FilmPose`), a
   `FilmGrade` (veil, bloom, edge_gold, cold, crack) and its props; at the end,
   however it ends, the props go, poses let go, Feyre is put at `_end_mark()`
   and the camera eases back to hers. `add_set` dressing stays (A's willow and
@@ -89,13 +95,18 @@ is skipped, or can't play (headless: every fact is written at once).
 - `FilmPose` stages the cast (kneel, sit, crouch, reach, bow...) over the
   body animation; it also drives the townsfolk rig (`creatures/models/people`).
 - B's Rhysand: the cast lane's `characters/rhysand/rhysand_model.tscn` when it
-  exists; until then a painted stand-in (ink, violet rim and eyes, his own
-  dark). B brings him itself; the moment no longer spawns him.
+  exists; until then Tamlin's rig re-dressed (no mask or claws, blue-black
+  hair, black and dark silver, violet eyes, his own dark). B brings him
+  itself; the moment no longer spawns him. B plays Tamlin and Lucien with its
+  own models too (`bring_own`): the lunch's go when the lunch ends.
 - `MuralDark` (`story/film/mural/mural_dark.gd`): the mural told true for C
   (queen, masks, terms; black, rust, thorns) and B's gold flash (well).
 - Mac capture: `res://tools/film/cutscene_shot.tscn -- {out} <film_id>` starts
   the real game at the moment's anchor with its chain of deeds done and
-  captures the film the story starts (`FilmCapture.wait_for_film`).
+  captures the film the story starts (`FilmCapture.wait_for_film`). The
+  moment's own `fact.*` gate opens 4 s after she is placed, so the region
+  (the house) is built before the film starts, and any other scene that
+  could start there is marked done first (`_hush`).
 
 ## Tests
 
@@ -114,4 +125,5 @@ is skipped, or can't play (headless: every fact is written at once).
 `tests/unit/film/test_cutscenes.gd` covers: each moment plays its film then
 waits on its facts; films write only facts (R2); headless, every fact at once;
 skipped on the first frame, the story moves on; every beat of every director
-runs and its props go.
+runs and its props go; the house frame stands on the ground floor; a posed
+head is framed where the pose draws it.

@@ -37,8 +37,17 @@ func _run() -> void:
 	var stage: Array = STAGES[id]
 	var moment := load(MOMENTS % stage[0]) as StoryMoment
 	WorldState.clear()
+	# Everything before the moment is done; its own gate opens once the region
+	# has settled (the house built, the cast placed), the way it would in play.
+	# Opened at once, an auto trigger fires while the region is still loading.
+	# Only its facts are held back (a deed held back could replay the moment
+	# that raises it); a gate of deeds alone is held back whole.
+	var own := PackedStringArray(Array(moment.require_flags).filter(func(f: String) -> bool: return f.begins_with("fact.")))
+	if own.is_empty():
+		own = moment.require_flags
 	for f in _chain(moment.require_flags, {}):
-		WorldState.set_flag(f, true)
+		if not own.has(f):
+			WorldState.set_flag(f, true)
 	var film := Films.data_of(id)
 	var cap := FilmCapture.new()
 	cap.name = "FilmCapture"
@@ -56,9 +65,11 @@ func _run() -> void:
 	game.set(&"opening_shot", "")
 	get_tree().root.add_child(game)
 	get_tree().current_scene = game
-	# Walking in starts it; if the trigger has not fired once the region has
-	# settled, start it as the trigger would (and say why, for the log).
+	_hush(moment.id)
+	# The gate opens 4 s after she is placed; walking in starts it, and if the
+	# trigger has not fired 2 s later, start it as the trigger would.
 	var space: SceneSpace = null
+	var spawned_at := -1
 	for i in 240:
 		await get_tree().create_timer(1.0).timeout
 		if FilmPlayer.current(get_tree()):
@@ -68,10 +79,30 @@ func _run() -> void:
 		if i % 10 == 9:
 			print("cutscene_shot: %d s, spawned %s, space %s, can_start %s" % [i + 1, game.get(&"spawned"),
 					space != null, space.can_start() if space else false])
-		if space and i >= 8 and bool(game.get(&"spawned")) and not space.running and space.can_start():
+		if bool(game.get(&"spawned")) and spawned_at < 0:
+			spawned_at = i
+		if spawned_at >= 0 and i == spawned_at + 4:
+			print("cutscene_shot: opening the gate %s" % [own])
+			for f in own:
+				WorldState.set_flag(f, true)
+		if space and spawned_at >= 0 and i >= spawned_at + 6 and not space.running and space.can_start():
 			print("cutscene_shot: starting %s by hand" % moment.id)
 			space.start()
-	queue_free()
+
+
+## The rest of the story is over by the time this moment plays: any other
+## scene that could start here (the chain opens some gates in passing, like
+## Calanmai's in the hall) is marked done before it can, for the whole run.
+func _hush(target: StringName) -> void:
+	while is_inside_tree():
+		for n in get_tree().root.find_children("*", "SceneSpace", true, false):
+			var other := n as SceneSpace
+			if other.space_id == target or other.running or other.done_flags.is_empty() or not other.can_start():
+				continue
+			print("cutscene_shot: %s marked done (%s)" % [other.space_id, other.done_flags])
+			for f in other.done_flags:
+				WorldState.set_flag(f, true)
+		await get_tree().create_timer(0.5).timeout
 
 
 func _space_of(moment_id: StringName) -> SceneSpace:
