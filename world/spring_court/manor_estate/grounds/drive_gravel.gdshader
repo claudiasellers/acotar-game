@@ -1,13 +1,13 @@
-// The drive and forecourt: blush-and-pearl gravel with gold grit and the odd
+// The drive and forecourt: honey-cream gravel (the roses carry the pink) with gold grit and the odd
 // fallen petal, in world space so long drapes never stretch it (R3).
 // Kept below ~0.86 albedo, with darker ground between paler stones: near-white
 // gravel under the noon sun clipped to white and lost its stones (2026-11-02).
 shader_type spatial;
 render_mode cull_back;
 
-uniform vec3 sand : source_color = vec3(0.72, 0.60, 0.55);
-uniform vec3 pearl : source_color = vec3(0.84, 0.79, 0.76);
-uniform vec3 taupe : source_color = vec3(0.52, 0.42, 0.39);
+uniform vec3 sand : source_color = vec3(0.66, 0.62, 0.56);
+uniform vec3 pearl : source_color = vec3(0.82, 0.80, 0.75);
+uniform vec3 taupe : source_color = vec3(0.50, 0.44, 0.38);
 uniform vec3 grit : source_color = vec3(0.95, 0.78, 0.42);
 uniform vec3 petal : source_color = vec3(1.0, 0.62, 0.76);
 uniform float pebble_size = 0.14;
