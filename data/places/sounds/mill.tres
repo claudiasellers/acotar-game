@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SoundCue" format=3]
+
+[ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="1_wpjwg"]
+[ext_resource type="AudioStream" path="res://audio/amb/places/mill.ogg" id="2_b81va"]
+
+[resource]
+script = ExtResource("1_wpjwg")
+id = &"place_mill"
+streams = Array[AudioStream]([ExtResource("2_b81va")])
+volume_db = -8.0
+loop = true
+max_distance = 34.0

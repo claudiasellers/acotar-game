@@ -26,7 +26,7 @@ func _run() -> void:
 	var args := OS.get_cmdline_user_args()
 	var id := args[0] if args.size() > 0 else "bw_walk"
 	var out := args[1] if args.size() > 1 else "user://%s.png" % id
-	var shot: Array = SHOTS[id]
+	var shot: Array = SHOTS[id] if SHOTS.has(id) else _place_shot(id)
 	Clock.paused = true
 	Clock.time_of_day = shot[3]
 	var root := get_tree().root
@@ -73,6 +73,18 @@ func _run() -> void:
 	var draw := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 	print("SHOT %s -> %s | draw_calls %d" % [id, out, draw])
 	get_tree().quit(0)
+
+
+## "place_<id>": eye level from the approach side of a PlaceSetting (lane L32);
+## "placeup_<id>": raised, further back, so the forecourt, collar and the
+## ground composition around it read.
+func _place_shot(id: String) -> Array:
+	var raised := id.begins_with("placeup_")
+	var place_id := StringName(id.substr(8 if raised else 6))
+	var s := PlaceComposer.table().find(place_id)
+	var back := PlaceComposer.approach(s)
+	var dist := s.radius + (38.0 if raised else 15.0)
+	return [s.center + back * dist, s.center, 24.0 if raised else 1.7, 0.42, 0.0]
 
 
 func _region_defs() -> Array[RegionDef]:

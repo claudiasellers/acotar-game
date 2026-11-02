@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SoundCue" format=3]
+
+[ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="1_dg1cw"]
+[ext_resource type="AudioStream" path="res://audio/amb/places/wind_birds.ogg" id="2_vejtk"]
+
+[resource]
+script = ExtResource("1_dg1cw")
+id = &"place_wind_birds"
+streams = Array[AudioStream]([ExtResource("2_vejtk")])
+volume_db = -12.0
+loop = true
