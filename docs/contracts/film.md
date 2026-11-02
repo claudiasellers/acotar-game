@@ -17,7 +17,7 @@ and the newcomer critic). Data rows are written by `tools/film/gen_film_data.py`
 | `story/film/film_captions.gd` `FilmCaptions` | Narration in EB Garamond italic, speech upright and tinted by speaker, just above the bottom bar. |
 | `story/film/film_skip.gd` `FilmSkip` | Hold any confirm/cancel action 0.8 s, or press twice within 0.6 s. Gold ring, "hold to skip". |
 | `story/film/film_insert.gd` `FilmInsert` | A full-screen painted insert (own `World3D` in a SubViewport) laid over the game, brushed on and off with `cover_to(k, s)`. |
-| `story/film/mural/mural_stage.gd` `MuralStage` | The living gold-and-ink mural: tableaux `land, court, slaves, war, treaty, mother, house, ships`, cut to with `play(id, s)`. |
+| `story/film/mural/mural_stage.gd` `MuralStage` | The living gold-and-ink mural: tableaux `land, court, slaves, war, treaty, mother, house, ships`, cut to with `play(id, s)`. `build_only` builds a subset. |
 | `story/film/opening/opening_film.gd` `OpeningFilm` | Part one (the mural and the turn at the Wall), in its own scene. |
 | `story/film/opening/opening_film_world.gd` `OpeningFilmWorld` | Part two in the real game world: the cottage at night, memory flashes, dawn with Feyre, the wolf's eye, the title, the hand-over. |
 
@@ -61,13 +61,41 @@ and the newcomer critic). Data rows are written by `tools/film/gen_film_data.py`
 - Skipping in part one goes straight to the game. Skipping in part two hands
   over on the spot.
 
-## Cutscenes A, B, C (next hand-in)
+## Cutscenes A, B, C
 
-They play when their story moment starts (`glamour_lift`, `rhysand_visit`,
-`alis_truth`). The moment's data keeps its anchor, gates and the deed it
-raises, fired the same way. Its other steps are thinned to
-`until_flag fact.film_<id>_seen` with a safety fallback, so the story moves
-on whether the film plays, is skipped, or can't play (headless).
+They play when their story moment starts: `glamour_lift` (A, the glade in
+Blossom Vale), `rhysand_visit` (B, the manor's dining hall), `alis_truth`
+(C, the entry hall, the kitchen, the garden steps). The moment's data keeps
+its anchor, gates and deed. Its steps are now: spawn the cast it owns,
+`film <id>`, `until_flag` on the film's facts, then the deed (written by
+`tools/story/gen_moments.py`). The story moves on whether the film plays,
+is skipped, or can't play (headless: every fact is written at once).
+
+| Film | Facts it writes | The moment then raises |
+|---|---|---|
+| `eyes_open` (76 s) | `fact.film_eyes_open_lift` (under the black, eyes closed), `fact.film_eyes_open_seen` | `glamour_lifted` on the lift fact |
+| `night_court` (105 s) | `fact.false_name_clare_beddor` (her answer), `fact.film_night_court_seen` | `rhysand_faced` |
+| `silent_manor` (150 s) | `fact.film_silent_manor_seen` | `alis_truth_heard` (journal entries first) |
+
+- `Films.play(space, id)` (`story/film/films.gd`) starts the player and adds
+  the film's director, `story/film/cutscenes/<id>.gd`, a `CutsceneDirector`.
+- `CutsceneDirector` (`story/film/cutscene_director.gd`): one `_b_<beat>()`
+  per beat. Points are in the moment's frame (`at`), or the manor house's
+  layout frame after `use_house()`. It owns Cine, poses (`FilmPose`), a
+  `FilmGrade` (veil, bloom, edge_gold, cold, crack) and its props; at the end,
+  however it ends, the props go, poses let go, Feyre is put at `_end_mark()`
+  and the camera eases back to hers. `add_set` dressing stays (A's willow and
+  brook).
+- `FilmPose` stages the cast (kneel, sit, crouch, reach, bow...) over the
+  body animation; it also drives the townsfolk rig (`creatures/models/people`).
+- B's Rhysand: the cast lane's `characters/rhysand/rhysand_model.tscn` when it
+  exists; until then a painted stand-in (ink, violet rim and eyes, his own
+  dark). B brings him itself; the moment no longer spawns him.
+- `MuralDark` (`story/film/mural/mural_dark.gd`): the mural told true for C
+  (queen, masks, terms; black, rust, thorns) and B's gold flash (well).
+- Mac capture: `res://tools/film/cutscene_shot.tscn -- {out} <film_id>` starts
+  the real game at the moment's anchor with its chain of deeds done and
+  captures the film the story starts (`FilmCapture.wait_for_film`).
 
 ## Tests
 
@@ -82,3 +110,8 @@ on whether the film plays, is skipped, or can't play (headless).
 - `take()` is false unless the film is armed;
 - New Game routing;
 - `opening_film.tres` matches the script.
+
+`tests/unit/film/test_cutscenes.gd` covers: each moment plays its film then
+waits on its facts; films write only facts (R2); headless, every fact at once;
+skipped on the first frame, the story moves on; every beat of every director
+runs and its props go.
