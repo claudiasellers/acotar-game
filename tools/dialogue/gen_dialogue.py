@@ -16,7 +16,8 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OUT = os.path.join(ROOT, "data", "dialogue")
+# GEN_DIALOGUE_OUT lets the drift test generate into a scratch folder.
+OUT = os.environ.get("GEN_DIALOGUE_OUT") or os.path.join(ROOT, "data", "dialogue")
 
 P = ["p0_winter", "p1_wolf_and_crossing", "p2_grounds", "p3_house_and_woods", "p4_wider_court",
      "p5_calanmai", "p6_blight_tightens", "p7_return_home", "p8_the_pass"]
@@ -899,8 +900,9 @@ spot("potion_stillroom", "potion_maker", PEOPLE % "potion_maker", "manor_estate"
 FV = [("fae_mushroom", "cottages", -6, 4), ("fae_moth", "great_lantern_tree", 5, -3),
       ("fae_fox", "market", -5, 2), ("fae_hedgehog", "market", 4, 5), ("fae_pixie", "seamstress", 4, 3),
       ("fae_satyr", "village_mill", 6, 0), ("fae_rose", "market", 1, -6), ("fae_owl", "great_lantern_tree", -4, 4),
-      ("fae_stag", "lantern_bridge", 0, 6), ("fae_nymph", "lantern_bridge", 3, -5),
+      ("fae_stag", "lantern_bridge", 23, 0), ("fae_nymph", "lantern_bridge", 21, -18),
       ("fae_birch", "cottages", 5, -4), ("fae_dryad", "potion_house", -5, -3)]
+# The stag and nymph stand on the bridge's east bank, off the river (T040).
 # Keeper (ch24): Tamlin's glamour covers his court, so before the lift only
 # humanoid, glamoured folk are seen (the satyr, the High Fae revellers); the
 # non-humanoid village fae appear once it lifts.
