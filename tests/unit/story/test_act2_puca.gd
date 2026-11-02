@@ -13,9 +13,13 @@ var looking := true
 var space: PucaLure
 
 
+var _clock_saved: Dictionary
+
+
 func before_each() -> void:
 	WorldState.clear()
 	StoryControl.release()
+	_clock_saved = Clock.to_dict()
 	Clock.paused = true
 	looking = true
 	root = Node3D.new()
@@ -38,6 +42,8 @@ func after_each() -> void:
 	for global_space in StoryDirector.get_children():
 		(global_space as SceneSpace).auto_tick = true
 	StoryControl.release()
+	# _night() moves the shared Clock; give later tests back their hour.
+	Clock.from_dict(_clock_saved)
 	Clock.paused = false
 
 
