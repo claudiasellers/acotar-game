@@ -162,6 +162,73 @@ func test_painting_slots_have_their_wall() -> void:
 	assert_eq(bad.size(), 0, "\n".join(bad))
 
 
+## F36: "pour the water away" needs Feyre within WoundDressing.USE_REACH of the
+## sink mark, which stands in the infirmary's south-east corner. A walk over
+## the floor (0.25 m grid, furniture and stations grown by her radius) from
+## where she works on his hand reaches a spot that close.
+func test_infirmary_sink_is_reachable() -> void:
+	var room := _room(&"svc_infirmary", 0)
+	assert_not_null(room)
+	var sink := Vector2.INF
+	var work := Vector2.INF
+	var built: Array[Vector2] = []
+	for z: Dictionary in _ctx.keep_clear:
+		var why := String(z.get("why", ""))
+		if not why.begins_with("wound_dressing_stage"):
+			continue
+		if why.ends_with(":sink"):
+			sink = z.a
+		if why.ends_with(":feyre_work"):
+			work = z.a
+		if z.get("built", false):
+			built.append(z.a)
+	assert_ne(sink, Vector2.INF, "the stage's sink mark")
+	assert_ne(work, Vector2.INF, "the stage's feyre_work mark")
+	const AGENT := 0.35
+	var blocks: Array[Rect2] = []
+	for p in room.props:
+		if ManorFurnishMetrics.is_floor_piece(p):
+			blocks.append(ManorFurnishMetrics.footprint(room, p).grow(AGENT))
+	for st in _ctx.index.stations:
+		if st.level == room.level and room.rect.has_point(Vector2(st.position.x, st.position.z)):
+			var sz := PropLib.size_of(st.prop_id)
+			var ext := Vector2(sz.z, sz.x) if absf(fposmod(st.yaw_deg, 180.0) - 90.0) < 45.0 else Vector2(sz.x, sz.z)
+			blocks.append(Rect2(Vector2(st.position.x, st.position.z) - ext * 0.5, ext).grow(AGENT))
+	var inner := room.rect.grow(-ManorFurnisher.WALL_FACE - AGENT)
+	var free := func(q: Vector2) -> bool:
+		if not inner.has_point(q):
+			return false
+		for b in blocks:
+			if b.has_point(q):
+				return false
+		for c in built:     # the scene's own sink and worktable
+			if q.distance_to(c) < 0.5 + AGENT:
+				return false
+		return true
+	const STEP := 0.25
+	var start := Vector2i(roundi(work.x / STEP), roundi(work.y / STEP))
+	assert_true(free.call(Vector2(start) * STEP), "she can stand at her work mark")
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
+	var best := INF
+	while not queue.is_empty():
+		var c: Vector2i = queue.pop_front()
+		best = minf(best, (Vector2(c) * STEP).distance_to(sink))
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if not seen.has(n) and free.call(Vector2(n) * STEP):
+				seen[n] = true
+				queue.append(n)
+	# her feet to the point 0.95 m up over the basin (InfirmaryWorktable.sink_point)
+	var reach := sqrt(WoundDressing.USE_REACH ** 2 - 0.95 ** 2) - 0.1
+	assert_lt(best, reach, "closest walkable spot to the sink: %.2f m" % best)
+	# and the way there from her work is straight and open, not round the cot
+	var stop := sink + (work - sink).normalized() * reach
+	for i in 21:
+		var q := work.lerp(stop, i / 20.0)
+		assert_true(free.call(q), "the walk from her work to the sink is open at %s" % (q - room.rect.position))
+
+
 func _wall_of(p: Vector3, w: float, d: float) -> String:
 	if p.z < 0.5:
 		return "n"

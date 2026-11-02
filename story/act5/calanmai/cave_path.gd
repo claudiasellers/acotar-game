@@ -125,7 +125,9 @@ func _surround() -> void:
 		var who := request_actor(id, xf, func() -> Node3D: return StandIns.figure("high_fae_male"))
 		who.global_transform = xf
 		actors[id] = who
-	_light_campfire(at + fwd * 6.5 - right * 2.5)
+	# Beside her, a step ahead: it lights their faces and hers from the side,
+	# not from behind the trees (Mac clip req-calanmai-3 found it hidden).
+	_light_campfire(at + fwd * 1.2 + right * 2.6)
 	_hiss = AudioStreamPlayer3D.new()
 	_hiss.stream = load(HISS)
 	_hiss.unit_size = 4.0
@@ -150,15 +152,15 @@ func _light_campfire(near: Vector3) -> void:
 			p.scale = Vector3.ONE * 0.9
 	var light := OmniLight3D.new()
 	light.light_color = Color(1.0, 0.55, 0.28)
-	light.light_energy = 3.2
-	light.omni_range = 16.0
+	light.light_energy = 5.0
+	light.omni_range = 20.0
 	light.shadow_enabled = true
 	light.position.y = 1.2
 	_campfire.add_child(light)
 	var tw := light.create_tween().set_loops()
-	tw.tween_property(light, ^"light_energy", 2.4, 0.23)
-	tw.tween_property(light, ^"light_energy", 3.6, 0.31)
-	tw.tween_property(light, ^"light_energy", 2.9, 0.19)
+	tw.tween_property(light, ^"light_energy", 4.0, 0.23)
+	tw.tween_property(light, ^"light_energy", 5.6, 0.31)
+	tw.tween_property(light, ^"light_energy", 4.6, 0.19)
 	var crackle := AudioStreamPlayer3D.new()
 	crackle.stream = CalanmaiNight._looped(CalanmaiNight.FIRE)
 	crackle.unit_size = 2.5

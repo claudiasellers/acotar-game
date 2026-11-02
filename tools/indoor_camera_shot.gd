@@ -28,9 +28,12 @@ func _run() -> void:
 	var cottage := (load(COTTAGE) as PackedScene).instantiate() as Node3D
 	add_child(cottage)
 	var spots: Array = []
-	var room := cottage.find_child("act1_cottage_interior", true, false) as Node3D
-	# On the floor between the beds and the broken door (the marker itself is over the table).
-	spots.append(["cottage", room.global_transform * Vector3(-1.6, 0.0, 0.6),
+	# The interior's own frame (cottage_buildings.py): the sisters' room is the
+	# back-west corner behind the partition (x < -1.1, z > -0.6), so she stands
+	# in the main room's west end, in front of the partition and west of the
+	# table, looking along the room to the hearth.
+	var inside := cottage.find_child("act1_cottage_interior", true, false).get_parent() as Node3D
+	spots.append(["cottage", inside.global_transform * Vector3(-1.6, 0.0, -2.1),
 			cottage.find_child("Hearth", true, false).global_position])
 	var house := Node3D.new()
 	add_child(house)

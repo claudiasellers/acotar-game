@@ -344,36 +344,67 @@ func _build_scene() -> Node3D:
 	hearth.add_child(fire)
 	fire.owner = root
 
+	# Two rooms [C ch 1]: the main room (hearth, table, chairs, Nesta's bench,
+	# her father's cot by the fire) and, behind the partition in the back-west
+	# corner (cottage_buildings.py PART_X/PART_Z), the sisters' small room with
+	# its door: the enormous ironwood bed (never painted) and the rickety dresser.
 	var props := [
-		# [node name, glb, local position, yaw, extra rotation]
-		["SistersBed", AI + "bed.glb", Vector3(-2.95, 0, 1.85), 180.0],
+		# [node name, glb, local position, yaw, extra rotation, scale]
+		["SistersBed", AI + "bed.glb", Vector3(-2.95, 0, 1.8), 180.0, Vector3.ZERO, Vector3(1.05, 1.0, 1.1)],
 		["FathersChair", AI + "father_chair.glb", Vector3(2.3, 0, 0.9), -100.0],
 		["FathersCane", AI + "cane.glb", Vector3(2.62, 0, 1.25), 0.0, Vector3(0, 0, 14)],
-		["CarvingStool", AI + "carving_stool.glb", Vector3(2.0, 0, 1.75), 20.0],
-		["CarvingKnifeAndFigures", AI + "wooden_figures.glb", Vector3(2.0, 0.44, 1.75), 20.0],
-		["WoodShavings", AI + "wood_shavings.glb", Vector3(2.2, 0.0, 1.35), 0.0],
+		["FathersCot", AI + "father_cot.glb", Vector3(2.3, 0, 2.27), 0.0],
+		["CarvingStool", AI + "carving_stool.glb", Vector3(1.9, 0, 1.5), 20.0],
+		["CarvingKnifeAndFigures", AI + "wooden_figures.glb", Vector3(1.9, 0.44, 1.5), 20.0],
+		["WoodShavings", AI + "wood_shavings.glb", Vector3(2.15, 0.0, 1.2), 0.0],
+		["KindlingBasket", AI + "kindling_basket.glb", Vector3(3.0, 0, 1.55), 15.0],
 		["Table", AI + "table.glb", Vector3(0.0, 0, -0.2), 0.0],
-		["Dresser", AI + "dresser.glb", Vector3(0.4, 0, 2.42), 0.0],
+		["ChairByTable", AI + "chair_rush_a.glb", Vector3(-0.45, 0, -1.05), 180.0],
+		["ChairTableEnd", AI + "chair_rush_b.glb", Vector3(1.2, 0, -0.2), 90.0],
+		["ChippedMug", AI + "mug_chipped.glb", Vector3(-0.55, 0.77, -0.38), 30.0],
+		["WaterPot", AI + "water_pot.glb", Vector3(3.0, 0.08, -0.55), 0.0],
+		["Dresser", AI + "dresser.glb", Vector3(-3.35, 0, -0.29), 180.0],
+		["NestasRibbonAndComb", AI + "nesta_ribbon_comb.glb", Vector3(-2.95, 1.12, -0.29), 190.0],
+		["ElainsSeedPackets", AI + "elain_seed_packets.glb", Vector3(-3.6, 1.12, -0.32), 165.0],
+		["IronBracelets", AI + "iron_bracelets.glb", Vector3(-3.45, 1.12, -0.1), 90.0],
+		["CandleStub", AI + "candle_stub.glb", Vector3(-3.85, 1.12, -0.12), 0.0],
+		["RagRug", AI + "rag_rug.glb", Vector3(-2.55, 0, 0.45), 8.0],
+		["PegsNightclothes", AI + "pegs_nightclothes.glb", Vector3(-1.16, 0, 1.75), 90.0],
+		["BedroomDoor", AI + "bedroom_door.glb", Vector3(-2.65, 0, -0.69), 180.0],
 		["WallCabinet", AI + "wall_cabinet.glb", Vector3(1.95, 1.35, 2.7), 0.0],
-		["PegsWithClothes", AI + "pegs_clothes.glb", Vector3(-4.0, 0, -0.9), -90.0],
+		["PegsWithClothes", AI + "pegs_clothes.glb", Vector3(-4.0, 0, -1.55), -90.0],
 		["FeyresBowAndQuiver", AI + "bow_quiver.glb", Vector3(-3.35, 0, -2.62), 180.0],
+		["FeyresBoots", AI + "boots_feyre.glb", Vector3(-2.8, 0, -2.42), 10.0],
+		["NestasBoots", AI + "boots_nesta.glb", Vector3(-1.05, 0, -2.48), -15.0],
 		["PaintCorner", AI + "paint_corner.glb", Vector3(2.75, 0, -2.3), 0.0],
-		["NestasRibbonAndComb", AI + "nesta_ribbon_comb.glb", Vector3(0.05, 1.12, 2.42), 10.0],
-		["ElainsSeedPackets", AI + "elain_seed_packets.glb", Vector3(0.6, 1.12, 2.45), -15.0],
+		["BesomBroom", AI + "besom_broom.glb", Vector3(3.85, 0, -2.45), -30.0],
 		["PressedFlowerCup", AI + "pressed_flower_cup.glb", Vector3(0.35, 0.77, -0.1), 0.0],
 		["HiddenCoin", AI + "hidden_coin.glb", Vector3(2.9, 0.0, -0.95), 30.0],
-		["DishShelf", AI + "dish_shelf.glb", Vector3(2.2, 1.5, -2.7), 180.0],
+		["DishShelf", AI + "dish_shelf.glb", Vector3(2.45, 1.5, -2.7), 180.0],
 		["ShutterFrostFront", AI + "shutter_frost.glb", Vector3(1.4, 0.9, -3.12), 180.0],
 		["ShutterFrostBack", AI + "shutter_frost.glb", Vector3(-0.6, 0.9, 3.12), 0.0],
+		["CurtainsFront", AI + "curtains_threadbare.glb", Vector3(1.4, 0, -2.69), 180.0],
+		# narrower at the back: the partition stands at the window's west edge
+		["CurtainsBack", AI + "curtains_threadbare.glb", Vector3(-0.6, 0, 2.69), 0.0, Vector3.ZERO, Vector3(0.72, 1.0, 1.0)],
 	]
 	for p in props:
-		_glb(p[1], p[0], inside, root, p[2], p[3], p[4] if p.size() > 4 else Vector3.ZERO)
+		_glb(p[1], p[0], inside, root, p[2], p[3], p[4] if p.size() > 4 else Vector3.ZERO, p[5] if p.size() > 5 else Vector3.ONE)
+	# The sisters' one light at bedtime (their room has no window).
+	var candle := OmniLight3D.new()
+	candle.name = "CandleLight"
+	candle.position = Vector3(-3.85, 1.32, -0.12)
+	candle.light_color = Color(1.0, 0.7, 0.4)
+	candle.light_energy = 0.35
+	candle.omni_range = 3.5
+	inside.add_child(candle)
+	candle.owner = root
 	var tally := _node(Node3D, "FoodTally", inside, root, Vector3(-0.115, 2.56, 0.0), 90.0)
 	_glb(AI + "food_tally_marks.glb", "Marks", tally, root, Vector3.ZERO, -90.0)
 	_node(Marker3D, "Counter", tally, root, Vector3(0.0, 0.0, -0.05))
 	# Feyre's painted motifs: the only saturated colour in the room.
 	var motifs := _node(Node3D, "PaintedMotifs", inside, root)
-	_glb(AI + "motif_dresser.glb", "DresserDrawers", motifs, root, Vector3(0.4, 0, 2.42), 0.0)
+	_glb(AI + "motif_dresser.glb", "DresserDrawers", motifs, root, Vector3(-3.35, 0, -0.29), 180.0)
+	_glb(AI + "motif_hearth_flames.glb", "HearthFlameCurls", motifs, root)
 	_glb(AI + "motif_table_foxglove.glb", "TableFoxglove", motifs, root, Vector3(0.0, 0, -0.2), 0.0)
 	_glb(AI + "motif_cabinet_daffodils.glb", "CabinetDaffodils", motifs, root, Vector3(1.95, 1.35, 2.7), 0.0)
 	_glb(AI + "motif_wall_vines.glb", "WallVinesByWindow", motifs, root, Vector3(0.85, 0, -2.7), 180.0)

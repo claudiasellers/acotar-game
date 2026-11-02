@@ -36,6 +36,7 @@ func _run() -> void:
 	var rider := Rider.new()
 	root.add_child(rider)
 	rider.model = FEYRE.instantiate() as Node3D
+	WardrobeApplier.dress(rider.model)   # her Act I clothes, as in play (L41-4)
 	rider.add_child(rider.model)
 	var cam := Camera3D.new()
 	root.add_child(cam)
