@@ -318,9 +318,14 @@ MESH_FOR = {
 # starlight gown and the short-sleeved garden cut leave the forearms bare, so
 # they don't hide "arms" either. The solstice cut's bell sleeves keep them hidden.
 GOWN_BARE_ARMS = {"gown_starlight", "gown_garden"}
+# The spring/fae tunic's sleeves stop near the elbow (x cut at 0.30 in build_wardrobe.py),
+# so hiding the whole arms region left the forearms invisible with floating hands.
+SHORT_SLEEVE_TOPS = {"spring_tunic"}
 
 
 def body_hides(mesh, hides):
+	if mesh in SHORT_SLEEVE_TOPS:
+		return [h for h in hides if h != "arms"]
 	if not mesh.startswith("gown_"):
 		return hides
 	drop = {"torso", "arms"} if mesh in GOWN_BARE_ARMS else {"torso"}
