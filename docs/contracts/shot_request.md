@@ -93,7 +93,7 @@ Top level (all optional except at least one shot or check):
 | `quality` | `"layout"` | `"layout"` or `"full"`; default for every shot |
 | `size` | 640×360 layout, 1920×1080 full | default image size |
 | `renderer` | `"auto"` | `"compatibility"` or `"forward_plus"`; applied by the wrapper (see Running) |
-| `time_of_day`, `grade` | 0.5, scene default | world only; per-shot override allowed |
+| `time_of_day`, `grade` | 0.5, the RegionGrade at the camera (else the World start grade) | world only; per-shot override allowed |
 | `settle_draws` | 1 layout, 30 full | layout: forced draws before capture; full: minimum real frames |
 | `warmup_s` | 0 layout, 3 full | full only: seconds the real render loop runs before capture, so TAA, GI, particles and streaming settle |
 
