@@ -64,6 +64,10 @@ func _run() -> void:
 			model.rotation.y = yaw
 		get_viewport().disable_3d = true
 		await get_tree().create_timer(3.0).timeout  # let the region and camera settle
+		# Stand her on what actually loaded: height data can lag the region on
+		# a fast machine, which left her under the estate.
+		feyre.global_position = _ground(feyre, at)
+		await get_tree().create_timer(0.5).timeout
 		if not hud.pin.active or hud.pin.xz != pin_at:
 			hud.set_pin(pin_at)
 		hud.wind.gust()
@@ -80,6 +84,16 @@ func _run() -> void:
 		print("WAYFIND %s: %d frames, marker %s edge=%s, wind %s heading %s" % [beat[0], beat[3],
 			hud.marker.shown_at, hud.marker.on_edge, hud.wind.gusting, hud.wind.heading])
 	get_tree().quit(0)
+
+
+func _ground(feyre: Node3D, at: Vector2) -> Vector3:
+	var space := feyre.get_world_3d().direct_space_state
+	var q := PhysicsRayQueryParameters3D.create(Vector3(at.x, 400.0, at.y), Vector3(at.x, -200.0, at.y))
+	if feyre is CollisionObject3D:
+		q.exclude = [(feyre as CollisionObject3D).get_rid()]
+	var hit := space.intersect_ray(q)
+	var y: float = (hit.position as Vector3).y if hit else WorldHeight.height_at(at.x, at.y)
+	return Vector3(at.x, y + 0.3, at.y)
 
 
 func _named_beats(args: PackedStringArray) -> bool:
