@@ -137,3 +137,92 @@ func test_facade_node_is_built_into_the_house() -> void:
 		var mmis := f.find_children("*", "MultiMeshInstance3D", false, false)
 		gut.p("facade multimeshes (draw calls before shadows): %d" % mmis.size())
 		assert_lte(mmis.size(), 16)
+
+
+## F39: a 1.4 m lane from the drive, up the front steps and to the front door
+## is clear for her capsule (no riser, column, pilaster or balcony in the way).
+func test_front_steps_walk_in_is_clear() -> void:
+	await get_tree().physics_frame
+	var ramps := ManorFacade.step_ramps(all)
+	var front: Dictionary = {}
+	for r: Dictionary in ramps:
+		if absf((r.from as Vector3).x) < 1.0 and (r.from as Vector3).z > -28.0:
+			front = r
+	assert_false(front.is_empty(), "a walk-in ramp over the front flight")
+	if front.is_empty():
+		return
+	assert_gte(front.width, 1.4)
+	var slope := rad_to_deg(atan2((front.to as Vector3).y - (front.from as Vector3).y,
+			Vector2((front.to as Vector3).x - (front.from as Vector3).x, (front.to as Vector3).z - (front.from as Vector3).z).length()))
+	gut.p("front ramp %s -> %s, slope %.1f deg, width %.1f m" % [front.from, front.to, slope, front.width])
+	assert_lt(slope, 40.0, "within her 45 degree floor limit")
+	var door_z := ManorSitePlan.FRONT_DOOR.z + 0.5   # capsule front 0.2 m short of the closed leaves
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.3
+	capsule.height = 1.7
+	var space := (house.get_world_3d() as World3D).direct_space_state
+	var lift := Vector3(0, 0.85 + 0.06, 0)
+	var blocked := PackedStringArray()
+	for x in [-0.7, 0.0, 0.7]:
+		var path: Array[Vector3] = [Vector3(x, (front.from as Vector3).y, -15.0), Vector3(x, (front.from as Vector3).y, (front.from as Vector3).z),
+			Vector3(x, (front.to as Vector3).y, (front.to as Vector3).z), Vector3(x, (front.to as Vector3).y, door_z)]
+		for i in path.size() - 1:
+			var q := PhysicsShapeQueryParameters3D.new()
+			q.shape = capsule
+			q.collision_mask = EstateKit.WORLD_LAYER
+			q.transform = Transform3D(Basis.IDENTITY, path[i] + lift)
+			q.motion = path[i + 1] - path[i]
+			var hit := space.cast_motion(q)
+			if hit.size() == 2 and hit[0] < 1.0:
+				blocked.append("x %.1f leg %d stops at %.0f%%" % [x, i, hit[0] * 100.0])
+	assert_eq(blocked, PackedStringArray())
+
+
+func test_every_outside_flight_gets_a_ramp() -> void:
+	var ramps := ManorFacade.step_ramps(all)
+	gut.p("step ramps: %d" % ramps.size())
+	assert_gte(ramps.size(), 4, "front flight and the three garden flights")
+
+
+## F39 as a walk: her capsule (Feyre's body settings) walks from the drive
+## straight to the front door on a flat ground plane and must arrive.
+func test_capsule_walks_up_the_front_steps() -> void:
+	var ground := StaticBody3D.new()
+	var gs := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(40, 1, 40)
+	gs.shape = box
+	ground.add_child(gs)
+	ground.position = Vector3(0, ManorSitePlan.base_y() - 0.5, -10)
+	ground.collision_layer = EstateKit.WORLD_LAYER
+	holder.add_child(ground)
+	for x in [-0.7, 0.0, 0.7]:
+		var reached := await _walk(Vector3(x, ManorSitePlan.base_y() + 0.9, -16.0), ManorSitePlan.FRONT_DOOR.z + 0.6)
+		assert_true(reached, "walks from the drive to the door at x %.1f" % x)
+	ground.free()
+
+
+func _walk(from: Vector3, to_z: float) -> bool:
+	var body := CharacterBody3D.new()
+	var cs := CollisionShape3D.new()
+	var cap := CapsuleShape3D.new()
+	cap.radius = 0.3
+	cap.height = 1.7
+	cs.shape = cap
+	body.add_child(cs)
+	body.collision_layer = 0
+	body.collision_mask = EstateKit.WORLD_LAYER
+	body.floor_snap_length = 0.4
+	holder.add_child(body)
+	body.global_position = from
+	var ok := false
+	for i in 240:   # 4 s at 60 Hz, 4.5 m/s
+		await get_tree().physics_frame
+		body.velocity = Vector3(0, body.velocity.y - 9.8 / 60.0 if not body.is_on_floor() else 0.0, -4.5)
+		body.move_and_slide()
+		if body.global_position.z <= to_z:
+			ok = true
+			break
+	gut.p("walk x %.1f ends at %s" % [from.x, body.global_position.snapped(Vector3.ONE * 0.01)])
+	body.free()
+	return ok
