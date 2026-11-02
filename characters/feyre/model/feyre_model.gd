@@ -27,6 +27,8 @@ const LOOK_AFTER := 9.0
 
 var skeleton: Skeleton3D
 var body: MeshInstance3D
+## Lashes carry blink_L / blink_R too, so set_shape closes the fringe with the lids.
+var lashes: MeshInstance3D
 var hair: Node3D
 var anim: AnimationPlayer
 var _mover: CharacterBody3D
@@ -38,6 +40,7 @@ var _animator: FeyreAnimator
 func _ready() -> void:
 	skeleton = find_child("Skeleton3D", true, false) as Skeleton3D
 	body = find_child("Body", true, false) as MeshInstance3D
+	lashes = find_child("Lashes", true, false) as MeshInstance3D
 	var lod := find_child("Body_LOD1", true, false) as MeshInstance3D
 	for mi: MeshInstance3D in [body, lod]:
 		if mi != null:
@@ -163,9 +166,12 @@ static func surface_name_of(mesh: Mesh, index: int) -> String:
 func set_shape(shape_name: String, weight: float) -> void:
 	if body == null:
 		return
-	var idx := body.find_blend_shape_by_name(shape_name)
-	if idx >= 0:
-		body.set_blend_shape_value(idx, clampf(weight, 0.0, 1.0))
+	for mi: MeshInstance3D in [body, lashes]:
+		if mi == null:
+			continue
+		var idx := mi.find_blend_shape_by_name(shape_name)
+		if idx >= 0:
+			mi.set_blend_shape_value(idx, clampf(weight, 0.0, 1.0))
 
 
 ## Hides body surfaces covered by clothing (e.g. ["torso", "arms"] for a tunic).

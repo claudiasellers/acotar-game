@@ -271,6 +271,29 @@ def detail_weight(P):
     return np.clip(np.maximum.reduce([face, ears * 0.6, hands * 0.55]), 0, 1)
 
 
+def relax_head_folds(me, z_min=1.38, iters=4):
+    """Decimation can leave a folded vertex in the tight bits of the face (a mouth
+    corner, a lid end) that renders as a dark dent.  Pull any head vertex whose
+    normal disagrees with a neighbour's to the centre of its neighbours."""
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    moved = set()
+    for _ in range(iters):
+        bm.normal_update()
+        bad = [v for v in bm.verts if v.co.z > z_min and v.link_edges
+               and min(v.normal.dot(e.other_vert(v).normal) for e in v.link_edges) < 0.3]
+        if not bad:
+            break
+        for v in bad:
+            nb = [e.other_vert(v).co for e in v.link_edges]
+            v.co = sum(nb, Vector()) / len(nb)
+            moved.add(v.index)
+    bm.to_mesh(me)
+    bm.free()
+    me.update()
+    return len(moved)
+
+
 def build_body():
     grid = fs.build_grid(GRID_H)
     V, Q = sdf.surface_nets(grid)
@@ -336,14 +359,15 @@ def build_body():
     bm.free()
     body.data.validate()
     print("body islands dropped:", len(islands) - 1, "verts", sum(len(i) for i in islands[1:]))
+    print("head folds relaxed:", relax_head_folds(body.data))
     return body, grid
 
 
 # --------------------------------------------------------------------------
 # Eyes: planar-mapped spheres with a painted iris; lashes from the lid edge
 # --------------------------------------------------------------------------
-IRIS_R = 0.62    # iris radius as a fraction of the eyeball radius (front view)
-PUPIL_R = 0.26
+IRIS_R = fs.IRIS_R    # iris radius as a fraction of the eyeball radius (front view)
+PUPIL_R = fs.PUPIL_R
 UV_SPAN = 1.1    # UV square covers +/- UV_SPAN * EYE_R
 
 
@@ -358,8 +382,8 @@ def bake_iris_texture(path, size=256):
     col[..., :3] -= np.array([0.03, 0.05, 0.06]) * smoothstep(0.2, 1.0, V)[..., None]  # lid shadow
     # iris: blue-grey, lighter round the pupil, radial fibres, dark limbal ring
     t = np.clip(r / IRIS_R, 0, 1)
-    outer = np.array([0.30, 0.42, 0.55])
-    inner = np.array([0.62, 0.74, 0.82])
+    outer = np.array([0.27, 0.40, 0.56])
+    inner = np.array([0.66, 0.78, 0.88])
     gold = np.array([0.75, 0.70, 0.55])
     iris = outer[None, None] * (t[..., None]) + inner[None, None] * (1 - t[..., None])
     fib = 0.5 + 0.5 * np.sin(ang * 31.0 + np.sin(ang * 7.0) * 2.0) * np.sin(ang * 13.0 + 1.3)
@@ -373,7 +397,7 @@ def bake_iris_texture(path, size=256):
     m_pup = 1.0 - smoothstep(PUPIL_R - 0.02, PUPIL_R + 0.01, r)
     col[..., :3] = col[..., :3] * (1 - m_pup[..., None]) + np.array([0.04, 0.04, 0.07]) * m_pup[..., None]
     # painted catchlights: a big soft one upper-left, a little one lower-right
-    for cu, cv, rad, k in ((-0.20, 0.24, 0.13, 1.0), (0.22, -0.20, 0.06, 0.85)):
+    for cu, cv, rad, k in ((-0.21, 0.25, 0.15, 1.0), (0.24, -0.21, 0.07, 0.85)):
         d = np.sqrt((U - cu) ** 2 + (V - cv) ** 2)
         m = (1.0 - smoothstep(rad * 0.75, rad, d)) * k
         col[..., :3] = col[..., :3] * (1 - m[..., None]) + m[..., None]
@@ -429,36 +453,60 @@ def lid_rim_points(P, side, n=15):
     return pts
 
 
+def _lid_at(side, upper, tx, extra):
+    """Point and outward direction on the lid margin at tx (-1 inner corner .. 1 outer)."""
+    P, D = fs.lid_curve(side, upper, n=121, extra=extra)
+    f = (np.clip(tx, -1.0, 1.0) + 1.0) * 60.0
+    i = min(int(f), 119)
+    w = f - i
+    p = P[i] * (1 - w) + P[i + 1] * w
+    d = D[i] * (1 - w) + D[i + 1] * w
+    return Vector(p.tolist()), Vector((d / np.linalg.norm(d)).tolist())
+
+
 def build_lashes(body_P):
+    """Tapered lash clumps: a full upper fringe that lengthens and sweeps out to a
+    flick at the outer corner, plus a few fine lower lashes at the outer half.
+    Every lash is two rows of four verts (under, base, mid, tip) whose tips meet,
+    so per-row tools (build_cast's LASH scaling) still work."""
     bm = bmesh.new()
+    clumps = [(True, -0.93 + 1.89 * k / (fs.LASH_CLUMPS - 1)) for k in range(fs.LASH_CLUMPS)]
+    clumps += [(False, 0.05 + 0.90 * k / max(1, fs.LASH_LOWER - 1)) for k in range(fs.LASH_LOWER)]
     for s in (1, -1):
-        P, D = fs.lid_curve(s, True, n=15, extra=fs.LID_R[0] * 0.55)
-        P = P - np.array([0.0, 0.0, fs.LID_R[0] * 0.2])
-        n = len(P)
-        rows = []
-        for i in range(n):
-            tx = -0.96 + 1.92 * i / (n - 1)
+        for k, (upper, tx) in enumerate(clumps):
+            extra = fs.LID_R[0 if upper else 1] * 0.15
+            centre, dv = _lid_at(s, upper, tx, extra)
             outer = max(0.0, tx)
-            length = 0.0018 + 0.0052 * smoothstep(-0.4, 1.0, tx) ** 1.5
-            if i % 2 == 1:
-                length *= 0.86  # soft clumps
-            if i in (0, n - 1):
-                length *= 0.4
-            dv = Vector(D[i].tolist())
-            out_dir = (dv + Vector((s * 1.2 * outer, -0.35, 0.25))).normalized()
-            base = Vector(P[i].tolist())
-            mid = base + out_dir * length * 0.5 + Vector((0, 0, length * 0.08))
-            tip = base + out_dir * length + Vector((0, 0, length * 0.15))
-            under = base - dv * 0.0012
-            rows.append([bm.verts.new(under), bm.verts.new(base), bm.verts.new(mid), bm.verts.new(tip)])
-        for i in range(n - 1):
+            if upper:
+                centre -= Vector((0.0, 0.0, fs.LID_R[0] * 0.9))   # root on the lid edge
+                length = fs.LASH_LEN[0] + fs.LASH_LEN[1] * smoothstep(-0.4, 1.0, tx) ** 1.5
+                length *= (0.88, 1.0, 0.94)[k % 3]          # soft, uneven clumps
+                length *= 0.45 + 0.55 * smoothstep(-1.0, -0.72, tx)   # short at the inner corner
+                out_dir = (dv + Vector((s * fs.LASH_FLICK * outer, -0.35, 0.25 + 0.15 * outer))).normalized()
+                curl = Vector((0.0, 0.0, 1.0))
+                half_w = 0.00115
+            else:
+                length = (0.0011 + 0.0016 * smoothstep(0.0, 0.9, tx)) * (0.9, 1.0)[k % 2]
+                out_dir = (dv + Vector((s * 0.6 * outer, -0.25, -0.15))).normalized()
+                curl = Vector((0.0, 0.0, -1.0))
+                half_w = 0.0006
+            a, b = _lid_at(s, upper, tx - 0.03, extra)[0], _lid_at(s, upper, tx + 0.03, extra)[0]
+            along = (b - a).normalized()
+            tip_c = centre + out_dir * length + curl * length * 0.22
+            rows = []
+            for side_w in (-half_w, half_w):
+                base = centre + along * side_w
+                tip = tip_c + along * side_w * 0.08
+                mid = centre + along * side_w * 0.45 + out_dir * length * 0.5 + curl * length * 0.06
+                under = base - dv * 0.0012
+                rows.append([bm.verts.new(under), bm.verts.new(base), bm.verts.new(mid), bm.verts.new(tip)])
             for r in range(3):
-                a, b2, c2, d2 = rows[i][r], rows[i + 1][r], rows[i + 1][r + 1], rows[i][r + 1]
-                f = bm.faces.new((a, d2, c2, b2) if s > 0 else (a, b2, c2, d2))
+                q = rows[0][r], rows[1][r], rows[1][r + 1], rows[0][r + 1]
+                f = bm.faces.new((q[0], q[3], q[2], q[1]) if s > 0 else q)
                 f.smooth = True
     bm.normal_update()
     obj = obj_from_bm("Lashes", bm)
-    obj.data.materials.append(make_material("lashes", srgb("#3B2A26"), 0.5, cull=False))
+    obj.data.materials.append(make_material("lashes", srgb("#2E201D"), 0.45, cull=False))
     return obj
 
 
@@ -669,10 +717,12 @@ def lid_delta(P, side, upper=1.0, lower=1.0):
     q = P - c
     dist = np.linalg.norm(q, axis=1)
     ax, az, up, lo = fs.eye_angles(q[:, 0], q[:, 1], q[:, 2], side)
-    near = (q[:, 1] < 0.004) & (dist < EYE_R + 0.016) & (np.abs(ax) < fs.EYE_OPEN_W * 1.15)
-    near = near * (1.0 - smoothstep(EYE_R + 0.008, EYE_R + 0.016, dist))
+    # soft falloffs all round (no hard cut at the eye corners), so the brow and the
+    # bridge of the nose stay smooth while the lid closes
+    near = (q[:, 1] < 0.004) * (1.0 - smoothstep(EYE_R + 0.006, EYE_R + 0.014, dist))
+    near = near * (1.0 - smoothstep(fs.EYE_OPEN_W * 1.0, fs.EYE_OPEN_W * 1.3, np.abs(ax)))
     meet = -0.3 * lo
-    wu = smoothstep(up + math.radians(40), up + math.radians(4), az) * (az > meet) * near * upper
+    wu = smoothstep(up + math.radians(30), up + math.radians(3), az) * (az > meet) * near * upper
     wl = smoothstep(-lo - math.radians(28), -lo - math.radians(3), az) * (az <= meet) * near * lower
     phi = -(up - meet) * wu + (meet + lo) * wl     # signed rotation (down is negative)
     rho = np.sqrt(q[:, 1] ** 2 + q[:, 2] ** 2)
@@ -681,6 +731,36 @@ def lid_delta(P, side, upper=1.0, lower=1.0):
     out[:, 1] = -rho * np.cos(alpha) - q[:, 1]
     out[:, 2] = rho * np.sin(alpha) - q[:, 2]
     return out
+
+
+def lash_blink_delta(P, side):
+    """Upper lashes swing down with the upper lid (same rotation as lid_delta at full
+    weight, so the fringe rides the lid edge); lower lashes stay."""
+    c = np.array([EYE_X * side, EYE_Y, EYE_Z])
+    q = P - c
+    ax, az, up, lo = fs.eye_angles(q[:, 0], q[:, 1], q[:, 2], side)
+    meet = -0.3 * lo
+    w = ((q[:, 0] * side) > -0.03) & (az > meet)
+    phi = -(up - meet) * w
+    rho = np.sqrt(q[:, 1] ** 2 + q[:, 2] ** 2)
+    alpha = np.arctan2(q[:, 2], -q[:, 1]) + phi
+    out = np.zeros_like(P)
+    out[:, 1] = -rho * np.cos(alpha) - q[:, 1]
+    out[:, 2] = rho * np.sin(alpha) - q[:, 2]
+    return out
+
+
+def add_lash_shape_keys(lashes):
+    """blink_L / blink_R on the lashes, named like the body's, so one call drives both."""
+    me = lashes.data
+    P = verts_np(me)
+    lashes.shape_key_add(name="Basis", from_mix=False)
+    for name, side in (("blink_L", 1), ("blink_R", -1)):
+        d = lash_blink_delta(P, side) * ((P[:, 0] * side) > 0)[:, None]
+        sk = lashes.shape_key_add(name=name, from_mix=False)
+        sk.data.foreach_set("co", (P + d).ravel())
+        sk.value = 0.0
+        sk.slider_min, sk.slider_max = 0.0, 1.0
 
 
 def add_body_shape_keys(obj, vreg):
@@ -1157,6 +1237,7 @@ def main():
     skin_to_armature(lod, arm)
 
     add_body_shape_keys(body, vreg)
+    add_lash_shape_keys(lashes)
 
     # Hunting outfit.
     kb = body.data.shape_keys.key_blocks
