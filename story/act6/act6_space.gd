@@ -176,19 +176,3 @@ class GroundLeadBeat:
 			who.global_position = Vector3(p.x, WorldHeight.height_at(p.x, p.z), p.z)
 		return super.tick(space, delta)
 
-
-## Safe on an actor freed elsewhere (a region unload, another scene's dismiss).
-func actor(actor_id: StringName) -> Node3D:
-	var v: Variant = actors.get(actor_id)
-	if v == null or not is_instance_valid(v):
-		return null
-	return v as Node3D
-
-
-## Leaves the story_actor group at once: queue_free waits a frame, and a scene
-## casting the same character in that frame would be handed the dying node.
-func dismiss(actor_id: StringName) -> void:
-	var who := actor(actor_id)
-	if who and is_ancestor_of(who):
-		who.remove_from_group(StringName("story_actor_%s" % actor_id))
-	super.dismiss(actor_id)
