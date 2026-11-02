@@ -1,0 +1,3 @@
+from L13
+quality look
+shot dressing res://tools/dressing_room_shot.tscn all {out}
