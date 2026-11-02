@@ -15,6 +15,7 @@ marks = {
 "hall_east": Vector3(-14, 0, -6.5),
 "hall_mid": Vector3(-21, 0, -6.5),
 "head_chair": Vector3(-5.6, 0, -6.5),
+"lucien_face": Vector3(-3.4, 0, -6.5),
 "lucien_seat": Vector3(-3.4, 0, -7.6),
 "table": Vector3(0, 0, -6.5),
 "tamlin_seat": Vector3(-4.4, 0, -6.5)

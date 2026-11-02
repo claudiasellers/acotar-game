@@ -79,6 +79,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			held = false
 			seated = false
+			unseat_feyre()
 			EventBus.celebration_requested.emit(&"meal", mark(&"plate"))
 			_use_seat_camera(false)
 			StoryControl.release(), "the bonds loosen"),
@@ -95,9 +96,10 @@ func _build_beats() -> Array:
 func _set_the_scene(_s: SceneSpace) -> void:
 	_seen_presses = presses()
 	_seen_nudges = nudges()
-	for spec: Array in [[&"tamlin", &"tamlin_seat", &"table"], [&"lucien", &"lucien_seat", &"lucien_face"]]:
-		cast(spec[0], spec[1], spec[2])
-		sit(spec[0])
+	cast(&"tamlin", &"tamlin_seat", &"table")
+	sit(&"tamlin", &"chair_head_dining")
+	cast(&"lucien", &"lucien_seat", &"lucien_face")
+	sit(&"lucien")
 	if table == null or not is_instance_valid(table):
 		table = DinnerTable.new()
 		table.name = "DinnerTable"
@@ -149,6 +151,7 @@ func _seat_her() -> void:
 		(p as CharacterBody3D).velocity = Vector3.ZERO
 	var seat := mark(&"feyre_chair")
 	p.global_position = Vector3(seat.x, p.global_position.y if absf(p.global_position.y - seat.y) < 1.5 else seat.y, seat.z)
+	seat_feyre(&"feyre_seat", &"table")
 
 
 func tick(delta: float) -> void:
@@ -223,6 +226,8 @@ func _clear_the_scene(_s: SceneSpace) -> void:
 
 
 func _finish() -> void:
+	if seated:
+		unseat_feyre()
 	held = false
 	seated = false
 	_use_seat_camera(false)

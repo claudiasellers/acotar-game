@@ -6,6 +6,7 @@
 script = ExtResource("1")
 marks = {
 "feyre_chair": Vector3(4.95, 0, -6.5),
+"feyre_seat": Vector3(4.4, 0, -6.5),
 "feyre_close": Vector3(1.7, 0, -6.5),
 "table": Vector3(0, 0, -6.5),
 "tamlin_close": Vector3(-1.6, 0, -6.5),

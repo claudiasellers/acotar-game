@@ -119,19 +119,49 @@ func cast(actor_id: StringName, at_mark: StringName, face_mark: StringName = &""
 	return who
 
 
-## Sits a cast actor in the chair they stand at: FilmPose's sit drops the hips
-## to seat height and swings the thighs forward, so the actor's origin stays
-## on the floor at the chair's centre, facing out from the back. No-op on a
-## stand-in with no skeleton.
-func sit(actor_id: StringName, pose_name: StringName = &"sit") -> void:
+## Sits a cast actor in the chair they stand at (`chair` a FilmPose.CHAIRS id):
+## the pose fits their legs to it, so the actor's origin stays on the floor at
+## the chair's centre, facing out from the back. No-op on a stand-in with no
+## skeleton.
+func sit(actor_id: StringName, chair: StringName = &"chair_dining") -> void:
 	var fp := FilmPose.on(actor(actor_id))
 	if fp:
-		fp.to(pose_name, 0.0)
+		fp.to(&"sit", 0.0, chair)
 
 
 ## Out of the chair: the body goes free of the sit pose.
 func rise(actor_id: StringName) -> void:
 	var fp := FilmPose.on(actor(actor_id))
+	if fp:
+		fp.to(&"", 0.0)
+
+
+## Sits Feyre's model in a chair, facing `face_mark`. Her body stays on its
+## mark behind the chair, where the chair's collision box leaves it alone. No-op
+## on a stand-in with no model.
+func seat_feyre(seat_mark: StringName, face_mark: StringName, chair: StringName = &"chair_dining") -> void:
+	var p := player()
+	var model: Variant = p.get(&"model") if p else null
+	if not model is Node3D:
+		return
+	var seat := mark(seat_mark)
+	var body := (model as Node3D)
+	body.global_position = Vector3(seat.x, p.global_position.y, seat.z)
+	var ahead := mark(face_mark) - seat
+	body.global_basis = Basis.looking_at(Vector3(ahead.x, 0.0, ahead.z).normalized(), Vector3.UP)
+	var fp := FilmPose.on(body)
+	if fp:
+		fp.to(&"sit", 0.0, chair)
+
+
+## Feyre out of the chair: her model back on her body, free of the pose.
+func unseat_feyre() -> void:
+	var p := player()
+	var model: Variant = p.get(&"model") if p else null
+	if not model is Node3D:
+		return
+	(model as Node3D).position = Vector3.ZERO
+	var fp := FilmPose.on(model as Node3D)
 	if fp:
 		fp.to(&"", 0.0)
 
