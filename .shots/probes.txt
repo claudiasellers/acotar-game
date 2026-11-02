@@ -1,0 +1,7 @@
+from L32 human realm after rocks smoke palette
+quality look
+size 1920x1080
+timeout 600
+shot village res://tools/world_shot.tscn village_market {out}/village_market.png
+shot cottage res://tools/world_shot.tscn cottage_snow {out}/cottage_snow.png
+shot wcs res://tools/world_shot.tscn wall_crossing_spring {out}/wall_crossing_spring.png
