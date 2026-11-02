@@ -12,6 +12,9 @@
 ##                     contract's forage_field metas)
 ##   TrunkColliders    one static body per chunk, shapes added on the server
 ##   Water, Landmarks  rivers, ponds, falls; named places and story anchors
+##   Places            each named place's setting (data/places/woods_places.tres,
+##                     PlaceComposer): a clear forecourt, planted collar, its
+##                     own light, particles and sound
 ##   GroundCover       DetailScatter: dense flowers and grass near Feyre
 ##   AmbientLife       particles and small creatures driven by the biome
 class_name WoodsRegion
@@ -42,6 +45,9 @@ const HERO_STYLE := {&"ancient_oak": [0.75, 1.2], &"crab_apple": [1.35, 0.3], &"
 		&"hawthorn": [1.4, 0.25], &"standing_stone": [1.5, 0.6], &"fallen_log": [1.0, 0.0],
 		&"twisted_dead": [1.3, 0.4]}
 const WATER_SHADER := preload("res://world/spring_court/shared/woods_water.gdshader")
+const PLACES_TABLE := "res://data/places/woods_places.tres"
+## Trees stand this much further back than shrubs from a place's forecourt.
+const PLACE_TREE_MARGIN := 3.0
 
 @export var def: WoodsRegionDef
 ## Build the stand-in terrain (off once the World scene's Terrain3D is live).
@@ -68,6 +74,8 @@ var _jobs: Array[Callable] = []
 var _fields: Dictionary = {}
 var _terrain_mat: StandardMaterial3D
 var _grid := Vector2i.ZERO
+## The named places inside this region (PlaceComposer settings).
+var _places: Array[PlaceSetting] = []
 
 
 func _ready() -> void:
@@ -78,6 +86,10 @@ func _ready() -> void:
 	# Warm the static noise/feature caches here before the worker reads them,
 	# and fingerprint the inputs so a stale cache is never trusted.
 	_fingerprint = WoodsScatterCache.fingerprint_for(def)
+	_places = own_places(def)
+	# Main thread, before the worker: a worker that loads a model can need the
+	# main thread (see PlaceComposer.prewarm).
+	PlaceComposer.prewarm(_places)
 	_start()
 
 
@@ -199,6 +211,8 @@ func _prepare() -> void:
 	var species := {}
 	for kind in KINDS:
 		var points: Dictionary = cache.placements[kind]
+		if kind != "forage":
+			points = clear_forecourts(points, _places, PLACE_TREE_MARGIN if kind == "tree" else 0.0)
 		for id: StringName in WoodsScatter.sorted_ids(points):
 			if BuildCancel.requested(def.region_id):
 				return
@@ -225,6 +239,7 @@ func _prepare() -> void:
 		_grid = cache.grid
 		out["terrain"] = _terrain_chunks(cache)
 	out["ribbons"] = _water_ribbons()
+	out["places"] = place_layers(def, _places)
 	WoodsComposition.of(def)
 	_prepare_extra()
 	_prepared = out
@@ -356,6 +371,7 @@ func _queue_jobs() -> void:
 	for ribbon in _prepared["ribbons"]:
 		_jobs.append(_job_ribbon.bind(ribbon))
 	_jobs.append(_job_landmarks)
+	_jobs.append(_job_places)
 	if build_ground_cover:
 		_jobs.append(_job_ground_cover)
 	if build_ambient_life:
@@ -598,6 +614,61 @@ func _job_landmarks() -> void:
 	landmarks.name = "Landmarks"
 	add_child(landmarks)
 	_build_landmarks(landmarks)
+
+
+func _job_places() -> void:
+	var holder := Node3D.new()
+	holder.name = "Places"
+	add_child(holder)
+	var typed: Array[ScatterLayer] = []
+	typed.assign(_prepared.get("places", []))
+	if not typed.is_empty():
+		var field := ScatterField.new()
+		field.name = "PlaceScatter"
+		field.region_id = def.region_id
+		field.chunk_size = CHUNK_SHRUB
+		field.layers = typed
+		holder.add_child(field)
+	PlaceComposer.build_nodes(holder, _places)
+
+
+## The settings of the named places whose centre lies in this region.
+static func own_places(region_def: WoodsRegionDef) -> Array[PlaceSetting]:
+	var out: Array[PlaceSetting] = []
+	var t := PlaceComposer.table(PLACES_TABLE)
+	var rect: Rect2 = region_def.provider.BOUNDS
+	for s in PlaceComposer.in_rect(t, rect):
+		if rect.has_point(s.center):
+			out.append(s)
+	return out
+
+
+## `points` ({id: x,y,z,yaw,scale...}) without anything standing in a place's
+## forecourt grown by `extra` m, so the place reads as a clearing. Pure.
+static func clear_forecourts(points: Dictionary, places: Array[PlaceSetting], extra: float) -> Dictionary:
+	if places.is_empty():
+		return points
+	var out := {}
+	for id: StringName in points:
+		var inst: PackedFloat32Array = points[id]
+		var kept := PackedFloat32Array()
+		for o in range(0, inst.size(), ScatterLayer.STRIDE):
+			if not PlaceComposer.blocks(places, Vector2(inst[o], inst[o + 2]), extra):
+				kept.append_array(inst.slice(o, o + ScatterLayer.STRIDE))
+		if not kept.is_empty():
+			out[id] = kept
+	return out
+
+
+## Collar beds, framing pair and props for `places` (pure; worker-safe once
+## PlaceComposer.prewarm ran). Never on water, never outside the region.
+static func place_layers(region_def: WoodsRegionDef, places: Array[PlaceSetting]) -> Array[ScatterLayer]:
+	var provider: Variant = region_def.provider
+	var rect: Rect2 = provider.BOUNDS
+	var mesh_for := func(id: StringName) -> Mesh: return CourtAssets.mesh(id)
+	var ground := func(p: Vector2) -> float: return WorldHeight.height_at(p.x, p.y)
+	var owns := func(p: Vector2) -> bool: return rect.has_point(p) and not provider.is_water(p.x, p.y)
+	return PlaceComposer.layers(places, region_def.seed, mesh_for, ground, owns)
 
 
 func _job_ground_cover() -> void:
