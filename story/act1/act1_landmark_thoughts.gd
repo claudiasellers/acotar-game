@@ -51,12 +51,34 @@ func _process(delta: float) -> void:
 	if WorldState.has_flag(DONE_FLAG):
 		set_process(false)
 		return
+	# A save loaded, or a dev jump, past the winter never sets the wolf flag:
+	# the ch1 trail is over all the same (L46-4).
+	if past_winter():
+		set_process(false)
+		queue_free()
+		return
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre == null:
 		return
 	update(Vector2(feyre.global_position.x, feyre.global_position.z), delta)
 	if not _queued.is_empty():
 		_try_show()
+
+
+## True once the story's phase ladder is beyond p0_winter.
+static func past_winter() -> bool:
+	var ladder := PhaseManager.phase_set
+	if ladder == null or PhaseManager.current_phase == &"":
+		return false
+	var at := -1
+	var winter := -1
+	for i in ladder.phases.size():
+		var id: StringName = ladder.phases[i].id
+		if id == PhaseManager.current_phase:
+			at = i
+		if id == &"p0_winter":
+			winter = i
+	return winter >= 0 and at > winter
 
 
 ## Advances from where Feyre stands (x, z). Returns the line raised, or "".

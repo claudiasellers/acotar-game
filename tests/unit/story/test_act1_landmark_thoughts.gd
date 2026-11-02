@@ -74,3 +74,22 @@ func test_a_landmark_shows_on_the_thoughts_card() -> void:
 	thoughts._try_show()
 	assert_true(journal.showing)
 	assert_eq(journal.shown_thread.line(0), Act1LandmarkThoughts.LANDMARKS[1][4])
+
+
+## L46-4: a dev jump or a loaded save in P6 has no fact.wolf_spotted; the
+## wrong-way thought must not fire there. The node frees itself past p0_winter.
+func test_silent_past_the_winter_without_the_wolf_flag() -> void:
+	var saved_set: PhaseSet = PhaseManager.phase_set
+	var saved_phase: StringName = PhaseManager.current_phase
+	PhaseManager.phase_set = load("res://data/phases/spring_court_phases.tres") as PhaseSet
+	PhaseManager.current_phase = &"p6_blight_tightens"
+	assert_true(Act1LandmarkThoughts.past_winter())
+	assert_false(WorldState.has_flag(Act1LandmarkThoughts.DONE_FLAG))
+	var thoughts := Act1LandmarkThoughts.new()
+	add_child(thoughts)
+	await wait_process_frames(2)
+	assert_false(is_instance_valid(thoughts), "freed itself in p6")
+	PhaseManager.current_phase = &"p0_winter"
+	assert_false(Act1LandmarkThoughts.past_winter(), "still on in the winter")
+	PhaseManager.phase_set = saved_set
+	PhaseManager.current_phase = saved_phase
