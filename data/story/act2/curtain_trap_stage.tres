@@ -16,6 +16,7 @@ marks = {
 "fixture": Vector3(0.5, 3, 17.6)
 }
 lines = {
+"rig_now": {"text": "Before anyone comes. The curtain rope, tied to the light, to snap in their face.", "who": ""},
 "alis_bones": {"text": "You think a bit of rope snapping in my face will keep me from breaking your bones?", "who": "Alis"},
 "alis_cauldron": {"text": "What in the bottomless depths of the Cauldron is—", "who": "Alis"},
 "alis_curtains": {"text": "But did you have to wreck those lovely curtains?", "who": "Alis"},
