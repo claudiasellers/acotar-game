@@ -635,4 +635,6 @@ func _build_grade() -> void:
 	grade.name = "RegionGrade"
 	grade.grade = content.grade
 	grade.bounds = content.bounding_rect()
+	grade.rects = content.bounds
+	grade.holes = content.holes
 	add_child(grade)

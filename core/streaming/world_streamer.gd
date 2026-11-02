@@ -104,8 +104,15 @@ func loaded_ids() -> PackedStringArray:
 	return PackedStringArray(_loaded.keys())
 
 
-## The region Feyre is standing in: the one whose edge she is deepest inside.
+## The region Feyre is standing in. In the wider court the macro-map's
+## rectangles decide (docs/contracts/world.md), because the streaming circles
+## overlap a lot there: the Blighted Reaches' circle covers the solstice
+## plateau more deeply than the meadow's own does. Elsewhere, the circle whose
+## edge she is deepest inside.
 func region_at(point: Vector3) -> RegionDef:
+	var mapped := CourtMap.region_at(point.x, point.z)
+	if mapped != &"" and _regions.has(String(mapped)):
+		return _regions[String(mapped)]
 	var best: RegionDef = null
 	var best_d := 0.0
 	for region: RegionDef in _regions.values():

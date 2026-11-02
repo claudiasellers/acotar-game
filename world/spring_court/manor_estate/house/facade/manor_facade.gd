@@ -156,6 +156,8 @@ static func dress(house: Node3D, all: ManorHouseIndex, cache: bool = false) -> N
 	var views: Array = plan.get(&"views", [])
 	if not views.is_empty():
 		root.add_child(_pane_multimesh(views, view_material(), "facade_views"))
+	for r: Dictionary in step_ramps(all):
+		root.add_child(_ramp_body(r))
 	var glow := ManorFacadeGlow.new()
 	glow.name = "Glow"
 	glow.materials.append(window_material())
@@ -531,3 +533,134 @@ static func _dress_window(plan: Dictionary, w: Dictionary) -> void:
 	var view_at: Vector2 = (w.at as Vector2) - out * 0.06
 	var view := Transform3D(_basis(-out, w.width, top - bottom), Vector3(view_at.x, (bottom + top) * 0.5, view_at.y))
 	plan[&"views"].append([view, seed, level / 3.0])
+
+
+# --- Walk-in ramps over the outside steps (F39) ------------------------------------
+
+const STEP_DEPTH := 3.0      # stone_steps catalogue size (4 x 1.8 x 3)
+const STEP_WIDTH := 4.0
+const STEP_HEIGHT := 1.8
+const RAMP_THICK := 0.4
+
+## One invisible ramp collider per outside flight of stone_steps, its surface
+## laid along the step nosings, so a capsule walks up instead of catching on a
+## riser (her capsule can't climb a 0.15 m edge: the contact is steeper than
+## the 45 degree floor limit). The steps still draw; only the walking surface
+## is smoothed. Each: {from: Vector3 (foot, on the ground), to: Vector3 (top
+## nosing), x0, x1 (or z0, z1 for flights descending along x), axis}.
+static func step_ramps(all: ManorHouseIndex) -> Array:
+	var out: Array = []
+	for room in all.rooms:
+		if room.kind != &"exterior":
+			continue
+		var steps: Array = []
+		for p in room.props:
+			if p.prop_id != &"stone_steps":
+				continue
+			var along_x := absf(sin(deg_to_rad(p.yaw_deg))) > 0.5
+			steps.append({"x": room.rect.position.x + p.position.x, "z": room.rect.position.y + p.position.z,
+				"top": ManorHouseBuilder.floor_y(room.level) + p.position.y + STEP_HEIGHT, "ax": along_x})
+		for flight: Array in _flights(steps):
+			var r := _ramp(flight)
+			if not r.is_empty():
+				out.append(r)
+	return out
+
+
+static func _flights(steps: Array) -> Array:
+	var groups: Array = []
+	var seen := {}
+	for i in steps.size():
+		if seen.has(i):
+			continue
+		var group: Array = [steps[i]]
+		seen[i] = true
+		var k := 0
+		while k < group.size():
+			for j in steps.size():
+				if not seen.has(j) and absf(steps[j].x - group[k].x) <= STEP_WIDTH + 0.1 \
+						and absf(steps[j].z - group[k].z) <= STEP_WIDTH + 0.1 and steps[j].ax == group[k].ax:
+					seen[j] = true
+					group.append(steps[j])
+			k += 1
+		groups.append(group)
+	return groups
+
+
+static func _ramp(flight: Array) -> Dictionary:
+	var tops: Array = []
+	for s: Dictionary in flight:
+		var t := snappedf(s.top, 0.01)
+		if not tops.has(t):
+			tops.append(t)
+	tops.sort()
+	if tops.size() < 2:
+		return {}
+	var along_x: bool = flight[0].ax
+	var key := "x" if along_x else "z"
+	var side := "z" if along_x else "x"
+	var low: float = tops[0]
+	var high: float = tops[-1]
+	# Descent direction: from the high steps toward the low ones.
+	var mean := func(t: float) -> float:
+		var sum := 0.0
+		var n := 0
+		for s: Dictionary in flight:
+			if absf(s.top - t) < 0.02:
+				sum += s[key]
+				n += 1
+		return sum / n
+	var dir := signf(mean.call(low) - mean.call(high))
+	var edge := func(t: float) -> float:   # outermost nosing of the steps at top t
+		var best := -INF
+		for s: Dictionary in flight:
+			if absf(s.top - t) < 0.02:
+				best = maxf(best, dir * (s[key] + dir * STEP_DEPTH * 0.5))
+		return best * dir
+	var e_low: float = edge.call(low)
+	var e_next: float = edge.call(tops[1])
+	var riser: float = tops[1] - low
+	var run := absf(e_low - e_next)
+	var foot := e_low + dir * run          # one run out, on the ground
+	var ground := low - riser
+	var e_high: float = edge.call(high)
+	var lo := INF
+	var hi := -INF
+	for s: Dictionary in flight:
+		lo = minf(lo, s[side] - STEP_WIDTH * 0.5)
+		hi = maxf(hi, s[side] + STEP_WIDTH * 0.5)
+	var a := Vector3(0, ground, 0)
+	var b := Vector3(0, high, 0)
+	var mid_side := (lo + hi) * 0.5
+	if along_x:
+		a.x = foot; b.x = e_high; a.z = mid_side; b.z = mid_side
+	else:
+		a.z = foot; b.z = e_high; a.x = mid_side; b.x = mid_side
+	return {"from": a, "to": b, "width": hi - lo - 0.1, "along_x": along_x}
+
+
+static func _ramp_body(r: Dictionary) -> StaticBody3D:
+	var a: Vector3 = r.from
+	var b: Vector3 = r.to
+	var along := (b - a).normalized()
+	var side := Vector3(0, 0, 1) if r.along_x else Vector3(1, 0, 0)
+	var normal := along.cross(side)
+	if normal.y < 0.0:
+		side = -side
+		normal = -normal
+	# Extend 0.4 m past the foot (buried) and 0.1 m onto the landing.
+	var start := a - along * 0.4
+	var end := b + along * 0.1
+	var length := start.distance_to(end)
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(r.width, RAMP_THICK, length)
+	var cs := CollisionShape3D.new()
+	cs.shape = shape
+	var body := StaticBody3D.new()
+	body.name = "StepRamp"
+	body.collision_layer = EstateKit.WORLD_LAYER
+	body.collision_mask = 0
+	var centre := (start + end) * 0.5 - normal * (RAMP_THICK * 0.5 - 0.01)
+	body.transform = Transform3D(Basis(side, normal, along), centre)
+	body.add_child(cs)
+	return body
