@@ -179,6 +179,7 @@ func _fire_until(t: float) -> void:
 	while _next_beat < data.beats.size() and data.beats[_next_beat].at <= t:
 		var b := data.beats[_next_beat]
 		_next_beat += 1
+		_fact(b.name)
 		beat.emit(b.name)
 	while _next_line < data.lines.size() and data.lines[_next_line].at <= t:
 		var l := data.lines[_next_line]
@@ -259,9 +260,31 @@ func _finish(was_skipped: bool) -> void:
 	out.tween_callback(queue_free)
 
 
+## A beat named "fact.<x>" also writes that fact when it fires: the story
+## moment playing the film waits on it to raise its deed at the right frame.
+static func _fact(beat_name: StringName) -> void:
+	var f := String(beat_name)
+	if f.begins_with("fact.") and not WorldState.has_flag(f):
+		WorldState.set_flag(f, true)
+
+
+## Every fact the film writes, in order, ending with its seen flag. Used when
+## the film can't play (headless) or ends early, so the story never waits.
+static func facts_of(film: FilmScript) -> PackedStringArray:
+	var out := PackedStringArray()
+	for b in film.beats:
+		if String(b.name).begins_with("fact."):
+			out.append(String(b.name))
+	if film.seen_flag != "":
+		out.append(film.seen_flag)
+	return out
+
+
 func _mark_seen() -> void:
-	if data.seen_flag != "" and not WorldState.has_flag(data.seen_flag):
-		WorldState.set_flag(data.seen_flag, true)
+	# Skipped or cut short: the facts it never reached are still written.
+	for f in facts_of(data):
+		if not WorldState.has_flag(f):
+			WorldState.set_flag(f, true)
 
 
 func _exit_tree() -> void:

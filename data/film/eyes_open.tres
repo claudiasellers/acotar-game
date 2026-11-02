@@ -1,0 +1,188 @@
+[gd_resource type="Resource" script_class="FilmScript" load_steps=29 format=3]
+
+[ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
+[ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
+[ext_resource type="Script" path="res://story/film/film_beat.gd" id="3_beat"]
+
+[sub_resource type="Resource" id="L00"]
+script = ExtResource("2_line")
+id = &"a_01"
+at = 3.0
+hold = 2.4
+speaker = &"tamlin"
+text = "It sings."
+canon = "C"
+
+[sub_resource type="Resource" id="L01"]
+script = ExtResource("2_line")
+id = &"a_02"
+at = 5.6
+hold = 3.2
+speaker = &"feyre"
+text = "And I suppose it knows drinking songs too."
+canon = "C"
+
+[sub_resource type="Resource" id="L02"]
+script = ExtResource("2_line")
+id = &"a_03"
+at = 10.0
+hold = 4.2
+speaker = &"tamlin"
+text = "You're human. Your senses are sealed off from all of it."
+canon = "C?"
+
+[sub_resource type="Resource" id="L03"]
+script = ExtResource("2_line")
+id = &"a_04"
+at = 14.8
+hold = 5.0
+speaker = &"tamlin"
+text = "I could open them. Let you see my world. Hear it, smell it. Taste it."
+canon = "C?"
+
+[sub_resource type="Resource" id="L04"]
+script = ExtResource("2_line")
+id = &"a_05"
+at = 21.0
+hold = 2.6
+speaker = &"feyre"
+text = "And what does it cost?"
+canon = "C"
+
+[sub_resource type="Resource" id="L05"]
+script = ExtResource("2_line")
+id = &"a_06"
+at = 24.0
+hold = 2.8
+speaker = &"tamlin"
+text = "Every gift comes with a price."
+canon = "C"
+
+[sub_resource type="Resource" id="L06"]
+script = ExtResource("2_line")
+id = &"a_07"
+at = 27.3
+hold = 1.8
+speaker = &"tamlin"
+text = "A kiss."
+canon = "C"
+
+[sub_resource type="Resource" id="L07"]
+script = ExtResource("2_line")
+id = &"a_08"
+at = 29.6
+hold = 1.8
+speaker = &"feyre"
+text = "...Fine."
+canon = "C"
+
+[sub_resource type="Resource" id="L08"]
+script = ExtResource("2_line")
+id = &"a_09"
+at = 34.5
+hold = 2.4
+speaker = &"tamlin"
+text = "Close your eyes."
+canon = "C"
+
+[sub_resource type="Resource" id="L09"]
+script = ExtResource("2_line")
+id = &"a_10"
+at = 49.0
+hold = 4.0
+speaker = &"feyre"
+text = "It smells of roses. Not metal any more."
+canon = "C"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("2_line")
+id = &"a_11"
+at = 62.5
+hold = 2.2
+speaker = &"feyre"
+text = "Why hide it?"
+canon = "C"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("2_line")
+id = &"a_12"
+at = 65.0
+hold = 2.4
+speaker = &"tamlin"
+text = "To look normal."
+canon = "C?"
+
+[sub_resource type="Resource" id="B00"]
+script = ExtResource("3_beat")
+name = &"open"
+at = 0.0
+
+[sub_resource type="Resource" id="B01"]
+script = ExtResource("3_beat")
+name = &"study"
+at = 9.5
+
+[sub_resource type="Resource" id="B02"]
+script = ExtResource("3_beat")
+name = &"wary"
+at = 20.5
+
+[sub_resource type="Resource" id="B03"]
+script = ExtResource("3_beat")
+name = &"kneel"
+at = 32.0
+
+[sub_resource type="Resource" id="B04"]
+script = ExtResource("3_beat")
+name = &"kiss"
+at = 37.5
+
+[sub_resource type="Resource" id="B05"]
+script = ExtResource("3_beat")
+name = &"dark"
+at = 42.5
+
+[sub_resource type="Resource" id="B06"]
+script = ExtResource("3_beat")
+name = &"fact.film_eyes_open_lift"
+at = 44.0
+
+[sub_resource type="Resource" id="B07"]
+script = ExtResource("3_beat")
+name = &"open_eyes"
+at = 47.0
+
+[sub_resource type="Resource" id="B08"]
+script = ExtResource("3_beat")
+name = &"true_form"
+at = 54.0
+
+[sub_resource type="Resource" id="B09"]
+script = ExtResource("3_beat")
+name = &"reach"
+at = 58.5
+
+[sub_resource type="Resource" id="B10"]
+script = ExtResource("3_beat")
+name = &"hide"
+at = 61.5
+
+[sub_resource type="Resource" id="B11"]
+script = ExtResource("3_beat")
+name = &"hold"
+at = 68.0
+
+[sub_resource type="Resource" id="B12"]
+script = ExtResource("3_beat")
+name = &"handover"
+at = 73.0
+
+[resource]
+script = ExtResource("1_script")
+id = &"eyes_open"
+length = 76.0
+music_cue = &"music_film_eyes_open"
+seen_flag = "fact.film_eyes_open_seen"
+bars = 1.0
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11")])
+beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12")])
