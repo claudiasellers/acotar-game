@@ -35,7 +35,8 @@ func yaw(input: Vector2, camera_yaw: float, auto_yaw: float = 0.0, live: bool = 
 		_held = true
 		_input = input
 		_auto0 = auto_yaw
-	return wrapf(camera_yaw - (auto_yaw - _auto0), -PI, PI)
+	_yaw = wrapf(camera_yaw - (auto_yaw - _auto0), -PI, PI)
+	return _yaw
 
 
 ## Forget the held frame (a teleport; a test bot steering by the camera).
@@ -45,3 +46,8 @@ func release() -> void:
 
 func is_held() -> bool:
 	return _held
+
+
+## The frame the keys are steering in (meaningful while is_held()).
+func held_yaw() -> float:
+	return _yaw

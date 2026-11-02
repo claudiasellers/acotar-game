@@ -8,6 +8,7 @@ marks = {
 "bread": Vector3(3.72, 0.83, -6.62),
 "chicken": Vector3(3.6, 0.83, -6.45),
 "feyre_chair": Vector3(4.95, 0, -6.5),
+"feyre_seat": Vector3(4.4, 0, -6.5),
 "lucien_goblet": Vector3(-3.4, 0.8, -7.15),
 "lucien_face": Vector3(-3.4, 0, -6.5),
 "lucien_seat": Vector3(-3.4, 0, -7.6),
@@ -22,6 +23,9 @@ marks = {
 "wine": Vector3(3.5, 0.8, -6.88)
 }
 lines = {
+"chair_where": {"text": "The far end. That chair is yours.", "who": "Tamlin"},
+"so_hungry": {"text": "I was starving. My head was light with it.", "who": ""},
+"torte_more": {"text": "There was still chocolate torte. I wanted more.", "who": ""},
 "contemplating": {"text": "Do not do whatever it was you were contemplating.", "who": "Tamlin"},
 "feyre_dress": {"text": "I'd prefer not to wear that dress.", "who": "Feyre"},
 "first_rule": {"text": "Never eat their food. My hands stayed pinned under my thighs.", "who": ""},
@@ -39,5 +43,5 @@ lines = {
 "vanished": {"text": "I reached for a second helping of torte, and the food vanished.", "who": ""}
 }
 extra_require = PackedStringArray("fact.alis_bathed")
-invented = PackedStringArray("sit", "go_rest")
+invented = PackedStringArray("sit", "go_rest", "chair_where", "torte_more")
 canon = "Ch7 (Keeper 2026-11-01, [C]): same dining room as ch6; the men have eaten, gold goblets; Tamlin seats her at the far end, meat and sauce and bread, pale sparkling wine. She won't eat (first rule, hands under her thighs). She shoots up; invisible hands shove her back once (the tang of magic, nothing visible); Tamlin: Do not do whatever it was you were contemplating; legs and middle stay bound until she eats. She sniffs, faeries can't lie, chicken first, eats the plate in silence; reaching for seconds of torte the food vanishes and the bonds loosen. Thank you for the meal; Lucien: Won't you stay for wine?; Tamlin: Go rest... ask the staff; she backs out; Lucien's laugh cut off by a growl. Invented (X): Sit. for ch7; the middle of go_rest."

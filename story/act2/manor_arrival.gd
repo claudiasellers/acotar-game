@@ -17,6 +17,9 @@ extends Act2Space
 const BATH_HOUR := 17.5 / 24.0
 const DOOR_RADIUS := 6.0
 
+## Seconds the beast waits on her down the hall before she notices (L34-6).
+const FOLLOW_NUDGE_AFTER := 15.0
+
 var flash: OmniLight3D
 
 
@@ -45,15 +48,19 @@ func _build_beats() -> Array:
 			cast(&"tamlin_beast", &"beast_start", &"dining_door")
 			StoryControl.set_mode(StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin_beast")), "the beast pads ahead"),
-		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0),
-		reach(&"dining_inside", 3.5),
+		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0,
+			2.2, &"beast_waits", FOLLOW_NUDGE_AFTER),
+		reach_nudged(&"dining_inside", 3.5, &"beast_waits", FOLLOW_NUDGE_AFTER),
 		Beats.run(_transform, "a flash of white light"),
 		say(&"transform"),
 		say(&"sit_eat"),
 		say(&"first_rule"),
 		Beats.run(func(_s: SceneSpace) -> void: cast(&"lucien", &"dining_door", &"lucien_seat"), "Lucien strides in"),
 		lead_along(&"lucien", [&"lucien_seat"], 0.0, 2.6),
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(actor(&"lucien")), "Lucien at the table"),
+		Beats.run(func(_s: SceneSpace) -> void:
+			cast(&"lucien", &"lucien_seat", &"lucien_face")
+			sit(&"lucien")
+			StoryControl.set_focus(actor(&"lucien")), "Lucien at the table"),
 		say(&"lucien_andras"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"alis", &"alis_door", &"feyre_wall")
@@ -75,7 +82,7 @@ func _transform(_s: SceneSpace) -> void:
 			(beast as BeastActor).visible = false
 		dismiss(&"tamlin_beast")
 	var tamlin := cast(&"tamlin", &"tamlin_seat", &"table")
-	sit(&"tamlin")
+	sit(&"tamlin", &"chair_head_dining")
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(tamlin)
 	StoryControl.shake = 0.0

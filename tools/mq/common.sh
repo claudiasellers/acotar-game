@@ -9,7 +9,9 @@ MQ_DIR="$MQ_GIT/mq"
 MQ_BIN="$MQ_DIR/bin"
 MQ_LANES_DIR="$MQ_REPO/.lanes"
 MQ_BUILD="$MQ_LANES_DIR/build"
-MQ_LEVELCACHE="$MQ_GIT/levelcache"
+# MQ_LEVELCACHE set in the environment points builds at another cache
+# (fresh_generate_check.sh uses an empty one so every builder really runs).
+MQ_LEVELCACHE="${MQ_LEVELCACHE:-$MQ_GIT/levelcache}"
 MQ_PROJECT=$(basename "$MQ_REPO")
 MQ_GODOT_VERSION=4.7.2
 export MQ_BIN

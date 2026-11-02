@@ -64,6 +64,12 @@ const PRIMITIVE_ALLOW: Array[String] = ["bowvisual", "arrow", "blood"]
 const PRIMITIVE_SCAN_FRAMES := 120
 const STUCK_SECONDS := 3.0
 const HOP_METRES := 6.0
+## Directions tried for a hop, at full, half and quarter length (_hop_spot).
+const HOP_DIRECTIONS := 16
+## The last few snags remembered, and how near a spot already used for the same
+## snag a new hop may not land.
+const HOP_SNAG_MEMORY := 2
+const HOP_AVOID_METRES := 1.5
 const WALK_SPEED_GUESS := 4.0
 const EXIT_GRACE := 15.0
 const SETTLE_LIMIT := 180.0
@@ -93,6 +99,8 @@ var _blocked_shots: int = 0
 var _last_landing: Vector3 = Vector3.INF
 var _load_seconds: float = 0.0
 var _hop_causes: Dictionary = {}
+## The last HOP_SNAG_MEMORY snags: {rid: the body she was pressing, spot: where she hopped}.
+var _snags: Array[Dictionary] = []
 var _under_noted: bool = false
 var _last_floor: String = ""
 var _shutdown_suspects: PackedStringArray = []
@@ -816,7 +824,7 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 				var pressing := _pressing()
 				await _press(&"jump")
 				var from := feyre.global_position
-				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)), pressing)
+				var p := _hop_spot(from, target, pressing)
 				var hop := p - from
 				hop.y = 0.0
 				feyre.teleport(p)   # the jump just pressed may have started a ledge climb
@@ -878,26 +886,80 @@ func _pressing() -> Array[RID]:
 	return out
 
 
-## Where an assist hop may land: open ground about `ahead` away (else turned
-## 45/90/135 degrees either way), never inside a building or prop (a body placed
-## inside a collider is pushed out below the ground) nor under the terrain, and in
-## her own room: in sight from her chest past only the bodies in `pressing` (the
-## door or cot she is stuck on may be hopped; no other wall may, so a hop never
-## leaves the room, e.g. from the infirmary cot to outside). Tries the full hop,
-## then half, then a quarter; only if none is in sight, any clear spot as before.
-func _hop_spot(from: Vector3, ahead: Vector3, pressing: Array[RID] = []) -> Vector3:
+## Where an assist hop may land: open ground up to HOP_METRES away, never
+## inside a building or prop (a body placed inside a collider is pushed out
+## below the ground) nor under the terrain, and in her own room: in sight from
+## her chest past only the bodies in `pressing` (the door or cot she is stuck on
+## may be hopped; no other wall may, so a hop never leaves the room, e.g. from
+## the infirmary cot to outside). Among those it picks the spot that brings her
+## nearest `target` by the way she would walk: a spot with a clear line to the
+## target (through a doorway, round a statue) beats one behind a wall, and a
+## line through a body she has just been snagged on counts as blocked. A spot
+## near one already used for the same snag is never picked again (F45: she hopped
+## to the same place and walked back into the entrance hall's statue 4 times).
+## Only if nothing in sight is clear, any clear spot ahead as before.
+func _hop_spot(from: Vector3, target: Vector3, pressing: Array[RID] = []) -> Vector3:
 	if pressing.is_empty():
 		pressing = [feyre.get_rid()]
-	for scale: float in [1.0, 0.5, 0.25]:
-		var p: Variant = _hop_candidate(from, ahead * scale, pressing)
-		if p != null:
-			return p
-	var any: Variant = _hop_candidate(from, ahead, [])
-	return any if any != null else from + Vector3.UP * 0.5
+	var snagged: Array[RID] = []
+	for rid in pressing:
+		if rid != feyre.get_rid():
+			snagged.append(rid)
+	var avoid: Array[Vector3] = []
+	var recent: Array[RID] = snagged.duplicate()
+	for snag: Dictionary in _snags:
+		recent.append(snag.rid)
+		if snagged.has(snag.rid):
+			avoid.append(snag.spot)
+	var best: Variant = null
+	var best_cost := INF
+	for metres: float in [HOP_METRES, HOP_METRES * 0.5, HOP_METRES * 0.25]:
+		for step in HOP_DIRECTIONS:
+			var dir := Vector3.FORWARD.rotated(Vector3.UP, TAU * step / HOP_DIRECTIONS)
+			var p: Variant = _hop_clear(from, dir * metres, pressing)
+			if p == null or avoid.any(func(a: Vector3) -> bool: return _flat_between(a, p) < HOP_AVOID_METRES):
+				continue
+			var cost := _hop_cost(p, target, recent)
+			if cost < best_cost:
+				best_cost = cost
+				best = p
+	if best == null:
+		var ahead := Vector3(target.x - from.x, 0.0, target.z - from.z).normalized() * HOP_METRES
+		for degrees in [0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0, 180.0]:
+			best = _hop_clear(from, ahead.rotated(Vector3.UP, deg_to_rad(degrees)), [])
+			if best != null:
+				break
+	var spot: Vector3 = best if best != null else from + Vector3.UP * 0.5
+	for rid in snagged:
+		_snags.append({"rid": rid, "spot": spot})
+	while _snags.size() > HOP_SNAG_MEMORY:
+		_snags.pop_front()
+	return spot
 
 
-## `sight_exclude` empty: no sight test; else the bodies the sight ray may pass.
-func _hop_candidate(from: Vector3, ahead: Vector3, sight_exclude: Array[RID]) -> Variant:
+## How far she would still walk from `p` to `target`: the straight distance, plus
+## a detour when a wall stands in the way (a body in `snags` counts as a wall
+## she can't get past at all).
+func _hop_cost(p: Vector3, target: Vector3, snags: Array[RID]) -> float:
+	var cost := _flat_between(p, target)
+	var eye := p + Vector3.UP * 1.0
+	var aim := Vector3(target.x, maxf(target.y + 1.0, eye.y), target.z)
+	var hit := feyre.get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(eye, aim, 1, [feyre.get_rid()]))
+	if hit.is_empty() or (hit.collider as Node).get_class() == "Terrain3D":
+		return cost
+	if snags.has((hit.collider as CollisionObject3D).get_rid()):
+		return cost + 100.0
+	return cost + HOP_METRES * 2.0
+
+
+func _flat_between(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()
+
+
+## A clear landing `offset` from `from`, or null. `sight_exclude` empty: no sight
+## test; else the bodies the sight ray from her chest may pass.
+func _hop_clear(from: Vector3, offset: Vector3, sight_exclude: Array[RID]) -> Variant:
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.45
 	capsule.height = 1.7
@@ -906,25 +968,20 @@ func _hop_candidate(from: Vector3, ahead: Vector3, sight_exclude: Array[RID]) ->
 	query.collision_mask = 1
 	query.exclude = [feyre.get_rid()]
 	var space := feyre.get_world_3d().direct_space_state
-	for degrees in [0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0, 180.0]:
-		var p := from + ahead.rotated(Vector3.UP, deg_to_rad(degrees))
-		p.y = maxf(_ground_at(p, 2.5), WorldHeight.height_at(p.x, p.z)) + 0.3
-		if not sight_exclude.is_empty():
-			var eye := from + Vector3.UP * 1.3
-			var sight := PhysicsRayQueryParameters3D.create(eye, Vector3(p.x, maxf(p.y + 1.0, eye.y), p.z), 1, sight_exclude)
-			var wall := space.intersect_ray(sight)
-			if not wall.is_empty() and (wall.collider as Node).get_class() != "Terrain3D":
-				continue
-		query.transform = Transform3D(Basis.IDENTITY, p + Vector3.UP * (capsule.height * 0.5 + 0.15))
-		var clear := true
-		for hit in space.intersect_shape(query, 8):
-			var body := hit.collider as Node
-			if body and body.get_class() != "Terrain3D":
-				clear = false
-				break
-		if clear:
-			return p
-	return null
+	var p := from + offset
+	p.y = maxf(_ground_at(p, 2.5), WorldHeight.height_at(p.x, p.z)) + 0.3
+	if not sight_exclude.is_empty():
+		var eye := from + Vector3.UP * 1.3
+		var sight := PhysicsRayQueryParameters3D.create(eye, Vector3(p.x, maxf(p.y + 1.0, eye.y), p.z), 1, sight_exclude)
+		var wall := space.intersect_ray(sight)
+		if not wall.is_empty() and (wall.collider as Node).get_class() != "Terrain3D":
+			return null
+	query.transform = Transform3D(Basis.IDENTITY, p + Vector3.UP * (capsule.height * 0.5 + 0.15))
+	for hit in space.intersect_shape(query, 8):
+		var body := hit.collider as Node
+		if body and body.get_class() != "Terrain3D":
+			return null
+	return p
 
 
 func _walk_region(id: StringName) -> void:

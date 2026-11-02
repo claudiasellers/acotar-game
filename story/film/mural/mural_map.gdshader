@@ -101,13 +101,16 @@ void fragment() {
 	// The Wall's split: north blooms in jewel colours, south drains to snow.
 	float north = smoothstep(wall_v - 0.004, wall_v + 0.004, p.y);
 	vec3 jewel = 0.5 + 0.5 * cos(6.28318 * (fbm(p * 4.0) + vec3(0.0, 0.33, 0.67)));
-	jewel = mix(jewel * vec3(0.8, 0.75, 0.95), vec3(1.0, 0.72, 0.62), 0.5);
+	// Deep jewel tones (emerald, garnet, sapphire), not pastel.
+	jewel = mix(jewel * jewel * vec3(0.75, 0.7, 0.9), vec3(0.9, 0.62, 0.4), 0.18);
 	vec2 sc = p * 260.0;
 	float sparkle = step(0.985, hash(floor(sc) + floor(TIME * 3.0)))
 			* smoothstep(0.45, 0.1, length(fract(sc) - 0.5));
 	vec3 bloom = jewel * 0.75 + sparkle * vec3(1.0, 0.95, 0.85) * 1.5;
 	vec3 snow = vec3(0.5, 0.53, 0.6) * (0.7 + 0.3 * fbm(p * 30.0));
-	land = mix(land, mix(snow, bloom, north), split);
+	// A tint over the map, not a wash over it: rivers, woods and the
+	// mountain stay legible under the colour, so it still reads as the land.
+	land = mix(land, mix(snow, bloom, north), split * mix(0.55, 0.85, 1.0 - north));
 	col = mix(col, land, inside);
 	// The coastline in gold, drawn around the island.
 	float coast = smoothstep(0.006, 0.0, abs(d)) * drawn;
@@ -118,5 +121,5 @@ void fragment() {
 	col += vec3(1.0, 0.95, 0.9) * line * (2.5 + 0.8 * sin(TIME * 5.0 + p.x * 40.0));
 	col *= 1.0 - smoothstep(0.55, 1.0, wash);
 	ALBEDO = col;
-	EMISSION = gold * (coast * 0.8 + tip * 2.0 + mountain * inside * 0.4) + vec3(1.0) * line * 1.5 + bloom * north * split * inside * 0.3;
+	EMISSION = gold * (coast * 0.8 + tip * 2.0 + mountain * inside * 0.4) + vec3(1.0) * line * 1.5 + bloom * north * split * inside * 0.12;
 }

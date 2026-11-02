@@ -1,0 +1,483 @@
+[gd_resource type="Resource" script_class="JournalBook" format=3]
+
+[ext_resource type="Script" path="res://ui/journal/journal_book.gd" id="1_book"]
+[ext_resource type="Script" path="res://ui/journal/journal_chapter.gd" id="2_chap"]
+[ext_resource type="Script" path="res://ui/journal/journal_entry.gd" id="3_entry"]
+
+[sub_resource type="Resource" id="e_hunt"]
+script = ExtResource("3_entry")
+id = &"hunt"
+memory = "The doe, and the thing that came for her. Both mine."
+guide_thread = &"hunt"
+sketch = &"bow"
+canon = "V"
+
+[sub_resource type="Resource" id="e_shoot"]
+script = ExtResource("3_entry")
+id = &"shoot"
+guide_thread = &"shoot"
+sketch = &"bow"
+canon = "V"
+
+[sub_resource type="Resource" id="e_skin"]
+script = ExtResource("3_entry")
+id = &"skin"
+memory = "Its pelt, rolled tight in my pack."
+guide_thread = &"skin"
+sketch = &"tree"
+canon = "V"
+
+[sub_resource type="Resource" id="e_sell"]
+script = ExtResource("3_entry")
+id = &"sell"
+memory = "The pelt sold. Coin enough to breathe on, for a while."
+guide_thread = &"sell"
+sketch = &"coin"
+canon = "V"
+
+[sub_resource type="Resource" id="c_0"]
+script = ExtResource("2_chap")
+phase = &"p0_winter"
+numeral = "Chapter One"
+title = "Winter"
+opener = "Snow to the knees and the larder bare. Four of us at the table, and only I hunt."
+sketch = &"tree"
+entries = Array[ExtResource("3_entry")]([SubResource("e_hunt"), SubResource("e_shoot"), SubResource("e_skin"), SubResource("e_sell")])
+
+[sub_resource type="Resource" id="e_home"]
+script = ExtResource("3_entry")
+id = &"home"
+memory = "A life for a life. I said I would go, and I went."
+guide_thread = &"home"
+sketch = &"house"
+canon = "V"
+
+[sub_resource type="Resource" id="e_ride"]
+script = ExtResource("3_entry")
+id = &"ride"
+done_flag = "wall_crossed"
+require_flags = PackedStringArray("beast_claim_accepted")
+after = "Wherever it's taking me, there's no turning back now."
+hints = PackedStringArray("The white horse knows the way. All I can do is hold on and look.", "Ride on through the woods. There's nothing to do but watch.")
+memory = "His magic put me under. I woke in the saddle, and it was spring."
+sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="c_1"]
+script = ExtResource("2_chap")
+phase = &"p1_wolf_and_crossing"
+numeral = "Chapter Two"
+title = "The Long Night"
+opener = "Coin in the jar and a fire in the hearth. For one night, we can rest."
+sketch = &"moon"
+entries = Array[ExtResource("3_entry")]([SubResource("e_home"), SubResource("e_ride")])
+
+[sub_resource type="Resource" id="e_arrive"]
+script = ExtResource("3_entry")
+id = &"arrive"
+done_flag = "fact.manor_arrived"
+require_flags = PackedStringArray("wall_crossed")
+after = "A house this big has a front door. Better to face them than stand out here."
+hints = PackedStringArray("The drive runs straight up to the great house.", "Up the drive to the front doors, then follow where he leads.")
+memory = "The doors opened on their own. He turned into a man at the table."
+sketch = &"door"
+canon = "A"
+
+[sub_resource type="Resource" id="e_bathe"]
+script = ExtResource("3_entry")
+id = &"bathe"
+done_flag = "fact.alis_bathed"
+require_flags = PackedStringArray("fact.manor_arrived")
+after = "Bathe. He says I could use a bath, and I couldn't argue."
+hints = PackedStringArray("The bath. Alis drew it for me.", "The bath in my room is steaming. Step in (E).")
+memory = "Hot water, for the first time in years."
+sketch = &"wave"
+canon = "A"
+
+[sub_resource type="Resource" id="e_dinner"]
+script = ExtResource("3_entry")
+id = &"dinner"
+done_flag = "first_dinner_eaten"
+require_flags = PackedStringArray("fact.alis_bathed")
+after = "They expect me at dinner. I won't eat their food. I can't starve, either."
+hints = PackedStringArray("My chair is at the far end of the table.", "Sit in my chair and take a bite (E). The table won't let me up until I eat.")
+memory = "I ate their food. Nothing happened to me, and the table let me go."
+sketch = &"flame"
+canon = "A"
+
+[sub_resource type="Resource" id="e_curtain_trap"]
+script = ExtResource("3_entry")
+id = &"curtain_trap"
+done_flag = "curtain_trap_set"
+require_flags = PackedStringArray("first_dinner_eaten")
+after = "If anything comes through my door tonight, I want warning."
+hints = PackedStringArray("That lock won't keep out anything that growls.", "The curtains by my window have long trimmings.", "At my window at night, the curtains (E): a rope of trimmings to snap into anyone's face.")
+memory = "My rope caught Alis, not a monster."
+sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="e_stables"]
+script = ExtResource("3_entry")
+id = &"stables"
+done_flag = "fact.hunt_invited"
+require_flags = PackedStringArray("curtain_trap_set")
+after = "There has to be a loophole in the Treaty. Lucien might know one."
+hints = PackedStringArray("Alis says he rides out on border patrol, from the stables.", "The stable yard, by the horse statue. Find Lucien there (E).")
+memory = "Lucien asked me to hunt with him in the southern woods."
+sketch = &"bow"
+canon = "A"
+
+[sub_resource type="Resource" id="e_bogge"]
+script = ExtResource("3_entry")
+id = &"bogge"
+done_flag = "bogge_survived"
+require_flags = PackedStringArray("fact.hunt_invited")
+fail_flags = PackedStringArray("fact.bogge_looked")
+after = "Hunting the southern woods with Lucien. A chance to ask about the Treaty."
+hints = PackedStringArray("Ride out with him from the stable yard.", "Whatever happens out there, keep my eyes ahead.", "If something circles us, don't look. Eyes on the far elm, and think of good things.")
+memory = "Something circled us and begged me to look. I didn't."
+sketch = &"tree"
+canon = "A"
+
+[sub_resource type="Resource" id="e_puca"]
+script = ExtResource("3_entry")
+id = &"puca"
+done_flag = "puca_resisted"
+require_flags = PackedStringArray("bogge_survived")
+after = "I can't sleep. Every night I watch the garden from my window."
+hints = PackedStringArray("From my window at night: the hedges below.", "If someone waits by the hedges, go down and follow, as far as the gates.", "At the gates, when Tamlin tells me to, look again.")
+memory = "It wore my father's face. It wasn't him."
+sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="c_2"]
+script = ExtResource("2_chap")
+phase = &"p2_grounds"
+numeral = "Chapter Three"
+title = "Across the Wall"
+opener = "Spring, in the dead of winter. Everything here is lovely, and none of it is safe."
+sketch = &"rose"
+entries = Array[ExtResource("3_entry")]([SubResource("e_arrive"), SubResource("e_bathe"), SubResource("e_dinner"), SubResource("e_curtain_trap"), SubResource("e_stables"), SubResource("e_bogge"), SubResource("e_puca")])
+
+[sub_resource type="Resource" id="e_map"]
+script = ExtResource("3_entry")
+id = &"map"
+done_flag = "manor_map_drawn"
+require_flags = PackedStringArray("puca_resisted")
+after = "If I ever have to run, I need this house by heart."
+hints = PackedStringArray("Mark the halls my own way: crosses and circles, since I can't write.", "Walk the halls and mark the doors that matter. The towers show the grounds.", "Make all five marks and draw enough rooms, then set my map down on the foyer table at night (E).")
+memory = "My map of the halls: crosses, circles and little pictures."
+sketch = &"door"
+canon = "A"
+
+[sub_resource type="Resource" id="e_wound"]
+script = ExtResource("3_entry")
+id = &"wound"
+done_flag = "tamlin_wound_dressed"
+require_flags = PackedStringArray("manor_map_drawn")
+after = "He's hurt, and nobody is helping him."
+hints = PackedStringArray("The infirmary. There'll be something in the cabinets.", "Sort the bowl, linen and bandage from the cabinets, then clean and bind his hand (E).")
+memory = "I bound his hand. He saw I couldn't read."
+sketch = &"flame"
+canon = "A"
+
+[sub_resource type="Resource" id="e_mural"]
+script = ExtResource("3_entry")
+id = &"mural"
+done_flag = "study_mural_seen"
+require_flags = PackedStringArray("tamlin_wound_dressed")
+after = "There's a painted wall in the study I can't stop thinking about."
+hints = PackedStringArray("The study. Stand before the mural and really look.", "Let my eyes rest on three details of the mural, one after another.")
+memory = "The mural: the courts, the mountain, and spring in crocuses and lambs."
+sketch = &"brush"
+canon = "A"
+
+[sub_resource type="Resource" id="e_suriel"]
+script = ExtResource("3_entry")
+id = &"suriel"
+done_flag = "suriel_bound"
+require_flags = PackedStringArray("study_mural_seen")
+after = "Lucien says there's a creature that will answer any question, if I can catch it."
+hints = PackedStringArray("The western woods, near young birches and running water.", "A fresh-killed chicken for bait, and cord for a double-loop snare.", "In the young-birch glade: set the snare (E), lay the bait, then wait hidden, still and downwind.")
+memory = "It told me the truth. Then it told me to run."
+sketch = &"tree"
+canon = "A"
+
+[sub_resource type="Resource" id="e_naga"]
+script = ExtResource("3_entry")
+id = &"naga"
+done_flag = "naga_survived"
+require_flags = PackedStringArray("suriel_bound")
+after = "Run. Get away from the glade."
+hints = PackedStringArray("Cut it free, or stand and shoot. Water won't stop them.", "My bow first, my knife when they're close. Keep moving.")
+memory = "Four of them. I'd be dead if he hadn't come."
+sketch = &"wave"
+canon = "A"
+
+[sub_resource type="Resource" id="e_summer_faerie"]
+script = ExtResource("3_entry")
+id = &"summer_faerie"
+done_flag = "summer_faerie_comforted"
+require_flags = PackedStringArray("naga_survived")
+after = "I'm tired of being no use in this house."
+hints = PackedStringArray("Stay near the house at night. If something happens, be there.", "At the long table in the entrance hall, take his hand (E) and stay with him.")
+memory = "I held his hand until the end. I promised him his wings."
+sketch = &"feather"
+canon = "A"
+
+[sub_resource type="Resource" id="c_3"]
+script = ExtResource("2_chap")
+phase = &"p3_house_and_woods"
+numeral = "Chapter Four"
+title = "The House and the Woods"
+opener = "A prisoner should know her cage. I'll learn every hall of this one."
+sketch = &"door"
+entries = Array[ExtResource("3_entry")]([SubResource("e_map"), SubResource("e_wound"), SubResource("e_mural"), SubResource("e_suriel"), SubResource("e_naga"), SubResource("e_summer_faerie")])
+
+[sub_resource type="Resource" id="e_starlight"]
+script = ExtResource("3_entry")
+id = &"starlight"
+done_flag = "starlight_pool_found"
+require_flags = PackedStringArray("summer_faerie_comforted")
+after = "Tamlin wants to show me something."
+hints = PackedStringArray("Join them at the purple blanket in the glen.", "Follow him down past the stream to the clearing.", "At the hollow's rim, wade or jump into the water.")
+memory = "A pool full of starlight. I swam in it."
+sketch = &"wave"
+canon = "A"
+
+[sub_resource type="Resource" id="e_gallery"]
+script = ExtResource("3_entry")
+id = &"gallery"
+done_flag = "gallery_opened"
+require_flags = PackedStringArray("starlight_pool_found")
+after = "I asked for paint. I'd like to hold a brush again."
+hints = PackedStringArray("There's a room for painting now, with an easel.", "Find the easel and make my first stroke (E).")
+memory = "He opened the gallery for me."
+sketch = &"brush"
+canon = "A"
+
+[sub_resource type="Resource" id="e_first_painting"]
+script = ExtResource("3_entry")
+id = &"first_painting"
+done_flag = "first_painting"
+require_flags = PackedStringArray("gallery_opened")
+after = "Finish something. Anything."
+hints = PackedStringArray("At the easel, keep painting until it's done.")
+memory = "My first painting in years."
+sketch = &"brush"
+canon = "V"
+
+[sub_resource type="Resource" id="e_attor"]
+script = ExtResource("3_entry")
+id = &"attor"
+done_flag = "attor_evaded"
+require_flags = PackedStringArray("first_painting")
+fail_flags = PackedStringArray("fact.attor_detected")
+after = "Tamlin's walking in the rose garden. I'd like to walk with him."
+hints = PackedStringArray("The rose garden's west walk, by day.", "If he says hide, stay hidden and still. Make no noise.", "Crouch, and don't move while it's close. Wait until it's gone.")
+memory = "I stayed hidden. Whatever it was, it didn't find me."
+sketch = &"rose"
+canon = "A"
+
+[sub_resource type="Resource" id="c_4"]
+script = ExtResource("2_chap")
+phase = &"p4_wider_court"
+numeral = "Chapter Five"
+title = "The Wider Court"
+opener = "They ride out across his lands now, and sometimes they take me."
+sketch = &"wave"
+entries = Array[ExtResource("3_entry")]([SubResource("e_starlight"), SubResource("e_gallery"), SubResource("e_first_painting"), SubResource("e_attor")])
+
+[sub_resource type="Resource" id="e_fires"]
+script = ExtResource("3_entry")
+id = &"fires"
+done_flag = "calanmai_attended"
+require_flags = PackedStringArray("attor_evaded")
+after = "They told me to lock myself in tonight. I'd rather see the fires."
+hints = PackedStringArray("The first great bonfire, on top of the hill.", "Go up to the hill fires after dark, by ten o'clock.")
+memory = "Fire Night. I went, though they told me not to."
+sketch = &"flame"
+canon = "A"
+
+[sub_resource type="Resource" id="e_cave"]
+script = ExtResource("3_entry")
+id = &"cave"
+done_flag = "stranger_met"
+require_flags = PackedStringArray("calanmai_attended")
+after = "The crowd's drifting toward the trees. I should keep my wits."
+hints = PackedStringArray("Toward the cave hung with leaves and flowers.", "When someone holds me, step out of his arm.")
+memory = "A stranger with violet eyes. I hope I never see him again."
+sketch = &"flame"
+canon = "A"
+
+[sub_resource type="Resource" id="e_bruise"]
+script = ExtResource("3_entry")
+id = &"bruise"
+done_flag = "bite_endured"
+require_flags = PackedStringArray("stranger_met")
+after = "I'm not hiding in my room over this."
+hints = PackedStringArray("Lunch in the dining room. Let them see it.")
+memory = "Faerie pig. Lucien howled. Even Tamlin smiled."
+sketch = &"rose"
+canon = "A"
+
+[sub_resource type="Resource" id="e_paintings"]
+script = ExtResource("3_entry")
+id = &"paintings"
+done_flag = "paintings_shown"
+require_flags = PackedStringArray("bite_endured")
+after = "I'd like him to see what I've painted."
+hints = PackedStringArray("Come down to dinner in a gown.", "Dress in a gown, go down to dinner, then lead him up to my painting room.")
+memory = "He kept the snow-veiled woods."
+sketch = &"brush"
+canon = "A"
+
+[sub_resource type="Resource" id="c_5"]
+script = ExtResource("2_chap")
+phase = &"p5_calanmai"
+numeral = "Chapter Six"
+title = "Fire Night"
+opener = "Drums in the hills all day. They're building bonfires."
+sketch = &"flame"
+entries = Array[ExtResource("3_entry")]([SubResource("e_fires"), SubResource("e_cave"), SubResource("e_bruise"), SubResource("e_paintings")])
+
+[sub_resource type="Resource" id="e_glen"]
+script = ExtResource("3_entry")
+id = &"glen"
+done_flag = "glamour_lifted"
+require_flags = PackedStringArray("paintings_shown")
+after = "He asked me out to a glen by a brook."
+hints = PackedStringArray("A weeping willow by a brook, and a blanket under it.", "Sit with him on the blanket under the willow (E).")
+memory = "He opened my eyes. Magic smells like jasmine and lilac and roses now."
+sketch = &"tree"
+canon = "A"
+
+[sub_resource type="Resource" id="e_fountain"]
+script = ExtResource("3_entry")
+id = &"fountain"
+done_flag = "fountain_head_found"
+require_flags = PackedStringArray("glamour_lifted")
+after = "I want to paint the irises in the garden."
+hints = PackedStringArray("Carry my paints out to the garden.", "In the morning, take my paints to the fountain's iris beds.")
+memory = "A head on the heron's bill. I can't stop seeing it."
+sketch = &"wave"
+canon = "A"
+
+[sub_resource type="Resource" id="e_solstice"]
+script = ExtResource("3_entry")
+id = &"solstice"
+done_flag = "solstice_danced"
+require_flags = PackedStringArray("fountain_head_found")
+after = "Midsummer. The whole court's in ribbons."
+hints = PackedStringArray("Alis will want to dress me for it.", "Dress for the Solstice and go out to the dancing.")
+memory = "We danced until sunrise among the will-o'-the-wisps."
+sketch = &"sun"
+canon = "A"
+
+[sub_resource type="Resource" id="e_visitor"]
+script = ExtResource("3_entry")
+id = &"visitor"
+done_flag = "rhysand_faced"
+require_flags = PackedStringArray("solstice_danced")
+after = "A letter came from another court. Everyone's on edge."
+hints = PackedStringArray("Stay close to the house.", "If they hide me, stay put and keep my answers short.")
+memory = "He saw through everything. I gave him a false name."
+sketch = &"mask"
+canon = "A"
+
+[sub_resource type="Resource" id="e_farewell"]
+script = ExtResource("3_entry")
+id = &"farewell"
+done_flag = "sent_home"
+require_flags = PackedStringArray("rhysand_faced")
+after = "He wants me far from here. I don't want to go."
+hints = PackedStringArray("My bedroom, tonight.", "Take his hand (E).")
+memory = "I went home."
+sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="c_6"]
+script = ExtResource("2_chap")
+phase = &"p6_blight_tightens"
+numeral = "Chapter Seven"
+title = "The Blight Tightens"
+opener = "Something is closing in on this court. I can see it in all of them."
+sketch = &"mask"
+entries = Array[ExtResource("3_entry")]([SubResource("e_glen"), SubResource("e_fountain"), SubResource("e_solstice"), SubResource("e_visitor"), SubResource("e_farewell")])
+
+[sub_resource type="Resource" id="e_nesta"]
+script = ExtResource("3_entry")
+id = &"nesta"
+done_flag = "nesta_truth_heard"
+require_flags = PackedStringArray("sent_home")
+after = "Nesta watches me like she knows something."
+hints = PackedStringArray("Find Nesta alone.", "Sit with Nesta and let her talk.")
+memory = "She knew. The glamour never touched her."
+sketch = &"house"
+canon = "A"
+
+[sub_resource type="Resource" id="e_beddor"]
+script = ExtResource("3_entry")
+id = &"beddor"
+done_flag = "beddor_fire_learned"
+require_flags = PackedStringArray("nesta_truth_heard")
+after = "Something's wrong. I can feel it."
+hints = PackedStringArray("Listen to Father and Elain at lunch, the day after the party.")
+memory = "Clare Beddor's family. Because of me."
+sketch = &"flame"
+canon = "A"
+
+[sub_resource type="Resource" id="e_recross"]
+script = ExtResource("3_entry")
+id = &"recross"
+done_flag = "wall_recrossed"
+require_flags = PackedStringArray("beddor_fire_learned")
+after = "I have to go back."
+hints = PackedStringArray("North, to the Wall.", "Ride for the Wall, alone.")
+memory = "I crossed back alone."
+sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="c_7"]
+script = ExtResource("2_chap")
+phase = &"p7_return_home"
+numeral = "Chapter Eight"
+title = "Home Again"
+opener = "Silk dresses and a manor. My family is rich now, and I can't sleep."
+sketch = &"house"
+entries = Array[ExtResource("3_entry")]([SubResource("e_nesta"), SubResource("e_beddor"), SubResource("e_recross")])
+
+[sub_resource type="Resource" id="e_alis"]
+script = ExtResource("3_entry")
+id = &"alis"
+done_flag = "alis_truth_heard"
+require_flags = PackedStringArray("wall_recrossed")
+after = "Somebody must still be here."
+hints = PackedStringArray("Search the house.", "Hide in the dining room and wait.")
+memory = "Alis told me everything."
+sketch = &"door"
+canon = "A"
+
+[sub_resource type="Resource" id="e_depart"]
+script = ExtResource("3_entry")
+id = &"depart"
+done_flag = "departed_for_mountain"
+require_flags = PackedStringArray("alis_truth_heard")
+after = "I know where he is now."
+hints = PackedStringArray("Toward the mountain.")
+memory = "I'm going after him."
+sketch = &"mountain"
+canon = "V"
+
+[sub_resource type="Resource" id="c_8"]
+script = ExtResource("2_chap")
+phase = &"p8_the_pass"
+numeral = "Chapter Nine"
+title = "The Silent House"
+opener = "No birdsong. No servants. Marks on the walls."
+sketch = &"mountain"
+entries = Array[ExtResource("3_entry")]([SubResource("e_alis"), SubResource("e_depart")])
+
+[resource]
+script = ExtResource("1_book")
+chapters = Array[ExtResource("2_chap")]([SubResource("c_0"), SubResource("c_1"), SubResource("c_2"), SubResource("c_3"), SubResource("c_4"), SubResource("c_5"), SubResource("c_6"), SubResource("c_7"), SubResource("c_8")])

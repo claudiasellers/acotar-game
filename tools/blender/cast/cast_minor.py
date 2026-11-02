@@ -54,6 +54,9 @@ TRIO = dict(MALE, eye_r=0.0185, eye_open_up=30.0, eye_open_lo=27.0, eye_tilt=10.
 ROUND = dict(FEMALE, cheeks=1.40, cheekbones=0.0, jaw_w=1.10, chin=1.15, face_w=1.08, neck=1.12, bust=1.25,
              ribs=1.14, waist=1.32, belly=1.40, pelvis=1.14, seat=1.20, thigh=1.18, calf=1.08, arm=1.18,
              forearm=1.12, hand=1.04, fae_ears=0.8)
+# the mortal queens and the Archerons' mother: Feyre's own build, human ears
+HUMAN = dict(FEMALE, fae_ears=0.0)
+HUMAN_M = dict(MALE, fae_ears=0.0)
 BROAD = dict(MALE, pecs=1.0, ribs=1.12, waist=1.10, lats=1.25, deltoid=1.22, arm=1.16, forearm=1.12, thigh=1.02,
              neck=1.14, jaw=1.0, jaw_w=0.98)
 
@@ -146,14 +149,76 @@ DESIGNS = {
                               hair="3E5A2A", brows="3A2A1A", lips="5A4030", style=("tamlin", "style_loose"),
                               outfit=[("tunic", "5C7A52", "C9A55A", True), ("trousers", "4A3E30"), ("boots", "3A2E22")],
                               mask=("bird", "B98E40", "D4B26A")),
+    # -- the opening film's history mural (lane L33, Keeper 2026-11-02) ------------------------------
+    # The High Fae who ruled before the Wall (ch 3, 6, 13) [C]: "ornate depictions of the beings who
+    # had once ruled", starry and golden in the mural; unmasked (the masks are the curse, 49 years
+    # old).  Their looks and clothes are [X].
+    "old_court_lord": dict(canon="X", body="trio", height=2.06, skin="F2E6DA", iris="C9A040", hair="EDE3CF",
+                           brows="B8A47C", lips="B48A80", style=("lucien", "style_half_up"),
+                           outfit=[("tunic", "1E1A3A", "E2C277", True), ("trousers", "2A2440"), ("boots", "1A1626"),
+                                   ("cloak", "3A2A5E")]),
+    "old_court_lady": dict(canon="X", body="female", height=1.86, skin="F5E4D6", iris="6C8FC8", hair="1A1420",
+                           brows="1A1420", lips="B05A6A", style=("feyre", "loose"),
+                           outfit=[("gown", "gown_starlight", "2A2F6A", "E2C277"), ("slippers", "E2C277")],
+                           extras=[("earrings", "earrings_drop")]),
+    "old_court_lady_2": dict(canon="X", body="female", height=1.82, skin="E8C8A8", iris="3F7A5A", hair="C9A46A",
+                             brows="9A7A48", lips="C0707A", style=("feyre", "crown_braid"),
+                             outfit=[("gown", "gown_ball", "E8C676", "FFF4DC"), ("slippers", "E8C676")],
+                             extras=[("earrings", "earrings_pearl")]),
+    # The War (ch 13 mural) [C]: "High Fae in their glimmering armor"; armour cut [X].
+    "war_fae_1": dict(canon="X", body="broad", height=1.96, skin="EED8C2", iris="C9A040", hair="EDE3CF",
+                      brows="B8A47C", lips="BE8676", style=("tamlin", "style_loose"),
+                      outfit=[("leathers", "C8CCD6", "E2C277"), ("boots", "8E94A2"), ("cloak", "5E6A8A")]),
+    "war_fae_2": dict(canon="X", body="broad", height=1.92, skin="D9A688", iris="4A6A8A", hair="3A2416",
+                      brows="2E1C12", lips="B07A66", style=("rhysand", "style_short"),
+                      outfit=[("leathers", "AEB4C2", "D9BE72"), ("boots", "6A6E7A"), ("cloak", "7A2A2A")]),
+    # The six mortal queens of the Treaty (ch 3) [C]; their looks are [X]: silver gowns, crowns.
+    "mortal_queen_1": dict(canon="X", body="human", height=1.70, skin="F1D3BE", iris="5A7A9A", hair="3A2416",
+                           brows="2E1C12", lips="B86A70", style=("feyre", "crown_braid"),
+                           outfit=[("gown", "gown_ball", "C9CED8", "F4F6FA"), ("slippers", "C9CED8")],
+                           extras=[("earrings", "earrings_pearl")]),
+    "mortal_queen_2": dict(canon="X", body="human", height=1.74, skin="B98060", iris="4A3018", hair="1A1210",
+                           brows="1A1210", lips="9A5A50", style=("feyre", "ballerina_bun"),
+                           outfit=[("gown", "gown_dinner", "AEB6C6", "E6EAF2"), ("slippers", "AEB6C6")],
+                           extras=[("earrings", "earrings_drop")]),
+    "mortal_queen_3": dict(canon="X", body="human", height=1.66, skin="7E4E36", iris="3A2414", hair="C9C2B8",
+                           brows="6A5E54", lips="7A4038", style=("feyre", "soft_curls"),
+                           outfit=[("gown", "gown_solstice", "D8DCE4", "9AA4B8"), ("slippers", "D8DCE4")]),
+    # The Archerons' mother (ch 2, 4, 7, 30) [C]: Nesta's cold face and blue-grey eyes, Feyre's
+    # straight nose, the sisters' gold-brown hair [X], dressed for the peerage she dazzled.
+    "archeron_mother": dict(canon="C", body="human", height=1.72, skin="EBCABC", iris="7E9098", hair="B08552",
+                            brows="7A5A38", lips="B07078", style=("nesta", "style_chignon"),
+                            outfit=[("gown", "gown_dinner", "3E4A66", "C9CED8"), ("slippers", "3E4A66")],
+                            extras=[("earrings", "earrings_pearl")]),
+    # The humans of the mural, slaves and soldiers and the creditors' men (ch 3, 13; ch 2): plain
+    # homespun [X].
+    "mortal_man": dict(canon="X", body="human_m", height=1.76, skin="D9A688", iris="4A3018", hair="3A2416",
+                       brows="2E1C12", lips="A87068", style=("rhysand", "style_short"),
+                       outfit=[("tunic", "7A6A52", "5A4A38", False), ("trousers", "4A3E30"), ("boots", "3A2E22")]),
+    "mortal_woman": dict(canon="X", body="human", height=1.64, skin="F1D3BE", iris="5A7A9A", hair="6A4A2A",
+                         brows="4A3420", lips="B07070", style=("feyre", "braid"),
+                         outfit=[("dress", "8A7A62", "6A5A48"), ("apron",), ("slippers", "4A3A2E")]),
+    "mortal_youth": dict(canon="X", body="human_m", height=1.62, skin="B98060", iris="3A2414", hair="1A1210",
+                         brows="1A1210", lips="9A5A50", style=("tamlin", "style_loose"),
+                         outfit=[("tunic", "5E6A52", "4A5440", False), ("trousers", "5A4A3A"), ("boots", "3A2E22")]),
+    "mortal_elder": dict(canon="X", body="human_m", height=1.72, skin="E2B596", iris="5A6A6A", hair="B8B4AE",
+                         brows="9A968E", lips="9A6A60", style=("lucien", "style_half_up"),
+                         outfit=[("tunic", "5A4A3E", "7A6A52", False), ("trousers", "3E342A"), ("boots", "2E241C")]),
+    # Feyre as a girl, hand in hand with her mother (ch 2) [X]: her mother's blue-grey eyes and the
+    # sisters' gold-brown hair, in a plain blue dress.
+    "young_feyre": dict(canon="X", body="human", height=1.42, skin="EBC4AE", iris="7E9098", hair="B08552",
+                        brows="8A6A42", lips="C08078", style=("feyre", "braid"),
+                        outfit=[("dress", "8EA4C8", "6A80A8"), ("slippers", "6A80A8")]),
 }
 
 D = DESIGNS[ID]
 KIND = D["body"]
 HEIGHT = D["height"]
-SHAPE = {"female": FEMALE, "male": MALE, "trio": TRIO, "round": ROUND, "broad": BROAD}[KIND]
-WARP = warp(HEIGHT, {"female": "female", "male": "male", "trio": "trio", "round": "round", "broad": "broad"}[KIND])
-GAIT = "female" if KIND in ("female", "round") else "male"
+SHAPE = {"female": FEMALE, "male": MALE, "trio": TRIO, "round": ROUND, "broad": BROAD, "human": HUMAN,
+         "human_m": HUMAN_M}[KIND]
+WARP = warp(HEIGHT, {"female": "female", "male": "male", "trio": "trio", "round": "round", "broad": "broad",
+                     "human": "female", "human_m": "male"}[KIND])
+GAIT = "female" if KIND in ("female", "round", "human") else "male"
 SKIN_SRGB = D["skin"]
 SKIN_LINEAR = cc.srgb(SKIN_SRGB)
 BLACK_EYES = D["iris"] == "black"
@@ -164,7 +229,7 @@ else:
     _i = np.array(cc.srgb(D["iris"]))
     IRIS = (tuple(_i * 0.45), tuple(_i), tuple(np.minimum(_i * 1.6 + 0.05, 1.0)))
     IRIS_FLECKS = 0.5
-LASH = 1.2 if KIND in ("female", "round") else 0.7
+LASH = 1.2 if KIND in ("female", "round", "human") else 0.7
 LASH_LINEAR = cc.srgb("1A1210")
 HAIR_RGB = cc.srgb(D["hair"])
 BROWS_SRGB = D["brows"]

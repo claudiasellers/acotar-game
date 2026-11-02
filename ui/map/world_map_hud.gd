@@ -13,6 +13,8 @@ const SAVE_KEY := "world_map"
 # checkout) still runs.
 const MapPin := preload("res://ui/map/map_pin.gd")
 const PinBeacon := preload("res://ui/map/pin_beacon.gd")
+const PinMarker := preload("res://ui/map/pin_marker.gd")
+const FaeWind := preload("res://ui/map/fae_wind.gd")
 const PLACES_PATH := "res://data/map/map_places.tres"
 const REVEAL_EVERY := 0.2
 const LOOK_EVERY := 0.25
@@ -30,6 +32,11 @@ var reveal: MapReveal = MapReveal.new()
 ## The one pin the player set on the full map (never the game's).
 var pin: MapPin = MapPin.new()
 var beacon: PinBeacon
+## The pin on screen (floats over the spot, clamps to the edge) and the
+## faelight wind that streams from her towards it.
+var marker: PinMarker
+var wind: FaeWind
+var _map_was_open: bool = false
 var places: MapPlaceSet
 ## id -> {label, kind, x, z}
 var seen_landmarks: Dictionary = {}
@@ -73,6 +80,11 @@ func _ready() -> void:
 	add_child(full_map)
 	beacon = PinBeacon.new()
 	add_child(beacon)
+	marker = PinMarker.new(self)
+	add_child(marker)
+	move_child(marker, 0)  # under the minimap and the full map
+	wind = FaeWind.new()
+	add_child(wind)
 	_bind_textures()
 	minimap.visible = MapSettings.minimap_shown()
 	SaveSystem.register_provider(SAVE_KEY, self)
@@ -114,7 +126,12 @@ func _hud_allowed() -> bool:
 # --- Per frame -----------------------------------------------------------------
 
 func _process(delta: float) -> void:
-	minimap.visible = MapSettings.minimap_shown() and _hud_allowed() and not full_map.is_open()
+	var map_open := full_map.is_open()
+	minimap.visible = MapSettings.minimap_shown() and _hud_allowed() and not map_open
+	marker.visible = pin.active and _hud_allowed() and not map_open
+	if _map_was_open and not map_open and pin.active:
+		wind.gust()  # closing the map with a pin: show her the way at once
+	_map_was_open = map_open
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre == null or get_tree().paused:
 		_upload_fog()
@@ -127,7 +144,12 @@ func _process(delta: float) -> void:
 		MapMarks.pin_in_spring = in_spring
 		if pin.active:
 			beacon.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
+			wind.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
 	_update_pin()
+	if pin.active and StoryControl.mode == StoryControl.Mode.FULL:
+		wind.follow(feyre.global_position, pin.xz, delta)
+	else:
+		wind.stop()
 
 	_reveal_timer -= delta
 	if _reveal_timer <= 0.0:
@@ -153,6 +175,8 @@ func _process(delta: float) -> void:
 func set_pin(at: Vector2) -> void:
 	pin.place(at)
 	_sync_beacon()
+	if wind:
+		wind.gust()
 
 
 func clear_pin() -> void:
@@ -176,6 +200,8 @@ func _sync_beacon() -> void:
 		return
 	var colours := MapMarks.beacon_colours()
 	beacon.set_colours(colours.accent, colours.glow)
+	if wind:
+		wind.set_colours(colours.accent, colours.glow)
 	beacon.show_at(Vector3(pin.xz.x, WorldHeight.height_at(pin.xz.x, pin.xz.y), pin.xz.y))
 	beacon.set_distance(player_xz.distance_to(pin.xz))
 

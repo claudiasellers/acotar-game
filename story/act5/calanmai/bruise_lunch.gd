@@ -25,7 +25,7 @@ func _build_beats() -> Array:
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		cast(&"tamlin", &"tamlin_seat", &"feyre_chair")
 		cast(&"lucien", &"lucien_seat", &"lucien_face")
-		sit(&"tamlin")
+		sit(&"tamlin", &"chair_head_dining")
 		sit(&"lucien"), "at the table"))
 	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:

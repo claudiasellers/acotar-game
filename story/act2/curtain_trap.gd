@@ -11,21 +11,43 @@
 ## Plays the moment `curtain_trap` (E at her window, at night). Play: E at
 ## the curtains takes the trimmings (a coil of rope), walk to the door, E
 ## rigs it at the light fixture.
+##
+## Before it starts (L34-7): at night after dinner, once she's in her room,
+## the window pulls her: a draught stirs the curtains, the growl that shut
+## Lucien up comes again from down the hall, the lock on her door is a joke
+## (ch7's motive, Keeper), then (if she still hasn't gone to the window) the
+## thought of the trimmings, twice at most. Near the
+## window the "E   the curtains" card shows. No marker, no objective (R2).
 class_name CurtainTrap
 extends Act2Space
 
 const DIR := "res://art/bedroom/"
 ## Before dawn, when Alis comes.
 const DAWN := 5.5 / 24.0
+## Quiet seconds before she reminds herself (L34-6).
+const NUDGE_AFTER := 15.0
+## The window's pull, seconds after she's in her room at night (L34-7).
+const ROOM_RADIUS := 9.0
+const DRAUGHT_AT := 3.0
+const GROWL_AT := 9.0
+const LOCK_AT := 16.0
+const CURTAINS_AT := 22.0
+## The growl that shut Lucien up, from down the hall past her door (space frame).
+const DOWN_THE_HALL := Vector3(0.0, 0.0, 26.0)
+const GROWL_SOUND := &"beast_snarl"
 
 var coil: Node3D
 var rope: Node3D
 var rigged: bool = false
+## Seconds she has spent in her room tonight with the scene ready, and the
+## pull's steps taken (draught, growl, lock, curtain thoughts).
+var pull_t: float = 0.0
+var pulled: PackedStringArray = []
+var _curtains: MeshInstance3D
 
 
 func _build_beats() -> Array:
 	rigged = false
-	var presses_at := [0]
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
@@ -36,12 +58,11 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "to the door"),
-		reach(&"door_inside", 2.0),
+		reach_nudged(&"door_inside", 2.0, &"rig_now", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void:
-			presses_at[0] = presses()
 			StoryControl.set_focus(_marker(&"fixture"))
 			aside(&"rig_prompt"), "under the light fixture"),
-		Beats.until(func() -> bool: return presses() > presses_at[0], "until she rigs it"),
+		wait_press("rig the rope", &"rig_now", NUDGE_AFTER, &"door_inside", 2.6, "until she rigs it"),
 		Beats.run(_rig, "rigged"),
 		Beats.raise("curtain_trap_set"),
 		say(&"locked"),
@@ -68,6 +89,79 @@ func _build_beats() -> Array:
 			dismiss(&"alis")
 			StoryControl.release(), "a new day"),
 	]
+
+
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	if auto_tick:
+		pull(delta)
+
+
+## The window's pull before the scene, while it could start and she's in the room.
+func pull(delta: float) -> void:
+	var ready_now := not running and can_start()
+	var here := ready_now and in_room()
+	if is_inside_tree() and not running:
+		var near := here and player_within(moment.entry_radius if moment else 2.5)
+		if near:
+			PressCard.find_or_make(self).show_text("the curtains")
+		else:
+			PressCard.hide_on(self)
+	if not ready_now:
+		pull_t = 0.0
+		pulled.clear()
+		return
+	if not here:
+		return
+	pull_t += delta
+	if pull_t >= DRAUGHT_AT and not pulled.has("draught"):
+		pulled.append("draught")
+		if is_inside_tree():
+			CurtainDraught.stir(curtains())
+		aside(&"pull_draught")
+	if pull_t >= GROWL_AT and not pulled.has("growl"):
+		pulled.append("growl")
+		if is_inside_tree():
+			SoundDirector.cue(GROWL_SOUND, global_transform * DOWN_THE_HALL)
+		aside(&"pull_growl")
+	if pull_t >= LOCK_AT and not pulled.has("lock"):
+		pulled.append("lock")
+		aside(&"pull_lock")
+	for i in 2:
+		var key := "curtains%d" % i
+		if pull_t >= CURTAINS_AT * (1.0 + 2.0 * i) and not pulled.has(key):
+			pulled.append(key)
+			aside(&"pull_curtains")
+
+
+## In her bedroom (by the window's anchor, on its floor).
+func in_room() -> bool:
+	var p := player()
+	if p == null:
+		return false
+	var d := p.global_position - global_position
+	return Vector2(d.x, d.z).length() <= ROOM_RADIUS and absf(d.y) <= arrive_height
+
+
+## The bedroom's own drapes (the house builds a "Curtains" mesh per room).
+func curtains() -> MeshInstance3D:
+	if _curtains and is_instance_valid(_curtains):
+		return _curtains
+	_curtains = null
+	if not is_inside_tree():
+		return null
+	var best := 6.0
+	for n in get_tree().root.find_children("Curtains", "MeshInstance3D", true, false):
+		var d := (n as Node3D).global_position.distance_to(mark(&"curtains"))
+		if n.get_parent() and n.get_parent().name == &"feyre_bedroom":
+			_curtains = n
+			break
+		var box := (n as MeshInstance3D).global_transform * (n as MeshInstance3D).get_aabb()
+		d = box.get_center().distance_to(mark(&"curtains"))
+		if d < best:
+			best = d
+			_curtains = n
+	return _curtains
 
 
 func _make_rope(_s: SceneSpace) -> void:
