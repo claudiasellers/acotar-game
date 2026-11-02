@@ -51,7 +51,7 @@ func test_grounds_and_scatter_are_in_the_region() -> void:
 	assert_not_null(estate.grounds)
 	assert_not_null(estate.scatter)
 	assert_gt(estate.scatter.forage_chunks().size(), 50)
-	assert_eq(get_tree().get_nodes_in_group(&"story_anchor").size(), 19, "4 grounds + 15 house anchors")
+	assert_eq(get_tree().get_nodes_in_group(&"story_anchor").size(), 20, "4 grounds + 16 house anchors (L38: the Calanmai painting wall)")
 
 
 func test_feyre_stands_on_grounds_structures() -> void:

@@ -3928,7 +3928,7 @@ position = Vector3(14.38, 0, 11.1)
 
 [sub_resource type="Resource" id="Resource_xmiq5"]
 script = ExtResource("5_51bm0")
-prop_id = &"chair_dining"
+prop_id = &"chair_head_dining"
 position = Vector3(6.6, 0, 10)
 yaw_deg = -90.0
 

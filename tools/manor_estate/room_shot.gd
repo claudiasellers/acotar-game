@@ -7,7 +7,7 @@ extends Node
 
 const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
 const EYE := 1.65
-const INSET := 0.9
+const INSET := 2.0       # clear of the corner plants and pedestals
 
 
 func _ready() -> void:

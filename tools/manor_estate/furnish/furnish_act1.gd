@@ -174,10 +174,9 @@ static func _dining_hall(f: ManorFurnisher) -> void:
 		var x := 7.6 + i * 1.13
 		f.put(&"chair_dining", x, 8.9, 0)
 		f.put(&"chair_dining", x, 11.1, 180)
-	# L29's chair at the head, as it was: the oversized chair_head_dining waits on
-	# a fix for teleports during a mantle (the chain's stuck-hop jump mantles onto
-	# its 1.7 m back, and Return Home later lands her back on it).
-	f.put(&"chair_dining", 6.6, 10, 90)
+	# Tamlin's oversized chair at the head [C] (Feyre.teleport ends a ledge climb
+	# since L03-8, so a mantle onto its 1.7 m back no longer carries over a teleport)
+	f.put(&"chair_head_dining", 6.6, 10, 90)
 	f.put(&"chair_dining", 15.4, 10, -90)
 	# the table's middle only: the first dinner lays its own places at the ends
 	f.set_on(table, [&"candelabra", &"bowl_floating_blossoms", &"vase_peonies", &"candle_cluster"])
