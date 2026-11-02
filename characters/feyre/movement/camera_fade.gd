@@ -6,7 +6,7 @@
 ## props crossing the line from the lens to her (bed drapes, posts) fade as well.
 ##
 ## Only meshes no bigger than MAX_SIZE fade (never a room shell, terrain or a
-## scatter field) and never Feyre herself. Purely presentational.
+## scatter field), never Feyre herself, never a mesh in NEVER_GROUP (her mount). Purely presentational.
 ##
 ## With no rendering device (headless: tests, world_smoke, the gate) it does
 ## nothing at all, unless a test sets `headless_opt_in` before Feyre enters the
@@ -18,6 +18,9 @@ extends Node
 static var headless_opt_in := false
 ## Headless opt-in only: the meshes a test offers as candidates.
 const PROBE_GROUP := &"camera_fade_probe"
+## Meshes that never fade: whatever she rides (the white mare, L47) sits on the
+## line from the lens to her and must stay solid.
+const NEVER_GROUP := &"camera_fade_never"
 
 const RADIUS := 0.5
 ## Her own third-person camera fades a little further out (a canopy post at the
@@ -108,6 +111,8 @@ func _fadeable_box(g: GeometryInstance3D) -> AABB:
 	if not g.visible or not g.is_visible_in_tree() or g is GPUParticles3D or g is CPUParticles3D:
 		return AABB()
 	if _owner_root and _owner_root.is_ancestor_of(g):
+		return AABB()
+	if g.is_in_group(NEVER_GROUP):
 		return AABB()
 	var box := g.global_transform * g.get_aabb()
 	if maxf(box.size.x, maxf(box.size.y, box.size.z)) > MAX_SIZE:
