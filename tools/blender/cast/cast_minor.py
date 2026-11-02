@@ -133,6 +133,19 @@ DESIGNS = {
                      brows="9A7A48", lips="BE8676", style=("tamlin", "style_loose"),
                      outfit=[("leathers", "8A8A80", "D9BE72"), ("boots", "3E3022"), ("cloak", "6A5A84")],
                      mask=("wolf", "D2C6A8", "9A8A62")),
+    # -- solstice dancers, true forms "shaped and colored and built so strangely and differently" (ch 25) --
+    "fae_rose": dict(canon="X", body="female", height=1.72, skin="D99AA8", iris="7A1E34", hair="8E1630",
+                     brows="6E1024", lips="B0304E", style=("feyre", "soft_curls"),
+                     outfit=[("gown", "gown_rose_petal", "C8304E", "D98A9A"), ("slippers", "B02844")],
+                     mask=("hawk", "D4AE5E", "D9B0B8"), extras=[("crown", "flower")]),
+    "fae_nymph": dict(canon="X", body="female", height=1.70, skin="9CC8D2", iris="1E5A6E", hair="2E6A80",
+                      brows="24505E", lips="5E8EA8", style=("feyre", "loose"),
+                      outfit=[("gown", "gown_starlight", "6FB2BC", "C8D9D6"), ("slippers", "5E9AA6")],
+                      mask=("hare", "B8C8D2", "D9C8D0"), extras=[("earrings", "earrings_pearl")]),
+    "fae_longlimb_true": dict(canon="C", body="trio", height=2.15, skin="7A6448", skin_tex="bark", iris="C9A040",
+                              hair="3E5A2A", brows="3A2A1A", lips="5A4030", style=("tamlin", "style_loose"),
+                              outfit=[("tunic", "5C7A52", "C9A55A", True), ("trousers", "4A3E30"), ("boots", "3A2E22")],
+                              mask=("bird", "B98E40", "D4B26A")),
 }
 
 D = DESIGNS[ID]
@@ -157,6 +170,7 @@ HAIR_RGB = cc.srgb(D["hair"])
 BROWS_SRGB = D["brows"]
 LIPS_SRGB = D["lips"]
 CANON = D["canon"]
+SKIN_TEX = D.get("skin_tex", "")
 
 
 # ---------------------------------------------------------------------------
@@ -170,6 +184,12 @@ def build(ctx):
         kind, metal, accent = D["mask"]
         rep.append(cc.tris_line(MASKS[kind](ctx, metal, accent)))
     for kind, name in D.get("extras", []):
+        if kind == "crown":
+            obj = ctx.bg.build_flower_crown(ctx.arm)
+            obj.name = ID + "_crown"
+            ctx.wardrobe.append((obj, "acc"))
+            rep.append(cc.tris_line(obj))
+            continue
         B = ctx.builder("%s_%s" % (ID, name), {"fabric": ("F6EFE4", 0.15, 0.0)})
         getattr(ctx.bw, "build_" + name)(B, ctx.probe, ctx.sh, ctx.rng)
         rep.append(cc.tris_line(ctx.head_piece(B, "%s_%s" % (ID, name))))
