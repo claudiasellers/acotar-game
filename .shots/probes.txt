@@ -1,0 +1,5 @@
+from film-lane
+quality look
+size 1920x1080
+timeout 900
+shot film res://tools/film/opening_film_shot.tscn {out}
