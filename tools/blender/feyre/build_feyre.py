@@ -39,6 +39,12 @@ import feyre_anims  # noqa: E402
 import feyre_shape as fs  # noqa: E402
 import sdf  # noqa: E402
 
+# build_cast runs this builder on a patched copy of feyre_shape (it sets CAST_PARAMS).
+# Feyre's princess-pass-2 extras (clumped lashes, lash blink keys, iris size, softer
+# blink falloff, inner-corner mask stop, fold relax) apply to her only, so a cast
+# rebuild reproduces the cast as it was.
+CAST = hasattr(fs, "CAST_PARAMS")
+
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 MODEL_DIR = os.path.join(REPO, "characters", "feyre", "model")
 WARDROBE_DIR = os.path.join(REPO, "characters", "feyre", "wardrobe")
@@ -359,15 +365,16 @@ def build_body():
     bm.free()
     body.data.validate()
     print("body islands dropped:", len(islands) - 1, "verts", sum(len(i) for i in islands[1:]))
-    print("head folds relaxed:", relax_head_folds(body.data))
+    if not CAST:
+        print("head folds relaxed:", relax_head_folds(body.data))
     return body, grid
 
 
 # --------------------------------------------------------------------------
 # Eyes: planar-mapped spheres with a painted iris; lashes from the lid edge
 # --------------------------------------------------------------------------
-IRIS_R = fs.IRIS_R    # iris radius as a fraction of the eyeball radius (front view)
-PUPIL_R = fs.PUPIL_R
+IRIS_R = 0.62 if CAST else fs.IRIS_R    # iris radius as a fraction of the eyeball radius (front view)
+PUPIL_R = 0.26 if CAST else fs.PUPIL_R
 UV_SPAN = 1.1    # UV square covers +/- UV_SPAN * EYE_R
 
 
@@ -464,11 +471,47 @@ def _lid_at(side, upper, tx, extra):
     return Vector(p.tolist()), Vector((d / np.linalg.norm(d)).tolist())
 
 
+def _build_lashes_strip(body_P):
+    """The pre-pass-2 lash strip (one ribbon per eye, rows of four verts), kept for the cast."""
+    bm = bmesh.new()
+    for s in (1, -1):
+        P, D = fs.lid_curve(s, True, n=15, extra=fs.LID_R[0] * 0.55)
+        P = P - np.array([0.0, 0.0, fs.LID_R[0] * 0.2])
+        n = len(P)
+        rows = []
+        for i in range(n):
+            tx = -0.96 + 1.92 * i / (n - 1)
+            outer = max(0.0, tx)
+            length = 0.0018 + 0.0052 * smoothstep(-0.4, 1.0, tx) ** 1.5
+            if i % 2 == 1:
+                length *= 0.86  # soft clumps
+            if i in (0, n - 1):
+                length *= 0.4
+            dv = Vector(D[i].tolist())
+            out_dir = (dv + Vector((s * 1.2 * outer, -0.35, 0.25))).normalized()
+            base = Vector(P[i].tolist())
+            mid = base + out_dir * length * 0.5 + Vector((0, 0, length * 0.08))
+            tip = base + out_dir * length + Vector((0, 0, length * 0.15))
+            under = base - dv * 0.0012
+            rows.append([bm.verts.new(under), bm.verts.new(base), bm.verts.new(mid), bm.verts.new(tip)])
+        for i in range(n - 1):
+            for r in range(3):
+                a, b2, c2, d2 = rows[i][r], rows[i + 1][r], rows[i + 1][r + 1], rows[i][r + 1]
+                f = bm.faces.new((a, d2, c2, b2) if s > 0 else (a, b2, c2, d2))
+                f.smooth = True
+    bm.normal_update()
+    obj = obj_from_bm("Lashes", bm)
+    obj.data.materials.append(make_material("lashes", srgb("#3B2A26"), 0.5, cull=False))
+    return obj
+
+
 def build_lashes(body_P):
     """Tapered lash clumps: a full upper fringe that lengthens and sweeps out to a
     flick at the outer corner, plus a few fine lower lashes at the outer half.
     Every lash is two rows of four verts (under, base, mid, tip) whose tips meet,
     so per-row tools (build_cast's LASH scaling) still work."""
+    if CAST:
+        return _build_lashes_strip(body_P)
     bm = bmesh.new()
     clumps = [(True, -0.93 + 1.89 * k / (fs.LASH_CLUMPS - 1)) for k in range(fs.LASH_CLUMPS)]
     clumps += [(False, 0.05 + 0.90 * k / max(1, fs.LASH_LOWER - 1)) for k in range(fs.LASH_LOWER)]
@@ -719,10 +762,16 @@ def lid_delta(P, side, upper=1.0, lower=1.0):
     ax, az, up, lo = fs.eye_angles(q[:, 0], q[:, 1], q[:, 2], side)
     # soft falloffs all round (no hard cut at the eye corners), so the brow and the
     # bridge of the nose stay smooth while the lid closes
-    near = (q[:, 1] < 0.004) * (1.0 - smoothstep(EYE_R + 0.006, EYE_R + 0.014, dist))
-    near = near * (1.0 - smoothstep(fs.EYE_OPEN_W * 1.0, fs.EYE_OPEN_W * 1.3, np.abs(ax)))
+    if CAST:   # the pre-pass-2 falloff
+        near = (q[:, 1] < 0.004) & (dist < EYE_R + 0.016) & (np.abs(ax) < fs.EYE_OPEN_W * 1.15)
+        near = near * (1.0 - smoothstep(EYE_R + 0.008, EYE_R + 0.016, dist))
+        reach = math.radians(40)
+    else:
+        near = (q[:, 1] < 0.004) * (1.0 - smoothstep(EYE_R + 0.006, EYE_R + 0.014, dist))
+        near = near * (1.0 - smoothstep(fs.EYE_OPEN_W * 1.0, fs.EYE_OPEN_W * 1.3, np.abs(ax)))
+        reach = math.radians(30)
     meet = -0.3 * lo
-    wu = smoothstep(up + math.radians(30), up + math.radians(3), az) * (az > meet) * near * upper
+    wu = smoothstep(up + reach, up + math.radians(3 if not CAST else 4), az) * (az > meet) * near * upper
     wl = smoothstep(-lo - math.radians(28), -lo - math.radians(3), az) * (az <= meet) * near * lower
     phi = -(up - meet) * wu + (meet + lo) * wl     # signed rotation (down is negative)
     rho = np.sqrt(q[:, 1] ** 2 + q[:, 2] ** 2)
@@ -902,9 +951,9 @@ def bake_makeup_masks(P, tris, uv, size=1024):
     over = eaz - up
     # outer corner: fade past the opening; inner corner: stop at the tear duct, so
     # shadow and liner never run onto the bridge of the nose
-    across = np.where(eax >= 0.0,
-                      1.0 - smoothstep(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.25, eax),
-                      1.0 - smoothstep(fs.EYE_OPEN_W * 0.80, fs.EYE_OPEN_W * 0.97, -eax))
+    across = 1.0 - smoothstep(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.25, np.abs(eax))
+    if not CAST:
+        across = np.where(eax >= 0.0, across, 1.0 - smoothstep(fs.EYE_OPEN_W * 0.80, fs.EYE_OPEN_W * 0.97, -eax))
     shadow = smoothstep(-2 * deg, 3 * deg, over) * (1.0 - smoothstep(22 * deg, 46 * deg, over)) * across * near_eye
     liner = smoothstep(-1.5 * deg, 0.5 * deg, over) * (1.0 - smoothstep(4 * deg, 8 * deg, over)) * across * near_eye
     # wing: continues the upper rim past the outer corner, flicking up
@@ -1241,7 +1290,8 @@ def main():
     skin_to_armature(lod, arm)
 
     add_body_shape_keys(body, vreg)
-    add_lash_shape_keys(lashes)
+    if not CAST:
+        add_lash_shape_keys(lashes)
 
     # Hunting outfit.
     kb = body.data.shape_keys.key_blocks
