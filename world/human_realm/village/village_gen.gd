@@ -183,7 +183,9 @@ func _build_collision(plan: VillagePlan) -> Node3D:
 				var size: Variant = spec[1]
 				var sk := "%s_%s_%.1f" % [kind, str(size), s]
 				if not shapes.has(sk):
-					if size is Vector3:
+					if size is StringName:
+						shapes[sk] = VillagePlan.bridge_deck()
+					elif size is Vector3:
 						var bs := BoxShape3D.new()
 						bs.size = size * s
 						shapes[sk] = bs

@@ -120,7 +120,7 @@ static func add_boxes(body: StaticBody3D, owner: Node, boxes: Array, pos: Vector
 
 ## Instance a landmark .glb at pos (y from the ground unless given) with its
 ## box collision on layer 1. Returns the instance.
-static func landmark(parent: Node, owner: Node, name: String, glb_path: String, p: Vector2, yaw: float, scale := 1.0, y_offset := 0.0) -> Node3D:
+static func landmark(parent: Node, owner: Node, name: String, glb_path: String, p: Vector2, yaw: float, scale := 1.0, y_offset := 0.0, boxes_from_glb := true) -> Node3D:
 	var scene := load(glb_path) as PackedScene
 	var pos := Vector3(p.x, WorldHeight.height_at(p.x, p.y) + y_offset, p.y)
 	var node: Node3D
@@ -133,7 +133,7 @@ static func landmark(parent: Node, owner: Node, name: String, glb_path: String, 
 	node.transform = Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale), pos)
 	parent.add_child(node)
 	node.owner = owner
-	var boxes := collision_boxes(glb_path)
+	var boxes := collision_boxes(glb_path) if boxes_from_glb else []
 	if not boxes.is_empty():
 		var body := StaticBody3D.new()
 		body.name = name + "Collision"

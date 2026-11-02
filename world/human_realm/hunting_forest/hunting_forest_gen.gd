@@ -78,8 +78,8 @@ func _initialize() -> void:
 	quit()
 
 
-func _lm(parent: Node, root: Node, name: String, asset: String, p: Vector2, yaw: float, scale := 1.0, y := 0.0) -> Node3D:
-	var n := ForestGenUtil.landmark(parent, root, name, asset, p, yaw, scale, y)
+func _lm(parent: Node, root: Node, name: String, asset: String, p: Vector2, yaw: float, scale := 1.0, y := 0.0, boxes_from_glb := true) -> Node3D:
+	var n := ForestGenUtil.landmark(parent, root, name, asset, p, yaw, scale, y, boxes_from_glb)
 	n.add_to_group(&"landmark", true)
 	_landmarks += 1
 	_node_positions.append(n.position)
@@ -167,12 +167,10 @@ func _build_landmarks(root: Node3D, b: HuntingForestBuilder) -> void:
 	# The long ride north to the Wall (ROADS[1]): bridge, crossroads, shrine,
 	# the abandoned farmstead, waystones.
 	var ride := _group(lm, "RideNorth", root)
-	var bridge: Array = HuntingForestBuilder.bridge_site()
-	var bp: Vector2 = bridge[0]
-	var road_dir: Vector2 = bridge[1]
-	_lm(ride, root, "FrozenBridge", A % "frozen_bridge", bp, ForestGenUtil.yaw_along(road_dir), 1.0, -0.6)
+	var bp := _frozen_bridge(ride, root)
 	var cr := HuntingForestBuilder.crossroads()
 	var road := HumanRealmLayout.ROADS[1]
+	var road_dir := _nearest_dir(road, cr)
 	var side := Vector2(-road_dir.y, road_dir.x)
 	_lm(ride, root, "CrossroadsGibbet", A % "gibbet", cr + side * 7.0 + road_dir * 4.0, ForestGenUtil.yaw_along(road_dir))
 	_lm(ride, root, "BrokenSignpost", A % "broken_signpost", cr - side * 5.0 - road_dir * 3.0, 0.4)
@@ -204,18 +202,48 @@ func _build_landmarks(root: Node3D, b: HuntingForestBuilder) -> void:
 		s += 110.0
 
 
+## The frozen bridge, its deck ends on the banks and its model tilted to them
+## if they differ. The model's long axis is local X. Returns its centre.
+func _frozen_bridge(parent: Node, root: Node) -> Vector2:
+	var span := HumanRealmLayout.frozen_bridge()
+	var ends := BridgeSpan.ends_on_ground(span, HuntingForestBuilder.BRIDGE_HALF_LENGTH)
+	var xf := BridgeSpan.frame(ends[0], ends[1])
+	var deck := HuntingForestBuilder.bridge_deck_profile()
+	xf.origin -= xf.basis.y * deck[0].y
+	var bp: Vector2 = span.centre
+	var n := _lm(parent, root, "FrozenBridge", A % "frozen_bridge", bp, 0.0, 1.0, 0.0, false)
+	var stretch := HuntingForestBuilder.BRIDGE_HALF_LENGTH * 2.0 / HuntingForestBuilder.BRIDGE_MODEL_LENGTH
+	n.transform = Transform3D(xf.basis * Basis(Vector3.UP, -PI * 0.5) * Basis.from_scale(Vector3(stretch, 1.0, 1.0)), xf.origin)
+	var body := StaticBody3D.new()
+	body.name = "FrozenBridgeCollision"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	parent.add_child(body)
+	body.owner = root
+	var cs := CollisionShape3D.new()
+	cs.shape = BridgeSpan.deck_shape(deck, 2.0)
+	cs.transform = xf
+	body.add_child(cs)
+	cs.owner = root
+	return bp
+
+
 func rng_yaw(i: int) -> float:
 	return fposmod(i * 2.399, TAU)
 
 
 func _creek_dir(p: Vector2) -> Vector2:
+	return _nearest_dir(HumanRealmLayout.CREEK, p)
+
+
+func _nearest_dir(line: PackedVector2Array, p: Vector2) -> Vector2:
 	var best := INF
 	var dir := Vector2.RIGHT
-	for i in HumanRealmLayout.CREEK.size() - 1:
-		var q := Geometry2D.get_closest_point_to_segment(p, HumanRealmLayout.CREEK[i], HumanRealmLayout.CREEK[i + 1])
+	for i in line.size() - 1:
+		var q := Geometry2D.get_closest_point_to_segment(p, line[i], line[i + 1])
 		if p.distance_to(q) < best:
 			best = p.distance_to(q)
-			dir = (HumanRealmLayout.CREEK[i + 1] - HumanRealmLayout.CREEK[i]).normalized()
+			dir = (line[i + 1] - line[i]).normalized()
 	return dir
 
 

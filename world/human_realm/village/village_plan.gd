@@ -38,6 +38,8 @@ const FOOT := {
 	&"bridge": Vector2(5.6, 20.0), &"barrel": Vector2(0.9, 0.9), &"crate": Vector2(0.8, 0.8),
 	&"lantern_post": Vector2(0.3, 0.3),
 }
+const BRIDGE_LENGTH := 20.0
+const BRIDGE_RISE := 0.4
 ## Kinds that are buildings (the GUT test checks these against roads/creek).
 const BUILDING_KINDS := [&"house_timber", &"house_wattle", &"house_long", &"house_croft", &"house_leanto",
 	&"shed", &"tavern", &"meeting_hall", &"debt_house", &"barn_abandoned", &"mill", &"smithy"]
@@ -78,16 +80,7 @@ const COLLIDE := {
 		[Vector3(4.4, 0.4, 1.2), Vector3(1.8, 0.8, 1.6)],
 	],
 	&"bridge": [
-		[Vector3(0, -0.224, -9), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, -0.096, -7), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.000, -5), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.064, -3), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.096, -1), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.096, 1), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.064, 3), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, 0.000, 5), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, -0.096, 7), Vector3(4.6, 0.6, 2.05)],
-		[Vector3(0, -0.224, 9), Vector3(4.6, 0.6, 2.05)],
+		[Vector3.ZERO, &"deck"],
 		[Vector3(-2.5, 0.5, 0), Vector3(0.45, 1.2, 20.0)],
 		[Vector3(2.5, 0.5, 0), Vector3(0.45, 1.2, 20.0)],
 	],
@@ -535,28 +528,32 @@ func _place_landmarks() -> void:
 	put(&"iron_charm", shrine.pos + rot(Vector2(0.9, 0.9), shrine.yaw), rng.randf() * TAU)
 
 
-## The ride-north road (ROADS[1]) crosses the creek: a stone bridge, deck at road height.
+## The ride-north road (ROADS[1]) crosses the creek: a stone bridge, square to
+## the creek, its deck ends on the road either side.
 func _place_bridge() -> void:
-	var road: PackedVector2Array = HumanRealmLayout.ROADS[1]
-	var c := HumanRealmLayout.CREEK
-	for i in road.size() - 1:
-		for j in c.size() - 1:
-			var hit: Variant = Geometry2D.segment_intersects_segment(road[i], road[i + 1], c[j], c[j + 1])
-			if hit == null or not rect.has_point(hit):
-				continue
-			var p: Vector2 = hit
-			var dir := (road[i + 1] - road[i]).normalized()
-			var yaw := atan2(dir.x, dir.y)
-			var e0 := p - dir * 10.0
-			var e1 := p + dir * 10.0
-			var y := maxf(WorldHeight.height_at(e0.x, e0.y), WorldHeight.height_at(e1.x, e1.y)) + 0.02
-			(layers[&"creek_bridge"] as ScatterLayer).add(Vector3(p.x, y, p.y), yaw, 1.0)
-			blockers.append({c = p, h = FOOT[&"bridge"] * 0.5, yaw = yaw})
-			landmarks.append({name = "CreekBridge", kind = &"bridge", xf = Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, y, p.y)), markers = {
-				"BridgeMid": Transform3D(Basis.IDENTITY, Vector3(0, 0.4, 0)),
-			}})
-			for k in 8:
-				put(&"icicles", p + rot(Vector2(rng.randf_range(-2.0, 2.0), rng.randf_range(-3.5, 3.5)), yaw), rng.randf() * TAU, 0.9, -0.3)
+	var span := HumanRealmLayout.creek_bridge()
+	var p: Vector2 = span.centre
+	var dir: Vector2 = span.across
+	var yaw := atan2(dir.x, dir.y)
+	var ends := BridgeSpan.ends_on_ground(span, BRIDGE_LENGTH * 0.5)
+	var y := (ends[0].y + ends[1].y) * 0.5
+	(layers[&"creek_bridge"] as ScatterLayer).add(Vector3(p.x, y, p.y), yaw, 1.0)
+	blockers.append({c = p, h = FOOT[&"bridge"] * 0.5, yaw = yaw})
+	landmarks.append({name = "CreekBridge", kind = &"bridge", xf = Transform3D(Basis(Vector3.UP, yaw), Vector3(p.x, y, p.y)), markers = {
+		"BridgeMid": Transform3D(Basis.IDENTITY, Vector3(0, 0.4, 0)),
+	}})
+	for k in 8:
+		put(&"icicles", p + rot(Vector2(rng.randf_range(-2.0, 2.0), rng.randf_range(-3.5, 3.5)), yaw), rng.randf() * TAU, 0.9, -0.3)
+
+
+## The village bridge's deck as tools/blender/human_realm/village_buildings.py
+## shapes it: end height at both ends, BRIDGE_RISE higher at mid-span.
+static func bridge_deck() -> ConcavePolygonShape3D:
+	var line := PackedVector2Array()
+	for i in 11:
+		var z := (float(i) / 10.0 - 0.5) * BRIDGE_LENGTH
+		line.append(Vector2(z, BRIDGE_RISE * (1.0 - pow(2.0 * z / BRIDGE_LENGTH, 2.0))))
+	return BridgeSpan.deck_shape(line, 2.3)
 
 
 func _place_mill() -> void:
