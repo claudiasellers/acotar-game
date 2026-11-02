@@ -204,6 +204,18 @@ func test_east_lawn_is_dressed_and_keeps_the_kitchen_walk_clear() -> void:
 	assert_eq(to_shed[1], ManorEastLawn.BEND, "the kitchen walk bends where the chain's walk does")
 
 
+## The south hedge returns open in line with the wings' garden doors (the chain
+## playtest walked into a solid hedge at x -71 coming back from the puca).
+func test_south_hedge_returns_open_toward_the_wings() -> void:
+	var space := grounds.get_node("RoseGarden/Collision")
+	for side: float in [-1.0, 1.0]:
+		var gap := Vector2(side * ManorRoseGarden.SOUTH_OPENING_X, -93.0)
+		for cs in space.get_children():
+			if cs is CollisionShape3D:
+				var o: Vector3 = (cs as CollisionShape3D).global_position
+				assert_gt(Vector2(o.x, o.z).distance_to(gap), 0.9, "nothing solid in the opening at %s" % gap)
+
+
 func test_decorations_and_draw_budget() -> void:
 	var areas: Array[Rect2] = [ManorSitePlan.ROSE_GARDEN, ManorGardenRooms.AREA, ManorGardenRooms.BUTTERCUP_MEADOW,
 		ManorReflectingPool.footprints()[0]]

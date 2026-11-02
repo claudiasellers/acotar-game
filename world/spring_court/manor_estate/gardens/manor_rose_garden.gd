@@ -22,6 +22,8 @@ const POOL_R := 4.95
 const IRIS := Vector2(5.4, 9.0)
 ## Outer edge of the inner walk; the manor_fountain anchor stands on it.
 const CIRCLE_R := 14.0
+## The arched openings in the south hedge returns (x = ±71), in line with the wings' garden doors.
+const SOUTH_OPENING_X := 71.0
 const INNER_WALK := Vector2(9.0, 14.0)
 const RING_A := Vector2(14.0, 23.5)
 const SWAG_R := 24.0
@@ -397,9 +399,12 @@ static func _hedges(b: GroundsBatch) -> void:
 	GardenKit.hedge_with_openings(b, Vector2(w, -93.0), Vector2(w, n), [WEST_GATE], 5.0)
 	GardenKit.hedge_with_openings(b, Vector2(e, -93.0), Vector2(e, n), [EAST_GATE], 5.0)
 	GardenKit.hedge_with_openings(b, Vector2(w, n), Vector2(e, n), [NORTH_GATE], 7.0, false)
-	# low south returns beside the wings: the hedges under Feyre's window (ch10)
-	GardenKit.hedge_line(b, Vector2(w, -93.0), Vector2(-50.0, -93.0))
-	GardenKit.hedge_line(b, Vector2(50.0, -93.0), Vector2(e, -93.0))
+	# low south returns beside the wings: the hedges under Feyre's window (ch10),
+	# each with an arched opening on the line from the garden to the wing's
+	# side door, so the way back to the house from the puca's hedge is a walk,
+	# not a scramble (the chain playtest snagged here)
+	GardenKit.hedge_with_openings(b, Vector2(w, -93.0), Vector2(-50.0, -93.0), [Vector2(-SOUTH_OPENING_X, -93.0)], 4.0)
+	GardenKit.hedge_with_openings(b, Vector2(50.0, -93.0), Vector2(e, -93.0), [Vector2(SOUTH_OPENING_X, -93.0)], 4.0)
 
 
 static func _north_gate(b: GroundsBatch) -> void:
