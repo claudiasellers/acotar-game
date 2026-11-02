@@ -2,8 +2,10 @@
 ## started in a woods region and WorldStreamer threaded, exactly as in play,
 ## and prints each woods region's build progress once a second until every
 ## woods region near her is built (or the limit passes).
-##   godot [--headless] res://tools/woods/woods_stream_probe.tscn -- [region] [seconds] [out.png]
-## With a renderer and an out path it also saves what Feyre's camera sees.
+##   godot [--headless] res://tools/woods/woods_stream_probe.tscn -- [region] [seconds] [out.png] [x z look_x look_z]
+## With a renderer and an out path it also saves what Feyre's camera sees, or,
+## given x z look_x look_z, Feyre stands at x z and a camera at her eye
+## height looks toward look_x look_z.
 ## Exit code 0 when every loaded woods region built and has trees, else 1.
 extends Node
 
@@ -32,6 +34,13 @@ func _run() -> void:
 	_game.set(&"start_anchor", &"")
 	_game.set(&"spawn_timeout", 0.5)
 	get_tree().root.add_child(_game)
+	var spot := Vector4.ZERO
+	var has_spot := args.size() > 6
+	if has_spot:
+		spot = Vector4(float(args[3]), float(args[4]), float(args[5]), float(args[6]))
+		var feyre: Node3D = _game.get(&"feyre")
+		feyre.global_position = Vector3(spot.x, WorldHeight.height_at(spot.x, spot.y) + 2.0, spot.y)
+		WorldStreamer.update_for(feyre.global_position)
 	_t0 = Time.get_ticks_msec()
 	var ok := false
 	var frames := 0
@@ -65,6 +74,14 @@ func _run() -> void:
 	_say("WOODS_PROBE budget: jobs run %d, worst frame %d us, slowest job %s %d us, job_max %s" % [FrameBudget.queued_jobs_started,
 			FrameBudget.max_frame_usec, FrameBudget.slowest_job, FrameBudget.max_job_usec, FrameBudget.job_max])
 	if not out.is_empty() and DisplayServer.get_name() != "headless":
+		if has_spot:
+			var cam := Camera3D.new()
+			cam.far = 1200.0
+			cam.fov = 60.0
+			_game.add_child(cam)
+			cam.global_position = Vector3(spot.x, WorldHeight.height_at(spot.x, spot.y) + 1.7, spot.y)
+			cam.look_at(Vector3(spot.z, WorldHeight.height_at(spot.z, spot.w) + 1.2, spot.w))
+			cam.make_current()
 		for i in 120:
 			await get_tree().process_frame
 		await RenderingServer.frame_post_draw
