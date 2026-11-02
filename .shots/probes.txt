@@ -1,0 +1,4 @@
+from L38 foyer aubergine
+quality look
+timeout 600
+shot rooms res://tools/manor_estate/room_shot.tscn entrance_hall {out}
