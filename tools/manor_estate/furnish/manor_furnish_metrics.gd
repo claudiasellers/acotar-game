@@ -100,7 +100,8 @@ static func measure(room: ManorRoomDef, ctx: ManorFurnishContext, stations: Arra
 	for s in stations:
 		if s.level == room.level and room.rect.has_point(Vector2(s.position.x, s.position.z)):
 			var sz := PropLib.size_of(s.prop_id)
-			var f := Rect2(Vector2(s.position.x, s.position.z) - Vector2(sz.x, sz.z) * 0.5, Vector2(sz.x, sz.z))
+			var ext := Vector2(sz.z, sz.x) if absf(fposmod(s.yaw_deg, 180.0) - 90.0) < 45.0 else Vector2(sz.x, sz.z)
+			var f := Rect2(Vector2(s.position.x, s.position.z) - ext * 0.5, ext)
 			foot += f.get_area()
 			floor_rects.append(f)
 			any_rects.append(f)
