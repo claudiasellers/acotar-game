@@ -28,12 +28,12 @@ SHAPE = dict(
     # refined, moderately square jaw with its corners under the outer irises and a defined chin (the
     # old jaw was too big and too long), a wide mouth with a full lower lip resting in a half smile
     # ("a half smile", ch20 [C]), and a warrior's neck.
-    eye_r=0.0200, eye_open_up=21.0, eye_open_lo=20.0, eye_tilt=10.0, eye_open_w=65.0,
+    eye_r=0.0184, eye_open_up=21.0, eye_open_lo=20.0, eye_tilt=10.0, eye_open_w=65.0,
     eye_dx=0.0016, cut_reach=0.008, cut_soft=0.009, lid=0.80, eye_sink=0.75, eye_dz=-0.0010, brow_dz=-0.0006,
     cheeks=0.70, cheekbones=0.0, cheek_lift=0.003,
     jaw=0.45, jaw_w=0.86, jaw_taper=0.95, chin=1.05, chin_drop=0.006, chin_y=-0.003,
-    brow=0.55, nose=0.92, nose_w=0.86, nose_up=0.08, nose_bridge=1.0, bridge_fill=1.0,
-    lips=1.04, lip_upper=0.80, lip_lower=1.22, lip_w=1.55, lip_bow=1.0, smile=0.6,
+    brow=0.55, nose=0.92, nose_w=1.02, nose_up=0.08, nose_bridge=1.12, bridge_fill=1.2,
+    lips=1.04, lip_upper=0.86, lip_lower=1.16, lip_w=1.80, lip_bow=1.0, smile=0.6,
     lower_fill=0.9, mouth_dy=0.006,
     fae_ears=1.0, face_w=1.0, neck=1.12, adams_apple=0.5,
     bust=0.0, pecs=0.9, ribs=1.08, waist=1.08, belly=0.82, pelvis=0.90, seat=0.60, lats=1.22,
@@ -52,20 +52,21 @@ LASH = 1.0
 LASH_STYLE = "strands"
 LASH_COUNT = 24
 LASH_FLICK = 0.35
-LOWER_LASH = 0.0
+LOWER_LASH = 0.35
 FACE_TRIS = 6500                     # the close-up face budget the sisters use (L37)
 # makeup-mask shapes (L49): dark, straight, strong brows with a low arch; a fine dark lash line
-MASK = dict(shadow_h=16.0, liner_w=4.5, wing=6.0, wing_lift=8.0, lower_liner=0.25,
-            blush=(0.054, 1.486, 0.018, 0.008), brow_arch=0.55, brow_peak=0.72, brow_weight=1.75)
+MASK = dict(shadow_h=21.0, liner_w=5.5, wing=6.0, wing_lift=8.0, lower_liner=0.40,
+            blush=(0.056, 1.468, 0.021, 0.007),   # the "blush" channel is a contour under the cheekbones
+            brow_arch=0.55, brow_peak=0.72, brow_weight=1.75)
 # feyre_skin.gdshader makeup (L49): a smoky violet-grey lid, a soft dark lash line, the faintest cool
 # contour on the cheekbones, a natural mouth; a cool lilac rim light (the Night Court against Spring).
-MAKEUP = dict(lips_amount=0.60, lips_sheen=0.30, eyeshadow_color="5E5470", eyeshadow_amount=0.50,
-              eyeshadow_sheen=0.15, liner_color="141220", liner_amount=0.85, blush_color="B89AA8",
-              blush_amount=0.18, blush_sheen=0.0, brows_amount=1.0, rim_color="D8D0FF", rim_amount=0.30)
+MAKEUP = dict(lips_amount=0.72, lips_sheen=0.22, eyeshadow_color="5A4C5E", eyeshadow_amount=0.62,
+              eyeshadow_sheen=0.15, liner_color="141220", liner_amount=0.85, blush_color="9C7C78",
+              blush_amount=0.32, blush_sheen=0.0, subsurface=0.45, brows_amount=1.0, rim_color="D8D0FF", rim_amount=0.30)
 LASH_LINEAR = cc.srgb("0E0E18")
-HAIR_RGB = cc.srgb("161A2C")         # blue-black
+HAIR_RGB = cc.srgb("131830")         # blue-black
 BROWS_SRGB = "1C1E2C"
-LIPS_SRGB = "A8686F"                 # a natural dusky rose
+LIPS_SRGB = "9A6461"                 # a muted rose-brown
 
 INK, INK_D, SILVER, SILVER_D = "2B2540", "1C1828", "D9DDEA", "A3A9BE"
 PAL = {"fabric": (INK, 0.66, 0.0), "trim": (SILVER, 0.24, 0.9), "chain": (SILVER, 0.2, 0.95),
@@ -103,6 +104,12 @@ def build(ctx):
 
     # -- hair
     obj, clear = ctx.hair_style("rhysand_short", style_short, HAIR_RGB)
+    for m in obj.data.materials:                          # matte satin, not the kit's glossy coat (L49)
+        bsdf = m.node_tree.nodes.get("Principled BSDF") if m and m.use_nodes else None
+        if bsdf is not None:
+            bsdf.inputs["Roughness"].default_value = 0.70
+            bsdf.inputs["Coat Weight"].default_value = 0.0
+            bsdf.inputs["Specular IOR Level"].default_value = 0.30
     rep.append(cc.tris_line(obj) + " crown_clear=%.4f" % clear)
     return rep
 
@@ -120,7 +127,7 @@ def style_short(st):
     clumps that flow from the crown forward and out at random lengths and lifts (an uneven,
     feathered silhouette), broad locks falling onto the forehead, and fine flyaways."""
     rng = np.random.default_rng(4949)
-    st.cap(thick=0.0062, back_extra=0.0035, line=short_line, lift=0.004)
+    st.cap(thick=0.0105, back_extra=0.0050, line=short_line, lift=0.006)
     st.cap_locks(math.radians(-12), n=30, off=0.0080, r=0.0072, front_sweep=False)
     # clumps: rings from the crown outwards; each flows away from the crown whorl (behind the top)
     for ph_deg, n, ln in ((78, 6, 18), (64, 12, 22), (50, 16, 24), (36, 18, 22), (22, 14, 18)):
@@ -132,7 +139,7 @@ def style_short(st):
             flow = math.radians(rng.uniform(-14, 14))     # tousled: each clump turns its own way
             th1 = th + flow + (0.10 if th > 0 else -0.10) * (abs(th) > 0.3)
             ph1 = ph - math.radians(ln + rng.uniform(-6, 8))
-            off = 0.0085 + rng.uniform(0.0, 0.0065) * (1.0 if ph_deg >= 50 else 0.6)
+            off = 0.0140 + rng.uniform(0.0, 0.0070) * (1.0 if ph_deg >= 50 else 0.6)
             st.skull_lock(th, ph, th1, ph1, off, rng.uniform(0.0058, 0.0080), n=8,
                           sag=-math.radians(rng.uniform(2, 7)))
     # locks falling over the forehead from a soft side part, the longest towards his right
@@ -141,7 +148,12 @@ def style_short(st):
         st.skull_lock(math.radians(th0), math.radians(72 - 2 * k), math.radians(th1), math.radians(ph1),
                       0.0090 + 0.0010 * (k % 2), r, n=11, sag=-math.radians(7))
     for s in (1, -1):                                     # short at the temples, over the ear tops
-        st.skull_lock(s * math.radians(50), math.radians(52), s * math.radians(84), math.radians(14), 0.0090, 0.0068,
+        st.skull_lock(s * math.radians(50), math.radians(52), s * math.radians(86), math.radians(4), 0.0120, 0.0080,
                       n=9, sag=-math.radians(3))
+    for i in range(9):                                    # the nape grows down to the collar
+        th = math.radians(140 + 80 * (i + 0.5) / 9)
+        th = th if th <= math.pi else th - 2 * math.pi
+        top = st.head.scalp(th, math.radians(-8), 0.008)
+        st.hang(top, 0.045 + rng.uniform(0.0, 0.015), 0.006, r0=0.0080, r1=0.0040, wave=0.002)
     st.flyaways(n=7)
     cc.tuck_behind_ears(st)

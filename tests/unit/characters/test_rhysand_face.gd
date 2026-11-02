@@ -33,7 +33,11 @@ func test_head_wears_his_makeup() -> void:
 		return
 	assert_gte(float(mat.get_shader_parameter("brows_amount")), 0.95, "strong dark brows")
 	assert_gt(float(mat.get_shader_parameter("liner_amount")), 0.5, "a dark lash line")
-	assert_lt(float(mat.get_shader_parameter("blush_amount")), 0.3, "barely any blush")
+	# the blush channel is a muted contour under the cheekbones, never a pink flush
+	var bc: Color = mat.get_shader_parameter("blush_color")
+	assert_lt(bc.r - bc.g, 0.2, "contour is a muted taupe-brown, not pink")
+	assert_lt(float(mat.get_shader_parameter("blush_amount")), 0.45, "subtle contour")
+	assert_gt(float(mat.get_shader_parameter("subsurface")), 0.3, "warm subsurface, not flat porcelain")
 
 
 func test_rests_in_a_half_smile_unmasked() -> void:
