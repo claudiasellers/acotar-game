@@ -1,0 +1,4 @@
+from gameplay-L12
+quality look
+shot dinner res://tools/act2_dinner_shot.tscn {out}
+shot rooms res://tools/indoor_camera_shot.tscn {out}
