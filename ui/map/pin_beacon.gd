@@ -10,7 +10,7 @@ const RADIUS := 2.2
 const FADE_NEAR := 18.0
 const FADE_FAR := 90.0
 const SHADER := preload("res://ui/map/pin_beacon.gdshader")
-const GLINT := preload("res://ui/map/fae_wind.gdshader")
+const GLINT := preload("res://ui/map/pin_glint.gdshader")
 
 var _beam: MeshInstance3D
 var _mat: ShaderMaterial
