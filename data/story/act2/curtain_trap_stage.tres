@@ -16,6 +16,7 @@ marks = {
 "fixture": Vector3(0.5, 3, 17.6)
 }
 lines = {
+"alis_lucien": {"text": "Lucien's on border patrol today. He'll be at the stables, getting ready to leave.", "who": "Alis"},
 "pull_curtains": {"text": "Those curtains. The trimmings would braid into a rope.", "who": ""},
 "pull_draught": {"text": "A draught stirred the curtains. Night air, sweet off the gardens.", "who": ""},
 "pull_growl": {"text": "That growl, down the hall. It shut him up. It could shut me up just as fast.", "who": ""},

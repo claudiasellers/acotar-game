@@ -27,6 +27,12 @@ const LEAD := 2.5
 const LUCIEN_SPEED := 1.6
 const PLEAS: Array[StringName] = [&"beg_grind", &"beg_marrow", &"beg_fear", &"beg_look"]
 const FOLLOW_PLEAS: Array[StringName] = [&"beg_belly", &"beg_devour", &"beg_look"]
+## Quiet seconds before Lucien calls her on (L34-8).
+const NUDGE_AFTER := 15.0
+## Home after the hunt: the front steps, where Lucien found her (L34-8).
+const HOME_REGION := &"manor_estate"
+const HOME_ANCHOR := &"manor_dining_table"
+const HOME_STEPS := Vector3(-21, 0, 6.5)
 const THOUGHTS: Array[StringName] = [&"thought_bread", &"thought_stars", &"thought_sunrise"]
 
 ## How real it is now (seconds of her looking, fading as she looks away).
@@ -76,7 +82,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			EventBus.journal_entry_added.emit(&"treaty_no_loophole")
 			EventBus.journal_entry_added.emit(&"masks_are_permanent"), "journal"),
-		reach(&"freeze", 3.0),
+		reach_nudged(&"freeze", 3.0, &"lucien_keep_up", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void: _freeze(), "Lucien goes still"),
 		Beats.control(StoryControl.Mode.LOOK),
 		say(&"lucien_bow_down"),
@@ -86,12 +92,21 @@ func _build_beats() -> Array:
 		say(&"lucien_walk"),
 		Beats.run(func(_s: SceneSpace) -> void: _walk_on(), "walk on"),
 		Beats.control(StoryControl.Mode.WALK),
-		reach(&"safety", 3.0),
+		reach_nudged(&"safety", 3.0, &"lucien_walk", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void: _safe(), "safety"),
 		say(&"lucien_gone"),
 		Beats.cue(&"tamlin", &"hunts_the_bogge"),
 		Beats.raise("bogge_survived"),
+		say(&"lucien_home"),
+		Beats.run(func(_s: SceneSpace) -> void: _home(), "home to the manor"),
 	]
+
+
+## The walk home is too long to play: dark, and she's on the manor's front steps.
+func _home() -> void:
+	release_actor(&"lucien")
+	if is_inside_tree():
+		Act2Travel.go(get_tree(), HOME_REGION, HOME_ANCHOR, HOME_STEPS)
 
 
 func tick(delta: float) -> void:

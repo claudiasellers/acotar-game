@@ -85,6 +85,7 @@ func _build_beats() -> Array:
 		say(&"dawn"),
 		say(&"alis_fight"),
 		Beats.raise("fact.alis_tripped"),
+		say(&"alis_lucien"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"alis")
 			StoryControl.release(), "a new day"),
