@@ -284,10 +284,10 @@ func feyre_model() -> Node3D:
 	return model as Node3D
 
 
-func pose(who: Node3D, pose_name: StringName, seconds: float = 0.6) -> void:
+func pose(who: Node3D, pose_name: StringName, seconds: float = 0.6, chair: StringName = &"chair_dining") -> void:
 	var p := FilmPose.on(who)
 	if p:
-		p.to(pose_name, seconds)
+		p.to(pose_name, seconds, chair)
 		if not _posed.has(p):
 			_posed.append(p)
 

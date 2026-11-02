@@ -18,6 +18,7 @@ extends SkeletonModifier3D
 const CHAIRS := {
 	&"chair_dining": {"top": 0.565, "frame": 0.49, "front": 0.25},
 	&"chair_head_dining": {"top": 0.592, "frame": 0.48, "front": 0.375},
+	&"chair_simple": {"top": 0.517, "frame": 0.49, "front": 0.225},
 }
 ## The hip bone over the cushion: what lifts the thigh's flesh onto the seat.
 const SEAT_LIFT := 0.135
@@ -26,6 +27,8 @@ const KNEE_CLEAR := 0.07
 ## The thigh's centre over the frame at the front edge. On a chair high for her
 ## legs the thigh slopes, so a short figure perches forward to keep this.
 const THIGH_CLEAR := 0.07
+## A slouch's stretched leg: the shin this far off plumb, heel on the floor.
+const LEG_OUT := deg_to_rad(40.0)
 
 const POSES := {
 	# Upright on both knees, shins flat behind (the kiss in the glen).
@@ -59,9 +62,10 @@ const POSES := {
 		"LeftUpperArm": Vector3(0.12, -1.0, 0.28), "RightUpperArm": Vector3(-0.12, -1.0, 0.28),
 		"LeftLowerArm": Vector3(-0.15, -0.6, 1.0), "RightLowerArm": Vector3(0.15, -0.6, 1.0)}},
 	# Slouched in the chair, one leg out (Tamlin pretending not to care).
-	&"sit_slouch": {"sits": true, "drop": 0.5, "back": 0.08, "aims": {
+	# _seated() fits the hips and the bent leg, and stretches the other to the floor.
+	&"sit_slouch": {"sits": true, "drop": 0.5, "back": 0.08, "seated": true, "leg_out": true, "aims": {
 		"LeftUpperLeg": Vector3(0.2, -0.05, 1.0), "RightUpperLeg": Vector3(-0.1, 0.0, 1.0),
-		"LeftLowerLeg": Vector3(0.1, -1.0, 0.5), "RightLowerLeg": Vector3(0.0, -0.6, 1.0),
+		"LeftLowerLeg": Vector3(0.05, -1.0, 0.0), "RightLowerLeg": Vector3(0.0, -0.6, 1.0),
 		"LeftFoot": Vector3(0.0, -0.3, 1.0), "RightFoot": Vector3(0.0, 0.2, 1.0),
 		"Spine": Vector3(0.0, 1.0, -0.25), "Chest": Vector3(0.0, 1.0, -0.1)}},
 	# Sitting in the grass, leaning back on the hands (the glen at noon).
@@ -238,6 +242,15 @@ func _seated(sit_pose: Dictionary, chair: StringName) -> Dictionary:
 		var flat := Vector3(0.0, sole.y, Vector2(sole.x, sole.z).length())
 		aims["LeftFoot"] = flat
 		aims["RightFoot"] = flat
+	if bool(sit_pose.get("leg_out", false)):
+		var shin_length := shin_rest.distance_to(foot_rest)
+		var knee_out := foot_rest.y + shin_length * cos(LEG_OUT)
+		var fall_out := knee_out - (hip_y + thigh_rest.y - hip_rest.y)
+		var reach_out := sqrt(maxf(thigh_length * thigh_length - fall_out * fall_out, 0.01))
+		var aim_out: Vector3 = aims["RightUpperLeg"]
+		aims["RightUpperLeg"] = Vector3(aim_out.x, fall_out / reach_out, 1.0)
+		aims["RightLowerLeg"] = Vector3(0.0, -cos(LEG_OUT), sin(LEG_OUT))
+		aims["RightFoot"] = Vector3(0.0, 0.2, 1.0)
 	return fitted
 
 

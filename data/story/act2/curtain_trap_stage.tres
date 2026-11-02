@@ -8,7 +8,7 @@ marks = {
 "alis_door": Vector3(0, 0, 18),
 "alis_heap": Vector3(0, 0, 17),
 "alis_up": Vector3(0.3, 0, 16.2),
-"coil": Vector3(3, 0.55, -1),
+"coil": Vector3(4, 0.5, -1),
 "curtains": Vector3(0, 1.8, -1.4),
 "curtains_floor": Vector3(0, 0, -0.6),
 "door_inside": Vector3(0, 0, 17.2),

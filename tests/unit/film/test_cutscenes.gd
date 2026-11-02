@@ -112,6 +112,26 @@ func test_every_beat_of_every_director_runs_and_the_props_go() -> void:
 		p.free()
 
 
+## Tamlin throws the house's own head chair over; it is back when the film ends.
+func test_the_head_chair_goes_home() -> void:
+	FilmPlayer.headless_opt_in = true
+	assert_eq(String(ManorHouseBuilder.LOOSE[&"dining_hall"][&"chair_head_dining"]), "HeadChair", "the house keeps it loose")
+	var head := Node3D.new()
+	head.name = "HeadChair"
+	root.add_child(head)
+	head.global_transform = Transform3D(Basis(Vector3.UP, 0.7), Vector3(1.0, 0.0, 2.0))
+	var home := head.global_transform
+	var p := Films.play(_space(), &"night_court")
+	var director := p.get_node("Director")
+	assert_eq(director.get(&"chair"), head, "the film uses the house's chair")
+	p.seek(p.data.length - 0.05)
+	p.skip()
+	await get_tree().process_frame
+	assert_true(is_instance_valid(head), "not taken away with the props")
+	assert_true(head.global_transform.is_equal_approx(home), "back where the house keeps it")
+	p.free()
+
+
 ## The house builds its floors at their world height: a film staged in its
 ## layout frame stands on the ground floor, not under it (the Mac run had
 ## the dining hall played on the terrain below the house).

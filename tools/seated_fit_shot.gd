@@ -1,5 +1,5 @@
 ## Seated figures in their clothes, from the side and both quarters (T045):
-##   godot res://tools/seated_fit_shot.tscn -- [out_dir] [who,who,...]
+##   godot res://tools/seated_fit_shot.tscn -- [out_dir] [who,who,...] [chair] [pose]
 ## Tamlin, Lucien and Feyre (her tunic, her dinner gown, her Act I clothes) each sit on the
 ## dining chair in FilmPose's fitted sit, on a plain floor with a studio light.
 ## A geometry check, not a lighting one. Needs a GPU or lavapipe.
@@ -43,7 +43,9 @@ func _run() -> void:
 	plane.size = Vector2(8, 8)
 	floor_mesh.mesh = plane
 	add_child(floor_mesh)
-	var chair := PropLib.build(&"chair_dining")
+	var chair_id := StringName(args[2]) if args.size() > 2 else &"chair_dining"
+	var sit_pose := StringName(args[3]) if args.size() > 3 else &"sit"
+	var chair := PropLib.build(chair_id)
 	add_child(chair)
 	_cam = Camera3D.new()
 	_cam.fov = 40.0
@@ -53,14 +55,15 @@ func _run() -> void:
 		var figure := _figure(id)
 		add_child(figure)
 		figure.global_basis = Basis.looking_at(Vector3.RIGHT, Vector3.UP)
+		chair.global_basis = figure.global_basis
 		await _frames(6)
-		for pose: StringName in [&"stand", &"sit"]:
-			FilmPose.on(figure).to(&"" if pose == &"stand" else pose, 0.0, &"chair_dining")
-			chair.visible = pose == &"sit"
+		for pose: StringName in [&"stand", sit_pose]:
+			FilmPose.on(figure).to(&"" if pose == &"stand" else pose, 0.0, chair_id)
+			chair.visible = pose == sit_pose
 			await _frames(8)
 			for view: String in VIEWS:
-				_cam.global_position = (VIEWS[view] as Vector3) * (1.0 if pose == &"sit" else 1.25)
-				_cam.look_at(Vector3(0.0, 0.7 if pose == &"sit" else 0.95, 0.0), Vector3.UP)
+				_cam.global_position = (VIEWS[view] as Vector3) * (1.0 if pose == sit_pose else 1.25)
+				_cam.look_at(Vector3(0.0, 0.7 if pose == sit_pose else 0.95, 0.0), Vector3.UP)
 				await RenderingServer.frame_post_draw
 				var img := get_viewport().get_texture().get_image()
 				if img != null and not img.is_empty():

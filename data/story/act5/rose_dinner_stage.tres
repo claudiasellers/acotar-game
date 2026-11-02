@@ -6,8 +6,8 @@
 script = ExtResource("1")
 marks = {
 "feyre_chair": Vector3(4.95, 0, -6.5),
-"roses": Vector3(4.3, 0.82, -6.95),
-"tamlin": Vector3(3.6, 0, -7.4)
+"roses": Vector3(3.7, 0.82, -6.95),
+"tamlin": Vector3(3.95, 0, -7.5)
 }
 lines = {
 "alis": {"text": "Alis takes them up to my painting room.", "who": ""},

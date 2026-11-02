@@ -36,6 +36,8 @@ var _table_scale: Vector3 = Vector3.ONE
 var _canvases: Array[Node3D] = []
 var _kept_canvas: Node3D
 var _hinted: bool = false
+## In her chair, for leaving the tree before she has been got up.
+var _seated: bool = false
 
 
 func _ready() -> void:
@@ -83,7 +85,8 @@ func _build_beats() -> Array:
 		cast(&"tamlin", &"tamlin_seat", &"feyre_chair")
 		sit(&"tamlin", &"chair_head_dining")
 		place_feyre(mark(&"feyre_chair"))
-		seat_feyre(&"feyre_seat", &"table"), "dinner, at opposite ends"))
+		seat_feyre(&"feyre_seat", &"table")
+		_seated = true, "dinner, at opposite ends"))
 	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(actor(&"tamlin")), "the length of the table"))
 	b.append_array(speak(&"far", &"tender"))
@@ -98,6 +101,7 @@ func _build_beats() -> Array:
 			t.global_position = mark(&"tamlin_close")
 			CalanmaiSpace.face_toward(t, mark(&"feyre_close"))
 		unseat_feyre()
+		_seated = false
 		place_feyre(mark(&"feyre_close"))
 		EventBus.face_requested.emit(&"tamlin", &"weary", 0.6, 3.0), "close"))
 	b.append(Beats.wait(1.2))
@@ -237,5 +241,7 @@ func _clear_canvases() -> void:
 
 
 func _exit_tree() -> void:
+	if _seated:
+		unseat_feyre()
 	_shrink_table(false)
 	_clear_canvases()
