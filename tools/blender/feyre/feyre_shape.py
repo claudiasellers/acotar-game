@@ -187,16 +187,17 @@ def build_grid(h=0.0025):
     for s in (1, -1):
         U(sdf.sphere((0.0057 * s, -0.0840, 1.4712), 0.0033), 0.004)
            # nostril shadow
-    # lips: full upper with a soft cupid's bow, rounder lower
+    # lips: full upper with a soft cupid's bow, rounder lower; set back into the face so they rest
+    # rather than pout (L41-3: ~6 mm proud of the skin, was ~8.5)
     for s in (1, -1):
-        U(sdf.ellipsoid((0.0072 * s, MOUTH_Y + 0.0038, MOUTH_Z + 0.0037), (0.0110, 0.0052, 0.0046),
+        U(sdf.ellipsoid((0.0078 * s, MOUTH_Y + 0.0056, MOUTH_Z + 0.0034), (0.0118, 0.0050, 0.0040),
                         _rot_y(math.radians(-12 * s))), 0.005)
-    U(sdf.ellipsoid((0, MOUTH_Y + 0.0036, MOUTH_Z - 0.0050), (0.0140, 0.0056, 0.0056)), 0.005)
+    U(sdf.ellipsoid((0, MOUTH_Y + 0.0058, MOUTH_Z - 0.0048), (0.0150, 0.0052, 0.0050)), 0.005)
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0055, MOUTH_Z), (0.0158, 0.005, 0.0010)), 0.0015)  # mouth line
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z - 0.0155), (0.011, 0.004, 0.0032)), 0.006)  # crease above the chin
     for s in (1, -1):
         # a closed, relaxed smile: the corners tuck in and lift a touch
-        S(sdf.sphere((s * (MOUTH_HALF_W + 0.0004), MOUTH_Y + 0.0012, MOUTH_Z + 0.0019), 0.0024), 0.0024)
+        S(sdf.sphere((s * (MOUTH_HALF_W + 0.0004), MOUTH_Y + 0.0020, MOUTH_Z + 0.0024), 0.0024), 0.0024)
         # cheekbone lift under the outer eye
         U(sdf.ellipsoid((0.044 * s, -0.061, 1.491), (0.019, 0.011, 0.009), _rot_z(math.radians(-15 * s))), 0.012)
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z + 0.0135), (0.0032, 0.003, 0.0045)), 0.004)          # philtrum

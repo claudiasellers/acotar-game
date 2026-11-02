@@ -41,7 +41,7 @@ func _run() -> void:
 	await _close_up(feyre, 0.0, out.path_join("face_drive_front.png"))
 	await _close_up(feyre, 32.0, out.path_join("face_drive_34.png"))
 	await _close_up(feyre, 180.0, out.path_join("face_drive_back.png"), 0.95)
-	var face: Variant = feyre.model.get(&"face")
+	var face: Node = feyre.find_child("FaceDriver", true, false)   # under her model scene
 	if face != null:
 		for e: StringName in [&"glare", &"mask_smile"]:
 			face.call(&"express", e, 1.0, 30.0)
