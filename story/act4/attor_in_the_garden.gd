@@ -448,3 +448,11 @@ func _drop(id: StringName) -> void:
 	if who and is_instance_valid(who):
 		who.remove_from_group(StringName("story_actor_%s" % id))
 		who.queue_free()
+
+
+func request_actor(actor_id: StringName, where: Transform3D, fallback: Callable) -> Node3D:
+	return Act4Walk.request_own(self, actor_id, where, fallback)
+
+
+func actor(actor_id: StringName) -> Node3D:
+	return Act4Walk.live(actors, actor_id)

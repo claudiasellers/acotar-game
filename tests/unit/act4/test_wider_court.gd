@@ -293,3 +293,18 @@ func test_pool_water_darkens_at_night() -> void:
 	steep._process(0.1)
 	assert_eq(float(mat.get_shader_parameter(&"night_amount")), 0.0)
 	Clock.time_of_day = keep
+
+
+func test_never_borrows_another_scenes_stand_in() -> void:
+	var other := SceneSpace.new()
+	root.add_child(other)
+	var theirs := Node3D.new()
+	theirs.add_to_group(&"story_actor_tamlin")
+	other.add_child(theirs)
+	var s := _pool()
+	var mine := s.cast(&"tamlin", &"tamlin_wait", &"blanket_view")
+	assert_ne(mine, theirs, "the pool casts its own Tamlin")
+	assert_eq(mine.get_parent(), s)
+	assert_false(mine.is_in_group(&"story_actor_tamlin"), "and keeps him out of the shared group")
+	mine.free()
+	assert_null(s.actor(&"tamlin"), "a freed actor reads as gone, without an error")

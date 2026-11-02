@@ -65,6 +65,9 @@ func tick(delta: float) -> void:
 	_dt = delta
 	if _stroll_on and running:
 		var who := actor(&"tamlin")
+		if who == null and not _stroll_route.is_empty():
+			who = cast(&"tamlin", _stroll_route[0], &"pool")
+			Act4Walk.plant(self, who)
 		if who and not _stroll_route.is_empty():
 			if Act4Walk.step(who, mark(_stroll_route[0]), STROLL, delta):
 				_stroll_route.pop_front()
@@ -225,3 +228,11 @@ func _swim_out() -> void:
 	who.global_position = out
 	Act4Walk.face(who, p)
 	Act4Walk.idle(who)
+
+
+func request_actor(actor_id: StringName, where: Transform3D, fallback: Callable) -> Node3D:
+	return Act4Walk.request_own(self, actor_id, where, fallback)
+
+
+func actor(actor_id: StringName) -> Node3D:
+	return Act4Walk.live(actors, actor_id)
