@@ -369,7 +369,7 @@ frame_scale = 1.3
 props = PackedStringArray()
 light_color = Color(1, 0.6, 0.32, 1)
 light_energy = 1.4
-fx_id = &"bonfire_smoke"
+fx_id = &""
 sound_cue = "res://data/places/sounds/fire.tres"
 
 [sub_resource type="Resource" id="Resource_l2wh2"]

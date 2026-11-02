@@ -105,60 +105,60 @@
    "kind": "landmark",
    "region": "hill_of_the_rite",
    "size_m": [
-    13.749,
-    6.406,
-    4.673
+    13.814,
+    6.474,
+    4.767
    ],
-   "tris": 2768,
-   "tris_lod1": 1384
+   "tris": 2946,
+   "tris_lod1": 1472
   },
   {
    "climbable": false,
    "collision": true,
    "file": "rite_cave_wall_a.gltf",
-   "glows": true,
+   "glows": false,
    "id": "rite_cave_wall_a",
    "kind": "structure",
    "region": "hill_of_the_rite",
    "size_m": [
-    7.89,
-    4.588,
-    2.232
+    6.0,
+    4.542,
+    2.992
    ],
-   "tris": 1216,
-   "tris_lod1": 608
+   "tris": 2210,
+   "tris_lod1": 1105
   },
   {
    "climbable": false,
    "collision": true,
    "file": "rite_cave_wall_b.gltf",
-   "glows": true,
+   "glows": false,
    "id": "rite_cave_wall_b",
    "kind": "structure",
    "region": "hill_of_the_rite",
    "size_m": [
-    6.86,
-    5.769,
-    2.392
+    5.0,
+    5.46,
+    3.28
    ],
-   "tris": 1216,
-   "tris_lod1": 608
+   "tris": 2150,
+   "tris_lod1": 1074
   },
   {
    "climbable": false,
    "collision": true,
    "file": "rite_cave_wall_c.gltf",
-   "glows": true,
+   "glows": false,
    "id": "rite_cave_wall_c",
    "kind": "structure",
    "region": "hill_of_the_rite",
    "size_m": [
-    8.935,
-    3.74,
-    2.247
+    7.0,
+    3.672,
+    2.978
    ],
-   "tris": 1216,
-   "tris_lod1": 608
+   "tris": 2150,
+   "tris_lod1": 1074
   },
   {
    "climbable": false,
@@ -169,12 +169,12 @@
    "kind": "structure",
    "region": "hill_of_the_rite",
    "size_m": [
-    2.228,
-    5.0,
-    2.233
+    2.629,
+    5.436,
+    2.631
    ],
-   "tris": 856,
-   "tris_lod1": 428
+   "tris": 1096,
+   "tris_lod1": 547
   },
   {
    "climbable": false,
