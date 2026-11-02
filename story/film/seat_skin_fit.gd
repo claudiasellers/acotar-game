@@ -31,6 +31,8 @@ const BODY_LAYERS := ["torso", "legs"]
 const LAYER_OF := [["trouser", 1], ["pants", 1], ["legging", 1], ["stocking", 1], ["shift", 1], ["shirt", 1],
 	["tunic", 2], ["blouse", 2], ["gown", 2], ["dress", 2], ["smock", 2],
 	["doublet", 3], ["waistcoat", 3], ["vest", 3], ["coat", 3]]
+## How far above the cushion's top a held vertex rests.
+const HOLD_CLEAR := 0.004
 const ORIGINAL := &"seat_fit_original"
 const FITTED := &"seat_fit_fitted"
 
@@ -66,6 +68,81 @@ static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 		if made != null:
 			mi.set_meta(ORIGINAL, mi.mesh)
 			mi.mesh = made
+
+
+## Rests the cloth that hangs into the seat on the cushion (T057). A tunic's hem hangs from
+## the hips, and with the hips on the cushion its flanks sink into it: the part outside the
+## cushion's edge showed as a wedge cut into the hem. Called once the sit pose has settled,
+## with the figure's bones as drawn. A garment vertex of layer 2 or more that lies below the
+## cushion's top, within `half` of the chair's centre, is moved up to it; the sitting copy
+## keeps the lift, and standing puts the originals back. Trousers and the body are the legs
+## on the seat: they sit in the cushion, and nothing shows. Returns how many vertices moved.
+static func hold_on_seat(skeleton: Skeleton3D, pose: Array[Transform3D], top: float, half: float) -> int:
+	if skeleton == null or skeleton.find_bone("Hips") < 0 or pose.size() != skeleton.get_bone_count():
+		return 0
+	var holder := _figure_root(skeleton)
+	var to_local := skeleton.global_transform.affine_inverse()
+	var at_floor: Vector3 = (holder as Node3D).global_position if holder is Node3D else skeleton.global_position
+	var centre: Vector3 = to_local * at_floor
+	var seat_y: float = centre.y + top / maxf(skeleton.global_basis.get_scale().y, 0.001)
+	var moved := 0
+	var garments: Dictionary = _parts(holder, skeleton, true)["garments"]
+	for mi: MeshInstance3D in garments.keys():
+		if int(garments[mi]) < 2:
+			continue
+		var src := mi.mesh as ArrayMesh
+		var to_pose: Array[Transform3D] = []
+		for b in mi.skin.get_bind_count():
+			var bone := skeleton.find_bone(_bind_name(mi.skin, b, skeleton))
+			to_pose.append(pose[bone] * mi.skin.get_bind_pose(b) if bone >= 0 else Transform3D.IDENTITY)
+		var out := ArrayMesh.new()
+		out.blend_shape_mode = src.blend_shape_mode
+		for b in src.get_blend_shape_count():
+			out.add_blend_shape(src.get_blend_shape_name(b))
+		var here := 0
+		for s in src.get_surface_count():
+			var arrays := src.surface_get_arrays(s)
+			here += _lift(arrays, to_pose, Vector2(centre.x, centre.z), seat_y, half)
+			var flags := src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
+			out.add_surface_from_arrays(src.surface_get_primitive_type(s), arrays, src.surface_get_blend_shape_arrays(s), {}, flags)
+			out.surface_set_material(s, src.surface_get_material(s))
+			out.surface_set_name(s, src.surface_get_name(s))
+		if here > 0:
+			if not mi.has_meta(ORIGINAL):
+				mi.set_meta(ORIGINAL, mi.mesh)
+			mi.mesh = out
+			moved += here
+	return moved
+
+
+## Moves the vertices of `arrays` that are drawn below `seat_y` within `half` of `centre`
+## (x, z of the skeleton's space) up to it, by shifting each in its bind space so the
+## skin carries it there. Returns how many moved.
+static func _lift(arrays: Array, to_pose: Array[Transform3D], centre: Vector2, seat_y: float, half: float) -> int:
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+	var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+	if verts.is_empty() or bones.is_empty():
+		return 0
+	var per := bones.size() / verts.size()
+	var moved := 0
+	for v in verts.size():
+		var at := Vector3.ZERO
+		var blend := Basis(Vector3.ZERO, Vector3.ZERO, Vector3.ZERO)
+		for k in per:
+			var w := weights[v * per + k]
+			if w > 0.0:
+				var m := to_pose[bones[v * per + k]]
+				at += w * (m * verts[v])
+				blend = Basis(blend.x + m.basis.x * w, blend.y + m.basis.y * w, blend.z + m.basis.z * w)
+		if at.y >= seat_y or absf(at.x - centre.x) > half or absf(at.z - centre.y) > half:
+			continue
+		if absf(blend.determinant()) < 0.05:
+			continue
+		verts[v] += blend.inverse() * Vector3(0.0, seat_y - at.y + HOLD_CLEAR, 0.0)
+		moved += 1
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	return moved
 
 
 ## The way the figure faces at rest, in the skeleton's space: its left, crossed with up.

@@ -125,6 +125,8 @@ var _people: int = -1   # -1 not looked yet, 0 humanoid, 1 townsfolk
 var _from: Dictionary = {}
 var _to: Dictionary = {}
 var _mix: float = 1.0
+## The chair a settled sit is waiting to rest the cloth on (SeatSkinFit.hold_on_seat); empty once done.
+var _hold: Dictionary = {}
 var _tween: Tween
 var _bones: Dictionary = {}
 ## Where the head is as drawn (this pose blended in), in the skeleton's space.
@@ -160,6 +162,9 @@ func to(pose_name: StringName, seconds: float = 0.6, chair: StringName = &"chair
 	var target: Dictionary = POSES.get(pose_name, {})
 	# Sitting bends the thigh past what clothes skinned for standing follow.
 	SeatSkinFit.set_seated(get_skeleton(), bool(target.get("sits", false)))
+	_hold = CHAIRS.get(chair, CHAIRS[&"chair_dining"]) if bool(target.get("sits", false)) else {}
+	if not _hold.is_empty() and get_skeleton() != null and not get_skeleton().skeleton_updated.is_connected(_rest_cloth_on_seat):
+		get_skeleton().skeleton_updated.connect(_rest_cloth_on_seat)
 	if bool(target.get("seated", false)):
 		target = _seated(target, chair)
 	_from = _current()
@@ -180,6 +185,18 @@ func to(pose_name: StringName, seconds: float = 0.6, chair: StringName = &"chair
 	_tween.tween_property(self, ^"_mix", 1.0, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	if end_influence != start_influence:
 		_tween.tween_property(self, ^"influence", end_influence, seconds)
+
+
+## Once the sit has settled and the bones are drawn, lays the hem on the cushion.
+func _rest_cloth_on_seat() -> void:
+	var sk := get_skeleton()
+	if _hold.is_empty() or sk == null or _mix < 1.0 or influence < 0.999:
+		return
+	var at: Array[Transform3D] = []
+	for i in sk.get_bone_count():
+		at.append(sk.get_bone_global_pose(i))
+	SeatSkinFit.hold_on_seat(sk, at, float(_hold["top"]), float(_hold["front"]))
+	_hold = {}
 
 
 ## `pose` fitted to this figure's legs on `chair`: hips on the cushion, shins
