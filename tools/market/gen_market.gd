@@ -10,7 +10,25 @@ extends SceneTree
 const OUT := "res://data/market/market.tres"
 const SCATTER := "res://world/human_realm/village/scatter/%s.tres"
 const VILLAGE := "res://world/human_realm/village/village.tscn"
-const SIGN := "res://story/market/assets/sign_%s.glb"
+const KIT := "res://story/market/assets/%s.glb"
+## Awning tones, so neighbours differ (tools/market/market_kit.py TONES).
+const TONE := {
+	&"charms": "slate", &"spice": "madder", &"cobbler": "oat", &"grain": "rust", &"clothier": "slate",
+	&"baker": "oat", &"wool": "madder", &"roots": "rust", &"tinker": "slate", &"salt": "oat",
+}
+## Nudges off the generated ring: [metres forward(+)/back along the stall's
+## facing, metres sideways, yaw radians]. The cobbler stays put: Act I's
+## act1_fur_stall anchor stands at its counter.
+const NUDGE := {
+	&"charms": [0.8, 0.3, 0.12], &"spice": [-0.6, 0.0, -0.08], &"cobbler": [0.0, 0.0, 0.0],
+	&"grain": [0.9, -0.2, 0.15], &"clothier": [-0.7, 0.4, -0.14], &"baker": [1.0, -0.3, 0.22],
+	&"wool": [0.0, 0.5, 0.06], &"roots": [0.3, 0.0, -0.1], &"tinker": [0.0, -0.4, -0.05], &"salt": [0.4, 0.0, 0.08],
+}
+## Set dressing for the square: [kit name, x, z, yaw, collision box size].
+const DRESSING := [
+	["handcart", 363.0, 2246.5, 0.6, Vector3(1.6, 1.1, 1.0)],
+	["crate_pile", 392.5, 2259.0, -0.4, Vector3(1.6, 1.0, 1.2)],
+]
 ## The cottage fork, a few metres down the village road (HumanRealmLayout.ROADS[0]).
 const FORK_FROM := Vector2(-150.0, 2160.0)
 const FORK_TOWARD := Vector2(-20.0, 2200.0)
@@ -57,9 +75,17 @@ func _initialize() -> void:
 			s.trade = trade
 			s.display_name = NAMES[trade][0]
 			s.canon = NAMES[trade][1]
-			s.sign_path = SIGN % trade
-			s.position = Vector3(layer.instances[i * 5], layer.instances[i * 5 + 1], layer.instances[i * 5 + 2])
-			s.yaw = layer.instances[i * 5 + 3]
+			s.stall_path = KIT % ("stall_" + TONE[trade])
+			s.goods_path = KIT % ("goods_" + trade)
+			s.sign_path = KIT % ("sign_" + trade)
+			s.scatter_position = Vector3(layer.instances[i * 5], layer.instances[i * 5 + 1], layer.instances[i * 5 + 2])
+			var yaw0: float = layer.instances[i * 5 + 3]
+			var nudge: Array = NUDGE[trade]
+			var b := Basis(Vector3.UP, yaw0)
+			var p := s.scatter_position + b * Vector3(float(nudge[1]), 0.0, float(nudge[0]))
+			p.y = WorldHeight.height_at(p.x, p.z) if nudge[0] != 0.0 or nudge[1] != 0.0 else s.scatter_position.y
+			s.position = p
+			s.yaw = yaw0 + float(nudge[2])
 			s.buyer = _buyer(trade)
 			set.stalls.append(s)
 			used[trade] = true
@@ -73,6 +99,13 @@ func _initialize() -> void:
 	set.fingerpost_at = Vector3(at.x, WorldHeight.height_at(at.x, at.y), at.y)
 	# The arm (local +Z) points down the road to the village.
 	set.fingerpost_yaw = atan2(dir.x, dir.y)
+	for d: Array in DRESSING:
+		set.dressing_paths.append(KIT % d[0])
+		set.dressing_xforms.append(Transform3D(Basis(Vector3.UP, d[3]), Vector3(d[1], WorldHeight.height_at(d[1], d[2]), d[2])))
+		set.dressing_boxes.append(d[4])
+	for st in set.stalls:
+		if st.buyer or st.trade in [&"grain", &"roots"]:
+			print("keeper %s: %.2f, %.2f yaw %.1f" % [st.trade, st.keeper_spot().x, st.keeper_spot().z, rad_to_deg(st.yaw + PI)])
 	var err := ResourceSaver.save(set, OUT)
 	print("gen_market: %d stalls (%d buy from Feyre), mercenary at %s -> %s (%d)" % [
 			set.stalls.size(), set.buyers().size() - 1, set.mercenary_at, OUT, err])
