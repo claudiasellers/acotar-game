@@ -40,27 +40,12 @@ static func create(arrow_data: ArrowData = null) -> Arrow:
 	shape.shape = box
 	arrow.add_child(shape)
 
-	var shaft := MeshInstance3D.new()
-	var cylinder := CylinderMesh.new()
-	cylinder.top_radius = 0.006
-	cylinder.bottom_radius = 0.006
-	cylinder.height = LENGTH
-	shaft.mesh = cylinder
-	shaft.rotation_degrees.x = 90.0
-	var wood := StandardMaterial3D.new()
-	wood.albedo_color = arrow.data.shaft_color
-	shaft.material_override = wood
-	arrow.add_child(shaft)
-
-	var fletching := MeshInstance3D.new()
-	var vanes := BoxMesh.new()
-	vanes.size = Vector3(0.05, 0.002, 0.12)
-	fletching.mesh = vanes
-	fletching.position.z = LENGTH * 0.5 - 0.07
-	var feather := StandardMaterial3D.new()
-	feather.albedo_color = arrow.data.fletching_color
-	fletching.material_override = feather
-	arrow.add_child(fletching)
+	# One shared ArrowModel mesh (F44): shaft, nock, steel head and vanes, so
+	# an arrow in flight or stuck in a wolf is never a primitive grey box.
+	var model := MeshInstance3D.new()
+	model.name = "ArrowModel"
+	model.mesh = ArrowModel.mesh(LENGTH, LENGTH * 0.5, arrow.data.shaft_color, arrow.data.fletching_color, ArrowModel.STEEL)
+	arrow.add_child(model)
 	return arrow
 
 
