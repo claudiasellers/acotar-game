@@ -20,6 +20,7 @@ const BLIGHT_WORDS := ["blight", "ashen", "grey_lichen", "bone", "mask", "crow",
 ## write of these caches holds _lock (Mutex is recursive).
 static var _meshes := {}
 static var _scenes := {}
+static var _resources := {}
 static var _materials := {}
 static var _lock := Mutex.new()
 
@@ -110,6 +111,21 @@ static func scene(id: StringName) -> PackedScene:
 		_scenes[id] = packed
 	_lock.unlock()
 	return packed
+
+
+## Any other resource by path (FX scenes, sound cues, place tables), loaded
+## and cached under the same lock as scene()/mesh(), so a main-thread load
+## never races a region worker's .gltf load (F27). Missing paths cache null.
+static func resource(path: String) -> Resource:
+	_lock.lock()
+	var res: Resource
+	if _resources.has(path):
+		res = _resources[path]
+	else:
+		res = load(path) if path != "" and ResourceLoader.exists(path) else null
+		_resources[path] = res
+	_lock.unlock()
+	return res
 
 
 static func material_for(id: StringName) -> Material:

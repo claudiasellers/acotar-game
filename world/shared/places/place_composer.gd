@@ -11,18 +11,9 @@ const FX_DIR := "res://world/spring_court/wider/fx/particles/fx_%s.tscn"
 const BED := 5.5
 const DRAW := 170.0
 
-static var _tables := {}
-static var _lock := Mutex.new()
-
-
-## The table at `path` (cached; safe from worker threads).
+## The table at `path` (cached under CourtAssets' lock: safe from worker threads, F27).
 static func table(path: String = COURT_TABLE) -> PlaceTable:
-	_lock.lock()
-	if not _tables.has(path):
-		_tables[path] = load(path) as PlaceTable if ResourceLoader.exists(path) else null
-	var t: PlaceTable = _tables[path]
-	_lock.unlock()
-	return t
+	return CourtAssets.resource(path) as PlaceTable
 
 
 ## Settings whose forecourt touches `rect`.
@@ -141,14 +132,15 @@ static func build_nodes(parent: Node3D, settings: Array[PlaceSetting]) -> void:
 			light.position = Vector3(0.0, s.light_height, 0.0)
 			node.add_child(light)
 		var fx_path := FX_DIR % s.fx_id
-		if s.fx_id != &"" and ResourceLoader.exists(fx_path):
-			var fx := (load(fx_path) as PackedScene).instantiate() as Node3D
+		var packed := CourtAssets.resource(fx_path) as PackedScene if s.fx_id != &"" else null
+		if packed != null:
+			var fx := packed.instantiate() as Node3D
 			if fx != null:
 				fx.name = "Fx"
 				fx.position = Vector3(0.0, 1.4, 0.0)
 				node.add_child(fx)
-		if s.sound_cue != "" and ResourceLoader.exists(s.sound_cue):
-			var cue := load(s.sound_cue) as SoundCue
+		if s.sound_cue != "":
+			var cue := CourtAssets.resource(s.sound_cue) as SoundCue
 			if cue != null:
 				var player := AudioStreamPlayer3D.new()
 				player.name = "Sound"
