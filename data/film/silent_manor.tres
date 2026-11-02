@@ -1,0 +1,298 @@
+[gd_resource type="Resource" script_class="FilmScript" load_steps=43 format=3]
+
+[ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
+[ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
+[ext_resource type="Script" path="res://story/film/film_beat.gd" id="3_beat"]
+
+[sub_resource type="Resource" id="L00"]
+script = ExtResource("2_line")
+id = &"c_01"
+at = 13.0
+hold = 3.5
+speaker = &"alis"
+text = "You can't be here. You were told to stay away."
+canon = "C"
+
+[sub_resource type="Resource" id="L01"]
+script = ExtResource("2_line")
+id = &"c_02"
+at = 18.5
+hold = 3.0
+speaker = &"feyre"
+text = "Where is he? What happened here?"
+canon = "C"
+
+[sub_resource type="Resource" id="L02"]
+script = ExtResource("2_line")
+id = &"c_03"
+at = 22.0
+hold = 3.6
+speaker = &"alis"
+text = "She took him. To her court, Under the Mountain."
+canon = "C"
+
+[sub_resource type="Resource" id="L03"]
+script = ExtResource("2_line")
+id = &"c_04"
+at = 26.0
+hold = 2.2
+speaker = &"alis"
+text = "Amarantha."
+canon = "C"
+
+[sub_resource type="Resource" id="L04"]
+script = ExtResource("2_line")
+id = &"c_05"
+at = 29.0
+hold = 4.8
+speaker = &"alis"
+text = "The seven times seven years are over. She is High Queen of Prythian now."
+canon = "C"
+
+[sub_resource type="Resource" id="L05"]
+script = ExtResource("2_line")
+id = &"c_06"
+at = 34.3
+hold = 4.4
+speaker = &"alis"
+text = "That I can tell you any of this means the game is over, to her."
+canon = "C?"
+
+[sub_resource type="Resource" id="L06"]
+script = ExtResource("2_line")
+id = &"c_07"
+at = 40.5
+hold = 10.0
+speaker = &"alis"
+text = "She came from across the sea, a commander in the old War. Forty-nine years ago, at a ball, she put a potion in the High Lords' wine and stole their powers. All seven of them."
+canon = "C"
+
+[sub_resource type="Resource" id="L07"]
+script = ExtResource("2_line")
+id = &"c_08"
+at = 51.5
+hold = 4.0
+speaker = &"alis"
+text = "For forty-nine years, we have been her slaves."
+canon = "C"
+
+[sub_resource type="Resource" id="L08"]
+script = ExtResource("2_line")
+id = &"c_09"
+at = 56.5
+hold = 5.0
+speaker = &"alis"
+text = "Tamlin would not be hers. He refused her and spat in her face."
+canon = "C"
+
+[sub_resource type="Resource" id="L09"]
+script = ExtResource("2_line")
+id = &"c_10"
+at = 62.0
+hold = 4.2
+speaker = &"alis"
+text = "So she cursed him, and all of us with him. The masks."
+canon = "C"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("2_line")
+id = &"c_11"
+at = 66.5
+hold = 4.4
+speaker = &"alis"
+text = "Then she bound us so we couldn't say a word about it. Not one word."
+canon = "C"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("2_line")
+id = &"c_12"
+at = 72.0
+hold = 8.0
+speaker = &"alis"
+text = "To break it, a human girl with ice in her heart, who hated our kind enough to kill one of his own, sent across the Wall."
+canon = "C"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("2_line")
+id = &"c_13"
+at = 80.5
+hold = 4.0
+speaker = &"alis"
+text = "And then she had to say she loved him, and mean it."
+canon = "C"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("2_line")
+id = &"c_14"
+at = 85.0
+hold = 5.5
+speaker = &"alis"
+text = "If no girl did, he would be her slave forever, and Prythian would stay under her rule."
+canon = "C?"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("2_line")
+id = &"c_15"
+at = 91.5
+hold = 4.5
+speaker = &"alis"
+text = "There was nothing in the Treaty about a life for a life. That was a lie."
+canon = "C"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("2_line")
+id = &"c_16"
+at = 96.5
+hold = 7.0
+speaker = &"alis"
+text = "The wolf you killed was one of us. Andras. Tamlin sent him across the Wall that day, knowing a girl like you might kill him."
+canon = "C"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("2_line")
+id = &"c_17"
+at = 104.5
+hold = 4.0
+speaker = &"alis"
+text = "You stupid, stupid girl. You never said it."
+canon = "C"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("2_line")
+id = &"c_18"
+at = 109.0
+hold = 5.5
+speaker = &"alis"
+text = "He had three days left when he sent you home. Three days, and he let you go."
+canon = "C"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("2_line")
+id = &"c_19"
+at = 115.5
+hold = 2.0
+speaker = &"feyre"
+text = "Where is he?"
+canon = "C"
+
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("2_line")
+id = &"c_20"
+at = 118.0
+hold = 3.8
+speaker = &"alis"
+text = "Under the Mountain. With her. You'll die there."
+canon = "C"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("2_line")
+id = &"c_21"
+at = 122.3
+hold = 2.2
+speaker = &"feyre"
+text = "Then take me."
+canon = "C"
+
+[sub_resource type="Resource" id="L21"]
+script = ExtResource("2_line")
+id = &"c_22"
+at = 128.0
+hold = 2.6
+speaker = &"alis"
+text = "...Get your cloak."
+canon = "C"
+
+[sub_resource type="Resource" id="B00"]
+script = ExtResource("3_beat")
+name = &"hall"
+at = 0.0
+
+[sub_resource type="Resource" id="B01"]
+script = ExtResource("3_beat")
+name = &"sound"
+at = 6.0
+
+[sub_resource type="Resource" id="B02"]
+script = ExtResource("3_beat")
+name = &"hood"
+at = 11.0
+
+[sub_resource type="Resource" id="B03"]
+script = ExtResource("3_beat")
+name = &"kitchen"
+at = 17.5
+
+[sub_resource type="Resource" id="B04"]
+script = ExtResource("3_beat")
+name = &"packing"
+at = 29.0
+
+[sub_resource type="Resource" id="B05"]
+script = ExtResource("3_beat")
+name = &"mural_queen"
+at = 39.5
+
+[sub_resource type="Resource" id="B06"]
+script = ExtResource("3_beat")
+name = &"drain"
+at = 51.0
+
+[sub_resource type="Resource" id="B07"]
+script = ExtResource("3_beat")
+name = &"mural_masks"
+at = 56.0
+
+[sub_resource type="Resource" id="B08"]
+script = ExtResource("3_beat")
+name = &"curse"
+at = 62.0
+
+[sub_resource type="Resource" id="B09"]
+script = ExtResource("3_beat")
+name = &"mural_terms"
+at = 71.5
+
+[sub_resource type="Resource" id="B10"]
+script = ExtResource("3_beat")
+name = &"arrow"
+at = 79.0
+
+[sub_resource type="Resource" id="B11"]
+script = ExtResource("3_beat")
+name = &"understand"
+at = 91.0
+
+[sub_resource type="Resource" id="B12"]
+script = ExtResource("3_beat")
+name = &"stop"
+at = 104.0
+
+[sub_resource type="Resource" id="B13"]
+script = ExtResource("3_beat")
+name = &"stand"
+at = 115.0
+
+[sub_resource type="Resource" id="B14"]
+script = ExtResource("3_beat")
+name = &"look"
+at = 125.0
+
+[sub_resource type="Resource" id="B15"]
+script = ExtResource("3_beat")
+name = &"steps"
+at = 131.5
+
+[sub_resource type="Resource" id="B16"]
+script = ExtResource("3_beat")
+name = &"handover"
+at = 146.0
+
+[resource]
+script = ExtResource("1_script")
+id = &"silent_manor"
+length = 150.0
+music_cue = &"music_film_silent_manor"
+seen_flag = "fact.film_silent_manor_seen"
+bars = 1.0
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21")])
+beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16")])

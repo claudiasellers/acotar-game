@@ -117,7 +117,8 @@ func _load_game() -> void:
 		OS.create_instance(PackedStringArray())
 		get_tree().quit()
 		return
-	get_tree().change_scene_to_file(GAME_SCENE)
+	# A new game opens with the opening film (L33), which goes on to GAME_SCENE.
+	get_tree().change_scene_to_file(OpeningFilm.route(GameSettings.pending_load_slot))
 
 
 # --- build -----------------------------------------------------------------------

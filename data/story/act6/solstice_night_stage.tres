@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"bower": Vector3(44.3, 0, -68.7),
+"hollow": Vector3(-235, 0, 85),
+"hollow_edge": Vector3(-200, 0, 70),
+"hollow_path": Vector3(-120, 0, 40),
+"lucien_near": Vector3(3, 0, -2),
+"ring": Vector3(0, 0, -20),
+"tamlin_leave": Vector3(-40, 0, 8),
+"wine_table": Vector3(88, 0, 18)
+}
+lines = {
+"crowds_thought": {"text": "Faeries everywhere, and for the first time I saw them as they were.", "who": ""},
+"follow_thought": {"text": "He led me from the fires to the edge of a vast meadow.", "who": ""},
+"kiss_thought": {"text": "We danced, and he kissed me.", "who": ""},
+"lucien_nursemaid": {"text": "Wonderful. And now I'm your nursemaid.", "who": "Lucien"},
+"lucien_wine_warning": {"text": "Don't drink the wine. Not unless you want to dance until you drop.", "who": "Lucien"},
+"sunrise_thought": {"text": "We watched the sun rise over the meadow.", "who": ""},
+"tamlin_almost_dawn": {"text": "It's almost dawn.", "who": "Tamlin"},
+"tamlin_come_away": {"text": "Come with me.", "who": "Tamlin"},
+"wine_prompt": {"text": "Long tables of faerie wine and candied flowers. Tamlin was playing the fiddle with the band.", "who": ""},
+"wine_thought": {"text": "It tasted of sunlight. The stars began to swim.", "who": ""},
+"wisps_thought": {"text": "Will-o'-the-wisps, spirits of air and light, danced around us.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("lucien_nursemaid", "lucien_wine_warning", "tamlin_come_away", "wine_thought")
+canon = "Ch25 [C] (Keeper): crowds of fae, unglamoured, seen for the first time; faerie wine (Lucien warns her, she drinks, he stays close); Tamlin plays the fiddle in the band; he takes her to the edge of a vast meadow; will-o'-the-wisps, spirits of air and light, dance around them; they dance; \"It's almost dawn\"; they watch the sunrise. Marks in solstice_dance_floor's frame (anchor at world -150, -1060): the dance ring is at (-150, -1080), the musicians' bower at (-100, -1135), the long tables at (-60, -1040), the wisp hollow round (-450, -950), r 85."

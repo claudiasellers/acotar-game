@@ -1,0 +1,311 @@
+[gd_resource type="Resource" script_class="FilmScript" load_steps=48 format=3]
+
+[ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
+[ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
+[ext_resource type="Script" path="res://story/film/film_beat.gd" id="3_beat"]
+
+[sub_resource type="Resource" id="L00"]
+script = ExtResource("2_line")
+id = &"b_01"
+at = 4.4
+hold = 3.0
+speaker = &"tamlin"
+text = "Get Feyre to the window. By the curtains."
+canon = "C"
+
+[sub_resource type="Resource" id="L01"]
+script = ExtResource("2_line")
+id = &"b_02"
+at = 21.5
+hold = 2.0
+speaker = &"rhysand"
+text = "High Lord."
+canon = "C"
+
+[sub_resource type="Resource" id="L02"]
+script = ExtResource("2_line")
+id = &"b_03"
+at = 24.0
+hold = 1.8
+speaker = &"tamlin"
+text = "Rhysand."
+canon = "C"
+
+[sub_resource type="Resource" id="L03"]
+script = ExtResource("2_line")
+id = &"b_04"
+at = 26.2
+hold = 4.5
+speaker = &"rhysand"
+text = "I don't see you for forty-nine years, and you start calling me Rhysand?"
+canon = "C"
+
+[sub_resource type="Resource" id="L04"]
+script = ExtResource("2_line")
+id = &"b_05"
+at = 31.5
+hold = 3.4
+speaker = &"rhysand"
+text = "A fox mask. Appropriate for you, Lucien."
+canon = "C"
+
+[sub_resource type="Resource" id="L05"]
+script = ExtResource("2_line")
+id = &"b_06"
+at = 37.0
+hold = 2.5
+speaker = &"rhysand"
+text = "Where's your guest?"
+canon = "C"
+
+[sub_resource type="Resource" id="L06"]
+script = ExtResource("2_line")
+id = &"b_07"
+at = 41.5
+hold = 2.5
+speaker = &"rhysand"
+text = "You dare glamour me?"
+canon = "C"
+
+[sub_resource type="Resource" id="L07"]
+script = ExtResource("2_line")
+id = &"b_08"
+at = 48.5
+hold = 3.2
+speaker = &"rhysand"
+text = "Let's see what's in that head of yours."
+canon = "X"
+
+[sub_resource type="Resource" id="L08"]
+script = ExtResource("2_line")
+id = &"b_09"
+at = 53.3
+hold = 3.5
+speaker = &"tamlin"
+text = "Please. Don't tell Amarantha about her."
+canon = "C"
+
+[sub_resource type="Resource" id="L09"]
+script = ExtResource("2_line")
+id = &"b_10"
+at = 58.0
+hold = 3.4
+speaker = &"rhysand"
+text = "Beg, and I'll consider not telling her."
+canon = "C"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("2_line")
+id = &"b_11"
+at = 62.0
+hold = 1.6
+speaker = &"rhysand"
+text = "Lower."
+canon = "C"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("2_line")
+id = &"b_12"
+at = 64.0
+hold = 2.0
+speaker = &"rhysand"
+text = "You too, fox-boy."
+canon = "C"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("2_line")
+id = &"b_13"
+at = 68.5
+hold = 2.4
+speaker = &"rhysand"
+text = "What's your name, love?"
+canon = "C"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("2_line")
+id = &"b_14"
+at = 71.5
+hold = 2.0
+speaker = &"feyre"
+text = "Clare Beddor."
+canon = "C"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("2_line")
+id = &"b_15"
+at = 75.3
+hold = 2.6
+speaker = &"rhysand"
+text = "Such a little liar."
+canon = "X"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("2_line")
+id = &"b_16"
+at = 79.0
+hold = 6.0
+speaker = &"rhysand"
+text = "I'm looking forward to seeing you three Under the Mountain. I'll give Amarantha your regards."
+canon = "C"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("2_line")
+id = &"b_17"
+at = 89.5
+hold = 2.2
+speaker = &"feyre"
+text = "Who was that?"
+canon = "X"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("2_line")
+id = &"b_18"
+at = 92.3
+hold = 3.4
+speaker = &"lucien"
+text = "Rhysand. High Lord of the Night Court."
+canon = "X"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("2_line")
+id = &"b_19"
+at = 96.4
+hold = 2.2
+speaker = &"feyre"
+text = "And Amarantha?"
+canon = "X"
+
+[sub_resource type="Resource" id="B00"]
+script = ExtResource("3_beat")
+name = &"lunch"
+at = 0.0
+
+[sub_resource type="Resource" id="B01"]
+script = ExtResource("3_beat")
+name = &"snarl"
+at = 3.5
+
+[sub_resource type="Resource" id="B02"]
+script = ExtResource("3_beat")
+name = &"knife"
+at = 5.6
+
+[sub_resource type="Resource" id="B03"]
+script = ExtResource("3_beat")
+name = &"curtain"
+at = 8.0
+
+[sub_resource type="Resource" id="B04"]
+script = ExtResource("3_beat")
+name = &"veil_on"
+at = 9.0
+
+[sub_resource type="Resource" id="B05"]
+script = ExtResource("3_beat")
+name = &"slouch"
+at = 12.0
+
+[sub_resource type="Resource" id="B06"]
+script = ExtResource("3_beat")
+name = &"enter"
+at = 17.0
+
+[sub_resource type="Resource" id="B07"]
+script = ExtResource("3_beat")
+name = &"eyes_widen"
+at = 18.8
+
+[sub_resource type="Resource" id="B08"]
+script = ExtResource("3_beat")
+name = &"greet"
+at = 21.0
+
+[sub_resource type="Resource" id="B09"]
+script = ExtResource("3_beat")
+name = &"fox"
+at = 31.2
+
+[sub_resource type="Resource" id="B10"]
+script = ExtResource("3_beat")
+name = &"goblet"
+at = 35.5
+
+[sub_resource type="Resource" id="B11"]
+script = ExtResource("3_beat")
+name = &"look"
+at = 40.0
+
+[sub_resource type="Resource" id="B12"]
+script = ExtResource("3_beat")
+name = &"tear"
+at = 44.5
+
+[sub_resource type="Resource" id="B13"]
+script = ExtResource("3_beat")
+name = &"mind"
+at = 48.0
+
+[sub_resource type="Resource" id="B14"]
+script = ExtResource("3_beat")
+name = &"beg"
+at = 53.0
+
+[sub_resource type="Resource" id="B15"]
+script = ExtResource("3_beat")
+name = &"kneel"
+at = 57.5
+
+[sub_resource type="Resource" id="B16"]
+script = ExtResource("3_beat")
+name = &"fox_boy"
+at = 64.0
+
+[sub_resource type="Resource" id="B17"]
+script = ExtResource("3_beat")
+name = &"crouch"
+at = 67.5
+
+[sub_resource type="Resource" id="B18"]
+script = ExtResource("3_beat")
+name = &"flash"
+at = 73.6
+
+[sub_resource type="Resource" id="B19"]
+script = ExtResource("3_beat")
+name = &"fact.false_name_clare_beddor"
+at = 74.6
+
+[sub_resource type="Resource" id="B20"]
+script = ExtResource("3_beat")
+name = &"stand"
+at = 78.5
+
+[sub_resource type="Resource" id="B21"]
+script = ExtResource("3_beat")
+name = &"vanish"
+at = 86.0
+
+[sub_resource type="Resource" id="B22"]
+script = ExtResource("3_beat")
+name = &"after"
+at = 88.5
+
+[sub_resource type="Resource" id="B23"]
+script = ExtResource("3_beat")
+name = &"silence"
+at = 98.8
+
+[sub_resource type="Resource" id="B24"]
+script = ExtResource("3_beat")
+name = &"handover"
+at = 102.0
+
+[resource]
+script = ExtResource("1_script")
+id = &"night_court"
+length = 105.0
+music_cue = &"music_film_night_court"
+seen_flag = "fact.film_night_court_seen"
+bars = 1.0
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18")])
+beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16"), SubResource("B17"), SubResource("B18"), SubResource("B19"), SubResource("B20"), SubResource("B21"), SubResource("B22"), SubResource("B23"), SubResource("B24")])

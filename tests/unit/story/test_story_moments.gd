@@ -157,6 +157,11 @@ func test_moments_chain_from_the_grounds_to_the_pass() -> void:
 			# Not a moment: her first P4 stroke at the easel (StudioDeeds, L30).
 			WorldState.raise_deed("gallery_opened")
 		var moment := StoryDirector.get_moment(StringName(id))
+		# A fact gate is the playable scene before the moment (L46's picnic,
+		# lunch, sunrise, carriage): the player has just done it.
+		for flag in moment.require_flags:
+			if flag.begins_with("fact."):
+				WorldState.set_flag(flag)
 		var space := _space(moment)
 		assert_true(space.can_start(), "%s is open after the moments before it" % id)
 		assert_true(_autoplay(space), "%s finishes" % id)

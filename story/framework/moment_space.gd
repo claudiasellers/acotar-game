@@ -19,6 +19,8 @@
 ##              survive s seconds without looking at actor for more than max seconds
 ##   gaze_hold actor, s, cone            look at actor (or "self") for s seconds
 ##   decision options [{action, fact}], s, default
+##   film     id                         plays a cutscene (Films, lane L33); follow it
+##              with until_flag on the facts it writes (fact.film_<id>_seen)
 ##
 ## A failed step (gaze_avoid, strict stay) raises its fail_fact if any and ends
 ## the scene without its deed, so Feyre can try again.
@@ -218,6 +220,9 @@ func _beat_for(step: Dictionary) -> SceneBeat:
 					0.0, "", false)
 		"decision":
 			return Beats.decision(step.get("options", []), s, String(step.get("default", "")))
+		"film":
+			var film_id := StringName(step.get("id", ""))
+			return Beats.run(func(_sp: SceneSpace) -> void: Films.play(self, film_id), "film %s" % film_id)
 	push_error("MomentSpace %s: unknown step %s" % [space_id, step])
 	return null
 

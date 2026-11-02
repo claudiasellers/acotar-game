@@ -35,10 +35,18 @@ var _mood_target := 0.0
 var _mood_rate := 1.0
 ## 0 at midday, 1 with the sun on the horizon: blends in the golden-hour sky.
 var golden := 0.0
+## Her true sight (L46, ch23): 0 under Tamlin's glamour, eases to 1 once
+## `glamour_lifted` rises; every grade then reads richer and clearer.
+var sight := 0.0
+var _sight_target := 0.0
+const SIGHT_SECONDS := 6.0
 
 
 func _ready() -> void:
 	EventBus.grade_swap_requested.connect(_on_grade_swap_requested)
+	EventBus.flag_changed.connect(_on_flag_changed)
+	_sight_target = 1.0 if WorldState.has_flag(GlamourLayer.FLAG) else 0.0
+	sight = _sight_target
 	if EventBus.has_signal(&"mood_requested"):
 		EventBus.connect(&"mood_requested", _on_mood_requested)
 	current = load_preset(start_grade)
@@ -56,6 +64,9 @@ func _process(delta: float) -> void:
 		dirty = true
 	if not is_equal_approx(mood_amount, _mood_target):
 		mood_amount = move_toward(mood_amount, _mood_target, _mood_rate * delta)
+		dirty = true
+	if not is_equal_approx(sight, _sight_target):
+		sight = move_toward(sight, _sight_target, delta / SIGHT_SECONDS)
 		dirty = true
 	if dirty:
 		apply(current)
@@ -91,7 +102,7 @@ func target_id() -> StringName:
 
 
 func apply(base: GradePreset) -> void:
-	var p := with_mood(base, mood_amount, mood)
+	var p := with_mood(with_true_sight(base, sight), mood_amount, mood)
 	snow_cover_now = p.snow_cover
 	magic_now = p.magic
 	RenderingServer.global_shader_parameter_set(&"snow_cover", p.snow_cover)
@@ -169,6 +180,32 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	cold.lut = p.lut
 	cold.snow_cover = p.snow_cover
 	return cold
+
+
+## `p` as she sees it once the glamour on her senses is gone (canon ch23:
+## "richer, clearer", a near-invisible rainbow on the brook, leaf edges
+## shimmering): more colour and clarity, a little more bloom and warm light,
+## and the world's magic shimmer turned up. Dread still drains it (applied after).
+static func with_true_sight(p: GradePreset, amount: float) -> GradePreset:
+	if amount <= 0.0:
+		return p
+	var s := GradePreset.mix(p, p, 0.0)
+	s.id = p.id
+	s.lut = p.lut
+	s.saturation = p.saturation * (1.0 + 0.16 * amount)
+	s.contrast = p.contrast * (1.0 + 0.05 * amount)
+	s.exposure = p.exposure * (1.0 + 0.04 * amount)
+	s.glow_intensity = p.glow_intensity + 0.12 * amount
+	s.glow_bloom = p.glow_bloom + 0.03 * amount
+	s.ambient_color = p.ambient_color.lerp(Color(1.0, 0.9, 0.86), 0.12 * amount)
+	s.fog_density = p.fog_density * (1.0 - 0.25 * amount)
+	s.magic = minf(1.0, p.magic + 0.25 * amount)
+	return s
+
+
+func _on_flag_changed(flag: String, _value: Variant) -> void:
+	if flag == GlamourLayer.FLAG or flag == "":
+		_sight_target = 1.0 if WorldState.has_flag(GlamourLayer.FLAG) else 0.0
 
 
 static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
