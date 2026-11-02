@@ -10,10 +10,10 @@ extends SkeletonModifier3D
 ## [bone, child, forward, up, outward]: the bone points from its head toward its
 ## child along this direction (outward is toward her left for Left* bones).
 const AIMS := [
-	[&"LeftUpperLeg", &"LeftLowerLeg", 0.62, -0.42, 0.66],
-	[&"RightUpperLeg", &"RightLowerLeg", 0.62, -0.42, 0.66],
-	[&"LeftLowerLeg", &"LeftFoot", -0.12, -0.97, 0.2],
-	[&"RightLowerLeg", &"RightFoot", -0.12, -0.97, 0.2],
+	[&"LeftUpperLeg", &"LeftLowerLeg", 0.3, -0.42, 0.95],
+	[&"RightUpperLeg", &"RightLowerLeg", 0.3, -0.42, 0.95],
+	[&"LeftLowerLeg", &"LeftFoot", -0.2, -0.9, 0.48],
+	[&"RightLowerLeg", &"RightFoot", -0.2, -0.9, 0.48],
 	[&"LeftFoot", &"LeftToes", 0.9, -0.25, 0.25],
 	[&"RightFoot", &"RightToes", 0.9, -0.25, 0.25],
 	[&"LeftUpperArm", &"LeftLowerArm", 0.42, -0.85, 0.22],

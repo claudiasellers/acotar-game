@@ -203,9 +203,15 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= GRAVITY * delta
 	_leap_pending = false
 	move_and_slide()
-	# Walled in (a tree, a fence): lose speed instead of grinding.
-	if is_on_wall() and speed > 2.0:
-		speed *= 0.6
+	# Walled in (a tree, a fence): head-on she pulls up rather than grinding;
+	# a glancing touch only costs speed.
+	if is_on_wall():
+		var n := get_wall_normal()
+		n.y = 0.0
+		if n.length_squared() > 0.01 and n.normalized().dot(heading()) < -0.6:
+			speed = 0.0
+		elif speed > 2.0:
+			speed *= 0.6
 	if state == State.COMING or state == State.GOING_HOME:
 		var left := Vector2(goal.x - global_position.x, goal.z - global_position.z).length()
 		_stuck = _stuck + delta if (speed < 0.5 and left > data.call_stop) else 0.0

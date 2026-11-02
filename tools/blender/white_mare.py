@@ -34,7 +34,7 @@ NAME = "white_horse"
 TRI_BUDGET = 15000
 
 SPEC = {
-    "length": 2.25, "height": 1.58, "width": 0.62, "girth": 0.42, "hip": 0.99, "withers": 1.0,
+    "length": 2.25, "height": 1.58, "width": 0.58, "girth": 0.37, "hip": 0.99, "withers": 1.0,
     "waist": 0.95, "neck": 0.8, "neck_angle": math.radians(54), "head": 0.16, "snout": 0.42,
     "snout_drop": 0.62, "snout_r": 0.58, "ear": 0.15, "ear_back": 0.05, "leg": 0.078, "thigh": 1.95,
     "hock": 0.42, "thigh_fwd": 0.05, "eye": 0.24, "eye_fwd": 0.32, "belly_line": 0.76,
