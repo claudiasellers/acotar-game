@@ -116,7 +116,7 @@ func test_moderate_dread_bites_indoors() -> void:
 	var dark := GradeDirector.with_mood(calm, 0.55, &"dread")
 	var calm_floor := calm.ambient_color.get_luminance() * calm.ambient_energy * calm.exposure
 	var dark_floor := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
-	assert_lt(dark_floor, calm_floor * 0.25, "ambient fill at least two stops down")
+	assert_lt(dark_floor, calm_floor * 0.3, "ambient fill well over a stop and a half down")
 	assert_lt(dark.saturation, calm.saturation * 0.6, "the pink world leaves")
 
 

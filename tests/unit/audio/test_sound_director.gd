@@ -200,3 +200,51 @@ func test_every_horror_cue_exists() -> void:
 			&"naga_death", &"tamlin_throat_tear", &"bogge_presence", &"bogge_whisper", &"bogge_passed",
 			&"puca_ripple", &"puca_dart"]:
 		assert_true(bank.has_cue(cue_id), "missing cue %s" % cue_id)
+
+
+class FakeDialogue:
+	extends Node
+	signal line_spoken(line_id: StringName, speaker: StringName, text: String, at: Vector3, inner: bool)
+
+
+func test_voiced_lines_duck_the_bed_and_music() -> void:
+	var d := _director()
+	var talk := FakeDialogue.new()
+	add_child_autofree(talk)
+	await wait_physics_frames(2)
+	assert_true(talk.line_spoken.is_connected(d._on_line_spoken))
+	talk.line_spoken.emit(&"no_such_line", &"lucien", "", Vector3.ZERO, false)
+	assert_eq(d.voice_duck, 0.0, "no file, no duck")
+	d.duck_for_voice(0.3)
+	await wait_seconds(0.3)
+	assert_gt(d.voice_duck, 0.9)
+	await wait_seconds(1.0)
+	assert_almost_eq(d.voice_duck, 0.0, 0.01)
+
+
+func test_the_opening_film_score_plays_on_music_and_stops_on_skip() -> void:
+	var d := _director()
+	var c := bank.cue(&"music_opening_film")
+	assert_not_null(c)
+	assert_true(c.music)
+	assert_between(c.streams[0].get_length(), 180.0, 190.0)
+	SoundDirector.cue(&"music_opening_film")
+	var playing := d.get_children().filter(func(p: Node) -> bool: return p.get_meta(&"cue", &"") == &"music_opening_film")
+	assert_eq(playing.size(), 1)
+	assert_true(playing[0].is_in_group(GameSettings.MUSIC_GROUP))
+	SoundDirector.stop_cue(&"music_opening_film", 0.05)
+	await wait_seconds(0.2)
+	assert_false(is_instance_valid(playing[0]))
+
+
+func test_films_silence_space_music_and_halve_the_bed() -> void:
+	var d := _director()
+	EventBus.scene_space_started.emit(&"film_opening")
+	await wait_seconds(1.7)
+	assert_almost_eq(d.film_hold, 1.0, 0.01)
+	EventBus.scene_space_started.emit(&"wolf_kill")
+	EventBus.scene_space_finished.emit(&"wolf_kill")
+	assert_almost_eq(d.film_hold, 1.0, 0.01, "only film_* spaces hold the music")
+	EventBus.scene_space_finished.emit(&"film_opening")
+	await wait_seconds(3.2)
+	assert_almost_eq(d.film_hold, 0.0, 0.01)
