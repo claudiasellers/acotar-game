@@ -32,11 +32,11 @@ SHAPE = dict(
     # rests cool and still, a small pointed chin.  Canon: her face is their mother's, "so cold and
     # unrelenting" (ch5); "beautiful, imperious, still as one of the High Fae" (ch31).
     eye_r=0.0214, eye_open_up=31.0, eye_open_lo=24.0, eye_tilt=13.0, eye_open_w=66.0,
-    eye_dx=0.0022, cut_reach=0.016, cut_soft=0.005, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
+    eye_dx=0.0022, cut_reach=0.018, cut_soft=0.007, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
     cheeks=0.62, cheekbones=0.55, cheek_lift=0.003, jaw=0.0, jaw_w=0.90, chin=0.88, chin_drop=-0.003,
     chin_point=0.75, brow=0.0, nose=0.82, nose_w=0.85, nose_up=0.25, nose_bridge=0.0,
     lips=1.16, lip_upper=0.98, lip_lower=1.0, lip_w=1.32, lip_bow=1.0, smile=-0.15,
-    chin_y=0.006, jaw_taper=0.8, lower_fill=1.0, bridge_fill=1.0, mouth_dy=0.0045,
+    chin_y=0.006, jaw_taper=0.8, lower_fill=1.4, bridge_fill=1.0, mouth_dy=0.0045,
     face_w=0.95, neck=0.96,
     bust=0.95, ribs=0.98, waist=0.95, belly=0.95, pelvis=0.97, seat=0.95,
     thigh=0.96, calf=0.96, arm=0.96, forearm=0.97, hand=0.98,
@@ -305,7 +305,7 @@ def style_chignon(st):
                           math.radians(4), 0.0085, 0.0072, n=12, sag=math.radians(3))
     for s in (1, -1):                                     # two fine loose tendrils framing the face
         top = st.head.scalp(s * math.radians(64), math.radians(30), 0.004)
-        st.hang(top, 0.105, 0.012, r0=0.0032, r1=0.0012, wave=0.006, curl=0.004, n=14, front=True)
+        st.hang(top, 0.095, 0.014, r0=0.0058, r1=0.0030, wave=0.004, curl=0.0, n=14, front=True)
     c = st.outer(math.pi, math.radians(-2), 0.017)
     st.bun(c, 0.040, wraps=12, axis=(0, 1, 0.05))
     pts = []
