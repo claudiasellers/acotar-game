@@ -1662,8 +1662,8 @@ position = Vector3(8.3, 0, 11.2)
 
 [sub_resource type="Resource" id="Resource_8g06q"]
 script = ExtResource("5_igwsw")
-prop_id = &"bookcase_low"
-position = Vector3(4.85, 0, 11.2)
+prop_id = &"console_gilt"
+position = Vector3(5.05, 0, 11.2)
 yaw_deg = 90.0
 metadata/dressed = true
 
@@ -1988,39 +1988,39 @@ yaw_deg = -17.145475
 
 [sub_resource type="Resource" id="Resource_bpehm"]
 script = ExtResource("5_igwsw")
-prop_id = &"bowl_floating_blossoms"
-position = Vector3(6.895, 0.505, 11.081667)
-yaw_deg = -101.33744
+prop_id = &"jewelry_tree"
+position = Vector3(5.0508323, 0.41733018, 11.651)
+yaw_deg = 78.66256
 
 [sub_resource type="Resource" id="Resource_hcjr5"]
 script = ExtResource("5_igwsw")
-prop_id = &"trinket_box_enamel"
-position = Vector3(6.8167343, 0.505, 11.443333)
-yaw_deg = -76.51052
+prop_id = &"candle_cluster"
+position = Vector3(5.0666533, 0.41733018, 11.222)
+yaw_deg = 103.48948
 
 [sub_resource type="Resource" id="Resource_n638k"]
 script = ExtResource("5_igwsw")
-prop_id = &"jewelry_tree"
-position = Vector3(4.852784, 1.1993872, 11.695)
+prop_id = &"trinket_box_enamel"
+position = Vector3(5.111258, 0.41733018, 10.868)
 yaw_deg = 99.08946418762207
 
 [sub_resource type="Resource" id="Resource_ce4io"]
 script = ExtResource("5_igwsw")
-prop_id = &"candle_cluster"
-position = Vector3(4.857321, 1.1993872, 11.2699995)
+prop_id = &"hourglass"
+position = Vector3(5.0768437, 0.41733018, 10.644)
 yaw_deg = 73.75296592712402
 
 [sub_resource type="Resource" id="Resource_t2iim"]
 script = ExtResource("5_igwsw")
-prop_id = &"music_box"
-position = Vector3(4.8788695, 1.1993872, 10.87)
-yaw_deg = 103.33468818664551
+prop_id = &"bowl_floating_blossoms"
+position = Vector3(6.895, 0.505, 11.065)
+yaw_deg = -76.66531181335449
 
 [sub_resource type="Resource" id="Resource_eguvj"]
 script = ExtResource("5_igwsw")
-prop_id = &"hourglass"
-position = Vector3(4.868842, 1.1993872, 10.599999)
-yaw_deg = 103.08414
+prop_id = &"bonbon_dish"
+position = Vector3(6.883727, 0.505, 11.434999)
+yaw_deg = -76.91586
 
 [sub_resource type="Resource" id="Resource_m4hm3"]
 script = ExtResource("5_igwsw")

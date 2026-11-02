@@ -847,32 +847,57 @@ def window_seat(p, size, c):
 # ------------------------------------------------------------ lighting
 
 
+CRYSTAL = (0.95, 0.93, 1.0)
+
+
 def chandelier(p, rad, h, tiers=2, c=GOLD, crystal=True):
-    rng = random.Random(161)
-    p.add(cyl(0.012, h * 0.35, 6), c, "gold", T(0, 0, h * 0.65))
-    p.add(lathe([(0, 0), (0.08 * rad, 0.03), (0.06 * rad, 0.15 * h), (0.1 * rad, 0.3 * h), (0.04 * rad, 0.45 * h), (0.06 * rad, 0.6 * h), (0, 0.66 * h)], 10), c, "gold", T(0, 0, 0.0))
+    """Gilt and crystal (audit A4). The frame is gilded wood: satin gold that
+    takes the room's light, because fully metallic gold seen from below
+    mirrors the dark under-sky and read as black wrought iron. Burnished gold
+    stays only on the crown and the candle cups, which face up into the light.
+    Crystal: a prism drop under every arm, swags of beads from arm to arm, a beaded
+    column round the stem and a ball at the foot."""
+    p.add(cyl(0.012, h * 0.35, 6), c, "satin", T(0, 0, h * 0.65))
+    p.add(lathe([(0, 0), (0.08 * rad, 0.03), (0.06 * rad, 0.15 * h), (0.1 * rad, 0.3 * h), (0.04 * rad, 0.45 * h), (0.06 * rad, 0.6 * h), (0, 0.66 * h)], 10), c, "satin", T(0, 0, 0.0))
+    # the crown: a gilt corona with little leaves
+    p.add(torus(0.07 * rad + 0.03, 0.01, 12, 4), c, "gold", T(0, 0, h * 0.66))
+    for i in range(6):
+        a = 2 * math.pi * i / 6
+        p.add(lathe([(0, 0), (0.012, 0.02), (0, 0.06)], 4), c, "gold", T((0.07 * rad + 0.03) * math.cos(a), (0.07 * rad + 0.03) * math.sin(a), h * 0.66))
     for t in range(tiers):
         r = rad * (0.9 - 0.4 * t)
         z = h * (0.2 + 0.25 * t)
         n = 8 - 3 * t
-        p.add(torus(r * 0.85, 0.012 * rad + 0.004, 24, 4), c, "gold", T(0, 0, z - 0.05))
+        p.add(torus(r * 0.85, 0.012 * rad + 0.004, 16, 4), c, "satin", T(0, 0, z - 0.05))
+        tips = []
         for i in range(n):
             a = 2 * math.pi * (i + 0.5 * t) / n
             ca, sa = math.cos(a), math.sin(a)
-            p.add(tube([(0.05 * ca, 0.05 * sa, z + 0.12), (r * 0.5 * ca, r * 0.5 * sa, z - 0.08), (r * ca, r * sa, z)], 0.012, 5), c, "gold")
-            p.add(lathe([(0, 0), (0.04, 0.0), (0.045, 0.025)], 8), c, "gold", T(r * ca, r * sa, z))
+            p.add(tube([(0.05 * ca, 0.05 * sa, z + 0.12), (r * 0.5 * ca, r * 0.5 * sa, z - 0.08), (r * ca, r * sa, z)], 0.014, 5), c, "satin")
+            p.add(lathe([(0, 0), (0.045, 0.0), (0.05, 0.028)], 6), c, "gold", T(r * ca, r * sa, z))
             candle(p, r * ca, r * sa, z + 0.02, 0.1 * rad + 0.04, 0.014)
+            tips.append((r * ca, r * sa, z))
             if crystal:
-                for k in range(1):
-                    zz = z - 0.12 - k * 0.08
-                    p.add(sphere(0.022 if k else 0.016, 4, 3), (0.95, 0.92, 1.0), "glass", T(r * 0.75 * ca, r * 0.75 * sa, zz) @ S(1, 1, 1.6), smooth=False)
+                # a prism drop under the cup
+                p.add(ico(0.022, 0), CRYSTAL, "glass", T(r * ca, r * sa, z - 0.07) @ S(1, 1, 2.2), smooth=False)
+        if crystal and t == 0:
+            # swags round the outer tier: three beads hanging in a curve from each arm to the next
+            for i in range(n):
+                x0, y0, z0 = tips[i]
+                x1, y1, _ = tips[(i + 1) % n]
+                for k in range(1, 4):
+                    u = k / 4
+                    sag = 0.12 * rad * math.sin(math.pi * u)
+                    p.add(sphere(0.011, 4, 3), CRYSTAL, "glass", T(x0 + (x1 - x0) * u, y0 + (y1 - y0) * u, z0 - 0.03 - sag), smooth=False)
     if crystal:
-        for i in range(12):
-            a = 2 * math.pi * i / 12
-            pts = [(rad * 0.85 * math.cos(a + 0.26 * k), rad * 0.85 * math.sin(a + 0.26 * k), h * 0.15 - 0.06 * math.sin(math.pi * k / 2)) for k in range(3)]
-            for x, y, z in pts[1:2]:
-                p.add(sphere(0.02, 4, 3), (0.95, 0.92, 1.0), "glass", T(x, y, z), smooth=False)
-        p.add(ico(0.06, 1), (0.98, 0.9, 1.0), "glass", T(0, 0, -0.02) @ S(1, 1, 1.8), smooth=False)
+        # a beaded column round the stem, and the ball at the foot
+        for k in range(3):
+            zz = h * 0.12 + k * h * 0.14
+            for i in range(4):
+                a = 2 * math.pi * (i + 0.5 * (k % 2)) / 4
+                p.add(sphere(0.012, 4, 3), CRYSTAL, "glass", T(0.07 * rad * math.cos(a), 0.07 * rad * math.sin(a), zz), smooth=False)
+        p.add(ico(0.075 * rad + 0.02, 1), CRYSTAL, "glass", T(0, 0, -0.03) @ S(1, 1, 1.5), smooth=False)
+        p.add(ico(0.02, 0), CRYSTAL, "glass", T(0, 0, -0.03 - (0.075 * rad + 0.02) * 1.5 - 0.03) @ S(1, 1, 2.0), smooth=False)
 
 
 def chandelier_crystal(p, size, c):
