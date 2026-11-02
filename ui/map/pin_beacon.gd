@@ -4,12 +4,13 @@
 ## WorldMapHud; follows its MapPin.
 extends Node3D
 
-const HEIGHT := 70.0
-const RADIUS := 1.1
+const HEIGHT := 120.0
+const RADIUS := 2.2
 ## Fully faded within FADE_NEAR m, full beyond FADE_FAR m.
 const FADE_NEAR := 18.0
 const FADE_FAR := 90.0
 const SHADER := preload("res://ui/map/pin_beacon.gdshader")
+const GLINT := preload("res://ui/map/fae_wind.gdshader")
 
 var _beam: MeshInstance3D
 var _mat: ShaderMaterial
@@ -65,6 +66,8 @@ func burst() -> void:
 
 
 func set_colours(tint: Color, glow: Color) -> void:
+	# The theme's pale rose vanishes against snow and a pale sky: deepen it.
+	tint = Color.from_hsv(tint.h, clampf(tint.s * 1.8, 0.0, 1.0), tint.v * 0.9)
 	_mat.set_shader_parameter(&"tint", tint)
 	_mat.set_shader_parameter(&"glow", glow)
 
@@ -92,16 +95,15 @@ func _sparkles(count: int, life: float, one_shot: bool) -> CPUParticles3D:
 	p.scale_amount_max = 0.3
 	var quad := QuadMesh.new()
 	quad.size = Vector2.ONE
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	m.vertex_color_use_as_albedo = true
-	m.albedo_texture = PauseStyle.soft_dot(32)
+	# The wind's glint material: soft dots, alpha-mixed (a plain added
+	# material drew hard white squares on the compatibility renderer).
+	var m := ShaderMaterial.new()
+	m.shader = GLINT
+	m.set_shader_parameter(&"dot", PauseStyle.soft_dot(32))
 	quad.material = m
 	p.mesh = quad
 	var ramp := Gradient.new()
-	ramp.set_color(0, Color(1.0, 0.95, 0.75, 1.0))
-	ramp.set_color(1, Color(1.0, 0.75, 0.88, 0.0))
+	ramp.set_color(0, Color(1.0, 0.84, 0.42, 1.0))
+	ramp.set_color(1, Color(0.95, 0.5, 0.7, 0.0))
 	p.color_ramp = ramp
 	return p
