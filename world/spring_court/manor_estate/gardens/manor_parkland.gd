@@ -39,6 +39,9 @@ const GROVES := [
 	[Vector2(-310.0, 62.0), 11.0, [[&"deco_oak", 1], [&"deco_apple_blossom", 3]]],
 	[Vector2(108.0, 52.0), 10.0, [[&"deco_apple_blossom", 4]]],
 	[Vector2(-98.0, 224.0), 10.0, [[&"deco_cherry_blossom", 4]]],
+	# L56-2: the middle distance of the views west and east from the dismount
+	[Vector2(-86.0, 160.0), 11.0, [[&"deco_oak", 1], [&"deco_cherry_blossom", 4]]],
+	[Vector2(84.0, 146.0), 10.0, [[&"deco_cherry_blossom", 4]]],
 ]
 ## Trees in a grove stand at least this far apart (canopies touch, never merge).
 const TREE_GAP := 5.2
@@ -292,8 +295,9 @@ static func _plant_drift(sb: ManorScatter, d: Array, rng: RandomNumberGenerator)
 
 static func build(parent: Node3D) -> void:
 	var b := GroundsBatch.new(parent, "Parkland")
+	ManorLawnStripes.build(b.root)
 	for w: Array in WALKS:
-		b.drape_path(walk_line(w), WALK_W, GardenKit.walk(), 0.05, 1.0)
+		b.drape_path(walk_line(w), WALK_W, ManorForecourt.drive_lanes(), 0.05, 1.0)
 		# a rose arbour where each walk leaves the drive
 		var p: Vector2 = (w[0] as Vector2).lerp(w[1], 0.5)
 		var dir: Vector2 = ((w[1] as Vector2) - (w[0] as Vector2)).normalized()

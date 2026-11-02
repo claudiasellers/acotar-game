@@ -62,13 +62,27 @@ static func plant(sb: ManorScatter) -> void:
 		sb.put(&"ing_rose_white", cos(a) * (FOUNTAIN_RADIUS + 2.2), sin(a) * (FOUNTAIN_RADIUS + 2.2), a, 0.8)
 
 
-## Blush-and-pearl gravel with gold grit and fallen petals (shared by the
-## drive and the forecourt ring).
+## Fine pearl-and-honey gravel with gold grit and fallen petals (shared by the
+## drive, the forecourt and the garden walks).
 static func drive_gravel() -> Material:
 	if _gravel == null:
 		_gravel = ShaderMaterial.new()
 		_gravel.shader = DRIVE_GRAVEL
 	return _gravel
+
+
+static var _lanes: ShaderMaterial
+
+
+## The same gravel with carriage ruts and worn, mossy edges, for draped
+## paths (their UV runs 0..0.25 across): the drive, its ring and the walks.
+static func drive_lanes() -> Material:
+	if _lanes == null:
+		_lanes = ShaderMaterial.new()
+		_lanes.shader = DRIVE_GRAVEL
+		_lanes.resource_name = "drive_lanes"
+		_lanes.set_shader_parameter(&"lanes", 1.0)
+	return _lanes
 
 
 ## The drive's flower borders, between the pearl kerb and the blossom avenue:
@@ -153,7 +167,7 @@ static func _fountain(b: GroundsBatch) -> void:
 static func _drive(b: GroundsBatch) -> void:
 	var s := ManorSitePlan.DRIVE_START
 	var e := ManorSitePlan.DRIVE_END
-	var gravel := drive_gravel()
+	var gravel := drive_lanes()
 	b.drape_path(PackedVector2Array([s, e]), ManorSitePlan.DRIVE_WIDTH, gravel, 0.04, 3.0)
 	# forecourt ring of gravel round the fountain
 	var pts := PackedVector2Array()

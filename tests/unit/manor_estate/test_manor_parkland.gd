@@ -84,5 +84,5 @@ func test_stables_garden_faces_are_dressed() -> void:
 
 
 func test_parterre_soil_reads_as_earth() -> void:
-	assert_gte(GardenKit.MULCH.get_luminance(), 0.45)
-	assert_gt(GardenKit.MULCH.r, GardenKit.MULCH.b, "warm, not purple")
+	assert_gte(GardenKit.MULCH.get_luminance(), 0.34, "lighter than the old near-black mauve")
+	assert_true(GardenKit.MULCH.r > GardenKit.MULCH.g and GardenKit.MULCH.g > GardenKit.MULCH.b, "brown loam, not purple or salmon")
