@@ -69,6 +69,9 @@ const DEFAULT_STYLES := [&"gilt_baroque", &"gilt_simple", &"silver_leaf", &"pear
 ## Slots that had to reuse a work on the last assign() (the test wants none).
 static var last_duplicates: PackedStringArray = PackedStringArray()
 static var _materials: Dictionary = {}
+## The most of a room's slots one genre takes while other works can fill them.
+const GENRE_SHARE := 0.4
+const GENRE_SHARE_CLASS := 0.5
 
 
 ## Every art slot of the house in build order:
@@ -116,15 +119,48 @@ static func assign(all: ManorHouseIndex, cat: ManorArtCatalog) -> Dictionary:
 			var score := _theme_rank(w, themes[i]) * 10 + _class_fit(w, s.cls, themes[i])
 			keys.append(score * 1000000 + i * 1000 + j)
 	keys.sort()
-	for k in keys:
-		var i := int(k / 1000) % 1000
-		var j := int(k % 1000)
-		var s: Dictionary = ss[i]
-		var w: ManorArtWork = cat.works[j]
-		if out.has(s.key) or used.has(w.id):
-			continue
-		out[s.key] = w
-		used[w.id] = true
+	# no genre takes more than GENRE_SHARE of a room, or GENRE_SHARE_CLASS of
+	# its slots of one size, while other works can fill them;
+	# pairs over the share wait for a second pass
+	var room_n: Dictionary = {}
+	var room_genre: Dictionary = {}
+	for s: Dictionary in ss:
+		for rk: String in ["%d" % s.room_index, "%d|%s" % [s.room_index, s.cls]]:
+			room_n[rk] = int(room_n.get(rk, 0)) + 1
+	for key: String in out:
+		var s0: Dictionary = _slot_by_key(ss, key)
+		for g0: String in ["%d|%s" % [s0.room_index, (out[key] as ManorArtWork).genre],
+				"%d|%s|%s" % [s0.room_index, s0.cls, (out[key] as ManorArtWork).genre]]:
+			room_genre[g0] = int(room_genre.get(g0, 0)) + 1
+	# portrait slots first: only portraits fit them, so they must not run short
+	for tier in 2:
+		var waiting := PackedInt64Array()
+		for k in keys:
+			var i := int(k / 1000) % 1000
+			var j := int(k % 1000)
+			var s: Dictionary = ss[i]
+			if (s.cls == &"portrait") != (tier == 0):
+				continue
+			var w: ManorArtWork = cat.works[j]
+			if out.has(s.key) or used.has(w.id):
+				continue
+			var g := "%d|%s" % [s.room_index, w.genre]
+			var gc := "%d|%s|%s" % [s.room_index, s.cls, w.genre]
+			if tier == 1 and (int(room_genre.get(g, 0)) >= maxi(2, ceili(int(room_n["%d" % s.room_index]) * GENRE_SHARE)) \
+					or int(room_genre.get(gc, 0)) >= maxi(2, ceili(int(room_n["%d|%s" % [s.room_index, s.cls]]) * GENRE_SHARE_CLASS))):
+				waiting.append(k)
+				continue
+			out[s.key] = w
+			used[w.id] = true
+			room_genre[g] = int(room_genre.get(g, 0)) + 1
+			room_genre[gc] = int(room_genre.get(gc, 0)) + 1
+		for k in waiting:
+			var s: Dictionary = ss[int(k / 1000) % 1000]
+			var w: ManorArtWork = cat.works[int(k % 1000)]
+			if not out.has(s.key) and not used.has(w.id):
+				out[s.key] = w
+				used[w.id] = true
+	_interleave(ss, out)
 	# more slots than works: reuse, never in the same room (reported, and failed by the test)
 	last_duplicates = PackedStringArray()
 	for i in ss.size():
@@ -141,6 +177,52 @@ static func assign(all: ManorHouseIndex, cat: ManorArtCatalog) -> Dictionary:
 				last_duplicates.append(s.key)
 				break
 	return out
+
+
+static func _slot_by_key(ss: Array, key: String) -> Dictionary:
+	for s: Dictionary in ss:
+		if s.key == key:
+			return s
+	return {}
+
+
+## Along each wall run of one slot class in a room, no two neighbours share a
+## genre where the room's mix allows it: the works are dealt out round-robin,
+## the biggest genre first. Pinned works keep their slots.
+static func _interleave(ss: Array, out: Dictionary) -> void:
+	var runs: Dictionary = {}
+	for s: Dictionary in ss:
+		if not out.has(s.key) or (out[s.key] as ManorArtWork).pin != &"":
+			continue
+		var rk := "%d|%s" % [s.room_index, s.cls]
+		if not runs.has(rk):
+			runs[rk] = []
+		runs[rk].append(s)
+	for rk: String in runs:
+		var run: Array = runs[rk]
+		if run.size() < 3:
+			continue
+		var by_genre: Dictionary = {}
+		for s: Dictionary in run:
+			var w: ManorArtWork = out[s.key]
+			if not by_genre.has(w.genre):
+				by_genre[w.genre] = []
+			by_genre[w.genre].append(w)
+		if by_genre.size() < 2:
+			continue
+		var groups: Array = by_genre.values()
+		groups.sort_custom(func(a: Array, b: Array) -> bool: return a.size() > b.size() or (a.size() == b.size() and String(a[0].genre) < String(b[0].genre)))
+		# deal into even slots, then odd ones, biggest genre first
+		var dealt: Array = []
+		for gr: Array in groups:
+			dealt.append_array(gr)
+		var order: Array = []
+		for i in range(0, run.size(), 2):
+			order.append(i)
+		for i in range(1, run.size(), 2):
+			order.append(i)
+		for n in run.size():
+			out[run[order[n]].key] = dealt[n]
 
 
 ## The slot a pinned work takes: the first alternative room that has a free,
