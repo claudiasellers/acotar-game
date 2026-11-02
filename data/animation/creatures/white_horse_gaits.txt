@@ -1,0 +1,11 @@
+# white_horse clips (creatures/models/white_horse.gltf), 30 fps. Written by tools/blender/creature_rig.py.
+# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
+idle 0.000 5.621 1
+walk 1.043 1.405 1
+trot 3.298 0.843 1
+gallop 15.974 0.562 1
+graze - 5.621 1
+hit_l - 1.124 0
+hit_r - 1.124 0
+death_l - 7.733 0
+death_r - 7.733 0
