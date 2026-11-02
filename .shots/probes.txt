@@ -1,0 +1,4 @@
+from village-people L52
+quality look
+size 1920x1080
+shot village_people res://tools/creatures/village_people_shot.tscn {out} faces diag
