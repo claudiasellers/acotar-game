@@ -20,6 +20,8 @@ const SHOVE_SECONDS := 0.35
 const RISE_AFTER := 4.0
 ## Chicken, bread, then the sauce and peas: then the plate is clear.
 const BITES_TO_CLEAR := 3
+## Quiet seconds before a nudge at each wait on her (L34-6).
+const NUDGE_AFTER := 15.0
 
 var table: DinnerTable
 ## While she's held: an over-the-shoulder view down the table to Tamlin, with
@@ -54,7 +56,7 @@ func _build_beats() -> Array:
 			StoryControl.set_mode(StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin")), "walk to her chair"),
 		say(&"sit"),
-		reach(&"feyre_chair", 1.3),
+		reach_nudged(&"feyre_chair", 1.3, &"chair_where", NUDGE_AFTER),
 		Beats.run(_sit, "she sits"),
 		say(&"lucien_tunic"),
 		say(&"feyre_dress"),
@@ -67,9 +69,11 @@ func _build_beats() -> Array:
 		say(&"held"),
 		say(&"contemplating"),
 		say(&"no_bite"),
-		Beats.until(func() -> bool: return bites >= 1, "until her first bite"),
-		Beats.until(func() -> bool: return bites >= BITES_TO_CLEAR, "until the plate is clear"),
-		Beats.until(func() -> bool: return torte_gone, "until she reaches for the torte"),
+		Beats.run(func(_s: SceneSpace) -> void: _eat_card(true), "E eats"),
+		nudged(func() -> bool: return bites >= 1, &"so_hungry", NUDGE_AFTER, "until her first bite"),
+		nudged(func() -> bool: return bites >= BITES_TO_CLEAR, &"so_hungry", NUDGE_AFTER, "until the plate is clear"),
+		nudged(func() -> bool: return torte_gone, &"torte_more", NUDGE_AFTER, "until she reaches for the torte"),
+		Beats.run(func(_s: SceneSpace) -> void: _eat_card(false), "the card goes"),
 		say(&"vanished"),
 		Beats.raise("first_dinner_eaten"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -81,7 +85,8 @@ func _build_beats() -> Array:
 		say(&"thanks"),
 		say(&"stay_for_wine"),
 		say(&"go_rest"),
-		Beats.until(func() -> bool: return not player_within(9.0, mark(&"table")), "until she leaves the table"),
+		nudged(func() -> bool: return not player_within(9.0, mark(&"table")), &"go_rest", NUDGE_AFTER,
+			"until she leaves the table"),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"laugh_growl"), "a laugh, cut off by a growl"),
 		Beats.run(_clear_the_scene, "clear the scene"),
 	]
@@ -201,6 +206,12 @@ func _take_a_bite() -> void:
 				if d:
 					Juice.burst(d, &"craft")
 				table.take(mark_name)
+
+
+## "E   eat" while the table holds her and there's food left (the forage card's look).
+func _eat_card(on: bool) -> void:
+	if is_inside_tree():
+		PressCard.find_or_make(self).show_text("eat" if on else "")
 
 
 func _clear_the_scene(_s: SceneSpace) -> void:

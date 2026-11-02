@@ -17,6 +17,8 @@ extends Act2Space
 const DIR := "res://art/bedroom/"
 ## Before dawn, when Alis comes.
 const DAWN := 5.5 / 24.0
+## Quiet seconds before she reminds herself (L34-6).
+const NUDGE_AFTER := 15.0
 
 var coil: Node3D
 var rope: Node3D
@@ -25,7 +27,6 @@ var rigged: bool = false
 
 func _build_beats() -> Array:
 	rigged = false
-	var presses_at := [0]
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
@@ -36,12 +37,11 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "to the door"),
-		reach(&"door_inside", 2.0),
+		reach_nudged(&"door_inside", 2.0, &"rig_now", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void:
-			presses_at[0] = presses()
 			StoryControl.set_focus(_marker(&"fixture"))
 			aside(&"rig_prompt"), "under the light fixture"),
-		Beats.until(func() -> bool: return presses() > presses_at[0], "until she rigs it"),
+		wait_press("rig the rope", &"rig_now", NUDGE_AFTER, &"door_inside", 2.6, "until she rigs it"),
 		Beats.run(_rig, "rigged"),
 		Beats.raise("curtain_trap_set"),
 		say(&"locked"),

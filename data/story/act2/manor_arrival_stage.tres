@@ -20,6 +20,7 @@ marks = {
 "tamlin_seat": Vector3(-4.4, 0, -6.5)
 }
 lines = {
+"beast_waits": {"text": "Those doors swung wider. A command to follow.", "who": ""},
 "alis_bath": {"text": "Come along, then. You'll want a bath.", "who": "Alis"},
 "doors": {"text": "The doors swung open on silent hinges. A faint, metallic smell: magic.", "who": ""},
 "first_rule": {"text": "Faerie food. The first rule: never eat their food.", "who": ""},

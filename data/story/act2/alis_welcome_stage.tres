@@ -11,6 +11,8 @@ marks = {
 "feyre_start": Vector3(0, 0, 12)
 }
 lines = {
+"alis_bath_where": {"text": "The bath's through there. Before it cools.", "who": "Alis"},
+"alis_go_on": {"text": "Go on, it won't bite.", "who": "Alis"},
 "alis_bath_drawn": {"text": "Your bath's drawn. In with you, and mind the hot water.", "who": "Alis"},
 "alis_dinner": {"text": "Dinner. Don't keep him waiting.", "who": "Alis"},
 "alis_dress": {"text": "I've laid out a dress for you.", "who": "Alis"},
@@ -21,5 +23,5 @@ lines = {
 "tunic_thought": {"text": "A white shirt, and a dark blue tunic with scratchy golden thread on the lapels.", "who": ""}
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("alis_bath_drawn", "alis_dinner", "alis_dress", "alis_tunic", "bath_prompt", "feyre_no_dress")
+invented = PackedStringArray("alis_bath_drawn", "alis_dinner", "alis_dress", "alis_tunic", "bath_prompt", "feyre_no_dress", "alis_bath_where", "alis_go_on")
 canon = "Ch6 (Keeper 2026-11-01, [C]): Alis (brass bird mask) bathes her and cuts her hair; she sits in a white dressing gown; refuses the velvet turquoise dress; her old shirt and pants fell apart in the wash; Alis brings trousers and a tunic that fit: white shirt, dark blue tunic, scratchy golden thread on the lapels. Wording of the spoken lines is invented (X). Marks are in feyre_bedroom_window's frame (anchor at world 23, level 1, -70.4); the bath station is at world (32.4, -57.8). Outfit: closest wardrobe pieces spring_tunic_sky + spring_trousers_cream until a navy-and-gold tunic piece exists."
