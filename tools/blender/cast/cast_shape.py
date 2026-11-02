@@ -59,6 +59,7 @@ DEFAULTS = dict(
     lower_fill=0.0,      # fills the valley between cheek and jaw beside the mouth (no nose-to-chin crease)
     bridge_fill=0.0,     # fills the nose root between the eyes: a small, straight bridge
     jaw_taper=1.0,       # < 1 narrows the jaw towards the chin (a tapered V)
+    cut_soft=0.0022,     # blend radius of the eye-opening cut (bigger = no ridge where a short cut ends)
     cut_reach=0.03,      # how far in front of the eyeball the eye opening is carved (m); Feyre's 3 cm
                          # also grooves the nose sides and cheeks below big eyes, ~1 cm keeps it to the lids
 
@@ -218,7 +219,7 @@ def build_grid(m, p, h=0.0025):
     S(sdf.ellipsoid((0, MY - 0.0035, MZ - 0.0155 - cd * 0.3), (0.011, 0.004, 0.0032)), 0.006)
     S(sdf.ellipsoid((0, MY - 0.0035, MZ + 0.0135), (0.0032, 0.003, 0.0045)), 0.004)
     for s in (1, -1):
-        S(_eye_cut(m, s, p["cut_reach"]), 0.0022)
+        S(_eye_cut(m, s, p["cut_reach"]), p["cut_soft"])
         U(m.lid_margin(s, True), 0.003)
         U(m.lid_margin(s, False), 0.0025)
         U(sdf.sphere((m.EYE_X * s, m.EYE_Y, m.EYE_Z), m.EYE_R - 0.002))

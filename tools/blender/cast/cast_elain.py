@@ -29,7 +29,7 @@ SHAPE = dict(
     # a soft round chin.  Canon: "the gentle heart" (ch4) who never lost "the desire to look
     # lovely" (ch2).
     eye_r=0.0226, eye_open_up=39.0, eye_open_lo=33.0, eye_tilt=1.0, eye_open_w=64.0,
-    eye_dx=0.0018, cut_reach=0.014, lid=0.58, eye_sink=0.75, eye_dz=-0.0025, brow_dz=0.0010,
+    eye_dx=0.0018, cut_reach=0.016, cut_soft=0.005, lid=0.58, eye_sink=0.75, eye_dz=-0.0025, brow_dz=0.0010,
     cheeks=1.08, cheekbones=0.0, cheek_lift=0.004, chin=0.92, chin_drop=-0.006,
     jaw_w=0.92, jaw_taper=0.85, chin_y=0.005, lower_fill=0.8, bridge_fill=0.6, mouth_dy=0.004,
     nose=0.84, nose_w=0.95, nose_up=0.15, nose_bridge=0.0,
