@@ -11,12 +11,12 @@ rest = &"brisk"
 blink_min = 2.8
 blink_max = 6.0
 presets = {
-"bark_laugh": { "cheek_raise": 0.3, "jaw_open": 0.45, "smile_L": 0.6, "smile_R": 0.6, "squint_L": 0.5, "squint_R": 0.5 },
+"bark_laugh": { "jaw_open": 0.45, "smile_L": 0.6, "smile_R": 0.6, "squint_L": 0.5, "squint_R": 0.5 },
 "brisk": { "lip_press": 0.25, "mouth_side_R": 0.15 },
-"horror_memory": { "eyes_wide_L": 0.9, "eyes_wide_R": 0.9, "jaw_open": 0.14, "mouth_stretch": 0.3 },
-"sneer": { "brow_down_L": 0.3, "brow_down_R": 0.3, "smile_R": 0.2, "sneer_R": 0.8, "squint_L": 0.3, "squint_R": 0.3 },
-"softened": { "blink_L": 0.24, "blink_R": 0.24, "brow_inner_up": 0.2, "smile_L": 0.22, "smile_R": 0.22 },
-"tight_lips": { "brow_down_L": 0.2, "brow_down_R": 0.2, "frown_L": 0.3, "frown_R": 0.3, "lip_press": 1.0 },
+"horror_memory": { "eyes_wide_L": 0.9, "eyes_wide_R": 0.9, "lips_part": 0.4, "mouth_stretch": 0.3 },
+"sneer": { "lips_part": 0.2, "smile_R": 0.2, "sneer_R": 0.85, "squint_L": 0.3, "squint_R": 0.3 },
+"softened": { "blink_L": 0.24, "blink_R": 0.24, "smile_L": 0.22, "smile_R": 0.22 },
+"tight_lips": { "frown_L": 0.3, "frown_R": 0.3, "lip_press": 1.0 },
 "tongue_click": { "lip_press": 0.7, "mouth_side_R": 0.5, "sneer_R": 0.15, "squint_L": 0.15, "squint_R": 0.15 }
 }
 aliases = {

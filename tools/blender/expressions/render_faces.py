@@ -29,9 +29,10 @@ LOOK = {"tamlin": ("9C7A3E", "B07A68"), "lucien": ("8A3A1E", "B0786A"), "alis": 
 
 bpy.ops.wm.open_mainfile(filepath=os.path.join(REPO, "characters", CHAR, "model", CHAR + ".blend"))
 scn = bpy.context.scene
+HIDE = set(filter(None, opts.get("hide", "").split(",")))
 for o in bpy.data.objects:
     if o.type == "MESH":
-        o.hide_render = o.name == "Body_LOD1"
+        o.hide_render = o.name == "Body_LOD1" or o.name in HIDE
 
 
 def srgb(h):
@@ -112,13 +113,13 @@ riders = [o for o in bpy.data.objects if o.type == "MESH" and o.data.shape_keys 
 P = np.array([v.co[:] for v in body.data.vertices])
 blink = np.array([v.co[:] for v in kb["blink_L"].data]) - P
 eye = P[np.linalg.norm(blink, axis=1) > 0.001].mean(0)
-target = (0.0, float(eye[1]) + 0.02, float(eye[2]) - 0.05)
+target = (0.0, float(eye[1]) + 0.02, float(eye[2]) - float(opts.get("drop", "0.05")))
 
 cam = bpy.data.objects.new("Cam", bpy.data.cameras.new("Cam"))
 cam.data.lens = 85
 scn.collection.objects.link(cam)
 scn.camera = cam
-yaw, pitch, dist = math.radians(22), math.radians(3), 0.56
+yaw, pitch, dist = math.radians(float(opts.get("yaw", "22"))), math.radians(3), float(opts.get("dist", "0.56"))
 cam.location = (target[0] + dist * math.sin(yaw) * math.cos(pitch), target[1] - dist * math.cos(yaw) * math.cos(pitch),
                 target[2] + dist * math.sin(pitch))
 cam.rotation_euler = (math.radians(90) - pitch, 0, yaw)
@@ -126,6 +127,13 @@ scn.render.resolution_x = scn.render.resolution_y = SIZE
 
 prof = face_profiles.PROFILES[CHAR]
 order = [prof["rest"]] + [k for k in prof["presets"] if k != prof["rest"]]
+if "mix" in opts:   # --mix=name/key:v,key:v;name2/... : ad-hoc frames for tuning
+    prof = {"presets": {}}
+    order = []
+    for part in opts["mix"].split(";"):
+        nm, kv = part.split("/")
+        prof["presets"][nm] = face_profiles.expand({k: float(v) for k, v in (x.split(":") for x in kv.split(","))})
+        order.append(nm)
 os.makedirs(OUT, exist_ok=True)
 
 

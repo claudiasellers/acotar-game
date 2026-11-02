@@ -85,10 +85,10 @@ func _row(id: StringName, img: Image, row: int) -> void:
 	d.profile.tics = []
 	var sk := m.get(&"skeleton") as Skeleton3D
 	var head := sk.global_transform * sk.get_bone_global_pose(sk.find_bone(&"Head"))
-	var face_pt := head.origin + Vector3(0, 0.06, 0)
+	var face_pt := head.origin + Vector3(0, 0.02, 0)   # between eyes and mouth: both read
 	# the model faces -Z after its 180-degree turn: stand in front, a little to its left
-	_cam.global_position = face_pt + Vector3(0.28, 0.02, -0.95)
-	_cam.look_at(face_pt + Vector3(0, -0.015, 0))
+	_cam.global_position = face_pt + Vector3(0.22, 0.0, -0.80)
+	_cam.look_at(face_pt + Vector3(0, -0.01, 0))
 	var order: Array = [d.profile.rest]
 	for p: String in d.profile.presets:
 		if StringName(p) != d.profile.rest:

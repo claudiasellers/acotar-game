@@ -39,6 +39,7 @@ EXPRESSION_KEYS = (
     "cheek_raise",                   # the cheeks of a real smile
     "mouth_side_L", "mouth_side_R",  # whole mouth shifted to one side
     "chin_raise",                    # chin bunched up, lower lip pushed up: holding back tears
+    "lips_part",                     # lips apart, jaw still (awe, fear, breath); shows teeth once the mouth is cut
 )
 
 # Feyre's reference proportions (tools/blender/feyre/feyre_shape.py): the
@@ -129,6 +130,19 @@ class Face:
         # Head half-width at the mouth (for the masseters).
         band = (np.abs(P[:, 2] - self.mouth[2]) < 0.012 * self.sv) & (self.head > 0.5)
         self.cheek_x = float(np.abs(P[band, 0]).max()) if band.any() else 0.07 * self.sh
+        # Once mouth.cut() has opened the lips, everything below the cut (the lower lip's own edge too)
+        # is the jaw side, so lip moves can part the lips.
+        z_cut = obj.get("mouth_z")
+        self.below = (P[:, 2] < z_cut - 1e-4) if z_cut is not None else (P[:, 2] < self.mouth[2])
+        att = obj.data.attributes.get("mouth_side")
+        if z_cut is not None and att is not None and len(att.data) == len(P):
+            side = np.empty(len(P), dtype=np.int32)
+            att.data.foreach_get("value", side)
+            self.below = (P[:, 2] < z_cut - 1e-4) | (side == -1)
+            # the lips by side of the cut, not by vis_MBP's own split (which sits a hair off the groove)
+            near = self.lip > 0
+            self.upper_lip = self.lip * near * ~self.below
+            self.lower_lip = self.lip * near * self.below
         side_band = band & (np.abs(P[:, 0]) > 0.85 * self.cheek_x)
         self.cheek_y = float(P[side_band, 1].mean()) if side_band.any() else face_y + 0.06
 
@@ -179,7 +193,7 @@ def deltas(f):
         out["eyes_wide_" + suf] = -0.38 * f.d["blink_" + suf]
         # sneer: upper lip lifts beside the philtrum, nose wing hikes up and in
         d = np.zeros_like(P)
-        lip = f.g((s * 0.55 * hw, 0, mz + 0.0055 * sv), (0.0085 * sh, 1, 0.006 * sv))
+        lip = f.g((s * 0.55 * hw, 0, mz + 0.0055 * sv), (0.0085 * sh, 1, 0.006 * sv)) * (1.0 - f.below)
         d[:, 2] += 0.0070 * sv * lip
         d[:, 1] -= 0.0016 * sh * lip
         wing = f.g((s * 0.017 * sh, 0, mz + 0.021 * sv), (0.008 * sh, 1, 0.008 * sv))
@@ -235,6 +249,12 @@ def deltas(f):
     d[:, 2] += 0.0020 * sv * f.lower_lip
     d[:, 1] -= 0.0020 * sh * f.lower_lip
     out["chin_raise"] = d
+    # lips part: upper lip up, lower lip down, the jaw stays
+    d = np.zeros_like(P)
+    d[:, 2] += 0.0026 * sv * f.upper_lip * (1.0 - f.below)
+    d[:, 2] -= 0.0032 * sv * f.lower_lip * f.below
+    d[:, 1] += 0.0006 * sh * f.lip
+    out["lips_part"] = d
     return {k: out[k] for k in EXPRESSION_KEYS}
 
 

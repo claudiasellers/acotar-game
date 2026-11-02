@@ -25,6 +25,12 @@ const VISEME_EASE := 18.0
 ## Past this distance from the camera the face stops updating (the body hands over to LOD1 at 14 m).
 const FAR := 15.0
 const VISEMES: Array[String] = ["vis_AA", "vis_E", "vis_O", "vis_U", "vis_MBP", "vis_FV"]
+## Skin under a fused Spring Court mask (brows, cheeks): never moved on a masked face, so the
+## rigid mask is never pierced and the acting reads through jaw, mouth and eyes [C ch6].
+const MASK_HIDDEN: Array[String] = ["brow_down_L", "brow_down_R", "brow_up_L", "brow_up_R", "brow_inner_up",
+	"brow_up", "brow_down", "cheek_raise", "cheek_puff"]
+## How far a masked face may squint (the lower lid rides up under the mask's eye holes).
+const MASKED_SQUINT := 0.6
 ## Shapes that hold the lips shut; talking eases them off so the mouth can move.
 const LIP_HOLDS: Array[String] = ["lip_press", "jaw_clench"]
 
@@ -317,6 +323,12 @@ func _compose(blink: float, talk_open: float) -> void:
 				_out[k] = float(_out[k]) * (1.0 - clampf(talk_open * 1.5, 0.0, 1.0))
 	for k in ["blink_L", "blink_R"]:
 		_out[k] = maxf(float(_out.get(k, 0.0)), blink)
+	if profile.masked:
+		for k in MASK_HIDDEN:
+			_out.erase(k)
+		for k in ["squint_L", "squint_R"]:
+			if _out.has(k):
+				_out[k] = minf(float(_out[k]), MASKED_SQUINT)
 	for k: String in _out:
 		_out[k] = clampf(float(_out[k]), 0.0, 1.0)
 

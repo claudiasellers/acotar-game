@@ -22,6 +22,15 @@ sys.path.insert(0, HERE)
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 
 import face_keys  # noqa: E402
+import mouth  # noqa: E402
+
+# Teeth per face: fangs = extra canine length (m) [C: Tamlin's fangs when furious, ch11];
+# Lucien's grin is "too-white" [C ch8-9]; the father's are a poor man's.
+TEETH = {
+    "tamlin": dict(fangs=0.0045, teeth_rgb=(0.97, 0.95, 0.90)),
+    "lucien": dict(teeth_rgb=(1.0, 1.0, 0.99)),
+    "father": dict(teeth_rgb=(0.86, 0.80, 0.68)),
+}
 
 
 # Meshes outside <id>.glb that sit on the face and must move with it: id -> {object: glb path}.
@@ -81,10 +90,11 @@ def run(char):
     body = bpy.data.objects["Body"]
     arm = bpy.data.objects["Armature"]
     lod_hidden = {}
+    seam, mouth_obj, _ = mouth.open_mouth(body, face_keys.Face(body), arm, **TEETH.get(char, {}))
     f, rep = face_keys.add_expression_keys(body)
     riders = []
     for o in bpy.data.objects:
-        if o.type == "MESH" and o is not body and face_keys.transfer_keys(body, f, o):
+        if o.type == "MESH" and o not in (body, mouth_obj) and face_keys.transfer_keys(body, f, o):
             riders.append(o.name)
     for name, rel in FACE_RIDERS.get(char, {}).items():
         o = bpy.data.objects[name]
@@ -93,6 +103,8 @@ def run(char):
         export_rider(os.path.join(REPO, rel), o, arm)
         o.hide_set(was)
         riders.append(name + " -> " + rel)
+    if "Mouth" not in mesh_nodes:
+        mesh_nodes.append("Mouth")
     objs = [bpy.data.objects[n] for n in mesh_nodes if n in bpy.data.objects]
     lost = [n for n in mesh_nodes if n not in bpy.data.objects]
     if lost:
@@ -114,6 +126,7 @@ def run(char):
         char, f.eye[1][0], f.mouth[2], f.corner_x, f.sh, f.sv))
     print("   keys on Body: %d (max shift %s mm)" % (nkeys, ", ".join(
         "%s %.1f" % (k, v * 1000) for k, v in rep.items())))
+    print("   mouth: %d seam edges opened, Mouth %d tris" % (seam, sum(len(p.vertices) - 2 for p in mouth_obj.data.polygons)))
     print("   riders: %s | meshes: %s" % (riders, [o.name for o in objs]))
     if clips_after != clips:
         raise RuntimeError("clips changed: %s -> %s" % (clips, clips_after))

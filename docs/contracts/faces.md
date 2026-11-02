@@ -8,7 +8,7 @@ Every cast head built on Feyre's kit has the **17 base keys** from
 `tools/blender/feyre/build_feyre.py` (`nourished`, `blink_L`, `blink_R`,
 `jaw_open`, `smile`, `frown`, `brow_up`, `brow_down`, `squint`, `cheek_puff`,
 `lips_pucker`, `vis_AA`, `vis_E`, `vis_O`, `vis_U`, `vis_MBP`, `vis_FV`) and,
-after `tools/blender/expressions/apply_face_keys.py <id>`, these **22 expression keys**
+after `tools/blender/expressions/apply_face_keys.py <id>`, these **23 expression keys**
 (`face_keys.EXPRESSION_KEYS`):
 
 | Key | Move |
@@ -26,6 +26,17 @@ after `tools/blender/expressions/apply_face_keys.py <id>`, these **22 expression
 | `cheek_raise` | the cheeks of a real smile |
 | `mouth_side_L`, `mouth_side_R` | whole mouth shifted to one side |
 | `chin_raise` | chin bunched, lower lip pushed up (holding back tears) |
+| `lips_part` | lips apart with the jaw still (awe, fear, a snarl's bared teeth) |
+
+**The mouth opens (L36-2).** `tools/blender/expressions/mouth.py` splits the lips along
+the groove (the lip region is subdivided first), rolls each lip edge inward, and
+carries the lower lip with the jaw in `jaw_open` and the jaw share of every
+viseme. A new mesh **`Mouth`** in `<id>.glb` holds the mouth bag (deep rose,
+never grey), an upper and lower row of pearly teeth and a tongue, skinned upper
+half to `Head` and lower half to `Jaw`, with every face key (only the lower half
+moves). Fangs per face in `apply_face_keys.TEETH` (Tamlin's, [C ch11]). The cut
+is recorded on the body as the custom property `mouth_z` and the point attribute
+`mouth_side` (+1 upper-lip seam copy, -1 lower).
 
 `_L` is the character's own left (+X in Blender). Values are 0..1. The neutral
 face (every key at 0) is unchanged by the pass. Landmarks are read from the base
@@ -50,7 +61,11 @@ guarded pleading`. A caller may also name a character's own preset (`restraint`,
 `vicious_grin`, `tongue_click`, `dozing`, ...). Unknown names fall back to rest.
 
 Spring Court folk (Tamlin, Lucien, Alis) wear fused masks over brows, nose and
-cheeks [C ch6]; their presets act through jaw, mouth, lips and eyes.
+cheeks [C ch6]; their presets act through jaw, mouth, lips and eyes. For a
+profile with `masked = true` the driver never writes the brow and cheek keys
+(`FaceDriver.MASK_HIDDEN`) and caps the squints at 0.6, so the rigid mask is never
+pierced; `face_profiles.check()` also refuses those keys in masked presets. When a
+mask comes off for good (after Amarantha) the profile's `masked` flips.
 
 ## 3. Asking for a face (story, dialogue, cutscenes)
 

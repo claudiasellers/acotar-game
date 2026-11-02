@@ -44,14 +44,13 @@ PROFILES = {
         presets={
             "guarded": {"lip_press": 0.25, "jaw_clench": 0.2, "frown": 0.1},
             "restraint": {"jaw_clench": 0.95, "lip_press": 0.6, "squint": 0.25, "frown": 0.2},
-            "growl": {"sneer_L": 0.45, "sneer_R": 0.55, "jaw_clench": 0.5, "squint": 0.4, "frown": 0.35,
-                      "brow_down": 0.6},
-            "fury": {"sneer_L": 1.0, "sneer_R": 1.0, "jaw_open": 0.32, "mouth_stretch": 0.25, "squint": 0.55,
-                     "brow_down": 1.0, "frown": 0.3},
+            "growl": {"sneer_L": 0.55, "sneer_R": 0.65, "lips_part": 0.45, "squint": 0.4, "frown": 0.3},
+            "fury": {"sneer_L": 1.0, "sneer_R": 1.0, "jaw_open": 0.35, "lips_part": 0.5, "mouth_stretch": 0.2,
+                     "squint": 0.55, "frown": 0.3},
             "weary": {"blink_L": 0.42, "blink_R": 0.42, "frown": 0.25, "jaw_open": 0.04},
-            "shy_warmth": {"smile": 0.32, "smile_L": 0.12, "cheek_raise": 0.3, "blink_L": 0.18, "blink_R": 0.18},
-            "grin": {"smile": 1.0, "cheek_raise": 0.8, "jaw_open": 0.14, "squint": 0.3},
-            "lazy_grin": {"smile": 0.55, "smile_R": 0.2, "blink_L": 0.25, "blink_R": 0.25, "cheek_raise": 0.3},
+            "shy_warmth": {"smile": 0.32, "smile_L": 0.12, "blink_L": 0.18, "blink_R": 0.18},
+            "grin": {"smile": 1.0, "lips_part": 0.35, "jaw_open": 0.12, "squint": 0.3},
+            "lazy_grin": {"smile": 0.55, "smile_R": 0.2, "blink_L": 0.25, "blink_R": 0.25, "lips_part": 0.15},
         },
         aliases={"neutral": "guarded", "guarded": "guarded", "happy": "shy_warmth", "laugh": "grin",
                  "smirk": "lazy_grin", "tender": "shy_warmth", "angry": "restraint", "fury": "fury",
@@ -72,11 +71,11 @@ PROFILES = {
         presets={
             "idle_smirk": lr("L", smile_S=0.28, mouth_side_S=0.15),
             "smirk": dict(lr("L", smile_S=0.95, mouth_side_S=0.5, squint_S=0.35, sneer_S=0.15)),
-            "vicious_grin": dict(lr("L", smile_S=0.35), smile=0.8, jaw_open=0.12, squint=0.3, cheek_raise=0.4),
-            "scowl": dict(lr("L", sneer_S=0.4), frown=0.7, brow_down=0.8, lip_press=0.3, squint=0.3),
-            "bark_laugh": dict(lr("L", smile_S=0.2), smile=0.65, jaw_open=0.42, squint=0.5, cheek_raise=0.4),
-            "pale_fear": {"eyes_wide_L": 0.85, "eyes_wide_R": 0.85, "lip_press": 0.6, "mouth_stretch": 0.25},
-            "crooked_smile": dict(lr("L", smile_S=0.25), smile=0.5, cheek_raise=0.5, squint=0.15),
+            "vicious_grin": dict(lr("L", smile_S=0.35), smile=0.8, jaw_open=0.1, lips_part=0.55, squint=0.3),
+            "scowl": dict(lr("L", sneer_S=0.45), frown=0.7, lip_press=0.3, squint=0.4),
+            "bark_laugh": dict(lr("L", smile_S=0.2), smile=0.65, jaw_open=0.42, squint=0.5),
+            "pale_fear": {"eyes_wide_L": 0.85, "eyes_wide_R": 0.85, "lips_part": 0.3, "mouth_stretch": 0.3},
+            "crooked_smile": dict(lr("L", smile_S=0.25), smile=0.5, squint=0.2),
             "grim": {"lip_press": 0.5, "frown": 0.45, "blink_L": 0.12, "blink_R": 0.12},
         },
         aliases={"neutral": "idle_smirk", "guarded": "smirk", "happy": "crooked_smile", "laugh": "bark_laugh",
@@ -97,11 +96,11 @@ PROFILES = {
         presets={
             "brisk": dict(lr("R", mouth_side_S=0.15), lip_press=0.25),
             "tongue_click": dict(lr("R", mouth_side_S=0.5, sneer_S=0.15), lip_press=0.7, squint=0.15),
-            "sneer": dict(lr("R", sneer_S=0.8, smile_S=0.2), squint=0.3, brow_down=0.3),
-            "bark_laugh": {"smile": 0.6, "jaw_open": 0.45, "squint": 0.5, "cheek_raise": 0.3},
-            "tight_lips": {"lip_press": 1.0, "frown": 0.3, "brow_down": 0.2},
-            "horror_memory": {"eyes_wide_L": 0.9, "eyes_wide_R": 0.9, "jaw_open": 0.14, "mouth_stretch": 0.3},
-            "softened": {"smile": 0.22, "blink_L": 0.24, "blink_R": 0.24, "brow_inner_up": 0.2},
+            "sneer": dict(lr("R", sneer_S=0.85, smile_S=0.2), lips_part=0.2, squint=0.3),
+            "bark_laugh": {"smile": 0.6, "jaw_open": 0.45, "squint": 0.5},
+            "tight_lips": {"lip_press": 1.0, "frown": 0.3},
+            "horror_memory": {"eyes_wide_L": 0.9, "eyes_wide_R": 0.9, "lips_part": 0.4, "mouth_stretch": 0.3},
+            "softened": {"smile": 0.22, "blink_L": 0.24, "blink_R": 0.24},
         },
         aliases={"neutral": "brisk", "guarded": "tight_lips", "happy": "softened", "laugh": "bark_laugh",
                  "smirk": "sneer", "tender": "softened", "angry": "tight_lips", "fury": "sneer",
@@ -122,10 +121,10 @@ PROFILES = {
             "defeated": {"brow_inner_up": 0.35, "frown": 0.3, "blink_L": 0.22, "blink_R": 0.22},
             "dozing": {"blink_L": 0.88, "blink_R": 0.88, "jaw_open": 0.16, "brow_inner_up": 0.1},
             "terror": {"eyes_wide_L": 1.0, "eyes_wide_R": 1.0, "brow_inner_up": 0.8, "brow_up": 0.6,
-                       "mouth_stretch": 0.6, "jaw_open": 0.3},
+                       "mouth_stretch": 0.6, "jaw_open": 0.3, "lips_part": 0.3},
             "wince": {"squint": 0.8, "brow_down": 0.45, "brow_inner_up": 0.3, "mouth_stretch": 0.4,
                       "jaw_clench": 0.5},
-            "pleading": {"brow_inner_up": 1.0, "eyes_wide_L": 0.3, "eyes_wide_R": 0.3, "jaw_open": 0.14,
+            "pleading": {"brow_inner_up": 1.0, "eyes_wide_L": 0.3, "eyes_wide_R": 0.3, "lips_part": 0.35,
                          "frown": 0.35, "chin_raise": 0.2},
             "goodbye_tears": {"chin_raise": 0.75, "brow_inner_up": 0.85, "frown": 0.6, "squint": 0.3},
             "faint_smile": {"smile": 0.25, "brow_inner_up": 0.3, "blink_L": 0.15, "blink_R": 0.15},
@@ -160,9 +159,18 @@ for _p in PROFILES.values():
     _p["presets"] = {n: expand(m) for n, m in _p["presets"].items()}
 
 
+# Skin under a Spring Court mask never moves (the mask is rigid and must not be pierced):
+# FaceDriver also zeroes these for masked profiles.
+MASK_HIDDEN = ("brow_down_L", "brow_down_R", "brow_up_L", "brow_up_R", "brow_inner_up", "brow_up", "brow_down",
+               "cheek_raise", "cheek_puff")
+
+
 def check():
-    """Every alias resolves and every emotion is covered."""
+    """Every alias resolves, every emotion is covered, masked faces act only below the mask."""
     for cid, p in PROFILES.items():
+        if p["masked"]:
+            for n, m in p["presets"].items():
+                assert not set(m) & set(MASK_HIDDEN), (cid, n, set(m) & set(MASK_HIDDEN))
         assert p["rest"] in p["presets"], (cid, p["rest"])
         for e in EMOTIONS:
             assert p["aliases"].get(e) in p["presets"], (cid, e)

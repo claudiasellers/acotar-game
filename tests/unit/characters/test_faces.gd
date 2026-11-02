@@ -9,7 +9,7 @@ const CAST: Array[StringName] = [&"tamlin", &"lucien", &"alis", &"father"]
 const EXPRESSION_KEYS: Array[String] = ["smile_L", "smile_R", "frown_L", "frown_R", "sneer_L", "sneer_R",
 	"lip_press", "jaw_clench", "mouth_stretch", "eyes_wide_L", "eyes_wide_R", "squint_L", "squint_R",
 	"brow_down_L", "brow_down_R", "brow_up_L", "brow_up_R", "brow_inner_up", "cheek_raise", "mouth_side_L",
-	"mouth_side_R", "chin_raise"]
+	"mouth_side_R", "chin_raise", "lips_part"]
 
 
 func _model(id: StringName) -> Node3D:
@@ -53,6 +53,29 @@ func test_models_carry_every_shape_their_presets_use() -> void:
 		for mix: Dictionary in p.presets.values():
 			for k: String in mix:
 				assert_gt(body.find_blend_shape_by_name(k), -1, "%s preset key %s" % [id, k])
+
+
+func test_every_cast_mouth_opens_onto_teeth() -> void:
+	for id in CAST:
+		var m := _model(id)
+		var mouth := m.find_child("Mouth", true, false) as MeshInstance3D
+		assert_not_null(mouth, "%s has a mouth (bag, teeth, tongue)" % id)
+		assert_gt(mouth.find_blend_shape_by_name("jaw_open"), -1, "%s lower teeth follow the jaw" % id)
+		var d := _driver(m)
+		assert_true(mouth in d.meshes, "%s mouth is driven with the face" % id)
+
+
+func test_masked_faces_never_move_skin_under_the_mask() -> void:
+	var d := _driver(_model(&"tamlin"))
+	assert_true(d.profile.masked)
+	d.profile.presets["_probe"] = {"brow_down_L": 1.0, "brow_inner_up": 1.0, "cheek_raise": 1.0, "squint_L": 1.0}
+	d.express(&"_probe")
+	_run(d, 0.5)
+	assert_eq(d.weight_of("brow_down_L"), 0.0)
+	assert_eq(d.weight_of("brow_inner_up"), 0.0)
+	assert_eq(d.weight_of("cheek_raise"), 0.0)
+	assert_lte(d.weight_of("squint_L"), FaceDriver.MASKED_SQUINT)
+	d.profile.presets.erase("_probe")
 
 
 func test_tamlin_angry_is_jaw_tight_restraint_and_fury_comes_by_cue() -> void:

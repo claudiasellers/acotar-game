@@ -11,14 +11,14 @@ rest = &"idle_smirk"
 blink_min = 2.5
 blink_max = 5.5
 presets = {
-"bark_laugh": { "cheek_raise": 0.4, "jaw_open": 0.42, "smile_L": 0.85, "smile_R": 0.65, "squint_L": 0.5, "squint_R": 0.5 },
-"crooked_smile": { "cheek_raise": 0.5, "smile_L": 0.75, "smile_R": 0.5, "squint_L": 0.15, "squint_R": 0.15 },
+"bark_laugh": { "jaw_open": 0.42, "smile_L": 0.85, "smile_R": 0.65, "squint_L": 0.5, "squint_R": 0.5 },
+"crooked_smile": { "smile_L": 0.75, "smile_R": 0.5, "squint_L": 0.2, "squint_R": 0.2 },
 "grim": { "blink_L": 0.12, "blink_R": 0.12, "frown_L": 0.45, "frown_R": 0.45, "lip_press": 0.5 },
 "idle_smirk": { "mouth_side_L": 0.15, "smile_L": 0.28 },
-"pale_fear": { "eyes_wide_L": 0.85, "eyes_wide_R": 0.85, "lip_press": 0.6, "mouth_stretch": 0.25 },
-"scowl": { "brow_down_L": 0.8, "brow_down_R": 0.8, "frown_L": 0.7, "frown_R": 0.7, "lip_press": 0.3, "sneer_L": 0.4, "squint_L": 0.3, "squint_R": 0.3 },
+"pale_fear": { "eyes_wide_L": 0.85, "eyes_wide_R": 0.85, "lips_part": 0.3, "mouth_stretch": 0.3 },
+"scowl": { "frown_L": 0.7, "frown_R": 0.7, "lip_press": 0.3, "sneer_L": 0.45, "squint_L": 0.4, "squint_R": 0.4 },
 "smirk": { "mouth_side_L": 0.5, "smile_L": 0.95, "sneer_L": 0.15, "squint_L": 0.35 },
-"vicious_grin": { "cheek_raise": 0.4, "jaw_open": 0.12, "smile_L": 1.15, "smile_R": 0.8, "squint_L": 0.3, "squint_R": 0.3 }
+"vicious_grin": { "jaw_open": 0.1, "lips_part": 0.55, "smile_L": 1.15, "smile_R": 0.8, "squint_L": 0.3, "squint_R": 0.3 }
 }
 aliases = {
 "neutral": "idle_smirk",

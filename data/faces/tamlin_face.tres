@@ -11,13 +11,13 @@ rest = &"guarded"
 blink_min = 3.0
 blink_max = 6.5
 presets = {
-"fury": { "brow_down_L": 1.0, "brow_down_R": 1.0, "frown_L": 0.3, "frown_R": 0.3, "jaw_open": 0.32, "mouth_stretch": 0.25, "sneer_L": 1.0, "sneer_R": 1.0, "squint_L": 0.55, "squint_R": 0.55 },
-"grin": { "cheek_raise": 0.8, "jaw_open": 0.14, "smile_L": 1.0, "smile_R": 1.0, "squint_L": 0.3, "squint_R": 0.3 },
-"growl": { "brow_down_L": 0.6, "brow_down_R": 0.6, "frown_L": 0.35, "frown_R": 0.35, "jaw_clench": 0.5, "sneer_L": 0.45, "sneer_R": 0.55, "squint_L": 0.4, "squint_R": 0.4 },
+"fury": { "frown_L": 0.3, "frown_R": 0.3, "jaw_open": 0.35, "lips_part": 0.5, "mouth_stretch": 0.2, "sneer_L": 1.0, "sneer_R": 1.0, "squint_L": 0.55, "squint_R": 0.55 },
+"grin": { "jaw_open": 0.12, "lips_part": 0.35, "smile_L": 1.0, "smile_R": 1.0, "squint_L": 0.3, "squint_R": 0.3 },
+"growl": { "frown_L": 0.3, "frown_R": 0.3, "lips_part": 0.45, "sneer_L": 0.55, "sneer_R": 0.65, "squint_L": 0.4, "squint_R": 0.4 },
 "guarded": { "frown_L": 0.1, "frown_R": 0.1, "jaw_clench": 0.2, "lip_press": 0.25 },
-"lazy_grin": { "blink_L": 0.25, "blink_R": 0.25, "cheek_raise": 0.3, "smile_L": 0.55, "smile_R": 0.75 },
+"lazy_grin": { "blink_L": 0.25, "blink_R": 0.25, "lips_part": 0.15, "smile_L": 0.55, "smile_R": 0.75 },
 "restraint": { "frown_L": 0.2, "frown_R": 0.2, "jaw_clench": 0.95, "lip_press": 0.6, "squint_L": 0.25, "squint_R": 0.25 },
-"shy_warmth": { "blink_L": 0.18, "blink_R": 0.18, "cheek_raise": 0.3, "smile_L": 0.44, "smile_R": 0.32 },
+"shy_warmth": { "blink_L": 0.18, "blink_R": 0.18, "smile_L": 0.44, "smile_R": 0.32 },
 "weary": { "blink_L": 0.42, "blink_R": 0.42, "frown_L": 0.25, "frown_R": 0.25, "jaw_open": 0.04 }
 }
 aliases = {
