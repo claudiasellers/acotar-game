@@ -16,6 +16,7 @@ const CRAFTED_PATH := "res://ui/satchel/crafted/satchel_crafted.tres"
 ## Cloak weave and watercolour wash used by the 3D cloth (SatchelTable).
 const WEAVE_PATH := "res://ui/satchel/crafted/cloak_weave.png"
 const WASH_PATH := "res://ui/satchel/crafted/wash_bloom.png"
+const PATCH_PATH := "res://ui/satchel/crafted/patch_linen.png"
 ## Phases before the wall crossing use the human-realm theme.
 const HUMAN_PHASES: Array[String] = ["p0", "p1"]
 ## type variation -> base type
