@@ -355,8 +355,7 @@ func _out_and_back(dining: Node3D, space: SceneSpace) -> bool:
 func _set_down(at: Vector3, floor_y: float) -> bool:
 	_beat["dev_jump"] = true
 	for tries in 6:
-		feyre.global_position = Vector3(at.x, floor_y + 0.2, at.z)
-		feyre.velocity = Vector3.ZERO
+		feyre.teleport(Vector3(at.x, floor_y + 0.2, at.z))
 		await _wait(1.0)
 		if absf(feyre.global_position.y - floor_y) < 1.0:
 			return true
