@@ -34,7 +34,7 @@ WIDER = ph(4, 6)          # once the wider court opens
 WHO = {"feyre": "Feyre", "tamlin": "Tamlin", "lucien": "Lucien", "alis": "Alis", "nesta": "Nesta",
        "elain": "Elain", "father": "Father", "mother": "Mother"}
 
-TRIG = {"region": 0, "room": 1, "place": 2, "near": 3, "deed": 4, "follow": 5}
+TRIG = {"region": 0, "room": 1, "place": 2, "near": 3, "deed": 4, "follow": 5, "scene": 6}
 
 LINES = []   # (area, dict)
 PLACES = {}  # area -> [(id, region, x, z, r)]
@@ -151,9 +151,49 @@ chat(A, "f_knee", "father", "The damp's in my knee again. It'll pass.", HUMAN, c
 deed(A, "A1_06_mother_vow", "fact.mother_bed_seen", "Stay together, and look after them.", speaker="mother",
      phases=HUMAN, pr=5, canon="V", inner=True, who="Mother",
      delivery="memory: a whisper in her head, feverish and fading")
-deed(A, "d_wolf_killed", "wolf_killed", "Done. Don't think about its eyes.", phases=HUMAN)
+deed(A, "d_wolf_killed", "wolf_killed", "I can carry only one. But it's a shame to leave the wolf.",
+     phases=HUMAN, canon="A", delivery="inner voice, breath coming back, practical")
 deed(A, "d_wolf_skinned", "fact.wolf_skinned", "Heavy. Heavier than any pelt has a right to be.",
-     phases=HUMAN)
+     phases=HUMAN, follow="d_wolf_wrap")
+line(A, "d_wolf_wrap", "feyre", "His pelt over her wound. No blood trail home.", "follow", phases=HUMAN,
+     inner=True, canon="A", delivery="inner voice, quiet, careful")
+
+# =============================================================================
+# The wolf hunt (ch1), spoken by WolfHuntGuide on WolfKill's beats [Keeper].
+# Lines of one beat play in this order; a newer beat cuts off the rest.
+# No objective text (R2): it's what she sees, knows and tells herself.
+# =============================================================================
+A = "wolf_hunt"
+
+
+def beat(lid, b, text, canon="A", delivery="inner voice: low, held breath, hunting", **kw):
+    # The guide says each beat at most once per hunt; a retry after a reload hears it again.
+    line(A, lid, "feyre", text, "scene", "wolf_kill." + b, HUMAN, inner=True, canon=canon,
+         delivery=delivery, once=False, cd=0.0, **kw)
+
+
+# The camera finds the doe.
+beat("wh_doe", "doe", "A doe. A deer like that could feed my family for a week or more.")
+beat("wh_doe_hide", "doe", "Her skin could be sold. I need new boots. Elain needs a cloak.")
+# Golden eyes in the brush (the snow pauses here, not at the seize).
+beat("wh_eyes", "eyes", "Golden eyes, in the brush across the clearing.", delivery="inner voice, a whisper, frozen")
+beat("wh_downwind", "eyes", "He's downwind of her. She can't see or smell him.")
+# He creeps out and shows his size.
+beat("wh_pony", "size", "The size of a pony. No animal that big should be so quiet.")
+beat("wh_faerie", "size", "If he's a faerie, I should already be running.", delivery="inner voice, afraid")
+beat("wh_ash_rule", "size", "Ash makes their healing falter. Long enough to kill.")
+beat("wh_alone", "wait", "Is he alone?", delivery="inner voice, scanning")
+beat("wh_animal", "wait", "Animal. Just an animal.", canon="V", delivery="inner voice, telling herself")
+# Nudges, only while she has never drawn; each once.
+beat("wh_nudge_draw", "nudge_draw", "The ash arrow. Three years in my quiver. Now.")
+beat("wh_nudge_loose", "nudge_loose", "Before he ruins the hide. His side.")
+# What her shots do.
+beat("wh_wood", "wood", "Bee stings, to a wolf that size. It has to be the ash.")
+beat("wh_miss", "miss", "Missed. I can't afford to miss.", delivery="inner voice, sharp with herself")
+beat("wh_ash", "ash", "He's looking at me. Like he knows. Just in case... the eye.",
+     delivery="inner voice, cold, very fast")
+beat("wh_dying", "kill", "He should be dead, not dying.", delivery="inner voice, shaken")
+beat("wh_still", "kill", "Wolf. Definitely just a wolf.", canon="V", delivery="inner voice, relief she doesn't trust")
 
 # =============================================================================
 # The village (ch3), and the gold she brings back (ch29-30)

@@ -36,6 +36,24 @@ Tamlin, Lucien and Alis leave their free-roam spots while a scene holds control 
 its own `story_actor_<id>` for them, so they never double. Nesta, Elain and their father stay in
 the cottage for the beast scene, because its `gather` cue moves them.
 
+## Scene guides (a scene's own thoughts)
+
+A staged scene that needs its own running thoughts gets a guide node: a child of the scene's
+SceneSpace that only listens (beats, cues, hits, the bow) and calls
+`DialogueDirector.say_beat(scene_id, beat)`. While a guide calls `hold(scene_id, true)`, the
+director's own ambient, place and deed lines wait; `hold(..., false)` ends it with the usual hush.
+A beat's lines are `SCENE` lines with `where = "<scene_id>.<beat>"`, spoken in book order one
+after another; a newer beat cuts off what is left of the last. Scene beats speak whatever the
+control mode (the guide decides when). The guide says each beat at most once per run.
+
+`WolfHuntGuide` (`systems/dialogue/scene_guides/wolf_hunt_guide.gd`, under `WolfKill`, ch1, all
+lines Keeper-checked): `doe` (the camera finds her), `eyes` (golden eyes, the snow holds), `size`,
+`wait`, `nudge_draw` and `nudge_loose` (only while she has never drawn; the second only once he
+has the doe), `wood`, `miss`, `ash`, `kill`. Her heart (`beast_heartbeat`, L15) beats under a
+draw while he is alive. The staging (`WolfKillStaging`) frames the doe, then him, and tightens the
+lens while she holds the bow drawn and aimed on him; the world's slow draw is the bow's own
+(`BowController`), unchanged.
+
 ## Data (generated, never hand-edited)
 
 `tools/dialogue/gen_dialogue.py` writes everything below. Edit the tables there and rerun it.
@@ -44,7 +62,7 @@ the cottage for the beast scene, because its `gather` cue moves them.
   `places: Array[DialoguePlace]`). `DialogueLine` fields: `id`, `speaker` (a cast id, a `CourtNpc`
   npc_id, or a group key: `villager`, `court_fae`, `servant`, `gardener`, `sentry`, `reveler`;
   see `DialogueRules.group_of`), `who`, `text`, `canon` (V/A/X), `trigger` (`ENTER_REGION`,
-  `ENTER_ROOM`, `NEAR_PLACE`, `NEAR_SPEAKER`, `DEED`, `FOLLOW_UP`), `where`, `deed`, `phases`,
+  `ENTER_ROOM`, `NEAR_PLACE`, `NEAR_SPEAKER`, `DEED`, `FOLLOW_UP`, `SCENE`), `where`, `deed`, `phases`,
   `require_flags`, `forbid_flags`, `hour_from`/`hour_to`, `once`/`cooldown`, `priority`, `inner`,
   `follow_up`, `delivery`, `emotion`.
 - `where` is a `RegionDef` id, `manor_house`/`manor_grounds` (from `ManorSitePlan`), a manor room id

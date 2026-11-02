@@ -13,6 +13,7 @@ enum Trigger {
 	NEAR_SPEAKER,  ## Feyre comes within talking range of the speaker (optionally only in `where`).
 	DEED,          ## Flag `deed` rises (a deed she did); spoken once she is free again.
 	FOLLOW_UP,     ## Only spoken right after the line that names it in `follow_up`.
+	SCENE,         ## Spoken by a scene's guide at beat `where` ("<scene>.<beat>"), in book order.
 }
 
 @export var id: StringName

@@ -2,6 +2,13 @@
 ## WolfKill space (one line in wolf_kill.gd) and only listens: the beats,
 ## flags and canon stay with the scene.
 ##
+## - The doe (the scene's first focus, lane L34-4): her camera drifts to the
+##   doe and the lens closes a little, no bars, so the player sees what she's
+##   hunting before anything else happens.
+## - Lining up the shot (L34-4): while she holds the bow drawn and aimed on
+##   him, the lens tightens and the bars edge in; the bow's own slow draw
+##   slows the world (BowController, unchanged: this never touches time or
+##   the arrow). It lets go when she looses, lowers or looks away.
 ## - His eyes (the scene's focus on him): the lens tightens on him through
 ##   Feyre's own camera, she keeps full control to draw, and the bars come in
 ##   halfway. They ease out when the focus lets go.
@@ -16,6 +23,13 @@
 class_name WolfKillStaging
 extends Node
 
+const DOE_FOV := 48.0
+const AIM_FOV := 40.0
+const AIM_BARS := 0.3
+## Degrees off him her view may be and still count as lined up (and the
+## wider angle at which it lets go again).
+const AIM_ON_DEG := 9.0
+const AIM_OFF_DEG := 16.0
 const NOTICE_FOV := 36.0
 const NOTICE_BARS := 0.5
 const ASH_LOOK_FOV := 54.0
@@ -36,6 +50,9 @@ var space: Node
 var stage: StringName = &""
 
 var _noticing: bool = false
+var _on_doe: bool = false
+## The lens is tightened on him for a drawn, aimed shot.
+var aiming: bool = false
 var _skip: bool = false
 var _since: float = 0.0
 ## Another scene took over during the kill shots.
@@ -60,6 +77,11 @@ func _wolf() -> Node3D:
 	return w as Node3D if is_instance_valid(w) and w is Node3D else null
 
 
+func _doe() -> Node3D:
+	var d: Variant = space.get(&"doe") if space else null
+	return d as Node3D if is_instance_valid(d) and d is Node3D else null
+
+
 func _animator() -> CreatureAnimator:
 	var w := _wolf()
 	return w.get(&"animator") as CreatureAnimator if w else null
@@ -70,17 +92,24 @@ func _on_focus(target: Node3D) -> void:
 		return
 	var cine := _cine()
 	if target != null and target == _wolf():
+		_on_doe = false
+		aiming = false
 		_noticing = true
 		cine.follow(NOTICE_FOV, 0.9)
 		cine.bars_to(NOTICE_BARS, 0.9)
-	elif target == null and _noticing:
+	elif target != null and target == _doe():
+		_on_doe = true
+		cine.follow(DOE_FOV, 1.2)
+	elif target == null and (_noticing or _on_doe):
 		_noticing = false
+		_on_doe = false
 		cine.drop(self, 1.4)
 
 
 func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:
 	if not _running() or kind != &"great_wolf" or cause != &"arrow_ash" or stage != &"":
 		return
+	aiming = false
 	var anim := _animator()
 	if anim:
 		anim.slow(0.06, 0.12, 0.3)
@@ -164,6 +193,40 @@ func _end() -> void:
 func _process(delta: float) -> void:
 	if stage == &"fall" or stage == &"breaths":
 		_since += delta / maxf(Engine.time_scale, 0.01)
+	elif stage == &"" and _running() and not _noticing and not _on_doe:
+		_line_up()
+
+
+## The drawn, aimed shot on him: tighten while lined up, let go otherwise.
+func _line_up() -> void:
+	var wolf := _wolf()
+	var feyre := get_tree().get_first_node_in_group(&"player")
+	var bow: Variant = feyre.get(&"bow_controller") if feyre else null
+	var cam: Variant = feyre.get(&"camera") if feyre else null
+	var want := false
+	if wolf and bow is BowController and cam is Camera3D and not bool(space.get(&"wolf_dead")):
+		var drawing := (bow as BowController).is_drawing and Input.is_action_pressed(&"aim")
+		var off := aim_off_degrees(cam as Camera3D, _chest(wolf))
+		want = drawing and off <= (AIM_OFF_DEG if aiming else AIM_ON_DEG)
+	if want and not aiming:
+		aiming = true
+		var cine := _cine()
+		cine.follow(AIM_FOV, 0.5)
+		cine.bars_to(AIM_BARS, 0.5)
+	elif not want and aiming:
+		aiming = false
+		var cine := Cine.of(get_tree())
+		cine.bars_to(0.0, 0.5)
+		cine.drop(self, 0.6)
+
+
+## Degrees between where `cam` looks and `point`.
+static func aim_off_degrees(cam: Camera3D, point: Vector3) -> float:
+	var fwd := -cam.global_basis.z
+	var to := point - cam.global_position
+	if to.length() < 0.01:
+		return 0.0
+	return rad_to_deg(fwd.angle_to(to.normalized()))
 
 
 func _unhandled_input(event: InputEvent) -> void:

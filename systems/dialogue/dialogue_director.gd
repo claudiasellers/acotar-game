@@ -72,6 +72,11 @@ var _house: Node3D
 var _rooms: Array[Dictionary] = []
 var _regions: Array[RegionDef] = []
 var _voice: AudioStreamPlayer3D
+## Scenes whose guide speaks instead of the ambient lines: scene id -> true.
+var _holds: Dictionary = {}
+## A scene beat's remaining lines: [{line, node}], spoken one after another.
+var _scene_queue: Array[Dictionary] = []
+var _scene_next: float = 0.0
 var _voice_flat: AudioStreamPlayer
 
 
@@ -122,6 +127,7 @@ func add_book(book: DialogueBook) -> void:
 
 func _process(delta: float) -> void:
 	_now += delta
+	_pump_scene()
 	if not auto_tick:
 		return
 	_t += delta
@@ -137,6 +143,9 @@ func _process(delta: float) -> void:
 func step(at: Vector3) -> DialogueLine:
 	_at = at
 	_locate(at)
+	_pump_scene()
+	if not _holds.is_empty():
+		return null
 	if busy():
 		return null
 	if _follow and _now >= _follow_at:
@@ -154,6 +163,58 @@ func step(at: Vector3) -> DialogueLine:
 	return _speak(line, _speaker_node(line.speaker, at, DEED_RADIUS))
 
 
+## A scene's guide takes the voice while `on`: ambient, place and deed lines
+## wait, and only its beats (say_beat) are spoken.
+func hold(scene_id: StringName, on: bool) -> void:
+	if on:
+		_holds[scene_id] = true
+	else:
+		_holds.erase(scene_id)
+		if _holds.is_empty():
+			# What's left of the last beat still finishes (his last breaths
+			# outlast the scene); the hush starts from now.
+			_scene_edge = _now
+
+
+func held() -> bool:
+	return not _holds.is_empty()
+
+
+## Speaks the SCENE lines at "<scene_id>.<beat>" that fit (phase, flags, not
+## yet heard), in book order, one after another. A newer beat cuts off what
+## is left of the last one. Scene beats are spoken whatever the control mode:
+## the guide decides when. Returns the lines it will speak.
+func say_beat(scene_id: StringName, beat: StringName, node: Node = null) -> Array[DialogueLine]:
+	var key := StringName("%s.%s" % [scene_id, beat])
+	var ctx := _ctx()
+	var out: Array[DialogueLine] = []
+	for line: DialogueLine in _of(DialogueLine.Trigger.SCENE, key):
+		if DialogueRules.fits(line, ctx):
+			out.append(line)
+	if out.is_empty():
+		return out
+	_scene_queue.clear()
+	for line in out:
+		_scene_queue.append({"line": line, "node": node})
+	_scene_next = _now
+	_pump_scene()
+	return out
+
+
+## True while a scene beat still has lines to say.
+func beat_speaking() -> bool:
+	return not _scene_queue.is_empty() or _now < _busy_until
+
+
+func _pump_scene() -> void:
+	if _scene_queue.is_empty() or _now < _scene_next:
+		return
+	var next: Dictionary = _scene_queue.pop_front()
+	var node: Node = next["node"] if is_instance_valid(next["node"]) else null
+	_speak(next["line"], node)
+	_scene_next = _busy_until + FOLLOW_PAUSE
+
+
 ## Staged scenes, films, narrowed control and other captions all win.
 func busy() -> bool:
 	# Staged moments narrow control (films hold NONE); some spaces run all
@@ -161,7 +222,7 @@ func busy() -> bool:
 	# a short hush around any scene starting or ending.
 	if StoryControl.mode != StoryControl.Mode.FULL or _now - _scene_edge < SCENE_HUSH:
 		return true
-	if _now < _busy_until:
+	if _now < _busy_until or not _scene_queue.is_empty():
 		return true
 	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption if is_inside_tree() else null
 	return caption != null and caption.showing != "" and (last_line == null or caption.showing != last_line.text)
