@@ -46,6 +46,7 @@ void fragment() {
 	float joint_rough = 0.85;
 	float joint_metal = 0.0;
 	float coat_k = 1.0;
+	float spec = 0.45;
 	if (pattern == 0) {
 		// chevron parquet (point de Hongrie): 0.5 m columns of 45-degree planks,
 		// alternating direction column to column
@@ -79,12 +80,14 @@ void fragment() {
 		nero = mix(nero, vec3(0.80, 0.78, 0.74), vein * 0.45 + fine * 0.22);
 		col = mix(ivory, nero, dark);
 		j = edge_mask(f, 0.012);
-		rough = mix(0.16, 0.24, dark);
 		// the fillet is brass, not grout
 		joint_rough = 0.32;
 		joint_metal = 0.85;
-		// the dark squares take less lacquer, so they don't mirror the lilac sky as navy
-		coat_k = mix(1.0, 0.35, dark);
+		// the dark squares are honed, not lacquered: a polished black mirrors the
+		// lilac sky and reads navy (shots L38-10)
+		coat_k = mix(1.0, 0.0, dark);
+		spec = mix(0.45, 0.12, dark);
+		rough = mix(0.16, 0.5, dark);
 	} else if (pattern == 2) {
 		vec2 cell = floor(p / 0.3);
 		vec2 f = fract(p / 0.3);
@@ -115,7 +118,7 @@ void fragment() {
 	ALBEDO = mix(joint.rgb, col, j);
 	ROUGHNESS = mix(joint_rough, rough * (1.0 - gloss * 0.5), j);
 	METALLIC = (1.0 - j) * joint_metal;
-	SPECULAR = 0.45;
+	SPECULAR = spec;
 	CLEARCOAT = gloss * j * coat_k;
 	CLEARCOAT_ROUGHNESS = 0.25;
 }
