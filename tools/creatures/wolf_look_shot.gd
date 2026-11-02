@@ -90,8 +90,9 @@ func _run() -> void:
 	# His face, three-quarter, snarling.
 	# The lunge face (L36-3's preset), set on the SnarlModifier directly since
 	# the face only ticks with physics.
-	for snarl in wolf.find_children("Snarl", "SnarlModifier", true, false):
-		(snarl as SnarlModifier).weights = {&"jaw_open": 1.0, &"ears_back": 1.0, &"head_low": 0.3}
+	for snarl in wolf.find_children("Snarl", "", true, false):
+		if snarl is SnarlModifier:
+			(snarl as SnarlModifier).weights = {&"jaw_open": 1.0, &"ears_back": 1.0, &"head_low": 0.3}
 	var sk := wolf.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	var head := sk.global_transform * sk.get_bone_global_pose(sk.find_bone(&"muzzle")).origin
 	_look(head + wolf.global_basis * Vector3(1.3, 0.25, -1.6), head + Vector3.DOWN * 0.05)
