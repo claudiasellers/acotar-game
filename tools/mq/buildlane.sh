@@ -172,9 +172,10 @@ build_chain() { # base batch-dir
 	return 0
 }
 
-# Smallest prefix of the batch that turns NAME red. Sets culprit (index).
+# Smallest prefix of the batch that turns NAME red. Sets culprit (index), and
+# flaky=1 if the last entry passes its own run: then the batch's red was no change's.
 narrow() { # name base known batch-dir
-	local name="$1" base="$2" known="$3" b="$4" lo=-1 hi=$(( ${#chain[@]} - 1 )) mid rc round=0
+	local name="$1" base="$2" known="$3" b="$4" lo=-1 hi=$(( ${#chain[@]} - 1 )) mid rc round=0 hi_ran=0
 	# lo: last prefix known good (-1 is base); hi: first known bad.
 	while [ $((hi - lo)) -gt 1 ]; do
 		mid=$(( (lo + hi) / 2 ))
@@ -184,11 +185,21 @@ narrow() { # name base known batch-dir
 		run_gate --out "$b/narrow-$round" --base "$base" --known "$known" --only "$name"; rc=$?
 		case "$rc" in
 			0) lo=$mid ;;
-			1) hi=$mid ;;
+			1) hi=$mid; hi_ran=1 ;;
 			*) return "$rc" ;;
 		esac
 	done
 	culprit=$hi
+	# The search never runs the last entry, so reaching it proves nothing yet.
+	[ "$hi_ran" = 1 ] && return 0
+	state "confirming $name on the last change"
+	goto "${chain[$hi]}" || return 3
+	run_gate --out "$b/narrow-last" --base "$base" --known "$known" --only "$name"; rc=$?
+	case "$rc" in
+		0) flaky=1 ;;
+		1) ;;
+		*) return "$rc" ;;
+	esac
 }
 
 # Returns 5 if origin moved first, 3 if the push failed any other way.
@@ -202,8 +213,9 @@ land() { # tip base batch-dir known
 	fi
 	mq_fetch_main
 	merged_to=$(git rev-parse --short "$tip")
-	# Reds that are still red carry over; fixed ones drop off.
-	grep -E '^KNOWNRED ' "$b/gate/results.txt" 2>/dev/null | cut -d' ' -f2 > "$MQ_DIR/baseline/$tip"
+	# Reds that are still red carry over; fixed ones drop off. A line excused as
+	# flaky for this batch isn't one.
+	grep -E '^KNOWNRED ' "$b/gate/results.txt" 2>/dev/null | cut -d' ' -f2 | grep -xFf "$known" > "$MQ_DIR/baseline/$tip"
 	for e in "$b"/*.entry; do
 		[ -f "$e" ] && done_merged "$e" "$merged_to"
 	done
@@ -224,7 +236,7 @@ land() { # tip base batch-dir known
 }
 
 run_batch() {
-	local id b e base rc tip known name
+	local id b e base rc tip known excused name
 	id=$(date +%s); b="$MQ_DIR/batches/$id"; mkdir -p "$b"
 	for e in "$MQ_DIR"/pending/*.entry; do
 		[ -f "$e" ] && mv "$e" "$b/"
@@ -235,6 +247,7 @@ run_batch() {
 	[ "$rc" = 4 ] && return
 	[ "$rc" = 0 ] || { stall "$b" "cannot run the gate on main"; return; }
 	known="$MQ_DIR/baseline/$base"
+	excused="$b/excused"; cp "$known" "$excused"
 
 	while :; do
 		state "batch $id: merging"
@@ -248,7 +261,7 @@ run_batch() {
 		state "batch $id: gate on ${#chain[@]} change(s)"
 		goto "$tip" || { stall "$b" "checkout failed"; return; }
 		rm -rf "$b/gate"
-		run_gate --out "$b/gate" --base "$base" --known "$known"; rc=$?
+		run_gate --out "$b/gate" --base "$base" --known "$excused"; rc=$?
 		case "$rc" in
 			0)
 				land "$tip" "$base" "$b" "$known"; rc=$?
@@ -263,15 +276,21 @@ run_batch() {
 			*) stall "$b" "the gate could not run"; return ;;
 		esac
 		name=$(head -1 "$b/gate/failed")
-		culprit=$(( ${#chain[@]} - 1 ))
+		culprit=$(( ${#chain[@]} - 1 )); flaky=0
 		if [ "${#chain[@]}" -gt 1 ]; then
-			narrow "$name" "$base" "$known" "$b"; rc=$?
+			narrow "$name" "$base" "$excused" "$b"; rc=$?
 			[ "$rc" = 4 ] && return
 			[ "$rc" = 0 ] || { stall "$b" "could not narrow $name"; return; }
 		fi
+		# The gate stopped at this line, so the rest of it still has to run.
+		if [ "$flaky" = 1 ]; then
+			echo "$name" >> "$excused"
+			mq_event FLAKY "$name red in the batch, passed on the last change; nobody blamed"
+			continue
+		fi
 		log="$b/gate/logs/$(printf '%s' "$name" | tr '/: ' '___').log"
 		reject "${entries[$culprit]}" "failed $name. Rebase on main, fix it, and submit again." "$log"
-		# Every round removes one change, so this ends.
+		# Every round removes one change or excuses one line, so this ends.
 	done
 }
 

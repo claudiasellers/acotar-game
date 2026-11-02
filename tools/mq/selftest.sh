@@ -42,6 +42,12 @@ if [ "${t:-}" = a ] && [ -f flaky ]; then
 	c="$(dirname "$(git rev-parse --git-common-dir)")/../flaky.count"
 	[ -f "$c" ] || { touch "$c"; exit 1; }
 fi
+# Red on every run but the third: the batch, its retry, then one good run.
+if [ "${t:-}" = c ] && [ -f flaky_load ]; then
+	c="$(dirname "$(git rev-parse --git-common-dir)")/../flaky_load.count"
+	r=$(( $(cat "$c" 2>/dev/null || echo 0) + 1 )); echo "$r" > "$c"
+	[ "$r" = 3 ] || { echo "fake test c too slow"; exit 1; }
+fi
 [ -n "${t:-}" ] && [ -f "fail_$t" ] && { echo "fake test $t failed"; exit 1; }
 [ "${t:-}" = b ] && [ -f pair_a ] && [ -f pair_b ] && { echo "pair failed"; exit 1; }
 exit 0
@@ -223,6 +229,22 @@ case_flaky() {
 	start_lane; drain
 	expect "flaky merged" in_main "$a"
 	expect "logged" grep -q 'FLAKY a' .git/mq/events.log
+}
+
+# The last entry is never reached by the search, so it gets a run of its own. It
+# passes, so nobody is blamed, and the rest of the gate still runs before landing.
+case_flaky_last() {
+	newrepo flakylast
+	local a b c
+	a=$(change a one); b=$(change b two); c=$(change c three flaky_load)
+	queue "$a" T1; queue "$b" T2; queue "$c" T3
+	start_lane; drain
+	expect "last entry not blamed" not rejected T3
+	expect "last entry merged" in_main "$c"
+	expect "the rest merged" in_main "$a"
+	expect "logged" grep -q 'FLAKY c ' .git/mq/events.log
+	expect "the gate ran again after the good run" test "$(cat "$ROOT/flakylast/flaky_load.count")" = 4
+	expect "not carried as known red" not grep -qx c ".git/mq/baseline/$(git rev-parse origin/main)"
 }
 
 case_stop_mid_batch() {
@@ -820,7 +842,7 @@ case_parse_error_fails_fast() {
 	expect "and the hung builder isn't left running" not pgrep -f 'bash tools/bake.sh'
 }
 
-for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
+for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky flaky_last \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
