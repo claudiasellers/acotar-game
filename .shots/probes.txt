@@ -1,0 +1,4 @@
+from blight-lane
+quality look
+timeout 1200
+shot farewell res://tools/playtest/p6_blight_clip.tscn {out} --film=farewell,carriage --stop-after=carriage
