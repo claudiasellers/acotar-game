@@ -1,4 +1,4 @@
-// Feyre's skin: base albedo + six makeup layers + soft rim light.
+// Feyre's skin: base albedo + natural colouring + six makeup layers + soft rim light.
 //
 // Masks are baked by tools/blender/feyre/build_feyre.py from the head's UVs:
 //   makeup_mask_a  R lips  G eyeshadow  B liner  A blush
@@ -44,6 +44,20 @@ uniform vec4 face_paint_color : source_color = vec4(0.95, 0.80, 0.35, 1.0);
 uniform float face_paint_amount : hint_range(0.0, 1.0) = 0.0;
 uniform float face_paint_sheen : hint_range(0.0, 1.0) = 0.6;
 
+// Natural look: her own colouring under the makeup. The wardrobe's "None" makeup
+// zeroes the six layers above, never these, so she keeps rosy cheeks, tinted
+// glossy lips, a soft lash line and brows bare-faced. All off by default (cast).
+uniform vec4 natural_blush_color : source_color = vec4(0.96, 0.56, 0.60, 1.0);
+uniform float natural_blush_amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 natural_lips_color : source_color = vec4(0.86, 0.44, 0.50, 1.0);
+uniform float natural_lips_amount : hint_range(0.0, 1.0) = 0.0;
+// 0 matte .. 1 wet gloss on the lips (lower roughness and a highlight, no glints)
+uniform float natural_lips_gloss : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 natural_liner_color : source_color = vec4(0.18, 0.12, 0.10, 1.0);
+uniform float natural_liner_amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 natural_brows_color : source_color = vec4(0.40, 0.27, 0.17, 1.0);
+uniform float natural_brows_amount : hint_range(0.0, 1.0) = 0.0;
+
 // Shimmer: tiny view-dependent glints scaled by each layer's sheen.
 uniform float shimmer_scale = 220.0;
 uniform float shimmer_strength : hint_range(0.0, 2.0) = 0.6;
@@ -72,6 +86,14 @@ void fragment() {
 	vec3 col = albedo.rgb;
 	float sheen = 0.0;
 	vec3 sheen_col = vec3(0.0);
+	// natural layers first (no glints); makeup paints over them
+	float nat_sheen = 0.0;
+	vec3 nat_col = vec3(0.0);
+	layer(col, nat_sheen, nat_col, ma.a, natural_blush_color, natural_blush_amount, 0.0);
+	layer(col, nat_sheen, nat_col, mb.r, natural_brows_color, natural_brows_amount, 0.0);
+	layer(col, nat_sheen, nat_col, ma.b, natural_liner_color, natural_liner_amount, 0.0);
+	layer(col, nat_sheen, nat_col, ma.r, natural_lips_color, natural_lips_amount, 0.0);
+	float gloss = clamp(ma.r * natural_lips_gloss, 0.0, 1.0);
 	layer(col, sheen, sheen_col, ma.a, blush_color, blush_amount, blush_sheen);
 	layer(col, sheen, sheen_col, ma.g, eyeshadow_color, eyeshadow_amount, eyeshadow_sheen);
 	layer(col, sheen, sheen_col, mb.r, brows_color, brows_amount, brows_sheen);
@@ -90,8 +112,8 @@ void fragment() {
 	float fres = pow(1.0 - ndv, rim_power);
 
 	ALBEDO = col;
-	ROUGHNESS = mix(roughness, 0.28, sheen);
-	SPECULAR = mix(specular_level, 0.7, sheen);
+	ROUGHNESS = mix(mix(roughness, 0.28, sheen), 0.16, gloss);
+	SPECULAR = mix(mix(specular_level, 0.7, sheen), 0.85, gloss);
 	EMISSION = glint * 0.25 + rim_color.rgb * rim_amount * fres * 0.5;
 	SSS_STRENGTH = subsurface;
 }

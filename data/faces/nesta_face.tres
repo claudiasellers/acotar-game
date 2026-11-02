@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"nesta"
+canon = "Unmasked, human. Cold, mother-like [C]; the sneer and narrowed eyes [C]; stormy eyes over thin, pressed lips [C]; imperious, looking down at people [C later]; rarely smiles [C]. Our reading [X]: fear and grief held behind the same tight mouth, chin up, never let fall."
+masked = false
+rest = &"cold"
+blink_min = 3.0
+blink_max = 6.5
+presets = {
+"cold": { "brow_down_L": 0.1, "brow_down_R": 0.1, "chin_raise": 0.15, "lip_press": 0.3, "squint_L": 0.18, "squint_R": 0.18 },
+"grief_held": { "brow_inner_up": 0.45, "chin_raise": 0.6, "lip_press": 0.7, "squint_L": 0.25, "squint_R": 0.25 },
+"imperious": { "blink_L": 0.22, "blink_R": 0.22, "brow_up_L": 0.25, "brow_up_R": 0.25, "chin_raise": 0.5, "lip_press": 0.3 },
+"narrowed": { "brow_down_L": 0.55, "brow_down_R": 0.55, "lip_press": 0.4, "squint_L": 0.75, "squint_R": 0.75 },
+"rare_smile": { "smile_L": 0.3, "smile_R": 0.4, "squint_L": 0.15, "squint_R": 0.15 },
+"shaken": { "brow_inner_up": 0.3, "eyes_wide_L": 0.4, "eyes_wide_R": 0.4, "lip_press": 0.55 },
+"sneer": { "brow_down_L": 0.35, "brow_down_R": 0.35, "mouth_side_R": 0.25, "sneer_L": 0.45, "sneer_R": 0.75, "squint_L": 0.4, "squint_R": 0.4 },
+"storm": { "brow_down_L": 0.85, "brow_down_R": 0.85, "frown_L": 0.3, "frown_R": 0.3, "jaw_clench": 0.45, "lip_press": 0.85, "squint_L": 0.5, "squint_R": 0.5 }
+}
+aliases = {
+"neutral": "cold",
+"happy": "rare_smile",
+"laugh": "rare_smile",
+"smirk": "sneer",
+"tender": "rare_smile",
+"angry": "storm",
+"fury": "storm",
+"contempt": "sneer",
+"disgust": "sneer",
+"sad": "grief_held",
+"grief": "grief_held",
+"afraid": "shaken",
+"terror": "shaken",
+"surprise": "shaken",
+"pained": "grief_held",
+"weary": "imperious",
+"guarded": "cold",
+"pleading": "grief_held"
+}
+tics = [{ "hold": 0.6, "max": 16.0, "min": 8.0, "preset": "narrowed", "weight": 0.4 }]

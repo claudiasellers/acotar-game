@@ -92,3 +92,20 @@ func test_every_piece_names_a_mesh() -> void:
 	for p in WardrobeCatalog.all_pieces():
 		assert_true(p.mesh_path.begins_with("res://characters/feyre/wardrobe/") and not p.mesh_path.ends_with("/.glb"),
 			"%s mesh %s" % [p.id, p.mesh_path])
+
+
+func test_gowns_stow_the_bow_and_hunting_clothes_bring_it_back() -> void:
+	var w := Gameplay.wardrobe
+	assert_false(BowVisual.stowed_for(w), "starting clothes carry the bow")
+	for id in [&"ball_gown_rose", &"picnic_dress_mint", &"starlight_gown", &"woods_leathers", &"fae_tunic_blush"]:
+		w.grant(id)
+	w.equip(&"ball_gown_rose")
+	assert_true(BowVisual.stowed_for(w), "formal gown")
+	w.equip(&"starlight_gown")
+	assert_true(BowVisual.stowed_for(w), "fae gown")
+	w.equip(&"picnic_dress_mint")
+	assert_true(BowVisual.stowed_for(w), "day dress")
+	w.equip(&"woods_leathers")
+	assert_false(BowVisual.stowed_for(w), "hunting leathers")
+	w.equip(&"fae_tunic_blush")
+	assert_false(BowVisual.stowed_for(w), "a tunic still hunts")

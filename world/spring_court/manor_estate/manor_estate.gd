@@ -12,7 +12,7 @@ const FEYRE_SCENE := "res://characters/feyre/feyre.tscn"
 
 @export var region_id: StringName = ManorSitePlan.REGION_GROUNDS
 ## Phase used when the estate is played on its own and no story is running.
-@export var preview_phase: StringName = &"p3_house_and_eastern_woods"
+@export var preview_phase: StringName = &"p3_house_and_woods"
 @export var build_terrain: bool = true
 @export var build_house: bool = true
 @export var build_grounds: bool = true

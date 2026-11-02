@@ -224,7 +224,7 @@ static func build(parent: Node3D) -> void:
 		b.box(Vector3(ex + 0.4, y + 1.7, ez + side * 1.9), Vector3(1.0, 3.4, 1.0), ManorGrounds.stone())
 		b.sphere(Vector3(ex + 0.4, y + 3.75, ez + side * 1.9), 0.35, ManorGrounds.gold())
 	b.torus(Vector3(ex + 0.4, y + 3.4, ez), 1.7, 1.85, ManorGrounds.iron_gold(), Basis(Vector3.FORWARD, PI * 0.5) * Basis(Vector3.RIGHT, PI * 0.5))
-	b.drape_path(PackedVector2Array([Vector2(-92.0, -104.0), Vector2(-140.0, -160.0), Vector2(ex + 1.0, ez)]), 3.0, ManorGrounds.gravel())
+	# the path in comes from the Wisteria Walk (ManorGardenRooms.MAZE_PATH)
 	# centre court: dew pool, statue, benches, lamps
 	var cc := court_center()
 	var base := Vector3(cc.x, y, cc.y)
