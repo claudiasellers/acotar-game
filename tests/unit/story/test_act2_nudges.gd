@@ -133,6 +133,10 @@ func test_every_press_wait_and_every_evening_wait_has_a_nudge() -> void:
 				assert_true(space.stage.invented.has(String(nudge)) or space.stage.canon != "", "%s marked" % nudge)
 		space.free()
 	assert_gt(checked, 8, "the evening's waits all carry nudges")
+	# The window's pull before the curtain trap (L34-7) speaks stage lines too.
+	var trap_stage := load("res://data/story/act2/curtain_trap_stage.tres") as Act2Stage
+	for id in ["pull_draught", "pull_growl", "pull_lock", "pull_curtains"]:
+		assert_false(trap_stage.line(StringName(id)).is_empty(), "the window pull's %s is in the stage" % id)
 
 
 func _act2_entries() -> Array[Dictionary]:
@@ -182,3 +186,47 @@ func test_the_bath_steams_shows_e_and_alis_tells_her_to_go_on() -> void:
 	assert_true(_tick_all(3.0, func() -> bool: return welcome().bathed))
 	assert_eq(card.text() if card else "", "", "the card goes once she's in")
 	assert_null(welcome().steam, "and the steam with it")
+
+
+func trap() -> CurtainTrap:
+	return bedroom.get_node(^"Moment_curtain_trap") as CurtainTrap
+
+
+func _pull(seconds: float) -> void:
+	trap().auto_tick = false
+	for _i in int(seconds / STEP):
+		trap().pull(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+
+
+func test_at_night_the_window_pulls_her_to_the_curtains() -> void:
+	WorldState.set_flag("wall_crossed")
+	WorldState.set_flag("first_dinner_eaten")
+	Clock.from_dict({"time_of_day": 0.55, "day": 3})
+	feyre.global_position = bedroom.global_position + Vector3(0, 0, 8)
+	_pull(30.0)
+	assert_true(heard.is_empty(), "nothing by day: %s" % [heard])
+	Clock.from_dict({"time_of_day": 0.95, "day": 3})
+	assert_true(trap().can_start())
+	feyre.global_position = bedroom.global_position + Vector3(0, 30, 8)
+	_pull(30.0)
+	assert_true(heard.is_empty(), "nothing from elsewhere in the house")
+	feyre.global_position = bedroom.global_position + Vector3(0, 0, 8)
+	_pull(CurtainTrap.CURTAINS_AT + 2.0)
+	for id: StringName in [&"pull_draught", &"pull_growl", &"pull_lock", &"pull_curtains"]:
+		assert_true(heard.has(_line(trap(), id)), "%s: %s" % [id, heard])
+	assert_eq(heard.find(_line(trap(), &"pull_draught")), 0, "the draught first")
+	var far := trap().get_node_or_null(^"PressCard") as PressCard
+	assert_eq(far.text() if far else "", "", "no card across the room")
+	feyre.global_position = bedroom.global_position + Vector3(0, 0, 1.0)
+	_pull(0.5)
+	var card := trap().get_node_or_null(^"PressCard") as PressCard
+	assert_eq(card.text() if card else "", "E   the curtains", "the card by the window")
+	_pull(120.0)
+	assert_eq(Array(trap().pulled), ["draught", "growl", "lock", "curtains0", "curtains1"],
+		"the curtain thought once more at most")
+	WorldState.set_flag("curtain_trap_set")
+	_pull(0.5)
+	assert_eq(card.text(), "", "gone once the night's done")
