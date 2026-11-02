@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_chair": Vector3(4.95, 0, -6.5),
+"feyre_close": Vector3(1.7, 0, -6.5),
+"table": Vector3(0, 0, -6.5),
+"tamlin_close": Vector3(-1.6, 0, -6.5),
+"tamlin_seat": Vector3(-4.75, 0, -6.5),
+"lean_1": Vector3(-6.8, 0, -3.3),
+"lean_2": Vector3(-6.8, 0, -5.6),
+"lean_3": Vector3(-6.8, 0, -7.9),
+"lean_4": Vector3(-6.8, 0, -10.2),
+"view": Vector3(-4.6, 0, -6.7)
+}
+lines = {
+"come": {"text": "Come with me.", "who": "Feyre"},
+"dress": {"text": "Not in a hunting tunic. Not tonight.", "who": ""},
+"far": {"text": "You're so far away.", "who": "Feyre"},
+"forest": {"text": "That was your forest. Where you hunted.", "who": "Tamlin"},
+"give": {"text": "It's yours.", "who": "Feyre"},
+"room": {"text": "My painting room. I've never shown anyone.", "who": ""},
+"shrinks": {"text": "The table shrinks between us. It costs him; I can see it.", "who": ""},
+"want": {"text": "That one. I want that one.", "who": "Tamlin"}
+}
+invented = PackedStringArray("come", "dress", "give", "room")
+canon = "Ch22 (Keeper, [C]): she wears a gown to dinner. 'You're so far away', and the table shrinks (it costs him). She leads him to her locked painting room. Seeing the snowy one: 'That was your forest. Where you hunted', then 'That one. I want that one.' He keeps the snowy forest, not the glen. [X]: he keeps whichever of the player's canvases is most wintry, with her premade 'hazy landscape of snow and skeletal trees' as the guaranteed fallback; it hangs in his bedchamber (no study in canon)."
