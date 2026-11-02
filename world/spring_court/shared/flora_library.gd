@@ -226,7 +226,13 @@ static func info(species: StringName) -> Dictionary:
 ## The full-detail mesh for a species. Main thread (creates GPU resources).
 static func mesh(species: StringName) -> Mesh:
 	if not _near.has(species):
-		_near[species] = _to_mesh(species, arrays_for(species, 1))
+		var arrays := arrays_for(species, 1)
+		if arrays.is_empty():
+			# A model species asked for off the main thread (the coarse world
+			# map's painter does): hand back an empty mesh but cache nothing,
+			# or every tree of the species would stay invisible all session.
+			return ArrayMesh.new()
+		_near[species] = _to_mesh(species, arrays)
 	return _near[species]
 
 
@@ -235,7 +241,10 @@ static func far_mesh(species: StringName) -> Mesh:
 	if info(species).get("layer", "") != "tree":
 		return null
 	if not _far.has(species):
-		_far[species] = _to_mesh(species, arrays_for(species, 0))
+		var arrays := arrays_for(species, 0)
+		if arrays.is_empty():
+			return ArrayMesh.new()  # off the main thread: see mesh()
+		_far[species] = _to_mesh(species, arrays)
 	return _far[species]
 
 
