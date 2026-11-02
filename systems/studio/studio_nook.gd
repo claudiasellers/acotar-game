@@ -45,7 +45,7 @@ const WINDOW_HALF := 0.75
 const CURTAIN_TOP := 3.8
 const CURTAIN_COLOR := Color(1.0, 0.84, 0.88)
 const DAYLIGHT := Color(1.0, 0.96, 0.88)
-const DAY_ENERGY := 2.2
+const DAY_ENERGY := 4.0
 
 
 ## Adds the nook once; returns it. `floor_y` is the floor's height in the
@@ -277,10 +277,11 @@ static func _daylight() -> SpotLight3D:
 	l.name = "WindowLight"
 	l.light_color = DAYLIGHT
 	l.spot_range = 7.5
-	l.spot_angle = 32.0
+	l.spot_angle = 38.0
 	l.spot_attenuation = 0.8
 	l.shadow_enabled = true
-	var from := Vector3(0, 3.2, WINDOW_Z + 0.3)
+	# High in the window and over her right shoulder, so she doesn't shade the canvas.
+	var from := Vector3(-0.55, 3.35, WINDOW_Z + 0.3)
 	l.transform = Transform3D(Basis.looking_at(Vector3(0, 1.0, 0.2) - from, Vector3.UP), from)
 	var timer := Timer.new()
 	timer.wait_time = 5.0
