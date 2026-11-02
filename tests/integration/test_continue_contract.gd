@@ -10,6 +10,9 @@ const SLOT := "gut_continue"
 ## boot through the cottage. Real play adds the GPU's share on top.
 const BUDGET_SECONDS := 45.0
 const MANOR_BEDROOM := [20.15, 13.7, -63.54]
+## The first frames of the game scene itself load the World; the manor was
+## 3400+ ms in one frame before it built across frames.
+const MAX_FRAME_MSEC := 1500
 
 
 func before_each() -> void:
@@ -63,11 +66,21 @@ func test_continue_replays_no_earlier_beat_and_keeps_to_its_budget() -> void:
 	assert_false(WorldStreamer.is_loaded(&"cottage"), "the boot never goes through the cottage")
 	assert_does_not_have(WorldStreamer._pending.keys(), "hunting_forest", "nor the forest beside it")
 
+	var longest := 0
+	var frame_at := Time.get_ticks_msec()
 	while not feyre.is_physics_processing() and (Time.get_ticks_msec() - started) / 1000.0 < BUDGET_SECONDS * 2.0:
 		await wait_frames(1)
+		longest = maxi(longest, Time.get_ticks_msec() - frame_at)
+		frame_at = Time.get_ticks_msec()
 	var seconds := (Time.get_ticks_msec() - started) / 1000.0
-	gut.p("Continue: %.1f s to control" % seconds)
+	gut.p("Continue: %.1f s to control, longest frame %d ms" % [seconds, longest])
 	assert_lt(seconds, BUDGET_SECONDS, "Continue reaches control within its budget")
+	assert_lt(longest, MAX_FRAME_MSEC, "the veil keeps moving: the manor builds across frames")
+	assert_true(WorldStreamer.is_ready(&"manor_estate"), "she has control only once the house is all there")
+	var from := feyre.global_position + Vector3.UP
+	var floor_hit := feyre.get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 4.0, 1))
+	assert_false(floor_hit.is_empty(), "with a floor under her in the upstairs bedroom")
 	assert_eq(PhaseManager.current_phase, &"p2_grounds")
 
 	var journal := _child_of(game, GuideJournal) as GuideJournal

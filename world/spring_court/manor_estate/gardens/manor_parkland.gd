@@ -337,15 +337,19 @@ static func _plant_drift(sb: ManorScatter, d: Array, rng: RandomNumberGenerator)
 		sb.put(id, p.x, p.y, rng.randf() * TAU, rng.randf_range(1.2, 1.5) + 0.6 * mid)
 
 
-static func build(parent: Node3D) -> void:
+static func build(parent: Node3D, pace: BuildPace = null) -> void:
 	var b := GroundsBatch.new(parent, "Parkland")
-	ManorLawnStripes.build(b.root)
+	await ManorLawnStripes.build(b.root, pace)
+	if pace:
+		await pace.tick()
 	for w: Array in WALKS:
 		b.drape_ribbon(walk_line(w), WALK_W, ManorForecourt.drive_lanes(), 0.08, 1.0)
 		# a rose arbour where each walk leaves the drive
 		var p: Vector2 = (w[0] as Vector2).lerp(w[1], 0.5)
 		var dir: Vector2 = ((w[1] as Vector2) - (w[0] as Vector2)).normalized()
 		b.prop_on_ground(&"rose_arbor", p.x, p.y, atan2(dir.x, dir.y))
+		if pace:
+			await pace.tick()
 	for isl: Array in ISLANDS:
 		var c: Vector2 = isl[0]
 		var y := ManorGrounds.ground(c.x, c.y)
@@ -361,4 +365,4 @@ static func build(parent: Node3D) -> void:
 	b.prop(&"gazebo", Vector3(GAZEBO.x, gy + 0.04, GAZEBO.y), PI * 0.5)
 	b.prop_on_ground(&"garden_urn", GAZEBO.x + 7.0, GAZEBO.y - 2.6)
 	b.prop_on_ground(&"garden_urn", GAZEBO.x + 7.0, GAZEBO.y + 2.6)
-	b.flush()
+	await b.finish(pace)

@@ -18,7 +18,7 @@ const MANOR := &"manor_estate"
 ## Just inside the sentry gate, on the drive, and how long to wait in the dark
 ## for the estate to stream in.
 const GATE_INSIDE := 8.0
-const LOAD_WAIT_SECONDS := 20.0
+const LOAD_WAIT_SECONDS := 45.0
 
 @export var ride_speed: float = 6.0
 ## Metres along the path where the wall is. Negative: use a "Seam" child
@@ -107,7 +107,7 @@ func _to_the_manor() -> Array:
 			# Game time (physics frames), not wall time: fixed-fps runs go faster.
 			deadline[0] = Engine.get_physics_frames() + LOAD_WAIT_SECONDS * Engine.physics_ticks_per_second, "the sentry gate"),
 		Beats.until(func() -> bool:
-			return (WorldStreamer.is_loaded(MANOR) and _ground_under(_rider)) \
+			return (WorldStreamer.is_ready(MANOR) and _ground_under(_rider)) \
 					or Engine.get_physics_frames() > deadline[0], "until the estate is there"),
 		Beats.run(func(_s: SceneSpace) -> void: _fade(0.0), "fade in"),
 		RideBeat.new(func() -> float: return path_length()),

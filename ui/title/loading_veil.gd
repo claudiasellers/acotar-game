@@ -1,7 +1,7 @@
 ## The screen between Continue and play: the cream the title's crossing washes
 ## to, so the crossing runs straight into it, with a line saying what's going
-## on. Lifts once Feyre has ground under her. The world builds in long frames
-## behind it, so it holds its look without needing frames to run.
+## on, breathing while the world builds behind it. Lifts once Feyre has ground
+## under her. Regions that build in one long frame stall the breath, not the look.
 class_name LoadingVeil
 extends CanvasLayer
 
@@ -10,7 +10,9 @@ const INK := Color(0.42, 0.29, 0.34)
 const FONT := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
 const LINE := "Returning…"
 const FADE_SECONDS := 0.6
-## Lifts anyway after this long (PlayerPlacement gives up on ground at 15 s).
+const BREATH_SECONDS := 2.4
+const BREATH_LOW := 0.55
+## Lifts anyway after this long (PlayerPlacement gives up on ground at 45 s).
 const MAX_SECONDS := 60.0
 
 ## Seconds from Continue reaching the game scene to Feyre having control.
@@ -45,6 +47,7 @@ func _process(_delta: float) -> void:
 	if _lifting:
 		return
 	var waited := (Time.get_ticks_msec() - _started_msec) / 1000.0
+	_label.modulate.a = lerpf(BREATH_LOW, 1.0, 0.5 + 0.5 * cos(TAU * waited / BREATH_SECONDS))
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if (feyre != null and feyre.is_physics_processing()) or waited >= MAX_SECONDS:
 		_lift(waited)

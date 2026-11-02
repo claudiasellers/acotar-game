@@ -348,5 +348,6 @@ func to_mesh(fit: Vector3 = Vector3.ZERO, wind_height: float = 0.0) -> ArrayMesh
 				cols[j] = Color(clampf(s.f[j] * w, 0.0, 1.0), 0.0, 0.0, 1.0)
 			arr[Mesh.ARRAY_COLOR] = cols
 		am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+		ManorMeshMerger.remember(am, am.get_surface_count() - 1, arr)
 		am.surface_set_material(am.get_surface_count() - 1, s.mat)
 	return am

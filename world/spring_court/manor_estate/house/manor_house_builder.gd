@@ -49,13 +49,20 @@ static func ceiling_of(room: ManorRoomDef) -> float:
 
 static func load_layouts(dir: String = LAYOUT_DIR) -> Array[ManorHouseLayout]:
 	var out: Array[ManorHouseLayout] = []
+	for path in _layout_paths(dir):
+		var layout := load(path) as ManorHouseLayout
+		if layout:
+			out.append(layout)
+	return out
+
+
+static func _layout_paths(dir: String) -> PackedStringArray:
+	var out := PackedStringArray()
 	var files := ResourceLoader.list_directory(dir) if ResourceLoader.has_method("list_directory") else DirAccess.get_files_at(dir)
 	for f in files:
 		var file := String(f).trim_suffix(".remap")
 		if file.ends_with(".tres") or file.ends_with(".res"):
-			var layout := load(dir + file) as ManorHouseLayout
-			if layout:
-				out.append(layout)
+			out.append(dir + file)
 	return out
 
 
@@ -65,23 +72,61 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 	var cache := layouts.is_empty()
 	if layouts.is_empty():
 		layouts = load_layouts()
+	var house := _root(parent)
+	_fill(house, ManorHouseIndex.new(layouts), cache, null)
+	return house
+
+
+## build() of the shipped house across frames: await it.
+static func build_paced(parent: Node3D, pace: BuildPace) -> void:
+	var paths := _layout_paths(LAYOUT_DIR)
+	for path in paths:
+		ResourceLoader.load_threaded_request(path)
+	var layouts: Array[ManorHouseLayout] = []
+	for path in paths:
+		while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await pace.next_frame()
+		var layout := ResourceLoader.load_threaded_get(path) as ManorHouseLayout
+		if layout:
+			layouts.append(layout)
+	var all := ManorHouseIndex.new(layouts)
+	await pace.tick()
+	await _fill(_root(parent), all, true, pace)
+
+
+static func _root(parent: Node3D) -> Node3D:
 	var house := Node3D.new()
 	house.name = "House"
 	house.add_to_group(ManorIndoors.GROUP)
 	parent.add_child(house)
-	var all := ManorHouseIndex.new(layouts)
+	return house
+
+
+## The steps of the house, in the order they depend on each other. With a
+## `pace` they wait for frames: nothing here may then need the scene tree.
+static func _fill(house: Node3D, all: ManorHouseIndex, cache: bool, pace: BuildPace) -> void:
 	for room in all.rooms:
-		_build_room(house, room, all)
+		await _build_room(house, room, all, pace)
 	for door in all.doors:
 		_build_door_leaf(house, door, all)
+		if pace:
+			await pace.tick()
 	for stair in all.stairs:
 		_build_stair(house, stair, all)
+		if pace:
+			await pace.tick()
 	for station in all.stations:
 		_build_station(house, station)
+		if pace:
+			await pace.tick()
 	for secret in all.secrets:
 		_build_secret(house, secret)
+		if pace:
+			await pace.tick()
 	for roof in all.roofs:
 		_build_roof(house, roof, all)
+		if pace:
+			await pace.tick()
 	for anchor in all.anchors:
 		var m := Marker3D.new()
 		m.name = String(anchor.anchor_id)
@@ -90,21 +135,27 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
+	if pace:
+		await pace.tick()
 	ManorFacade.dress(house, all, cache)
-	ManorArtHanger.hang(house, all)  # L39: frames and paintings into the art slots
-	_merge_meshes(house, all, cache)
+	if pace:
+		await pace.tick()
+	await ManorArtHanger.hang_paced(house, all, pace)  # L39: frames and paintings into the art slots
+	if pace:
+		await pace.tick()
+	await _merge_meshes(house, all, cache, pace)
+	ManorMeshMerger.forget()
 	var mood := ManorMoodLights.new()
 	mood.name = "MoodLights"
 	house.add_child(mood)
 	house.add_child(ManorInteriorGrade.new())
-	return house
 
 
 ## Props merge per room (drawn within PROP_DRAW m), the shell (walls, floors,
 ## stairs, roofs) per level. Doors that open, stations and pickups stay apart.
 const PROP_DRAW := 45.0
 
-static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool = false) -> void:
+static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool, pace: BuildPace) -> void:
 	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, LarderPickup, ActionTrigger, ManorLooseProp]
 	for room in all.rooms:
 		var node := house.get_node_or_null(NodePath(String(room.id))) as Node3D
@@ -114,11 +165,11 @@ static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool = fal
 		props.name = "Props"
 		node.add_child(props)
 		var sources: Array = node.get_children().filter(func(c: Node) -> bool: return c.get_node_or_null("Look") != null)
-		ManorMeshMerger.merge_sources(sources, props, PROP_DRAW, keep_apart, "house_props_%s" % room.id if cache else "")
+		await ManorMeshMerger.merge_paced(sources, props, PROP_DRAW, keep_apart, "house_props_%s" % room.id if cache else "", pace)
 	var shell := Node3D.new()
 	shell.name = "Shell"
 	house.add_child(shell)
-	ManorMeshMerger.merge_sources([house], shell, 0.0, keep_apart + [_PropsMarker], "house_shell" if cache else "")
+	await ManorMeshMerger.merge_paced([house], shell, 0.0, keep_apart + [_PropsMarker], "house_shell" if cache else "", pace)
 
 
 ## Nodes named "Props" hold already-merged prop meshes; the shell pass skips them.
@@ -128,7 +179,7 @@ class _PropsMarker extends Node3D:
 
 # --- Rooms -----------------------------------------------------------------
 
-static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex) -> void:
+static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex, pace: BuildPace = null) -> void:
 	var node := Node3D.new()
 	node.name = String(room.id)
 	house.add_child(node)
@@ -149,6 +200,8 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 		ManorRoomFinish.add_curtains(node, room, all, y, ch)
 	var origin := Vector3(room.rect.position.x, y, room.rect.position.y)
 	for p in room.props:
+		if pace:
+			await pace.tick()
 		var prop := PropLib.build(p.prop_id)
 		prop.position = origin + p.position
 		prop.rotation.y = deg_to_rad(p.yaw_deg)

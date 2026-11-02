@@ -13,7 +13,7 @@ const STEP := 2.0
 const LIFT := 0.05
 
 
-static func build(parent: Node3D) -> MeshInstance3D:
+static func build(parent: Node3D, pace: BuildPace = null) -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for r in AREAS:
@@ -21,6 +21,8 @@ static func build(parent: Node3D) -> MeshInstance3D:
 		var nz := ceili(r.size.y / STEP)
 		var verts := []
 		for j in nz + 1:
+			if pace:
+				await pace.tick()
 			for i in nx + 1:
 				var x := r.position.x + r.size.x * i / nx
 				var z := r.position.y + r.size.y * j / nz
@@ -46,4 +48,3 @@ static func build(parent: Node3D) -> MeshInstance3D:
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.layers = EstateKit.WORLD_LAYER
 	parent.add_child(mi)
-	return mi

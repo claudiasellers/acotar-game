@@ -93,23 +93,25 @@ static func walks() -> Array:
 
 # --- Building ---------------------------------------------------------------------
 
-static func build(parent: Node3D) -> void:
+static func build(parent: Node3D, pace: BuildPace = null) -> void:
 	var b := GroundsBatch.new(parent, "GardenRooms")
 	var walk := GardenKit.walk()
 	for w: Array in walks():
 		b.drape_path(w[0], w[1], walk, WALK_LIFT)
-	_walls(b)
-	_wisteria_walk(b)
-	_topiary_court(b)
-	_moon_garden(b)
-	_lamb_lawn(b)
-	_lilac_room(b)
+		if pace:
+			await pace.tick()
+	for step: Callable in [_walls.bind(pace), _wisteria_walk.bind(pace), _topiary_court, _moon_garden, _lamb_lawn, _lilac_room]:
+		await step.call(b)
+		if pace:
+			await pace.tick()
 	GardenKit.tag_props(b)
-	b.flush()
+	await b.finish(pace)
 
 
-static func _walls(b: GroundsBatch) -> void:
+static func _walls(b: GroundsBatch, pace: BuildPace) -> void:
 	for id: StringName in ROOMS:
+		if pace:
+			await pace.tick()
 		var r: Rect2 = ROOMS[id]
 		var corners := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]
 		for i in 4:
@@ -147,11 +149,13 @@ static func _arch_piers(b: GroundsBatch, o: Vector2, dir: Vector2) -> void:
 
 
 ## 28 pergola bays dripping wisteria, the walk running beneath them.
-static func _wisteria_walk(b: GroundsBatch) -> void:
+static func _wisteria_walk(b: GroundsBatch, pace: BuildPace) -> void:
 	var n := floori(walk_length() / BAY)
 	var yaw := GardenKit.yaw_facing(Vector2(-1.0, 0.0))
 	var turn := Basis(Vector3.UP, yaw)
 	for i in n:
+		if pace:
+			await pace.tick()
 		var x := WALK_EAST - 1.0 - BAY * (i + 0.5)
 		# each bay is sheared to run from the ground at its east end to the
 		# ground at its west end, its piers still plumb, so neighbouring bays

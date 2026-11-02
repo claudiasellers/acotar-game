@@ -4,11 +4,18 @@
 ## code from data and committed generators, with fixed seeds (R15). Played on
 ## its own (F6 or as the current scene) it adds a preview sky and sun and spawns
 ## Feyre on the drive; inside the World scene the GradeDirector owns lighting.
+##
+## Streamed in, it builds across frames: everything is made off-tree (BuildPace)
+## and handed over a child at a time, in BUSY_GROUP until it is all there, so
+## arrivals wait on WorldStreamer.is_ready(), not is_loaded(). Added any other
+## way (tests, tools) it builds whole in _ready().
 class_name ManorEstate
 extends Node3D
 
 const PHASES_PATH := "res://data/phases/spring_court_phases.tres"
 const FEYRE_SCENE := "res://characters/feyre/feyre.tscn"
+## Shot tools and arrivals wait while this group holds it.
+const BUSY_GROUP := &"shot_busy"
 
 @export var region_id: StringName = ManorSitePlan.REGION_GROUNDS
 ## Phase used when the estate is played on its own and no story is running.
@@ -23,6 +30,8 @@ var house: Node3D
 var grounds: Node3D
 var scatter: ScatterField
 var standalone: bool = false
+## The streamer's id for this region: set before _ready, it builds across frames.
+var stream_id: StringName = &""
 
 
 func _ready() -> void:
@@ -31,6 +40,10 @@ func _ready() -> void:
 		PhaseManager.start(load(PHASES_PATH), preview_phase)
 	if build_terrain and not ManorTerrain.world_terrain_active(get_tree()):
 		ManorTerrain.build_fallback(self)
+	if stream_id != &"":
+		add_to_group(BUSY_GROUP)
+		_build_paced(weakref(self), get_tree(), BuildPace.new(get_tree(), stream_id))
+		return
 	if build_house:
 		house = ManorHouseBuilder.build(self)
 	if build_grounds:
@@ -41,6 +54,74 @@ func _ready() -> void:
 	if standalone:
 		_add_preview_environment()
 		_spawn_feyre()
+
+
+## Static, and off-tree until the end: the estate can be streamed out mid-build.
+static func _build_paced(estate: WeakRef, tree: SceneTree, pace: BuildPace) -> void:
+	var live: ManorEstate = estate.get_ref()
+	var want_house := live.build_house
+	var want_grounds := live.build_grounds
+	var want_scatter := live.build_scatter
+	live = null
+	var holder := Node3D.new()
+	if want_house:
+		await ManorHouseBuilder.build_paced(holder, pace)
+	if want_grounds:
+		await ManorGrounds.build_paced(holder, pace)
+	if want_scatter:
+		await ManorScatter.add_field_paced(holder, pace)
+	var anchors: Array[Array] = []
+	for top in holder.get_children():
+		await _hand_over(top, holder, estate, pace, anchors)
+	# Last and a frame each: StoryDirector hangs scenes on an anchor the moment
+	# it arrives (up to 200 ms), and they look for the ground under them.
+	for entry in anchors:
+		if estate.get_ref() == null:
+			(entry[1] as Node).free()
+			continue
+		(entry[0] as Node).add_child(entry[1])
+		await pace.next_frame()
+	await pace.next_frame()
+	holder.free()
+	live = estate.get_ref()
+	if live != null:
+		live._finish_paced()
+
+
+## Moves `top` into the estate empty, then its children one by one, so no frame
+## pays for the whole house entering the tree (physics, instances, _ready).
+## Story anchors are left in `anchors` as [parent, anchor].
+static func _hand_over(top: Node, holder: Node3D, estate: WeakRef, pace: BuildPace, anchors: Array[Array]) -> void:
+	var kids := top.get_children()
+	for kid in kids:
+		top.remove_child(kid)
+	holder.remove_child(top)
+	var live: ManorEstate = estate.get_ref()
+	if live == null:
+		top.free()
+		for kid in kids:
+			kid.free()
+		return
+	live.add_child(top)
+	live = null
+	for i in kids.size():
+		if estate.get_ref() == null:
+			for rest in kids.slice(i):
+				rest.free()
+			return
+		if kids[i].is_in_group(&"story_anchor"):
+			anchors.append([top, kids[i]])
+			continue
+		top.add_child(kids[i])
+		await pace.tick()
+
+
+func _finish_paced() -> void:
+	house = get_node_or_null(^"House") as Node3D
+	grounds = get_node_or_null(^"Grounds") as Node3D
+	scatter = get_node_or_null(^"ScatterField") as ScatterField
+	_add_creatures()
+	remove_from_group(BUSY_GROUP)
 
 
 ## The creatures lane's spawn table brings the grounds to life: songbirds,

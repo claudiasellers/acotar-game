@@ -10,33 +10,39 @@ const LANDMARK_GROUP := &"landmark"
 
 
 static func build(parent: Node3D) -> Node3D:
+	var root := _root(parent)
+	_fill(root, null)
+	return root
+
+
+## build() across frames: await it.
+static func build_paced(parent: Node3D, pace: BuildPace) -> void:
+	await _fill(_root(parent), pace)
+
+
+static func _root(parent: Node3D) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Grounds"
 	parent.add_child(root)
-	ManorForecourt.build(root)
-	ManorWardVeil.build(root)
-	ManorTerraceBuilder.build(root)
-	ManorRoseGarden.build(root)
-	ManorGardenRooms.build(root)
-	ManorReflectingPool.build(root)
-	ManorFrontGarden.build(root)
-	ManorEastLawn.build(root)
-	ManorParkland.build(root)
-	ManorHedgeMaze.build(root)
-	ManorGlassHouses.build(root)
-	ManorKitchenGarden.build(root)
-	ManorStables.build(root)
-	ManorPond.build(root)
-	ManorOrchard.build(root)
-	ManorBelvedere.build(root)
-	ManorAmbientLife.build(root)
+	return root
+
+
+static func _fill(root: Node3D, pace: BuildPace) -> void:
+	var parts: Array[Callable] = [ManorForecourt.build, ManorWardVeil.build, ManorTerraceBuilder.build,
+			ManorRoseGarden.build.bind(pace), ManorGardenRooms.build.bind(pace), ManorReflectingPool.build,
+			ManorFrontGarden.build.bind(pace), ManorEastLawn.build, ManorParkland.build.bind(pace),
+			ManorHedgeMaze.build, ManorGlassHouses.build, ManorKitchenGarden.build, ManorStables.build,
+			ManorPond.build, ManorOrchard.build, ManorBelvedere.build, ManorAmbientLife.build]
+	for part in parts:
+		await part.call(root)
+		if pace:
+			await pace.tick()
 	var grade := RegionGrade.new()
 	grade.name = "ManorGrade"
 	grade.grade = &"manor"
 	grade.bounds = ManorSitePlan.BOUNDS
 	grade.blend_seconds = 4.0
 	root.add_child(grade)
-	return root
 
 
 ## Marks a node as a named landmark (counted by the coverage report).

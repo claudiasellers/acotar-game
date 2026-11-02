@@ -29,12 +29,17 @@ func _init(parent: Node3D, node_name: String) -> void:
 
 ## Appends any mesh's first surface, transformed, to the merged mesh of `material`.
 func add_mesh(mesh: Mesh, xform: Transform3D, material: Material, key_suffix: String = "") -> void:
+	var size := (mesh as BoxMesh).size if ManorMeshMerger._plain_box(mesh) else Vector3.ONE
+	add_arrays(ManorMeshMerger._arrays_of(mesh, 0), xform, material, key_suffix, size)
+
+
+## add_mesh() for arrays in hand (SurfaceTool.commit_to_arrays): a mesh would
+## cost a trip to the GPU and back (3,265 of them took 2.8 s on Metal).
+func add_arrays(arrays: Array, xform: Transform3D, material: Material, key_suffix: String = "", size: Vector3 = Vector3.ONE) -> void:
 	var key := str(material.get_instance_id()) + key_suffix
 	if not _surfaces.has(key):
-		var st := SurfaceTool.new()
-		st.begin(Mesh.PRIMITIVE_TRIANGLES)
-		_surfaces[key] = [st, material]
-	(_surfaces[key][0] as SurfaceTool).append_from(mesh, 0, xform)
+		_surfaces[key] = [_Bucket.new(), material]
+	(_surfaces[key][0] as _Bucket).add(arrays, xform, size)
 
 
 func add_box_shape(xform: Transform3D, size: Vector3) -> void:
@@ -164,8 +169,7 @@ func drape_path(points: PackedVector2Array, width: float, material: Material, li
 				st.set_uv(uvs[idx] * 0.25)
 				st.add_vertex(verts[idx])
 		dist += seg
-	var mesh := st.commit()
-	add_mesh(mesh, Transform3D(), material, "|path")
+	add_arrays(st.commit_to_arrays(), Transform3D(), material, "|path")
 
 
 ## Like drape_path, for curving walks (L56-3): one continuous ribbon whose
@@ -231,7 +235,7 @@ func disc(center: Vector3, radii: Vector2, material: Material, segments: int = 4
 			st.set_normal(Vector3.UP)
 			st.set_uv(Vector2(v.x, v.z) * 0.1)
 			st.add_vertex(center + v)
-	add_mesh(st.commit(), Transform3D(), material, "|path")
+	add_arrays(st.commit_to_arrays(), Transform3D(), material, "|path")
 
 
 # --- Props -------------------------------------------------------------------
@@ -269,24 +273,33 @@ func prop_count(id: StringName = &"") -> int:
 
 ## Commits merged meshes and prop multimeshes as nodes under root.
 func flush() -> Node3D:
+	finish(null)
+	return root
+
+
+## flush(), across frames with a `pace`: await it.
+func finish(pace: BuildPace) -> void:
 	var i := 0
 	for key in _surfaces:
-		var st: SurfaceTool = _surfaces[key][0]
+		var bucket: _Bucket = _surfaces[key][0]
 		var mi := MeshInstance3D.new()
 		mi.name = "Mesh_%d" % i
-		mi.mesh = st.commit()
+		mi.mesh = bucket.commit()
 		mi.material_override = _surfaces[key][1]
 		if vis_end > 0.0:
 			mi.visibility_range_end = vis_end
 		root.add_child(mi)
 		i += 1
+		if pace:
+			await pace.tick()
 	_surfaces.clear()
 	for id: StringName in _props:
 		_flush_prop(id, _props[id])
+		if pace:
+			await pace.tick()
 	_props.clear()
 	if body.get_child_count() == 0:
 		body.free()
-	return root
 
 
 func _flush_prop(id: StringName, xforms: Array) -> void:
@@ -340,6 +353,88 @@ static func _relative(top: Node, node: Node3D) -> Transform3D:
 			t = (p as Node3D).transform * t
 		p = p.get_parent()
 	return t
+
+
+## One merged surface, gathered in packed arrays. A piece missing a channel
+## others have gets SurfaceTool's defaults, as append_from() gave it.
+class _Bucket:
+	var verts := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var tangents := PackedFloat32Array()
+	var uvs := PackedVector2Array()
+	var colors := PackedColorArray()
+	var indices := PackedInt32Array()
+
+	func add(arrays: Array, xform: Transform3D, size: Vector3) -> void:
+		var base := verts.size()
+		var v: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		verts.append_array(xform.scaled_local(size) * v)
+		_add_normals(arrays[Mesh.ARRAY_NORMAL], v.size(), xform)
+		_add_tangents(arrays[Mesh.ARRAY_TANGENT], v.size(), xform.basis, base)
+		var uv: Variant = arrays[Mesh.ARRAY_TEX_UV]
+		if uv != null:
+			uvs.resize(base)
+			uvs.append_array(uv)
+		var col: Variant = arrays[Mesh.ARRAY_COLOR]
+		if col != null:
+			var have := colors.size()
+			colors.resize(base)
+			for i in range(have, base):
+				colors[i] = Color.BLACK
+			colors.append_array(col)
+		var idx: Variant = arrays[Mesh.ARRAY_INDEX]
+		if idx == null:
+			for i in v.size():
+				indices.append(base + i)
+		else:
+			for i: int in idx:
+				indices.append(base + i)
+
+	func _add_normals(n: Variant, count: int, xform: Transform3D) -> void:
+		if n == null:
+			normals.resize(normals.size() + count)
+			return
+		var turn := xform.basis.inverse().transposed()
+		var src: PackedVector3Array = n
+		if turn.is_conformal() and is_equal_approx(turn.get_scale().x, 1.0):
+			normals.append_array(Transform3D(turn, Vector3.ZERO) * src)
+			return
+		for x in src:
+			normals.append((turn * x).normalized())
+
+	func _add_tangents(t: Variant, count: int, b: Basis, base: int) -> void:
+		if t == null:
+			if not tangents.is_empty():
+				_pad_tangents(base + count)
+			return
+		_pad_tangents(base)
+		var src: PackedFloat32Array = t
+		for i in count:
+			var d := (b * Vector3(src[i * 4], src[i * 4 + 1], src[i * 4 + 2])).normalized()
+			tangents.append_array([d.x, d.y, d.z, src[i * 4 + 3]])
+
+	func _pad_tangents(vertices: int) -> void:
+		while tangents.size() < vertices * 4:
+			tangents.append_array([0.0, 0.0, 0.0, 1.0])
+
+	func commit() -> ArrayMesh:
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = verts
+		arrays[Mesh.ARRAY_NORMAL] = normals
+		arrays[Mesh.ARRAY_INDEX] = indices
+		if not tangents.is_empty():
+			_pad_tangents(verts.size())
+			arrays[Mesh.ARRAY_TANGENT] = tangents
+		if not uvs.is_empty():
+			uvs.resize(verts.size())
+			arrays[Mesh.ARRAY_TEX_UV] = uvs
+		if not colors.is_empty():
+			colors.resize(verts.size())
+			arrays[Mesh.ARRAY_COLOR] = colors
+		var mesh := ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		return mesh
 
 
 static var _box_cache: Dictionary = {}

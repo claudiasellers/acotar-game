@@ -1,11 +1,11 @@
 ## SaveSystem provider for where Feyre stands, so Continue puts her back where
-## she saved. On load she is held still until there is ground under her (the
-## region may still be streaming in), then released.
+## she saved. On load she is held still until there is ground under her and
+## her region has finished building (it may still be streaming in), then released.
 class_name PlayerPlacement
 extends RefCounted
 
 const KEY := "player_placement"
-const GROUND_WAIT_SECONDS := 15.0
+const GROUND_WAIT_SECONDS := 45.0
 
 var _player: WeakRef
 
@@ -60,7 +60,9 @@ func _release_on_ground(p: Node3D, time_left: float) -> void:
 	var from := p.global_position + Vector3.UP * 1.0
 	var hit := p.get_world_3d().direct_space_state.intersect_ray(
 			PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 4.0, 1))
-	if not hit.is_empty() or time_left <= 0.0:
+	var region := WorldStreamer.region_at(p.global_position)
+	var built := region == null or WorldStreamer.is_ready(region.id)
+	if (not hit.is_empty() and built) or time_left <= 0.0:
 		p.set_physics_process(true)
 		if p.has_method(&"recenter_camera"):
 			p.call(&"recenter_camera")

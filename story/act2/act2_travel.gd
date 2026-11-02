@@ -65,7 +65,7 @@ func _process(delta: float) -> void:
 		return
 	_waited += delta
 	var a := ReturnHome.find_anchor(get_tree(), anchor_id)
-	var ready_ground := a != null and (WorldStreamer.get_region(region_id) == null or WorldStreamer.is_loaded(region_id))
+	var ready_ground := a != null and (WorldStreamer.get_region(region_id) == null or WorldStreamer.is_ready(region_id))
 	if ready_ground:
 		_place()
 		_settle += delta

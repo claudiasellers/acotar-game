@@ -7,9 +7,13 @@
 ##
 ## Loads queue nearest first, with one in flight besides the region she is
 ## in (or arriving at, after a teleport). That region skips the queue, and
-## nothing else is requested or instanced until it has landed, so it never
-## waits behind its neighbours (act1-fixlist F16: the manor took 97 s behind
-## seven parallel loads).
+## nothing else is requested or instanced until it has landed and finished
+## building, so it never waits behind its neighbours (act1-fixlist F16: the
+## manor took 97 s behind seven parallel loads).
+##
+## A region root with a `stream_id` builds across frames: in BUSY_GROUP it is in
+## the tree but unfinished, is_loaded() is true, is_ready() isn't, and arrivals
+## wait for is_ready(). (The woods build behind her and don't hold anyone up.)
 ##
 ## Locks are not the streamer's job: a loaded region that the phase has not
 ## opened is still loaded, and its RegionGate keeps Feyre out.
@@ -17,6 +21,8 @@ extends Node
 
 signal region_loaded(region_id: StringName, root: Node3D)
 signal region_unloaded(region_id: StringName)
+
+const BUSY_GROUP := &"shot_busy"
 
 @export var load_margin: float = 300.0
 @export var unload_margin: float = 450.0
@@ -96,6 +102,19 @@ func is_loaded(region_id: StringName) -> bool:
 	return _loaded.has(String(region_id))
 
 
+## Loaded and finished building: there is ground and house to stand on.
+func is_ready(region_id: StringName) -> bool:
+	var root: Node3D = _loaded.get(String(region_id))
+	if root == null or not is_instance_valid(root):
+		return false
+	return not (&"stream_id" in root and root.is_in_group(BUSY_GROUP))
+
+
+## Is this the region she is in (or arriving at)?
+func in_focus(region_id: StringName) -> bool:
+	return _focus == String(region_id)
+
+
 func loaded_root(region_id: StringName) -> Node3D:
 	return _loaded.get(String(region_id))
 
@@ -169,9 +188,11 @@ func unload_all() -> void:
 	_focus = ""
 
 
-## True while the region she is in is still loading.
+## True while the region she is in is still loading or building.
 func _focus_waiting() -> bool:
-	return _focus != "" and _pending.has(_focus)
+	if _focus == "":
+		return false
+	return _pending.has(_focus) or (_loaded.has(_focus) and not is_ready(StringName(_focus)))
 
 
 ## Starts queued loads while there is room and her region is not waiting.
@@ -232,6 +253,8 @@ func _finish_load(id: String, scene: PackedScene) -> void:
 		push_error("WorldStreamer: region '%s' root must be a Node3D" % id)
 		return
 	root.name = "Region_%s" % id
+	if not synchronous and &"stream_id" in root:
+		root.set(&"stream_id", StringName(id))
 	_parent.add_child(root)
 	_loaded[id] = root
 	region_loaded.emit(StringName(id), root)

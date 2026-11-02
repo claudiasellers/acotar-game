@@ -45,9 +45,9 @@ static var _frame := -1
 static var _spent := 0
 
 
-static func has_time() -> bool:
+static func has_time(budget_usec: int = BUDGET_USEC) -> bool:
 	_roll()
-	return _spent < BUDGET_USEC
+	return _spent < budget_usec
 
 
 static func spend(usec: int) -> void:

@@ -432,20 +432,42 @@ static func layer_path(id: StringName) -> String:
 static func load_or_build() -> Array[ScatterLayer]:
 	var s := specs()
 	var out: Array[ScatterLayer] = []
+	for id in _generated_ids(s):
+		var l := ResourceLoader.load(layer_path(StringName(id)), "", ResourceLoader.CACHE_MODE_IGNORE) as ScatterLayer
+		l.mesh = ManorLooks.mesh_for(s[StringName(id)]["look"])
+		out.append(l)
+	return out if not out.is_empty() else build_all()
+
+
+## load_or_build() across frames: await it. Reading the files takes a thread.
+static func _load_paced(pace: BuildPace) -> Array[ScatterLayer]:
+	var s := specs()
+	await pace.tick()
+	var ids := _generated_ids(s)
+	for id in ids:
+		ResourceLoader.load_threaded_request(layer_path(StringName(id)), "", false, ResourceLoader.CACHE_MODE_IGNORE)
+	var out: Array[ScatterLayer] = []
+	for id in ids:
+		var path := layer_path(StringName(id))
+		while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await pace.next_frame()
+		var l := ResourceLoader.load_threaded_get(path) as ScatterLayer
+		l.mesh = ManorLooks.mesh_for(s[StringName(id)]["look"])
+		out.append(l)
+		await pace.tick()
+	return out if not out.is_empty() else build_all()
+
+
+## The layer ids in the generated cache, or none if it can't be used.
+static func _generated_ids(s: Dictionary) -> PackedStringArray:
 	var index_path := DIR + "layers.txt"
-	if FileAccess.file_exists(index_path):
-		var ids := FileAccess.get_file_as_string(index_path).split("\n", false)
-		for id in ids:
-			var path := layer_path(StringName(id))
-			if not ResourceLoader.exists(path) or not s.has(StringName(id)):
-				out.clear()
-				break
-			var l := ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE) as ScatterLayer
-			l.mesh = ManorLooks.mesh_for(s[StringName(id)]["look"])
-			out.append(l)
-		if not out.is_empty():
-			return out
-	return build_all()
+	if not FileAccess.file_exists(index_path):
+		return PackedStringArray()
+	var ids := FileAccess.get_file_as_string(index_path).split("\n", false)
+	for id in ids:
+		if not ResourceLoader.exists(layer_path(StringName(id))) or not s.has(StringName(id)):
+			return PackedStringArray()
+	return ids
 
 
 static func save_all(list: Array[ScatterLayer]) -> void:
@@ -482,6 +504,22 @@ static func chunk_size_for(l: ScatterLayer) -> float:
 static func add_field(parent: Node3D, list: Array[ScatterLayer] = []) -> ScatterField:
 	if list.is_empty():
 		list = load_or_build()
+	return _fields(parent, list)[0]
+
+
+## add_field() off-tree across frames: await it. The fields come out prebuilt.
+static func add_field_paced(parent: Node3D, pace: BuildPace) -> void:
+	var list: Array[ScatterLayer] = await _load_paced(pace)
+	await pace.tick()
+	for field: ScatterField in _fields(parent, list):
+		field.prebuilt = true
+		for layer in field.layers:
+			if layer != null and layer.count() > 0 and layer.draw_mesh() != null:
+				field._build_layer(layer)
+			await pace.tick()
+
+
+static func _fields(parent: Node3D, list: Array[ScatterLayer]) -> Array[ScatterField]:
 	var near: Array[ScatterLayer] = []
 	var wide: Array[ScatterLayer] = []
 	for l in list:
@@ -517,7 +555,7 @@ static func add_field(parent: Node3D, list: Array[ScatterLayer] = []) -> Scatter
 			cs.position = l.position_of(i) + Vector3.UP * 2.0
 			trunks.add_child(cs)
 	parent.add_child(trunks)
-	return field
+	return [field, wide_field]
 
 
 ## Distinct zones a layer's instances fall in.

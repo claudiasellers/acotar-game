@@ -51,7 +51,7 @@ static func walks() -> Array:
 	return out
 
 
-static func build(parent: Node3D) -> void:
+static func build(parent: Node3D, pace: BuildPace = null) -> void:
 	var b := GroundsBatch.new(parent, "FrontGarden")
 	var walk := GardenKit.walk()
 	var mulch := GardenKit.mulch()
@@ -69,6 +69,8 @@ static func build(parent: Node3D) -> void:
 			var dz := r.size.y * 0.36
 			GardenKit.edging(b, PackedVector2Array([m + Vector2(-dx, 0), m + Vector2(0, -dz), m + Vector2(dx, 0), m + Vector2(0, dz), m + Vector2(-dx, 0)]))
 			b.prop_on_ground(&"topiary_ball", m.x, m.y)
+			if pace:
+				await pace.tick()
 		# the centre: an urn on a round stone plinth
 		var y := ManorGrounds.ground(c.x, c.y)
 		b.cylinder(Vector3(c.x, y, c.y), 1.0, 0.7, GardenKit.stone(), true, 16)
@@ -85,9 +87,13 @@ static func build(parent: Node3D) -> void:
 			b.prop_on_ground(&"rose_standard_white", c.x + side * (p.size.x * 0.25 + WALK * 0.25), p.end.y - 1.2)
 	for w: Array in walks():
 		b.drape_path(w[0], w[1], walk, LIFT_WALK + 0.01)
-	_forecourt(b)
+		if pace:
+			await pace.tick()
+	await _forecourt(b, pace)
+	if pace:
+		await pace.tick()
 	GardenKit.tag_props(b)
-	b.flush()
+	await b.finish(pace)
 
 
 ## Where walks and doors meet the forecourt's edge: the border and kerb open there.
@@ -122,18 +128,24 @@ static func forecourt_open(a: float, r: float) -> bool:
 ## it. A turf island with a bed of roses round the fountain covers the inside,
 ## stone kerbs edge the gravel on both sides, and a flower border on a mulch
 ## bed runs round the outside, open wherever a walk or the front door meets it.
-static func _forecourt(b: GroundsBatch) -> void:
+static func _forecourt(b: GroundsBatch, pace: BuildPace) -> void:
 	var c := ManorSitePlan.FORECOURT_CENTER
 	var lawn := GardenKit.lawn()
 	var mulch := GardenKit.mulch()
 	# a true round gravel ring over the forecourt's own (a polyline drape whose
 	# mitred corners left saw-teeth of soil at its outer edge)
-	GardenKit.drape_sector(b, c, ISLAND_R - 0.1, BORDER_R.x + 0.05, 0.0, TAU, GardenKit.walk(), 0.055, "|forecourt_ring")
-	GardenKit.drape_sector(b, c, ManorForecourt.FOUNTAIN_RADIUS + 0.3, ISLAND_R, 0.0, TAU, lawn, 0.05)
-	GardenKit.drape_sector(b, c, ISLAND_BED.x, ISLAND_BED.y, 0.0, TAU, mulch, 0.08)
+	await GardenKit.drape_sector(b, c, ISLAND_R - 0.1, BORDER_R.x + 0.05, 0.0, TAU, GardenKit.walk(), 0.055, "|forecourt_ring", pace)
+	await GardenKit.drape_sector(b, c, ManorForecourt.FOUNTAIN_RADIUS + 0.3, ISLAND_R, 0.0, TAU, lawn, 0.05, "|sector", pace)
+	await GardenKit.drape_sector(b, c, ISLAND_BED.x, ISLAND_BED.y, 0.0, TAU, mulch, 0.08, "|sector", pace)
 	GardenKit.edge_sector(b, c, ISLAND_BED.x, ISLAND_BED.y, 0.0, TAU)
+	if pace:
+		await pace.tick()
 	_kerb(b, ISLAND_R, false)
+	if pace:
+		await pace.tick()
 	_kerb(b, BORDER_R.x - 0.15, true)
+	if pace:
+		await pace.tick()
 	# the outer bed, in arcs between the openings
 	var n := 96
 	var start := -1
@@ -148,6 +160,8 @@ static func _forecourt(b: GroundsBatch) -> void:
 			GardenKit.drape_sector(b, c, BORDER_R.x, BORDER_R.y, a0, a1, mulch, 0.08)
 			GardenKit.edging(b, GardenKit.ring(c, BORDER_R.y, maxi(2, ceili((a1 - a0) * BORDER_R.y / GardenKit.EDGING_MODULE)), a0, a1))
 			start = -1
+			if pace:
+				await pace.tick()
 
 
 ## A ring of low stone kerb blocks at radius r (left open at the walks when `open`).

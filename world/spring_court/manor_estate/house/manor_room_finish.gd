@@ -196,7 +196,7 @@ static func add_trim(node: Node3D, room: ManorRoomDef, origin: Vector3, ceiling:
 	for i in 3:
 		if counts[i] > 0:
 			sts[i].generate_normals()
-			mesh = sts[i].commit(mesh)
+			mesh = ManorMeshMerger.commit(sts[i], mesh)
 			mesh.surface_set_material(mesh.get_surface_count() - 1, mats[i])
 	var mi := MeshInstance3D.new()
 	mi.name = "CeilingTrim"
@@ -217,7 +217,7 @@ static func _box(st: SurfaceTool, r: Rect2, cy: float, h: float) -> void:
 		return
 	var b := BoxMesh.new()
 	b.size = Vector3(r.size.x, h, r.size.y)
-	st.append_from(b, 0, Transform3D(Basis(), Vector3(r.get_center().x, cy, r.get_center().y)))
+	ManorMeshMerger.append(st, b, Transform3D(Basis(), Vector3(r.get_center().x, cy, r.get_center().y)))
 
 
 static func _disc(st: SurfaceTool, c: Vector3, r: float, h: float, seg: int) -> void:
@@ -227,7 +227,7 @@ static func _disc(st: SurfaceTool, c: Vector3, r: float, h: float, seg: int) -> 
 	m.height = h
 	m.radial_segments = seg
 	m.rings = 1
-	st.append_from(m, 0, Transform3D(Basis(), c - Vector3(0, h * 0.5, 0)))
+	ManorMeshMerger.append(st, m, Transform3D(Basis(), c - Vector3(0, h * 0.5, 0)))
 
 
 static func _ring_disc(st: SurfaceTool, c: Vector3, r_out: float, r_in: float, h: float, seg: int) -> void:
@@ -236,7 +236,7 @@ static func _ring_disc(st: SurfaceTool, c: Vector3, r_out: float, r_in: float, h
 	m.inner_radius = r_in
 	m.rings = seg
 	m.ring_segments = 6
-	st.append_from(m, 0, Transform3D(Basis().scaled(Vector3(1, h / maxf(r_out - r_in, 0.01), 1)), c))
+	ManorMeshMerger.append(st, m, Transform3D(Basis().scaled(Vector3(1, h / maxf(r_out - r_in, 0.01), 1)), c))
 
 
 # --- windows and curtains -----------------------------------------------------------
@@ -289,19 +289,19 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 				var tie := c + n * 0.06
 				var tb := BoxMesh.new()
 				tb.size = Vector3(absf(dir.x) * 0.5 + absf(n.x) * 0.12, 0.07, absf(dir.y) * 0.5 + absf(n.y) * 0.12)
-				trim.append_from(tb, 0, Transform3D(Basis(), Vector3(tie.x, y + 1.05, tie.y)))
+				ManorMeshMerger.append(trim, tb, Transform3D(Basis(), Vector3(tie.x, y + 1.05, tie.y)))
 			var mid: Vector2 = face + dir * ((o[0] + o[1]) * 0.5) + n * 0.08
 			var len: float = o[1] - o[0] + 2.0 * (DRAPE_OUT + DRAPE_W * 0.5) + 0.1
 			var pel := BoxMesh.new()
 			pel.size = Vector3(absf(dir.x) * len + absf(n.x) * 0.2, 0.42, absf(dir.y) * len + absf(n.y) * 0.2)
-			drape.append_from(pel, 0, Transform3D(Basis(), Vector3(mid.x, y + top + 0.05, mid.y)))
+			ManorMeshMerger.append(drape, pel, Transform3D(Basis(), Vector3(mid.x, y + top + 0.05, mid.y)), false)
 			var bead := BoxMesh.new()
 			bead.size = Vector3(absf(dir.x) * (len + 0.04) + absf(n.x) * 0.23, 0.05, absf(dir.y) * (len + 0.04) + absf(n.y) * 0.23)
-			trim.append_from(bead, 0, Transform3D(Basis(), Vector3(mid.x, y + top - 0.16, mid.y)))
+			ManorMeshMerger.append(trim, bead, Transform3D(Basis(), Vector3(mid.x, y + top - 0.16, mid.y)))
 	if not any:
 		return null
 	drape.generate_normals()
-	var mesh := drape.commit()
+	var mesh := ManorMeshMerger.commit(drape)
 	var fabric := StandardMaterial3D.new()
 	fabric.resource_name = "curtain"
 	fabric.albedo_color = cols[0]
@@ -309,7 +309,7 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 	fabric.cull_mode = BaseMaterial3D.CULL_DISABLED     # pleats read from both sides
 	mesh.surface_set_material(0, fabric)
 	trim.generate_normals()
-	mesh = trim.commit(mesh)
+	mesh = ManorMeshMerger.commit(trim, mesh)
 	var tm := StandardMaterial3D.new()
 	tm.resource_name = "curtain_trim"
 	tm.albedo_color = cols[1]

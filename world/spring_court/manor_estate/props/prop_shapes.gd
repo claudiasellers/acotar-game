@@ -57,7 +57,7 @@ static func mesh(id: StringName, size: Vector3, color: Color) -> ArrayMesh:
 		return _cache[key]
 	var model := PropModels.prop(id)
 	if not model.is_empty():
-		_tris[id] = PropModels.tri_count(model[0])
+		_tris[id] = model[0]  # counted when asked: it reads the mesh back from the GPU
 		_cache[key] = model[0]
 		return model[0]
 	var k := PropMeshKit.new()
@@ -73,7 +73,8 @@ static func mesh(id: StringName, size: Vector3, color: Color) -> ArrayMesh:
 
 
 static func tri_count(id: StringName) -> int:
-	return int(_tris.get(id, 0))
+	var tris: Variant = _tris.get(id, 0)
+	return PropModels.tri_count(tris) if tris is Mesh else int(tris)
 
 
 ## True when the id draws its Blender model rather than the procedural mesh.

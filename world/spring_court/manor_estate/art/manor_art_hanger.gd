@@ -368,22 +368,29 @@ static func canvas_material(sheet: String) -> Material:
 ## Replaces every art slot's stand-in under `house` (built from `all`) with a
 ## framed painting. Returns the number hung.
 static func hang(house: Node3D, all: ManorHouseIndex) -> int:
+	var hung: Array[int] = [0]
+	hang_paced(house, all, null, hung)
+	return hung[0]
+
+
+## hang() across frames with a `pace`: await it. Counts into `hung`.
+static func hang_paced(house: Node3D, all: ManorHouseIndex, pace: BuildPace, hung: Array[int] = [0]) -> void:
 	var cat := ManorArtCatalog.load_default()
 	if cat == null or cat.works.is_empty():
 		push_warning("ManorArtHanger: no catalogue at %s" % ManorArtCatalog.PATH)
-		return 0
+		return
 	var chosen := assign(all, cat)
 	if not last_duplicates.is_empty():
 		push_warning("ManorArtHanger: more art slots than paintings; reused at %s" % ", ".join(last_duplicates))
-	var hung := 0
 	for s: Dictionary in slots(all):
+		if pace:
+			await pace.tick()
 		var room: ManorRoomDef = s.room
 		var prop := _slot_prop(house, room, s.room_index, s.placement)
 		if prop == null or not chosen.has(s.key):
 			continue
 		_dress(prop, chosen[s.key], s, cat.themes_for(room.id, room.level))
-		hung += 1
-	return hung
+		hung[0] += 1
 
 
 ## The prop for a placement. The builder adds rooms first, in order, so room

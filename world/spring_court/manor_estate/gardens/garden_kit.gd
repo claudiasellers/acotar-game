@@ -103,12 +103,14 @@ static func ring(c: Vector2, r: float, n: int = 48, a0: float = 0.0, a1: float =
 
 ## An annular sector (a curved bed or ring walk) draped on the ground.
 static func drape_sector(b: GroundsBatch, c: Vector2, r0: float, r1: float, a0: float, a1: float, material: Material,
-		lift: float = 0.04, key: String = "|sector") -> void:
+		lift: float = 0.04, key: String = "|sector", pace: BuildPace = null) -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var n := maxi(2, ceili((a1 - a0) * r1 / 2.0))
 	var rings := maxi(1, ceili((r1 - r0) / 3.0))
 	for i in n:
+		if pace:
+			await pace.tick()
 		for j in rings:
 			var q := [
 				on_circle(c, lerpf(r0, r1, float(j) / rings), lerpf(a0, a1, float(i) / n)),
@@ -121,7 +123,7 @@ static func drape_sector(b: GroundsBatch, c: Vector2, r0: float, r1: float, a0: 
 				st.set_normal(Vector3.UP)
 				st.set_uv(p * 0.25)
 				st.add_vertex(Vector3(p.x, WorldHeight.height_at(p.x, p.y) + lift, p.y))
-	b.add_mesh(st.commit(), Transform3D(), material, key)
+	b.add_arrays(st.commit_to_arrays(), Transform3D(), material, key)
 
 
 ## A rectangle draped on the ground (beds, lawns, paving), axis-aligned.
@@ -143,7 +145,7 @@ static func drape_rect(b: GroundsBatch, r: Rect2, material: Material, lift: floa
 				st.set_normal(Vector3.UP)
 				st.set_uv(p * 0.25)
 				st.add_vertex(Vector3(p.x, WorldHeight.height_at(p.x, p.y) + lift, p.y))
-	b.add_mesh(st.commit(), Transform3D(), material, key)
+	b.add_arrays(st.commit_to_arrays(), Transform3D(), material, key)
 
 
 # --- Hedges and edging ------------------------------------------------------------
@@ -289,7 +291,7 @@ static func edging(b: GroundsBatch, pts: PackedVector2Array) -> int:
 					st.set_color(BOX_GREEN)
 					st.add_vertex(v)
 	st.generate_normals()
-	b.add_mesh(st.commit(), Transform3D(), edging_material(), "|edging")
+	b.add_arrays(st.commit_to_arrays(), Transform3D(), edging_material(), "|edging")
 	var modules := maxi(1, roundi(length / EDGING_MODULE))
 	b.set_meta(&"edging_modules", int(b.get_meta(&"edging_modules", 0)) + modules)
 	return modules

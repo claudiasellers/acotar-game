@@ -175,8 +175,8 @@ static func add_coffers(node: Node3D, room: ManorRoomDef, origin: Vector3, ceili
 			var inside := (edge as Rect2).intersection(rect)
 			if inside.size.x > 0.01 and inside.size.y > 0.01:
 				_beam(beams, gilt, inside, y)
-	var mesh := beams.commit()
-	mesh = gilt.commit(mesh)
+	var mesh := ManorMeshMerger.commit(beams)
+	mesh = ManorMeshMerger.commit(gilt, mesh)
 	mesh.surface_set_material(0, _coffer_mat(&"beam", EstateKit.PEARL, 0.6, 0.0))
 	mesh.surface_set_material(1, _coffer_mat(&"gilt", EstateKit.GOLD, 0.35, 0.6))
 	var mi := MeshInstance3D.new()
@@ -202,11 +202,11 @@ static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> 
 	var center := Vector3(r.get_center().x, y, r.get_center().y)
 	var box := BoxMesh.new()
 	box.size = Vector3(r.size.x, BEAM_DEPTH, r.size.y)
-	beams.append_from(box, 0, Transform3D(Basis(), center))
+	ManorMeshMerger.append(beams, box, Transform3D(Basis(), center))
 	var strip := BoxMesh.new()
 	var along_x := r.size.x > r.size.y
 	strip.size = Vector3(r.size.x if along_x else FILLET_WIDTH, 0.03, FILLET_WIDTH if along_x else r.size.y)
-	gilt.append_from(strip, 0, Transform3D(Basis(), center - Vector3(0.0, BEAM_DEPTH * 0.5 + 0.005, 0.0)))
+	ManorMeshMerger.append(gilt, strip, Transform3D(Basis(), center - Vector3(0.0, BEAM_DEPTH * 0.5 + 0.005, 0.0)))
 
 
 ## Coffer materials ignore ambient light, which from below is the lawn green

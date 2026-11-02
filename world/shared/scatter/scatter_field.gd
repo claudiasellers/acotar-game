@@ -19,10 +19,13 @@ const FORAGE_GROUP := &"forage_field"
 @export var region_id: StringName
 @export var layers: Array[ScatterLayer] = []
 @export var chunk_size := 64.0
+## Its chunks are already there (built off-tree a step at a time, ManorScatter).
+var prebuilt := false
 
 
 func _ready() -> void:
-	build()
+	if not prebuilt:
+		build()
 
 
 func build() -> void:

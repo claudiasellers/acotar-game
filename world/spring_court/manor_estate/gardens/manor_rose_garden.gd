@@ -267,32 +267,46 @@ static func _border(sb: ManorScatter, rng: RandomNumberGenerator, a: Vector2, b:
 
 # --- Structures ---------------------------------------------------------------
 
-static func build(parent: Node3D) -> void:
+static func build(parent: Node3D, pace: BuildPace = null) -> void:
 	var b := GroundsBatch.new(parent, "RoseGarden")
 	var c := CENTER
 	var walk := GardenKit.walk()
 	var mulch := GardenKit.mulch()
 	# the gravel field of the circle (walks), with mulch beds laid over it
-	GardenKit.drape_sector(b, c, POOL_R - 0.2, OUTER_R, 0.0, TAU, walk, 0.035, "|walks")
+	await GardenKit.drape_sector(b, c, POOL_R - 0.2, OUTER_R, 0.0, TAU, walk, 0.035, "|walks", pace)
 	GardenKit.drape_sector(b, c, IRIS.x, IRIS.y, 0.0, TAU, mulch, 0.07)
 	GardenKit.edging(b, GardenKit.ring(c, IRIS.y, 40))
+	if pace:
+		await pace.tick()
 	for j in PETALS.size():
 		var s := petal_span(j, RING_A.x)
 		GardenKit.drape_sector(b, c, RING_A.x, RING_A.y, s.x, s.y, mulch, 0.07)
 		GardenKit.edge_sector(b, c, RING_A.x, RING_A.y, s.x, s.y)
+		if pace:
+			await pace.tick()
 	for k in WHEEL.size():
 		var s := wheel_span(k, RING_C.x)
 		GardenKit.drape_sector(b, c, RING_C.x, RING_C.y, s.x, s.y, mulch, 0.07)
 		GardenKit.edge_sector(b, c, RING_C.x, RING_C.y, s.x, s.y)
+		if pace:
+			await pace.tick()
 	# axis walks out to the outer wall and the steps
 	for w: Array in walks().slice(1):
 		b.drape_path(w[0], w[1], walk, 0.035)
 	for bed: Array in CUTTING_BEDS:
 		GardenKit.drape_rect(b, bed[1], mulch, 0.07)
 		GardenKit.edging(b, GardenKit.rect_outline(bed[1]))
+		if pace:
+			await pace.tick()
 	_fountain(b)
+	if pace:
+		await pace.tick()
 	_swags(b)
+	if pace:
+		await pace.tick()
 	_tunnels(b)
+	if pace:
+		await pace.tick()
 	# curved benches on the inner walk's diagonals, facing the heron
 	for i in 4:
 		var a := PI * 0.25 + i * PI * 0.5
