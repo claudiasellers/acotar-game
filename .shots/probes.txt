@@ -1,0 +1,3 @@
+from feyre-face
+quality look
+shot face res://tools/feyre_face_shot.tscn {out} ab
