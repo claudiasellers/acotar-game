@@ -140,14 +140,11 @@ func _build_fire(at: Vector3, i: int) -> void:
 	fire.name = "Fire_%d" % i
 	_burning.add_child(fire)
 	fire.global_position = at
-	for fx: String in ["fx_bonfire_flame", "fx_bonfire_embers", "fx_bonfire_smoke"]:
-		var path := FX + fx + ".tscn"
-		if not ResourceLoader.exists(path):
-			continue
-		var p := (load(path) as PackedScene).instantiate() as Node3D
-		fire.add_child(p)
-		p.position.y = 1.0 if fx == "fx_bonfire_flame" else 3.0
-		p.scale = Vector3.ONE * (3.2 if fx == "fx_bonfire_flame" else 2.4)
+	# L45-6: flame cards licking up through the pyre (CalanmaiFire), capped so
+	# they burn orange up close; this node keeps the breathing light below.
+	var flames := CalanmaiFire.bonfire(3.2)
+	flames.light_energy = 0.0
+	fire.add_child(flames)
 	var light := OmniLight3D.new()
 	light.light_color = Color(1.0, 0.62, 0.32)
 	light.light_energy = 5.5
