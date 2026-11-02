@@ -127,8 +127,9 @@ WOUND_CANON = ("Ch12 (Keeper 2026-11-01, [C]): sleepless, she creeps barefoot do
 
 # --- the study mural (ch13) -------------------------------------------------------
 MURAL_MARKS = {
-    # On the study's east wall (x -10), over the map that hangs there, facing west.
-    "mural": (-10.38, 2.0, -61.0), "view": (-12.8, 0.0, -61.0),
+    # On the library's east wall (x -20), its north end beside the bank of windows,
+    # facing west (the book's "study" is the manor library; Keeper, L38).
+    "mural": (-20.38, 2.0, -69.0), "view": (-22.8, 0.0, -69.0),
 }
 MURAL_YAWS = {"mural": -90.0}
 MURAL_LINES = {

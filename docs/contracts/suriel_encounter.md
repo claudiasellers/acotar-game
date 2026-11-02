@@ -32,7 +32,7 @@ the place is sketched and named, with no celebration (horror beat).
   `LarderPickup` named `SnareTwine` on the potting-shed work table in the
   manor kitchen garden (about (153, ground+1.0, -75.8)), restocked daily. A
   `snare_kit` item ties both loops on its own and is used up whole.
-- Hint: `SnareKitThought` on the `manor_study_mural` anchor shows tier 0 of
+- Hint: `SnareKitThought` on the `manor_study_mural` anchor (in the library) shows tier 0 of
   `data/story/suriel/snare_kit_thought.tres` on Feyre's card when
   `fact.suriel_method_known` is set without two loops' cordage, and tier 1 if
   she tries to rig the snare with none.

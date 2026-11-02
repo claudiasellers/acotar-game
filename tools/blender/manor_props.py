@@ -20,11 +20,13 @@ import manor_props_a as A  # noqa: E402
 import manor_props_b as B  # noqa: E402
 import manor_props_c as C  # noqa: E402
 import manor_props_studio as D  # noqa: E402
+import manor_props_furnish as E  # noqa: E402
+import manor_props_detail as F  # noqa: E402
 import manor_props_garden as G  # noqa: E402
 
 OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/props/models")
 MAX_TRIS = 3000
-BUILDERS = {**A.BUILDERS, **B.BUILDERS, **C.BUILDERS, **D.BUILDERS, **G.BUILDERS}
+BUILDERS = {**A.BUILDERS, **B.BUILDERS, **C.BUILDERS, **D.BUILDERS, **E.BUILDERS, **F.BUILDERS, **G.BUILDERS}
 
 
 def build(pid, entry):

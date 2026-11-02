@@ -31,3 +31,6 @@ brightness = 0.86
 glow_intensity = 0.08
 glow_bloom = 0.0
 lut = SubResource("GradientTexture1D_y5m7i")
+cloud_cover = 0.60
+cloud_color = Color(0.62, 0.62, 0.60, 1)
+cloud_shade = Color(0.38, 0.38, 0.40, 1)
