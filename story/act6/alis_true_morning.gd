@@ -19,6 +19,12 @@ func _init() -> void:
 	arrive_radius = 7.0
 
 
+func _ready() -> void:
+	super._ready()
+	# The middle of her room (the anchor is at the garden window).
+	arrive_offset = Vector3(2.5, 0.0, 11.0)
+
+
 func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:

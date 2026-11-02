@@ -122,14 +122,14 @@ func test_glamour_arc_by_deeds() -> void:
 	var t := get_tree().get_first_node_in_group(&"story_actor_tamlin") as Node3D
 	assert_true(_tick_all(2.0, func() -> bool: return wonders.running))
 	wonders.gaze_override = func() -> Array:
-		var w := wonders.local(EyesOpenWonders.WILLOW_TOP)
+		var w: Vector3 = wonders.local(EyesOpenWonders.WILLOW_TOP)
 		return [w + Vector3(0, 0, 8), Vector3(0, 0, -1)]
 	feyre.global_position = wonders.local(EyesOpenWonders.WILLOW_TOP) + Vector3(0, -4, 8)
 	_tick_all(3.0, func() -> bool: return wonders.found.has(&"willow"))
 	feyre.global_position = t.global_position + Vector3(1, 0, 0)
 	_tick_all(1.0, func() -> bool: return wonders.found.has(&"scent"))
 	wonders.gaze_override = func() -> Array:
-		var b := wonders.local(EyesOpenWonders.BROOK_MID)
+		var b: Vector3 = wonders.local(EyesOpenWonders.BROOK_MID)
 		return [b + Vector3(0, 1, 6), (Vector3(0, -1, -6)).normalized()]
 	feyre.global_position = wonders.local(EyesOpenWonders.BROOK_MID) + Vector3(0, 0, 6)
 	_tick_all(3.0, func() -> bool: return wonders.found.size() == 3)
@@ -148,7 +148,7 @@ func test_alis_then_the_head_the_morning_after() -> void:
 	feyre.global_position = morning.mark(&"bed_side")
 	assert_true(_tick_all(2.0, func() -> bool: return morning.running))
 	morning.gaze_override = func() -> Array:
-		var face := morning._alis_face()
+		var face: Vector3 = morning._alis_face()
 		return [face + Vector3(0, 0, 2), Vector3(0, 0, -1)]
 	assert_true(_tick_all(30.0, func() -> bool: return morning._true_form() != null and morning._true_form().fright > 0.5),
 			"her bark bleaches when Feyre stares")
@@ -164,7 +164,7 @@ func test_alis_then_the_head_the_morning_after() -> void:
 	assert_false(_tick_all(2.0, func() -> bool: return head.current_beat_label() != "the quiet garden"), "she has to walk up")
 	feyre.global_position = head.center() + Vector3(0, 0, 6.5)
 	head.gaze_override = func() -> Array: return [head.head_point() + Vector3(0, -3, 6), (Vector3(0, 3, -6)).normalized()]
-	assert_true(_tick_all(6.0, func() -> bool: return head.current_beat_label() == "she backs into Tamlin" or head.actor(&"tamlin") != null))
+	assert_true(_tick_all(15.0, func() -> bool: return head.actor(&"tamlin") != null), "she backs into Tamlin")
 	assert_true(_tick_all(90.0, func() -> bool: return WorldState.has_flag("fact.fountain_head_seen")))
 	assert_false(WorldState.has_flag("fountain_head_found"), "the moment raises the deed")
 

@@ -75,15 +75,15 @@ func looking_at_point(p: Vector3, cone: float = 14.0) -> bool:
 
 ## A fact stamped with today's day number (WorldState holds the value).
 func stamp(fact: String) -> void:
+	WorldState.set_flag(fact + ".day", Clock.day)
 	raise(fact)
-	WorldState.set_flag(fact, Clock.day)
 
 
 ## True once the Clock has passed into a later day than the fact's stamp.
 static func day_after(fact: String) -> bool:
 	if not WorldState.has_flag(fact):
 		return false
-	var v: Variant = WorldState.get_flag(fact)
+	var v: Variant = WorldState.get_flag(fact + ".day")
 	return typeof(v) != TYPE_INT or Clock.day > int(v)
 
 
