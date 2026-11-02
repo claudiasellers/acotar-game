@@ -1,0 +1,4 @@
+from L36 faces
+quality look
+size 1920x1080
+shot faces res://tools/faces/faces_shot.tscn {out}
