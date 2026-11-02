@@ -102,7 +102,7 @@ static func drape_sector(b: GroundsBatch, c: Vector2, r0: float, r1: float, a0: 
 				on_circle(c, lerpf(r0, r1, float(j + 1) / rings), lerpf(a0, a1, float(i + 1) / n)),
 				on_circle(c, lerpf(r0, r1, float(j) / rings), lerpf(a0, a1, float(i + 1) / n)),
 			]
-			for idx in [0, 2, 1, 0, 3, 2]:
+			for idx in [0, 1, 2, 0, 2, 3]:
 				var p: Vector2 = q[idx]
 				st.set_normal(Vector3.UP)
 				st.set_uv(p * 0.25)
@@ -124,7 +124,7 @@ static func drape_rect(b: GroundsBatch, r: Rect2, material: Material, lift: floa
 				r.position + Vector2(r.size.x * (i + 1) / nx, r.size.y * (j + 1) / nz),
 				r.position + Vector2(r.size.x * (i + 1) / nx, r.size.y * j / nz),
 			]
-			for idx in [0, 1, 2, 0, 2, 3]:
+			for idx in [0, 2, 1, 0, 3, 2]:
 				var p: Vector2 = q[idx]
 				st.set_normal(Vector3.UP)
 				st.set_uv(p * 0.25)
@@ -206,9 +206,10 @@ static func rect_outline(r: Rect2) -> PackedVector2Array:
 
 # --- Planting ---------------------------------------------------------------
 
-## Fills an annular sector with one species on a staggered grid.
+## Fills an annular sector with one species on a staggered grid; with `mix`, every
+## other plant is that layer instead (forage roses among their garden look).
 static func fill_sector(sb: ManorScatter, id: StringName, c: Vector2, r0: float, r1: float, a0: float, a1: float,
-		step: float, rng: RandomNumberGenerator, scale_range: Vector2 = Vector2(0.9, 1.1)) -> int:
+		step: float, rng: RandomNumberGenerator, scale_range: Vector2 = Vector2(0.9, 1.1), mix: StringName = &"") -> int:
 	var n := 0
 	var r := r0 + step * 0.5
 	var row := 0
@@ -218,7 +219,8 @@ static func fill_sector(sb: ManorScatter, id: StringName, c: Vector2, r0: float,
 		for i in k:
 			var a := a0 + (a1 - a0) * (i + 0.5 + (0.25 if row % 2 else -0.25) * 0.0) / k
 			var p := on_circle(c, r + rng.randf_range(-0.15, 0.15), a + rng.randf_range(-0.02, 0.02))
-			sb.put(id, p.x, p.y, rng.randf() * TAU, rng.randf_range(scale_range.x, scale_range.y))
+			var this := mix if mix != &"" and (i + row) % 2 == 1 else id
+			sb.put(this, p.x, p.y, rng.randf() * TAU, rng.randf_range(scale_range.x, scale_range.y))
 			n += 1
 		r += step * 0.87
 		row += 1

@@ -92,6 +92,10 @@ static func specs() -> Dictionary:
 	# garden rooms (L35): the rose colour wheel and the garden flowers
 	for hue: String in ["crimson", "raspberry", "blush", "cream", "butter", "apricot", "peach", "coral", "mauve"]:
 		_d(s, StringName("deco_rose_" + hue), StringName("rose_" + hue), "X", 0.25, 120.0)
+	# the forage roses' garden look, mixed through the beds with the pickable ones
+	_d(s, &"deco_rose_red", &"rose_red", "C", 0.25, 120.0)
+	_d(s, &"deco_rose_white", &"rose_white", "C", 0.25, 120.0)
+	_d(s, &"deco_rose_gold", &"rose_gold", "X", 0.25, 120.0)
 	_d(s, &"deco_iris", &"iris", "C", 0.35, 100.0)
 	_d(s, &"deco_snowdrop", &"snowdrop", "C", 0.4, 70.0)
 	_d(s, &"deco_daffodil", &"daffodil", "C", 0.45, 90.0)

@@ -42,6 +42,9 @@ const WEST_GATE := Vector2(-80.0, -152.0)
 const EAST_GATE := Vector2(80.0, -152.0)
 const PAVILION := Vector2(62.0, -152.0)
 ## Arbors: [position, yaw]. The one by the house hides the Attor (ch19 anchor).
+## The cutting beds of the three forage roses (picking roses for the manor's vases).
+const CUTTING_BEDS := [[&"ing_rose_white", Rect2(51.0, -138.0, 16.5, 17.0)], [&"ing_rose_red", Rect2(-72.0, -194.5, 18.0, 14.5)],
+		[&"ing_rose_gold", Rect2(54.0, -195.5, 18.0, 15.5)]]
 const ARBORS := [[Vector2(-40.0, -105.5), 0.0], [Vector2(40.0, -105.5), 0.0]]
 
 
@@ -105,6 +108,11 @@ static func rose_layer(colour: StringName) -> StringName:
 	return StringName("deco_rose_" + String(colour))
 
 
+## The garden look mixed through a forage-rose bed (none for the other hues).
+static func rose_mix(colour: StringName) -> StringName:
+	return StringName("deco_rose_" + String(colour)) if rose_layer(colour).begins_with("ing_") else &""
+
+
 # --- Planting (scatter) ----------------------------------------------------------
 
 static func plant(sb: ManorScatter) -> void:
@@ -125,15 +133,15 @@ static func plant(sb: ManorScatter) -> void:
 		var s2 := petal_span(j, RING_A.x + 2.0)
 		var mid := (s2.x + s2.y) * 0.5
 		var hole := 1.4 / ((RING_A.x + RING_A.y) * 0.5)
-		GardenKit.fill_sector(sb, rose_layer(PETALS[j]), c, RING_A.x + 1.6, RING_A.y - 0.3, s2.x, mid - hole, ROSE_STEP, rng)
-		GardenKit.fill_sector(sb, rose_layer(PETALS[j]), c, RING_A.x + 1.6, RING_A.y - 0.3, mid + hole, s2.y, ROSE_STEP, rng)
+		GardenKit.fill_sector(sb, rose_layer(PETALS[j]), c, RING_A.x + 1.6, RING_A.y - 0.3, s2.x, mid - hole, ROSE_STEP, rng, Vector2(0.9, 1.1), rose_mix(PETALS[j]))
+		GardenKit.fill_sector(sb, rose_layer(PETALS[j]), c, RING_A.x + 1.6, RING_A.y - 0.3, mid + hole, s2.y, ROSE_STEP, rng, Vector2(0.9, 1.1), rose_mix(PETALS[j]))
 		if rng.randf() < 0.7:
 			var p := GardenKit.on_circle(c, (RING_A.x + RING_A.y) * 0.5 + 2.0, mid + 0.12)
 			sb.put(&"ing_rose_maze_dew", p.x, p.y, rng.randf() * TAU)
 	# ring C: the colour wheel, lavender along its outer rim
 	for k in WHEEL.size():
 		var s := wheel_span(k, RING_C.x + 1.0)
-		GardenKit.fill_sector(sb, rose_layer(WHEEL[k]), c, RING_C.x + 0.3, RING_C.y - 1.4, s.x, s.y, ROSE_STEP, rng)
+		GardenKit.fill_sector(sb, rose_layer(WHEEL[k]), c, RING_C.x + 0.3, RING_C.y - 1.4, s.x, s.y, ROSE_STEP, rng, Vector2(0.9, 1.1), rose_mix(WHEEL[k]))
 		var s3 := wheel_span(k, RING_C.y)
 		GardenKit.fill_sector(sb, &"ing_lavender" if k % 2 == 0 else &"deco_catmint", c, RING_C.y - 1.3, RING_C.y - 0.2, s3.x, s3.y, 1.25, rng, Vector2(0.75, 0.9))
 	# the outer yew wall's herbaceous border (inside faces of W, E and N walls)
@@ -143,15 +151,15 @@ static func plant(sb: ManorScatter) -> void:
 	_border(sb, rng, Vector2(78.0, -148.0), Vector2(78.0, -98.0))
 	_border(sb, rng, Vector2(-76.0, -197.5), Vector2(-4.0, -197.5))
 	_border(sb, rng, Vector2(4.0, -197.5), Vector2(76.0, -197.5))
+	_ring_border(sb, rng)
 	# the corners: drifts of hydrangea, peony and foxglove between standard roses
-	for corner: Vector2 in [Vector2(-60.0, -185.0), Vector2(60.0, -185.0), Vector2(-60.0, -122.0)]:
+	for corner: Vector2 in [Vector2(-46.0, -184.0), Vector2(46.0, -184.0), Vector2(-60.0, -122.0)]:
 		GardenKit.drift(sb, &"deco_hydrangea_pink" if corner.x < 0.0 else &"deco_hydrangea", corner, 5.0, 9, rng)
 		GardenKit.drift(sb, &"deco_peony", corner + Vector2(8.0 * signf(-corner.x), 3.0), 3.5, 7, rng)
 		GardenKit.drift(sb, &"ing_foxglove", corner + Vector2(-6.0 * signf(-corner.x), 6.0), 3.0, 6, rng)
-	# the white-rose corner by the outer walk (the rose_garden_bush anchor faces it)
-	GardenKit.fill_rect(sb, &"ing_rose_white", Rect2(46.0, -136.0, 11.0, 13.0), ROSE_STEP, rng)
-	GardenKit.fill_rect(sb, &"ing_rose_red", Rect2(-59.0, -196.0, 12.0, 10.0), ROSE_STEP, rng)
-	GardenKit.fill_rect(sb, &"ing_rose_gold", Rect2(47.0, -196.0, 12.0, 10.0), ROSE_STEP, rng)
+	# the cutting beds (the white one by the outer walk: the rose_garden_bush anchor faces it)
+	for bed: Array in CUTTING_BEDS:
+		GardenKit.fill_rect(sb, bed[0], bed[1], ROSE_STEP, rng)
 	# round the birdcage pavilion: blue and pink hydrangea, white foxglove
 	GardenKit.fill_sector(sb, &"deco_hydrangea", PAVILION, 5.0, 7.4, -PI * 0.25, PI * 0.25 + PI, 1.5, rng)
 	GardenKit.fill_line(sb, &"deco_foxglove_white", GardenKit.ring(PAVILION, 8.3, 24, PI * 0.35, PI * 1.65), 1.2, rng)
@@ -165,10 +173,38 @@ static func plant(sb: ManorScatter) -> void:
 		GardenKit.fill_line(sb, &"deco_catmint", PackedVector2Array([Vector2(side * 13.0, -105.0), Vector2(side * 36.0, -105.0)]), 0.9, rng)
 		GardenKit.fill_line(sb, &"deco_rose_blush", PackedVector2Array([Vector2(side * 13.0, -106.5), Vector2(side * 36.0, -106.5)]), 1.3, rng)
 	# canon: the crab-apple, foxglove alcove and lambs moved to the garden rooms
-	# (ManorGardenRooms); a few violets and dew for the collection book here
-	for i in 5:
-		var p := GardenKit.on_circle(c, OUTER_R + 2.0 + rng.randf() * 3.0, rng.randf() * TAU)
-		sb.put(&"col_pressed_violet", p.x, p.y, rng.randf() * TAU)
+	# (ManorGardenRooms); dew on the roses either side of the north gate
+	for i in 9:
+		var side := -1.0 if i % 2 == 0 else 1.0
+		sb.put(&"ing_rose_maze_dew", side * (6.0 + 2.2 * i), -195.5 + rng.randf() * 1.5, rng.randf() * TAU)
+
+
+## A deep ring of perennials round the outer walk, in drifts ~5 m long, broken at
+## the four axes and where the side-step walks come in.
+static func _ring_border(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
+	const R0 := OUTER_R + 2.0
+	const R1 := OUTER_R + 6.5
+	var kinds: Array[StringName] = [&"deco_delphinium", &"deco_peony", &"deco_foxglove_white", &"deco_lupin",
+		&"deco_hydrangea", &"deco_catmint", &"deco_allium", &"deco_peony_white", &"deco_hollyhock", &"deco_hydrangea_pink"]
+	var gap := 6.0 / R0
+	var skips := [Vector2(PI * 0.25, PI * 0.36), Vector2(PI * 0.64, PI * 0.75)]    # the side-step walks (south-east, south-west)
+	var drift_a := 5.0 / R0
+	var k := 0
+	for q in 4:
+		var a0 := north() + q * PI * 0.5 + gap
+		var a1 := north() + (q + 1) * PI * 0.5 - gap
+		var a := a0
+		while a < a1 - drift_a * 0.5:
+			var b := minf(a + drift_a, a1)
+			var mid := fposmod((a + b) * 0.5, TAU)
+			var clear := true
+			for sk: Vector2 in skips:
+				if mid > sk.x and mid < sk.y:
+					clear = false
+			if clear:
+				GardenKit.fill_sector(sb, kinds[k % kinds.size()], CENTER, R0, R1, a, b, 1.15, rng, Vector2(0.85, 1.15))
+				k += 3
+			a = b
 
 
 static func _border(sb: ManorScatter, rng: RandomNumberGenerator, a: Vector2, b: Vector2) -> void:
@@ -222,6 +258,9 @@ static func build(parent: Node3D) -> void:
 	b.drape_path(PackedVector2Array([Vector2(-40.0, -103.0), Vector2(-40.0, -108.0), Vector2(-28.0, -118.0)]), 3.0, walk, 0.035)
 	b.drape_path(PackedVector2Array([Vector2(40.0, -103.0), Vector2(40.0, -108.0), Vector2(28.0, -118.0)]), 3.0, walk, 0.035)
 	b.drape_path(PackedVector2Array([Vector2(-50.0, -104.0), Vector2(50.0, -104.0)]), 3.0, walk, 0.035)
+	for bed: Array in CUTTING_BEDS:
+		GardenKit.drape_rect(b, bed[1], mulch, 0.07)
+		GardenKit.edging(b, GardenKit.rect_outline(bed[1]))
 	_fountain(b)
 	_swags(b)
 	_tunnels(b)
@@ -270,7 +309,7 @@ static func build(parent: Node3D) -> void:
 		b.prop_on_ground(&"topiary_peacock", EAST_GATE.x - 4.5, EAST_GATE.y + side * 4.2, PI * 0.5)
 		b.prop_on_ground(&"topiary_ball", NORTH_GATE.x + side * 5.0, NORTH_GATE.y + 4.0)
 	# standard roses and box balls in the corners
-	for corner: Vector2 in [Vector2(-66.0, -178.0), Vector2(66.0, -178.0), Vector2(-66.0, -126.0), Vector2(66.0, -122.0)]:
+	for corner: Vector2 in [Vector2(-66.0, -172.0), Vector2(66.0, -172.0), Vector2(-66.0, -126.0), Vector2(70.0, -108.0)]:
 		for i in 4:
 			var p := corner + Vector2((i % 2) * 8.0 - 4.0, (i / 2) * 8.0 - 4.0)
 			b.prop_on_ground(std[(i + int(corner.y)) % 3], p.x, p.y, i * 1.3)
