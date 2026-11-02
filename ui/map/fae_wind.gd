@@ -13,6 +13,9 @@ const GUST_SECONDS := 1.8
 const NEAR := 25.0
 const SPEED := 7.0
 const LIFE := 2.0
+## Where a gust starts: this far behind her along the wind, at knee height.
+const UPWIND := 1.5
+const KNEE := 0.4
 const SHADER := preload("res://ui/map/fae_wind.gdshader")
 static var _petal: ImageTexture
 
@@ -31,7 +34,7 @@ func _ready() -> void:
 	_stream.local_coords = false
 	_stream.emitting = false
 	_stream.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-	_stream.emission_box_extents = Vector3(1.6, 0.35, 1.6)
+	_stream.emission_box_extents = Vector3(1.4, 0.2, 1.4)
 	_stream.spread = 7.0
 	_stream.gravity = Vector3(0, -0.6, 0)
 	# Tumbling: the shader turns each petal by its angle.
@@ -117,9 +120,10 @@ func follow(feyre_pos: Vector3, pin_xz: Vector2, delta: float) -> void:
 	heading = to.normalized()
 	var dir := Vector3(heading.x, 0.05, heading.y).normalized()
 	_stream.direction = dir
-	# Start a few steps ahead of her, low (knee to hip, like wind through the
-	# grass), so it leads the eye without crossing the camera's view of her.
-	_stream.global_position = feyre_pos + Vector3(heading.x, 0.0, heading.y) * 3.5 + Vector3.UP * 0.7
+	# Start a little upwind of her and low, knee height, like wind through the
+	# grass: the petals blow past her legs and on towards the pin. (Higher or
+	# further ahead, the camera behind her sees them burst round her head.)
+	_stream.global_position = feyre_pos - Vector3(heading.x, 0.0, heading.y) * UPWIND + Vector3.UP * KNEE
 	_next_gust -= delta
 	if _gust_left > 0.0:
 		_gust_left -= delta

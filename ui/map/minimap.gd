@@ -11,10 +11,16 @@ const MARGIN := Vector2(28, 28)
 ## Metres from the centre to the rim.
 const VIEW_RADIUS := 170.0
 const SHADER := preload("res://ui/map/map_view.gdshader")
+const ManorSketch := preload("res://ui/map/manor_sketch.gd")
+## Inside the manor: metres from the centre to the rim of her house plan.
+const MANOR_RADIUS := 28.0
 
 var hud: WorldMapHud
 var map_rect: ColorRect
 var _overlay: Control
+## Her house plan on a paper disc, shown instead of the land while she is inside.
+var _manor_disc: Control
+var _manor_plan: Control
 var _pill: Label
 var _toast: Label
 var _toast_tween: Tween
@@ -50,6 +56,22 @@ func _ready() -> void:
 	mat.set_shader_parameter(&"round_mask", true)
 	map_rect.material = mat
 	add_child(map_rect)
+
+	_manor_disc = Control.new()
+	_manor_disc.name = "ManorDisc"
+	_manor_disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_manor_disc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_manor_disc.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	_manor_disc.visible = false
+	_manor_disc.draw.connect(func() -> void:
+		_manor_disc.draw_circle(size * 0.5, DIAMETER * 0.5 - RING + 0.5, ManorSketch.PAPER))
+	add_child(_manor_disc)
+	_manor_plan = Control.new()
+	_manor_plan.name = "ManorPlan"
+	_manor_plan.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_manor_plan.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_manor_plan.draw.connect(_draw_manor)
+	_manor_disc.add_child(_manor_plan)
 
 	_overlay = Control.new()
 	_overlay.name = "Marks"
@@ -131,7 +153,24 @@ func _process(delta: float) -> void:
 		_glow[id] = maxf(0.0, float(_glow[id]) - delta * 0.35)
 		if _glow[id] <= 0.0:
 			_glow.erase(id)
+	var in_house := in_manor()
+	_manor_disc.visible = in_house
+	map_rect.visible = not in_house
+	if in_house:
+		_manor_plan.queue_redraw()
 	_overlay.queue_redraw()
+
+
+func in_manor() -> bool:
+	return hud.manor != null and hud.manor.inside
+
+
+## Her plan of the floor she is on, centred on her.
+func _draw_manor() -> void:
+	var plan := hud.manor
+	var c := size * 0.5
+	var ppm := (DIAMETER * 0.5 - RING) / MANOR_RADIUS
+	ManorSketch.draw_plan(_manor_plan, plan, plan.level, func(xz: Vector2) -> Vector2: return c + (xz - plan.at) * ppm, ppm)
 
 
 ## World XZ to a point on this control (may fall outside the disc).
@@ -188,21 +227,23 @@ func _draw_marks() -> void:
 
 	# Landmarks she has seen, inside the disc.
 	var inner := r - RING - 10.0
-	for id: String in hud.seen_landmarks:
+	var in_house := in_manor()
+	for id: String in ([] if in_house else hud.seen_landmarks.keys()):
 		var lm: Dictionary = hud.seen_landmarks[id]
 		var p := to_local_point(Vector2(lm.x, lm.z))
 		if p.distance_to(c) <= inner:
 			MapMarks.draw_landmark(ci, p, StringName(lm.kind), 9.0, float(_glow.get(id, 0.0)))
-	_draw_pin(ci, c, inner)
-	MapMarks.draw_feyre(ci, c, hud.player_angle, 10.0, _t)
+	_draw_pin(ci, c, inner, in_house)
+	MapMarks.draw_feyre(ci, c, hud.manor.angle if in_house else hud.player_angle, 10.0, _t)
 
 
 ## Her pin: on the map when it is near, else riding the rim, leaning the way to go.
-func _draw_pin(ci: CanvasItem, c: Vector2, inner: float) -> void:
+## Indoors the plan is at another scale: the pin always rides the rim.
+func _draw_pin(ci: CanvasItem, c: Vector2, inner: float, rim_only: bool = false) -> void:
 	if not hud.pin.active:
 		return
 	var p := to_local_point(hud.pin.xz)
-	if p.distance_to(c) <= inner:
+	if p.distance_to(c) <= inner and not rim_only:
 		MapMarks.draw_pin(ci, p, 11.0, _t)
 		return
 	var bearing := hud.pin.bearing_from(hud.player_xz)

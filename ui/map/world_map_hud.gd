@@ -15,6 +15,7 @@ const MapPin := preload("res://ui/map/map_pin.gd")
 const PinBeacon := preload("res://ui/map/pin_beacon.gd")
 const PinMarker := preload("res://ui/map/pin_marker.gd")
 const FaeWind := preload("res://ui/map/fae_wind.gd")
+const ManorPlan := preload("res://ui/map/manor_plan.gd")
 const PLACES_PATH := "res://data/map/map_places.tres"
 const REVEAL_EVERY := 0.2
 const LOOK_EVERY := 0.25
@@ -37,6 +38,11 @@ var beacon: PinBeacon
 var marker: PinMarker
 var wind: FaeWind
 var _map_was_open: bool = false
+## Her plan of the manor's inside; the minimap and full map switch to it
+## while she is in the house.
+var manor: ManorPlan
+## The built house (found in the streamed manor estate; tests set it).
+var manor_house: Node3D
 var places: MapPlaceSet
 ## id -> {label, kind, x, z}
 var seen_landmarks: Dictionary = {}
@@ -73,6 +79,7 @@ func _ready() -> void:
 	places = load(PLACES_PATH) as MapPlaceSet if ResourceLoader.exists(PLACES_PATH) else MapPlaceSet.new()
 	fog_texture = ImageTexture.create_from_image(reveal.to_image())
 	_load_bake()
+	manor = ManorPlan.new()
 
 	minimap = Minimap.new(self)
 	add_child(minimap)
@@ -138,6 +145,7 @@ func _process(delta: float) -> void:
 		return
 	player_xz = Vector2(feyre.global_position.x, feyre.global_position.z)
 	player_angle = _facing(feyre)
+	_locate_in_manor(feyre)
 	var in_spring := WorldMap.is_in_prythian(feyre.global_position)
 	if in_spring != MapMarks.pin_in_spring:
 		# Crossing the wall: the beacon takes the new realm's colours.
@@ -211,6 +219,34 @@ func _facing(feyre: Node3D) -> float:
 	var basis := model.global_basis if model else feyre.global_basis
 	var fwd := -basis.z
 	return atan2(fwd.x, -fwd.z)
+
+
+# --- Inside the manor ------------------------------------------------------------
+
+func _locate_in_manor(feyre: Node3D) -> void:
+	if manor_house == null or not is_instance_valid(manor_house) or not manor_house.is_inside_tree():
+		manor_house = _find_house()
+	if manor_house == null:
+		manor.inside = false
+		return
+	var to_house := manor_house.global_transform.affine_inverse()
+	var fwd := Vector3(sin(player_angle), 0.0, -cos(player_angle))
+	var local_fwd := to_house.basis * fwd
+	manor.locate(to_house * feyre.global_position, atan2(local_fwd.x, -local_fwd.z))
+
+
+## The builder puts the house in ManorIndoors.GROUP (named here, so a stale
+## class cache still runs).
+func _find_house() -> Node3D:
+	return get_tree().get_first_node_in_group(&"manor_house") as Node3D
+
+
+## House XZ to world XZ (for the world map's pin and such).
+func manor_to_world(xz: Vector2) -> Vector2:
+	if manor_house == null:
+		return xz
+	var w := manor_house.global_transform * Vector3(xz.x, 0.0, xz.y)
+	return Vector2(w.x, w.z)
 
 
 func _upload_fog() -> void:
@@ -366,7 +402,11 @@ func _celebrate(text: String, landmark_id: String, big: bool) -> void:
 func stats_line() -> String:
 	var pct := reveal.explored_fraction() * 100.0
 	var shown := "%.1f" % pct if pct < 10.0 else "%d" % roundi(pct)
-	return "%s%% sketched  ·  %d places  ·  %d landmarks" % [shown, found.size(), seen_landmarks.size()]
+	return "%s%% sketched  ·  %s  ·  %s" % [shown, _count(found.size(), "place"), _count(seen_landmarks.size(), "landmark")]
+
+
+static func _count(n: int, word: String) -> String:
+	return "%d %s" % [n, word if n == 1 else word + "s"]
 
 
 # --- Map art -------------------------------------------------------------------
@@ -415,7 +455,7 @@ func _bind_textures() -> void:
 
 func save_state() -> Dictionary:
 	return {"reveal": reveal.save_state(), "landmarks": seen_landmarks.duplicate(true), "places": found.keys(),
-		"pin": pin.save_state()}
+		"pin": pin.save_state(), "manor": manor.save_state()}
 
 
 func load_state(data: Dictionary) -> void:
@@ -427,6 +467,7 @@ func load_state(data: Dictionary) -> void:
 	for id: String in seen_landmarks.keys():
 		_candidates.erase(id)
 	pin.load_state(data.get("pin"))
+	manor.load_state(data.get("manor", []))
 	_sync_beacon()
 	_last_reveal = Vector2.INF
 	_upload_fog()
