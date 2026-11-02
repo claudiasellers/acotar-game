@@ -84,6 +84,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
+	ManorArtHanger.hang(house, all)  # L39: frames and paintings into the art slots
 	_merge_meshes(house, all, cache)
 	var mood := ManorMoodLights.new()
 	mood.name = "MoodLights"
