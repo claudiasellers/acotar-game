@@ -900,7 +900,11 @@ def bake_makeup_masks(P, tris, uv, size=1024):
     near_eye = (edist < EYE_R + 0.022) * F
     deg = math.pi / 180.0
     over = eaz - up
-    across = 1.0 - smoothstep(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.25, np.abs(eax))
+    # outer corner: fade past the opening; inner corner: stop at the tear duct, so
+    # shadow and liner never run onto the bridge of the nose
+    across = np.where(eax >= 0.0,
+                      1.0 - smoothstep(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.25, eax),
+                      1.0 - smoothstep(fs.EYE_OPEN_W * 0.80, fs.EYE_OPEN_W * 0.97, -eax))
     shadow = smoothstep(-2 * deg, 3 * deg, over) * (1.0 - smoothstep(22 * deg, 46 * deg, over)) * across * near_eye
     liner = smoothstep(-1.5 * deg, 0.5 * deg, over) * (1.0 - smoothstep(4 * deg, 8 * deg, over)) * across * near_eye
     # wing: continues the upper rim past the outer corner, flicking up
@@ -912,7 +916,7 @@ def bake_makeup_masks(P, tris, uv, size=1024):
     # brows: tapered, gently arched
     bt = np.clip((ax - 0.013) / 0.047, 0, 1)
     brow_z = fs.BROW_Z + 0.006 * np.sin(bt * math.pi * 0.8) - 0.004 * bt
-    brow_th = 0.0030 * (1.0 - 0.6 * bt)
+    brow_th = 0.0036 * (1.0 - 0.6 * bt)
     brows = np.exp(-((Z - brow_z) / brow_th) ** 4) * (ax > 0.011) * (ax < 0.062) * F
     brows *= 1.0 - smoothstep(0.85, 1.0, bt)
     # face paint (festival / Calanmai): a sweep along the cheekbone, three dots, a forehead mark
