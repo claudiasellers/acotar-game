@@ -225,6 +225,23 @@ func test_bow_is_stowed_indoors_and_comes_out_to_aim() -> void:
 	assert_true(visual.bow_root.visible, "raising the bow brings it out")
 
 
+## The user: loading an arrow (Q) swung her arms backward. With the camera
+## behind her looking past her the other way, the bow still goes out in front.
+func test_loading_an_arrow_keeps_her_arms_in_front() -> void:
+	var visual := feyre.bow_controller.find_child("BowVisual", true, false) as BowVisual
+	await wait_frames(2)
+	feyre.model.rotation.y = feyre.camera.global_rotation.y + PI
+	visual.hold_ready(5.0)
+	await wait_frames(30)
+	var fwd := -feyre.model.global_basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized()
+	assert_gt(visual.aim_direction().dot(fwd), 0.7, "aims where she faces")
+	var chest := feyre.global_position + Vector3.UP * 1.3
+	assert_gt((visual.pose.bow_hand_world() - chest).dot(fwd), 0.3, "bow hand out in front")
+	assert_gt((visual.pose.string_hand_world() - chest).dot(fwd), 0.0, "string hand in front too")
+
+
 func test_reticle_follows_the_predicted_impact() -> void:
 	var reticle := feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
 	assert_not_null(reticle)

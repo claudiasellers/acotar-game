@@ -11,6 +11,8 @@ extends Node3D
 ## Seconds the bow stays up after Q, F or a shot, with no aim held.
 const READY_HOLD := 2.5
 const SWING_SPEED := 6.0
+## How far (rad) the bow arm may swing from the way she faces while she turns.
+const AIM_CONE := deg_to_rad(60.0)
 const HALF_LENGTH := 0.62
 ## How far the tips sit back toward her at rest, and at full draw.
 const BEND := 0.13
@@ -111,14 +113,37 @@ func _process(delta: float) -> void:
 		_place()
 
 
-## Where the arrow would go: from her chest toward the camera's aim point.
+## Where the arrow would go: from her chest toward the camera's aim point,
+## kept within AIM_CONE of the way she faces. Only aiming or drawing turns her
+## to the camera; when Q, F or a shot just lifts the bow she may face anywhere,
+## and aiming straight at the camera's point swung her arms out behind her.
+## Then the bow comes up along her own facing.
 func aim_direction() -> Vector3:
 	var feyre := controller.feyre if controller else null
 	if feyre == null or feyre.camera == null or not feyre.is_inside_tree():
 		return Vector3.FORWARD
+	var fwd := -feyre.model.global_basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized() if fwd.length() > 0.001 else Vector3.FORWARD
+	if not (feyre.is_aiming or controller.is_drawing):
+		return (fwd + Vector3.DOWN * 0.08).normalized()
 	var chest := feyre.global_position + Vector3.UP * 1.4
 	var d := feyre.aim_point() - chest
-	return d.normalized() if d.length() > 0.5 else -feyre.camera.global_basis.z
+	var dir := d.normalized() if d.length() > 0.5 else -feyre.camera.global_basis.z
+	return within_cone(dir, fwd, AIM_CONE)
+
+
+## `dir` turned about UP until its heading is within `cone` of `fwd` (flat,
+## unit), keeping its pitch.
+static func within_cone(dir: Vector3, fwd: Vector3, cone: float) -> Vector3:
+	var flat := Vector3(dir.x, 0.0, dir.z)
+	if flat.length() < 0.001:
+		return dir
+	var angle := fwd.signed_angle_to(flat.normalized(), Vector3.UP)
+	if absf(angle) <= cone:
+		return dir
+	var heading := fwd.rotated(Vector3.UP, signf(angle) * cone)
+	return (heading * flat.length() + Vector3.UP * dir.y).normalized()
 
 
 ## Puts the bow (and quiver) where they belong this frame, after the pose.
