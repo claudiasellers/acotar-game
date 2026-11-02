@@ -8390,12 +8390,12 @@ yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_v5ik6"]
 script = ExtResource("5_51bm0")
-prop_id = &"mannequin_gown"
+prop_id = &"mannequin_gown_rose"
 position = Vector3(3, 0, 6)
 
 [sub_resource type="Resource" id="Resource_myaku"]
 script = ExtResource("5_51bm0")
-prop_id = &"mannequin_gown"
+prop_id = &"mannequin_gown_ball"
 position = Vector3(6, 0, 6)
 
 [sub_resource type="Resource" id="Resource_o5qp0"]

@@ -147,7 +147,7 @@ func _level_1_main() -> void:
 	dr.notes = "Outfits (wardrobe station) and makeup/hair (dressing_mirror station). A mirror door hides the jewellery closet."
 	_p(dr, [
 		[&"gown_rack", 5.6, 0.6], [&"gown_rack", 9.2, 0.6], [&"wardrobe_tall", 11.0, 2.0, -90],
-		[&"mannequin_gown", 4.2, 5.6], [&"mannequin_gown", 6.0, 7.4], [&"mannequin_gown", 7.8, 5.6],
+		[&"mannequin_gown_rose", 4.2, 5.6], [&"mannequin_gown_ball", 6.0, 7.4], [&"mannequin_gown", 7.8, 5.6],
 		[&"rug_round", 6, 6.2], [&"shoe_shelf", 0.3, 2.6, 90], [&"shoe_shelf", 0.3, 9.6, 90],
 		[&"hat_stand", 1.0, 11.2], [&"hat_stand", 2.6, 11.2], [&"dressing_screen", 4.2, 10.4, 20],
 		[&"cheval_mirror", 6.4, 11.4, 180], [&"cheval_mirror", 11.4, 10.4, -90],
@@ -267,7 +267,7 @@ func _level_1_main() -> void:
 	var sew := dsl.room(&"sewing_room", "Sewing & Needlework Room", 1, Rect2(-26, -48, 18, 10), "X", &"wood", MINT)
 	_p(sew, [
 		[&"table_work", 9, 5], [&"spinning_wheel", 2, 2], [&"embroidery_frame", 4, 7.5],
-		[&"mannequin_gown", 15, 2], [&"mannequin_gown", 16.6, 4], [&"ironing_table", 14, 8.6],
+		[&"mannequin_gown", 15, 2], [&"mannequin_gown_rose", 16.6, 4], [&"ironing_table", 14, 8.6],
 		[&"chair_simple", 8, 6.2, 180], [&"chair_simple", 10, 6.2, 180], [&"chair_simple", 3.4, 8.4],
 		[&"linen_press", 0.4, 6, 90], [&"chest_trunk", 6, 0.5], [&"bookcase_low", 12, 0.3],
 		[&"chandelier_small", 9, 5, 0, 3.3], [&"candelabra", 9, 4.6, 0, 0.9], [&"faelight_orb", 4, 7.5, 0, 2.3],
@@ -379,7 +379,7 @@ func _level_2_attic() -> void:
 	_p(linen, [
 		[&"linen_press", 0.4, 3, 90], [&"linen_press", 0.4, 7, 90], [&"linen_press", 0.4, 11, 90],
 		[&"wardrobe_tall", 6, 0.4], [&"wardrobe_tall", 10, 0.4], [&"mask_display", 15.85, 10, -90, 1.4],
-		[&"mask_display", 15.85, 14, -90, 1.4], [&"mannequin_gown", 6, 8], [&"mannequin_gown", 9, 8],
+		[&"mask_display", 15.85, 14, -90, 1.4], [&"mannequin_gown_rose", 6, 8], [&"mannequin_gown", 9, 8],
 		[&"chest_trunk", 12, 16.8], [&"chest_trunk", 3, 16.8], [&"drying_line", 8, 12, 90],
 		[&"ironing_table", 12, 11], [&"hat_stand", 14.5, 2], [&"lantern_hanging", 8, 8, 0, 3.4],
 		[&"loose_panel", 15.9, 6, -90, 0.6],

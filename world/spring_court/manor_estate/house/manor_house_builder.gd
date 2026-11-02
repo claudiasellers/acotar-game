@@ -80,7 +80,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 	for secret in all.secrets:
 		_build_secret(house, secret)
 	for roof in all.roofs:
-		_build_roof(house, roof)
+		_build_roof(house, roof, all)
 	for anchor in all.anchors:
 		var m := Marker3D.new()
 		m.name = String(anchor.anchor_id)
@@ -454,7 +454,35 @@ static func _build_secret(house: Node3D, def: ManorSecretDef) -> void:
 			house.add_child(t)
 
 
-static func _build_roof(house: Node3D, roof: ManorRoofDef) -> void:
+## Eaves overhang (m) on a side of a pitched roof that faces the open air.
+const EAVES := 0.4
+
+
+## Per side [west, east, north, south], how far `roof`'s eaves reach out: EAVES,
+## or 0 where the house goes on at the roof's height (a tower beside the main
+## block). An overhang there cut through the tower room's wall and floor as a
+## lilac slab (audit B9).
+static func roof_overhang(roof: ManorRoofDef, all: ManorHouseIndex) -> Array[float]:
+	var r := roof.rect
+	var out: Array[float] = []
+	var probes := [
+		[Vector2(r.position.x - 0.5, 0.0), Vector2(0.0, 1.0)], [Vector2(r.end.x + 0.5, 0.0), Vector2(0.0, 1.0)],
+		[Vector2(0.0, r.position.y - 0.5), Vector2(1.0, 0.0)], [Vector2(0.0, r.end.y + 0.5), Vector2(1.0, 0.0)],
+	]
+	for pr: Array in probes:
+		var at: Vector2 = pr[0]
+		var along: Vector2 = pr[1]
+		var blocked := false
+		for t: float in [0.1, 0.5, 0.9]:
+			var q: Vector2 = at + along * (r.position + r.size * t)
+			for room in all.rooms:
+				if ManorHouseIndex.occupies(room, roof.base_level + 1) and room.rect.has_point(q):
+					blocked = true
+		out.append(0.0 if blocked else EAVES)
+	return out
+
+
+static func _build_roof(house: Node3D, roof: ManorRoofDef, all: ManorHouseIndex = null) -> void:
 	var y := floor_y(roof.base_level + 1) - 0.02
 	var r := roof.rect
 	var mat := ManorFacade.roof_material(roof.color)
@@ -488,9 +516,12 @@ static func _build_roof(house: Node3D, roof: ManorRoofDef) -> void:
 		_:
 			var prism := PrismMesh.new()
 			var along_x := r.size.x >= r.size.y if roof.style == &"hip" else roof.style == &"gable_x"
-			prism.size = Vector3(r.size.y + 0.8, roof.height, r.size.x + 0.8) if along_x else Vector3(r.size.x + 0.8, roof.height, r.size.y + 0.8)
+			var o: Array[float] = roof_overhang(roof, all) if all != null else [EAVES, EAVES, EAVES, EAVES]
+			var ext := Vector2(r.size.x + o[0] + o[1], r.size.y + o[2] + o[3])
+			var mid := r.get_center() + Vector2(o[1] - o[0], o[3] - o[2]) * 0.5
+			prism.size = Vector3(ext.y, roof.height, ext.x) if along_x else Vector3(ext.x, roof.height, ext.y)
 			mi.mesh = prism
-			mi.position = Vector3(r.get_center().x, y + roof.height * 0.5, r.get_center().y)
+			mi.position = Vector3(mid.x, y + roof.height * 0.5, mid.y)
 			if along_x:
 				mi.rotation.y = PI * 0.5
 	mi.material_override = mat
