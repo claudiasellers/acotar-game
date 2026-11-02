@@ -1,0 +1,3 @@
+from L37 sister faces
+quality look
+shot faces res://tools/cast/sister_faces_shot.tscn {out}
