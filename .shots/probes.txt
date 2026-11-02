@@ -1,0 +1,4 @@
+from L38 B9 and A6 before
+quality look
+timeout 600
+shot upper res://tools/manor_estate/room_shot.tscn observatory,rose_bower,dressing_room {out}
