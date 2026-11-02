@@ -75,9 +75,12 @@ void fragment() {
 		float fine = 1.0 - smoothstep(0.0, 0.035, abs(sin(w.x * 4.1 - w.y * 2.3 + warp * 4.0)));
 		float cloud = noise(w * 0.8) * 0.6 + noise(w * 2.7) * 0.4;
 		vec3 ivory = base.rgb * mix(0.96, 1.02, cloud);
-		ivory = mix(ivory, vec3(0.70, 0.67, 0.64), vein * 0.32 + fine * 0.12);
+		// veins borrow the other square's warmth: rose-grey in the ivory,
+		// rose-pearl in the plum-black (L38-5: the canon's black and white,
+		// warmed to sit with the pastel house)
+		ivory = mix(ivory, mix(vec3(0.70, 0.64, 0.64), alt.rgb * 6.0, 0.25), vein * 0.32 + fine * 0.12);
 		vec3 nero = alt.rgb * mix(0.85, 1.15, cloud);
-		nero = mix(nero, vec3(0.80, 0.78, 0.74), vein * 0.45 + fine * 0.22);
+		nero = mix(nero, base.rgb * vec3(1.0, 0.86, 0.9), vein * 0.5 + fine * 0.25);
 		col = mix(ivory, nero, dark);
 		j = edge_mask(f, 0.012);
 		// the fillet is brass, not grout

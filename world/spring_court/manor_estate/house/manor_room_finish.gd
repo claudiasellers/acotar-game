@@ -18,7 +18,7 @@ enum Floor { PARQUET, CHECKER, TILE, BOARDS, FLAGS }
 ## Floor per room: [pattern, base, alt, joint, gloss]. Rooms not listed use
 ## FLOOR_BY_KIND (state rooms) or keep their plain floor.
 const FLOORS := {
-	&"entrance_hall": [Floor.CHECKER, Color(0.90, 0.86, 0.79), Color(0.075, 0.068, 0.062), Color(0.86, 0.68, 0.36), 0.6],
+	&"entrance_hall": [Floor.CHECKER, Color(0.93, 0.88, 0.84), Color(0.10, 0.055, 0.075), Color(0.86, 0.68, 0.36), 0.6],
 	&"gallery": [Floor.BOARDS, Color(0.86, 0.74, 0.62), Color(0.80, 0.66, 0.55), Color(0.62, 0.48, 0.42), 0.35],
 	&"svc_kitchen": [Floor.TILE, Color(0.85, 0.58, 0.52), Color(0.82, 0.70, 0.60), Color(0.80, 0.76, 0.70), 0.25],
 	&"svc_infirmary": [Floor.TILE, Color(0.78, 0.84, 0.82), Color(0.84, 0.82, 0.80), Color(0.72, 0.74, 0.74), 0.3],
