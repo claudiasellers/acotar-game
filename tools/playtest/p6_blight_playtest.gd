@@ -58,8 +58,10 @@ func _play() -> void:
 		WorldState.set_flag("fact.hall_x_%d" % i)
 		WorldState.set_flag("fact.hall_mark_%d" % i)
 	WorldState.set_flag("fact.hall_map_set_down")
-	# L29's summer faerie (P3) already happened: he was held, and buried.
-	for f in ["fact.summer_faerie_held", "fact.summer_faerie_farewell", "fact.summer_faerie_buried"]:
+	# Earlier scenes already happened: L29's summer faerie (P3), held and
+	# buried, and the arrival at the manor (P2).
+	for f in ["fact.summer_faerie_held", "fact.summer_faerie_farewell", "fact.summer_faerie_buried",
+			"fact.manor_arrived"]:
 		WorldState.set_flag(f)
 	for flag in DEV_DEEDS:
 		WorldState.raise_deed(flag)

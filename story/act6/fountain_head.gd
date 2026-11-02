@@ -137,7 +137,10 @@ func _build_beats() -> Array:
 		Beats.wait(1.2),
 		Beats.run(func(_s: SceneSpace) -> void:
 			var p := player()
-			var back := p.global_position + ((p.global_position - head_point()) * Vector3(1, 0, 1)).normalized() * 1.1 if p else mark(&"tamlin_behind")
+			# Behind her and a little to her right, so he isn't between her and
+			# the camera over her shoulder.
+			var away := ((p.global_position - head_point()) * Vector3(1, 0, 1)).normalized() if p else Vector3.BACK
+			var back := p.global_position + away * 0.8 + away.cross(Vector3.UP) * -0.75 if p else mark(&"tamlin_behind")
 			var t := cast(&"tamlin", &"tamlin_behind", &"fountain")
 			t.global_position = snap(back)
 			t.look_at(Vector3(head_point().x, t.global_position.y, head_point().z), Vector3.UP)
