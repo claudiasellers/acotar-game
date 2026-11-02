@@ -1,0 +1,7 @@
+from L32 landscape composition (after)
+quality look
+size 1920x1080
+timeout 600
+shot place_market res://tools/landscape/landscape_shot.tscn place_market {out}/place_market.png
+shot place_weeping_lady res://tools/landscape/landscape_shot.tscn place_weeping_lady {out}/place_weeping_lady.png
+shot placeup_briar_gate res://tools/landscape/landscape_shot.tscn placeup_briar_gate {out}/placeup_briar_gate.png
