@@ -1,0 +1,4 @@
+from beast-light L55 tune
+quality look
+timeout 900
+shot beast res://tools/creatures/beast_door_light_probe.tscn {out}/on on gains=0.25,0.4,0.6
