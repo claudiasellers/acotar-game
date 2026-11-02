@@ -128,15 +128,23 @@ func flower(center: Vector3, petals: int, radius: float, petal_col: Color, heart
 	var side := n.cross(Vector3.RIGHT if absf(n.dot(Vector3.RIGHT)) < 0.9 else Vector3.FORWARD).normalized()
 	var fwd := n.cross(side)
 	var heart := center + n * radius * 0.15
+	# Rounded, overlapping petals (quality audit B4): pointed two-triangle
+	# petals read as flat star decals from a distance. Each petal is a small
+	# fan: narrow at the heart, broad shoulders, a soft round end, cupped.
+	var at := func(a: float, r: float, dip: float) -> Vector3:
+		return center + (side * cos(a) + fwd * sin(a)) * radius * r - n * radius * dip
 	for i in petals:
-		var a0 := TAU * (i - 0.35) / petals
-		var a1 := TAU * (i + 0.35) / petals
 		var am := TAU * i / petals
-		var p0 := center + (side * cos(a0) + fwd * sin(a0)) * radius * 0.45
-		var p1 := center + (side * cos(a1) + fwd * sin(a1)) * radius * 0.45
-		var tip := center + (side * cos(am) + fwd * sin(am)) * radius - n * radius * 0.12
-		tri(heart, p0, tip, heart_col, petal_col, petal_col, sway, sway, sway, glow)
-		tri(heart, tip, p1, heart_col, petal_col, petal_col, sway, sway, sway, glow)
+		var w := minf(PI / petals * 1.15, 0.9)
+		var p0: Vector3 = at.call(am - w * 0.45, 0.35, 0.0)
+		var s0: Vector3 = at.call(am - w, 0.8, 0.06)
+		var tip: Vector3 = at.call(am, 1.0, 0.12)
+		var s1: Vector3 = at.call(am + w, 0.8, 0.06)
+		var p1: Vector3 = at.call(am + w * 0.45, 0.35, 0.0)
+		tri(heart, p0, s0, heart_col, petal_col, petal_col, sway, sway, sway, glow)
+		tri(heart, s0, tip, heart_col, petal_col, petal_col, sway, sway, sway, glow)
+		tri(heart, tip, s1, heart_col, petal_col, petal_col, sway, sway, sway, glow)
+		tri(heart, s1, p1, heart_col, petal_col, petal_col, sway, sway, sway, glow)
 
 
 ## A drooping bell (bluebell, foxglove).
