@@ -140,9 +140,10 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 					Vector3(r.size.x, SLAB, r.size.y), floor_mat)
 		var ceil_mat := ManorRoomLook.ceiling_material(room, EstateKit.mat(room.wall_color.lightened(0.25), 0.9))
 		var ch := ceiling_of(room)
+		# Solid: rooms under the roof have nothing else over them, and her jumps reach 9 m.
 		for r in _subtract(room.rect, all.stair_holes_on(room.level + 1) if ch < storey_height(room.level) else []):
 			EstateKit.box(node, Vector3(r.get_center().x, y + ch + 0.05, r.get_center().y),
-					Vector3(r.size.x, 0.1, r.size.y), ceil_mat, false)
+					Vector3(r.size.x, 0.1, r.size.y), ceil_mat)
 		_build_walls(node, room, all, y, ch)
 		ManorRoomFinish.add_curtains(node, room, all, y, ch)
 	var origin := Vector3(room.rect.position.x, y, room.rect.position.y)
@@ -312,6 +313,8 @@ static func _build_door_leaf(house: Node3D, door: ManorDoorDef, all: ManorHouseI
 			house.add_child(gate)
 			EstateKit.box(gate, Vector3.ZERO, size + Vector3(0, 0, 0.1), EstateKit.mat(EstateKit.OAK, 0.55, 0.0, "front_door"))
 			EstateKit.box(gate, Vector3(0, 0.0, 0.0), Vector3(0.1, 0.1, 0.1) + (Vector3(0.0, 0.0, 0.2) if along_x else Vector3(0.2, 0, 0)), EstateKit.mat(EstateKit.GOLD, 0.3, 0.9, "brass"), false)
+			# Its _ready ran before these pieces existed: an open gate must not stay solid.
+			gate.refresh()
 
 
 static func _leaf_material(disguise: StringName) -> Material:
