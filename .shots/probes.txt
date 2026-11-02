@@ -1,0 +1,7 @@
+from L32 woods places before
+quality look
+size 1920x1080
+timeout 600
+shot place_great_oak res://tools/landscape/landscape_shot.tscn place_great_oak {out}/place_great_oak.png
+shot placeup_moonstone_ring res://tools/landscape/landscape_shot.tscn placeup_moonstone_ring {out}/placeup_moonstone_ring.png
+shot place_faelight_hollow res://tools/landscape/landscape_shot.tscn place_faelight_hollow {out}/place_faelight_hollow.png
