@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"wolf"
+canon = "The human-realm forest wolves [C ch1-2]: a pack that stalks, flanks and circles, darting in. Our reading [X]: ears pinned and heads low with lips off the teeth while they ring her, the jaws gaping for each feint, silent and ears-forward while roaming."
+masked = false
+rest = &"rest"
+blink_min = 0.0
+blink_max = 0.0
+presets = {
+"alert": { "ears_up": 1.0 },
+"cowed": { "ears_back": 1.0, "head_low": 0.8 },
+"dead": { "ears_back": 0.5, "jaw_open": 0.4 },
+"dying": { "ears_back": 0.35, "jaw_open": 0.3 },
+"lunge": { "ears_back": 1.0, "head_low": 0.3, "jaw_open": 1.0 },
+"rest": { "ears_up": 0.4 },
+"snarl": { "ears_back": 0.9, "head_low": 0.65, "jaw_open": 0.4 },
+"stalk": { "ears_up": 0.7, "head_low": 0.5 }
+}
+aliases = {
+"neutral": "rest",
+"happy": "rest",
+"laugh": "rest",
+"smirk": "rest",
+"tender": "rest",
+"angry": "snarl",
+"fury": "lunge",
+"contempt": "snarl",
+"disgust": "snarl",
+"sad": "rest",
+"grief": "rest",
+"afraid": "cowed",
+"terror": "cowed",
+"surprise": "alert",
+"pained": "cowed",
+"weary": "rest",
+"guarded": "rest",
+"pleading": "cowed"
+}
+tics = [{ "hold": 0.3, "max": 9.0, "min": 4.0, "preset": "alert", "weight": 0.6 }]
+creature = true
+states = {
+"break": "snarl",
+"circle": "snarl",
+"dead": "dead",
+"dying": "dying",
+"flank": "snarl",
+"lunge": "lunge",
+"stalk": "stalk"
+}
+cues = {
+
+}

@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"great_wolf"
+canon = "Andras in wolf form, pony-sized and unnaturally quiet [C ch1]: no sound and no bared teeth while he creeps on the doe; jaws open only for the burst and the seize; after the ash he turns and looks at her with something too aware in his face, ears up, jaw shut [C ch1]; dies slowly, eye on the sky, jaw slack [C ch1]."
+masked = false
+rest = &"rest"
+blink_min = 0.0
+blink_max = 0.0
+presets = {
+"alert": { "ears_up": 1.0 },
+"cowed": { "ears_back": 1.0, "head_low": 0.8 },
+"dead": { "ears_back": 0.5, "jaw_open": 0.4 },
+"dying": { "ears_back": 0.35, "jaw_open": 0.3 },
+"hold_prey": { "ears_back": 0.5, "head_low": 0.2, "jaw_open": 0.35 },
+"lunge": { "ears_back": 1.0, "head_low": 0.3, "jaw_open": 1.0 },
+"rest": { "ears_up": 0.3 },
+"retreat": { "ears_back": 0.7, "head_low": 0.45, "jaw_open": 0.2 },
+"rush": { "ears_back": 0.9, "head_low": 0.3, "jaw_open": 0.95 },
+"snarl": { "ears_back": 0.85, "head_low": 0.6, "jaw_open": 0.35 },
+"stalk": { "ears_up": 0.8, "head_low": 0.35 },
+"stare": { "ears_up": 1.0 }
+}
+aliases = {
+"neutral": "rest",
+"happy": "rest",
+"laugh": "rest",
+"smirk": "rest",
+"tender": "rest",
+"angry": "snarl",
+"fury": "lunge",
+"contempt": "snarl",
+"disgust": "snarl",
+"sad": "rest",
+"grief": "rest",
+"afraid": "cowed",
+"terror": "cowed",
+"surprise": "alert",
+"pained": "cowed",
+"weary": "rest",
+"guarded": "rest",
+"pleading": "cowed"
+}
+tics = [{ "hold": 0.3, "max": 11.0, "min": 5.0, "preset": "alert", "weight": 0.6 }]
+creature = true
+states = {
+"dead": "dead",
+"dying": "dying",
+"hold_prey": "hold_prey",
+"retreat": "retreat",
+"rush": "rush",
+"stalk": "stalk",
+"stare": "stare"
+}
+cues = {
+
+}

@@ -44,6 +44,8 @@ var gait_hint: StringName = &""
 ## Clips, flinches, death and ground conform for a rigged model; null for an
 ## unrigged one (docs/contracts/creature_motion.md).
 var animator: CreatureAnimator
+## Its face, when data/faces/<kind>_face.tres exists (lane L36-3, docs/contracts/faces.md).
+var face: CreatureFace
 ## Seconds left asleep (sleep arrow) and slowed (barbed arrow).
 var asleep_left: float = 0.0
 var slowed_left: float = 0.0
@@ -67,6 +69,7 @@ func _ready() -> void:
 	model = PlaceholderBody.build(data)
 	add_child(model)
 	animator = CreatureAnimator.attach(self)
+	face = CreatureFace.attach_to(self, model, data.kind)
 	senses = CreatureSenses.new()
 	senses.name = "Senses"
 	senses.sight_range = data.sight_range

@@ -35,6 +35,15 @@ func _on_wounded(_from: Vector3, _cause: StringName) -> void:
 		pack.report(get_tree().get_first_node_in_group(&"player") as Node3D)
 
 
+## What its face shows (CreatureFace, data/faces/wolf_face.tres): the feint, else the pack's phase.
+func face_state() -> StringName:
+	if _lunge_time > 0.0:
+		return &"lunge"
+	if pack == null:
+		return &""
+	return StringName(String(WolfPack.Phase.keys()[pack.phase]).to_lower())
+
+
 ## A short feint at the target, then back to the ring.
 func lunge(at: Vector3) -> void:
 	_lunge_target = at
