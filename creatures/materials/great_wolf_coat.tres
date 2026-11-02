@@ -1,0 +1,143 @@
+[gd_resource type="ShaderMaterial" load_steps=8 format=3]
+
+[ext_resource type="Shader" path="res://creatures/materials/fur.gdshader" id="1_fur"]
+
+[sub_resource type="ShaderMaterial" id="Shell6"]
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 1.0
+
+[sub_resource type="ShaderMaterial" id="Shell5"]
+next_pass = SubResource("Shell6")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.8333333333333334
+
+[sub_resource type="ShaderMaterial" id="Shell4"]
+next_pass = SubResource("Shell5")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.6666666666666666
+
+[sub_resource type="ShaderMaterial" id="Shell3"]
+next_pass = SubResource("Shell4")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.5
+
+[sub_resource type="ShaderMaterial" id="Shell2"]
+next_pass = SubResource("Shell3")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.3333333333333333
+
+[sub_resource type="ShaderMaterial" id="Shell1"]
+next_pass = SubResource("Shell2")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.16666666666666666
+
+[resource]
+resource_name = "great_wolf_coat"
+next_pass = SubResource("Shell1")
+shader = ExtResource("1_fur")
+shader_parameter/coat = Color(0.24, 0.24, 0.27, 1)
+shader_parameter/pale = Color(0.62, 0.59, 0.52, 1)
+shader_parameter/dark = Color(0.06, 0.06, 0.07, 1)
+shader_parameter/tip = Color(0.74, 0.76, 0.8, 1)
+shader_parameter/mouth = Color(0.22, 0.04, 0.05, 1)
+shader_parameter/tip_amount = 0.65
+shader_parameter/fur_length = 0.075
+shader_parameter/density = 70.0
+shader_parameter/droop = 0.4
+shader_parameter/comb = 0.6
+shader_parameter/streak = 0.55
+shader_parameter/rib_depth = 0.55
+shader_parameter/rib_spacing = 0.085
+shader_parameter/rim_amount = 0.55
+shader_parameter/roughness_fur = 0.8
+shader_parameter/shell = 0.0
