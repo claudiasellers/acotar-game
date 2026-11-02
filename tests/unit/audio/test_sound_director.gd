@@ -220,3 +220,18 @@ func test_voiced_lines_duck_the_bed_and_music() -> void:
 	assert_gt(d.voice_duck, 0.9)
 	await wait_seconds(1.0)
 	assert_almost_eq(d.voice_duck, 0.0, 0.01)
+
+
+func test_the_opening_film_score_plays_on_music_and_stops_on_skip() -> void:
+	var d := _director()
+	var c := bank.cue(&"music_opening_film")
+	assert_not_null(c)
+	assert_true(c.music)
+	assert_between(c.streams[0].get_length(), 180.0, 190.0)
+	SoundDirector.cue(&"music_opening_film")
+	var playing := d.get_children().filter(func(p: Node) -> bool: return p.get_meta(&"cue", &"") == &"music_opening_film")
+	assert_eq(playing.size(), 1)
+	assert_true(playing[0].is_in_group(GameSettings.MUSIC_GROUP))
+	SoundDirector.stop_cue(&"music_opening_film", 0.05)
+	await wait_seconds(0.2)
+	assert_false(is_instance_valid(playing[0]))
