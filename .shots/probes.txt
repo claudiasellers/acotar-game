@@ -1,0 +1,5 @@
+from L43 great wolf and doe look (quality audit B7)
+quality look
+size 1920x1080
+timeout 600
+shot wolf res://tools/creatures/wolf_look_shot.tscn -- {out}
