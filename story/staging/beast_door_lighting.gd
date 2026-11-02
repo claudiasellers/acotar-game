@@ -43,6 +43,12 @@ const RIM_RANGE := 3.2
 const RIM_ANGLE := 30.0
 ## Rim offset from his head: behind him (his +Z) and above.
 const RIM_BACK := 1.0
+## The moonlit glow behind him: a soft omni at the rim's spot that lights the
+## wall around the doorway, so he stands as a dark shape against it. On the
+## Mac a 60-energy omni there clipped that wall to white (L55-1); this level
+## keeps it a pale glow.
+const GLOW_ENERGY := 12.0
+const GLOW_RANGE := 3.8
 const RIM_UP := 0.7
 const FADE_IN := 0.3
 const FADE_OUT := 2.0
@@ -54,6 +60,7 @@ var gain := 1.0
 var amount := 0.0
 var moon: SpotLight3D
 var rim: SpotLight3D
+var glow: OmniLight3D
 var fire: OmniLight3D
 var _fire_base := 0.0
 var _target := 0.0
@@ -122,6 +129,15 @@ func light_up() -> void:
 		rim.shadow_enabled = false
 		rim.light_energy = 0.0
 		parent.add_child(rim)
+	if glow == null:
+		glow = OmniLight3D.new()
+		glow.name = "BeastBackGlow"
+		glow.light_color = RIM_COLOR
+		glow.omni_range = GLOW_RANGE
+		glow.omni_attenuation = 1.6
+		glow.shadow_enabled = false
+		glow.light_energy = 0.0
+		parent.add_child(glow)
 	if fire == null:
 		fire = _hearth_light()
 		if fire != null:
@@ -155,6 +171,9 @@ func _apply() -> void:
 	if rim != null:
 		rim.light_energy = RIM_ENERGY * amount * gain
 		rim.visible = amount > 0.0
+	if glow != null:
+		glow.light_energy = GLOW_ENERGY * amount * gain
+		glow.visible = amount > 0.0
 	if fire != null and is_instance_valid(fire):
 		var k := lerpf(FIRE_GAIN, FIRE_FLARE, _flare / FLARE_SECONDS) * gain
 		_set_base(fire, _fire_base * lerpf(1.0, k, amount))
@@ -171,17 +190,20 @@ func _follow() -> void:
 	var head := _head(beast)
 	rim.global_position = head + back * RIM_BACK + Vector3.UP * RIM_UP
 	rim.look_at(head, Vector3.UP)
+	if glow != null:
+		glow.global_position = rim.global_position
 
 
 func _restore() -> void:
 	if fire != null and is_instance_valid(fire):
 		_set_base(fire, _fire_base)
 	fire = null
-	for l: Light3D in [moon, rim]:
+	for l: Light3D in [moon, rim, glow]:
 		if l != null and is_instance_valid(l):
 			l.queue_free()
 	moon = null
 	rim = null
+	glow = null
 
 
 ## The fire_flicker script flickers around its own _base; plain lights take
