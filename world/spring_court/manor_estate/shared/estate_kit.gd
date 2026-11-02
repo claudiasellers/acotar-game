@@ -7,17 +7,19 @@ extends RefCounted
 
 # Palette (R3, princess look): rose pink, blush, lilac, periwinkle, mint, butter
 # yellow, pearl white, gold accents. Saturated and candy-bright, never grey.
-const PEARL := Color(0.98, 0.95, 0.93)
-const MARBLE := Color(0.97, 0.92, 0.91)          # pearl-pink marble
-const WARM_STONE := Color(0.96, 0.86, 0.80)
+# Whites stay at or below ~0.88 albedo: near-white stone and gravel under the
+# noon sun clipped to white and made the grounds glare (user, 2026-11-02).
+const PEARL := Color(0.88, 0.84, 0.82)
+const MARBLE := Color(0.88, 0.82, 0.81)          # pearl-pink marble
+const WARM_STONE := Color(0.87, 0.77, 0.71)
 const STONE_DARK := Color(0.86, 0.72, 0.70)
-const GRAVEL := Color(0.97, 0.89, 0.82)
+const GRAVEL := Color(0.84, 0.75, 0.69)
 const OAK := Color(0.78, 0.55, 0.42)              # honeyed, warm
 const OAK_DARK := Color(0.58, 0.36, 0.30)
 const GOLD := Color(1.0, 0.80, 0.38)
 const ROSE := Color(0.98, 0.55, 0.70)
 const BLUSH := Color(1.0, 0.80, 0.84)
-const CREAM := Color(1.0, 0.96, 0.88)
+const CREAM := Color(0.92, 0.87, 0.78)
 const BUTTER := Color(1.0, 0.92, 0.58)
 const MINT := Color(0.66, 0.93, 0.80)
 const LILAC := Color(0.80, 0.68, 0.96)

@@ -915,6 +915,10 @@ import horrors  # noqa: E402  (the court's horrors, Acts II-III)
 
 SOUNDS.update(horrors.SOUNDS)
 CUES.update(horrors.CUES)
+import film  # noqa: E402  (the opening film's score, L33)
+
+SOUNDS.update(film.SOUNDS)
+CUES.update(film.CUES)
 
 SPRING = ["border_woods", "manor_estate", "eastern_woods", "suriel_glade", "blossom_vale", "rosewild",
           "solstice_meadow", "starlight_glen", "western_fells", "autumn_foothills", "hill_of_the_rite",
