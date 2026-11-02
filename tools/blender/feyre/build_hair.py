@@ -37,7 +37,7 @@ HAIR_DIR = os.path.join(bf.REPO, "characters", "feyre", "hair")
 H = 0.0025
 LO = np.array([-0.17, -0.15, 0.99])
 HI = np.array([0.17, 0.22, 1.76])
-MAX_TRIS = 6600
+MAX_TRIS = 6200
 SKULL_C = np.array([0.0, 0.012, 1.535])
 RNG = np.random.default_rng(1966)
 
@@ -590,20 +590,23 @@ def strand_image(wet=False):
     key = "wet" if wet else "dry"
     if key in _STRAND_IMG:
         return _STRAND_IMG[key]
-    w, h = 256, 128
+    w, h = 512, 128
     rng = np.random.default_rng(7 if wet else 3)
     v = (np.arange(h) + 0.5) / h
     x = np.arange(w)[None, :] / w * 2 * math.pi
-    sway = 0.02 * np.sin(v[:, None] * 2 * math.pi + 1.3)          # streaks wander a little
-    cols = np.zeros((h, w))
-    for k, amp in ((9, 0.08), (22, 0.07), (47, 0.045)):   # whole cycles, so the tile seam is invisible
-        ph = rng.uniform(0, 2 * math.pi, 4)
-        cols += amp * sum(np.sin((x + sway) * (k + j) + ph[j]) for j in range(4)) / 4.0 * 2.0
     z = LO[2] + v * (HI[2] - LO[2])
-    ring = 0.22 * np.exp(-((z - 1.605) / 0.022) ** 2)          # crown highlight
-    tips = -0.10 * np.clip((1.30 - z) / 0.25, 0, 1)            # ends a touch deeper
+    # Many fine, low-contrast strands over a broad soft variation: bold mid-width streaks
+    # read as wood grain in game (L41-3).  Whole cycles, so the tile seam is invisible.
+    cols = np.zeros((h, w))
+    for k, amp in ((5, 0.030), (27, 0.030), (61, 0.026), (113, 0.020)):
+        ph = rng.uniform(0, 2 * math.pi, 4)
+        cols += amp * sum(np.sin(x * (k + j) + ph[j]) for j in range(4)) / 4.0 * 2.0
+    # the u = angle mapping pinches at the top of the crown: fade the strands out there
+    cols *= np.clip((1.715 - z) / 0.04, 0, 1)[:, None]
+    ring = 0.16 * np.exp(-((z - 1.605) / 0.024) ** 2)          # crown highlight
+    tips = -0.08 * np.clip((1.30 - z) / 0.25, 0, 1)            # ends a touch deeper
     base = np.array(HAIR_WET_RGB if wet else HAIR_RGB)
-    lum = 1.0 + cols + ring[:, None] * (1.0 + 2.5 * np.clip(cols, 0, None)) + tips[:, None]
+    lum = 1.0 + cols + ring[:, None] * (1.0 + 1.2 * np.clip(cols, 0, None)) + tips[:, None]
     lin = np.clip(base[None, None, :] * lum[..., None], 0, 1)
     lin = lin * (1 + 0.25 * ring[:, None, None] * np.array([0.25, 0.15, 0.0]))   # warm gold in the ring
     srgb_px = np.where(lin <= 0.0031308, lin * 12.92, 1.055 * np.power(lin, 1 / 2.4) - 0.055)
