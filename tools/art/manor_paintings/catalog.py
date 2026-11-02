@@ -61,8 +61,8 @@ w("war_before_treaty", "The War", "landscape", "land", ["library", "store"], "C"
 w("treaty_signed", "The Treaty", "landscape", "land", ["library"], "C",
   "The Treaty ended the War five centuries ago and split the land at the Wall; humans freed. Signing scene [X].",
   major=True, eye="human", age=0.55, time="overcast", season="summer", far="hills", features=["signing"], flowers=0.2, mid_n=6)
-w("wall_raised", "The Wall at First Light", "landscape", "land", ["library", "hall"], "C",
-  "The Wall: invisible and magical, crossable only at gaps (prythian-overview). Painted as a shimmering veil across the land.",
+w("wall_raised", "The Wall at First Light", "landscape", "land", ["library", "hall"], "C?",
+  "The Wall: invisible and magical; creatures slip through it in book 1, so it has breaches (gaps are C?). Painted as a shimmering veil across the land.",
   major=True, age=0.4, time="dawn", season="spring", far="mountains", features=["wall"], wall_k=0.75, trees=["conifer", "round"])
 w("lone_peak", "The Mountain in the Middle", "landscape", "land", ["store", "library"], "C",
   "Ch13 mural, last panel: a snowy range with a mammoth, solitary peak, bald of snow, bald of life. Unnamed.",
@@ -82,7 +82,7 @@ w("high_lord_father", "A High Lord of Spring", "portrait", "port", ["store", "po
   "Tamlin's father: 'a tyrant' who kept slaves (ch19). No description. Hung only in dim rooms; unmasked (before the curse).",
   age=0.5, eye="human", back="storm", sitter=sitter("tamlin", "half", turn=10, mask="none", hair_col=H_HONEY, garment=PLUM, trim=GOLDC, light="rembrandt"))
 w("elder_brothers", "Two Sons of Spring", "portrait", "land", ["store"], "X",
-  "Tamlin's two older brothers, 'just like him' (their father), killed with him by an enemy High Lord (ch19). Stored away.",
+  "Tamlin's two older brothers, 'just like him' (their father), killed with him and their mother by an enemy High Lord (ch19). Stored away.",
   age=0.45, back="storm", pair=[sitter("tamlin", "bust", turn=18, mask="none", hair="lucien", hair_col=H_HONEY, garment=RUBY, light="rembrandt"),
                                 sitter("lucien", "bust", turn=-18, mask="none", hide=["EyeOrb"], hair="tamlin", hair_col=H_GOLD, garment=EMERALD, light="rembrandt")])
 w("youngest_son", "The Youngest Son", "portrait", "port", ["store_secret"], "X",
@@ -102,7 +102,7 @@ w("solstice_wisps", "Solstice Dawn with Will-o'-the-Wisps", "landscape", "land",
   "Ch25: the solstice meadow, will-o'-the-wisps, dancing until sunrise.",
   time="dawn", season="summer", far="hills", features=["dancers"], fire_x=0.5, fire_y=0.72, dancers_n=9, fx=["wisps", "mist"], flowers=0.7)
 w("white_mare", "A White Mare by the Painted Stables", "animal", "land", ["hall", "study", "service"], "C",
-  "Ch9: the pretty, painted stables; Feyre rides a white mare with Lucien.",
+  "The pretty, painted stables (ch8); Feyre rides a white mare with Lucien.",
   time="morning", season="spring", far="hills", flowers=0.6, trees=["blossom"],
   tableau=dict(items=[dict(src="creatures/models/fae/white_horse.gltf", at=[0, 0, 0], yaw=110, tint=[0.86, 0.85, 0.88])],
                cam=dict(at=[1.0, -6.4, 1.4], look=[0, 0, 1.0], lens=45), light="soft", sun=[-0.5, 0.5, -0.6]))
@@ -118,8 +118,8 @@ w("crocus_lambs_roses", "Crocuses, Lambs and Roses", "landscape", "land", ["gall
   tableau=dict(items=[dict(src="creatures/models/spring/lamb.gltf", at=[-1.2, 0, 0], yaw=150), dict(src="creatures/models/spring/lamb.gltf", at=[0.6, -0.6, 0], yaw=230),
                       dict(src="creatures/models/spring/lamb.gltf", at=[1.8, 1.4, 0], yaw=170), dict(src="creatures/models/spring/lamb.gltf", at=[-2.6, 2.2, 0], yaw=200)],
                cam=dict(at=[0, -7, 1.4], look=[0, 0.8, 0.3], lens=42), light="soft", sun=[-0.5, 0.6, -0.6]))
-w("two_boys_birch", "Two Boys under a Birch", "landscape", "square", ["alis"], "X",
-  "Alis is raising her dead sister's two sons (ch16). A small, humble picture in her room.",
+w("two_boys_birch", "Boys under a Birch", "landscape", "square", ["alis"], "X",
+  "Alis's sister and her mate were killed, and Alis cares for her boys (ch22); how many is not said [X]. A small, humble picture in her room [X].",
   pin="svc_alis_room", time="morning", season="spring", far="hills", trees=["birch"], near_trees=[(0.18, "birch")], near_tree_h=0.7,
   features=["strollers"], strollers_n=2, flowers=0.5, eye="human")
 w("summer_envoy", "An Envoy from the Summer Court", "portrait", "port", ["gallery", "portrait", "hall"], "X",
@@ -140,9 +140,18 @@ COURTS = [
     ("day", "Noon in the Day Court", dict(time="noon", season="summer", far="hills", features=["tower"], tower_x=0.6, roof="#e6c068", trees=["round"], fx=["rays"])),
     ("night", "Stars over the Northern Mountains", dict(time="night", season="winter", far="mountains", mount_col="#4a4a7a", trees=["conifer"], flowers=0.0, crescent=True)),
 ]
+COURT_REFS = {
+    "spring": "The ch13 mural paints Spring with trees in bloom, fickle storms and young animals.",
+    "summer": "One of the seven courts on the ch13 mural, 'easy enough to pick out'. The coast placement is [X].",
+    "autumn": "One of the seven courts on the ch13 mural, 'easy enough to pick out'.",
+    "winter": "One of the seven courts on the ch13 mural, 'easy enough to pick out'.",
+    "dawn": "The ch13 mural paints Dawn in 'a softer, redder palate'. The eastern cliffs are [X].",
+    "day": "The ch13 mural paints Day in bright gold and yellow and blue.",
+    "night": "The ch13 mural paints Night as a frozen, mountainous spread of darkness and stars, little eyes and gleaming teeth in its shadows. 'Northern' is [X].",
+}
 for i, (court, title, prm) in enumerate(COURTS):
-    w("court_%s" % court, title, "landscape", "land", ["hall", "corridor", "gallery"], "C?",
-      "One of the seven courts of Prythian (prythian-overview); positions are map lore. Part of a set of seven.", **prm)
+    w("court_%s" % court, title, "landscape", "land", ["hall", "corridor", "gallery"], "C",
+      COURT_REFS[court] + " Part of a set of seven.", **prm)
 
 REGIONS = [
     ("rosewild", "The Rosewild", "reg_rosewild: wild roses spilling from the gardens into the countryside.", dict(time="golden", season="summer", far="hills", flower_cols=["#e8708f", "#f39cb8", "#fde2ea"], flowers=1.3, trees=["round"])),
@@ -373,7 +382,7 @@ for i, (title, model, ref) in enumerate(FAE_FOLK):
 # =================================================================== interiors and festivals
 
 w("masquerade_old", "A Spring Masquerade, Long Ago", "interior", "land", ["mask", "ballroom", "store"], "X",
-  "Before the curse the court wore masks only for a night (ch32). Not Amarantha's masquerade.", major=True, age=0.3, masked=True, dancers=16, petals=True)
+  "Invented pre-curse costume ball [X]; not the masquerade of ch32, whose masks honoured Tamlin's shape-shifting.", major=True, age=0.3, masked=True, dancers=16, petals=True)
 w("ballroom_spring", "The Ballroom in Spring", "interior", "land", ["ballroom", "music", "gallery"], "X",
   "The manor's ballroom in happier days, before the curse and the blight.", masked=False, dancers=14, wall="#e8f2ea", floor="#f2e8dc")
 w("music_salon", "An Evening of Music", "interior", "land", ["music", "bedroom"], "X", "Music in the house [X]: the masked court gathered for an evening's playing.", masked=True, dancers=7, wall="#e8e0f6")
@@ -383,9 +392,9 @@ w("tea_in_conservatory", "Tea in the Conservatory", "interior", "land", ["dining
 
 PLATES = [
     ("suriel", "The Suriel, a Plate", "C", "Ch13-14: tall and corpse-like, veiled tattered robe, lipless mouth, long teeth, milky eyes; caught near young birches and running water."),
-    ("naga", "Naga, a Plate", "C", "Ch15: serpentine males with dark scales, amber almond eyes, silvery forked tongues, black talons."),
+    ("naga", "Naga, a Plate", "C", "Ch15: dark scales, serpentine features on male humanoid bodies, huge almond-shaped eyes, polished black, flesh-shredding talons."),
     ("bogge", "The Bogge: What Is Not to Be Looked At", "C", "Ch9-10: invisible; it becomes real only if you acknowledge it. The plate shows only a darkness."),
-    ("puca", "The Puca, and What It Wears", "C", "Ch10-11: it lures with your own desire; no true form is described. Its shadow is wrong."),
+    ("puca", "The Puca, and What It Wears", "C", "Ch11: it lures with your own desire; no true form is described. Its shadow is wrong."),
     ("faerie", "Lesser Faerie of the Garden", "C", "Ch8: shimmering unseen things in the garden."),
     ("lamb", "The Spring Lamb", "X", "Spring's emblem, as on the mural of Prythian (ch13)."),
     ("stag", "The Stag of the Estate Woods", "X", "The game of the estate woods, where Tamlin and Lucien hunt."),
@@ -406,7 +415,7 @@ BOTANICALS = [
     ("elderflower", "Elderflower", ("maiden_lace", ["#fbf7f0"]), "X"), ("wild_strawberry", "Wild Strawberry", ("daisy", ["#fbfbff"]), "X"),
     ("moonflower", "Moonflower", ("morning_glory", ["#f6f2ff", "#e8e8ff"]), "X"), ("faelight_dandelion", "Faelight Dandelion", ("daisy", ["#fff2a0"]), "X"),
     ("woad", "Woad", ("plume", ["#ffe070"]), "X"), ("madder", "Madder Root", ("daisy", ["#fff6c8"]), "X"),
-    ("snowdrop", "Snowdrop", ("tulip", ["#fbfbff"]), "X"), ("wisteria", "Wisteria", ("plume", ["#b8a8f2", "#c8b6f2"]), "C"),
+    ("snowdrop", "Snowdrop", ("tulip", ["#fbfbff"]), "C"), ("wisteria", "Wisteria", ("plume", ["#b8a8f2", "#c8b6f2"]), "C"),
     ("lilac", "Lilac", ("plume", ["#c8a8e8", "#d8c0f0"]), "C"), ("crab_apple", "Crab Apple", ("daisy", ["#fde2ea", "#f7c6d6"]), "C"),
     ("buttercup", "Meadow Buttercup", ("daisy", ["#ffe060"]), "C"), ("iris", "Amethyst Iris", ("iris", ["#9a7ae0", "#b8a8f2"]), "C"),
     ("crocus", "Crocus", ("tulip", ["#b8a0f0", "#d8c8ff"]), "C"), ("daffodil", "Daffodil", ("daisy", ["#ffe070", "#fff1a8"]), "C"),
@@ -414,6 +423,17 @@ BOTANICALS = [
     ("morning_glory", "Morning Glory", ("morning_glory", ["#8fa0f0", "#b8a8f2"]), "C"), ("goldenrod", "Goldenrod", ("plume", ["#f6c84a"]), "C"),
     ("maidens_lace", "Maiden's Lace", ("maiden_lace", ["#fbf7f0"]), "C"), ("blackberry", "Blackberry", ("daisy", ["#fbfbff"]), "X"),
 ]
+# Where each C plant is in book 1 (the Keeper's check); a plate is C only then.
+BOOK_PLANTS = {
+    "rose_red": "Red roses fill the manor's gardens (book 1). ", "rose_white": "White roses fill the manor's gardens (book 1). ",
+    "wild_hyacinth": "The ch7 breeze is scented with hyacinth ('wild' is [X]). ", "foxglove": "Foxglove, as at the cottage table (book 1). ",
+    "wisteria": "Wisteria, as on her trellis (book 1). ", "lilac": "Lilac in flower (ch9, and the smell of magic in ch23). ",
+    "snowdrop": "Snowdrops (ch6 and the ch18 glen). ", "crab_apple": "'A blossoming crab apple tree' (ch24). ",
+    "buttercup": "The buttercup field (ch8). ", "iris": "She paints 'beds of irises' (ch24). ", "crocus": "Crocuses in the glen (ch18). ",
+    "daffodil": "Daffodils, on the cottage cabinets and in Spring's grounds (book 1). ",
+    "peony": "Peonies, in the ch7 still life. ", "tulip": "Tulips, in the ch7 still life. ", "morning_glory": "Morning glory, in the ch7 still life. ",
+    "goldenrod": "Goldenrod, in the ch7 still life. ", "maidens_lace": "Maiden's lace, in the ch7 still life. ",
+}
 for i, (pid, title, bloom, canon) in enumerate(BOTANICALS):
     extra = {}
     if pid in ("wild_strawberry",):
@@ -422,8 +442,20 @@ for i, (pid, title, bloom, canon) in enumerate(BOTANICALS):
         extra["berries"] = "#3a2440"
     rooms = ["stillroom", "library", "bedroom", "service"] if i % 2 else ["stillroom", "service", "nursery", "library"]
     w("botanical_%s" % pid, "%s, a Botanical Plate" % title, "botanical", "port", rooms, canon,
-      "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_%s). Plate [X]." % pid, bloom=bloom, age=0.2 + 0.1 * (i % 3), eye="human", **extra)
+      (BOOK_PLANTS.get(pid, "") + "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_%s). Plate [X]." % pid), bloom=bloom, age=0.2 + 0.1 * (i % 3), eye="human", **extra)
 
+
+# The Keeper's rule: C means the painting or its exact subject is in the book.
+# A canon category with an invented subject or sitter is X (the note keeps
+# the category). Gallery works carry the ch19 detail: some were painted
+# "through eyes like mine" (human hands), some with "a bend to the world".
+for _e in WORKS:
+    if _e["canon"] == "C" and any(k in _e["ref"] for k in ("Subject invented", "Sitter invented", "Sitters invented", "Figure invented")):
+        _e["canon"] = "X"
+    if _e["id"] == "portrait_08":
+        _e["canon"] = "X"
+    if "gallery" in _e["rooms"] and _e.get("eye") in ("human", "fae"):
+        _e["ref"] += (" Painted through human eyes (ch19)." if _e["eye"] == "human" else " Painted with a fae 'bend to the world' (ch19).")
 
 # Held back from hanging (still listed, never hung) until they reach the bar
 # (quality audit A5: a subject a player can name): bird and small-creature
