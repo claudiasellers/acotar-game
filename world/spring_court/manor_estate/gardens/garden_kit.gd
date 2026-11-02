@@ -62,6 +62,15 @@ static func mirror_water() -> Material:
 	return m
 
 
+## Records how many of each prop a batch placed (meta "props") before it flushes,
+## for the tests.
+static func tag_props(b: GroundsBatch) -> void:
+	var d := {}
+	for id: StringName in b._props:
+		d[id] = (b._props[id] as Array).size()
+	b.root.set_meta(&"props", d)
+
+
 # --- Orientation ---------------------------------------------------------------
 
 ## Yaw that lays a prop's local X (its width) along `dir` (XZ).

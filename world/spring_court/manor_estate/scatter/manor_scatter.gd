@@ -113,6 +113,13 @@ static func specs() -> Dictionary:
 	_d(s, &"deco_wisteria", &"wisteria", "C", 0.3, 150.0)
 	_d(s, &"deco_buttercup", &"meadow_buttercup", "C", 0.6, 110.0)
 	_d(s, &"deco_crab_apple", &"crab_apple", "C", 0.2, 350.0, true)
+	# the garden flowers sit in a few compact gardens spread over the estate, so
+	# they draw in 128 m chunks (fewer, fuller draw calls) however dense they are
+	for id: StringName in s:
+		if String(id).begins_with("deco_rose_") and id != &"deco_rose_pink" and id != &"deco_rose_climbing" or id in GARDEN_WIDE:
+			var tags: PackedStringArray = s[id]["tags"]
+			tags.append("wide")
+			s[id]["tags"] = tags
 	_d(s, &"deco_oak", &"oak", "C", 0.15, 450.0, true)
 	_d(s, &"deco_birch", &"birch", "C", 0.2, 450.0, true)
 	_d(s, &"deco_willow", &"willow", "C", 0.3, 450.0, true)
@@ -120,6 +127,11 @@ static func specs() -> Dictionary:
 	_d(s, &"deco_apple_blossom", &"apple_blossom", "C", 0.2, 350.0, true)
 	_d(s, &"deco_pear_tree", &"pear_tree", "X", 0.2, 350.0, true)
 	return s
+
+
+const GARDEN_WIDE: Array[StringName] = [&"deco_iris", &"deco_snowdrop", &"deco_daffodil", &"deco_hydrangea", &"deco_hydrangea_pink",
+	&"deco_delphinium", &"deco_lupin", &"deco_hollyhock", &"deco_allium", &"deco_catmint", &"deco_foxglove_white", &"deco_foxglove",
+	&"deco_peony_white", &"deco_lilac", &"deco_wisteria", &"deco_buttercup", &"deco_peony"]
 
 
 static func _f(s: Dictionary, id: StringName, look: Array, canon: String, wind: float, draw: float = 120.0) -> void:
@@ -448,7 +460,7 @@ const SPARSE_PER_CHUNK := 12
 ## Trees and sparse layers (fewer than SPARSE_PER_CHUNK instances per 64 m chunk) go in a
 ## second field with 128 m chunks, so a lone feather is not a draw call of its own.
 static func chunk_size_for(l: ScatterLayer) -> float:
-	if l.tags.has("tree"):
+	if l.tags.has("tree") or l.tags.has("wide"):
 		return WIDE_CHUNK
 	var keys := {}
 	for i in l.count():

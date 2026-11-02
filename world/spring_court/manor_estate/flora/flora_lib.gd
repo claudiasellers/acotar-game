@@ -58,7 +58,7 @@ const SPECIES := {
 	&"rose_apricot": [&"bush", 1.2, Color(1.0, 0.72, 0.50)],
 	&"rose_peach": [&"bush", 1.1, Color(1.0, 0.68, 0.60)],
 	&"rose_coral": [&"bush", 1.15, Color(1.0, 0.50, 0.48)],
-	&"rose_mauve": [&"bush", 1.1, Color(0.80, 0.60, 0.88)],
+	&"rose_mauve": [&"bush", 1.12, Color(0.80, 0.60, 0.88)],
 	&"snowdrop": [&"flower", 0.22, Color(0.98, 0.98, 1.0)],
 	&"daffodil": [&"flower", 0.42, Color(1.0, 0.88, 0.38)],
 	&"hydrangea": [&"bush", 1.1, Color(0.66, 0.72, 1.0)],

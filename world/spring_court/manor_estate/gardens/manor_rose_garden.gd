@@ -43,7 +43,7 @@ const EAST_GATE := Vector2(80.0, -152.0)
 const PAVILION := Vector2(62.0, -152.0)
 ## Arbors: [position, yaw]. The one by the house hides the Attor (ch19 anchor).
 ## The cutting beds of the three forage roses (picking roses for the manor's vases).
-const CUTTING_BEDS := [[&"ing_rose_white", Rect2(51.0, -138.0, 16.5, 17.0)], [&"ing_rose_red", Rect2(-72.0, -194.5, 18.0, 14.5)],
+const CUTTING_BEDS := [[&"ing_rose_white", Rect2(51.0, -138.0, 16.5, 16.0)], [&"ing_rose_red", Rect2(-72.0, -194.5, 18.0, 14.5)],
 		[&"ing_rose_gold", Rect2(54.0, -195.5, 18.0, 15.5)]]
 const ARBORS := [[Vector2(-40.0, -105.5), 0.0], [Vector2(40.0, -105.5), 0.0]]
 
@@ -113,6 +113,22 @@ static func rose_mix(colour: StringName) -> StringName:
 	return StringName("deco_rose_" + String(colour)) if rose_layer(colour).begins_with("ing_") else &""
 
 
+## Walks as [polyline, width] (the path graph): the circle's gravel field as its
+## outer ring walk first, then the axis walks, the side-step links and the cross walk.
+static func walks() -> Array:
+	var c := CENTER
+	return [
+		[GardenKit.ring(c, (OUTER_WALK.x + OUTER_WALK.y) * 0.5, 64), OUTER_WALK.y - OUTER_WALK.x],
+		[PackedVector2Array([Vector2(0.0, -103.0), Vector2(0.0, c.y + OUTER_R - 1.0)]), AXIS_W],
+		[PackedVector2Array([Vector2(0.0, c.y - OUTER_R + 1.0), NORTH_GATE + Vector2(0.0, -1.0)]), AXIS_W],
+		[PackedVector2Array([WEST_GATE + Vector2(-1.0, 0.0), Vector2(-OUTER_R + 1.0, c.y)]), AXIS_W],
+		[PackedVector2Array([Vector2(OUTER_R - 1.0, c.y), EAST_GATE + Vector2(1.0, 0.0)]), AXIS_W],
+		[PackedVector2Array([Vector2(-40.0, -103.0), Vector2(-40.0, -108.0), Vector2(-28.0, -118.0)]), 3.0],
+		[PackedVector2Array([Vector2(40.0, -103.0), Vector2(40.0, -108.0), Vector2(28.0, -118.0)]), 3.0],
+		[PackedVector2Array([Vector2(-50.0, -104.0), Vector2(50.0, -104.0)]), 3.0],
+	]
+
+
 # --- Planting (scatter) ----------------------------------------------------------
 
 static func plant(sb: ManorScatter) -> void:
@@ -146,17 +162,20 @@ static func plant(sb: ManorScatter) -> void:
 		GardenKit.fill_sector(sb, &"ing_lavender" if k % 2 == 0 else &"deco_catmint", c, RING_C.y - 1.3, RING_C.y - 0.2, s3.x, s3.y, 1.25, rng, Vector2(0.75, 0.9))
 	# the outer yew wall's herbaceous border (inside faces of W, E and N walls)
 	_border(sb, rng, Vector2(-78.0, -196.0), Vector2(-78.0, -156.0))
-	_border(sb, rng, Vector2(-78.0, -148.0), Vector2(-78.0, -112.0))
+	_border(sb, rng, Vector2(-78.0, -148.0), Vector2(-78.0, -130.0))
 	_border(sb, rng, Vector2(78.0, -196.0), Vector2(78.0, -156.0))
-	_border(sb, rng, Vector2(78.0, -148.0), Vector2(78.0, -98.0))
+	_border(sb, rng, Vector2(78.0, -148.0), Vector2(78.0, -130.0))
 	_border(sb, rng, Vector2(-76.0, -197.5), Vector2(-4.0, -197.5))
 	_border(sb, rng, Vector2(4.0, -197.5), Vector2(76.0, -197.5))
 	_ring_border(sb, rng)
 	# the corners: drifts of hydrangea, peony and foxglove between standard roses
 	for corner: Vector2 in [Vector2(-46.0, -184.0), Vector2(46.0, -184.0), Vector2(-60.0, -122.0)]:
-		GardenKit.drift(sb, &"deco_hydrangea_pink" if corner.x < 0.0 else &"deco_hydrangea", corner, 5.0, 9, rng)
+		var near_terrace := corner.y > SOUTH_ROW_Z
+		var shrub := &"deco_rose_blush" if near_terrace else (&"deco_hydrangea_pink" if corner.x < 0.0 else &"deco_hydrangea")
+		GardenKit.drift(sb, shrub, corner, 5.0, 9, rng)
 		GardenKit.drift(sb, &"deco_peony", corner + Vector2(8.0 * signf(-corner.x), 3.0), 3.5, 7, rng)
-		GardenKit.drift(sb, &"ing_foxglove", corner + Vector2(-6.0 * signf(-corner.x), 6.0), 3.0, 4, rng)
+		if not near_terrace:
+			GardenKit.drift(sb, &"ing_foxglove", corner + Vector2(-6.0 * signf(-corner.x), 6.0), 3.0, 6, rng)
 	# the cutting beds (the white one by the outer walk: the rose_garden_bush anchor faces it)
 	for bed: Array in CUTTING_BEDS:
 		GardenKit.fill_rect(sb, bed[0], bed[1], ROSE_STEP, rng)
@@ -181,6 +200,11 @@ static func plant(sb: ManorScatter) -> void:
 
 ## A deep ring of perennials round the outer walk, in drifts ~5 m long, broken at
 ## the four axes and where the side-step walks come in.
+## The scatter's 128 m chunk row boundary across the garden (z = -128).
+const SOUTH_ROW_Z := -128.0
+const SOUTH_KINDS: Array[StringName] = [&"deco_peony", &"deco_catmint", &"deco_rose_blush", &"deco_peony", &"deco_catmint"]
+
+
 static func _ring_border(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 	const R0 := OUTER_R + 2.0
 	const R1 := OUTER_R + 6.5
@@ -202,7 +226,13 @@ static func _ring_border(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 				if mid > sk.x and mid < sk.y:
 					clear = false
 			if clear:
-				GardenKit.fill_sector(sb, kinds[k % kinds.size()], CENTER, R0, R1, a, b, 1.15, rng, Vector2(0.85, 1.15))
+				# toward the terrace (south of z -128) only the flowers already
+				# planted there, so the ring adds no draw calls in that chunk row
+				var south := false
+				for p: Vector2 in [GardenKit.on_circle(CENTER, R0, a), GardenKit.on_circle(CENTER, R1, a), GardenKit.on_circle(CENTER, R0, b), GardenKit.on_circle(CENTER, R1, b)]:
+					south = south or p.y > SOUTH_ROW_Z - 0.3
+				var id: StringName = SOUTH_KINDS[k % SOUTH_KINDS.size()] if south else kinds[k % kinds.size()]
+				GardenKit.fill_sector(sb, id, CENTER, R0, R1, a, b, 1.15, rng, Vector2(0.85, 1.15))
 				k += 3
 			a = b
 
@@ -251,13 +281,8 @@ static func build(parent: Node3D) -> void:
 		GardenKit.drape_sector(b, c, RING_C.x, RING_C.y, s.x, s.y, mulch, 0.07)
 		GardenKit.edge_sector(b, c, RING_C.x, RING_C.y, s.x, s.y)
 	# axis walks out to the outer wall and the steps
-	b.drape_path(PackedVector2Array([Vector2(0.0, -103.0), Vector2(0.0, c.y + OUTER_R - 1.0)]), AXIS_W, walk, 0.035)
-	b.drape_path(PackedVector2Array([Vector2(0.0, c.y - OUTER_R + 1.0), NORTH_GATE + Vector2(0.0, -1.0)]), AXIS_W, walk, 0.035)
-	b.drape_path(PackedVector2Array([WEST_GATE + Vector2(-1.0, 0.0), Vector2(-OUTER_R + 1.0, c.y)]), AXIS_W, walk, 0.035)
-	b.drape_path(PackedVector2Array([Vector2(OUTER_R - 1.0, c.y), EAST_GATE + Vector2(1.0, 0.0)]), AXIS_W, walk, 0.035)
-	b.drape_path(PackedVector2Array([Vector2(-40.0, -103.0), Vector2(-40.0, -108.0), Vector2(-28.0, -118.0)]), 3.0, walk, 0.035)
-	b.drape_path(PackedVector2Array([Vector2(40.0, -103.0), Vector2(40.0, -108.0), Vector2(28.0, -118.0)]), 3.0, walk, 0.035)
-	b.drape_path(PackedVector2Array([Vector2(-50.0, -104.0), Vector2(50.0, -104.0)]), 3.0, walk, 0.035)
+	for w: Array in walks().slice(1):
+		b.drape_path(w[0], w[1], walk, 0.035)
 	for bed: Array in CUTTING_BEDS:
 		GardenKit.drape_rect(b, bed[1], mulch, 0.07)
 		GardenKit.edging(b, GardenKit.rect_outline(bed[1]))
@@ -315,6 +340,7 @@ static func build(parent: Node3D) -> void:
 			b.prop_on_ground(std[(i + int(corner.y)) % 3], p.x, p.y, i * 1.3)
 	_hedges(b)
 	_north_gate(b)
+	GardenKit.tag_props(b)
 	b.flush()
 	_markers(parent)
 

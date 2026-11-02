@@ -1,6 +1,6 @@
 ## The reflecting pool beyond the rose garden's north gate (canon ch18: a pool
 ## beyond the garden that mirrors the sky), with a cherry allée down both sides,
-## buttercup meadows beyond the trees and a Temple of Love closing the vista
+## flowery meadows beyond the trees and a Temple of Love closing the vista
 ## (allée, meadows and temple are canon:X).
 ##
 ## The canal is level while the ground is not, so it sits in a raised stone
@@ -78,6 +78,7 @@ static func build(parent: Node3D) -> void:
 	_basin(b)
 	_temple(b)
 	_furnish(b)
+	GardenKit.tag_props(b)
 	b.flush()
 
 
@@ -153,25 +154,22 @@ static func plant(sb: ManorScatter) -> void:
 			var x := AXIS_X + side * ALLEE_X
 			sb.put(&"deco_cherry_blossom", x, z, rng.randf() * TAU, rng.randf_range(0.95, 1.1))
 			GardenKit.drift(sb, &"deco_daffodil", Vector2(x + side * 1.5, z + 2.5), 1.8, 7, rng)
-			GardenKit.drift(sb, &"deco_snowdrop", Vector2(x - side * 0.5, z - 2.5), 1.5, 8, rng)
+			if z > -254.0:
+				GardenKit.drift(sb, &"deco_snowdrop", Vector2(x - side * 0.5, z - 2.5), 1.5, 8, rng)
 		z -= ALLEE_STEP
 	# irises along the inner edge of both side walks
 	for side: float in [-1.0, 1.0]:
 		var x := AXIS_X + side * (HALF_W + COPING + 0.9)
 		GardenKit.fill_line(sb, &"deco_iris", PackedVector2Array([Vector2(x, SOUTH_Z - 1.0), Vector2(x, NORTH_Z + 1.0)]), 1.1, rng)
-	# water lilies at both ends of the pool
-	for i in 16:
-		var at_north := i % 2 == 1
-		var lz := (NORTH_Z + rng.randf_range(2.0, 10.0)) if at_north else (SOUTH_Z - rng.randf_range(2.0, 10.0))
+	# water lilies at the near end of the pool
+	for i in 10:
+		var lz := SOUTH_Z - rng.randf_range(2.0, 12.0)
 		sb.put_at(&"deco_water_lily", Vector3(AXIS_X + rng.randf_range(-HALF_W + 1.2, HALF_W - 1.2), wy + 0.02, lz), rng.randf() * TAU)
-	# the buttercup meadows beyond the allée, with daisies
+	# daisy meadows beyond the allée (the deer park's own flower, so no new draw calls)
 	for m: Rect2 in MEADOWS:
-		for i in 26:
+		for i in 22:
 			var c := Vector2(rng.randf_range(m.position.x, m.end.x), rng.randf_range(m.position.y, m.end.y))
-			GardenKit.drift(sb, &"deco_buttercup", c, 3.5, 18, rng)
-		for i in 10:
-			var c := Vector2(rng.randf_range(m.position.x, m.end.x), rng.randf_range(m.position.y, m.end.y))
-			GardenKit.drift(sb, &"deco_daisy", c, 2.5, 8, rng)
-	# a ring of hydrangea and white roses round the temple
-	GardenKit.fill_sector(sb, &"deco_hydrangea", TEMPLE, TEMPLE_R + 2.2, TEMPLE_R + 3.6, PI * 0.62, PI * 2.38, 1.4, rng)
-	GardenKit.fill_sector(sb, &"deco_rose_white", TEMPLE, TEMPLE_R + 3.8, TEMPLE_R + 5.2, PI * 0.62, PI * 2.38, 1.2, rng)
+			GardenKit.drift(sb, &"deco_daisy", c, 3.0, 12, rng)
+	# rings of irises and daffodils round the temple (the allée's own flowers)
+	GardenKit.fill_sector(sb, &"deco_iris", TEMPLE, TEMPLE_R + 2.2, TEMPLE_R + 3.4, PI * 0.62, PI * 2.38, 0.9, rng)
+	GardenKit.fill_sector(sb, &"deco_daffodil", TEMPLE, TEMPLE_R + 3.4, TEMPLE_R + 5.0, PI * 0.62, PI * 2.38, 0.8, rng)

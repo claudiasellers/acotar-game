@@ -83,8 +83,8 @@ static func walks() -> Array:
 		[PackedVector2Array(REAR_PATH), 3.0],
 		[PackedVector2Array(MAZE_PATH), 3.0],
 		# inside the rooms: cross walks from each arch to the room's middle
-		[PackedVector2Array([Vector2(-148.0, -156.0), Vector2(-148.0, -177.0), Vector2(-124.0, -177.0), Vector2(-104.0, -177.0), Vector2(-104.0, -156.0)]), 2.4],
-		[PackedVector2Array([Vector2(-148.0, -148.0), Vector2(-148.0, -123.0), Vector2(-124.0, -123.0), Vector2(-104.0, -123.0), Vector2(-104.0, -148.0)]), 2.4],
+		[PackedVector2Array([Vector2(-148.0, WALK_Z), Vector2(-148.0, -177.0), Vector2(-124.0, -177.0), Vector2(-104.0, -177.0), Vector2(-104.0, WALK_Z)]), 2.4],
+		[PackedVector2Array([Vector2(-148.0, WALK_Z), Vector2(-148.0, -123.0), Vector2(-124.0, -123.0), Vector2(-104.0, -123.0), Vector2(-104.0, WALK_Z)]), 2.4],
 		[PackedVector2Array([Vector2(-104.0, -123.0), Vector2(-104.0, -98.0)]), 2.4],
 	]
 
@@ -102,6 +102,7 @@ static func build(parent: Node3D) -> void:
 	_moon_garden(b)
 	_lamb_lawn(b)
 	_lilac_room(b)
+	GardenKit.tag_props(b)
 	b.flush()
 
 
@@ -254,11 +255,16 @@ static func plant(sb: ManorScatter) -> void:
 
 static func _plant_walk(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 	# alliums and catmint under the pergola, lavender-blue and lilac all the way
+	# (broken where the room arches open off the walk)
+	var stops := [WALK_EAST - 1.0, -101.6, -106.4, -145.6, -150.4, WALK_WEST + 1.0]
 	for side: float in [-1.0, 1.0]:
-		var z := WALK_Z + side * 3.0
-		GardenKit.fill_line(sb, &"deco_catmint", PackedVector2Array([Vector2(WALK_EAST - 1.0, z), Vector2(WALK_WEST + 1.0, z)]), 1.0, rng)
-		var z2 := WALK_Z + side * 3.6
-		GardenKit.fill_line(sb, &"deco_allium", PackedVector2Array([Vector2(WALK_EAST - 1.5, z2), Vector2(WALK_WEST + 1.5, z2)]), 1.6, rng)
+		for k in range(0, stops.size(), 2):
+			var x0: float = stops[k]
+			var x1: float = stops[k + 1]
+			var z := WALK_Z + side * 3.0
+			GardenKit.fill_line(sb, &"deco_catmint", PackedVector2Array([Vector2(x0, z), Vector2(x1, z)]), 1.0, rng)
+			var z2 := WALK_Z + side * 3.6
+			GardenKit.fill_line(sb, &"deco_allium", PackedVector2Array([Vector2(x0 - 0.5, z2), Vector2(x1 + 0.5, z2)]), 1.6, rng)
 	# the pickable wisteria hangs at seven of the piers
 	for i in 7:
 		var x := WALK_EAST - 6.0 - i * 12.0
@@ -267,9 +273,8 @@ static func _plant_walk(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 
 static func _plant_topiary_court(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 	var r: Rect2 = ROOMS[&"topiary_court"]
-	_inner_border(sb, rng, r, [&"deco_tulip_bed", &"deco_peony", &"deco_lupin", &"deco_hydrangea"])
-	GardenKit.fill_sector(sb, &"deco_snowdrop", DOVECOTE, 0.7, 2.4, 0.0, TAU, 0.5, rng)
-	GardenKit.fill_sector(sb, &"deco_iris", DOVECOTE, 1.4, 2.4, 0.0, TAU, 0.9, rng)
+	_inner_border(sb, rng, r, [&"deco_peony", &"deco_lupin", &"deco_catmint", &"deco_lupin"])
+	GardenKit.fill_sector(sb, &"deco_catmint", DOVECOTE, 0.7, 2.4, 0.0, TAU, 0.8, rng)
 
 
 static func _plant_moon_garden(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
@@ -298,10 +303,10 @@ static func _plant_lamb_lawn(sb: ManorScatter, rng: RandomNumberGenerator) -> vo
 	GardenKit.drift(sb, &"deco_foxglove", ALCOVE + Vector2(-2.5, 3.0), 1.6, 9, rng)
 	GardenKit.fill_line(sb, &"deco_foxglove", PackedVector2Array([Vector2(r.end.x - 2.0, r.position.y + 3.0), Vector2(r.end.x - 2.0, ALCOVE.y - 4.0)]), 0.9, rng)
 	GardenKit.fill_line(sb, &"deco_foxglove", PackedVector2Array([Vector2(r.end.x - 2.0, ALCOVE.y + 4.0), Vector2(r.end.x - 2.0, -125.5)]), 0.9, rng)
-	_inner_border(sb, rng, r, [&"deco_foxglove", &"deco_peony", &"deco_lupin", &"deco_catmint", &"deco_peony_white"])
-	# buttercups straying in from the meadow, daisies in the grass round the lambs
+	_inner_border(sb, rng, r, [&"deco_foxglove", &"deco_peony", &"deco_lupin", &"deco_catmint"])
+	# buttercups straying in from the meadow, round the lambs too
 	GardenKit.drift(sb, &"deco_buttercup", Vector2(-162.0, -118.0), 7.0, 60, rng)
-	GardenKit.drift(sb, &"deco_daisy", LAMBS, 5.0, 24, rng)
+	GardenKit.drift(sb, &"deco_buttercup", LAMBS + Vector2(-3.0, 4.0), 4.0, 24, rng)
 	GardenKit.fill_line(sb, &"deco_peony", PackedVector2Array([Vector2(r.position.x + 2.0, r.position.y + 2.0), Vector2(r.end.x - 2.0, r.position.y + 2.0)]), 1.4, rng)
 
 
@@ -359,6 +364,3 @@ static func _plant_meadow(sb: ManorScatter, rng: RandomNumberGenerator) -> void:
 	for i in 70:
 		var c := Vector2(rng.randf_range(m.position.x, m.end.x), rng.randf_range(m.position.y, m.end.y))
 		GardenKit.drift(sb, &"deco_buttercup", c, 4.0, 22, rng)
-	for i in 30:
-		var c := Vector2(rng.randf_range(m.position.x, m.end.x), rng.randf_range(m.position.y, m.end.y))
-		GardenKit.drift(sb, &"deco_daisy", c, 3.0, 10, rng)

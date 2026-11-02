@@ -6,7 +6,7 @@ class_name ManorFrontGarden
 extends RefCounted
 
 ## The east parterre; the west one mirrors it in x.
-const EAST := Rect2(32.0, -30.0, 48.0, 24.0)
+const EAST := Rect2(32.0, -25.0, 48.0, 21.0)
 const WALK := 2.6
 const LIFT_WALK := 0.06
 const LIFT_BED := 0.1
@@ -37,7 +37,9 @@ static func walks() -> Array:
 	for p in parterres():
 		var c := p.get_center()
 		var s := signf(c.x)
-		out.append([PackedVector2Array([Vector2(s * (ManorSitePlan.FORECOURT_RADIUS - 1.0), c.y), Vector2(c.x + s * p.size.x * 0.5, c.y)]), WALK])
+		var r := ManorSitePlan.FORECOURT_RADIUS - 1.0
+		var x0 := sqrt(r * r - c.y * c.y)       # where the walk leaves the forecourt's gravel
+		out.append([PackedVector2Array([Vector2(s * x0, c.y), Vector2(c.x + s * p.size.x * 0.5, c.y)]), WALK])
 		out.append([PackedVector2Array([Vector2(c.x, p.position.y), Vector2(c.x, p.end.y)]), WALK])
 	return out
 
@@ -72,6 +74,7 @@ static func build(parent: Node3D) -> void:
 			b.prop_on_ground(&"rose_standard_white", c.x + side * (p.size.x * 0.25 + WALK * 0.25), p.end.y - 1.2)
 	for w: Array in walks():
 		b.drape_path(w[0], w[1], walk, LIFT_WALK + 0.01)
+	GardenKit.tag_props(b)
 	b.flush()
 
 
