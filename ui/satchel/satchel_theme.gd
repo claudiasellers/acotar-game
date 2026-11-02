@@ -8,6 +8,14 @@ extends RefCounted
 
 const THEME_PATH := "res://ui/theme/acotar_theme.tres"
 const THEME_HUMAN_PATH := "res://ui/theme/acotar_theme_human.tres"
+## The handmade layer (L50): stitched leather tabs, the deckled paper tag,
+## enamel chips and leather key buttons, laid over whichever theme is active.
+## Swap the look by editing this resource or re-running
+## tools/ui/build_satchel_crafted.py; nothing in code names a texture.
+const CRAFTED_PATH := "res://ui/satchel/crafted/satchel_crafted.tres"
+## Cloak weave and watercolour wash used by the 3D cloth (SatchelTable).
+const WEAVE_PATH := "res://ui/satchel/crafted/cloak_weave.png"
+const WASH_PATH := "res://ui/satchel/crafted/wash_bloom.png"
 ## Phases before the wall crossing use the human-realm theme.
 const HUMAN_PHASES: Array[String] = ["p0", "p1"]
 ## type variation -> base type
@@ -18,21 +26,42 @@ const VARIATIONS := {
 	&"SatchelMeter": &"ProgressBar",
 	&"QuickBarSlot": &"PanelContainer", &"QuickBarSlotSelected": &"PanelContainer",
 	&"QuickBarKey": &"Label", &"QuickBarCount": &"Label",
+	&"SatchelChip": &"PanelContainer", &"SatchelKey": &"PanelContainer",
+	&"SatchelKeyLabel": &"Label", &"SatchelWhere": &"Label", &"SatchelPin": &"Label",
 }
 ## Colours read from type "Satchel".
 const COLOR_TYPE := &"Satchel"
 const COLORS: Array[StringName] = [&"ink", &"accent", &"glow", &"rare", &"scrim"]
 
 static var _fallback_theme: Theme = null
+## base theme path -> that theme with the crafted layer merged on top.
+static var _crafted: Dictionary = {}
 
 
+## The page's theme: the shared one with the handmade layer on top.
 static func theme() -> Theme:
 	var path := THEME_HUMAN_PATH if is_human_realm() else THEME_PATH
-	if ResourceLoader.exists(path):
-		return load(path) as Theme
-	if _fallback_theme == null:
-		_fallback_theme = _fallback()
-	return _fallback_theme
+	if not ResourceLoader.exists(path):
+		path = ""
+	if _crafted.has(path):
+		return _crafted[path]
+	var base: Theme
+	if path != "":
+		base = load(path) as Theme
+	else:
+		if _fallback_theme == null:
+			_fallback_theme = _fallback()
+		base = _fallback_theme
+	var out := base
+	if ResourceLoader.exists(CRAFTED_PATH):
+		out = base.duplicate() as Theme
+		out.merge_with(load(CRAFTED_PATH) as Theme)
+	_crafted[path] = out
+	return out
+
+
+static func texture(path: String) -> Texture2D:
+	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
 static func is_human_realm() -> bool:

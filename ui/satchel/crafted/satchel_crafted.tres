@@ -1,0 +1,98 @@
+[gd_resource type="Theme" load_steps=13 format=3]
+
+[ext_resource type="Texture2D" path="res://ui/satchel/crafted/tab_leather.png" id="1_tab"]
+[ext_resource type="Texture2D" path="res://ui/satchel/crafted/tab_leather_on.png" id="2_tabon"]
+[ext_resource type="Texture2D" path="res://ui/satchel/crafted/tag_paper.png" id="3_tag"]
+[ext_resource type="Texture2D" path="res://ui/satchel/crafted/chip_enamel.png" id="4_chip"]
+[ext_resource type="Texture2D" path="res://ui/satchel/crafted/key_leather.png" id="5_key"]
+[ext_resource type="FontFile" path="res://ui/title/fonts/EBGaramond-MediumItalic.ttf" id="6_italic"]
+
+[sub_resource type="StyleBoxTexture" id="tab"]
+texture = ExtResource("1_tab")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 25.0
+texture_margin_bottom = 25.0
+content_margin_left = 22.0
+content_margin_top = 13.0
+content_margin_right = 25.0
+content_margin_bottom = 17.0
+
+[sub_resource type="StyleBoxTexture" id="tab_on"]
+texture = ExtResource("2_tabon")
+texture_margin_left = 22.0
+texture_margin_top = 22.0
+texture_margin_right = 25.0
+texture_margin_bottom = 25.0
+content_margin_left = 22.0
+content_margin_top = 13.0
+content_margin_right = 25.0
+content_margin_bottom = 17.0
+
+[sub_resource type="StyleBoxTexture" id="tag"]
+texture = ExtResource("3_tag")
+texture_margin_left = 44.0
+texture_margin_top = 40.0
+texture_margin_right = 30.0
+texture_margin_bottom = 30.0
+content_margin_left = 34.0
+content_margin_top = 38.0
+content_margin_right = 32.0
+content_margin_bottom = 30.0
+
+[sub_resource type="StyleBoxTexture" id="chip"]
+texture = ExtResource("4_chip")
+texture_margin_left = 17.0
+texture_margin_top = 17.0
+texture_margin_right = 17.0
+texture_margin_bottom = 17.0
+content_margin_left = 12.0
+content_margin_top = 3.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxTexture" id="key"]
+texture = ExtResource("5_key")
+texture_margin_left = 23.0
+texture_margin_top = 22.0
+texture_margin_right = 26.0
+texture_margin_bottom = 26.0
+content_margin_left = 18.0
+content_margin_top = 13.0
+content_margin_right = 21.0
+content_margin_bottom = 17.0
+
+[sub_resource type="StyleBoxEmpty" id="none"]
+
+[resource]
+SatchelTab/base_type = &"Button"
+SatchelTab/colors/font_color = Color(0.98, 0.93, 0.84, 1)
+SatchelTab/colors/font_hover_color = Color(1, 0.97, 0.9, 1)
+SatchelTab/colors/font_focus_color = Color(1, 0.97, 0.9, 1)
+SatchelTab/colors/font_pressed_color = Color(1, 0.98, 0.94, 1)
+SatchelTab/colors/font_hover_pressed_color = Color(1, 0.98, 0.94, 1)
+SatchelTab/colors/font_outline_color = Color(0.35, 0.18, 0.2, 0.55)
+SatchelTab/constants/outline_size = 2
+SatchelTab/styles/normal = SubResource("tab")
+SatchelTab/styles/hover = SubResource("tab_on")
+SatchelTab/styles/pressed = SubResource("tab_on")
+SatchelTab/styles/hover_pressed = SubResource("tab_on")
+SatchelTab/styles/focus = SubResource("none")
+SatchelTab/styles/disabled = SubResource("tab")
+SatchelDetail/base_type = &"PanelContainer"
+SatchelDetail/styles/panel = SubResource("tag")
+SatchelChip/base_type = &"PanelContainer"
+SatchelChip/styles/panel = SubResource("chip")
+SatchelKey/base_type = &"PanelContainer"
+SatchelKey/styles/panel = SubResource("key")
+SatchelKeyLabel/base_type = &"Label"
+SatchelKeyLabel/colors/font_color = Color(0.98, 0.93, 0.84, 1)
+SatchelKeyLabel/font_sizes/font_size = 16
+SatchelWhere/base_type = &"Label"
+SatchelWhere/font_sizes/font_size = 18
+SatchelWhere/fonts/font = ExtResource("6_italic")
+SatchelCount/base_type = &"Label"
+SatchelCount/styles/normal = SubResource("chip")
+SatchelPin/base_type = &"Label"
+SatchelPin/font_sizes/font_size = 14
+SatchelPin/styles/normal = SubResource("chip")
