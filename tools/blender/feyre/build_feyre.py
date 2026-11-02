@@ -1008,7 +1008,7 @@ def ring_fit(grid, z, n, cy=0.0, rmax=0.36):
     return np.array(out)
 
 
-def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra=None, neckline=False):
+def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra=None, neckline=False, rim_z=None):
     """Garment shell: copy body faces, subdivide (smooth), then push out along normals."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
@@ -1058,6 +1058,8 @@ def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra
     decimate_to(obj, max_tris)
     if neckline:
         neat_neckline(obj, base_P, body, offset_fn)
+    if rim_z is not None:          # a top edge cut by the region filter (boots): same cure as the collar
+        neat_neckline(obj, base_P, body, offset_fn, z_min=rim_z, iters=40)
     for p in obj.data.polygons:
         p.use_smooth = True
     return obj
@@ -1362,7 +1364,7 @@ def main():
         "hunter_boots", body, P,
         lambda f: face_region(f) == "feet" or (face_region(f) == "legs" and centre(f).z < 0.36),
         lambda co: 0.008 + 0.002 * (co.z > 0.2),
-        3990, make_material("boots_leather", srgb("#8E6A6E"), 0.5))
+        3990, make_material("boots_leather", srgb("#8E6A6E"), 0.5), rim_z=0.2)
     bme = boots.data
     bP = verts_np(bme)
     bP[:, 2] = np.where(bP[:, 2] < 0.012, np.maximum(bP[:, 2], 0.0) * 0.3, bP[:, 2])
