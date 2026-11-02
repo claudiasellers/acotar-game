@@ -62,12 +62,16 @@ var _heard: Array = []
 var _out := "/tmp/dialogue_tour.json"
 ## --from=<stop name> starts the tour there (to rerun the tail of a long tour).
 var _from := ""
+## --only=<stop name> visits just that stop.
+var _only := ""
 
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			_out = a.trim_prefix("--out=")
+		elif a.begins_with("--only="):
+			_only = a.trim_prefix("--only=")
 		elif a.begins_with("--from="):
 			_from = a.trim_prefix("--from=")
 	_run.call_deferred()
@@ -90,6 +94,8 @@ func _run() -> void:
 	var started := _from == ""
 	for stop in stops:
 		started = started or stop["name"] == _from
+		if _only != "" and stop["name"] != _only:
+			continue
 		if started:
 			await _visit(stop)
 	_finish("")
@@ -148,6 +154,10 @@ func _visit(stop: Dictionary) -> void:
 		if not is_instance_valid(node):
 			continue
 		standing.append(String(node.get_meta(&"speaker", node.name)))
+		var at3 := (node as Node3D).global_position if node is Node3D else Vector3.ZERO
+		if stop.has("anchor") and presence._find_anchor(stop["anchor"]):
+			at3 = presence._find_anchor(stop["anchor"]).global_transform.affine_inverse() * at3
+		print("TOUR   %s at %s" % [node.name, at3])
 		bad.append_array(_primitives(node))
 	var speakers := {}
 	for h in _heard:

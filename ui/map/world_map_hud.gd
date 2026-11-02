@@ -52,6 +52,8 @@ var _look_timer: float = 0.0
 var _nodes_timer: float = 0.0
 var _look_cursor: int = 0
 var _paint_thread: Thread
+## Where the baked map is read from (tests point it somewhere empty).
+static var bake_path: String = MapArt.BAKE_PATH
 ## Shared with the fallback paint thread: set to stop it on quit.
 var _paint_cancel: Array = [false]
 
@@ -344,19 +346,25 @@ func stats_line() -> String:
 # --- Map art -------------------------------------------------------------------
 
 func _load_bake() -> void:
-	var bake := load(MapArt.BAKE_PATH) as MapBake if ResourceLoader.exists(MapArt.BAKE_PATH) else null
+	var bake := load(bake_path) as MapBake if ResourceLoader.exists(bake_path) else null
 	if bake and bake.image and not bake.image.is_empty():
 		var img := bake.image.duplicate() as Image
 		img.generate_mipmaps()
 		map_texture = ImageTexture.create_from_image(img)
 		_add_baked_landmarks(bake.landmarks)
 		return
-	push_warning("WorldMapHud: no baked map at %s (run tools/generators/world_map.gd); painting a coarse one" % MapArt.BAKE_PATH)
+	push_warning("WorldMapHud: no baked map at %s (run tools/generators/world_map.gd); painting a coarse one" % bake_path)
 	var blank := Image.create(8, 10, false, Image.FORMAT_RGB8)
 	blank.fill(MapArt.PAPER)
 	map_texture = ImageTexture.create_from_image(blank)
+	# F37: everything that loads (tree scatter, court meshes, height data) is
+	# gathered here on the main thread; the paint thread only does arithmetic.
+	# A load on that thread held CourtAssets' lock while waiting on the main
+	# thread, which was waiting on the same lock: the game froze.
+	WorldHeight.warm_up()
+	var trees := MapArt.tree_points()
 	_paint_thread = Thread.new()
-	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false, _paint_cancel))
+	_paint_thread.start(func() -> Image: return MapArt.build(MapArt.FALLBACK_METRES_PER_PIXEL, false, _paint_cancel, trees))
 	_wait_for_paint.call_deferred()
 	_add_baked_landmarks(MapArt.scatter_landmarks())
 

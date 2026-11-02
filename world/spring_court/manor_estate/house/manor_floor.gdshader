@@ -1,7 +1,7 @@
 // Manor floors other than the Rococo lozenge marble (L38, quality audit A2):
 // painted in world space so every room sharing a pattern and palette shares
-// one material. pattern: 0 chevron parquet, 1 square checker marble (the
-// foyer's canon black and white), 2 small glazed tiles, 3 long pale boards
+// one material. pattern: 0 chevron parquet, 1 checker marble laid on point
+// (the foyer's canon black and white), 2 small glazed tiles, 3 long pale boards
 // (the gallery, canon), 4 stone flags.
 shader_type spatial;
 render_mode cull_back;
@@ -43,6 +43,10 @@ void fragment() {
 	vec3 col = base.rgb;
 	float j = 1.0;
 	float rough = 0.5;
+	float joint_rough = 0.85;
+	float joint_metal = 0.0;
+	float coat_k = 1.0;
+	float spec = 0.45;
 	if (pattern == 0) {
 		// chevron parquet (point de Hongrie): 0.5 m columns of 45-degree planks,
 		// alternating direction column to column
@@ -57,14 +61,33 @@ void fragment() {
 		j = min(edge_mask(vec2(lx, 0.5), 0.006), edge_mask(vec2(0.5, fract(along)), 0.04));
 		rough = 0.45;
 	} else if (pattern == 1) {
-		vec2 cell = floor(p / 0.75);
-		vec2 f = fract(p / 0.75);
-		float checker = mod(cell.x + cell.y, 2.0);
-		col = mix(base.rgb, alt.rgb, checker);
-		float vein = noise(p * 2.3 + cell * 3.7) * 0.6 + noise(p * 7.1) * 0.4;
-		col *= mix(0.93, 1.04, smoothstep(0.35, 0.8, vein));
-		j = edge_mask(f, 0.008);
-		rough = 0.18;
+		// the foyer's canon black-and-white marble, laid on point: 0.85 m
+		// squares turned 45 degrees, ivory with soft grey veins and nero with
+		// fine white veins, set in a gilt fillet (audit G1: a square grid of
+		// flat navy and white read as a diner floor)
+		vec2 q = vec2(p.x + p.y, p.y - p.x) * 0.70710678 / 0.85;
+		vec2 cell = floor(q);
+		vec2 f = fract(q);
+		float dark = mod(cell.x + cell.y, 2.0);
+		vec2 w = q * 0.85 + cell * 5.3;
+		float warp = noise(w * 1.1) * 2.2 + noise(w * 3.3) * 0.9;
+		float vein = 1.0 - smoothstep(0.0, 0.07, abs(sin(w.x * 1.6 + w.y * 0.7 + warp * 2.6)));
+		float fine = 1.0 - smoothstep(0.0, 0.035, abs(sin(w.x * 4.1 - w.y * 2.3 + warp * 4.0)));
+		float cloud = noise(w * 0.8) * 0.6 + noise(w * 2.7) * 0.4;
+		vec3 ivory = base.rgb * mix(0.96, 1.02, cloud);
+		ivory = mix(ivory, vec3(0.70, 0.67, 0.64), vein * 0.32 + fine * 0.12);
+		vec3 nero = alt.rgb * mix(0.85, 1.15, cloud);
+		nero = mix(nero, vec3(0.80, 0.78, 0.74), vein * 0.45 + fine * 0.22);
+		col = mix(ivory, nero, dark);
+		j = edge_mask(f, 0.012);
+		// the fillet is brass, not grout
+		joint_rough = 0.32;
+		joint_metal = 0.85;
+		// the dark squares are honed, not lacquered: a polished black mirrors the
+		// lilac sky and reads navy (shots L38-10)
+		coat_k = mix(1.0, 0.0, dark);
+		spec = mix(0.45, 0.12, dark);
+		rough = mix(0.16, 0.5, dark);
 	} else if (pattern == 2) {
 		vec2 cell = floor(p / 0.3);
 		vec2 f = fract(p / 0.3);
@@ -93,8 +116,9 @@ void fragment() {
 		rough = 0.8;
 	}
 	ALBEDO = mix(joint.rgb, col, j);
-	ROUGHNESS = mix(0.85, rough * (1.0 - gloss * 0.5), j);
-	SPECULAR = 0.45;
-	CLEARCOAT = gloss * j;
+	ROUGHNESS = mix(joint_rough, rough * (1.0 - gloss * 0.5), j);
+	METALLIC = (1.0 - j) * joint_metal;
+	SPECULAR = spec;
+	CLEARCOAT = gloss * j * coat_k;
 	CLEARCOAT_ROUGHNESS = 0.25;
 }

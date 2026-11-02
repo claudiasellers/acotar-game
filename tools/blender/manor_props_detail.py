@@ -172,8 +172,10 @@ def cloth_lid(p, x, y, z, r, col, tie=CREAM):
 
 
 def apple(p, m, r, col, rng, leafy=False):
-    p.add(lathe([(0, r * 0.12), (r * 0.5, 0), (r * 0.95, r * 0.35), (r, r * 0.72), (r * 0.72, r * 1.06), (r * 0.25, r * 1.0),
-                 (0, r * 0.86)], 9), col, "satin", m)
+    # shallow dimples top and bottom: a deep closing fan reads as a tip turned
+    # against its surface (test_lathe_tips)
+    p.add(lathe([(0, r * 0.04), (r * 0.5, 0), (r * 0.95, r * 0.35), (r, r * 0.72), (r * 0.72, r * 1.06), (r * 0.25, r * 1.0),
+                 (0, r * 0.97)], 9), col, "satin", m)
     p.add(tube([(0, 0, r * 0.88), (r * 0.06, 0, r * 1.15), (r * 0.14, 0, r * 1.25)], r * 0.05, 3), BARK, "matte", m)
     if leafy:
         p.add(leaf(r * 0.9, r * 0.45), LEAF, "leaf", m @ T(r * 0.08, 0, r * 1.1) @ R("Y", -15))
@@ -312,7 +314,7 @@ def lily(p, c, r, col, facing=None, throat=BLUSH):
     for i in range(6):
         p.add(petal(r * 1.6, r * 0.55, cup=0.18, curl=-0.55), col if i % 2 else lighter(col, 0.1), "fabric",
               m @ R("Z", 60 * i + 15) @ R("Y", -58))
-    p.add(lathe([(0, 0), (r * 0.2, r * 0.15), (r * 0.32, r * 0.55), (0, r * 0.4)], 6), throat, "fabric", m)
+    p.add(lathe([(0, 0), (r * 0.2, r * 0.15), (r * 0.32, r * 0.55), (r * 0.12, r * 0.46), (0, r * 0.46)], 6), throat, "fabric", m)
     for i in range(3):
         a = math.radians(120 * i + 40)
         tip = (r * 0.35 * math.cos(a), r * 0.35 * math.sin(a), r * 1.15)

@@ -200,14 +200,15 @@ static func _dining_hall(f: ManorFurnisher) -> void:
 	f.fit_wall("w", 15.6, &"cabinet_curio")
 	f.art("w", 4.6, &"painting_medium", 3.0, 0.9)
 	f.art("w", 15.6, &"painting_medium", 3.0, 0.9)
-	var cart := f.at(&"tea_cart", 2.6, 7.4, -90)
+	# a pier commode by the hall door, for the service
+	var cart := f.fit_wall("w", 7.6, &"commode_serpentine")
 	# between the corridor door and the table: a round table with a great
-	# arrangement, dumbwaiters either side for the service; a pair of urns on
-	# the garden side
+	# arrangement, a serving trolley either side of it (the "dumbwaiter" prop is
+	# the service shaft, not a stand: audit G2); a pair of urns on the garden side
 	var ft := f.at(&"hall_table_round", 11.0, 5.9)
 	f.set_on(ft, [&"urn_hydrangea_white"])
-	f.at(&"dumbwaiter", 7.4, 6.3)
-	f.at(&"dumbwaiter", 14.6, 6.3)
+	var tc1 := f.at(&"tea_cart", 7.4, 6.3, 180)
+	var tc2 := f.at(&"tea_cart", 14.6, 6.3, 180)
 	f.at(&"urn_flowers", 8.0, 15.4)
 	f.at(&"urn_flowers", 14.0, 15.4)
 	f.at(&"statue_maiden", 4.6, 15.8)
@@ -235,7 +236,7 @@ static func _dining_hall(f: ManorFurnisher) -> void:
 	f.fit_wall("e", 2.0, &"bust_pedestal")
 	f.fit_wall("e", 18.2, &"plant_stand_fern")
 	f.hang("e", 18.2, &"wall_shelf_curios", 2.0)
-	_dress(f, [sb1, sb2, pier, cart, bt, tt, ft, fs1, fs2], &"dining", 3)
+	_dress(f, [sb1, sb2, pier, cart, bt, tt, ft, fs1, fs2, tc1, tc2], &"dining", 3)
 	f.dress_all(&"dining", 2)
 	f.mantel(&"dining")
 	f.hang("e", 2.0, &"wall_clock_sunburst", 2.3)
@@ -605,8 +606,9 @@ static func _feyre_bedroom(f: ManorFurnisher) -> void:
 	# a sofa at the bed's foot facing the fire, clear of where Alis finds her (z 13.6)
 	var fire := f.seating(6.9, 11.2, -90, &"sofa", &"chair_bergere")
 	f.at(&"ottoman_tufted", 8.3, 11.2)
-	# her books on a low case behind the sofa, a reading chair by the fire, a gown on its form
-	f.at(&"bookcase_low", 4.85, 11.2, 90)
+	# a sofa table along its back with her books and a lamp (a case standing
+	# free there faced nowhere: audit G2), a reading chair by the fire, a gown on its form
+	var st := f.at(&"console_gilt", 5.05, 11.2, 90)
 	f.at(&"armchair", 12.5, 7.6, -120)
 	f.at(&"mannequin_gown", 4.4, 17.8, 20)
 	f.at(&"footstool_velvet", 11.7, 8.4, -30)
@@ -647,7 +649,7 @@ static func _feyre_bedroom(f: ManorFurnisher) -> void:
 	f.at(&"hatbox_stack", 13.3, 18.9)
 	f.art("w", 7.9, &"painting_medium", 2.0)
 	f.art("e", 18.3, &"painting_small", 1.9, 1.2)
-	_dress(f, [tr, tea, cm, bs1, bs2, pt] + fire, &"bedroom", 3)
+	_dress(f, [tr, tea, cm, bs1, bs2, pt, st] + fire, &"bedroom", 3)
 	f.dress_all(&"bedroom", 2)
 	_wall_accents(f, &"cosy")
 	_wall_accents(f, &"grand")

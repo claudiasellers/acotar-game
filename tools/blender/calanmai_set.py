@@ -50,6 +50,10 @@ PASTRY = K.hexc("#E9BE7A")
 WHITE_ROSE = K.hexc("#FBF6EE")
 WHITE_ROSE_SH = K.hexc("#EFE3DA")
 STEM = K.hexc("#6C9A64")
+RIVER_STONE = K.hexc("#4F4A4C")  # the cave's campfire ring: dark, wet river stones
+RIVER_STONE_LT = K.hexc("#6B6461")
+BARK = K.hexc("#3E2F25")
+CHAR_DK = K.hexc("#262024")
 
 SIZES = {
     "calanmai_pyre": (4.2, 5.6, 4.2),
@@ -58,6 +62,7 @@ SIZES = {
     "kitchen_apple": (0.08, 0.09, 0.08),
     "kitchen_lemon_tart": (0.13, 0.05, 0.13),
     "white_roses_vase": (0.34, 0.62, 0.34),
+    "calanmai_campfire": (1.05, 0.38, 1.05),
 }
 
 
@@ -177,9 +182,44 @@ def white_roses_vase(p):
         p.add(K.leaf(0.04, 0.018), STEM, "leaf", T(*[c * 0.9 for c in top[:2]], top[2] - 0.08) @ R("Z", math.degrees(a)) @ R("Y", 60))
 
 
+def campfire(p):
+    """The three's fire in the cave [X]: a ring of dark river stones, a small
+    lean-to of split logs charred at the tips, a bed of embers under them.
+    The flame itself is CalanmaiFire's cards; this is what it burns."""
+    rng = random.Random(2003)
+    for i in range(11):                          # the ring, stones of uneven size
+        a = 2 * math.pi * i / 11 + rng.uniform(-0.1, 0.1)
+        s = 0.11 * rng.uniform(0.75, 1.3)
+        col = RIVER_STONE if i % 3 else RIVER_STONE_LT
+        p.add(sphere(s, 9, 6), col, "matte",
+              T(math.cos(a) * 0.56, math.sin(a) * 0.56, s * 0.2) @ R("Z", math.degrees(a) + rng.uniform(-20, 20))
+              @ S(1.5, 1.0 + rng.uniform(-0.15, 0.2), 0.6))
+    p.add(lathe([(0.0, 0.0), (0.44, 0.0), (0.4, 0.04), (0.22, 0.07), (0.0, 0.08)], 14), CHAR, "matte")
+    for i in range(12):                          # live embers in the bed
+        a = rng.uniform(0, 2 * math.pi)
+        r = rng.uniform(0.0, 0.3)
+        p.add(sphere(rng.uniform(0.025, 0.045), 6, 4), EMBER, "glow", T(math.cos(a) * r, math.sin(a) * r, 0.07))
+    for i in range(7):                           # split logs leaning in, charred where they meet
+        a = 2 * math.pi * i / 7 + rng.uniform(-0.12, 0.12)
+        r0 = 0.42 + rng.uniform(-0.04, 0.04)
+        base = (math.cos(a) * r0, math.sin(a) * r0, 0.05)
+        mid = (math.cos(a) * r0 * 0.45, math.sin(a) * r0 * 0.45, 0.22)
+        tip = (math.cos(a + 0.4) * 0.05, math.sin(a + 0.4) * 0.05, 0.36 + rng.uniform(-0.03, 0.04))
+        rad = 0.045 + rng.uniform(-0.008, 0.01)
+        p.add(tube([base, mid], rad, 7), BARK, "matte")
+        p.add(tube([mid, tip], rad * 0.85, 7), CHAR_DK, "matte")
+        p.add(sphere(rad * 0.7, 6, 4), EMBER, "glow", T(*mid))
+    for i in range(2):                           # two logs laid across the ring, burnt through in the middle
+        a = 0.9 + i * 1.9
+        d = (math.cos(a), math.sin(a), 0.0)
+        p.add(tube([(-d[0] * 0.5, -d[1] * 0.5, 0.06), (-d[0] * 0.08, -d[1] * 0.08, 0.1)], 0.05, 7), BARK, "matte")
+        p.add(tube([(d[0] * 0.12, d[1] * 0.12, 0.09), (d[0] * 0.5, d[1] * 0.5, 0.06)], 0.05, 7), BARK, "matte")
+
+
 BUILDERS = {
     "calanmai_pyre": pyre, "calanmai_pyre_ash": pyre_ash, "laurel_crown": laurel_crown,
     "kitchen_apple": apple, "kitchen_lemon_tart": lemon_tart, "white_roses_vase": white_roses_vase,
+    "calanmai_campfire": campfire,
 }
 
 
