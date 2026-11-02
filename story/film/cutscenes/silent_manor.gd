@@ -30,7 +30,9 @@ const FEYRE_SIT := Vector3(50.55, 0.0, -58.85)
 const FEYRE_STAND := Vector3(50.3, 0.0, -58.3)
 const SATCHEL_AT := Vector3(49.25, 0.9, -60.25)
 const STEPS_IN := Vector3(0.0, 0.0, -70.6)
-const STEPS_OUT := Vector3(0.0, 0.0, -75.4)
+## Out past the terrace's orange-tree tub (site plan: x 0, z -74.5, straight
+## out of the door), not into it: she stood stuck behind it, hidden by its leaves.
+const STEPS_OUT := Vector3(2.6, 0.0, -76.8)
 
 var alis: Node3D
 var hood: Node3D
