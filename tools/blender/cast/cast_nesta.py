@@ -32,7 +32,7 @@ SHAPE = dict(
     # rests cool and still, a small pointed chin.  Canon: her face is their mother's, "so cold and
     # unrelenting" (ch5); "beautiful, imperious, still as one of the High Fae" (ch31).
     eye_r=0.0214, eye_open_up=31.0, eye_open_lo=24.0, eye_tilt=13.0, eye_open_w=66.0,
-    eye_dx=0.0022, cut_reach=0.014, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
+    eye_dx=0.0022, cut_reach=0.016, cut_soft=0.005, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
     cheeks=0.62, cheekbones=0.55, cheek_lift=0.003, jaw=0.0, jaw_w=0.90, chin=0.88, chin_drop=-0.003,
     chin_point=0.75, brow=0.0, nose=0.82, nose_w=0.85, nose_up=0.25, nose_bridge=0.0,
     lips=1.16, lip_upper=0.98, lip_lower=1.0, lip_w=1.32, lip_bow=1.0, smile=-0.15,
