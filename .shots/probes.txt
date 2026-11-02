@@ -1,0 +1,6 @@
+from L32 village after v2
+quality look
+size 1920x1080
+timeout 600
+shot village res://tools/world_shot.tscn village_market {out}/village_market.png
+shot cottage res://tools/world_shot.tscn cottage_snow {out}/cottage_snow.png
