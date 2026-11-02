@@ -86,10 +86,10 @@ func fits(spot: PresenceSpot) -> bool:
 	if not spot.fits_hour(Clock.hour()):
 		return false
 	for f in spot.require_flags:
-		if not WorldState.has_flag(f):
+		if not DialogueDirector.truthy(WorldState.get_flag(f)):
 			return false
 	for f in spot.forbid_flags:
-		if WorldState.has_flag(f):
+		if DialogueDirector.truthy(WorldState.get_flag(f)):
 			return false
 	if spot.speaker in STAGED:
 		if StoryControl.mode != StoryControl.Mode.FULL:

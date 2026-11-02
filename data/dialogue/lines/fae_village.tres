@@ -745,21 +745,21 @@ script = ExtResource("2")
 id = &"great_lantern_tree"
 region = &"fae_village"
 at = Vector2(-990.0, -905.0)
-radius = 25.300000190734863
+radius = 22.8
 
 [sub_resource type="Resource" id="P1"]
 script = ExtResource("2")
 id = &"lantern_bridge"
 region = &"fae_village"
 at = Vector2(-1052.0, -855.0)
-radius = 24.300000190734863
+radius = 22.8
 
 [sub_resource type="Resource" id="P2"]
 script = ExtResource("2")
 id = &"village_mill"
 region = &"fae_village"
 at = Vector2(-1150.0, -950.0)
-radius = 19.0
+radius = 18.0
 
 [sub_resource type="Resource" id="P3"]
 script = ExtResource("2")
@@ -780,14 +780,14 @@ script = ExtResource("2")
 id = &"market"
 region = &"fae_village"
 at = Vector2(-940.0, -880.0)
-radius = 29.5
+radius = 28.0
 
 [sub_resource type="Resource" id="P6"]
 script = ExtResource("2")
 id = &"cottages"
 region = &"fae_village"
 at = Vector2(-1000.0, -820.0)
-radius = 34.7
+radius = 33.2
 
 [resource]
 script = ExtResource("3")

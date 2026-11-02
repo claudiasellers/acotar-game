@@ -23,7 +23,7 @@ COATS = {
     # at a distance. Long, shaggy, starved: ribs show through.
     "great_wolf": dict(shells=6, params=dict(
         coat=col((0.24, 0.24, 0.27)), pale=col((0.62, 0.59, 0.52)), dark=col((0.06, 0.06, 0.07)),
-        tip=col((0.74, 0.76, 0.8)), mouth=col((0.22, 0.04, 0.05)), tip_amount=0.65,
+        tip=col((0.74, 0.76, 0.8)), mouth=col((0.34, 0.06, 0.07)), tip_amount=0.7, sheen=0.45,
         fur_length=0.075, density=70.0, droop=0.4, comb=0.6, streak=0.55, rib_depth=0.55, rib_spacing=0.085,
         rim_amount=0.55, roughness_fur=0.8)),
     # The opening doe, winter coat [X]: grey-brown back, warmer flank, white
