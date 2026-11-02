@@ -1,0 +1,6 @@
+{"id":"L35-1","scene":"world","time_of_day":0.5,"quality":"full","size":[1920,1080],
+"shots":[
+ {"name":"terrace_over_rose_garden","eye":[0,16,-86],"at":[0,8,-160],"fov":65},
+ {"name":"wisteria_walk","eye":[-79,8.2,-151.5],"at":[-120,9.8,-152],"fov":65},
+ {"name":"front_parterre_from_drive","eye":[8,10,30],"at":[50,8.3,-14],"fov":65}
+],"checks":[]}
