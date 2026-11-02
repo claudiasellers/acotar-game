@@ -1,0 +1,7 @@
+from L53 market
+quality look
+size 1920x1080
+timeout 400
+shot road res://tools/market/market_shot.tscn road {out}/market_road.png
+shot square res://tools/market/market_shot.tscn stall {out}/market_square.png
+shot menu res://tools/market/market_shot.tscn menu {out}/market_menu.png
