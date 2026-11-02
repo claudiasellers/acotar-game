@@ -152,6 +152,8 @@ func _shot(shot: Dictionary, headless: bool) -> Dictionary:
 		r.error = "no shot_frame marker '%s'" % shot.frame
 		return r
 	await _stream_to(_cam.global_position)
+	if _world != null and shot.grade == &"":
+		_apply_region_grade(_cam.global_position)
 	var vp := get_tree().root
 	ShotQuality.apply(shot.quality, vp, _root, shot.size)
 	await get_tree().process_frame
@@ -220,3 +222,16 @@ func _fail(code: int, msg: String) -> void:
 		_results.error = msg
 		_write_results()
 	get_tree().quit(code)
+
+
+## With no "grade" in the request, show what a player standing at the camera
+## would see: the RegionGrade there (the manor, a court region), not the
+## World's start grade. Without this a Spring view rendered in human_winter
+## (snow on the roses, grey sky) and read as the region's look.
+func _apply_region_grade(pos: Vector3) -> void:
+	for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
+		var rg := node as RegionGrade
+		if rg != null and rg.contains(pos):
+			if _world.grade.current == null or _world.grade.current.id != rg.grade:
+				_world.grade.swap_to(rg.grade, 0.0)
+			return
