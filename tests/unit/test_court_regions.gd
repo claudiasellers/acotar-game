@@ -54,8 +54,17 @@ func test_lakes_hold_water_below_their_shores() -> void:
 	for lake in CourtHeight.lakes():
 		var c: Vector2 = lake["center"]
 		assert_lt(CourtHeight.height_at(c.x, c.y), float(lake["level"]) - 0.5, "lake bed under water at %s" % c)
-		var shore := c + Vector2(float(lake["radius"]) * 1.55, 0.0)
-		assert_gt(CourtHeight.height_at(shore.x, shore.y), float(lake["level"]), "shore above water at %s" % c)
+		# The dry shore: the Thornwater is carved through the Looking Lake's rim
+		# (it must not be buried), so a shore point in the river's channel is
+		# river bed, not shore. Test the ring points the river doesn't cross.
+		var tested := 0
+		for k in 8:
+			var shore := c + Vector2.from_angle(k * TAU / 8.0) * float(lake["radius"]) * 1.55
+			if MacroHeight.distance_to_river(shore.x, shore.y) < MacroHeight.RIVER_HALF_WIDTH + MacroHeight.RIVER_BANK:
+				continue
+			tested += 1
+			assert_gt(CourtHeight.height_at(shore.x, shore.y), float(lake["level"]), "shore above water at %s, %s" % [c, shore])
+		assert_gt(tested, 0, "no dry shore to test at %s" % c)
 
 
 func test_every_region_meets_the_density_bar() -> void:
