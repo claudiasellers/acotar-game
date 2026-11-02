@@ -94,7 +94,16 @@ const POSES := {
 		"LeftLowerArm": Vector3(-0.1, -0.5, 1.0), "RightLowerArm": Vector3(0.1, -0.5, 1.0)}},
 }
 
+## The townsfolk rig (creatures/models/people): its bones by their humanoid
+## names. It faces -Z in its own space, so its directions turn half round.
+const PEOPLE_BONES := {"Hips": "pelvis", "Spine": "spine", "Chest": "chest", "Neck": "neck",
+	"Head": "head", "LeftUpperArm": "arm_l", "LeftLowerArm": "forearm_l", "LeftHand": "hand_l",
+	"RightUpperArm": "arm_r", "RightLowerArm": "forearm_r", "RightHand": "hand_r",
+	"LeftUpperLeg": "upper_leg_l", "LeftLowerLeg": "lower_leg_l", "LeftFoot": "paw_leg_l",
+	"RightUpperLeg": "upper_leg_r", "RightLowerLeg": "lower_leg_r", "RightFoot": "paw_leg_r"}
+
 var pose: StringName = &""
+var _people: int = -1   # -1 not looked yet, 0 humanoid, 1 townsfolk
 var _from: Dictionary = {}
 var _to: Dictionary = {}
 var _mix: float = 1.0
@@ -167,9 +176,19 @@ static func _blend(a: Dictionary, b: Dictionary, k: float) -> Dictionary:
 
 
 func _bone(sk: Skeleton3D, bone_name: String) -> int:
+	if _people < 0:
+		_people = 1 if sk.find_bone("Hips") < 0 and sk.find_bone("pelvis") >= 0 else 0
 	if not _bones.has(bone_name):
-		_bones[bone_name] = sk.find_bone(bone_name)
+		if _people == 1:
+			_bones[bone_name] = sk.find_bone(String(PEOPLE_BONES.get(bone_name, "-")))
+		else:
+			_bones[bone_name] = sk.find_bone(bone_name)
 	return _bones[bone_name]
+
+
+## A pose direction (figure faces +Z) in this skeleton's own space.
+func _dir(v: Vector3) -> Vector3:
+	return Vector3(-v.x, v.y, -v.z) if _people == 1 else v
 
 
 func _process_modification_with_delta(_delta: float) -> void:
@@ -183,7 +202,7 @@ func _process_modification_with_delta(_delta: float) -> void:
 	if hips >= 0:
 		var hp := sk.get_bone_global_pose(hips)
 		var h := sk.get_bone_global_rest(hips).origin.y
-		var o := hp.origin + Vector3(0.0, -float(p.get("drop", 0.0)), float(p.get("back", 0.0))) * h
+		var o := hp.origin + _dir(Vector3(0.0, -float(p.get("drop", 0.0)), float(p.get("back", 0.0)))) * h
 		sk.set_bone_global_pose(hips, Transform3D(hp.basis, o))
 	var aims: Dictionary = p.get("aims", {})
 	var order: Array = []
@@ -196,7 +215,7 @@ func _process_modification_with_delta(_delta: float) -> void:
 		var i := int(entry[0])
 		var pose_now := sk.get_bone_global_pose(i)
 		var from_dir := pose_now.basis.y.normalized()
-		var to_dir := (entry[1] as Vector3).normalized()
+		var to_dir := _dir(entry[1] as Vector3).normalized()
 		if from_dir.dot(to_dir) > 0.99999 or from_dir.dot(to_dir) < -0.99999:
 			continue
 		sk.set_bone_global_pose(i, Transform3D(Basis(Quaternion(from_dir, to_dir)) * pose_now.basis, pose_now.origin))
