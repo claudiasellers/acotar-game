@@ -20,6 +20,7 @@ static func build(parent: Node3D) -> Node3D:
 	ManorGardenRooms.build(root)
 	ManorReflectingPool.build(root)
 	ManorFrontGarden.build(root)
+	ManorEastLawn.build(root)
 	ManorHedgeMaze.build(root)
 	ManorGlassHouses.build(root)
 	ManorKitchenGarden.build(root)

@@ -55,11 +55,11 @@ def rose_bush(p, h, col, rng):
     """Mounded rose shrub smothered in big cupped blooms: the blooms, not the
     leaves, carry the colour (rose garden 'dozens of hues', canon ch13)."""
     r = h * 0.45
-    for i in range(5):
-        a = 2 * math.pi * i / 5 + rng.uniform(-0.2, 0.2)
-        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.42, r * 0.55, LEAF if i % 2 else LEAF_DARK, rng, 1 if i < 2 else 0)
+    for i in range(3):
+        a = 2 * math.pi * i / 3 + rng.uniform(-0.2, 0.2)
+        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.42, r * 0.66, LEAF if i % 2 else LEAF_DARK, rng, 1)
     blob(p, 0, 0, h * 0.68, r * 0.62, mix(LEAF, SAGE_LIGHT, 0.3), rng, 1)
-    n = 15
+    n = 14
     for i in range(n):
         # golden-angle spiral over the upper dome so blooms never clump
         a = 2.39996 * i + rng.uniform(-0.15, 0.15)
@@ -72,11 +72,9 @@ def rose_bush(p, h, col, rng):
 
 
 def cup_rose(p, center, radius, col, rng, tilt):
-    """A cheap full rose (~60 tris): five cupped petals round a closed bud."""
-    m = T(*center) @ tilt
-    for i in range(5):
-        p.add(petal(radius, radius * 0.95, cup=0.45, curl=0.12), col, F, m @ R("Z", 72 * i + rng.uniform(-10, 10)) @ R("Y", -38))
-    p.add(lathe([(0, 0), (radius * 0.42, radius * 0.2), (0, radius * 0.55)], 5), K.darker(col, 0.12), F, m)
+    """A rounded full rose (L35-4): smooth cupped head, swirled heart and
+    broad outer petals (prop_kit.soft_rose), never a pointed shard."""
+    K.soft_rose(p, T(*center) @ tilt, radius * 0.95, col, F, rng, petals=3)
 
 
 def hedge(p, h, col, rng):

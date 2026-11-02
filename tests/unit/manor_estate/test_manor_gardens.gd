@@ -154,6 +154,68 @@ func test_every_garden_is_reachable_from_the_terrace() -> void:
 		assert_true(_walks_touch(ring, front[k]) if k % 2 == 0 else _walks_touch(front[k - 1], front[k]), "parterre walk %d joins" % k)
 
 
+## Audit D5: the east lawn in front of the house is a garden, not a bare plane,
+## and it keeps the way to the kitchen garden's gate (the playtest's route to
+## the potting shed) clear of anything solid.
+func test_east_lawn_is_dressed_and_keeps_the_kitchen_walk_clear() -> void:
+	var p := _props("EastLawn")
+	assert_gte(int(p.get(&"box_edging", 0)), 40, "box-edged borders")
+	for id: StringName in [&"yew_hedge", &"bench_curved", &"cupid_statue", &"garden_bench", &"topiary_cone", &"faelight_lantern", &"urn_overflowing"]:
+		assert_gte(int(p.get(id, 0)), 1, String(id))
+	assert_gte(ManorEastLawn.bed_runs().size(), 3)
+	var flowers := 0
+	var area := Rect2(60.0, -18.0, 120.0, 46.0)
+	for l in layers:
+		if l.tags.has("decoration"):
+			for i in l.count():
+				var q := l.position_of(i)
+				if area.has_point(Vector2(q.x, q.z)):
+					flowers += 1
+	assert_gte(flowers, 450, "the borders are planted thick")
+	# the exedra and the kitchen garden's gate are on walks from the front door
+	var walks: Array = [[GardenKit.ring(ManorSitePlan.FORECOURT_CENTER, ManorSitePlan.FORECOURT_RADIUS - 2.0, 48), 4.0]]
+	walks.append_array(ManorFrontGarden.walks())
+	walks.append_array(ManorEastLawn.walks())
+	var seen := {0: true}
+	var queue: Array[int] = [0]
+	while not queue.is_empty():
+		var i: int = queue.pop_back()
+		for j in walks.size():
+			if not seen.has(j) and _walks_touch(walks[i], walks[j]):
+				seen[j] = true
+				queue.append(j)
+	for target: Vector2 in [Vector2(ManorEastLawn.WALK_END_X, ManorEastLawn.WALK_Z), ManorEastLawn.GATE]:
+		var ok := false
+		for i: int in seen:
+			ok = ok or _near_walk(target, walks[i], 0.5)
+		assert_true(ok, "%s reachable from the front door" % target)
+	# nothing solid within a body's width of the kitchen walk, which follows
+	# P3P4Chain.TO_SHED from the lawn to the gate
+	var line := ManorEastLawn.kitchen_line()
+	var root_node := grounds.get_node("EastLawn/Collision")
+	for shape_owner in root_node.get_children():
+		if shape_owner is CollisionShape3D:
+			var o: Vector3 = (shape_owner as CollisionShape3D).global_position
+			var d := INF
+			for i in line.size() - 1:
+				d = minf(d, Geometry2D.get_closest_point_to_segment(Vector2(o.x, o.z), line[i], line[i + 1]).distance_to(Vector2(o.x, o.z)))
+			assert_gt(d, ManorEastLawn.KITCHEN_W * 0.5 + 0.3, "collider at %.1f, %.1f clear of the kitchen walk" % [o.x, o.z])
+	var to_shed: Array = P3P4Chain.TO_SHED
+	assert_eq(to_shed[1], ManorEastLawn.BEND, "the kitchen walk bends where the chain's walk does")
+
+
+## The south hedge returns open in line with the wings' garden doors (the chain
+## playtest walked into a solid hedge at x -71 coming back from the puca).
+func test_south_hedge_returns_open_toward_the_wings() -> void:
+	var space := grounds.get_node("RoseGarden/Collision")
+	for side: float in [-1.0, 1.0]:
+		var gap := Vector2(side * ManorRoseGarden.SOUTH_OPENING_X, -93.0)
+		for cs in space.get_children():
+			if cs is CollisionShape3D:
+				var o: Vector3 = (cs as CollisionShape3D).global_position
+				assert_gt(Vector2(o.x, o.z).distance_to(gap), 0.9, "nothing solid in the opening at %s" % gap)
+
+
 func test_decorations_and_draw_budget() -> void:
 	var areas: Array[Rect2] = [ManorSitePlan.ROSE_GARDEN, ManorGardenRooms.AREA, ManorGardenRooms.BUTTERCUP_MEADOW,
 		ManorReflectingPool.footprints()[0]]

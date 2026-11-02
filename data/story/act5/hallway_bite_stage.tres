@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"exit": Vector3(0.5, 0, 10),
+"moon": Vector3(0.4, 4.2, 4.5),
+"pin": Vector3(-1.75, 0, 2.6),
+"tamlin_shadow": Vector3(0.2, 0, 5.5),
+"wall": Vector3(-2.3, 0, 2.6)
+}
+lines = {
+"dont": {"text": "Don't bite me like some enraged beast.", "who": "Feyre"},
+"going": {"text": "Going somewhere?", "who": "Tamlin"},
+"gone": {"text": "He lets go. Then he's gone into the dark.", "who": ""},
+"laurel": {"text": "His mask, and a crown of laurel. His eyes aren't his own tonight.", "who": ""},
+"moon": {"text": "Moonlight in the hallway. Someone is standing in it.", "who": ""},
+"teeth": {"text": "Claws punch into the wall beside my head. His teeth at my neck, holding, not piercing.", "who": ""}
+}
+invented = PackedStringArray("gone", "laurel", "moon")
+canon = "Ch21 (Keeper, [C]): NOT in the kitchen: walking to her painting room she meets him in a moonlit hallway, masked, crowned with laurel. 'Going somewhere?' He pins her to the wall, claws punch into the wall, he bites to hold her; the teeth don't pierce. She: 'don't bite me like some enraged beast.' No slap in canon: her E is pushing him off. Restraint: the camera stays with her, the screen nearly dark, no close-up of the bite."

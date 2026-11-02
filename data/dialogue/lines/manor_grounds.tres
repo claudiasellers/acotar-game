@@ -1,0 +1,449 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"g_bloom"
+speaker = &"feyre"
+who = ""
+text = "Every flower open at once. Nothing grows like this. Nothing."
+canon = "X"
+trigger = 0
+where = &"manor_grounds"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"g_bloom_later"
+speaker = &"feyre"
+who = ""
+text = "I've stopped counting the roses. I've started naming the colours."
+canon = "X"
+trigger = 0
+where = &"manor_grounds"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"g_full"
+speaker = &"feyre"
+who = ""
+text = "Wings in the hedges, eyes in the roses. It was always this full."
+canon = "A"
+trigger = 0
+where = &"manor_grounds"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"g_roses"
+speaker = &"feyre"
+who = ""
+text = "Roses as big as my fists. They smell like a summer I never had."
+canon = "X"
+trigger = 2
+where = &"rose_garden"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"g_roses_gift"
+speaker = &"feyre"
+who = ""
+text = "His father had this garden planted for his mother. A mating present."
+canon = "A"
+trigger = 2
+where = &"rose_garden"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("gallery_opened")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 1
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"g_maze"
+speaker = &"feyre"
+who = ""
+text = "A maze. Lovely. Exactly where something would wait for me."
+canon = "X"
+trigger = 2
+where = &"hedge_maze"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"g_glass"
+speaker = &"feyre"
+who = ""
+text = "Glass houses full of fruit out of season."
+canon = "X"
+trigger = 2
+where = &"glass_houses"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"g_herbs"
+speaker = &"feyre"
+who = ""
+text = "Herbs in neat rows. Feverfew, sage. The rest I'll learn."
+canon = "X"
+trigger = 2
+where = &"kitchen_garden"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"g_stables"
+speaker = &"feyre"
+who = ""
+text = "Horses with coats like poured cream. The white mare remembers me."
+canon = "X"
+trigger = 2
+where = &"stables"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"g_paddock"
+speaker = &"feyre"
+who = ""
+text = "Room to ride all day without ever seeing a wall."
+canon = "X"
+trigger = 2
+where = &"paddock"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"g_swans"
+speaker = &"feyre"
+who = ""
+text = "Swans. Even the birds here look painted on."
+canon = "X"
+trigger = 2
+where = &"swan_pond"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"g_orchard"
+speaker = &"feyre"
+who = ""
+text = "Apples and blossom on the same branch. That isn't right. It's lovely."
+canon = "X"
+trigger = 2
+where = &"walled_orchard"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"g_fountain"
+speaker = &"feyre"
+who = ""
+text = "A fountain that sings when the wind's right."
+canon = "X"
+trigger = 2
+where = &"forecourt_fountain"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("fountain_head_found")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"g_fountain_after"
+speaker = &"feyre"
+who = ""
+text = "I can't look at the water. I still see it there."
+canon = "X"
+trigger = 2
+where = &"forecourt_fountain"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("fountain_head_found")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, flat with shock"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"g_gate"
+speaker = &"feyre"
+who = ""
+text = "The gate's open. He meant it, then. I'm not his prisoner."
+canon = "A"
+trigger = 2
+where = &"manor_gate"
+deed = &""
+phases = PackedStringArray("p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"g_unseen"
+speaker = &"feyre"
+who = ""
+text = "Something shimmered by the hedge. When I looked, nothing."
+canon = "A"
+trigger = 2
+where = &"rose_garden"
+deed = &""
+phases = PackedStringArray("p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("glamour_lifted")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 2
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="P0"]
+script = ExtResource("2")
+id = &"rose_garden"
+region = &"manor_estate"
+at = Vector2(0.0, -146.0)
+radius = 40.0
+
+[sub_resource type="Resource" id="P1"]
+script = ExtResource("2")
+id = &"hedge_maze"
+region = &"manor_estate"
+at = Vector2(-218.0, -208.0)
+radius = 30.0
+
+[sub_resource type="Resource" id="P2"]
+script = ExtResource("2")
+id = &"glass_houses"
+region = &"manor_estate"
+at = Vector2(140.0, -148.0)
+radius = 28.0
+
+[sub_resource type="Resource" id="P3"]
+script = ExtResource("2")
+id = &"kitchen_garden"
+region = &"manor_estate"
+at = Vector2(126.0, -49.0)
+radius = 24.0
+
+[sub_resource type="Resource" id="P4"]
+script = ExtResource("2")
+id = &"stables"
+region = &"manor_estate"
+at = Vector2(-130.0, -31.0)
+radius = 26.0
+
+[sub_resource type="Resource" id="P5"]
+script = ExtResource("2")
+id = &"paddock"
+region = &"manor_estate"
+at = Vector2(-247.0, -25.0)
+radius = 40.0
+
+[sub_resource type="Resource" id="P6"]
+script = ExtResource("2")
+id = &"swan_pond"
+region = &"manor_estate"
+at = Vector2(190.0, 110.0)
+radius = 50.0
+
+[sub_resource type="Resource" id="P7"]
+script = ExtResource("2")
+id = &"walled_orchard"
+region = &"manor_estate"
+at = Vector2(-242.0, 152.0)
+radius = 40.0
+
+[sub_resource type="Resource" id="P8"]
+script = ExtResource("2")
+id = &"forecourt_fountain"
+region = &"manor_estate"
+at = Vector2(0.0, 0.0)
+radius = 18.0
+
+[sub_resource type="Resource" id="P9"]
+script = ExtResource("2")
+id = &"manor_gate"
+region = &"manor_estate"
+at = Vector2(0.0, 295.0)
+radius = 22.0
+
+[resource]
+script = ExtResource("3")
+area = &"manor_grounds"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15")])
+places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6"), SubResource("P7"), SubResource("P8"), SubResource("P9")])

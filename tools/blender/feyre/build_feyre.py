@@ -1008,7 +1008,7 @@ def ring_fit(grid, z, n, cy=0.0, rmax=0.36):
     return np.array(out)
 
 
-def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra=None):
+def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra=None, neckline=False):
     """Garment shell: copy body faces, subdivide (smooth), then push out along normals."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
@@ -1056,9 +1056,42 @@ def shell_from_body(name, body, base_P, face_ok, offset_fn, max_tris, mat, extra
     for m in mat if isinstance(mat, list) else [mat]:
         me.materials.append(m)
     decimate_to(obj, max_tris)
+    if neckline:
+        neat_neckline(obj, base_P, body, offset_fn)
     for p in obj.data.polygons:
         p.use_smooth = True
     return obj
+
+
+def neat_neckline(obj, base_P, body, offset_fn, z_min=1.24, iters=6):
+    """The neck edge of a shell follows the body's region border, a saw-tooth of
+    triangles.  Lift each edge vertex to the higher of its edge neighbours, smooth
+    along the edge, and settle it back on the body, so the collar is one clean
+    curve with no skin teeth above it."""
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    edge = [v for v in bm.verts if v.is_boundary and v.co.z > z_min]
+    nb = {v: [e.other_vert(v) for e in v.link_edges if e.is_boundary] for v in edge}
+    eset = set(edge)
+    for _ in range(iters):
+        new = {}
+        for v in edge:
+            ring = [o for o in nb[v] if o in eset]
+            if not ring:
+                continue
+            avg = (v.co + sum((o.co for o in ring), Vector())) / (len(ring) + 1)
+            avg.z = max([v.co.z] + [o.co.z for o in ring]) * 0.6 + avg.z * 0.4
+            new[v] = avg
+        for v, c in new.items():
+            v.co = c
+    bvh = BVHTree.FromPolygons([tuple(p) for p in base_P], [tuple(p.vertices) for p in body.data.polygons])
+    for v in edge:
+        loc, nrm, _, _ = bvh.find_nearest(v.co)
+        v.co = loc + nrm * offset_fn(v.co)
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    return len(edge)
 
 
 def ring_surface(bm, rings, cols, mat_index=0, closed=True):
@@ -1318,7 +1351,7 @@ def main():
         lambda co: 0.0055 + 0.005 * (abs(co.x) < 0.16),
         3990, [make_material("tunic_linen", srgb("#A9B4CF"), 0.85),
                make_material("belt_leather", srgb("#8E6A6E"), 0.5)],
-        extra=tunic_skirt_and_belt(grid))
+        extra=tunic_skirt_and_belt(grid), neckline=not CAST)
     trousers = shell_from_body(
         "hunter_trousers", body, P,
         lambda f: (face_region(f) == "legs" and centre(f).z > 0.11)

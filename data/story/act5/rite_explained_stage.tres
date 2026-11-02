@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_floor": Vector3(5.5, 0, -5),
+"lucien": Vector3(7.5, 0, -3.5),
+"lucien_exit": Vector3(-4, 0, -1)
+}
+lines = {
+"floor": {"text": "He drops me on the floor of the hallway.", "who": ""},
+"hunter": {"text": "Tonight he's the Hunter. The magic takes him; he hunts the white stag, and then he finds the Maiden in the cave.", "who": "Lucien"},
+"scent": {"text": "If he'd caught your scent before he found her, it would have been you. He'd have had no say in it.", "who": "Lucien"},
+"stay": {"text": "Stay in your room tonight, Feyre.", "who": "Lucien"}
+}
+invented = PackedStringArray("hunter", "scent")
+canon = "Ch21 (Keeper, [C]): he drops her 'on the floor of the manor hallway' and explains the Hunter, the Maiden and the white stag there; his last line: 'Stay in your room tonight, Feyre.' The two explanation lines are paraphrase [X]."

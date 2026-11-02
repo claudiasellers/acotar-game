@@ -43,6 +43,15 @@ static func all_hair() -> Array[HairstyleData]:
 	return out
 
 
+## The hairstyles she can pick now (a style's require_flag is met).
+static func available_hair() -> Array[HairstyleData]:
+	var out: Array[HairstyleData] = []
+	for h in all_hair():
+		if h.unlocked():
+			out.append(h)
+	return out
+
+
 static func all_makeup() -> Array[MakeupData]:
 	_load()
 	var out: Array[MakeupData] = []

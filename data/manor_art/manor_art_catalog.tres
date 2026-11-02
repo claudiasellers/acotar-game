@@ -1,0 +1,3982 @@
+[gd_resource type="Resource" script_class="ManorArtCatalog" format=3]
+
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/art/manor_art_work.gd" id="1_work"]
+[ext_resource type="Script" path="res://world/spring_court/manor_estate/art/manor_art_catalog.gd" id="2_cat"]
+
+[sub_resource type="Resource" id="w000"]
+script = ExtResource("1_work")
+id = &"still_green_glass_vase"
+title = "Still Life with a Green Glass Vase"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch7: the first hall painting Feyre stops at, a green glass vase of roses, tulips, morning glory, goldenrod, maiden's lace and peonies against a dark ground; she had never seen anything like it."
+themes = PackedStringArray("hall")
+pin = &"upper_hall@0.15,5.0|entrance_hall"
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.5781250, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w001"]
+script = ExtResource("1_work")
+id = &"cauldron_making"
+title = "The Cauldron Poured"
+genre = &"cauldron"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch13 mural, first panel: a black cauldron tipped by glowing, slender female hands in a starry night, spilling gold effervescent with symbols."
+themes = PackedStringArray("shrine", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.0039062, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w002"]
+script = ExtResource("1_work")
+id = &"war_before_treaty"
+title = "The War"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "Ch13 mural: bloodied mud; human soldiers facing High Fae in glimmering armour and faeries with claws and fangs. Not for human eyes."
+themes = PackedStringArray("library", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.5000000, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w003"]
+script = ExtResource("1_work")
+id = &"treaty_signed"
+title = "The Treaty"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "The Treaty ended the War five centuries ago and split the land at the Wall; humans freed. Signing scene [X]."
+themes = PackedStringArray("library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.5000000, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w004"]
+script = ExtResource("1_work")
+id = &"wall_raised"
+title = "The Wall at First Light"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C?"
+story_ref = "The Wall: invisible and magical; creatures slip through it in book 1, so it has breaches (gaps are C?). Painted as a shimmering veil across the land."
+themes = PackedStringArray("library", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.0039062, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w005"]
+script = ExtResource("1_work")
+id = &"lone_peak"
+title = "The Mountain in the Middle"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "Ch13 mural, last panel: a snowy range with a mammoth, solitary peak, bald of snow, bald of life. Unnamed."
+themes = PackedStringArray("store", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.0039062, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w006"]
+script = ExtResource("1_work")
+id = &"court_map_spring"
+title = "The Spring Court, Mapped"
+genre = &"map"
+fmt = &"land"
+major = false
+canon = "C?"
+story_ref = "Spring is the southernmost court, painted with crocuses, lambs and roses; the Wall a dark smear to the south (ch13)."
+themes = PackedStringArray("library", "study", "map")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.0039062, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w007"]
+script = ExtResource("1_work")
+id = &"court_map_estate"
+title = "The Estate and its Woods"
+genre = &"map"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "The manor among its woods: the region Feyre maps by hand in ch12."
+themes = PackedStringArray("map", "study", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.0039062, 0.7647059, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w008"]
+script = ExtResource("1_work")
+id = &"rose_garden_gift"
+title = "The Rose Garden, a Mating Gift"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "Ch19: Tamlin's father planted the rose garden for his mother as a mating present. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.0039062, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w009"]
+script = ExtResource("1_work")
+id = &"high_lady_roses"
+title = "The High Lady of Spring, with Roses"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Tamlin's mother (no description in the book): she loved her mate deeply. Painted before the curse, so unmasked. Keeper: a place of honour. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "portrait")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.7695312, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w010"]
+script = ExtResource("1_work")
+id = &"high_lord_father"
+title = "A High Lord of Spring"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Tamlin's father: 'a tyrant' who kept slaves (ch19). No description. Hung only in dim rooms; unmasked (before the curse)."
+themes = PackedStringArray("store", "portrait_dim")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.0039062, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w011"]
+script = ExtResource("1_work")
+id = &"elder_brothers"
+title = "Two Sons of Spring"
+genre = &"portrait"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Tamlin's two older brothers, 'just like him' (their father), killed with him and their mother by an enemy High Lord (ch19). Stored away."
+themes = PackedStringArray("store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.5117188, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w012"]
+script = ExtResource("1_work")
+id = &"youngest_son"
+title = "The Youngest Son"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "An old portrait of a golden-haired youth, unmasked: Tamlin before the curse (keeper: sparingly; Feyre has never seen his face). Under a dust sheet in the loft."
+themes = PackedStringArray("store_secret")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.0039062, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w013"]
+script = ExtResource("1_work")
+id = &"war_band"
+title = "The War-Band Rides Out"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Tamlin trained in his father's war-band from youth (ch19)."
+themes = PackedStringArray("store", "study")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.5117188, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w014"]
+script = ExtResource("1_work")
+id = &"calanmai_fires"
+title = "Calanmai: Fires on the Hill"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "Calanmai, the fire night of spring: bonfires on the hills (festival-sites). The Rite itself is not shown. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "ballroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.5000000, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w015"]
+script = ExtResource("1_work")
+id = &"solstice_wisps"
+title = "Solstice Dawn with Will-o'-the-Wisps"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "Ch25: the solstice meadow, will-o'-the-wisps, dancing until sunrise. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "ballroom", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.2578125, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w016"]
+script = ExtResource("1_work")
+id = &"white_mare"
+title = "A White Mare by the Painted Stables"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The pretty, painted stables (ch8); Feyre rides a white mare with Lucien."
+themes = PackedStringArray("hall", "study", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.0039062, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w017"]
+script = ExtResource("1_work")
+id = &"blight_grove"
+title = "The Grove after the Blight"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The blight: a sickness through the courts, the outward sign of Amarantha's poison (the blight and the curse). Grey, wilted spring."
+themes = PackedStringArray("store", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.6406250, 0.7372549, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w018"]
+script = ExtResource("1_work")
+id = &"andras_sentries"
+title = "Sentries on the Southern March"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "Tamlin's sentries patrol the lands toward the Wall (spring-court-regions: reg_wall_marches)."
+themes = PackedStringArray("study", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.7187500, 0.7686275, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w019"]
+script = ExtResource("1_work")
+id = &"crocus_lambs_roses"
+title = "Crocuses, Lambs and Roses"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "Spring's emblems as the study mural paints them (ch13): crocuses, lambs and roses. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "nursery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.0039062, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w020"]
+script = ExtResource("1_work")
+id = &"two_boys_birch"
+title = "Boys under a Birch"
+genre = &"landscape"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Alis's sister and her mate were killed, and Alis cares for her boys (ch22); how many is not said [X]. A small, humble picture in her room [X]."
+themes = PackedStringArray("alis")
+pin = &"svc_alis_room"
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.2265625, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w021"]
+script = ExtResource("1_work")
+id = &"summer_envoy"
+title = "An Envoy from the Summer Court"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Summer folk as the book shows one (ch17): blue skin, long black hair, glossy dark eyes. A guest from better days. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "portrait", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.7695312, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w022"]
+script = ExtResource("1_work")
+id = &"autumn_woods_lucien"
+title = "The Autumn Court in its Turning"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "C"
+story_ref = "Lucien comes from the Autumn Court, west of Spring (lucien.md, spring-court-regions: reg_autumn_border). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("autumn", "hall", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.0039062, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w023"]
+script = ExtResource("1_work")
+id = &"court_spring"
+title = "The Spring Court at Blossom-Time"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The ch13 mural paints Spring with trees in bloom, fickle storms and young animals. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.5117188, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w024"]
+script = ExtResource("1_work")
+id = &"court_summer"
+title = "The Summer Court's Bright Coast"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "One of the seven courts on the ch13 mural, 'easy enough to pick out'. The coast placement is [X]. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.0039062, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w025"]
+script = ExtResource("1_work")
+id = &"court_autumn"
+title = "Autumn Woods at Evening"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "One of the seven courts on the ch13 mural, 'easy enough to pick out'. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.0039062, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w026"]
+script = ExtResource("1_work")
+id = &"court_winter"
+title = "The Winter Court's White Peaks"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "One of the seven courts on the ch13 mural, 'easy enough to pick out'. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.2578125, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w027"]
+script = ExtResource("1_work")
+id = &"court_dawn"
+title = "Dawn over the Eastern Cliffs"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The ch13 mural paints Dawn in 'a softer, redder palate'. The eastern cliffs are [X]. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.2578125, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w028"]
+script = ExtResource("1_work")
+id = &"court_day"
+title = "Noon in the Day Court"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The ch13 mural paints Day in bright gold and yellow and blue. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.5117188, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w029"]
+script = ExtResource("1_work")
+id = &"court_night"
+title = "Stars over the Northern Mountains"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "C"
+story_ref = "The ch13 mural paints Night as a frozen, mountainous spread of darkness and stars, little eyes and gleaming teeth in its shadows. 'Northern' is [X]. Part of a set of seven. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.2578125, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w030"]
+script = ExtResource("1_work")
+id = &"region_rosewild"
+title = "The Rosewild"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "reg_rosewild: wild roses spilling from the gardens into the countryside. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.0039062, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w031"]
+script = ExtResource("1_work")
+id = &"region_blossom_vale"
+title = "Blossom Vale Orchards"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_blossom_vale): an orchard valley in bloom under the court's endless spring. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.0039062, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w032"]
+script = ExtResource("1_work")
+id = &"region_mirror_lakes"
+title = "The Mirror Lakes"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_mirror_lakes): a chain of still pools below the mountains. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.0039062, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w033"]
+script = ExtResource("1_work")
+id = &"region_greenmarch"
+title = "Stone Circle on the Greenmarch"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_greenmarch): wildflower downs and old stone circles at dusk. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.2578125, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w034"]
+script = ExtResource("1_work")
+id = &"region_old_shrines"
+title = "The Old Shrines"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_old_temples): overgrown shrines from before the Treaty. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.2578125, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w035"]
+script = ExtResource("1_work")
+id = &"region_western_fells"
+title = "The Western Fells above the Summer Coast"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "reg_western_fells: an escarpment with the Summer coast far off. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.0039062, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w036"]
+script = ExtResource("1_work")
+id = &"region_masked_hamlet"
+title = "A Masked Hamlet"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_mask_villages): a lesser-fae hamlet whose folk wear the curse's masks. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.5117188, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w037"]
+script = ExtResource("1_work")
+id = &"region_manor_drive"
+title = "The Manor from the Drive"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Arrival (ch6): alabaster house veiled in roses and ivy at the end of a gravel drive. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.0039062, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w038"]
+script = ExtResource("1_work")
+id = &"region_manor_night"
+title = "The Manor by Moonlight"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The house at night, lamps lit; a quiet echo of the nights Feyre walks its halls. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.2578125, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w039"]
+script = ExtResource("1_work")
+id = &"region_estate_woods"
+title = "The Estate Woods in Spring"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_estate_woods): the woods around the manor, sun-dappled and deceptive. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.2578125, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w040"]
+script = ExtResource("1_work")
+id = &"region_western_birches"
+title = "Birches by Running Water"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The western woods: young birches by running water, where the Suriel is caught (ch13). No Suriel shown. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.5117188, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w041"]
+script = ExtResource("1_work")
+id = &"region_solstice_meadow"
+title = "The Solstice Meadow at Noon"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_solstice_meadow): the solstice meadow by day, flowers and butterflies. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.2578125, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w042"]
+script = ExtResource("1_work")
+id = &"region_wall_marches"
+title = "Toward the Wall"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (spring-court-regions, reg_wall_marches): Feyre's road in and out of Prythian, toward the Wall. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.2578125, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w043"]
+script = ExtResource("1_work")
+id = &"region_glass_houses"
+title = "The Glass Houses in Rain"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The manor's glass houses [X], where the court's flowers are grown, under a silver rain. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.0039062, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w044"]
+script = ExtResource("1_work")
+id = &"region_hedge_maze"
+title = "Evening in the Hedge Maze"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The manor's hedge maze [X] at evening, two masked courtiers walking its paths. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.5117188, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w045"]
+script = ExtResource("1_work")
+id = &"region_rite_cave_hill"
+title = "The Hill of the Rite by Day"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "reg_calanmai_hills: the hill and cave of the Great Rite, quiet in daylight. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.5117188, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w046"]
+script = ExtResource("1_work")
+id = &"region_fae_village_market"
+title = "Market Day in the Fae Village"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Spring Court lands (plan region): market day in the village of the court's lesser faeries. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.5117188, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w047"]
+script = ExtResource("1_work")
+id = &"region_autumn_border"
+title = "Where Spring Meets Autumn"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "reg_autumn_border: the forest turning red and gold at the court's edge. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.5117188, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w048"]
+script = ExtResource("1_work")
+id = &"region_spring_river"
+title = "A River through the Downs"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The rivers and fords of the Spring Court's downs [X], crossed by an old stone bridge. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.5117188, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w049"]
+script = ExtResource("1_work")
+id = &"region_starry_fells"
+title = "Starlight on the Fells"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "A clear night over the Spring Court's high ground [X], faelights drifting below the stars. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("hall", "corridor", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 12
+uv = Rect2(0.0039062, 0.3647059, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w050"]
+script = ExtResource("1_work")
+id = &"pastoral_01"
+title = "Shepherdess at Morning"
+genre = &"landscape"
+fmt = &"oval_l"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.0039062, 0.3549020, 0.3750000, 0.3009804)
+pixels = Vector2i(768, 614)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w051"]
+script = ExtResource("1_work")
+id = &"pastoral_02"
+title = "Lambs at the Ford"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.5000000, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w052"]
+script = ExtResource("1_work")
+id = &"pastoral_03"
+title = "A Picnic under the Blossom"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.0039062, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w053"]
+script = ExtResource("1_work")
+id = &"pastoral_04"
+title = "Boating on the Lake"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.5000000, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w054"]
+script = ExtResource("1_work")
+id = &"pastoral_05"
+title = "Haymaking on the Downs"
+genre = &"landscape"
+fmt = &"oval_l"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.3828125, 0.3549020, 0.3750000, 0.3009804)
+pixels = Vector2i(768, 614)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w055"]
+script = ExtResource("1_work")
+id = &"pastoral_06"
+title = "Apple Harvest"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.0039062, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w056"]
+script = ExtResource("1_work")
+id = &"pastoral_07"
+title = "Deer at the Wood's Edge"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.5000000, 0.3549020, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w057"]
+script = ExtResource("1_work")
+id = &"pastoral_08"
+title = "First Snow on the Downs"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.0039062, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w058"]
+script = ExtResource("1_work")
+id = &"pastoral_09"
+title = "A Hunting Party"
+genre = &"landscape"
+fmt = &"oval_l"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.0039062, 0.6598039, 0.3750000, 0.3009804)
+pixels = Vector2i(768, 614)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w059"]
+script = ExtResource("1_work")
+id = &"pastoral_10"
+title = "Swans at Dusk"
+genre = &"landscape"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.5000000, 0.0039216, 0.4921875, 0.3470588)
+pixels = Vector2i(1008, 708)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w060"]
+script = ExtResource("1_work")
+id = &"pastoral_11"
+title = "A Walk in the Rose Garden"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.0039062, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w061"]
+script = ExtResource("1_work")
+id = &"pastoral_12"
+title = "Dancers in a Ring of Flowers"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.2578125, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w062"]
+script = ExtResource("1_work")
+id = &"pastoral_13"
+title = "Spring Rain over the Orchards"
+genre = &"landscape"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.2421875, 0.7686275, 0.2343750, 0.1882353)
+pixels = Vector2i(480, 384)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w063"]
+script = ExtResource("1_work")
+id = &"pastoral_14"
+title = "A Summer Evening, Fireflies"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.5117188, 0.7254902, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w064"]
+script = ExtResource("1_work")
+id = &"pastoral_15"
+title = "The Gazebo by the Water"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.0039062, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w065"]
+script = ExtResource("1_work")
+id = &"pastoral_16"
+title = "Faelights in the Garden"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.2578125, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w066"]
+script = ExtResource("1_work")
+id = &"pastoral_17"
+title = "Hares in the Meadow"
+genre = &"landscape"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.4804688, 0.7686275, 0.2343750, 0.1882353)
+pixels = Vector2i(480, 384)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w067"]
+script = ExtResource("1_work")
+id = &"pastoral_18"
+title = "An Old Bridge in Autumn"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.5117188, 0.0039216, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w068"]
+script = ExtResource("1_work")
+id = &"pastoral_19"
+title = "Wisteria Walk"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.0039062, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w069"]
+script = ExtResource("1_work")
+id = &"pastoral_20"
+title = "Blue Hour on the Water"
+genre = &"landscape"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds pastorals (no named works). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "hall", "bedroom", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 11
+uv = Rect2(0.2578125, 0.1843137, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w070"]
+script = ExtResource("1_work")
+id = &"still_01"
+title = "Peonies and a Gilt Urn"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.0039062, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w071"]
+script = ExtResource("1_work")
+id = &"still_02"
+title = "Tulips in a Crystal Vase"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.1953125, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w072"]
+script = ExtResource("1_work")
+id = &"still_03"
+title = "Irises with Pears"
+genre = &"still"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.2265625, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w073"]
+script = ExtResource("1_work")
+id = &"still_04"
+title = "Morning Glory and Teacups"
+genre = &"still"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.3867188, 0.4980392, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w074"]
+script = ExtResource("1_work")
+id = &"still_05"
+title = "Lilac in a Porcelain Vase"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.3867188, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w075"]
+script = ExtResource("1_work")
+id = &"still_06"
+title = "Snowdrops and Crocus"
+genre = &"still"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.5781250, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w076"]
+script = ExtResource("1_work")
+id = &"still_07"
+title = "Daffodils by a Window"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.7695312, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w077"]
+script = ExtResource("1_work")
+id = &"still_08"
+title = "Roses and Faerie Wine"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.0039062, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w078"]
+script = ExtResource("1_work")
+id = &"still_09"
+title = "Chocolate Torte and Roses"
+genre = &"still"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.4492188, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w079"]
+script = ExtResource("1_work")
+id = &"still_10"
+title = "Lemon Tart and Lilies"
+genre = &"still"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.5781250, 0.4980392, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w080"]
+script = ExtResource("1_work")
+id = &"still_11"
+title = "Apples, a Lemon and a Chocolate Cookie"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]."
+themes = PackedStringArray("service", "dining", "kitchen")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w081"]
+script = ExtResource("1_work")
+id = &"still_12"
+title = "Bread, Cheese and Honey"
+genre = &"still"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]."
+themes = PackedStringArray("service", "dining", "kitchen")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.1953125, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w082"]
+script = ExtResource("1_work")
+id = &"still_13"
+title = "Masks on a Marble Table"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("mask", "gallery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.3867188, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w083"]
+script = ExtResource("1_work")
+id = &"still_14"
+title = "A Fox Mask and Autumn Leaves"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("mask", "gallery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.5781250, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w084"]
+script = ExtResource("1_work")
+id = &"still_15"
+title = "Spoils of the Hunt"
+genre = &"still"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]."
+themes = PackedStringArray("study", "dining", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.6718750, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w085"]
+script = ExtResource("1_work")
+id = &"still_16"
+title = "Hourglass and Candle"
+genre = &"still"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]."
+themes = PackedStringArray("library", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.7695312, 0.4980392, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w086"]
+script = ExtResource("1_work")
+id = &"still_17"
+title = "Camellias and Pearls"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.7695312, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w087"]
+script = ExtResource("1_work")
+id = &"still_18"
+title = "Pomegranates and Anemones"
+genre = &"still"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.0039062, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w088"]
+script = ExtResource("1_work")
+id = &"still_19"
+title = "Wisteria and Cherries"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.1953125, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w089"]
+script = ExtResource("1_work")
+id = &"still_20"
+title = "Foxglove and a Quill"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.3867188, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w090"]
+script = ExtResource("1_work")
+id = &"still_21"
+title = "Bluebells in a Stone Crock"
+genre = &"still"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.0039062, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w091"]
+script = ExtResource("1_work")
+id = &"still_22"
+title = "Poppies and Oranges"
+genre = &"still"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.0039062, 0.7372549, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w092"]
+script = ExtResource("1_work")
+id = &"still_23"
+title = "Hellebores at Midwinter"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.5781250, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w093"]
+script = ExtResource("1_work")
+id = &"still_24"
+title = "Sweet Peas and a Butterfly"
+genre = &"still"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "dining", "service", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.7695312, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w094"]
+script = ExtResource("1_work")
+id = &"still_25"
+title = "Ranunculus and Peaches"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "dining", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.0039062, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w095"]
+script = ExtResource("1_work")
+id = &"still_26"
+title = "Roses for the Dining Hall"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.1953125, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w096"]
+script = ExtResource("1_work")
+id = &"still_27"
+title = "A Bowl of Plums"
+genre = &"still"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]."
+themes = PackedStringArray("service", "dining", "kitchen")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w097"]
+script = ExtResource("1_work")
+id = &"still_28"
+title = "Lilies of the Shrine"
+genre = &"still"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("shrine", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.1953125, 0.7372549, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w098"]
+script = ExtResource("1_work")
+id = &"still_29"
+title = "Shells from the Summer Coast"
+genre = &"still"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w099"]
+script = ExtResource("1_work")
+id = &"still_30"
+title = "Mixed Bouquet with a Lilac Mask"
+genre = &"still"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds still lifes; the canon dinner and night snack foods (ch7) and the court's masks recur. Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("mask", "gallery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.3867188, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w100"]
+script = ExtResource("1_work")
+id = &"portrait_01"
+title = "A Lady of the Spring Court, Masked"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "gallery", "mask")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.3867188, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w101"]
+script = ExtResource("1_work")
+id = &"portrait_02"
+title = "A Courtier in a Fox Mask"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "mask", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.7695312, 0.0039216, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w102"]
+script = ExtResource("1_work")
+id = &"portrait_03"
+title = "Lady with a Lamb"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery", "nursery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.5781250, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w103"]
+script = ExtResource("1_work")
+id = &"portrait_04"
+title = "The Lady in Lilac"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.7695312, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w104"]
+script = ExtResource("1_work")
+id = &"portrait_05"
+title = "A Lord in Emerald"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.0039062, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w105"]
+script = ExtResource("1_work")
+id = &"portrait_06"
+title = "A Huntress of the Court"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "study", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.0039062, 0.2588235, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w106"]
+script = ExtResource("1_work")
+id = &"portrait_07"
+title = "A Winter Lady in Pearl"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.1953125, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w107"]
+script = ExtResource("1_work")
+id = &"portrait_08"
+title = "A Lady of the Dawn Court"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w108"]
+script = ExtResource("1_work")
+id = &"portrait_09"
+title = "A Day Court Scholar"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.3867188, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w109"]
+script = ExtResource("1_work")
+id = &"portrait_10"
+title = "A Masked Musician"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "music", "mask")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.1953125, 0.2588235, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w110"]
+script = ExtResource("1_work")
+id = &"portrait_11"
+title = "The Rose Maiden"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.5781250, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w111"]
+script = ExtResource("1_work")
+id = &"portrait_12"
+title = "A Sentry of Spring, Masked"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "hall", "study")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.7695312, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w112"]
+script = ExtResource("1_work")
+id = &"portrait_13"
+title = "A Lady of the Autumn Court"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "autumn", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.0039062, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w113"]
+script = ExtResource("1_work")
+id = &"portrait_14"
+title = "A Young Lord with a Book"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "library", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.3867188, 0.2588235, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w114"]
+script = ExtResource("1_work")
+id = &"portrait_15"
+title = "The Lady of the Glass Houses"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.1953125, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w115"]
+script = ExtResource("1_work")
+id = &"portrait_16"
+title = "A Housekeeper of Long Ago"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("service", "portrait")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.3867188, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w116"]
+script = ExtResource("1_work")
+id = &"portrait_17"
+title = "A Masked Lady in Butter-Yellow"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "mask", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.5781250, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w117"]
+script = ExtResource("1_work")
+id = &"portrait_18"
+title = "A Lord in Plum Velvet"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "portrait_dim", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.5781250, 0.2588235, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w118"]
+script = ExtResource("1_work")
+id = &"portrait_19"
+title = "Lady with a Fan"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "gallery", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.7695312, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w119"]
+script = ExtResource("1_work")
+id = &"portrait_20"
+title = "A Masked Gardener"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("service", "portrait")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.0039062, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w120"]
+script = ExtResource("1_work")
+id = &"portrait_21"
+title = "A Young Lady in Periwinkle"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "bedroom", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.1953125, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w121"]
+script = ExtResource("1_work")
+id = &"portrait_22"
+title = "A Lord of Summer at Ease"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted through human eyes (ch19)."
+themes = PackedStringArray("portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.7695312, 0.2588235, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w122"]
+script = ExtResource("1_work")
+id = &"portrait_23"
+title = "A Masked Lady in Silver"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "mask", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.3867188, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w123"]
+script = ExtResource("1_work")
+id = &"portrait_24"
+title = "The Embroideress"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "service", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.5781250, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w124"]
+script = ExtResource("1_work")
+id = &"portrait_25"
+title = "A Captain of the Guard"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "study", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.7695312, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w125"]
+script = ExtResource("1_work")
+id = &"portrait_26"
+title = "A Lady in a Flower Crown"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery", "bedroom", "nursery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.0039062, 0.4980392, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w126"]
+script = ExtResource("1_work")
+id = &"portrait_27"
+title = "A Lady of the Court, Unmasked"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32). Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.0039062, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w127"]
+script = ExtResource("1_work")
+id = &"portrait_28"
+title = "A Masked Lord in Gold"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "mask", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.1953125, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w128"]
+script = ExtResource("1_work")
+id = &"portrait_29"
+title = "An Old Lord of Spring"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait_dim", "store", "portrait")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.3867188, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w129"]
+script = ExtResource("1_work")
+id = &"portrait_30"
+title = "A Lady of the Night Sky"
+genre = &"portrait"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. Before the curse: unmasked (keeper, ch32)."
+themes = PackedStringArray("portrait", "night")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.1953125, 0.4980392, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w130"]
+script = ExtResource("1_work")
+id = &"portrait_31"
+title = "A Masked Lady in Rose"
+genre = &"portrait"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "mask", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.5781250, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w131"]
+script = ExtResource("1_work")
+id = &"portrait_32"
+title = "A Herald in Mint and Gold"
+genre = &"portrait"
+fmt = &"arch_p"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits. Sitter invented [X]. After the curse: masked (ch7, ch32)."
+themes = PackedStringArray("portrait", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.7695312, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w132"]
+script = ExtResource("1_work")
+id = &"full_01"
+title = "The High Lady in the Rose Garden"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Tamlin's mother, before the curse [X]; companion to the rose-garden painting. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.0039062, 0.0039216, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w133"]
+script = ExtResource("1_work")
+id = &"full_02"
+title = "A Lady in Mint Silk"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits of the court; a lady of Spring before the curse. Sitter invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.2578125, 0.0039216, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w134"]
+script = ExtResource("1_work")
+id = &"full_03"
+title = "A Lord of Spring in Hunting Dress"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Ch19: gallery portraits. Before the curse: an unmasked lord dressed for the hunt. Sitter invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.5117188, 0.0039216, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w135"]
+script = ExtResource("1_work")
+id = &"full_04"
+title = "A Masked Lady at the Ball"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Ch19: gallery portraits. After the curse: a lady masked like the rest of the court. Sitter invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.0039062, 0.3843137, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w136"]
+script = ExtResource("1_work")
+id = &"full_05"
+title = "A Lady in Butter Silk"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits of the court; a lady in spring silks, unmasked. Sitter invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.2578125, 0.3843137, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w137"]
+script = ExtResource("1_work")
+id = &"full_06"
+title = "A Masked Lord in Blue"
+genre = &"portrait"
+fmt = &"port"
+major = true
+canon = "X"
+story_ref = "Ch19: gallery portraits. After the curse: a lord masked like the rest of the court. Sitter invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("portrait_full", "portrait", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.5117188, 0.3843137, 0.2500000, 0.3764706)
+pixels = Vector2i(512, 768)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w138"]
+script = ExtResource("1_work")
+id = &"pair_mated"
+title = "A Mated Pair of the Spring Court"
+genre = &"portrait"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Mating bonds are canon (ch19: Tamlin's parents were mated). Sitters invented, before the curse. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "portrait")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.2578125, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w139"]
+script = ExtResource("1_work")
+id = &"pair_sisters"
+title = "Two Sisters of the Dawn Court"
+genre = &"portrait"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Ch19: the gallery holds portraits; two sisters visiting from the Dawn Court, one of Prythian's seven courts. Sitters invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 10
+uv = Rect2(0.5117188, 0.5450980, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w140"]
+script = ExtResource("1_work")
+id = &"animal_01"
+title = "Swans on the Mirror Lakes"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.4492188, 0.7686275, 0.2343750, 0.1882353)
+pixels = Vector2i(480, 384)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w141"]
+script = ExtResource("1_work")
+id = &"animal_02"
+title = "A Fox among Bluebells"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("study", "gallery", "autumn")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.0039062, 0.7686275, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w142"]
+script = ExtResource("1_work")
+id = &"animal_03"
+title = "Hares at Twilight"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("nursery", "gallery", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.2578125, 0.7686275, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w143"]
+script = ExtResource("1_work")
+id = &"animal_04"
+title = "A Stag in the Estate Woods"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted through human eyes (ch19)."
+themes = PackedStringArray("study", "hall", "gallery")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.6875000, 0.7686275, 0.2343750, 0.1882353)
+pixels = Vector2i(480, 384)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w144"]
+script = ExtResource("1_work")
+id = &"animal_05"
+title = "Songbirds in the Blossom"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("bedroom", "nursery", "music")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w145"]
+script = ExtResource("1_work")
+id = &"animal_06"
+title = "The Owl of the Old Tower"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("night", "library", "store")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w146"]
+script = ExtResource("1_work")
+id = &"animal_07"
+title = "Butterflies of the Rosewild"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("bedroom", "nursery", "gallery")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w147"]
+script = ExtResource("1_work")
+id = &"animal_08"
+title = "A Hawk on the March"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("study", "hall")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w148"]
+script = ExtResource("1_work")
+id = &"animal_09"
+title = "The Cat in the Kitchen Garden"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("service", "kitchen")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 8
+uv = Rect2(0.5117188, 0.7686275, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w149"]
+script = ExtResource("1_work")
+id = &"animal_10"
+title = "Hens in the Yard"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("service", "kitchen")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w150"]
+script = ExtResource("1_work")
+id = &"animal_11"
+title = "Squirrels in the Old Oak"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("nursery", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.3867188, 0.7372549, 0.2500000, 0.1764706)
+pixels = Vector2i(512, 360)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w151"]
+script = ExtResource("1_work")
+id = &"animal_12"
+title = "Larks over the Downs"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("music", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w152"]
+script = ExtResource("1_work")
+id = &"animal_13"
+title = "Crows on the Wall Road"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("store", "study")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w153"]
+script = ExtResource("1_work")
+id = &"animal_14"
+title = "A Rabbit by the Hedge"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("nursery", "service", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w154"]
+script = ExtResource("1_work")
+id = &"animal_15"
+title = "A Water Sprite at the Pool"
+genre = &"animal"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("bedroom", "gallery")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w155"]
+script = ExtResource("1_work")
+id = &"animal_16"
+title = "Faelights over the Pond"
+genre = &"animal"
+fmt = &"oval_l"
+major = false
+canon = "X"
+story_ref = "The court's creatures as the game's world has them (creatures/models). Subject invented [X]."
+themes = PackedStringArray("night", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 7
+uv = Rect2(0.0039062, 0.7686275, 0.2343750, 0.1882353)
+pixels = Vector2i(480, 384)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w156"]
+script = ExtResource("1_work")
+id = &"fae_folk_01"
+title = "A Pixie in the Rose Bed"
+genre = &"animal"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The unseen shimmering things in the garden (ch8), seen as they are after the glamour lifts (ch23-24). Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w157"]
+script = ExtResource("1_work")
+id = &"fae_folk_02"
+title = "The Moth Folk at Dusk"
+genre = &"animal"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (lesser-fae-and-ambient). Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w158"]
+script = ExtResource("1_work")
+id = &"fae_folk_03"
+title = "An Owl-Faerie of the Library"
+genre = &"animal"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (ch8), here a wise one among the books. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.2265625, 0.7647059, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w159"]
+script = ExtResource("1_work")
+id = &"fae_folk_04"
+title = "The Stag-Crowned Fae"
+genre = &"animal"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court; Spring's stags. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.1953125, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w160"]
+script = ExtResource("1_work")
+id = &"fae_folk_05"
+title = "A Satyr Piping"
+genre = &"animal"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Calanmai revellers are lesser faeries (ch21). Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.1953125, 0.0039216, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w161"]
+script = ExtResource("1_work")
+id = &"fae_folk_06"
+title = "A Rose Dryad"
+genre = &"animal"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (ch8), a spirit of the manor's roses. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.4492188, 0.7647059, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w162"]
+script = ExtResource("1_work")
+id = &"fae_folk_07"
+title = "A Birch Dryad"
+genre = &"animal"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The western birch woods (ch13), where Feyre goes to catch the Suriel. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.3867188, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w163"]
+script = ExtResource("1_work")
+id = &"fae_folk_08"
+title = "The Hedgehog Folk"
+genre = &"animal"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (ch8), small folk of the hedgerows. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.3867188, 0.0039216, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w164"]
+script = ExtResource("1_work")
+id = &"fae_folk_09"
+title = "A Mushroom Faerie"
+genre = &"animal"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (ch8), a sprite of the woodland floor. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.6718750, 0.7647059, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w165"]
+script = ExtResource("1_work")
+id = &"fae_folk_10"
+title = "A Nymph of the Pools"
+genre = &"animal"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court; water sprites [X]. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.5781250, 0.2588235, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w166"]
+script = ExtResource("1_work")
+id = &"fae_folk_11"
+title = "Revellers of Calanmai"
+genre = &"animal"
+fmt = &"oval_p"
+major = false
+canon = "X"
+story_ref = "Calanmai revellers (ch20-21), dancing toward the bonfires on the night of the Rite. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "library", "music")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 9
+uv = Rect2(0.5781250, 0.0039216, 0.1875000, 0.2352941)
+pixels = Vector2i(384, 480)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w167"]
+script = ExtResource("1_work")
+id = &"fae_folk_12"
+title = "A Fox-Folk Wanderer"
+genre = &"animal"
+fmt = &"square"
+major = false
+canon = "X"
+story_ref = "Lesser faeries of the court (ch8); the fox recalls Lucien's mask. Figure invented [X]. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("gallery", "bedroom", "nursery", "hall")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.0039062, 0.7686275, 0.2187500, 0.2196078)
+pixels = Vector2i(448, 448)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w168"]
+script = ExtResource("1_work")
+id = &"masquerade_old"
+title = "A Spring Masquerade, Long Ago"
+genre = &"interior"
+fmt = &"land"
+major = true
+canon = "X"
+story_ref = "Invented pre-curse costume ball [X]; not the masquerade of ch32, whose masks honoured Tamlin's shape-shifting."
+themes = PackedStringArray("mask", "ballroom", "store")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w169"]
+script = ExtResource("1_work")
+id = &"ballroom_spring"
+title = "The Ballroom in Spring"
+genre = &"interior"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "The manor's ballroom in happier days, before the curse and the blight. Painted with a fae 'bend to the world' (ch19)."
+themes = PackedStringArray("ballroom", "music", "gallery")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w170"]
+script = ExtResource("1_work")
+id = &"music_salon"
+title = "An Evening of Music"
+genre = &"interior"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "Music in the house [X]: the masked court gathered for an evening's playing."
+themes = PackedStringArray("music", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w171"]
+script = ExtResource("1_work")
+id = &"tea_in_conservatory"
+title = "Tea in the Conservatory"
+genre = &"interior"
+fmt = &"land"
+major = false
+canon = "X"
+story_ref = "A quiet afternoon [X]: masked courtiers taking tea among the conservatory's plants."
+themes = PackedStringArray("dining", "bedroom", "service")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w172"]
+script = ExtResource("1_work")
+id = &"plate_suriel"
+title = "The Suriel, a Plate"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch13-14: tall and corpse-like, veiled tattered robe, lipless mouth, long teeth, milky eyes; caught near young birches and running water. Bestiary plate [X]."
+themes = PackedStringArray("library", "study", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.0039062, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w173"]
+script = ExtResource("1_work")
+id = &"plate_naga"
+title = "Naga, a Plate"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch15: dark scales, serpentine features on male humanoid bodies, huge almond-shaped eyes, polished black, flesh-shredding talons. Bestiary plate [X]."
+themes = PackedStringArray("library", "study", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.7695312, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w174"]
+script = ExtResource("1_work")
+id = &"plate_bogge"
+title = "The Bogge: What Is Not to Be Looked At"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch9-10: invisible; it becomes real only if you acknowledge it. The plate shows only a darkness. Bestiary plate [X]."
+themes = PackedStringArray("library", "study", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.1953125, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w175"]
+script = ExtResource("1_work")
+id = &"plate_puca"
+title = "The Puca, and What It Wears"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch11: it lures with your own desire; no true form is described. Its shadow is wrong. Bestiary plate [X]."
+themes = PackedStringArray("library", "study", "store")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w176"]
+script = ExtResource("1_work")
+id = &"plate_faerie"
+title = "Lesser Faerie of the Garden"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Ch8: shimmering unseen things in the garden. Bestiary plate [X]."
+themes = PackedStringArray("library", "study", "store")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.5781250, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w177"]
+script = ExtResource("1_work")
+id = &"plate_lamb"
+title = "The Spring Lamb"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Spring's emblem, as on the mural of Prythian (ch13). Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w178"]
+script = ExtResource("1_work")
+id = &"plate_stag"
+title = "The Stag of the Estate Woods"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The game of the estate woods, where Tamlin and Lucien hunt. Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w179"]
+script = ExtResource("1_work")
+id = &"plate_fox"
+title = "The Red Fox"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "Lucien's fox mask echoes it; the fox of the court's woods. Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w180"]
+script = ExtResource("1_work")
+id = &"plate_hare"
+title = "The Brown Hare"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The quarry of Feyre's snares, set as she did at home (ch19). Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = true
+sheet = ""
+layer = -1
+uv = Rect2(0.0000000, 0.0000000, 0.0000000, 0.0000000)
+pixels = Vector2i(0, 0)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w181"]
+script = ExtResource("1_work")
+id = &"plate_swan"
+title = "The Mute Swan"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The swans of the court's lakes and still pools. Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 6
+uv = Rect2(0.1953125, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w182"]
+script = ExtResource("1_work")
+id = &"plate_butterflies"
+title = "Butterflies of the Court"
+genre = &"plate"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "The butterflies of the manor's gardens, always in spring. Bestiary plate [X]."
+themes = PackedStringArray("library", "nursery", "service", "bedroom")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.3867188, 0.5137255, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w183"]
+script = ExtResource("1_work")
+id = &"botanical_rose_red"
+title = "Red Rose, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Red roses fill the manor's gardens (book 1). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_rose_red). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.3828125, 0.6598039, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w184"]
+script = ExtResource("1_work")
+id = &"botanical_rose_white"
+title = "White Rose, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "White roses fill the manor's gardens (book 1). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_rose_white). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.5742188, 0.6598039, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w185"]
+script = ExtResource("1_work")
+id = &"botanical_wild_hyacinth"
+title = "Wild Hyacinth, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "The ch7 breeze is scented with hyacinth ('wild' is [X]). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_wild_hyacinth). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.1953125, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w186"]
+script = ExtResource("1_work")
+id = &"botanical_foxglove"
+title = "Foxglove, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Foxglove, as at the cottage table (book 1). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_foxglove). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.0039062, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w187"]
+script = ExtResource("1_work")
+id = &"botanical_lavender"
+title = "Lavender, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_lavender). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.7695312, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w188"]
+script = ExtResource("1_work")
+id = &"botanical_honeysuckle"
+title = "Honeysuckle, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_honeysuckle). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.3867188, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w189"]
+script = ExtResource("1_work")
+id = &"botanical_elderflower"
+title = "Elderflower, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_elderflower). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.5781250, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w190"]
+script = ExtResource("1_work")
+id = &"botanical_wild_strawberry"
+title = "Wild Strawberry, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_wild_strawberry). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.3867188, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w191"]
+script = ExtResource("1_work")
+id = &"botanical_moonflower"
+title = "Moonflower, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_moonflower). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.5781250, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w192"]
+script = ExtResource("1_work")
+id = &"botanical_faelight_dandelion"
+title = "Faelight Dandelion, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_faelight_dandelion). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.7695312, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w193"]
+script = ExtResource("1_work")
+id = &"botanical_woad"
+title = "Woad, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_woad). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.7695312, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w194"]
+script = ExtResource("1_work")
+id = &"botanical_madder"
+title = "Madder Root, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_madder). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.1953125, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w195"]
+script = ExtResource("1_work")
+id = &"botanical_snowdrop"
+title = "Snowdrop, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Snowdrops (ch6 and the ch18 glen). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_snowdrop). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.7656250, 0.6598039, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w196"]
+script = ExtResource("1_work")
+id = &"botanical_wisteria"
+title = "Wisteria, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Wisteria, as on her trellis (book 1). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_wisteria). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.5781250, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w197"]
+script = ExtResource("1_work")
+id = &"botanical_lilac"
+title = "Lilac, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Lilac in flower (ch9, and the smell of magic in ch23). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_lilac). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.0039062, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w198"]
+script = ExtResource("1_work")
+id = &"botanical_crab_apple"
+title = "Crab Apple, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "'A blossoming crab apple tree' (ch24). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_crab_apple). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.0039062, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w199"]
+script = ExtResource("1_work")
+id = &"botanical_buttercup"
+title = "Meadow Buttercup, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "The buttercup field (ch8). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_buttercup). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.7656250, 0.3843137, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w200"]
+script = ExtResource("1_work")
+id = &"botanical_iris"
+title = "Amethyst Iris, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "She paints 'beds of irises' (ch24). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_iris). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.5781250, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w201"]
+script = ExtResource("1_work")
+id = &"botanical_crocus"
+title = "Crocus, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Crocuses in the glen (ch18). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_crocus). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.1953125, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w202"]
+script = ExtResource("1_work")
+id = &"botanical_daffodil"
+title = "Daffodil, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Daffodils, on the cottage cabinets and in Spring's grounds (book 1). A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_daffodil). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 1
+uv = Rect2(0.3867188, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w203"]
+script = ExtResource("1_work")
+id = &"botanical_peony"
+title = "Peony, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Peonies, in the ch7 still life. A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_peony). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 4
+uv = Rect2(0.7617188, 0.3549020, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w204"]
+script = ExtResource("1_work")
+id = &"botanical_tulip"
+title = "Tulip, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Tulips, in the ch7 still life. A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_tulip). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 5
+uv = Rect2(0.0039062, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w205"]
+script = ExtResource("1_work")
+id = &"botanical_morning_glory"
+title = "Morning Glory, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Morning glory, in the ch7 still life. A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_morning_glory). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.7695312, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w206"]
+script = ExtResource("1_work")
+id = &"botanical_goldenrod"
+title = "Goldenrod, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Goldenrod, in the ch7 still life. A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_goldenrod). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 2
+uv = Rect2(0.1953125, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w207"]
+script = ExtResource("1_work")
+id = &"botanical_maidens_lace"
+title = "Maiden's Lace, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "C"
+story_ref = "Maiden's lace, in the ch7 still life. A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_maidens_lace). Plate [X]."
+themes = PackedStringArray("stillroom", "service", "nursery", "library")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 3
+uv = Rect2(0.3867188, 0.7058824, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[sub_resource type="Resource" id="w208"]
+script = ExtResource("1_work")
+id = &"botanical_blackberry"
+title = "Blackberry, a Botanical Plate"
+genre = &"botanical"
+fmt = &"port"
+major = false
+canon = "X"
+story_ref = "A forage ingredient of the game (lore/05-foraging-chemistry/ingredients.md: ing_blackberry). Plate [X]."
+themes = PackedStringArray("stillroom", "library", "bedroom", "service")
+pin = &""
+reserve = false
+sheet = "res://art/house/paintings/paintings.webp"
+layer = 0
+uv = Rect2(0.7656250, 0.0039216, 0.1875000, 0.2509804)
+pixels = Vector2i(384, 512)
+source = "generated for this game by tools/art/manor_paintings (L39)"
+licence = "original work made for this game"
+
+[resource]
+script = ExtResource("2_cat")
+; every work that can hang in the manor; built by tools/art/manor_paintings/build.py, do not hand-edit
+works = Array[ExtResource("1_work")]([SubResource("w000"), SubResource("w001"), SubResource("w002"), SubResource("w003"), SubResource("w004"), SubResource("w005"), SubResource("w006"), SubResource("w007"), SubResource("w008"), SubResource("w009"), SubResource("w010"), SubResource("w011"), SubResource("w012"), SubResource("w013"), SubResource("w014"), SubResource("w015"), SubResource("w016"), SubResource("w017"), SubResource("w018"), SubResource("w019"), SubResource("w020"), SubResource("w021"), SubResource("w022"), SubResource("w023"), SubResource("w024"), SubResource("w025"), SubResource("w026"), SubResource("w027"), SubResource("w028"), SubResource("w029"), SubResource("w030"), SubResource("w031"), SubResource("w032"), SubResource("w033"), SubResource("w034"), SubResource("w035"), SubResource("w036"), SubResource("w037"), SubResource("w038"), SubResource("w039"), SubResource("w040"), SubResource("w041"), SubResource("w042"), SubResource("w043"), SubResource("w044"), SubResource("w045"), SubResource("w046"), SubResource("w047"), SubResource("w048"), SubResource("w049"), SubResource("w050"), SubResource("w051"), SubResource("w052"), SubResource("w053"), SubResource("w054"), SubResource("w055"), SubResource("w056"), SubResource("w057"), SubResource("w058"), SubResource("w059"), SubResource("w060"), SubResource("w061"), SubResource("w062"), SubResource("w063"), SubResource("w064"), SubResource("w065"), SubResource("w066"), SubResource("w067"), SubResource("w068"), SubResource("w069"), SubResource("w070"), SubResource("w071"), SubResource("w072"), SubResource("w073"), SubResource("w074"), SubResource("w075"), SubResource("w076"), SubResource("w077"), SubResource("w078"), SubResource("w079"), SubResource("w080"), SubResource("w081"), SubResource("w082"), SubResource("w083"), SubResource("w084"), SubResource("w085"), SubResource("w086"), SubResource("w087"), SubResource("w088"), SubResource("w089"), SubResource("w090"), SubResource("w091"), SubResource("w092"), SubResource("w093"), SubResource("w094"), SubResource("w095"), SubResource("w096"), SubResource("w097"), SubResource("w098"), SubResource("w099"), SubResource("w100"), SubResource("w101"), SubResource("w102"), SubResource("w103"), SubResource("w104"), SubResource("w105"), SubResource("w106"), SubResource("w107"), SubResource("w108"), SubResource("w109"), SubResource("w110"), SubResource("w111"), SubResource("w112"), SubResource("w113"), SubResource("w114"), SubResource("w115"), SubResource("w116"), SubResource("w117"), SubResource("w118"), SubResource("w119"), SubResource("w120"), SubResource("w121"), SubResource("w122"), SubResource("w123"), SubResource("w124"), SubResource("w125"), SubResource("w126"), SubResource("w127"), SubResource("w128"), SubResource("w129"), SubResource("w130"), SubResource("w131"), SubResource("w132"), SubResource("w133"), SubResource("w134"), SubResource("w135"), SubResource("w136"), SubResource("w137"), SubResource("w138"), SubResource("w139"), SubResource("w140"), SubResource("w141"), SubResource("w142"), SubResource("w143"), SubResource("w144"), SubResource("w145"), SubResource("w146"), SubResource("w147"), SubResource("w148"), SubResource("w149"), SubResource("w150"), SubResource("w151"), SubResource("w152"), SubResource("w153"), SubResource("w154"), SubResource("w155"), SubResource("w156"), SubResource("w157"), SubResource("w158"), SubResource("w159"), SubResource("w160"), SubResource("w161"), SubResource("w162"), SubResource("w163"), SubResource("w164"), SubResource("w165"), SubResource("w166"), SubResource("w167"), SubResource("w168"), SubResource("w169"), SubResource("w170"), SubResource("w171"), SubResource("w172"), SubResource("w173"), SubResource("w174"), SubResource("w175"), SubResource("w176"), SubResource("w177"), SubResource("w178"), SubResource("w179"), SubResource("w180"), SubResource("w181"), SubResource("w182"), SubResource("w183"), SubResource("w184"), SubResource("w185"), SubResource("w186"), SubResource("w187"), SubResource("w188"), SubResource("w189"), SubResource("w190"), SubResource("w191"), SubResource("w192"), SubResource("w193"), SubResource("w194"), SubResource("w195"), SubResource("w196"), SubResource("w197"), SubResource("w198"), SubResource("w199"), SubResource("w200"), SubResource("w201"), SubResource("w202"), SubResource("w203"), SubResource("w204"), SubResource("w205"), SubResource("w206"), SubResource("w207"), SubResource("w208")])
+room_themes = {"attic_long_hall": PackedStringArray("store", "corridor"), "attic_painting_loft": PackedStringArray("store_secret", "store", "portrait_dim"), "attic_stair_hall": PackedStringArray("store", "service"), "ballroom": PackedStringArray("ballroom", "music"), "card_room": PackedStringArray("mask", "music", "bedroom"), "dining_hall": PackedStringArray("dining", "hall"), "drawing_room": PackedStringArray("hall", "music", "bedroom"), "east_corridor@0": PackedStringArray("corridor", "hall", "portrait"), "east_corridor@1": PackedStringArray("corridor", "bedroom", "hall"), "entrance_hall": PackedStringArray("hall", "gallery"), "feyre_bedroom": PackedStringArray("bedroom", "nursery"), "gallery": PackedStringArray("gallery"), "garden_saloon": PackedStringArray("hall", "dining", "nursery"), "guest_suite_lilac": PackedStringArray("bedroom", "music"), "guest_suite_periwinkle": PackedStringArray("night", "bedroom"), "guest_suite_wisteria": PackedStringArray("autumn", "bedroom"), "hidden_nook": PackedStringArray("library", "study"), "library": PackedStringArray("library", "study", "map"), "map_stairwell": PackedStringArray("map", "library", "store"), "mask_vault": PackedStringArray("mask", "portrait_dim"), "moon_tower": PackedStringArray("night", "portrait"), "moon_tower_hidden": PackedStringArray("night", "library"), "morning_room": PackedStringArray("nursery", "bedroom", "hall"), "music_room": PackedStringArray("music", "ballroom"), "painting_room": PackedStringArray("gallery", "bedroom"), "painting_store": PackedStringArray("store", "portrait_dim", "library"), "portrait_gallery": PackedStringArray("portrait_full", "portrait"), "rose_corridor": PackedStringArray("corridor", "bedroom", "hall"), "rose_parlour": PackedStringArray("bedroom", "music", "hall"), "study": PackedStringArray("study", "map", "library"), "svc_alis_room": PackedStringArray("alis", "service"), "svc_attic_playroom": PackedStringArray("nursery", "service"), "svc_housekeeper": PackedStringArray("service", "stillroom"), "svc_kitchen": PackedStringArray("kitchen", "service"), "svc_maid_bedroom_a": PackedStringArray("service", "bedroom"), "svc_stillroom": PackedStringArray("stillroom", "service"), "tamlin_study": PackedStringArray("study", "map", "library"), "upper_hall": PackedStringArray("hall", "gallery"), "west_corridor@0": PackedStringArray("portrait", "mask", "corridor"), "west_corridor@1": PackedStringArray("corridor", "portrait", "hall"), "west_wing_hall": PackedStringArray("hall", "gallery", "corridor")}
+room_patterns = Array[PackedStringArray]([PackedStringArray("library", "library", "study"), PackedStringArray("study", "study", "map"), PackedStringArray("kitchen", "kitchen", "service"), PackedStringArray("still", "stillroom", "service"), PackedStringArray("svc_", "service", "stillroom"), PackedStringArray("nursery", "nursery", "bedroom"), PackedStringArray("bed", "bedroom", "nursery"), PackedStringArray("suite", "bedroom", "night"), PackedStringArray("dining", "dining", "hall"), PackedStringArray("music", "music", "ballroom"), PackedStringArray("ball", "ballroom", "music"), PackedStringArray("mask", "mask", "portrait"), PackedStringArray("portrait", "portrait", "portrait_full"), PackedStringArray("attic", "store", "service"), PackedStringArray("store", "store"), PackedStringArray("corridor", "corridor", "hall"), PackedStringArray("hall", "hall", "gallery"), PackedStringArray("", "hall", "bedroom", "gallery")])
