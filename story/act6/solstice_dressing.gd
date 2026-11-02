@@ -12,8 +12,10 @@ extends Act6Space
 const GOWN := &"outfit_solstice_blue_gown"
 const HAIR := &"hair_loose_with_flowers"
 ## Late afternoon, then the sun's last descent on the plateau.
-const AFTERNOON := 17.0 / 24.0
-const DUSK := 19.6 / 24.0
+const AFTERNOON := 15.5 / 24.0
+## The sun beginning its final descent (canon) as they reach the plateau; it
+## sets at about 18.25 h (GradeDirector.sun_rotation).
+const DUSK := 17.4 / 24.0
 
 
 func _init() -> void:

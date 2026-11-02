@@ -176,3 +176,35 @@ class GroundLeadBeat:
 			who.global_position = Vector3(p.x, WorldHeight.height_at(p.x, p.z), p.z)
 		return super.tick(space, delta)
 
+
+
+## A short camera insert: a slow push in on a point from Feyre's side (from
+## `far` to `near` metres, `drop` metres below it), then back to her camera.
+func insert_shot(at: Vector3, far: float, near: float, drop: float, seconds: float, fov: float = 36.0) -> void:
+	if not is_inside_tree():
+		return
+	var p := player()
+	var away := ((p.global_position - at) * Vector3(1, 0, 1)) if p else Vector3.BACK
+	away = away.normalized() if away.length() > 0.1 else Vector3.BACK
+	var cam := Camera3D.new()
+	cam.name = "InsertShot"
+	cam.fov = fov
+	add_child(cam)
+	var from := at + away * far + Vector3.UP * drop
+	var to := at + away * near + Vector3.UP * drop * 0.45
+	cam.global_position = from
+	cam.look_at(at, Vector3.UP)
+	cam.current = true
+	var tw := create_tween()
+	tw.tween_method(func(t: float) -> void:
+		if is_instance_valid(cam):
+			cam.global_position = from.lerp(to, t)
+			cam.look_at(at, Vector3.UP), 0.0, 1.0, seconds) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_callback(func() -> void:
+		if is_instance_valid(cam):
+			cam.current = false
+			cam.queue_free()
+		var f := player() as Feyre
+		if f and f.camera:
+			f.camera.current = true)

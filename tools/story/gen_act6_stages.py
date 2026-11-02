@@ -58,15 +58,15 @@ STAGES = {
         },
     },
     "fountain_head": {
-        "canon": "Ch24 [C] (Keeper): the next morning she hauls her paints out to paint the irises; the head is spiked on the heron's upraised bill; no mask, so not Spring; she backs into Tamlin, Lucien pale and grim beside him; Lucien wades in, finds the sigil behind the ear (a mountain with three stars); Tamlin: \"Night Court.\" Lucien climbs the heron's wing and yanks the head off while Tamlin holds her shoulders and she looks at a blossoming crab apple tree; \"court posturing\", \"You're still safe\"; Lucien leaves with it; Tamlin kneels and helps her pick up her paints. Marks in manor_fountain's frame: the fountain centre is (0, 0, -12.5).",
+        "canon": "Ch24 [C] (Keeper): the next morning she hauls her paints out to paint the irises; the head is spiked on the heron's upraised bill; no mask, so not Spring; she backs into Tamlin, Lucien pale and grim beside him; Lucien wades in, finds the sigil behind the ear (a mountain with three stars); Tamlin: \"Night Court.\" Lucien climbs the heron's wing and yanks the head off while Tamlin holds her shoulders and she looks at a blossoming crab apple tree; \"court posturing\", \"You're still safe\"; Lucien leaves with it; Tamlin kneels and helps her pick up her paints. Marks in manor_fountain's frame: the fountain centre is (0, 0, -12.5); L35's pool r 4.95, irises to r 9, the inner walk r 9-14 (she stands on it, about r 11.5); the crab apple (L46's own tree) at r 15 east.",
         "marks": {
             "fountain": (0.0, 0.0, -12.5),
-            "tamlin_behind": (0.8, 0.0, -4.0),
-            "lucien_behind": (-1.4, 0.0, -3.6),
+            "tamlin_behind": (0.8, 0.0, 1.6),
+            "lucien_behind": (-1.4, 0.0, 2.0),
             "lucien_rim": (-1.6, 0.0, -7.2),
             "lucien_wade": (-0.9, 0.0, -10.1),
             "lucien_exit": (-16.0, 0.0, 8.0),
-            "crab_apple": (11.0, 2.6, -3.0),
+            "crab_apple": (11.5, 2.6, -2.5),
         },
         "lines": {
             "irises_thought": ("", "I hauled my paints and easel out to paint one of the beds of irises.", "C"),

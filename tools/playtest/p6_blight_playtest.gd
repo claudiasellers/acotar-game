@@ -241,7 +241,7 @@ func _fountain() -> bool:
 		return _failed("FountainHead never started (%s)" % (("can_start %s, alis day %s, today %d, %.1f h, %.1f m from the centre" % [
 			f.can_start(), WorldState.get_flag("fact.alis_true_seen.day"), Clock.day, Clock.hour(),
 			_flat(f.center())]) if f else "no node"))
-	await _walk_to(sp.center() + Vector3(0, 0, 7.0), 0.8)
+	await _walk_to(sp.center() + Vector3(0, 0, 11.5), 0.8)
 	await _look(func() -> Vector3: return sp.head_point(), 4.0)
 	if not await _until_wall(func() -> bool: return WorldState.has_flag("fountain_head_found"), 120.0):
 		return _failed("stuck at '%s'" % sp.current_beat_label())

@@ -19,7 +19,15 @@ const DANCE := 20.0
 const DANCE_R := 1.3
 const KEEP_CLOSE := 2.4
 const LATE := 22.5 / 24.0
-const SUNRISE := 5.4 / 24.0
+## Grades (L18's presets): the meadow at golden hour, then the twilight of the
+## wisps. A story hold, released at the end.
+const PARTY_GRADE := &"grade_solstice"
+const NIGHT_GRADE := &"grade_solstice_twilight"
+## Lantern strings between the tables and the ring, in the dance floor's frame.
+const LANTERNS: Array[Vector3] = [Vector3(70.0, 0.0, 12.0), Vector3(50.0, 0.0, 4.0), Vector3(28.0, 0.0, -6.0),
+	Vector3(36.0, 0.0, -50.0), Vector3(14.0, 0.0, -30.0)]
+## The sun clears the meadow's rim at about 5.8 h (GradeDirector.sun_rotation).
+const SUNRISE := 6.3 / 24.0
 ## The crowd: true forms (the glamour is gone), round the dance ring.
 const CROWD := [&"reveler_1", &"reveler_2", &"reveler_3", &"fae_nymph", &"fae_rose", &"fae_pixie",
 		&"fae_dryad", &"fae_moth", &"fae_fox", &"fae_birch", &"fae_satyr", &"fae_stag", &"fae_owl",
@@ -28,6 +36,7 @@ const CROWD := [&"reveler_1", &"reveler_2", &"reveler_3", &"fae_nymph", &"fae_ro
 var drank: bool = false
 var danced: float = 0.0
 var crowd: Array[Node3D] = []
+var dressing: Array[Node3D] = []
 var wisps: GPUParticles3D
 var _party := 0.0
 var _angle := 0.0
@@ -92,9 +101,35 @@ func _open_party(_s: SceneSpace) -> void:
 	var l := cast(&"lucien", &"lucien_near", &"ring")
 	l.global_position = ground_mark(&"lucien_near")
 	_spawn_crowd()
+	_dress_party()
+	EventBus.grade_swap_requested.emit(PARTY_GRADE, 2.0)
 	SoundDirector.cue(&"music_spring_estate")
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(t)
+
+
+## The faerie wine on its own table by the long tables, and lantern strings
+## that glow once the sun is down.
+func _dress_party() -> void:
+	if not dressing.is_empty():
+		return
+	var wt := ground_mark(&"wine_table") + Vector3(0.0, 0.0, 3.5)
+	var table := prop(&"wine_table_solstice", wt, 0.4)
+	if table:
+		dressing.append(table)
+	var a := get_parent() as Node3D
+	for i in LANTERNS.size():
+		var at := snap(a.global_transform * LANTERNS[i] if a else LANTERNS[i])
+		var string := prop(&"solstice_lantern_string", at + Vector3.UP * 2.6, 0.5 + i * 0.9)
+		if string == null:
+			continue
+		dressing.append(string)
+		var lamp := OmniLight3D.new()
+		lamp.light_color = [Color(1.0, 0.78, 0.86), Color(0.8, 0.86, 1.0), Color(1.0, 0.92, 0.7)][i % 3]
+		lamp.light_energy = 1.4
+		lamp.omni_range = 9.0
+		lamp.position = Vector3(0.0, -0.4, 0.0)
+		string.add_child(lamp)
 
 
 func _spawn_crowd() -> void:
@@ -145,6 +180,7 @@ func _night_falls() -> void:
 		t.global_position = ground_mark(&"tamlin_leave")
 	place_feyre(ground_mark(&"tamlin_leave") + Vector3(1.2, 0.0, 1.0))
 	dismiss(&"lucien")
+	EventBus.grade_swap_requested.emit(NIGHT_GRADE, 3.0)
 
 
 func _open_wisps(_s: SceneSpace) -> void:
@@ -193,6 +229,30 @@ func _open_wisps(_s: SceneSpace) -> void:
 	glow.light_energy = 1.6
 	glow.omni_range = 11.0
 	wisps.add_child(glow)
+	# Spirits of air and light: the hollow is lit by them alone (and a high,
+	# cool wash for the moon), each light drifting on its own slow loop.
+	var hollow := ground_mark(&"hollow")
+	var moon := OmniLight3D.new()
+	moon.name = "MoonWash"
+	moon.light_color = Color(0.7, 0.76, 1.0)
+	moon.light_energy = 0.9
+	moon.omni_range = 70.0
+	moon.omni_attenuation = 0.6
+	wisps.add_child(moon)
+	moon.global_position = hollow + Vector3(-10.0, 30.0, 6.0)
+	for i in 6:
+		var w := OmniLight3D.new()
+		w.light_color = [Color(1.0, 0.8, 0.92), Color(0.78, 0.88, 1.0), Color(0.82, 1.0, 0.9)][i % 3]
+		w.light_energy = 1.5
+		w.omni_range = 7.0
+		wisps.add_child(w)
+		var ang := TAU * i / 6.0
+		var home := hollow + Vector3(cos(ang) * 4.5, 1.4 + 0.3 * (i % 2), sin(ang) * 4.5)
+		w.global_position = home
+		var tw := w.create_tween().set_loops()
+		tw.tween_property(w, "global_position", home + Vector3(sin(ang) * 1.4, 0.7, -cos(ang) * 1.4), 3.0 + i * 0.4) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(w, "global_position", home, 3.0 + i * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	Juice.burst(null, &"unlock", wisps.global_position)
 
 
@@ -220,6 +280,12 @@ func _sun_target() -> Node3D:
 
 
 func _close() -> void:
+	for n in dressing:
+		if is_instance_valid(n):
+			n.queue_free()
+	dressing.clear()
+	for node in get_tree().root.find_children("*", "GradeDirector", true, false):
+		(node as GradeDirector).release_story_hold()
 	for n in crowd:
 		if is_instance_valid(n):
 			n.queue_free()

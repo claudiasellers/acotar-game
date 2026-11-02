@@ -8,7 +8,7 @@
 ## (all when left out) and stops after --stop-after.
 extends "res://tools/playtest/p6_blight_playtest.gd"
 
-const MAX_FRAMES := 150
+const MAX_FRAMES := 400
 ## Seconds of game time between frames, by beat (0 = none). The dressing beat
 ## is mostly the ride to the plateau, so it is sparse.
 const EVERY := {

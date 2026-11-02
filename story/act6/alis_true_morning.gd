@@ -41,7 +41,9 @@ func _build_beats() -> Array:
 			var tf := _true_form()
 			if tf:
 				tf.frighten(1.0)
-			EventBus.face_requested.emit(&"alis", &"startled", 0.8, 1.5), "Alis pales"),
+			EventBus.face_requested.emit(&"alis", &"startled", 0.8, 1.5)
+			# Close on her face while the bark bleaches and colours back.
+			insert_shot(_alis_face(), 1.9, 1.15, -0.05, 3.2, 40.0), "Alis pales"),
 		say(&"birch_thought"),
 		say(&"alis_i_am"),
 		lead_along(&"alis", [&"bath"], 0.0, 1.4),

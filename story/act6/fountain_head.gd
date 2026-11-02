@@ -17,7 +17,9 @@ extends Act6Space
 ## the heron's upraised bill in that frame (the heron faces south).
 const HEAD_ON_BILL := Vector3(0.0, 4.55, 1.7)
 const NEAR := 26.0
-const RIM := 7.5
+## On L35's inner walk (r 9-14), outside the iris bed round the pool.
+const RIM := 12.0
+const CLOSEUP_SECONDS := 3.4
 const LOOK := 1.5
 ## Seconds at the rim before the scene turns her head to it for her.
 const NUDGE_AFTER := 14.0
@@ -41,6 +43,9 @@ func can_start() -> bool:
 	return super.can_start() and day_after("fact.alis_true_seen")
 
 
+var _planted := false
+
+
 func _ready() -> void:
 	super._ready()
 	arrive_offset = Vector3(0.0, 0.0, -12.5)
@@ -57,6 +62,9 @@ func head_point() -> Vector3:
 
 
 func _process(_delta: float) -> void:
+	if not _planted and is_inside_tree() and player() != null:
+		_planted = true
+		_plant_crab_apple()
 	# The head is there all that morning, seen from across the garden.
 	var on_show := running or (can_start() and not WorldState.has_flag("fact.fountain_head_seen"))
 	if on_show and head == null:
@@ -179,6 +187,13 @@ func _sting(_s: SceneSpace) -> void:
 		tins = prop(&"paint_tins_spilled", snap(p.global_position + p.global_transform.basis.z * -0.5), p.global_rotation.y)
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(head)
+	_closeup()
+
+
+## The cut she can't look away from: at 11 m a head on a 4.5 m bill is too
+## small to read, so a slow push in from her side makes sure nobody misses it.
+func _closeup() -> void:
+	insert_shot(head_point(), 2.8, 1.55, -0.55, CLOSEUP_SECONDS)
 
 
 ## Lucien on the heron's stone wing pulls it off; it goes with him.
@@ -197,7 +212,10 @@ func _yank(_s: SceneSpace) -> void:
 		SoundDirector.cue(&"bow_hit_flesh", hand))
 
 
+## The blossoming crab apple Tamlin turns her to (ch24): a real tree at the
+## edge of the rose wheel, there every day, not only during the scene.
 func _crab_apple_target() -> Node3D:
+	_plant_crab_apple()
 	var n := get_node_or_null(^"CrabApple") as Node3D
 	if n == null:
 		n = Node3D.new()
@@ -205,6 +223,18 @@ func _crab_apple_target() -> Node3D:
 		add_child(n)
 	n.global_position = mark(&"crab_apple")
 	return n
+
+
+func _plant_crab_apple() -> void:
+	if get_node_or_null(^"CrabAppleTree") != null or not FloraLibrary.has_mesh(&"crab_apple"):
+		return
+	var tree := MeshInstance3D.new()
+	tree.name = "CrabAppleTree"
+	tree.mesh = FloraLibrary.mesh(&"crab_apple")
+	tree.material_override = FloraLibrary.material(FloraLibrary.look_of(&"crab_apple"))
+	add_child(tree)
+	var at := mark(&"crab_apple")
+	tree.global_transform = Transform3D(Basis(Vector3.UP, 0.7).scaled(Vector3.ONE * 1.05), snap(Vector3(at.x, at.y - 2.6, at.z)))
 
 
 ## Birdsong thins and a heartbeat rises as she comes up the walk.
