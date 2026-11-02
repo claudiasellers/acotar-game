@@ -108,16 +108,21 @@ func _wreck() -> void:
 		pool.scale = Vector3(rng.randf_range(0.6, 1.8), 1.0, rng.randf_range(0.5, 1.2))
 		pool.rotation.y = rng.randf() * TAU
 	var gouge := _mat(Color(0.12, 0.1, 0.09), 0.9)
-	# Four claws dragged down the east wall, beside the dining-room door.
+	# Four claws dragged down the east wall, south of the dining-room door
+	# (its opening is z -39.2 to -36.8), on the wall's face.
 	for set_i in 3:
-		var base := Vector3(9.94, 1.2 + set_i * 0.35, -43.0 + set_i * 2.6)
+		var base := Vector3(8.0, 1.2 + set_i * 0.35, -46.4 + set_i * 2.1)
 		for k in 4:
+			var from := at(base + Vector3(0.0, 0.0, k * 0.11))
+			var hit := _ray(from, at(base + Vector3(3.0, 0.0, k * 0.11)))
+			if hit.is_empty():
+				continue
 			var g := MeshInstance3D.new()
 			var b := BoxMesh.new()
 			b.size = Vector3(0.03, 1.1, 0.035)
 			g.mesh = b
 			g.material_override = gouge
-			add_prop(g, at(base + Vector3(0.0, 0.0, k * 0.11)))
+			add_prop(g, (hit.position as Vector3) + (hit.normal as Vector3) * 0.012)
 			g.global_basis = frame.basis * Basis(Vector3.RIGHT, 0.35)
 
 

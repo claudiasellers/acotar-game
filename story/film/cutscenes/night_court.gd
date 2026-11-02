@@ -65,8 +65,9 @@ func _setup() -> void:
 	Clock.from_dict({"time_of_day": NOON, "day": Clock.day})
 	player.veil_to(1.0, 0.0)
 	_dress_table()
-	tamlin = bring(&"tamlin", TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0.0, 0.0))
-	lucien = bring(&"lucien", LUCIEN_SEAT, LUCIEN_SEAT + Vector3(0.0, 0.0, 1.0))
+	# Their own: the lunch's Tamlin and Lucien go when the lunch ends.
+	tamlin = bring_own(&"tamlin", TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0.0, 0.0))
+	lucien = bring_own(&"lucien", LUCIEN_SEAT, LUCIEN_SEAT + Vector3(0.0, 0.0, 1.0))
 	for who in [tamlin, lucien]:
 		_quiet(who)
 	put_feyre(FEYRE_SEAT, FEYRE_SEAT + Vector3(0.0, 0.0, -1.0))

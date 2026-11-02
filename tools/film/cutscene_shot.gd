@@ -65,6 +65,7 @@ func _run() -> void:
 	game.set(&"opening_shot", "")
 	get_tree().root.add_child(game)
 	get_tree().current_scene = game
+	_hush(moment.id)
 	# The gate opens 4 s after she is placed; walking in starts it, and if the
 	# trigger has not fired 2 s later, start it as the trigger would.
 	var space: SceneSpace = null
@@ -87,7 +88,21 @@ func _run() -> void:
 		if space and spawned_at >= 0 and i >= spawned_at + 6 and not space.running and space.can_start():
 			print("cutscene_shot: starting %s by hand" % moment.id)
 			space.start()
-	queue_free()
+
+
+## The rest of the story is over by the time this moment plays: any other
+## scene that could start here (the chain opens some gates in passing, like
+## Calanmai's in the hall) is marked done before it can, for the whole run.
+func _hush(target: StringName) -> void:
+	while is_inside_tree():
+		for n in get_tree().root.find_children("*", "SceneSpace", true, false):
+			var other := n as SceneSpace
+			if other.space_id == target or other.running or other.done_flags.is_empty() or not other.can_start():
+				continue
+			print("cutscene_shot: %s marked done (%s)" % [other.space_id, other.done_flags])
+			for f in other.done_flags:
+				WorldState.set_flag(f, true)
+		await get_tree().create_timer(0.5).timeout
 
 
 func _space_of(moment_id: StringName) -> SceneSpace:

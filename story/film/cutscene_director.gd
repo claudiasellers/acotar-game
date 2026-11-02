@@ -27,6 +27,9 @@ var _done: bool = false
 var _posed: Array = []   # [FilmPose]
 ## Everyone this scene has placed (put, walk, bring): what a shot must see past.
 var cast: Array[Node3D] = []
+## The world's own figures a film plays with its own (bring_own), hidden
+## till it ends.
+var _hidden: Array[Node3D] = []
 ## In the house frame: ground() finds the floor, not the furniture.
 var _indoors: bool = false
 var _feyre_physics: bool = true
@@ -90,6 +93,10 @@ func _on_finished(_skipped: bool) -> void:
 		if is_instance_valid(n):
 			n.queue_free()
 	props.clear()
+	for n in _hidden:
+		if is_instance_valid(n):
+			n.visible = true
+	_hidden.clear()
 	if feyre and is_instance_valid(feyre):
 		var end := _end_mark()
 		feyre.global_position = end.origin
@@ -170,7 +177,7 @@ func ground(local: Vector3, up: float = 0.0) -> Vector3:
 	if feyre is CollisionObject3D:
 		skip.append((feyre as CollisionObject3D).get_rid())
 	for who in cast:
-		if who is CollisionObject3D and is_instance_valid(who):
+		if is_instance_valid(who) and who is CollisionObject3D:
 			skip.append((who as CollisionObject3D).get_rid())
 	for i in 8:
 		var hit := _ray(p + Vector3.UP * 3.0, p + Vector3.DOWN * 6.0, skip)
@@ -216,6 +223,26 @@ func bring(id: StringName, local: Vector3, face_local: Vector3) -> Node3D:
 		who.add_to_group(StringName("story_actor_%s" % id))
 		(space if space else get_tree().current_scene).add_child(who)
 		props.append(who)
+	put(who, local, face_local)
+	return who
+
+
+## A cast member played by its own model for this film (the cast lane's
+## characters/<id>/<id>_model.tscn), whoever is out in the world: a figure
+## another scene owns can be freed mid-film when that scene ends (B: the
+## lunch's Tamlin and Lucien went at 12 s on the Mac). The world's own are
+## hidden meanwhile and shown again after.
+func bring_own(id: StringName, local: Vector3, face_local: Vector3) -> Node3D:
+	var path := "res://characters/%s/%s_model.tscn" % [id, id]
+	if not ResourceLoader.exists(path):
+		return bring(id, local, face_local)
+	for n in get_tree().get_nodes_in_group(StringName("story_actor_%s" % id)):
+		if n is Node3D and (n as Node3D).visible:
+			(n as Node3D).visible = false
+			_hidden.append(n as Node3D)
+	var who := (load(path) as PackedScene).instantiate() as Node3D
+	who.name = "Film_%s" % id
+	add_prop(who, at(local))
 	put(who, local, face_local)
 	return who
 
@@ -440,7 +467,7 @@ func close(who: Node3D, dist: float = 1.1, side: float = 0.35, fov: float = 32.0
 func clear_view(from: Vector3, look: Vector3, who: Node3D, keep: Node3D = null) -> Vector3:
 	var others: Array[Node3D] = []
 	for f in cast + ([feyre] as Array[Node3D]):
-		if f and is_instance_valid(f) and f.is_inside_tree() and f != who and not others.has(f) \
+		if is_instance_valid(f) and f.is_inside_tree() and f != who and not others.has(f) \
 				and not (who == feyre_model() and f == feyre) and not (f == feyre and who == feyre):
 			others.append(f)
 	if others.is_empty():
@@ -482,7 +509,7 @@ func _blocked(from: Vector3, look: Vector3, others: Array[Node3D], keep: Node3D)
 func _inside(from: Vector3, look: Vector3) -> Vector3:
 	var skip: Array[RID] = []
 	for f in cast + ([feyre] as Array[Node3D]):
-		if f is CollisionObject3D and is_instance_valid(f):
+		if is_instance_valid(f) and f is CollisionObject3D:
 			skip.append((f as CollisionObject3D).get_rid())
 	var hit := _ray(look, from, skip)
 	if hit.is_empty():
