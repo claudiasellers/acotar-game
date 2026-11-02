@@ -210,6 +210,7 @@ class FakeDialogue:
 func test_voiced_lines_duck_the_bed_and_music() -> void:
 	var d := _director()
 	var talk := FakeDialogue.new()
+	talk.add_to_group(&"dialogue_director")
 	add_child_autofree(talk)
 	await wait_physics_frames(2)
 	assert_true(talk.line_spoken.is_connected(d._on_line_spoken))
@@ -220,6 +221,18 @@ func test_voiced_lines_duck_the_bed_and_music() -> void:
 	assert_gt(d.voice_duck, 0.9)
 	await wait_seconds(1.0)
 	assert_almost_eq(d.voice_duck, 0.0, 0.01)
+
+
+func test_eventbus_lines_are_left_alone() -> void:
+	var d := _director()
+	var stray := FakeDialogue.new()
+	add_child_autofree(stray)
+	await wait_physics_frames(2)
+	assert_false(EventBus.line_spoken.is_connected(d._on_line_spoken), "EventBus has its own shape")
+	assert_false(stray.line_spoken.is_connected(d._on_line_spoken), "only group dialogue_director")
+	EventBus.line_spoken.emit(&"lucien", "hello", &"calm", 1.0)
+	await wait_physics_frames(1)
+	assert_eq(d.voice_duck, 0.0)
 
 
 func test_the_opening_film_score_plays_on_music_and_stops_on_skip() -> void:
