@@ -1,0 +1,5 @@
+from beast-light L55
+quality look
+timeout 900
+shot beast res://tools/creatures/beast_door_light_probe.tscn {out}/on on
+shot beast_off res://tools/creatures/beast_door_light_probe.tscn {out}/off off
