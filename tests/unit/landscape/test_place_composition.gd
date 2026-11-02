@@ -80,3 +80,41 @@ func test_place_layers_are_deterministic() -> void:
 	assert_eq(a.size(), b.size())
 	for i in a.size():
 		assert_eq(a[i].instances, b[i].instances)
+
+
+## L32-3 regression: a region worker that loads an un-prewarmed model can
+## deadlock against the main thread. After CourtRegion.prewarm(), generating
+## a region's layers must not load anything new.
+func test_prewarm_covers_everything_the_worker_loads() -> void:
+	for id in ["fae_village", "rosewild", "starlight_glen"]:
+		var content := load(CONTENT_DIR + id + ".tres") as CourtRegionContent
+		# From a cold cache, so earlier tests' loads can't hide a gap.
+		CourtAssets._lock.lock()
+		CourtAssets._meshes.clear()
+		CourtAssets._scenes.clear()
+		CourtAssets._resources.clear()
+		CourtAssets._lock.unlock()
+		CourtRegion.prewarm(content)
+		CourtAssets._lock.lock()
+		var meshes := CourtAssets._meshes.size()
+		var scenes := CourtAssets._scenes.size()
+		var resources := CourtAssets._resources.size()
+		CourtAssets._lock.unlock()
+		CourtScatterGenerator.forage_layers(content)
+		CourtScatterGenerator.decor_layers(content)
+		assert_eq(CourtAssets._meshes.size(), meshes, "%s: the worker loaded a mesh prewarm missed" % id)
+		assert_eq(CourtAssets._scenes.size(), scenes, "%s: the worker loaded a scene prewarm missed" % id)
+		assert_eq(CourtAssets._resources.size(), resources, "%s: the worker loaded a resource prewarm missed" % id)
+
+
+## The threaded path finishes (polled with a hard deadline instead of
+## blocking, so a regression fails here rather than hanging the suite).
+func test_threaded_region_with_places_builds_in_time() -> void:
+	var region: CourtRegion = (load("res://world/spring_court/fae_village/fae_village.tscn") as PackedScene).instantiate()
+	region.threaded = true
+	add_child_autofree(region)
+	var deadline := Time.get_ticks_msec() + 60_000
+	while not region.is_built and Time.get_ticks_msec() < deadline:
+		await get_tree().process_frame
+	assert_true(region.is_built, "fae_village (7 places) built within 60 s on the threaded path")
+	assert_eq(get_tree().get_nodes_in_group(&"place_setting").size(), 7)
