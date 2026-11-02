@@ -79,7 +79,8 @@ func equipped_in(slot: StringName) -> StringName:
 
 
 func set_hair(hair_id: StringName) -> bool:
-	if WardrobeCatalog.hair(hair_id) == null:
+	var h := WardrobeCatalog.hair(hair_id)
+	if h == null or not h.unlocked():
 		return false
 	hair = hair_id
 	changed.emit()

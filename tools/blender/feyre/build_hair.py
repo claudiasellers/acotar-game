@@ -1,4 +1,4 @@
-"""Feyre's 16 hairstyles as separate skinned glbs (swap like clothes).
+"""Feyre's 17 hairstyles as separate skinned glbs (swap like clothes).
 
 Reproducible build (cloud Blender module):
     /opt/bpyenv/bin/python tools/blender/feyre/build_hair.py [style ...]
@@ -467,6 +467,44 @@ def style_crown_braid(st):
     st.braid(pts, width=0.034, lobes=30)
 
 
+def style_calanmai_crown(st):
+    """Calanmai crown [X] (keeper 2026-11-02: no flowers, those are the Solstice's): the crown braid wound
+    with the hill's ember-red Fire Night ribbons, crossing the braid every few lobes, tied in a bow at the
+    nape with two long tails down her back."""
+    swept_back(st, fringe=False)
+    st.fringe(PART, 1, n=2)
+    st.ribbon_rgb = srgb("#D8344A")
+    pts = []
+    for i in range(37):
+        a = math.radians(-180 + 360 * i / 36)
+        pts.append(st.outer(a, math.radians(25 + 9 * math.cos(a)), 0.009))
+    st.braid(pts, width=0.034, lobes=30)
+    P = np.array(pts, float)
+    for i in range(1, 36, 3):                       # ribbon bands wound over the braid
+        c = P[i]
+        tang = P[i + 1] - P[i - 1]
+        tang /= max(np.linalg.norm(tang), 1e-9)
+        out = c - SKULL_C
+        out /= max(np.linalg.norm(out), 1e-9)
+        side = np.cross(tang, out)
+        side /= max(np.linalg.norm(side), 1e-9)
+        a = c + out * 0.017 + side * 0.016 - tang * 0.006
+        b = c + out * 0.017 - side * 0.016 + tang * 0.006
+        prim = sdf.capsule(a, b, 0.0034)
+        st.g.union(prim, 0.0015)
+        st.tags["ribbon"].append(prim)
+    nape = st.outer(math.pi, math.radians(14), 0.012)
+    st.ribbon_bow(nape, 0.022)
+    for s in (1, -1):                               # two long tails
+        tail = [nape + np.array([s * 0.006, 0.004, 0.0]), nape + np.array([s * 0.014, 0.012, -0.06]),
+                nape + np.array([s * 0.020, 0.018, -0.13]), nape + np.array([s * 0.024, 0.020, -0.19])]
+        tail = st.head.push_out(np.array(tail), 0.012)
+        for k in range(len(tail) - 1):
+            prim = sdf.capsule(tail[k], tail[k + 1], 0.0040 - 0.0006 * k)
+            st.g.union(prim, 0.002)
+            st.tags["ribbon"].append(prim)
+
+
 def style_waterfall_braid(st):
     loose_base(st, bottom=1.14, wave=0.003)
     pts = [st.head.scalp(math.radians(a), math.radians(30 if abs(a) < 120 else 26), 0.012)
@@ -511,6 +549,7 @@ STYLES = {
     "fishtail_braid": style_fishtail_braid,
     "crown_braid": style_crown_braid,
     "waterfall_braid": style_waterfall_braid,
+    "calanmai_crown": style_calanmai_crown,
     "flower_crown_hair": style_flower_crown_hair,
     "hair_loose_with_flowers": style_loose_with_flowers,
 }
@@ -558,7 +597,7 @@ def mesh_style(st, spec, arm):
         vmat[d < 0.0018] = idx
 
     if st.tags["ribbon"]:
-        mats.append(bf.make_material("ribbon", RIBBON_RGB, 0.35))
+        mats.append(bf.make_material("ribbon", getattr(st, "ribbon_rgb", RIBBON_RGB), 0.35))
         tag(st.tags["ribbon"], len(mats) - 1)
     if st.tags["flowers"]:
         cols = sorted(set(st.flower_cols))

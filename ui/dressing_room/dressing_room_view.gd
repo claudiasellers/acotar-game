@@ -480,7 +480,7 @@ func _hair_tab() -> Control:
 	grid.columns = 2
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	(parts[1] as VBoxContainer).add_child(grid)
-	var styles := WardrobeCatalog.all_hair()
+	var styles := WardrobeCatalog.available_hair()
 	styles.sort_custom(func(a: HairstyleData, b: HairstyleData) -> bool: return a.display_name < b.display_name)
 	for h in styles:
 		var b := UiStyle.button(h.display_name, true)
