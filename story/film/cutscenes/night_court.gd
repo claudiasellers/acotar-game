@@ -12,15 +12,17 @@
 ## (use_house): the dining hall is Rect2(10, -48, 22, 20), its doors on the
 ## west wall at (10, -38), the long table at (21, -38), windows on the south
 ## wall (z -28). Rhysand has no model yet: until the cast lane makes one he
-## is painted ink with violet light at the rim, half in his own shadow, so a
+## is the cast rig re-dressed (Tamlin's build, unmasked): blue-black hair,
+## black clothes with dark silver, violet eyes, half in his own shadow, so a
 ## stand-in reads as intended (scripts.md, B note).
 extends CutsceneDirector
 
 const NOON := 0.5
-const PAINT := preload("res://story/film/mural/mural_paint.gdshader")
 const VEIL := preload("res://story/film/cutscenes/glamour_veil.gdshader")
 const RHYS_MODEL := "res://characters/rhysand/rhysand_model.tscn"
-const RHYS_STANDIN := "res://creatures/models/people/reveler_2.gltf"
+## The stand-in's rig: tall, young, athletic; his mask and claws come off.
+const RHYS_STANDIN := "res://characters/tamlin/tamlin_model.tscn"
+const RHYS_HIDE := ["tamlin_mask", "Claws"]
 const PLATE := "res://art/dinner/dinner_plate.glb"
 const GOBLET := "res://art/dinner/dinner_goblet.glb"
 const KNIFE := "res://characters/father/model/father_knife.glb"
@@ -63,8 +65,9 @@ func _setup() -> void:
 	Clock.from_dict({"time_of_day": NOON, "day": Clock.day})
 	player.veil_to(1.0, 0.0)
 	_dress_table()
-	tamlin = bring(&"tamlin", TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0.0, 0.0))
-	lucien = bring(&"lucien", LUCIEN_SEAT, LUCIEN_SEAT + Vector3(0.0, 0.0, 1.0))
+	# Their own: the lunch's Tamlin and Lucien go when the lunch ends.
+	tamlin = bring_own(&"tamlin", TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0.0, 0.0))
+	lucien = bring_own(&"lucien", LUCIEN_SEAT, LUCIEN_SEAT + Vector3(0.0, 0.0, 1.0))
 	for who in [tamlin, lucien]:
 		_quiet(who)
 	put_feyre(FEYRE_SEAT, FEYRE_SEAT + Vector3(0.0, 0.0, -1.0))
@@ -131,20 +134,15 @@ func _rhysand() -> Node3D:
 		who = (load(RHYS_MODEL) as PackedScene).instantiate() as Node3D
 	else:
 		who = (load(RHYS_STANDIN) as PackedScene).instantiate() as Node3D
-		var ink := ShaderMaterial.new()
-		ink.shader = PAINT
-		ink.set_shader_parameter(&"ink", Color(0.022, 0.02, 0.04))
-		ink.set_shader_parameter(&"gold", VIOLET * 0.8)
-		ink.set_shader_parameter(&"rim_gain", 1.15)
-		ink.set_shader_parameter(&"rim_power", 3.0)
-		# One stroke for the whole figure, already painted.
-		ink.set_shader_parameter(&"origin", Vector3(-100000.0, -100.0, 0.0))
-		ink.set_shader_parameter(&"span", 1000000.0)
-		_paint(who, ink)
 	who.name = "FilmRhysand"
 	add_prop(who, ground(DOOR))
+	cast.append(who)
+	# Re-dressed once in the tree: the rig puts its outfit on in _ready.
+	if not ResourceLoader.exists(RHYS_MODEL):
+		_redress(who)
 	_quiet(who)
-	_eyes(who)
+	if who.find_child("Eyes", true, false) == null:
+		_eyes(who)
 	shadow = OmniLight3D.new()
 	shadow.light_negative = true
 	shadow.light_color = Color(0.85, 0.8, 1.0)
@@ -195,6 +193,43 @@ func _paint(node: Node, m: Material) -> void:
 		(node as GeometryInstance3D).material_override = m
 	for c in node.get_children():
 		_paint(c, m)
+
+
+## The stand-in dressed as Rhysand: everything Tamlin's that would give
+## him away goes (mask, claws), hair blue-black, clothes black with dark
+## silver at the trims and chains, the eyes violet and faintly lit.
+func _redress(who: Node3D) -> void:
+	var black := StandardMaterial3D.new()
+	black.albedo_color = Color(0.028, 0.026, 0.036)
+	black.roughness = 0.55
+	var silver := StandardMaterial3D.new()
+	silver.albedo_color = Color(0.36, 0.36, 0.42)
+	silver.metallic = 0.8
+	silver.roughness = 0.35
+	var hair := StandardMaterial3D.new()
+	hair.albedo_color = Color(0.03, 0.032, 0.05)
+	hair.roughness = 0.42
+	hair.rim_enabled = true
+	hair.rim = 0.35
+	for mi: MeshInstance3D in who.find_children("*", "MeshInstance3D", true, false):
+		var part := String(mi.name)
+		if RHYS_HIDE.has(part) or RHYS_HIDE.has(String(mi.get_parent().name)):
+			mi.visible = false
+			continue
+		for i in mi.mesh.get_surface_count():
+			var m := mi.get_active_material(i)
+			var kind := m.resource_name if m else ""
+			if part.begins_with("hair_"):
+				mi.set_surface_override_material(i, hair)
+			elif part == "Eyes" and m is BaseMaterial3D:
+				var eye := (m as BaseMaterial3D).duplicate() as BaseMaterial3D
+				eye.albedo_color = Color(0.72, 0.52, 1.0)
+				eye.emission_enabled = true
+				eye.emission = VIOLET
+				eye.emission_energy_multiplier = 0.6
+				mi.set_surface_override_material(i, eye)
+			elif mi.get_parent() != null and String(mi.get_parent().name).begins_with("tamlin_"):
+				mi.set_surface_override_material(i, silver if kind in ["trim", "chain", "gem"] else black)
 
 
 ## Two violet eyes on the head bone, a little in front of the face.
@@ -265,7 +300,8 @@ func _b_snarl() -> void:
 
 ## Close: Feyre's hand closes on the dinner knife by her plate.
 func _b_knife() -> void:
-	shot_world(at(Vector3(17.15, 1.3, -36.55)), _top(Vector3(17.95, 0, -37.55)), 34.0, 0.15, 2.0)
+	# From her right, low over the table: her hand and the knife.
+	shot_world(at(Vector3(18.75, 1.4, -36.55)), _top(Vector3(17.95, 0, -37.55)), 34.0, 0.15, 2.0)
 	pose(feyre_model(), &"reach", 0.5)
 	after(0.9, func() -> void:
 		if knife_on_table:
@@ -316,7 +352,8 @@ func _b_slouch() -> void:
 	put(tamlin, TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0, 0))
 	pose(tamlin, &"sit_slouch", 0.0)
 	put(lucien, LUCIEN_GUARD, ROOM)
-	shot(Vector3(16.25, 1.62, -28.85), Vector3(12.0, 1.2, -37.5), 40.0, 0.25, 5.0)
+	# From the window corner past the drapes, out over the room to the doors.
+	shot(Vector3(17.0, 1.6, -28.9), Vector3(12.0, 1.2, -37.5), 40.0, 0.25, 5.0)
 
 
 ## #4 He walks in. With every step the light cools and the shadows lean in.
@@ -343,7 +380,7 @@ func _b_greet() -> void:
 ## #5 He turns to Lucien: "A fox mask. Appropriate for you, Lucien."
 func _b_fox() -> void:
 	turn(rhys, LUCIEN_GUARD, 0.7)
-	over(rhys, lucien, 34.0, 0.4, 0.15, 4.0)
+	after(0.7, func() -> void: close(rhys, 1.6, 0.65, 34.0, 0.15, 3.5, -0.06))
 
 
 ## #6 He lifts Feyre's goblet from the table and sniffs it.
@@ -380,7 +417,8 @@ func _b_look() -> void:
 func _b_tear() -> void:
 	_darken(1.4, 1.0)
 	walk(rhys, RHYS_FEYRE, 1.4)
-	shot(Vector3(13.2, 1.5, -30.8), Vector3(15.6, 1.3, -29.3), 36.0, 0.15, 3.4)
+	# Along the window wall: the veil on her, him coming in from the right.
+	shot(Vector3(13.4, 1.5, -28.95), Vector3(15.75, 1.25, -28.7), 36.0, 0.15, 3.4)
 	after(1.0, func() -> void:
 		walk(lucien, LUCIEN_ASIDE, 0.35)
 		create_tween().tween_method(func(v: float) -> void: veil_mat.set_shader_parameter(&"tear", v), 0.0, 1.0, 1.2) \
@@ -427,7 +465,8 @@ func _b_kneel() -> void:
 func _b_fox_boy() -> void:
 	turn(rhys, LUCIEN_ASIDE, 0.5)
 	pose(lucien, &"kneel", 1.0)
-	over(rhys, lucien, 34.0, 0.35, 0.1, 3.0)
+	# Once he is down (the shot finds him where he kneels, not where he stood).
+	after(0.9, func() -> void: over(rhys, lucien, 36.0, 0.75, 0.1, 2.5, 2.2))
 
 
 ## #12 Rhysand crouches by her on the floor: "What's your name, love?"
@@ -485,7 +524,7 @@ func _b_after() -> void:
 
 ## Hold on the silence; they cannot look at her.
 func _b_silence() -> void:
-	shot(Vector3(14.1, 1.05, -30.2), Vector3(15.9, 0.75, -28.8), 34.0, 0.12, 3.0)
+	shot(Vector3(13.6, 1.1, -29.0), Vector3(15.9, 0.75, -28.8), 34.0, 0.12, 3.0)
 
 
 ## Ease into her camera: she gets up.

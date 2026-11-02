@@ -24,6 +24,7 @@ var quit_after: float = 0.0
 ## from load; give up after `give_up` seconds without one.
 var wait_for_film: bool = false
 var give_up: float = 300.0
+var _seen_film: bool = false
 
 var _done_stills: int = 0
 var _frame: int = 0
@@ -46,7 +47,9 @@ func _ready() -> void:
 
 func _film_time() -> float:
 	var p := FilmPlayer.current(get_tree())
-	if wait_for_film and _watched == null and p == null:
+	if p:
+		_seen_film = true
+	if wait_for_film and not _seen_film:
 		if Time.get_ticks_msec() / 1000.0 > give_up:
 			push_error("film_capture: no film started in %.0f s" % give_up)
 			_log.append("no film started")
