@@ -49,6 +49,27 @@ const SPECIES := {
 	&"madder": [&"flower", 0.7, Color(0.45, 0.70, 0.38)],
 	&"crab_apple": [&"tree", 6.0, Color(1.0, 0.96, 0.95)],
 	&"orchid": [&"flower", 0.5, Color(0.96, 0.66, 0.90)],
+	# garden rooms (L35): the rose colour wheel and the garden flowers
+	&"rose_crimson": [&"bush", 1.2, Color(0.74, 0.10, 0.24)],
+	&"rose_raspberry": [&"bush", 1.15, Color(0.90, 0.26, 0.52)],
+	&"rose_blush": [&"bush", 1.1, Color(1.0, 0.80, 0.84)],
+	&"rose_cream": [&"bush", 1.15, Color(1.0, 0.93, 0.80)],
+	&"rose_butter": [&"bush", 1.1, Color(1.0, 0.90, 0.52)],
+	&"rose_apricot": [&"bush", 1.2, Color(1.0, 0.72, 0.50)],
+	&"rose_peach": [&"bush", 1.1, Color(1.0, 0.68, 0.60)],
+	&"rose_coral": [&"bush", 1.15, Color(1.0, 0.50, 0.48)],
+	&"rose_mauve": [&"bush", 1.1, Color(0.80, 0.60, 0.88)],
+	&"snowdrop": [&"flower", 0.22, Color(0.98, 0.98, 1.0)],
+	&"daffodil": [&"flower", 0.42, Color(1.0, 0.88, 0.38)],
+	&"hydrangea": [&"bush", 1.1, Color(0.66, 0.72, 1.0)],
+	&"hydrangea_pink": [&"bush", 1.1, Color(1.0, 0.72, 0.86)],
+	&"delphinium": [&"flower", 1.6, Color(0.50, 0.58, 1.0)],
+	&"lupin": [&"flower", 1.0, Color(0.96, 0.62, 0.86)],
+	&"hollyhock": [&"flower", 1.9, Color(1.0, 0.70, 0.82)],
+	&"allium": [&"flower", 1.0, Color(0.76, 0.56, 0.96)],
+	&"catmint": [&"flower", 0.5, Color(0.64, 0.62, 0.96)],
+	&"foxglove_white": [&"flower", 1.3, Color(0.98, 0.94, 0.97)],
+	&"peony_white": [&"flower", 0.8, Color(1.0, 0.96, 0.94)],
 }
 
 const FOLIAGE_SHADER := preload("res://world/shared/shaders/stylized_foliage.gdshader")
