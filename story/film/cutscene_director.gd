@@ -25,6 +25,7 @@ var grade: FilmGrade
 var props: Array[Node] = []
 var _done: bool = false
 var _posed: Array = []   # [FilmPose]
+var _feyre_physics: bool = true
 
 
 func _ready() -> void:
@@ -39,6 +40,10 @@ func _ready() -> void:
 	grade = FilmGrade.new()
 	player.add_child(grade)
 	frame = space.global_transform if space else Transform3D()
+	# Her body holds still while the film places her: no gravity, no input.
+	if feyre:
+		_feyre_physics = feyre.is_physics_processing()
+		feyre.set_physics_process(false)
 	_setup()
 
 
@@ -81,6 +86,9 @@ func _on_finished(_skipped: bool) -> void:
 			(model as Node3D).visible = true
 		if feyre.has_method(&"recenter_camera"):
 			feyre.call(&"recenter_camera")
+		feyre.set_physics_process(_feyre_physics)
+		if feyre is CharacterBody3D:
+			(feyre as CharacterBody3D).velocity = Vector3.ZERO
 	grade.to(0.0, 1.0)
 	cine.drop(self, HANDOVER_BLEND)
 

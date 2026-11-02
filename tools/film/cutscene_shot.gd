@@ -59,6 +59,7 @@ func _run() -> void:
 	# Walking in starts it; if the trigger has not fired once the region has
 	# settled, start it as the trigger would (and say why, for the log).
 	var space: SceneSpace = null
+	var spawned_at := -1
 	for i in 240:
 		await get_tree().create_timer(1.0).timeout
 		if FilmPlayer.current(get_tree()):
@@ -68,7 +69,9 @@ func _run() -> void:
 		if i % 10 == 9:
 			print("cutscene_shot: %d s, spawned %s, space %s, can_start %s" % [i + 1, game.get(&"spawned"),
 					space != null, space.can_start() if space else false])
-		if space and i >= 8 and bool(game.get(&"spawned")) and not space.running and space.can_start():
+		if bool(game.get(&"spawned")) and spawned_at < 0:
+			spawned_at = i
+		if space and spawned_at >= 0 and i >= spawned_at + 4 and not space.running and space.can_start():
 			print("cutscene_shot: starting %s by hand" % moment.id)
 			space.start()
 	queue_free()
