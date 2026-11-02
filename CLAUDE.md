@@ -104,6 +104,10 @@ See `tools/mq/` and `tools/mq/selftest.sh` for the rules they keep.
   one needs no gate edit. A batch that skips world_smoke takes about 30 seconds;
   one that runs it takes about 4 minutes. world_smoke runs when `world/` or
   `data/regions/` change. The idle full gate runs everything.
+- A test file can scope itself with a `# gate: when:a/*,*.x` line (same patterns
+  as `when:` in gate.conf; its own file always counts). Under a `--base` gate it
+  is skipped unless the change touches a match; idle full gates run it anyway.
+  The seat, dinner and fit tests use it. Be generous with patterns.
 - A test that loads World (`world.tscn` or `act1_game.tscn`) carries a
   `# gate: needs:terrain` comment, so it waits for the terrain bake.
   `levels.sh check` catches a direct reference. A test that reaches World

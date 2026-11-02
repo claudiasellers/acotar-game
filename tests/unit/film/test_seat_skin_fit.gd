@@ -1,3 +1,4 @@
+# gate: when:story/film/*,core/*,systems/wardrobe/*,data/wardrobe/*,characters/*,art/film/*,project.godot
 ## A sitting figure's body doesn't poke through their clothes (T045). Tamlin's tunic
 ## and Lucien's are skinned for standing, so with the thigh swung forward the
 ## buttock and hip came out through them in patches of skin. SeatSkinFit takes the

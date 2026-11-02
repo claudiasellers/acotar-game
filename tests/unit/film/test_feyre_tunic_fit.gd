@@ -1,3 +1,4 @@
+# gate: when:story/film/*,core/*,systems/wardrobe/*,data/wardrobe/*,characters/*,art/film/*,project.godot
 ## Feyre's trousers stay under her tunic (T053). They came through it at the hip
 ## standing as well as sitting: the skirt sat 2 mm off them in coarse rows, and the
 ## shell stopped short of the skirt's top edge at the flanks. A trouser vertex under

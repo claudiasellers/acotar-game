@@ -71,6 +71,9 @@ while IFS= read -r line; do
 	if [ "${line%% *}" = "@gut" ]; then
 		for t in $(find "${line#* }" -name 'test_*.gd' 2>/dev/null | sort); do
 			need=$(sed -n 's/^#* *gate: needs:\([a-z_-]*\).*/\1/p' "$t" | head -1)
+			when=$(sed -n 's/^#* *gate: when:\([^ ]*\).*/\1/p' "$t" | head -1)
+			# The test's own file always counts as touching it.
+			if [ -n "$when" ] && ! matches "$when,$t"; then echo "SKIP gut:$t (change touches no $when)" >> "$out/plan.txt"; continue; fi
 			add rest "gut:$t" "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://$t" "$need"
 		done
 		continue
