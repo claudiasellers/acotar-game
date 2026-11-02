@@ -28,6 +28,7 @@ var _frames_dir: String = ""
 var _wp: int = 0
 var _gallop: bool = true
 var _stop: bool = false
+var _progress_at: Vector3 = Vector3.INF
 
 
 func _process(delta: float) -> void:
@@ -96,6 +97,12 @@ func _play() -> void:
 	for i in 40:
 		_turn_camera_to(director.mare.global_position + Vector3.UP * 1.2)
 		await get_tree().physics_frame
+	# The dev jump can leave a p2 moment holding the controls; wait for it.
+	if not await _until(func() -> bool: return director.block_reason(feyre.global_position) == &"", 20.0):
+		_note("blocked: %s (mode %s, focus %s); releasing story control for the probe" % [director.block_reason(feyre.global_position), _mode(), StoryControl.focus])
+		workarounds.append("StoryControl.release() before mounting (dev jump)")
+		_beat["workarounds"] = true
+		StoryControl.release()
 	_record("mount")
 	await _wait(1.0)
 	if not director.mount(feyre):
@@ -128,19 +135,28 @@ func _play() -> void:
 		last = at
 		stats.top_speed = maxf(stats.top_speed, m.speed)
 		_measure(stats, at, m.heading())
-		stuck = stuck + get_physics_process_delta_time() if m.speed < 1.0 else 0.0
+		if stats.frames % 600 == 0:
+			_log("  riding at %s, %.1f m/s, waypoint %d, region %s" % [_v(at), m.speed, _wp, _region()])
+		# No headway for 2 s (pulled up at a tree, a hedge, a gate): hop on.
+		if at.distance_to(_progress_at) > 2.0:
+			_progress_at = at
+			stuck = 0.0
+		else:
+			stuck += get_physics_process_delta_time()
 		if stuck > 2.0:
 			# Walled in (a hedge, a gate): hop ahead along the road and count it.
 			var to := Vector3(ROUTE[_wp].x - at.x, 0.0, ROUTE[_wp].y - at.z).normalized()
 			m.global_position = at + to * 6.0 + Vector3.UP * 1.5
+			_progress_at = m.global_position
 			stats.stuck_hops += 1
 			stuck = 0.0
 			_note("hop at %s toward waypoint %d" % [_v(at), _wp])
 		if Time.get_ticks_msec() - started > 600000:
 			_stop_recording()
+			_beat["pop_in"] = stats
 			return _fail("ride took over 10 min wall")
 	_stop_recording()
-	var secs := stats.frames / float(Engine.physics_ticks_per_second)
+	var secs: float = stats.frames / float(Engine.physics_ticks_per_second)
 	_note("rode %.0f m in %.1f s game (avg %.1f m/s, top %.1f m/s), %d hops" % [stats.metres, secs, stats.metres / maxf(secs, 0.01), stats.top_speed, stats.stuck_hops])
 	_note("pop-in: %d of %d frames in an unbuilt region, %d with the region 60 m ahead unbuilt, %d with no ground under her" % [stats.unbuilt_frames, stats.frames, stats.ahead_unbuilt_frames, stats.no_ground_frames])
 	for id: String in stats.regions:
@@ -172,7 +188,7 @@ func _play() -> void:
 		_stop_recording()
 		return _fail("whistle not answered: %s" % director.last_block)
 	var t0 := _sim_seconds()
-	var came := await _until(func() -> bool: return director.mare != null and director.mare.state == MareMount.State.STANDING, 25.0)
+	var came: bool = await _until(func() -> bool: return director.mare != null and director.mare.state == MareMount.State.STANDING, 25.0)
 	await _wait(2.0)
 	_stop_recording()
 	if not came:

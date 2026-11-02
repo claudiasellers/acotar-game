@@ -1,0 +1,57 @@
+## Layout check for the saddle (L47): the white horse with Feyre's model on it
+## in the ride pose, three views, no world. Cloud:
+##   xvfb-run godot --rendering-method gl_compatibility res://tools/mount/ride_pose_shot.tscn -- <out_dir>
+extends Node
+
+const HORSE := preload("res://creatures/fae/white_horse.tscn")
+const FEYRE := preload("res://characters/feyre/model/feyre_model.tscn")
+const DATA := preload("res://data/mount/white_mare.tres")
+
+
+func _ready() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	var out := OS.get_cmdline_user_args()[0] if not OS.get_cmdline_user_args().is_empty() else "user://ride_pose"
+	DirAccess.make_dir_recursive_absolute(out)
+	var root := Node3D.new()
+	add_child(root)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	env.environment.background_color = Color(0.78, 0.8, 0.9)
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(0.7, 0.7, 0.75)
+	root.add_child(env)
+	var sun := DirectionalLight3D.new()
+	sun.rotation = Vector3(-0.9, 0.6, 0)
+	root.add_child(sun)
+	var horse := HORSE.instantiate() as WhiteHorse
+	root.add_child(horse)
+	var sks := horse.model.find_children("*", "Skeleton3D", true, false)
+	var seat := BoneAttachment3D.new()
+	seat.bone_name = "spine"
+	(sks.front() as Skeleton3D).add_child(seat)
+	var feyre := FEYRE.instantiate() as Node3D
+	root.add_child(feyre)
+	var fsk := feyre.find_children("*", "Skeleton3D", true, false).front() as Skeleton3D
+	var pose := RidePose.attach(fsk)
+	pose.amount = 1.0
+	var cam := Camera3D.new()
+	root.add_child(cam)
+	cam.current = true
+	cam.fov = 40.0
+	for i in 10:
+		await get_tree().process_frame
+	var hips := fsk.find_bone(&"Hips")
+	var drop := (fsk.global_transform * fsk.get_bone_global_rest(hips).origin).y - feyre.global_position.y
+	var at := seat.global_position + horse.global_basis * DATA.seat_offset
+	feyre.global_position = at - Vector3.UP * drop
+	print("seat %s drop %.2f feyre %s" % [at, drop, feyre.global_position])
+	for view: Array in [["side", Vector3(5.5, 1.6, 0.0)], ["front", Vector3(2.8, 2.2, -4.5)], ["back", Vector3(-2.5, 2.6, 4.5)]]:
+		cam.look_at_from_position(view[1], Vector3(0, 1.3, 0))
+		for i in 4:
+			await get_tree().process_frame
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [out, view[0]])
+	get_tree().quit()
