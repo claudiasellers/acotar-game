@@ -367,35 +367,43 @@ def wisteria_bay(p, size, c):
     # walk so the tiled bays join without a seam or a repeating tile shape;
     # a few lighter clumps of new growth break it up. The flowers show from
     # above as lilac sprays lying on top, never as pale near-white leaf.
+    OVERLAP = 0.45
     bm = bmesh.new()
     nx, ny = 14, 8
     bmesh.ops.create_grid(bm, x_segments=nx, y_segments=ny, size=1.0)
     half = w / 2 + 0.3
     for v in bm.verts:
         u, t = v.co.x, v.co.y                       # -1..1 each
-        x, y = u * half, t * d / 2
+        # the roof runs OVERLAP past each bay end and tucks just under the
+        # neighbour's, so a run of bays on sloping ground reads as one roof
+        # with no seams or steps (L35-6)
+        x, y = u * half, t * (d / 2 + OVERLAP)
         ph = 2 * math.pi * y / d
         z = (0.13 * math.sin(2 * ph + 1.7 * x) + 0.09 * math.cos(ph - 2.3 * x + 0.6)
              + 0.06 * math.sin(3 * ph + 3.1 * x))
-        if abs(t) < 0.99:
+        if abs(y) < d / 2 - 0.05:
             z += rng.uniform(-0.04, 0.04)
-        z -= 0.55 * max(0.0, abs(u) - 0.72) / 0.28   # roll down over the sides
-        v.co = Vector((x, y, h + 0.3 + z))
+        z -= 0.12 * max(0.0, abs(y) - d / 2) / OVERLAP
+        z -= 0.6 * max(0.0, abs(u) - 0.86) / 0.14    # roll down over the sides, past the beam ends
+        v.co = Vector((x, y, h + 0.46 + z))
     p.add(bm, mix(SAGE, YEW_MID, 0.35), "leaf", sharp_deg=89.0)
     for i in range(7):
-        b = ico(1.0, 1)
+        # finer and only gently dented, so from above they read as soft
+        # mounds of new growth rather than pale hexagons (L35-7)
+        b = lathe([(1.0, -0.2), (0.74, 0.68), (0.0, 1.0)], 8, cap_bottom=False, cap_top=False)
+        jr = random.Random(5152 + i)
         for v in b.verts:
-            v.co *= 1.0 + rng.uniform(-0.18, 0.18)
+            v.co *= 1.0 + jr.uniform(-0.06, 0.06)
         r = rng.uniform(0.38, 0.55)
-        p.add(b, [SAGE_LIGHT, mix(SAGE_LIGHT, LICHEN, 0.5)][i % 2], "leaf",
-              T(rng.uniform(-w / 2 + 0.6, w / 2 - 0.6), rng.uniform(-d / 2 + 0.4, d / 2 - 0.4), h + 0.38)
+        p.add(b, [mix(SAGE, SAGE_LIGHT, 0.35), mix(SAGE, LICHEN, 0.5)][i % 2], "leaf",
+              T(rng.uniform(-w / 2 + 0.6, w / 2 - 0.6), rng.uniform(-d / 2 + 0.4, d / 2 - 0.4), h + 0.54)
               @ S(r * 1.3, r, r * 0.45), sharp_deg=89.0)
     for i in range(22):
         x = rng.uniform(-w / 2 + 0.4, w / 2 - 0.4)
         y = rng.uniform(-d / 2 + 0.2, d / 2 - 0.2)
         length = rng.uniform(0.35, 0.6)
         p.add(lathe([(0, 0), (length * 0.2, length * 0.3), (length * 0.16, length * 0.75), (0, length)], 4),
-              WISTERIA[i % 3], "fabric", T(x, y, h + 0.48) @ R("Z", rng.uniform(0, 360)) @ R("Y", rng.uniform(75, 105)))
+              WISTERIA[i % 3], "fabric", T(x, y, h + 0.62) @ R("Z", rng.uniform(0, 360)) @ R("Y", rng.uniform(75, 105)))
     # the racemes: many slim, soft drops, heavier along the sides, a scatter
     # over the walk. Slim and smooth so they read as hanging flower trusses
     # from the path, not as faceted crystals (L35-3); lilac, mauve and a

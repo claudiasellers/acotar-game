@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="Act2Stage" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"bank": Vector3(14, 0, -12),
+"blanket": Vector3(118, 0, 42),
+"blanket_view": Vector3(110, 0, 36),
+"lucien_seat": Vector3(119.4, 0, 43.6),
+"pool": Vector3(0, 0, -30),
+"station": Vector3(-6, 0, -12.5),
+"tamlin_bank": Vector3(16, 0, -10.5),
+"tamlin_rim": Vector3(30, 0, -6),
+"tamlin_wait": Vector3(116.5, 0, 41),
+"trail_1": Vector3(92, 0, 28),
+"trail_2": Vector3(62, 0, 12),
+"trail_3": Vector3(40, 0, 0)
+}
+lines = {
+"tamlin_after": {
+"text": "Lucien will have finished the wine by now.",
+"who": "Tamlin"
+},
+"tamlin_dare": {
+"text": "Down the hill, past the stream. Let's see if you find it before I do.",
+"who": "Tamlin"
+},
+"tamlin_haunt": {
+"text": "This was my favorite haunt as a boy.",
+"who": "Tamlin"
+},
+"tamlin_jump": {
+"text": "Jump in.",
+"who": "Tamlin"
+},
+"tamlin_lucien_1": {
+"text": "Lucien is the youngest of seven brothers. His father is the High Lord of Autumn.",
+"who": "Tamlin"
+},
+"tamlin_lucien_2": {
+"text": "He loved a lesser faerie. His father had her executed, and made him watch.",
+"who": "Tamlin"
+},
+"tamlin_lucien_3": {
+"text": "His brothers would have killed him too. He came to me with nothing, and he never speaks of it.",
+"who": "Tamlin"
+},
+"tamlin_show": {
+"text": "I want to show you something.",
+"who": "Tamlin"
+}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("tamlin_dare", "tamlin_lucien_1", "tamlin_lucien_2", "tamlin_lucien_3", "tamlin_after")
+canon = "Ch18 (Keeper, 2026-11-02, book-checked). DAYTIME. The three ride out; Tamlin and Lucien lay the purple blanket a few feet into a glen and Lucien stays on it with the wine. Tamlin: 'I want to show you something' [C], and leads her down the hill to the stream, over brooks and up knolls to a mound above a clearing ringed with tall trees and a sparkling silver pool, warm and full of starlight. 'This was my favorite haunt as a boy' [C] comes before the swim; he dares her to 'Jump in' [C]; she swims in her ivory underthings. Tamlin tells Lucien's history at the pool (youngest of seven brothers, the lover executed); the lucien lines are X wording of that. No knife gift in ch18. X (accepted by the Keeper): she finds the pool before he catches up (the player-led deed); the dare line; the golden-hour line. The blanket is 125 m from the pool (marks are in the starlight_pool anchor's frame; pool = the Starlight Pool landmark)."

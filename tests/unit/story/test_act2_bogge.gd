@@ -10,11 +10,16 @@ var root: Node3D
 var feyre: Node3D
 var look_at_bogge := false
 var space: BoggeHunt
+var _clock_saved: Dictionary
 
 
 func before_each() -> void:
 	WorldState.clear()
 	StoryControl.release()
+	# A day hunt: an earlier test can leave the shared Clock at night, which
+	# would make start() wait for the morning.
+	_clock_saved = Clock.to_dict()
+	Clock.from_dict({"time_of_day": 0.4, "day": Clock.day})
 	Clock.paused = true
 	look_at_bogge = false
 	root = Node3D.new()
@@ -37,6 +42,7 @@ func after_each() -> void:
 	for global_space in StoryDirector.get_children():
 		(global_space as SceneSpace).auto_tick = true
 	StoryControl.release()
+	Clock.from_dict(_clock_saved)
 	Clock.paused = false
 
 

@@ -100,11 +100,17 @@ var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
 var movement_feel: MovementFeel
 var is_mantling: bool = false
+var _mantle_tween: Tween
+var _camera_fade: CameraFade
 
 var model: Node3D
 var camera: Camera3D
 
 var _camera_rig: Node3D
+## Extra pivot height and arm length (m) for the third-person camera, set by
+## whatever carries her (the white mare, MountDirector) and eased back to 0 after.
+var camera_lift: float = 0.0
+var camera_arm_extra: float = 0.0
 var _camera_pitch: Node3D
 var _spring_arm: SpringArm3D
 var _stamina_cooldown: float = 0.0
@@ -163,7 +169,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
 		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
@@ -176,7 +182,7 @@ func _process(delta: float) -> void:
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	_update_indoor(delta)
-	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6, INDOOR_ARM, _indoor)
+	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6 + camera_arm_extra, INDOOR_ARM, _indoor)
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
@@ -257,15 +263,32 @@ func recenter_camera(max_turn: float = PI) -> void:
 	_recentering = true
 
 
+## The one way to move her instantly (Return Home, Wriggle Free, a save load, tools):
+## stops a ledge climb in progress (its tween would otherwise carry her back onto
+## the ledge), zeroes her velocity, and brings the camera and its fade with her.
+func teleport(pos: Vector3) -> void:
+	if _mantle_tween and _mantle_tween.is_valid():
+		_mantle_tween.kill()
+	_mantle_tween = null
+	is_mantling = false
+	velocity = Vector3.ZERO
+	global_position = pos
+	_camera_rig.global_position = pos + Vector3.UP * (1.5 + camera_lift)
+	_room_arm = 3.6
+	if _spring_arm:
+		for rid in _cam_skip:
+			_spring_arm.remove_excluded_object(rid)
+	_cam_skip.clear()
+	if _camera_fade:
+		_camera_fade.restore_all()
+
+
 ## Pause menu "Wriggle free": hop to the nearest open ground. False if no spot was found.
 func wriggle_free() -> bool:
 	var spot: Variant = WriggleFree.find_spot(self, _safe_spots)
 	if spot == null:
 		return false
-	is_mantling = false
-	velocity = Vector3.ZERO
-	global_position = spot
-	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	teleport(spot)
 	recenter_camera()
 	Juice.burst(self, &"unlock")
 	return true
@@ -367,11 +390,11 @@ func _try_mantle() -> bool:
 		return false
 	is_mantling = true
 	velocity = Vector3.ZERO
-	var tween := create_tween()
-	tween.tween_property(self, ^"global_position:y", top.position.y + 0.05, 0.28)
+	_mantle_tween = create_tween()
+	_mantle_tween.tween_property(self, ^"global_position:y", top.position.y + 0.05, 0.28)
 	var landing: Vector3 = top.position + forward * 0.25 + Vector3.UP * 0.05
-	tween.tween_property(self, ^"global_position", landing, 0.16)
-	tween.finished.connect(func() -> void: is_mantling = false)
+	_mantle_tween.tween_property(self, ^"global_position", landing, 0.16)
+	_mantle_tween.finished.connect(func() -> void: is_mantling = false)
 	return true
 
 
@@ -581,9 +604,9 @@ func _build_components() -> void:
 	movement_feel.name = "MovementFeel"
 	add_child(movement_feel)
 	# Props with no collision (tables, beams) fade when a lens comes right up to them.
-	var fade := CameraFade.new()
-	fade.name = "CameraFade"
-	add_child(fade)
+	_camera_fade = CameraFade.new()
+	_camera_fade.name = "CameraFade"
+	add_child(_camera_fade)
 	_build_breath()
 
 
@@ -706,4 +729,4 @@ func _build_camera() -> void:
 	camera.far = 2000.0
 	camera.current = true
 	_spring_arm.add_child(camera)
-	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)

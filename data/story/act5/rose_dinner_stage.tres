@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_chair": Vector3(4.95, 0, -6.5),
+"roses": Vector3(4.3, 0.82, -6.95),
+"tamlin": Vector3(3.6, 0, -7.4)
+}
+lines = {
+"alis": {"text": "Alis takes them up to my painting room.", "who": ""},
+"roses": {"text": "White roses, from his parents' garden.", "who": ""},
+"sorry": {"text": "About last night. I'm sorry.", "who": "Tamlin"}
+}
+invented = PackedStringArray("sorry")
+canon = "Ch22 (Keeper, [C]): 'We apologized at dinner. He even brought me a bouquet of white roses from his parents' garden.' Alis puts them in her painting room."

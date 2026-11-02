@@ -2,7 +2,9 @@
 ##   godot res://tools/feyre_face_shot.tscn -- [out_dir]
 ## Writes face_vanity.png (the vanity screen, no makeup chosen: her natural look),
 ## face_vanity_close.png (camera at her face by the mirror) and face_drive_front.png /
-## face_drive_34.png (daylight on the manor drive, front and three-quarter).
+## face_drive_34.png (daylight on the manor drive, front and three-quarter), face_drive_back.png
+## (her hair from behind), face_glare.png and face_mask_smile.png (expressions, lane L36),
+## and face_vanity_back.png (the crown braid from behind).
 extends Node
 
 const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
@@ -38,6 +40,15 @@ func _run() -> void:
 	await _seconds(settle)
 	await _close_up(feyre, 0.0, out.path_join("face_drive_front.png"))
 	await _close_up(feyre, 32.0, out.path_join("face_drive_34.png"))
+	await _close_up(feyre, 180.0, out.path_join("face_drive_back.png"), 0.95)
+	var face: Node = feyre.find_child("FaceDriver", true, false)   # under her model scene
+	if face != null:
+		for e: StringName in [&"glare", &"mask_smile"]:
+			face.call(&"express", e, 1.0, 30.0)
+			await _seconds(1.0)
+			await _close_up(feyre, 12.0, out.path_join("face_%s.png" % e))
+		face.call(&"clear")
+		await _seconds(0.5)
 	# A/B for the skin shader's terms (diagnostic): no subsurface, then no rim
 	var head_mat: ShaderMaterial = null
 	for c in feyre.model.get_children():
@@ -67,13 +78,14 @@ func _run() -> void:
 	DressingRoom.close_room(feyre)
 	await _frames(10)
 	await _close_up(feyre, 20.0, out.path_join("face_vanity_close.png"))
+	await _close_up(feyre, 160.0, out.path_join("face_vanity_back.png"), 0.95)
 	feyre.global_position = drive_pos
 	feyre.rotation = drive_rot
 	get_tree().quit()
 
 
-## A camera 0.62 m in front of her face (turned `yaw` degrees round her), aimed at her eyes.
-func _close_up(feyre: Feyre, yaw: float, path: String) -> void:
+## A camera `dist` m in front of her face (turned `yaw` degrees round her), aimed at her eyes.
+func _close_up(feyre: Feyre, yaw: float, path: String, dist: float = 0.62) -> void:
 	var sk := feyre.find_child("Skeleton3D", true, false) as Skeleton3D
 	var xf := sk.global_transform
 	var head := xf * sk.get_bone_global_pose(sk.find_bone("Head")).origin
@@ -86,7 +98,7 @@ func _close_up(feyre: Feyre, yaw: float, path: String) -> void:
 	var cam := Camera3D.new()
 	cam.fov = 30.0
 	get_tree().root.add_child(cam)
-	cam.global_position = eyes + fwd * 0.62 - Vector3.UP * 0.035
+	cam.global_position = eyes + fwd * dist - Vector3.UP * 0.035
 	cam.look_at(eyes - Vector3.UP * 0.04, Vector3.UP)
 	cam.make_current()
 	await _frames(30)

@@ -35,6 +35,13 @@ uniform float glitter_threshold : hint_range(0.5, 0.999) = 0.9;
 uniform float glitter_strength : hint_range(0.0, 20.0) = 7.0;
 uniform vec4 glitter_color : source_color = vec4(1.0, 0.95, 0.82, 1.0);
 uniform vec3 sun_dir_hint = vec3(0.3, 0.8, 0.4);
+// Starlight Pool by night (0 day .. 1 night), driven by the pool's own node
+// (story/act4/starlight_steep.gd): the water goes dark and clear and the sun
+// glitter gives way to a still field of reflected stars.
+uniform float night_amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 night_deep : source_color = vec4(0.012, 0.02, 0.07, 1.0);
+uniform vec4 night_shallow : source_color = vec4(0.04, 0.07, 0.16, 1.0);
+uniform vec4 star_color : source_color = vec4(0.86, 0.9, 1.0, 1.0);
 
 varying vec3 v_world_pos;
 
@@ -74,15 +81,19 @@ void fragment() {
 	}
 	vec3 behind = texture(screen_tex, refr_uv).rgb;
 
+	float night = starlight_mode ? night_amount : 0.0;
+	vec3 shallow_c = mix(shallow_color.rgb, night_shallow.rgb, night);
+	vec3 deep_c = mix(deep_color.rgb, night_deep.rgb, night);
 	float depth_f = 1.0 - exp(-water_depth / max(depth_scale, 0.01));
-	vec3 water_col = mix(shallow_color.rgb, deep_color.rgb, depth_f);
-	vec3 col = mix(water_col, behind * shallow_color.rgb * 1.2, clarity * (1.0 - depth_f));
+	vec3 water_col = mix(shallow_c, deep_c, depth_f);
+	vec3 col = mix(water_col, behind * shallow_c * 1.2, clarity * (1.0 - depth_f));
 
 	float fres = pow(1.0 - clamp(dot(n, VIEW), 0.0, 1.0), fresnel_power);
-	col = mix(col, fresnel_color.rgb, fres * 0.6);
+	col = mix(col, mix(fresnel_color.rgb, night_shallow.rgb * 1.6, night), fres * 0.6);
 
 	float foam_noise = court_vnoise(wp * 3.0 + vec2(t * 0.3, -t * 0.2));
 	float foam = (1.0 - smoothstep(0.0, foam_width, water_depth)) * smoothstep(0.25, 0.75, foam_noise + 0.3);
+	foam *= 1.0 - night;
 	col = mix(col, foam_color.rgb, foam * foam_strength);
 
 	vec3 emit = vec3(0.0);
@@ -97,15 +108,27 @@ void fragment() {
 		vec3 refl = reflect(-VIEW, n);
 		float sun_align = pow(clamp(dot(refl, sun_v), 0.0, 1.0), 4.0) * 0.7 + 0.3;
 		float spark = step(glitter_threshold, rnd) * pt * tw * sun_align;
-		emit += glitter_color.rgb * spark * glitter_strength;
-		col += vec3(0.06, 0.05, 0.08) * fres;
+		emit += glitter_color.rgb * spark * glitter_strength * (1.0 - night);
+		col += vec3(0.06, 0.05, 0.08) * fres * (1.0 - night);
+		// Night: reflected stars, finer and steadier than the sun glitter,
+		// shivering a little with the ripples; a few brighter ones.
+		vec2 sp = wp * glitter_density * 1.7 + slope * 0.6;
+		vec2 scell = floor(sp);
+		float srnd = court_hash12(scell + 17.0);
+		vec2 sf = fract(sp) - 0.5 - (vec2(court_hash12(scell + 3.1), court_hash12(scell + 7.7)) - 0.5) * 0.6;
+		float spt = exp(-dot(sf, sf) * 220.0);
+		float stw = 0.65 + 0.35 * sin(t * (0.6 + srnd * 1.8) + srnd * 40.0);
+		float bright = step(0.985, srnd) * 2.5 + 1.0;
+		float star = step(0.93, srnd) * spt * stw * bright;
+		emit += star_color.rgb * star * glitter_strength * 0.8 * night;
+		emit += night_shallow.rgb * 0.12 * fres * night;
 	}
 
 	float b = blight * blight_affect;
 	col = court_blight_mix(col, b) * mix(1.0, 0.45, b);
 	ALBEDO = col;
 	ROUGHNESS = mix(roughness_value, 0.6, b);
-	SPECULAR = 0.6;
+	SPECULAR = 0.6 * (1.0 - 0.6 * night);
 	METALLIC = 0.0;
 	EMISSION = emit * (1.0 - b) + foam * foam_color.rgb * 0.05;
 }

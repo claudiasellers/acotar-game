@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"drums": Vector3(-60, 0, 195),
+"pyre_0": Vector3(2, 0, -16),
+"pyre_1": Vector3(55, 0, -40),
+"pyre_2": Vector3(-30, 0, -52),
+"pyre_3": Vector3(120, 0, -20),
+"pyre_4": Vector3(180, 0, -45),
+"pyre_5": Vector3(70, 0, 50),
+"trench": Vector3(70, 0, 60)
+}
+lines = {
+"masks": {"text": "Hundreds of High Fae round the fire. Masks, only masks; when I try to see a face, it blurs into colour.", "who": ""},
+"trench": {"text": "The crowd drifts toward a trench between two hills.", "who": ""}
+}
+invented = PackedStringArray("masks", "trench")
+canon = "Ch20 (Keeper, [C]): 'the first giant bonfire atop the hill': 'hundreds of High Fae... I couldn't discern any of their features beyond the various masks.' She follows the crowd to 'a trench between two nearby hills', where a cave mouth opens, dressed with flowers. Six pyres, the ribbons and the crowd's dance are [X]."

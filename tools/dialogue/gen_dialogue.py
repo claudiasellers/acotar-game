@@ -695,7 +695,7 @@ deed(A, "d_attor", "attor_evaded", "That voice. Like nails drawn slow down my sp
 deed(A, "d_calanmai", "calanmai_attended", "I should have stayed in my room.", COURT)
 deed(A, "d_bite", "bite_endured", "He bit me. I'm going to show everyone the bruise.", COURT, canon="A",
      delivery="inner voice, furious, a little proud")
-deed(A, "d_shown", "paintings_shown", "He kept the snowy forest. The one I hated painting.", COURT, canon="A")
+deed(A, "d_shown", "paintings_shown", "He chose the winter one. Cold and melancholy, and he wanted it anyway.", COURT, canon="A")
 deed(A, "d_glamour", "glamour_lifted", "Magic smells like flowers now. Not metal. Flowers.", COURT, canon="A")
 deed(A, "d_fountain", "fountain_head_found", "A head in the fountain. A mark on its brow. Don't scream.", COURT,
      delivery="inner voice, a breath from screaming")

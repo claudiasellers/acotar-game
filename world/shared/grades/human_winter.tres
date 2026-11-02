@@ -36,3 +36,7 @@ fog_aerial_perspective = 0.6
 volumetric_anisotropy = 0.6
 volumetric_light_energy = 1.5
 glow_hdr_threshold = 0.9
+; Overcast winter sky over the human lands.
+cloud_cover = 0.78
+cloud_color = Color(0.86, 0.88, 0.92, 1)
+cloud_shade = Color(0.68, 0.70, 0.76, 1)

@@ -4,8 +4,12 @@
 ##   house:*    p3_house_playtest.gd (L28)    hall marks, map, the beast, wound, mural
 ##   suriel:*   p3_suriel_playtest.gd (L26)   stream, snare, hide, Suriel, answers, naga
 ##   faerie:*   p3_faerie_playtest.gd (L29)   the Summer faerie on the hall table (held)
-##   starlight_pool                            Tamlin's pool in the glen (data moment)
+##   pool:*                                    L44: the picnic, finding the pool, jumping in
 ##   painting:* p4_painting_playtest.gd (L30) studio, gallery, first painting
+##   attor:*                                   L44: the garden goes still; she hides in the yew and keeps still
+##   calanmai:* p5_calanmai_playtest.gd (L45) the order, the fires, the stranger,
+##                                             the hallway, the bruise, the roses,
+##                                             the gown and the paintings (p5)
 ## Each segment script is instanced as a "chained" child that shares this run's
 ## game, Feyre, beats and log, so its _run (which loads a dev jump) never runs.
 ## Its beats are renamed "<segment>:<beat>". Before each one the chain walks her
@@ -24,6 +28,7 @@ const HOUSE := "res://tools/playtest/p3_house_playtest.gd"
 const SURIEL := "res://tools/playtest/p3_suriel_playtest.gd"
 const FAERIE := "res://tools/playtest/p3_faerie_playtest.gd"
 const PAINTING := "res://tools/playtest/p4_painting_playtest.gd"
+const CALANMAI := "res://tools/playtest/p5_calanmai_playtest.gd"
 ## The snare kit from the house and grounds (L26-4): a fresh-killed chicken
 ## from the kitchen larder for the bait, the gardener's twine on the potting
 ## shed's work table for both loops. Both restock daily.
@@ -32,7 +37,7 @@ const TWINE := &"mat_snare_twine"
 ## House-space walks (x, z; the house sits at the world origin), from the
 ## study to the kitchen and from the kitchen back to the front doors, along
 ## L28's door-to-door routes (p3_house_playtest.gd).
-const STUDY_TO_KITCHEN := [Vector2(-12.8, -61.5), Vector2(-12, -66), Vector2(-9, -66), Vector2(-9, -67.5),
+const STUDY_TO_KITCHEN := [Vector2(-22.8, -68.5), Vector2(-21.5, -65), Vector2(-15, -65), Vector2(-12, -66), Vector2(-9, -66), Vector2(-9, -67.5),
 		Vector2(-1.8, -67.5), Vector2(-1.8, -62.5), Vector2(-1, -59), Vector2(7, -55), Vector2(9, -50),
 		Vector2(12, -50), Vector2(40, -50), Vector2(44, -51), Vector2(52, -51), Vector2(52, -57)]
 const KITCHEN_TO_DOORS := [Vector2(52, -51), Vector2(44, -51), Vector2(40, -50), Vector2(12, -50),
@@ -48,9 +53,12 @@ const BEATS: Array[String] = [
 	"suriel:travel", "suriel:spawn", "suriel:scout_stream", "suriel:set_snare", "suriel:hide_downwind",
 	"suriel:suriel_caught", "suriel:answers", "suriel:naga",
 	"faerie:travel", "faerie:spawn", "faerie:carried_in", "faerie:shelves", "faerie:triage", "faerie:words", "faerie:hand", "faerie:held",
-	"starlight_pool",
+	"pool:picnic", "pool:found", "pool:jump_in", "pool:swim",
 	"painting:travel", "painting:spawn", "painting:dev_jump_p4", "painting:studio_open",
-	"painting:gallery_opened", "painting:first_painting", "painting:gallery_seen"]
+	"painting:gallery_opened", "painting:first_painting", "painting:gallery_seen",
+	"attor:travel", "attor:stillness", "attor:hide", "attor:still",
+	"calanmai:travel", "calanmai:order", "calanmai:fires", "calanmai:stranger", "calanmai:explained",
+	"calanmai:supper", "calanmai:bite", "calanmai:vanity", "calanmai:lunch", "calanmai:roses", "calanmai:gown"]
 
 var pt: Node
 
@@ -60,7 +68,7 @@ func _init(playtest: Node) -> void:
 
 
 func play() -> bool:
-	for step: Callable in [_house, _suriel, _faerie, _starlight_pool, _painting]:
+	for step: Callable in [_house, _suriel, _faerie, _starlight_pool, _painting, _attor, _calanmai]:
 		if not await step.call():
 			return false
 		if pt.stop_after != "" and pt.stop_after in _played_since(step):
@@ -124,17 +132,65 @@ func _faerie() -> bool:
 	return await _segment("faerie", FAERIE)
 
 
+## L44 (ch18): Lucien's picnic on the glen shore starts it; she finds the pool
+## herself (the walker knows where; a player follows the stream); after
+## Tamlin's "Jump in" she walks into the water: starlight_pool_found.
 func _starlight_pool() -> bool:
-	pt._begin("starlight_pool", "to Tamlin's pool in the starlight glen; stay; starlight_pool_found")
+	pt._begin("pool:picnic", "to the starlight glen; the purple blanket on the shore; Tamlin's 'I want to show you something'")
 	var a: Node3D = await _reach_anchor(&"starlight_pool", _region_center(&"starlight_glen"))
 	if a == null:
 		return false
-	await pt._walk_to(a.global_position, 2.0, func() -> bool: return WorldState.has_flag("starlight_pool_found"))
-	pt._release_all()
-	if not await pt._until(func() -> bool: return WorldState.has_flag("starlight_pool_found"), 40.0):
-		pt._fail("starlight_pool_found never raised (%.1f m from the pool, %s)" % [pt._flat(a.global_position), _clock()])
+	var swim := a.get_node_or_null(^"Moment_starlight_pool") as StarlightPoolSwim
+	if swim == null:
+		pt._fail("no StarlightPoolSwim on the starlight_pool anchor")
 		return false
-	pt._note("phase %s" % PhaseManager.current_phase)
+	await pt._walk_to(swim.mark(&"blanket_view"), 3.0, func() -> bool: return swim.running)
+	await pt._walk_to(swim.mark(&"blanket"), 4.0, func() -> bool: return swim.running, 30.0)
+	pt._release_all()
+	if not await pt._until(func() -> bool: return swim.running, 20.0):
+		pt._fail("the picnic scene never started (can_start %s, %s, %.1f m from the blanket)" % [swim.can_start(), _clock(), pt._flat(swim.mark(&"blanket"))])
+		return false
+	if swim.picnic == null or swim.actor(&"lucien") == null:
+		pt._fail("no picnic or no Lucien on the blanket")
+		return false
+	pt._pass()
+
+	pt._begin("pool:found", "down past the stream to the hollow's rim; nothing marks the way; Tamlin catches up")
+	if not await pt._until(func() -> bool: return swim.current_beat_label() == "find the pool", 40.0):
+		pt._fail("never dared to find it (beat %s)" % swim.current_beat_label())
+		return false
+	if WorldState.has_flag("starlight_pool_found"):
+		pt._fail("the deed was given before she found the pool")
+		return false
+	for m: StringName in [&"trail_1", &"trail_2", &"trail_3", &"tamlin_rim"]:
+		await pt._walk_to(swim.mark(m), 4.0, func() -> bool: return swim.found)
+		if swim.found:
+			break
+	if not swim.found:
+		# Over the lip, looking down at the water (the walker stops short of a mark).
+		var lip: Vector3 = swim.mark(&"pool") + (swim.mark(&"tamlin_rim") - swim.mark(&"pool")).normalized() * (StarlightPoolSwim.RIM_REACH - 8.0)
+		await pt._walk_to(lip, 2.0, func() -> bool: return swim.found, 30.0)
+	pt._release_all()
+	if not await pt._until(func() -> bool: return swim.dared, 60.0):
+		pt._fail("Tamlin never said 'Jump in' (found %s, beat %s)" % [swim.found, swim.current_beat_label()])
+		return false
+	pt._pass()
+
+	pt._begin("pool:jump_in", "into the warm water: starlight_pool_found")
+	var into: Vector3 = swim.mark(&"pool") + (swim.mark(&"tamlin_rim") - swim.mark(&"pool")).normalized() * 8.0
+	await pt._walk_to(into, 2.0, func() -> bool: return WorldState.has_flag("starlight_pool_found"), 60.0)
+	pt._release_all()
+	if not await pt._until(func() -> bool: return WorldState.has_flag("starlight_pool_found"), 20.0):
+		pt._fail("starlight_pool_found never raised (in_pool %s, %.1f m from the centre, y %.2f, water %.2f)" % [swim.in_pool(), pt._flat(swim.mark(&"pool")), pt.feyre.global_position.y, swim.water_level()])
+		return false
+	pt._note("in the pool at %s; water level %.2f" % [pt._v(pt.feyre.global_position), swim.water_level()])
+	pt._pass()
+
+	pt._begin("pool:swim", "Tamlin swims out and tells Lucien's story; golden hour on the bank")
+	if not await pt._until(func() -> bool: return not swim.running, 120.0):
+		pt._fail("the swim never ended (beat %s)" % swim.current_beat_label())
+		return false
+	pt._note("phase %s, %s" % [PhaseManager.current_phase, _clock()])
 	pt._pass()
 	return true
 
@@ -159,6 +215,77 @@ func _painting() -> bool:
 	pt._note("every deed its dev jump writes is already earned; its set-down at the easel stands in for the stairs")
 	pt._pass()
 	return await _segment("painting", PAINTING)
+
+
+## L44 (ch19): out of the house by the front doors, round the west side into
+## the rose garden by day. Tamlin on the west walk; the garden goes still; she
+## goes into the yew pocket on the lawn west of the arbor (open to the east) and
+## stands still with no key held until it's gone: attor_evaded, no
+## fact.attor_detected.
+func _attor() -> bool:
+	pt._begin("attor:travel", "out by the front doors and round the west side to the rose garden, by day")
+	await pt._walk_to(PORTICO, 2.0, Callable(), 60.0)
+	await pt._walk_to(FORECOURT, 4.0)
+	var a: Node3D = await _reach_anchor(&"attor_hiding_spot", Vector3(-ROUND_X, 0, -100))
+	if a == null:
+		return false
+	var scene := a.get_node_or_null(^"Moment_attor") as AttorInTheGarden
+	if scene == null:
+		pt._fail("no AttorInTheGarden on attor_hiding_spot")
+		return false
+	await pt._walk_to(Vector3(-ROUND_X, 0, FORECOURT.z), 6.0)
+	await pt._walk_to(Vector3(-ROUND_X, 0, -96.0), 6.0)
+	await pt._walk_to(scene.mark(&"tamlin_idle") + Vector3(0, 0, 6.0), 3.0, func() -> bool: return scene.running or scene.shifting_time)
+	await pt._walk_to(scene.mark(&"tamlin_idle"), 6.0, func() -> bool: return scene.running or scene.shifting_time, 20.0)
+	pt._release_all()
+	if not await pt._until(func() -> bool: return scene.running, 30.0):
+		pt._fail("the garden never went still (can_start %s, %s, %.1f m from Tamlin's mark)" % [scene.can_start(), _clock(), pt._flat(scene.mark(&"tamlin_idle"))])
+		return false
+	pt._pass()
+
+	pt._begin("attor:stillness", "Tamlin: 'Stay hidden...' and he's gone")
+	if not await pt._until(func() -> bool: return scene.current_beat_label() == "hide", 30.0):
+		pt._fail("Tamlin never told her to hide (beat %s)" % scene.current_beat_label())
+		return false
+	pt._pass()
+
+	pt._begin("attor:hide", "into the yew pocket west of the arbor, through its open east side, within the window")
+	await pt._walk_to(scene.mark(&"tamlin_back"), 1.0, func() -> bool: return scene.in_pocket(), 6.0)
+	await pt._walk_to(scene.mark(&"hide"), 0.6, Callable(), 5.0)
+	pt._release_all()
+	if not await pt._until(func() -> bool: return scene.watching, 4.0):
+		pt._fail("not in the pocket in time (in_pocket %s, detected %s, %.1f m from it)" % [scene.in_pocket(), scene.detected, pt._flat(scene.mark(&"hide"))])
+		return false
+	pt._pass()
+
+	pt._begin("attor:still", "no key held while the voice speaks, prowls near and leaves: attor_evaded")
+	if not await pt._until(func() -> bool: return WorldState.has_flag("attor_evaded") or not scene.running, 180.0):
+		pt._fail("it never left (beat %s)" % scene.current_beat_label())
+		return false
+	if WorldState.has_flag("fact.attor_detected") or not WorldState.has_flag("attor_evaded"):
+		pt._fail("she was found (noise %.2f, exposed %.1f)" % [scene.noise, scene.exposed])
+		return false
+	pt._note("noise peaked below %.2f; phase %s" % [AttorInTheGarden.NOISE_MAX, PhaseManager.current_phase])
+	pt._pass()
+	return true
+## p5 (L45): from wherever p4 ended, round to the manor's forecourt; the
+## segment walks in through the front doors (the order's hour comes to her).
+func _calanmai() -> bool:
+	pt._begin("calanmai:travel", "round to the manor forecourt for Calanmai; the Attor must already be behind her")
+	if not WorldState.has_flag("attor_evaded"):
+		pt._fail("attor_evaded isn't earned: the chain needs p4's Attor segment before Calanmai")
+		return false
+	var a: Node3D = await _reach_anchor(&"manor_window_hide", Vector3(7, 0, -30.5))
+	if a == null:
+		return false
+	var p: Vector3 = pt.feyre.global_position
+	if p.z < FORECOURT.z - 10.0:
+		await pt._walk_to(Vector3(-ROUND_X, 0, minf(p.z, -100.0)), 6.0)
+		await pt._walk_to(Vector3(-ROUND_X, 0, FORECOURT.z), 6.0)
+	await pt._walk_to(FORECOURT, 4.0)
+	pt._note("on the forecourt, %s" % _clock())
+	pt._pass()
+	return await _segment("calanmai", CALANMAI)
 
 
 # --- plumbing ---------------------------------------------------------------

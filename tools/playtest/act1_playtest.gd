@@ -18,12 +18,12 @@
 ##      (tools/playtest/act2_grounds_beats.gd, L25): first_dinner (already
 ##      eaten), bogge_hunt, puca_gate; then p3 and p4's painting in the same
 ##      run (tools/playtest/p3p4_chain.gd, P3P4Chain.BEATS: house:*, suriel:*,
-##      faerie:*, starlight_pool, painting:*). Act I alone:
+##      faerie:*, pool:*, painting:*, attor:*). Act I alone:
 ##      --stop-after=manor_arrival; Acts I-II: --stop-after=puca_gate.
 ##   3. "workarounds" in the report is empty (a workaround patches a game bug).
 ##   4. The phase is p2_grounds on arrival, and after the ride she stands on
 ##      the manor estate and walks (manor_arrival checks both). At the end of
-##      the full chain, final_phase in the report is p4_wider_court
+##      the full chain, final_phase in the report is p5_calanmai
 ##      (p3_house_and_woods with --stop-after=puca_gate).
 ##   5. No "SCRIPT ERROR" lines in the log (not checked by the exit code).
 ##   6. No StandIns placeholder (box or capsule) entered the tree: each one
@@ -814,8 +814,7 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)))
 				var hop := p - from
 				hop.y = 0.0
-				feyre.global_position = p
-				feyre.velocity = Vector3.ZERO
+				feyre.teleport(p)   # the jump just pressed may have started a ledge climb
 				_log("    stuck at %s in %s (%s), hopping %.0f m to %s" % [_v(from), _region(), why, hop.length(), _v(p)])
 				_hop_causes[why.get_slice(" ", 0)] = int(_hop_causes.get(why.get_slice(" ", 0), 0)) + 1
 				hops += 1

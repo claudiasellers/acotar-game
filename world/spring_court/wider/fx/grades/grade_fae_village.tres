@@ -32,3 +32,6 @@ glow_bloom = 0.04
 glow_hdr_threshold = 1.1
 lut = SubResource("GradientTexture1D_amw1y")
 magic = 1.0
+cloud_cover = 0.20
+cloud_color = Color(1.00, 0.86, 0.80, 1)
+cloud_shade = Color(0.62, 0.52, 0.72, 1)

@@ -1,13 +1,13 @@
 // The drive and forecourt: blush-and-pearl gravel with gold grit and the odd
 // fallen petal, in world space so long drapes never stretch it (R3).
-// Kept below ~0.86 albedo: near-white gravel under the noon sun clipped to
-// white and made the drive glare (user, 2026-11-02).
+// Kept below ~0.86 albedo, with darker ground between paler stones: near-white
+// gravel under the noon sun clipped to white and lost its stones (2026-11-02).
 shader_type spatial;
 render_mode cull_back;
 
-uniform vec3 sand : source_color = vec3(0.80, 0.67, 0.61);
-uniform vec3 pearl : source_color = vec3(0.86, 0.80, 0.77);
-uniform vec3 taupe : source_color = vec3(0.66, 0.53, 0.49);
+uniform vec3 sand : source_color = vec3(0.72, 0.60, 0.55);
+uniform vec3 pearl : source_color = vec3(0.84, 0.79, 0.76);
+uniform vec3 taupe : source_color = vec3(0.52, 0.42, 0.39);
 uniform vec3 grit : source_color = vec3(0.95, 0.78, 0.42);
 uniform vec3 petal : source_color = vec3(1.0, 0.62, 0.76);
 uniform float pebble_size = 0.14;
@@ -35,7 +35,9 @@ void fragment() {
 		float radius = mix(0.12, 0.34, hash(cell + 13.0));
 		float peb = smoothstep(radius, radius * 0.55, length(f - jitter)) * step(0.35, hash(cell + 29.0));
 		col = mix(col, pearl, step(0.6, h) * peb * 0.8);
-		col = mix(col, taupe, step(h, 0.22) * peb * 0.55);
+		col = mix(col, taupe, step(h, 0.22) * peb * 0.8);
+		// a soft dark rim on each stone so the gravel reads as stones under noon sun
+		col *= 1.0 - peb * (1.0 - peb) * 0.9;
 		col = mix(col, grit, step(0.95, hash(cell + 11.0)) * peb);
 	}
 	// broad soft variation so it never reads as a flat strip

@@ -116,6 +116,16 @@ func apply(base: GradePreset) -> void:
 		sky_mat.sky_horizon_color = p.sky_horizon.lerp(p.golden_sky_horizon, golden)
 		sky_mat.ground_horizon_color = p.ground_horizon
 		sky_mat.ground_bottom_color = p.ground_bottom
+	# The World's painted sky (painted_sky.gdshader): same gradient, plus clouds.
+	var painted := env.sky.sky_material as ShaderMaterial if env.sky != null else null
+	if painted != null:
+		painted.set_shader_parameter(&"sky_top_color", p.sky_top.lerp(p.golden_sky_top, golden))
+		painted.set_shader_parameter(&"sky_horizon_color", p.sky_horizon.lerp(p.golden_sky_horizon, golden))
+		painted.set_shader_parameter(&"ground_horizon_color", p.ground_horizon)
+		painted.set_shader_parameter(&"ground_bottom_color", p.ground_bottom)
+		painted.set_shader_parameter(&"cloud_cover", p.cloud_cover)
+		painted.set_shader_parameter(&"cloud_color", p.cloud_color)
+		painted.set_shader_parameter(&"cloud_shade", p.cloud_shade)
 	env.ambient_light_color = p.ambient_color
 	env.ambient_light_energy = p.ambient_energy
 	env.fog_light_color = p.fog_color

@@ -96,11 +96,12 @@ moment("summer_faerie", "17", "", "manor_house", ["naga_survived"], [
 ], trigger="auto", notes="Unwinnable triage on the entrance-hall table; the deed is holding his hand until he dies.")
 
 # --- P4 The wider court (ch 18-19) -------------------------------------------
+# Coded by L44 (story/act4/starlight_pool_swim.gd, Act2Spaces.CODED): these
+# steps are the fallback and name the deed. No knife in ch18 (Keeper).
 moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faerie_comforted"], [
     SP("tamlin", V(2, 0, 2)), C("WALK"), CU("tamlin", "shows_his_childhood_pool"), CEL("vista"),
     ST(6.0, 8.0), R("starlight_pool_found"), CEL("deed"), J("lucien_autumn_history"),
-    G("obj_lucien_knife"),
-], r=10.0, notes="Picnic in the glen, swim in the pool; Lucien's story and his knife.")
+], r=10.0, notes="L44: picnic on the glen shore; she finds the pool below the falls and jumps in; Tamlin tells Lucien's history.")
 moment("gallery", "19", "manor_gallery", "manor_house", ["gallery_opened"], [
     C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 3.0, "cone": 35.0}, CEL("gallery"),
     R("fact.gallery_seen"),
@@ -117,30 +118,35 @@ moment("attor", "19", "attor_hiding_spot", "manor_grounds", ["first_painting"], 
     SP("attor", V(0, 3, -12)), CU("attor", "speaks_of_her"),
     ST(18.0, 2.5, "self", True, "fact.attor_detected"), MO("dread", 0.2, 2.0), DS("attor"),
     R("attor_evaded"),
-], r=3.0, notes="Stay hidden; leaving the spot is detection (a permanent fact) and the scene ends.")
+], r=3.0, notes="L44 (story/act4/attor_in_the_garden.gd): by day; Tamlin says stay hidden and she hides herself behind the hedge; leaving cover or rustling is detection (a permanent fact) and the scene ends.")
 
 # --- P5 Calanmai (ch 20-22) --------------------------------------------------
 moment("calanmai_fires", "20", "calanmai_bonfires", "hill_of_the_rite", ["attor_evaded"], [
     MO("fire_night", 1.0, 3.0), R("calanmai_attended"),
-], r=25.0, night=True)
+], r=25.0, night=True, notes="L45: coded (story/act5/calanmai/rite_fires.gd). Tamlin orders her to stay in her room at dusk "
+   "(FireNightOrder); she follows the drums anyway, and walking in among the bonfires is her deed.")
 moment("cave_mouth", "20-21", "calanmai_cave_mouth", "hill_of_the_rite", ["calanmai_attended"], [
     SP("high_fae_male", V(2, 0, -2)), SP("high_fae_male_2", V(-2, 0, -2)), SP("high_fae_male_3", V(0, 0, -3)),
-    C("WALK"), MO("dread", 0.9, 0.8, 0.2), W(4.0), SP("rhysand", V(0, 0, 2)), CU("rhysand", "steadies_her"),
+    C("NONE"), MO("dread", 0.9, 0.8, 0.2), W(4.0), SP("rhysand", V(0, 0, 2)), CU("rhysand", "arm_around_her"),
     CU("high_fae_male", "flee"), DS("high_fae_male"), DS("high_fae_male_2"), DS("high_fae_male_3"),
-    MO("dread", 0.3, 2.0), C("LOOK", "rhysand"), W(4.0), J("stranger_violet_eyes"), R("stranger_met"),
+    MO("dread", 0.3, 2.0), C("WALK"), IN(1, 3.0), R("fact.stranger_stepped_away"), W(2.0), R("stranger_met"),
     SP("lucien", V(3, 0, 3)), CU("lucien", "carries_her_home"),
-], r=5.0, night=True)
+], r=5.0, night=True, notes="L45: coded (story/act5/calanmai/cave_path.gd). Three faeries pin her; the stranger "
+   "(Rhysand, unnamed) claims her as his; stepping out of his arm and walking away is her deed. Lucien carries her home.")
 moment("bite", "21", "manor_kitchen_hall", "manor_house", ["stranger_met"], [
     SP("tamlin", V(0, 0, -1)), C("NONE", "tamlin", ["interact"]), MO("dread", 0.8, 0.3, 0.3),
     CU("tamlin", "pins_and_bites"), W(2.5),
-    DEC([{"action": "interact", "fact": "fact.bite.slapped"}], 4.0, "fact.bite.slapped"),
-    MO("dread", 0.0, 2.0), R("bite_endured"), G("obj_white_roses"),
-], r=4.0, night=True, notes="She slaps him (canon); the next day he gives her white roses.")
+    DEC([{"action": "interact", "fact": "fact.bite.pushed"}], 7.0, ""),
+    MO("dread", 0.0, 2.0), R("fact.bite_held_off"), R("bite_endured"),
+], r=4.0, night=True, notes="L45: coded (story/act5/calanmai/hallway_bite.gd). After supper in the empty kitchen, the "
+   "Hunter pins her in the moonlit passage; she pushes him off (no slap in canon). In play bite_endured rises the next "
+   "day, when she goes down to lunch with the bruise bared (BruiseLunch).")
 moment("paintings_shown", "22", "manor_dining_table", "manor_house", ["bite_endured", "first_painting"], [
     SP("tamlin", V(0, 0, -2.5)), C("LOOK", "tamlin"), CU("tamlin", "shrinks_the_table"), IN(1, 3.0),
-    CU("tamlin", "keeps_the_snowy_forest"), R("fact.tamlin_kept_snowy_forest"), R("paintings_shown"),
+    CU("tamlin", "keeps_the_snowy_forest"), R("fact.tamlin_kept_canvas"), R("paintings_shown"),
     CEL("deed"),
-], trigger="interact", r=3.0)
+], trigger="interact", r=3.0, notes="L45: coded (story/act5/calanmai/gown_dinner.gd). After the white roses (RoseDinner), "
+   "she comes to dinner in a gown, the table shrinks, she shows him her painting room, and gives him the wintry canvas.")
 
 # --- P6 The blight tightens (ch 23-27) ---------------------------------------
 moment("glamour_lift", "23", "glamour_lift_glade", "blossom_vale", ["paintings_shown", "fact.glen_picnic_shared"], [

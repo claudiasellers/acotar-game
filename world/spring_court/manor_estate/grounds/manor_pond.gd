@@ -13,6 +13,11 @@ const ISLET_R := 4.0
 const STONES_FROM := Vector2(210.0, 66.5)
 
 
+## The walk from the forecourt to the jetty (dressed by ManorEastLawn).
+static func path_to_jetty() -> PackedVector2Array:
+	return PackedVector2Array([Vector2(26, 6), Vector2(120, 40), Vector2(JETTY_X, 58.0)])
+
+
 static func footprints() -> Array[Rect2]:
 	return [BOATHOUSE.grow(1.0), Rect2(JETTY_X - 2.0, 58.0, 4.0, 24.0)]
 
@@ -110,8 +115,8 @@ static func build(parent: Node3D) -> void:
 		b.prop_on_ground(&"garden_bench", p.x, p.y, (c - p).angle_to(Vector2(0, -1)))
 	for p: Vector2 in [Vector2(171, 60), Vector2(179, 60), Vector2(242, 98), Vector2(214, 64)]:
 		ManorGrounds.lamp(b, p.x, p.y)
-	b.drape_path(PackedVector2Array([Vector2(26, 6), Vector2(120, 40), Vector2(JETTY_X, 58.0)]), 3.0, ManorGrounds.gravel())
-	b.drape_path(PackedVector2Array([Vector2(JETTY_X, 58.0), Vector2(230, 70), Vector2(BOATHOUSE.end.x + 1.5, BOATHOUSE.get_center().y)]), 2.5, ManorGrounds.gravel())
+	b.drape_path(path_to_jetty(), 3.0, GardenKit.walk())
+	b.drape_path(PackedVector2Array([Vector2(JETTY_X, 58.0), Vector2(230, 70), Vector2(BOATHOUSE.end.x + 1.5, BOATHOUSE.get_center().y)]), 2.5, GardenKit.walk())
 	b.flush()
 
 

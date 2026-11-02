@@ -14,15 +14,37 @@ const CODED := {
 	# L25: the grounds' dangers (ch9-11).
 	&"bogge": {"script": "res://story/act2/bogge_hunt.gd", "stage": "res://data/story/act2/bogge_stage.tres"},
 	&"puca": {"script": "res://story/act2/puca_lure.gd", "stage": "res://data/story/act2/puca_stage.tres"},
+	# L44: the wider court (ch18-19).
+	&"starlight_pool": {"script": "res://story/act4/starlight_pool_swim.gd", "stage": "res://data/story/act4/starlight_pool_stage.tres"},
+	&"attor": {"script": "res://story/act4/attor_in_the_garden.gd", "stage": "res://data/story/act4/attor_stage.tres"},
+	# L45: Calanmai (ch20-22), docs/contracts/calanmai.md.
+	&"calanmai_fires": {"script": "res://story/act5/calanmai/rite_fires.gd", "stage": "res://data/story/act5/rite_fires_stage.tres"},
+	&"cave_mouth": {"script": "res://story/act5/calanmai/cave_path.gd", "stage": "res://data/story/act5/cave_path_stage.tres"},
+	&"bite": {"script": "res://story/act5/calanmai/hallway_bite.gd", "stage": "res://data/story/act5/hallway_bite_stage.tres"},
+	&"paintings_shown": {"script": "res://story/act5/calanmai/gown_dinner.gd", "stage": "res://data/story/act5/gown_dinner_stage.tres"},
 }
 
 ## Anchor id -> list of {"name", "script", "stage"}: scenes with no moment.
 const EXTRA := {
 	&"manor_dining_table": [
 		{"name": "ManorArrival", "script": "res://story/act2/manor_arrival.gd", "stage": "res://data/story/act2/manor_arrival_stage.tres"},
+		# L45: lunch with the bruise bared, then dinner and the white roses (ch22).
+		{"name": "BruiseLunch", "script": "res://story/act5/calanmai/bruise_lunch.gd", "stage": "res://data/story/act5/bruise_lunch_stage.tres"},
+		{"name": "RoseDinner", "script": "res://story/act5/calanmai/rose_dinner.gd", "stage": "res://data/story/act5/rose_dinner_stage.tres"},
 	],
 	&"feyre_bedroom_window": [
 		{"name": "AlisWelcome", "script": "res://story/act2/alis_welcome.gd", "stage": "res://data/story/act2/alis_welcome_stage.tres"},
+		# L45: the bruise in her vanity mirror (ch22).
+		{"name": "BruiseVanity", "script": "res://story/act5/calanmai/bruise_vanity.gd", "stage": "res://data/story/act5/bruise_vanity_stage.tres"},
+	],
+	# L45: the order to stay inside at dusk, and Lucien's account of the Rite after (ch20-21).
+	&"manor_window_hide": [
+		{"name": "FireNightOrder", "script": "res://story/act5/calanmai/fire_night_order.gd", "stage": "res://data/story/act5/fire_night_order_stage.tres"},
+		{"name": "RiteExplained", "script": "res://story/act5/calanmai/rite_explained.gd", "stage": "res://data/story/act5/rite_explained_stage.tres"},
+	],
+	# L45: supper alone in the empty kitchen (ch21).
+	&"manor_alis_hiding": [
+		{"name": "KitchenSupper", "script": "res://story/act5/calanmai/kitchen_supper.gd", "stage": "res://data/story/act5/kitchen_supper_stage.tres"},
 	],
 }
 

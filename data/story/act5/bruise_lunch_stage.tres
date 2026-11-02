@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_chair": Vector3(4.95, 0, -6.5),
+"lucien_seat": Vector3(-3.4, 0, -8),
+"tamlin_seat": Vector3(-4.75, 0, -6.5)
+}
+lines = {
+"laugh": {"text": "Lucien howls. Even Tamlin laughs.", "who": ""},
+"look": {"text": "Lucien's eyes go to my neck, and he grins.", "who": ""},
+"pig": {"text": "Faerie pig!", "who": "Feyre"},
+"stayed": {"text": "You should have stayed in your room.", "who": "Tamlin"}
+}
+invented = PackedStringArray("look")
+canon = "Ch22 (Keeper, [C]): she goes down to the dining room for LUNCH with the bruise showing. They laugh; Tamlin says she should have stayed in her room; she yells 'Faerie pig!' She paints the pig portraits after."

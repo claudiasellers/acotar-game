@@ -146,7 +146,8 @@ func generate() -> void:
 	rect = HumanRealmLayout.REGION_RECTS[REGION_ID]
 	_define_layers()
 	for step in ["_place_landmarks", "_place_square", "_place_houses", "_place_fence_line",
-			"_place_fields", "_place_creek", "_place_village_finds", "_settle_finds", "_fill_empty_cells"]:
+			"_place_fields", "_place_creek", "_place_village_finds", "_settle_finds", "_place_verges",
+			"_fill_empty_cells"]:
 		var t0 := Time.get_ticks_msec()
 		call(step)
 		if verbose:
@@ -734,6 +735,51 @@ func _place_market_lane() -> void:
 						lr.randf() * TAU, 0.9, rec.y - WorldHeight.height_at(p.x, p.y) + 1.2)
 			put(&"barrel", p + rot(Vector2(0.75, 0.2), yaw), lr.randf() * TAU, 0.75, rec.y - WorldHeight.height_at(p.x, p.y) + 1.2)
 			break
+
+
+## The open snow either side of the roads (lane L32, audit A7): wind-piled
+## drifts, dead grass and bracken poking through, the odd stone and stump,
+## thicker near the road where carts and feet churn the verge, thinning out
+## into open snow. Decoration only (no finds), own RNG.
+func _place_verges() -> void:
+	var vr := RandomNumberGenerator.new()
+	vr.seed = SEED + 91
+	var hw := HumanRealmLayout.ROAD_HALF_WIDTH
+	for line in HumanRealmLayout.ROADS:
+		for i in line.size() - 1:
+			var a := line[i]
+			var b := line[i + 1]
+			var seg := b - a
+			var n := Vector2(-seg.y, seg.x).normalized()
+			var t := 0.0
+			while t < seg.length():
+				var base := a + seg.normalized() * t
+				t += vr.randf_range(1.8, 3.2)
+				if not rect.grow(-2.0).has_point(base):
+					continue
+				for sgn in [1.0, -1.0]:
+					# Most things hug the verge; a few wander into the field.
+					var d := hw + 1.2 + pow(vr.randf(), 2.0) * 14.0
+					var p: Vector2 = base + n * sgn * d + seg.normalized() * vr.randf_range(-1.0, 1.0)
+					if not ground_ok(p, 0.6) or not footprint_free(p, Vector2(0.8, 0.8), 0.0, 0.3):
+						continue
+					var r := vr.randf()
+					if r < 0.5:
+						for k in vr.randi_range(3, 6):  # a tussock of dead grass
+							var q: Vector2 = p + Vector2(vr.randf_range(-0.6, 0.6), vr.randf_range(-0.6, 0.6))
+							var sc := vr.randf_range(0.8, 1.4)
+							if rect.grow(-0.3).has_point(q):
+								put(&"grass_tufts", q, vr.randf() * TAU, sc)
+					elif r < 0.6:
+						put(&"dead_bracken", p, vr.randf() * TAU, vr.randf_range(0.7, 1.1))
+					elif r < 0.84 and d < hw + 4.0:
+						# Drifts pile on the lee of the verge, long and low,
+						# right against it (not out where a camera stands).
+						put(&"snow_mounds", p, n.angle() * -1.0 + vr.randf_range(-0.3, 0.3), vr.randf_range(0.9, 1.8))
+					elif r < 0.95 and d < hw + 4.0:  # stones at the verge only
+						put(&"boulders", p, vr.randf() * TAU, vr.randf_range(0.25, 0.5))
+					elif d > hw + 3.0 and d < hw + 5.5:  # an old stump back from the verge
+						put(&"stumps", p, vr.randf() * TAU, vr.randf_range(0.7, 1.0))
 
 
 ## Lantern post at p with a light, facing `yaw`.
