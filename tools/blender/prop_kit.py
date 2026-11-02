@@ -527,3 +527,36 @@ def star_flower(prop, center, radius, color, n=5, finish="fabric", heart=BUTTER,
     for i in range(n):
         prop.add(petal(radius, radius * 0.6, cup=0.15, curl=-0.05), color, finish, m0 @ R("Z", 360 * i / n))
     prop.add(sphere(radius * 0.28, 6, 4), heart, finish, m0 @ S(1, 1, 0.6))
+
+
+def round_petal(length, width, cup=0.3, curl=0.1):
+    """A rounded petal along +X (2x2 quads): broad, blunt tip rather than a
+    point, so blooms read as soft petals, not shards (L35-4)."""
+    bm = bmesh.new()
+    rows = []
+    for i, t in enumerate((0.0, 0.55, 1.0)):
+        w = width * (0.4, 1.0, 0.78)[i]
+        z = cup * length * t * t + curl * length * (t ** 3)
+        rows.append([bm.verts.new((length * t, -w / 2, z + cup * w * 0.45)),
+                     bm.verts.new((length * t, 0.0, z)),
+                     bm.verts.new((length * t, w / 2, z + cup * w * 0.45))])
+    for a, b in zip(rows, rows[1:]):
+        bm.faces.new((a[0], a[1], b[1], b[0]))
+        bm.faces.new((a[1], a[2], b[2], b[1]))
+    return bm
+
+
+def soft_rose(prop, m, r, color, finish="fabric", rng=None, petals=3, sides=8):
+    """A rounded full rose (~35 tris + 8 per petal), facing +Z under matrix m:
+    a smooth cupped head with a darker swirled heart, and a few broad outer
+    petals rolling open. Smooth-shaded throughout so it never reads as a
+    faceted crystal at eye level (L35-4)."""
+    rng = rng or random.Random(5)
+    prop.add(lathe([(0.0, 0.0), (r * 0.66, r * 0.2), (r * 0.6, r * 0.56), (r * 0.16, r * 0.64)], sides, cap_top=False),
+             color, finish, m, sharp_deg=89.0)
+    prop.add(lathe([(r * 0.18, r * 0.62), (0.0, r * 0.76)], 5, cap_bottom=False),
+             darker(color, 0.14), finish, m @ R("Z", rng.uniform(0, 72)), sharp_deg=89.0)
+    for i in range(petals):
+        a = 360 / petals * i + rng.uniform(-15, 15)
+        prop.add(round_petal(r * 0.95, r * 1.0, cup=0.35, curl=-0.06), lighter(color, 0.06), finish,
+                 m @ R("Z", a) @ R("Y", -24) @ T(r * 0.1, 0, 0), sharp_deg=89.0)

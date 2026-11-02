@@ -1,0 +1,287 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"a_trousers"
+speaker = &"alis"
+who = "Alis"
+text = "Trousers again? Fine. One day you'll wear a gown and like it."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"a_curtain"
+speaker = &"alis"
+who = "Alis"
+text = "Next time you string up a curtain to catch me, use the ugly ones."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray("curtain_trap_set")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"a_lucien"
+speaker = &"alis"
+who = "Alis"
+text = "Don't let Lucien bully you. Bite back. He likes it better."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"a_suriel"
+speaker = &"alis"
+who = "Alis"
+text = "The next time that fool Lucien gives you advice on how to trap the Suriel, you come to me. Dead chickens! All you needed to do was offer it a new robe."
+canon = "V"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray("suriel_bound")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "scandalised, then fond"
+emotion = &"surprise"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"a_nephews"
+speaker = &"alis"
+who = "Alis"
+text = "My sister and her mate were killed. Her boys are why I'm here."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"a_glass"
+speaker = &"alis"
+who = "Alis"
+text = "There. Look in the glass. That's a girl worth looking at."
+canon = "X"
+trigger = 3
+where = &"dressing_room"
+deed = &""
+phases = PackedStringArray("p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("bite_endured")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"a_solstice"
+speaker = &"alis"
+who = "Alis"
+text = "Hold still. Flowers in your hair, and the blue. He won't be able to breathe."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("solstice_danced")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"a_face"
+speaker = &"alis"
+who = "Alis"
+text = "Yes, this is my face. Close your mouth, child."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"a_fountain"
+speaker = &"alis"
+who = "Alis"
+text = "Stay away from the fountain. Please. Just for a while."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("fountain_head_found")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"a_elbows"
+speaker = &"alis"
+who = "Alis"
+text = "Eat something. You're all elbows."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"a_mud"
+speaker = &"alis"
+who = "Alis"
+text = "Mud on the floor again. I'll have it out of the rugs by supper."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"a_bath"
+speaker = &"alis"
+who = "Alis"
+text = "The bath's drawn whenever you want it. Hot as you like."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[resource]
+script = ExtResource("3")
+area = &"alis"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11")])
+places = Array[ExtResource("2")]([])

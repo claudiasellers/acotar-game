@@ -13,8 +13,11 @@ albedo (manor glare fix), never near-white in direct sun.
 """
 import math
 import random
+
+import bmesh
+from mathutils import Vector
 from prop_kit import (BLUSH, BUTTER, GOLD, LILAC, PERI, ROSE, SAGE, SAGE_DEEP, SAGE_LIGHT, WHITE, R, S, T,
-                      box, cyl, ico, lathe, leaf, lighter, darker, mix, petal, sphere, torus, tube, disc)
+                      box, cyl, ico, lathe, leaf, lighter, darker, mix, petal, soft_rose, sphere, torus, tube, disc)
 
 # Garden palette (sRGB). Stone is warm and mid-light so it never glares.
 STONE = (0.84, 0.78, 0.77)
@@ -36,13 +39,11 @@ SWEETPEA = [(1.0, 0.62, 0.78), (0.80, 0.62, 0.98), (1.0, 0.86, 0.90), (0.98, 0.4
 
 
 def rosette(p, center, r, col, tilt=None, rng=None, finish="fabric", n=5):
-    """A cheap full rose (~50-65 tris): n cupped petals round a closed bud."""
+    """A rounded full rose: a smooth cupped head and a few broad outer petals
+    (prop_kit.soft_rose; L35-4 replaced the pointed five-petal shard)."""
     rng = rng or random.Random(3)
     m = T(*center) @ (tilt if tilt is not None else R("Z", 0))
-    for i in range(n):
-        a = 360 / n * i + rng.uniform(-10, 10)
-        p.add(petal(r, r * 0.95, cup=0.45, curl=0.12), col, finish, m @ R("Z", a) @ R("Y", -38))
-    p.add(lathe([(0, 0), (r * 0.42, r * 0.2), (0, r * 0.55)], 5), darker(col, 0.12), finish, m)
+    soft_rose(p, m, r, col, finish, rng, petals=min(n, 3))
 
 
 def leaves_mass(p, cx, cy, cz, r, col, rng, n=4, sub=1, squash=0.85, finish="leaf"):
@@ -77,10 +78,14 @@ def clipped_block(p, sx, sy, sz, cx, cy, cz, rng, col=YEW, tip=YEW_TIP, seg=2):
 def climbing_roses(p, pts, rng, cols=ROSE_MIX, every=2, leaf_r=0.16, bloom_r=0.11, petals=4):
     """Foliage and roses strung along a path of points (a vine)."""
     for i, (x, y, z) in enumerate(pts):
-        p.add(ico(leaf_r * rng.uniform(0.8, 1.15), 0), SAGE if i % 2 else SAGE_DEEP, "leaf",
-              T(x, y, z) @ S(1, 1, 0.8))
-        p.add(ico(leaf_r * 0.8, 0), SAGE_LIGHT if i % 3 == 0 else SAGE, "leaf",
-              T(x + rng.uniform(-leaf_r, leaf_r), y + rng.uniform(-leaf_r, leaf_r), z - leaf_r * 0.5) @ S(1, 1, 0.8))
+        if i % 2 == 0:
+            # one soft, lumpy clump every other point (same tris as two
+            # hexagonal ico-0 balls per point, but round in silhouette)
+            b = ico(leaf_r * 1.35 * rng.uniform(0.85, 1.1), 1)
+            for v in b.verts:
+                v.co *= 1.0 + rng.uniform(-0.12, 0.12)
+            p.add(b, [SAGE, SAGE_DEEP, mix(SAGE, SAGE_LIGHT, 0.5)][(i // 2) % 3], "leaf",
+                  T(x, y, z - leaf_r * 0.2) @ S(1, 1, 0.8), sharp_deg=89.0)
         if i % every == 0:
             ox, oy = rng.uniform(-0.08, 0.08), rng.uniform(-0.08, 0.08)
             rosette(p, (x + ox, y + oy, z + 0.05), bloom_r * rng.uniform(0.85, 1.2), cols[(i // every) % len(cols)],
@@ -249,7 +254,7 @@ def wisteria_trellis(p, size, c):
     p.add(tube(vine, [0.09, 0.07, 0.06, 0.05, 0.04, 0.03], 5), (0.55, 0.42, 0.44), "matte")
     vine2 = [(-0.4, 0.12, 2.0), (-1.4, 0.12, 3.0), (-1.6, 0.12, 4.3), (-0.8, 0.12, 5.5)]
     p.add(tube(vine2, [0.05, 0.04, 0.035, 0.025], 5), (0.55, 0.42, 0.44), "matte")
-    for i in range(30):
+    for i in range(29):
         x = rng.uniform(-1.9, 1.9)
         z = rng.uniform(1.6, 5.9)
         p.add(ico(rng.uniform(0.18, 0.28), 0), SAGE if i % 2 else SAGE_DEEP, "leaf", T(x, 0.18, z) @ S(1, 0.6, 0.8))
@@ -357,19 +362,53 @@ def wisteria_bay(p, size, c):
     for k in range(4):
         y = -d / 2 + 0.35 + k * 0.8
         p.add(box(w + 0.4, 0.14, 0.18, bevel=0.03), (0.80, 0.64, 0.60), "satin", T(0, y, h + 0.09))
-    # canopy of leaves over the beams
-    for i in range(12):
-        x = -w / 2 + (i % 4 + 0.5) * w / 4 + rng.uniform(-0.3, 0.3)
-        y = -d / 2 + (i // 4 + 0.5) * d / 3 + rng.uniform(-0.2, 0.2)
-        p.add(ico(rng.uniform(0.55, 0.7), 0), [SAGE, mix(WISTERIA[0], SAGE_LIGHT, 0.35), SAGE_LIGHT, mix(WISTERIA[3], SAGE_LIGHT, 0.3)][i % 4], "leaf",
-              T(x, y, h + 0.3) @ S(1.3, 1.3, 0.45))
-    # the racemes: heavier along the sides, a scatter over the walk
-    for i in range(40):
-        side = rng.random() < 0.65
-        x = (rng.choice((-1, 1)) * rng.uniform(w / 2 - 0.9, w / 2 + 0.1)) if side else rng.uniform(-w / 2 + 0.6, w / 2 - 0.6)
+    # canopy of leaves over the beams (L35-3): one continuous, lumpy mattress
+    # of foliage rolling down over both sides, its lumps periodic along the
+    # walk so the tiled bays join without a seam or a repeating tile shape;
+    # a few lighter clumps of new growth break it up. The flowers show from
+    # above as lilac sprays lying on top, never as pale near-white leaf.
+    bm = bmesh.new()
+    nx, ny = 14, 8
+    bmesh.ops.create_grid(bm, x_segments=nx, y_segments=ny, size=1.0)
+    half = w / 2 + 0.3
+    for v in bm.verts:
+        u, t = v.co.x, v.co.y                       # -1..1 each
+        x, y = u * half, t * d / 2
+        ph = 2 * math.pi * y / d
+        z = (0.13 * math.sin(2 * ph + 1.7 * x) + 0.09 * math.cos(ph - 2.3 * x + 0.6)
+             + 0.06 * math.sin(3 * ph + 3.1 * x))
+        if abs(t) < 0.99:
+            z += rng.uniform(-0.04, 0.04)
+        z -= 0.55 * max(0.0, abs(u) - 0.72) / 0.28   # roll down over the sides
+        v.co = Vector((x, y, h + 0.3 + z))
+    p.add(bm, mix(SAGE, YEW_MID, 0.35), "leaf", sharp_deg=89.0)
+    for i in range(7):
+        b = ico(1.0, 1)
+        for v in b.verts:
+            v.co *= 1.0 + rng.uniform(-0.18, 0.18)
+        r = rng.uniform(0.38, 0.55)
+        p.add(b, [SAGE_LIGHT, mix(SAGE_LIGHT, LICHEN, 0.5)][i % 2], "leaf",
+              T(rng.uniform(-w / 2 + 0.6, w / 2 - 0.6), rng.uniform(-d / 2 + 0.4, d / 2 - 0.4), h + 0.38)
+              @ S(r * 1.3, r, r * 0.45), sharp_deg=89.0)
+    for i in range(22):
+        x = rng.uniform(-w / 2 + 0.4, w / 2 - 0.4)
+        y = rng.uniform(-d / 2 + 0.2, d / 2 - 0.2)
+        length = rng.uniform(0.35, 0.6)
+        p.add(lathe([(0, 0), (length * 0.2, length * 0.3), (length * 0.16, length * 0.75), (0, length)], 4),
+              WISTERIA[i % 3], "fabric", T(x, y, h + 0.48) @ R("Z", rng.uniform(0, 360)) @ R("Y", rng.uniform(75, 105)))
+    # the racemes: many slim, soft drops, heavier along the sides, a scatter
+    # over the walk. Slim and smooth so they read as hanging flower trusses
+    # from the path, not as faceted crystals (L35-3); lilac, mauve and a
+    # muted white that stays out of glare.
+    cols = [WISTERIA[0], WISTERIA[1], mix(WISTERIA[0], (0.80, 0.58, 0.86), 0.5), (0.86, 0.84, 0.93)]
+    for i in range(44):
+        side = rng.random() < 0.7
+        x = (rng.choice((-1, 1)) * rng.uniform(w / 2 - 0.8, w / 2 + 0.15)) if side else rng.uniform(-w / 2 + 0.6, w / 2 - 0.6)
         y = rng.uniform(-d / 2 + 0.1, d / 2 - 0.1)
-        length = rng.uniform(0.75, 1.3) if side else rng.uniform(0.45, 0.8)
-        raceme(p, (x, y, h + 0.05), length, WISTERIA[i % 4], rng)
+        length = rng.uniform(0.7, 1.25) if side else rng.uniform(0.4, 0.75)
+        rw = length * rng.uniform(0.09, 0.12)
+        p.add(lathe([(0.0, 0.0), (rw * 0.5, length * 0.12), (rw, length * 0.55), (rw * 0.75, length * 0.85), (0.0, length)], 5),
+              cols[(i + rng.randrange(2)) % 4], "fabric", T(x, y, h + 0.08 - length) @ R("Z", rng.uniform(0, 72)), sharp_deg=89.0)
 
 
 # ------------------------------------------------------------ hedges and topiary
@@ -643,7 +682,7 @@ def obelisk_sweetpea(p, size, c):
     for z, rr in ((0.5, 0.34), (1.1, 0.25), (1.7, 0.15)):
         p.add(torus(rr, 0.02, 8, 3), GOLD, "gold", T(0, 0, z) @ R("Z", 45))
     p.add(ico(0.08, 1), GOLD, "gold", T(0, 0, h - 0.1))
-    for i in range(34):
+    for i in range(29):
         t = rng.uniform(0.05, 0.9)
         a = rng.uniform(0, 2 * math.pi)
         rr = 0.44 * (1 - t) + 0.08

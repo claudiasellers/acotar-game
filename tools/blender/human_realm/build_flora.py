@@ -324,10 +324,23 @@ def arch_canes(b, n, color, height, reach, sides=4, thorn=False):
 
 @asset(1500)
 def blackberry_bramble(b):
-    canes = arch_canes(b, 11, "red_deep", 0.9, 1.4)
+    """A winter bramble thicket (quality audit B2): a tangle of arching
+    purple-brown canes, hooked thorns along them, clusters of bronze and
+    dark-green leaves that hang on through the cold, frost on the tops."""
+    rng = b.rng
+    canes = arch_canes(b, 12, "bramble_cane", 0.9, 1.4, sides=4)
     for pts in canes:
-        berry_cluster(b, pts[3] + V((0, 0, -0.04)), 3, 0.02, 0.03, "charcoal")
-        b.leaf(pts[3], V((0.3, 0.2, -0.6)), 0.1, 0.07, "red_deep")
+        for i in range(1, 5):  # thorns along the cane
+            b.cone(pts[i], 0.045, 0.008, 3, "bark_brown", bottom=False)
+        for i in (2, 4):  # leaf clusters, three leaflets each
+            base = pts[i]
+            for k in range(3):
+                a = rng.uniform(0, 6.28)
+                d = V((math.cos(a), math.sin(a), rng.uniform(-0.5, 0.1)))
+                col = "madder_leaf" if rng.random() < 0.45 else ("holly_leaf" if rng.random() < 0.5 else "evergreen")
+                b.leaf(base, d, rng.uniform(0.07, 0.11), rng.uniform(0.05, 0.07), col)
+        if rng.random() < 0.6:
+            berry_cluster(b, pts[3] + V((0, 0, -0.04)), 3, 0.02, 0.03, "charcoal")
     b.blob(V((0, 0, 0.1)), (0.3, 0.3, 0.12), 1, "straw_dark", 0.3)
 
 
@@ -754,23 +767,23 @@ def icicle_cluster(b):
 
 
 # ================================================================ rocks/wood
-@asset(800)
+@asset(1300)  # smooth rounded rock (quality audit B1)
 def rock_boulder_a(b):
     b.rock(V((0, 0, 0)), (1.0, 0.8, 0.7), 2, "rock", 0.38, snow=0.5)
 
 
-@asset(800)
+@asset(1300)  # smooth rounded rock (quality audit B1)
 def rock_boulder_b(b):
     b.rock(V((0, 0, 0)), (1.6, 1.1, 1.1), 2, "rock_warm", 0.32, snow=0.55, facet=1.6)
 
 
-@asset(800)
+@asset(1700)  # smooth rounded rock (quality audit B1)
 def rock_boulder_c(b):
     b.rock(V((0, 0, 0)), (0.7, 0.6, 1.1), 2, "rock_dark", 0.4, snow=0.55, facet=2.8)
     b.rock(V((0.7, 0.3, 0)), (0.3, 0.3, 0.25), 1, "rock_dark", snow=0.5)
 
 
-@asset(800)
+@asset(1300)  # smooth rounded rock (quality audit B1)
 def rock_flat(b):
     b.rock(V((0, 0, 0)), (1.3, 1.0, 0.22), 2, "rock", 0.25, snow=0.35, flat=0.6, facet=1.5)
 
@@ -783,7 +796,7 @@ def rock_scree(b):
         r = rng.uniform(0, 0.8)
         s = rng.uniform(0.08, 0.22)
         b.rock(V((math.cos(a) * r, math.sin(a) * r, 0)), (s, s * 0.8, s * 0.6), 1,
-               "rock" if k % 2 else "rock_dark", 0.4, snow=0.55)
+               "rock" if k % 2 else "rock_dark", 0.4, snow=0.55, smooth=False)
 
 
 @asset(800)

@@ -359,6 +359,7 @@ static func build_all() -> Array[ScatterLayer]:
 	ManorGardenRooms.plant(sb)
 	ManorReflectingPool.plant(sb)
 	ManorFrontGarden.plant(sb)
+	ManorEastLawn.plant(sb)
 	ManorHedgeMaze.plant(sb)
 	ManorGlassHouses.plant(sb)
 	ManorKitchenGarden.plant(sb)
