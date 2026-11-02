@@ -58,7 +58,8 @@ func _ready() -> void:
 ## True when what she's wearing is no outfit for a bow on her back: a formal
 ## piece in her top or bottom slot, or any dress or gown (one piece over both)
 ## that isn't hunting or riding leathers. The bow and quiver are stowed then
-## (B8), and come back with hunting clothes.
+## (B8), and indoors whatever she wears (D1); they come back when she raises
+## the bow, or outdoors in hunting clothes.
 static func stowed_for(wardrobe: Wardrobe) -> bool:
 	if wardrobe == null:
 		return false
@@ -127,7 +128,7 @@ func _place() -> void:
 		return
 	# Here rather than in _process: the dressing room pauses the game but keeps
 	# her model (and so this, via skeleton_updated) running.
-	var stowed := raised <= 0.0 and stowed_for(Gameplay.wardrobe)
+	var stowed := raised <= 0.0 and (feyre.is_indoors() or stowed_for(Gameplay.wardrobe))
 	bow_root.visible = not stowed
 	quiver.visible = not stowed
 	var back := _back_transform(feyre)
