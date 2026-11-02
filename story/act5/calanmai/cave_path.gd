@@ -25,6 +25,9 @@ const WALK_AWAY_M := 12.0
 ## Lucien finds her this long after she leaves the stranger, or sooner at the cave path.
 const LUCIEN_AFTER_S := 14.0
 const CAVE_PATH_M := 9.0
+## Where Lucien sets her down: the manor estate region, the entrance hall.
+const HOME_REGION := &"manor_estate"
+const HOME_ANCHOR := &"manor_window_hide"
 
 var _hold_at: Vector3
 var _since_met: float = 0.0
@@ -65,7 +68,8 @@ func _build_beats() -> Array:
 	b.append(Beats.wait(1.4))
 	b.append(Beats.mood(&"calm", 0.0, 2.0))
 	# 3. her deed: out of his arm
-	b.append(Beats.control(StoryControl.Mode.WALK, null, PackedStringArray(["interact"])))
+	# Her E is the scene's (Act2Space counts it); not the mirror, easel or a forage spot.
+	b.append(Beats.control(StoryControl.Mode.WALK, null))
 	b.append(say(&"arm"))
 	b.append(Beats.run(func(_s: SceneSpace) -> void: _hold_at = _feyre_pos(), "his arm"))
 	b.append(Beats.until(func() -> bool: return _stepped_away(), "she steps out of his arm"))
@@ -231,4 +235,11 @@ func _carried_home() -> void:
 		dismiss(id)
 	CalanmaiKit.night_grade(get_tree(), false)
 	raise(CARRIED_FACT)
-	EventBus.travel_requested.emit(&"manor_house", &"manor_window_hide")
+	# The house may still be streamed in (the hill is near enough): then set her
+	# down on the hall floor directly, since the director's travel only lands
+	# on an anchor that streams in afresh.
+	var hall := find_anchor(HOME_ANCHOR)
+	if hall:
+		place_feyre(hall.global_position)
+	else:
+		EventBus.travel_requested.emit(HOME_REGION, HOME_ANCHOR)

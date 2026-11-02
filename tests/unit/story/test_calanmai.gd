@@ -156,6 +156,7 @@ func _the_stranger() -> void:
 	assert_not_null(cave().actor(&"rhysand"), "he doesn't vanish")
 	assert_true(_tick_all(90.0, func() -> bool: return not cave().running), "Lucien carries her home")
 	assert_true(WorldState.has_flag("fact.calanmai_carried"))
+	assert_true(ResourceLoader.exists("res://data/regions/spring_court/%s.tres" % CavePath.HOME_REGION), "Lucien carries her to a real region")
 	assert_true(Clock.hour() >= 22.5 or Clock.hour() < 1.0, "late in the night")
 
 

@@ -22,7 +22,8 @@ func _ready() -> void:
 
 func _build_beats() -> Array:
 	var b: Array = []
-	b.append(Beats.control(StoryControl.Mode.LOOK, null, PackedStringArray(["interact"])))
+	# Her E is the scene's (Act2Space counts it); not the mirror, easel or a forage spot.
+	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		var f := Node3D.new()
 		f.name = "MirrorFocus"

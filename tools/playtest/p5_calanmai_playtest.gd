@@ -12,7 +12,7 @@
 ##   vanity       DEV set-down at her vanity (stairs): E bares the bruise
 ##   lunch        DEV set-down in the dining hall at noon: bite_endured
 ##   roses        out and back in at dinner: the white roses
-##   gown         a gown from her wardrobe (WORKAROUND: equipped directly, no
+##   gown         a gown from her wardrobe (DEV: equipped directly, no
 ##                dressing-room UI walk); dinner; the table shrinks; DEV
 ##                set-down at her easel for the stairs; E gives him the
 ##                canvas: paintings_shown; it hangs in his bedchamber
@@ -69,6 +69,9 @@ func _dev_jump() -> bool:
 		WorldState.set_flag("fact.hall_mark_%d" % i)
 	WorldState.set_flag("fact.hall_map_set_down")
 	WorldState.set_flag("fact.gallery_seen")
+	# Act II's first evening, which the real path has long since played.
+	WorldState.set_flag("fact.manor_arrived")
+	WorldState.set_flag("fact.alis_bathed")
 	for flag in DEV_DEEDS:
 		WorldState.raise_deed(flag)
 	Clock.from_dict({"time_of_day": 18.75 / 24.0, "day": int(Clock.get(&"day"))})
@@ -279,9 +282,8 @@ func _roses() -> bool:
 	var a := _anchor(&"manor_dining_table")
 	var roses := a.get_node_or_null(^"RoseDinner") as Act2Space
 	await _until(func() -> bool: return not (a.get_node(^"BruiseLunch") as SceneSpace).running, 20.0)
-	await _walk_to(Vector3(7, feyre.global_position.y, -36), 1.5)
-	await _wait(1.0)
-	await _walk_to(a.global_position + Vector3(0, 0, -2.0), 1.5, func() -> bool: return roses.running)
+	if not await _out_and_back(a, roses):
+		return false
 	if not await _until(func() -> bool: return WorldState.has_flag("fact.white_roses_given"), 90.0):
 		return _no("no roses (can_start %s, %s, at %s)" % [roses.can_start(), _clock(), roses.current_beat_label()])
 	await _until(func() -> bool: return not roses.running, 20.0)
@@ -297,12 +299,14 @@ func _gown() -> bool:
 	var gown := a.get_node_or_null(^"Moment_paintings_shown") as Act2Space
 	if gown == null:
 		return _no("no paintings_shown space on manor_dining_table")
-	_workaround("equips %s from her wardrobe directly (the dressing-room walk is L12's playtest)" % GOWN, func() -> void:
-		Gameplay.wardrobe.grant(GOWN)
-		Gameplay.wardrobe.equip(GOWN))
-	await _walk_to(Vector3(7, feyre.global_position.y, -36), 1.5)
-	await _wait(1.0)
-	await _walk_to(a.global_position + Vector3(0, 0, -2.0), 1.5, func() -> bool: return gown.running)
+	# A dev assist, not a workaround (nothing in the game is broken): the
+	# dressing-room walk upstairs is L12's playtest; here she just puts it on.
+	_beat["dev_jump"] = true
+	Gameplay.wardrobe.grant(GOWN)
+	Gameplay.wardrobe.equip(GOWN)
+	_note("DEV: dressed in %s from her wardrobe (gown %s)" % [GOWN, CalanmaiKit.wearing_gown()])
+	if not await _out_and_back(a, gown):
+		return false
 	if not await _until(func() -> bool: return gown.current_beat_label() == "she leads him up to her painting room", 90.0):
 		return _no("no dinner (can_start %s, gown %s, %s, at %s)" % [gown.can_start(), CalanmaiKit.wearing_gown(), _clock(),
 			gown.current_beat_label()])
@@ -326,6 +330,25 @@ func _gown() -> bool:
 
 
 # --- plumbing ---------------------------------------------------------------
+
+## Out of the dining hall into the entrance hall and back in to the table, as
+## she would come down to the next meal. A stuck-hop can lift her onto the
+## upper floor; then she is set down in the entrance hall (noted).
+func _out_and_back(dining: Node3D, space: SceneSpace) -> bool:
+	var hall := _anchor(&"manor_window_hide")
+	await _walk_to(Vector3(hall.global_position.x, feyre.global_position.y, hall.global_position.z - 5.5), 1.5)
+	if absf(feyre.global_position.y - hall.global_position.y) > 1.5:
+		_note("a hop lifted her to %s; set down in the entrance hall" % _v(feyre.global_position))
+		if not await _set_down(hall.global_position + Vector3(0, 0, -5.5), hall.global_position.y):
+			return false
+	await _wait(1.0)
+	await _walk_to(dining.global_position + Vector3(0, 0, -2.0), 1.5, func() -> bool: return space.running)
+	if not space.running and absf(feyre.global_position.y - dining.global_position.y) > 1.5:
+		_note("a hop lifted her to %s; set down in the dining hall" % _v(feyre.global_position))
+		if not await _set_down(dining.global_position + Vector3(0, 0, -2.0), dining.global_position.y):
+			return false
+	return true
+
 
 ## Sets her down at `at` on the floor at `floor_y` until she stays there (the
 ## house builds its floors over a few frames). The beat is marked dev_jump.

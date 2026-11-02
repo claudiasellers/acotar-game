@@ -104,7 +104,8 @@ func _build_beats() -> Array:
 		_shrink_table(false)
 		_show_canvases(), "her canvases along the wall"))
 	b.append(say(&"room"))
-	b.append(Beats.control(StoryControl.Mode.LOOK, null, PackedStringArray(["interact"])))
+	# Her E is the scene's (Act2Space counts it); not the mirror, easel or a forage spot.
+	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(walk(&"tamlin", [_easel_point(&"view")], 1.2))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		var t := actor(&"tamlin")

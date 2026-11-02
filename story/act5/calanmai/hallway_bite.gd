@@ -63,7 +63,8 @@ func _build_beats() -> Array:
 		_sink(true), "pinned to the wall"))
 	b.append(Beats.mood(&"dread", 1.0, 0.3, 0.35))
 	b.append(say(&"teeth"))
-	b.append(Beats.control(StoryControl.Mode.NONE, null, PackedStringArray(["interact"])))
+	# Her E is the scene's (Act2Space counts it); not the mirror, easel or a forage spot.
+	b.append(Beats.control(StoryControl.Mode.NONE, null))
 	b.append(Beats.decision([{"action": &"interact", "fact": PUSHED}], PUSH_WINDOW, ""))
 	b.append_array(speak(&"dont"))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
