@@ -115,7 +115,9 @@ func _on_beat(beat_name: StringName) -> void:
 			mural.play(&"land", 8.0, 0.0)
 			(mural.tableaux[&"land"] as Dictionary).rail = [
 					Transform3D(Basis(), Vector3(0.0, 13.0, 8.0)).looking_at(Vector3(0.0, 0.0, 0.0), Vector3.UP),
-					Transform3D(Basis(), Vector3(0.0, 4.0, 7.5)).looking_at(Vector3(0.0, 0.0, 1.0), Vector3.UP)]
+					# Stays high enough that the island and its one line of light
+					# still read as a map; lower, it was a pastel smear.
+					Transform3D(Basis(), Vector3(0.0, 8.5, 9.5)).looking_at(Vector3(0.0, 0.0, 0.5), Vector3.UP)]
 			_tween_shader(land, &"wall", 0.0, 1.0, 3.5)
 			var split := create_tween()
 			split.tween_interval(3.0)

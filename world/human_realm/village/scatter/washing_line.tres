@@ -8,5 +8,5 @@ script = ExtResource("2_y0t8e")
 id = &"washing_line"
 mesh_path = "res://world/human_realm/village/assets/village_washing_line.glb"
 tags = PackedStringArray("look", "canon:X")
-instances = PackedFloat32Array(479.3555, 3.1776638, 2222.6929, -2.7373939, 1)
+instances = PackedFloat32Array(338.3378, 3.1776638, 2266.755, 3.0574753, 1, 342.2803, 3.1776638, 2225.8232, -0.13275886, 1, 316.67233, 3.1776638, 2263.7551, 3.0993166, 1, 444.99615, 3.1776638, 2279.8972, -0.656944, 1)
 material = ExtResource("1_ijryb")

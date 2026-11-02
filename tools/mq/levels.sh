@@ -102,20 +102,73 @@ ensure_one() {
 		terrain) echo "Building $name (no saved copy yet; this takes about 14 minutes)..." >&2 ;;
 		*) echo "Building $name (no saved copy yet; this can take a few minutes)..." >&2 ;;
 	esac
+	ensure_import || { mq_lock_release "$lockd"; return 1; }
 	log="$MQ_DIR/logs/build-$name-$fp.log"
 	mkdir -p "$MQ_DIR/logs"
-	mq_timeout "$BUILD_TIMEOUT" /bin/bash -c "$cmd" > "$log" 2>&1
+	: > "$log"
+	# perl itself in the background (not the mq_timeout function, whose
+	# subshell would be what $! names): stopping $pid takes the build down.
+	/usr/bin/perl "$here/mqtimeout.pl" "$BUILD_TIMEOUT" /bin/bash -c "$cmd" > "$log" 2>&1 &
+	local pid=$! broken=0
+	# Stopped (a gate gave up on it): take the build down too.
+	trap 'kill -TERM "$pid" 2>/dev/null; exit 143' TERM INT
+	# A builder whose script fails to parse never quits (F42): stop it at once.
+	# (Sleep first: a TERM before mqtimeout.pl has set its handler would
+	# leave the builder running.)
+	while kill -0 "$pid" 2>/dev/null; do
+		sleep 2
+		if grep -qE "$BROKEN_SCRIPT" "$log" 2>/dev/null; then
+			broken=1
+			kill -TERM "$pid" 2>/dev/null
+			break
+		fi
+	done
+	wait "$pid"
 	rc=$?
+	trap - TERM INT
+	grep -qE "$BROKEN_SCRIPT" "$log" 2>/dev/null && broken=1
+	[ "$broken" = 1 ] && rc=65
 	if [ "$rc" = 0 ]; then
 		store "$name" "$fp" "$outs" || rc=1
 	fi
 	mq_lock_release "$lockd"
 	if [ "$rc" != 0 ]; then
-		echo "levels: build of $name failed (exit $rc); log: $log" >&2
-		tail -20 "$log" >&2
+		if [ "$broken" = 1 ]; then
+			echo "levels: build of $name stopped: a script failed to parse (exit $rc); log: $log" >&2
+			grep -E "$BROKEN_SCRIPT" "$log" | head -8 >&2
+			echo "levels: if those classes exist, the import cache is stale: run make import, then make generate" >&2
+		else
+			echo "levels: build of $name failed (exit $rc); log: $log" >&2
+			tail -20 "$log" >&2
+		fi
 		return 1
 	fi
 	echo "$fp" > "$stamp"
+}
+
+# What a builder's log says when it can't see a project class: a missing or
+# stale class cache (F42). Not every compile error: a -s builder always logs
+# one for any autoload it reaches (WorldStreamer) and still builds fine.
+BROKEN_SCRIPT='Parse Error: Identifier "[A-Za-z0-9_]+" not declared|Could not find type "|Could not resolve class "'
+
+# Builders find each other's classes through Godot's class cache, which only
+# an import writes. A fresh checkout or a make clean has none (F42), and a
+# cache from before a class was added lacks it (F47): import once, before the
+# first build, whenever the cache is missing a class.
+IMPORTED=0
+ensure_import() {
+	[ "$IMPORTED" = 1 ] && return 0
+	IMPORTED=1
+	"$MQ_BIN/class_cache.sh" stale >/dev/null && return 0
+	echo "Godot's class cache is missing or out of date: importing first (a minute or two)..." >&2
+	mq_timeout "$BUILD_TIMEOUT" "$MQ_BIN/godot.sh" --import > "$MQ_DIR/logs/import-before-build.log" 2>&1
+	local missing
+	if ! missing=$("$MQ_BIN/class_cache.sh" stale); then
+		echo "levels: after importing, the class cache still lacks:" >&2
+		echo "$missing" | head -10 >&2
+		echo "levels: log: $MQ_DIR/logs/import-before-build.log" >&2
+		return 1
+	fi
 }
 
 check_one() {

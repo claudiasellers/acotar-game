@@ -57,6 +57,7 @@ func _ready() -> void:
 	add_child(hud)
 	add_child(SettingsPanel.new())
 	add_child(GuideJournal.new())
+	add_child(StoryJournal.new())
 	add_child(KeyPrompts.new())
 	add_child(Act1Wayfinding.new())
 	add_child(Act1Milestones.new())

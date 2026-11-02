@@ -23,6 +23,8 @@ const PEOPLE := "res://creatures/models/people/%s.gltf"
 const FAE := "res://creatures/models/fae/%s.gltf"
 const CAST := "res://characters/%s/%s_model.tscn"
 const WOLF := "res://creatures/models/great_wolf.gltf"
+## The mural's Blender props (tools/blender/film/mural_props.py).
+const PROP := "res://art/film/mural/%s.glb"
 const IDS: Array[StringName] = [&"land", &"court", &"slaves", &"war", &"treaty",
 		&"mother", &"house", &"ships"]
 
@@ -265,7 +267,8 @@ func _dress(t: Dictionary, node: Node, m: ShaderMaterial) -> void:
 		mi.material_override = null
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 		for i in (mi.mesh.get_surface_count() if mi.mesh else 0):
-			mi.set_surface_override_material(i, _lit(t, m, mi.get_active_material(i)))
+			var vcol: bool = (mi.mesh.surface_get_format(i) & Mesh.ARRAY_FORMAT_COLOR) != 0
+			mi.set_surface_override_material(i, _lit(t, m, mi.get_active_material(i), vcol))
 	elif node is GeometryInstance3D:
 		_paint_all(node, m)
 		return
@@ -273,7 +276,7 @@ func _dress(t: Dictionary, node: Node, m: ShaderMaterial) -> void:
 		_dress(t, c, m)
 
 
-func _lit(t: Dictionary, m: ShaderMaterial, own: Material) -> ShaderMaterial:
+func _lit(t: Dictionary, m: ShaderMaterial, own: Material, vcol: bool = false) -> ShaderMaterial:
 	var l := ShaderMaterial.new()
 	l.shader = LIT
 	l.resource_name = m.resource_name
@@ -282,12 +285,18 @@ func _lit(t: Dictionary, m: ShaderMaterial, own: Material) -> ShaderMaterial:
 		if v != null:
 			l.set_shader_parameter(param, v)
 	l.set_shader_parameter(&"ink_mix", float(m.get_meta(&"ink_mix", figure_ink)))
+	var rough: float = m.get_meta(&"roughness", -1.0)
 	if own is BaseMaterial3D:
 		var b := own as BaseMaterial3D
 		l.set_shader_parameter(&"albedo_col", b.albedo_color)
 		if b.albedo_texture:
 			l.set_shader_parameter(&"albedo_tex", b.albedo_texture)
-		l.set_shader_parameter(&"use_vcol", b.vertex_color_use_as_albedo)
+		# The Blender props (prop_kit) carry their colours per vertex on
+		# "opaque" and "glow"; "glow" is a lit window, a lantern or a flame.
+		var kit := b.resource_name in ["opaque", "glow", "clear"]
+		l.set_shader_parameter(&"use_vcol", b.vertex_color_use_as_albedo or (kit and vcol))
+		if b.resource_name == "glow":
+			l.set_shader_parameter(&"glow", 1.4)
 		l.set_shader_parameter(&"roughness", clampf(b.roughness, 0.45, 1.0))
 		if b.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED:
 			l.set_shader_parameter(&"alpha_scissor", 0.5)
@@ -306,6 +315,8 @@ func _lit(t: Dictionary, m: ShaderMaterial, own: Material) -> ShaderMaterial:
 			if v is Texture2D:
 				l.set_shader_parameter(&"albedo_tex", v)
 				break
+	if rough >= 0.0:
+		l.set_shader_parameter(&"roughness", rough)
 	(t.mats as Array).append(l)
 	return l
 
@@ -334,6 +345,34 @@ func _figure(t: Dictionary, path: String, at: Vector3, yaw: float, s: float, m: 
 			ap.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 			ap.seek(_rng.randf() * ap.get_animation(clip).length, true)
 	return n
+
+
+## A Blender prop from art/film/mural (PROP), placed like a figure.
+func _prop(t: Dictionary, id: String, at: Vector3, yaw: float, s: float, m: ShaderMaterial) -> Node3D:
+	return _figure(t, PROP % id, at, yaw, s, m, &"")
+
+
+## A prop held in a figure's right hand (a sword, a bow), or nothing when the
+## figure has no hand bone. `rot` turns it in the bone's own frame.
+func _hold(t: Dictionary, fig: Node3D, id: String, m: ShaderMaterial, rot: Vector3, off := Vector3.ZERO) -> void:
+	if fig == null:
+		return
+	for s in fig.find_children("*", "Skeleton3D", true, false):
+		var sk := s as Skeleton3D
+		var bi := sk.find_bone("hand_r")
+		if bi < 0:
+			bi = sk.find_bone("RightHand")
+		if bi < 0:
+			continue
+		var att := BoneAttachment3D.new()
+		att.bone_name = sk.get_bone_name(bi)
+		sk.add_child(att)
+		var n := (load(PROP % id) as PackedScene).instantiate() as Node3D
+		n.position = off
+		n.rotation_degrees = rot
+		att.add_child(n)
+		_dress(t, n, m)
+		return
 
 
 func _box(t: Dictionary, size: Vector3, at: Vector3, m: ShaderMaterial, rot := Vector3.ZERO) -> MeshInstance3D:
@@ -527,21 +566,25 @@ func land_material() -> ShaderMaterial:
 func _build_court(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 6, -16), Vector2(64, 30), Color(0.07, 0.04, 0.16), Color(0.42, 0.2, 0.36))
 	var fae := _mat(t, INK, GOLD, 2.0, "fae")
+	# Their palaces behind them, spires lit, falling back into the haze.
 	var city := _mat(t, Color(0.08, 0.05, 0.13), Color(1.0, 0.86, 0.6), 1.2, "fae")
-	city.set_shader_parameter(&"glow", 0.25)
-	for i in 13:
-		var x := -14.0 + i * 2.4 + _rng.randf_range(-0.6, 0.6)
-		_cone(t, _rng.randf_range(0.5, 1.1), _rng.randf_range(5.0, 13.0), Vector3(x, 0.4, -9.0 - _rng.randf() * 3.0), city)
-	# The ridge they stand on.
-	var ridge := _box(t, Vector3(30, 1.2, 4), Vector3(0, -0.2, -1.5), _mat(t, Color(0.03, 0.025, 0.06), GOLD, 0.8, "fae"))
-	ridge.rotation_degrees.z = 1.5
+	city.set_meta(&"ink_mix", 0.3)
+	for c: Array in [["fae_palace_c", -12.5, -13.0, 18.0, 1.2], ["fae_palace_b", -5.5, -10.5, 6.0, 1.0],
+			["fae_palace_a", 2.5, -12.0, -8.0, 1.25], ["fae_palace_b", 9.0, -10.0, -20.0, 1.1],
+			["fae_palace_c", 16.0, -14.0, -28.0, 1.0]]:
+		_prop(t, String(c[0]), Vector3(float(c[1]), 0.0, float(c[2])), float(c[3]), float(c[4]), city)
+	# The marble terrace they stand on, blind arches under it toward the beasts.
+	var marble := _mat(t, Color(0.03, 0.025, 0.06), GOLD, 0.8, "fae")
+	marble.set_meta(&"ink_mix", 0.32)
+	_prop(t, "court_terrace", Vector3(0.0, -0.8, -1.5), 0.0, 1.0, marble)
 	var gilt := _gilt(t, "fae")
-	# Not a row: one lord forward, the court staggered back along the ridge.
+	# Not a row: one lord forward, the court staggered back along the terrace.
+	# The rulers before the Wall (the ch 13 mural's "ornate" beings), unmasked.
 	# [model, x, z, yaw, scale]
-	var who := [[CAST % ["tamlin", "tamlin"], -0.6, -0.8, 8.0, 1.34],
-		[CAST % ["lucien", "lucien"], 2.7, -1.9, -24.0, 1.22],
-		[PEOPLE % "calanmai_1", -3.9, -2.5, 30.0, 1.16], [PEOPLE % "reveler_2", 5.4, -2.9, -34.0, 1.1],
-		[PEOPLE % "calanmai_3", -6.9, -1.5, 42.0, 1.2]]
+	var who := [[PEOPLE % "old_court_lord", -0.6, -0.8, 8.0, 1.12],
+		[PEOPLE % "old_court_lady", 2.7, -1.9, -24.0, 1.18],
+		[PEOPLE % "calanmai_1", -3.9, -2.5, 30.0, 1.1], [PEOPLE % "old_court_lady_2", 5.4, -2.9, -34.0, 1.16],
+		[PEOPLE % "calanmai_3", -6.9, -1.5, 42.0, 1.12]]
 	for w: Array in who:
 		var f := _figure(t, String(w[0]), Vector3(float(w[1]), 0.4, float(w[2])), float(w[3]), float(w[4]), fae)
 		_crown(f, gilt, 2.15)
@@ -560,7 +603,10 @@ func _build_court(t: Dictionary) -> void:
 	_figure(t, PEOPLE % "fae_longlimb_true", Vector3(3.8, -4.7, 1.6), -40.0, 1.3, beast)
 	_figure(t, FAE % "naga", Vector3(-6.4, -4.8, 1.0), 50.0, 1.3, beast, &"")
 	_figure(t, FAE % "attor", Vector3(6.6, -4.4, 0.6), -60.0, 1.2, beast, &"")
-	_box(t, Vector3(30, 1.0, 8), Vector3(0, -5.3, 2.5), _mat(t, Color(0.012, 0.01, 0.016), SICK, 0.04, "beast"))
+	var under := _mat(t, Color(0.012, 0.01, 0.016), SICK, 0.04, "beast")
+	under.set_meta(&"ink_mix", 0.8)
+	var floor_ := _prop(t, "ground_mud", Vector3(0, -4.8, 2.5), 0.0, 1.0, under)
+	floor_.scale = Vector3(0.7, 1.0, 0.35)
 	# One yellow eye in the dark, opened by the director (eye.scale.y 0 → 1).
 	var eye := MeshInstance3D.new()
 	eye.name = "Eye"
@@ -612,38 +658,30 @@ func _build_slaves(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 6, -16), Vector2(64, 30), Color(0.06, 0.03, 0.08), Color(0.36, 0.12, 0.12))
 	var fae := _mat(t, INK, GOLD, 2.0, "fae")
 	var human := _mat(t, Color(0.07, 0.05, 0.07), Color(1.0, 0.7, 0.45), 1.4, "human")
-	_figure(t, CAST % ["tamlin", "tamlin"], Vector3(-4.6, 0.0, -5.0), 25.0, 2.1, fae)
-	_figure(t, CAST % ["lucien", "lucien"], Vector3(5.0, 0.0, -5.4), -25.0, 2.1, fae)
-	# A temple rising, stone by stone.
+	_figure(t, PEOPLE % "old_court_lord", Vector3(-4.6, 0.0, -5.0), 25.0, 1.9, fae)
+	_figure(t, PEOPLE % "calanmai_2", Vector3(5.0, 0.0, -5.4), -25.0, 1.85, fae)
+	# A temple to their feral gods rising, stone by stone (ch 3).
 	var stone := _mat(t, Color(0.1, 0.07, 0.08), GOLD, 0.9, "human")
-	_box(t, Vector3(44, 0.4, 24), Vector3(0, -0.2, -5.0), _mat(t, Color(0.05, 0.03, 0.04), GOLD, 0.6, "human"))
-	for i in 5:
-		_box(t, Vector3(0.7, 4.0 - i * 0.2, 0.7), Vector3(-2.4 + i * 1.2, 2.0, -8.0), stone)
-	_box(t, Vector3(7.0, 0.6, 1.6), Vector3(0, 4.3, -8.0), stone)
-	var kinds := ["human_man", "human_woman", "human_youth", "human_elder"]
+	_prop(t, "ground_dust", Vector3(0, -0.04, -5.0), 0.0, 1.0, _mat(t, Color(0.05, 0.03, 0.04), GOLD, 0.6, "human"))
+	_prop(t, "feral_temple", Vector3(0.0, 0.0, -10.0), 0.0, 1.0, stone)
+	var kinds := ["mortal_man", "mortal_woman", "mortal_youth", "mortal_elder"]
 	var feet: Array[Vector3] = []
 	for i in 9:
 		var x := -5.2 + i * 1.3
 		var p := Vector3(x, 0.0, -0.4 + _rng.randf_range(-0.4, 0.4))
 		_figure(t, PEOPLE % kinds[i % 4], p, _rng.randf_range(-30, 30), 0.85, human, &"bow", 0.5)
 		if i % 3 == 1:
-			_box(t, Vector3(0.5, 0.4, 0.4), p + Vector3(0, 1.05, 0.25), stone)
+			_prop(t, "stone_block", p + Vector3(0, 0.85, 0.25), _rng.randf_range(-20, 20), 1.0, stone)
 		feet.append(p + Vector3(0, 0.12, 0.1))
 	var chain := _mat(t, Color(0.2, 0.18, 0.2), Color(1.0, 0.9, 0.75), 1.8, "chain")
 	for i in feet.size() - 1:
 		var a := feet[i]
 		var b := feet[i + 1]
-		var links := 8
-		for k in links:
-			var link := MeshInstance3D.new()
-			var tor := TorusMesh.new()
-			tor.inner_radius = 0.03
-			tor.outer_radius = 0.06
-			link.mesh = tor
-			link.material_override = chain
-			link.position = a.lerp(b, (k + 0.5) / links) - Vector3(0, 0.05 * sin(PI * (k + 0.5) / links), 0)
-			link.rotation = Vector3(PI * 0.5 * (k % 2), atan2(b.x - a.x, b.z - a.z), 0)
-			(t.root as Node3D).add_child(link)
+		# A metre of chain along its own +x, stretched from ankle to ankle.
+		var d := b - a
+		var c := _prop(t, "chain_span", a.lerp(b, 0.5), rad_to_deg(atan2(-d.z, d.x)) - 180.0, 1.0, chain)
+		if c:
+			c.scale = Vector3(Vector2(d.x, d.z).length(), 1.0, 1.0)
 	_rail(t, Vector3(-2.0, 1.2, 8.5), Vector3(0.0, 2.2, -2.0), Vector3(1.5, 1.6, 7.0), Vector3(0.0, 2.6, -3.0), 42.0)
 
 
@@ -655,28 +693,35 @@ func _build_war(t: Dictionary) -> void:
 	# Against the fire they stay half in shadow: colour, but dark and backlit.
 	human.set_meta(&"ink_mix", 0.45)
 	fae.set_meta(&"ink_mix", 0.3)
-	fae.set_shader_parameter(&"glow", 0.6)
-	_box(t, Vector3(44, 0.4, 24), Vector3(0, -0.2, -4.0), _mat(t, Color(0.05, 0.025, 0.02), Color(1.0, 0.5, 0.25), 0.6, "human"))
-	var kinds := ["human_man", "human_youth", "human_woman", "human_man", "human_elder"]
+	# Their armour glimmers (ch 13) in the rim; a glow over the whole body
+	# washed the armour out to white.
+	fae.set_shader_parameter(&"glow", 0.12)
+	# "Bloodied mud" (ch 13).
+	_prop(t, "ground_mud", Vector3(0, -0.04, -4.0), 0.0, 1.0, _mat(t, Color(0.05, 0.025, 0.02), Color(1.0, 0.5, 0.25), 0.6, "human"))
+	# Humans shoulder to shoulder with swords and bows (ch 13), and one faerie
+	# fighting at their side (ch 18).
+	var kinds := ["mortal_man", "mortal_youth", "mortal_woman", "mortal_man", "mortal_elder"]
 	for i in 11:
 		var p := Vector3(-7.0 + i * 0.9, 0.0, 1.0 + _rng.randf_range(-0.8, 0.8))
-		_figure(t, PEOPLE % kinds[i % 5], p, 160.0 + _rng.randf_range(-15, 15), 0.95, human, &"walk", _rng.randf())
-		var spear := MeshInstance3D.new()
-		var cyl := CylinderMesh.new()
-		cyl.top_radius = 0.02
-		cyl.bottom_radius = 0.02
-		cyl.height = 2.8
-		spear.mesh = cyl
-		spear.material_override = human
-		spear.position = p + Vector3(0.25, 1.7, -0.2)
-		spear.rotation_degrees = Vector3(-28, 0, 6)
-		(t.root as Node3D).add_child(spear)
+		var who := PEOPLE % ("fae_satyr" if i == 8 else kinds[i % 5])
+		var f := _figure(t, who, p, 160.0 + _rng.randf_range(-15, 15), 0.95, human, &"walk", _rng.randf())
+		if i % 3 == 2:
+			_hold(t, f, "longbow", human, Vector3(0, 0, 90))
+		else:
+			_hold(t, f, "sword", human, Vector3(90, 0, 0), Vector3(0, 0.06, 0))
 	for i in 3:
-		var banner := _box(t, Vector3(0.9, 1.3, 0.02), Vector3(-5.0 + i * 4.0, 3.4, 1.2), human, Vector3(0, 0, 4))
+		var banner := _prop(t, "war_banner", Vector3(-5.0 + i * 4.0, 0.0, 1.9), 170.0 + i * 8.0, 1.0, human)
 		banner.name = "Banner%d" % i
+	# High Fae in their glimmering armour, and faeries bristling with claws
+	# and fangs (ch 13).
 	for i in 4:
-		_figure(t, PEOPLE % ["calanmai_1", "reveler_1", "calanmai_2", "reveler_3"][i],
-				Vector3(-3.0 + i * 2.2, 0.0, -6.0), 15.0 - i * 10.0, 1.35, fae)
+		_figure(t, PEOPLE % ["war_fae_1", "war_fae_2", "war_fae_1", "war_fae_2"][i],
+				Vector3(-3.0 + i * 2.2, 0.0, -6.0), 15.0 - i * 10.0, 1.3, fae)
+	var claws := _mat(t, Color(0.05, 0.04, 0.06), Color(1.0, 0.9, 0.7), 1.4, "fae")
+	claws.set_meta(&"ink_mix", 0.5)
+	_figure(t, FAE % "naga", Vector3(-6.2, 0.0, -5.2), 30.0, 1.4, claws, &"")
+	_figure(t, FAE % "attor", Vector3(6.4, 0.6, -5.4), -30.0, 1.3, claws, &"")
+	_figure(t, FAE % "bogge", Vector3(3.6, 0.0, -4.6), -10.0, 1.2, claws, &"idle")
 	_particles(t, Vector3(0, 1.2, -2.0), Vector3(9, 1.2, 1.5), Color(1.0, 0.42, 0.12, 0.85), 220, 0.24,
 			Vector3(0, 1.6, 0), 2.2)
 	_particles(t, Vector3(0, 3.0, -2.0), Vector3(10, 3.0, 2.0), Color(1.0, 0.7, 0.3, 0.9), 260, 0.05,
@@ -692,37 +737,25 @@ func _build_treaty(t: Dictionary) -> void:
 	var queen := _mat(t, Color(0.06, 0.06, 0.1), SILVER, 2.2, "queen")
 	var crowns := _gilt(t, "queen")
 	var table := _mat(t, Color(0.08, 0.06, 0.09), GOLD, 0.8, "queen")
-	_box(t, Vector3(3.2, 0.9, 1.6), Vector3(0, 0.45, 0), table)
-	var sheet := _box(t, Vector3(1.3, 0.01, 0.9), Vector3(0, 0.91, 0), _mat(t, Color(0.85, 0.82, 0.74), SILVER, 0.5, "queen"))
+	_prop(t, "treaty_table", Vector3.ZERO, 0.0, 1.0, table)
+	var sheet := _prop(t, "treaty_parchment", Vector3(0, 0.905, 0), 0.0, 1.0,
+			_mat(t, Color(0.85, 0.82, 0.74), SILVER, 0.5, "queen"))
 	sheet.name = "Sheet"
+	# Six mortal queens (ch 3), three of a kind each side, in silver.
 	for i in 6:
 		var a := PI * (0.15 + 0.7 * float(i) / 5.0)
 		var p := Vector3(cos(a) * -2.4, 0.0, -sin(a) * 1.6 - 0.2)
-		var q := _figure(t, PEOPLE % "human_woman", p, rad_to_deg(atan2(-p.x, -p.z)), 1.0, queen, &"talk", 0.3)
+		var q := _figure(t, PEOPLE % ("mortal_queen_%d" % [1, 2, 3, 3, 1, 2][i]), p,
+				rad_to_deg(atan2(-p.x, -p.z)), 1.0, queen, &"talk", 0.3)
 		_crown(q, crowns, 1.7, 7, 0.1)
-	var seal := MeshInstance3D.new()
-	seal.name = "Seal"
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.09
-	cyl.bottom_radius = 0.14
-	cyl.height = 0.5
-	seal.mesh = cyl
 	var gold := _mat(t, Color(0.6, 0.42, 0.12), GOLD, 2.0, "seal")
-	gold.set_shader_parameter(&"glow", 0.8)
-	seal.material_override = gold
-	seal.position = Vector3(0.0, 2.2, 0.0)
-	(t.root as Node3D).add_child(seal)
-	var wax := MeshInstance3D.new()
+	gold.set_shader_parameter(&"glow", 0.3)
+	var seal := _prop(t, "treaty_seal", Vector3(0.0, 2.2, 0.0), 0.0, 1.4, gold)
+	seal.name = "Seal"
+	var wax := _prop(t, "treaty_wax", Vector3(0.0, 0.91, 0.0), 0.0, 1.0,
+			_mat(t, Color(0.7, 0.05, 0.1), Color(1.0, 0.5, 0.5), 1.0, "seal"))
 	wax.name = "Wax"
-	var disc := CylinderMesh.new()
-	disc.top_radius = 0.16
-	disc.bottom_radius = 0.16
-	disc.height = 0.02
-	wax.mesh = disc
-	wax.material_override = _mat(t, Color(0.7, 0.05, 0.1), Color(1.0, 0.5, 0.5), 1.0, "seal")
-	wax.position = Vector3(0.0, 0.925, 0.0)
 	wax.scale = Vector3.ZERO
-	(t.root as Node3D).add_child(wax)
 	_rail(t, Vector3(0.0, 2.4, 6.8), Vector3(0.0, 1.3, -0.4), Vector3(0.0, 1.9, 4.6), Vector3(0.0, 1.1, -0.2), 40.0)
 
 
@@ -732,7 +765,7 @@ func press_seal(seconds: float) -> void:
 	var seal := root.get_node("Seal") as Node3D
 	var wax := root.get_node("Wax") as Node3D
 	var tw := create_tween()
-	tw.tween_property(seal, ^"position:y", 1.18, seconds * 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_property(seal, ^"position:y", 0.93, seconds * 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func() -> void: wax.scale = Vector3.ONE)
 	tw.tween_property(seal, ^"position:y", 1.9, seconds * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
@@ -742,8 +775,9 @@ func _build_mother(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 3, -8), Vector2(40, 20), Color(0.1, 0.06, 0.12), Color(0.5, 0.3, 0.3))
 	var mother := _mat(t, Color(0.08, 0.05, 0.08), GOLD, 2.0, "mother")
 	var girl := _mat(t, Color(0.08, 0.05, 0.08), Color(1.0, 0.9, 0.7), 2.0, "girl")
-	_figure(t, PEOPLE % "human_woman", Vector3(-0.32, 0, 0), 20.0, 1.0, mother, &"idle")
-	_figure(t, PEOPLE % "human_youth", Vector3(0.3, 0, 0.1), -20.0, 0.66, girl, &"idle")
+	# Nesta's cold face and blue-grey eyes, dressed for the peerage (ch 2, 4, 30).
+	_figure(t, PEOPLE % "archeron_mother", Vector3(-0.32, 0, 0), 20.0, 1.0, mother, &"idle")
+	_figure(t, PEOPLE % "young_feyre", Vector3(0.3, 0, 0.1), -20.0, 0.82, girl, &"idle")
 	_particles(t, Vector3(-0.3, 1.0, 0), Vector3(0.4, 0.9, 0.3), Color(1.0, 0.85, 0.5, 0.8), 60, 0.03,
 			Vector3(0, 0.2, 0), 4.0)
 	_rail(t, Vector3(0.0, 1.1, 3.6), Vector3(0.0, 0.9, 0.0), Vector3(0.0, 1.0, 2.7), Vector3(0.0, 0.9, 0.0), 38.0)
@@ -758,33 +792,23 @@ func mother_fades(seconds: float) -> void:
 func _build_house(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 4, -10), Vector2(44, 22), Color(0.07, 0.05, 0.12), Color(0.38, 0.26, 0.3))
 	var house := _mat(t, Color(0.07, 0.05, 0.09), GOLD, 1.4, "house")
-	house.set_shader_parameter(&"glow", 0.1)
-	_box(t, Vector3(6, 3.2, 3), Vector3(0, 1.6, -3), house)
-	var roof := MeshInstance3D.new()
-	var pr := PrismMesh.new()
-	pr.size = Vector3(6.6, 1.8, 3.2)
-	roof.mesh = pr
-	roof.material_override = house
-	roof.position = Vector3(0, 4.1, -3)
-	(t.root as Node3D).add_child(roof)
-	for i in 5:
-		_box(t, Vector3(0.6, 0.9, 0.05), Vector3(-2.4 + i * 1.2, 2.0, -1.46), _mat(t, Color(0.6, 0.45, 0.2), GOLD, 1.0, "house"))
+	# "Our manor home" (ch 2): a merchant's country manor lit for a party.
+	_prop(t, "archeron_manor", Vector3(0, 0, -5.0), 0.0, 0.85, house)
 	var men := Node3D.new()
 	men.name = "Men"
 	men.visible = false
 	(t.root as Node3D).add_child(men)
 	var man := _mat(t, Color(0.03, 0.03, 0.04), Color(0.9, 0.6, 0.4), 1.2, "house")
+	# The creditors ransack it (ch 2): a chest, a gilt frame, a chair.
 	for i in 3:
-		var f := _figure(t, PEOPLE % "human_man", Vector3(-1.5 + i * 1.4, 0, 0.6), 90.0, 1.0, man, &"walk")
+		var f := _figure(t, PEOPLE % ["mortal_man", "mortal_elder", "mortal_youth"][i], Vector3(-1.5 + i * 1.4, 0, 0.6),
+				90.0, 1.0, man, &"walk")
 		if f:
 			f.reparent(men)
-			var crate := MeshInstance3D.new()
-			var b := BoxMesh.new()
-			b.size = Vector3(0.6, 0.45, 0.45)
-			crate.mesh = b
-			crate.material_override = man
-			crate.position = Vector3(0, 1.2, 0.35)
-			f.add_child(crate)
+			var thing := (load(PROP % ["carried_chest", "carried_frame", "carried_chair"][i]) as PackedScene).instantiate() as Node3D
+			thing.position = Vector3(0, 1.05, 0.3)
+			f.add_child(thing)
+			_dress(t, thing, man)
 	_rail(t, Vector3(0.0, 2.0, 9.0), Vector3(0.0, 2.2, -2.0), Vector3(0.0, 1.8, 7.4), Vector3(0.0, 2.0, -2.0), 40.0)
 
 
@@ -800,7 +824,11 @@ func men_take(seconds: float) -> void:
 func _build_ships(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 4, -14), Vector2(60, 24), Color(0.03, 0.04, 0.1), Color(0.14, 0.2, 0.32))
 	var sea := _mat(t, Color(0.03, 0.06, 0.12), Color(0.6, 0.75, 1.0), 0.7, "sea")
-	var water := _box(t, Vector3(40, 0.2, 20), Vector3(0, -0.1, 0), sea)
+	sea.set_meta(&"ink_mix", 0.55)
+	sea.set_meta(&"roughness", 1.0)
+	sea.set_shader_parameter(&"rim_gain", 0.25)
+	# Lost at sea in a storm, kept ambiguous (ch 19; ch 28 has them found).
+	var water := _prop(t, "storm_sea", Vector3.ZERO, 0.0, 1.0, sea)
 	water.name = "Sea"
 	var ship := _mat(t, Color(0.05, 0.04, 0.05), GOLD, 1.6, "ship")
 	for i in 3:
@@ -810,35 +838,16 @@ func _build_ships(t: Dictionary) -> void:
 	_rail(t, Vector3(0.0, 1.5, 8.0), Vector3(0.0, 0.8, -2.0), Vector3(0.0, 1.2, 6.4), Vector3(0.0, 0.6, -2.0), 42.0)
 
 
-## A painted ship: hull, mast and sail.
+## A merchant ship for Bharat (ch 19), broadside to the lens.
 func _ship(t: Dictionary, at: Vector3, ship: ShaderMaterial) -> Node3D:
 	var s := Node3D.new()
 	s.position = at
 	(t.root as Node3D).add_child(s)
-	var hull := MeshInstance3D.new()
-	var b := BoxMesh.new()
-	b.size = Vector3(2.4, 0.6, 0.7)
-	hull.mesh = b
-	hull.material_override = ship
-	hull.position.y = 0.2
+	var hull := (load(PROP % "merchant_ship") as PackedScene).instantiate() as Node3D
+	hull.scale = Vector3.ONE * 0.9
+	hull.rotation_degrees.y = 180.0 + _rng.randf_range(-12.0, 12.0)
 	s.add_child(hull)
-	var mast := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.03
-	cyl.bottom_radius = 0.04
-	cyl.height = 2.4
-	mast.mesh = cyl
-	mast.material_override = ship
-	mast.position.y = 1.6
-	s.add_child(mast)
-	var sail := MeshInstance3D.new()
-	var q := QuadMesh.new()
-	q.size = Vector2(1.4, 1.5)
-	sail.mesh = q
-	sail.material_override = ship
-	sail.position = Vector3(0.05, 1.7, 0)
-	sail.rotation_degrees.y = 90.0
-	s.add_child(sail)
+	_dress(t, hull, ship)
 	return s
 
 

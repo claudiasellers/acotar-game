@@ -20,8 +20,7 @@ GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_
 setup:
 	@tools/mq/install_hooks.sh
 
-play: godot bake
-	@test -d .godot || $(MAKE) --no-print-directory import
+play: godot bake import
 	@echo "Starting the game. This terminal stays busy until you quit the game. Log: .tools/play.log"
 	@"$(GODOT)" --path . >.tools/play.log 2>&1; rc=$$?; \
 	if [ $$rc -ne 0 ]; then echo "The game stopped with exit code $$rc. Log: .tools/play.log"; fi; exit $$rc
@@ -55,12 +54,19 @@ godot:
 # Without baked terrain the game bakes at launch and looks frozen for minutes,
 # so play runs this too. Fast when the cache has the build.
 generate: godot
+	@tools/mq/class_cache.sh stale >/dev/null || $(MAKE) --no-print-directory import
 	@tools/mq/levels.sh ensure
 
 bake: generate
 
+# Incremental, so cheap when little changed. Every class_name must be in
+# Godot's class cache afterwards, or scripts naming it fail to parse (F42, F47).
 import: godot
-	@"$(GODOT)" --headless --path . --import >/dev/null 2>&1 || true
+	@mkdir -p .tools; "$(GODOT)" --headless --path . --import >.tools/import.log 2>&1; rc=$$?; \
+	if [ $$rc -ne 0 ]; then echo "Godot's import failed (exit $$rc). Log: .tools/import.log"; exit $$rc; fi; \
+	if ! missing=$$(tools/mq/class_cache.sh stale); then \
+		echo "The import finished but Godot's class cache still lacks:"; echo "$$missing" | head -10; \
+		echo "Log: .tools/import.log"; exit 1; fi
 
 clean:
 	@rm -rf .godot; find . -type d -name _generated -prune -not -path './.git/*' -exec rm -rf {} +; \

@@ -264,7 +264,7 @@ static func regions() -> Dictionary:
 			],
 			"landmarks": [
 				["great_lantern_tree", "The Great Lantern Tree", -990.0, -905.0, 22.0, "landmark", "woods_lilac_tree,fae_lantern_post,fae_bunting", "X", "A huge lilac tree in the green hung with lanterns; visible glowing at dusk from the glen and the meadow."],
-				["lantern_bridge", "The Lantern Bridge", -1052.0, -855.0, 6.0, "landmark", "fae_footbridge,fae_lantern_post,fae_lantern_post", "X", "Arched footbridge over the Thornwater."],
+				["lantern_bridge", "The Lantern Bridge", -1051.0, -846.0, 6.0, "landmark", "fae_footbridge,fae_lantern_post,fae_lantern_post", "X", "Arched footbridge over the Thornwater."],
 				["village_mill", "The Mill", -1150.0, -950.0, 12.0, "landmark", "fae_mill", "X", "Waterwheel on the mill race."],
 				["seamstress", "The Seamstress's Shop", -960.0, -960.0, 9.0, "station", "fae_seamstress_shop", "X", "Outfits and colour variants (systems lane wardrobe station)."],
 				["potion_house", "The Potion House", -1060.0, -980.0, 10.0, "station", "fae_potion_house", "X", "Fae potion room station (P4)."],
@@ -690,7 +690,7 @@ static func regions() -> Dictionary:
 				["blossom_cathedral", "The Blossom Cathedral", 900.0, 750.0, 14.0, "landmark", "woods_wild_cherry,woods_wild_cherry,woods_wild_cherry,woods_wild_cherry", "X", "An avenue of huge cherries whose pink canopies meet overhead."],
 				["cider_mill", "The Old Cider Mill", 1050.0, 1060.0, 12.0, "landmark", "fae_mill,fae_market_stall_b", "X", "A tenants' mill on the river, wheel still turning."],
 				["bee_tower", "The Bee Tower", 1250.0, 900.0, 10.0, "landmark", "watchtower_ruined", "X", "A ruined tower gone to the bees; honeycomb in its walls."],
-				["vale_weir", "The Weir", 1350.0, 1150.0, 4.0, "landmark", "stepping_stones,wooden_footbridge_small", "X", "Stepping stones and a little bridge over the Thornwater's weir."],
+				["vale_weir", "The Weir", 1350.0, 1150.0, 4.0, "landmark", "stepping_stones,fae_footbridge", "X", "Stepping stones and a little bridge over the Thornwater's weir."],
 			],
 		},
 	}

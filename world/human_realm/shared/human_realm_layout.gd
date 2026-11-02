@@ -69,12 +69,20 @@ const CREEK_BANK := 7.0
 const MILL_POND := Vector2(545.0, 2395.0)
 const MILL_POND_RADIUS := 28.0
 
+## The creek's two bridges, near these points; BridgeSpan finds the exact spot
+## on the creek. Each road or path comes in on the bridge's axis for this far
+## either side of the creek.
+const CREEK_BRIDGE_AT := Vector2(318.0, 2149.0)
+const FROZEN_BRIDGE_AT := Vector2(-323.0, 1784.0)
+const BRIDGE_RUN_IN := 16.0
+
 ## Roads and paths (polylines). Roads are rutted and flattened; paths are trodden snow.
 static var ROADS: Array[PackedVector2Array] = [
 	# Cottage to the village square.
 	PackedVector2Array([Vector2(-150.0, 2160.0), Vector2(-20.0, 2200.0), Vector2(150.0, 2230.0), Vector2(380.0, 2250.0)]),
 	# Village north road, then the ride north to the gap in the Wall.
-	PackedVector2Array([Vector2(380.0, 2250.0), Vector2(300.0, 2120.0), Vector2(150.0, 1950.0), Vector2(0.0, 1700.0), Vector2(-80.0, 1500.0), Vector2(-100.0, 1400.0)]),
+	PackedVector2Array([Vector2(380.0, 2250.0)]) + BridgeSpan.run_in(creek_bridge(), BRIDGE_RUN_IN)
+		+ PackedVector2Array([Vector2(150.0, 1950.0), Vector2(0.0, 1700.0), Vector2(-80.0, 1500.0), Vector2(-100.0, 1400.0)]),
 	# Village to the burnt estate and workshop.
 	PackedVector2Array([Vector2(-150.0, 2160.0), Vector2(-330.0, 2230.0), Vector2(-560.0, 2240.0), Vector2(-640.0, 2330.0)]),
 	# Village to the mill and the barn.
@@ -84,13 +92,24 @@ static var ROADS: Array[PackedVector2Array] = [
 const ROAD_HALF_WIDTH := 2.5
 static var PATHS: Array[PackedVector2Array] = [
 	# Feyre's path from the cottage into the forest, to the oak.
-	PackedVector2Array([Vector2(-150.0, 2160.0), Vector2(-200.0, 2050.0), Vector2(-300.0, 1900.0), Vector2(-380.0, 1780.0), Vector2(-420.0, 1720.0)]),
+	PackedVector2Array([Vector2(-150.0, 2160.0), Vector2(-200.0, 2050.0), Vector2(-300.0, 1900.0)]) + BridgeSpan.run_in(frozen_bridge(), BRIDGE_RUN_IN)
+		+ PackedVector2Array([Vector2(-420.0, 1720.0)]),
 	# Deer trails.
 	PackedVector2Array([Vector2(-880.0, 1700.0), Vector2(-650.0, 1720.0), Vector2(-420.0, 1720.0), Vector2(-200.0, 1640.0), Vector2(100.0, 1600.0), Vector2(450.0, 1650.0)]),
 	PackedVector2Array([Vector2(-600.0, 2000.0), Vector2(-500.0, 1850.0), Vector2(-360.0, 1660.0), Vector2(-300.0, 1520.0)]),
 	PackedVector2Array([Vector2(200.0, 2000.0), Vector2(300.0, 1820.0), Vector2(480.0, 1650.0), Vector2(650.0, 1500.0)]),
 ]
 const PATH_HALF_WIDTH := 1.0
+
+
+## The village bridge, crossing north from the square side.
+static func creek_bridge() -> Dictionary:
+	return BridgeSpan.square_across(CREEK, CREEK_BRIDGE_AT, VILLAGE_SQUARE)
+
+
+## The frozen bridge, crossing north on Feyre's path from the cottage.
+static func frozen_bridge() -> Dictionary:
+	return BridgeSpan.square_across(CREEK, FROZEN_BRIDGE_AT, COTTAGE)
 
 
 static func distance_to_polyline(p: Vector2, line: PackedVector2Array) -> float:

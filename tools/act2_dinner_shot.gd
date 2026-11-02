@@ -57,6 +57,7 @@ func _run() -> void:
 	await _until(func() -> bool: return dinner.current_beat_label() == "until she rises", 40.0)
 	print("probe: seated, beat '%s'" % dinner.current_beat_label())
 	await _still("dinner_seated")
+	await _chair_views(dinner)
 	dinner.nudge()
 	await _until(func() -> bool: return dinner.current_beat_label() == "until her first bite", 30.0)
 	for i in 4:
@@ -91,7 +92,7 @@ func _process(_delta: float) -> void:
 
 
 func _still(still_name: String) -> void:
-	if stills >= 3 or _headless():
+	if stills >= 6 or _headless():
 		print("still %s (headless: not drawn)" % still_name)
 		return
 	stills += 1
@@ -129,6 +130,22 @@ func _until(cond: Callable, seconds: float) -> void:
 	var until := Time.get_ticks_msec() + int(seconds * 1000.0)
 	while Time.get_ticks_msec() < until and not cond.call():
 		await get_tree().process_frame
+
+
+## Each seated figure from the side, table to the right: are the legs clear?
+func _chair_views(dinner: FirstDinner) -> void:
+	var was := get_viewport().get_camera_3d()
+	var side := Camera3D.new()
+	side.fov = 42.0
+	dinner.add_child(side)
+	for view: Array in [[&"tamlin_seat", Vector3(-0.4, 0.8, 2.6)], [&"lucien_seat", Vector3(2.4, 0.8, 0.2)], [&"feyre_seat", Vector3(0.4, 0.8, 2.6)]]:
+		var at := dinner.mark(view[0])
+		side.global_position = at + view[1]
+		side.look_at(at + Vector3.UP * 0.55, Vector3.UP)
+		side.make_current()
+		await _still("dinner_side_%s" % view[0])
+	was.make_current()
+	side.queue_free()
 
 
 func _seconds(s: float) -> void:
