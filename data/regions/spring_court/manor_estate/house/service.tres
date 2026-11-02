@@ -803,7 +803,7 @@ yaw_deg = 178.51981925964355
 [sub_resource type="Resource" id="Resource_me4jh"]
 script = ExtResource("5_d7hx6")
 prop_id = &"servants_bell_board"
-position = Vector3(4, 1.6, 0.32)
+position = Vector3(5.6, 1.6, 0.32)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_pvj4i"]
@@ -831,7 +831,7 @@ yaw_deg = 180.0
 [sub_resource type="Resource" id="Resource_p5fpg"]
 script = ExtResource("5_d7hx6")
 prop_id = &"wall_mirror_oval"
-position = Vector3(6.625, 1.4, 0.29)
+position = Vector3(25.625, 1.4, 0.29)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_jukdj"]

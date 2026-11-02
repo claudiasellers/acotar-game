@@ -129,3 +129,44 @@ func test_story_walls_stay_clear() -> void:
 		var sz := PropLib.size_of(p.prop_id) * p.scale
 		if p.position.x < 1.0 and absf(p.position.z - ManorFurnishAct1.TAMLIN_PAINTING_T) < 1.0 + sz.x * 0.5:
 			assert_lt(p.position.y + sz.y, 1.45, "tamlin_bedchamber: %s rises into the painting's place" % p.prop_id)
+
+
+## L39 hangs frames up to 2.3 m wide: nothing else hung on a slot's wall
+## within ManorFurnisher.ART_CLEAR of its centre (sconces, mirrors, shelves).
+func test_painting_slots_have_their_wall() -> void:
+	var bad := []
+	for r in _ctx.index.interior_rooms():
+		if not ManorFurnishMetrics.REFURNISHED.has(r.id):
+			continue
+		var w := r.rect.size.x
+		var d := r.rect.size.y
+		for a in r.props:
+			if not ManorFurnisher.ART_CLEAR.has(a.prop_id):
+				continue
+			var side := _wall_of(a.position, w, d)
+			if side == "":
+				continue
+			var ta := a.position.x if side in ["n", "s"] else a.position.z
+			for p in r.props:
+				if p == a or p.position.y < 0.3 or _wall_of(p.position, w, d) != side:
+					continue
+				if PropLib.entry(p.prop_id)[3] and p.position.y < 1.2:
+					continue        # a thing on a sideboard under the picture
+				var tp := p.position.x if side in ["n", "s"] else p.position.z
+				var half := PropLib.size_of(p.prop_id).x * p.scale * 0.5
+				if not ManorFurnisher.ART_CLEAR.has(p.prop_id) and absf(tp - ta) < ManorFurnisher.ART_CLEAR[a.prop_id] + half - 0.05 \
+						and not ManorDecorDecks.DETAIL.values().any(func(l: Array) -> bool: return l.has(p.prop_id)):
+					bad.append("%s: %s at %s %.1f on %s at %.1f" % [r.id, p.prop_id, side, tp, a.prop_id, ta])
+	assert_eq(bad.size(), 0, "\n".join(bad))
+
+
+func _wall_of(p: Vector3, w: float, d: float) -> String:
+	if p.z < 0.5:
+		return "n"
+	if p.z > d - 0.5:
+		return "s"
+	if p.x < 0.5:
+		return "w"
+	if p.x > w - 0.5:
+		return "e"
+	return ""

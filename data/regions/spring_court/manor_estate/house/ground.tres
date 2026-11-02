@@ -736,294 +736,294 @@ metadata/dressed = true
 [sub_resource type="Resource" id="Resource_0teap"]
 script = ExtResource("5_51bm0")
 prop_id = &"fan_lace"
-position = Vector3(0.5231328, 0.14123853, 15.6)
+position = Vector3(0.5231328, 0.14123853, 15.511667)
 yaw_deg = -73.03998
 
 [sub_resource type="Resource" id="Resource_cp7hr"]
+script = ExtResource("5_51bm0")
+prop_id = &"hourglass"
+position = Vector3(0.45749786, 0.14123853, 15.793334)
+yaw_deg = -86.08619117736816
+
+[sub_resource type="Resource" id="Resource_q5aea"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_large"
 position = Vector3(0.3025, 1.535, 15.6)
 yaw_deg = -90.0
 scale = 0.85
 
-[sub_resource type="Resource" id="Resource_q5aea"]
+[sub_resource type="Resource" id="Resource_8h22w"]
 script = ExtResource("5_51bm0")
 prop_id = &"bust_pedestal"
 position = Vector3(0.52, 0, 13)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_8h22w"]
+[sub_resource type="Resource" id="Resource_17ihe"]
 script = ExtResource("5_51bm0")
 prop_id = &"plant_stand_fern"
 position = Vector3(0.545, 0, 18.3)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_17ihe"]
+[sub_resource type="Resource" id="Resource_wesbt"]
 script = ExtResource("5_51bm0")
 prop_id = &"clock_grandfather"
 position = Vector3(0.495, 0, 25.6)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_wesbt"]
+[sub_resource type="Resource" id="Resource_vwkhq"]
 script = ExtResource("5_51bm0")
 prop_id = &"coat_rack"
 position = Vector3(0.52, 0, 30.2)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_vwkhq"]
+[sub_resource type="Resource" id="Resource_7scxw"]
 script = ExtResource("5_51bm0")
 prop_id = &"commode_serpentine"
 position = Vector3(19.44, 0, 4.4)
 yaw_deg = 90.0
 metadata/dressed = true
 
-[sub_resource type="Resource" id="Resource_7scxw"]
+[sub_resource type="Resource" id="Resource_hf06g"]
 script = ExtResource("5_51bm0")
 prop_id = &"wall_clock_sunburst"
 position = Vector3(19.7, 1.7, 4.4)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_hf06g"]
+[sub_resource type="Resource" id="Resource_b8803"]
 script = ExtResource("5_51bm0")
 prop_id = &"hall_bench_cushioned"
 position = Vector3(19.48, 0, 15.6)
 yaw_deg = 90.0
 metadata/dressed = true
 
-[sub_resource type="Resource" id="Resource_b8803"]
+[sub_resource type="Resource" id="Resource_g1t2d"]
 script = ExtResource("5_51bm0")
 prop_id = &"book_pile_ribbon"
-position = Vector3(19.518463, 0.14123853, 15.6)
-yaw_deg = 93.91380882263184
+position = Vector3(19.499891, 0.14123853, 15.7300005)
+yaw_deg = 92.5310173034668
 
-[sub_resource type="Resource" id="Resource_g1t2d"]
+[sub_resource type="Resource" id="Resource_khwsd"]
+script = ExtResource("5_51bm0")
+prop_id = &"songbird_cage_small"
+position = Vector3(19.482607, 0.14123853, 15.435)
+yaw_deg = 95.05826187133789
+
+[sub_resource type="Resource" id="Resource_x08b0"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_large"
 position = Vector3(19.6975, 1.535, 15.6)
 yaw_deg = 90.0
 scale = 0.85
 
-[sub_resource type="Resource" id="Resource_khwsd"]
+[sub_resource type="Resource" id="Resource_ijttb"]
 script = ExtResource("5_51bm0")
 prop_id = &"candle_tree"
 position = Vector3(19.38, 0, 13)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_x08b0"]
+[sub_resource type="Resource" id="Resource_rfgry"]
 script = ExtResource("5_51bm0")
 prop_id = &"bust_pedestal"
 position = Vector3(19.48, 0, 18.3)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_ijttb"]
+[sub_resource type="Resource" id="Resource_l05jo"]
 script = ExtResource("5_51bm0")
 prop_id = &"etagere_gilt"
 position = Vector3(19.52, 0, 26.2)
 yaw_deg = 90.0
 metadata/dressed = true
 
-[sub_resource type="Resource" id="Resource_rfgry"]
-script = ExtResource("5_51bm0")
-prop_id = &"books_upright_bookends"
-position = Vector3(19.52, 0.42, 26.35)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_l05jo"]
-script = ExtResource("5_51bm0")
-prop_id = &"candle_cluster"
-position = Vector3(19.52, 0.86, 26.050001)
-yaw_deg = 90.0
-
 [sub_resource type="Resource" id="Resource_hkeqa"]
 script = ExtResource("5_51bm0")
 prop_id = &"sheet_music"
-position = Vector3(19.52, 1.28, 26.35)
+position = Vector3(19.52, 0.42, 26.35)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_6vcub"]
 script = ExtResource("5_51bm0")
+prop_id = &"apples_bowl"
+position = Vector3(19.52, 0.86, 26.050001)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_hpsng"]
+script = ExtResource("5_51bm0")
+prop_id = &"figurine_swan"
+position = Vector3(19.52, 1.28, 26.35)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_nm5r5"]
+script = ExtResource("5_51bm0")
 prop_id = &"orange_tree_tub"
 position = Vector3(7.4, 0, 31.23)
 
-[sub_resource type="Resource" id="Resource_hpsng"]
+[sub_resource type="Resource" id="Resource_tynm7"]
 script = ExtResource("5_51bm0")
 prop_id = &"statue_maiden"
 position = Vector3(5.2, 0, 31.28)
 
-[sub_resource type="Resource" id="Resource_nm5r5"]
+[sub_resource type="Resource" id="Resource_nd1q6"]
 script = ExtResource("5_51bm0")
 prop_id = &"statue_maiden"
 position = Vector3(14.8, 0, 31.28)
 
-[sub_resource type="Resource" id="Resource_tynm7"]
+[sub_resource type="Resource" id="Resource_aocaa"]
 script = ExtResource("5_51bm0")
 prop_id = &"vase_tall"
 position = Vector3(0.75, 0, 31.2)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_nd1q6"]
+[sub_resource type="Resource" id="Resource_8tp7m"]
 script = ExtResource("5_51bm0")
 prop_id = &"potted_palm"
 position = Vector3(19.2, 0, 31.2)
 
-[sub_resource type="Resource" id="Resource_aocaa"]
+[sub_resource type="Resource" id="Resource_vl2ab"]
 script = ExtResource("5_51bm0")
 prop_id = &"swan_planter"
 position = Vector3(19, 0, 1)
 yaw_deg = 180.0
 
-[sub_resource type="Resource" id="Resource_8tp7m"]
-script = ExtResource("5_51bm0")
-prop_id = &"mantel_clock_porcelain"
-position = Vector3(17.065, 0.41733018, 0.46462086)
-yaw_deg = 185.75803756713867
-
-[sub_resource type="Resource" id="Resource_vl2ab"]
-script = ExtResource("5_51bm0")
-prop_id = &"terrarium_bell"
-position = Vector3(16.7, 0.41733018, 0.4892702)
-yaw_deg = 164.97568321228027
-
 [sub_resource type="Resource" id="Resource_s1ohx"]
-script = ExtResource("5_51bm0")
-prop_id = &"tea_service_silver"
-position = Vector3(16.235, 0.41733018, 0.48500004)
-yaw_deg = 163.73821830749512
-
-[sub_resource type="Resource" id="Resource_d0abc"]
-script = ExtResource("5_51bm0")
-prop_id = &"vase_tulips"
-position = Vector3(0.4937498, 0.41733018, 3.94)
-yaw_deg = -75.92187118530273
-
-[sub_resource type="Resource" id="Resource_s2b5p"]
-script = ExtResource("5_51bm0")
-prop_id = &"figurine_swan"
-position = Vector3(0.49913412, 0.41733018, 4.2850003)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_cgu4a"]
-script = ExtResource("5_51bm0")
-prop_id = &"globe_table"
-position = Vector3(0.49888173, 0.41733018, 4.6400003)
-yaw_deg = -72.20925521850586
-
-[sub_resource type="Resource" id="Resource_21go4"]
-script = ExtResource("5_51bm0")
-prop_id = &"hourglass"
-position = Vector3(0.47586113, 0.41733018, 4.94)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_db1as"]
-script = ExtResource("5_51bm0")
-prop_id = &"vase_roses"
-position = Vector3(19.441772, 0.925, 4.726667)
-yaw_deg = 106.93534
-
-[sub_resource type="Resource" id="Resource_v5sd4"]
-script = ExtResource("5_51bm0")
-prop_id = &"teacup_set"
-position = Vector3(19.431728, 0.925, 4.1733336)
-yaw_deg = 103.23480606079102
-
-[sub_resource type="Resource" id="Resource_njjx2"]
-script = ExtResource("5_51bm0")
-prop_id = &"butterfly_dome"
-position = Vector3(7.2816668, 1.005, 0.55999994)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_txoin"]
-script = ExtResource("5_51bm0")
-prop_id = &"mantel_clock_gilt"
-position = Vector3(6.733333, 1.005, 0.63379395)
-yaw_deg = 188.58081817626953
-
-[sub_resource type="Resource" id="Resource_5cj0y"]
-script = ExtResource("5_51bm0")
-prop_id = &"playing_cards"
-position = Vector3(6.31, 1.005, 0.5788374)
-yaw_deg = 166.47415924072266
-
-[sub_resource type="Resource" id="Resource_8ct2p"]
-script = ExtResource("5_51bm0")
-prop_id = &"vase_irises"
-position = Vector3(5.9866667, 1.005, 0.52263576)
-yaw_deg = 176.28927421569824
-
-[sub_resource type="Resource" id="Resource_ouqvw"]
-script = ExtResource("5_51bm0")
-prop_id = &"candlestick_crystal"
-position = Vector3(5.7283335, 1.005, 0.552615)
-yaw_deg = 181.8487720489502
-
-[sub_resource type="Resource" id="Resource_3m4hf"]
-script = ExtResource("5_51bm0")
-prop_id = &"flower_garland"
-position = Vector3(0.36, 1.7, 27.925)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_51425"]
-script = ExtResource("5_51bm0")
-prop_id = &"tapestry_hunt"
-position = Vector3(0.285, 0.9, 18.7775)
-yaw_deg = -90.0
-
-[sub_resource type="Resource" id="Resource_h1cjf"]
-script = ExtResource("5_51bm0")
-prop_id = &"tapestry_roses"
-position = Vector3(19.715, 0.6999999, 29.15)
-yaw_deg = 90.0
-
-[sub_resource type="Resource" id="Resource_8kufn"]
-script = ExtResource("5_51bm0")
-prop_id = &"wall_shelf_books"
-position = Vector3(3.3375, 1.65, 0.385)
-yaw_deg = 180.0
-
-[sub_resource type="Resource" id="Resource_v4ynx"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_medium"
 position = Vector3(0.3, 1.4, 6.8)
 yaw_deg = -90.0
 
-[sub_resource type="Resource" id="Resource_1ietb"]
+[sub_resource type="Resource" id="Resource_d0abc"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_medium"
 position = Vector3(0.292, 1.6, 27.9)
 yaw_deg = -90.0
 scale = 0.8
 
-[sub_resource type="Resource" id="Resource_4gspx"]
+[sub_resource type="Resource" id="Resource_s2b5p"]
 script = ExtResource("5_51bm0")
 prop_id = &"portrait_masked"
 position = Vector3(19.704, 1.38, 28.4)
 yaw_deg = 90.0
 scale = 0.9
 
-[sub_resource type="Resource" id="Resource_qsw1w"]
+[sub_resource type="Resource" id="Resource_cgu4a"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_medium"
 position = Vector3(3, 1.6, 0.308)
 yaw_deg = 180.0
 scale = 1.2
 
-[sub_resource type="Resource" id="Resource_d32x5"]
+[sub_resource type="Resource" id="Resource_21go4"]
 script = ExtResource("5_51bm0")
 prop_id = &"painting_small"
 position = Vector3(19.71, 1.65, 6.8)
 yaw_deg = 90.0
 
-[sub_resource type="Resource" id="Resource_lwl65"]
+[sub_resource type="Resource" id="Resource_db1as"]
 script = ExtResource("5_51bm0")
-prop_id = &"candle_sconce"
+prop_id = &"vase_tulips"
+position = Vector3(17.086, 0.41733018, 0.48676264)
+yaw_deg = 163.73821830749512
+
+[sub_resource type="Resource" id="Resource_v5sd4"]
+script = ExtResource("5_51bm0")
+prop_id = &"hurricane_lamp"
+position = Vector3(16.782, 0.41733018, 0.4920828)
+yaw_deg = 194.07812881469727
+
+[sub_resource type="Resource" id="Resource_njjx2"]
+script = ExtResource("5_51bm0")
+prop_id = &"mantel_clock_gilt"
+position = Vector3(16.378, 0.41733018, 0.4981498)
+yaw_deg = 180.0
+
+[sub_resource type="Resource" id="Resource_txoin"]
+script = ExtResource("5_51bm0")
+prop_id = &"candlestick_crystal"
+position = Vector3(16.024, 0.41733018, 0.5182904)
+yaw_deg = 197.79074478149414
+
+[sub_resource type="Resource" id="Resource_5cj0y"]
+script = ExtResource("5_51bm0")
+prop_id = &"mantel_clock_porcelain"
+position = Vector3(0.47934097, 0.41733018, 3.9975002)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_8ct2p"]
+script = ExtResource("5_51bm0")
+prop_id = &"vase_irises"
+position = Vector3(0.492342, 0.41733018, 4.425)
+yaw_deg = -73.06466
+
+[sub_resource type="Resource" id="Resource_ouqvw"]
+script = ExtResource("5_51bm0")
+prop_id = &"terrarium_bell"
+position = Vector3(0.5074083, 0.41733018, 4.8275003)
+yaw_deg = -76.76519393920898
+
+[sub_resource type="Resource" id="Resource_3m4hf"]
+script = ExtResource("5_51bm0")
+prop_id = &"vase_roses"
+position = Vector3(19.43655, 0.925, 4.726667)
+yaw_deg = 90.0
+
+[sub_resource type="Resource" id="Resource_51425"]
+script = ExtResource("5_51bm0")
+prop_id = &"teacup_set"
+position = Vector3(19.430887, 0.925, 4.1733336)
+yaw_deg = 98.58082
+
+[sub_resource type="Resource" id="Resource_h1cjf"]
+script = ExtResource("5_51bm0")
+prop_id = &"bowl_floating_blossoms"
+position = Vector3(7.3116665, 1.005, 0.5708837)
+yaw_deg = 166.47415924072266
+
+[sub_resource type="Resource" id="Resource_8kufn"]
+script = ExtResource("5_51bm0")
+prop_id = &"jug_daffodils"
+position = Vector3(6.8933334, 1.005, 0.5226357)
+yaw_deg = 176.28927421569824
+
+[sub_resource type="Resource" id="Resource_v4ynx"]
+script = ExtResource("5_51bm0")
+prop_id = &"playing_cards"
+position = Vector3(6.575, 1.005, 0.5555124)
+yaw_deg = 181.8487720489502
+
+[sub_resource type="Resource" id="Resource_1ietb"]
+script = ExtResource("5_51bm0")
+prop_id = &"petal_bowl"
+position = Vector3(6.2066665, 1.005, 0.5894369)
+yaw_deg = 164.92521953582764
+
+[sub_resource type="Resource" id="Resource_4gspx"]
+script = ExtResource("5_51bm0")
+prop_id = &"potpourri_bowl"
+position = Vector3(5.813333, 1.005, 0.61494935)
+yaw_deg = 175.76242446899414
+
+[sub_resource type="Resource" id="Resource_qsw1w"]
+script = ExtResource("5_51bm0")
+prop_id = &"tapestry_roses"
+position = Vector3(0.285, 0.6999999, 18.8)
+yaw_deg = -90.0
+
+[sub_resource type="Resource" id="Resource_d32x5"]
+script = ExtResource("5_51bm0")
+prop_id = &"flower_garland"
 position = Vector3(0.36, 1.7, 2)
 yaw_deg = -90.0
 
+[sub_resource type="Resource" id="Resource_lwl65"]
+script = ExtResource("5_51bm0")
+prop_id = &"tapestry_hunt"
+position = Vector3(19.715, 0.9, 2.1)
+yaw_deg = 90.0
+
 [sub_resource type="Resource" id="Resource_lqttb"]
 script = ExtResource("5_51bm0")
-prop_id = &"candle_sconce"
-position = Vector3(19.64, 1.7, 2.1)
-yaw_deg = 90.0
+prop_id = &"wall_shelf_books"
+position = Vector3(18.375, 1.65, 0.385)
+yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_0mesc"]
 script = ExtResource("4_go0pt")
@@ -3046,13 +3046,13 @@ yaw_deg = 186.46947
 [sub_resource type="Resource" id="Resource_b4vjl"]
 script = ExtResource("5_51bm0")
 prop_id = &"candle_sconce"
-position = Vector3(12.84, 1.7, 0.36)
+position = Vector3(12.85, 1.7, 0.36)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_bxhk4"]
 script = ExtResource("5_51bm0")
 prop_id = &"candle_sconce"
-position = Vector3(7.18, 1.7, 3.64)
+position = Vector3(7.25, 1.7, 3.64)
 
 [sub_resource type="Resource" id="Resource_5wexo"]
 script = ExtResource("5_51bm0")
@@ -3899,7 +3899,7 @@ position = Vector3(14.38, 0, 11.1)
 
 [sub_resource type="Resource" id="Resource_71w5s"]
 script = ExtResource("5_51bm0")
-prop_id = &"chair_head_dining"
+prop_id = &"chair_dining"
 position = Vector3(6.6, 0, 10)
 yaw_deg = -90.0
 
@@ -4381,25 +4381,25 @@ yaw_deg = 90.0
 [sub_resource type="Resource" id="Resource_08fol"]
 script = ExtResource("5_51bm0")
 prop_id = &"tapestry_hunt"
-position = Vector3(2.08, 0.9, 0.285)
+position = Vector3(2.025, 0.9, 0.285)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_k3o0y"]
 script = ExtResource("5_51bm0")
 prop_id = &"flower_garland"
-position = Vector3(19.92, 1.7, 0.36)
+position = Vector3(19.975, 1.7, 0.36)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_44apv"]
 script = ExtResource("5_51bm0")
 prop_id = &"wall_mirror_oval"
-position = Vector3(0.29, 1.4, 2.085)
+position = Vector3(0.29, 1.4, 2.075)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_4e3me"]
 script = ExtResource("5_51bm0")
 prop_id = &"tapestry_roses"
-position = Vector3(0.285, 0.6999999, 13.16)
+position = Vector3(0.285, 0.6999999, 13.15)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_sjdci"]
@@ -4411,19 +4411,19 @@ yaw_deg = 90.0
 [sub_resource type="Resource" id="Resource_3dmw7"]
 script = ExtResource("5_51bm0")
 prop_id = &"wall_shelf_books"
-position = Vector3(14.805, 1.65, 0.385)
+position = Vector3(14.75, 1.65, 0.385)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_l7roe"]
 script = ExtResource("5_51bm0")
 prop_id = &"candle_sconce"
-position = Vector3(0.36, 1.7, 6.94)
+position = Vector3(0.36, 1.7, 6.95)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_4wf10"]
 script = ExtResource("5_51bm0")
 prop_id = &"candle_sconce"
-position = Vector3(0.36, 1.7, 18.015)
+position = Vector3(0.36, 1.7, 18.025)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_a6bsq"]

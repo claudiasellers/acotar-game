@@ -741,19 +741,19 @@ yaw_deg = 14.315914
 [sub_resource type="Resource" id="Resource_b0yjw"]
 script = ExtResource("5_igwsw")
 prop_id = &"candle_sconce"
-position = Vector3(0.36, 1.7, 2.08)
+position = Vector3(0.36, 1.7, 2.025)
 yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_5qisi"]
 script = ExtResource("5_igwsw")
 prop_id = &"candle_sconce"
-position = Vector3(15.64, 1.7, 2.1125)
+position = Vector3(15.64, 1.7, 2.025)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_ddj5p"]
 script = ExtResource("5_igwsw")
 prop_id = &"candle_sconce"
-position = Vector3(15.64, 1.7, 8.3125)
+position = Vector3(15.64, 1.7, 8.4)
 yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_t0mhp"]
@@ -1151,7 +1151,7 @@ yaw_deg = -13.61762
 [sub_resource type="Resource" id="Resource_528k4"]
 script = ExtResource("5_igwsw")
 prop_id = &"candle_sconce"
-position = Vector3(20.52, 1.7, 0.36)
+position = Vector3(20.4, 1.7, 0.36)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_0al8c"]
@@ -1365,7 +1365,7 @@ yaw_deg = -9.606317
 [sub_resource type="Resource" id="Resource_utgq0"]
 script = ExtResource("5_igwsw")
 prop_id = &"candle_sconce"
-position = Vector3(12.3125, 1.7, 0.36)
+position = Vector3(12.225, 1.7, 0.36)
 yaw_deg = 180.0
 
 [sub_resource type="Resource" id="Resource_00fks"]

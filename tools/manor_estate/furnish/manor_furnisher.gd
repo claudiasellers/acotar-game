@@ -17,6 +17,8 @@ const WALL_FACE := 0.25          # inner wall face from the rect edge (ManorHous
 const DOOR_APRON := 1.2          # floor kept clear in front of every door
 const OPENING_PAD := 0.3         # wall kept clear either side of a door or window
 const SIDES := ["n", "s", "w", "e"]
+## Wall kept clear either side of a painting slot's centre, by slot (L39's frames).
+const ART_CLEAR := {&"painting_large": 1.3, &"painting_medium": 0.8, &"painting_small": 0.5, &"portrait_masked": 0.8}
 
 var dsl: ManorLayoutDSL
 var room: ManorRoomDef
@@ -539,4 +541,9 @@ func light(id: StringName, x: float, z: float, drop: float = 0.05) -> ManorPropP
 
 ## A painting slot (L39 fills it) centred `y` up the wall; scale varies the size.
 func art(side: String, t: float, id: StringName = &"painting_medium", y: float = 1.75, s: float = 1.0) -> ManorPropPlacement:
-	return hang(side, t, id, y, s)
+	var p := hang(side, t, id, y, s)
+	# L39 hangs frames up to 2.3 m wide in a large slot (docs/contracts/manor_art.md):
+	# keep sconces and wall pieces this far either side of the slot's centre
+	var clear: float = ART_CLEAR.get(id, 0.5)
+	_hung[side].append([t - clear, t + clear])
+	return p

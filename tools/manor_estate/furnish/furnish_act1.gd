@@ -101,7 +101,7 @@ static func _entrance_hall(f: ManorFurnisher) -> void:
 	# west wall: console and pier glass, the bench under the hall's long painting, the clock
 	var c2 := f.fit_wall("w", 4.4, &"console_gilt")
 	f.hang("w", 4.4, &"mirror_gilt", 2.0)
-	f.set_on(f.fit_wall("w", 15.6, &"hall_bench_cushioned"), [&"fan_lace"])
+	f.set_on(f.fit_wall("w", 15.6, &"hall_bench_cushioned"), [&"fan_lace", &"hourglass"])
 	f.art("w", 15.6, &"painting_large", 2.3, 0.85)
 	f.fit_wall("w", 13.0, &"bust_pedestal")
 	f.fit_wall("w", 18.3, &"plant_stand_fern")
@@ -110,7 +110,7 @@ static func _entrance_hall(f: ManorFurnisher) -> void:
 	# east wall: commode by mark 3, the matching bench, an étagère of curios by the front windows
 	var c3 := f.fit_wall("e", 4.4, &"commode_serpentine")
 	f.hang("e", 4.4, &"wall_clock_sunburst", 2.1)
-	f.set_on(f.fit_wall("e", 15.6, &"hall_bench_cushioned"), [&"book_pile_ribbon"])
+	f.set_on(f.fit_wall("e", 15.6, &"hall_bench_cushioned"), [&"book_pile_ribbon", &"songbird_cage_small"])
 	f.art("e", 15.6, &"painting_large", 2.3, 0.85)
 	f.fit_wall("e", 13.0, &"candle_tree")
 	f.fit_wall("e", 18.3, &"bust_pedestal")
@@ -123,14 +123,14 @@ static func _entrance_hall(f: ManorFurnisher) -> void:
 	f.at(&"vase_tall", 0.75, 31.2)
 	f.at(&"potted_palm", 19.2, 31.2)
 	f.at(&"swan_planter", 19.0, 1.0, 180)
-	_dress(f, [c1, c2, c3, c4], &"hall", 3)
-	_wall_accents(f, &"grand", ["w", "e"])
-	_wall_accents(f, &"cosy", ["n", "w", "e"])
 	f.art("w", 6.8, &"painting_medium", 1.9)
 	f.art("w", 27.9, &"painting_medium", 2.0, 0.8)
 	f.art("e", 28.4, &"portrait_masked", 2.1, 0.9)
 	f.art("n", 3.0, &"painting_medium", 2.2, 1.2)
 	f.art("e", 6.8, &"painting_small", 1.9)
+	_dress(f, [c1, c2, c3, c4], &"hall", 3)
+	_wall_accents(f, &"grand", ["w", "e"])
+	_wall_accents(f, &"cosy", ["n", "w", "e"])
 	f.sconces(3.0)
 
 
@@ -174,7 +174,10 @@ static func _dining_hall(f: ManorFurnisher) -> void:
 		var x := 7.6 + i * 1.13
 		f.put(&"chair_dining", x, 8.9, 0)
 		f.put(&"chair_dining", x, 11.1, 180)
-	f.put(&"chair_head_dining", 6.6, 10, 90)
+	# L29's chair at the head, as it was: the oversized chair_head_dining waits on
+	# a fix for teleports during a mantle (the chain's stuck-hop jump mantles onto
+	# its 1.7 m back, and Return Home later lands her back on it).
+	f.put(&"chair_dining", 6.6, 10, 90)
 	f.put(&"chair_dining", 15.4, 10, -90)
 	# the table's middle only: the first dinner lays its own places at the ends
 	f.set_on(table, [&"candelabra", &"bowl_floating_blossoms", &"vase_peonies", &"candle_cluster"])
@@ -803,7 +806,7 @@ static func _svc_passage_0(f: ManorFurnisher) -> void:
 	f.art("n", 3.0, &"painting_small", 1.7, 0.9)
 	f.art("s", 13.0, &"painting_small", 2.6, 0.8)
 	_dress(f, [d1, d2], &"service", 2)
-	f.hang("n", 4.0, &"servants_bell_board", 2.0)
+	f.hang("n", 5.6, &"servants_bell_board", 2.0)
 	f.hang("n", 20.0, &"barometer_wall", 1.8)
 	f.hang("s", 4.0, &"wall_shelf_books", 1.8)
 	f.hang("s", 19.4, &"herb_bundle_hanging", 2.1)
