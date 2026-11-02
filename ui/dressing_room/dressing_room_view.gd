@@ -243,29 +243,20 @@ func _face_the_room(station_id: StringName) -> void:
 
 
 func _build() -> void:
-	var mirror := Panel.new()
+	var mirror := GiltMirrorFrame.new()
 	mirror.name = "MirrorFrame"
-	mirror.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mirror.anchor_right = 1.0 - PANEL_FRACTION
 	mirror.anchor_bottom = 1.0
 	mirror.offset_left = 28
 	mirror.offset_top = 28
 	mirror.offset_right = -18
 	mirror.offset_bottom = -28
-	var frame := StyleBoxFlat.new()
-	frame.draw_center = false
-	frame.border_color = UiStyle.BORDER
-	frame.set_border_width_all(6)
-	frame.set_corner_radius_all(220)
-	frame.corner_detail = 16
-	frame.shadow_color = Color(1.0, 0.85, 0.95, 0.55)
-	frame.shadow_size = 18
-	mirror.add_theme_stylebox_override(&"panel", frame)
 	add_child(mirror)
 
-	var hint := UiStyle.label("Drag, or Q / E, to turn", 15)
+	var hint := DressingStyle.label("Drag, or Q / E, to turn", 17, true, DressingStyle.IVORY)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.modulate.a = 0.75
+	hint.add_theme_color_override(&"font_shadow_color", Color(DressingStyle.INK, 0.6))
+	hint.add_theme_constant_override(&"shadow_offset_y", 1)
 	hint.anchor_top = 1.0
 	hint.anchor_bottom = 1.0
 	hint.anchor_right = 1.0 - PANEL_FRACTION
@@ -276,7 +267,7 @@ func _build() -> void:
 
 	var panel := PanelContainer.new()
 	panel.name = "Wardrobe"
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
+	panel.add_theme_stylebox_override(&"panel", DressingStyle.sheet())
 	panel.anchor_left = 1.0 - PANEL_FRACTION
 	panel.anchor_right = 1.0
 	panel.anchor_bottom = 1.0
@@ -285,15 +276,24 @@ func _build() -> void:
 	panel.offset_right = -28
 	panel.offset_bottom = -28
 	add_child(panel)
+	panel.add_child(GiltFrameDecor.new())
+	var margin := MarginContainer.new()
+	for side in [&"margin_left", &"margin_right"]:
+		margin.add_theme_constant_override(side, 30)
+	for side in [&"margin_top", &"margin_bottom"]:
+		margin.add_theme_constant_override(side, 24)
+	panel.add_child(margin)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 10)
-	panel.add_child(box)
+	margin.add_child(box)
 
-	var title := UiStyle.label("The vanity" if mirror_only else "The dressing room", 30)
-	title.add_theme_color_override(&"font_color", Color(0.62, 0.36, 0.52))
+	var title := DressingStyle.label(("The vanity" if mirror_only else "The dressing room").to_upper(), 30)
+	title.add_theme_font_override(&"font", DressingStyle.caps_font(5))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	wearing = UiStyle.label("", 15)
-	wearing.modulate.a = 0.85
+	box.add_child(GiltFrameDecor.new(GiltFrameDecor.Mode.DIVIDER))
+	wearing = DressingStyle.label("", 17, true, DressingStyle.INK_SOFT)
+	wearing.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(wearing)
 
 	tabs = TabContainer.new()
@@ -324,57 +324,51 @@ func _build() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 8)
 	box.add_child(row)
-	var left := UiStyle.button("  ◀  ")
+	var left := DressingStyle.button("  ◀  ")
 	left.pressed.connect(func() -> void: _turn(-PI / 4.0))
 	row.add_child(left)
-	var right := UiStyle.button("  ▶  ")
+	var right := DressingStyle.button("  ▶  ")
 	right.pressed.connect(func() -> void: _turn(PI / 4.0))
 	row.add_child(right)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
-	var done := UiStyle.button("   Done   ")
+	var done := DressingStyle.button("    Done    ")
 	done.name = "Done"
 	done.pressed.connect(func() -> void: DressingRoom.close_room(feyre))
 	row.add_child(done)
 
 
-## Ribbon tabs over a clear page, so the cards sit on the panel's blush.
+## Engraved-label tabs: spaced capitals, the open one underlined in gilt,
+## over a clear page so the cards sit on the ivory sheet.
 func _style_tabs(t: TabContainer) -> void:
 	var page := StyleBoxFlat.new()
-	page.bg_color = Color(1.0, 0.97, 0.98, 0.6)
-	page.set_corner_radius_all(14)
-	page.set_content_margin_all(10)
-	page.border_color = Color(UiStyle.BORDER, 0.35)
-	page.set_border_width_all(1)
+	page.draw_center = false
+	page.border_color = Color(DressingStyle.GILT, 0.6)
+	page.border_width_top = 1
+	page.content_margin_top = 14
 	t.add_theme_stylebox_override(&"panel", page)
 	for state in ["tab_selected", "tab_unselected", "tab_hovered", "tab_focus"]:
 		var tab := StyleBoxFlat.new()
-		tab.set_corner_radius_all(12)
-		tab.corner_radius_bottom_left = 0
-		tab.corner_radius_bottom_right = 0
-		tab.content_margin_left = 10
-		tab.content_margin_right = 10
-		tab.content_margin_top = 6
+		tab.draw_center = state == "tab_hovered"
+		tab.bg_color = Color(DressingStyle.GREEN, 0.6)
+		tab.content_margin_left = 9
+		tab.content_margin_right = 9
+		tab.content_margin_top = 5
 		tab.content_margin_bottom = 6
-		match state:
-			"tab_selected":
-				tab.bg_color = UiStyle.ACCENT
-				tab.border_color = UiStyle.BORDER
-				tab.border_width_top = 2
-			"tab_hovered", "tab_focus":
-				tab.bg_color = Color(1.0, 0.86, 0.92)
-			_:
-				tab.bg_color = Color(1.0, 0.93, 0.96)
-		if state == "tab_focus":
-			tab.draw_center = false
-			tab.border_color = UiStyle.BORDER
-			tab.set_border_width_all(2)
+		if state == "tab_selected":
+			tab.border_color = DressingStyle.GILT_DEEP
+			tab.border_width_bottom = 3
+		elif state == "tab_focus":
+			tab.border_color = DressingStyle.GILT_DEEP
+			tab.set_border_width_all(1)
 		t.add_theme_stylebox_override(state, tab)
-	t.add_theme_color_override(&"font_selected_color", Color.WHITE)
-	t.add_theme_color_override(&"font_unselected_color", UiStyle.TEXT)
-	t.add_theme_color_override(&"font_hovered_color", UiStyle.TEXT)
+	t.add_theme_font_override(&"font", DressingStyle.caps_font(2))
+	t.add_theme_color_override(&"font_selected_color", DressingStyle.INK)
+	t.add_theme_color_override(&"font_unselected_color", DressingStyle.INK_SOFT)
+	t.add_theme_color_override(&"font_hovered_color", DressingStyle.INK)
 	t.add_theme_font_size_override(&"font_size", 15)
+	t.tab_alignment = TabBar.ALIGNMENT_CENTER
 
 
 func _scroll(tab_name: String) -> Array:
@@ -397,14 +391,14 @@ func _piece_tab(tab_name: String, pieces: Array[WardrobePiece]) -> Control:
 			if REMOVABLE.has(s) and not slots.has(s):
 				slots.append(s)
 	if not slots.is_empty():
-		var off := UiStyle.button("Take it off")
+		var off := DressingStyle.button("Take it off")
 		off.pressed.connect(func() -> void: take_off(slots))
 		col.add_child(off)
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override(&"h_separation", 8)
-	grid.add_theme_constant_override(&"v_separation", 8)
+	grid.add_theme_constant_override(&"h_separation", 10)
+	grid.add_theme_constant_override(&"v_separation", 10)
 	col.add_child(grid)
 	for fam in families(pieces):
 		grid.add_child(_card(fam))
@@ -417,18 +411,17 @@ func _card(fam: Dictionary) -> Control:
 	var card := PanelContainer.new()
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.set_meta(&"pieces", variants.map(func(p: WardrobePiece) -> StringName: return p.id))
-	card.add_theme_stylebox_override(&"panel", _card_box(false))
+	card.add_theme_stylebox_override(&"panel", DressingStyle.card(false))
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 4)
 	card.add_child(col)
-	col.add_child(UiStyle.label(fam["name"], 17))
-	var about := UiStyle.label(variants[0].description, 12)
-	about.modulate.a = 0.75
+	col.add_child(DressingStyle.label(fam["name"], 19))
+	var about := DressingStyle.label(variants[0].description, 14, true, DressingStyle.INK_SOFT)
 	about.custom_minimum_size = Vector2(0, 34)
 	col.add_child(about)
 	var swatches := HFlowContainer.new()
-	swatches.add_theme_constant_override(&"h_separation", 6)
-	swatches.add_theme_constant_override(&"v_separation", 6)
+	swatches.add_theme_constant_override(&"h_separation", 9)
+	swatches.add_theme_constant_override(&"v_separation", 8)
 	col.add_child(swatches)
 	for p in variants:
 		var sw := _swatch_button(p.color, variant_name(p))
@@ -442,36 +435,22 @@ func _card(fam: Dictionary) -> Control:
 
 func _swatch_button(color: Color, tip: String) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(34, 34)
+	b.custom_minimum_size = Vector2(30, 30)
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_ALL
 	for state in ["normal", "hover", "pressed", "focus"]:
 		b.add_theme_stylebox_override(state, _swatch_box(color, state != "normal", false))
 	b.pressed.connect(func() -> void: Juice.bounce_control(b, 0.18))
-	b.pivot_offset = Vector2(17, 17)
+	b.pivot_offset = Vector2(15, 15)
 	return b
 
 
 func _swatch_box(color: Color, hot: bool, worn: bool) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = color
-	box.set_corner_radius_all(17)
-	box.set_border_width_all(4 if worn else (3 if hot else 2))
-	box.border_color = UiStyle.BORDER if worn else (Color(1, 1, 1) if hot else Color(1, 1, 1, 0.85))
-	box.shadow_color = Color(0.6, 0.3, 0.5, 0.35) if not worn else Color(1.0, 0.85, 0.45, 0.8)
-	box.shadow_size = 3 if not worn else 7
-	box.anti_aliasing = true
-	return box
+	return DressingStyle.swatch(color, hot, worn)
 
 
 func _card_box(worn: bool) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color(1, 1, 1, 0.92) if not worn else Color(1.0, 0.93, 0.96)
-	box.set_corner_radius_all(16)
-	box.set_content_margin_all(10)
-	box.set_border_width_all(2 if not worn else 3)
-	box.border_color = Color(UiStyle.BORDER, 0.45) if not worn else UiStyle.ACCENT
-	return box
+	return DressingStyle.card(worn)
 
 
 func _hair_tab() -> Control:
@@ -479,11 +458,13 @@ func _hair_tab() -> Control:
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override(&"h_separation", 8)
+	grid.add_theme_constant_override(&"v_separation", 8)
 	(parts[1] as VBoxContainer).add_child(grid)
 	var styles := WardrobeCatalog.all_hair()
 	styles.sort_custom(func(a: HairstyleData, b: HairstyleData) -> bool: return a.display_name < b.display_name)
 	for h in styles:
-		var b := UiStyle.button(h.display_name, true)
+		var b := DressingStyle.button(h.display_name, true)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.set_meta(&"hair", h.id)
 		var id := h.id
@@ -498,12 +479,14 @@ func _makeup_tab() -> Control:
 	var parts := _scroll("Makeup")
 	var col: VBoxContainer = parts[1]
 	for channel in MakeupData.CHANNELS:
-		col.add_child(UiStyle.label(String(channel).replace("_", " ").capitalize(), 16))
+		var head := DressingStyle.label(String(channel).replace("_", " ").to_upper(), 14, false, DressingStyle.INK_SOFT)
+		head.add_theme_font_override(&"font", DressingStyle.caps_font(2))
+		col.add_child(head)
 		var row := HFlowContainer.new()
 		row.add_theme_constant_override(&"h_separation", 6)
 		row.add_theme_constant_override(&"v_separation", 6)
 		col.add_child(row)
-		var none := UiStyle.button("None")
+		var none := DressingStyle.button("None")
 		var ch := channel
 		none.pressed.connect(func() -> void: Gameplay.wardrobe.clear_makeup(ch))
 		row.add_child(none)
@@ -520,7 +503,7 @@ func _makeup_tab() -> Control:
 	return parts[0]
 
 
-## Worn swatches get a gold ring, their cards a rose border; the line under
+## Worn swatches get a gilt rim, their cards turn ivory with a gilt edge; the line under
 ## the title names the look.
 func _refresh() -> void:
 	var worn: Array = Gameplay.wardrobe.equipped().values()
@@ -546,7 +529,7 @@ func _refresh() -> void:
 	var names: Array[String] = []
 	for p in Gameplay.wardrobe.worn_pieces():
 		names.append(p.display_name)
-	wearing.text = "Wearing: " + (", ".join(PackedStringArray(names)) if not names.is_empty() else "nothing much")
+	wearing.text = "Wearing " + (", ".join(PackedStringArray(names)) if not names.is_empty() else "nothing much")
 
 
 func _swatch_color(sw: Button) -> Color:
