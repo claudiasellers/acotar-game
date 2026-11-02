@@ -4,6 +4,8 @@
 class_name Arrow
 extends RigidBody3D
 
+const ArrowModel := preload("res://systems/bow/arrow_model.gd")
+
 signal hit(collider: Node, at: Vector3)
 signal broke(at: Vector3)
 
