@@ -832,9 +832,9 @@ spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, H
      notes="peddlers bring border-town stories; one sold her the ash arrow")
 # The mercenary on the lip of the square's well (lane L53; the Keeper, ch 3: "on the lip of our
 # broken square fountain, without any cart or stall"). Lane L52 is modelling her
-# (creatures/people/scenes/mercenary.tscn); human_woman stands in until it lands.
+# (creatures/people/scenes/mercenary.tscn, merged L52-1).
 # Matches data/market/market.tres mercenary_at / mercenary_yaw (tools/market/gen_market.gd).
-spot("mercenary_well", "mercenary", PEOPLE % "human_woman", "village", 376.16, 2256.58, HUMAN, yaw=90.0,
+spot("mercenary_well", "mercenary", PEOPLE % "mercenary", "village", 376.16, 2256.58, HUMAN, yaw=90.0,
      canon="C", notes="buys the wolf pelt and a doe hide, overpays; coin only (MarketMenu)")
 spot("woman_return", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, ph(7), wander=1.5)
 spot("elder_return", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, ph(7))

@@ -46,8 +46,8 @@ trade = &"tinker"
 display_name = "the tinker"
 canon = "C"
 sign_path = "res://story/market/assets/sign_tinker.glb"
-position = Vector3(371.5948, 2.9289067, 2226.9922)
-yaw = -1.0190774
+position = Vector3(370.51807, 2.9289014, 2230.6326)
+yaw = -0.88625634
 
 [sub_resource type="Resource" id="Resource_sg4fh"]
 script = ExtResource("1_e8bbh")
@@ -78,8 +78,8 @@ trade = &"salt"
 display_name = "salt"
 canon = "C"
 sign_path = "res://story/market/assets/sign_salt.glb"
-position = Vector3(364.03467, 2.928908, 2233.4058)
-yaw = 2.1225152
+position = Vector3(361.9773, 2.9289057, 2235.6667)
+yaw = 2.2553363
 
 [sub_resource type="Resource" id="Resource_k3otb"]
 script = ExtResource("1_e8bbh")
@@ -126,8 +126,8 @@ script = ExtResource("3_yl0oj")
 trade = &"roots"
 display_name = "roots and turnips"
 sign_path = "res://story/market/assets/sign_roots.glb"
-position = Vector3(367.70337, 2.9289098, 2239.3674)
-yaw = 2.1225152
+position = Vector3(366.40332, 2.9289043, 2241.0898)
+yaw = 2.2553363
 
 [sub_resource type="Resource" id="Resource_kn4sk"]
 script = ExtResource("1_e8bbh")
@@ -157,8 +157,8 @@ script = ExtResource("3_yl0oj")
 trade = &"wool"
 display_name = "wool and old cloth"
 sign_path = "res://story/market/assets/sign_wool.glb"
-position = Vector3(373.6912, 2.9289098, 2230.3987)
-yaw = -1.0190774
+position = Vector3(374.94412, 2.9289029, 2236.0557)
+yaw = -0.88625634
 
 [resource]
 script = ExtResource("2_ap8ah")
