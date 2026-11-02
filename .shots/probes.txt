@@ -1,0 +1,10 @@
+from L27-5 puca route
+quality layout
+size 1280x720
+timeout 1200
+shot manor1 res://tools/playtest/act1_playtest.tscn --out={out}/report.json --from=manor --stop-after=puca_gate --max-wall=1150
+shot manor2 res://tools/playtest/act1_playtest.tscn --out={out}/report.json --from=manor --stop-after=puca_gate --max-wall=1150
+shot manor3 res://tools/playtest/act1_playtest.tscn --out={out}/report.json --from=manor --stop-after=puca_gate --max-wall=1150
+shot leg1 res://tools/_probe/puca_route_probe.tscn --out={out}/report.json --max-wall=1100
+shot leg2 res://tools/_probe/puca_route_probe.tscn --out={out}/report.json --max-wall=1100
+shot leg3 res://tools/_probe/puca_route_probe.tscn --out={out}/report.json --max-wall=1100
