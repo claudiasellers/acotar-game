@@ -28,6 +28,13 @@ const ROWS := {
 		{"name": "SummerFaerieTriage", "script": "res://story/act3/summer/summer_faerie_triage.gd"},
 		{"name": "SummerFaerieGrave", "script": "res://story/act3/summer/summer_faerie_grave.gd"},
 	],
+	# L45: the bruise on her neck, from the hallway until the paintings (ch21-22).
+	&"manor_kitchen_hall": [{"name": "BruiseMark", "script": "res://story/act5/calanmai/bruise_mark.gd"}],
+	# L45: Calanmai on the hill (bonfires, drums, revelers), the white roses in her
+	# painting room, and the canvas Tamlin keeps in his bedchamber.
+	&"calanmai_bonfires": [{"name": "CalanmaiNight", "script": "res://story/act5/calanmai/calanmai_night.gd"}],
+	&"painting_room_easel": [{"name": "WhiteRosesVase", "script": "res://story/act5/calanmai/white_roses_vase.gd"}],
+	&"manor_tamlin_room": [{"name": "KeptCanvas", "script": "res://story/act5/calanmai/kept_canvas.gd"}],
 }
 const ANCHORS := [&"suriel_snare", &"manor_study_mural"]
 

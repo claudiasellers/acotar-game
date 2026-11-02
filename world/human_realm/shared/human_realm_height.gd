@@ -52,22 +52,31 @@ static func texture_at(x: float, z: float) -> Vector3i:
 	# the snow overlay's weight over the mud (0 bare mud .. 255 all snow).
 	var n := _vnoise(x * 0.35, z * 0.35) * 0.65 + _vnoise(x * 1.3, z * 1.3) * 0.35  # 0..1
 	var snow := 255.0
+	var wet := false  # dark wet ground: ruts and slush puddles
 	var dr := HumanRealmLayout.distance_to_road(p)
 	var hw := HumanRealmLayout.ROAD_HALF_WIDTH
-	if dr < hw + 3.5:
-		# Wheel ruts 0.9 m either side of the crown stay bare and wet; the
-		# crown between them and the verges carry more snow.
+	if dr < hw + 4.5:
+		# Wheel ruts 0.9 m either side of the crown stay bare, dark and wet;
+		# the crown between them and the verges carry more snow. The verge
+		# breaks up into clumps and tongues of snow (two noise scales), so
+		# the road never reads as a smooth brown band.
 		var rut := 1.0 - clampf(absf(dr - 0.9) / 0.6, 0.0, 1.0)
-		var verge := smoothstep(hw * 0.55, hw + 2.5, dr + (n - 0.5) * 2.2)
-		snow = minf(snow, lerpf(75.0, 255.0, verge) * (1.0 - 0.7 * rut) + (35.0 if dr < 0.45 else 0.0))
+		var clumps := _vnoise(x * 0.9 + 7.0, z * 0.9 - 3.0)
+		var verge := smoothstep(hw * 0.45, hw + 2.0, dr + (n - 0.5) * 3.6 + (clumps - 0.5) * 2.2)
+		snow = minf(snow, lerpf(70.0, 255.0, verge) * (1.0 - 0.75 * rut) + (40.0 if dr < 0.45 else 0.0))
+		var puddle := _vnoise(x * 0.45 - 13.0, z * 0.45 + 21.0)
+		wet = (rut > 0.45 or puddle > 0.72) and verge < 0.5
 	var ds := p.distance_to(HumanRealmLayout.VILLAGE_SQUARE)
 	if ds < 60.0:
 		# Footpaths of slush across a trampled square; the edge frays out.
 		var edge := 42.0 + (n - 0.5) * 12.0
-		var trodden := lerpf(55.0, 150.0, smoothstep(0.35, 0.7, _vnoise(x * 0.6 + 17.0, z * 0.6 - 9.0)))
-		snow = minf(snow, lerpf(trodden, 255.0, smoothstep(edge - 7.0, edge + 7.0, ds)))
+		var trodden := lerpf(45.0, 140.0, smoothstep(0.35, 0.7, _vnoise(x * 0.6 + 17.0, z * 0.6 - 9.0)))
+		var sq_snow := lerpf(trodden, 255.0, smoothstep(edge - 7.0, edge + 7.0, ds))
+		if sq_snow < snow:
+			snow = sq_snow
+			wet = wet or (_vnoise(x * 0.5 + 3.0, z * 0.5 + 8.0) > 0.74 and ds < edge - 4.0)
 	if snow < 250.0:
-		return Vector3i(T.PATH, T.SNOW, int(clampf(snow, 0.0, 255.0)))
+		return Vector3i(T.RIVERBED if wet else T.PATH, T.SNOW, int(clampf(snow * (0.6 if wet else 1.0), 0.0, 255.0)))
 	if p.distance_to(HumanRealmLayout.BURNT_ESTATE) < 40.0:
 		return Vector3i(T.FROZEN_EARTH, T.SNOW, 110)
 	var dpath := HumanRealmLayout.distance_to_path(p)

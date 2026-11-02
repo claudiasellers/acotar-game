@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"apple": Vector3(-2.4, 0.92, -2.8),
+"bread": Vector3(-2.8, 0.92, -3.1),
+"table": Vector3(-2.4, 0, -3),
+"tart": Vector3(-2, 0.92, -3.2)
+}
+lines = {
+"empty": {"text": "The kitchen's empty. Bread, an apple, a lemon tart.", "who": ""},
+"fed": {"text": "Better. Now the painting room, where I can't think about any of it.", "who": ""}
+}
+invented = PackedStringArray("fed")
+canon = "Ch21 (Keeper, [C]): hungry, she eats in 'the empty kitchen': bread, an apple, a lemon tart. Then she walks toward her painting room."

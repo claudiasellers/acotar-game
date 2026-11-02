@@ -15,6 +15,8 @@ const HEDGE_H := 3.0
 
 # --- Materials (manor glare fix: stone and gravel stay <= 0.85 albedo) ---------
 
+const GARDEN_WATER := preload("res://world/spring_court/manor_estate/gardens/garden_water.gdshader")
+
 ## The walks: the drive's blush gravel shader, so the estate reads as one.
 static func walk() -> Material:
 	return ManorForecourt.drive_gravel()
@@ -44,20 +46,15 @@ static func lawn() -> Material:
 	return EstateKit.mat(Color(0.40, 0.66, 0.40), 0.9, 0.0, "garden_lawn")
 
 
-## Still mirror water for the reflecting pool (sky shows in it).
+## Still water for the reflecting canal: deep looking down, a rippled mirror of
+## the sky at a glance (garden_water.gdshader; L35-6, audit E2).
 static func mirror_water() -> Material:
 	var key := "garden_mirror_water"
 	if EstateKit._materials.has(key):
 		return EstateKit._materials[key]
-	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.46, 0.56, 0.80, 0.9)
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.roughness = 0.0
-	m.metallic = 0.85
-	m.metallic_specular = 0.8
-	m.rim_enabled = true
-	m.rim = 0.3
-	m.rim_tint = 0.6
+	var m := ShaderMaterial.new()
+	m.shader = GARDEN_WATER
+	m.resource_name = key
 	EstateKit._materials[key] = m
 	return m
 

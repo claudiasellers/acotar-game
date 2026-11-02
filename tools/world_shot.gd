@@ -10,7 +10,9 @@ extends Node
 
 ## shot id: [camera position, look-at point, time of day 0-1, grade, optional eye height]
 const SHOTS := {
-	"cottage_snow": [Vector3(-112, 0, 2152), Vector3(-150, 0, 2161), 0.42, &"human_winter"],
+	# From the cottage pad in front of the door (the old eye stood 5 m below
+	# the pad and saw only the rise; lane L32).
+	"cottage_snow": [Vector3(-137.5, 0, 2181.6), Vector3(-151, 0, 2158), 0.42, &"human_winter"],
 	"village_market": [Vector3(345, 0, 2210), Vector3(385, 0, 2252), 0.5, &"human_winter"],
 	"wall_seam": [Vector3(-110, 0, 1470), Vector3(-100, 0, 1380), 0.62, &"human_winter"],
 	"hunting_forest": [Vector3(-380, 0, 1690), Vector3(-420, 0, 1722), 0.35, &"human_winter"],
