@@ -32,6 +32,15 @@ whole phase (Feyre's hall map in p3), so the mode is the test, not whether a spa
 deed to end. There are at least 5 s between ambient lines and 25 s before the same speaker speaks
 again. A speaker greets her once per approach (within 4.5 m); she has to step 9 m away to re-arm.
 
+Nesta, Elain and their father speak only face to face (L34-5, `DialogueDirector.face_to_face`):
+Feyre and the speaker both inside the cottage (the `act1_cottage_interior` anchor's floor box,
+`COTTAGE_FLOOR`), within 4.5 m flat, and the speaker on her camera: their head within 32° of the
+view's centre with nothing between the camera and them. Never from the yard through the wall,
+across the room, or behind her back. Their greeting isn't spent until then, so it comes the
+moment she turns to them; their deed lines (up to 120 s) and follow-ups (up to 20 s) wait the same
+way. Her own thoughts, and everyone else, are unchanged. Staged scene beats (`say_beat`) aren't
+gated: the scene frames them itself.
+
 Tamlin, Lucien and Alis leave their free-roam spots while a scene holds control or the story has spawned
 its own `story_actor_<id>` for them, so they never double. Nesta, Elain and their father stay in
 the cottage for the beast scene, because its `gather` cue moves them.
