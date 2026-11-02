@@ -1,0 +1,4 @@
+from lane/shots
+quality look
+timeout 900
+shot bath res://tools/playtest/bath_shot.tscn --from=manor --stop-after=act2_bath --out={out}/report.json
