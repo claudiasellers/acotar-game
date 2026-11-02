@@ -1,0 +1,4 @@
+from map-lane
+quality look
+timeout 600
+shot petals res://tools/map_wayfind_clip.tscn {out} spring_toward realtime
