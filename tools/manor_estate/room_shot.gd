@@ -1,0 +1,73 @@
+## Screenshots of furnished manor rooms from two corners each (L38 review shots).
+##   godot res://tools/manor_estate/room_shot.tscn -- <room[@level]>[,<room>...] [out_dir]
+## Loads the real estate, then stands a camera at eye height in a room's
+## corners, looking across it, and saves room_<id>_<a|b>.png. Day light from
+## the estate's preview sky through the windows, plus the rooms' own lamps.
+extends Node
+
+const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
+const EYE := 1.65
+const INSET := 0.9
+
+
+func _ready() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	var args := OS.get_cmdline_user_args()
+	var which: PackedStringArray = (args[0] if args.size() > 0 else "dining_hall").split(",")
+	var out := args[1] if args.size() > 1 else OS.get_environment("SHOTS_OUT")
+	if out == "":
+		out = "user://"
+	var estate := (load(ESTATE) as PackedScene).instantiate()
+	get_tree().root.add_child(estate)
+	get_tree().current_scene = estate
+	if estate.get(&"feyre") == null:
+		estate.call(&"_add_preview_environment")
+	var feyre = estate.get(&"feyre")
+	if feyre is Node3D:
+		(feyre as Node3D).visible = false
+	var cam := Camera3D.new()
+	cam.fov = 72.0
+	cam.far = 200.0
+	estate.add_child(cam)
+	cam.make_current()
+	await _frames(30)
+	var settle := 3.0 if OS.get_environment("SHOTS_QUALITY") == "look" else 0.5
+	var rooms := {}
+	for layout in ManorHouseBuilder.load_layouts():
+		for r: ManorRoomDef in layout.rooms:
+			rooms["%s@%d" % [r.id, r.level]] = r
+			if not rooms.has(String(r.id)):
+				rooms[String(r.id)] = r
+	for key in which:
+		var r: ManorRoomDef = rooms.get(key)
+		if r == null:
+			push_error("room_shot: no room %s" % key)
+			continue
+		var y := ManorHouseBuilder.floor_y(r.level)
+		var lo := r.rect.position + Vector2(INSET, INSET)
+		var hi := r.rect.end - Vector2(INSET, INSET)
+		var views := {"a": [lo, hi], "b": [hi, lo]}
+		for tag: String in views:
+			var from: Vector2 = views[tag][0]
+			var to: Vector2 = views[tag][1]
+			var aim := from.lerp(to, 0.65)
+			cam.global_position = Vector3(from.x, y + EYE, from.y)
+			cam.look_at(Vector3(aim.x, y + 0.9, aim.y), Vector3.UP)
+			await _seconds(settle)
+			await RenderingServer.frame_post_draw
+			var path := out.path_join("room_%s_L%d_%s.png" % [r.id, r.level, tag])
+			get_tree().root.get_texture().get_image().save_png(path)
+			print("saved ", path)
+	get_tree().quit()
+
+
+func _frames(n: int) -> void:
+	for i in n:
+		await get_tree().process_frame
+
+
+func _seconds(s: float) -> void:
+	await get_tree().create_timer(s).timeout
