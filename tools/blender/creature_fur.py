@@ -157,6 +157,10 @@ def sculpt_wolf(body, g, spec):
             d_up, t_up = seg_dist(p, head, snout)
             if p.z < snout.z and abs(n.x) > 0.3:
                 p.z -= 0.1 * hr * bump(abs(t_up - 0.35), 0.25) * ss((abs(n.x) - 0.3) / 0.4)
+            # The snarl: the front of the upper lip is lifted off the teeth,
+            # so the gum line and the tooth row show from the front.
+            if p.z < snout.z and t_up > 0.45 and (abs(n.x) > 0.2 or n.y > 0.3):
+                p.z += 0.09 * hr * ss((t_up - 0.45) / 0.3) * ss((snout.z - p.z) / (0.2 * hr))
             if p.y > head.y + 0.2 * hr and p.z > snout.z:
                 p.z = snout.z + (p.z - snout.z) * 0.78
             if p.y > head.y:
@@ -285,7 +289,7 @@ def wolf_zones(g, spec):
         if co.y > head.y + 0.1 * hr:
             d_up, t_up = seg_dist(co, head, snout)
             d_lo, t_lo = seg_dist(co, head, jaw)
-            side = ss((abs(n.x) - 0.25) / 0.4)
+            side = max(ss((abs(n.x) - 0.25) / 0.4), ss((n.y - 0.3) / 0.4))
             if d_lo < d_up * 0.95:
                 if n.z > 0.1:
                     wet = ss((n.z - 0.1) / 0.4) * ss((t_lo - 0.2) / 0.3)
@@ -511,6 +515,26 @@ def card_weights_from_roots(obj, cards):
 
 
 # ---------------------------------------------------------------- mouth and eyes
+
+def wedge_nose(obj, r):
+    """Turns the nose ball into leather: a flat top sloping to a broad front
+    pad, and a groove splitting the nostrils down the middle (mesh space,
+    before the object's scale is applied)."""
+    for v in obj.data.vertices:
+        c = v.co
+        # Top slopes down toward the front: a wedge, not a dome.
+        cap = r * (0.55 - 0.45 * max(c.y, 0.0) / r)
+        if c.z > cap:
+            c.z = cap + (c.z - cap) * 0.25
+        # Broad, flat front pad.
+        if c.y > r * 0.6:
+            c.y = r * 0.6 + (c.y - r * 0.6) * 0.4
+        # The philtrum: a groove up the middle of the front and underside.
+        if c.y > 0.0 and c.z < r * 0.3:
+            c.y -= r * 0.3 * bump(abs(c.x), r * 0.22) * ss(c.y / r)
+            c.z += r * 0.12 * bump(abs(c.x), r * 0.22) * ss(-c.z / r)
+        v.co = c
+
 
 def ear_plate(name, base, tip, radius, mat, flat=0.4):
     """A wolf ear: a six-sided cone flattened front to back, cupped forward."""

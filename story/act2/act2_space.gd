@@ -128,11 +128,14 @@ func actor(actor_id: StringName) -> Node3D:
 	return raw as Node3D
 
 
-## Removes an actor this scene placed (only its own stand-ins are freed).
+## Removes an actor this scene placed (only its own stand-ins are freed). It
+## leaves the story_actor group at once: queue_free waits a frame, and a scene
+## casting the same character in that frame must not be handed the dying node.
 func dismiss(actor_id: StringName) -> void:
 	var who := actor(actor_id)
 	actors.erase(actor_id)
 	if who and is_ancestor_of(who):
+		who.remove_from_group(StringName("story_actor_%s" % actor_id))
 		who.queue_free()
 
 

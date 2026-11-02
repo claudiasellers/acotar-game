@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"crab_apple": Vector3(11, 2.6, -3),
+"fountain": Vector3(0, 0, -12.5),
+"lucien_behind": Vector3(-1.4, 0, -3.6),
+"lucien_exit": Vector3(-16, 0, 8),
+"lucien_rim": Vector3(-1.6, 0, -7.2),
+"lucien_wade": Vector3(-0.9, 0, -10.1),
+"tamlin_behind": Vector3(0.8, 0, -4)
+}
+lines = {
+"crab_apple_thought": {"text": "His hands on my shoulders. I looked at a blossoming crab apple tree.", "who": ""},
+"irises_thought": {"text": "I hauled my paints and easel out to paint one of the beds of irises.", "who": ""},
+"lucien_brand": {"text": "They branded him behind the ear with a sigil... A mountain with three stars.", "who": "Lucien"},
+"lucien_not_autumn": {"text": "Not Autumn Court... I don't recognize him at all.", "who": "Lucien"},
+"no_mask": {"text": "No mask. So he wasn't a part of the Spring Court.", "who": ""},
+"paints_thought": {"text": "He knelt and helped me pick up my paints.", "who": ""},
+"something_wrong": {"text": "The birds had gone quiet.", "who": ""},
+"tamlin_court_posturing": {"text": "Court posturing. Their lord's idea of a joke.", "who": "Tamlin"},
+"tamlin_night_court": {"text": "Night Court.", "who": "Tamlin"},
+"tamlin_still_safe": {"text": "You're still safe.", "who": "Tamlin"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("something_wrong")
+canon = "Ch24 [C] (Keeper): the next morning she hauls her paints out to paint the irises; the head is spiked on the heron's upraised bill; no mask, so not Spring; she backs into Tamlin, Lucien pale and grim beside him; Lucien wades in, finds the sigil behind the ear (a mountain with three stars); Tamlin: \"Night Court.\" Lucien climbs the heron's wing and yanks the head off while Tamlin holds her shoulders and she looks at a blossoming crab apple tree; \"court posturing\", \"You're still safe\"; Lucien leaves with it; Tamlin kneels and helps her pick up her paints. Marks in manor_fountain's frame: the fountain centre is (0, 0, -12.5)."

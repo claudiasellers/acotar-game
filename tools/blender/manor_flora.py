@@ -21,7 +21,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 import bpy  # noqa: E402,I001
 import prop_kit as K  # noqa: E402
-from prop_kit import (BARK, BUTTER, LEAF, LEAF_DARK, R, S, SAGE_DEEP, SAGE_LIGHT, SAGE_SHADOW, T, WHITE, bloom, ico,  # noqa: E402
+from prop_kit import (BARK, BUTTER, LEAF, LEAF_DARK, R, S, SAGE_DEEP, SAGE_LIGHT, SAGE_SHADOW, T, WHITE, bloom, ico, layered_rose, rose_bud,  # noqa: E402
                       leaf, lighter, lathe, mix, petal, sphere, star_flower, tube, cyl)
 
 OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/models")
@@ -51,24 +51,100 @@ def blob(p, x, y, z, r, col, rng, sub=1, squash=0.85):
 # ------------------------------------------------------------ shrubs
 
 
+# a clipped cushion: (radius, height) fractions, broad shoulders, a soft flat crown
+MASS_PROFILE = [(0.7, 0.0), (0.94, 0.18), (1.0, 0.4), (0.95, 0.6), (0.78, 0.8), (0.44, 0.95), (0.0, 1.0)]
+
+
+def shrub_mass(p, cx, cy, rad, top, col, rng, sides=14, lobes=3, crown=None, bumps=0.0):
+    """A rounded, clipped shrub mass (L35-8): a smooth dome of revolution, its
+    rim gently lobed, so the bush reads as one soft clipped cushion rather than
+    a heap of faceted balls."""
+    prof = [(rad * p0, top * p1) for p0, p1 in MASS_PROFILE]
+    b = lathe(prof, sides, cap_bottom=False)
+    ph = rng.uniform(0, 2 * math.pi)
+    for v in b.verts:
+        a = math.atan2(v.co.y, v.co.x)
+        k = 1.0 + 0.07 * math.cos(lobes * a + ph) + 0.035 * math.cos((lobes + 2) * a - ph) + rng.uniform(-0.015, 0.015)
+        v.co.x *= k
+        v.co.y *= k
+        v.co.z *= 1.0 + 0.05 * math.cos(lobes * a + ph) * (1.0 - v.co.z / top)
+    shade = None
+    if crown is not None:
+        # deeper toward the base, lighter on the sunlit crown, with a little
+        # patchy variation so the clipped face is not one flat colour (L35-10)
+        nr = random.Random(rng.random())
+        ph2 = nr.uniform(0, 6.3)
+
+        def shade(c):
+            t = max(0.0, min(1.0, c.z / top))
+            w = 0.5 + 0.5 * math.sin(7.0 * math.atan2(c.y, c.x) + 9.0 * t + ph2)
+            return mix(mix(col, crown, t ** 1.4), crown if w > 0.5 else col, 0.12 * abs(w - 0.5) * 2)
+    if bumps:
+        # small clipped-leaf lumps on the face, so the silhouette breaks up
+        for v in b.verts:
+            a = math.atan2(v.co.y, v.co.x)
+            k = 1.0 + bumps * (math.sin(9 * a + 5.0 * v.co.z / top + ph) * 0.6 + rng.uniform(-0.6, 0.6))
+            v.co.x *= k
+            v.co.y *= k
+    p.add(b, col, F, T(cx, cy, 0), sharp_deg=89.0, shade=shade)
+
+
+def _mass_point(rad, top, a, s):
+    """A point on shrub_mass's profile at angle a and height fraction s (0..1),
+    and the outward direction there."""
+    for (r0, z0), (r1, z1) in zip(MASS_PROFILE, MASS_PROFILE[1:]):
+        if z0 <= s <= z1:
+            t = (s - z0) / max(z1 - z0, 1e-4)
+            rr = rad * (r0 + (r1 - r0) * t)
+            dz, dr = (z1 - z0) * top, (r1 - r0) * rad
+            n = (dz, -dr)                       # outward normal in (r, z)
+            ln = math.hypot(*n)
+            return (rr * math.cos(a), rr * math.sin(a), s * top), (n[0] / ln, n[1] / ln)
+    return (0.0, 0.0, top), (0.0, 1.0)
+
+
+# a rose's own leaf: deeper and greener than the estate's mint sage (L35-10)
+ROSE_LEAF_BASE = K.hexc("#3D7055")
+ROSE_LEAF_TOP = K.hexc("#8CC390")
+
+
 def rose_bush(p, h, col, rng):
-    """Mounded rose shrub smothered in big cupped blooms: the blooms, not the
-    leaves, carry the colour (rose garden 'dozens of hues', canon ch13)."""
-    r = h * 0.45
-    for i in range(3):
-        a = 2 * math.pi * i / 3 + rng.uniform(-0.2, 0.2)
-        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.42, r * 0.66, LEAF if i % 2 else LEAF_DARK, rng, 1)
-    blob(p, 0, 0, h * 0.68, r * 0.62, mix(LEAF, SAGE_LIGHT, 0.3), rng, 1)
-    n = 14
-    for i in range(n):
-        # golden-angle spiral over the upper dome so blooms never clump
-        a = 2.39996 * i + rng.uniform(-0.15, 0.15)
-        e = math.asin(min(0.97, -0.15 + 1.1 * (i + 0.5) / n))
-        x, y = r * 0.8 * math.cos(a) * math.cos(e), r * 0.8 * math.sin(a) * math.cos(e)
-        z = h * 0.5 + r * 0.72 * math.sin(e)
-        c = col if i % 3 else lighter(col, 0.22)
-        cup_rose(p, (x, y, z), h * 0.15 * rng.uniform(0.9, 1.12), c, rng,
-                 R("Z", math.degrees(a)) @ R("Y", 90 - math.degrees(e) * 0.9))
+    """Rounded, clipped rose shrub (L35-8, L35-10): one gently lobed cushion of
+    deep rose-leaf green, darker at its foot and lighter on the crown, its face
+    broken by small clipped lumps, and roses in clusters (an open head, a
+    half-open one, buds) sunk into the foliage, a few standing proud of the
+    outline. The blooms, not the leaves, carry the colour (rose garden 'dozens
+    of hues', canon ch13). Within the 1,200-tri bush budget."""
+    rad = h * rng.uniform(0.55, 0.65)
+    top = h * 0.86
+    shrub_mass(p, 0.0, 0.0, rad, top, ROSE_LEAF_BASE, rng, sides=20, crown=ROSE_LEAF_TOP, bumps=0.035)
+    # nine clusters on a golden spiral over the upper two thirds: five led by
+    # an open rose, four by a half-open one; each with a bud, and the first
+    # five with a second, half-open head
+    heads = []
+    for c in range(9):
+        a = 2.39996 * c + rng.uniform(-0.15, 0.15)
+        s = 0.32 + 0.6 * (c + 0.5) / 9
+        heads.append((a, s, "open" if c < 5 else "half"))
+        heads.append((a + rng.choice((-1, 1)) * rng.uniform(0.16, 0.24), s + rng.uniform(-0.07, 0.05), "bud"))
+        if c < 5:
+            heads.append((a + rng.uniform(-0.3, 0.3), s - rng.uniform(0.08, 0.12), "half"))
+    for i, (a, s, stage) in enumerate(heads):
+        s = max(0.3, min(0.95, s))
+        (x, y, z), (nr, nz) = _mass_point(rad, top, a, s)
+        e = math.degrees(math.atan2(nz, nr))     # 0 = facing out sideways, 90 = up
+        # most heads sit sunk into the leaves; every fourth stands proud of the outline
+        proud = i % 4 == 1
+        c = col if i % 3 else lighter(col, 0.18)
+        rr = h * {"open": 0.2, "half": 0.2, "bud": 0.11}[stage] * rng.uniform(0.9, 1.1)
+        sink = -0.1 if proud else 0.08
+        nx, ny = math.cos(a) * nr, math.sin(a) * nr
+        m = T(x - nx * rr * sink, y - ny * rr * sink, z - nz * rr * sink) @ R("Z", math.degrees(a)) \
+            @ R("Y", 90 - e + rng.uniform(-12, 12))
+        if stage == "bud":
+            rose_bud(p, m, rr, c, F, rng)
+        else:
+            layered_rose(p, m, rr, c, F, rng, inner=3, outer=5 if stage == "open" else 0)
 
 
 def cup_rose(p, center, radius, col, rng, tilt):
@@ -175,16 +251,19 @@ def tulip(p, h, col, rng):
 
 
 def peony(p, h, col, rng):
-    r = h * 0.4
-    for i in range(5):
-        a = 2 * math.pi * i / 5
-        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.38, r * 0.45, LEAF if i % 2 else LEAF_DARK, rng, 1, 0.7)
+    """A clump of peony (L35-8): a low, soft cushion of foliage carrying four
+    big, ruffled, many-petalled heads, never faceted balls and flat discs."""
+    rad = h * 0.55
+    top = h * 0.62
+    shrub_mass(p, 0.0, 0.0, rad, top, ROSE_LEAF_BASE, rng, sides=14, lobes=4,
+               crown=mix(ROSE_LEAF_TOP, SAGE_LIGHT, 0.15), bumps=0.04)
     for i in range(4):
-        a = 2 * math.pi * i / 4 + 0.4
-        x, y = r * 0.6 * math.cos(a), r * 0.6 * math.sin(a)
-        z = h * rng.uniform(0.75, 0.9)
-        bloom(p, (x, y, z), h * 0.17, col if i % 2 else lighter(col, 0.25), 2, 6, rng, finish=F,
-              tilt=R("Z", math.degrees(a)) @ R("Y", 25))
+        a = 2 * math.pi * i / 4 + 0.4 + rng.uniform(-0.2, 0.2)
+        (x, y, z), (nr, nz) = _mass_point(rad, top, a, rng.uniform(0.72, 0.86))
+        e = math.degrees(math.atan2(nz, nr))
+        rr = h * 0.21 * rng.uniform(0.9, 1.08)
+        layered_rose(p, T(x * 0.9, y * 0.9, z + rr * 0.1) @ R("Z", math.degrees(a)) @ R("Y", (90 - e) * 0.6),
+                     rr, col if i % 2 else lighter(col, 0.22), F, rng, inner=4, outer=6)
 
 
 def small_stars(p, h, col, rng, n=7, heart=BUTTER, petals=5):

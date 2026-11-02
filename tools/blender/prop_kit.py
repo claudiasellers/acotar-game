@@ -111,8 +111,11 @@ class Prop:
         self.bm = bmesh.new()
         self.col = self.bm.loops.layers.float_color.new("Col")
 
-    def add(self, part, color, finish="satin", matrix=None, smooth=True, sharp_deg=48.0):
-        """Appends bmesh `part` (consumed) with one colour and finish."""
+    def add(self, part, color, finish="satin", matrix=None, smooth=True, sharp_deg=48.0, shade=None):
+        """Appends bmesh `part` (consumed) with one colour and finish. `shade`,
+        if given, colours each vertex instead: shade(local position before
+        `matrix`) -> RGB (a gradient over a cushion, a petal's paler rim)."""
+        vcol = {v: srgb(shade(v.co.copy())) for v in part.verts} if shade else None
         if matrix is not None:
             part.transform(matrix)
         if smooth:
@@ -133,8 +136,8 @@ class Prop:
                 continue
             nf.material_index = mi
             nf.smooth = f.smooth
-            for loop in nf.loops:
-                loop[self.col] = c
+            for loop, ov in zip(nf.loops, f.verts):
+                loop[self.col] = vcol[ov] if vcol else c
         if smooth:
             # carry sharp edges across
             for e in part.edges:
@@ -310,10 +313,13 @@ def lathe(profile, n=12, cap_bottom=True, cap_top=True):
             continue
         for i in range(n):
             j = (i + 1) % n
+            # the tip fans wind the same way as the quads, so they face out
+            # like the rest of the surface (L35-8: they faced in, which shaded
+            # every pointed tip and dome crown flat and dark)
             if len(a) == 1:
-                bm.faces.new((a[0], b[i], b[j]))
+                bm.faces.new((a[0], b[j], b[i]))
             elif len(b) == 1:
-                bm.faces.new((a[i], b[0], a[j]))
+                bm.faces.new((a[i], a[j], b[0]))
             else:
                 bm.faces.new((a[i], a[j], b[j], b[i]))
     if cap_bottom and len(rings[0]) > 2:
@@ -544,6 +550,60 @@ def round_petal(length, width, cup=0.3, curl=0.1):
         bm.faces.new((a[0], a[1], b[1], b[0]))
         bm.faces.new((a[1], a[2], b[2], b[1]))
     return bm
+
+
+def _petal_rim(color, length, width, rim=0.3):
+    """Shade for a round_petal: the colour deepening a touch toward the base
+    and paling to a thin, soft rim at the edge and tip, so a petal reads as a
+    thin, lit sheet at arm's length rather than a cut-out plate (L35-10)."""
+    base = darker(color, 0.1)
+    edge = lighter(color, rim)
+
+    def shade(co):
+        t = max(0.0, min(1.0, co.x / max(length, 1e-6)))
+        side = min(1.0, abs(co.y) / max(width * 0.5, 1e-6))
+        e = max(t * t, side * side * 0.9)
+        c = mix(base, color, min(1.0, t * 2.2))
+        return mix(c, edge, e * 0.85)
+    return shade
+
+
+def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5):
+    """A full garden rose in layers (L35-8), facing +Z under matrix m: a
+    furled, swirled heart, a ring of upright cupped petals round it and a
+    ring of broad petals rolling open beneath, each ring turned half a step
+    so the bloom's outline is scalloped and round, never a flat polygon.
+    Petals pale to a soft rim (L35-10). About 15 + 8 per petal tris."""
+    rng = rng or random.Random(5)
+    heart = darker(color, 0.16)
+    prop.add(lathe([(r * 0.24, r * 0.12), (r * 0.2, r * 0.42), (0.0, r * 0.52)], 5, cap_bottom=False),
+             heart, finish, m @ R("Z", rng.uniform(0, 72)), sharp_deg=89.0)
+    a0 = rng.uniform(0, 360)
+    ci = mix(color, heart, 0.35)
+    for i in range(inner):
+        a = a0 + 360 / inner * i + rng.uniform(-10, 10)
+        prop.add(round_petal(r * 0.62, r * 0.8, cup=0.55, curl=-0.1), ci, finish,
+                 m @ R("Z", a) @ T(r * 0.06, 0, r * 0.1) @ R("Y", -64), sharp_deg=89.0,
+                 shade=_petal_rim(ci, r * 0.62, r * 0.8, 0.22))
+    co = lighter(color, 0.05)
+    for i in range(outer):
+        a = a0 + 180 / max(outer, 1) + 360 / max(outer, 1) * i + rng.uniform(-8, 8)
+        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.4, curl=-0.12), co, finish,
+                 m @ R("Z", a) @ T(r * 0.1, 0, 0) @ R("Y", -34), sharp_deg=89.0,
+                 shade=_petal_rim(co, r * 0.98, r * 1.05))
+
+
+def rose_bud(prop, m, r, color, finish="fabric", rng=None):
+    """A furled rose bud facing +Z under matrix m (L35-10): a plump, pointed
+    swirl of deeper colour in a cup of green sepals' worth of shade at its
+    base. 20 tris."""
+    rng = rng or random.Random(5)
+    deep = darker(color, 0.12)
+    tip = lighter(color, 0.1)
+    prop.add(lathe([(0.0, -r * 0.1), (r * 0.42, r * 0.22), (r * 0.36, r * 0.72), (0.0, r * 1.15)], 5,
+                   cap_bottom=False, cap_top=False), deep, finish,
+             m @ R("Z", rng.uniform(0, 72)) @ R("X", rng.uniform(-8, 8)), sharp_deg=89.0,
+             shade=lambda c: mix(mix(LEAF_DARK, deep, min(1.0, (c.z / r + 0.1) * 3.0)), tip, max(0.0, c.z / r - 0.5)))
 
 
 def soft_rose(prop, m, r, color, finish="fabric", rng=None, petals=3, sides=8):

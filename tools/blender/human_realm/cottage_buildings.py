@@ -24,6 +24,13 @@ FOOT = -1.2            # stone footing depth
 DOOR = (-2.4, -1.4, 0.0, 1.95)
 WIN_FRONT = (1.0, 1.8, 0.9, 1.7)
 WIN_BACK = (-1.0, -0.2, 0.9, 1.7)
+# The sisters' room [C ch 1: two rooms, a small second room with a door]: the
+# back-west corner behind a timber-framed partition, under the tie beams.
+PART_Z = -0.6          # north partition centre (x from the west wall to PART_X)
+PART_X = -1.1          # east partition centre (z from PART_Z to the back wall)
+PART_T = 0.12
+PART_H = H - 0.24      # up to the tie beams' underside
+BED_DOOR = (-2.65, -1.75, 0.0, 1.9)
 
 
 def wallcol(p, _n):
@@ -56,6 +63,40 @@ def gable(x0, x1, collision=False):
     L.poly(v, f, col=L.PLASTER, col_fn=None if collision else wallcol, collision=collision)
 
 
+def partwall(p, _n):
+    """Limewashed wattle and daub, scuffed low down."""
+    c = L.mottled((0.66, 0.63, 0.56), 0.05, 4)(p, _n)
+    t = max(0.0, (0.5 - p[1]) / 0.5)
+    return tuple(c[k] * (1.0 - 0.18 * t) for k in range(3))
+
+
+def partition(collision):
+    x0, z1 = -HX + T, HZ - T
+    zn0, zn1 = PART_Z - PART_T / 2, PART_Z + PART_T / 2
+    xe0, xe1 = PART_X - PART_T / 2, PART_X + PART_T / 2
+    for a, b in ((x0, BED_DOOR[0]), (BED_DOOR[1], xe1)):
+        L.box((b - a, PART_H, PART_T), at=((a + b) / 2, PART_H / 2, PART_Z), col_fn=None if collision else partwall, collision=collision)
+    L.box((BED_DOOR[1] - BED_DOOR[0], PART_H - BED_DOOR[3], PART_T), at=((BED_DOOR[0] + BED_DOOR[1]) / 2, (PART_H + BED_DOOR[3]) / 2, PART_Z),
+          col_fn=None if collision else partwall, collision=collision)
+    L.box((PART_T, PART_H, z1 - zn1), at=(PART_X, PART_H / 2, (zn1 + z1) / 2), col_fn=None if collision else partwall, collision=collision)
+    if collision:
+        return
+    # Timber frame: corner and jamb posts, a head plate, a sill board, the lintel.
+    for x in (x0 + 0.06, BED_DOOR[0] - 0.05, BED_DOOR[1] + 0.05, PART_X):
+        L.box((0.1, PART_H, PART_T + 0.04), at=(x, PART_H / 2, PART_Z), col=L.TIMBER, jitter=0.004)
+    L.box((PART_T + 0.04, PART_H, 0.1), at=(PART_X, PART_H / 2, z1 - 0.05), col=L.TIMBER, jitter=0.004)
+    L.box((xe1 - x0, 0.1, PART_T + 0.05), at=((x0 + xe1) / 2, PART_H - 0.05, PART_Z), col=L.TIMBER)
+    L.box((PART_T + 0.05, 0.1, z1 - zn0), at=(PART_X, PART_H - 0.05, (zn0 + z1) / 2), col=L.TIMBER)
+    L.box((BED_DOOR[1] - BED_DOOR[0] + 0.2, 0.12, PART_T + 0.05), at=((BED_DOOR[0] + BED_DOOR[1]) / 2, BED_DOOR[3] + 0.06, PART_Z), col=L.TIMBER)
+    for (a, b) in ((x0, BED_DOOR[0] - 0.1), (BED_DOOR[1] + 0.1, xe0)):
+        L.box((b - a, 0.12, PART_T + 0.03), at=((a + b) / 2, 0.06, PART_Z), col=L.TIMBER_OLD)
+    L.box((PART_T + 0.03, 0.12, z1 - zn1), at=(PART_X, 0.06, (zn1 + z1) / 2), col=L.TIMBER_OLD)
+    # A mid rail and a brace in each panel, as in the outer walls.
+    L.box((PART_T + 0.03, 0.1, z1 - zn1), at=(PART_X, 1.2, (zn1 + z1) / 2), col=L.TIMBER)
+    L.box((0.1, 1.5, PART_T + 0.03), at=(-3.3, 1.45, PART_Z), rot=(0, 0, 34), col=L.TIMBER)
+    L.box((PART_T + 0.03, 1.3, 0.1), at=(PART_X, 1.85, 1.25), rot=(-30, 0, 0), col=L.TIMBER)
+
+
 def shell(collision):
     wall_x(-HZ, -HZ + T, -HX, HX, FOOT, H, [DOOR, WIN_FRONT], collision)
     wall_x(HZ - T, HZ, -HX, HX, FOOT, H, [WIN_BACK], collision)
@@ -63,6 +104,7 @@ def shell(collision):
     wall_z(HX - T, HX, -HZ + T, HZ - T, FOOT, H, collision)
     gable(-HX, -HX + T, collision)
     gable(HX - T, HX, collision)
+    partition(collision)
     L.box((2 * HX, 0.3, 2 * HZ), at=(0, -0.15, 0), col=L.EARTH, col_fn=L.mottled(L.EARTH, 0.05, 2), collision=collision)
 
 
@@ -351,4 +393,8 @@ if __name__ == "__main__":
     L.reset()
     for fn in (cottage, door_intact, door_broken, outhouse, woodpile, chopping_block, elain_garden, rain_barrel,
                snares_hanging, drying_rack, scarecrow, shepherd_hut_ruin, frozen_pond, drystone_wall):
+        # `-- name ...` rebuilds only those.
+        only = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+        if only and fn.__name__ not in only:
+            continue
         fn()

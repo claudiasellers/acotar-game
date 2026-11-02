@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://characters/cast/cast_model.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://characters/alis/model/alis.glb" id="2_glb"]
 [ext_resource type="Shader" path="res://characters/feyre/feyre_skin.gdshader" id="3_skin"]
 [ext_resource type="Texture2D" path="res://characters/alis/model/makeup_mask_a.png" id="4_mask_a"]
 [ext_resource type="Texture2D" path="res://characters/alis/model/makeup_mask_b.png" id="5_mask_b"]
+[ext_resource type="Script" path="res://characters/alis/true_form/alis_true_form.gd" id="6_true"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_head"]
 resource_name = "skin_head"
@@ -33,3 +34,6 @@ held_props = PackedStringArray()
 
 [node name="alis" parent="." instance=ExtResource("2_glb")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="TrueForm" type="Node" parent="."]
+script = ExtResource("6_true")

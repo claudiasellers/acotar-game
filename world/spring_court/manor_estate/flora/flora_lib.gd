@@ -134,6 +134,12 @@ static func is_model(species: StringName) -> bool:
 	return ResourceLoader.exists(PropModels.FLORA_DIR + String(species) + ".glb")
 
 
+## The clipped rose bushes and peonies (L35-8): leafy cushions set with blooms.
+static func is_rose_cushion(species: StringName) -> bool:
+	var sid := String(species)
+	return (sid.begins_with("rose_") and kind_of(species) == &"bush") or sid.begins_with("peony")
+
+
 ## One stylized_foliage material per modelled species (colour from vertex colours,
 ## sway from height).
 static func foliage_material(species: StringName) -> ShaderMaterial:
@@ -146,5 +152,12 @@ static func foliage_material(species: StringName) -> ShaderMaterial:
 	m.set_shader_parameter(&"sparkle", SPARKLE.get(species, 0.1))
 	var kind := kind_of(species)
 	m.set_shader_parameter(&"translucency", 0.45 if kind in [&"flower", &"climber", &"reed"] else 0.3)
+	if is_rose_cushion(species):
+		# clipped rose-leaf texture and soft petal rims (L35-10)
+		m.set_shader_parameter(&"leaf_noise", 1.0)
+		m.set_shader_parameter(&"leaf_scale", 11.0)
+		m.set_shader_parameter(&"leaf_bump", 0.6)
+		m.set_shader_parameter(&"leaf_lump", 0.035)
+		m.set_shader_parameter(&"petal_rim", 0.55)
 	m.resource_name = "flora_" + String(species)
 	return m

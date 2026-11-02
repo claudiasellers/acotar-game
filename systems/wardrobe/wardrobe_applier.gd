@@ -6,22 +6,57 @@ extends Node
 
 const REGIONS: Array[StringName] = [&"torso", &"arms", &"legs", &"feet", &"hands", &"head"]
 
+## The Feyre that owns this applier, or null when it dresses a bare model (dress()).
 var feyre: Feyre
+## The node her model hangs under: Feyre.model, or a bare feyre_model.tscn instance.
+var model: Node3D
+## What she wears: Gameplay.wardrobe in play; dress() defaults to a fresh Wardrobe
+## (her starting p0 outfit, Wardrobe.STARTING_PIECES).
+var wardrobe: Wardrobe
 var _worn: Node3D
+
+
+## Dresses a bare feyre_model.tscn instance (world shots, cutscenes, previews) through the
+## same path as the game: worn pieces bound to her skeleton, covered regions hidden.
+## With no `outfit`, her default Act I clothes.
+static func dress(feyre_model: Node3D, outfit: Wardrobe = null) -> WardrobeApplier:
+	var a := WardrobeApplier.new()
+	a.name = "WardrobeApplier"
+	a.model = feyre_model
+	a.wardrobe = outfit if outfit != null else Wardrobe.new()
+	feyre_model.add_child(a)
+	return a
 
 
 func _ready() -> void:
 	feyre = get_parent() as Feyre
+	if model == null:
+		model = feyre.model if feyre != null else get_parent() as Node3D
+	if wardrobe == null:
+		wardrobe = Gameplay.wardrobe
+	var fm := _feyre_model()
+	if fm != null and not fm.is_node_ready():
+		await fm.ready   # her skin materials and base layer exist from her _ready on
 	_worn = Node3D.new()
 	_worn.name = "Worn"
-	feyre.model.add_child(_worn)
-	Gameplay.wardrobe.changed.connect(apply)
+	model.add_child(_worn)
+	wardrobe.changed.connect(apply)
 	apply()
 
 
 func _exit_tree() -> void:
-	if Gameplay.wardrobe.changed.is_connected(apply):
-		Gameplay.wardrobe.changed.disconnect(apply)
+	if wardrobe != null and wardrobe.changed.is_connected(apply):
+		wardrobe.changed.disconnect(apply)
+
+
+## The FeyreModel node (feyre_model.gd): `model` itself, or its child holding her scene.
+func _feyre_model() -> Node:
+	if model.has_method(&"set_hair"):
+		return model
+	for c in model.get_children():
+		if c.has_method(&"set_hair"):
+			return c
+	return null
 
 
 func apply() -> void:
@@ -31,7 +66,7 @@ func apply() -> void:
 		c.queue_free()
 	var skeleton := _skeleton()
 	var hidden: Array[StringName] = []
-	for p in Gameplay.wardrobe.worn_pieces():
+	for p in wardrobe.worn_pieces():
 		hidden.append_array(p.hides_body_regions)
 		if skeleton and p.mesh_path != "" and ResourceLoader.exists(p.mesh_path):
 			_attach_skinned(p, skeleton)
@@ -45,11 +80,8 @@ func apply() -> void:
 ## Her chosen hairstyle on the FeyreModel. Until a style's glb exists she
 ## keeps the hair she has (the model's default braid).
 func _apply_hair() -> void:
-	var body: Node = null
-	for c in feyre.model.get_children():
-		if c.has_method(&"set_hair"):
-			body = c
-	var style := WardrobeCatalog.hair(Gameplay.wardrobe.hair)
+	var body := _feyre_model()
+	var style := WardrobeCatalog.hair(wardrobe.hair)
 	if style and body and ResourceLoader.exists(style.mesh_path) \
 			and body.get_meta(&"hair_path", "") != style.mesh_path:
 		body.call(&"set_hair", style.mesh_path)
@@ -57,7 +89,7 @@ func _apply_hair() -> void:
 
 
 func _skeleton() -> Skeleton3D:
-	var found := feyre.model.find_children("*", "Skeleton3D", true, false)
+	var found := model.find_children("*", "Skeleton3D", true, false)
 	return found[0] as Skeleton3D if found.size() > 0 else null
 
 
@@ -180,13 +212,16 @@ func _sphere(r: float) -> SphereMesh:
 func _hide_regions(hidden: Array[StringName]) -> void:
 	var head_skin: Material = null
 	var body_skin: Material = null
-	for c in feyre.model.get_children():
-		if c.get(&"skin_head_material") != null:
-			head_skin = c.get(&"skin_head_material")
-			body_skin = c.get(&"skin_body_material")
-	for mi in feyre.model.find_children("*", "MeshInstance3D", true, false):
+	var fm := _feyre_model()
+	if fm != null and fm.get(&"skin_head_material") != null:
+		head_skin = fm.get(&"skin_head_material")
+		body_skin = fm.get(&"skin_body_material")
+	if fm != null and fm.has_method(&"cover_base_layer"):
+		fm.call(&"cover_base_layer", hidden)   # her linen shift shows where nothing covers her
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var mesh_instance := mi as MeshInstance3D
-		if mesh_instance.has_meta(&"wardrobe") or mesh_instance.get_parent() == _worn or mesh_instance.mesh == null:
+		if mesh_instance.has_meta(&"wardrobe") or mesh_instance.has_meta(&"base_layer") \
+				or mesh_instance.get_parent() == _worn or mesh_instance.mesh == null:
 			continue
 		var mesh := mesh_instance.mesh as ArrayMesh
 		if mesh == null:
@@ -203,8 +238,8 @@ func _hide_regions(hidden: Array[StringName]) -> void:
 
 ## Sets <channel>_color/_amount/_sheen on any ShaderMaterial on Feyre's body.
 func _apply_makeup() -> void:
-	var looks := Gameplay.wardrobe.makeup()
-	for mi in feyre.model.find_children("*", "MeshInstance3D", true, false):
+	var looks := wardrobe.makeup()
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var mesh_instance := mi as MeshInstance3D
 		if mesh_instance.mesh == null:
 			continue

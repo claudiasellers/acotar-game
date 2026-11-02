@@ -3938,7 +3938,7 @@ prop_id = &"stillroom_bench"
 script = ExtResource("9_agin8")
 station_id = &"infirmary"
 display_name = "Infirmary Cot"
-position = Vector3(72.5, 0, -36.5)
+position = Vector3(71.4, 0, -34.8)
 prop_id = &"infirmary_cot"
 canon = "C"
 

@@ -28,18 +28,49 @@ uniform vec4 snow_color : source_color = vec4(0.93, 0.95, 1.0, 1.0);
 uniform float sparkle : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 sparkle_color : source_color = vec4(1.0, 0.93, 0.75, 1.0);
 uniform float emission_glow : hint_range(0.0, 4.0) = 0.0;
+// Clipped-leaf texture (L35-10, the manor's rose bushes): a small-leaf noise
+// in albedo and normals, and a little lumpiness, on the green (vertex-colour)
+// parts only, so a clipped cushion reads as foliage, not a smooth pill. Off at 0.
+uniform float leaf_noise : hint_range(0.0, 1.0) = 0.0;
+uniform float leaf_scale = 11.0;
+uniform float leaf_bump : hint_range(0.0, 2.0) = 0.5;
+uniform float leaf_lump = 0.0;
+// Petals pale toward their edges where they turn from view, a thin lit rim
+// rather than a cut-out edge (the non-green parts). Off at 0.
+uniform float petal_rim : hint_range(0.0, 1.0) = 0.0;
 
 varying vec3 world_normal;
 varying vec3 world_pos;
-
-void vertex() {
-	VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.0, max(flex_height, 0.001), VERTEX.y));
-	world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
-	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-}
+varying vec3 leaf_pos;
+varying float leafiness;
 
 float hash3(vec3 p) {
 	return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+}
+
+float vnoise(vec3 p) {
+	vec3 i = floor(p);
+	vec3 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(mix(hash3(i), hash3(i + vec3(1, 0, 0)), f.x), mix(hash3(i + vec3(0, 1, 0)), hash3(i + vec3(1, 1, 0)), f.x), f.y),
+			mix(mix(hash3(i + vec3(0, 0, 1)), hash3(i + vec3(1, 0, 1)), f.x), mix(hash3(i + vec3(0, 1, 1)), hash3(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+}
+
+float leaf_field(vec3 p) {
+	return vnoise(p) * 0.62 + vnoise(p * 2.7 + 7.1) * 0.38;
+}
+
+void vertex() {
+	// green where the vertex colour is clearly green: leaves, not petals
+	leafiness = leaf_noise * smoothstep(1.15, 1.5, COLOR.g / max(max(COLOR.r, COLOR.b), 0.01));
+	// pattern fixed to the plant (not swimming with the wind), offset per instance
+	leaf_pos = VERTEX + MODEL_MATRIX[3].xyz * 0.37;
+	if (leaf_lump > 0.0) {
+		VERTEX += NORMAL * leafiness * leaf_lump * (vnoise(leaf_pos * 3.1) * 2.0 - 1.0);
+	}
+	VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.0, max(flex_height, 0.001), VERTEX.y));
+	world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
+	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
 
 void fragment() {
@@ -47,6 +78,20 @@ void fragment() {
 	vec3 col = albedo.rgb * tex.rgb;
 	if (use_vertex_color) {
 		col *= COLOR.rgb;
+	}
+	if (leafiness > 0.001) {
+		vec3 lp = leaf_pos * leaf_scale;
+		float h = leaf_field(lp);
+		// little leaves: lighter tips, darker gaps between them
+		col *= mix(1.0, mix(0.8, 1.14, h) * (1.0 - 0.16 * smoothstep(0.42, 0.18, h)), leafiness);
+		float e = 0.08;
+		vec3 g = vec3(leaf_field(lp + vec3(e, 0, 0)) - h, leaf_field(lp + vec3(0, e, 0)) - h, leaf_field(lp + vec3(0, 0, e)) - h) / e;
+		vec3 gv = (VIEW_MATRIX * vec4(g, 0.0)).xyz;
+		NORMAL = normalize(NORMAL - leafiness * leaf_bump * 0.35 * (gv - dot(gv, NORMAL) * NORMAL));
+	}
+	if (petal_rim > 0.0) {
+		float edge = pow(1.0 - abs(dot(NORMAL, VIEW)), 2.0);
+		col = mix(col, min(col * 1.28 + vec3(0.07), vec3(1.0)), edge * petal_rim * (1.0 - leafiness));
 	}
 	float up = clamp(world_normal.y, 0.0, 1.0);
 	float snow = smoothstep(0.35, 0.8, up) * snow_cover * snow_catch;

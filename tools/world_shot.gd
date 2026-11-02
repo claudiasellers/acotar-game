@@ -81,6 +81,7 @@ func _run() -> void:
 		for a in get_tree().get_nodes_in_group(&"story_anchor"):
 			if a.name == &"opening_cottage_dawn":
 				var feyre: Node3D = load("res://characters/feyre/model/feyre_model.tscn").instantiate()
+				WardrobeApplier.dress(feyre)   # her Act I clothes, as in play (L41-4)
 				world.add_child(feyre)
 				feyre.global_transform = (a as Node3D).global_transform
 	if args.has("layout"):

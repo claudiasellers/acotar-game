@@ -410,7 +410,10 @@ func _stairs_and_roof() -> void:
 	dsl.station(&"hearth", "Servants' Hall Fire", 0, Vector3(42.5, 0.0, -41.0), &"fireplace_small", 90.0, "X")
 	dsl.station(&"bread_oven", "Bread Oven", 0, Vector3(59.0, 0.0, -67.2), &"bread_oven", 0.0, "X")
 	dsl.station(&"stillroom", "Stillroom Bench", 0, Vector3(73.3, 0.0, -44.5), &"stillroom_bench", -90.0, "X")
-	dsl.station(&"infirmary", "Infirmary Cot", 0, Vector3(72.5, 0.0, -36.5), &"infirmary_cot", 0.0, "C")
+	# The cot along the south wall, head to the west (L38, F36): the wound scene's
+	# sink (wound_dressing_stage "sink", world 73.55, -35.6) keeps an open
+	# approach from the room, inside the scene's USE_REACH.
+	dsl.station(&"infirmary", "Infirmary Cot", 0, Vector3(71.4, 0.0, -34.8), &"infirmary_cot", 90.0, "C")
 
 	dsl.roof(ManorSitePlan.HOUSE_SERVICE, 2, &"hip", 6.0, EstateKit.SLATE)
 	dsl.roof(Rect2(74, -57, 4, 12), 0, &"flat", 0.6, EstateKit.SLATE)   # porch canopy

@@ -123,3 +123,60 @@ func test_worn_feyre_keeps_the_skin_shader_on_her_face() -> void:
 			var mat := body.get_active_material(i) as ShaderMaterial
 			assert_not_null(mat, "head keeps the skin shader")
 			assert_gt(float(mat.get_shader_parameter("natural_lips_amount")), 0.2)
+
+
+## L41-4 (audit G0): a bare feyre_model.tscn, with no Feyre and no wardrobe, is never unclothed:
+## she wears her linen shift over the torso and legs.
+func test_bare_model_wears_her_linen_shift() -> void:
+	var m := _model()
+	await wait_frames(1)
+	assert_not_null(m.base_layer, "the bare model wears a base layer")
+	var shown := _base_layer_regions(m, false)
+	for r in ["torso", "legs"]:
+		assert_has(shown, r, "%s covered on the bare model" % r)
+
+
+## Dressing a bare model the game's way hides the shift where her clothes cover her,
+## and her clothes cover the torso and legs.
+func test_dressed_bare_model_hides_the_shift_under_her_clothes() -> void:
+	var m := (load(MODEL) as PackedScene).instantiate() as Node3D
+	var applier := WardrobeApplier.dress(m)
+	add_child_autofree(m)
+	await wait_frames(2)
+	var worn := m.get_node_or_null(^"Worn")
+	assert_not_null(worn, "worn pieces bound to the bare model")
+	assert_gt(worn.get_child_count(), 0)
+	var covered: Array[StringName] = []
+	for p in applier.wardrobe.worn_pieces():
+		covered.append_array(p.hides_body_regions)
+	for r in [&"torso", &"legs"]:
+		assert_has(covered, r, "her default outfit covers the %s" % r)
+	assert_eq(_base_layer_regions(m, false), [], "shift hidden under the tunic and trousers")
+
+
+## The cast reuse feyre_model.gd with other bodies: they get no Feyre shift.
+func test_cast_models_have_no_feyre_base_layer() -> void:
+	var path := "res://characters/elain/elain_model.tscn"
+	if not ResourceLoader.exists(path):
+		pending("no elain model")
+		return
+	var c := (load(path) as PackedScene).instantiate() as Node3D
+	add_child_autofree(c)
+	await wait_frames(1)
+	assert_null(c.get(&"base_layer"))
+
+
+## Region names of the base-layer surfaces that are drawn (`hidden` false) or hidden.
+func _base_layer_regions(m: Node3D, hidden: bool) -> Array:
+	var out := []
+	for c in (m.base_layer as Node3D).get_children():
+		var mi := c as MeshInstance3D
+		for i in mi.mesh.get_surface_count():
+			var name: String = m.surface_name_of(mi.mesh, i).trim_prefix("shift_")
+			if name == "fabric":
+				continue
+			var mat := mi.get_surface_override_material(i) as BaseMaterial3D
+			var clear := mat != null and mat.albedo_color.a == 0.0
+			if clear == hidden:
+				out.append(name)
+	return out
