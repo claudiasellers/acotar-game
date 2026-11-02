@@ -19,6 +19,18 @@ const TRACK_STEP := 1.3
 ## L27-6: 0.16 m read as specks past 5 m).
 const PRINT_STEP := 0.6
 const PRINT_LENGTH := 0.22
+## The doe's wander either side of the line (m), and the room she leaves
+## round trunks and rocks (planner, L27-7).
+const WANDER := 0.8
+const OBSTACLE_CLEARANCE := 1.0
+const MAX_DETOUR := 3.5
+## Footprint radius at scale 1 by scatter layer id, first match wins (trees:
+## trunk, from the ForestTrunkCollision radii, rounded up; a spruce by its
+## skirt of low branches, which sweep the snow: cloud shot L27-7).
+const OBSTACLE_RADII := {
+	"boulder": 1.1, "rock": 1.0, "stump": 0.45, "log": 1.2, "deadfall": 1.2,
+	"spruce": 1.7, "tree": 0.4, "pine": 0.4, "snag": 0.35,
+}
 const COTTAGE_GEN := preload("res://world/human_realm/cottage/cottage_gen.gd")
 ## Trodden snow reads by value, not by markers: a cool shadow-blue band
 ## darker than the drifts, with a deeper rut down the middle where the hooves
@@ -85,6 +97,7 @@ func _build_tracks() -> void:
 	var pts := COTTAGE_GEN.deer_trail_points()
 	pts = _resample(pts, PRINT_STEP)
 	pts.append_array(_resample(track_points(), PRINT_STEP))
+	pts = wander_line(pts, trail_obstacles(pts))
 	# Cloven prints as decals (HoofPrint): projected onto the ground actually
 	# drawn, so terrain LOD and snow cover never swallow them, and dark and
 	# deep enough to read from Feyre's walking camera. Pairs alternate sides,
@@ -102,6 +115,121 @@ func _build_tracks() -> void:
 		d.position = Vector3(q.x, WorldHeight.height_at(q.x, q.y), q.y)
 		d.rotation.y = yaw
 		tracks.add_child(d)
+
+
+## The doe's actual path along `line`: a slow wander either side of it (a
+## deer doesn't walk a ruler line) that bends round every trunk and rock in
+## `obstacles` (Vector3(x, z, radius)) with OBSTACLE_CLEARANCE to spare.
+static func wander_line(line: PackedVector2Array, obstacles: Array[Vector3]) -> PackedVector2Array:
+	var n := line.size()
+	if n < 3:
+		return line
+	var normals := PackedVector2Array()
+	var off := PackedFloat32Array()
+	var s := 0.0
+	for i in n:
+		var ahead := line[mini(i + 1, n - 1)] - line[maxi(i - 1, 0)]
+		normals.append(Vector2(ahead.y, -ahead.x).normalized())
+		if i > 0:
+			s += line[i].distance_to(line[i - 1])
+		# Low frequency only: two slow waves, never per-print jitter.
+		off.append(WANDER * (0.7 * sin(s / 14.0 * TAU) + 0.3 * sin(s / 37.0 * TAU + 1.3)))
+	var near := _obstacles_by_point(line, obstacles)
+	for pass_i in 8:
+		var moved := false
+		for i in n:
+			for o: Vector3 in near[i]:
+				var p := line[i] + normals[i] * off[i]
+				var need := o.z + OBSTACLE_CLEARANCE
+				var d := p.distance_to(Vector2(o.x, o.y))
+				if d < need:
+					var away := (p - Vector2(o.x, o.y)).dot(normals[i])
+					off[i] += (1.0 if away >= 0.0 else -1.0) * (need - d + 0.05)
+					moved = true
+		if not moved:
+			break
+		# Spread each detour along the line so the path bends, not kinks.
+		if pass_i < 6:
+			var smooth := PackedFloat32Array(off)
+			for i in n:
+				var sum := 0.0
+				var w := 0.0
+				for k in range(maxi(i - 6, 0), mini(i + 7, n)):
+					var wk := 1.0 - absf(k - i) / 7.0
+					sum += off[k] * wk
+					w += wk
+				smooth[i] = sum / w if absf(off[i]) <= absf(sum / w) + 1.5 else off[i]
+			off = smooth
+	var out := PackedVector2Array()
+	for i in n:
+		var p := line[i] + normals[i] * clampf(off[i], -MAX_DETOUR, MAX_DETOUR)
+		if is_clear(p, near[i], OBSTACLE_CLEARANCE * 0.5):
+			out.append(p)
+	return out
+
+
+## Trunks and rocks near `line` from the human realm's scatter (the same
+## layers ForestTrunkCollision and the rock colliders are built from), as
+## Vector3(x, z, radius). Trees by trunk, rocks, stumps and logs by footprint.
+static func trail_obstacles(line: PackedVector2Array) -> Array[Vector3]:
+	var lo := Vector2(INF, INF)
+	var hi := -lo
+	for p in line:
+		lo = lo.min(p)
+		hi = hi.max(p)
+	lo -= Vector2.ONE * 6.0
+	hi += Vector2.ONE * 6.0
+	var out: Array[Vector3] = []
+	var realm := DirAccess.open("res://world/human_realm")
+	if realm == null:
+		return out
+	for region in realm.get_directories():
+		var dir := "res://world/human_realm/%s/scatter" % region
+		if not DirAccess.dir_exists_absolute(dir):
+			continue
+		for f in DirAccess.get_files_at(dir):
+			var file := f.trim_suffix(".remap")
+			if not file.ends_with(".tres"):
+				continue
+			var r := _obstacle_radius(file.get_basename())
+			var layer := load(dir.path_join(file)) as ScatterLayer
+			if layer == null or layer.is_forage():
+				continue
+			if r <= 0.0 and layer.tags.has("tree"):
+				r = 0.4
+			if r <= 0.0:
+				continue
+			for i in layer.count():
+				var at := layer.position_of(i)
+				if at.x >= lo.x and at.x <= hi.x and at.z >= lo.y and at.z <= hi.y:
+					out.append(Vector3(at.x, at.z, r * layer.instances[i * ScatterLayer.STRIDE + 4]))
+	return out
+
+
+static func is_clear(p: Vector2, obstacles: Array, margin: float) -> bool:
+	for o: Vector3 in obstacles:
+		if p.distance_to(Vector2(o.x, o.y)) < o.z + margin:
+			return false
+	return true
+
+
+static func _obstacle_radius(id: String) -> float:
+	for key: String in OBSTACLE_RADII:
+		if id.contains(key):
+			return OBSTACLE_RADII[key]
+	return 0.0
+
+
+## For each line point, the obstacles within reach of any detour from it.
+static func _obstacles_by_point(line: PackedVector2Array, obstacles: Array[Vector3]) -> Array:
+	var out: Array = []
+	for p in line:
+		var near: Array[Vector3] = []
+		for o in obstacles:
+			if p.distance_to(Vector2(o.x, o.y)) < o.z + OBSTACLE_CLEARANCE + MAX_DETOUR:
+				near.append(o)
+		out.append(near)
+	return out
 
 
 ## A soft-edged ribbon of trodden snow along `line` (world XZ), following the

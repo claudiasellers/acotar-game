@@ -92,3 +92,26 @@ func test_doe_prints_walk_at_a_doe_stride() -> void:
 	var median := gaps[gaps.size() / 2]
 	assert_between(median, 0.5, 0.75, "one print per walking step")
 	gut.p("doe prints: %d, median step %.2f m" % [prints.size(), median])
+
+
+func test_doe_prints_wander_and_never_land_in_a_trunk_or_rock() -> void:
+	var way := Act1Wayfinding.new()
+	add_child_autofree(way)
+	var line := Act1Wayfinding._resample(Act1Wayfinding.track_points(), Act1Wayfinding.PRINT_STEP)
+	var obstacles := Act1Wayfinding.trail_obstacles(line)
+	assert_gt(obstacles.size(), 20, "the doe's line runs through the forest")
+	var inside := 0
+	for d in way.tracks.get_children():
+		var p := (d as Node3D).position
+		if not Act1Wayfinding.is_clear(Vector2(p.x, p.z), obstacles, 0.0):
+			inside += 1
+	assert_eq(inside, 0, "no print inside a tree or rock collider")
+	# A slow wander, not a ruler line and not jitter.
+	var wandered := Act1Wayfinding.wander_line(line, [] as Array[Vector3])
+	var max_off := 0.0
+	var max_step := 0.0
+	for i in range(1, wandered.size()):
+		max_off = maxf(max_off, wandered[i].distance_to(line[i]))
+		max_step = maxf(max_step, absf(wandered[i].distance_to(line[i]) - wandered[i - 1].distance_to(line[i - 1])))
+	assert_between(max_off, 0.5, 1.0, "wanders about +-0.5-1 m")
+	assert_lt(max_step, 0.25, "no per-print jitter")
