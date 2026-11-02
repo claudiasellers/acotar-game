@@ -11,7 +11,9 @@
 ## faelight lanterns. Outside the circle: an outer yew wall (ch19) lined with a
 ## herbaceous border, the birdcage pavilion east, the window garden under
 ## Feyre's window (puca, ch10) south-west, and the gilt gate north.
-## Invented structure and planting are canon:"X". Story anchors are unchanged.
+## [C] canon: the rose garden of many hues, the heron fountain and its iris
+## beds, the outer hedge wall. [X] invented: the circular plan, colour wheel,
+## swags, tunnels, pavilion, cutting beds and borders. Story anchors unchanged.
 class_name ManorRoseGarden
 extends RefCounted
 
