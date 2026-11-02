@@ -32,7 +32,7 @@ const TWINE := &"mat_snare_twine"
 ## House-space walks (x, z; the house sits at the world origin), from the
 ## study to the kitchen and from the kitchen back to the front doors, along
 ## L28's door-to-door routes (p3_house_playtest.gd).
-const STUDY_TO_KITCHEN := [Vector2(-12.8, -61.5), Vector2(-12, -66), Vector2(-9, -66), Vector2(-9, -67.5),
+const STUDY_TO_KITCHEN := [Vector2(-22.8, -68.5), Vector2(-21.5, -65), Vector2(-15, -65), Vector2(-12, -66), Vector2(-9, -66), Vector2(-9, -67.5),
 		Vector2(-1.8, -67.5), Vector2(-1.8, -62.5), Vector2(-1, -59), Vector2(7, -55), Vector2(9, -50),
 		Vector2(12, -50), Vector2(40, -50), Vector2(44, -51), Vector2(52, -51), Vector2(52, -57)]
 const KITCHEN_TO_DOORS := [Vector2(52, -51), Vector2(44, -51), Vector2(40, -50), Vector2(12, -50),

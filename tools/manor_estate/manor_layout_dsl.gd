@@ -191,6 +191,9 @@ static func _table_yaw(r: ManorRoomDef, chair: ManorPropPlacement) -> float:
 		if not (tid.begins_with("table") or tid.begins_with("desk")):
 			continue
 		var half := PropLib.size_of(t.prop_id) * 0.5 * t.scale
+		if maxf(half.x, half.z) < 0.35 or t.position.y > 0.3:
+			continue        # a side table beside an armchair is not one to sit at
+
 		var local := Basis(Vector3.UP, deg_to_rad(-t.yaw_deg)) * (chair.position - t.position)
 		var near := Vector3(clampf(local.x, -half.x, half.x), 0.0, clampf(local.z, -half.z, half.z))
 		var to := Basis(Vector3.UP, deg_to_rad(t.yaw_deg)) * (near - local)

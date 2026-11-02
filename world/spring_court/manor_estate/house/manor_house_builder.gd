@@ -22,6 +22,11 @@ const FLOOR_COLORS := {
 	&"carpet": Color(0.93, 0.52, 0.66), &"flagstone": Color(0.90, 0.82, 0.78),
 }
 const FACADE := Color(0.99, 0.94, 0.94)
+## Props built outside the merge so story scenes can move them: room -> prop id,
+## and the node name they get (a direct child of the room node, origin at the
+## prop's base centre, its long axis along local X).
+const LOOSE := {&"dining_hall": &"table_dining_long"}
+const LOOSE_NAMES := {&"dining_hall": "DiningTable"}
 
 
 ## World height of a level's finished floor.
@@ -96,7 +101,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 const PROP_DRAW := 45.0
 
 static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool = false) -> void:
-	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, LarderPickup, ActionTrigger]
+	var keep_apart: Array = [ManorDoorLeaf, RegionGate, ManorStation, ManorKeepsake, LarderPickup, ActionTrigger, ManorLooseProp]
 	for room in all.rooms:
 		var node := house.get_node_or_null(NodePath(String(room.id))) as Node3D
 		if node == null:
@@ -136,6 +141,7 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 			EstateKit.box(node, Vector3(r.get_center().x, y + ch + 0.05, r.get_center().y),
 					Vector3(r.size.x, 0.1, r.size.y), ceil_mat, false)
 		_build_walls(node, room, all, y, ch)
+		ManorRoomFinish.add_curtains(node, room, all, y, ch)
 	var origin := Vector3(room.rect.position.x, y, room.rect.position.y)
 	for p in room.props:
 		var prop := PropLib.build(p.prop_id)
@@ -143,11 +149,21 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 		prop.rotation.y = deg_to_rad(p.yaw_deg)
 		if p.scale != 1.0:
 			prop.scale = Vector3.ONE * p.scale
+		if LOOSE.get(room.id, &"") == p.prop_id and node.get_node_or_null(NodePath(LOOSE_NAMES[room.id])) == null:
+			# kept out of the merge so a scene can move it (L45: the table Tamlin shrinks, ch22)
+			var loose := ManorLooseProp.new()
+			loose.name = LOOSE_NAMES[room.id]
+			loose.transform = prop.transform
+			prop.transform = Transform3D.IDENTITY
+			loose.add_child(prop)
+			node.add_child(loose)
+			continue
 		node.add_child(prop)
 	if room.kind != &"exterior":
 		ManorRoomLook.add_hero_light(node, room, origin, ceiling_of(room))
-		ManorRoomLook.add_coffers(node, room, origin, ceiling_of(room),
-				all.stair_holes_on(room.level + 1) if ceiling_of(room) < storey_height(room.level) else [])
+		var holes: Array = all.stair_holes_on(room.level + 1) if ceiling_of(room) < storey_height(room.level) else []
+		ManorRoomLook.add_coffers(node, room, origin, ceiling_of(room), holes)
+		ManorRoomFinish.add_trim(node, room, origin, ceiling_of(room), holes)
 
 
 static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> void:
