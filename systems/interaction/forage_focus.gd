@@ -7,8 +7,6 @@ extends Node
 
 const GLINT_RADIUS := 9.0
 const REFRESH := 0.15
-## Chunks are at most this far from any of their instances (64 m chunks).
-const CHUNK_SLACK := 48.0
 
 var interactor: Interactor
 ## {"id", "position", "distance"} of the nearest find, or {}.
@@ -60,8 +58,11 @@ func _process(delta: float) -> void:
 		return
 	focus = nearest(feyre.global_position, GLINT_RADIUS)
 	_glint.emitting = not focus.is_empty()
+	var glow := _glint.get_node(^"GroundGlow") as MeshInstance3D
+	glow.visible = not focus.is_empty()
 	if not focus.is_empty():
 		_glint.global_position = focus.position + Vector3.UP * 0.35
+		glow.global_position = focus.position + Vector3.UP * 0.04
 	var in_reach: bool = not focus.is_empty() and focus.distance <= Interactor.REACH
 	_card.visible = in_reach
 	if in_reach:
@@ -79,7 +80,9 @@ func nearest(at: Vector3, radius: float) -> Dictionary:
 		var mmi := field as MultiMeshInstance3D
 		if mmi == null or mmi.multimesh == null or not mmi.is_visible_in_tree() or not mmi.has_meta(&"ingredient_id"):
 			continue
-		if mmi.global_position.distance_to(at) > radius + CHUNK_SLACK:
+		# Skip fields whose bounds are out of range (chunks or one big field).
+		var box := mmi.global_transform * mmi.get_aabb()
+		if box.grow(radius).has_point(at) == false:
 			continue
 		var hidden: Dictionary = mmi.get_meta(&"_forage_original", {})
 		var mm := mmi.multimesh
@@ -97,36 +100,76 @@ func nearest(at: Vector3, radius: float) -> Dictionary:
 	return best
 
 
+## Pastel and gold glint tints (R3), one picked per particle.
+const GLINT_TINTS: Array[Color] = [Color(1.0, 0.78, 0.35), Color(1.0, 0.62, 0.8), Color(0.76, 0.66, 1.0),
+	Color(1.0, 0.84, 0.45), Color(0.62, 0.95, 0.8)]
+const GLINT_SHADER := preload("res://systems/interaction/forage_glint.gdshader")
+const GLOW_SHADER := preload("res://systems/interaction/forage_ground_glow.gdshader")
+
+
+## Soft star glints rising and twinkling over the find (no texture: the shape
+## is drawn in forage_glint.gdshader), plus a gentle glow on the ground.
 func _make_glint() -> GPUParticles3D:
 	var p := GPUParticles3D.new()
 	p.name = "Glint"
-	p.amount = 6
-	p.lifetime = 1.4
+	p.amount = 10
+	p.lifetime = 1.6
+	p.randomness = 0.5
 	p.emitting = false
 	var mat := ParticleProcessMaterial.new()
 	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	mat.emission_sphere_radius = 0.25
+	mat.emission_sphere_radius = 0.28
 	mat.direction = Vector3.UP
-	mat.spread = 30.0
-	mat.initial_velocity_min = 0.05
-	mat.initial_velocity_max = 0.2
+	mat.spread = 25.0
+	mat.initial_velocity_min = 0.04
+	mat.initial_velocity_max = 0.14
 	mat.gravity = Vector3.ZERO
+	mat.angle_min = -45.0
+	mat.angle_max = 45.0
 	mat.scale_min = 0.6
-	mat.scale_max = 1.2
-	var grad := Gradient.new()
-	grad.offsets = PackedFloat32Array([0.0, 0.3, 1.0])
-	grad.colors = PackedColorArray([Color(1, 0.95, 0.8, 0.0), Color(1, 0.95, 0.8, 1.0), Color(1, 0.85, 0.95, 0.0)])
-	var ramp := GradientTexture1D.new()
-	ramp.gradient = grad
-	mat.color_ramp = ramp
+	mat.scale_max = 1.3
+	var pop := Curve.new()
+	pop.add_point(Vector2(0.0, 0.0))
+	pop.add_point(Vector2(0.25, 1.0))
+	pop.add_point(Vector2(0.7, 0.8))
+	pop.add_point(Vector2(1.0, 0.0))
+	var pop_tex := CurveTexture.new()
+	pop_tex.curve = pop
+	mat.scale_curve = pop_tex
+	var tints := Gradient.new()
+	tints.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CONSTANT
+	var offs := PackedFloat32Array()
+	for i in GLINT_TINTS.size():
+		offs.append(float(i) / GLINT_TINTS.size())
+	tints.offsets = offs
+	tints.colors = PackedColorArray(GLINT_TINTS)
+	var tint_tex := GradientTexture1D.new()
+	tint_tex.gradient = tints
+	mat.color_initial_ramp = tint_tex
+	var fade := Gradient.new()
+	fade.offsets = PackedFloat32Array([0.0, 0.25, 0.75, 1.0])
+	fade.colors = PackedColorArray([Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0.8), Color(1, 1, 1, 0)])
+	var fade_tex := GradientTexture1D.new()
+	fade_tex.gradient = fade
+	mat.color_ramp = fade_tex
 	p.process_material = mat
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.06, 0.06)
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	m.vertex_color_use_as_albedo = true
-	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	quad.size = Vector2(0.16, 0.16)
+	var m := ShaderMaterial.new()
+	m.shader = GLINT_SHADER
 	quad.material = m
 	p.draw_pass_1 = quad
+	var glow := MeshInstance3D.new()
+	glow.name = "GroundGlow"
+	var disc := QuadMesh.new()
+	disc.size = Vector2(1.1, 1.1)
+	disc.orientation = PlaneMesh.FACE_Y
+	var gm := ShaderMaterial.new()
+	gm.shader = GLOW_SHADER
+	disc.material = gm
+	glow.mesh = disc
+	glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	glow.top_level = true
+	glow.visible = false
+	p.add_child(glow)
 	return p

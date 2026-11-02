@@ -261,6 +261,8 @@ func test_nearest_find_glints_and_names_itself() -> void:
 	assert_false(near.is_empty())
 	await wait_seconds(ForageFocus.REFRESH * 2.0 + 0.05)
 	assert_false(focus.focus.is_empty(), "something glints nearby")
+	assert_true((focus._glint.draw_pass_1.surface_get_material(0) as ShaderMaterial) != null, "soft star glints, not plain quads")
+	assert_true(focus._glint.get_node(^"GroundGlow").visible, "a glow on the ground under it")
 	assert_true(focus._card.visible, "a pick card shows in reach")
 	assert_string_contains(focus._label.text, "pick")
 	var id: StringName = focus.focus.id
