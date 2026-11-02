@@ -1,25 +1,26 @@
-## Keeps a sitting figure's clothes over their body (T045). Each garment is
-## skinned for standing: a tunic's hem and a trouser's waist hang from the hips
-## while the body under them hangs from the thigh, so once the thigh swings
-## forward 90 degrees the thigh (and the trousers under a tunic) push out through
-## the cloth. Sitting swaps each garment for a copy whose vertices that hug a
-## layer under them take that layer's skin weights, so they bend where it bends.
-## Standing puts the originals back: the standing look is the authored one.
+## Keeps a sitting figure's body and trousers from poking through the clothes
+## over them (T045). Garments are skinned for standing: a tunic's hem hangs from
+## the hips while the thigh under it swings forward 90 degrees, so the buttock
+## and the thigh's top push out through the cloth in patches of skin and trouser.
+## Cloth can't follow, so while sitting the figure's layers lose the triangles
+## that sit under cloth, and the cloth shows whole. Standing puts the originals
+## back, so the standing look is the authored one.
 ##
-## Layers, innermost out: the body (torso, arms, legs), trousers and shirts,
-## tunics and gowns, doublets and vests. A vertex within SHELL of an inner layer
-## blends toward the weights of that layer's nearest vertex, fully inside CLOSE.
-## Cloth hanging free of the layers under it (a skirt's hem) keeps its own weights.
+## Layers, innermost out: the body (torso, legs), trousers and shirts, tunics and
+## gowns, doublets and vests. A triangle goes only when all three corners are buried:
+## an outer layer's vertex lies in front of each along its normal, in the rest pose.
+## What shows through an opening (a neckline's chest, a sleeve's wrist) has nothing
+## in front of it, so it stays.
 class_name SeatSkinFit
 extends RefCounted
 
-## Skin weights are copied from vertices this close, fully inside CLOSE, fading out by SHELL.
-const CLOSE := 0.012
-const SHELL := 0.04
-## Body surfaces that are a layer to be covered.
-const BODY_LAYERS := ["torso", "arms", "legs"]
+## How far in front of a vertex cloth counts as covering it, and the widest cone (cosine) it may sit in.
+const REACH := 0.08
+const COVER_COS := 0.3
+## Body surfaces that lie under the clothes. Arms and hands are drawn as they are.
+const BODY_LAYERS := ["torso", "legs"]
 ## Garment name fragments, by layer (1 is worn next to the body). Anything else
-## (boots, belts, masks, cloaks, hair) is left as it is.
+## (boots, belts, masks, cloaks, hair) is left as it is, and covers nothing.
 const LAYER_OF := [["trouser", 1], ["pants", 1], ["legging", 1], ["stocking", 1], ["shift", 1], ["shirt", 1],
 	["tunic", 2], ["blouse", 2], ["gown", 2], ["dress", 2], ["smock", 2],
 	["doublet", 3], ["waistcoat", 3], ["vest", 3], ["coat", 3]]
@@ -27,32 +28,35 @@ const ORIGINAL := &"seat_fit_original"
 const FITTED := &"seat_fit_fitted"
 
 
-## Puts the sitting copies of `skeleton`'s figure's garments on, or the originals back.
+## Puts the sitting copies of `skeleton`'s figure's meshes on, or the originals back.
 static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 	if skeleton == null or skeleton.find_bone("Hips") < 0:
 		return
 	var holder := _figure_root(skeleton)
-	var parts := _parts(holder, skeleton)
-	var worn: Array = parts["garments"]
 	if not seated:
 		for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
 			if mi.has_meta(ORIGINAL):
-				var orig: Array = mi.get_meta(ORIGINAL)
-				mi.mesh = orig[0]
-				mi.skin = orig[1]
+				mi.mesh = mi.get_meta(ORIGINAL)
 				mi.remove_meta(ORIGINAL)
 		return
-	for entry: Array in worn:
-		var mi := entry[0] as MeshInstance3D
+	var parts := _parts(holder, skeleton)
+	var outer_pool: Dictionary = {}   # layer -> _Pool of the vertices of every layer outside it
+	for mi: MeshInstance3D in parts["inner"].keys():
 		if mi.has_meta(ORIGINAL):
 			continue
-		var layer := int(entry[1])
-		var made: Array = _fitted(mi, layer, skeleton, parts["body"], worn)
-		if made.is_empty():
-			continue
-		mi.set_meta(ORIGINAL, [mi.mesh, mi.skin])
-		mi.mesh = made[0]
-		mi.skin = made[1]
+		var layer: int = parts["inner"][mi]
+		if not outer_pool.has(layer):
+			var pool := _Pool.new()
+			for other: MeshInstance3D in parts["garments"].keys():
+				if int(parts["garments"][other]) > layer:
+					for s in other.mesh.get_surface_count():
+						pool.add(other, s, skeleton)
+			pool.index()
+			outer_pool[layer] = pool
+		var made: ArrayMesh = _fitted(mi, outer_pool[layer], skeleton, parts["surfaces"].get(mi, []))
+		if made != null:
+			mi.set_meta(ORIGINAL, mi.mesh)
+			mi.mesh = made
 
 
 ## The node the figure's meshes hang under: three levels up from the skeleton (the glb, the
@@ -67,27 +71,39 @@ static func _figure_root(skeleton: Skeleton3D) -> Node:
 	return at
 
 
-## Every skinned mesh under `holder` that is a layer: {"body": [[mesh instance, surface], ...], "garments": [[mesh instance, layer], ...]}.
+## The figure's skinned meshes: {"garments": {mesh instance: layer}, "inner": {mesh
+## instance: the layer it is under}, "surfaces": {body mesh instance: [its covered surfaces]}}.
+## The body is layer 0 and is `inner` only; a garment is both, unless it is the outermost.
 static func _parts(holder: Node, skeleton: Skeleton3D) -> Dictionary:
-	var body: Array = []
-	var garments: Array = []
+	var garments := {}
+	var inner := {}
+	var surfaces := {}
+	var top := 0
 	for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
 		if mi.mesh == null or mi.skin == null or not mi.mesh is ArrayMesh or mi.get_node_or_null(mi.skeleton) != skeleton:
 			continue
 		if mi.get_parent() == skeleton:
-			if mi.name == &"Body":
+			if mi.name == &"Body" or mi.name == &"Body_LOD1":
+				var covered: Array = []
 				for s in mi.mesh.get_surface_count():
 					if _surface_name(mi.mesh, s) in BODY_LAYERS:
-						body.append([mi, s])
+						covered.append(s)
+				surfaces[mi] = covered
+				inner[mi] = 0
 			continue
 		var label := ("%s %s" % [mi.get_parent().name, mi.name]).to_lower()
 		if label.contains("hair"):
 			continue
 		for pair: Array in LAYER_OF:
 			if label.contains(String(pair[0])):
-				garments.append([mi, int(pair[1])])
+				garments[mi] = int(pair[1])
+				inner[mi] = int(pair[1])
+				top = maxi(top, int(pair[1]))
 				break
-	return {"body": body, "garments": garments}
+	for mi: MeshInstance3D in inner.keys():
+		if int(inner[mi]) >= top:   # nothing outside the outermost layer
+			inner.erase(mi)
+	return {"garments": garments, "inner": inner, "surfaces": surfaces}
 
 
 static func _surface_name(mesh: Mesh, index: int) -> String:
@@ -97,92 +113,54 @@ static func _surface_name(mesh: Mesh, index: int) -> String:
 	return (mesh as ArrayMesh).surface_get_name(index)
 
 
-## `mi`'s mesh and skin with its vertices' weights taken from the layers under it,
-## or [] when no layer is under it. Cached on the node: the fit is the same every time.
-static func _fitted(mi: MeshInstance3D, layer: int, skeleton: Skeleton3D, body: Array, worn: Array) -> Array:
+## `mi`'s mesh without the triangles buried under `outer`, or null when none are.
+## `only` lists the surfaces to look at (all of them when empty). Cached on the node:
+## the fit is the same every time.
+static func _fitted(mi: MeshInstance3D, outer: _Pool, skeleton: Skeleton3D, only: Array) -> ArrayMesh:
 	if mi.has_meta(FITTED):
 		return mi.get_meta(FITTED)
-	var under := _Pool.new()
-	for pair: Array in body:
-		under.add(pair[0], pair[1], skeleton)
-	for entry: Array in worn:
-		if int(entry[1]) < layer:
-			var other := entry[0] as MeshInstance3D
-			for s in other.mesh.get_surface_count():
-				under.add(other, s, skeleton)
-	var made: Array = []
-	if not under.is_empty():
-		under.index()
-		made = _rebuilt(mi, skeleton, under)
-	mi.set_meta(FITTED, made)
-	return made
-
-
-static func _rebuilt(mi: MeshInstance3D, skeleton: Skeleton3D, under: _Pool) -> Array:
 	var src := mi.mesh as ArrayMesh
-	var skin := mi.skin.duplicate() as Skin
-	var bind_of := {}
-	for i in skin.get_bind_count():
-		bind_of[_bind_name(skin, i, skeleton)] = i
 	var out := ArrayMesh.new()
 	out.blend_shape_mode = src.blend_shape_mode
 	for b in src.get_blend_shape_count():
 		out.add_blend_shape(src.get_blend_shape_name(b))
-	var changed := false
+	var dropped := 0
 	for s in src.get_surface_count():
 		var arrays := src.surface_get_arrays(s)
-		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-		var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
-		var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
-		if bones.is_empty() or verts.is_empty():
-			out.add_surface_from_arrays(src.surface_get_primitive_type(s), arrays, src.surface_get_blend_shape_arrays(s))
-			_copy_surface(src, out, s)
-			continue
-		var per := bones.size() / verts.size()
-		var rest := _rest_positions(mi, verts, bones, weights, per, skeleton)
-		for v in verts.size():
-			var hit := under.nearest(rest[v])
-			if hit.is_empty() or float(hit[0]) >= SHELL:
-				continue
-			var t := 1.0 - smoothstep(CLOSE, SHELL, float(hit[0]))
-			var blend := {}   # bone name -> weight
-			for k in per:
-				var w := weights[v * per + k]
-				if w > 0.0:
-					var nm := _bind_name(mi.skin, bones[v * per + k], skeleton)
-					blend[nm] = float(blend.get(nm, 0.0)) + w * (1.0 - t)
-			var theirs: Dictionary = hit[1]
-			for nm: String in theirs:
-				blend[nm] = float(blend.get(nm, 0.0)) + float(theirs[nm]) * t
-			var names: Array = blend.keys()
-			names.sort_custom(func(a: String, b: String) -> bool: return float(blend[a]) > float(blend[b]))
-			var total := 0.0
-			for k in mini(per, names.size()):
-				total += float(blend[names[k]])
-			for k in per:
-				if k < names.size():
-					var nm: String = names[k]
-					if not bind_of.has(nm):
-						var at := under.bind_pose(nm)
-						bind_of[nm] = skin.get_bind_count()
-						skin.add_named_bind(nm, at)
-					bones[v * per + k] = int(bind_of[nm])
-					weights[v * per + k] = float(blend[nm]) / total
-				else:
-					bones[v * per + k] = 0
-					weights[v * per + k] = 0.0
-			changed = true
-		arrays[Mesh.ARRAY_BONES] = bones
-		arrays[Mesh.ARRAY_WEIGHTS] = weights
-		var flags := Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS if per == 8 else 0
+		var flags := src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
+		if only.is_empty() or only.has(s):
+			dropped += _drop_buried(mi, arrays, outer, skeleton)
 		out.add_surface_from_arrays(src.surface_get_primitive_type(s), arrays, src.surface_get_blend_shape_arrays(s), {}, flags)
-		_copy_surface(src, out, s)
-	return [out, skin] if changed else []
+		out.surface_set_material(s, src.surface_get_material(s))
+		out.surface_set_name(s, src.surface_get_name(s))
+	var made: ArrayMesh = out if dropped > 0 else null
+	mi.set_meta(FITTED, made)
+	return made
 
 
-static func _copy_surface(src: ArrayMesh, out: ArrayMesh, s: int) -> void:
-	out.surface_set_material(s, src.surface_get_material(s))
-	out.surface_set_name(s, src.surface_get_name(s))
+## Takes the buried triangles out of `arrays`' index list; how many went.
+static func _drop_buried(mi: MeshInstance3D, arrays: Array, outer: _Pool, skeleton: Skeleton3D) -> int:
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var norms: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+	var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+	var index: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+	if verts.is_empty() or norms.size() != verts.size() or bones.is_empty() or index.is_empty():
+		return 0
+	var rest := _rest_frames(mi, verts, norms, bones, weights, bones.size() / verts.size(), skeleton)
+	var buried := PackedByteArray()
+	buried.resize(verts.size())
+	for v in verts.size():
+		buried[v] = 1 if outer.covers(rest[0][v], rest[1][v]) else 0
+	var kept := PackedInt32Array()
+	for t in range(0, index.size() - 2, 3):
+		if buried[index[t]] == 0 or buried[index[t + 1]] == 0 or buried[index[t + 2]] == 0:
+			kept.append_array(index.slice(t, t + 3))
+	var dropped := (index.size() - kept.size()) / 3
+	if kept.is_empty():   # a surface needs an index list: one degenerate triangle draws nothing
+		kept = PackedInt32Array([0, 0, 0])
+	arrays[Mesh.ARRAY_INDEX] = kept
+	return dropped
 
 
 static func _bind_name(skin: Skin, bind: int, skeleton: Skeleton3D) -> String:
@@ -192,58 +170,48 @@ static func _bind_name(skin: Skin, bind: int, skeleton: Skeleton3D) -> String:
 	return skin.get_bind_name(bind)
 
 
-## Where each vertex stands in the skeleton's space with the skeleton at rest.
-static func _rest_positions(mi: MeshInstance3D, verts: PackedVector3Array, bones: PackedInt32Array, weights: PackedFloat32Array, per: int, skeleton: Skeleton3D) -> PackedVector3Array:
+## [positions, normals] of each vertex in the skeleton's space with the skeleton at rest.
+static func _rest_frames(mi: MeshInstance3D, verts: PackedVector3Array, norms: PackedVector3Array, bones: PackedInt32Array, weights: PackedFloat32Array, per: int, skeleton: Skeleton3D) -> Array:
 	var skin := mi.skin
 	var to_rest: Array[Transform3D] = []
 	for b in skin.get_bind_count():
 		var bone := skeleton.find_bone(_bind_name(skin, b, skeleton))
 		to_rest.append((skeleton.get_bone_global_rest(bone) if bone >= 0 else Transform3D.IDENTITY) * skin.get_bind_pose(b))
-	var out := PackedVector3Array()
-	out.resize(verts.size())
+	var at := PackedVector3Array()
+	var facing := PackedVector3Array()
+	at.resize(verts.size())
+	facing.resize(verts.size())
 	for v in verts.size():
 		var p := Vector3.ZERO
+		var n := Vector3.ZERO
 		var sum := 0.0
 		for k in per:
 			var w := weights[v * per + k]
 			if w > 0.0:
-				p += w * (to_rest[bones[v * per + k]] * verts[v])
+				var m := to_rest[bones[v * per + k]]
+				p += w * (m * verts[v])
+				if v < norms.size():
+					n += w * (m.basis * norms[v])
 				sum += w
-		out[v] = p / sum if sum > 0.0 else verts[v]
-	return out
+		at[v] = p / sum if sum > 0.0 else verts[v]
+		facing[v] = n.normalized()
+	return [at, facing]
 
 
-## The vertices of the layers under a garment, in the skeleton's space at rest,
-## in a grid of SHELL-wide cells: a position, its weights by bone name.
+## The vertices of the layers outside a mesh, in the skeleton's space at rest, in a
+## grid of REACH-wide cells.
 class _Pool extends RefCounted:
 	var points: PackedVector3Array = PackedVector3Array()
-	var weights: Array[Dictionary] = []
-	var binds: Dictionary = {}   # bone name -> bind pose
 	var cells: Dictionary = {}   # Vector3i -> PackedInt32Array
-
-	func is_empty() -> bool:
-		return points.is_empty()
 
 	func add(mi: MeshInstance3D, surface: int, skeleton: Skeleton3D) -> void:
 		var arrays := (mi.mesh as ArrayMesh).surface_get_arrays(surface)
 		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 		var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
-		var wts: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
 		if bones.is_empty() or verts.is_empty():
 			return
-		var per := bones.size() / verts.size()
-		var rest := SeatSkinFit._rest_positions(mi, verts, bones, wts, per, skeleton)
-		for b in mi.skin.get_bind_count():
-			binds[SeatSkinFit._bind_name(mi.skin, b, skeleton)] = mi.skin.get_bind_pose(b)
-		for v in verts.size():
-			var mine := {}
-			for k in per:
-				var w := wts[v * per + k]
-				if w > 0.0:
-					var nm := SeatSkinFit._bind_name(mi.skin, bones[v * per + k], skeleton)
-					mine[nm] = float(mine.get(nm, 0.0)) + w
-			points.append(rest[v])
-			weights.append(mine)
+		var frames := SeatSkinFit._rest_frames(mi, verts, PackedVector3Array(), bones, arrays[Mesh.ARRAY_WEIGHTS], bones.size() / verts.size(), skeleton)
+		points.append_array(frames[0])
 
 	func index() -> void:
 		for i in points.size():
@@ -253,16 +221,11 @@ class _Pool extends RefCounted:
 			cells[key] = members
 
 	func _cell(p: Vector3) -> Vector3i:
-		return Vector3i((p / SeatSkinFit.SHELL).floor())
+		return Vector3i((p / SeatSkinFit.REACH).floor())
 
-	func bind_pose(bone_name: String) -> Transform3D:
-		return binds.get(bone_name, Transform3D.IDENTITY)
-
-	## [distance, weights] of the nearest vertex within SHELL, or [].
-	func nearest(p: Vector3) -> Array:
+	## Whether one of these vertices lies in front of `p` along `facing`, within REACH.
+	func covers(p: Vector3, facing: Vector3) -> bool:
 		var home := _cell(p)
-		var best := SeatSkinFit.SHELL
-		var found := -1
 		for dx in range(-1, 2):
 			for dy in range(-1, 2):
 				for dz in range(-1, 2):
@@ -270,8 +233,8 @@ class _Pool extends RefCounted:
 					if not cells.has(key):
 						continue
 					for i: int in cells[key]:
-						var d := points[i].distance_to(p)
-						if d < best:
-							best = d
-							found = i
-		return [best, weights[found]] if found >= 0 else []
+						var d := points[i] - p
+						var len := d.length()
+						if len < SeatSkinFit.REACH and len > 0.0001 and d.dot(facing) > SeatSkinFit.COVER_COS * len:
+							return true
+		return false
