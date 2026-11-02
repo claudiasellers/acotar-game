@@ -55,6 +55,24 @@ func _ready() -> void:
 		controller.feyre.arrow_fired.connect(func(_a: Node) -> void: hold_ready(1.2))
 
 
+## True when what she's wearing is no outfit for a bow on her back: a formal
+## piece in her top or bottom slot, or any dress or gown (one piece over both)
+## that isn't hunting or riding leathers. The bow and quiver are stowed then
+## (B8), and come back with hunting clothes.
+static func stowed_for(wardrobe: Wardrobe) -> bool:
+	if wardrobe == null:
+		return false
+	for slot: StringName in [&"top", &"bottom"]:
+		var p := WardrobeCatalog.piece(wardrobe.equipped_in(slot))
+		if p == null:
+			continue
+		if p.reaction_tag == &"formal":
+			return true
+		if p.slots.has(&"top") and p.slots.has(&"bottom") and not p.reaction_tag in [&"hunter", &"rider"]:
+			return true
+	return false
+
+
 ## Keeps the bow up for `seconds` (Q, F, a shot) without aiming.
 func hold_ready(seconds: float = READY_HOLD) -> void:
 	ready_timer = maxf(ready_timer, seconds)
@@ -107,6 +125,11 @@ func _place() -> void:
 	var feyre := controller.feyre if controller else null
 	if feyre == null or not feyre.is_inside_tree():
 		return
+	# Here rather than in _process: the dressing room pauses the game but keeps
+	# her model (and so this, via skeleton_updated) running.
+	var stowed := raised <= 0.0 and stowed_for(Gameplay.wardrobe)
+	bow_root.visible = not stowed
+	quiver.visible = not stowed
 	var back := _back_transform(feyre)
 	var hand := _hand_transform(feyre)
 	var w := smoothstep(0.0, 1.0, raised)
