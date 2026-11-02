@@ -1,0 +1,6 @@
+from L38 interior designer
+quality look
+timeout 900
+shot ground res://tools/manor_estate/room_shot.tscn entrance_hall,dining_hall,library,tamlin_study,gallery {out}
+shot upper res://tools/manor_estate/room_shot.tscn feyre_bedroom,feyre_bath,painting_room,tamlin_bedchamber,upper_hall {out}
+shot service res://tools/manor_estate/room_shot.tscn svc_kitchen,svc_servants_hall,svc_alis_room,svc_infirmary {out}
