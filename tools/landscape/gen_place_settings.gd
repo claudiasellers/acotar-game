@@ -72,7 +72,7 @@ const PLACES := {
 	"market": ["station", {"props": ["fae_bunting", "fae_bench"], "frame": "fae_lantern_post"}],
 	"cottages": ["hearth", {"props": [], "frame": ""}],
 	"stone_ring": ["sacred", {"frame": "", "collar": ["flora_heather_mound", "flora_carpet_pearl"], "fx": "faelights"}],
-	"cave_of_the_rite": ["fire", {"collar": ["rock_pebble_cluster", "flora_fern_b"], "frame": "", "energy": 1.4, "fx": "bonfire_smoke"}],
+	"cave_of_the_rite": ["fire", {"collar": ["rock_pebble_cluster", "flora_fern_b"], "frame": "", "energy": 1.4, "fx": ""}],
 	"bonfire_terraces": ["fire", {}],
 	"drum_field": ["fire", {"collar": ["flora_heather_mound", "flora_carpet_butter"], "sound": "fire", "energy": 1.4}],
 	"rose_spire": ["garden", {"collar": ["flora_bush_rose", "flora_carpet_rose", "flora_carpet_blush"], "fx": "rose_petals", "frame": "", "props": []}],

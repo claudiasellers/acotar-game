@@ -83,8 +83,10 @@ manor from the order until she reaches the fires.
   the hill's ACES grade (glow threshold 1.1) and never clips to white.
   `test_calanmai_fire.gd` keeps the cap.
 - The court's `fx_bonfire_flame` particles bloomed white at 2 m. They're no
-  longer used here, and the hill's `ambient_fx` no longer floats one over each
-  habitat centre (one of those sat in the cave).
+  longer used here. The hill's `ambient_fx` is now pollen and fireflies only:
+  its flames, embers and smoke had floated over every habitat centre with no
+  fire under them, and one of those sat in the cave. The cave's place setting
+  (`gen_place_settings.gd`) drops its fireless smoke for the same reason.
 - **The Rite cave** (`rite_cave_wall_*`, `rite_cave_pillar`, `rite_cave_mouth`,
   and the pool rim's stones) is built by `tools/court/blender/props_shapes_a.py`.
   The walls are rough, ledged banks of stone and earth, and the pillar is a
@@ -95,7 +97,8 @@ manor from the order until she reaches the fires.
   glossier. It uses standard light with no rim and no wrap, so only the fire
   warms them.
 - R17 bench: `tools/playtest/calanmai_fire_shot.tscn` (a campfire at 2 m, the
-  cave stone, a pyre at 3 m). The Mac clip also writes `pyre_3m.png`.
+  cave stone, a pyre at 3 m). The Mac clip also writes `a_pyre_3m.png`, and
+  `--stop-after=stranger` ends it after the cave, inside the Mac's 300 s.
 
 ## The crown braid
 

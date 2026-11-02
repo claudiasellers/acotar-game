@@ -146,7 +146,7 @@ func _light_campfire(near: Vector3) -> void:
 	# L45-6: a real campfire (stone ring, logs, capped flame cards, sparks,
 	# smoke), not the court's flame particles, which bloomed white at 2 m.
 	var fire := CalanmaiFire.campfire()
-	fire.light_energy = 5.0
+	fire.light_energy = 6.0
 	fire.light_range = 20.0
 	_campfire.add_child(fire)
 	var crackle := AudioStreamPlayer3D.new()

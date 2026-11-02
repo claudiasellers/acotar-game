@@ -28,7 +28,7 @@ const CARDS := [
 @export var size: float = 1.0
 @export var with_logs: bool = true
 ## A pyre's flames climb higher than they spread.
-@export var height_scale: float = 1.0
+@export var height_scale: float = 1.25
 @export var light_energy: float = 4.2
 @export var light_range: float = 14.0
 @export var light_shadows: bool = true
@@ -212,9 +212,10 @@ func _build_light() -> void:
 	light.light_color = Color(1.0, 0.56, 0.26)
 	light.light_energy = light_energy
 	light.omni_range = light_range
-	light.omni_attenuation = 1.1
+	light.omni_attenuation = 1.0
 	light.shadow_enabled = light_shadows
-	light.position.y = TONGUE * size * height_scale * 0.6
+	# Above the logs, so their shadows don't hide the faces round the fire.
+	light.position.y = maxf(1.2 * size, TONGUE * size * height_scale * 0.6)
 	add_child(light)
 	_flicker = light.create_tween().set_loops()
 	_flicker.tween_property(light, ^"light_energy", light_energy * 0.82, 0.21)

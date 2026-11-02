@@ -12,11 +12,15 @@ var frames_dir: String = ""
 var frame: int = 0
 var _next_at: float = 0.0
 var _pyre_shot: bool = false
+## --stop-after=<beat>: end the clip once that beat is done (the Mac's 300 s and 60 MB).
+var _stop_after: String = ""
 
 
 func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
-		if not arg.begins_with("--"):
+		if arg.begins_with("--stop-after="):
+			_stop_after = arg.get_slice("=", 1)
+		elif not arg.begins_with("--"):
 			frames_dir = arg
 	if frames_dir != "":
 		out_path = frames_dir.path_join("p5_playtest.json")
@@ -32,6 +36,12 @@ func _filming() -> bool:
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
+	if _stop_after != "" and not _beat.is_empty():
+		var i := BEATS.find(String(_beat.id))
+		if i > BEATS.find(_stop_after) and BEATS.find(_stop_after) >= 0:
+			_stop_after = ""
+			get_tree().quit(0)
+			return
 	if not _filming() or _beat.is_empty():
 		return
 	if String(_beat.id) == "fires" and not _pyre_shot and WorldState.has_flag("calanmai_attended"):
@@ -75,7 +85,7 @@ func _grab() -> void:
 
 
 ## L45-6: one frame of a burning pyre from 3 m (its own camera, for a moment),
-## so the flames are judged up close: pyre_3m.png.
+## so the flames are judged up close: a_pyre_3m.png (first by name, under the cap).
 func _pyre_close_up() -> void:
 	var fires := get_tree().root.find_children("Fire_*", "Node3D", true, false)
 	if fires.is_empty():
@@ -96,7 +106,7 @@ func _pyre_close_up() -> void:
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	if img:
-		img.save_png(frames_dir.path_join("pyre_3m.png"))
+		img.save_png(frames_dir.path_join("a_pyre_3m.png"))
 	cam.queue_free()
 	if prev and is_instance_valid(prev):
 		prev.make_current()

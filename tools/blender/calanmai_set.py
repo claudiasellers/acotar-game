@@ -62,7 +62,7 @@ SIZES = {
     "kitchen_apple": (0.08, 0.09, 0.08),
     "kitchen_lemon_tart": (0.13, 0.05, 0.13),
     "white_roses_vase": (0.34, 0.62, 0.34),
-    "calanmai_campfire": (1.3, 0.42, 1.3),
+    "calanmai_campfire": (1.05, 0.38, 1.05),
 }
 
 
