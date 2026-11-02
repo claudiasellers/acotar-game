@@ -1,0 +1,8 @@
+{"id":"L35-4","scene":"world","time_of_day":0.42,"grade":"manor","quality":"full","size":[1920,1080],
+"shots":[
+ {"name":"manor_garden_east_audit","eye":[110,9.7,10],"at":[0,9.5,-40],"fov":70},
+ {"name":"east_border_walk","eye":[84,9.8,-10],"at":[130,9,-10],"fov":70},
+ {"name":"manor_rear_audit","eye":[30,7.9,-150],"at":[0,8,-100],"fov":70},
+ {"name":"rose_garden_from_terrace","eye":[0,16,-86],"at":[0,8,-160],"fov":65},
+ {"name":"wisteria_walk_path","eye":[-86,11.2,-152],"at":[-120,11.0,-152],"fov":70}
+],"checks":[]}
