@@ -1,0 +1,6 @@
+{"id":"L35-7","scene":"world","grade":"manor","time_of_day":0.42,"quality":"full","size":[1920,1080],
+"shots":[
+ {"name":"wisteria_walk_above","eye":[-79,8.2,-151.5],"at":[-120,9.8,-152],"fov":65},
+ {"name":"wisteria_roof_high","eye":[-80,18,-138],"at":[-118,9,-152],"fov":60},
+ {"name":"wisteria_walk_path","eye":[-86,11.2,-152],"at":[-120,11.0,-152],"fov":70}
+],"checks":[]}
