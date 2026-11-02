@@ -602,12 +602,14 @@ static func _b_cattail(kit: MeshKit, _detail: int) -> void:
 
 
 static func _b_boulder(kit: MeshKit, _detail: int) -> void:
-	kit.blob(Vector3(0, 0.35, 0), Vector3(1.0, 0.75, 0.85), Color(0.58, 0.56, 0.50), Color(0.40, 0.38, 0.34), 0.25, 5, 8)
-	kit.blob(Vector3(0.1, 0.9, 0.0), Vector3(0.75, 0.22, 0.6), MOSS.lightened(0.1), MOSS.darkened(0.2), 0.3, 3, 7)
+	# Rounded and water-worn, like the foliage (quality audit B1): enough rings
+	# that the silhouette reads smooth, a gentle lump, and a moss cap.
+	kit.blob(Vector3(0, 0.35, 0), Vector3(1.0, 0.75, 0.85), Color(0.58, 0.56, 0.50), Color(0.40, 0.38, 0.34), 0.08, 9, 14)
+	kit.blob(Vector3(0.1, 0.92, 0.0), Vector3(0.78, 0.2, 0.62), MOSS.lightened(0.1), MOSS.darkened(0.2), 0.1, 5, 12)
 
 
 static func _b_mossy_rock(kit: MeshKit, _detail: int) -> void:
-	kit.blob(Vector3(0, 0.15, 0), Vector3(0.6, 0.4, 0.5), MOSS, Color(0.42, 0.40, 0.36), 0.3, 4, 7)
+	kit.blob(Vector3(0, 0.15, 0), Vector3(0.6, 0.4, 0.5), MOSS, Color(0.42, 0.40, 0.36), 0.1, 7, 12)
 
 
 static func _b_standing_stone(kit: MeshKit, _detail: int) -> void:
