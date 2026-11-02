@@ -32,3 +32,4 @@ glow_bloom = 0.0
 glow_hdr_threshold = 1.4
 lut = SubResource("GradientTexture1D_tmbbp")
 magic = 0.35
+cloud_cover = 0.30
