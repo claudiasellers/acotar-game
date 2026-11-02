@@ -19,7 +19,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 import bpy  # noqa: E402,F401,I001
 import bmesh  # noqa: E402
 import prop_kit as K  # noqa: E402
-from prop_kit import (BLUSH, BUTTER, COPPER, GOLD, IRON, STRAW, LILAC, MINT, OAK, OAK_DARK, PEARL, PERI, ROSE, WHITE,  # noqa: E402
+from prop_kit import (BLUSH, BUTTER, COPPER, CREAM, GOLD, IRON, STRAW, LILAC, MINT, OAK, OAK_DARK, PEARL, PERI, ROSE,  # noqa: E402
+                      WARM_STONE, WHITE,
                       R, S, T, box, cyl, lathe, sphere, torus, tube)
 
 OUT = os.path.join(K.ROOT, "story/act4/models")
@@ -163,6 +164,66 @@ def grooming_kit(p, size, _c):
     p.add(tube([(-0.25, 0.1, 0.16), (-0.33, 0.16, 0.02), (-0.3, 0.2, 0.0)], 0.01, 4), BLUSH, "fabric")
 
 
+TERRACE_W, TERRACE_D, TERRACE_H, RAIL_H = 8.4, 7.0, 6.0, 0.9
+
+
+def stillroom_terrace(p, size, _c):
+    """The potion room's terrace: the fae village sits on a steep bank, so the
+    potion-maker built a level stone shelf in front of the house. Dry-laid
+    ashlar in warm cream and blush stone on the back (-Y, downhill) and both
+    sides, a pearl coping, a flagged floor and a low balustrade on the back
+    and east edges. The front (+Y, toward the house) runs into the hill, and
+    the west edge is left open as the way on."""
+    rng = random.Random(4417)
+    w, d, h = TERRACE_W, TERRACE_D, TERRACE_H
+    p.add(box(w, d, h), WARM_STONE, "matte", T(0, 0, h / 2))
+    tints = (WARM_STONE, K.mix(WARM_STONE, PEARL, 0.45), K.mix(WARM_STONE, BLUSH, 0.35), K.mix(WARM_STONE, CREAM, 0.6))
+    rows = 8
+    rh = h / rows
+    for face in ("back", "east", "west"):
+        run = w if face == "back" else d
+        for r in range(rows):
+            x = -run / 2 + (rng.uniform(0.2, 0.7) if r % 2 else 0.0)
+            while x < run / 2 - 0.15:
+                L = min(rng.uniform(1.1, 1.7), run / 2 - x)
+                cx, cz = x + L / 2, r * rh + rh / 2
+                out = rng.uniform(0.03, 0.08)
+                blk = box(L - 0.06, out * 2, rh - 0.06)
+                col = tints[rng.randrange(len(tints))]
+                if face == "back":
+                    p.add(blk, col, "matte", T(cx, -d / 2, cz))
+                else:
+                    side = 1 if face == "east" else -1
+                    p.add(blk, col, "matte", T(side * w / 2, -cx, cz) @ R("Z", 90))
+                x += L
+    # coping on the two open edges
+    p.add(box(w + 0.3, 0.42, 0.14, bevel=0.03), PEARL, "satin", T(0, -d / 2 + 0.06, h + 0.07))
+    p.add(box(0.42, d + 0.3, 0.14, bevel=0.03), PEARL, "satin", T(w / 2 - 0.06, 0, h + 0.07))
+    # flagged floor
+    nx, ny = 6, 5
+    for i in range(nx):
+        for j in range(ny):
+            fw, fd = w / nx, d / ny
+            fx = -w / 2 + (i + 0.5) * fw + rng.uniform(-0.04, 0.04)
+            fy = -d / 2 + (j + 0.5) * fd + rng.uniform(-0.04, 0.04)
+            col = K.mix(CREAM, PEARL, rng.uniform(0, 1)) if (i + j) % 3 else K.mix(CREAM, BLUSH, 0.3)
+            p.add(box(fw - 0.07, fd - 0.07, 0.03), col, "matte", T(fx, fy, h + 0.015))
+    # balustrade: posts, top and bottom rails, gilt finials at the corners
+    top = h + 0.14
+    for (x0, y0, x1, y1, n) in ((-w / 2 + 0.2, -d / 2 + 0.1, w / 2 - 0.1, -d / 2 + 0.1, 7),
+                                (w / 2 - 0.1, -d / 2 + 0.1, w / 2 - 0.1, d / 2 - 0.2, 6)):
+        for k in range(n + 1):
+            t = k / n
+            p.add(box(0.16, 0.16, RAIL_H - 0.14), PEARL, "satin", T(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, top + (RAIL_H - 0.14) / 2))
+        ln = math.hypot(x1 - x0, y1 - y0)
+        ang = math.degrees(math.atan2(y1 - y0, x1 - x0))
+        mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+        p.add(box(ln + 0.2, 0.2, 0.08, bevel=0.02), PEARL, "satin", T(mx, my, h + RAIL_H - 0.04) @ R("Z", ang))
+        p.add(box(ln, 0.1, 0.06), CREAM, "satin", T(mx, my, top + 0.12) @ R("Z", ang))
+    for (x, y) in ((-w / 2 + 0.2, -d / 2 + 0.1), (w / 2 - 0.1, -d / 2 + 0.1), (w / 2 - 0.1, d / 2 - 0.2)):
+        p.add(sphere(0.1, 8, 5), GOLD, "gold", T(x, y, h + RAIL_H + 0.06))
+
+
 BUILDERS = {
     # id: (builder, (w, h, d) in metres)
     "picnic_blanket": (picnic_blanket, (2.6, 0.2, 2.0)),
@@ -171,6 +232,7 @@ BUILDERS = {
     "warbow_chest": (warbow_chest, (1.15, 0.8, 0.62)),
     "fae_cauldron": (fae_cauldron, (0.95, 0.95, 0.95)),
     "grooming_kit": (grooming_kit, (0.6, 0.33, 0.3)),
+    "stillroom_terrace": (stillroom_terrace, (TERRACE_W + 0.3, TERRACE_H + RAIL_H + 0.16, TERRACE_D + 0.3)),
 }
 
 

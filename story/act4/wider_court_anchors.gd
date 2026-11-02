@@ -6,7 +6,8 @@
 ## region lane moves it. Act3Anchors.ROWS hangs the p4 nodes on them.
 ##   stables_dusk        manor_estate   the stable yard's mouth (Tamlin at dusk)
 ##   fells_sentry_range  western_fells  beside the North Watchtower (butts, warbow chest)
-##   fae_potion_room     fae_village    in front of the Potion House
+##   fae_potion_room     fae_village    at the foot of the Potion House's bank, where
+##                                      the village green levels out, facing up to it
 class_name WiderCourtAnchors
 extends RefCounted
 
@@ -14,7 +15,7 @@ extends RefCounted
 const PLACES := {
 	&"stables_dusk": [&"manor_estate", &"", Vector2(-130.0, -9.0), Vector2.ZERO, 0.0],
 	&"fells_sentry_range": [&"western_fells", &"north_watchtower", Vector2(-1650.0, -650.0), Vector2(14.0, 0.0), -90.0],
-	&"fae_potion_room": [&"fae_village", &"potion_house", Vector2(-1060.0, -980.0), Vector2(0.0, 7.5), 0.0],
+	&"fae_potion_room": [&"fae_village", &"potion_house", Vector2(-1060.0, -980.0), Vector2(18.0, 20.0), 45.0],
 }
 
 

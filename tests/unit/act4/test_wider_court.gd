@@ -253,3 +253,43 @@ func test_anchors_land_in_their_regions() -> void:
 		assert_true(m.is_in_group(&"story_anchor"))
 		assert_true(Act3Anchors.ROWS.has(StringName(m.name)), "Act3Anchors hangs a node on %s" % m.name)
 	assert_eq(WiderCourtAnchors.where(&"fells_sentry_range", null), Vector2(-1636.0, -650.0))
+
+
+func test_potion_room_stands_level_on_its_terrace() -> void:
+	var at := WiderCourtAnchors.where(&"fae_potion_room", null)
+	var room := PotionRoom.new()
+	room.position = Vector3(at.x, WorldHeight.height_at(at.x, at.y), at.y) - root.global_position
+	room.rotation.y = deg_to_rad(45.0)
+	root.add_child(room)
+	var lowest := INF
+	var highest := -INF
+	for i in 5:
+		for j in 5:
+			var p := room.to_global(Vector3(lerpf(-4.2, 4.2, i / 4.0), 0.0, lerpf(-3.5, 3.5, j / 4.0)))
+			var h := WorldHeight.height_at(p.x, p.z)
+			lowest = minf(lowest, h)
+			highest = maxf(highest, h)
+	assert_true(room.floor_y >= highest, "the bank never pokes through the floor")
+	assert_lt(room.floor_y - lowest, 2.0, "a low shelf at the green's edge, not a tower")
+	var cauldron := room.find_child("Cauldron", true, false) as Node3D
+	assert_almost_eq(cauldron.global_position.y, room.floor_y, 0.01, "the cauldron stands on the floor")
+	assert_true(room.find_child("TerraceBody", true, false) is StaticBody3D, "the floor and balustrade collide")
+	assert_eq(room.station.station.id, &"fae_potion_room")
+
+
+func test_pool_water_darkens_at_night() -> void:
+	assert_eq(StarlightSteep.night_amount(12.0), 0.0, "noon: daylight glitter")
+	assert_eq(StarlightSteep.night_amount(23.0), 1.0, "late night: stars")
+	assert_eq(StarlightSteep.night_amount(2.0), 1.0)
+	var dusk := StarlightSteep.night_amount(20.0)
+	assert_true(dusk > 0.0 and dusk < 1.0, "dusk eases")
+	var mat := load(StarlightSteep.WATER) as ShaderMaterial
+	var keep := Clock.time_of_day
+	Clock.time_of_day = 0.0
+	var steep := StarlightSteep.new()
+	root.add_child(steep)
+	assert_eq(float(mat.get_shader_parameter(&"night_amount")), 1.0, "the pool's water is told it is night")
+	Clock.time_of_day = 0.5
+	steep._process(0.1)
+	assert_eq(float(mat.get_shader_parameter(&"night_amount")), 0.0)
+	Clock.time_of_day = keep

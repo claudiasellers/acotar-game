@@ -25,7 +25,7 @@ landmark (read from `CourtRegionContent.landmarks`, so they follow it):
 |---|---|---|---|
 | `stables_dusk` | manor_estate | stable yard mouth (-130, -9) | `StableDusk` |
 | `fells_sentry_range` | western_fells | `north_watchtower` + (14, 0), yaw -90 (shoots east) | `SentryRange` (+ `SentryButt` ×3, `SentryChest`) |
-| `fae_potion_room` | fae_village | `potion_house` + (0, 7.5) | `PotionRoom` (CookingStation `fae_potion_room`) |
+| `fae_potion_room` | fae_village | `potion_house` + (18, 20), yaw 45 (faces up the bank to the house; the house stands on a 20° slope, the green is level here) | `PotionRoom` on its `stillroom_terrace` (CookingStation `fae_potion_room`) |
 | (on `starlight_pool`) | starlight_glen | the pool's rim | `StarlightSteep` (CookingStation `starlight_pool`, night only) |
 
 ## Stations (group "station")
@@ -45,5 +45,6 @@ No `obj_lucien_knife` in ch 18 (Keeper).
 
 `story/act4/models/<id>.glb` from `tools/blender/wider_court_props.py`
 (prop_kit finishes, LOD1): picnic_blanket, picnic_wine, sentry_butt,
-warbow_chest, fae_cauldron, grooming_kit. Everything else is the estate's
+warbow_chest, fae_cauldron, grooming_kit, stillroom_terrace (the potion
+room's level stone shelf; PotionRoom adds its deck and balustrade collision). Everything else is the estate's
 PropLib catalogue.

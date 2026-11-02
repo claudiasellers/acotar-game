@@ -14,6 +14,8 @@ const OURS := {
 	&"warbow_chest": [Vector3(1.15, 0.8, 0.62), true],
 	&"fae_cauldron": [Vector3(0.95, 0.95, 0.95), true],
 	&"grooming_kit": [Vector3(0.6, 0.33, 0.3), false],
+	# Collides through PotionRoom's own deck and balustrade shapes.
+	&"stillroom_terrace": [Vector3(8.7, 7.06, 7.3), false],
 }
 
 
