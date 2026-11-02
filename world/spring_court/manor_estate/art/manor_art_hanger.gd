@@ -225,6 +225,28 @@ static func _interleave(ss: Array, out: Dictionary) -> void:
 			out[run[order[n]].key] = dealt[n]
 
 
+## How far behind a slot (along the prop's back, +Z) the room's inner wall
+## face is, in metres, 1 cm proud of it. Each room builds its own walls
+## ManorHouseBuilder.WALL thick inside its rect, so a slot placed a little
+## into that thickness still hangs on the face. `fallback` when no wall is
+## within half a metre of it (a free-standing or odd-shaped spot).
+static func _wall_behind(room: ManorRoomDef, p: ManorPropPlacement, fallback: float) -> float:
+	var back := Vector3(0, 0, 1).rotated(Vector3.UP, deg_to_rad(p.yaw_deg))
+	var t := INF
+	var lo := Vector2(ManorHouseBuilder.WALL, ManorHouseBuilder.WALL)
+	var hi := room.rect.size - lo
+	for axis in 2:
+		var d := back.x if axis == 0 else back.z
+		var at := p.position.x if axis == 0 else p.position.z
+		if absf(d) < 0.7:
+			continue
+		var face := (hi[axis] if d > 0.0 else lo[axis])
+		t = minf(t, (face - at) / d)
+	if t == INF or absf(t - fallback) > 0.5:
+		return fallback
+	return t - 0.01
+
+
 ## The slot a pinned work takes: the first alternative room that has a free,
 ## fitting slot; with "@x,z", the one nearest that room-local point.
 static func _pinned_slot(w: ManorArtWork, ss: Array, themes: Array, out: Dictionary) -> int:
@@ -415,9 +437,11 @@ static func _dress(prop: Node3D, w: ManorArtWork, s: Dictionary, room_themes: Pa
 	old.free()
 	var look := Node3D.new()
 	look.name = "Look"
-	# the frame's back board sits on the wall (the back of the stand-in)
-	look.position = Vector3(0.0, cy, stand_in.z * 0.5 - 0.024 * long)
+	# the frame's back board sits on the wall: the room's own wall behind the
+	# slot when it is near, else the back of the stand-in
+	look.position = Vector3(0.0, cy, _wall_behind(room, p, stand_in.z * 0.5 * sc) / sc - 0.024 * long)
 	look.set_meta(&"art_id", w.id)
+	look.set_meta(&"art_long", long)
 	prop.add_child(look)
 	prop.set_meta(&"art_id", w.id)
 	var style := frame_style(w, room_themes)

@@ -169,3 +169,32 @@ func test_built_house_hangs_framed_canvases_on_few_draws() -> void:
 	gut.p("canvas draws: %d in the house, at most %d in one room" % [canvas_draws, worst])
 	assert_lte(canvas_draws, 60, "the paintings add at most 60 draws to the house")
 	assert_lte(worst, 1, "a room draws all its canvases in one call")
+
+
+func test_frames_hang_on_the_wall_face_not_inside_it() -> void:
+	# a slot placed a little into a room's own wall (ManorHouseBuilder.WALL)
+	# once hid its canvas in the plaster (audit A5, F1)
+	var root := Node3D.new()
+	add_child_autofree(root)
+	var house := ManorHouseBuilder.build(root)
+	var checked := 0
+	for s: Dictionary in ManorArtHanger.slots(all):
+		var room: ManorRoomDef = s.room
+		var p: ManorPropPlacement = s.placement
+		var prop := ManorArtHanger._slot_prop(house, room, s.room_index, p)
+		if prop == null:
+			continue
+		var look := prop.get_node("Look") as Node3D
+		# the frame's back, in room-local metres
+		var back := prop.transform * (look.position + Vector3(0, 0, 0.024 * _long(look, prop)))
+		var local := back - Vector3(room.rect.position.x, ManorHouseBuilder.floor_y(room.level), room.rect.position.y)
+		var w := ManorHouseBuilder.WALL - 0.005
+		var inside := local.x >= w and local.z >= w and local.x <= room.rect.size.x - w and local.z <= room.rect.size.y - w
+		assert_true(inside, "%s hangs in front of the wall (back at %s, room %s)" % [s.key, local, room.rect.size])
+		checked += 1
+	assert_eq(checked, ManorArtHanger.slots(all).size(), "every slot checked")
+
+
+## The frame's scale: the long side of the canvas, kept on the Look as meta.
+func _long(look: Node3D, _prop: Node3D) -> float:
+	return float(look.get_meta(&"art_long", 0.0))
