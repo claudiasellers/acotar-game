@@ -8,7 +8,7 @@
 ## primitives (hardware-independent budget numbers).
 extends Node
 
-## shot id: [camera position, look-at point, time of day 0-1, grade]
+## shot id: [camera position, look-at point, time of day 0-1, grade, optional eye height]
 const SHOTS := {
 	"cottage_snow": [Vector3(-112, 0, 2152), Vector3(-150, 0, 2161), 0.42, &"human_winter"],
 	"village_market": [Vector3(345, 0, 2210), Vector3(385, 0, 2252), 0.5, &"human_winter"],
@@ -22,6 +22,8 @@ const SHOTS := {
 	"manor_drive": [Vector3(0, 0, 120), Vector3(0, 0, -28), 0.5, &"manor"],
 	"manor_garden_east": [Vector3(110, 0, 10), Vector3(0, 0, -40), 0.42, &"manor"],
 	"manor_rear": [Vector3(30, 0, -150), Vector3(0, 0, -80), 0.6, &"manor"],
+	"manor_rose_garden": [Vector3(0, 0, -100), Vector3(0, 0, -160), 0.5, &"manor", 14.0],
+	"manor_parterre": [Vector3(70, 0, 40), Vector3(0, 0, -10), 0.45, &"manor", 8.0],
 	"eastern_bogge": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.45, &"bogge"],
 	"eastern_bogge_dusk": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.74, &"bogge"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
@@ -47,7 +49,7 @@ func _run() -> void:
 	var cam := Camera3D.new()
 	var eye: Vector3 = shot[0]
 	var at: Vector3 = shot[1]
-	eye.y = WorldHeight.height_at(eye.x, eye.z) + 1.7
+	eye.y = WorldHeight.height_at(eye.x, eye.z) + (float(shot[4]) if shot.size() > 4 else 1.7)
 	at.y = WorldHeight.height_at(at.x, at.z) + 1.2
 	cam.position = eye
 	cam.far = 1200.0
@@ -85,7 +87,9 @@ func _run() -> void:
 		await get_tree().process_frame
 		RenderingServer.force_draw(true, 0.0)
 	else:
-		await _wait_regions_built(world, 180.0)
+		# Software renders (cloud lavapipe) build far slower: WORLD_SHOT_REGION_CAP=900.
+		var cap := OS.get_environment("WORLD_SHOT_REGION_CAP")
+		await _wait_regions_built(world, float(cap) if cap.is_valid_float() else 180.0)
 		for i in 30:
 			await get_tree().process_frame
 	var img := root.get_texture().get_image()
