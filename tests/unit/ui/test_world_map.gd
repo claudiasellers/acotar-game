@@ -301,21 +301,32 @@ func test_wind_and_marker_follow_the_pin() -> void:
 	feyre.global_position = Vector3(-150.0, 0.0, 2160.0)
 	var hud := WorldMapHud.new()
 	add_child_autofree(hud)
-	await wait_physics_frames(2)
+	# Process frames, not physics: the first frame (painting the coarse map)
+	# is long, and physics ticks catch up before the HUD's _process runs.
+	await wait_process_frames(2)
 	assert_false(hud.marker.visible, "no pin, no marker")
 	assert_false(hud.wind.gusting)
 	hud.set_pin(Vector2(150.0, 2160.0))  # due east
-	await wait_physics_frames(3)
+	await wait_process_frames(3)
 	assert_true(hud.marker.visible, "the pin shows on screen")
 	assert_true(hud.wind.gusting, "setting it starts a gust")
 	assert_almost_eq(hud.wind.heading.x, 1.0, 0.01, "the wind blows east, towards it")
+	var from: Vector3 = hud.wind._stream.global_position
+	assert_lt(from.x, feyre.global_position.x, "a gust starts upwind of her, to blow past her")
+	assert_lt(from.y, feyre.global_position.y + 0.6, "at knee height, not round her head")
 	await wait_seconds(FaeWind.GUST_SECONDS + 0.3)
 	assert_false(hud.wind.gusting, "a gust passes")
 	feyre.global_position = Vector3(135.0, 0.0, 2160.0)
 	hud.wind.gust()
-	await wait_physics_frames(3)
+	await wait_process_frames(3)
 	assert_false(hud.wind.gusting, "quiet near the pin, the beam takes over")
 	hud.clear_pin()
-	await wait_physics_frames(2)
+	await wait_process_frames(2)
 	assert_false(hud.marker.visible)
 
+
+
+func test_stats_line_counts_in_words() -> void:
+	assert_eq(WorldMapHud._count(1, "place"), "1 place")
+	assert_eq(WorldMapHud._count(0, "landmark"), "0 landmarks")
+	assert_eq(WorldMapHud._count(3, "place"), "3 places")

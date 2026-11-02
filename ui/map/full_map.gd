@@ -6,6 +6,15 @@ class_name FullMap
 extends CanvasLayer
 
 const SHADER := preload("res://ui/map/map_view.gdshader")
+const ManorSketch := preload("res://ui/map/manor_sketch.gd")
+const FOOT_LAND := "Drag to look around  ·  Scroll to zoom  ·  Click to set or lift your pin  ·  R finds Feyre  ·  M closes"
+const FOOT_MANOR := "W / S or click a little house for another floor  ·  Tab shows the land  ·  R finds Feyre  ·  M closes"
+## Floor keys down the left of the manor page, and the key that swaps pages.
+const KEY_SIZE := 22.0
+const KEY_GAP := 74.0
+const KEY_X := 70.0
+## Most pixels per metre on the manor page (a small plan stays a sketch).
+const MAX_PPM := 22.0
 ## Width of the view in metres: closest, furthest, and on opening.
 const ZOOM_MIN := 360.0
 const ZOOM_MAX := 4600.0
@@ -32,6 +41,14 @@ var _dragged: float = 0.0
 var _pad: bool = false
 var _t: float = 0.0
 var _hover_id: String = ""
+## The manor page: her plan of the house, one floor at a time. Opens on its
+## own when she is inside.
+var showing_manor: bool = false
+var manor_level: int = 0
+var _manor_page: Control
+var _page_ppm: float = 10.0
+var _page_offset: Vector2 = Vector2.ZERO
+var _foot: Label
 
 
 func _init(owner_hud: WorldMapHud) -> void:
@@ -62,6 +79,8 @@ func open() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	view_center = hud.player_xz
 	view_width = ZOOM_OPEN
+	manor_level = hud.manor.level
+	show_manor(hud.manor.inside)
 	_stats.text = hud.stats_line()
 	Juice.bounce_control(_card, 0.03)
 
@@ -80,8 +99,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(MapSettings.ACTION_OPEN) or event.is_action_pressed(&"pause"):
 		close()
 		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_TAB:
+		show_manor(not showing_manor)
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"camera_recenter"):
 		view_center = hud.player_xz
+		manor_level = hud.manor.level
+		get_viewport().set_input_as_handled()
+	elif showing_manor and (event.is_action_pressed(&"move_forward") or event.is_action_pressed(&"move_back")):
+		step_floor(1 if event.is_action_pressed(&"move_forward") else -1)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		_pad = true
@@ -105,10 +131,37 @@ func toggle_pin_at(world: Vector2, point: Vector2) -> void:
 		Juice.bounce_control(_card, 0.015)
 
 
+## Swaps between the land and the manor page (only once she knows a room).
+func show_manor(on: bool) -> void:
+	showing_manor = on and not hud.manor.levels_shown().is_empty()
+	if showing_manor and not manor_level in floors():
+		manor_level = floors()[0]
+	_manor_page.visible = showing_manor
+	_foot.text = FOOT_MANOR if showing_manor else FOOT_LAND
+
+
+## Floors on the manor page, low to high: the ones with rooms she knows, and hers.
+func floors() -> Array[int]:
+	var out := hud.manor.levels_shown()
+	if hud.manor.inside and not hud.manor.level in out:
+		out.append(hud.manor.level)
+		out.sort()
+	return out
+
+
+func step_floor(by: int) -> void:
+	var fl := floors()
+	var i := fl.find(manor_level)
+	manor_level = fl[clampi(i + by, 0, fl.size() - 1)]
+
+
 func _process(delta: float) -> void:
 	if not is_open():
 		return
 	_t += delta
+	if showing_manor:
+		_manor_page.queue_redraw()
+		return
 	var pan := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	if pan != Vector2.ZERO:
 		view_center += pan * view_width * PAN_SPEED * delta
@@ -154,7 +207,9 @@ func _on_map_input(event: InputEvent) -> void:
 				_dragged = 0.0
 			elif _dragged < CLICK_SLOP:
 				# A click, not a drag: left sets or lifts the pin, right lifts it.
-				if mb.button_index == MOUSE_BUTTON_LEFT:
+				if mb.button_index == MOUSE_BUTTON_LEFT and _has_manor_key() and mb.position.distance_to(_swap_key_at()) < KEY_SIZE * 1.4:
+					show_manor(true)
+				elif mb.button_index == MOUSE_BUTTON_LEFT:
 					toggle_pin_at(to_world(mb.position), mb.position)
 				elif mb.button_index == MOUSE_BUTTON_RIGHT:
 					hud.clear_pin()
@@ -244,11 +299,18 @@ func _build() -> void:
 	_overlay.draw.connect(_draw_marks)
 	_overlay.gui_input.connect(_on_map_input)
 	frame.add_child(_overlay)
+	_manor_page = Control.new()
+	_manor_page.name = "ManorPage"
+	_manor_page.mouse_filter = Control.MOUSE_FILTER_STOP
+	_manor_page.draw.connect(_draw_manor_page)
+	_manor_page.gui_input.connect(_on_manor_input)
+	_manor_page.visible = false
+	frame.add_child(_manor_page)
 
-	var foot := PauseStyle.note("Drag to look around  ·  Scroll to zoom  ·  Click to set or lift your pin  ·  R finds Feyre  ·  M closes")
-	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	foot.autowrap_mode = TextServer.AUTOWRAP_OFF
-	col.add_child(foot)
+	_foot = PauseStyle.note(FOOT_LAND)
+	_foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_foot.autowrap_mode = TextServer.AUTOWRAP_OFF
+	col.add_child(_foot)
 
 
 func _draw_marks() -> void:
@@ -279,6 +341,8 @@ func _draw_marks() -> void:
 	if hud.pin.active:
 		MapMarks.draw_pin(ci, to_map_point(hud.pin.xz), 16.0, _t)
 	MapMarks.draw_feyre(ci, to_map_point(hud.player_xz), hud.player_angle, 13.0, _t)
+	if _has_manor_key():
+		ManorSketch.draw_floor_key(ci, _swap_key_at(), KEY_SIZE, hud.manor.level, false, hud.manor.inside)
 	if _pad:
 		_draw_reticle(ci, _map.size * 0.5)
 	_draw_compass(ci, Vector2(_map.size.x - 64, 64))
@@ -307,3 +371,85 @@ func _draw_compass(ci: CanvasItem, at: Vector2) -> void:
 	ci.draw_circle(at, 4, PauseStyle.GOLD)
 	var font := PauseStyle.DISPLAY_FONT
 	ci.draw_string(font, at + Vector2(-6, -40), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PauseStyle.PLUM)
+
+
+# --- The manor page ---------------------------------------------------------------
+
+func _has_manor_key() -> bool:
+	return not hud.manor.levels_shown().is_empty()
+
+
+## Where the swap key sits: bottom left on either page.
+func _swap_key_at() -> Vector2:
+	return Vector2(KEY_X, _map.size.y - 64.0)
+
+
+func _floor_key_at(i: int, count: int) -> Vector2:
+	# Highest floor at the top, like the house.
+	return Vector2(KEY_X, 70.0 + (count - 1 - i) * KEY_GAP)
+
+
+## What she knows of the house, every floor together, so each floor sits in
+## the same place on the page and the page grows with her plan.
+func _house_rect() -> Rect2:
+	var b := Rect2()
+	for l in floors():
+		var fb: Rect2 = hud.manor.bounds_of(l)
+		b = fb if b.size == Vector2.ZERO else b.merge(fb)
+	return b.grow(4.0)
+
+
+## Fits the page to her plan (each frame, before drawing).
+func _fit_page() -> void:
+	var area := Rect2(Vector2(KEY_X * 2.0, 40.0), _manor_page.size - Vector2(KEY_X * 2.0 + 40.0, 80.0))
+	var b := _house_rect()
+	_page_ppm = minf(minf(area.size.x / b.size.x, area.size.y / b.size.y), MAX_PPM)
+	_page_offset = area.get_center() - b.get_center() * _page_ppm
+
+
+func manor_to_page(xz: Vector2) -> Vector2:
+	return _page_offset + xz * _page_ppm
+
+
+func _draw_manor_page() -> void:
+	var ci := _manor_page
+	_manor_page.size = _map.size
+	ci.draw_rect(Rect2(Vector2.ZERO, ci.size), ManorSketch.PAPER)
+	var plan := hud.manor
+	_fit_page()
+	ManorSketch.draw_plan(ci, plan, manor_level, manor_to_page, _page_ppm)
+	if plan.inside:
+		ManorSketch.draw_her(ci, manor_to_page(plan.at), plan.angle, 13.0, _t, plan.level, manor_level)
+	var fl := floors()
+	for i in fl.size():
+		ManorSketch.draw_floor_key(ci, _floor_key_at(i, fl.size()), KEY_SIZE, fl[i], fl[i] == manor_level,
+			plan.inside and plan.level == fl[i])
+	_draw_land_key(ci, _swap_key_at())
+	_draw_compass(ci, Vector2(ci.size.x - 64, 64))
+
+
+## A little hill with a tree: back to the land.
+func _draw_land_key(ci: CanvasItem, c: Vector2) -> void:
+	var s := KEY_SIZE
+	ci.draw_rect(Rect2(c - Vector2(s * 1.35, s * 1.35), Vector2(s * 2.7, s * 2.7)), Color(ManorSketch.PAPER, 0.7))
+	var hill := PackedVector2Array()
+	for i in 13:
+		var a := PI * i / 12.0
+		hill.append(c + Vector2(-cos(a) * s, s * 0.6 - sin(a) * s * 0.7))
+	ci.draw_polyline(hill, Color(ManorSketch.INK, 0.6), 1.6, true)
+	ci.draw_line(c + Vector2(s * 0.2, -s * 0.05), c + Vector2(s * 0.2, -s * 0.5), Color(ManorSketch.INK, 0.6), 1.6, true)
+	ci.draw_circle(c + Vector2(s * 0.2, -s * 0.7), s * 0.32, Color(MapMarks.MINT, 0.8))
+
+
+func _on_manor_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+		return
+	var at := (event as InputEventMouseButton).position
+	if at.distance_to(_swap_key_at()) < KEY_SIZE * 1.4:
+		show_manor(false)
+		return
+	var fl := floors()
+	for i in fl.size():
+		if at.distance_to(_floor_key_at(i, fl.size())) < KEY_SIZE * 1.4:
+			manor_level = fl[i]
+			return
