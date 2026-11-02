@@ -9,7 +9,9 @@
 ## Canon (book 1, ch8): the bench in an alcove blooming with foxglove, the gnarled
 ## crab apple shedding petals like snow, the lanky meadow buttercups and the
 ## weathered statue of two bounding lambs all live in the SW room and its meadow.
-## Wisteria (ch10-11) drips from the walk. Room names and the rest are canon:X.
+## Wisteria (ch10-11) drips from the walk.
+## [X] invented: the room layout and names, the walk as a pergola, the topiary,
+## the moon garden, the swing, the dovecote. Not book material.
 class_name ManorGardenRooms
 extends RefCounted
 

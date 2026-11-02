@@ -396,33 +396,8 @@ func _build_scene() -> Node3D:
 	_glb(A + "rain_barrel.glb", "RainBarrelFrozen", yard_n, root, Vector3(4.0, 0, 3.75), 0.0)
 	_glb(A + "drying_rack.glb", "DryingRack", yard_n, root, Vector3(-3.0, 0, 5.4), 10.0)
 	_glb(A + "outhouse.glb", "Outhouse", yard_n, root, Vector3(9.0, 0, 11.0), 200.0)
-	var smoke := CPUParticles3D.new()
-	smoke.name = "ChimneySmoke"
-	smoke.position = Vector3(4.95, 6.35, 0.0)
-	smoke.amount = 24
-	smoke.lifetime = 7.0
-	smoke.direction = Vector3(0.15, 1.0, 0.0)
-	smoke.spread = 12.0
-	smoke.initial_velocity_min = 0.6
-	smoke.initial_velocity_max = 1.0
-	smoke.gravity = Vector3(0.25, 0.15, 0.0)
-	smoke.scale_amount_min = 0.6
-	smoke.scale_amount_max = 1.4
-	var curve := Curve.new()
-	curve.add_point(Vector2(0.0, 0.4))
-	curve.add_point(Vector2(1.0, 2.6))
-	smoke.scale_amount_curve = curve
-	var puff := SphereMesh.new()
-	puff.radius = 0.5
-	puff.height = 1.0
-	puff.radial_segments = 8
-	puff.rings = 4
-	var smat := StandardMaterial3D.new()
-	smat.albedo_color = Color(0.7, 0.72, 0.76, 0.35)
-	smat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	smat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	puff.material = smat
-	smoke.mesh = puff
+	# Soft sprite plume (quality audit B3; world/shared/fx/chimney_smoke.gd).
+	var smoke := ChimneySmoke.make(Vector3(4.95, 6.35, 0.0))
 	cot.add_child(smoke)
 	smoke.owner = root
 
