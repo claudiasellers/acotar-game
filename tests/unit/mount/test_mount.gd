@@ -205,3 +205,24 @@ func test_ride_pose_drives_her_legs() -> void:
 		assert_has(pose.driven_bones(), bone)
 	assert_gt(pose.hip_height, 0.6, "hips a leg's length above her feet")
 	assert_almost_eq(pose.forward.dot(pose.up), 0.0, 0.05)
+
+
+func test_the_camera_never_fades_her() -> void:
+	var h := HORSE.instantiate() as WhiteHorse
+	add_child_autofree(h)
+	var meshes := h.find_children("*", "GeometryInstance3D", true, false)
+	assert_gt(meshes.size(), 0)
+	CameraFade.headless_opt_in = true
+	# Its owner is a bystander, not an ancestor of the horse (owners never fade).
+	var bystander := Node.new()
+	add_child_autofree(bystander)
+	var fade := CameraFade.new()
+	bystander.add_child(fade)
+	for g in meshes:
+		g.add_to_group(CameraFade.PROBE_GROUP)
+	var hits := fade.near_meshes(h.global_position + Vector3.UP * 1.2, 3.0)
+	hits.append_array(fade.sight_blockers(h.global_position + Vector3(0, 2.5, 4), h.global_position + Vector3.UP * 1.5))
+	CameraFade.headless_opt_in = false
+	for g in meshes:
+		g.remove_from_group(CameraFade.PROBE_GROUP)
+	assert_eq(hits.size(), 0, "the mare stays solid under the chase camera")

@@ -29,6 +29,10 @@ func _init() -> void:
 	_attic()
 	_stairs_and_roof()
 	_secrets()
+	# L38-1: the rooms in ManorFurnishAct1.ROOMS are cleared and laid out again
+	# there, so their prop rows above are overwritten: change them in
+	# tools/manor_estate/furnish/furnish_act1.gd, not here.
+	ManorFurnishAct1.furnish(dsl)
 	dsl.save()
 	quit()
 

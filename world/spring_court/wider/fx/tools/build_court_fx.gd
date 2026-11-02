@@ -38,6 +38,15 @@ const BRIGHTNESS_CAP := 1.0
 ## Blight: saturation about 0.4, light 2-3 stops under the spring grade.
 const BLIGHT_SATURATION := 0.4
 const BLIGHT_SUN := 0.3
+# Painted clouds (painted_sky.gdshader): a few by day, thinner and warm at
+# golden hour, a grey lid over the blight.
+const DAY_CLOUDS := 0.3
+const GOLDEN_CLOUDS := 0.2
+const GOLDEN_CLOUD_COLOR := Color(1.0, 0.86, 0.80)
+const GOLDEN_CLOUD_SHADE := Color(0.62, 0.52, 0.72)
+const BLIGHT_CLOUDS := 0.6
+const BLIGHT_CLOUD_COLOR := Color(0.62, 0.62, 0.60)
+const BLIGHT_CLOUD_SHADE := Color(0.38, 0.38, 0.40)
 
 
 func _initialize() -> void:
@@ -148,10 +157,14 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	# "thick", never glaring. Daylight has no glow but true highlights; dusk and
 	# night keep a soft glow for fires and lanterns. Vibrancy is colour contrast.
 	if golden:
+		p.set("cloud_cover", GOLDEN_CLOUDS)
+		p.set("cloud_color", GOLDEN_CLOUD_COLOR)
+		p.set("cloud_shade", GOLDEN_CLOUD_SHADE)
 		p.set("glow_intensity", NIGHT_GLOW)
 		p.set("glow_bloom", NIGHT_BLOOM)
 		p.set("glow_hdr_threshold", NIGHT_THRESHOLD)
 	else:
+		p.set("cloud_cover", DAY_CLOUDS)
 		p.set("glow_intensity", DAY_GLOW)
 		p.set("glow_bloom", 0.0)
 		p.set("glow_hdr_threshold", DAY_THRESHOLD)
@@ -169,6 +182,9 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 func _withdraw(p: Resource) -> void:
 	p.set("saturation", BLIGHT_SATURATION)
 	p.set("sun_energy", BLIGHT_SUN)
+	p.set("cloud_cover", BLIGHT_CLOUDS)
+	p.set("cloud_color", BLIGHT_CLOUD_COLOR)
+	p.set("cloud_shade", BLIGHT_CLOUD_SHADE)
 
 
 func _build_grades() -> int:
@@ -247,7 +263,7 @@ func _build_materials() -> int:
 		"mat_prop_glitter": _mat("court_prop.gdshader", {"blight": 0.0, "blight_affect": 1.0, "pearl_strength": 0.5, "glitter_strength": 4.0, "roughness_value": 0.3, "emission_glow": 3.5}),
 		"mat_water_lake": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_water_river": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "flow_dir": Vector2(0.0, 1.0), "flow_speed": 0.6, "ripple_strength": 0.7, "foam_strength": 1.0, "clarity": 0.65}),
-		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.7, 0.95, 1.0), "deep_color": Color(0.62, 0.62, 1.0), "clarity": 0.75, "glitter_strength": 9.0}),
+		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.32, 0.6, 0.74), "deep_color": Color(0.05, 0.09, 0.26), "fresnel_color": Color(0.56, 0.62, 0.86), "depth_scale": 1.6, "clarity": 0.85, "glitter_strength": 6.0, "foam_width": 0.3, "foam_strength": 0.12}),
 		"mat_glint": _mat("court_glint.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true,
 			"grass_a": Color("458045"), "grass_b": Color("789F4D"), "grass_c": Color("3F7F5A"),

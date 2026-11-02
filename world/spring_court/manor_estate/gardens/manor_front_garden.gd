@@ -11,6 +11,12 @@ const EAST := Rect2(32.0, -25.0, 48.0, 21.0)
 const WALK := 2.6
 const LIFT_WALK := 0.06
 const LIFT_BED := 0.1
+## The forecourt: turf island out to the gravel ring, a rose bed round the
+## fountain, and the outer border bed (inner, outer radius).
+const ISLAND_R := 15.0
+const ISLAND_BED := Vector2(8.2, 10.4)
+const BORDER_R := Vector2(25.0, 28.4)
+const FRONT_DOOR_HALF := 11.0
 
 
 static func parterres() -> Array[Rect2]:
@@ -79,11 +85,86 @@ static func build(parent: Node3D) -> void:
 			b.prop_on_ground(&"rose_standard_white", c.x + side * (p.size.x * 0.25 + WALK * 0.25), p.end.y - 1.2)
 	for w: Array in walks():
 		b.drape_path(w[0], w[1], walk, LIFT_WALK + 0.01)
+	_forecourt(b)
 	GardenKit.tag_props(b)
 	b.flush()
 
 
+## Where walks and doors meet the forecourt's edge: the border and kerb open there.
+static func forecourt_openings() -> PackedVector2Array:
+	var out := PackedVector2Array([Vector2(0.0, 26.0), Vector2(0.0, -26.0), Vector2(-26.0, 4.0), Vector2(26.0, 6.0)])
+	for w: Array in walks():
+		var pts: PackedVector2Array = w[0]
+		if pts[0].length() < ManorSitePlan.FORECOURT_RADIUS:
+			out.append(pts[0])
+	for w: Array in ManorEastLawn.walks():
+		var pts: PackedVector2Array = w[0]
+		out.append(pts[pts.size() - 1])
+	return out
+
+
+## Is the angle a (radians, about the forecourt centre) on a walk's opening at radius r?
+static func forecourt_open(a: float, r: float) -> bool:
+	for o in forecourt_openings():
+		var half_m := 3.6
+		if o == Vector2(0.0, -26.0):
+			half_m = FRONT_DOOR_HALF
+		elif o == Vector2(0.0, 26.0):
+			half_m = ManorSitePlan.DRIVE_WIDTH * 0.5 + 1.0
+		var half := half_m / r
+		if absf(angle_difference(a, o.angle())) < half:
+			return true
+	return false
+
+
+## The forecourt (audit E1): the terrain paints the whole disc as path, so its
+## soil showed brown inside the gravel ring and as a saw-toothed band outside
+## it. A turf island with a bed of roses round the fountain covers the inside,
+## stone kerbs edge the gravel on both sides, and a flower border on a mulch
+## bed runs round the outside, open wherever a walk or the front door meets it.
+static func _forecourt(b: GroundsBatch) -> void:
+	var c := ManorSitePlan.FORECOURT_CENTER
+	var lawn := GardenKit.lawn()
+	var mulch := GardenKit.mulch()
+	# a true round gravel ring over the forecourt's own (a polyline drape whose
+	# mitred corners left saw-teeth of soil at its outer edge)
+	GardenKit.drape_sector(b, c, ISLAND_R - 0.1, BORDER_R.x + 0.05, 0.0, TAU, GardenKit.walk(), 0.055, "|forecourt_ring")
+	GardenKit.drape_sector(b, c, ManorForecourt.FOUNTAIN_RADIUS + 0.3, ISLAND_R, 0.0, TAU, lawn, 0.05)
+	GardenKit.drape_sector(b, c, ISLAND_BED.x, ISLAND_BED.y, 0.0, TAU, mulch, 0.08)
+	GardenKit.edge_sector(b, c, ISLAND_BED.x, ISLAND_BED.y, 0.0, TAU)
+	_kerb(b, ISLAND_R, false)
+	_kerb(b, BORDER_R.x - 0.15, true)
+	# the outer bed, in arcs between the openings
+	var n := 96
+	var start := -1
+	for i in n + 1:
+		var a := TAU * i / n
+		var open := i == n or forecourt_open(a, BORDER_R.x)
+		if not open and start < 0:
+			start = i
+		elif open and start >= 0:
+			var a0 := TAU * start / n
+			var a1 := TAU * i / n
+			GardenKit.drape_sector(b, c, BORDER_R.x, BORDER_R.y, a0, a1, mulch, 0.08)
+			GardenKit.edging(b, GardenKit.ring(c, BORDER_R.y, maxi(2, ceili((a1 - a0) * BORDER_R.y / GardenKit.EDGING_MODULE)), a0, a1))
+			start = -1
+
+
+## A ring of low stone kerb blocks at radius r (left open at the walks when `open`).
+static func _kerb(b: GroundsBatch, r: float, open: bool) -> void:
+	var n := ceili(TAU * r / 1.6)
+	var stone := GardenKit.stone()
+	for i in n:
+		var a := TAU * (i + 0.5) / n
+		if open and forecourt_open(a, r):
+			continue
+		var p := Vector2(cos(a), sin(a)) * r
+		var y := ManorGrounds.ground(p.x, p.y)
+		b.box(Vector3(p.x, y + 0.07, p.y), Vector3(TAU * r / n + 0.02, 0.18, 0.32), stone, false, -a + PI * 0.5)
+
+
 static func plant(sb: ManorScatter) -> void:
+	_plant_forecourt(sb)
 	var rng := EstateKit.rng("front_garden_plant_v1")
 	for p in parterres():
 		for r in compartments(p):
@@ -110,3 +191,28 @@ static func plant(sb: ManorScatter) -> void:
 						sb.put(id, x + rng.randf_range(-0.1, 0.1), z + rng.randf_range(-0.1, 0.1), rng.randf() * TAU, rng.randf_range(1.15, 1.45))
 					x += 0.6 if id == &"deco_snowdrop" else 0.8
 				z += 0.7
+
+
+## Peonies all round the forecourt border with a low blue edge (catmint on the
+## house side, forget-me-nots on the drive side: the species each 128 m scatter
+## chunk there already carries), peonies between the white rose tubs on the
+## island. No new chunk draws.
+static func _plant_forecourt(sb: ManorScatter) -> void:
+	var rng := EstateKit.rng("forecourt_border_v1")
+	var c := ManorSitePlan.FORECOURT_CENTER
+	var n := 96
+	for i in n:
+		var a := TAU * (i + 0.5) / n
+		if forecourt_open(a, BORDER_R.x):
+			continue
+		var dir := Vector2(cos(a), sin(a))
+		var edge: StringName = &"deco_catmint" if dir.y < 0.0 else &"deco_forget_me_not"
+		var p := c + dir * (BORDER_R.x + 0.6)
+		sb.put(edge, p.x, p.y, rng.randf() * TAU, rng.randf_range(0.85, 1.05))
+		var p2 := c + dir.rotated(PI / n) * (BORDER_R.x + 1.1)
+		sb.put(edge, p2.x, p2.y, rng.randf() * TAU, rng.randf_range(0.8, 1.0))
+		GardenKit.drift(sb, &"deco_peony", c + dir * (BORDER_R.x + 2.3), 0.7, 3, rng)
+	for i in 12:
+		var a := TAU * (i + 0.5) / 12.0
+		var p := c + Vector2(cos(a), sin(a)) * (ISLAND_BED.x + ISLAND_BED.y) * 0.5
+		sb.put(&"deco_peony", p.x, p.y, rng.randf() * TAU, rng.randf_range(0.9, 1.05))

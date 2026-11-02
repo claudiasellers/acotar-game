@@ -18,6 +18,10 @@ PAL = {
     "bark_wet": (0.15, 0.12, 0.10),  # wet bark, dark but not a black cut-out (quality audit B2)
     "bark_grey": (0.23, 0.21, 0.19),
     "bark_brown": (0.20, 0.15, 0.11),
+    "hazel_bark": (0.36, 0.28, 0.22),  # glossy grey-brown coppice rods
+    "hazel_tip": (0.48, 0.36, 0.24),
+    "catkin": (0.82, 0.74, 0.42),
+    "leaf_dry": (0.55, 0.38, 0.20),
     "bark_ash": (0.56, 0.57, 0.56),
     "bark_ash_lt": (0.70, 0.71, 0.70),
     "bark_birch": (0.86, 0.85, 0.82),
@@ -43,6 +47,7 @@ PAL = {
     "lichen_grey": (0.62, 0.66, 0.62),
     "straw": (0.62, 0.52, 0.34),
     "straw_dark": (0.42, 0.34, 0.22),
+    "buff": (0.86, 0.78, 0.60),
     "bracken": (0.48, 0.24, 0.10),
     "reed": (0.55, 0.47, 0.32),
     "willow_red": (0.48, 0.16, 0.09),

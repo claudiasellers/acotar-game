@@ -150,9 +150,18 @@ static func _arch_piers(b: GroundsBatch, o: Vector2, dir: Vector2) -> void:
 static func _wisteria_walk(b: GroundsBatch) -> void:
 	var n := floori(walk_length() / BAY)
 	var yaw := GardenKit.yaw_facing(Vector2(-1.0, 0.0))
+	var turn := Basis(Vector3.UP, yaw)
 	for i in n:
 		var x := WALK_EAST - 1.0 - BAY * (i + 0.5)
-		b.prop_on_ground(&"wisteria_bay", x, WALK_Z, yaw)
+		# each bay is sheared to run from the ground at its east end to the
+		# ground at its west end, its piers still plumb, so neighbouring bays
+		# meet at one height and the roof climbs the slope as one canopy with
+		# no step to look under (L35-7: the steps of up to half a metre showed
+		# from above as dark stripes between the bays)
+		var y_east := WorldHeight.height_at(x + BAY * 0.5, WALK_Z)
+		var y_west := WorldHeight.height_at(x - BAY * 0.5, WALK_Z)
+		var shear := Basis(Vector3(1.0, (y_east - y_west) / BAY, 0.0), Vector3.UP, Vector3.BACK)
+		b.prop_xform(&"wisteria_bay", Transform3D(shear * turn, Vector3(x, (y_east + y_west) * 0.5, WALK_Z)))
 		for side: float in [-1.0, 1.0]:
 			var px := x + BAY * 0.5 - 0.25
 			b.add_cyl_shape(Vector3(px, ManorGrounds.ground(px, WALK_Z + side * 2.25), WALK_Z + side * 2.25), 0.26, 2.9)

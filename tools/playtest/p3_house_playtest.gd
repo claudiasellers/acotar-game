@@ -27,7 +27,8 @@ const SERVICE_ROOMS := [Vector2(49, -51), Vector2(49, -47), Vector2(54.8, -46.5)
 const BACK_TO_FOYER := [Vector2(44, -51), Vector2(40, -50), Vector2(12, -50), Vector2(9, -50), Vector2(7, -54),
 		Vector2(-7.5, -54.5), Vector2(-8, -48.5)]
 const TO_STUDY := [Vector2(60, -37.5), Vector2(54.8, -38), Vector2(54.8, -46.5), Vector2(49, -47), Vector2(49, -51), Vector2(40, -50), Vector2(12, -50), Vector2(9, -50),
-		Vector2(7, -55), Vector2(-1, -59), Vector2(-1.8, -62.5), Vector2(-1.8, -67.5), Vector2(-9, -67.5), Vector2(-9, -66), Vector2(-12, -66), Vector2(-12.8, -61.5)]
+		Vector2(7, -55), Vector2(-1, -59), Vector2(-1.8, -62.5), Vector2(-1.8, -67.5), Vector2(-9, -67.5), Vector2(-9, -66), Vector2(-12, -66), Vector2(-15, -65),
+		Vector2(-21.5, -65), Vector2(-22.8, -68.5)]   # through Tamlin's study to the library mural (L38)
 
 var jump: Node
 var house: Node3D
@@ -158,7 +159,7 @@ func _play() -> void:
 		return _fail("stuck at '%s'" % wound.current_beat_label())
 	_pass()
 
-	_begin("mural", "to his study: look at the crocuses, the lambs, the roses; study_mural_seen")
+	_begin("mural", "to the library: look at the crocuses, the lambs, the roses; study_mural_seen")
 	await _until(func() -> bool: return not wound.running, 30.0)
 	if not await _walk_route(TO_STUDY):
 		return _fail("couldn't reach the study")

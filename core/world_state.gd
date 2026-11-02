@@ -27,8 +27,21 @@ func get_flag(flag: String, default: Variant = null) -> Variant:
 
 ## True when the flag is set to a truthy value.
 func has_flag(flag: String) -> bool:
-	var value: Variant = _flags.get(String(flag), false)
-	return value != null and bool(value)
+	return truthy(_flags.get(String(flag), false))
+
+
+## Truthiness for any flag value (facts can hold a quality, a count or an id):
+## null, false, 0, 0.0 and an empty String/StringName are false; a bool, number
+## or non-empty String/StringName is true by its value; anything else is true.
+static func truthy(value: Variant) -> bool:
+	match typeof(value):
+		TYPE_NIL:
+			return false
+		TYPE_BOOL, TYPE_INT, TYPE_FLOAT:
+			return bool(value)
+		TYPE_STRING, TYPE_STRING_NAME:
+			return not String(value).is_empty()
+	return true
 
 
 func all_flags() -> Dictionary:

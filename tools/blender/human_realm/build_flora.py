@@ -390,16 +390,32 @@ def hawthorn(b):
 
 @asset(1500)
 def hazel_shrub(b):
+    """Coppiced hazel: a stool of many springy rods, arching outward and
+    forking into twigs, glossy grey-brown bark lighter at the tips, lamb's-tail
+    catkins hanging in twos and threes and a few dry leaves still clinging.
+    (Nine straight dark four-sided poles read as black rods up close:
+    quality audit F2.)"""
     rng = b.rng
-    for k in range(9):
-        a = 2 * math.pi * k / 9 + rng.uniform(-0.3, 0.3)
-        d = V((math.cos(a) * 0.3, math.sin(a) * 0.3, 1))
-        pts, _ = b.branch_curve(V((math.cos(a) * 0.12, math.sin(a) * 0.12, 0)), d, rng.uniform(2.0, 3.0), 4, 0.06)
-        b.tube(pts, [0.035, 0.03, 0.022, 0.015, 0.006], 4, "bark_brown", "bark_grey", cap=False)
-        for i in (2, 3, 4):  # catkins: lamb's tails
-            p = pts[i]
-            b.tube([p, p + V((rng.uniform(-0.03, 0.03), 0.02, -0.09))], [0.012, 0.006], 3, "willow_yellow", cap=False)
-    b.blob(V((0, 0, 0.06)), (0.22, 0.22, 0.1), 1, "bark_grey", 0.3)
+    for k in range(11):
+        a = 2 * math.pi * k / 11 + rng.uniform(-0.25, 0.25)
+        lean = rng.uniform(0.25, 0.55)
+        d = V((math.cos(a) * lean, math.sin(a) * lean, 1))
+        pts, _ = b.branch_curve(V((math.cos(a) * 0.12, math.sin(a) * 0.12, 0.05)), d, rng.uniform(1.6, 2.8), 4,
+                                0.1, droop=0.06)
+        b.tube(pts, [0.028, 0.022, 0.016, 0.01, 0.004], 5, "hazel_bark", "hazel_tip", cap=False)
+        for i in (2, 3):  # a forked twig off the upper rod
+            if rng.random() < 0.6:
+                tw, _ = b.branch_curve(pts[i], d + V((rng.uniform(-0.8, 0.8), rng.uniform(-0.8, 0.8), 0.1)),
+                                       rng.uniform(0.35, 0.6), 2, 0.15, droop=0.1)
+                b.tube(tw, [0.008, 0.005, 0.002], 3, "hazel_tip", cap=False)
+        for i in (3, 4):  # catkins: lamb's tails in twos and threes
+            for _ in range(rng.randint(2, 3)):
+                p = pts[i] + V((rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05), 0))
+                tip = p + V((rng.uniform(-0.03, 0.03), rng.uniform(-0.03, 0.03), -rng.uniform(0.07, 0.11)))
+                b.tube([p, (p + tip) * 0.5 + V((0.01, 0, 0)), tip], [0.009, 0.011, 0.004], 3, "catkin", cap=False)
+        if k % 4 == 0:  # a dry leaf that never fell
+            b.blade(pts[2], V((rng.uniform(-1, 1), rng.uniform(-1, 1), -0.4)), 0.09, 0.045, "leaf_dry", "straw")
+    b.blob(V((0, 0, 0.06)), (0.3, 0.3, 0.12), 1, "bark_grey", 0.3)
 
 
 @asset(1500)
@@ -431,16 +447,22 @@ def dead_bracken(b):
 @asset(800)
 def winter_grass_tuft(b):
     rng = b.rng
-    for k in range(18):
+    # Pale straw and buff, many soft drooping blades (audit A7: dark, stiff
+    # blades read as black stamped stars against the snow).
+    for k in range(30):
         a = rng.uniform(0, 6.28)
-        d = V((math.cos(a) * rng.uniform(0.2, 0.7), math.sin(a) * rng.uniform(0.2, 0.7), 1))
-        b.blade(V((math.cos(a) * 0.04, math.sin(a) * 0.04, 0)), d, rng.uniform(0.3, 0.5), 0.04,
-                "straw_dark", "straw", bend=0.35, segs=2)
+        d = V((math.cos(a) * rng.uniform(0.3, 0.9), math.sin(a) * rng.uniform(0.3, 0.9), 1))
+        b.blade(V((math.cos(a) * 0.06, math.sin(a) * 0.06, 0)), d, rng.uniform(0.25, 0.45), 0.028,
+                "straw", "buff", bend=0.5, segs=3)
 
 
 @asset(800)
 def snow_mound(b):
-    b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.25, flat_bottom=0.0)
+    # A smooth wind-carved drift, not a faceted lump: softer noise and
+    # smooth shading.
+    faces = b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.12, flat_bottom=0.0)
+    if faces:
+        b.smooth_faces.update(faces)
 
 
 @asset(1500)

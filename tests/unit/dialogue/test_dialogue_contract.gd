@@ -262,6 +262,36 @@ func test_place_lines_and_follow_ups() -> void:
 	assert_eq(d.step(Vector3(100, 0, 101)), b, "the follow-up comes right after")
 
 
+func test_a_string_valued_flag_counts_as_a_deed() -> void:
+	var d := _bare_director()
+	var line := DialogueLine.new()
+	line.id = &"t_kept"
+	line.trigger = DialogueLine.Trigger.DEED
+	line.deed = &"paintings_shown"
+	line.inner = true
+	line.text = "Kept."
+	d.add_book(_book([line]))
+	WorldState.set_flag("paintings_shown", "winter_woods")
+	assert_eq(d._deed_queue.size(), 1, "a String value raises the deed")
+	assert_eq(d.step(Vector3.ZERO), line)
+	# And a line that requires it reads it without a bool() cast.
+	var after := DialogueLine.new()
+	after.id = &"t_after_kept"
+	after.trigger = DialogueLine.Trigger.DEED
+	after.deed = &"wolf_killed"
+	after.require_flags = ["paintings_shown"]
+	after.inner = true
+	after.text = "After."
+	d.add_book(_book([after]))
+	WorldState.set_flag("wolf_killed", true)
+	d._now += 10.0
+	assert_eq(d.step(Vector3.ZERO), after, "a String-valued flag meets require_flags")
+	for v: Variant in [null, false, 0, "", &""]:
+		assert_false(DialogueDirector.truthy(v), "%s is unset" % [v])
+	for v: Variant in [true, 1, "winter_woods", &"x"]:
+		assert_true(DialogueDirector.truthy(v), "%s is set" % [v])
+
+
 func test_regions_come_from_the_macro_map() -> void:
 	var d := _bare_director()
 	# The streaming circles overlap (the blight's covers the hill, the forest's

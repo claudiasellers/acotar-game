@@ -764,14 +764,15 @@ func _place_verges() -> void:
 					if not ground_ok(p, 0.6) or not footprint_free(p, Vector2(0.8, 0.8), 0.0, 0.3):
 						continue
 					var r := vr.randf()
-					if r < 0.42:
-						for k in vr.randi_range(2, 4):  # a tussock of dead grass
+					if r < 0.5:
+						for k in vr.randi_range(3, 6):  # a tussock of dead grass
 							put(&"grass_tufts", p + Vector2(vr.randf_range(-0.6, 0.6), vr.randf_range(-0.6, 0.6)),
 									vr.randf() * TAU, vr.randf_range(0.8, 1.4))
 					elif r < 0.6:
 						put(&"dead_bracken", p, vr.randf() * TAU, vr.randf_range(0.7, 1.1))
-					elif r < 0.84:
-						# Drifts pile on the lee of the verge, long and low.
+					elif r < 0.84 and d < hw + 4.0:
+						# Drifts pile on the lee of the verge, long and low,
+						# right against it (not out where a camera stands).
 						put(&"snow_mounds", p, n.angle() * -1.0 + vr.randf_range(-0.3, 0.3), vr.randf_range(0.9, 1.8))
 					elif r < 0.95:
 						put(&"boulders", p, vr.randf() * TAU, vr.randf_range(0.25, 0.5))

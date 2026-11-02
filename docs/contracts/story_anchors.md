@@ -23,7 +23,7 @@ The full list of anchors is generated: [story_anchors_table.md](story_anchors_ta
 
 ## For the systems lane
 
-- `story_item_granted(item_id, n)`: `obj_lucien_knife`, `obj_white_roses`, `outfit_solstice_blue_gown`, `hair_loose_with_flowers`, `outfit_mortal_travel_dress`, `arrow_ash`.
+- `story_item_granted(item_id, n)`: `obj_white_roses`, `outfit_solstice_blue_gown`, `hair_loose_with_flowers`, `outfit_mortal_travel_dress`, `arrow_ash`.
 - `journal_entry_added(entry_id)`: Suriel answers, the mural, the Treaty, Nesta's truth, Amarantha's terms.
 - `celebration_requested(kind, at)` marks Spring Court deeds (sparkle and chime); horror beats use `mood_requested(&"dread", ...)` instead.
 

@@ -96,11 +96,12 @@ moment("summer_faerie", "17", "", "manor_house", ["naga_survived"], [
 ], trigger="auto", notes="Unwinnable triage on the entrance-hall table; the deed is holding his hand until he dies.")
 
 # --- P4 The wider court (ch 18-19) -------------------------------------------
+# Coded by L44 (story/act4/starlight_pool_swim.gd, Act2Spaces.CODED): these
+# steps are the fallback and name the deed. No knife in ch18 (Keeper).
 moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faerie_comforted"], [
     SP("tamlin", V(2, 0, 2)), C("WALK"), CU("tamlin", "shows_his_childhood_pool"), CEL("vista"),
     ST(6.0, 8.0), R("starlight_pool_found"), CEL("deed"), J("lucien_autumn_history"),
-    G("obj_lucien_knife"),
-], r=10.0, notes="Picnic in the glen, swim in the pool; Lucien's story and his knife.")
+], r=10.0, notes="L44: picnic on the glen shore; she finds the pool below the falls and jumps in; Tamlin tells Lucien's history.")
 moment("gallery", "19", "manor_gallery", "manor_house", ["gallery_opened"], [
     C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 3.0, "cone": 35.0}, CEL("gallery"),
     R("fact.gallery_seen"),
@@ -117,7 +118,7 @@ moment("attor", "19", "attor_hiding_spot", "manor_grounds", ["first_painting"], 
     SP("attor", V(0, 3, -12)), CU("attor", "speaks_of_her"),
     ST(18.0, 2.5, "self", True, "fact.attor_detected"), MO("dread", 0.2, 2.0), DS("attor"),
     R("attor_evaded"),
-], r=3.0, notes="Stay hidden; leaving the spot is detection (a permanent fact) and the scene ends.")
+], r=3.0, notes="L44 (story/act4/attor_in_the_garden.gd): by day; Tamlin says stay hidden and she hides herself behind the hedge; leaving cover or rustling is detection (a permanent fact) and the scene ends.")
 
 # --- P5 Calanmai (ch 20-22) --------------------------------------------------
 moment("calanmai_fires", "20", "calanmai_bonfires", "hill_of_the_rite", ["attor_evaded"], [

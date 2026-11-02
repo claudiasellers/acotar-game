@@ -53,7 +53,7 @@ const HERO := {
 	&"attic_west_gable": &"mirror_gilt", &"attic_schoolroom": &"globe_stand", &"observatory": &"telescope_brass",
 	&"rose_bower": &"rose_arbor", &"lantern_lookout": &"map_wall", &"moon_tower": &"harp_gilt",
 	# service wing
-	&"svc_kitchen": &"table_kitchen", &"svc_servants_hall": &"table_dining_long", &"svc_stillroom": &"alembic",
+	&"svc_kitchen": &"table_kitchen", &"svc_servants_hall": &"table_kitchen", &"svc_stillroom": &"alembic",
 	&"svc_housekeeper": &"desk_writing", &"svc_alis_room": &"cradle_chest", &"svc_sewing_room": &"mannequin_gown",
 }
 
@@ -100,10 +100,13 @@ static func wall_material(room: ManorRoomDef) -> Material:
 
 
 ## The floor material: state rooms with marble floors get the lozenge damier
-## (one shared material), everything else keeps `plain`.
+## (one shared material); rooms with a pattern in ManorRoomFinish (the foyer's
+## checker, the gallery's pale boards, parquet, tiles, flags) get that; the
+## rest keep `plain`.
 static func floor_material(room: ManorRoomDef, plain: Material) -> Material:
-	if room.floor_kind != &"marble" or not is_state_room(room):
-		return plain
+	if room.floor_kind != &"marble" or not is_state_room(room) or ManorRoomFinish.FLOORS.has(room.id):
+		var patterned := ManorRoomFinish.floor_material(room)
+		return patterned if patterned != null else plain
 	if _marble == null:
 		_marble = ShaderMaterial.new()
 		_marble.shader = MARBLE
@@ -111,12 +114,14 @@ static func floor_material(room: ManorRoomDef, plain: Material) -> Material:
 	return _marble
 
 
-## The ceiling material: a painted sky over this room's rect, else `plain`.
-static func ceiling_material(room: ManorRoomDef, plain: Material) -> Material:
+## The ceiling material: coffer fields, a painted sky over this room's rect,
+## else plaster that ignores the lawn-green ambient (ManorRoomFinish.plaster).
+## `plain` is kept for callers that pass one; plaster replaces it.
+static func ceiling_material(room: ManorRoomDef, plain: Material = null) -> Material:
 	if is_coffered(room):
-		return _coffer_mat(&"field", room.wall_color.lerp(EstateKit.BLUSH, 0.3).lerp(EstateKit.PEARL, 0.45), 0.85, 0.0)
+		return _coffer_mat(&"field", room.wall_color.lerp(EstateKit.BLUSH, 0.25).lerp(Color(0.98, 0.95, 0.92), 0.35), 0.85, 0.0)
 	if not has_sky(room):
-		return plain
+		return ManorRoomFinish.plaster(ManorRoomFinish.ceiling_color(room))
 	if _skies.has(room.id):
 		return _skies[room.id]
 	var m := ShaderMaterial.new()
@@ -205,9 +210,9 @@ static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> 
 
 
 ## Coffer materials ignore ambient light, which from below is the lawn green
-## (see sky_ceiling.gdshader) and would muddy them, and glow only faintly of
-## their own colour: the room's lights carry them, so at night, with the
-## lights down, the ceiling goes dark with the hall instead of glowing.
+## (see sky_ceiling.gdshader) and would muddy them, and carry a soft bounce
+## of their own colour instead, the same as the plaster ceilings (L38: at the
+## old 0.08 the pearl coffers read black in every shot, quality audit A4).
 static func _coffer_mat(kind: StringName, color: Color, roughness: float, metallic: float) -> StandardMaterial3D:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _coffer_mats.has(key):
@@ -220,7 +225,7 @@ static func _coffer_mat(kind: StringName, color: Color, roughness: float, metall
 	m.disable_ambient_light = true
 	m.emission_enabled = true
 	m.emission = color
-	m.emission_energy_multiplier = 0.08 if kind != &"gilt" else 0.15
+	m.emission_energy_multiplier = 0.3 if kind != &"gilt" else 0.22
 	_coffer_mats[key] = m
 	return m
 

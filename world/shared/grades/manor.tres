@@ -26,3 +26,5 @@ glow_bloom = 0.0
 snow_cover = 0.0
 magic = 0.35
 glow_hdr_threshold = 1.4
+; A few soft fair-weather clouds over the grounds (painted_sky).
+cloud_cover = 0.30
