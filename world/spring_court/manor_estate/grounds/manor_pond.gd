@@ -11,6 +11,9 @@ const BOATHOUSE := Rect2(246.0, 104.0, 12.0, 12.0)
 const ISLAND_R := 6.0
 const ISLET_R := 4.0
 const STONES_FROM := Vector2(210.0, 66.5)
+const BRIDGE_RISE := 1.2
+## The grass top of the island and islet, above ManorPond.level().
+const BRIDGE_DECK_Y := 0.55
 
 
 ## The walk from the forecourt to the jetty (dressed by ManorEastLawn).
@@ -24,6 +27,21 @@ static func footprints() -> Array[Rect2]:
 
 static func level() -> float:
 	return ManorTerrain.pond_level()
+
+
+## The footbridge's ends on the island and islet rims, on the line between
+## their centres, so it meets each shore square.
+static func bridge_ends() -> PackedVector2Array:
+	var il := ManorSitePlan.POND_ISLAND
+	var it := ManorSitePlan.POND_ISLET
+	var d := (it - il).normalized()
+	return PackedVector2Array([il + d * (ISLAND_R - 0.2), it - d * (ISLET_R - 0.2)])
+
+
+static func bridge_frame(y: float) -> Transform3D:
+	var e := bridge_ends()
+	var deck := y + BRIDGE_DECK_Y
+	return BridgeSpan.frame(Vector3(e[0].x, deck, e[0].y), Vector3(e[1].x, deck, e[1].y))
 
 
 static func stones() -> PackedVector2Array:
@@ -190,24 +208,29 @@ static func _island(b: GroundsBatch, y: float) -> void:
 	b.prop(&"garden_bench", top + Vector3(0, 0, -1.2), PI)
 	b.prop(&"faelight_orb", top + Vector3(0, 2.6, 0))
 	# arched footbridge to the islet
-	var a2 := il + Vector2(ISLAND_R - 0.2, 0.2)
-	var b2 := ManorSitePlan.POND_ISLET + Vector2(-ISLET_R + 0.2, 0.0)
+	var ends := bridge_ends()
+	var a2 := ends[0]
+	var b2 := ends[1]
 	var n := 8
 	for i in n:
 		var t0 := float(i) / n
 		var t1 := float(i + 1) / n
 		var p0 := a2.lerp(b2, t0)
 		var p1 := a2.lerp(b2, t1)
-		var h0 := y + 0.55 + 1.2 * sin(PI * t0)
-		var h1 := y + 0.55 + 1.2 * sin(PI * t1)
+		var h0 := y + BRIDGE_DECK_Y + BRIDGE_RISE * sin(PI * t0)
+		var h1 := y + BRIDGE_DECK_Y + BRIDGE_RISE * sin(PI * t1)
 		var d := p1 - p0
 		var yaw := atan2(-d.y, d.x)
 		var len := d.length()
 		var basis := Basis(Vector3.UP, yaw) * Basis(Vector3.BACK, atan2(h1 - h0, len))
 		var mid := Vector3((p0.x + p1.x) * 0.5, (h0 + h1) * 0.5 - 0.1, (p0.y + p1.y) * 0.5)
-		b.box(mid, Vector3(len + 0.05, 0.2, 1.8), ManorGrounds.wood(), true, 0.0, basis)
+		b.box(mid, Vector3(len + 0.05, 0.2, 1.8), ManorGrounds.wood(), false, 0.0, basis)
 		for side: float in [-1.0, 1.0]:
 			var off := Basis(Vector3.UP, yaw) * Vector3(0, 0, side * 0.9)
 			b.box(mid + off + Vector3.UP * 0.9, Vector3(len + 0.05, 0.08, 0.08), ManorGrounds.pearl(), false, 0.0, basis)
 			b.box(Vector3(p0.x, h0 + 0.45, p0.y) + off, Vector3(0.1, 0.9, 0.1), ManorGrounds.pearl(), false)
+	var deck := CollisionShape3D.new()
+	deck.shape = BridgeSpan.deck_shape(BridgeSpan.arch_profile(a2.distance_to(b2), BRIDGE_RISE), 0.9)
+	deck.transform = bridge_frame(y)
+	b.body.add_child(deck)
 	b.prop(&"lamp_post", Vector3(ManorSitePlan.POND_ISLET.x + 1.5, y + 0.55, ManorSitePlan.POND_ISLET.y + 1.5))

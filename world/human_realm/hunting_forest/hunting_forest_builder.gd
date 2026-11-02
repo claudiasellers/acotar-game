@@ -48,20 +48,23 @@ func _init() -> void:
 	_ride = HumanRealmLayout.ROADS[1]
 
 
+## The frozen bridge: tools/blender/human_realm/forest_landmarks.py makes it
+## BRIDGE_MODEL_LENGTH long; stretched to land on the creek's bank tops.
+const BRIDGE_MODEL_LENGTH := 12.0
+const BRIDGE_HALF_LENGTH := HumanRealmLayout.CREEK_HALF_WIDTH + HumanRealmLayout.CREEK_BANK
+
+
+## The deck along its length: a low hump, its crest eased.
+static func bridge_deck_profile() -> PackedVector2Array:
+	var h := BRIDGE_HALF_LENGTH
+	return PackedVector2Array([Vector2(-h, 0.88), Vector2(-h / 6.0, 1.38), Vector2(0.0, 1.43), Vector2(h / 6.0, 1.38), Vector2(h, 0.88)])
+
+
 static func bridge_site() -> Array:
-	## [point, way direction] of the frozen bridge: where the ride north
-	## crosses the creek if it does inside the forest (it doesn't with the
-	## current layout: that crossing is in the village region), else where a
-	## trail crosses it (Feyre's path first, then the deer trails).
-	var rect: Rect2 = HumanRealmLayout.REGION_RECTS[&"hunting_forest"]
-	var ways: Array = [HumanRealmLayout.ROADS[1]] + HumanRealmLayout.PATHS
-	for way: PackedVector2Array in ways:
-		for i in way.size() - 1:
-			for j in HumanRealmLayout.CREEK.size() - 1:
-				var hit: Variant = Geometry2D.segment_intersects_segment(way[i], way[i + 1], HumanRealmLayout.CREEK[j], HumanRealmLayout.CREEK[j + 1])
-				if hit != null and rect.grow(-20.0).has_point(hit):
-					return [hit, (way[i + 1] - way[i]).normalized()]
-	return [Vector2(-330.0, 1780.0), Vector2(0.0, 1.0)]
+	## [point, way direction] of the frozen bridge: where Feyre's path from the
+	## cottage crosses the creek, square to it.
+	var span := HumanRealmLayout.frozen_bridge()
+	return [span.centre, span.across]
 
 
 static func crossroads() -> Vector2:

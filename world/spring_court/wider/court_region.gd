@@ -28,6 +28,13 @@ var forage_field: ScatterField
 var decor_field: ScatterField
 var tree_field: ScatterField
 
+## The arched footbridge (tools/court/blender/props_shapes_b.py fae_footbridge).
+const BRIDGE_ASSET := &"fae_footbridge"
+const BRIDGE_MODEL_SPAN := 8.0
+const BRIDGE_RISE := 1.3
+const BRIDGE_HALF_WIDTH := 1.0
+## River half width, the water ribbon's margin and a little dry bank.
+const BRIDGE_HALF_SPAN := MacroHeight.RIVER_HALF_WIDTH + 5.0
 const MAGNET_STEP := 75.0
 const MAGNET_OFFSET := 18.0
 const MAGNET_HEIGHT := 14.0
@@ -270,6 +277,9 @@ func _build_landmarks() -> void:
 		if lm.kind == &"waterfall" and not lm.offsets.is_empty():
 			_build_falls(node, lm)
 		var n := lm.asset_ids.size()
+		if lm.asset_ids.has(BRIDGE_ASSET):
+			_build_bridge(node, lm)
+			continue
 		for i in n:
 			var offset := _offset(lm, i, n)
 			var world := lm.position + offset.rotated(-node.rotation.y)
@@ -280,6 +290,51 @@ func _build_landmarks() -> void:
 			piece.position = Vector3(offset.x, ground - y, offset.y)
 			piece.rotation.y = atan2(-offset.x, -offset.y) if n > 4 and offset != Vector2.ZERO else 0.0
 			node.add_child(piece)
+
+
+## {a, b}: where a bridge landmark's deck ends sit, square across the Thornwater
+## at its nearest point, clear of the water ribbon either side.
+static func bridge_ends(lm: CourtLandmark) -> Array[Vector3]:
+	var span := BridgeSpan.square_across(MacroHeight.THORNWATER, lm.position, Vector2.ZERO)
+	return BridgeSpan.ends_on_ground(span, BRIDGE_HALF_SPAN)
+
+
+## The arched footbridge stretched along its length to reach both banks, a
+## deck collider of its own, and the landmark's other pieces at its ends.
+func _build_bridge(node: Node3D, lm: CourtLandmark) -> void:
+	var ends := bridge_ends(lm)
+	var xf := node.transform.affine_inverse() * BridgeSpan.frame(ends[0], ends[1])
+	var length := ends[0].distance_to(ends[1])
+	var piece := _model(BRIDGE_ASSET)
+	var col := piece.get_node_or_null("Collision")
+	if col != null:
+		piece.remove_child(col)
+		col.free()
+	# The model's long axis is local X and its deck spans BRIDGE_MODEL_SPAN.
+	piece.transform = Transform3D(xf.basis * Basis(Vector3.UP, -PI * 0.5) * Basis.from_scale(Vector3(length / BRIDGE_MODEL_SPAN, 1.0, 1.0)), xf.origin)
+	node.add_child(piece)
+	var body := StaticBody3D.new()
+	body.name = "BridgeDeck"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var cs := CollisionShape3D.new()
+	cs.shape = BridgeSpan.deck_shape(BridgeSpan.arch_profile(length, BRIDGE_RISE), BRIDGE_HALF_WIDTH)
+	cs.transform = xf
+	body.add_child(cs)
+	node.add_child(body)
+	var side := xf.basis.x * (BRIDGE_HALF_WIDTH + 0.5)
+	var posts := 0
+	for id in lm.asset_ids:
+		if id == BRIDGE_ASSET:
+			continue
+		var other := _model(StringName(id))
+		if id == "stepping_stones":
+			var mid := (ends[0] + ends[1]) * 0.5
+			other.position = node.transform.affine_inverse() * Vector3(mid.x, WorldHeight.height_at(mid.x, mid.z), mid.z)
+		else:
+			other.position = node.transform.affine_inverse() * ends[posts % 2] + side
+			posts += 1
+		node.add_child(other)
 
 
 ## Each landmark's own setting (lane L32): its light, particles and

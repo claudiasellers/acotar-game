@@ -8,5 +8,5 @@ script = ExtResource("2_e4t1x")
 id = &"fallen_logs"
 mesh_path = "res://world/human_realm/shared/assets/flora/log_fallen.glb"
 tags = PackedStringArray("canon:X")
-instances = PackedFloat32Array(612.4518, 2.1220305, 2143.2954, 0.6803246, 1)
+instances = PackedFloat32Array(612.4518, 2.1220305, 2143.2954, 1.0939436, 1)
 material = ExtResource("1_usa7f")
