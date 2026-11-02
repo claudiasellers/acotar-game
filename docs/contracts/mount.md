@@ -68,7 +68,8 @@ so position-based checks (wayside, exit conditions, the streamer) see her.
 | jump | | a leap (from 3 m/s) |
 
 The bow is off in the saddle. The camera swings in behind her after 0.8 s
-without look input.
+without look input. The white horse's meshes are in `CameraFade.NEVER_GROUP`,
+so the chase camera's sight-line fade never turns her see-through.
 
 ## Nodes
 
