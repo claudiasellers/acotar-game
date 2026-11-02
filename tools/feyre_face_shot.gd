@@ -38,6 +38,19 @@ func _run() -> void:
 	await _seconds(settle)
 	await _close_up(feyre, 0.0, out.path_join("face_drive_front.png"))
 	await _close_up(feyre, 32.0, out.path_join("face_drive_34.png"))
+	# A/B for the skin shader's terms (diagnostic): no subsurface, then no rim
+	var head_mat: ShaderMaterial = null
+	for c in feyre.model.get_children():
+		if c.get(&"skin_head_material") != null:
+			head_mat = c.get(&"skin_head_material")
+	if head_mat != null and args.size() > 1 and args[1] == "ab":
+		var sss: Variant = head_mat.get_shader_parameter("subsurface")
+		head_mat.set_shader_parameter("subsurface", 0.0)
+		await _close_up(feyre, 0.0, out.path_join("face_drive_front_nosss.png"))
+		head_mat.set_shader_parameter("subsurface", 0.25 if sss == null else sss)
+		head_mat.set_shader_parameter("natural_brows_amount", 0.0)
+		await _close_up(feyre, 0.0, out.path_join("face_drive_front_nobrows.png"))
+		head_mat.set_shader_parameter("natural_brows_amount", 0.8)
 
 	# The vanity: open the mirror on the Makeup tab with nothing chosen.
 	_stand_at(feyre, &"dressing_mirror")
