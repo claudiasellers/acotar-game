@@ -156,7 +156,7 @@ static func plant(sb: ManorScatter) -> void:
 	for corner: Vector2 in [Vector2(-46.0, -184.0), Vector2(46.0, -184.0), Vector2(-60.0, -122.0)]:
 		GardenKit.drift(sb, &"deco_hydrangea_pink" if corner.x < 0.0 else &"deco_hydrangea", corner, 5.0, 9, rng)
 		GardenKit.drift(sb, &"deco_peony", corner + Vector2(8.0 * signf(-corner.x), 3.0), 3.5, 7, rng)
-		GardenKit.drift(sb, &"ing_foxglove", corner + Vector2(-6.0 * signf(-corner.x), 6.0), 3.0, 6, rng)
+		GardenKit.drift(sb, &"ing_foxglove", corner + Vector2(-6.0 * signf(-corner.x), 6.0), 3.0, 4, rng)
 	# the cutting beds (the white one by the outer walk: the rose_garden_bush anchor faces it)
 	for bed: Array in CUTTING_BEDS:
 		GardenKit.fill_rect(sb, bed[0], bed[1], ROSE_STEP, rng)

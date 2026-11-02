@@ -464,6 +464,21 @@ def daffodil(p, h, col, rng):
               (1.0, 0.70, 0.30) if i % 2 == 0 else col, F, m)
 
 
+def meadow_buttercup(p, h, col, rng):
+    """[C] ch8: lanky meadow buttercups, glossy yellow cups held high on thin
+    branching stems over a low tuft of cut leaves."""
+    clump_leaves(p, h * 0.35, 5, rng, length=0.6)
+    for i in range(9):
+        a = 2.39996 * i + rng.uniform(-0.2, 0.2)
+        top = h * rng.uniform(0.7, 1.0)
+        rr = h * rng.uniform(0.08, 0.3)
+        x, y = rr * math.cos(a), rr * math.sin(a)
+        stem(p, (0, 0, 0), (x, y, top), h * 0.012)
+        m = T(x, y, top) @ R("Z", math.degrees(a)) @ R("Y", rng.uniform(15, 40))
+        for k in range(5):
+            p.add(petal(h * 0.1, h * 0.09, cup=0.5, curl=0.1), col if k % 2 else lighter(col, 0.12), F, m @ R("Z", 72 * k) @ R("Y", -40))
+
+
 def hydrangea(p, h, col, rng):
     """Mophead hydrangea: round heads of tiny florets over broad leaves (canon:X outdoors)."""
     r = h * 0.48
@@ -578,6 +593,8 @@ def build_species(sid, kind, h, col, rng):
         snowdrop(p, h, c, rng)
     elif sid == "daffodil":
         daffodil(p, h, c, rng)
+    elif sid == "meadow_buttercup":
+        meadow_buttercup(p, h, c, rng)
     elif sid.startswith("hydrangea"):
         hydrangea(p, h, c, rng)
     elif sid == "delphinium":

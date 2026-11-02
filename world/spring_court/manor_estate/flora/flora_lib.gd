@@ -69,6 +69,7 @@ const SPECIES := {
 	&"allium": [&"flower", 1.0, Color(0.76, 0.56, 0.96)],
 	&"catmint": [&"flower", 0.5, Color(0.64, 0.62, 0.96)],
 	&"foxglove_white": [&"flower", 1.3, Color(0.98, 0.94, 0.97)],
+	&"meadow_buttercup": [&"flower", 0.8, Color(1.0, 0.84, 0.12)],
 	&"peony_white": [&"flower", 0.8, Color(1.0, 0.96, 0.94)],
 }
 
