@@ -350,17 +350,87 @@ def gown_rack(p, size, c):
         gown(p, x, 0, 0.12, 1.55, col, rng, flare=0.75, sleeves=False, seg=10, rose=False)
 
 
+# Feyre's own gowns on a padded dress form (audit A6: no more cones). The gown
+# is her wardrobe mesh in its rest shape, decimated to the prop budget; the
+# form is ivory linen with a turned gilt finial, so no skin shows.
+GOWN_TRIS = 2300
+# wardrobe material -> (colour, finish); None = the prop's own colour
+GOWN_PARTS = {
+    "fabric": (None, "fabric"), "lining": ("light", "fabric"), "trim_gold": (GOLD, "satin"),
+    "pearl": (PEARL, "pearl"), "flowers": (ROSE, "fabric"), "flower_centers": (BUTTER, "satin"),
+}
+
+
+def _wardrobe_gown(p, name, c):
+    import bpy
+    import bmesh
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "characters", "feyre", "wardrobe", name + ".glb")
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=os.path.abspath(path))
+    new = [o for o in bpy.data.objects if o not in before]
+    ob = next(o for o in new if o.type == "MESH")
+    me = ob.data
+    tris = sum(len(poly.vertices) - 2 for poly in me.polygons)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    mats = [m.name.split(".")[0] if m else "fabric" for m in me.materials]
+    if tris > GOWN_TRIS:
+        bmesh.ops.triangulate(bm, faces=bm.faces[:])
+        tmp = bpy.data.meshes.new("gown_tmp")
+        bm.to_mesh(tmp)
+        bm.free()
+        tob = bpy.data.objects.new("gown_tmp", tmp)
+        bpy.context.scene.collection.objects.link(tob)
+        mod = tob.modifiers.new("dec", "DECIMATE")
+        mod.ratio = GOWN_TRIS / tris
+        dg = bpy.context.evaluated_depsgraph_get()
+        bm = bmesh.new()
+        bm.from_mesh(tob.evaluated_get(dg).to_mesh())
+        bpy.data.objects.remove(tob)
+    for idx, mname in enumerate(mats):
+        col, finish = GOWN_PARTS.get(mname, (None, "fabric"))
+        col = c if col is None else lighter(c, 0.45) if col == "light" else col
+        part = bm.copy()
+        bmesh.ops.delete(part, geom=[f for f in part.faces if f.material_index != idx], context="FACES")
+        bmesh.ops.delete(part, geom=[v for v in part.verts if not v.link_faces], context="VERTS")
+        if part.faces:
+            # her gowns face +Z in the wardrobe glb; a prop's front is -Z in Godot
+            p.add(part, col, finish, R("Z", 180), sharp_deg=70.0)
+    bm.free()
+    for o in new:
+        bpy.data.objects.remove(o)
+
+
+def _dress_form(p, top=1.42):
+    """Ivory linen torso inside the bodice, a neck and a gilt finial above it,
+    a turned pole and tripod foot under the skirt."""
+    k = top / 1.42
+    # slimmer than her body, so the bodice shows over it and only the
+    # shoulders and neck show linen
+    prof = [(0.0, 0.92), (0.08, 0.93), (0.088, 1.02), (0.105, 1.18), (0.112, 1.27), (0.11, 1.35), (0.06, 1.41),
+            (0.042, 1.43), (0.04, 1.5), (0.045, 1.52), (0.0, 1.53)]
+    p.add(lathe([(r * k, z * k) for r, z in prof], 14), CREAM, "fabric", S(1, 0.72, 1))
+    p.add(lathe([(0, 0), (0.03, 0.0), (0.035, 0.02), (0.018, 0.05), (0.03, 0.08), (0, 0.13)], 8), GOLD, "satin", T(0, 0, 1.53 * k))
+    p.add(cyl(0.018, 0.92 * k, 6), OAK_DARK, "satin")
+    for i in range(3):
+        a = math.radians(90 + 120 * i)
+        p.add(box(0.36, 0.035, 0.03), OAK_DARK, "satin", T(0.15 * math.cos(a), 0.15 * math.sin(a), 0.02) @ R("Z", math.degrees(a)))
+
+
 def mannequin_gown(p, size, c):
-    rng = random.Random(41)
-    p.add(lathe([(0.0, 0), (0.18, 0), (0.18, 0.03), (0.05, 0.05), (0.03, 0.5)], 12), GOLD, "gold")
-    gown(p, 0, 0, 0.05, 1.55, c, rng, flare=1.05)
-    p.add(lathe([(0.0, 0), (0.04, 0.0), (0.03, 0.08), (0.06, 0.12), (0.075, 0.2), (0.05, 0.27), (0, 0.29)], 10), CREAM, "pearl", T(0, 0, 1.47))
-    # tiara on the form
-    for i in range(7):
-        a = math.radians(-60 + i * 20)
-        p.add(lathe([(0.006, 0), (0.0, 0.03 + (0.025 if i == 3 else 0))], 4), GOLD, "gold", T(0.065 * math.sin(a), -0.065 * math.cos(a) * 0.8, 1.73))
-    p.add(torus(0.065, 0.006, 12, 3), GOLD, "gold", T(0, 0, 1.73) @ S(1, 0.8, 1))
-    p.add(sphere(0.012, 6, 4), ROSE, "glass", T(0, -0.055, 1.77))
+    _dress_form(p)
+    _wardrobe_gown(p, "gown_starlight", c)
+
+
+def mannequin_gown_rose(p, size, c):
+    _dress_form(p, 1.38)
+    _wardrobe_gown(p, "gown_rose_petal", c)
+
+
+def mannequin_gown_ball(p, size, c):
+    _dress_form(p)
+    _wardrobe_gown(p, "gown_ball", c)
 
 
 def shoe(p, x, y, z, col, rng):
@@ -952,7 +1022,8 @@ BUILDERS = {
     "bed_canopy": bed_canopy, "bed_single": bed_single, "bed_servant": bed_servant, "cradle_chest": cradle_chest,
     "nightstand": nightstand, "wardrobe_tall": wardrobe_tall, "dresser": dresser,
     "vanity_table": vanity_table, "vanity_mirror": vanity_mirror, "cheval_mirror": cheval_mirror,
-    "gown_rack": gown_rack, "mannequin_gown": mannequin_gown, "shoe_shelf": shoe_shelf, "hat_stand": hat_stand,
+    "gown_rack": gown_rack, "mannequin_gown": mannequin_gown, "mannequin_gown_rose": mannequin_gown_rose,
+    "mannequin_gown_ball": mannequin_gown_ball, "shoe_shelf": shoe_shelf, "hat_stand": hat_stand,
     "jewelry_box": jewelry_box, "perfume_tray": perfume_tray, "makeup_palette": makeup_palette,
     "dressing_screen": dressing_screen, "pouf_stool": pouf_stool,
     "chaise_longue": chaise_longue, "sofa": sofa, "armchair": armchair, "wingback_chair": wingback_chair,

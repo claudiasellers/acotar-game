@@ -11,7 +11,7 @@
 ## its frame by the film itself. Points are in the manor house's layout frame
 ## (use_house): the dining hall is Rect2(10, -48, 22, 20), its doors on the
 ## west wall at (10, -38), the long table at (21, -38), windows on the south
-## wall (z -28). Rhysand has no model yet: until the cast lane makes one he
+## wall (z -28). Rhysand is the cast lane's model; without it he
 ## is the cast rig re-dressed (Tamlin's build, unmasked): blue-black hair,
 ## black clothes with dark silver, violet eyes, half in his own shadow, so a
 ## stand-in reads as intended (scripts.md, B note).
@@ -148,7 +148,11 @@ func _rhysand() -> Node3D:
 	shadow.light_color = Color(0.85, 0.8, 1.0)
 	shadow.light_energy = 0.0
 	shadow.omni_range = 5.0
-	shadow.position = Vector3(0.0, 1.3, 0.0)
+	# Behind him, so it drinks the light from his back, the floor and the wall
+	# and never his face: from inside his chest it lit the undersides of brow,
+	# cheek and lip black, a skull where a face should be.
+	# The rig faces -Z (its model sits in a 180-degree turn), so +Z is behind.
+	shadow.position = Vector3(0.0, 1.2, 0.9)
 	who.add_child(shadow)
 	smoke = GPUParticles3D.new()
 	smoke.amount = 60

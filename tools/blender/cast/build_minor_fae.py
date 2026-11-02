@@ -190,6 +190,9 @@ def bake_face(body):
     for m, hexc, amt in layers:
         k = np.clip(m * amt, 0, 1)[..., None]
         col = col * (1 - k) + _srgb01(hexc) * k
+    if C.SKIN_TEX == "bark":
+        col *= (0.78 + 0.22 * _bark(w, h))[..., None]     # a fine grain on the face, deep bark below
+    col = _cap_rgb(col)
     img = bpy.data.images.new(ID + "_face", w, h, alpha=False)
     img.colorspace_settings.name = "sRGB"
     px = np.ones((h, w, 4), np.float32)
@@ -208,6 +211,100 @@ def bake_face(body):
     nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
     nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
     return "face bake: %dx%d" % (w, h)
+
+
+# --------------------------------------------------------------------------
+# Albedo cap (planner, L48: every authored albedo channel <= 0.85 sRGB, hue kept) and bark skin
+# --------------------------------------------------------------------------
+CAP_SRGB = 0.85
+CAP_LIN = ((CAP_SRGB + 0.055) / 1.055) ** 2.4
+
+
+def _cap_rgb(col):
+    m = col.max(axis=-1, keepdims=True)
+    return col * np.minimum(1.0, CAP_SRGB / np.maximum(m, 1e-6))
+
+
+def cap_albedo():
+    """Scale every base colour (linear) and every colour texture down to the cap, keeping the hue."""
+    n = 0
+    for m in bpy.data.materials:
+        if not m.node_tree:
+            continue
+        b = m.node_tree.nodes.get("Principled BSDF")
+        if b is None:
+            continue
+        c = list(b.inputs["Base Color"].default_value)
+        k = max(c[:3])
+        if k > CAP_LIN:
+            b.inputs["Base Color"].default_value = [x * CAP_LIN / k for x in c[:3]] + [c[3]]
+            n += 1
+    for img in bpy.data.images:
+        if img.users == 0 or img.size[0] == 0 or img.colorspace_settings.name != "sRGB":
+            continue
+        w, h = img.size
+        px = np.array(img.pixels[:], np.float32).reshape(h, w, 4)
+        if px[..., :3].max() <= CAP_SRGB + 1e-3:
+            continue
+        px[..., :3] = _cap_rgb(px[..., :3])
+        img.pixels = px.ravel()
+        img.update()
+        img.pack()
+        n += 1
+    return "albedo capped at %.2f sRGB on %d materials/textures" % (CAP_SRGB, n)
+
+
+def _bark(w, h, seed=48):
+    """Tileable bark: long vertical ridges with dark fissures, a little knotting.  0.45..1 shade."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:h, 0:w] / np.array([h, w])[:, None, None]
+    v = np.zeros((h, w), np.float32)
+    for k in range(1, 7):
+        fx, fy = 3 * k + rng.integers(0, 3), k
+        ph = rng.uniform(0, 2 * np.pi, 2)
+        v += np.sin(2 * np.pi * (fx * x + 0.35 * np.sin(2 * np.pi * (fy * y + ph[0]))) + ph[1]) / k
+    v = (v - v.min()) / (v.max() - v.min())
+    fissure = np.clip((v - 0.18) / 0.25, 0, 1)
+    knots = np.zeros_like(v)
+    for _ in range(5):
+        cx, cy, r = rng.uniform(0, 1), rng.uniform(0, 1), rng.uniform(0.03, 0.07)
+        d = np.sqrt(np.minimum(abs(x - cx), 1 - abs(x - cx)) ** 2 + np.minimum(abs(y - cy), 1 - abs(y - cy)) ** 2)
+        knots += np.exp(-(d / r) ** 2) * 0.5 * np.cos(d / r * 6) ** 2
+    return (0.45 + 0.55 * fissure * (1 - 0.4 * knots)).astype(np.float32)
+
+
+def bark_skin(body):
+    """The long-limbed household's green-and-brown bark skin (ch 24): a tiling bark shade over the
+    skin colour on every body surface but the face (the face bake carries its own)."""
+    size = 512
+    sh = _bark(size, size)
+    rgb = _srgb01(C.SKIN_SRGB)
+    moss = _srgb01("4E5E2E")
+    px = np.ones((size, size, 4), np.float32)
+    mix = np.clip((0.75 - sh) * 1.4, 0, 1)[..., None] * 0.35       # moss sits in the fissures
+    px[..., :3] = _cap_rgb((rgb * sh[..., None]) * (1 - mix) + moss * mix * sh[..., None])
+    img = bpy.data.images.new(ID + "_bark", size, size, alpha=False)
+    img.colorspace_settings.name = "sRGB"
+    img.pixels = px.ravel()
+    img.pack()
+    n = 0
+    for m in body.data.materials:
+        if m is None or m.name in ("head", "eye", "lashes", "mouth_inside", "teeth", "tongue"):
+            continue
+        nt = m.node_tree
+        b = nt.nodes.get("Principled BSDF")
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        mp = nt.nodes.new("ShaderNodeMapping")
+        mp.inputs["Scale"].default_value = (6.0, 6.0, 1.0)
+        uv = nt.nodes.new("ShaderNodeUVMap")
+        uv.uv_map = "UVMap"
+        nt.links.new(uv.outputs["UV"], mp.inputs["Vector"])
+        nt.links.new(mp.outputs["Vector"], tex.inputs["Vector"])
+        nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
+        b.inputs["Roughness"].default_value = 0.85
+        n += 1
+    return "bark skin on %d surfaces" % n
 
 
 # --------------------------------------------------------------------------
@@ -383,6 +480,9 @@ def main():
                 if b and "Coat Weight" in b.inputs:
                     b.inputs["Coat Weight"].default_value = 0.0
     report.append(bake_face(ctx.body))
+    if C.SKIN_TEX == "bark":
+        report.append(bark_skin(ctx.body))
+    report.append(cap_albedo())
     model, lines = merge(ctx, arm)
     report += lines
     path = export(model, arm, gaits)

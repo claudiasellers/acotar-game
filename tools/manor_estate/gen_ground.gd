@@ -1009,8 +1009,9 @@ func _furnish_cellars() -> void:
 	hang(id, &"lantern_hanging", 3)
 	sconces(id, 5.0)
 	wall_line(id, &"gown_rack", "n", 3)
-	for x in [3.0, 6.0, 9.0]:
-		p(id, &"mannequin_gown", x, 6)
+	# her gowns on dress forms, three different ones (audit A6)
+	for g in [[&"mannequin_gown_rose", 3.0], [&"mannequin_gown_ball", 6.0], [&"mannequin_gown", 9.0]]:
+		p(id, g[0], g[1], 6)
 	for c in [Vector2(1.2, 9), Vector2(1.2, 12), Vector2(11.8, 13.6)]:
 		p(id, &"chest_trunk", c.x, c.y, 90)
 	p(id, &"hat_stand", 11.5, 4)
