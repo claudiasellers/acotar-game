@@ -24,26 +24,26 @@ const SOUNDS := {
 ## Theme presets: the fields of PlaceSetting they set.
 const THEMES := {
 	"hearth": {"collar": ["flora_carpet_butter", "flora_bush_boxwood", "flora_carpet_rose"], "frame": "fae_lantern_post",
-		"props": ["fae_bench"], "light": Color(1.0, 0.78, 0.52), "energy": 1.6, "fx": "lantern_glow_motes", "sound": "village", "margin": 5.0},
+		"props": ["fae_bench"], "light": Color(1.0, 0.78, 0.52), "energy": 1.6, "fx": "lantern_glow_motes", "sound": "village", "margin": 3.5},
 	"station": {"collar": ["flora_carpet_rose", "flora_bush_boxwood", "flora_carpet_butter"], "frame": "fae_lantern_post",
-		"props": ["fae_bench", "fae_flower_cart"], "light": Color(1.0, 0.8, 0.6), "energy": 1.8, "fx": "lantern_glow_motes", "sound": "village", "margin": 5.0},
+		"props": ["fae_bench", "fae_flower_cart"], "light": Color(1.0, 0.8, 0.6), "energy": 1.8, "fx": "lantern_glow_motes", "sound": "village", "margin": 3.5},
 	"water": {"collar": ["flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle"], "frame": "rock_mossy_a",
-		"props": [], "light": Color(0.72, 0.82, 1.0), "energy": 1.0, "fx": "water_mist", "sound": "brook", "margin": 5.0},
+		"props": [], "light": Color(0.72, 0.82, 1.0), "energy": 1.0, "fx": "water_mist", "sound": "brook", "margin": 3.5},
 	"sacred": {"collar": ["flora_carpet_pearl", "flora_toadstool_ring", "flora_carpet_lilac"], "frame": "rite_standing_stone_e",
-		"props": [], "light": Color(0.86, 0.76, 1.0), "energy": 1.4, "fx": "faelights", "sound": "chimes", "margin": 6.0},
+		"props": [], "light": Color(0.86, 0.76, 1.0), "energy": 1.4, "fx": "faelights", "sound": "chimes", "margin": 3.5},
 	"fire": {"collar": ["flora_heather_mound", "rock_pebble_cluster"], "frame": "rite_ribbon_pole",
-		"props": [], "light": Color(1.0, 0.6, 0.32), "energy": 2.2, "fx": "bonfire_embers", "sound": "fire", "margin": 5.0},
+		"props": [], "light": Color(1.0, 0.6, 0.32), "energy": 2.2, "fx": "bonfire_embers", "sound": "fire", "margin": 3.5},
 	"garden": {"collar": ["flora_bush_rose", "flora_carpet_blush", "flora_bush_hydrangea"], "frame": "flora_bush_boxwood",
-		"props": ["fae_bench"], "light": Color(1.0, 0.82, 0.86), "energy": 1.0, "fx": "butterflies", "sound": "bees", "margin": 5.0},
+		"props": ["fae_bench"], "light": Color(1.0, 0.82, 0.86), "energy": 1.0, "fx": "butterflies", "sound": "bees", "margin": 3.5},
 	"lookout": {"collar": ["flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b"], "frame": "fells_cairn",
-		"props": ["fells_overlook_bench"], "light": Color(1.0, 0.9, 0.7), "energy": 0.6, "fx": "dandelion_seeds", "sound": "wind_birds", "margin": 6.0},
+		"props": ["fells_overlook_bench"], "light": Color(1.0, 0.9, 0.7), "energy": 0.6, "fx": "dandelion_seeds", "sound": "wind_birds", "margin": 3.5},
 	"shrine": {"collar": ["flora_fern_b", "flora_carpet_pearl", "rock_mossy_c"], "frame": "shrine_column_broken",
-		"props": [], "light": Color(0.92, 0.9, 1.0), "energy": 0.9, "fx": "faelights", "sound": "shrine_hum", "margin": 5.0},
+		"props": [], "light": Color(0.92, 0.9, 1.0), "energy": 0.9, "fx": "faelights", "sound": "shrine_hum", "margin": 3.5},
 	"autumn": {"collar": ["flora_heather_mound", "flora_fern_b", "autumn_fallen_log"], "frame": "autumn_border_marker",
-		"props": [], "light": Color(1.0, 0.72, 0.42), "energy": 1.0, "fx": "autumn_leaves", "sound": "wind_birds", "margin": 5.0},
+		"props": [], "light": Color(1.0, 0.72, 0.42), "energy": 1.0, "fx": "autumn_leaves", "sound": "wind_birds", "margin": 3.5},
 	# Horror is never softened (R3): a dim, sick light, ash, a drone you feel.
 	"dread": {"collar": ["flora_blighted_thicket", "blight_bone_rock"], "frame": "blight_dead_stump",
-		"props": ["blight_mask_pile"], "light": Color(0.55, 0.66, 0.5), "energy": 0.45, "fx": "blight_ash", "sound": "blight_drone", "margin": 5.0},
+		"props": ["blight_mask_pile"], "light": Color(0.55, 0.66, 0.5), "energy": 0.45, "fx": "blight_ash", "sound": "blight_drone", "margin": 3.5},
 }
 
 ## Place id -> [theme, overrides]. Every wider-court landmark must be here
@@ -146,6 +146,11 @@ func _setting(content: CourtRegionContent, lm: CourtLandmark, walks: Array[Packe
 	s.radius = _footprint(lm) + float(spec["margin"])
 	s.approach_deg = _approach(content, lm.position, walks)
 	s.collar_meshes = PackedStringArray(spec["collar"])
+	# A dense, narrow band hugging the place reads planted at eye level;
+	# a thin wide one reads as scatter.
+	s.collar_width = 3.0
+	s.collar_per_m = 2.6
+	s.frame_scale = 1.3
 	s.frame_mesh = StringName(spec["frame"])
 	s.props = PackedStringArray(spec["props"])
 	s.light_color = spec["light"]
@@ -163,8 +168,9 @@ func _footprint(lm: CourtLandmark) -> float:
 		return 9.0
 	if n <= 1:
 		var id := String(lm.asset_ids[0]) if n == 1 else ""
+		# Hero trees: the crown, not the trunk, is the footprint.
 		if id.begins_with("woods_") or id.begins_with("flora_tree"):
-			return clampf(lm.height_m * 0.32, 5.0, 9.0)
+			return clampf(lm.height_m * 0.45, 6.0, 13.0)
 		return clampf(lm.height_m * 0.5, 4.0, 8.0)
 	var ring := 0.0
 	for i in n:

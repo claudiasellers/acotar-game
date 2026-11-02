@@ -41,21 +41,27 @@ func _ready() -> void:
 		push_error("CourtRegion '%s' has no content" % name)
 		return
 	if threaded:
-		# Load every model and fill the static caches here on the main thread, so
-		# the worker never waits on the resource loader (which can need this thread).
-		CourtHeight.prewarm()
-		WorldHeight.height_at(0.0, 0.0)
-		for e in content.forage:
-			CourtAssets.mesh(e.model_id())
-		for d in content.decor:
-			CourtAssets.mesh(d.mesh_id)
-			if d.is_tree:
-				CourtAssets.mesh(d.mesh_id, true)
-		# The places' collars, props, FX and sounds too (decor_layers asks for them).
-		PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), content.bounding_rect()))
+		prewarm(content)
 		_start()
 	else:
 		build()
+
+
+## Loads every model and fills the static caches on the main thread, so the
+## worker never waits on the resource loader (which can need this thread
+## while it waits on the worker: a deadlock). Covers everything
+## forage_layers / decor_layers ask for, places included
+## (tests/unit/landscape/test_place_composition.gd checks that).
+static func prewarm(c: CourtRegionContent) -> void:
+	CourtHeight.prewarm()
+	WorldHeight.height_at(0.0, 0.0)
+	for e in c.forage:
+		CourtAssets.mesh(e.model_id())
+	for d in c.decor:
+		CourtAssets.mesh(d.mesh_id)
+		if d.is_tree:
+			CourtAssets.mesh(d.mesh_id, true)
+	PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), c.bounding_rect()))
 
 
 func _start() -> void:
