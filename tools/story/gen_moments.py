@@ -154,9 +154,8 @@ moment("solstice", "25", "solstice_dance_floor", "solstice_meadow", ["fountain_h
     R("solstice_danced"),
 ], trigger="auto", r=12.0, notes="L46 stages the night (Alis dresses her) and writes fact.solstice_sunrise_watched.")
 moment("rhysand_visit", "26", "manor_window_hide", "manor_house", ["solstice_danced", "fact.lunch_sat_down"], [
-    SP("lucien", V(1, 0, 0)), SP("tamlin", V(-2, 0, -5)), FILM("night_court"),
-    UF("fact.film_night_court_seen"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
-], r=3.0, notes="Cutscene B (lane L33) plays it in the dining hall and brings Rhysand itself; the film writes fact.false_name_clare_beddor.")
+    FILM("night_court"), UF("fact.film_night_court_seen"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
+], trigger="auto", r=3.0, notes="Starts when she sits down to lunch (L46 casts Tamlin and Lucien). Cutscene B (lane L33) plays it in the dining hall and brings Rhysand itself; the film writes fact.false_name_clare_beddor.")
 moment("sent_home", "27-28", "manor_tamlin_room", "manor_house", ["rhysand_faced", "fact.carriage_boarded"], [
     R("sent_home"),
 ], trigger="auto", r=4.0, notes="L46 stages the night, the paintings, the carriage and the sleep, and writes fact.carriage_boarded.")
