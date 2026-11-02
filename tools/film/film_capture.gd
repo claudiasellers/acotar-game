@@ -20,6 +20,10 @@ var out: String = "user://film_capture"
 var stills: PackedFloat32Array = []
 var fps: float = 4.0
 var quit_after: float = 0.0
+## Count from the first film to start (a cutscene the story starts), not
+## from load; give up after `give_up` seconds without one.
+var wait_for_film: bool = false
+var give_up: float = 300.0
 
 var _done_stills: int = 0
 var _frame: int = 0
@@ -42,6 +46,12 @@ func _ready() -> void:
 
 func _film_time() -> float:
 	var p := FilmPlayer.current(get_tree())
+	if wait_for_film and _watched == null and p == null:
+		if Time.get_ticks_msec() / 1000.0 > give_up:
+			push_error("film_capture: no film started in %.0f s" % give_up)
+			_log.append("no film started")
+			_finish()
+		return -1.0
 	if p and p != _watched:
 		_watched = p
 		p.beat.connect(func(b: StringName) -> void: _log.append("beat %s at %.2f" % [b, p.time]))

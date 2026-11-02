@@ -1,0 +1,73 @@
+## A cutscene as the story plays it (lane L33), captured on the Mac GPU:
+##   godot res://tools/film/cutscene_shot.tscn -- <out_dir> <film_id> [noclip]
+## Starts the real game at the story moment's anchor with the story up to it
+## done (the chain of deeds its gates need), lets the moment start the film
+## the way a player walking in would, and captures it with FilmCapture
+## (stills at the script's shots, a contact sheet, a 6 fps clip in atlases,
+## timing). Script: /mnt/project-files/plans/film/scripts.md sections 2 to 4.
+extends Node
+
+const GAME := "res://story/act1/act1_game.tscn"
+const MOMENTS := "res://data/story/moments/%s.tres"
+## film -> [moment, start region, anchor, stills (film seconds)]
+const STAGES := {
+	&"eyes_open": [&"glamour_lift", &"blossom_vale", &"glamour_lift_glade",
+		[4.0, 11.0, 21.5, 26.0, 33.0, 36.0, 39.5, 48.0, 51.5, 56.0, 59.5, 62.0, 65.5, 70.0, 74.5]],
+	&"night_court": [&"rhysand_visit", &"manor_estate", &"manor_window_hide",
+		[2.0, 4.4, 6.4, 8.8, 11.0, 15.0, 18.3, 20.0, 23.0, 28.0, 33.0, 37.5, 43.0, 45.5, 48.0, 50.5,
+		55.0, 59.0, 63.0, 65.5, 70.0, 72.0, 74.1, 76.5, 82.0, 86.4, 92.0, 100.0]],
+	&"silent_manor": [&"alis_truth", &"manor_estate", &"manor_alis_hiding",
+		[3.0, 9.0, 13.5, 16.0, 20.0, 27.0, 33.0, 37.0, 42.0, 49.0, 54.0, 58.5, 63.5, 68.0, 74.0, 81.5,
+		88.0, 93.0, 99.0, 106.0, 112.0, 117.0, 123.0, 129.0, 133.0, 138.0, 144.0, 148.5]],
+}
+
+
+func _ready() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	var args := OS.get_cmdline_user_args()
+	var out := args[0] if args.size() > 0 else "user://cutscene_shot"
+	var id := StringName(args[1]) if args.size() > 1 else &"eyes_open"
+	if not STAGES.has(id):
+		push_error("cutscene_shot: no stage for %s" % id)
+		get_tree().quit(1)
+		return
+	var stage: Array = STAGES[id]
+	var moment := load(MOMENTS % stage[0]) as StoryMoment
+	WorldState.clear()
+	for f in _chain(moment.require_flags, {}):
+		WorldState.set_flag(f, true)
+	var film := Films.data_of(id)
+	var cap := FilmCapture.new()
+	cap.name = "FilmCapture"
+	cap.out = out
+	cap.stills = PackedFloat32Array(stage[3])
+	cap.fps = 0.0 if args.has("noclip") else 6.0
+	cap.wait_for_film = true
+	cap.quit_after = film.length + 3.0
+	get_tree().root.size = Vector2i(1920, 1080)
+	get_tree().root.add_child(cap)
+	var game := (load(GAME) as PackedScene).instantiate()
+	game.set(&"start_region", stage[1])
+	game.set(&"start_anchor", stage[2])
+	game.set(&"opening_shot", "")
+	get_tree().root.add_child(game)
+	get_tree().current_scene = game
+	queue_free()
+
+
+## Every deed the gates need, and every deed those need, back to the start.
+func _chain(flags: PackedStringArray, seen: Dictionary) -> PackedStringArray:
+	var out := PackedStringArray()
+	for f in flags:
+		if seen.has(f):
+			continue
+		seen[f] = true
+		out.append(f)
+		for m: StoryMoment in StoryDirector.moments:
+			for step in m.steps:
+				if step.get("do") == "raise" and String(step.get("flag")) == f:
+					out.append_array(_chain(m.require_flags, seen))
+	return out
