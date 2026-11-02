@@ -102,9 +102,6 @@ func _process(delta: float) -> void:
 	ready_timer = maxf(ready_timer - delta, 0.0)
 	var real := delta / maxf(Engine.time_scale, 0.01)
 	raised = move_toward(raised, 1.0 if wants_raised() else 0.0, real * SWING_SPEED)
-	var stowed := raised <= 0.0 and stowed_for(Gameplay.wardrobe)
-	bow_root.visible = not stowed
-	quiver.visible = not stowed
 	if pose:
 		pose.influence = smoothstep(0.0, 1.0, raised)
 		pose.aim_dir = aim_direction()
@@ -128,6 +125,11 @@ func _place() -> void:
 	var feyre := controller.feyre if controller else null
 	if feyre == null or not feyre.is_inside_tree():
 		return
+	# Here rather than in _process: the dressing room pauses the game but keeps
+	# her model (and so this, via skeleton_updated) running.
+	var stowed := raised <= 0.0 and stowed_for(Gameplay.wardrobe)
+	bow_root.visible = not stowed
+	quiver.visible = not stowed
 	var back := _back_transform(feyre)
 	var hand := _hand_transform(feyre)
 	var w := smoothstep(0.0, 1.0, raised)
