@@ -16,6 +16,10 @@ marks = {
 "fixture": Vector3(0.5, 3, 17.6)
 }
 lines = {
+"pull_curtains": {"text": "Those curtains. The trimmings would braid into a rope.", "who": ""},
+"pull_draught": {"text": "A draught stirred the curtains. Night air, sweet off the gardens.", "who": ""},
+"pull_growl": {"text": "That growl, down the hall. It shut him up. It could shut me up just as fast.", "who": ""},
+"pull_lock": {"text": "The lock on my door. A joke, against claws like those.", "who": ""},
 "rig_now": {"text": "Before anyone comes. The curtain rope, tied to the light, to snap in their face.", "who": ""},
 "alis_bones": {"text": "You think a bit of rope snapping in my face will keep me from breaking your bones?", "who": "Alis"},
 "alis_cauldron": {"text": "What in the bottomless depths of the Cauldron is—", "who": "Alis"},
@@ -31,5 +35,5 @@ lines = {
 "trimmings": {"text": "The curtain trimmings. Braided, they'd make a length of rope.", "who": ""}
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("alis_word", "feyre_sorry", "locked", "rig_prompt", "trimmings")
+invented = PackedStringArray("alis_word", "feyre_sorry", "locked", "rig_prompt", "trimmings", "pull_draught")
 canon = "Ch7 (Keeper 2026-11-01, [C]): the length of rope I'd made from the curtain trimmings, hanging from the light fixture, rigged to snap into anyone's face when the door opens; she locks her door. Alis unlocks it before dawn: a screech and a thud, Alis in a heap; up at once, hissing, brushing her apron; the Cauldron line; Feyre babbles apologies; the breaking-bones sneer; warning bell, not a trap; a barked laugh; the master gave his word she'd live (paraphrase, X wording); the lovely curtains; curtains thrown open on a periwinkle dawn splashed with pumpkin and magenta; at least you're willing to put up a fight. Ch8: Tamlin asks if the trip wire was for him."
