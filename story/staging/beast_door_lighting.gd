@@ -18,7 +18,7 @@ class_name BeastDoorLighting
 extends Node
 
 const MOON_COLOR := Color(0.68, 0.78, 1.0)
-const MOON_ENERGY := 45.0
+const MOON_ENERGY := 35.0
 const MOON_RANGE := 14.0
 const MOON_ANGLE := 30.0
 ## How far outside, and how high, the moon spot hangs from the door.
@@ -47,8 +47,8 @@ const RIM_BACK := 1.0
 ## wall around the doorway, so he stands as a dark shape against it. On the
 ## Mac a 60-energy omni there clipped that wall to white (L55-1); this level
 ## keeps it a pale glow.
-const GLOW_ENERGY := 12.0
-const GLOW_RANGE := 3.8
+const GLOW_ENERGY := 7.0
+const GLOW_RANGE := 5.0
 const RIM_UP := 0.7
 const FADE_IN := 0.3
 const FADE_OUT := 2.0
@@ -134,7 +134,7 @@ func light_up() -> void:
 		glow.name = "BeastBackGlow"
 		glow.light_color = RIM_COLOR
 		glow.omni_range = GLOW_RANGE
-		glow.omni_attenuation = 1.6
+		glow.omni_attenuation = 1.0
 		glow.shadow_enabled = false
 		glow.light_energy = 0.0
 		parent.add_child(glow)
