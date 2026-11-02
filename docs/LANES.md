@@ -5,7 +5,7 @@ Every lane (thread) follows these rules. The full plan is the project's build pl
 ## Branches and the build lane
 
 1. Work on your own branch: `laneN/<topic>` on the home machine, `lane/<topic>` in the cloud. Never commit to `main`.
-2. Before handing off, run the import headless and **only the tests directly related to what you changed** (for example `godot --headless -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://tests/unit/test_phase_data.gd`). Never run the full suite in a feature lane.
+2. Before handing off, run the import headless and **only the tests directly related to what you changed** (for example `godot --headless -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://tests/unit/test_phase_data.gd`). Never run the full suite in a feature lane. The seat and dinner tests (`tests/unit/story/test_act2_seated.gd`, `test_act2_first_dinner.gd` and similar) run only when you change seats, poses, furniture or those scenes.
 3. Every task starts with a written definition of done. Stop when it is met; do not keep retesting or polishing details.
 4. Screenshots only at milestones. Work in code and numbers otherwise.
 5. Hand off through the queue, never by hand. Lanes on the home machine run `tools/mq/submit.sh HEAD <task>`. Cloud sessions merge `origin/main` in, push `lead/ready-<TASK>-<n>` at the finished commit, and read the answer from the tag `merged/<TASK>-<n>` or `rejected/<TASK>-<n>`. A resubmission takes the next number. See `CLAUDE.md`.

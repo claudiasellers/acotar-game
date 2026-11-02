@@ -50,12 +50,12 @@ worker working: workers end their turn to ask for a decision.
 
 ## If you're a lane worker
 
-Follow `.claude/agents/lane-worker.md`.
+Follow `.claude/agents/lane-worker.md`. Run only the tests that exercise the files you changed; the seat and dinner tests (`tests/unit/story/test_act2_seated.gd`, `test_act2_first_dinner.gd` and similar) run only when you change seats, poses, furniture or those scenes, and only the build lane runs the gate.
 
 ## If you're a cloud session
 
 You can't reach the home machine, so git carries the messages. Never run
-`submit.sh` or start a build lane.
+`submit.sh` or start a build lane. Run only the tests that exercise the files you changed; the seat and dinner tests (`tests/unit/story/test_act2_seated.gd`, `test_act2_first_dinner.gd` and similar) run only when you change seats, poses, furniture or those scenes, and only the build lane runs the gate.
 
 1. Finish on your own branch with `origin/main` merged in, and push.
 2. Push a branch at that exact commit: `git push origin <commit>:refs/heads/lead/ready-<TASK-ID>-<n>`.
