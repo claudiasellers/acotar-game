@@ -1,7 +1,8 @@
 ## Screenshots of furnished manor rooms from two corners each (L38 review shots).
 ##   godot res://tools/manor_estate/room_shot.tscn -- <room[@level]>[,<room>...] [out_dir]
 ## A room may name its own views instead of the corners, room-local x/z from
-## the rect's min corner: entrance_hall:10/1.5>10/20+2/14>18/17 saves _v1, _v2.
+## the rect's min corner: entrance_hall:10/1.5=10/20+2/14=18/17 saves _v1, _v2
+## (from=to; the shots queue takes no '>').
 ## Loads the real estate, then stands a camera at eye height in a room's
 ## corners, looking across it, and saves room_<id>_<a|b>.png. Day light from
 ## the estate's preview sky through the windows, plus the rooms' own lamps.
@@ -57,7 +58,7 @@ func _run() -> void:
 			views = {}
 			var n := 0
 			for v in spec.get_slice(":", 1).split("+"):
-				var ends := v.split(">")
+				var ends := v.replace(">", "=").split("=")
 				if ends.size() != 2:
 					continue
 				n += 1
