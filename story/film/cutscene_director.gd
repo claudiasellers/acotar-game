@@ -25,7 +25,15 @@ var grade: FilmGrade
 var props: Array[Node] = []
 var _done: bool = false
 var _posed: Array = []   # [FilmPose]
+## Everyone this scene has placed (put, walk, bring): what a shot must see past.
+var cast: Array[Node3D] = []
+## In the house frame: ground() finds the floor, not the furniture.
+var _indoors: bool = false
 var _feyre_physics: bool = true
+## Her bow and quiver hang off her controller, not her skeleton: they would
+## float at standing height while a film sits or kneels her. Films play
+## her without them (no scene of the three needs the bow).
+var _bow: Node3D
 
 
 func _ready() -> void:
@@ -44,6 +52,11 @@ func _ready() -> void:
 	if feyre:
 		_feyre_physics = feyre.is_physics_processing()
 		feyre.set_physics_process(false)
+		_bow = feyre.get_node_or_null(^"BowController/BowVisual") as Node3D
+		if _bow and _bow.visible:
+			_bow.visible = false
+		else:
+			_bow = null
 	_setup()
 
 
@@ -87,6 +100,8 @@ func _on_finished(_skipped: bool) -> void:
 		if feyre.has_method(&"recenter_camera"):
 			feyre.call(&"recenter_camera")
 		feyre.set_physics_process(_feyre_physics)
+		if _bow and is_instance_valid(_bow):
+			_bow.visible = true
 		if feyre is CharacterBody3D:
 			(feyre as CharacterBody3D).velocity = Vector3.ZERO
 	grade.to(0.0, 1.0)
@@ -114,20 +129,27 @@ func at(local: Vector3) -> Vector3:
 
 
 ## Points from now on are in the manor house's layout frame (the numbers in
-## data/regions/spring_court/manor_estate/house/*.tres): the house is the
-## parent of every manor story anchor. False (frame unchanged) elsewhere.
+## data/regions/spring_court/manor_estate/house/*.tres), y 0 on the ground
+## floor: the house is the parent of every manor story anchor, and builds its
+## floors at their world height (ManorHouseBuilder.floor_y), so the frame is
+## lifted onto the ground floor. False (frame unchanged) elsewhere.
 func use_house() -> bool:
+	var house: Node3D = null
 	var n: Node = space
-	while n != null:
+	while n != null and house == null:
 		if n.is_in_group(&"story_anchor") and n.get_parent() is Node3D:
-			frame = (n.get_parent() as Node3D).global_transform
-			return true
+			house = n.get_parent() as Node3D
 		n = n.get_parent()
-	var a := find_anchor(&"manor_dining_table")
-	if a and a.get_parent() is Node3D:
-		frame = (a.get_parent() as Node3D).global_transform
-		return true
-	return false
+	if house == null:
+		var a := find_anchor(&"manor_dining_table")
+		if a and a.get_parent() is Node3D:
+			house = a.get_parent() as Node3D
+	if house == null:
+		return false
+	frame = house.global_transform
+	frame.origin += frame.basis.y.normalized() * ManorHouseBuilder.floor_y(0)
+	_indoors = true
+	return true
 
 
 func find_anchor(id: StringName) -> Node3D:
@@ -138,12 +160,29 @@ func find_anchor(id: StringName) -> Node3D:
 
 
 ## A point in the frame, dropped onto the ground under it (terrain or floor).
+## In the house (use_house) it is the floor of the frame's level: furniture
+## the point is over (a chair, the table) is passed through, so a figure set
+## down at a seat stands on the floor and its pose sits it. People are
+## always passed through.
 func ground(local: Vector3, up: float = 0.0) -> Vector3:
 	var p := at(local)
-	var hit := _ray(p + Vector3.UP * 3.0, p + Vector3.DOWN * 6.0)
-	if not hit.is_empty():
+	var skip: Array[RID] = []
+	if feyre is CollisionObject3D:
+		skip.append((feyre as CollisionObject3D).get_rid())
+	for who in cast:
+		if who is CollisionObject3D and is_instance_valid(who):
+			skip.append((who as CollisionObject3D).get_rid())
+	for i in 8:
+		var hit := _ray(p + Vector3.UP * 3.0, p + Vector3.DOWN * 6.0, skip)
+		if hit.is_empty():
+			break
+		var at_y := (hit.position as Vector3).y
+		var body: Object = hit.get("collider")
+		if (_indoors and at_y > p.y + 0.3) or body is CharacterBody3D:
+			skip.append(hit.rid as RID)
+			continue
 		return (hit.position as Vector3) + Vector3.UP * up
-	return Vector3(p.x, WorldHeight.height_at(p.x, p.z) + up, p.z) if _outdoors() else p
+	return Vector3(p.x, WorldHeight.height_at(p.x, p.z) + up, p.z) if _outdoors() else p + Vector3.UP * up
 
 
 func _outdoors() -> bool:
@@ -151,12 +190,10 @@ func _outdoors() -> bool:
 	return absf(WorldHeight.height_at(p.x, p.z) - p.y) < 2.0
 
 
-func _ray(from: Vector3, to: Vector3) -> Dictionary:
+func _ray(from: Vector3, to: Vector3, skip: Array[RID] = []) -> Dictionary:
 	if not is_inside_tree():
 		return {}
-	var q := PhysicsRayQueryParameters3D.create(from, to, 1)
-	if feyre is CollisionObject3D:
-		q.exclude = [(feyre as CollisionObject3D).get_rid()]
+	var q := PhysicsRayQueryParameters3D.create(from, to, 1, skip)
 	return get_viewport().world_3d.direct_space_state.intersect_ray(q)
 
 
@@ -187,6 +224,8 @@ func bring(id: StringName, local: Vector3, face_local: Vector3) -> Node3D:
 func put(who: Node3D, local: Vector3, face_local: Vector3) -> void:
 	if who == null:
 		return
+	if not cast.has(who):
+		cast.append(who)
 	var p := ground(local)
 	var f := at(face_local)
 	who.global_position = p
@@ -240,6 +279,8 @@ static func anim_of(who: Node) -> AnimationPlayer:
 func walk(who: Node3D, local: Vector3, seconds: float) -> void:
 	if who == null:
 		return
+	if not cast.has(who):
+		cast.append(who)
 	var to := ground(local)
 	var from := who.global_position
 	var d := Vector3(to.x - from.x, 0.0, to.z - from.z)
@@ -277,6 +318,10 @@ func turn(who: Node3D, face_local: Vector3, seconds: float = 0.5) -> void:
 static func head_of(who: Node3D) -> Vector3:
 	if who == null:
 		return Vector3.ZERO
+	# A posed figure: where its pose drew the head this frame.
+	for fp: FilmPose in who.find_children("*", "FilmPose", true, false):
+		if fp.has_head and fp.get_skeleton():
+			return fp.get_skeleton().global_transform * fp.head_local + Vector3.UP * 0.07
 	for s in who.find_children("*", "Skeleton3D", true, false):
 		var sk := s as Skeleton3D
 		var i := sk.find_bone("Head")
@@ -352,22 +397,27 @@ func shot_world(from: Vector3, look: Vector3, fov: float, push: float = 0.0, pus
 			func() -> Vector3: return look, push, push_time)
 
 
-## A shot that keeps a moving figure's head framed.
+## A shot that keeps a moving figure's head framed. It swings round the face
+## as far as it must so no one else's head stands in front of it (`keep`, the
+## shoulder of an over-the-shoulder, may sit in frame but not over the face).
 func shot_on(from: Vector3, who: Node3D, fov: float, push: float = 0.0, push_time: float = 0.0,
-		blend: float = 0.0, lift: float = 0.0) -> void:
+		blend: float = 0.0, lift: float = 0.0, keep: Node3D = null) -> void:
 	cine.claim(self)
 	var look := head_of(who) + Vector3.UP * lift
+	from = _inside(clear_view(from, look, who, keep), look)
 	cine.shot(Transform3D(Basis(), from).looking_at(look, Vector3.UP), fov, blend,
 			func() -> Vector3: return head_of(who) + Vector3.UP * lift, push, push_time)
 
 
 ## Over `who`'s shoulder toward `target` (both figures): the standard two-shot.
+## `back` metres behind the shoulder (further back for a far target, so the
+## shoulder does not fill the frame).
 func over(who: Node3D, target: Node3D, fov: float = 38.0, side: float = 0.42, push: float = 0.2,
-		push_time: float = 4.0) -> void:
+		push_time: float = 4.0, back: float = 1.25) -> void:
 	var a := head_of(who)
 	var b := head_of(target)
-	var from := Cine.over_shoulder(Vector3(a.x, who.global_position.y, a.z), b, 1.25, side, a.y - who.global_position.y)
-	shot_on(from, target, fov, push, push_time)
+	var from := Cine.over_shoulder(Vector3(a.x, who.global_position.y, a.z), b, back, side, a.y - who.global_position.y)
+	shot_on(from, target, fov, push, push_time, 0.0, 0.0, who)
 
 
 ## A close shot on `who`'s face from in front, a little to one side.
@@ -381,3 +431,63 @@ func close(who: Node3D, dist: float = 1.1, side: float = 0.35, fov: float = 32.0
 	fwd = fwd.normalized()
 	var right := fwd.cross(Vector3.UP)
 	shot_on(h + fwd * dist + right * side + Vector3.UP * 0.02, who, fov, push, push_time, 0.0, lift)
+
+
+## `from`, or the nearest spot swung round `look` (level, same distance,
+## toward the side it already leans first) where no placed figure but `who`
+## stands in the line of sight: heads and bodies down to the hips keep
+## 0.32 m clear, `keep`'s head (the shoulder of an over) 0.2 m.
+func clear_view(from: Vector3, look: Vector3, who: Node3D, keep: Node3D = null) -> Vector3:
+	var others: Array[Node3D] = []
+	for f in cast + ([feyre] as Array[Node3D]):
+		if f and is_instance_valid(f) and f.is_inside_tree() and f != who and not others.has(f) \
+				and not (who == feyre_model() and f == feyre) and not (f == feyre and who == feyre):
+			others.append(f)
+	if others.is_empty():
+		return from
+	var off := from - look
+	# Swing on round the side the shot is already on (away from the nose).
+	var sgn := 1.0
+	if who:
+		var face := -who.global_basis.z
+		if who == feyre and feyre_model():
+			face = -feyre_model().global_basis.z
+		var side := face.cross(Vector3.UP)
+		if side.dot(off) < 0.0:
+			side = -side
+		sgn = 1.0 if off.rotated(Vector3.UP, 0.1).dot(side) > off.dot(side) else -1.0
+	for deg in [0.0, 12.0, 24.0, 36.0, 48.0, 60.0, -12.0, -24.0, -36.0, 72.0, -48.0]:
+		var p := look + off.rotated(Vector3.UP, deg_to_rad(deg) * sgn)
+		if not _blocked(p, look, others, keep):
+			return p
+	return from
+
+
+func _blocked(from: Vector3, look: Vector3, others: Array[Node3D], keep: Node3D) -> bool:
+	for f in others:
+		var h := head_of(f)
+		for drop: float in [-0.22, 0.0, 0.3, 0.6, 0.9]:
+			var q := h + Vector3.DOWN * drop
+			# A shoulder may frame the face; its head may not cover it, nor a body.
+			var room := 0.2 if f == keep and drop < 0.1 else 0.32
+			var near := Geometry3D.get_closest_point_to_segment(q, from, look)
+			var k := from.distance_to(near) / maxf(from.distance_to(look), 0.01)
+			if k > 0.04 and k < 0.93 and near.distance_to(q) < room:
+				return true
+	return false
+
+
+## `from`, pulled in toward `look` if a wall stands between (the camera stays
+## in the room the face is in). People are seen through.
+func _inside(from: Vector3, look: Vector3) -> Vector3:
+	var skip: Array[RID] = []
+	for f in cast + ([feyre] as Array[Node3D]):
+		if f is CollisionObject3D and is_instance_valid(f):
+			skip.append((f as CollisionObject3D).get_rid())
+	var hit := _ray(look, from, skip)
+	if hit.is_empty():
+		return from
+	var at_hit := hit.position as Vector3
+	if at_hit.distance_to(look) < 0.5:
+		return from
+	return at_hit + (look - at_hit).normalized() * 0.2

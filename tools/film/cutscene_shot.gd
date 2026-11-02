@@ -37,8 +37,17 @@ func _run() -> void:
 	var stage: Array = STAGES[id]
 	var moment := load(MOMENTS % stage[0]) as StoryMoment
 	WorldState.clear()
+	# Everything before the moment is done; its own gate opens once the region
+	# has settled (the house built, the cast placed), the way it would in play.
+	# Opened at once, an auto trigger fires while the region is still loading.
+	# Only its facts are held back (a deed held back could replay the moment
+	# that raises it); a gate of deeds alone is held back whole.
+	var own := PackedStringArray(Array(moment.require_flags).filter(func(f: String) -> bool: return f.begins_with("fact.")))
+	if own.is_empty():
+		own = moment.require_flags
 	for f in _chain(moment.require_flags, {}):
-		WorldState.set_flag(f, true)
+		if not own.has(f):
+			WorldState.set_flag(f, true)
 	var film := Films.data_of(id)
 	var cap := FilmCapture.new()
 	cap.name = "FilmCapture"
@@ -56,8 +65,8 @@ func _run() -> void:
 	game.set(&"opening_shot", "")
 	get_tree().root.add_child(game)
 	get_tree().current_scene = game
-	# Walking in starts it; if the trigger has not fired once the region has
-	# settled, start it as the trigger would (and say why, for the log).
+	# The gate opens 4 s after she is placed; walking in starts it, and if the
+	# trigger has not fired 2 s later, start it as the trigger would.
 	var space: SceneSpace = null
 	var spawned_at := -1
 	for i in 240:
@@ -71,7 +80,11 @@ func _run() -> void:
 					space != null, space.can_start() if space else false])
 		if bool(game.get(&"spawned")) and spawned_at < 0:
 			spawned_at = i
-		if space and spawned_at >= 0 and i >= spawned_at + 4 and not space.running and space.can_start():
+		if spawned_at >= 0 and i == spawned_at + 4:
+			print("cutscene_shot: opening the gate %s" % [own])
+			for f in own:
+				WorldState.set_flag(f, true)
+		if space and spawned_at >= 0 and i >= spawned_at + 6 and not space.running and space.can_start():
 			print("cutscene_shot: starting %s by hand" % moment.id)
 			space.start()
 	queue_free()

@@ -174,7 +174,8 @@ func _b_sound() -> void:
 	pose(feyre_model(), &"", 0.0)
 	put_feyre(FEYRE_HIDE, ALIS_SNIFF)
 	pose(feyre_model(), &"crouch", 0.0)
-	shot(Vector3(12.0, 1.35, -36.7), Vector3(5.0, 1.0, -36.4), 38.0, 0.15, 5.0)
+	# Over her crouched head, out through the doorway (z -39.2 to -36.8) into the hall.
+	shot(Vector3(12.2, 1.35, -37.9), Vector3(4.9, 1.0, -35.4), 38.0, 0.15, 5.0)
 
 
 ## A cloaked figure limps in and sniffs the air. The hood falls: Alis.
@@ -309,22 +310,28 @@ func _b_steps() -> void:
 func _mountain() -> void:
 	var p := ground(STEPS_OUT)
 	var n := _north_dir(p)
-	var peak := MeshInstance3D.new()
-	var c := CylinderMesh.new()
-	c.top_radius = 6.0
-	c.bottom_radius = 330.0
-	c.height = 420.0
-	c.radial_segments = 9
-	peak.mesh = c
+	var across := n.cross(Vector3.UP)
 	var m := StandardMaterial3D.new()
 	m.albedo_color = Color(0.13, 0.12, 0.17)
 	m.roughness = 1.0
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	peak.material_override = m
-	peak.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var at_p := p + n * 1400.0
-	add_prop(peak, Vector3(at_p.x, p.y + 120.0, at_p.z))
-	peak.rotation.y = 0.3
+	# A ragged range, not a cone: the peak and two shoulders, few-sided and
+	# turned unevenly so the skyline breaks.
+	for spec: Array in [[0.0, 1400.0, 420.0, 330.0, 0.3], [-260.0, 1520.0, 300.0, 280.0, 1.1],
+			[230.0, 1480.0, 250.0, 300.0, 2.0], [110.0, 1350.0, 190.0, 160.0, 0.7]]:
+		var peak := MeshInstance3D.new()
+		var c := CylinderMesh.new()
+		c.top_radius = 4.0
+		c.bottom_radius = spec[3]
+		c.height = spec[2]
+		c.radial_segments = 6
+		c.rings = 1
+		peak.mesh = c
+		peak.material_override = m
+		peak.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var at_p: Vector3 = p + n * float(spec[1]) + across * float(spec[0])
+		add_prop(peak, Vector3(at_p.x, p.y + float(spec[2]) * 0.3, at_p.z))
+		peak.rotation = Vector3(0.0, spec[4], 0.04 * signf(float(spec[0])))
 
 
 func _b_handover() -> void:

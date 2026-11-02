@@ -109,6 +109,11 @@ var _to: Dictionary = {}
 var _mix: float = 1.0
 var _tween: Tween
 var _bones: Dictionary = {}
+## Where the head is as drawn (this pose blended in), in the skeleton's space.
+## Outside the modification pass the skeleton answers with the animated pose,
+## not the posed one: a sitting figure's head reads a metre too high.
+var head_local: Vector3
+var has_head: bool = false
 
 
 ## The FilmPose on `figure`'s skeleton, made on first use. Null when it has none.
@@ -193,11 +198,14 @@ func _dir(v: Vector3) -> Vector3:
 
 func _process_modification_with_delta(_delta: float) -> void:
 	var sk := get_skeleton()
+	has_head = false
 	if sk == null or influence <= 0.001:
 		return
 	var p := _current()
 	if p.is_empty():
 		return
+	var head := _bone(sk, "Head")
+	var head_was := sk.get_bone_global_pose(head).origin if head >= 0 else Vector3.ZERO
 	var hips := _bone(sk, "Hips")
 	if hips >= 0:
 		var hp := sk.get_bone_global_pose(hips)
@@ -219,3 +227,6 @@ func _process_modification_with_delta(_delta: float) -> void:
 		if from_dir.dot(to_dir) > 0.99999 or from_dir.dot(to_dir) < -0.99999:
 			continue
 		sk.set_bone_global_pose(i, Transform3D(Basis(Quaternion(from_dir, to_dir)) * pose_now.basis, pose_now.origin))
+	if head >= 0:
+		head_local = head_was.lerp(sk.get_bone_global_pose(head).origin, influence)
+		has_head = true
