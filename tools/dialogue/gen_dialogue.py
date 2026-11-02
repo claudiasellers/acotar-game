@@ -212,6 +212,13 @@ think(A, "v_market", "Market day. Everyone watching everyone else's purse.", "re
 think(A, "v_silver", "Silver in my pocket. Just once, I could buy something that isn't food.", "region",
       "village", HUMAN, req=["pelt_sold"])
 think(A, "v_return", "They don't know me in this dress. Good.", "region", "village", ph(7))
+# The mercenary on the well's lip (lane L53; Keeper, ch 3, lines 676-990). She sells
+# through the market screen (MarketMenu); these are what she says as Feyre comes near.
+say(A, "merc_business", "mercenary", "What is your business with me, girl?", HUMAN, canon="A",
+    req=["fact.wolf_skinned"], forbid=["pelt_sold"], who="The mercenary",
+    delivery="clipped, unknown accent; sizing her up")
+chat(A, "merc_woods", "mercenary", "From one hunter to another: stay out of the deep woods. Things are slipping through the Wall.",
+     HUMAN, canon="A", req=["pelt_sold"], who="The mercenary", delivery="low, plain warning")
 line(A, "A1_07_blessed_greeting", "blessed", "May the Immortal Light shine upon thee, sisters.", "place",
      "village_square", HUMAN, pr=5, canon="V", who="Child of the Blessed",
      delivery="serene, sing-song, over silver bells")
@@ -823,6 +830,12 @@ spot("elder_board", "human_elder", PEOPLE % "human_elder", "village", 386.0, 224
 spot("youth_tavern", "human_youth", PEOPLE % "human_youth", "village", 408.0, 2222.0, HUMAN, wander=3.0)
 spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, HUMAN, canon="C", hours=(8.0, 17.0),
      notes="peddlers bring border-town stories; one sold her the ash arrow")
+# The mercenary on the lip of the square's well (lane L53; the Keeper, ch 3: "on the lip of our
+# broken square fountain, without any cart or stall"). Lane L52 is modelling her
+# (creatures/people/scenes/mercenary.tscn, merged L52-1).
+# Matches data/market/market.tres mercenary_at / mercenary_yaw (tools/market/gen_market.gd).
+spot("mercenary_well", "mercenary", PEOPLE % "mercenary", "village", 376.16, 2256.58, HUMAN, yaw=90.0,
+     canon="C", notes="buys the wolf pelt and a doe hide, overpays; coin only (MarketMenu)")
 spot("woman_return", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, ph(7), wander=1.5)
 spot("elder_return", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, ph(7))
 # The manor (ch6-28). Tamlin patrols and is often away [C]; Lucien is about by day.

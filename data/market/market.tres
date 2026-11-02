@@ -1,0 +1,170 @@
+[gd_resource type="Resource" script_class="MarketSet" format=3]
+
+[ext_resource type="Script" path="res://data/market/market_buyer.gd" id="1_e8bbh"]
+[ext_resource type="Script" path="res://data/market/market_set.gd" id="2_ap8ah"]
+[ext_resource type="Script" path="res://data/market/market_stall.gd" id="3_yl0oj"]
+
+[sub_resource type="Resource" id="Resource_q2vy5"]
+script = ExtResource("1_e8bbh")
+id = &"mercenary"
+display_name = "the woman at the well"
+canon = "C"
+buys = PackedStringArray("obj_wolf_pelt", "ing_wolf_pelt", "ing_hide")
+buys_tags = PackedStringArray()
+refuses = PackedStringArray()
+price_factor = 1.5
+greeting = "What is your business with me, girl?"
+thanks = "Doesn't seem like a faerie. From one hunter to another: stay out of the deep woods."
+nothing = "I travel light. Coin for hides, nothing else."
+
+[sub_resource type="Resource" id="Resource_r3usm"]
+script = ExtResource("1_e8bbh")
+id = &"charms"
+display_name = "charms and bits of iron"
+canon = "X"
+buys = PackedStringArray("ing_crow_feather", "ing_owl_feather", "ing_hawk_feather", "ing_shed_antler", "ing_iron_filings", "ing_oak_gall", "ing_snail_shell")
+buys_tags = PackedStringArray("bitter", "quiet", "keen", "steady", "cool", "warm", "bind", "swift", "bright", "vital", "strong")
+refuses = PackedStringArray("ing_rabbit", "ing_hare", "ing_venison", "ing_boar", "ing_trout", "ing_dead_chicken", "ing_hide", "ing_hare_pelt", "ing_wolf_pelt", "obj_wolf_pelt", "ing_salt", "ing_venison_stew")
+price_factor = 1.0
+greeting = "Herbs for charms? Iron wards and rowan, that's what keeps them out."
+thanks = "Good. That'll ward a doorway."
+nothing = "Nothing a charm wants."
+
+[sub_resource type="Resource" id="Resource_m32ui"]
+script = ExtResource("3_yl0oj")
+trade = &"charms"
+display_name = "charms and bits of iron"
+canon = "C"
+sign_path = "res://story/market/assets/sign_charms.glb"
+position = Vector3(388.76743, 3.0484247, 2267.9758)
+yaw = -2.687806
+buyer = SubResource("Resource_r3usm")
+
+[sub_resource type="Resource" id="Resource_rktbk"]
+script = ExtResource("3_yl0oj")
+trade = &"tinker"
+display_name = "the tinker"
+canon = "C"
+sign_path = "res://story/market/assets/sign_tinker.glb"
+position = Vector3(370.51807, 2.9289014, 2230.6326)
+yaw = -0.88625634
+
+[sub_resource type="Resource" id="Resource_sg4fh"]
+script = ExtResource("1_e8bbh")
+id = &"spice"
+display_name = "hot food and spice"
+canon = "X"
+buys = PackedStringArray("ing_rabbit", "ing_hare", "ing_venison", "ing_boar", "ing_trout", "ing_dead_chicken", "ing_honey", "ing_wild_garlic", "ing_juniper_berry", "ing_salt")
+buys_tags = PackedStringArray()
+refuses = PackedStringArray()
+price_factor = 0.8
+greeting = "Fresh meat? I'll take it off your hands."
+thanks = "Into the pot it goes."
+nothing = "Nothing for my pot there."
+
+[sub_resource type="Resource" id="Resource_2pg8l"]
+script = ExtResource("3_yl0oj")
+trade = &"spice"
+display_name = "hot food and spice"
+canon = "C"
+sign_path = "res://story/market/assets/sign_spice.glb"
+position = Vector3(382.09058, 3.0976639, 2269.8904)
+yaw = -3.0368721
+buyer = SubResource("Resource_sg4fh")
+
+[sub_resource type="Resource" id="Resource_285iq"]
+script = ExtResource("3_yl0oj")
+trade = &"salt"
+display_name = "salt"
+canon = "C"
+sign_path = "res://story/market/assets/sign_salt.glb"
+position = Vector3(361.9773, 2.9289057, 2235.6667)
+yaw = 2.2553363
+
+[sub_resource type="Resource" id="Resource_k3otb"]
+script = ExtResource("1_e8bbh")
+id = &"cobbler"
+display_name = "the cobbler"
+canon = "C"
+buys = PackedStringArray("ing_hide", "ing_hare_pelt", "ing_wolf_pelt", "obj_wolf_pelt", "ing_sinew")
+buys_tags = PackedStringArray()
+refuses = PackedStringArray()
+price_factor = 0.6
+greeting = "Hides again? Let's see them."
+thanks = "That'll do."
+nothing = "Nothing I can use."
+
+[sub_resource type="Resource" id="Resource_q7g3c"]
+script = ExtResource("3_yl0oj")
+trade = &"cobbler"
+display_name = "the cobbler"
+canon = "C"
+sign_path = "res://story/market/assets/sign_cobbler.glb"
+position = Vector3(375.16156, 3.0976639, 2269.406)
+yaw = 2.8972476
+buyer = SubResource("Resource_k3otb")
+
+[sub_resource type="Resource" id="Resource_n55q2"]
+script = ExtResource("3_yl0oj")
+trade = &"grain"
+display_name = "grain"
+canon = "C"
+sign_path = "res://story/market/assets/sign_grain.glb"
+position = Vector3(368.81613, 3.0976639, 2266.5808)
+yaw = 2.548182
+
+[sub_resource type="Resource" id="Resource_nkpqv"]
+script = ExtResource("3_yl0oj")
+trade = &"baker"
+display_name = "bread"
+sign_path = "res://story/market/assets/sign_baker.glb"
+position = Vector3(360.77478, 3.0207617, 2255.5127)
+yaw = 1.8500468
+
+[sub_resource type="Resource" id="Resource_ne5lq"]
+script = ExtResource("3_yl0oj")
+trade = &"roots"
+display_name = "roots and turnips"
+sign_path = "res://story/market/assets/sign_roots.glb"
+position = Vector3(366.40332, 2.9289043, 2241.0898)
+yaw = 2.2553363
+
+[sub_resource type="Resource" id="Resource_kn4sk"]
+script = ExtResource("1_e8bbh")
+id = &"clothier"
+display_name = "the clothier"
+canon = "C"
+buys = PackedStringArray("ing_hide", "ing_hare_pelt", "ing_wolf_pelt", "obj_wolf_pelt")
+buys_tags = PackedStringArray()
+refuses = PackedStringArray()
+price_factor = 0.6
+greeting = "Show me. Quickly, girl."
+thanks = "Fair enough. Next time, bring them clean."
+nothing = "No hides, no business."
+
+[sub_resource type="Resource" id="Resource_w2w1v"]
+script = ExtResource("3_yl0oj")
+trade = &"clothier"
+display_name = "the clothier"
+canon = "C"
+sign_path = "res://story/market/assets/sign_clothier.glb"
+position = Vector3(363.81967, 3.0976639, 2261.7556)
+yaw = 2.1991115
+buyer = SubResource("Resource_kn4sk")
+
+[sub_resource type="Resource" id="Resource_ualej"]
+script = ExtResource("3_yl0oj")
+trade = &"wool"
+display_name = "wool and old cloth"
+sign_path = "res://story/market/assets/sign_wool.glb"
+position = Vector3(374.94412, 2.9289029, 2236.0557)
+yaw = -0.88625634
+
+[resource]
+script = ExtResource("2_ap8ah")
+stalls = Array[ExtResource("3_yl0oj")]([SubResource("Resource_m32ui"), SubResource("Resource_rktbk"), SubResource("Resource_2pg8l"), SubResource("Resource_285iq"), SubResource("Resource_q7g3c"), SubResource("Resource_n55q2"), SubResource("Resource_nkpqv"), SubResource("Resource_ne5lq"), SubResource("Resource_w2w1v"), SubResource("Resource_ualej")])
+mercenary = SubResource("Resource_q2vy5")
+mercenary_at = Vector3(376.15585, 2.9981546, 2256.578)
+mercenary_yaw = 1.5707963267948966
+fingerpost_at = Vector3(-123.13526, 4.053611, 2164.4995)
+fingerpost_yaw = 1.2722973973998277
