@@ -41,6 +41,7 @@ const TAG_GAP := 72.0
 const TAG_WIDTH := 360.0
 ## The tag keeps its own column on the right; things lie to the left of it.
 const TAG_COLUMN := TAG_WIDTH + TAG_GAP * 2.0
+const SKETCHBOOK_SCRIPT := "res://ui/journal/story_journal.gd"
 
 var bar: QuickBar
 var pocket: StringName = SatchelEntries.ALL
@@ -215,6 +216,16 @@ func _to_map() -> void:
 	(huds[0] as WorldMapHud).full_map.open()
 
 
+## Closes the satchel and opens L54's sketchbook (StoryJournal.open_from),
+## loaded by path so the satchel never depends on it being there.
+func _to_sketchbook() -> void:
+	var tree := get_tree()
+	close()
+	var journal: Variant = load(SKETCHBOOK_SCRIPT)
+	if journal:
+		journal.open_from(tree)
+
+
 func _watch_new() -> void:
 	if not bar.inventory.item_added.is_connected(_on_item_added):
 		bar.inventory.item_added.connect(_on_item_added)
@@ -264,6 +275,12 @@ func _build() -> void:
 	_map_flap.focus_mode = Control.FOCUS_NONE
 	_map_flap.pressed.connect(_to_map)
 	_flaps.add_child(_map_flap)
+	# L54's story sketchbook, once it is in the project.
+	if ResourceLoader.exists(SKETCHBOOK_SCRIPT):
+		var book := _button("Sketchbook", &"SatchelTab")
+		book.focus_mode = Control.FOCUS_NONE
+		book.pressed.connect(_to_sketchbook)
+		_flaps.add_child(book)
 
 	_purse = _label("", &"SatchelSmall")
 	_purse.set_anchors_preset(Control.PRESET_TOP_RIGHT)
