@@ -205,3 +205,112 @@ func test_moments_gate_on_p6_facts() -> void:
 	for id: String in gates:
 		var m := load("res://data/story/moments/%s.tres" % id) as StoryMoment
 		assert_true(m.require_flags.has(gates[id]), "%s waits for %s" % [id, gates[id]])
+
+
+func _near_tamlin(s: Act6Space) -> void:
+	var t := s.actor(&"tamlin")
+	if t:
+		feyre.global_position = t.global_position + Vector3(0.6, 0, 0)
+
+
+func test_solstice_to_the_carriage_by_deeds() -> void:
+	var dance := _anchor("solstice_dance_floor", Vector3(-150, 40, -1060))
+	var dining := _anchor("manor_dining_table", Vector3(21, 0.9, -31.5))
+	for a in [dance, dining]:
+		for c in a.get_children():
+			if c is Act6Space:
+				(c as Act6Space).auto_tick = false
+				(c as Act6Space).instant_fades = true
+	for f in ["paintings_shown", "glamour_lifted", "fountain_head_found"]:
+		WorldState.raise_deed(f)
+	for f in ["fact.eyes_open_wonders", "fact.alis_true_seen", "fact.fountain_head_seen"]:
+		WorldState.set_flag(f)
+	WorldState.set_flag("fact.fountain_head_seen.day", 10)
+	Clock.from_dict({"time_of_day": 0.4, "day": 12})
+	var garden := _space(fountain, "SolsticeGarden")
+	garden._process(0.0)
+	assert_gt(garden.get_child_count(), 0, "ribbons go up round the rose garden")
+
+	var dressing := _space(bedroom, "SolsticeDressing")
+	feyre.global_position = dressing.mark(&"bed_side")
+	assert_true(_tick_all(2.0, func() -> bool: return dressing.running))
+	_tick_all(30.0, func() -> bool: return dressing.current_beat_label() == "E: the blue gown")
+	_press(dressing, dressing.mark(&"gown"))
+	assert_true(_tick_all(30.0, func() -> bool: return WorldState.has_flag("fact.solstice_dressed")))
+	assert_eq(Gameplay.wardrobe.equipped_in(&"top"), SolsticeDressing.GOWN, "she wears the cornflower gown")
+	assert_eq(Gameplay.wardrobe.hair, SolsticeDressing.HAIR)
+	_tick_all(20.0, func() -> bool: return not dressing.running)
+	assert_lt(feyre.global_position.distance_to(dance.global_position), 15.0, "on the plateau at sunset")
+
+	var night := dance.get_node(^"SolsticeNight") as SolsticeNight
+	night.auto_tick = false
+	night.instant_fades = true
+	assert_true(_tick_all_with(night, 2.0, func() -> bool: return night.running))
+	assert_gt(night.crowd.size(), 10, "the court, unglamoured")
+	_tick_all_with(night, 20.0, func() -> bool: return night.current_beat_label() == "the party")
+	_press(night, night.ground_mark(&"wine_table"))
+	_tick_all_with(night, 0.2, func() -> bool: return night.drank)
+	assert_true(night.drank, "the faerie wine")
+	feyre.global_position = night.ground_mark(&"bower")
+	assert_true(_tick_all_with(night, 40.0, func() -> bool: return night.current_beat_label() == "lead tamlin"))
+	assert_true(_tick_all_with(night, 400.0, func() -> bool:
+		_near_tamlin(night)
+		return night.danced >= SolsticeNight.DANCE))
+	assert_true(_tick_all_with(night, 40.0, func() -> bool: return WorldState.has_flag("fact.solstice_sunrise_watched")))
+	assert_false(WorldState.has_flag("solstice_danced"), "the moment raises the deed")
+
+	WorldState.raise_deed("solstice_danced")
+	Clock.from_dict({"time_of_day": 0.45, "day": 14})
+	var lunch := dining.get_node(^"LunchTable") as LunchTable
+	lunch.auto_tick = false
+	lunch.instant_fades = true
+	feyre.global_position = lunch.mark(&"table") + Vector3(0, 0, 3)
+	assert_true(_tick_all_with(lunch, 2.0, func() -> bool: return lunch.running))
+	_tick_all_with(lunch, 20.0, func() -> bool: return lunch.current_beat_label() == "E: sit down to lunch")
+	_press(lunch, lunch.mark(&"feyre_chair"))
+	assert_true(_tick_all_with(lunch, 2.0, func() -> bool: return WorldState.has_flag("fact.lunch_sat_down")))
+
+	# L33's film B: its moment raises the deed; the film writes its facts.
+	WorldState.raise_deed("rhysand_faced")
+	WorldState.set_flag("fact.film_night_court_seen")
+	Clock.from_dict({"time_of_day": 0.93, "day": 14})
+	var farewell := _space(bedroom, "FarewellNight")
+	feyre.global_position = farewell.mark(&"bed_side")
+	assert_true(_tick_all(2.0, func() -> bool: return farewell.running))
+	_tick_all(30.0, func() -> bool: return farewell.current_beat_label() == "E: take his hand")
+	_near_tamlin(farewell)
+	farewell.press_interact()
+	_tick_all(30.0, func() -> bool: return farewell.current_beat_label() == "E: the travel dress")
+	assert_false(Clock.is_night(), "dawn")
+	_press(farewell, farewell.actor(&"alis").global_position)
+	_tick_all(30.0, func() -> bool: return farewell.current_beat_label() == "E: her paintings")
+	assert_eq(Gameplay.wardrobe.equipped_in(&"top"), FarewellNight.DRESS, "mortal finery")
+	_press(farewell, farewell.mark(&"desk"))
+	assert_true(_tick_all(10.0, func() -> bool: return WorldState.has_flag("fact.travel_dressed")))
+	assert_eq(get_tree().get_nodes_in_group(&"p6_carried_paintings").size(), 1, "she carries her paintings")
+
+	var carriage := _space(hall, "CarriageFarewell")
+	feyre.global_position = hall.global_position
+	assert_true(_tick_all(2.0, func() -> bool: return carriage.running))
+	_tick_all(30.0, func() -> bool: return carriage.current_beat_label() == "she walks out to him")
+	assert_eq(carriage.horses.size(), 6, "six horses")
+	feyre.global_position = carriage.ground_mark(&"tamlin_carriage")
+	_tick_all(10.0, func() -> bool: return carriage.current_beat_label() == "E: give him the paintings")
+	_press(carriage, carriage.ground_mark(&"tamlin_carriage"))
+	_tick_all(5.0, func() -> bool: return carriage.given)
+	assert_true(carriage.given, "the paintings are his")
+	_tick_all(20.0, func() -> bool: return carriage.current_beat_label() == "E: get in")
+	_press(carriage, carriage.ground_mark(&"carriage_door"))
+	assert_true(_tick_all(10.0, func() -> bool: return WorldState.has_flag("fact.carriage_boarded")))
+	assert_false(WorldState.has_flag("sent_home"), "the moment raises the deed")
+
+
+func _tick_all_with(s: Act6Space, seconds: float, until: Callable) -> bool:
+	for _i in int(seconds / STEP):
+		if s.running:
+			s.tick(STEP)
+		elif s._player_here() and s.can_start():
+			s.arrive()
+		if until.call():
+			return true
+	return bool(until.call())

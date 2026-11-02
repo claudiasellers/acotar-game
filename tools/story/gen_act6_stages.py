@@ -81,6 +81,81 @@ STAGES = {
             "paints_thought": ("", "He knelt and helped me pick up my paints.", "C"),
         },
     },
+    "solstice_dressing": {
+        "canon": "Ch25 [C] (Keeper): that morning the garden is bedecked in ribbons and streamers; Alis: \"Summer Solstice. The main celebration used to be at the Summer Court... You're going.\" In late afternoon Alis yanked her upstairs: a cornflower-blue chiffon gown, hair unbound, a garland of pink, white and blue wildflowers around the crown. Downstairs Lucien: \"Cauldron boil me.\" Through the garden into the fields; the sun beginning its final descent when they reach the plateau. plateau_arrive is in solstice_dance_floor's frame.",
+        "marks": dict(BEDROOM, alis_gown=(1.4, 0.0, 12.6), gown=(1.4, 0.0, 12.6), plateau_arrive=(6.0, 0.0, 8.0)),
+        "lines": {
+            "ribbons_thought": ("", "Beyond the window the garden was bedecked in ribbons and streamers.", "C"),
+            "alis_solstice": ("Alis", "Summer Solstice. The main celebration used to be at the Summer Court... You're going.", "C"),
+            "alis_upstairs": ("Alis", "Up. Now. You'll not go down looking like a stable hand.", "X"),
+            "gown_prompt": ("", "Cornflower-blue chiffon, light as breath.", "C"),
+            "garland_thought": ("", "My hair unbound, a garland of pink, white and blue wildflowers around the crown.", "C"),
+            "alis_go_on": ("Alis", "Go on, then.", "X"),
+            "lucien_cauldron": ("Lucien", "Cauldron boil me.", "C"),
+            "plateau_thought": ("", "The sun was beginning its final descent when we reached the plateau.", "C"),
+        },
+    },
+    "solstice_night": {
+        "canon": "Ch25 [C] (Keeper): crowds of fae, unglamoured, seen for the first time; faerie wine (Lucien warns her, she drinks, he stays close); Tamlin plays the fiddle in the band; he takes her to the edge of a vast meadow; will-o'-the-wisps, spirits of air and light, dance around them; they dance; \"It's almost dawn\"; they watch the sunrise. Marks in solstice_dance_floor's frame (anchor at world -150, -1060): the dance ring is at (-150, -1080), the musicians' bower at (-100, -1135), the long tables at (-60, -1040), the wisp hollow round (-450, -950), r 85.",
+        "marks": {
+            "ring": (0.0, 0.0, -20.0), "bower": (48.0, 0.0, -72.0), "lucien_near": (3.0, 0.0, -2.0),
+            "wine_table": (88.0, 0.0, 18.0), "tamlin_leave": (-40.0, 0.0, 8.0),
+            "hollow_path": (-120.0, 0.0, 40.0), "hollow_edge": (-200.0, 0.0, 70.0), "hollow": (-235.0, 0.0, 85.0),
+        },
+        "lines": {
+            "crowds_thought": ("", "Faeries everywhere, and for the first time I saw them as they were.", "C"),
+            "lucien_wine_warning": ("Lucien", "Don't drink the wine. Not unless you want to dance until you drop.", "X"),
+            "wine_prompt": ("", "Long tables of faerie wine and candied flowers. Tamlin was playing the fiddle with the band.", "C"),
+            "wine_thought": ("", "It tasted of sunlight. The stars began to swim.", "X"),
+            "lucien_nursemaid": ("Lucien", "Wonderful. And now I'm your nursemaid.", "X"),
+            "tamlin_come_away": ("Tamlin", "Come with me.", "X"),
+            "follow_thought": ("", "He led me from the fires to the edge of a vast meadow.", "C"),
+            "wisps_thought": ("", "Will-o'-the-wisps, spirits of air and light, danced around us.", "C"),
+            "kiss_thought": ("", "We danced, and he kissed me.", "C"),
+            "tamlin_almost_dawn": ("Tamlin", "It's almost dawn.", "C"),
+            "sunrise_thought": ("", "We watched the sun rise over the meadow.", "C"),
+        },
+    },
+    "lunch_table": {
+        "canon": "Ch26 [C]: a letter from Winter, the blight killed twenty-four younglings; she is already at the table at lunch with Tamlin and Lucien when Rhysand arrives (L33's film B plays the rest). manor_dining_table is at house (21, 0, -31.5) facing the table; L33's table centre is (21, -38).",
+        "marks": {"table": (0.0, 0.0, -6.5), "tamlin_chair": (0.0, 0.0, -11.0), "lucien_chair": (-1.4, 0.0, -6.8), "feyre_chair": (1.4, 0.0, -6.2)},
+        "lines": {
+            "tamlin_letter": ("Tamlin", "A letter from Winter. The blight took twenty-four of their younglings.", "X"),
+            "lucien_blight": ("Lucien", "Twenty-four. And it's spreading.", "X"),
+            "chair_prompt": ("", "My place was laid beside Lucien's.", "X"),
+        },
+    },
+    "farewell_night": {
+        "canon": "Ch27-28 [C] (Keeper): no letter; that night Tamlin comes to HER bedroom by moonlight: \"So you need to go home, far from here.\" When? \"At dawn.\" They spend the night in her bed; he stays (handled with restraint: a fade). Ch28: Alis dresses her in mortal finery (pale pink silk with white and blue lace, a white linen jacket, a little ivory hat, lace gloves, white pumps); goodbye to Alis: \"Make the most of your freedom.\"",
+        "marks": dict(BEDROOM, door=(-1.5, 0.0, 15.5), near_bed=(0.8, 0.0, 12.6), desk=(5.6, 0.0, 9.2)),
+        "lines": {
+            "moonlight_thought": ("", "He came to my room by moonlight.", "C"),
+            "tamlin_go_home": ("Tamlin", "So you need to go home, far from here.", "C"),
+            "feyre_when": ("Feyre", "When?", "C"),
+            "tamlin_at_dawn": ("Tamlin", "At dawn.", "C"),
+            "hand_prompt": ("", "I didn't want words. I reached for his hand.", "X"),
+            "dawn_thought": ("", "He stayed.", "C"),
+            "alis_finery": ("Alis", "Mortal finery. Pink silk, lace, and a hat to keep the sun off.", "X"),
+            "dress_prompt": ("", "Pale pink silk with white and blue lace, a white linen jacket, a little ivory hat.", "C"),
+            "alis_freedom": ("Alis", "Make the most of your freedom.", "C"),
+            "paintings_prompt": ("", "My paintings, bundled on the writing table.", "X"),
+        },
+    },
+    "carriage_farewell": {
+        "canon": "Ch28 [C] (Keeper): downstairs Lucien: \"I thought you were smarter than this\" and storms off; Tamlin waits in front of a gilded carriage with six horses at the front of the house; \"My paintings, they're yours.\" \"Remember what I told you.\" Carriage, magic sleep. hall_mark_1 is at house (4, 0, -31); the front steps are at about (0, -17).",
+        "marks": {
+            "lucien_hall": (0.0, 0.0, 1.5), "feyre_door": (-4.0, 0.0, 10.0), "lucien_storms": (10.0, 0.0, -8.0),
+            "carriage": (-1.0, 0.0, 24.0), "carriage_door": (-1.0, 0.0, 22.4), "tamlin_carriage": (-3.0, 0.0, 20.5),
+        },
+        "lines": {
+            "lucien_smarter": ("Lucien", "I thought you were smarter than this.", "C"),
+            "give_prompt": ("", "Six horses, a gilded carriage, and Tamlin waiting before it.", "C"),
+            "feyre_paintings": ("Feyre", "My paintings. They're yours.", "C"),
+            "tamlin_remember": ("Tamlin", "Remember what I told you.", "C"),
+            "board_prompt": ("", "The carriage door stood open.", "X"),
+            "sleep_thought": ("", "Sleep came over me like a hand.", "X"),
+        },
+    },
 }
 
 

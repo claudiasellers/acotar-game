@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"carriage": Vector3(-1, 0, 24),
+"carriage_door": Vector3(-1, 0, 22.4),
+"feyre_door": Vector3(-4, 0, 10),
+"lucien_hall": Vector3(0, 0, 1.5),
+"lucien_storms": Vector3(10, 0, -8),
+"tamlin_carriage": Vector3(-3, 0, 20.5)
+}
+lines = {
+"board_prompt": {"text": "The carriage door stood open.", "who": ""},
+"feyre_paintings": {"text": "My paintings. They're yours.", "who": "Feyre"},
+"give_prompt": {"text": "Six horses, a gilded carriage, and Tamlin waiting before it.", "who": ""},
+"lucien_smarter": {"text": "I thought you were smarter than this.", "who": "Lucien"},
+"sleep_thought": {"text": "Sleep came over me like a hand.", "who": ""},
+"tamlin_remember": {"text": "Remember what I told you.", "who": "Tamlin"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("board_prompt", "sleep_thought")
+canon = "Ch28 [C] (Keeper): downstairs Lucien: \"I thought you were smarter than this\" and storms off; Tamlin waits in front of a gilded carriage with six horses at the front of the house; \"My paintings, they're yours.\" \"Remember what I told you.\" Carriage, magic sleep. hall_mark_1 is at house (4, 0, -31); the front steps are at about (0, -17)."
