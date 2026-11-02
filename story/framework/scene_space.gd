@@ -231,9 +231,12 @@ func player() -> Node3D:
 func request_actor(actor_id: StringName, where: Transform3D, fallback: Callable) -> Node3D:
 	EventBus.story_spawn_requested.emit(actor_id, where)
 	var group := StringName("story_actor_%s" % actor_id)
-	var answered := get_tree().get_first_node_in_group(group) as Node3D
-	if answered:
-		return answered
+	# A spawner's actor, or this scene's own stand-in; never a stand-in owned
+	# by another scene, which that scene (or its region unloading) frees.
+	for n in get_tree().get_nodes_in_group(group):
+		if n is Node3D and is_instance_valid(n) and not n.is_queued_for_deletion() \
+				and (not (n.get_parent() is SceneSpace) or n.get_parent() == self):
+			return n as Node3D
 	var stand_in := fallback.call() as Node3D
 	stand_in.add_to_group(group)
 	add_child(stand_in)

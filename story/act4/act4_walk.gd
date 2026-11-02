@@ -69,27 +69,3 @@ static func plant(from: Node3D, who: Node3D) -> Node3D:
 	if who and is_instance_valid(who):
 		who.global_position = ground_point(from, who.global_position)
 	return who
-
-
-## Casting for the p4 spaces: a spawner's real actor when one answers, or
-## the space's own stand-in. Never another scene's stand-in: that one goes
-## when its scene dismisses it or its region unloads, mid-scene here. Our
-## stand-ins stay out of the shared story_actor_* group for the same reason.
-static func request_own(space: SceneSpace, actor_id: StringName, where: Transform3D, fallback: Callable) -> Node3D:
-	EventBus.story_spawn_requested.emit(actor_id, where)
-	for n in space.get_tree().get_nodes_in_group(StringName("story_actor_%s" % actor_id)):
-		if n is Node3D and is_instance_valid(n) and not (n.get_parent() is SceneSpace):
-			return n as Node3D
-	var stand_in := fallback.call() as Node3D
-	space.add_child(stand_in)
-	stand_in.global_transform = where
-	return stand_in
-
-
-## An actor still alive, or null (and forgotten) once it has been freed.
-static func live(actors: Dictionary, actor_id: StringName) -> Node3D:
-	var raw: Variant = actors.get(actor_id)
-	if raw == null or not is_instance_valid(raw):
-		actors.erase(actor_id)
-		return null
-	return raw as Node3D
