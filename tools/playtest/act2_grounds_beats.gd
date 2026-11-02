@@ -100,7 +100,18 @@ func _bogge_hunt() -> bool:
 
 func _puca_gate() -> bool:
 	pt._begin("puca_gate", "night in the garden; follow 'Father' to the gate; Tamlin stops her; look again; puca_resisted")
-	var anchor := await _find_anchor(&"garden_gate", Vector3(0.0, 0.0, -194.0))
+	# Round the house to the window garden as a player would, not straight
+	# through it: the walker steers in lines, and the line from the Bogge's
+	# path to the hedge runs through the west wing (ballroom and cellar pit),
+	# where she can stall short of the scene's reach.
+	for p: Vector2 in _window_garden_route():
+		if pt._anchor(&"garden_gate") != null and _near_hedge():
+			break
+		await pt._walk_to(Vector3(p.x, 0.0, p.y), 3.0, Callable(), 150.0)
+	# Wait for the garden to stream in where she stands, by the hedge (the
+	# anchor itself is at the north gate, 100 m on).
+	var hedge_at := Vector3(ManorSitePlan.PUCA_GARDEN_SPOT.x, 0.0, ManorSitePlan.PUCA_GARDEN_SPOT.y)
+	var anchor := await _find_anchor(&"garden_gate", hedge_at)
 	if anchor == null:
 		pt._fail("no garden_gate anchor")
 		return false
@@ -133,6 +144,29 @@ func _puca_gate() -> bool:
 	pt._note("shapes: %s" % [space.shifts_seen])
 	pt._pass()
 	return true
+
+
+## Outdoor waypoints from the south to the hedges under her window: down the
+## lane between the stables and the west wing, then in through the arched
+## opening in the window garden's south hedge (ManorRoseGarden._hedges).
+## Each waypoint she is already past (north of) is skipped.
+func _window_garden_route() -> Array[Vector2]:
+	var wing := ManorSitePlan.HOUSE_WEST
+	var lane_x := (wing.position.x + ManorSitePlan.STABLES.end.x) * 0.5
+	var gap := Vector2(-ManorRoseGarden.SOUTH_OPENING_X, ManorSitePlan.ROSE_GARDEN.end.y - 1.0)
+	var route: Array[Vector2] = [Vector2(lane_x, wing.end.y + 30.0), Vector2(lane_x, wing.position.y - 8.0),
+		gap + Vector2(0, 6.0), gap - Vector2(0, 6.0)]
+	var z: float = pt.feyre.global_position.z
+	var ahead: Array[Vector2] = []
+	for p in route:
+		if p.y < z - 2.0:
+			ahead.append(p)
+	return ahead
+
+
+func _near_hedge() -> bool:
+	var h := ManorSitePlan.PUCA_GARDEN_SPOT
+	return Vector2(pt.feyre.global_position.x - h.x, pt.feyre.global_position.z - h.y).length() < 15.0
 
 
 func _space_running(id: StringName) -> bool:

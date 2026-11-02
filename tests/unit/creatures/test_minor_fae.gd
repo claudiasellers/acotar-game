@@ -1,15 +1,17 @@
 extends GutTest
-## Lane L48: the revellers, the cave trio, the masked household and the sentries
+## Lane L48: the revellers, the cave trio, the masked household, the sentries and
+## three solstice dancers
 ## are built on the main cast's body (tools/blender/cast/build_minor_fae.py) and
 ## still fill the old CourtNpc slots: rigged, all five clips, a head that turns
 ## to Feyre, inside the 15k creature budget (R4).
 
 ## CourtNpc scenes (creatures/people/scenes/).
 const IDS := ["reveler_1", "reveler_2", "reveler_3", "servant_maid", "servant_footman", "servant_cook",
-		"sentry_1", "sentry_2"]
+		"sentry_1", "sentry_2", "fae_rose", "fae_nymph", "fae_longlimb"]
 ## Every model file, the cave trio's included (calanmai_faerie.gd instances them as they are).
 const MODELS := ["reveler_1", "reveler_2", "reveler_3", "calanmai_1", "calanmai_2", "calanmai_3",
-		"servant_maid_true", "servant_footman_true", "servant_cook_true", "sentry_1", "sentry_2"]
+		"servant_maid_true", "servant_footman_true", "servant_cook_true", "sentry_1", "sentry_2",
+		"fae_rose", "fae_nymph", "fae_longlimb_true"]
 const CLIPS: Array[StringName] = [&"idle", &"walk", &"talk", &"flinch", &"bow"]
 const BUDGET := 15000
 
@@ -88,3 +90,15 @@ func test_feet_on_the_ground_and_a_fae_height() -> void:
 			hi = maxf(hi, box.end.y)
 		assert_almost_eq(lo, 0.0, 0.08, id + " stands on its origin")
 		assert_between(hi, 1.5, 2.4, id + " height")
+
+
+func test_no_albedo_channel_over_the_cap() -> void:
+	for id in MODELS:
+		for mi in _model(id).find_children("*", "MeshInstance3D", true, false):
+			var mesh := (mi as MeshInstance3D).mesh
+			for s in mesh.get_surface_count():
+				var mat := mesh.surface_get_material(s) as BaseMaterial3D
+				if mat == null or mat.albedo_texture != null:
+					continue    # textures are capped when they are baked (build_minor_fae.py cap_albedo)
+				var c := mat.albedo_color
+				assert_lte(maxf(c.r, maxf(c.g, c.b)), 0.852, "%s %s albedo" % [id, mat.resource_name])
