@@ -10,6 +10,7 @@ const SEED := 1702
 
 var camera: Camera3D
 var eye: Node3D
+var wolf_point: Vector3
 var _t: float = 0.0
 var _from: Transform3D
 var _to: Transform3D
@@ -82,7 +83,8 @@ func _ready() -> void:
 		var wolf := (load(WOLF) as PackedScene).instantiate() as Node3D
 		wolf.scale = Vector3.ONE * 1.25
 		wolf.position = Vector3(0.0, 0.0, -2.4)
-		wolf.rotation_degrees.y = 18.0
+		# The glTF faces -z; turn it to look into the lens.
+		wolf.rotation_degrees.y = 198.0
 		add_child(wolf)
 		var dark := StandardMaterial3D.new()
 		dark.albedo_color = Color(0.04, 0.04, 0.05)
@@ -96,11 +98,12 @@ func _ready() -> void:
 			ap.play(&"idle")
 			ap.speed_scale = 0.4
 		eye = _eye(wolf)
+		wolf_point = wolf.global_transform * (eye.get_meta(&"model_point") as Vector3)
 	camera = Camera3D.new()
 	camera.fov = 30.0
 	add_child(camera)
 	camera.current = true
-	var head := eye.global_position if eye else Vector3(0, 1.4, -1.6)
+	var head := wolf_point if eye else Vector3(0, 1.4, -1.6)
 	_from = Transform3D(Basis(), head + Vector3(0.55, 0.12, 2.2)).looking_at(head + Vector3(-0.1, -0.05, 0), Vector3.UP)
 	_to = Transform3D(Basis(), head + Vector3(0.35, 0.06, 1.25)).looking_at(head, Vector3.UP)
 	camera.global_transform = _from
@@ -114,45 +117,63 @@ func _dress(n: Node, m: Material) -> void:
 
 
 ## The yellow eye: an emissive almond on the head bone, closed (scale.y 0).
+## Both eyes on the wolf's head bone, opened by `wake()` (scale.y 0 to 1).
+## Placed in the model's own frame from the rest pose (the glTF faces -z),
+## so it never depends on which way the bone's axes point. Returns the pair's
+## frame, which is level and faces the way the wolf does.
 func _eye(wolf: Node3D) -> Node3D:
+	var frame := Node3D.new()
+	frame.name = "Eyes"
+	var at_model := Vector3(0.0, 1.35, -1.0)
 	var holder: Node3D = wolf
-	var off := Vector3(0.06, 1.35, -0.75)
 	for s in wolf.find_children("*", "Skeleton3D", true, false):
 		var sk := s as Skeleton3D
-		if sk.find_bone("head") >= 0:
-			var att := BoneAttachment3D.new()
-			att.bone_name = "head"
-			sk.add_child(att)
-			holder = att
-			off = Vector3(0.07, 0.06, 0.16)
-			break
-	var e := MeshInstance3D.new()
-	e.name = "Eye"
-	var sph := SphereMesh.new()
-	sph.radius = 0.035
-	sph.height = 0.05
-	e.mesh = sph
+		var bi := sk.find_bone("head")
+		if bi < 0:
+			continue
+		var att := BoneAttachment3D.new()
+		att.bone_name = "head"
+		sk.add_child(att)
+		holder = att
+		var rest := sk.get_bone_global_rest(bi)
+		# Skeleton space to the wolf's own space (both fixed at build time).
+		var sk_in_wolf := wolf.global_transform.affine_inverse() * sk.global_transform
+		at_model = sk_in_wolf * rest.origin + Vector3(0.0, 0.08, -0.14)
+		frame.transform = rest.affine_inverse() * sk_in_wolf.affine_inverse() * Transform3D(Basis(), at_model)
+		break
+	if holder == wolf:
+		frame.position = at_model
+	holder.add_child(frame)
+	frame.set_meta(&"model_point", at_model)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(1.0, 0.78, 0.12)
 	m.emission_enabled = true
 	m.emission = Color(1.0, 0.72, 0.08)
 	m.emission_energy_multiplier = 5.0
-	e.material_override = m
-	e.position = off
-	e.scale = Vector3(1.4, 0.0, 1.0)
-	holder.add_child(e)
-	var pupil := MeshInstance3D.new()
-	var pb := BoxMesh.new()
-	pb.size = Vector3(0.008, 0.05, 0.02)
-	pupil.mesh = pb
 	var pm := StandardMaterial3D.new()
 	pm.albedo_color = Color.BLACK
 	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	pupil.material_override = pm
-	pupil.position = Vector3(0, 0, 0.03)
-	e.add_child(pupil)
-	return e
+	for side in [-1.0, 1.0]:
+		var e := MeshInstance3D.new()
+		e.name = "Eye%s" % ("L" if side < 0.0 else "R")
+		var sph := SphereMesh.new()
+		sph.radius = 0.032
+		sph.height = 0.045
+		e.mesh = sph
+		e.material_override = m
+		e.position = Vector3(side * 0.085, 0.0, 0.0)
+		e.rotation_degrees.y = side * 28.0
+		e.scale = Vector3(1.5, 0.0, 1.0)
+		frame.add_child(e)
+		var pupil := MeshInstance3D.new()
+		var pb := BoxMesh.new()
+		pb.size = Vector3(0.007, 0.042, 0.02)
+		pupil.mesh = pb
+		pupil.material_override = pm
+		pupil.position = Vector3(0, 0, -0.026)
+		e.add_child(pupil)
+	return frame
 
 
 func _snowfall(at: Vector3, box: Vector3, amount: int, life: float, color: Color) -> GPUParticles3D:
@@ -194,4 +215,6 @@ func wake() -> void:
 		return
 	var tw := create_tween()
 	tw.tween_interval(1.1)
-	tw.tween_property(eye, ^"scale:y", 1.0, 0.9).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_method(func(v: float) -> void:
+		for e in eye.get_children():
+			(e as Node3D).scale.y = v, 0.0, 1.0, 0.9).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

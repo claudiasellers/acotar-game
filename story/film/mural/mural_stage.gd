@@ -189,7 +189,9 @@ func _figure(t: Dictionary, path: String, at: Vector3, yaw: float, s: float, m: 
 		return null
 	var n := (load(path) as PackedScene).instantiate() as Node3D
 	n.position = at
-	n.rotation_degrees.y = yaw
+	# yaw 0 faces the lens (+z): the cast models are built facing +z, the
+	# creature and people glTFs face -z.
+	n.rotation_degrees.y = yaw + (0.0 if path.begins_with("res://characters/") else 180.0)
 	n.scale = Vector3.ONE * s
 	(t.root as Node3D).add_child(n)
 	_paint_all(n, m)
@@ -252,9 +254,11 @@ func _crown(fig: Node3D, _m: ShaderMaterial, h: float, spikes: int = 9, r: float
 		var sk := s as Skeleton3D
 		var bi := sk.find_bone("head")
 		if bi < 0:
+			bi = sk.find_bone("Head")
+		if bi < 0:
 			continue
 		var att := BoneAttachment3D.new()
-		att.bone_name = "head"
+		att.bone_name = sk.get_bone_name(bi)
 		sk.add_child(att)
 		holder = att
 		var bone_y := (sk.global_transform * sk.get_bone_global_pose(bi)).origin.y
@@ -415,7 +419,7 @@ func _build_court(t: Dictionary) -> void:
 	_particles(t, Vector3(0, 4, -2), Vector3(12, 3, 3), ROSE, 160, 0.09, Vector3(0.15, -0.25, 0), 10.0, false)
 	_particles(t, Vector3(0, 6, -9), Vector3(14, 5, 1), Color(1.0, 0.9, 0.6, 0.8), 260, 0.04, Vector3.ZERO, 6.0)
 	# The beasts below, in the ink under the ridge.
-	var beast := _mat(t, Color(0.015, 0.015, 0.02), SICK * 0.8, 0.85, "beast")
+	var beast := _mat(t, Color(0.012, 0.012, 0.016), SICK * 0.7, 0.55, "beast")
 	beast.set_shader_parameter(&"rim_power", 4.0)
 	# The ink under the ridge: no sky down here, only the dark they live in.
 	_sky(t, Vector3(0.0, -4.6, -0.6), Vector2(70.0, 8.2), Color(0.01, 0.008, 0.02), Color(0.03, 0.02, 0.025))
@@ -430,8 +434,8 @@ func _build_court(t: Dictionary) -> void:
 	var eye := MeshInstance3D.new()
 	eye.name = "Eye"
 	var sph := SphereMesh.new()
-	sph.radius = 0.09
-	sph.height = 0.18
+	sph.radius = 0.06
+	sph.height = 0.12
 	eye.mesh = sph
 	var em := StandardMaterial3D.new()
 	em.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -440,9 +444,19 @@ func _build_court(t: Dictionary) -> void:
 	em.emission = Color(1.0, 0.75, 0.1)
 	em.emission_energy_multiplier = 6.0
 	eye.material_override = em
-	eye.position = Vector3(1.5, -3.3, 1.0)
-	eye.scale = Vector3(2.2, 0.0, 1.0)
+	eye.position = Vector3(2.4, -2.9, 0.3)
+	eye.scale = Vector3(2.4, 0.0, 1.0)
 	(t.root as Node3D).add_child(eye)
+	var slit := MeshInstance3D.new()
+	var sb := BoxMesh.new()
+	sb.size = Vector3(0.012, 0.11, 0.02)
+	slit.mesh = sb
+	var sm := StandardMaterial3D.new()
+	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	sm.albedo_color = Color.BLACK
+	slit.material_override = sm
+	slit.position = Vector3(0.0, 0.0, 0.055)
+	eye.add_child(slit)
 	_rail(t, Vector3(0.0, 2.4, 13.0), Vector3(0.0, 2.6, -2.0), Vector3(0.0, 2.0, 10.5), Vector3(0.0, 2.4, -2.0), 44.0)
 	t[&"rail_beasts"] = [Vector3(0.0, -1.6, 10.0), Vector3(0.0, -3.4, 2.0), Vector3(0.0, -2.4, 7.6), Vector3(0.6, -3.2, 3.0)]
 
