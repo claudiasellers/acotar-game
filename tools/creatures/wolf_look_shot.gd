@@ -3,7 +3,7 @@
 ## Needs a GPU (Mac shots, docs/contracts/shots.md):
 ##   godot res://tools/creatures/wolf_look_shot.tscn -- <out_dir> [numbers]
 ## hunt.png: the wolf stalking the doe from the side at ~9 m (the audit's view).
-## face.png: his head three-quarter close, the snarl (Faces "lunge") open.
+## face.png: his head three-quarter close, the snarl (Faces "snarl").
 ## eye_level.png: his head from Feyre's eye height (1.6 m) at 4 m.
 ## Also prints the draw calls the wolf adds.
 extends Node
@@ -89,11 +89,12 @@ func _run() -> void:
 	print("wolf: tris %d, draw calls in frame %d with / %d without = +%d" % [tris, with_wolf, without, with_wolf - without])
 	await _save(_out + "/hunt.png")
 	# His face, three-quarter, snarling.
-	# The lunge face (L36-3's preset), set on the SnarlModifier directly since
-	# the face only ticks with physics.
-	for snarl in wolf.find_children("Snarl", "", true, false):
-		if snarl is SnarlModifier:
-			(snarl as SnarlModifier).weights = {&"jaw_open": 1.0, &"ears_back": 1.0, &"head_low": 0.3}
+	# The snarl as the game drives it: the face and the clips tick with physics,
+	# by now the terrain's collision has streamed in, and HOLD_PREY keeps him still.
+	wolf.state = GreatWolf.State.HOLD_PREY
+	wolf.set_physics_process(true)
+	Faces.express(&"great_wolf", &"snarl")
+	await _settle(1.0)
 	var sk := wolf.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	var head := sk.global_transform * sk.get_bone_global_pose(sk.find_bone(&"muzzle")).origin
 	_look(head + wolf.global_basis * Vector3(1.3, 0.25, -1.6), head + Vector3.DOWN * 0.05)
