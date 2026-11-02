@@ -192,6 +192,14 @@ func prop(id: StringName, pos: Vector3, yaw: float = 0.0, scale: float = 1.0) ->
 	(_props[id] as Array).append(Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * scale), pos))
 
 
+## A prop with a whole transform of its own, e.g. sheared so that a run of
+## pergola bays climbs a slope with its posts still plumb.
+func prop_xform(id: StringName, xform: Transform3D) -> void:
+	if not _props.has(id):
+		_props[id] = []
+	(_props[id] as Array).append(xform)
+
+
 ## A prop standing on the ground at x/z.
 func prop_on_ground(id: StringName, x: float, z: float, yaw: float = 0.0, scale: float = 1.0, lift: float = 0.0) -> void:
 	prop(id, Vector3(x, WorldHeight.height_at(x, z) + lift, z), yaw, scale)

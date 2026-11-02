@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"alis_tray": Vector3(2.6, 0, 10.4),
+"bath": Vector3(8.6, 0, 13),
+"bed_side": Vector3(0, 0, 12),
+"desk": Vector3(5.6, 0, 9.2),
+"door": Vector3(-1.5, 0, 15.5),
+"near_bed": Vector3(0.8, 0, 12.6)
+}
+lines = {
+"alis_finery": {"text": "Mortal finery. Pink silk, lace, and a hat to keep the sun off.", "who": "Alis"},
+"alis_freedom": {"text": "Make the most of your freedom.", "who": "Alis"},
+"dawn_thought": {"text": "He stayed.", "who": ""},
+"dress_prompt": {"text": "Pale pink silk with white and blue lace, a white linen jacket, a little ivory hat.", "who": ""},
+"feyre_when": {"text": "When?", "who": "Feyre"},
+"hand_prompt": {"text": "I didn't want words. I reached for his hand.", "who": ""},
+"moonlight_thought": {"text": "He came to my room by moonlight.", "who": ""},
+"paintings_prompt": {"text": "My paintings, bundled on the writing table.", "who": ""},
+"tamlin_at_dawn": {"text": "At dawn.", "who": "Tamlin"},
+"tamlin_go_home": {"text": "So you need to go home, far from here.", "who": "Tamlin"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("alis_finery", "hand_prompt", "paintings_prompt")
+canon = "Ch27-28 [C] (Keeper): no letter; that night Tamlin comes to HER bedroom by moonlight: \"So you need to go home, far from here.\" When? \"At dawn.\" They spend the night in her bed; he stays (handled with restraint: a fade). Ch28: Alis dresses her in mortal finery (pale pink silk with white and blue lace, a white linen jacket, a little ivory hat, lace gloves, white pumps); goodbye to Alis: \"Make the most of your freedom.\""

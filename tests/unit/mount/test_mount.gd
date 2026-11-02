@@ -12,6 +12,8 @@ class Rider:
 	extends CharacterBody3D
 	var model: Node3D
 	var yaw: float = 0.0
+	var camera_lift: float = 0.0
+	var camera_arm_extra: float = 0.0
 
 	func _init() -> void:
 		add_to_group(&"player")
@@ -226,3 +228,22 @@ func test_the_camera_never_fades_her() -> void:
 	for g in meshes:
 		g.remove_from_group(CameraFade.PROBE_GROUP)
 	assert_eq(hits.size(), 0, "the mare stays solid under the chase camera")
+
+
+func test_the_riding_camera_lifts_and_comes_back() -> void:
+	_ready_mare()
+	assert_true(director.mount(rider))
+	await wait_seconds(MountDirector.RIDE_BLEND + 0.2)
+	assert_almost_eq(rider.camera_lift, MountDirector.RIDE_LIFT, 0.01, "lifted to see her neck and ears")
+	assert_almost_eq(rider.camera_arm_extra, MountDirector.RIDE_ARM, 0.01, "drawn back")
+	director.dismount()
+	await wait_seconds(MountDirector.RIDE_BLEND + 0.2)
+	assert_almost_eq(rider.camera_lift, 0.0, 0.001, "her own camera again on foot")
+	assert_almost_eq(rider.camera_arm_extra, 0.0, 0.001)
+
+
+func test_feyre_has_the_camera_hooks() -> void:
+	var src := (load("res://characters/feyre/feyre.gd") as Script)
+	var names := src.get_script_property_list().map(func(d: Dictionary) -> String: return d.name)
+	assert_has(names, "camera_lift")
+	assert_has(names, "camera_arm_extra")

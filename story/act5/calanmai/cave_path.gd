@@ -32,6 +32,9 @@ const HOME_ANCHOR := &"manor_window_hide"
 var _hold_at: Vector3
 var _since_met: float = 0.0
 var _hiss: AudioStreamPlayer3D
+## Their small fire near the trees (ch20 [C]: "by a fire"): the one light she
+## sees them by, low and flickering.
+var _campfire: Node3D
 
 
 func _ready() -> void:
@@ -122,12 +125,46 @@ func _surround() -> void:
 		var who := request_actor(id, xf, func() -> Node3D: return StandIns.figure("high_fae_male"))
 		who.global_transform = xf
 		actors[id] = who
+	_light_campfire(at + fwd * 6.5 - right * 2.5)
 	_hiss = AudioStreamPlayer3D.new()
 	_hiss.stream = load(HISS)
 	_hiss.unit_size = 4.0
 	add_child(_hiss)
 	_hiss.global_position = at + fwd * 2.0 + Vector3.UP * 1.6
 	_hiss.play()
+
+
+func _light_campfire(near: Vector3) -> void:
+	if _campfire:
+		return
+	_campfire = Node3D.new()
+	_campfire.name = "TheirFire"
+	add_child(_campfire)
+	_campfire.global_position = CalanmaiKit.ground(near.x, near.z)
+	for fx: String in ["fx_bonfire_flame", "fx_bonfire_embers"]:
+		var path := CalanmaiNight.FX + fx + ".tscn"
+		if ResourceLoader.exists(path):
+			var p := (load(path) as PackedScene).instantiate() as Node3D
+			_campfire.add_child(p)
+			p.position.y = 0.3
+			p.scale = Vector3.ONE * 0.9
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.55, 0.28)
+	light.light_energy = 3.2
+	light.omni_range = 16.0
+	light.shadow_enabled = true
+	light.position.y = 1.2
+	_campfire.add_child(light)
+	var tw := light.create_tween().set_loops()
+	tw.tween_property(light, ^"light_energy", 2.4, 0.23)
+	tw.tween_property(light, ^"light_energy", 3.6, 0.31)
+	tw.tween_property(light, ^"light_energy", 2.9, 0.19)
+	var crackle := AudioStreamPlayer3D.new()
+	crackle.stream = CalanmaiNight._looped(CalanmaiNight.FIRE)
+	crackle.unit_size = 2.5
+	crackle.volume_db = -10.0
+	_campfire.add_child(crackle)
+	crackle.play.call_deferred()
 
 
 ## They close to arm's length: 1.0 m ahead, 0.7 m at her sides. Done when all three are there.
@@ -233,6 +270,9 @@ func _lucien_appears() -> void:
 func _carried_home() -> void:
 	for id: StringName in actors.keys():
 		dismiss(id)
+	if _campfire:
+		_campfire.queue_free()
+		_campfire = null
 	CalanmaiKit.night_grade(get_tree(), false)
 	raise(CARRIED_FACT)
 	# The house may still be streamed in (the hill is near enough): then set her

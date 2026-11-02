@@ -1,0 +1,304 @@
+[gd_resource type="Resource" script_class="FilmScript" load_steps=49 format=3]
+
+[ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
+[ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
+[ext_resource type="Script" path="res://story/film/film_beat.gd" id="3_beat"]
+
+[sub_resource type="Resource" id="L00"]
+script = ExtResource("2_line")
+id = &"op_01"
+at = 1.5
+hold = 7.8
+speaker = &""
+text = "Every human child learns the story the same way. In lullabies. In rhymes we chant before we can read."
+canon = "C"
+
+[sub_resource type="Resource" id="L01"]
+script = ExtResource("2_line")
+id = &"op_02"
+at = 11.0
+hold = 7.5
+speaker = &""
+text = "Once, the whole of this land belonged to the faeries."
+canon = "C"
+
+[sub_resource type="Resource" id="L02"]
+script = ExtResource("2_line")
+id = &"op_03"
+at = 21.0
+hold = 11.0
+speaker = &""
+text = "The greatest of them, the High Fae, were ageless, and so beautiful it hurt to look at them. Stronger than us, faster than us, with magic in their blood."
+canon = "C"
+
+[sub_resource type="Resource" id="L03"]
+script = ExtResource("2_line")
+id = &"op_04"
+at = 34.5
+hold = 6.5
+speaker = &""
+text = "But not every faerie looked like a lord. Some wore the shapes of beasts."
+canon = "C"
+
+[sub_resource type="Resource" id="L04"]
+script = ExtResource("2_line")
+id = &"op_05"
+at = 43.0
+hold = 10.0
+speaker = &""
+text = "Once, we were their slaves. For thousands of years we built their cities with our blood and sweat, and their temples to gods we never knew."
+canon = "C"
+
+[sub_resource type="Resource" id="L05"]
+script = ExtResource("2_line")
+id = &"op_06"
+at = 55.5
+hold = 9.5
+speaker = &""
+text = "Once, we rose against them. The war was so terrible that we never told it plainly. We sang it to our children instead."
+canon = "C"
+
+[sub_resource type="Resource" id="L06"]
+script = ExtResource("2_line")
+id = &"op_07"
+at = 69.0
+hold = 8.0
+speaker = &""
+text = "Six human queens signed a Treaty with them, five hundred years ago. A promise."
+canon = "C"
+
+[sub_resource type="Resource" id="L07"]
+script = ExtResource("2_line")
+id = &"op_08"
+at = 79.0
+hold = 10.5
+speaker = &""
+text = "The faeries kept the north, and took their magic with them. They called it Prythian. We were given the south, and a Wall between us that no one can see."
+canon = "C"
+
+[sub_resource type="Resource" id="L08"]
+script = ExtResource("2_line")
+id = &"op_09"
+at = 92.0
+hold = 9.0
+speaker = &""
+text = "Five hundred years on, we still wear iron to keep them away. We still tell our children that ash wood can kill them."
+canon = "C"
+
+[sub_resource type="Resource" id="L09"]
+script = ExtResource("2_line")
+id = &"op_10"
+at = 107.0
+hold = 6.5
+speaker = &""
+text = "My name is Feyre. I am nineteen, the youngest of three sisters."
+canon = "C?"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("2_line")
+id = &"op_11"
+at = 128.0
+hold = 8.5
+speaker = &""
+text = "My mother died when I was eight. Before she did, she made me promise to keep us together, and to look after them."
+canon = "C"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("2_line")
+id = &"op_12"
+at = 137.5
+hold = 14.0
+speaker = &""
+text = "We were rich once. My father was a merchant. Three years after she died, he put every coin we had on three ships, and the sea took all three. The men he owed took everything else. Later, one of them found us here, and broke his leg."
+canon = "C"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("2_line")
+id = &"op_13"
+at = 160.0
+hold = 6.0
+speaker = &""
+text = "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."
+canon = "C"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("2_line")
+id = &"op_14"
+at = 166.4
+hold = 2.2
+speaker = &""
+text = "So I hunt."
+canon = "C"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("2_line")
+id = &"op_15"
+at = 168.4
+hold = 3.0
+speaker = &""
+text = "They say some of them are getting through the Wall now, into these woods. Out of Prythian."
+canon = "C"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("2_line")
+id = &"op_16"
+at = 171.3
+hold = 2.0
+speaker = &""
+text = "If I meet one, I'll kill it."
+canon = "C"
+
+[sub_resource type="Resource" id="B00"]
+script = ExtResource("3_beat")
+name = &"black_open"
+at = 0.0
+
+[sub_resource type="Resource" id="B01"]
+script = ExtResource("3_beat")
+name = &"land_fill"
+at = 10.0
+
+[sub_resource type="Resource" id="B02"]
+script = ExtResource("3_beat")
+name = &"court"
+at = 20.0
+
+[sub_resource type="Resource" id="B03"]
+script = ExtResource("3_beat")
+name = &"beasts"
+at = 33.0
+
+[sub_resource type="Resource" id="B04"]
+script = ExtResource("3_beat")
+name = &"eye_open"
+at = 39.0
+
+[sub_resource type="Resource" id="B05"]
+script = ExtResource("3_beat")
+name = &"slaves"
+at = 42.0
+
+[sub_resource type="Resource" id="B06"]
+script = ExtResource("3_beat")
+name = &"war"
+at = 54.0
+
+[sub_resource type="Resource" id="B07"]
+script = ExtResource("3_beat")
+name = &"war_crack"
+at = 63.0
+
+[sub_resource type="Resource" id="B08"]
+script = ExtResource("3_beat")
+name = &"treaty"
+at = 68.0
+
+[sub_resource type="Resource" id="B09"]
+script = ExtResource("3_beat")
+name = &"seal"
+at = 72.5
+
+[sub_resource type="Resource" id="B10"]
+script = ExtResource("3_beat")
+name = &"wall"
+at = 78.0
+
+[sub_resource type="Resource" id="B11"]
+script = ExtResource("3_beat")
+name = &"wash"
+at = 87.5
+
+[sub_resource type="Resource" id="B12"]
+script = ExtResource("3_beat")
+name = &"ripple"
+at = 93.0
+
+[sub_resource type="Resource" id="B13"]
+script = ExtResource("3_beat")
+name = &"to_world"
+at = 101.0
+
+[sub_resource type="Resource" id="B14"]
+script = ExtResource("3_beat")
+name = &"change_scene"
+at = 103.0
+
+[sub_resource type="Resource" id="B15"]
+script = ExtResource("3_beat")
+name = &"cottage_ext"
+at = 105.0
+
+[sub_resource type="Resource" id="B16"]
+script = ExtResource("3_beat")
+name = &"interior"
+at = 115.0
+
+[sub_resource type="Resource" id="B17"]
+script = ExtResource("3_beat")
+name = &"mother"
+at = 127.0
+
+[sub_resource type="Resource" id="B18"]
+script = ExtResource("3_beat")
+name = &"fall_house"
+at = 137.0
+
+[sub_resource type="Resource" id="B19"]
+script = ExtResource("3_beat")
+name = &"fall_ships"
+at = 139.6
+
+[sub_resource type="Resource" id="B20"]
+script = ExtResource("3_beat")
+name = &"fall_men"
+at = 146.0
+
+[sub_resource type="Resource" id="B21"]
+script = ExtResource("3_beat")
+name = &"cane"
+at = 149.6
+
+[sub_resource type="Resource" id="B22"]
+script = ExtResource("3_beat")
+name = &"foxglove"
+at = 152.0
+
+[sub_resource type="Resource" id="B23"]
+script = ExtResource("3_beat")
+name = &"larder"
+at = 159.0
+
+[sub_resource type="Resource" id="B24"]
+script = ExtResource("3_beat")
+name = &"dawn"
+at = 166.0
+
+[sub_resource type="Resource" id="B25"]
+script = ExtResource("3_beat")
+name = &"shoulder"
+at = 168.4
+
+[sub_resource type="Resource" id="B26"]
+script = ExtResource("3_beat")
+name = &"wolf_eye"
+at = 172.0
+
+[sub_resource type="Resource" id="B27"]
+script = ExtResource("3_beat")
+name = &"title"
+at = 176.0
+
+[sub_resource type="Resource" id="B28"]
+script = ExtResource("3_beat")
+name = &"handover"
+at = 183.0
+
+[resource]
+script = ExtResource("1_script")
+id = &"opening"
+length = 185.0
+music_cue = &"music_opening_film"
+seen_flag = ""
+bars = 1.0
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15")])
+beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16"), SubResource("B17"), SubResource("B18"), SubResource("B19"), SubResource("B20"), SubResource("B21"), SubResource("B22"), SubResource("B23"), SubResource("B24"), SubResource("B25"), SubResource("B26"), SubResource("B27"), SubResource("B28")])

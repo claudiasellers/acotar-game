@@ -12,5 +12,5 @@ require_flags = PackedStringArray("wall_recrossed")
 night_only = false
 trigger = &"enter"
 entry_radius = 4.0
-steps = Array[Dictionary]([{"do": "mood", "mood": "dread", "i": 0.5, "s": 2.0, "shake": 0.0}, {"do": "spawn", "actor": "alis", "at": Vector3(0.0, 0.0, -1.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "control", "mode": "LOOK", "focus": "alis"}, {"do": "wait", "s": 6.0}, {"do": "journal", "entry": "amarantha_and_the_curse"}, {"do": "journal", "entry": "andras_crossed_to_help"}, {"do": "raise", "flag": "alis_truth_heard"}])
-notes = "The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed)."
+steps = Array[Dictionary]([{"do": "spawn", "actor": "alis", "at": Vector3(0.0, 0.0, -1.5), "face": Vector3(0.0, 0.0, 0.0)}, {"do": "film", "id": "silent_manor"}, {"do": "until_flag", "flag": "fact.film_silent_manor_seen"}, {"do": "journal", "entry": "amarantha_and_the_curse"}, {"do": "journal", "entry": "andras_crossed_to_help"}, {"do": "raise", "flag": "alis_truth_heard"}])
+notes = "Cutscene C (lane L33) plays it and ends on the garden steps at dawn, facing north. The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed)."

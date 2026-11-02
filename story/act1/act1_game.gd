@@ -96,6 +96,9 @@ func _spawn_at(anchor: Node3D) -> void:
 		feyre.global_position = anchor.global_position + Vector3.UP * 0.1
 		feyre.model.rotation.y = anchor.global_rotation.y
 	feyre.set_physics_process(true)
+	# Straight after New Game the opening film plays its last part here (L33).
+	if OpeningFilmWorld.take(self, feyre, _first_thought):
+		return
 	_play_opening_shot()
 
 

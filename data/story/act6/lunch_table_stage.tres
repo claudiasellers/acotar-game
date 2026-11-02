@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_chair": Vector3(1.4, 0, -6.2),
+"lucien_chair": Vector3(-1.4, 0, -6.8),
+"table": Vector3(0, 0, -6.5),
+"tamlin_chair": Vector3(0, 0, -11)
+}
+lines = {
+"chair_prompt": {"text": "My place was laid beside Lucien's.", "who": ""},
+"lucien_blight": {"text": "Twenty-four. And it's spreading.", "who": "Lucien"},
+"tamlin_letter": {"text": "A letter from Winter. The blight took twenty-four of their younglings.", "who": "Tamlin"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("chair_prompt", "lucien_blight", "tamlin_letter")
+canon = "Ch26 [C]: a letter from Winter, the blight killed twenty-four younglings; she is already at the table at lunch with Tamlin and Lucien when Rhysand arrives (L33's film B plays the rest). manor_dining_table is at house (21, 0, -31.5) facing the table; L33's table centre is (21, -38)."
