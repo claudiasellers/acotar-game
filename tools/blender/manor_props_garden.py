@@ -17,7 +17,7 @@ import random
 import bmesh
 from mathutils import Vector
 from prop_kit import (BLUSH, BUTTER, GOLD, LILAC, PERI, ROSE, SAGE, SAGE_DEEP, SAGE_LIGHT, WHITE, R, S, T,
-                      box, cyl, ico, lathe, leaf, lighter, darker, mix, petal, sphere, torus, tube, disc)
+                      box, cyl, ico, lathe, leaf, lighter, darker, mix, petal, soft_rose, sphere, torus, tube, disc)
 
 # Garden palette (sRGB). Stone is warm and mid-light so it never glares.
 STONE = (0.84, 0.78, 0.77)
@@ -39,13 +39,11 @@ SWEETPEA = [(1.0, 0.62, 0.78), (0.80, 0.62, 0.98), (1.0, 0.86, 0.90), (0.98, 0.4
 
 
 def rosette(p, center, r, col, tilt=None, rng=None, finish="fabric", n=5):
-    """A cheap full rose (~50-65 tris): n cupped petals round a closed bud."""
+    """A rounded full rose: a smooth cupped head and a few broad outer petals
+    (prop_kit.soft_rose; L35-4 replaced the pointed five-petal shard)."""
     rng = rng or random.Random(3)
     m = T(*center) @ (tilt if tilt is not None else R("Z", 0))
-    for i in range(n):
-        a = 360 / n * i + rng.uniform(-10, 10)
-        p.add(petal(r, r * 0.95, cup=0.45, curl=0.12), col, finish, m @ R("Z", a) @ R("Y", -38))
-    p.add(lathe([(0, 0), (r * 0.42, r * 0.2), (0, r * 0.55)], 5), darker(col, 0.12), finish, m)
+    soft_rose(p, m, r, col, finish, rng, petals=min(n, 3))
 
 
 def leaves_mass(p, cx, cy, cz, r, col, rng, n=4, sub=1, squash=0.85, finish="leaf"):
@@ -80,10 +78,14 @@ def clipped_block(p, sx, sy, sz, cx, cy, cz, rng, col=YEW, tip=YEW_TIP, seg=2):
 def climbing_roses(p, pts, rng, cols=ROSE_MIX, every=2, leaf_r=0.16, bloom_r=0.11, petals=4):
     """Foliage and roses strung along a path of points (a vine)."""
     for i, (x, y, z) in enumerate(pts):
-        p.add(ico(leaf_r * rng.uniform(0.8, 1.15), 0), SAGE if i % 2 else SAGE_DEEP, "leaf",
-              T(x, y, z) @ S(1, 1, 0.8))
-        p.add(ico(leaf_r * 0.8, 0), SAGE_LIGHT if i % 3 == 0 else SAGE, "leaf",
-              T(x + rng.uniform(-leaf_r, leaf_r), y + rng.uniform(-leaf_r, leaf_r), z - leaf_r * 0.5) @ S(1, 1, 0.8))
+        if i % 2 == 0:
+            # one soft, lumpy clump every other point (same tris as two
+            # hexagonal ico-0 balls per point, but round in silhouette)
+            b = ico(leaf_r * 1.35 * rng.uniform(0.85, 1.1), 1)
+            for v in b.verts:
+                v.co *= 1.0 + rng.uniform(-0.12, 0.12)
+            p.add(b, [SAGE, SAGE_DEEP, mix(SAGE, SAGE_LIGHT, 0.5)][(i // 2) % 3], "leaf",
+                  T(x, y, z - leaf_r * 0.2) @ S(1, 1, 0.8), sharp_deg=89.0)
         if i % every == 0:
             ox, oy = rng.uniform(-0.08, 0.08), rng.uniform(-0.08, 0.08)
             rosette(p, (x + ox, y + oy, z + 0.05), bloom_r * rng.uniform(0.85, 1.2), cols[(i // every) % len(cols)],
