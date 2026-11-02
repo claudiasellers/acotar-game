@@ -54,16 +54,18 @@ func _run() -> void:
 		add_child(figure)
 		figure.global_basis = Basis.looking_at(Vector3.RIGHT, Vector3.UP)
 		await _frames(6)
-		FilmPose.on(figure).to(&"sit", 0.0, &"chair_dining")
-		await _frames(8)
-		for view: String in VIEWS:
-			_cam.global_position = Vector3(0.0, 0.0, 0.0) + (VIEWS[view] as Vector3)
-			_cam.look_at(Vector3(0.0, 0.7, 0.0), Vector3.UP)
-			await RenderingServer.frame_post_draw
-			var img := get_viewport().get_texture().get_image()
-			if img != null and not img.is_empty():
-				img.save_png(out.path_join("%s_%s.png" % [id, view]))
-				print("saved ", id, "_", view)
+		for pose: StringName in [&"stand", &"sit"]:
+			FilmPose.on(figure).to(&"" if pose == &"stand" else pose, 0.0, &"chair_dining")
+			chair.visible = pose == &"sit"
+			await _frames(8)
+			for view: String in VIEWS:
+				_cam.global_position = (VIEWS[view] as Vector3) * (1.0 if pose == &"sit" else 1.25)
+				_cam.look_at(Vector3(0.0, 0.7 if pose == &"sit" else 0.95, 0.0), Vector3.UP)
+				await RenderingServer.frame_post_draw
+				var img := get_viewport().get_texture().get_image()
+				if img != null and not img.is_empty():
+					img.save_png(out.path_join("%s_%s_%s.png" % [id, pose, view]))
+					print("saved ", id, "_", pose, "_", view)
 		figure.queue_free()
 		await _frames(2)
 	get_tree().quit()
