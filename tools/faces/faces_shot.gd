@@ -1,6 +1,6 @@
 ## In-game close-ups of the cast's canon expressions (lane L36), for the Mac look shots:
 ##   godot res://tools/faces/faces_shot.tscn -- <out_dir> [numbers]
-## faces_tamlin_lucien.png, faces_alis_father.png and faces_nesta_elain.png: one row per character,
+## faces_tamlin_lucien.png, faces_alis_father.png, faces_nesta_elain.png and faces_rhysand.png: one row per character,
 ## its rest face then each preset, driven through Faces.express() exactly as
 ## story code asks (EventBus), so the sheet proves the whole path. `numbers`
 ## prints each preset's strongest shape weight instead of rendering.
@@ -8,7 +8,7 @@ extends Node
 
 const TILE := Vector2i(480, 480)
 const SHEETS := {"faces_tamlin_lucien": [&"tamlin", &"lucien"], "faces_alis_father": [&"alis", &"father"],
-	"faces_nesta_elain": [&"nesta", &"elain"]}
+	"faces_nesta_elain": [&"nesta", &"elain"], "faces_rhysand": [&"rhysand"]}
 const COLS := 8
 
 var _out := "user://faces_shot"
