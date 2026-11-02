@@ -132,7 +132,11 @@ def stem(kit, base, top, width, col, f0=0.0, f1=1.0):
 
 
 def fan(kit, center, normal, petals, radius, petal, heart, flex, notch=0.45, tip=None):
-    """An open blossom: a star fan of 2*petals triangles facing `normal`."""
+    """An open blossom: a fan of 2*petals triangles facing `normal`. The
+    notch between petals stays shallow (quality audit B4: deep notches made
+    pointed stars that read as flat star decals), so the outline is a soft
+    scalloped round at the same triangle count."""
+    notch = max(notch, 0.74)
     n, side, up = frame(normal)
     c = Vector(center)
     tip = tip or petal
@@ -171,7 +175,11 @@ def pom(kit, center, radius, ca, cb, flex, subdiv=1, squash=1.0, lump=0.1):
     for v in verts:
         r = radius * (1.0 + lump * noise.noise(v * 2.3 + seed))
         idx.append(kit.add_vert(c + Vector((v.x * r, v.y * r, v.z * r * squash))))
-        col = mix(ca, cb, kit.rng.random())
+        # Soft drifts of colour rather than a random value per vertex: up
+        # close, per-vertex noise on these big triangles smeared into streaks
+        # that read as a stretched texture (quality audit B4).
+        k = min(1.0, max(0.0, 0.5 + 0.9 * noise.noise(v * 1.6 + seed * 1.3) + kit.rng.uniform(-0.08, 0.08)))
+        col = mix(ca, cb, k)
         cols.append(shade(col, 0.9 + 0.16 * (v.z + 1.0) * 0.5))
     for f in faces:
         kit.face(tuple(idx[i] for i in f), tuple(cols[i] for i in f), ((flex, 0.0),) * 3)
