@@ -1,23 +1,27 @@
-## Proof clip for "turning the camera doesn't steer her" (SteerFrame): she walks
-## a straight gold line holding only the forward key while the camera swings
-## round her and back; then the key is let go and pressed again, and she sets
-## off where the camera now looks. Writes frame_####.jpg (and prints her heading
-## each half second) for ffmpeg:
+## Proof clip for how she moves (SteerFrame and Feyre._ground_or_air): she
+## breaks straight into a run, the camera is swung round her for her (as the
+## follow-behind does) and she keeps her line, the mouse turns her, a quarter
+## turn keeps her speed and faces her path, she stops short, and a jump lands
+## quickly. Writes frame_####.jpg (and prints her speed and heading every
+## 0.25 s) for ffmpeg:
 ##   godot --fixed-fps 30 res://tools/steer_clip.tscn -- <out_dir>
 extends Node3D
 
 const FEYRE := "res://characters/feyre/feyre.tscn"
 const FPS := 30.0
-## [seconds, camera turn over the step (degrees), forward held, caption]
+## [seconds, auto camera turn (deg), mouse turn (deg), keys held, caption]
 const SCRIPT := [
-	[1.2, 0.0, true, "holding forward only"],
-	[1.6, 110.0, true, "camera swings right: she keeps to the line"],
-	[0.8, 0.0, true, "holding forward only"],
-	[2.0, -200.0, true, "camera swings back left: still the line"],
-	[0.8, 0.0, true, "holding forward only"],
-	[0.6, 0.0, false, "let go"],
-	[2.0, 0.0, true, "press forward again: she goes where the camera looks"],
+	[0.8, 0.0, 0.0, [&"move_forward", &"sprint"], "Shift + forward: straight into a run"],
+	[2.4, 0.0, 0.0, [&"move_forward", &"move_left", &"sprint"], "forward + left: the camera follows behind her, no circling"],
+	[1.0, 0.0, 0.0, [&"move_forward"], "forward only: straight on"],
+	[1.0, 0.0, -70.0, [&"move_forward"], "mouse turns the camera: she turns with it"],
+	[1.0, 0.0, 0.0, [&"move_right"], "right: a quarter turn, same speed"],
+	[0.8, 0.0, 0.0, [], "let go: she stops short"],
+	[0.5, 0.0, 0.0, [&"move_forward"], "forward"],
+	[0.45, 0.0, 0.0, [&"move_forward", &"jump"], "jump"],
+	[1.2, 0.0, 0.0, [], "let go in the air: she doesn't drift on"],
 ]
+const KEYS: Array[StringName] = [&"move_forward", &"move_left", &"move_right", &"sprint", &"jump"]
 
 var _feyre: Feyre
 var _label: Label
@@ -41,30 +45,36 @@ func _run() -> void:
 	var t_all := 0.0
 	var next_note := 0.0
 	for step: Array in SCRIPT:
-		_label.text = step[3]
-		if step[2]:
-			Input.action_press(&"move_forward")
-		else:
-			Input.action_release(&"move_forward")
+		_label.text = step[4]
+		for k in KEYS:
+			if (step[3] as Array).has(k):
+				if k != &"jump" or not Input.is_action_pressed(k):
+					Input.action_press(k)
+			else:
+				Input.action_release(k)
 		var frames := int(float(step[0]) * FPS)
-		var per := deg_to_rad(float(step[1])) / frames
+		var auto := deg_to_rad(float(step[1])) / frames
+		var mouse := deg_to_rad(float(step[2])) / frames
 		for f in frames:
-			if per != 0.0:
-				_feyre.nudge_camera(per, 0.0)
+			if auto != 0.0:
+				_feyre.nudge_camera(auto, 0.0)
+			if mouse != 0.0:
+				_feyre._rotate_camera(mouse, 0.0)
 				_feyre.look_input_this_frame = true
 			await get_tree().process_frame
 			t_all += 1.0 / FPS
 			if t_all >= next_note:
-				next_note += 0.5
+				next_note += 0.25
 				var v := Vector2(_feyre.velocity.x, _feyre.velocity.z)
-				print("t %.1f  camera yaw %4.0f deg  heading %4.0f deg  speed %.1f  x %.2f  [%s]" % [t_all,
-						rad_to_deg(_feyre.camera_yaw()), rad_to_deg(atan2(-v.x, -v.y)) if v.length() > 0.1 else 0.0,
-						v.length(), _feyre.global_position.x, step[3]])
+				print("t %.2f  speed %5.2f  heading %4.0f  facing %4.0f  camera %4.0f  y %.2f  [%s]" % [t_all, v.length(),
+						rad_to_deg(atan2(-v.x, -v.y)) if v.length() > 0.1 else 0.0, rad_to_deg(_feyre.model.rotation.y),
+						rad_to_deg(_feyre.camera_yaw()), _feyre.global_position.y, step[4]])
 			if _frame % 2 == 0:
 				await RenderingServer.frame_post_draw
 				get_viewport().get_texture().get_image().save_jpg("%s/frame_%04d.jpg" % [_out, _frame / 2], 0.9)
 			_frame += 1
-	Input.action_release(&"move_forward")
+	for k in KEYS:
+		Input.action_release(k)
 	get_tree().quit()
 
 
@@ -100,9 +110,9 @@ func _build_stage() -> void:
 	# The line she should keep to: straight ahead (-z) from where she starts.
 	var line := MeshInstance3D.new()
 	var strip := BoxMesh.new()
-	strip.size = Vector3(0.25, 0.02, 80.0)
+	strip.size = Vector3(0.25, 0.02, 120.0)
 	line.mesh = strip
-	line.position = Vector3(0.0, 0.01, -40.0)
+	line.position = Vector3(0.0, 0.01, -60.0)
 	var gold := StandardMaterial3D.new()
 	gold.albedo_color = Color(0.95, 0.75, 0.2)
 	line.material_override = gold
