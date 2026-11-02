@@ -173,13 +173,20 @@ func _mount(_space: SceneSpace) -> void:
 	if _rider:
 		_rider.set_physics_process(false)
 	horse = request_actor(&"white_horse", _pose_at(0.0), StandIns.horse)
+	# Seated astride, as on the mount (L47): legs on the barrel, hands on the reins.
+	if _rider and horse is WhiteHorse:
+		Saddle.seat(_rider)
 
 
 func _dismount(_space: SceneSpace) -> void:
 	if _rider and is_instance_valid(_rider):
 		if _rider is CharacterBody3D:
 			(_rider as CharacterBody3D).velocity = Vector3.ZERO
+		var seated := _rider.has_meta(Saddle.HIP_DROP)
+		Saddle.unseat(_rider)
 		_rider.global_position += _rider.global_basis.x * 1.2
+		if seated and horse and is_instance_valid(horse):
+			_rider.global_position.y = horse.global_position.y + 0.1
 		_rider.set_physics_process(true)
 
 
@@ -202,7 +209,10 @@ func _place(offset: float) -> void:
 	if horse and is_instance_valid(horse):
 		horse.global_transform = pose
 	if _rider and is_instance_valid(_rider):
-		_rider.global_position = pose.origin + Vector3.UP * 1.1
+		if horse is WhiteHorse and _rider.has_meta(Saddle.HIP_DROP):
+			Saddle.place(_rider, horse as WhiteHorse)
+		else:
+			_rider.global_position = pose.origin + Vector3.UP * 1.1
 
 
 ## Rides forward at ride_speed until the offset `until` returns.

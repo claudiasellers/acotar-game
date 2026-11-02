@@ -80,8 +80,16 @@ without look input.
   uses it; arrows and the camera's spring arm ignore it), mask world. Group
   `station` with `station_id` `white_mare` while nobody rides. States
   STANDING, COMING, RIDDEN, GOING_HOME.
+- `Saddle` (`saddle.gd`): the one way to sit Feyre on the white horse, used by
+  both the mount and the ch5 ride north (`story/act1/ride_north.gd`).
+  `Saddle.seat(rider)` adds the `RidePose`, `Saddle.place(rider, horse)` puts
+  her hips on `WhiteHorse.seat_point()` (a bone attachment on the horse's
+  spine plus `WhiteHorse.SEAT_OFFSET`, so she rides with the gait),
+  `Saddle.unseat(rider)` takes it off.
 - `RidePose` (`ride_pose.gd`): a `SkeletonModifier3D` on Feyre's skeleton
-  (the shared cast rig) that aims legs astride and hands to the reins.
+  (the shared cast rig): hips in the saddle, thighs on the barrel, feet in
+  the stirrups (hung at 0.84 of the withers height in `white_mare.py`),
+  hands on the reins.
 - `MountData` (`mount_data.gd`, `data/mount/white_mare.tres`): every number.
 - Sounds: `systems/mount/sounds/*.wav` from `tools/mount/mare_sounds.py` (numpy, fixed seed).
 

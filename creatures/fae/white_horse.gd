@@ -8,6 +8,9 @@ class_name WhiteHorse
 extends StoryActor
 
 @export var walk_speed: float = 1.6
+## Saddle seat (where a rider's hips sit) from the spine bone, in the horse's
+## space: up, and forward (-Z). See tools/blender/white_mare.py and Saddle.
+const SEAT_OFFSET := Vector3(0.0, 0.47, -0.2)
 
 var mount_point: Marker3D
 var walking: bool = false
@@ -21,6 +24,7 @@ var speed_override: float = -1.0
 var _destination: Vector3
 var _t: float = 0.0
 var _last: Vector3 = Vector3.INF
+var _seat: BoneAttachment3D
 
 
 func _ready() -> void:
@@ -34,6 +38,21 @@ func _ready() -> void:
 	add_child(mount_point)
 	_destination = global_position if is_inside_tree() else position
 	animator = MareAnimator.attach(model, self)
+
+
+## Where a rider's hips sit, riding the spine bone through each stride.
+func seat_point() -> Vector3:
+	if _seat == null and model:
+		var sks := model.find_children("*", "Skeleton3D", true, false)
+		if not sks.is_empty() and (sks.front() as Skeleton3D).find_bone(&"spine") >= 0:
+			_seat = BoneAttachment3D.new()
+			_seat.name = "Seat"
+			_seat.bone_name = "spine"
+			(sks.front() as Skeleton3D).add_child(_seat)
+	var base := global_position + Vector3.UP * 1.25
+	if _seat and _seat.is_inside_tree():
+		base = _seat.global_position
+	return base + global_basis * SEAT_OFFSET
 
 
 func play_cue(cue: StringName) -> void:

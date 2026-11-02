@@ -5,7 +5,11 @@ extends Node
 
 const HORSE := preload("res://creatures/fae/white_horse.tscn")
 const FEYRE := preload("res://characters/feyre/model/feyre_model.tscn")
-const DATA := preload("res://data/mount/white_mare.tres")
+
+
+class Rider:
+	extends Node3D
+	var model: Node3D
 
 
 func _ready() -> void:
@@ -29,26 +33,23 @@ func _run() -> void:
 	root.add_child(sun)
 	var horse := HORSE.instantiate() as WhiteHorse
 	root.add_child(horse)
-	var sks := horse.model.find_children("*", "Skeleton3D", true, false)
-	var seat := BoneAttachment3D.new()
-	seat.bone_name = "spine"
-	(sks.front() as Skeleton3D).add_child(seat)
-	var feyre := FEYRE.instantiate() as Node3D
-	root.add_child(feyre)
-	var fsk := feyre.find_children("*", "Skeleton3D", true, false).front() as Skeleton3D
-	var pose := RidePose.attach(fsk)
-	pose.amount = 1.0
+	var rider := Rider.new()
+	root.add_child(rider)
+	rider.model = FEYRE.instantiate() as Node3D
+	rider.add_child(rider.model)
 	var cam := Camera3D.new()
 	root.add_child(cam)
 	cam.current = true
 	cam.fov = 40.0
-	for i in 10:
+	for i in 6:
 		await get_tree().process_frame
-	var hips := fsk.find_bone(&"Hips")
-	var drop := (fsk.global_transform * fsk.get_bone_global_rest(hips).origin).y - feyre.global_position.y
-	var at := seat.global_position + horse.global_basis * DATA.seat_offset
-	feyre.global_position = at - Vector3.UP * drop
-	print("seat %s drop %.2f feyre %s" % [at, drop, feyre.global_position])
+	Saddle.seat(rider)
+	for i in 4:
+		Saddle.place(rider, horse)
+		await get_tree().process_frame
+	var at := horse.seat_point()
+	var drop: float = rider.get_meta(Saddle.HIP_DROP)
+	print("seat %s drop %.2f rider %s" % [at, drop, rider.global_position])
 	for view: Array in [["side", Vector3(5.5, 1.6, 0.0)], ["front", Vector3(2.8, 2.2, -4.5)], ["back", Vector3(-2.5, 2.6, 4.5)]]:
 		cam.look_at_from_position(view[1], Vector3(0, 1.3, 0))
 		for i in 4:
