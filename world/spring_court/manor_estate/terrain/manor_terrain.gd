@@ -55,6 +55,12 @@ static func texture_at(x: float, z: float) -> Vector3i:
 	var b := ManorSitePlan.BOUNDS
 	var edge := minf(minf(x - b.position.x, b.end.x - x), minf(z - b.position.y, b.end.y - z))
 	var woods := int(clampf(1.0 - (edge - 40.0) / 80.0, 0.0, 1.0) * 255.0)
+	# L56-3: on open lawn the overlay is grass too. Terrain3D height-blends the
+	# overlay even at blend 0 wherever its height map stands above the base's,
+	# so a forest-floor overlay leaked through the lawns as 1 m stair-stepped
+	# yellow-brown blotches.
+	if woods == 0:
+		return Vector3i(WorldHeight.Tex.SPRING_GRASS, WorldHeight.Tex.SPRING_GRASS, 0)
 	return Vector3i(WorldHeight.Tex.SPRING_GRASS, WorldHeight.Tex.FOREST_FLOOR, woods)
 
 

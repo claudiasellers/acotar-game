@@ -71,6 +71,8 @@ const SPECIES := {
 	&"foxglove_white": [&"flower", 1.3, Color(0.98, 0.94, 0.97)],
 	&"meadow_buttercup": [&"flower", 0.8, Color(1.0, 0.84, 0.12)],
 	&"peony_white": [&"flower", 0.8, Color(1.0, 0.96, 0.94)],
+	# L56-3: long meadow grass on the park's outer edges
+	&"meadow_grass": [&"reed", 0.75, Color(0.52, 0.55, 0.30)],
 }
 
 const FOLIAGE_SHADER := preload("res://world/shared/shaders/stylized_foliage.gdshader")

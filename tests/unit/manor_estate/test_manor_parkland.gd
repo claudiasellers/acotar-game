@@ -86,3 +86,29 @@ func test_stables_garden_faces_are_dressed() -> void:
 func test_parterre_soil_reads_as_earth() -> void:
 	assert_gte(GardenKit.MULCH.get_luminance(), 0.34, "lighter than the old near-black mauve")
 	assert_true(GardenKit.MULCH.r > GardenKit.MULCH.g and GardenKit.MULCH.g > GardenKit.MULCH.b, "brown loam, not purple or salmon")
+
+
+# L56-3: the open lawn paints grass over grass, so no forest floor leaks
+# through it as blotches (Terrain3D height-blends an overlay even at blend 0).
+func test_open_lawn_has_no_leaking_overlay() -> void:
+	for p: Vector2 in [Vector2(-60, 160), Vector2(40, 120), Vector2(-120, 90)]:
+		var t := ManorTerrain.texture_at(p.x, p.y)
+		assert_eq(t.x, WorldHeight.Tex.SPRING_GRASS, "grass at %s" % p)
+		assert_eq(t.y, WorldHeight.Tex.SPRING_GRASS, "no forest-floor overlay at %s" % p)
+
+
+# L56-3: mown near the house, long meadow grass toward the park's edges.
+func test_meadow_grows_at_the_edges_only() -> void:
+	var near := 0
+	var far := 0
+	for l in layers:
+		if l.id != &"deco_meadow_grass":
+			continue
+		for i in l.count():
+			var p := l.position_of(i)
+			if absf(p.x) < ManorParkland.MEADOW_X and p.z < ManorParkland.MEADOW_Z:
+				near += 1
+			else:
+				far += 1
+	assert_eq(near, 0, "no long grass on the mown lawns")
+	assert_gt(far, 2000, "a real meadow on the outer edges")

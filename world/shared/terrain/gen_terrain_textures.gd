@@ -15,9 +15,9 @@ const LOOKS := {
 	"rock": [Color(0.48, 0.50, 0.56), Color(0.66, 0.66, 0.72), 5.0, 0.9, 0.85, 0.45],
 	"winter_grass": [Color(0.62, 0.58, 0.44), Color(0.82, 0.84, 0.88), 14.0, 0.5, 0.9, 0.45],
 	# L56-2: desaturated, slightly warm green at value ~0.3 (the manor grade's
-	# saturation 1.22 had pushed the old 0.50-0.63 green to a neon #5f5), with
-	# ~2.5 m blotches of warmer and cooler blades.
-	"spring_grass": [Color(0.25, 0.36, 0.20), Color(0.38, 0.44, 0.24), 4.0, 0.45, 0.85, 0.55],
+	# saturation 1.22 had pushed the old 0.50-0.63 green to a neon #5f5).
+	# L56-3: finer variation (~1 m) and a little less accent.
+	"spring_grass": [Color(0.27, 0.36, 0.21), Color(0.36, 0.41, 0.24), 9.0, 0.4, 0.85, 0.45],
 	"moss": [Color(0.22, 0.43, 0.30), Color(0.56, 0.46, 0.70), 9.0, 0.5, 0.95, 0.18],
 	"forest_floor": [Color(0.40, 0.31, 0.24), Color(0.62, 0.45, 0.30), 16.0, 0.55, 0.95, 0.4],
 	"path": [Color(0.50, 0.40, 0.31), Color(0.66, 0.56, 0.44), 8.0, 0.4, 0.9, 0.35],
