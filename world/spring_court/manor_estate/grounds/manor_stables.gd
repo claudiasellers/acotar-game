@@ -59,8 +59,9 @@ static func build(parent: Node3D) -> void:
 	var b := GroundsBatch.new(parent, "Stables")
 	var s := ManorSitePlan.STABLES
 	var y := ManorGrounds.ground(s.get_center().x, s.get_center().y)
-	# cobbled yard
-	b.box(Vector3(-130.0, y + 0.03, -26.0), Vector3(50.0, 0.06, 52.0), EstateKit.mat(Color(0.96, 0.84, 0.80), 0.9, 0.0, "cobbles"), false)
+	# cobbled yard: worn warm sandstone, well under the 0.88 albedo cap (a
+	# 0.96 slab this size blew out to white in the noon sun, L47 Mac frames)
+	b.box(Vector3(-130.0, y + 0.03, -26.0), Vector3(50.0, 0.06, 52.0), EstateKit.mat(Color(0.72, 0.62, 0.57), 0.92, 0.0, "cobbles"), false)
 	_range(b, WEST, "e", y)
 	_range(b, EAST, "w", y)
 	_range(b, NORTH, "s", y)
