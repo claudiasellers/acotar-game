@@ -15,7 +15,7 @@ from mathutils import Matrix, Vector, noise
 
 # ---------------------------------------------------------------- palette
 PAL = {
-    "bark_wet": (0.07, 0.065, 0.06),
+    "bark_wet": (0.15, 0.12, 0.10),  # wet bark, dark but not a black cut-out (quality audit B2)
     "bark_grey": (0.23, 0.21, 0.19),
     "bark_brown": (0.20, 0.15, 0.11),
     "bark_ash": (0.56, 0.57, 0.56),
@@ -32,6 +32,7 @@ PAL = {
     "juniper": (0.17, 0.25, 0.22),
     "red": (0.72, 0.04, 0.04),
     "red_deep": (0.45, 0.03, 0.04),
+    "bramble_cane": (0.28, 0.09, 0.12),  # purple-brown winter canes, not paint red
     "orange_hip": (0.80, 0.18, 0.05),
     "sloe": (0.18, 0.20, 0.34),
     "juniper_berry": (0.25, 0.30, 0.45),
@@ -357,7 +358,7 @@ class Builder:
             c = jitter(_c, rng, 0.04 if smooth else 0.1)
             if f.calc_center_median().z < center.z + size[2] * 0.25:
                 c = mix(c[:3], "rock_dark", 0.4)
-            elif smooth and 0.15 < f.normal.z <= snow + 0.05:
+            elif smooth and snow is not None and 0.15 < f.normal.z <= snow + 0.05:
                 # Moss just under the snow line, on the shaded north faces.
                 c = mix(c[:3], "moss_ice", 0.55 * min(1.0, max(0.0, 0.5 + f.normal.y)))
             return c
