@@ -305,10 +305,21 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat, motion=N
     nose_r = head_r * (0.11 if spec.get("horror") else 0.15)
     parts.append(sphere("Nose", snout + Vector((0, head_r * spec.get("snout_r", 0.42) * 0.35, head_r * 0.08)), nose_r,
                         coat if fur else nose_mat, 8))
+    nose = parts[-1]
+    painted[nose] = (0.0, 0.0, 1.0, 0.75)
+    rigid.append((nose, "muzzle"))
     if fur:
-        parts[-1].scale = (1.25, 0.8, 0.75)
-    painted[parts[-1]] = (0.0, 0.0, 1.0, 0.75)
-    rigid.append((parts[-1], "muzzle"))
+        nose.scale = (1.35, 0.85, 0.7)
+        painted[nose] = (0.0, 0.0, 1.0, 1.0)
+        if spec.get("horror"):
+            # Nostrils: matte black commas in the wet leather.
+            tip = snout + Vector((0, head_r * spec.get("snout_r", 0.42) * 0.35 + nose_r * 0.8, head_r * 0.06))
+            for side in (-1, 1):
+                nostril = sphere(f"Nostril{side}", tip + Vector((side * nose_r * 0.45, 0, 0)), nose_r * 0.3, coat, 8)
+                nostril.scale = (1.3, 0.6, 0.8)
+                parts.append(nostril)
+                painted[nostril] = (0.0, 0.0, 1.0, 0.0)
+                rigid.append((nostril, "muzzle"))
     if spec.get("jaw_open") and not spec.get("horror"):
         jaw = Vector(g.points[g.names["jaw"]])
         for side in (-1, 1):
@@ -325,12 +336,25 @@ def finish_quadruped(name, spec, coat, belly, eye_mat, ivory, nose_mat, motion=N
                 paw = Vector(g.points[g.names[f"{key}{side}_3"]])
                 pw = spec["leg"] * spec.get("shape", {}).get("paw", 1.0)
                 for c in (-1, 0, 1):
-                    base = paw + Vector((c * pw * 0.5, pw * 0.6, 0.01))
-                    parts.append(cone(f"Claw{key}{side}{c}", base, base + Vector((0, pw * 0.9, -0.012)), pw * 0.16, ivory, 4))
+                    if fur:
+                        # Dark horn, seated at the toe tips and hooked into the snow.
+                        base = paw + Vector((c * pw * 0.42, pw * 0.5, 0.0))
+                        claw = cone(f"Claw{key}{side}{c}", base, base + Vector((0, pw * 0.45, -0.02)), pw * 0.14, coat, 4)
+                        painted[claw] = (0.0, 0.0, 1.0, 0.35)
+                    else:
+                        base = paw + Vector((c * pw * 0.5, pw * 0.6, 0.01))
+                        claw = cone(f"Claw{key}{side}{c}", base, base + Vector((0, pw * 0.9, -0.012)), pw * 0.16, ivory, 4)
+                    parts.append(claw)
                     rigid.append((parts[-1], f"paw_{key}_{'l' if side < 0 else 'r'}"))
     if spec.get("antlers"):
         pass  # The M1 deer is a doe herd; stags come with the Spring Court lanes.
     if spec.get("horror"):
+        for side, tag in ((-1, "l"), (1, "r")):
+            base, tip = Vector(g.points[g.names[f"ear{side}"]]), Vector(g.points[g.names[f"eart{side}"]])
+            ear = creature_fur.ear_plate(f"Ear{side}", base - (tip - base) * 0.1, tip, head_r * 0.3, coat)
+            parts.append(ear)
+            painted[ear] = (0.0, 0.0, 0.6, 0.0)
+            rigid.append((ear, f"ear_{tag}"))
         wolf_mouth(spec, g, head, snout, coat, ivory, parts, rigid, painted)
     for part, bone in rigid:
         creature_rig.weight_rigid(part, bone)
@@ -359,14 +383,14 @@ def wolf_eyes(spec, head, eye_mat, coat, parts, rigid, painted):
     hr = spec["head"]
     fwd = spec.get("eye_fwd", 0.5)
     for side in (-1, 1):
-        c = head + Vector((side * 0.5 * hr, fwd * hr, 0.34 * hr))
-        eye = sphere(f"Eye{side}", c, 0.12 * hr, eye_mat, 12)
+        c = head + Vector((side * 0.47 * hr, fwd * hr, 0.34 * hr))
+        eye = sphere(f"Eye{side}", c, 0.1 * hr, eye_mat, 12)
         eye.rotation_euler = (0.0, side * math.radians(-18), side * math.radians(-30))
         eye.scale = (1.0, 1.0, 0.5)
         parts.append(eye)
         rigid.append((eye, "head"))
         look = Vector((side * 0.45, 0.89, 0.0)).normalized()
-        pupil = sphere(f"Pupil{side}", c + look * 0.105 * hr, 0.04 * hr, coat, 8)
+        pupil = sphere(f"Pupil{side}", c + look * 0.088 * hr, 0.038 * hr, coat, 8)
         pupil.scale = (1.0, 0.5, 1.0)
         parts.append(pupil)
         painted[pupil] = (0.0, 0.0, 1.0, 1.0)
@@ -398,12 +422,12 @@ def wolf_mouth(spec, g, head, snout, coat, ivory, parts, rigid, painted):
             t = 0.05 + i * 0.07
             canine = i == 1
             base = upper(t, side)
-            ln = (0.36 if canine else 0.11 + 0.03 * (i % 2)) * hr
+            ln = (0.14, 0.42, 0.13, 0.11, 0.09)[i] * hr
             parts.append(cone(f"ToothU{side}{i}", base, base + Vector((side * 0.03 * hr, 0.02 * hr if canine else 0.0, -ln)),
                               (0.06 if canine else 0.035) * hr, ivory, 5 if canine else 4))
             rigid.append((parts[-1], "muzzle"))
             base = lower(t, side)
-            ln = (0.3 if canine else 0.1) * hr
+            ln = (0.11, 0.32, 0.1, 0.09, 0.08)[i] * hr
             parts.append(cone(f"ToothL{side}{i}", base, base + Vector((side * 0.02 * hr, -0.03 * hr if canine else 0.0, ln)),
                               (0.05 if canine else 0.032) * hr, ivory, 5 if canine else 4))
             rigid.append((parts[-1], "jaw"))
@@ -458,7 +482,7 @@ def wolf(name, scale, coat_rgb, belly_rgb, eye_rgb, glow, teeth_rgb=(0.86, 0.80,
         # with shells (creatures/materials/fur.gdshader) and guard-hair cards.
         spec["waist"] = 0.5
         spec["eye_fwd"] = 0.38
-        spec["shape"] = {"upper": 0.85, "fore": 0.72, "lower": 0.62, "paw": 1.55, "paw_h": 1.2, "tail": 0.6,
+        spec["shape"] = {"upper": 0.85, "fore": 0.88, "lower": 0.68, "paw": 1.55, "paw_h": 1.2, "tail": 0.6,
                          "neck": 0.8, "snout_rz": 0.27, "jaw_rx": 0.25, "jaw_rz": 0.17}
         spec["fur"] = {"sculpt": creature_fur.sculpt_wolf, "zones": creature_fur.wolf_zones,
                        "cards": material("GuardHair", coat_rgb, 0.9)}
@@ -561,7 +585,7 @@ if __name__ == "__main__":
         # Partial run: tools/blender/creatures.py <out_dir> great_wolf deer
         for fn in only:
             {"wolf": lambda: wolf("wolf", 1.0, (0.36, 0.34, 0.32), (0.58, 0.55, 0.50), (0.78, 0.62, 0.22), 0.0),
-             "great_wolf": lambda: wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.0,
+             "great_wolf": lambda: wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.85, 0.5, 0.06), 1.0,
                                         teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.82, death_breaths=4,
                                         horror=True),
              "deer": deer, "hare": hare, "bird": bird}[fn]()
@@ -572,7 +596,7 @@ if __name__ == "__main__":
     # Andras (chapter 1 text via the keeper): pony-sized, paws bigger than a hand;
     # charcoal and obsidian with ivory, reading silver at a distance; golden
     # eyes, yellow fangs.
-    wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.95, 0.78, 0.2), 1.0,
+    wolf("great_wolf", 1.65, (0.11, 0.11, 0.13), (0.78, 0.75, 0.68), (0.85, 0.5, 0.06), 1.0,
          teeth_rgb=(0.82, 0.70, 0.38), paw=1.25, coat_rough=0.82, death_breaths=4, horror=True)
     deer()
     hare()

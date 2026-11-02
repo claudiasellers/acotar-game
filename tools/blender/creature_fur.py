@@ -103,9 +103,16 @@ def sculpt_wolf(body, g, spec):
     neck, head, snout = P(g, "neck"), P(g, "head"), P(g, "snout")
     spine = [P(g, "tail0"), hip, mid, chest, sh]
     eye_fwd = spec.get("eye_fwd", 0.5)
+    ears = [(P(g, f"ear{s}"), P(g, f"eart{s}")) for s in (-1, 1)]
     normals = _normals(body)
     for v, n in zip(body.data.vertices, normals):
         p = v.co.copy()
+        # The skin modifier kinks one ear tip; fold the skin ear down to a
+        # stub (wolf_ears in creatures.py lays a modelled ear over it).
+        for base, tip in ears:
+            d, t = seg_dist(p, base, tip)
+            if d < hr * 0.4 and t > 0.05:
+                p = base + (p - base) * 0.45
         d_sp, _, _ = poly_dist(p, spine)
         torso = bump(d_sp, r * 1.9) * ss((p.z - (chest.z - r * 2.2)) / (r * 0.6))
         # Lateral squeeze: wolves are narrow, deep-chested.
@@ -137,12 +144,19 @@ def sculpt_wolf(body, g, spec):
         dh = (p - head).length
         if dh < hr * 2.6 or (p - snout).length < hr * 1.4:
             for sx in (-1, 1):
-                brow = head + Vector((sx * 0.48 * hr, (eye_fwd - 0.02) * hr, 0.6 * hr))
-                out += 0.26 * hr * bump((p - brow).length, 0.34 * hr)
-                eye = head + Vector((sx * 0.5 * hr, eye_fwd * hr, 0.34 * hr))
-                out -= 0.12 * hr * bump((p - eye).length, 0.28 * hr)
-                cheek = head + Vector((sx * 0.72 * hr, 0.05 * hr, -0.05 * hr))
-                out += 0.1 * hr * bump((p - cheek).length, 0.4 * hr)
+                brow = head + Vector((sx * 0.46 * hr, (eye_fwd - 0.02) * hr, 0.58 * hr))
+                out += 0.36 * hr * bump((p - brow).length, 0.36 * hr)
+                eye = head + Vector((sx * 0.47 * hr, eye_fwd * hr, 0.34 * hr))
+                out -= 0.14 * hr * bump((p - eye).length, 0.26 * hr)
+                cheek = head + Vector((sx * 0.72 * hr, 0.08 * hr, -0.08 * hr))
+                out += 0.18 * hr * bump((p - cheek).length, 0.42 * hr)
+            # The stop: a dip from the brow down onto the muzzle bridge.
+            stop = head + Vector((0, (eye_fwd + 0.3) * hr, 0.5 * hr))
+            out -= 0.12 * hr * bump((p - stop).length, 0.3 * hr) * ss((n.z - 0.2) / 0.5)
+            # Flews: the back of the upper lip hangs at the corners.
+            d_up, t_up = seg_dist(p, head, snout)
+            if p.z < snout.z and abs(n.x) > 0.3:
+                p.z -= 0.1 * hr * bump(abs(t_up - 0.35), 0.25) * ss((abs(n.x) - 0.3) / 0.4)
             if p.y > head.y + 0.2 * hr and p.z > snout.z:
                 p.z = snout.z + (p.z - snout.z) * 0.78
             if p.y > head.y:
@@ -233,6 +247,8 @@ def wolf_zones(g, spec):
     tail_end = P(g, "tail_2")
     spine = [hip, mid, chest, sh]
     H = spec["height"]
+    shape_snout_rz = spec["shape"]["snout_rz"]
+    shape_jaw_rz = spec["shape"]["jaw_rz"]
 
     def zone(co, n):
         pale = fur = dark = wet = 0.0
@@ -243,34 +259,54 @@ def wolf_zones(g, spec):
         pale = max(pale, ss((-n.z - 0.2) / 0.5) * torso * 0.85)
         throat = bump(seg_dist(co, sh, neck)[0], r * 1.6) * ss((-n.z + n.y * 0.5 - 0.1) / 0.5)
         pale = max(pale, throat * 0.8)
-        # Obsidian saddle and face mask.
-        dark = max(dark, ss((n.z - 0.35) / 0.5) * torso)
+        # Obsidian saddle; a lighter face (silver cheeks, dark mask only round
+        # the eyes) so the head reads as form, not a black hole.
+        dark = max(dark, 0.75 * ss((n.z - 0.35) / 0.5) * torso)
         d_head = (co - head).length
         if d_head < hr * 1.6:
-            dark = max(dark, 0.7 * ss((n.z + 0.2) / 0.6))
+            dark = max(dark, 0.3 * ss((n.z + 0.2) / 0.6))
             for sx in (-1, 1):
-                eye = head + Vector((sx * 0.5 * hr, spec.get("eye_fwd", 0.5) * hr, 0.34 * hr))
-                dark = max(dark, bump((co - eye).length, 0.3 * hr))
-        # Fur length: full on the body, short on face, legs and paws.
-        fur = 1.0
-        fur *= 1.0 - 0.75 * bump((co - snout).length, hr * 1.8)
+                eye = head + Vector((sx * 0.47 * hr, spec.get("eye_fwd", 0.5) * hr, 0.34 * hr))
+                dark = max(dark, bump((co - eye).length, 0.24 * hr))
+                cheek = head + Vector((sx * 0.7 * hr, 0.1 * hr, -0.12 * hr))
+                pale = max(pale, 0.4 * bump((co - cheek).length, 0.5 * hr))
+        # Fur length: long on the spine, ruff, tail and belly fringe; shorter
+        # on the flat flanks; next to none on the face, legs and paws.
+        fur = 0.55 + 0.45 * max(ss((n.z - 0.3) / 0.5), bump(seg_dist(co, sh, neck)[0], r * 1.8),
+                                ss((-n.z - 0.4) / 0.4))
+        fur *= 1.0 - 0.92 * bump(d_head, hr * 1.7)
         fur *= 1.0 - 0.6 * leg * ss((H * 0.4 - co.z) / (H * 0.3))
         if co.z < 0.06:
             fur *= 0.3
         if (co - tail_end).length < r * 2.0:
             fur = 1.0
-        # Mouth: the inside of the muzzle/jaw gap, lips and gums, is bare and wet.
-        if co.y > head.y + 0.15 * hr:
+        # Mouth: inside the gap is bare and wet; on the outside the lips are
+        # drawn back in a snarl, a black lip edge over a band of wet gum.
+        if co.y > head.y + 0.1 * hr:
             d_up, t_up = seg_dist(co, head, snout)
             d_lo, t_lo = seg_dist(co, head, jaw)
-            if d_lo < d_up * 0.95 and n.z > 0.1:
-                wet = ss((n.z - 0.1) / 0.4) * ss((t_lo - 0.2) / 0.3)
-            elif d_up <= d_lo and n.z < -0.2 and co.z < snout.z:
-                wet = ss((-n.z - 0.2) / 0.4) * ss((t_up - 0.3) / 0.3)
-            # Black lips along the gap.
-            lip = bump(abs(co.z - (snout.z + jaw.z) * 0.5 - 0.15 * hr), 0.35 * hr) * ss((co.y - head.y) / hr)
-            dark = max(dark, lip * 0.9)
-            fur *= 1.0 - max(wet, lip * 0.8)
+            side = ss((abs(n.x) - 0.25) / 0.4)
+            if d_lo < d_up * 0.95:
+                if n.z > 0.1:
+                    wet = ss((n.z - 0.1) / 0.4) * ss((t_lo - 0.2) / 0.3)
+                tj = 1.0 - t_lo
+                rzj = hr * (shape_jaw_rz + (0.5 - shape_jaw_rz) * tj)
+                rel = co.z - (jaw.z + (head.z - jaw.z) * tj)
+                gum = bump(abs(rel - rzj * 0.75), rzj * 0.35) * side * ss((t_lo - 0.15) / 0.2)
+                wet = max(wet, gum)
+                dark = max(dark, bump(abs(rel - rzj * 0.25), rzj * 0.3) * side * ss((t_lo - 0.15) / 0.2))
+            else:
+                if n.z < -0.2 and co.z < snout.z:
+                    wet = ss((-n.z - 0.2) / 0.4) * ss((t_up - 0.3) / 0.3)
+                tu = 1.0 - t_up
+                rz = hr * (shape_snout_rz + 0.45 * tu)
+                rel = co.z - (snout.z + (head.z - snout.z) * tu)
+                band = ss((t_up - 0.2) / 0.2)
+                gum = bump(abs(rel + rz * 0.82), rz * 0.22) * side * band
+                lip = bump(abs(rel + rz * 0.5), rz * 0.16) * side * band
+                wet = max(wet, gum)
+                dark = max(dark, lip)
+            fur *= 1.0 - max(wet, dark * 0.8)
         return (sat(pale), sat(fur), sat(dark), sat(wet))
 
     def rib(co, n):
@@ -475,6 +511,28 @@ def card_weights_from_roots(obj, cards):
 
 
 # ---------------------------------------------------------------- mouth and eyes
+
+def ear_plate(name, base, tip, radius, mat, flat=0.4):
+    """A wolf ear: a six-sided cone flattened front to back, cupped forward."""
+    bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=radius, radius2=0.0, depth=(tip - base).length)
+    obj = bpy.context.active_object
+    obj.name = name
+    obj.rotation_mode = "QUATERNION"
+    obj.rotation_quaternion = Vector((0, 0, 1)).rotation_difference((tip - base).normalized())
+    obj.location = (base + tip) / 2
+    obj.data.materials.append(mat)
+    bpy.context.view_layer.update()
+    obj.data.transform(obj.matrix_world)
+    obj.matrix_world = obj.matrix_world.__class__.Identity(4)
+    ax = (tip - base).normalized()
+    for v in obj.data.vertices:
+        q = v.co - base
+        along = q.dot(ax)
+        off = q - ax * along
+        off.y *= flat
+        v.co = base + ax * along + off
+    return obj
+
 
 def strand(name, top, bottom, radius, mat, segs=6, sag=0.0):
     """A thin tube from top to bottom (saliva). Returns (obj, t per vertex)."""

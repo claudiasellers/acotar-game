@@ -23,6 +23,7 @@ uniform float comb = 0.5;
 uniform float streak : hint_range(0.0, 1.0) = 0.45;
 uniform float rib_depth : hint_range(0.0, 1.0) = 0.0;
 uniform float rib_spacing = 0.09;
+uniform float sheen : hint_range(0.0, 1.0) = 0.0;
 uniform float rim_amount : hint_range(0.0, 1.0) = 0.45;
 uniform float roughness_fur : hint_range(0.0, 1.0) = 0.82;
 
@@ -86,12 +87,16 @@ void fragment() {
 	col *= mix(1.0, 0.6 + 0.8 * st, streak) * (0.85 + 0.3 * big);
 	// Root shade to tip sheen: the hide is darkest, the outer shells catch silver.
 	float layer = shell > 0.0 ? shell : 0.0;
-	col *= mix(0.55 + 0.35 * s, 1.0, layer);
+	col *= mix(0.72 + 0.18 * s, 1.0, layer);
 	col = mix(col, tip, tip_amount * layer * layer * (1.0 - zone.b));
 	// Ribs: grooves between the ribs on a starved flank.
 	float phase = (rest.y - 0.35 * rest.z) / rib_spacing;
 	float ridge = pow(0.5 + 0.5 * cos(6.2831853 * phase), 2.0);
 	col *= 1.0 - rib_depth * rib * (1.0 - ridge) * (1.0 - layer);
+	// Silver sheen at grazing angles: the "reads silver at a distance" of the
+	// canon coat, and what gives the dark head its planes.
+	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	col = mix(col, tip, sheen * fres * (1.0 - zone.a));
 	// Wet mouth, then black lips, nose and pupils on top.
 	col = mix(col, mouth, zone.a);
 	col = mix(col, dark, zone.b);
