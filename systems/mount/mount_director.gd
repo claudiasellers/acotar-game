@@ -53,14 +53,12 @@ var last_block: StringName = &""
 var autopilot: Callable
 
 var _spaces: Dictionary = {}
-var _hip_drop: float = 0.9
 var _e_down: float = -1.0
 var _since_look: float = 99.0
 var _sweep: float = 0.0
 var _inside: Dictionary = {}
 var _whistle: AudioStreamPlayer
 var _prompt: Label3D
-var _seat: BoneAttachment3D
 var _unlock: ActionTrigger
 var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
@@ -270,15 +268,10 @@ func mount(user: Node = null) -> bool:
 	_set_bow(false)
 	mare.state = MareMount.State.RIDDEN
 	mare.set_mountable(false)
-	_seat_attach()
-	var sk := _skeleton()
-	if sk:
-		pose = RidePose.attach(sk)
-		var hips := sk.find_bone(&"Hips")
-		if hips >= 0:
-			_hip_drop = (sk.global_transform * sk.get_bone_global_rest(hips).origin).y - p.global_position.y
-		var tw := create_tween()
-		tw.tween_property(pose, ^"amount", 1.0, 0.25)
+	pose = Saddle.seat(p)
+	if pose:
+		pose.amount = 0.0
+		create_tween().tween_property(pose, ^"amount", 1.0, 0.25)
 	_inside.clear()
 	_place_rider(0.0)
 	if first:
@@ -309,12 +302,8 @@ func dismount() -> void:
 		p.set_physics_process(true)
 	_set_bow(true)
 	_calm_feel()
-	if pose and is_instance_valid(pose):
-		pose.amount = 0.0
-		pose.lean = 0.0
-	if _seat and is_instance_valid(_seat):
-		_seat.queue_free()
-	_seat = null
+	if p:
+		Saddle.unseat(p)
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
@@ -335,17 +324,6 @@ func _landing(p: Node3D) -> Vector3:
 	return mare.global_position + left * 1.3 + Vector3.UP * 0.3
 
 
-func _skeleton() -> Skeleton3D:
-	var p := _player()
-	if p == null:
-		return null
-	var model := p.get(&"model") as Node3D
-	if model == null:
-		return null
-	var found := model.find_children("*", "Skeleton3D", true, false)
-	return null if found.is_empty() else found.front() as Skeleton3D
-
-
 func _set_bow(on: bool) -> void:
 	var p := _player()
 	if p == null:
@@ -355,40 +333,18 @@ func _set_bow(on: bool) -> void:
 		bow.set_physics_process(on)
 
 
-func _seat_attach() -> void:
-	if mare == null or mare.horse == null or mare.horse.model == null:
-		return
-	var sks := mare.horse.model.find_children("*", "Skeleton3D", true, false)
-	if sks.is_empty():
-		return
-	var sk := sks.front() as Skeleton3D
-	if sk.find_bone(&"spine") < 0:
-		return
-	_seat = BoneAttachment3D.new()
-	_seat.name = "Seat"
-	_seat.bone_name = "spine"
-	sk.add_child(_seat)
-
-
 ## Where her hips sit: the saddle, riding the spine bone through each stride.
 func seat_point() -> Vector3:
-	if mare == null:
+	if mare == null or mare.horse == null:
 		return Vector3.ZERO
-	var base := mare.global_position + Vector3.UP * 1.25
-	if _seat and is_instance_valid(_seat) and _seat.is_inside_tree():
-		base = _seat.global_position
-	return base + mare.global_basis * data.seat_offset
+	return mare.horse.seat_point()
 
 
 func _place_rider(_delta: float) -> void:
 	var p := _player()
-	if p == null or mare == null:
+	if p == null or mare == null or mare.horse == null:
 		return
-	var seat := seat_point()
-	p.global_position = seat - Vector3.UP * _hip_drop
-	var model := p.get(&"model") as Node3D
-	if model:
-		model.rotation = Vector3(0.0, mare.rotation.y, 0.0)
+	Saddle.place(p, mare.horse)
 	if pose:
 		var lean := clampf((mare.speed - data.canter_speed * 0.6) / maxf(data.gallop_speed - data.canter_speed * 0.6, 0.1), 0.0, 1.0)
 		pose.lean = lerpf(pose.lean, lean, 0.1)

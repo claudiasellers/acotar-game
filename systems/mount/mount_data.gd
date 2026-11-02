@@ -33,7 +33,5 @@ extends Resource
 @export var balk_probe: float = 7.0
 ## Region ids she will not enter at all (horror: the Suriel glade and its naga reeds).
 @export var no_ride_regions: PackedStringArray = ["suriel_glade"]
-## Saddle seat above the spine bone's origin, in the model's space (metres).
-@export var seat_offset: Vector3 = Vector3(0.0, 0.47, -0.2)
 @export var canon: String = "C"
 @export var source: String = "ch 9: she rides a white mare from the painted stables with Lucien; ch 5: the beast's white horse"

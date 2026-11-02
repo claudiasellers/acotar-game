@@ -238,7 +238,7 @@ def white_mare():
     rigid.append((parts[-1], "spine"))
     for side in (-1, 1):
         strap_top = sc + Vector((side * spec["girth"] * 0.95, 0.0, -0.05))
-        strap_bot = Vector((side * spec["girth"] * 1.05, seat.y, H * 0.5))
+        strap_bot = Vector((side * spec["girth"] * 1.08, seat.y + 0.04, H * 0.84))
         parts.append(base.cone(f"Leather{side}", strap_bot, strap_top, 0.022, gold, 4))
         rigid.append((parts[-1], "spine"))
         parts.append(torus(f"Stirrup{side}", strap_bot + Vector((0, 0, -0.07)), (0, 1, 0), 0.07, 0.013, gold, 10, 4))
