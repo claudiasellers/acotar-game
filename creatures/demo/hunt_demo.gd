@@ -79,12 +79,10 @@ func _on_arrow_fired(arrow: Node3D) -> void:
 	ash_arrows -= 1
 	arrow.set(&"arrow_id", &"ash")
 	arrow.set_meta(&"arrow_id", &"ash")
-	for child in arrow.get_children():
-		if child is MeshInstance3D:
-			var mat := StandardMaterial3D.new()
-			mat.albedo_color = Color(0.86, 0.84, 0.78)
-			(child as MeshInstance3D).material_override = mat
-			break
+	var model := arrow.get_node_or_null(^"ArrowModel") as MeshInstance3D
+	if model:
+		var fletch: Color = arrow.get(&"data").fletching_color
+		model.mesh = ArrowModel.mesh(Arrow.LENGTH, Arrow.LENGTH * 0.5, Color(0.86, 0.84, 0.78), fletch, ArrowModel.STEEL)
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -78,3 +78,43 @@ func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
 	Input.action_release(&"aim")
 	await wait_seconds(0.4)
 	assert_gt(_visual().raised, 0.9, "the bow stays up a moment after the shot")
+
+
+## F43: every draw logged "det == 0" inverting a degenerate bow transform.
+func test_ten_draws_log_no_errors() -> void:
+	for k in 10:
+		Input.action_press(&"aim")
+		await wait_physics_frames(4)
+		Input.action_press(&"fire")
+		await wait_seconds(0.4)
+		Input.action_release(&"fire")
+		Input.action_release(&"aim")
+		await wait_physics_frames(6)
+	assert_engine_error_count(0, "no invert errors while drawing")
+
+
+func test_hand_basis_holds_up_aiming_straight_up_or_down() -> void:
+	for dir: Vector3 in [Vector3.DOWN, Vector3.UP, Vector3(0, -1, 0.0001), Vector3.ZERO, Vector3.FORWARD]:
+		var b := BowVisual.hand_basis(dir, Vector3.FORWARD)
+		assert_almost_eq(absf(b.determinant()), 1.0, 0.001, "basis for %s" % dir)
+
+
+## F44: arrows in flight, stuck arrows and the nocked arrow share ArrowModel,
+## never a primitive mesh the grey-box guard would flag.
+func test_arrows_use_the_arrow_model_not_primitives() -> void:
+	for id: StringName in BowController.arrow_data():
+		var arrow := Arrow.create(BowController.arrow_data()[id])
+		var model := arrow.get_node_or_null(^"ArrowModel") as MeshInstance3D
+		assert_not_null(model, "%s has an ArrowModel" % id)
+		for child in arrow.get_children():
+			if child is MeshInstance3D:
+				assert_false((child as MeshInstance3D).mesh is PrimitiveMesh, "%s: %s" % [id, child.name])
+		arrow.free()
+	feyre.bow_controller.cycle_arrow()
+	await wait_seconds(0.5)
+	var nocked := _visual().arrow_node
+	for child in nocked.get_children():
+		if child is MeshInstance3D:
+			assert_false((child as MeshInstance3D).mesh is PrimitiveMesh, "nocked %s" % child.name)
+	var aabb := ArrowModel.mesh(0.83, 0.0, Color.WHITE, Color.WHITE, ArrowModel.STEEL).get_aabb()
+	assert_almost_eq(aabb.position.z, -0.83, 0.01, "tip 0.83 down -Z from the nock")
