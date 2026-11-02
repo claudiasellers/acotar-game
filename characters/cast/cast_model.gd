@@ -25,6 +25,8 @@ var notice: NoticePlayer
 ## Story cues the model acts out itself, e.g. Lucien's leaves_sick (lane L22,
 ## creatures/anim/cast_cues.gd).
 var cues: CastCues
+## Blinks, canon expressions and talking (lane L36, systems/faces/; data/faces/<id>_face.tres).
+var face: FaceDriver
 
 
 func _ready() -> void:
@@ -47,6 +49,7 @@ func _ready() -> void:
 			anim.play(&"idle")
 	notice = NoticePlayer.attach(skeleton, self)
 	cues = CastCues.attach(self, skeleton)
+	face = FaceDriver.attach(self, FaceDriver.id_of(self))
 
 
 ## Puts on a garment or accessory glb skinned to this rig.  Wearing it again does nothing.

@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"tamlin"
+canon = "Mask over brows, nose, cheeks [C ch6]. Jaw tightens, quivers [C ch7, ch11]; growls and snarls [C ch6-7]; fangs when furious [C ch11]; claws out [C ch7, ch10]; still and weary after the Bogge [C ch12]; does not smile early [C ch7]; colour in his cheeks then a broad, unguarded grin [C ch16]; later a lazy grin [C ch22]. Never smirks or sneers (Lucien's register)."
+masked = true
+rest = &"guarded"
+blink_min = 3.0
+blink_max = 6.5
+presets = {
+"fury": { "brow_down_L": 1.0, "brow_down_R": 1.0, "frown_L": 0.3, "frown_R": 0.3, "jaw_open": 0.32, "mouth_stretch": 0.25, "sneer_L": 1.0, "sneer_R": 1.0, "squint_L": 0.55, "squint_R": 0.55 },
+"grin": { "cheek_raise": 0.8, "jaw_open": 0.14, "smile_L": 1.0, "smile_R": 1.0, "squint_L": 0.3, "squint_R": 0.3 },
+"growl": { "brow_down_L": 0.6, "brow_down_R": 0.6, "frown_L": 0.35, "frown_R": 0.35, "jaw_clench": 0.5, "sneer_L": 0.45, "sneer_R": 0.55, "squint_L": 0.4, "squint_R": 0.4 },
+"guarded": { "frown_L": 0.1, "frown_R": 0.1, "jaw_clench": 0.2, "lip_press": 0.25 },
+"lazy_grin": { "blink_L": 0.25, "blink_R": 0.25, "cheek_raise": 0.3, "smile_L": 0.55, "smile_R": 0.75 },
+"restraint": { "frown_L": 0.2, "frown_R": 0.2, "jaw_clench": 0.95, "lip_press": 0.6, "squint_L": 0.25, "squint_R": 0.25 },
+"shy_warmth": { "blink_L": 0.18, "blink_R": 0.18, "cheek_raise": 0.3, "smile_L": 0.44, "smile_R": 0.32 },
+"weary": { "blink_L": 0.42, "blink_R": 0.42, "frown_L": 0.25, "frown_R": 0.25, "jaw_open": 0.04 }
+}
+aliases = {
+"neutral": "guarded",
+"happy": "shy_warmth",
+"laugh": "grin",
+"smirk": "lazy_grin",
+"tender": "shy_warmth",
+"angry": "restraint",
+"fury": "fury",
+"contempt": "growl",
+"disgust": "growl",
+"sad": "weary",
+"grief": "weary",
+"afraid": "restraint",
+"terror": "restraint",
+"surprise": "guarded",
+"pained": "restraint",
+"weary": "weary",
+"guarded": "guarded",
+"pleading": "weary"
+}
+tics = [{ "hold": 0.9, "max": 15.0, "min": 7.0, "preset": "restraint", "weight": 0.45 }]
