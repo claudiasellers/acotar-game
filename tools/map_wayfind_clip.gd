@@ -8,12 +8,15 @@
 extends Node
 
 const PIN := Vector2(375, 2250)
-## [label, where she stands, camera faces the pin? (else north), frames]
+## [label, where she stands, camera faces the pin? (else a quarter turn left), frames, pin?]
+## The spring beats stand in the manor's forecourt under the pale Spring sky.
 const BEATS := [
 	["away", Vector2(-150, 2190), false, 10],
 	["toward", Vector2(-150, 2190), true, 10],
 	["nearer", Vector2(150, 2225), true, 6],
 	["close", Vector2(330, 2245), true, 6],
+	["spring_toward", Vector2(30, 40), true, 4, Vector2(-240, -460)],
+	["spring_away", Vector2(30, 40), false, 4, Vector2(-240, -460)],
 ]
 const FRAME_GAP := 0.2
 const SAVE_SIZE := Vector2i(1280, 720)
@@ -50,7 +53,10 @@ func _run() -> void:
 		var at: Vector2 = beat[1]
 		feyre.global_position = Vector3(at.x, WorldHeight.height_at(at.x, at.y) + 0.3, at.y)
 		WorldStreamer.update_for(feyre.global_position)
-		var look := (PIN - at).normalized() if beat[2] else Vector2(0, -1)
+		var pin_at: Vector2 = beat[4] if beat.size() > 4 else PIN
+		var to_pin := (pin_at - at).normalized()
+		# Looking away: a quarter turn left of the pin, so it rides the right edge.
+		var look := to_pin if beat[2] else Vector2(to_pin.y, -to_pin.x)
 		var yaw := atan2(-look.x, -look.y)
 		feyre.call(&"nudge_camera", angle_difference(feyre.call(&"camera_yaw"), yaw), 0.0)
 		var model: Node3D = feyre.get(&"model")
@@ -58,8 +64,8 @@ func _run() -> void:
 			model.rotation.y = yaw
 		get_viewport().disable_3d = true
 		await get_tree().create_timer(3.0).timeout  # let the region and camera settle
-		if not hud.pin.active:
-			hud.set_pin(PIN)
+		if not hud.pin.active or hud.pin.xz != pin_at:
+			hud.set_pin(pin_at)
 		hud.wind.gust()
 		await get_tree().create_timer(0.6).timeout  # the gust gets going
 		get_viewport().disable_3d = false
