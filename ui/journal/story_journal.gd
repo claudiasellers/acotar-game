@@ -25,7 +25,8 @@ const GROUP := &"story_journal"
 const ACTION_OPEN := &"journal_open"
 const PAGE := Vector2(660, 800)
 const SPINE := 6.0
-const MAX_MEMORIES := 6
+## The most recent memories that fit the page without growing it.
+const MAX_MEMORIES := 4
 const SAVE_KEY := "story_journal"
 
 var book: JournalBook
