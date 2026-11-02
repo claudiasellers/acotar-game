@@ -196,6 +196,31 @@ def bind(B: Builder, bm: bmesh.types.BMesh, r: float, mat: str, kind: str = "she
         B.mark(kind, i0, **prm)
 
 
+def neat_collar(bm: bmesh.types.BMesh, probe: BodyProbe, off: Callable[[Vector], float], z_min: float = 1.24,
+                x_max: float = 0.14, iters: int = 6) -> None:
+    """The neck edge of a shell that follows the body's torso/neck region border, a saw-tooth that leaves
+    skin teeth above the collar (and, with a U neckline, a void below them).  Lift each edge vertex to the
+    higher of its edge neighbours, smooth along the edge and settle it back on the body, as the hunter
+    tunic's neat_neckline does: one clean curve (T057)."""
+    edge = [v for v in bm.verts if v.is_boundary and v.co.z > z_min and abs(v.co.x) < x_max]
+    nb = {v: [e.other_vert(v) for e in v.link_edges if e.is_boundary] for v in edge}
+    eset = set(edge)
+    for _ in range(iters):
+        new = {}
+        for v in edge:
+            ring = [o for o in nb[v] if o in eset]
+            if not ring:
+                continue
+            avg = (v.co + sum((o.co for o in ring), Vector())) / (len(ring) + 1)
+            avg.z = max([v.co.z] + [o.co.z for o in ring]) * 0.6 + avg.z * 0.4
+            new[v] = avg
+        for v, c in new.items():
+            v.co = c
+    for v in edge:
+        loc, nrm, _, _ = probe.bvh.find_nearest(v.co)
+        v.co = loc + nrm * off(v.co)
+
+
 def girth(probe: BodyProbe, z: float) -> Tuple[float, float, float]:
     cy = probe.cy(z)
     rx = max(abs(probe.torso_pt(z, a).x) for a in (math.pi / 2, -math.pi / 2))
@@ -403,11 +428,16 @@ def buttons(B: Builder, probe: BodyProbe, zs, lift: float, r: float = 0.0042, ma
 
 
 def build_spring_tunic(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
-    hole = neckline(0.11, 0.075)
     # The body's legs region rises above the hem at the flanks: the shell keeps it, or the skirt's top
     # edge would stand clear of nothing there and the trousers show between them (T053).
-    bm = sh.make(lambda r, c: (r in ("torso", "arms") or (r == "legs" and c.z > 0.89)) and not hole(c),
-                 lambda c: 0.006 + 0.004 * float(smoothstep(1.03, 0.98, c.z)), [z_below(0.90)] + x_beyond(0.30))
+    # No neckline hole: the old U cut every face above 1.333 at any x, which holed the shoulder tops
+    # (the arm skin showed there) and, with her torso hidden, left a void under saw-tooth neck skin.
+    # The collar is the torso/neck region border, straightened like the hunter tunic's (T057).
+    def off(c: Vector) -> float:
+        return 0.006 + 0.004 * float(smoothstep(1.03, 0.98, c.z))
+    bm = sh.make(lambda r, c: r in ("torso", "arms") or (r == "legs" and c.z > 0.89), off,
+                 [z_below(0.90)] + x_beyond(0.30))
+    neat_collar(bm, probe, off)
     add_bm(B, bm, "fabric", "shell", fit=0.006)
     bind(B, bm, 0.0028, "silk", where=lambda p: p[2] > 1.1 and abs(p[0]) < 0.2)
     bm.free()

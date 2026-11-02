@@ -3,7 +3,7 @@
 ## Rooms get a floor slab, walls inset half a wall thickness from their rect
 ## (so neighbours never share a face), a ceiling, auto windows in exterior walls
 ## and openings wherever a door sits on a wall line. Stairs get steps plus a
-## smooth ramp collider and cut a hole in the floor above.
+## solid wedge collider with a smooth top, and cut a hole in the floor above.
 class_name ManorHouseBuilder
 extends RefCounted
 
@@ -15,6 +15,7 @@ const WINDOW_SPACING := 4.2
 const WINDOW_WIDTH := 1.5
 const SILL := 0.9
 const DOOR_TOLERANCE := 0.6
+const STAIR_BURIED := 0.1   # how far a flight's collider reaches into the floor under it
 
 const FLOOR_COLORS := {
 	&"wood": Color(0.80, 0.58, 0.44), &"marble": Color(0.98, 0.93, 0.93),
@@ -353,22 +354,28 @@ static func _build_stair(house: Node3D, stair: ManorStairDef, all: ManorHouseInd
 		var h := rise * (i + 1) / steps
 		var size := Vector3(width if along_z else tread, h, tread if along_z else width)
 		EstateKit.box(node, Vector3(c.x, y0 + h * 0.5, c.y), size, mat, false, 0.0, 120.0)
-	# Smooth ramp collider so walking up never snags.
+	# One solid wedge for the whole flight, as solid as it looks: its top is a
+	# smooth ramp so walking up never snags, and it fills down to the floor.
 	var body := StaticBody3D.new()
 	body.collision_layer = EstateKit.WORLD_LAYER
 	var cs := CollisionShape3D.new()
-	var shape := BoxShape3D.new()
-	var length := sqrt(run * run + rise * rise)
-	shape.size = Vector3(width, 0.2, length) if along_z else Vector3(length, 0.2, width)
+	var shape := ConvexPolygonShape3D.new()
+	var across := Vector2(dir.y, dir.x) * width * 0.5
+	var points := PackedVector3Array()
+	for s: float in [-1.0, 1.0]:
+		var foot := start + across * s
+		var head := foot + dir * run
+		points.append(Vector3(foot.x, y0, foot.y))
+		points.append(Vector3(head.x, y0 + rise, head.y))
+		points.append(Vector3(head.x, y0 - STAIR_BURIED, head.y))
+		points.append(Vector3(foot.x, y0 - STAIR_BURIED, foot.y))
+	shape.points = points
 	cs.shape = shape
 	body.add_child(cs)
-	var mid := r.get_center()
-	body.position = Vector3(mid.x, y0 + rise * 0.5 - 0.1, mid.y)
+	var length := sqrt(run * run + rise * rise)
 	var angle := atan2(rise, run)
-	if along_z:
-		body.rotation.x = angle * (1.0 if dir.y > 0.0 else -1.0)
-	else:
-		body.rotation.z = angle * (-1.0 if dir.x > 0.0 else 1.0)
+	var slope := Vector3(angle * (-1.0 if dir.y > 0.0 else 1.0), 0.0, 0.0) if along_z \
+			else Vector3(0.0, 0.0, angle * (1.0 if dir.x > 0.0 else -1.0))
 	node.add_child(body)
 	if hall != null:
 		return
@@ -384,7 +391,7 @@ static func _build_stair(house: Node3D, stair: ManorStairDef, all: ManorHouseInd
 		post.mesh = bm
 		post.material_override = rail
 		post.position = Vector3(c.x, y0 + rise * 0.5 + 1.0, c.y)
-		post.rotation = body.rotation
+		post.rotation = slope
 		node.add_child(post)
 
 

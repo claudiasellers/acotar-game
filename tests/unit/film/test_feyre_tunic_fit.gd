@@ -171,3 +171,22 @@ func test_rising_puts_her_whole_trousers_back() -> void:
 	assert_ne(trousers.mesh, whole, "sitting swaps her trousers for the fitted ones")
 	fp.to(&"", 0.0)
 	assert_eq(trousers.mesh, whole, "rising puts the same trousers back")
+
+
+## Sitting, her hem rests on the cushion instead of sinking into it (T057): the flanks of the
+## hem hung 6 cm below the cushion's top, and what stood out of its edge showed as a wedge.
+func test_sitting_the_hem_rests_on_the_cushion() -> void:
+	var model := await _feyre()
+	var fp := FilmPose.on(model)
+	fp.to(&"sit", 0.0, &"chair_dining")
+	var pose := await _drawn()
+	var top: float = FilmPose.CHAIRS[&"chair_dining"]["top"]
+	var cloth := _skinned(_worn(model, "tunic"), pose)
+	var posed: PackedVector3Array = cloth["posed"]
+	var lowest := 9.0
+	for v: int in cloth["used"]:
+		var at := _sk.global_transform * posed[v]
+		if absf(at.x) < 0.25 and absf(at.z) < 0.25:
+			lowest = minf(lowest, at.y)
+	gut.p("sitting: the hem's lowest point is %.1f mm under the cushion's top" % ((top - lowest) * 1000.0))
+	assert_gte(lowest, top - 0.002, "no cloth sunk into the cushion")
