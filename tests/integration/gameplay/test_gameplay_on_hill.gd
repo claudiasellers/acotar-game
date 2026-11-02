@@ -212,6 +212,19 @@ func test_bow_and_quiver_hide_under_a_gown() -> void:
 	assert_true(visual.bow_root.visible and visual.quiver.visible, "back with the tunic")
 
 
+func test_bow_is_stowed_indoors_and_comes_out_to_aim() -> void:
+	var visual := feyre.bow_controller.find_child("BowVisual", true, false) as BowVisual
+	await wait_frames(2)
+	assert_true(visual.bow_root.visible, "outdoors in hunting clothes")
+	feyre.set(&"_indoor", 1.0)
+	visual.raised = 0.0
+	visual._place()
+	assert_false(visual.bow_root.visible or visual.quiver.visible, "stowed under a roof (D1)")
+	visual.raised = 0.5
+	visual._place()
+	assert_true(visual.bow_root.visible, "raising the bow brings it out")
+
+
 func test_reticle_follows_the_predicted_impact() -> void:
 	var reticle := feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
 	assert_not_null(reticle)

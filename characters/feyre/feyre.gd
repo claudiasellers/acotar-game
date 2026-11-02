@@ -425,6 +425,11 @@ func _remember_safe_spot(delta: float) -> void:
 			_safe_spots.pop_front()
 
 
+## True under a roof (the manor, the cottage): BowVisual stows the slung bow.
+func is_indoors() -> bool:
+	return _indoor > 0.5
+
+
 ## Is there a roof over her? Reads the ceiling height straight above the camera pivot.
 func _update_indoor(delta: float) -> void:
 	var from := _camera_rig.global_position
