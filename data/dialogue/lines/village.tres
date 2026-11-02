@@ -75,6 +75,52 @@ emotion = &"guarded"
 
 [sub_resource type="Resource" id="L3"]
 script = ExtResource("1")
+id = &"merc_business"
+speaker = &"mercenary"
+who = "The mercenary"
+text = "What is your business with me, girl?"
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("fact.wolf_skinned")
+forbid_flags = PackedStringArray("pelt_sold")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "clipped, unknown accent; sizing her up"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"merc_woods"
+speaker = &"mercenary"
+who = "The mercenary"
+text = "From one hunter to another: stay out of the deep woods. Things are slipping through the Wall."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("pelt_sold")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = "low, plain warning"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
 id = &"A1_07_blessed_greeting"
 speaker = &"blessed"
 who = "Child of the Blessed"
@@ -96,7 +142,7 @@ follow_up = &""
 delivery = "serene, sing-song, over silver bells"
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L4"]
+[sub_resource type="Resource" id="L6"]
 script = ExtResource("1")
 id = &"v_tavern"
 speaker = &"feyre"
@@ -119,7 +165,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L5"]
+[sub_resource type="Resource" id="L7"]
 script = ExtResource("1")
 id = &"v_notices"
 speaker = &"feyre"
@@ -142,7 +188,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L6"]
+[sub_resource type="Resource" id="L8"]
 script = ExtResource("1")
 id = &"v_pillory"
 speaker = &"feyre"
@@ -165,7 +211,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L7"]
+[sub_resource type="Resource" id="L9"]
 script = ExtResource("1")
 id = &"v_mill"
 speaker = &"feyre"
@@ -188,7 +234,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L8"]
+[sub_resource type="Resource" id="L10"]
 script = ExtResource("1")
 id = &"v_debt"
 speaker = &"feyre"
@@ -211,7 +257,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L9"]
+[sub_resource type="Resource" id="L11"]
 script = ExtResource("1")
 id = &"v_barn"
 speaker = &"feyre"
@@ -234,7 +280,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L10"]
+[sub_resource type="Resource" id="L12"]
 script = ExtResource("1")
 id = &"v_hall"
 speaker = &"feyre"
@@ -257,7 +303,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L11"]
+[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"v_gold"
 speaker = &"feyre"
@@ -280,7 +326,7 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L12"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"vil_wall"
 speaker = &"villager"
@@ -303,7 +349,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L13"]
+[sub_resource type="Resource" id="L15"]
 script = ExtResource("1")
 id = &"vil_hunter"
 speaker = &"villager"
@@ -326,7 +372,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("1")
 id = &"vil_blessed"
 speaker = &"villager"
@@ -349,7 +395,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L15"]
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
 id = &"vil_iron"
 speaker = &"villager"
@@ -372,7 +418,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"vil_copper"
 speaker = &"villager"
@@ -395,7 +441,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"vil_rich"
 speaker = &"villager"
@@ -418,7 +464,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("1")
 id = &"vil_aunt"
 speaker = &"villager"
@@ -441,7 +487,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L21"]
 script = ExtResource("1")
 id = &"elder_slaves"
 speaker = &"human_elder"
@@ -464,7 +510,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"elder_ships"
 speaker = &"human_elder"
@@ -487,7 +533,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L21"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"youth_isaac"
 speaker = &"human_youth"
@@ -510,7 +556,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L22"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"youth_vane"
 speaker = &"human_youth"
@@ -533,7 +579,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L23"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"woman_tomas"
 speaker = &"human_woman"
@@ -556,7 +602,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L24"]
+[sub_resource type="Resource" id="L26"]
 script = ExtResource("1")
 id = &"woman_eggs"
 speaker = &"human_woman"
@@ -579,7 +625,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L25"]
+[sub_resource type="Resource" id="L27"]
 script = ExtResource("1")
 id = &"man_ice"
 speaker = &"human_man"
@@ -602,7 +648,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L26"]
+[sub_resource type="Resource" id="L28"]
 script = ExtResource("1")
 id = &"man_wolves"
 speaker = &"human_man"
@@ -625,7 +671,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L27"]
+[sub_resource type="Resource" id="L29"]
 script = ExtResource("1")
 id = &"blessed_home"
 speaker = &"blessed"
@@ -648,7 +694,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L28"]
+[sub_resource type="Resource" id="L30"]
 script = ExtResource("1")
 id = &"blessed_bells"
 speaker = &"blessed"
@@ -671,7 +717,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L29"]
+[sub_resource type="Resource" id="L31"]
 script = ExtResource("1")
 id = &"peddler_ash"
 speaker = &"peddler"
@@ -694,7 +740,7 @@ follow_up = &""
 delivery = "low, a salesman's secret"
 emotion = &"smirk"
 
-[sub_resource type="Resource" id="L30"]
+[sub_resource type="Resource" id="L32"]
 script = ExtResource("1")
 id = &"peddler_border"
 speaker = &"peddler"
@@ -717,7 +763,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L31"]
+[sub_resource type="Resource" id="L33"]
 script = ExtResource("1")
 id = &"peddler_trinkets"
 speaker = &"peddler"
@@ -740,7 +786,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L32"]
+[sub_resource type="Resource" id="L34"]
 script = ExtResource("1")
 id = &"d_pelt_sold"
 speaker = &"feyre"
@@ -822,5 +868,5 @@ radius = 12.0
 [resource]
 script = ExtResource("3")
 area = &"village"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32"), SubResource("L33"), SubResource("L34")])
 places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6"), SubResource("P7")])
