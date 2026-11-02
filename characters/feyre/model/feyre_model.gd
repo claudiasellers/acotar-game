@@ -24,12 +24,19 @@ const LOOK_AFTER := 9.0
 @export var skin_head_material: ShaderMaterial
 @export var skin_body_material: ShaderMaterial
 @export_file("*.glb") var hair_path: String = "res://characters/feyre/hair/braid.glb"
+## The layer under everything (L41-4): a plain linen shift and drawers, worn by the bare
+## model so no scene that instances it without a wardrobe shows her unclothed. Each
+## surface is named shift_<body region it covers>; cover_base_layer() hides those a
+## worn piece covers. Feyre only: cast models (cast_model.gd) have other bodies.
+@export_file("*.glb") var base_layer_path: String = "res://characters/feyre/wardrobe/linen_shift.glb"
 
 var skeleton: Skeleton3D
 var body: MeshInstance3D
 ## Lashes carry blink_L / blink_R too, so set_shape closes the fringe with the lids.
 var lashes: MeshInstance3D
 var hair: Node3D
+## Her linen shift (see base_layer_path); null on cast models.
+var base_layer: Node3D
 var anim: AnimationPlayer
 var _mover: CharacterBody3D
 var _idle_time := 0.0
@@ -52,6 +59,8 @@ func _ready() -> void:
 	if lod != null:
 		lod.visibility_range_begin = LOD1_DISTANCE
 	set_hair(hair_path)
+	if _is_feyre():
+		_wear_base_layer()
 	anim = find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if anim != null:
 		for clip in LOOPING_CLIPS:
@@ -65,7 +74,7 @@ func _ready() -> void:
 	_mover = n as CharacterBody3D
 	if _mover != null:
 		_animator = FeyreAnimator.attach(self, anim, _mover)
-	if (get_script() as Script).resource_path == "res://characters/feyre/model/feyre_model.gd":
+	if _is_feyre():
 		face = FaceDriver.attach(self, &"feyre")
 
 
@@ -148,6 +157,57 @@ func set_hair(path: String) -> void:
 	hair_path = path
 
 
+## Hides the base-layer surfaces for body regions a worn piece covers and shows the rest
+## (WardrobeApplier calls this with the regions it hid; [] shows the whole shift).
+func cover_base_layer(hidden: Array[StringName]) -> void:
+	if base_layer == null:
+		return
+	for c in base_layer.get_children():
+		var mi := c as MeshInstance3D
+		if mi == null or mi.mesh == null:
+			continue
+		for i in mi.mesh.get_surface_count():
+			var region := StringName(surface_name_of(mi.mesh, i).trim_prefix("shift_"))
+			mi.set_surface_override_material(i, _clear_material() if hidden.has(region) else null)
+
+
+func _is_feyre() -> bool:
+	return (get_script() as Script).resource_path == "res://characters/feyre/model/feyre_model.gd"
+
+
+func _wear_base_layer() -> void:
+	if skeleton == null or base_layer_path == "" or not ResourceLoader.exists(base_layer_path):
+		return
+	var scene := load(base_layer_path) as PackedScene
+	if scene == null:
+		return
+	var inst := scene.instantiate()
+	base_layer = Node3D.new()
+	base_layer.name = "BaseLayer"
+	skeleton.get_parent().add_child(base_layer)
+	for mi in inst.find_children("*", "MeshInstance3D", true, false):
+		var src := mi as MeshInstance3D
+		var copy := MeshInstance3D.new()
+		copy.name = src.name
+		copy.mesh = src.mesh
+		copy.skin = src.skin
+		copy.set_meta(&"base_layer", true)
+		base_layer.add_child(copy)
+		copy.skeleton = copy.get_path_to(skeleton)
+	inst.free()
+
+
+var _clear: StandardMaterial3D
+
+
+func _clear_material() -> StandardMaterial3D:
+	if _clear == null:
+		_clear = StandardMaterial3D.new()
+		_clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_clear.albedo_color = Color(0, 0, 0, 0)
+	return _clear
+
+
 func _apply_skin(mi: MeshInstance3D) -> void:
 	for i in mi.mesh.get_surface_count():
 		var surface_name := surface_name_of(mi.mesh, i)
@@ -170,7 +230,10 @@ static func surface_name_of(mesh: Mesh, index: int) -> String:
 func set_shape(shape_name: String, weight: float) -> void:
 	if body == null:
 		return
-	for mi: MeshInstance3D in [body, lashes]:
+	var meshes: Array = [body, lashes]
+	if base_layer != null:
+		meshes.append_array(base_layer.get_children())   # the shift follows "nourished"
+	for mi: MeshInstance3D in meshes:
 		if mi == null:
 			continue
 		var idx := mi.find_blend_shape_by_name(shape_name)
