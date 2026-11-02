@@ -94,8 +94,11 @@ static func plant_borders(sb: ManorScatter) -> void:
 					continue
 				var bloom: StringName = BORDER_BLOOMS[(i + row * 3 + (0 if side < 0 else 2)) % BORDER_BLOOMS.size()]
 				var off := edge + 0.9 + row * 1.1 + rng.randf_range(-0.2, 0.3)
-				sb.put(bloom, side * off, z + row * BORDER_STEP * 0.5 + rng.randf_range(-0.4, 0.4),
-						rng.randf() * TAU, rng.randf_range(1.1, 1.5))
+				var bz := z + row * BORDER_STEP * 0.5 + rng.randf_range(-0.4, 0.4)
+				var bx_y := [side * off, rng.randf() * TAU, rng.randf_range(1.1, 1.5)]
+				if ManorParkland.near_walk(Vector2(bx_y[0], bz), 0.6):
+					continue   # the parkland walks leave the drive here (L56)
+				sb.put(bloom, bx_y[0], bz, bx_y[1], bx_y[2])
 			if i % 4 == 1:
 				var find: StringName = BORDER_FINDS[rng.randi() % BORDER_FINDS.size()]
 				sb.put(find, side * (edge + rng.randf_range(2.6, 3.2)), z + rng.randf_range(-0.6, 0.6), rng.randf() * TAU)

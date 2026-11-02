@@ -35,6 +35,11 @@ static func clock_top() -> Vector3:
 	return Vector3(c.x, ManorGrounds.ground(c.x, c.y) + TOWER_H + 5.5, c.y)
 
 
+## The manor's own lilac fish-scale slate (L56: the plain slate read flat blue at dusk).
+static func roof() -> Material:
+	return ManorFacade.roof_material(EstateKit.SLATE)
+
+
 static func plant(sb: ManorScatter) -> void:
 	var rng := EstateKit.rng("stables_plant")
 	# owl feathers in the hayloft (a barn owl roosts there)
@@ -83,6 +88,7 @@ static func build(parent: Node3D) -> void:
 	b.drape_path(PackedVector2Array([Vector2(-130.0, 0.0), Vector2(-100.0, 18.0), Vector2(-26.0, 4.0)]), 4.0, ManorGrounds.gravel())
 	_paddock(b)
 	b.flush()
+	ManorStablesDress.dress(b.root, y)
 	var stalls := Node3D.new()
 	stalls.name = "Stalls"
 	b.root.add_child(stalls)
@@ -109,7 +115,7 @@ static func build(parent: Node3D) -> void:
 
 ## One range: walls with a door per bay on the yard side, gable roof.
 static func _range(b: GroundsBatch, r: Rect2, open_side: String, y: float) -> void:
-	var wall := ManorGrounds.plaster()
+	var wall := ManorFacade.stone()
 	var trim := ManorGrounds.wood_dark()
 	var t := 0.45
 	var base := y - 0.5
@@ -150,9 +156,9 @@ static func _range(b: GroundsBatch, r: Rect2, open_side: String, y: float) -> vo
 	b.box(Vector3(c2.x, y + WALL_H - 0.1, c2.y), Vector3(r.size.x + 0.4, 0.22, r.size.y + 0.4), trim, false)
 	var along_x := r.size.x > r.size.y
 	if along_x:
-		b.gable(Vector3(c2.x, y + WALL_H, c2.y), Vector3(r.size.x + 1.0, 3.2, r.size.y + 1.2), ManorGrounds.roof())
+		b.gable(Vector3(c2.x, y + WALL_H, c2.y), Vector3(r.size.x + 1.0, 3.2, r.size.y + 1.2), roof())
 	else:
-		b.gable(Vector3(c2.x, y + WALL_H, c2.y), Vector3(r.size.y + 1.0, 3.2, r.size.x + 1.2), ManorGrounds.roof(), PI * 0.5)
+		b.gable(Vector3(c2.x, y + WALL_H, c2.y), Vector3(r.size.y + 1.0, 3.2, r.size.x + 1.2), roof(), PI * 0.5)
 	b.box(Vector3(c2.x, y + 0.05, c2.y), Vector3(r.size.x - 0.5, 0.1, r.size.y - 0.5), EstateKit.mat(Color(1.0, 0.88, 0.6), 0.95, 0.0, "straw_floor"), true)
 
 
@@ -223,7 +229,7 @@ static func _clock_tower(b: GroundsBatch, y: float) -> void:
 	var c := TOWER.get_center()
 	var base := Vector3(c.x, y, c.y)
 	var w := TOWER.size.x
-	var wall := ManorGrounds.plaster()
+	var wall := ManorFacade.stone()
 	b.box(base + Vector3.UP * (TOWER_H * 0.5 - 0.5), Vector3(w, TOWER_H + 1.0, w), wall)
 	for k: float in [WALL_H, TOWER_H - 4.0, TOWER_H]:
 		b.box(base + Vector3.UP * k, Vector3(w + 0.5, 0.35, w + 0.5), ManorGrounds.marble(), false)
@@ -243,7 +249,7 @@ static func _clock_tower(b: GroundsBatch, y: float) -> void:
 		for sz: float in [-1.0, 1.0]:
 			b.box(bt + Vector3(sx * (w * 0.5 - 0.5), 1.6, sz * (w * 0.5 - 0.5)), Vector3(0.8, 3.2, 0.8), wall, false)
 	b.box(bt + Vector3.UP * 3.35, Vector3(w + 0.3, 0.3, w + 0.3), ManorGrounds.marble(), false)
-	b.cylinder(bt + Vector3.UP * 3.5, w * 0.48, 0.6, ManorGrounds.roof(), false, 8)
+	b.cylinder(bt + Vector3.UP * 3.5, w * 0.48, 0.6, roof(), false, 8)
 	b.cone(bt + Vector3.UP * 4.1, w * 0.5, 3.0, ManorGrounds.gold(), 8)
 	b.sphere(bt + Vector3.UP * 7.2, 0.3, ManorGrounds.gold())
 	b.box(bt + Vector3.UP * 7.7, Vector3(1.2, 0.08, 0.3), ManorGrounds.gold(), false)
