@@ -28,9 +28,9 @@ id = &"nesta_dresser"
 speaker = &"nesta"
 scene = "res://creatures/family/nesta.tscn"
 region = &"cottage"
-at = Vector2(0.7, 1.75)
+at = Vector2(-3.05, 0.45)
 room = &""
-yaw_deg = 180.0
+yaw_deg = 0.0
 anchor = &"act1_cottage_interior"
 phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
 require_flags = PackedStringArray()
@@ -39,7 +39,7 @@ hour_from = -1.0
 hour_to = -1.0
 wander = 0.0
 canon = "C"
-notes = "by the dresser with her ribbon and comb"
+notes = "by the dresser with her ribbon and comb, in the sisters' room"
 
 [sub_resource type="Resource" id="S2"]
 script = ExtResource("1")

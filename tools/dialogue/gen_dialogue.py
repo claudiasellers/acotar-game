@@ -765,8 +765,11 @@ def spot(sid, speaker, scene, region, x, z, phases, room="", anchor="", yaw=0.0,
 # The family, in the cottage only while she lives there (ch1-4) [C].
 spot("father_hearth", "father", FAMILY % "father", "cottage", 2.25, 0.95, HUMAN, anchor="act1_cottage_interior",
      yaw=-100.0, canon="C", notes="by his chair and carving stool, his leg toward the fire")
-spot("nesta_dresser", "nesta", FAMILY % "nesta", "cottage", 0.7, 1.75, HUMAN, anchor="act1_cottage_interior",
-     yaw=180.0, canon="C", notes="by the dresser with her ribbon and comb")
+# In the sisters' room behind the partition (L38-2): the dresser is at interior
+# (-3.35, -0.29) against the partition, the anchor at interior (-0.5, 0). She
+# stands in front of it, 1.45 m clear of the bedroom door at (-2.65, -0.69).
+spot("nesta_dresser", "nesta", FAMILY % "nesta", "cottage", -3.05, 0.45, HUMAN, anchor="act1_cottage_interior",
+     yaw=0.0, canon="C", notes="by the dresser with her ribbon and comb, in the sisters' room")
 spot("elain_table", "elain", FAMILY % "elain", "cottage", 1.8, -1.0, HUMAN, anchor="act1_cottage_interior",
      yaw=30.0, canon="C", notes="indoors all winter; she tends her garden in the milder months (Keeper)")
 # The village at market (ch3) [C]: the Blessed, villagers, a peddler.
