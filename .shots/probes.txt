@@ -1,0 +1,5 @@
+from L53 market
+quality look
+size 1920x1080
+timeout 400
+shot menu res://tools/market/market_shot.tscn menu {out}/market_menu.png
