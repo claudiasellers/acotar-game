@@ -96,7 +96,9 @@ is skipped, or can't play (headless: every fact is written at once).
   body animation; it also drives the townsfolk rig (`creatures/models/people`).
 - B's Rhysand: the cast lane's `characters/rhysand/rhysand_model.tscn` when it
   exists; until then Tamlin's rig re-dressed (no mask or claws, blue-black
-  hair, black and dark silver, violet eyes, his own dark). B brings him
+  hair, black and dark silver, violet eyes, his own dark). His dark is a
+  negative light behind him (+Z, the rig faces -Z), never inside him: from his
+  chest it blacks the undersides of brow, cheek and lip. B brings him
   itself; the moment no longer spawns him. B plays Tamlin and Lucien with its
   own models too (`bring_own`): the lunch's go when the lunch ends.
 - `MuralDark` (`story/film/mural/mural_dark.gd`): the mural told true for C
@@ -105,8 +107,9 @@ is skipped, or can't play (headless: every fact is written at once).
   the real game at the moment's anchor with its chain of deeds done and
   captures the film the story starts (`FilmCapture.wait_for_film`). The
   moment's own `fact.*` gate opens 4 s after she is placed, so the region
-  (the house) is built before the film starts, and any other scene that
-  could start there is marked done first (`_hush`).
+  (the house) is built before the film starts, and any other scene whose
+  gate is open there is marked done as it is built (`_hush`, by flags only:
+  some scenes, like Calanmai's order in the hall, bring their hour with them).
 
 ## Tests
 

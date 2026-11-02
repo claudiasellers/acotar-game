@@ -65,7 +65,7 @@ func _run() -> void:
 	game.set(&"opening_shot", "")
 	get_tree().root.add_child(game)
 	get_tree().current_scene = game
-	_hush(moment.id)
+	_hush(moment.id, own)
 	# The gate opens 4 s after she is placed; walking in starts it, and if the
 	# trigger has not fired 2 s later, start it as the trigger would.
 	var space: SceneSpace = null
@@ -91,18 +91,33 @@ func _run() -> void:
 
 
 ## The rest of the story is over by the time this moment plays: any other
-## scene that could start here (the chain opens some gates in passing, like
-## Calanmai's in the hall) is marked done before it can, for the whole run.
-func _hush(target: StringName) -> void:
+## scene whose gate is open here (the chain opens some in passing, like
+## Calanmai's order in the hall) is marked done the moment it is built, before
+## the player can walk into it, and again whenever another gate opens. Only the
+## flags count, not the hour: some scenes bring the hour with them when she
+## arrives. A scene whose deed is one of the moment's own facts is left alone.
+func _hush(target: StringName, own: PackedStringArray) -> void:
+	get_tree().node_added.connect(func(n: Node) -> void:
+		if n is SceneSpace:
+			n.ready.connect(_quiet.bind(n, target, own), CONNECT_ONE_SHOT))
 	while is_inside_tree():
 		for n in get_tree().root.find_children("*", "SceneSpace", true, false):
-			var other := n as SceneSpace
-			if other.space_id == target or other.running or other.done_flags.is_empty() or not other.can_start():
-				continue
-			print("cutscene_shot: %s marked done (%s)" % [other.space_id, other.done_flags])
-			for f in other.done_flags:
-				WorldState.set_flag(f, true)
+			_quiet(n as SceneSpace, target, own)
 		await get_tree().create_timer(0.5).timeout
+
+
+func _quiet(other: SceneSpace, target: StringName, own: PackedStringArray) -> void:
+	if not is_instance_valid(other) or other.space_id == target or other.running or other.done_flags.is_empty():
+		return
+	for f in other.done_flags:
+		if own.has(f) or WorldState.has_flag(f):
+			return
+	for f in other.require_flags:
+		if not WorldState.has_flag(f):
+			return
+	print("cutscene_shot: %s marked done (%s)" % [other.space_id, other.done_flags])
+	for f in other.done_flags:
+		WorldState.set_flag(f, true)
 
 
 func _space_of(moment_id: StringName) -> SceneSpace:
