@@ -216,11 +216,135 @@ def _backdrop(r, q, rng):
         r.shaded(r.poly([(0.72, 0), (0.86, 0), (0.86, 1), (0.72, 1)]), "#d8ccc4", LIGHT, 0.3)
         M.sky(r, "dusk", q["seed"], 0.4, 0.8)
         r.rgb[:, : int(r.w * 0.7)] = r.rgb[:, : int(r.w * 0.7)] * 0.0 + C(BACKS[q.get("drape_base", "umber")][0][1])
+    elif back in SETTINGS:
+        grand(r, q, rng)
     elif back == "night":
         r.vgrad([(0, "#141a3c"), (1, "#3c4278")])
         M.stars(r, q["seed"], 90, 1.0)
     else:
         r.rgrad(0.3, 0.25, 1.1, BACKS.get(back, BACKS["umber"]))
+
+
+# Grand-manner settings for the full-lengths (audit A5: a painted setting,
+# not a flat backdrop): a column, a swagged curtain, a balustrade or arbour,
+# a glimpse of the court's countryside, and a floor the sitter stands on.
+SETTINGS = ("column_curtain", "terrace", "niche", "arbour")
+
+
+def _curtain(r, rng, side, col, top=0.0, bottom=0.82, width=0.3):
+    """A heavy swagged curtain hanging down one side, its folds catching the
+    light, gathered by a gold tie-back."""
+    c = C(col)
+    x0, x1 = (0.0, width) if side < 0 else (1.0 - width, 1.0)
+    tie = top + (bottom - top) * 0.62
+    def edge(v):  # the inner edge: pulled in at the tie-back, flaring below
+        t = (v - top) / max(1e-3, tie - top)
+        pull = 0.55 + 0.45 * np.clip(np.abs(1 - t), 0, 1) ** 1.4
+        return pull
+    vv = r.v
+    k = np.clip(edge(vv), 0.2, 1.0)
+    inner = x1 - (x1 - x0) * (1 - k) if side < 0 else x0 + (x1 - x0) * (1 - k)
+    m = ((r.u < inner) if side < 0 else (r.u > inner)) & (vv >= top) & (vv <= bottom)
+    m = m.astype(np.float32)
+    # folds: bands across the curtain's width that follow the pull
+    span = np.abs(r.u - (x0 if side < 0 else x1)) / np.maximum(1e-3, np.abs(inner - (x0 if side < 0 else x1)))
+    phase = rng.uniform(0, 6.28)
+    folds = np.sin(span * 9.5 + phase + r.noise(2.0, rng.randint(0, 999), 2) * 1.5) * 0.5 + 0.5
+    img = shade(c, -0.32)[None, None, :] * (1 - folds[..., None]) + shade(c, 0.18)[None, None, :] * folds[..., None]
+    img = img * (0.8 + 0.2 * np.clip(1 - span, 0, 1))[..., None]
+    r.put(img, m)
+    # swag across the top
+    sw = r.poly([(0.0, 0.0), (1.0, 0.0), (1.0, 0.05), (0.75, 0.1), (0.5, 0.075), (0.25, 0.1), (0.0, 0.05)], blur=1.5)
+    r.shaded(sw, shade(c, -0.05), LIGHT, 0.35)
+    for x in (0.25, 0.5, 0.75):
+        r.put(shade(c, 0.2), r.lines([[(x - 0.2, 0.03), (x, 0.08 if x != 0.5 else 0.065), (x + 0.2, 0.03)]], max(2, r.w * 0.008), blur=3.0), alpha=0.6)
+    ty = tie
+    tx = inner[int(ty * r.h)].mean() if hasattr(inner, "mean") else inner
+    r.shaded(r.ellipse(float(tx), ty, 0.025, 0.012), "#d8b060", LIGHT, 0.4)
+    r.put("#e6c068", r.lines([[(float(tx), ty), (float(tx) + side * 0.01, ty + 0.06)]], max(2, r.w * 0.005), blur=1.0), alpha=0.8)
+
+
+def _column(r, x, w, top, base, col="#d8ccc4"):
+    """A fluted column on a plinth, lit from the left."""
+    shaft = r.poly([(x - w / 2, top), (x + w / 2, top), (x + w / 2, base), (x - w / 2, base)], blur=0.8)
+    r.shaded(shaft, col, LIGHT, 0.4)
+    for i in range(1, 6):
+        fx = x - w / 2 + w * i / 6
+        r.put(shade(C(col), -0.25), r.lines([[(fx, top + 0.01), (fx, base - 0.01)]], max(1, r.w * 0.003), blur=1.0), alpha=0.45)
+    r.shaded(r.poly([(x - w * 0.75, base), (x + w * 0.75, base), (x + w * 0.75, base + 0.05), (x - w * 0.75, base + 0.05)]), col, LIGHT, 0.35)
+    r.shaded(r.poly([(x - w * 0.7, top - 0.035), (x + w * 0.7, top - 0.035), (x + w * 0.6, top), (x - w * 0.6, top)]), col, LIGHT, 0.35)
+
+
+def _vista(r, q, x0, x1, y0, y1, time="golden"):
+    """A glimpse of the court's countryside through an opening."""
+    hold = r.rgb.copy()
+    M.sky(r, time, q["seed"] + 5, 0.55, y0 + (y1 - y0) * 0.62)
+    M.hills(r, q["seed"] + 6, y0 + (y1 - y0) * 0.66, 0.05, ["#9fc8a8", "#7fae8c"], time, 0.45)
+    M.grove(r, q["seed"] + 7, 7, y0 + (y1 - y0) * 0.7, y0 + (y1 - y0) * 0.8, 0.14, 0.24, ["blossom", "round"], "spring", time, x_lo=x0, x_hi=x1)
+    r.rgb = r.rgb * 0.88   # a glimpse past the sitter, held below the figure's lights
+    box = ((r.u >= x0) & (r.u <= x1) & (r.v >= y0) & (r.v <= y1)).astype(np.float32)[..., None]
+    r.rgb = hold * (1 - box) + r.rgb * box
+
+
+def _floor(r, top, col, flags=True):
+    base = C(col)
+    r.vgrad([(0, shade(base, -0.1)), (1, shade(base, -0.4))], top, 1.0, mask=(r.v > top).astype(np.float32))
+    if flags:
+        for i in range(-6, 7):
+            r.put(shade(base, -0.35), r.lines([[(0.5 + i * 0.04, top), (0.5 + i * 0.22, 1.0)]], 1, blur=0.6), alpha=0.35)
+        for j, y in enumerate((0.03, 0.075, 0.13)):
+            r.put(shade(base, -0.35), r.lines([[(0, top + y), (1, top + y)]], 1, blur=0.6), alpha=0.35)
+
+
+def grand(r, q, rng):
+    setting = q.get("back")
+    wall = q.get("wall", "#5a4038")
+    drape = q.get("drape_col", "#8a3a4e")
+    if setting == "column_curtain":
+        r.vgrad([(0, shade(C(wall), 0.05)), (1, shade(C(wall), -0.25))])
+        _vista(r, q, 0.62, 1.0, 0.18, 0.78, q.get("time", "dusk"))
+        _column(r, 0.8, 0.16, 0.12, 0.74)
+        _floor(r, 0.8, q.get("floor", "#8a7066"))
+        _curtain(r, rng, -1, drape, 0.0, 0.85, 0.36)
+    elif setting == "terrace":
+        _vista(r, q, 0.0, 1.0, 0.0, 0.8, q.get("time", "golden"))
+        y = 0.6
+        rail = r.poly([(0, y), (1, y), (1, y + 0.025), (0, y + 0.025)])
+        r.shaded(rail, "#d8ccc4", LIGHT, 0.3)
+        for i in range(14):
+            bx = (i + 0.5) / 14
+            r.shaded(r.ellipse(bx, y + 0.07, 0.016, 0.045), "#cfc2ba", LIGHT, 0.4)
+        r.shaded(r.poly([(0, y + 0.115), (1, y + 0.115), (1, y + 0.13), (0, y + 0.13)]), "#c8bab2", LIGHT, 0.3)
+        r.shaded(r.poly([(0, y + 0.13), (1, y + 0.13), (1, 0.82), (0, 0.82)]), "#b8aaa4", LIGHT, 0.2)
+        _floor(r, 0.82, q.get("floor", "#a89088"))
+        # an urn of roses on the balustrade
+        r.shaded(r.ellipse(0.12, y - 0.04, 0.05, 0.04), "#d8ccc4", LIGHT, 0.4)
+        for i in range(9):
+            M.flower_head(r, 0.12 + rng.uniform(-0.06, 0.06), y - 0.1 + rng.uniform(-0.04, 0.03), 0.018, "rose",
+                          rng.choice(["#e8708f", "#f39cb8", "#d0485e"]), rng)
+        _curtain(r, rng, 1, drape, 0.0, 0.5, 0.22)
+    elif setting == "niche":
+        r.vgrad([(0, shade(C(wall), 0.1)), (1, shade(C(wall), -0.2))])
+        arch = r.poly([(0.22, 0.85), (0.22, 0.25)] + [(0.5 - 0.28 * math.cos(a), 0.25 - 0.2 * math.sin(a)) for a in np.linspace(0, math.pi, 24)] + [(0.78, 0.25), (0.78, 0.85)], blur=1.2)
+        r.put(shade(C(wall), -0.38), arch)
+        r.rgrad(0.5, 0.35, 0.4, [(0, shade(C(wall), -0.15)), (1, shade(C(wall), -0.4))], mask=arch)
+        for x in (0.14, 0.86):
+            _column(r, x, 0.09, 0.1, 0.8, "#cdbfb6")
+        _floor(r, 0.84, q.get("floor", "#7a6058"))
+        _curtain(r, rng, 1, drape, 0.0, 0.6, 0.2)
+    elif setting == "arbour":
+        _vista(r, q, 0.0, 1.0, 0.0, 0.84, q.get("time", "golden"))
+        arch = r.poly([(0.08, 0.86), (0.08, 0.3)] + [(0.5 - 0.42 * math.cos(a), 0.3 - 0.24 * math.sin(a)) for a in np.linspace(0, math.pi, 30)] + [(0.92, 0.3), (0.92, 0.86), (1, 0.86), (1, 0), (0, 0), (0, 0.86)], blur=2.0)
+        r.put(C("#3e6a4a"), arch)
+        r.put(r.noise(9.0, q["seed"] + 9, 3)[..., None] * C("#7aae7c") + (1 - r.noise(9.0, q["seed"] + 9, 3))[..., None] * C("#24402e"), arch * 0.85)
+        for i in range(70):
+            a = rng.uniform(0, math.pi)
+            rad = rng.uniform(0.38, 0.47)
+            x, y = 0.5 - rad * math.cos(a), 0.3 - rad * 0.6 * math.sin(a)
+            if rng.random() < 0.35:
+                x, y = rng.choice([rng.uniform(0.02, 0.1), rng.uniform(0.9, 0.98)]), rng.uniform(0.3, 0.84)
+            M.flower_head(r, x, y, rng.uniform(0.012, 0.022), "rose", rng.choice(["#e8708f", "#f39cb8", "#fde2ea", "#d0485e"]), rng)
+        M.meadow(r, 0.84, "spring", q.get("time", "golden"), q["seed"], 0.6)
 
 
 def portrait(r, q):
