@@ -131,12 +131,14 @@ class Style:
         radii = [r0 + (r1 - r0) * (i / (n - 1)) ** 1.3 for i in range(n)]
         self.g.union(sdf.tube(pts, radii), k)
 
-    def cap(self, thick=0.013, back_extra=0.010, line=hairline):
+    def cap(self, thick=0.016, back_extra=0.012, line=hairline, lift=0.008):
         X, Y, Z = self.g._coords(tuple(slice(None) for _ in range(3)))
         th = np.arctan2(X, -(Y - SKULL_C[1]))
         hl = line(th)
         back = np.clip((Y - SKULL_C[1]) / 0.08, 0, 1)
         t = thick + back_extra * back * (Z > 1.50)
+        t = t + lift * np.clip((Z - 1.615) / 0.03, 0, 1)   # crown lift (princess volume)
+        t = t + 0.007 * np.clip((1.595 - Z) / 0.03, 0, 1) * np.clip((np.abs(X) - 0.035) / 0.03, 0, 1)  # soft side volume
         t = t * (0.55 + 0.45 * np.clip((Z - hl) / 0.025, 0, 1))
         d = self.head.Fb - t
         d = sdf.smax(d, hl - Z, 0.006)
@@ -153,7 +155,7 @@ class Style:
         self.lock(pts, r, r * 0.55)
         return pts
 
-    def cap_locks(self, part_th, n=26, off=0.0115, r=0.0085, back=True, sides=True, front_sweep=True):
+    def cap_locks(self, part_th, n=26, off=0.0145, r=0.0095, back=True, sides=True, front_sweep=True):
         """Locks from the parting over the skull: gives the cap direction and grooves."""
         ph_part = math.radians(70)
         targets = []
@@ -176,7 +178,7 @@ class Style:
             ph0 = math.radians(72 - 6 * t)
             th1 = -side * math.radians(48 + 22 * t)
             ph1 = math.radians(26 - 10 * t) - depth
-            self.skull_lock(th0, ph0, th1, ph1, 0.009 + 0.002 * t, 0.0085 - 0.0012 * t, n=11, sag=math.radians(14))
+            self.skull_lock(th0, ph0, th1, ph1, 0.012 + 0.002 * t, 0.0095 - 0.0012 * t, n=11, sag=math.radians(14))
 
     def hang(self, start, length, drift, r0=0.010, r1=None, wave=0.0, curl=0.0, n=12, front=False):
         """A lock that falls from `start` under gravity, kept clear of the body."""
@@ -364,11 +366,12 @@ def loose_base(st, bottom=1.13, wave=0.0, curl=0.0, r=0.021):
 
 def style_braid(st):
     swept_back(st)
-    for s in (1, -1):  # face-framing wisps
-        st.hang(st.head.scalp(s * math.radians(70), math.radians(16), 0.005), 0.07, 0.01, 0.0055, wave=0.004)
+    for s in (1, -1):  # soft face-framing tendrils, past the jaw
+        st.hang(st.head.scalp(s * math.radians(66), math.radians(20), 0.008), 0.13, 0.012, 0.0075, wave=0.006)
+        st.hang(st.head.scalp(s * math.radians(80), math.radians(12), 0.008), 0.10, 0.016, 0.0065, wave=0.005)
     top = st.outer(math.pi, math.radians(-12), 0.0)
-    chain = [top] + [np.array(p) + (0, 0.012, 0) for p in BACK_CHAIN[1:]]
-    st.braid(chain, width=0.042, lobes=14)
+    chain = [top] + [np.array(p) + (0, 0.016, 0) for p in BACK_CHAIN[1:]]
+    st.braid(chain, width=0.054, lobes=14)
 
 
 def style_hunters_knot(st):
@@ -464,7 +467,9 @@ def style_crown_braid(st):
         a = math.radians(-180 + 360 * i / 36)
         p = st.outer(a, math.radians(25 + 9 * math.cos(a)), 0.009)
         pts.append(p)
-    st.braid(pts, width=0.034, lobes=30)
+    st.braid(pts, width=0.040, lobes=30)
+    for s in (1, -1):  # soft tendrils at the temples
+        st.hang(st.head.scalp(s * math.radians(68), math.radians(18), 0.008), 0.11, 0.012, 0.0065, wave=0.006)
 
 
 def style_waterfall_braid(st):
@@ -546,7 +551,7 @@ def mesh_style(st, spec, arm):
     me = obj.data
 
     rgb = HAIR_WET_RGB if st.wet else HAIR_RGB
-    mats = [bf.make_material("hair_wet" if st.wet else "hair", rgb, 0.22 if st.wet else 0.42)]
+    mats = [bf.make_material("hair_wet" if st.wet else "hair", rgb, 0.22 if st.wet else 0.32)]
     P = bf.verts_np(me)
     X, Y, Z = P[:, 0], P[:, 1], P[:, 2]
     vmat = np.zeros(len(P), int)
