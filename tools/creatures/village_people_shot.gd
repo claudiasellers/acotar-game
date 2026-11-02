@@ -5,7 +5,7 @@
 ## (the three nearest the camera, 3.2 m back). Ids missing from the build are skipped.
 extends Node
 
-const IDS := ["human_woman", "human_man", "human_elder", "mercenary", "human_youth", "peddler", "blessed"]
+const IDS := ["human_woman", "human_man", "human_elder", "mercenary", "human_youth", "peddler", "blessed", "blessed_2"]
 
 var _out := "user://village_people"
 var _world: World
@@ -46,7 +46,7 @@ func _run() -> void:
 		var npc := (load("res://creatures/people/scenes/%s.tscn" % IDS[i]) as PackedScene).instantiate() as CourtNpc
 		npc.wander_radius = 0.0
 		_world.add_child(npc)
-		npc.global_position = _ground(c + Vector3(-4.2 + 1.4 * i, 0.0, 0.0))
+		npc.global_position = _ground(c + Vector3(-4.9 + 1.4 * i, 0.0, 0.0))
 		npc.rotation.y = PI    # the people face -Z; turn them to the camera
 		placed += 1
 	print("placed ", placed, " villagers at ", c)
@@ -59,6 +59,19 @@ func _run() -> void:
 	_cam.look_at(c + Vector3(0.0, 1.15, 0.0))
 	await _settle(0.5)
 	await _save(_out + "/village_people_close.png")
+	if args.has("faces"):    # the two nearest faces at arm's length, for checking the face bake
+		_cam.global_position = c + Vector3(-0.7, 1.5, 1.3)
+		_cam.look_at(c + Vector3(-0.7, 1.45, 0.0))
+		await _settle(0.5)
+		await _save(_out + "/village_people_faces.png")
+	if args.has("pose"):
+		for npc in get_tree().get_nodes_in_group(&"court_npc"):
+			var cn := npc as CourtNpc
+			for a in cn.animators:
+				var sk := a.skeleton
+				var hand := sk.get_bone_global_pose(sk.find_bone("LeftHand")).origin
+				var sh := sk.get_bone_global_pose(sk.find_bone("LeftUpperArm")).origin
+				print("pose %s: hand %.2f m below the shoulder, %.2f m out; tree active %s" % [cn.npc_id, sh.y - hand.y, absf(hand.x - sh.x), a.tree.active])
 	get_tree().quit()
 
 

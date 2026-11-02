@@ -5,7 +5,7 @@ extends GutTest
 ## the cast's 60-bone rig, all five CourtNpc clips, a baked face, clothes, a human
 ## height, inside the 15k creature budget (R4).
 
-const IDS := ["human_woman", "human_man", "human_elder", "human_youth", "peddler", "blessed", "mercenary"]
+const IDS := ["human_woman", "human_man", "human_elder", "human_youth", "peddler", "blessed", "blessed_2", "mercenary"]
 const CLIPS: Array[StringName] = [&"idle", &"walk", &"talk", &"flinch", &"bow"]
 const BUDGET := 15000
 
