@@ -229,44 +229,18 @@ func _is_far() -> bool:
 	var cam := vp.get_camera_3d() if vp else null
 	if cam == null:
 		return false
-	return cam.global_position.distance_to(_model.global_position) > FAR
+	return cam.global_position.distance_to(_model.global_position) > _far()
+
+
+## How far from the camera the face keeps updating.
+func _far() -> float:
+	return FAR
 
 
 ## One step of every layer, then the weights are written.  Public so tests can step it.
 func tick(delta: float) -> void:
-	# expression cross-fade and hold
-	if _expr != &"":
-		if _expr_left > 0.0:
-			_expr_left = maxf(0.0, _expr_left - delta)
-		if _expr_left == 0.0:
-			_expr_weight = maxf(0.0, _expr_weight - delta / FADE_OUT)
-			if _expr_weight == 0.0:
-				_expr = &""
-				_expr_left = -1.0
-		else:
-			_expr_weight = minf(1.0, _expr_weight + delta / FADE_IN)
-	# tics
-	_tic_next -= delta
-	if _tic.is_empty() and _tic_next <= 0.0 and _expr == &"" and not is_talking():
-		var tics := profile.tics
-		if not tics.is_empty():
-			_tic = tics[_rng.randi() % tics.size()] as Dictionary
-			_tic_t = 0.0
-	if not _tic.is_empty():
-		_tic_t += delta
-		var hold := float(_tic.get("hold", 0.6))
-		var ramp := 0.18
-		var w := float(_tic.get("weight", 0.5))
-		if _tic_t < ramp:
-			_tic_weight = w * _tic_t / ramp
-		elif _tic_t < ramp + hold:
-			_tic_weight = w
-		elif _tic_t < ramp * 2.0 + hold:
-			_tic_weight = w * (1.0 - (_tic_t - ramp - hold) / ramp)
-		else:
-			_tic_weight = 0.0
-			_tic = {}
-			_schedule_tic()
+	_step_expression(delta)
+	_step_tic(delta)
 	# blinks
 	var blink := 0.0
 	_blink_next -= delta
@@ -302,9 +276,48 @@ func tick(delta: float) -> void:
 	_write()
 
 
+## The asked-for expression: cross-fade in, hold, fade back out (shared with CreatureFace).
+func _step_expression(delta: float) -> void:
+	if _expr != &"":
+		if _expr_left > 0.0:
+			_expr_left = maxf(0.0, _expr_left - delta)
+		if _expr_left == 0.0:
+			_expr_weight = maxf(0.0, _expr_weight - delta / FADE_OUT)
+			if _expr_weight == 0.0:
+				_expr = &""
+				_expr_left = -1.0
+		else:
+			_expr_weight = minf(1.0, _expr_weight + delta / FADE_IN)
+
+
+## Recurring small moves over the rest face, only while nothing else is asked.
+func _step_tic(delta: float) -> void:
+	_tic_next -= delta
+	if _tic.is_empty() and _tic_next <= 0.0 and _expr == &"" and not is_talking():
+		var tics := profile.tics
+		if not tics.is_empty():
+			_tic = tics[_rng.randi() % tics.size()] as Dictionary
+			_tic_t = 0.0
+	if not _tic.is_empty():
+		_tic_t += delta
+		var hold := float(_tic.get("hold", 0.6))
+		var ramp := 0.18
+		var w := float(_tic.get("weight", 0.5))
+		if _tic_t < ramp:
+			_tic_weight = w * _tic_t / ramp
+		elif _tic_t < ramp + hold:
+			_tic_weight = w
+		elif _tic_t < ramp * 2.0 + hold:
+			_tic_weight = w * (1.0 - (_tic_t - ramp - hold) / ramp)
+		else:
+			_tic_weight = 0.0
+			_tic = {}
+			_schedule_tic()
+
+
 func _compose(blink: float, talk_open: float) -> void:
 	_out.clear()
-	var rest := profile.mix_of(profile.rest)
+	var rest := _rest_mix()
 	var e := profile.mix_of(_expr) if _expr != &"" else {}
 	var a := _expr_weight * _expr_intensity
 	for k: String in rest:
@@ -331,6 +344,11 @@ func _compose(blink: float, talk_open: float) -> void:
 				_out[k] = minf(float(_out[k]), MASKED_SQUINT)
 	for k: String in _out:
 		_out[k] = clampf(float(_out[k]), 0.0, 1.0)
+
+
+## The face under every expression: the profile's rest preset (a creature's follows what it is doing).
+func _rest_mix() -> Dictionary:
+	return profile.mix_of(profile.rest)
 
 
 func _write() -> void:

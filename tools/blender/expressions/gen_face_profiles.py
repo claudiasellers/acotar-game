@@ -49,6 +49,13 @@ def write(cid, p):
                                                             num(t[1]), s("preset"), s(t[0]), s("weight"), num(t[4]))
             for t in p["tics"]]
     lines.append("tics = [" + ", ".join(tics) + "]")
+    if "states" in p:
+        lines.append("creature = true")
+        lines.append("states = {\n" + ",\n".join("%s: %s" % (s(k), s(v)) for k, v in sorted(p["states"].items()))
+                     + "\n}")
+        lines.append("cues = {\n" + ",\n".join("%s: { %s: %s, %s: %s }" % (s(k), s("preset"), s(v[0]), s("seconds"),
+                                                                       num(v[1]))
+                                              for k, v in sorted(p["cues"].items())) + "\n}")
     path = os.path.join(OUT, cid + "_face.tres")
     with open(path, "w") as fh:
         fh.write("\n".join(lines) + "\n")
@@ -57,5 +64,8 @@ def write(cid, p):
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for cid, p in sorted(face_profiles.PROFILES.items()):
+    profiles = dict(face_profiles.PROFILES)
+    for cid, p in face_profiles.CREATURES.items():
+        profiles[cid] = dict(p, masked=False, blink=(0.0, 0.0))
+    for cid, p in sorted(profiles.items()):
         print("wrote", os.path.relpath(write(cid, p), REPO))

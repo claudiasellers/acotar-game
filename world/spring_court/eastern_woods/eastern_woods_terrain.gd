@@ -15,6 +15,8 @@
 class_name EasternWoodsTerrain
 extends RefCounted
 
+const WoodsGround := preload("res://world/spring_court/shared/woods_ground.gd")
+
 const BOUNDS := Rect2(650.0, -650.0, 1200.0, 1200.0)
 
 const STREAM_GLEN := Vector3(1060.0, -190.0, 55.0)
@@ -82,7 +84,8 @@ static func texture_at(x: float, z: float) -> Vector3i:
 		return Vector3i(WorldHeight.Tex.RIVERBED, WorldHeight.Tex.RIVERBED, 0)
 	if f.distance(&"path", x, z) < 0.0:
 		return Vector3i(WorldHeight.Tex.PATH, WorldHeight.Tex.FOREST_FLOOR, 60)
-	match biome_at(x, z):
+	var biome := biome_at(x, z)
+	match biome:
 		&"bogge_territory", &"dread_margin":
 			return Vector3i(WorldHeight.Tex.FOREST_FLOOR, WorldHeight.Tex.BLIGHT, 150)
 		&"blight_edge":
@@ -90,7 +93,8 @@ static func texture_at(x: float, z: float) -> Vector3i:
 		&"reed_marsh":
 			return Vector3i(WorldHeight.Tex.RIVERBED, WorldHeight.Tex.MOSS, 120)
 		&"deep_wood", &"beech_hall", &"fern_hollow":
-			return Vector3i(WorldHeight.Tex.FOREST_FLOOR, WorldHeight.Tex.MOSS, 100)
+			# Leaf litter under the groves only; the gaps between stay moss.
+			return WoodsGround.paint("eastern_woods", biome, x, z, WorldHeight.Tex.FOREST_FLOOR, WorldHeight.Tex.MOSS, 100)
 		&"stream_shallows":
 			return Vector3i(WorldHeight.Tex.MOSS, WorldHeight.Tex.RIVERBED, 70)
 	return Vector3i(WorldHeight.Tex.SPRING_GRASS, WorldHeight.Tex.MOSS, 40)

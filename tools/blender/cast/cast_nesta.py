@@ -32,10 +32,11 @@ SHAPE = dict(
     # rests cool and still, a small pointed chin.  Canon: her face is their mother's, "so cold and
     # unrelenting" (ch5); "beautiful, imperious, still as one of the High Fae" (ch31).
     eye_r=0.0214, eye_open_up=31.0, eye_open_lo=24.0, eye_tilt=13.0, eye_open_w=66.0,
-    eye_dx=0.0022, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
-    cheeks=0.62, cheekbones=0.55, cheek_lift=0.003, jaw=0.0, jaw_w=0.92, chin=0.88, chin_drop=0.004,
+    eye_dx=0.0022, cut_reach=0.018, cut_soft=0.007, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
+    cheeks=0.62, cheekbones=0.55, cheek_lift=0.003, jaw=0.0, jaw_w=0.90, chin=0.88, chin_drop=-0.003,
     chin_point=0.75, brow=0.0, nose=0.82, nose_w=0.85, nose_up=0.25, nose_bridge=0.0,
-    lips=1.25, lip_upper=0.95, lip_lower=1.12, lip_w=1.32, lip_bow=1.0, smile=-0.15,
+    lips=1.16, lip_upper=0.98, lip_lower=1.0, lip_w=1.32, lip_bow=1.0, smile=-0.15,
+    chin_y=0.006, jaw_taper=0.8, lower_fill=1.4, bridge_fill=1.0, mouth_dy=0.0045,
     face_w=0.95, neck=0.96,
     bust=0.95, ribs=0.98, waist=0.95, belly=0.95, pelvis=0.97, seat=0.95,
     thigh=0.96, calf=0.96, arm=0.96, forearm=0.97, hand=0.98,
@@ -292,14 +293,21 @@ def worn_cloak(ctx, name, pal, hem=0.34, rag=0.040, nr=18, nc=36, hood=True):
 def style_chignon(st):
     """Severe and sleek: centre parting, hair drawn tight over the ears into a low knot at the back of
     the head, a thin braid wrapped round it and five pearl pins."""
-    st.cap(thick=0.0085, back_extra=0.004)
-    st.cap_locks(0.0, n=26, off=0.0090, r=0.0074, front_sweep=False)
+    # L37: princess volume (a soft lift at the crown and fuller sides), still severe and swept back
+    st.cap(thick=0.0140, back_extra=0.008)
+    st.cap_locks(0.0, n=26, off=0.0140, r=0.0085, front_sweep=False)
+    for s in (1, -1):                                     # a soft rolled lift from the parting
+        st.skull_lock(s * math.radians(6), math.radians(74), s * math.radians(70), math.radians(40),
+                      0.0150, 0.0120, n=12, sag=-math.radians(4))
     for s in (1, -1):                                     # drawn back from the temples, over the ears
         for k in range(3):
             st.skull_lock(s * math.radians(28 + 14 * k), math.radians(46 - 14 * k), s * math.radians(160),
                           math.radians(4), 0.0085, 0.0072, n=12, sag=math.radians(3))
+    for s in (1, -1):                                     # two fine loose tendrils framing the face
+        top = st.head.scalp(s * math.radians(64), math.radians(30), 0.004)
+        st.hang(top, 0.095, 0.014, r0=0.0058, r1=0.0030, wave=0.004, curl=0.0, n=14, front=True)
     c = st.outer(math.pi, math.radians(-2), 0.017)
-    st.bun(c, 0.036, wraps=11, axis=(0, 1, 0.05))
+    st.bun(c, 0.040, wraps=12, axis=(0, 1, 0.05))
     pts = []
     for i in range(22):                                   # braid wrapped round the knot
         a = math.radians(-70 + 330 * i / 21)

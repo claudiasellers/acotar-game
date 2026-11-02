@@ -84,6 +84,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		m.position = Vector3(anchor.position.x, floor_y(anchor.level) + anchor.position.y, anchor.position.z)
 		m.rotation.y = deg_to_rad(anchor.yaw_deg)
 		house.add_child(m)
+	ManorFacade.dress(house, all, cache)
 	ManorArtHanger.hang(house, all)  # L39: frames and paintings into the art slots
 	_merge_meshes(house, all, cache)
 	var mood := ManorMoodLights.new()
@@ -154,8 +155,8 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> void:
 	var r := room.rect
 	var mat := ManorRoomLook.wall_material(room)
-	var skin := EstateKit.mat(FACADE, 0.8, 0.0, "facade")
-	var glass := EstateKit.mat(EstateKit.GLASS, 0.05, 0.0, "glass")
+	var skin := ManorFacade.stone()
+	var glass := ManorFacade.glass()
 	var frame := EstateKit.mat(EstateKit.CREAM, 0.6, 0.0, "window_frame")
 	# Each side: start, end (along the wall line), the inward normal.
 	var sides := [
@@ -210,6 +211,7 @@ static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 				EstateKit.box(node, Vector3(mid.x, y + (o[2] + o[3]) * 0.5, mid.y), size, glass)
 				var sill := Vector3(absf(dir.x) * (to - from + 0.2) + absf(n.x) * 0.4, 0.08, absf(dir.y) * (to - from + 0.2) + absf(n.y) * 0.4)
 				EstateKit.box(node, Vector3(mid.x, y + o[2], mid.y), sill, frame, false)
+				ManorFacade.note_window(node, room, a + dir * ((from + to) * 0.5), -n, to - from, y + o[2], y + o[3])
 				exterior_any = true
 			cursor = maxf(cursor, to)
 		if cursor < length:
@@ -439,7 +441,7 @@ static func _build_secret(house: Node3D, def: ManorSecretDef) -> void:
 static func _build_roof(house: Node3D, roof: ManorRoofDef) -> void:
 	var y := floor_y(roof.base_level + 1) - 0.02
 	var r := roof.rect
-	var mat := EstateKit.mat(roof.color, 0.35)
+	var mat := ManorFacade.roof_material(roof.color)
 	var mi := MeshInstance3D.new()
 	match roof.style:
 		&"cone", &"dome":
@@ -462,7 +464,7 @@ static func _build_roof(house: Node3D, roof: ManorRoofDef) -> void:
 			slab.size = Vector3(r.size.x + 0.6, 0.4, r.size.y + 0.6)
 			mi.mesh = slab
 			mi.position = Vector3(r.get_center().x, y + 0.2, r.get_center().y)
-			var parapet := EstateKit.mat(FACADE, 0.8, 0.0, "facade")
+			var parapet := ManorFacade.stone()
 			for s in [[Vector2(0, -0.5), true], [Vector2(0, 0.5), true], [Vector2(-0.5, 0), false], [Vector2(0.5, 0), false]]:
 				var off: Vector2 = s[0] * r.size
 				var sz := Vector3(r.size.x + 0.6, 1.1, 0.3) if s[1] else Vector3(0.3, 1.1, r.size.y + 0.6)

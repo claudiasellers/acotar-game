@@ -52,20 +52,29 @@ def blob(p, x, y, z, r, col, rng, sub=1, squash=0.85):
 
 
 def rose_bush(p, h, col, rng):
-    """Mounded rose shrub smothered in big cupped blooms."""
+    """Mounded rose shrub smothered in big cupped blooms: the blooms, not the
+    leaves, carry the colour (rose garden 'dozens of hues', canon ch13)."""
     r = h * 0.45
-    for i in range(6):
-        a = 2 * math.pi * i / 6 + rng.uniform(-0.2, 0.2)
-        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.45, r * 0.55, LEAF if i % 2 else LEAF_DARK, rng)
-    blob(p, 0, 0, h * 0.7, r * 0.6, mix(LEAF, SAGE_LIGHT, 0.3), rng)
-    for i in range(8):
-        a = 2 * math.pi * i / 8 + rng.uniform(-0.3, 0.3)
-        e = rng.uniform(0.1, 1.1)
-        x, y = r * 0.85 * math.cos(a) * math.cos(e), r * 0.85 * math.sin(a) * math.cos(e)
-        z = h * 0.55 + r * 0.75 * math.sin(e)
-        c = col if i % 3 else lighter(col, 0.2)
-        bloom(p, (x, y, z), h * 0.13 * rng.uniform(0.85, 1.15), c, 2, 5, rng, finish=F,
-              tilt=R("Z", math.degrees(a)) @ R("Y", 90 - math.degrees(e) * 0.8))
+    for i in range(3):
+        a = 2 * math.pi * i / 3 + rng.uniform(-0.2, 0.2)
+        blob(p, r * 0.5 * math.cos(a), r * 0.5 * math.sin(a), h * 0.42, r * 0.66, LEAF if i % 2 else LEAF_DARK, rng, 1)
+    blob(p, 0, 0, h * 0.68, r * 0.62, mix(LEAF, SAGE_LIGHT, 0.3), rng, 1)
+    n = 14
+    for i in range(n):
+        # golden-angle spiral over the upper dome so blooms never clump
+        a = 2.39996 * i + rng.uniform(-0.15, 0.15)
+        e = math.asin(min(0.97, -0.15 + 1.1 * (i + 0.5) / n))
+        x, y = r * 0.8 * math.cos(a) * math.cos(e), r * 0.8 * math.sin(a) * math.cos(e)
+        z = h * 0.5 + r * 0.72 * math.sin(e)
+        c = col if i % 3 else lighter(col, 0.22)
+        cup_rose(p, (x, y, z), h * 0.15 * rng.uniform(0.9, 1.12), c, rng,
+                 R("Z", math.degrees(a)) @ R("Y", 90 - math.degrees(e) * 0.9))
+
+
+def cup_rose(p, center, radius, col, rng, tilt):
+    """A rounded full rose (L35-4): smooth cupped head, swirled heart and
+    broad outer petals (prop_kit.soft_rose), never a pointed shard."""
+    K.soft_rose(p, T(*center) @ tilt, radius * 0.95, col, F, rng, petals=3)
 
 
 def hedge(p, h, col, rng):
@@ -419,6 +428,123 @@ def tree(p, h, col, rng, kind):
             blob(p, lean + h * 0.42 * math.cos(a), h * 0.42 * math.sin(a), crown_c[2] - h * 0.04, h * 0.14, mix(col, SAGE_DEEP, 0.3), rng, 1, 0.75)
 
 
+# ------------------------------------------------------------ garden flowers (L35)
+
+
+def snowdrop(p, h, col, rng):
+    """[C] front garden: pale snowdrops, nodding white bells on arched stems."""
+    clump_leaves(p, h, 5, rng, length=0.8)
+    for i in range(5):
+        a = 2 * math.pi * i / 5 + rng.uniform(-0.3, 0.3)
+        top = h * rng.uniform(0.8, 1.0)
+        bx, by = 0.02 * math.cos(a), 0.02 * math.sin(a)
+        tip = (bx + h * 0.22 * math.cos(a), by + h * 0.22 * math.sin(a), top * 0.88)
+        p.add(tube([(bx, by, 0), (bx * 2, by * 2, top * 0.8), (bx + h * 0.12 * math.cos(a), by + h * 0.12 * math.sin(a), top),
+                    tip], h * 0.02, 3, caps=False), LEAF_DARK, F)
+        m = T(*tip) @ R("Z", math.degrees(a)) @ R("Y", 160)
+        for k in range(3):
+            p.add(petal(h * 0.2, h * 0.12, cup=0.6, curl=0.2), col, F, m @ R("Z", 120 * k) @ R("Y", -70))
+        p.add(ico(h * 0.05, 0), (0.7, 0.9, 0.7), F, m @ T(0, 0, h * 0.03))
+
+
+def daffodil(p, h, col, rng):
+    """[C] front garden: butter-yellow daffodils, a trumpet in a star of petals."""
+    clump_leaves(p, h, 6, rng, length=0.8)
+    for i in range(4):
+        a = 2 * math.pi * i / 4 + rng.uniform(-0.3, 0.3)
+        top = h * rng.uniform(0.85, 1.0)
+        x, y = h * 0.12 * math.cos(a), h * 0.12 * math.sin(a)
+        stem(p, (0, 0, 0), (x, y, top), h * 0.02)
+        m = T(x, y, top) @ R("Z", math.degrees(a)) @ R("Y", 70)
+        for k in range(6):
+            p.add(petal(h * 0.16, h * 0.1, cup=0.1, curl=-0.05), lighter(col, 0.25) if i % 2 else col, F, m @ R("Z", 60 * k))
+        p.add(lathe([(h * 0.03, 0), (h * 0.045, h * 0.08), (h * 0.07, h * 0.13), (h * 0.06, h * 0.135)], 7, cap_bottom=True, cap_top=False),
+              (1.0, 0.70, 0.30) if i % 2 == 0 else col, F, m)
+
+
+def meadow_buttercup(p, h, col, rng):
+    """[C] ch8: lanky meadow buttercups, glossy yellow cups held high on thin
+    branching stems over a low tuft of cut leaves."""
+    clump_leaves(p, h * 0.35, 5, rng, length=0.6)
+    for i in range(9):
+        a = 2.39996 * i + rng.uniform(-0.2, 0.2)
+        top = h * rng.uniform(0.7, 1.0)
+        rr = h * rng.uniform(0.08, 0.3)
+        x, y = rr * math.cos(a), rr * math.sin(a)
+        stem(p, (0, 0, 0), (x, y, top), h * 0.012)
+        m = T(x, y, top) @ R("Z", math.degrees(a)) @ R("Y", rng.uniform(15, 40))
+        for k in range(5):
+            p.add(petal(h * 0.1, h * 0.09, cup=0.5, curl=0.1), col if k % 2 else lighter(col, 0.12), F, m @ R("Z", 72 * k) @ R("Y", -40))
+
+
+def hydrangea(p, h, col, rng):
+    """Mophead hydrangea: round heads of tiny florets over broad leaves (canon:X outdoors)."""
+    r = h * 0.48
+    for i in range(5):
+        a = 2 * math.pi * i / 5
+        blob(p, r * 0.55 * math.cos(a), r * 0.55 * math.sin(a), h * 0.35, r * 0.5, LEAF if i % 2 else LEAF_DARK, rng, 0, 0.8)
+    for i in range(7):
+        a = 2.39996 * i
+        e = math.asin(min(0.95, 0.05 + 0.9 * (i + 0.5) / 7))
+        x, y, z = r * 0.75 * math.cos(a) * math.cos(e), r * 0.75 * math.sin(a) * math.cos(e), h * 0.55 + r * 0.6 * math.sin(e)
+        c = col if i % 3 else mix(col, (1.0, 0.85, 0.95), 0.35)
+        hr = h * 0.17
+        blob(p, x, y, z, hr, c, rng, 1, 0.9)
+        for k in range(3):
+            b = 2 * math.pi * k / 3 + i
+            p.add(ico(hr * 0.3, 0), lighter(c, 0.2), F, T(x + hr * 0.7 * math.cos(b), y + hr * 0.7 * math.sin(b), z + hr * 0.55))
+
+
+def tall_spire(p, h, col, rng, n=3, florets=9, w=0.06):
+    """Delphinium / lupin: a few dense tapering spires of florets."""
+    clump_leaves(p, h, 6, rng, length=0.35)
+    for i in range(n):
+        a = 2 * math.pi * i / n + rng.uniform(-0.3, 0.3)
+        lean = rng.uniform(3, 10)
+        top = h * rng.uniform(0.85, 1.0)
+        m = R("Z", math.degrees(a)) @ R("Y", lean)
+        stem(p, (0, 0, 0), tuple(m @ K.Vector((0, 0, top))), h * 0.012)
+        for j in range(florets):
+            t = 0.42 + 0.56 * j / florets
+            pos = m @ K.Vector((0, 0, top * t))
+            rr = h * w * (1.25 - t)
+            c = col if j % 2 else lighter(col, 0.18)
+            p.add(ico(rr, 0), c, F, T(pos.x, pos.y, pos.z) @ R("Z", j * 40) @ S(1, 1, 1.3))
+
+
+def hollyhock(p, h, col, rng):
+    """Cottage-garden hollyhocks: tall stems stacked with open saucer flowers."""
+    clump_leaves(p, h, 5, rng, length=0.2)
+    for i in range(2):
+        a = math.pi * i + rng.uniform(-0.3, 0.3)
+        top = h * rng.uniform(0.85, 1.0)
+        m = R("Z", math.degrees(a)) @ R("Y", rng.uniform(3, 8))
+        stem(p, (0, 0, 0), tuple(m @ K.Vector((0, 0, top))), h * 0.01)
+        c = col if i != 1 else mix(col, (1.0, 0.95, 0.85), 0.5)
+        for j in range(4):
+            t = 0.45 + 0.14 * j
+            pos = m @ K.Vector((0, 0, top * t))
+            b = j * 2.3 + a
+            star_flower(p, (pos.x + 0.05 * math.cos(b), pos.y + 0.05 * math.sin(b), pos.z), h * (0.085 - 0.01 * j), c, 5, F, (1.0, 0.95, 0.7),
+                        R("Z", math.degrees(b)) @ R("Y", 80))
+
+
+def allium(p, h, col, rng):
+    """Allium: lollipop globes of star florets on bare stems."""
+    clump_leaves(p, h, 4, rng, length=0.25)
+    for i in range(3):
+        a = 2 * math.pi * i / 3 + rng.uniform(-0.3, 0.3)
+        top = h * rng.uniform(0.75, 1.0)
+        x, y = h * 0.08 * math.cos(a), h * 0.08 * math.sin(a)
+        stem(p, (0, 0, 0), (x, y, top), h * 0.012)
+        p.add(ico(h * 0.1, 1), col, F, T(x, y, top))
+        for k in range(8):
+            b = 2.39996 * k
+            e = math.asin(-0.6 + 1.5 * (k + 0.5) / 8)
+            q = (x + h * 0.11 * math.cos(b) * math.cos(e), y + h * 0.11 * math.sin(b) * math.cos(e), top + h * 0.11 * math.sin(e))
+            p.add(ico(h * 0.025, 0), lighter(col, 0.25), F, T(*q))
+
+
 # ------------------------------------------------------------ table
 
 
@@ -461,6 +587,28 @@ def build_species(sid, kind, h, col, rng):
         tulip(p, h, c, rng)
     elif sid == "buttercup":
         small_stars(p, h, c, rng, 6, (1.0, 0.95, 0.6), 5)
+    elif sid == "snowdrop":
+        snowdrop(p, h, c, rng)
+    elif sid == "daffodil":
+        daffodil(p, h, c, rng)
+    elif sid == "meadow_buttercup":
+        meadow_buttercup(p, h, c, rng)
+    elif sid.startswith("hydrangea"):
+        hydrangea(p, h, c, rng)
+    elif sid == "delphinium":
+        tall_spire(p, h, c, rng, 3, 10, 0.06)
+    elif sid == "lupin":
+        tall_spire(p, h, c, rng, 3, 9, 0.07)
+    elif sid == "hollyhock":
+        hollyhock(p, h, c, rng)
+    elif sid == "allium":
+        allium(p, h, c, rng)
+    elif sid == "catmint":
+        spike_flower(p, h, c, rng, 5)
+    elif sid == "foxglove_white":
+        spike_flower(p, h, c, rng, 3, bells=True)
+    elif sid == "peony_white":
+        peony(p, h, c, rng)
     elif sid == "iris":
         iris(p, h, c, rng)
     elif sid == "madder":
@@ -500,9 +648,12 @@ def build_species(sid, kind, h, col, rng):
 def main():
     args = sys.argv[1:]
     prev = args[args.index("--preview") + 1] if "--preview" in args else None
+    only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
     K.reset()
     objs, over = [], []
     for sid, (kind, h, col) in sorted(species().items()):
+        if only is not None and sid not in only:
+            continue
         rng = random.Random(sum(map(ord, sid)))
         p = build_species(sid, kind, h, col, rng)
         ob = p.to_object(sid)

@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"feyre"
+canon = "Unmasked, human; guarded by default [C]. The glare and the clamped jaw [C]; a willed blank face [C]; the bland mask-smile she wears for others [C]; silent tears [C]; awe at Prythian's beauty [C]. Our reading [X]: terror held behind a steady jaw ('no tremble'), a defiant chin, and a real smile that reaches her eyes only later. First pass for the user's co-design review."
+masked = false
+rest = &"guarded"
+blink_min = 2.8
+blink_max = 6.0
+presets = {
+"awe": { "brow_up_L": 0.5, "brow_up_R": 0.5, "eyes_wide_L": 0.45, "eyes_wide_R": 0.45, "jaw_open": 0.12, "lips_part": 0.4 },
+"blank": { "blink_L": 0.12, "blink_R": 0.12 },
+"defiant": { "brow_down_L": 0.3, "brow_down_R": 0.3, "chin_raise": 0.4, "jaw_clench": 0.4, "squint_L": 0.2, "squint_R": 0.2 },
+"fear_held": { "brow_inner_up": 0.4, "eyes_wide_L": 0.5, "eyes_wide_R": 0.5, "jaw_clench": 0.5, "lip_press": 0.4 },
+"glare": { "brow_down_L": 0.75, "brow_down_R": 0.75, "jaw_clench": 0.7, "lip_press": 0.5, "squint_L": 0.55, "squint_R": 0.55 },
+"guarded": { "brow_down_L": 0.12, "brow_down_R": 0.12, "lip_press": 0.2, "squint_L": 0.12, "squint_R": 0.12 },
+"mask_smile": { "lip_press": 0.2, "smile_L": 0.4, "smile_R": 0.4 },
+"silent_tears": { "brow_inner_up": 0.8, "chin_raise": 0.5, "frown_L": 0.3, "frown_R": 0.3, "lip_press": 0.45, "squint_L": 0.3, "squint_R": 0.3 },
+"smile": { "cheek_raise": 0.45, "smile_L": 0.75, "smile_R": 0.75, "squint_L": 0.25, "squint_R": 0.25 }
+}
+aliases = {
+"neutral": "guarded",
+"happy": "smile",
+"laugh": "smile",
+"smirk": "mask_smile",
+"tender": "smile",
+"angry": "glare",
+"fury": "glare",
+"contempt": "defiant",
+"disgust": "glare",
+"sad": "silent_tears",
+"grief": "silent_tears",
+"afraid": "fear_held",
+"terror": "fear_held",
+"surprise": "awe",
+"pained": "silent_tears",
+"weary": "blank",
+"guarded": "guarded",
+"pleading": "silent_tears"
+}
+tics = [{ "hold": 0.6, "max": 18.0, "min": 9.0, "preset": "defiant", "weight": 0.35 }]
