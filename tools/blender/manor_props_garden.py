@@ -388,9 +388,12 @@ def wisteria_bay(p, size, c):
         v.co = Vector((x, y, h + 0.46 + z))
     p.add(bm, mix(SAGE, YEW_MID, 0.35), "leaf", sharp_deg=89.0)
     for i in range(7):
-        b = ico(1.0, 1)
+        # finer and only gently dented, so from above they read as soft
+        # mounds of new growth rather than pale hexagons (L35-7)
+        b = lathe([(1.0, -0.2), (0.74, 0.68), (0.0, 1.0)], 8, cap_bottom=False, cap_top=False)
+        jr = random.Random(5152 + i)
         for v in b.verts:
-            v.co *= 1.0 + rng.uniform(-0.18, 0.18)
+            v.co *= 1.0 + jr.uniform(-0.06, 0.06)
         r = rng.uniform(0.38, 0.55)
         p.add(b, [mix(SAGE, SAGE_LIGHT, 0.35), mix(SAGE, LICHEN, 0.5)][i % 2], "leaf",
               T(rng.uniform(-w / 2 + 0.6, w / 2 - 0.6), rng.uniform(-d / 2 + 0.4, d / 2 - 0.4), h + 0.54)
