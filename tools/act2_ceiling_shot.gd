@@ -32,7 +32,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		estate.call(&"_add_preview_environment")
+		ShotLook.dress(estate, &"manor_interior")
 	Clock.from_dict({"time_of_day": 11.0 / 24.0, "day": 2})
 	Clock.paused = true
 	var rooms := {}

@@ -23,7 +23,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		estate.call(&"_add_preview_environment")
+		ShotLook.dress(estate, &"manor_interior")
 		estate.call(&"_spawn_feyre")
 	await _frames(60)
 	var feyre := estate.get(&"feyre") as Feyre

@@ -29,7 +29,7 @@ func _run() -> void:
 	# The estate spawns her itself when it is the current scene; this probe
 	# adds it after, so spawn her the same way.
 	if estate.get(&"feyre") == null:
-		estate.call(&"_add_preview_environment")
+		ShotLook.dress(estate, &"manor_interior")
 		estate.call(&"_spawn_feyre")
 	await _frames(60)
 	var feyre := estate.get(&"feyre") as Feyre

@@ -15,6 +15,8 @@ extends Resource
 @export var sun_energy := 0.9
 @export var ambient_color := Color(0.6, 0.66, 0.75)
 @export var ambient_energy := 0.6
+## 0 is all ambient_color, 1 all sky.
+@export_range(0.0, 1.0) var ambient_sky_contribution := 0.6
 @export_group("Clouds")
 ## Painted clouds in the World sky (painted_sky.gdshader): 0 clear, ~0.3 a few
 ## fair-weather clouds, ~0.8 overcast. Left out of ambient and reflections.
@@ -50,6 +52,10 @@ extends Resource
 @export var glow_intensity := 0.4
 @export var glow_bloom := 0.05
 @export var glow_hdr_threshold := 1.0
+## Neither of these blends: like the LUT, they switch at the middle of a mix.
+@export var tonemap_mode := Environment.TONE_MAPPER_ACES
+## Global illumination, for places closed to the sky. Outdoors it's cost for nothing.
+@export var sdfgi := false
 @export_group("Golden hour")
 ## Sky and sun when the sun is low (dawn and dusk). GradeDirector blends
 ## toward these as the sun nears the horizon.
@@ -75,13 +81,14 @@ const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric
 	&"saturation", &"contrast", &"brightness", &"glow_intensity", &"glow_bloom", &"snow_cover", &"magic",
 	&"volumetric_anisotropy", &"volumetric_light_energy", &"fog_sky_affect", &"fog_height",
 	&"fog_height_density", &"fog_aerial_perspective", &"glow_hdr_threshold", &"golden_sun_energy",
-	&"dread_headroom", &"volumetric_ambient_inject", &"cloud_cover"]
+	&"dread_headroom", &"volumetric_ambient_inject", &"cloud_cover", &"ambient_sky_contribution"]
 const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom", &"sun_color",
 	&"ambient_color", &"fog_color", &"volumetric_albedo", &"golden_sky_top", &"golden_sky_horizon",
 	&"golden_sun_color", &"cloud_color", &"cloud_shade"]
 
 
-## A new preset `t` of the way from `a` to `b`. The LUT switches at t = 0.5.
+## A new preset `t` of the way from `a` to `b`. The LUT, tone mapper and GI
+## switch at t = 0.5.
 static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 	var out := GradePreset.new()
 	out.id = b.id if t >= 0.5 else a.id
@@ -90,4 +97,6 @@ static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 	for c in _COLORS:
 		out.set(c, (a.get(c) as Color).lerp(b.get(c), t))
 	out.lut = b.lut if t >= 0.5 else a.lut
+	out.tonemap_mode = b.tonemap_mode if t >= 0.5 else a.tonemap_mode
+	out.sdfgi = b.sdfgi if t >= 0.5 else a.sdfgi
 	return out

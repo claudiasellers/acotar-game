@@ -96,6 +96,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 	var mood := ManorMoodLights.new()
 	mood.name = "MoodLights"
 	house.add_child(mood)
+	house.add_child(ManorInteriorGrade.new())
 	return house
 
 

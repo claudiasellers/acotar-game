@@ -284,8 +284,7 @@ func _close() -> void:
 		if is_instance_valid(n):
 			n.queue_free()
 	dressing.clear()
-	for node in get_tree().root.find_children("*", "GradeDirector", true, false):
-		(node as GradeDirector).release_story_hold()
+	GradeDirector.release_story_holds(get_tree())
 	for n in crowd:
 		if is_instance_valid(n):
 			n.queue_free()

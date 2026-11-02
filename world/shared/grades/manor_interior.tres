@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"manor_interior"
+sky_top = Color(0.55, 0.68, 0.98, 1)
+sky_horizon = Color(1.0, 0.78, 0.86, 1)
+ground_horizon = Color(0.98, 0.86, 0.8, 1)
+ground_bottom = Color(0.55, 0.7, 0.45, 1)
+sun_color = Color(1.0, 0.88, 0.74, 1)
+sun_energy = 1.2
+; GI carries the room's light, so the ambient is all sky, and it only reaches
+; what SDFGI finds open (T043, the look the owner chose).
+sdfgi = true
+tonemap_mode = 4
+ambient_color = Color(0.84, 0.76, 0.90, 1)
+ambient_energy = 1.2
+ambient_sky_contribution = 1.0
+fog_color = Color(1.0, 0.86, 0.90, 1)
+fog_density = 0.0012
+volumetric_density = 0.008
+volumetric_albedo = Color(1.0, 0.90, 0.94, 1)
+exposure = 1.0
+saturation = 1.18
+contrast = 1.0
+brightness = 1.0
+glow_intensity = 1.1
+glow_bloom = 0.25
+glow_hdr_threshold = 1.0
+snow_cover = 0.0
+magic = 0.35
+cloud_cover = 0.30

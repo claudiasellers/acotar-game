@@ -542,11 +542,12 @@ func _play() -> void:
 		return _fail("no BeastDoor space")
 	if not await _until(func() -> bool: return door.running or WorldState.has_flag("beast_claim_accepted"), 15.0):
 		return _fail("night, Feyre home, the beast never came (player_inside=%s, can_start=%s)" % [door._player_inside, door.can_start()])
-	await _until(func() -> bool: return door.current_beat_label().begins_with("decision"), 20.0)
+	await _until(func() -> bool: return not is_instance_valid(door) or door.current_beat_label().begins_with("decision"), 20.0)
 	await _press(&"interact")
 	if not await _until(func() -> bool: return WorldState.has_flag("beast_claim_accepted"), 20.0):
-		return _fail("stuck at beat '%s'" % door.current_beat_label())
-	_note("choice: %s" % door.chosen_fact)
+		return _fail("stuck at beat '%s'" % (door.current_beat_label() if is_instance_valid(door) else "door gone"))
+	if is_instance_valid(door):
+		_note("choice: %s" % door.chosen_fact)
 	_pass()
 	if _beat.id == stop_after:
 		return
@@ -595,6 +596,11 @@ func _play() -> void:
 		if not walked_in:
 			return _fail("couldn't reach the manor estate on foot from the ride's end (now in %s, %.0f m off)" % [_region(), _flat(manor.center)])
 	_note("on the manor estate at %s" % _v(feyre.global_position))
+	var grade := (get_tree().get_first_node_in_group(World.GROUP) as World).grade
+	await _until(func() -> bool: return grade.target_id() == &"manor", 8.0)
+	_note("grade on arrival: %s" % grade.target_id())
+	if grade.target_id() != &"manor":
+		return _fail("the ride left the look on '%s', not the manor's grade" % grade.target_id())
 	await _wait(1.0)
 	var ground := _ground_at(feyre.global_position + Vector3.UP * 3.0, 3.0)
 	if not feyre.is_on_floor() or feyre.global_position.y < ground - 1.0:

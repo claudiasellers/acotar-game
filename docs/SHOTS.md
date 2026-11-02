@@ -42,6 +42,7 @@ Tips:
   The probe's output comes back in `logs/<label>.log`.
 - No answer usually means the Mac is asleep or the owner is playing. Keep working.
   Don't resubmit the same request; nothing is lost.
+- Manor probes show the game's look (`ShotLook`: the World's environment under a GradeDirector). Add `--preview-look` to a probe's arguments for the estate's preview sky; nothing in the game looks like that, so don't judge a look on it.
 - Generated content (terrain bake, woods cache) comes from the build queue's cache (`tools/mq/levels.sh`, `generated.conf`)
   and is rebuilt only when its inputs change. If you add a generator, add a line to `generated.conf`. Generators not listed there,
   such as the manor scatter today, need a `prep` line.

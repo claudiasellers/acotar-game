@@ -16,6 +16,8 @@ const GROUP := &"region_grade"
 ## Rectangles inside `rects` that belong to someone else.
 @export var holes: Array[Rect2] = []
 @export var blend_seconds := 4.0
+## How long the blend takes on the way out of here; 0 uses the next area's.
+@export var leave_seconds := 0.0
 
 
 func _ready() -> void:

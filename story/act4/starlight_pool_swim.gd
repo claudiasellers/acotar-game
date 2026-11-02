@@ -151,6 +151,8 @@ func _build_beats() -> Array:
 			Act4Walk.face(t, _feyre_pos())
 		EventBus.grade_swap_requested.emit(GRADE_DAY, 3.0), "golden hour"))
 	out.append(say(&"tamlin_after"))
+	out.append(Beats.run(func(_s: SceneSpace) -> void:
+		GradeDirector.release_story_holds(get_tree()), "grade back to the region"))
 	return out
 
 

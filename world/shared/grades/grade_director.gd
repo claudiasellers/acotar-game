@@ -26,6 +26,7 @@ var _seconds := 0.0
 ## While a story swap is in effect, region grades don't override it.
 var _story_hold := false
 var _region_grade: StringName = &""
+var _region: RegionGrade
 ## Story mood overlay (EventBus.mood_requested): "dread" drops the light about
 ## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft dark blur (the ride
 ## north); "calm" eases whatever is on back to 0.
@@ -134,6 +135,9 @@ func apply(base: GradePreset) -> void:
 		painted.set_shader_parameter(&"cloud_shade", p.cloud_shade)
 	env.ambient_light_color = p.ambient_color
 	env.ambient_light_energy = p.ambient_energy
+	env.ambient_light_sky_contribution = p.ambient_sky_contribution
+	env.tonemap_mode = p.tonemap_mode
+	env.sdfgi_enabled = p.sdfgi
 	env.fog_light_color = p.fog_color
 	env.fog_density = p.fog_density
 	env.fog_sky_affect = p.fog_sky_affect
@@ -184,6 +188,8 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	var cold := GradePreset.mix(p, _dread_preset, dread_weight(dread))
 	cold.id = p.id
 	cold.lut = p.lut
+	cold.tonemap_mode = p.tonemap_mode
+	cold.sdfgi = p.sdfgi
 	cold.snow_cover = p.snow_cover
 	return cold
 
@@ -252,14 +258,25 @@ func _update_region_grade() -> void:
 		var rg := node as RegionGrade
 		if rg.contains(focus.global_position):
 			if rg.grade != _region_grade:
+				var leaving := _region.leave_seconds if is_instance_valid(_region) else 0.0
 				_region_grade = rg.grade
-				swap_to(rg.grade, rg.blend_seconds)
+				_region = rg
+				swap_to(rg.grade, leaving if leaving > 0.0 else rg.blend_seconds)
 			return
 
 
 ## Story swaps hold until the story (or a test) releases them.
 func release_story_hold() -> void:
 	_story_hold = false
+
+
+## Hands the look back to the region grades. Every scene that swaps the grade
+## calls this when it's done with it; a hold left on hides every region's grade.
+static func release_story_holds(tree: SceneTree) -> void:
+	if tree == null:
+		return
+	for node in tree.root.find_children("*", "GradeDirector", true, false):
+		(node as GradeDirector).release_story_hold()
 
 
 func _update_sun() -> void:

@@ -83,11 +83,7 @@ static func night_grade(tree: SceneTree, on: bool, seconds: float = 3.0) -> void
 	if on:
 		EventBus.grade_swap_requested.emit(NIGHT_GRADE, seconds)
 		return
-	if tree == null:
-		return
-	for node in tree.root.find_children("*", "Node", true, false):
-		if node is GradeDirector:
-			(node as GradeDirector).release_story_hold()
+	GradeDirector.release_story_holds(tree)
 
 
 ## A gown fills her top and bottom at once (WardrobePiece.slots).

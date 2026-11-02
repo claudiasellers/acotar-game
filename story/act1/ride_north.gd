@@ -101,6 +101,8 @@ func _to_the_manor() -> Array:
 			path = drive_path()
 			progress = 0.0
 			_place(0.0)
+			# Spring was the crossing's; on the estate the manor grade takes over.
+			GradeDirector.release_story_holds(get_tree())
 			WorldStreamer.update_for(path.global_transform * path.curve.get_point_position(0))
 			# Game time (physics frames), not wall time: fixed-fps runs go faster.
 			deadline[0] = Engine.get_physics_frames() + LOAD_WAIT_SECONDS * Engine.physics_ticks_per_second, "the sentry gate"),

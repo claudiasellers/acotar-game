@@ -189,6 +189,8 @@ func _beat_for(step: Dictionary) -> SceneBeat:
 		"grade":
 			return Beats.run(func(_sp: SceneSpace) -> void:
 				EventBus.grade_swap_requested.emit(StringName(step.get("to", "spring")), s if s > 0.0 else 2.0), "grade")
+		"grade_release":
+			return Beats.run(func(_sp: SceneSpace) -> void: GradeDirector.release_story_holds(get_tree()), "grade release")
 		"grant":
 			return Beats.run(func(_sp: SceneSpace) -> void:
 				EventBus.story_item_granted.emit(StringName(step.get("item", "")), int(step.get("n", 1))), "grant")

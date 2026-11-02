@@ -4,8 +4,8 @@
 ## the rect's min corner: entrance_hall:10/1.5=10/20+2/14=18/17 saves _v1, _v2
 ## (from=to; the shots queue takes no '>').
 ## Loads the real estate, then stands a camera at eye height in a room's
-## corners, looking across it, and saves room_<id>_<a|b>.png. Day light from
-## the estate's preview sky through the windows, plus the rooms' own lamps.
+## corners, looking across it, and saves room_<id>_<a|b>.png. Lit as the game
+## lights it (ShotLook): day through the windows, plus the rooms' own lamps.
 extends Node
 
 const ESTATE := "res://world/spring_court/manor_estate/manor_estate.tscn"
@@ -27,7 +27,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		estate.call(&"_add_preview_environment")
+		ShotLook.dress(estate, &"manor_interior")
 	var feyre = estate.get(&"feyre")
 	if feyre is Node3D:
 		(feyre as Node3D).visible = false
