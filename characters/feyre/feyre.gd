@@ -432,15 +432,17 @@ func _update_recenter(delta: float) -> void:
 		_recentering = false
 
 
-## "Camera follows behind while running": a lazy swing behind her once the
-## player stops steering the camera. Not under a roof: each fresh press of a move
-## key steers from the swung camera (SteerFrame), so in a house of short runs and
-## corners the swings stack up and the camera spins with no look input.
+## "Camera follows behind while running": a lazy swing back to the frame the keys
+## are steering in, once the player stops steering the camera. Aimed at that frame
+## and not at her facing, because a fresh key press takes the camera as its frame:
+## following her facing, each press turned her and the camera further, a spiral
+## with no look input. Off under a roof, where the camera is the player's alone.
 func _follow_behind(delta: float) -> void:
 	if not GameSettings.camera_follow or not _running or _since_look < follow_delay \
-			or StoryControl.focus != null:
+			or StoryControl.focus != null or not steer_frame.is_held():
 		return
-	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, model.rotation.y, follow_speed * (1.0 - _indoor) * delta)
+	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, steer_frame.held_yaw(),
+			follow_speed * (1.0 - _indoor) * delta)
 
 
 func _remember_safe_spot(delta: float) -> void:
@@ -454,19 +456,22 @@ func _remember_safe_spot(delta: float) -> void:
 			_safe_spots.pop_front()
 
 
-## True under a roof (the manor, the cottage): BowVisual stows the slung bow.
+## True under a roof or in a manor room: BowVisual stows the slung bow.
 func is_indoors() -> bool:
 	return _indoor > 0.5
 
 
-## Is there a roof over her? Reads the ceiling height straight above the camera pivot.
+## Is there a roof over her? Reads the ceiling height straight above the camera
+## pivot; manor rooms count whether or not a collider roofs them (ManorIndoors).
 func _update_indoor(delta: float) -> void:
 	var from := _camera_rig.global_position
 	var hit := get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(
 			from, from + Vector3.UP * INDOOR_PROBE, WORLD_MASK, [get_rid()]))
 	var roofed := not hit.is_empty()
+	var ceiling: float = (hit.position as Vector3).y if roofed else ManorIndoors.ceiling_over(get_tree(), from)
+	roofed = not is_nan(ceiling)
 	if roofed:
-		_indoor_rise = clampf((hit.position as Vector3).y - from.y - INDOOR_CEILING_GAP, 0.0, INDOOR_RISE)
+		_indoor_rise = clampf(ceiling - from.y - INDOOR_CEILING_GAP, 0.0, INDOOR_RISE)
 	_indoor = move_toward(_indoor, 1.0 if roofed else 0.0, delta / 0.3)
 
 

@@ -31,3 +31,8 @@ func release() -> void:
 
 func is_held() -> bool:
 	return _held
+
+
+## The frame the keys are steering in (meaningful while is_held()).
+func held_yaw() -> float:
+	return _yaw

@@ -67,6 +67,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 		layouts = load_layouts()
 	var house := Node3D.new()
 	house.name = "House"
+	house.add_to_group(ManorIndoors.GROUP)
 	parent.add_child(house)
 	var all := ManorHouseIndex.new(layouts)
 	for room in all.rooms:
