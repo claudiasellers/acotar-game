@@ -1,0 +1,7 @@
+# mercenary clips (creatures/models/people/mercenary.gltf), 30 fps. Written by tools/blender/cast/build_minor_fae.py.
+# name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
+idle 0.000 5.000 1
+walk 1.300 0.933 1
+talk - 4.000 1
+flinch - 1.200 0
+bow - 2.400 0
