@@ -2,6 +2,8 @@ extends GutTest
 
 const SETTINGS_PATH := "user://test_map_settings.cfg"
 const MapPin := preload("res://ui/map/map_pin.gd")
+const PinMarker := preload("res://ui/map/pin_marker.gd")
+const FaeWind := preload("res://ui/map/fae_wind.gd")
 
 
 func before_each() -> void:
@@ -268,3 +270,52 @@ func test_cold_map_paint_needs_no_court_assets_lock() -> void:
 	assert_true(finished, "coarse map painted without CourtAssets' lock (%.1f s)" % secs)
 	await wait_physics_frames(3)
 	assert_gt(hud.map_texture.get_width(), 8, "the painted map replaced the blank paper")
+
+
+## The on-screen pin: over the spot when it is in view, on the screen edge
+## pointing the way when it is to the side, and on the bottom edge when behind.
+func test_pin_marker_places_and_clamps() -> void:
+	var cam := Camera3D.new()
+	add_child_autofree(cam)
+	cam.global_position = Vector3.ZERO  # looks down -Z (north)
+	var screen := Vector2(1920, 1080)
+	var ahead: Array = PinMarker.place_on_screen(cam, Vector3(0, 0, -100), screen)
+	assert_false(ahead[1], "in view: not on the edge")
+	assert_almost_eq((ahead[0] as Vector2).x, 960.0, 1.0)
+	var east: Array = PinMarker.place_on_screen(cam, Vector3(100, 0, -5), screen)
+	assert_true(east[1], "far to the right: clamped")
+	assert_almost_eq((east[0] as Vector2).x, 1920.0 - PinMarker.EDGE, 1.0)
+	assert_almost_eq(float(east[2]), PI / 2.0, 0.2, "points right")
+	var behind: Array = PinMarker.place_on_screen(cam, Vector3(-20, 0, 100), screen)
+	assert_true(behind[1], "behind: clamped")
+	assert_almost_eq((behind[0] as Vector2).y, 1080.0 - PinMarker.EDGE, 1.0, "on the bottom edge")
+	assert_lt((behind[0] as Vector2).x, 960.0, "on the side it lies (left)")
+
+
+## With a pin the wind gusts towards it and the marker shows; near it, the
+## wind falls quiet; without one, neither shows.
+func test_wind_and_marker_follow_the_pin() -> void:
+	var feyre := Node3D.new()
+	feyre.add_to_group(&"player")
+	add_child_autofree(feyre)
+	feyre.global_position = Vector3(-150.0, 0.0, 2160.0)
+	var hud := WorldMapHud.new()
+	add_child_autofree(hud)
+	await wait_physics_frames(2)
+	assert_false(hud.marker.visible, "no pin, no marker")
+	assert_false(hud.wind.gusting)
+	hud.set_pin(Vector2(150.0, 2160.0))  # due east
+	await wait_physics_frames(3)
+	assert_true(hud.marker.visible, "the pin shows on screen")
+	assert_true(hud.wind.gusting, "setting it starts a gust")
+	assert_almost_eq(hud.wind.heading.x, 1.0, 0.01, "the wind blows east, towards it")
+	await wait_seconds(FaeWind.GUST_SECONDS + 0.3)
+	assert_false(hud.wind.gusting, "a gust passes")
+	feyre.global_position = Vector3(135.0, 0.0, 2160.0)
+	hud.wind.gust()
+	await wait_physics_frames(3)
+	assert_false(hud.wind.gusting, "quiet near the pin, the beam takes over")
+	hud.clear_pin()
+	await wait_physics_frames(2)
+	assert_false(hud.marker.visible)
+
