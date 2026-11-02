@@ -52,7 +52,7 @@ static func texture_at(x: float, z: float) -> Vector3i:
 	# the snow overlay's weight over the mud (0 bare mud .. 255 all snow).
 	var n := _vnoise(x * 0.35, z * 0.35) * 0.65 + _vnoise(x * 1.3, z * 1.3) * 0.35  # 0..1
 	var snow := 255.0
-	var wet := false  # dark wet ground: ruts and slush puddles
+	var wet := false  # dark wet mud: ruts and slush puddles (frozen-earth paint; riverbed read as blue streams)
 	var dr := HumanRealmLayout.distance_to_road(p)
 	var hw := HumanRealmLayout.ROAD_HALF_WIDTH
 	if dr < hw + 4.5:
@@ -76,7 +76,7 @@ static func texture_at(x: float, z: float) -> Vector3i:
 			snow = sq_snow
 			wet = wet or (_vnoise(x * 0.5 + 3.0, z * 0.5 + 8.0) > 0.74 and ds < edge - 4.0)
 	if snow < 250.0:
-		return Vector3i(T.RIVERBED if wet else T.PATH, T.SNOW, int(clampf(snow * (0.6 if wet else 1.0), 0.0, 255.0)))
+		return Vector3i(T.FROZEN_EARTH if wet else T.PATH, T.SNOW, int(clampf(snow * (0.6 if wet else 1.0), 0.0, 255.0)))
 	if p.distance_to(HumanRealmLayout.BURNT_ESTATE) < 40.0:
 		return Vector3i(T.FROZEN_EARTH, T.SNOW, 110)
 	var dpath := HumanRealmLayout.distance_to_path(p)

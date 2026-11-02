@@ -447,16 +447,22 @@ def dead_bracken(b):
 @asset(800)
 def winter_grass_tuft(b):
     rng = b.rng
-    for k in range(18):
+    # Pale straw and buff, many soft drooping blades (audit A7: dark, stiff
+    # blades read as black stamped stars against the snow).
+    for k in range(30):
         a = rng.uniform(0, 6.28)
-        d = V((math.cos(a) * rng.uniform(0.2, 0.7), math.sin(a) * rng.uniform(0.2, 0.7), 1))
-        b.blade(V((math.cos(a) * 0.04, math.sin(a) * 0.04, 0)), d, rng.uniform(0.3, 0.5), 0.04,
-                "straw_dark", "straw", bend=0.35, segs=2)
+        d = V((math.cos(a) * rng.uniform(0.3, 0.9), math.sin(a) * rng.uniform(0.3, 0.9), 1))
+        b.blade(V((math.cos(a) * 0.06, math.sin(a) * 0.06, 0)), d, rng.uniform(0.25, 0.45), 0.028,
+                "straw", "buff", bend=0.5, segs=3)
 
 
 @asset(800)
 def snow_mound(b):
-    b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.25, flat_bottom=0.0)
+    # A smooth wind-carved drift, not a faceted lump: softer noise and
+    # smooth shading.
+    faces = b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.12, flat_bottom=0.0)
+    if faces:
+        b.smooth_faces.update(faces)
 
 
 @asset(1500)
