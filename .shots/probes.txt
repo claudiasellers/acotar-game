@@ -1,0 +1,5 @@
+from L47 seated pose views
+quality look
+size 1920x1080
+timeout 300
+shot pose res://tools/mount/ride_pose_shot.tscn {out}
