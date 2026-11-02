@@ -1,0 +1,3 @@
+from blight-lane
+quality look
+shot blight res://tools/playtest/p6_blight_clip.tscn {out}
