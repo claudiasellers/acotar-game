@@ -3,6 +3,8 @@
 ## ash arrow. E skins the nearest carcass. Not part of the story flow.
 extends Node3D
 
+const ArrowModel := preload("res://systems/bow/arrow_model.gd")
+
 const HILL := preload("res://world/shared/test_hill/test_hill.tscn")
 const HILL_SCRIPT := preload("res://world/shared/test_hill/test_hill.gd")
 const DEER := preload("res://creatures/prey/deer.tscn")

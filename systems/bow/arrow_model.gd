@@ -3,7 +3,9 @@
 ## vertex colours (R3). Arrows in flight, arrows stuck in things and the arrow
 ## nocked on her bow all use it, so none of them is a primitive grey box (F44).
 ## The tip points down -Z; `nock_z` is where the nock end sits.
-class_name ArrowModel
+## Loaded by path (no global class): a new class_name isn't registered until
+## the class cache is rebuilt, and a stale cache broke the bow (the arrow
+## script failed to compile, so she could not shoot).
 extends RefCounted
 
 const RADIUS := 0.0055
