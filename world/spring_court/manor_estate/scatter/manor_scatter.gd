@@ -211,6 +211,7 @@ static func footprints() -> Array[Rect2]:
 	out.append_array(ManorForecourt.footprints())
 	out.append_array(ManorOrchard.footprints())
 	out.append(ManorSitePlan.HEDGE_MAZE)   # the maze places its own (cell centres)
+	out.append_array(ManorReflectingPool.footprints())
 	return out
 
 
@@ -344,6 +345,8 @@ static func build_all() -> Array[ScatterLayer]:
 	ManorTerraceBuilder.plant(sb)
 	ManorRoseGarden.plant(sb)
 	ManorGardenRooms.plant(sb)
+	ManorReflectingPool.plant(sb)
+	ManorFrontGarden.plant(sb)
 	ManorHedgeMaze.plant(sb)
 	ManorGlassHouses.plant(sb)
 	ManorKitchenGarden.plant(sb)
