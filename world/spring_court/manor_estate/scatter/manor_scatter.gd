@@ -131,7 +131,7 @@ static func specs() -> Dictionary:
 
 const GARDEN_WIDE: Array[StringName] = [&"deco_iris", &"deco_snowdrop", &"deco_daffodil", &"deco_hydrangea", &"deco_hydrangea_pink",
 	&"deco_delphinium", &"deco_lupin", &"deco_hollyhock", &"deco_allium", &"deco_catmint", &"deco_foxglove_white", &"deco_foxglove",
-	&"deco_peony_white", &"deco_lilac", &"deco_wisteria", &"deco_buttercup", &"deco_peony"]
+	&"deco_peony_white", &"deco_lilac", &"deco_wisteria", &"deco_buttercup", &"deco_peony", &"deco_forget_me_not", &"deco_water_lily"]
 
 
 static func _f(s: Dictionary, id: StringName, look: Array, canon: String, wind: float, draw: float = 120.0) -> void:

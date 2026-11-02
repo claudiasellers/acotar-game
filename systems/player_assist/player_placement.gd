@@ -35,7 +35,10 @@ func load_state(data: Dictionary) -> void:
 	var scene := p.get_tree().current_scene
 	if scene and &"spawned" in scene:
 		scene.set(&"spawned", true)
-	p.global_position = at + Vector3.UP * 0.2
+	if p.has_method(&"teleport"):
+		p.call(&"teleport", at + Vector3.UP * 0.2)   # also stops a ledge climb mid-tween
+	else:
+		p.global_position = at + Vector3.UP * 0.2
 	var model := p.get(&"model") as Node3D
 	if model:
 		model.rotation.y = float(data.get("yaw", 0.0))

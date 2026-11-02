@@ -178,7 +178,7 @@ const ENTRIES := {
 	&"rose_standard_pink": [&"garden_rooms", Vector3(1.43, 2.43, 1.44), Color(0.98, 0.56, 0.70), false],
 	&"rose_standard_white": [&"garden_rooms", Vector3(1.43, 2.50, 1.44), Color(1.0, 0.95, 0.93), false],
 	&"rose_standard_apricot": [&"garden_rooms", Vector3(1.43, 2.36, 1.44), Color(1.0, 0.74, 0.55), false],
-	&"wisteria_bay": [&"garden_rooms", Vector3(5.75, 3.82, 3.64), Color(0.74, 0.62, 0.95), false],
+	&"wisteria_bay": [&"garden_rooms", Vector3(5.75, 4.02, 3.90), Color(0.74, 0.62, 0.95), false],
 	&"yew_hedge": [&"garden_rooms", Vector3(4.10, 3.07, 1.36), Color(0.16, 0.38, 0.27), true],
 	&"yew_hedge_arch": [&"garden_rooms", Vector3(4.04, 5.06, 1.40), Color(0.16, 0.38, 0.27), false],
 	&"box_edging": [&"garden_rooms", Vector3(1.66, 0.49, 0.42), Color(0.26, 0.52, 0.34), false],

@@ -30,6 +30,7 @@ const WALK_CLEAR := 3.0
 const GROVE := Rect2(131.0, -17.0, 33.0, 15.0)
 const EXEDRA := Vector2(170.0, WALK_Z)
 const EXEDRA_R := 5.5
+const POND_WALK_STEP := 12.0
 const LAWN_CHERRIES := [Vector2(92.0, 4.0), Vector2(110.0, 24.0), Vector2(70.0, 2.0)]
 
 
@@ -122,6 +123,7 @@ static func build(parent: Node3D) -> void:
 	for bx: float in [96.0, 106.0]:
 		b.prop_on_ground(&"garden_bench", bx, SOUTH_BED.end.y + 1.6, GardenKit.yaw_facing(Vector2(0.0, -1.0)))
 	_exedra(b)
+	_dress_pond_walk(b)
 	# a birdbath among the lawn cherries
 	b.prop_on_ground(&"birdbath", 82.0, 8.0)
 	GardenKit.tag_props(b)
@@ -146,8 +148,32 @@ static func _exedra(b: GroundsBatch) -> void:
 		b.prop_on_ground(&"topiary_cone", c.x - EXEDRA_R + 0.6, c.y + side * (EXEDRA_R + 0.4))
 
 
+## The walk from the forecourt to the jetty (ManorPond.path_to_jetty()) crossed
+## the lawn as a bare strip (audit E1): standard roses alternate along it with
+## faelight lanterns between.
+static func _dress_pond_walk(b: GroundsBatch) -> void:
+	var pts := ManorPond.path_to_jetty()
+	var k := 0
+	for i in pts.size() - 1:
+		var a := pts[i]
+		var c := pts[i + 1]
+		var dir := (c - a).normalized()
+		var side_n := Vector2(-dir.y, dir.x)
+		var t := 8.0 if i == 0 else 6.0
+		while t < a.distance_to(c) - 4.0:
+			var p := a + dir * t
+			var side := 1.0 if k % 2 == 0 else -1.0
+			var q := p + side_n * side * 2.4
+			b.prop_on_ground(&"rose_standard_white" if k % 4 < 2 else &"rose_standard_pink", q.x, q.y, k * 1.1)
+			var l := a + dir * (t + POND_WALK_STEP * 0.5) - side_n * side * 2.1
+			b.prop_on_ground(&"faelight_lantern", l.x, l.y, GardenKit.yaw_facing(side_n * side))
+			t += POND_WALK_STEP
+			k += 1
+
+
 static func plant(sb: ManorScatter) -> void:
 	var rng := EstateKit.rng("east_lawn_plant_v1")
+	_plant_pond_walk(sb)
 	# the borders, back to front: blush roses and peonies in alternating drifts
 	# against the wall, irises through the middle, catmint along the front,
 	# daffodils and snowdrops tucked in at the walk's edge
@@ -184,3 +210,20 @@ static func plant(sb: ManorScatter) -> void:
 	for c: Vector2 in LAWN_CHERRIES:
 		sb.put(&"deco_cherry_blossom", c.x, c.y, rng.randf() * TAU, rng.randf_range(0.95, 1.1))
 		GardenKit.drift(sb, &"deco_forget_me_not", c + Vector2(1.0, 1.5), 2.2, 10, rng)
+
+
+## Forget-me-not ribbons either side of the jetty walk, west of x 127 (the one
+## 128 m scatter chunk there already carries them), peonies at the roses' feet.
+static func _plant_pond_walk(sb: ManorScatter) -> void:
+	var rng := EstateKit.rng("pond_walk_plant_v1")
+	var a := ManorPond.path_to_jetty()[0]
+	var c := ManorPond.path_to_jetty()[1]
+	var dir := (c - a).normalized()
+	var side_n := Vector2(-dir.y, dir.x)
+	var t := 4.0
+	while t < a.distance_to(c) - 2.0:
+		for side: float in [-1.0, 1.0]:
+			var p := a + dir * t + side_n * side * (1.5 + 0.5)
+			if p.x < 127.0:
+				sb.put(&"deco_forget_me_not", p.x + rng.randf_range(-0.2, 0.2), p.y + rng.randf_range(-0.2, 0.2), rng.randf() * TAU, rng.randf_range(0.8, 1.05))
+		t += 1.1
