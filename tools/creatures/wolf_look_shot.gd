@@ -64,7 +64,9 @@ func _run() -> void:
 	world.add_child(wolf)
 	wolf.global_position = _ground(at)
 	wolf.prey = doe
-	wolf.state = GreatWolf.State.HOLD_PREY  # stands still; the face and clips keep ticking
+	# Frozen where he's put: a moving body can drop through terrain whose
+	# collision hasn't streamed in yet, and the cameras would follow him down.
+	wolf.set_physics_process(false)
 	_cam = Camera3D.new()
 	_cam.fov = 50.0
 	world.add_child(_cam)
@@ -86,7 +88,10 @@ func _run() -> void:
 	print("wolf: tris %d, draw calls in frame %d with / %d without = +%d" % [tris, with_wolf, without, with_wolf - without])
 	await _save(_out + "/hunt.png")
 	# His face, three-quarter, snarling.
-	Faces.express(&"great_wolf", &"lunge")
+	# The lunge face (L36-3's preset), set on the SnarlModifier directly since
+	# the face only ticks with physics.
+	for snarl in wolf.find_children("Snarl", "SnarlModifier", true, false):
+		(snarl as SnarlModifier).weights = {&"jaw_open": 1.0, &"ears_back": 1.0, &"head_low": 0.3}
 	var sk := wolf.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	var head := sk.global_transform * sk.get_bone_global_pose(sk.find_bone(&"muzzle")).origin
 	_look(head + wolf.global_basis * Vector3(1.3, 0.25, -1.6), head + Vector3.DOWN * 0.05)
