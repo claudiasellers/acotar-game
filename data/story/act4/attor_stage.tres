@@ -6,19 +6,19 @@
 script = ExtResource("1")
 marks = {
 "attor_land": Vector3(20, 0, -24),
-"attor_near": Vector3(-4, 0, -3),
+"attor_near": Vector3(-1.5, 0, -8),
 "attor_prowl": Vector3(8, 0, -11),
 "confront": Vector3(13, 0, -16),
-"hedge_e": Vector3(-2.2, 0, 3.4),
-"hedge_n": Vector3(-5, 0, 0.6),
-"hedge_w": Vector3(-7.8, 0, 3.4),
-"hide": Vector3(-5, 0, 3.2),
+"hedge_n": Vector3(-6.5, 0, -9.3),
+"hedge_s": Vector3(-6.5, 0, -3.7),
+"hedge_w": Vector3(-9.3, 0, -6.5),
+"hide": Vector3(-6.5, 0, -6.5),
 "lucien_at": Vector3(18, 0, -13),
 "lucien_in": Vector3(38, 0, 9),
 "roses": Vector3(10, 0, -8),
-"tamlin_back": Vector3(-4.6, 0, 6.2),
+"tamlin_back": Vector3(-3, 0, -6.5),
 "tamlin_idle": Vector3(5, 0, -4),
-"tamlin_round": Vector3(1, 0, 7.5)
+"tamlin_round": Vector3(2, 0, -8)
 }
 lines = {
 "attor_1": {
@@ -56,4 +56,4 @@ lines = {
 }
 extra_require = PackedStringArray()
 invented = PackedStringArray()
-canon = "Ch19 (Keeper, 2026-11-02, book-checked). DAYTIME ('despite the warmth of the day'). Walking back into the gardens on a gravel path, the garden goes horribly still. Tamlin snarls 'Stay hidden, and no matter what you overhear, don't come out' and is gone; there is NO push: she ducks behind a hedge herself and nearly bolts for the stables but freezes. Through dense leaves she watches Tamlin and Lucien face someone invisible: a low, disembodied, deep and sibilant voice, a hiss, a chuckle like sand shifting; at the end a flap of leathery wings, a foul wind, silence; then Tamlin: 'It's gone.' Every line here is [V] (Keeper-confirmed wording). Tamlin's glamour hid her from it (ch24). X: the yew pocket by the arbor, the rustle/detection mechanic and its permanent fact, the gravel pressed by unseen feet. Marks are in the attor_hiding_spot anchor's frame (-40, -105.5, under the arbor near the house; -Z faces the rose garden)."
+canon = "Ch19 (Keeper, 2026-11-02, book-checked). DAYTIME ('despite the warmth of the day'). Walking back into the gardens on a gravel path, the garden goes horribly still. Tamlin snarls 'Stay hidden, and no matter what you overhear, don't come out' and is gone; there is NO push: she ducks behind a hedge herself and nearly bolts for the stables but freezes. Through dense leaves she watches Tamlin and Lucien face someone invisible: a low, disembodied, deep and sibilant voice, a hiss, a chuckle like sand shifting; at the end a flap of leathery wings, a foul wind, silence; then Tamlin: 'It's gone.' Every line here is [V] (Keeper-confirmed wording). Tamlin's glamour hid her from it (ch24). X: the yew pocket on the lawn west of the arbor (open to the east, toward Tamlin; clear of the house's walled walk, which runs x -42..-38 from the terrace), the rustle/detection mechanic and its permanent fact, the gravel pressed by unseen feet. Marks are in the attor_hiding_spot anchor's frame (-40, -105.5, under the arbor near the house; -Z faces the rose garden)."

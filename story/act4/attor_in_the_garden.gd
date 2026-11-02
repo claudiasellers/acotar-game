@@ -39,8 +39,9 @@ const PROWL_SPEED := 1.3
 const TAMLIN_STRIDE := 4.6
 const PRESENCE_RANGE := 70.0
 const HEDGES := [
-	# [mark, yaw degrees]: a U of yew round the pocket, open to the house.
-	[&"hedge_n", 0.0], [&"hedge_w", 90.0], [&"hedge_e", 90.0],
+	# [mark, yaw degrees]: a U of yew round the pocket on the lawn west of
+	# the arbor, open to the east, toward Tamlin and the walk the thing prowls.
+	[&"hedge_n", 0.0], [&"hedge_w", 90.0], [&"hedge_s", 0.0],
 ]
 
 ## true while the Attor is there and she has to keep still.

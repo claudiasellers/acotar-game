@@ -160,6 +160,10 @@ func _starlight_pool() -> bool:
 		await pt._walk_to(swim.mark(m), 4.0, func() -> bool: return swim.found)
 		if swim.found:
 			break
+	if not swim.found:
+		# Over the lip, looking down at the water (the walker stops short of a mark).
+		var lip: Vector3 = swim.mark(&"pool") + (swim.mark(&"tamlin_rim") - swim.mark(&"pool")).normalized() * (StarlightPoolSwim.RIM_REACH - 8.0)
+		await pt._walk_to(lip, 2.0, func() -> bool: return swim.found, 30.0)
 	pt._release_all()
 	if not await pt._until(func() -> bool: return swim.dared, 60.0):
 		pt._fail("Tamlin never said 'Jump in' (found %s, beat %s)" % [swim.found, swim.current_beat_label()])
@@ -209,7 +213,7 @@ func _painting() -> bool:
 
 ## L44 (ch19): out of the house by the front doors, round the west side into
 ## the rose garden by day. Tamlin on the west walk; the garden goes still; she
-## goes into the yew pocket by the arbor (round its open south side) and
+## goes into the yew pocket on the lawn west of the arbor (open to the east) and
 ## stands still with no key held until it's gone: attor_evaded, no
 ## fact.attor_detected.
 func _attor() -> bool:
@@ -239,9 +243,8 @@ func _attor() -> bool:
 		return false
 	pt._pass()
 
-	pt._begin("attor:hide", "into the yew pocket by the arbor, round its open side, within the window")
-	await pt._walk_to(scene.mark(&"tamlin_round"), 1.2, Callable(), 6.0)
-	await pt._walk_to(scene.mark(&"tamlin_back") + Vector3(0, 0, 1.0), 1.0, func() -> bool: return scene.in_pocket(), 6.0)
+	pt._begin("attor:hide", "into the yew pocket west of the arbor, through its open east side, within the window")
+	await pt._walk_to(scene.mark(&"tamlin_back"), 1.0, func() -> bool: return scene.in_pocket(), 6.0)
 	await pt._walk_to(scene.mark(&"hide"), 0.6, Callable(), 5.0)
 	pt._release_all()
 	if not await pt._until(func() -> bool: return scene.watching, 4.0):
