@@ -1,0 +1,4 @@
+from L36 creature faces
+quality look
+size 1920x1080
+shot creature_faces res://tools/faces/creature_faces_shot.tscn {out}
