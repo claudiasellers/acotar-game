@@ -11,6 +11,10 @@
 ## an outer layer's vertex lies in front of each along its normal, in the rest pose.
 ## What shows through an opening (a neckline's chest, a sleeve's wrist) has nothing
 ## in front of it, so it stays.
+##
+## Feyre is left alone: her wardrobe already hides the body regions each piece
+## covers, and the base layer under it is hers (BaseLayer). Her trousers show through
+## her tunic standing as well as sitting, which is a fault of the pair, not of the pose.
 class_name SeatSkinFit
 extends RefCounted
 
@@ -33,6 +37,8 @@ static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 	if skeleton == null or skeleton.find_bone("Hips") < 0:
 		return
 	var holder := _figure_root(skeleton)
+	if holder.find_child("BaseLayer", true, false) != null:
+		return
 	if not seated:
 		for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
 			if mi.has_meta(ORIGINAL):
