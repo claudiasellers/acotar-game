@@ -82,6 +82,8 @@ func _place_shot(id: String) -> Array:
 	var raised := id.begins_with("placeup_")
 	var place_id := StringName(id.substr(8 if raised else 6))
 	var s := PlaceComposer.table().find(place_id)
+	if s == null:
+		s = PlaceComposer.table("res://data/places/woods_places.tres").find(place_id)
 	var back := PlaceComposer.approach(s)
 	var dist := s.radius + (38.0 if raised else 15.0)
 	return [s.center + back * dist, s.center, 24.0 if raised else 1.7, 0.42, 0.0]
