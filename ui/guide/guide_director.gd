@@ -48,6 +48,12 @@ func refresh(has_flag: Callable) -> bool:
 	return true
 
 
+## A loaded game: the current need counts as already announced.
+func resume() -> void:
+	announced = true
+	ever_shown = true
+
+
 ## Something in the story moved: the stall clock starts again.
 func note_progress() -> void:
 	stall = 0.0

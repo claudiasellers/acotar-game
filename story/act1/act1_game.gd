@@ -13,6 +13,7 @@ const FEYRE_SCENE := preload("res://characters/feyre/feyre.tscn")
 const HUD_SCRIPT := preload("res://ui/debug_hud.gd")
 const PHASES := preload("res://data/phases/spring_court_phases.tres")
 const SPAWNER := "res://creatures/story_spawner.gd"
+const TITLE_SCENE := "res://ui/title/title_screen.tscn"
 
 @export var start_region: StringName = &"cottage"
 @export var start_anchor: StringName = &"opening_cottage_dawn"
@@ -24,13 +25,19 @@ const SPAWNER := "res://creatures/story_spawner.gd"
 var world: Node3D
 var feyre: Feyre
 var spawned: bool = false
+## Over the world while Continue brings her back; gone once she has ground.
+var veil: LoadingVeil
 var _wait: float = 0.0
 
 
 func _ready() -> void:
+	var loading := GameSettings.pending_load_slot != ""
+	if loading and not _begin_continue():
+		return
 	if PhaseManager.phase_set == null:
 		PhaseManager.start(PHASES)
-	Clock.from_dict({"time_of_day": 0.27, "day": Clock.day})
+	if not loading:
+		Clock.from_dict({"time_of_day": 0.27, "day": Clock.day})
 	world = (load(WORLD_SCENE) as PackedScene).instantiate() as Node3D
 	add_child(world)
 	var regions_parent: Node3D = world.get_node_or_null(^"Regions") as Node3D
@@ -42,6 +49,12 @@ func _ready() -> void:
 	feyre = FEYRE_SCENE.instantiate()
 	var start := WorldStreamer.get_region(start_region)
 	feyre.position = (start.center if start else Vector3.ZERO) + Vector3.UP * 2.0
+	# Continue never passes through the cottage: the first regions asked for are
+	# the ones she stands in (PlayerPlacement holds her until there's ground).
+	var saved := PlayerPlacement.saved_position(SaveSystem.loading_state(PlayerPlacement.KEY))
+	if loading and saved != Vector3.INF:
+		feyre.position = saved + Vector3.UP * 0.2
+		spawned = true
 	add_child(feyre)
 	feyre.set_physics_process(false)
 	WorldStreamer.track(feyre)
@@ -69,6 +82,20 @@ func _ready() -> void:
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
 	add_child(MountDirector.new())
+
+
+## Restores the story before anything is built, behind the loading veil. A save
+## that can't be read goes back to the title: a new game here would overwrite it.
+func _begin_continue() -> bool:
+	var err := SaveSystem.begin_load(GameSettings.pending_load_slot)
+	if err != OK:
+		push_error("Act1Game: can't load '%s' (%s)" % [GameSettings.pending_load_slot, error_string(err)])
+		GameSettings.pending_load_slot = ""
+		get_tree().change_scene_to_file.call_deferred(TITLE_SCENE)
+		return false
+	veil = LoadingVeil.new()
+	add_child(veil)
+	return true
 
 
 func _process(delta: float) -> void:
