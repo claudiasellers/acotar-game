@@ -80,7 +80,12 @@ static func uv_to_world(uv: Vector2) -> Vector2:
 ## Paints the whole map. threaded = false for callers already on a thread.
 ## `cancel` is a shared [bool]: set cancel[0] = true from another thread and
 ## build stops after the current row and returns null.
-static func build(metres_per_pixel: float, threaded: bool = true, cancel: Array = [false]) -> Image:
+## `trees` is tree_points() gathered by the caller; pass it when building on a
+## thread of your own (F37): gathering loads scatter, region scenes and court
+## meshes, and a load off the main thread can deadlock against CourtAssets'
+## lock. Left null, it is gathered here (fine on the main thread).
+static func build(metres_per_pixel: float, threaded: bool = true, cancel: Array = [false],
+		trees: Variant = null) -> Image:
 	var size := image_size(metres_per_pixel)
 	var w := size.x
 	var h := size.y
@@ -124,7 +129,12 @@ static func build(metres_per_pixel: float, threaded: bool = true, cancel: Array 
 		return null
 
 	# 2. Tree canopy density from scatter, softened.
-	var canopy := _canopy_density(w, h, step)
+	var points: Array[PackedFloat32Array] = []
+	if trees == null:
+		points = tree_points()
+	else:
+		points.assign(trees)
+	var canopy := _canopy_density(w, h, step, points)
 	if cancel[0]:
 		return null
 
@@ -291,11 +301,11 @@ static func _noise(seed: int, frequency: float, octaves: int) -> FastNoiseLite:
 	return n
 
 
-static func _canopy_density(w: int, h: int, step: float) -> PackedFloat32Array:
+static func _canopy_density(w: int, h: int, step: float, points: Array[PackedFloat32Array]) -> PackedFloat32Array:
 	var grid := PackedFloat32Array()
 	grid.resize(w * h)
 	var rect := WorldMap.MAP_RECT
-	for inst in tree_points():
+	for inst in points:
 		for k in range(0, inst.size() - 4, 5):
 			var col := int((inst[k] - rect.position.x) / step)
 			var row := int((inst[k + 2] - rect.position.y) / step)
