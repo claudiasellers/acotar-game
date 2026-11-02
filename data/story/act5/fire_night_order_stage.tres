@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"door": Vector3(-4, 0, -1),
+"feyre_look": Vector3(0.5, 0, -1),
+"out": Vector3(-12.5, 0, -1),
+"tamlin": Vector3(2.5, 0, -3)
+}
+lines = {
+"calanmai": {"text": "It's Calanmai. I have to go.", "who": "Tamlin"},
+"drums": {"text": "Far off on the hills, the drums begin.", "who": ""},
+"dusk": {"text": "Dying sunlight through the hall. He's bare to the waist but for the baldric.", "who": ""},
+"lock": {"text": "Go to your chamber. Lock your doors, set up a snare, whatever you do.", "who": "Tamlin"},
+"rite": {"text": "As a High Lord, I have to partake in the Great Rite.", "who": "Tamlin"}
+}
+invented = PackedStringArray("drums", "dusk")
+canon = "Ch20 (Keeper 2026-11-02, [C]): Tamlin alone, at dusk in the hall, shirtless but for the baldric, armed. 'It's Calanmai... I have to go.' 'As a High Lord, I have to partake in the Great Rite.' 'Go to your chamber... Lock your doors, set up a snare, whatever you do.' Lucien isn't there. She locks herself in; by ten she follows the drums."

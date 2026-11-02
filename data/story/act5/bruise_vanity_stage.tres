@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"mirror": Vector3(18.85, 1.35, 4.4),
+"stand": Vector3(17.9, 0, 4.4),
+"vanity": Vector3(18.85, 0, 4.4)
+}
+lines = {
+"bruise": {"text": "An enormous bruise, where his teeth held me.", "who": ""},
+"open": {"text": "I open the collar of my tunic farther. Let them look.", "who": ""},
+"scarf": {"text": "A scarf would cover it.", "who": ""}
+}
+invented = PackedStringArray("scarf")
+canon = "Ch22 (Keeper, [C]): the servants sleep in; she draws her own bath and sits at the vanity: 'an enormous bruise'. She looks for a scarf, then 'opened the collar of my tunic farther'. Her blue tunic, not a gown."

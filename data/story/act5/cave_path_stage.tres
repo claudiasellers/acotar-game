@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"cave": Vector3(0, 0, -18),
+"lucien_from": Vector3(10, 0, -18)
+}
+lines = {
+"arm": {"text": "His arm is still round my shoulders.", "who": ""},
+"enjoy": {"text": "Enjoy the Rite.", "who": "The stranger"},
+"fool": {"text": "Useless human fool.", "who": "Lucien"},
+"fun": {"text": "Just some Fire Night fun.", "who": "A faerie"},
+"looking": {"text": "There you are. I've been looking for you.", "who": "The stranger"},
+"pinned": {"text": "Hands on my arms, pulling them away from my knives. Their eyes are black all the way through.", "who": ""},
+"sack": {"text": "He throws me over his shoulder like a sack of potatoes, and the night blurs past.", "who": ""},
+"thanks": {"text": "Thank you for finding her for me.", "who": "The stranger"},
+"trouble": {"text": "Enjoy the Rite, then. Try to stay out of trouble.", "who": "The stranger"}
+}
+invented = PackedStringArray("arm", "pinned", "sack")
+canon = "Ch20-21 (Keeper, [C]): by a bonfire near the trees the three unmasked lesser faeries ('Just some Fire Night fun') pin her arms away from her knives and shove her; a stranger catches her: 'There you are. I've been looking for you.' His arm round her shoulders; 'Thank you for finding her for me... Enjoy the Rite'; they scuttle off. Black hair, violet eyes, all-black fine clothes, no mask. She steps out of his arm; 'Enjoy the Rite, then. Try to stay out of trouble.' SHE walks away; he doesn't vanish. Lucien finds her by the cave path ('Useless human fool'), throws her over his shoulder 'like a sack of potatoes' and runs at fae speed; the horse is left."
