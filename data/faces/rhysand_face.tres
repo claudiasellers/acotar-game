@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"rhysand"
+canon = "Unmasked, the only High Fae at Spring without one [C]. A half smile and a lazy smile [C ch20]; \"his perfect face\" [C ch26]; a lover's purr of a voice [C ch20]. Amused, still and cold; menace worn as a smile; never openly afraid [X]. Added by L49 with his new face."
+masked = false
+rest = &"half_smile"
+blink_min = 3.0
+blink_max = 6.5
+presets = {
+"amused": { "brow_up_L": 0.25, "mouth_side_R": 0.4, "smile_R": 0.85, "squint_R": 0.3 },
+"cold": { "brow_down_L": 0.15, "brow_down_R": 0.15, "lip_press": 0.25, "squint_L": 0.2, "squint_R": 0.2 },
+"half_smile": { "mouth_side_R": 0.12, "smile_R": 0.32 },
+"laugh": { "jaw_open": 0.18, "lips_part": 0.4, "smile_L": 0.8, "smile_R": 0.8, "squint_L": 0.35, "squint_R": 0.35 },
+"lazy_smile": { "blink_L": 0.22, "blink_R": 0.22, "smile_L": 0.35, "smile_R": 0.65 },
+"menace": { "brow_down_L": 0.35, "brow_down_R": 0.35, "lips_part": 0.15, "smile_R": 0.4, "squint_L": 0.45, "squint_R": 0.45 },
+"unreadable": { "blink_L": 0.28, "blink_R": 0.28, "lip_press": 0.18 }
+}
+aliases = {
+"neutral": "half_smile",
+"happy": "lazy_smile",
+"laugh": "laugh",
+"smirk": "amused",
+"tender": "lazy_smile",
+"angry": "cold",
+"fury": "menace",
+"contempt": "amused",
+"disgust": "cold",
+"sad": "unreadable",
+"grief": "unreadable",
+"afraid": "unreadable",
+"terror": "cold",
+"surprise": "amused",
+"pained": "unreadable",
+"weary": "unreadable",
+"guarded": "unreadable",
+"pleading": "unreadable"
+}
+tics = [{ "hold": 0.8, "max": 14.0, "min": 7.0, "preset": "amused", "weight": 0.45 }]
