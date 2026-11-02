@@ -814,8 +814,7 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)))
 				var hop := p - from
 				hop.y = 0.0
-				feyre.global_position = p
-				feyre.velocity = Vector3.ZERO
+				feyre.teleport(p)   # the jump just pressed may have started a ledge climb
 				_log("    stuck at %s in %s (%s), hopping %.0f m to %s" % [_v(from), _region(), why, hop.length(), _v(p)])
 				_hop_causes[why.get_slice(" ", 0)] = int(_hop_causes.get(why.get_slice(" ", 0), 0)) + 1
 				hops += 1

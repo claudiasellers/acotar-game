@@ -38,6 +38,9 @@ func _ready() -> void:
 	add_child(mount_point)
 	_destination = global_position if is_inside_tree() else position
 	animator = MareAnimator.attach(model, self)
+	# She is under the chase camera's line to the rider: never fade her (CameraFade).
+	for g in find_children("*", "GeometryInstance3D", true, false):
+		g.add_to_group(CameraFade.NEVER_GROUP)
 
 
 ## Where a rider's hips sit, riding the spine bone through each stride.

@@ -51,13 +51,10 @@ def house_wattle():
     a.box((w, d, 2.5), (0, 0, 0.35 + 1.25), C["daub_grey"], bevel=0.08)
     a.timber_frame(w, d, 0.35, 2.5, posts=2, braces=False)
     a.gable_fill(w, d, 2.85, 2.5, C["daub_grey"])
-    # An old thatch: the ridge has settled between the gables and the snow has
-    # slid off in places, showing mended patches (audit A7: lived in, poor).
+    # An old thatch: the ridge has
+    # settled between the gables (audit A7: lived in, poor).
     nr = a._mark()
     a.gable_roof(w, d, 2.85, 2.5, C["thatch"], overhang=0.7, thick=0.5, snow_depth=0.28, bevel=0.18)
-    a.roof_patch(d, 2.85, 2.5, 0.7, 0.5, 0.28, 1.4, 0.55, -1, (1.5, 1.1), C["thatch_old"])
-    a.roof_patch(d, 2.85, 2.5, 0.7, 0.5, 0.28, -0.6, 0.75, -1, (1.0, 0.7), C["thatch"])
-    a.roof_patch(d, 2.85, 2.5, 0.7, 0.5, 0.28, -1.5, 0.5, 1, (1.3, 0.9), C["thatch_old"])
     a.bend_since(nr, 0.22, w * 0.5 + 0.75)
     a.chimney(-2.3, 0.6, 0.0, 6.4, w=0.65)
     a.door(0.8, -d / 2, w=1.0, h=1.9)
@@ -102,7 +99,6 @@ def house_croft():
     a.gable_fill(w, d, 2.3, 2.2, C["stone"])
     nr = a._mark()
     a.gable_roof(w, d, 2.3, 2.2, C["thatch"], overhang=0.6, thick=0.45, snow_depth=0.3, bevel=0.16)
-    a.roof_patch(d, 2.3, 2.2, 0.6, 0.45, 0.3, -0.9, 0.6, -1, (1.2, 0.9), C["thatch_old"])
     a.bend_since(nr, 0.14, w * 0.5 + 0.65)
     a.chimney(w / 2 - 0.2, 0.0, 0.0, 5.3, col=C["stone_dark"], w=0.6)
     a.door(-0.9, -d / 2, w=0.95, h=1.8)
@@ -123,7 +119,6 @@ def house_leanto():
     a.gable_fill(w, d, 2.4, 2.3, C["stone"], x0=bx)
     nr = a._mark()
     a.gable_roof(w, d, 2.4, 2.3, C["thatch_old"], overhang=0.55, thick=0.45, snow_depth=0.26, bevel=0.16, x0=bx)
-    a.roof_patch(d, 2.4, 2.3, 0.55, 0.45, 0.26, -0.8, 0.6, -1, (1.3, 1.0), C["thatch"], x0=bx)
     a.bend_since(nr, 0.12, w * 0.5 + 0.6, bx)
     a.chimney(bx - w / 2 + 0.3, 0.3, 0.0, 5.4, col=C["stone_dark"], w=0.6)
     a.door(bx - 0.9, -d / 2, w=0.95, h=1.85)

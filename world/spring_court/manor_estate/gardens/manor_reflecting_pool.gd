@@ -164,10 +164,13 @@ static func plant(sb: ManorScatter) -> void:
 	for side: float in [-1.0, 1.0]:
 		var x := AXIS_X + side * (HALF_W + COPING + 0.9)
 		GardenKit.fill_line(sb, &"deco_iris", PackedVector2Array([Vector2(x, SOUTH_Z - 1.0), Vector2(x, NORTH_Z + 1.0)]), 1.1, rng)
-	# water lilies at the near end of the pool
-	for i in 10:
-		var lz := SOUTH_Z - rng.randf_range(2.0, 12.0)
-		sb.put_at(&"deco_water_lily", Vector3(AXIS_X + rng.randf_range(-HALF_W + 1.2, HALF_W - 1.2), wy + 0.02, lz), rng.randf() * TAU)
+	# water lilies along both edges at the near end, a few drifting toward the
+	# middle (kept south of z -256 so they share one scatter chunk row)
+	for i in 26:
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var lz := SOUTH_Z - rng.randf_range(1.5, 19.0)
+		var inset := rng.randf_range(0.7, 1.9) if i % 5 != 0 else rng.randf_range(2.2, 4.2)
+		sb.put_at(&"deco_water_lily", Vector3(AXIS_X + side * (HALF_W - inset), wy + 0.02, lz), rng.randf() * TAU, rng.randf_range(0.85, 1.2))
 	# daisy meadows beyond the allée (the deer park's own flower, so no new draw calls)
 	for m: Rect2 in MEADOWS:
 		for i in 22:
