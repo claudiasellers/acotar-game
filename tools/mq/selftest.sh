@@ -843,11 +843,35 @@ case_parse_error_fails_fast() {
 }
 
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky flaky_last \
+case_test_when() {
+	bake_repo testwhen
+	commit_build 'mkdir tests zone; echo "# gate: when:zone/*,*.x" > tests/test_s.gd; : > tests/test_u.gd; echo "@gut tests" >> tools/mq/gate.conf'
+	local base
+	base=$(in_build git rev-parse HEAD)
+	commit_build 'echo one > other.txt'
+	gate off --base "$base"; expect "gate passes" test "$?" = 0
+	expect "a scoped test the change doesn't touch is skipped" not ran gut:tests/test_s.gd
+	expect "and the plan says why" grep -q '^SKIP gut:tests/test_s.gd' "$GATE_OUT/plan.txt"
+	expect "an unscoped test still runs" ran gut:tests/test_u.gd
+	commit_build 'echo two > zone/a'
+	gate on --base "$base"; expect "gate passes again" test "$?" = 0
+	expect "a change under its pattern runs it" ran gut:tests/test_s.gd
+	in_build git checkout -q --detach "$base"
+	commit_build 'echo three > b.x'
+	gate ext --base "$base"; expect "a second pattern in the list runs it" ran gut:tests/test_s.gd
+	in_build git checkout -q --detach "$base"
+	commit_build 'echo four > tests/test_s.gd'
+	gate own --base "$base"; expect "a change to the test file itself runs it" ran gut:tests/test_s.gd
+	in_build git checkout -q --detach "$base"
+	commit_build 'echo five > other.txt'
+	gate full; expect "an idle gate (no --base) runs everything" ran gut:tests/test_s.gd
+}
+
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
 		build_known_red needs_nothing marker_check script_uid miss_message stamp_without_output \
-		import_before_build stale_class_cache parse_error_fails_fast; do
+		import_before_build stale_class_cache parse_error_fails_fast test_when; do
 	scenario "$c"
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
