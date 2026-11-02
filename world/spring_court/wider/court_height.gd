@@ -67,12 +67,13 @@ static func height_at(x: float, z: float) -> float:
 		var s: Array = STAMPS[i]
 		if s[0] == K.NOTCH:
 			h = _apply(i, s, x, z, h)
-	h = _carve_river(x, z, h)
 	for i in STAMPS.size():
 		var s: Array = STAMPS[i]
 		if s[0] == K.BASIN:
 			h = _apply(i, s, x, z, h)
-	return h
+	# Last, so a lake's raised rim (the Looking Lake's reaches the Thornwater)
+	# can't bury the channel the water is laid in.
+	return _carve_river(x, z, h)
 
 
 ## Ground textures (WorldHeight.Tex slots): blight in the Reaches, leaf litter in
@@ -118,9 +119,25 @@ static func prewarm() -> void:
 		_centre(i, STAMPS[i])
 
 
-## Water surface height of the Thornwater near a point (bank level less a metre).
+## How far the water stands above the carved bed on the river's centreline.
+const RIVER_WATER_DEPTH := 0.5
+
+
+## Water surface height of the Thornwater near a point: the real carved bed
+## (WorldHeight, so village pads and other providers count) on the nearest
+## centreline point, plus RIVER_WATER_DEPTH. Level across the channel.
 static func river_level_at(x: float, z: float) -> float:
-	return MacroHeight.land_height_at(x, z) - 1.0
+	var p := Vector2(x, z)
+	var best := INF
+	var at := p
+	var pts := MacroHeight.THORNWATER
+	for i in pts.size() - 1:
+		var q := Geometry2D.get_closest_point_to_segment(p, pts[i], pts[i + 1])
+		var d := p.distance_squared_to(q)
+		if d < best:
+			best = d
+			at = q
+	return WorldHeight.height_at(at.x, at.y) + RIVER_WATER_DEPTH
 
 
 static func _centre(i: int, s: Array) -> float:

@@ -423,7 +423,7 @@ func _highest_near(p: Vector2, radius: float) -> Vector2:
 
 ## The Thornwater's surface where the court lays it (CourtHeight.river_level_at).
 func _river_water(p: Vector2) -> float:
-	return MacroHeight.land_height_at(p.x, p.y) - 1.0
+	return CourtHeight.river_level_at(p.x, p.y)
 
 
 func _ground3(p: Vector2) -> Vector3:
