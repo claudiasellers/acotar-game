@@ -12,15 +12,18 @@
 ## What shows through an opening (a neckline's chest, a sleeve's wrist) has nothing
 ## in front of it, so it stays.
 ##
-## Feyre is left alone: her wardrobe already hides the body regions each piece
-## covers, and the base layer under it is hers (BaseLayer). Her trousers show through
-## her tunic standing as well as sitting, which is a fault of the pair, not of the pose.
+## Feyre's wardrobe already hides the body regions each piece covers, so her body and
+## the base layer under it (BaseLayer) are left alone, and nothing is drawn under her
+## trousers. They keep what faces forward: the thigh swings out from under a hem, and
+## a hole there would look right through her (T053).
 class_name SeatSkinFit
 extends RefCounted
 
 ## How far in front of a vertex cloth counts as covering it, and the widest cone (cosine) it may sit in.
 const REACH := 0.08
 const COVER_COS := 0.3
+## How far forward a vertex of a figure's last layer may face and still go (a dot with her front).
+const KEEP_FRONT := -0.1
 ## Body surfaces that lie under the clothes. Arms and hands are drawn as they are.
 const BODY_LAYERS := ["torso", "legs"]
 ## Garment name fragments, by layer (1 is worn next to the body). Anything else
@@ -37,15 +40,15 @@ static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 	if skeleton == null or skeleton.find_bone("Hips") < 0:
 		return
 	var holder := _figure_root(skeleton)
-	if holder.find_child("BaseLayer", true, false) != null:
-		return
 	if not seated:
 		for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
 			if mi.has_meta(ORIGINAL):
 				mi.mesh = mi.get_meta(ORIGINAL)
 				mi.remove_meta(ORIGINAL)
 		return
-	var parts := _parts(holder, skeleton)
+	var dressed := holder.find_child("BaseLayer", true, false) != null
+	var front := _front(skeleton) if dressed else Vector3.ZERO
+	var parts := _parts(holder, skeleton, dressed)
 	var outer_pool: Dictionary = {}   # layer -> _Pool of the vertices of every layer outside it
 	for mi: MeshInstance3D in parts["inner"].keys():
 		if mi.has_meta(ORIGINAL):
@@ -59,10 +62,17 @@ static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 						pool.add(other, s, skeleton)
 			pool.index()
 			outer_pool[layer] = pool
-		var made: ArrayMesh = _fitted(mi, outer_pool[layer], skeleton, parts["surfaces"].get(mi, []))
+		var made: ArrayMesh = _fitted(mi, outer_pool[layer], skeleton, parts["surfaces"].get(mi, []), front)
 		if made != null:
 			mi.set_meta(ORIGINAL, mi.mesh)
 			mi.mesh = made
+
+
+## The way the figure faces at rest, in the skeleton's space: its left, crossed with up.
+static func _front(skeleton: Skeleton3D) -> Vector3:
+	var left := skeleton.get_bone_global_rest(skeleton.find_bone("LeftUpperLeg")).origin
+	var right := skeleton.get_bone_global_rest(skeleton.find_bone("RightUpperLeg")).origin
+	return (left - right).cross(Vector3.UP).normalized()
 
 
 ## The node the figure's meshes hang under: three levels up from the skeleton (the glb, the
@@ -79,8 +89,9 @@ static func _figure_root(skeleton: Skeleton3D) -> Node:
 
 ## The figure's skinned meshes: {"garments": {mesh instance: layer}, "inner": {mesh
 ## instance: the layer it is under}, "surfaces": {body mesh instance: [its covered surfaces]}}.
-## The body is layer 0 and is `inner` only; a garment is both, unless it is the outermost.
-static func _parts(holder: Node, skeleton: Skeleton3D) -> Dictionary:
+## The body is layer 0 and is `inner` only, unless `dressed` hides it; a garment is both,
+## unless it is the outermost.
+static func _parts(holder: Node, skeleton: Skeleton3D, dressed: bool) -> Dictionary:
 	var garments := {}
 	var inner := {}
 	var surfaces := {}
@@ -88,8 +99,10 @@ static func _parts(holder: Node, skeleton: Skeleton3D) -> Dictionary:
 	for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
 		if mi.mesh == null or mi.skin == null or not mi.mesh is ArrayMesh or mi.get_node_or_null(mi.skeleton) != skeleton:
 			continue
+		if mi.has_meta(&"base_layer"):
+			continue
 		if mi.get_parent() == skeleton:
-			if mi.name == &"Body" or mi.name == &"Body_LOD1":
+			if not dressed and (mi.name == &"Body" or mi.name == &"Body_LOD1"):
 				var covered: Array = []
 				for s in mi.mesh.get_surface_count():
 					if _surface_name(mi.mesh, s) in BODY_LAYERS:
@@ -120,9 +133,9 @@ static func _surface_name(mesh: Mesh, index: int) -> String:
 
 
 ## `mi`'s mesh without the triangles buried under `outer`, or null when none are.
-## `only` lists the surfaces to look at (all of them when empty). Cached on the node:
-## the fit is the same every time.
-static func _fitted(mi: MeshInstance3D, outer: _Pool, skeleton: Skeleton3D, only: Array) -> ArrayMesh:
+## `only` lists the surfaces to look at (all of them when empty); with a `front`, what
+## faces it stays. Cached on the node: the fit is the same every time.
+static func _fitted(mi: MeshInstance3D, outer: _Pool, skeleton: Skeleton3D, only: Array, front: Vector3) -> ArrayMesh:
 	if mi.has_meta(FITTED):
 		return mi.get_meta(FITTED)
 	var src := mi.mesh as ArrayMesh
@@ -135,7 +148,7 @@ static func _fitted(mi: MeshInstance3D, outer: _Pool, skeleton: Skeleton3D, only
 		var arrays := src.surface_get_arrays(s)
 		var flags := src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
 		if only.is_empty() or only.has(s):
-			dropped += _drop_buried(mi, arrays, outer, skeleton)
+			dropped += _drop_buried(mi, arrays, outer, skeleton, front)
 		out.add_surface_from_arrays(src.surface_get_primitive_type(s), arrays, src.surface_get_blend_shape_arrays(s), {}, flags)
 		out.surface_set_material(s, src.surface_get_material(s))
 		out.surface_set_name(s, src.surface_get_name(s))
@@ -145,7 +158,7 @@ static func _fitted(mi: MeshInstance3D, outer: _Pool, skeleton: Skeleton3D, only
 
 
 ## Takes the buried triangles out of `arrays`' index list; how many went.
-static func _drop_buried(mi: MeshInstance3D, arrays: Array, outer: _Pool, skeleton: Skeleton3D) -> int:
+static func _drop_buried(mi: MeshInstance3D, arrays: Array, outer: _Pool, skeleton: Skeleton3D, front: Vector3) -> int:
 	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var norms: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
 	var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
@@ -157,7 +170,8 @@ static func _drop_buried(mi: MeshInstance3D, arrays: Array, outer: _Pool, skelet
 	var buried := PackedByteArray()
 	buried.resize(verts.size())
 	for v in verts.size():
-		buried[v] = 1 if outer.covers(rest[0][v], rest[1][v]) else 0
+		var kept_front: bool = front != Vector3.ZERO and (rest[1][v] as Vector3).dot(front) > KEEP_FRONT
+		buried[v] = 1 if not kept_front and outer.covers(rest[0][v], rest[1][v]) else 0
 	var kept := PackedInt32Array()
 	for t in range(0, index.size() - 2, 3):
 		if buried[index[t]] == 0 or buried[index[t + 1]] == 0 or buried[index[t + 2]] == 0:

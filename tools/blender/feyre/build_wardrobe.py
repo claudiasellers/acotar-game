@@ -366,7 +366,8 @@ def neckline(depth_front: float, width: float, z_back: float = 1.325) -> Callabl
 
 
 def peplum(B: Builder, probe: BodyProbe, z0: float, z1: float, flare: float, mats, nrows: int = 6,
-           hem=None, lmax: float = 0.6, fold=(0.04, 7, 0.0), gap: float = 0.010) -> List[Arr]:
+           hem=None, lmax: float = 0.6, fold=(0.04, 7, 0.0), gap: float = 0.010,
+           fit: Optional[float] = None) -> List[Arr]:
     rx, ry, cy = girth(probe, z0)
     ctrl = []
     for k in range(4):
@@ -376,7 +377,10 @@ def peplum(B: Builder, probe: BodyProbe, z0: float, z1: float, flare: float, mat
             gx, gy, gc = girth(probe, z)
             rx, ry, cy = max(rx, gx), max(ry, gy), gc
         ctrl.append((z, rx + gap + flare * s ** 1.3, ry + gap + flare * 0.8 * s ** 1.3, cy))
-    return bg.skirt(B, ctrl, nrows, mats, fold=fold, hem=hem, lmax=lmax)
+    rings = bg.skirt(B, ctrl, nrows, mats, fold=fold, hem=hem, lmax=lmax)
+    if fit is not None:
+        B.parts[-1][3]["fit"] = fit
+    return rings
 
 
 def belt(B: Builder, probe: BodyProbe, z: float, width: float, mat: str, off: float = 0.012,
@@ -400,8 +404,10 @@ def buttons(B: Builder, probe: BodyProbe, zs, lift: float, r: float = 0.0042, ma
 
 def build_spring_tunic(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
     hole = neckline(0.11, 0.075)
-    bm = sh.make(lambda r, c: r in ("torso", "arms") and not hole(c),
-                 lambda c: 0.006, [z_below(0.90)] + x_beyond(0.30))
+    # The body's legs region rises above the hem at the flanks: the shell keeps it, or the skirt's top
+    # edge would stand clear of nothing there and the trousers show between them (T053).
+    bm = sh.make(lambda r, c: (r in ("torso", "arms") or (r == "legs" and c.z > 0.89)) and not hole(c),
+                 lambda c: 0.006 + 0.004 * float(smoothstep(1.03, 0.98, c.z)), [z_below(0.90)] + x_beyond(0.30))
     add_bm(B, bm, "fabric", "shell", fit=0.006)
     bind(B, bm, 0.0028, "silk", where=lambda p: p[2] > 1.1 and abs(p[0]) < 0.2)
     bm.free()
@@ -411,7 +417,10 @@ def build_spring_tunic(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
         rs = [(ra[0] + 0.012, ra[1] + 0.012), (ra[0] + 0.016, ra[1] + 0.016), (ra[0] + 0.022, ra[1] + 0.024),
               (ra[0] + 0.030, ra[1] + 0.032), (ra[0] + 0.034, ra[1] + 0.036)]
         bg.sleeve(B, s, xs, rs, ["fabric"], 16, hem=(0.010, 5))
-    peplum(B, probe, 0.94, 0.70, 0.07, ["fabric"] * 5 + ["silk"], 7, hem=("sin", 0.018, 5, 0.6), lmax=0.7)
+    # Clears the trousers under it (T053): 6 mm body shell over 3.5-6 mm trousers would meet them,
+    # so the skirt keeps 16 mm off the body, in rows fine enough not to chord in over the hip.
+    peplum(B, probe, 0.94, 0.70, 0.07, ["fabric"] * 10 + ["silk"], 12, hem=("sin", 0.018, 5, 0.6), lmax=0.7,
+           gap=0.018, fit=0.016)
     belt(B, probe, 0.975, 0.020, "silk", buckle=None)
     i0 = len(B.bm.verts)
     p, n = probe.on_torso(0.975, -40, 0.020)
@@ -439,10 +448,11 @@ def build_linen_shift(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
 
 def build_spring_trousers(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
     bm = sh.make(lambda r, c: r == "legs" or (r == "torso" and c.z < 1.0),
-                 lambda c: 0.006 + 0.020 * float(smoothstep(0.62, 0.14, c.z)), [z_above(0.99), z_below(0.11)],
+                 lambda c: 0.0035 + 0.0025 * float(smoothstep(0.84, 0.76, c.z))
+                 + 0.020 * float(smoothstep(0.62, 0.14, c.z)), [z_above(0.99), z_below(0.11)],
                  max_tris=3600)
-    add_bm(B, bm, "fabric", "shell", fit=0.006)
-    bind(B, bm, 0.0035, "silk", squash=1.6)
+    add_bm(B, bm, "fabric", "shell", fit=0.0035)         # snug at the hip: every top goes over it (T053)
+    bind(B, bm, 0.0035, "silk", squash=1.6, where=lambda p: p[2] < 0.5)
     bm.free()
 
 

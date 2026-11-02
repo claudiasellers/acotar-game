@@ -1,11 +1,11 @@
 ## Seated figures in their clothes, from the side and both quarters (T045):
 ##   godot res://tools/seated_fit_shot.tscn -- [out_dir] [who,who,...]
-## Tamlin, Lucien and Feyre (her tunic, then her dinner gown) each sit on the
+## Tamlin, Lucien and Feyre (her tunic, her dinner gown, her Act I clothes) each sit on the
 ## dining chair in FilmPose's fitted sit, on a plain floor with a studio light.
 ## A geometry check, not a lighting one. Needs a GPU or lavapipe.
 extends Node
 
-const WHO := ["tamlin", "lucien", "feyre_tunic", "feyre_gown"]
+const WHO := ["tamlin", "lucien", "feyre_tunic", "feyre_gown", "feyre_hunter"]
 const VIEWS := {
 	"side": Vector3(0.0, 0.75, 2.2),
 	"front_l": Vector3(1.6, 0.9, 1.5),
@@ -76,7 +76,8 @@ func _figure(id: String) -> Node3D:
 		return (load("res://characters/%s/%s_model.tscn" % [id, id]) as PackedScene).instantiate() as Node3D
 	var model := (load("res://characters/feyre/model/feyre_model.tscn") as PackedScene).instantiate() as Node3D
 	var outfit := Wardrobe.new()
-	var pieces: Array = [&"spring_tunic_sky", &"spring_trousers_cream"] if id == "feyre_tunic" else [&"dinner_gown_blush"]
+	var pieces: Array = {"feyre_tunic": [&"spring_tunic_sky", &"spring_trousers_cream"],
+		"feyre_gown": [&"dinner_gown_blush"]}.get(id, [])
 	for piece: StringName in pieces:
 		outfit.grant(piece)
 		outfit.equip(piece)
