@@ -32,6 +32,7 @@ const WRONG_FOR := 20.0
 const LEAVE_HOME := 60.0
 const WRONG_REST := 180.0
 const WRONG_MAX := 2
+const SAVE_KEY := "landmark_thoughts"
 
 var landmarks: Array = LANDMARKS.duplicate(true)
 var reached: Dictionary = {}
@@ -45,6 +46,21 @@ var _queued: Array = []
 
 func _ready() -> void:
 	name = "Act1LandmarkThoughts"
+	SaveSystem.register_provider(SAVE_KEY, self)
+
+
+func _exit_tree() -> void:
+	SaveSystem.unregister_provider(SAVE_KEY)
+
+
+func save_state() -> Dictionary:
+	return {"reached": reached.keys().map(func(id: StringName) -> String: return String(id)), "wrong_shown": wrong_shown}
+
+
+func load_state(data: Dictionary) -> void:
+	for id: String in data.get("reached", []):
+		reached[StringName(id)] = true
+	wrong_shown = int(data.get("wrong_shown", 0))
 
 
 func _process(delta: float) -> void:

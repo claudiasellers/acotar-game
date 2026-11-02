@@ -456,8 +456,9 @@ func _steer() -> void:
 		return
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	var yaw: float = feyre.call(&"camera_yaw") if feyre.has_method(&"camera_yaw") else 0.0
-	# Like on foot (SteerFrame): the keys steer, turning the camera doesn't.
-	mare.steer = Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _steer_frame.yaw(input, yaw))
+	# Like on foot (SteerFrame): camera-relative, but camera moves the rider didn't make don't steer.
+	var auto: float = float(feyre.call(&"steer_exclusion")) if feyre.has_method(&"steer_exclusion") else 0.0
+	mare.steer = Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _steer_frame.yaw(input, yaw, auto))
 	mare.gallop = Input.is_action_pressed(&"sprint")
 
 
@@ -508,16 +509,19 @@ func _exit_tree() -> void:
 
 
 ## While she rides and the player isn't steering the camera, it swings in behind
-## and settles to the riding pitch.
+## and settles to the riding pitch. It only ever returns to the yaw the keys steer in.
 func _follow_camera(p: Node3D, delta: float) -> void:
 	if mare == null or _since_look < LOOK_GRACE or not p.has_method(&"nudge_camera"):
 		return
 	if p.has_method(&"camera_pitch"):
 		var dp := RIDE_PITCH - float(p.call(&"camera_pitch"))
 		p.call(&"nudge_camera", 0.0, dp * clampf(1.5 * delta, 0.0, 1.0))
-	if mare.speed < 3.0:
+	# Aimed at the frame the keys steer in, not the mare's facing: a fresh press
+	# takes the camera as its frame, so following her facing stacked every turn
+	# into a spiral with no look input (as on foot, T037).
+	if mare.speed < 3.0 or not _steer_frame.is_held():
 		return
-	var diff := wrapf(mare.rotation.y - float(p.call(&"camera_yaw")), -PI, PI)
+	var diff := wrapf(_steer_frame.held_yaw() - float(p.call(&"camera_yaw")), -PI, PI)
 	p.call(&"nudge_camera", diff * clampf(2.2 * delta, 0.0, 1.0), 0.0)
 
 

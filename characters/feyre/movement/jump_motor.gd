@@ -24,12 +24,15 @@ const MAX_JUMPS := 3
 ## Extra height the held apex hang can add to each jump (m), for max_chain_rise().
 const HANG_BONUS := 0.1
 
-var rise_gravity: float = 22.0
-var fall_gravity: float = 34.0
+## Heights stay HEIGHTS; stronger gravity only makes the jump quicker: about
+## 0.45 s up and 0.3 s down for jump 1 (was 0.55 and 0.43), the "time to apex"
+## tuning of Pittman's "Building a Better Jump" (GDC 2016).
+var rise_gravity: float = 32.0
+var fall_gravity: float = 55.0
 var coyote_time: float = 0.12
 var buffer_time: float = 0.15
 ## Gravity scale near the apex (|vy| below apex_hang_speed) while jump is held.
-var apex_hang_scale: float = 0.55
+var apex_hang_scale: float = 0.7
 var apex_hang_speed: float = 1.6
 ## Rising velocity kept when jump 1 is released early (a short hop).
 var jump_cut: float = 0.5

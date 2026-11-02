@@ -18,7 +18,7 @@ Read the code first. Make the change. Test near it. Commit, with a message
 starting with the task id. `tools/mq/submit.sh HEAD <task>`. Report. Claim the next.
 
 **Lanes don't run the gate.** The build lane does. Run the smallest check that
-proves your change: a long suite here wastes time and tokens.
+proves your change: a long suite here wastes time and tokens. Run only the tests that exercise the files you changed; the seat and dinner tests (`tests/unit/story/test_act2_seated.gd`, `test_act2_first_dinner.gd` and similar) run only when you change seats, poses, furniture or those scenes, and only the build lane runs the gate.
 
 **Running the game:** always `tools/mq/godot.sh`, never the bare engine.
 

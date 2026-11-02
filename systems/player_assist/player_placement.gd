@@ -14,6 +14,14 @@ func _init(player: Node3D) -> void:
 	_player = weakref(player)
 
 
+## Where a saved state puts her, or Vector3.INF for none.
+static func saved_position(data: Dictionary) -> Vector3:
+	var pos: Array = data.get("position", [])
+	if pos.size() != 3:
+		return Vector3.INF
+	return Vector3(float(pos[0]), float(pos[1]), float(pos[2]))
+
+
 func save_state() -> Dictionary:
 	var p := _player.get_ref() as Node3D
 	if p == null:
@@ -27,10 +35,9 @@ func save_state() -> Dictionary:
 
 func load_state(data: Dictionary) -> void:
 	var p := _player.get_ref() as Node3D
-	var pos: Array = data.get("position", [])
-	if p == null or pos.size() != 3:
+	var at := saved_position(data)
+	if p == null or at == Vector3.INF:
 		return
-	var at := Vector3(float(pos[0]), float(pos[1]), float(pos[2]))
 	# The opening (Act1Game) would otherwise move her to the dawn anchor.
 	var scene := p.get_tree().current_scene
 	if scene and &"spawned" in scene:

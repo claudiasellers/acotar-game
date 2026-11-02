@@ -43,7 +43,7 @@ func test_people_are_rigged_with_their_clips() -> void:
 			for c in CLIPS:
 				assert_true(a.anim.has_animation(c), "%s %s" % [id, c])
 			assert_between(a.native_walk, 0.6, 2.0, id + " native walk speed")
-			assert_ne(a.skeleton.find_bone("head"), -1, id)
+			assert_true(a.skeleton.find_bone("head") != -1 or a.skeleton.find_bone("Head") != -1, id + " has a head bone")
 	assert_eq(_npc("alis").animators.size(), 2, "both glamour layers")
 
 
@@ -84,6 +84,8 @@ func test_head_turns_to_feyre_in_front_and_not_behind() -> void:
 	assert_not_null(a.notice, "notice attached")
 	var sk := a.skeleton
 	var head := sk.find_bone("head")
+	if head == -1:
+		head = sk.find_bone("Head")    # the villagers are on the main cast's rig since L52
 	var seen := {"basis": Basis.IDENTITY}
 	sk.skeleton_updated.connect(func() -> void: seen.basis = sk.get_bone_global_pose(head).basis)
 	await wait_process_frames(3)

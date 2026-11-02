@@ -16,7 +16,8 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OUT = os.path.join(ROOT, "data", "dialogue")
+# GEN_DIALOGUE_OUT lets the drift test generate into a scratch folder.
+OUT = os.environ.get("GEN_DIALOGUE_OUT") or os.path.join(ROOT, "data", "dialogue")
 
 P = ["p0_winter", "p1_wolf_and_crossing", "p2_grounds", "p3_house_and_woods", "p4_wider_court",
      "p5_calanmai", "p6_blight_tightens", "p7_return_home", "p8_the_pass"]
@@ -212,6 +213,13 @@ think(A, "v_market", "Market day. Everyone watching everyone else's purse.", "re
 think(A, "v_silver", "Silver in my pocket. Just once, I could buy something that isn't food.", "region",
       "village", HUMAN, req=["pelt_sold"])
 think(A, "v_return", "They don't know me in this dress. Good.", "region", "village", ph(7))
+# The mercenary on the well's lip (lane L53; Keeper, ch 3, lines 676-990). She sells
+# through the market screen (MarketMenu); these are what she says as Feyre comes near.
+say(A, "merc_business", "mercenary", "What is your business with me, girl?", HUMAN, canon="A",
+    req=["fact.wolf_skinned"], forbid=["pelt_sold"], who="The mercenary",
+    delivery="clipped, unknown accent; sizing her up")
+chat(A, "merc_woods", "mercenary", "From one hunter to another: stay out of the deep woods. Things are slipping through the Wall.",
+     HUMAN, canon="A", req=["pelt_sold"], who="The mercenary", delivery="low, plain warning")
 line(A, "A1_07_blessed_greeting", "blessed", "May the Immortal Light shine upon thee, sisters.", "place",
      "village_square", HUMAN, pr=5, canon="V", who="Child of the Blessed",
      delivery="serene, sing-song, over silver bells")
@@ -823,6 +831,29 @@ spot("elder_board", "human_elder", PEOPLE % "human_elder", "village", 386.0, 224
 spot("youth_tavern", "human_youth", PEOPLE % "human_youth", "village", 408.0, 2222.0, HUMAN, wander=3.0)
 spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, HUMAN, canon="C", hours=(8.0, 17.0),
      notes="peddlers bring border-town stories; one sold her the ash arrow")
+# The mercenary on the lip of the square's well (lane L53; the Keeper, ch 3: "on the lip of our
+# broken square fountain, without any cart or stall"). Lane L52 is modelling her
+# (creatures/people/scenes/mercenary.tscn, merged L52-1).
+# Matches data/market/market.tres mercenary_at / mercenary_yaw (tools/market/gen_market.gd).
+spot("mercenary_well", "mercenary", PEOPLE % "mercenary", "village", 376.16, 2256.58, HUMAN, yaw=90.0,
+     canon="C", notes="buys the wolf pelt and a doe hide, overpays; coin only (MarketMenu)")
+# Market keepers behind their counters and a few shoppers (lane L53, the director's
+# L53-2 note). Keeper spots = MarketStall.keeper_spot() from tools/market/gen_market.gd
+# (it prints them); facing out over the counter. woman_stall keeps the charm stall.
+spot("market_cobbler", "human_elder", PEOPLE % "human_elder", "village", 375.08, 2269.75, HUMAN, yaw=346.0,
+     hours=(8.0, 17.0), canon="C", notes="the weathered cobbler, from a nearby town (ch 3)")
+spot("market_clothier", "human_woman", PEOPLE % "human_woman", "village", 362.71, 2262.01, HUMAN, yaw=298.0,
+     hours=(8.0, 17.0), canon="C", notes="the sharp-eyed clothier (ch 3)")
+spot("market_spice", "human_man", PEOPLE % "human_man", "village", 382.16, 2270.84, HUMAN, yaw=1.4,
+     hours=(8.0, 17.0), notes="hot food and spice")
+spot("market_roots", "human_elder", PEOPLE % "human_elder", "village", 366.34, 2241.09, HUMAN, yaw=303.5,
+     hours=(8.0, 17.0), notes="roots and turnips, up the north lane")
+spot("market_shopper_1", "human_youth", PEOPLE % "human_youth", "village", 371.5, 2262.0, HUMAN, wander=2.5,
+     hours=(8.0, 17.0))
+spot("market_shopper_2", "human_woman", PEOPLE % "human_woman", "village", 368.5, 2234.5, HUMAN, wander=2.0,
+     hours=(8.0, 17.0))
+spot("market_shopper_3", "human_man", PEOPLE % "human_man", "village", 385.0, 2262.5, HUMAN, wander=1.5,
+     hours=(9.0, 16.0))
 spot("woman_return", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, ph(7), wander=1.5)
 spot("elder_return", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, ph(7))
 # The manor (ch6-28). Tamlin patrols and is often away [C]; Lucien is about by day.
@@ -869,8 +900,9 @@ spot("potion_stillroom", "potion_maker", PEOPLE % "potion_maker", "manor_estate"
 FV = [("fae_mushroom", "cottages", -6, 4), ("fae_moth", "great_lantern_tree", 5, -3),
       ("fae_fox", "market", -5, 2), ("fae_hedgehog", "market", 4, 5), ("fae_pixie", "seamstress", 4, 3),
       ("fae_satyr", "village_mill", 6, 0), ("fae_rose", "market", 1, -6), ("fae_owl", "great_lantern_tree", -4, 4),
-      ("fae_stag", "lantern_bridge", 0, 6), ("fae_nymph", "lantern_bridge", 3, -5),
+      ("fae_stag", "lantern_bridge", 23, 0), ("fae_nymph", "lantern_bridge", 21, -18),
       ("fae_birch", "cottages", 5, -4), ("fae_dryad", "potion_house", -5, -3)]
+# The stag and nymph stand on the bridge's east bank, off the river (T040).
 # Keeper (ch24): Tamlin's glamour covers his court, so before the lift only
 # humanoid, glamoured folk are seen (the satyr, the High Fae revellers); the
 # non-humanoid village fae appear once it lifts.

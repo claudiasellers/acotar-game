@@ -94,7 +94,8 @@ func _attach_to_player() -> void:
 	if GameSettings.pending_load_slot != "":
 		var slot := GameSettings.pending_load_slot
 		GameSettings.pending_load_slot = ""
-		SaveSystem.load_game(slot)
+		SaveSystem.finish_load(slot)
+		_hint.hide_now()  # the controls are taught once, on a new game
 
 
 # --- actions -----------------------------------------------------------------
@@ -217,6 +218,7 @@ func _build() -> void:
 	_check(camera, &"invert_x", "Invert camera X")
 	_check(camera, &"invert_y", "Invert camera Y")
 	_check(camera, &"camera_follow", "Camera follows behind while running")
+	_check(camera, &"mouse_steers", "Turning the camera steers her while moving")
 	camera.add_child(_note("Press R (or click the right stick) to bring\nthe camera back behind Feyre."))
 
 	var moving := _section(left, "Movement keys", PauseStyle.LILAC)

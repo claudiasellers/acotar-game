@@ -24,6 +24,7 @@ const KEY_EDGE := Color(0.78, 0.60, 0.24)
 const KEY_INK := Color(0.42, 0.29, 0.10)
 const MEDAL := 84.0
 const MEDAL_TOP := 18.0
+const SAVE_KEY := "guide"
 
 var director: GuideDirector
 var mode: GuideSettings.Mode = GuideSettings.Mode.AUTO
@@ -65,7 +66,31 @@ func _ready() -> void:
 	EventBus.mood_requested.connect(_on_mood)
 	CelebrationGate.watch()
 	StoryControl.mode_changed.connect(_on_control_changed)
+	EventBus.game_loaded.connect(_on_game_loaded)
+	SaveSystem.register_provider(SAVE_KEY, self)
 	director.refresh(WorldState.has_flag)
+
+
+func _exit_tree() -> void:
+	SaveSystem.unregister_provider(SAVE_KEY)
+
+
+func save_state() -> Dictionary:
+	return {"thread": String(director.thread.id) if director.thread else "", "tier": director.shown_tier}
+
+
+func load_state(data: Dictionary) -> void:
+	director.refresh(WorldState.has_flag)
+	if director.thread and String(director.thread.id) == String(data.get("thread", "")):
+		director.shown_tier = int(data.get("tier", -1))
+
+
+## A returning player has met the card and her need: no opening thought and no
+## lesson on G; the tab is there, and stalling still nudges her.
+func _on_game_loaded(_slot: String) -> void:
+	director.refresh(WorldState.has_flag)
+	director.resume()
+	_taught_key = true
 
 
 ## GuideSettings.set_mode calls this through the group.

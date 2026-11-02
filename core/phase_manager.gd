@@ -69,7 +69,6 @@ func from_dict(data: Dictionary) -> void:
 	for region in data.get("unlocked_regions", []):
 		_unlocked_regions[String(region)] = true
 		EventBus.region_unlocked.emit(StringName(region))
-	EventBus.phase_changed.emit(&"", current_phase)
 
 
 func _enter_phase(phase_id: StringName) -> void:

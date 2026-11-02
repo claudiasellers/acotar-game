@@ -94,6 +94,11 @@ is skipped, or can't play (headless: every fact is written at once).
   brook).
 - `FilmPose` stages the cast (kneel, sit, crouch, reach, bow...) over the
   body animation; it also drives the townsfolk rig (`creatures/models/people`).
+  The sit poses (`sit`, `sit_slouch`, `sit_ground`) swap a cast figure's body and
+  trousers for copies without the triangles buried under cloth (`SeatSkinFit`),
+  because clothes skinned for standing can't follow a thigh swung forward and the
+  buttock came out through the tunic; leaving the pose puts the originals back.
+  Feyre is left as she is.
 - B's Rhysand: the cast lane's `characters/rhysand/rhysand_model.tscn` when it
   exists; until then Tamlin's rig re-dressed (no mask or claws, blue-black
   hair, black and dark silver, violet eyes, his own dark). His dark is a

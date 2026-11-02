@@ -176,6 +176,158 @@ notes = "peddlers bring border-town stories; one sold her the ash arrow"
 
 [sub_resource type="Resource" id="S9"]
 script = ExtResource("1")
+id = &"mercenary_well"
+speaker = &"mercenary"
+scene = "res://creatures/people/scenes/mercenary.tscn"
+region = &"village"
+at = Vector2(376.16, 2256.58)
+room = &""
+yaw_deg = 90.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "buys the wolf pelt and a doe hide, overpays; coin only (MarketMenu)"
+
+[sub_resource type="Resource" id="S10"]
+script = ExtResource("1")
+id = &"market_cobbler"
+speaker = &"human_elder"
+scene = "res://creatures/people/scenes/human_elder.tscn"
+region = &"village"
+at = Vector2(375.08, 2269.75)
+room = &""
+yaw_deg = 346.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 0.0
+canon = "C"
+notes = "the weathered cobbler, from a nearby town (ch 3)"
+
+[sub_resource type="Resource" id="S11"]
+script = ExtResource("1")
+id = &"market_clothier"
+speaker = &"human_woman"
+scene = "res://creatures/people/scenes/human_woman.tscn"
+region = &"village"
+at = Vector2(362.71, 2262.01)
+room = &""
+yaw_deg = 298.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 0.0
+canon = "C"
+notes = "the sharp-eyed clothier (ch 3)"
+
+[sub_resource type="Resource" id="S12"]
+script = ExtResource("1")
+id = &"market_spice"
+speaker = &"human_man"
+scene = "res://creatures/people/scenes/human_man.tscn"
+region = &"village"
+at = Vector2(382.16, 2270.84)
+room = &""
+yaw_deg = 1.4
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 0.0
+canon = "X"
+notes = "hot food and spice"
+
+[sub_resource type="Resource" id="S13"]
+script = ExtResource("1")
+id = &"market_roots"
+speaker = &"human_elder"
+scene = "res://creatures/people/scenes/human_elder.tscn"
+region = &"village"
+at = Vector2(366.34, 2241.09)
+room = &""
+yaw_deg = 303.5
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 0.0
+canon = "X"
+notes = "roots and turnips, up the north lane"
+
+[sub_resource type="Resource" id="S14"]
+script = ExtResource("1")
+id = &"market_shopper_1"
+speaker = &"human_youth"
+scene = "res://creatures/people/scenes/human_youth.tscn"
+region = &"village"
+at = Vector2(371.5, 2262.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 2.5
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S15"]
+script = ExtResource("1")
+id = &"market_shopper_2"
+speaker = &"human_woman"
+scene = "res://creatures/people/scenes/human_woman.tscn"
+region = &"village"
+at = Vector2(368.5, 2234.5)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 17.0
+wander = 2.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S16"]
+script = ExtResource("1")
+id = &"market_shopper_3"
+speaker = &"human_man"
+scene = "res://creatures/people/scenes/human_man.tscn"
+region = &"village"
+at = Vector2(385.0, 2262.5)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 9.0
+hour_to = 16.0
+wander = 1.5
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S17"]
+script = ExtResource("1")
 id = &"woman_return"
 speaker = &"human_woman"
 scene = "res://creatures/people/scenes/human_woman.tscn"
@@ -193,7 +345,7 @@ wander = 1.5
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S10"]
+[sub_resource type="Resource" id="S18"]
 script = ExtResource("1")
 id = &"elder_return"
 speaker = &"human_elder"
@@ -212,7 +364,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S11"]
+[sub_resource type="Resource" id="S19"]
 script = ExtResource("1")
 id = &"alis_dressing"
 speaker = &"alis"
@@ -231,7 +383,7 @@ wander = 0.0
 canon = "C"
 notes = "she dresses and bathes Feyre"
 
-[sub_resource type="Resource" id="S12"]
+[sub_resource type="Resource" id="S20"]
 script = ExtResource("1")
 id = &"alis_kitchen"
 speaker = &"alis"
@@ -250,7 +402,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S13"]
+[sub_resource type="Resource" id="S21"]
 script = ExtResource("1")
 id = &"lucien_stables"
 speaker = &"lucien"
@@ -269,7 +421,7 @@ wander = 0.0
 canon = "A"
 notes = "hunts and patrols with her by day (ch9-11)"
 
-[sub_resource type="Resource" id="S14"]
+[sub_resource type="Resource" id="S22"]
 script = ExtResource("1")
 id = &"lucien_roses"
 speaker = &"lucien"
@@ -288,7 +440,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S15"]
+[sub_resource type="Resource" id="S23"]
 script = ExtResource("1")
 id = &"lucien_drawing"
 speaker = &"lucien"
@@ -307,7 +459,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S16"]
+[sub_resource type="Resource" id="S24"]
 script = ExtResource("1")
 id = &"tamlin_armory"
 speaker = &"tamlin"
@@ -326,7 +478,7 @@ wander = 0.0
 canon = "A"
 notes = "a warrior; arms before he rides out"
 
-[sub_resource type="Resource" id="S17"]
+[sub_resource type="Resource" id="S25"]
 script = ExtResource("1")
 id = &"tamlin_study"
 speaker = &"tamlin"
@@ -345,7 +497,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S18"]
+[sub_resource type="Resource" id="S26"]
 script = ExtResource("1")
 id = &"tamlin_garden"
 speaker = &"tamlin"
@@ -364,7 +516,7 @@ wander = 0.0
 canon = "A"
 notes = "the rose garden his father planted (ch19)"
 
-[sub_resource type="Resource" id="S19"]
+[sub_resource type="Resource" id="S27"]
 script = ExtResource("1")
 id = &"sentry_gate_w"
 speaker = &"sentry"
@@ -383,7 +535,7 @@ wander = 0.0
 canon = "C"
 notes = "High Fae sentries"
 
-[sub_resource type="Resource" id="S20"]
+[sub_resource type="Resource" id="S28"]
 script = ExtResource("1")
 id = &"sentry_gate_e"
 speaker = &"sentry"
@@ -402,7 +554,7 @@ wander = 0.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S21"]
+[sub_resource type="Resource" id="S29"]
 script = ExtResource("1")
 id = &"gardener_roses"
 speaker = &"gardener"
@@ -421,7 +573,7 @@ wander = 4.0
 canon = "C"
 notes = "insect masks, iridescent wings, prune the hedges"
 
-[sub_resource type="Resource" id="S22"]
+[sub_resource type="Resource" id="S30"]
 script = ExtResource("1")
 id = &"gardener_hedge"
 speaker = &"gardener"
@@ -440,7 +592,7 @@ wander = 4.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S23"]
+[sub_resource type="Resource" id="S31"]
 script = ExtResource("1")
 id = &"cook_kitchen"
 speaker = &"servant_cook"
@@ -459,7 +611,7 @@ wander = 0.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S24"]
+[sub_resource type="Resource" id="S32"]
 script = ExtResource("1")
 id = &"maid_upper"
 speaker = &"servant_maid"
@@ -478,7 +630,7 @@ wander = 2.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S25"]
+[sub_resource type="Resource" id="S33"]
 script = ExtResource("1")
 id = &"footman_hall"
 speaker = &"servant_footman"
@@ -497,7 +649,7 @@ wander = 0.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S26"]
+[sub_resource type="Resource" id="S34"]
 script = ExtResource("1")
 id = &"greenbrown_gallery"
 speaker = &"fae_greenbrown"
@@ -516,7 +668,7 @@ wander = 3.0
 canon = "C"
 notes = "green-and-brown skin, long limbs"
 
-[sub_resource type="Resource" id="S27"]
+[sub_resource type="Resource" id="S35"]
 script = ExtResource("1")
 id = &"longlimb_library"
 speaker = &"fae_longlimb"
@@ -535,7 +687,7 @@ wander = 2.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S28"]
+[sub_resource type="Resource" id="S36"]
 script = ExtResource("1")
 id = &"seamstress_sewing"
 speaker = &"seamstress"
@@ -554,7 +706,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S29"]
+[sub_resource type="Resource" id="S37"]
 script = ExtResource("1")
 id = &"potion_stillroom"
 speaker = &"potion_maker"
@@ -573,7 +725,7 @@ wander = 0.0
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S30"]
+[sub_resource type="Resource" id="S38"]
 script = ExtResource("1")
 id = &"fae_mushroom_cottages"
 speaker = &"fae_mushroom"
@@ -592,7 +744,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S31"]
+[sub_resource type="Resource" id="S39"]
 script = ExtResource("1")
 id = &"fae_moth_great_lantern_tree"
 speaker = &"fae_moth"
@@ -611,7 +763,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S32"]
+[sub_resource type="Resource" id="S40"]
 script = ExtResource("1")
 id = &"fae_fox_market"
 speaker = &"fae_fox"
@@ -630,7 +782,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S33"]
+[sub_resource type="Resource" id="S41"]
 script = ExtResource("1")
 id = &"fae_hedgehog_market"
 speaker = &"fae_hedgehog"
@@ -649,7 +801,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S34"]
+[sub_resource type="Resource" id="S42"]
 script = ExtResource("1")
 id = &"fae_pixie_seamstress"
 speaker = &"fae_pixie"
@@ -668,7 +820,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S35"]
+[sub_resource type="Resource" id="S43"]
 script = ExtResource("1")
 id = &"fae_satyr_village_mill"
 speaker = &"fae_satyr"
@@ -687,7 +839,7 @@ wander = 2.5
 canon = "X"
 notes = ""
 
-[sub_resource type="Resource" id="S36"]
+[sub_resource type="Resource" id="S44"]
 script = ExtResource("1")
 id = &"fae_rose_market"
 speaker = &"fae_rose"
@@ -706,7 +858,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S37"]
+[sub_resource type="Resource" id="S45"]
 script = ExtResource("1")
 id = &"fae_owl_great_lantern_tree"
 speaker = &"fae_owl"
@@ -725,13 +877,13 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S38"]
+[sub_resource type="Resource" id="S46"]
 script = ExtResource("1")
 id = &"fae_stag_lantern_bridge"
 speaker = &"fae_stag"
 scene = "res://creatures/people/scenes/fae_stag.tscn"
 region = &"fae_village"
-at = Vector2(-1052.0, -849.0)
+at = Vector2(-1028.0, -846.0)
 room = &""
 yaw_deg = 0.0
 anchor = &""
@@ -744,13 +896,13 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S39"]
+[sub_resource type="Resource" id="S47"]
 script = ExtResource("1")
 id = &"fae_nymph_lantern_bridge"
 speaker = &"fae_nymph"
 scene = "res://creatures/people/scenes/fae_nymph.tscn"
 region = &"fae_village"
-at = Vector2(-1049.0, -860.0)
+at = Vector2(-1030.0, -864.0)
 room = &""
 yaw_deg = 0.0
 anchor = &""
@@ -763,7 +915,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S40"]
+[sub_resource type="Resource" id="S48"]
 script = ExtResource("1")
 id = &"fae_birch_cottages"
 speaker = &"fae_birch"
@@ -782,7 +934,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S41"]
+[sub_resource type="Resource" id="S49"]
 script = ExtResource("1")
 id = &"fae_dryad_potion_house"
 speaker = &"fae_dryad"
@@ -801,7 +953,7 @@ wander = 2.5
 canon = "X"
 notes = "unseen (glamoured) before the lift, Keeper ch24"
 
-[sub_resource type="Resource" id="S42"]
+[sub_resource type="Resource" id="S50"]
 script = ExtResource("1")
 id = &"reveler_village_1"
 speaker = &"reveler"
@@ -820,7 +972,7 @@ wander = 2.5
 canon = "X"
 notes = "glamoured High Fae villagers before the lift"
 
-[sub_resource type="Resource" id="S43"]
+[sub_resource type="Resource" id="S51"]
 script = ExtResource("1")
 id = &"reveler_village_2"
 speaker = &"reveler"
@@ -839,13 +991,13 @@ wander = 2.5
 canon = "X"
 notes = "glamoured High Fae villagers before the lift"
 
-[sub_resource type="Resource" id="S44"]
+[sub_resource type="Resource" id="S52"]
 script = ExtResource("1")
 id = &"reveler_village_3"
 speaker = &"reveler"
 scene = "res://creatures/people/scenes/reveler_3.tscn"
 region = &"fae_village"
-at = Vector2(-1055.0, -851.0)
+at = Vector2(-1054.0, -842.0)
 room = &""
 yaw_deg = 0.0
 anchor = &""
@@ -858,7 +1010,7 @@ wander = 2.5
 canon = "X"
 notes = "glamoured High Fae villagers before the lift"
 
-[sub_resource type="Resource" id="S45"]
+[sub_resource type="Resource" id="S53"]
 script = ExtResource("1")
 id = &"reveler_rite_1"
 speaker = &"reveler"
@@ -877,7 +1029,7 @@ wander = 3.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S46"]
+[sub_resource type="Resource" id="S54"]
 script = ExtResource("1")
 id = &"reveler_rite_2"
 speaker = &"reveler"
@@ -896,7 +1048,7 @@ wander = 3.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S47"]
+[sub_resource type="Resource" id="S55"]
 script = ExtResource("1")
 id = &"reveler_rite_3"
 speaker = &"reveler"
@@ -915,7 +1067,7 @@ wander = 3.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S48"]
+[sub_resource type="Resource" id="S56"]
 script = ExtResource("1")
 id = &"reveler_solstice_1"
 speaker = &"reveler"
@@ -934,7 +1086,7 @@ wander = 3.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S49"]
+[sub_resource type="Resource" id="S57"]
 script = ExtResource("1")
 id = &"reveler_solstice_2"
 speaker = &"reveler"
@@ -953,7 +1105,7 @@ wander = 3.0
 canon = "C"
 notes = ""
 
-[sub_resource type="Resource" id="S50"]
+[sub_resource type="Resource" id="S58"]
 script = ExtResource("1")
 id = &"reveler_solstice_3"
 speaker = &"reveler"
@@ -974,4 +1126,4 @@ notes = ""
 
 [resource]
 script = ExtResource("2")
-spots = Array[ExtResource("1")]([SubResource("S0"), SubResource("S1"), SubResource("S2"), SubResource("S3"), SubResource("S4"), SubResource("S5"), SubResource("S6"), SubResource("S7"), SubResource("S8"), SubResource("S9"), SubResource("S10"), SubResource("S11"), SubResource("S12"), SubResource("S13"), SubResource("S14"), SubResource("S15"), SubResource("S16"), SubResource("S17"), SubResource("S18"), SubResource("S19"), SubResource("S20"), SubResource("S21"), SubResource("S22"), SubResource("S23"), SubResource("S24"), SubResource("S25"), SubResource("S26"), SubResource("S27"), SubResource("S28"), SubResource("S29"), SubResource("S30"), SubResource("S31"), SubResource("S32"), SubResource("S33"), SubResource("S34"), SubResource("S35"), SubResource("S36"), SubResource("S37"), SubResource("S38"), SubResource("S39"), SubResource("S40"), SubResource("S41"), SubResource("S42"), SubResource("S43"), SubResource("S44"), SubResource("S45"), SubResource("S46"), SubResource("S47"), SubResource("S48"), SubResource("S49"), SubResource("S50")])
+spots = Array[ExtResource("1")]([SubResource("S0"), SubResource("S1"), SubResource("S2"), SubResource("S3"), SubResource("S4"), SubResource("S5"), SubResource("S6"), SubResource("S7"), SubResource("S8"), SubResource("S9"), SubResource("S10"), SubResource("S11"), SubResource("S12"), SubResource("S13"), SubResource("S14"), SubResource("S15"), SubResource("S16"), SubResource("S17"), SubResource("S18"), SubResource("S19"), SubResource("S20"), SubResource("S21"), SubResource("S22"), SubResource("S23"), SubResource("S24"), SubResource("S25"), SubResource("S26"), SubResource("S27"), SubResource("S28"), SubResource("S29"), SubResource("S30"), SubResource("S31"), SubResource("S32"), SubResource("S33"), SubResource("S34"), SubResource("S35"), SubResource("S36"), SubResource("S37"), SubResource("S38"), SubResource("S39"), SubResource("S40"), SubResource("S41"), SubResource("S42"), SubResource("S43"), SubResource("S44"), SubResource("S45"), SubResource("S46"), SubResource("S47"), SubResource("S48"), SubResource("S49"), SubResource("S50"), SubResource("S51"), SubResource("S52"), SubResource("S53"), SubResource("S54"), SubResource("S55"), SubResource("S56"), SubResource("S57"), SubResource("S58")])
