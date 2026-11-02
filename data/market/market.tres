@@ -35,9 +35,12 @@ script = ExtResource("3_yl0oj")
 trade = &"charms"
 display_name = "charms and bits of iron"
 canon = "C"
+stall_path = "res://story/market/assets/stall_slate.glb"
+goods_path = "res://story/market/assets/goods_charms.glb"
 sign_path = "res://story/market/assets/sign_charms.glb"
-position = Vector3(388.76743, 3.0484247, 2267.9758)
-yaw = -2.687806
+scatter_position = Vector3(388.76743, 3.0484247, 2267.9758)
+position = Vector3(388.1471, 3.1776638, 2267.3884)
+yaw = -2.567805891036987
 buyer = SubResource("Resource_r3usm")
 
 [sub_resource type="Resource" id="Resource_rktbk"]
@@ -45,9 +48,12 @@ script = ExtResource("3_yl0oj")
 trade = &"tinker"
 display_name = "the tinker"
 canon = "C"
+stall_path = "res://story/market/assets/stall_slate.glb"
+goods_path = "res://story/market/assets/goods_tinker.glb"
 sign_path = "res://story/market/assets/sign_tinker.glb"
-position = Vector3(370.51807, 2.9289014, 2230.6326)
-yaw = -0.88625634
+scatter_position = Vector3(370.51807, 2.9289014, 2230.6326)
+position = Vector3(370.26514, 3.0776541, 2230.3228)
+yaw = -0.9362563371658326
 
 [sub_resource type="Resource" id="Resource_sg4fh"]
 script = ExtResource("1_e8bbh")
@@ -67,9 +73,12 @@ script = ExtResource("3_yl0oj")
 trade = &"spice"
 display_name = "hot food and spice"
 canon = "C"
+stall_path = "res://story/market/assets/stall_madder.glb"
+goods_path = "res://story/market/assets/goods_spice.glb"
 sign_path = "res://story/market/assets/sign_spice.glb"
-position = Vector3(382.09058, 3.0976639, 2269.8904)
-yaw = -3.0368721
+scatter_position = Vector3(382.09058, 3.0976639, 2269.8904)
+position = Vector3(382.1533, 3.1776638, 2270.487)
+yaw = -3.116872148513794
 buyer = SubResource("Resource_sg4fh")
 
 [sub_resource type="Resource" id="Resource_285iq"]
@@ -77,9 +86,12 @@ script = ExtResource("3_yl0oj")
 trade = &"salt"
 display_name = "salt"
 canon = "C"
+stall_path = "res://story/market/assets/stall_oat.glb"
+goods_path = "res://story/market/assets/goods_salt.glb"
 sign_path = "res://story/market/assets/sign_salt.glb"
-position = Vector3(361.9773, 2.9289057, 2235.6667)
-yaw = 2.2553363
+scatter_position = Vector3(361.9773, 2.9289057, 2235.6667)
+position = Vector3(362.28717, 3.052659, 2235.4138)
+yaw = 2.3353362846374512
 
 [sub_resource type="Resource" id="Resource_k3otb"]
 script = ExtResource("1_e8bbh")
@@ -99,7 +111,10 @@ script = ExtResource("3_yl0oj")
 trade = &"cobbler"
 display_name = "the cobbler"
 canon = "C"
+stall_path = "res://story/market/assets/stall_oat.glb"
+goods_path = "res://story/market/assets/goods_cobbler.glb"
 sign_path = "res://story/market/assets/sign_cobbler.glb"
+scatter_position = Vector3(375.16156, 3.0976639, 2269.406)
 position = Vector3(375.16156, 3.0976639, 2269.406)
 yaw = 2.8972476
 buyer = SubResource("Resource_k3otb")
@@ -109,25 +124,34 @@ script = ExtResource("3_yl0oj")
 trade = &"grain"
 display_name = "grain"
 canon = "C"
+stall_path = "res://story/market/assets/stall_rust.glb"
+goods_path = "res://story/market/assets/goods_grain.glb"
 sign_path = "res://story/market/assets/sign_grain.glb"
-position = Vector3(368.81613, 3.0976639, 2266.5808)
-yaw = 2.548182
+scatter_position = Vector3(368.81613, 3.0976639, 2266.5808)
+position = Vector3(369.4852, 3.1776638, 2265.9465)
+yaw = 2.6981820106506347
 
 [sub_resource type="Resource" id="Resource_nkpqv"]
 script = ExtResource("3_yl0oj")
 trade = &"baker"
 display_name = "bread"
+stall_path = "res://story/market/assets/stall_oat.glb"
+goods_path = "res://story/market/assets/goods_baker.glb"
 sign_path = "res://story/market/assets/sign_baker.glb"
-position = Vector3(360.77478, 3.0207617, 2255.5127)
-yaw = 1.8500468
+scatter_position = Vector3(360.77478, 3.0207617, 2255.5127)
+position = Vector3(361.81873, 3.1776638, 2255.5254)
+yaw = 2.070046753883362
 
 [sub_resource type="Resource" id="Resource_ne5lq"]
 script = ExtResource("3_yl0oj")
 trade = &"roots"
 display_name = "roots and turnips"
+stall_path = "res://story/market/assets/stall_rust.glb"
+goods_path = "res://story/market/assets/goods_roots.glb"
 sign_path = "res://story/market/assets/sign_roots.glb"
-position = Vector3(366.40332, 2.9289043, 2241.0898)
-yaw = 2.2553363
+scatter_position = Vector3(366.40332, 2.9289043, 2241.0898)
+position = Vector3(366.63574, 3.0589082, 2240.9001)
+yaw = 2.155336284637451
 
 [sub_resource type="Resource" id="Resource_kn4sk"]
 script = ExtResource("1_e8bbh")
@@ -147,18 +171,24 @@ script = ExtResource("3_yl0oj")
 trade = &"clothier"
 display_name = "the clothier"
 canon = "C"
+stall_path = "res://story/market/assets/stall_slate.glb"
+goods_path = "res://story/market/assets/goods_clothier.glb"
 sign_path = "res://story/market/assets/sign_clothier.glb"
-position = Vector3(363.81967, 3.0976639, 2261.7556)
-yaw = 2.1991115
+scatter_position = Vector3(363.81967, 3.0976639, 2261.7556)
+position = Vector3(363.01825, 3.1776638, 2261.8435)
+yaw = 2.059111461639404
 buyer = SubResource("Resource_kn4sk")
 
 [sub_resource type="Resource" id="Resource_ualej"]
 script = ExtResource("3_yl0oj")
 trade = &"wool"
 display_name = "wool and old cloth"
+stall_path = "res://story/market/assets/stall_madder.glb"
+goods_path = "res://story/market/assets/goods_wool.glb"
 sign_path = "res://story/market/assets/sign_wool.glb"
-position = Vector3(374.94412, 2.9289029, 2236.0557)
-yaw = -0.88625634
+scatter_position = Vector3(374.94412, 2.9289029, 2236.0557)
+position = Vector3(375.26028, 3.0776558, 2236.443)
+yaw = -0.8262563371658325
 
 [resource]
 script = ExtResource("2_ap8ah")
@@ -168,3 +198,6 @@ mercenary_at = Vector3(376.15585, 2.9981546, 2256.578)
 mercenary_yaw = 1.5707963267948966
 fingerpost_at = Vector3(-123.13526, 4.053611, 2164.4995)
 fingerpost_yaw = 1.2722973973998277
+dressing_paths = PackedStringArray("res://story/market/assets/handcart.glb", "res://story/market/assets/crate_pile.glb")
+dressing_xforms = Array[Transform3D]([Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, 363, 2.9276638, 2246.5), Transform3D(0.921061, 0, -0.38941833, 0, 1, 0, 0.38941833, 0, 0.921061, 392.5, 2.9276638, 2259)])
+dressing_boxes = PackedVector3Array(1.6, 1.1, 1, 1.6, 1, 1.2)

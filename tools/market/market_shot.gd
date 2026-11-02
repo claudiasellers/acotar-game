@@ -8,8 +8,8 @@ extends Node
 
 ## shot: [eye, look-at, eye height]
 const SHOTS := {
-	"road": [Vector3(352.0, 0, 2243.0), Vector3(378.0, 0, 2264.0), 1.7],
-	"stall": [Vector3(383.5, 0, 2250.5), Vector3(371.0, 0, 2266.0), 1.7],
+	"road": [Vector3(345.0, 0, 2238.0), Vector3(376.0, 0, 2262.0), 1.7],
+	"stall": [Vector3(381.5, 0, 2257.5), Vector3(371.0, 0, 2267.5), 1.7],
 	"menu": [Vector3(372.0, 0, 2253.0), Vector3(376.2, 0, 2256.6), 1.7],
 }
 
@@ -49,13 +49,24 @@ func _run() -> void:
 				world.regions.add_child((load(def.scene_path) as PackedScene).instantiate())
 	var dressing := MarketDressing.new()
 	world.add_child(dressing)
-	# CastPresence isn't running here: stand her at her spot as it would.
-	var merc: Node3D = load("res://creatures/people/scenes/human_woman.tscn").instantiate()
-	merc.set(&"wander_radius", 0.0)
-	merc.add_to_group(DialogueDirector.PRESENCE_GROUP)
-	merc.set_meta(&"speaker", &"mercenary")
-	world.add_child(merc)
-	merc.global_transform = Transform3D(Basis(Vector3.UP, dressing.market.mercenary_yaw), dressing.market.mercenary_at)
+	# CastPresence isn't running here: stand the market's people at their spots as it would.
+	var merc: Node3D = null
+	var roster := load(CastPresence.ROSTER_PATH) as PresenceRoster
+	for sp in roster.spots:
+		var sid := String(sp.id)
+		if sp.region != &"village" or not (sid.begins_with("market_") or sid in ["mercenary_well", "woman_stall", "peddler_stall", "man_well"]):
+			continue
+		if not ResourceLoader.exists(sp.scene) or not sp.phases.has("p0_winter"):
+			continue
+		var npc: Node3D = (load(sp.scene) as PackedScene).instantiate()
+		npc.set(&"wander_radius", 0.0)
+		npc.add_to_group(DialogueDirector.PRESENCE_GROUP)
+		npc.set_meta(&"speaker", sp.speaker)
+		world.add_child(npc)
+		npc.global_position = Vector3(sp.at.x, WorldHeight.height_at(sp.at.x, sp.at.y), sp.at.y)
+		npc.rotation.y = deg_to_rad(sp.yaw_deg)
+		if sid == "mercenary_well":
+			merc = npc
 	if id == "menu":
 		var feyre: Node3D = load("res://characters/feyre/model/feyre_model.tscn").instantiate()
 		WardrobeApplier.dress(feyre)

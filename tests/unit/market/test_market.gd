@@ -40,14 +40,16 @@ func test_every_stall_has_one_distinct_trade_and_a_sign() -> void:
 		for i in layer.instances.size() / 5:
 			stalls += 1
 			var at := Vector3(layer.instances[i * 5], layer.instances[i * 5 + 1], layer.instances[i * 5 + 2])
-			var match := market.stalls.filter(func(s: MarketStall) -> bool: return s.position.distance_to(at) < 0.05)
+			var match := market.stalls.filter(func(s: MarketStall) -> bool: return s.scatter_position.distance_to(at) < 0.05)
 			assert_eq(match.size(), 1, "%s stall %d at %s has a trade" % [id, i, at])
 	assert_eq(market.stalls.size(), stalls, "one trade per stall")
 	var trades := {}
 	for s in market.stalls:
 		assert_false(trades.has(s.trade), "%s is not doubled" % s.trade)
 		trades[s.trade] = true
-		assert_true(ResourceLoader.exists(s.sign_path), "%s has its sign" % s.trade)
+		for path in [s.stall_path, s.goods_path, s.sign_path]:
+			assert_true(ResourceLoader.exists(path), "%s: %s" % [s.trade, path])
+		assert_lt(s.position.distance_to(s.scatter_position), 1.5, "%s nudged, not moved away" % s.trade)
 		assert_true(s.canon in ["C", "A", "X"], "%s is tagged canon" % s.trade)
 	assert_true(ResourceLoader.exists("res://story/market/assets/sign_fingerpost.glb"), "the fingerpost")
 
@@ -55,7 +57,7 @@ func test_every_stall_has_one_distinct_trade_and_a_sign() -> void:
 func test_the_cobbler_keeps_the_act1_pelt_stall() -> void:
 	var cobbler := market.stall(&"cobbler")
 	assert_not_null(cobbler)
-	assert_almost_eq(cobbler.position.distance_to(PELT_STALL), 0.0, 0.05, "the goods_pelts stall")
+	assert_almost_eq(cobbler.position.distance_to(PELT_STALL), 0.0, 0.05, "the goods_pelts stall, not nudged")
 
 
 func test_buyers_take_and_price() -> void:
@@ -152,14 +154,19 @@ func test_dressing_builds_signs_stations_and_the_mercenary() -> void:
 	add_child_autofree(d)
 	var signs := d.get_children().filter(func(n: Node) -> bool: return n.name.begins_with("Sign_"))
 	assert_eq(signs.size(), 10, "a sign per stall")
+	for prefix in ["Stall_", "Goods_", "Counter_"]:
+		assert_eq(d.get_children().filter(func(n: Node) -> bool: return n.name.begins_with(prefix)).size(), 10, prefix)
+	assert_not_null(d.get_node_or_null(^"Handcart"))
+	assert_not_null(d.get_node_or_null(^"CratePile"))
 	var stations := get_tree().get_nodes_in_group(MarketStation.GROUP)
 	var ids := stations.map(func(s: MarketStation) -> String: return String(s.buyer.id))
 	ids.sort()
 	assert_eq(ids, ["charms", "clothier", "mercenary", "spice"], "the cobbler is the FurStall")
 	assert_not_null(d.mercenary_station, "her station is by the well in the winter")
 	assert_not_null(d.get_node_or_null(^"Fingerpost"))
-	for s in signs:
-		assert_lt((s as MeshInstance3D).mesh.get_faces().size() / 3, 3000, "%s is a prop (<3k tris)" % s.name)
+	for s in d.get_children():
+		if s is MeshInstance3D:
+			assert_lt((s as MeshInstance3D).mesh.get_faces().size() / 3, 3000, "%s is a prop (<3k tris)" % s.name)
 
 
 func test_the_mercenary_presence_spot_matches_the_market() -> void:
@@ -171,3 +178,36 @@ func test_the_mercenary_presence_spot_matches_the_market() -> void:
 	assert_not_null(found, "CastPresence stands her at the well")
 	assert_almost_eq(found.at.distance_to(Vector2(market.mercenary_at.x, market.mercenary_at.z)), 0.0, 0.05)
 	assert_almost_eq(deg_to_rad(found.yaw_deg), market.mercenary_yaw, 0.01)
+
+
+func test_the_village_stall_layers_give_way() -> void:
+	var field := ScatterField.new()
+	field.region_id = &"village"
+	add_child_autofree(field)
+	var chunk := MultiMeshInstance3D.new()
+	chunk.name = "stall_brown_3_8"
+	field.add_child(chunk)
+	var crate := MultiMeshInstance3D.new()
+	crate.name = "crate_3_8"
+	field.add_child(crate)
+	assert_true(MarketDressing.is_village_stall_chunk(chunk))
+	assert_false(MarketDressing.is_village_stall_chunk(crate), "only stalls and goods")
+	var d := MarketDressing.new()
+	add_child_autofree(d)
+	assert_false(chunk.visible, "hidden")
+	assert_true(crate.visible)
+
+
+func test_market_keepers_stand_behind_their_counters() -> void:
+	var roster := load(CastPresence.ROSTER_PATH) as PresenceRoster
+	var keepers := 0
+	for sp in roster.spots:
+		var id := String(sp.id)
+		if not id.begins_with("market_") or id.begins_with("market_shopper"):
+			continue
+		keepers += 1
+		var st := market.stall(StringName(id.trim_prefix("market_")))
+		assert_not_null(st, id)
+		var k := st.keeper_spot()
+		assert_almost_eq(sp.at.distance_to(Vector2(k.x, k.z)), 0.0, 0.05, "%s behind the counter" % id)
+	assert_gte(keepers, 4)
