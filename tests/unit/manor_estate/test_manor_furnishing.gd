@@ -44,6 +44,8 @@ func test_refurnished_rooms_meet_the_bar() -> void:
 			why.append("%d doors unreachable" % m.unreachable_doors)
 		if not m.story_hits.is_empty():
 			why.append("story %s" % [m.story_hits])
+		if not m.ok_open:
+			why.append("open floor %.1f m round %s" % [m.open, m.open_at])
 		if not m.passage and m.bare_cells > 0:
 			why.append("bare cells %s" % [m.bare_list])
 		if not why.is_empty():

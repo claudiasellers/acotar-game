@@ -15,11 +15,15 @@ const REFURNISHED := [
 	&"tamlin_bedchamber",
 ]
 
-## Floor coverage wanted: 15% in rooms up to 100 m2, easing to 8% at 250 m2
-## and over (a state room needs its circulation space; the bare-cell rule
-## keeps a big room from being empty in patches). Passages 5%.
+## Floor coverage wanted: 15% in rooms up to 100 m2, easing to 12% at 250 m2
+## and over (a state room needs its circulation space; the open-floor rule
+## keeps a big room from being an empty hall in the middle). Passages 5%.
 const COVERAGE_ROOM := 0.15
-const COVERAGE_BIG := 0.08
+const COVERAGE_BIG := 0.12
+## Open floor: in a room (not a passage) no spot of furnishable floor is more
+## than this far from a piece of furniture, a rug or a wall. The story's floor
+## and the door aprons don't count: they are kept open on purpose.
+const OPEN_MAX := 2.5
 const SMALL_AREA := 100.0
 const BIG_AREA := 250.0
 const COVERAGE_PASSAGE := 0.05
@@ -147,6 +151,7 @@ static func measure(room: ManorRoomDef, ctx: ManorFurnishContext, stations: Arra
 			if not z.is_empty():
 				story_hits.append("%s near %s" % [p.prop_id, z.get("why", "?")])
 	var unreachable := _unreachable_doors(room, floor_rects, aprons)
+	var open := _open_floor(room, ctx, any_rects, aprons)
 	# a table or sink a story scene builds at its mark stands on this floor too
 	for z: Dictionary in ctx.keep_clear:
 		if z.level == room.level and z.get("built", false) and room.rect.has_point(z.a):
@@ -167,10 +172,52 @@ static func measure(room: ManorRoomDef, ctx: ManorFurnishContext, stations: Arra
 		"id": room.id, "area": area, "coverage": coverage, "details": details, "need_details": need_details,
 		"repeats": repeats, "bare_cells": bare, "bare_list": bare_list, "cells": nx * nz, "blocked_doors": blocked_doors, "blockers": blockers,
 		"story_hits": story_hits, "unreachable_doors": unreachable, "passage": passage,
-		"art_slots": art, "want_coverage": want_coverage(room),
+		"art_slots": art, "want_coverage": want_coverage(room), "open": open[0], "open_at": open[1],
+		"ok_open": passage or CANON_SPARSE.has(room.id) or open[0] <= OPEN_MAX,
 		"ok_coverage": coverage >= want_coverage(room),
 		"ok_details": details >= need_details,
 	}
+
+
+## The widest open floor: [radius, local centre] of the largest disc of
+## furnishable floor (outside the story's floor and the door aprons) that
+## touches no piece, rug or wall (sampled on a 0.5 m grid).
+static func _open_floor(room: ManorRoomDef, ctx: ManorFurnishContext, rects: Array, aprons: Array) -> Array:
+	var best := 0.0
+	var at := Vector2.ZERO
+	var inner := room.rect.grow(-ManorFurnisher.WALL_FACE)
+	var y := room.rect.position.y + 0.25
+	while y < room.rect.end.y:
+		var x := room.rect.position.x + 0.25
+		while x < room.rect.end.x:
+			var p := Vector2(x, y)
+			x += 0.5
+			var d := minf(minf(p.x - inner.position.x, inner.end.x - p.x), minf(p.y - inner.position.y, inner.end.y - p.y))
+			if d <= best:
+				continue
+			var kept := false
+			for a in aprons:
+				if (a as Rect2).has_point(p):
+					kept = true
+					break
+			if not kept:
+				for z: Dictionary in ctx.keep_clear:
+					if z.level == room.level and ManorKeepClear.distance(z, p) < z.r:
+						kept = true
+						break
+			if kept:
+				continue
+			for r in rects:
+				var rr := r as Rect2
+				var c := Vector2(clampf(p.x, rr.position.x, rr.end.x), clampf(p.y, rr.position.y, rr.end.y))
+				d = minf(d, c.distance_to(p))
+				if d <= best:
+					break
+			if d > best:
+				best = d
+				at = p - room.rect.position
+		y += 0.5
+	return [best, at]
 
 
 ## Share of the room's floor inside a story keep-clear zone or a door apron

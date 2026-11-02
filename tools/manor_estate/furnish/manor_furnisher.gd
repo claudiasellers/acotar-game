@@ -328,6 +328,26 @@ func group_at(origin: Vector2, yaw: float, items: Array, careful: bool = true) -
 	return out
 
 
+## A conversation group round room-local (x, z): `back` (a sofa or settee) on
+## the group's far side facing the middle, a pair of `chair` either side facing
+## in, a low table between them. `yaw` turns the group: at 0 the sofa sits at
+## +z looking towards -z. Pieces that would block something are left out (and
+## logged). Returns the tables placed, for dressing.
+func seating(x: float, z: float, yaw: float, back: StringName, chair: StringName,
+		table: StringName = &"table_tea", reach: float = 1.35) -> Array[ManorPropPlacement]:
+	var b := Basis(Vector3.UP, deg_to_rad(yaw))
+	var depth_back := PropLib.size_of(back).z
+	var out: Array[ManorPropPlacement] = []
+	var items := [[back, 0.0, 0.55 + depth_back * 0.5, 0.0], [table, 0.0, 0.0, 0.0],
+			[chair, -reach, 0.0, -90.0], [chair, reach, 0.0, 90.0]]
+	for it: Array in items:
+		var w := b * Vector3(it[1], 0.0, it[2])
+		var p := at(it[0], x + w.x, z + w.z, yaw + it[3])
+		if p != null and it[0] == table:
+			out.append(p)
+	return out
+
+
 ## Pieces in a row along a wall's free spans, each `gap` apart; returns the count.
 func line_wall(side: String, ids: Array, gap: float = 0.25, from: float = -1.0, to: float = -1.0) -> int:
 	var placed := 0
