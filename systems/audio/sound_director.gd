@@ -61,6 +61,11 @@ var _naga: Array = []
 var _once_ms: Dictionary = {}
 ## 0..1 while a voiced line plays: the bed and music step back for it.
 var voice_duck: float = 0.0
+## 0..1 while a film (scene space id `film_*`) runs: the film carries its own
+## score, so space music falls silent and beds sit at half.
+var film_hold: float = 0.0
+var _films: Dictionary = {}
+var _film_tween: Tween
 var _voice_tween: Tween
 var _interior: Node3D
 
@@ -87,8 +92,8 @@ func _ready() -> void:
 	EventBus.creature_killed.connect(_on_creature_killed)
 	EventBus.celebration_requested.connect(_on_celebration)
 	EventBus.journal_entry_added.connect(_on_journal_entry)
-	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _story_spaces += 1)
-	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _story_spaces = maxi(_story_spaces - 1, 0))
+	EventBus.scene_space_started.connect(_on_space_started)
+	EventBus.scene_space_finished.connect(_on_space_finished)
 	get_tree().node_added.connect(_on_node_added)
 	for node in get_tree().root.find_children("*", "", true, false):
 		_on_node_added(node)
@@ -264,10 +269,12 @@ func _mix() -> void:
 	var wall_keep := 1.0 - 0.9 * wall
 	var paused_db := -6.0 if get_tree().paused else 0.0
 	var voice_db := VOICE_DUCK_DB * voice_duck
+	var film_bed := 1.0 - 0.5 * film_hold
+	var film_music := 1.0 - film_hold
 	for p in _beds:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep, paused_db + voice_db)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep * film_bed, paused_db + voice_db)
 	for p in _music:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep, voice_db * 1.5)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep * film_music, voice_db * 1.5)
 	_apply(_dread_bed, dread, 0.0)
 
 
@@ -310,6 +317,26 @@ func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	_set_dread(target, seconds)
 	if target < 0.3:
 		_stop_loop(&"beast_heartbeat", 3.0)
+
+
+func _on_space_started(space_id: StringName) -> void:
+	_story_spaces += 1
+	if String(space_id).begins_with("film_"):
+		_films[space_id] = true
+		_tween_film(1.0)
+
+
+func _on_space_finished(space_id: StringName) -> void:
+	_story_spaces = maxi(_story_spaces - 1, 0)
+	if _films.erase(space_id) and _films.is_empty():
+		_tween_film(0.0)
+
+
+func _tween_film(target: float) -> void:
+	if _film_tween:
+		_film_tween.kill()
+	_film_tween = create_tween()
+	_film_tween.tween_property(self, ^"film_hold", target, 1.5 if target > 0.0 else 3.0)
 
 
 func _set_dread(target: float, seconds: float) -> void:

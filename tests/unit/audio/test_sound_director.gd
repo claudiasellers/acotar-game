@@ -235,3 +235,16 @@ func test_the_opening_film_score_plays_on_music_and_stops_on_skip() -> void:
 	SoundDirector.stop_cue(&"music_opening_film", 0.05)
 	await wait_seconds(0.2)
 	assert_false(is_instance_valid(playing[0]))
+
+
+func test_films_silence_space_music_and_halve_the_bed() -> void:
+	var d := _director()
+	EventBus.scene_space_started.emit(&"film_opening")
+	await wait_seconds(1.7)
+	assert_almost_eq(d.film_hold, 1.0, 0.01)
+	EventBus.scene_space_started.emit(&"wolf_kill")
+	EventBus.scene_space_finished.emit(&"wolf_kill")
+	assert_almost_eq(d.film_hold, 1.0, 0.01, "only film_* spaces hold the music")
+	EventBus.scene_space_finished.emit(&"film_opening")
+	await wait_seconds(3.2)
+	assert_almost_eq(d.film_hold, 0.0, 0.01)
