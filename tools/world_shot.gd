@@ -87,7 +87,9 @@ func _run() -> void:
 		await get_tree().process_frame
 		RenderingServer.force_draw(true, 0.0)
 	else:
-		await _wait_regions_built(world, 180.0)
+		# Software renders (cloud lavapipe) build far slower: WORLD_SHOT_REGION_CAP=900.
+		var cap := OS.get_environment("WORLD_SHOT_REGION_CAP")
+		await _wait_regions_built(world, float(cap) if cap.is_valid_float() else 180.0)
 		for i in 30:
 			await get_tree().process_frame
 	var img := root.get_texture().get_image()
