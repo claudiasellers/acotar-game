@@ -1,0 +1,7 @@
+from film-lane
+quality look
+size 1920x1080
+timeout 1200
+shot opening res://tools/film/opening_film_shot.tscn {out} noclip
+shot eyes_open res://tools/film/cutscene_shot.tscn {out} eyes_open
+shot night_court res://tools/film/cutscene_shot.tscn {out} night_court
