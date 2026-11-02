@@ -56,7 +56,7 @@ func test_every_hairstyle_binds() -> void:
 			var mi := m.hair.get_child(0) as MeshInstance3D
 			assert_not_null(mi.skin, f)
 			count += 1
-	assert_eq(count, 16)
+	assert_eq(count, 17, "16 + the Calanmai crown braid (L45)")
 
 
 func test_gowns_have_tintable_fabric() -> void:
@@ -86,3 +86,40 @@ func test_everyday_wardrobe_is_skinned_with_fabric_first() -> void:
 		var mat := mi.mesh.surface_get_material(0)
 		assert_eq(mat.resource_name if mat else "", "fabric", id)
 		inst.free()
+
+
+## Princess pass 2: the lashes close with the lids, and her natural colouring
+## (blush, glossy lips, lash line, brows) lives outside the six makeup channels,
+## so the vanity's "None" never leaves her bare-faced.
+func test_lashes_blink_and_natural_colouring_survives_no_makeup() -> void:
+	var m := _model()
+	assert_not_null(m.lashes)
+	for s in ["blink_L", "blink_R"]:
+		assert_gt(m.lashes.find_blend_shape_by_name(s), -1, s)
+	m.set_shape("blink_L", 1.0)
+	var li: int = m.lashes.find_blend_shape_by_name("blink_L")
+	assert_almost_eq(m.lashes.get_blend_shape_value(li), 1.0, 0.001)
+	var head: ShaderMaterial = m.skin_head_material
+	for ch in MakeupData.CHANNELS:
+		head.set_shader_parameter("%s_amount" % ch, 0.0)
+	for p in ["natural_blush_amount", "natural_lips_amount", "natural_lips_gloss",
+			"natural_liner_amount", "natural_brows_amount"]:
+		assert_gt(float(head.get_shader_parameter(p)), 0.2, p)
+	var body: ShaderMaterial = m.skin_body_material
+	var body_blush: Variant = body.get_shader_parameter("natural_blush_amount")
+	assert_true(body_blush == null or float(body_blush) == 0.0, "body has no face colouring")
+
+
+## The wardrobe applier must leave her head on the skin shader (it used to reset
+## uncovered regions to the glb's flat skin, losing makeup and natural colouring).
+func test_worn_feyre_keeps_the_skin_shader_on_her_face() -> void:
+	var f := (load("res://characters/feyre/feyre.tscn") as PackedScene).instantiate() as Feyre
+	add_child_autofree(f)
+	await wait_frames(2)
+	var body := f.find_child("Body", true, false) as MeshInstance3D
+	assert_not_null(body)
+	for i in body.mesh.get_surface_count():
+		if (body.mesh as ArrayMesh).surface_get_name(i) == "head":
+			var mat := body.get_active_material(i) as ShaderMaterial
+			assert_not_null(mat, "head keeps the skin shader")
+			assert_gt(float(mat.get_shader_parameter("natural_lips_amount")), 0.2)

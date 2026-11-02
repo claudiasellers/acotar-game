@@ -3,7 +3,9 @@
 ## between groves read as bare brown dirt from a distance. Here the floor
 ## paint fades with the same stand map the trees are placed from: leaf litter
 ## under the groves, grass (or moss) out in the open, feathered through the
-## edge band. Pure and deterministic; safe from the terrain baker's threads.
+## edge band, and none where the trees are kept out (view cones, clearing
+## floors, path verges). Pure and deterministic; safe from the terrain
+## baker's threads.
 ## Loaded by path (no class_name), like LandscapeLayout.
 extends RefCounted
 
@@ -23,8 +25,17 @@ static func grove(region: String, biome: StringName, x: float, z: float) -> floa
 	var c := _region(region)
 	if c.is_empty() or not (c["open"] as Dictionary).has(biome):
 		return 1.0
+	var def: WoodsRegionDef = c["def"]
+	# Where WoodsScatter keeps trees out, the litter goes too: the view cones
+	# (the wall-crossing reveal), clearing floors and path verges.
+	if WoodsComposition.in_vista(def, x, z):
+		return 0.0
 	var u := LandscapeLayout.stand_at(c["layout"], x, z)
-	return LandscapeLayout.zone(u, c["open"][biome])["grove"]
+	var g: float = LandscapeLayout.zone(u, c["open"][biome])["grove"]
+	var glade := WoodsComposition.clearing_at(def, x, z, 1.4)
+	if not glade.is_empty():
+		g *= LandscapeLayout.clearing_factor(Vector2(x, z).distance_to(glade["center"]), float(glade["radius"]))
+	return g * LandscapeLayout.path_factor(WoodsComposition.path_distance(def, x, z))
 
 
 ## The biome's own paint (floor base, `overlay`, `floor_blend`) under the
@@ -46,7 +57,7 @@ static func _region(region: String) -> Dictionary:
 			for b in def.biomes:
 				# Same open share WoodsScatter places the trees with.
 				open[b.id] = 0.05 if WoodsComposition.is_horror(b) else LandscapeLayout.open_share(b.tree_density)
-			c = {"layout": LandscapeLayout.make(def.seed, def.provider.BOUNDS), "open": open}
+			c = {"layout": LandscapeLayout.make(def.seed, def.provider.BOUNDS), "open": open, "def": def}
 		_cache[region] = c
 	_lock.unlock()
 	return c

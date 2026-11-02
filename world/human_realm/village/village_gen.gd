@@ -124,22 +124,10 @@ func _build_scene(plan: VillagePlan, saved: Array[ScatterLayer]) -> Node3D:
 	var smoke := Node3D.new()
 	smoke.name = "ChimneySmoke"
 	root.add_child(smoke)
-	var pm := _smoke_process()
-	var mesh := _smoke_mesh()
 	i = 0
 	for s in plan.smokes:
-		var p := GPUParticles3D.new()
-		p.name = "Smoke%d" % i
-		p.position = s
-		p.amount = 10
-		p.lifetime = 7.0
-		p.preprocess = 7.0
-		p.process_material = pm
-		p.draw_pass_1 = mesh
-		p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		p.visibility_aabb = AABB(Vector3(-4, -1, -4), Vector3(14, 14, 14))
-		p.visibility_range_end = 300.0
-		smoke.add_child(p)
+		# Soft sprite plumes (quality audit B3; world/shared/fx/chimney_smoke.gd).
+		smoke.add_child(ChimneySmoke.make(s, "Smoke%d" % i))
 		i += 1
 
 	var mood := Node3D.new()
@@ -209,45 +197,3 @@ func _build_collision(plan: VillagePlan) -> Node3D:
 				cshape.transform = Transform3D(rot, xf.origin + rot * ((spec[0] as Vector3) * s))
 				body.add_child(cshape)
 	return holder
-
-
-func _smoke_process() -> ParticleProcessMaterial:
-	var m := ParticleProcessMaterial.new()
-	m.direction = Vector3(0, 1, 0)
-	m.spread = 12.0
-	m.initial_velocity_min = 0.6
-	m.initial_velocity_max = 1.0
-	m.gravity = Vector3(0.35, 0.25, 0.1)
-	m.scale_min = 0.5
-	m.scale_max = 1.2
-	m.damping_min = 0.1
-	m.damping_max = 0.2
-	var curve := Curve.new()
-	curve.add_point(Vector2(0, 0.4))
-	curve.add_point(Vector2(1, 1.6))
-	var ct := CurveTexture.new()
-	ct.curve = curve
-	m.scale_curve = ct
-	var g := Gradient.new()
-	g.set_color(0, Color(0.55, 0.55, 0.58, 0.55))
-	g.set_color(1, Color(0.75, 0.76, 0.8, 0.0))
-	var gt := GradientTexture1D.new()
-	gt.gradient = g
-	m.color_ramp = gt
-	return m
-
-
-func _smoke_mesh() -> SphereMesh:
-	var s := SphereMesh.new()
-	s.radius = 0.45
-	s.height = 0.8
-	s.radial_segments = 8
-	s.rings = 4
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.vertex_color_use_as_albedo = true
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
-	mat.albedo_color = Color(1, 1, 1, 1)
-	mat.roughness = 1.0
-	s.material = mat
-	return s

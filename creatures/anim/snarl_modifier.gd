@@ -10,7 +10,7 @@ extends SkeletonModifier3D
 ## Each channel at weight 1, in degrees about the bone's own X axis, and which
 ## way (in the skeleton's space: the model faces -Z) the bone's tip must go.
 const CHANNELS := {
-	&"jaw_open": [[&"jaw", 32.0, Vector3.DOWN]],
+	&"jaw_open": [[&"jaw", 46.0, Vector3.DOWN]],
 	&"ears_back": [[&"ear_l", 60.0, Vector3.BACK], [&"ear_r", 60.0, Vector3.BACK]],
 	&"ears_up": [[&"ear_l", 18.0, Vector3.FORWARD], [&"ear_r", 18.0, Vector3.FORWARD]],
 	&"head_low": [[&"head", 16.0, Vector3.DOWN], [&"neck", 8.0, Vector3.DOWN]],

@@ -19,16 +19,24 @@ static func go(player: Node3D, fallback: Vector3) -> void:
 	var dest := destination(PhaseManager.current_phase)
 	var anchor := find_anchor(player.get_tree(), dest.anchor)
 	if anchor:
-		player.global_position = anchor.global_position + Vector3.UP * 0.1
+		_place(player, anchor.global_position + Vector3.UP * 0.1)
 		_face(player, anchor.global_rotation.y)
 	elif WorldStreamer.get_region(dest.region) != null:
 		EventBus.travel_requested.emit(dest.region, dest.anchor)
 	else:
-		player.global_position = fallback
+		_place(player, fallback)
 	if player is CharacterBody3D:
 		(player as CharacterBody3D).velocity = Vector3.ZERO
 	if player.has_method(&"recenter_camera"):
 		player.call(&"recenter_camera")
+
+
+## Feyre.teleport when she has it (it also stops a ledge climb mid-tween).
+static func _place(player: Node3D, at: Vector3) -> void:
+	if player.has_method(&"teleport"):
+		player.call(&"teleport", at)
+	else:
+		player.global_position = at
 
 
 static func find_anchor(tree: SceneTree, anchor_id: StringName) -> Node3D:

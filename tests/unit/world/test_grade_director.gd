@@ -143,3 +143,23 @@ func test_a_blend_into_the_bogge_carries_its_dread_headroom() -> void:
 	var mid_moody := GradeDirector.with_mood(mid, 1.0).exposure
 	assert_gt(mid_moody / mid.exposure, spring_moody / spring.exposure,
 		"half-way into the Bogge takes less of the dread than spring does")
+
+
+func test_the_bogge_fog_is_lit_by_its_cold_ambient() -> void:
+	# Fog lit by a 0.45 sun alone became a black wall that ate the sky, so the
+	# trunks had nothing paler behind them (audit D8). Its ambient lights it.
+	var bogge := GradeDirector.load_preset(&"bogge")
+	assert_gt(bogge.volumetric_ambient_inject, 0.5, "the Bogge fog takes the ambient")
+	assert_gt(bogge.fog_color.get_luminance(), 0.45, "the murk is paler than the trunks")
+	assert_lt(bogge.fog_color.get_luminance(), 0.65, "but still grey murk, not milk")
+	assert_gt(bogge.sun_color.b, bogge.sun_color.r, "a cold rim, not a warm one")
+	assert_eq(bogge.glow_bloom, 0.0, "no eye bloom")
+	assert_almost_eq(GradeDirector.load_preset(&"spring").volumetric_ambient_inject, 0.0, 0.0001,
+		"other grades keep their sun-lit fog")
+	var env := Environment.new()
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child_autofree(we)
+	director.environment = we
+	director.apply(bogge)
+	assert_almost_eq(env.volumetric_fog_ambient_inject, bogge.volumetric_ambient_inject, 0.0001)

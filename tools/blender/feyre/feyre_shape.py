@@ -1,8 +1,9 @@
 """Feyre's body as a signed-distance sculpt, plus the landmarks every builder shares.
 
 Art direction (R3): a storybook-princess take on a 19-year-old huntress.  About
-1 : 5.9 head-to-body, big round blue-grey eyes with an arched upper lid, a small
-button nose, full soft lips, round cheeks and a small chin; slim neck, narrow
+1 : 5.9 head-to-body, big round blue-grey eyes with a high arched upper lid and a
+lifted outer corner, a small upturned button nose, full soft lips, round cheeks,
+a soft narrow jaw and a small round chin (princess pass 2, Nov 2026); slim neck, narrow
 waist, long legs, small hands and feet.  Thin-from-hunger is the base; the
 `nourished` shape key fills her out.
 
@@ -21,21 +22,29 @@ HEIGHT = 1.66
 # ---- head -----------------------------------------------------------------
 CHIN_Z = 1.405
 HEAD_C = np.array([0.0, 0.004, 1.528])  # rough head centre (UV projection / weights)
-EYE_R = 0.0188
-EYE_X = 0.0365
+EYE_R = 0.0207     # princess pass 2: 0.0188 -> +10%
+EYE_X = 0.0372
 EYE_Z = 1.507
 EYE_Y = -0.0612
-NOSE_TIP = np.array([0.0, -0.0925, 1.4725])
+NOSE_TIP = np.array([0.0, -0.0905, 1.4740])  # smaller, slightly upturned button
 MOUTH_Z = 1.4455
 MOUTH_Y = -0.0815
-MOUTH_HALF_W = 0.0165
+MOUTH_HALF_W = 0.0176
 BROW_Z = EYE_Z + 0.029
+# eye look (build_feyre reads these; cast_shape.load can pin the pre-pass-2 values:
+# IRIS_R 0.62, PUPIL_R 0.26, LASH_LEN (0.0018, 0.0052), LASH_FLICK 1.2)
+IRIS_R = 0.66      # iris radius as a fraction of the eyeball radius (front view)
+PUPIL_R = 0.27
+LASH_LEN = (0.0030, 0.0078)   # upper lash length: inner corner, extra towards the outer corner
+LASH_FLICK = 1.6              # how far the outer lashes sweep out and up
+LASH_CLUMPS = 24              # tapered upper lash clumps per eye (pre-pass-2: one solid strip)
+LASH_LOWER = 6                # fine lower lashes per eye, outer half
 # eye opening, as angles (radians) seen from the eye centre: horizontal half-width,
 # upper and lower lid heights, and how far the opening tilts up at the outer corner
-EYE_OPEN_W = math.radians(64)
-EYE_OPEN_UP = math.radians(35)
-EYE_OPEN_LO = math.radians(31)
-EYE_TILT = math.radians(7)
+EYE_OPEN_W = math.radians(66)
+EYE_OPEN_UP = math.radians(41)
+EYE_OPEN_LO = math.radians(33)
+EYE_TILT = math.radians(8)
 
 # ---- skeleton anchor points ----------------------------------------------
 NECK_BASE = np.array([0.0, 0.012, 1.315])
@@ -162,9 +171,9 @@ def build_grid(h=0.0025):
     U(sdf.ellipsoid((0, 0.012, 1.553), (0.0915, 0.096, 0.1035)))                 # cranium
     U(sdf.ellipsoid((0, -0.010, 1.497), (0.0775, 0.074, 0.080)), 0.03)          # face mass
     for s in (1, -1):
-        U(sdf.ellipsoid((0.042 * s, -0.053, 1.474), (0.032, 0.031, 0.027)), 0.022)  # baby cheeks
-    U(sdf.round_cone((0, -0.024, 1.462), (0, -0.056, 1.423), 0.052, 0.0175), 0.03)  # jaw to chin
-    U(sdf.sphere((0, -0.061, 1.4205), 0.0145), 0.012)                              # chin ball
+        U(sdf.ellipsoid((0.042 * s, -0.053, 1.481), (0.031, 0.030, 0.026)), 0.026)  # cheek apples, high
+    U(sdf.round_cone((0, -0.024, 1.462), (0, -0.055, 1.424), 0.0495, 0.0162), 0.036)  # jaw to chin (soft, narrow)
+    U(sdf.sphere((0, -0.0605, 1.4215), 0.0136), 0.012)                              # chin ball
     # brow ridge softness (very slight) and temple fill
     U(sdf.ellipsoid((0, -0.058, 1.556), (0.064, 0.034, 0.030)), 0.025)
     # ears (small, rounded, mostly under hair)
@@ -173,18 +182,23 @@ def build_grid(h=0.0025):
         U(sdf.ellipsoid((0.088 * s, 0.016, 1.500), (0.010, 0.019, 0.026), rot), 0.006)
         S(sdf.ellipsoid((0.096 * s, 0.012, 1.497), (0.004, 0.011, 0.016), rot), 0.003)
     # nose: soft bridge + button tip + nostril wings
-    U(sdf.round_cone((0, -0.0825, 1.500), (0, -0.0885, 1.477), 0.0038, 0.0050), 0.010)
-    U(sdf.sphere(NOSE_TIP, 0.0057), 0.005)
+    U(sdf.round_cone((0, -0.0795, 1.502), (0, -0.0862, 1.478), 0.0023, 0.0040), 0.008)
+    U(sdf.sphere(NOSE_TIP, 0.0049), 0.005)
     for s in (1, -1):
-        U(sdf.sphere((0.0068 * s, -0.0855, 1.4700), 0.0040), 0.004)
+        U(sdf.sphere((0.0057 * s, -0.0840, 1.4712), 0.0033), 0.004)
            # nostril shadow
     # lips: full upper with a soft cupid's bow, rounder lower
     for s in (1, -1):
-        U(sdf.ellipsoid((0.0068 * s, MOUTH_Y + 0.0015, MOUTH_Z + 0.0036), (0.0098, 0.0046, 0.0040),
+        U(sdf.ellipsoid((0.0072 * s, MOUTH_Y + 0.0038, MOUTH_Z + 0.0037), (0.0110, 0.0052, 0.0046),
                         _rot_y(math.radians(-12 * s))), 0.005)
-    U(sdf.ellipsoid((0, MOUTH_Y + 0.0022, MOUTH_Z - 0.0043), (0.0118, 0.0052, 0.0048)), 0.005)
-    S(sdf.ellipsoid((0, MOUTH_Y - 0.0055, MOUTH_Z), (0.016, 0.005, 0.0010)), 0.0012)  # mouth line
+    U(sdf.ellipsoid((0, MOUTH_Y + 0.0036, MOUTH_Z - 0.0050), (0.0140, 0.0056, 0.0056)), 0.005)
+    S(sdf.ellipsoid((0, MOUTH_Y - 0.0055, MOUTH_Z), (0.0158, 0.005, 0.0010)), 0.0015)  # mouth line
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z - 0.0155), (0.011, 0.004, 0.0032)), 0.006)  # crease above the chin
+    for s in (1, -1):
+        # a closed, relaxed smile: the corners tuck in and lift a touch
+        S(sdf.sphere((s * (MOUTH_HALF_W + 0.0004), MOUTH_Y + 0.0012, MOUTH_Z + 0.0019), 0.0024), 0.0024)
+        # cheekbone lift under the outer eye
+        U(sdf.ellipsoid((0.044 * s, -0.061, 1.491), (0.019, 0.011, 0.009), _rot_z(math.radians(-15 * s))), 0.012)
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z + 0.0135), (0.0032, 0.003, 0.0045)), 0.004)          # philtrum
     # eye sockets + lids
     for s in (1, -1):

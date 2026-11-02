@@ -51,7 +51,11 @@ def house_wattle():
     a.box((w, d, 2.5), (0, 0, 0.35 + 1.25), C["daub_grey"], bevel=0.08)
     a.timber_frame(w, d, 0.35, 2.5, posts=2, braces=False)
     a.gable_fill(w, d, 2.85, 2.5, C["daub_grey"])
+    # An old thatch: the ridge has
+    # settled between the gables (audit A7: lived in, poor).
+    nr = a._mark()
     a.gable_roof(w, d, 2.85, 2.5, C["thatch"], overhang=0.7, thick=0.5, snow_depth=0.28, bevel=0.18)
+    a.bend_since(nr, 0.22, w * 0.5 + 0.75)
     a.chimney(-2.3, 0.6, 0.0, 6.4, w=0.65)
     a.door(0.8, -d / 2, w=1.0, h=1.9)
     a.window(-1.2, -d / 2, 1.7, w=0.7, h=0.7)
@@ -93,11 +97,44 @@ def house_croft():
     for i in range(10):
         a.box((a.rng.uniform(0.4, 0.8), 0.08, 0.3), (a.rng.uniform(-2.2, 2.2), -d / 2 - 0.02, a.rng.uniform(0.3, 2.0)), C["stone_dark"])
     a.gable_fill(w, d, 2.3, 2.2, C["stone"])
+    nr = a._mark()
     a.gable_roof(w, d, 2.3, 2.2, C["thatch"], overhang=0.6, thick=0.45, snow_depth=0.3, bevel=0.16)
+    a.bend_since(nr, 0.14, w * 0.5 + 0.65)
     a.chimney(w / 2 - 0.2, 0.0, 0.0, 5.3, col=C["stone_dark"], w=0.6)
     a.door(-0.9, -d / 2, w=0.95, h=1.8)
     a.window(0.9, -d / 2, 1.4, w=0.6, h=0.6)
     a.icicles(-3.0, 3.0, -d / 2 - 0.7, 2.1, 9)
+    a.export()
+
+
+def house_leanto():
+    """Stone croft with a lean-to byre on its east gable: a mono-pitch board
+    roof, plank walls, a half door for the cow, hay at the door."""
+    a = Asset("village_house_leanto", 15)
+    w, d = 5.0, 4.2
+    bx = -1.3  # the croft sits west, the byre east: footprint 7.6 x 4.4
+    a.box((w, d, 2.4), (bx, 0, 1.2), C["stone"], bevel=0.12)
+    for i in range(8):
+        a.box((a.rng.uniform(0.4, 0.8), 0.08, 0.3), (bx + a.rng.uniform(-2.2, 2.2), -d / 2 - 0.02, a.rng.uniform(0.3, 2.1)), C["stone_dark"])
+    a.gable_fill(w, d, 2.4, 2.3, C["stone"], x0=bx)
+    nr = a._mark()
+    a.gable_roof(w, d, 2.4, 2.3, C["thatch_old"], overhang=0.55, thick=0.45, snow_depth=0.26, bevel=0.16, x0=bx)
+    a.bend_since(nr, 0.12, w * 0.5 + 0.6, bx)
+    a.chimney(bx - w / 2 + 0.3, 0.3, 0.0, 5.4, col=C["stone_dark"], w=0.6)
+    a.door(bx - 0.9, -d / 2, w=0.95, h=1.85)
+    a.window(bx + 1.0, -d / 2, 1.5, w=0.6, h=0.6)
+    # The byre: plank walls under a single slope falling away from the croft.
+    lx = bx + w / 2 + 1.25
+    a.box((2.5, d - 0.3, 2.0), (lx, 0, 1.0), C["plank_old"], bevel=0.03)
+    for y in (-(d - 0.3) / 2, (d - 0.3) / 2):
+        for x in (lx - 1.2, lx + 1.2):
+            a.box((0.16, 0.16, 2.1), (x, y, 1.05), C["timber"])
+    a.box((3.0, d + 0.4, 0.14), (lx + 0.1, 0, 2.25), C["plank"], rot=(0, 0.32, 0), bevel=0.02, snow=1.0)
+    a.door(lx - 0.2, -(d - 0.3) / 2, w=1.2, h=1.1, col=C["plank_old"])  # half door
+    a.box((1.3, 0.12, 0.8), (lx - 0.2, -(d - 0.3) / 2 - 0.02, 1.55), C["glass_dark"])
+    a.sphere(0.55, (lx + 0.8, -d / 2 - 0.5, 0.2), C["thatch"], scale=(1.2, 0.8, 0.6), subdiv=1)  # hay
+    a.icicles(bx - 2.8, bx + 2.8, -d / 2 - 0.65, 2.3, 9)
+    a.snow_mound((lx + 1.4, 1.6, 0.0), 0.7, 0.4)
     a.export()
 
 
@@ -519,7 +556,7 @@ def bridge():
 
 ALL = {
     "house_timber": house_timber, "house_wattle": house_wattle, "house_long": house_long,
-    "house_croft": house_croft, "shed": shed, "tavern": tavern, "tavern_interior": tavern_interior,
+    "house_croft": house_croft, "house_leanto": house_leanto, "shed": shed, "tavern": tavern, "tavern_interior": tavern_interior,
     "meeting_hall": meeting_hall, "debt_house": debt_house, "barn_abandoned": barn_abandoned,
     "mill": mill, "mill_wheel": mill_wheel, "bridge": bridge, "smithy": smithy, "well": well,
     "stalls": lambda: [market_stall("village_stall_grey", C["cloth_grey"], 31),

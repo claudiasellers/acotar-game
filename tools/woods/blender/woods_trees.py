@@ -145,17 +145,20 @@ class Kit:
                       tuple((flex, glow) for _ in f))
 
     def flower(self, center, normal, petals, radius, petal, heart, flex):
-        """An oversized five-petal blossom (R3), a flat fan facing `normal`."""
+        """An oversized blossom (R3) facing `normal`: rounded lobed petals
+        (quality audit B4: pointed stars read as flat star decals), each
+        running notch, shoulder, tip, shoulder."""
         n = Vector(normal).normalized()
         side = n.orthogonal().normalized()
         up = n.cross(side)
         c = Vector(center)
         mid = self.add_vert(c + n * radius * 0.15)
+        half = math.pi / petals
         ring = []
-        for i in range(petals * 2):
-            a = math.tau * i / (petals * 2)
-            r = radius if i % 2 == 0 else radius * 0.45
-            ring.append(self.add_vert(c + (side * math.cos(a) + up * math.sin(a)) * r))
+        for i in range(petals):
+            am = math.tau * i / petals
+            for a, r in ((am - half, 0.45), (am - half * 0.55, 0.9), (am, 1.0), (am + half * 0.55, 0.9)):
+                ring.append(self.add_vert(c + (side * math.cos(a) + up * math.sin(a)) * radius * r))
         for i in range(len(ring)):
             a, b = ring[i], ring[(i + 1) % len(ring)]
             # One-sided: woods_foliage.gdshader draws both faces (cull_disabled).
@@ -369,7 +372,7 @@ def hawthorn(kit, near):
                                         limb=1.9, rise=0.45, leaf=1.1, crown=1.1, leaf_top=LEAF,
                                         leaf_bottom=mix(LEAF_DEEP, TEAL, 0.4)))
     if near:
-        blossoms(kit, tips, 7, 0.13, [CREAM, CREAM, BLUSH], GOLD, 1.0)
+        blossoms(kit, tips, 5, 0.12, [CREAM, CREAM, BLUSH], GOLD, 1.0)
 
 
 def wild_cherry(kit, near):
@@ -378,7 +381,7 @@ def wild_cherry(kit, near):
                                         lean=0.18, limbs=6, limb=3.0, rise=0.45, leaf=1.5, crown=1.2,
                                         leaf_top=pink, leaf_bottom=shade(pink, 0.78)))
     if near:
-        blossoms(kit, tips, 4, 0.18, [CREAM, BLUSH, ROSE], GOLD, 1.3)
+        blossoms(kit, tips, 2, 0.2, [CREAM, BLUSH, ROSE], GOLD, 1.3)
 
 
 def elder(kit, near):
@@ -388,7 +391,7 @@ def elder(kit, near):
         for t in tips:
             for _ in range(3):
                 c = Vector(t) + Vector((kit.rng.uniform(-0.7, 0.7), kit.rng.uniform(-0.7, 0.7), 0.55))
-                kit.flower(c, (0, 0, 1), 9, 0.2, CREAM, shade(CREAM, 0.9), 0.5)
+                kit.flower(c, (0, 0, 1), 6, 0.2, CREAM, shade(CREAM, 0.9), 0.5)
 
 
 def twisted_dead(kit, near):
@@ -437,7 +440,7 @@ def crab_apple(kit, near):
                                         limb=2.8, rise=0.35, leaf=1.5, crown=1.3, squash=0.7,
                                         leaf_top=BLUSH, leaf_bottom=mix(ROSE, BRUISE, 0.15)))
     if near:
-        blossoms(kit, tips, 4, 0.2, [CREAM, BLUSH, ROSE], GOLD, 1.3)
+        blossoms(kit, tips, 2, 0.21, [CREAM, BLUSH, ROSE], GOLD, 1.3)
 
 
 def lilac_tree(kit, near):
@@ -509,11 +512,22 @@ def fallen_log(kit, near):
     if near:
         for i in range(1, 4):  # moss along the top
             kit.blob(pts[i] + Vector((0, 0, 0.3)), 0.45, 0.35, MOSS, shade(MOSS, 0.75), 1, 0.0, lump=0.45)
-        plate = pts[0] + Vector((-0.2, 0, 0.3))
-        for k in range(7):  # the torn root plate, roots splayed in a disc
-            a = math.tau * k / 7
-            tip = plate + Vector((-0.2, math.cos(a) * 1.3, math.sin(a) * 1.1))
-            kit.tube([plate, tip], [0.16, 0.04], 4, BARK_DARK, FAWN, 0.0, 0.0)
+        # The torn root plate: a clod of dark earth with roots that bend,
+        # fork and taper to threads. (Seven straight four-sided rays, dark
+        # to fawn, read up close as a black spiky star: quality audit B4.)
+        plate = pts[0] + Vector((-0.25, 0, 0.3))
+        earth, earth_top = shade(BOG, 1.3), mix(BARK_DARK, MOSS, 0.25)
+        for k in range(5):
+            a = math.tau * k / 5 + kit.rng.uniform(-0.3, 0.3)
+            c = plate + Vector((kit.rng.uniform(-0.15, 0.05), math.cos(a) * 0.5, math.sin(a) * 0.4))
+            kit.blob(c, kit.rng.uniform(0.3, 0.42), 0.85, earth_top, earth, 1, 0.0, lump=0.5)
+        for k in range(9):
+            a = math.tau * k / 9 + kit.rng.uniform(-0.25, 0.25)
+            d = Vector((-0.35, math.cos(a), math.sin(a) * 0.85))
+            line = branch_line(kit, plate, d, kit.rng.uniform(0.9, 1.6), 3, droop=0.15)
+            kit.tube(line, taper(len(line), 0.12, 0.015), 5, BARK_DARK, BARK, 0.0, 0.0)
+            fork = branch_line(kit, line[1], d + Vector((0, kit.rng.uniform(-0.6, 0.6), -0.3)), 0.5, 2, droop=0.2)
+            kit.tube(fork, taper(len(fork), 0.04, 0.008), 3, BARK_DARK, BARK, 0.0, 0.0)
         for _ in range(2):  # broken branch stubs
             b = kit.rng.choice(pts[1:4])
             d = Vector((kit.rng.uniform(-0.3, 0.3), kit.rng.choice([-1, 1]), 0.6))

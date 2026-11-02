@@ -7,6 +7,9 @@
 ##   pool:*                                    L44: the picnic, finding the pool, jumping in
 ##   painting:* p4_painting_playtest.gd (L30) studio, gallery, first painting
 ##   attor:*                                   L44: the garden goes still; she hides in the yew and keeps still
+##   calanmai:* p5_calanmai_playtest.gd (L45) the order, the fires, the stranger,
+##                                             the hallway, the bruise, the roses,
+##                                             the gown and the paintings (p5)
 ## Each segment script is instanced as a "chained" child that shares this run's
 ## game, Feyre, beats and log, so its _run (which loads a dev jump) never runs.
 ## Its beats are renamed "<segment>:<beat>". Before each one the chain walks her
@@ -25,6 +28,7 @@ const HOUSE := "res://tools/playtest/p3_house_playtest.gd"
 const SURIEL := "res://tools/playtest/p3_suriel_playtest.gd"
 const FAERIE := "res://tools/playtest/p3_faerie_playtest.gd"
 const PAINTING := "res://tools/playtest/p4_painting_playtest.gd"
+const CALANMAI := "res://tools/playtest/p5_calanmai_playtest.gd"
 ## The snare kit from the house and grounds (L26-4): a fresh-killed chicken
 ## from the kitchen larder for the bait, the gardener's twine on the potting
 ## shed's work table for both loops. Both restock daily.
@@ -52,7 +56,9 @@ const BEATS: Array[String] = [
 	"pool:picnic", "pool:found", "pool:jump_in", "pool:swim",
 	"painting:travel", "painting:spawn", "painting:dev_jump_p4", "painting:studio_open",
 	"painting:gallery_opened", "painting:first_painting", "painting:gallery_seen",
-	"attor:travel", "attor:stillness", "attor:hide", "attor:still"]
+	"attor:travel", "attor:stillness", "attor:hide", "attor:still",
+	"calanmai:travel", "calanmai:order", "calanmai:fires", "calanmai:stranger", "calanmai:explained",
+	"calanmai:supper", "calanmai:bite", "calanmai:vanity", "calanmai:lunch", "calanmai:roses", "calanmai:gown"]
 
 var pt: Node
 
@@ -62,7 +68,7 @@ func _init(playtest: Node) -> void:
 
 
 func play() -> bool:
-	for step: Callable in [_house, _suriel, _faerie, _starlight_pool, _painting, _attor]:
+	for step: Callable in [_house, _suriel, _faerie, _starlight_pool, _painting, _attor, _calanmai]:
 		if not await step.call():
 			return false
 		if pt.stop_after != "" and pt.stop_after in _played_since(step):
@@ -262,6 +268,24 @@ func _attor() -> bool:
 	pt._note("noise peaked below %.2f; phase %s" % [AttorInTheGarden.NOISE_MAX, PhaseManager.current_phase])
 	pt._pass()
 	return true
+## p5 (L45): from wherever p4 ended, round to the manor's forecourt; the
+## segment walks in through the front doors (the order's hour comes to her).
+func _calanmai() -> bool:
+	pt._begin("calanmai:travel", "round to the manor forecourt for Calanmai; the Attor must already be behind her")
+	if not WorldState.has_flag("attor_evaded"):
+		pt._fail("attor_evaded isn't earned: the chain needs p4's Attor segment before Calanmai")
+		return false
+	var a: Node3D = await _reach_anchor(&"manor_window_hide", Vector3(7, 0, -30.5))
+	if a == null:
+		return false
+	var p: Vector3 = pt.feyre.global_position
+	if p.z < FORECOURT.z - 10.0:
+		await pt._walk_to(Vector3(-ROUND_X, 0, minf(p.z, -100.0)), 6.0)
+		await pt._walk_to(Vector3(-ROUND_X, 0, FORECOURT.z), 6.0)
+	await pt._walk_to(FORECOURT, 4.0)
+	pt._note("on the forecourt, %s" % _clock())
+	pt._pass()
+	return await _segment("calanmai", CALANMAI)
 
 
 # --- plumbing ---------------------------------------------------------------

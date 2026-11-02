@@ -43,8 +43,8 @@ const UNLOCK_PHASE := {
 	&"rosewild": &"p2_grounds",
 	&"solstice_meadow": &"p6_blight_tightens",
 	&"hill_of_the_rite": &"p5_calanmai",
-	&"blighted_reaches": &"p3_house_and_eastern_woods",
-	&"blossom_vale": &"p3_house_and_eastern_woods",
+	&"blighted_reaches": &"p3_house_and_woods",
+	&"blossom_vale": &"p3_house_and_woods",
 }
 
 

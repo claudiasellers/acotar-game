@@ -18,20 +18,22 @@ OUT_DIR = os.path.join(REPO, "world", "human_realm", "village", "assets")
 
 SNOW = (0.92, 0.94, 0.98)
 
-# Winter village palette: blue-grey, snow-white, wet-black, bone, smoke-brown.
+# Winter village palette: warm limewash, dark timber, golden thatch, oxblood
+# doors, against blue-grey snow (the winter grade halves saturation, so the
+# warm colours carry the "lived in" read, quality audit A7).
 C = {
-    "daub": (0.74, 0.70, 0.62),
-    "daub_grey": (0.62, 0.62, 0.60),
+    "daub": (0.84, 0.68, 0.46),  # warm ochre limewash (reads through the winter grade)
+    "daub_grey": (0.74, 0.64, 0.52),
     "timber": (0.22, 0.16, 0.11),
     "timber_grey": (0.36, 0.33, 0.30),
     "plank": (0.38, 0.29, 0.20),
     "plank_old": (0.33, 0.30, 0.27),
     "stone": (0.52, 0.53, 0.56),
     "stone_dark": (0.38, 0.39, 0.42),
-    "shingle": (0.30, 0.28, 0.28),
-    "thatch": (0.48, 0.40, 0.27),
-    "thatch_old": (0.38, 0.34, 0.27),
-    "door": (0.26, 0.18, 0.12),
+    "shingle": (0.36, 0.27, 0.24),
+    "thatch": (0.66, 0.50, 0.26),
+    "thatch_old": (0.50, 0.40, 0.26),
+    "door": (0.52, 0.16, 0.10),  # oxblood doors and shutters
     "glass_dark": (0.16, 0.20, 0.27),
     "glass_warm": (1.0, 0.72, 0.36),
     "iron": (0.16, 0.16, 0.18),
@@ -56,6 +58,10 @@ C = {
 }
 
 
+def shade_col(c, k):
+    return tuple(min(1.0, max(0.0, v * k)) for v in c[:3])
+
+
 class Asset:
     """One asset under construction: a single bmesh with a Col layer."""
 
@@ -66,11 +72,23 @@ class Asset:
         self.rng = random.Random(seed)
 
     # --- colouring -------------------------------------------------------
+    # A primitive's faces are "the faces that weren't there before it": bmesh
+    # reuses freed slots, so after a bevel (which replaces faces) new faces can
+    # land anywhere in the face list, and slicing from the old length missed
+    # them. They then kept the layer's default white: every plastered wall in
+    # the village rendered white (quality audit A7).
+    def _mark(self):
+        return set(self.bm.faces)
+
+    def _new_faces(self, before):
+        self.bm.faces.ensure_lookup_table()
+        return [f for f in self.bm.faces if f not in before]
+
     def _paint(self, n0, col, snow=0.0, jitter=0.05):
         bm = self.bm
         bm.faces.ensure_lookup_table()
         bm.normal_update()
-        for f in bm.faces[n0:]:
+        for f in self._new_faces(n0):
             j = 1.0 + self.rng.uniform(-jitter, jitter)
             c = [min(1.0, x * j) for x in col]
             if snow > 0.0 and f.normal.z > 0.45:
@@ -83,7 +101,7 @@ class Asset:
         if amount <= 0.0:
             return
         self.bm.faces.ensure_lookup_table()
-        edges = {e for f in self.bm.faces[n0:] for e in f.edges}
+        edges = {e for f in self._new_faces(n0) for e in f.edges}
         bmesh.ops.bevel(self.bm, geom=list(edges), offset=amount, segments=segments,
                         affect="EDGES", profile=0.5, clamp_overlap=True)
 
@@ -94,14 +112,14 @@ class Asset:
 
     # --- primitives ------------------------------------------------------
     def box(self, size, loc, col, rot=(0, 0, 0), bevel=0.0, snow=0.0, jitter=0.05):
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         bmesh.ops.create_cube(self.bm, size=1.0, matrix=self._matrix(loc, rot, size))
         self._bevel(n0, bevel)
         self._paint(n0, col, snow, jitter)
 
     def cyl(self, r, h, loc, col, rot=(0, 0, 0), segs=10, r2=None, snow=0.0, bevel=0.0):
         """Cylinder (or cone with r2) standing on loc (base centre) along local Z."""
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         m = self._matrix(loc, rot) @ Matrix.Translation((0, 0, h * 0.5))
         bmesh.ops.create_cone(self.bm, cap_ends=True, cap_tris=False, segments=segs,
                               radius1=r, radius2=r if r2 is None else r2, depth=h, matrix=m)
@@ -109,14 +127,14 @@ class Asset:
         self._paint(n0, col, snow)
 
     def sphere(self, r, loc, col, scale=(1, 1, 1), subdiv=2, snow=0.0, rot=(0, 0, 0)):
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         bmesh.ops.create_icosphere(self.bm, subdivisions=subdiv, radius=r,
                                    matrix=self._matrix(loc, rot, scale))
         self._paint(n0, col, snow)
 
     def prism(self, profile, length, loc, col, rot=(0, 0, 0), snow=0.0, bevel=0.0):
         """Extrude a closed YZ profile (list of (y, z)) along X, centred on loc."""
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         m = self._matrix(loc, rot)
         half = length * 0.5
         left = [self.bm.verts.new(m @ Vector((-half, y, z))) for y, z in profile]
@@ -128,15 +146,54 @@ class Asset:
             j = (i + 1) % n
             self.bm.faces.new([left[i], left[j], right[j], right[i]])
         self.bm.faces.ensure_lookup_table()
-        bmesh.ops.recalc_face_normals(self.bm, faces=list(self.bm.faces)[n0:])
+        bmesh.ops.recalc_face_normals(self.bm, faces=self._new_faces(n0))
         self._bevel(n0, bevel)
         self._paint(n0, col, snow)
 
     # --- architectural kit ----------------------------------------------
+    def bend_since(self, n0, amount, half, x0=0.0, cuts=5):
+        """Sag everything built since mark `n0` along X: split the long edges,
+        then drop each vertex by a parabola (0 at x0 +- half, `amount` at x0),
+        so a ridge and its slabs dip in the middle like old rafters."""
+        faces = self._new_faces(n0)
+        edges = {e for f in faces for e in f.edges
+                 if abs((e.verts[1].co - e.verts[0].co).normalized().x) > 0.8}
+        if edges:
+            bmesh.ops.subdivide_edges(self.bm, edges=list(edges), cuts=cuts, use_grid_fill=True)
+        self.bm.faces.ensure_lookup_table()
+        verts = {v for f in self._new_faces(n0) for v in f.verts}
+        for v in verts:
+            k = max(0.0, 1.0 - ((v.co.x - x0) / half) ** 2)
+            v.co.z -= amount * k
+
+    def roof_patch(self, d, z0, h, overhang, thick, snow_depth, x, t, side, size, col, x0=0.0, y0=0.0):
+        """A patch of bare thatch or boards lying on a gable_roof slope over
+        its snow (where the snow slid off or the roof was mended): `t` 0 at
+        the ridge .. 1 at the eave, `side` -1 front, 1 back."""
+        half = d * 0.5
+        run = half + overhang
+        pitch = math.atan2(h, half)
+        rise = run * math.tan(pitch)
+        rx = -side * pitch
+        n = Vector((0, -math.sin(rx), math.cos(rx)))
+        p = Vector((x0 + x, y0 + side * run * t, z0 + h - rise * t)) + n * (thick + snow_depth + 0.015)
+        along = Vector((0, side * math.cos(pitch), -math.sin(pitch)))  # down the slope
+        # A ragged cluster of overlapping bundles, not one square tile: the
+        # middle one largest, the others smaller, skewed and offset.
+        for k in range(4):
+            sx = size[0] * (1.0 if k == 0 else self.rng.uniform(0.35, 0.6))
+            sy = size[1] * (1.0 if k == 0 else self.rng.uniform(0.35, 0.6))
+            off = (Vector((self.rng.uniform(-0.5, 0.5) * size[0], 0, 0)) + along * self.rng.uniform(-0.45, 0.45) * size[1]
+                   if k else Vector((0, 0, 0)))
+            self.box((sx, sy, 0.05 + 0.02 * k), tuple(p + off + n * 0.012 * k), shade_col(col, self.rng.uniform(0.85, 1.12)),
+                     rot=(rx, 0, self.rng.uniform(-0.3, 0.3)), bevel=0.02, jitter=0.1)
+
     def gable_roof(self, w, d, z0, h, col, overhang=0.45, thick=0.22, snow_depth=0.16,
-                   sag=0.0, bevel=0.06, x0=0.0, y0=0.0, bare_back=False):
+                   sag=0.0, bevel=0.06, x0=0.0, y0=0.0, bare_back=False, sway=0.0):
         """Two slanted slabs from the eaves (z0) to the ridge (z0 + h) along X,
-        with a chunky snow layer on top of each and a snow bolster on the ridge."""
+        with a chunky snow layer on top of each and a snow bolster on the ridge.
+        `sway` > 0 sags the ridge that much in the middle (an old roof)."""
+        nr = self._mark()
         half = d * 0.5
         run = half + overhang
         pitch = math.atan2(h, half)
@@ -155,6 +212,8 @@ class Asset:
             self.box((size[0] - 0.15, slab * 0.9, snow_depth), tuple(sloc), SNOW, rot=(rx, 0, 0), bevel=0.06, jitter=0.02)
         ln = w + 2 * overhang - 0.2
         self.cyl(0.2, ln, (x0 - ln / 2, y0, z0 + h + thick * 0.7 - sag), SNOW, rot=(0, math.pi / 2, 0), segs=8)
+        if sway > 0.0:
+            self.bend_since(nr, sway, w * 0.5 + overhang + 0.05, x0)
 
     def gable_fill(self, w, d, z0, h, col, x0=0.0, y0=0.0):
         half = d * 0.5

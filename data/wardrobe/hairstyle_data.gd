@@ -8,3 +8,10 @@ extends Resource
 ## Hides the head slot piece when true (a crown style brings its own flowers).
 @export var occupies_head: bool = false
 @export var canon: String = "X"
+## A story deed that has to be done before the style shows in the dressing
+## room ("" = always there). The Calanmai crown waits for calanmai_attended.
+@export var require_flag: String = ""
+
+
+func unlocked() -> bool:
+	return require_flag == "" or WorldState.has_flag(require_flag)
