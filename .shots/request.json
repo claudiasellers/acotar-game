@@ -1,0 +1,12 @@
+{
+  "id": "l56_2",
+  "scene": "world",
+  "quality": "full",
+  "time_of_day": 0.68,
+  "grade": "manor",
+  "shots": [
+    {"name": "arrival_nw", "eye": [3, 1.7, 124], "at": [-70, 1.2, 70], "fov": 70},
+    {"name": "lawn_west", "eye": [-14, 1.8, 150], "at": [-120, 1.2, 185], "fov": 70},
+    {"name": "stables_from_parterre", "eye": [-58, 1.7, -12], "at": [-100, 3.0, -30], "fov": 70}
+  ]
+}
