@@ -1,5 +1,5 @@
-## Is a point inside the manor? Reads the room layouts, not colliders: the top
-## storeys have no ceiling collider, and the camera has to know them as rooms too.
+## Is a point inside the manor? Reads the room layouts, not colliders, so the
+## camera knows every room however its ceiling is built.
 class_name ManorIndoors
 extends RefCounted
 
