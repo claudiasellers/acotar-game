@@ -1,0 +1,8 @@
+from woods-stream-fix L40 fix
+quality look
+size 1920x1080
+timeout 400
+shot border res://tools/woods/woods_stream_probe.tscn border_woods 120 {out}/border_woods_fix.png
+shot bogge res://tools/woods/woods_stream_probe.tscn border_woods 120 {out}/bogge_path_fix.png -420 1000 -560 900
+shot snare res://tools/woods/woods_stream_probe.tscn suriel_glade 120 {out}/suriel_snare_fix.png -790 640 -815 610
+shot eastern res://tools/woods/woods_stream_probe.tscn eastern_woods 120 {out}/eastern_woods_fix.png
