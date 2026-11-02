@@ -30,6 +30,7 @@ def ST(s, r, near="self", strict=False, fail=""):
     return d
 def UF(flag): return {"do": "until_flag", "flag": flag}
 def UK(kind, n): return {"do": "until_killed", "kind": kind, "n": n}
+def FILM(id): return {"do": "film", "id": id}
 def DEC(options, s, default): return {"do": "decision", "options": options, "s": s, "default": default}
 
 M = []
@@ -143,9 +144,9 @@ moment("paintings_shown", "22", "manor_dining_table", "manor_house", ["bite_endu
 
 # --- P6 The blight tightens (ch 23-27) ---------------------------------------
 moment("glamour_lift", "23", "glamour_lift_glade", "blossom_vale", ["paintings_shown"], [
-    SP("tamlin", V(0, 0, -1.2)), C("LOOK", "tamlin"), W(2.0), CU("tamlin", "kisses_her_eyelids"),
-    R("glamour_lifted"), CU("feyre", "smell_flowers"), CEL("glamour"), W(3.0),
-], r=8.0, notes="Magic smells of flowers now; true forms show (GlamourLayer).")
+    SP("tamlin", V(0, 0, -1.2)), FILM("eyes_open"), UF("fact.film_eyes_open_lift"),
+    R("glamour_lifted"), CU("feyre", "smell_flowers"), UF("fact.film_eyes_open_seen"), CEL("glamour"), W(1.0),
+], r=8.0, notes="Cutscene A (lane L33) plays it; the glamour lifts under its black. Magic smells of flowers now; true forms show (GlamourLayer).")
 moment("fountain_head", "24", "manor_fountain", "manor_grounds", ["glamour_lifted"], [
     C("LOOK", "self"), MO("dread", 0.7, 1.0), W(3.0), J("night_court_mark"), R("fountain_head_found"),
 ], r=6.0)
@@ -156,12 +157,9 @@ moment("solstice", "25", "solstice_dance_floor", "solstice_meadow", ["fountain_h
     ST(12.0, 3.0, "tamlin"), CEL("dance"), R("solstice_danced"),
 ], r=12.0)
 moment("rhysand_visit", "26", "manor_window_hide", "manor_house", ["solstice_danced"], [
-    SP("lucien", V(1, 0, 0)), CU("lucien", "glamours_her"), SP("rhysand", V(0, 0, -6)),
-    SP("tamlin", V(-2, 0, -5)), MO("dread", 0.7, 1.0), C("WALK", "rhysand"), CU("rhysand", "mocks_tamlin"),
-    ST(10.0, 2.5), CU("rhysand", "pries_into_her_mind"), MO("dread", 0.9, 0.3, 0.25),
-    DEC([{"action": "interact", "fact": "fact.false_name_clare_beddor"}], 6.0, "fact.false_name_clare_beddor"),
-    CU("rhysand", "see_you_under_the_mountain"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
-], r=3.0)
+    SP("lucien", V(1, 0, 0)), SP("tamlin", V(-2, 0, -5)), FILM("night_court"),
+    UF("fact.film_night_court_seen"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
+], r=3.0, notes="Cutscene B (lane L33) plays it in the dining hall and brings Rhysand itself; the film writes fact.false_name_clare_beddor.")
 moment("sent_home", "27-28", "manor_tamlin_room", "manor_house", ["rhysand_faced"], [
     SP("tamlin", V(0, 0, -1.5)), C("LOOK", "tamlin"), W(4.0), CU("tamlin", "sends_her_home"),
     G("outfit_mortal_travel_dress"), MO("enchanted_sleep", 1.0, 2.5), W(3.0), R("sent_home"),
@@ -184,9 +182,9 @@ moment("wall_recross", "31", "wall_gate_north", "wall_seam", ["beddor_fire_learn
 
 # --- P8 The pass (ch 32) -----------------------------------------------------
 moment("alis_truth", "32", "manor_alis_hiding", "manor_house", ["wall_recrossed"], [
-    MO("dread", 0.5, 2.0), SP("alis", V(0, 0, -1.5)), C("LOOK", "alis"), W(6.0),
+    SP("alis", V(0, 0, -1.5)), FILM("silent_manor"), UF("fact.film_silent_manor_seen"),
     J("amarantha_and_the_curse"), J("andras_crossed_to_help"), R("alis_truth_heard"),
-], r=4.0, notes="The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed).")
+], r=4.0, notes="Cutscene C (lane L33) plays it and ends on the garden steps at dawn, facing north. The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed).")
 moment("departure", "32", "the_pass_road", "the_pass", ["alis_truth_heard"], [
     C("LOOK"), W(3.0), R("departed_for_mountain"),
 ], r=10.0)

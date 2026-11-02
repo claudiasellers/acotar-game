@@ -165,8 +165,12 @@ func queen_drains(seconds: float) -> void:
 	for i in 7:
 		var s := root.get_node_or_null("Stream%d" % i) as GPUParticles3D
 		if s:
-			get_tree().create_timer(seconds * 0.06 * i).timeout.connect(func() -> void: s.emitting = true)
-			get_tree().create_timer(seconds * 0.85).timeout.connect(func() -> void: s.emitting = false)
+			# On the stage's own clock, so nothing outlives it.
+			var tw := create_tween()
+			tw.tween_interval(seconds * 0.06 * i)
+			tw.tween_callback(s.set.bind(&"emitting", true))
+			tw.tween_interval(seconds * (0.85 - 0.06 * i))
+			tw.tween_callback(s.set.bind(&"emitting", false))
 	tween_param(&"queen", &"drain", 0.0, 1.0, seconds, "lords")
 	var mats := (tableaux[&"queen"] as Dictionary).mats as Array
 	for m: ShaderMaterial in mats:

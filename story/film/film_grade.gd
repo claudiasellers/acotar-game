@@ -36,7 +36,8 @@ func _process(delta: float) -> void:
 
 
 func value(param: StringName) -> float:
-	return float(material.get_shader_parameter(param)) if material else 0.0
+	var x: Variant = material.get_shader_parameter(param) if material else null
+	return float(x) if x != null else 0.0
 
 
 ## Eases one look to `v` over `seconds`.
