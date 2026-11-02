@@ -49,6 +49,8 @@ wh_still,feyre,,Wolf. Definitely just a wolf.,V,yes,scene,wolf_kill.kill,,p0_win
 v_market,feyre,,Market day. Everyone watching everyone else's purse.,X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_market.ogg
 v_silver,feyre,,"Silver in my pocket. Just once, I could buy something that isn't food.",X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_silver.ogg
 v_return,feyre,,They don't know me in this dress. Good.,X,yes,region,village,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/v_return.ogg
+merc_business,mercenary,The mercenary,"What is your business with me, girl?",A,,near,,,p0_winter p1_wolf_and_crossing,"clipped, unknown accent; sizing her up",audio/voice/merc_business.ogg
+merc_woods,mercenary,The mercenary,From one hunter to another: stay out of the deep woods. Things are slipping through the Wall.,A,,near,,,p0_winter p1_wolf_and_crossing,"low, plain warning",audio/voice/merc_woods.ogg
 A1_07_blessed_greeting,blessed,Child of the Blessed,"May the Immortal Light shine upon thee, sisters.",V,,place,village_square,,p0_winter p1_wolf_and_crossing,"serene, sing-song, over silver bells",audio/voice/A1_07_blessed_greeting.ogg
 v_tavern,feyre,,Ale and wet wool. I'd trade a pelt for an hour by that fire.,X,yes,place,tavern,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_tavern.ogg
 v_notices,feyre,,"Notices I can't read. Bounties, probably. Or more rules about faeries.",A,yes,place,notice_board,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_notices.ogg
