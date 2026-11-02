@@ -46,6 +46,8 @@ PEOPLE = {
     "human_youth": ("Villager", "X", 5.0),
     "blessed": ("Child of the Blessed", "C", 1.0),
     "peddler": ("Peddler", "X", 0.0),
+    # ch 3: the woman who buys the wolf pelt at the broken fountain (lane L52 model; L53 places her)
+    "mercenary": ("Mercenary", "C", 0.0),
 }
 
 

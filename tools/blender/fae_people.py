@@ -586,10 +586,12 @@ def glamoured(name):
     return look(design, extras=keep, **GLAMOURED[name])
 
 
-# Figures rebuilt on the main cast's body by tools/blender/cast/build_minor_fae.py (lane L48): this
+# Figures rebuilt on the main cast's body by tools/blender/cast/build_minor_fae.py (lanes L48, L52): this
 # script must not overwrite their files.
 MAIN_BODY = ("reveler_1", "reveler_2", "reveler_3", "calanmai_1", "calanmai_2", "calanmai_3", "servant_maid",
-             "servant_footman", "servant_cook", "sentry_1", "sentry_2", "fae_rose", "fae_nymph", "fae_longlimb")
+             "servant_footman", "servant_cook", "sentry_1", "sentry_2", "fae_rose", "fae_nymph", "fae_longlimb",
+             # the human village, rebuilt by tools/blender/cast/build_village_people.py (lane L52)
+             "human_woman", "human_man", "human_elder", "human_youth", "blessed", "peddler")
 
 
 if __name__ == "__main__":
