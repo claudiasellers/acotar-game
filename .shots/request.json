@@ -1,0 +1,9 @@
+{"id":"audit-5","scene":"world","quality":"full","size":[1920,1080],"time_of_day":0.45,"grade":"manor",
+"shots":[
+ {"name":"gallery_long","eye":[12,10.6,-56],"at":[40,10.2,-58],"fov":70,"ground":false},
+ {"name":"closeup_six","eye":[20.3,11.4,-56.0],"at":[20.3,11.6,-59.67],"fov":60,"ground":false},
+ {"name":"portrait_gallery","eye":[-27,16.2,-70.5],"at":[-27,16.0,-64.14],"fov":75,"ground":false},
+ {"name":"entrance_hall","eye":[0,10.6,-36],"at":[-9.66,11.0,-36],"fov":75,"ground":false},
+ {"name":"facade_from_drive","eye":[0,10,60],"at":[0,14,-30],"fov":65},
+ {"name":"facade_east","eye":[8,10,30],"at":[50,8.3,-14],"fov":65}
+],"checks":[]}
