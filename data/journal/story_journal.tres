@@ -111,19 +111,30 @@ id = &"curtain_trap"
 done_flag = "curtain_trap_set"
 require_flags = PackedStringArray("first_dinner_eaten")
 after = "If anything comes through my door tonight, I want warning."
-hints = PackedStringArray("My room is full of soft things that could be rope.", "My bedroom window, after dark: those curtains have long trimmings.", "At my window at night, twist the curtain trimmings into a rope and rig it from the light fixture to snap into anyone's face (E).")
+hints = PackedStringArray("That lock won't keep out anything that growls.", "The curtains by my window have long trimmings.", "At my window at night, the curtains (E): a rope of trimmings to snap into anyone's face.")
 memory = "My rope caught Alis, not a monster."
 sketch = &"moon"
+canon = "A"
+
+[sub_resource type="Resource" id="e_stables"]
+script = ExtResource("3_entry")
+id = &"stables"
+done_flag = "fact.hunt_invited"
+require_flags = PackedStringArray("curtain_trap_set")
+after = "There has to be a loophole in the Treaty. Lucien might know one."
+hints = PackedStringArray("Alis says he rides out on border patrol, from the stables.", "The stable yard, by the horse statue. Find Lucien there (E).")
+memory = "Lucien asked me to hunt with him in the southern woods."
+sketch = &"bow"
 canon = "A"
 
 [sub_resource type="Resource" id="e_bogge"]
 script = ExtResource("3_entry")
 id = &"bogge"
 done_flag = "bogge_survived"
-require_flags = PackedStringArray("curtain_trap_set")
+require_flags = PackedStringArray("fact.hunt_invited")
 fail_flags = PackedStringArray("fact.bogge_looked")
-after = "If there's a way home, it's out past the grounds. Lucien hunts the border woods."
-hints = PackedStringArray("Lucien might take me with him if I go out where he hunts.", "The border woods, with Lucien and my bow.", "If something circles us, don't look. Eyes on one far tree, and think of good things.")
+after = "Hunting the southern woods with Lucien. A chance to ask about the Treaty."
+hints = PackedStringArray("Ride out with him from the stable yard.", "Whatever happens out there, keep my eyes ahead.", "If something circles us, don't look. Eyes on the far elm, and think of good things.")
 memory = "Something circled us and begged me to look. I didn't."
 sketch = &"tree"
 canon = "A"
@@ -134,7 +145,7 @@ id = &"puca"
 done_flag = "puca_resisted"
 require_flags = PackedStringArray("bogge_survived")
 after = "I can't sleep. Every night I watch the garden from my window."
-hints = PackedStringArray("Something moves by the hedges at night, under my window.", "After dark, go down to the garden hedges.", "At night, follow what waits by the hedges, all the way to the gates.")
+hints = PackedStringArray("From my window at night: the hedges below.", "If someone waits by the hedges, go down and follow, as far as the gates.", "At the gates, when Tamlin tells me to, look again.")
 memory = "It wore my father's face. It wasn't him."
 sketch = &"moon"
 canon = "A"
@@ -146,7 +157,7 @@ numeral = "Chapter Three"
 title = "Across the Wall"
 opener = "Spring, in the dead of winter. Everything here is lovely, and none of it is safe."
 sketch = &"rose"
-entries = Array[ExtResource("3_entry")]([SubResource("e_arrive"), SubResource("e_bathe"), SubResource("e_dinner"), SubResource("e_curtain_trap"), SubResource("e_bogge"), SubResource("e_puca")])
+entries = Array[ExtResource("3_entry")]([SubResource("e_arrive"), SubResource("e_bathe"), SubResource("e_dinner"), SubResource("e_curtain_trap"), SubResource("e_stables"), SubResource("e_bogge"), SubResource("e_puca")])
 
 [sub_resource type="Resource" id="e_map"]
 script = ExtResource("3_entry")

@@ -22,9 +22,10 @@ func _col(n: StringName, fallback: StringName = &"ink") -> Color:
 
 func _draw() -> void:
 	var ink := SatchelTheme.color(&"ink")
-	var thread := SatchelTheme.color(&"accent")
+	# Undyed linen and a plain brown thread (director, L54-2 note).
+	var thread := _col(&"ink_soft")
 	var shine := SatchelTheme.color(&"glow")
-	var tape := _col(&"paper_deep", &"paper")
+	var tape := SatchelTheme.color(&"paper").darkened(0.1)
 	var cx := size.x * 0.5
 	# The fold: pages curving down into the gutter.
 	for i in int(SHADE):
