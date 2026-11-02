@@ -3,7 +3,7 @@
 ## glen, Alis's bark, the head on the heron, the solstice dance, the carriage).
 ## Mac only.
 ##   shot blight res://tools/playtest/p6_blight_clip.tscn {out} [--film=alis,fountain] [--stop-after=fountain]
-## Frames: <out>/frame_000.png ... (at most MAX_FRAMES). A shot is capped at
+## Frames: <out>/frame_000.jpg ... (at most MAX_FRAMES). A shot is capped at
 ## 1200 s and 60 MB, so the clip is split: each run films only the --film beats
 ## (all when left out) and stops after --stop-after.
 extends "res://tools/playtest/p6_blight_playtest.gd"
@@ -58,5 +58,6 @@ func _grab() -> void:
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	if img:
-		img.save_png(frames_dir.path_join("frame_%03d.png" % frame))
+		# JPEG at full size: a request returns at most 60 MB, about 110 PNGs.
+		img.save_jpg(frames_dir.path_join("frame_%03d.jpg" % frame), 0.9)
 		frame += 1
