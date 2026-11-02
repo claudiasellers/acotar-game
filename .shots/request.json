@@ -1,0 +1,9 @@
+{"id":"L35-6","scene":"world","time_of_day":0.42,"grade":"manor","quality":"full","size":[1920,1080],
+"shots":[
+ {"name":"reflecting_pool_to_temple","eye":[0,12,-226],"at":[0,8,-334],"fov":60},
+ {"name":"front_parterre_from_drive","eye":[8,10,30],"at":[50,8.3,-14],"fov":65},
+ {"name":"forecourt_above","eye":[0,30,45],"at":[0,8,0],"fov":60},
+ {"name":"wisteria_walk_above","eye":[-79,8.2,-151.5],"at":[-120,9.8,-152],"fov":65},
+ {"name":"manor_garden_east_audit","eye":[110,9.7,10],"at":[0,9.5,-40],"fov":70},
+ {"name":"manor_rear_audit","eye":[30,7.9,-150],"at":[0,8,-100],"fov":70}
+],"checks":[]}
