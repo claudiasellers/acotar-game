@@ -8,6 +8,7 @@ extends RefCounted
 ## registered until the editor rescans, so no class_name).
 const LandscapeLayout := preload("res://world/spring_court/shared/landscape_layout.gd")
 const GroundComposition := preload("res://world/spring_court/shared/ground_composition.gd")
+const ForageZones := preload("res://world/spring_court/shared/forage_zones.gd")
 const FORAGE_CELL := 25.0
 const DECOR_CELL := 10.0
 const REPORT_CELL := 100.0
@@ -25,16 +26,21 @@ const MIN_CLUSTERS := 8
 const PLACE_TREE_MARGIN := 3.0
 
 
+## Forage keyed to L09's zones (ForageZones): each cluster's kind is picked
+## by habitat and by how well it suits the open, the wood's edge or the grove
+## core where it falls, and clusters gather toward the edges with the region's
+## total held (lambda is raised by the mean keep chance).
 static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	var layers := {}
+	var zones := forage_zone_map(content)
 	var avg_cluster := 0.0
 	var total_w := 0.0
 	for e in content.forage:
 		avg_cluster += (e.cluster_min + e.cluster_max) * 0.5 * e.weight
 		total_w += e.weight
 	avg_cluster = maxf(avg_cluster / maxf(total_w, 0.001), 1.0)
-	var lambda := content.forage_density * FORAGE_CELL * FORAGE_CELL / 1_000_000.0 / avg_cluster
 	var r := content.bounding_rect()
+	var lambda := content.forage_density * FORAGE_CELL * FORAGE_CELL / 1_000_000.0 / avg_cluster / _mean_keep(content, zones, r)
 	var cx := 0
 	var x := r.position.x
 	while x < r.end.x:
@@ -48,13 +54,15 @@ static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 			var clusters := _poisson(rng, lambda)
 			for _k in clusters:
 				var p := Vector2(x + rng.randf() * FORAGE_CELL, z + rng.randf() * FORAGE_CELL)
-				_place_cluster(content, layers, rng, p)
+				var keep := rng.randf()
+				if content.owns(p) and keep < ForageZones.keep_chance(zone_shares(content, zones, p)):
+					_place_cluster(content, layers, rng, p, zones)
 			z += FORAGE_CELL
 			cz += 1
 		x += FORAGE_CELL
 		cx += 1
-	_meet_quotas(content, layers)
-	_fill_empty_cells(content, layers)
+	_meet_quotas(content, layers, zones)
+	_fill_empty_cells(content, layers, zones)
 	var out: Array[ScatterLayer] = []
 	var ids := layers.keys()
 	ids.sort()
@@ -453,11 +461,57 @@ static func estimate_draw_calls(content: CourtRegionContent, forage: Array[Scatt
 	return int(calls * 1.3)
 
 
-static func _place_cluster(content: CourtRegionContent, layers: Dictionary, rng: RandomNumberGenerator, p: Vector2) -> int:
+## The stand map and each habitat's open share, for ForageZones lookups:
+## { layout, open: { habitat: share } }. Open share comes from the habitat's
+## tree density exactly as _tree_layers composes it; a habitat with no trees
+## is all open, a planted (formal) one reads as open grass and row edge.
+static func forage_zone_map(content: CourtRegionContent) -> Dictionary:
+	var open := {}
+	for h in content.habitats:
+		open[h.tag] = _open_for(content, h.tag)
+	open[content.default_habitat] = _open_for(content, content.default_habitat)
+	return {"layout": LandscapeLayout.make(content.seed, content.bounding_rect()), "open": open}
+
+
+static func _open_for(content: CourtRegionContent, tag: StringName) -> float:
+	if LandscapeLayout.is_formal(tag):
+		return -1.0
+	var total := 0.0
+	for e in content.decor:
+		if e.is_tree and _fits(e.habitats, tag, content):
+			total += e.density
+	return LandscapeLayout.open_share(total / 100.0) if total > 0.0 else 2.0
+
+
+## (open, edge, core) shares at `p` for the habitat there.
+static func zone_shares(content: CourtRegionContent, zones: Dictionary, p: Vector2) -> Vector3:
+	var hab := content.habitat_at(p)
+	var open: float = zones["open"].get(hab, _open_for(content, hab))
+	if open > 1.0:
+		return Vector3(1.0, 0.0, 0.0)
+	if open < 0.0:
+		return Vector3(0.5, 0.5, 0.0)
+	return ForageZones.shares(zones["layout"], p, open)
+
+
+static func _mean_keep(content: CourtRegionContent, zones: Dictionary, r: Rect2) -> float:
+	var sum := 0.0
+	var n := 0
+	for iz in 40:
+		for ix in 40:
+			var p := r.position + Vector2((ix + 0.5) / 40.0, (iz + 0.5) / 40.0) * r.size
+			if content.owns(p):
+				sum += ForageZones.keep_chance(zone_shares(content, zones, p))
+				n += 1
+	return clampf(sum / maxf(n, 1), 0.3, 1.0) if n > 0 else 1.0
+
+
+static func _place_cluster(content: CourtRegionContent, layers: Dictionary, rng: RandomNumberGenerator, p: Vector2,
+		zones: Dictionary = {}) -> int:
 	if not content.owns(p):
 		return 0
 	var hab := content.habitat_at(p)
-	var entry := _pick(content, hab, rng)
+	var entry := _pick(content, hab, rng, zone_shares(content, zones, p) if not zones.is_empty() else Vector3.ONE)
 	if entry == null:
 		return 0
 	return _place_entry(content, layers, rng, p, entry)
@@ -485,7 +539,7 @@ static func _place_entry(content: CourtRegionContent, layers: Dictionary, rng: R
 
 ## Every type shows up all over its habitats, never in just a couple of spots:
 ## top each entry up to MIN_CLUSTERS clusters at random spots where it grows.
-static func _meet_quotas(content: CourtRegionContent, layers: Dictionary) -> void:
+static func _meet_quotas(content: CourtRegionContent, layers: Dictionary, zones: Dictionary) -> void:
 	var r := content.bounding_rect()
 	for ei in content.forage.size():
 		var e := content.forage[ei]
@@ -502,10 +556,15 @@ static func _meet_quotas(content: CourtRegionContent, layers: Dictionary) -> voi
 			var p := Vector2(rng.randf_range(r.position.x, r.end.x), rng.randf_range(r.position.y, r.end.y))
 			if not content.owns(p) or not _fits(e.habitats, content.habitat_at(p), content):
 				continue
+			# Top-ups land where the kind belongs (its zone), most of the time.
+			var a := ForageZones.affinity(e.item_id)
+			if rng.randf() > ForageZones.fit(e.item_id, zone_shares(content, zones, p)) / maxf(a.x, maxf(a.y, a.z)) \
+					and attempts < 4000:
+				continue
 			have += _place_entry(content, layers, rng, p, e)
 
 
-static func _fill_empty_cells(content: CourtRegionContent, layers: Dictionary) -> void:
+static func _fill_empty_cells(content: CourtRegionContent, layers: Dictionary, zones: Dictionary) -> void:
 	var filled := {}
 	for id in layers:
 		var layer: ScatterLayer = layers[id]
@@ -521,24 +580,30 @@ static func _fill_empty_cells(content: CourtRegionContent, layers: Dictionary) -
 		rng.seed = hash([content.seed, "fill", c.x, c.y])
 		for _attempt in 40:
 			var p := origin + Vector2((c.x + rng.randf()) * REPORT_CELL, (c.y + rng.randf()) * REPORT_CELL)
-			if _place_cluster(content, layers, rng, p) > 0:
+			if _place_cluster(content, layers, rng, p, zones) > 0:
 				break
 
 
-static func _pick(content: CourtRegionContent, hab: StringName, rng: RandomNumberGenerator) -> CourtForageEntry:
+## A kind for a cluster: by its weight among those the habitat grows, times
+## how well it suits the zone (`shares`, open/edge/core; ONE = ignore zones).
+static func _pick(content: CourtRegionContent, hab: StringName, rng: RandomNumberGenerator,
+		shares := Vector3.ONE) -> CourtForageEntry:
 	var total := 0.0
 	var fits: Array[CourtForageEntry] = []
+	var weights: Array[float] = []
 	for e in content.forage:
 		if _fits(e.habitats, hab, content):
+			var w := e.weight * (1.0 if shares == Vector3.ONE else ForageZones.fit(e.item_id, shares))
 			fits.append(e)
-			total += e.weight
+			weights.append(w)
+			total += w
 	if fits.is_empty():
 		return null
 	var roll := rng.randf() * total
-	for e in fits:
-		roll -= e.weight
+	for i in fits.size():
+		roll -= weights[i]
 		if roll <= 0.0:
-			return e
+			return fits[i]
 	return fits[-1]
 
 
