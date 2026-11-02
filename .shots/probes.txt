@@ -1,0 +1,7 @@
+from L32 rocks bramble blossoms before
+quality look
+size 1920x1080
+timeout 900
+shot seam res://tools/world_shot.tscn wall_seam {out}/wall_seam.png
+shot crocus res://tools/landscape/landscape_shot.tscn place_crocus_knoll {out}/place_crocus_knoll.png
+shot wcs res://tools/world_shot.tscn wall_crossing_spring {out}/wall_crossing_spring.png
