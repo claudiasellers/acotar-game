@@ -13,7 +13,7 @@ const FPS := 30.0
 ## [seconds, auto camera turn (deg), mouse turn (deg), keys held, caption]
 const SCRIPT := [
 	[0.8, 0.0, 0.0, [&"move_forward", &"sprint"], "Shift + forward: straight into a run"],
-	[2.4, 0.0, 0.0, [&"move_forward", &"move_left", &"sprint"], "forward + left: the camera follows behind her, no circling"],
+	[2.4, 0.0, 0.0, [&"move_forward", &"move_left", &"sprint"], "forward + left: she runs the diagonal, no circling"],
 	[1.0, 0.0, 0.0, [&"move_forward"], "forward only: straight on"],
 	[1.2, 0.0, -60.0, [&"move_forward"], "mouse turns the camera: she keeps her line (default)"],
 	[0.5, 0.0, 0.0, [], "let go"],
