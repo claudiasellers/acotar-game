@@ -1,0 +1,6 @@
+from woods-stream-fix (base: main + probe only)
+quality look
+size 1920x1080
+timeout 400
+shot border res://tools/woods/woods_stream_probe.tscn border_woods 120 {out}/border_woods_main.png
+shot eastern res://tools/woods/woods_stream_probe.tscn eastern_woods 120 {out}/eastern_woods_main.png
