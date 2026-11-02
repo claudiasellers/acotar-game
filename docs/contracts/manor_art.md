@@ -27,7 +27,9 @@ A slot is any prop placement whose id is `painting_large`, `painting_medium`,
 `painting_small` or `portrait_masked`, keyed `room_id@level#n` (n counts the
 art placements in that room, in order). The stand-in's `Look` is replaced by a
 frame and canvas; the prop node keeps its name, position and rotation and gets
-the meta `art_id`. The frame's back sits on the stand-in's back face; the
+the meta `art_id`. The frame's back sits on the room's inner wall face
+behind the slot (each room's walls are `ManorHouseBuilder.WALL` thick inside
+its rect), or on the stand-in's back face when no wall is within 0.5 m; the
 whole frame, crest to plaque, is kept between 0.25 m above the floor and the
 ceiling.
 
