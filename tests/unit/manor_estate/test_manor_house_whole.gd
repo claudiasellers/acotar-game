@@ -5,7 +5,7 @@ extends GutTest
 const ANCHORS := [&"feyre_bedroom_window", &"hall_mark_1", &"hall_mark_2", &"hall_mark_3",
 	&"hall_mark_4", &"hall_mark_5", &"manor_alis_hiding", &"manor_dining_table", &"manor_gallery",
 	&"manor_infirmary", &"manor_kitchen_hall", &"manor_study_mural", &"manor_tamlin_room",
-	&"manor_window_hide", &"painting_room_easel"]
+	&"manor_window_hide", &"painting_room_easel", &"tamlin_bedchamber_painting_wall"]
 
 var index: ManorHouseIndex
 

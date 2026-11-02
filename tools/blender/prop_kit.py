@@ -310,10 +310,13 @@ def lathe(profile, n=12, cap_bottom=True, cap_top=True):
             continue
         for i in range(n):
             j = (i + 1) % n
+            # the tip fans wind the same way as the quads, so they face out
+            # like the rest of the surface (L35-8: they faced in, which shaded
+            # every pointed tip and dome crown flat and dark)
             if len(a) == 1:
-                bm.faces.new((a[0], b[i], b[j]))
+                bm.faces.new((a[0], b[j], b[i]))
             elif len(b) == 1:
-                bm.faces.new((a[i], b[0], a[j]))
+                bm.faces.new((a[i], a[j], b[0]))
             else:
                 bm.faces.new((a[i], a[j], b[j], b[i]))
     if cap_bottom and len(rings[0]) > 2:
@@ -544,6 +547,27 @@ def round_petal(length, width, cup=0.3, curl=0.1):
         bm.faces.new((a[0], a[1], b[1], b[0]))
         bm.faces.new((a[1], a[2], b[2], b[1]))
     return bm
+
+
+def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5):
+    """A full garden rose in layers (L35-8), facing +Z under matrix m: a
+    furled, swirled heart, a ring of upright cupped petals round it and a
+    ring of broad petals rolling open beneath, each ring turned half a step
+    so the bloom's outline is scalloped and round, never a flat polygon.
+    About 15 + 8 per petal tris; smooth-shaded."""
+    rng = rng or random.Random(5)
+    heart = darker(color, 0.16)
+    prop.add(lathe([(r * 0.24, r * 0.12), (r * 0.2, r * 0.42), (0.0, r * 0.52)], 5, cap_bottom=False),
+             heart, finish, m @ R("Z", rng.uniform(0, 72)), sharp_deg=89.0)
+    a0 = rng.uniform(0, 360)
+    for i in range(inner):
+        a = a0 + 360 / inner * i + rng.uniform(-10, 10)
+        prop.add(round_petal(r * 0.62, r * 0.8, cup=0.55, curl=-0.1), mix(color, heart, 0.35), finish,
+                 m @ R("Z", a) @ T(r * 0.06, 0, r * 0.1) @ R("Y", -64), sharp_deg=89.0)
+    for i in range(outer):
+        a = a0 + 180 / outer + 360 / outer * i + rng.uniform(-8, 8)
+        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.4, curl=-0.12), lighter(color, 0.05), finish,
+                 m @ R("Z", a) @ T(r * 0.1, 0, 0) @ R("Y", -34), sharp_deg=89.0)
 
 
 def soft_rose(prop, m, r, color, finish="fabric", rng=None, petals=3, sides=8):

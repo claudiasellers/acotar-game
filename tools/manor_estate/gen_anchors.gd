@@ -12,8 +12,11 @@ func _init() -> void:
 	dsl.anchor(&"manor_gallery", 0, Vector3(13.0, 0.0, -56.0), -90.0)          # down the gallery
 	dsl.anchor(&"manor_infirmary", 0, Vector3(65.5, 0.0, -37.5), -90.0)
 	dsl.anchor(&"manor_kitchen_hall", 0, Vector3(46.0, 0.0, -51.0), -90.0)     # the bite, service passage
-	dsl.anchor(&"manor_study_mural", 0, Vector3(-15.0, 0.0, -61.0), 0.0)       # crocuses, lambs and roses
+	dsl.anchor(&"manor_study_mural", 0, Vector3(-25.0, 0.0, -69.0), 0.0)       # library east wall by the windows (the book's "study")
 	dsl.anchor(&"manor_tamlin_room", 1, Vector3(33.0, 0.0, -39.0), 0.0)
+	# Calanmai (L45): her painting for him hangs here, on the bedchamber's west wall
+	# at the wall face, centre 1.6 m up; 1.3 x 1.0 m of wall kept clear round it.
+	dsl.anchor(&"tamlin_bedchamber_painting_wall", 1, Vector3(24.27, 1.6, -42.0), -90.0)
 	dsl.anchor(&"manor_window_hide", 0, Vector3(7.0, 0.0, -30.5), 90.0)        # entrance hall, by the front windows
 	dsl.anchor(&"painting_room_easel", 1, Vector3(16.0, 0.0, -30.3), 0.0)
 	dsl.anchor(&"manor_alis_hiding", 0, Vector3(50.0, 0.0, -57.0), 0.0)        # kitchens of the emptied manor

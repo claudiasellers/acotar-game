@@ -172,7 +172,7 @@ func _ctx() -> Dictionary:
 		"phase": PhaseManager.current_phase,
 		"hour": Clock.hour(),
 		"places": here,
-		"flag": func(f: String) -> bool: return WorldState.has_flag(f),
+		"flag": func(f: String) -> bool: return DialogueDirector.truthy(WorldState.get_flag(f)),
 		"now": _now,
 		"said_at": _said_at,
 	}
@@ -366,12 +366,28 @@ func _next_deed_line(at: Vector3) -> DialogueLine:
 
 
 func _on_flag_changed(flag: String, value: Variant) -> void:
-	if flag.begins_with("dlg.") or value == null or not bool(value):
+	if flag.begins_with("dlg.") or not truthy(value):
 		return
 	for line: DialogueLine in _of(DialogueLine.Trigger.DEED):
 		if String(line.deed) == flag:
 			_deed_queue.append({"flag": line.deed, "t": _now})
 			return
+
+
+## Whether a flag value counts as set. Story lanes store ids in some flags
+## (the kept canvas), so a non-empty String or StringName is true; null,
+## false, 0 and "" are false (F30).
+static func truthy(value: Variant) -> bool:
+	match typeof(value):
+		TYPE_NIL:
+			return false
+		TYPE_BOOL:
+			return value
+		TYPE_INT, TYPE_FLOAT:
+			return value != 0
+		TYPE_STRING, TYPE_STRING_NAME:
+			return String(value) != ""
+	return true
 
 
 ## Lines of one trigger, optionally only those at `where` / by `speaker`.

@@ -21,6 +21,8 @@ const PERI := Color(0.82, 0.85, 1.0)
 const PEARL := Color(0.99, 0.96, 0.94)
 const PEACH := Color(1.0, 0.87, 0.78)
 const SAGE := Color(0.84, 0.93, 0.80)
+## Feyre's bedroom [C]: ivory and cream with pale green and gold (L38).
+const CELADON := Color(0.89, 0.95, 0.86)
 
 const SLATE := Color(0.60, 0.52, 0.80)
 const GOLD := Color(1.0, 0.80, 0.38)
@@ -34,6 +36,10 @@ func _init() -> void:
 	_level_2_attic()
 	_level_3_towers()
 	_roofs()
+	# L38-1: the rooms in ManorFurnishAct1.ROOMS are cleared and laid out again
+	# there, so their prop rows above are overwritten: change them in
+	# tools/manor_estate/furnish/furnish_act1.gd, not here.
+	ManorFurnishAct1.furnish(dsl)
 	dsl.save()
 	quit()
 
@@ -123,7 +129,7 @@ func _level_1_main() -> void:
 	])
 
 	# Feyre's bedroom [C]: canopy bed (station), window seats onto the gardens, hearth.
-	var bed := dsl.room(&"feyre_bedroom", "Feyre's Bedroom", 1, Rect2(16, -72, 14, 20), "C", &"wood", BLUSH)
+	var bed := dsl.room(&"feyre_bedroom", "Feyre's Bedroom", 1, Rect2(16, -72, 14, 20), "C", &"wood", CELADON)
 	bed.notes = "Second level, attached bathing chamber, windows over the garden with a wisteria trellis below (ch7, ch11)."
 	_p(bed, [
 		[&"window_seat", 4, 0.5], [&"window_seat", 10, 0.5], [&"cushion_pile", 4, 0.9, 0, 0.6, 0.6], [&"cushion_pile", 10, 0.9, 0, 0.6, 0.6],
@@ -578,7 +584,7 @@ func _stations_and_secrets() -> void:
 	dsl.secret(&"moon_tower", &"lever", 2, Vector3(31.6, 0.6, -64.5), &"", &"secret_lever",
 			"Under a loose board in the costume store; opens the panel in the Old Schoolroom.")
 	# Keepsakes.
-	dsl.secret(&"pressed_violet", &"keepsake", 1, Vector3(20, 0.65, -71.4), &"col_pressed_violet", &"",
+	dsl.secret(&"pressed_violet", &"keepsake", 1, Vector3(18.6, 0.49, -71.45), &"col_pressed_violet", &"",
 			"Tucked under the window-seat cushion in Feyre's bedroom.")
 	dsl.secret(&"pearl_hairpin", &"keepsake", 1, Vector3(39, 0.75, -53.5), &"col_pearl_hairpin", &"",
 			"In the hidden jewellery closet.")

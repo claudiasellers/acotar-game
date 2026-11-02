@@ -28,3 +28,4 @@ magic = 0.15
 fog_sky_affect = 0.15
 fog_aerial_perspective = 0.55
 glow_hdr_threshold = 1.4
+cloud_cover = 0.34

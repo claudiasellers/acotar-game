@@ -18,6 +18,11 @@ All of it is before the Suriel.
 | `manor_infirmary` | `InfirmaryWorktable`, `WoundDressing` | InfirmaryWorktable (always), WoundDressing |
 | `manor_study_mural` | `StudyMural` | StudyMural (the painting is always on the wall) |
 
+The book's "study" is the manor library (Keeper, 2026-11-02): `manor_study_mural`
+stands in the library at (-25, 0, -69), yaw 0, and the mural hangs on the library's
+east wall at its north end, beside the bank of windows (L38 moved it there from
+Tamlin's private study; the marks kept their anchor-local values).
+
 Stage marks come from `tools/story/gen_house_beats.py`, written in each
 anchor's local frame from `anchors.tres`. If the manor lane moves an anchor,
 re-run it (test_act3_house checks the foyer table is in the entrance hall and

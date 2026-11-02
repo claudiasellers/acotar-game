@@ -38,6 +38,15 @@ const BRIGHTNESS_CAP := 1.0
 ## Blight: saturation about 0.4, light 2-3 stops under the spring grade.
 const BLIGHT_SATURATION := 0.4
 const BLIGHT_SUN := 0.3
+# Painted clouds (painted_sky.gdshader): a few by day, thinner and warm at
+# golden hour, a grey lid over the blight.
+const DAY_CLOUDS := 0.3
+const GOLDEN_CLOUDS := 0.2
+const GOLDEN_CLOUD_COLOR := Color(1.0, 0.86, 0.80)
+const GOLDEN_CLOUD_SHADE := Color(0.62, 0.52, 0.72)
+const BLIGHT_CLOUDS := 0.6
+const BLIGHT_CLOUD_COLOR := Color(0.62, 0.62, 0.60)
+const BLIGHT_CLOUD_SHADE := Color(0.38, 0.38, 0.40)
 
 
 func _initialize() -> void:
@@ -148,10 +157,14 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	# "thick", never glaring. Daylight has no glow but true highlights; dusk and
 	# night keep a soft glow for fires and lanterns. Vibrancy is colour contrast.
 	if golden:
+		p.set("cloud_cover", GOLDEN_CLOUDS)
+		p.set("cloud_color", GOLDEN_CLOUD_COLOR)
+		p.set("cloud_shade", GOLDEN_CLOUD_SHADE)
 		p.set("glow_intensity", NIGHT_GLOW)
 		p.set("glow_bloom", NIGHT_BLOOM)
 		p.set("glow_hdr_threshold", NIGHT_THRESHOLD)
 	else:
+		p.set("cloud_cover", DAY_CLOUDS)
 		p.set("glow_intensity", DAY_GLOW)
 		p.set("glow_bloom", 0.0)
 		p.set("glow_hdr_threshold", DAY_THRESHOLD)
@@ -169,6 +182,9 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 func _withdraw(p: Resource) -> void:
 	p.set("saturation", BLIGHT_SATURATION)
 	p.set("sun_energy", BLIGHT_SUN)
+	p.set("cloud_cover", BLIGHT_CLOUDS)
+	p.set("cloud_color", BLIGHT_CLOUD_COLOR)
+	p.set("cloud_shade", BLIGHT_CLOUD_SHADE)
 
 
 func _build_grades() -> int:
