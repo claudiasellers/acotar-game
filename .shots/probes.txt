@@ -1,0 +1,5 @@
+from manor glare lane after
+quality look
+shot drive res://tools/world_shot.tscn manor_drive {out}/drive.png
+shot east res://tools/world_shot.tscn manor_garden_east {out}/east.png
+shot rear res://tools/world_shot.tscn manor_rear {out}/rear.png
