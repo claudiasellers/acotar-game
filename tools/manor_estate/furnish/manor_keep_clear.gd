@@ -33,8 +33,15 @@ const WALKS := ["res://tools/playtest/p3_house_playtest.gd", "res://tools/playte
 const WALK_R := 0.5
 const JOIN := 20.0
 const MARK_R := 0.6
-## Stages whose table and seats are furniture the furnisher places itself.
-const FURNISHED_MARKS := ["res://data/story/act2/first_dinner_stage.tres", "res://data/story/act2/manor_arrival_stage.tres"]
+## Anchors whose stages' table and seat marks are furniture the furnisher
+## places itself (every meal at the long table, the supper at the kitchen table).
+const FURNISHED_ANCHORS := [&"manor_dining_table", &"manor_alis_hiding"]
+## The long table and its chairs in manor_dining_table's frame (L29's set, which
+## the meals' scenes move and shrink): their marks along it are not floor.
+const TABLE_SET := Rect2(-5.6, -7.9, 11.2, 2.8)
+## The story's scene registry: coded moments and the extra scenes per anchor
+## (every lane adds its stages there, so new scenes are kept clear too).
+const SPACES := "res://story/act2/act2_spaces.gd"
 ## Room round a table or sink that a scene builds at its mark.
 const BUILT_R := 1.0
 const ROUTE_R := 0.55
@@ -51,11 +58,14 @@ static func zones(anchors: Array) -> Array:
 			continue        # a wall anchor (a painting's place): the furnisher keeps its wall clear
 		var p := Vector2(a.position.x, a.position.z)
 		out.append({"level": a.level, "a": p, "b": p, "r": ANCHOR_R, "why": String(a.anchor_id)})
-	for path: String in STAGES:
-		var anchor = by_id.get(STAGES[path])
+	var stages := all_stages()
+	for path: String in stages:
+		var anchor = by_id.get(stages[path])
 		if anchor == null or not ResourceLoader.exists(path):
 			continue
 		var stage := load(path) as Act2Stage
+		if stage == null:
+			continue
 		var basis := Basis(Vector3.UP, deg_to_rad(anchor.yaw_deg))
 		var route := {}
 		for key in stage.marks:
@@ -69,7 +79,9 @@ static func zones(anchors: Array) -> Array:
 				continue
 			# at the dinners the table and chairs are the furnisher's own pieces;
 			# elsewhere a "table" or "sink" mark is something the scene builds there
-			if FURNISHED_MARKS.has(path) and (name.contains("seat") or name.contains("chair") or name.contains("table")):
+			if FURNISHED_ANCHORS.has(stages[path]) and TABLE_SET.has_point(Vector2(local.x, local.z)):
+				continue
+			if FURNISHED_ANCHORS.has(stages[path]) and (name.contains("seat") or name.contains("chair") or name.contains("table")):
 				continue
 			var r := MARK_R
 			var built := name.contains("table") or name.contains("sink")
@@ -88,6 +100,38 @@ static func zones(anchors: Array) -> Array:
 					"why": "%s:route" % path.get_file()})
 	out.append_array(_moment_spawns(by_id))
 	out.append_array(_walks())
+	return out
+
+
+## Stage file -> anchor id: STAGES plus every stage in Act2Spaces (CODED by
+## moment, whose anchor is the moment's; EXTRA by anchor).
+static func all_stages() -> Dictionary:
+	var out := STAGES.duplicate()
+	# read as text: loading the registry would compile the story's scenes,
+	# which need the autoloads the layout generators run without
+	var src := FileAccess.get_file_as_string(SPACES)
+	var key := RegEx.create_from_string("^\\t&\"(\\w+)\": ([\\[{])")
+	var stage := RegEx.create_from_string("\"stage\": \"(res://[^\"]+)\"")
+	var current := &""
+	var is_moment := false
+	for line in src.split("\n"):
+		var k := key.search(line)
+		if k != null:
+			current = StringName(k.get_string(1))
+			is_moment = k.get_string(2) == "{"
+		var m := stage.search(line)
+		if m == null or current == &"" or out.has(m.get_string(1)):
+			continue
+		var anchor := current
+		if is_moment:
+			var mpath := MOMENTS_DIR + String(current) + ".tres"
+			if not ResourceLoader.exists(mpath):
+				continue
+			var mo := load(mpath) as StoryMoment
+			if mo == null:
+				continue
+			anchor = mo.anchor_id
+		out[m.get_string(1)] = anchor
 	return out
 
 

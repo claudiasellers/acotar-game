@@ -740,12 +740,22 @@ static func _tamlin_bedchamber(f: ManorFurnisher) -> void:
 static func _svc_kitchen(f: ManorFurnisher) -> void:
 	for x in [4.0, 10.0]:
 		f.light(&"lantern_hanging", x, 6.5)
-	f.put(&"pot_rack_hanging", 7.0, 6.8, 0, ManorFurnishContext.ceiling_of(f.room) - 0.75)
+	f.put(&"pot_rack_hanging", 6.4, 8.0, 0, ManorFurnishContext.ceiling_of(f.room) - 0.75)
 	f.put(&"rug_round", 9.6, 11.4, 0, 0.0, 0.6)
-	var isl := f.at(&"table_kitchen", 7.0, 6.8, 0)
-	f.set_on(isl, [&"bread_board", &"pie_lattice", &"mixing_bowls", &"egg_basket", &"rolling_pin_flour", &"copper_kettle"])
-	f.at(&"stool", 5.6, 8.0)
-	f.at(&"stool", 8.4, 8.0)
+	# the scrubbed table where L45's supper waits at the west end (kitchen_supper
+	# stage, marks at local x 5.2-6.0): the kitchen's own things at the east end
+	var isl := f.at(&"table_kitchen", 6.4, 8.0, 0)
+	var top := ManorDecorDecks.top_of(&"table_kitchen")
+	f.put_on(&"pie_lattice", 7.0, 7.75, 10, top)
+	f.put_on(&"mixing_bowls", 7.55, 8.25, -15, top)
+	f.put_on(&"rolling_pin_flour", 7.6, 7.7, 80, top)
+	isl.set_meta(&"dressed", true)
+	f.at(&"stool", 5.0, 9.2)
+	f.at(&"stool", 6.2, 9.2)
+	# the pastry bench in the middle of the floor, under the lanterns
+	var pb := f.at(&"table_work", 7.0, 4.9, 0)
+	if pb != null:
+		f.set_on(pb, [&"bread_board", &"egg_basket", &"copper_kettle", &"jam_jars"])
 	f.fit_wall("n", 4.6, &"sink_stone")
 	var dc := f.fit_wall("n", 9.2, &"dresser_crockery")
 	f.fit_wall("e", 7.0, &"bread_oven")
@@ -761,7 +771,7 @@ static func _svc_kitchen(f: ManorFurnisher) -> void:
 	f.hang("s", 6.4, &"garlic_braid_wall", 1.9)
 	f.hang("s", 13.4, &"herb_bundle_hanging", 2.2)
 	f.hang("n", 0.9, &"copper_pots", 2.2)
-	_dress(f, [tw, dc, fb], &"kitchen", 2)
+	_dress(f, [tw, dc, fb], &"kitchen", 3)
 	_wall_accents(f, &"work")
 
 
