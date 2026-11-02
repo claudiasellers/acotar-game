@@ -8,6 +8,7 @@ const FEYRE := preload("res://characters/feyre/feyre.tscn")
 
 
 func after_each() -> void:
+	GameSettings.set_value(&"mouse_steers", false)
 	for a in [&"move_forward", &"move_left", &"move_right", &"aim", &"sprint"]:
 		Input.action_release(a)
 
@@ -78,13 +79,36 @@ func test_an_automatic_camera_turn_mid_run_keeps_her_heading() -> void:
 	assert_gt(before.dot(_heading(f)), 0.99, "same heading after the camera was turned for her")
 
 
-func test_turning_the_camera_with_the_mouse_steers_her() -> void:
+func _mouse_turn(f: Feyre, radians: float) -> void:
+	f._look(-radians if not GameSettings.invert_x else radians, 0.0)
+
+
+func test_by_default_the_keys_alone_steer_her_mid_stride() -> void:
+	GameSettings.set_value(&"mouse_steers", false)
 	var f := _feyre()
 	await wait_seconds(0.3)
 	Input.action_press(&"move_forward")
 	await wait_seconds(0.5)
-	f._look(-0.8 if not GameSettings.invert_x else 0.8, 0.0)
+	var before := _heading(f)
+	_mouse_turn(f, 0.8)
 	await wait_seconds(0.6)
+	assert_gt(before.dot(_heading(f)), 0.99, "the mouse turned the camera, not her (%s -> %s)" % [before, _heading(f)])
+	Input.action_release(&"move_forward")
+	await wait_seconds(0.3)
+	Input.action_press(&"move_forward")
+	await wait_seconds(0.6)
+	assert_gt(_heading(f).dot(_cam_forward(f)), 0.97, "a fresh press goes the way the camera now faces")
+
+
+func test_with_the_setting_on_the_mouse_steers_her() -> void:
+	GameSettings.set_value(&"mouse_steers", true)
+	var f := _feyre()
+	await wait_seconds(0.3)
+	Input.action_press(&"move_forward")
+	await wait_seconds(0.5)
+	_mouse_turn(f, 0.8)
+	await wait_seconds(0.6)
+	GameSettings.set_value(&"mouse_steers", false)
 	assert_gt(_heading(f).dot(_cam_forward(f)), 0.97, "runs where the camera now looks (%s vs %s)" % [_heading(f), _cam_forward(f)])
 	var facing := Vector2(0, -1).rotated(-f.model.rotation.y)
 	assert_gt(facing.dot(_heading(f)), 0.98, "her body faces her path, not at an angle to it")

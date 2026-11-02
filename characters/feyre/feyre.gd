@@ -116,6 +116,9 @@ var jump_motor := JumpMotor.new()
 ## Running total of camera yaw turns the player didn't make (follow-behind,
 ## story glances, recentre, nudges); SteerFrame takes them out of steering.
 var camera_auto_yaw: float = 0.0
+## Running total of the player's own camera turns (mouse, right stick) made
+## while "Turning the camera steers her while moving" was off.
+var camera_look_yaw: float = 0.0
 ## The move keys steer in this frame, not the live camera (see SteerFrame).
 var steer_frame := SteerFrame.new()
 var movement_feel: MovementFeel
@@ -222,7 +225,7 @@ func _physics_process(delta: float) -> void:
 	if not StoryControl.can_move():
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
-	var steer := steer_frame.yaw(input, yaw, camera_auto_yaw, is_aiming or is_drawing)
+	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
@@ -344,6 +347,13 @@ func drain_stamina(amount: float) -> void:
 func nudge_camera(yaw_delta: float, pitch_delta: float) -> void:
 	camera_auto_yaw += yaw_delta
 	_rotate_camera(yaw_delta, pitch_delta)
+
+
+## The camera turns kept out of her steering while a direction is held
+## (SteerFrame): turns the player didn't make, always; the player's own too
+## unless "Turning the camera steers her while moving" is on.
+func steer_exclusion() -> float:
+	return camera_auto_yaw + camera_look_yaw
 
 
 ## A camera turn the player didn't make: it doesn't steer her (SteerFrame).
@@ -472,7 +482,10 @@ func _drift_toward_focus(delta: float) -> void:
 
 ## Player look input (already scaled); applies the invert settings.
 func _look(x: float, y: float) -> void:
-	_rotate_camera(x * (1.0 if GameSettings.invert_x else -1.0), y * (1.0 if GameSettings.invert_y else -1.0))
+	var yaw := x * (1.0 if GameSettings.invert_x else -1.0)
+	_rotate_camera(yaw, y * (1.0 if GameSettings.invert_y else -1.0))
+	if not GameSettings.mouse_steers:
+		camera_look_yaw += yaw
 	look_input_this_frame = true
 	_recentering = false
 

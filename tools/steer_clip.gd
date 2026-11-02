@@ -1,6 +1,7 @@
 ## Proof clip for how she moves (SteerFrame and Feyre._ground_or_air): she
 ## breaks straight into a run, the camera is swung round her for her (as the
-## follow-behind does) and she keeps her line, the mouse turns her, a quarter
+## follow-behind does) and she keeps her line, the mouse turns only the camera
+## (or her too, with "Turning the camera steers her while moving"), a quarter
 ## turn keeps her speed and faces her path, she stops short, and a jump lands
 ## quickly. Writes frame_####.jpg (and prints her speed and heading every
 ## 0.25 s) for ffmpeg:
@@ -14,7 +15,10 @@ const SCRIPT := [
 	[0.8, 0.0, 0.0, [&"move_forward", &"sprint"], "Shift + forward: straight into a run"],
 	[2.4, 0.0, 0.0, [&"move_forward", &"move_left", &"sprint"], "forward + left: the camera follows behind her, no circling"],
 	[1.0, 0.0, 0.0, [&"move_forward"], "forward only: straight on"],
-	[1.0, 0.0, -70.0, [&"move_forward"], "mouse turns the camera: she turns with it"],
+	[1.2, 0.0, -60.0, [&"move_forward"], "mouse turns the camera: she keeps her line (default)"],
+	[0.5, 0.0, 0.0, [], "let go"],
+	[0.8, 0.0, 0.0, [&"move_forward"], "forward again: the way the camera now faces"],
+	[1.2, 0.0, 60.0, [&"move_forward"], "setting on, \"Turning the camera steers her\": she turns with it"],
 	[1.0, 0.0, 0.0, [&"move_right"], "right: a quarter turn, same speed"],
 	[0.8, 0.0, 0.0, [], "let go: she stops short"],
 	[0.5, 0.0, 0.0, [&"move_forward"], "forward"],
@@ -55,12 +59,12 @@ func _run() -> void:
 		var frames := int(float(step[0]) * FPS)
 		var auto := deg_to_rad(float(step[1])) / frames
 		var mouse := deg_to_rad(float(step[2])) / frames
+		GameSettings.set_value(&"mouse_steers", String(step[4]).begins_with("setting on"))
 		for f in frames:
 			if auto != 0.0:
 				_feyre.nudge_camera(auto, 0.0)
 			if mouse != 0.0:
-				_feyre._rotate_camera(mouse, 0.0)
-				_feyre.look_input_this_frame = true
+				_feyre._look(-mouse if not GameSettings.invert_x else mouse, 0.0)
 			await get_tree().process_frame
 			t_all += 1.0 / FPS
 			if t_all >= next_note:
@@ -75,6 +79,7 @@ func _run() -> void:
 			_frame += 1
 	for k in KEYS:
 		Input.action_release(k)
+	GameSettings.set_value(&"mouse_steers", false)
 	get_tree().quit()
 
 

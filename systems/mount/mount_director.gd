@@ -457,7 +457,7 @@ func _steer() -> void:
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	var yaw: float = feyre.call(&"camera_yaw") if feyre.has_method(&"camera_yaw") else 0.0
 	# Like on foot (SteerFrame): camera-relative, but camera moves the rider didn't make don't steer.
-	var auto: float = float(feyre.get(&"camera_auto_yaw")) if &"camera_auto_yaw" in feyre else 0.0
+	var auto: float = float(feyre.call(&"steer_exclusion")) if feyre.has_method(&"steer_exclusion") else 0.0
 	mare.steer = Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _steer_frame.yaw(input, yaw, auto))
 	mare.gallop = Input.is_action_pressed(&"sprint")
 

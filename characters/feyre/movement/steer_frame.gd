@@ -1,7 +1,9 @@
 ## Camera-relative steering, the way shipped third-person games do it (Unity's
 ## Starter Assets ThirdPersonController, Unreal's third-person template): the
 ## move keys point her relative to where the camera looks. Two refinements:
-## - The player's own look (mouse, right stick) steers live, as in those games.
+## - The player's own look (mouse, right stick) steers live, as in those games,
+##   only with the "Turning the camera steers her while moving" setting on. Off
+##   (the default, the owner's ask), the keys alone steer her mid-stride.
 ## - Camera moves the player didn't make (follow-behind while sprinting, story
 ##   glances, the R recentre) don't steer: the frame is held while the keys stay
 ##   the same, so the camera swinging behind her can't spiral her into a circle.
@@ -23,7 +25,7 @@ var _auto0: float = 0.0
 
 
 ## The yaw to rotate `input` by this frame. `auto_yaw` is the running total of
-## camera turns the player didn't make (Feyre.camera_auto_yaw); only those are
+## camera turns that must not steer (Feyre.steer_exclusion()); only those are
 ## taken back out of the camera's yaw.
 func yaw(input: Vector2, camera_yaw: float, auto_yaw: float = 0.0, live: bool = false) -> float:
 	if input == Vector2.ZERO or live:
