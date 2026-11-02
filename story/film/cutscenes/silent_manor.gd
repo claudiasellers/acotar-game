@@ -306,11 +306,12 @@ func _b_steps() -> void:
 		put_feyre(STEPS_IN, STEPS_OUT)
 		_mountain()
 		var p := ground(STEPS_IN)
-		var n := _north_dir(p)
-		# From inside the hall, square to the doorway: she fills its lower half,
-		# the mountain stands over her shoulder in the frame of the door.
-		var right := n.cross(Vector3.UP)
-		shot_world(p - n * 2.6 + right * 0.15 + Vector3.UP * 1.45, p + n * 60.0 + Vector3.UP * 3.0, 40.0, 0.6, 9.0)
+		# From inside the hall, down the line she walks: she stays in the middle
+		# of the doorway all the way out, the mountain over her shoulder.
+		var w := ground(STEPS_OUT) - p
+		w.y = 0.0
+		w = w.normalized()
+		shot_world(p - w * 2.6 + Vector3.UP * 1.45, p + w * 60.0 + Vector3.UP * 3.0, 40.0, 0.6, 9.0)
 		player.veil_to(0.0, 1.6)
 		walk_feyre(STEPS_OUT, 6.0))
 
