@@ -36,3 +36,6 @@ golden_sun_color = Color(0.604, 0.639, 0.416, 1)
 golden_sun_energy = 0.3
 snow_cover = 0.0
 magic = 0.0
+cloud_cover = 0.65
+cloud_color = Color(0.50, 0.52, 0.56, 1)
+cloud_shade = Color(0.28, 0.30, 0.34, 1)

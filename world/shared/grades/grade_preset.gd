@@ -15,6 +15,13 @@ extends Resource
 @export var sun_energy := 0.9
 @export var ambient_color := Color(0.6, 0.66, 0.75)
 @export var ambient_energy := 0.6
+@export_group("Clouds")
+## Painted clouds in the World sky (painted_sky.gdshader): 0 clear, ~0.3 a few
+## fair-weather clouds, ~0.8 overcast. Left out of ambient and reflections.
+@export_range(0.0, 1.0) var cloud_cover := 0.0
+## Lit side and shaded side; the sun and sky light multiply both.
+@export var cloud_color := Color(0.97, 0.94, 0.96)
+@export var cloud_shade := Color(0.74, 0.72, 0.86)
 @export_group("Fog")
 @export var fog_color := Color(0.75, 0.78, 0.83)
 @export var fog_density := 0.004
@@ -68,10 +75,10 @@ const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric
 	&"saturation", &"contrast", &"brightness", &"glow_intensity", &"glow_bloom", &"snow_cover", &"magic",
 	&"volumetric_anisotropy", &"volumetric_light_energy", &"fog_sky_affect", &"fog_height",
 	&"fog_height_density", &"fog_aerial_perspective", &"glow_hdr_threshold", &"golden_sun_energy",
-	&"dread_headroom", &"volumetric_ambient_inject"]
+	&"dread_headroom", &"volumetric_ambient_inject", &"cloud_cover"]
 const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom", &"sun_color",
 	&"ambient_color", &"fog_color", &"volumetric_albedo", &"golden_sky_top", &"golden_sky_horizon",
-	&"golden_sun_color"]
+	&"golden_sun_color", &"cloud_color", &"cloud_shade"]
 
 
 ## A new preset `t` of the way from `a` to `b`. The LUT switches at t = 0.5.
