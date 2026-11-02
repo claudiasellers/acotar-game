@@ -836,6 +836,23 @@ spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, H
 # Matches data/market/market.tres mercenary_at / mercenary_yaw (tools/market/gen_market.gd).
 spot("mercenary_well", "mercenary", PEOPLE % "mercenary", "village", 376.16, 2256.58, HUMAN, yaw=90.0,
      canon="C", notes="buys the wolf pelt and a doe hide, overpays; coin only (MarketMenu)")
+# Market keepers behind their counters and a few shoppers (lane L53, the director's
+# L53-2 note). Keeper spots = MarketStall.keeper_spot() from tools/market/gen_market.gd
+# (it prints them); facing out over the counter. woman_stall keeps the charm stall.
+spot("market_cobbler", "human_elder", PEOPLE % "human_elder", "village", 375.08, 2269.75, HUMAN, yaw=346.0,
+     hours=(8.0, 17.0), canon="C", notes="the weathered cobbler, from a nearby town (ch 3)")
+spot("market_clothier", "human_woman", PEOPLE % "human_woman", "village", 362.71, 2262.01, HUMAN, yaw=298.0,
+     hours=(8.0, 17.0), canon="C", notes="the sharp-eyed clothier (ch 3)")
+spot("market_spice", "human_man", PEOPLE % "human_man", "village", 382.16, 2270.84, HUMAN, yaw=1.4,
+     hours=(8.0, 17.0), notes="hot food and spice")
+spot("market_roots", "human_elder", PEOPLE % "human_elder", "village", 366.34, 2241.09, HUMAN, yaw=303.5,
+     hours=(8.0, 17.0), notes="roots and turnips, up the north lane")
+spot("market_shopper_1", "human_youth", PEOPLE % "human_youth", "village", 371.5, 2262.0, HUMAN, wander=2.5,
+     hours=(8.0, 17.0))
+spot("market_shopper_2", "human_woman", PEOPLE % "human_woman", "village", 368.5, 2234.5, HUMAN, wander=2.0,
+     hours=(8.0, 17.0))
+spot("market_shopper_3", "human_man", PEOPLE % "human_man", "village", 385.0, 2262.5, HUMAN, wander=1.5,
+     hours=(9.0, 16.0))
 spot("woman_return", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, ph(7), wander=1.5)
 spot("elder_return", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, ph(7))
 # The manor (ch6-28). Tamlin patrols and is often away [C]; Lucien is about by day.
