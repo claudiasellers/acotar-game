@@ -65,6 +65,7 @@ func _ready() -> void:
 	add_child(SatchelHud.new())
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
+	add_child(MountDirector.new())
 
 
 func _process(delta: float) -> void:
