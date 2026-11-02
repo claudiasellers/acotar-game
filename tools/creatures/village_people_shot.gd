@@ -64,6 +64,20 @@ func _run() -> void:
 		_cam.look_at(c + Vector3(-0.7, 1.45, 0.0))
 		await _settle(0.5)
 		await _save(_out + "/village_people_faces.png")
+		if args.has("diag"):    # which effect draws the dark patches beside the nose: SSAO or shadows
+			var envs: Array[Environment] = []
+			for we in _world.find_children("*", "WorldEnvironment", true, false):
+				envs.append((we as WorldEnvironment).environment)
+			for e in envs:
+				e.ssao_enabled = false
+			await _settle(0.5)
+			await _save(_out + "/village_people_faces_nossao.png")
+			for e in envs:
+				e.ssao_enabled = true
+			for l in _world.find_children("*", "DirectionalLight3D", true, false):
+				(l as DirectionalLight3D).shadow_enabled = false
+			await _settle(0.5)
+			await _save(_out + "/village_people_faces_noshadow.png")
 	if args.has("pose"):
 		for npc in get_tree().get_nodes_in_group(&"court_npc"):
 			var cn := npc as CourtNpc
