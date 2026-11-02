@@ -61,9 +61,12 @@ var _t: float = 0.0
 
 func _ready() -> void:
 	name = "Act1Wayfinding"
-	_build_band(COTTAGE_GEN.deer_trail_points(), DEER_TRAIL_WIDTH, "DeerTrailBand", 1.0, BAND_FADE_IN)
-	_build_band(track_points(), DOE_FURROW_WIDTH, "DoeFurrow", DOE_STRENGTH, 0.0)
-	_build_tracks()
+	# One path for the furrow and the prints: the doe's wandering line round
+	# the trees, so they never read as two trails (L27-8).
+	var path := doe_path()
+	_build_band(path[0], DEER_TRAIL_WIDTH, "DeerTrailBand", 1.0, BAND_FADE_IN)
+	_build_band(path[1], DOE_FURROW_WIDTH, "DoeFurrow", DOE_STRENGTH, 0.0)
+	_build_tracks(path)
 	_build_crows()
 	_build_smoke()
 	_build_lanterns()
@@ -93,11 +96,22 @@ static func track_points(step: float = TRACK_STEP) -> PackedVector2Array:
 	return pts
 
 
-func _build_tracks() -> void:
-	var pts := COTTAGE_GEN.deer_trail_points()
-	pts = _resample(pts, PRINT_STEP)
-	pts.append_array(_resample(track_points(), PRINT_STEP))
-	pts = wander_line(pts, trail_obstacles(pts))
+## The walked path as [cottage deer trail, doe's line to the clearing]: both
+## resampled at her stride and wandered round trunks and rocks as one line,
+## so the two join without a step. Bands and prints are both built from it.
+static func doe_path() -> Array[PackedVector2Array]:
+	var trail := _resample(COTTAGE_GEN.deer_trail_points(), PRINT_STEP)
+	var doe := _resample(track_points(), PRINT_STEP)
+	var all := PackedVector2Array(trail)
+	all.append_array(doe)
+	var walked := wander_line(all, trail_obstacles(all))
+	return [walked.slice(0, trail.size()), walked.slice(trail.size())]
+
+
+func _build_tracks(path: Array[PackedVector2Array]) -> void:
+	var pts := PackedVector2Array(path[0])
+	pts.append_array(path[1])
+	var obstacles := trail_obstacles(pts)
 	# Cloven prints as decals (HoofPrint): projected onto the ground actually
 	# drawn, so terrain LOD and snow cover never swallow them, and dark and
 	# deep enough to read from Feyre's walking camera. Pairs alternate sides,
@@ -111,6 +125,8 @@ func _build_tracks() -> void:
 		var yaw := atan2(-ahead.x, -ahead.y)
 		# A walking doe: one print per step, left and right of her line.
 		var q := p + Vector2(ahead.y, -ahead.x).normalized() * (0.1 if i % 2 == 0 else -0.1)
+		if not is_clear(q, obstacles, 0.0):
+			continue  # a detour capped at MAX_DETOUR: skip, never print in a trunk
 		var d := HoofPrint.make(PRINT_LENGTH, 30.0)
 		d.position = Vector3(q.x, WorldHeight.height_at(q.x, q.y), q.y)
 		d.rotation.y = yaw
@@ -162,9 +178,7 @@ static func wander_line(line: PackedVector2Array, obstacles: Array[Vector3]) -> 
 			off = smooth
 	var out := PackedVector2Array()
 	for i in n:
-		var p := line[i] + normals[i] * clampf(off[i], -MAX_DETOUR, MAX_DETOUR)
-		if is_clear(p, near[i], OBSTACLE_CLEARANCE * 0.5):
-			out.append(p)
+		out.append(line[i] + normals[i] * clampf(off[i], -MAX_DETOUR, MAX_DETOUR))
 	return out
 
 

@@ -115,3 +115,22 @@ func test_doe_prints_wander_and_never_land_in_a_trunk_or_rock() -> void:
 		max_step = maxf(max_step, absf(wandered[i].distance_to(line[i]) - wandered[i - 1].distance_to(line[i - 1])))
 	assert_between(max_off, 0.5, 1.0, "wanders about +-0.5-1 m")
 	assert_lt(max_step, 0.25, "no per-print jitter")
+
+
+func test_prints_walk_inside_the_furrow() -> void:
+	var path := Act1Wayfinding.doe_path()
+	var way := Act1Wayfinding.new()
+	add_child_autofree(way)
+	var line := PackedVector2Array(path[0])
+	line.append_array(path[1])
+	var half := Act1Wayfinding.DOE_FURROW_WIDTH * 0.5
+	var outside := 0
+	for d in way.tracks.get_children():
+		var p := (d as Node3D).position
+		var q := Vector2(p.x, p.z)
+		var best := INF
+		for i in range(1, line.size()):
+			best = minf(best, q.distance_to(Geometry2D.get_closest_point_to_segment(q, line[i - 1], line[i])))
+		if best > half:
+			outside += 1
+	assert_eq(outside, 0, "every print within the furrow's half-width of its centreline")
