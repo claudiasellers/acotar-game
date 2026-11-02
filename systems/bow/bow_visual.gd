@@ -8,6 +8,8 @@
 class_name BowVisual
 extends Node3D
 
+const ArrowModel := preload("res://systems/bow/arrow_model.gd")
+
 ## Seconds the bow stays up after Q, F or a shot, with no aim held.
 const READY_HOLD := 2.5
 const SWING_SPEED := 6.0

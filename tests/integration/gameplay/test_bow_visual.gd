@@ -2,6 +2,8 @@
 ## the string hand coming back to her chin, Q always answering with a card.
 extends GutTest
 
+const ArrowModel := preload("res://systems/bow/arrow_model.gd")
+
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
 const SCENE := preload("res://world/shared/test_hill/test_hill.tscn")
 
@@ -118,3 +120,11 @@ func test_arrows_use_the_arrow_model_not_primitives() -> void:
 			assert_false((child as MeshInstance3D).mesh is PrimitiveMesh, "nocked %s" % child.name)
 	var aabb := ArrowModel.mesh(0.83, 0.0, Color.WHITE, Color.WHITE, ArrowModel.STEEL).get_aabb()
 	assert_almost_eq(aabb.position.z, -0.83, 0.01, "tip 0.83 down -Z from the nock")
+
+
+## The bow broke when arrow_model.gd was a new global class the play folder's
+## class cache hadn't picked up yet: arrow.gd failed to compile and she could
+## not shoot. It is loaded by path, so a stale cache can't do that again.
+func test_arrow_model_is_loaded_by_path_not_a_global_class() -> void:
+	var src := FileAccess.get_file_as_string("res://systems/bow/arrow_model.gd")
+	assert_false(src.contains("\nclass_name "), "arrow_model.gd declares no class_name")
