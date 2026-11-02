@@ -114,6 +114,9 @@ var _bones: Dictionary = {}
 ## not the posed one: a sitting figure's head reads a metre too high.
 var head_local: Vector3
 var has_head: bool = false
+## Where the hips are as drawn, in the skeleton's space (the head's reason).
+var hips_local: Vector3
+var has_hips: bool = false
 
 
 ## The FilmPose on `figure`'s skeleton, made on first use. Null when it has none.
@@ -199,6 +202,7 @@ func _dir(v: Vector3) -> Vector3:
 func _process_modification_with_delta(_delta: float) -> void:
 	var sk := get_skeleton()
 	has_head = false
+	has_hips = false
 	if sk == null or influence <= 0.001:
 		return
 	var p := _current()
@@ -212,6 +216,8 @@ func _process_modification_with_delta(_delta: float) -> void:
 		var h := sk.get_bone_global_rest(hips).origin.y
 		var o := hp.origin + _dir(Vector3(0.0, -float(p.get("drop", 0.0)), float(p.get("back", 0.0)))) * h
 		sk.set_bone_global_pose(hips, Transform3D(hp.basis, o))
+		hips_local = hp.origin.lerp(o, influence)
+		has_hips = true
 	var aims: Dictionary = p.get("aims", {})
 	var order: Array = []
 	for bone_name in aims.keys():

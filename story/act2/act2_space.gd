@@ -119,6 +119,23 @@ func cast(actor_id: StringName, at_mark: StringName, face_mark: StringName = &""
 	return who
 
 
+## Sits a cast actor in the chair they stand at: FilmPose's sit drops the hips
+## to seat height and swings the thighs forward, so the actor's origin stays
+## on the floor at the chair's centre, facing out from the back. No-op on a
+## stand-in with no skeleton.
+func sit(actor_id: StringName, pose_name: StringName = &"sit") -> void:
+	var fp := FilmPose.on(actor(actor_id))
+	if fp:
+		fp.to(pose_name, 0.0)
+
+
+## Out of the chair: the body goes free of the sit pose.
+func rise(actor_id: StringName) -> void:
+	var fp := FilmPose.on(actor(actor_id))
+	if fp:
+		fp.to(&"", 0.0)
+
+
 ## The actor this scene cast, or null once it has been freed (forgotten too).
 func actor(actor_id: StringName) -> Node3D:
 	var raw: Variant = actors.get(actor_id)

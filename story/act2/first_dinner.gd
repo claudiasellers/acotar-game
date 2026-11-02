@@ -90,10 +90,9 @@ func _build_beats() -> Array:
 func _set_the_scene(_s: SceneSpace) -> void:
 	_seen_presses = presses()
 	_seen_nudges = nudges()
-	for spec: Array in [[&"tamlin", &"tamlin_seat", &"table"], [&"lucien", &"lucien_seat", &"table"]]:
-		var who := cast(spec[0], spec[1], spec[2])
-		# No sit clip yet (L22 owns clips): lower them behind the table edge.
-		who.global_position.y -= 0.45
+	for spec: Array in [[&"tamlin", &"tamlin_seat", &"table"], [&"lucien", &"lucien_seat", &"lucien_face"]]:
+		cast(spec[0], spec[1], spec[2])
+		sit(spec[0])
 	if table == null or not is_instance_valid(table):
 		table = DinnerTable.new()
 		table.name = "DinnerTable"

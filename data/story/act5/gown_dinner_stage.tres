@@ -9,7 +9,7 @@ marks = {
 "feyre_close": Vector3(1.7, 0, -6.5),
 "table": Vector3(0, 0, -6.5),
 "tamlin_close": Vector3(-1.6, 0, -6.5),
-"tamlin_seat": Vector3(-4.75, 0, -6.5),
+"tamlin_seat": Vector3(-4.4, 0, -6.5),
 "lean_1": Vector3(-6.8, 0, -3.3),
 "lean_2": Vector3(-6.8, 0, -5.6),
 "lean_3": Vector3(-6.8, 0, -7.9),
