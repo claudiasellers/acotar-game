@@ -1,0 +1,5 @@
+from L32 hazel after
+quality look
+size 1920x1080
+timeout 900
+shot hf res://tools/world_shot.tscn hunting_forest {out}/hunting_forest.png
