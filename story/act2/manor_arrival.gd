@@ -57,7 +57,10 @@ func _build_beats() -> Array:
 		say(&"first_rule"),
 		Beats.run(func(_s: SceneSpace) -> void: cast(&"lucien", &"dining_door", &"lucien_seat"), "Lucien strides in"),
 		lead_along(&"lucien", [&"lucien_seat"], 0.0, 2.6),
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(actor(&"lucien")), "Lucien at the table"),
+		Beats.run(func(_s: SceneSpace) -> void:
+			cast(&"lucien", &"lucien_seat", &"lucien_face")
+			sit(&"lucien")
+			StoryControl.set_focus(actor(&"lucien")), "Lucien at the table"),
 		say(&"lucien_andras"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"alis", &"alis_door", &"feyre_wall")
@@ -79,7 +82,7 @@ func _transform(_s: SceneSpace) -> void:
 			(beast as BeastActor).visible = false
 		dismiss(&"tamlin_beast")
 	var tamlin := cast(&"tamlin", &"tamlin_seat", &"table")
-	sit(&"tamlin")
+	sit(&"tamlin", &"chair_head_dining")
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(tamlin)
 	StoryControl.shake = 0.0

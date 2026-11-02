@@ -8,6 +8,7 @@ marks = {
 "bread": Vector3(3.72, 0.83, -6.62),
 "chicken": Vector3(3.6, 0.83, -6.45),
 "feyre_chair": Vector3(4.95, 0, -6.5),
+"feyre_seat": Vector3(4.4, 0, -6.5),
 "lucien_goblet": Vector3(-3.4, 0.8, -7.15),
 "lucien_face": Vector3(-3.4, 0, -6.5),
 "lucien_seat": Vector3(-3.4, 0, -7.6),
