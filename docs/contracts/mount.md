@@ -67,8 +67,10 @@ so position-based checks (wayside, exit conditions, the streamer) see her.
 | sprint | | gallop, 15 m/s (capped for streaming: ~20 s look-ahead); the lens widens 12° and the wind rises |
 | jump | | a leap (from 3 m/s) |
 
-The bow is off in the saddle. The camera swings in behind her after 0.8 s
-without look input. The white horse's meshes are in `CameraFade.NEVER_GROUP`,
+The bow is off in the saddle. In the saddle the chase camera is lifted 0.8 m
+and drawn back 1.6 m (`Feyre.camera_lift` / `camera_arm_extra`, eased over
+0.6 s each way) so it looks down past Feyre to the mare's neck and ears; after
+0.8 s without look input it swings in behind her and settles to -18° pitch. The white horse's meshes are in `CameraFade.NEVER_GROUP`,
 so the chase camera's sight-line fade never turns her see-through.
 
 ## Nodes
