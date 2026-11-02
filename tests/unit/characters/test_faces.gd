@@ -146,3 +146,20 @@ func test_sisters_lashes_ride_the_lids_and_elain_never_sneers() -> void:
 	_run(d, 0.5)
 	assert_eq(d.current_expression(), &"sneer")
 	assert_gt(d.weight_of("sneer_R"), 0.7)
+
+
+func test_feyre_has_her_face_too() -> void:
+	var m := (load("res://characters/feyre/model/feyre_model.tscn") as PackedScene).instantiate() as Node3D
+	add_child_autofree(m)
+	var d := _driver(m)
+	assert_eq(d.character_id, &"feyre")
+	var body := m.find_child("Body", true, false) as MeshInstance3D
+	for k in EXPRESSION_KEYS:
+		assert_gt(body.find_blend_shape_by_name(k), -1, "feyre has %s" % k)
+	assert_not_null(m.find_child("Mouth", true, false), "her mouth opens onto teeth")
+	for e in FaceProfile.EMOTIONS:
+		assert_true(d.profile.presets.has(String(d.profile.aliases.get(String(e), ""))), "feyre resolves %s" % e)
+	Faces.express(&"feyre", &"angry")
+	_run(d, 0.5)
+	assert_eq(d.current_expression(), &"glare", "her anger is the glare and the clamped jaw")
+	assert_gt(d.weight_of("jaw_clench"), 0.6)
