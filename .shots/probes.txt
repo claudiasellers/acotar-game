@@ -1,0 +1,5 @@
+from main
+quality look
+size 1920x1080
+timeout 300
+shot indoor res://tools/indoor_camera_shot.tscn {out}
