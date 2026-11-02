@@ -6,6 +6,11 @@
 ## swings in, in its own column. Pockets are flaps along the top edge, and the map is the
 ## last flap.
 ##
+## L50: every cut-out is rendered from the thing's real model, and the one in
+## focus becomes the model itself, lifted and slowly turning over a painted
+## wash; the tag is a deckled paper label that also says where and when it
+## grows and what it is good for. Tabs and keys are stitched leather.
+##
 ## Keys: I / Tab / Esc close, Q / R (pad LB / RB) flip pockets and run on to
 ## the map, M opens the map, E / Enter (pad A) uses, 1–4 (pad X) pins.
 ## Silent by the user's call (T022). Look: theme variations from SatchelTheme
@@ -55,6 +60,8 @@ var _tag: PanelContainer
 var _tag_name: Label
 var _tag_line: Label
 var _tag_meta: Label
+var _tag_where: Label
+var _tag_chips: HFlowContainer
 var _use_button: Button
 var _pin_buttons: Array[Button] = []
 var _twine: Line2D
@@ -300,6 +307,13 @@ func _build_tag() -> void:
 	_tag_line = _label("", &"SatchelBody")
 	_tag_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_tag_line)
+	_tag_where = _label("", &"SatchelWhere")
+	_tag_where.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(_tag_where)
+	_tag_chips = HFlowContainer.new()
+	_tag_chips.add_theme_constant_override(&"h_separation", 6)
+	_tag_chips.add_theme_constant_override(&"v_separation", 6)
+	col.add_child(_tag_chips)
 	_tag_meta = _label("", &"SatchelSmall")
 	_tag_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_tag_meta)
@@ -468,14 +482,14 @@ func _make_item(e: Dictionary) -> Dictionary:
 	var count := _label("", &"SatchelCount")
 	count.position = Vector2(px * 0.66, px * 0.66)
 	b.add_child(count)
-	var pin := _label("", &"QuickBarKey")
+	var pin := _label("", &"SatchelPin")
 	pin.position = Vector2(px * 0.12, px * 0.70)
 	b.add_child(pin)
 	_lay.add_child(b)
 	var it := {"id": e.id, "node": b, "px": px, "count": count, "pin": pin, "entry": e,
 		"card": _table.add_card(e), "lift": 0.0, "face": 0.0,
 		"tilt": deg_to_rad(_seeded(e.id).z * TILT_DEG), "at": Vector2.ZERO, "rot": 0.0, "scale": 1.0,
-		"delay": 0.0, "home": Vector2.ZERO}
+		"delay": 0.0, "home": Vector2.ZERO, "show": 0.0, "spin": 0.0}
 	b.focus_entered.connect(select.bind(e.id))
 	b.mouse_entered.connect(func() -> void: b.grab_focus())
 	b.pressed.connect(func() -> void:
@@ -491,8 +505,10 @@ func _free_item(it: Dictionary) -> void:
 
 func _update_count(it: Dictionary, e: Dictionary) -> void:
 	(it.count as Label).text = "×%d" % e.count if int(e.count) > 1 else ""
+	(it.count as Label).visible = (it.count as Label).text != ""
 	var at := bar.slot_of(e.id)
 	(it.pin as Label).text = "ring %d" % (at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
+	(it.pin as Label).visible = (it.pin as Label).text != ""
 
 
 func _process(delta: float) -> void:
@@ -519,6 +535,14 @@ func _process(delta: float) -> void:
 		node.rotation = it.rot
 		node.scale = Vector2.ONE * it.scale
 		_table.place(card, _lay.position + it.at, it.px * it.scale, it.rot, it.lift, it.face)
+		# The hero becomes its real model, turning slowly; the rest settle back
+		# to cut-outs facing the way they lay.
+		if is_hero and not it.has("model_tried"):
+			it.model_tried = true
+			_table.hero_model(card, it.id)
+		it.show = lerpf(it.show, 1.0 if is_hero else 0.0, k)
+		it.spin = it.spin + delta * SatchelTable.SPIN_SPEED if is_hero else lerp_angle(it.spin, -it.rot, k)
+		_table.place_model(card, it.show, it.spin)
 		if is_hero:
 			hero = it
 	_place_tag(hero, delta, k)
@@ -567,6 +591,16 @@ func _show_detail() -> void:
 	if item and item.base_price > 0:
 		meta.append("MARKET %d COPPERS" % item.base_price)
 	_tag_meta.text = "   ".join(meta)
+	_tag_where.text = where_text(item)
+	_tag_where.visible = _tag_where.text != ""
+	for c in _tag_chips.get_children():
+		c.queue_free()
+	for word in trait_words(item):
+		var chip := PanelContainer.new()
+		chip.theme_type_variation = &"SatchelChip"
+		chip.add_child(_label(word, &"SatchelSmall"))
+		_tag_chips.add_child(chip)
+	_tag_chips.visible = _tag_chips.get_child_count() > 0
 	var verb := SatchelUse.verb(selected_id)
 	_use_button.visible = verb != ""
 	_use_button.text = verb
@@ -575,6 +609,58 @@ func _show_detail() -> void:
 		_pin_buttons[i].set_pressed_no_signal(bar.entry(i) == selected_id)
 	for it in _items:
 		_update_count(it, it.entry)
+
+
+## Where and when it grows, from the catalogue: "The western fells, in
+## spring." / "Only at night." Empty for things that aren't found.
+static func where_text(item: ItemData) -> String:
+	if item == null:
+		return ""
+	var parts: Array[String] = []
+	if item.hint != "":
+		parts.append(item.hint.trim_suffix("."))
+	var when := ""
+	var bound := item.bound
+	if item is IngredientData and (item as IngredientData).night_only:
+		bound = &"night"
+	match bound:
+		&"dawn": when = "only at dawn"
+		&"dusk": when = "only at dusk"
+		&"night": when = "only at night"
+		&"mist": when = "only in the morning mist"
+		&"rain": when = "only in the rain"
+		&"snow": when = "only in the snow"
+	if when == "" and item is IngredientData:
+		var season := (item as IngredientData).season
+		if season == &"winter" or season == &"spring":
+			when = "in " + String(season)
+	if when != "" and not (parts.size() > 0 and parts[0].to_lower().contains(when.trim_prefix("only ").trim_prefix("in ").trim_prefix("at "))):
+		parts.append(when)
+	if parts.is_empty():
+		return ""
+	var out := ", ".join(parts)
+	return out.left(1).to_upper() + out.substr(1) + "."
+
+
+## Small enamel chips: its chemistry tags, whether she can eat it, and
+## how rare it is. Words come straight from the data (no invented lore).
+static func trait_words(item: ItemData) -> Array[String]:
+	var out: Array[String] = []
+	if item == null:
+		return out
+	if item.rarity == &"shiny":
+		out.append("Shimmering")
+	elif item.rarity == &"rare":
+		out.append("Rare")
+	if item is IngredientData:
+		var ing := item as IngredientData
+		for t in ing.tags:
+			out.append(String(t).capitalize())
+		if ing.edible and ing.nutrition > 0.0 and not ing.is_apply_only():
+			out.append("Edible")
+		if ing.pigment != &"":
+			out.append("%s pigment" % String(ing.pigment).capitalize())
+	return out
 
 
 ## Button glyphs, not a sentence: pad or keys, whichever was used last.
@@ -593,8 +679,8 @@ func _build_prompts() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override(&"separation", 8)
 		var glyph := PanelContainer.new()
-		glyph.theme_type_variation = &"QuickBarSlot"
-		var key := _label(p[0], &"QuickBarKey")
+		glyph.theme_type_variation = &"SatchelKey"
+		var key := _label(p[0], &"SatchelKeyLabel")
 		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		glyph.add_child(key)
 		row.add_child(glyph)

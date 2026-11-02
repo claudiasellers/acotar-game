@@ -146,8 +146,13 @@ func _visit(stop: Dictionary) -> void:
 			continue
 		Clock.time_of_day = float(stop["hour"]) / 24.0
 		var front := n3.global_transform.basis.z.normalized() * -2.5
+		if stop.has("anchor"):
+			# Indoors, from the room's side of them (they may face a wall).
+			var mid := _where(stop, Vector3.ZERO) - n3.global_position
+			front = Vector3(mid.x, 0.0, mid.z).normalized() * 2.0
 		_place(n3.global_position + Vector3(front.x, 0.0, front.z))
-		await _wait(12.0)
+		# And looks at them: the family speaks only face to face (L34-5).
+		await _face(n3, 12.0)
 	var standing: Array = []
 	var bad: Array = []
 	for node in presence.get_children():
@@ -212,6 +217,21 @@ func _primitives(node: Node) -> Array:
 	for c in node.get_children():
 		out.append_array(_primitives(c))
 	return out
+
+
+## Turns her camera to `node` for `seconds`, as a player looks at who's there.
+func _face(node: Node3D, seconds: float) -> void:
+	var t := 0.0
+	while t < seconds and is_instance_valid(node):
+		var cam: Camera3D = feyre.get(&"camera")
+		if cam and feyre.has_method(&"nudge_camera"):
+			var want := (node.global_position + Vector3.UP * 1.5 - cam.global_position).normalized()
+			var have := -cam.global_basis.z
+			var dyaw := wrapf(atan2(-want.x, -want.z) - atan2(-have.x, -have.z), -PI, PI)
+			var dpitch := asin(clampf(want.y, -1, 1)) - asin(clampf(have.y, -1, 1))
+			feyre.call(&"nudge_camera", dyaw * 0.5, dpitch * 0.5)
+		await get_tree().process_frame
+		t += get_process_delta_time()
 
 
 func _wait(seconds: float) -> void:

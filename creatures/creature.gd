@@ -272,7 +272,7 @@ func _leave_tracks(delta: float) -> void:
 	_stride_left = data.stride
 	_print_side = -_print_side
 	var side := global_basis.x * _print_side * data.body_width * 0.25
-	TrackLayer.leave(get_tree(), &"print", global_position + side, rotation.y, data.print_size)
+	TrackLayer.leave(get_tree(), &"hoof" if data.hooved else &"print", global_position + side, rotation.y, data.print_size)
 	if move_speed > data.walk_speed * 2.0 and randf() < data.twig_chance:
 		TrackLayer.leave(get_tree(), &"twig", global_position + side * 2.0, rotation.y)
 

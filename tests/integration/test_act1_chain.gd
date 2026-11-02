@@ -93,7 +93,8 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	watch_signals(EventBus)
 	assert_true(wolf.start())
 	assert_signal_emitted_with_parameters(EventBus, "story_item_granted", [&"arrow_ash", 1])
-	_run(wolf, 6.0)
+	# Her eye rests on the doe first (doe_look_seconds), then golden eyes.
+	_run(wolf, wolf.doe_look_seconds + 2.5)
 	assert_not_null(wolf.wolf, "a wolf (stand-in) is in the clearing")
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL, "free to take the shot")
 	assert_true(WorldState.has_flag("fact.wolf_spotted"), "voice A1_01 hook")

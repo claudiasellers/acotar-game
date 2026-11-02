@@ -65,6 +65,9 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Distance walked between two prints.
 @export var stride: float = 0.8
 @export var print_size: float = 0.09
+## Cloven hooves (deer): prints are HoofPrint decals that read from walking
+## height, not small pads.
+@export var hooved: bool = false
 ## Chance per stride, while running, of snapping a twig.
 @export var twig_chance: float = 0.08
 

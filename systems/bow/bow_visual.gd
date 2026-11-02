@@ -24,7 +24,6 @@ const GOLD := Color(1.0, 0.82, 0.42)
 const STRING := Color(1.0, 0.96, 0.9)
 const QUIVER := Color(0.62, 0.40, 0.33)
 const FLETCH := Color(0.98, 0.70, 0.80)
-const ASH := Color(0.93, 0.92, 0.88)
 
 var controller: BowController
 var pose: BowArmPose
@@ -39,7 +38,7 @@ var string_bottom: MeshInstance3D
 var arrow_node: Node3D
 var quiver: Node3D
 var _fletches: Array[MeshInstance3D] = []
-var _arrow_shaft_mat: StandardMaterial3D
+var _arrow_model: MeshInstance3D
 var _skeleton: Skeleton3D
 
 
@@ -168,7 +167,7 @@ func _place() -> void:
 	var top := Vector3(0, HALF_LENGTH, bend)
 	var bottom := Vector3(0, -HALF_LENGTH, bend)
 	var nock := Vector3(0, 0, bend)
-	if w > 0.5 and pose and _skeleton:
+	if w > 0.5 and pose and _skeleton and absf(bow_root.global_basis.determinant()) > 0.000001:
 		var local := bow_root.global_transform.affine_inverse() * pose.string_hand_world()
 		nock = Vector3(0, clampf(local.y, -0.1, 0.1), clampf(local.z, bend, 0.85))
 	_stretch(string_top, top, nock)
@@ -177,7 +176,7 @@ func _place() -> void:
 	arrow_node.visible = nocked
 	if nocked:
 		arrow_node.position = nock
-		_arrow_shaft_mat.albedo_color = ASH if controller.selected == &"arrow_ash" else WOOD
+		_arrow_model.mesh = nocked_mesh(controller.selected)
 	_place_quiver(feyre)
 
 
@@ -201,12 +200,22 @@ func _hand_transform(feyre: Feyre) -> Transform3D:
 	var grip := feyre.global_position + Vector3.UP * 1.35 + dir * 0.55
 	if pose and _skeleton:
 		grip = pose.bow_hand_world() + dir * 0.03
-	# Limbs upright with a slight cant, the grip (local -Z) facing the aim.
-	var up := (Vector3.UP - dir * dir.dot(Vector3.UP)).normalized()
+	return Transform3D(hand_basis(dir, -feyre.model.global_basis.z), grip)
+
+
+## Limbs upright with a slight cant, the grip (local -Z) facing `dir`. Aiming
+## near straight up or down leaves no "upright" (F43: a zero basis, and every
+## draw logged det == 0), so the limbs then lean along `facing` instead.
+static func hand_basis(dir: Vector3, facing: Vector3) -> Basis:
+	dir = dir.normalized() if dir.length() > 0.001 else Vector3.FORWARD
+	var up := Vector3.UP - dir * dir.dot(Vector3.UP)
+	if up.length() < 0.05:
+		up = facing - dir * dir.dot(facing)
+	if up.length() < 0.05:
+		up = dir.cross(Vector3.RIGHT)
+	up = up.normalized().rotated(dir, deg_to_rad(-10.0))
 	var side := dir.cross(up).normalized()
-	up = up.rotated(dir, deg_to_rad(-10.0))
-	side = dir.cross(up).normalized()
-	return Transform3D(Basis(side, up, -dir).orthonormalized(), grip)
+	return Basis(side, up, -dir).orthonormalized()
 
 
 func _place_quiver(feyre: Feyre) -> void:
@@ -282,44 +291,23 @@ func _string_segment() -> MeshInstance3D:
 	return seg
 
 
+## The nocked arrow's mesh: the same ArrowModel as in flight (F44), in the
+## selected arrow's colours, nock at the origin, tip down local -Z.
+static func nocked_mesh(arrow_item: StringName) -> ArrayMesh:
+	var d: ArrowData = BowController.arrow_data().get(arrow_item)
+	var shaft := d.shaft_color if d else WOOD
+	var fletch := d.fletching_color if d else FLETCH
+	return ArrowModel.mesh(0.83, 0.0, shaft, fletch, ArrowModel.STEEL)
+
+
 ## The nocked arrow, nock at the origin, pointing down local -Z.
 func _arrow() -> Node3D:
 	var root := Node3D.new()
 	root.name = "NockedArrow"
-	var shaft := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.0055
-	cyl.bottom_radius = 0.0055
-	cyl.height = 0.78
-	cyl.radial_segments = 6
-	cyl.rings = 1
-	_arrow_shaft_mat = _mat(WOOD, 0.5)
-	cyl.material = _arrow_shaft_mat
-	shaft.mesh = cyl
-	shaft.rotation.x = PI * 0.5
-	shaft.position.z = -0.39
-	root.add_child(shaft)
-	var head := MeshInstance3D.new()
-	var cone := CylinderMesh.new()
-	cone.top_radius = 0.0
-	cone.bottom_radius = 0.016
-	cone.height = 0.06
-	cone.radial_segments = 6
-	cone.material = _mat(GOLD, 0.2, 0.9)
-	head.mesh = cone
-	head.rotation.x = -PI * 0.5
-	head.position.z = -0.8
-	root.add_child(head)
-	for i in 3:
-		var vane := MeshInstance3D.new()
-		var quad := BoxMesh.new()
-		quad.size = Vector3(0.002, 0.03, 0.09)
-		quad.material = _mat(FLETCH, 0.5)
-		vane.mesh = quad
-		vane.position = Vector3(0, 0, -0.07)
-		vane.rotation.z = TAU * i / 3.0
-		vane.position += Vector3(0, 0.014, 0).rotated(Vector3.BACK, TAU * i / 3.0)
-		root.add_child(vane)
+	_arrow_model = MeshInstance3D.new()
+	_arrow_model.name = "ArrowModel"
+	_arrow_model.mesh = nocked_mesh(&"arrow_wood")
+	root.add_child(_arrow_model)
 	return root
 
 

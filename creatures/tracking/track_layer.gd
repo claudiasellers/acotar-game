@@ -12,11 +12,14 @@ const MAX_MARKS := 600
 ## Seconds of clear weather before a mark is gone.
 const LIFETIMES := {
 	&"print": 360.0,
+	&"hoof": 360.0,
 	&"blood": 600.0,
 	&"twig": 900.0,
 }
 ## Snowfall at 1.0 buries marks this many times faster than clear weather.
 const SNOW_BURY_RATE := 5.0
+## Shortest a hoof print is drawn, in metres (deer prints are ~7 cm in life).
+const HOOF_MIN_LENGTH := 0.2
 
 var marks: Array[Dictionary] = []
 ## Overrides the weather lookup (tests, scripted storms). Negative means look it up.
@@ -59,6 +62,16 @@ static func burial_step(delta: float, snowfall: float) -> float:
 func add_mark(kind: StringName, at: Vector3, heading: float, size: float) -> Dictionary:
 	if marks.size() >= MAX_MARKS:
 		_remove(0)
+	if kind == &"hoof":
+		# Projected onto the real ground, so terrain LOD never buries it; sized
+		# to read from Feyre's walking camera rather than to scale.
+		var decal := HoofPrint.make(maxf(size * 3.0, HOOF_MIN_LENGTH))
+		decal.position = at
+		decal.rotation.y = heading
+		add_child(decal)
+		var hoof := {"kind": kind, "node": decal, "burial": 0.0, "lifetime": LIFETIMES[kind], "position": at}
+		marks.append(hoof)
+		return hoof
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = _mesh_for(kind, size)
 	mesh.material_override = _material_for(kind)
@@ -84,6 +97,8 @@ func step(delta: float) -> void:
 		var vis := visibility(mark.burial, mark.lifetime)
 		if vis <= 0.0:
 			_remove(i)
+		elif mark.node is Decal:
+			(mark.node as Decal).modulate.a = vis
 		else:
 			(mark.node as GeometryInstance3D).transparency = 1.0 - vis
 		i -= 1

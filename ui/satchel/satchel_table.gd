@@ -1,8 +1,10 @@
 ## The 3D stage under the satchel page: her cloak spread on the ground, seen
 ## at an angle under a low warm light, with each of her things lying on it as
-## a painted cut-out that casts a real shadow. The page's 2D layer decides
-## where things go (in screen pixels); this turns that into the scene.
-## Colours come from SatchelTheme.
+## a cut-out (rendered from its real model) that casts a real shadow. The one
+## in focus is the real 3D model itself, lifted off the cloth and slowly
+## turning over a watercolour wash. The page's 2D layer decides where things
+## go (in screen pixels); this turns that into the scene. Colours and
+## textures come from SatchelTheme.
 class_name SatchelTable
 extends SubViewportContainer
 
@@ -16,6 +18,11 @@ const CAMERA_FOV := 30.0
 ## How high a cut-out sits above the cloth, so it never sinks into a fold.
 const REST_HEIGHT := 0.03
 const ICON_TEXTURE_PX := 192
+## The hero model fills this share of its card's width, and turns this fast.
+const MODEL_FILL := 0.95
+const SPIN_SPEED := 0.6
+## The linen patch under each thing, as a share of its card.
+const PATCH_SCALE := 1.08
 
 var viewport: SubViewport
 var camera: Camera3D
@@ -27,6 +34,10 @@ var _icons: Dictionary = {}  # id -> Texture2D
 var _waiting: Dictionary = {}  # id -> [SubViewport, materials...] until keyed
 var _noise := FastNoiseLite.new()
 var _icon_holder := Node.new()
+var _patch_mat: StandardMaterial3D
+var _patch_mesh: QuadMesh
+var _wash: MeshInstance3D
+var _wash_mat: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -72,6 +83,20 @@ func _ready() -> void:
 	_cloth_mat.uv1_scale = Vector3(CLOTH.x * 6.0, CLOTH.y * 6.0, 1)
 	_cloth.material_override = _cloth_mat
 	viewport.add_child(_cloth)
+	var weave := SatchelTheme.texture(SatchelTheme.WEAVE_PATH)
+	if weave:
+		_cloth_mat.albedo_texture = weave
+		_cloth_mat.uv1_scale = Vector3(CLOTH.x * 1.5, CLOTH.y * 1.5, 1)
+	_build_wash()
+	var patch_tex := SatchelTheme.texture(SatchelTheme.PATCH_PATH)
+	if patch_tex:
+		_patch_mesh = QuadMesh.new()
+		_patch_mesh.size = Vector2.ONE
+		_patch_mesh.orientation = PlaneMesh.FACE_Y
+		_patch_mat = StandardMaterial3D.new()
+		_patch_mat.albedo_texture = patch_tex
+		_patch_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
+		_patch_mat.roughness = 1.0
 	apply_theme()
 
 
@@ -87,6 +112,7 @@ func apply_theme() -> void:
 	_env.ambient_light_energy = 0.42
 	_light.light_color = paper.lerp(glow, 0.3)
 	_light.light_energy = 0.62
+	_wash_mat.albedo_color = Color(SatchelTheme.color(&"accent"), 0.42)
 
 
 ## The point on the cloth under a screen position (in this control's pixels).
@@ -125,8 +151,65 @@ func add_card(e: Dictionary) -> Node3D:
 	quad.material_override = mat
 	quad.name = "Face"
 	card.add_child(quad)
+	if _patch_mat:
+		# Its home on the cloak: a stitched linen patch that stays put while
+		# the thing lifts.
+		var patch := MeshInstance3D.new()
+		patch.name = "Patch"
+		patch.mesh = _patch_mesh
+		patch.material_override = _patch_mat
+		patch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		patch.top_level = true
+		card.add_child(patch)
 	viewport.add_child(card)
 	return card
+
+
+## The hero's real model, made once per card on first focus (main thread,
+## F27/F37), sized to the card and stood on the cloth. Null when the item
+## has no model (it keeps its cut-out).
+func hero_model(card: Node3D, id: StringName) -> Node3D:
+	var pivot := card.get_node_or_null(^"Model") as Node3D
+	if pivot:
+		return pivot
+	var model := SatchelModel.instance(id)
+	if model == null:
+		return null
+	pivot = Node3D.new()
+	pivot.name = "Model"
+	pivot.visible = false
+	pivot.top_level = true
+	card.add_child(pivot)
+	pivot.add_child(model)
+	var box := SatchelModel.bounds(model)
+	var span := maxf(maxf(box.size.x, box.size.z), box.size.y * 0.8)
+	var k := MODEL_FILL / maxf(span, 0.001)
+	model.scale = Vector3.ONE * k
+	var c := box.get_center()
+	model.position = -Vector3(c.x, box.position.y, c.z) * k
+	return pivot
+
+
+## Stands the hero model where its card lies, `show` 0..1 (0 = the cut-out,
+## 1 = the model), turning by `spin` radians.
+func place_model(card: Node3D, show: float, spin: float) -> void:
+	var pivot := card.get_node_or_null(^"Model") as Node3D
+	var face := card.get_node(^"Face") as Node3D
+	if pivot == null:
+		face.visible = true
+		return
+	pivot.visible = show > 0.02
+	face.visible = show < 0.5
+	var s := card.scale.x
+	pivot.global_transform = Transform3D(Basis(Vector3.UP, spin).scaled(Vector3.ONE * s * lerpf(0.6, 1.0, show)),
+			card.global_position + Vector3(0, -0.02 * s, 0))
+	var ground := card.global_position
+	_wash.visible = show > 0.02
+	var patch := card.get_node_or_null(^"Patch") as Node3D
+	var floor_y := patch.global_position.y if patch else _fold(ground.x, ground.z)
+	_wash.global_position = Vector3(ground.x, floor_y + 0.003, ground.z)
+	_wash.scale = Vector3.ONE * s * 1.9 * lerpf(0.5, 1.0, show)
+	_wash_mat.albedo_color.a = 0.42 * show
 
 
 ## Lays a card at a screen position. `lift` is metres off the cloth, `face`
@@ -134,9 +217,19 @@ func add_card(e: Dictionary) -> Node3D:
 func place(card: Node3D, screen: Vector2, px: float, turn: float, lift: float, face: float) -> void:
 	var ground := ground_at(screen)
 	var s := px * metres_per_px(ground)
-	card.position = ground + Vector3(0, REST_HEIGHT + _fold(ground.x, ground.z) + lift, 0)
+	# Things lie flat, so they ride just over the highest fold beneath their
+	# patch (and the patch just under them).
+	var half := s * PATCH_SCALE * 0.5
+	var top := _fold(ground.x, ground.z)
+	for c in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1), Vector2(0, -1), Vector2(0, 1), Vector2(-1, 0), Vector2(1, 0)]:
+		top = maxf(top, _fold(ground.x + c.x * half, ground.z + c.y * half))
+	card.position = ground + Vector3(0, REST_HEIGHT + top + lift, 0)
 	card.basis = Basis(Vector3.UP, -turn) * Basis(Vector3.RIGHT, deg_to_rad(52.0) * face)
 	card.scale = Vector3.ONE * s
+	var patch := card.get_node_or_null(^"Patch") as Node3D
+	if patch:
+		patch.global_transform = Transform3D(Basis(Vector3.UP, -turn * 0.6).scaled(Vector3.ONE * s * PATCH_SCALE),
+				ground + Vector3(0, top + 0.004, 0))
 
 
 ## Cloth height at a point: a few long soft folds and a little rumple.
@@ -170,6 +263,24 @@ func _cloth_mesh() -> ArrayMesh:
 	st.generate_normals()
 	st.generate_tangents()
 	return st.commit()
+
+
+## A watercolour bloom painted on the cloth under the hero.
+func _build_wash() -> void:
+	_wash = MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2.ONE
+	q.orientation = PlaneMesh.FACE_Y
+	_wash.mesh = q
+	_wash_mat = StandardMaterial3D.new()
+	_wash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_wash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_wash_mat.albedo_texture = SatchelTheme.texture(SatchelTheme.WASH_PATH)
+	_wash_mat.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
+	_wash.material_override = _wash_mat
+	_wash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_wash.visible = false
+	viewport.add_child(_wash)
 
 
 ## A fine woven texture as a normal map, made from noise (no file needed).

@@ -33,8 +33,22 @@ const SPEAKER_GAP := 25.0
 ## A deed line waits at most this long for the scene that raised it to end.
 const DEED_WAIT := 120.0
 const FOLLOW_PAUSE := 0.4
+## How long a family follow-up waits for her to be with them and looking.
+const FOLLOW_WAIT := 20.0
 ## Quiet after any staged scene starts or ends.
 const SCENE_HUSH := 6.0
+## Nesta, Elain and their father speak only face to face in the cottage: she
+## is inside, close, and has them on screen with nothing in between (owner,
+## L34-5: lines from outside the walls were confusing).
+const FAMILY := [&"nesta", &"elain", &"father"]
+const COTTAGE_ANCHOR := &"act1_cottage_interior"
+## The cottage's floor in the interior anchor's frame (x, z min/max; the
+## interior is centred 0.5 m east of the anchor, walls at ±4.1 by ±2.8).
+const COTTAGE_FLOOR := Rect2(-3.65, -2.85, 8.3, 5.7)
+const COTTAGE_HEIGHT := 3.0
+## How far off the middle of her view a speaker may stand and still be "on
+## camera", in degrees.
+const ON_CAMERA_DEG := 32.0
 
 var lines: Array[DialogueLine] = []
 var places: Array[DialoguePlace] = []
@@ -72,6 +86,15 @@ var _house: Node3D
 var _rooms: Array[Dictionary] = []
 var _regions: Array[RegionDef] = []
 var _voice: AudioStreamPlayer3D
+## Where she looks from and toward: [origin, forward], or [] for no camera.
+## Tests replace it.
+var view_fn: Callable = _camera_view
+var _cottage: Node3D
+## Scenes whose guide speaks instead of the ambient lines: scene id -> true.
+var _holds: Dictionary = {}
+## A scene beat's remaining lines: [{line, node}], spoken one after another.
+var _scene_queue: Array[Dictionary] = []
+var _scene_next: float = 0.0
 var _voice_flat: AudioStreamPlayer
 
 
@@ -122,6 +145,7 @@ func add_book(book: DialogueBook) -> void:
 
 func _process(delta: float) -> void:
 	_now += delta
+	_pump_scene()
 	if not auto_tick:
 		return
 	_t += delta
@@ -137,13 +161,22 @@ func _process(delta: float) -> void:
 func step(at: Vector3) -> DialogueLine:
 	_at = at
 	_locate(at)
+	_pump_scene()
+	if not _holds.is_empty():
+		return null
 	if busy():
 		return null
 	if _follow and _now >= _follow_at:
 		var f := _follow
-		_follow = null
-		if DialogueRules.fits(f, _ctx()):
-			return _speak(f, _speaker_node(f.speaker, at, DEED_RADIUS))
+		# The family answers only face to face: she waits for them a while.
+		if f.speaker in FAMILY and not _can_say(f.speaker, at):
+			if _now - _follow_at < FOLLOW_WAIT:
+				return null
+			_follow = null
+		else:
+			_follow = null
+			if DialogueRules.fits(f, _ctx()):
+				return _speak(f, _speaker_node(f.speaker, at, DEED_RADIUS))
 	if _now < _busy_until + GAP:
 		return null
 	var line := _next_deed_line(at)
@@ -154,6 +187,58 @@ func step(at: Vector3) -> DialogueLine:
 	return _speak(line, _speaker_node(line.speaker, at, DEED_RADIUS))
 
 
+## A scene's guide takes the voice while `on`: ambient, place and deed lines
+## wait, and only its beats (say_beat) are spoken.
+func hold(scene_id: StringName, on: bool) -> void:
+	if on:
+		_holds[scene_id] = true
+	else:
+		_holds.erase(scene_id)
+		if _holds.is_empty():
+			# What's left of the last beat still finishes (his last breaths
+			# outlast the scene); the hush starts from now.
+			_scene_edge = _now
+
+
+func held() -> bool:
+	return not _holds.is_empty()
+
+
+## Speaks the SCENE lines at "<scene_id>.<beat>" that fit (phase, flags, not
+## yet heard), in book order, one after another. A newer beat cuts off what
+## is left of the last one. Scene beats are spoken whatever the control mode:
+## the guide decides when. Returns the lines it will speak.
+func say_beat(scene_id: StringName, beat: StringName, node: Node = null) -> Array[DialogueLine]:
+	var key := StringName("%s.%s" % [scene_id, beat])
+	var ctx := _ctx()
+	var out: Array[DialogueLine] = []
+	for line: DialogueLine in _of(DialogueLine.Trigger.SCENE, key):
+		if DialogueRules.fits(line, ctx):
+			out.append(line)
+	if out.is_empty():
+		return out
+	_scene_queue.clear()
+	for line in out:
+		_scene_queue.append({"line": line, "node": node})
+	_scene_next = _now
+	_pump_scene()
+	return out
+
+
+## True while a scene beat still has lines to say.
+func beat_speaking() -> bool:
+	return not _scene_queue.is_empty() or _now < _busy_until
+
+
+func _pump_scene() -> void:
+	if _scene_queue.is_empty() or _now < _scene_next:
+		return
+	var next: Dictionary = _scene_queue.pop_front()
+	var node: Node = next["node"] if is_instance_valid(next["node"]) else null
+	_speak(next["line"], node)
+	_scene_next = _busy_until + FOLLOW_PAUSE
+
+
 ## Staged scenes, films, narrowed control and other captions all win.
 func busy() -> bool:
 	# Staged moments narrow control (films hold NONE); some spaces run all
@@ -161,7 +246,7 @@ func busy() -> bool:
 	# a short hush around any scene starting or ending.
 	if StoryControl.mode != StoryControl.Mode.FULL or _now - _scene_edge < SCENE_HUSH:
 		return true
-	if _now < _busy_until:
+	if _now < _busy_until or not _scene_queue.is_empty():
 		return true
 	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption if is_inside_tree() else null
 	return caption != null and caption.showing != "" and (last_line == null or caption.showing != last_line.text)
@@ -295,7 +380,7 @@ func _next_place_line() -> DialogueLine:
 		# Someone else's line at a place needs them there to say it.
 		var candidates: Array = []
 		for c: DialogueLine in _of(DialogueLine.Trigger.NEAR_PLACE, p.id):
-			if c.speaker in [&"feyre", &"mother"] or _speaker_node(c.speaker, _feyre_at(), DEED_RADIUS) != null:
+			if c.speaker in [&"feyre", &"mother"] or _can_say(c.speaker, _feyre_at()):
 				candidates.append(c)
 		var line := DialogueRules.pick(candidates, ctx)
 		if line:
@@ -331,6 +416,10 @@ func _next_speaker_line(at: Vector3) -> DialogueLine:
 			continue
 		if _now - float(_speaker_at.get(who_key, -INF)) < SPEAKER_GAP:
 			continue
+		# Family: not greeted until she's with them and looking (so it comes
+		# the moment she turns to them).
+		if nid in FAMILY and not face_to_face(n3, at):
+			continue
 		var candidates: Array = []
 		for key in DialogueRules.keys_for(nid):
 			candidates.append_array(_of(DialogueLine.Trigger.NEAR_SPEAKER, &"", StringName(key)))
@@ -353,16 +442,97 @@ func _next_deed_line(at: Vector3) -> DialogueLine:
 			_deed_queue.remove_at(i)
 			continue
 		var candidates: Array = []
+		var waiting := false
 		for line: DialogueLine in _of(DialogueLine.Trigger.DEED):
 			if line.deed != e["flag"]:
 				continue
-			if line.speaker == &"feyre" or _speaker_node(line.speaker, at, DEED_RADIUS) != null:
+			if line.speaker == &"feyre" or _can_say(line.speaker, at):
 				candidates.append(line)
-		_deed_queue.remove_at(i)
+			elif line.speaker in FAMILY and DialogueRules.fits(line, _ctx()) \
+					and _speaker_node(line.speaker, at, DEED_RADIUS) != null:
+				# They're about (in the cottage, or she's outside it): the line
+				# waits until she's with them and looking.
+				waiting = true
 		var line := DialogueRules.pick(candidates, _ctx())
+		if line == null and waiting:
+			i += 1
+			continue
+		_deed_queue.remove_at(i)
 		if line:
 			return line
 	return null
+
+
+## Whether `speaker` is there to say a line now: someone within DEED_RADIUS,
+## and for the family, face to face in the cottage.
+func _can_say(speaker: StringName, at: Vector3) -> bool:
+	var node := _speaker_node(speaker, at, TALK_RADIUS if speaker in FAMILY else DEED_RADIUS)
+	if node == null:
+		return false
+	return not speaker in FAMILY or face_to_face(node, at)
+
+
+## She is inside the cottage with them, within TALK_RADIUS, and they are on
+## her screen near the middle with nothing between the camera and them.
+func face_to_face(node: Node3D, at: Vector3) -> bool:
+	if node == null or Vector2(node.global_position.x - at.x, node.global_position.z - at.z).length() > TALK_RADIUS:
+		return false
+	if not in_cottage(at) or not in_cottage(node.global_position):
+		return false
+	return on_camera(node)
+
+
+## Inside the cottage's walls (the interior anchor's floor box).
+func in_cottage(p: Vector3) -> bool:
+	var c := _find_cottage()
+	if c == null:
+		return false
+	var local := c.global_transform.affine_inverse() * p
+	return COTTAGE_FLOOR.has_point(Vector2(local.x, local.z)) and local.y > -1.0 and local.y < COTTAGE_HEIGHT
+
+
+## Near the middle of her view, with a clear line from the camera to their head.
+func on_camera(node: Node3D) -> bool:
+	var view: Array = view_fn.call()
+	if view.is_empty():
+		return false
+	var from: Vector3 = view[0]
+	var fwd: Vector3 = view[1]
+	var head := node.global_position + Vector3.UP * 1.5
+	var to := head - from
+	if to.length() < 0.05 or rad_to_deg(fwd.angle_to(to.normalized())) > ON_CAMERA_DEG:
+		return false
+	if not node.is_inside_tree():
+		return true
+	var q := PhysicsRayQueryParameters3D.create(from, head)
+	var exclude: Array[RID] = []
+	var feyre := get_tree().get_first_node_in_group(&"player")
+	for body: Node in [feyre, node]:
+		if body is CollisionObject3D:
+			exclude.append((body as CollisionObject3D).get_rid())
+	q.exclude = exclude
+	var hit := node.get_world_3d().direct_space_state.intersect_ray(q)
+	return hit.is_empty() or (hit["collider"] is Node and (node.is_ancestor_of(hit["collider"]) or hit["collider"] == node))
+
+
+func _camera_view() -> Array:
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() and get_viewport() else null
+	if cam == null:
+		return []
+	return [cam.global_position, -cam.global_basis.z]
+
+
+func _find_cottage() -> Node3D:
+	if _cottage != null and is_instance_valid(_cottage) and _cottage.is_inside_tree():
+		return _cottage
+	_cottage = null
+	if not is_inside_tree():
+		return null
+	for n in get_tree().get_nodes_in_group(&"story_anchor"):
+		if StringName(n.get_meta(&"anchor_id", n.name)) == COTTAGE_ANCHOR:
+			_cottage = n as Node3D
+			break
+	return _cottage
 
 
 func _on_flag_changed(flag: String, value: Variant) -> void:

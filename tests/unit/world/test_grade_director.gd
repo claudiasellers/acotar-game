@@ -196,3 +196,22 @@ func test_director_drives_the_painted_sky() -> void:
 	assert_eq(mat.get_shader_parameter(&"ground_bottom_color"), manor.ground_bottom)
 	assert_eq(mat.get_shader_parameter(&"cloud_shade"), manor.cloud_shade)
 
+
+
+func test_night_fog_takes_the_ambient_instead_of_going_black() -> void:
+	# The mill void (L51): volumetric fog and every mist FogVolume are lit only by
+	# lights unless they take the ambient, so with the sun down they rendered as
+	# an opaque black wall. At night the fog takes at least NIGHT_FOG_INJECT.
+	assert_almost_eq(GradeDirector.night_amount(0.8), 0.0, 0.0001, "noon is day")
+	assert_almost_eq(GradeDirector.night_amount(-0.5), 1.0, 0.0001, "midnight is night")
+	assert_almost_eq(GradeDirector.fog_ambient_inject(0.0, 0.0), 0.0, 0.0001, "daytime fog keeps its sun-lit look")
+	assert_almost_eq(GradeDirector.fog_ambient_inject(0.0, 1.0), GradeDirector.NIGHT_FOG_INJECT, 0.0001)
+	assert_almost_eq(GradeDirector.fog_ambient_inject(1.5, 1.0), 1.5, 0.0001, "never lowers a grade's own take")
+	var env := Environment.new()
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child_autofree(we)
+	director.environment = we
+	director.night = 1.0
+	director.apply(GradeDirector.load_preset(&"human_winter"))
+	assert_gt(env.volumetric_fog_ambient_inject, 0.3, "the winter night fog is lit by the ambient")

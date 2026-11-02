@@ -1,0 +1,379 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"wh_doe"
+speaker = &"feyre"
+who = ""
+text = "A doe. A deer like that could feed my family for a week or more."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.doe"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"wh_doe_hide"
+speaker = &"feyre"
+who = ""
+text = "Her skin could be sold. I need new boots. Elain needs a cloak."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.doe"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"wh_eyes"
+speaker = &"feyre"
+who = ""
+text = "Golden eyes, in the brush across the clearing."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.eyes"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, a whisper, frozen"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"wh_downwind"
+speaker = &"feyre"
+who = ""
+text = "He's downwind of her. She can't see or smell him."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.eyes"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"wh_pony"
+speaker = &"feyre"
+who = ""
+text = "The size of a pony. No animal that big should be so quiet."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.size"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"wh_faerie"
+speaker = &"feyre"
+who = ""
+text = "If he's a faerie, I should already be running."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.size"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, afraid"
+emotion = &"afraid"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"wh_ash_rule"
+speaker = &"feyre"
+who = ""
+text = "Ash makes their healing falter. Long enough to kill."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.size"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"wh_alone"
+speaker = &"feyre"
+who = ""
+text = "Is he alone?"
+canon = "A"
+trigger = 6
+where = &"wolf_kill.wait"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, scanning"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"wh_animal"
+speaker = &"feyre"
+who = ""
+text = "Animal. Just an animal."
+canon = "V"
+trigger = 6
+where = &"wolf_kill.wait"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, telling herself"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"wh_nudge_draw"
+speaker = &"feyre"
+who = ""
+text = "The ash arrow. Three years in my quiver. Now."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.nudge_draw"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"wh_nudge_loose"
+speaker = &"feyre"
+who = ""
+text = "Before he ruins the hide. His side."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.nudge_loose"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"wh_wood"
+speaker = &"feyre"
+who = ""
+text = "Bee stings, to a wolf that size. It has to be the ash."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.wood"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, held breath, hunting"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"wh_miss"
+speaker = &"feyre"
+who = ""
+text = "Missed. I can't afford to miss."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.miss"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, sharp with herself"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"wh_ash"
+speaker = &"feyre"
+who = ""
+text = "He's looking at me. Like he knows. Just in case... the eye."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.ash"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, cold, very fast"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"wh_dying"
+speaker = &"feyre"
+who = ""
+text = "He should be dead, not dying."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.kill"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, shaken"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"wh_still"
+speaker = &"feyre"
+who = ""
+text = "Wolf. Definitely just a wolf."
+canon = "V"
+trigger = 6
+where = &"wolf_kill.kill"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, relief she doesn't trust"
+emotion = &"guarded"
+
+[resource]
+script = ExtResource("3")
+area = &"wolf_hunt"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15")])
+places = Array[ExtResource("2")]([])
