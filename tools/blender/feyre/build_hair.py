@@ -37,7 +37,7 @@ HAIR_DIR = os.path.join(bf.REPO, "characters", "feyre", "hair")
 H = 0.0025
 LO = np.array([-0.17, -0.15, 0.99])
 HI = np.array([0.17, 0.22, 1.76])
-MAX_TRIS = 5600
+MAX_TRIS = 6600
 SKULL_C = np.array([0.0, 0.012, 1.535])
 RNG = np.random.default_rng(1966)
 
@@ -131,12 +131,14 @@ class Style:
         radii = [r0 + (r1 - r0) * (i / (n - 1)) ** 1.3 for i in range(n)]
         self.g.union(sdf.tube(pts, radii), k)
 
-    def cap(self, thick=0.013, back_extra=0.010, line=hairline):
+    def cap(self, thick=0.012, back_extra=0.010, line=hairline, lift=0.008):
         X, Y, Z = self.g._coords(tuple(slice(None) for _ in range(3)))
         th = np.arctan2(X, -(Y - SKULL_C[1]))
         hl = line(th)
         back = np.clip((Y - SKULL_C[1]) / 0.08, 0, 1)
         t = thick + back_extra * back * (Z > 1.50)
+        t = t + lift * np.clip((Z - 1.615) / 0.03, 0, 1)   # crown lift (princess volume)
+        t = t + 0.007 * np.clip((1.595 - Z) / 0.03, 0, 1) * np.clip((np.abs(X) - 0.035) / 0.03, 0, 1)  # soft side volume
         t = t * (0.55 + 0.45 * np.clip((Z - hl) / 0.025, 0, 1))
         d = self.head.Fb - t
         d = sdf.smax(d, hl - Z, 0.006)
@@ -153,7 +155,7 @@ class Style:
         self.lock(pts, r, r * 0.55)
         return pts
 
-    def cap_locks(self, part_th, n=26, off=0.0115, r=0.0085, back=True, sides=True, front_sweep=True):
+    def cap_locks(self, part_th, n=44, off=0.0170, r=0.0078, back=True, sides=True, front_sweep=True):
         """Locks from the parting over the skull: gives the cap direction and grooves."""
         ph_part = math.radians(70)
         targets = []
@@ -176,7 +178,7 @@ class Style:
             ph0 = math.radians(72 - 6 * t)
             th1 = -side * math.radians(48 + 22 * t)
             ph1 = math.radians(26 - 10 * t) - depth
-            self.skull_lock(th0, ph0, th1, ph1, 0.009 + 0.002 * t, 0.0085 - 0.0012 * t, n=11, sag=math.radians(14))
+            self.skull_lock(th0, ph0, th1, ph1, 0.012 + 0.002 * t, 0.0095 - 0.0012 * t, n=11, sag=math.radians(14))
 
     def hang(self, start, length, drift, r0=0.010, r1=None, wave=0.0, curl=0.0, n=12, front=False):
         """A lock that falls from `start` under gravity, kept clear of the body."""
@@ -323,6 +325,21 @@ class Style:
         self.g.union(knot, 0.002)
         self.tags["ribbon"].append(knot)
 
+    def flyaways(self, n=9):
+        """Fine wisps that lift off the surface at the crown and the back of the head."""
+        for i in range(n):
+            th = math.radians(RNG.uniform(100, 260))
+            th = th if th <= math.pi else th - 2 * math.pi
+            ph = math.radians(RNG.uniform(20, 60))
+            p0 = self.outer(th, ph, -0.001)
+            d = p0 - SKULL_C
+            d /= np.linalg.norm(d)
+            side = np.cross([0, 0, 1], d)
+            side /= max(np.linalg.norm(side), 1e-6)
+            pts = [p0 + d * 0.004 * t + side * 0.012 * math.sin(t * 2.5) * t + np.array([0, 0, -0.03 * t * t])
+                   for t in np.linspace(0, 1, 7)]
+            self.lock(pts, 0.0028, 0.0010, k=0.0015)
+
     # -- finish --------------------------------------------------------------
     def carve_body(self, margin=0.0012):
         self.g.F = sdf.smax(self.g.F, -(self.head.Fb - margin), 0.002).astype(np.float32)
@@ -350,6 +367,7 @@ BACK_CHAIN = [(0.0, 0.095, 1.47), (0.0, 0.112, 1.40), (0.0, 0.118, 1.30), (0.0, 
 def swept_back(st, fringe=True):
     st.cap()
     st.cap_locks(PART, front_sweep=False)
+    st.flyaways()
     if fringe:
         st.fringe(PART, 1, n=4)
 
@@ -357,6 +375,7 @@ def swept_back(st, fringe=True):
 def loose_base(st, bottom=1.13, wave=0.0, curl=0.0, r=0.021):
     st.cap()
     st.cap_locks(PART)
+    st.flyaways(6)
     st.fringe(PART, 1, n=6)
     st.back_mass(bottom, n=12, spread=0.055, r=r, wave=wave, curl=curl)
     st.front_locks(bottom + 0.06, n=2, r=r * 0.8, wave=wave, curl=curl)
@@ -364,11 +383,12 @@ def loose_base(st, bottom=1.13, wave=0.0, curl=0.0, r=0.021):
 
 def style_braid(st):
     swept_back(st)
-    for s in (1, -1):  # face-framing wisps
-        st.hang(st.head.scalp(s * math.radians(70), math.radians(16), 0.005), 0.07, 0.01, 0.0055, wave=0.004)
+    for s in (1, -1):  # soft face-framing tendrils, past the jaw
+        st.hang(st.head.scalp(s * math.radians(66), math.radians(20), 0.008), 0.13, 0.012, 0.0075, wave=0.006)
+        st.hang(st.head.scalp(s * math.radians(80), math.radians(12), 0.008), 0.10, 0.016, 0.0065, wave=0.005)
     top = st.outer(math.pi, math.radians(-12), 0.0)
-    chain = [top] + [np.array(p) + (0, 0.012, 0) for p in BACK_CHAIN[1:]]
-    st.braid(chain, width=0.042, lobes=14)
+    chain = [top] + [np.array(p) + (0, 0.016, 0) for p in BACK_CHAIN[1:]]
+    st.braid(chain, width=0.054, lobes=14)
 
 
 def style_hunters_knot(st):
@@ -464,7 +484,9 @@ def style_crown_braid(st):
         a = math.radians(-180 + 360 * i / 36)
         p = st.outer(a, math.radians(25 + 9 * math.cos(a)), 0.009)
         pts.append(p)
-    st.braid(pts, width=0.034, lobes=30)
+    st.braid(pts, width=0.040, lobes=30)
+    for s in (1, -1):  # soft tendrils at the temples
+        st.hang(st.head.scalp(s * math.radians(68), math.radians(18), 0.008), 0.11, 0.012, 0.0065, wave=0.006)
 
 
 def style_waterfall_braid(st):
@@ -519,6 +541,58 @@ STYLES = {
 # --------------------------------------------------------------------------
 # Mesh, materials, weights
 # --------------------------------------------------------------------------
+STRAND_TILE = 3          # the strand texture repeats three times round the head
+_STRAND_IMG = {}
+
+
+def strand_image(wet=False):
+    """Painted strands: fine vertical streaks of lighter and darker hair, and a soft
+    'angel ring' highlight across the crown, over the hair colour (sRGB PNG)."""
+    key = "wet" if wet else "dry"
+    if key in _STRAND_IMG:
+        return _STRAND_IMG[key]
+    w, h = 256, 128
+    rng = np.random.default_rng(7 if wet else 3)
+    v = (np.arange(h) + 0.5) / h
+    x = np.arange(w)[None, :] / w * 2 * math.pi
+    sway = 0.02 * np.sin(v[:, None] * 2 * math.pi + 1.3)          # streaks wander a little
+    cols = np.zeros((h, w))
+    for k, amp in ((9, 0.08), (22, 0.07), (47, 0.045)):   # whole cycles, so the tile seam is invisible
+        ph = rng.uniform(0, 2 * math.pi, 4)
+        cols += amp * sum(np.sin((x + sway) * (k + j) + ph[j]) for j in range(4)) / 4.0 * 2.0
+    z = LO[2] + v * (HI[2] - LO[2])
+    ring = 0.22 * np.exp(-((z - 1.605) / 0.022) ** 2)          # crown highlight
+    tips = -0.10 * np.clip((1.30 - z) / 0.25, 0, 1)            # ends a touch deeper
+    base = np.array(HAIR_WET_RGB if wet else HAIR_RGB)
+    lum = 1.0 + cols + ring[:, None] * (1.0 + 2.5 * np.clip(cols, 0, None)) + tips[:, None]
+    lin = np.clip(base[None, None, :] * lum[..., None], 0, 1)
+    lin = lin * (1 + 0.25 * ring[:, None, None] * np.array([0.25, 0.15, 0.0]))   # warm gold in the ring
+    srgb_px = np.where(lin <= 0.0031308, lin * 12.92, 1.055 * np.power(lin, 1 / 2.4) - 0.055)
+    img = bpy.data.images.new("hair_strands_" + key, w, h, alpha=False)
+    rgba = np.concatenate([srgb_px, np.ones((h, w, 1))], axis=2)
+    img.pixels = rgba.astype(np.float32).ravel()
+    img.file_format = "PNG"
+    img.pack()
+    _STRAND_IMG[key] = img
+    return img
+
+
+def strand_uvs(me):
+    """u round the head (tiled), v up: the painted streaks run down the hair."""
+    uvl = (me.uv_layers.get("UVMap") or me.uv_layers.new(name="UVMap")).data
+    for poly in me.polygons:
+        us, vs = [], []
+        for li in poly.loop_indices:
+            co = me.vertices[me.loops[li].vertex_index].co
+            th = math.atan2(co.x, -(co.y - SKULL_C[1]))
+            us.append((th / (2 * math.pi) + 0.5) * STRAND_TILE)
+            vs.append((co.z - LO[2]) / (HI[2] - LO[2]))
+        if max(us) - min(us) > STRAND_TILE * 0.5:
+            us = [u + STRAND_TILE if u < STRAND_TILE * 0.5 else u for u in us]
+        for li, u, v in zip(poly.loop_indices, us, vs):
+            uvl[li].uv = (round(u * 2048) / 2048, round(v * 2048) / 2048)   # rounded: compresses in hair.blend
+
+
 def mesh_style(st, spec, arm):
     V, Q = sdf.surface_nets(st.g)
     me = bpy.data.meshes.new("hair_" + st.id)
@@ -546,7 +620,13 @@ def mesh_style(st, spec, arm):
     me = obj.data
 
     rgb = HAIR_WET_RGB if st.wet else HAIR_RGB
-    mats = [bf.make_material("hair_wet" if st.wet else "hair", rgb, 0.22 if st.wet else 0.42)]
+    mats = [bf.make_material("hair_wet" if st.wet else "hair", rgb, 0.22 if st.wet else 0.32,
+                             image=strand_image(st.wet))]
+    strand_uvs(me)
+    bsdf = mats[0].node_tree.nodes.get("Principled BSDF")
+    if bsdf is not None:   # soft sheen over the colour
+        bsdf.inputs["Coat Weight"].default_value = 0.45
+        bsdf.inputs["Coat Roughness"].default_value = 0.25
     P = bf.verts_np(me)
     X, Y, Z = P[:, 0], P[:, 1], P[:, 2]
     vmat = np.zeros(len(P), int)
