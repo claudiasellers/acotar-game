@@ -415,6 +415,30 @@ def reed(p, h, col, rng):
             p.add(cyl(0.018, top * 0.14, 5), (0.78, 0.6, 0.62), F, T(*(m @ K.Vector((0, 0, top * 0.72)))) @ m)
 
 
+def meadow_grass(p, h, col, rng):
+    """L56-3: a long-meadow tussock for the park's outer edges, past the mown
+    lawns. Arching blades in warm olive and straw, a few seed heads nodding
+    above (no mint: the grade lifts saturation)."""
+    olive = (0.34, 0.40, 0.20)
+    straw = (0.80, 0.74, 0.50)
+    # a dense tussock: flat blades (4 tris each) fanning out from a tight base
+    for i in range(44):
+        a = 2.39996 * i + rng.uniform(-0.3, 0.3)
+        up = rng.uniform(52, 84)            # degrees above the ground
+        length = h * rng.uniform(0.6, 1.0) / max(math.sin(math.radians(up)), 0.5)
+        r0 = 0.1 * h * math.sqrt(rng.random())
+        c = col if i % 3 == 0 else (olive if i % 3 == 1 else mix(col, straw, 0.35))
+        p.add(leaf(length, h * rng.uniform(0.05, 0.08)), c, F,
+              T(r0 * math.cos(a), r0 * math.sin(a), 0) @ R("Z", math.degrees(a)) @ R("Y", -up) @ R("X", rng.uniform(-40, 40)))
+    for i in range(5):
+        a = 2 * math.pi * i / 5 + rng.uniform(-0.4, 0.4)
+        m = R("Z", math.degrees(a)) @ R("Y", rng.uniform(4, 14))
+        top = h * rng.uniform(0.9, 1.0)
+        tip = m @ K.Vector((0, 0, top))
+        p.add(tube([(0, 0, 0), tuple(m @ K.Vector((0, 0, top * 0.6))), tuple(tip)], [0.006, 0.005, 0.004], 3, caps=False), mix(olive, straw, 0.5), F)
+        p.add(cyl(0.016, top * 0.16, 5), straw, F, T(*tip) @ m @ R("Y", 160))
+
+
 def water_lily(p, h, col, rng):
     for i in range(3):
         a = 2 * math.pi * i / 3
@@ -705,6 +729,8 @@ def build_species(sid, kind, h, col, rng):
         starmoss(p, h, c, rng)
     elif sid == "mushroom_glowcap":
         glowcap(p, h, c, rng)
+    elif sid == "meadow_grass":
+        meadow_grass(p, h, c, rng)
     elif sid == "reed":
         reed(p, h, mix(c, SAGE_DEEP, 0.3), rng)
     elif sid == "water_lily":

@@ -168,6 +168,57 @@ func drape_path(points: PackedVector2Array, width: float, material: Material, li
 	add_mesh(mesh, Transform3D(), material, "|path")
 
 
+## Like drape_path, for curving walks (L56-3): one continuous ribbon whose
+## cross-sections are mitred at every bend, so no wedge of lawn shows
+## through on the outside of a curve. Each straight run is subdivided to
+## `step` so the ribbon follows the ground.
+func drape_ribbon(points: PackedVector2Array, width: float, material: Material, lift: float = 0.08, step: float = 1.0) -> void:
+	if points.size() < 2:
+		return
+	var dense := PackedVector2Array()
+	for i in points.size() - 1:
+		var n := maxi(1, ceili(points[i].distance_to(points[i + 1]) / step))
+		for k in n:
+			dense.append(points[i].lerp(points[i + 1], float(k) / n))
+	dense.append(points[-1])
+	var half := width * 0.5
+	var left := PackedVector3Array()
+	var right := PackedVector3Array()
+	var us := PackedFloat32Array()
+	var dist := 0.0
+	for i in dense.size():
+		var d_in := (dense[i] - dense[maxi(i - 1, 0)]).normalized()
+		var d_out := (dense[mini(i + 1, dense.size() - 1)] - dense[i]).normalized()
+		if i == 0:
+			d_in = d_out
+		if i == dense.size() - 1:
+			d_out = d_in
+		var tangent := (d_in + d_out).normalized()
+		var normal := Vector2(-tangent.y, tangent.x)
+		# mitre: widen where the walk bends so the edges stay parallel
+		var mitre := half / maxf(normal.dot(Vector2(-d_out.y, d_out.x)), 0.5)
+		if i > 0:
+			dist += dense[i].distance_to(dense[i - 1])
+		for sd: float in [-1.0, 1.0]:
+			var q := dense[i] + normal * mitre * sd
+			var v := Vector3(q.x, WorldHeight.height_at(q.x, q.y) + lift, q.y)
+			if sd < 0.0:
+				left.append(v)
+			else:
+				right.append(v)
+		us.append(dist)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in dense.size() - 1:
+		var v := [left[i], right[i], right[i + 1], left[i + 1]]
+		var uvs := [Vector2(0, us[i]), Vector2(1, us[i]), Vector2(1, us[i + 1]), Vector2(0, us[i + 1])]
+		for idx in [0, 2, 1, 0, 3, 2]:
+			st.set_normal(Vector3.UP)
+			st.set_uv(uvs[idx] * 0.25)
+			st.add_vertex(v[idx])
+	add_mesh(st.commit(), Transform3D(), material, "|path")
+
+
 ## A flat disc or ellipse at height y (water surfaces, paving).
 func disc(center: Vector3, radii: Vector2, material: Material, segments: int = 48) -> void:
 	var st := SurfaceTool.new()

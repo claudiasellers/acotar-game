@@ -112,6 +112,7 @@ static func specs() -> Dictionary:
 	_d(s, &"deco_lilac", &"lilac", "C", 0.3, 160.0)
 	_d(s, &"deco_wisteria", &"wisteria", "C", 0.3, 150.0)
 	_d(s, &"deco_buttercup", &"meadow_buttercup", "C", 0.6, 110.0)
+	_d(s, &"deco_meadow_grass", &"meadow_grass", "X", 0.7, 100.0)
 	_d(s, &"deco_crab_apple", &"crab_apple", "C", 0.2, 350.0, true)
 	# the garden flowers sit in a few compact gardens spread over the estate, so
 	# they draw in 128 m chunks (fewer, fuller draw calls) however dense they are
@@ -132,7 +133,7 @@ static func specs() -> Dictionary:
 ## The south lawns' rose islands and flower rivers (ManorParkland, L56) gather
 ## these into dense compact drifts, which would tip them into 64 m chunks over
 ## the whole estate (they were 128 m layers when scattered thinly).
-const PARK_WIDE: Array[StringName] = [&"ing_rose_red", &"ing_rose_white", &"ing_crocus", &"ing_faelight_dandelion", &"deco_tulip_bed"]
+const PARK_WIDE: Array[StringName] = [&"ing_rose_red", &"ing_rose_white", &"ing_crocus", &"ing_faelight_dandelion", &"deco_tulip_bed", &"deco_meadow_grass"]
 const GARDEN_WIDE: Array[StringName] = [&"deco_iris", &"deco_snowdrop", &"deco_daffodil", &"deco_hydrangea", &"deco_hydrangea_pink",
 	&"deco_delphinium", &"deco_lupin", &"deco_hollyhock", &"deco_allium", &"deco_catmint", &"deco_foxglove_white", &"deco_foxglove",
 	&"deco_peony_white", &"deco_lilac", &"deco_wisteria", &"deco_buttercup", &"deco_peony", &"deco_forget_me_not", &"deco_water_lily"]

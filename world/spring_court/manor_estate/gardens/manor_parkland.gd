@@ -42,7 +42,20 @@ const GROVES := [
 	# L56-2: the middle distance of the views west and east from the dismount
 	[Vector2(-86.0, 160.0), 11.0, [[&"deco_oak", 1], [&"deco_cherry_blossom", 4]]],
 	[Vector2(84.0, 146.0), 10.0, [[&"deco_cherry_blossom", 4]]],
+	# L56-3: the middle plane of the view west along the walk (it was an empty slope)
+	[Vector2(-56.0, 146.0), 13.0, [[&"deco_oak", 1], [&"deco_cherry_blossom", 3], [&"deco_apple_blossom", 3]]],
 ]
+## Groves that get a shrub understorey (lilacs) as well as the flower skirt.
+const UNDERSTOREY := [Vector2(-56.0, 146.0), Vector2(-86.0, 160.0)]
+
+## Long meadow grass on the park's outer edges (L56-3): mown near the house,
+## longer the further out. Starts this far either side of the drive and this
+## far down the lawns, full strength MEADOW_FADE metres further on.
+const MEADOW_X := 175.0
+const MEADOW_Z := 238.0
+const MEADOW_FADE := 60.0
+## Tussocks per square metre where the meadow is at full strength.
+const MEADOW_DENSITY := 0.16
 ## Trees in a grove stand at least this far apart (canopies touch, never merge).
 const TREE_GAP := 5.2
 
@@ -212,6 +225,12 @@ static func plant(sb: ManorScatter) -> void:
 			if not _open(p.x, p.y):
 				continue
 			sb.put(skirt, p.x, p.y, rng.randf() * TAU, rng.randf_range(0.9, 1.2))
+		if c in UNDERSTOREY:
+			for k in 7:
+				var a := TAU * (k + rng.randf() * 0.6) / 7.0
+				var p := c + Vector2(cos(a), sin(a)) * (r * rng.randf_range(0.55, 0.95))
+				if _open(p.x, p.y):
+					sb.put(&"ing_lilac", p.x, p.y, rng.randf() * TAU, rng.randf_range(1.0, 1.3))
 	# Rose islands.
 	for isl: Array in ISLANDS:
 		var c: Vector2 = isl[0]
@@ -247,10 +266,35 @@ static func plant(sb: ManorScatter) -> void:
 	# Flower rivers.
 	for d: Array in DRIFTS + MID_DRIFTS:
 		_plant_drift(sb, d, rng)
+	_plant_meadow(sb)
 	# Keepsakes on the benches and by the drive.
 	sb.put(&"col_tiny_horseshoe", -10.0, 236.0, 0.4)
 	sb.put(&"col_tiny_horseshoe", 12.0, 62.0, 1.1)
 	sb.put(&"col_painted_pebble", 66.0, 176.0, 0.0)
+
+
+## 0 on the mown lawns, rising to 1 towards the park's outer edges.
+static func meadow_weight(p: Vector2) -> float:
+	var t := maxf((absf(p.x) - MEADOW_X) / MEADOW_FADE, (p.y - MEADOW_Z) / (MEADOW_FADE * 0.6))
+	return clampf(t, 0.0, 1.0)
+
+
+static func _plant_meadow(sb: ManorScatter) -> void:
+	var rng := EstateKit.rng("parkland_meadow")
+	var z := zone()
+	var step := 1.0 / sqrt(MEADOW_DENSITY)
+	var y := z.position.y
+	while y < z.end.y:
+		var x := z.position.x
+		while x < z.end.x:
+			var p := Vector2(x, y) + Vector2(rng.randf(), rng.randf()) * step
+			var w := meadow_weight(p)
+			# patchy, not a uniform carpet: thins in soft swathes
+			var patch := 0.6 + 0.4 * sin(p.x * 0.07 + 1.3) * sin(p.y * 0.09)
+			if rng.randf() < w * w * (3.0 - 2.0 * w) * patch and not is_elsewhere(p) and _open(p.x, p.y):
+				sb.put(&"deco_meadow_grass", p.x, p.y, rng.randf() * TAU, rng.randf_range(0.8, 1.3) * (0.7 + 0.4 * w))
+			x += step
+		y += step
 
 
 static func _plant_drift(sb: ManorScatter, d: Array, rng: RandomNumberGenerator) -> void:
@@ -297,7 +341,7 @@ static func build(parent: Node3D) -> void:
 	var b := GroundsBatch.new(parent, "Parkland")
 	ManorLawnStripes.build(b.root)
 	for w: Array in WALKS:
-		b.drape_path(walk_line(w), WALK_W, ManorForecourt.drive_lanes(), 0.05, 1.0)
+		b.drape_ribbon(walk_line(w), WALK_W, ManorForecourt.drive_lanes(), 0.08, 1.0)
 		# a rose arbour where each walk leaves the drive
 		var p: Vector2 = (w[0] as Vector2).lerp(w[1], 0.5)
 		var dir: Vector2 = ((w[1] as Vector2) - (w[0] as Vector2)).normalized()

@@ -38,8 +38,9 @@ static func paving() -> Material:
 
 ## Brown loam under the beds. It was a dark mauve (0.40, 0.28, 0.27) that the
 ## lilac dusk grade turned near-black purple in the parterres (L56, user
-## report); a rose-cocoa try read salmon at noon, so: plain warm brown earth.
-const MULCH := Color(0.46, 0.35, 0.27)
+## report); a rose-cocoa try read salmon, then (0.46, 0.35, 0.27) read terracotta
+## on the Mac (L56-3), so: a plainer, greyer brown loam.
+const MULCH := Color(0.42, 0.36, 0.30)
 
 
 static func mulch() -> Material:
@@ -192,7 +193,9 @@ static func hedge_with_openings(b: GroundsBatch, a: Vector2, c: Vector2, opening
 ## runs), kept for the gardens' tests.
 const EDGING_W := 0.44
 const EDGING_H := 0.46
-const BOX_GREEN := Color(0.24, 0.47, 0.30)
+## L56-3: deep, slightly yellow box green (0.24, 0.47, 0.30 read as mint
+## under the wrap light, the lavender shade tint and the grade).
+const BOX_GREEN := Color(0.16, 0.30, 0.13)
 
 static var _edging_mat: ShaderMaterial
 
@@ -206,7 +209,10 @@ static func edging_material() -> ShaderMaterial:
 		m.set_shader_parameter(&"alpha_scissor", 0.0)
 		m.set_shader_parameter(&"wind_amount", 0.0)
 		m.set_shader_parameter(&"sparkle", 0.0)
-		m.set_shader_parameter(&"translucency", 0.2)
+		m.set_shader_parameter(&"translucency", 0.08)
+		m.set_shader_parameter(&"rim_strength", 0.2)
+		m.set_shader_parameter(&"wrap", 0.3)
+		m.set_shader_parameter(&"shade_tint", Color(0.55, 0.58, 0.62))
 		m.set_shader_parameter(&"leaf_noise", 1.0)
 		m.set_shader_parameter(&"leaf_scale", 16.0)
 		m.set_shader_parameter(&"leaf_bump", 0.7)
