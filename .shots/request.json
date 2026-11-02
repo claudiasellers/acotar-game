@@ -1,0 +1,6 @@
+{"id":"l39_f1","scene":"world","quality":"full","size":[1920,1080],"time_of_day":0.5,
+"shots":[
+ {"name":"portrait_gallery","eye":[-27,16.2,-70.5],"at":[-27,16.0,-64.14],"fov":75,"ground":false},
+ {"name":"upper_hall_vase","eye":[-2.5,15.4,-55.0],"at":[-7.86,15.6,-55.0],"fov":60,"ground":false},
+ {"name":"portrait_close","eye":[-24,15.9,-67.5],"at":[-24,15.9,-64.14],"fov":55,"ground":false}
+]}
