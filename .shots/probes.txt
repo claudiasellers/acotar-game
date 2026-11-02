@@ -1,0 +1,4 @@
+from L36 F35 feyre mouth corners
+quality look
+size 1920x1080
+shot feyre_face res://tools/feyre_face_shot.tscn {out}
