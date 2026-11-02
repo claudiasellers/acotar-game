@@ -248,3 +248,11 @@ func test_films_silence_space_music_and_halve_the_bed() -> void:
 	EventBus.scene_space_finished.emit(&"film_opening")
 	await wait_seconds(3.2)
 	assert_almost_eq(d.film_hold, 0.0, 0.01)
+
+
+func test_cutscene_scores_match_the_film_lengths() -> void:
+	for spec in [[&"music_film_eyes_open", 76.0], [&"music_film_night_court", 105.0], [&"music_film_silent_manor", 150.0]]:
+		var c := bank.cue(spec[0])
+		assert_not_null(c, spec[0])
+		assert_true(c.music)
+		assert_almost_eq(c.streams[0].get_length(), spec[1], 0.5, spec[0])

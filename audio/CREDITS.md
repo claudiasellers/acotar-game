@@ -15,6 +15,9 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/amb/wall_seam.ogg | The Wall: wind thins out, low pressure hum, glassy shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/winter_wood.ogg | Winter hunting forest: gusting wind, whistles, sifting snow, creaking trees, a distant crow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/cottage.ogg | Music, cottage: D minor, piano and pad | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/music/film_eyes_open.ogg | Cutscene A 'Eyes Open' (76 s): veiled glen, the senses open into birds, a singing willow, celesta | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/music/film_night_court.ogg | Cutscene B 'The Night Court' (105 s): silence, marble steps, a cold rising hum, whispers in her mind | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/music/film_silent_manor.ogg | Cutscene C 'The Silent Manor' (150 s): wind through broken glass, the lullaby detuned, a cracked waltz, the theme | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/opening_film.ogg | Opening film score 'Once' (3:05): lullaby, beauty, war, the Wall, hearth, title swell | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/spring_estate.ogg | Music, spring estate (from Act II): harp waltz in E lydian | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/village.ogg | Music, village: A dorian lute and drone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"attor"
+canon = "Grey leathery skin, bat-like wings, long thin fingers, a snout full of fangs [C]; her painting shows it 'snout open in a roar, revealing row after row of fangs' [C]. It hisses when it speaks of her (ch19 cue speaks_of_her). Our reading [X]: ears pinned back as it hisses, the snout never fully shut."
+masked = false
+rest = &"menace"
+blink_min = 0.0
+blink_max = 0.0
+presets = {
+"hiss": { "ears_back": 1.0, "threat": 0.6 },
+"listen": { "ears_back": 0.0 },
+"menace": { "ears_back": 0.25, "threat": 0.15 },
+"roar": { "ears_back": 1.0, "threat": 1.0 }
+}
+aliases = {
+"neutral": "menace",
+"happy": "hiss",
+"laugh": "hiss",
+"smirk": "hiss",
+"tender": "menace",
+"angry": "hiss",
+"fury": "roar",
+"contempt": "hiss",
+"disgust": "hiss",
+"sad": "menace",
+"grief": "menace",
+"afraid": "listen",
+"terror": "listen",
+"surprise": "listen",
+"pained": "roar",
+"weary": "menace",
+"guarded": "menace",
+"pleading": "menace"
+}
+tics = [{ "hold": 0.5, "max": 10.0, "min": 5.0, "preset": "hiss", "weight": 0.4 }]
+creature = true
+states = {
+
+}
+cues = {
+"speaks_of_her": { "preset": "hiss", "seconds": 2.5 }
+}

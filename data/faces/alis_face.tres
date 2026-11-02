@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"alis"
+canon = "Masked like all the Spring folk [C]. Clicks her tongue again and again [C ch7, 28, 32]; sneer [C ch7]; barks a laugh [C ch7]; lips a tight line [C ch22]; eyes wide with remembered horror [C ch32]; eyes soften [C ch32]. Dry and brusque, never giggly or effusive."
+masked = true
+rest = &"brisk"
+blink_min = 2.8
+blink_max = 6.0
+presets = {
+"bark_laugh": { "jaw_open": 0.45, "smile_L": 0.6, "smile_R": 0.6, "squint_L": 0.5, "squint_R": 0.5 },
+"brisk": { "lip_press": 0.25, "mouth_side_R": 0.15 },
+"horror_memory": { "eyes_wide_L": 0.9, "eyes_wide_R": 0.9, "lips_part": 0.4, "mouth_stretch": 0.3 },
+"sneer": { "lips_part": 0.2, "smile_R": 0.2, "sneer_R": 0.85, "squint_L": 0.3, "squint_R": 0.3 },
+"softened": { "blink_L": 0.24, "blink_R": 0.24, "smile_L": 0.22, "smile_R": 0.22 },
+"tight_lips": { "frown_L": 0.3, "frown_R": 0.3, "lip_press": 1.0 },
+"tongue_click": { "lip_press": 0.7, "mouth_side_R": 0.5, "sneer_R": 0.15, "squint_L": 0.15, "squint_R": 0.15 }
+}
+aliases = {
+"neutral": "brisk",
+"happy": "softened",
+"laugh": "bark_laugh",
+"smirk": "sneer",
+"tender": "softened",
+"angry": "tight_lips",
+"fury": "sneer",
+"contempt": "sneer",
+"disgust": "sneer",
+"sad": "softened",
+"grief": "horror_memory",
+"afraid": "horror_memory",
+"terror": "horror_memory",
+"surprise": "horror_memory",
+"pained": "tight_lips",
+"weary": "tight_lips",
+"guarded": "tight_lips",
+"pleading": "softened"
+}
+tics = [{ "hold": 0.35, "max": 16.0, "min": 8.0, "preset": "tongue_click", "weight": 0.8 }]

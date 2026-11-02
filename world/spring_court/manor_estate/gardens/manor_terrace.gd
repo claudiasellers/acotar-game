@@ -7,6 +7,8 @@ extends RefCounted
 const STEP_SETS := [[0.0, 20.0], [-40.0, 6.0], [40.0, 6.0]]   # [centre x, width]
 const EDGE_Z := -88.5
 const STEPS_BOTTOM_Z := -103.0
+## Feyre's bedroom window on the garden front (gen_anchors: feyre_bedroom_window).
+const FEYRE_WINDOW_X := 23.0
 
 
 static func plant(sb: ManorScatter) -> void:
@@ -32,7 +34,8 @@ static func build(parent: Node3D) -> void:
 	var c := t.get_center()
 	var y := ManorGrounds.ground(c.x, c.y)
 	var marble := ManorGrounds.marble()
-	b.box(Vector3(c.x, y + 0.03, c.y), Vector3(t.size.x, 0.06, t.size.y), EstateKit.mat(EstateKit.BLUSH, 0.4, 0.0, "terrace_paving"), false)
+	# rose-taupe paving: blush read near-white in noon sun (manor glare fix, L35)
+	b.box(Vector3(c.x, y + 0.03, c.y), Vector3(t.size.x, 0.06, t.size.y), GardenKit.paving(), false)
 	# pearl inlay stripes
 	for i in 8:
 		var x := t.position.x + 6.0 + i * 12.0
@@ -55,7 +58,7 @@ static func build(parent: Node3D) -> void:
 		for side: float in [-1.0, 1.0]:
 			var ux: float = s[0] + side * (s[1] * 0.5 + 0.8)
 			b.box(Vector3(ux, y + 0.6, EDGE_Z), Vector3(1.0, 1.2, 1.0), marble)
-			b.prop(&"garden_urn", Vector3(ux, y + 1.2, EDGE_Z))
+			b.prop(&"urn_overflowing", Vector3(ux, y + 1.2, EDGE_Z), 0.0, 0.85)
 	# tea tables, chairs, tubs
 	for i in 4:
 		var tx := -30.0 + i * 20.0
@@ -68,6 +71,10 @@ static func build(parent: Node3D) -> void:
 	for i in 9:
 		var ox := t.position.x + 4.0 + i * 11.0
 		b.prop_on_ground(&"orange_tree_tub", ox, -74.5)
+	# wisteria trellises climbing to Feyre's window (canon ch10-11), either side
+	# of the garden door beneath it
+	for side: float in [-1.0, 1.0]:
+		b.prop_on_ground(&"wisteria_trellis", FEYRE_WINDOW_X + side * 3.6, ManorSitePlan.HOUSE_MAIN.position.y - 0.25, 0.0, 1.0, 0.06)
 	# steps down to the rose garden: visual treads over a smooth ramp collider
 	for s in STEP_SETS:
 		_steps(b, s[0], s[1])

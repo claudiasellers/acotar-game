@@ -49,7 +49,7 @@ Pickup, craft, unlock and outfit chimes stay with `Juice` (feedback lane).
 is left out). `SoundDirector.stop_cue(&"<cue_id>", seconds)` fades out every
 play of a cue still sounding (a skipped film). The opening film's score is
 `music_opening_film` (3:05, Music bus): call it once at 0:00 and it carries
-every section itself (`tools/audio/film.py` lists the section times). It does nothing when no director is running, so tools and tests
+every section itself (`tools/audio/film.py` lists the section times). The cutscenes work the same way: `music_film_eyes_open` (76 s), `music_film_night_court` (105 s) and `music_film_silent_manor` (150 s), timed to plans/film/cutscene_cues.md (`tools/audio/cutscenes.py`). It does nothing when no director is running, so tools and tests
 need no guard. Cue ids are listed in `data/audio/act1_sound_bank.tres`.
 
 ## Adding sound

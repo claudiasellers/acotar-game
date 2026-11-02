@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"father"
+canon = "Unmasked, human. Dozing, slack by the fire [C ch3]; terror-stricken [C ch4]; grimace, grunting at the pain of standing [C ch4]; stammered pleas [C]; a passive, defeated look that avoids eyes [X from 'he just stopped trying']; trembling at the goodbye [C ch5]. Never stern or commanding."
+masked = false
+rest = &"defeated"
+blink_min = 2.2
+blink_max = 4.8
+presets = {
+"clear_eyed": { "brow_up_L": 0.12, "brow_up_R": 0.12, "chin_raise": 0.1, "eyes_wide_L": 0.15, "eyes_wide_R": 0.15, "smile_L": 0.3, "smile_R": 0.3 },
+"defeated": { "blink_L": 0.22, "blink_R": 0.22, "brow_inner_up": 0.35, "frown_L": 0.3, "frown_R": 0.3 },
+"dozing": { "blink_L": 0.88, "blink_R": 0.88, "brow_inner_up": 0.1, "jaw_open": 0.16 },
+"faint_smile": { "blink_L": 0.15, "blink_R": 0.15, "brow_inner_up": 0.3, "smile_L": 0.25, "smile_R": 0.25 },
+"goodbye_tears": { "brow_inner_up": 0.85, "chin_raise": 0.75, "frown_L": 0.6, "frown_R": 0.6, "squint_L": 0.3, "squint_R": 0.3 },
+"pleading": { "brow_inner_up": 1.0, "chin_raise": 0.2, "eyes_wide_L": 0.3, "eyes_wide_R": 0.3, "frown_L": 0.35, "frown_R": 0.35, "lips_part": 0.35 },
+"terror": { "brow_inner_up": 0.8, "brow_up_L": 0.6, "brow_up_R": 0.6, "eyes_wide_L": 1.0, "eyes_wide_R": 1.0, "jaw_open": 0.3, "lips_part": 0.3, "mouth_stretch": 0.6 },
+"wince": { "brow_down_L": 0.45, "brow_down_R": 0.45, "brow_inner_up": 0.3, "jaw_clench": 0.5, "mouth_stretch": 0.4, "squint_L": 0.8, "squint_R": 0.8 }
+}
+aliases = {
+"neutral": "defeated",
+"happy": "faint_smile",
+"laugh": "faint_smile",
+"smirk": "faint_smile",
+"tender": "faint_smile",
+"angry": "wince",
+"fury": "wince",
+"contempt": "defeated",
+"disgust": "wince",
+"sad": "defeated",
+"grief": "goodbye_tears",
+"afraid": "terror",
+"terror": "terror",
+"surprise": "terror",
+"pained": "wince",
+"weary": "dozing",
+"guarded": "defeated",
+"pleading": "pleading"
+}
+tics = [{ "hold": 0.6, "max": 22.0, "min": 10.0, "preset": "wince", "weight": 0.35 }]
