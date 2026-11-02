@@ -61,6 +61,11 @@ TMP = os.path.join(tempfile.gettempdir(), "cast_build", CHAR)
 bf.MODEL_DIR = TMP
 bf.WARDROBE_DIR = os.path.join(TMP, "_hunter")
 bf.SKIN_RGB = C.SKIN_LINEAR
+# a finer face where the character asks for it (the sisters' close-up faces): more of the tri budget
+# goes to face, ears and hands; the rest of the body keeps Feyre's count
+if getattr(C, "FACE_TRIS", 0):
+    bf.BODY_TRIS += C.FACE_TRIS - bf.DETAIL_TRIS
+    bf.DETAIL_TRIS = C.FACE_TRIS
 
 import build_gowns as bg  # noqa: E402
 import build_hair as bh  # noqa: E402
@@ -108,16 +113,21 @@ _feyre_lashes = bf.build_lashes
 
 
 def build_lashes(body_P):
-    """Feyre's lashes, shortened towards the lid line by C.LASH (1 = Feyre)."""
+    """Feyre's lashes scaled by C.LASH (1 = Feyre), with C.LASH_FLICK lengthening the outer
+    half into a princess flick (0 = Feyre's taper)."""
     obj = _feyre_lashes(body_P)
-    if C.LASH != 1.0:
+    flick = getattr(C, "LASH_FLICK", 0.0)
+    if C.LASH != 1.0 or flick:
         me = obj.data
         P = bf.verts_np(me)
-        # rows of four verts: under, base, mid, tip
+        per_side = len(P) // 8   # rows of four verts (under, base, mid, tip), both sides
         for i in range(0, len(P), 4):
+            j = (i // 4) % per_side
+            tx = -0.96 + 1.92 * j / max(1, per_side - 1)
+            k = C.LASH * (1.0 + flick * max(0.0, tx) ** 1.5)
             base = P[i + 1].copy()
-            P[i + 2] = base + (P[i + 2] - base) * C.LASH
-            P[i + 3] = base + (P[i + 3] - base) * C.LASH
+            P[i + 2] = base + (P[i + 2] - base) * k
+            P[i + 3] = base + (P[i + 3] - base) * k
         me.vertices.foreach_set("co", P.ravel())
         me.update()
     for m in obj.data.materials:
@@ -128,6 +138,159 @@ def build_lashes(body_P):
 
 
 bf.build_lashes = build_lashes
+
+
+def build_strand_lashes(body_P):
+    """Princess lashes for C.LASH_STYLE == "strands": separate tapered strands that rise from the
+    upper-lid rim and curl up and out, longest at the outer corner (C.LASH_FLICK), a few short
+    lower lashes at the outer corner (C.LOWER_LASH).  Same object name, material and skinning
+    as Feyre's ribbon, so the export and the game see no difference but the shape."""
+    bm = bmesh.new()
+    n_up = getattr(C, "LASH_COUNT", 26)
+    flick = getattr(C, "LASH_FLICK", 0.0)
+    lower = getattr(C, "LOWER_LASH", 0.0)
+    for s in (1, -1):
+        c = np.array([fs.EYE_X * s, fs.EYE_Y, fs.EYE_Z])
+        rim = bf.lid_rim_points(body_P, s, n=15)
+        # resample the rim evenly
+        seg = np.linalg.norm(np.diff(rim, axis=0), axis=1)
+        t = np.concatenate([[0], np.cumsum(seg)]) / seg.sum()
+        rows = [(n_up, True)] + ([(9, False)] if lower > 0 else [])
+        for count, upper in rows:
+            for i in range(count):
+                if upper:
+                    u = (i + 0.5) / count
+                    base = np.array([np.interp(0.04 + 0.94 * u, t, rim[:, k]) for k in range(3)])
+                    base += (c - base) * 0.04 - np.array([0, 0, 0.0007])   # root on the lid edge, not above it
+                    tx = -1.0 + 2.0 * u                     # inner corner -> outer corner
+                else:
+                    u = 0.55 + 0.42 * (i + 0.5) / count
+                    a = (-0.06 + 1.0 * (u - 0.5) * 2) * fs.EYE_OPEN_W
+                    az = -fs.EYE_OPEN_LO * math.sqrt(max(0.0, 1.0 - abs(u * 2 - 1) ** 1.6)) - math.radians(4)
+                    az += fs.EYE_TILT * (u * 2 - 1)
+                    d = np.array([math.sin(a) * math.cos(az) * s, -math.cos(a) * math.cos(az), math.sin(az)])
+                    base = c + d * (fs.EYE_R + fs.LID_GAP + 0.0006)
+                    tx = u * 2 - 1
+                out = base - c
+                out /= np.linalg.norm(out)
+                side_v = np.cross(out, [0, 0, 1.0])
+                side_v /= np.linalg.norm(side_v)
+                outer = max(0.0, tx)
+                if upper:
+                    L = 0.0060 * C.LASH * (0.55 + 0.45 * math.sin(math.pi * (0.5 + 0.5 * tx) * 0.5 + 0.3)) \
+                        * (1.0 + flick * outer ** 1.4)
+                    L *= 0.88 if i % 3 == 1 else 1.0
+                    up = np.array([0, -0.15, 1.0])
+                    lat = np.array([s * 1.0, 0, 0]) * (0.25 + 1.1 * outer ** 1.2) - np.array([s, 0, 0]) * 0.25 * max(0.0, -tx)
+                    curl = 1.0
+                else:
+                    L = 0.0022 * C.LASH * lower * (0.6 + 0.8 * (tx - 0.1))
+                    up = np.array([0, -0.2, -1.0])
+                    lat = np.array([s * 0.9, 0, 0]) * tx
+                    curl = -1.0
+                d0 = out * 0.75 + up * 0.25 + lat * 0.25
+                d0 /= np.linalg.norm(d0)
+                pts, w = [], []
+                p = base.copy()
+                dirn = d0.copy()
+                for k in range(4):
+                    pts.append(p.copy())
+                    w.append(0.0011 * (1.0 - k / 3.0) ** 0.7 + 0.00008)
+                    bend = up * 0.55 * curl + lat * 0.2
+                    dirn = dirn + bend * 0.45
+                    dirn /= np.linalg.norm(dirn)
+                    p = p + dirn * L / 3.0
+                vs = []
+                for k, (q, ww) in enumerate(zip(pts, w)):
+                    vs.append((bm.verts.new(q - side_v * ww), bm.verts.new(q + side_v * ww)))
+                for k in range(3):
+                    a1, b1 = vs[k]
+                    a2, b2 = vs[k + 1]
+                    f = bm.faces.new((a1, b1, b2, a2) if s > 0 else (a1, a2, b2, b1))
+                    f.smooth = True
+    bm.normal_update()
+    obj = bf.obj_from_bm("Lashes", bm)
+    obj.data.materials.append(bf.make_material("lashes", C.LASH_LINEAR, 0.45, cull=False))
+    return obj
+
+
+if getattr(C, "LASH_STYLE", "") == "strands":
+    bf.build_lashes = build_strand_lashes
+
+
+_feyre_masks = bf.bake_makeup_masks
+
+
+def bake_makeup_masks(P, tris, uv, size=1024):
+    """Feyre's masks, then (when the character sets MASK) its own eye shadow, liner, blush and brows:
+    the shadow and liner hug the upper lid from the inner corner to a wing at C.MASK["wing"] degrees,
+    the blush sits on the apples, the brows take C.MASK's arch and weight.  Lips are Feyre's mask
+    widened to the character's mouth (MOUTH_HALF_W)."""
+    stats = _feyre_masks(P, tris, uv, size)
+    M = getattr(C, "MASK", None)
+    if not M:
+        return stats
+    X, Y, Z, cov = bf.raster_head(P, tris, uv, size)
+    F = (cov & (Y < bf.HEAD_C.y - 0.015)).astype(float)
+    ax = np.abs(X)
+    side = np.where(X >= 0, 1.0, -1.0)
+    sm = bf.smoothstep
+    deg = math.pi / 180.0
+
+    def ell(cx, cz, rx, rz, soft=0.35):
+        d = np.sqrt(((ax - cx) / rx) ** 2 + ((Z - cz) / rz) ** 2)
+        return (1.0 - sm(1.0 - soft, 1.0, d)) * F
+
+    MZ, lw = fs.MOUTH_Z, fs.MOUTH_HALF_W / 0.0165
+    upper = ell(0.0, MZ + 0.0040, 0.0172 * lw, 0.0049, 0.35)
+    bow = 1.0 - 0.6 * np.exp(-(X / 0.0028) ** 2) * sm(MZ + 0.006, MZ + 0.0085, Z)
+    lower = ell(0.0, MZ - 0.0045, 0.0140 * lw, 0.0060, 0.4)
+    lips = np.maximum(upper * bow, lower) * (Y < fs.MOUTH_Y + 0.004)
+    qx, qy, qz = X - fs.EYE_X * side, Y - fs.EYE_Y, Z - fs.EYE_Z
+    eax, eaz, up, lo = fs.eye_angles(qx, qy, qz, side)
+    edist = np.sqrt(qx * qx + qy * qy + qz * qz)
+    near = (edist < fs.EYE_R + 0.020) * F * (ax > 0.008)     # never across the bridge of the nose
+    over = eaz - up
+    inner_cut = sm(-fs.EYE_OPEN_W * 1.02, -fs.EYE_OPEN_W * 0.80, eax)
+    outer_cut = 1.0 - sm(fs.EYE_OPEN_W * 1.05, fs.EYE_OPEN_W * 1.40, eax)
+    sh_h = M.get("shadow_h", 20.0) * deg
+    shadow = sm(-2 * deg, 2 * deg, over) * (1.0 - sm(sh_h * 0.5, sh_h, over)) * inner_cut * outer_cut * near
+    lw_deg = M.get("liner_w", 3.5) * deg
+    liner = sm(-5.0 * deg, -3.0 * deg, over) * (1.0 - sm(lw_deg * 0.6, lw_deg, over)) * inner_cut \
+        * (1.0 - sm(fs.EYE_OPEN_W * 0.98, fs.EYE_OPEN_W * 1.05, eax)) * near * (edist < fs.EYE_R + 0.0075)
+    # thicker towards the outer corner
+    liner *= 0.75 + 0.25 * sm(-0.2, 0.8, eax / fs.EYE_OPEN_W)
+    wing_deg = M.get("wing", 0.0)
+    if wing_deg > 0:
+        wt = np.clip((eax - fs.EYE_OPEN_W * 0.92) / (wing_deg * deg), 0, 1)
+        wing_az = up * 0 + fs.EYE_TILT * 0.0 + wt * M.get("wing_lift", 14.0) * deg
+        wing = np.exp(-((eaz - wing_az) / ((2.8 - 2.2 * wt) * deg)) ** 2) * (eax > fs.EYE_OPEN_W * 0.88) * (wt < 1) * near
+        liner = np.maximum(liner, wing)
+    low = M.get("lower_liner", 0.0)
+    if low > 0:   # a soft smudge under the outer half of the lower lid
+        under = -eaz - lo
+        ll = sm(-1.0 * deg, 0.5 * deg, under) * (1.0 - sm(2 * deg, 4 * deg, under)) * sm(0.1, 0.6, eax / fs.EYE_OPEN_W) \
+            * (1.0 - sm(fs.EYE_OPEN_W * 0.95, fs.EYE_OPEN_W * 1.05, eax)) * near
+        liner = np.maximum(liner, ll * low)
+    bx, bz, brx, brz = M.get("blush", (0.047, 1.477, 0.017, 0.012))
+    blush = ell(bx, bz, brx, brz, 0.9)
+    arch, wgt = M.get("brow_arch", 1.0), M.get("brow_weight", 1.0)
+    bt = np.clip((ax - 0.013) / 0.047, 0, 1)
+    brow_z = fs.BROW_Z + 0.006 * arch * np.sin(np.minimum(bt / M.get("brow_peak", 0.7), 1.0) * math.pi * 0.5) \
+        - 0.009 * arch * sm(M.get("brow_peak", 0.7), 1.0, bt) - 0.003 * bt
+    brow_th = 0.0031 * wgt * (1.0 - 0.65 * bt)
+    brows = np.exp(-((Z - brow_z) / brow_th) ** 4) * (ax > 0.011) * (ax < 0.062) * F
+    brows *= 1.0 - sm(0.85, 1.0, bt)
+    a = np.stack([lips, shadow, liner, blush], axis=-1)
+    paint = np.zeros_like(X)   # festival paint stays Feyre's (Calanmai) alone
+    b = np.stack([brows, paint, np.zeros_like(X), np.ones_like(X)], axis=-1)
+    bf.write_png(os.path.join(bf.MODEL_DIR, "makeup_mask_a.png"), a)
+    bf.write_png(os.path.join(bf.MODEL_DIR, "makeup_mask_b.png"), b)
+    return {k: round(float(v.sum()) / 1000.0, 1) for k, v in dict(
+        lips=lips, shadow=shadow, liner=liner, blush=blush, brows=brows).items()}
+
+
+bf.bake_makeup_masks = bake_makeup_masks
 
 
 # --------------------------------------------------------------------------

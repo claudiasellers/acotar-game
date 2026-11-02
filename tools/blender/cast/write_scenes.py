@@ -7,7 +7,7 @@ feyre_skin.gdshader with the character's skin, brow and lip colours and its own
 makeup masks, and lists its default outfit, hair and held props for
 characters/cast/cast_model.gd.  Each cast_<id>.py may set DEFAULT_OUTFIT (wardrobe
 file stems), DEFAULT_HAIR (hair stem), HELD_PROPS ([(stem, bone[, (tx, ty, tz, qx, qy, qz, qw)])]), IDLE_CLIP,
-WALK_CLIP, LIPS_SRGB; otherwise every wardrobe glb is worn and the first hair is used.
+WALK_CLIP, LIPS_SRGB, MAKEUP ({feyre_skin uniform: hex colour or float}); otherwise every wardrobe glb is worn and the first hair is used.
 """
 
 import importlib
@@ -59,6 +59,10 @@ def write(cid):
         'shader_parameter/makeup_mask_b = ExtResource("5_mask_b")',
         'shader_parameter/brows_color = %s' % col(getattr(C, "BROWS_SRGB", "4A3524")),
         'shader_parameter/lips_color = %s' % col(getattr(C, "LIPS_SRGB", "B07A68")),
+    ]
+    for k, v in sorted(getattr(C, "MAKEUP", {}).items()):   # e.g. blush_color, liner_amount (feyre_skin uniforms)
+        lines.append('shader_parameter/%s = %s' % (k, col(v) if isinstance(v, str) else "%.3f" % v))
+    lines += [
         '',
         '[sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]',
         'resource_name = "skin"',
