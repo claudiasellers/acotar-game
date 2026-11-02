@@ -54,11 +54,26 @@ const CLIMB_CENTRE := 0.9
 @export var walk_speed: float = 3.2
 @export var run_speed: float = 8.22
 @export var sprint_speed: float = 13.10
-## Ground acceleration (m/s²) while winding up into a sprint, so it reads as effort.
-@export var sprint_acceleration: float = 11.0
+## Ground acceleration (m/s²) from run speed up to sprint speed. Below run speed
+## she gets the full `acceleration`, so Shift + forward breaks straight into a
+## run and reaches the sprint in about a quarter of a second.
+@export var sprint_acceleration: float = 24.0
 @export var aim_speed: float = 2.2
+## Ground acceleration toward the target speed, per m/s of that speed (1/s):
+## 14 reaches a run from standing in about 0.07 s.
 @export var acceleration: float = 14.0
-@export var air_control: float = 0.35
+## Ground stop with no keys held (m/s²): about 0.2 s and 1.5 m from a sprint.
+@export var braking: float = 60.0
+## How fast her running direction swings to a new heading, keeping her speed
+## (1/s; Unreal's CharacterMovement GroundFriction, whose template uses 8).
+## A turn no longer dips her speed or slides her sideways.
+@export var turn_friction: float = 10.0
+## Slowest her running direction turns (rad/s): small corrections still land fast.
+const TURN_MIN_RATE := 5.0
+## A change of direction wider than this (degrees) is a reversal: she plants and
+## pushes off the other way instead of running round in a loop.
+const PIVOT_ANGLE := 135.0
+@export var air_control: float = 0.5
 ## How far an air jump (2nd, 3rd) swings her drift toward the stick (0..1).
 @export var air_jump_redirect: float = 0.65
 @export var turn_speed: float = 12.0
@@ -103,6 +118,12 @@ var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
+## Running total of camera yaw turns the player didn't make (follow-behind,
+## story glances, recentre, nudges); SteerFrame takes them out of steering.
+var camera_auto_yaw: float = 0.0
+## Running total of the player's own camera turns (mouse, right stick) made
+## while "Turning the camera steers her while moving" was off.
+var camera_look_yaw: float = 0.0
 ## The move keys steer in this frame, not the live camera (see SteerFrame).
 var steer_frame := SteerFrame.new()
 var movement_feel: MovementFeel
@@ -209,7 +230,7 @@ func _physics_process(delta: float) -> void:
 	if not StoryControl.can_move():
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
-	var steer := steer_frame.yaw(input, yaw, is_aiming or is_drawing)
+	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
@@ -241,12 +262,7 @@ func _physics_process(delta: float) -> void:
 	if jump_motor.jumps_used > maxi(jumps_before, 1) and direction != Vector3.ZERO:
 		horizontal = horizontal.lerp(direction * maxf(horizontal.length(), speed), air_jump_redirect)
 
-	var rate := acceleration * speed
-	if not is_on_floor():
-		rate *= air_control
-	elif sprinting and horizontal.length() < speed:
-		rate = minf(rate, sprint_acceleration)
-	horizontal = horizontal.move_toward(direction * speed, rate * delta)
+	horizontal = _ground_or_air(horizontal, direction, speed, sprinting, delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
@@ -334,7 +350,21 @@ func drain_stamina(amount: float) -> void:
 
 ## Small camera turn from gameplay (notice moments), in radians.
 func nudge_camera(yaw_delta: float, pitch_delta: float) -> void:
+	camera_auto_yaw += yaw_delta
 	_rotate_camera(yaw_delta, pitch_delta)
+
+
+## The camera turns kept out of her steering while a direction is held
+## (SteerFrame): turns the player didn't make, always; the player's own too
+## unless "Turning the camera steers her while moving" is on.
+func steer_exclusion() -> float:
+	return camera_auto_yaw + camera_look_yaw
+
+
+## A camera turn the player didn't make: it doesn't steer her (SteerFrame).
+func _auto_turn(new_yaw: float) -> void:
+	camera_auto_yaw += angle_difference(_camera_rig.rotation.y, new_yaw)
+	_camera_rig.rotation.y = new_yaw
 
 
 func aim_point(max_distance: float = 250.0) -> Vector3:
@@ -365,13 +395,49 @@ func _update_stamina(delta: float) -> void:
 		_exhausted = false
 
 
+## Her horizontal velocity for this frame. With keys held her running
+## direction turns toward them at `turn_friction` (exponential, at least
+## TURN_MIN_RATE) while keeping her speed, as Unreal's CharacterMovement does,
+## so a turn never dips her speed or slides her sideways; a near reversal
+## (over PIVOT_ANGLE) plants and pushes off the other way instead. Then the
+## speed eases to the target. With no keys she brakes to a stop. In the air
+## the same at `air_control` strength: a jump carries her, but she steers.
+func _ground_or_air(horizontal: Vector3, direction: Vector3, speed: float, sprinting: bool, delta: float) -> Vector3:
+	var grounded := is_on_floor()
+	var control := 1.0 if grounded else air_control
+	if direction == Vector3.ZERO:
+		var brake := braking if grounded else acceleration * run_speed * air_control
+		return horizontal.move_toward(Vector3.ZERO, brake * delta)
+	var size := horizontal.length()
+	var want := atan2(-direction.x, -direction.z)
+	var target_speed := speed * minf(direction.length(), 1.0)
+	var rate := acceleration * speed * control
+	if sprinting and grounded and size >= run_speed * 0.98:
+		rate = sprint_acceleration
+	var heading := atan2(-horizontal.x, -horizontal.z) if size > 0.5 else want
+	var diff := angle_difference(heading, want)
+	if absf(diff) >= deg_to_rad(PIVOT_ANGLE):
+		# A reversal: plant and push off the other way.
+		return horizontal.move_toward(Vector3.FORWARD.rotated(Vector3.UP, want) * target_speed, acceleration * speed * control * delta)
+	var turn := maxf(absf(diff) * minf(delta * turn_friction * control, 1.0), TURN_MIN_RATE * control * delta)
+	heading += clampf(diff, -turn, turn)
+	return Vector3.FORWARD.rotated(Vector3.UP, heading) * move_toward(size, target_speed, rate * delta)
+
+
+## Faces where she is going (Unreal's "orient rotation to movement"): her
+## running direction once she is moving, so her body never runs at an angle
+## to her path, else the keys; the camera while aiming or drawing.
 func _turn_model(direction: Vector3, camera_yaw: float, delta: float) -> void:
 	var target_yaw := model.rotation.y
+	var moving := Vector2(velocity.x, velocity.z)
 	if is_aiming or is_drawing:
 		target_yaw = camera_yaw
+	elif moving.length() > 1.0 and (direction != Vector3.ZERO or not is_on_floor()):
+		target_yaw = atan2(-moving.x, -moving.y)
 	elif direction.length_squared() > 0.01:
 		target_yaw = atan2(-direction.x, -direction.z)
-	model.rotation.y = lerp_angle(model.rotation.y, target_yaw, turn_speed * delta)
+	var rate := turn_speed * (2.0 if moving.length() > 1.0 and not (is_aiming or is_drawing) else 1.0)
+	model.rotation.y = lerp_angle(model.rotation.y, target_yaw, minf(rate * delta, 1.0))
 
 
 ## Climbs onto a ledge in front of Feyre between knee and reach height.
@@ -440,12 +506,15 @@ func _drift_toward_focus(delta: float) -> void:
 	if Vector2(to.x, to.z).length() < 0.5:
 		return
 	var yaw := atan2(-to.x, -to.z)
-	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, yaw, 1.6 * delta)
+	_auto_turn(lerp_angle(_camera_rig.rotation.y, yaw, 1.6 * delta))
 
 
 ## Player look input (already scaled); applies the invert settings.
 func _look(x: float, y: float) -> void:
-	_rotate_camera(x * (1.0 if GameSettings.invert_x else -1.0), y * (1.0 if GameSettings.invert_y else -1.0))
+	var yaw := x * (1.0 if GameSettings.invert_x else -1.0)
+	_rotate_camera(yaw, y * (1.0 if GameSettings.invert_y else -1.0))
+	if not GameSettings.mouse_steers:
+		camera_look_yaw += yaw
 	look_input_this_frame = true
 	_recentering = false
 
@@ -455,7 +524,7 @@ func _update_recenter(delta: float) -> void:
 		return
 	_recenter_t = minf(_recenter_t + delta / maxf(recenter_time, 0.01), 1.0)
 	var k := smoothstep(0.0, 1.0, _recenter_t)
-	_camera_rig.rotation.y = wrapf(lerpf(_recenter_from.x, _recenter_to.x, k), -PI, PI)
+	_auto_turn(wrapf(lerpf(_recenter_from.x, _recenter_to.x, k), -PI, PI))
 	_camera_pitch.rotation.x = lerpf(_recenter_from.y, _recenter_to.y, k)
 	if _recenter_t >= 1.0:
 		_recentering = false
@@ -470,8 +539,8 @@ func _follow_behind(delta: float) -> void:
 	if not GameSettings.camera_follow or not _running or _since_look < follow_delay \
 			or StoryControl.focus != null or not steer_frame.is_held():
 		return
-	_camera_rig.rotation.y = lerp_angle(_camera_rig.rotation.y, steer_frame.held_yaw(),
-			follow_speed * (1.0 - _indoor) * delta)
+	_auto_turn(lerp_angle(_camera_rig.rotation.y, steer_frame.held_yaw(),
+			follow_speed * (1.0 - _indoor) * delta))
 
 
 func _remember_safe_spot(delta: float) -> void:

@@ -1,30 +1,45 @@
-## The move keys steer; the camera only shows the way. The frame the keys
-## steer in is the camera's yaw when she starts moving, held while any move key
-## (or the stick) stays down, so turning the camera mid-stride never swings her
-## path. Letting go of the keys frees it: the next press steers from wherever
-## the camera looks then. `live` frames (aiming, drawing) follow the camera,
-## so she still strafes around a shot.
-##
+## Camera-relative steering, the way shipped third-person games do it (Unity's
+## Starter Assets ThirdPersonController, Unreal's third-person template): the
+## move keys point her relative to where the camera looks. Two refinements:
+## - The player's own look (mouse, right stick) steers live, as in those games,
+##   only with the "Turning the camera steers her while moving" setting on. Off
+##   (the default, the owner's ask), the keys alone steer her mid-stride.
+## - Camera moves the player didn't make (follow-behind while sprinting, story
+##   glances, the R recentre) don't steer: the frame is held while the keys stay
+##   the same, so the camera swinging behind her can't spiral her into a circle.
+##   Pressing a different direction (or letting go) takes the camera's frame
+##   again, like the "hold the input frame until the stick changes" rule fixed-
+##   and auto-camera games use across camera changes.
+## Aiming and drawing (`live`) follow the camera exactly, for strafing a shot.
 ## Feyre on foot and the mare under her each keep their own frame.
 class_name SteerFrame
 extends RefCounted
 
+## A new key combination (stick turned this far, radians) takes the camera's frame.
+const RESYNC := 0.35
+
 var _held: bool = false
 var _yaw: float = 0.0
+var _input := Vector2.ZERO
+var _auto0: float = 0.0
 
 
-## The yaw to rotate `input` by this frame.
-func yaw(input: Vector2, camera_yaw: float, live: bool = false) -> float:
+## The yaw to rotate `input` by this frame. `auto_yaw` is the running total of
+## camera turns that must not steer (Feyre.steer_exclusion()); only those are
+## taken back out of the camera's yaw.
+func yaw(input: Vector2, camera_yaw: float, auto_yaw: float = 0.0, live: bool = false) -> float:
 	if input == Vector2.ZERO or live:
 		_held = false
 		return camera_yaw
-	if not _held:
+	if not _held or absf(input.angle_to(_input)) > RESYNC:
 		_held = true
-		_yaw = camera_yaw
+		_input = input
+		_auto0 = auto_yaw
+	_yaw = wrapf(camera_yaw - (auto_yaw - _auto0), -PI, PI)
 	return _yaw
 
 
-## Forget the held frame (a teleport, a cutscene taking her).
+## Forget the held frame (a teleport; a test bot steering by the camera).
 func release() -> void:
 	_held = false
 

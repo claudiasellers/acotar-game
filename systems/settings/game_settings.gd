@@ -8,6 +8,7 @@ signal changed(key: StringName)
 const SECTIONS := {
 	&"mouse_sensitivity": "camera", &"stick_sensitivity": "camera",
 	&"invert_x": "camera", &"invert_y": "camera", &"camera_follow": "camera",
+	&"mouse_steers": "camera",
 	&"gentle_mode": "play", &"reduced_effects": "play",
 	&"music_volume": "audio", &"sound_volume": "audio",
 	&"text_size": "ui",
@@ -15,6 +16,9 @@ const SECTIONS := {
 const DEFAULTS := {
 	&"mouse_sensitivity": 1.0, &"stick_sensitivity": 1.0,
 	&"invert_x": false, &"invert_y": false, &"camera_follow": true,
+	## Off (the owner's choice): the move keys alone steer her mid-stride; the
+	## camera only sets which way is "forward" when a direction is pressed.
+	&"mouse_steers": false,
 	&"gentle_mode": false, &"reduced_effects": false,
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
@@ -45,6 +49,8 @@ var invert_y: bool:
 	get: return bool(get_value(&"invert_y"))
 var camera_follow: bool:
 	get: return bool(get_value(&"camera_follow"))
+var mouse_steers: bool:
+	get: return bool(get_value(&"mouse_steers"))
 var gentle_mode: bool:
 	get: return bool(get_value(&"gentle_mode"))
 var reduced_effects: bool:

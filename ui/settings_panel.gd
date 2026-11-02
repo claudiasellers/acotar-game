@@ -218,6 +218,7 @@ func _build() -> void:
 	_check(camera, &"invert_x", "Invert camera X")
 	_check(camera, &"invert_y", "Invert camera Y")
 	_check(camera, &"camera_follow", "Camera follows behind while running")
+	_check(camera, &"mouse_steers", "Turning the camera steers her while moving")
 	camera.add_child(_note("Press R (or click the right stick) to bring\nthe camera back behind Feyre."))
 
 	var moving := _section(left, "Movement keys", PauseStyle.LILAC)

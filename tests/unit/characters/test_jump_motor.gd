@@ -82,7 +82,7 @@ func test_air_jumps_stack_from_anywhere() -> void:
 	var y2 := y
 	_tick(true, true)
 	assert_eq(jumps, [1, 2])
-	assert_almost_eq(vy, motor.launch_speed(2) - motor.rise_gravity * DT, 0.5)
+	assert_almost_eq(vy, motor.launch_speed(2), motor.rise_gravity * DT + 0.1, "the press frame sets the launch speed")
 	for i in 20:
 		_tick(false, true)
 	_tick(true, true)
@@ -121,7 +121,8 @@ func test_buffered_press_jumps_on_landing() -> void:
 	_tick(true, true)
 	_tick(true, true)
 	_tick(true, true)
-	while vy > -0.1 or y > 0.15:
+	# Falling fast enough to cover 0.15 m in one frame, so wait by frames, not height.
+	while not (vy < 0.0 and y + vy * DT * 3.0 <= 0.0):
 		_tick(false, false)
 	# Pressed a few frames before touching down, jumps all spent.
 	_tick(true, true)

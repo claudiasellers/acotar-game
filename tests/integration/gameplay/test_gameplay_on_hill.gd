@@ -256,6 +256,9 @@ func test_nearest_find_glints_and_names_itself() -> void:
 	var field := hill.get_node("GameplaySandbox/Forage_ing_snowdrop") as ForageScatter
 	var spot := field.global_transform * field.multimesh.get_instance_transform(0).origin
 	feyre.global_position = spot + Vector3(0.8, 0, 0)
+	# The sandbox has no floor under this field: hold her there, or she falls out
+	# of reach while the focus refreshes (more so with the quicker jump gravity).
+	feyre.set_physics_process(false)
 	var focus := feyre.interactor.forage_focus
 	var near := focus.nearest(feyre.global_position, ForageFocus.GLINT_RADIUS)
 	assert_false(near.is_empty())
