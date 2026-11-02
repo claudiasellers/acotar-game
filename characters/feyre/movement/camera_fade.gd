@@ -20,6 +20,9 @@ static var headless_opt_in := false
 const PROBE_GROUP := &"camera_fade_probe"
 
 const RADIUS := 0.5
+## Her own third-person camera fades a little further out (a canopy post at the
+## edge of frame); cutscene cameras keep RADIUS so framed foreground props stay.
+const OWN_RADIUS := 0.9
 ## Largest mesh (longest world AABB side, m) that may fade.
 const MAX_SIZE := 3.5
 const FADED := 0.85
@@ -49,10 +52,11 @@ func _process(delta: float) -> void:
 	if cam == null:
 		return
 	var near := {}
-	for g in near_meshes(cam.global_position):
-		near[g.get_instance_id()] = g
 	var body := _owner_root as Node3D
-	if body and body.is_ancestor_of(cam):
+	var own := body != null and body.is_ancestor_of(cam)
+	for g in near_meshes(cam.global_position, OWN_RADIUS if own else RADIUS):
+		near[g.get_instance_id()] = g
+	if own:
 		for g in sight_blockers(cam.global_position, body.global_position + Vector3.UP * SIGHT_HEIGHT):
 			near[g.get_instance_id()] = g
 	var step := delta / FADE_TIME
@@ -74,16 +78,16 @@ func _process(delta: float) -> void:
 			_touched.erase(id)
 
 
-## Fadeable meshes within RADIUS of `at`.
-func near_meshes(at: Vector3) -> Array[GeometryInstance3D]:
+## Fadeable meshes within `radius` of `at`.
+func near_meshes(at: Vector3, radius: float = RADIUS) -> Array[GeometryInstance3D]:
 	var out: Array[GeometryInstance3D] = []
-	var query := AABB(at - Vector3.ONE * RADIUS, Vector3.ONE * RADIUS * 2.0)
+	var query := AABB(at - Vector3.ONE * radius, Vector3.ONE * radius * 2.0)
 	for g in _candidates(query):
 		var box := _fadeable_box(g)
 		if box.size == Vector3.ZERO:
 			continue
 		var closest := at.clamp(box.position, box.end)
-		if closest.distance_to(at) <= RADIUS:
+		if closest.distance_to(at) <= radius:
 			out.append(g)
 	return out
 

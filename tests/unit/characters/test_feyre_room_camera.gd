@@ -126,3 +126,9 @@ func test_indoors_furniture_behind_her_does_not_shove_the_camera_in() -> void:
 	await wait_seconds(1.5)
 	assert_gt(f.camera.global_position.z, 2.0, "camera z %.2f: through the bed, not wedged against it" % f.camera.global_position.z)
 	assert_gt(look.transparency, 0.5, "and the bed fades while it is between the lens and her")
+
+
+func test_a_short_arm_moves_her_off_centre() -> void:
+	var f := _feyre()
+	assert_eq(f.close_shoulder(2.4), 0.0, "the usual arm is centred")
+	assert_almost_eq(f.close_shoulder(Feyre.ROOM_MIN_ARM), Feyre.CLOSE_SHOULDER, 0.001, "the shortest is over her shoulder")

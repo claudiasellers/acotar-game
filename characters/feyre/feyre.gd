@@ -38,6 +38,8 @@ const ROOM_NARROW := 0.75
 const ROOM_DOOR_MAX := 2.2
 const ROOM_MARGIN := 0.2
 const ROOM_MIN_ARM := 0.9
+const CLOSE_FROM := 1.8
+const CLOSE_SHOULDER := 0.35
 const ROOM_PULL_IN := 14.0
 const ROOM_LET_OUT := 2.5
 ## How far up (m) a roof still counts as "indoors".
@@ -179,7 +181,7 @@ func _process(delta: float) -> void:
 	target_length = minf(target_length, _room_arm)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	_clamp_indoor_pitch()
-	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
+	var shoulder := 0.55 if (is_aiming or is_drawing) else close_shoulder(_spring_arm.spring_length)
 	_spring_arm.position.x = lerpf(_spring_arm.position.x, shoulder, 10.0 * delta)
 	_update_breath(delta)
 	look_input_this_frame = false
@@ -432,6 +434,13 @@ func _update_indoor(delta: float) -> void:
 	if roofed:
 		_indoor_rise = clampf((hit.position as Vector3).y - from.y - INDOOR_CEILING_GAP, 0.0, INDOOR_RISE)
 	_indoor = move_toward(_indoor, 1.0 if roofed else 0.0, delta / 0.3)
+
+
+## Over-the-shoulder offset (m) when a small room holds the arm short: none at
+## CLOSE_FROM and longer, CLOSE_SHOULDER at ROOM_MIN_ARM, so she sits off-centre
+## instead of filling the middle of the frame.
+func close_shoulder(arm: float) -> float:
+	return CLOSE_SHOULDER * clampf((CLOSE_FROM - arm) / (CLOSE_FROM - ROOM_MIN_ARM), 0.0, 1.0)
 
 
 ## Indoors: the longest arm (up to `want`) whose view-edge whiskers clear the walls.
