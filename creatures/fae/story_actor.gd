@@ -10,6 +10,8 @@ signal cued(cue: StringName)
 @export var model_scene: PackedScene
 
 var model: Node3D
+## Its face, when data/faces/<actor_id>_face.tres exists (lane L36-3, docs/contracts/faces.md).
+var face: CreatureFace
 
 
 func _ready() -> void:
@@ -19,6 +21,7 @@ func _ready() -> void:
 		model = model_scene.instantiate() as Node3D
 		model.name = "Model"
 		_mount_model(model)
+		face = CreatureFace.attach_to(self, model, actor_id)
 	if EventBus.has_signal(&"story_actor_cue"):
 		EventBus.connect(&"story_actor_cue", _on_story_cue)
 

@@ -27,6 +27,13 @@ const EMOTIONS: Array[StringName] = [&"neutral", &"happy", &"laugh", &"smirk", &
 ## Recurring small moves over the rest face:
 ## [{ "preset": String, "min": float, "max": float, "hold": float, "weight": float }].
 @export var tics: Array = []
+## A creature's face (lane L36-3): a threat display with no blinks or visemes.
+@export var creature: bool = false
+## Creature only: what it is doing (its State enum name lower-cased, or its face_state()) -> preset,
+## worn as its rest face while it lasts.
+@export var states: Dictionary = {}
+## Creature only: story cue -> { "preset": String, "seconds": float (< 0: hold) }.
+@export var cues: Dictionary = {}
 
 
 ## The preset an expression or emotion resolves to: its own preset name first,

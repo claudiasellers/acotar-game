@@ -11,6 +11,7 @@ rest = &"defeated"
 blink_min = 2.2
 blink_max = 4.8
 presets = {
+"clear_eyed": { "brow_up_L": 0.12, "brow_up_R": 0.12, "chin_raise": 0.1, "eyes_wide_L": 0.15, "eyes_wide_R": 0.15, "smile_L": 0.3, "smile_R": 0.3 },
 "defeated": { "blink_L": 0.22, "blink_R": 0.22, "brow_inner_up": 0.35, "frown_L": 0.3, "frown_R": 0.3 },
 "dozing": { "blink_L": 0.88, "blink_R": 0.88, "brow_inner_up": 0.1, "jaw_open": 0.16 },
 "faint_smile": { "blink_L": 0.15, "blink_R": 0.15, "brow_inner_up": 0.3, "smile_L": 0.25, "smile_R": 0.25 },

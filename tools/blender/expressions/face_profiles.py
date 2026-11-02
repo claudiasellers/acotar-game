@@ -128,6 +128,8 @@ PROFILES = {
                          "frown": 0.35, "chin_raise": 0.2},
             "goodbye_tears": {"chin_raise": 0.75, "brow_inner_up": 0.85, "frown": 0.6, "squint": 0.3},
             "faint_smile": {"smile": 0.25, "brow_inner_up": 0.3, "blink_L": 0.15, "blink_R": 0.15},
+            # what the puca shows her: her father whole, sharp and steady, the defeat gone [X]
+            "clear_eyed": {"eyes_wide_L": 0.15, "eyes_wide_R": 0.15, "brow_up": 0.12, "smile": 0.3, "chin_raise": 0.1},
         },
         aliases={"neutral": "defeated", "guarded": "defeated", "happy": "faint_smile", "laugh": "faint_smile",
                  "smirk": "faint_smile", "tender": "faint_smile", "angry": "wince", "fury": "wince",
@@ -137,6 +139,141 @@ PROFILES = {
         tics=[("wince", 10.0, 22.0, 0.6, 0.35)],
     ),
 }
+
+
+# ----------------------------------------------------------------------
+# Creatures (lane L36-3).  No visemes, no blinks: a threat display, driven by
+# what the creature is doing (`states`: its brain's State enum, lower-cased, or
+# its face_state()), by story cues (`cues`: cue -> (preset, seconds), -1 = hold)
+# and by Faces.express like the cast.  Keys:
+#   fae (shape keys, tools/blender/fae_creatures.py): threat, eyes_wide, tongue, ears_back
+#   wolves (bones, SnarlModifier): jaw_open, ears_back, ears_up, head_low
+# The monsters stay frightening (R3): every threat is wide and toothy, never cute.
+# The Bogge has no face at all (shadow, no eye bloom) and the beast has its own
+# snarl clips, so neither is here.
+WOLF_ALIASES = {"neutral": "rest", "guarded": "rest", "happy": "rest", "laugh": "rest", "smirk": "rest",
+                "tender": "rest", "angry": "snarl", "fury": "lunge", "contempt": "snarl", "disgust": "snarl",
+                "sad": "rest", "grief": "rest", "afraid": "cowed", "terror": "cowed", "surprise": "alert",
+                "pained": "cowed", "weary": "rest", "pleading": "cowed"}
+
+CREATURES = {
+    "great_wolf": dict(
+        canon="Andras in wolf form, pony-sized and unnaturally quiet [C ch1]: no sound and no bared teeth while "
+              "he creeps on the doe; jaws open only for the burst and the seize; after the ash he turns and "
+              "looks at her with something too aware in his face, ears up, jaw shut [C ch1]; dies slowly, eye "
+              "on the sky, jaw slack [C ch1].",
+        rest="rest",
+        presets={
+            "rest": {"ears_up": 0.3},
+            "stalk": {"ears_up": 0.8, "head_low": 0.35},
+            "rush": {"jaw_open": 0.95, "ears_back": 0.9, "head_low": 0.3},
+            "hold_prey": {"jaw_open": 0.35, "ears_back": 0.5, "head_low": 0.2},
+            "stare": {"ears_up": 1.0},
+            "retreat": {"ears_back": 0.7, "jaw_open": 0.2, "head_low": 0.45},
+            "snarl": {"jaw_open": 0.35, "ears_back": 0.85, "head_low": 0.6},
+            "lunge": {"jaw_open": 1.0, "ears_back": 1.0, "head_low": 0.3},
+            "alert": {"ears_up": 1.0},
+            "cowed": {"ears_back": 1.0, "head_low": 0.8},
+            "dying": {"jaw_open": 0.3, "ears_back": 0.35},
+            "dead": {"jaw_open": 0.4, "ears_back": 0.5},
+        },
+        aliases=WOLF_ALIASES,
+        tics=[("alert", 5.0, 11.0, 0.3, 0.6)],
+        states={"stalk": "stalk", "rush": "rush", "hold_prey": "hold_prey", "stare": "stare", "retreat": "retreat",
+                "dying": "dying", "dead": "dead"},
+        cues={},
+    ),
+    "wolf": dict(
+        canon="The human-realm forest wolves [C ch1-2]: a pack that stalks, flanks and circles, darting in. "
+              "Our reading [X]: ears pinned and heads low with lips off the teeth while they ring her, the "
+              "jaws gaping for each feint, silent and ears-forward while roaming.",
+        rest="rest",
+        presets={
+            "rest": {"ears_up": 0.4},
+            "stalk": {"ears_up": 0.7, "head_low": 0.5},
+            "snarl": {"jaw_open": 0.4, "ears_back": 0.9, "head_low": 0.65},
+            "lunge": {"jaw_open": 1.0, "ears_back": 1.0, "head_low": 0.3},
+            "alert": {"ears_up": 1.0},
+            "cowed": {"ears_back": 1.0, "head_low": 0.8},
+            "dying": {"jaw_open": 0.3, "ears_back": 0.35},
+            "dead": {"jaw_open": 0.4, "ears_back": 0.5},
+        },
+        aliases=WOLF_ALIASES,
+        tics=[("alert", 4.0, 9.0, 0.3, 0.6)],
+        states={"stalk": "stalk", "flank": "snarl", "circle": "snarl", "break": "snarl", "lunge": "lunge",
+                "dying": "dying", "dead": "dead"},
+        cues={},
+    ),
+    "suriel": dict(
+        canon="Thin as death, skin like old cloth, lipless mouth over too-many grey teeth [C ch14]. It smiles "
+              "that lipless smile while it answers her, amused, and the teeth are horribly large [C ch14]; its "
+              "milky eyes widen and it shrieks when it scents the naga [C ch14]. Never sad, never pleading.",
+        rest="calm",
+        presets={
+            "calm": {},
+            "smile": {"threat": 0.55},
+            "grin": {"threat": 1.0},
+            "watch": {"eyes_wide": 0.45},
+            "shriek": {"threat": 1.0, "eyes_wide": 1.0},
+            "speak": {"threat": 0.45},
+        },
+        aliases={"neutral": "calm", "guarded": "calm", "happy": "smile", "laugh": "grin", "smirk": "smile",
+                 "tender": "smile", "angry": "grin", "fury": "shriek", "contempt": "smile", "disgust": "smile",
+                 "sad": "calm", "grief": "calm", "afraid": "shriek", "terror": "shriek", "surprise": "watch",
+                 "pained": "watch", "weary": "calm", "pleading": "calm"},
+        tics=[("smile", 6.0, 12.0, 0.8, 0.5)],
+        states={"snared": "watch", "caught": "smile", "screaming": "shriek", "stalking": "calm", "freed": "grin"},
+        cues={"naga_are_coming": ("shriek", 2.0), "freed": ("grin", 1.5)},
+    ),
+    "naga": dict(
+        canon="Serpent-faced fae with scales [C ch14-15]: 'the creature smiled, a row of razor-sharp teeth', "
+              "the jaw dropping away from them, a silvery forked tongue [C ch15]. Our reading [X]: the tongue "
+              "tastes the air while it lurks, the eyes flare as it strikes.",
+        rest="lurk",
+        presets={
+            "lurk": {},
+            "taste": {"tongue": 1.0},
+            "smile": {"threat": 0.7, "eyes_wide": 0.3},
+            "strike": {"threat": 1.0, "eyes_wide": 1.0, "tongue": 0.3},
+            "hiss": {"threat": 0.5, "tongue": 0.8},
+            "reel": {"eyes_wide": 1.0, "threat": 0.25},
+            "flee": {"eyes_wide": 0.6},
+        },
+        aliases={"neutral": "lurk", "guarded": "lurk", "happy": "smile", "laugh": "smile", "smirk": "smile",
+                 "tender": "smile", "angry": "hiss", "fury": "strike", "contempt": "smile", "disgust": "hiss",
+                 "sad": "lurk", "grief": "lurk", "afraid": "flee", "terror": "flee", "surprise": "reel",
+                 "pained": "reel", "weary": "lurk", "pleading": "lurk"},
+        tics=[("taste", 2.5, 6.0, 0.3, 1.0)],
+        states={"lurk": "lurk", "charge": "smile", "strike": "strike", "recover": "hiss", "stagger": "reel",
+                "flee": "flee", "dying": "reel", "dead": "reel"},
+        cues={"attack": ("smile", 1.0), "stagger": ("reel", 1.0)},
+    ),
+    "attor": dict(
+        canon="Grey leathery skin, bat-like wings, long thin fingers, a snout full of fangs [C]; her painting "
+              "shows it 'snout open in a roar, revealing row after row of fangs' [C]. It hisses when it speaks of "
+              "her (ch19 cue speaks_of_her). Our reading [X]: ears pinned back as it hisses, the snout never "
+              "fully shut.",
+        rest="menace",
+        presets={
+            "menace": {"threat": 0.15, "ears_back": 0.25},
+            "hiss": {"threat": 0.6, "ears_back": 1.0},
+            "roar": {"threat": 1.0, "ears_back": 1.0},
+            "listen": {"ears_back": 0.0},
+        },
+        aliases={"neutral": "menace", "guarded": "menace", "happy": "hiss", "laugh": "hiss", "smirk": "hiss",
+                 "tender": "menace", "angry": "hiss", "fury": "roar", "contempt": "hiss", "disgust": "hiss",
+                 "sad": "menace", "grief": "menace", "afraid": "listen", "terror": "listen", "surprise": "listen",
+                 "pained": "roar", "weary": "menace", "pleading": "menace"},
+        tics=[("hiss", 5.0, 10.0, 0.5, 0.4)],
+        states={},
+        cues={"speaks_of_her": ("hiss", 2.5)},
+    ),
+}
+
+CREATURE_KEYS = {"great_wolf": ("jaw_open", "ears_back", "ears_up", "head_low"),
+                 "wolf": ("jaw_open", "ears_back", "ears_up", "head_low"),
+                 "suriel": ("threat", "eyes_wide"), "naga": ("threat", "tongue", "eyes_wide"),
+                 "attor": ("threat", "ears_back")}
 
 
 # Symmetric names in a preset are spread onto the stronger one-sided keys
@@ -176,6 +313,18 @@ def check():
             assert p["aliases"].get(e) in p["presets"], (cid, e)
         for t in p["tics"]:
             assert t[0] in p["presets"], (cid, t)
+    for cid, p in CREATURES.items():
+        assert p["rest"] in p["presets"], (cid, p["rest"])
+        for e in EMOTIONS:
+            assert p["aliases"].get(e) in p["presets"], (cid, e)
+        for n, m in p["presets"].items():
+            assert set(m) <= set(CREATURE_KEYS[cid]), (cid, n, set(m) - set(CREATURE_KEYS[cid]))
+        for t in p["tics"]:
+            assert t[0] in p["presets"], (cid, t)
+        for st, pr in p["states"].items():
+            assert pr in p["presets"], (cid, st)
+        for cue, (pr, _sec) in p["cues"].items():
+            assert pr in p["presets"], (cid, cue)
 
 
 check()

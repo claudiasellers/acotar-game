@@ -96,3 +96,35 @@ expression (0.22 s in, 0.45 s out) -> tics -> visemes (talking eases off
 `lip_press`/`jaw_clench`) -> blinks. Writes every face mesh under the model.
 Dormant beyond 15 m from the camera (the body hands over to LOD1 at 14 m) or when
 hidden. Contract test: `tests/unit/characters/test_faces.gd`.
+
+## 5. Creatures: `systems/faces/creature_face.gd` (`CreatureFace`, L36-3)
+
+A `FaceDriver` with no blinks or visemes, attached by `Creature._ready` (id =
+`data.kind`) and `StoryActor._ready` (id = `actor_id`, `naga_2` falls back to
+`naga`) when `data/faces/<id>_face.tres` has `creature = true`. Profiles come
+from `CREATURES` in `tools/blender/expressions/face_profiles.py`; the monsters
+stay frightening (R3).
+
+| creature | keys | how |
+|---|---|---|
+| suriel | `threat` (lipless grin, teeth stretch), `eyes_wide` | shape keys, `tools/blender/fae_creatures.py` |
+| naga | `threat` (jaw drops off the teeth), `tongue`, `eyes_wide` | shape keys |
+| attor | `threat` (snout roar), `ears_back` | shape keys |
+| great_wolf, wolf | `jaw_open`, `ears_back`, `ears_up`, `head_low` | bones: `SnarlModifier` (`creatures/anim/snarl_modifier.gd`) on head, neck, jaw, ear_l, ear_r; each bone's sign is read from its rest pose |
+
+Not here: the Bogge (no face: shadow, no eye bloom) and the beast (its own snarl clips).
+
+Drivers, all from the profile:
+- `states`: what the creature is doing -> a preset worn as its rest face
+  (0.3 s cross-fade). The state is `face_state()` when the host has one (Wolf:
+  `lunge`, else the pack's phase), else its `State` enum name lower-cased
+  (GreatWolf, Naga, Suriel), and `dying` / `dead` when mortally wounded / dead.
+- `cues`: story cue -> `{preset, seconds}` (a StoryActor's `cued` signal, or
+  `story_actor_cue` for a Creature), plus `face_<expression>` / `face_clear`.
+- `Faces.express` / `Faces.speak` exactly as for the cast; a creature's line
+  shows its `speak` preset (or the line's emotion) for the line's length.
+- Tics only while its state shows the rest preset (the naga tastes the air).
+
+Updates to 40 m (ears and a dropped jaw read further than a cast face).
+Contract test: `tests/unit/creatures/test_creature_faces.gd`. Look probe:
+`tools/faces/creature_faces_shot.tscn` (-> `creature_faces.png`).
