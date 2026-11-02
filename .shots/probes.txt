@@ -1,0 +1,18 @@
+from quality-audit playthrough pass 3
+quality look
+size 1920x1080
+timeout 900
+shot opening res://tools/world_shot.tscn opening_dawn {out}/opening_dawn.png
+shot cottage res://tools/world_shot.tscn cottage_snow {out}/cottage_snow.png
+shot village res://tools/world_shot.tscn village_market {out}/village_market.png
+shot forest res://tools/world_shot.tscn hunting_forest {out}/hunting_forest.png
+shot wall res://tools/world_shot.tscn wall_seam {out}/wall_seam.png
+shot crossing res://tools/world_shot.tscn wall_crossing_spring {out}/wall_crossing_spring.png
+shot drive res://tools/world_shot.tscn manor_drive {out}/manor_drive.png
+shot garden res://tools/world_shot.tscn manor_garden_east {out}/manor_garden_east.png
+shot rear res://tools/world_shot.tscn manor_rear {out}/manor_rear.png
+shot bogge res://tools/world_shot.tscn eastern_bogge {out}/eastern_bogge.png
+shot indoor res://tools/indoor_camera_shot.tscn {out}
+shot dinner res://tools/act2_dinner_shot.tscn {out}
+shot gowns res://tools/dressing_room_shot.tscn gowns {out}
+shot bw res://tools/landscape/landscape_shot.tscn bw_walk {out}/bw_walk.png
