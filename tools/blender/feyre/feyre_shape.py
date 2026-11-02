@@ -189,9 +189,9 @@ def build_grid(h=0.0025):
            # nostril shadow
     # lips: full upper with a soft cupid's bow, rounder lower
     for s in (1, -1):
-        U(sdf.ellipsoid((0.0072 * s, MOUTH_Y + 0.0017, MOUTH_Z + 0.0039), (0.0110, 0.0052, 0.0046),
+        U(sdf.ellipsoid((0.0072 * s, MOUTH_Y + 0.0025, MOUTH_Z + 0.0039), (0.0110, 0.0052, 0.0046),
                         _rot_y(math.radians(-12 * s))), 0.005)
-    U(sdf.ellipsoid((0, MOUTH_Y + 0.0021, MOUTH_Z - 0.0050), (0.0134, 0.0058, 0.0058)), 0.005)
+    U(sdf.ellipsoid((0, MOUTH_Y + 0.0030, MOUTH_Z - 0.0050), (0.0140, 0.0058, 0.0058)), 0.005)
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0055, MOUTH_Z), (0.0158, 0.005, 0.0010)), 0.0015)  # mouth line
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z - 0.0155), (0.011, 0.004, 0.0032)), 0.006)  # crease above the chin
     S(sdf.ellipsoid((0, MOUTH_Y - 0.0035, MOUTH_Z + 0.0135), (0.0032, 0.003, 0.0045)), 0.004)          # philtrum

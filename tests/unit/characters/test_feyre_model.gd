@@ -108,3 +108,18 @@ func test_lashes_blink_and_natural_colouring_survives_no_makeup() -> void:
 	var body: ShaderMaterial = m.skin_body_material
 	var body_blush: Variant = body.get_shader_parameter("natural_blush_amount")
 	assert_true(body_blush == null or float(body_blush) == 0.0, "body has no face colouring")
+
+
+## The wardrobe applier must leave her head on the skin shader (it used to reset
+## uncovered regions to the glb's flat skin, losing makeup and natural colouring).
+func test_worn_feyre_keeps_the_skin_shader_on_her_face() -> void:
+	var f := (load("res://characters/feyre/feyre.tscn") as PackedScene).instantiate() as Feyre
+	add_child_autofree(f)
+	await wait_frames(2)
+	var body := f.find_child("Body", true, false) as MeshInstance3D
+	assert_not_null(body)
+	for i in body.mesh.get_surface_count():
+		if (body.mesh as ArrayMesh).surface_get_name(i) == "head":
+			var mat := body.get_active_material(i) as ShaderMaterial
+			assert_not_null(mat, "head keeps the skin shader")
+			assert_gt(float(mat.get_shader_parameter("natural_lips_amount")), 0.2)
