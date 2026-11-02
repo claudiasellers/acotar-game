@@ -181,7 +181,7 @@ def bake_face(body):
     h, w = a.shape[:2]
     col = np.empty((h, w, 3), np.float32)
     col[:] = _srgb01(C.SKIN_SRGB)
-    female = C.KIND in ("female", "round")
+    female = C.KIND in ("female", "round", "human")
     layers = [(a[..., 3], "F29A9A" if female else "D99A8E", 0.45 if female else 0.18),     # blush
               (a[..., 1], "C9A8D8" if female else C.SKIN_SRGB, 0.30 if female else 0.0),   # lid wash
               (a[..., 2], "3A2420" if not C.BLACK_EYES else "141018", 0.55 if female else 0.30),   # liner
