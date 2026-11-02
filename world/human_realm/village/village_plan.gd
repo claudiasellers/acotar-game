@@ -508,7 +508,7 @@ func _place_landmarks() -> void:
 		"BarnDoorSpot": Transform3D(Basis.IDENTITY, Vector3(0.0, 0.0, 6.0)),
 		"IsaacMeetSpot": Transform3D(Basis.IDENTITY, Vector3(-3.0, 0.0, 6.5)),
 	})
-	fogs.append({name = "BarnMist", pos = Vector3(barn.pos.x, barn.y + 1.5, barn.pos.y), size = Vector3(40, 4, 40), density = 0.6})
+	fogs.append({name = "BarnMist", pos = Vector3(barn.pos.x, barn.y + 1.5, barn.pos.y), size = Vector3(40, 4, 40), density = 0.06})
 
 	r = resolve(&"smithy", Vector2(300.0, 2272.0), face_road)
 	var smithy := put_block(&"smithy", &"smithy", r[0], r[1], "Smithy")
@@ -585,7 +585,7 @@ func _place_mill() -> void:
 	(layers[&"mill_wheel"] as ScatterLayer).add(Vector3(wheel_c.x, wy, wheel_c.y), yaw, 1.0)
 	_landmark("Mill", mill, {"MillDoor": Transform3D(Basis.IDENTITY, Vector3(-1.5, 0.0, 4.6))})
 	landmarks.append({name = "MillWheel", kind = &"mill_wheel", xf = Transform3D(Basis(Vector3.UP, yaw), Vector3(wheel_c.x, wy, wheel_c.y)), markers = {}})
-	fogs.append({name = "MillPondMist", pos = Vector3(L.MILL_POND.x, WorldHeight.height_at(L.MILL_POND.x, L.MILL_POND.y) + 0.8, L.MILL_POND.y), size = Vector3(70, 2.5, 70), density = 0.8})
+	fogs.append({name = "MillPondMist", pos = Vector3(L.MILL_POND.x, WorldHeight.height_at(L.MILL_POND.x, L.MILL_POND.y) + 0.8, L.MILL_POND.y), size = Vector3(70, 2.5, 70), density = 0.08})
 	for i in 6:
 		put(&"icicles", wheel_c + rot(Vector2(rng.randf_range(-0.8, 0.8), rng.randf_range(-2.5, 2.5)), yaw), rng.randf() * TAU, rng.randf_range(0.8, 1.3), -0.2)
 	for i in 4:

@@ -35,6 +35,12 @@ var _mood_target := 0.0
 var _mood_rate := 1.0
 ## 0 at midday, 1 with the sun on the horizon: blends in the golden-hour sky.
 var golden := 0.0
+## 0 while the sun is up, 1 once it is below the horizon. Volumetric fog is lit
+## only by lights unless it takes the ambient, so at night the sun-lit fog of
+## every grade turned into an opaque black wall past ~30 m (the mill void).
+var night := 0.0
+## How much ambient the volumetric fog takes at full night, at least.
+const NIGHT_FOG_INJECT := 0.4
 ## Her true sight (L46, ch23): 0 under Tamlin's glamour, eases to 1 once
 ## `glamour_lifted` rises; every grade then reads richer and clearer.
 var sight := 0.0
@@ -138,7 +144,7 @@ func apply(base: GradePreset) -> void:
 	env.glow_hdr_threshold = p.glow_hdr_threshold
 	env.volumetric_fog_density = p.volumetric_density
 	env.volumetric_fog_albedo = p.volumetric_albedo
-	env.volumetric_fog_ambient_inject = p.volumetric_ambient_inject
+	env.volumetric_fog_ambient_inject = fog_ambient_inject(p.volumetric_ambient_inject, night)
 	env.tonemap_exposure = p.exposure
 	env.adjustment_enabled = true
 	env.adjustment_saturation = p.saturation
@@ -262,8 +268,10 @@ func _update_sun() -> void:
 	sun.rotation = sun_rotation(Clock.time_of_day)
 	var elevation := sin((Clock.time_of_day - 0.25) * TAU)
 	var g := golden_amount(elevation)
-	if absf(g - golden) > 0.01:
+	var n := night_amount(elevation)
+	if absf(g - golden) > 0.01 or absf(n - night) > 0.01:
 		golden = g
+		night = n
 		apply(current)
 	var energy := lerpf(current.sun_energy, current.golden_sun_energy, golden)
 	sun.light_energy = energy * clampf(elevation * 3.0, 0.04, 1.0)
@@ -273,6 +281,18 @@ func _update_sun() -> void:
 ## horizon, gone by about 25° up, and fading out again once the sun is down.
 static func golden_amount(elevation: float) -> float:
 	return (1.0 - smoothstep(0.08, 0.42, elevation)) * smoothstep(-0.2, 0.0, elevation)
+
+
+## Night weight for a sun elevation: 0 in daylight, 1 once the sun is down.
+static func night_amount(elevation: float) -> float:
+	return 1.0 - smoothstep(-0.12, 0.1, elevation)
+
+
+## The volumetric fog's ambient take: the grade's own by day, and at night at
+## least NIGHT_FOG_INJECT, so the fog glows with the night ambient instead of
+## going black with the sun.
+static func fog_ambient_inject(grade_inject: float, night_weight: float) -> float:
+	return lerpf(grade_inject, maxf(grade_inject, NIGHT_FOG_INJECT), clampf(night_weight, 0.0, 1.0))
 
 
 ## Sun rises in the east at 06:00, highest at noon (tilted south), sets west.
