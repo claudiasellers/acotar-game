@@ -163,3 +163,36 @@ func test_the_bogge_fog_is_lit_by_its_cold_ambient() -> void:
 	director.environment = we
 	director.apply(bogge)
 	assert_almost_eq(env.volumetric_fog_ambient_inject, bogge.volumetric_ambient_inject, 0.0001)
+
+
+func test_painted_clouds_per_grade() -> void:
+	# A cloudless sky read unfinished (audit): a few soft clouds in Spring,
+	# an overcast lid over the human winter, none to compete with the Bogge fog.
+	var spring := GradeDirector.load_preset(&"spring")
+	var manor := GradeDirector.load_preset(&"manor")
+	var winter := GradeDirector.load_preset(&"human_winter")
+	assert_between(spring.cloud_cover, 0.2, 0.45, "a few fair-weather clouds")
+	assert_between(manor.cloud_cover, 0.2, 0.45, "a few fair-weather clouds")
+	assert_gt(winter.cloud_cover, 0.65, "winter is overcast")
+	assert_gt(spring.cloud_color.get_luminance(), winter.cloud_color.get_luminance(), "Spring clouds are brighter")
+	assert_lt(spring.cloud_color.get_luminance(), 0.99, "but not pure white glare")
+	assert_eq(GradeDirector.load_preset(&"bogge").cloud_cover, 0.0)
+
+
+func test_director_drives_the_painted_sky() -> void:
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://world/shared/grades/painted_sky.gdshader")
+	var sky := Sky.new()
+	sky.sky_material = mat
+	var env := Environment.new()
+	env.sky = sky
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child_autofree(we)
+	director.environment = we
+	var manor := GradeDirector.load_preset(&"manor")
+	director.apply(manor)
+	assert_almost_eq(float(mat.get_shader_parameter(&"cloud_cover")), manor.cloud_cover, 0.0001)
+	assert_eq(mat.get_shader_parameter(&"ground_bottom_color"), manor.ground_bottom)
+	assert_eq(mat.get_shader_parameter(&"cloud_shade"), manor.cloud_shade)
+
