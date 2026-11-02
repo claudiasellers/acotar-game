@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"naga"
+canon = "Serpent-faced fae with scales [C ch14-15]: 'the creature smiled, a row of razor-sharp teeth', the jaw dropping away from them, a silvery forked tongue [C ch15]. Our reading [X]: the tongue tastes the air while it lurks, the eyes flare as it strikes."
+masked = false
+rest = &"lurk"
+blink_min = 0.0
+blink_max = 0.0
+presets = {
+"flee": { "eyes_wide": 0.6 },
+"hiss": { "threat": 0.5, "tongue": 0.8 },
+"lurk": {  },
+"reel": { "eyes_wide": 1.0, "threat": 0.25 },
+"smile": { "eyes_wide": 0.3, "threat": 0.7 },
+"strike": { "eyes_wide": 1.0, "threat": 1.0, "tongue": 0.3 },
+"taste": { "tongue": 1.0 }
+}
+aliases = {
+"neutral": "lurk",
+"happy": "smile",
+"laugh": "smile",
+"smirk": "smile",
+"tender": "smile",
+"angry": "hiss",
+"fury": "strike",
+"contempt": "smile",
+"disgust": "hiss",
+"sad": "lurk",
+"grief": "lurk",
+"afraid": "flee",
+"terror": "flee",
+"surprise": "reel",
+"pained": "reel",
+"weary": "lurk",
+"guarded": "lurk",
+"pleading": "lurk"
+}
+tics = [{ "hold": 0.3, "max": 6.0, "min": 2.5, "preset": "taste", "weight": 1.0 }]
+creature = true
+states = {
+"charge": "smile",
+"dead": "reel",
+"dying": "reel",
+"flee": "flee",
+"lurk": "lurk",
+"recover": "hiss",
+"stagger": "reel",
+"strike": "strike"
+}
+cues = {
+"attack": { "preset": "smile", "seconds": 1.0 },
+"stagger": { "preset": "reel", "seconds": 1.0 }
+}

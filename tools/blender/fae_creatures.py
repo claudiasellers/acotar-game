@@ -32,6 +32,42 @@ def decimated(obj, ratio):
     return obj
 
 
+def face_keys(obj, builders):
+    """Threat-display shape keys (lane L36, docs/contracts/faces.md): builders is [(name, fn)], fn(P, mat)
+    -> (n, 3) deltas, where P are vertex positions and mat each vertex's material name."""
+    import numpy as np
+    me = obj.data
+    P = np.array([v.co[:] for v in me.vertices])
+    names = [m.name for m in me.materials]
+    mat = [""] * len(P)
+    for poly in me.polygons:
+        for vi in poly.vertices:
+            mat[vi] = names[poly.material_index]
+    mat = np.array(mat)
+    obj.shape_key_add(name="Basis", from_mix=False)
+    for name, fn in builders:
+        sk = obj.shape_key_add(name=name, from_mix=False)
+        sk.data.foreach_set("co", (P + fn(P, mat)).ravel())
+        sk.value = 0.0
+    return obj
+
+
+def _np():
+    import numpy as np
+    return np
+
+
+def _scale_islands(P, sel, centers, k):
+    """Scale the selected vertices about the nearest of `centers` (eyes) by k."""
+    np = _np()
+    d = np.zeros_like(P)
+    C = np.array([tuple(c) for c in centers])
+    idx = np.where(sel)[0]
+    near = np.argmin(((P[idx, None, :] - C[None, :, :]) ** 2).sum(-1), axis=1)
+    d[idx] = (P[idx] - C[near]) * (k - 1.0)
+    return d
+
+
 def humanoid(p):
     """A skin-modifier figure from proportions. y forward, z up. Returns (obj, graph)."""
     g = base.Graph()
@@ -116,7 +152,27 @@ def suriel():
     for i in range(6):
         t = i / 5.0
         parts.append(base.sphere(f"Spine{i}", (0, -0.02 + 0.35 * t, 1.45 + 0.55 * t), 0.035, skin, 6))
-    base.export("suriel", [base.join(parts, "suriel")])
+    obj = base.join(parts, "suriel")
+    m = head + Vector((0, 0.13, -0.07))
+    eyes_c = [head + Vector((side * 0.035, 0.12, 0.02)) for side in (-1, 1)]
+
+    def grin(P, mat):
+        # it "smiles" with that lipless mouth, the grey teeth horrifically large (ch14): the mouth
+        # widens and everything below its middle stretches down, teeth and gums with it
+        np = _np()
+        reg = ((np.abs(P[:, 0]) < 0.07) & (P[:, 1] > head.y + 0.08) & (P[:, 2] > head.z - 0.14)
+               & (P[:, 2] < head.z - 0.025) & (mat != "Robe") & (mat != "Eyes"))
+        d = np.zeros_like(P)
+        below = np.clip(m.z + 0.01 - P[:, 2], 0.0, None)
+        d[:, 2] = -0.65 * below * reg
+        d[:, 0] = 0.35 * P[:, 0] * reg
+        return d
+
+    def eyes_wide(P, mat):
+        return _scale_islands(P, mat == "Eyes", eyes_c, 1.4)
+
+    face_keys(obj, [("threat", grin), ("eyes_wide", eyes_wide)])
+    base.export("suriel", [obj])
 
 
 def naga():
@@ -153,7 +209,40 @@ def naga():
     for i in range(7):
         t = i / 6.0
         parts.append(base.cone(f"Scute{i}", (0, 0.08 - 0.25 * t, 1.75 - 0.6 * t), (0, 0.02 - 0.25 * t, 1.83 - 0.6 * t), 0.03, scales, 4))
-    base.export("naga", [base.join(parts, "naga")])
+    obj = base.join(parts, "naga")
+    eyes_c = [head + Vector((side * 0.065, 0.07, 0.03)) for side in (-1, 1)]
+    root_y = snout.y + 0.06
+
+    def smile(P, mat):
+        # "The creature smiled, a row of razor-sharp teeth" (ch14-15): the lower jaw drops away from
+        # the teeth, which lengthen; the mouth's corners draw back
+        np = _np()
+        near = np.linalg.norm(P - np.array(tuple(snout)), axis=1) < 0.16
+        jaw = near & (P[:, 2] < snout.z - 0.035) & (mat != "Teeth") & (mat != "Tongue") & (mat != "Eyes")
+        d = np.zeros_like(P)
+        hinge = np.clip((P[:, 1] - (snout.y - 0.12)) / 0.12, 0.3, 1.0)   # swings from the back of the jaw
+        d[:, 2] -= 0.085 * hinge * jaw
+        d[:, 1] -= 0.015 * jaw
+        teeth = mat == "Teeth"
+        d[:, 2] -= 0.5 * np.clip(snout.z - 0.03 - P[:, 2], 0.0, None) * teeth
+        d[:, 0] += 0.25 * P[:, 0] * (near & (P[:, 2] < snout.z) & (mat != "Teeth"))
+        return d
+
+    def tongue_out(P, mat):
+        # the silvery forked tongue darts out
+        np = _np()
+        t = (mat == "Tongue").astype(float)
+        along = np.clip((P[:, 1] - root_y) / 0.10, 0.0, 1.0)
+        d = np.zeros_like(P)
+        d[:, 1] = (0.03 + 0.11 * along) * t
+        d[:, 2] = -0.02 * along * t
+        return d
+
+    def eyes_wide(P, mat):
+        return _scale_islands(P, mat == "Eyes", eyes_c, 1.3)
+
+    face_keys(obj, [("threat", smile), ("tongue", tongue_out), ("eyes_wide", eyes_wide)])
+    base.export("naga", [obj])
 
 
 def attor():
@@ -198,7 +287,54 @@ def attor():
         parts.append(w)
         for i in (1, 5):
             parts.append(base.cone(f"Finger{side}{i}", root, verts[i], 0.012, hide, 4))
-    base.export("attor", [decimated(base.join(parts, "attor"), 0.85)])
+    # The lower jaw, built shut and small inside the snout (unseen at rest): the roar swings it down off
+    # the silver fangs, a dark maw lined with row after row of fangs.
+    jaw_m = base.material("Jaw", (0.30, 0.31, 0.32), 0.3)
+    maw_m = base.material("Maw", (0.22, 0.04, 0.06), 0.5)
+    maw_f = base.material("MawFangs", (0.85, 0.87, 0.9), 0.1)
+    hinge = Vector((0, head.y + 0.02, snout.z - 0.018))
+    tip = Vector((0, snout.y - 0.015, hinge.z))
+    parts.append(base.cone("Jaw", hinge, tip, 0.02, jaw_m, 8))
+    parts.append(base.cone("Maw", hinge + Vector((0, 0, 0.012)), tip + Vector((0, -0.01, 0.007)), 0.014, maw_m, 8))
+    for i in range(5):
+        t = 0.3 + 0.15 * i
+        at = hinge.lerp(tip, t)
+        for xo, ln in ((0.014, 0.02), (0.006, 0.014)):
+            for side in (-1, 1):
+                fb = at + Vector((side * xo * (1.0 - 0.4 * t), 0, 0.012))
+                parts.append(base.cone(f"MawFang{i}{side}{xo}", fb, fb + Vector((0, 0.004, ln)), 0.004, maw_f, 4))
+    obj = decimated(base.join(parts, "attor"), 0.85)
+    ears = [head + Vector((side * 0.06, -0.02, 0.06)) for side in (-1, 1)]
+
+    def roar(P, mat):
+        # "snout open in a roar, revealing row after row of fangs" (her painting, ch20 [C?]): the lower
+        # snout swings down off the silver fangs
+        np = _np()
+        near = np.linalg.norm(P - np.array(tuple(snout)), axis=1) < 0.13
+        chin = near & (P[:, 2] < snout.z - 0.02) & (mat == "Hide")
+        d = np.zeros_like(P)
+        d[:, 2] -= 0.015 * chin            # the throat gives a little; the jaw itself swings
+        jaw = (mat == "Jaw") | (mat == "Maw") | (mat == "MawFangs")
+        a = math.radians(45.0)
+        rel = (P[jaw] - np.array(tuple(hinge))) * 1.75   # it unfolds far bigger than the snout could hide
+        y = rel[:, 1] * math.cos(a) + rel[:, 2] * math.sin(a)
+        z = -rel[:, 1] * math.sin(a) + rel[:, 2] * math.cos(a)
+        d[jaw, 1] = y - rel[:, 1]
+        d[jaw, 2] = z - rel[:, 2]
+        return d
+
+    def ears_back(P, mat):
+        np = _np()
+        d = np.zeros_like(P)
+        for e in ears:
+            near = (np.linalg.norm(P - np.array(tuple(e)), axis=1) < 0.25) & (P[:, 2] > e.z - 0.01) & (mat == "Hide")
+            up = np.clip(P[:, 2] - e.z, 0.0, None)
+            d[:, 1] -= 0.8 * up * near
+            d[:, 2] -= 0.35 * up * near
+        return d
+
+    face_keys(obj, [("threat", roar), ("ears_back", ears_back)])
+    base.export("attor", [obj])
 
 
 def white_horse():
