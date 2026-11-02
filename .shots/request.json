@@ -1,0 +1,7 @@
+{"id":"L35-10","scene":"world","grade":"manor","time_of_day":0.5,"quality":"full","size":[1920,1080],
+"shots":[
+ {"name":"drive_noon","eye":[0,1.7,75],"at":[0,12,-40],"fov":62},
+ {"name":"drive_border_close","eye":[-2.5,2.2,66],"at":[-9,2.0,44],"fov":58},
+ {"name":"drive_roses_arms_length","eye":[-4.6,2.1,58],"at":[-7.5,1.2,55.5],"fov":55},
+ {"name":"rose_garden_from_terrace","eye":[0,16,-86],"at":[0,8,-160],"fov":65}
+],"checks":[]}
