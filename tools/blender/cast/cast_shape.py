@@ -148,6 +148,8 @@ def build_grid(m, p, h=0.0025):
         for s in (1, -1):
             U(sdf.ellipsoid((0.026 * s * fw, -0.052 + 0.5 * cy, 1.452 - cd * 0.4), (0.024, 0.022, 0.028 * lf ** 0.5)),
               0.020 * lf)
+            if lf > 1.0:   # the fold from the nostril wing to the mouth corner, filled
+                U(sdf.ellipsoid((0.016 * s, -0.070 + 0.5 * p["mouth_dy"], 1.4605), (0.008, 0.008, 0.013)), 0.010 * (lf - 1.0) + 0.004)
     if p["bridge_fill"] > 0:
         bfl = p["bridge_fill"]
         U(sdf.ellipsoid((0, -0.0755, m.EYE_Z - 0.002), (0.0075, 0.010, 0.013)), 0.008 * bfl)
