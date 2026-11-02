@@ -57,6 +57,25 @@ func _physics_process(delta: float) -> void:
 	_grab.call_deferred()
 
 
+## Before she paints: the nook from where she stands, a frame at each part
+## (the easel under the arbor, the paint table, the canvases, the roses).
+const NOOK_LOOKS: Array[Vector3] = [Vector3(0, 1.3, 0), Vector3(-1.45, 0.8, -1.2), Vector3(0, 2.4, 1.1),
+	Vector3(1.55, 0.7, -0.6), Vector3(0.75, 1.0, 2.3), Vector3(0, 1.1, 0)]
+
+
+func _look_around_nook() -> void:
+	if not _filming():
+		return
+	await _grab()
+	for local in NOOK_LOOKS:
+		var at := easel.global_transform * local
+		for i in 50:
+			_turn_camera_to(at)
+			await get_tree().physics_frame
+			if i % 25 == 24:
+				await _grab()
+
+
 ## Seconds between frames outside the studio; 0 = none.
 func _every() -> float:
 	match String(_beat.id):

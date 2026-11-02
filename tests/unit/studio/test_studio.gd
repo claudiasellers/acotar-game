@@ -195,3 +195,24 @@ func test_studio_ui_opens_paints_and_closes() -> void:
 	assert_false(get_tree().paused)
 	assert_not_null(easel.get_node_or_null(StudioRoom.VIEW_NAME))
 	StudioCanvas.clear_wip("UiEasel")
+
+
+func test_easel_nook_dresses_once_with_light_petals_and_chime() -> void:
+	var easel := Node3D.new()
+	add_child_autofree(easel)
+	var nook := StudioNook.dress(easel)
+	assert_eq(StudioNook.dress(easel), nook, "dressed once")
+	for id in [&"arch_trellis", &"rug_round", &"paint_table", &"canvas_stack", &"potted_roses"]:
+		assert_not_null(nook.get_node_or_null(String(id)), "has %s" % id)
+	assert_not_null(nook.get_node_or_null("DropCloth"))
+	assert_true(nook.get_node("NookLight") is OmniLight3D)
+	assert_gt((nook.get_node("Petals") as CPUParticles3D).amount, 0)
+	var chime := StudioNook.chime_stream()
+	assert_eq(chime.loop_mode, AudioStreamWAV.LOOP_FORWARD)
+	assert_gt(chime.data.size(), 22050 * 2 * 10, "a long, slow loop")
+	# Her standing spot stays clear of anything she'd bump into.
+	for c in nook.get_children():
+		if c is StaticBody3D:
+			var d := Vector2((c as Node3D).position.x, (c as Node3D).position.z).distance_to(
+				Vector2(StudioNook.STAND.x, StudioNook.STAND.z))
+			assert_gt(d, 1.2, "%s clear of where she stands (%.2f m)" % [c.name, d])

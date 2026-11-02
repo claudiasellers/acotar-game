@@ -392,6 +392,8 @@ static func _build_station(house: Node3D, def: ManorStationDef) -> void:
 	house.add_child(station)
 	if def.prop_id != &"":
 		station.add_child(PropLib.build(def.prop_id))
+	if def.station_id == &"easel":
+		StudioNook.dress(station)  # L30: her painting nook around the easel
 
 
 static func _build_secret(house: Node3D, def: ManorSecretDef) -> void:

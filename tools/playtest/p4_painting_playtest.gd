@@ -95,6 +95,9 @@ func _play() -> void:
 	for i in 45:
 		_turn_camera_to(easel.global_position + Vector3.UP)
 		await get_tree().physics_frame
+	if easel.get_node_or_null(StudioNook.NAME) == null:
+		return _fail("the easel has no painting nook around it")
+	await _look_around_nook()
 	await _press(&"interact")
 	if not await _until_wall(func() -> bool: return StudioUi.is_open(), 3.0):
 		return _fail("E didn't open the studio (%.1f m from the easel, on floor %s, reach %.1f, control %s)" % [
@@ -173,6 +176,11 @@ func _play() -> void:
 	if not await _until(func() -> bool: return played[0], 20.0):
 		return _fail("the gallery moment never finished (at %s, %.1f m from the anchor)" % [_v(feyre.global_position), _flat(inside.global_position)])
 	_pass()
+
+
+## The clip looks around the painting nook here; the playtest doesn't.
+func _look_around_nook() -> void:
+	pass
 
 
 ## A small spring landscape: a periwinkle-to-blush sky in washes, spring-green
