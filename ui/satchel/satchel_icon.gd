@@ -1,6 +1,7 @@
-## An item's picture: the painted icon from the UI look lane when it exists
-## (res://ui/theme/icons/items/<id>.png, <id>_128.png for small sizes), else
-## the collection book's drawn shape.
+## An item's picture: the icon rendered from its real model
+## (tools/ui/render_item_icons.gd -> res://ui/theme/icons/items/<id>.webp), or
+## a painted one from the UI look lane (<id>.png, <id>_128.png for small
+## sizes), else the collection book's drawn shape.
 class_name SatchelIcon
 extends RefCounted
 
@@ -9,7 +10,10 @@ const DISH_ID := "dish"
 
 
 static func path_for(id: StringName, px: float) -> String:
-	var key := DISH_ID if SatchelEntries.is_dish(id) else String(id)
+	var key := DISH_ID if SatchelEntries.is_dish(id) else String(ItemCatalog.canonical(id))
+	var rendered := DIR + key + ".webp"
+	if ResourceLoader.exists(rendered):
+		return rendered
 	var small := DIR + key + "_128.png"
 	var big := DIR + key + ".png"
 	if px <= 128.0 and ResourceLoader.exists(small):
