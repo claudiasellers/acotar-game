@@ -769,17 +769,17 @@ def icicle_cluster(b):
 # ================================================================ rocks/wood
 @asset(1300)  # smooth rounded rock (quality audit B1)
 def rock_boulder_a(b):
-    b.rock(V((0, 0, 0)), (1.0, 0.8, 0.7), 2, "rock", 0.38, snow=0.5)
+    b.rock(V((0, 0, 0)), (1.0, 0.8, 0.7), 2, "rock", 0.38, snow=0.4)
 
 
 @asset(1300)  # smooth rounded rock (quality audit B1)
 def rock_boulder_b(b):
-    b.rock(V((0, 0, 0)), (1.6, 1.1, 1.1), 2, "rock_warm", 0.32, snow=0.55, facet=1.6)
+    b.rock(V((0, 0, 0)), (1.6, 1.1, 1.1), 2, "rock_warm", 0.32, snow=0.4, facet=1.6)
 
 
 @asset(1700)  # smooth rounded rock (quality audit B1)
 def rock_boulder_c(b):
-    b.rock(V((0, 0, 0)), (0.7, 0.6, 1.1), 2, "rock_dark", 0.4, snow=0.55, facet=2.8)
+    b.rock(V((0, 0, 0)), (0.7, 0.6, 1.1), 2, "rock_dark", 0.4, snow=0.42, facet=2.8)
     b.rock(V((0.7, 0.3, 0)), (0.3, 0.3, 0.25), 1, "rock_dark", snow=0.5)
 
 
