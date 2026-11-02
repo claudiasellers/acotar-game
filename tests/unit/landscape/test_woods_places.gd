@@ -74,3 +74,43 @@ func test_the_region_build_gives_each_place_its_light_fx_and_sound() -> void:
 	if snare != null:
 		assert_not_null(snare.get_node_or_null("Sound"), "running water at the snare")
 		assert_null(snare.get_node_or_null("Glow"), "no lamp at the snare: it stays tense")
+
+
+## L32-3's deadlock class: from a cold cache, what the region warms on the
+## main thread covers everything its worker and its node jobs then load.
+func test_prewarm_covers_everything_the_woods_worker_loads() -> void:
+	for r in REGIONS:
+		var def := _def(r)
+		CourtAssets._lock.lock()
+		CourtAssets._meshes.clear()
+		CourtAssets._scenes.clear()
+		CourtAssets._resources.clear()
+		CourtAssets._lock.unlock()
+		var places := WoodsRegion.prewarm_places(def)
+		assert_gt(places.size(), 0, "%s has named places" % r)
+		CourtAssets._lock.lock()
+		var meshes := CourtAssets._meshes.size()
+		var scenes := CourtAssets._scenes.size()
+		var resources := CourtAssets._resources.size()
+		CourtAssets._lock.unlock()
+		WoodsRegion.place_layers(def, places)
+		var holder := Node3D.new()
+		add_child_autofree(holder)
+		PlaceComposer.build_nodes(holder, places)
+		assert_eq(CourtAssets._meshes.size(), meshes, "%s: a mesh prewarm missed" % r)
+		assert_eq(CourtAssets._scenes.size(), scenes, "%s: a scene prewarm missed" % r)
+		assert_eq(CourtAssets._resources.size(), resources, "%s: a resource prewarm missed" % r)
+
+
+## The threaded path finishes (polled with a deadline, so a regression fails
+## here rather than hanging the suite).
+func test_threaded_woods_region_with_places_builds_in_time() -> void:
+	var region := (load("res://world/spring_court/suriel_glade/suriel_glade.tscn") as PackedScene).instantiate() as WoodsRegion
+	region.build_ground_cover = false
+	region.build_ambient_life = false
+	add_child_autofree(region)
+	var deadline := Time.get_ticks_msec() + 60_000
+	while not region.is_built and Time.get_ticks_msec() < deadline:
+		await get_tree().process_frame
+	assert_true(region.is_built, "suriel_glade built within 60 s on the threaded path")
+	assert_not_null(region.get_node_or_null("Places/Place_suriel_snare"), "the snare's setting node")
