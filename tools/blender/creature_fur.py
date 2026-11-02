@@ -531,6 +531,8 @@ def ear_plate(name, base, tip, radius, mat, flat=0.4):
         off = q - ax * along
         off.y *= flat
         v.co = base + ax * along + off
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
     return obj
 
 

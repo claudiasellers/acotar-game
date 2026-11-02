@@ -76,7 +76,7 @@ void fragment() {
 	// read as a soft fattened coat instead of shimmering contour rings.
 	float footprint = length(fwidth(rest)) * density;
 	s = mix(s, 0.45, smoothstep(0.6, 1.6, footprint));
-	if (shell > 0.0 && (zone.g < 0.04 || s < shell * 0.95 + 0.05)) {
+	if (shell > 0.0 && (zone.g < 0.2 || s < shell * 0.95 + 0.05)) {
 		discard;
 	}
 	// Coat: base, ivory underparts, obsidian saddle and mask, then the
