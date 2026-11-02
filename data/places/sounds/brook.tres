@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SoundCue" format=3]
+
+[ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="1_mwveu"]
+[ext_resource type="AudioStream" path="res://audio/amb/places/brook.ogg" id="2_qp4gu"]
+
+[resource]
+script = ExtResource("1_mwveu")
+id = &"place_brook"
+streams = Array[AudioStream]([ExtResource("2_qp4gu")])
+volume_db = -8.0
+loop = true
+max_distance = 38.0

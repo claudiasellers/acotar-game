@@ -222,6 +222,7 @@ func _finish() -> void:
 	decor_field = _field("Decor", small, SMALL_CHUNK)
 	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
 	_build_landmarks()
+	_build_places()
 	_build_magnets()
 	_build_anchors()
 	_build_water()
@@ -271,6 +272,23 @@ func _build_landmarks() -> void:
 			piece.position = Vector3(offset.x, ground - y, offset.y)
 			piece.rotation.y = atan2(-offset.x, -offset.y) if n > 4 and offset != Vector2.ZERO else 0.0
 			node.add_child(piece)
+
+
+## Each landmark's own setting (lane L32): its light, particles and
+## positional sound. The planted collar and props are scatter (decor_layers).
+func _build_places() -> void:
+	var holder := Node3D.new()
+	holder.name = "Places"
+	add_child(holder)
+	var mine: Array[PlaceSetting] = []
+	var t := PlaceComposer.table()
+	if t == null:
+		return
+	for lm in content.landmarks:
+		var s := t.find(lm.id)
+		if s != null:
+			mine.append(s)
+	PlaceComposer.build_nodes(holder, mine)
 
 
 ## Story anchors: StoryDirector hangs each book scene's MomentSpace here.
@@ -504,8 +522,11 @@ func _build_fx() -> void:
 	holder.name = "Ambient"
 	add_child(holder)
 	var spots: Array[Vector2] = []
+	# Landmarks with a PlaceSetting carry their own particles (_build_places).
+	var dressed := PlaceComposer.table()
 	for lm in content.landmarks:
-		spots.append(lm.position)
+		if dressed == null or dressed.find(lm.id) == null:
+			spots.append(lm.position)
 	for h in content.habitats:
 		if h.shape == CourtHabitat.Shape.CIRCLE or h.shape == CourtHabitat.Shape.RING:
 			if content.owns(h.center):

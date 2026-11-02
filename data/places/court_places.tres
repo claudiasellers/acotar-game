@@ -1,0 +1,626 @@
+[gd_resource type="Resource" script_class="PlaceTable" format=3]
+
+[ext_resource type="Script" path="res://world/shared/places/place_table.gd" id="1_3pyrv"]
+[ext_resource type="Script" path="res://world/shared/places/place_setting.gd" id="2_4ntit"]
+
+[sub_resource type="Resource" id="Resource_5qmn4"]
+script = ExtResource("2_4ntit")
+id = &"sealed_pass"
+theme = &"autumn"
+center = Vector2(-1650, -1620)
+approach_deg = 125.41705502907637
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_fern_b", "autumn_fallen_log")
+frame_mesh = &"autumn_border_marker"
+props = PackedStringArray()
+light_color = Color(1, 0.72, 0.42, 1)
+light_energy = 1.0
+fx_id = &"autumn_leaves"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_p18i6"]
+script = ExtResource("2_4ntit")
+id = &"ember_crown"
+theme = &"autumn"
+center = Vector2(-1200, -1450)
+radius = 13.32
+approach_deg = 180.0
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_fern_b")
+props = PackedStringArray()
+light_color = Color(1, 0.72, 0.42, 1)
+light_energy = 1.4
+fx_id = &"autumn_leaves"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_fyfw3"]
+script = ExtResource("2_4ntit")
+id = &"thornwater_spring"
+theme = &"water"
+center = Vector2(-1690, -1545)
+radius = 14.5
+approach_deg = 116.56505117707799
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+frame_mesh = &"rock_mossy_a"
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_pp7mv"]
+script = ExtResource("2_4ntit")
+id = &"border_markers"
+theme = &"autumn"
+center = Vector2(-1000, -1280)
+radius = 16.300000190734863
+approach_deg = 187.03794096717408
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_fern_b", "autumn_fallen_log")
+props = PackedStringArray()
+light_color = Color(1, 0.72, 0.42, 1)
+light_energy = 1.0
+fx_id = &"autumn_leaves"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_nn8l3"]
+script = ExtResource("2_4ntit")
+id = &"hollow_steading"
+theme = &"dread"
+center = Vector2(300, -1600)
+radius = 18.9
+approach_deg = 147.99461461992064
+collar_meshes = PackedStringArray("flora_blighted_thicket", "blight_bone_rock")
+frame_mesh = &"blight_dead_stump"
+props = PackedStringArray()
+light_color = Color(0.55, 0.66, 0.5, 1)
+light_energy = 0.45
+fx_id = &"blight_ash"
+sound_cue = "res://data/places/sounds/blight_drone.tres"
+
+[sub_resource type="Resource" id="Resource_hfngn"]
+script = ExtResource("2_4ntit")
+id = &"dead_sentinel"
+theme = &"dread"
+center = Vector2(900, -1600)
+radius = 13.32
+approach_deg = 221.1859270933
+collar_meshes = PackedStringArray("flora_blighted_thicket", "blight_bone_rock")
+frame_mesh = &"blight_dead_stump"
+props = PackedStringArray("blight_mask_pile")
+light_color = Color(0.55, 0.66, 0.5, 1)
+light_energy = 0.45
+fx_id = &"blight_ash"
+sound_cue = "res://data/places/sounds/blight_drone.tres"
+
+[sub_resource type="Resource" id="Resource_sjywg"]
+script = ExtResource("2_4ntit")
+id = &"grey_briar_wall"
+theme = &"dread"
+center = Vector2(-200, -1550)
+radius = 16.300000190734863
+approach_deg = 115.01689296231648
+collar_meshes = PackedStringArray("flora_blighted_thicket", "blight_bone_rock")
+props = PackedStringArray()
+light_color = Color(0.55, 0.66, 0.5, 1)
+light_energy = 0.45
+fx_id = &"blight_ash"
+sound_cue = "res://data/places/sounds/blight_drone.tres"
+
+[sub_resource type="Resource" id="Resource_8rw7r"]
+script = ExtResource("2_4ntit")
+id = &"blight_heart"
+theme = &"dread"
+center = Vector2(1500, -1600)
+radius = 16.300000190734863
+approach_deg = 247.16634491097216
+collar_meshes = PackedStringArray("flora_blighted_thicket", "blight_bone_rock")
+frame_mesh = &"blight_dead_stump"
+props = PackedStringArray("blight_mask_pile", "blight_mask_pile")
+light_color = Color(0.55, 0.66, 0.5, 1)
+light_energy = 0.35
+fx_id = &"blight_ash"
+sound_cue = "res://data/places/sounds/blight_drone.tres"
+
+[sub_resource type="Resource" id="Resource_030ts"]
+script = ExtResource("2_4ntit")
+id = &"blossom_cathedral"
+theme = &"sacred"
+center = Vector2(900, 750)
+radius = 19.9
+approach_deg = 224.36274772412187
+collar_meshes = PackedStringArray("flora_carpet_pearl", "flora_carpet_blush", "flora_carpet_rose")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_bench")
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"cherry_petals"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_ljkcy"]
+script = ExtResource("2_4ntit")
+id = &"cider_mill"
+theme = &"hearth"
+center = Vector2(1050, 1060)
+radius = 14.5
+approach_deg = 335.5560447956306
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_bush_boxwood", "flora_carpet_rose")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_bench", "fae_flower_cart")
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 1.6
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/mill.tres"
+
+[sub_resource type="Resource" id="Resource_dorc6"]
+script = ExtResource("2_4ntit")
+id = &"bee_tower"
+center = Vector2(1250, 900)
+radius = 10.0
+approach_deg = 258.69006769341854
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_bush_hydrangea", "flora_carpet_lilac")
+props = PackedStringArray()
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"butterflies"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_eo6qi"]
+script = ExtResource("2_4ntit")
+id = &"vale_weir"
+theme = &"water"
+center = Vector2(1350, 1150)
+radius = 14.5
+approach_deg = 299.7448804497615
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_dalhg"]
+script = ExtResource("2_4ntit")
+id = &"great_lantern_tree"
+theme = &"sacred"
+center = Vector2(-990, -905)
+radius = 17.300000190734863
+approach_deg = 218.89195774786666
+collar_meshes = PackedStringArray("flora_carpet_pearl", "flora_toadstool_ring", "flora_carpet_lilac")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_bench", "fae_bench")
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.8
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_tohgc"]
+script = ExtResource("2_4ntit")
+id = &"lantern_bridge"
+theme = &"water"
+center = Vector2(-1052, -855)
+radius = 16.300000190734863
+approach_deg = 38.89213268462878
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+props = PackedStringArray()
+light_color = Color(1, 0.82, 0.62, 1)
+light_energy = 1.4
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_hks2t"]
+script = ExtResource("2_4ntit")
+id = &"village_mill"
+theme = &"hearth"
+center = Vector2(-1150, -950)
+radius = 11.0
+approach_deg = 126.86989832886292
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_bush_boxwood", "flora_carpet_rose")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray()
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 1.6
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/mill.tres"
+
+[sub_resource type="Resource" id="Resource_atyl3"]
+script = ExtResource("2_4ntit")
+id = &"seamstress"
+theme = &"station"
+center = Vector2(-960, -960)
+radius = 9.5
+approach_deg = 218.89198227303618
+collar_meshes = PackedStringArray("flora_carpet_lilac", "flora_bush_boxwood", "flora_carpet_rose")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_bench")
+light_color = Color(1, 0.8, 0.6, 1)
+light_energy = 1.8
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/village.tres"
+
+[sub_resource type="Resource" id="Resource_b1kga"]
+script = ExtResource("2_4ntit")
+id = &"potion_house"
+theme = &"station"
+center = Vector2(-1060, -980)
+radius = 10.0
+approach_deg = 174.5596681106491
+collar_meshes = PackedStringArray("flora_fern_a", "flora_carpet_periwinkle", "flora_toadstool_ring")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_well")
+light_color = Color(0.78, 1, 0.86, 1)
+light_energy = 1.8
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/bubbles.tres"
+
+[sub_resource type="Resource" id="Resource_2ldax"]
+script = ExtResource("2_4ntit")
+id = &"market"
+theme = &"station"
+center = Vector2(-940, -880)
+radius = 21.5
+approach_deg = 218.8919358807711
+collar_meshes = PackedStringArray("flora_carpet_rose", "flora_bush_boxwood", "flora_carpet_butter")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray("fae_bunting", "fae_bench")
+light_color = Color(1, 0.8, 0.6, 1)
+light_energy = 1.8
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/village.tres"
+
+[sub_resource type="Resource" id="Resource_hk3dm"]
+script = ExtResource("2_4ntit")
+id = &"cottages"
+theme = &"hearth"
+center = Vector2(-1000, -820)
+radius = 26.7
+approach_deg = 38.89198921947298
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_bush_boxwood", "flora_carpet_rose")
+props = PackedStringArray()
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 1.6
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/village.tres"
+
+[sub_resource type="Resource" id="Resource_i8pji"]
+script = ExtResource("2_4ntit")
+id = &"stone_ring"
+theme = &"sacred"
+center = Vector2(800, -1100)
+radius = 31.5
+approach_deg = 180.0
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_carpet_pearl")
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_cr1w5"]
+script = ExtResource("2_4ntit")
+id = &"cave_of_the_rite"
+theme = &"fire"
+center = Vector2(690, -1000)
+radius = 24.1
+approach_deg = 126.73292217248134
+collar_meshes = PackedStringArray("rock_pebble_cluster", "flora_fern_b")
+props = PackedStringArray()
+light_color = Color(1, 0.6, 0.32, 1)
+light_energy = 1.4
+fx_id = &"bonfire_smoke"
+sound_cue = "res://data/places/sounds/fire.tres"
+
+[sub_resource type="Resource" id="Resource_l2wh2"]
+script = ExtResource("2_4ntit")
+id = &"bonfire_terraces"
+theme = &"fire"
+center = Vector2(620, -1080)
+radius = 21.5
+approach_deg = 126.73282449942367
+collar_meshes = PackedStringArray("flora_heather_mound", "rock_pebble_cluster")
+frame_mesh = &"rite_ribbon_pole"
+props = PackedStringArray()
+light_color = Color(1, 0.6, 0.32, 1)
+light_energy = 2.2
+fx_id = &"bonfire_embers"
+sound_cue = "res://data/places/sounds/fire.tres"
+
+[sub_resource type="Resource" id="Resource_d6upa"]
+script = ExtResource("2_4ntit")
+id = &"drum_field"
+theme = &"fire"
+center = Vector2(560, -860)
+radius = 21.5
+approach_deg = 126.73280742399983
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_carpet_butter")
+frame_mesh = &"rite_ribbon_pole"
+props = PackedStringArray()
+light_color = Color(1, 0.6, 0.32, 1)
+light_energy = 1.4
+fx_id = &"bonfire_embers"
+sound_cue = "res://data/places/sounds/fire.tres"
+
+[sub_resource type="Resource" id="Resource_4j85b"]
+script = ExtResource("2_4ntit")
+id = &"rose_spire"
+center = Vector2(0, -700)
+radius = 16.300000190734863
+approach_deg = 261.8469242174399
+collar_meshes = PackedStringArray("flora_bush_rose", "flora_carpet_rose", "flora_carpet_blush")
+props = PackedStringArray()
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"rose_petals"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_u58v3"]
+script = ExtResource("2_4ntit")
+id = &"briar_gate"
+center = Vector2(-100, -560)
+radius = 16.300000190734863
+approach_deg = 81.84688147590157
+collar_meshes = PackedStringArray("flora_bush_rose", "flora_carpet_blush", "flora_bush_hydrangea")
+frame_mesh = &"flora_bush_boxwood"
+props = PackedStringArray()
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"rose_petals"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_jl5ej"]
+script = ExtResource("2_4ntit")
+id = &"gardeners_folly"
+center = Vector2(-480, -560)
+radius = 16.300000190734863
+approach_deg = 218.89197001045167
+collar_meshes = PackedStringArray("flora_bush_hydrangea", "flora_carpet_lilac", "flora_fern_a")
+frame_mesh = &"shrine_column"
+props = PackedStringArray("fae_bench")
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"butterflies"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_qq4vg"]
+script = ExtResource("2_4ntit")
+id = &"dance_ring"
+theme = &"sacred"
+center = Vector2(-150, -1080)
+radius = 15.5
+approach_deg = 180.0
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_carpet_rose", "flora_carpet_lilac")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_wye00"]
+script = ExtResource("2_4ntit")
+id = &"musicians_bower"
+center = Vector2(-100, -1135)
+radius = 9.0
+approach_deg = 219.80556978049108
+collar_meshes = PackedStringArray("flora_bush_rose", "flora_carpet_blush", "flora_bush_hydrangea")
+frame_mesh = &"flora_bush_boxwood"
+props = PackedStringArray("fae_bench")
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"butterflies"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_1d6by"]
+script = ExtResource("2_4ntit")
+id = &"arch_avenue"
+center = Vector2(-240, -1000)
+radius = 21.5
+approach_deg = 81.8468921019572
+collar_meshes = PackedStringArray("flora_bush_rose", "flora_carpet_blush", "flora_bush_hydrangea")
+props = PackedStringArray()
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"rose_petals"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_cloy3"]
+script = ExtResource("2_4ntit")
+id = &"crown_oak"
+theme = &"sacred"
+center = Vector2(100, -1180)
+radius = 13.68
+approach_deg = 247.21759445843767
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_toadstool_ring", "flora_carpet_pearl")
+props = PackedStringArray("fae_bench")
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_2epd0"]
+script = ExtResource("2_4ntit")
+id = &"long_tables"
+theme = &"hearth"
+center = Vector2(-60, -1040)
+radius = 16.300000190734863
+approach_deg = 261.8469505404146
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_bush_boxwood", "flora_carpet_rose")
+frame_mesh = &"fae_lantern_post"
+props = PackedStringArray()
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 1.6
+fx_id = &"lantern_glow_motes"
+sound_cue = "res://data/places/sounds/village.tres"
+
+[sub_resource type="Resource" id="Resource_l7w64"]
+script = ExtResource("2_4ntit")
+id = &"starlight_pool"
+theme = &"water"
+center = Vector2(-1300, 262)
+radius = 18.9
+approach_deg = 49.70205625680866
+collar_meshes = PackedStringArray("flora_carpet_pearl", "flora_fern_a", "flora_carpet_periwinkle")
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.4
+fx_id = &"starlight_sparkles"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_5u0u6"]
+script = ExtResource("2_4ntit")
+id = &"glimmerfall"
+theme = &"water"
+center = Vector2(-1300, 212)
+radius = 14.0
+approach_deg = 57.05676280896679
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_g12ku"]
+script = ExtResource("2_4ntit")
+id = &"looking_lake_isle"
+theme = &"water"
+center = Vector2(-1235, -175)
+radius = 14.5
+approach_deg = 140.57219809706447
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_n7otg"]
+script = ExtResource("2_4ntit")
+id = &"heron_stones"
+theme = &"water"
+center = Vector2(-1105, -40)
+radius = 16.300000190734863
+approach_deg = 148.57043341381546
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_b")
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_0630d"]
+script = ExtResource("2_4ntit")
+id = &"weeping_lady"
+theme = &"water"
+center = Vector2(-1100, 345)
+radius = 10.120000000000001
+approach_deg = 9.619727742629815
+collar_meshes = PackedStringArray("flora_carpet_periwinkle", "flora_fern_a", "flora_carpet_pearl")
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"fireflies"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_ra43o"]
+script = ExtResource("2_4ntit")
+id = &"north_watchtower"
+theme = &"lookout"
+center = Vector2(-1650, -650)
+radius = 14.0
+approach_deg = 156.03751085204664
+collar_meshes = PackedStringArray("flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b")
+frame_mesh = &"fells_cairn"
+props = PackedStringArray()
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.6
+fx_id = &"dandelion_seeds"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_o330h"]
+script = ExtResource("2_4ntit")
+id = &"middle_watchtower"
+theme = &"lookout"
+center = Vector2(-1650, 350)
+radius = 14.0
+approach_deg = 75.96375653207353
+collar_meshes = PackedStringArray("flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b")
+frame_mesh = &"fells_cairn"
+props = PackedStringArray()
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.6
+fx_id = &"dandelion_seeds"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_rdkhq"]
+script = ExtResource("2_4ntit")
+id = &"foot_watchtower"
+theme = &"lookout"
+center = Vector2(-1050, 1250)
+radius = 13.0
+approach_deg = 348.6900676934186
+collar_meshes = PackedStringArray("flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b")
+props = PackedStringArray()
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.6
+fx_id = &"dandelion_seeds"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_2j6q8"]
+script = ExtResource("2_4ntit")
+id = &"summers_window"
+theme = &"lookout"
+center = Vector2(-1775, 900)
+radius = 19.9
+approach_deg = 38.92754308188023
+collar_meshes = PackedStringArray("flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b")
+props = PackedStringArray()
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.9
+fx_id = &"dandelion_seeds"
+sound_cue = "res://data/places/sounds/wind_birds.tres"
+
+[sub_resource type="Resource" id="Resource_gundj"]
+script = ExtResource("2_4ntit")
+id = &"silent_hollow"
+theme = &"shrine"
+center = Vector2(-1250, 1100)
+radius = 14.5
+approach_deg = 56.309933421197016
+collar_meshes = PackedStringArray("flora_fern_b", "flora_carpet_pearl", "rock_mossy_c")
+frame_mesh = &"shrine_column_broken"
+props = PackedStringArray()
+light_color = Color(0.92, 0.9, 1, 1)
+light_energy = 0.6
+fx_id = &"faelights"
+
+[sub_resource type="Resource" id="Resource_nqxrh"]
+script = ExtResource("2_4ntit")
+id = &"rainbow_cascade"
+theme = &"water"
+center = Vector2(-1788, 560)
+radius = 14.0
+approach_deg = 60.049101494266175
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+frame_mesh = &"fells_cairn"
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_p6nly"]
+script = ExtResource("2_4ntit")
+id = &"old_shrines"
+theme = &"shrine"
+center = Vector2(-1640, 120)
+radius = 24.1
+approach_deg = 108.43494936289589
+collar_meshes = PackedStringArray("flora_fern_b", "flora_carpet_pearl", "rock_mossy_c")
+props = PackedStringArray()
+light_color = Color(0.92, 0.9, 1, 1)
+light_energy = 0.9
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/shrine_hum.tres"
+
+[resource]
+script = ExtResource("1_3pyrv")
+settings = Array[ExtResource("2_4ntit")]([SubResource("Resource_5qmn4"), SubResource("Resource_p18i6"), SubResource("Resource_fyfw3"), SubResource("Resource_pp7mv"), SubResource("Resource_nn8l3"), SubResource("Resource_hfngn"), SubResource("Resource_sjywg"), SubResource("Resource_8rw7r"), SubResource("Resource_030ts"), SubResource("Resource_ljkcy"), SubResource("Resource_dorc6"), SubResource("Resource_eo6qi"), SubResource("Resource_dalhg"), SubResource("Resource_tohgc"), SubResource("Resource_hks2t"), SubResource("Resource_atyl3"), SubResource("Resource_b1kga"), SubResource("Resource_2ldax"), SubResource("Resource_hk3dm"), SubResource("Resource_i8pji"), SubResource("Resource_cr1w5"), SubResource("Resource_l2wh2"), SubResource("Resource_d6upa"), SubResource("Resource_4j85b"), SubResource("Resource_u58v3"), SubResource("Resource_jl5ej"), SubResource("Resource_qq4vg"), SubResource("Resource_wye00"), SubResource("Resource_1d6by"), SubResource("Resource_cloy3"), SubResource("Resource_2epd0"), SubResource("Resource_l7w64"), SubResource("Resource_5u0u6"), SubResource("Resource_g12ku"), SubResource("Resource_n7otg"), SubResource("Resource_0630d"), SubResource("Resource_ra43o"), SubResource("Resource_o330h"), SubResource("Resource_rdkhq"), SubResource("Resource_2j6q8"), SubResource("Resource_gundj"), SubResource("Resource_nqxrh"), SubResource("Resource_p6nly")])

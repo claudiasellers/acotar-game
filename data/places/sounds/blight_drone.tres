@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SoundCue" format=3]
+
+[ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="1_yva48"]
+[ext_resource type="AudioStream" path="res://audio/amb/places/blight_drone.ogg" id="2_matt5"]
+
+[resource]
+script = ExtResource("1_yva48")
+id = &"place_blight_drone"
+streams = Array[AudioStream]([ExtResource("2_matt5")])
+volume_db = -6.0
+loop = true
+max_distance = 42.0

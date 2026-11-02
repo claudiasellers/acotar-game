@@ -7,6 +7,7 @@ extends RefCounted
 ## Tree and shrub composition (loaded by path: a new global class isn't
 ## registered until the editor rescans, so no class_name).
 const LandscapeLayout := preload("res://world/spring_court/shared/landscape_layout.gd")
+const GroundComposition := preload("res://world/spring_court/shared/ground_composition.gd")
 const FORAGE_CELL := 25.0
 const DECOR_CELL := 10.0
 const REPORT_CELL := 100.0
@@ -20,6 +21,8 @@ const TREE_DRAW := 260.0
 const TREE_FAR := 600.0
 ## Each forage type appears in at least this many separate clusters per region.
 const MIN_CLUSTERS := 8
+## Trees keep this far beyond a place's forecourt (m).
+const PLACE_TREE_MARGIN := 3.0
 
 
 static func forage_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
@@ -78,6 +81,7 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	var all: Array[ScatterLayer] = []
 	var trees := {}
 	var r := content.bounding_rect()
+	var places := PlaceComposer.in_rect(PlaceComposer.table(), r)
 	for di in content.decor.size():
 		var e := content.decor[di]
 		var layer := ScatterLayer.new()
@@ -94,54 +98,150 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 			trees[di] = layer
 			continue
 		layer.draw_distance = e.draw_distance
-		# Sparse things (rocks, logs) are placed per 100 m² cell with a probability;
-		# dense ones (grass, flowers) as several per cell.
-		var cell := DECOR_CELL if e.density >= 0.2 else 50.0
-		var lambda := e.density * cell * cell / 100.0
-		# Groves and one-colour drifts instead of an even sprinkle (experience
-		# bar 2.4): a low-frequency mask keeps about a third of the ground and
-		# triples the density there, so the total stays the same.
-		var drift := _drift_noise(e, content.seed + di)
-		if drift != null:
-			lambda *= 1.0 / DRIFT_KEEP
-		var cx := 0
-		var x := r.position.x
-		while x < r.end.x:
-			if BuildCancel.requested(content.region_id):
-				return []
-			var cz := 0
-			var z := r.position.y
-			while z < r.end.y:
-				var rng := RandomNumberGenerator.new()
-				rng.seed = hash([content.seed, di, cx, cz])
-				for _k in _poisson(rng, lambda):
-					var p := Vector2(x + rng.randf() * cell, z + rng.randf() * cell)
-					if not content.owns(p):
-						continue
-					if drift != null and drift.get_noise_2d(p.x, p.y) < DRIFT_CUT:
-						continue
-					var hab := content.habitat_at(p)
-					if not _fits(e.habitats, hab, content):
-						continue
-					if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
-						continue
-					if e.cast_shadow and content.in_anchor_clearing(p):
-						continue
-					if e.max_slope < 90.0 and e.cast_shadow and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
-						continue
-					var y := _ground_y(content, hab, p)
-					layer.add(Vector3(p.x, y, p.y), rng.randf() * TAU, rng.randf_range(e.scale_min, e.scale_max))
-				z += cell
-				cz += 1
-			x += cell
-			cx += 1
+	# Big things first (plans/landscape-brief.md): the trees stand, then every
+	# smaller layer reads how far it is from the nearest trunk (GroundComposition).
 	if not trees.is_empty() and not BuildCancel.requested(content.region_id):
-		_tree_layers(content, trees)
+		_tree_layers(content, trees, places)
+	var canopy := GroundComposition.canopy(r, trees.values())
+	for di in content.decor.size():
+		var e := content.decor[di]
+		if e.is_tree:
+			continue
+		if BuildCancel.requested(content.region_id):
+			return []
+		_ground_layer(content, di, all[di], canopy, places)
+	if not BuildCancel.requested(content.region_id):
+		var mesh_for := func(id: StringName) -> Mesh: return CourtAssets.mesh(id)
+		var ground := func(p: Vector2) -> float: return WorldHeight.height_at(p.x, p.y)
+		all.append_array(PlaceComposer.layers(places, content.seed, mesh_for, ground, content.owns))
 	var out: Array[ScatterLayer] = []
 	for layer in all:
 		if layer.count() > 0:
 			out.append(layer)
 	return out
+
+
+## One non-tree decoration entry, placed by its composition role: weighted by
+## distance to the nearest trunk (renormalised so the count holds), outcrops
+## and drifts for clustered roles, flower carpets also gathered by the drift
+## mask, and nothing clutters a place's forecourt (grass is only thinned).
+static func _ground_layer(content: CourtRegionContent, di: int, layer: ScatterLayer, canopy: Dictionary,
+		places: Array[PlaceSetting]) -> void:
+	var e := content.decor[di]
+	var r := content.bounding_rect()
+	var role := GroundComposition.role(e.mesh_id)
+	# Sparse things (rocks, logs) are placed per 100 m² cell with a probability;
+	# dense ones (grass, flowers) as several per cell.
+	var cell := DECOR_CELL if e.density >= 0.2 else 50.0
+	var lambda := e.density * cell * cell / 100.0
+	# Groves and one-colour drifts instead of an even sprinkle (experience
+	# bar 2.4): a low-frequency mask keeps about a third of the ground and
+	# triples the density there, so the total stays the same.
+	var drift := _drift_noise(e, content.seed + di)
+	if drift != null:
+		lambda *= 1.0 / DRIFT_KEEP
+	var fits := func(p: Vector2) -> bool:
+		return content.owns(p) and _fits(e.habitats, content.habitat_at(p), content)
+	var weighted := lambda / GroundComposition.mean_weight(canopy, role, r, fits, content.seed + di)
+	if not GroundComposition.is_clustered(role):
+		_ground_pass(content, di, layer, canopy, places, role, cell, weighted, drift, 0, false)
+		return
+	# Outcrops and drifts come in few, big groups, so their count swings with
+	# the dice: place them, then settle on the plain sprinkle's count (more
+	# groups from further passes, then a seeded trim), within a few percent.
+	var want := _ground_pass(content, di, ScatterLayer.new(), canopy, places, role, cell, lambda, drift, -1, true)
+	var per := weighted / GroundComposition.mean_members(role)
+	var pass_id := 0
+	while layer.count() < want and pass_id < 6:
+		_ground_pass(content, di, layer, canopy, places, role, cell, per, drift, pass_id, false)
+		pass_id += 1
+	if layer.count() > want:
+		_trim(layer, want, hash([content.seed, di, "trim"]))
+
+
+## One placement pass over the region's cells. `pass_id` -1 is the plain
+## sprinkle (no weights, no groups) used as the count to keep; `count_only`
+## counts without adding. Returns the instances placed (or counted).
+static func _ground_pass(content: CourtRegionContent, di: int, layer: ScatterLayer, canopy: Dictionary,
+		places: Array[PlaceSetting], role: StringName, cell: float, lambda: float, drift: FastNoiseLite,
+		pass_id: int, count_only: bool) -> int:
+	var e := content.decor[di]
+	var r := content.bounding_rect()
+	var plain := pass_id < 0
+	var clustered := GroundComposition.is_clustered(role) and not plain
+	var placed := 0
+	var cx := 0
+	var x := r.position.x
+	while x < r.end.x:
+		var cz := 0
+		var z := r.position.y
+		while z < r.end.y:
+			var rng := RandomNumberGenerator.new()
+			rng.seed = hash([content.seed, di, cx, cz]) if pass_id <= 0 else hash([content.seed, di, cx, cz, pass_id])
+			for _k in _poisson(rng, lambda):
+				var p := Vector2(x + rng.randf() * cell, z + rng.randf() * cell)
+				if not plain:
+					var w := GroundComposition.weight(role, GroundComposition.distance(canopy, p.x, p.y))
+					if rng.randf() >= w:
+						continue
+				if drift != null and drift.get_noise_2d(p.x, p.y) < DRIFT_CUT:
+					continue
+				if not clustered:
+					placed += _put_decor(content, e, layer, rng, places, role, p, 1.0, count_only)
+					continue
+				for m: Array in GroundComposition.cluster(role, rng):
+					placed += _put_decor(content, e, layer, rng, places, role, p + (m[0] as Vector2), float(m[1]), count_only)
+			z += cell
+			cz += 1
+		x += cell
+		cx += 1
+	return placed
+
+
+## Drops instances (seeded) until `want` remain.
+static func _trim(layer: ScatterLayer, want: int, seed_value: int) -> void:
+	var n := layer.count()
+	var order: Array[int] = []
+	for i in n:
+		order.append(i)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	for i in range(n - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t := order[i]
+		order[i] = order[j]
+		order[j] = t
+	var keep := order.slice(0, want)
+	keep.sort()
+	var src := layer.instances
+	var out := PackedFloat32Array()
+	out.resize(want * 5)
+	for k in keep.size():
+		for f in 5:
+			out[k * 5 + f] = src[keep[k] * 5 + f]
+	layer.instances = out
+
+
+static func _put_decor(content: CourtRegionContent, e: CourtDecorEntry, layer: ScatterLayer, rng: RandomNumberGenerator,
+		places: Array[PlaceSetting], role: StringName, p: Vector2, size: float, count_only: bool = false) -> int:
+	var yaw := rng.randf() * TAU
+	var s := rng.randf_range(e.scale_min, e.scale_max) * size
+	if not content.owns(p):
+		return 0
+	var hab := content.habitat_at(p)
+	if not _fits(e.habitats, hab, content):
+		return 0
+	if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
+		return 0
+	if e.cast_shadow and content.in_anchor_clearing(p):
+		return 0
+	if e.max_slope < 90.0 and e.cast_shadow and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
+		return 0
+	if PlaceComposer.blocks(places, p) and (role != &"grass" or rng.randf() < 0.5):
+		return 0
+	if not count_only:
+		layer.add(Vector3(p.x, _ground_y(content, hab, p), p.y), yaw, s)
+	return 1
 
 
 ## Trees for every is_tree entry together (plans/landscape-brief.md): planted
@@ -151,9 +251,10 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 ## kept apart, and specimen clumps of odd numbers in the open. Each habitat
 ## keeps its expected count, so budgets stay where they were.
 ## Returns { entry index: ScatterLayer }.
-static func _tree_layers(content: CourtRegionContent, layers: Dictionary) -> void:
+static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places: Array[PlaceSetting] = []) -> void:
 	var r := content.bounding_rect()
 	var layout := LandscapeLayout.make(content.seed, r)
+	layout["places"] = places
 	# habitat -> {table: [[cum, "idx"]], edge: [...], density: per m2}
 	var habs := {}
 	var hab_of := func(tag: StringName) -> Dictionary:
@@ -277,6 +378,9 @@ static func _add_tree(content: CourtRegionContent, layers: Dictionary, layout: D
 	if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
 		return
 	if content.in_anchor_clearing(p):
+		return
+	# Trees stand back from a place's forecourt so it reads as a clearing.
+	if PlaceComposer.blocks(layout.get("places", [] as Array[PlaceSetting]), p, PLACE_TREE_MARGIN):
 		return
 	if e.max_slope < 90.0 and WorldHeight.slope_at(p.x, p.y) > e.max_slope:
 		return
