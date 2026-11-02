@@ -21,6 +21,9 @@ const INTERIOR_SPACE := &"cottage_interior"
 const INTERIOR_ANCHOR := &"act1_cottage_interior"
 ## Same cue within this window plays once (two systems announcing one event).
 const ONCE_WINDOW_MS := 1500
+## Voice files the dialogue lane plays (systems/dialogue): res://audio/voice/<line_id>.ogg.
+const VOICE_PATH := "res://audio/voice/%s.ogg"
+const VOICE_DUCK_DB := -7.0
 
 ## The live director, for SoundDirector.cue() calls from other lanes.
 static var current: SoundDirector = null
@@ -56,6 +59,9 @@ var _suriel: Node3D
 ## Naga in the tree; their creature_id is the actor id (naga, naga_2...).
 var _naga: Array = []
 var _once_ms: Dictionary = {}
+## 0..1 while a voiced line plays: the bed and music step back for it.
+var voice_duck: float = 0.0
+var _voice_tween: Tween
 var _interior: Node3D
 
 
@@ -239,10 +245,11 @@ func _mix() -> void:
 	var calm := 1.0 - dread
 	var wall_keep := 1.0 - 0.9 * wall
 	var paused_db := -6.0 if get_tree().paused else 0.0
+	var voice_db := VOICE_DUCK_DB * voice_duck
 	for p in _beds:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep, paused_db)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep, paused_db + voice_db)
 	for p in _music:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep, 0.0)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep, voice_db * 1.5)
 	_apply(_dread_bed, dread, 0.0)
 
 
@@ -404,6 +411,8 @@ func _on_node_added(node: Node) -> void:
 		puca.darted.connect(func() -> void: play(&"puca_dart", puca.global_position))
 	elif node is DreadField:
 		(node as DreadField).wrong_sound.connect(func(at: Vector3) -> void: play_once(&"horror_wrong", at))
+	elif node.is_in_group(&"dialogue_director") or node.has_signal(&"line_spoken"):
+		_attach_dialogue.call_deferred(node)
 	elif node is WolfPack:
 		var pack := node as WolfPack
 		pack.target_acquired.connect(func(_t: Node3D) -> void: play(&"wolf_pack_growl", pack.global_position))
@@ -500,6 +509,31 @@ func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, 
 		play(&"wolf_death", at)
 	elif kind == &"naga":
 		play(&"naga_death", at)
+
+
+## The dialogue lane plays voice files itself; this only ducks the bed and
+## music under a line that has a file (systems/dialogue line_spoken).
+func _attach_dialogue(node: Node) -> void:
+	if is_instance_valid(node) and node.has_signal(&"line_spoken") \
+			and not node.is_connected(&"line_spoken", _on_line_spoken):
+		node.connect(&"line_spoken", _on_line_spoken)
+
+
+func _on_line_spoken(line_id: StringName, _speaker: StringName, _text: String, _at: Vector3, _inner: bool) -> void:
+	var path := VOICE_PATH % line_id
+	if not ResourceLoader.exists(path):
+		return
+	var stream := load(path) as AudioStream
+	duck_for_voice(stream.get_length() if stream else 2.0)
+
+
+func duck_for_voice(seconds: float) -> void:
+	if _voice_tween:
+		_voice_tween.kill()
+	_voice_tween = create_tween()
+	_voice_tween.tween_property(self, ^"voice_duck", 1.0, 0.25)
+	_voice_tween.tween_interval(maxf(seconds - 0.25, 0.0))
+	_voice_tween.tween_property(self, ^"voice_duck", 0.0, 0.8)
 
 
 ## The Suriel answers each question aloud (ids `fact.suriel_<id>`).

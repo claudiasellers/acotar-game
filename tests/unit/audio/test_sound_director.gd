@@ -200,3 +200,23 @@ func test_every_horror_cue_exists() -> void:
 			&"naga_death", &"tamlin_throat_tear", &"bogge_presence", &"bogge_whisper", &"bogge_passed",
 			&"puca_ripple", &"puca_dart"]:
 		assert_true(bank.has_cue(cue_id), "missing cue %s" % cue_id)
+
+
+class FakeDialogue:
+	extends Node
+	signal line_spoken(line_id: StringName, speaker: StringName, text: String, at: Vector3, inner: bool)
+
+
+func test_voiced_lines_duck_the_bed_and_music() -> void:
+	var d := _director()
+	var talk := FakeDialogue.new()
+	add_child_autofree(talk)
+	await wait_physics_frames(2)
+	assert_true(talk.line_spoken.is_connected(d._on_line_spoken))
+	talk.line_spoken.emit(&"no_such_line", &"lucien", "", Vector3.ZERO, false)
+	assert_eq(d.voice_duck, 0.0, "no file, no duck")
+	d.duck_for_voice(0.3)
+	await wait_seconds(0.3)
+	assert_gt(d.voice_duck, 0.9)
+	await wait_seconds(1.0)
+	assert_almost_eq(d.voice_duck, 0.0, 0.01)
