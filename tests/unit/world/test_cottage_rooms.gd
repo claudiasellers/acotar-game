@@ -89,3 +89,15 @@ func test_the_little_things_from_the_book() -> void:
 	for n in ["FeyresBoots", "NestasBoots"]:
 		var p := _local(n)
 		assert_lt(Vector2(p.x, p.z).distance_to(Vector2(-1.9, -2.7)), 1.2, "%s by the door" % n)
+
+
+## Every cottage glb goes through the shared post-import that turns on its
+## baked vertex colour (an .import without it renders the piece white).
+func test_cottage_glbs_import_their_colour() -> void:
+	for dir in ["res://world/human_realm/cottage/assets/", "res://world/human_realm/cottage/assets/interior/"]:
+		for f in DirAccess.get_files_at(dir):
+			if not f.ends_with(".glb.import"):
+				continue
+			var cfg := ConfigFile.new()
+			assert_eq(cfg.load(dir + f), OK, f)
+			assert_eq(cfg.get_value("params", "import_script/path", ""), "res://world/shared/import/vertex_color_import.gd", f)

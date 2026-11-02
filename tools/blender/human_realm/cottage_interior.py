@@ -409,11 +409,15 @@ BLU = chip((0.22, 0.32, 0.78))
 GRN = chip((0.3, 0.55, 0.24))
 
 
-def flame_curl(x, y, z, s=1.0, ang=0.0, face=(0, 0, 0)):
-    """A tiny curl of flame painted on a face: three tapering licks."""
+def flame_curl(x, y, z, s=1.0, ang=0.0):
+    """A tiny curl of flame painted flat on a face in the x plane (facing -x):
+    three licks, red under orange under yellow, leaning and curling."""
     for k, c in enumerate((RED, chip((0.95, 0.5, 0.14)), YEL)):
-        f = 1.0 - k * 0.28
-        L.cyl(0.018 * s * f, 0.075 * s * f, at=(x, y, z), rot=(face[0], face[1], ang + L.rnd(-14, 14)), r2=0.0, seg=5, col=c, smooth=False)
+        f = 1.0 - k * 0.3
+        lean = ang + L.rnd(-16, 16)
+        L.ball(1.0, at=(x - 0.001 * k, y + 0.03 * s * f, z + 0.006 * k), scale=(0.002, 0.04 * s * f, 0.014 * s * f),
+               rot=(lean, 0, 0), col=c, sub=1, smooth=False)
+    L.ball(1.0, at=(x - 0.003, y + 0.075 * s, z - 0.012 * s), scale=(0.002, 0.012 * s, 0.006 * s), rot=(ang - 40, 0, 0), col=YEL, sub=0, smooth=False)
 
 
 def father_cot():
@@ -538,9 +542,9 @@ def motif_hearth_flames():
     for zc in (-1.0, 1.0):
         for i in range(5):
             y = 0.15 + i * 0.22
-            flame_curl(x, y, zc + 0.07 * math.sin(i * 2.1), 1.0, 0.0, face=(0, 90, 0))
+            flame_curl(x, y, zc + 0.07 * math.sin(i * 2.1), 1.0, 0.0)
     for i in range(9):
-        flame_curl(x - 0.012, 1.3, -0.9 + i * 0.225, 0.8, 0.0, face=(0, 90, 0))  # along the mantel stone
+        flame_curl(x - 0.102, 1.3, -0.9 + i * 0.225, 0.8, 90.0 if i % 2 else -90.0)  # along the mantel stone
     L.export(OUT + "motif_hearth_flames.glb")
 
 
