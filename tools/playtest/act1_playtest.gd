@@ -175,13 +175,16 @@ func _on_node_added(node: Node) -> void:
 	if node is Creature or node.name.begins_with("StandIn_"):
 		_actor_roots[node.get_instance_id()] = node
 	else:
-		_maybe_story_actor.call_deferred(node)
+		_maybe_story_actor.call_deferred(node.get_instance_id())
 
 
 ## Spawners answer story_spawn_requested by joining "story_actor_<id>", which
-## can happen just after the node enters the tree.
-func _maybe_story_actor(node: Node) -> void:
-	if not is_instance_valid(node):
+## can happen just after the node enters the tree. Takes the instance id: a node
+## freed before the deferred call can't be passed as a typed Node at all (Godot
+## logs "Cannot convert argument 1 from Object to Object" for each one).
+func _maybe_story_actor(id: int) -> void:
+	var node := instance_from_id(id) as Node
+	if node == null:
 		return
 	for g: StringName in node.get_groups():
 		if String(g).begins_with("story_actor_"):
@@ -809,9 +812,10 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 			var progress := Vector2(last_pos.x, last_pos.z).distance_to(Vector2(feyre.global_position.x, feyre.global_position.z))
 			if progress < 1.0:
 				var why := _blocker()
+				var pressing := _pressing()
 				await _press(&"jump")
 				var from := feyre.global_position
-				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)))
+				var p := _hop_spot(from, Vector3(to.x, 0, to.z).normalized() * minf(HOP_METRES, _flat(target)), pressing)
 				var hop := p - from
 				hop.y = 0.0
 				feyre.teleport(p)   # the jump just pressed may have started a ledge climb
@@ -863,11 +867,36 @@ func _blocker() -> String:
 	return "nothing pressing, floor %.0f deg" % floor_deg
 
 
-## Where an assist hop may land: ahead if that's open ground, else turned
-## 45/90/135 degrees either way. Never inside a building or prop (a body
-## placed inside a collider is pushed out below the ground) and never under
-## the terrain.
-func _hop_spot(from: Vector3, ahead: Vector3) -> Vector3:
+## The bodies she is pressing against (not the floor), and herself.
+func _pressing() -> Array[RID]:
+	var out: Array[RID] = [feyre.get_rid()]
+	for i in feyre.get_slide_collision_count():
+		var c := feyre.get_slide_collision(i)
+		if c.get_normal().y <= 0.7 and c.get_collider() is CollisionObject3D:
+			out.append((c.get_collider() as CollisionObject3D).get_rid())
+	return out
+
+
+## Where an assist hop may land: open ground about `ahead` away (else turned
+## 45/90/135 degrees either way), never inside a building or prop (a body placed
+## inside a collider is pushed out below the ground) nor under the terrain, and in
+## her own room: in sight from her chest past only the bodies in `pressing` (the
+## door or cot she is stuck on may be hopped; no other wall may, so a hop never
+## leaves the room, e.g. from the infirmary cot to outside). Tries the full hop,
+## then half, then a quarter; only if none is in sight, any clear spot as before.
+func _hop_spot(from: Vector3, ahead: Vector3, pressing: Array[RID] = []) -> Vector3:
+	if pressing.is_empty():
+		pressing = [feyre.get_rid()]
+	for scale: float in [1.0, 0.5, 0.25]:
+		var p: Variant = _hop_candidate(from, ahead * scale, pressing)
+		if p != null:
+			return p
+	var any: Variant = _hop_candidate(from, ahead, [])
+	return any if any != null else from + Vector3.UP * 0.5
+
+
+## `sight_exclude` empty: no sight test; else the bodies the sight ray may pass.
+func _hop_candidate(from: Vector3, ahead: Vector3, sight_exclude: Array[RID]) -> Variant:
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.45
 	capsule.height = 1.7
@@ -879,6 +908,12 @@ func _hop_spot(from: Vector3, ahead: Vector3) -> Vector3:
 	for degrees in [0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0, 180.0]:
 		var p := from + ahead.rotated(Vector3.UP, deg_to_rad(degrees))
 		p.y = maxf(_ground_at(p, 2.5), WorldHeight.height_at(p.x, p.z)) + 0.3
+		if not sight_exclude.is_empty():
+			var eye := from + Vector3.UP * 1.3
+			var sight := PhysicsRayQueryParameters3D.create(eye, Vector3(p.x, maxf(p.y + 1.0, eye.y), p.z), 1, sight_exclude)
+			var wall := space.intersect_ray(sight)
+			if not wall.is_empty() and (wall.collider as Node).get_class() != "Terrain3D":
+				continue
 		query.transform = Transform3D(Basis.IDENTITY, p + Vector3.UP * (capsule.height * 0.5 + 0.15))
 		var clear := true
 		for hit in space.intersect_shape(query, 8):
@@ -888,7 +923,7 @@ func _hop_spot(from: Vector3, ahead: Vector3) -> Vector3:
 				break
 		if clear:
 			return p
-	return from + Vector3.UP * 0.5
+	return null
 
 
 func _walk_region(id: StringName) -> void:
