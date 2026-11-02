@@ -61,6 +61,17 @@ var _t: float = 0.0
 
 func _ready() -> void:
 	name = "Act1Wayfinding"
+	# Past the winter the hunt's trail is over; planning it reads every
+	# human-realm scatter layer (0.7 s on each Continue).
+	if not Act1LandmarkThoughts.past_winter():
+		_build_hunt_trail()
+	_build_smoke()
+	_build_lanterns()
+	EventBus.flag_changed.connect(_on_flag)
+	_on_flag("", null)
+
+
+func _build_hunt_trail() -> void:
 	# One path for the furrow and the prints: the doe's wandering line round
 	# the trees, so they never read as two trails (L27-8).
 	var path := doe_path()
@@ -68,10 +79,6 @@ func _ready() -> void:
 	_build_band(path[1], DOE_FURROW_WIDTH, "DoeFurrow", DOE_STRENGTH, 0.0)
 	_build_tracks(path)
 	_build_crows()
-	_build_smoke()
-	_build_lanterns()
-	EventBus.flag_changed.connect(_on_flag)
-	_on_flag("", null)
 
 
 ## The track line: a lazy S from the trail's end to the doe's grazing spot.

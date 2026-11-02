@@ -94,7 +94,8 @@ func _attach_to_player() -> void:
 	if GameSettings.pending_load_slot != "":
 		var slot := GameSettings.pending_load_slot
 		GameSettings.pending_load_slot = ""
-		SaveSystem.load_game(slot)
+		SaveSystem.finish_load(slot)
+		_hint.hide_now()  # the controls are taught once, on a new game
 
 
 # --- actions -----------------------------------------------------------------
