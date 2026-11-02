@@ -1,0 +1,4 @@
+from minor-fae lane L48
+quality look
+shot hall res://tools/cast/minor_fae_hall_shot.tscn {out}
+shot calanmai res://tools/playtest/p5_calanmai_clip.tscn {out}
