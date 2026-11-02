@@ -1,5 +1,7 @@
 ## Screenshots of furnished manor rooms from two corners each (L38 review shots).
 ##   godot res://tools/manor_estate/room_shot.tscn -- <room[@level]>[,<room>...] [out_dir]
+## A room may name its own views instead of the corners, room-local x/z from
+## the rect's min corner: entrance_hall:10/1.5>10/20+2/14>18/17 saves _v1, _v2.
 ## Loads the real estate, then stands a camera at eye height in a room's
 ## corners, looking across it, and saves room_<id>_<a|b>.png. Day light from
 ## the estate's preview sky through the windows, plus the rooms' own lamps.
@@ -41,7 +43,8 @@ func _run() -> void:
 			rooms["%s@%d" % [r.id, r.level]] = r
 			if not rooms.has(String(r.id)):
 				rooms[String(r.id)] = r
-	for key in which:
+	for spec in which:
+		var key := spec.get_slice(":", 0)
 		var r: ManorRoomDef = rooms.get(key)
 		if r == null:
 			push_error("room_shot: no room %s" % key)
@@ -50,6 +53,15 @@ func _run() -> void:
 		var lo := r.rect.position + Vector2(INSET, INSET)
 		var hi := r.rect.end - Vector2(INSET, INSET)
 		var views := {"a": [lo, hi], "b": [hi, lo]}
+		if spec.contains(":"):
+			views = {}
+			var n := 0
+			for v in spec.get_slice(":", 1).split("+"):
+				var ends := v.split(">")
+				if ends.size() != 2:
+					continue
+				n += 1
+				views["v%d" % n] = [r.rect.position + _xz(ends[0]), r.rect.position + _xz(ends[1])]
 		for tag: String in views:
 			var from: Vector2 = views[tag][0]
 			var to: Vector2 = views[tag][1]
@@ -62,6 +74,10 @@ func _run() -> void:
 			get_tree().root.get_texture().get_image().save_png(path)
 			print("saved ", path)
 	get_tree().quit()
+
+
+func _xz(s: String) -> Vector2:
+	return Vector2(s.get_slice("/", 0).to_float(), s.get_slice("/", 1).to_float())
 
 
 func _frames(n: int) -> void:

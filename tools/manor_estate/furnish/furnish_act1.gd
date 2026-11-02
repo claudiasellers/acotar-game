@@ -85,6 +85,15 @@ static func _entrance_hall(f: ManorFurnisher) -> void:
 	# the stair's foot, flanked by columns
 	f.at(&"column_marble", 4.0, 20.7)
 	f.at(&"column_marble", 16.0, 20.7)
+	# under the landing (L48 hall probe: a blank wall facing the saloon door):
+	# a masked lady of the court in marble, a rose to her heart, in the arched
+	# niche ManorGrandStair cuts in the panelled face; sconces either side of it,
+	# potted roses at its corners
+	f.put(&"statue_masked_lady", 10.0, 8.38, 0.0, ManorGrandStair.NICHE_SILL)
+	f.put(&"candle_sconce", 9.0, 7.89, 0.0, 1.95)
+	f.put(&"candle_sconce", 11.0, 7.89, 0.0, 1.95)
+	f.at(&"potted_roses", 7.4, 7.3)
+	f.at(&"potted_roses", 12.6, 7.3)
 	# scattered hall tables, each with its fat hydrangeas
 	f.set_on(f.at(&"hall_table_round", 4.6, 2.9), [&"urn_hydrangea_white", &"candlestick_brass", &"shell_dish"])
 	f.set_on(f.at(&"hall_table_round", 3.6, 27.6), [&"vase_hydrangea_blue", &"trinket_box_enamel", &"music_box"])

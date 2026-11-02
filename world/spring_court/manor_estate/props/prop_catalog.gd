@@ -68,6 +68,7 @@ const ENTRIES := {
 	&"tapestry_roses": [&"art", Vector3(3.0, 2.4, 0.05), EstateKit.ROSE, false],
 	&"statue_maiden": [&"art", Vector3(0.9, 2.2, 0.9), EstateKit.MARBLE, true],
 	&"statue_stag": [&"art", Vector3(1.6, 1.8, 0.8), EstateKit.MARBLE, true],
+	&"statue_masked_lady": [&"art", Vector3(0.62, 2.0, 0.62), EstateKit.MARBLE, true],
 	&"bust_pedestal": [&"art", Vector3(0.5, 1.6, 0.5), EstateKit.MARBLE, true],
 	&"vase_roses": [&"decor", Vector3(0.4, 0.8, 0.4), EstateKit.ROSE, false],
 	&"vase_tall": [&"decor", Vector3(0.5, 1.3, 0.5), EstateKit.PERIWINKLE, true],

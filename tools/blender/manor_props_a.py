@@ -8,7 +8,7 @@ generator fits every prop to its catalogue box afterwards. Front faces +Y.
 import math
 import random
 
-from prop_kit import (BLUSH, BUTTER, CANVAS, COPPER, CREAM, FLAME, GOLD, LILAC, MINT, OAK, OAK_DARK, PEARL, PERI,
+from prop_kit import (BLUSH, BUTTER, CANVAS, COPPER, CREAM, FLAME, GOLD, LEAF_DARK, LILAC, MINT, OAK, OAK_DARK, PEARL, PERI,
                       ROSE, WHITE, R, S, T, arc_pts, arched_outline, bloom, box, cabriole, cushion, cyl, darker, disc,
                       frame_ring, ico, lathe, lighter, mix, oval_outline, petal, scroll, slab, sphere, torus, tube,
                       turned_leg)
@@ -1018,6 +1018,52 @@ def faelight_orb(p, size, c):
         p.add(petal(0.08, 0.05, cup=0.1, curl=0.2), (0.85, 1.0, 0.95), "glass", T(0.06 * math.cos(a), 0.06 * math.sin(a), 0.05) @ R("Z", math.degrees(a)) @ R("Y", -40))
 
 
+def statue_masked_lady(p, size, c):
+    """The figure in the niche under the foyer stair's landing (L48 hall probe):
+    a lady of the court in marble, the gilt half-mask the court has worn since
+    the curse, a single rose held to her heart."""
+    p.add(lathe([(0, 0), (0.31, 0), (0.31, 0.05), (0.27, 0.08), (0.27, 0.12), (0, 0.12)], 16), c, "pearl")
+    skirt = lathe([(0, 0), (0.3, 0), (0.29, 0.08), (0.24, 0.4), (0.18, 0.75), (0.135, 1.0), (0, 1.0)], 16)
+    for v in skirt.verts:
+        a = math.atan2(v.co.y, v.co.x)
+        fold = 0.035 * math.sin(a * 7) * (1 - v.co.z)
+        v.co.x += fold * math.cos(a)
+        v.co.y += fold * math.sin(a)
+    p.add(skirt, c, "pearl", T(0, 0, 0.12))
+    # bodice and shoulders
+    p.add(lathe([(0.13, 0), (0.12, 0.1), (0.145, 0.28), (0.15, 0.36), (0.1, 0.44), (0, 0.46)], 12), c, "pearl",
+          T(0, 0, 1.1) @ S(1, 0.72, 1))
+    p.add(cyl(0.04, 0.1, 8), c, "pearl", T(0, 0, 1.52))
+    head = 1.69
+    p.add(sphere(0.095, 12, 8), c, "pearl", T(0, 0.005, head) @ S(0.86, 0.92, 1.12))
+    # hair drawn up, a chignon at the back crowned with rosebuds
+    p.add(sphere(0.1, 10, 7), c, "pearl", T(0, -0.02, head + 0.04) @ S(0.95, 0.95, 0.85))
+    p.add(sphere(0.06, 8, 6), c, "pearl", T(0, -0.1, head + 0.05))
+    rng = random.Random(62)
+    for i in range(5):
+        a = math.radians(-150 + 30 * i)
+        bloom(p, (0.075 * math.cos(a), -0.06 + 0.04 * math.sin(a), head + 0.09), 0.018, BLUSH, 2, 5, rng,
+              tilt=R("X", -40))
+    # the half-mask: two gilt eye rims joined over the nose, a brow band
+    # following the head round to swept wings at the temples
+    ez = head + 0.012
+    for sx in (-1, 1):
+        p.add(torus(0.024, 0.009, 12, 4), GOLD, "satin", T(sx * 0.033, 0.083, ez) @ R("X", 90) @ S(1.15, 1, 0.85))
+        p.add(petal(0.075, 0.032, cup=0.1, curl=0.3), GOLD, "satin",
+              T(sx * 0.072, 0.055, ez + 0.03) @ R("Y", -90 + sx * 50) @ R("X", 90))
+    brow = [(math.sin(a) * 0.085, math.cos(a) * 0.082, ez + 0.03 - 0.01 * abs(math.sin(a))) for a in
+            [math.radians(d) for d in range(-75, 76, 25)]]
+    p.add(tube(brow, 0.008, 4), GOLD, "satin")
+    p.add(tube([(-0.012, 0.09, ez), (0, 0.095, ez + 0.006), (0.012, 0.09, ez)], 0.006, 4), GOLD, "satin")
+    # arms: the left brings the rose to her heart, the right gathers the skirt
+    p.add(tube([(-0.14, 0, 1.48), (-0.17, 0.04, 1.3), (-0.03, 0.13, 1.37)], [0.038, 0.032, 0.028], 7), c, "pearl")
+    p.add(tube([(0.14, 0, 1.48), (0.18, 0.02, 1.26), (0.17, 0.08, 1.06)], [0.038, 0.032, 0.028], 7), c, "pearl")
+    p.add(sphere(0.03, 6, 4), c, "pearl", T(0.17, 0.09, 1.04))
+    p.add(tube([(0.0, 0.15, 1.42), (0.03, 0.15, 1.3), (0.05, 0.12, 1.18)], 0.008, 4), LEAF_DARK, "leaf")
+    p.add(petal(0.06, 0.03, cup=0.2), LEAF_DARK, "leaf", T(0.035, 0.15, 1.27) @ R("Y", 50) @ R("X", 70))
+    bloom(p, (0.0, 0.16, 1.44), 0.045, ROSE, 3, 5, random.Random(61), tilt=R("X", -70))
+
+
 BUILDERS = {
     "bed_canopy": bed_canopy, "bed_single": bed_single, "bed_servant": bed_servant, "cradle_chest": cradle_chest,
     "nightstand": nightstand, "wardrobe_tall": wardrobe_tall, "dresser": dresser,
@@ -1035,5 +1081,5 @@ BUILDERS = {
     "rug_runner": rug_runner, "cushion_pile": cushion_pile, "window_seat": window_seat,
     "chandelier_crystal": chandelier_crystal, "chandelier_small": chandelier_small, "candelabra": candelabra,
     "candle_sconce": candle_sconce, "lantern_hanging": lantern_hanging, "floor_candlestand": floor_candlestand,
-    "faelight_orb": faelight_orb,
+    "faelight_orb": faelight_orb, "statue_masked_lady": statue_masked_lady,
 }

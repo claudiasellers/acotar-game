@@ -74,7 +74,7 @@ static func build(parent: Node3D, layouts: Array[ManorHouseLayout] = []) -> Node
 	for door in all.doors:
 		_build_door_leaf(house, door, all)
 	for stair in all.stairs:
-		_build_stair(house, stair)
+		_build_stair(house, stair, all)
 	for station in all.stations:
 		_build_station(house, station)
 	for secret in all.secrets:
@@ -325,7 +325,7 @@ static func _leaf_material(disguise: StringName) -> Material:
 
 # --- Stairs ----------------------------------------------------------------
 
-static func _build_stair(house: Node3D, stair: ManorStairDef) -> void:
+static func _build_stair(house: Node3D, stair: ManorStairDef, all: ManorHouseIndex = null) -> void:
 	var y0 := floor_y(stair.level_from)
 	var rise := floor_y(stair.level_from + 1) - y0
 	var r := stair.rect
@@ -337,10 +337,14 @@ static func _build_stair(house: Node3D, stair: ManorStairDef) -> void:
 	var node := Node3D.new()
 	node.name = "Stair_%s" % stair.id
 	house.add_child(node)
+	# The foyer's flight is dressed as a grand staircase (ManorGrandStair).
+	var hall := _stair_room(stair, all) if stair.style == &"grand" else null
+	if hall != null:
+		ManorGrandStair.build(node, stair, hall, y0, rise)
 	var mat := EstateKit.mat(EstateKit.MARBLE if stair.style == &"grand" else EstateKit.WARM_STONE, 0.5)
 	var steps := int(ceil(rise / 0.19))
 	var tread := run / steps
-	for i in steps:
+	for i in steps if hall == null else 0:
 		var c := start + dir * (tread * (i + 0.5))
 		var h := rise * (i + 1) / steps
 		var size := Vector3(width if along_z else tread, h, tread if along_z else width)
@@ -362,6 +366,8 @@ static func _build_stair(house: Node3D, stair: ManorStairDef) -> void:
 	else:
 		body.rotation.z = angle * (-1.0 if dir.x > 0.0 else 1.0)
 	node.add_child(body)
+	if hall != null:
+		return
 	# Balustrades along both long sides.
 	var rail := EstateKit.mat(EstateKit.CREAM if stair.style == &"grand" else EstateKit.OAK, 0.5)
 	for s in [-1.0, 1.0]:
@@ -376,6 +382,16 @@ static func _build_stair(house: Node3D, stair: ManorStairDef) -> void:
 		post.position = Vector3(c.x, y0 + rise * 0.5 + 1.0, c.y)
 		post.rotation = body.rotation
 		node.add_child(post)
+
+
+## The room a flight stands in at its foot's level (null when there is none).
+static func _stair_room(stair: ManorStairDef, all: ManorHouseIndex) -> ManorRoomDef:
+	if all == null:
+		return null
+	for r in all.rooms_at(stair.level_from, stair.rect.get_center()):
+		if r.kind != &"stair_hall" and r.kind != &"exterior":
+			return r
+	return null
 
 
 static func _dir(rise_toward: StringName) -> Vector2:

@@ -15,6 +15,11 @@ uniform float floor0 = 0.0;
 uniform float storey = 4.8;
 uniform float wall_height = 4.5;
 uniform float panel_width = 1.6;
+// shifts the panels along the wall (a staircase lays its own out from its foot)
+uniform float panel_phase = 0.0;
+// a staircase string: (on, along at the foot, rise per metre along, top at the
+// foot). Each panel stops under the string's raking top, stepping down the flight.
+uniform vec4 rake = vec4(0.0);
 
 varying vec3 wpos;
 varying vec3 wnrm;
@@ -44,9 +49,25 @@ void fragment() {
 	if (abs(wnrm.y) < 0.5) {
 		float along = abs(wnrm.x) > abs(wnrm.z) ? wpos.z : wpos.x;
 		float h = mod(wpos.y - floor0 + 0.001, storey);
-		float u = (fract(along / panel_width) - 0.5) * panel_width;
+		float u = (fract((along + panel_phase) / panel_width) - 0.5) * panel_width;
 		float top = wall_height - 0.5;
-		if (h < 0.2) {
+		if (rake.x > 0.5) {
+			// raking string: one tall panel per bay, under the slope at its low end
+			float pc = (floor((along + panel_phase) / panel_width) + 0.5) * panel_width - panel_phase;
+			float low = rake.w + (pc - rake.y) * rake.z - abs(rake.z) * panel_width * 0.5;
+			float ptop = min(low - 0.3, top);
+			if (h < 0.2) {
+				col = mix(field, frame, 0.3) * 0.86;
+			} else if (ptop > 0.8) {
+				vec2 p = vec2(u, h - (0.32 + ptop) * 0.5);
+				float d = sd_round_box(p, vec2(panel_width * 0.5 - 0.16, (ptop - 0.32) * 0.5), 0.14);
+				col = d < 0.0 ? mix(field, frame_color.rgb, 0.18) : frame;
+				g = band(d + 0.025, 0.011);
+				g = max(g, band(d + 0.09, 0.004) * 0.7);
+				shade = d < 0.0 ? mix(0.9, 1.0, smoothstep(0.0, 0.08, -d)) : 1.0;
+			}
+			g = max(g, band(h - 0.2, 0.012));
+		} else if (h < 0.2) {
 			col = mix(field, frame, 0.3) * 0.86;
 		} else if (h < 0.9) {
 			float d = sd_round_box(vec2(u, h - 0.56), vec2(panel_width * 0.5 - 0.14, 0.24), 0.05);
@@ -77,11 +98,13 @@ void fragment() {
 			shade = mix(1.0, 1.08, smoothstep(top, wall_height, h));
 		}
 		// gilt rails: top of skirting, both edges of the dado, the cornice
-		g = max(g, band(h - 0.2, 0.012));
-		g = max(g, band(h - 0.9, 0.01));
-		g = max(g, band(h - 1.02, 0.014));
-		g = max(g, band(h - top, 0.016));
-		g = max(g, band(h - (top + 0.18), 0.008));
+		if (rake.x < 0.5) {
+			g = max(g, band(h - 0.2, 0.012));
+			g = max(g, band(h - 0.9, 0.01));
+			g = max(g, band(h - 1.02, 0.014));
+			g = max(g, band(h - top, 0.016));
+			g = max(g, band(h - (top + 0.18), 0.008));
+		}
 	}
 	ALBEDO = mix(col * shade, gilt.rgb, g);
 	METALLIC = 0.85 * g;
