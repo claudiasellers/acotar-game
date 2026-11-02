@@ -3,6 +3,28 @@
 Canon: Keeper answers 2026-11-02 (all [C] unless a line is listed in its stage's
 `invented`), lore/07-story/timeline-overview.md, book-scene-spaces.md.
 
+## Keeper citations (answers of 2026-11-02, to L46)
+- **The head (ch24) [C]:** spiked on the heron's upraised bill; no mask, so not
+  Spring; the brand is behind the LEFT ear, a mountain with three stars (Night
+  Court); Lucien wades in and yanks it off while Tamlin turns her to a
+  blossoming crab apple tree: "You're still safe." Built as `head_severed` and
+  staged in `fountain_head_stage.tres`.
+- **Lunch and Rhysand (ch26) [C]:** she is already at the table with Tamlin and
+  Lucien (the Winter letter, the blight killed twenty-four younglings) when
+  Rhysand arrives; L46 writes no Rhysand lines. L33's film "The Night Court"
+  plays him, including Lucien dragging her to the curtains.
+- **Alis (ch23–24) [C]:** her bark skin is seen in the bedroom the morning after
+  the glen: "I am Alis."
+- **Solstice (ch25) [C]:** the plateau at sunset, a cornflower chiffon gown and a
+  wildflower garland, faerie wine, Tamlin's fiddle, the wisp meadow, dancing
+  until dawn.
+- **The farewell (ch27–28) [C]:** no letter; Tamlin comes to her room by
+  moonlight ("So you need to go home—far from here." "At dawn."); Alis: "Make
+  the most of your freedom."; Lucien: "I thought you were smarter than this.";
+  "My paintings—they're yours." / "Remember what I told you."
+Each stage's `canon` field holds the full answer; lines not from the book are
+listed in that stage's `invented`.
+
 ## Who raises what (R2)
 L46's scenes write **facts** only. The data moments (`tools/story/gen_moments.py`,
 owned by L33) raise the deeds from them; L33's films play two of them.

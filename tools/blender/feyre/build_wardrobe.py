@@ -419,6 +419,24 @@ def build_spring_tunic(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
     B.mark("near", i0, fit=0.012)
 
 
+def build_linen_shift(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
+    """Her plain linen shift and drawers, the layer under everything (L41-4).  feyre_model.tscn
+    wears it on the bare model, so no scene can show her unclothed; the wardrobe hides each
+    surface (shift_<body region it covers>) when a worn piece covers that region."""
+    hole = neckline(0.07, 0.068)
+    top = sh.make(lambda r, c: r in ("torso", "arms") and not hole(c) and c.z > 0.93,
+                  lambda c: 0.005, [z_below(0.93)] + x_beyond(0.215), max_tris=2200)
+    add_bm(B, top, "shift_torso", "shell", fit=0.005)
+    bind(B, top, 0.0018, "shift_torso", where=lambda p: p[2] > 1.2)
+    top.free()
+    low = sh.make(lambda r, c: r == "legs" or (r == "torso" and c.z <= 0.97),
+                  lambda c: 0.005 + 0.004 * float(smoothstep(0.80, 0.56, c.z)),
+                  [z_above(0.965), z_below(0.54)], max_tris=1800)
+    add_bm(B, low, "shift_legs", "shell", fit=0.005)
+    bind(B, low, 0.0018, "shift_legs", where=lambda p: p[2] < 0.6)
+    low.free()
+
+
 def build_spring_trousers(B: Builder, probe: BodyProbe, sh: Shell, rng) -> None:
     bm = sh.make(lambda r, c: r == "legs" or (r == "torso" and c.z < 1.0),
                  lambda c: 0.006 + 0.020 * float(smoothstep(0.62, 0.14, c.z)), [z_above(0.99), z_below(0.11)],
@@ -1075,6 +1093,8 @@ def build_ribbon_cuff(B, probe, sh, rng):
 # --------------------------------------------------------------------------
 BODY, HEAD = finalize, finalize_head
 PIECES = {
+    "linen_shift": (build_linen_shift, BODY, {"shift_torso": ("E8DFCC", 0.85, 0.0), "shift_legs": ("E8DFCC", 0.85, 0.0)},
+                    TRI_CLOTH, True),
     "spring_tunic": (build_spring_tunic, BODY, {"fabric": (MINT, 0.32, 0.0)}, TRI_CLOTH, True),
     "spring_trousers": (build_spring_trousers, BODY, {"fabric": (MINT, 0.32, 0.0)}, TRI_CLOTH, True),
     "painter_smock": (build_painter_smock, BODY, {"fabric": (CREAM, 0.8, 0.0)}, TRI_CLOTH, True),
