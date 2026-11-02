@@ -57,30 +57,42 @@ def shapes(cm):
                     calf=0.9, neck=0.98, adams_apple=0.3)
     elder = _m(cm.ROUND, _HUMAN, hf, eye_r=0.0172, eye_open_up=26.0, cheeks=1.0, bust=1.0, waist=1.15,
                  belly=1.15, gaunt=0.15)
-    stout_m = _m(cm.BROAD, _HUMAN, hm, belly=1.15, waist=1.20)
+    stout_m = _m(cm.BROAD, _HUMAN, hm, belly=1.5, waist=1.35)
+    acolyte_m = _m(cm.MALE, _HUMAN, hm, brow=1.0, jaw=1.0, jaw_w=0.98, chin=1.2, gaunt=0.1, cheekbones=1.05)
     # "a mountain of a woman": tall and heavy, a woman's frame (hips, bust, a softer jaw) and a hard,
     # weathered face; big through the arms and thighs rather than the shoulders
     mountain = dict(cm.FEMALE, **_HUMAN, eye_r=0.0178, eye_open_up=27.0, eye_open_lo=25.0, eye_tilt=3.0,
-                    cheeks=0.45, cheekbones=1.0, chin=1.0, jaw_w=0.96, nose=1.0, nose_bridge=0.6,
+                    cheeks=0.55, cheekbones=1.0, chin=0.94, jaw_w=0.88, nose=1.0, nose_bridge=0.6,
                     lips=1.08, lip_w=1.04, face_w=1.0, neck=1.08,
                     bust=1.12, ribs=1.08, waist=1.06, belly=0.98, pelvis=1.12, seat=1.12,
                     thigh=1.18, calf=1.12, arm=1.12, forearm=1.10, hand=1.06)
     return {"v_female": lean_f, "v_plump": plump_f, "v_male": lean_m, "v_slight": slight_m, "v_elder": elder,
-            "v_stout": stout_m, "v_mountain": mountain}
+            "v_stout": stout_m, "v_mountain": mountain, "v_acolyte": acolyte_m}
 
 
 def warp(cm, kind, height):
     if kind == "v_mountain":
-        return dict(height=height, head=0.99, legs=1.02, arm_len=1.0, arm_thick=1.08,
-                    wx=((0.0, 1.06), (0.45, 1.08), (0.85, 1.10), (1.00, 1.08), (1.15, 1.08), (1.285, 1.06),
-                        (1.37, 1.02), (1.47, 1.0)),
+        return dict(height=height, head=0.99, legs=1.02, arm_len=1.0, arm_thick=1.04,
+                    wx=((0.0, 1.06), (0.45, 1.08), (0.85, 1.12), (1.00, 1.06), (1.15, 1.0), (1.285, 0.93),
+                        (1.37, 0.95), (1.47, 1.0)),
                     wy=((0.0, 1.04), (0.85, 1.08), (1.05, 1.08), (1.25, 1.08), (1.40, 1.02), (1.47, 1.0)))
+    if kind == "v_plump":                 # the farmer's wife: a wide waist and hips
+        return dict(height=height, head=1.02, legs=0.96, arm_len=0.97, arm_thick=1.12,
+                    wx=((0.0, 1.06), (0.45, 1.14), (0.85, 1.30), (1.00, 1.30), (1.15, 1.16), (1.285, 1.06),
+                        (1.47, 1.0)),
+                    wy=((0.0, 1.04), (0.85, 1.22), (1.00, 1.26), (1.15, 1.16), (1.30, 1.04), (1.47, 1.0)))
+    if kind == "v_stout":                 # the peddler: a belly over his belt
+        return dict(height=height, head=1.02, legs=1.0, arm_len=1.0, arm_thick=1.10,
+                    wx=((0.0, 1.04), (0.45, 1.04), (0.85, 1.14), (0.98, 1.26), (1.10, 1.24), (1.20, 1.16),
+                        (1.285, 1.14), (1.37, 1.06), (1.47, 1.0)),
+                    wy=((0.0, 1.02), (0.85, 1.12), (0.98, 1.38), (1.10, 1.34), (1.22, 1.10), (1.40, 1.02), (1.47, 1.0)))
+    if kind == "v_acolyte":
+        return cm.warp(height, "male")
     if kind == "v_slight":
-        return dict(height=height, head=1.03, legs=1.0, arm_len=1.0, arm_thick=0.92,
-                    wx=((0.0, 0.96), (0.85, 0.94), (1.15, 0.96), (1.285, 0.98), (1.47, 1.0)),
-                    wy=((0.0, 0.96), (0.85, 0.94), (1.25, 0.96), (1.47, 1.0)))
-    base = {"v_female": "female", "v_plump": "round", "v_male": "male", "v_elder": "round",
-            "v_stout": "broad"}[kind]
+        return dict(height=height, head=1.03, legs=1.0, arm_len=1.0, arm_thick=0.86,
+                    wx=((0.0, 0.92), (0.85, 0.88), (1.15, 0.88), (1.285, 0.88), (1.40, 0.95), (1.47, 1.0)),
+                    wy=((0.0, 0.94), (0.85, 0.90), (1.25, 0.92), (1.47, 1.0)))
+    base = {"v_female": "female", "v_male": "male", "v_elder": "round"}[kind]
     return cm.warp(height, base)
 
 
@@ -121,7 +133,7 @@ DESIGNS = {
                               ("iron_charm",)]),
     # -- the old woman at the notice board, stooped: slate dress, oatmeal hooded cloak, a cheap charm
     "human_elder": dict(canon="X", body="v_elder", height=1.54, skin="EBCDBC", iris="6A7480", hair="CFCAC2",
-                        brows="A29C94", lips="C09A90", style=("alis", "style_bun"), stoop=1.8,
+                        brows="A29C94", lips="C09A90", style=("alis", "style_bun"), stoop=2.4,
                         outfit=[("dress", SLATE, SLATE_D), ("apron",), ("slippers", "3E342E"),
                                 ("cloak_worn", ASH, ASH, 0.36), ("iron_charm",)]),
     # -- the young man by the tavern, shorter and slighter: undyed shirt, rust vest, a slate cape
@@ -142,8 +154,8 @@ DESIGNS = {
                     brows="2A201C", lips="D4949C", style=("feyre", "loose"), face="glow",
                     outfit=[("robe", BLESSED_BLUE), ("slippers", BLESSED_PALE), ("cord_belt",),
                             ("silver", "charm_bracelet"), ("silver", "necklace_pendant")]),
-    "blessed_2": dict(canon="C", body="v_slight", height=1.76, skin="F2E2D8", iris="4E5E70", hair="6A4A30",
-                      brows="4E3626", lips="C49088", style=("tamlin", "style_loose"), face="glow",
+    "blessed_2": dict(canon="C", body="v_acolyte", height=1.78, skin="F2E2D8", iris="4E5E70", hair="5A3E28",
+                      brows="3E2A1C", lips="B88A80", style=("rhysand", "style_short"), face="glow",
                       outfit=[("robe", BLESSED_PALE), ("slippers", BLESSED_PALE), ("cord_belt",),
                               ("silver", "charm_bracelet")]),
     # -- the mercenary at the broken fountain: heavy peat coat with a rust lining, sword and long knife
@@ -163,11 +175,90 @@ def _cm():
     return sys.modules["cast_minor"]
 
 
+class _NoRound:
+    """While active, the shared builders skip their round patch, darn and pocket ellipsoids (and the
+    running stitch rings round them): they read as holes or stickers in game.  sewn_patches() adds
+    irregular patches with a visible stitch in their place."""
+    def __init__(self, ell_mats, tube_mats=()):
+        self.ell, self.tube = set(ell_mats), set(tube_mats)
+
+    def __enter__(self):
+        import build_gowns
+        B = build_gowns.Builder
+        self.saved = (B.ellipsoid, B.tube)
+        ell0, tube0, ell, tub = B.ellipsoid, B.tube, self.ell, self.tube
+
+        def ellipsoid(b, c, a1, a2, a3, mat, *a, **k):
+            if mat not in ell:
+                return ell0(b, c, a1, a2, a3, mat, *a, **k)
+
+        def tube(b, path, radii, sec, mat, *a, **k):
+            if mat not in tub:
+                return tube0(b, path, radii, sec, mat, *a, **k)
+        B.ellipsoid, B.tube = ellipsoid, tube
+        return self
+
+    def __exit__(self, *exc):
+        import build_gowns
+        build_gowns.Builder.ellipsoid, build_gowns.Builder.tube = self.saved
+
+
+def sewn_patches(ctx, name, patches, cloth_hex, thread_hex="D8CDB6"):
+    """Irregular four-sided patches sewn onto a garment, each with a dashed running stitch inset from
+    its edge.  patches: (ray origin, ray direction onto the body, offset off the body (the garment's fit
+    plus a little), half width, half height, seed).  The patch follows the body's curve."""
+    bw, probe = ctx.bw, ctx.probe
+    B = ctx.builder(name, {"fabric": (cloth_hex, 0.9, 0.0), "thread": (thread_hex, 0.85, 0.0)})
+    for origin, direction, off, hw, hh, seed in patches:
+        hit = probe.bvh.ray_cast(V(origin), V(direction).normalized(), 0.6)
+        if hit[0] is None:
+            continue
+        c, n = hit[0], hit[1].normalized()
+        up = V((0, 0, 1)) if abs(n.z) < 0.9 else V((1, 0, 0))
+        side = n.cross(up).normalized()
+        up = side.cross(n).normalized() * -1 if side.cross(n).dot(up) < 0 else side.cross(n).normalized()
+        rng = np.random.default_rng(seed)
+        tilt = rng.uniform(-0.35, 0.35)
+        ct, st = math.cos(tilt), math.sin(tilt)
+        corners = [(-hw, -hh), (hw, -hh), (hw, hh), (-hw, hh)]
+        corners = [(x + rng.uniform(-0.25, 0.25) * hw, y + rng.uniform(-0.2, 0.2) * hh) for x, y in corners]
+
+        def at(u, v, lift=0.0):
+            x0 = corners[0][0] * (1 - u) * (1 - v) + corners[1][0] * u * (1 - v) + corners[2][0] * u * v + corners[3][0] * (1 - u) * v
+            y0 = corners[0][1] * (1 - u) * (1 - v) + corners[1][1] * u * (1 - v) + corners[2][1] * u * v + corners[3][1] * (1 - u) * v
+            x, y = x0 * ct - y0 * st, x0 * st + y0 * ct
+            q = c + side * x + up * y
+            h = probe.bvh.ray_cast(q + n * 0.12, -n, 0.3)
+            if h[0] is None:
+                return tuple(q + n * (off + lift))
+            return tuple(h[0] + h[1].normalized() * (off + lift))
+        rows = [np.array([at(u, v) for u in np.linspace(0, 1, 6)]) for v in np.linspace(0, 1, 6)]
+        i0 = len(B.bm.verts)
+        faces = B.grid(rows, ["fabric"], closed=False)
+        B.orient(faces, lambda p, n=n: n)
+        edge = [(t, 0.0) for t in np.linspace(0.08, 0.92, 7)] + [(1.0 - 0.08, t) for t in np.linspace(0.08, 0.92, 7)] + \
+               [(t, 1.0 - 0.08) for t in np.linspace(0.92, 0.08, 7)] + [(0.08, t) for t in np.linspace(0.92, 0.08, 7)]
+        edge = [(max(u, 0.08), max(v, 0.08)) for u, v in edge]
+        pts = [V(at(u, v, 0.0012)) for u, v in edge]
+        for k in range(0, len(pts) - 1, 2):                  # dashes: stitch, gap, stitch
+            a, b = pts[k], pts[k + 1]
+            B.tube(np.array([tuple(a), tuple(a.lerp(b, 0.7))]), 0.0009, 3, "thread", cap=True)
+        B.mark("near", i0, fit=off + 0.002)
+    return ctx.cloth(B, name)
+
+
 def layers(ctx, o):
     """Shirt, vest, long coat, trousers and shoes on the father's cut, in this figure's wool."""
     import bpy
     import cast_father
-    rep = cast_father.build_outfit(ctx, o, _cm().ID + "_")
+    with _NoRound(("patch_a", "patch_b"), ("thread",)):
+        rep = cast_father.build_outfit(ctx, o, _cm().ID + "_")
+    pa, pb = o["pal"]["patch_a"][0], o["pal"]["patch_b"][0]
+    knee = [((-0.098, -0.25, 0.405), (0, 1, 0), 0.0100, 0.030, 0.034, 11)]   # below and outside the knee, under the coat
+    elbow = [] if o.get("no_coat") else [((0.392, 0.25, 1.280), (0, -1, 0), 0.0245, 0.036, 0.028, 23)]
+    sewn_patches(ctx, _cm().ID + "_patch_knee", knee, pa)
+    if elbow:
+        sewn_patches(ctx, _cm().ID + "_patch_elbow", elbow, pb)
     if o.get("no_coat"):                      # shirt and vest only: the youth goes without a coat
         coat = bpy.data.objects[_cm().ID + "_coat"]
         ctx.wardrobe[:] = [(ob, k) for ob, k in ctx.wardrobe if ob is not coat]
@@ -192,7 +283,8 @@ def cloak_worn(ctx, colour, edge, hem):
     del edge
     pal = {"fabric": (colour, 0.88, 0.0), "lining": (colour, 0.9, 0.0), "patch": (UNDYED, 0.9, 0.0),
            "cord": (OAT, 0.85, 0.0), "clasp": (IRON, 0.6, 0.7)}
-    return cast_nesta.worn_cloak(ctx, _cm().ID + "_cloak", pal, hem=hem, hood=True)
+    with _NoRound(("patch",)):
+        return cast_nesta.worn_cloak(ctx, _cm().ID + "_cloak", pal, hem=hem, hood=True)
 
 
 def robe_cloak(ctx, colour):
@@ -298,7 +390,8 @@ def apron(ctx):
     import cast_alis
     cast_alis.PAL = {**cast_alis.PAL, "apron": ("CFC5B2", 0.85, 0.0), "apron_d": ("C2B8A4", 0.85, 0.0),
                      "cord": ("B3A68E", 0.85, 0.0)}
-    obj = cast_alis.build_apron(ctx)
+    with _NoRound(("apron_d",)):                 # no round patch pocket
+        obj = cast_alis.build_apron(ctx)
     obj.name = _cm().ID + "_apron"
     return obj
 
@@ -344,7 +437,7 @@ def install(cm, vid):
     body = D["body"]
     # cast_minor's kind names, which build_minor_fae keys the face bake and the stroll on
     cm.KIND = {"v_female": "female", "v_plump": "round", "v_elder": "round", "v_mountain": "female",
-               "v_male": "male", "v_slight": "male", "v_stout": "broad"}[body]
+               "v_male": "male", "v_slight": "male", "v_stout": "broad", "v_acolyte": "male"}[body]
     cm.HEIGHT = D["height"]
     cm.SHAPE = shapes(cm)[body]
     cm.WARP = warp(cm, body, cm.HEIGHT)
