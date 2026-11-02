@@ -46,6 +46,7 @@ func _run() -> void:
 	cap.stills = PackedFloat32Array(stage[3])
 	cap.fps = 0.0 if args.has("noclip") else 6.0
 	cap.wait_for_film = true
+	cap.give_up = 900.0
 	cap.quit_after = film.length + 3.0
 	get_tree().root.size = Vector2i(1920, 1080)
 	get_tree().root.add_child(cap)
@@ -55,7 +56,29 @@ func _run() -> void:
 	game.set(&"opening_shot", "")
 	get_tree().root.add_child(game)
 	get_tree().current_scene = game
+	# Walking in starts it; if the trigger has not fired once the region has
+	# settled, start it as the trigger would (and say why, for the log).
+	var space: SceneSpace = null
+	for i in 240:
+		await get_tree().create_timer(1.0).timeout
+		if FilmPlayer.current(get_tree()):
+			print("cutscene_shot: %s started after %d s" % [id, i + 1])
+			break
+		space = _space_of(moment.id)
+		if i % 10 == 9:
+			print("cutscene_shot: %d s, spawned %s, space %s, can_start %s" % [i + 1, game.get(&"spawned"),
+					space != null, space.can_start() if space else false])
+		if space and i >= 8 and bool(game.get(&"spawned")) and not space.running and space.can_start():
+			print("cutscene_shot: starting %s by hand" % moment.id)
+			space.start()
 	queue_free()
+
+
+func _space_of(moment_id: StringName) -> SceneSpace:
+	for n in get_tree().root.find_children("*", "MomentSpace", true, false):
+		if (n as SceneSpace).space_id == moment_id:
+			return n as SceneSpace
+	return null
 
 
 ## Every deed the gates need, and every deed those need, back to the start.
