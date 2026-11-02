@@ -46,7 +46,7 @@ id = &"op_05"
 at = 43.0
 hold = 10.0
 speaker = &""
-text = "Once, we were their slaves. For thousands of years we built their cities with our blood and sweat, and their temples to gods we never knew."
+text = "Once, we were their slaves. For thousands of years we built their cities with our blood and sweat, and temples to their feral gods."
 canon = "C"
 
 [sub_resource type="Resource" id="L05"]

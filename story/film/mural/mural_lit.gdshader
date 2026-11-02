@@ -8,7 +8,7 @@
 // - ink, ink_mix 0..1: how far the body leans into the tableau's ink colour
 //   (beasts lean far, so they stay half-seen).
 // - reveal, origin, span, gold, rim_power, rim_gain, glow, drain, rust,
-//   crack: as in mural_paint, so the director drives both alike.
+//   crack, alpha_cut: as in mural_paint, so the director drives both alike.
 shader_type spatial;
 render_mode cull_disabled, diffuse_burley;
 
@@ -29,6 +29,8 @@ uniform float span = 20.0;
 uniform float drain = 0.0;
 uniform float rust = 0.0;
 uniform float crack = 0.0;
+// The paint thins to nothing (the mother lets go): grain below this is gone.
+uniform float alpha_cut = 0.0;
 
 varying vec3 wpos;
 
@@ -67,6 +69,9 @@ void fragment() {
 	vec3 col = mix(tex.rgb, ink, ink_mix);
 	// Paint grain: a light hand of pigment over the colour.
 	float grain = fbm(q.xy * 9.0 + q.z * 3.0);
+	if (alpha_cut > 0.0 && grain < alpha_cut) {
+		discard;
+	}
 	col *= 0.9 + 0.2 * grain;
 	col = mix(col, vec3(0.55, 0.07, 0.05), rust * smoothstep(0.6, -0.4, q.y * 0.25 + grain * 0.5 - 0.2));
 	float cr = smoothstep(0.02, 0.0, abs(fbm(q.xy * 2.2) - 0.5)) * crack;

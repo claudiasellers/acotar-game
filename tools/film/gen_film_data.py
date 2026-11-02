@@ -28,7 +28,7 @@ FILMS = {
             ("op_02", 11.0, 7.5, "", "C", "Once, the whole of this land belonged to the faeries."),
             ("op_03", 21.0, 11.0, "", "C", "The greatest of them, the High Fae, were ageless, and so beautiful it hurt to look at them. Stronger than us, faster than us, with magic in their blood."),
             ("op_04", 34.5, 6.5, "", "C", "But not every faerie looked like a lord. Some wore the shapes of beasts."),
-            ("op_05", 43.0, 10.0, "", "C", "Once, we were their slaves. For thousands of years we built their cities with our blood and sweat, and their temples to gods we never knew."),
+            ("op_05", 43.0, 10.0, "", "C", "Once, we were their slaves. For thousands of years we built their cities with our blood and sweat, and temples to their feral gods."),
             ("op_06", 55.5, 9.5, "", "C", "Once, we rose against them. The war was so terrible that we never told it plainly. We sang it to our children instead."),
             ("op_07", 69.0, 8.0, "", "C", "Six human queens signed a Treaty with them, five hundred years ago. A promise."),
             ("op_08", 79.0, 10.5, "", "C", "The faeries kept the north, and took their magic with them. They called it Prythian. We were given the south, and a Wall between us that no one can see."),
