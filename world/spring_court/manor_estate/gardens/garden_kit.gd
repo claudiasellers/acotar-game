@@ -36,9 +36,14 @@ static func paving() -> Material:
 	return EstateKit.mat(Color(0.80, 0.68, 0.68), 0.6, 0.0, "garden_paving")
 
 
-## Dark, rich mulch under the rose beds so the blooms pop.
+## Warm cocoa-rose mulch under the beds. It was a dark mauve (0.40, 0.28, 0.27)
+## that the lilac dusk grade turned near-black purple in the parterres (L56,
+## user report); this stays clearly earth but light enough to read as soil.
+const MULCH := Color(0.58, 0.43, 0.36)
+
+
 static func mulch() -> Material:
-	return EstateKit.mat(Color(0.40, 0.28, 0.27), 0.95, 0.0, "garden_mulch")
+	return EstateKit.mat(MULCH, 0.95, 0.0, "garden_mulch")
 
 
 ## Clipped lawn inside the rooms: a cooler, deeper green than the meadows.

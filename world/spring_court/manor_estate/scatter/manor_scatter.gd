@@ -116,7 +116,7 @@ static func specs() -> Dictionary:
 	# the garden flowers sit in a few compact gardens spread over the estate, so
 	# they draw in 128 m chunks (fewer, fuller draw calls) however dense they are
 	for id: StringName in s:
-		if String(id).begins_with("deco_rose_") and id != &"deco_rose_pink" and id != &"deco_rose_climbing" or id in GARDEN_WIDE:
+		if String(id).begins_with("deco_rose_") and id != &"deco_rose_pink" and id != &"deco_rose_climbing" or id in GARDEN_WIDE or id in PARK_WIDE:
 			var tags: PackedStringArray = s[id]["tags"]
 			tags.append("wide")
 			s[id]["tags"] = tags
@@ -129,6 +129,10 @@ static func specs() -> Dictionary:
 	return s
 
 
+## The south lawns' rose islands and flower rivers (ManorParkland, L56) gather
+## these into dense compact drifts, which would tip them into 64 m chunks over
+## the whole estate (they were 128 m layers when scattered thinly).
+const PARK_WIDE: Array[StringName] = [&"ing_rose_red", &"ing_rose_white", &"ing_crocus", &"ing_faelight_dandelion", &"deco_tulip_bed"]
 const GARDEN_WIDE: Array[StringName] = [&"deco_iris", &"deco_snowdrop", &"deco_daffodil", &"deco_hydrangea", &"deco_hydrangea_pink",
 	&"deco_delphinium", &"deco_lupin", &"deco_hollyhock", &"deco_allium", &"deco_catmint", &"deco_foxglove_white", &"deco_foxglove",
 	&"deco_peony_white", &"deco_lilac", &"deco_wisteria", &"deco_buttercup", &"deco_peony", &"deco_forget_me_not", &"deco_water_lily"]
@@ -224,6 +228,7 @@ static func footprints() -> Array[Rect2]:
 	out.append_array(ManorOrchard.footprints())
 	out.append(ManorSitePlan.HEDGE_MAZE)   # the maze places its own (cell centres)
 	out.append_array(ManorReflectingPool.footprints())
+	out.append_array(ManorParkland.footprints())
 	return out
 
 
@@ -283,21 +288,21 @@ func scatter_zone(id: StringName, zone: StringName, count: int, cluster: int = 4
 ## Generic zone forage: id -> [[zone, count, cluster], ...]. Structures add
 ## their own placements (beds, walls, hives, dead ends) in their plant().
 const FORAGE := {
-	&"ing_rose_red": [[&"south_lawns", 40, 5], [&"walled_orchard", 20, 4], [&"southwest_park", 20, 4], [&"east_glade", 12, 4]],
-	&"ing_rose_white": [[&"south_lawns", 30, 5], [&"east_glade", 15, 5], [&"southeast_park", 15, 5]],
+	&"ing_rose_red": [[&"walled_orchard", 20, 4], [&"southwest_park", 20, 4], [&"east_glade", 12, 4]],
+	&"ing_rose_white": [[&"east_glade", 15, 5], [&"southeast_park", 15, 5]],
 	&"ing_rose_gold": [[&"deer_park", 12, 3], [&"east_glade", 9, 3]],
 	&"ing_lavender": [[&"west_downs", 120, 8], [&"east_meadow", 60, 8], [&"kitchen_garden", 24, 6], [&"southwest_park", 40, 8]],
-	&"ing_honeysuckle": [[&"paddock", 30, 3], [&"west_woods_edge", 24, 4], [&"east_woods_edge", 20, 4], [&"south_lawns", 18, 3]],
-	&"ing_wisteria": [[&"stables", 6, 2], [&"east_glade", 8, 2], [&"south_lawns", 8, 2]],
-	&"ing_lilac": [[&"rose_garden", 16, 2], [&"south_lawns", 30, 3], [&"deer_park", 20, 3], [&"east_glade", 15, 3]],
+	&"ing_honeysuckle": [[&"paddock", 30, 3], [&"west_woods_edge", 24, 4], [&"east_woods_edge", 20, 4]],
+	&"ing_wisteria": [[&"stables", 6, 2], [&"east_glade", 8, 2]],
+	&"ing_lilac": [[&"rose_garden", 16, 2], [&"deer_park", 20, 3], [&"east_glade", 15, 3]],
 	&"ing_cherry_blossom": [[&"deer_park", 20, 4], [&"southeast_park", 16, 4]],
 	&"ing_elderflower": [[&"west_downs", 20, 2], [&"north_hills", 30, 2], [&"southeast_park", 20, 2], [&"walled_orchard", 8, 2]],
-	&"ing_wild_strawberry": [[&"east_meadow", 80, 8], [&"west_downs", 60, 8], [&"south_lawns", 40, 6], [&"walled_orchard", 30, 6], [&"southeast_park", 40, 6]],
+	&"ing_wild_strawberry": [[&"east_meadow", 80, 8], [&"west_downs", 60, 8], [&"walled_orchard", 30, 6], [&"southeast_park", 40, 6]],
 	&"ing_blackberry": [[&"north_hills", 50, 5], [&"west_woods_edge", 40, 5], [&"east_woods_edge", 40, 5], [&"paddock", 20, 4], [&"southwest_park", 30, 5]],
 	&"ing_willow_bark": [[&"west_woods_edge", 12, 2], [&"east_woods_edge", 12, 2], [&"southwest_park", 8, 2]],
 	&"ing_wild_hyacinth": [[&"north_hills", 150, 10], [&"west_woods_edge", 80, 10], [&"east_woods_edge", 80, 10], [&"deer_park", 60, 10], [&"southeast_park", 60, 10]],
-	&"ing_foxglove": [[&"north_hills", 50, 5], [&"west_woods_edge", 30, 5], [&"east_woods_edge", 30, 5], [&"south_lawns", 20, 5]],
-	&"ing_faelight_dandelion": [[&"south_lawns", 120, 8], [&"east_meadow", 80, 8], [&"deer_park", 60, 8], [&"west_downs", 60, 8], [&"southwest_park", 40, 8]],
+	&"ing_foxglove": [[&"north_hills", 50, 5], [&"west_woods_edge", 30, 5], [&"east_woods_edge", 30, 5]],
+	&"ing_faelight_dandelion": [[&"east_meadow", 80, 8], [&"deer_park", 60, 8], [&"west_downs", 60, 8], [&"southwest_park", 40, 8]],
 	&"ing_moss": [[&"north_hills", 100, 8], [&"west_woods_edge", 60, 8], [&"east_woods_edge", 60, 8], [&"pond", 30, 6], [&"stables", 8, 4]],
 	&"ing_snail_shell": [[&"kitchen_garden", 20, 3], [&"rose_garden", 15, 3], [&"pond", 20, 3], [&"walled_orchard", 12, 3], [&"stables", 8, 2]],
 	&"ing_hawk_feather": [[&"paddock", 15, 1], [&"east_meadow", 20, 1], [&"west_downs", 20, 1], [&"deer_park", 15, 1], [&"north_hills", 15, 1]],
@@ -307,16 +312,16 @@ const FORAGE := {
 	&"ing_madder": [[&"kitchen_garden", 20, 4], [&"west_downs", 30, 5], [&"east_meadow", 30, 5], [&"paddock", 15, 5]],
 	&"ing_river_silt": [],
 	&"ing_crab_apple": [[&"deer_park", 20, 4], [&"east_glade", 10, 4]],
-	&"ing_buttercup": [[&"east_meadow", 150, 10], [&"west_downs", 120, 10], [&"deer_park", 80, 10], [&"paddock", 60, 10], [&"south_lawns", 60, 10], [&"southeast_park", 60, 10], [&"southwest_park", 60, 10]],
+	&"ing_buttercup": [[&"east_meadow", 150, 10], [&"west_downs", 120, 10], [&"deer_park", 80, 10], [&"paddock", 60, 10], [&"southeast_park", 60, 10], [&"southwest_park", 60, 10]],
 	&"ing_iris": [[&"rose_garden", 20, 5], [&"pond", 40, 5], [&"kitchen_garden", 10, 5]],
-	&"ing_crocus": [[&"south_lawns", 150, 10], [&"deer_park", 80, 10], [&"rose_garden", 30, 10], [&"east_meadow", 60, 10], [&"north_hills", 50, 10], [&"east_glade", 30, 10]],
+	&"ing_crocus": [[&"deer_park", 80, 10], [&"rose_garden", 30, 10], [&"east_meadow", 60, 10], [&"north_hills", 50, 10], [&"east_glade", 30, 10]],
 	&"ing_glowcap": [[&"north_hills", 40, 5], [&"west_woods_edge", 30, 5], [&"east_woods_edge", 30, 5]],
 	&"col_pressed_violet": [[&"rose_garden", 5, 1], [&"deer_park", 5, 1], [&"east_glade", 4, 1]],
-	&"col_painted_pebble": [[&"pond", 6, 1], [&"kitchen_garden", 4, 1], [&"south_lawns", 6, 1], [&"southwest_park", 4, 1]],
-	&"col_lost_ribbon": [[&"rose_garden", 4, 1], [&"south_lawns", 5, 1], [&"walled_orchard", 4, 1]],
+	&"col_painted_pebble": [[&"pond", 6, 1], [&"kitchen_garden", 4, 1], [&"southwest_park", 4, 1]],
+	&"col_lost_ribbon": [[&"rose_garden", 4, 1], [&"walled_orchard", 4, 1]],
 	&"col_pearl_button": [[&"rose_garden", 4, 1], [&"kitchen_garden", 4, 1], [&"stables", 4, 1]],
-	&"col_glass_marble": [[&"south_lawns", 5, 1], [&"pond", 4, 1], [&"southeast_park", 4, 1]],
-	&"col_tiny_horseshoe": [[&"stables", 6, 1], [&"paddock", 6, 1], [&"south_lawns", 4, 1], [&"west_downs", 4, 1]],
+	&"col_glass_marble": [[&"pond", 4, 1], [&"southeast_park", 4, 1]],
+	&"col_tiny_horseshoe": [[&"stables", 6, 1], [&"paddock", 6, 1], [&"west_downs", 4, 1]],
 	&"col_garden_key": [[&"walled_orchard", 3, 1], [&"kitchen_garden", 3, 1]],
 	&"col_mask_feather": [[&"rose_garden", 4, 1], [&"deer_park", 4, 1], [&"north_hills", 5, 1], [&"east_meadow", 4, 1]],
 	&"col_rose_quartz": [[&"north_hills", 6, 1], [&"east_woods_edge", 5, 1], [&"west_woods_edge", 5, 1], [&"east_meadow", 4, 1]],
@@ -327,13 +332,13 @@ const FORAGE := {
 
 ## Decoration over open ground: id -> [[zone, count, cluster], ...].
 const DECO := {
-	&"deco_daisy": [[&"south_lawns", 260, 12], [&"deer_park", 120, 12], [&"east_meadow", 100, 12], [&"southwest_park", 80, 12], [&"southeast_park", 80, 12]],
+	&"deco_daisy": [[&"deer_park", 120, 12], [&"east_meadow", 100, 12], [&"southwest_park", 80, 12], [&"southeast_park", 80, 12]],
 	&"deco_forget_me_not": [[&"west_downs", 120, 12], [&"east_meadow", 100, 12], [&"pond", 60, 10], [&"north_hills", 80, 10]],
-	&"deco_tulip_bed": [[&"south_lawns", 90, 10], [&"east_glade", 50, 10]],
+	&"deco_tulip_bed": [[&"east_glade", 50, 10]],
 	&"deco_fern": [[&"north_hills", 200, 6], [&"west_woods_edge", 90, 6], [&"east_woods_edge", 90, 6], [&"southeast_park", 50, 6]],
-	&"deco_oak": [[&"north_hills", 170, 3], [&"deer_park", 26, 1], [&"south_lawns", 14, 1], [&"west_woods_edge", 50, 3], [&"east_woods_edge", 50, 3], [&"southwest_park", 30, 3], [&"southeast_park", 34, 3]],
+	&"deco_oak": [[&"north_hills", 170, 3], [&"deer_park", 26, 1], [&"west_woods_edge", 50, 3], [&"east_woods_edge", 50, 3], [&"southwest_park", 30, 3], [&"southeast_park", 34, 3]],
 	&"deco_birch": [[&"north_hills", 150, 4], [&"east_meadow", 22, 2], [&"west_woods_edge", 50, 4], [&"east_woods_edge", 50, 4], [&"southeast_park", 26, 3], [&"west_downs", 16, 2]],
-	&"deco_apple_blossom": [[&"south_lawns", 14, 1], [&"deer_park", 10, 1], [&"east_glade", 8, 1]],
+	&"deco_apple_blossom": [[&"deer_park", 10, 1], [&"east_glade", 8, 1]],
 	&"deco_cherry_blossom": [[&"deer_park", 10, 1], [&"southwest_park", 16, 2], [&"east_glade", 8, 1]],
 }
 
@@ -360,6 +365,7 @@ static func build_all() -> Array[ScatterLayer]:
 	ManorReflectingPool.plant(sb)
 	ManorFrontGarden.plant(sb)
 	ManorEastLawn.plant(sb)
+	ManorParkland.plant(sb)
 	ManorHedgeMaze.plant(sb)
 	ManorGlassHouses.plant(sb)
 	ManorKitchenGarden.plant(sb)

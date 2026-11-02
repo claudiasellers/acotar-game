@@ -24,6 +24,9 @@ func test_borders_line_both_sides_with_finds() -> void:
 				zs.append(p.z)
 	zs.sort()
 	for k in zs.size() - 1:
+		# the parkland walks leave the drive through the border (L56): that gap is the path
+		if ManorParkland.near_walk(Vector2(-edge - 1.0, (zs[k] + zs[k + 1]) * 0.5), 0.6):
+			continue
 		longest_gap = maxf(longest_gap, zs[k + 1] - zs[k])
 	assert_gt(per_side[-1], 250)
 	assert_gt(per_side[1], 250)
