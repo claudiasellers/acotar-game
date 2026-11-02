@@ -247,7 +247,7 @@ func _build_materials() -> int:
 		"mat_prop_glitter": _mat("court_prop.gdshader", {"blight": 0.0, "blight_affect": 1.0, "pearl_strength": 0.5, "glitter_strength": 4.0, "roughness_value": 0.3, "emission_glow": 3.5}),
 		"mat_water_lake": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_water_river": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "flow_dir": Vector2(0.0, 1.0), "flow_speed": 0.6, "ripple_strength": 0.7, "foam_strength": 1.0, "clarity": 0.65}),
-		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.7, 0.95, 1.0), "deep_color": Color(0.62, 0.62, 1.0), "clarity": 0.75, "glitter_strength": 9.0}),
+		"mat_water_starlight": _mat("court_water.gdshader", {"blight": 0.0, "blight_affect": 1.0, "starlight_mode": true, "shallow_color": Color(0.32, 0.6, 0.74), "deep_color": Color(0.05, 0.09, 0.26), "fresnel_color": Color(0.56, 0.62, 0.86), "depth_scale": 1.6, "clarity": 0.85, "glitter_strength": 6.0}),
 		"mat_glint": _mat("court_glint.gdshader", {"blight": 0.0, "blight_affect": 1.0}),
 		"mat_terrain_tint": _mat("court_terrain_tint.gdshader", {"blight": 0.0, "blight_affect": 1.0, "vertex_color_srgb": true,
 			"grass_a": Color("458045"), "grass_b": Color("789F4D"), "grass_c": Color("3F7F5A"),

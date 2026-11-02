@@ -14,6 +14,9 @@ const CODED := {
 	# L25: the grounds' dangers (ch9-11).
 	&"bogge": {"script": "res://story/act2/bogge_hunt.gd", "stage": "res://data/story/act2/bogge_stage.tres"},
 	&"puca": {"script": "res://story/act2/puca_lure.gd", "stage": "res://data/story/act2/puca_stage.tres"},
+	# L44: the wider court (ch18-19).
+	&"starlight_pool": {"script": "res://story/act4/starlight_pool_swim.gd", "stage": "res://data/story/act4/starlight_pool_stage.tres"},
+	&"attor": {"script": "res://story/act4/attor_in_the_garden.gd", "stage": "res://data/story/act4/attor_stage.tres"},
 }
 
 ## Anchor id -> list of {"name", "script", "stage"}: scenes with no moment.
