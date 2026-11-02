@@ -143,24 +143,12 @@ func _light_campfire(near: Vector3) -> void:
 	_campfire.name = "TheirFire"
 	add_child(_campfire)
 	_campfire.global_position = CalanmaiKit.ground(near.x, near.z)
-	for fx: String in ["fx_bonfire_flame", "fx_bonfire_embers"]:
-		var path := CalanmaiNight.FX + fx + ".tscn"
-		if ResourceLoader.exists(path):
-			var p := (load(path) as PackedScene).instantiate() as Node3D
-			_campfire.add_child(p)
-			p.position.y = 0.3
-			p.scale = Vector3.ONE * 0.9
-	var light := OmniLight3D.new()
-	light.light_color = Color(1.0, 0.55, 0.28)
-	light.light_energy = 5.0
-	light.omni_range = 20.0
-	light.shadow_enabled = true
-	light.position.y = 1.2
-	_campfire.add_child(light)
-	var tw := light.create_tween().set_loops()
-	tw.tween_property(light, ^"light_energy", 4.0, 0.23)
-	tw.tween_property(light, ^"light_energy", 5.6, 0.31)
-	tw.tween_property(light, ^"light_energy", 4.6, 0.19)
+	# L45-6: a real campfire (stone ring, logs, capped flame cards, sparks,
+	# smoke), not the court's flame particles, which bloomed white at 2 m.
+	var fire := CalanmaiFire.campfire()
+	fire.light_energy = 6.0
+	fire.light_range = 20.0
+	_campfire.add_child(fire)
 	var crackle := AudioStreamPlayer3D.new()
 	crackle.stream = CalanmaiNight._looped(CalanmaiNight.FIRE)
 	crackle.unit_size = 2.5

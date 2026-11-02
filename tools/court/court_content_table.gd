@@ -486,7 +486,7 @@ static func regions() -> Dictionary:
 			"anchors": [["calanmai_bonfires", 620.0, -1055.0, 0.0, 25.0], ["calanmai_cave_mouth", 690.0, -982.0, 0.0, 12.0]],
 			"default": &"hill_grass",
 			"grade": &"grade_hill_of_the_rite_dusk",
-			"fx": ["fx_pollen_motes", "fx_bonfire_embers", "fx_bonfire_flame", "fx_bonfire_smoke", "fx_fireflies"],
+			"fx": ["fx_pollen_motes", "fx_fireflies"],
 			"notes": "Calanmai (Fire Night, C): bonfires on the hill, drums, the Great Rite in a cave. Rhysand meets Feyre near the bonfires (C). Stones on the summit are [X]. After Calanmai the hill permanently changes (story lane StateVisibility): burnt-out fires, scattered ribbons.",
 			"habitats": [
 				["stone_ring", "circle", 800.0, -1100.0, 45.0, 0.0, 9, false],

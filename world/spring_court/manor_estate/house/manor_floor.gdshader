@@ -30,6 +30,50 @@ float noise(vec2 p) {
 	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
+vec2 hash2(vec2 p) {
+	return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
+}
+
+// Distance to the nearest Voronoi border (Quilez): the crack network marble
+// veins follow, with branching junctions instead of closed loops.
+float vein_dist(vec2 x) {
+	vec2 n = floor(x);
+	vec2 f = fract(x);
+	vec2 mr = vec2(0.0);
+	vec2 mg = vec2(0.0);
+	float md = 8.0;
+	for (int j = -1; j <= 1; j++) {
+		for (int i = -1; i <= 1; i++) {
+			vec2 g = vec2(float(i), float(j));
+			vec2 r = g + hash2(n + g) - f;
+			float d = dot(r, r);
+			if (d < md) {
+				md = d;
+				mr = r;
+				mg = g;
+			}
+		}
+	}
+	md = 8.0;
+	for (int j = -2; j <= 2; j++) {
+		for (int i = -2; i <= 2; i++) {
+			vec2 g = mg + vec2(float(i), float(j));
+			vec2 r = g + hash2(n + g) - f;
+			if (dot(mr - r, mr - r) > 0.00001) {
+				md = min(md, dot(0.5 * (mr + r), normalize(r - mr)));
+			}
+		}
+	}
+	return md;
+}
+
+// A vein of half-width `w` (in the units of `d`), anti-aliased; thinner than a
+// pixel it fades instead of shimmering.
+float vein_line(float d, float w) {
+	float aa = max(fwidth(d), 0.0001);
+	return (1.0 - smoothstep(w, w + aa, d)) * clamp(w / aa, 0.0, 1.0);
+}
+
 // 0..1 distance-to-joint for a cell (0 on the joint line).
 float edge_mask(vec2 f, float w) {
 	vec2 d = min(f, 1.0 - f);
@@ -70,14 +114,20 @@ void fragment() {
 		vec2 f = fract(q);
 		float dark = mod(cell.x + cell.y, 2.0);
 		vec2 w = q * 0.85 + cell * 5.3;
-		float warp = noise(w * 1.1) * 2.2 + noise(w * 3.3) * 0.9;
-		float vein = 1.0 - smoothstep(0.0, 0.07, abs(sin(w.x * 1.6 + w.y * 0.7 + warp * 2.6)));
-		float fine = 1.0 - smoothstep(0.0, 0.035, abs(sin(w.x * 4.1 - w.y * 2.3 + warp * 4.0)));
+		// veins (L48 hall probe: the old ones were even, wobbly loops like
+		// contour lines): a warped crack network, a main vein about a centimetre
+		// wide and a finer one, each tapering out and fading along its length
+		vec2 wm = w * 1.25 + vec2(noise(w * 1.7), noise(w * 1.7 + 31.0)) * 0.9;
+		vec2 wf = w * 3.1 + vec2(noise(w * 4.3 + 7.0), noise(w * 4.3 + 19.0)) * 1.1;
+		float taper_m = smoothstep(0.32, 0.72, noise(w * 0.9 + 11.0));
+		float taper_f = smoothstep(0.38, 0.8, noise(w * 1.6 + 23.0));
+		float vein = vein_line(vein_dist(wm), 0.0075 * taper_m) * mix(0.55, 1.0, noise(w * 2.2 + 3.0));
+		float fine = vein_line(vein_dist(wf), 0.006 * taper_f) * mix(0.3, 0.8, noise(w * 3.7 + 5.0));
 		float cloud = noise(w * 0.8) * 0.6 + noise(w * 2.7) * 0.4;
 		vec3 ivory = base.rgb * mix(0.96, 1.02, cloud);
-		ivory = mix(ivory, vec3(0.70, 0.67, 0.64), vein * 0.32 + fine * 0.12);
+		ivory = mix(ivory, vec3(0.70, 0.67, 0.64), min(vein * 0.5 + fine * 0.3, 0.6));
 		vec3 nero = alt.rgb * mix(0.85, 1.15, cloud);
-		nero = mix(nero, vec3(0.80, 0.78, 0.74), vein * 0.45 + fine * 0.22);
+		nero = mix(nero, vec3(0.80, 0.78, 0.74), min(vein * 0.7 + fine * 0.4, 0.8));
 		col = mix(ivory, nero, dark);
 		j = edge_mask(f, 0.012);
 		// the fillet is brass, not grout

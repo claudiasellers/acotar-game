@@ -586,10 +586,16 @@ def glamoured(name):
     return look(design, extras=keep, **GLAMOURED[name])
 
 
+# Figures rebuilt on the main cast's body by tools/blender/cast/build_minor_fae.py (lane L48): this
+# script must not overwrite their files.
+MAIN_BODY = ("reveler_1", "reveler_2", "reveler_3", "calanmai_1", "calanmai_2", "calanmai_3", "servant_maid",
+             "servant_footman", "servant_cook", "sentry_1", "sentry_2", "fae_rose", "fae_nymph", "fae_longlimb")
+
+
 if __name__ == "__main__":
     only = set(os.environ.get("ONLY", "").split(",")) - {""}
     for name, design in CAST.items():
-        if only and name not in only:
+        if only and name not in only or name in MAIN_BODY:
             continue
         if name in GLAMOURED:
             build(name, glamoured(name))

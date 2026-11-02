@@ -30,7 +30,9 @@ const FEYRE_SIT := Vector3(50.55, 0.0, -58.85)
 const FEYRE_STAND := Vector3(50.3, 0.0, -58.3)
 const SATCHEL_AT := Vector3(49.25, 0.9, -60.25)
 const STEPS_IN := Vector3(0.0, 0.0, -70.6)
-const STEPS_OUT := Vector3(0.0, 0.0, -75.4)
+## Out past the terrace's orange-tree tub (site plan: x 0, z -74.5, straight
+## out of the door), not into it: she stood stuck behind it, hidden by its leaves.
+const STEPS_OUT := Vector3(2.6, 0.0, -76.8)
 
 var alis: Node3D
 var hood: Node3D
@@ -304,9 +306,12 @@ func _b_steps() -> void:
 		put_feyre(STEPS_IN, STEPS_OUT)
 		_mountain()
 		var p := ground(STEPS_IN)
-		var n := _north_dir(p)
-		var right := n.cross(Vector3.UP)
-		shot_world(p - n * 2.6 + right * 0.6 + Vector3.UP * 1.45, p + n * 60.0 + Vector3.UP * 14.0, 40.0, 0.6, 9.0)
+		# From inside the hall, down the line she walks: she stays in the middle
+		# of the doorway all the way out, the mountain over her shoulder.
+		var w := ground(STEPS_OUT) - p
+		w.y = 0.0
+		w = w.normalized()
+		shot_world(p - w * 2.6 + Vector3.UP * 1.45, p + w * 60.0 + Vector3.UP * 3.0, 40.0, 0.6, 9.0)
 		player.veil_to(0.0, 1.6)
 		walk_feyre(STEPS_OUT, 6.0))
 
