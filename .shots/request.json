@@ -1,0 +1,12 @@
+{
+  "id": "L42-1",
+  "scene": "world",
+  "quality": "full",
+  "size": [1920, 1080],
+  "time_of_day": 0.5,
+  "shots": [
+    {"name": "drive_noon", "eye": [0, 1.7, 75], "at": [0, 12, -40], "fov": 62},
+    {"name": "drive_dusk", "eye": [-22, 1.7, 30], "at": [-4, 10, -30], "fov": 66, "time_of_day": 0.765},
+    {"name": "bedroom_window", "eye": [23, 15.3, -61], "at": [23, 15.2, -72], "fov": 70, "ground": false}
+  ]
+}
