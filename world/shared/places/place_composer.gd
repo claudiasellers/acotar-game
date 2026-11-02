@@ -16,6 +16,22 @@ static func table(path: String = COURT_TABLE) -> PlaceTable:
 	return CourtAssets.resource(path) as PlaceTable
 
 
+## Loads every model, FX scene and sound cue the settings use (main thread,
+## before a region's worker starts): a worker that has to load a .gltf can
+## need the main thread, and the main thread may be waiting on that worker
+## (build_now), which deadlocks.
+static func prewarm(settings: Array[PlaceSetting]) -> void:
+	for s in settings:
+		for m in Array(s.collar_meshes) + Array(s.props):
+			CourtAssets.mesh(StringName(m))
+		if s.frame_mesh != &"":
+			CourtAssets.mesh(s.frame_mesh)
+		if s.fx_id != &"":
+			CourtAssets.resource(FX_DIR % s.fx_id)
+		if s.sound_cue != "":
+			CourtAssets.resource(s.sound_cue)
+
+
 ## Settings whose forecourt touches `rect`.
 static func in_rect(t: PlaceTable, rect: Rect2) -> Array[PlaceSetting]:
 	var out: Array[PlaceSetting] = []

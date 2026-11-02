@@ -51,6 +51,8 @@ func _ready() -> void:
 			CourtAssets.mesh(d.mesh_id)
 			if d.is_tree:
 				CourtAssets.mesh(d.mesh_id, true)
+		# The places' collars, props, FX and sounds too (decor_layers asks for them).
+		PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), content.bounding_rect()))
 		_start()
 	else:
 		build()
