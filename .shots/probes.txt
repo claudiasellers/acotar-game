@@ -1,0 +1,6 @@
+from L32 stump after
+quality look
+size 1920x1080
+timeout 900
+shot cottage res://tools/world_shot.tscn cottage_snow {out}/cottage_snow.png
+shot dawn res://tools/world_shot.tscn opening_dawn {out}/opening_dawn.png
