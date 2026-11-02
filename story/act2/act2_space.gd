@@ -172,6 +172,98 @@ func reach(mark_name: StringName, radius: float) -> SceneBeat:
 		"reach %s" % mark_name)
 
 
+## Waits for `done`. If she still hasn't after `after` seconds, says `nudge`
+## (a stage line) as an aside, and once more after twice as long again: a
+## thought or a word from whoever's there, never a marker (R2). Every wait
+## on her (a press, a place, following someone) carries one (L34-6).
+func nudged(done: Callable, nudge: StringName, after: float, label: String = "until") -> SceneBeat:
+	return NudgeBeat.new(done, nudge, after, label)
+
+
+## reach(), with an idle nudge.
+func reach_nudged(mark_name: StringName, radius: float, nudge: StringName, after: float) -> SceneBeat:
+	var r := reach(mark_name, radius) as Beats.UntilBeat
+	return nudged(r.condition, nudge, after, r.label)
+
+
+## Waits for her next E press, showing the "E   <verb>" card (the forage
+## card's look) while she's within `card_radius` of `at_mark`, or anywhere
+## when `at_mark` is empty; `nudge` comes after `after` quiet seconds.
+func wait_press(verb: String, nudge: StringName, after: float, at_mark: StringName = &"",
+		card_radius: float = 2.5, label: String = "until she presses E") -> SceneBeat:
+	return PressBeat.new(verb, nudge, after, at_mark, card_radius, label)
+
+
+func _finish() -> void:
+	if is_inside_tree():
+		PressCard.hide_on(self)
+	super._finish()
+
+
+class NudgeBeat:
+	extends SceneBeat
+	var done: Callable
+	var nudge: StringName
+	var after: float
+	var waited: float = 0.0
+	## How many times the nudge has been said this wait (at most twice).
+	var said: int = 0
+
+	func _init(d: Callable, n: StringName, a: float, l: String) -> void:
+		done = d
+		nudge = n
+		after = a
+		label = l
+
+	func enter(_space: SceneSpace) -> void:
+		waited = 0.0
+		said = 0
+
+	func tick(space: SceneSpace, delta: float) -> bool:
+		if is_done(space):
+			return true
+		waited += delta
+		var due := after * (1.0 + 2.0 * said)
+		if said < 2 and waited >= due:
+			said += 1
+			(space as Act2Space).aside(nudge)
+		return false
+
+	func is_done(_space: SceneSpace) -> bool:
+		return bool(done.call())
+
+
+class PressBeat:
+	extends NudgeBeat
+	var verb: String
+	var at_mark: StringName
+	var card_radius: float
+	var _base: int = 0
+
+	func _init(v: String, n: StringName, a: float, m: StringName, r: float, l: String) -> void:
+		super._init(Callable(), n, a, l)
+		verb = v
+		at_mark = m
+		card_radius = r
+
+	func enter(space: SceneSpace) -> void:
+		super.enter(space)
+		_base = (space as Act2Space).presses()
+
+	func is_done(space: SceneSpace) -> bool:
+		var s := space as Act2Space
+		if s.presses() > _base:
+			return true
+		if s.is_inside_tree():
+			var near := at_mark == &"" or s.player_within(card_radius, s.mark(at_mark))
+			PressCard.find_or_make(s).show_text(verb if near else "")
+		return false
+
+	func exit(space: SceneSpace) -> void:
+		if space.is_inside_tree():
+			PressCard.hide_on(space)
+
+
 ## Sparkles, chime and bounce (R3: every reward gets its burst).
 func delight(kind: StringName, at_mark: StringName = &"", target: Node3D = null) -> void:
 	if not is_inside_tree():
@@ -230,8 +322,13 @@ func find_anchor(anchor_id: StringName) -> Node3D:
 ## An actor walks a list of marks; with `wait_for` > 0 it waits at each mark
 ## until Feyre is that close (she follows it). Uses the actor's own lead()
 ## when it has one (BeastActor), otherwise slides it at `speed`.
-func lead_along(actor_id: StringName, route: Array, wait_for: float = 0.0, speed: float = 2.2) -> SceneBeat:
-	return LeadBeat.new(actor_id, route, wait_for, speed)
+## `nudge` (with wait_for > 0): said when he has waited `after` seconds for her.
+func lead_along(actor_id: StringName, route: Array, wait_for: float = 0.0, speed: float = 2.2,
+		nudge: StringName = &"", after: float = 15.0) -> SceneBeat:
+	var lead := LeadBeat.new(actor_id, route, wait_for, speed)
+	lead.nudge = nudge
+	lead.after = after
+	return lead
 
 
 class LeadBeat:
@@ -242,6 +339,11 @@ class LeadBeat:
 	var speed: float
 	var index: int = 0
 	var _asked: int = -1
+	var nudge: StringName = &""
+	var after: float = 15.0
+	## Seconds he has stood waiting for her this lead, and nudges said.
+	var waited: float = 0.0
+	var said: int = 0
 
 	func consumes_time() -> bool:
 		return true
@@ -256,6 +358,8 @@ class LeadBeat:
 	func enter(_space: SceneSpace) -> void:
 		index = 0
 		_asked = -1
+		waited = 0.0
+		said = 0
 
 	func tick(space: SceneSpace, delta: float) -> bool:
 		var s := space as Act2Space
@@ -278,6 +382,10 @@ class LeadBeat:
 		if who.global_position.distance_to(target) > 0.6:
 			return false
 		if wait_for > 0.0 and not s.player_within(wait_for, who.global_position):
+			waited += delta
+			if nudge != &"" and said < 2 and waited >= after * (1.0 + 2.0 * said):
+				said += 1
+				s.aside(nudge)
 			return false
 		index += 1
 		return index >= route.size()

@@ -5,8 +5,10 @@
 ## and a dark blue tunic with scratchy gold thread on the lapels. Then dinner.
 ##
 ## Hangs on feyre_bedroom_window (Act2Spaces.EXTRA). Starts when she is in her
-## room after the arrival. Play: walk to the bath and press E; the tunic goes
-## on with the outfit sparkle. Fact: fact.alis_bathed (FirstDinner's gate).
+## room after the arrival. Play: walk to the steaming bath (Alis points the
+## way if she lingers) and press E (the "E   step in" card; Alis says go on
+## if she stands there); the tunic goes on with the outfit sparkle. Fact:
+## fact.alis_bathed (FirstDinner's gate).
 class_name AlisWelcome
 extends Act2Space
 
@@ -16,8 +18,14 @@ const DINNER_HOUR := 20.0 / 24.0
 const TUNIC := &"spring_tunic_sky"
 const TROUSERS := &"spring_trousers_cream"
 const ROOM_RADIUS := 6.0
+## Quiet seconds before Alis points her to the bath, and, at the bath, tells
+## her to get in (L34-6: the player never wonders what the room wants).
+const WHERE_AFTER := 12.0
+const GO_ON_AFTER := 6.0
 
 var bathed: bool = false
+## Steam off the hot water until she's in (soft white wisps, no glow).
+var steam: GPUParticles3D
 
 
 func _init() -> void:
@@ -35,19 +43,18 @@ func _ready() -> void:
 
 func _build_beats() -> Array:
 	bathed = false
-	var presses_at := [0]
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"alis", &"alis_spot", &"feyre_start")
 			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"alis")), "Alis waits"),
 		say(&"alis_bath_drawn"),
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(null), "free to look"),
-		reach(&"bath", 2.2),
 		Beats.run(func(_s: SceneSpace) -> void:
-			presses_at[0] = presses()
-			aside(&"bath_prompt"), "at the bath"),
-		Beats.until(func() -> bool: return presses() > presses_at[0], "until she steps in"),
+			StoryControl.set_focus(null)
+			_steam_the_bath(), "free to look"),
+		reach_nudged(&"bath", 2.2, &"alis_bath_where", WHERE_AFTER),
+		Beats.run(func(_s: SceneSpace) -> void: aside(&"bath_prompt"), "at the bath"),
+		wait_press("step in", &"alis_go_on", GO_ON_AFTER, &"bath", 2.8, "until she steps in"),
 	] + fade_time(DINNER_HOUR - 1.0 / 24.0, _bathe, "the bath") + [
 		say(&"bath_thought"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -66,10 +73,29 @@ func _build_beats() -> Array:
 
 func _bathe() -> void:
 	bathed = true
+	if steam and is_instance_valid(steam):
+		steam.queue_free()
+	steam = null
 	place_feyre(mark(&"after_bath"))
 	var alis := actor(&"alis")
 	if alis:
 		alis.global_position = mark(&"alis_spot")
+
+
+## Wisps curling off the bath, so it reads as hot water drawn for her.
+func _steam_the_bath() -> void:
+	if not is_inside_tree() or (steam and is_instance_valid(steam)):
+		return
+	steam = BathSteam.make()
+	add_child(steam)
+	steam.global_position = mark(&"bath") + Vector3.UP * 0.7
+
+
+func _finish() -> void:
+	if steam and is_instance_valid(steam):
+		steam.queue_free()
+	steam = null
+	super._finish()
 
 
 ## Trousers and a tunic, with the outfit sparkle (R3: every change gets it).
