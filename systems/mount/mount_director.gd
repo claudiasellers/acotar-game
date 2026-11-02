@@ -71,6 +71,7 @@ var _unlock: ActionTrigger
 var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
 var _cam_tween: Tween
+var _steer_frame := SteerFrame.new()
 
 
 func _ready() -> void:
@@ -451,10 +452,12 @@ func _steer() -> void:
 		var a: Array = autopilot.call()
 		mare.steer = a[0]
 		mare.gallop = a[1]
+		_steer_frame.release()
 		return
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	var yaw: float = feyre.call(&"camera_yaw") if feyre.has_method(&"camera_yaw") else 0.0
-	mare.steer = Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
+	# Like on foot (SteerFrame): the keys steer, turning the camera doesn't.
+	mare.steer = Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _steer_frame.yaw(input, yaw))
 	mare.gallop = Input.is_action_pressed(&"sprint")
 
 

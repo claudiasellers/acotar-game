@@ -11,7 +11,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/amb/cottage_yard.ogg | Outside the cottage: lighter wind, boards creaking, a shutter knocking | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/dread.ogg | Dread bed: near silence and sub-bass pressure | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/spring_arrival.ogg | Spring Court arrival: balmy breeze, leaves, sparse small birds, faint metal shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
-| audio/amb/village.ogg | The village: distant voices, a smith's anvil, carts, wind | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/amb/village.ogg | The village market in winter: a muffled crowd, steps in slush, a passing cart, a distant bargain, wind | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/wall_seam.ogg | The Wall: wind thins out, low pressure hum, glassy shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/winter_wood.ogg | Winter hunting forest: gusting wind, whistles, sifting snow, creaking trees, a distant crow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/cottage.ogg | Music, cottage: D minor, piano and pad | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

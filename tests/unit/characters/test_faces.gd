@@ -5,7 +5,7 @@
 ## talking moves the visemes.
 extends GutTest
 
-const CAST: Array[StringName] = [&"tamlin", &"lucien", &"alis", &"father", &"nesta", &"elain"]
+const CAST: Array[StringName] = [&"tamlin", &"lucien", &"alis", &"father", &"nesta", &"elain", &"rhysand"]
 const EXPRESSION_KEYS: Array[String] = ["smile_L", "smile_R", "frown_L", "frown_R", "sneer_L", "sneer_R",
 	"lip_press", "jaw_clench", "mouth_stretch", "eyes_wide_L", "eyes_wide_R", "squint_L", "squint_R",
 	"brow_down_L", "brow_down_R", "brow_up_L", "brow_up_R", "brow_inner_up", "cheek_raise", "mouth_side_L",

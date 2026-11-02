@@ -317,6 +317,7 @@ func _walk_step(target: Vector3, radius: float = 2.0) -> void:
 		return
 	var to := target - feyre.global_position
 	feyre.nudge_camera(wrapf(atan2(-to.x, -to.z) - feyre.camera_yaw(), -PI, PI), 0.0)
+	feyre.steer_frame.release()   # the walker steers by the camera: a fresh press each frame
 	Input.action_press(&"move_forward")
 
 

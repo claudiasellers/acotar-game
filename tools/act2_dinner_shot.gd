@@ -115,6 +115,9 @@ func _walk(feyre: Node3D, to: Vector3, radius: float, seconds: float) -> void:
 		if feyre.has_method(&"nudge_camera"):
 			var want := atan2(-d.x, -d.y)
 			feyre.call(&"nudge_camera", wrapf(want - float(feyre.call(&"camera_yaw")), -PI, PI), 0.0)
+			var frame: Variant = feyre.get(&"steer_frame")
+			if frame is SteerFrame:
+				(frame as SteerFrame).release()   # steering by the camera: a fresh press each frame
 		Input.action_press(&"move_forward")
 		await get_tree().physics_frame
 	Input.action_release(&"move_forward")

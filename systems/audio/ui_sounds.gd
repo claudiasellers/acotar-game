@@ -1,16 +1,13 @@
-## Glassy hover and bell press for every button in the game, and a harp rise
-## and fall when the game pauses (a menu opens) and resumes. Hooks buttons as
+## Bell press for every button in the game (no hover sound: scanning over
+## satchel slots and menus is silent), and a harp rise and fall when the game pauses (a menu opens) and resumes. Hooks buttons as
 ## they enter the tree, so no menu has to know about sound. A button with meta
 ## `silent` = true is skipped.
 class_name UiSounds
 extends Node
 
-const HOVER_GAP_MS := 60
 
 var director: SoundDirector
-var hovers: int = 0
 var presses: int = 0
-var _last_hover_ms: int = -1000
 var _was_paused: bool = false
 
 
@@ -35,26 +32,12 @@ func hook(node: Node) -> void:
 		return
 	var button := node as BaseButton
 	button.set_meta(&"_ui_sounds", true)
-	button.mouse_entered.connect(_on_hover.bind(button))
-	button.focus_entered.connect(_on_hover.bind(button))
 	button.pressed.connect(_on_press)
 
 
 func _on_node_added(node: Node) -> void:
 	if node is BaseButton:
 		hook(node)
-
-
-func _on_hover(button: BaseButton) -> void:
-	if button.disabled:
-		return
-	var now := Time.get_ticks_msec()
-	if now - _last_hover_ms < HOVER_GAP_MS:
-		return
-	_last_hover_ms = now
-	hovers += 1
-	if director:
-		director.play(&"ui_hover")
 
 
 func _on_press() -> void:

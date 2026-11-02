@@ -190,6 +190,30 @@ PROFILES = {
         tics=[("smile", 7.0, 14.0, 0.8, 0.4)],
     ),
     # ------------------------------------------------------------------
+    "rhysand": dict(
+        canon="Unmasked, the only High Fae at Spring without one [C]. A half smile and a lazy smile [C ch20]; "
+              "\"his perfect face\" [C ch26]; a lover's purr of a voice [C ch20]. Amused, still and cold; menace "
+              "worn as a smile; never openly afraid [X]. Added by L49 with his new face.",
+        masked=False,
+        rest="half_smile",
+        blink=(3.0, 6.5),
+        presets={
+            "half_smile": lr("R", smile_S=0.32, mouth_side_S=0.12),
+            "lazy_smile": dict(lr("R", smile_S=0.3), smile=0.35, blink_L=0.22, blink_R=0.22),
+            "amused": dict(lr("R", smile_S=0.85, mouth_side_S=0.4, squint_S=0.3), brow_up_L=0.25),
+            "cold": {"lip_press": 0.25, "squint": 0.2, "brow_down_L": 0.15, "brow_down_R": 0.15},
+            "menace": dict(lr("R", smile_S=0.4), squint=0.45, brow_down_L=0.35, brow_down_R=0.35, lips_part=0.15),
+            "laugh": {"smile": 0.8, "jaw_open": 0.18, "lips_part": 0.4, "squint": 0.35},
+            "unreadable": {"blink_L": 0.28, "blink_R": 0.28, "lip_press": 0.18},
+        },
+        aliases={"neutral": "half_smile", "guarded": "unreadable", "happy": "lazy_smile", "laugh": "laugh",
+                 "smirk": "amused", "tender": "lazy_smile", "angry": "cold", "fury": "menace",
+                 "contempt": "amused", "disgust": "cold", "sad": "unreadable", "grief": "unreadable",
+                 "afraid": "unreadable", "terror": "cold", "surprise": "amused", "pained": "unreadable",
+                 "weary": "unreadable", "pleading": "unreadable"},
+        tics=[("amused", 7.0, 14.0, 0.8, 0.45)],
+    ),
+    # ------------------------------------------------------------------
     "feyre": dict(
         canon="Unmasked, human; guarded by default [C]. The glare and the clamped jaw [C]; a willed blank face "
               "[C]; the bland mask-smile she wears for others [C]; silent tears [C]; awe at Prythian's beauty [C]. "
