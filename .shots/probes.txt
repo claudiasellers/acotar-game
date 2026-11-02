@@ -1,0 +1,3 @@
+from rhysand-face L49
+quality look
+shot faces res://tools/faces/faces_shot.tscn {out}
