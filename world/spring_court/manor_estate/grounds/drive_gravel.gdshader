@@ -1,11 +1,13 @@
 // The drive and forecourt: blush-and-pearl gravel with gold grit and the odd
 // fallen petal, in world space so long drapes never stretch it (R3).
+// Kept below ~0.86 albedo: near-white gravel under the noon sun clipped to
+// white and made the drive glare (user, 2026-11-02).
 shader_type spatial;
 render_mode cull_back;
 
-uniform vec3 sand : source_color = vec3(0.93, 0.80, 0.74);
-uniform vec3 pearl : source_color = vec3(1.0, 0.95, 0.92);
-uniform vec3 taupe : source_color = vec3(0.78, 0.64, 0.60);
+uniform vec3 sand : source_color = vec3(0.80, 0.67, 0.61);
+uniform vec3 pearl : source_color = vec3(0.86, 0.80, 0.77);
+uniform vec3 taupe : source_color = vec3(0.66, 0.53, 0.49);
 uniform vec3 grit : source_color = vec3(0.95, 0.78, 0.42);
 uniform vec3 petal : source_color = vec3(1.0, 0.62, 0.76);
 uniform float pebble_size = 0.14;
