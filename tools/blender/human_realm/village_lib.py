@@ -18,20 +18,22 @@ OUT_DIR = os.path.join(REPO, "world", "human_realm", "village", "assets")
 
 SNOW = (0.92, 0.94, 0.98)
 
-# Winter village palette: blue-grey, snow-white, wet-black, bone, smoke-brown.
+# Winter village palette: warm limewash, dark timber, golden thatch, oxblood
+# doors, against blue-grey snow (the winter grade halves saturation, so the
+# warm colours carry the "lived in" read, quality audit A7).
 C = {
-    "daub": (0.74, 0.70, 0.62),
-    "daub_grey": (0.62, 0.62, 0.60),
+    "daub": (0.84, 0.68, 0.46),  # warm ochre limewash (reads through the winter grade)
+    "daub_grey": (0.74, 0.64, 0.52),
     "timber": (0.22, 0.16, 0.11),
     "timber_grey": (0.36, 0.33, 0.30),
     "plank": (0.38, 0.29, 0.20),
     "plank_old": (0.33, 0.30, 0.27),
     "stone": (0.52, 0.53, 0.56),
     "stone_dark": (0.38, 0.39, 0.42),
-    "shingle": (0.30, 0.28, 0.28),
-    "thatch": (0.48, 0.40, 0.27),
-    "thatch_old": (0.38, 0.34, 0.27),
-    "door": (0.26, 0.18, 0.12),
+    "shingle": (0.36, 0.27, 0.24),
+    "thatch": (0.66, 0.50, 0.26),
+    "thatch_old": (0.50, 0.40, 0.26),
+    "door": (0.52, 0.16, 0.10),  # oxblood doors and shutters
     "glass_dark": (0.16, 0.20, 0.27),
     "glass_warm": (1.0, 0.72, 0.36),
     "iron": (0.16, 0.16, 0.18),
