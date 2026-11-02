@@ -245,3 +245,26 @@ func test_hud_reveal_place_sketches_saves_and_rejects_unknown() -> void:
 	other.load_state(JSON.parse_string(JSON.stringify(hud.save_state())))
 	assert_true(other.found.has("suriel_glade"))
 	assert_true(other.reveal.is_seen(-825, 620))
+
+
+## F37: with no baked map the HUD paints a coarse one on a thread. That thread
+## must never load or touch CourtAssets: a region worker holding CourtAssets'
+## lock (simulated here by this thread holding it) must not stop the paint.
+## On the old code the paint thread blocked in CourtAssets.mesh() and the
+## game froze.
+func test_cold_map_paint_needs_no_court_assets_lock() -> void:
+	var saved := WorldMapHud.bake_path
+	WorldMapHud.bake_path = "res://ui/map/_generated/__f37_missing__.res"
+	CourtAssets._lock.lock()
+	var hud := WorldMapHud.new()
+	add_child_autofree(hud)
+	var start := Time.get_ticks_msec()
+	while hud._paint_thread != null and hud._paint_thread.is_alive() and Time.get_ticks_msec() - start < 60000:
+		await wait_physics_frames(5)
+	var finished := hud._paint_thread != null and not hud._paint_thread.is_alive()
+	var secs := (Time.get_ticks_msec() - start) / 1000.0
+	CourtAssets._lock.unlock()
+	WorldMapHud.bake_path = saved
+	assert_true(finished, "coarse map painted without CourtAssets' lock (%.1f s)" % secs)
+	await wait_physics_frames(3)
+	assert_gt(hud.map_texture.get_width(), 8, "the painted map replaced the blank paper")
