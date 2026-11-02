@@ -21,6 +21,8 @@ const ICON_TEXTURE_PX := 192
 ## The hero model fills this share of its card's width, and turns this fast.
 const MODEL_FILL := 0.95
 const SPIN_SPEED := 0.6
+## The linen patch under each thing, as a share of its card.
+const PATCH_SCALE := 1.08
 
 var viewport: SubViewport
 var camera: Camera3D
@@ -32,6 +34,8 @@ var _icons: Dictionary = {}  # id -> Texture2D
 var _waiting: Dictionary = {}  # id -> [SubViewport, materials...] until keyed
 var _noise := FastNoiseLite.new()
 var _icon_holder := Node.new()
+var _patch_mat: StandardMaterial3D
+var _patch_mesh: QuadMesh
 var _wash: MeshInstance3D
 var _wash_mat: StandardMaterial3D
 
@@ -84,6 +88,15 @@ func _ready() -> void:
 		_cloth_mat.albedo_texture = weave
 		_cloth_mat.uv1_scale = Vector3(CLOTH.x * 1.5, CLOTH.y * 1.5, 1)
 	_build_wash()
+	var patch_tex := SatchelTheme.texture(SatchelTheme.PATCH_PATH)
+	if patch_tex:
+		_patch_mesh = QuadMesh.new()
+		_patch_mesh.size = Vector2.ONE
+		_patch_mesh.orientation = PlaneMesh.FACE_Y
+		_patch_mat = StandardMaterial3D.new()
+		_patch_mat.albedo_texture = patch_tex
+		_patch_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
+		_patch_mat.roughness = 1.0
 	apply_theme()
 
 
@@ -138,6 +151,16 @@ func add_card(e: Dictionary) -> Node3D:
 	quad.material_override = mat
 	quad.name = "Face"
 	card.add_child(quad)
+	if _patch_mat:
+		# Its home on the cloak: a stitched linen patch that stays put while
+		# the thing lifts.
+		var patch := MeshInstance3D.new()
+		patch.name = "Patch"
+		patch.mesh = _patch_mesh
+		patch.material_override = _patch_mat
+		patch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		patch.top_level = true
+		card.add_child(patch)
 	viewport.add_child(card)
 	return card
 
@@ -182,7 +205,9 @@ func place_model(card: Node3D, show: float, spin: float) -> void:
 			card.global_position + Vector3(0, -0.02 * s, 0))
 	var ground := card.global_position
 	_wash.visible = show > 0.02
-	_wash.global_position = Vector3(ground.x, _fold(ground.x, ground.z) + 0.012, ground.z)
+	var patch := card.get_node_or_null(^"Patch") as Node3D
+	var floor_y := patch.global_position.y if patch else _fold(ground.x, ground.z)
+	_wash.global_position = Vector3(ground.x, floor_y + 0.003, ground.z)
 	_wash.scale = Vector3.ONE * s * 1.9 * lerpf(0.5, 1.0, show)
 	_wash_mat.albedo_color.a = 0.42 * show
 
@@ -192,9 +217,19 @@ func place_model(card: Node3D, show: float, spin: float) -> void:
 func place(card: Node3D, screen: Vector2, px: float, turn: float, lift: float, face: float) -> void:
 	var ground := ground_at(screen)
 	var s := px * metres_per_px(ground)
-	card.position = ground + Vector3(0, REST_HEIGHT + _fold(ground.x, ground.z) + lift, 0)
+	# Things lie flat, so they ride just over the highest fold beneath their
+	# patch (and the patch just under them).
+	var half := s * PATCH_SCALE * 0.5
+	var top := _fold(ground.x, ground.z)
+	for c in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1), Vector2(0, -1), Vector2(0, 1), Vector2(-1, 0), Vector2(1, 0)]:
+		top = maxf(top, _fold(ground.x + c.x * half, ground.z + c.y * half))
+	card.position = ground + Vector3(0, REST_HEIGHT + top + lift, 0)
 	card.basis = Basis(Vector3.UP, -turn) * Basis(Vector3.RIGHT, deg_to_rad(52.0) * face)
 	card.scale = Vector3.ONE * s
+	var patch := card.get_node_or_null(^"Patch") as Node3D
+	if patch:
+		patch.global_transform = Transform3D(Basis(Vector3.UP, -turn * 0.6).scaled(Vector3.ONE * s * PATCH_SCALE),
+				ground + Vector3(0, top + 0.004, 0))
 
 
 ## Cloth height at a point: a few long soft folds and a little rumple.

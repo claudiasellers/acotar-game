@@ -265,6 +265,33 @@ def wash(name="wash_bloom", s=256, seed=51):
     img.save(os.path.join(OUT, name + ".png"))
 
 
+def linen_patch(name="patch_linen", s=192, seed=61):
+    """A quiet stitched linen patch the things rest on: a soft rounded square of
+    darker linen pressed into the cloak, with a running stitch round it.
+    Near-neutral so it reads as a home, not a box."""
+    r = s // 7
+    inset = 10
+    yy, xx = np.mgrid[0:s, 0:s].astype(np.float32)
+    weave_v = 0.5 + 0.5 * np.sin(2 * math.pi * xx / 4.0) * 0.5 + 0.25 * np.sin(2 * math.pi * yy / 4.0)
+    slub = noise(s, s, 9, seed)
+    base = np.array(PALETTE["paper_edge"], dtype=np.float32)
+    shade = 0.93 + 0.04 * weave_v + 0.05 * (slub - 0.5)
+    # Debossed: a soft inner shadow along the top-left edge, light along the bottom-right.
+    m = Image.new("L", (s, s), 0)
+    ImageDraw.Draw(m).rounded_rectangle([inset, inset, s - 1 - inset, s - 1 - inset], r, fill=255)
+    mask = np.asarray(m.filter(ImageFilter.GaussianBlur(1.2)), dtype=np.float32) / 255.0
+    inner = np.asarray(m.filter(ImageFilter.GaussianBlur(7)), dtype=np.float32) / 255.0
+    shifted = np.roll(np.roll(inner, 4, 0), 4, 1)
+    shade = shade * (0.86 + 0.14 * shifted)
+    rgb = np.clip(base[None, None, :] * shade[..., None], 0, 255).astype(np.uint8)
+    img = Image.fromarray(rgb, "RGB").convert("RGBA")
+    img.putalpha(Image.fromarray((mask * 150).astype(np.uint8)))
+    d = ImageDraw.Draw(img)
+    i = inset + 9
+    stitches(d, (i, i, s - 1 - i, s - 1 - i), r - 8, PALETTE["thread"] + (230,), dash=9, gap=6, width=2)
+    img.save(os.path.join(OUT, name + ".png"))
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     leather_tab("tab_leather", PALETTE["leather"], 1)
@@ -274,6 +301,7 @@ def main():
     key_button()
     weave()
     wash()
+    linen_patch()
     print("crafted textures ->", os.path.normpath(OUT))
 
 

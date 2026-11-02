@@ -83,3 +83,47 @@ func test_handmade_layer_dresses_the_page() -> void:
 		assert_true(t.get_stylebox(style_name, v) is StyleBoxTexture, "%s is a crafted texture" % v)
 	assert_not_null(SatchelTheme.texture(SatchelTheme.WEAVE_PATH))
 	assert_not_null(SatchelTheme.texture(SatchelTheme.WASH_PATH))
+
+
+func _tris(root: Node) -> int:
+	var n := 0
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		var m := (mi as MeshInstance3D).mesh as ArrayMesh
+		for s in m.get_surface_count():
+			n += (m.surface_get_arrays(s)[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
+	return n
+
+
+func test_icons_show_what_she_picks_not_the_patch_it_grew_in() -> void:
+	var raw := (load(SatchelModel.path_for(&"ing_hazelnut")) as PackedScene).instantiate()
+	var lod0 := raw.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
+	var raw_tris := (lod0.mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
+	var picked := SatchelModel.instance(&"ing_hazelnut")
+	assert_eq(picked.find_children("*", "MeshInstance3D", true, false).size(), 1, "LOD1 dropped")
+	assert_lt(_tris(picked), raw_tris, "the moss pad under the nuts is gone")
+	assert_gt(_tris(picked), raw_tris / 3, "the nuts are kept")
+	# Bilberry: berries gathered into a small pile, no bush.
+	var bil := SatchelModel.instance(&"ing_bilberry")
+	var box := SatchelModel.bounds(bil)
+	assert_lt(maxf(box.size.x, box.size.z), 0.3, "a handful, not the whole bush")
+	# The world's own mesh is untouched.
+	assert_eq((lod0.mesh.surface_get_arrays(0)[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3, raw_tris)
+	raw.free()
+	picked.free()
+	bil.free()
+
+
+func test_neon_greens_are_softened_in_the_satchel_copy_only() -> void:
+	var out := SatchelModel._soften(PackedColorArray([Color(0.3, 0.95, 0.2), Color(0.9, 0.1, 0.1)]))
+	assert_lt(out[0].s, Color(0.3, 0.95, 0.2).s)
+	assert_eq(out[1], Color(0.9, 0.1, 0.1), "non-greens untouched")
+
+
+func test_every_thing_rests_on_a_linen_patch() -> void:
+	var table := SatchelTable.new()
+	add_child_autofree(table)
+	var card := table.add_card({"id": &"ing_bilberry", "icon": &"berry"})
+	table.place(card, Vector2(300, 300), 150.0, 0.2, 0.0, 0.0)
+	var patch := card.get_node_or_null(^"Patch") as Node3D
+	assert_not_null(patch)
+	assert_lt(patch.global_position.y, card.global_position.y, "the patch lies under the thing")
