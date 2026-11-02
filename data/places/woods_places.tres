@@ -1,0 +1,174 @@
+[gd_resource type="Resource" script_class="PlaceTable" format=3]
+
+[ext_resource type="Script" path="res://world/shared/places/place_table.gd" id="1_83vlm"]
+[ext_resource type="Script" path="res://world/shared/places/place_setting.gd" id="2_1a1cl"]
+
+[sub_resource type="Resource" id="Resource_d8hqi"]
+script = ExtResource("2_1a1cl")
+id = &"blighted_arch"
+theme = &"dread"
+center = Vector2(1660, -60)
+radius = 7.5
+approach_deg = 268.60281893367073
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_blighted_thicket", "blight_bone_rock")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.55, 0.66, 0.5, 1)
+light_energy = 0.45
+fx_id = &"blight_ash"
+sound_cue = "res://data/places/sounds/blight_drone.tres"
+
+[sub_resource type="Resource" id="Resource_jqhgr"]
+script = ExtResource("2_1a1cl")
+id = &"crocus_knoll"
+center = Vector2(-470, 1240)
+radius = 17.5
+approach_deg = 95.10215522989647
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_carpet_lilac", "flora_carpet_butter", "flora_carpet_lilac")
+frame_scale = 1.3
+props = PackedStringArray("fae_bench")
+light_color = Color(1, 0.82, 0.86, 1)
+light_energy = 1.0
+fx_id = &"butterflies"
+sound_cue = "res://data/places/sounds/bees.tres"
+
+[sub_resource type="Resource" id="Resource_u3g0i"]
+script = ExtResource("2_1a1cl")
+id = &"faelight_hollow"
+theme = &"sacred"
+center = Vector2(210, 720)
+radius = 27.5
+approach_deg = 275.1021614863421
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_fern_a", "flora_toadstool_ring", "flora_fern_b")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.6
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_3fkre"]
+script = ExtResource("2_1a1cl")
+id = &"glen_stones"
+theme = &"sacred"
+center = Vector2(1060, -190)
+radius = 15.5
+approach_deg = 178.9916898909619
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_fern_b", "flora_carpet_periwinkle", "rock_mossy_b")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_418ub"]
+script = ExtResource("2_1a1cl")
+id = &"great_oak"
+theme = &"sacred"
+center = Vector2(-150, 1080)
+radius = 16.5
+approach_deg = 95.10217721857039
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_carpet_butter", "flora_fern_a", "flora_carpet_pearl")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 0.0
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_hdpne"]
+script = ExtResource("2_1a1cl")
+id = &"great_willow"
+theme = &"water"
+center = Vector2(-345, 1010)
+radius = 13.5
+approach_deg = 95.10217339181222
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_reeds_bulrush", "flora_fern_a", "flora_carpet_periwinkle")
+frame_scale = 1.3
+props = PackedStringArray("fae_bench")
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.0
+fx_id = &"water_mist"
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_acjgl"]
+script = ExtResource("2_1a1cl")
+id = &"king_beech"
+theme = &"shrine"
+center = Vector2(980, -480)
+radius = 14.5
+approach_deg = 178.99169495271374
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_fern_a", "flora_toadstool_ring", "flora_fern_b")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.92, 0.9, 1, 1)
+light_energy = 0.0
+sound_cue = "res://data/places/sounds/shrine_hum.tres"
+
+[sub_resource type="Resource" id="Resource_tfcx2"]
+script = ExtResource("2_1a1cl")
+id = &"moonstone_ring"
+theme = &"sacred"
+center = Vector2(290, 1230)
+radius = 18.5
+approach_deg = 275.1021685931791
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_heather_mound", "flora_carpet_pearl", "flora_toadstool_ring")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.86, 0.76, 1, 1)
+light_energy = 1.4
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/chimes.tres"
+
+[sub_resource type="Resource" id="Resource_7g4yo"]
+script = ExtResource("2_1a1cl")
+id = &"suriel_snare"
+theme = &"water"
+center = Vector2(-815, 610)
+radius = 22.0
+approach_deg = 141.63788296118648
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_fern_b", "flora_reeds_bulrush", "flora_fern_a")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 0.0
+sound_cue = "res://data/places/sounds/brook.tres"
+
+[sub_resource type="Resource" id="Resource_xjous"]
+script = ExtResource("2_1a1cl")
+id = &"wall_gap_waystone"
+theme = &"shrine"
+center = Vector2(-86, 1360)
+radius = 6.0
+approach_deg = 275.10187830622107
+collar_width = 3.0
+collar_per_m = 2.6
+collar_meshes = PackedStringArray("flora_carpet_periwinkle", "flora_fern_b", "rock_mossy_c")
+frame_scale = 1.3
+props = PackedStringArray()
+light_color = Color(0.92, 0.9, 1, 1)
+light_energy = 0.9
+fx_id = &"faelights"
+sound_cue = "res://data/places/sounds/shrine_hum.tres"
+
+[resource]
+script = ExtResource("1_83vlm")
+settings = Array[ExtResource("2_1a1cl")]([SubResource("Resource_d8hqi"), SubResource("Resource_jqhgr"), SubResource("Resource_u3g0i"), SubResource("Resource_3fkre"), SubResource("Resource_418ub"), SubResource("Resource_hdpne"), SubResource("Resource_acjgl"), SubResource("Resource_tfcx2"), SubResource("Resource_7g4yo"), SubResource("Resource_xjous")])
