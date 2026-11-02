@@ -197,6 +197,21 @@ func test_e_by_a_carcass_pulls_the_arrow_first_and_skinning_keeps_the_rest() -> 
 	assert_eq(get_tree().get_nodes_in_group(Arrow.STUCK_GROUP).size(), 0)
 
 
+func test_bow_and_quiver_hide_under_a_gown() -> void:
+	var visual := feyre.bow_controller.find_child("BowVisual", true, false) as BowVisual
+	assert_not_null(visual)
+	await wait_frames(2)
+	assert_true(visual.bow_root.visible and visual.quiver.visible, "slung in hunting clothes")
+	Gameplay.wardrobe.grant(&"ball_gown_rose")
+	Gameplay.wardrobe.equip(&"ball_gown_rose")
+	await wait_frames(2)
+	assert_false(visual.bow_root.visible or visual.quiver.visible, "stowed under the gown (B8)")
+	Gameplay.wardrobe.equip(&"hunter_tunic")
+	Gameplay.wardrobe.equip(&"hunter_trousers")
+	await wait_frames(2)
+	assert_true(visual.bow_root.visible and visual.quiver.visible, "back with the tunic")
+
+
 func test_reticle_follows_the_predicted_impact() -> void:
 	var reticle := feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
 	assert_not_null(reticle)
