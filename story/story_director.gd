@@ -105,7 +105,8 @@ func _space_for(moment: StoryMoment) -> SceneSpace:
 	return space
 
 
-func _on_region_loaded(_region_id: StringName, root: Node3D) -> void:
+func _on_region_loaded(region_id: StringName, root: Node3D) -> void:
+	WiderCourtAnchors.place(region_id, root)  # L44: p4 anchors beside other lanes' landmarks
 	attach_all(root)
 
 

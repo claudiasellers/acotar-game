@@ -28,6 +28,11 @@ const ROWS := {
 		{"name": "SummerFaerieTriage", "script": "res://story/act3/summer/summer_faerie_triage.gd"},
 		{"name": "SummerFaerieGrave", "script": "res://story/act3/summer/summer_faerie_grave.gd"},
 	],
+	# L44: the wider court (p4). Anchors from WiderCourtAnchors except the pool's.
+	&"starlight_pool": [{"name": "StarlightSteep", "script": "res://story/act4/starlight_steep.gd"}],
+	&"stables_dusk": [{"name": "StableDusk", "script": "res://story/act4/stable_dusk.gd"}],
+	&"fells_sentry_range": [{"name": "SentryRange", "script": "res://story/act4/sentry_range.gd"}],
+	&"fae_potion_room": [{"name": "PotionRoom", "script": "res://story/act4/potion_room.gd"}],
 	# L45: the bruise on her neck, from the hallway until the paintings (ch21-22).
 	&"manor_kitchen_hall": [{"name": "BruiseMark", "script": "res://story/act5/calanmai/bruise_mark.gd"}],
 	# L45: Calanmai on the hill (bonfires, drums, revelers), the white roses in her

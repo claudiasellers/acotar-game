@@ -41,3 +41,19 @@ func test_dict_round_trip() -> void:
 	WorldState.from_dict(saved)
 	assert_true(WorldState.has_flag("wolf_killed"))
 	assert_eq(WorldState.get_flag("pelts_sold"), 3)
+
+
+func test_string_valued_facts_are_truthy_when_not_empty() -> void:
+	WorldState.clear()
+	WorldState.set_flag("fact.test.kept_id", "snowy_forest")
+	WorldState.set_flag("fact.test.kept_name", &"snowy_forest")
+	WorldState.set_flag("fact.test.empty_id", "")
+	WorldState.set_flag("fact.test.empty_name", &"")
+	WorldState.set_flag("fact.test.quality", 0.0)
+	assert_true(WorldState.has_flag("fact.test.kept_id"), "a String id")
+	assert_true(WorldState.has_flag("fact.test.kept_name"), "a StringName id")
+	assert_false(WorldState.has_flag("fact.test.empty_id"))
+	assert_false(WorldState.has_flag("fact.test.empty_name"))
+	assert_false(WorldState.has_flag("fact.test.quality"))
+	assert_false(WorldState.has_flag("fact.test.never_set"))
+	WorldState.clear()

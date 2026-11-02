@@ -20,6 +20,8 @@ func _ready() -> void:
 	if frames_dir != "":
 		out_path = frames_dir.path_join("p5_playtest.json")
 	get_tree().root.size = Vector2i(1920, 1080)
+	# The Mac gives a shot about five minutes: no 1.2 km walk on film.
+	ride_to_hill = true
 	super._ready()
 
 
@@ -42,7 +44,7 @@ func _physics_process(delta: float) -> void:
 func _every() -> float:
 	match String(_beat.id):
 		"order":
-			return 2.0
+			return 3.0
 		"stranger":
 			return 1.2
 		"bite":

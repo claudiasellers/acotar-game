@@ -14,6 +14,9 @@ const CODED := {
 	# L25: the grounds' dangers (ch9-11).
 	&"bogge": {"script": "res://story/act2/bogge_hunt.gd", "stage": "res://data/story/act2/bogge_stage.tres"},
 	&"puca": {"script": "res://story/act2/puca_lure.gd", "stage": "res://data/story/act2/puca_stage.tres"},
+	# L44: the wider court (ch18-19).
+	&"starlight_pool": {"script": "res://story/act4/starlight_pool_swim.gd", "stage": "res://data/story/act4/starlight_pool_stage.tres"},
+	&"attor": {"script": "res://story/act4/attor_in_the_garden.gd", "stage": "res://data/story/act4/attor_stage.tres"},
 	# L45: Calanmai (ch20-22), docs/contracts/calanmai.md.
 	&"calanmai_fires": {"script": "res://story/act5/calanmai/rite_fires.gd", "stage": "res://data/story/act5/rite_fires_stage.tres"},
 	&"cave_mouth": {"script": "res://story/act5/calanmai/cave_path.gd", "stage": "res://data/story/act5/cave_path_stage.tres"},
