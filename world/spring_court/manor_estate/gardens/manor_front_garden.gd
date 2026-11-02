@@ -2,6 +2,7 @@
 ## the main doors between amethyst irises, pale snowdrops and butter-yellow
 ## daffodils, the whole garden "hushed and sleeping"). Laid out as two mirrored
 ## box parterres in front of the wings, each four compartments round an urn.
+## [X] invented: the parterre form, box edging, topiary and urns; the flowers are [C].
 class_name ManorFrontGarden
 extends RefCounted
 
