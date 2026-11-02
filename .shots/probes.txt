@@ -1,0 +1,6 @@
+from bogge readable lane after
+quality look
+shot bogge res://tools/world_shot.tscn eastern_bogge {out}/bogge.png
+shot dusk res://tools/world_shot.tscn eastern_bogge_dusk {out}/dusk.png
+shot rose res://tools/world_shot.tscn manor_rose_garden {out}/rose.png
+shot parterre res://tools/world_shot.tscn manor_parterre {out}/parterre.png
