@@ -107,6 +107,10 @@ var model: Node3D
 var camera: Camera3D
 
 var _camera_rig: Node3D
+## Extra pivot height and arm length (m) for the third-person camera, set by
+## whatever carries her (the white mare, MountDirector) and eased back to 0 after.
+var camera_lift: float = 0.0
+var camera_arm_extra: float = 0.0
 var _camera_pitch: Node3D
 var _spring_arm: SpringArm3D
 var _stamina_cooldown: float = 0.0
@@ -165,7 +169,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
 		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
@@ -178,7 +182,7 @@ func _process(delta: float) -> void:
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	_update_indoor(delta)
-	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6, INDOOR_ARM, _indoor)
+	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6 + camera_arm_extra, INDOOR_ARM, _indoor)
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
@@ -269,7 +273,7 @@ func teleport(pos: Vector3) -> void:
 	is_mantling = false
 	velocity = Vector3.ZERO
 	global_position = pos
-	_camera_rig.global_position = pos + Vector3.UP * 1.5
+	_camera_rig.global_position = pos + Vector3.UP * (1.5 + camera_lift)
 	_room_arm = 3.6
 	if _spring_arm:
 		for rid in _cam_skip:
@@ -725,4 +729,4 @@ func _build_camera() -> void:
 	camera.far = 2000.0
 	camera.current = true
 	_spring_arm.add_child(camera)
-	_camera_rig.global_position = global_position + Vector3.UP * 1.5
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)
