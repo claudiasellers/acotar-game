@@ -40,6 +40,29 @@ DEFAULTS = dict(
     lips=1.0,            # lip fullness
     lip_w=1.0,           # mouth width
     fae_ears=0.0,        # 1 = High Fae pointed ears
+    # face placement and finish (all 0 = Feyre)
+    eye_dx=0.0,          # eyes further apart (m, each side)
+    eye_dz=0.0,          # eyes lower (-) or higher (+) on the face (m)
+    eye_sink=0.0,        # bigger eyes sink back by this fraction of the extra radius (0.75 keeps the cornea put)
+    brow_dz=0.0,         # brow line raised (m): a lifted, open look
+    mouth_dz=0.0,        # mouth higher (+) or lower (-) (m)
+    nose_w=1.0,          # nostril-wing width
+    nose_up=0.0,         # tip turned up (button nose)
+    lip_bow=0.0,         # cupid's-bow definition: the two upper peaks and the notch between
+    lip_upper=1.0,       # upper-lip fullness relative to `lips`
+    lip_lower=1.0,       # lower-lip fullness relative to `lips`
+    smile=0.0,           # mouth corners lifted into a soft resting smile (- = cool, turned down)
+    cheek_lift=0.0,      # apples of the cheeks raised and brought forward (m)
+    lid=1.0,             # lid-margin thickness: < 1 = a finer lid, more of the eye shows
+    chin_y=0.0,          # chin and jaw tip moved back (+) or forward (-) (m)
+    mouth_dy=0.0,        # mouth (lips, mouth line, masks, shape keys) moved back (+) (m)
+    lower_fill=0.0,      # fills the valley between cheek and jaw beside the mouth (no nose-to-chin crease)
+    bridge_fill=0.0,     # fills the nose root between the eyes: a small, straight bridge
+    jaw_taper=1.0,       # < 1 narrows the jaw towards the chin (a tapered V)
+    cut_soft=0.0022,     # blend radius of the eye-opening cut (bigger = no ridge where a short cut ends)
+    cut_reach=0.03,      # how far in front of the eyeball the eye opening is carved (m); Feyre's 3 cm
+                         # also grooves the nose sides and cheeks below big eyes, ~1 cm keeps it to the lids
+
     cranium=1.0,
     face_w=1.0,          # face width
     neck=1.0,            # neck radius
@@ -63,12 +86,33 @@ def load(params=None):
     m.EYE_OPEN_LO = math.radians(p["eye_open_lo"])
     m.EYE_OPEN_W = math.radians(p["eye_open_w"])
     m.EYE_TILT = math.radians(p["eye_tilt"])
+    # placement offsets (and eye_sink) move the eye bones too
+    m.EYE_X = 0.0365 + p["eye_dx"]
+    m.EYE_Z = 1.507 + p["eye_dz"]
+    m.EYE_Y = -0.0612 + p["eye_sink"] * (p["eye_r"] - 0.0188)
+    m.BROW_Z = m.EYE_Z + 0.029 + p["brow_dz"]
+    m.MOUTH_Z = 1.4455 + p["mouth_dz"]
+    m.MOUTH_Y = -0.0815 + p["mouth_dy"]
+    m.LID_R = (0.0027 * p["lid"], 0.0017 * p["lid"])
     m.MOUTH_HALF_W = 0.0165 * p["lip_w"]
     m.CHIN_Z = 1.405 - p["chin_drop"]
-    m.NOSE_TIP = np.array([0.0, -0.0925 - 0.006 * (p["nose"] - 1.0), 1.4725 - 0.004 * (p["nose"] - 1.0)])
+    m.NOSE_TIP = np.array([0.0, -0.0925 - 0.006 * (p["nose"] - 1.0) - 0.0015 * p["nose_up"],
+                           1.4725 - 0.004 * (p["nose"] - 1.0) + 0.0025 * p["nose_up"]])
     m.CAST_PARAMS = p
     m.build_grid = lambda h=0.0025: build_grid(m, p, h)
     return m
+
+
+def _eye_cut(m, side, reach_extra):
+    """feyre_shape.eye_cut with an adjustable reach in front of the eyeball."""
+    c = np.array([m.EYE_X * side, m.EYE_Y, m.EYE_Z])
+    reach = m.EYE_R + reach_extra
+
+    def f(X, Y, Z):
+        qx, qy, qz = X - c[0], Y - c[1], Z - c[2]
+        dist = np.sqrt(qx * qx + qy * qy + qz * qz)
+        return np.maximum(dist - reach, m._eye_opening(qx, qy, qz, side))
+    return sdf.custom(f, c - reach, c + reach)
 
 
 def build_grid(m, p, h=0.0025):
@@ -86,13 +130,31 @@ def build_grid(m, p, h=0.0025):
     ck = p["cheeks"]
     if ck > 0.05:
         for s in (1, -1):
-            U(sdf.ellipsoid((0.042 * s * fw, -0.053, 1.474), (0.032 * ck, 0.031 * ck, 0.027 * ck)), 0.022 * ck)
+            cl = p["cheek_lift"]
+            U(sdf.ellipsoid((0.042 * s * fw, -0.053 - 0.3 * cl, 1.474 + cl), (0.032 * ck, 0.031 * ck, 0.027 * ck)),
+              0.022 * ck)
     if p["cheekbones"] > 0:
         for s in (1, -1):
             U(sdf.ellipsoid((0.054 * s * fw, -0.047, 1.497), (0.026, 0.020, 0.012 + 0.004 * p["cheekbones"]),
                             rz(math.radians(-18 * s))), 0.014)
     jw = p["jaw_w"]
-    U(sdf.round_cone((0, -0.024, 1.462 - cd * 0.5), (0, -0.056, 1.423 - cd), 0.052 * jw, 0.0175 * jw ** 0.5), 0.03)
+    cy = p["chin_y"]
+    U(sdf.round_cone((0, -0.024, 1.462 - cd * 0.5), (0, -0.056 + cy, 1.423 - cd), 0.052 * jw,
+                     0.0175 * jw ** 0.5 * p["jaw_taper"]), 0.03)
+    if p["lower_fill"] > 0:   # soft flesh between the cheek apples and the jaw, beside the mouth
+        lf = p["lower_fill"]
+        # and a rounded muzzle under the nose and round the mouth, so the lips sit on it, not out in front
+        U(sdf.ellipsoid((0, -0.0655 + p["mouth_dy"], m.MOUTH_Z + 0.002), (0.019, 0.013, 0.020)), 0.014 * lf)
+        for s in (1, -1):
+            U(sdf.ellipsoid((0.026 * s * fw, -0.052 + 0.5 * cy, 1.452 - cd * 0.4), (0.024, 0.022, 0.028 * lf ** 0.5)),
+              0.020 * lf)
+            if lf > 1.0:   # the fold from the nostril wing to the mouth corner, filled
+                U(sdf.ellipsoid((0.016 * s, -0.070 + 0.5 * p["mouth_dy"], 1.4605), (0.008, 0.008, 0.013)), 0.010 * (lf - 1.0) + 0.004)
+    if p["bridge_fill"] > 0:
+        bfl = p["bridge_fill"]
+        U(sdf.ellipsoid((0, -0.0755, m.EYE_Z - 0.002), (0.0075, 0.010, 0.013)), 0.008 * bfl)
+        for s in (1, -1):   # the sides of the nose into the cheeks: no valley from the inner eye to the nostril
+            U(sdf.ellipsoid((0.015 * s, -0.0725, 1.484), (0.011, 0.010, 0.017)), 0.012 * bfl)
     if p["jaw"] > 0:
         j = p["jaw"]
         for s in (1, -1):   # mandible angle below the ear, and the jaw line to the chin
@@ -101,12 +163,12 @@ def build_grid(m, p, h=0.0025):
                              0.012 + 0.004 * j, 0.010 + 0.003 * j), 0.012)
     chin_r = 0.0145 * p["chin"]
     if p["chin_point"] > 0:
-        U(sdf.ellipsoid((0, -0.062, 1.4205 - cd), (chin_r * (1 - 0.35 * p["chin_point"]), chin_r * 0.9, chin_r * 1.1)),
+        U(sdf.ellipsoid((0, -0.062 + cy, 1.4205 - cd), (chin_r * (1 - 0.35 * p["chin_point"]), chin_r * 0.9, chin_r * 1.1)),
           0.012)
     elif p["jaw"] > 0:
-        U(sdf.ellipsoid((0, -0.063, 1.4205 - cd), (chin_r * 1.35, chin_r, chin_r * 1.05)), 0.012)  # square chin
+        U(sdf.ellipsoid((0, -0.063 + cy, 1.4205 - cd), (chin_r * 1.35, chin_r, chin_r * 1.05)), 0.012)  # square chin
     else:
-        U(sdf.sphere((0, -0.061, 1.4205 - cd), chin_r), 0.012)
+        U(sdf.sphere((0, -0.061 + cy, 1.4205 - cd), chin_r), 0.012)
     U(sdf.ellipsoid((0, -0.058, 1.556), (0.064 * fw, 0.034, 0.030)), 0.025)
     if p["brow"] > 0:
         b = p["brow"]
@@ -133,20 +195,33 @@ def build_grid(m, p, h=0.0025):
                      0.0038 + 0.0012 * nb, 0.0050 * n ** 0.5), 0.010)
     U(sdf.sphere(m.NOSE_TIP, 0.0057 * n ** 0.6), 0.005)
     for s in (1, -1):
-        U(sdf.sphere((0.0068 * s * n ** 0.5, -0.0855 - 0.004 * (n - 1), 1.4700 - 0.004 * (n - 1)), 0.0040 * n ** 0.5),
-          0.004)
+        U(sdf.sphere((0.0068 * s * n ** 0.5 * p["nose_w"], -0.0855 - 0.004 * (n - 1), 1.4700 - 0.004 * (n - 1)),
+                     0.0040 * n ** 0.5 * p["nose_w"] ** 0.5), 0.004)
     # lips
     L, lw = p["lips"], p["lip_w"]
+    Lu, Ll = L * p["lip_upper"], L * p["lip_lower"]
     MY, MZ = m.MOUTH_Y, m.MOUTH_Z
+    sm_, bow = p["smile"], p["lip_bow"]
     for s in (1, -1):
-        U(sdf.ellipsoid((0.0068 * s * lw, MY + 0.0015, MZ + 0.0036 * L), (0.0098 * lw, 0.0046 * L, 0.0040 * L),
-                        ry(math.radians(-12 * s))), 0.005)
-    U(sdf.ellipsoid((0, MY + 0.0022, MZ - 0.0043 * L), (0.0118 * lw, 0.0052 * L, 0.0048 * L)), 0.005)
-    S(sdf.ellipsoid((0, MY - 0.0055, MZ), (0.016 * lw, 0.005, 0.0010)), 0.0012)
+        U(sdf.ellipsoid((0.0068 * s * lw, MY + 0.0015, MZ + 0.0036 * Lu + 0.0004 * bow),
+                        (0.0098 * lw, 0.0046 * Lu, 0.0040 * Lu + 0.0004 * bow),
+                        ry(math.radians(-12 * s - 6 * sm_ * s))), 0.005)
+    U(sdf.ellipsoid((0, MY + 0.0022, MZ - 0.0043 * Ll), (0.0118 * lw, 0.0052 * Ll, 0.0048 * Ll)), 0.005)
+    if bow > 0:   # the notch between the two peaks of the cupid's bow
+        S(sdf.ellipsoid((0, MY - 0.0030, MZ + 0.0078 * Lu + 0.0004 * bow), (0.0026, 0.004, 0.0016 * bow)), 0.0016)
+    if abs(sm_) > 0.01:   # mouth line bends up (or down) towards the corners
+        S(sdf.ellipsoid((0, MY - 0.0055, MZ), (0.0085 * lw, 0.005, 0.0010)), 0.0012)
+        for s in (1, -1):
+            S(sdf.ellipsoid((0.0118 * s * lw, MY - 0.0040, MZ + 0.0016 * sm_), (0.0062 * lw, 0.005, 0.0010),
+                            ry(math.radians(-14 * sm_ * s))), 0.0012)
+            if sm_ > 0:   # a little lift of the cheek beside each corner
+                U(sdf.sphere((0.0205 * s * lw, MY + 0.0040, MZ + 0.0030), 0.0040 * sm_), 0.006)
+    else:
+        S(sdf.ellipsoid((0, MY - 0.0055, MZ), (0.016 * lw, 0.005, 0.0010)), 0.0012)
     S(sdf.ellipsoid((0, MY - 0.0035, MZ - 0.0155 - cd * 0.3), (0.011, 0.004, 0.0032)), 0.006)
     S(sdf.ellipsoid((0, MY - 0.0035, MZ + 0.0135), (0.0032, 0.003, 0.0045)), 0.004)
     for s in (1, -1):
-        S(m.eye_cut(s), 0.0022)
+        S(_eye_cut(m, s, p["cut_reach"]), p["cut_soft"])
         U(m.lid_margin(s, True), 0.003)
         U(m.lid_margin(s, False), 0.0025)
         U(sdf.sphere((m.EYE_X * s, m.EYE_Y, m.EYE_Z), m.EYE_R - 0.002))

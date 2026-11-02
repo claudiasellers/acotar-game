@@ -86,10 +86,7 @@ func _ready() -> void:
 	# Warm the static noise/feature caches here before the worker reads them,
 	# and fingerprint the inputs so a stale cache is never trusted.
 	_fingerprint = WoodsScatterCache.fingerprint_for(def)
-	_places = own_places(def)
-	# Main thread, before the worker: a worker that loads a model can need the
-	# main thread (see PlaceComposer.prewarm).
-	PlaceComposer.prewarm(_places)
+	_places = prewarm_places(def)
 	_start()
 
 
@@ -630,6 +627,15 @@ func _job_places() -> void:
 		field.layers = typed
 		holder.add_child(field)
 	PlaceComposer.build_nodes(holder, _places)
+
+
+## Main thread, before the worker starts: this region's place settings, with
+## every model, FX scene and cue they use loaded (a worker that loads a model
+## can need the main thread, which may be waiting on it: L32-3's deadlock).
+static func prewarm_places(region_def: WoodsRegionDef) -> Array[PlaceSetting]:
+	var places := own_places(region_def)
+	PlaceComposer.prewarm(places)
+	return places
 
 
 ## The settings of the named places whose centre lies in this region.

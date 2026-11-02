@@ -24,9 +24,17 @@ from cast_nesta import box, iron_bangle
 
 HEIGHT = 1.63
 SHAPE = dict(
-    eye_r=0.0195, eye_open_up=37.0, eye_open_lo=32.0, eye_tilt=3.0, eye_open_w=65.0,
-    cheeks=1.22, cheekbones=0.0, chin=1.06, chin_drop=-0.002, nose=0.93, nose_bridge=0.0,
-    lips=1.16, lip_w=0.97, face_w=1.03, cranium=1.01, neck=0.99,
+    # face (L37): a Barbie storybook sweetheart: big round doe eyes, soft open brows, round apple
+    # cheeks set high, a tiny upturned button nose, a full rosebud mouth in a gentle resting smile,
+    # a soft round chin.  Canon: "the gentle heart" (ch4) who never lost "the desire to look
+    # lovely" (ch2).
+    eye_r=0.0226, eye_open_up=39.0, eye_open_lo=33.0, eye_tilt=1.0, eye_open_w=64.0,
+    eye_dx=0.0018, cut_reach=0.018, cut_soft=0.007, lid=0.58, eye_sink=0.75, eye_dz=-0.0025, brow_dz=0.0010,
+    cheeks=1.08, cheekbones=0.0, cheek_lift=0.004, chin=0.92, chin_drop=-0.006,
+    jaw_w=0.92, jaw_taper=0.85, chin_y=0.005, lower_fill=1.2, bridge_fill=0.6, mouth_dy=0.004,
+    nose=0.84, nose_w=0.95, nose_up=0.15, nose_bridge=0.0,
+    lips=1.28, lip_upper=1.05, lip_lower=1.02, lip_w=1.22, lip_bow=0.7, smile=0.9,
+    face_w=1.0, cranium=1.01, neck=0.99,
     bust=1.06, ribs=1.0, waist=1.03, belly=1.02, pelvis=1.03, seat=1.05,
     thigh=1.04, calf=1.02, arm=1.03, forearm=1.02, hand=0.98,
 )
@@ -38,11 +46,25 @@ SKIN_LINEAR = (0.82, 0.55, 0.45)        # warm, rosy
 SKIN_SRGB = "EAC4B3"
 IRIS = ((0.13, 0.065, 0.025), (0.42, 0.24, 0.09), (0.72, 0.48, 0.17))   # warm brown with honey flecks
 IRIS_FLECKS = 0.55
-LASH = 1.05
-LASH_LINEAR = cc.srgb("3A2618")
+LASH = 1.6
+LASH_FLICK = 0.35                        # long, soft, evenly fluttery
+LASH_STYLE = "strands"
+FACE_TRIS = 6600
+LASH_COUNT = 44
+LOWER_LASH = 0.8
+# makeup-mask shapes (L37): soft lid wash, a fine liner with only a tiny flick, round apples
+# of blush, soft gently-rounded brows
+MASK = dict(shadow_h=20.0, liner_w=5.5, wing=9.0, wing_lift=8.0, lower_liner=0.0,
+            blush=(0.045, 1.476, 0.018, 0.014), brow_arch=0.75, brow_peak=0.6, brow_weight=1.2)
+LASH_LINEAR = cc.srgb("24160F")
 HAIR_RGB = cc.srgb("B08552")            # the sisters' shared brassy golden-brown
 BROWS_SRGB = "8A6440"
-LIPS_SRGB = "C97C7C"
+LIPS_SRGB = "E06A86"                    # warm rosebud pink
+# feyre_skin.gdshader makeup (L37): a warm peach-pink flush high on the cheeks, champagne-rose
+# lids, a soft brown liner, a glossy pink mouth; a warm rim light.
+MAKEUP = dict(lips_amount=0.85, lips_sheen=0.6, eyeshadow_color="E9B4B0", eyeshadow_amount=0.45,
+              eyeshadow_sheen=0.6, liner_color="4A2E22", liner_amount=0.55, blush_color="F29A9A",
+              blush_amount=0.70, blush_sheen=0.3, brows_amount=0.85, rim_color="FFE2D2", rim_amount=0.30)
 
 DEFAULT_OUTFIT = ["elain_dress", "elain_slippers", "elain_iron_bangle"]
 DEFAULT_HAIR = "elain_curls"

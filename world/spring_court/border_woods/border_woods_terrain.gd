@@ -8,6 +8,8 @@
 class_name BorderWoodsTerrain
 extends RefCounted
 
+const WoodsGround := preload("res://world/spring_court/shared/woods_ground.gd")
+
 const BOUNDS := Rect2(-700.0, 300.0, 1200.0, 1100.0)
 
 ## Named places (centre, radius). Shared with the region scene and tests.
@@ -108,7 +110,9 @@ static func texture_at(x: float, z: float) -> Vector3i:
 		&"ancient_oak_wood", &"faelight_hollow":
 			return Vector3i(WorldHeight.Tex.MOSS, WorldHeight.Tex.FOREST_FLOOR, 90)
 		&"spring_woodland":
-			return Vector3i(WorldHeight.Tex.FOREST_FLOOR, WorldHeight.Tex.SPRING_GRASS, 110)
+			# Leaf litter under the groves only; the meadows between stay grass.
+			return WoodsGround.paint("border_woods", &"spring_woodland", x, z,
+					WorldHeight.Tex.FOREST_FLOOR, WorldHeight.Tex.SPRING_GRASS, 110)
 		&"brook":
 			return Vector3i(WorldHeight.Tex.MOSS, WorldHeight.Tex.RIVERBED, 70)
 	return Vector3i(WorldHeight.Tex.SPRING_GRASS, WorldHeight.Tex.MOSS, 40)

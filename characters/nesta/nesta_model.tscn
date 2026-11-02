@@ -14,7 +14,20 @@ shader_parameter/albedo = Color(0.922, 0.792, 0.737, 1.0)
 shader_parameter/makeup_mask_a = ExtResource("4_mask_a")
 shader_parameter/makeup_mask_b = ExtResource("5_mask_b")
 shader_parameter/brows_color = Color(0.431, 0.306, 0.188, 1.0)
-shader_parameter/lips_color = Color(0.706, 0.392, 0.424, 1.0)
+shader_parameter/lips_color = Color(0.722, 0.314, 0.431, 1.0)
+shader_parameter/blush_amount = 0.450
+shader_parameter/blush_color = Color(0.851, 0.549, 0.612, 1.0)
+shader_parameter/blush_sheen = 0.200
+shader_parameter/brows_amount = 0.950
+shader_parameter/eyeshadow_amount = 0.550
+shader_parameter/eyeshadow_color = Color(0.612, 0.525, 0.690, 1.0)
+shader_parameter/eyeshadow_sheen = 0.450
+shader_parameter/liner_amount = 0.950
+shader_parameter/liner_color = Color(0.118, 0.086, 0.125, 1.0)
+shader_parameter/lips_amount = 0.800
+shader_parameter/lips_sheen = 0.550
+shader_parameter/rim_amount = 0.300
+shader_parameter/rim_color = Color(0.902, 0.925, 1.000, 1.0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
 resource_name = "skin"

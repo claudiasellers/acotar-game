@@ -27,9 +27,17 @@ import cast_common as cc
 
 HEIGHT = 1.70
 SHAPE = dict(
-    eye_r=0.0181, eye_open_up=30.0, eye_open_lo=27.0, eye_tilt=10.0, eye_open_w=63.0,
-    cheeks=0.70, cheekbones=0.40, jaw=0.0, jaw_w=0.95, chin=0.92, chin_drop=0.005, chin_point=0.55,
-    brow=0.0, nose=1.04, nose_bridge=0.45, lips=0.90, lip_w=0.97, face_w=0.95, neck=0.96,
+    # face (L37): a Barbie ice-queen: big upswept almond eyes under a lifted, high-arched brow,
+    # sculpted high cheekbones, a fine straight nose with a neat tip, a full defined mouth that
+    # rests cool and still, a small pointed chin.  Canon: her face is their mother's, "so cold and
+    # unrelenting" (ch5); "beautiful, imperious, still as one of the High Fae" (ch31).
+    eye_r=0.0214, eye_open_up=31.0, eye_open_lo=24.0, eye_tilt=13.0, eye_open_w=66.0,
+    eye_dx=0.0022, cut_reach=0.018, cut_soft=0.007, lid=0.62, eye_sink=0.75, eye_dz=-0.0015, brow_dz=0.0008,
+    cheeks=0.62, cheekbones=0.55, cheek_lift=0.003, jaw=0.0, jaw_w=0.90, chin=0.88, chin_drop=-0.003,
+    chin_point=0.75, brow=0.0, nose=0.82, nose_w=0.85, nose_up=0.25, nose_bridge=0.0,
+    lips=1.16, lip_upper=0.98, lip_lower=1.0, lip_w=1.32, lip_bow=1.0, smile=-0.15,
+    chin_y=0.006, jaw_taper=0.8, lower_fill=1.4, bridge_fill=1.0, mouth_dy=0.0045,
+    face_w=0.95, neck=0.96,
     bust=0.95, ribs=0.98, waist=0.95, belly=0.95, pelvis=0.97, seat=0.95,
     thigh=0.96, calf=0.96, arm=0.96, forearm=0.97, hand=0.98,
 )
@@ -41,11 +49,24 @@ SKIN_LINEAR = (0.83, 0.59, 0.50)        # a cool porcelain, a shade paler than F
 SKIN_SRGB = "EBCABC"
 IRIS = ((0.20, 0.29, 0.38), (0.50, 0.60, 0.68), (0.62, 0.66, 0.70))   # steel outer, grey-blue inner, cold fleck
 IRIS_FLECKS = 0.25
-LASH = 0.95
+LASH = 1.35
+LASH_FLICK = 0.9                         # long upswept outer lashes: a cat-eye sweep
+LASH_STYLE = "strands"
+FACE_TRIS = 6600
+LASH_COUNT = 34
+LOWER_LASH = 0.6
+# makeup-mask shapes (L37): a long winged liner, smoky lid, a high sharp arch to the brows
+MASK = dict(shadow_h=24.0, liner_w=7.0, wing=22.0, wing_lift=16.0, lower_liner=0.6,
+            blush=(0.052, 1.484, 0.019, 0.009), brow_arch=1.35, brow_peak=0.68, brow_weight=1.25)
 LASH_LINEAR = cc.srgb("2E2118")
 HAIR_RGB = cc.srgb("B08552")            # the sisters' shared brassy golden-brown
 BROWS_SRGB = "6E4E30"
-LIPS_SRGB = "B4646C"
+LIPS_SRGB = "B8506E"                    # cool berry rose
+# feyre_skin.gdshader makeup (L37): smoky lilac-grey lids, a sharp winged liner, a cool rose
+# contour on the cheekbones, a glossy berry mouth; a pearl rim light.
+MAKEUP = dict(lips_amount=0.80, lips_sheen=0.55, eyeshadow_color="9C86B0", eyeshadow_amount=0.55,
+              eyeshadow_sheen=0.45, liner_color="1E1620", liner_amount=0.95, blush_color="D98C9C",
+              blush_amount=0.45, blush_sheen=0.2, brows_amount=0.95, rim_color="E6ECFF", rim_amount=0.30)
 
 DEFAULT_OUTFIT = ["nesta_gown", "nesta_slippers", "nesta_iron_bangle"]
 DEFAULT_HAIR = "nesta_chignon"
@@ -272,14 +293,21 @@ def worn_cloak(ctx, name, pal, hem=0.34, rag=0.040, nr=18, nc=36, hood=True):
 def style_chignon(st):
     """Severe and sleek: centre parting, hair drawn tight over the ears into a low knot at the back of
     the head, a thin braid wrapped round it and five pearl pins."""
-    st.cap(thick=0.0085, back_extra=0.004)
-    st.cap_locks(0.0, n=26, off=0.0090, r=0.0074, front_sweep=False)
+    # L37: princess volume (a soft lift at the crown and fuller sides), still severe and swept back
+    st.cap(thick=0.0140, back_extra=0.008)
+    st.cap_locks(0.0, n=26, off=0.0140, r=0.0085, front_sweep=False)
+    for s in (1, -1):                                     # a soft rolled lift from the parting
+        st.skull_lock(s * math.radians(6), math.radians(74), s * math.radians(70), math.radians(40),
+                      0.0150, 0.0120, n=12, sag=-math.radians(4))
     for s in (1, -1):                                     # drawn back from the temples, over the ears
         for k in range(3):
             st.skull_lock(s * math.radians(28 + 14 * k), math.radians(46 - 14 * k), s * math.radians(160),
                           math.radians(4), 0.0085, 0.0072, n=12, sag=math.radians(3))
+    for s in (1, -1):                                     # two fine loose tendrils framing the face
+        top = st.head.scalp(s * math.radians(64), math.radians(30), 0.004)
+        st.hang(top, 0.095, 0.014, r0=0.0058, r1=0.0030, wave=0.004, curl=0.0, n=14, front=True)
     c = st.outer(math.pi, math.radians(-2), 0.017)
-    st.bun(c, 0.036, wraps=11, axis=(0, 1, 0.05))
+    st.bun(c, 0.040, wraps=12, axis=(0, 1, 0.05))
     pts = []
     for i in range(22):                                   # braid wrapped round the knot
         a = math.radians(-70 + 330 * i / 21)

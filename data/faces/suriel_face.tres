@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"suriel"
+canon = "Thin as death, skin like old cloth, lipless mouth over too-many grey teeth [C ch14]. It smiles that lipless smile while it answers her, amused, and the teeth are horribly large [C ch14]; its milky eyes widen and it shrieks when it scents the naga [C ch14]. Never sad, never pleading."
+masked = false
+rest = &"calm"
+blink_min = 0.0
+blink_max = 0.0
+presets = {
+"calm": {  },
+"grin": { "threat": 1.0 },
+"shriek": { "eyes_wide": 1.0, "threat": 1.0 },
+"smile": { "threat": 0.55 },
+"speak": { "threat": 0.45 },
+"watch": { "eyes_wide": 0.45 }
+}
+aliases = {
+"neutral": "calm",
+"happy": "smile",
+"laugh": "grin",
+"smirk": "smile",
+"tender": "smile",
+"angry": "grin",
+"fury": "shriek",
+"contempt": "smile",
+"disgust": "smile",
+"sad": "calm",
+"grief": "calm",
+"afraid": "shriek",
+"terror": "shriek",
+"surprise": "watch",
+"pained": "watch",
+"weary": "calm",
+"guarded": "calm",
+"pleading": "calm"
+}
+tics = [{ "hold": 0.8, "max": 12.0, "min": 6.0, "preset": "smile", "weight": 0.5 }]
+creature = true
+states = {
+"caught": "smile",
+"freed": "grin",
+"screaming": "shriek",
+"snared": "watch",
+"stalking": "calm"
+}
+cues = {
+"freed": { "preset": "grin", "seconds": 1.5 },
+"naga_are_coming": { "preset": "shriek", "seconds": 2.0 }
+}

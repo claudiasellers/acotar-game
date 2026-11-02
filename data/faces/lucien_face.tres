@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"lucien"
+canon = "Fox mask over the upper face [C]. Smirks often, the scar pulling [C ch8-9; side X: the scarred, metal-eye side, his left]; lazy, vicious grin, too-white teeth [C ch8-9]; scowl with the scar stretching [C ch9]; snorts, harsh barking laugh [C ch7, ch9]; very pale, gaze fixed in fear [C ch9]; a rare crooked, genuine smile [C ch12]."
+masked = true
+rest = &"idle_smirk"
+blink_min = 2.5
+blink_max = 5.5
+presets = {
+"bark_laugh": { "jaw_open": 0.42, "smile_L": 0.85, "smile_R": 0.65, "squint_L": 0.5, "squint_R": 0.5 },
+"crooked_smile": { "smile_L": 0.75, "smile_R": 0.5, "squint_L": 0.2, "squint_R": 0.2 },
+"grim": { "blink_L": 0.12, "blink_R": 0.12, "frown_L": 0.45, "frown_R": 0.45, "lip_press": 0.5 },
+"idle_smirk": { "mouth_side_L": 0.15, "smile_L": 0.28 },
+"pale_fear": { "eyes_wide_L": 0.85, "eyes_wide_R": 0.85, "lips_part": 0.3, "mouth_stretch": 0.3 },
+"scowl": { "frown_L": 0.7, "frown_R": 0.7, "lip_press": 0.3, "sneer_L": 0.45, "squint_L": 0.4, "squint_R": 0.4 },
+"smirk": { "mouth_side_L": 0.5, "smile_L": 0.95, "sneer_L": 0.15, "squint_L": 0.35 },
+"vicious_grin": { "jaw_open": 0.1, "lips_part": 0.55, "smile_L": 1.15, "smile_R": 0.8, "squint_L": 0.3, "squint_R": 0.3 }
+}
+aliases = {
+"neutral": "idle_smirk",
+"happy": "crooked_smile",
+"laugh": "bark_laugh",
+"smirk": "smirk",
+"tender": "crooked_smile",
+"angry": "scowl",
+"fury": "scowl",
+"contempt": "smirk",
+"disgust": "scowl",
+"sad": "grim",
+"grief": "grim",
+"afraid": "pale_fear",
+"terror": "pale_fear",
+"surprise": "pale_fear",
+"pained": "grim",
+"weary": "grim",
+"guarded": "smirk",
+"pleading": "grim"
+}
+tics = [{ "hold": 0.7, "max": 12.0, "min": 6.0, "preset": "smirk", "weight": 0.55 }]
