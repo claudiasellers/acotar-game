@@ -25,6 +25,7 @@ const MAX_HOUSES := 18
 const FOOT := {
 	&"house_timber": Vector2(7.6, 5.6), &"house_wattle": Vector2(6.2, 4.6),
 	&"house_long": Vector2(11.8, 5.2), &"house_croft": Vector2(5.2, 4.2),
+	&"house_leanto": Vector2(8.2, 4.6),
 	&"shed": Vector2(3.4, 2.8), &"tavern": Vector2(12.4, 8.4),
 	&"meeting_hall": Vector2(14.4, 8.4), &"debt_house": Vector2(5.9, 4.5),
 	&"barn_abandoned": Vector2(14.2, 9.2), &"mill": Vector2(8.4, 7.4),
@@ -38,7 +39,7 @@ const FOOT := {
 	&"lantern_post": Vector2(0.3, 0.3),
 }
 ## Kinds that are buildings (the GUT test checks these against roads/creek).
-const BUILDING_KINDS := [&"house_timber", &"house_wattle", &"house_long", &"house_croft",
+const BUILDING_KINDS := [&"house_timber", &"house_wattle", &"house_long", &"house_croft", &"house_leanto",
 	&"shed", &"tavern", &"meeting_hall", &"debt_house", &"barn_abandoned", &"mill", &"smithy"]
 
 ## Collision per kind (local): [centre, size] boxes; a Vector2 size is a
@@ -48,6 +49,7 @@ const COLLIDE := {
 	&"house_wattle": [[Vector3(0, 2.6, 0), Vector3(6.0, 5.2, 4.4)]],
 	&"house_long": [[Vector3(0, 2.8, 0), Vector3(10.0, 5.6, 5.0)], [Vector3(5.9, 1.1, 0), Vector3(1.8, 2.2, 3.6)]],
 	&"house_croft": [[Vector3(0, 2.2, 0), Vector3(5.0, 4.4, 4.0)]],
+	&"house_leanto": [[Vector3(-1.3, 2.3, 0), Vector3(5.0, 4.6, 4.2)], [Vector3(2.45, 1.0, 0), Vector3(2.5, 2.0, 3.9)]],
 	&"shed": [[Vector3(0, 1.2, 0), Vector3(3.2, 2.4, 2.6)]],
 	&"tavern": [
 		[Vector3(-4.15, 1.9, 3.825), Vector3(3.7, 3.2, 0.35)],
@@ -113,7 +115,7 @@ const COLLIDE := {
 ## Chimney tops (local) for smoke.
 const CHIMNEYS := {
 	&"house_timber": Vector3(2.6, 9.6, -0.9), &"house_wattle": Vector3(-2.3, 6.4, -0.6),
-	&"house_long": Vector3(-1.5, 7.2, 0.0), &"house_croft": Vector3(2.3, 5.3, 0.0),
+	&"house_long": Vector3(-1.5, 7.2, 0.0), &"house_croft": Vector3(2.3, 5.3, 0.0), &"house_leanto": Vector3(-3.5, 5.4, -0.3),
 	&"tavern": Vector3(4.8, 11.0, -1.5), &"debt_house": Vector3(1.8, 5.9, -0.5),
 	&"smithy": Vector3(-1.6, 6.6, -1.9),
 }
@@ -210,7 +212,7 @@ func _define_layers() -> void:
 		_def(StringName("goods_" + g), _a("goods_" + g), &"", [], "C", 120.0, false)
 	_def(&"goods_pelts", _a("goods_pelts"), &"", ["landmark"], "C", 120.0, false)
 	# Houses.
-	for k in ["house_timber", "house_wattle", "house_long", "house_croft", "shed"]:
+	for k in ["house_timber", "house_wattle", "house_long", "house_croft", "house_leanto", "shed"]:
 		_def(StringName(k), _a(k), &"", [], "X", 500.0, true, 0.0, false, "", StringName(k))
 	# Village props.
 	_def(&"fence_wattle", _a("fence_wattle"), &"", [], "X", 150.0, true, 0.0, false, "", &"fence_wattle")
@@ -667,12 +669,71 @@ func _place_square() -> void:
 				var p: Vector2 = b.pos + rot(Vector2(rng.randf_range(-7.5, 7.5), rng.randf_range(-6.5, -4.8)), b.yaw)
 				if ground_ok(p, 0.1):
 					put(&"snowdrops", p, rng.randf() * TAU, rng.randf_range(0.8, 1.1))
+	_place_market_lane()
 	# Carts and loose barrels/crates about the square.
 	for k in 3:
 		var p: Vector2 = at.call(rng.randf_range(0, 360), rng.randf_range(30.0, 38.0))
 		var yaw := rng.randf() * TAU
 		if footprint_clear(p, FOOT[&"cart"], yaw, 0.3) and footprint_free(p, FOOT[&"cart"], yaw, 0.5):
 			put_block(&"cart", &"cart", p, yaw)
+
+
+## The market spills up the north road (lane L32, audit A7): the way in from
+## the Wall and the cottage road is the first thing anyone sees of the
+## village, and an empty street read as abandoned. Stalls face each other
+## across the road (pelts, roots and grain, a tinker's ironmongery), a cart
+## stands loaded by the verge and lantern posts mark the lane. Own RNG, so
+## the rest of the plan keeps its draws.
+func _place_market_lane() -> void:
+	var lr := RandomNumberGenerator.new()
+	lr.seed = SEED + 77
+	var sq := HumanRealmLayout.VILLAGE_SQUARE
+	var road: PackedVector2Array = HumanRealmLayout.ROADS[1]
+	var dir := (road[1] - road[0]).normalized()
+	var side := Vector2(-dir.y, dir.x)
+	var lane := [
+		[14.0, 1.0, &"stall_brown", &"goods_furs"], [15.5, -1.0, &"stall_grey", &"goods_grain"],
+		[21.0, 1.0, &"stall_grey", &"goods_iron"], [22.5, -1.0, &"stall_blue", &"goods_salt"],
+	]
+	for s in lane:
+		var off := HumanRealmLayout.ROAD_HALF_WIDTH + 2.4
+		var yaw := 0.0
+		var p := Vector2.INF
+		for slide in [0.0, 3.0, 6.0, -2.5]:  # slide along the verge to a free spot
+			var q: Vector2 = sq + dir * (float(s[0]) + slide) + side * float(s[1]) * off
+			yaw = yaw_toward(q, q - side * float(s[1]))
+			if footprint_clear(q, FOOT[&"stall"], yaw, 0.2) and footprint_free(q, FOOT[&"stall"], yaw, 0.4):
+				p = q
+				break
+		if p == Vector2.INF:
+			continue
+		var rec := put_block(s[2], &"stall", p, yaw)
+		(layers[s[3]] as ScatterLayer).add(Vector3(p.x, rec.y, p.y), yaw, 1.0)
+		put(&"herb_bundles", p + rot(Vector2(lr.randf_range(-1.2, 1.2), -0.9), yaw), lr.randf() * TAU, 1.0, 1.55)
+		# Stock behind the counter and a crate or barrel at the end.
+		for k in 3:
+			put(&"salt_sacks", p + rot(Vector2(lr.randf_range(-1.3, 1.3), lr.randf_range(-1.4, -0.9)), yaw),
+					lr.randf() * TAU, lr.randf_range(0.85, 1.05))
+		var cp: Vector2 = p + rot(Vector2(lr.randf_range(2.0, 2.5) * (1.0 if lr.randf() < 0.5 else -1.0), -0.2), yaw)
+		if ground_ok(cp, 0.1) and footprint_free(cp, FOOT[&"crate"], 0.0, 0.2):
+			put_block(&"crate" if lr.randf() < 0.5 else &"barrel", &"crate", cp, lr.randf() * TAU)
+	# Lantern posts down the lane, both verges.
+	for d in [9.0, 18.0, 27.0]:
+		for sgn in [1.0, -1.0]:
+			var lp: Vector2 = sq + dir * (d + 1.5 * sgn) + side * sgn * (HumanRealmLayout.ROAD_HALF_WIDTH + 0.9)
+			if footprint_free(lp, Vector2(0.4, 0.4), 0.0, 0.3):
+				_lantern(lp, yaw_toward(lp, lp - side * sgn))
+	# A cart loaded for market day, pulled onto the verge.
+	for t in [29.0, 33.0, 37.0]:
+		var p: Vector2 = sq + dir * t - side * (HumanRealmLayout.ROAD_HALF_WIDTH + 2.6)
+		var yaw := dir.angle_to(Vector2.RIGHT) + lr.randf_range(-0.15, 0.15)
+		if footprint_clear(p, FOOT[&"cart"], yaw, 0.2) and footprint_free(p, FOOT[&"cart"], yaw, 0.4):
+			var rec := put_block(&"cart", &"cart", p, yaw)
+			for k in 4:
+				put(&"salt_sacks", p + rot(Vector2(lr.randf_range(-0.8, 0.6), lr.randf_range(-0.45, 0.45)), yaw),
+						lr.randf() * TAU, 0.9, rec.y - WorldHeight.height_at(p.x, p.y) + 1.2)
+			put(&"barrel", p + rot(Vector2(0.75, 0.2), yaw), lr.randf() * TAU, 0.75, rec.y - WorldHeight.height_at(p.x, p.y) + 1.2)
+			break
 
 
 ## Lantern post at p with a light, facing `yaw`.
@@ -704,7 +765,7 @@ func _place_houses() -> void:
 						cands.append([c.distance_to(sq) + rng.randf_range(0.0, 60.0), c])
 				step += rng.randf_range(17.0, 24.0)
 	cands.sort_custom(func(x: Array, y: Array) -> bool: return x[0] < y[0])
-	var kinds := [&"house_wattle", &"house_croft", &"house_timber", &"house_long", &"house_wattle", &"house_croft", &"house_timber"]
+	var kinds := [&"house_wattle", &"house_croft", &"house_timber", &"house_long", &"house_wattle", &"house_leanto", &"house_timber"]
 	var count := 0
 	for cand: Array in cands:
 		if count >= MAX_HOUSES:
