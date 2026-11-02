@@ -283,6 +283,10 @@ func _build() -> void:
 		_action(actions, "Map", func() -> void:
 			close()
 			_map.call(&"open_map"))
+	# L54: Feyre's sketchbook (story, what she's after, hints on request).
+	_action(actions, "Journal", func() -> void:
+		close()
+		StoryJournal.open_from(get_tree()))
 	_action(actions, "Return Home", _return_home)
 	_action(actions, "Save & Title", func() -> void: _save_then(_to_title))
 	_action(actions, "Save & Quit", func() -> void: _save_then(_quit))
