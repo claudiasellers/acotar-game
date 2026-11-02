@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="FaceProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/faces/face_profile.gd" id="1_face"]
+
+[resource]
+script = ExtResource("1_face")
+character_id = &"elain"
+canon = "Unmasked, human, 'lovely' [C]. The gasp, the wince, pale and cowering, weeping [C]; later bright laughter [C]. Never sneers [C]. Our reading [X]: a soft, sweet rest face, worry before anger."
+masked = false
+rest = &"sweet"
+blink_min = 2.2
+blink_max = 5.0
+presets = {
+"cower": { "brow_inner_up": 0.9, "chin_raise": 0.3, "eyes_wide_L": 0.3, "eyes_wide_R": 0.3, "frown_L": 0.4, "frown_R": 0.4, "lips_part": 0.2 },
+"gasp": { "brow_inner_up": 0.3, "brow_up_L": 0.6, "brow_up_R": 0.6, "eyes_wide_L": 0.45, "eyes_wide_R": 0.45, "jaw_open": 0.3, "lips_part": 0.5 },
+"laugh": { "brow_up_L": 0.2, "brow_up_R": 0.2, "cheek_raise": 0.6, "jaw_open": 0.2, "lips_part": 0.4, "smile_L": 1.0, "smile_R": 1.0, "squint_L": 0.35, "squint_R": 0.35 },
+"smile": { "cheek_raise": 0.35, "smile_L": 0.6, "smile_R": 0.6, "squint_L": 0.15, "squint_R": 0.15 },
+"sweet": { "brow_inner_up": 0.12, "cheek_raise": 0.1, "smile_L": 0.22, "smile_R": 0.22 },
+"weeping": { "brow_inner_up": 1.0, "chin_raise": 0.5, "frown_L": 0.65, "frown_R": 0.65, "lips_part": 0.25, "squint_L": 0.45, "squint_R": 0.45 },
+"wince": { "brow_inner_up": 0.6, "frown_L": 0.35, "frown_R": 0.35, "lip_press": 0.3, "squint_L": 0.7, "squint_R": 0.7 },
+"worried": { "brow_inner_up": 0.6, "frown_L": 0.2, "frown_R": 0.2, "lip_press": 0.2 }
+}
+aliases = {
+"neutral": "sweet",
+"happy": "smile",
+"laugh": "laugh",
+"smirk": "smile",
+"tender": "smile",
+"angry": "worried",
+"fury": "wince",
+"contempt": "worried",
+"disgust": "wince",
+"sad": "worried",
+"grief": "weeping",
+"afraid": "cower",
+"terror": "cower",
+"surprise": "gasp",
+"pained": "wince",
+"weary": "worried",
+"guarded": "worried",
+"pleading": "cower"
+}
+tics = [{ "hold": 0.8, "max": 14.0, "min": 7.0, "preset": "smile", "weight": 0.4 }]
