@@ -5,7 +5,7 @@
 ## talking moves the visemes.
 extends GutTest
 
-const CAST: Array[StringName] = [&"tamlin", &"lucien", &"alis", &"father"]
+const CAST: Array[StringName] = [&"tamlin", &"lucien", &"alis", &"father", &"nesta", &"elain"]
 const EXPRESSION_KEYS: Array[String] = ["smile_L", "smile_R", "frown_L", "frown_R", "sneer_L", "sneer_R",
 	"lip_press", "jaw_clench", "mouth_stretch", "eyes_wide_L", "eyes_wide_R", "squint_L", "squint_R",
 	"brow_down_L", "brow_down_R", "brow_up_L", "brow_up_R", "brow_inner_up", "cheek_raise", "mouth_side_L",
@@ -128,3 +128,21 @@ func test_faces_blink_and_talk() -> void:
 	assert_eq(d.current_expression(), &"sneer", "contempt is Alis's sneer")
 	_run(d, 1.0)
 	assert_false(d.is_talking())
+
+
+func test_sisters_lashes_ride_the_lids_and_elain_never_sneers() -> void:
+	for id: StringName in [&"nesta", &"elain"]:
+		var m := _model(id)
+		var lashes := m.find_child("Lashes", true, false) as MeshInstance3D
+		assert_not_null(lashes, "%s has strand lashes" % id)
+		assert_gt(lashes.find_blend_shape_by_name("blink_L"), -1, "%s lashes close with the lid" % id)
+		assert_true(lashes in _driver(m).meshes, "%s lashes are driven" % id)
+	var p := FaceProfile.for_character(&"elain")
+	for mix: Dictionary in p.presets.values():
+		for k: String in mix:
+			assert_false(k.begins_with("sneer"), "Elain never sneers [C]")
+	var d := _driver(_model(&"nesta"))
+	Faces.express(&"nesta", &"contempt")
+	_run(d, 0.5)
+	assert_eq(d.current_expression(), &"sneer")
+	assert_gt(d.weight_of("sneer_R"), 0.7)
