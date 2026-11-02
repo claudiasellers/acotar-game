@@ -31,7 +31,7 @@ const FITTED := &"seat_fit_fitted"
 static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 	if skeleton == null or skeleton.find_bone("Hips") < 0:
 		return
-	var holder := skeleton.get_parent()
+	var holder := _figure_root(skeleton)
 	var parts := _parts(holder, skeleton)
 	var worn: Array = parts["garments"]
 	if not seated:
@@ -55,12 +55,24 @@ static func set_seated(skeleton: Skeleton3D, seated: bool) -> void:
 		mi.skin = made[1]
 
 
+## The node the figure's meshes hang under: three levels up from the skeleton (the glb, the
+## model, what the wardrobe's "Worn" node hangs on), no further than a character body.
+static func _figure_root(skeleton: Skeleton3D) -> Node:
+	var at: Node = skeleton
+	for i in 3:
+		var up := at.get_parent()
+		if up == null or up is CharacterBody3D or up == skeleton.get_tree().root:
+			break
+		at = up
+	return at
+
+
 ## Every skinned mesh under `holder` that is a layer: {"body": [[mesh instance, surface], ...], "garments": [[mesh instance, layer], ...]}.
 static func _parts(holder: Node, skeleton: Skeleton3D) -> Dictionary:
 	var body: Array = []
 	var garments: Array = []
 	for mi: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
-		if mi.mesh == null or mi.skin == null or not mi.mesh is ArrayMesh:
+		if mi.mesh == null or mi.skin == null or not mi.mesh is ArrayMesh or mi.get_node_or_null(mi.skeleton) != skeleton:
 			continue
 		if mi.get_parent() == skeleton:
 			if mi.name == &"Body":
