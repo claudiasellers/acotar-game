@@ -52,20 +52,20 @@ const POSES := {
 		"LeftLowerArm": Vector3(0.05, -0.3, 1.0), "RightLowerArm": Vector3(-0.05, -0.3, 1.0)}},
 	# On a dining chair, hands in the lap. _seated() fits the hips and legs to
 	# the figure and the chair; these are what it starts from.
-	&"sit": {"drop": 0.3, "back": 0.0, "seated": true, "aims": {
+	&"sit": {"sits": true, "drop": 0.3, "back": 0.0, "seated": true, "aims": {
 		"LeftUpperLeg": Vector3(0.05, -0.08, 1.0), "RightUpperLeg": Vector3(-0.05, -0.08, 1.0),
 		"LeftLowerLeg": Vector3(0.0, -1.0, 0.0), "RightLowerLeg": Vector3(0.0, -1.0, 0.0),
 		"LeftFoot": Vector3(0.0, -0.4, 1.0), "RightFoot": Vector3(0.0, -0.4, 1.0),
 		"LeftUpperArm": Vector3(0.12, -1.0, 0.28), "RightUpperArm": Vector3(-0.12, -1.0, 0.28),
 		"LeftLowerArm": Vector3(-0.15, -0.6, 1.0), "RightLowerArm": Vector3(0.15, -0.6, 1.0)}},
 	# Slouched in the chair, one leg out (Tamlin pretending not to care).
-	&"sit_slouch": {"drop": 0.5, "back": 0.08, "aims": {
+	&"sit_slouch": {"sits": true, "drop": 0.5, "back": 0.08, "aims": {
 		"LeftUpperLeg": Vector3(0.2, -0.05, 1.0), "RightUpperLeg": Vector3(-0.1, 0.0, 1.0),
 		"LeftLowerLeg": Vector3(0.1, -1.0, 0.5), "RightLowerLeg": Vector3(0.0, -0.6, 1.0),
 		"LeftFoot": Vector3(0.0, -0.3, 1.0), "RightFoot": Vector3(0.0, 0.2, 1.0),
 		"Spine": Vector3(0.0, 1.0, -0.25), "Chest": Vector3(0.0, 1.0, -0.1)}},
 	# Sitting in the grass, leaning back on the hands (the glen at noon).
-	&"sit_ground": {"drop": 0.84, "back": 0.0, "aims": {
+	&"sit_ground": {"sits": true, "drop": 0.84, "back": 0.0, "aims": {
 		"LeftUpperLeg": Vector3(0.12, -0.12, 1.0), "RightUpperLeg": Vector3(-0.08, -0.12, 1.0),
 		"LeftLowerLeg": Vector3(0.05, -0.55, 1.0), "RightLowerLeg": Vector3(0.0, -0.12, 1.0),
 		"LeftFoot": Vector3(0.0, 0.4, 1.0), "RightFoot": Vector3(0.0, 0.6, 1.0),
@@ -158,6 +158,8 @@ static func on(figure: Node) -> FilmPose:
 ## The sit pose fits `chair`, one of CHAIRS.
 func to(pose_name: StringName, seconds: float = 0.6, chair: StringName = &"chair_dining") -> void:
 	var target: Dictionary = POSES.get(pose_name, {})
+	# Sitting bends the thigh past what clothes skinned for standing follow.
+	SeatSkinFit.set_seated(get_skeleton(), bool(target.get("sits", false)))
 	if bool(target.get("seated", false)):
 		target = _seated(target, chair)
 	_from = _current()
