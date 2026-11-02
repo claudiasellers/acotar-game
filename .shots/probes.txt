@@ -1,0 +1,4 @@
+from L38 foyer grand stair and veins
+quality look
+timeout 600
+shot rooms res://tools/manor_estate/room_shot.tscn entrance_hall:10/1.2>10/14+2.2/26>8/12+16.5/9>9.5/8.6+14/6>5/1 {out}
