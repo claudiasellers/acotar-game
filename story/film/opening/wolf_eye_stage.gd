@@ -14,6 +14,7 @@ var wolf_point: Vector3
 var _t: float = 0.0
 var _from: Transform3D
 var _to: Transform3D
+var _aimed: bool = false
 
 
 func _ready() -> void:
@@ -103,7 +104,11 @@ func _ready() -> void:
 	camera.fov = 30.0
 	add_child(camera)
 	camera.current = true
-	var head := wolf_point if eye else Vector3(0, 1.4, -1.6)
+	_aim(wolf_point if eye else Vector3(0, 1.4, -1.6))
+
+
+## Frames the eyes: from where the head really is once the idle has posed it.
+func _aim(head: Vector3) -> void:
 	_from = Transform3D(Basis(), head + Vector3(0.55, 0.12, 2.2)).looking_at(head + Vector3(-0.1, -0.05, 0), Vector3.UP)
 	_to = Transform3D(Basis(), head + Vector3(0.35, 0.06, 1.25)).looking_at(head, Vector3.UP)
 	camera.global_transform = _from
@@ -138,7 +143,7 @@ func _eye(wolf: Node3D) -> Node3D:
 		var rest := sk.get_bone_global_rest(bi)
 		# Skeleton space to the wolf's own space (both fixed at build time).
 		var sk_in_wolf := wolf.global_transform.affine_inverse() * sk.global_transform
-		at_model = sk_in_wolf * rest.origin + Vector3(0.0, 0.08, -0.14)
+		at_model = sk_in_wolf * rest.origin + Vector3(0.0, 0.05, -0.54)
 		frame.transform = rest.affine_inverse() * sk_in_wolf.affine_inverse() * Transform3D(Basis(), at_model)
 		break
 	if holder == wolf:
@@ -158,8 +163,8 @@ func _eye(wolf: Node3D) -> Node3D:
 		var e := MeshInstance3D.new()
 		e.name = "Eye%s" % ("L" if side < 0.0 else "R")
 		var sph := SphereMesh.new()
-		sph.radius = 0.032
-		sph.height = 0.045
+		sph.radius = 0.026
+		sph.height = 0.038
 		e.mesh = sph
 		e.material_override = m
 		e.position = Vector3(side * 0.085, 0.0, 0.0)
@@ -203,6 +208,11 @@ func _snowfall(at: Vector3, box: Vector3, amount: int, life: float, color: Color
 
 
 func _process(delta: float) -> void:
+	# Track the eyes where the idle has really put the head (it breathes).
+	if eye:
+		wolf_point = eye.global_position if _aimed else wolf_point
+		_aimed = true
+		_aim(wolf_point)
 	_t = minf(1.0, _t + delta / 4.0)
 	var k := _t * _t * (3.0 - 2.0 * _t)
 	camera.global_transform = _from.interpolate_with(_to, k)

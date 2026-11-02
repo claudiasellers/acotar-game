@@ -23,6 +23,7 @@ var current: FilmLine
 ## How far the letterbox is in (the captions sit just above the bottom bar).
 var bars_k: float = 1.0
 var _label: Label
+var _scrim: TextureRect
 var _tween: Tween
 
 
@@ -42,6 +43,26 @@ func _ready() -> void:
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label.modulate.a = 0.0
 	add_child(_label)
+	# A soft shadow behind the words, so they read on a bright frame too (the
+	# Wall's pale sky, the sea); on a dark frame it disappears into it.
+	_scrim = TextureRect.new()
+	_scrim.show_behind_parent = true
+	_scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_scrim.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_scrim.stretch_mode = TextureRect.STRETCH_SCALE
+	var g := Gradient.new()
+	g.set_color(0, Color(0.03, 0.015, 0.05, 0.62))
+	g.set_color(1, Color(0.03, 0.015, 0.05, 0.0))
+	g.add_point(0.45, Color(0.03, 0.015, 0.05, 0.45))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 128
+	tex.height = 64
+	_scrim.texture = tex
+	_label.add_child(_scrim)
 	resized.connect(_layout)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
@@ -65,6 +86,18 @@ func _layout() -> void:
 	_label.custom_minimum_size = Vector2(w, 0.0)
 	_label.size = Vector2(w, 220.0)
 	_label.position = Vector2((s.x - w) * 0.5, s.y - _bar(bars_k) - LIFT - 220.0)
+	_fit_scrim()
+
+
+## The shadow hugs the lines actually shown (the label is bottom-aligned).
+func _fit_scrim() -> void:
+	if _scrim == null:
+		return
+	var lines := maxi(1, _label.get_line_count()) if _label.text != "" else 1
+	var h := lines * 52.0 + 70.0
+	var w := _label.size.x
+	_scrim.position = Vector2(-w * 0.2, _label.size.y - h + 30.0)
+	_scrim.size = Vector2(w * 1.4, h)
 
 
 func show_line(line: FilmLine) -> void:
