@@ -28,6 +28,8 @@ const CODED := {
 const EXTRA := {
 	&"manor_dining_table": [
 		{"name": "ManorArrival", "script": "res://story/act2/manor_arrival.gd", "stage": "res://data/story/act2/manor_arrival_stage.tres"},
+		# L34-8: Lucien on the front steps, the morning after the curtain trap (ch9).
+		{"name": "LucienInvite", "script": "res://story/act2/lucien_invite.gd", "stage": "res://data/story/act2/lucien_invite_stage.tres"},
 		# L45: lunch with the bruise bared, then dinner and the white roses (ch22).
 		{"name": "BruiseLunch", "script": "res://story/act5/calanmai/bruise_lunch.gd", "stage": "res://data/story/act5/bruise_lunch_stage.tres"},
 		{"name": "RoseDinner", "script": "res://story/act5/calanmai/rose_dinner.gd", "stage": "res://data/story/act5/rose_dinner_stage.tres"},

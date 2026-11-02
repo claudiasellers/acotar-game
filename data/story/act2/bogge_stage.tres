@@ -15,6 +15,8 @@ marks = {
 "safety": Vector3(0, 0, -38)
 }
 lines = {
+"lucien_keep_up": {"text": "Keep up, human. And keep quiet.", "who": "Lucien"},
+"lucien_home": {"text": "Home. Before anything else finds us.", "who": "Lucien"},
 "beg_belly": {
 "text": "I will fill my belly with you.",
 "who": ""
@@ -77,5 +79,5 @@ lines = {
 }
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("lucien_quiet", "lucien_walk", "lucien_gone", "lucien_told_you")
+invented = PackedStringArray("lucien_quiet", "lucien_walk", "lucien_gone", "lucien_told_you", "lucien_keep_up", "lucien_home")
 canon = "Ch9-10 (keeper, 2026-11-01, 04-creatures/bogge.md). Lucien's warning and the Bogge's pleas are the book's words; she fixes on a distant elm and thinks of hot bread, a starry sky, a summer sunrise. In the book they are on horseback; staged on foot here (X). The failure (it becomes real, she wakes back up the path) is game design (X): in the book she never looks."

@@ -9,9 +9,11 @@ extends GutTest
 const STEP := 0.1
 ## The manor's first evening: every wait on her has a nudge, not just presses.
 const EVENING := ["res://story/act2/manor_arrival.gd", "res://story/act2/alis_welcome.gd",
-	"res://story/act2/first_dinner.gd", "res://story/act2/curtain_trap.gd"]
-## Waits that move on by themselves (her temper rises on a timer).
-const SELF_ENDING := ["until she rises"]
+	"res://story/act2/first_dinner.gd", "res://story/act2/curtain_trap.gd",
+	# L34-8: Lucien's invitation, the Bogge, the puca.
+	"res://story/act2/lucien_invite.gd", "res://story/act2/bogge_hunt.gd", "res://story/act2/puca_lure.gd"]
+## Waits that move on by themselves (her temper rises on a timer; the Bogge's pass).
+const SELF_ENDING := ["until she rises", "it passes behind her", "she knows him"]
 
 var root: Node3D
 var feyre: Node3D
@@ -230,3 +232,98 @@ func test_at_night_the_window_pulls_her_to_the_curtains() -> void:
 	WorldState.set_flag("curtain_trap_set")
 	_pull(0.5)
 	assert_eq(card.text(), "", "gone once the night's done")
+
+
+func test_the_morning_after_lucien_asks_her_to_hunt() -> void:
+	for f in ["wall_crossed", "first_dinner_eaten", "curtain_trap_set", "fact.alis_tripped"]:
+		WorldState.set_flag(f)
+	Clock.from_dict({"time_of_day": 0.4, "day": 4})
+	var invite := dining.get_node(^"LucienInvite") as LucienInvite
+	invite.auto_tick = false
+	assert_true(invite.can_start())
+	# About the house, not at the steps: she remembers him after a while.
+	feyre.global_position = invite.mark(&"lucien_steps") + Vector3(60, 0, -20)
+	for _i in int((LucienInvite.PULL_AFTER + 2.0) / STEP):
+		invite.pull(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+	assert_true(heard.has(_line(invite, &"invite_pull")), "she remembers Lucien: %s" % [heard])
+	feyre.global_position = invite.mark(&"lucien_steps") + Vector3(0, 0, -4)
+	for _i in 20:
+		if invite._player_here() and invite.can_start():
+			invite.arrive()
+		if invite.running:
+			break
+	assert_true(invite.running, "he calls to her on the steps")
+	assert_not_null(invite.actor(&"lucien"))
+	var ok := false
+	for _i in 400:
+		invite.tick(STEP)
+		if invite.current_beat_label() == "until she goes with him":
+			ok = true
+			break
+	assert_true(ok, "he waits for her answer")
+	for _i in int((LucienInvite.NUDGE_AFTER + 2.0) / STEP):
+		invite.tick(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+	var card := invite.get_node_or_null(^"PressCard") as PressCard
+	assert_eq(card.text() if card else "", "E   go with Lucien")
+	assert_true(heard.has(_line(invite, &"lucien_light")), "Lucien: the light won't wait")
+	invite.press_interact()
+	for _i in 20:
+		invite.tick(STEP)
+	assert_true(WorldState.has_flag("fact.hunt_invited"))
+	assert_false(invite.running)
+	assert_not_null(invite.travel, "dark, and out to the oaks")
+	if invite.travel:
+		invite.travel.queue_free()
+	assert_false(invite.can_start(), "asked once")
+
+
+func test_the_puca_shows_himself_under_her_window() -> void:
+	WorldState.set_flag("bogge_survived")
+	Clock.from_dict({"time_of_day": 0.95, "day": 5})
+	for global_space in StoryDirector.get_children():
+		(global_space as SceneSpace).auto_tick = false
+	var puca := Act2Spaces.space_for(StoryDirector.get_moment(&"puca")) as PucaLure
+	puca.auto_tick = false
+	puca.position = Vector3(0, 0, -194)
+	root.add_child(puca)
+	feyre.global_position = bedroom.global_position + Vector3(0, 0, 6)
+	assert_true(puca.in_her_room())
+	assert_true(puca._player_here(), "at night her room counts: she sees him from the window")
+	assert_true(puca.can_start())
+	puca.arrive()
+	var ok := false
+	for _i in 100:
+		puca.tick(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+		if puca.current_beat_label() == "she goes down to him":
+			ok = true
+			break
+	assert_true(ok, "he waits for her below")
+	var p := puca.puca()
+	assert_not_null(p)
+	if p == null:
+		return
+	assert_lt(Vector2(p.global_position.x, p.global_position.z).distance_to(
+		Vector2(puca.below_her_window().x, puca.below_her_window().z)), 0.5, "under her window")
+	assert_true(heard.has(_line(puca, &"puca_window")))
+	for _i in int((PucaLure.NUDGE_AFTER + 2.0) / STEP):
+		puca.tick(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+	assert_true(heard.has(_line(puca, &"puca_come_down")), "she has to go down to him: %s" % [heard])
+	assert_eq(puca.current_beat_label(), "she goes down to him", "he doesn't wander off while she's upstairs")
+	feyre.global_position = p.global_position + Vector3(0, 0, 3)
+	for _i in 5:
+		puca.tick(STEP)
+	assert_eq(puca.current_beat_label(), "follow him to the gate")
+	for global_space in StoryDirector.get_children():
+		(global_space as SceneSpace).auto_tick = true
