@@ -14,6 +14,7 @@ extends RefCounted
 ## Tree and shrub composition (loaded by path: a new global class isn't
 ## registered until the editor rescans, so no class_name).
 const LandscapeLayout := preload("res://world/spring_court/shared/landscape_layout.gd")
+const ForageZones := preload("res://world/spring_court/shared/forage_zones.gd")
 ## Grid cell (m) per kind. Smaller cells for denser layers.
 const CELL := {"tree": 4.0, "shrub": 2.5, "forage": 5.0, "detail": 0.9}
 ## Species allowed on water (everything else is skipped there).
@@ -31,6 +32,8 @@ const CHUNK_FORAGE := 64.0
 const DRIFT_CELL := 50.0
 const DRIFT_TRIES := 4
 const DRIFT_SIZE := Vector2i(5, 30)
+## Spots tried when a drift settles into its kind's zone (ForageZones).
+const SETTLE_TRIES := 6
 ## Finds that lie alone or in pairs rather than in drifts.
 const LONE_VISUALS := [&"feather_hawk", &"feather_owl", &"feather_jay", &"snail_shell", &"shed_antler",
 		&"egg_shell", &"wild_hive", &"trout_pool", &"odd_stone", &"painted_pebble", &"river_glass",
@@ -265,6 +268,9 @@ static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) ->
 	var nz := ceili(rect.size.y / DRIFT_CELL)
 	var counters := {}  # biome id -> drifts tried
 	var mean_size := 7.0  # mix of lone finds and drifts
+	# Keyed to L09's zones (ForageZones): each drift keeps its kind and count
+	# but settles, within its cell and biome, where that kind belongs.
+	var layout := LandscapeLayout.make(def.seed, provider.BOUNDS)
 	for iz in nz:
 		if BuildCancel.requested(def.region_id):
 			return out
@@ -288,6 +294,8 @@ static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) ->
 				var n: int = counters.get(b.id, 0)
 				counters[b.id] = n + 1
 				pick = fposmod(n * 0.6180339887 + pick * 0.05, 1.0)
+				var cell := Rect2(rect.position + Vector2(ix, iz) * DRIFT_CELL, Vector2.ONE * DRIFT_CELL)
+				c = settle(def, layout, b, _pick(tables[b.id], pick), c, cell, drift_seed)
 				_drift(def, out, tables[b.id], c, pick, size_roll, drift_seed)
 	# R1 floor: every 100 m block holds at least one drift.
 	var filled := {}
@@ -314,6 +322,29 @@ static func _place_drifts(def: WoodsRegionDef, rect: Rect2, seed_offset: int) ->
 				if b != null and tables.has(b.id) and _drift(def, out, tables[b.id], c, pick, size_roll, drift_seed, area) > 0:
 					break
 	return out
+
+
+## Where a drift of `kind` settles: the best of a few spots in its cell and
+## biome by ForageZones.fit (shade kinds under the grove core, hedgerow kinds
+## along the wood's edge, meadow kinds in the open). Neutral kinds stay put.
+static func settle(def: WoodsRegionDef, layout: Dictionary, b: WoodsBiome, kind: StringName, c: Vector2,
+		cell: Rect2, drift_seed: int) -> Vector2:
+	if ForageZones.affinity(kind) == ForageZones.NEUTRAL:
+		return c
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([drift_seed, "settle"])
+	var open := _open(b)
+	var best := c
+	var best_fit := ForageZones.fit(kind, ForageZones.shares(layout, c, open))
+	for _k in SETTLE_TRIES:
+		var p := cell.position + Vector2(rng.randf(), rng.randf()) * cell.size
+		if def.provider.biome_at(p.x, p.y) != b.id:
+			continue
+		var f := ForageZones.fit(kind, ForageZones.shares(layout, p, open))
+		if f > best_fit + 0.05:
+			best = p
+			best_fit = f
+	return best
 
 
 ## Places one drift around `c`; returns how many instances landed.
