@@ -24,7 +24,22 @@ const WORLD_MASK := 1 << 0
 ## within INDOOR_CEILING_GAP of the ceiling it does hit. The arm is shorter too.
 const INDOOR_RISE := 0.7
 const INDOOR_CEILING_GAP := 0.35
-const INDOOR_ARM := 2.8
+const INDOOR_ARM := 2.4
+## Indoors the arm also stops before a doorway behind her: walking out along the
+## arm, the free width side to side (up to 2 * ROOM_REACH) is sampled every
+## ROOM_STEP, and where it narrows to a doorway (under ROOM_NARROW of the width where
+## she stands, and under ROOM_DOOR_MAX) the camera stops ROOM_MARGIN short of it. So
+## it stays in her room in front of the jambs, while a corridor she walks along (as
+## narrow behind her as where she is) does not shrink the arm. Pull-in is quick and
+## letting out is slow, so it never pops.
+const ROOM_REACH := 1.5
+const ROOM_STEP := 0.25
+const ROOM_NARROW := 0.75
+const ROOM_DOOR_MAX := 2.2
+const ROOM_MARGIN := 0.2
+const ROOM_MIN_ARM := 0.9
+const ROOM_PULL_IN := 14.0
+const ROOM_LET_OUT := 2.5
 ## How far up (m) a roof still counts as "indoors".
 const INDOOR_PROBE := 9.0
 
@@ -97,6 +112,14 @@ var _recentering: bool = false
 var _indoor: float = 0.0
 ## Highest the camera may sit above its pivot right now (m).
 var _indoor_rise: float = INDOOR_RISE
+## Arm length the room allows, eased; see LENS_CLEAR.
+var _room_arm: float = 3.6
+## Indoors the camera does not collide with furniture (a small box-shaped body that
+## carries its own mesh, such as a canopy bed): CameraFade fades it instead, so bed
+## drapes never shove the camera in. Walls and anything taller than
+## CameraFade.MAX_SIZE still stop it.
+var _cam_skip: Array[RID] = []
+var _cam_prop_cache: Dictionary = {}
 var _recenter_t: float = 0.0
 var _recenter_from := Vector2.ZERO
 var _recenter_to := Vector2.ZERO
@@ -152,6 +175,8 @@ func _process(delta: float) -> void:
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	_update_indoor(delta)
 	var target_length := 1.7 if (is_aiming or is_drawing) else lerpf(3.6, INDOOR_ARM, _indoor)
+	_update_room_arm(delta, target_length)
+	target_length = minf(target_length, _room_arm)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	_clamp_indoor_pitch()
 	var shoulder := 0.55 if (is_aiming or is_drawing) else 0.0
@@ -407,6 +432,87 @@ func _update_indoor(delta: float) -> void:
 	if roofed:
 		_indoor_rise = clampf((hit.position as Vector3).y - from.y - INDOOR_CEILING_GAP, 0.0, INDOOR_RISE)
 	_indoor = move_toward(_indoor, 1.0 if roofed else 0.0, delta / 0.3)
+
+
+## Indoors: the longest arm (up to `want`) whose view-edge whiskers clear the walls.
+## Outdoors (_indoor 0) it allows the full arm, as before.
+func _update_room_arm(delta: float, want: float) -> void:
+	if _indoor < 0.5 and not _cam_skip.is_empty():
+		for rid in _cam_skip:
+			_spring_arm.remove_excluded_object(rid)
+		_cam_skip.clear()
+	var allowed := want
+	if _indoor > 0.0:
+		_cam_ray(_spring_arm.global_position, _spring_arm.global_position + _spring_arm.global_basis.z * (want + 0.3))
+		allowed = lerpf(want, room_clearance(want), _indoor)
+	var rate := ROOM_PULL_IN if allowed < _room_arm else ROOM_LET_OUT
+	_room_arm = lerpf(_room_arm, allowed, minf(1.0, rate * delta))
+
+
+## How far back (m, up to `want`) the camera can sit along the arm's current
+## direction and still be in front of any doorway behind her (see ROOM_REACH).
+func room_clearance(want: float) -> float:
+	var pivot := _spring_arm.global_position
+	var basis := _spring_arm.global_basis
+	var here := _free_width(pivot, basis.x)
+	var dist := ROOM_STEP
+	# A little past the camera too, so a doorway just behind the lens counts.
+	while dist <= want + ROOM_STEP:
+		var w := _free_width(pivot + basis.z * dist, basis.x)
+		if w < here * ROOM_NARROW and w < ROOM_DOOR_MAX:
+			return clampf(dist - ROOM_STEP - ROOM_MARGIN, ROOM_MIN_ARM, want)
+		dist += ROOM_STEP
+	return want
+
+
+## Free width (m) at `at` along +/- `side`, each way up to ROOM_REACH.
+func _free_width(at: Vector3, side: Vector3) -> float:
+	var space := get_world_3d().direct_space_state
+	var total := 0.0
+	for dir: Vector3 in [side, -side]:
+		var hit := _cam_ray(at, at + dir * ROOM_REACH)
+		total += ROOM_REACH if hit.is_empty() else at.distance_to(hit.position)
+	return total
+
+
+## A camera ray against the world that, indoors, passes through furniture and adds
+## each piece it meets to the spring arm's exclusions.
+func _cam_ray(from: Vector3, to: Vector3) -> Dictionary:
+	var space := get_world_3d().direct_space_state
+	for i in 4:
+		var skip: Array[RID] = [get_rid()]
+		skip.append_array(_cam_skip)
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to, WORLD_MASK, skip))
+		if hit.is_empty() or _indoor < 0.5 or not _is_furniture(hit.collider):
+			return hit
+		_cam_skip.append(hit.rid)
+		_spring_arm.add_excluded_object(hit.rid)
+	return {}
+
+
+func _is_furniture(o: Object) -> bool:
+	var body := o as StaticBody3D
+	if body == null:
+		return false
+	var id := body.get_instance_id()
+	if not _cam_prop_cache.has(id):
+		_cam_prop_cache[id] = _furniture_shape(body)
+	return _cam_prop_cache[id]
+
+
+static func _furniture_shape(body: StaticBody3D) -> bool:
+	var shapes := 0
+	var scale := body.global_basis.get_scale()
+	for owner_id in body.get_shape_owners():
+		for i in body.shape_owner_get_shape_count(owner_id):
+			var box := body.shape_owner_get_shape(owner_id, i) as BoxShape3D
+			if box == null:
+				return false
+			var size := box.size * scale
+			if maxf(size.x, maxf(size.y, size.z)) > CameraFade.MAX_SIZE:
+				return false
+			shapes += 1
+	return shapes > 0 and not body.find_children("*", "GeometryInstance3D", true, false).is_empty()
 
 
 ## Indoors, the downward look is limited so the camera (pivot + arm * sin(pitch))
