@@ -1,14 +1,17 @@
-## Feyre's painting nook (L30): dresses the floor around her easel so it reads
-## as a place made for painting, not an easel left on an open floor. Built at
-## run time as one child of the easel station, in the station's own frame
-## (the easel's canvas faces -Z, where she stands to paint), so the manor's
-## generated house layout stays untouched:
-## - a rose arbor behind the easel with a garland and two floating faelights;
+## Feyre's painting corner (L30): dresses the floor around her easel so it
+## reads as a painter's corner of the manor, not an easel left on an open
+## floor. Built at run time as one child of the easel station, in the
+## station's own frame (the canvas faces -Z, where she stands to paint), so the
+## manor's generated house layout stays untouched. Her easel stands with the
+## tall south window at her back, the painter's light over her shoulder:
+## - curtains tied back either side of that window on a gilt rod, and daylight
+##   falling through it onto the canvas (off at night), dust motes in the beam;
 ## - a round rug where she stands and a paint-spattered drop cloth under the easel;
-## - the paint table at her right hand, canvases leaning at her left;
+## - the paint table at her right hand and a studio stool behind her;
+## - at her left, a low shelf of pigment jars, unframed canvases leaning on it
+##   and a framed one beside them;
 ## - a still-life subject (roses on a side table) seen past the canvas;
-## - potted roses at the arbor posts, a warm pink light, drifting petals,
-##   gold motes, and a soft wind chime that only carries a few metres.
+## - a gilt candlestand and a warm lamp glow for the evenings.
 ##   StudioNook.dress(easel_station)   # manor_house_builder, station_id easel
 class_name StudioNook
 extends RefCounted
@@ -20,25 +23,29 @@ const STAND := Vector3(0, 0, -2.2)
 ## the station's frame, +X her left as she paints, +Z beyond the easel.
 const PROPS: Array = [
 	[&"rug_round", Vector3(0, 0.006, -1.5), 0.0, 0.0],
-	[&"arch_trellis", Vector3(0, 0, 1.1), 0.0, 0.0],
-	[&"flower_garland", Vector3(0, 2.75, 0.95), 0.0, 0.0],
-	[&"potted_roses", Vector3(1.55, 0, 1.15), 0.0, 0.0],
-	[&"potted_roses", Vector3(-1.55, 0, 1.15), 25.0, 0.0],
+	[&"floor_candlestand", Vector3(-1.5, 0, 0.3), 0.0, 0.0],
+	[&"stool", Vector3(1.0, 0, -3.1), 15.0, 0.0],
+	[&"bookcase_low", Vector3(2.35, 0, -0.9), 90.0, 0.0],
+	[&"pigment_jars", Vector3(2.35, 1.2, -1.35), 90.0, 0.0],
+	[&"pigment_jars", Vector3(2.35, 1.2, -0.45), 80.0, 0.0],
+	[&"painting_medium", Vector3(2.0, 0, 0.75), 80.0, -12.0],
 	[&"paint_table", Vector3(-1.45, 0, -1.2), -90.0, 0.0],
 	[&"canvas_stack", Vector3(1.55, 0, -0.6), 100.0, 0.0],
 	[&"table_side", Vector3(0.75, 0, 2.3), 0.0, 0.0],
 	[&"vase_roses", Vector3(0.75, 0.7, 2.3), 0.0, 0.0],
-	[&"faelight_orb", Vector3(1.05, 2.15, 1.0), 0.0, 0.0],
-	[&"faelight_orb", Vector3(-1.05, 2.3, 1.0), 0.0, 0.0],
 ]
 ## The round rug (3 m) trimmed to the spot where she stands.
 const RUG_SCALE := 0.85
 const CLOTH_SIZE := Vector2(2.1, 1.5)
 const LIGHT_COLOR := Color(1.0, 0.82, 0.86)
-const CHIME_NOTES: Array[float] = [1046.5, 1174.7, 1318.5, 1568.0, 1760.0, 2093.0]
-const CHIME_SECONDS := 14.0
-
-static var _chime: AudioStreamWAV = null
+## The south window behind her, in the station's frame (house builder: 1.5 m
+## wide, sill 0.9 m, head 3.5 m; the wall's inner face 4.25 m behind the easel).
+const WINDOW_Z := -4.25
+const WINDOW_HALF := 0.75
+const CURTAIN_TOP := 3.8
+const CURTAIN_COLOR := Color(1.0, 0.84, 0.88)
+const DAYLIGHT := Color(1.0, 0.96, 0.88)
+const DAY_ENERGY := 2.2
 
 
 ## Adds the nook once; returns it. `floor_y` is the floor's height in the
@@ -63,9 +70,11 @@ static func dress(station: Node3D, floor_y: float = 0.0) -> Node3D:
 		nook.add_child(prop)
 	nook.add_child(_drop_cloth())
 	nook.add_child(_light())
-	nook.add_child(_petals())
+	for side in [-1.0, 1.0]:
+		nook.add_child(_curtain(side))
+	nook.add_child(_rod())
+	nook.add_child(_daylight())
 	nook.add_child(_motes())
-	nook.add_child(_chime_player())
 	return nook
 
 
@@ -135,38 +144,7 @@ static func _light() -> OmniLight3D:
 	return l
 
 
-## Rose petals drifting down through the arbor.
-static func _petals() -> CPUParticles3D:
-	var p := _drift("Petals", 18, 9.0)
-	p.position = Vector3(0, 2.7, 0.3)
-	p.emission_box_extents = Vector3(1.4, 0.15, 1.6)
-	p.direction = Vector3(0.3, -1, 0.1)
-	p.spread = 25.0
-	p.gravity = Vector3(0.05, -0.18, 0)
-	p.initial_velocity_min = 0.05
-	p.initial_velocity_max = 0.15
-	p.angular_velocity_min = -90.0
-	p.angular_velocity_max = 90.0
-	p.scale_amount_min = 0.7
-	p.scale_amount_max = 1.2
-	var grad := Gradient.new()
-	grad.offsets = PackedFloat32Array([0.0, 0.1, 0.85, 1.0])
-	grad.colors = PackedColorArray([Color(EstateKit.ROSE, 0.0), EstateKit.ROSE, EstateKit.BLUSH, Color(EstateKit.BLUSH, 0.0)])
-	p.color_ramp = grad
-	var quad := QuadMesh.new()
-	quad.size = Vector2(0.05, 0.035)
-	var m := StandardMaterial3D.new()
-	m.vertex_color_use_as_albedo = true
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	m.albedo_texture = _petal_texture()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	quad.material = m
-	p.mesh = quad
-	return p
-
-
-## Slow gold motes rising in the light, the "something here" sparkle.
+## Dust motes turning slowly in the window light.
 static func _motes() -> CPUParticles3D:
 	var p := _drift("Motes", 22, 6.0)
 	p.position = Vector3(0, 0.6, -0.4)
@@ -205,66 +183,117 @@ static func _drift(node_name: String, amount: int, lifetime: float) -> CPUPartic
 	return p
 
 
-static func _petal_texture() -> ImageTexture:
-	const N := 24
-	var img := Image.create(N, N, false, Image.FORMAT_RGBA8)
-	for y in N:
-		for x in N:
-			var u := (x + 0.5) / N * 2.0 - 1.0
-			var v := (y + 0.5) / N * 2.0 - 1.0
-			# A teardrop: wider at the top, a notch at the tip.
-			var w := 0.75 - 0.35 * v
-			var d := (u * u) / (w * w) + v * v
-			var a := clampf((1.0 - d) * 4.0, 0.0, 1.0)
-			var shade := 1.0 - 0.15 * maxf(v, 0.0)
-			img.set_pixel(x, y, Color(shade, shade, shade, a))
-	return ImageTexture.create_from_image(img)
+## A pink silk curtain tied back beside the window, pleated, gathered in at
+## the tie and pooling a little on the floor. `side` -1 her right, +1 her left.
+static func _curtain(side: float) -> MeshInstance3D:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	const COLS := 24
+	const ROWS := 18
+	var width := 0.85
+	var tie_y := 1.25
+	for r in ROWS + 1:
+		var v := float(r) / ROWS
+		var y := lerpf(0.0, CURTAIN_TOP, v)
+		# Gathered to a narrow waist at the tie, full above and below.
+		var gather := lerpf(0.45, 1.0, clampf(absf(y - tie_y) / 1.2, 0.0, 1.0))
+		for c in COLS + 1:
+			var u := float(c) / COLS
+			var x := WINDOW_HALF * side + side * (u * width * gather - 0.1)
+			var z := WINDOW_Z + 0.12 + 0.05 * sin(u * TAU * 5.0) * (1.4 - 0.4 * gather)
+			if y < 0.1:
+				z += (0.1 - y) * 0.6
+			st.set_uv(Vector2(u, 1.0 - v))
+			st.add_vertex(Vector3(x, maxf(y, 0.01), z))
+	for r in ROWS:
+		for c in COLS:
+			var i := r * (COLS + 1) + c
+			st.add_index(i)
+			st.add_index(i + 1)
+			st.add_index(i + COLS + 1)
+			st.add_index(i + 1)
+			st.add_index(i + COLS + 2)
+			st.add_index(i + COLS + 1)
+	st.generate_normals()
+	var mi := MeshInstance3D.new()
+	mi.name = "Curtain%s" % ("L" if side > 0 else "R")
+	mi.mesh = st.commit()
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = CURTAIN_COLOR
+	mat.roughness = 0.55
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.rim_enabled = true
+	mat.rim = 0.25
+	mi.material_override = mat
+	# A gold tie-back cord at the waist.
+	var tie := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.17
+	torus.outer_radius = 0.2
+	tie.mesh = torus
+	tie.position = Vector3(WINDOW_HALF * side + side * 0.17, tie_y, WINDOW_Z + 0.14)
+	tie.rotation_degrees.x = 90.0
+	tie.material_override = _gold()
+	mi.add_child(tie)
+	return mi
 
 
-## A wind chime, soft and close: a few slow bell notes, looped.
-static func _chime_player() -> AudioStreamPlayer3D:
-	var s := AudioStreamPlayer3D.new()
-	s.name = "NookChime"
-	s.stream = chime_stream()
-	s.volume_db = -16.0
-	s.unit_size = 1.5
-	s.max_distance = 9.0
-	s.position = Vector3(1.0, 2.4, 1.0)
-	s.autoplay = true
-	return s
+## The gilt curtain rod above the window, with ball finials.
+static func _rod() -> Node3D:
+	var rod := MeshInstance3D.new()
+	rod.name = "CurtainRod"
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.022
+	cyl.bottom_radius = 0.022
+	cyl.height = WINDOW_HALF * 2.0 + 2.0
+	rod.mesh = cyl
+	rod.rotation_degrees.z = 90.0
+	rod.position = Vector3(0, CURTAIN_TOP + 0.04, WINDOW_Z + 0.12)
+	rod.material_override = _gold()
+	for side in [-1.0, 1.0]:
+		var ball := MeshInstance3D.new()
+		var sph := SphereMesh.new()
+		sph.radius = 0.05
+		sph.height = 0.1
+		ball.mesh = sph
+		ball.position = Vector3(0, side * cyl.height * 0.5, 0)
+		ball.material_override = rod.material_override
+		rod.add_child(ball)
+	return rod
 
 
-static func chime_stream() -> AudioStreamWAV:
-	if _chime:
-		return _chime
-	var rate := 22050
-	var frames := int(rate * CHIME_SECONDS)
-	var buf := PackedFloat32Array()
-	buf.resize(frames)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 30
-	var t0 := 0.4
-	while t0 < CHIME_SECONDS - 2.5:
-		var f: float = CHIME_NOTES[rng.randi() % CHIME_NOTES.size()]
-		var amp := rng.randf_range(0.5, 1.0)
-		var start := int(t0 * rate)
-		for i in range(start, mini(start + int(2.4 * rate), frames)):
-			var lt := float(i - start) / rate
-			buf[i] += amp * (sin(TAU * f * lt) + 0.3 * sin(TAU * f * 2.76 * lt) * exp(-lt * 5.0)) \
-					* exp(-lt * 2.2) * minf(lt * 300.0, 1.0)
-		# Clusters of two or three, then a rest, the way a breeze catches them.
-		t0 += rng.randf_range(0.18, 0.4) if rng.randf() < 0.6 else rng.randf_range(1.6, 3.2)
-	var data := PackedByteArray()
-	data.resize(frames * 2)
-	for i in frames:
-		data.encode_s16(i * 2, clampi(int(buf[i] * 0.18 * 32767.0), -32768, 32767))
-	var wav := AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = rate
-	wav.stereo = false
-	wav.data = data
-	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	wav.loop_begin = 0
-	wav.loop_end = frames
-	_chime = wav
-	return wav
+static func _gold() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = EstateKit.GOLD
+	m.metallic = 0.8
+	m.roughness = 0.3
+	return m
+
+
+## Daylight through the window over her shoulder onto the canvas; it follows
+## the clock and goes out at night.
+static func _daylight() -> SpotLight3D:
+	var l := SpotLight3D.new()
+	l.name = "WindowLight"
+	l.light_color = DAYLIGHT
+	l.spot_range = 7.5
+	l.spot_angle = 32.0
+	l.spot_attenuation = 0.8
+	l.shadow_enabled = true
+	var from := Vector3(0, 3.2, WINDOW_Z + 0.3)
+	l.transform = Transform3D(Basis.looking_at(Vector3(0, 1.0, 0.2) - from, Vector3.UP), from)
+	var timer := Timer.new()
+	timer.wait_time = 5.0
+	timer.autostart = true
+	var follow := func() -> void:
+		l.light_energy = DAY_ENERGY * day_factor()
+	timer.timeout.connect(follow)
+	l.add_child(timer)
+	follow.call()
+	return l
+
+
+## 1 at midday, 0 at night, easing through dawn and dusk.
+static func day_factor() -> float:
+	var h := Clock.hour()
+	return clampf(minf(h - 5.5, 20.5 - h) / 2.0, 0.0, 1.0)

@@ -197,19 +197,26 @@ func test_studio_ui_opens_paints_and_closes() -> void:
 	StudioCanvas.clear_wip("UiEasel")
 
 
-func test_easel_nook_dresses_once_with_light_petals_and_chime() -> void:
+func test_easel_nook_dresses_once_as_an_indoor_painting_corner() -> void:
 	var easel := Node3D.new()
 	add_child_autofree(easel)
 	var nook := StudioNook.dress(easel)
 	assert_eq(StudioNook.dress(easel), nook, "dressed once")
-	for id in [&"arch_trellis", &"rug_round", &"paint_table", &"canvas_stack", &"potted_roses"]:
+	for id in [&"floor_candlestand", &"rug_round", &"paint_table", &"canvas_stack", &"stool", &"bookcase_low", &"painting_medium"]:
 		assert_not_null(nook.get_node_or_null(String(id)), "has %s" % id)
 	assert_not_null(nook.get_node_or_null("DropCloth"))
+	# Indoors: no garden arbor, garland, potted roses, falling petals or chimes.
+	for gone in ["arch_trellis", "flower_garland", "potted_roses", "Petals", "NookChime"]:
+		assert_null(nook.get_node_or_null(gone), "no %s indoors" % gone)
+	assert_not_null(nook.get_node_or_null("CurtainL"))
+	assert_not_null(nook.get_node_or_null("CurtainR"))
 	assert_true(nook.get_node("NookLight") is OmniLight3D)
-	assert_gt((nook.get_node("Petals") as CPUParticles3D).amount, 0)
-	var chime := StudioNook.chime_stream()
-	assert_eq(chime.loop_mode, AudioStreamWAV.LOOP_FORWARD)
-	assert_gt(chime.data.size(), 22050 * 2 * 10, "a long, slow loop")
+	assert_true(nook.get_node("WindowLight") is SpotLight3D)
+	Clock.time_of_day = 0.5
+	assert_almost_eq(StudioNook.day_factor(), 1.0, 0.01, "full daylight at noon")
+	Clock.time_of_day = 0.0
+	assert_eq(StudioNook.day_factor(), 0.0, "dark at midnight")
+	Clock.time_of_day = 0.3
 	# Her standing spot stays clear of anything she'd bump into.
 	for c in nook.get_children():
 		if c is StaticBody3D:

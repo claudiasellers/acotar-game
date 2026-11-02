@@ -58,14 +58,18 @@ func _physics_process(delta: float) -> void:
 
 
 ## Before she paints: the nook from where she stands, a frame at each part
-## (the easel under the arbor, the paint table, the canvases, the roses).
-const NOOK_LOOKS: Array[Vector3] = [Vector3(0, 1.3, 0), Vector3(-1.45, 0.8, -1.2), Vector3(0, 2.4, 1.1),
+## (the easel, the paint table, the pigment shelf, the window, the canvases,
+## the still life). The dev jump lands at night; the clip sets late morning
+## first so the window light shows.
+const NOOK_LOOKS: Array[Vector3] = [Vector3(0, 1.3, 0), Vector3(-1.45, 0.8, -1.2), Vector3(2.35, 1.2, -0.9), Vector3(0, 2.0, -4.25),
 	Vector3(1.55, 0.7, -0.6), Vector3(0.75, 1.0, 2.3), Vector3(0, 1.1, 0)]
 
 
 func _look_around_nook() -> void:
 	if not _filming():
 		return
+	Clock.time_of_day = 0.45
+	await _wait(5.5)
 	await _grab()
 	for local in NOOK_LOOKS:
 		var at := easel.global_transform * local
