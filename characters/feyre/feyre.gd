@@ -98,6 +98,8 @@ var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
+## The move keys steer in this frame, not the live camera (see SteerFrame).
+var steer_frame := SteerFrame.new()
 var movement_feel: MovementFeel
 var is_mantling: bool = false
 var _mantle_tween: Tween
@@ -202,7 +204,8 @@ func _physics_process(delta: float) -> void:
 	if not StoryControl.can_move():
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
-	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
+	var steer := steer_frame.yaw(input, yaw, is_aiming or is_drawing)
+	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
 			and not is_drawing and not is_aiming
@@ -272,6 +275,7 @@ func teleport(pos: Vector3) -> void:
 	_mantle_tween = null
 	is_mantling = false
 	velocity = Vector3.ZERO
+	steer_frame.release()
 	global_position = pos
 	_camera_rig.global_position = pos + Vector3.UP * (1.5 + camera_lift)
 	_room_arm = 3.6
