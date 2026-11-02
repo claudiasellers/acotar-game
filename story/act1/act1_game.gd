@@ -63,6 +63,8 @@ func _ready() -> void:
 	add_child(Act1LandmarkThoughts.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
+	add_child(CastPresence.new())
+	add_child(DialogueDirector.new())
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
 

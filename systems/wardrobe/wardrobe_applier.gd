@@ -175,7 +175,15 @@ func _sphere(r: float) -> SphereMesh:
 
 
 ## Hides body-mesh surfaces named after covered regions (real model only).
+## Uncovered regions get the FeyreModel's skin shader back (head: makeup and her
+## natural colouring), never a bare null that would drop to the glb's flat skin.
 func _hide_regions(hidden: Array[StringName]) -> void:
+	var head_skin: Material = null
+	var body_skin: Material = null
+	for c in feyre.model.get_children():
+		if c.get(&"skin_head_material") != null:
+			head_skin = c.get(&"skin_head_material")
+			body_skin = c.get(&"skin_body_material")
 	for mi in feyre.model.find_children("*", "MeshInstance3D", true, false):
 		var mesh_instance := mi as MeshInstance3D
 		if mesh_instance.has_meta(&"wardrobe") or mesh_instance.get_parent() == _worn or mesh_instance.mesh == null:
@@ -189,7 +197,8 @@ func _hide_regions(hidden: Array[StringName]) -> void:
 				var transparent := StandardMaterial3D.new()
 				transparent.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 				transparent.albedo_color = Color(0, 0, 0, 0)
-				mesh_instance.set_surface_override_material(s, transparent if hidden.has(region) else null)
+				var skin := head_skin if region == &"head" else body_skin
+				mesh_instance.set_surface_override_material(s, transparent if hidden.has(region) else skin)
 
 
 ## Sets <channel>_color/_amount/_sheen on any ShaderMaterial on Feyre's body.

@@ -15,7 +15,7 @@ from mathutils import Matrix, Vector, noise
 
 # ---------------------------------------------------------------- palette
 PAL = {
-    "bark_wet": (0.07, 0.065, 0.06),
+    "bark_wet": (0.15, 0.12, 0.10),  # wet bark, dark but not a black cut-out (quality audit B2)
     "bark_grey": (0.23, 0.21, 0.19),
     "bark_brown": (0.20, 0.15, 0.11),
     "bark_ash": (0.56, 0.57, 0.56),
@@ -32,6 +32,7 @@ PAL = {
     "juniper": (0.17, 0.25, 0.22),
     "red": (0.72, 0.04, 0.04),
     "red_deep": (0.45, 0.03, 0.04),
+    "bramble_cane": (0.28, 0.09, 0.12),  # purple-brown winter canes, not paint red
     "orange_hip": (0.80, 0.18, 0.05),
     "sloe": (0.18, 0.20, 0.34),
     "juniper_berry": (0.25, 0.30, 0.45),
@@ -121,6 +122,7 @@ class Builder:
         self.col = self.bm.loops.layers.color.new("Col")
         self.rng = random.Random(seed)
         self.seed = seed
+        self.smooth_faces = set()
 
     # ---------------------------------------------------------- low level
     def _face(self, verts, c):
@@ -326,10 +328,17 @@ class Builder:
         return self._merge(tmp, color)
 
     def rock(self, center, size, subdiv=2, color="rock", noise_amt=0.35, snow=0.55,
-             flat=0.35, facet=2.3):
-        """Faceted displaced ico rock, buried flat bottom, snow on top faces."""
+             flat=0.35, facet=2.3, smooth=True):
+        """Displaced ico rock, buried flat bottom, snow on top faces. Smooth
+        (the default since quality audit B1): one more subdivision, softer,
+        broader lumps, smooth shading and a moss band under the snow cap, so it
+        sits with the rounded foliage instead of reading as flat triangles."""
         if not isinstance(size, (tuple, list, Vector)):
             size = (size, size, size)
+        if smooth:
+            subdiv += 1
+            noise_amt *= 0.6
+            facet *= 0.55
         tmp = bmesh.new()
         bmesh.ops.create_icosphere(tmp, subdivisions=subdiv + 1, radius=1.0)
         off = Vector((self.rng.uniform(0, 100), self.rng.uniform(0, 100), self.seed * 0.71))
@@ -346,15 +355,25 @@ class Builder:
         rng = self.rng
 
         def fn(f, _c=color):
-            c = jitter(_c, rng, 0.1)
+            c = jitter(_c, rng, 0.015 if smooth else 0.1)
             if f.calc_center_median().z < center.z + size[2] * 0.25:
                 c = mix(c[:3], "rock_dark", 0.4)
+            elif smooth and snow is not None and 0.0 < f.normal.z <= snow + 0.08:
+                # Moss just under the snow line, heaviest on the shaded north
+                # faces, in noisy patches rather than an even band.
+                k = 0.6 + 0.3 * max(-1.0, min(1.0, f.normal.y)) + 0.35 * noise.noise(f.calc_center_median() * 1.7 + off)
+                c = mix(c[:3], "moss_ice", min(0.85, max(0.0, k)))
             return c
-        return self._merge(tmp, color, snow=snow, color_fn=fn)
+        faces = self._merge(tmp, color, snow=snow, color_fn=fn)
+        if smooth:
+            self.smooth_faces.update(faces)
+        return faces
 
     # ---------------------------------------------------------- finish
     def to_object(self, name):
         bmesh.ops.remove_doubles(self.bm, verts=self.bm.verts, dist=0.0001)
+        self.bm.faces.index_update()
+        smooth = {f.index for f in self.smooth_faces if f.is_valid}
         me = bpy.data.meshes.new(name)
         self.bm.to_mesh(me)
         self.bm.free()
@@ -365,7 +384,7 @@ class Builder:
         ob = bpy.data.objects.new(name, me)
         bpy.context.scene.collection.objects.link(ob)
         for p in me.polygons:
-            p.use_smooth = False
+            p.use_smooth = p.index in smooth
         return ob
 
 

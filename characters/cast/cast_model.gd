@@ -25,8 +25,7 @@ var notice: NoticePlayer
 ## Story cues the model acts out itself, e.g. Lucien's leaves_sick (lane L22,
 ## creatures/anim/cast_cues.gd).
 var cues: CastCues
-## Blinks, canon expressions and talking (lane L36, systems/faces/; data/faces/<id>_face.tres).
-var face: FaceDriver
+# `face` (blinks, canon expressions, talking: lane L36, systems/faces/) is declared in feyre_model.gd.
 
 
 func _ready() -> void:

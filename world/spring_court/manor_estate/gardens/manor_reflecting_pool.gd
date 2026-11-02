@@ -1,7 +1,10 @@
-## The reflecting pool beyond the rose garden's north gate (canon ch18: a pool
-## beyond the garden that mirrors the sky), with a cherry allée down both sides,
-## flowery meadows beyond the trees and a Temple of Love closing the vista
-## (allée, meadows and temple are canon:X).
+## The reflecting pool beyond the rose garden's north gate, with a cherry allée
+## down both sides, daisy meadows beyond the trees and a Temple of Love closing
+## the vista.
+##
+## Canon: [C] a pool beyond the garden that mirrors the sky (ch18).
+## [X] invented: its form as a long raised canal, the cherry allée, the
+## meadows and the Temple of Love. Not book material.
 ##
 ## The canal is level while the ground is not, so it sits in a raised stone
 ## basin: the coping stands ~1 m proud where the ground dips and ~0.3 m where it

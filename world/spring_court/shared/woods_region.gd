@@ -48,6 +48,8 @@ const WATER_SHADER := preload("res://world/spring_court/shared/woods_water.gdsha
 const PLACES_TABLE := "res://data/places/woods_places.tres"
 ## Trees stand this much further back than shrubs from a place's forecourt.
 const PLACE_TREE_MARGIN := 3.0
+## Members are still building (shot tools wait for it to empty).
+const BUSY_GROUP := &"shot_busy"
 
 @export var def: WoodsRegionDef
 ## Build the stand-in terrain (off once the World scene's Terrain3D is live).
@@ -83,6 +85,12 @@ func _ready() -> void:
 		push_error("WoodsRegion '%s' has no def" % name)
 		return
 	bounds = def.provider.BOUNDS
+	if build_terrain_fallback and terrain_is_live(self):
+		# Streamed into the World: Terrain3D is the ground, and World hides any
+		# TerrainFallback the moment it appears. Building one anyway put ~350
+		# invisible chunk jobs ahead of every tree (the woods read as bare
+		# ground for the first minutes of a slow machine's stream-in).
+		build_terrain_fallback = false
 	# Warm the static noise/feature caches here before the worker reads them,
 	# and fingerprint the inputs so a stale cache is never trusted.
 	_fingerprint = WoodsScatterCache.fingerprint_for(def)
@@ -91,8 +99,13 @@ func _ready() -> void:
 
 
 func _start() -> void:
+	# Shot tools wait while this group is non-empty (docs/contracts/shot_request.md).
+	add_to_group(BUSY_GROUP)
 	BuildCancel.clear(def.region_id)
-	_task_id = WorkerThreadPool.add_task(_prepare, false, "woods:%s" % def.region_id)
+	# High priority: low-priority tasks share one or two pool threads, and a
+	# neighbouring court region's long generate held the Suriel glade's ~1 s
+	# prepare (a cache load) back for 50 s.
+	_task_id = WorkerThreadPool.add_task(_prepare, true, "woods:%s" % def.region_id)
 
 
 ## Back in the tree after leaving mid-build (the cancelled worker's partial
@@ -155,6 +168,15 @@ func sightline_paths() -> Array[PackedVector2Array]:
 ## Horror biomes withdraw on purpose: the sightline check leaves them out.
 func sightline_skip(x: float, z: float) -> bool:
 	return WoodsComposition.of(def)["horror"].has(def.provider.biome_at(x, z))
+
+
+## True when `node` sits in a World whose Terrain3D is up (the fallback
+## ground would be hidden on arrival).
+static func terrain_is_live(node: Node) -> bool:
+	if not node.is_inside_tree():
+		return false
+	var world := node.get_tree().get_first_node_in_group(&"world") as World
+	return world != null and world.terrain != null and world.is_ancestor_of(node)
 
 
 ## Builds synchronously, ignoring the frame budget (tests and tools).
@@ -331,7 +353,9 @@ static func _collect_colliders(layer: ScatterLayer, visual: StringName, into: Di
 
 # -------------------------------------------------------------- main side --
 
-## Turns prepared data into small jobs for FrameBudget.
+## Turns prepared data into small jobs for FrameBudget, in the order a
+## player notices them: ground (stand-in only), then the trees, the shrubs,
+## what blocks her, the forage, and the dressing after that.
 func _queue_jobs() -> void:
 	_jobs.clear()
 	layers.clear()
@@ -339,28 +363,30 @@ func _queue_jobs() -> void:
 	for entry in _prepared["layers"]:
 		layers.append(entry[1])
 		visuals[entry[2]] = entry[0]
-	for visual in PROP_SPECIES:
-		if FloraLibrary.has(visual) and not visuals.has(visual):
-			visuals[visual] = FloraLibrary.info(visual).get("layer", "")
-	for visual: StringName in visuals:
-		_jobs.append(_job_mesh.bind(visual, visuals[visual] == "tree"))
-	for entry in _prepared["layers"]:
-		_jobs.append(_job_assign_mesh.bind(entry[1], entry[2], entry[0] == "tree"))
 	if build_terrain_fallback:
 		_jobs.append(_job_terrain_root)
 		for chunk in _prepared["terrain"]:
 			_jobs.append(_job_terrain_chunk.bind(chunk))
-	_jobs.append(_job_fields)
-	for entry in _prepared["chunks"]:
-		_jobs.append(_job_scatter_chunk.bind(entry[0], entry[1], entry[2]))
-	_jobs.append(_job_collider_root)
-	for key: Vector2i in _prepared["colliders"]:
-		var entries: Array = _prepared["colliders"][key]
-		# Small bodies: Jolt rebuilds a body's compound shape on every add,
-		# so one big body per chunk costs tens of ms.
-		for b in range(0, entries.size(), COLLIDER_BATCH):
-			_jobs.append(_job_colliders.bind("Trunks_%d_%d_%d" % [key.x, key.y, b / COLLIDER_BATCH],
-					entries.slice(b, b + COLLIDER_BATCH)))
+	for kind in KINDS:
+		var queued := {}
+		for entry in _prepared["layers"]:
+			if entry[0] != kind:
+				continue
+			if not queued.has(entry[2]):
+				queued[entry[2]] = true
+				_jobs.append(_job_mesh.bind(entry[2], kind == "tree"))
+			_jobs.append(_job_assign_mesh.bind(entry[1], entry[2], kind == "tree"))
+		if kind == "tree":
+			_jobs.append(_job_fields)
+		for entry in _prepared["chunks"]:
+			if entry[0] == kind:
+				_jobs.append(_job_scatter_chunk.bind(entry[0], entry[1], entry[2]))
+		if kind == "shrub":
+			_queue_colliders()
+	for visual in PROP_SPECIES:
+		if FloraLibrary.has(visual) and not visuals.has(visual):
+			visuals[visual] = FloraLibrary.info(visual).get("layer", "")
+			_jobs.append(_job_mesh.bind(visual, visuals[visual] == "tree"))
 	_jobs.append(_job_clearing_root)
 	for glade: Dictionary in WoodsComposition.clearings(def):
 		_jobs.append(_job_clearing.bind(glade))
@@ -377,11 +403,23 @@ func _queue_jobs() -> void:
 			_jobs.append(_job_ambient_effect.bind(id))
 
 
+func _queue_colliders() -> void:
+	_jobs.append(_job_collider_root)
+	for key: Vector2i in _prepared["colliders"]:
+		var entries: Array = _prepared["colliders"][key]
+		# Small bodies: Jolt rebuilds a body's compound shape on every add,
+		# so one big body per chunk costs tens of ms.
+		for b in range(0, entries.size(), COLLIDER_BATCH):
+			_jobs.append(_job_colliders.bind("Trunks_%d_%d_%d" % [key.x, key.y, b / COLLIDER_BATCH],
+					entries.slice(b, b + COLLIDER_BATCH)))
+
+
 func _finish() -> void:
 	if is_built:
 		return
 	_prepared.clear()
 	is_built = true
+	remove_from_group(BUSY_GROUP)
 	set_process(false)
 	built.emit()
 

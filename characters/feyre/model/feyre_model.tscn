@@ -12,6 +12,13 @@ resource_local_to_scene = true
 shader = ExtResource("3_skin")
 shader_parameter/makeup_mask_a = ExtResource("4_mask_a")
 shader_parameter/makeup_mask_b = ExtResource("5_mask_b")
+shader_parameter/natural_blush_amount = 0.5
+shader_parameter/natural_lips_amount = 0.75
+shader_parameter/natural_lips_color = Color(0.84, 0.38, 0.47, 1)
+shader_parameter/natural_lips_gloss = 0.75
+shader_parameter/natural_liner_amount = 0.6
+shader_parameter/natural_brows_amount = 0.8
+shader_parameter/rim_amount = 0.35
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
 resource_name = "skin"

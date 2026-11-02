@@ -128,6 +128,7 @@ func apply(base: GradePreset) -> void:
 	env.glow_hdr_threshold = p.glow_hdr_threshold
 	env.volumetric_fog_density = p.volumetric_density
 	env.volumetric_fog_albedo = p.volumetric_albedo
+	env.volumetric_fog_ambient_inject = p.volumetric_ambient_inject
 	env.tonemap_exposure = p.exposure
 	env.adjustment_enabled = true
 	env.adjustment_saturation = p.saturation

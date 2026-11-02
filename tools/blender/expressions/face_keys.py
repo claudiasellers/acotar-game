@@ -285,7 +285,7 @@ def transfer_keys(body, f, other, names=EXPRESSION_KEYS, force=False):
     vertex.  By default only meshes that already carry the base face keys are touched (Lucien's scar);
     force=True gives a rider such as the father's beard the base face keys too (names + FACE_BASE_KEYS)."""
     sk = other.data.shape_keys
-    if not force and (sk is None or "jaw_open" not in sk.key_blocks):
+    if not force and (sk is None or ("jaw_open" not in sk.key_blocks and "blink_L" not in sk.key_blocks)):
         return 0
     if sk is None:
         other.shape_key_add(name="Basis", from_mix=False)

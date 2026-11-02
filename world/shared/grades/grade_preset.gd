@@ -23,6 +23,10 @@ extends Resource
 @export var volumetric_anisotropy := 0.6
 ## How much the sun lights the volumetric fog (god-rays).
 @export var volumetric_light_energy := 1.0
+## How much the ambient light lights the volumetric fog. 0 leaves the fog lit
+## by the sun alone: under a weak sun a dense fog turns into a black wall that
+## swallows the sky. Raise it so dark shapes stand against paler fog.
+@export_range(0.0, 2.0) var volumetric_ambient_inject := 0.0
 ## Keep low (≈0.1): at 1.0 distance fog paints the sky flat milk.
 @export_range(0.0, 1.0) var fog_sky_affect := 0.15
 ## Height fog: mist that pools below fog_height (world metres; the terrain
@@ -64,7 +68,7 @@ const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric
 	&"saturation", &"contrast", &"brightness", &"glow_intensity", &"glow_bloom", &"snow_cover", &"magic",
 	&"volumetric_anisotropy", &"volumetric_light_energy", &"fog_sky_affect", &"fog_height",
 	&"fog_height_density", &"fog_aerial_perspective", &"glow_hdr_threshold", &"golden_sun_energy",
-	&"dread_headroom"]
+	&"dread_headroom", &"volumetric_ambient_inject"]
 const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom", &"sun_color",
 	&"ambient_color", &"fog_color", &"volumetric_albedo", &"golden_sky_top", &"golden_sky_horizon",
 	&"golden_sun_color"]
