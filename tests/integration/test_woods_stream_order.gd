@@ -62,23 +62,27 @@ func test_region_is_shot_busy_until_built() -> void:
 
 
 func test_one_spike_does_not_pin_a_kind_to_one_job_a_frame() -> void:
+	# As if one job of this kind once took 1.5 budgets (a first shader
+	# compile): the old estimator kept that worst forever, so each later job
+	# ran alone in its frame. No real delays here, so no machine timing.
 	FrameBudget.reset_stats()
+	FrameBudget.job_max[&"_spiky"] = FrameBudget.BUDGET_USEC * 3 / 2
+	FrameBudget._recent[&"_spiky"] = FrameBudget.BUDGET_USEC * 3 / 2
 	var ran: Array[String] = []
-	var queue: Array[Callable] = [_spiky.bind(ran, 6000)]
+	var queue: Array[Callable] = []
 	for i in 12:
-		queue.append(_spiky.bind(ran, 0))
-	await wait_process_frames(1)
-	FrameBudget.run(queue)
-	assert_eq(ran.size(), 1, "the spike runs alone")
-	await wait_process_frames(1)
-	FrameBudget.run(queue)
-	assert_gte(ran.size(), 4, "the next frame packs several cheap jobs of that kind")
+		queue.append(_spiky.bind(ran))
+	var frames := 0
+	while not queue.is_empty() and frames < 12:
+		await wait_process_frames(1)
+		FrameBudget.run(queue)
+		frames += 1
+	assert_eq(ran.size(), 12)
+	assert_lte(frames, 3, "cheap jobs pack into a few frames once the spike decays")
 	assert_eq(FrameBudget.late_starts, 0)
 
 
-func _spiky(ran: Array[String], usec: int) -> void:
-	if usec > 0:
-		OS.delay_usec(usec)
+func _spiky(ran: Array[String]) -> void:
 	ran.append("job")
 
 
