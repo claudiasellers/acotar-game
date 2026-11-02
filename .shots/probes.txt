@@ -1,0 +1,6 @@
+from L32 woods ground paint after
+quality look
+size 1920x1080
+timeout 900
+shot bw_raised res://tools/landscape/landscape_shot.tscn bw_raised {out}/bw_raised.png
+shot wcs res://tools/world_shot.tscn wall_crossing_spring {out}/wall_crossing_spring.png
