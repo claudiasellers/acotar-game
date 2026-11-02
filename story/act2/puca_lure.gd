@@ -21,11 +21,23 @@ const LOOK_CONE := 25.0
 const SHIFTS := 4
 const STRAY := 45.0
 const GATE_RADIUS := 4.0
+## L34-8: the scene also opens from her bedroom at night; he waits below the
+## window until she's down with him, and each wait carries a nudge.
+const WINDOW_ANCHOR := &"feyre_bedroom_window"
+const ROOM_RADIUS := 9.0
+const BELOW_WINDOW := Vector3(0.0, 0.0, -9.0)
+const NEAR_HIM := 14.0
+const NUDGE_AFTER := 15.0
+## Seconds on "something moved by the hedges" before she knows him.
+const SEE_HIM_AFTER := 2.6
 
 var shifts_seen: Array[StringName] = []
 var lost_count: int = 0
 
 var _luring: bool = false
+## He showed himself under her window (she was in her room), not by the hedge.
+var _from_window: bool = false
+var _see_left: float = 0.0
 var _looked: float = 0.0
 
 
@@ -44,7 +56,15 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void: _father_appears(), "father by the hedge"),
 		Beats.control(StoryControl.Mode.WALK),
-		Beats.until(func() -> bool: return player_within(GATE_RADIUS, mark(&"gate")), "follow him to the gate"),
+		Beats.run(func(_s: SceneSpace) -> void: _see_him(), "she sees him"),
+		Beats.until(func() -> bool: return _see_left <= 0.0, "she knows him"),
+		Beats.run(func(_s: SceneSpace) -> void:
+			if _from_window:
+				aside(&"puca_window"), "my father"),
+		nudged(func() -> bool: return _near_him(), &"puca_come_down", NUDGE_AFTER, "she goes down to him"),
+		Beats.run(func(_s: SceneSpace) -> void: _lure(), "he limps toward the gates"),
+		nudged(func() -> bool: return player_within(GATE_RADIUS, mark(&"gate")), &"puca_beckons", NUDGE_AFTER,
+			"follow him to the gate"),
 		Beats.run(func(_s: SceneSpace) -> void: _caught(), "Tamlin catches her"),
 		Beats.control(StoryControl.Mode.NONE),
 		say(&"tamlin_going"),
@@ -61,6 +81,7 @@ func _build_beats() -> Array:
 
 
 func tick(delta: float) -> void:
+	_see_left -= delta
 	if running and _luring:
 		var p := puca()
 		var feyre := player()
@@ -81,25 +102,85 @@ func _strayed(p: Node3D, feyre: Node3D) -> bool:
 	return apart > STRAY and hers > its
 
 
+## She's down on the ground near him (not up at her window).
+func _near_him() -> bool:
+	var p := puca()
+	var feyre := player()
+	if p == null or feyre == null:
+		return true
+	var d := p.global_position - feyre.global_position
+	return Vector2(d.x, d.z).length() <= NEAR_HIM and absf(d.y) <= 2.5
+
+
+## In her bedroom, by the window's anchor, on its floor.
+func in_her_room() -> bool:
+	var room := find_anchor(WINDOW_ANCHOR)
+	var feyre := player()
+	if room == null or feyre == null:
+		return false
+	var d := feyre.global_position - room.global_position
+	return Vector2(d.x, d.z).length() <= ROOM_RADIUS and absf(d.y) <= 2.5
+
+
+## On the lawn below her window, on the ground.
+func below_her_window() -> Vector3:
+	var room := find_anchor(WINDOW_ANCHOR)
+	if room == null:
+		return mark(&"hedge")
+	var at := room.global_transform * BELOW_WINDOW
+	at.y = ManorGrounds.ground(at.x, at.z)
+	return at
+
+
+## At night in her room counts as arriving: she sees him from the window.
+func _player_here() -> bool:
+	return super._player_here() or in_her_room()
+
+
 func puca() -> Puca:
 	return actor(&"puca") as Puca
 
 
 func _father_appears() -> void:
+	_from_window = in_her_room()
 	var p := summon(&"puca", PUCA_SCENE, &"hedge", &"house") as Puca
 	EventBus.story_actor_cue.emit(&"puca", &"looks_like_father")
 	if p:
 		if not p.visible:
 			p.play_cue(&"looks_like_father")
-		# Through the open gate, the only way out of the walled garden.
-		p.lure_to(mark(&"gate"))
+		if _from_window:
+			# Under her window, where she can see him from the glass (ch10-11).
+			p.global_position = below_her_window()
+			var room := find_anchor(WINDOW_ANCHOR)
+			if room:
+				p.look_at(Vector3(room.global_position.x, p.global_position.y, room.global_position.z), Vector3.UP)
 		if not p.image_changed.is_connected(_on_image):
 			p.image_changed.connect(_on_image)
-	_luring = true
+	if _from_window:
+		# Watching for Tamlin back from hunting the Bogge, by moonlight (ch10, Keeper).
+		aside(&"puca_watch")
 	# The garden hushes: no crickets, no fountain, only her boots.
 	note_mood()
 	EventBus.mood_requested.emit(&"dread", 0.35, 4.0)
 	sound(&"drone", -30.0, 0.8)
+
+
+## From her window: the camera finds him by the hedges.
+func _see_him() -> void:
+	var p := puca()
+	_see_left = SEE_HIM_AFTER if _from_window else 0.0
+	if _from_window and p:
+		StoryControl.set_focus(p)
+
+
+## He waits (beckoning) until she has come down to him, then limps off.
+func _lure() -> void:
+	StoryControl.set_focus(null)
+	var p := puca()
+	if p:
+		# Through the open gate, the only way out of the walled garden.
+		p.lure_to(mark(&"gate"))
+	_luring = true
 
 
 func _caught() -> void:

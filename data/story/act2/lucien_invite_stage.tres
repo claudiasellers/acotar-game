@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"lucien_steps": Vector3(-149, 0, 13.5),
+"stable_door": Vector3(-151, 0, 1.5)
+}
+lines = {
+"feyre_dressed": {"text": "I suppose I'm already dressed for a hunt.", "who": "Feyre"},
+"invite_pull": {"text": "Lucien, at the stables. Alone. If anyone knows a way out of the Treaty, it's him.", "who": ""},
+"lucien_hunt": {"text": "I'm to patrol the southern woods today. Indulge me in a hunt.", "who": "Lucien"},
+"lucien_light": {"text": "Well? The light won't wait for us.", "who": "Lucien"},
+"lucien_woods": {"text": "The southern woods. Stay close.", "who": "Lucien"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("lucien_light", "lucien_woods")
+canon = "Ch9 (Keeper 2026-11-02, [C]): the following morning she asks Alis after Lucien: on border patrol, at the stables. At the painted stables he is astride a black gelding: I'm to patrol the southern woods today... Indulge me in a hunt. [V]; I suppose I'm already dressed for a hunt. [V]; they ride out on the broad path (she on a white mare, a yew bow). Staged on foot by the horse statue in the stable yard (no gelding model yet, X); the ride is a fade. Marks are in manor_dining_table's frame (anchor at world 21, 0.9, -31.5): lucien_steps is world (-128, -18), in the yard."

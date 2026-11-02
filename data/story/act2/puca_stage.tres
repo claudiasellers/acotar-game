@@ -11,6 +11,10 @@ marks = {
 "house": Vector3(-62, 0, 100)
 }
 lines = {
+"puca_watch": {"text": "Still no sign of Tamlin. Then something moved by the hedges.", "who": ""},
+"puca_window": {"text": "Below my window, by the hedges: my father. Under-dressed for winter, stooped on his cane.", "who": ""},
+"puca_come_down": {"text": "Father, out there in the cold. I had to go down to him.", "who": ""},
+"puca_beckons": {"text": "He beckoned, and limped on toward the gates.", "who": ""},
 "tamlin_going": {
 "text": "Going somewhere?",
 "who": "Tamlin"
