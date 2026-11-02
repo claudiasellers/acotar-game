@@ -1,0 +1,4 @@
+from L38 interior designer cottage
+quality look
+timeout 600
+shot cottage res://tools/cottage_room_shot.tscn {out}
