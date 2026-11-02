@@ -1,0 +1,5 @@
+from L38 interior designer audit fixes and cottage colours
+quality look
+timeout 900
+shot rooms res://tools/manor_estate/room_shot.tscn entrance_hall,dining_hall,feyre_bedroom {out}
+shot cottage res://tools/cottage_room_shot.tscn {out}
