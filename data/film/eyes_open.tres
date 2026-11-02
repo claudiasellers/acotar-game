@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FilmScript" load_steps=29 format=3]
+[gd_resource type="Resource" script_class="FilmScript" load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
 [ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
@@ -129,50 +129,80 @@ at = 20.5
 
 [sub_resource type="Resource" id="B03"]
 script = ExtResource("3_beat")
+name = &"price"
+at = 23.8
+
+[sub_resource type="Resource" id="B04"]
+script = ExtResource("3_beat")
+name = &"fine"
+at = 29.4
+
+[sub_resource type="Resource" id="B05"]
+script = ExtResource("3_beat")
 name = &"kneel"
 at = 32.0
 
-[sub_resource type="Resource" id="B04"]
+[sub_resource type="Resource" id="B06"]
+script = ExtResource("3_beat")
+name = &"close_eyes"
+at = 34.0
+
+[sub_resource type="Resource" id="B07"]
 script = ExtResource("3_beat")
 name = &"kiss"
 at = 37.5
 
-[sub_resource type="Resource" id="B05"]
+[sub_resource type="Resource" id="B08"]
 script = ExtResource("3_beat")
 name = &"dark"
 at = 42.5
 
-[sub_resource type="Resource" id="B06"]
+[sub_resource type="Resource" id="B09"]
 script = ExtResource("3_beat")
 name = &"fact.film_eyes_open_lift"
 at = 44.0
 
-[sub_resource type="Resource" id="B07"]
+[sub_resource type="Resource" id="B10"]
 script = ExtResource("3_beat")
 name = &"open_eyes"
 at = 47.0
 
-[sub_resource type="Resource" id="B08"]
+[sub_resource type="Resource" id="B11"]
+script = ExtResource("3_beat")
+name = &"whisper"
+at = 50.6
+
+[sub_resource type="Resource" id="B12"]
 script = ExtResource("3_beat")
 name = &"true_form"
 at = 54.0
 
-[sub_resource type="Resource" id="B09"]
+[sub_resource type="Resource" id="B13"]
 script = ExtResource("3_beat")
 name = &"reach"
 at = 58.5
 
-[sub_resource type="Resource" id="B10"]
+[sub_resource type="Resource" id="B14"]
 script = ExtResource("3_beat")
 name = &"hide"
 at = 61.5
 
-[sub_resource type="Resource" id="B11"]
+[sub_resource type="Resource" id="B15"]
+script = ExtResource("3_beat")
+name = &"why"
+at = 62.3
+
+[sub_resource type="Resource" id="B16"]
+script = ExtResource("3_beat")
+name = &"normal"
+at = 64.8
+
+[sub_resource type="Resource" id="B17"]
 script = ExtResource("3_beat")
 name = &"hold"
 at = 68.0
 
-[sub_resource type="Resource" id="B12"]
+[sub_resource type="Resource" id="B18"]
 script = ExtResource("3_beat")
 name = &"handover"
 at = 73.0
@@ -185,4 +215,4 @@ music_cue = &"music_film_eyes_open"
 seen_flag = "fact.film_eyes_open_seen"
 bars = 1.0
 lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11")])
-beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12")])
+beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16"), SubResource("B17"), SubResource("B18")])

@@ -90,6 +90,15 @@ func _teardown() -> void:
 	pass
 
 
+## Runs `f` in `seconds` unless the film has ended by then (skipped).
+func after(seconds: float, f: Callable) -> void:
+	var tw := create_tween()
+	tw.tween_interval(seconds)
+	tw.tween_callback(func() -> void:
+		if not _done:
+			f.call())
+
+
 # --- the frame -------------------------------------------------------------------
 
 func at(local: Vector3) -> Vector3:
@@ -280,11 +289,22 @@ func add_prop(node: Node3D, world_pos: Vector3) -> Node3D:
 	return node
 
 
-func load_prop(path: String, world_pos: Vector3, yaw_deg: float = 0.0, s: float = 1.0) -> Node3D:
+## Set dressing that stays after the film (until the region reloads), so the
+## hand-over shows the same place: it lives under the moment's space.
+func add_set(node: Node3D, world_pos: Vector3) -> Node3D:
+	(space if space else get_tree().current_scene).add_child(node)
+	node.global_position = world_pos
+	return node
+
+
+func load_prop(path: String, world_pos: Vector3, yaw_deg: float = 0.0, s: float = 1.0, keep: bool = false) -> Node3D:
 	if not ResourceLoader.exists(path):
 		return null
 	var n := (load(path) as PackedScene).instantiate() as Node3D
-	add_prop(n, world_pos)
+	if keep:
+		add_set(n, world_pos)
+	else:
+		add_prop(n, world_pos)
 	n.rotation_degrees.y = yaw_deg
 	n.scale = Vector3.ONE * s
 	return n

@@ -49,9 +49,11 @@ FILMS = {
     "eyes_open": dict(
         id="eyes_open", length=76.0, music="music_film_eyes_open", seen="fact.film_eyes_open_seen", bars=1.0,
         beats=[
-            ("open", 0.0), ("study", 9.5), ("wary", 20.5), ("kneel", 32.0), ("kiss", 37.5),
-            ("dark", 42.5), ("fact.film_eyes_open_lift", 44.0), ("open_eyes", 47.0), ("true_form", 54.0),
-            ("reach", 58.5), ("hide", 61.5), ("hold", 68.0), ("handover", 73.0),
+            ("open", 0.0), ("study", 9.5), ("wary", 20.5), ("price", 23.8), ("fine", 29.4),
+            ("kneel", 32.0), ("close_eyes", 34.0), ("kiss", 37.5),
+            ("dark", 42.5), ("fact.film_eyes_open_lift", 44.0), ("open_eyes", 47.0), ("whisper", 50.6),
+            ("true_form", 54.0), ("reach", 58.5), ("hide", 61.5), ("why", 62.3), ("normal", 64.8),
+            ("hold", 68.0), ("handover", 73.0),
         ],
         lines=[
             ("a_01", 3.0, 2.4, "tamlin", "C", "It sings."),

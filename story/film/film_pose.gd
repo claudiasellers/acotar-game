@@ -65,6 +65,14 @@ const POSES := {
 	&"reach": {"drop": 0.0, "back": 0.0, "aims": {
 		"RightUpperArm": Vector3(-0.2, 0.55, 1.0), "RightLowerArm": Vector3(0.05, 0.75, 1.0),
 		"RightHand": Vector3(0.0, 0.7, 1.0)}},
+	# Kneeling, leaning in close (a kiss on the eyelids).
+	&"kneel_lean": {"drop": 0.5, "back": 0.0, "aims": {
+		"LeftUpperLeg": Vector3(0.04, -1.0, -0.05), "RightUpperLeg": Vector3(-0.04, -1.0, -0.05),
+		"LeftLowerLeg": Vector3(0.0, -0.08, -1.0), "RightLowerLeg": Vector3(0.0, -0.08, -1.0),
+		"LeftFoot": Vector3(0.0, -0.15, -1.0), "RightFoot": Vector3(0.0, -0.15, -1.0),
+		"Spine": Vector3(0.0, 1.0, 0.3), "Chest": Vector3(0.0, 1.0, 0.42), "Neck": Vector3(0.0, 1.0, 0.55),
+		"Head": Vector3(0.0, 1.0, 0.2),
+		"LeftUpperArm": Vector3(0.2, -0.5, 1.0), "LeftLowerArm": Vector3(-0.3, 0.4, 1.0)}},
 	# The same, kneeling.
 	&"kneel_reach": {"drop": 0.5, "back": 0.0, "aims": {
 		"LeftUpperLeg": Vector3(0.04, -1.0, 0.06), "RightUpperLeg": Vector3(-0.04, -1.0, 0.06),
