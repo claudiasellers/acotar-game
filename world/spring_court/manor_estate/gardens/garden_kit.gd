@@ -36,10 +36,10 @@ static func paving() -> Material:
 	return EstateKit.mat(Color(0.80, 0.68, 0.68), 0.6, 0.0, "garden_paving")
 
 
-## Warm cocoa-rose mulch under the beds. It was a dark mauve (0.40, 0.28, 0.27)
-## that the lilac dusk grade turned near-black purple in the parterres (L56,
-## user report); this stays clearly earth but light enough to read as soil.
-const MULCH := Color(0.58, 0.43, 0.36)
+## Brown loam under the beds. It was a dark mauve (0.40, 0.28, 0.27) that the
+## lilac dusk grade turned near-black purple in the parterres (L56, user
+## report); a rose-cocoa try read salmon at noon, so: plain warm brown earth.
+const MULCH := Color(0.46, 0.35, 0.27)
 
 
 static func mulch() -> Material:
@@ -70,6 +70,8 @@ static func tag_props(b: GroundsBatch) -> void:
 	var d := {}
 	for id: StringName in b._props:
 		d[id] = (b._props[id] as Array).size()
+	if b.has_meta(&"edging_modules"):
+		d[&"box_edging"] = int(b.get_meta(&"edging_modules"))
 	b.root.set_meta(&"props", d)
 
 
@@ -182,22 +184,109 @@ static func hedge_with_openings(b: GroundsBatch, a: Vector2, c: Vector2, opening
 	hedge_line(b, a + dir * s, c)
 
 
-## Dwarf box edging along a polyline (beds, parterre scrolls).
+## Dwarf box edging along a polyline (beds, parterre scrolls): one continuous
+## clipped hedge, swept along the line and mitred at the corners, with a soft,
+## slightly irregular top and the clipped-leaf texture (L56-2). It replaced a
+## 1.6 m box_edging module repeated end to end, which read as Lego: tube
+## segments with seams and hexagon studs. Returns the old module count (1.5 m
+## runs), kept for the gardens' tests.
+const EDGING_W := 0.44
+const EDGING_H := 0.46
+const BOX_GREEN := Color(0.24, 0.47, 0.30)
+
+static var _edging_mat: ShaderMaterial
+
+
+static func edging_material() -> ShaderMaterial:
+	if _edging_mat == null:
+		var m := ShaderMaterial.new()
+		m.shader = FloraLib.FOLIAGE_SHADER
+		m.resource_name = "box_edging_hedge"
+		m.set_shader_parameter(&"use_vertex_color", true)
+		m.set_shader_parameter(&"alpha_scissor", 0.0)
+		m.set_shader_parameter(&"wind_amount", 0.0)
+		m.set_shader_parameter(&"sparkle", 0.0)
+		m.set_shader_parameter(&"translucency", 0.2)
+		m.set_shader_parameter(&"leaf_noise", 1.0)
+		m.set_shader_parameter(&"leaf_scale", 16.0)
+		m.set_shader_parameter(&"leaf_bump", 0.7)
+		m.set_shader_parameter(&"leaf_lump", 0.015)
+		_edging_mat = m
+	return _edging_mat
+
+
+## Cross-section (across, up) of the clipped box, from one foot round the top to the other.
+const EDGING_PROFILE := [Vector2(-0.50, 0.0), Vector2(-0.50, 0.50), Vector2(-0.40, 0.86), Vector2(-0.18, 1.0),
+	Vector2(0.18, 1.0), Vector2(0.40, 0.86), Vector2(0.50, 0.50), Vector2(0.50, 0.0)]
+
+
 static func edging(b: GroundsBatch, pts: PackedVector2Array) -> int:
-	var n := 0
+	if pts.size() < 2:
+		return 0
+	var closed := pts[0].distance_to(pts[pts.size() - 1]) < 0.05
+	# resample to ~0.3 m, keeping the corners
+	var line := PackedVector2Array()
+	var length := 0.0
 	for i in pts.size() - 1:
-		var a := pts[i]
-		var c := pts[i + 1]
-		var seg := a.distance_to(c)
+		var seg := pts[i].distance_to(pts[i + 1])
 		if seg < 0.05:
 			continue
-		var dir := (c - a) / seg
-		var k := maxi(1, roundi(seg / EDGING_MODULE))
+		var k := maxi(1, ceili(seg / 0.3))
 		for j in k:
-			var p := a + dir * seg * (j + 0.5) / k
-			b.prop_on_ground(&"box_edging", p.x, p.y, yaw_along(dir), 1.0, -0.03)
-			n += 1
-	return n
+			line.append(pts[i].lerp(pts[i + 1], float(j) / k))
+		length += seg
+	line.append(pts[pts.size() - 1])
+	if line.size() < 2:
+		return 0
+	var n := line.size()
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rows: Array = []
+	var dist := 0.0
+	for i in n:
+		var prev := line[i - 1] if i > 0 else (line[n - 2] if closed else line[i])
+		var next := line[i + 1] if i < n - 1 else (line[1] if closed else line[i])
+		var d0 := (line[i] - prev).normalized() if line[i] != prev else (next - line[i]).normalized()
+		var d1 := (next - line[i]).normalized() if next != line[i] else d0
+		var t := (d0 + d1).normalized() if (d0 + d1).length() > 0.01 else d1
+		var nrm := Vector2(-t.y, t.x)
+		# mitre: widen at corners so both sides keep their thickness
+		var miter := 1.0 / maxf(0.5, nrm.dot(Vector2(-d1.y, d1.x)))
+		if i > 0:
+			dist += line[i].distance_to(line[i - 1])
+		# clipped by hand: the top waves a few centimetres, the sides breathe
+		var wob := 0.035 * sin(dist * 1.7 + line[i].x * 0.3) + 0.02 * sin(dist * 4.3 + 1.1)
+		var y := WorldHeight.height_at(line[i].x, line[i].y) - 0.04
+		var row: Array[Vector3] = []
+		for q: Vector2 in EDGING_PROFILE:
+			var across := q.x * EDGING_W * miter * (1.0 + wob * 0.8)
+			var up := q.y * (EDGING_H + wob) if q.y > 0.0 else 0.0
+			var p := line[i] + nrm * across
+			row.append(Vector3(p.x, y + up, p.y))
+		rows.append([row, dist])
+	for i in n - 1:
+		var r0: Array = rows[i][0]
+		var r1: Array = rows[i + 1][0]
+		for j in EDGING_PROFILE.size() - 1:
+			var quad := [r0[j], r1[j], r1[j + 1], r0[j + 1]]
+			var shade := 0.92 + 0.08 * float(EDGING_PROFILE[j].y)
+			for idx in [0, 1, 2, 0, 2, 3]:
+				st.set_color(BOX_GREEN.lightened(0.06 * shade - 0.03))
+				st.add_vertex(quad[idx])
+	# end caps on open runs
+	if not closed:
+		for e in [0, n - 1]:
+			var r: Array = rows[e][0]
+			for j in range(1, EDGING_PROFILE.size() - 2):
+				var tri := [r[0], r[j], r[j + 1]] if e == n - 1 else [r[0], r[j + 1], r[j]]
+				for v in tri:
+					st.set_color(BOX_GREEN)
+					st.add_vertex(v)
+	st.generate_normals()
+	b.add_mesh(st.commit(), Transform3D(), edging_material(), "|edging")
+	var modules := maxi(1, roundi(length / EDGING_MODULE))
+	b.set_meta(&"edging_modules", int(b.get_meta(&"edging_modules", 0)) + modules)
+	return modules
 
 
 ## Edging round an annular sector bed (both arcs and both radial sides).
