@@ -30,6 +30,8 @@ TEETH = {
     "tamlin": dict(fangs=0.0045, teeth_rgb=(0.97, 0.95, 0.90)),
     "lucien": dict(teeth_rgb=(1.0, 1.0, 0.99)),
     "father": dict(teeth_rgb=(0.86, 0.80, 0.68)),
+    "nesta": dict(teeth_rgb=(0.99, 0.98, 0.96)),
+    "elain": dict(teeth_rgb=(0.99, 0.98, 0.96)),
 }
 
 
@@ -37,6 +39,9 @@ TEETH = {
 FACE_RIDERS = {
     "father": {"hair_father_greying": "characters/father/hair/father_greying.glb"},   # the beard
 }
+
+
+LASH_KEYS = ("eyes_wide_L", "eyes_wide_R", "squint_L", "squint_R")
 
 
 def export_rider(path, obj, arm):
@@ -95,6 +100,11 @@ def run(char):
     riders = []
     for o in bpy.data.objects:
         if o.type == "MESH" and o not in (body, mouth_obj) and face_keys.transfer_keys(body, f, o):
+            riders.append(o.name)
+    for o in bpy.data.objects:
+        # strand lashes (L37, L41) ride the lids: blinks, wide eyes and squints carry them
+        if o.type == "MESH" and o.name.startswith("Lashes") and o.data.shape_keys is None:
+            face_keys.transfer_keys(body, f, o, names=LASH_KEYS, force=True)
             riders.append(o.name)
     for name, rel in FACE_RIDERS.get(char, {}).items():
         o = bpy.data.objects[name]

@@ -138,6 +138,57 @@ PROFILES = {
                  "weary": "dozing", "pleading": "pleading"},
         tics=[("wince", 10.0, 22.0, 0.6, 0.35)],
     ),
+    # ------------------------------------------------------------------
+    "nesta": dict(
+        canon="Unmasked, human. Cold, mother-like [C]; the sneer and narrowed eyes [C]; stormy eyes over thin, "
+              "pressed lips [C]; imperious, looking down at people [C later]; rarely smiles [C]. Our reading [X]: "
+              "fear and grief held behind the same tight mouth, chin up, never let fall.",
+        masked=False,
+        rest="cold",
+        blink=(3.0, 6.5),
+        presets={
+            "cold": {"lip_press": 0.3, "squint": 0.18, "chin_raise": 0.15, "brow_down": 0.1},
+            "sneer": {"sneer_L": 0.45, "sneer_R": 0.75, "squint": 0.4, "brow_down": 0.35, "mouth_side_R": 0.25},
+            "narrowed": {"squint": 0.75, "brow_down": 0.55, "lip_press": 0.4},
+            "storm": {"brow_down": 0.85, "lip_press": 0.85, "squint": 0.5, "frown": 0.3, "jaw_clench": 0.45},
+            "imperious": {"chin_raise": 0.5, "brow_up": 0.25, "blink_L": 0.22, "blink_R": 0.22, "lip_press": 0.3},
+            "rare_smile": {"smile": 0.3, "smile_R": 0.1, "squint": 0.15},
+            "shaken": {"eyes_wide_L": 0.4, "eyes_wide_R": 0.4, "brow_inner_up": 0.3, "lip_press": 0.55},
+            "grief_held": {"chin_raise": 0.6, "lip_press": 0.7, "brow_inner_up": 0.45, "squint": 0.25},
+        },
+        aliases={"neutral": "cold", "guarded": "cold", "happy": "rare_smile", "laugh": "rare_smile",
+                 "smirk": "sneer", "tender": "rare_smile", "angry": "storm", "fury": "storm", "contempt": "sneer",
+                 "disgust": "sneer", "sad": "grief_held", "grief": "grief_held", "afraid": "shaken",
+                 "terror": "shaken", "surprise": "shaken", "pained": "grief_held", "weary": "imperious",
+                 "pleading": "grief_held"},
+        tics=[("narrowed", 8.0, 16.0, 0.6, 0.4)],
+    ),
+    # ------------------------------------------------------------------
+    "elain": dict(
+        canon="Unmasked, human, 'lovely' [C]. The gasp, the wince, pale and cowering, weeping [C]; later bright "
+              "laughter [C]. Never sneers [C]. Our reading [X]: a soft, sweet rest face, worry before anger.",
+        masked=False,
+        rest="sweet",
+        blink=(2.2, 5.0),
+        presets={
+            "sweet": {"smile": 0.22, "brow_inner_up": 0.12, "cheek_raise": 0.1},
+            "smile": {"smile": 0.6, "cheek_raise": 0.35, "squint": 0.15},
+            "laugh": {"smile": 1.0, "cheek_raise": 0.6, "squint": 0.35, "jaw_open": 0.2, "lips_part": 0.4,
+                      "brow_up": 0.2},
+            "gasp": {"eyes_wide_L": 0.45, "eyes_wide_R": 0.45, "brow_up": 0.6, "brow_inner_up": 0.3, "jaw_open": 0.3,
+                     "lips_part": 0.5},
+            "wince": {"squint": 0.7, "brow_inner_up": 0.6, "frown": 0.35, "lip_press": 0.3},
+            "cower": {"brow_inner_up": 0.9, "eyes_wide_L": 0.3, "eyes_wide_R": 0.3, "frown": 0.4, "chin_raise": 0.3,
+                      "lips_part": 0.2},
+            "weeping": {"brow_inner_up": 1.0, "frown": 0.65, "squint": 0.45, "chin_raise": 0.5, "lips_part": 0.25},
+            "worried": {"brow_inner_up": 0.6, "frown": 0.2, "lip_press": 0.2},
+        },
+        aliases={"neutral": "sweet", "guarded": "worried", "happy": "smile", "laugh": "laugh", "smirk": "smile",
+                 "tender": "smile", "angry": "worried", "fury": "wince", "contempt": "worried", "disgust": "wince",
+                 "sad": "worried", "grief": "weeping", "afraid": "cower", "terror": "cower", "surprise": "gasp",
+                 "pained": "wince", "weary": "worried", "pleading": "cower"},
+        tics=[("smile", 7.0, 14.0, 0.8, 0.4)],
+    ),
 }
 
 
