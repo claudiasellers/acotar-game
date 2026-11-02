@@ -4,7 +4,8 @@
 ##   godot res://tools/creatures/wolf_look_shot.tscn -- <out_dir> [numbers]
 ## hunt.png: the wolf stalking the doe from the side at ~9 m (the audit's view).
 ## face.png: his head three-quarter close, the snarl (Faces "lunge") open.
-## doe.png: the doe at ~4 m. Also prints the draw calls the wolf adds.
+## eye_level.png: his head from Feyre's eye height (1.6 m) at 4 m.
+## Also prints the draw calls the wolf adds.
 extends Node
 
 const CLEARING := Vector2(-360.0, 1660.0)  # HumanRealmLayout.DOE_CLEARING
@@ -98,11 +99,12 @@ func _run() -> void:
 	_look(head + wolf.global_basis * Vector3(1.3, 0.25, -1.6), head + Vector3.DOWN * 0.05)
 	await _settle(1.5)
 	await _save(_out + "/face.png")
-	# The doe.
-	wolf.visible = false
-	_look(doe.global_position + Vector3(-2.2, 1.3, 3.0), doe.global_position + Vector3(0.0, 0.7, 0.0))
+	# What Feyre sees at 4 m: her eye height, a little off his nose line.
+	var eye := wolf.global_transform * Vector3(1.2, 0.0, -4.0)
+	eye.y = _ground(eye).y + 1.6
+	_look(eye, head)
 	await _settle(1.0)
-	await _save(_out + "/doe.png")
+	await _save(_out + "/eye_level.png")
 	get_tree().quit(0)
 
 

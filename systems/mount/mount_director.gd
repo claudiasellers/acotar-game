@@ -28,6 +28,14 @@ const WHISTLE := preload("res://systems/mount/sounds/whistle.wav")
 const WIND := preload("res://systems/mount/sounds/wind.wav")
 ## The gallop is capped (streaming); it is sold with a wider lens and the wind.
 const GALLOP_FOV := 12.0
+## The chase camera in the saddle: pivot lifted and arm drawn back so the
+## camera looks down past Feyre to the mare's neck and ears and the road ahead.
+## Eased in on mounting, back to 0 on getting down (Feyre.camera_lift/_arm_extra).
+const RIDE_LIFT := 0.8
+const RIDE_ARM := 1.6
+## The pitch the camera settles to when the player isn't looking around (rad, -18 deg).
+const RIDE_PITCH := -0.314
+const RIDE_BLEND := 0.6
 const ACTION := &"call_mount"
 const UNLOCK_AFTER := "first_dinner_eaten"
 const RIDDEN_FLAG := "fact.mare_ridden"
@@ -62,6 +70,7 @@ var _prompt: Label3D
 var _unlock: ActionTrigger
 var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
+var _cam_tween: Tween
 
 
 func _ready() -> void:
@@ -274,6 +283,7 @@ func mount(user: Node = null) -> bool:
 		create_tween().tween_property(pose, ^"amount", 1.0, 0.25)
 	_inside.clear()
 	_place_rider(0.0)
+	_ride_camera(p, true)
 	if first:
 		_unlock.fire()
 		Juice.burst(mare, &"unlock")
@@ -304,6 +314,7 @@ func dismount() -> void:
 	_calm_feel()
 	if p:
 		Saddle.unseat(p)
+		_ride_camera(p, false)
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
@@ -474,9 +485,34 @@ func _calm_feel() -> void:
 		_wind.volume_db = -60.0
 
 
-## While she rides and the player isn't steering the camera, it swings in behind.
+## Eases Feyre's camera out to the riding frame (`on`) or back to her own.
+func _ride_camera(p: Node, on: bool) -> void:
+	if p == null or not (&"camera_lift" in p and &"camera_arm_extra" in p):
+		return
+	if _cam_tween:
+		_cam_tween.kill()
+	_cam_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(p, ^"camera_lift", RIDE_LIFT if on else 0.0, RIDE_BLEND)
+	_cam_tween.tween_property(p, ^"camera_arm_extra", RIDE_ARM if on else 0.0, RIDE_BLEND)
+
+
+func _exit_tree() -> void:
+	# Never leave her camera lifted if the director goes while she rides.
+	var p := _player()
+	if riding and p and &"camera_lift" in p:
+		p.set(&"camera_lift", 0.0)
+		p.set(&"camera_arm_extra", 0.0)
+
+
+## While she rides and the player isn't steering the camera, it swings in behind
+## and settles to the riding pitch.
 func _follow_camera(p: Node3D, delta: float) -> void:
-	if mare == null or _since_look < LOOK_GRACE or mare.speed < 3.0 or not p.has_method(&"nudge_camera"):
+	if mare == null or _since_look < LOOK_GRACE or not p.has_method(&"nudge_camera"):
+		return
+	if p.has_method(&"camera_pitch"):
+		var dp := RIDE_PITCH - float(p.call(&"camera_pitch"))
+		p.call(&"nudge_camera", 0.0, dp * clampf(1.5 * delta, 0.0, 1.0))
+	if mare.speed < 3.0:
 		return
 	var diff := wrapf(mare.rotation.y - float(p.call(&"camera_yaw")), -PI, PI)
 	p.call(&"nudge_camera", diff * clampf(2.2 * delta, 0.0, 1.0), 0.0)
