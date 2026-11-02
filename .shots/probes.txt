@@ -1,0 +1,3 @@
+from calanmai-lane
+quality look
+shot calanmai res://tools/playtest/p5_calanmai_clip.tscn {out}
