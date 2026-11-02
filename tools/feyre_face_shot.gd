@@ -26,6 +26,11 @@ func _run() -> void:
 	await _frames(60)
 	var feyre := estate.get(&"feyre") as Feyre
 	var settle := 4.0 if OS.get_environment("SHOTS_QUALITY") == "look" else 1.0
+	# the slung bow and quiver cross the lens this close; hide them
+	for n in feyre.find_children("*", "Node3D", true, false):
+		var low := String(n.name).to_lower()
+		if low.contains("bow") or low.contains("quiver") or low.contains("arrow"):
+			(n as Node3D).visible = false
 	var drive_pos := feyre.global_position
 	var drive_rot := feyre.rotation
 
