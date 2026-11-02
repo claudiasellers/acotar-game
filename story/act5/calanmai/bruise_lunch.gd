@@ -24,7 +24,9 @@ func _build_beats() -> Array:
 	var b: Array = []
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		cast(&"tamlin", &"tamlin_seat", &"feyre_chair")
-		cast(&"lucien", &"lucien_seat", &"feyre_chair"), "at the table"))
+		cast(&"lucien", &"lucien_seat", &"lucien_face")
+		sit(&"tamlin")
+		sit(&"lucien"), "at the table"))
 	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		StoryControl.set_focus(actor(&"lucien"))

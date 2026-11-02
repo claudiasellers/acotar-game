@@ -6,8 +6,9 @@
 script = ExtResource("1")
 marks = {
 "feyre_chair": Vector3(4.95, 0, -6.5),
-"lucien_seat": Vector3(-3.4, 0, -8),
-"tamlin_seat": Vector3(-4.75, 0, -6.5)
+"lucien_face": Vector3(-3.4, 0, -6.5),
+"lucien_seat": Vector3(-3.4, 0, -7.6),
+"tamlin_seat": Vector3(-4.4, 0, -6.5)
 }
 lines = {
 "laugh": {"text": "Lucien howls. Even Tamlin laughs.", "who": ""},

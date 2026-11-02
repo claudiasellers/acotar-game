@@ -81,6 +81,7 @@ func _build_beats() -> Array:
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		kept = CalanmaiKit.pick_kept(Gameplay.gallery.paintings)
 		cast(&"tamlin", &"tamlin_seat", &"feyre_chair")
+		sit(&"tamlin")
 		place_feyre(mark(&"feyre_chair")), "dinner, at opposite ends"))
 	b.append(Beats.control(StoryControl.Mode.LOOK, null))
 	b.append(Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_focus(actor(&"tamlin")), "the length of the table"))
@@ -92,6 +93,7 @@ func _build_beats() -> Array:
 	b.append(Beats.run(func(_s: SceneSpace) -> void:
 		var t := actor(&"tamlin")
 		if t:
+			rise(&"tamlin")
 			t.global_position = mark(&"tamlin_close")
 			CalanmaiSpace.face_toward(t, mark(&"feyre_close"))
 		place_feyre(mark(&"feyre_close"))

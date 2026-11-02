@@ -75,7 +75,7 @@ func _transform(_s: SceneSpace) -> void:
 			(beast as BeastActor).visible = false
 		dismiss(&"tamlin_beast")
 	var tamlin := cast(&"tamlin", &"tamlin_seat", &"table")
-	tamlin.global_position.y -= 0.45  # seated behind the table end (no sit clip yet, L22)
+	sit(&"tamlin")
 	StoryControl.set_mode(StoryControl.Mode.LOOK)
 	StoryControl.set_focus(tamlin)
 	StoryControl.shake = 0.0
