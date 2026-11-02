@@ -5,8 +5,8 @@
 shader_type spatial;
 render_mode cull_back;
 
-uniform vec3 sand : source_color = vec3(0.66, 0.62, 0.56);
-uniform vec3 pearl : source_color = vec3(0.82, 0.80, 0.75);
+uniform vec3 sand : source_color = vec3(0.63, 0.62, 0.52);
+uniform vec3 pearl : source_color = vec3(0.80, 0.80, 0.72);
 uniform vec3 taupe : source_color = vec3(0.50, 0.44, 0.38);
 uniform vec3 grit : source_color = vec3(0.95, 0.78, 0.42);
 uniform vec3 petal : source_color = vec3(1.0, 0.62, 0.76);
