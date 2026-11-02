@@ -119,9 +119,13 @@ func cast(actor_id: StringName, at_mark: StringName, face_mark: StringName = &""
 	return who
 
 
+## The actor this scene cast, or null once it has been freed (forgotten too).
 func actor(actor_id: StringName) -> Node3D:
-	var who := actors.get(actor_id) as Node3D
-	return who if who and is_instance_valid(who) else null
+	var raw: Variant = actors.get(actor_id)
+	if raw == null or not is_instance_valid(raw):
+		actors.erase(actor_id)
+		return null
+	return raw as Node3D
 
 
 ## Removes an actor this scene placed (only its own stand-ins are freed).

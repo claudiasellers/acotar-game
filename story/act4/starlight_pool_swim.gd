@@ -228,11 +228,3 @@ func _swim_out() -> void:
 	who.global_position = out
 	Act4Walk.face(who, p)
 	Act4Walk.idle(who)
-
-
-func request_actor(actor_id: StringName, where: Transform3D, fallback: Callable) -> Node3D:
-	return Act4Walk.request_own(self, actor_id, where, fallback)
-
-
-func actor(actor_id: StringName) -> Node3D:
-	return Act4Walk.live(actors, actor_id)
