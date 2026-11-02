@@ -45,7 +45,8 @@ func sleep() -> void:
 	tween.tween_callback(func() -> void:
 		layer.queue_free()
 		StoryControl.release()
-		sleeping = false)
+		sleeping = false
+		SaveSystem.autosave())
 
 
 ## Advances the Clock (so day_started and everything time-driven still fire).
