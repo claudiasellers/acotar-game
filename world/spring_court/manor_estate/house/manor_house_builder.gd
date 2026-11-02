@@ -26,8 +26,7 @@ const FACADE := Color(0.99, 0.94, 0.94)
 ## Props built outside the merge so story scenes can move them: room -> prop id,
 ## and the node name they get (a direct child of the room node, origin at the
 ## prop's base centre, its long axis along local X).
-const LOOSE := {&"dining_hall": &"table_dining_long"}
-const LOOSE_NAMES := {&"dining_hall": "DiningTable"}
+const LOOSE := {&"dining_hall": {&"table_dining_long": "DiningTable", &"chair_head_dining": "HeadChair"}}
 
 
 ## World height of a level's finished floor.
@@ -154,10 +153,12 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex)
 		prop.rotation.y = deg_to_rad(p.yaw_deg)
 		if p.scale != 1.0:
 			prop.scale = Vector3.ONE * p.scale
-		if LOOSE.get(room.id, &"") == p.prop_id and node.get_node_or_null(NodePath(LOOSE_NAMES[room.id])) == null:
-			# kept out of the merge so a scene can move it (L45: the table Tamlin shrinks, ch22)
+		var loose_name: String = LOOSE.get(room.id, {}).get(p.prop_id, "")
+		if loose_name != "" and node.get_node_or_null(NodePath(loose_name)) == null:
+			# kept out of the merge so a scene can move it (L45: the table Tamlin
+			# shrinks, ch22; the head chair he throws over, ch26)
 			var loose := ManorLooseProp.new()
-			loose.name = LOOSE_NAMES[room.id]
+			loose.name = loose_name
 			loose.transform = prop.transform
 			prop.transform = Transform3D.IDENTITY
 			loose.add_child(prop)

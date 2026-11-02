@@ -29,9 +29,10 @@ const KNIFE := "res://characters/father/model/father_knife.glb"
 const VIOLET := Color(0.62, 0.42, 1.0)
 const TABLE_TOP := 0.8
 
-## The seats: Tamlin at the head (a chair the scene brings), Lucien and
-## Feyre facing each other at his right and left hand.
-const TAMLIN_SEAT := Vector3(16.35, 0.0, -38.0)
+## The seats: Tamlin in the head chair, Lucien and Feyre facing each other
+## at his right and left hand.
+const HEAD_CHAIR := &"chair_head_dining"
+const TAMLIN_SEAT := Vector3(16.6, 0.0, -38.0)
 const LUCIEN_SEAT := Vector3(17.6, 0.0, -39.1)
 const FEYRE_SEAT := Vector3(17.6, 0.0, -36.9)
 const DOOR := Vector3(10.4, 0.0, -38.0)
@@ -49,6 +50,10 @@ var tamlin: Node3D
 var lucien: Node3D
 var rhys: Node3D
 var chair: Node3D
+## Where the house keeps its head chair, for after he has thrown it over.
+var chair_home: Transform3D
+var house_chair: bool = false
+var chair_fall: Tween
 var knife_on_table: Node3D
 var goblet_on_table: Node3D
 var held_knife: Node3D
@@ -71,7 +76,7 @@ func _setup() -> void:
 	for who in [tamlin, lucien]:
 		_quiet(who)
 	put_feyre(FEYRE_SEAT, FEYRE_SEAT + Vector3(0.0, 0.0, -1.0))
-	pose(tamlin, &"sit", 0.0)
+	pose(tamlin, &"sit", 0.0, HEAD_CHAIR)
 	pose(lucien, &"sit", 0.0)
 	pose(feyre_model(), &"sit", 0.0)
 	rhys = _rhysand()
@@ -89,6 +94,10 @@ func _end_mark() -> Transform3D:
 func _teardown() -> void:
 	if insert and is_instance_valid(insert):
 		insert.queue_free()
+	if chair_fall:
+		chair_fall.kill()
+	if house_chair and chair and is_instance_valid(chair):
+		chair.global_transform = chair_home
 	for who in [tamlin, lucien]:
 		if who and is_instance_valid(who) and who.has_method(&"set_claws"):
 			who.call(&"set_claws", 0.0)
@@ -109,11 +118,17 @@ func _top(local: Vector3) -> Vector3:
 	return at(Vector3(local.x, TABLE_TOP, local.z))
 
 
-## Lunch: a chair at the head for Tamlin, three places laid, her knife.
+## Lunch: the house's head chair for Tamlin to throw over (a chair of the
+## scene's own when there is no house), three places laid, her knife.
 func _dress_table() -> void:
-	chair = PropLib.build(&"chair_dining")
-	add_prop(chair, at(TAMLIN_SEAT))
-	chair.global_basis = Basis(Vector3.UP, frame.basis.get_euler().y - PI * 0.5)
+	for found in get_tree().root.find_children("HeadChair", "Node3D", true, false):
+		chair = found as Node3D
+		house_chair = true
+		chair_home = chair.global_transform
+	if chair == null:
+		chair = PropLib.build(HEAD_CHAIR)
+		add_prop(chair, at(TAMLIN_SEAT))
+		chair.global_basis = Basis(Vector3.UP, frame.basis.get_euler().y - PI * 0.5)
 	for p in [[Vector3(17.05, 0, -38.0), -90.0], [Vector3(17.6, 0, -38.5), 0.0], [Vector3(17.6, 0, -37.5), 180.0]]:
 		load_prop(PLATE, _top(p[0]), float(p[1]))
 	load_prop(GOBLET, _top(Vector3(17.25, 0, -38.35)))
@@ -293,9 +308,9 @@ func _b_snarl() -> void:
 	if tamlin.has_method(&"set_claws"):
 		tamlin.call(&"set_claws", 1.0)
 	# The chair goes over backwards (its back is to the doors).
-	var tw := create_tween()
-	tw.tween_property(chair, ^"global_position", at(TAMLIN_SEAT + Vector3(-0.5, 0, 0)), 0.3)
-	tw.parallel().tween_property(chair, ^"rotation:x", deg_to_rad(80.0), 0.35) \
+	chair_fall = create_tween()
+	chair_fall.tween_property(chair, ^"global_position", at(TAMLIN_SEAT + Vector3(-0.5, 0, 0)), 0.3)
+	chair_fall.parallel().tween_property(chair, ^"rotation:x", deg_to_rad(80.0), 0.35) \
 			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	pose(lucien, &"", 0.4)
 	put(lucien, LUCIEN_SEAT + Vector3(0, 0, 0.1), DOOR)
@@ -351,10 +366,11 @@ func _veil() -> void:
 func _b_slouch() -> void:
 	if tamlin.has_method(&"set_claws"):
 		tamlin.call(&"set_claws", 0.0)
+	chair_fall.kill()
 	chair.rotation.x = 0.0
 	chair.global_position = at(TAMLIN_SEAT)
 	put(tamlin, TAMLIN_SEAT, TAMLIN_SEAT + Vector3(1.0, 0, 0))
-	pose(tamlin, &"sit_slouch", 0.0)
+	pose(tamlin, &"sit_slouch", 0.0, HEAD_CHAIR)
 	put(lucien, LUCIEN_GUARD, ROOM)
 	# From the window corner past the drapes, out over the room to the doors.
 	shot(Vector3(17.0, 1.6, -28.9), Vector3(12.0, 1.2, -37.5), 40.0, 0.25, 5.0)

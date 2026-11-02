@@ -26,6 +26,8 @@ const FEYRE_HIDE := Vector3(10.65, 0.0, -37.35)
 const ALIS_IN := Vector3(1.0, 0.0, -29.2)
 const ALIS_SNIFF := Vector3(4.9, 0.0, -35.4)
 const ALIS_PACK := Vector3(49.25, 0.0, -61.0)
+## Her chair is the film's: the kitchen keeps none at this table's end.
+const CHAIR := &"chair_simple"
 const FEYRE_SIT := Vector3(50.55, 0.0, -58.85)
 const FEYRE_STAND := Vector3(50.3, 0.0, -58.3)
 const SATCHEL_AT := Vector3(49.25, 0.9, -60.25)
@@ -208,8 +210,10 @@ func _b_kitchen() -> void:
 	pose(feyre_model(), &"", 0.0)
 	cloak.visible = false
 	put(alis, ALIS_PACK, ALIS_PACK + Vector3(0.0, 0.0, 1.0))
+	var chair := add_prop(PropLib.build(CHAIR), at(FEYRE_SIT))
+	chair.global_basis = frame.basis
 	put_feyre(FEYRE_SIT, FEYRE_SIT + Vector3(0.0, 0.0, -1.0))
-	pose(feyre_model(), &"sit", 0.0)
+	pose(feyre_model(), &"sit", 0.0, CHAIR)
 	pose(alis, &"pack", 0.6)
 	satchel = MeshInstance3D.new()
 	var b := BoxMesh.new()
