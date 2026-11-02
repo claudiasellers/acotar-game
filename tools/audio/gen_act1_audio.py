@@ -124,38 +124,144 @@ def amb_cottage_hearth():
     return rms_to(loop_seam(x, L, F), -25)
 
 
-def _babble(r, n):
-    """Distant voices: noise through gliding vowel formants, syllable-chopped."""
+# Vowel formants (F1, F2, F3) of an adult voice; a syllable holds one.
+_VOWELS = [(730, 1090, 2440), (530, 1840, 2480), (270, 2290, 3010), (570, 840, 2410),
+           (300, 870, 2240), (660, 1720, 2410), (490, 1350, 1690), (440, 1020, 2240)]
+
+
+def _talker(r, n, f0_mean, busy=0.55, start=0.0):
+    """One person talking: phrases of syllables, each a held vowel with a soft
+    consonant onset and a falling phrase pitch. Static formants per syllable,
+    so it reads as speech rather than a wah."""
     out = np.zeros(n)
-    for v in range(5):
-        syl = (smooth_random(r, n, r.uniform(4, 6.5), 0, 1) > 0.45).astype(float)
-        syl = lp(syl, 18)
-        phrase = (smooth_random(r, n, 0.25, 0, 1) > 0.5).astype(float)
-        phrase = lp(phrase, 2)
-        f0 = r.uniform(110, 230) * (1 + 0.08 * smooth_random(r, n, 3, -1, 1))
-        vo = voiced(r, f0, lambda t, k=v: [(500 + 250 * np.sin(t * 7 + k), 5, 1.0), (1500 + 400 * np.sin(t * 5 + k * 2), 6, 0.5)], breath=0.1, rough=0.2)
-        out += vo * syl * phrase
-    return lp(out, 1600)
+    t = start
+    total = n / SR
+    while t < total - 0.5:
+        k = int(r.integers(3, 11))  # syllables in this phrase
+        base = f0_mean * r.uniform(0.92, 1.12)
+        for i in range(k):
+            d = r.uniform(0.11, 0.26)
+            m = secs(d)
+            fall = 1.0 - 0.18 * i / max(k - 1, 1) + (0.12 if i == 0 and r.random() < 0.4 else 0)
+            f0 = np.full(m, base * fall) * (1 + 0.03 * np.linspace(1, -1, m))
+            f1, f2, f3 = _VOWELS[int(r.integers(len(_VOWELS)))]
+            v = voiced(r, f0, [(f1, 5, 1.0), (f2, 7, 0.5), (f3, 9, 0.2)], breath=0.06, rough=0.15)
+            v *= env_ar(m, 0.025, 0.06, max(d - 0.085, 0))
+            if r.random() < 0.6:  # consonant: a short noise burst before the vowel
+                cm = secs(r.uniform(0.02, 0.06))
+                c = bp(white(r, cm), r.uniform(1500, 4500), 7000) * env_ar(cm, 0.005, 0.02) * 0.25
+                place(out, c, t)
+                t += cm / SR * 0.6
+            place(out, v, t, r.uniform(0.6, 1.0))
+            t += d + r.uniform(0.0, 0.05)
+        t += r.uniform(0.4, 2.5) / busy  # a pause between phrases
+    return out
+
+
+def _crowd(r, n, talkers=14):
+    """A muffled market crowd: many talkers at once, far enough that words go."""
+    L = np.zeros(n)
+    R = np.zeros(n)
+    for _ in range(talkers):
+        f0 = r.uniform(95, 140) if r.random() < 0.55 else r.uniform(175, 240)
+        v = _talker(r, n, f0, start=r.uniform(0, 3)) * r.uniform(0.4, 1.0)
+        p = r.uniform(-0.8, 0.8)
+        L += v * np.sqrt(0.5 * (1 - p))
+        R += v * np.sqrt(0.5 * (1 + p))
+    x = np.vstack([L, R])
+    x = lp(x, 950)  # muffled: walls, distance, snow
+    # The bed swells and settles a little, like a crowd does.
+    return x * (0.75 + 0.25 * smooth_random(r, n, 0.08, 0, 1))
+
+
+def _slush_step(r):
+    s = 0.34
+    n = secs(s)
+    heel = lambda u: np.exp(-((u - 0.15) / 0.1) ** 2)  # noqa: E731
+    roll = lambda u: np.exp(-((u - 0.5) / 0.2) ** 2) * 0.7  # noqa: E731
+    wet = grains(r, s, 2600, (0.6, 3.0), (250, 2200), lambda u: min(1.0, heel(u) + roll(u)))
+    squelch = bp(white(r, n), 300, 1100) * env_ar(n, 0.03, 0.18) * 0.5
+    body = thump(80, s, 0.05) * 0.3
+    return normalize(fade(wet + squelch + body, 0.002, 0.05), -3)
+
+
+def _passerby(r, out, at, dur, pan_from, pan_to, gain):
+    """Someone crossing the square: steps in slush, panning past."""
+    t = at
+    pace = r.uniform(0.48, 0.6)
+    k = 0
+    steps = int(dur / pace)
+    for k in range(steps):
+        u = k / max(steps - 1, 1)
+        g = gain * np.sin(np.pi * u) ** 1.5
+        place(out, lp(_slush_step(r), 3500) * g, t, pan=pan_from + (pan_to - pan_from) * u)
+        t += pace * r.uniform(0.95, 1.05)
+
+
+def _cart(r, ir, dur=9.0):
+    """A horse and cart through the slush: muffled hooves, wheel rumble, a
+    creaking axle and a jingle of harness. Mono, enveloped to pass by."""
+    n = secs(dur)
+    x = np.zeros(n)
+    u = np.linspace(0, 1, n)
+    rumble = lp(brown(r, n), 180) * (1 + 0.8 * (smooth_random(r, n, 9, 0, 1) > 0.75))
+    x += rumble * 0.6
+    t = 0.2
+    while t < dur - 0.5:  # a walking horse: four-beat, uneven
+        for off in (0.0, 0.26, 0.5, 0.74):
+            hm = secs(0.12)
+            hoof = thump(r.uniform(140, 190), 0.12, 0.03, 0.4) * 0.6 + bp(white(r, hm), 300, 1500) * env_exp(hm, 0.03) * 0.5
+            place(x, hoof * r.uniform(0.6, 1.0), t + off * 1.1)
+        t += 1.1
+    for _ in range(3):
+        place(x, _creak(r, r.uniform(0.8, 1.4), low=True) * 0.5, r.uniform(0.5, dur - 1.5))
+    t = 0.3
+    while t < dur - 0.3:  # harness bits
+        jm = secs(0.08)
+        j = sum(reso(white(r, jm), f, 30) for f in (3200 * r.uniform(0.97, 1.03), 4700 * r.uniform(0.97, 1.03)))
+        place(x, j * env_exp(jm, 0.03) * 0.04, t)
+        t += 0.55 * r.uniform(0.8, 1.2)
+    x *= np.sin(np.pi * u) ** 2  # it comes and goes
+    return reverb_mono(lp(x, 2500), ir, 0.35)
+
+
+def _haggle(r, ir):
+    """Two people bargaining across a stall, far off: a man and a woman taking
+    turns, a little louder and quicker than the crowd."""
+    n = secs(7.0)
+    x = np.zeros(n)
+    t = 0.0
+    who = 0
+    while t < 6.0:
+        d = r.uniform(0.9, 1.8)
+        m = secs(d)
+        f0 = 130 if who == 0 else 215
+        phrase = _talker(r, m, f0 * r.uniform(1.05, 1.15), busy=3.0)
+        place(x, phrase * (1.0 if who == 0 else 0.85), t)
+        t += d + r.uniform(0.15, 0.5)
+        who = 1 - who
+    return reverb_mono(lp(x, 1300), ir, 0.45) * env_ar(n, 0.3, 0.8, 5.9)
 
 
 def amb_village():
+    """A winter market in a poor village, kept low: a muffled crowd, people
+    crossing in slush, a cart now and then, one bargain at a stall, wind."""
     r = rng(104)
     L, F = 44.0, 3.0
     n = secs(L + F)
-    wind, _ = _wind(r, n, 0.45, whistle=False)
-    x = wind * 0.6
-    voices = _babble(r, n)
-    x += widen(r, voices, 17) * 0.5
-    ir = reverb_ir(r, 1.8, 0.4)
-    anvil = place(bell(1250, 0.9, r) * 0.6, bell(1873, 0.6, r) * 0.25, 0.0)
-    t = 2.0
-    while t < L - 3:  # a smith at work, in bursts
-        for k in range(r.integers(3, 7)):
-            place(x, reverb_mono(anvil, ir, 0.6) * 0.035, t + k * 0.55, pan=0.55)
-        t += r.uniform(7, 12)
-    for _ in range(3):  # a cart creaking past, a door
-        place(x, reverb_mono(_creak(r, r.uniform(1.2, 2.0), low=True), ir, 0.4) * 0.12, r.uniform(1, L), pan=r.uniform(-0.8, 0.8))
-    return rms_to(loop_seam(x, L, F), -24)
+    wind, _ = _wind(r, n, 0.4, whistle=False)
+    x = wind * 0.55
+    ir = reverb_ir(r, 1.4, 0.35)
+    x += reverb(_crowd(r, n), ir, 0.4) * 0.5
+    for _ in range(7):
+        at = r.uniform(0.5, L - 6)
+        p = r.uniform(-0.9, 0.9)
+        _passerby(r, x, at, r.uniform(3.5, 6.0), p, -p * r.uniform(0.3, 1.0), r.uniform(0.05, 0.1))
+    for at in (6.0, 29.0):
+        place(x, _cart(r, ir) * 0.22, at + r.uniform(-1, 1), pan=r.choice([-0.6, 0.6]))
+    for at in (15.0, 37.0):
+        place(x, _haggle(r, ir) * 0.16, at, pan=r.uniform(-0.5, 0.5))
+    return rms_to(loop_seam(x, L, F), -26)
 
 
 def amb_wall_seam():
@@ -798,7 +904,7 @@ SOUNDS = {
     "amb/winter_wood": (amb_winter_wood, 3, "Winter hunting forest: gusting wind, whistles, sifting snow, creaking trees, a distant crow"),
     "amb/cottage_yard": (amb_cottage_yard, 3, "Outside the cottage: lighter wind, boards creaking, a shutter knocking"),
     "amb/cottage_hearth": (amb_cottage_hearth, 3, "Inside the cottage: hearth fire crackle, the storm through thin walls"),
-    "amb/village": (amb_village, 3, "The village: distant voices, a smith's anvil, carts, wind"),
+    "amb/village": (amb_village, 3, "The village market in winter: a muffled crowd, steps in slush, a passing cart, a distant bargain, wind"),
     "amb/wall_seam": (amb_wall_seam, 3, "The Wall: wind thins out, low pressure hum, glassy shimmer"),
     "amb/spring_arrival": (amb_spring_arrival, 3, "Spring Court arrival: balmy breeze, leaves, sparse small birds, faint metal shimmer"),
     "amb/dread": (amb_dread, 2, "Dread bed: near silence and sub-bass pressure"),
