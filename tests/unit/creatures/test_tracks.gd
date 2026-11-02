@@ -30,3 +30,24 @@ func test_layer_is_capped() -> void:
 	for i in TrackLayer.MAX_MARKS + 5:
 		layer.add_mark(&"print", Vector3(i, 0, 0), 0.0, 0.1)
 	assert_eq(layer.marks.size(), TrackLayer.MAX_MARKS)
+
+
+func test_hoof_marks_are_projected_decals_that_fade() -> void:
+	var layer := TrackLayer.new()
+	add_child_autofree(layer)
+	layer.snowfall_override = 0.0
+	var mark := layer.add_mark(&"hoof", Vector3(1, 2, 3), 0.5, 0.07)
+	assert_true(mark.node is Decal, "projected onto the real ground")
+	var d := mark.node as Decal
+	assert_gte(d.size.z, TrackLayer.HOOF_MIN_LENGTH, "big enough to read while walking")
+	assert_null(d.texture_emission, "no glow: the glint is specular only")
+	assert_not_null(d.texture_orm)
+	layer.step(180.0)
+	assert_almost_eq(d.modulate.a, 0.5, 0.01)
+
+
+func test_hoof_print_is_two_deep_lobes_split_down_the_middle() -> void:
+	assert_gt(HoofPrint.depth(-0.42, 0.2), 0.8, "left slot")
+	assert_gt(HoofPrint.depth(0.42, 0.2), 0.8, "right slot")
+	assert_lt(HoofPrint.depth(0.0, 0.2), 0.1, "the split between the toes")
+	assert_eq(HoofPrint.depth(0.0, 1.6), 0.0, "nothing past the heel")

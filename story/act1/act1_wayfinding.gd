@@ -14,6 +14,11 @@ extends Node3D
 ## The end of the cottage's deer trail (cottage_gen.gd deer_trail_points()).
 const TRAIL_END := Vector2(-205.0, 2088.0)
 const TRACK_STEP := 1.3
+## A walking doe's stride (0.5 to 0.7 m), and a print a touch larger than
+## life (~0.08 m) so it reads from Feyre's camera at 3 to 8 m (cloud shot
+## L27-6: 0.16 m read as specks past 5 m).
+const PRINT_STEP := 0.6
+const PRINT_LENGTH := 0.22
 const COTTAGE_GEN := preload("res://world/human_realm/cottage/cottage_gen.gd")
 ## Trodden snow reads by value, not by markers: a cool shadow-blue band
 ## darker than the drifts, with a deeper rut down the middle where the hooves
@@ -35,7 +40,7 @@ const SMOKE_SPOTS := [
 	Vector2(380.0, 2250.0), Vector2(415.0, 2215.0), Vector2(330.0, 2300.0), Vector2(460.0, 2320.0),
 ]
 
-var tracks: MultiMeshInstance3D
+var tracks: Node3D
 var bands: Array[MeshInstance3D] = []
 var crows: Array[Node3D] = []
 var _crow_phase: Array[float] = []
@@ -78,37 +83,25 @@ static func track_points(step: float = TRACK_STEP) -> PackedVector2Array:
 
 func _build_tracks() -> void:
 	var pts := COTTAGE_GEN.deer_trail_points()
-	pts = _resample(pts, TRACK_STEP)
-	pts.append_array(track_points())
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.15
-	mesh.bottom_radius = 0.15
-	mesh.height = 0.02
-	mesh.radial_segments = 8
-	mesh.rings = 1
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.27, 0.31, 0.44)
-	mat.roughness = 1.0
-	mesh.material = mat
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = mesh
-	mm.instance_count = pts.size() * 2
+	pts = _resample(pts, PRINT_STEP)
+	pts.append_array(_resample(track_points(), PRINT_STEP))
+	# Cloven prints as decals (HoofPrint): projected onto the ground actually
+	# drawn, so terrain LOD and snow cover never swallow them, and dark and
+	# deep enough to read from Feyre's walking camera. Pairs alternate sides,
+	# toes toward the doe.
+	tracks = Node3D.new()
+	tracks.name = "DoeTracks"
+	add_child(tracks)
 	for i in pts.size():
 		var p := pts[i]
 		var ahead := pts[mini(i + 1, pts.size() - 1)] - p if i + 1 < pts.size() else p - pts[i - 1]
 		var yaw := atan2(-ahead.x, -ahead.y)
-		var side := Vector2(ahead.y, -ahead.x).normalized() * (0.14 if i % 2 == 0 else -0.14)
-		for hoof in 2:
-			var q := p + side + ahead.normalized() * (0.09 * hoof)
-			var basis := Basis(Vector3.UP, yaw).scaled(Vector3(0.7, 1.0, 1.25))
-			var at := Vector3(q.x, WorldHeight.height_at(q.x, q.y) + 0.005, q.y)
-			mm.set_instance_transform(i * 2 + hoof, Transform3D(basis, at))
-	tracks = MultiMeshInstance3D.new()
-	tracks.name = "DoeTracks"
-	tracks.multimesh = mm
-	tracks.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(tracks)
+		# A walking doe: one print per step, left and right of her line.
+		var q := p + Vector2(ahead.y, -ahead.x).normalized() * (0.1 if i % 2 == 0 else -0.1)
+		var d := HoofPrint.make(PRINT_LENGTH, 30.0)
+		d.position = Vector3(q.x, WorldHeight.height_at(q.x, q.y), q.y)
+		d.rotation.y = yaw
+		tracks.add_child(d)
 
 
 ## A soft-edged ribbon of trodden snow along `line` (world XZ), following the
