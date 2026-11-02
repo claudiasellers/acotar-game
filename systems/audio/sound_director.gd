@@ -106,6 +106,23 @@ static func cue(cue_id: StringName, at: Vector3 = Vector3.INF) -> void:
 		current.play(cue_id, at)
 
 
+## Fade out every play of a cue still sounding (a skipped film's score).
+static func stop_cue(cue_id: StringName, seconds: float = 1.0) -> void:
+	if current:
+		current.stop(cue_id, seconds)
+
+
+func stop(cue_id: StringName, seconds: float = 1.0) -> void:
+	for p: Node in get_children():
+		if p.get_meta(&"bed", false):
+			continue
+		if p.get_meta(&"cue", &"") == cue_id and (p is AudioStreamPlayer or p is AudioStreamPlayer3D):
+			p.set_meta(&"cue", &"")
+			var t := create_tween()
+			t.tween_property(p, ^"volume_db", SILENT_DB, maxf(seconds, 0.01))
+			t.tween_callback(p.queue_free)
+
+
 ## Play a cue once: positional at `at`, or flat when `at` is INF.
 func play(cue_id: StringName, at: Vector3 = Vector3.INF, volume_offset_db: float = 0.0) -> Node:
 	var c := bank.cue(cue_id) if bank else null
@@ -130,6 +147,7 @@ func play(cue_id: StringName, at: Vector3 = Vector3.INF, volume_offset_db: float
 		player = spot
 	if c.music:
 		player.add_to_group(GameSettings.MUSIC_GROUP)
+	player.set_meta(&"cue", cue_id)
 	player.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(player)
 	if player is AudioStreamPlayer3D:
@@ -260,6 +278,7 @@ func _apply(p: AudioStreamPlayer, level: float, offset_db: float) -> void:
 
 func _make_player(music: bool) -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
+	p.set_meta(&"bed", true)
 	if music:
 		p.add_to_group(GameSettings.MUSIC_GROUP)
 	p.volume_db = SILENT_DB
