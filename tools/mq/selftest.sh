@@ -26,7 +26,9 @@ cat > "$FAKE" <<'EOF'
 while [ "$#" -gt 0 ]; do
 	case "$1" in
 		--path) cd "$2"; shift 2 ;;
-		--import) exit 0 ;;
+		--import) mkdir -p .godot
+			grep -rh '^class_name ' --include='*.gd' . 2>/dev/null | sed 's/^class_name \([A-Za-z0-9_]*\).*/"class": \&"\1"/' > .godot/global_script_class_cache.cfg
+			exit 0 ;;
 		-s) s="$2"; shift 2 ;;
 		check) t="$2"; shift 2 ;;
 		*) shift ;;
@@ -624,7 +626,9 @@ bake_repo() { # name [file-on-base]
 	cat > tools/bake.sh <<'EOF'
 #!/bin/bash
 [ -f fail_bake ] && exit 1
+[ -f parse_hang ] && { echo 'SCRIPT ERROR: Parse Error: Identifier "ManorSitePlan" not declared in the current scope.'; sleep 60; }
 mkdir -p built; echo partial > built/content; echo $$ > built/pid
+[ -f .godot/global_script_class_cache.cfg ] && echo yes > built/had_class_cache
 sleep "$(cat bake_secs)"
 cat bake_input > built/content
 EOF
@@ -772,11 +776,56 @@ case_stamp_without_output() {
 	expect "and the output is back" cmp built/content bake_input
 }
 
+case_import_before_build() {
+	bake_repo importfirst
+	echo 0 > bake_secs
+	mkdir -p lib; printf 'class_name ManorSitePlan\nextends RefCounted\n' > lib/plan.gd
+	rm -rf .godot
+	tools/mq/levels.sh ensure 2>"$ROOT/import.err"
+	expect "a tree with no class cache imports before it builds" test -f built/had_class_cache
+	expect "and says so" grep -q 'importing first' "$ROOT/import.err"
+	expect "the class is in the cache" grep -q '&"ManorSitePlan"' .godot/global_script_class_cache.cfg
+}
+
+case_stale_class_cache() {
+	bake_repo stalecache
+	echo 0 > bake_secs
+	mkdir -p lib; printf 'class_name ManorSitePlan\nextends RefCounted\n' > lib/plan.gd
+	tools/mq/levels.sh ensure 2>/dev/null
+	expect "fresh after the first import" tools/mq/class_cache.sh stale
+	# A class added after the cache was written (F47: ArrowModel).
+	printf 'class_name ArrowModel\nextends Node3D\n' > lib/arrow.gd
+	expect "a class added later makes the cache stale" not tools/mq/class_cache.sh stale
+	expect "and is named" sh -c 'tools/mq/class_cache.sh stale | grep -q "^ArrowModel (lib/arrow.gd)"'
+	mkdir -p skip; touch skip/.gdignore; printf 'class_name NotImported\n' > skip/x.gd
+	expect "a .gdignore folder's classes aren't expected" not sh -c 'tools/mq/class_cache.sh stale | grep -q NotImported'
+	echo 1 > bake_input; rm -rf built
+	tools/mq/levels.sh ensure 2>"$ROOT/stale.err"
+	expect "the next build imports first" grep -q 'importing first' "$ROOT/stale.err"
+	expect "and the new class is in the cache" grep -q '&"ArrowModel"' .godot/global_script_class_cache.cfg
+}
+
+case_parse_error_fails_fast() {
+	bake_repo parsefail
+	echo 0 > bake_secs
+	touch parse_hang
+	local t0=$SECONDS
+	tools/mq/levels.sh ensure >/dev/null 2>"$ROOT/parse.err"; local rc=$?
+	expect "a builder whose script won't parse fails the ensure" test "$rc" != 0
+	expect "at once, not at the timeout" test $((SECONDS - t0)) -lt 20
+	expect "and names the parse error" grep -q 'failed to parse' "$ROOT/parse.err"
+	expect "and the class" grep -q 'ManorSitePlan' "$ROOT/parse.err"
+	expect "nothing is stamped" test ! -f .git/mq-levels/terrain
+	perl -e 'select(undef,undef,undef,2.5)'
+	expect "and the hung builder isn't left running" not pgrep -f 'bash tools/bake.sh'
+}
+
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check script_uid miss_message stamp_without_output; do
+		build_known_red needs_nothing marker_check script_uid miss_message stamp_without_output \
+		import_before_build stale_class_cache parse_error_fails_fast; do
 	scenario "$c"
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
