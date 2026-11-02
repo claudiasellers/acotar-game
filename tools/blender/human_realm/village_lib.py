@@ -66,11 +66,23 @@ class Asset:
         self.rng = random.Random(seed)
 
     # --- colouring -------------------------------------------------------
+    # A primitive's faces are "the faces that weren't there before it": bmesh
+    # reuses freed slots, so after a bevel (which replaces faces) new faces can
+    # land anywhere in the face list, and slicing from the old length missed
+    # them. They then kept the layer's default white: every plastered wall in
+    # the village rendered white (quality audit A7).
+    def _mark(self):
+        return set(self.bm.faces)
+
+    def _new_faces(self, before):
+        self.bm.faces.ensure_lookup_table()
+        return [f for f in self.bm.faces if f not in before]
+
     def _paint(self, n0, col, snow=0.0, jitter=0.05):
         bm = self.bm
         bm.faces.ensure_lookup_table()
         bm.normal_update()
-        for f in bm.faces[n0:]:
+        for f in self._new_faces(n0):
             j = 1.0 + self.rng.uniform(-jitter, jitter)
             c = [min(1.0, x * j) for x in col]
             if snow > 0.0 and f.normal.z > 0.45:
@@ -83,7 +95,7 @@ class Asset:
         if amount <= 0.0:
             return
         self.bm.faces.ensure_lookup_table()
-        edges = {e for f in self.bm.faces[n0:] for e in f.edges}
+        edges = {e for f in self._new_faces(n0) for e in f.edges}
         bmesh.ops.bevel(self.bm, geom=list(edges), offset=amount, segments=segments,
                         affect="EDGES", profile=0.5, clamp_overlap=True)
 
@@ -94,14 +106,14 @@ class Asset:
 
     # --- primitives ------------------------------------------------------
     def box(self, size, loc, col, rot=(0, 0, 0), bevel=0.0, snow=0.0, jitter=0.05):
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         bmesh.ops.create_cube(self.bm, size=1.0, matrix=self._matrix(loc, rot, size))
         self._bevel(n0, bevel)
         self._paint(n0, col, snow, jitter)
 
     def cyl(self, r, h, loc, col, rot=(0, 0, 0), segs=10, r2=None, snow=0.0, bevel=0.0):
         """Cylinder (or cone with r2) standing on loc (base centre) along local Z."""
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         m = self._matrix(loc, rot) @ Matrix.Translation((0, 0, h * 0.5))
         bmesh.ops.create_cone(self.bm, cap_ends=True, cap_tris=False, segments=segs,
                               radius1=r, radius2=r if r2 is None else r2, depth=h, matrix=m)
@@ -109,14 +121,14 @@ class Asset:
         self._paint(n0, col, snow)
 
     def sphere(self, r, loc, col, scale=(1, 1, 1), subdiv=2, snow=0.0, rot=(0, 0, 0)):
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         bmesh.ops.create_icosphere(self.bm, subdivisions=subdiv, radius=r,
                                    matrix=self._matrix(loc, rot, scale))
         self._paint(n0, col, snow)
 
     def prism(self, profile, length, loc, col, rot=(0, 0, 0), snow=0.0, bevel=0.0):
         """Extrude a closed YZ profile (list of (y, z)) along X, centred on loc."""
-        n0 = len(self.bm.faces)
+        n0 = self._mark()
         m = self._matrix(loc, rot)
         half = length * 0.5
         left = [self.bm.verts.new(m @ Vector((-half, y, z))) for y, z in profile]
@@ -128,7 +140,7 @@ class Asset:
             j = (i + 1) % n
             self.bm.faces.new([left[i], left[j], right[j], right[i]])
         self.bm.faces.ensure_lookup_table()
-        bmesh.ops.recalc_face_normals(self.bm, faces=list(self.bm.faces)[n0:])
+        bmesh.ops.recalc_face_normals(self.bm, faces=self._new_faces(n0))
         self._bevel(n0, bevel)
         self._paint(n0, col, snow)
 
