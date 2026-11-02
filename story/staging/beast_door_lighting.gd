@@ -9,7 +9,7 @@
 ## - The hearth: the room's fire flares with the gust from the door and burns
 ##   high, a warm key on his face, Feyre and her father (the hearth's own
 ##   shadowed FireLight is turned up, not doubled).
-## - A rim on his back: a short cold light behind his head and shoulders,
+## - A rim on his back: a short cold spot behind his head and shoulders,
 ##   following him, so horns, mane and spine edge against the dark.
 ##
 ## Lights only: the grade, the camera and the beats are untouched. Everything
@@ -18,7 +18,7 @@ class_name BeastDoorLighting
 extends Node
 
 const MOON_COLOR := Color(0.68, 0.78, 1.0)
-const MOON_ENERGY := 100.0
+const MOON_ENERGY := 35.0
 const MOON_RANGE := 14.0
 const MOON_ANGLE := 30.0
 ## How far outside, and how high, the moon spot hangs from the door.
@@ -27,19 +27,28 @@ const MOON_UP := 3.4
 ## The hearth's FireLight is multiplied by this while the scene runs. The dread
 ## grade's exposure is 0.19 against the winter grade's 0.85 (x0.22) and its
 ## ambient is near black, so the fire must burn far hotter to carry the room:
-## measured in the cloud (beast_door_light_probe), x3.5 left the frame at a
-## mean luma of 2-7 of 255; this rig gives the beast 24-53 in the low, window
-## and plea shots with 50-74% of each frame still near black. The door-burst
-## shot stays a silhouette against the moonlit doorway on purpose.
-const FIRE_GAIN := 28.0
+## measured on the Mac (Forward+, beast_door_light_probe), without the back glow
+## he was 3-6 of 255; with the full rig he reads at 19-31 (eyes, horns and mane against
+## a pale moonlit wall), 58-96% of each frame stays near black, and under 1% of
+## pixels pass 235. The door-burst shot stays a silhouette on purpose.
+const FIRE_GAIN := 14.0
 ## The gust through the broken door: the fire leaps to this, then settles.
-const FIRE_FLARE := 42.0
+const FIRE_FLARE := 22.0
 const FLARE_SECONDS := 0.9
 const RIM_COLOR := Color(0.72, 0.8, 1.0)
-const RIM_ENERGY := 60.0
-const RIM_RANGE := 3.8
+const RIM_ENERGY := 30.0
+const RIM_RANGE := 3.2
+## A narrow cone aimed at his head from behind, so it never lights the wall
+## around the door (an omni there blew that wall to white on the Mac, L55-1).
+const RIM_ANGLE := 30.0
 ## Rim offset from his head: behind him (his +Z) and above.
 const RIM_BACK := 1.0
+## The moonlit glow behind him: a soft omni at the rim's spot that lights the
+## wall around the doorway, so he stands as a dark shape against it. On the
+## Mac a 60-energy omni there clipped that wall to white (L55-1); this level
+## keeps it a pale glow.
+const GLOW_ENERGY := 7.0
+const GLOW_RANGE := 5.0
 const RIM_UP := 0.7
 const FADE_IN := 0.3
 const FADE_OUT := 2.0
@@ -50,7 +59,8 @@ var gain := 1.0
 ## 0 = the room's own light, 1 = the full rig.
 var amount := 0.0
 var moon: SpotLight3D
-var rim: OmniLight3D
+var rim: SpotLight3D
+var glow: OmniLight3D
 var fire: OmniLight3D
 var _fire_base := 0.0
 var _target := 0.0
@@ -110,14 +120,24 @@ func light_up() -> void:
 	moon.global_position = from
 	moon.look_at(aim, Vector3.UP)
 	if rim == null:
-		rim = OmniLight3D.new()
+		rim = SpotLight3D.new()
 		rim.name = "BeastRim"
 		rim.light_color = RIM_COLOR
-		rim.omni_range = RIM_RANGE
-		rim.omni_attenuation = 1.4
+		rim.spot_range = RIM_RANGE
+		rim.spot_angle = RIM_ANGLE
+		rim.spot_attenuation = 1.2
 		rim.shadow_enabled = false
 		rim.light_energy = 0.0
 		parent.add_child(rim)
+	if glow == null:
+		glow = OmniLight3D.new()
+		glow.name = "BeastBackGlow"
+		glow.light_color = RIM_COLOR
+		glow.omni_range = GLOW_RANGE
+		glow.omni_attenuation = 1.0
+		glow.shadow_enabled = false
+		glow.light_energy = 0.0
+		parent.add_child(glow)
 	if fire == null:
 		fire = _hearth_light()
 		if fire != null:
@@ -151,6 +171,9 @@ func _apply() -> void:
 	if rim != null:
 		rim.light_energy = RIM_ENERGY * amount * gain
 		rim.visible = amount > 0.0
+	if glow != null:
+		glow.light_energy = GLOW_ENERGY * amount * gain
+		glow.visible = amount > 0.0
 	if fire != null and is_instance_valid(fire):
 		var k := lerpf(FIRE_GAIN, FIRE_FLARE, _flare / FLARE_SECONDS) * gain
 		_set_base(fire, _fire_base * lerpf(1.0, k, amount))
@@ -164,18 +187,23 @@ func _follow() -> void:
 	var back := beast.global_basis.z
 	back.y = 0.0
 	back = back.normalized() if back.length() > 0.01 else Vector3.BACK
-	rim.global_position = _head(beast) + back * RIM_BACK + Vector3.UP * RIM_UP
+	var head := _head(beast)
+	rim.global_position = head + back * RIM_BACK + Vector3.UP * RIM_UP
+	rim.look_at(head, Vector3.UP)
+	if glow != null:
+		glow.global_position = rim.global_position
 
 
 func _restore() -> void:
 	if fire != null and is_instance_valid(fire):
 		_set_base(fire, _fire_base)
 	fire = null
-	for l: Light3D in [moon, rim]:
+	for l: Light3D in [moon, rim, glow]:
 		if l != null and is_instance_valid(l):
 			l.queue_free()
 	moon = null
 	rim = null
+	glow = null
 
 
 ## The fire_flicker script flickers around its own _base; plain lights take

@@ -53,6 +53,7 @@ func before_each() -> void:
 func test_nothing_lights_before_the_door_breaks() -> void:
 	assert_null(_rig.moon)
 	assert_null(_rig.rim)
+	assert_null(_rig.glow)
 	assert_almost_eq(_fire.light_energy, 1.8, 0.001)
 
 
@@ -80,9 +81,9 @@ func test_the_door_breaks_into_moon_fire_and_rim() -> void:
 	_beast.global_position += Vector3(1.0, 0, 1.0)
 	await wait_process_frames(2)
 	assert_almost_eq(rim.global_position.x, _beast.global_position.x, 0.01, "follows him")
-	# At most three lights touched, two of them shadowed (the moon and the hearth's own).
+	# Four lights, two of them shadowed (the moon and the hearth's own).
 	var added := _space.find_children("*", "Light3D", true, false).size()
-	assert_eq(added, 3, "fire + moon + rim")
+	assert_eq(added, 4, "fire + moon + rim + back glow")
 
 
 func test_the_gust_flares_the_fire_first() -> void:
@@ -99,6 +100,7 @@ func test_the_room_gets_its_own_light_back_after() -> void:
 	assert_eq(_rig.amount, 0.0)
 	assert_null(_rig.moon)
 	assert_null(_rig.rim)
+	assert_null(_rig.glow)
 	assert_almost_eq(_fire.light_energy, 1.8, 0.001)
 	assert_almost_eq(_fire._base, 1.8, 0.001)
 	assert_eq(_space.find_children("*", "Light3D", true, false).size(), 1, "only the hearth")
