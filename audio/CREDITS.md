@@ -15,6 +15,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/amb/wall_seam.ogg | The Wall: wind thins out, low pressure hum, glassy shimmer | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/amb/winter_wood.ogg | Winter hunting forest: gusting wind, whistles, sifting snow, creaking trees, a distant crow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/cottage.ogg | Music, cottage: D minor, piano and pad | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/music/opening_film.ogg | Opening film score 'Once' (3:05): lullaby, beauty, war, the Wall, hearth, title swell | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/spring_estate.ogg | Music, spring estate (from Act II): harp waltz in E lydian | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/village.ogg | Music, village: A dorian lute and drone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/music/winter_forest.ogg | Music, winter forest: drone and sparse cold bells | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

@@ -21,6 +21,9 @@ const INTERIOR_SPACE := &"cottage_interior"
 const INTERIOR_ANCHOR := &"act1_cottage_interior"
 ## Same cue within this window plays once (two systems announcing one event).
 const ONCE_WINDOW_MS := 1500
+## Voice files the dialogue lane plays (systems/dialogue): res://audio/voice/<line_id>.ogg.
+const VOICE_PATH := "res://audio/voice/%s.ogg"
+const VOICE_DUCK_DB := -7.0
 
 ## The live director, for SoundDirector.cue() calls from other lanes.
 static var current: SoundDirector = null
@@ -56,6 +59,14 @@ var _suriel: Node3D
 ## Naga in the tree; their creature_id is the actor id (naga, naga_2...).
 var _naga: Array = []
 var _once_ms: Dictionary = {}
+## 0..1 while a voiced line plays: the bed and music step back for it.
+var voice_duck: float = 0.0
+## 0..1 while a film (scene space id `film_*`) runs: the film carries its own
+## score, so space music falls silent and beds sit at half.
+var film_hold: float = 0.0
+var _films: Dictionary = {}
+var _film_tween: Tween
+var _voice_tween: Tween
 var _interior: Node3D
 
 
@@ -81,8 +92,8 @@ func _ready() -> void:
 	EventBus.creature_killed.connect(_on_creature_killed)
 	EventBus.celebration_requested.connect(_on_celebration)
 	EventBus.journal_entry_added.connect(_on_journal_entry)
-	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _story_spaces += 1)
-	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _story_spaces = maxi(_story_spaces - 1, 0))
+	EventBus.scene_space_started.connect(_on_space_started)
+	EventBus.scene_space_finished.connect(_on_space_finished)
 	get_tree().node_added.connect(_on_node_added)
 	for node in get_tree().root.find_children("*", "", true, false):
 		_on_node_added(node)
@@ -98,6 +109,23 @@ func _exit_tree() -> void:
 static func cue(cue_id: StringName, at: Vector3 = Vector3.INF) -> void:
 	if current:
 		current.play(cue_id, at)
+
+
+## Fade out every play of a cue still sounding (a skipped film's score).
+static func stop_cue(cue_id: StringName, seconds: float = 1.0) -> void:
+	if current:
+		current.stop(cue_id, seconds)
+
+
+func stop(cue_id: StringName, seconds: float = 1.0) -> void:
+	for p: Node in get_children():
+		if p.get_meta(&"bed", false):
+			continue
+		if p.get_meta(&"cue", &"") == cue_id and (p is AudioStreamPlayer or p is AudioStreamPlayer3D):
+			p.set_meta(&"cue", &"")
+			var t := create_tween()
+			t.tween_property(p, ^"volume_db", SILENT_DB, maxf(seconds, 0.01))
+			t.tween_callback(p.queue_free)
 
 
 ## Play a cue once: positional at `at`, or flat when `at` is INF.
@@ -124,6 +152,7 @@ func play(cue_id: StringName, at: Vector3 = Vector3.INF, volume_offset_db: float
 		player = spot
 	if c.music:
 		player.add_to_group(GameSettings.MUSIC_GROUP)
+	player.set_meta(&"cue", cue_id)
 	player.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(player)
 	if player is AudioStreamPlayer3D:
@@ -239,10 +268,13 @@ func _mix() -> void:
 	var calm := 1.0 - dread
 	var wall_keep := 1.0 - 0.9 * wall
 	var paused_db := -6.0 if get_tree().paused else 0.0
+	var voice_db := VOICE_DUCK_DB * voice_duck
+	var film_bed := 1.0 - 0.5 * film_hold
+	var film_music := 1.0 - film_hold
 	for p in _beds:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep, paused_db)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * wall_keep * film_bed, paused_db + voice_db)
 	for p in _music:
-		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep, 0.0)
+		_apply(p, float(p.get_meta(&"level", 0.0)) * calm * calm * wall_keep * film_music, voice_db * 1.5)
 	_apply(_dread_bed, dread, 0.0)
 
 
@@ -253,6 +285,7 @@ func _apply(p: AudioStreamPlayer, level: float, offset_db: float) -> void:
 
 func _make_player(music: bool) -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
+	p.set_meta(&"bed", true)
 	if music:
 		p.add_to_group(GameSettings.MUSIC_GROUP)
 	p.volume_db = SILENT_DB
@@ -284,6 +317,26 @@ func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	_set_dread(target, seconds)
 	if target < 0.3:
 		_stop_loop(&"beast_heartbeat", 3.0)
+
+
+func _on_space_started(space_id: StringName) -> void:
+	_story_spaces += 1
+	if String(space_id).begins_with("film_"):
+		_films[space_id] = true
+		_tween_film(1.0)
+
+
+func _on_space_finished(space_id: StringName) -> void:
+	_story_spaces = maxi(_story_spaces - 1, 0)
+	if _films.erase(space_id) and _films.is_empty():
+		_tween_film(0.0)
+
+
+func _tween_film(target: float) -> void:
+	if _film_tween:
+		_film_tween.kill()
+	_film_tween = create_tween()
+	_film_tween.tween_property(self, ^"film_hold", target, 1.5 if target > 0.0 else 3.0)
 
 
 func _set_dread(target: float, seconds: float) -> void:
@@ -404,6 +457,8 @@ func _on_node_added(node: Node) -> void:
 		puca.darted.connect(func() -> void: play(&"puca_dart", puca.global_position))
 	elif node is DreadField:
 		(node as DreadField).wrong_sound.connect(func(at: Vector3) -> void: play_once(&"horror_wrong", at))
+	elif node.is_in_group(&"dialogue_director") or node.has_signal(&"line_spoken"):
+		_attach_dialogue.call_deferred(node)
 	elif node is WolfPack:
 		var pack := node as WolfPack
 		pack.target_acquired.connect(func(_t: Node3D) -> void: play(&"wolf_pack_growl", pack.global_position))
@@ -500,6 +555,31 @@ func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, 
 		play(&"wolf_death", at)
 	elif kind == &"naga":
 		play(&"naga_death", at)
+
+
+## The dialogue lane plays voice files itself; this only ducks the bed and
+## music under a line that has a file (systems/dialogue line_spoken).
+func _attach_dialogue(node: Node) -> void:
+	if is_instance_valid(node) and node.has_signal(&"line_spoken") \
+			and not node.is_connected(&"line_spoken", _on_line_spoken):
+		node.connect(&"line_spoken", _on_line_spoken)
+
+
+func _on_line_spoken(line_id: StringName, _speaker: StringName, _text: String, _at: Vector3, _inner: bool) -> void:
+	var path := VOICE_PATH % line_id
+	if not ResourceLoader.exists(path):
+		return
+	var stream := load(path) as AudioStream
+	duck_for_voice(stream.get_length() if stream else 2.0)
+
+
+func duck_for_voice(seconds: float) -> void:
+	if _voice_tween:
+		_voice_tween.kill()
+	_voice_tween = create_tween()
+	_voice_tween.tween_property(self, ^"voice_duck", 1.0, 0.25)
+	_voice_tween.tween_interval(maxf(seconds - 0.25, 0.0))
+	_voice_tween.tween_property(self, ^"voice_duck", 0.0, 0.8)
 
 
 ## The Suriel answers each question aloud (ids `fact.suriel_<id>`).

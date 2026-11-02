@@ -35,6 +35,11 @@ signal story_item_granted(item_id: StringName, count: int)
 signal story_spawn_requested(spawn_id: StringName, where: Transform3D)
 ## Story: a staging cue for an actor or group ("family", "gather").
 signal story_actor_cue(actor: StringName, cue: StringName)
+## Story/dialogue to faces: hold an expression on an actor for `seconds`
+## (0 = until the next request), intensity 0..1 (docs/contracts/faces.md).
+signal face_requested(actor: StringName, expression: StringName, intensity: float, seconds: float)
+## A line was spoken aloud (lip movement and its emotion), lasting `seconds`.
+signal line_spoken(actor: StringName, text: String, emotion: StringName, seconds: float)
 ## Story: an anchored scene space began or ended.
 signal scene_space_started(space_id: StringName)
 signal scene_space_finished(space_id: StringName)
