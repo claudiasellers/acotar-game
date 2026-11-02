@@ -29,13 +29,13 @@ minimap or in the world.
   `ATTEMPTS[k]` failed tries (1/2/4), whichever comes first.
 - A failed try: a `fail_flags` flag rising, or the same scene space starting
   again while the step is open (`EventBus.scene_space_started`).
-- Unlocked hints show only when the player asks (E / Enter / pad A / "Think on it").
+- Unlocked hints show only when the player asks (E / Enter / pad A / the "Think on it" tab).
 
 ## Reads, never writes
 WorldState.has_flag, PhaseManager.current_phase, EventBus.flag_changed and
-scene_space_started. It sets no flags and emits no story signals.
+scene_space_started. It sets no flags and emits no story signals. Hint state saves through SaveSystem as provider "story_journal".
 
 ## Look
 SatchelTheme.theme() only (L13 theme + L50 crafted layer): SatchelDetail paper
 pages, SatchelKey leather cover and key caps, SatchelTab button, Satchel*
-label variations, Satchel colours for the ink sketches and spiral binding.
+label variations, Satchel colours for the charcoal sketches, the sewn spine (JournalSpine) and the tie (JournalTie).

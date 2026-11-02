@@ -5,7 +5,7 @@ extends GutTest
 
 const BOOK := "res://data/journal/story_journal.tres"
 const PHASES := "res://data/phases/spring_court_phases.tres"
-const PANEL_SCRIPTS := ["res://ui/journal/story_journal.gd", "res://ui/journal/journal_sketch.gd", "res://ui/journal/journal_spine.gd"]
+const PANEL_SCRIPTS := ["res://ui/journal/story_journal.gd", "res://ui/journal/journal_sketch.gd", "res://ui/journal/journal_spine.gd", "res://ui/journal/journal_tie.gd"]
 ## Names she can't know before the phase she meets or learns them in.
 const NAMES := {
 	"tamlin": 2, "lucien": 2, "alis": 2, "high lord": 2, "andras": 2,
@@ -135,15 +135,27 @@ func test_panel_opens_reveals_on_ask_and_closes() -> void:
 
 
 func test_look_comes_only_from_satchel_theme() -> void:
-	var colour := RegEx.create_from_string("Color\\(|Color8\\(|\\.ttf|\\.otf|PauseStyle\\.(PLUM|ROSE|GOLD|PEARL|BLUSH)")
+	# A literal colour (Color(0.5, ...), Color8, a hex string) or a font file is a miss;
+	# tinting a theme colour (Color(ink, 0.4)) is fine.
+	var bad := RegEx.create_from_string("Color\\(\\s*[0-9.]|Color8\\(|Color\\(\\s*\"|\\.ttf|\\.otf|PauseStyle\\.(PLUM|ROSE|GOLD|PEARL|BLUSH|LILAC)")
 	for path: String in PANEL_SCRIPTS:
-		var src := FileAccess.get_file_as_string(path)
 		var hits := []
-		for line in src.split("\n"):
-			if line.strip_edges().begins_with("#"):
-				continue
-			if colour.search(line) and not line.contains("Color(ink") and not line.contains("Color(tint") \
-					and not line.contains("Color(hole") and not line.contains("Color(shine") \
-					and not line.contains("Color(SatchelTheme"):
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
 		assert_eq(hits, [], "%s names its own colour or font" % path)
+
+
+func test_hint_state_saves_and_loads() -> void:
+	var j := StoryJournal.new(_book())
+	j.phase_getter = func() -> StringName: return &"p2_grounds"
+	j.has_flag = _has
+	add_child_autofree(j)
+	j.ladder.tick(&"bathe", 75.0)
+	j.ladder.reveal(&"bathe", 2)
+	var saved := j.save_state()
+	var k := StoryJournal.new(_book())
+	add_child_autofree(k)
+	k.load_state(saved)
+	assert_eq(k.ladder.shown(&"bathe"), 1)
+	assert_true(SaveSystem.snapshot().get("providers", {}).has(StoryJournal.SAVE_KEY), "registered with SaveSystem")

@@ -231,7 +231,7 @@ require_flags = PackedStringArray("summer_faerie_comforted")
 after = "Tamlin wants to show me something."
 hints = PackedStringArray("Join them at the purple blanket in the glen.", "Follow him down past the stream to the clearing.", "At the hollow's rim, wade or jump into the water.")
 memory = "A pool full of starlight. I swam in it."
-sketch = &"star"
+sketch = &"wave"
 canon = "A"
 
 [sub_resource type="Resource" id="e_gallery"]
@@ -360,7 +360,7 @@ require_flags = PackedStringArray("fountain_head_found")
 after = "Midsummer. The whole court's in ribbons."
 hints = PackedStringArray("Alis will want to dress me for it.", "Dress for the Solstice and go out to the dancing.")
 memory = "We danced until sunrise among the will-o'-the-wisps."
-sketch = &"star"
+sketch = &"sun"
 canon = "A"
 
 [sub_resource type="Resource" id="e_visitor"]

@@ -208,9 +208,9 @@ SKETCH = {
     "hunt": "bow", "shoot": "bow", "skin": "tree", "sell": "coin", "home": "house", "ride": "moon",
     "arrive": "door", "bathe": "wave", "dinner": "flame", "curtain_trap": "moon", "bogge": "tree",
     "puca": "moon", "map": "door", "wound": "flame", "mural": "brush", "suriel": "tree",
-    "naga": "wave", "summer_faerie": "feather", "starlight": "star", "gallery": "brush",
+    "naga": "wave", "summer_faerie": "feather", "starlight": "wave", "gallery": "brush",
     "first_painting": "brush", "attor": "rose", "fires": "flame", "cave": "flame", "bruise": "rose",
-    "paintings": "brush", "glen": "tree", "fountain": "wave", "solstice": "star", "visitor": "mask",
+    "paintings": "brush", "glen": "tree", "fountain": "wave", "solstice": "sun", "visitor": "mask",
     "farewell": "moon", "nesta": "house", "beddor": "flame", "recross": "moon", "alis": "door",
     "depart": "mountain",
 }

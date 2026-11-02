@@ -24,8 +24,9 @@ const BOOK_PATH := "res://data/journal/story_journal.tres"
 const GROUP := &"story_journal"
 const ACTION_OPEN := &"journal_open"
 const PAGE := Vector2(660, 800)
-const SPINE := 64.0
+const SPINE := 6.0
 const MAX_MEMORIES := 6
+const SAVE_KEY := "story_journal"
 
 var book: JournalBook
 var ladder := HintLadder.new()
@@ -80,6 +81,27 @@ func _ready() -> void:
 	if bus:
 		bus.connect(&"flag_changed", _on_flag_changed)
 		bus.connect(&"scene_space_started", _on_space_started)
+	var saves := Gameplay.autoload(&"SaveSystem")
+	if saves:
+		saves.call(&"register_provider", SAVE_KEY, self)
+
+
+func _exit_tree() -> void:
+	var saves := Gameplay.autoload(&"SaveSystem")
+	if saves:
+		saves.call(&"unregister_provider", SAVE_KEY)
+
+
+## SaveSystem provider: which hints she has earned and seen, per step.
+func save_state() -> Dictionary:
+	return {"ladder": ladder.to_dict(), "spaces": _spaces_seen.keys()}
+
+
+func load_state(data: Dictionary) -> void:
+	ladder.from_dict(data.get("ladder", {}))
+	_spaces_seen.clear()
+	for k in data.get("spaces", []):
+		_spaces_seen[String(k)] = true
 
 
 ## Opens the sketchbook in whatever scene is running, adding one if the scene
@@ -249,7 +271,7 @@ func _fill_right() -> void:
 		c.queue_free()
 	if entry == null:
 		_after.text = "Nothing presses on me right now. I could just breathe, for once."
-		_after_sketch.set_motif(&"star")
+		_after_sketch.set_motif(&"sun")
 		_hints_head.visible = false
 		_think.visible = false
 		_status.text = ""
@@ -336,9 +358,13 @@ func _build() -> void:
 	_left = _page(Vector2.ZERO, -0.5)
 	_right = _page(Vector2(PAGE.x + SPINE, 0), 0.5)
 	var spine := JournalSpine.new()
-	spine.position = Vector2(PAGE.x - 18.0, 0)
-	spine.size = Vector2(SPINE + 36.0, PAGE.y)
+	spine.position = Vector2(PAGE.x - JournalSpine.SHADE, 0)
+	spine.size = Vector2(SPINE + JournalSpine.SHADE * 2.0, PAGE.y)
 	_book_box.add_child(spine)
+	var tie := JournalTie.new()
+	tie.position = Vector2(_book_box.size.x - 4.0, PAGE.y * 0.5 - 92.0)
+	tie.size = tie.custom_minimum_size
+	_book_box.add_child(tie)
 
 	var lc := _column(_left)
 	lc.add_child(_label("Feyre's sketchbook", &"SatchelSmall"))
@@ -447,7 +473,7 @@ func _build_prompts(parent: Control) -> void:
 	var prompts := HBoxContainer.new()
 	prompts.add_theme_constant_override(&"separation", 22)
 	parent.add_child(prompts)
-	for p in [["E", "Think on it"], ["L", "Close"], ["Esc", "Back"]]:
+	for p in [["L", "Close"], ["Esc", "Back"]]:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override(&"separation", 8)
 		var glyph := PanelContainer.new()
