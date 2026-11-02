@@ -79,13 +79,13 @@ static func button(text: String, toggle: bool = false) -> Button:
 	return b
 
 
-## A colour swatch: a round enamel with an ivory rim; worn ones get a gilt rim.
+## A colour swatch: a round enamel with a faint gilt rim; worn ones get a strong one.
 static func swatch(colour: Color, hot: bool, worn: bool) -> StyleBoxFlat:
 	var b := StyleBoxFlat.new()
 	b.bg_color = colour
 	b.set_corner_radius_all(32)
 	b.set_border_width_all(3 if worn else 2)
-	b.border_color = GILT_DEEP if worn else (GILT if hot else IVORY)
+	b.border_color = GILT_DEEP if worn else (GILT if hot else Color(GILT, 0.45))
 	if worn:
 		b.set_expand_margin_all(3)
 	b.anti_aliasing = true

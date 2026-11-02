@@ -416,7 +416,7 @@ func _card(fam: Dictionary) -> Control:
 	col.add_theme_constant_override(&"separation", 4)
 	card.add_child(col)
 	col.add_child(DressingStyle.label(fam["name"], 19))
-	var about := DressingStyle.label(variants[0].description, 14, true, DressingStyle.INK_SOFT)
+	var about := DressingStyle.label(variants[0].description, 15, true, DressingStyle.INK_SOFT)
 	about.custom_minimum_size = Vector2(0, 34)
 	col.add_child(about)
 	var swatches := HFlowContainer.new()
@@ -436,6 +436,7 @@ func _card(fam: Dictionary) -> Control:
 func _swatch_button(color: Color, tip: String) -> Button:
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(30, 30)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	b.tooltip_text = tip
 	b.focus_mode = Control.FOCUS_ALL
 	for state in ["normal", "hover", "pressed", "focus"]:

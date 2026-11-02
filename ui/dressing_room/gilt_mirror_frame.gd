@@ -12,25 +12,28 @@ func _init() -> void:
 
 func _draw() -> void:
 	# Mouldings from the outside in: a dark edge, the broad gilt band, a bright bead.
-	_arch(0.0, DressingStyle.GILT_DEEP, 2.0)
-	_arch(5.0, DressingStyle.GILT, 6.0)
-	_arch(10.0, DressingStyle.GILT_LIGHT, 1.5)
-	_arch(15.0, Color(DressingStyle.GILT_DEEP, 0.7), 1.0)
-	_crest(Vector2(size.x * 0.5, 2.0))
+	_arch(0.0, DressingStyle.GILT_DEEP, 3.0)
+	_arch(5.0, DressingStyle.GILT, 7.0)
+	_arch(9.0, DressingStyle.GILT_LIGHT, 2.0)
+	_arch(13.0, DressingStyle.GILT_DEEP, 1.5)
+	_arch(19.0, DressingStyle.GILT, 3.0)
+	_arch(23.0, Color(DressingStyle.GILT_DEEP, 0.6), 1.0)
+	_crest(Vector2(size.x * 0.5, 4.0))
 	for x: float in [size.x * 0.5 - 42.0, size.x * 0.5 + 42.0]:
 		draw_circle(Vector2(x, size.y - 2.0), 4.0, DressingStyle.GILT, true, -1.0, true)
 
 
 ## A round-topped outline inset by `inset`, as one closed polyline.
 func _arch(inset: float, colour: Color, width: float) -> void:
-	var w := size.x - inset * 2.0
-	var radius := w * 0.5
-	var centre := Vector2(size.x * 0.5, inset + radius)
+	# An elliptical crown, so a wide frame still reads as a tall mirror.
+	var rx := size.x * 0.5 - inset
+	var ry := minf(size.x * 0.5, size.y * 0.3) - inset
+	var centre := Vector2(size.x * 0.5, inset + ry)
 	var pts := PackedVector2Array()
 	pts.append(Vector2(inset, size.y - inset))
 	for i in ARCH_SEGMENTS + 1:
 		var a := PI + PI * float(i) / ARCH_SEGMENTS
-		pts.append(centre + Vector2(cos(a), sin(a)) * radius)
+		pts.append(centre + Vector2(cos(a) * rx, sin(a) * ry))
 	pts.append(Vector2(size.x - inset, size.y - inset))
 	pts.append(Vector2(inset, size.y - inset))
 	draw_polyline(pts, colour, width, true)
