@@ -1,0 +1,4 @@
+from dialogue L34-4 wolf hunt guidance
+quality look
+timeout 900
+shot wolf res://tools/playtest/wolf_hunt_clip.tscn -- --out={out}/report.json
