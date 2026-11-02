@@ -1,0 +1,872 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"v_market"
+speaker = &"feyre"
+who = ""
+text = "Market day. Everyone watching everyone else's purse."
+canon = "X"
+trigger = 0
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("pelt_sold")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"v_silver"
+speaker = &"feyre"
+who = ""
+text = "Silver in my pocket. Just once, I could buy something that isn't food."
+canon = "X"
+trigger = 0
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("pelt_sold")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"v_return"
+speaker = &"feyre"
+who = ""
+text = "They don't know me in this dress. Good."
+canon = "X"
+trigger = 0
+where = &"village"
+deed = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"A1_07_blessed_greeting"
+speaker = &"blessed"
+who = "Child of the Blessed"
+text = "May the Immortal Light shine upon thee, sisters."
+canon = "V"
+trigger = 2
+where = &"village_square"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 5
+inner = false
+follow_up = &""
+delivery = "serene, sing-song, over silver bells"
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"v_tavern"
+speaker = &"feyre"
+who = ""
+text = "Ale and wet wool. I'd trade a pelt for an hour by that fire."
+canon = "X"
+trigger = 2
+where = &"tavern"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"v_notices"
+speaker = &"feyre"
+who = ""
+text = "Notices I can't read. Bounties, probably. Or more rules about faeries."
+canon = "A"
+trigger = 2
+where = &"notice_board"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"v_pillory"
+speaker = &"feyre"
+who = ""
+text = "Someone stood there all last week for stealing bread. I remember thinking: careless."
+canon = "X"
+trigger = 2
+where = &"pillory"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"v_mill"
+speaker = &"feyre"
+who = ""
+text = "The mill wheel's frozen solid. No grinding till spring."
+canon = "X"
+trigger = 2
+where = &"mill"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"v_debt"
+speaker = &"feyre"
+who = ""
+text = "That house owes half the village. The shutters haven't opened since autumn."
+canon = "X"
+trigger = 2
+where = &"debt_house"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"v_barn"
+speaker = &"feyre"
+who = ""
+text = "Nobody's kept animals in that barn since the fever winter."
+canon = "X"
+trigger = 2
+where = &"abandoned_barn"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"v_hall"
+speaker = &"feyre"
+who = ""
+text = "Where they read the Treaty out every year. As if any of us could forget it."
+canon = "X"
+trigger = 2
+where = &"meeting_hall"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"v_gold"
+speaker = &"feyre"
+who = ""
+text = "Gold for the poorest doors first. It won't fix anything. It'll fix this winter."
+canon = "A"
+trigger = 2
+where = &"debt_house"
+deed = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"vil_wall"
+speaker = &"villager"
+who = ""
+text = "My cousin swears she heard something at the Wall. Not a wolf. Worse."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"vil_hunter"
+speaker = &"villager"
+who = ""
+text = "You're the Archeron girl. The hunter. Seen you dragging deer up that road."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"vil_blessed"
+speaker = &"villager"
+who = ""
+text = "The Blessed again, telling folk the faeries are holy. Holy!"
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"vil_iron"
+speaker = &"villager"
+who = ""
+text = "Iron over every doorframe. I don't care what the Blessed say."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"vil_copper"
+speaker = &"villager"
+who = ""
+text = "Spare a copper? No? Didn't think so."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"vil_winter"
+speaker = &"villager"
+who = ""
+text = "Worst winter in years. The ground's like iron."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("1")
+id = &"vil_rich"
+speaker = &"villager"
+who = ""
+text = "Is that the youngest Archeron? You look like a lady now."
+canon = "X"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("1")
+id = &"vil_aunt"
+speaker = &"villager"
+who = ""
+text = "An aunt left you a fortune, they say. Lucky. Some of us got nothing."
+canon = "A"
+trigger = 3
+where = &"village"
+deed = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("1")
+id = &"elder_slaves"
+speaker = &"human_elder"
+who = ""
+text = "Before the Treaty, my grandmother's grandmother served them. Don't you forget it."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L21"]
+script = ExtResource("1")
+id = &"elder_ships"
+speaker = &"human_elder"
+who = ""
+text = "I remember your father's ships coming in. Whole town turned out."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L22"]
+script = ExtResource("1")
+id = &"elder_bones"
+speaker = &"human_elder"
+who = ""
+text = "Snow by nightfall. My bones never lie."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L23"]
+script = ExtResource("1")
+id = &"youth_isaac"
+speaker = &"human_youth"
+who = ""
+text = "Isaac Hale's been asking after you."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L24"]
+script = ExtResource("1")
+id = &"youth_vane"
+speaker = &"human_youth"
+who = ""
+text = "Bet you couldn't hit the weathervane from here."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L25"]
+script = ExtResource("1")
+id = &"woman_tomas"
+speaker = &"human_woman"
+who = ""
+text = "The Mandray boy's sweet on your sister. Everyone knows it."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L26"]
+script = ExtResource("1")
+id = &"woman_eggs"
+speaker = &"human_woman"
+who = ""
+text = "Fresh eggs, if you've the coin. You haven't, have you."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L27"]
+script = ExtResource("1")
+id = &"man_ice"
+speaker = &"human_man"
+who = ""
+text = "Mind the ice by the well. Old Rowan broke his hip on it."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L28"]
+script = ExtResource("1")
+id = &"man_wolves"
+speaker = &"human_man"
+who = ""
+text = "Wolves are bold this year. Took a calf off a farm east of here."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L29"]
+script = ExtResource("1")
+id = &"blessed_home"
+speaker = &"blessed"
+who = ""
+text = "One day they will carry us across the Wall, sister, and we will be home."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L30"]
+script = ExtResource("1")
+id = &"blessed_bells"
+speaker = &"blessed"
+who = ""
+text = "Do you hear the bells? Each one is a prayer that they come for us."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L31"]
+script = ExtResource("1")
+id = &"peddler_ash"
+speaker = &"peddler"
+who = ""
+text = "Ash, cut at the border. The one wood they fear, so the stories go."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "low, a salesman's secret"
+emotion = &"smirk"
+
+[sub_resource type="Resource" id="L32"]
+script = ExtResource("1")
+id = &"peddler_border"
+speaker = &"peddler"
+who = ""
+text = "Border towns are emptying. Folk say things come over the Wall at night."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L33"]
+script = ExtResource("1")
+id = &"peddler_trinkets"
+speaker = &"peddler"
+who = ""
+text = "Ribbons, needles, a mirror that only lies a little. For you, a bargain."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L34"]
+script = ExtResource("1")
+id = &"d_pelt_sold"
+speaker = &"feyre"
+who = ""
+text = "She paid more than it was worth. Someone did the same for her once, she said."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"pelt_sold"
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, just after the deed"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="P0"]
+script = ExtResource("2")
+id = &"village_square"
+region = &"village"
+at = Vector2(380.0, 2250.0)
+radius = 16.0
+
+[sub_resource type="Resource" id="P1"]
+script = ExtResource("2")
+id = &"tavern"
+region = &"village"
+at = Vector2(415.0, 2215.0)
+radius = 10.0
+
+[sub_resource type="Resource" id="P2"]
+script = ExtResource("2")
+id = &"notice_board"
+region = &"village"
+at = Vector2(383.6, 2236.5)
+radius = 5.0
+
+[sub_resource type="Resource" id="P3"]
+script = ExtResource("2")
+id = &"pillory"
+region = &"village"
+at = Vector2(377.0, 2233.3)
+radius = 5.0
+
+[sub_resource type="Resource" id="P4"]
+script = ExtResource("2")
+id = &"mill"
+region = &"village"
+at = Vector2(560.0, 2420.0)
+radius = 16.0
+
+[sub_resource type="Resource" id="P5"]
+script = ExtResource("2")
+id = &"debt_house"
+region = &"village"
+at = Vector2(460.0, 2320.0)
+radius = 10.0
+
+[sub_resource type="Resource" id="P6"]
+script = ExtResource("2")
+id = &"abandoned_barn"
+region = &"village"
+at = Vector2(600.0, 2150.0)
+radius = 16.0
+
+[sub_resource type="Resource" id="P7"]
+script = ExtResource("2")
+id = &"meeting_hall"
+region = &"village"
+at = Vector2(330.0, 2300.0)
+radius = 12.0
+
+[resource]
+script = ExtResource("3")
+area = &"village"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32"), SubResource("L33"), SubResource("L34")])
+places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6"), SubResource("P7")])

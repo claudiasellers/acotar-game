@@ -1,0 +1,299 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"hf_snow"
+speaker = &"feyre"
+who = ""
+text = "The snow's already covering the blood. Good."
+canon = "X"
+trigger = 0
+where = &"hunting_forest"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("wolf_killed")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"hf_oak"
+speaker = &"feyre"
+who = ""
+text = "My oak. I've waited out half a winter in those branches."
+canon = "X"
+trigger = 2
+where = &"waiting_oak"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("wolf_killed")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"hf_ash"
+speaker = &"feyre"
+who = ""
+text = "Ash trees. If the stories are true, this is all they fear."
+canon = "A"
+trigger = 2
+where = &"ash_grove"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"hf_lodge"
+speaker = &"feyre"
+who = ""
+text = "The old lords hunted here for sport. Sport."
+canon = "X"
+trigger = 2
+where = &"hunting_lodge"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"ws_enter"
+speaker = &"feyre"
+who = ""
+text = "The old estate. I don't come here. I don't know why I came."
+canon = "X"
+trigger = 0
+where = &"workshop"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"ws_glass"
+speaker = &"feyre"
+who = ""
+text = "Our house had glass windows once. I used to count the colours in them."
+canon = "X"
+trigger = 2
+where = &"lost_estate"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"ws_shed"
+speaker = &"feyre"
+who = ""
+text = "Father's workshop. He hasn't carved anything bigger than a bird in eight years."
+canon = "X"
+trigger = 2
+where = &"fathers_workshop"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"ws_return"
+speaker = &"feyre"
+who = ""
+text = "Nothing left to come back for here. I came anyway."
+canon = "X"
+trigger = 0
+where = &"workshop"
+deed = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"wall_breath"
+speaker = &"feyre"
+who = ""
+text = "The Wall. You can't see it. You feel it, like a held breath."
+canon = "X"
+trigger = 0
+where = &"wall_seam"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"wall_hush"
+speaker = &"feyre"
+who = ""
+text = "Even the crows go quiet this close. They know better than we do."
+canon = "X"
+trigger = 0
+where = &"wall_seam"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray("wolf_killed")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 1
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"wall_back"
+speaker = &"feyre"
+who = ""
+text = "The Wall again. This time I'm the one choosing."
+canon = "X"
+trigger = 0
+where = &"wall_seam"
+deed = &""
+phases = PackedStringArray("p7_return_home", "p8_the_pass")
+require_flags = PackedStringArray("beddor_fire_learned")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="P0"]
+script = ExtResource("2")
+id = &"waiting_oak"
+region = &"hunting_forest"
+at = Vector2(-420.0, 1720.0)
+radius = 10.0
+
+[sub_resource type="Resource" id="P1"]
+script = ExtResource("2")
+id = &"ash_grove"
+region = &"hunting_forest"
+at = Vector2(-700.0, 1580.0)
+radius = 20.0
+
+[sub_resource type="Resource" id="P2"]
+script = ExtResource("2")
+id = &"hunting_lodge"
+region = &"hunting_forest"
+at = Vector2(480.0, 1650.0)
+radius = 18.0
+
+[sub_resource type="Resource" id="P3"]
+script = ExtResource("2")
+id = &"lost_estate"
+region = &"workshop"
+at = Vector2(-640.0, 2330.0)
+radius = 22.0
+
+[sub_resource type="Resource" id="P4"]
+script = ExtResource("2")
+id = &"fathers_workshop"
+region = &"workshop"
+at = Vector2(-560.0, 2240.0)
+radius = 10.0
+
+[resource]
+script = ExtResource("3")
+area = &"human_wilds"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10")])
+places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4")])

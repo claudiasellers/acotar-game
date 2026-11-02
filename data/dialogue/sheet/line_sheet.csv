@@ -1,0 +1,319 @@
+line_id,speaker,who,text,canon,inner,trigger,where,deed,phases,delivery,audio_file
+c_home_hungry,feyre,,"Smoke from our chimney, thin as thread. We're down to the last of the wood.",X,yes,region,cottage,,p0_winter,"inner voice: dry, quiet, close",audio/voice/c_home_hungry.ogg
+c_home_doe,feyre,,A doe on my shoulders and a pelt worth silver. We eat this week.,X,yes,region,cottage,,p0_winter,"inner voice: dry, quiet, close",audio/voice/c_home_doe.ogg
+c_home_coin,feyre,,Coin in my pocket for once. It still doesn't feel like enough.,X,yes,region,cottage,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/c_home_coin.ogg
+c_home_return,feyre,,So small. The cottage had been so small.,V,yes,region,cottage,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/c_home_return.ogg
+c_snowdrops,feyre,,"Elain's garden, asleep under the snow. She'll be out here the first mild day.",A,yes,place,elain_garden,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/c_snowdrops.ogg
+c_snowdrops_return,feyre,,Her old garden's a wild tangle of weeds and blooms now.,A,yes,place,elain_garden,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/c_snowdrops_return.ogg
+A1_03_nesta_beast,nesta,Nesta,You're just a half-wild beast with the nerve to bark orders at all hours of the day and night.,V,,near,,,p0_winter p1_wolf_and_crossing,"cold, quick, cutting; not shouted (Keeper, voice-lines-act1)",audio/voice/A1_03_nesta_beast.ogg
+A1_04_nesta_forget,nesta,Nesta,"Someday, Feyre, you'll have no one left to remember you.",A,,follow,,,p0_winter p1_wolf_and_crossing,"quieter, meaner",audio/voice/A1_04_nesta_forget.ogg
+n_tomas,nesta,Nesta,Tomas Mandray walked me halfway home. Don't look at me like that.,X,,near,,,p0_winter p1_wolf_and_crossing,"defensive, chin up",audio/voice/n_tomas.ogg
+n_cloak,nesta,Nesta,I'll get the cloak for Elain first. Nobody's buying me the boots I need.,A,,near,,,p0_winter,,audio/voice/n_cloak.ogg
+n_hale,nesta,Nesta,Going to see the Hale boy again? Don't pretend you aren't.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/n_hale.ogg
+n_ribbon,nesta,Nesta,You bought the cheap thread. Of course you did.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/n_ribbon.ogg
+n_door,nesta,Nesta,Close the door. You're letting the cold in.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/n_door.ogg
+n_hands,nesta,Nesta,Wash the blood off before you touch the bread.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/n_hands.ogg
+A1_02_elain_cloak,elain,Elain,I'd love a new cloak.,V,,near,,,p0_winter p1_wolf_and_crossing,"soft, wistful, almost apologetic",audio/voice/A1_02_elain_cloak.ogg
+e_doe,elain,Elain,"A whole doe! Feyre, we'll have stew for days.",X,,near,,,p0_winter,,audio/voice/e_doe.ogg
+e_snowdrops,elain,Elain,When it's warm again I'll have the garden back. You'll see.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_snowdrops.ogg
+e_seeds,elain,Elain,"If we ever had a little money, I'd buy seeds. Real ones, from the south.",A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_seeds.ogg
+e_bird,elain,Elain,Father carved a little bird today. It looks like it's about to sing.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_bird.ogg
+e_fire,elain,Elain,You look frozen through. Sit by the fire a moment.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_fire.ogg
+e_hum,elain,Elain,I was thinking about summer. Do you remember summer?,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_hum.ogg
+A1_05_father_hope,father,Father,"We need hope, or else we cannot endure.",V,,deed,,fact.father_hearth_sat,p0_winter p1_wolf_and_crossing,"tired, then a rare clarity; gentle",audio/voice/A1_05_father_hope.ogg
+f_sorry,father,Father,"You shouldn't have to do all this, Feyre. I know that.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_sorry.ogg
+f_ships,father,Father,I had three ships at sea once. I thought that was the worst a man could lose.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_ships.ogg
+f_wolf,father,Father,"A wolf that size, this near the village? Be careful in those woods.",X,,near,,,p0_winter,,audio/voice/f_wolf.ogg
+f_pine,father,Father,"Hand me that bit of pine, would you? The good piece.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_pine.ogg
+f_knee,father,Father,The damp's in my leg again. It'll pass.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_knee.ogg
+A1_06_mother_vow,mother,Mother,"Stay together, and look after them.",V,yes,deed,,fact.mother_bed_seen,p0_winter p1_wolf_and_crossing,"memory: a whisper in her head, feverish and fading",audio/voice/A1_06_mother_vow.ogg
+d_wolf_killed,feyre,,Done. Don't think about its eyes.,X,yes,deed,,wolf_killed,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_wolf_killed.ogg
+d_wolf_skinned,feyre,,Heavy. Heavier than any pelt has a right to be.,X,yes,deed,,fact.wolf_skinned,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_wolf_skinned.ogg
+v_market,feyre,,Market day. Everyone watching everyone else's purse.,X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_market.ogg
+v_silver,feyre,,"Silver in my pocket. Just once, I could buy something that isn't food.",X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_silver.ogg
+v_return,feyre,,They don't know me in this dress. Good.,X,yes,region,village,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/v_return.ogg
+A1_07_blessed_greeting,blessed,Child of the Blessed,"May the Immortal Light shine upon thee, sisters.",V,,place,village_square,,p0_winter p1_wolf_and_crossing,"serene, sing-song, over silver bells",audio/voice/A1_07_blessed_greeting.ogg
+v_tavern,feyre,,Ale and wet wool. I'd trade a pelt for an hour by that fire.,X,yes,place,tavern,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_tavern.ogg
+v_notices,feyre,,"Notices I can't read. Bounties, probably. Or more rules about faeries.",A,yes,place,notice_board,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_notices.ogg
+v_pillory,feyre,,Someone stood there all last week for stealing bread. I remember thinking: careless.,X,yes,place,pillory,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_pillory.ogg
+v_mill,feyre,,The mill wheel's frozen solid. No grinding till spring.,X,yes,place,mill,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_mill.ogg
+v_debt,feyre,,That house owes half the village. The shutters haven't opened since autumn.,X,yes,place,debt_house,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_debt.ogg
+v_barn,feyre,,Nobody's kept animals in that barn since the fever winter.,X,yes,place,abandoned_barn,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_barn.ogg
+v_hall,feyre,,Where they read the Treaty out every year. As if any of us could forget it.,X,yes,place,meeting_hall,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_hall.ogg
+v_gold,feyre,,Gold for the poorest doors first. It won't fix anything. It'll fix this winter.,A,yes,place,debt_house,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/v_gold.ogg
+vil_wall,villager,,My cousin swears she heard something at the Wall. Not a wolf. Worse.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_wall.ogg
+vil_hunter,villager,,You're the Archeron girl. The hunter. Seen you dragging deer up that road.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_hunter.ogg
+vil_blessed,villager,,"The Blessed again, telling folk the faeries are holy. Holy!",X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_blessed.ogg
+vil_iron,villager,,Iron over every doorframe. I don't care what the Blessed say.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_iron.ogg
+vil_copper,villager,,Spare a copper? No? Didn't think so.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_copper.ogg
+vil_winter,villager,,Worst winter in years. The ground's like iron.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_winter.ogg
+vil_rich,villager,,Is that the youngest Archeron? You look like a lady now.,X,,near,village,,p7_return_home,,audio/voice/vil_rich.ogg
+vil_aunt,villager,,"An aunt left you a fortune, they say. Lucky. Some of us got nothing.",A,,near,village,,p7_return_home,,audio/voice/vil_aunt.ogg
+elder_slaves,human_elder,,"Before the Treaty, my grandmother's grandmother served them. Don't you forget it.",A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_slaves.ogg
+elder_ships,human_elder,,I remember your father's ships coming in. Whole town turned out.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_ships.ogg
+elder_bones,human_elder,,Snow by nightfall. My bones never lie.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_bones.ogg
+youth_isaac,human_youth,,Isaac Hale's been asking after you.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/youth_isaac.ogg
+youth_vane,human_youth,,Bet you couldn't hit the weathervane from here.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/youth_vane.ogg
+woman_tomas,human_woman,,The Mandray boy's sweet on your sister. Everyone knows it.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/woman_tomas.ogg
+woman_eggs,human_woman,,"Fresh eggs, if you've the coin. You haven't, have you.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/woman_eggs.ogg
+man_ice,human_man,,Mind the ice by the well. Old Rowan broke his hip on it.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/man_ice.ogg
+man_wolves,human_man,,Wolves are bold this year. Took a calf off a farm east of here.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/man_wolves.ogg
+blessed_home,blessed,,"One day they will carry us across the Wall, sister, and we will be home.",A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/blessed_home.ogg
+blessed_bells,blessed,,Do you hear the bells? Each one is a prayer that they come for us.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/blessed_bells.ogg
+peddler_ash,peddler,,"Ash, cut at the border. The one wood they fear, so the stories go.",A,,near,,,p0_winter p1_wolf_and_crossing,"low, a salesman's secret",audio/voice/peddler_ash.ogg
+peddler_border,peddler,,Border towns are emptying. Folk say things come over the Wall at night.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_border.ogg
+peddler_trinkets,peddler,,"Ribbons, needles, a mirror that only lies a little. For you, a bargain.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_trinkets.ogg
+d_pelt_sold,feyre,,"She paid more than it was worth. Someone did the same for her once, she said.",A,yes,deed,,pelt_sold,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_pelt_sold.ogg
+hf_snow,feyre,,The snow's already covering the blood. Good.,X,yes,region,hunting_forest,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_snow.ogg
+hf_oak,feyre,,My oak. I've waited out half a winter in those branches.,X,yes,place,waiting_oak,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_oak.ogg
+hf_ash,feyre,,"Ash trees. If the stories are true, this is all they fear.",A,yes,place,ash_grove,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_ash.ogg
+hf_lodge,feyre,,The old lords hunted here for sport. Sport.,X,yes,place,hunting_lodge,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_lodge.ogg
+ws_enter,feyre,,The old estate. I don't come here. I don't know why I came.,X,yes,region,workshop,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ws_enter.ogg
+ws_glass,feyre,,Our house had glass windows once. I used to count the colours in them.,X,yes,place,lost_estate,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ws_glass.ogg
+ws_shed,feyre,,Father's workshop. He hasn't carved anything bigger than a bird in eight years.,X,yes,place,fathers_workshop,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ws_shed.ogg
+ws_return,feyre,,Nothing left to come back for here. I came anyway.,X,yes,region,workshop,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/ws_return.ogg
+wall_breath,feyre,,"The Wall. You can't see it. You feel it, like a held breath.",X,yes,region,wall_seam,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/wall_breath.ogg
+wall_hush,feyre,,Even the crows go quiet this close. They know better than we do.,X,yes,region,wall_seam,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/wall_hush.ogg
+wall_back,feyre,,The Wall again. This time I'm the one choosing.,X,yes,region,wall_seam,,p7_return_home p8_the_pass,"inner voice: dry, quiet, close",audio/voice/wall_back.ogg
+h_entrance,feyre,,Marble and gold and flowers on every table. And no one to see any of it.,A,yes,room,entrance_hall,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_entrance.ogg
+h_entrance_full,feyre,,Masks everywhere. The hall was never empty. I just couldn't see.,A,yes,room,entrance_hall,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_entrance_full.ogg
+h_dining,feyre,,That table could seat forty. Three of us rattle around it.,X,yes,room,dining_hall,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_dining.ogg
+h_gallery_shut,feyre,,Sheets over the paintings. Who hides paintings?,A,yes,room,gallery,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_gallery_shut.ogg
+h_gallery_open,feyre,,I could stand here until I starve. I almost want to.,X,yes,room,gallery,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_gallery_open.ogg
+h_library,feyre,,"Shelf after shelf, and I can't read a single spine.",A,yes,room,library,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_library.ogg
+h_study,feyre,,His study smells of leather and candle smoke.,X,yes,room,tamlin_study,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_study.ogg
+h_map_room,feyre,,"Maps of lands I'll never walk, every border inked in gold.",X,yes,room,map_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_map_room.ogg
+h_armory,feyre,,Blades enough for an army. He fights his wars alone.,X,yes,room,armory,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_armory.ogg
+h_drawing,feyre,,"Lucien's favourite room, judging by the wine rings.",X,yes,room,drawing_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_drawing.ogg
+h_music,feyre,,"A harp with every string in tune, and no one to play it.",X,yes,room,music_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_music.ogg
+h_morning,feyre,,"Light like honey through the glass. I'd paint this, if I could.",X,yes,room,morning_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_morning.ogg
+h_ballroom,feyre,,"A ballroom, for a court that doesn't dance.",X,yes,room,ballroom,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/h_ballroom.ogg
+h_conservatory,feyre,,Flowers I have no names for. Elain would weep.,X,yes,room,conservatory,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_conservatory.ogg
+h_flower_room,feyre,,Someone arranges these every morning. I've never once seen who.,X,yes,room,flower_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_flower_room.ogg
+h_shrine,feyre,,"Candles that never burn down. Magic, or someone very patient.",X,yes,room,shrine,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_shrine.ogg
+h_saloon,feyre,,"Doors open onto the roses. Nothing is locked here. That's worse, somehow.",X,yes,room,garden_saloon,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_saloon.ogg
+h_bedroom,feyre,,A bed I could lose myself in. The knife stays under the pillow.,X,yes,room,feyre_bedroom,,p2_grounds,"inner voice: dry, quiet, close",audio/voice/h_bedroom.ogg
+h_dressing,feyre,,"Gowns in every colour of a sunset. I'll take the trousers, thank you.",A,yes,room,dressing_room,,p2_grounds p3_house_and_woods p4_wider_court,"inner voice: dry, quiet, close",audio/voice/h_dressing.ogg
+h_dressing_gown,feyre,,Maybe the rose one. Just this once.,X,yes,room,dressing_room,,p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_dressing_gown.ogg
+h_bath,feyre,,Hot water whenever I want it. I keep waiting for the price.,X,yes,room,feyre_bath,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_bath.ogg
+h_painting_room,feyre,,Canvases. Brushes. Paint. All of it mine.,X,yes,room,painting_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_painting_room.ogg
+h_portraits,feyre,,Old lords in gilt frames. None of them look kind.,A,yes,room,portrait_gallery,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_portraits.ogg
+h_lucien_rooms,feyre,,Russet and bronze and far too many mirrors.,X,yes,room,lucien_chambers,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_lucien_rooms.ogg
+h_tamlin_room,feyre,,His room. I shouldn't be in here.,X,yes,room,tamlin_bedchamber,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/h_tamlin_room.ogg
+h_nursery,feyre,,Dust on the cradle. Nobody's been small in this house for a long time.,X,yes,room,old_nursery,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_nursery.ogg
+h_observatory,feyre,,"The whole court laid out like a painting. Spring, as far as I can see.",X,yes,room,observatory,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_observatory.ogg
+h_rose_bower,feyre,,Roses on the tower top. Of course there are.,X,yes,room,rose_bower,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_rose_bower.ogg
+h_attic_loft,feyre,,Someone painted up here once. The colours are still in the boards.,X,yes,room,attic_painting_loft,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_attic_loft.ogg
+h_playroom,feyre,,Wooden horses with chipped gilt. I wonder whose they were.,X,yes,room,attic_playroom,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_playroom.ogg
+h_kitchen,feyre,,Always warm. Somebody's always just left.,X,yes,room,svc_kitchen,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_kitchen.ogg
+h_kitchen_full,feyre,,So this is who's been cooking. Hello.,X,yes,room,svc_kitchen,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_kitchen_full.ogg
+h_infirmary,feyre,,Clean linen and bitter herbs. My hands remember his blood.,X,yes,room,svc_infirmary,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_infirmary.ogg
+h_wine,feyre,,Wine older than my grandmother. Lucien will have opinions.,X,yes,room,wine_vault,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_wine.ogg
+h_crypt,feyre,,The old High Lords. His father is down here somewhere.,X,yes,room,ancestral_crypt,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_crypt.ogg
+h_mask_vault,feyre,,Masks on every hook. The ones no one can take off aren't here.,A,yes,room,mask_vault,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_mask_vault.ogg
+h_well,feyre,,A well under the house. The water's so still it looks solid.,X,yes,room,well_chamber,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_well.ogg
+h_tunnel,feyre,,Cold down here. Cold like the woods at night.,X,yes,room,old_tunnel,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_tunnel.ogg
+h_alis_room,feyre,,"A narrow bed, a mended apron, and two little wooden horses on the sill.",X,yes,room,svc_alis_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_alis_room.ogg
+h_sewing,feyre,,Bolts of silk in every pastel there is. I'm not touching them. Probably.,X,yes,room,sewing_room,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/h_sewing.ogg
+h_ruined,feyre,,Glass on the floors. Claw marks in the panels. Where is everyone?,A,yes,room,entrance_hall,,p8_the_pass,"inner voice, frightened, very quiet",audio/voice/h_ruined.ogg
+g_bloom,feyre,,Every flower open at once. Nothing grows like this. Nothing.,X,yes,region,manor_grounds,,p2_grounds p3_house_and_woods,"inner voice: dry, quiet, close",audio/voice/g_bloom.ogg
+g_bloom_later,feyre,,I've stopped counting the roses. I've started naming the colours.,X,yes,region,manor_grounds,,p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/g_bloom_later.ogg
+g_full,feyre,,"Wings in the hedges, eyes in the roses. It was always this full.",A,yes,region,manor_grounds,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_full.ogg
+g_roses,feyre,,Roses as big as my fists. They smell like a summer I never had.,X,yes,place,rose_garden,,p2_grounds p3_house_and_woods,"inner voice: dry, quiet, close",audio/voice/g_roses.ogg
+g_roses_gift,feyre,,His father had this garden planted for his mother. A mating present.,A,yes,place,rose_garden,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_roses_gift.ogg
+g_maze,feyre,,A maze. Lovely. Exactly where something would wait for me.,X,yes,place,hedge_maze,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_maze.ogg
+g_glass,feyre,,Glass houses full of fruit out of season.,X,yes,place,glass_houses,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_glass.ogg
+g_herbs,feyre,,"Herbs in neat rows. Feverfew, sage. The rest I'll learn.",X,yes,place,kitchen_garden,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_herbs.ogg
+g_stables,feyre,,Horses with coats like poured cream. The white mare remembers me.,X,yes,place,stables,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_stables.ogg
+g_paddock,feyre,,Room to ride all day without ever seeing a wall.,X,yes,place,paddock,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_paddock.ogg
+g_swans,feyre,,Swans. Even the birds here look painted on.,X,yes,place,swan_pond,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_swans.ogg
+g_orchard,feyre,,Apples and blossom on the same branch. That isn't right. It's lovely.,X,yes,place,walled_orchard,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_orchard.ogg
+g_fountain,feyre,,A fountain that sings when the wind's right.,X,yes,place,forecourt_fountain,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/g_fountain.ogg
+g_fountain_after,feyre,,I can't look at the water. I still see it there.,X,yes,place,forecourt_fountain,,p6_blight_tightens,"inner voice, flat with shock",audio/voice/g_fountain_after.ogg
+g_gate,feyre,,"The gate's open. He meant it, then. I'm not his prisoner.",A,yes,place,manor_gate,,p2_grounds,"inner voice: dry, quiet, close",audio/voice/g_gate.ogg
+g_unseen,feyre,,"Something shimmered by the hedge. When I looked, nothing.",A,yes,place,rose_garden,,p2_grounds,"inner voice: dry, quiet, close",audio/voice/g_unseen.ogg
+l_still_here,lucien,Lucien,Still here? I'd bet myself you'd be over the wall by now.,X,,near,,,p2_grounds,,audio/voice/l_still_here.ogg
+l_andras,lucien,Lucien,"I hunted with Andras, you know. Most mornings. Before.",A,,near,,,p2_grounds,"light, then the light goes out",audio/voice/l_andras.ogg
+l_knife,lucien,Lucien,Do keep the dinner knife. We've hundreds.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/l_knife.ogg
+l_mask,lucien,Lucien,"Don't stare. It's rude, and it isn't coming off.",A,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_mask.ogg
+l_treaty,lucien,Lucien,"There's no loophole in the Treaty, if that's what you're hoping. We've looked.",A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/l_treaty.ogg
+l_walls,lucien,Lucien,"Admiring the roses, or measuring the walls? Both, I expect.",X,,near,manor_grounds,,p2_grounds p3_house_and_woods,,audio/voice/l_walls.ogg
+l_eye,lucien,Lucien,"It sees well enough. Better than the old one, some days.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_eye.ogg
+l_didnt_look,lucien,Lucien,You didn't look. Most people look.,X,,near,,,p2_grounds p3_house_and_woods,,audio/voice/l_didnt_look.ogg
+l_mood,lucien,Lucien,He's in a mood. He's always in a mood. Today it's a worse one.,X,,near,,,p3_house_and_woods,,audio/voice/l_mood.ogg
+l_time,lucien,Lucien,Some of us have run out of time to be polite.,A,,near,,,p3_house_and_woods,,audio/voice/l_time.ogg
+l_autumn,lucien,Lucien,"Autumn's lovely this time of year, I hear. I'm not welcome there to see it.",A,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_autumn.ogg
+l_paint_nose,lucien,Lucien,"You've paint on your nose. No, leave it. It's an improvement.",X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_paint_nose.ogg
+l_fire_night,lucien,Lucien,Fire Night's coming. Lock your door. I mean it.,A,,near,,,p5_calanmai,,audio/voice/l_fire_night.ogg
+l_pigs,lucien,Lucien,Faerie pigs. I'll treasure that until I die.,A,,near,,,p5_calanmai p6_blight_tightens,"delighted, barely holding a laugh",audio/voice/l_pigs.ogg
+l_wine,lucien,Lucien,"If anyone offers you faerie wine, say no. Then say no again.",A,,near,,,p6_blight_tightens,,audio/voice/l_wine.ogg
+l_gardeners,lucien,Lucien,So you can see us now. Try not to scream at the gardeners. They're sensitive.,X,,near,,,p6_blight_tightens,,audio/voice/l_gardeners.ogg
+l_alis,lucien,Lucien,Alis is looking for you. That's never good.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_alis.ogg
+l_nursemaid,lucien,Lucien,Walk with me or don't. I'm not your nursemaid.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_nursemaid.ogg
+l_weather,lucien,Lucien,Lovely weather. It's always lovely weather. You get used to it.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_weather.ogg
+l_glare,lucien,Lucien,"If you're going to glare, at least do it from the shade.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_glare.ogg
+d_bogge_lucien,lucien,Lucien,Breathe. It's gone. You did well.,X,,deed,,bogge_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/d_bogge_lucien.ogg
+t_grounds,tamlin,Tamlin,Go where you like on the grounds. Not the woods after dark.,A,,near,,,p2_grounds,,audio/voice/t_grounds.ogg
+t_eating,tamlin,Tamlin,You're eating more. Good.,X,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_eating.ogg
+t_border,tamlin,Tamlin,I'll be at the border tonight. Lucien stays.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_border.ogg
+t_bogge,tamlin,Tamlin,It won't come near the house. I'll see to it.,X,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_bogge.ogg
+t_hand,tamlin,Tamlin,It's healing. You've steady hands.,X,,near,,,p3_house_and_woods,,audio/voice/t_hand.ogg
+t_letters,tamlin,Tamlin,"If you want help with your letters, ask. Or don't. The offer stands.",A,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_letters.ogg
+t_naga,tamlin,Tamlin,"Four naga, and you went at them with a boot knife.",A,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_naga.ogg
+t_faerie,tamlin,Tamlin,You held his hand. Most wouldn't have.,X,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_faerie.ogg
+t_paint,tamlin,Tamlin,"Paint whatever you like. Paint the walls, if the canvases run out.",X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_paint.ogg
+t_pool,tamlin,Tamlin,"That pool was mine when I was a boy. It's yours too, now.",X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_pool.ogg
+t_father,tamlin,Tamlin,My father had this garden planted for my mother. It was a mating present.,V,,near,manor_grounds,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_father.ogg
+t_calanmai,tamlin,Tamlin,Calanmai. Stay inside tonight. Please.,A,,near,,,p5_calanmai,,audio/voice/t_calanmai.ogg
+t_sorry,tamlin,Tamlin,The kitchen. I'm sorry. For what I was that night.,A,,near,,,p5_calanmai p6_blight_tightens,"ashamed, low",audio/voice/t_sorry.ogg
+t_blight,tamlin,Tamlin,The blight's spreading. I'll be gone a few days.,A,,near,,,p6_blight_tightens,,audio/voice/t_blight.ogg
+t_fiddle,tamlin,Tamlin,"I can play a mean fiddle, you know.",A,,near,,,p6_blight_tightens,,audio/voice/t_fiddle.ogg
+t_hungry,tamlin,Tamlin,Are you hungry? You're always hungry. Come and eat.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_hungry.ogg
+t_thorns,tamlin,Tamlin,Mind the thorns.,X,,near,manor_grounds,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_thorns.ogg
+t_light,tamlin,Tamlin,"The light's good today. For painting, I mean.",X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_light.ogg
+d_naga_tamlin,tamlin,Tamlin,You're safe. I've got you.,X,,deed,,naga_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/d_naga_tamlin.ogg
+a_trousers,alis,Alis,Trousers again? Fine. One day you'll wear a gown and like it.,A,,near,,,p2_grounds p3_house_and_woods p4_wider_court,,audio/voice/a_trousers.ogg
+a_curtain,alis,Alis,"Next time you string up a curtain to catch me, use the ugly ones.",A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/a_curtain.ogg
+a_lucien,alis,Alis,Don't let Lucien bully you. Bite back. He likes it better.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/a_lucien.ogg
+a_suriel,alis,Alis,"The next time that fool Lucien gives you advice on how to trap the Suriel, you come to me. Dead chickens! All you needed to do was offer it a new robe.",V,,near,,,p3_house_and_woods p4_wider_court,"scandalised, then fond",audio/voice/a_suriel.ogg
+a_nephews,alis,Alis,My sister and her mate were killed. Her boys are why I'm here.,A,,near,,,p5_calanmai p6_blight_tightens,,audio/voice/a_nephews.ogg
+a_glass,alis,Alis,There. Look in the glass. That's a girl worth looking at.,X,,near,dressing_room,,p5_calanmai p6_blight_tightens,,audio/voice/a_glass.ogg
+a_solstice,alis,Alis,"Hold still. Flowers in your hair, and the blue. He won't be able to breathe.",A,,near,,,p6_blight_tightens,,audio/voice/a_solstice.ogg
+a_face,alis,Alis,"Yes, this is my face. Close your mouth, child.",X,,near,,,p6_blight_tightens,,audio/voice/a_face.ogg
+a_fountain,alis,Alis,Stay away from the fountain. Please. Just for a while.,X,,near,,,p6_blight_tightens,,audio/voice/a_fountain.ogg
+a_elbows,alis,Alis,Eat something. You're all elbows.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/a_elbows.ogg
+a_mud,alis,Alis,Mud on the floor again. I'll have it out of the rugs by supper.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/a_mud.ogg
+a_bath,alis,Alis,The bath's drawn whenever you want it. Hot as you like.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/a_bath.ogg
+s_lady,sentry,,"The grounds are safe, lady. It's past them you should worry about.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/s_lady.ogg
+s_andras,sentry,,Andras stood this watch with me. Before.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"flat, not forgiving, not cruel",audio/voice/s_andras.ogg
+s_double,sentry,,The border's restless. We've doubled the watch.,X,,near,,,p6_blight_tightens,,audio/voice/s_double.ogg
+s_paths,sentry,,Keep to the paths after dark.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/s_paths.ogg
+gd_buds,gardener,,"Mind the buds, mind the buds! Those are for the Solstice.",X,,near,,,p6_blight_tightens,,audio/voice/gd_buds.ogg
+gd_peonies,gardener,,You trampled my peonies in the spring. I forgave you. Mostly.,X,,near,,,p6_blight_tightens,,audio/voice/gd_peonies.ogg
+gd_lovely,gardener,,Lovely day for it. Every day's a lovely day for it.,X,,near,,,p6_blight_tightens,,audio/voice/gd_lovely.ogg
+sv_place,servant,,"We've set your place at table since the very first night, miss.",X,,near,,,p6_blight_tightens,,audio/voice/sv_place.ogg
+sv_see,servant,,You really couldn't see us? Not even a little?,X,,near,,,p6_blight_tightens,,audio/voice/sv_see.ogg
+sv_linens,servant,,"Pardon, miss. Linens.",X,,near,,,p6_blight_tightens,,audio/voice/sv_linens.ogg
+cook_torte,servant_cook,,You ate like a starved fox that first week. I took it as a compliment.,X,,near,,,p6_blight_tightens,,audio/voice/cook_torte.ogg
+cook_hands,servant_cook,,Torte's for after supper. Hands off.,X,,near,,,p6_blight_tightens,,audio/voice/cook_hands.ogg
+maid_flowers,servant_maid,,I'm the one who leaves flowers on your pillow. You're welcome.,X,,near,,,p6_blight_tightens,,audio/voice/maid_flowers.ogg
+foot_doors,servant_footman,,The front doors open themselves. I like to pretend I help.,A,,near,,,p6_blight_tightens,,audio/voice/foot_doors.ogg
+seam_blue,seamstress,,Your blue gown's nearly done. Arms out. Higher.,X,,near,,,p6_blight_tightens,,audio/voice/seam_blue.ogg
+seam_pins,seamstress,,"Pins in my mouth, don't make me laugh.",X,,near,,,p6_blight_tightens,,audio/voice/seam_pins.ogg
+potion_green,potion_maker,,"Don't touch the green bottle. Don't touch any bottle, actually.",X,,near,,,p6_blight_tightens,,audio/voice/potion_green.ogg
+w_border_quiet,feyre,,These woods are too quiet. Even the birds keep their voices down.,X,yes,region,border_woods,,p2_grounds,"inner voice: dry, quiet, close",audio/voice/w_border_quiet.ogg
+w_border_after,feyre,,I don't look between the trees anymore. I just don't.,X,yes,region,border_woods,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, tight, not looking",audio/voice/w_border_after.ogg
+w_border_thin,feyre,,The woods feel thinner. Like something's been eating the light.,X,yes,region,border_woods,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/w_border_thin.ogg
+w_east_moss,feyre,,"Old trees thick with moss. The deeper I go, the colder it gets.",X,yes,region,eastern_woods,,p3_house_and_woods p4_wider_court,"inner voice: dry, quiet, close",audio/voice/w_east_moss.ogg
+w_east_bait,feyre,,Light in coloured ribbons through the leaves. It doesn't feel safe. It feels like bait.,X,yes,region,eastern_woods,,p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/w_east_bait.ogg
+w_east_ferns,feyre,,Something's watching from the ferns. Probably nothing. Probably.,X,yes,region,eastern_woods,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/w_east_ferns.ogg
+w_glade_birch,feyre,,Young birches and running water. My skin is crawling.,A,yes,region,suriel_glade,,p3_house_and_woods,"inner voice: dry, quiet, close",audio/voice/w_glade_birch.ogg
+w_glade_teeth,feyre,,The snare's still on the branch. I can't stop seeing their teeth.,X,yes,region,suriel_glade,,p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, frightened",audio/voice/w_glade_teeth.ogg
+w_glade_truth,feyre,,The birches look ordinary in daylight. They weren't.,X,yes,region,suriel_glade,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/w_glade_truth.ogg
+sg_silver,feyre,,"The light here comes up from the ground, silver and slow.",X,yes,region,starlight_glen,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_silver.ogg
+sg_boy,feyre,,"""My favorite haunt as a boy,"" he said. I can see why.",A,yes,region,starlight_glen,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_boy.ogg
+sg_grey,feyre,,Even here the edges are going grey.,X,yes,region,starlight_glen,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_grey.ogg
+sg_pool,feyre,,I swam in starlight. No one at home would ever believe it.,X,yes,place,starlight_pool,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_pool.ogg
+sg_falls,feyre,,A waterfall that sparkles as it falls. Of course it does.,X,yes,place,glimmerfall,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_falls.ogg
+sg_isle,feyre,,An island in a lake as still as a mirror. The trees on it lean to look.,X,yes,place,looking_lake_isle,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sg_isle.ogg
+wf_velvet,feyre,,"Hills like rumpled green velvet, and wind that smells of heather.",X,yes,region,western_fells,,p3_house_and_woods p4_wider_court,"inner voice: dry, quiet, close",audio/voice/wf_velvet.ogg
+wf_sheep,feyre,,Sheep with gold-tipped wool. I've stopped asking.,X,yes,region,western_fells,,p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/wf_sheep.ogg
+wf_grey,feyre,,"Grey patches on the slopes. The blight, he said.",A,yes,region,western_fells,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/wf_grey.ogg
+af_red,feyre,,"Red leaves in the middle of spring. That's Autumn, past those hills.",A,yes,region,autumn_foothills,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_red.ogg
+af_lucien,feyre,,Lucien never comes this far. I don't ask him why.,A,yes,region,autumn_foothills,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_lucien.ogg
+af_smoke,feyre,,Smoke on the far ridges. Autumn burns differently.,X,yes,region,autumn_foothills,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_smoke.ogg
+af_pass,feyre,,"The pass to Autumn, sealed. His family is on the other side.",A,yes,place,sealed_pass,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_pass.ogg
+af_embers,feyre,,Leaves like embers that never burn out.,X,yes,place,ember_crown,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_embers.ogg
+af_spring,feyre,,"Water through thorns, cold enough to ache.",X,yes,place,thornwater_spring,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_spring.ogg
+af_markers,feyre,,"Stones carved with leaves. One court ends here, and another begins.",A,yes,place,border_markers,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/af_markers.ogg
+rw_blush,feyre,,"Roses gone wild, taller than me, pink as a blush.",X,yes,region,rosewild,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/rw_blush.ogg
+rw_from_manor,feyre,,I've watched that spire from my window for weeks.,X,yes,region,rosewild,,p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/rw_from_manor.ogg
+rw_spire,feyre,,"A tower of roses, petals falling like slow snow.",X,yes,place,rose_spire,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/rw_spire.ogg
+rw_briar,feyre,,A gate of briars. The thorns lean away from me.,X,yes,place,briar_gate,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/rw_briar.ogg
+rw_folly,feyre,,A little folly with no door. Somebody's idea of a joke.,X,yes,place,gardeners_folly,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/rw_folly.ogg
+sm_ribbons,feyre,,"Long tables, ribbons in the trees. They're dressing the meadow for something.",X,yes,region,solstice_meadow,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_ribbons.ogg
+sm_dawn,feyre,,I danced here until dawn. Me.,X,yes,region,solstice_meadow,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_dawn.ogg
+sm_bower,feyre,,"Fiddles hung in the branches, waiting for hands.",X,yes,place,musicians_bower,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_bower.ogg
+sm_arches,feyre,,"Arches of flowers all the way down, like a procession waiting to start.",X,yes,place,arch_avenue,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_arches.ogg
+sm_oak,feyre,,An oak wearing a crown of blossom. They dress the trees here.,X,yes,place,crown_oak,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_oak.ogg
+sm_tables,feyre,,Food enough for a thousand. My stomach still clenches at the sight.,X,yes,place,long_tables,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/sm_tables.ogg
+hr_building,feyre,,They're building the fires already. Wood piled taller than houses.,A,yes,region,hill_of_the_rite,,p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/hr_building.ogg
+hr_drums,feyre,,Drums. I can feel them in my teeth.,A,yes,region,hill_of_the_rite,,p5_calanmai,"inner voice: dry, quiet, close",audio/voice/hr_drums.ogg
+hr_ash,feyre,,Ash on the hill still. I don't like it here.,X,yes,region,hill_of_the_rite,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/hr_ash.ogg
+hr_stones,feyre,,"Standing stones, warm to the touch even at night.",X,yes,place,stone_ring,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/hr_stones.ogg
+hr_cave,feyre,,"Flowers round the cave mouth, as if someone dressed a doorway for a wedding.",A,yes,place,cave_of_the_rite,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/hr_cave.ogg
+hr_cave_after,feyre,,I won't go near that cave again.,X,yes,place,cave_of_the_rite,,p5_calanmai p6_blight_tightens,"inner voice, cold",audio/voice/hr_cave_after.ogg
+hr_field,feyre,,The ground's beaten flat from dancing.,X,yes,place,drum_field,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/hr_field.ogg
+hr_terraces,feyre,,Terraces cut for fires. Hundreds of them.,X,yes,place,bonfire_terraces,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/hr_terraces.ogg
+br_silent,feyre,,"Nothing sings here. Not a bird, not the wind.",X,yes,region,blighted_reaches,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, whispered, afraid to be heard",audio/voice/br_silent.ogg
+br_crumble,feyre,,The grass crumbles when I step on it. Grey all the way down.,X,yes,region,blighted_reaches,,p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/br_crumble.ogg
+br_coming,feyre,,This is what's coming for the rest of it. I know it is.,X,yes,region,blighted_reaches,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/br_coming.ogg
+br_steading,feyre,,A farmhouse with the door open and the table set. No one's coming back.,X,yes,place,hollow_steading,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, very quiet",audio/voice/br_steading.ogg
+br_sentinel,feyre,,"A tree like a man standing guard, dead on his feet.",X,yes,place,dead_sentinel,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/br_sentinel.ogg
+br_briars,feyre,,"The briars here are grey, and they move when I'm not looking.",X,yes,place,grey_briar_wall,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, breath held",audio/voice/br_briars.ogg
+br_heart,feyre,,It's colder at the centre. Something here is listening.,X,yes,place,blight_heart,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, barely there",audio/voice/br_heart.ogg
+bv_pink,feyre,,Blossom so thick the air itself is pink.,X,yes,region,blossom_vale,,p4_wider_court p5_calanmai,"inner voice: dry, quiet, close",audio/voice/bv_pink.ogg
+bv_bees,feyre,,"Bees the size of my thumb, drunk on nectar.",X,yes,region,blossom_vale,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_bees.ogg
+bv_afraid,feyre,,Petals still falling. Some things here don't know to be afraid.,X,yes,region,blossom_vale,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_afraid.ogg
+bv_cathedral,feyre,,Trees grown into arches like a temple. I'm whispering without meaning to.,X,yes,place,blossom_cathedral,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_cathedral.ogg
+bv_cider,feyre,,Cider and blossom. The whole valley smells like a feast day.,X,yes,place,cider_mill,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_cider.ogg
+bv_bee_tower,feyre,,"A tower humming like a held note. Bees, thousands of them.",X,yes,place,bee_tower,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_bee_tower.ogg
+bv_weir,feyre,,Water over the weir like spun glass.,X,yes,place,vale_weir,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/bv_weir.ogg
+fv_lanterns,feyre,,"Music and lanterns, and a dozen faces turning to look at me.",X,yes,region,fae_village,,p4_wider_court,"inner voice: dry, quiet, close",audio/voice/fv_lanterns.ogg
+fv_fires,feyre,,Everyone here is talking about the fires.,X,yes,region,fae_village,,p5_calanmai,"inner voice: dry, quiet, close",audio/voice/fv_fires.ogg
+fv_more,feyre,,More of them than I ever saw before. So many more.,X,yes,region,fae_village,,p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_more.ogg
+fv_tree,feyre,,"A tree full of lanterns, every one a different pink.",X,yes,place,great_lantern_tree,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_tree.ogg
+fv_bridge,feyre,,The bridge glows under my feet. I'm trying not to like it.,X,yes,place,lantern_bridge,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_bridge.ogg
+fv_market,feyre,,A market where nobody shouts the prices. They sing them.,X,yes,place,market,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_market.ogg
+fv_mill,feyre,,A mill grinding petals into something that smells like honey.,X,yes,place,village_mill,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_mill.ogg
+fv_silks,feyre,,"Silks hung out like flags, every colour I've ever wanted.",X,yes,place,seamstress,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_silks.ogg
+fv_bottles,feyre,,Bottles bubbling in the window. I'm not touching anything.,X,yes,place,potion_house,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_bottles.ogg
+fv_roofs,feyre,,Toadstool roofs. Actual toadstool roofs.,X,yes,place,cottages,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_roofs.ogg
+rvv_human,reveler,,A human girl in the village? Don't eat anything unless you're sure of it.,A,,near,fae_village,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/rvv_human.ogg
+rvv_lord,reveler,,The High Lord's mortal. We've all heard about you. Mostly good things.,X,,near,fae_village,,p4_wider_court p5_calanmai,,audio/voice/rvv_lord.ogg
+rvv_lanterns,reveler,,Lovely day for lanterns. They light themselves at dusk.,X,,near,fae_village,,p4_wider_court p5_calanmai,,audio/voice/rvv_lanterns.ogg
+cf_human,court_fae,,So you can see us now. We could always see you.,X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_human.ogg
+cf_welcome,court_fae,,"The High Lord's mortal! Welcome, welcome. Mind your step.",X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_welcome.ogg
+cf_lanterns,court_fae,,Lovely night for lanterns. Every night is.,X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_lanterns.ogg
+fm_cousins,fae_mushroom,,Don't step on my cousins. They're the small ones.,X,,near,,,p6_blight_tightens,,audio/voice/fm_cousins.ogg
+fmo_lantern,fae_moth,,Your lantern's lovely. May I just sit near it? A moment?,X,,near,,,p6_blight_tightens,,audio/voice/fmo_lantern.ogg
+ff_metal,fae_fox,,Is it true magic used to smell like metal to you? Poor thing.,A,,near,,,p6_blight_tightens,,audio/voice/ff_metal.ogg
+fh_prick,fae_hedgehog,,Pricked you? Sorry. It happens when I'm happy.,X,,near,,,p6_blight_tightens,,audio/voice/fh_prick.ogg
+fp_braids,fae_pixie,,"Ooh, braids! Can I? I'll put flowers in. Tiny ones.",X,,near,,,p6_blight_tightens,,audio/voice/fp_braids.ogg
+fs_hill,fae_satyr,,"Fire Night's coming. Stay far from the hill, little mortal.",X,,near,,,p4_wider_court p5_calanmai,,audio/voice/fs_hill.ogg
+fr_smell,fae_rose,,"Smell me. Go on. Best roses in the court, and I'm not being modest.",X,,near,,,p6_blight_tightens,,audio/voice/fr_smell.ogg
+fo_andras,fae_owl,,Who? Oh. You. The one who shot Andras. We remember.,X,,near,,,p6_blight_tightens,"soft, unblinking",audio/voice/fo_andras.ogg
+fst_thin,fae_stag,,The woods are thinner than they were. The blight eats the edges.,A,,near,,,p6_blight_tightens,,audio/voice/fst_thin.ogg
+fn_warm,fae_nymph,,The water's warm today. It's always warm for friends.,X,,near,,,p6_blight_tightens,,audio/voice/fn_warm.ogg
+fb_trees,fae_birch,,Shh. I'm listening to the trees. They're worried.,X,,near,,,p6_blight_tightens,,audio/voice/fb_trees.ogg
+fd_roots,fae_dryad,,Nearly fifty years the roots have tasted it. Something sour.,A,,near,,,p6_blight_tightens,,audio/voice/fd_roots.ogg
+rv_fire,reveler,,"Drink, mortal! It's Fire Night!",X,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_fire.ogg
+rv_cave,reveler,,The High Lord leads the Rite tonight. You'll want to be well away from the cave.,A,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_cave.ogg
+rv_drums,reveler,,Can you feel it? The drums? Dance!,X,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_drums.ogg
+rv_solstice,reveler,,"Longest day of the year! Dance, or get out of the meadow!",X,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_solstice.ogg
+rv_wine,reveler,,Have you tried the wine? No? Clever girl.,A,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_wine.ogg
+rv_flowers,reveler,,Flowers in your hair! Now you look like one of us.,X,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_flowers.ogg
+d_first_dinner,feyre,,I ate their food. I'm still me. I think.,X,yes,deed,,first_dinner_eaten,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_first_dinner.ogg
+d_curtain,feyre,,Anything that comes through that door gets a faceful of velvet.,X,yes,deed,,curtain_trap_set,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_curtain.ogg
+d_bogge,feyre,,My hands won't stop shaking. I didn't look. I didn't look.,X,yes,deed,,bogge_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, shaking",audio/voice/d_bogge.ogg
+d_puca,feyre,,It wore Father's face. It knew his face.,X,yes,deed,,puca_resisted,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, sick",audio/voice/d_puca.ogg
+d_wound,feyre,,"His blood on my hands, and he thanked me for it.",X,yes,deed,,tamlin_wound_dressed,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_wound.ogg
+d_map,feyre,,Every hall on one page. Now I know every way out.,X,yes,deed,,manor_map_drawn,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_map.ogg
+d_mural,feyre,,"Seven courts, a war, a mountain in the middle. And us, at the edge of it.",A,yes,deed,,study_mural_seen,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_mural.ogg
+d_suriel,feyre,,It told me the truth. I wish it hadn't.,X,yes,deed,,suriel_bound,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_suriel.ogg
+d_naga,feyre,,I'm alive. I'm alive. Stop shaking.,X,yes,deed,,naga_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_naga.ogg
+d_faerie,feyre,,"""It will be all right,"" I told him. I hope he couldn't smell the lie.",A,yes,deed,,summer_faerie_comforted,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, hollow",audio/voice/d_faerie.ogg
+d_pool,feyre,,"Warm as silk, that water. Like floating in light.",A,yes,deed,,starlight_pool_found,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_pool.ogg
+d_gallery,feyre,,All of it. He opened all of it for me.,X,yes,deed,,gallery_opened,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_gallery.ogg
+d_painting,feyre,,My first painting in years. It's terrible. I love it.,X,yes,deed,,first_painting,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_painting.ogg
+d_attor,feyre,,That voice. Like nails drawn slow down my spine.,X,yes,deed,,attor_evaded,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, frozen",audio/voice/d_attor.ogg
+d_calanmai,feyre,,I should have stayed in my room.,X,yes,deed,,calanmai_attended,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_calanmai.ogg
+d_bite,feyre,,He bit me. I can still feel it.,X,yes,deed,,bite_endured,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, furious, a little proud",audio/voice/d_bite.ogg
+d_shown,feyre,,He kept the snowy forest. The one I hated painting.,A,yes,deed,,paintings_shown,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_shown.ogg
+d_glamour,feyre,,Magic smells like flowers now. Not metal. Flowers.,A,yes,deed,,glamour_lifted,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_glamour.ogg
+d_fountain,feyre,,A head in the fountain. A mark on its brow. Don't scream.,X,yes,deed,,fountain_head_found,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, a breath from screaming",audio/voice/d_fountain.ogg
+d_solstice,feyre,,I watched the sun come up in his arms. I didn't want it to.,X,yes,deed,,solstice_danced,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_solstice.ogg
+d_rhysand,feyre,,"See you Under the Mountain, he said. As if I'd ever go.",A,yes,deed,,rhysand_faced,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_rhysand.ogg
+d_sent_home,feyre,,He's sending me home. I should be glad.,X,yes,deed,,sent_home,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_sent_home.ogg
+d_nesta_truth,feyre,,Nesta went to the Wall for me. Nesta.,X,yes,deed,,nesta_truth_heard,p7_return_home,"inner voice, just after the deed",audio/voice/d_nesta_truth.ogg
+d_beddor,feyre,,Clare Beddor. I gave him her name.,A,yes,deed,,beddor_fire_learned,p7_return_home,"inner voice, the floor dropping away",audio/voice/d_beddor.ogg

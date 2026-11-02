@@ -1,0 +1,977 @@
+[gd_resource type="Resource" script_class="PresenceRoster" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/presence_spot.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/presence_roster.gd" id="2"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("1")
+id = &"father_hearth"
+speaker = &"father"
+scene = "res://creatures/family/father.tscn"
+region = &"cottage"
+at = Vector2(2.25, 0.95)
+room = &""
+yaw_deg = -100.0
+anchor = &"act1_cottage_interior"
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "by his chair and carving stool, his leg toward the fire"
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("1")
+id = &"nesta_dresser"
+speaker = &"nesta"
+scene = "res://creatures/family/nesta.tscn"
+region = &"cottage"
+at = Vector2(0.7, 1.75)
+room = &""
+yaw_deg = 180.0
+anchor = &"act1_cottage_interior"
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "by the dresser with her ribbon and comb"
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("1")
+id = &"elain_table"
+speaker = &"elain"
+scene = "res://creatures/family/elain.tscn"
+region = &"cottage"
+at = Vector2(1.8, -1.0)
+room = &""
+yaw_deg = 30.0
+anchor = &"act1_cottage_interior"
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "indoors all winter; she tends her garden in the milder months (Keeper)"
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("1")
+id = &"blessed_square"
+speaker = &"blessed"
+scene = "res://creatures/people/scenes/blessed.tscn"
+region = &"village"
+at = Vector2(372.0, 2244.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "C"
+notes = "Children of the Blessed accost the sisters in the square"
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("1")
+id = &"woman_stall"
+speaker = &"human_woman"
+scene = "res://creatures/people/scenes/human_woman.tscn"
+region = &"village"
+at = Vector2(387.5, 2265.3)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 1.5
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S5"]
+script = ExtResource("1")
+id = &"man_well"
+speaker = &"human_man"
+scene = "res://creatures/people/scenes/human_man.tscn"
+region = &"village"
+at = Vector2(384.0, 2252.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S6"]
+script = ExtResource("1")
+id = &"elder_board"
+speaker = &"human_elder"
+scene = "res://creatures/people/scenes/human_elder.tscn"
+region = &"village"
+at = Vector2(386.0, 2240.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S7"]
+script = ExtResource("1")
+id = &"youth_tavern"
+speaker = &"human_youth"
+scene = "res://creatures/people/scenes/human_youth.tscn"
+region = &"village"
+at = Vector2(408.0, 2222.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S8"]
+script = ExtResource("1")
+id = &"peddler_stall"
+speaker = &"peddler"
+scene = "res://creatures/people/scenes/peddler.tscn"
+region = &"village"
+at = Vector2(363.7, 2254.7)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "peddlers bring border-town stories; one sold her the ash arrow"
+
+[sub_resource type="Resource" id="S9"]
+script = ExtResource("1")
+id = &"woman_return"
+speaker = &"human_woman"
+scene = "res://creatures/people/scenes/human_woman.tscn"
+region = &"village"
+at = Vector2(387.5, 2265.3)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 1.5
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S10"]
+script = ExtResource("1")
+id = &"elder_return"
+speaker = &"human_elder"
+scene = "res://creatures/people/scenes/human_elder.tscn"
+region = &"village"
+at = Vector2(386.0, 2240.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p7_return_home")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S11"]
+script = ExtResource("1")
+id = &"alis_dressing"
+speaker = &"alis"
+scene = "res://creatures/people/scenes/alis.tscn"
+region = &"manor_estate"
+at = Vector2(36.0, -66.5)
+room = &"dressing_room"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 7.0
+hour_to = 11.0
+wander = 0.0
+canon = "C"
+notes = "she dresses and bathes Feyre"
+
+[sub_resource type="Resource" id="S12"]
+script = ExtResource("1")
+id = &"alis_kitchen"
+speaker = &"alis"
+scene = "res://creatures/people/scenes/alis.tscn"
+region = &"manor_estate"
+at = Vector2(48.0, -62.0)
+room = &"svc_kitchen"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 11.0
+hour_to = 21.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S13"]
+script = ExtResource("1")
+id = &"lucien_stables"
+speaker = &"lucien"
+scene = "res://characters/lucien/lucien_model.tscn"
+region = &"manor_estate"
+at = Vector2(-112.0, -24.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 13.0
+wander = 0.0
+canon = "A"
+notes = "hunts and patrols with her by day (ch9-11)"
+
+[sub_resource type="Resource" id="S14"]
+script = ExtResource("1")
+id = &"lucien_roses"
+speaker = &"lucien"
+scene = "res://characters/lucien/lucien_model.tscn"
+region = &"manor_estate"
+at = Vector2(-34.0, -118.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 13.0
+hour_to = 18.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S15"]
+script = ExtResource("1")
+id = &"lucien_drawing"
+speaker = &"lucien"
+scene = "res://characters/lucien/lucien_model.tscn"
+region = &"manor_estate"
+at = Vector2(-18.0, -40.0)
+room = &"drawing_room"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 18.0
+hour_to = 23.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S16"]
+script = ExtResource("1")
+id = &"tamlin_armory"
+speaker = &"tamlin"
+scene = "res://characters/tamlin/tamlin_model.tscn"
+region = &"manor_estate"
+at = Vector2(-36.0, -34.5)
+room = &"armory"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 7.0
+hour_to = 10.0
+wander = 0.0
+canon = "A"
+notes = "a warrior; arms before he rides out"
+
+[sub_resource type="Resource" id="S17"]
+script = ExtResource("1")
+id = &"tamlin_study"
+speaker = &"tamlin"
+scene = "res://characters/tamlin/tamlin_model.tscn"
+region = &"manor_estate"
+at = Vector2(-15.0, -66.0)
+room = &"tamlin_study"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 17.0
+hour_to = 21.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S18"]
+script = ExtResource("1")
+id = &"tamlin_garden"
+speaker = &"tamlin"
+scene = "res://characters/tamlin/tamlin_model.tscn"
+region = &"manor_estate"
+at = Vector2(18.0, -160.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 9.0
+hour_to = 13.0
+wander = 0.0
+canon = "A"
+notes = "the rose garden his father planted (ch19)"
+
+[sub_resource type="Resource" id="S19"]
+script = ExtResource("1")
+id = &"sentry_gate_w"
+speaker = &"sentry"
+scene = "res://creatures/people/scenes/sentry_1.tscn"
+region = &"manor_estate"
+at = Vector2(-7.0, 292.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = "High Fae sentries"
+
+[sub_resource type="Resource" id="S20"]
+script = ExtResource("1")
+id = &"sentry_gate_e"
+speaker = &"sentry"
+scene = "res://creatures/people/scenes/sentry_2.tscn"
+region = &"manor_estate"
+at = Vector2(7.0, 292.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S21"]
+script = ExtResource("1")
+id = &"gardener_roses"
+speaker = &"gardener"
+scene = "res://creatures/people/scenes/gardener_1.tscn"
+region = &"manor_estate"
+at = Vector2(-40.0, -130.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 4.0
+canon = "C"
+notes = "insect masks, iridescent wings, prune the hedges"
+
+[sub_resource type="Resource" id="S22"]
+script = ExtResource("1")
+id = &"gardener_hedge"
+speaker = &"gardener"
+scene = "res://creatures/people/scenes/gardener_2.tscn"
+region = &"manor_estate"
+at = Vector2(42.0, -165.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 4.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S23"]
+script = ExtResource("1")
+id = &"cook_kitchen"
+speaker = &"servant_cook"
+scene = "res://creatures/people/scenes/servant_cook.tscn"
+region = &"manor_estate"
+at = Vector2(45.0, -58.0)
+room = &"svc_kitchen"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S24"]
+script = ExtResource("1")
+id = &"maid_upper"
+speaker = &"servant_maid"
+scene = "res://creatures/people/scenes/servant_maid.tscn"
+region = &"manor_estate"
+at = Vector2(3.0, -55.0)
+room = &"upper_hall"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S25"]
+script = ExtResource("1")
+id = &"footman_hall"
+speaker = &"servant_footman"
+scene = "res://creatures/people/scenes/servant_footman.tscn"
+region = &"manor_estate"
+at = Vector2(6.0, -42.0)
+room = &"entrance_hall"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S26"]
+script = ExtResource("1")
+id = &"greenbrown_gallery"
+speaker = &"fae_greenbrown"
+scene = "res://creatures/people/scenes/fae_greenbrown.tscn"
+region = &"manor_estate"
+at = Vector2(26.0, -56.5)
+room = &"gallery"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "C"
+notes = "green-and-brown skin, long limbs"
+
+[sub_resource type="Resource" id="S27"]
+script = ExtResource("1")
+id = &"longlimb_library"
+speaker = &"fae_longlimb"
+scene = "res://creatures/people/scenes/fae_longlimb.tscn"
+region = &"manor_estate"
+at = Vector2(-31.0, -61.0)
+room = &"library"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S28"]
+script = ExtResource("1")
+id = &"seamstress_sewing"
+speaker = &"seamstress"
+scene = "res://creatures/people/scenes/seamstress.tscn"
+region = &"manor_estate"
+at = Vector2(68.5, -37.5)
+room = &"svc_sewing_room"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S29"]
+script = ExtResource("1")
+id = &"potion_stillroom"
+speaker = &"potion_maker"
+scene = "res://creatures/people/scenes/potion_maker.tscn"
+region = &"manor_estate"
+at = Vector2(69.0, -44.5)
+room = &"svc_stillroom"
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 0.0
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S30"]
+script = ExtResource("1")
+id = &"fae_mushroom_cottages"
+speaker = &"fae_mushroom"
+scene = "res://creatures/people/scenes/fae_mushroom.tscn"
+region = &"fae_village"
+at = Vector2(-1006.0, -816.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S31"]
+script = ExtResource("1")
+id = &"fae_moth_great_lantern_tree"
+speaker = &"fae_moth"
+scene = "res://creatures/people/scenes/fae_moth.tscn"
+region = &"fae_village"
+at = Vector2(-985.0, -908.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S32"]
+script = ExtResource("1")
+id = &"fae_fox_market"
+speaker = &"fae_fox"
+scene = "res://creatures/people/scenes/fae_fox.tscn"
+region = &"fae_village"
+at = Vector2(-945.0, -878.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S33"]
+script = ExtResource("1")
+id = &"fae_hedgehog_market"
+speaker = &"fae_hedgehog"
+scene = "res://creatures/people/scenes/fae_hedgehog.tscn"
+region = &"fae_village"
+at = Vector2(-936.0, -875.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S34"]
+script = ExtResource("1")
+id = &"fae_pixie_seamstress"
+speaker = &"fae_pixie"
+scene = "res://creatures/people/scenes/fae_pixie.tscn"
+region = &"fae_village"
+at = Vector2(-956.0, -957.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S35"]
+script = ExtResource("1")
+id = &"fae_satyr_village_mill"
+speaker = &"fae_satyr"
+scene = "res://creatures/people/scenes/fae_satyr.tscn"
+region = &"fae_village"
+at = Vector2(-1144.0, -950.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = ""
+
+[sub_resource type="Resource" id="S36"]
+script = ExtResource("1")
+id = &"fae_rose_market"
+speaker = &"fae_rose"
+scene = "res://creatures/people/scenes/fae_rose.tscn"
+region = &"fae_village"
+at = Vector2(-939.0, -886.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S37"]
+script = ExtResource("1")
+id = &"fae_owl_great_lantern_tree"
+speaker = &"fae_owl"
+scene = "res://creatures/people/scenes/fae_owl.tscn"
+region = &"fae_village"
+at = Vector2(-994.0, -901.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S38"]
+script = ExtResource("1")
+id = &"fae_stag_lantern_bridge"
+speaker = &"fae_stag"
+scene = "res://creatures/people/scenes/fae_stag.tscn"
+region = &"fae_village"
+at = Vector2(-1052.0, -849.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S39"]
+script = ExtResource("1")
+id = &"fae_nymph_lantern_bridge"
+speaker = &"fae_nymph"
+scene = "res://creatures/people/scenes/fae_nymph.tscn"
+region = &"fae_village"
+at = Vector2(-1049.0, -860.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S40"]
+script = ExtResource("1")
+id = &"fae_birch_cottages"
+speaker = &"fae_birch"
+scene = "res://creatures/people/scenes/fae_birch.tscn"
+region = &"fae_village"
+at = Vector2(-995.0, -824.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S41"]
+script = ExtResource("1")
+id = &"fae_dryad_potion_house"
+speaker = &"fae_dryad"
+scene = "res://creatures/people/scenes/fae_dryad.tscn"
+region = &"fae_village"
+at = Vector2(-1065.0, -983.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 2.5
+canon = "X"
+notes = "unseen (glamoured) before the lift, Keeper ch24"
+
+[sub_resource type="Resource" id="S42"]
+script = ExtResource("1")
+id = &"reveler_village_1"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_1.tscn"
+region = &"fae_village"
+at = Vector2(-934.0, -883.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 19.0
+wander = 2.5
+canon = "X"
+notes = "glamoured High Fae villagers before the lift"
+
+[sub_resource type="Resource" id="S43"]
+script = ExtResource("1")
+id = &"reveler_village_2"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_2.tscn"
+region = &"fae_village"
+at = Vector2(-996.0, -907.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 19.0
+wander = 2.5
+canon = "X"
+notes = "glamoured High Fae villagers before the lift"
+
+[sub_resource type="Resource" id="S44"]
+script = ExtResource("1")
+id = &"reveler_village_3"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_3.tscn"
+region = &"fae_village"
+at = Vector2(-1055.0, -851.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 8.0
+hour_to = 19.0
+wander = 2.5
+canon = "X"
+notes = "glamoured High Fae villagers before the lift"
+
+[sub_resource type="Resource" id="S45"]
+script = ExtResource("1")
+id = &"reveler_rite_1"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_1.tscn"
+region = &"hill_of_the_rite"
+at = Vector2(552.0, -856.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 19.0
+hour_to = 5.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S46"]
+script = ExtResource("1")
+id = &"reveler_rite_2"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_2.tscn"
+region = &"hill_of_the_rite"
+at = Vector2(567.0, -865.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 19.0
+hour_to = 5.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S47"]
+script = ExtResource("1")
+id = &"reveler_rite_3"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_3.tscn"
+region = &"hill_of_the_rite"
+at = Vector2(806.0, -1094.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 19.0
+hour_to = 5.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S48"]
+script = ExtResource("1")
+id = &"reveler_solstice_1"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_1.tscn"
+region = &"solstice_meadow"
+at = Vector2(-66.0, -1037.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S49"]
+script = ExtResource("1")
+id = &"reveler_solstice_2"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_2.tscn"
+region = &"solstice_meadow"
+at = Vector2(-54.0, -1042.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[sub_resource type="Resource" id="S50"]
+script = ExtResource("1")
+id = &"reveler_solstice_3"
+speaker = &"reveler"
+scene = "res://creatures/people/scenes/reveler_3.tscn"
+region = &"solstice_meadow"
+at = Vector2(-95.0, -1130.0)
+room = &""
+yaw_deg = 0.0
+anchor = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+wander = 3.0
+canon = "C"
+notes = ""
+
+[resource]
+script = ExtResource("2")
+spots = Array[ExtResource("1")]([SubResource("S0"), SubResource("S1"), SubResource("S2"), SubResource("S3"), SubResource("S4"), SubResource("S5"), SubResource("S6"), SubResource("S7"), SubResource("S8"), SubResource("S9"), SubResource("S10"), SubResource("S11"), SubResource("S12"), SubResource("S13"), SubResource("S14"), SubResource("S15"), SubResource("S16"), SubResource("S17"), SubResource("S18"), SubResource("S19"), SubResource("S20"), SubResource("S21"), SubResource("S22"), SubResource("S23"), SubResource("S24"), SubResource("S25"), SubResource("S26"), SubResource("S27"), SubResource("S28"), SubResource("S29"), SubResource("S30"), SubResource("S31"), SubResource("S32"), SubResource("S33"), SubResource("S34"), SubResource("S35"), SubResource("S36"), SubResource("S37"), SubResource("S38"), SubResource("S39"), SubResource("S40"), SubResource("S41"), SubResource("S42"), SubResource("S43"), SubResource("S44"), SubResource("S45"), SubResource("S46"), SubResource("S47"), SubResource("S48"), SubResource("S49"), SubResource("S50")])

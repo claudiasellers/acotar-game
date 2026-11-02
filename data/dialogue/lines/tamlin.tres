@@ -1,0 +1,448 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"t_grounds"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Go where you like on the grounds. Not the woods after dark."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"t_eating"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "You're eating more. Good."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray("first_dinner_eaten")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"t_border"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "I'll be at the border tonight. Lucien stays."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"t_bogge"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "It won't come near the house. I'll see to it."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods")
+require_flags = PackedStringArray("bogge_survived")
+forbid_flags = PackedStringArray("tamlin_wound_dressed")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"t_hand"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "It's healing. You've steady hands."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p3_house_and_woods")
+require_flags = PackedStringArray("tamlin_wound_dressed")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"t_letters"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "If you want help with your letters, ask. Or don't. The offer stands."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray("study_mural_seen")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"t_naga"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Four naga, and you went at them with a boot knife."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray("naga_survived")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"t_faerie"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "You held his hand. Most wouldn't have."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p3_house_and_woods", "p4_wider_court")
+require_flags = PackedStringArray("summer_faerie_comforted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"t_paint"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Paint whatever you like. Paint the walls, if the canvases run out."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("gallery_opened")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"t_pool"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "That pool was mine when I was a boy. It's yours too, now."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("starlight_pool_found")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"t_father"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "My father had this garden planted for my mother. It was a mating present."
+canon = "V"
+trigger = 3
+where = &"manor_grounds"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("gallery_opened")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"t_calanmai"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Calanmai. Stay inside tonight. Please."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("calanmai_attended")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"t_sorry"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "The kitchen. I'm sorry. For what I was that night."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("bite_endured")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "ashamed, low"
+emotion = &"pained"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"t_blight"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "The blight's spreading. I'll be gone a few days."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"t_fiddle"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "I can play a mean fiddle, you know."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("solstice_danced")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"t_hungry"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Are you hungry? You're always hungry. Come and eat."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"t_thorns"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Mind the thorns."
+canon = "X"
+trigger = 3
+where = &"manor_grounds"
+deed = &""
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"t_light"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "The light's good today. For painting, I mean."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray("first_painting")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("1")
+id = &"d_naga_tamlin"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "You're safe. I've got you."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"naga_survived"
+phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 5
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"guarded"
+
+[resource]
+script = ExtResource("3")
+area = &"tamlin"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18")])
+places = Array[ExtResource("2")]([])

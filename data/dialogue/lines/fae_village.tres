@@ -1,0 +1,842 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"fv_lanterns"
+speaker = &"feyre"
+who = ""
+text = "Music and lanterns, and a dozen faces turning to look at me."
+canon = "X"
+trigger = 0
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p4_wider_court")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"fv_fires"
+speaker = &"feyre"
+who = ""
+text = "Everyone here is talking about the fires."
+canon = "X"
+trigger = 0
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 1
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"fv_more"
+speaker = &"feyre"
+who = ""
+text = "More of them than I ever saw before. So many more."
+canon = "X"
+trigger = 0
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 2
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"fv_tree"
+speaker = &"feyre"
+who = ""
+text = "A tree full of lanterns, every one a different pink."
+canon = "X"
+trigger = 2
+where = &"great_lantern_tree"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"fv_bridge"
+speaker = &"feyre"
+who = ""
+text = "The bridge glows under my feet. I'm trying not to like it."
+canon = "X"
+trigger = 2
+where = &"lantern_bridge"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"fv_market"
+speaker = &"feyre"
+who = ""
+text = "A market where nobody shouts the prices. They sing them."
+canon = "X"
+trigger = 2
+where = &"market"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"fv_mill"
+speaker = &"feyre"
+who = ""
+text = "A mill grinding petals into something that smells like honey."
+canon = "X"
+trigger = 2
+where = &"village_mill"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"fv_silks"
+speaker = &"feyre"
+who = ""
+text = "Silks hung out like flags, every colour I've ever wanted."
+canon = "X"
+trigger = 2
+where = &"seamstress"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"fv_bottles"
+speaker = &"feyre"
+who = ""
+text = "Bottles bubbling in the window. I'm not touching anything."
+canon = "X"
+trigger = 2
+where = &"potion_house"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"fv_roofs"
+speaker = &"feyre"
+who = ""
+text = "Toadstool roofs. Actual toadstool roofs."
+canon = "X"
+trigger = 2
+where = &"cottages"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"rvv_human"
+speaker = &"reveler"
+who = ""
+text = "A human girl in the village? Don't eat anything unless you're sure of it."
+canon = "A"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"rvv_lord"
+speaker = &"reveler"
+who = ""
+text = "The High Lord's mortal. We've all heard about you. Mostly good things."
+canon = "X"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"rvv_lanterns"
+speaker = &"reveler"
+who = ""
+text = "Lovely day for lanterns. They light themselves at dusk."
+canon = "X"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"cf_human"
+speaker = &"court_fae"
+who = ""
+text = "So you can see us now. We could always see you."
+canon = "X"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"cf_welcome"
+speaker = &"court_fae"
+who = ""
+text = "The High Lord's mortal! Welcome, welcome. Mind your step."
+canon = "X"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"cf_lanterns"
+speaker = &"court_fae"
+who = ""
+text = "Lovely night for lanterns. Every night is."
+canon = "X"
+trigger = 3
+where = &"fae_village"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"fm_cousins"
+speaker = &"fae_mushroom"
+who = ""
+text = "Don't step on my cousins. They're the small ones."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"fmo_lantern"
+speaker = &"fae_moth"
+who = ""
+text = "Your lantern's lovely. May I just sit near it? A moment?"
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("1")
+id = &"ff_metal"
+speaker = &"fae_fox"
+who = ""
+text = "Is it true magic used to smell like metal to you? Poor thing."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("1")
+id = &"fh_prick"
+speaker = &"fae_hedgehog"
+who = ""
+text = "Pricked you? Sorry. It happens when I'm happy."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("1")
+id = &"fp_braids"
+speaker = &"fae_pixie"
+who = ""
+text = "Ooh, braids! Can I? I'll put flowers in. Tiny ones."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L21"]
+script = ExtResource("1")
+id = &"fs_hill"
+speaker = &"fae_satyr"
+who = ""
+text = "Fire Night's coming. Stay far from the hill, little mortal."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray("calanmai_attended")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L22"]
+script = ExtResource("1")
+id = &"fr_smell"
+speaker = &"fae_rose"
+who = ""
+text = "Smell me. Go on. Best roses in the court, and I'm not being modest."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L23"]
+script = ExtResource("1")
+id = &"fo_andras"
+speaker = &"fae_owl"
+who = ""
+text = "Who? Oh. You. The one who shot Andras. We remember."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "soft, unblinking"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L24"]
+script = ExtResource("1")
+id = &"fst_thin"
+speaker = &"fae_stag"
+who = ""
+text = "The woods are thinner than they were. The blight eats the edges."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L25"]
+script = ExtResource("1")
+id = &"fn_warm"
+speaker = &"fae_nymph"
+who = ""
+text = "The water's warm today. It's always warm for friends."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L26"]
+script = ExtResource("1")
+id = &"fb_trees"
+speaker = &"fae_birch"
+who = ""
+text = "Shh. I'm listening to the trees. They're worried."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L27"]
+script = ExtResource("1")
+id = &"fd_roots"
+speaker = &"fae_dryad"
+who = ""
+text = "Nearly fifty years the roots have tasted it. Something sour."
+canon = "A"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray("glamour_lifted")
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L28"]
+script = ExtResource("1")
+id = &"rv_fire"
+speaker = &"reveler"
+who = ""
+text = "Drink, mortal! It's Fire Night!"
+canon = "X"
+trigger = 3
+where = &"hill_of_the_rite"
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L29"]
+script = ExtResource("1")
+id = &"rv_cave"
+speaker = &"reveler"
+who = ""
+text = "The High Lord leads the Rite tonight. You'll want to be well away from the cave."
+canon = "A"
+trigger = 3
+where = &"hill_of_the_rite"
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L30"]
+script = ExtResource("1")
+id = &"rv_drums"
+speaker = &"reveler"
+who = ""
+text = "Can you feel it? The drums? Dance!"
+canon = "X"
+trigger = 3
+where = &"hill_of_the_rite"
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L31"]
+script = ExtResource("1")
+id = &"rv_solstice"
+speaker = &"reveler"
+who = ""
+text = "Longest day of the year! Dance, or get out of the meadow!"
+canon = "X"
+trigger = 3
+where = &"solstice_meadow"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L32"]
+script = ExtResource("1")
+id = &"rv_wine"
+speaker = &"reveler"
+who = ""
+text = "Have you tried the wine? No? Clever girl."
+canon = "A"
+trigger = 3
+where = &"solstice_meadow"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L33"]
+script = ExtResource("1")
+id = &"rv_flowers"
+speaker = &"reveler"
+who = ""
+text = "Flowers in your hair! Now you look like one of us."
+canon = "X"
+trigger = 3
+where = &"solstice_meadow"
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="P0"]
+script = ExtResource("2")
+id = &"great_lantern_tree"
+region = &"fae_village"
+at = Vector2(-990.0, -905.0)
+radius = 25.300000190734863
+
+[sub_resource type="Resource" id="P1"]
+script = ExtResource("2")
+id = &"lantern_bridge"
+region = &"fae_village"
+at = Vector2(-1052.0, -855.0)
+radius = 24.300000190734863
+
+[sub_resource type="Resource" id="P2"]
+script = ExtResource("2")
+id = &"village_mill"
+region = &"fae_village"
+at = Vector2(-1150.0, -950.0)
+radius = 19.0
+
+[sub_resource type="Resource" id="P3"]
+script = ExtResource("2")
+id = &"seamstress"
+region = &"fae_village"
+at = Vector2(-960.0, -960.0)
+radius = 18.0
+
+[sub_resource type="Resource" id="P4"]
+script = ExtResource("2")
+id = &"potion_house"
+region = &"fae_village"
+at = Vector2(-1060.0, -980.0)
+radius = 18.0
+
+[sub_resource type="Resource" id="P5"]
+script = ExtResource("2")
+id = &"market"
+region = &"fae_village"
+at = Vector2(-940.0, -880.0)
+radius = 29.5
+
+[sub_resource type="Resource" id="P6"]
+script = ExtResource("2")
+id = &"cottages"
+region = &"fae_village"
+at = Vector2(-1000.0, -820.0)
+radius = 34.7
+
+[resource]
+script = ExtResource("3")
+area = &"fae_village"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32"), SubResource("L33")])
+places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6")])
