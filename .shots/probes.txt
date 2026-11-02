@@ -1,0 +1,5 @@
+from L38 gowns on dress forms and tower rooms
+quality look
+timeout 900
+shot upper res://tools/manor_estate/room_shot.tscn dressing_room,observatory,rose_bower,svc_sewing_room {out}
+shot ground res://tools/manor_estate/room_shot.tscn costume_store@-1 {out}
