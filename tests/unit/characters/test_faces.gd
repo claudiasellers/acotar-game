@@ -163,3 +163,13 @@ func test_feyre_has_her_face_too() -> void:
 	_run(d, 0.5)
 	assert_eq(d.current_expression(), &"glare", "her anger is the glare and the clamped jaw")
 	assert_gt(d.weight_of("jaw_clench"), 0.6)
+
+
+func test_feyre_mouth_opening_stays_inside_her_lips() -> void:
+	# F35: wide painted lips must not carry the slit, the bag and the teeth out into the cheek
+	# (mouth.SEAM_HALF_MAX 0.0105 m x her horizontal scale ~1.05, / 0.86 for the bag: < 0.013 a side)
+	var m := (load("res://characters/feyre/model/feyre_model.tscn") as PackedScene).instantiate() as Node3D
+	add_child_autofree(m)
+	var mouth := m.find_child("Mouth", true, false) as MeshInstance3D
+	assert_lt(mouth.mesh.get_aabb().size.x, 0.028, "the inside of her mouth is no wider than her lips")
+	assert_gt(mouth.mesh.get_aabb().size.x, 0.018, "but still spans her mouth")

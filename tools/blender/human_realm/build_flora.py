@@ -447,16 +447,21 @@ def dead_bracken(b):
 @asset(800)
 def winter_grass_tuft(b):
     rng = b.rng
-    for k in range(18):
+    # Pale straw and buff, many soft drooping blades (audit A7: dark, stiff
+    # blades read as black stamped stars against the snow).
+    for k in range(30):
         a = rng.uniform(0, 6.28)
-        d = V((math.cos(a) * rng.uniform(0.2, 0.7), math.sin(a) * rng.uniform(0.2, 0.7), 1))
-        b.blade(V((math.cos(a) * 0.04, math.sin(a) * 0.04, 0)), d, rng.uniform(0.3, 0.5), 0.04,
-                "straw_dark", "straw", bend=0.35, segs=2)
+        d = V((math.cos(a) * rng.uniform(0.3, 0.9), math.sin(a) * rng.uniform(0.3, 0.9), 1))
+        b.blade(V((math.cos(a) * 0.06, math.sin(a) * 0.06, 0)), d, rng.uniform(0.25, 0.45), 0.028,
+                "straw", "buff", bend=0.5, segs=3)
 
 
 @asset(800)
 def snow_mound(b):
-    b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.25, flat_bottom=0.0)
+    # A smooth wind-carved drift, not a faceted lump: softer noise and
+    # smooth shading.
+    b.blob(V((0, 0, 0)), (1.1, 0.8, 0.35), 2, "snow", 0.12, flat_bottom=0.0)
+    b.smooth_faces.update(b.bm.faces)  # every face, the flattened base too
 
 
 @asset(1500)
@@ -835,11 +840,22 @@ def log_fallen(b):
 
 @asset(800)
 def stump(b):
-    b.tube([V((0, 0, 0)), V((0, 0, 0.3)), V((0, 0, 0.55))], [0.42, 0.36, 0.34], 10, "bark_wet", "bark_grey", cap=False)
-    b.cone(V((0, 0, 0.55)), 0.04, 0.34, 10, "wood_cut", bottom=False)
-    b.blob(V((0, 0, 0.6)), (0.15, 0.15, 0.015), 0, fl.mix("wood_cut", "bark_brown", 0.4), 0.05)  # ring
-    fl.flare(b, V((0, 0, 0)), 0.4, 5, "bark_wet", 0.3, 0.45)
-    b.blob(V((0.32, 0.1, 0.2)), (0.1, 0.1, 0.06), 1, "tinder", 0.2)
+    """A felled tree's stump: smooth ridged bark, root flare, a pale sawn top
+    with growth rings and a cap of snow, a bracket of tinder fungus. (Was a
+    flat-shaded ten-sided drum in near-black wet bark, which read as an
+    untextured black block: quality audit G3.)"""
+    b.tube([V((0, 0, 0)), V((0, 0, 0.3)), V((0, 0, 0.55))], [0.42, 0.37, 0.35], 14, "bark_stump", "bark_grey", cap=False)
+    fl.flare(b, V((0, 0, 0)), 0.4, 6, "bark_stump", 0.2, 0.28)  # low, rounded root buttresses
+    # Sawn top: concentric rings, heartwood darker, sapwood pale.
+    b.cone(V((0, 0, 0.55)), 0.02, 0.35, 14, "wood_cut", bottom=False)
+    for r, c in ((0.27, fl.mix("wood_cut", "bark_brown", 0.25)), (0.18, "wood_cut"), (0.1, fl.mix("wood_cut", "bark_brown", 0.4))):
+        b.blob(V((0, 0, 0.565)), (r, r, 0.006), 1, c, 0.0)
+    # Snow drifted onto half the cut (a soft dome, not a disc) and into the
+    # roots on the north side.
+    b.blob(V((0.08, 0.1, 0.6)), (0.24, 0.2, 0.09), 1, "snow", 0.25)
+    b.blob(V((0.0, 0.42, 0.06)), (0.35, 0.22, 0.12), 1, "snow", 0.2)
+    b.blob(V((0.32, -0.1, 0.25)), (0.11, 0.1, 0.06), 1, "tinder", 0.2)
+    b.smooth_faces.update(b.bm.faces)  # soft bark and snow, no faceting
 
 
 @asset(800)

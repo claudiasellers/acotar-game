@@ -38,6 +38,8 @@ const HALL_TO_KITCHEN := [Vector2(7, -38), Vector2(7, -54), Vector2(9, -50), Vec
 const GOWN := &"dinner_gown_rose"
 
 var _spaces_seen: Dictionary = {}
+## The clip sets this: skip the long road to the hill (a dev set-down).
+var ride_to_hill: bool = false
 
 
 func _run() -> void:
@@ -72,6 +74,9 @@ func _dev_jump() -> bool:
 	# Act II's first evening, which the real path has long since played.
 	WorldState.set_flag("fact.manor_arrived")
 	WorldState.set_flag("fact.alis_bathed")
+	# The Summer faerie (p3) is long buried: no body on the hall table.
+	for fact in ["fact.summer_faerie_died_alone", "fact.summer_faerie_buried", "fact.summer_faerie_farewell"]:
+		WorldState.set_flag(fact)
 	for flag in DEV_DEEDS:
 		WorldState.raise_deed(flag)
 	Clock.from_dict({"time_of_day": 18.75 / 24.0, "day": int(Clock.get(&"day"))})
@@ -123,8 +128,18 @@ func _fires() -> bool:
 	_begin("fires", "out by the front doors, the wayside road to the Hill of the Rite; in among the bonfires: calanmai_attended")
 	await _walk_to(PORTICO, 2.0)
 	await _walk_to(FORECOURT, 4.0)
-	for p: Vector3 in _wayside():
-		await _walk_to(p, 6.0)
+	if ride_to_hill:
+		# The clip's time budget: a dev set-down at the last wayside spot
+		# instead of the 1.2 km road (the playtest walks it).
+		var last: Vector3 = _wayside()[-1]
+		feyre.global_position = Vector3(last.x, WorldHeight.height_at(last.x, last.z) + 1.0, last.z)
+		feyre.velocity = Vector3.ZERO
+		WorldStreamer.update_for(feyre.global_position)
+		_beat["dev_jump"] = true
+		_note("DEV: set down at the last wayside spot %s" % _v(feyre.global_position))
+	else:
+		for p: Vector3 in _wayside():
+			await _walk_to(p, 6.0)
 	var a: Node3D = null
 	if await _until_wall(func() -> bool: return _anchor(&"calanmai_bonfires") != null, 120.0):
 		a = _anchor(&"calanmai_bonfires")

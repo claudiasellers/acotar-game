@@ -39,6 +39,8 @@ func _ready() -> void:
 		prey = get_node_or_null(prey_path) as Node3D
 	# Fixed on the doe: the player never registers as anything worth turning for.
 	senses.decay = 10.0
+	_keep_guard_hair()
+	_set_eye_glow(data.eye_glow)
 	if not kill_flag.is_empty():
 		_trigger = ActionTrigger.new()
 		_trigger.name = "KillTrigger"
@@ -52,6 +54,16 @@ func _ready() -> void:
 
 ## Story cues: `stalk` creeps on the nearest doe, `seize_doe` bursts out at
 ## her, `look_at_feyre` turns him to her (the scene plays it after the ash).
+## Lane L43: the guard-hair cards are thin strips, the first thing the
+## automatic LOD throws away, and they make his silhouette. Hold the full mesh
+## out to about four times the usual LOD distance.
+func _keep_guard_hair() -> void:
+	if model == null:
+		return
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		(mi as MeshInstance3D).lod_bias = 4.0
+
+
 func _on_cue(actor: StringName, cue: StringName) -> void:
 	if actor != &"great_wolf" or not alive:
 		return

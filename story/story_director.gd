@@ -75,6 +75,7 @@ func attach_anchor(anchor: Node3D) -> Array[SceneSpace]:
 	Act1Anchors.attach(anchor, self)
 	spaces.append_array(Act2Spaces.attach(anchor))
 	spaces.append_array(Act3Anchors.attach(anchor))
+	spaces.append_array(Act6Spaces.attach(anchor))
 	if anchor_id == _pending_anchor:
 		_pending_anchor = &""
 		var p := get_tree().get_first_node_in_group(&"player") as Node3D
@@ -105,7 +106,8 @@ func _space_for(moment: StoryMoment) -> SceneSpace:
 	return space
 
 
-func _on_region_loaded(_region_id: StringName, root: Node3D) -> void:
+func _on_region_loaded(region_id: StringName, root: Node3D) -> void:
+	WiderCourtAnchors.place(region_id, root)  # L44: p4 anchors beside other lanes' landmarks
 	attach_all(root)
 
 

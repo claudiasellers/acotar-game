@@ -30,6 +30,7 @@ def ST(s, r, near="self", strict=False, fail=""):
     return d
 def UF(flag): return {"do": "until_flag", "flag": flag}
 def UK(kind, n): return {"do": "until_killed", "kind": kind, "n": n}
+def FILM(id): return {"do": "film", "id": id}
 def DEC(options, s, default): return {"do": "decision", "options": options, "s": s, "default": default}
 
 M = []
@@ -95,11 +96,12 @@ moment("summer_faerie", "17", "", "manor_house", ["naga_survived"], [
 ], trigger="auto", notes="Unwinnable triage on the entrance-hall table; the deed is holding his hand until he dies.")
 
 # --- P4 The wider court (ch 18-19) -------------------------------------------
+# Coded by L44 (story/act4/starlight_pool_swim.gd, Act2Spaces.CODED): these
+# steps are the fallback and name the deed. No knife in ch18 (Keeper).
 moment("starlight_pool", "18", "starlight_pool", "starlight_glen", ["summer_faerie_comforted"], [
     SP("tamlin", V(2, 0, 2)), C("WALK"), CU("tamlin", "shows_his_childhood_pool"), CEL("vista"),
     ST(6.0, 8.0), R("starlight_pool_found"), CEL("deed"), J("lucien_autumn_history"),
-    G("obj_lucien_knife"),
-], r=10.0, notes="Picnic in the glen, swim in the pool; Lucien's story and his knife.")
+], r=10.0, notes="L44: picnic on the glen shore; she finds the pool below the falls and jumps in; Tamlin tells Lucien's history.")
 moment("gallery", "19", "manor_gallery", "manor_house", ["gallery_opened"], [
     C("WALK"), {"do": "gaze_hold", "actor": "self", "s": 3.0, "cone": 35.0}, CEL("gallery"),
     R("fact.gallery_seen"),
@@ -116,7 +118,7 @@ moment("attor", "19", "attor_hiding_spot", "manor_grounds", ["first_painting"], 
     SP("attor", V(0, 3, -12)), CU("attor", "speaks_of_her"),
     ST(18.0, 2.5, "self", True, "fact.attor_detected"), MO("dread", 0.2, 2.0), DS("attor"),
     R("attor_evaded"),
-], r=3.0, notes="Stay hidden; leaving the spot is detection (a permanent fact) and the scene ends.")
+], r=3.0, notes="L44 (story/act4/attor_in_the_garden.gd): by day; Tamlin says stay hidden and she hides herself behind the hedge; leaving cover or rustling is detection (a permanent fact) and the scene ends.")
 
 # --- P5 Calanmai (ch 20-22) --------------------------------------------------
 moment("calanmai_fires", "20", "calanmai_bonfires", "hill_of_the_rite", ["attor_evaded"], [
@@ -147,32 +149,22 @@ moment("paintings_shown", "22", "manor_dining_table", "manor_house", ["bite_endu
    "she comes to dinner in a gown, the table shrinks, she shows him her painting room, and gives him the wintry canvas.")
 
 # --- P6 The blight tightens (ch 23-27) ---------------------------------------
-moment("glamour_lift", "23", "glamour_lift_glade", "blossom_vale", ["paintings_shown"], [
-    SP("tamlin", V(0, 0, -1.2)), C("LOOK", "tamlin"), W(2.0), CU("tamlin", "kisses_her_eyelids"),
-    R("glamour_lifted"), CU("feyre", "smell_flowers"), CEL("glamour"), W(3.0),
-], r=8.0, notes="Magic smells of flowers now; true forms show (GlamourLayer).")
-moment("fountain_head", "24", "manor_fountain", "manor_grounds", ["glamour_lifted"], [
-    C("LOOK", "self"), MO("dread", 0.7, 1.0), W(3.0), J("night_court_mark"), R("fountain_head_found"),
-], r=6.0)
-moment("solstice", "25", "solstice_dance_floor", "solstice_meadow", ["fountain_head_found"], [
-    G("outfit_solstice_blue_gown"), G("hair_loose_with_flowers"), SP("lucien", V(2, 0, 0)),
-    SP("tamlin", V(0, 0, -6)), CU("tamlin", "plays_the_fiddle"), CEL("solstice"), ST(15.0, 15.0),
-    CU("lucien", "warns_of_faerie_wine"), CU("tamlin", "takes_her_to_the_wisps"),
-    ST(12.0, 3.0, "tamlin"), CEL("dance"), R("solstice_danced"),
-], r=12.0)
-moment("rhysand_visit", "26", "manor_window_hide", "manor_house", ["solstice_danced"], [
-    SP("lucien", V(1, 0, 0)), CU("lucien", "glamours_her"), SP("rhysand", V(0, 0, -6)),
-    SP("tamlin", V(-2, 0, -5)), MO("dread", 0.7, 1.0), C("WALK", "rhysand"), CU("rhysand", "mocks_tamlin"),
-    ST(10.0, 2.5), CU("rhysand", "pries_into_her_mind"), MO("dread", 0.9, 0.3, 0.25),
-    DEC([{"action": "interact", "fact": "fact.false_name_clare_beddor"}], 6.0, "fact.false_name_clare_beddor"),
-    CU("rhysand", "see_you_under_the_mountain"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
-], r=3.0)
-moment("sent_home", "27-28", "manor_tamlin_room", "manor_house", ["rhysand_faced"], [
-    SP("tamlin", V(0, 0, -1.5)), C("LOOK", "tamlin"), W(4.0), CU("tamlin", "sends_her_home"),
-    G("outfit_mortal_travel_dress"), MO("enchanted_sleep", 1.0, 2.5), W(3.0), R("sent_home"),
-    {"do": "grade", "to": "human_spring", "s": 2.0}, {"do": "travel", "region": "archeron_estate", "anchor": "arrival_archeron_estate"},
-    MO("calm", 0.0, 2.0),
-], r=4.0)
+moment("glamour_lift", "23", "glamour_lift_glade", "blossom_vale", ["paintings_shown", "fact.glen_picnic_shared"], [
+    FILM("eyes_open"), UF("fact.film_eyes_open_lift"),
+    R("glamour_lifted"), CU("feyre", "smell_flowers"), UF("fact.film_eyes_open_seen"), CEL("glamour"), W(1.0),
+], r=8.0, notes="Cutscene A (lane L33) plays it with the picnic's own Tamlin (L46); the glamour lifts under its black. Magic smells of flowers now; true forms show (GlamourLayer).")
+moment("fountain_head", "24", "manor_fountain", "manor_grounds", ["glamour_lifted", "fact.fountain_head_seen"], [
+    R("fountain_head_found"),
+], trigger="auto", r=6.0, notes="L46 stages the find and writes fact.fountain_head_seen.")
+moment("solstice", "25", "solstice_dance_floor", "solstice_meadow", ["fountain_head_found", "fact.solstice_sunrise_watched"], [
+    R("solstice_danced"),
+], trigger="auto", r=12.0, notes="L46 stages the night (Alis dresses her) and writes fact.solstice_sunrise_watched.")
+moment("rhysand_visit", "26", "manor_window_hide", "manor_house", ["solstice_danced", "fact.lunch_sat_down"], [
+    FILM("night_court"), UF("fact.film_night_court_seen"), MO("dread", 0.2, 2.0), R("rhysand_faced"),
+], trigger="auto", r=3.0, notes="Starts when she sits down to lunch (L46 casts Tamlin and Lucien). Cutscene B (lane L33) plays it in the dining hall and brings Rhysand itself; the film writes fact.false_name_clare_beddor.")
+moment("sent_home", "27-28", "manor_tamlin_room", "manor_house", ["rhysand_faced", "fact.carriage_boarded"], [
+    R("sent_home"),
+], trigger="auto", r=4.0, notes="L46 stages the night, the paintings, the carriage and the sleep, and writes fact.carriage_boarded.")
 
 # --- P7 Return to the human realm (ch 28-31) ---------------------------------
 moment("nesta_truth", "29-30", "archeron_estate_garden", "archeron_estate", ["sent_home"], [
@@ -189,9 +181,9 @@ moment("wall_recross", "31", "wall_gate_north", "wall_seam", ["beddor_fire_learn
 
 # --- P8 The pass (ch 32) -----------------------------------------------------
 moment("alis_truth", "32", "manor_alis_hiding", "manor_house", ["wall_recrossed"], [
-    MO("dread", 0.5, 2.0), SP("alis", V(0, 0, -1.5)), C("LOOK", "alis"), W(6.0),
+    SP("alis", V(0, 0, -1.5)), FILM("silent_manor"), UF("fact.film_silent_manor_seen"),
     J("amarantha_and_the_curse"), J("andras_crossed_to_help"), R("alis_truth_heard"),
-], r=4.0, notes="The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed).")
+], r=4.0, notes="Cutscene C (lane L33) plays it and ends on the garden steps at dawn, facing north. The manor shows signs of violent struggle (region lanes: StateVisibility on wall_recrossed).")
 moment("departure", "32", "the_pass_road", "the_pass", ["alis_truth_heard"], [
     C("LOOK"), W(3.0), R("departed_for_mountain"),
 ], r=10.0)

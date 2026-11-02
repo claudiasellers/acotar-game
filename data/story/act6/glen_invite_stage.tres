@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"feyre_door": Vector3(-4, 0, 9),
+"glen_arrive": Vector3(2.2, 0, -2.6),
+"tamlin_steps": Vector3(-4, 0, 14)
+}
+lines = {
+"press_go": {"text": "The horses were saddled. He was waiting for me.", "who": ""},
+"ride_thought": {"text": "We rode until the hills folded green around us.", "who": ""},
+"tamlin_come": {"text": "Come riding with me. There's somewhere I want you to see.", "who": "Tamlin"}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("press_go", "ride_thought", "tamlin_come")
+canon = "Ch23 (Keeper 2026-11-02): another beautiful place on his land; they ride there. hall_mark_1 is at house (4, 0, -31); the front steps are at about (0, -17). glen_arrive is in glamour_lift_glade's frame, a few steps from the blanket."

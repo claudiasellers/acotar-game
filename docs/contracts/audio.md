@@ -34,7 +34,7 @@ gets sound by emitting what it already emits. Files are self-made and CC0
 | `Bogge.manifested` / `begged` / `passed` (L25) | flat (in her head): sub throb, icy whine and chattering teeth loop / whispers circling her / the cold lets go |
 | `Puca.image_changed` / `darted` | a quiet watery shimmer / a shimmer whoosh (canon: it is silent) |
 | `DreadField.wrong_sound(at)` | the wrong sound at that spot (once per 1.5 s) |
-| `line_spoken(line_id, ...)` on a node in group `dialogue_director` (dialogue lane) | when `res://audio/voice/<line_id>.ogg` exists: bed -7 dB, music -10.5 dB for the file's length. The dialogue lane plays the file itself |
+| `line_spoken(line_id, ...)` on a node in group `dialogue_director` (dialogue lane; `EventBus.line_spoken` is not used) | when `res://audio/voice/<line_id>.ogg` exists: bed -7 dB, music -10.5 dB for the file's length. The dialogue lane plays the file itself |
 | `scene_space_started` / `finished` with an id starting `film_` (cinematic lane) | space music fades to silence (1.5 s) and beds to 50% until the last film space finishes (3 s back). The film plays its own score |
 | `EventBus.celebration_requested` | harp sweep, bell chord, glitter (once per 1.5 s) |
 | Any `BaseButton` (hover, focus, press) | glass tick, soft bell. Set meta `silent` = true to opt out |

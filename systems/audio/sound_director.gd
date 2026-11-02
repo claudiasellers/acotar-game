@@ -457,7 +457,8 @@ func _on_node_added(node: Node) -> void:
 		puca.darted.connect(func() -> void: play(&"puca_dart", puca.global_position))
 	elif node is DreadField:
 		(node as DreadField).wrong_sound.connect(func(at: Vector3) -> void: play_once(&"horror_wrong", at))
-	elif node.is_in_group(&"dialogue_director") or node.has_signal(&"line_spoken"):
+	elif node.has_signal(&"line_spoken") and node != EventBus:
+		# Deferred: a dialogue director may join its group in _ready.
 		_attach_dialogue.call_deferred(node)
 	elif node is WolfPack:
 		var pack := node as WolfPack
@@ -558,9 +559,11 @@ func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, 
 
 
 ## The dialogue lane plays voice files itself; this only ducks the bed and
-## music under a line that has a file (systems/dialogue line_spoken).
+## music under a line that has a file (systems/dialogue line_spoken). Only
+## nodes in group dialogue_director: EventBus.line_spoken has another shape.
 func _attach_dialogue(node: Node) -> void:
-	if is_instance_valid(node) and node.has_signal(&"line_spoken") \
+	if is_instance_valid(node) and node.is_in_group(&"dialogue_director") \
+			and node.has_signal(&"line_spoken") \
 			and not node.is_connected(&"line_spoken", _on_line_spoken):
 		node.connect(&"line_spoken", _on_line_spoken)
 

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Act2Stage" format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"bed_side": Vector3(0, 0, 12)
+}
+lines = {
+"brook_rainbow": {"text": "A near-invisible rainbow ran over the brook.", "who": ""},
+"everything_sang": {"text": "The birdsong was an orchestra.", "who": ""},
+"magic_scent": {"text": "Magic smelled like jasmine, like lilac, like roses.", "who": ""},
+"tamlin_home": {"text": "Come. Alis will scold us both if we're late.", "who": "Tamlin"},
+"willow_sings": {"text": "The willow sang, melancholy and weary.", "who": ""}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("tamlin_home")
+canon = "Ch23 [C]: sound first, birdsong an orchestra; the willow sings, melancholy and weary; sight richer, clearer; the brook a near-invisible rainbow; magic smells like jasmine, like lilac, like roses. Bedroom offset bed_side is in feyre_bedroom_window's frame."

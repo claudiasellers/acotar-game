@@ -43,7 +43,7 @@ ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, HERE)
 
 import numpy as np  # noqa: E402
-from PIL import Image, ImageDraw  # noqa: E402
+from PIL import Image, ImageDraw, ImageFilter  # noqa: E402
 
 import catalog  # noqa: E402
 import painter  # noqa: E402
@@ -239,7 +239,9 @@ FACE_V = {"bust": 0.56, "half": 0.36, "full": 0.2}
 
 
 def _floor_band(r, q):
-    """The floor a full-length sitter stands on."""
+    """The floor a full-length sitter stands on (a grand setting has its own)."""
+    if q.get("back") in P.SETTINGS:
+        return
     if q.get("back") == "garden":
         import motifs as M
         M.meadow(r, 0.84, "spring", "golden", q["seed"], 0.5)
@@ -249,8 +251,54 @@ def _floor_band(r, q):
                 mask=(r.v > 0.86).astype(np.float32))
 
 
-def _sitter_into(r, rgb, alpha, x0, frame, k=1.0):
+def _oil_sitter(rgb, alpha):
+    """Take the render's CG look off a full-length sitter before the brush
+    does (audit A5): simplified forms, shadows glazed warm, highlights held
+    down, a softened silhouette."""
+    img = Image.fromarray(np.clip(rgb * 255, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.MedianFilter(3))
+    out = np.asarray(img, np.float32) / 255.0
+    lum = (out @ np.array([0.3, 0.59, 0.11], np.float32))[..., None]
+    glaze = np.array([0.42, 0.26, 0.2], np.float32)
+    out = out * (0.86 + 0.1 * lum) + glaze * (1 - lum) * 0.14
+    a = Image.fromarray(np.clip(alpha * 255, 0, 255).astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(1.6))
+    return np.clip(out, 0, 1), np.asarray(a, np.float32) / 255.0
+
+
+def _cast_shadow(r, alpha):
+    """A soft shadow pooled at the sitter's feet, falling right (light from the left)."""
+    rows = np.nonzero(alpha.max(axis=1) > 0.5)[0]
+    cols = np.nonzero(alpha.max(axis=0) > 0.5)[0]
+    if len(rows) == 0:
+        return
+    fy = rows.max() / r.h
+    cx = (cols.min() + cols.max()) / 2 / r.w
+    sh = r.ellipse(cx + 0.08, min(0.98, fy), 0.2, 0.025, blur=10.0)
+    r.put("#291c1a", sh, alpha=0.45)
+
+
+def _stand_back(rgb, alpha, stand):
+    """Shrink a full-length sitter so the setting shows round them (audit A5):
+    stand = (centre x, height) in canvas fractions, feet near the bottom."""
+    h, w = alpha.shape
+    cx, k = stand
+    sw, sh = max(1, int(w * k)), max(1, int(h * k))
+    small = np.asarray(Image.fromarray(np.clip(rgb * 255, 0, 255).astype(np.uint8)).resize((sw, sh), Image.LANCZOS), np.float32) / 255.0
+    sa = np.asarray(Image.fromarray(np.clip(alpha * 255, 0, 255).astype(np.uint8)).resize((sw, sh), Image.LANCZOS), np.float32) / 255.0
+    out = np.zeros_like(rgb)
+    oa = np.zeros_like(alpha)
+    x0 = int(w * cx - sw / 2)
+    y0 = h - sh - int(h * 0.025)
+    xa, xb = max(0, x0), min(w, x0 + sw)
+    out[y0:y0 + sh, xa:xb] = small[:, xa - x0:xb - x0]
+    oa[y0:y0 + sh, xa:xb] = sa[:, xa - x0:xb - x0]
+    return out, oa, y0 / h + FACE_V["full"] * k
+
+
+def _sitter_into(r, rgb, alpha, x0, frame, k=1.0, face_v=None):
     """Composite a sitter render (its own width) at pixel column x0."""
+    if frame == "full":
+        rgb, alpha = _oil_sitter(rgb, alpha)
+        _cast_shadow(r, alpha)
     hh, ww = alpha.shape
     big_rgb = np.zeros((r.h, r.w, 3), np.float32)
     big_a = np.zeros((r.h, r.w), np.float32)
@@ -258,8 +306,8 @@ def _sitter_into(r, rgb, alpha, x0, frame, k=1.0):
     big_rgb[:, xa:xb] = rgb[:, xa - x0:xb - x0]
     big_a[:, xa:xb] = alpha[:, xa - x0:xb - x0] * k
     r.put(big_rgb, big_a)
-    face = big_a * (r.v < FACE_V.get(frame, 0.5))
-    r.mark_detail(face, 0.6)
+    face = big_a * (r.v < (face_v if face_v is not None else FACE_V.get(frame, 0.5)))
+    r.mark_detail(face, 0.9 if frame == "full" else 0.6)
 
 
 def reference(e):
@@ -289,7 +337,10 @@ def reference(e):
             if frame == "full":
                 _floor_band(r, p)
             rgb, a = _rgba(renders[0], w, h)
-            _sitter_into(r, rgb, a, 0, frame)
+            face_v = None
+            if frame == "full":
+                rgb, a, face_v = _stand_back(rgb, a, e.get("stand", (0.5, 0.8)))
+            _sitter_into(r, rgb, a, 0, frame, face_v=face_v)
         else:
             pw = int(w * 0.58)
             for i, path in enumerate(renders):
@@ -313,12 +364,14 @@ def reference(e):
 # brush settings per family
 PAINT = {
     "portrait": dict(crisp=0.2),
+    "full": dict(scales=(0.05, 0.026, 0.014, 0.008), threshold=0.085, bristle=0.7, crisp=0.08, value_jitter=0.04),
     "still": dict(crisp=0.2),
     "print": dict(scales=(0.03, 0.015, 0.008, 0.005), crisp=0.5, bristle=0.25, value_jitter=0.015),
     "default": dict(),
 }
 FINISH = {
     "portrait": dict(varnish=0.35, vignette=0.45, contrast=0.12, saturate=0.05),
+    "full": dict(varnish=0.5, vignette=0.5, contrast=0.2, saturate=0.12),
     "still": dict(varnish=0.35, vignette=0.4, contrast=0.12, saturate=0.08),
     "print": dict(varnish=0.08, vignette=0.0),
     "default": dict(varnish=0.3, vignette=0.22, contrast=0.22, saturate=0.12),
@@ -329,13 +382,15 @@ def _family(e):
     g = e["genre"]
     if g in ("plate", "botanical", "map"):
         return "print"
+    if g == "portrait" and e.get("sitter", {}).get("frame") == "full":
+        return "full"
     if g in ("portrait", "still"):
         return g
     return "default"
 
 
 # Bump when reference()/paint_one() change how a family is composited.
-RECIPE_VERSION = {"portrait": 2, "landscape": 2, "animal": 2, "still": 1, "plate": 1, "botanical": 2,
+RECIPE_VERSION = {"portrait": 4, "landscape": 2, "animal": 2, "still": 1, "plate": 1, "botanical": 2,
                   "map": 1, "cauldron": 2, "interior": 1}
 GENRE_FILES = {"landscape": "scenes_land.py", "animal": "scenes_land.py", "still": "scenes_still.py",
                "portrait": "scenes_portrait.py", "plate": "scenes_misc.py", "botanical": "scenes_misc.py",
@@ -451,6 +506,32 @@ def write_sheets(layers, images):
     return cells
 
 
+def patch_array(works, images):
+    """Paste repainted works into their existing cells of the committed array,
+    so a fix to a few works needs neither the others' cache nor a repack."""
+    cat = open(TRES).read()
+    Image.MAX_IMAGE_PIXELS = None
+    path = os.path.join(OUT_DIR, ARRAY_NAME)
+    big = Image.open(path).convert("RGB")
+    for e in works:
+        blk = cat[cat.index('id = &%s' % _q(e["id"])):]
+        blk = blk[:blk.index("[sub_resource") if "[sub_resource" in blk else len(blk)]
+        layer = int(re.search(r"layer = (-?\d+)", blk).group(1))
+        uv = [float(x) for x in re.search(r"uv = Rect2\(([^)]*)\)", blk).group(1).split(",")]
+        px = tuple(int(x) for x in re.search(r"pixels = Vector2i\(([^)]*)\)", blk).group(1).split(","))
+        assert layer >= 0, "%s is held back: it has no cell" % e["id"]
+        assert images[e["id"]].size == px, "%s changed size %s -> %s: run a full build" % (e["id"], px, images[e["id"]].size)
+        lx, ly = (layer % COLS) * LAYER_W, (layer // COLS) * LAYER_H
+        x, y = round(uv[0] * LAYER_W), round(uv[1] * LAYER_H)
+        lay = big.crop((lx, ly, lx + LAYER_W, ly + LAYER_H))
+        lay.paste(images[e["id"]], (x, y))
+        lay = _extend(lay, x, y, px[0], px[1])
+        big.paste(lay, (lx, ly))
+        print("patched %s into layer %d at %d,%d" % (e["id"], layer, x, y))
+    big.save(path, "WEBP", quality=QUALITY, method=6)
+    print("array %s %.2f MB" % (ARRAY_NAME, os.path.getsize(path) / 1e6))
+
+
 IMPORT = """[remap]
 
 importer="2d_array_texture"
@@ -562,6 +643,8 @@ def main():
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 4)))
     ap.add_argument("--no-blender", action="store_true")
     ap.add_argument("--no-sheets", action="store_true")
+    ap.add_argument("--patch", action="store_true",
+                    help="with --only: repaint those works into their cells of the committed array (same sizes), leaving the rest as they are")
     a = ap.parse_args()
     works = catalog.WORKS
     ids = [e["id"] for e in works]
@@ -583,6 +666,9 @@ def main():
     print("painted %d works in %.0f s" % (len(works), time.time() - t))
     if a.contact:
         contact(works, images, a.contact)
+    if a.patch:
+        patch_array(works, images)
+        return
     if a.only or a.no_sheets:
         return
     cells = write_sheets(pack(works, images), images)

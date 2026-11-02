@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="Act2Stage" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://story/act2/act2_stage.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+marks = {
+"horse": Vector3(2.4, 0, -1.6),
+"horse_faces": Vector3(6, 0, -1.6),
+"kit": Vector3(0.9, 0, 0.9),
+"tamlin": Vector3(0.9, 0, -2.6)
+}
+lines = {
+"brush": {
+"text": "Grab a brush. Long strokes, with the grain. She'll tell you if you're doing it wrong.",
+"who": "Tamlin"
+},
+"no_route": {
+"text": "You know my roads as well as I do now. Better, some evenings.",
+"who": "Tamlin"
+},
+"pleased": {
+"text": "Look at that. She's never shone like that for me.",
+"who": "Tamlin"
+},
+"route_fells": {
+"text": "Ride west past the glen and the land climbs into the fells. My sentries keep the towers there. They practise at the butts below the north one.",
+"who": "Tamlin"
+},
+"route_glen": {
+"text": "There's a glen west of here, lakes like mirrors. Some afternoon I'll show you the best of it.",
+"who": "Tamlin"
+},
+"route_rosewild": {
+"text": "South-west the roses run wild for miles. Pretty from the saddle. Less so if you fall in.",
+"who": "Tamlin"
+},
+"route_vale": {
+"text": "East, past the woods, the Blossom Vale. The orchards there were planted before my grandfather's time.",
+"who": "Tamlin"
+},
+"route_village": {
+"text": "The lesser faeries keep a village up the Thornwater, north-west. Their potion-maker lets travellers use the potion room, if they're polite.",
+"who": "Tamlin"
+},
+"tomorrow": {
+"text": "Same time tomorrow, if you like.",
+"who": "Tamlin"
+}
+}
+extra_require = PackedStringArray()
+invented = PackedStringArray("brush", "no_route", "pleased", "route_fells", "route_glen", "route_rosewild", "route_vale", "route_village", "tomorrow")
+canon = "Routine (GAME_DESIGN_PLAN §NPC routines: 'Tamlin at the stables at dusk'). Keeper 2026-11-02: [X] but grounded: the stables lie beyond the garden fields (ch19), and Tamlin 'had taught me how to ride bareback these past few weeks' (ch20); he rides the grounds with her on lazy days. Every line is X. Places named are the court's [X] expansion regions (lore/01-world/spring-court-regions.md) except the glen [C ch18]. Marks are in the stables_dusk anchor's frame (the stable yard's mouth)."

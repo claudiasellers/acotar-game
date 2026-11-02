@@ -36,3 +36,5 @@ fog_aerial_perspective = 0.4
 volumetric_anisotropy = 0.7
 volumetric_light_energy = 1.6
 glow_hdr_threshold = 1.4
+; A few soft fair-weather clouds drifting over the meadows (painted_sky).
+cloud_cover = 0.32
