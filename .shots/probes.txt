@@ -1,0 +1,7 @@
+from L32 story sites on main
+quality look
+size 1920x1080
+timeout 600
+shot s05 res://tools/landscape/landscape_shot.tscn place_starlight_pool {out}/s05_starlight_pool.png
+shot s06 res://tools/landscape/landscape_shot.tscn place_cave_of_the_rite {out}/s06_cave_of_the_rite.png
+shot s07 res://tools/landscape/landscape_shot.tscn place_dance_ring {out}/s07_dance_ring.png
