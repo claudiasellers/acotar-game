@@ -355,12 +355,14 @@ class Builder:
         rng = self.rng
 
         def fn(f, _c=color):
-            c = jitter(_c, rng, 0.04 if smooth else 0.1)
+            c = jitter(_c, rng, 0.015 if smooth else 0.1)
             if f.calc_center_median().z < center.z + size[2] * 0.25:
                 c = mix(c[:3], "rock_dark", 0.4)
-            elif smooth and snow is not None and 0.15 < f.normal.z <= snow + 0.05:
-                # Moss just under the snow line, on the shaded north faces.
-                c = mix(c[:3], "moss_ice", 0.55 * min(1.0, max(0.0, 0.5 + f.normal.y)))
+            elif smooth and snow is not None and 0.0 < f.normal.z <= snow + 0.08:
+                # Moss just under the snow line, heaviest on the shaded north
+                # faces, in noisy patches rather than an even band.
+                k = 0.6 + 0.3 * max(-1.0, min(1.0, f.normal.y)) + 0.35 * noise.noise(f.calc_center_median() * 1.7 + off)
+                c = mix(c[:3], "moss_ice", min(0.85, max(0.0, k)))
             return c
         faces = self._merge(tmp, color, snow=snow, color_fn=fn)
         if smooth:
