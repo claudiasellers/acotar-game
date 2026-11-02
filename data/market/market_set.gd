@@ -10,6 +10,10 @@ extends Resource
 @export var mercenary_yaw: float
 @export var fingerpost_at: Vector3
 @export var fingerpost_yaw: float
+## Square dressing (a handcart, a crate pile): kit path, transform, collision box.
+@export var dressing_paths: PackedStringArray = []
+@export var dressing_xforms: Array[Transform3D] = []
+@export var dressing_boxes: PackedVector3Array = []
 
 
 func stall(trade: StringName) -> MarketStall:
