@@ -799,6 +799,7 @@ func _walk_to(target: Vector3, radius: float, done: Callable = Callable(), timeo
 		var to := target - feyre.global_position
 		var want_yaw := atan2(-to.x, -to.z)
 		feyre.nudge_camera(wrapf(want_yaw - feyre.camera_yaw(), -PI, PI), 0.0)
+		feyre.steer_frame.release()   # the walker steers by the camera: a fresh press each frame
 		Input.action_press(&"move_forward")
 		if feyre.stamina > feyre.max_stamina * 0.5 and _flat(target) > 15.0:
 			Input.action_press(&"sprint")
