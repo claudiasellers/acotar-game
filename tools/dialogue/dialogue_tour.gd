@@ -14,8 +14,6 @@ extends Node
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
 const PHASES := "res://data/phases/spring_court_phases.tres"
 const SETTLE := 12.0
-const DWELL := 40.0
-const STEP_EVERY := 1.0
 
 ## {name, phase, flags, hour, at (world, or house space with "house"), expect
 ## (speakers that must speak), walk (points to stroll through, relative to at)}
@@ -40,7 +38,9 @@ var stops: Array[Dictionary] = [
 	{"name": "fae_village", "phase": &"p4_wider_court", "flags": [], "hour": 12.0, "at": Vector3(-940.0, 0.0, -878.0),
 		"walk": [Vector3(0, 0, 0), Vector3(-4, 0, 3), Vector3(3, 0, 6), Vector3(0, 0, -6), Vector3(-50, 0, -27),
 			Vector3(-112, 0, 25)],
-		"expect": ["court_fae"]},
+		"expect": ["reveler"]},
+	{"name": "fae_village_after_glamour", "phase": &"p6_blight_tightens", "flags": ["glamour_lifted"], "hour": 12.0,
+		"at": Vector3(-940.0, 0.0, -878.0), "walk": [Vector3(0, 0, 0)], "expect": ["court_fae"]},
 	{"name": "calanmai_hill", "phase": &"p5_calanmai", "flags": [], "hour": 21.0, "at": Vector3(556.0, 0.0, -856.0),
 		"walk": [Vector3(0, 0, 0), Vector3(10, 0, -8)], "expect": ["reveler"]},
 	{"name": "kitchen_after_glamour", "phase": &"p6_blight_tightens", "flags": ["glamour_lifted"], "hour": 13.0,
@@ -60,12 +60,16 @@ var presence: CastPresence
 var report: Dictionary = {"stops": [], "pass": true}
 var _heard: Array = []
 var _out := "/tmp/dialogue_tour.json"
+## --from=<stop name> starts the tour there (to rerun the tail of a long tour).
+var _from := ""
 
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			_out = a.trim_prefix("--out=")
+		elif a.begins_with("--from="):
+			_from = a.trim_prefix("--from=")
 	_run.call_deferred()
 
 
@@ -81,8 +85,13 @@ func _run() -> void:
 		return
 	director.line_spoken.connect(func(id: StringName, speaker: StringName, text: String, _at: Vector3, inner: bool) -> void:
 		_heard.append({"id": String(id), "speaker": String(speaker), "text": text, "inner": inner}))
+	EventBus.scene_space_started.connect(func(id: StringName) -> void: print("TOUR scene start ", id))
+	EventBus.scene_space_finished.connect(func(id: StringName) -> void: print("TOUR scene end ", id))
+	var started := _from == ""
 	for stop in stops:
-		await _visit(stop)
+		started = started or stop["name"] == _from
+		if started:
+			await _visit(stop)
 	_finish("")
 
 
@@ -91,24 +100,53 @@ func _visit(stop: Dictionary) -> void:
 	WorldState.clear()
 	for f: String in stop["flags"]:
 		WorldState.set_flag(f, true)
-	PhaseManager.start(load(PHASES) as PhaseSet, stop["phase"])
+	# Walk the ladder so every earlier phase's regions are unlocked too, as
+	# in play (a bare start() unlocks only the target phase's own).
+	var ladder := ["p0_winter", "p1_wolf_and_crossing", "p2_grounds", "p3_house_and_woods", "p4_wider_court",
+		"p5_calanmai", "p6_blight_tightens"]
+	PhaseManager.start(load(PHASES) as PhaseSet, &"p0_winter")
+	for id: String in ladder.slice(1, ladder.find(String(stop["phase"])) + 1):
+		PhaseManager._enter_phase(StringName(id))
 	Clock.time_of_day = float(stop["hour"]) / 24.0
 	var base := _where(stop, Vector3.ZERO)
 	_place(base)
+	# Wait for her region to stream in (wide-court regions take a while in the cloud).
+	var waited := 0.0
+	var here := WorldStreamer.region_at(base)
+	while here and not WorldStreamer.loaded_ids().has(String(here.id)) and waited < 60.0:
+		await _wait(2.0)
+		waited += 2.0
+		_place(base)
+	print("TOUR %s: region %s loaded after %.0f s" % [stop["name"], here.id if here else &"?", waited])
+	base = _where(stop, Vector3.ZERO)
+	_place(base)
 	await _wait(SETTLE)
-	var t := 0.0
+	# Let the stop's set-up deeds have their say before walking up to people.
+	var drain := 0.0
+	while not director._deed_queue.is_empty() and drain < 90.0:
+		await _wait(2.0)
+		drain += 2.0
 	var walk: Array = stop["walk"]
-	var i := 0
-	while t < DWELL:
+	for w: Vector3 in walk:
 		Clock.time_of_day = float(stop["hour"]) / 24.0
-		if i < walk.size() and t >= float(i) * (DWELL / maxf(walk.size(), 1.0)):
-			_place(_where(stop, walk[i]))
-			i += 1
-		await _wait(STEP_EVERY)
-		t += STEP_EVERY
+		_place(_where(stop, w))
+		await _wait(6.0)
+	# Then up to each person standing nearby, the way a player wanders over.
+	for node in presence.get_children():
+		if not is_instance_valid(node):
+			continue
+		var n3 := node as Node3D
+		if n3 == null or n3.global_position.distance_to(base) > 70.0:
+			continue
+		Clock.time_of_day = float(stop["hour"]) / 24.0
+		var front := n3.global_transform.basis.z.normalized() * -2.5
+		_place(n3.global_position + Vector3(front.x, 0.0, front.z))
+		await _wait(12.0)
 	var standing: Array = []
 	var bad: Array = []
 	for node in presence.get_children():
+		if not is_instance_valid(node):
+			continue
 		standing.append(String(node.get_meta(&"speaker", node.name)))
 		bad.append_array(_primitives(node))
 	var speakers := {}
@@ -131,6 +169,7 @@ func _visit(stop: Dictionary) -> void:
 	report["stops"].append(entry)
 	if not ok:
 		report["pass"] = false
+	print("TOUR mode %d loaded %s" % [StoryControl.mode, WorldStreamer.loaded_ids()])
 	print("TOUR %s %s: %d lines, standing %s, missing %s, primitives %d" % [
 		"pass" if ok else "FAIL", stop["name"], _heard.size(), standing, missing, bad.size()])
 	for h in _heard:

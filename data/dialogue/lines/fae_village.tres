@@ -242,13 +242,13 @@ who = ""
 text = "A human girl in the village? Don't eat anything unless you're sure of it."
 canon = "A"
 trigger = 3
-where = &"fae_village"
+where = &""
 deed = &""
-phases = PackedStringArray("p4_wider_court", "p5_calanmai", "p6_blight_tightens")
+phases = PackedStringArray("p4_wider_court", "p5_calanmai")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
+hour_from = 8.0
+hour_to = 19.0
 once = true
 cooldown = 240.0
 priority = 0
@@ -265,13 +265,13 @@ who = ""
 text = "The High Lord's mortal. We've all heard about you. Mostly good things."
 canon = "X"
 trigger = 3
-where = &"fae_village"
+where = &""
 deed = &""
 phases = PackedStringArray("p4_wider_court", "p5_calanmai")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
+hour_from = 8.0
+hour_to = 19.0
 once = true
 cooldown = 240.0
 priority = 0
@@ -281,29 +281,6 @@ delivery = ""
 emotion = &"laugh"
 
 [sub_resource type="Resource" id="L12"]
-script = ExtResource("1")
-id = &"rvv_lanterns"
-speaker = &"reveler"
-who = ""
-text = "Lovely day for lanterns. They light themselves at dusk."
-canon = "X"
-trigger = 3
-where = &"fae_village"
-deed = &""
-phases = PackedStringArray("p4_wider_court", "p5_calanmai")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"laugh"
-
-[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"cf_human"
 speaker = &"court_fae"
@@ -326,7 +303,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"cf_welcome"
 speaker = &"court_fae"
@@ -349,30 +326,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L15"]
-script = ExtResource("1")
-id = &"cf_lanterns"
-speaker = &"court_fae"
-who = ""
-text = "Lovely night for lanterns. Every night is."
-canon = "X"
-trigger = 3
-where = &"fae_village"
-deed = &""
-phases = PackedStringArray("p6_blight_tightens")
-require_flags = PackedStringArray("glamour_lifted")
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"happy"
-
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"fm_cousins"
 speaker = &"fae_mushroom"
@@ -395,7 +349,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L15"]
 script = ExtResource("1")
 id = &"fmo_lantern"
 speaker = &"fae_moth"
@@ -418,7 +372,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("1")
 id = &"ff_metal"
 speaker = &"fae_fox"
@@ -441,7 +395,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
 id = &"fh_prick"
 speaker = &"fae_hedgehog"
@@ -464,7 +418,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"fp_braids"
 speaker = &"fae_pixie"
@@ -487,7 +441,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L21"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"fs_hill"
 speaker = &"fae_satyr"
@@ -510,7 +464,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L22"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("1")
 id = &"fr_smell"
 speaker = &"fae_rose"
@@ -533,7 +487,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L23"]
+[sub_resource type="Resource" id="L21"]
 script = ExtResource("1")
 id = &"fo_andras"
 speaker = &"fae_owl"
@@ -556,7 +510,7 @@ follow_up = &""
 delivery = "soft, unblinking"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L24"]
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"fst_thin"
 speaker = &"fae_stag"
@@ -579,7 +533,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L25"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"fn_warm"
 speaker = &"fae_nymph"
@@ -602,7 +556,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L26"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"fb_trees"
 speaker = &"fae_birch"
@@ -625,7 +579,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L27"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"fd_roots"
 speaker = &"fae_dryad"
@@ -648,7 +602,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L28"]
+[sub_resource type="Resource" id="L26"]
 script = ExtResource("1")
 id = &"rv_fire"
 speaker = &"reveler"
@@ -656,13 +610,13 @@ who = ""
 text = "Drink, mortal! It's Fire Night!"
 canon = "X"
 trigger = 3
-where = &"hill_of_the_rite"
+where = &""
 deed = &""
 phases = PackedStringArray("p5_calanmai")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
+hour_from = 19.0
+hour_to = 5.0
 once = true
 cooldown = 240.0
 priority = 0
@@ -671,7 +625,7 @@ follow_up = &""
 delivery = ""
 emotion = &"laugh"
 
-[sub_resource type="Resource" id="L29"]
+[sub_resource type="Resource" id="L27"]
 script = ExtResource("1")
 id = &"rv_cave"
 speaker = &"reveler"
@@ -679,13 +633,59 @@ who = ""
 text = "The High Lord leads the Rite tonight. You'll want to be well away from the cave."
 canon = "A"
 trigger = 3
-where = &"hill_of_the_rite"
+where = &""
 deed = &""
 phases = PackedStringArray("p5_calanmai")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
+hour_from = 19.0
+hour_to = 5.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L28"]
+script = ExtResource("1")
+id = &"rv_drums"
+speaker = &"reveler"
+who = ""
+text = "Can you feel it? The drums? Dance!"
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p5_calanmai")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 19.0
+hour_to = 5.0
+once = false
+cooldown = 300.0
+priority = -10
+inner = false
+follow_up = &""
+delivery = ""
+emotion = &"laugh"
+
+[sub_resource type="Resource" id="L29"]
+script = ExtResource("1")
+id = &"rv_solstice"
+speaker = &"reveler"
+who = ""
+text = "Longest day of the year! Dance, or get out of the meadow!"
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray("p6_blight_tightens")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = 5.0
+hour_to = 19.0
 once = true
 cooldown = 240.0
 priority = 0
@@ -696,22 +696,22 @@ emotion = &"laugh"
 
 [sub_resource type="Resource" id="L30"]
 script = ExtResource("1")
-id = &"rv_drums"
+id = &"rv_wine"
 speaker = &"reveler"
 who = ""
-text = "Can you feel it? The drums? Dance!"
-canon = "X"
+text = "Have you tried the wine? No? Clever girl."
+canon = "A"
 trigger = 3
-where = &"hill_of_the_rite"
+where = &""
 deed = &""
-phases = PackedStringArray("p5_calanmai")
+phases = PackedStringArray("p6_blight_tightens")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
+hour_from = 5.0
+hour_to = 19.0
+once = true
+cooldown = 240.0
+priority = 0
 inner = false
 follow_up = &""
 delivery = ""
@@ -719,65 +719,19 @@ emotion = &"laugh"
 
 [sub_resource type="Resource" id="L31"]
 script = ExtResource("1")
-id = &"rv_solstice"
-speaker = &"reveler"
-who = ""
-text = "Longest day of the year! Dance, or get out of the meadow!"
-canon = "X"
-trigger = 3
-where = &"solstice_meadow"
-deed = &""
-phases = PackedStringArray("p6_blight_tightens")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = true
-cooldown = 240.0
-priority = 0
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"laugh"
-
-[sub_resource type="Resource" id="L32"]
-script = ExtResource("1")
-id = &"rv_wine"
-speaker = &"reveler"
-who = ""
-text = "Have you tried the wine? No? Clever girl."
-canon = "A"
-trigger = 3
-where = &"solstice_meadow"
-deed = &""
-phases = PackedStringArray("p6_blight_tightens")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = true
-cooldown = 240.0
-priority = 0
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"laugh"
-
-[sub_resource type="Resource" id="L33"]
-script = ExtResource("1")
 id = &"rv_flowers"
 speaker = &"reveler"
 who = ""
 text = "Flowers in your hair! Now you look like one of us."
 canon = "X"
 trigger = 3
-where = &"solstice_meadow"
+where = &""
 deed = &""
 phases = PackedStringArray("p6_blight_tightens")
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
+hour_from = 5.0
+hour_to = 19.0
 once = false
 cooldown = 300.0
 priority = -10
@@ -838,5 +792,5 @@ radius = 34.7
 [resource]
 script = ExtResource("3")
 area = &"fae_village"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32"), SubResource("L33")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31")])
 places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6")])

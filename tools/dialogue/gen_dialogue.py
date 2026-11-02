@@ -199,7 +199,6 @@ say(A, "vil_blessed", "villager", "The Blessed again, telling folk the faeries a
 say(A, "vil_iron", "villager", "Iron over every doorframe. I don't care what the Blessed say.", HUMAN,
     where="village")
 chat(A, "vil_copper", "villager", "Spare a copper? No? Didn't think so.", HUMAN, where="village")
-chat(A, "vil_winter", "villager", "Worst winter in years. The ground's like iron.", HUMAN, where="village")
 say(A, "vil_rich", "villager", "Is that the youngest Archeron? You look like a lady now.", ph(7),
     where="village")
 say(A, "vil_aunt", "villager", "An aunt left you a fortune, they say. Lucky. Some of us got nothing.", ph(7),
@@ -207,7 +206,6 @@ say(A, "vil_aunt", "villager", "An aunt left you a fortune, they say. Lucky. Som
 say(A, "elder_slaves", "human_elder",
     "Before the Treaty, my grandmother's grandmother served them. Don't you forget it.", HUMAN, canon="A")
 say(A, "elder_ships", "human_elder", "I remember your father's ships coming in. Whole town turned out.", HUMAN)
-chat(A, "elder_bones", "human_elder", "Snow by nightfall. My bones never lie.", HUMAN)
 say(A, "youth_isaac", "human_youth", "Isaac Hale's been asking after you.", HUMAN)
 chat(A, "youth_vane", "human_youth", "Bet you couldn't hit the weathervane from here.", HUMAN)
 say(A, "woman_tomas", "human_woman", "The Mandray boy's sweet on your sister. Everyone knows it.", HUMAN)
@@ -402,7 +400,6 @@ say(A, "l_gardeners", "lucien", "So you can see us now. Try not to scream at the
     ph(6), req=["glamour_lifted"])
 chat(A, "l_alis", "lucien", "Alis is looking for you. That's never good.", COURT)
 chat(A, "l_nursemaid", "lucien", "Walk with me or don't. I'm not your nursemaid.", COURT)
-chat(A, "l_weather", "lucien", "Lovely weather. It's always lovely weather. You get used to it.", COURT)
 chat(A, "l_glare", "lucien", "If you're going to glare, at least do it from the shade.", COURT)
 deed(A, "d_bogge_lucien", "bogge_survived", "Breathe. It's gone. You did well.", speaker="lucien",
      phases=COURT, pr=5)
@@ -466,14 +463,11 @@ say(A, "s_lady", "sentry", "The grounds are safe, lady. It's past them you shoul
 say(A, "s_andras", "sentry", "Andras stood this watch with me. Before.", COURT, req=["first_dinner_eaten"],
     delivery="flat, not forgiving, not cruel")
 say(A, "s_double", "sentry", "The border's restless. We've doubled the watch.", ph(6))
-chat(A, "s_paths", "sentry", "Keep to the paths after dark.", COURT)
 say(A, "gd_buds", "gardener", "Mind the buds, mind the buds! Those are for the Solstice.", ph(6),
     forbid=["solstice_danced"])
 say(A, "gd_peonies", "gardener", "You trampled my peonies in the spring. I forgave you. Mostly.", ph(6))
-chat(A, "gd_lovely", "gardener", "Lovely day for it. Every day's a lovely day for it.", ph(6))
 say(A, "sv_place", "servant", "We've set your place at table since the very first night, miss.", ph(6))
 say(A, "sv_see", "servant", "You really couldn't see us? Not even a little?", ph(6))
-chat(A, "sv_linens", "servant", "Pardon, miss. Linens.", ph(6))
 say(A, "cook_torte", "servant_cook", "You ate like a starved fox that first week. I took it as a compliment.",
     ph(6))
 chat(A, "cook_hands", "servant_cook", "Torte's for after supper. Hands off.", ph(6))
@@ -638,17 +632,13 @@ think(A, "fv_bottles", "Bottles bubbling in the window. I'm not touching anythin
       WIDER)
 think(A, "fv_roofs", "Toadstool roofs. Actual toadstool roofs.", "place", "cottages", WIDER)
 say(A, "rvv_human", "reveler", "A human girl in the village? Don't eat anything unless you're sure of it.",
-    WIDER, where="fae_village", canon="A")
+    ph(4, 5), hours=(8.0, 19.0), canon="A")
 say(A, "rvv_lord", "reveler", "The High Lord's mortal. We've all heard about you. Mostly good things.", ph(4, 5),
-    where="fae_village")
-chat(A, "rvv_lanterns", "reveler", "Lovely day for lanterns. They light themselves at dusk.", ph(4, 5),
-     where="fae_village")
+    hours=(8.0, 19.0))
 say(A, "cf_human", "court_fae", "So you can see us now. We could always see you.", ph(6),
     req=["glamour_lifted"], where="fae_village")
 say(A, "cf_welcome", "court_fae", "The High Lord's mortal! Welcome, welcome. Mind your step.", ph(6),
     req=["glamour_lifted"], where="fae_village")
-chat(A, "cf_lanterns", "court_fae", "Lovely night for lanterns. Every night is.", ph(6), req=["glamour_lifted"],
-     where="fae_village")
 say(A, "fm_cousins", "fae_mushroom", "Don't step on my cousins. They're the small ones.", ph(6), req=["glamour_lifted"])
 say(A, "fmo_lantern", "fae_moth", "Your lantern's lovely. May I just sit near it? A moment?", ph(6), req=["glamour_lifted"])
 say(A, "ff_metal", "fae_fox", "Is it true magic used to smell like metal to you? Poor thing.", ph(6),
@@ -667,16 +657,16 @@ say(A, "fb_trees", "fae_birch", "Shh. I'm listening to the trees. They're worrie
 say(A, "fd_roots", "fae_dryad", "Nearly fifty years the roots have tasted it. Something sour.", ph(6), req=["glamour_lifted"],
     canon="A")
 # Revellers: Calanmai and the Solstice.
-say(A, "rv_fire", "reveler", "Drink, mortal! It's Fire Night!", ph(5), where="hill_of_the_rite")
+say(A, "rv_fire", "reveler", "Drink, mortal! It's Fire Night!", ph(5), hours=(19.0, 5.0))
 say(A, "rv_cave", "reveler", "The High Lord leads the Rite tonight. You'll want to be well away from the cave.",
-    ph(5), where="hill_of_the_rite", canon="A")
-chat(A, "rv_drums", "reveler", "Can you feel it? The drums? Dance!", ph(5), where="hill_of_the_rite")
+    ph(5), hours=(19.0, 5.0), canon="A")
+chat(A, "rv_drums", "reveler", "Can you feel it? The drums? Dance!", ph(5), hours=(19.0, 5.0))
 say(A, "rv_solstice", "reveler", "Longest day of the year! Dance, or get out of the meadow!", ph(6),
-    where="solstice_meadow")
-say(A, "rv_wine", "reveler", "Have you tried the wine? No? Clever girl.", ph(6), where="solstice_meadow",
+    hours=(5.0, 19.0))
+say(A, "rv_wine", "reveler", "Have you tried the wine? No? Clever girl.", ph(6), hours=(5.0, 19.0),
     canon="A")
 chat(A, "rv_flowers", "reveler", "Flowers in your hair! Now you look like one of us.", ph(6),
-     where="solstice_meadow")
+     hours=(5.0, 19.0))
 
 # =============================================================================
 # After her deeds (spoken once she is free again)
@@ -781,12 +771,14 @@ spot("elain_table", "elain", FAMILY % "elain", "cottage", 1.8, -1.0, HUMAN, anch
      yaw=30.0, canon="C", notes="indoors all winter; she tends her garden in the milder months (Keeper)")
 # The village at market (ch3) [C]: the Blessed, villagers, a peddler.
 spot("blessed_square", "blessed", PEOPLE % "blessed", "village", 372.0, 2244.0, HUMAN, canon="C", wander=3.0,
+     hours=(8.0, 18.0),
      notes="Children of the Blessed accost the sisters in the square")
-spot("woman_stall", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, HUMAN, wander=1.5)
+spot("woman_stall", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, HUMAN, wander=1.5,
+     hours=(8.0, 17.0), notes="market stalls by day")
 spot("man_well", "human_man", PEOPLE % "human_man", "village", 384.0, 2252.0, HUMAN, wander=2.0)
 spot("elder_board", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, HUMAN)
 spot("youth_tavern", "human_youth", PEOPLE % "human_youth", "village", 408.0, 2222.0, HUMAN, wander=3.0)
-spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, HUMAN, canon="C",
+spot("peddler_stall", "peddler", PEOPLE % "peddler", "village", 363.7, 2254.7, HUMAN, canon="C", hours=(8.0, 17.0),
      notes="peddlers bring border-town stories; one sold her the ash arrow")
 spot("woman_return", "human_woman", PEOPLE % "human_woman", "village", 387.5, 2265.3, ph(7), wander=1.5)
 spot("elder_return", "human_elder", PEOPLE % "human_elder", "village", 386.0, 2240.0, ph(7))

@@ -215,10 +215,16 @@ func test_scenes_win_and_deed_lines_wait_for_them() -> void:
 	line.text = "I didn't look."
 	d.add_book(_book([line]))
 	EventBus.scene_space_started.emit(&"bogge")
+	StoryControl.set_mode(StoryControl.Mode.WALK)
 	WorldState.set_flag("bogge_survived", true)
 	assert_null(d.step(Vector3.ZERO), "silent during the scene")
+	d._now += 30.0
+	assert_null(d.step(Vector3.ZERO), "silent while the scene holds control")
 	assert_true(shown.is_empty())
+	StoryControl.set_mode(StoryControl.Mode.FULL)
 	EventBus.scene_space_finished.emit(&"bogge")
+	assert_null(d.step(Vector3.ZERO), "a short hush after it ends")
+	d._now += DialogueDirector.SCENE_HUSH + 0.1
 	assert_eq(d.step(Vector3.ZERO), line, "spoken once the scene ends")
 
 
@@ -254,6 +260,20 @@ func test_place_lines_and_follow_ups() -> void:
 	assert_eq(d.step(Vector3(100, 0, 101)), a, "her thought at the place, not an absent speaker's line")
 	d._now += 1.5
 	assert_eq(d.step(Vector3(100, 0, 101)), b, "the follow-up comes right after")
+
+
+func test_regions_come_from_the_macro_map() -> void:
+	var d := _bare_director()
+	# The streaming circles overlap (the blight's covers the hill, the forest's
+	# the cottage); the owners' rectangles decide.
+	assert_eq(d.region_for(Vector3(556, 0, -856)), &"hill_of_the_rite")
+	assert_eq(d.region_for(Vector3(300, 0, -1595)), &"blighted_reaches")
+	assert_eq(d.region_for(Vector3(-940, 0, -878)), &"fae_village")
+	assert_eq(d.region_for(Vector3(-62, 0, -1038)), &"solstice_meadow")
+	assert_eq(d.region_for(Vector3(-150, 0, 2150)), &"cottage")
+	assert_eq(d.region_for(Vector3(378, 0, 2247)), &"village")
+	assert_eq(d.region_for(Vector3(-30, 0, -112)), &"manor_estate")
+	assert_eq(d.region_for(Vector3(-100, 0, 800)), &"border_woods")
 
 
 func _book(list: Array) -> DialogueBook:

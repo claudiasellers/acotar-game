@@ -25,13 +25,14 @@ No choices, no objective text, no quest markers.
 
 ## When it stays quiet
 
-Staged scenes always win. Nothing is said while any SceneSpace runs (`EventBus.scene_space_started`
-/ `scene_space_finished`; the L33 films use the same pair), while `StoryControl.mode` isn't `FULL`,
-or while another caption is on screen. Deed lines wait up to 120 s for the scene that raised the
+Staged scenes always win. Nothing is said while `StoryControl.mode` isn't `FULL` (staged moments
+narrow it, and the L33 films hold `NONE`), for 6 s after any `EventBus.scene_space_started` /
+`scene_space_finished`, or while another caption is on screen. Some spaces run in FULL play for a
+whole phase (Feyre's hall map in p3), so the mode is the test, not whether a space exists. Deed lines wait up to 120 s for the scene that raised the
 deed to end. There are at least 5 s between ambient lines and 25 s before the same speaker speaks
 again. A speaker greets her once per approach (within 4.5 m); she has to step 9 m away to re-arm.
 
-Tamlin, Lucien and Alis leave their free-roam spots while any scene runs or the story has spawned
+Tamlin, Lucien and Alis leave their free-roam spots while a scene holds control or the story has spawned
 its own `story_actor_<id>` for them, so they never double. Nesta, Elain and their father stay in
 the cottage for the beast scene, because its `gather` cue moves them.
 

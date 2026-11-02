@@ -420,29 +420,6 @@ emotion = &"smirk"
 
 [sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
-id = &"l_weather"
-speaker = &"lucien"
-who = "Lucien"
-text = "Lovely weather. It's always lovely weather. You get used to it."
-canon = "X"
-trigger = 3
-where = &""
-deed = &""
-phases = PackedStringArray("p2_grounds", "p3_house_and_woods", "p4_wider_court", "p5_calanmai", "p6_blight_tightens")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"smirk"
-
-[sub_resource type="Resource" id="L19"]
-script = ExtResource("1")
 id = &"l_glare"
 speaker = &"lucien"
 who = "Lucien"
@@ -464,7 +441,7 @@ follow_up = &""
 delivery = ""
 emotion = &"smirk"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"d_bogge_lucien"
 speaker = &"lucien"
@@ -490,5 +467,5 @@ emotion = &"smirk"
 [resource]
 script = ExtResource("3")
 area = &"lucien"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19")])
 places = Array[ExtResource("2")]([])

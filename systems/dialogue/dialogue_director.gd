@@ -33,6 +33,8 @@ const SPEAKER_GAP := 25.0
 ## A deed line waits at most this long for the scene that raised it to end.
 const DEED_WAIT := 120.0
 const FOLLOW_PAUSE := 0.4
+## Quiet after any staged scene starts or ends.
+const SCENE_HUSH := 6.0
 
 var lines: Array[DialogueLine] = []
 var places: Array[DialoguePlace] = []
@@ -56,7 +58,7 @@ var _t: float = 0.0
 var _at: Vector3 = Vector3.ZERO
 var _now: float = 0.0
 var _busy_until: float = -1000.0
-var _scene_count: int = 0
+var _scene_edge: float = -1000.0
 var _said_at: Dictionary = {}
 var _speaker_at: Dictionary = {}
 var _greeted: Dictionary = {}
@@ -68,6 +70,7 @@ var _follow_at: float = -1.0
 var _talking: Node
 var _house: Node3D
 var _rooms: Array[Dictionary] = []
+var _regions: Array[RegionDef] = []
 var _voice: AudioStreamPlayer3D
 var _voice_flat: AudioStreamPlayer
 
@@ -80,8 +83,8 @@ func _init() -> void:
 func _ready() -> void:
 	if lines.is_empty() and books_dir != "":
 		load_books(books_dir)
-	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _scene_count += 1)
-	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _scene_count = maxi(_scene_count - 1, 0))
+	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _scene_edge = _now)
+	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _scene_edge = _now)
 	EventBus.flag_changed.connect(_on_flag_changed)
 	EventBus.game_loaded.connect(func(_slot: String) -> void: _reset_presence_state())
 	_voice = AudioStreamPlayer3D.new()
@@ -153,7 +156,10 @@ func step(at: Vector3) -> DialogueLine:
 
 ## Staged scenes, films, narrowed control and other captions all win.
 func busy() -> bool:
-	if _scene_count > 0 or StoryControl.mode != StoryControl.Mode.FULL:
+	# Staged moments narrow control (films hold NONE); some spaces run all
+	# phase long in FULL play (Feyre's hall map), so control is the test, plus
+	# a short hush around any scene starting or ending.
+	if StoryControl.mode != StoryControl.Mode.FULL or _now - _scene_edge < SCENE_HUSH:
 		return true
 	if _now < _busy_until:
 		return true
@@ -174,9 +180,47 @@ func _ctx() -> Dictionary:
 
 # --- Where she is -------------------------------------------------------
 
+## The region she is in, for dialogue: the one whose centre she is nearest,
+## relative to its size. (The streamer's "deepest inside" picks a huge
+## neighbour, the hunting forest, for the cottage doorstep.)
+func region_for(at: Vector3) -> StringName:
+	# The macro-map owners first (docs/contracts/world.md): the human realm's
+	# rectangles and the wider court's. Streaming radii overlap a lot (the
+	# blight's circle covers the hill), so they're only the fallback, for the
+	# manor, the woods and the glade.
+	var flat := Vector2(at.x, at.z)
+	var mapped := HumanRealmLayout.region_at(flat)
+	if mapped == &"":
+		mapped = CourtMap.region_at(at.x, at.z)
+	if mapped != &"":
+		return mapped
+	if _regions.is_empty():
+		_regions = load_regions()
+	var best := &""
+	var best_k := 1.0
+	for r: RegionDef in _regions:
+		var k := flat.distance_to(Vector2(r.center.x, r.center.z)) / maxf(r.radius, 1.0)
+		if k < best_k:
+			best = r.id
+			best_k = k
+	return best
+
+
+static func load_regions() -> Array[RegionDef]:
+	var out: Array[RegionDef] = []
+	for dir in ["res://data/regions/human_realm/", "res://data/regions/spring_court/"]:
+		for f in DirAccess.get_files_at(dir):
+			var file := f.trim_suffix(".remap")
+			if not file.ends_with(".tres"):
+				continue
+			var r := load(dir + file) as RegionDef
+			if r and r.scene_path != "" and r.radius > 0.0:
+				out.append(r)
+	return out
+
+
 func _locate(at: Vector3) -> void:
-	var region := WorldStreamer.region_at(at)
-	region_id = region.id if region else &""
+	region_id = region_for(at)
 	zone_id = &""
 	room_id = &""
 	if region_id == &"manor_estate":
@@ -270,26 +314,34 @@ func _clear_left_arrivals() -> void:
 
 func _next_speaker_line(at: Vector3) -> DialogueLine:
 	var ctx := _ctx()
+	var seen := {}
 	for node in _speakers():
 		var n3 := node as Node3D
 		if n3 == null or not n3.is_visible_in_tree():
 			continue
 		var d := n3.global_position.distance_to(at)
 		var nid := _node_speaker(node)
+		# Greetings are per person: three revellers are three people.
+		var who_key: int = node.get_instance_id()
+		seen[who_key] = true
 		if d > RESET_RADIUS:
-			_greeted.erase(nid)
+			_greeted.erase(who_key)
 			continue
-		if d > TALK_RADIUS or _greeted.get(nid, false):
+		if d > TALK_RADIUS or _greeted.get(who_key, false):
 			continue
-		if _now - float(_speaker_at.get(nid, -INF)) < SPEAKER_GAP:
+		if _now - float(_speaker_at.get(who_key, -INF)) < SPEAKER_GAP:
 			continue
 		var candidates: Array = []
 		for key in DialogueRules.keys_for(nid):
 			candidates.append_array(_of(DialogueLine.Trigger.NEAR_SPEAKER, &"", StringName(key)))
 		var line := DialogueRules.pick(candidates, ctx)
-		_greeted[nid] = true
+		_greeted[who_key] = true
 		if line:
 			return _speak(line, node)
+	# Someone who left (despawned, or she travelled away) greets her afresh.
+	for key in _greeted.keys():
+		if not seen.has(key):
+			_greeted.erase(key)
 	return null
 
 
@@ -390,8 +442,7 @@ func _speak(line: DialogueLine, node: Node) -> DialogueLine:
 	if line.once:
 		WorldState.set_flag(line.heard_flag(), true)
 	_said_at[line.id] = _now
-	var nid := _node_speaker(node) if node else line.speaker
-	_speaker_at[nid] = _now
+	_speaker_at[node.get_instance_id() if node else line.speaker] = _now
 	_set_talking(node, seconds)
 	_drive_face(node, line, seconds)
 	var where: Vector3 = (node as Node3D).global_position if node is Node3D else Vector3.ZERO
@@ -459,4 +510,3 @@ func _reset_presence_state() -> void:
 	_entered.clear()
 	_deed_queue.clear()
 	_follow = null
-	_scene_count = 0

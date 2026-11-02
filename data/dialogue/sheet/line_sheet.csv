@@ -46,12 +46,10 @@ vil_hunter,villager,,You're the Archeron girl. The hunter. Seen you dragging dee
 vil_blessed,villager,,"The Blessed again, telling folk the faeries are holy. Holy!",X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_blessed.ogg
 vil_iron,villager,,Iron over every doorframe. I don't care what the Blessed say.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_iron.ogg
 vil_copper,villager,,Spare a copper? No? Didn't think so.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_copper.ogg
-vil_winter,villager,,Worst winter in years. The ground's like iron.,X,,near,village,,p0_winter p1_wolf_and_crossing,,audio/voice/vil_winter.ogg
 vil_rich,villager,,Is that the youngest Archeron? You look like a lady now.,X,,near,village,,p7_return_home,,audio/voice/vil_rich.ogg
 vil_aunt,villager,,"An aunt left you a fortune, they say. Lucky. Some of us got nothing.",A,,near,village,,p7_return_home,,audio/voice/vil_aunt.ogg
 elder_slaves,human_elder,,"Before the Treaty, my grandmother's grandmother served them. Don't you forget it.",A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_slaves.ogg
 elder_ships,human_elder,,I remember your father's ships coming in. Whole town turned out.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_ships.ogg
-elder_bones,human_elder,,Snow by nightfall. My bones never lie.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/elder_bones.ogg
 youth_isaac,human_youth,,Isaac Hale's been asking after you.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/youth_isaac.ogg
 youth_vane,human_youth,,Bet you couldn't hit the weathervane from here.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/youth_vane.ogg
 woman_tomas,human_woman,,The Mandray boy's sweet on your sister. Everyone knows it.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/woman_tomas.ogg
@@ -150,7 +148,6 @@ l_wine,lucien,Lucien,"If anyone offers you faerie wine, say no. Then say no agai
 l_gardeners,lucien,Lucien,So you can see us now. Try not to scream at the gardeners. They're sensitive.,X,,near,,,p6_blight_tightens,,audio/voice/l_gardeners.ogg
 l_alis,lucien,Lucien,Alis is looking for you. That's never good.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_alis.ogg
 l_nursemaid,lucien,Lucien,Walk with me or don't. I'm not your nursemaid.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_nursemaid.ogg
-l_weather,lucien,Lucien,Lovely weather. It's always lovely weather. You get used to it.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_weather.ogg
 l_glare,lucien,Lucien,"If you're going to glare, at least do it from the shade.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_glare.ogg
 d_bogge_lucien,lucien,Lucien,Breathe. It's gone. You did well.,X,,deed,,bogge_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/d_bogge_lucien.ogg
 t_grounds,tamlin,Tamlin,Go where you like on the grounds. Not the woods after dark.,A,,near,,,p2_grounds,,audio/voice/t_grounds.ogg
@@ -187,13 +184,10 @@ a_bath,alis,Alis,The bath's drawn whenever you want it. Hot as you like.,X,,near
 s_lady,sentry,,"The grounds are safe, lady. It's past them you should worry about.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/s_lady.ogg
 s_andras,sentry,,Andras stood this watch with me. Before.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"flat, not forgiving, not cruel",audio/voice/s_andras.ogg
 s_double,sentry,,The border's restless. We've doubled the watch.,X,,near,,,p6_blight_tightens,,audio/voice/s_double.ogg
-s_paths,sentry,,Keep to the paths after dark.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/s_paths.ogg
 gd_buds,gardener,,"Mind the buds, mind the buds! Those are for the Solstice.",X,,near,,,p6_blight_tightens,,audio/voice/gd_buds.ogg
 gd_peonies,gardener,,You trampled my peonies in the spring. I forgave you. Mostly.,X,,near,,,p6_blight_tightens,,audio/voice/gd_peonies.ogg
-gd_lovely,gardener,,Lovely day for it. Every day's a lovely day for it.,X,,near,,,p6_blight_tightens,,audio/voice/gd_lovely.ogg
 sv_place,servant,,"We've set your place at table since the very first night, miss.",X,,near,,,p6_blight_tightens,,audio/voice/sv_place.ogg
 sv_see,servant,,You really couldn't see us? Not even a little?,X,,near,,,p6_blight_tightens,,audio/voice/sv_see.ogg
-sv_linens,servant,,"Pardon, miss. Linens.",X,,near,,,p6_blight_tightens,,audio/voice/sv_linens.ogg
 cook_torte,servant_cook,,You ate like a starved fox that first week. I took it as a compliment.,X,,near,,,p6_blight_tightens,,audio/voice/cook_torte.ogg
 cook_hands,servant_cook,,Torte's for after supper. Hands off.,X,,near,,,p6_blight_tightens,,audio/voice/cook_hands.ogg
 maid_flowers,servant_maid,,I'm the one who leaves flowers on your pillow. You're welcome.,X,,near,,,p6_blight_tightens,,audio/voice/maid_flowers.ogg
@@ -269,12 +263,10 @@ fv_mill,feyre,,A mill grinding petals into something that smells like honey.,X,y
 fv_silks,feyre,,"Silks hung out like flags, every colour I've ever wanted.",X,yes,place,seamstress,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_silks.ogg
 fv_bottles,feyre,,Bottles bubbling in the window. I'm not touching anything.,X,yes,place,potion_house,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_bottles.ogg
 fv_roofs,feyre,,Toadstool roofs. Actual toadstool roofs.,X,yes,place,cottages,,p4_wider_court p5_calanmai p6_blight_tightens,"inner voice: dry, quiet, close",audio/voice/fv_roofs.ogg
-rvv_human,reveler,,A human girl in the village? Don't eat anything unless you're sure of it.,A,,near,fae_village,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/rvv_human.ogg
-rvv_lord,reveler,,The High Lord's mortal. We've all heard about you. Mostly good things.,X,,near,fae_village,,p4_wider_court p5_calanmai,,audio/voice/rvv_lord.ogg
-rvv_lanterns,reveler,,Lovely day for lanterns. They light themselves at dusk.,X,,near,fae_village,,p4_wider_court p5_calanmai,,audio/voice/rvv_lanterns.ogg
+rvv_human,reveler,,A human girl in the village? Don't eat anything unless you're sure of it.,A,,near,,,p4_wider_court p5_calanmai,,audio/voice/rvv_human.ogg
+rvv_lord,reveler,,The High Lord's mortal. We've all heard about you. Mostly good things.,X,,near,,,p4_wider_court p5_calanmai,,audio/voice/rvv_lord.ogg
 cf_human,court_fae,,So you can see us now. We could always see you.,X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_human.ogg
 cf_welcome,court_fae,,"The High Lord's mortal! Welcome, welcome. Mind your step.",X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_welcome.ogg
-cf_lanterns,court_fae,,Lovely night for lanterns. Every night is.,X,,near,fae_village,,p6_blight_tightens,,audio/voice/cf_lanterns.ogg
 fm_cousins,fae_mushroom,,Don't step on my cousins. They're the small ones.,X,,near,,,p6_blight_tightens,,audio/voice/fm_cousins.ogg
 fmo_lantern,fae_moth,,Your lantern's lovely. May I just sit near it? A moment?,X,,near,,,p6_blight_tightens,,audio/voice/fmo_lantern.ogg
 ff_metal,fae_fox,,Is it true magic used to smell like metal to you? Poor thing.,A,,near,,,p6_blight_tightens,,audio/voice/ff_metal.ogg
@@ -287,12 +279,12 @@ fst_thin,fae_stag,,The woods are thinner than they were. The blight eats the edg
 fn_warm,fae_nymph,,The water's warm today. It's always warm for friends.,X,,near,,,p6_blight_tightens,,audio/voice/fn_warm.ogg
 fb_trees,fae_birch,,Shh. I'm listening to the trees. They're worried.,X,,near,,,p6_blight_tightens,,audio/voice/fb_trees.ogg
 fd_roots,fae_dryad,,Nearly fifty years the roots have tasted it. Something sour.,A,,near,,,p6_blight_tightens,,audio/voice/fd_roots.ogg
-rv_fire,reveler,,"Drink, mortal! It's Fire Night!",X,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_fire.ogg
-rv_cave,reveler,,The High Lord leads the Rite tonight. You'll want to be well away from the cave.,A,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_cave.ogg
-rv_drums,reveler,,Can you feel it? The drums? Dance!,X,,near,hill_of_the_rite,,p5_calanmai,,audio/voice/rv_drums.ogg
-rv_solstice,reveler,,"Longest day of the year! Dance, or get out of the meadow!",X,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_solstice.ogg
-rv_wine,reveler,,Have you tried the wine? No? Clever girl.,A,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_wine.ogg
-rv_flowers,reveler,,Flowers in your hair! Now you look like one of us.,X,,near,solstice_meadow,,p6_blight_tightens,,audio/voice/rv_flowers.ogg
+rv_fire,reveler,,"Drink, mortal! It's Fire Night!",X,,near,,,p5_calanmai,,audio/voice/rv_fire.ogg
+rv_cave,reveler,,The High Lord leads the Rite tonight. You'll want to be well away from the cave.,A,,near,,,p5_calanmai,,audio/voice/rv_cave.ogg
+rv_drums,reveler,,Can you feel it? The drums? Dance!,X,,near,,,p5_calanmai,,audio/voice/rv_drums.ogg
+rv_solstice,reveler,,"Longest day of the year! Dance, or get out of the meadow!",X,,near,,,p6_blight_tightens,,audio/voice/rv_solstice.ogg
+rv_wine,reveler,,Have you tried the wine? No? Clever girl.,A,,near,,,p6_blight_tightens,,audio/voice/rv_wine.ogg
+rv_flowers,reveler,,Flowers in your hair! Now you look like one of us.,X,,near,,,p6_blight_tightens,,audio/voice/rv_flowers.ogg
 d_first_dinner,feyre,,I ate their food. I'm still me. I think.,X,yes,deed,,first_dinner_eaten,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_first_dinner.ogg
 d_curtain,feyre,,Anything that comes through that door gets a faceful of velvet.,X,yes,deed,,curtain_trap_set,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_curtain.ogg
 d_bogge,feyre,,My hands won't stop shaking. I didn't look. I didn't look.,X,yes,deed,,bogge_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, shaking",audio/voice/d_bogge.ogg

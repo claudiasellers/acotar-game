@@ -397,29 +397,6 @@ emotion = &"neutral"
 
 [sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
-id = &"vil_winter"
-speaker = &"villager"
-who = ""
-text = "Worst winter in years. The ground's like iron."
-canon = "X"
-trigger = 3
-where = &"village"
-deed = &""
-phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"neutral"
-
-[sub_resource type="Resource" id="L18"]
-script = ExtResource("1")
 id = &"vil_rich"
 speaker = &"villager"
 who = ""
@@ -441,7 +418,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"vil_aunt"
 speaker = &"villager"
@@ -464,7 +441,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"elder_slaves"
 speaker = &"human_elder"
@@ -487,7 +464,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L21"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("1")
 id = &"elder_ships"
 speaker = &"human_elder"
@@ -510,30 +487,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L22"]
-script = ExtResource("1")
-id = &"elder_bones"
-speaker = &"human_elder"
-who = ""
-text = "Snow by nightfall. My bones never lie."
-canon = "X"
-trigger = 3
-where = &""
-deed = &""
-phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = false
-cooldown = 300.0
-priority = -10
-inner = false
-follow_up = &""
-delivery = ""
-emotion = &"neutral"
-
-[sub_resource type="Resource" id="L23"]
+[sub_resource type="Resource" id="L21"]
 script = ExtResource("1")
 id = &"youth_isaac"
 speaker = &"human_youth"
@@ -556,7 +510,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L24"]
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"youth_vane"
 speaker = &"human_youth"
@@ -579,7 +533,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L25"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"woman_tomas"
 speaker = &"human_woman"
@@ -602,7 +556,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L26"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"woman_eggs"
 speaker = &"human_woman"
@@ -625,7 +579,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L27"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"man_ice"
 speaker = &"human_man"
@@ -648,7 +602,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L28"]
+[sub_resource type="Resource" id="L26"]
 script = ExtResource("1")
 id = &"man_wolves"
 speaker = &"human_man"
@@ -671,7 +625,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L29"]
+[sub_resource type="Resource" id="L27"]
 script = ExtResource("1")
 id = &"blessed_home"
 speaker = &"blessed"
@@ -694,7 +648,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L30"]
+[sub_resource type="Resource" id="L28"]
 script = ExtResource("1")
 id = &"blessed_bells"
 speaker = &"blessed"
@@ -717,7 +671,7 @@ follow_up = &""
 delivery = ""
 emotion = &"happy"
 
-[sub_resource type="Resource" id="L31"]
+[sub_resource type="Resource" id="L29"]
 script = ExtResource("1")
 id = &"peddler_ash"
 speaker = &"peddler"
@@ -740,7 +694,7 @@ follow_up = &""
 delivery = "low, a salesman's secret"
 emotion = &"smirk"
 
-[sub_resource type="Resource" id="L32"]
+[sub_resource type="Resource" id="L30"]
 script = ExtResource("1")
 id = &"peddler_border"
 speaker = &"peddler"
@@ -763,7 +717,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L33"]
+[sub_resource type="Resource" id="L31"]
 script = ExtResource("1")
 id = &"peddler_trinkets"
 speaker = &"peddler"
@@ -786,7 +740,7 @@ follow_up = &""
 delivery = ""
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L34"]
+[sub_resource type="Resource" id="L32"]
 script = ExtResource("1")
 id = &"d_pelt_sold"
 speaker = &"feyre"
@@ -868,5 +822,5 @@ radius = 12.0
 [resource]
 script = ExtResource("3")
 area = &"village"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32"), SubResource("L33"), SubResource("L34")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31"), SubResource("L32")])
 places = Array[ExtResource("2")]([SubResource("P0"), SubResource("P1"), SubResource("P2"), SubResource("P3"), SubResource("P4"), SubResource("P5"), SubResource("P6"), SubResource("P7")])

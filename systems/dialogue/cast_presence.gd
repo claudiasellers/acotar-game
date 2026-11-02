@@ -6,8 +6,8 @@
 ## Spots are keyed to phase, flags and hour only (data/dialogue/presence.tres,
 ## Keeper-checked roster) and never write WorldState. A spot spawns while its
 ## region is loaded and Feyre is within SPAWN_DIST, and goes when she leaves or
-## it stops fitting. Tamlin, Lucien and Alis step aside while any staged scene
-## runs or the story has spawned its own actor for them, so they never double.
+## it stops fitting. Tamlin, Lucien and Alis step aside while a staged scene
+## holds control or the story has spawned its own actor for them, so they never double.
 ## Nesta, Elain and their father stay for the beast scene (it gathers them).
 class_name CastPresence
 extends Node
@@ -27,7 +27,6 @@ var auto_tick: bool = true
 var spawned: Dictionary = {}
 
 var _t: float = 0.0
-var _scene_count: int = 0
 var _house: Node3D
 var _rooms: Dictionary = {}
 
@@ -39,8 +38,6 @@ func _init() -> void:
 func _ready() -> void:
 	if roster == null and ResourceLoader.exists(ROSTER_PATH):
 		roster = load(ROSTER_PATH) as PresenceRoster
-	EventBus.scene_space_started.connect(func(_id: StringName) -> void: _scene_count += 1)
-	EventBus.scene_space_finished.connect(func(_id: StringName) -> void: _scene_count = maxi(_scene_count - 1, 0))
 
 
 func _process(delta: float) -> void:
@@ -65,7 +62,9 @@ func step(at: Vector3) -> void:
 		if node != null and not is_instance_valid(node):
 			spawned.erase(spot.id)
 			node = null
-		var want := fits(spot) and (loaded.is_empty() or loaded.has(String(spot.region)) or spot.region == &"")
+		# Open-air spots stand on the terrain whether or not their region's
+		# props have streamed in; house and anchor spots wait for their nodes.
+		var want := fits(spot) and (spot.room == &"" and spot.anchor == &"" or loaded.has(String(spot.region)))
 		var where := Vector3.INF
 		if want:
 			where = world_position(spot)
@@ -93,7 +92,7 @@ func fits(spot: PresenceSpot) -> bool:
 		if WorldState.has_flag(f):
 			return false
 	if spot.speaker in STAGED:
-		if _scene_count > 0 or StoryControl.mode != StoryControl.Mode.FULL:
+		if StoryControl.mode != StoryControl.Mode.FULL:
 			return false
 		if is_inside_tree() and get_tree().get_first_node_in_group(StringName("story_actor_%s" % spot.speaker)) != null:
 			return false
