@@ -400,10 +400,245 @@ def dish_shelf():
     L.export(OUT + "dish_shelf.glb")
 
 
+# --- L38-2: the two rooms (audit D6; Keeper canon ch 1-4) -------------------
+# Feyre's only paints are three tins, red, yellow and blue: every motif below
+# mixes from those (greens and violets), never white; yellow stands in for it.
+RED = chip((0.82, 0.2, 0.18))
+YEL = chip((1.0, 0.84, 0.22))
+BLU = chip((0.22, 0.32, 0.78))
+GRN = chip((0.3, 0.55, 0.24))
+
+
+def flame_curl(x, y, z, s=1.0, ang=0.0, face=(0, 0, 0)):
+    """A tiny curl of flame painted on a face: three tapering licks."""
+    for k, c in enumerate((RED, chip((0.95, 0.5, 0.14)), YEL)):
+        f = 1.0 - k * 0.28
+        L.cyl(0.018 * s * f, 0.075 * s * f, at=(x, y, z), rot=(face[0], face[1], ang + L.rnd(-14, 14)), r2=0.0, seg=5, col=c, smooth=False)
+
+
+def father_cot():
+    """Her father's cot by the fire [C]: a low pegged frame, a straw tick, his
+    patched blanket and a rolled coat for a pillow. 1.9 x 0.75, head to +x."""
+    L.seed(41)
+    for x in (-0.9, 0.9):
+        for z in (-0.33, 0.33):
+            L.box((0.07, 0.3, 0.07), at=(x, 0.15, z), col=L.TIMBER, bevel=0.005)
+    for z in (-0.34, 0.34):
+        L.box((1.9, 0.08, 0.06), at=(0, 0.26, z), col=L.TIMBER_OLD, jitter=0.004)
+    for x in (-0.92, 0.92):
+        L.box((0.06, 0.08, 0.72), at=(x, 0.26, 0), col=L.TIMBER_OLD)
+    L.box((1.8, 0.12, 0.66), at=(0, 0.34, 0), col=(0.58, 0.54, 0.44), jitter=0.012)  # straw tick
+    L.box((1.25, 0.05, 0.7), at=(-0.25, 0.42, 0), rot=(0, 2, 0), col=L.CLOTH_BROWN, jitter=0.012)
+    L.box((0.32, 0.052, 0.28), at=(-0.5, 0.425, 0.12), col=L.CLOTH_GREY)  # a patch
+    L.box((0.22, 0.052, 0.2), at=(0.1, 0.425, -0.18), col=L.WOOL)
+    L.cyl(0.11, 0.5, at=(0.68, 0.48, -0.25), rot=(90, 0, 0), seg=9, col=(0.32, 0.3, 0.3))  # rolled coat
+    L.box((1.9, 0.5, 0.75), at=(0, 0.25, 0), collision=True)
+    L.export(OUT + "father_cot.glb")
+
+
+def kitchen_chair(name, seed, lean=0.0, painted=False):
+    """A rickety rush-seat chair, front -z. Feyre hid a posy under the seat."""
+    L.seed(seed)
+    for x in (-0.19, 0.19):
+        for z in (-0.18, 0.18):
+            L.box((0.045, 0.44, 0.045), at=(x, 0.22, z), rot=(0, 0, L.rnd(-2, 2)), col=L.TIMBER)
+        L.box((0.045, 0.5, 0.045), at=(x, 0.7, 0.19), rot=(-6 - lean, 0, 0), col=L.TIMBER)
+    L.box((0.42, 0.04, 0.4), at=(0, 0.45, 0), col=(0.55, 0.47, 0.3), jitter=0.006)  # rush seat
+    for y in (0.72, 0.9):
+        L.box((0.4, 0.05, 0.025), at=(0, y, 0.2), rot=(-6 - lean, 0, 0), col=L.TIMBER_OLD)
+    L.box((0.4, 0.025, 0.025), at=(0, 0.14, -0.18), col=L.TIMBER_OLD)
+    L.box((0.025, 0.025, 0.36), at=(-0.19, 0.12, 0), col=L.TIMBER_OLD)
+    if painted:
+        y = 0.425 - PAINT_D
+        for i, c in enumerate((RED, YEL, BLU)):
+            a = i / 3 * math.tau
+            L.cyl(0.02, PAINT_D, at=(0.06 * math.cos(a), y, 0.06 * math.sin(a)), seg=7, col=c, smooth=False)
+        L.box((0.12, PAINT_D, 0.008), at=(0.0, y, 0.09), rot=(0, 30, 0), col=GRN)
+    L.box((0.45, 0.95, 0.45), at=(0, 0.47, 0), collision=True)
+    L.export(OUT + name + ".glb")
+
+
+def chair_rush_a():
+    kitchen_chair("chair_rush_a", 42, 0.0, painted=True)
+
+
+def chair_rush_b():
+    kitchen_chair("chair_rush_b", 43, 3.0)
+
+
+def bedroom_door():
+    """The sisters' room door: ledged planks, hung open against the partition.
+    Origin at the hinge foot, the leaf runs along +x, braced face +z."""
+    L.seed(44)
+    for i in range(5):
+        L.box((0.17, 1.86, 0.03), at=(0.09 + i * 0.175, 0.93, 0), col=L.TIMBER_OLD if i % 2 else (0.33, 0.27, 0.21), jitter=0.003)
+    for y in (0.3, 1.55):
+        L.box((0.86, 0.1, 0.03), at=(0.46, y, 0.03), col=L.TIMBER)
+    L.box((0.08, 1.4, 0.03), at=(0.46, 0.93, 0.03), rot=(0, 0, -30), col=L.TIMBER)
+    L.box((0.12, 0.02, 0.02), at=(0.82, 1.0, -0.03), col=L.IRON)  # latch
+    for y in (0.3, 1.55):
+        L.box((0.28, 0.035, 0.012), at=(0.15, y, -0.022), col=L.IRON)
+    # Little vines along its edge, the threshold side [C].
+    vine([(0.84, 0.25 + i * 0.16 + 0.02 * math.sin(i)) for i in range(10)], -0.016 - PAINT_D)
+    for i in (1, 4, 7):
+        flower(0.8, 0.3 + i * 0.16, -0.017 - PAINT_D, YEL, RED, r=0.014)
+    L.box((0.9, 1.88, 0.05), at=(0.45, 0.94, 0), collision=True)
+    L.export(OUT + "bedroom_door.glb")
+
+
+def boots_feyre():
+    """Feyre's boots by the door [C]: worn through at the toes, the left one
+    patched, the laces knotted where they broke."""
+    L.seed(45)
+    for x, rot in ((-0.08, 4), (0.1, -10)):
+        L.box((0.1, 0.24, 0.11), at=(x, 0.12, 0.04), rot=(0, rot, 0), col=(0.27, 0.2, 0.15), jitter=0.006)
+        L.box((0.1, 0.08, 0.17), at=(x, 0.04, -0.08), rot=(0, rot, 0), col=(0.29, 0.22, 0.16), jitter=0.006)
+        L.box((0.11, 0.015, 0.29), at=(x, 0.008, -0.03), rot=(0, rot, 0), col=(0.16, 0.13, 0.1))
+    L.box((0.06, 0.05, 0.004), at=(-0.08, 0.06, -0.165), col=L.CLOTH_GREY)
+    L.cyl(0.003, 0.1, at=(0.13, 0.2, -0.0), rot=(0, 0, 70), seg=3, col=L.BONE)
+    L.export(OUT + "boots_feyre.glb")
+
+
+def boots_nesta():
+    """Nesta's boots [C]: kept shiny, the only good thing she owns, side by side."""
+    L.seed(46)
+    shine = (0.07, 0.065, 0.075)
+    for x in (-0.07, 0.07):
+        L.box((0.09, 0.3, 0.1), at=(x, 0.15, 0.05), col=shine, bevel=0.01)
+        L.box((0.09, 0.07, 0.16), at=(x, 0.035, -0.07), col=shine, bevel=0.012)
+        L.box((0.1, 0.03, 0.06), at=(x, 0.015, 0.08), col=(0.1, 0.09, 0.1))  # little heel
+        L.box((0.02, 0.2, 0.004), at=(x, 0.17, -0.0), col=(0.2, 0.2, 0.22))
+    L.export(OUT + "boots_nesta.glb")
+
+
+def curtains_threadbare():
+    """Threadbare curtains inside a window [C], tied back on a cord; Feyre's
+    painted vine hides behind the left one [C]. Wall plane z=0, front -z,
+    origin floor centre under an 0.8 m window."""
+    L.seed(47)
+    L.cyl(0.012, 1.25, at=(-0.625, 1.83, -0.05), rot=(0, 0, -90), seg=5, col=L.TIMBER)
+    for side in (-1, 1):
+        x = side * 0.5
+        for k in range(4):
+            L.box((0.07, 1.05 - 0.04 * k, 0.012), at=(x + side * (k * 0.045 - 0.06), 1.3, -0.06 - 0.012 * (k % 2)),
+                  rot=(0, 0, side * 3), col=(0.6, 0.58, 0.52) if k % 2 else (0.54, 0.52, 0.47), jitter=0.004)
+        L.box((0.2, 0.03, 0.03), at=(x, 1.05, -0.08), col=L.CLOTH_BROWN)  # tie
+        L.box((0.06, 0.04, 0.003), at=(x + side * 0.02, 1.5, -0.075), col=(0.66, 0.64, 0.58))  # a darn
+    vine([(-0.55 + 0.03 * math.sin(i), 0.95 + i * 0.1) for i in range(9)], -PAINT_D)
+    for i in (2, 5, 8):
+        flower(-0.52, 0.95 + i * 0.1, -PAINT_D - 0.001, BLU if i == 5 else RED, YEL, r=0.015)
+    L.export(OUT + "curtains_threadbare.glb")
+
+
+def motif_hearth_flames():
+    """Tiny curls of flame on the hearth's border stones [C] (cottage-interior
+    frame: the jambs' fronts at x 3.25, z -1.15..-0.85 and 0.85..1.15)."""
+    L.seed(48)
+    x = 3.25 - PAINT_D
+    for zc in (-1.0, 1.0):
+        for i in range(5):
+            y = 0.15 + i * 0.22
+            flame_curl(x, y, zc + 0.07 * math.sin(i * 2.1), 1.0, 0.0, face=(0, 90, 0))
+    for i in range(9):
+        flame_curl(x - 0.012, 1.3, -0.9 + i * 0.225, 0.8, 0.0, face=(0, 90, 0))  # along the mantel stone
+    L.export(OUT + "motif_hearth_flames.glb")
+
+
+def mug_chipped():
+    """The chipped mug [C] by her place, a pot for hot water beside it."""
+    L.cyl(0.045, 0.1, seg=10, col=(0.62, 0.56, 0.46))
+    L.cyl(0.04, 0.006, at=(0, 0.1, 0), seg=10, col=(0.36, 0.3, 0.24))
+    L.box((0.015, 0.06, 0.03), at=(0.05, 0.05, 0), col=(0.62, 0.56, 0.46))
+    L.box((0.02, 0.02, 0.012), at=(-0.04, 0.095, -0.02), col=(0.75, 0.7, 0.6))  # the chip
+    L.export(OUT + "mug_chipped.glb")
+
+
+def water_pot():
+    """A clay pot of water warming on the hearthstone [C: a pot for hot water]."""
+    L.cyl(0.13, 0.22, r2=0.1, seg=12, col=(0.5, 0.33, 0.22))
+    L.cyl(0.1, 0.05, at=(0, 0.22, 0), r2=0.11, seg=12, col=(0.46, 0.3, 0.2))
+    L.cyl(0.095, 0.004, at=(0, 0.25, 0), seg=12, col=(0.3, 0.36, 0.4))
+    for a in (0, 180):
+        L.box((0.03, 0.06, 0.02), at=(0.13 * math.cos(math.radians(a)), 0.17, 0), col=(0.46, 0.3, 0.2))
+    L.export(OUT + "water_pot.glb")
+
+
+def iron_bracelets():
+    """Nesta's and Elain's iron bracelets [C] on the dresser top, and the
+    village ribbons Nesta keeps for market days [C]."""
+    L.seed(49)
+    for x, r in ((0.0, 0.035), (0.09, 0.032)):
+        for i in range(10):
+            a = i / 10 * math.tau
+            L.box((0.024, 0.012, 0.008), at=(x + r * math.cos(a), 0.006, r * math.sin(a)), rot=(0, -math.degrees(a) + 90, 0), col=L.IRON)
+    for i, c in enumerate(((0.55, 0.22, 0.25), (0.3, 0.4, 0.55))):
+        L.box((0.3, 0.003, 0.02), at=(0.25, 0.002 + i * 0.003, -0.04 + i * 0.03), rot=(0, 10 - i * 25, 0), col=c)
+    L.export(OUT + "iron_bracelets.glb")
+
+
+def candle_stub():
+    """A tallow stub in a tin dish: the sisters' one light at bedtime."""
+    L.cyl(0.06, 0.012, seg=10, col=L.IRON)
+    L.cyl(0.018, 0.07, at=(0, 0.012, 0), seg=8, col=(0.86, 0.8, 0.62))
+    L.cyl(0.003, 0.012, at=(0, 0.082, 0), seg=3, col=L.CHAR)
+    L.ball(0.012, at=(0, 0.1, 0), scale=(0.7, 1.6, 0.7), col=(1.0, 0.75, 0.35), sub=0)
+    L.export(OUT + "candle_stub.glb")
+
+
+def rag_rug():
+    """A braided rag rug by the bed, rags of old dresses in faded rounds."""
+    L.seed(50)
+    cols = ((0.45, 0.4, 0.36), (0.4, 0.38, 0.42), (0.5, 0.44, 0.34), (0.38, 0.34, 0.3))
+    for k in range(6):
+        sx, sz = 0.6 - k * 0.09, 0.36 - k * 0.055
+        L.ball(1.0, at=(0, 0.004 + k * 0.0015, 0), scale=(sx, 0.008, sz), col=cols[k % 4], sub=2)
+    L.export(OUT + "rag_rug.glb")
+
+
+def pegs_nightclothes():
+    """A peg rail inside the sisters' room: three shifts and a shawl."""
+    L.box((1.3, 0.07, 0.04), at=(0, 1.6, -0.02), col=L.TIMBER_OLD)
+    for i, (c, ln) in enumerate(((L.BONE, 1.05), ((0.72, 0.68, 0.6), 1.0), ((0.66, 0.66, 0.62), 1.1), ((0.42, 0.36, 0.42), 0.55))):
+        x = -0.48 + i * 0.32
+        L.cyl(0.014, 0.1, at=(x, 1.6, -0.04), rot=(-90, 0, 0), seg=4, col=L.TIMBER)
+        L.box((0.28, ln, 0.05), at=(x, 1.6 - ln / 2, -0.08), rot=(0, 0, 2 - i * 1.5), col=c, jitter=0.01)
+    L.export(OUT + "pegs_nightclothes.glb")
+
+
+def besom_broom():
+    """A birch besom against the wall by the hearth."""
+    L.seed(51)
+    L.cyl(0.018, 1.25, at=(0, 0.35, 0), rot=(0, 0, 8), seg=6, col=L.TIMBER_OLD)
+    for i in range(14):
+        a = i / 14 * math.tau
+        L.cyl(0.006, 0.42, at=(0.03 * math.cos(a) + 0.02, 0, 0.03 * math.sin(a)), rot=(0, 0, 8 + 6 * math.cos(a)), seg=3, col=(0.4, 0.34, 0.24))
+    L.cyl(0.04, 0.05, at=(0.05, 0.36, 0), rot=(0, 0, 8), seg=8, col=L.CLOTH_BROWN)
+    L.export(OUT + "besom_broom.glb")
+
+
+def kindling_basket():
+    """A split-willow basket of kindling by the hearth; almost empty."""
+    L.seed(52)
+    L.cyl(0.22, 0.3, r2=0.25, seg=12, col=(0.45, 0.38, 0.26), cap=False)
+    L.cyl(0.2, 0.02, at=(0, 0.02, 0), seg=12, col=(0.4, 0.33, 0.22))
+    for i in range(5):
+        L.cyl(0.02, 0.45, at=(L.rnd(-0.08, 0.08), 0.05, L.rnd(-0.08, 0.08)), rot=(L.rnd(-18, 18), 0, L.rnd(-18, 18)), seg=5, col=L.TIMBER_OLD)
+    L.export(OUT + "kindling_basket.glb")
+
+
+L38_2 = (father_cot, chair_rush_a, chair_rush_b, bedroom_door, boots_feyre, boots_nesta, curtains_threadbare,
+         motif_hearth_flames, mug_chipped, water_pot, iron_bracelets, candle_stub, rag_rug, pegs_nightclothes,
+         besom_broom, kindling_basket)
+
+
 if __name__ == "__main__":
     L.reset()
     for fn in (bed, father_chair, cane, carving_stool, wooden_figures, wood_shavings, table, motif_table_foxglove,
                dresser, motif_dresser, wall_cabinet, motif_cabinet_daffodils, motif_wall_vines, pegs_clothes,
                bow_quiver, food_tally, paint_corner, nesta_ribbon_comb, elain_seed_packets, pressed_flower_cup,
-               iron_pot, hearth_embers_glow, shutter_frost, hidden_coin, dish_shelf):
+               iron_pot, hearth_embers_glow, shutter_frost, hidden_coin, dish_shelf) + L38_2:
+        # `-- name ...` rebuilds only those (the others' glbs stay byte-for-byte).
+        only = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+        if only and fn.__name__ not in only:
+            continue
         fn()
