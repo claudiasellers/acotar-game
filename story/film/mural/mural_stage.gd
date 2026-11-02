@@ -52,11 +52,15 @@ func _ready() -> void:
 	environment.background_color = Color(0.02, 0.015, 0.04)
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.glow_enabled = true
-	environment.glow_intensity = 1.1
-	environment.glow_strength = 1.15
-	environment.glow_bloom = 0.12
-	environment.glow_hdr_threshold = 0.85
-	environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SCREEN
+	# Glow only on the gold itself, kept tight: the Mac's Forward+ glow (far
+	# stronger than the Compatibility renderer's) hazed whole tableaux pale.
+	environment.glow_intensity = 0.45
+	environment.glow_strength = 1.0
+	environment.glow_bloom = 0.0
+	environment.glow_hdr_threshold = 1.05
+	environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	for level in 7:
+		environment.set_glow_level(level, 1.0 if level in [1, 2, 3] else 0.0)
 	environment.adjustment_enabled = true
 	environment.adjustment_saturation = 1.08
 	we.environment = environment
@@ -158,6 +162,13 @@ func _mat(t: Dictionary, ink: Color, gold: Color, rim_gain: float = 1.6, mat_nam
 	return m
 
 
+## Gold leaf (crowns, seals): a bright gilt paint that glows a little.
+func _gilt(t: Dictionary, mat_name: String) -> ShaderMaterial:
+	var m := _mat(t, Color(0.62, 0.44, 0.16), GOLD, 1.4, mat_name)
+	m.set_shader_parameter(&"glow", 0.9)
+	return m
+
+
 func _sky(t: Dictionary, at: Vector3, size: Vector2, top: Color, low: Color) -> void:
 	var m := ShaderMaterial.new()
 	m.shader = SKY
@@ -189,9 +200,9 @@ func _figure(t: Dictionary, path: String, at: Vector3, yaw: float, s: float, m: 
 		return null
 	var n := (load(path) as PackedScene).instantiate() as Node3D
 	n.position = at
-	# yaw 0 faces the lens (+z): the cast models are built facing +z, the
-	# creature and people glTFs face -z.
-	n.rotation_degrees.y = yaw + (0.0 if path.begins_with("res://characters/") else 180.0)
+	# yaw 0 faces the lens (+z). Every model here faces -z as built (the
+	# cast after its own half turn, the people and creature glTFs natively).
+	n.rotation_degrees.y = yaw + 180.0
 	n.scale = Vector3.ONE * s
 	(t.root as Node3D).add_child(n)
 	_paint_all(n, m)
@@ -235,17 +246,12 @@ func _cone(t: Dictionary, radius: float, height: float, at: Vector3, m: ShaderMa
 
 ## A crown of gilt leaves on a figure's head: a ring sat on the crown of the
 ## skull (bone "head", height from the figure's own bounds), or `h` up when
-## the model has no head bone. `_m` is unused: crowns are always gold leaf.
-func _crown(fig: Node3D, _m: ShaderMaterial, h: float, spikes: int = 9, r: float = 0.13) -> void:
+## the model has no head bone. `gilt` is a paint material of the tableau, so
+## the crown is brushed on with the figure that wears it.
+func _crown(fig: Node3D, gilt: ShaderMaterial, h: float, spikes: int = 9, r: float = 0.13) -> void:
 	if fig == null:
 		return
-	var leaf_mat := StandardMaterial3D.new()
-	leaf_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	leaf_mat.albedo_color = GOLD
-	leaf_mat.emission_enabled = true
-	leaf_mat.emission = GOLD
-	leaf_mat.emission_energy_multiplier = 2.2
-	leaf_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var leaf_mat := gilt
 	var holder: Node3D = fig
 	var top := _top_of(fig)
 	var base := h
@@ -411,11 +417,12 @@ func _build_court(t: Dictionary) -> void:
 	# The ridge they stand on.
 	var ridge := _box(t, Vector3(30, 1.2, 4), Vector3(0, -0.2, -1.5), _mat(t, Color(0.03, 0.025, 0.06), GOLD, 0.8, "fae"))
 	ridge.rotation_degrees.z = 1.5
+	var gilt := _gilt(t, "fae")
 	var who := [[CAST % ["tamlin", "tamlin"], -2.6, 18.0], [CAST % ["lucien", "lucien"], 1.2, -20.0],
 		[PEOPLE % "calanmai_1", -5.6, 30.0], [PEOPLE % "reveler_2", 4.4, -32.0], [PEOPLE % "calanmai_3", 7.2, -10.0]]
 	for w: Array in who:
 		var f := _figure(t, String(w[0]), Vector3(float(w[1]), 0.4, -1.5), float(w[2]), 1.25, fae)
-		_crown(f, fae, 2.15)
+		_crown(f, gilt, 2.15)
 	_particles(t, Vector3(0, 4, -2), Vector3(12, 3, 3), ROSE, 160, 0.09, Vector3(0.15, -0.25, 0), 10.0, false)
 	_particles(t, Vector3(0, 6, -9), Vector3(14, 5, 1), Color(1.0, 0.9, 0.6, 0.8), 260, 0.04, Vector3.ZERO, 6.0)
 	# The beasts below, in the ink under the ridge.
@@ -429,7 +436,7 @@ func _build_court(t: Dictionary) -> void:
 	_figure(t, PEOPLE % "fae_longlimb_true", Vector3(3.8, -4.7, 1.6), -40.0, 1.3, beast)
 	_figure(t, FAE % "naga", Vector3(-6.4, -4.8, 1.0), 50.0, 1.3, beast, &"")
 	_figure(t, FAE % "attor", Vector3(6.6, -4.4, 0.6), -60.0, 1.2, beast, &"")
-	_box(t, Vector3(30, 1.0, 8), Vector3(0, -5.3, 2.5), _mat(t, Color(0.015, 0.012, 0.02), SICK, 0.3, "beast"))
+	_box(t, Vector3(30, 1.0, 8), Vector3(0, -5.3, 2.5), _mat(t, Color(0.012, 0.01, 0.016), SICK, 0.04, "beast"))
 	# One yellow eye in the dark, opened by the director (eye.scale.y 0 → 1).
 	var eye := MeshInstance3D.new()
 	eye.name = "Eye"
@@ -554,6 +561,7 @@ func _build_war(t: Dictionary) -> void:
 func _build_treaty(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 6, -14), Vector2(60, 30), Color(0.05, 0.05, 0.12), Color(0.22, 0.24, 0.4))
 	var queen := _mat(t, Color(0.06, 0.06, 0.1), SILVER, 2.2, "queen")
+	var crowns := _gilt(t, "queen")
 	var table := _mat(t, Color(0.08, 0.06, 0.09), GOLD, 0.8, "queen")
 	_box(t, Vector3(3.2, 0.9, 1.6), Vector3(0, 0.45, 0), table)
 	var sheet := _box(t, Vector3(1.3, 0.01, 0.9), Vector3(0, 0.91, 0), _mat(t, Color(0.85, 0.82, 0.74), SILVER, 0.5, "queen"))
@@ -562,7 +570,7 @@ func _build_treaty(t: Dictionary) -> void:
 		var a := PI * (0.15 + 0.7 * float(i) / 5.0)
 		var p := Vector3(cos(a) * -2.4, 0.0, -sin(a) * 1.6 - 0.2)
 		var q := _figure(t, PEOPLE % "human_woman", p, rad_to_deg(atan2(-p.x, -p.z)), 1.0, queen, &"talk", 0.3)
-		_crown(q, queen, 1.7, 7, 0.1)
+		_crown(q, crowns, 1.7, 7, 0.1)
 	var seal := MeshInstance3D.new()
 	seal.name = "Seal"
 	var cyl := CylinderMesh.new()

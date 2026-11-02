@@ -43,6 +43,100 @@ FILMS = {
             ("op_16", 171.3, 2.0, "", "C", "If I meet one, I'll kill it."),
         ],
     ),
+    # Cutscene A (scripts.md section 2): the glamour lifts in the glen (ch 23).
+    # The moment raises glamour_lifted on fact.film_eyes_open_lift, under the
+    # black while her eyes are closed (R2: the film writes facts only).
+    "eyes_open": dict(
+        id="eyes_open", length=76.0, music="music_film_eyes_open", seen="fact.film_eyes_open_seen", bars=1.0,
+        beats=[
+            ("open", 0.0), ("study", 9.5), ("wary", 20.5), ("kneel", 32.0), ("kiss", 37.5),
+            ("dark", 42.5), ("fact.film_eyes_open_lift", 44.0), ("open_eyes", 47.0), ("true_form", 54.0),
+            ("reach", 58.5), ("hide", 61.5), ("hold", 68.0), ("handover", 73.0),
+        ],
+        lines=[
+            ("a_01", 3.0, 2.4, "tamlin", "C", "It sings."),
+            ("a_02", 5.6, 3.2, "feyre", "C", "And I suppose it knows drinking songs too."),
+            ("a_03", 10.0, 4.2, "tamlin", "C?", "You're human. Your senses are sealed off from all of it."),
+            ("a_04", 14.8, 5.0, "tamlin", "C?", "I could open them. Let you see my world. Hear it, smell it. Taste it."),
+            ("a_05", 21.0, 2.6, "feyre", "C", "And what does it cost?"),
+            ("a_06", 24.0, 2.8, "tamlin", "C", "Every gift comes with a price."),
+            ("a_07", 27.3, 1.8, "tamlin", "C", "A kiss."),
+            ("a_08", 29.6, 1.8, "feyre", "C", "...Fine."),
+            ("a_09", 34.5, 2.4, "tamlin", "C", "Close your eyes."),
+            ("a_10", 49.0, 4.0, "feyre", "C", "It smells of roses. Not metal any more."),
+            ("a_11", 62.5, 2.2, "feyre", "C", "Why hide it?"),
+            ("a_12", 65.0, 2.4, "tamlin", "C?", "To look normal."),
+        ],
+    ),
+    # Cutscene B (scripts.md section 3): Rhysand at lunch (ch 26). The moment
+    # raises rhysand_faced when the film ends.
+    "night_court": dict(
+        id="night_court", length=105.0, music="music_film_night_court", seen="fact.film_night_court_seen", bars=1.0,
+        beats=[
+            ("lunch", 0.0), ("snarl", 3.5), ("knife", 5.6), ("curtain", 8.0), ("veil_on", 9.0),
+            ("slouch", 12.0), ("enter", 17.0), ("eyes_widen", 18.8), ("greet", 21.0), ("fox", 31.2),
+            ("goblet", 35.5), ("look", 40.0), ("tear", 44.5), ("mind", 48.0), ("beg", 53.0),
+            ("kneel", 57.5), ("fox_boy", 64.0), ("crouch", 67.5), ("flash", 73.6),
+            ("fact.false_name_clare_beddor", 74.6), ("stand", 78.5), ("vanish", 86.0), ("after", 88.5),
+            ("silence", 98.8), ("handover", 102.0),
+        ],
+        lines=[
+            ("b_01", 4.4, 3.0, "tamlin", "C", "Get Feyre to the window. By the curtains."),
+            ("b_02", 21.5, 2.0, "rhysand", "C", "High Lord."),
+            ("b_03", 24.0, 1.8, "tamlin", "C", "Rhysand."),
+            ("b_04", 26.2, 4.5, "rhysand", "C", "I don't see you for forty-nine years, and you start calling me Rhysand?"),
+            ("b_05", 31.5, 3.4, "rhysand", "C", "A fox mask. Appropriate for you, Lucien."),
+            ("b_06", 37.0, 2.5, "rhysand", "C", "Where's your guest?"),
+            ("b_07", 41.5, 2.5, "rhysand", "C", "You dare glamour me?"),
+            ("b_08", 48.5, 3.2, "rhysand", "X", "Let's see what's in that head of yours."),
+            ("b_09", 53.3, 3.5, "tamlin", "C", "Please. Don't tell Amarantha about her."),
+            ("b_10", 58.0, 3.4, "rhysand", "C", "Beg, and I'll consider not telling her."),
+            ("b_11", 62.0, 1.6, "rhysand", "C", "Lower."),
+            ("b_12", 64.0, 2.0, "rhysand", "C", "You too, fox-boy."),
+            ("b_13", 68.5, 2.4, "rhysand", "C", "What's your name, love?"),
+            ("b_14", 71.5, 2.0, "feyre", "C", "Clare Beddor."),
+            ("b_15", 75.3, 2.6, "rhysand", "X", "Such a little liar."),
+            ("b_16", 79.0, 6.0, "rhysand", "C", "I'm looking forward to seeing you three Under the Mountain. I'll give Amarantha your regards."),
+            ("b_17", 89.5, 2.2, "feyre", "X", "Who was that?"),
+            ("b_18", 92.3, 3.4, "lucien", "X", "Rhysand. High Lord of the Night Court."),
+            ("b_19", 96.4, 2.2, "feyre", "X", "And Amarantha?"),
+        ],
+    ),
+    # Cutscene C (scripts.md section 4): Alis's truth in the ruined manor
+    # (end of ch 31 into ch 32). The moment raises alis_truth_heard at the end.
+    "silent_manor": dict(
+        id="silent_manor", length=150.0, music="music_film_silent_manor", seen="fact.film_silent_manor_seen", bars=1.0,
+        beats=[
+            ("hall", 0.0), ("sound", 6.0), ("hood", 11.0), ("kitchen", 17.5), ("packing", 29.0),
+            ("mural_queen", 39.5), ("drain", 51.0), ("mural_masks", 56.0), ("curse", 62.0),
+            ("mural_terms", 71.5), ("arrow", 79.0), ("understand", 91.0), ("stop", 104.0),
+            ("stand", 115.0), ("look", 125.0), ("steps", 131.5), ("handover", 146.0),
+        ],
+        lines=[
+            ("c_01", 13.0, 3.5, "alis", "C", "You can't be here. You were told to stay away."),
+            ("c_02", 18.5, 3.0, "feyre", "C", "Where is he? What happened here?"),
+            ("c_03", 22.0, 3.6, "alis", "C", "She took him. To her court, Under the Mountain."),
+            ("c_04", 26.0, 2.2, "alis", "C", "Amarantha."),
+            ("c_05", 29.0, 4.8, "alis", "C", "The seven times seven years are over. She is High Queen of Prythian now."),
+            ("c_06", 34.3, 4.4, "alis", "C?", "That I can tell you any of this means the game is over, to her."),
+            ("c_07", 40.5, 10.0, "alis", "C", "She came from across the sea, a commander in the old War. Forty-nine years ago, at a ball, she put a potion in the High Lords' wine and stole their powers. All seven of them."),
+            ("c_08", 51.5, 4.0, "alis", "C", "For forty-nine years, we have been her slaves."),
+            ("c_09", 56.5, 5.0, "alis", "C", "Tamlin would not be hers. He refused her and spat in her face."),
+            ("c_10", 62.0, 4.2, "alis", "C", "So she cursed him, and all of us with him. The masks."),
+            ("c_11", 66.5, 4.4, "alis", "C", "Then she bound us so we couldn't say a word about it. Not one word."),
+            ("c_12", 72.0, 8.0, "alis", "C", "To break it, a human girl with ice in her heart, who hated our kind enough to kill one of his own, sent across the Wall."),
+            ("c_13", 80.5, 4.0, "alis", "C", "And then she had to say she loved him, and mean it."),
+            ("c_14", 85.0, 5.5, "alis", "C?", "If no girl did, he would be her slave forever, and Prythian would stay under her rule."),
+            ("c_15", 91.5, 4.5, "alis", "C", "There was nothing in the Treaty about a life for a life. That was a lie."),
+            ("c_16", 96.5, 7.0, "alis", "C", "The wolf you killed was one of us. Andras. Tamlin sent him across the Wall that day, knowing a girl like you might kill him."),
+            ("c_17", 104.5, 4.0, "alis", "C", "You stupid, stupid girl. You never said it."),
+            ("c_18", 109.0, 5.5, "alis", "C", "He had three days left when he sent you home. Three days, and he let you go."),
+            ("c_19", 115.5, 2.0, "feyre", "C", "Where is he?"),
+            ("c_20", 118.0, 3.8, "alis", "C", "Under the Mountain. With her. You'll die there."),
+            ("c_21", 122.3, 2.2, "feyre", "C", "Then take me."),
+            ("c_22", 128.0, 2.6, "alis", "C", "...Get your cloak."),
+        ],
+    ),
 }
 
 

@@ -3,13 +3,18 @@
 ## opening film's scene change. Writes into `out`:
 ## - still_<t>.jpg at each time in `stills` (full size),
 ## - sheet.png: the stills as a 4-wide contact sheet (640x360 tiles),
-## - clip/f_<n>.jpg at `fps` (640x360), for tools/film/make_clip.sh,
+## - clip_<k>.jpg at `fps`: frames of 384x216, 64 to an 8x8 atlas, left to
+##   right then down (the Mac returns at most 200 files a shot), for
+##   tools/film/make_clip.sh,
 ## - timing.txt: when each beat fired against the film clock, and the
 ##   frame time it rendered at (for the R9 check).
 class_name FilmCapture
 extends Node
 
 const TILE := Vector2i(640, 360)
+const CLIP := Vector2i(384, 216)
+const CLIP_COLS := 8
+const CLIP_PER := 64
 
 var out: String = "user://film_capture"
 var stills: PackedFloat32Array = []
@@ -18,6 +23,7 @@ var quit_after: float = 0.0
 
 var _done_stills: int = 0
 var _frame: int = 0
+var _atlas: Image
 var _next_clip: float = 0.0
 var _sheet_tiles: Array[Image] = []
 var _log: PackedStringArray = []
@@ -31,7 +37,7 @@ var _last_t: float = 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	DirAccess.make_dir_recursive_absolute(out + "/clip")
+	DirAccess.make_dir_recursive_absolute(out)
 
 
 func _film_time() -> float:
@@ -58,9 +64,15 @@ func _process(delta: float) -> void:
 		_next_clip += 1.0 / fps
 		img = get_viewport().get_texture().get_image()
 		var small := img.duplicate() as Image
-		small.resize(TILE.x, TILE.y, Image.INTERPOLATE_BILINEAR)
-		small.save_jpg("%s/clip/f_%04d.jpg" % [out, _frame], 0.82)
+		small.resize(CLIP.x, CLIP.y, Image.INTERPOLATE_BILINEAR)
+		small.convert(Image.FORMAT_RGB8)
+		if _atlas == null:
+			_atlas = Image.create(CLIP.x * CLIP_COLS, CLIP.y * (CLIP_PER / CLIP_COLS), false, Image.FORMAT_RGB8)
+		var k := _frame % CLIP_PER
+		_atlas.blit_rect(small, Rect2i(Vector2i.ZERO, CLIP), Vector2i((k % CLIP_COLS) * CLIP.x, (k / CLIP_COLS) * CLIP.y))
 		_frame += 1
+		if _frame % CLIP_PER == 0:
+			_flush_atlas()
 	if _done_stills < stills.size() and t >= stills[_done_stills]:
 		if img == null:
 			img = get_viewport().get_texture().get_image()
@@ -73,8 +85,16 @@ func _process(delta: float) -> void:
 		_finish()
 
 
+func _flush_atlas() -> void:
+	if _atlas == null:
+		return
+	_atlas.save_jpg("%s/clip_%02d.jpg" % [out, (_frame - 1) / CLIP_PER], 0.85)
+	_atlas = null
+
+
 func _finish() -> void:
 	set_process(false)
+	_flush_atlas()
 	if not _sheet_tiles.is_empty():
 		var cols := 4
 		var rows := int(ceil(_sheet_tiles.size() / float(cols)))
@@ -84,6 +104,7 @@ func _finish() -> void:
 			tile.convert(Image.FORMAT_RGB8)
 			sheet.blit_rect(tile, Rect2i(Vector2i.ZERO, TILE), Vector2i((i % cols) * TILE.x, (i / cols) * TILE.y))
 		sheet.save_png(out + "/sheet.png")
+	_log.append("clip %d frames at %.1f fps, %dx%d, %d to an atlas" % [_frame, fps, CLIP.x, CLIP.y, CLIP_PER])
 	_log.append("frames %d, mean %.2f ms, worst %.2f ms" % [_frames, _sum_ms / maxf(1.0, _frames), _worst_ms])
 	_log.append("draw calls (last frame) %d" % RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME))
 	var f := FileAccess.open(out + "/timing.txt", FileAccess.WRITE)

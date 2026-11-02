@@ -1,7 +1,7 @@
 ## The opening film as New Game plays it (lane L33), captured on the Mac GPU:
 ##   godot res://tools/film/opening_film_shot.tscn -- <out_dir> [noclip] [until=<s>]
 ## Stills at the script's key shots, a contact sheet, a 4 fps clip and
-## timing (FilmCapture). Script: /mnt/project-files/plans/film/scripts.md §1.
+## timing (FilmCapture); a 6 fps clip packed in atlases. Script: /mnt/project-files/plans/film/scripts.md §1.
 extends Node
 
 ## film #2 land, #3 court, #4 beasts, #5 slaves, #6 war, #7 treaty, #8 wall,
@@ -21,7 +21,7 @@ func _run() -> void:
 	cap.name = "FilmCapture"
 	cap.out = args[0] if args.size() > 0 else "user://opening_film_shot"
 	cap.stills = PackedFloat32Array(STILLS)
-	cap.fps = 0.0 if args.has("noclip") else 4.0
+	cap.fps = 0.0 if args.has("noclip") else 6.0
 	cap.quit_after = 190.0
 	for a in args:
 		if a.begins_with("until="):
