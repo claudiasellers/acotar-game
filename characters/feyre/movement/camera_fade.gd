@@ -78,6 +78,15 @@ func _process(delta: float) -> void:
 			_touched.erase(id)
 
 
+## Puts every faded mesh straight back (after a teleport the old room is far away).
+func restore_all() -> void:
+	for id in _touched:
+		var g := instance_from_id(id) as GeometryInstance3D
+		if g:
+			g.transparency = _touched[id]
+	_touched.clear()
+
+
 ## Fadeable meshes within `radius` of `at`.
 func near_meshes(at: Vector3, radius: float = RADIUS) -> Array[GeometryInstance3D]:
 	var out: Array[GeometryInstance3D] = []
