@@ -6,6 +6,8 @@ class_name Act6Space
 extends Act2Space
 
 const PROP_DIR := "res://art/p6/"
+## How far above or below still counts as the same level for player_within.
+const LEVEL := 4.0
 
 ## Tests replace how Feyre's view is read: returns [origin, forward].
 var gaze_override: Callable
@@ -18,12 +20,26 @@ func snap(p: Vector3, from_above: float = 4.0) -> Vector3:
 	if not is_inside_tree():
 		return p
 	var space := get_world_3d().direct_space_state
-	var q := PhysicsRayQueryParameters3D.create(p + Vector3.UP * from_above, p + Vector3.DOWN * 30.0)
+	# Start above the terrain too: an outdoor mark in the anchor's frame can sit
+	# under a hillside that rises away from the anchor.
+	var top := maxf(p.y, WorldHeight.height_at(p.x, p.z)) + from_above
+	var q := PhysicsRayQueryParameters3D.create(Vector3(p.x, top, p.z), p + Vector3.DOWN * 30.0)
 	var pl := player()
 	if pl is CollisionObject3D:
 		q.exclude = [(pl as CollisionObject3D).get_rid()]
 	var hit := space.intersect_ray(q)
 	return hit.position if not hit.is_empty() else p
+
+
+## Within radius on the ground: horizontal distance, and on the same level
+## (a mark snapped onto a roof, a table or a bower's canopy still counts; the
+## floor above doesn't).
+func player_within(radius: float, at: Vector3 = global_position) -> bool:
+	var p := player()
+	if p == null:
+		return false
+	var d := p.global_position - at
+	return Vector2(d.x, d.z).length() <= radius and absf(d.y) <= LEVEL
 
 
 ## A stage mark on the ground (outdoor marks).
@@ -142,3 +158,37 @@ func press_near(at: Callable, radius: float, label: String = "press") -> SceneBe
 			return true
 		base[0] = presses()
 		return false, label)
+
+
+## lead_along over open country: the actor keeps to the terrain instead of
+## gliding at the height it started from (the plateau rises and falls).
+func lead_over_ground(actor_id: StringName, route: Array, wait_for: float = 0.0, speed: float = 2.2) -> SceneBeat:
+	return GroundLeadBeat.new(actor_id, route, wait_for, speed)
+
+
+class GroundLeadBeat:
+	extends Act2Space.LeadBeat
+
+	func tick(space: SceneSpace, delta: float) -> bool:
+		var who := (space as Act2Space).actor(actor_id)
+		if who:
+			var p := who.global_position
+			who.global_position = Vector3(p.x, WorldHeight.height_at(p.x, p.z), p.z)
+		return super.tick(space, delta)
+
+
+## Safe on an actor freed elsewhere (a region unload, another scene's dismiss).
+func actor(actor_id: StringName) -> Node3D:
+	var v: Variant = actors.get(actor_id)
+	if v == null or not is_instance_valid(v):
+		return null
+	return v as Node3D
+
+
+## Leaves the story_actor group at once: queue_free waits a frame, and a scene
+## casting the same character in that frame would be handed the dying node.
+func dismiss(actor_id: StringName) -> void:
+	var who := actor(actor_id)
+	if who and is_ancestor_of(who):
+		who.remove_from_group(StringName("story_actor_%s" % actor_id))
+	super.dismiss(actor_id)

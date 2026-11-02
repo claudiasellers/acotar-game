@@ -57,7 +57,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.release()
 			aside(&"follow_thought"), "she follows him"),
-		lead_along(&"tamlin", [&"hollow_path", &"hollow_edge", &"hollow"], 6.0, 2.0),
+		lead_over_ground(&"tamlin", [&"hollow_path", &"hollow_edge", &"hollow"], 6.0, 2.0),
 		Beats.run(_open_wisps, "the wisps"),
 		say(&"wisps_thought"),
 		DanceBeat.new(self),
@@ -282,7 +282,7 @@ class DanceBeat:
 		var close := s.player_within(SolsticeNight.KEEP_CLOSE, t.global_position)
 		s._angle += delta * (0.55 if close else 0.2)
 		var p := c + Vector3(cos(s._angle), 0.0, sin(s._angle)) * SolsticeNight.DANCE_R
-		t.global_position = Vector3(p.x, t.global_position.y, p.z)
+		t.global_position = Vector3(p.x, WorldHeight.height_at(p.x, p.z), p.z)
 		var pl := s.player()
 		if pl:
 			t.look_at(Vector3(pl.global_position.x, t.global_position.y, pl.global_position.z), Vector3.UP)

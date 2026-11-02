@@ -98,7 +98,7 @@ STAGES = {
     "solstice_night": {
         "canon": "Ch25 [C] (Keeper): crowds of fae, unglamoured, seen for the first time; faerie wine (Lucien warns her, she drinks, he stays close); Tamlin plays the fiddle in the band; he takes her to the edge of a vast meadow; will-o'-the-wisps, spirits of air and light, dance around them; they dance; \"It's almost dawn\"; they watch the sunrise. Marks in solstice_dance_floor's frame (anchor at world -150, -1060): the dance ring is at (-150, -1080), the musicians' bower at (-100, -1135), the long tables at (-60, -1040), the wisp hollow round (-450, -950), r 85.",
         "marks": {
-            "ring": (0.0, 0.0, -20.0), "bower": (48.0, 0.0, -72.0), "lucien_near": (3.0, 0.0, -2.0),
+            "ring": (0.0, 0.0, -20.0), "bower": (44.3, 0.0, -68.7), "lucien_near": (3.0, 0.0, -2.0),
             "wine_table": (88.0, 0.0, 18.0), "tamlin_leave": (-40.0, 0.0, 8.0),
             "hollow_path": (-120.0, 0.0, 40.0), "hollow_edge": (-200.0, 0.0, 70.0), "hollow": (-235.0, 0.0, 85.0),
         },

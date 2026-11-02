@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 marks = {
-"bower": Vector3(48, 0, -72),
+"bower": Vector3(44.3, 0, -68.7),
 "hollow": Vector3(-235, 0, 85),
 "hollow_edge": Vector3(-200, 0, 70),
 "hollow_path": Vector3(-120, 0, 40),

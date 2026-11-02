@@ -58,6 +58,9 @@ func _play() -> void:
 		WorldState.set_flag("fact.hall_x_%d" % i)
 		WorldState.set_flag("fact.hall_mark_%d" % i)
 	WorldState.set_flag("fact.hall_map_set_down")
+	# L29's summer faerie (P3) already happened: he was held, and buried.
+	for f in ["fact.summer_faerie_held", "fact.summer_faerie_farewell", "fact.summer_faerie_buried"]:
+		WorldState.set_flag(f)
 	for flag in DEV_DEEDS:
 		WorldState.raise_deed(flag)
 	TimeShift.advance_to(TimeShift.MORNING + 0.01)
@@ -133,6 +136,11 @@ func _set_down(anchor_id: StringName, local: Vector3, why: String) -> bool:
 
 ## The next morning: the clock runs on (a sleep in a real game).
 func _next_day(hour: float) -> void:
+	var today := Clock.day
+	# Through midnight first, so an early hour can't land later the same day.
+	TimeShift.advance_to(0.0)
+	if Clock.day == today:
+		TimeShift.advance_to(0.0)
 	TimeShift.advance_to(hour / 24.0)
 	_note("the clock runs on to day %d, %.1f h" % [Clock.day, Clock.hour()])
 
@@ -189,11 +197,13 @@ func _wonders() -> bool:
 	var t := sp.actor(&"tamlin")
 	if t:
 		await _walk_to(t.global_position, 1.5)
-	_note("wonders found: %s" % sp.found.keys())
+	var found: Array = sp.found.keys()
+	_note("wonders found: %s" % [found])
+	_release_all()
 	if not await _until_wall(func() -> bool: return WorldState.has_flag("fact.eyes_open_wonders"), 200.0):
-		return _failed("never went home (at '%s')" % sp.current_beat_label())
-	if sp.found.size() < 3:
-		return _failed("only %d wonders" % sp.found.size())
+		return _failed("never went home")
+	if found.size() < 3:
+		return _failed("only %d wonders" % found.size())
 	_pass()
 	return true
 
@@ -209,10 +219,12 @@ func _alis() -> bool:
 	await _label_is(sp, "she stares at Alis", 30.0)
 	await _look(func() -> Vector3: return sp._alis_face(), 2.5)
 	var tf := sp._true_form()
-	_note("Alis true form %s, fright %.2f" % [tf != null and tf.lifted, tf.fright if tf else -1.0])
+	# Read now: Alis is dismissed (and her true form freed) when the scene ends.
+	var lifted := tf != null and tf.lifted
+	_note("Alis true form %s, fright %.2f" % [lifted, tf.fright if tf else -1.0])
 	if not await _until_wall(func() -> bool: return WorldState.has_flag("fact.alis_true_seen"), 60.0):
 		return _failed("stuck at '%s'" % sp.current_beat_label())
-	if tf == null or not tf.lifted:
+	if not lifted:
 		return _failed("Alis wasn't in her true form")
 	_pass()
 	return true
@@ -221,11 +233,14 @@ func _alis() -> bool:
 func _fountain() -> bool:
 	_begin("fountain", "the next morning: up the rose garden walk to the heron; look at what's on its bill")
 	_next_day(8.5)
-	if not await _set_down(&"manor_fountain", Vector3(0, 0, 14), "out to paint the irises"):
+	if not await _set_down(&"manor_fountain", Vector3(0, 0, 1), "out to paint the irises"):
 		return false
 	var sp := (await _started(&"manor_fountain", "FountainHead", 30.0)) as FountainHead
 	if sp == null:
-		return _failed("FountainHead never started")
+		var f := _space(&"manor_fountain", "FountainHead") as FountainHead
+		return _failed("FountainHead never started (%s)" % (("can_start %s, alis day %s, today %d, %.1f h, %.1f m from the centre" % [
+			f.can_start(), WorldState.get_flag("fact.alis_true_seen.day"), Clock.day, Clock.hour(),
+			_flat(f.center())]) if f else "no node"))
 	await _walk_to(sp.center() + Vector3(0, 0, 7.0), 0.8)
 	await _look(func() -> Vector3: return sp.head_point(), 4.0)
 	if not await _until_wall(func() -> bool: return WorldState.has_flag("fountain_head_found"), 120.0):
@@ -267,6 +282,11 @@ func _solstice() -> bool:
 	await _press(&"interact")
 	_note("crowd %d, wine %s" % [sp.crowd.size(), sp.drank])
 	await _walk_to(sp.ground_mark(&"bower"), 4.0)
+	_note("at the bower: her %s, mark %s, ground %s, party %.1f s" % [_v(feyre.global_position),
+		_v(sp.mark(&"bower")), _v(sp.ground_mark(&"bower")), sp._party])
+	var under := feyre.get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(
+		feyre.global_position + Vector3.UP * 0.5, feyre.global_position + Vector3.DOWN * 3.0, 0xFFFFFFFF, [feyre.get_rid()]))
+	_note("standing on %s" % (under.collider.get_path() if not under.is_empty() and under.collider else "nothing"))
 	if not await _until(func() -> bool: return sp.current_beat_label().begins_with("lead"), 90.0):
 		return _failed("Tamlin never left the band (at '%s')" % sp.current_beat_label())
 	if not await _until_wall(func() -> bool:

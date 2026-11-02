@@ -32,16 +32,17 @@ from prop_kit import (BLUSH, BUTTER, CREAM, GOLD, GOLD_DEEP, LILAC, MINT, PEARL,
 
 OUT = os.path.join(K.ROOT, "art/p6")
 MAX_TRIS = 3000
+CAPS = {"head_severed": 5000}     # the horror close-up gets more for its eyes and hair
 
 SIZES = {
-    "head_severed": (0.24, 0.30, 0.26),
-    "paint_tins_spilled": (0.60, 0.08, 0.40),
+    "head_severed": (0.21, 0.30, 0.21),     # true head proportions (asked ~0.24 x 0.30 x 0.26)
+    "paint_tins_spilled": (0.60, 0.09, 0.40),
     "picnic_blanket": (2.0, 0.05, 1.6),
     "picnic_basket": (0.50, 0.40, 0.35),
     "maypole_solstice": (3.0, 6.5, 3.0),
     "wine_table_solstice": (1.8, 1.0, 0.8),
     "fiddle": (0.62, 0.08, 0.22),
-    "garden_streamer_post": (0.6, 3.2, 0.6),
+    "garden_streamer_post": (0.6, 3.2, 0.5),
     "paintings_bundle": (0.7, 0.6, 0.12),
     "solstice_lantern_string": (6.0, 0.6, 0.2),
 }
@@ -123,6 +124,8 @@ def emit(p, part, paint, finish="satin", matrix=None, smooth_=True, sharp_deg=60
         data[f] = (K.FINISHES.index(fin(c)), fc)
     if matrix is not None:
         part.transform(matrix)
+        if matrix.determinant() < 0:
+            bmesh.ops.reverse_faces(part, faces=part.faces)
     if smooth_:
         for f in part.faces:
             f.smooth = True
@@ -188,7 +191,8 @@ def strip(points, normals, widths, off=0.0):
     return bm
 
 
-def decimate_bm(bm, ratio):
+def decimate_bm(bm, ratio, weight=None, factor=1.0):
+    """Collapse-decimates bm (consumed); weight(co) in 0..1 keeps detail where it is high."""
     me = bpy.data.meshes.new("tmp_dec")
     bm.to_mesh(me)
     bm.free()
@@ -198,6 +202,13 @@ def decimate_bm(bm, ratio):
     mod.decimate_type = "COLLAPSE"
     mod.ratio = ratio
     mod.use_collapse_triangulate = True
+    if weight is not None:
+        vg = ob.vertex_groups.new(name="keep")
+        for v in me.vertices:
+            vg.add([v.index], weight(v.co), "REPLACE")
+        mod.vertex_group = "keep"
+        mod.invert_vertex_group = True     # Blender collapses weighted verts first; keep them instead
+        mod.vertex_group_factor = factor
     dg = bpy.context.evaluated_depsgraph_get()
     new = bpy.data.meshes.new_from_object(ob.evaluated_get(dg))
     out = bmesh.new()
@@ -213,8 +224,13 @@ def bm_tris(bm):
 
 
 def rose(p, center, r, color, rng, tilt=None, heart=None):
-    """Light two-ring rose (~80 tris)."""
-    K.bloom(p, center, r, color, rings=2, per=5, rng=rng, tilt=tilt, heart=heart)
+    """Lean cupped rose: 5 open petals, 4 standing, a furled heart (~56 tris)."""
+    base = T(*center) @ (tilt if tilt is not None else Matrix.Identity(4))
+    for ring, (n, L, lift, col) in enumerate(((5, r, 22, color), (4, r * 0.62, 58, K.lighter(color, 0.15)))):
+        for i in range(n):
+            a = 360.0 * i / n + ring * 36 + rng.uniform(-9, 9)
+            p.add(K.petal(L, L * 0.95, cup=0.4, curl=0.14), col, "fabric", base @ R("Z", a) @ R("Y", -lift))
+    p.add(sphere(r * 0.26, 5, 3), heart or K.darker(color, 0.08), "fabric", base @ T(0, 0, r * 0.16) @ S(1, 1, 1.2))
 
 
 def leaf_at(p, pos, length, width, yaw, pitch=-15.0, color=None, roll=0.0):
@@ -250,9 +266,10 @@ HF = [0.038, 0.040, 0.047, 0.060, 0.072, 0.078, 0.080, 0.081, 0.082, 0.083, 0.08
 HB = [0.050, 0.051, 0.054, 0.058, 0.064, 0.074, 0.086, 0.094, 0.098, 0.100, 0.100, 0.099]
 HYC = [-0.016, -0.016, -0.013, -0.009, -0.005, -0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Z_DOME, Z_TOP = 0.195, 0.284
-MOUTH_Z, MOUTH_W, MOUTH_H = 0.096, 0.0185, 0.0135
+MOUTH_Z, MOUTH_W, MOUTH_H = 0.0915, 0.0172, 0.0185
 EYE_X, EYE_Z, EYE_R = 0.032, 0.158, 0.0128
 NECK_C = Vector((0.0, -0.016, 0.0))
+SKIN_TRIS = 1500
 
 
 def neck_edge(th):
@@ -284,7 +301,8 @@ def head_base(th, z):
 
 
 def mouth_e(x, z):
-    return math.sqrt((x / MOUTH_W) ** 2 + ((z - MOUTH_Z) / MOUTH_H) ** 2)
+    zz = z - MOUTH_Z + 0.16 * x          # the dead jaw hangs open, lower on the left
+    return math.sqrt((x / MOUTH_W) ** 2 + (zz / MOUTH_H) ** 2)
 
 
 def face_offset(x, z, th):
@@ -300,10 +318,10 @@ def face_offset(x, z, th):
     d += fm * 0.009 * g2(ax - 0.0115, z - 0.1235, 0.0058, 0.0055)
     d -= fm * 0.003 * g2(x, z - 0.162, 0.008, 0.004)                      # nasion dip
     # brow ridge and glabella, eye sockets, lid fold
-    d += fm * 0.0085 * g2(ax - 0.029, z - 0.1775, 0.021, 0.0062)
+    d += fm * 0.0105 * g2(ax - 0.029, z - 0.1765, 0.021, 0.0062)
     d += fm * 0.003 * g2(x, z - 0.172, 0.010, 0.008)
-    d -= fm * 0.0175 * g2(ax - EYE_X, z - EYE_Z, 0.0165, 0.0105)
-    d += fm * 0.0025 * g2(ax - EYE_X, z - 0.1695, 0.013, 0.0022)
+    d -= fm * 0.0225 * g2(ax - EYE_X, z - EYE_Z, 0.0175, 0.0125)
+    d -= fm * 0.004 * g2(ax - EYE_X, z - 0.143, 0.014, 0.006)            # hollow under the eye
     # high, hard cheekbones over sunken hollows; temples drawn in
     d += sm * 0.0075 * g2(ax - 0.050, z - 0.139, 0.016, 0.009)
     d -= sm * 0.0115 * g2(ax - 0.045, z - 0.110, 0.013, 0.016)
@@ -311,11 +329,11 @@ def face_offset(x, z, th):
     # lips round a slack open mouth
     e = mouth_e(x, z)
     upper = z > MOUTH_Z
-    d += fm * (0.0042 if upper else 0.0058) * math.exp(-((e - 1.16) / 0.2) ** 2)
+    d += fm * (0.0024 if upper else 0.0042) * math.exp(-((e - 1.14) / 0.22) ** 2)
     d += fm * 0.003 * g2(x, z - 0.112, 0.0035, 0.006)                     # philtrum
     d -= fm * 0.030 * (1.0 - smooth(0.66, 1.0, e))
     # chin, jaw angle, larynx
-    d += fm * 0.0085 * g2(x, z - 0.071, 0.017, 0.009)
+    d += fm * 0.0085 * g2(x + 0.002, z - 0.066, 0.017, 0.009)
     d += 0.0055 * g2(ax - 0.054, z - 0.080, 0.012, 0.011) * smooth(-0.5, 0.2, math.cos(th))
     d += fm * 0.0065 * g2(x, z - 0.038, 0.008, 0.011)
     return d
@@ -353,39 +371,43 @@ def skin_color(co):
     th = head_theta(co)
     ax = abs(x)
     h = hair_amount(th, z)
-    # dead skin: blue-grey, mottled, a greenish cast in places
-    c = K.hexc("#9AA3AE")
-    m = nz(x * 38, y * 38, z * 38)
-    c = mixc(c, K.hexc("#8792A0"), 0.5 + 0.5 * m)
-    c = mixc(c, K.hexc("#9EA68F"), max(0.0, nz(x * 14 + 3, y * 14, z * 14)) * 0.7)
+    # dead skin: waxy grey-yellow, mottled with purple lividity, cold grey at the extremities
+    c = K.hexc("#A9A391")
+    c = mixc(c, K.hexc("#97938A"), 0.5 + 0.5 * nz(x * 40, y * 40, z * 40))
+    c = mixc(c, K.hexc("#C2B898"), max(0.0, nz(x * 16 + 3, y * 16, z * 16)) * 0.7)
+    liv = smooth(0.15, 0.6, nz(x * 11 - 2, y * 11, z * 11 + 5))
+    c = mixc(c, K.hexc("#857285"), liv * 0.7)
+    c = mixc(c, K.hexc("#8E8676"), smooth(0.0, 0.5, nz(x * 70, y * 70, z * 70)) * 0.35)
+    c = mixc(c, K.hexc("#9097A0"), smooth(0.2, 0.7, nz(x * 7, y * 7 + 4, z * 7)) * 0.35)
     fm = smooth(0.15, 0.6, math.cos(th))
-    # bruised, sunken sockets
-    c = mixc(c, K.hexc("#4A3A55"), 0.9 * fm * g2(ax - 0.031, z - 0.153, 0.02, 0.014))
-    c = mixc(c, K.hexc("#2E2235"), 0.8 * fm * g2(ax - 0.033, z - 0.149, 0.012, 0.006))
-    # a beating: right cheekbone/temple, left jaw
+    # dark, sunken sockets
+    c = mixc(c, K.hexc("#5A4A50"), 0.85 * fm * g2(ax - 0.031, z - 0.152, 0.022, 0.017))
+    c = mixc(c, K.hexc("#2A1F22"), 0.85 * fm * g2(ax - 0.033, z - 0.150, 0.014, 0.008))
+    c = mixc(c, K.hexc("#4A3A40"), 0.6 * fm * g2(ax - 0.032, z - 0.140, 0.014, 0.005))
+    # an old beating: right cheekbone/temple, left jaw
     b1 = g2(x - 0.054, z - 0.150, 0.02, 0.024) * smooth(-0.3, 0.3, math.cos(th))
-    c = mixc(c, K.hexc("#A3A56A"), smooth(0.15, 0.4, b1) * 0.7)
-    c = mixc(c, K.hexc("#5B3F6E"), smooth(0.4, 0.85, b1))
+    c = mixc(c, K.hexc("#9A9466"), smooth(0.15, 0.4, b1) * 0.55)
+    c = mixc(c, K.hexc("#5E4656"), smooth(0.45, 0.9, b1) * 0.85)
     b2 = g2(x + 0.05, z - 0.083, 0.016, 0.014) * smooth(-0.4, 0.3, math.cos(th))
-    c = mixc(c, K.hexc("#55405F"), smooth(0.25, 0.8, b2))
-    # cold nose tip and ear-ward blue
-    c = mixc(c, K.hexc("#7E86A6"), 0.6 * fm * g2(x, z - 0.128, 0.008, 0.008))
-    # lips, mouth, gums
+    c = mixc(c, K.hexc("#5E4A58"), smooth(0.25, 0.8, b2) * 0.8)
+    # cold grey nose tip
+    c = mixc(c, K.hexc("#8A8A94"), 0.5 * fm * g2(x, z - 0.128, 0.008, 0.008))
+    # dry grey-violet lips, black mouth
     e = mouth_e(x, z)
     if fm > 0.2:
-        c = mixc(c, K.hexc("#5E5470"), fm * (1 - smooth(1.05, 1.5, e)))
-        c = mixc(c, K.hexc("#6B1820"), fm * (1 - smooth(0.82, 0.98, e)))
-        c = mixc(c, K.hexc("#1A0608"), fm * (1 - smooth(0.62, 0.8, e)))
-        # nostrils
+        c = mixc(c, K.hexc("#5E4E58"), fm * (1 - smooth(1.0, 1.45, e)))
+        c = mixc(c, K.hexc("#3A2226"), fm * (1 - smooth(0.85, 1.0, e)))
+        c = mixc(c, K.hexc("#0E0607"), fm * (1 - smooth(0.6, 0.8, e)))
         c = mixc(c, K.hexc("#20141A"), fm * g2(ax - 0.0075, z - 0.1185, 0.0035, 0.0025))
     # lividity in the neck, blood-soaked toward the cut
-    c = mixc(c, K.hexc("#6E5A7A"), smooth(0.07, 0.03, z) * 0.6)
+    c = mixc(c, K.hexc("#76627A"), smooth(0.07, 0.03, z) * 0.6)
     edge = neck_edge(th)
-    soak = smooth(edge + 0.018 + 0.008 * nz(th * 3, z * 60, 1.7), edge + 0.002, z)
-    c = mixc(c, K.hexc("#5A0A10"), soak)
+    soak = smooth(edge + 0.026 + 0.01 * nz(th * 3, z * 60, 1.7), edge + 0.004, z)
+    c = mixc(c, K.hexc("#4A1C16"), soak)                                    # dried, brown
+    c = mixc(c, K.hexc("#62080E"), smooth(edge + 0.01, edge + 0.002, z))   # still wet at the cut
     # matted hair
     if h > 0:
-        hc = mixc(K.hexc("#1B1311"), K.hexc("#33241D"), 0.5 + 0.5 * nz(x * 120, y * 120, z * 30))
+        hc = mixc(K.hexc("#140E0C"), K.hexc("#3A2A22"), 0.5 + 0.5 * nz(x * 140, y * 140, z * 22))
         clot = smooth(0.25, 0.55, nz(x * 26 + 7, y * 26, z * 26))
         hc = mixc(hc, K.hexc("#3A0A0B"), clot)
         c = mixc(c, hc, h)
@@ -413,6 +435,11 @@ def build_skin():
             row.append(q)
         rows.append(row)
     bm = grid(rows, close=True, pole_top=Vector((0.0, -0.014, Z_TOP)))
+    bmesh.ops.reverse_faces(bm, faces=bm.faces)          # outward normals
+    return bm
+
+
+def add_hair(bm):
     bm.normal_update()
     # matted hair: thick, clumped and stringy along its fall
     for v in bm.verts:
@@ -421,9 +448,9 @@ def build_skin():
         if h <= 0:
             continue
         x, y, z = v.co
-        cl = nz(x * 30, y * 30, z * 9)
-        st = nz(x * 95, y * 95, z * 14)
-        th_ = 0.0055 + 0.0065 * max(0.0, cl) + 0.0022 * st
+        cl = nz(x * 22, y * 22, z * 7)
+        st = nz(x * 60, y * 60, z * 10)
+        th_ = 0.003 + 0.007 * max(0.0, cl) + 0.002 * st
         v.co += v.normal * h * th_
     bm.normal_update()
     return bm
@@ -451,17 +478,30 @@ def surface_path(tree, pts_xz, off):
     return pts, ns
 
 
-def blood_trail(p, tree, path_xz, w0, w1, color, rng, drop=True):
+DRIED, DRIED_EDGE, WET = K.hexc("#5C1E18"), K.hexc("#3A1610"), K.hexc("#6A0810")
+
+
+def blood_trail(p, tree, path_xz, w0, w1, core, rng, drop=True):
+    """Blood run down the skin: dark dried edges, a redder core, a bead at the foot."""
     pts, ns = surface_path(tree, path_xz, 0.0011)
     if len(pts) < 2:
         return
     m = len(pts)
-    widths = [lerp(w0, w1, i / (m - 1)) * (0.85 + 0.3 * rng.random()) for i in range(m)]
-    emit(p, strip(pts, ns, widths), lambda c: color, "satin", smooth_=False)
+    bm = bmesh.new()
+    rows = []
+    for i, (q, n) in enumerate(zip(pts, ns)):
+        t = pts[min(i + 1, m - 1)] - pts[max(i - 1, 0)]
+        w = lerp(w0, w1, i / (m - 1)) * (1.1 + 0.4 * rng.random())
+        side = n.cross(t).normalized() * (w / 2)
+        rows.append([bm.verts.new(q - side), bm.verts.new(q + n * 0.0003), bm.verts.new(q + side)])
+    for a, b in zip(rows, rows[1:]):
+        bm.faces.new((a[0], a[1], b[1], b[0]))
+        bm.faces.new((a[1], a[2], b[2], b[1]))
+    key = lambda co: (round(co.x, 6), round(co.y, 6), round(co.z, 6))  # noqa: E731
+    centre = {key(r[1].co) for r in rows}
+    emit(p, bm, lambda co: core if key(co) in centre else DRIED_EDGE, "matte", smooth_=False)
     if drop:
-        n = ns[-1]
-        p.add(sphere(w1 * 0.9, 6, 4), K.darker(color, 0.15), "satin",
-              T(*(pts[-1] + n * 0.0006)) @ S(1.0, 1.0, 1.25))
+        p.add(sphere(w1 * 0.85, 5, 3), DRIED_EDGE, "matte", T(*(pts[-1] + ns[-1] * 0.0005)) @ S(1.0, 1.0, 1.3))
 
 
 def conform(tree, bm, C, N, lift):
@@ -492,25 +532,29 @@ def head_sigil(p, tree):
     if loc is None:
         return
     scar = K.hexc("#4A2630")
-    burn = K.hexc("#8C4A52")
+    burn = K.hexc("#7A4A50")
     # inflamed halo, flush to the skin
-    halo = [(x, z) for x, z in blob_outline(0.019, 0.021, 14, random.Random(5), 0.15)]
+    halo = [(x, z) for x, z in blob_outline(0.022, 0.024, 10, random.Random(5), 0.15)]
     emit(p, conform(tree, K.slab([(x, z + 0.004) for x, z in halo], 0.0004), loc, n, 0.0004),
          lambda c: burn, "matte", smooth_=False)
     mountain = [(-0.0135, -0.006), (-0.0075, 0.0035), (-0.0045, 0.0005), (0.0005, 0.0115), (0.0055, 0.002),
                 (0.0085, 0.0052), (0.0135, -0.006)]
+    mountain = [(x * 1.2, z * 1.2) for x, z in mountain]
     emit(p, conform(tree, K.slab(mountain, 0.0016), loc, n, 0.0012), lambda c: scar, "satin", smooth_=False)
     for sx in (-0.0075, 0.0, 0.0075):
-        sz = 0.0185 if sx == 0.0 else 0.0165
-        so = [(x + sx, z + sz) for x, z in star_outline(0.0028)]
+        sz = 0.0215 if sx == 0.0 else 0.019
+        so = [(x + sx * 1.2, z + sz) for x, z in star_outline(0.0033)]
         emit(p, conform(tree, K.slab(so, 0.0013), loc, n, 0.0011), lambda c: scar, "satin", smooth_=False)
 
 
-def eye(p, tree, side, gaze):
+def eye(p, tree, side, gaze, droop):
+    """Sunken, half-lidded dead eye: a dull clouded ball set back in a shadowed socket
+    under a heavy upper lid, the lower lid sagging off it with a red rim."""
     loc, n = ray_front(tree, side * EYE_X, EYE_Z)
-    yc = loc.y - EYE_R + 0.0062
+    yc = loc.y - EYE_R + 0.0032
+    c = Vector((side * EYE_X, yc, EYE_Z))
     prof = []
-    for phi in (128, 100, 78, 60, 46, 35, 29, 25, 20, 13, 8, 0):
+    for phi in (110, 80, 58, 42, 32, 26, 22, 17, 11, 6, 0):
         a = math.radians(phi)
         prof.append((EYE_R * math.sin(a), EYE_R * math.cos(a)))
 
@@ -518,21 +562,53 @@ def eye(p, tree, side, gaze):
         r = co.length
         phi = math.degrees(math.acos(max(-1.0, min(1.0, co.z / max(r, 1e-6)))))
         ang = math.atan2(co.y, co.x)
-        if phi < 9:
-            return K.hexc("#0B0809")
-        if phi < 21:
-            c = mixc(K.hexc("#8A5A2A"), K.hexc("#5A3518"), (phi - 9) / 12)
-            return mixc(c, K.hexc("#8F949C"), 0.22)          # clouding
-        if phi < 26:
-            return K.hexc("#2A1A12")
-        c = mixc(K.hexc("#E2D9C6"), K.hexc("#D7C1A8"), smooth(30, 70, phi))
-        vein = smooth(0.1, 0.5, math.sin(ang * 7 + phi * 0.08)) * smooth(36, 80, phi)
-        return mixc(c, K.hexc("#B54A44"), 0.75 * vein)
+        film = K.hexc("#9C9A90")                               # the dry film of death
+        if phi < 8:
+            return mixc(K.hexc("#2A2224"), film, 0.5)
+        if phi < 20:
+            return mixc(mixc(K.hexc("#6A4524"), K.hexc("#4A2E1A"), (phi - 8) / 12), film, 0.45)
+        if phi < 24:
+            return mixc(K.hexc("#3A2A20"), film, 0.4)
+        c_ = mixc(K.hexc("#C9C0A8"), K.hexc("#B29A84"), smooth(28, 70, phi))
+        vein = smooth(0.0, 0.7, math.sin(ang * 11 + phi * 0.13)) * smooth(28, 60, phi)
+        c_ = mixc(c_, K.hexc("#963038"), 0.7 * vein)
+        return mixc(c_, K.hexc("#7A2A30"), smooth(55, 85, phi))
 
     g = Vector(gaze).normalized()
     rot = Vector((0, 0, 1)).rotation_difference(g).to_matrix().to_4x4()
-    emit(p, lathe(prof, 12, cap_bottom=True, cap_top=False), paint, "satin",
-         T(side * EYE_X, yc, EYE_Z) @ rot, sharp_deg=80)
+    emit(p, lathe(prof, 12, cap_bottom=True, cap_top=False), paint, "satin", T(*c) @ rot, sharp_deg=80)
+    # heavy upper lid: a shell over the top of the ball, its edge low across the iris
+    rl = EYE_R + 0.0011
+    edge_up = 76 + droop
+
+    def lid_rows(a0, a1, na, nb=9):
+        rows = []
+        for i in range(na + 1):
+            al = math.radians(lerp(a0, a1, i / na))
+            row = []
+            for j in range(nb + 1):
+                be = math.radians(lerp(18, 162, j / nb))
+                sag = 0.1 * math.sin(be) ** 2 * (1 if a1 > 90 else 0)
+                row.append(c + Vector((side * rl * math.cos(be), rl * math.sin(be) * math.sin(al + sag),
+                                       rl * math.sin(be) * math.cos(al + sag))))
+            rows.append(row)
+        return rows
+
+    lid_col = lambda co: mixc(K.hexc("#6E6068"), K.hexc("#4A3C44"), smooth(c.z + 0.008, c.z, co.z))  # noqa: E731
+    up = lid_rows(-25, edge_up, 4)
+    bm = grid(up)
+    if side > 0:
+        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+    emit(p, bm, lid_col, "matte", sharp_deg=85)
+    emit(p, tube(up[-1], [0.0009] + [0.0014] * (len(up[-1]) - 2) + [0.0009], 4, caps=False),
+         lambda co: K.hexc("#4E3A3E"), "matte", sharp_deg=85)
+    # sagging lower lid, its wet red inner rim turned out
+    lo = lid_rows(200, 128, 2)
+    bm = grid(lo)
+    if side < 0:
+        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+    emit(p, bm, lambda co: K.hexc("#6A5A62"), "matte", sharp_deg=85)
+    emit(p, tube(lo[-1], 0.0012, 4, caps=False), lambda co: K.hexc("#7A2E34"), "satin", sharp_deg=85)
 
 
 def tooth(w, d, h, tip_h=None, taper=0.6):
@@ -551,35 +627,37 @@ def tooth(w, d, h, tip_h=None, taper=0.6):
 
 
 def head_teeth(p, tree):
-    loc, _ = ray_front(tree, 0.0, MOUTH_Z + MOUTH_H * 1.15)
-    yf = loc.y - 0.0055
-    enamel, blood = K.hexc("#D9CDAE"), K.hexc("#5E0E12")
+    """A slack dead mouth: the upper lip hides most of the top teeth, a few
+    stained, uneven lower teeth, one gone, one snapped; a dark tongue fallen back."""
+    loc, _ = ray_front(tree, 0.0, MOUTH_Z + MOUTH_H * 1.12)
+    yf = loc.y - 0.0065
+    enamel, stain, blood = K.hexc("#B8A882"), K.hexc("#7A6A4A"), K.hexc("#4A1A14")
 
     def paint_for(h, bloody):
-        return lambda co: mixc(enamel, blood, max(bloody, smooth(0.45 * h, 0.0, co.z)))
+        return lambda co: mixc(mixc(enamel, stain, smooth(0.3 * h, 0.9 * h, co.z) * 0.5), blood,
+                               max(bloody, smooth(0.45 * h, 0.0, co.z)))
 
-    upper = [(-0.0145, 0.0044, 0.0108, "canine"), (-0.0094, 0.0050, 0.0090, "chip"),
-             (-0.0034, 0.0058, 0.0094, "broken"), (0.0026, 0.0058, 0.0094, "ok"),
-             (0.0086, 0.0050, 0.0090, "gone"), (0.0142, 0.0044, 0.0108, "canine")]
-    for x, w, h, kind in upper:
-        if kind == "gone":
-            p.add(sphere(0.0026, 6, 4), K.hexc("#3C0609"), "satin", T(x, yf - 0.001, MOUTH_Z + 0.0105))
-            continue
-        tips = {"broken": [h * 0.42, h * 0.3, h * 0.48, h * 0.55], "chip": [h, h * 0.6, h * 0.65, h]}.get(kind)
-        taper = 0.25 if kind == "canine" else 0.75
-        y = yf - 0.006 * (x / 0.017) ** 2
-        m = T(x, y, MOUTH_Z + 0.0125) @ R("Y", 180) @ R("Z", 4 * x / 0.015)
-        emit(p, tooth(w, 0.0045, h, tips, taper), paint_for(h, 0.55 if kind != "ok" else 0.15), "satin", m,
-             smooth_=False)
-    lower = [(-0.0118, 0.0042, 0.0064, "askew"), (-0.0068, 0.0046, 0.0068, "ok"), (-0.0022, 0.0046, 0.0066, "ok"),
-             (0.0024, 0.0046, 0.0066, "broken"), (0.0070, 0.0046, 0.0068, "ok"), (0.0118, 0.0042, 0.0064, "ok")]
-    for x, w, h, kind in lower:
-        tips = [h * 0.35, h * 0.5, h * 0.3, h * 0.42] if kind == "broken" else None
-        y = yf - 0.0012 - 0.006 * (x / 0.017) ** 2
-        m = T(x, y, MOUTH_Z - 0.0128) @ R("Z", -4 * x / 0.015)
-        if kind == "askew":
-            m = m @ R("Y", -24) @ R("X", 12)
-        emit(p, tooth(w, 0.0042, h, tips, 0.8), paint_for(h, 0.35), "satin", m, smooth_=False)
+    def tilt(x):
+        return 0.16 * x                                          # follows the crooked jaw
+
+    upper = [(-0.0118, 0.0042, 0.0085, 0.25, 6, 0.3), (-0.0052, 0.0052, 0.0072, 0.75, -4, 0.2),
+             (0.0012, 0.0054, 0.0046, 0.8, 9, 0.7), (0.0075, 0.0048, 0.0078, 0.75, 3, 0.25)]
+    for x, w, h, taper, rz, bl in upper:
+        y = yf - 0.007 * (x / 0.017) ** 2
+        tips = [h, h * 0.55, h * 0.7, h * 0.9] if h < 0.005 else None
+        m = T(x, y, MOUTH_Z + MOUTH_H * 0.95 - tilt(x)) @ R("Y", 180) @ R("Z", rz) @ R("X", -8)
+        emit(p, tooth(w, 0.0042, h, tips, taper), paint_for(h, bl), "satin", m, smooth_=False)
+    lower = [(-0.0105, 0.0042, 0.0052, 18, 0.2), (-0.0045, 0.0046, 0.0060, -6, 0.15),
+             (0.0062, 0.0044, 0.0030, 12, 0.6)]
+    for x, w, h, rz, bl in lower:
+        y = yf - 0.0025 - 0.007 * (x / 0.017) ** 2
+        tips = [h * 0.6, h, h * 0.75, h * 0.5] if h < 0.004 else None
+        m = T(x, y, MOUTH_Z - MOUTH_H * 0.92 - tilt(x)) @ R("Z", rz) @ R("Y", -rz * 0.8) @ R("X", 10)
+        emit(p, tooth(w, 0.004, h, tips, 0.8), paint_for(h, bl), "satin", m, smooth_=False)
+    p.add(sphere(0.0024, 5, 3), K.hexc("#30080A"), "satin", T(0.0012, yf - 0.0035, MOUTH_Z - MOUTH_H * 0.9))
+    # tongue, swollen and dark, slumped in shadow at the back of the jaw
+    p.add(sphere(0.012, 8, 5), K.hexc("#3A2228"), "satin",
+          T(-0.002, yf - 0.016, MOUTH_Z - MOUTH_H * 0.55) @ R("Z", 8) @ S(1.25, 1.1, 0.45))
 
 
 EAR_RIM = [(-0.010, 0.127), (-0.020, 0.131), (-0.029, 0.142), (-0.035, 0.158), (-0.040, 0.176), (-0.045, 0.196),
@@ -589,18 +667,28 @@ EAR_RIM = [(-0.010, 0.127), (-0.020, 0.131), (-0.029, 0.142), (-0.035, 0.158), (
 
 def head_ear(p, tree, side):
     """Long pointed fae ear sweeping up and back; built for +X, mirrored for -X."""
+    rim = []
+    for i in range(len(EAR_RIM) - 1):
+        p0, p1 = EAR_RIM[max(i - 1, 0)], EAR_RIM[i]
+        p2, p3 = EAR_RIM[i + 1], EAR_RIM[min(i + 2, len(EAR_RIM) - 1)]
+        for t in ((0.0, 0.5) if 3 <= i <= 8 and i != 6 else (0.0,)):
+            rim.append(tuple(0.5 * ((2 * p1[k]) + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t * t
+                                    + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t ** 3) for k in range(2)))
+    rim.append(EAR_RIM[-1])
     pts = []
-    for i, (y, z) in enumerate(EAR_RIM):
+    for i, (y, z) in enumerate(rim):
         loc, n = ray_axis(tree, math.atan2(1.0, y / 0.07), z)
         xs = loc.x if loc is not None else 0.07
-        out = 0.004 + 0.022 * smooth(0.0, 0.6, (-y - 0.006) / 0.05)
+        out = 0.003 + 0.03 * smooth(0.0, 0.7, (-y - 0.006) / 0.05) + 0.006 * smooth(0.18, 0.235, z)
         pts.append(Vector((xs + out, y, z)))
-    rim_r = [0.0034, 0.0032, 0.003, 0.0028, 0.0027, 0.0025, 0.0022, 0.0012, 0.002, 0.0024, 0.0026, 0.0026, 0.0024]
+    tip = min(range(len(pts)), key=lambda i: -pts[i].z)
+    rim_r = [lerp(0.0046, 0.0012, smooth(0, 1, 1 - abs(i - tip) / tip)) if i <= tip else
+             lerp(0.0012, 0.0032, smooth(0, 1, (i - tip) / max(len(pts) - 1 - tip, 1))) for i in range(len(pts))]
     centre = Vector((0.067, -0.017, 0.151))
     bm = bmesh.new()
     cv = bm.verts.new(centre)
-    inner = [bm.verts.new(centre.lerp(q, 0.86) + Vector((-0.002, 0, 0))) for q in pts]
-    mid = [bm.verts.new(centre.lerp(q, 0.5) + Vector((-0.0045, 0, 0))) for q in pts]
+    inner = [bm.verts.new(centre.lerp(q, 0.97) + Vector((-0.0025, 0, 0))) for q in pts]
+    mid = [bm.verts.new(centre.lerp(q, 0.55) + Vector((-0.0065, 0, 0))) for q in pts]
     for i in range(len(pts) - 1):
         bm.faces.new((cv, mid[i], mid[i + 1]))
         bm.faces.new((mid[i], inner[i], inner[i + 1], mid[i + 1]))
@@ -610,47 +698,100 @@ def head_ear(p, tree, side):
 
     def ear_col(co):
         t = smooth(0.17, 0.235, co.z)
-        c = mixc(K.hexc("#959DAA"), K.hexc("#6E6488"), t)
+        c = mixc(K.hexc("#A39D8C"), K.hexc("#76696E"), t)
         d = (co - centre).length
-        return mixc(K.hexc("#5C4C60"), c, smooth(0.006, 0.02, d))
+        return mixc(K.hexc("#4A3A44"), c, smooth(0.006, 0.024, d))
 
-    if side < 0:
-        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+    bmesh.ops.reverse_faces(bm, faces=bm.faces)
     emit(p, bm, ear_col, "matte", mir, sharp_deg=80)
-    emit(p, tube(pts, rim_r, 4), ear_col, "matte", mir, sharp_deg=80)
+    emit(p, tube(pts, rim_r, 4, caps=False), ear_col, "matte", mir, sharp_deg=80)
 
 
-def head_locks(p, tree, rng):
-    hair, clot = K.hexc("#211613"), K.hexc("#3A0C0C")
-    for th, z0, ln in ((2.35, 0.128, 0.07), (2.62, 0.118, 0.085), (2.92, 0.112, 0.075), (-3.08, 0.110, 0.09),
-                       (-2.72, 0.114, 0.07), (1.92, 0.15, 0.06)):
-        loc, n = ray_axis(tree, th, z0)
-        if loc is None:
+def flat_tube(pts, ns, widths, flat=0.38, sides=4):
+    """Tube with an elliptical section lying flat on the surface normal: a plastered hank."""
+    bm = bmesh.new()
+    rings = []
+    m = len(pts)
+    for i, (q, n) in enumerate(zip(pts, ns)):
+        t = (pts[min(i + 1, m - 1)] - pts[max(i - 1, 0)]).normalized()
+        nn = (n - t * n.dot(t)).normalized()
+        side = nn.cross(t).normalized()
+        w = widths[i]
+        rings.append([bm.verts.new(q + side * (w * math.cos(2 * math.pi * k / sides + 0.4))
+                                   + nn * (w * flat * math.sin(2 * math.pi * k / sides + 0.4)))
+                      for k in range(sides)])
+    for r0, r1 in zip(rings, rings[1:]):
+        for k in range(sides):
+            j = (k + 1) % sides
+            bm.faces.new((r0[k], r0[j], r1[j], r1[k]))
+    bm.faces.new(list(reversed(rings[0])))
+    bm.faces.new(rings[-1])
+    return bm
+
+
+def hank_path(tree, th0, e0, z_stop, rng, cling=0.0034, drift=0.0, hang_n=0):
+    """A wet hank from the crown: follows the skull, clings down the cheek or neck,
+    then (hang_n > 0) hangs off the skin in a few heavy steps."""
+    C = Vector((0.0, -0.012, 0.165))
+    pts, ns = [], []
+    th, e = th0, e0
+    while e > 0.3:                                               # over the dome
+        d = Vector((math.sin(th) * math.cos(e), math.cos(th) * math.cos(e), math.sin(e)))
+        hit = tree.ray_cast(C + d * 0.4, -d)
+        if hit[0] is not None:
+            pts.append(hit[0] + hit[1] * cling)
+            ns.append(hit[1])
+        e -= 0.27
+        th += drift * 0.5 + rng.uniform(-0.03, 0.03)
+    z = pts[-1].z if pts else 0.2
+    while z > z_stop:
+        z -= 0.019
+        th += drift + rng.uniform(-0.03, 0.03)
+        loc, n = ray_axis(tree, th, z)
+        if loc is None or (pts and (loc - pts[-1]).length > 0.035):
+            break
+        pts.append(loc + n * cling)
+        ns.append(n)
+    for k in range(hang_n):
+        q = pts[-1] + Vector((rng.uniform(-0.003, 0.003), rng.uniform(-0.003, 0.003), -0.017))
+        pts.append(q)
+        ns.append(ns[-1])
+    return pts, ns
+
+
+def head_hair(p, tree, rng):
+    """Long dark hair in matted, wet hanks: plastered to the skull, cheek and neck,
+    a few heavy ones hanging below the cut, blood-clotted toward the ends."""
+    def hair_col(co, base):
+        c = mixc(base, K.hexc("#241812"), 0.5 + 0.5 * nz(co.x * 90, co.y * 90, co.z * 25))
+        c = mixc(c, K.hexc("#3A0E0C"), smooth(0.08, 0.03, co.z))      # blood climbing the ends
+        return mixc(c, K.hexc("#200606"), smooth(0.03, -0.01, co.z))
+
+    # (theta, start elevation, stop z, drift, half-width, hang steps)
+    hanks = [
+        (0.6, 1.15, 0.105, 0.03, 0.0085, 0), (1.05, 1.05, 0.06, -0.025, 0.009, 0),
+        (-0.7, 1.15, 0.115, -0.03, 0.008, 0), (-1.15, 1.0, 0.07, 0.03, 0.0085, 0),
+        (1.85, 1.15, 0.012, 0.0, 0.010, 0), (2.3, 1.2, 0.012, 0.01, 0.013, 3), (2.75, 1.2, 0.012, 0.0, 0.012, 0),
+        (3.1, 1.2, 0.012, -0.01, 0.014, 4), (-2.9, 1.2, 0.012, 0.0, 0.011, 0), (-2.55, 1.15, 0.03, 0.0, 0.010, 0),
+        (0.2, 1.2, 0.192, 0.06, 0.007, 0), (-0.15, 1.2, 0.195, -0.06, 0.007, 0),
+        (1.5, 1.15, 0.19, 0.0, 0.009, 0), (-1.5, 1.15, 0.19, 0.0, 0.009, 0),
+    ]
+    for th0, e0, zs, drift, w0, hang in hanks:
+        pts, ns = hank_path(tree, th0, e0, zs, rng, drift=drift, hang_n=hang)
+        if len(pts) < 3:
             continue
-        pts = []
-        for i in range(5):
-            t = i / 4
-            sway = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0)) * 0.004 * t
-            pts.append(loc - n * 0.003 + n * 0.006 * t + Vector((0, 0, -ln * t)) + sway)
-        rad = [0.0062, 0.0055, 0.0045, 0.003, 0.0012]
-        col = clot if rng.random() < 0.4 else hair
-        emit(p, tube(pts, rad, 4), lambda c, col=col: col, "satin", S(1, 1, 1), sharp_deg=80)
-    # wet locks plastered to the brow
-    for path in (((-0.006, 0.217), (-0.016, 0.205), (-0.024, 0.192), (-0.029, 0.181)),
-                 ((0.014, 0.216), (0.021, 0.204), (0.024, 0.194))):
-        pts, ns = surface_path(tree, path, 0.0016)
-        if len(pts) > 1:
-            m = len(pts)
-            emit(p, tube(pts, [lerp(0.0032, 0.0012, i / (m - 1)) for i in range(m)], 4),
-                 lambda c: hair, "satin", sharp_deg=80)
+        m = len(pts)
+        ws = [w0 * (0.8 + 0.4 * math.sin(math.pi * min(1.0, 1.6 * i / (m - 1)))) *
+              (1.0 - 0.7 * smooth(0.55, 1.0, i / (m - 1))) * (0.8 + 0.4 * rng.random()) for i in range(m)]
+        base = K.hexc("#100A08") if rng.random() < 0.6 else K.hexc("#1C120E")
+        emit(p, flat_tube(pts, ns, ws), lambda co, b=base: hair_col(co, b), "matte", sharp_deg=85)
 
 
 def head_stump(p, rng):
     """Wet torn wound closing the neck, open at the centre for the heron's bill."""
-    M = 26
+    M = 22
     rings = []
-    spec = [(1.012, -0.0004), (0.955, -0.0045), (0.80, -0.0025), (0.60, 0.004), (0.36, 0.010), (0.17, 0.016),
-            (0.15, 0.042)]
+    spec = [(1.012, -0.0004), (0.94, -0.0045), (0.62, 0.003), (0.36, 0.010), (0.17, 0.016), (0.15, 0.042)]
     for k, (rad, dz) in enumerate(spec):
         row = []
         for i in range(M):
@@ -658,12 +799,11 @@ def head_stump(p, rng):
             ze = neck_edge(th)
             q, _ = head_base(th, ze)
             rel = Vector((q.x - NECK_C.x, q.y - NECK_C.y, 0))
-            j = 0.0 if k in (0, 6) else 0.002 * nz(math.cos(th) * 4, math.sin(th) * 4, k)
-            zz = (ze if k < 3 else 0.0) + dz + j
+            j = 0.0 if k in (0, 5) else 0.002 * nz(math.cos(th) * 4, math.sin(th) * 4, k)
+            zz = (ze if k < 2 else 0.0) + dz + j
             row.append(Vector((NECK_C.x + rel.x * rad, NECK_C.y + rel.y * rad, zz)))
         rings.append(row)
     bm = grid(rings, close=True, pole_top=Vector((NECK_C.x, NECK_C.y, 0.046)))
-    bmesh.ops.reverse_faces(bm, faces=bm.faces)
 
     def wound(co):
         rel = Vector((co.x - NECK_C.x, co.y - NECK_C.y))
@@ -675,55 +815,46 @@ def head_stump(p, rng):
 
     emit(p, bm, wound, "satin", sharp_deg=75)
     # severed spine and windpipe
-    p.add(torus(0.0105, 0.0042, 10, 4), K.hexc("#D8CDB6"), "satin",
+    p.add(torus(0.0105, 0.0042, 9, 3), K.hexc("#D8CDB6"), "satin",
           T(0, NECK_C.y - 0.030, -0.0005) @ S(1.0, 0.8, 1.0))
     p.add(sphere(0.0045, 6, 4), K.hexc("#B89A8C"), "satin", T(0, NECK_C.y - 0.030, -0.0008) @ S(1, 1, 0.5))
-    p.add(torus(0.0078, 0.0024, 10, 4), K.hexc("#C79090"), "satin", T(0, NECK_C.y + 0.034, 0.0015))
+    p.add(torus(0.0078, 0.0024, 8, 3), K.hexc("#C79090"), "satin", T(0, NECK_C.y + 0.030, 0.0065))
     # clots hanging off the torn edge
-    for th in (2.55, -1.25, 0.9):
+    for th in (2.55, -1.25):
         ze = neck_edge(th)
         q, n = head_base(th, ze)
         q = q - n * 0.002
-        ln = rng.uniform(0.012, 0.024)
-        pts = [q + Vector((0, 0, -0.002)), q + Vector((0, 0, -ln * 0.6)) - n * 0.001, q + Vector((0, 0, -ln))]
-        p.add(tube(pts, [0.0026, 0.0016, 0.0012], 4, caps=False), K.hexc("#4E070B"), "satin", smooth=True)
-        p.add(sphere(0.0028, 6, 4), K.hexc("#4E070B"), "satin", T(*pts[-1]) @ S(1, 1, 1.3))
+        p.add(sphere(0.0034, 6, 4), K.hexc("#4E070B"), "satin", T(*(q + Vector((0, 0, -0.0015)))) @ S(1.4, 1.4, 0.8))
 
 
 def head_severed(p):
     rng = random.Random(613)
-    skin = build_skin()
+    bare = build_skin()                       # decimate the clean surface, then lay the hair on it
+    skin = decimate_bm(bare, SKIN_TRIS / bm_tris(bare))
+    add_hair(skin)
     tree = BVHTree.FromBMesh(skin)
-    eye(p, tree, 1, (0.16, 1.0, 0.03))
-    eye(p, tree, -1, (-0.05, 1.0, 0.11))
+    eye(p, tree, 1, (0.06, 1.0, -0.1), 4)
+    eye(p, tree, -1, (-0.34, 1.0, 0.06), 0)   # the left one has drifted
     head_teeth(p, tree)
     head_ear(p, tree, 1)
     head_ear(p, tree, -1)
     head_sigil(p, tree)
-    head_locks(p, tree, rng)
-    red, dark = K.hexc("#6A0B12"), K.hexc("#480609")
-    # tears of blood from the inner corners, from the nose, from the slack mouth
-    blood_trail(p, tree, [(0.021, 0.149), (0.022, 0.141), (0.026, 0.131), (0.028, 0.121), (0.027, 0.108),
-                          (0.029, 0.097)], 0.0034, 0.0018, red, rng)
-    blood_trail(p, tree, [(-0.022, 0.149), (-0.023, 0.140), (-0.021, 0.130), (-0.024, 0.118)],
-                0.0032, 0.0019, dark, rng)
-    blood_trail(p, tree, [(-0.037, 0.147), (-0.040, 0.136), (-0.041, 0.124), (-0.043, 0.112), (-0.042, 0.101),
-                          (-0.044, 0.092)], 0.0026, 0.0014, red, rng)
-    blood_trail(p, tree, [(0.0072, 0.1175), (0.0068, 0.112), (0.009, 0.1075)], 0.0034, 0.0026, red, rng, False)
-    blood_trail(p, tree, [(0.016, 0.0865), (0.017, 0.080), (0.016, 0.073), (0.018, 0.066)], 0.0048, 0.0026, red, rng)
-    blood_trail(p, tree, [(-0.010, 0.0835), (-0.011, 0.076), (-0.009, 0.069), (-0.010, 0.064)],
-                0.0042, 0.0022, dark, rng)
-    blood_trail(p, tree, [(0.006, 0.050), (0.007, 0.040), (0.005, 0.030), (0.006, 0.021)], 0.0046, 0.003, dark, rng,
+    head_hair(p, tree, rng)
+    # dried runs from the eyes and nose, the mouth and down the throat; wet only near the cut
+    blood_trail(p, tree, [(0.021, 0.147), (0.022, 0.139), (0.026, 0.13), (0.028, 0.12), (0.027, 0.108),
+                          (0.029, 0.097)], 0.003, 0.0018, DRIED, rng)
+    blood_trail(p, tree, [(-0.022, 0.147), (-0.023, 0.138), (-0.021, 0.129), (-0.024, 0.118)],
+                0.0028, 0.0018, DRIED, rng)
+    blood_trail(p, tree, [(0.0072, 0.1175), (0.0068, 0.112), (0.009, 0.1065)], 0.0034, 0.0026, DRIED, rng, False)
+    blood_trail(p, tree, [(0.017, 0.080), (0.018, 0.072), (0.016, 0.064), (0.018, 0.057)], 0.0048, 0.0026, DRIED,
+                rng)
+    blood_trail(p, tree, [(-0.012, 0.075), (-0.013, 0.068), (-0.011, 0.061)], 0.0042, 0.0022, DRIED, rng)
+    blood_trail(p, tree, [(0.006, 0.050), (0.007, 0.040), (0.005, 0.030), (0.006, 0.021)], 0.0046, 0.003, WET, rng,
                 False)
-    # a split above the right brow
-    blood_trail(p, tree, [(0.018, 0.192), (0.028, 0.190), (0.038, 0.186)], 0.0022, 0.0018, K.hexc("#3A0508"), rng,
-                False)
-    blood_trail(p, tree, [(0.030, 0.189), (0.031, 0.182), (0.0325, 0.176)], 0.0024, 0.0014, red, rng)
+    blood_trail(p, tree, [(0.052, 0.205), (0.055, 0.192), (0.056, 0.18), (0.058, 0.168)], 0.0042, 0.0022, DRIED,
+                rng)
     head_stump(p, rng)
-    budget = MAX_TRIS - 30 - p.tris()
-    lo = decimate_bm(skin, budget / bm_tris(skin))
-    emit(p, lo, skin_color, lambda c: "satin" if hair_amount(head_theta(c), c.z) > 0.5 else "matte",
-         sharp_deg=70)
+    emit(p, skin, skin_color, "matte", sharp_deg=85)
 
 
 # =============================================================== paint tins
@@ -732,21 +863,20 @@ TIN = K.hexc("#E7E1E6")
 
 
 def paint_tin(p, paint, m, open_=True, fill=0.75):
-    p.add(lathe([(0.0, 0.0), (0.034, 0.0), (0.0375, 0.002), (0.0365, 0.005), (0.0365, 0.064), (0.0385, 0.067),
-                 (0.0385, 0.0705), (0.034, 0.0705), (0.0335, 0.064), (0.0335, 0.05)], 14, cap_top=False),
+    p.add(lathe([(0.0, 0.0), (0.0365, 0.0), (0.0365, 0.064), (0.0385, 0.067),
+                 (0.0385, 0.0705), (0.034, 0.0705), (0.0335, 0.064), (0.0335, 0.05)], 12, cap_top=False),
           TIN, "pearl", m)
-    p.add(cyl(0.0372, 0.034, 14, caps=False), paint, "satin", m @ T(0, 0, 0.016))
-    p.add(torus(0.0373, 0.0016, 14, 3), GOLD, "gold", m @ T(0, 0, 0.050))
-    p.add(torus(0.0373, 0.0016, 14, 3), GOLD, "gold", m @ T(0, 0, 0.016))
+    p.add(cyl(0.0372, 0.034, 12, caps=False), paint, "satin", m @ T(0, 0, 0.016))
+    p.add(torus(0.0373, 0.0016, 12, 3), GOLD, "gold", m @ T(0, 0, 0.050))
     if open_:
-        p.add(K.disc(0.0335, 14, 0.07 * fill), paint, "satin", m)
+        p.add(K.disc(0.0335, 12, 0.07 * fill), paint, "satin", m)
     else:
         p.add(lathe([(0.0, 0.074), (0.03, 0.0735), (0.039, 0.071), (0.0395, 0.0695), (0.0, 0.0695)], 14),
               TIN, "pearl", m)
     # folded wire bail
     bail = [(0.0395 * math.cos(math.radians(a)), 0.0395 * math.sin(math.radians(a)), 0.052 + 0.0005 * k)
             for k, a in enumerate(range(-90, 91, 30))]
-    p.add(tube(bail, 0.0013, 4), GOLD, "gold", m)
+    p.add(tube(bail, 0.0013, 3), GOLD, "gold", m)
 
 
 def brush(p, tip, m, rng):
@@ -778,7 +908,7 @@ def paint_tins_spilled(p):
     hp = 25
     m = T(0.02, -0.04, 0.0385) @ R("Z", hp) @ R("Y", 90)
     paint_tin(p, peri_p, m, True, 0.5)
-    emit(p, puddle(blob_outline(0.11, 0.06, 18, rng), 0.004), lambda c: peri_p, "satin",
+    emit(p, puddle(blob_outline(0.11, 0.06, 14, rng), 0.004), lambda c: peri_p, "satin",
          T(0.02, -0.04, 0) @ R("Z", hp) @ T(0.13, 0.0, 0) @ S(1.0, 1.0, 1.0))
     for dx, dy, r in ((0.27, 0.05, 0.012), (0.25, -0.06, 0.008), (0.30, -0.01, 0.006)):
         emit(p, puddle(blob_outline(r, r * 0.8, 10, rng), 0.0025), lambda c: peri_p, "satin",
@@ -805,10 +935,10 @@ def paint_tins_spilled(p):
         emit(p, puddle(blob_outline(0.014, 0.008, 9, rng), 0.001), lambda co, c=c: c, "satin",
              T(0.21 + dx, -0.115 + dy, 0.0215) @ R("Z", rng.uniform(0, 180)))
     # a few gravel stones kicked into the mess
-    for i in range(12):
+    for i in range(6):
         x, y = rng.uniform(-0.29, 0.29), rng.uniform(-0.19, 0.19)
         r = rng.uniform(0.005, 0.011)
-        p.add(K.ico(r, 1), K.mix(PEBBLE, K.hexc("#C8B2A6"), rng.random()), "matte",
+        p.add(sphere(r, 6, 4), K.mix(PEBBLE, K.hexc("#C8B2A6"), rng.random()), "matte",
               T(x, y, r * 0.35) @ R("Z", rng.uniform(0, 180)) @ S(1.2, 0.9, 0.6), sharp_deg=70)
 
 
@@ -824,10 +954,10 @@ def picnic_blanket(p):
     deep = K.hexc("#F2A9BC")
 
     def height(x, y):
-        z = 0.004 + 0.006 * (0.5 + 0.5 * nz(x * 1.3, y * 1.3, 0.5))
+        z = 0.004 + 0.012 * (0.5 + 0.5 * nz(x * 1.6, y * 1.6, 0.5))
         d = min(HX - abs(x), HY - abs(y))
         per = (x + 3 * y) if abs(HX - abs(x)) < abs(HY - abs(y)) else (3 * x + y)
-        z += smooth(0.22, 0.0, d) * 0.026 * (0.55 + 0.45 * math.sin(per * 9.0 + 1.3 * nz(x, y, 3)))
+        z += smooth(0.26, 0.0, d) * 0.03 * (0.55 + 0.45 * math.sin(per * 9.0 + 1.3 * nz(x, y, 3)))
         return z
 
     rows = []
@@ -893,17 +1023,17 @@ def basket_outline(A, B, n, ex=4.0):
 
 def picnic_basket(p):
     rng = random.Random(65)
-    A, B, H = 0.215, 0.145, 0.205
-    n = 40
+    A, B, H = 0.228, 0.142, 0.205
+    n = 36
     base = basket_outline(A, B, n)
     rows = []
-    zs = [0.0, 0.012, 0.035, 0.06, 0.085, 0.11, 0.135, 0.16, 0.185, H]
+    zs = [0.0, 0.01] + [0.01 + (H - 0.01) * k / 10 for k in range(1, 11)]
     for j, z in enumerate(zs):
         sc = 0.9 + 0.1 * (z / H)
         row = []
         for i, (x, y) in enumerate(base):
             o = Vector((x, y, 0)).normalized()
-            bump = 0.003 if (i + j) % 2 else 0.0
+            bump = 0.0025 if (i + j) % 2 else 0.0
             row.append(Vector((x * sc, y * sc, z)) + o * bump)
         rows.append(row)
     body = grid(rows, close=True, pole_bottom=Vector((0, 0, 0.0)))
@@ -911,20 +1041,21 @@ def picnic_basket(p):
     def weave(c, f):
         a = math.atan2(c.y, c.x)
         i = int((a + math.pi) / (2 * math.pi) * n)
-        j = int(c.z / 0.025)
-        return STRAW if (i + j) % 2 else STRAW_DARK
+        j = int((c.z - 0.01) / ((H - 0.01) / 10) + 1)
+        k = (i + j) % 2
+        return mixc(STRAW, K.hexc("#D9AE6E"), k * 0.45 + 0.25 * (j % 4 == 0))
 
     emit(p, body, weave, "matte", per_face=True)
     # gingham lining
     lin = []
-    for z in (0.015, 0.1, H - 0.004):
+    for z in (0.015, H - 0.004):
         sc = (0.9 + 0.1 * z / H) * 0.955
         lin.append([Vector((x * sc, y * sc, z)) for x, y in base])
     emit(p, grid(lin, close=True, pole_bottom=Vector((0, 0, 0.015))),
          lambda c, f: BLUSH if int((math.atan2(c.y, c.x) + 3.2) * 6) % 2 else LINEN, "fabric", per_face=True)
     # wrapped cane rim
-    rim = [Vector((x, y, H + 0.004)) for x, y in basket_outline(A + 0.002, B + 0.002, 36)]
-    rimb = tube(rim, 0.009, 5, closed=True)
+    rim = [Vector((x, y, H + 0.004)) for x, y in basket_outline(A + 0.002, B + 0.002, 30)]
+    rimb = tube(rim, 0.009, 4, closed=True)
     emit(p, rimb, lambda c, f: STRAW_SHADE if int((math.atan2(c.y, c.x) + 3.2) * 9) % 2 else STRAW, "satin",
          per_face=True)
     # lids: the left one closed, the right one thrown open
@@ -934,8 +1065,8 @@ def picnic_basket(p):
 
     def lid(mirror):
         rows_ = []
-        for k in range(6):
-            t = k / 5
+        for k in range(5):
+            t = k / 4
             rows_.append([Vector((x * t, y, 0.006 * math.sin(math.pi * (1 - t) / 2) + 0.004 * (1 - abs(y) / B)))
                           for x, y in half])
         b2 = grid(rows_)
@@ -945,15 +1076,15 @@ def picnic_basket(p):
         return b2
 
     def lid_weave(c, f):
-        return STRAW if (int(abs(c.x) / 0.03) + int((c.y + 0.2) / 0.03)) % 2 else STRAW_DARK
+        return STRAW if (int(abs(c.x) / 0.02) + int((c.y + 0.2) / 0.02)) % 2 else K.hexc("#E2BC7E")
 
     emit(p, lid(False), lid_weave, "matte", T(-0.002, 0, H + 0.008), per_face=True)
     edge = [Vector((x, y, 0.0)) for x, y in half]
-    p.add(tube(edge, 0.006, 4), STRAW_SHADE, "satin", T(-0.002, 0, H + 0.008))
+    p.add(tube(edge, 0.006, 3), STRAW_SHADE, "satin", T(-0.002, 0, H + 0.008))
     hinge = T(0.002, 0, H + 0.010) @ R("Y", -112)
     emit(p, lid(True), lid_weave, "matte", hinge, per_face=True)
     edge2 = [Vector((-x, y, 0.0)) for x, y in half]
-    p.add(tube(edge2, 0.006, 4), STRAW_SHADE, "satin", hinge)
+    p.add(tube(edge2, 0.006, 3), STRAW_SHADE, "satin", hinge)
     # bentwood handle over the hinge, gold-capped, a blush bow on top
     hp = [(0.0, -B * 0.98 + 0.012 * (1 - abs(math.cos(a))), H + 0.17 * math.sin(a) ** 0.8)
           for a in [math.pi * k / 12 for k in range(13)]]
@@ -980,24 +1111,24 @@ def picnic_basket(p):
             row.append(Vector((x, y + 0.012 * math.sin(i * 1.7), z + 0.008 * math.sin(i * 1.3 + k))))
         nap.append(row)
     emit(p, grid(nap), lambda c: LINEN, "pearl")
-    p.add(sphere(0.06, 12, 8), CRUST, "satin", T(0.075, -0.05, H + 0.008) @ R("Z", 25) @ S(1.35, 0.85, 0.62))
+    p.add(sphere(0.06, 10, 6), CRUST, "satin", T(0.075, -0.05, H + 0.008) @ R("Z", 25) @ S(1.35, 0.85, 0.62))
     for k in range(3):
         p.add(K.box(0.008, 0.07, 0.004), CRUST_DARK, "matte",
               T(0.06 + k * 0.035, -0.05, H + 0.044) @ R("Z", 40) @ R("X", 8))
     bottle = lathe([(0.0, 0.0), (0.033, 0.0), (0.034, 0.16), (0.03, 0.19), (0.013, 0.215), (0.012, 0.27),
-                    (0.0135, 0.275), (0.0, 0.276)], 12)
+                    (0.0135, 0.275), (0.0, 0.276)], 10)
     bm_ = T(0.15, -0.075, 0.03) @ R("X", 14) @ R("Y", -6)
     p.add(bottle, K.hexc("#C9E6D5"), "glass", bm_)
-    p.add(cyl(0.0305, 0.14, 12), K.hexc("#F6C7D4"), "satin", bm_ @ T(0, 0, 0.004))
+    p.add(cyl(0.0305, 0.14, 10), K.hexc("#F6C7D4"), "satin", bm_ @ T(0, 0, 0.004))
     p.add(cyl(0.0138, 0.045, 10), GOLD, "gold", bm_ @ T(0, 0, 0.235))
     for i, (x, y, z, yaw) in enumerate(((0.06, 0.07, H + 0.025, 20), (0.1, 0.09, H + 0.03, 110),
-                                        (0.15, 0.075, H + 0.022, 200), (0.12, 0.17, H - 0.04, 60),
-                                        (0.20, 0.22, 0.012, 140), (0.15, 0.24, 0.012, 300))):
+                                        (0.15, 0.075, H + 0.022, 200),
+                                        (0.262, 0.1, 0.012, 140))):
         m = T(x, y, z) @ R("Z", yaw) @ R("Y", 80 if i >= 4 else 60)
         p.add(lathe([(0.0, 0.0), (0.006, 0.004), (0.0115, 0.014), (0.012, 0.021), (0.007, 0.027), (0.0, 0.028)],
-                    8), BERRY, "satin", m @ T(0, 0, -0.014))
-        for j in range(5):
-            p.add(K.leaf(0.011, 0.006), SAGE_DEEP, "leaf", m @ T(0, 0, 0.013) @ R("Z", 72 * j) @ R("Y", -25),
+                    7), BERRY, "satin", m @ T(0, 0, -0.014))
+        for j in range(4):
+            p.add(K.leaf(0.011, 0.006), SAGE_DEEP, "leaf", m @ T(0, 0, 0.013) @ R("Z", 90 * j) @ R("Y", -25),
                   smooth=False)
 
 
@@ -1008,8 +1139,8 @@ def maypole_solstice(p):
     rng = random.Random(66)
     H = 6.0
     p.add(lathe([(0.0, 0.0), (0.36, 0.0), (0.36, 0.08), (0.30, 0.12), (0.30, 0.2), (0.22, 0.26), (0.12, 0.3),
-                 (0.0, 0.3)], 16), PEARL, "pearl")
-    p.add(torus(0.33, 0.022, 16, 4), GOLD, "gold", T(0, 0, 0.1))
+                 (0.0, 0.3)], 12), PEARL, "pearl")
+    p.add(torus(0.33, 0.022, 12, 4), GOLD, "gold", T(0, 0, 0.1))
     p.add(lathe([(0.075, 0.28), (0.07, 1.0), (0.062, H - 0.4), (0.058, H)], 12, cap_bottom=False), K.hexc("#FFFBF6"),
           "pearl")
     # gilt spiral wrap
@@ -1031,19 +1162,19 @@ def maypole_solstice(p):
     p.add(lathe([(0.0, H - 0.05), (0.07, H), (0.085, H + 0.06), (0.06, H + 0.13), (0.02, H + 0.2), (0.0, H + 0.42)],
                 10), GOLD, "gold")
     crown_cols = [ROSE, BLUSH, BUTTER, LILAC, PEARL, DEEP_BLUSH, PERI]
-    for i in range(7):
-        a = 2 * math.pi * i / 7
-        c = Vector((0.13 * math.cos(a), 0.13 * math.sin(a), H - 0.03))
-        rose(p, c, 0.075, crown_cols[i], rng, tilt=R("Z", math.degrees(a)) @ R("Y", 35))
+    for i in range(6):
+        a = 2 * math.pi * i / 6
+        c = Vector((0.15 * math.cos(a), 0.15 * math.sin(a), H - 0.04))
+        rose(p, c, 0.12, crown_cols[i], rng, tilt=R("Z", math.degrees(a)) @ R("Y", 35))
         for j in (-1, 1):
-            leaf_at(p, (c.x, c.y, c.z - 0.02), 0.11, 0.05, math.degrees(a) + 26 * j, -10)
+            leaf_at(p, (c.x, c.y, c.z - 0.03), 0.17, 0.07, math.degrees(a) + 30 * j, -10)
     # eight ribbons sweeping out and round to their stakes
     rib_cols = [ROSE, BLUSH, LILAC, PERI, MINT, BUTTER, PEARL, CORNFLOWER]
     for i in range(8):
         a0 = 2 * math.pi * i / 8
         a1 = a0 + math.radians(38)
         pts, ns, ws = [], [], []
-        nseg = 26
+        nseg = 20
         for k in range(nseg + 1):
             t = k / nseg
             a = lerp(a0, a1, t ** 0.8)
@@ -1054,23 +1185,23 @@ def maypole_solstice(p):
             side = Vector((-math.sin(a), math.cos(a), 0))
             up = Vector((0, 0, 1))
             ns.append(up * math.cos(tw) + side * math.sin(tw))
-            ws.append(0.085)
+            ws.append(0.12)
         emit(p, strip(pts, ns, ws), lambda c, col=rib_cols[i]: col, "satin", smooth_=False)
         sx, sy = 1.4 * math.cos(a1), 1.4 * math.sin(a1)
         p.add(cyl(0.028, 0.36, 6, 0.02), K.OAK, "satin", T(sx, sy, 0.0))
-        p.add(sphere(0.035, 8, 6), GOLD, "gold", T(sx, sy, 0.37))
-        p.add(sphere(0.04, 6, 4), rib_cols[i], "satin", T(sx, sy, 0.31) @ S(1, 1, 0.6))
+        p.add(sphere(0.035, 6, 4), GOLD, "gold", T(sx, sy, 0.37))
+        p.add(sphere(0.045, 5, 3), rib_cols[i], "satin", T(sx, sy, 0.31) @ S(1, 1, 0.6))
         tail = [(sx, sy, 0.31), (sx * 1.04, sy * 1.04, 0.2), (sx * 1.06, sy * 1.06, 0.02)]
-        emit(p, strip(tail, [(-math.sin(a1), math.cos(a1), 0)] * 3, [0.07, 0.065, 0.06]),
+        emit(p, strip(tail, [(-math.sin(a1), math.cos(a1), 0)] * 3, [0.1, 0.09, 0.08]),
              lambda c, col=rib_cols[i]: col, "satin", smooth_=False)
     # garland round the foot
     gcols = [ROSE, BUTTER, BLUSH, LILAC, PEARL, MINT, PERI, DEEP_BLUSH, BUTTER]
-    for i in range(9):
-        a = 2 * math.pi * i / 9 + 0.2
-        c = Vector((0.36 * math.cos(a), 0.36 * math.sin(a), 0.16))
-        rose(p, c, 0.07, gcols[i], rng, tilt=R("Z", math.degrees(a)) @ R("Y", 50))
+    for i in range(6):
+        a = 2 * math.pi * i / 6 + 0.2
+        c = Vector((0.36 * math.cos(a), 0.36 * math.sin(a), 0.17))
+        rose(p, c, 0.11, gcols[i], rng, tilt=R("Z", math.degrees(a)) @ R("Y", 50))
         for j in (-1, 1):
-            leaf_at(p, (0.34 * math.cos(a + 0.17 * j), 0.34 * math.sin(a + 0.17 * j), 0.13), 0.12, 0.05,
+            leaf_at(p, (0.36 * math.cos(a + 0.3 * j), 0.36 * math.sin(a + 0.3 * j), 0.13), 0.17, 0.07,
                     math.degrees(a) + 55 * j, 10)
 
 
@@ -1079,86 +1210,83 @@ def maypole_solstice(p):
 
 def wine_table_solstice(p):
     rng = random.Random(67)
-    A, B, H = 0.86, 0.36, 0.74
-    n = 40
+    A, B, H = 0.84, 0.35, 0.74
+    n = 36
 
     def rr(t, s=1.0):
         c, si = math.cos(t), math.sin(t)
         return Vector((A * s * math.copysign(abs(c) ** 0.8, c), B * s * math.copysign(abs(si) ** 0.8, si), 0))
 
+    def outw(t):
+        return Vector((math.cos(t) / A, math.sin(t) / B, 0)).normalized()
+
+    # gilt cabriole legs, knees out, showing under the cloth
+    for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+        yaw = math.degrees(math.atan2(sy, sx)) - 45
+        p.add(K.cabriole(0.44, 0.024), GOLD, "gold", T(sx * 0.62, sy * 0.21, 0.0) @ R("Z", yaw))
+        p.add(sphere(0.026, 6, 4), GOLD_DEEP, "gold", T(sx * 0.632, sy * 0.222, 0.018) @ S(1, 1, 0.7))
+    # pearl cloth: a short skirt with soft folds and a scalloped hem
     ts = [2 * math.pi * (i + 0.5) / n for i in range(n)]
     rows = []
-    for z, sc, fold in ((0.012, 1.045, 1.0), (0.10, 1.035, 0.9), (0.3, 1.02, 0.6), (0.52, 1.008, 0.3),
-                        (H - 0.015, 1.0, 0.05), (H, 0.985, 0.0)):
+    for z, sc, fold in ((0.40, 1.05, 1.0), (0.52, 1.035, 0.7), (0.64, 1.015, 0.35), (H - 0.012, 1.0, 0.05),
+                        (H, 0.982, 0.0)):
         row = []
         for i, t in enumerate(ts):
-            q = rr(t, sc)
-            o = Vector((math.cos(t) / A, math.sin(t) / B, 0)).normalized()
-            hem = 0.018 * (0.5 + 0.5 * math.cos(i * math.pi / 2.5)) if z < 0.05 else 0.0
-            row.append(q + o * (0.016 * fold * math.sin(i * 2.5)) + Vector((0, 0, z + hem)))
+            hem = 0.035 * abs(math.sin(i * math.pi / 4)) if z < 0.45 else 0.0
+            row.append(rr(t, sc) + outw(t) * (0.016 * fold * math.sin(i * 2.5)) + Vector((0, 0, z + hem)))
         rows.append(row)
-    for sc in (0.75, 0.4):
-        rows.append([rr(t, sc) + Vector((0, 0, H)) for t in ts])
+    rows.append([rr(t, 0.6) + Vector((0, 0, H)) for t in ts])
     emit(p, grid(rows, close=True, pole_top=Vector((0, 0, H))), lambda c: LINEN, "pearl")
-    # gold hem cord and blush swags with rosettes
-    hem = [Vector((q.x, q.y, q.z + 0.004)) for q in rows[0]]
-    p.add(tube(hem, 0.007, 3, closed=True), GOLD, "gold")
-    for k in range(10):
-        t0, t1 = 2 * math.pi * k / 10, 2 * math.pi * (k + 1) / 10
-        pts, ns, ws = [], [], []
+    hem = [Vector((q.x, q.y, q.z)) + outw(ts[i]) * 0.003 for i, q in enumerate(rows[0])]
+    p.add(tube(hem, 0.0065, 3, closed=True), GOLD, "gold")
+    # blush swags caught up with little roses
+    for k in range(8):
+        t0, t1 = 2 * math.pi * k / 8, 2 * math.pi * (k + 1) / 8
+        pts, ns = [], []
         for j in range(7):
             t = lerp(t0, t1, j / 6)
-            q = rr(t, 1.012)
-            o = Vector((math.cos(t) / A, math.sin(t) / B, 0)).normalized()
-            pts.append(q + Vector((0, 0, H - 0.03 - 0.09 * math.sin(math.pi * j / 6))) + o * 0.006)
-            ns.append(o)
-            ws.append(0.035)
-        emit(p, strip(pts, ns, ws), lambda c: DEEP_BLUSH if k % 2 else BLUSH, "satin", smooth_=False)
-        q = rr(t0, 1.02)
-        o = Vector((math.cos(t0) / A, math.sin(t0) / B, 0)).normalized()
-        K.star_flower(p, (q.x + o.x * 0.01, q.y + o.y * 0.01, H - 0.03), 0.028, ROSE if k % 2 else BUTTER,
-                      facing=R("Z", math.degrees(math.atan2(o.y, o.x))) @ R("Y", 90))
-    # crystal decanter of faerie wine, gold-mounted, glowing
+            pts.append(rr(t, 1.013) + Vector((0, 0, H - 0.03 - 0.085 * math.sin(math.pi * j / 6))) + outw(t) * 0.006)
+            ns.append(outw(t))
+        emit(p, strip(pts, ns, [0.034] * 7), lambda c, k=k: DEEP_BLUSH if k % 2 else BLUSH, "satin", smooth_=False)
+        q = rr(t0, 1.02) + outw(t0) * 0.012
+        p.add(sphere(0.022, 5, 3), ROSE if k % 2 else BUTTER, "fabric", T(q.x, q.y, H - 0.03) @ S(1, 1, 0.8))
+        leaf_at(p, (q.x, q.y, H - 0.04), 0.05, 0.025, math.degrees(t0) + 60, 30)
+    # crystal decanter of faerie wine, gold-mounted, the wine glowing
     dec = T(0, 0, H)
-    p.add(lathe([(0.0, 0.0), (0.06, 0.0), (0.065, 0.006), (0.04, 0.012), (0.075, 0.05), (0.095, 0.1),
-                 (0.08, 0.15), (0.03, 0.19), (0.022, 0.27), (0.03, 0.285)], 14, cap_top=False),
-          K.GLASS_TINT, "glass", dec)
-    p.add(lathe([(0.0, 0.013), (0.04, 0.014), (0.07, 0.05), (0.088, 0.1), (0.074, 0.14), (0.0, 0.142)], 12),
+    p.add(lathe([(0.0, 0.0), (0.06, 0.0), (0.04, 0.012), (0.075, 0.05), (0.095, 0.1), (0.08, 0.15), (0.03, 0.19),
+                 (0.022, 0.27), (0.03, 0.285)], 11, cap_top=False), K.GLASS_TINT, "glass", dec)
+    p.add(lathe([(0.0, 0.013), (0.04, 0.014), (0.07, 0.05), (0.088, 0.1), (0.074, 0.14), (0.0, 0.142)], 10),
           FAE_WINE, "glow", dec)
-    p.add(lathe([(0.0, 0.0), (0.068, 0.0), (0.07, 0.01), (0.045, 0.016), (0.0, 0.016)], 14), GOLD, "gold", dec)
-    p.add(torus(0.027, 0.006, 12, 4), GOLD, "gold", dec @ T(0, 0, 0.2))
-    p.add(lathe([(0.0, 0.27), (0.024, 0.275), (0.03, 0.3), (0.018, 0.33), (0.0, 0.345)], 10), GOLD, "gold", dec)
-    # six gold goblets with glowing wine
-    for i, (x, y) in enumerate(((-0.62, 0.12), (-0.5, -0.17), (-0.32, 0.2), (0.3, -0.21), (0.52, 0.16),
+    p.add(lathe([(0.0, 0.0), (0.068, 0.0), (0.07, 0.01), (0.045, 0.016), (0.0, 0.016)], 11), GOLD, "gold", dec)
+    p.add(torus(0.027, 0.006, 10, 3), GOLD, "gold", dec @ T(0, 0, 0.2))
+    p.add(lathe([(0.0, 0.27), (0.024, 0.275), (0.03, 0.3), (0.018, 0.33), (0.0, 0.345)], 8), GOLD, "gold", dec)
+    # six gold goblets, poured
+    for i, (x, y) in enumerate(((-0.62, 0.12), (-0.5, -0.17), (-0.33, 0.2), (0.3, -0.21), (0.52, 0.16),
                                 (0.66, -0.08))):
         m = T(x, y, H)
-        p.add(lathe([(0.0, 0.0), (0.038, 0.0), (0.038, 0.007), (0.011, 0.018), (0.008, 0.07), (0.018, 0.088),
-                     (0.036, 0.11), (0.04, 0.165), (0.0345, 0.163), (0.0, 0.112)], 9), GOLD, "gold", m)
-        p.add(K.disc(0.034, 9, 0.148), FAE_WINE, "glow", m)
-        p.add(torus(0.0105, 0.0035, 8, 3), [ROSE, MINT, PERI][i % 3], "glow", m @ T(0, 0, 0.06))
-    # gilt comport heaped with fruit
-    cm = T(-0.24, -0.04, H)
-    p.add(lathe([(0.0, 0.0), (0.06, 0.0), (0.06, 0.01), (0.016, 0.03), (0.014, 0.08), (0.11, 0.11), (0.12, 0.125),
-                 (0.0, 0.1)], 12), GOLD, "gold", cm)
-    for k in range(3):
-        a = 2 * math.pi * k / 3
-        p.add(sphere(0.042, 9, 6), PEACH, "satin", cm @ T(0.05 * math.cos(a), 0.05 * math.sin(a), 0.14))
-    for k in range(9):
+        p.add(lathe([(0.0, 0.0), (0.038, 0.0), (0.012, 0.016), (0.008, 0.07), (0.036, 0.105), (0.04, 0.165),
+                     (0.0, 0.112)], 7), GOLD, "gold", m)
+        p.add(K.disc(0.035, 7, 0.15), FAE_WINE, "glow", m)
+    # gilt comport heaped with peaches and grapes
+    cm = T(-0.22, -0.04, H)
+    p.add(lathe([(0.0, 0.0), (0.06, 0.0), (0.016, 0.03), (0.014, 0.08), (0.11, 0.11), (0.12, 0.125), (0.0, 0.1)],
+                10), GOLD, "gold", cm)
+    for k in range(2):
+        a = math.pi * k + 0.6
+        p.add(sphere(0.042, 8, 5), PEACH, "satin", cm @ T(0.04 * math.cos(a), 0.05 * math.sin(a), 0.14))
+    for k in range(6):
         a = k * 2.4
         r = 0.012 * math.sqrt(k)
-        p.add(sphere(0.016, 6, 4), GRAPE, "satin", cm @ T(0.07 + r * math.cos(a), r * math.sin(a), 0.2 - 0.008 * k))
+        p.add(sphere(0.017, 6, 4), GRAPE, "satin", cm @ T(0.06 + r * math.cos(a), r * math.sin(a), 0.19 - 0.008 * k))
     leaf_at(p, (cm.translation.x + 0.08, cm.translation.y - 0.06, H + 0.13), 0.08, 0.04, -40)
-    # a posy in a pearl bud vase and scattered blooms
+    # a posy in a pearl bud vase
     vm = T(0.22, 0.04, H)
-    p.add(lathe([(0.0, 0.0), (0.03, 0.0), (0.045, 0.05), (0.02, 0.11), (0.026, 0.13), (0.0, 0.12)], 10), PEARL,
+    p.add(lathe([(0.0, 0.0), (0.03, 0.0), (0.045, 0.05), (0.02, 0.11), (0.026, 0.13), (0.0, 0.12)], 8), PEARL,
           "pearl", vm)
-    for j, (c, dx, dy, dz) in enumerate(((ROSE, 0.0, 0.0, 0.2), (BUTTER, 0.04, 0.02, 0.17),
-                                         (LILAC, -0.035, 0.025, 0.175), (BLUSH, 0.01, -0.04, 0.165))):
-        rose(p, (0.22 + dx, 0.04 + dy, H + dz), 0.04, c, rng, tilt=R("X", dy * 600) @ R("Y", dx * 600))
+    for c, dx, dy, dz in ((ROSE, 0.0, 0.0, 0.2), (BUTTER, 0.04, 0.02, 0.17), (LILAC, -0.035, 0.025, 0.175)):
+        rose(p, (0.22 + dx, 0.04 + dy, H + dz), 0.045, c, rng, tilt=R("X", dy * 600) @ R("Y", dx * 600))
     for j in range(4):
         leaf_at(p, (0.22, 0.04, H + 0.13), 0.08, 0.035, 90 * j + 20, -30)
-    for (x, y, c) in ((0.06, -0.2, BLUSH), (-0.1, 0.2, BUTTER), (0.42, -0.02, ROSE)):
-        rose(p, (x, y, H + 0.012), 0.03, c, rng)
 
 
 # =============================================================== fiddle
@@ -1234,7 +1362,7 @@ def fiddle(p):
                 0.004)
     p.add(tp, EBONY, "satin", T(-0.168, 0, 0.0535) @ R("Z", -90) @ R("X", 90), smooth=False)
     p.add(cyl(0.003, 0.006, 6), GOLD, "gold", T(-0.122, 0.006, 0.055))
-    p.add(sphere(0.03, 10, 6), EBONY, "satin", T(-0.15, -0.055, 0.046) @ S(1.1, 0.9, 0.28))
+    p.add(sphere(0.026, 10, 6), EBONY, "satin", T(-0.142, -0.042, 0.044) @ S(1.1, 0.85, 0.22))
     p.add(sphere(0.006, 6, 4), EBONY, "satin", T(-0.181, 0, 0.02))
     # strings: nut -> bridge -> tailpiece
     for k, (yb, yn) in enumerate(((-0.0165, -0.0075), (-0.0055, -0.0025), (0.0055, 0.0025), (0.0165, 0.0075))):
@@ -1305,91 +1433,84 @@ def garden_streamer_post(p):
 # =============================================================== paintings bundle
 
 
-def painted_canvas(p, w, h, m, kind, framed=None, rng=None):
-    """Canvas standing in the XZ plane, face toward +Y, base at z=0."""
-    d = 0.022
-    p.add(K.box(w, d, h, bevel=0.003, seg=1), K.hexc("#F4EBDD"), "matte", m @ T(0, 0, h / 2))
-    nu, nv = 14, 12
-    rows = []
-    for j in range(nv + 1):
-        rows.append([Vector((-w / 2 + 0.006 + (w - 0.012) * i / nu, d / 2 + 0.0008, 0.006 + (h - 0.012) * j / nv))
-                     for i in range(nu + 1)])
-
-    def paint(c, face):
-        u = (c.x + w / 2) / w
-        v = c.z / h
+def painterly(kind):
+    """A small oil sketch as a colour field (u, v in 0..1), dabbed with noise like brushwork."""
+    def f(u, v):
+        ju = u + 0.03 * nz(u * 9, v * 9, 1.0)
+        jv = v + 0.03 * nz(u * 9, v * 9, 7.0)
         if kind == "meadow":
-            sky = mixc(K.hexc("#FCE6D6"), K.hexc("#C9D3FA"), smooth(0.4, 1.0, v))
-            if (u - 0.7) ** 2 + ((v - 0.68) * 1.2) ** 2 < 0.012:
-                return K.hexc("#FFE59A")
-            hill1 = 0.42 + 0.08 * math.sin(u * 5.0 + 0.5)
-            hill2 = 0.28 + 0.07 * math.sin(u * 7.0 + 2.0)
-            if v < hill2:
-                c2 = K.hexc("#9FD9AE")
-                if (int(u * 14) + int(v * 12)) % 5 == 0:
-                    return [ROSE, BUTTER, PEARL][int(u * 14) % 3]
-                return c2
-            if v < hill1:
-                return K.hexc("#B9C8EA")
-            return sky
+            c = mixc(K.hexc("#FCE3D3"), K.hexc("#BFCBF7"), smooth(0.45, 1.0, jv))
+            c = mixc(c, K.hexc("#FFE9A6"), smooth(0.13, 0.0, math.hypot(ju - 0.7, (jv - 0.7) * 1.2)))
+            far = 0.47 + 0.07 * math.sin(ju * 5.0 + 0.5)
+            c = mixc(c, K.hexc("#C3C2EC"), smooth(far + 0.02, far - 0.02, jv))
+            near = 0.3 + 0.08 * math.sin(ju * 6.5 + 2.0)
+            c = mixc(c, K.hexc("#9ED6B0"), smooth(near + 0.02, near - 0.02, jv))
+            return mixc(c, K.hexc("#7FBF98"), smooth(0.2, 0.0, jv) * 0.6)
         if kind == "roses":
-            bg = mixc(K.hexc("#FBEFF2"), K.hexc("#F6D7E0"), v)
-            for cx, cv, col in ((0.35, 0.55, ROSE), (0.62, 0.45, DEEP_BLUSH), (0.5, 0.72, BUTTER)):
-                if (u - cx) ** 2 + (v - cv) ** 2 < 0.018:
-                    return col
-            if abs(u - 0.5) < 0.04 and v < 0.45:
-                return SAGE
-            return bg
-        return mixc(K.hexc("#D9E8F6"), K.hexc("#EAD9F6"), v)
+            c = mixc(K.hexc("#FBEFF2"), K.hexc("#F3D3DE"), jv)
+            for cx, cv, col in ((0.35, 0.58, ROSE), (0.64, 0.46, DEEP_BLUSH), (0.5, 0.74, BUTTER)):
+                c = mixc(c, col, smooth(0.16, 0.08, math.hypot(ju - cx, jv - cv)))
+            return mixc(c, SAGE, smooth(0.05, 0.02, abs(ju - 0.5)) * smooth(0.5, 0.4, jv))
+        return mixc(K.hexc("#D9E8F6"), K.hexc("#EAD9F6"), jv)
+    return f
 
-    emit(p, grid(rows), paint, "satin", m, per_face=True, smooth_=False)
+
+def painted_canvas(p, w, h, m, kind, framed=None, rng=None, front=False):
+    """Stretched canvas standing in the XZ plane, painted face toward +Y, base at z=0."""
+    d = 0.016
+    p.add(K.box(w, d, h, bevel=0.0025, seg=1), K.hexc("#F4EBDD"), "matte", m @ T(0, 0, h / 2))
+    nu, nv = (26, 22) if front else (5, 4)
+    rows = [[Vector((-w / 2 + 0.005 + (w - 0.01) * i / nu, d / 2 + 0.0008, 0.005 + (h - 0.01) * j / nv))
+             for i in range(nu + 1)] for j in range(nv + 1)]
+    pf = painterly(kind)
+    emit(p, grid(rows), lambda c: pf((c.x + w / 2) / w, c.z / h), "satin", m, smooth_=False)
+    if front and kind == "meadow":
+        # impasto dabs: wildflowers in the near grass
+        for k in range(9):
+            u, v = 0.08 + 0.84 * rng.random(), 0.04 + 0.2 * rng.random()
+            col = [ROSE, BUTTER, PEARL, LILAC][k % 4]
+            p.add(sphere(0.008, 5, 3), col, "satin",
+                  m @ T(-w / 2 + u * w, d / 2 + 0.0015, v * h) @ S(1.0, 0.35, 0.8))
     if framed:
-        fo = [(-w / 2 - 0.012, -0.012), (w / 2 + 0.012, -0.012), (w / 2 + 0.012, h + 0.012), (-w / 2 - 0.012, h + 0.012)]
-        fp = [(x, d / 2 + 0.004, z) for x, z in fo]
-        p.add(tube(fp, 0.016, 4, closed=True), framed, "gold" if framed == GOLD else "pearl",
-              m @ T(0, 0, 0) @ R("Y", 45) @ R("Y", -45))
+        fo = [(-w / 2 - 0.01, -0.01), (w / 2 + 0.01, -0.01), (w / 2 + 0.01, h + 0.01), (-w / 2 - 0.01, h + 0.01)]
+        p.add(tube([(x, d / 2, z) for x, z in fo], 0.014, 4, closed=True), framed,
+              "gold" if framed == GOLD else "pearl", m)
 
 
 def paintings_bundle(p):
     rng = random.Random(69)
     specs = [  # w, h, x, y, roll, kind, frame
-        (0.6, 0.56, 0.02, -0.044, 1.5, "plain", GOLD),
-        (0.5, 0.5, -0.06, -0.022, -2.5, "roses", None),
+        (0.6, 0.56, 0.02, -0.036, 1.5, "plain", GOLD),
+        (0.5, 0.5, -0.06, -0.018, -2.5, "roses", None),
         (0.46, 0.58, 0.07, 0.0, 2.0, "plain", PEARL),
-        (0.44, 0.44, -0.03, 0.022, -1.5, "roses", None),
-        (0.52, 0.47, 0.01, 0.044, 1.0, "meadow", None),
+        (0.44, 0.44, -0.03, 0.018, -1.5, "roses", None),
+        (0.52, 0.47, 0.01, 0.036, 1.0, "meadow", None),
     ]
-    for w, h, x, y, roll, kind, frame in specs:
-        m = T(x, y, 0.014) @ R("Y", roll)
-        painted_canvas(p, w, h, m, kind, frame, rng)
-    # blush ribbon round the bundle, both ways, with a bow at the front
-    ry = 0.075
-    for path, nrm in (([(-0.355, -ry, 0.27), (0.355, -ry, 0.27), (0.355, ry, 0.27), (-0.355, ry, 0.27),
-                        (-0.355, -ry, 0.27)], None),
-                      ([(0.05, -ry, 0.0), (0.05, -ry, 0.6), (0.05, ry, 0.6), (0.05, ry, 0.0), (0.05, -ry, 0.0)],
-                       None)):
+    for i, (w, h, x, y, roll, kind, frame) in enumerate(specs):
+        painted_canvas(p, w, h, T(x, y, 0.012) @ R("Y", roll), kind, frame, rng, front=(i == len(specs) - 1))
+    # blush ribbon round the bundle both ways, bowed at the front
+    ry, rx = 0.051, 0.345
+    for path in ([(-rx, -ry, 0.27), (rx, -ry, 0.27), (rx, ry, 0.27), (-rx, ry, 0.27), (-rx, -ry, 0.27)],
+                 [(0.05, -ry, 0.0), (0.05, -ry, 0.6), (0.05, ry, 0.6), (0.05, ry, 0.0), (0.05, -ry, 0.0)]):
         pts, ns = [], []
         for a, b in zip(path, path[1:]):
             a, b = Vector(a), Vector(b)
-            for k in range(4):
-                q = a.lerp(b, k / 4)
-                pts.append(q)
+            for k in range(3):
+                pts.append(a.lerp(b, k / 3))
         pts.append(Vector(path[-1]))
         horiz = path[0][2] == path[1][2]
         for q in pts:
-            if horiz:
-                ns.append(Vector((q.x, q.y * 4, 0)).normalized())
-            else:
-                ns.append(Vector((0, q.y, (q.z - 0.3) * 0.4)).normalized())
-        emit(p, strip(pts, ns, [0.035] * len(pts)), lambda c: DEEP_BLUSH, "satin", smooth_=False)
-    bow = T(0.05, ry + 0.008, 0.27)
+            ns.append(Vector((q.x, q.y * 6, 0)).normalized() if horiz else
+                      Vector((0, q.y, (q.z - 0.3) * 0.25)).normalized())
+        emit(p, strip(pts, ns, [0.032] * len(pts)), lambda c: DEEP_BLUSH, "satin", smooth_=False)
+    bow = T(0.05, ry + 0.006, 0.27)
     for s_ in (1, -1):
-        p.add(torus(0.045, 0.012, 12, 4), DEEP_BLUSH, "satin", bow @ T(s_ * 0.045, 0.004, 0.012) @ R("Y", s_ * 20)
+        p.add(torus(0.042, 0.011, 10, 4), DEEP_BLUSH, "satin", bow @ T(s_ * 0.042, 0.003, 0.012) @ R("Y", s_ * 20)
               @ R("X", 90) @ S(1, 0.55, 1))
         tail = [(0, 0.004, 0), (s_ * 0.03, 0.008, -0.06), (s_ * 0.05, 0.006, -0.12)]
-        emit(p, strip(tail, [(0, 1, 0)] * 3, [0.032, 0.03, 0.026]), lambda c: DEEP_BLUSH, "satin", bow,
+        emit(p, strip(tail, [(0, 1, 0)] * 3, [0.03, 0.028, 0.024]), lambda c: DEEP_BLUSH, "satin", bow,
              smooth_=False)
-    p.add(sphere(0.016, 8, 6), ROSE, "satin", bow @ T(0, 0.006, 0) @ S(1, 0.7, 1))
+    p.add(sphere(0.015, 8, 6), ROSE, "satin", bow @ T(0, 0.005, 0) @ S(1, 0.7, 1))
 
 
 # =============================================================== lantern string
@@ -1397,7 +1518,7 @@ def paintings_bundle(p):
 
 def solstice_lantern_string(p):
     L = 2.95
-    sag = 0.25
+    sag = 0.27
     top = 0.6
 
     def cord(x):
@@ -1412,8 +1533,8 @@ def solstice_lantern_string(p):
     for i in range(nl):
         x = -L + 2 * L * (i + 0.5) / nl
         zc = cord(x)
-        r = 0.088 if i % 2 == 0 else 0.075
-        hh = r * 2.1
+        r = 0.1 if i % 2 == 0 else 0.086
+        hh = r * 1.85
         drop = 0.06 + 0.03 * (i % 3 == 1)
         ztop = zc - drop
         prof = [(0.0, -hh / 2), (r * 0.42, -hh / 2 + 0.003)]
@@ -1423,9 +1544,9 @@ def solstice_lantern_string(p):
             prof.append((max(rad, r * 0.42), -hh / 2 + hh * t))
         prof += [(r * 0.42, hh / 2 - 0.003), (0.0, hh / 2)]
         m = T(x, 0, ztop - hh / 2)
-        emit(p, lathe(prof, 9), lambda c, col=cols[i]: col, "glow", m)
-        p.add(cyl(r * 0.45, 0.02, 9), GOLD, "gold", m @ T(0, 0, hh / 2 - 0.01))
-        p.add(cyl(r * 0.45, 0.016, 9), GOLD, "gold", m @ T(0, 0, -hh / 2 - 0.006))
+        emit(p, lathe(prof, 8), lambda c, col=cols[i]: col, "glow", m)
+        p.add(cyl(r * 0.45, 0.02, 8), GOLD, "gold", m @ T(0, 0, hh / 2 - 0.01))
+        p.add(cyl(r * 0.45, 0.016, 8), GOLD, "gold", m @ T(0, 0, -hh / 2 - 0.006))
         p.add(tube([(x, 0, zc), (x, 0, ztop + 0.01)], 0.003, 3), GOLD, "gold", smooth=False)
         p.add(lathe([(0.0, 0.0), (0.012, 0.004), (0.006, 0.035), (0.0, 0.04)], 6), cols[(i + 3) % nl], "satin",
               m @ T(0, 0, -hh / 2 - 0.046))
@@ -1460,6 +1581,7 @@ def build(pid):
     n = K.mesh_tris(ob)
     lo = K.lod(ob, 0.5 if n > 300 else 0.6)
     lo.name = pid + "_lod1"
+    lo.data.validate(clean_customdata=False)     # drop faces the collapse left degenerate
     return ob, lo, sc
 
 
@@ -1529,11 +1651,13 @@ def render_tile(objs, target, path, res, az, el, ground=True, pad=1.12):
     bpy.ops.render.render(write_still=True)
 
 
-def sheet(path):
+def sheet(path, only=None):
     import numpy as np
     K.reset()
     built = {}
     for pid in BUILDERS:
+        if only and pid not in only:
+            continue
         ob, lo, _ = build(pid)
         lo.hide_render = True
         built[pid] = ob
@@ -1576,13 +1700,17 @@ def sheet(path):
     tmp = os.path.join(os.path.dirname(path), "p6_tiles")
     os.makedirs(tmp, exist_ok=True)
     tiles = []
-    head = built["head_severed"]
+    head = built.get("head_severed")
     for name, az, el, res, gr in (("head_a", 28, 8, 1024, True), ("head_b", -128, 12, 512, True),
                                   ("head_c", 20, -60, 512, False)):
+        if head is None:
+            break
         f = os.path.join(tmp, name + ".png")
         render_tile([head], None, f, res, az, el, gr)
         tiles.append(f)
     for pid in list(BUILDERS)[1:]:
+        if pid not in built:
+            continue
         f = os.path.join(tmp, pid + ".png")
         render_tile([built[pid]], None, f, 512, 35, 24)
         tiles.append(f)
@@ -1594,6 +1722,9 @@ def sheet(path):
         bpy.data.images.remove(im)
         return np.flipud(a)
 
+    if only:
+        print("tiles in", tmp)
+        return
     W, H = 2560, 1536
     canvas = np.ones((H, W, 4), dtype=np.float32)
     canvas[:1024, :1024] = load(tiles[0])
@@ -1615,7 +1746,7 @@ def main():
     args = sys.argv[1:]
     only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
     if "--sheet" in args:
-        sheet(args[args.index("--sheet") + 1])
+        sheet(args[args.index("--sheet") + 1], only)
         return
     over = []
     print(f"  {'id':26s} {'lod0':>6s} {'lod1':>6s} {'bytes':>9s}  scale(w,h,d)")
@@ -1630,7 +1761,7 @@ def main():
         size = os.path.getsize(path)
         warn = "  <- check proportions" if max(sc) / min(sc) > 1.2 else ""
         print(f"  {pid:26s} {n0:6d} {n1:6d} {size:9d}  ({sc[0]:.2f}, {sc[1]:.2f}, {sc[2]:.2f}){warn}")
-        if n0 > MAX_TRIS or size > 2 * 1024 * 1024:
+        if n0 > CAPS.get(pid, MAX_TRIS) or size > 2 * 1024 * 1024:
             over.append(pid)
     if over:
         print("OVER BUDGET:", ", ".join(over))

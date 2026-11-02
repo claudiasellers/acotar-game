@@ -12,6 +12,7 @@ const WILLOW_TOP := Vector3(-4.8, 4.0, -6.2)
 const BROOK_MID := Vector3(0.0, 0.2, 3.6)
 const LOOK_SECONDS := 1.2
 const LINGER := 120.0
+const MIN_STAY := 12.0
 
 var found: Dictionary = {}  # &"willow" / &"brook" / &"scent" -> true
 var _since := 0.0
@@ -38,9 +39,7 @@ func _build_beats() -> Array:
 			aside(&"everything_sang"), "her senses open"),
 		WonderBeat.new(self, held),
 		say(&"tamlin_home"),
-	] + fade_time(TimeShift.MORNING, _home, "the ride home") + [
-		Beats.run(func(_s: SceneSpace) -> void: stamp("fact.eyes_open_wonders"), "home"),
-	]
+	] + fade_time(TimeShift.MORNING, _home, "the ride home")
 
 
 func local(p: Vector3) -> Vector3:
@@ -58,6 +57,8 @@ func notice(id: StringName, line: StringName, at: Vector3) -> void:
 
 
 func _home() -> void:
+	# Stamped before the travel: the glade unloads and frees this space.
+	stamp("fact.eyes_open_wonders")
 	dismiss(&"tamlin")
 	# Tomorrow (the fade runs the clock forward to the morning).
 	go_to(&"manor_estate", &"feyre_bedroom_window", stage.mark(&"bed_side") if stage else Vector3.ZERO)
@@ -80,7 +81,8 @@ class WonderBeat:
 		s._since += delta
 		var willow := s.local(WILLOW_TOP)
 		var brook := s.local(BROOK_MID)
-		if s.player_within(30.0, willow) and s.looking_at_point(willow, 18.0):
+		# Distance from the trunk's foot; the gaze is at the crown.
+		if s.player_within(30.0, s.local(Vector3(WILLOW_TOP.x, 0.0, WILLOW_TOP.z))) and s.looking_at_point(willow, 18.0):
 			held[&"willow"] += delta
 			if held[&"willow"] >= LOOK_SECONDS:
 				s.notice(&"willow", &"willow_sings", willow)
@@ -91,4 +93,5 @@ class WonderBeat:
 		var t := s.actor(&"tamlin")
 		if t and s.player_within(2.6, t.global_position):
 			s.notice(&"scent", &"magic_scent", t.global_position + Vector3.UP * 1.4)
-		return s.found.size() >= 3 or s._since >= LINGER
+		# Time to take it in: at least MIN_STAY in the glen even when all three come at once.
+		return (s.found.size() >= 3 and s._since >= MIN_STAY) or s._since >= LINGER
