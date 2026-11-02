@@ -26,6 +26,9 @@ P = {
     "crimson": C("b3263a"), "amber": C("e39a2d"), "au_gold": C("d9a520"), "rust": C("9e4a2a"), "au_stone": C("c9b4a0"),
     "au_stone_dk": C("a38c78"), "thorn": C("5a2430"), "thorn_dk": C("3c1820"), "ward": C("ffc86b", True),
     # blight (dark, desaturated, never pastel)
+    # the Rite cave (L45-6): dark, wet stone and earth that only the fire warms
+    "cave_stone": C("6a6466"), "cave_stone_lt": C("847c79"), "cave_wet": C("3e3a3d"), "cave_earth": C("5e4c40"),
+    "cave_earth_dk": C("463a31"), "cave_root": C("5e4634"), "cave_root_dk": C("3f3026"), "cave_moss": C("4d6040"),
     "bl_black": C("161618"), "bl_dk": C("2a2a2d"), "bl_grey": C("45454a"), "bl_ash": C("67676c"), "bl_bone": C("8e8b86"),
 }
 FLOWER_COLS = ["rose", "lilac", "butter", "peri", "blush", "coral", "white", "berry"]
@@ -144,16 +147,17 @@ def altar_stone(mb, rng, out):
     colbox(out, 2.4, 1.3, 1.1)
 
 
-def _rock_chain(mb, rng, pts, size, col, moss=True, seg=8, rings=6):
-    for p, s in zip(pts, size):
+def _rock_chain(mb, rng, pts, size, col, moss=True, seg=8, rings=6, moss_col="moss", cols=None):
+    for k, (p, s) in enumerate(zip(pts, size)):
         sx, sy, sz = s
-        L.rock(mb, sx, sy, sz, col, rng, T(p[0], p[1], p[2] - sz * 0.1, rz=rng.uniform(0, 360)), seg=seg, rings=rings, jit=0.18)
+        c = cols[k % len(cols)] if cols else col
+        L.rock(mb, sx, sy, sz, c, rng, T(p[0], p[1], p[2] - sz * 0.1, rz=rng.uniform(0, 360)), seg=seg, rings=rings, jit=0.18)
         if moss and rng.random() < 0.55:
-            L.sphere(mb, sx * 0.35, sy * 0.35, sz * 0.12, P["moss"], T(p[0], p[1], p[2] + sz * 0.78), 6, 3)
+            L.sphere(mb, sx * 0.35, sy * 0.35, sz * 0.12, P[moss_col], T(p[0], p[1], p[2] + sz * 0.78), 6, 3)
 
 
 def cave_mouth(mb, rng, out):
-    stone = P["stone_pale"]
+    stone = P["cave_stone"]
     pts, sizes = [], []
     n = 13
     for i in range(n):
@@ -164,10 +168,11 @@ def cave_mouth(mb, rng, out):
         pts.append((x, rng.uniform(-0.3, 0.3), max(0.0, z - 1.0)))
         big = 2.6 if i in (0, 1, n - 2, n - 1) else 1.9
         sizes.append((big * rng.uniform(0.9, 1.15), 3.0 * rng.uniform(0.85, 1.1), big * 1.1))
-    _rock_chain(mb, rng, pts, sizes, stone)
+    _rock_chain(mb, rng, pts, sizes, stone, seg=9, rings=6, moss_col="cave_moss",
+                cols=[P["cave_stone"], P["cave_wet"], P["cave_stone_lt"], P["cave_earth"]])
     # flank masses that tie the arch into the hill
     for sx in (-1, 1):
-        L.rock(mb, 2.8, 4.0, 3.2, P["pearl_lilac"], rng, T(sx * 5.4, 0.8, 0), seg=10, rings=7)
+        L.rock(mb, 2.8, 4.0, 3.2, P["cave_earth"], rng, T(sx * 5.4, 0.8, 0), seg=10, rings=7)
     # gold-flecked lintel spiral and ribbons tied across the mouth
     L.spiral_beads(mb, 0.05, 0.55, 2.5, 30, 0.07, P["gold"], T(0, -1.55, 5.3))
     flecks(mb, rng, 30, 9.0, 3.0, 0.5, 5.5, P["gold"], 0.05)
@@ -183,39 +188,157 @@ def cave_mouth(mb, rng, out):
     colbox(out, 2.8, 4.0, 3.0, T(-5.4, 0.8, 0))
 
 
+# ---- the Rite cave (L45-6): rough banks of wet stone and earth, not stacked pebbles.
+_NOISE_SEED = [0.0, 0.0, 0.0]
+
+
+def _n3(x, y, z, scale=1.0, octaves=3):
+    """Deterministic fractal noise in -1..1 (mathutils.noise, offset per asset)."""
+    from mathutils import noise
+    o = _NOISE_SEED
+    return noise.fractal(Vector(((x + o[0]) * scale, (y + o[1]) * scale, (z + o[2]) * scale)), 0.55, 2.0, octaves) * 0.7
+
+
+def _seed_noise(rng):
+    _NOISE_SEED[:] = [rng.uniform(-500, 500) for _ in range(3)]
+
+
+def _cave_col(h, n, wet):
+    """Earth low down, stone above, darker where water runs (per-face colour)."""
+    base = L.mix(P["cave_earth"], P["cave_stone"], max(0.0, min(1.0, h * 1.4 - 0.15 + n * 0.5)))
+    base = L.mix(base, P["cave_stone_lt"], max(0.0, n - 0.25) * 0.8)
+    return L.mix(base, P["cave_wet"], wet)
+
+
+def _grid_mesh(mb, rows, cols, pos, col_fn):
+    """Quads over a (rows+1) x (cols+1) grid of points pos(i, j), sharing their
+    vertices so the mass shades smooth; colour per quad."""
+    verts = [pos(i, j) for i in range(rows + 1) for j in range(cols + 1)]
+    w = cols + 1
+    base = len(mb.v)
+    mb.v.extend(verts)
+    for i in range(rows):
+        for j in range(cols):
+            q = [i * w + j, i * w + j + 1, (i + 1) * w + j + 1, (i + 1) * w + j]
+            c = sum((verts[k] for k in q), Vector()) / 4
+            mb.f.append([base + k for k in q])
+            mb.c.append(col_fn(i, j, c))
+            mb.s.append(True)
+    return verts
+
+
+def _root(mb, rng, pts, r):
+    col = P["cave_root"] if rng.random() < 0.6 else P["cave_root_dk"]
+    L.tube(mb, pts, r, col, seg=5, r_end=r * 0.25, caps=False)
+
+
 def cave_wall(mb, rng, out, length=6.0, height=4.0, curve=0.8):
-    stone = P["pearl_lilac"]
-    pts, sizes = [], []
-    cols_n, rows_n = 5, 3
-    for i in range(cols_n):
-        for j in range(rows_n):
-            t = i / (cols_n - 1) - 0.5
-            x = t * length
-            y = curve * (4 * t * t - 1) * 0.5
-            z = j * height / rows_n
-            pts.append((x + rng.uniform(-0.2, 0.2), y, z))
-            sizes.append((length / cols_n * 1.4, 1.4 * rng.uniform(0.8, 1.2), height / rows_n * 1.5))
-    _rock_chain(mb, rng, pts, sizes, stone, moss=False, seg=7, rings=5)
-    flecks(mb, rng, 22, length, 1.2, 0.3, height, P["gold"], 0.04)
-    # pale glow lichen
-    for _ in range(10):
-        L.sphere(mb, 0.12, 0.05, 0.09, P["glow_teal"], T(rng.uniform(-length / 2, length / 2), -0.75, rng.uniform(0.3, height)), 5, 3)
-    colbox(out, length, 1.4, height, T(0, -curve * 0.1, 0))
+    """A bank of wet stone and earth: one rough mass, ledged in strata, thick at
+    the foot and leaning back, roots hanging over its lip, a few boulders
+    bedded at its foot. Both long faces are finished (the trench runs either side)."""
+    _seed_noise(rng)
+    cols, rows = 26, 13
+    depth0, depth1 = 1.7, 0.8
+    prof = []                                   # cross-section loop (y, z, side): front foot -> crest -> back foot
+    for k in range(rows + 1):
+        t = k / rows
+        a = math.pi * t
+        side = -math.cos(a)
+        z = math.sin(a) ** 0.55
+        prof.append((side, z))
+
+    def surf(i, j):
+        u = j / cols
+        x = (u - 0.5) * length
+        end = math.sin(math.pi * u) ** 0.35      # the ends slump to the floor
+        side, zt = prof[i]
+        z = zt * height * (0.55 + 0.45 * end)
+        half = (depth0 + (depth1 - depth0) * zt) / 2 * (0.6 + 0.4 * end)
+        y = side * half + curve * (4 * (u - 0.5) ** 2 - 1) * 0.5
+        # strata: ledges every ~0.7 m, broken by noise; then rough displacement
+        strata = 0.07 * math.sin(z * 6.5 + _n3(x, 0, z, 0.6) * 4.0) + 0.04 * math.sin(z * 15.0 + x * 0.8)
+        d = _n3(x, y, z, 0.5) * 0.75 + _n3(x, y, z, 1.6, 2) * 0.22 + strata
+        nrm_y = side * (1.0 - zt * 0.6)
+        return Vector((x, y + nrm_y * d, max(0.0, z + zt * d * 0.4) if i not in (0, rows) else -0.15))
+
+    def col(i, j, c):
+        n = _n3(c.x, c.y, c.z, 1.1)
+        wet = max(0.0, _n3(c.x * 0.8, c.y * 0.8, c.z * 0.3, 1.0)) * 0.6
+        return _cave_col(c.z / height, n, min(1.0, wet))
+
+    _grid_mesh(mb, rows, cols, surf, col)
+    # boulders bedded at the foot, half sunk
+    for k in range(4):
+        u = rng.uniform(0.12, 0.88)
+        side = -1 if k % 2 == 0 else 1
+        x = (u - 0.5) * length
+        L.rock(mb, rng.uniform(0.7, 1.1), rng.uniform(0.6, 0.9), rng.uniform(0.5, 0.8), P["cave_stone"], rng,
+               T(x, side * (depth0 / 2 + 0.15), -0.12, rz=rng.uniform(0, 360)), seg=9, rings=6, jit=0.15)
+    # roots: over the lip and down the face, hugging it, then a short tip hanging free
+    for k in range(9):
+        j = rng.randint(2, cols - 2)
+        front = k % 2 == 0
+        stop = height * rng.uniform(0.35, 0.7)
+        pts = []
+        wob = rng.uniform(0.0, 6.0)
+        top = rows // 2
+        steps = [top - m * 0.5 for m in range(rows)] if front else [top + m * 0.5 for m in range(rows)]
+        for m, fi in enumerate(steps):
+            i = int(round(fi))
+            if i < 0 or i > rows:
+                break
+            jj = min(cols, max(0, j + int(round(math.sin(wob + m * 0.7) * 0.8))))
+            p = surf(i, jj)
+            lift = Vector((0.0, -0.05 if front else 0.05, 0.03))
+            pts.append(p + lift)
+            if p.z < stop and m > 2:
+                pts.append(p + lift * 3.0 + Vector((0.0, 0.0, -rng.uniform(0.2, 0.45))))
+                break
+        if len(pts) >= 3:
+            _root(mb, rng, pts, rng.uniform(0.045, 0.075))
+    # dark moss along the crest
+    for k in range(6):
+        p = surf(rows // 2, rng.randint(3, cols - 3))
+        L.sphere(mb, rng.uniform(0.3, 0.6), rng.uniform(0.25, 0.4), 0.07, P["cave_moss"], T(p.x, p.y, p.z - 0.02), 6, 3)
+    colbox(out, length * 0.9, depth0, height * 0.9, T(0, -curve * 0.1, 0))
 
 
 def cave_pillar(mb, rng, out):
-    prof = []
-    for k in range(9):
-        z = 5.0 * k / 8
-        r = 0.9 - 0.45 * math.sin(math.pi * k / 8) + rng.uniform(-0.06, 0.06)
-        prof.append((r, z, rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05)))
-    L.lathe(mb, prof, 12, P["stone_pale"])
-    for k in range(4):
-        L.torus(mb, 0.55 + 0.1 * (k % 2), 0.02, P["gold"], T(0, 0, 1.2 + k * 0.9, rx=rng.uniform(-8, 8)), 14, 3)
-    flecks(mb, rng, 16, 1.2, 1.2, 0.3, 4.6, P["gold"], 0.03)
-    for i in range(5):
-        a = TAU * i / 5
-        L.rock(mb, 0.5, 0.5, 0.4, P["pearl_lilac"], rng, T(math.cos(a) * 0.95, math.sin(a) * 0.95, 0), seg=6, rings=4)
+    """A rough column of wet stone where the roof comes down: waisted, ledged,
+    roots wound down it from above, rubble round its foot."""
+    _seed_noise(rng)
+    seg, rows, h = 16, 18, 5.0
+
+    def surf(i, j):
+        t = i / rows
+        a = TAU * (j % seg) / seg
+        r = 0.95 - 0.42 * math.sin(math.pi * min(1.0, t * 1.05)) ** 0.8 + 0.25 * t * t
+        z = t * h
+        x0, y0 = math.cos(a), math.sin(a)
+        d = _n3(x0 * r, y0 * r, z, 0.9) * 0.35 + _n3(x0, y0, z, 2.6, 2) * 0.08 + 0.06 * math.sin(z * 8.0 + _n3(x0, y0, z, 0.5) * 4.0)
+        rr = max(0.25, r + d)
+        return Vector((x0 * rr, y0 * rr, z if i > 0 else -0.15))
+
+    def col(i, j, c):
+        n = _n3(c.x, c.y, c.z, 1.3)
+        wet = max(0.0, _n3(c.x * 0.8, c.y * 0.8, c.z * 0.3, 1.0)) * 0.6
+        return _cave_col(0.35 + c.z / h * 0.6, n, min(1.0, wet))
+
+    _grid_mesh(mb, rows, seg, surf, col)
+    for k in range(3):                          # roots spiralling down from the roof
+        j0 = rng.uniform(0, seg)
+        pts = []
+        for m in range(9):
+            i = rows - m * 1.4
+            if i < rows * 0.3:
+                break
+            p = surf(int(i), int(j0 + m * 0.9) % seg)
+            pts.append(p * 1.05)
+        _root(mb, rng, pts, rng.uniform(0.04, 0.065))
+    for k in range(5):                          # rubble at the foot
+        a = TAU * k / 5 + rng.uniform(-0.3, 0.3)
+        L.rock(mb, rng.uniform(0.35, 0.6), rng.uniform(0.3, 0.5), rng.uniform(0.2, 0.35), P["cave_stone"], rng,
+               T(math.cos(a) * 1.15, math.sin(a) * 1.15, 0, rz=math.degrees(a)), seg=7, rings=5, jit=0.18)
     colcyl(out, 0.75, 5.0)
 
 
@@ -223,7 +346,7 @@ def cave_pool_rim(mb, rng, out):
     n = 12
     for i in range(n):
         a = TAU * i / n
-        L.rock(mb, 1.1, 0.8, 0.55, P["pearl"], rng, T(math.cos(a) * 1.9, math.sin(a) * 1.5, 0, rz=math.degrees(a) + 90), seg=7, rings=5)
+        L.rock(mb, 1.1, 0.8, 0.55, P["cave_stone"] if i % 3 else P["cave_stone_lt"], rng, T(math.cos(a) * 1.9, math.sin(a) * 1.5, 0, rz=math.degrees(a) + 90), seg=7, rings=5)
     L.disc(mb, 1.75, 20, P["glow_teal"], T(0, 0, 0.18, s=(1, 0.8, 1)))
     L.disc(mb, 1.0, 14, P["glow_star"], T(0, 0, 0.19, s=(1, 0.8, 1)))
     flecks(mb, rng, 18, 4.2, 3.4, 0.15, 0.5, P["glow_star"], 0.035)

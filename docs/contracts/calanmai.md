@@ -69,6 +69,34 @@ bite moment's data summary raises `bite_endured`; in play it is lunch's deed.
 `FarDrums` (a root node, `CalanmaiFarDrums`) plays the drums faintly at the
 manor from the order until she reaches the fires.
 
+## Fire and the cave's stone (L45-6)
+
+- **`CalanmaiFire`** (`story/act5/calanmai/calanmai_fire.gd`) is every fire in
+  the chapter. `campfire()` is the three's fire in the cave: a stone ring and
+  split logs on an ember bed (`calanmai_campfire.glb`), five flame cards, sparks,
+  a thin smoke column, and a shadowed light. `bonfire(3.2)` is a pyre's flames,
+  with a crown of tongues round the cone and no wood of its own, since the pyre
+  model is the wood. CalanmaiNight keeps the pyre's breathing light.
+- **Flame cards** (`fx/calanmai_flame.gdshader`) turn about their own upright
+  axis to face the camera, are noise-sheared and torn at the tip, and are
+  additive with each card's `gain` under 0.7. A stack then blooms orange under
+  the hill's ACES grade (glow threshold 1.1) and never clips to white.
+  `test_calanmai_fire.gd` keeps the cap.
+- The court's `fx_bonfire_flame` particles bloomed white at 2 m. They're no
+  longer used here, and the hill's `ambient_fx` no longer floats one over each
+  habitat centre (one of those sat in the cave).
+- **The Rite cave** (`rite_cave_wall_*`, `rite_cave_pillar`, `rite_cave_mouth`,
+  and the pool rim's stones) is built by `tools/court/blender/props_shapes_a.py`.
+  The walls are rough, ledged banks of stone and earth, and the pillar is a
+  waisted column. Both have shared-vertex smooth shading, roots, and boulders or
+  rubble at the foot. Their vertex colours are dark and cool (`cave_*` palette),
+  and they take `mat_prop_cave_stone` (`court_cave_stone.gdshader`). That
+  material adds a grain bump, mottling, and wet streaks that are darker and
+  glossier. It uses standard light with no rim and no wrap, so only the fire
+  warms them.
+- R17 bench: `tools/playtest/calanmai_fire_shot.tscn` (a campfire at 2 m, the
+  cave stone, a pyre at 3 m). The Mac clip also writes `pyre_3m.png`.
+
 ## The crown braid
 
 `data/wardrobe/hair/calanmai_crown.tres` (`[X]`: crown braid, ember-red ribbons,

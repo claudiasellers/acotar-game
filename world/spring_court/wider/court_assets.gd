@@ -145,6 +145,9 @@ static func _material_locked(id: StringName) -> Material:
 		name = "mat_foliage_default"
 	elif s.contains("crystal") or s.contains("starglass") or s.contains("pool_rim"):
 		name = "mat_prop_glitter"
+	elif s.begins_with("rite_cave_"):
+		# L45-6: the Rite cave is dark, wet stone the fire warms, not pastel rock.
+		name = "mat_prop_cave_stone"
 	# Trees sway less than grass and flowers; wind is a material uniform (see
 	# court_foliage.gdshader), so they get their own copy.
 	if name == "mat_foliage_default" and s.begins_with("flora_tree_"):
