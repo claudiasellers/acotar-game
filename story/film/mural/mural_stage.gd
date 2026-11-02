@@ -18,6 +18,7 @@ const SPACING := 80.0
 const PAINT := preload("res://story/film/mural/mural_paint.gdshader")
 const MAP := preload("res://story/film/mural/mural_map.gdshader")
 const SKY := preload("res://story/film/mural/mural_sky.gdshader")
+const LIT := preload("res://story/film/mural/mural_lit.gdshader")
 const PEOPLE := "res://creatures/models/people/%s.gltf"
 const FAE := "res://creatures/models/fae/%s.gltf"
 const CAST := "res://characters/%s/%s_model.tscn"
@@ -30,12 +31,20 @@ const GOLD := Color(1.0, 0.82, 0.45)
 const SILVER := Color(0.86, 0.9, 1.0)
 const SICK := Color(0.78, 0.86, 0.35)
 const ROSE := Color(1.0, 0.62, 0.72)
+## Aerial haze (depth fog) from the lens, in metres, and how much at most.
+const HAZE_BEGIN := 14.0
+const HAZE_END := 40.0
+const HAZE := 0.4
 
 ## The tableaux to build, set before the stage enters the tree; empty builds
 ## the opening film's IDS. A subclass adds its own `_build_<id>` (MuralDark).
 var build_only: Array[StringName] = []
+## How far a figure's own colours lean into its tableau's ink (0 = its own
+## colours, 1 = a silhouette). A material's "ink_mix" meta overrides it.
+var figure_ink: float = 0.18
 var camera: Camera3D
 var environment: Environment
+var lens: CameraAttributesPractical
 ## id -> {root: Node3D, mats: Array[ShaderMaterial], rail: [Transform3D, Transform3D], fov: float}
 var tableaux: Dictionary = {}
 var current: StringName = &""
@@ -68,10 +77,40 @@ func _ready() -> void:
 	environment.adjustment_saturation = 1.08
 	we.environment = environment
 	add_child(we)
+	# Depth: the far paint hazes into the backdrop's own colour, and the lens
+	# holds the figures sharp with the cities and sky soft behind them, so a
+	# tableau reads as a deep painted stage, not cut-outs in a row.
+	environment.fog_mode = Environment.FOG_MODE_DEPTH
+	environment.fog_depth_begin = HAZE_BEGIN
+	environment.fog_depth_end = HAZE_END
+	environment.fog_depth_curve = 1.0
+	environment.fog_sky_affect = 0.0
 	camera = Camera3D.new()
 	camera.name = "MuralCamera"
 	camera.fov = 40.0
 	camera.near = 0.05
+	# The painter's light: a warm key from high front-left, a cool rim from
+	# behind, and the backdrop's own colour as the fill (set per tableau).
+	var key := DirectionalLight3D.new()
+	key.name = "Key"
+	key.light_color = Color(1.0, 0.9, 0.76)
+	key.light_energy = 1.25
+	key.shadow_enabled = true
+	key.rotation_degrees = Vector3(-38.0, -28.0, 0.0)
+	add_child(key)
+	var back := DirectionalLight3D.new()
+	back.name = "Rim"
+	back.light_color = Color(0.72, 0.78, 1.0)
+	back.light_energy = 0.7
+	back.rotation_degrees = Vector3(-20.0, 160.0, 0.0)
+	add_child(back)
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color(0.5, 0.45, 0.6)
+	environment.ambient_light_energy = 0.55
+	lens = CameraAttributesPractical.new()
+	lens.dof_blur_amount = 0.045
+	lens.dof_blur_far_transition = 9.0
+	camera.attributes = lens
 	add_child(camera)
 	camera.current = true
 	var ids: Array[StringName] = IDS if build_only.is_empty() else build_only
@@ -104,6 +143,7 @@ func play(id: StringName, seconds: float, reveal_seconds: float = 2.6) -> void:
 	if not tableaux.has(id):
 		return
 	current = id
+	_look(tableaux[id] as Dictionary)
 	_rail_t = 0.0
 	_rail_len = maxf(seconds, 0.1)
 	_shake = 0.0
@@ -115,6 +155,21 @@ func play(id: StringName, seconds: float, reveal_seconds: float = 2.6) -> void:
 	else:
 		tween_param(id, &"reveal", 0.0, 1.0, reveal_seconds)
 	_process(0.0)
+
+
+## The tableau's haze and focus: haze in its backdrop's low colour (none
+## when it has no backdrop, like the map), focus `focus` metres out (0: all sharp).
+func _look(t: Dictionary) -> void:
+	var haze: Variant = t.get(&"haze")
+	environment.fog_enabled = haze is Color
+	if haze is Color:
+		environment.fog_light_color = haze
+		environment.fog_density = HAZE
+		# Fill from the backdrop, lifted so the shadow side keeps its colour.
+		environment.ambient_light_color = (haze as Color).lerp(Color(0.8, 0.78, 0.85), 0.45)
+	var focus := float(t.get(&"focus", 0.0))
+	lens.dof_blur_far_enabled = focus > 0.0
+	lens.dof_blur_far_distance = maxf(focus, 0.1)
 
 
 ## Sets `param` on every paint material of tableau `id` (map shader included
@@ -179,6 +234,10 @@ func _sky(t: Dictionary, at: Vector3, size: Vector2, top: Color, low: Color) -> 
 	m.set_shader_parameter(&"top", top)
 	m.set_shader_parameter(&"low", low)
 	(t.mats as Array).append(m)
+	# The first backdrop sets the tableau's haze and a focus just past its figures.
+	if not t.has(&"haze"):
+		t[&"haze"] = low.lerp(top, 0.35)
+		t[&"focus"] = 17.0
 	var q := MeshInstance3D.new()
 	var quad := QuadMesh.new()
 	quad.size = size
@@ -196,6 +255,61 @@ func _paint_all(node: Node, m: ShaderMaterial) -> void:
 		_paint_all(c, m)
 
 
+## Paints a model in its own colours: every surface gets a mural_lit material
+## with the model's albedo and the tableau paint `m`'s ink, gold, rim and
+## stroke settings, and joins the tableau's materials (so reveal, drain,
+## rust and crack reach it), under `m`'s name.
+func _dress(t: Dictionary, node: Node, m: ShaderMaterial) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		mi.material_override = null
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		for i in (mi.mesh.get_surface_count() if mi.mesh else 0):
+			mi.set_surface_override_material(i, _lit(t, m, mi.get_active_material(i)))
+	elif node is GeometryInstance3D:
+		_paint_all(node, m)
+		return
+	for c in node.get_children():
+		_dress(t, c, m)
+
+
+func _lit(t: Dictionary, m: ShaderMaterial, own: Material) -> ShaderMaterial:
+	var l := ShaderMaterial.new()
+	l.shader = LIT
+	l.resource_name = m.resource_name
+	for param: StringName in [&"ink", &"gold", &"rim_gain", &"rim_power", &"glow", &"origin", &"span"]:
+		var v: Variant = m.get_shader_parameter(param)
+		if v != null:
+			l.set_shader_parameter(param, v)
+	l.set_shader_parameter(&"ink_mix", float(m.get_meta(&"ink_mix", figure_ink)))
+	if own is BaseMaterial3D:
+		var b := own as BaseMaterial3D
+		l.set_shader_parameter(&"albedo_col", b.albedo_color)
+		if b.albedo_texture:
+			l.set_shader_parameter(&"albedo_tex", b.albedo_texture)
+		l.set_shader_parameter(&"use_vcol", b.vertex_color_use_as_albedo)
+		l.set_shader_parameter(&"roughness", clampf(b.roughness, 0.45, 1.0))
+		if b.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED:
+			l.set_shader_parameter(&"alpha_scissor", 0.5)
+	elif own is ShaderMaterial:
+		var sm := own as ShaderMaterial
+		# A shader of its own (fur, skin): its main colour if it names one,
+		# else a mid grey, never the shader default white.
+		l.set_shader_parameter(&"albedo_col", Color(0.3, 0.28, 0.3))
+		for c: StringName in [&"albedo", &"albedo_color", &"base_color", &"coat", &"color"]:
+			var v: Variant = sm.get_shader_parameter(c)
+			if v is Color:
+				l.set_shader_parameter(&"albedo_col", v)
+				break
+		for c: StringName in [&"albedo_texture", &"texture_albedo", &"albedo_tex", &"base_texture"]:
+			var v: Variant = sm.get_shader_parameter(c)
+			if v is Texture2D:
+				l.set_shader_parameter(&"albedo_tex", v)
+				break
+	(t.mats as Array).append(l)
+	return l
+
+
 ## A model (gltf or scene) in silhouette at `at`, facing `yaw` degrees, with
 ## clip `clip` held at `clip_at` (0..1 of its length) or looping when < 0.
 func _figure(t: Dictionary, path: String, at: Vector3, yaw: float, s: float, m: ShaderMaterial,
@@ -209,7 +323,7 @@ func _figure(t: Dictionary, path: String, at: Vector3, yaw: float, s: float, m: 
 	n.rotation_degrees.y = yaw + 180.0
 	n.scale = Vector3.ONE * s
 	(t.root as Node3D).add_child(n)
-	_paint_all(n, m)
+	_dress(t, n, m)
 	var ap := n.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if ap and ap.has_animation(clip):
 		ap.play(clip)
@@ -422,18 +536,24 @@ func _build_court(t: Dictionary) -> void:
 	var ridge := _box(t, Vector3(30, 1.2, 4), Vector3(0, -0.2, -1.5), _mat(t, Color(0.03, 0.025, 0.06), GOLD, 0.8, "fae"))
 	ridge.rotation_degrees.z = 1.5
 	var gilt := _gilt(t, "fae")
-	var who := [[CAST % ["tamlin", "tamlin"], -2.6, 18.0], [CAST % ["lucien", "lucien"], 1.2, -20.0],
-		[PEOPLE % "calanmai_1", -5.6, 30.0], [PEOPLE % "reveler_2", 4.4, -32.0], [PEOPLE % "calanmai_3", 7.2, -10.0]]
+	# Not a row: one lord forward, the court staggered back along the ridge.
+	# [model, x, z, yaw, scale]
+	var who := [[CAST % ["tamlin", "tamlin"], -0.6, -0.8, 8.0, 1.34],
+		[CAST % ["lucien", "lucien"], 2.7, -1.9, -24.0, 1.22],
+		[PEOPLE % "calanmai_1", -3.9, -2.5, 30.0, 1.16], [PEOPLE % "reveler_2", 5.4, -2.9, -34.0, 1.1],
+		[PEOPLE % "calanmai_3", -6.9, -1.5, 42.0, 1.2]]
 	for w: Array in who:
-		var f := _figure(t, String(w[0]), Vector3(float(w[1]), 0.4, -1.5), float(w[2]), 1.25, fae)
+		var f := _figure(t, String(w[0]), Vector3(float(w[1]), 0.4, float(w[2])), float(w[3]), float(w[4]), fae)
 		_crown(f, gilt, 2.15)
 	_particles(t, Vector3(0, 4, -2), Vector3(12, 3, 3), ROSE, 160, 0.09, Vector3(0.15, -0.25, 0), 10.0, false)
 	_particles(t, Vector3(0, 6, -9), Vector3(14, 5, 1), Color(1.0, 0.9, 0.6, 0.8), 260, 0.04, Vector3.ZERO, 6.0)
 	# The beasts below, in the ink under the ridge.
-	var beast := _mat(t, Color(0.012, 0.012, 0.016), SICK * 0.7, 0.55, "beast")
+	var beast := _mat(t, Color(0.012, 0.012, 0.016), SICK * 0.7, 0.95, "beast")
+	beast.set_meta(&"ink_mix", 0.62)
 	beast.set_shader_parameter(&"rim_power", 4.0)
 	# The ink under the ridge: no sky down here, only the dark they live in.
-	_sky(t, Vector3(0.0, -4.6, -0.6), Vector2(70.0, 8.2), Color(0.01, 0.008, 0.02), Color(0.03, 0.02, 0.025))
+	# A sick glow low in it, so their shapes show against it and stay half-seen.
+	_sky(t, Vector3(0.0, -4.6, -0.6), Vector2(70.0, 8.2), Color(0.01, 0.008, 0.02), Color(0.085, 0.07, 0.03))
 	(t.mats.back() as ShaderMaterial).set_shader_parameter(&"stars", 0.0)
 	_figure(t, FAE % "bogge", Vector3(-3.2, -4.6, 2.2), 30.0, 1.6, beast, &"idle")
 	_figure(t, WOLF, Vector3(0.6, -4.8, 2.8), -25.0, 1.2, beast, &"stalk")
@@ -445,8 +565,8 @@ func _build_court(t: Dictionary) -> void:
 	var eye := MeshInstance3D.new()
 	eye.name = "Eye"
 	var sph := SphereMesh.new()
-	sph.radius = 0.06
-	sph.height = 0.12
+	sph.radius = 0.085
+	sph.height = 0.17
 	eye.mesh = sph
 	var em := StandardMaterial3D.new()
 	em.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -468,7 +588,9 @@ func _build_court(t: Dictionary) -> void:
 	slit.material_override = sm
 	slit.position = Vector3(0.0, 0.0, 0.055)
 	eye.add_child(slit)
-	_rail(t, Vector3(0.0, 2.4, 13.0), Vector3(0.0, 2.6, -2.0), Vector3(0.0, 2.0, 10.5), Vector3(0.0, 2.4, -2.0), 44.0)
+	# Close enough to see faces and crowns: a slow push in on the lord.
+	_rail(t, Vector3(-0.6, 2.2, 8.8), Vector3(0.2, 2.3, -2.0), Vector3(-0.2, 2.0, 6.4), Vector3(-0.4, 2.2, -1.5), 42.0)
+	t[&"focus"] = 11.5
 	t[&"rail_beasts"] = [Vector3(0.0, -1.6, 10.0), Vector3(0.0, -3.4, 2.0), Vector3(0.0, -2.4, 7.6), Vector3(0.6, -3.2, 3.0)]
 
 
@@ -530,6 +652,9 @@ func _build_war(t: Dictionary) -> void:
 	_sky(t, Vector3(0, 6, -16), Vector2(64, 30), Color(0.08, 0.02, 0.03), Color(0.6, 0.18, 0.06))
 	var human := _mat(t, Color(0.06, 0.04, 0.05), Color(1.0, 0.55, 0.28), 1.8, "human")
 	var fae := _mat(t, Color(0.14, 0.12, 0.18), Color(1.0, 0.95, 0.85), 2.4, "fae")
+	# Against the fire they stay half in shadow: colour, but dark and backlit.
+	human.set_meta(&"ink_mix", 0.45)
+	fae.set_meta(&"ink_mix", 0.3)
 	fae.set_shader_parameter(&"glow", 0.6)
 	_box(t, Vector3(44, 0.4, 24), Vector3(0, -0.2, -4.0), _mat(t, Color(0.05, 0.025, 0.02), Color(1.0, 0.5, 0.25), 0.6, "human"))
 	var kinds := ["human_man", "human_youth", "human_woman", "human_man", "human_elder"]

@@ -62,7 +62,11 @@ void fragment() {
 			* smoothstep(0.5, 0.15, length(fract(sg) - 0.5));
 	col += gold * st * 0.8 * step(0.0, d);
 	// Inside the land: a soft lacquer wash, later forests, rivers, mountain.
-	float inside = smoothstep(0.01, -0.01, d) * drawn;
+	// The lacquer runs in from the coast once the line has closed, like ink
+	// soaking into paper, never as a wedge cut behind the brush.
+	float closed = smoothstep(0.82, 1.0, draw);
+	float soak = smoothstep(0.0, 0.035, closed * 0.5 + d + (fbm(p * 8.0 + 2.0) - 0.5) * 0.06);
+	float inside = smoothstep(0.01, -0.01, d) * soak;
 	vec3 land = mix(vec3(0.09, 0.07, 0.13), vec3(0.16, 0.12, 0.1), fbm(p * 5.0));
 	// Forests: tiny painted trees, stippled where the woods grow thick.
 	vec2 tc = p * 120.0;

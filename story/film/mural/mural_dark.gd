@@ -26,6 +26,8 @@ static func of(ids: Array[StringName]) -> MuralDark:
 
 
 func _ready() -> void:
+	# The mural told true is darker: colours show, half sunk in the ink.
+	figure_ink = 0.38
 	super._ready()
 	for id in build_only:
 		if id in DARK_IDS:

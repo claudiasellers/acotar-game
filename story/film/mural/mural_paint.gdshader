@@ -1,8 +1,8 @@
 // The living mural's paint (lane L33): ink bodies with gilt edges, painted on
 // by brush strokes. Unshaded, so the look is the painter's, not the light's.
 // - ink: the body colour; gold: the rim (fresnel) and the wet stroke edge.
-// - reveal 0..1: horizontal brush strokes sweep across the tableau, each
-//   band starting at its own offset with a ragged, bristled edge.
+// - reveal 0..1: the paint blooms on like ink in wet paper, a soft ragged
+//   front sweeping west to east with a wet gold edge.
 // - origin / span: the tableau's left edge and width in world x, so every
 //   mesh in one tableau shares one set of strokes.
 // - drain 0..1: the gold goes out of the paint (horror beats).
@@ -44,12 +44,12 @@ void vertex() {
 
 void fragment() {
 	vec3 q = wpos - origin;
-	// Brush strokes: bands in y, each sweeping in x from its own start.
-	float row = floor((q.y + 0.25 * noise(vec2(q.x * 0.35, 3.1))) / band);
-	float start = hash(vec2(row, 7.0)) * 0.35;
+	// The paint blooms on like ink into wet paper: a soft, ragged front that
+	// sweeps west to east and runs ahead in rivulets, never in torn bands.
 	float p = q.x / span;
-	float bristle = (fbm(vec2(q.x * 3.0, q.y * 28.0)) - 0.5) * 0.08;
-	float front = reveal * 1.45 - start + bristle;
+	float pool = fbm(q.xy * 0.32 + vec2(11.0, 3.0));
+	float bristle = (fbm(vec2(q.x * 2.2, q.y * 9.0)) - 0.5) * 0.06;
+	float front = reveal * 1.6 - 0.3 - (pool - 0.5) * 0.5 + bristle;
 	float edge = front - p;
 	if (edge < 0.0) {
 		discard;

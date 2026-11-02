@@ -17,7 +17,7 @@ and the newcomer critic). Data rows are written by `tools/film/gen_film_data.py`
 | `story/film/film_captions.gd` `FilmCaptions` | Narration in EB Garamond italic, speech upright and tinted by speaker, just above the bottom bar. |
 | `story/film/film_skip.gd` `FilmSkip` | Hold any confirm/cancel action 0.8 s, or press twice within 0.6 s. Gold ring, "hold to skip". |
 | `story/film/film_insert.gd` `FilmInsert` | A full-screen painted insert (own `World3D` in a SubViewport) laid over the game, brushed on and off with `cover_to(k, s)`. |
-| `story/film/mural/mural_stage.gd` `MuralStage` | The living gold-and-ink mural: tableaux `land, court, slaves, war, treaty, mother, house, ships`, cut to with `play(id, s)`. `build_only` builds a subset. |
+| `story/film/mural/mural_stage.gd` `MuralStage` | The living gold-and-ink mural: tableaux `land, court, slaves, war, treaty, mother, house, ships`, cut to with `play(id, s)`. `build_only` builds a subset. Figures keep their own colours (`mural_lit.gdshader`: the model's albedo, lit by the stage's warm key and cool rim, a thin gilt line, leaning into the tableau ink by `figure_ink` or a material's `ink_mix` meta); backdrops and props stay painted (`mural_paint`, `mural_sky`). Paint soaks on in a soft ragged front, never torn bands. Each tableau with a backdrop gets depth haze in its own colour and far focus (`focus`). |
 | `story/film/opening/opening_film.gd` `OpeningFilm` | Part one (the mural and the turn at the Wall), in its own scene. |
 | `story/film/opening/opening_film_world.gd` `OpeningFilmWorld` | Part two in the real game world: the cottage at night, memory flashes, dawn with Feyre, the wolf's eye, the title, the hand-over. |
 

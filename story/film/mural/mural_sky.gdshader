@@ -25,9 +25,9 @@ void vertex() {
 }
 
 void fragment() {
-	float row = floor(uv.y * 14.0);
-	float start = hash(vec2(row, 3.0)) * 0.3;
-	if (uv.x > reveal * 1.35 - start + (noise(vec2(uv.x * 30.0, uv.y * 200.0)) - 0.5) * 0.04) {
+	// Soaks on like the figures' paint: a soft ragged front, west to east.
+	float pool = noise(uv * vec2(5.0, 3.0) + 7.0) * 0.65 + noise(uv * vec2(17.0, 11.0)) * 0.35;
+	if (uv.x > reveal * 1.6 - 0.3 - (pool - 0.5) * 0.5 + (noise(vec2(uv.x * 40.0, uv.y * 60.0)) - 0.5) * 0.03) {
 		discard;
 	}
 	vec3 col = mix(low, top, smoothstep(0.0, 0.8, 1.0 - uv.y));
