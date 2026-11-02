@@ -31,6 +31,9 @@ const SILVER := Color(0.86, 0.9, 1.0)
 const SICK := Color(0.78, 0.86, 0.35)
 const ROSE := Color(1.0, 0.62, 0.72)
 
+## The tableaux to build, set before the stage enters the tree; empty builds
+## the opening film's IDS. A subclass adds its own `_build_<id>` (MuralDark).
+var build_only: Array[StringName] = []
 var camera: Camera3D
 var environment: Environment
 ## id -> {root: Node3D, mats: Array[ShaderMaterial], rail: [Transform3D, Transform3D], fov: float}
@@ -71,8 +74,9 @@ func _ready() -> void:
 	camera.near = 0.05
 	add_child(camera)
 	camera.current = true
-	for i in IDS.size():
-		_build(IDS[i], Vector3(SPACING * i, 0.0, 0.0))
+	var ids: Array[StringName] = IDS if build_only.is_empty() else build_only
+	for i in ids.size():
+		_build(ids[i], Vector3(SPACING * i, 0.0, 0.0))
 
 
 func _process(delta: float) -> void:
@@ -675,37 +679,42 @@ func _build_ships(t: Dictionary) -> void:
 	water.name = "Sea"
 	var ship := _mat(t, Color(0.05, 0.04, 0.05), GOLD, 1.6, "ship")
 	for i in 3:
-		var s := Node3D.new()
-		s.name = "Ship%d" % i
-		s.position = Vector3(-4.0 + i * 4.0, 0.0, -2.0 - i * 0.8)
-		(t.root as Node3D).add_child(s)
-		var hull := MeshInstance3D.new()
-		var b := BoxMesh.new()
-		b.size = Vector3(2.4, 0.6, 0.7)
-		hull.mesh = b
-		hull.material_override = ship
-		hull.position.y = 0.2
-		s.add_child(hull)
-		var mast := MeshInstance3D.new()
-		var cyl := CylinderMesh.new()
-		cyl.top_radius = 0.03
-		cyl.bottom_radius = 0.04
-		cyl.height = 2.4
-		mast.mesh = cyl
-		mast.material_override = ship
-		mast.position.y = 1.6
-		s.add_child(mast)
-		var sail := MeshInstance3D.new()
-		var q := QuadMesh.new()
-		q.size = Vector2(1.4, 1.5)
-		sail.mesh = q
-		sail.material_override = ship
-		sail.position = Vector3(0.05, 1.7, 0)
-		sail.rotation_degrees.y = 90.0
-		s.add_child(sail)
+		_ship(t, Vector3(-4.0 + i * 4.0, 0.0, -2.0 - i * 0.8), ship).name = "Ship%d" % i
 	_particles(t, Vector3(0, 0.3, -2), Vector3(10, 0.2, 3), Color(0.7, 0.85, 1.0, 0.5), 120, 0.05,
 			Vector3(0.3, 0.1, 0), 3.0)
 	_rail(t, Vector3(0.0, 1.5, 8.0), Vector3(0.0, 0.8, -2.0), Vector3(0.0, 1.2, 6.4), Vector3(0.0, 0.6, -2.0), 42.0)
+
+
+## A painted ship: hull, mast and sail.
+func _ship(t: Dictionary, at: Vector3, ship: ShaderMaterial) -> Node3D:
+	var s := Node3D.new()
+	s.position = at
+	(t.root as Node3D).add_child(s)
+	var hull := MeshInstance3D.new()
+	var b := BoxMesh.new()
+	b.size = Vector3(2.4, 0.6, 0.7)
+	hull.mesh = b
+	hull.material_override = ship
+	hull.position.y = 0.2
+	s.add_child(hull)
+	var mast := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.03
+	cyl.bottom_radius = 0.04
+	cyl.height = 2.4
+	mast.mesh = cyl
+	mast.material_override = ship
+	mast.position.y = 1.6
+	s.add_child(mast)
+	var sail := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(1.4, 1.5)
+	sail.mesh = q
+	sail.material_override = ship
+	sail.position = Vector3(0.05, 1.7, 0)
+	sail.rotation_degrees.y = 90.0
+	s.add_child(sail)
+	return s
 
 
 ## The sea takes the ships one by one over `seconds`.
