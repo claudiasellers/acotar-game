@@ -568,7 +568,7 @@ def _petal_rim(color, length, width, rim=0.3):
     return shade
 
 
-def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5):
+def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5, cupped=False):
     """A full garden rose in layers (L35-8), facing +Z under matrix m: a
     furled, swirled heart, a ring of upright cupped petals round it and a
     ring of broad petals rolling open beneath, each ring turned half a step
@@ -588,8 +588,9 @@ def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5)
     co = lighter(color, 0.05)
     for i in range(outer):
         a = a0 + 180 / max(outer, 1) + 360 / max(outer, 1) * i + rng.uniform(-8, 8)
-        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.4, curl=-0.12), co, finish,
-                 m @ R("Z", a) @ T(r * 0.1, 0, 0) @ R("Y", -34), sharp_deg=89.0,
+        # cupped (L56-2): the outer ring stands up round the heart instead of lying open flat
+        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.62 if cupped else 0.4, curl=-0.04 if cupped else -0.12), co, finish,
+                 m @ R("Z", a) @ T(r * 0.1, 0, 0) @ R("Y", -56 if cupped else -34), sharp_deg=89.0,
                  shade=_petal_rim(co, r * 0.98, r * 1.05))
 
 

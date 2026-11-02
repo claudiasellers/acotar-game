@@ -118,17 +118,16 @@ def rose_bush(p, h, col, rng):
     rad = h * rng.uniform(0.55, 0.65)
     top = h * 0.86
     shrub_mass(p, 0.0, 0.0, rad, top, ROSE_LEAF_BASE, rng, sides=20, crown=ROSE_LEAF_TOP, bumps=0.035)
-    # nine clusters on a golden spiral over the upper two thirds: five led by
-    # an open rose, four by a half-open one; each with a bud, and the first
-    # five with a second, half-open head
+    # twelve clusters on a golden spiral over the upper two thirds, half led by
+    # an open rose and half by a half-open one, each with a bud (L56-2: smaller,
+    # cupped heads and more of them; the old big open heads read as flat discs)
     heads = []
-    for c in range(9):
+    n_clusters = 12
+    for c in range(n_clusters):
         a = 2.39996 * c + rng.uniform(-0.15, 0.15)
-        s = 0.32 + 0.6 * (c + 0.5) / 9
-        heads.append((a, s, "open" if c < 5 else "half"))
-        heads.append((a + rng.choice((-1, 1)) * rng.uniform(0.16, 0.24), s + rng.uniform(-0.07, 0.05), "bud"))
-        if c < 5:
-            heads.append((a + rng.uniform(-0.3, 0.3), s - rng.uniform(0.08, 0.12), "half"))
+        s = 0.3 + 0.62 * (c + 0.5) / n_clusters
+        heads.append((a, s, "open" if c % 2 == 0 else "half"))
+        heads.append((a + rng.choice((-1, 1)) * rng.uniform(0.12, 0.18), s + rng.uniform(-0.06, 0.04), "bud"))
     for i, (a, s, stage) in enumerate(heads):
         s = max(0.3, min(0.95, s))
         (x, y, z), (nr, nz) = _mass_point(rad, top, a, s)
@@ -136,7 +135,7 @@ def rose_bush(p, h, col, rng):
         # most heads sit sunk into the leaves; every fourth stands proud of the outline
         proud = i % 4 == 1
         c = col if i % 3 else lighter(col, 0.18)
-        rr = h * {"open": 0.2, "half": 0.2, "bud": 0.11}[stage] * rng.uniform(0.9, 1.1)
+        rr = h * {"open": 0.135, "half": 0.12, "bud": 0.075}[stage] * rng.uniform(0.9, 1.1)
         sink = -0.1 if proud else 0.08
         nx, ny = math.cos(a) * nr, math.sin(a) * nr
         m = T(x - nx * rr * sink, y - ny * rr * sink, z - nz * rr * sink) @ R("Z", math.degrees(a)) \
@@ -144,7 +143,7 @@ def rose_bush(p, h, col, rng):
         if stage == "bud":
             rose_bud(p, m, rr, c, F, rng)
         else:
-            layered_rose(p, m, rr, c, F, rng, inner=3, outer=5 if stage == "open" else 0)
+            layered_rose(p, m, rr, c, F, rng, inner=3, outer=4 if stage == "open" else 0, cupped=True)
 
 
 def cup_rose(p, center, radius, col, rng, tilt):

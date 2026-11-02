@@ -74,7 +74,8 @@ const SPECIES := {
 }
 
 const FOLIAGE_SHADER := preload("res://world/shared/shaders/stylized_foliage.gdshader")
-## Magical species glow softly and sparkle (R3); the rest get a gentle glint.
+## Magical species glow softly and sparkle (R3). The rest do not glint: a 0.1
+## default sprinkled white specks over every crown and rose bush (L56-2).
 const GLOW := {&"faelight_dandelion": 1.2, &"mushroom_glowcap": 1.4, &"starmoss": 0.6}
 const SPARKLE := {&"faelight_dandelion": 0.9, &"mushroom_glowcap": 0.7, &"starmoss": 0.8, &"rose_gold": 0.3, &"water_lily": 0.3}
 
@@ -149,7 +150,7 @@ static func foliage_material(species: StringName) -> ShaderMaterial:
 	m.set_shader_parameter(&"alpha_scissor", 0.0)
 	m.set_shader_parameter(&"flex_height", height_of(species))
 	m.set_shader_parameter(&"emission_glow", GLOW.get(species, 0.0))
-	m.set_shader_parameter(&"sparkle", SPARKLE.get(species, 0.1))
+	m.set_shader_parameter(&"sparkle", SPARKLE.get(species, 0.0))
 	var kind := kind_of(species)
 	m.set_shader_parameter(&"translucency", 0.45 if kind in [&"flower", &"climber", &"reed"] else 0.3)
 	if is_rose_cushion(species):
