@@ -59,7 +59,7 @@ func test_menu_with_a_save_and_continue_sets_the_slot() -> void:
 	f.store_string("{}")
 	f.close()
 	var t := _title()
-	assert_eq(_menu_texts(t), ["Continue", "New Game", "Settings", "Quit"])
+	assert_eq(_menu_texts(t), ["Continue", "Load", "New Game", "Settings", "Quit"])
 	t.set(&"_leaving", true)  # don't actually leave the test scene
 	t.call(&"_on_continue")
 	assert_eq(GameSettings.pending_load_slot, "slot_0")

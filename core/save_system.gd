@@ -6,6 +6,9 @@
 ## The game also saves itself (autosave): on every phase change and when Feyre
 ## sleeps. It never writes while a load is under way, while no game is up, or
 ## while a cutscene or staged moment is playing; it waits for that to end.
+##
+## There are three story slots (SLOTS), each its own file and .bak. The game in
+## play writes to active_slot: autosave, Save & Title and Save & Quit alike.
 extends Node
 
 const SAVE_DIR := "user://saves"
@@ -13,6 +16,8 @@ const FORMAT_VERSION := 2
 const BACKUP_SUFFIX := ".bak"
 ## The provider whose presence means a game scene is up and Feyre can be placed.
 const PLACEMENT_KEY := "player_placement"
+## The story slots, shown as Story 1 to 3. slot_0 is the save from before slots.
+const SLOTS: Array[String] = ["slot_0", "slot_1", "slot_2"]
 
 ## Other lanes' state (inventory, journal, body state...), by key. A provider
 ## implements save_state() -> Dictionary and load_state(data: Dictionary).
@@ -24,7 +29,10 @@ var _autosave_due: bool = false
 ## Scene spaces and films that have started and not yet finished.
 var _open_spaces: Dictionary = {}
 var autosave_enabled: bool = true
-var autosave_slot: String = "slot_0"
+## The slot the game in play saves to. A load or a new game sets it.
+var active_slot: String = "slot_0"
+## Time spent in this story, carried in its save.
+var play_seconds: float = 0.0
 
 
 func _ready() -> void:
@@ -34,6 +42,12 @@ func _ready() -> void:
 		_open_spaces.erase(id)
 		_autosave_if_due())
 	StoryControl.mode_changed.connect(func(_m: int) -> void: _autosave_if_due())
+
+
+func _process(delta: float) -> void:
+	# Paused with the tree, so the pause menu doesn't count; the title neither.
+	if _loading.is_empty() and _feyre_placed():
+		play_seconds += delta
 
 
 func register_provider(key: String, provider: Object) -> void:
@@ -50,6 +64,8 @@ func unregister_provider(key: String) -> void:
 func snapshot() -> Dictionary:
 	return {
 		"version": FORMAT_VERSION,
+		"saved_at": int(Time.get_unix_time_from_system()),
+		"play_seconds": int(play_seconds),
 		"world_state": WorldState.to_dict(),
 		"phase": PhaseManager.to_dict(),
 		"clock": Clock.to_dict(),
@@ -102,6 +118,10 @@ func can_autosave() -> bool:
 		return false
 	if StoryControl.mode != StoryControl.Mode.FULL:
 		return false
+	return _feyre_placed()
+
+
+func _feyre_placed() -> bool:
 	var placement: Object = _providers.get(PLACEMENT_KEY)
 	if placement == null or not is_instance_valid(placement):
 		return false
@@ -114,7 +134,7 @@ func autosave() -> bool:
 		_autosave_due = true
 		return false
 	_autosave_due = false
-	var err := save_game(autosave_slot)
+	var err := save_game(active_slot)
 	if err != OK:
 		push_warning("SaveSystem: autosave failed (%s)" % error_string(err))
 	return err == OK
@@ -179,6 +199,8 @@ func begin_load(slot: String = "slot_0") -> Error:
 	if int(parsed.get("version", 0)) > FORMAT_VERSION:
 		return ERR_FILE_UNRECOGNIZED
 	_loading = parsed
+	active_slot = slot
+	play_seconds = float(parsed.get("play_seconds", 0))
 	_restore_story(parsed)
 	return OK
 
@@ -197,10 +219,68 @@ func finish_load(slot: String = "slot_0") -> void:
 	EventBus.game_loaded.emit(slot)
 
 
+## A new story in a slot: what it saves goes there, from no time played.
+func begin_new(slot: String) -> void:
+	active_slot = slot
+	play_seconds = 0.0
+
+
 func delete_save(slot: String) -> void:
-	for path in [_path(slot), _path(slot) + BACKUP_SUFFIX]:
+	for path in [_path(slot), _path(slot) + BACKUP_SUFFIX, _path(slot) + ".part"]:
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(path)
+
+
+func has_save(slot: String) -> bool:
+	return FileAccess.file_exists(_path(slot)) or FileAccess.file_exists(_path(slot) + BACKUP_SUFFIX)
+
+
+func any_save() -> bool:
+	return SLOTS.any(has_save)
+
+
+## The slot played last, for Continue; "" when there is none.
+func latest_slot() -> String:
+	var best := ""
+	var best_at := -1
+	for slot in SLOTS:
+		var info := slot_info(slot)
+		if not info.is_empty() and int(info.saved_at) > best_at:
+			best = slot
+			best_at = int(info.saved_at)
+	return best
+
+
+## What the Load screen shows of a slot, without loading it: {} when empty.
+## Otherwise phase (its name, or "" if unknown), day, play_seconds (-1 when the
+## save is from before play time was kept), saved_at (unix) and readable.
+func slot_info(slot: String) -> Dictionary:
+	if not has_save(slot):
+		return {}
+	var path := _path(slot)
+	if not FileAccess.file_exists(path):
+		path += BACKUP_SUFFIX
+	var parsed: Variant = _read(path)
+	if not parsed is Dictionary:
+		parsed = _read(_path(slot) + BACKUP_SUFFIX)
+	var data: Dictionary = parsed if parsed is Dictionary else {}
+	var at := int(data.get("saved_at", FileAccess.get_modified_time(path)))
+	return {
+		"readable": not data.is_empty() and int(data.get("version", 0)) <= FORMAT_VERSION,
+		"phase": _phase_name(data.get("phase", {})),
+		"day": int(data.get("clock", {}).get("day", 0)),
+		"play_seconds": int(data.get("play_seconds", -1)),
+		"saved_at": at,
+	}
+
+
+func _phase_name(phase: Dictionary) -> String:
+	var path := String(phase.get("phase_set", ""))
+	if path == "" or not ResourceLoader.exists(path):
+		return ""
+	var phase_set := load(path) as PhaseSet
+	var def := phase_set.get_phase(StringName(phase.get("phase", ""))) if phase_set else null
+	return def.display_name if def else ""
 
 
 func _read(path: String) -> Variant:

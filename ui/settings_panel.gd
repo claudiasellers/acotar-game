@@ -9,7 +9,6 @@ class_name SettingsPanel
 extends CanvasLayer
 
 const TITLE_SCENE := "res://ui/title/title_screen.tscn"
-const SAVE_SLOT := "slot_0"
 const CARD_WIDTH := 1000.0
 ## The guidance lane's "Feyre's thoughts" setting, shown once that lane lands.
 const GUIDE_SETTINGS := "res://ui/guide/guide_settings.gd"
@@ -117,7 +116,7 @@ func _return_home() -> void:
 
 
 func _save_then(after: Callable) -> void:
-	var err := SaveSystem.save_game(SAVE_SLOT)
+	var err := SaveSystem.save_game(SaveSystem.active_slot)
 	if err != OK:
 		_toast.text = "Couldn't save (%s)." % error_string(err)
 		return

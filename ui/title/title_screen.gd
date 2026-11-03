@@ -1,15 +1,17 @@
 ## Title screen: the first thing on launch. A living 3D backdrop of the Wall at
 ## dusk (TitleBackdrop), the title set in gilt EB Garamond, and the menu:
-## Continue (only when a save exists), New Game, Settings, Quit. Starting
-## pushes the camera through the Wall into spring, then loads Act I.
+## Continue and Load (only when a save exists), New Game, Settings, Quit.
+## Starting pushes the camera through the Wall into spring, then loads Act I.
 ##
 ## Interface (docs/contracts/title.md): New Game and Continue both open
-## GAME_SCENE unchanged; Continue first sets GameSettings.pending_load_slot.
+## GAME_SCENE unchanged; Continue first sets GameSettings.pending_load_slot to
+## the story played last, Load to the one picked (TitleSlots). New Game picks
+## the slot the new story saves to (SaveSystem.begin_new).
 extends Control
 
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
-const SAVE_SLOT := "slot_0"
-const SAVE_FILE := "user://saves/slot_0.json"
+## Carries a new story's slot across the fresh program New Game starts after a game.
+const NEW_STORY_ARG := "--new-story="
 const TITLE := "Prythian"
 const SUBTITLE := "The Spring Court"
 ## The beast's Treaty rule, ch. 4 (Storykeeper's pick; verbatim).
@@ -21,8 +23,6 @@ const FONT_SEMIBOLD := preload("res://ui/title/fonts/EBGaramond-SemiBold.ttf")
 const FONT_ITALIC := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
 const GILT_SHADER := preload("res://ui/title/gilt_text.gdshader")
 
-const PEARL := Color(0.95, 0.92, 0.96)
-const BUTTER := Color(1.0, 0.91, 0.62)
 const SHADOW := Color(0.12, 0.08, 0.18, 0.75)
 
 var backdrop: TitleBackdrop
@@ -32,6 +32,7 @@ var _heading: Control
 var _marker: TextureRect
 var _veil: ColorRect
 var _settings: TitleSettings
+var _slots: TitleSlots
 var _leaving := false
 var _ambience: AudioStreamPlayer
 
@@ -45,15 +46,30 @@ func _ready() -> void:
 	add_child(backdrop)
 	_build()
 	_play_ambience()
+	var carried := new_story_from(OS.get_cmdline_user_args())
+	if carried != "":
+		# The program before already crossed the Wall; go on from its cream wash.
+		_leaving = true
+		_veil.color = Color(1.0, 0.95, 0.86, 1.0)
+		SaveSystem.begin_new(carried)
+		_load_game.call_deferred()
+		return
 	_intro()
 
 
 func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_FILE)
+	return SaveSystem.any_save()
+
+
+static func new_story_from(args: PackedStringArray) -> String:
+	for arg in args:
+		if arg.begins_with(NEW_STORY_ARG) and SaveSystem.SLOTS.has(arg.trim_prefix(NEW_STORY_ARG)):
+			return arg.trim_prefix(NEW_STORY_ARG)
+	return ""
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _leaving or (_settings != null and _settings.is_open()):
+	if _leaving or (_settings != null and _settings.is_open()) or (_slots != null and _slots.visible):
 		return
 	# Any key or click during the fade-in skips it.
 	if event.is_pressed() and _veil.color.a > 0.05 and not _leaving:
@@ -63,11 +79,59 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_continue() -> void:
-	GameSettings.pending_load_slot = SAVE_SLOT
+	GameSettings.pending_load_slot = SaveSystem.latest_slot()
 	_enter_game()
 
 
+func _on_load() -> void:
+	_open_slots(TitleSlots.Mode.LOAD)
+
+
+## With no story saved anywhere, there is nothing to choose: Story 1.
 func _on_new_game() -> void:
+	if has_save():
+		_open_slots(TitleSlots.Mode.NEW)
+	else:
+		_start_new(SaveSystem.SLOTS[0])
+
+
+func _open_slots(mode: TitleSlots.Mode) -> void:
+	if _slots == null:
+		_slots = TitleSlots.new(_on_focus)
+		_slots.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+		_slots.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		_slots.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		_slots.offset_right = _menu.offset_right
+		_slots.offset_bottom = _menu.offset_bottom
+		_slots.chosen.connect(_on_slot_chosen)
+		_slots.closed.connect(_on_slots_closed)
+		add_child(_slots)
+		move_child(_slots, _marker.get_index())
+	_menu.visible = false
+	_slots.open(mode)
+
+
+func _on_slot_chosen(slot: String) -> void:
+	if _slots.mode == TitleSlots.Mode.LOAD:
+		GameSettings.pending_load_slot = slot
+		_enter_game()
+	else:
+		_start_new(slot)
+
+
+func _on_slots_closed() -> void:
+	_menu.visible = true
+	if has_save() != buttons.has("Continue"):
+		_rebuild_menu()
+	var opener := "Load" if _slots.mode == TitleSlots.Mode.LOAD and buttons.has("Load") else "New Game"
+	(buttons[opener] as Button).grab_focus()
+
+
+## The story that was in the slot goes (the player said so), so its backup can
+## never stand in for the new one.
+func _start_new(slot: String) -> void:
+	SaveSystem.delete_save(slot)
+	SaveSystem.begin_new(slot)
 	_enter_game()
 
 
@@ -105,6 +169,8 @@ func _enter_game() -> void:
 	fade.tween_property(_menu, ^"modulate:a", 0.0, 0.5)
 	fade.tween_property(_heading, ^"modulate:a", 0.0, 0.9)
 	fade.tween_property(_marker, ^"modulate:a", 0.0, 0.3)
+	if _slots != null:
+		fade.tween_property(_slots, ^"modulate:a", 0.0, 0.5)
 	backdrop.cross_over(CROSS_SECONDS)
 	var wash := create_tween()
 	wash.tween_interval(CROSS_SECONDS * 0.55)
@@ -114,7 +180,7 @@ func _enter_game() -> void:
 
 func _load_game() -> void:
 	if PhaseManager.phase_set != null and GameSettings.pending_load_slot == "":
-		OS.create_instance(PackedStringArray())
+		OS.create_instance(PackedStringArray(["--", NEW_STORY_ARG + SaveSystem.active_slot]))
 		get_tree().quit()
 		return
 	# A new game opens with the opening film (L33), which goes on to GAME_SCENE.
@@ -145,11 +211,7 @@ func _build() -> void:
 	_menu.offset_right = -150.0
 	_menu.offset_bottom = -130.0
 	add_child(_menu)
-	var entries := [["Continue", _on_continue], ["New Game", _on_new_game], ["Settings", _on_settings], ["Quit", _on_quit]]
-	for e: Array in entries:
-		if e[0] == "Continue" and not has_save():
-			continue
-		buttons[e[0]] = _button(e[0], e[1])
+	_fill_menu()
 
 	_marker = TextureRect.new()
 	_marker.name = "RoseMarker"
@@ -167,6 +229,23 @@ func _build() -> void:
 
 	var first: Button = buttons.get("Continue", buttons["New Game"])
 	first.grab_focus.call_deferred()
+
+
+func _fill_menu() -> void:
+	var entries := [["Continue", _on_continue], ["Load", _on_load], ["New Game", _on_new_game], ["Settings", _on_settings], ["Quit", _on_quit]]
+	for e: Array in entries:
+		if e[0] in ["Continue", "Load"] and not has_save():
+			continue
+		buttons[e[0]] = _button(e[0], e[1])
+
+
+## After the last story is deleted, Continue and Load go.
+func _rebuild_menu() -> void:
+	for b in _menu.get_children():
+		_menu.remove_child(b)
+		b.queue_free()
+	buttons.clear()
+	_fill_menu()
 
 
 func _build_heading() -> Control:
@@ -223,23 +302,8 @@ func _button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.name = text.replace(" ", "")
 	b.text = text
-	b.flat = true
-	b.focus_mode = Control.FOCUS_ALL
-	b.alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	b.custom_minimum_size = Vector2(320, 58)
-	b.add_theme_font_override(&"font", FONT_MEDIUM)
-	b.add_theme_font_size_override(&"font_size", 42)
-	for state: StringName in [&"font_color", &"font_pressed_color"]:
-		b.add_theme_color_override(state, PEARL)
-	for state: StringName in [&"font_hover_color", &"font_focus_color", &"font_hover_pressed_color"]:
-		b.add_theme_color_override(state, BUTTER)
-	b.add_theme_color_override(&"font_disabled_color", Color(PEARL, 0.35))
-	b.add_theme_color_override(&"font_outline_color", SHADOW)
-	b.add_theme_constant_override(&"outline_size", 6)
-	var empty := StyleBoxEmpty.new()
-	for box: StringName in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
-		b.add_theme_stylebox_override(box, empty)
-	b.mouse_entered.connect(b.grab_focus)
+	TitleSlots.style(b, 42)
 	b.focus_entered.connect(_on_focus.bind(b))
 	b.pressed.connect(callback)
 	_menu.add_child(b)

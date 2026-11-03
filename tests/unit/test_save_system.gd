@@ -142,3 +142,30 @@ func test_landmark_thoughts_already_had_stay_had() -> void:
 	thoughts.reached.clear()
 	assert_eq(SaveSystem.load_game(SLOT), OK)
 	assert_true(thoughts.reached.has(&"bark"))
+
+
+func test_a_load_makes_its_slot_the_one_saved_to_and_carries_play_time() -> void:
+	SaveSystem.play_seconds = 754.0
+	assert_eq(SaveSystem.save_game(SLOT), OK)
+	SaveSystem.begin_new("slot_2")
+	assert_eq(SaveSystem.play_seconds, 0.0, "a new story starts its own clock")
+	assert_eq(SaveSystem.load_game(SLOT), OK)
+	assert_eq(SaveSystem.active_slot, SLOT, "Save & Title and autosave now write here")
+	assert_eq(int(SaveSystem.play_seconds), 754)
+	SaveSystem.active_slot = "slot_0"
+	SaveSystem.play_seconds = 0.0
+
+
+func test_slot_info_names_where_the_story_is() -> void:
+	assert_eq(SaveSystem.slot_info(SLOT), {}, "an empty slot")
+	Clock.from_dict({"time_of_day": 0.4, "day": 5})
+	SaveSystem.play_seconds = 3725.0
+	assert_eq(SaveSystem.save_game(SLOT), OK)
+	var info := SaveSystem.slot_info(SLOT)
+	assert_true(info.readable)
+	assert_eq(info.phase, "Explore the hill")
+	assert_eq(info.day, 5)
+	assert_eq(info.play_seconds, 3725)
+	assert_almost_eq(float(info.saved_at), Time.get_unix_time_from_system(), 5.0)
+	assert_string_starts_with(TitleSlots.details(info), "Day 5  ·  1 h 2 min played  ·  saved ")
+	SaveSystem.play_seconds = 0.0
