@@ -9,7 +9,7 @@ Out:  world/spring_court/manor_estate/flora/models/<species>.glb
 
 Look (experience bar 2.2/2.7): oversized blooms, mint-sage foliage (never
 lime), rose-taupe bark, one blossom hue per bed. Budgets: flowers <= 700 tris,
-shrubs <= 1,200, trees <= 3,000 (scatter draws thousands of these).
+shrubs <= 2,000, trees <= 3,000 (scatter draws thousands of these).
 """
 
 import math
@@ -20,13 +20,17 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 import bpy  # noqa: E402,I001
+from mathutils import Vector, noise  # noqa: E402
 import prop_kit as K  # noqa: E402
 from prop_kit import (BARK, BUTTER, LEAF, LEAF_DARK, R, S, SAGE_DEEP, SAGE_LIGHT, SAGE_SHADOW, T, WHITE, bloom, ico, layered_rose, rose_bud,  # noqa: E402
                       leaf, lighter, lathe, mix, petal, sphere, star_flower, tube, cyl)
 
 OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/models")
 F = "leaf"
-BUDGET = {"flower": 700, "groundcover": 600, "aquatic": 600, "reed": 400, "bush": 1200, "climber": 1600, "tree": 3000}
+# Triangle budgets per kind (R4 props <= 3k). Lane L61 raised "bush" from
+# 1,200 to 2,000 so the rose bushes' petals (18-tri cupped, not 8-tri folded)
+# hold up at 1 m; LOD1 stays ~50%.
+BUDGET = {"flower": 700, "groundcover": 600, "aquatic": 600, "reed": 400, "bush": 2000, "climber": 1600, "tree": 3000}
 
 
 def species():
@@ -41,10 +45,24 @@ def stem(p, a, b, r=0.01, col=LEAF_DARK, sides=3):
     p.add(tube([a, b], [r, r * 0.7], sides, caps=False), col, F)
 
 
-def blob(p, x, y, z, r, col, rng, sub=1, squash=0.85):
-    b = ico(r, sub)
-    for v in b.verts:
-        v.co *= 1.0 + rng.uniform(-0.08, 0.08)
+def blob(p, x, y, z, r, col, rng, sub=1, squash=0.85, fine=0):
+    """A foliage blob. fine=n (lane L61) is n icosphere levels finer with
+    a smooth noise lump instead of per-vertex jitter (jitter on a fine mesh
+    crinkles); it draws from `rng` exactly as the coarse blob did, so every
+    later shape in the species stays where it was."""
+    if not fine:
+        b = ico(r, sub)
+        for v in b.verts:
+            v.co *= 1.0 + rng.uniform(-0.08, 0.08)
+    else:
+        coarse = ico(r, sub)
+        n = len(coarse.verts)
+        coarse.free()
+        draws = [rng.uniform(-0.08, 0.08) for _ in range(n)]
+        seed = Vector((draws[0], draws[1], draws[2])) * 400.0
+        b = ico(r, sub + fine)
+        for v in b.verts:
+            v.co *= 1.0 + 0.1 * noise.noise(v.co.normalized() * 1.6 + seed)
     p.add(b, col, F, T(x, y, z) @ S(1, 1, squash), sharp_deg=89.0)
 
 
@@ -141,9 +159,9 @@ def rose_bush(p, h, col, rng):
         m = T(x - nx * rr * sink, y - ny * rr * sink, z - nz * rr * sink) @ R("Z", math.degrees(a)) \
             @ R("Y", 90 - e + rng.uniform(-12, 12))
         if stage == "bud":
-            rose_bud(p, m, rr, c, F, rng)
+            rose_bud(p, m, rr, c, F, rng, fine=True)
         else:
-            layered_rose(p, m, rr, c, F, rng, inner=3, outer=4 if stage == "open" else 0, cupped=True)
+            layered_rose(p, m, rr, c, F, rng, inner=3, outer=4 if stage == "open" else 0, cupped=True, fine=True)
 
 
 def cup_rose(p, center, radius, col, rng, tilt):
@@ -490,10 +508,16 @@ def tree(p, h, col, rng, kind):
         p.add(tube([(0, 0, 0.0), (h * 0.04 * math.cos(a), h * 0.04 * math.sin(a), -h * 0.01)], [h * 0.025, h * 0.01], 4), bark, F)
     crown_c = (lean, 0, trunk_h + h * 0.28)
     blossom = kind in ("cherry_blossom", "apple_blossom", "crab_apple")
+    # Lane L61: crown blobs were 20-face icosahedrons (read as crystals). They
+    # go two levels finer (320 faces) when the species' blobs fit the tree
+    # budget that way, else one (80).
+    blobs = {"willow": 5, "oak": 13}.get(kind, (7 if kind == "oak" else 6) + 1)
+    fine = 2 if blobs * 320 + 700 <= BUDGET["tree"] else 1
     if kind == "willow":
         for i in range(5):
             a = 2 * math.pi * i / 5
-            blob(p, lean + h * 0.15 * math.cos(a), h * 0.15 * math.sin(a), trunk_h + h * 0.25, h * 0.17, col if i % 2 else SAGE_LIGHT, rng, 1, 0.7)
+            blob(p, lean + h * 0.15 * math.cos(a), h * 0.15 * math.sin(a), trunk_h + h * 0.25, h * 0.17, col if i % 2 else SAGE_LIGHT, rng, 1, 0.7,
+                 fine=fine)
         for i in range(18):   # weeping curtains
             a = 2 * math.pi * i / 18
             r0 = h * 0.22
@@ -511,8 +535,8 @@ def tree(p, h, col, rng, kind):
         z = crown_c[2] + h * spread * 0.4 * math.sin(e) - h * 0.03
         p.add(tube([(lean * 0.9, 0, trunk_h * 0.95), (x * 0.8, y * 0.8, z - h * 0.05)], [h * 0.015, h * 0.008], 4), bark, F)
         c = col if i % 2 else (lighter(col, 0.15) if blossom else mix(col, SAGE_DEEP, 0.35))
-        blob(p, x, y, z, h * spread * 0.62, c, rng, 1, 0.8)
-    blob(p, crown_c[0], 0, crown_c[2] + h * spread * 0.35, h * spread * 0.75, lighter(col, 0.08), rng, 1, 0.8)
+        blob(p, x, y, z, h * spread * 0.62, c, rng, 1, 0.8, fine=fine)
+    blob(p, crown_c[0], 0, crown_c[2] + h * spread * 0.35, h * spread * 0.75, lighter(col, 0.08), rng, 1, 0.8, fine=fine)
     if blossom or kind == "pear_tree":
         for i in range(16):
             a = rng.uniform(0, 2 * math.pi)
@@ -523,11 +547,13 @@ def tree(p, h, col, rng, kind):
             if kind == "pear_tree":
                 p.add(lathe([(0, 0), (h * 0.02, h * 0.012), (h * 0.012, h * 0.035), (0, h * 0.045)], 6), (0.85, 0.92, 0.5), F, T(x, y, z - h * 0.05))
             else:
-                p.add(ico(h * 0.045, 0), WHITE if i % 3 == 0 else lighter(col, 0.2), F, T(x, y, z))
+                # smooth puffs of blossom (lane L61; a 20-tri icosahedron read as a crystal)
+                p.add(sphere(h * 0.045, 6, 4), WHITE if i % 3 == 0 else lighter(col, 0.2), F, T(x, y, z))
     if kind == "oak":
         for i in range(5):
             a = 2 * math.pi * i / 5 + 0.3
-            blob(p, lean + h * 0.42 * math.cos(a), h * 0.42 * math.sin(a), crown_c[2] - h * 0.04, h * 0.14, mix(col, SAGE_DEEP, 0.3), rng, 1, 0.75)
+            blob(p, lean + h * 0.42 * math.cos(a), h * 0.42 * math.sin(a), crown_c[2] - h * 0.04, h * 0.14, mix(col, SAGE_DEEP, 0.3), rng, 1, 0.75,
+                 fine=fine)
 
 
 # ------------------------------------------------------------ garden flowers (L35)
