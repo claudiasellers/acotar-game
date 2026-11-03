@@ -1,6 +1,6 @@
 ## Milestone screenshots and render stats for the world (needs a GPU or
 ## lavapipe; not headless):
-##   xvfb-run godot --rendering-driver vulkan res://tools/world_shot.tscn -- <shot_id> [out.png] [layout]
+##   xvfb-run godot --rendering-driver vulkan res://tools/world_shot.tscn -- <shot_id> [out.png] [layout] [tod=0.68]
 ## `layout` = cheap 640x360 layout render (ShotQuality). For many shots in one
 ## run, or numeric checks, use tools/shots/take_shots.sh instead.
 ## Loads the World scene plus the regions near the viewpoint, sets the clock
@@ -43,6 +43,9 @@ func _run() -> void:
 	var shot: Array = SHOTS[id]
 	Clock.paused = true
 	Clock.time_of_day = shot[2]
+	for a in args:
+		if a.begins_with("tod="):  # time-of-day override, e.g. tod=0.68
+			Clock.time_of_day = float(a.substr(4))
 	var root := get_tree().root
 	root.size = Vector2i(1920, 1080)
 	var world: World = load("res://world/shared/world/world.tscn").instantiate()
