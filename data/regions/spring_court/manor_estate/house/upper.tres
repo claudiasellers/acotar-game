@@ -2094,8 +2094,8 @@ yaw_deg = 180.0
 [sub_resource type="Resource" id="Resource_4vr8k"]
 script = ExtResource("5_igwsw")
 prop_id = &"wardrobe_tall"
-position = Vector3(11, 0, 2)
-yaw_deg = -90.0
+position = Vector3(11.6, 0, 2)
+yaw_deg = 90.0
 
 [sub_resource type="Resource" id="Resource_djri7"]
 script = ExtResource("5_igwsw")
@@ -3189,8 +3189,8 @@ yaw_deg = 180.0
 [sub_resource type="Resource" id="Resource_3r2f0"]
 script = ExtResource("5_igwsw")
 prop_id = &"wardrobe_tall"
-position = Vector3(1.2, 0, 4)
-yaw_deg = 90.0
+position = Vector3(0.4, 0, 4)
+yaw_deg = -90.0
 
 [sub_resource type="Resource" id="Resource_xbjku"]
 script = ExtResource("5_igwsw")

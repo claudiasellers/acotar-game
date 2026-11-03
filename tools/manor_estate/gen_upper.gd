@@ -146,7 +146,7 @@ func _level_1_main() -> void:
 	var dr := dsl.room(&"dressing_room", "Feyre's Dressing Room", 1, Rect2(30, -72, 12, 12), "X", &"carpet", ROSE)
 	dr.notes = "Outfits (wardrobe station) and makeup/hair (dressing_mirror station). A mirror door hides the jewellery closet."
 	_p(dr, [
-		[&"gown_rack", 5.6, 0.6], [&"gown_rack", 9.2, 0.6], [&"wardrobe_tall", 11.0, 2.0, -90],
+		[&"gown_rack", 5.6, 0.6], [&"gown_rack", 9.2, 0.6], [&"wardrobe_tall", 11.6, 2.0, 90],
 		[&"mannequin_gown_rose", 4.2, 5.6], [&"mannequin_gown_ball", 6.0, 7.4], [&"mannequin_gown", 7.8, 5.6],
 		[&"rug_round", 6, 6.2], [&"shoe_shelf", 0.3, 2.6, 90], [&"shoe_shelf", 0.3, 9.6, 90],
 		[&"hat_stand", 1.0, 11.2], [&"hat_stand", 2.6, 11.2], [&"dressing_screen", 4.2, 10.4, 20],
@@ -206,7 +206,7 @@ func _level_1_main() -> void:
 	var tbath := dsl.room(&"tamlin_bath", "Tamlin's Bathing & Dressing Room", 1, Rect2(24, -36, 18, 8), "X", &"marble", PERI)
 	_p(tbath, [
 		[&"bath_sunken", 12, 4.5], [&"towel_rack", 16, 7.4, 180], [&"soap_shelf", 17.8, 3, -90, 0.9],
-		[&"washstand", 4, 0.4], [&"mirror_gilt", 4, 0.15, 0, 1.5], [&"wardrobe_tall", 1.2, 4, 90],
+		[&"washstand", 4, 0.4], [&"mirror_gilt", 4, 0.15, 0, 1.5], [&"wardrobe_tall", 0.4, 4, -90],
 		[&"coat_rack", 7, 0.6], [&"chest_trunk", 1.2, 7.2], [&"bench_settle", 7, 6.8, 180],
 		[&"fern_pot", 17, 0.8], [&"chandelier_small", 12, 4, 0, 3.3], [&"candle_bank", 17.6, 6, -90],
 	])
