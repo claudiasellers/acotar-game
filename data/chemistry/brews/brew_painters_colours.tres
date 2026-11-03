@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_painters_colours"
+display_name = "Painter's colours"
+note = "Colour I made myself, from things I found. I want to paint everything."
+methods = Array[StringName]([&"infuse"])
+kind = &"pigment"
+need = {}
+forbid = Array[StringName]([])
+priority = 8
+element = &""
+color = Color(0.357, 0.482, 0.839, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_woad"])
+canon = "X"

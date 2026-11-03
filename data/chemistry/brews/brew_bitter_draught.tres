@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_bitter_draught"
+display_name = "Bitter draught"
+note = "Pretty flowers, ugly end. Never by mistake."
+methods = Array[StringName]([&"roast", &"stew", &"infuse", &"cook", &"bake", &"preserve", &"distill", &"salve", &"tincture"])
+kind = &"poison"
+need = {
+&"harm": 0.1
+}
+forbid = Array[StringName]([])
+priority = 9
+element = &""
+color = Color(0.365, 0.290, 0.431, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_foxglove", &"ing_oak_gall"])
+canon = "X"

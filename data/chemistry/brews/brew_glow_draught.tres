@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_glow_draught"
+display_name = "Glow draught"
+note = "A little lantern I can drink. The dark backs away from me."
+methods = Array[StringName]([&"distill"])
+kind = &""
+need = {
+&"bright": 2.0
+}
+forbid = Array[StringName]([])
+priority = 5
+element = &""
+color = Color(0.714, 0.949, 0.831, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_glowcap", &"ing_moss"])
+canon = "X"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_firebrand_steep"
+display_name = "Firebrand steep"
+note = "Resin and red root. The arrowhead catches as it flies. Dry grass won't forgive it."
+methods = Array[StringName]([&"steep"])
+kind = &""
+need = {
+&"warm": 1.5
+}
+forbid = Array[StringName]([])
+priority = 2
+element = &"fire"
+color = Color(1.000, 0.541, 0.239, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_pine_resin", &"ing_madder"])
+canon = "X"

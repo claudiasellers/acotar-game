@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hearthwarm_tea"
+display_name = "Hearth-warm tea"
+note = "It sits in my chest like a coal. The snow can wait."
+methods = Array[StringName]([&"infuse"])
+kind = &""
+need = {
+&"warm": 2.0
+}
+forbid = Array[StringName]([])
+priority = 2
+element = &""
+color = Color(0.788, 0.396, 0.235, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_chaga", &"ing_blackberry"])
+canon = "X"

@@ -93,7 +93,9 @@ func _sense_player(player: Node3D, dt: float) -> void:
 		# Walking is ~0.25 loud, sprinting through snow ~0.8.
 		hear(player.global_position, clampf(speed / 10.0, 0.0, 1.0) * dt * 4.0)
 
-	var scent := scent_strength(player.global_position, global_position, wind_at(global_position), scent_range)
+	# L62: a quiet brew (lavender, hollow-root) masks her scent.
+	var scent := scent_strength(player.global_position, global_position, wind_at(global_position),
+			scent_range * BrewEffects.scent_scale(player))
 	if scent > 0.0:
 		stimulate(&"scent", player.global_position, scent * dt * 1.5)
 

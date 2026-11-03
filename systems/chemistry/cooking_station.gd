@@ -7,7 +7,6 @@ extends Node3D
 signal used(station_id: StringName)
 signal cooked(result: Dictionary)
 
-const PANEL := preload("res://ui/hearth_panel.gd")
 
 @export var station: StationData = preload("res://data/stations/hearth.tres")
 ## Warmth reaches this far, fading with distance.
@@ -42,7 +41,7 @@ func heat_at(world_pos: Vector3) -> float:
 func use(user: Node) -> void:
 	used.emit(station_id)
 	if user is Feyre:
-		PANEL.open(user as Feyre, self)
+		BrewMenu.open_for(user as Feyre, self)
 
 
 ## Why the station can't be used right now, or "" when it can.
@@ -93,9 +92,16 @@ func cook(ids: Array[StringName], method: StringName) -> Dictionary:
 				Gameplay.inventory.add(StringName("pig_%s" % i.pigment))
 	else:
 		Gameplay.inventory.add_dish(result)
-	Juice.burst(self, &"unlock" if first else &"craft")
-	cooked.emit(result)
+	_celebrate(result)
 	return result
+
+
+## Sparkle, chime and bounce (R3): the bigger "unlock" burst for a new named
+## brew or a first-time combination.
+func _celebrate(result: Dictionary) -> void:
+	var discovery := bool(result.get("new_brew", false)) or bool(result.get("first_time", false))
+	Juice.burst(self, &"unlock" if discovery else &"craft")
+	cooked.emit(result)
 
 
 ## The steeped arrow type a steep result makes.
@@ -129,7 +135,8 @@ func _steep_arrows(result: Dictionary, ingredients: Array[IngredientData], neede
 	var first := Gameplay.journal.record(result, ingredients)
 	result["first_time"] = first
 	result["arrows"] = {"item_id": arrow, "count": count}
-	result["name"] = "%s (%d)" % [ItemCatalog.get_item(arrow).display_name, count]
-	Juice.burst(self, &"unlock" if first else &"craft")
-	cooked.emit(result)
+	var rule := BrewBook.get_rule(StringName(result.get("brew", &"")))
+	var arrow_name := ItemCatalog.get_item(arrow).display_name
+	result["name"] = "%s: %s (%d)" % [rule.display_name, arrow_name, count] if rule else "%s (%d)" % [arrow_name, count]
+	_celebrate(result)
 	return result

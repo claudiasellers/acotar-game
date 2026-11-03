@@ -149,7 +149,9 @@ func _harvest() -> bool:
 
 
 func _station() -> bool:
-	var station := _nearest(get_tree().get_nodes_in_group(&"station"))
+	# L62: the cottage hearth (a plain node in group "hearth") brews too.
+	var station := _nearest(get_tree().get_nodes_in_group(&"station") \
+			+ get_tree().get_nodes_in_group(ChemistryStations.HEARTH_GROUP))
 	if station == null:
 		return false
 	var id := StringName(station.get(&"station_id")) if &"station_id" in station else &""
@@ -159,6 +161,8 @@ func _station() -> bool:
 		DRESSING_ROOM.open(feyre, id)
 	elif id == &"easel":
 		PAINTING_UI.open(feyre, station)
+	elif ChemistryStations.open(feyre, station, id):
+		pass
 	station_used.emit(id)
 	return true
 

@@ -5,6 +5,8 @@ class_name ProofJournal
 extends RefCounted
 
 signal discovered(entry: Dictionary)
+## A named brew (BrewBook, lane L62) made for the first time.
+signal brew_discovered(brew_id: StringName)
 
 ## key -> entry
 var entries: Dictionary = {}
@@ -13,6 +15,8 @@ var learned_tags: Dictionary = {}
 var order: Array[String] = []
 ## Story truths Feyre has learned (story lane's journal_entry_added), in order.
 var truths: Array[StringName] = []
+## Named brews found: brew id -> {"day", "times", "key"} (the first recipe).
+var brews: Dictionary = {}
 
 
 func _init() -> void:
@@ -27,9 +31,11 @@ func add_truth(entry_id: StringName) -> bool:
 
 
 ## Records a successful result. Returns true the first time it is made.
+## Sets result.new_brew when it is a named brew found for the first time.
 func record(result: Dictionary, ingredients: Array[IngredientData] = []) -> bool:
 	if not result.get("ok", false):
 		return false
+	result["new_brew"] = _record_brew(result)
 	for i in ingredients:
 		var known: Array = learned_tags.get(String(i.id), [])
 		for tag in i.tags:
@@ -54,6 +60,23 @@ func record(result: Dictionary, ingredients: Array[IngredientData] = []) -> bool
 	return true
 
 
+func _record_brew(result: Dictionary) -> bool:
+	var id := String(result.get("brew", ""))
+	if id == "":
+		return false
+	if brews.has(id):
+		brews[id]["times"] = int(brews[id]["times"]) + 1
+		return false
+	var clock := Gameplay.autoload(&"Clock")
+	brews[id] = {"day": int(clock.get(&"day")) if clock else 0, "times": 1, "key": String(result.get("key", ""))}
+	brew_discovered.emit(StringName(id))
+	return true
+
+
+func has_brew(id: StringName) -> bool:
+	return brews.has(String(id))
+
+
 func has(key: String) -> bool:
 	return entries.has(key)
 
@@ -68,12 +91,13 @@ func known_tags(ingredient_id: StringName) -> Array:
 
 func save_state() -> Dictionary:
 	return {"entries": entries.duplicate(true), "learned_tags": learned_tags.duplicate(true), "order": order.duplicate(),
-		"truths": truths.map(func(t: StringName) -> String: return String(t))}
+		"truths": truths.map(func(t: StringName) -> String: return String(t)), "brews": brews.duplicate(true)}
 
 
 func load_state(data: Dictionary) -> void:
 	entries = (data.get("entries", {}) as Dictionary).duplicate(true)
 	learned_tags = (data.get("learned_tags", {}) as Dictionary).duplicate(true)
+	brews = (data.get("brews", {}) as Dictionary).duplicate(true)
 	order.clear()
 	for key in data.get("order", []):
 		order.append(String(key))

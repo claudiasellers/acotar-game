@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_mending_tea"
+display_name = "Mending tea"
+note = "Bitter bark, sweet hips. The ache in my hands lets go."
+methods = Array[StringName]([&"infuse"])
+kind = &""
+need = {
+&"heal": 0.3
+}
+forbid = Array[StringName]([])
+priority = 1
+element = &""
+color = Color(0.906, 0.639, 0.659, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_willow_bark", &"ing_rose_hip"])
+canon = "X"

@@ -78,6 +78,7 @@ func _ready() -> void:
 	add_child(MarketDressing.new())
 	add_child(MarketThoughts.new())
 	add_child(MarketPrompt.new())
+	add_child(BrewPrompt.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 	add_child(CastPresence.new())
