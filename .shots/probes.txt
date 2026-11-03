@@ -1,0 +1,4 @@
+from surface-model-L58
+quality look
+shot manor_drive_late res://tools/world_shot.tscn manor_drive {out}/manor_drive_late.png tod=0.68
+shot hunting_forest_late res://tools/world_shot.tscn hunting_forest {out}/hunting_forest_late.png tod=0.68
