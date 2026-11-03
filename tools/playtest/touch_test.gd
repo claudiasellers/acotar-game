@@ -5,12 +5,17 @@
 ##   route  - build the real manor house, bake its navmesh and send a wolf from
 ##            the entrance hall down the east corridor: it arrives, and walks no more
 ##            than 1.5x the straight line plus the door detour of the nav path
-##   fire   - light one tuft of dry grass: the fire reaches a neighbour <= 3 s
-##   wet    - try to light wet grass: it will not catch
+##   fire   - stream in Blossom Vale, register its grass (TouchWorld), shoot a
+##            fire arrow at a clump in a meadow: it spreads beyond the first
+##            cells within 3 s
+##   wet    - a frost arrow soaks another meadow: it will not light; unloading
+##            the region frees every ground cell
 ##   tools/mq/godot.sh res://tools/playtest/touch_test.tscn
 ## (a scene, not -s, so the autoloads the manor builder needs are loaded)
 ## Passes when the log ends "TOUCH exit 0".
 extends Node
+
+const FIRE_REGION := "res://world/spring_court/blossom_vale/blossom_vale.tscn"
 
 var _root: Node3D
 var _results: Array[String] = []
@@ -117,28 +122,81 @@ func _check_route() -> void:
 
 
 func _check_fire() -> void:
-	var field := ElementField.new()
+	# The real Blossom Vale streams in and registers its grass the way World does.
+	var touch := TouchWorld.new()
+	_root.add_child(touch)
+	var field := touch.elements
 	field.follow_world_wind = false
-	_root.add_child(field)
-	field.add_patch(Vector3(-30, 0, 0), 2.0, &"grass", 1.0)
-	var neighbour := field.cells_near(Vector3(-29, 0, 0), 0.1)[0]
-	var lit := field.ignite_at(Vector3(-30, 0, 0), 0.1)
+	var region := (load(FIRE_REGION) as PackedScene).instantiate() as Node3D
+	_root.add_child(region)
 	var frames := 0
-	while frames < 60 * 4 and not field.is_burning(neighbour):
+	while not region.get(&"is_built") and frames < 60 * 120:
+		await get_tree().process_frame
+		frames += 1
+	touch.add_ground_fuel(&"blossom_vale", region)
+	while field.ground_pending() and frames < 60 * 150:
+		await get_tree().process_frame
+		frames += 1
+	var fuel := field.ground(&"blossom_vale")
+	if fuel == null:
+		_record("fire", false, "Blossom Vale registered no ground fuel (built %s)" % region.get(&"is_built"))
+		region.queue_free()
+		touch.queue_free()
+		return
+	var spots := _meadow_spots(region, fuel, 2)
+	var start: Vector3 = spots[0]
+	var lit := field.ignite_at(start, 1.2)  # a fire arrow (forage-chemistry contract)
+	frames = 0
+	while frames < 60 * 3 and _touched(field, start, 20.0) <= lit:
 		await get_tree().physics_frame
 		frames += 1
-	var seconds := frames / 60.0
-	_record("fire", lit == 1 and field.is_burning(neighbour) and seconds <= 3.0,
-			"dry grass lit %d, neighbour caught after %.1f s (%d flames)" % [lit, seconds, field.get_node("FireFx").flame_count()])
-	var wet_cells := field.add_patch(Vector3(-30, 0, 12), 1.5, &"grass", 1.0, 0.8)
-	var wet_lit := field.ignite_at(Vector3(-30, 0, 12), 1.0)
+	var spread_s := frames / 60.0
+	await _physics(60 * 5)
+	_record("fire", lit > 0 and spread_s < 3.0,
+			"a fire arrow at a grass clump in Blossom Vale (%s) lit %d cells, the fire spread on after %.1f s, %d cells burning or burnt after %.0f s, %d flames, %d fuel squares in the region"
+			% [start.snapped(Vector3.ONE * 0.1), lit, spread_s, _touched(field, start, 20.0), spread_s + 5.0,
+			field.get_node("FireFx").flame_count(), fuel.square_count()])
+	var wet_at: Vector3 = spots[1]
+	field.soak_at(wet_at, 1.8)  # a frost arrow
+	var wet_lit := field.ignite_at(wet_at, 1.2)
 	await _physics(60)
-	var burning := 0
-	for id in wet_cells:
-		if field.is_burning(id):
-			burning += 1
-	_record("wet", wet_lit == 0 and burning == 0, "wet grass lit %d, burning after 1 s %d" % [wet_lit, burning])
-	field.queue_free()
+	var cells_before := field.cell_count()
+	touch._on_region_unloaded(&"blossom_vale")
+	_record("wet", wet_lit == 0 and _touched(field, wet_at, 3.0) == 0 and field.cell_count() == 0,
+			"soaked grass at %s lit %d; unloading the region freed %d ground cells (left %d)"
+			% [wet_at.snapped(Vector3.ONE * 0.1), wet_lit, cells_before, field.cell_count()])
+	region.queue_free()
+	touch.queue_free()
+
+
+## Grass clumps in the middle of a meadow (every square round them has fuel), 40 m apart.
+func _meadow_spots(region: Node3D, fuel: GroundFuel, n: int) -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	for layer in TouchWorld.scatter_layers(region):
+		if GroundFuel.code_for(layer) != GroundFuel.GRASS:
+			continue
+		for i in range(0, layer.count(), 7):
+			var p := (layer as ScatterLayer).position_of(i)
+			var k := GroundFuel.key_of(p)
+			var inside := true
+			for dx in range(-2, 3):
+				for dz in range(-2, 3):
+					if fuel.at(k + Vector2i(dx, dz)) == GroundFuel.NONE:
+						inside = false
+			if inside and out.all(func(q: Vector3) -> bool: return q.distance_to(p) > 40.0):
+				out.append(p)
+				if out.size() == n:
+					return out
+	return out
+
+
+## Cells round `at` that are burning or burnt.
+func _touched(field: ElementField, at: Vector3, radius: float) -> int:
+	var n := 0
+	for id in field.cells_near(at, radius):
+		if field.is_burning(id) or field.is_burnt(id):
+			n += 1
+	return n
 
 
 func _room_at(p: Vector2) -> String:

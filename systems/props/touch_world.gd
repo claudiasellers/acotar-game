@@ -4,6 +4,9 @@
 ## runs the navmesh tile around Feyre (NavBaker), the element chemistry
 ## (ElementField: fire, water, wind) and the spring weather visuals
 ## (SpringWeather), so World needs just this one node.
+## A Spring Court region's grass, reeds and hay are registered with the
+## ElementField as ground fuel once its scatter is built, and dropped when it
+## streams out. The human realm is winter: its ground never burns.
 class_name TouchWorld
 extends Node
 
@@ -35,11 +38,38 @@ func _ready() -> void:
 
 func _on_region_loaded(id: StringName, root: Node3D) -> void:
 	add_props(id, root)
+	add_ground_fuel(id, root)
 
 
-## Props go with their region root; only the cached nav source is ours to drop.
+## Props go with their region root; the cached nav source and the ground fuel are ours to drop.
 func _on_region_unloaded(id: StringName) -> void:
 	nav.region_unloaded(id)
+	elements.remove_ground(id)
+
+
+## Registers a Spring region's flammable scatter with the ElementField, now
+## or when the region finishes building it (CourtRegion, WoodsRegion `built`).
+func add_ground_fuel(id: StringName, root: Node3D, threaded: bool = true) -> void:
+	if not is_spring(root):
+		return
+	if root.get(&"is_built") == false and root.has_signal(&"built"):
+		root.connect(&"built", func() -> void:
+			if is_instance_valid(root) and root.is_inside_tree():
+				elements.add_ground(id, scatter_layers(root), threaded), CONNECT_ONE_SHOT)
+		return
+	elements.add_ground(id, scatter_layers(root), threaded)
+
+
+static func is_spring(root: Node) -> bool:
+	return root.scene_file_path.contains("/spring_court/")
+
+
+## Every ScatterLayer under a region root (its ScatterFields' layers).
+static func scatter_layers(root: Node) -> Array:
+	var out := []
+	for field in root.find_children("*", "ScatterField", true, false):
+		out.append_array((field as ScatterField).layers)
+	return out
 
 
 ## Adds the region's PropField under `root`. Returns it (null if the region has none).
