@@ -6,6 +6,12 @@
 // the odd fallen petal. With `lanes` on (drapes laid with across-UV 0..0.25),
 // two soft carriage ruts run down the middle and the edges wear into the lawn.
 // Kept below ~0.86 albedo so it never clips white at noon.
+// L56-4 (the user: "extend it out a little further ... then smooth it out by
+// gradation as it flows backward"): the stones now hold through the foreground
+// and midground and soften in three steps with distance: the fine grit goes
+// first (~12-35 m), the stones next (~30-85 m), and a coarse low-contrast
+// mottle of stone clusters carries the texture on to ~160 m. Each step fades
+// toward the average gravel tone, never to flat sand, so there is no band.
 shader_type spatial;
 render_mode cull_back;
 
@@ -17,6 +23,12 @@ uniform vec3 petal : source_color = vec3(1.0, 0.64, 0.77);
 uniform vec3 moss : source_color = vec3(0.42, 0.50, 0.30);
 uniform float stone_size = 0.045;
 uniform float lanes = 0.0;
+
+uniform float stones_near = 30.0;   // stones full strength up to here (m)
+uniform float stones_far = 85.0;    // and gone (melted into the mottle) by here
+uniform float grit_near = 12.0;
+uniform float grit_far = 35.0;
+uniform float mottle_far = 160.0;
 
 varying vec3 world_pos;
 
@@ -60,17 +72,28 @@ void vertex() {
 
 void fragment() {
 	vec2 w = world_pos.xz;
+	float dist = length(world_pos - CAMERA_POSITION_WORLD);
+	// the tone the stones average out to, so every fade lands on gravel colour
+	vec3 avg = mix(sand, mix(taupe, pearl, 0.5), 0.55);
+	float grit_fade = smoothstep(grit_far, grit_near, dist);
+	float stone_fade = smoothstep(stones_far, stones_near, dist);
+	float mottle_fade = smoothstep(mottle_far, stones_near, dist);
 	// fine grit between the stones
-	vec3 col = sand * mix(0.86, 1.06, vnoise(w * 60.0));
+	vec3 col = mix(avg, sand, stone_fade) * mix(1.0, mix(0.86, 1.06, vnoise(w * 60.0)), grit_fade);
+	// coarse mottle: clusters of lighter and darker stones, ~4 stones across
+	vec3 m = cells(w / (stone_size * 4.5) + 7.3);
+	float mot = (m.z - 0.5) * 0.14 * mottle_fade * clamp(2.4 - length(fwidth(w / (stone_size * 4.5))) * 1.6, 0.0, 1.0);
+	col *= 1.0 + mot;
 	// two grain sizes of irregular stones
 	for (int layer = 0; layer < 2; layer++) {
 		float sz = stone_size * (layer == 0 ? 1.0 : 0.55);
 		vec3 c = cells(w / sz + float(layer) * 13.1);
 		float stone = smoothstep(0.02, 0.12, c.y);          // the gaps between stones stay sand
-		// fade the stones out where a stone shrinks under a couple of pixels (no shimmer at range)
-		stone *= clamp(1.6 - length(fwidth(w / sz)) * 2.0, 0.0, 1.0);
+		// soften where a stone shrinks under a couple of pixels (no shimmer), and with distance
+		stone *= clamp(2.4 - length(fwidth(w / sz)) * 1.6, 0.0, 1.0);
+		stone *= layer == 0 ? stone_fade : grit_fade;
 		vec3 tone = c.z < 0.35 ? taupe : (c.z > 0.7 ? pearl : mix(sand, pearl, 0.45));
-		tone *= mix(0.9, 1.08, hash(vec2(c.z * 91.0, float(layer))));
+		tone *= mix(0.9, 1.08, hash(vec2(c.z * 91.0, float(layer)))) * (1.0 + mot);
 		col = mix(col, tone, stone * (layer == 0 ? 0.85 : 0.6));
 		col = mix(col, grit, step(0.97, c.z) * stone * 0.8);
 	}
