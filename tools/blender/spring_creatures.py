@@ -17,7 +17,9 @@ import bpy  # noqa: I001  (bpy must load before bmesh)
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(__file__))
+import creature_rig  # noqa: E402
 import creatures as base  # noqa: E402  (shared helpers)
+import creatures_rig_graph as rig  # noqa: E402  (lane L61: a skeleton for every model)
 
 base.OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "..", "creatures", "models", "spring")
 
@@ -67,8 +69,9 @@ def songbird(name, back, breast, cap, beak_rgb=(0.98, 0.72, 0.35)):
         wing = w.build(label)
         wing.data.materials.append(crown)
         base.set_origin(wing, (side * 0.06, 0.02, 0.15))
-        wings.append(wing)
-    base.export(name, [body, head, *wings])
+        wings.append((wing, (side * 0.06, 0.02, 0.15), (side * 0.13, -0.08, 0.145)))
+    arm = rig.rig_bird(body, g, head, (0, 0.07, 0.17), wings)
+    base.export(name, [body, head, *[w[0] for w in wings], arm])
 
 
 def rabbit():
@@ -98,7 +101,10 @@ def rabbit():
         ear.data.materials.append(fur)
         parts.append(ear)
     eyes(head, 0.085, 0.55, 0.45, 0.2, 0.24, parts)
-    base.export("rabbit", [base.join(parts, "rabbit")])
+    obj = base.join(parts, "rabbit")
+    arm = rig.rig_graph(obj, g, [("head", (0, 0.02, 0.14), tuple(head), "chest"),
+                                 ("ears", tuple(head), (0, 0.06, 0.45), "head")])
+    base.export("rabbit", [obj, arm])
 
 
 def lamb():
@@ -131,7 +137,9 @@ def lamb():
     for side in (-1, 1):
         for y in (0.13, -0.17):
             parts.append(base.sphere(f"Hoof{side}{y}", (side * 0.09, y, 0.02), 0.032, hoof, 8))
-    base.export("lamb", [base.join(parts, "lamb")])
+    obj = base.join(parts, "lamb")
+    arm = rig.rig_graph(obj, g, [("head", (0, 0.12, 0.32), tuple(head), "chest")])
+    base.export("lamb", [obj, arm])
 
 
 def swan():
@@ -153,7 +161,9 @@ def swan():
     parts = [body, base.cone("Beak", (0, 0.37, 0.7), (0, 0.46, 0.67), 0.025, beak, 8),
              base.sphere("Knob", (0, 0.365, 0.715), 0.02, black, 8)]
     eyes(Vector((0, 0.34, 0.7)), 0.05, 0.75, 0.25, 0.15, 0.16, parts, sparkle=False)
-    base.export("swan", [base.join(parts, "swan")])
+    obj = base.join(parts, "swan")
+    arm = rig.rig_graph(obj, g)
+    base.export("swan", [obj, arm])
 
 
 def flier(name, wing_shape, body_len, body_r):
@@ -177,7 +187,8 @@ def flier(name, wing_shape, body_len, body_r):
     body = bpy.context.active_object
     body.data.materials.append(mat)
     obj = base.join([wings, body], name)
-    base.export(name, [obj])
+    arm = rig.rig_single(obj)
+    base.export(name, [obj, arm])
 
 
 def small_quadruped(name, spec, coat_rgb, belly_rgb, eye_rgb=(0.05, 0.04, 0.04), nose_rgb=(0.2, 0.12, 0.12),
@@ -194,7 +205,12 @@ def small_quadruped(name, spec, coat_rgb, belly_rgb, eye_rgb=(0.05, 0.04, 0.04),
     eyes(head, spec["head"], 0.55, spec.get("eye_fwd", 0.55), 0.25, spec.get("eye", 0.2), parts)
     if extra:
         extra(g, head, parts)
-    base.export(name, [base.join(parts, name)])
+    # The wolves' quadruped skeleton (creature_rig), with no clips (lane L61).
+    arm = creature_rig.build_armature(g, spec)
+    obj = base.join(parts, name)
+    creature_rig.weight_body(obj, arm)
+    creature_rig.skin(obj, arm)
+    base.export(name, [obj, arm])
 
 
 def fox():

@@ -165,8 +165,33 @@ def tris(objs):
     return total
 
 
+SMOOTH_ANGLE = 75.0
+
+
+def smooth_by_angle(obj, angle=SMOOTH_ANGLE):
+    """Lane L61: flat-shaded faces (Blender primitives: cones, the Suriel's
+    robe) are smoothed, keeping edges sharper than `angle` crisp, so nothing
+    reads as faceted at 1 m while claw and fang tips stay sharp."""
+    if obj.type != "MESH":
+        return
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    flat = [f for f in bm.faces if not f.smooth]
+    if flat:
+        limit = math.radians(angle)
+        for e in bm.edges:
+            if len(e.link_faces) == 2 and not all(f.smooth for f in e.link_faces) and e.calc_face_angle(0.0) > limit:
+                e.smooth = False
+        for f in flat:
+            f.smooth = True
+        bm.to_mesh(obj.data)
+    bm.free()
+
+
 def export(name, objs, vertex_colors=False):
     os.makedirs(OUT, exist_ok=True)
+    for o in objs:
+        smooth_by_angle(o)
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
         o.select_set(True)
@@ -584,8 +609,10 @@ def bird():
         wing = w.build(label)
         wing.data.materials.append(coat)
         set_origin(wing, (side * 0.045, 0.03, 0.17))
-        wings.append(wing)
-    export("bird", [body, head, *wings])
+        wings.append((wing, (side * 0.045, 0.03, 0.17), (side * 0.17, -0.07, 0.165)))
+    import creatures_rig_graph as rig  # lane L61: a skeleton for the bird too
+    arm = rig.rig_bird(body, g, head, (0, 0.09, 0.18), wings)
+    export("bird", [body, head, *[w[0] for w in wings], arm])
 
 
 if __name__ == "__main__":
