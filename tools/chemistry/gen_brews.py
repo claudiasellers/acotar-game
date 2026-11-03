@@ -89,10 +89,10 @@ brew("brew_oakheart_draught", "Oakheart draught", ["distill"], {"strong": 2.0}, 
      "Tastes like the forest floor. The bowstring comes back like nothing.")
 brew("brew_iron_will_tincture", "Iron-will tincture", ["tincture"], {"keen": 2.0, "steady": 1.5}, 6,
      "fae_potion_room", ["ing_lilac", "ing_juniper_berry", "ing_woad"], "8fa3d6",
-     "Nesta never needed a bottle for this. I do. Glamour slides, and I see the seams.")
+     "Nesta never needed a bottle for this. I do. Something's painted the wrong shade, and I notice the seams.")
 brew("brew_giddy_tincture", "Giddy tincture", ["tincture"], {"strong": 1.0, "fae_toll": 0.4}, 7,
      "fae_potion_room", ["ing_faerie_wine", "ing_honey"], "f0a6d8",
-     "One drop and the music gets louder. Careful.")
+     "One drop and the music gets louder. I'll pay for it in the morning.")
 brew("brew_bitter_draught", "Bitter draught", NOT_STEEP, {"harm": 0.1}, 9,
      "stillroom", ["ing_foxglove", "ing_oak_gall"], "5d4a6e",
      "Pretty flowers, ugly end. Never by mistake.", kind="poison")

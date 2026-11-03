@@ -4,6 +4,8 @@
 # gate: when:story/film/opening/*,world/spring_court/shared/models/*,tools/woods/blender/*,creatures/*,data/creatures/*
 extends GutTest
 
+const PUCA := preload("res://creatures/fae/puca.tscn")
+
 
 func test_opening_film_trees_are_models_not_cylinders() -> void:
 	var stage := WolfEyeStage.new()
@@ -45,6 +47,24 @@ func test_every_creature_data_names_a_model() -> void:
 		if res is CreatureData and (res as CreatureData).model_scene == null:
 			missing.append(path)
 	assert_eq(missing, [] as Array[String], "CreatureData without model_scene")
+
+
+## Nothing that has a model builds a code-built stand-in: every species, the
+## family, the puca's images and the Summer faerie. Game code only logs a
+## stand-in (the owner plays debug builds), so this is the hard failure.
+func test_nothing_builds_a_code_built_stand_in() -> void:
+	var before := PlaceholderBody.stand_ins_built
+	for path in _files("res://data/creatures", ".tres"):
+		var res := load(path)
+		if res is CreatureData:
+			PlaceholderBody.build(res as CreatureData).free()
+	for id in [&"nesta", &"elain", &"father"]:
+		var member := FamilyMember.new()
+		member.member_id = id
+		add_child_autofree(member)
+	add_child_autofree(PUCA.instantiate())
+	add_child_autofree(SummerFaerie.new())
+	assert_eq(PlaceholderBody.stand_ins_built - before, 0, "code-built stand-ins (see the errors above)")
 
 
 func _models(dir: String) -> Array[String]:

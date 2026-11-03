@@ -1,7 +1,7 @@
 ## "E  Brew at the kitchen range": the key hint within arm's reach of any
 ## station that brews (lane L62), drawn like the satchel's leather keys. A
 ## hint at arm's length, never a marker (R2). It also gives Feyre her brew
-## aura (BrewAura), so a bright brew glows however she drank it.
+## tells (BrewTells), so a brew shows however she drank it.
 class_name BrewPrompt
 extends CanvasLayer
 
@@ -45,7 +45,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre:
-		BrewAura.ensure(feyre)
+		BrewTells.ensure(feyre)
 	showing = target(feyre)
 	if showing:
 		_glyph.text = "A" if SatchelHud.pad_active else "E"
