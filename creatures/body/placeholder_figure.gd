@@ -10,6 +10,7 @@ extends RefCounted
 ## pointed_ears (bool), mask (Color, alpha 0 = none), wings (Color, alpha 0 =
 ## none), stoop (degrees), cane (bool).
 static func build(spec: Dictionary) -> Node3D:
+	PlaceholderBody.stand_in("a figure %s" % spec)
 	var root := Node3D.new()
 	root.name = "Figure"
 	var h: float = spec.get("height", 1.85)

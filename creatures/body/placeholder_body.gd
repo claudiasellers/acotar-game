@@ -9,9 +9,25 @@ static func build(data: CreatureData) -> Node3D:
 		var model := data.model_scene.instantiate() as Node3D
 		model.scale = Vector3.ONE * data.model_scale
 		return model
+	stand_in("creature %s" % data.resource_path)
 	if data.body_plan == CreatureData.BodyPlan.BIRD:
 		return _bird(data)
 	return _quadruped(data)
+
+
+## Lane L61 (render program T4): a code-built body in place of a real model
+## is a bug now that every species and cast member has one, so it is loud:
+## an error always, and in debug builds an assert stops on it. Tests that
+## mean to build one set `stand_ins_allowed`. The mesh helpers below (_mat,
+## _sphere, _cylinder, _box) stay free to use for props.
+static var stand_ins_allowed := false
+
+
+static func stand_in(what: String) -> void:
+	if stand_ins_allowed:
+		return
+	push_error("Code-built stand-in for %s: its model is missing" % what)
+	assert(stand_ins_allowed, "Code-built stand-in for %s: its model is missing" % what)
 
 
 static func _quadruped(data: CreatureData) -> Node3D:
