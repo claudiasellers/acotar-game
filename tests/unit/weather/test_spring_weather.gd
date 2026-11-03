@@ -39,3 +39,21 @@ func test_weather_fog_defaults_to_zero_and_is_clamped() -> void:
 	assert_lte(GradeDirector.MAX_WEATHER_FOG, 0.04)
 	g.set_weather_fog(-1.0)
 	assert_eq(g.weather_fog, 0.0)
+
+
+func test_weather_steps_aside_while_a_story_scene_runs() -> void:
+	var w := SpringWeather.new()
+	add_child_autofree(w)
+	var space := SceneSpace.new()
+	add_child_autofree(space)
+	w.active = true
+	w.mist = 1.0
+	w.precipitation = 0.7
+	assert_almost_eq(w.fog_offset(), GradeDirector.MAX_WEATHER_FOG, 0.00001, "mist outside scenes")
+	space.running = true
+	w.held = w.story_running()
+	assert_true(w.held, "sees the running scene")
+	assert_eq(w.fog_offset(), 0.0, "no weather fog during a scene")
+	space.running = false
+	w.held = w.story_running()
+	assert_false(w.held, "back after the scene")

@@ -7,6 +7,10 @@
 ##   ElementField.rain (wets what can burn, puts fires out);
 ## - wind: wind_ms() for the chemistry; gusts above GUST m/s burst petals;
 ## - mist: GradeDirector.set_weather_fog() (an offset, presets untouched).
+## Story scenes come first: while any SceneSpace (or a StoryMoment's
+## MomentSpace) runs, the mist offset is held at 0 and rain and petal gusts
+## stop, then return after (the Bogge's fog, the puca and the beast at the
+## door are graded scenes of their own).
 ## A Weather node in the scene (systems/elements) wins for precipitation and
 ## wind when there is one. States: spring_clear, spring_showers, spring_mist,
 ## spring_breeze, from EventBus.weather_requested or one per day.
@@ -37,6 +41,9 @@ var mist := 0.0
 var base_wind := 2.5
 var wetness := 0.0
 var active := false
+## True while a story scene runs (weather steps aside).
+var held := false
+var _spaces: Array[WeakRef] = []
 
 var _target := Vector3(0.0, 0.0, 2.5)
 var _ease_rate := 1.0 / 6.0
@@ -55,6 +62,25 @@ func _ready() -> void:
 	EventBus.day_started.connect(_on_day_started)
 	_rain = _make_rain()
 	add_child(_rain)
+	for n in get_tree().root.find_children("*", "SceneSpace", true, false):
+		_spaces.append(weakref(n))
+	get_tree().node_added.connect(_on_node_added)
+
+
+func _on_node_added(node: Node) -> void:
+	if node is SceneSpace:
+		_spaces.append(weakref(node))
+
+
+## True while any story scene is running.
+func story_running() -> bool:
+	for i in range(_spaces.size() - 1, -1, -1):
+		var space := _spaces[i].get_ref() as SceneSpace
+		if space == null:
+			_spaces.remove_at(i)
+		elif space.running:
+			return true
+	return false
 
 
 static func ensure_wetness_global() -> void:
@@ -85,6 +111,7 @@ func wind_ms() -> Vector3:
 func _process(delta: float) -> void:
 	_time += delta
 	active = _in_spring()
+	held = story_running()
 	var goal := _target if active else Vector3(0.0, 0.0, base_wind)
 	var weather := Weather.find(get_tree())
 	if weather and active:
@@ -95,7 +122,7 @@ func _process(delta: float) -> void:
 	wetness = step_wetness(wetness, precipitation, delta)
 	_update_rain()
 	_gust_cooldown -= delta
-	if active and _gust_cooldown <= 0.0 and wind_ms().length() >= GUST:
+	if active and not held and _gust_cooldown <= 0.0 and wind_ms().length() >= GUST:
 		_gust_cooldown = GUST_COOLDOWN
 		petal_gust()
 	_slow_tick -= delta
@@ -155,16 +182,21 @@ func _apply_slow() -> void:
 	RenderingServer.global_shader_parameter_set(WETNESS_GLOBAL, wetness)
 	var field := ElementField.find(get_tree())
 	if field:
-		field.rain = precipitation if active else 0.0
+		field.rain = precipitation if active and not held else 0.0
 	var grades := get_tree().get_first_node_in_group(&"world")
 	var director := grades.get_node_or_null(^"GradeDirector") if grades else null
 	if director and director.has_method(&"set_weather_fog"):
-		director.call(&"set_weather_fog", mist * GradeDirector.MAX_WEATHER_FOG if active else 0.0)
+		director.call(&"set_weather_fog", fog_offset())
+
+
+## The mist offset GradeDirector gets: 0 outside the Spring Court and during story scenes.
+func fog_offset() -> float:
+	return mist * GradeDirector.MAX_WEATHER_FOG if active and not held else 0.0
 
 
 func _update_rain() -> void:
 	var cam := get_viewport().get_camera_3d() if get_viewport() else null
-	var on := active and precipitation > 0.02 and cam != null
+	var on := active and not held and precipitation > 0.02 and cam != null
 	_rain.emitting = on
 	if not on:
 		return
