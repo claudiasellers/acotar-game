@@ -50,6 +50,7 @@ vec3 to_linear(vec3 c) {
 #define CANDY_BACKLIGHT_DEFAULT 0.8
 #define CANDY_NO_SPEC_LOBE
 #define CANDY_BACKLIGHT_SCALE (1.0 - v_blight)
+#define CANDY_RIM_SCALE (1.0 - v_blight)
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
@@ -83,7 +84,6 @@ void fragment() {
 	ROUGHNESS = mix(mix(roughness_value, 0.55, snow), 1.0, v_blight);
 	SPECULAR = 0.3;
 	float alive = 1.0 - v_blight;
-	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = sparkle * magic_amount * alive;
 	if (s > 0.0) {
@@ -93,6 +93,6 @@ void fragment() {
 		glint = sparkle_color.rgb * twinkle * 3.0;
 	}
 	float glow = clamp(v_color.a, 0.0, 1.0) * emission_glow * mix(1.0, 0.1, v_blight);
-	EMISSION = (rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) + glint) * alive + col * glow;
+	EMISSION = glint * alive + col * glow;  // the rim is lit in candy_lit's light()
 	BACKLIGHT = col * translucency * alive;
 }

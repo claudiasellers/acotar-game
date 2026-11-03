@@ -50,3 +50,24 @@ func test_material_library_returns_candy_kinds() -> void:
 	for kind in MaterialLibrary.KINDS:
 		var m := MaterialLibrary.get_material(kind, Color(0.8, 0.7, 0.9))
 		assert_true(MaterialLibrary.is_candy(m), "%s is candy_lit" % kind)
+
+
+func test_material_library_holds_the_albedo_cap() -> void:
+	assert_almost_eq(CandyMaterial.MAX_ALBEDO, 0.85, 0.0001)
+	for kind in MaterialLibrary.KINDS:
+		var m := MaterialLibrary.get_material(kind, Color.WHITE)
+		var cm := m as CandyMaterial
+		if cm == null or cm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+			continue
+		var shown := cm.shown_albedo()
+		assert_lte(maxf(shown.r, maxf(shown.g, shown.b)), 0.8501, "%s albedo capped" % kind)
+	var surface := (load(CandyMaterial.SURFACE_INC) as ShaderInclude).code
+	assert_true(surface.contains("uniform float albedo_cap : hint_range(0.0, 1.0) = 0.85;"), "cap defaults to D9")
+	assert_true(surface.contains("ALBEDO = min(col.rgb, vec3(albedo_cap));"), "lit surfaces apply the cap")
+
+
+func test_the_candy_rim_is_lit_not_emissive() -> void:
+	var code := (load("res://world/shared/shaders/candy_lit.gdshaderinc") as ShaderInclude).code
+	assert_false(code.contains("EMISSION"), "candy_lit never writes EMISSION")
+	assert_true(code.contains("SPECULAR_LIGHT += rim_color.rgb"), "the rim is added per light")
+	assert_true(code.contains("#define CANDY_RIM_STRENGTH_DEFAULT 0.0"), "default rim off")
