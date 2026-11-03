@@ -108,7 +108,6 @@ void fragment() {
 	ALPHA_SCISSOR_THRESHOLD = alpha_scissor;
 	ROUGHNESS = mix(roughness_value, 0.55, snow);
 	SPECULAR = 0.3;
-	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = sparkle * magic_amount;
 	if (s > 0.0) {
@@ -117,6 +116,6 @@ void fragment() {
 		float twinkle = step(0.985 - s * 0.03, h) * (0.5 + 0.5 * sin(TIME * 6.0 + h * 40.0));
 		glint = sparkle_color.rgb * twinkle * 3.0;
 	}
-	EMISSION = rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) + glint + col * emission_glow;
+	EMISSION = glint + col * emission_glow;  // the rim is lit in candy_lit's light()
 	BACKLIGHT = col * translucency;
 }

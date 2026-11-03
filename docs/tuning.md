@@ -24,10 +24,11 @@ each shader, chosen to reproduce the look each one had before T2.
 | `ground_bounce` | candy_lit.gdshaderinc | 0.0 | 0–1 | T3a hook: light the lit ground throws back into the shade band. | L58 (set by T3a) |
 | `ground_bounce_color` | candy_lit.gdshaderinc | (1.0, 0.92, 0.86) | colour | Colour of that bounce. | L58 (set by T3a) |
 | `backlight_strength` | candy_lit.gdshaderinc | 0.0; 0.8 court foliage | 0–4 | Petals glowing when the sun is behind them. | L58 |
-| `rim_color` | candy_lit.gdshaderinc | (1.0, 0.86, 0.74) median of the old rims; foliage/court props keep theirs | colour | Warm emissive silhouette rim. | L58 |
-| `rim_strength` | candy_lit.gdshaderinc | 0.0 surfaces (they had none); 0.6 stylized/court foliage; 0.55 woods; 0.4 court props | 0–2 | Rim brightness; scaled by `magic_amount` (0.25× under dread). | L58 |
+| `rim_color` | candy_lit.gdshaderinc | (1.0, 0.86, 0.74) median of the old rims; foliage/court props keep theirs | colour | Colour of the candy rim. The rim is **lit**: added per light, scaled by the light's colour and shadow, never an additive glow (director rule, L58-2). | L58 |
+| `rim_strength` | candy_lit.gdshaderinc | 0.0 surfaces; 0.6 stylized/court foliage; 0.55 woods; 0.4 court props (their pre-T2 values, now lit) | 0–2 | Rim brightness; scaled by `magic_amount` (0.25× under dread) and, on court/woods foliage, by blight/drain. | L58 |
 | `rim_power` | candy_lit.gdshaderinc | 3.0 | 0.5–8 | Rim falloff (`candy_fresnel`, the one fresnel curve; skin, fur, bark, water and FX call it too). | L58 |
 | `specular` | candy_lit.gdshaderinc | 0.5 | 0–1 | Dielectric reflectance (StandardMaterial3D `metallic_specular`). | L58 |
+| `albedo_cap` | candy_surface.gdshaderinc (`CandyMaterial.MAX_ALBEDO`) | 0.85 (hex D9) | 0–1 | Glare rule (L18-4): the most a lit candy surface reflects per channel, applied after texture and vertex colour. Unshaded FX are exempt. | L58 |
 | `pearl` | candy_surface.gdshaderinc | 0.0 | 0–1 | Pearlescent sheen at grazing angles (CandyMaterial surfaces). | L58 |
 | `glitter` | candy_surface.gdshaderinc | 0.0 | 0–1 | Twinkling glitter cells; scaled by `magic_amount`. | L58 |
 | `glitter_scale` | candy_surface.gdshaderinc | 18.0 | >0 | Glitter cells per metre. | L58 |

@@ -8,6 +8,8 @@
 //   tint   = mix(shade_tint, 1, band)
 //   diffuse = mix(1, ALBEDO, light_albedo_mix) * tint * band * burley * diffuse_gain
 //   + ground_bounce in the shade band (T3a hook, 0 now)
+//   + the candy rim: rim_color * candy_fresnel * rim_strength, LIT by each light
+//     (scaled by its colour and shadowing), never an additive glow
 //   + Godot's own light rim (CANDY_LOBES), clearcoat (CANDY_COAT) and GGX specular.
 //
 // Optional defines, set before the #include:
@@ -21,6 +23,7 @@
 //   CANDY_WRAP_DEFAULT, CANDY_SHADE_DEFAULT, CANDY_ALBEDO_MIX_DEFAULT,
 //   CANDY_GAIN_DEFAULT, CANDY_BURLEY_DEFAULT, CANDY_RIM_STRENGTH_DEFAULT,
 //   CANDY_RIM_COLOR_DEFAULT, CANDY_BACKLIGHT_DEFAULT: per-family defaults.
+//   CANDY_RIM_SCALE      expression scaling the rim (e.g. (1.0 - v_blight))
 
 #ifndef CANDY_WRAP_DEFAULT
 #define CANDY_WRAP_DEFAULT 0.0
@@ -88,10 +91,6 @@ varying float v_coat_rough;
 
 #include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
-// The warm emissive rim, withdrawn under dread like every other magic sparkle.
-vec3 candy_rim_emission(vec3 n, vec3 v) {
-	return rim_color.rgb * candy_fresnel(n, v, rim_power) * rim_strength * mix(0.25, 1.0, clamp(magic_amount, 0.0, 1.0));
-}
 
 float candy_band(float x) {
 	vec4 r = texture(diffuse_ramp, vec2(x, 0.5));
@@ -138,6 +137,14 @@ void light() {
 		back *= CANDY_BACKLIGHT_SCALE;
 #endif
 		DIFFUSE_LIGHT += alb * back * lc * 0.6;
+	}
+	if (rim_strength > 0.0) {
+		// Lit, never glowing: the light's colour and shadow scale it; withdrawn under dread.
+		float rim_amt = candy_fresnel(NORMAL, VIEW, rim_power) * rim_strength * mix(0.25, 1.0, clamp(magic_amount, 0.0, 1.0));
+#ifdef CANDY_RIM_SCALE
+		rim_amt *= CANDY_RIM_SCALE;
+#endif
+		SPECULAR_LIGHT += rim_color.rgb * rim_amt * lc;
 	}
 #ifdef CANDY_LOBES
 	if (v_rim > 0.0) {

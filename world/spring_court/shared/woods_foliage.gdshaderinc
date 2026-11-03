@@ -29,6 +29,7 @@ varying float v_glow;
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.84, 0.76, 1.0)
 #define CANDY_RIM_STRENGTH_DEFAULT 0.55
 #define CANDY_NO_SPEC_LOBE
+#define CANDY_RIM_SCALE (1.0 - drain)
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
@@ -52,7 +53,6 @@ void fragment() {
 	ALBEDO = col;
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.35;
-	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = (sparkle + v_glow * 0.6) * magic_amount * (1.0 - drain);
 	if (s > 0.0) {
@@ -61,7 +61,6 @@ void fragment() {
 		float twinkle = step(0.996 - s * 0.012, h) * pow(0.5 + 0.5 * sin(TIME * 4.0 + h * 40.0), 4.0);
 		glint = sparkle_color.rgb * twinkle * 3.0;
 	}
-	EMISSION = rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) * (1.0 - drain)
-			+ glint + col * v_glow * glow_energy;
+	EMISSION = glint + col * v_glow * glow_energy;
 	BACKLIGHT = col * translucency;
 }

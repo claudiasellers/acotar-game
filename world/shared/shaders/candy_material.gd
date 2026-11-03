@@ -13,6 +13,9 @@ extends ShaderMaterial
 const SURFACE_INC := "res://world/shared/shaders/candy_surface.gdshaderinc"
 const DEFAULT_SHADER := "res://world/shared/shaders/candy_lit.gdshader"
 const VARIANT_DIR := "res://world/shared/shaders/candy/"
+## Glare rule (L18-4): the most a lit candy surface reflects per channel (hex D9).
+## candy_surface applies it to the final albedo (colour x texture x vertex colour).
+const MAX_ALBEDO := 0.85
 
 static var _variants: Dictionary = {}
 
@@ -170,6 +173,14 @@ var glitter: float:
 
 func _init() -> void:
 	_rebuild()
+
+
+## The albedo a lit candy surface actually shows for a colour (the shader's cap).
+func shown_albedo(c: Color = albedo_color) -> Color:
+	if shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+		return c
+	var cap: float = _get_param(&"albedo_cap", MAX_ALBEDO)
+	return Color(minf(c.r, cap), minf(c.g, cap), minf(c.b, cap), c.a)
 
 
 func _get_param(param: StringName, fallback: Variant) -> Variant:

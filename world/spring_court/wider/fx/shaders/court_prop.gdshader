@@ -44,6 +44,7 @@ vec3 to_linear(vec3 c) {
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.88, 0.76, 1.0)
 #define CANDY_RIM_STRENGTH_DEFAULT 0.4
 #define CANDY_SOFT_SPEC
+#define CANDY_RIM_SCALE (1.0 - v_blight)
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
@@ -87,7 +88,6 @@ void fragment() {
 	ROUGHNESS = mix(roughness_value, 1.0, b);
 	METALLIC = metallic_value * alive;
 	SPECULAR = 0.4;
-	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	float glow = clamp(v_color.a, 0.0, 1.0) * emission_glow * mix(1.0, 0.1, b);
-	EMISSION = (emit + rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount)) * alive + col * glow;
+	EMISSION = emit * alive + col * glow;  // the rim is lit in candy_lit's light()
 }

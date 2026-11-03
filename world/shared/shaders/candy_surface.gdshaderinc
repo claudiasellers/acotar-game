@@ -32,6 +32,9 @@ uniform vec3 uv1_scale = vec3(1.0);
 uniform vec3 uv1_offset = vec3(0.0);
 uniform float alpha_scissor_threshold : hint_range(0.0, 1.0) = 0.5;
 uniform float grow = 0.0;
+// Glare rule (L18-4): lit candy surfaces never exceed 0.85 albedo per channel
+// (hex D9), whatever the colour, texture or vertex colour says.
+uniform float albedo_cap : hint_range(0.0, 1.0) = 0.85;
 group_uniforms emission;
 uniform bool emission_enabled = false;
 uniform vec4 emission : source_color = vec4(0.0, 0.0, 0.0, 1.0);
@@ -116,12 +119,16 @@ void fragment() {
 		float hsh = candy_hash(floor(candy_world_pos * glitter_scale));
 		emit += glitter_color.rgb * step(0.985 - g * 0.03, hsh) * (0.5 + 0.5 * sin(TIME * 6.0 + hsh * 40.0)) * 3.0;
 	}
+#ifdef CANDY_UNSHADED
 	ALBEDO = col.rgb;
+#else
+	ALBEDO = min(col.rgb, vec3(albedo_cap));
+#endif
 #ifndef CANDY_UNSHADED
 	vec4 orm = texture(orm_texture, UV);
 	ROUGHNESS = roughness * orm.g;
 	METALLIC = metallic * orm.b;
-	EMISSION = emit + candy_rim_emission(NORMAL, VIEW);
+	EMISSION = emit;
 #ifdef CANDY_LOBES
 	candy_lobes(specular, rim, rim_tint);
 #endif
