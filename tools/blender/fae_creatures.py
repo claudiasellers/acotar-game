@@ -16,6 +16,7 @@ import bpy  # noqa: I001  (bpy must load before bmesh)
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(__file__))
+import creatures_rig_graph as rig  # noqa: E402
 import creatures as base  # noqa: E402  (shared helpers)
 
 base.OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "..", "creatures", "models", "fae")
@@ -172,7 +173,8 @@ def suriel():
         return _scale_islands(P, mat == "Eyes", eyes_c, 1.4)
 
     face_keys(obj, [("threat", grin), ("eyes_wide", eyes_wide)])
-    base.export("suriel", [obj])
+    arm = rig.rig_graph(obj, g)  # lane L61: graph skeleton, no clips
+    base.export("suriel", [obj, arm])
 
 
 def naga():
@@ -242,7 +244,8 @@ def naga():
         return _scale_islands(P, mat == "Eyes", eyes_c, 1.3)
 
     face_keys(obj, [("threat", smile), ("tongue", tongue_out), ("eyes_wide", eyes_wide)])
-    base.export("naga", [obj])
+    arm = rig.rig_graph(obj, g)  # lane L61: graph skeleton, no clips
+    base.export("naga", [obj, arm])
 
 
 def attor():
@@ -334,7 +337,8 @@ def attor():
         return d
 
     face_keys(obj, [("threat", roar), ("ears_back", ears_back)])
-    base.export("attor", [obj])
+    arm = rig.rig_graph(obj, g)  # lane L61: graph skeleton, no clips
+    base.export("attor", [obj, arm])
 
 
 def white_horse():

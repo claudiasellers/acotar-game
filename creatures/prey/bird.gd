@@ -17,11 +17,19 @@ var _peck_timer: float = 0.0
 var hushed: bool = false
 var _dread_left: float = 0.0
 var _flap: float = 0.0
+var _head_down: bool = false
+## The model's skeleton (lane L61): head and wings are skinned to bones
+## "head", "wing_l" and "wing_r". Null for an old unrigged model, whose Head,
+## WingL and WingR are plain child nodes.
+var _skeleton: Skeleton3D
 
 
 func _ready() -> void:
 	super._ready()
 	senses.sensed.connect(_on_sensed)
+	if model:
+		var found := model.find_children("*", "Skeleton3D", true, false)
+		_skeleton = found[0] as Skeleton3D if not found.is_empty() else null
 
 
 func _on_sensed(_kind: StringName, at: Vector3, _strength: float) -> void:
@@ -76,9 +84,8 @@ func _think(delta: float) -> void:
 	_peck_timer -= delta
 	if _peck_timer <= 0.0:
 		_peck_timer = randf_range(0.6, 2.5)
-		var head := model.get_node_or_null(^"Head") as Node3D
-		if head:
-			head.rotation.x = -0.6 if head.rotation.x == 0.0 else 0.0
+		_head_down = not _head_down
+		_swing(&"Head", &"head", Vector3.RIGHT, -0.6 if _head_down else 0.0)
 		rotation.y += randf_range(-1.0, 1.0)
 
 
@@ -95,14 +102,33 @@ func _fly(delta: float) -> void:
 	velocity = velocity.move_toward(desired, 12.0 * delta)
 	face_towards(global_position + flat, delta)
 	_flap += delta * 22.0
-	for wing_name in [&"WingL", &"WingR"]:
-		var wing := model.get_node_or_null(NodePath(wing_name)) as Node3D
-		if wing:
-			wing.rotation.z = sin(_flap) * 0.9 * (1.0 if wing_name == &"WingL" else -1.0)
+	_swing(&"WingL", &"wing_l", Vector3.BACK, sin(_flap) * 0.9)
+	_swing(&"WingR", &"wing_r", Vector3.BACK, -sin(_flap) * 0.9)
 	move_and_slide()
 	if state == State.LAND and is_on_floor():
 		state = State.PECK
 		senses.awareness = 0.0
+
+
+## Turns a part by `angle` about a model-space axis through its joint: the
+## bone when the model is skinned, else the part's own node (rotation.x for
+## RIGHT, rotation.z for BACK, as before).
+func _swing(part: StringName, bone: StringName, axis: Vector3, angle: float) -> void:
+	if _skeleton:
+		var i := _skeleton.find_bone(bone)
+		if i < 0:
+			return
+		var g := _skeleton.get_bone_global_rest(i).basis.orthonormalized()
+		var rest := _skeleton.get_bone_rest(i).basis.get_rotation_quaternion()
+		_skeleton.set_bone_pose_rotation(i, rest * Quaternion((g.inverse() * axis).normalized(), angle))
+		return
+	var node := model.get_node_or_null(NodePath(part)) as Node3D
+	if node == null:
+		return
+	if axis == Vector3.RIGHT:
+		node.rotation.x = angle
+	else:
+		node.rotation.z = angle
 
 
 func _height_above_start() -> float:
