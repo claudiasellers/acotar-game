@@ -1,0 +1,5 @@
+from bounce-light
+quality look
+shot beast_door res://tools/creatures/beast_door_light_probe.tscn {out}
+shot dining_day res://tools/manor_estate/room_shot.tscn dining_hall {out} 12
+shot bedroom_night res://tools/manor_estate/room_shot.tscn feyre_bedroom {out} 22
