@@ -54,6 +54,23 @@ func test_routes_through_the_door() -> void:
 	assert_lt(walker.global_position.distance_to(goal), 0.6, "arrives")
 
 
+func test_parse_runs_on_the_main_thread_and_bake_callback_lands() -> void:
+	_two_rooms()
+	NavBaker.last_parse_thread = -1
+	var source := NavBaker.parse(_root)
+	assert_eq(NavBaker.last_parse_thread, OS.get_main_thread_id(), "parse reads the tree on the main thread")
+	var region := NavigationRegion3D.new()
+	_root.add_child(region)
+	var done := [false]
+	NavBaker.bake(region, source, AABB(Vector3(-10, -1, -6), Vector3(20, 5, 12)), true, func() -> void: done[0] = true)
+	for i in 300:
+		if done[0]:
+			break
+		await wait_physics_frames(1)
+	assert_true(done[0], "async bake finished")
+	assert_gt(region.navigation_mesh.get_polygon_count() if region.navigation_mesh else 0, 0)
+
+
 func test_without_a_navmesh_it_steers_straight() -> void:
 	var walker := Node3D.new()
 	_root.add_child(walker)
