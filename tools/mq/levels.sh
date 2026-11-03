@@ -71,6 +71,35 @@ store() {
 	mv "$tmp" "$MQ_LEVELCACHE/$name/$fp"
 }
 
+# A shared cache between machines that cannot see each other's .git (cloud
+# lanes: /mnt/project-files/cache/levelcache). MQ_LEVELCACHE_SHARED overrides;
+# empty or missing turns it off. Entries are <name>/<fingerprint>.tar, so a
+# fresh lane copies a build instead of paying for it (terrain: ~15 min).
+SHARED="${MQ_LEVELCACHE_SHARED-/mnt/project-files/cache/levelcache}"
+[ -n "$SHARED" ] && [ -d "$(dirname "$SHARED")" ] || SHARED=""
+shared_fetch() {
+	local name="$1" fp="$2" tar tmp
+	[ -n "$SHARED" ] || return 1
+	tar="$SHARED/$name/$fp.tar"
+	[ -f "$tar" ] || return 1
+	tmp="$MQ_LEVELCACHE/$name/.fetch.$$"
+	rm -rf "$tmp"; mkdir -p "$tmp"
+	if tar -xf "$tar" -C "$tmp"; then
+		mv "$tmp" "$MQ_LEVELCACHE/$name/$fp" 2>/dev/null || rm -rf "$tmp"
+		echo "levels: $name $fp restored from the shared cache" >&2
+		return 0
+	fi
+	rm -rf "$tmp"
+	return 1
+}
+shared_publish() {
+	local name="$1" fp="$2" tmp
+	[ -n "$SHARED" ] || return 0
+	[ -f "$SHARED/$name/$fp.tar" ] && return 0
+	mkdir -p "$SHARED/$name" 2>/dev/null || return 0
+	tmp="$SHARED/$name/.$fp.tar.$$"
+	tar -cf "$tmp" -C "$MQ_LEVELCACHE/$name/$fp" . 2>/dev/null && mv "$tmp" "$SHARED/$name/$fp.tar" || rm -f "$tmp"
+}
 outputs_present() {
 	local o
 	for o in $1; do [ -e "$o" ] || return 1; done
@@ -83,6 +112,7 @@ ensure_one() {
 	[ "$(cat "$stamp" 2>/dev/null)" = "$fp" ] && outputs_present "$outs" && return 0
 	mkdir -p "$MQ_LEVELCACHE/$name" "$GITDIR/mq-levels"
 	lockd="$MQ_LEVELCACHE/$name/$fp.lock"
+	[ -d "$MQ_LEVELCACHE/$name/$fp" ] || shared_fetch "$name" "$fp" || true
 	while :; do
 		if [ -d "$MQ_LEVELCACHE/$name/$fp" ]; then
 			# No stamp until it's whole: a gate can kill this part way through.
@@ -129,7 +159,7 @@ ensure_one() {
 	grep -qE "$BROKEN_SCRIPT" "$log" 2>/dev/null && broken=1
 	[ "$broken" = 1 ] && rc=65
 	if [ "$rc" = 0 ]; then
-		store "$name" "$fp" "$outs" || rc=1
+		store "$name" "$fp" "$outs" && shared_publish "$name" "$fp" || rc=1
 	fi
 	mq_lock_release "$lockd"
 	if [ "$rc" != 0 ]; then
