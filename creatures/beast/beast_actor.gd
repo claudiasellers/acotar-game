@@ -232,8 +232,11 @@ func _process(delta: float) -> void:
 	to.y = 0.0
 	_animate(to.length() > 0.05 and visible)
 	if to.length() > 0.05:
-		global_position += to.limit_length((burst_speed if _bursting else walk_speed) * delta)
-		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 4.0 * delta)
+		# Round the walls on the navmesh (T5); straight when there is none.
+		var dir := NavMover.on(self).steer(_destination) if to.length() >= NavMover.MIN_DISTANCE else to
+		var step := minf((burst_speed if _bursting else walk_speed) * delta, to.length())
+		global_position += dir.normalized() * step
+		rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), 4.0 * delta)
 	elif _bursting:
 		_bursting = false
 	elif stage == Stage.PATROL:

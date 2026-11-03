@@ -1,16 +1,23 @@
 ## The touchable world's one hookup in the World scene (T5): for every region
 ## WorldStreamer loads, adds that region's loose props (PropField, from
-## data/props/placements/<id>.tres). Later slices add the nav bake, weather
+## data/props/placements/<id>.tres, a child of the region so it goes with it),
+## and runs the navmesh tile around Feyre (NavBaker). Later slices add weather
 ## visuals and element chemistry here, so World needs just this one node.
 class_name TouchWorld
 extends Node
 
+var nav: NavBaker
+
 
 func _ready() -> void:
+	nav = NavBaker.new()
+	nav.name = "NavBaker"
+	add_child(nav)
 	var streamer := Gameplay.autoload(&"WorldStreamer")
 	if streamer == null:
 		return
 	streamer.region_loaded.connect(_on_region_loaded)
+	streamer.region_unloaded.connect(_on_region_unloaded)
 	for id in streamer.loaded_ids():
 		var root: Node3D = streamer.loaded_root(StringName(id))
 		if root:
@@ -19,6 +26,11 @@ func _ready() -> void:
 
 func _on_region_loaded(id: StringName, root: Node3D) -> void:
 	add_props(id, root)
+
+
+## Props go with their region root; only the cached nav source is ours to drop.
+func _on_region_unloaded(id: StringName) -> void:
+	nav.region_unloaded(id)
 
 
 ## Adds the region's PropField under `root`. Returns it (null if the region has none).
