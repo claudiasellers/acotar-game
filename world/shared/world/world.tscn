@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://world/shared/world/world.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/grades/grade_director.gd" id="2"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://world/shared/weather/snowfall.gd" id="5"]
 [ext_resource type="Script" path="res://world/shared/weather/winter_weather.gd" id="6"]
 [ext_resource type="Shader" uid="uid://cx4e1fim4qxqt" path="res://world/shared/grades/painted_sky.gdshader" id="7"]
+[ext_resource type="Script" path="res://systems/props/touch_world.gd" id="touch_world"]
 
 [sub_resource type="ShaderMaterial" id="sky_mat"]
 shader = ExtResource("7")
@@ -89,3 +90,6 @@ script = ExtResource("6")
 prints = NodePath("../SnowPrints")
 snowfall_node = NodePath("../Snowfall")
 wind = NodePath("../WindDriver")
+
+[node name="TouchWorld" type="Node" parent="."]
+script = ExtResource("touch_world")

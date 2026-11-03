@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PropData" format=3]
+
+[ext_resource type="Script" path="res://systems/props/prop_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pot_clay"
+display_name = "Clay pot"
+mesh_path = "res://world/human_realm/cottage/assets/interior/water_pot.glb"
+shape = &"cylinder"
+size = Vector3(0.28, 0.27, 0.28)
+mass = 2.5
+friction = 0.6
+bounce = 0.2
+carryable = true
+breakable = true
+break_speed = 11.0
+flammable = false
+wetness = 0.0
+sparkle = Color(1, 0.8, 0.7, 1)
