@@ -1,30 +1,27 @@
-[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GradePreset" format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+[ext_resource type="Resource" path="res://data/grades/luts/manor.tres" id="1_g1lpj"]
 
 [resource]
 script = ExtResource("1")
 id = &"manor"
 sky_top = Color(0.55, 0.68, 0.98, 1)
-sky_horizon = Color(1.0, 0.78, 0.86, 1)
+sky_horizon = Color(1, 0.78, 0.86, 1)
 ground_horizon = Color(0.98, 0.86, 0.8, 1)
 ground_bottom = Color(0.55, 0.7, 0.45, 1)
-sun_color = Color(1.0, 0.88, 0.74, 1)
+sun_color = Color(1, 0.88, 0.74, 1)
 sun_energy = 1.2
-ambient_color = Color(0.84, 0.76, 0.90, 1)
+ambient_color = Color(0.84, 0.76, 0.9, 1)
 ambient_energy = 0.5
-fog_color = Color(0.92, 0.84, 0.90, 1)
+cloud_cover = 0.3
+fog_color = Color(0.92, 0.84, 0.9, 1)
 fog_density = 0.0012
 volumetric_density = 0.002
-volumetric_albedo = Color(0.90, 0.84, 0.90, 1)
-exposure = 0.78
-saturation = 1.22
-contrast = 1.15
-brightness = 1.0
-glow_intensity = 0.3
-glow_bloom = 0.0
-snow_cover = 0.0
+volumetric_albedo = Color(0.9, 0.84, 0.9, 1)
+exposure = 1.797
+glow_intensity = 0.7
+glow_bloom = 0.2
+glow_hdr_threshold = 1.0
+lut_params = ExtResource("1_g1lpj")
 magic = 0.35
-glow_hdr_threshold = 1.4
-; A few soft fair-weather clouds over the grounds (painted_sky).
-cloud_cover = 0.30

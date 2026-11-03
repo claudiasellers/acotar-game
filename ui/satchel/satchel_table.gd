@@ -53,6 +53,9 @@ func _ready() -> void:
 	_env = Environment.new()
 	_env.background_mode = Environment.BG_COLOR
 	_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	# Linear, not AgX (T3b reading): the cloth, wash and patches take SatchelTheme
+	# colours that must match the 2D page drawn over them; AgX shifts greys up to
+	# 6% and pulls chroma, so the 3D page would stop matching its own UI.
 	_env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	var we := WorldEnvironment.new()
 	we.environment = _env

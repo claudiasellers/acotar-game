@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="LutParams" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/lut_params.gd" id="1_ubee1"]
+
+[sub_resource type="Gradient" id="Gradient_3l3t1"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.023529414, 0.01764706, 0.05647059, 1, 0.51235294, 0.4429412, 0.5335294, 1, 1, 0.9529412, 0.8882353, 1)
+
+[resource]
+script = ExtResource("1_ubee1")
+brightness = 0.98
+contrast = 1.12
+saturation = 1.2
+curve = SubResource("Gradient_3l3t1")

@@ -51,6 +51,10 @@ const NIGHT_FOG_INJECT := 0.4
 var sight := 0.0
 var _sight_target := 0.0
 const SIGHT_SECONDS := 6.0
+## The swap target's LUT, built one slice a frame (~3 ms) so it is ready by
+## mid-blend without stalling a frame; apply() finishes it if a blend is short.
+var _lut_job: LutParams
+var _lut_slices: Array[Image] = []
 
 
 func _ready() -> void:
@@ -67,6 +71,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_build_lut_slice()
 	var dirty := false
 	if _t < 1.0:
 		_t = minf(1.0, _t + delta / maxf(_seconds, 0.001))
@@ -83,6 +88,19 @@ func _process(delta: float) -> void:
 		apply(current)
 	_update_region_grade()
 	_update_sun()
+
+
+func _build_lut_slice() -> void:
+	if _lut_job == null:
+		return
+	if _lut_job.is_built():
+		_lut_job = null
+		return
+	_lut_slices.append(_lut_job.build_slice(_lut_slices.size()))
+	if _lut_slices.size() == LutParams.SIZE:
+		_lut_job.store(_lut_slices.duplicate())
+		_lut_job = null
+		_lut_slices.clear()
 
 
 ## Mist from the weather, 0..MAX_WEATHER_FOG on top of the grade's own fog.
@@ -107,6 +125,8 @@ static func load_preset(id: StringName) -> GradePreset:
 func swap_to(to_grade: StringName, seconds: float) -> void:
 	_from = current
 	_to = load_preset(to_grade)
+	_lut_job = _to.lut_params if _to.lut_params != null and not _to.lut_params.is_built() else null
+	_lut_slices.clear()
 	_seconds = seconds
 	_t = 0.0 if seconds > 0.0 else 1.0
 	if seconds <= 0.0:
@@ -168,7 +188,7 @@ func apply(base: GradePreset) -> void:
 	env.adjustment_saturation = p.saturation
 	env.adjustment_contrast = p.contrast
 	env.adjustment_brightness = p.brightness
-	env.adjustment_color_correction = p.lut
+	env.adjustment_color_correction = p.lut_texture()
 	env.glow_intensity = p.glow_intensity
 	env.glow_bloom = p.glow_bloom
 	if sun != null:
@@ -199,11 +219,8 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	# lilac shadows); snow stays where it lies.
 	if _dread_preset == null:
 		_dread_preset = load_preset(&"dread")
-	var cold := GradePreset.mix(p, _dread_preset, dread_weight(dread))
+	var cold := GradePreset.mix(p, _dread_preset, dread_weight(dread), p)
 	cold.id = p.id
-	cold.lut = p.lut
-	cold.tonemap_mode = p.tonemap_mode
-	cold.sdfgi = p.sdfgi
 	cold.snow_cover = p.snow_cover
 	return cold
 
@@ -217,7 +234,6 @@ static func with_true_sight(p: GradePreset, amount: float) -> GradePreset:
 		return p
 	var s := GradePreset.mix(p, p, 0.0)
 	s.id = p.id
-	s.lut = p.lut
 	s.saturation = p.saturation * (1.0 + 0.16 * amount)
 	s.contrast = p.contrast * (1.0 + 0.05 * amount)
 	s.exposure = p.exposure * (1.0 + 0.04 * amount)
@@ -236,7 +252,6 @@ func _on_flag_changed(flag: String, _value: Variant) -> void:
 
 static func _sleepy(p: GradePreset, amount: float) -> GradePreset:
 	var s := GradePreset.mix(p, p, 0.0)
-	s.lut = p.lut
 	# A dreamy fade, not a dropout: about 1.3 stops down at full sleep, colour
 	# drained and a soft bloom haze, so horse, rider and path still read.
 	s.exposure = p.exposure * (1.0 - 0.6 * amount)

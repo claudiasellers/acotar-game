@@ -1,13 +1,7 @@
 [gd_resource type="Resource" script_class="GradePreset" format=3]
 
+[ext_resource type="Resource" path="res://data/grades/luts/grade_blossom_vale.tres" id="1_3uxu0"]
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_q28nf"]
-
-[sub_resource type="Gradient" id="Gradient_mkby7"]
-offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(0.10588236, 0.08705883, 0.15058824, 1, 0.6335294, 0.57117647, 0.60176474, 1, 1, 0.9964706, 0.9941176, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_tmbbp"]
-gradient = SubResource("Gradient_mkby7")
 
 [resource]
 script = ExtResource("1_q28nf")
@@ -20,16 +14,14 @@ sun_color = Color(1, 0.95686275, 0.9254902, 1)
 sun_energy = 1.6674999999999998
 ambient_color = Color(0.8556863, 0.7727059, 0.8912941, 1)
 ambient_energy = 0.63
+cloud_cover = 0.3
 fog_color = Color(1, 0.91764706, 0.95686275, 1)
 fog_density = 0.0012
 volumetric_density = 0.008
 volumetric_albedo = Color(1, 0.9647059, 0.98039216, 1)
-exposure = 0.8
-saturation = 1.2
-contrast = 1.12
-glow_intensity = 0.3
-glow_bloom = 0.0
-glow_hdr_threshold = 1.4
-lut = SubResource("GradientTexture1D_tmbbp")
+exposure = 2.217
+glow_intensity = 0.7
+glow_bloom = 0.2
+glow_hdr_threshold = 1.0
+lut_params = ExtResource("1_3uxu0")
 magic = 0.35
-cloud_cover = 0.30

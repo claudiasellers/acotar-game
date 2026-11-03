@@ -1,39 +1,29 @@
-[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GradePreset" format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
+[ext_resource type="Resource" path="res://data/grades/luts/bogge.tres" id="1_w3hjq"]
 
 [resource]
 script = ExtResource("1")
 id = &"bogge"
-sky_top = Color(0.30, 0.32, 0.36, 1)
-sky_horizon = Color(0.40, 0.41, 0.42, 1)
-ground_horizon = Color(0.30, 0.30, 0.30, 1)
+sky_top = Color(0.3, 0.32, 0.36, 1)
+sky_horizon = Color(0.4, 0.41, 0.42, 1)
+ground_horizon = Color(0.3, 0.3, 0.3, 1)
 ground_bottom = Color(0.12, 0.13, 0.12, 1)
-sun_color = Color(0.72, 0.80, 0.94, 1)
+sun_color = Color(0.72, 0.8, 0.94, 1)
 sun_energy = 0.45
 ambient_color = Color(0.52, 0.58, 0.68, 1)
 ambient_energy = 0.7
-fog_color = Color(0.52, 0.56, 0.60, 1)
+fog_color = Color(0.52, 0.56, 0.6, 1)
 fog_density = 0.012
 volumetric_density = 0.008
-volumetric_albedo = Color(0.70, 0.74, 0.78, 1)
-exposure = 0.85
-saturation = 0.35
-contrast = 1.12
-brightness = 0.9
-glow_intensity = 0.2
-glow_bloom = 0.0
-snow_cover = 0.0
-magic = 0.0
-; Already the horror grade: the woods dread mood would stack two stops
-; more on top and turn the Bogge heart black.
-dread_headroom = 0.0
-; Dread through fog and desaturation, not darkness: low pooled fog
-; hides the wood beyond ~60 m while the near ground and the Bogge read.
+volumetric_albedo = Color(0.7, 0.74, 0.78, 1)
+volumetric_ambient_inject = 1.0
 fog_sky_affect = 0.6
 fog_height = -1.0
 fog_height_density = 0.07
-fog_aerial_perspective = 0.5
-; The volumetric fog takes the cold ambient, so it reads as pale grey murk
-; behind black trunks instead of a black wall that eats the sky (audit D8).
-volumetric_ambient_inject = 1.0
+exposure = 1.107
+glow_intensity = 0.2
+glow_bloom = 0.0
+lut_params = ExtResource("1_w3hjq")
+dread_headroom = 0.0

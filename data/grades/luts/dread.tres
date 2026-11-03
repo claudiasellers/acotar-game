@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="LutParams" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/lut_params.gd" id="1_0mxd5"]
+
+[resource]
+script = ExtResource("1_0mxd5")
+contrast = 1.1
+saturation = 0.4

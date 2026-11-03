@@ -16,6 +16,7 @@ run headless becomes a Mac step instead of iteration; canonical shots re-rendere
 | T2 surface model | L58 | lane/surface-model | L58-1 413510d handed in 20:48Z; Mac look request shots/req-L58-1 pending |
 | T5 touchable world | L59 | lane/touchable-world | props merged (8c2ea45); L59-4 e472d51 (navmesh + weather/fire + scene yield) queued; Mac look check of rain/petals/flames left |
 | T3a bounce, T3b grade, T4 hero meshes, T6 housekeeping | — | — | after L58 |
+| T3b grade unification | L63 | lane/grade-unify | handed in as lead/ready-L63-1 (stacked on L60-1, which needs its resubmit) |
 
 ## Readings taken (the brief said: take the most reasonable reading and record it)
 
@@ -78,6 +79,10 @@ boots a level in **under 2 minutes** instead of ~16.
 6. L60 look + corner probes: the canonical shots at L60, plus `entrance_hall` and the cottage main room
    (cottage crashes lavapipe), with two samples per room (corner vs wall centre, corner ≥5% darker), and
    `tools/lighting/bounce_probe.tscn` on the GPU (prints the PROBE numbers in the T3a section below).
+7. L63 (T3b) look + clip + perf: the canonical shots at L63 against L60 (lit band, 5 samples each, within 5%; sky,
+   water and window pixels < 0.98 per channel), `GRADE_PROBE=check` of `tools/env/grade_probe.tscn` on the GPU,
+   and `make perf` (±0.3 ms; the only per-frame cost added is the colour LUT lookup, and the LUT itself
+   builds a slice a frame during a grade blend).
 
 ## T2 (L58-1) as handed in
 
@@ -129,3 +134,47 @@ Readings:
 - **SDFGI outdoors (step 3)** is not enabled. It waits for the Mac measurement (Mac step 5).
 - "Hue shift toward the ground colour" is measured toward the light leaving the ground (terrain albedo × sun
   colour). The albedo mean alone is near-neutral (snow and ice), and the warm sun dominates the bounce.
+
+## T3b (L63) as handed in
+
+AgX everywhere: all 20 grades (GradePreset default; `manor_interior` was already AgX, so the house → grounds
+tonemapper jump is gone), the mural and wolf-eye film stages and the title (exposure 1.8 / 1.8 / 1.7 holds
+Filmic's mid band, rms 3.7%). One grade layer: each preset's brightness/contrast/saturation sliders and old 1D
+LUT are folded into LutParams (`data/grades/luts/`), a 32³ RGBA-half Texture3D built at load (60–130 ms in one
+go; GradeDirector builds a swap target one slice a frame). Steps 2–4 of the LUT (lift/gamma/gain, hue, saturation
+curve) ship as identity. LUT vs its numbers: max channel error 0.0004 on affine grades, ≤0.0101 where a channel
+clamps inside a cell. Blends: the shown slider value is (blended grade value) ÷ (shown LUT's folded value), so
+nothing pops when the LUT switches at mid-blend; moods keep the grade's LUT.
+
+Probe (`tools/env/grade_probe.tscn`, lavapipe, deterministic: no fog reprojection; T3a reference retaken from a
+clean worktree at 9efa62e, `tools/env/grade_reference_t3a.json`):
+- Lit band (5 sunlit samples per grade): all 19 solved grades within ±1% of T3a; `dread` kept at 0.19 on purpose
+  (its lit band is near black, 1.1% → 2.7% display, and 0.19 keeps the manor ambient floor readable under dread).
+- Estate boundary, same prop under `manor` vs `spring`: 3.2% (T3a 2.9%; both sides were and are one tonemapper).
+- Clip: the probe's sky samples look toward the sun (worst case). Under ACES at T3a these were 1.0 (255) on 9
+  of 20 grades and lit tops clipped too (blush top v = 1.000); under AgX lit tops sit at 0.96, and the toward-sun
+  sky still reaches ≥ 0.98 on the 8 brightest day grades (white pixels: blossom_vale 10.5%, pool_sparkle 9.2%,
+  human_spring 5.9%, glen_day 2.0%, fells 1.4%). Holding the lit band and dropping those skies below 0.98 needs
+  the sun up 3× (tested, rejected as relighting the grade) or a dimmer sky. Left for the canonical-shot check
+  (Mac step 7), where most views do not face the sun.
+- Colour: AgX takes ~30–40% chroma out of bright pastels at an equal lit band (spring: mint top HSV s 0.113 →
+  0.068, sky 0.113 → 0.068, blush 0.118 → 0.098). Not compensated (no look invention); `highlight_saturation`
+  in the LUT is the knob (docs/tuning.md).
+
+Readings:
+- "AgX white 1.0" = `tonemap_white` 1.0 (Godot's default, unused by AgX). `tonemap_agx_white` stays at Godot's
+  16.29: at 1.0 AgX would hard-clip every highlight, the opposite of done-when 2.
+- No `make luts` output to ignore: the Texture3D is built at load. `make luts` runs the parameter generator and
+  check (exit 1 if a LUT misses its numbers).
+- Satchel keeps Linear: its cloth, wash and patches take SatchelTheme colours that must match the 2D page over
+  them; AgX at its best exposure shifts greys up to 6% and pulls chroma.
+- The 12 court grades also live as sources in `world/spring_court/wider/fx/grades/` (build_court_fx.gd's
+  output, still 1D LUT + sliders). The game loads `world/shared/grades/`; re-copying the fx files over them
+  would undo T3b. Follow-up for the court-fx owner: emit LutParams, or stop copying.
+- Spring bloom 0.7 / 0.2 / 1.0 (R3) overrides the court grades' earlier "no daytime bloom wash" rule
+  (Keeper's book-light note, still asserted by test_court_fx on the fx copies). Flagged to the director.
+- Still ACES/Filmic, not shipping: `world.tscn` `tonemap_mode = 3` (GradeDirector sets AgX in `_ready`, before
+  the first frame; world lane's file), and tool views: faces_shot, creature_faces_shot, indoor_camera_shot,
+  art_probe, minor_fae_hall_shot, cottage_room_shot, feyre_gait_shot, render_item_icons (icon art, a non-game
+  look), bounce_probe (L60's probe, ACES vs its own reference), calanmai_fire_shot. The views that mimic the
+  game should follow AgX in a housekeeping pass.

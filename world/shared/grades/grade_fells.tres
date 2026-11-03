@@ -1,13 +1,7 @@
 [gd_resource type="Resource" script_class="GradePreset" format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_8lgp3"]
-
-[sub_resource type="Gradient" id="Gradient_annig"]
-offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(0.08705883, 0.09176471, 0.15058824, 1, 0.5464706, 0.54882354, 0.61352944, 1, 0.9952941, 0.9929412, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_wn13p"]
-gradient = SubResource("Gradient_annig")
+[ext_resource type="Resource" path="res://data/grades/luts/grade_fells.tres" id="1_t22ij"]
 
 [resource]
 script = ExtResource("1_8lgp3")
@@ -17,19 +11,17 @@ sky_horizon = Color(0.9019608, 0.8627451, 1, 1)
 ground_horizon = Color(0.9137255, 0.8862745, 0.9411765, 1)
 ground_bottom = Color(0.6156863, 0.72156864, 0.65882355, 1)
 sun_color = Color(1, 0.9490196, 0.9019608, 1)
-sun_energy = 1.4949999999999999
+sun_energy = 1.495
 ambient_color = Color(0.76235294, 0.73537254, 0.9259608, 1)
 ambient_energy = 0.57
+cloud_cover = 0.3
 fog_color = Color(0.89411765, 0.8784314, 1, 1)
 fog_density = 0.0012
 volumetric_density = 0.008
 volumetric_albedo = Color(0.9490196, 0.9411765, 1, 1)
-exposure = 0.8
-saturation = 1.2
-contrast = 1.12
+exposure = 2.554
 glow_intensity = 0.3
 glow_bloom = 0.0
 glow_hdr_threshold = 1.4
-lut = SubResource("GradientTexture1D_wn13p")
+lut_params = ExtResource("1_t22ij")
 magic = 0.35
-cloud_cover = 0.30

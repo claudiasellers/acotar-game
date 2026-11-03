@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LutParams" format=3]
+
+[ext_resource type="Script" path="res://world/shared/grades/lut_params.gd" id="1_ti55p"]
+
+[resource]
+script = ExtResource("1_ti55p")
+brightness = 0.9
+contrast = 1.12
+saturation = 0.35

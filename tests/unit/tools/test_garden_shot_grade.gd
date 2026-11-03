@@ -12,7 +12,7 @@ func _dressed() -> Node3D:
 
 func test_a_dressed_estate_has_the_world_environment() -> void:
 	var we := _dressed().get_node("WorldEnvironment") as WorldEnvironment
-	assert_eq(we.environment.tonemap_mode, Environment.TONE_MAPPER_ACES, "the game's tonemap, not the preview's AgX")
+	assert_eq(we.environment.tonemap_mode, GradeDirector.load_preset(&"manor").tonemap_mode, "the game's tonemap")
 	assert_false(we.environment.sdfgi_enabled, "no preview SDFGI")
 
 
