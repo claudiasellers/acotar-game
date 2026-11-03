@@ -1,0 +1,4 @@
+from lane3-T075-after
+quality look
+shot noon res://tools/manor_estate/room_shot.tscn entrance_hall:10/1.5=10/20+2/14=18/17 {out} 12
+shot night res://tools/manor_estate/room_shot.tscn entrance_hall:10/1.5=10/20+2/14=18/17 {out} 20
