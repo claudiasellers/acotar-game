@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"brew_giddy_tincture"
 display_name = "Giddy tincture"
-note = "One drop and the music gets louder. Careful."
+note = "One drop and the music gets louder. I'll pay for it in the morning."
 methods = Array[StringName]([&"tincture"])
 kind = &""
 need = {
