@@ -535,20 +535,24 @@ def star_flower(prop, center, radius, color, n=5, finish="fabric", heart=BUTTER,
     prop.add(sphere(radius * 0.28, 6, 4), heart, finish, m0 @ S(1, 1, 0.6))
 
 
-def round_petal(length, width, cup=0.3, curl=0.1):
+def round_petal(length, width, cup=0.3, curl=0.1, fine=False):
     """A rounded petal along +X (2x2 quads): broad, blunt tip rather than a
-    point, so blooms read as soft petals, not shards (L35-4)."""
+    point, so blooms read as soft petals, not shards (L35-4). fine=True (lane
+    L61, 3x3 quads, 18 tris) bows the cross-section into a smooth cup instead
+    of a folded V, so the petal has no crease or flat facets at arm's length."""
     bm = bmesh.new()
     rows = []
-    for i, t in enumerate((0.0, 0.55, 1.0)):
-        w = width * (0.4, 1.0, 0.78)[i]
+    ts, ws, us = ((0.0, 0.55, 1.0), (0.4, 1.0, 0.78), (-1.0, 0.0, 1.0)) if not fine else \
+        ((0.0, 0.4, 0.75, 1.0), (0.4, 0.95, 0.98, 0.7), (-1.0, -0.36, 0.36, 1.0))
+    for i, t in enumerate(ts):
+        w = width * ws[i]
         z = cup * length * t * t + curl * length * (t ** 3)
-        rows.append([bm.verts.new((length * t, -w / 2, z + cup * w * 0.45)),
-                     bm.verts.new((length * t, 0.0, z)),
-                     bm.verts.new((length * t, w / 2, z + cup * w * 0.45))])
+        # fine: the cup lifts with the square of the distance from the midrib
+        rows.append([bm.verts.new((length * t, u * w / 2, z + cup * w * 0.45 * (u * u if fine else abs(u))))
+                     for u in us])
     for a, b in zip(rows, rows[1:]):
-        bm.faces.new((a[0], a[1], b[1], b[0]))
-        bm.faces.new((a[1], a[2], b[2], b[1]))
+        for k in range(len(us) - 1):
+            bm.faces.new((a[k], a[k + 1], b[k + 1], b[k]))
     return bm
 
 
@@ -568,40 +572,43 @@ def _petal_rim(color, length, width, rim=0.3):
     return shade
 
 
-def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5, cupped=False):
+def layered_rose(prop, m, r, color, finish="fabric", rng=None, inner=3, outer=5, cupped=False, fine=False):
     """A full garden rose in layers (L35-8), facing +Z under matrix m: a
     furled, swirled heart, a ring of upright cupped petals round it and a
     ring of broad petals rolling open beneath, each ring turned half a step
     so the bloom's outline is scalloped and round, never a flat polygon.
-    Petals pale to a soft rim (L35-10). About 15 + 8 per petal tris."""
+    Petals pale to a soft rim (L35-10). About 15 + 8 per petal tris; fine=True
+    (lane L61) uses 18-tri cupped petals and an 8-sided heart, about 30 + 18
+    per petal, so it holds up at 1 m."""
     rng = rng or random.Random(5)
     heart = darker(color, 0.16)
-    prop.add(lathe([(r * 0.24, r * 0.12), (r * 0.2, r * 0.42), (0.0, r * 0.52)], 5, cap_bottom=False),
+    prop.add(lathe([(r * 0.24, r * 0.12), (r * 0.2, r * 0.42), (0.0, r * 0.52)], 8 if fine else 5, cap_bottom=False),
              heart, finish, m @ R("Z", rng.uniform(0, 72)), sharp_deg=89.0)
     a0 = rng.uniform(0, 360)
     ci = mix(color, heart, 0.35)
     for i in range(inner):
         a = a0 + 360 / inner * i + rng.uniform(-10, 10)
-        prop.add(round_petal(r * 0.62, r * 0.8, cup=0.55, curl=-0.1), ci, finish,
+        prop.add(round_petal(r * 0.62, r * 0.8, cup=0.55, curl=-0.1, fine=fine), ci, finish,
                  m @ R("Z", a) @ T(r * 0.06, 0, r * 0.1) @ R("Y", -64), sharp_deg=89.0,
                  shade=_petal_rim(ci, r * 0.62, r * 0.8, 0.22))
     co = lighter(color, 0.05)
     for i in range(outer):
         a = a0 + 180 / max(outer, 1) + 360 / max(outer, 1) * i + rng.uniform(-8, 8)
         # cupped (L56-2): the outer ring stands up round the heart instead of lying open flat
-        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.62 if cupped else 0.4, curl=-0.04 if cupped else -0.12), co, finish,
+        prop.add(round_petal(r * 0.98, r * 1.05, cup=0.62 if cupped else 0.4, curl=-0.04 if cupped else -0.12, fine=fine),
+                 co, finish,
                  m @ R("Z", a) @ T(r * 0.1, 0, 0) @ R("Y", -56 if cupped else -34), sharp_deg=89.0,
                  shade=_petal_rim(co, r * 0.98, r * 1.05))
 
 
-def rose_bud(prop, m, r, color, finish="fabric", rng=None):
+def rose_bud(prop, m, r, color, finish="fabric", rng=None, fine=False):
     """A furled rose bud facing +Z under matrix m (L35-10): a plump, pointed
     swirl of deeper colour in a cup of green sepals' worth of shade at its
-    base. 20 tris."""
+    base. 20 tris (fine=True, lane L61: 8 sides, 32)."""
     rng = rng or random.Random(5)
     deep = darker(color, 0.12)
     tip = lighter(color, 0.1)
-    prop.add(lathe([(0.0, -r * 0.1), (r * 0.42, r * 0.22), (r * 0.36, r * 0.72), (0.0, r * 1.15)], 5,
+    prop.add(lathe([(0.0, -r * 0.1), (r * 0.42, r * 0.22), (r * 0.36, r * 0.72), (0.0, r * 1.15)], 8 if fine else 5,
                    cap_bottom=False, cap_top=False), deep, finish,
              m @ R("Z", rng.uniform(0, 72)) @ R("X", rng.uniform(-8, 8)), sharp_deg=89.0,
              shade=lambda c: mix(mix(LEAF_DARK, deep, min(1.0, (c.z / r + 0.1) * 3.0)), tip, max(0.0, c.z / r - 0.5)))

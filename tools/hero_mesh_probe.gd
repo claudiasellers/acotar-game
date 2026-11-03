@@ -69,7 +69,7 @@ func _probe(path: String) -> void:
 	var lines: Array[String] = []
 	for node in root.find_children("*", "MeshInstance3D", true, false):
 		var mi := node as MeshInstance3D
-		if mi.mesh == null or mi.name.contains("LOD1") or mi.name == "far":
+		if mi.mesh == null or mi.name.to_lower().contains("lod1") or mi.name == "far":
 			continue
 		for s in mi.mesh.get_surface_count():
 			var st := Stats.new()

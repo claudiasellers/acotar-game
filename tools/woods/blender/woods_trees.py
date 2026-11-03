@@ -32,6 +32,11 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
 # with Subdivision Surface 2 and decimated to whatever the crown leaves of the
 # cap, never more than WOOD_MAX. Printed per species on every run.
 WOOD_MAX = 2400
+# Crown blobs go one icosphere level finer, biggest first (buried faces
+# culled), while that still leaves the wood at least WOOD_MIN triangles.
+WOOD_MIN = 450
+# The horror trees keep their jagged lichen and rot (R3: never softened).
+DREAD = ("twisted_dead", "blighted_tree")
 
 # Palette (sRGB): experience-bar.md §2.2. No lime anywhere in the court.
 def hexc(h):
@@ -85,6 +90,12 @@ class Kit:
         # Near models grow their wood as one Skin-modifier graph (lane L61):
         # every limb and twig joins the trunk in one continuous surface.
         self.skin = None
+        # Near crowns (lane L61): the blobs whose call index is in `fine` go
+        # one icosphere level finer, biggest first, while the cap allows; faces
+        # buried inside a neighbouring blob are culled (cull_buried).
+        self.fine = set()
+        self.blob_radii = []  # per blob call: (radius, subdiv)
+        self.blobs = []  # (center, radius, squash, lump, first face, end face)
 
     def tri_count(self):
         return len(self.faces)
@@ -146,7 +157,11 @@ class Kit:
     def blob(self, center, radius, squash, top, bottom, subdiv, flex, lump=0.28, glow=0.0):
         """A lumpy cloud of foliage: an icosphere pushed out by noise, lit
         light on top and deeper underneath (baked into the colour)."""
+        if len(self.blob_radii) in self.fine:
+            subdiv = min(2, subdiv + 1)
+        self.blob_radii.append((radius, subdiv))
         verts, faces = icosphere(subdiv)
+        first = len(self.faces)
         seed = Vector((self.rng.random() * 50, self.rng.random() * 50, self.rng.random() * 50))
         tint = self.rng.uniform(-0.05, 0.05)
         idx, cols = [], []
@@ -168,6 +183,35 @@ class Kit:
         for f in faces:
             self.face(tuple(idx[i] for i in f), tuple(cols[i] for i in f),
                       tuple((flex, glow) for _ in f))
+        self.blobs.append((c, radius, squash, lump, first, len(self.faces)))
+
+    def cull_buried(self):
+        """Drops crown faces buried inside a neighbouring blob: overlapping
+        clouds hide most of each other, and those triangles are better spent
+        on a rounder silhouette."""
+        drop = set()
+        for bi, (c, r, sq, lump, f0, f1) in enumerate(self.blobs):
+            others = [b for bj, b in enumerate(self.blobs) if bj != bi and (b[0] - c).length < r + b[1] * 1.3]
+            if not others:
+                continue
+            for fi in range(f0, f1):
+                for oc, orad, osq, olump, _, _ in others:
+                    core = orad * (1.0 - olump * 0.6)  # inside even the deepest dent
+
+                    def inside(p):
+                        d = p - oc
+                        return (d.x * d.x + d.y * d.y) / (core * core) + (d.z * d.z) / ((core * osq) ** 2) < 0.95
+
+                    if all(inside(self.verts[v]) for v in self.faces[fi]):
+                        drop.add(fi)
+                        break
+        if drop:
+            keep = [i for i in range(len(self.faces)) if i not in drop]
+            self.faces = [self.faces[i] for i in keep]
+            self.colors = [self.colors[i] for i in keep]
+            self.uvs = [self.uvs[i] for i in keep]
+        self.blobs = []
+        return len(drop)
 
     def flower(self, center, normal, petals, radius, petal, heart, flex):
         """An oversized blossom (R3) facing `normal`: rounded lobed petals
@@ -796,17 +840,38 @@ def to_object(kit, name):
     return obj
 
 
+def grow(fn, seed, near, fine):
+    kit = Kit(seed)
+    kit.fine = fine
+    if near:
+        kit.skin = SkinGraph()
+    fn(kit, near)
+    kit.cull_buried()
+    return kit
+
+
 def build(species, fn, near_cap, far_cap, wood_max=WOOD_MAX):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     seed = sum(ord(c) * (i + 1) for i, c in enumerate(species))
     objs = []
     counts = []
     woods = []
+    fines = []
     for name, near, cap in (("near", True, near_cap), ("far", False, far_cap)):
-        kit = Kit(seed)
-        if near:
-            kit.skin = SkinGraph()
-        fn(kit, near)
+        kit = grow(fn, seed, near, set())
+        if near and species not in DREAD:
+            # Finer crowns, biggest blob first, while the wood keeps WOOD_MIN.
+            order = sorted((i for i, (r, sd) in enumerate(kit.blob_radii) if sd < 2),
+                           key=lambda i: -kit.blob_radii[i][0])
+            fine = set()
+            for i in order:
+                trial = grow(fn, seed, near, fine | {i})
+                if trial.tri_count() > cap - WOOD_MIN:
+                    break
+                fine.add(i)
+                kit = trial
+            kit = grow(fn, seed, near, fine)
+        fines.append(len(kit.fine))
         if near:
             # The wood gets whatever the crown leaves of the cap (R4).
             budget = min(wood_max, cap - kit.tri_count() - 10)
@@ -824,8 +889,8 @@ def build(species, fn, near_cap, far_cap, wood_max=WOOD_MAX):
                               export_vertex_color="ACTIVE", export_all_vertex_colors=False,
                               export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
                               export_apply=False, export_animations=False)
-    print("%-14s near %5d tris (wood %4d)  far %4d tris  %6.0f KB" % (species, counts[0], woods[0], counts[1],
-                                                                   os.path.getsize(path) / 1024))
+    print("%-14s near %5d tris (wood %4d, %2d finer blobs)  far %4d tris  %6.0f KB" % (
+        species, counts[0], woods[0], fines[0], counts[1], os.path.getsize(path) / 1024))
 
 
 def main():
