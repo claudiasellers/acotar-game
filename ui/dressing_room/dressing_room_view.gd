@@ -132,8 +132,15 @@ func _ready() -> void:
 	_refresh()
 	_open_on_arrivals()
 	_tab_changed(tabs.current_tab)
-	if _swatches.size() > 0:
-		_swatches[0].grab_focus.call_deferred()
+	# Focus starts on what she wears (focus previews a colour on its card).
+	var start: Button = null
+	for sw in _swatches:
+		if start == null and sw.is_visible_in_tree() and sw.button_pressed:
+			start = sw
+	if start == null and _swatches.size() > 0:
+		start = _swatches[0]
+	if start:
+		start.grab_focus.call_deferred()
 
 
 func _exit_tree() -> void:
@@ -317,7 +324,7 @@ func _build() -> void:
 	box.add_child(head)
 	arrivals_label = _label("", &"SatchelBody")
 	arrivals_label.name = "Arrivals"
-	arrivals_label.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent"))
+	arrivals_label.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent").darkened(0.35))
 	arrivals_label.visible = false
 	box.add_child(arrivals_label)
 	wearing = _label("", &"SatchelSmall")
@@ -497,19 +504,20 @@ func _card(fam: Dictionary) -> Control:
 		sw.set_meta(&"card", card)
 		var piece := p
 		sw.pressed.connect(func() -> void: wear(piece.id))
-		sw.focus_entered.connect(func() -> void: _show(piece, card))
+		sw.focus_entered.connect(func() -> void: _show(piece, card, false))
 		sw.mouse_entered.connect(func() -> void: _show(piece, card))
+		sw.mouse_exited.connect(_refresh)
 		swatches.add_child(sw)
 		_swatches.append(sw)
 	return card
 
 
-## The line under the tabs names the garment and colour in focus, and its card
-## shows that colour.
-func _show(p: WardrobePiece, card: Control) -> void:
+## The line under the tabs names the garment and colour in focus; under the
+## pointer its card previews that colour (back to the worn one on leaving).
+func _show(p: WardrobePiece, card: Control, preview: bool = true) -> void:
 	about.text = ("%s. %s" % [p.display_name, p.description]).strip_edges() if p.description != "" else p.display_name
 	var thumb := card.get_meta(&"thumb") as Control
-	if thumb:
+	if thumb and preview:
 		WardrobeIcon.show_piece(thumb, p)
 
 
@@ -519,7 +527,7 @@ func _new_ribbon() -> Control:
 	pill.name = "NewRibbon"
 	pill.theme_type_variation = &"SatchelChip"
 	var word := _label("New", &"SatchelPin")
-	word.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent"))
+	word.add_theme_color_override(&"font_color", SatchelTheme.color(&"ink"))
 	pill.add_child(word)
 	pill.ready.connect(func() -> void:
 		pill.pivot_offset = pill.size * 0.5
