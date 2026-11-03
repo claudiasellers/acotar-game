@@ -63,9 +63,11 @@ func _run() -> void:
 		while view.is_twirling():
 			await get_tree().process_frame
 		await _seconds(settle)
-		# One more sparkle so the capture shows the burst mid-air.
-		Juice.burst(feyre.model, &"outfit")
-		await _seconds(0.35)
+		# L64-3: sparkles are for the change only and fade in under a second,
+		# so the capture is of the settled look (and says so).
+		var lit := get_tree().root.find_children("*", "GPUParticles3D", true, false).filter(
+				func(n: Node) -> bool: return (n as GPUParticles3D).emitting)
+		print("sparkles still emitting at capture: %d" % lit.size())
 		await RenderingServer.frame_post_draw
 		var path := out.path_join("dressing_%s.png" % id)
 		get_tree().root.get_texture().get_image().save_png(path)

@@ -36,7 +36,11 @@ const REMOVABLE: Array[StringName] = [&"outer", &"head", &"neck", &"mask", &"ear
 const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55, "Masks": 0.8}
 ## What she can change from her satchel, out in the world.
 const SATCHEL_TABS: Array[String] = ["Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
-const NEW_PINK := Color(0.93, 0.42, 0.62)
+## The gilt of the mirror's frame (the dressing room's own; the panel is the satchel's).
+const GILT := Color(0.83, 0.68, 0.38)
+const COLUMNS := 3
+const THUMB := 104.0
+const SWATCH := 30.0
 
 var feyre: Feyre
 var mirror_only: bool = false
@@ -45,6 +49,9 @@ var from_satchel: bool = false
 var arrivals: Array[StringName] = []
 var arrivals_label: Label
 var found_label: Label
+## The garment and colour in focus, under the tabs.
+var about: Label
+var _tab_row: HFlowContainer
 var camera: Camera3D
 var tabs: TabContainer
 var wearing: Label
@@ -258,6 +265,9 @@ func _face_the_room(station_id: StringName) -> void:
 
 
 func _build() -> void:
+	# L64-3: the satchel's handmade look (SatchelTheme, L50): paper, stitched
+	# tabs and slots, the serif. The gilt mirror stays the dressing room's own.
+	theme = SatchelTheme.theme()
 	var mirror := Panel.new()
 	mirror.name = "MirrorFrame"
 	mirror.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -269,7 +279,7 @@ func _build() -> void:
 	mirror.offset_bottom = -28
 	var frame := StyleBoxFlat.new()
 	frame.draw_center = false
-	frame.border_color = UiStyle.BORDER
+	frame.border_color = GILT
 	frame.set_border_width_all(6)
 	frame.set_corner_radius_all(220)
 	frame.corner_detail = 16
@@ -278,20 +288,9 @@ func _build() -> void:
 	mirror.add_theme_stylebox_override(&"panel", frame)
 	add_child(mirror)
 
-	var hint := UiStyle.label("Drag, or Q / E, to turn", 15)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.modulate.a = 0.75
-	hint.anchor_top = 1.0
-	hint.anchor_bottom = 1.0
-	hint.anchor_right = 1.0 - PANEL_FRACTION
-	hint.offset_top = -74
-	hint.offset_bottom = -44
-	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(hint)
-
 	var panel := PanelContainer.new()
 	panel.name = "Wardrobe"
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
+	panel.theme_type_variation = &"SatchelDetail"
 	panel.anchor_left = 1.0 - PANEL_FRACTION
 	panel.anchor_right = 1.0
 	panel.anchor_bottom = 1.0
@@ -304,31 +303,41 @@ func _build() -> void:
 	box.add_theme_constant_override(&"separation", 10)
 	panel.add_child(box)
 
-	var title := UiStyle.label("Her satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"), 30)
-	title.add_theme_color_override(&"font_color", Color(0.62, 0.36, 0.52))
-	# UiStyle labels wrap, so in a row they need the width or they stack letters.
 	var head := HBoxContainer.new()
+	var title := _label("Her satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"), &"SatchelHeading")
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
-	found_label = UiStyle.label(found_text(), 14)
-	found_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var chip := PanelContainer.new()
+	chip.theme_type_variation = &"SatchelChip"
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	found_label = _label(found_text(), &"SatchelCount")
 	found_label.name = "Found"
-	found_label.modulate.a = 0.8
-	found_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(found_label)
+	chip.add_child(found_label)
+	head.add_child(chip)
 	box.add_child(head)
-	arrivals_label = UiStyle.label("", 16)
+	arrivals_label = _label("", &"SatchelBody")
 	arrivals_label.name = "Arrivals"
-	arrivals_label.add_theme_color_override(&"font_color", NEW_PINK)
+	arrivals_label.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent"))
 	arrivals_label.visible = false
 	box.add_child(arrivals_label)
-	wearing = UiStyle.label("", 15)
-	wearing.modulate.a = 0.85
+	wearing = _label("", &"SatchelSmall")
+	wearing.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(wearing)
 
+	# Stitched leather tabs drive a page stack (the TabContainer keeps its API).
+	_tab_row = HFlowContainer.new()
+	_tab_row.add_theme_constant_override(&"h_separation", 6)
+	_tab_row.add_theme_constant_override(&"v_separation", 6)
+	box.add_child(_tab_row)
+	about = _label("", &"SatchelSmall")
+	about.name = "About"
+	about.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	about.custom_minimum_size = Vector2(0, 40)
+	box.add_child(about)
 	tabs = TabContainer.new()
+	tabs.tabs_visible = false
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_style_tabs(tabs)
+	tabs.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	tabs.tab_changed.connect(_tab_changed)
 	box.add_child(tabs)
 	var owned: Array[WardrobePiece] = []
@@ -357,61 +366,53 @@ func _build() -> void:
 	elif not mirror_only:
 		tabs.add_child(_hair_tab())
 		tabs.add_child(_makeup_tab())
+	for i in tabs.get_tab_count():
+		var t := Button.new()
+		t.text = String(tabs.get_tab_control(i).name)
+		t.theme_type_variation = &"SatchelTab"
+		t.toggle_mode = true
+		t.focus_mode = Control.FOCUS_NONE
+		var index := i
+		t.pressed.connect(func() -> void: tabs.current_tab = index)
+		_tab_row.add_child(t)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
+	row.add_theme_constant_override(&"separation", 18)
 	box.add_child(row)
-	var left := UiStyle.button("  ◀  ")
-	left.pressed.connect(func() -> void: _turn(-PI / 4.0))
-	row.add_child(left)
-	var right := UiStyle.button("  ▶  ")
-	right.pressed.connect(func() -> void: _turn(PI / 4.0))
-	row.add_child(right)
+	row.add_child(_key_hint("Q  E", "Turn"))
+	row.add_child(_key_hint("Esc", "Done"))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
-	var done := UiStyle.button("   Done   ")
+	var done := Button.new()
 	done.name = "Done"
+	done.text = "Done"
+	done.theme_type_variation = &"SatchelTab"
 	done.pressed.connect(func() -> void: DressingRoom.close_room(feyre))
 	row.add_child(done)
 
 
-## Ribbon tabs over a clear page, so the cards sit on the panel's blush.
-func _style_tabs(t: TabContainer) -> void:
-	var page := StyleBoxFlat.new()
-	page.bg_color = Color(1.0, 0.97, 0.98, 0.6)
-	page.set_corner_radius_all(14)
-	page.set_content_margin_all(10)
-	page.border_color = Color(UiStyle.BORDER, 0.35)
-	page.set_border_width_all(1)
-	t.add_theme_stylebox_override(&"panel", page)
-	for state in ["tab_selected", "tab_unselected", "tab_hovered", "tab_focus"]:
-		var tab := StyleBoxFlat.new()
-		tab.set_corner_radius_all(12)
-		tab.corner_radius_bottom_left = 0
-		tab.corner_radius_bottom_right = 0
-		tab.content_margin_left = 10
-		tab.content_margin_right = 10
-		tab.content_margin_top = 6
-		tab.content_margin_bottom = 6
-		match state:
-			"tab_selected":
-				tab.bg_color = UiStyle.ACCENT
-				tab.border_color = UiStyle.BORDER
-				tab.border_width_top = 2
-			"tab_hovered", "tab_focus":
-				tab.bg_color = Color(1.0, 0.86, 0.92)
-			_:
-				tab.bg_color = Color(1.0, 0.93, 0.96)
-		if state == "tab_focus":
-			tab.draw_center = false
-			tab.border_color = UiStyle.BORDER
-			tab.set_border_width_all(2)
-		t.add_theme_stylebox_override(state, tab)
-	t.add_theme_color_override(&"font_selected_color", Color.WHITE)
-	t.add_theme_color_override(&"font_unselected_color", UiStyle.TEXT)
-	t.add_theme_color_override(&"font_hovered_color", UiStyle.TEXT)
-	t.add_theme_font_size_override(&"font_size", 15)
+func _label(text: String, variation: StringName) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.theme_type_variation = variation
+	return l
+
+
+## A leather key glyph and its word, like the satchel's footer.
+func _key_hint(key: String, word: String) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", 8)
+	var glyph := PanelContainer.new()
+	glyph.theme_type_variation = &"SatchelKey"
+	var k := _label(key, &"SatchelKeyLabel")
+	k.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	glyph.add_child(k)
+	row.add_child(glyph)
+	var w := _label(word, &"SatchelSmall")
+	w.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(w)
+	return row
 
 
 func _scroll(tab_name: String) -> Array:
@@ -425,6 +426,16 @@ func _scroll(tab_name: String) -> Array:
 	return [scroll, col]
 
 
+func _grid(col: VBoxContainer) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = COLUMNS
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override(&"h_separation", 8)
+	grid.add_theme_constant_override(&"v_separation", 8)
+	col.add_child(grid)
+	return grid
+
+
 func _piece_tab(tab_name: String, pieces: Array[WardrobePiece]) -> Control:
 	var parts := _scroll(tab_name)
 	var col: VBoxContainer = parts[1]
@@ -434,72 +445,81 @@ func _piece_tab(tab_name: String, pieces: Array[WardrobePiece]) -> Control:
 			if REMOVABLE.has(s) and not slots.has(s):
 				slots.append(s)
 	if not slots.is_empty():
-		var off := UiStyle.button("Take it off")
+		var off := Button.new()
+		off.text = "Take it off"
+		off.theme_type_variation = &"SatchelSlot"
 		off.pressed.connect(func() -> void: take_off(slots))
 		col.add_child(off)
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override(&"h_separation", 8)
-	grid.add_theme_constant_override(&"v_separation", 8)
-	col.add_child(grid)
+	var grid := _grid(col)
 	for fam in families(pieces):
 		grid.add_child(_card(fam))
 	return parts[0]
 
 
-## One garment: its name, a line of description, and a swatch per colour.
+## One garment: its rendered thumbnail (New pinned on it while unseen), its
+## name, and a stitched swatch per colour. The thumbnail shows the colour
+## worn, or the first.
 func _card(fam: Dictionary) -> Control:
 	var variants: Array[WardrobePiece] = fam["pieces"]
 	var card := PanelContainer.new()
+	card.theme_type_variation = &"SatchelCard"
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.set_meta(&"pieces", variants.map(func(p: WardrobePiece) -> StringName: return p.id))
-	card.add_theme_stylebox_override(&"panel", _card_box(false))
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 4)
 	card.add_child(col)
-	var head := HBoxContainer.new()
-	var garment := UiStyle.label(fam["name"], 17)
-	garment.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(garment)
+	var pic := Control.new()
+	pic.custom_minimum_size = Vector2(0, THUMB)
+	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(pic)
+	var thumb := WardrobeIcon.make(variants[0], THUMB)
+	thumb.name = "Thumb"
+	thumb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pic.add_child(thumb)
+	card.set_meta(&"thumb", thumb)
 	if variants.any(func(p: WardrobePiece) -> bool: return Gameplay.wardrobe.is_unseen(p.id)):
 		var pill := _new_ribbon()
-		pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		head.add_child(pill)
-	col.add_child(head)
-	var about := UiStyle.label(variants[0].description, 12)
-	about.modulate.a = 0.75
-	about.custom_minimum_size = Vector2(0, 34)
-	col.add_child(about)
+		pill.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		pic.add_child(pill)
+	var name_label := _label(fam["name"], &"SatchelSmall")
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(name_label)
 	var swatches := HFlowContainer.new()
-	swatches.add_theme_constant_override(&"h_separation", 6)
-	swatches.add_theme_constant_override(&"v_separation", 6)
+	swatches.alignment = FlowContainer.ALIGNMENT_CENTER
+	swatches.add_theme_constant_override(&"h_separation", 4)
+	swatches.add_theme_constant_override(&"v_separation", 4)
 	col.add_child(swatches)
 	for p in variants:
 		var sw := _swatch_button(p.color, variant_name(p))
 		sw.set_meta(&"piece", p.id)
-		var id := p.id
-		sw.pressed.connect(func() -> void: wear(id))
+		sw.set_meta(&"card", card)
+		var piece := p
+		sw.pressed.connect(func() -> void: wear(piece.id))
+		sw.focus_entered.connect(func() -> void: _show(piece, card))
+		sw.mouse_entered.connect(func() -> void: _show(piece, card))
 		swatches.add_child(sw)
 		_swatches.append(sw)
 	return card
 
 
-## The pink "New" pill on a card she hasn't looked at yet; it bounces in.
+## The line under the tabs names the garment and colour in focus, and its card
+## shows that colour.
+func _show(p: WardrobePiece, card: Control) -> void:
+	about.text = ("%s. %s" % [p.display_name, p.description]).strip_edges() if p.description != "" else p.display_name
+	var thumb := card.get_meta(&"thumb") as Control
+	if thumb:
+		WardrobeIcon.show_piece(thumb, p)
+
+
+## The "New" pin on a card she hasn't looked at yet; it bounces in.
 func _new_ribbon() -> Control:
 	var pill := PanelContainer.new()
 	pill.name = "NewRibbon"
-	var box := StyleBoxFlat.new()
-	box.bg_color = NEW_PINK
-	box.set_corner_radius_all(9)
-	box.content_margin_left = 8
-	box.content_margin_right = 8
-	box.content_margin_top = 1
-	box.content_margin_bottom = 1
-	pill.add_theme_stylebox_override(&"panel", box)
-	var word := UiStyle.label("New", 12)
-	word.autowrap_mode = TextServer.AUTOWRAP_OFF
-	word.add_theme_color_override(&"font_color", Color.WHITE)
+	pill.theme_type_variation = &"SatchelChip"
+	var word := _label("New", &"SatchelPin")
+	word.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent"))
 	pill.add_child(word)
 	pill.ready.connect(func() -> void:
 		pill.pivot_offset = pill.size * 0.5
@@ -533,51 +553,49 @@ func _open_on_arrivals() -> void:
 	Juice.burst(feyre.model, &"outfit")
 
 
+## A small stitched slot holding an enamel dot of the colour; pressed while worn.
 func _swatch_button(color: Color, tip: String) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(34, 34)
+	b.theme_type_variation = &"SatchelSlot"
+	b.custom_minimum_size = Vector2(SWATCH, SWATCH)
 	b.tooltip_text = tip
+	b.toggle_mode = true
 	b.focus_mode = Control.FOCUS_ALL
-	for state in ["normal", "hover", "pressed", "focus"]:
-		b.add_theme_stylebox_override(state, _swatch_box(color, state != "normal", false))
-	b.pressed.connect(func() -> void: Juice.bounce_control(b, 0.18))
-	b.pivot_offset = Vector2(17, 17)
+	var dot := Panel.new()
+	dot.name = "Dot"
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dot.offset_left = 6
+	dot.offset_top = 6
+	dot.offset_right = -6
+	dot.offset_bottom = -6
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = color
+	fill.set_corner_radius_all(SWATCH)
+	fill.border_color = Color(SatchelTheme.color(&"ink"), 0.35)
+	fill.set_border_width_all(1)
+	fill.anti_aliasing = true
+	dot.add_theme_stylebox_override(&"panel", fill)
+	b.add_child(dot)
+	b.pressed.connect(func() -> void:
+		b.pivot_offset = b.size * 0.5
+		Juice.bounce_control(b, 0.18))
 	return b
-
-
-func _swatch_box(color: Color, hot: bool, worn: bool) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = color
-	box.set_corner_radius_all(17)
-	box.set_border_width_all(4 if worn else (3 if hot else 2))
-	box.border_color = UiStyle.BORDER if worn else (Color(1, 1, 1) if hot else Color(1, 1, 1, 0.85))
-	box.shadow_color = Color(0.6, 0.3, 0.5, 0.35) if not worn else Color(1.0, 0.85, 0.45, 0.8)
-	box.shadow_size = 3 if not worn else 7
-	box.anti_aliasing = true
-	return box
-
-
-func _card_box(worn: bool) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color(1, 1, 1, 0.92) if not worn else Color(1.0, 0.93, 0.96)
-	box.set_corner_radius_all(16)
-	box.set_content_margin_all(10)
-	box.set_border_width_all(2 if not worn else 3)
-	box.border_color = Color(UiStyle.BORDER, 0.45) if not worn else UiStyle.ACCENT
-	return box
 
 
 func _hair_tab() -> Control:
 	var parts := _scroll("Hair")
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	(parts[1] as VBoxContainer).add_child(grid)
+	var grid := _grid(parts[1] as VBoxContainer)
 	var styles := WardrobeCatalog.available_hair()
 	styles.sort_custom(func(a: HairstyleData, b: HairstyleData) -> bool: return a.display_name < b.display_name)
 	for h in styles:
-		var b := UiStyle.button(h.display_name, true)
+		var b := Button.new()
+		b.text = h.display_name
+		b.theme_type_variation = &"SatchelSlot"
+		b.toggle_mode = true
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 44)
+		b.clip_text = true
 		b.set_meta(&"hair", h.id)
 		var id := h.id
 		b.pressed.connect(func() -> void:
@@ -591,12 +609,14 @@ func _makeup_tab() -> Control:
 	var parts := _scroll("Makeup")
 	var col: VBoxContainer = parts[1]
 	for channel in MakeupData.CHANNELS:
-		col.add_child(UiStyle.label(String(channel).replace("_", " ").capitalize(), 16))
+		col.add_child(_label(String(channel).replace("_", " ").capitalize(), &"SatchelBody"))
 		var row := HFlowContainer.new()
-		row.add_theme_constant_override(&"h_separation", 6)
-		row.add_theme_constant_override(&"v_separation", 6)
+		row.add_theme_constant_override(&"h_separation", 4)
+		row.add_theme_constant_override(&"v_separation", 4)
 		col.add_child(row)
-		var none := UiStyle.button("None")
+		var none := Button.new()
+		none.text = "None"
+		none.theme_type_variation = &"SatchelSlot"
 		var ch := channel
 		none.pressed.connect(func() -> void: Gameplay.wardrobe.clear_makeup(ch))
 		row.add_child(none)
@@ -613,41 +633,34 @@ func _makeup_tab() -> Control:
 	return parts[0]
 
 
-## Worn swatches get a gold ring, their cards a rose border; the line under
-## the title names the look.
+## Worn swatches, hairstyles and makeup stay pressed; each card shows the
+## colour she wears; the line under the title names the look.
 func _refresh() -> void:
 	var worn: Array = Gameplay.wardrobe.equipped().values()
 	for sw in _swatches:
 		if not is_instance_valid(sw):
 			continue
 		var on := worn.has(sw.get_meta(&"piece"))
-		sw.add_theme_stylebox_override(&"normal", _swatch_box(_swatch_color(sw), false, on))
-		var card := sw.get_parent().get_parent().get_parent() as PanelContainer
-		if card:
-			var any := false
-			for id in card.get_meta(&"pieces"):
-				any = any or worn.has(id)
-			card.add_theme_stylebox_override(&"panel", _card_box(any))
+		sw.set_pressed_no_signal(on)
+		if on:
+			var thumb := (sw.get_meta(&"card") as Control).get_meta(&"thumb") as Control
+			WardrobeIcon.show_piece(thumb, WardrobeCatalog.piece(sw.get_meta(&"piece")))
 	var mk := Gameplay.wardrobe.makeup()
 	for b in find_children("*", "Button", true, false):
 		if b.has_meta(&"hair"):
 			(b as Button).set_pressed_no_signal(b.get_meta(&"hair") == Gameplay.wardrobe.hair)
 		elif b.has_meta(&"makeup"):
 			var m := WardrobeCatalog.makeup(b.get_meta(&"makeup"))
-			var on: bool = mk.has(m.channel) and mk[m.channel]["id"] == m.id
-			b.add_theme_stylebox_override(&"normal", _swatch_box(m.color, false, on))
+			(b as Button).set_pressed_no_signal(mk.has(m.channel) and mk[m.channel]["id"] == m.id)
 	var names: Array[String] = []
 	for p in Gameplay.wardrobe.worn_pieces():
 		names.append(p.display_name)
 	wearing.text = "Wearing: " + (", ".join(PackedStringArray(names)) if not names.is_empty() else "nothing much")
 
 
-func _swatch_color(sw: Button) -> Color:
-	var p := WardrobeCatalog.piece(sw.get_meta(&"piece"))
-	return p.color if p else Color.WHITE
-
-
 func _tab_changed(index: int) -> void:
+	for i in _tab_row.get_child_count():
+		(_tab_row.get_child(i) as Button).set_pressed_no_signal(i == index)
 	var tab := tabs.get_tab_control(index)
 	var face: float = CLOSE_UPS.get(String(tab.name), 0.0) if tab else 0.0
 	if _frame_tween and _frame_tween.is_valid():
@@ -655,7 +668,6 @@ func _tab_changed(index: int) -> void:
 	_frame_tween = create_tween()
 	_frame_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	_frame_tween.tween_method(_frame, _face, face, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-
 
 ## The mirror's camera, framing her in the gilded oval on the left.
 func _enter_camera() -> void:
