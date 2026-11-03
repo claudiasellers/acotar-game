@@ -11,6 +11,12 @@
 ## (a flammable Prop). Heat sources (group "heat_source", a hearth, a
 ## campfire) light cells they touch. Cooking chemistry is chemistry.gd; the
 ## per-thing fire/wet/cold model for Feyre and her things is ElementState.
+## Ground fuel: each loaded Spring region's grass, reeds and hay
+## (add_ground / remove_ground, a GroundFuel grid built off the main thread);
+## its squares become cells only where fire or water arrives.
+## Rain raises one shared soak level instead of touching every cell, and the
+## tick walks only the burning and node-following cells, so a region's worth
+## of ground costs nothing until something happens there.
 class_name ElementField
 extends Node3D
 
@@ -28,9 +34,11 @@ const WIND_REACH := 1.2
 const HEAT_RATE := 0.9
 ## Wet at or above this never lights.
 const WET_STOPS := 0.5
-## Fire dries neighbours at this rate per second; rain wets exposed cells.
+## Fire dries neighbours at this rate per second; rain raises the soak of
+## everything out in it at RAIN_WET_RATE x rain, and it dries at SOAK_DRY.
 const DRY_RATE := 0.04
 const RAIN_WET_RATE := 0.08
+const SOAK_DRY := 1.0 / 150.0
 ## Wind pushes loose props lighter than this (kg) at gusts above WIND_PUSH_SPEED (m/s).
 const WIND_PUSH_MASS := 6.0
 const WIND_PUSH_SPEED := 6.0
@@ -58,9 +66,18 @@ var _node: Array = []
 var _alive: PackedByteArray = []
 var _free_ids: PackedInt32Array = []
 var _hash: Dictionary = {}  # Vector3i -> PackedInt32Array
+var _burning: Dictionary = {}  # id -> true
+var _tracked: Dictionary = {}  # id -> true (cells that follow a node)
 var _tick_left := 0.0
 ## Rain on exposed cells, 0..1 (SpringWeather sets it).
 var rain: float = 0.0
+## How soaked everything out in the weather is, 0..1: rises in rain, dries slowly.
+var soak: float = 0.0
+## Ground fuel per region, the squares turned into cells and builds in flight.
+var _ground: Dictionary = {}  # region id -> GroundFuel
+var _woken: Dictionary = {}  # Vector2i square -> [region id, PackedInt32Array cells]
+var _ground_gen: Dictionary = {}  # region id -> int (a newer add or a remove drops older builds)
+var _ground_tasks: Dictionary = {}  # task id -> true
 ## Horizontal wind in m/s, read from the world each tick unless follow_world_wind is off.
 var wind: Vector3 = Vector3.ZERO
 var follow_world_wind := true
@@ -112,6 +129,8 @@ func add_cell(pos: Vector3, material: StringName, wet: float = 0.0, node: Node3D
 	_node[id] = node
 	_alive[id] = 1
 	_hash_add(id)
+	if node:
+		_tracked[id] = true
 	return id
 
 
@@ -131,8 +150,14 @@ func remove_cell(id: int) -> void:
 	if id < 0 or id >= _alive.size() or not _alive[id]:
 		return
 	_hash_remove(id)
+	if _burning.has(id):
+		_burning.erase(id)
+		if _fx:
+			_fx.douse(id, false)
+	_tracked.erase(id)
 	_alive[id] = 0
 	_node[id] = null
+	_fire[id] = 0.0
 	_free_ids.append(id)
 
 
@@ -150,8 +175,9 @@ func fire(id: int) -> float:
 	return _fire[id] if _ok(id) else 0.0
 
 
+## How wet a cell is: its own wetness or the weather's soak, whichever is more.
 func wet(id: int) -> float:
-	return _wet[id] if _ok(id) else 0.0
+	return maxf(_wet[id], soak) if _ok(id) else 0.0
 
 
 func is_burning(id: int) -> bool:
@@ -167,17 +193,106 @@ func cell_count() -> int:
 
 
 func burning_count() -> int:
-	var n := 0
-	for i in _alive.size():
-		if _alive[i] and _fire[i] > 0.0:
-			n += 1
-	return n
+	return _burning.size()
+
+
+# --- ground fuel --------------------------------------------------------------
+
+## Registers a region's flammable scatter (GroundFuel.pick: grass, reeds, hay).
+## The grid is built on a worker thread unless `threaded` is off; until it
+## lands the region's ground does not burn.
+func add_ground(region_id: StringName, layers: Array, threaded: bool = true) -> void:
+	var gen: int = _ground_gen.get(region_id, 0) + 1
+	_ground_gen[region_id] = gen
+	var picked := GroundFuel.pick(layers)
+	if picked.is_empty():
+		return
+	if not threaded:
+		_land_ground(region_id, gen, GroundFuel.build(region_id, picked), [-1])
+		return
+	var me: WeakRef = weakref(self)
+	var task_box := [-1]  # read on the main thread, after add_task has returned
+	task_box[0] = WorkerThreadPool.add_task(func() -> void:
+		var fuel := GroundFuel.build(region_id, picked)
+		var field := me.get_ref() as ElementField
+		if field:
+			field._land_ground.call_deferred(region_id, gen, fuel, task_box))
+	_ground_tasks[task_box[0]] = true
+
+
+## Drops a region's ground and every cell made from it (it streamed out).
+func remove_ground(region_id: StringName) -> void:
+	_ground_gen[region_id] = int(_ground_gen.get(region_id, 0)) + 1
+	_ground.erase(region_id)
+	for key: Vector2i in _woken.keys():
+		var entry: Array = _woken[key]
+		if entry[0] == region_id:
+			for id in (entry[1] as PackedInt32Array):
+				remove_cell(id)
+			_woken.erase(key)
+
+
+func has_ground(region_id: StringName) -> bool:
+	return _ground.has(region_id)
+
+
+func ground(region_id: StringName) -> GroundFuel:
+	return _ground.get(region_id) as GroundFuel
+
+
+## True while a ground build is still on a worker thread.
+func ground_pending() -> bool:
+	return not _ground_tasks.is_empty()
+
+
+func _land_ground(region_id: StringName, gen: int, fuel: GroundFuel, task_box: Array) -> void:
+	var task: int = task_box[0]
+	if _ground_tasks.has(task):
+		WorkerThreadPool.wait_for_task_completion(task)
+		_ground_tasks.erase(task)
+	if gen != int(_ground_gen.get(region_id, 0)) or fuel.square_count() == 0:
+		return
+	_ground[region_id] = fuel
+
+
+## Turns the fuel squares within `radius` of `pos` into cells (four per
+## square, 1 m apart, at the weather's soak), once.
+func _wake_ground(pos: Vector3, radius: float) -> void:
+	if _ground.is_empty():
+		return
+	var lo := GroundFuel.key_of(pos - Vector3.ONE * radius)
+	var hi := GroundFuel.key_of(pos + Vector3.ONE * radius)
+	var quarter := GroundFuel.STEP * 0.25
+	for x in range(lo.x, hi.x + 1):
+		for z in range(lo.y, hi.y + 1):
+			var key := Vector2i(x, z)
+			if _woken.has(key):
+				continue
+			for region_id: StringName in _ground:
+				var fuel: GroundFuel = _ground[region_id]
+				var code := fuel.at(key)
+				if code == GroundFuel.NONE:
+					continue
+				var y := fuel.height_at(key)
+				var ids := PackedInt32Array()
+				for q: Vector2 in [Vector2(1, 1), Vector2(3, 1), Vector2(1, 3), Vector2(3, 3)]:
+					var at := Vector3(x * GroundFuel.STEP + q.x * quarter, y, z * GroundFuel.STEP + q.y * quarter)
+					ids.append(add_cell(at, GroundFuel.MATERIALS[code]))
+				_woken[key] = [region_id, ids]
+				break
+
+
+func _exit_tree() -> void:
+	for task: int in _ground_tasks.keys():
+		WorkerThreadPool.wait_for_task_completion(task)
+	_ground_tasks.clear()
 
 
 # --- elements arriving -------------------------------------------------------
 
 ## FIRE at a point: lights every dry, flammable cell within `radius`. Returns how many lit.
 func ignite_at(pos: Vector3, radius: float = 0.8) -> int:
+	_wake_ground(pos, radius)
 	var lit := 0
 	for id in cells_near(pos, radius):
 		if _try_ignite(id):
@@ -187,13 +302,13 @@ func ignite_at(pos: Vector3, radius: float = 0.8) -> int:
 
 ## WATER at a point (a thrown bucket, a splash): soaks and puts out fires within `radius`.
 func soak_at(pos: Vector3, radius: float = 1.5, amount: float = 1.0) -> int:
+	_wake_ground(pos, radius)
 	var hit := 0
 	for id in cells_near(pos, radius):
 		_wet[id] = clampf(_wet[id] + amount, 0.0, 1.0)
 		_heat[id] = 0.0
 		if _fire[id] > 0.0:
-			_fire[id] = 0.0
-			extinguished.emit(id)
+			_put_out(id)
 		_sync_node(id)
 		hit += 1
 	return hit
@@ -234,22 +349,25 @@ func step(dt: float) -> void:
 	var wind_k := clampf(wind_dir.length() / 8.0, 0.0, 1.0)
 	wind_dir = wind_dir.normalized() if wind_dir.length_squared() > 0.0001 else Vector3.ZERO
 	var reach := SPREAD + WIND_REACH * wind_k
+	# Rain soaks everything out in it (rule 1), and dries off slowly after.
+	if rain > 0.0:
+		soak = clampf(soak + rain * RAIN_WET_RATE * dt, 0.0, 1.0)
+	else:
+		soak = maxf(soak - SOAK_DRY * dt, 0.0)
 	var to_light: Array[int] = []
-	for id in _alive.size():
-		if not _alive[id]:
+	for id: int in _burning.keys():
+		if not _burning.has(id):
 			continue
-		# Rain wets what stands in it (rule 1); fire dries itself out under it more slowly.
-		if rain > 0.0:
-			_wet[id] = clampf(_wet[id] + rain * RAIN_WET_RATE * dt, 0.0, 1.0)
-			if _wet[id] >= WET_STOPS and _fire[id] > 0.0:
-				_fire[id] = 0.0
-				extinguished.emit(id)
-		if _fire[id] <= 0.0:
+		# Rain puts fires out (rule 2).
+		if soak >= WET_STOPS:
+			_wet[id] = maxf(_wet[id], soak)
+			_put_out(id)
 			continue
 		# Fire burns its material's fuel (rule 1)...
 		_fuel[id] -= dt
 		if _fuel[id] <= 0.0:
 			_fire[id] = 0.0
+			_burning.erase(id)
 			burnt_out.emit(id)
 			_sync_node(id)
 			continue
@@ -265,9 +383,10 @@ func step(dt: float) -> void:
 			if d > limit:
 				continue
 			_wet[n] = maxf(_wet[n] - DRY_RATE * dt, 0.0)
-			if _wet[n] >= WET_STOPS:
+			var wet_n := maxf(_wet[n], soak)
+			if wet_n >= WET_STOPS:
 				continue
-			var gain := HEAT_RATE * dt * _fire[id] * (1.0 + wind_k * along) * (1.0 - _wet[n])
+			var gain := HEAT_RATE * dt * _fire[id] * (1.0 + wind_k * along) * (1.0 - wet_n)
 			_heat[n] += maxf(gain, 0.0)
 			if _heat[n] >= 1.0:
 				to_light.append(n)
@@ -278,17 +397,27 @@ func step(dt: float) -> void:
 
 
 func _try_ignite(id: int) -> bool:
-	if not _ok(id) or _fire[id] > 0.0 or _fuel[id] <= 0.0 or _wet[id] >= WET_STOPS:
+	if not _ok(id) or _fire[id] > 0.0 or _fuel[id] <= 0.0 or wet(id) >= WET_STOPS:
 		return false
 	if not bool(MATERIALS.get(_material[id], {}).get("flammable", false)):
 		return false
-	if burning_count() >= MAX_BURNING:
+	if _burning.size() >= MAX_BURNING:
 		return false
 	_fire[id] = 1.0
 	_heat[id] = 0.0
+	_burning[id] = true
 	ignited.emit(id)
 	_sync_node(id)
+	# The ground it could reach becomes cells now, at the widest windy reach.
+	_wake_ground(_pos[id], SPREAD + WIND_REACH)
 	return true
+
+
+func _put_out(id: int) -> void:
+	_fire[id] = 0.0
+	_burning.erase(id)
+	extinguished.emit(id)
+	_sync_node(id)
 
 
 ## Lit fires light what is pushed into them: heat sources (group
@@ -299,6 +428,7 @@ func _heat_sources() -> void:
 	for source in get_tree().get_nodes_in_group(ElementState.HEAT_GROUP):
 		if source is Node3D and source.has_method(&"heat_at"):
 			var at := (source as Node3D).global_position
+			_wake_ground(at, 1.0)
 			for id in cells_near(at, 1.0):
 				if float(source.heat_at(_pos[id])) >= 0.6:
 					_ignite_loose(id)
@@ -329,9 +459,7 @@ func _wind_on_props(dt: float) -> void:
 
 
 func _follow_nodes() -> void:
-	for id in _alive.size():
-		if not _alive[id] or _node[id] == null:
-			continue
+	for id: int in _tracked.keys():
 		var node := _node[id] as Node3D
 		if not is_instance_valid(node):
 			remove_cell(id)
@@ -435,7 +563,7 @@ func debug_cells() -> Array:
 			c = Color(1.0, 0.3, 0.2)
 		elif is_burnt(id):
 			c = Color(0.35, 0.33, 0.36)
-		elif _wet[id] >= WET_STOPS:
+		elif wet(id) >= WET_STOPS:
 			c = Color(0.35, 0.55, 1.0)
 		out.append([_pos[id], c])
 	return out
