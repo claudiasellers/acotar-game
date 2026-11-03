@@ -1,0 +1,5 @@
+from wearables-lane
+quality look
+timeout 900
+shot arrivals res://tools/dressing_room_shot.tscn arrivals {out}
+shot satchel res://tools/dressing_room_shot.tscn satchel {out}
