@@ -1,0 +1,3 @@
+from lane1
+quality look
+shot title_load res://tools/pause_menu_shot.tscn title_load {out}/title_load.png
