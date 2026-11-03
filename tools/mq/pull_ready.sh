@@ -85,7 +85,7 @@ push_result() { # sigf tagname message
 }
 
 answer() { # sigf
-	local f="$1" key sha st entry msg
+	local f="$1" key sha st entry msg m
 	st=$(kv_get "$f" state)
 	key=$(kv_get "$f" key); sha=$(kv_get "$f" sha); entry=$(kv_get "$f" entry)
 	case "$st" in
@@ -97,6 +97,11 @@ Fix it and push ready-$key with the next number."
 	esac
 	if git rev-parse -q --verify "$REMOTE/main" >/dev/null && git merge-base --is-ancestor "$sha" "$REMOTE/main"; then
 		push_result "$f" "merged/$key" "In $REMOTE/main."
+	elif [ -n "$entry" ] && m="$MQ_DIR/done/merged/$entry.entry" && [ -n "$(kv_get "$m" landed)" ] &&
+			git merge-base --is-ancestor "$(kv_get "$m" landed)" "$REMOTE/main"; then
+		# Restacked: the work is in main under new commits, so this sha never will be.
+		push_result "$f" "merged/$key" "In $REMOTE/main as $(kv_get "$m" landed), not as this commit: the build lane dropped commits already in main ($(kv_get "$m" dropped)) and merged the rest.
+Start the next slice from $REMOTE/main, not from this branch."
 	elif [ -n "$entry" ] && [ -f "$MQ_DIR/done/rejected/$entry.entry" ]; then
 		msg="$(kv_get "$MQ_DIR/done/rejected/$entry.entry" reason)
 Merge origin/main, fix it, and push the next number; tags are never reused."
