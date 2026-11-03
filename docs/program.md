@@ -14,7 +14,7 @@ run headless becomes a Mac step instead of iteration; canonical shots re-rendere
 |---|---|---|---|
 | P1–P5, T1 | L57 (lead) | lane/render-program | in progress |
 | T2 surface model | L58 | lane/surface-model | L58-1 413510d handed in 20:48Z; Mac look request shots/req-L58-1 pending |
-| T5 touchable world | L59 | lane/touchable-world | L59-1 ef78672 (props) handed in 20:23Z, director-approved |
+| T5 touchable world | L59 | lane/touchable-world | props merged (8c2ea45); L59-4 e472d51 (navmesh + weather/fire + scene yield) queued; Mac look check of rain/petals/flames left |
 | T3a bounce, T3b grade, T4 hero meshes, T6 housekeeping | — | — | after L58 |
 
 ## Readings taken (the brief said: take the most reasonable reading and record it)
@@ -69,6 +69,7 @@ boots a level in **under 2 minutes** instead of ~16.
 
 1. `make perf` on the Mac at main after L57-1 merges: the real frame-time baseline (cloud ms are lavapipe).
 2. cottage (`cottage_snow`) crashes lavapipe in Forward+ on both trees: its counts come from the Mac pass.
+4. L59: look check of rain, petals and flames; frame time of the paced nav parse when the manor streams in.
 3. L58-1 look request `shots/req-L58-1`: the lead's same-prop check across manor / village / forest.
 
 ## T2 (L58-1) as handed in
@@ -79,3 +80,14 @@ is the importer default and in all 1,378 .import files. Checks reported: 0 Stand
 surfaces in all 1,378 imports; layout pixel delta 0.09–1.12% (< 8%); draw calls identical. Deviation: one line of
 docs/contracts/world.md (glb import_script) changed, flagged to the director under R13. bogge_form and fur_card use
 Godot's built-in RIM and stay untouched (horror values kept). Frame ms: Mac step.
+
+## T5 (L59) as handed in
+
+Props: 7 PropData kinds, 37 props in village + manor grounds, pooled (1 MultiMesh draw per kind + ≤16 live bodies),
+manor chunk guard untouched; touch_test push 4.84 m, throw 8.81 m. Navmesh: NavBaker bakes a 192 m tile round Feyre
+(parse on the main thread, bake async), manor levels inside the same tile so stairs join (deviation from "one region
+per level", which would cut every flight); NavMover on wolves, BeastActor, CourtNpc, straight steering as fallback;
+wolf hall→east corridor 35.7 m walked vs 35.1 straight; act1 playtest to wolf_kill passes. Weather: rain streaks,
+`ground_wetness` global, petal gusts, mist via GradeDirector.set_weather_fog (0 default, ≤0.04), all held off while a
+story scene runs. Chemistry: ElementField fire/water/wind, 3 rules, 2 m hash, 10 Hz, F8 overlay; fire spreads in 1.1 s,
+wet grass won't light. Free climb/glide: skipped by design.
