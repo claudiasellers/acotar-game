@@ -4,6 +4,8 @@
 extends Node
 
 signal changed(key: StringName)
+## The sun shadow profile changed (program T1); `profile` is the resolved name, "high" or "mac".
+signal shadow_profile_changed(profile: String)
 
 const SECTIONS := {
 	&"mouse_sensitivity": "camera", &"stick_sensitivity": "camera",
@@ -147,6 +149,7 @@ var shadow_profile: String = "auto":
 		shadow_profile = v
 		if is_inside_tree():
 			apply_shadow_profile()
+			shadow_profile_changed.emit(shadow_profile_name())
 
 
 func apply_shadow_profile() -> void:
