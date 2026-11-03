@@ -69,7 +69,9 @@ func test_shadow_profile_applies_to_world_suns_only() -> void:
 	assert_eq(sun.directional_shadow_max_distance, 160.0)
 	assert_eq(sun.directional_shadow_mode, DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS)
 	assert_eq(lamp.directional_shadow_max_distance, 20.0, "satchel/title lights untouched")
+	watch_signals(GameSettings)
 	GameSettings.shadow_profile = "high"
+	assert_signal_emitted_with_parameters(GameSettings, "shadow_profile_changed", ["high"])
 	assert_eq(sun.directional_shadow_max_distance, 220.0, "back to its own reach")
 	assert_eq(sun.directional_shadow_mode, DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS)
 	GameSettings.shadow_profile = old
@@ -89,3 +91,30 @@ func test_village_and_manor_carry_occluders() -> void:
 	for l in levels:
 		gut.p("%s: %d boxes" % [l.name, (l.occluder as ArrayOccluder3D).get_vertices().size() / 8])
 	assert_gte(levels.size(), 4, "one occluder per manor level")
+	# Openings stay open: no occluder box covers any window or doorway, so the
+	# garden seen through a window or the open front doors is never culled.
+	var boxes_aabb: Array[AABB] = []
+	for l in levels:
+		var verts := (l.occluder as ArrayOccluder3D).get_vertices()
+		for b in verts.size() / 8:
+			var a := AABB(verts[b * 8], Vector3.ZERO)
+			for k in 8:
+				a = a.expand(verts[b * 8 + k])
+			boxes_aabb.append(a.grow(-0.02))
+	var probes: Array[Vector3] = []
+	for w: Dictionary in house.get_meta(&"facade_windows", []):
+		# Mid-thickness of the wall, where an uncut box would sit.
+		var at: Vector2 = (w.at as Vector2) - (w.out as Vector2) * ManorHouseBuilder.WALL * 0.5
+		probes.append(Vector3(at.x, (float(w.bottom) + float(w.top)) * 0.5, at.y))
+	for d in ManorHouseIndex.new(ManorHouseBuilder.load_layouts()).doors:
+		for off in [Vector2(0.125, 0), Vector2(-0.125, 0), Vector2(0, 0.125), Vector2(0, -0.125)]:
+			probes.append(Vector3(d.at.x + off.x, ManorHouseBuilder.floor_y(d.level) + 1.0, d.at.y + off.y))
+	assert_gt(probes.size(), 100, "windows and doors probed")
+	var blocked := 0
+	for p in probes:
+		for a in boxes_aabb:
+			if a.has_point(p):
+				blocked += 1
+				break
+	gut.p("openings probed: %d, covered by an occluder: %d" % [probes.size(), blocked])
+	assert_eq(blocked, 0, "no window or doorway is covered by an occluder")
