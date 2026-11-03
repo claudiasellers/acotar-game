@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="PropPlacements" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_nb6e0"]
+[ext_resource type="Script" path="res://systems/props/prop_placements.gd" id="2_j2nmg"]
+
+[sub_resource type="Resource" id="Resource_ic8vr"]
+script = ExtResource("1_nb6e0")
+id = &"firewood_log"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(83.02004, 8, -39.959446, 2.4688628, 1, -138.71439, 8.392668, 11.430538, 5.4378314, 1)
+
+[sub_resource type="Resource" id="Resource_y3e43"]
+script = ExtResource("1_nb6e0")
+id = &"bucket"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(83.13879, 8, -38.925514, 1.231049, 1, -136.23152, 8.36424, 13.082039, 6.05697, 1, 142.01833, 8, -74.7925, 3.6449065, 1, 139.36595, 8, -71.29142, 4.332011, 1, -205.40775, 9.6, 139.69391, 1.6233286, 1)
+
+[sub_resource type="Resource" id="Resource_5uh6n"]
+script = ExtResource("1_nb6e0")
+id = &"crate"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(83.31573, 8, -41.618782, 3.7089105, 1, -137.86807, 8.370551, 12.853813, 1.7988559, 1, -203.66348, 9.6, 139.73935, 1.8412254, 1)
+
+[sub_resource type="Resource" id="Resource_3jncr"]
+script = ExtResource("1_nb6e0")
+id = &"pot_glazed"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(143.54984, 8, -75.471344, 1.5763695, 1, 144.14, 8, -73.95624, 2.9161508, 1, 138.5622, 8, -70.24019, 3.1443658, 1, 137.27922, 8, -70.10354, 6.2427273, 1, -202.42548, 9.6, 139.84824, 1.2021619, 1, 20.489546, 6.2, -104.97748, 0.388233, 1, 18.735598, 6.2, -105.090096, 0.54523844, 1, 20.220781, 6.2, -106.55116, 0.38334656, 1, 21.557047, 6.2, -104.66819, 1.7127911, 1)
+
+[resource]
+script = ExtResource("2_j2nmg")
+region_id = &"manor_estate"
+layers = Array[ExtResource("1_nb6e0")]([SubResource("Resource_ic8vr"), SubResource("Resource_y3e43"), SubResource("Resource_5uh6n"), SubResource("Resource_3jncr")])

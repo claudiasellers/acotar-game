@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PropData" format=3]
+
+[ext_resource type="Script" path="res://systems/props/prop_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pot_glazed"
+display_name = "Glazed flower pot"
+mesh_path = "res://art/props/touch/pot_glazed.glb"
+shape = &"cylinder"
+size = Vector3(0.46, 0.46, 0.46)
+mass = 4.0
+friction = 0.6
+bounce = 0.15
+carryable = true
+breakable = true
+break_speed = 11.0
+flammable = false
+wetness = 0.0
+sparkle = Color(1, 0.75, 0.88, 1)

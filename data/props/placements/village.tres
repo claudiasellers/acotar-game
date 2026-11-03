@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="PropPlacements" format=3]
+
+[ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="1_i4o01"]
+[ext_resource type="Script" path="res://systems/props/prop_placements.gd" id="2_2pagt"]
+
+[sub_resource type="Resource" id="Resource_s3hvy"]
+script = ExtResource("1_i4o01")
+id = &"crate_village"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(384.70703, 3.1776638, 2219.8328, 1.7179509, 1, 368.04468, 3.1776638, 2257.3025, 4.6011186, 1, 299.5056, 3.1776638, 2266.7368, 0.47631633, 1, 425.95157, 3.1776638, 2192.276, 1.7533277, 1, 425.29062, 3.1776638, 2191.0867, 0.1456631, 1)
+
+[sub_resource type="Resource" id="Resource_gl5my"]
+script = ExtResource("1_i4o01")
+id = &"barrel"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(383.6489, 3.1776638, 2219.2034, 6.0101614, 1, 367.11716, 3.1776638, 2258.573, 5.6151547, 1, 427.01392, 3.1776638, 2193.6245, 6.1872005, 1)
+
+[sub_resource type="Resource" id="Resource_n735r"]
+script = ExtResource("1_i4o01")
+id = &"pot_clay"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(385.88394, 3.1776638, 2218.944, 1.4543494, 1, 366.39752, 3.1776638, 2259.5356, 0.11224855, 1, 340.63968, 3.1776638, 2300.941, 4.0972047, 1, 341.0303, 3.1776638, 2302.085, 4.6438055, 1)
+
+[sub_resource type="Resource" id="Resource_pnf1f"]
+script = ExtResource("1_i4o01")
+id = &"bucket"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(368.04932, 3.1776638, 2259.293, 3.7594986, 1, 296.5596, 3.1776638, 2266.8203, 3.1352248, 1, 341.80072, 3.1776638, 2299.6355, 2.7033577, 1)
+
+[sub_resource type="Resource" id="Resource_q4wjw"]
+script = ExtResource("1_i4o01")
+id = &"firewood_log"
+tags = PackedStringArray("prop")
+instances = PackedFloat32Array(298.01642, 3.1776638, 2267.5122, 2.2294726, 1, 426.75085, 3.1776638, 2191.0813, 3.1501977, 1, 339.53143, 3.1776638, 2300.6826, 1.9489772, 1)
+
+[resource]
+script = ExtResource("2_2pagt")
+region_id = &"village"
+layers = Array[ExtResource("1_i4o01")]([SubResource("Resource_s3hvy"), SubResource("Resource_gl5my"), SubResource("Resource_n735r"), SubResource("Resource_pnf1f"), SubResource("Resource_q4wjw")])

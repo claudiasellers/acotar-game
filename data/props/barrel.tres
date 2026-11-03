@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PropData" format=3]
+
+[ext_resource type="Script" path="res://systems/props/prop_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"barrel"
+display_name = "Barrel"
+mesh_path = "res://world/human_realm/village/assets/village_barrel.glb"
+shape = &"cylinder"
+size = Vector3(0.82, 0.96, 0.82)
+mass = 45.0
+friction = 0.7
+bounce = 0.1
+carryable = false
+breakable = false
+break_speed = 9.0
+flammable = true
+wetness = 0.0
+sparkle = Color(1, 0.85, 0.7, 1)
