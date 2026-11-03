@@ -1,0 +1,6 @@
+from surface-model-L58
+quality look
+shot manor_drive res://tools/world_shot.tscn manor_drive {out}/manor_drive.png
+shot village_market res://tools/world_shot.tscn village_market {out}/village_market.png
+shot cottage_snow res://tools/world_shot.tscn cottage_snow {out}/cottage_snow.png
+shot hunting_forest res://tools/world_shot.tscn hunting_forest {out}/hunting_forest.png
