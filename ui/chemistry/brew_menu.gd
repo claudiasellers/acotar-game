@@ -18,6 +18,9 @@ const ICON := 52.0
 const COLUMNS := 6
 ## The scene-tree name, kept from the M1 panel (tests and tools look for it).
 const NODE_NAME := "HearthPanel"
+## One bottle per brew (tools/chemistry/render_brew_icons.gd).
+const BREW_ICONS := "res://ui/theme/icons/brews/"
+const REVEAL_ICON := 96.0
 ## Effect tag -> the word Feyre senses for it.
 const SENSE := {
 	&"warm": "warm", &"cool": "cool", &"bright": "bright", &"quiet": "quiet",
@@ -44,7 +47,7 @@ var _brew: Button
 var _reveal: PanelContainer
 var _reveal_name: Label
 var _reveal_note: Label
-var _reveal_swatch: Panel
+var _reveal_icon: TextureRect
 var _outcome: Label
 var _dishes: VBoxContainer
 
@@ -254,7 +257,7 @@ func _build() -> void:
 	_hunch.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_hunch)
 	_brew = Button.new()
-	_brew.theme_type_variation = &"SatchelSlot"
+	_brew.theme_type_variation = &"SatchelTab"
 	_brew.text = "Brew"
 	_brew.custom_minimum_size = Vector2(0, 44)
 	_brew.pressed.connect(func() -> void: brew())
@@ -267,15 +270,12 @@ func _build() -> void:
 	var reveal_row := HBoxContainer.new()
 	reveal_row.add_theme_constant_override(&"separation", 14)
 	_reveal.add_child(reveal_row)
-	_reveal_swatch = Panel.new()
-	var round := StyleBoxFlat.new()
-	round.set_corner_radius_all(20)
-	round.border_color = Color(1, 1, 1, 0.85)
-	round.set_border_width_all(3)
-	_reveal_swatch.add_theme_stylebox_override(&"panel", round)
-	_reveal_swatch.custom_minimum_size = Vector2(40, 40)
-	_reveal_swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	reveal_row.add_child(_reveal_swatch)
+	_reveal_icon = TextureRect.new()
+	_reveal_icon.custom_minimum_size = Vector2(REVEAL_ICON, REVEAL_ICON)
+	_reveal_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_reveal_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_reveal_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	reveal_row.add_child(_reveal_icon)
 	var reveal_text := VBoxContainer.new()
 	reveal_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	reveal_row.add_child(reveal_text)
@@ -395,6 +395,14 @@ func _refresh_dishes() -> void:
 		var d: Dictionary = inv.dishes[i]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override(&"separation", 10)
+		var tex := icon_for(StringName(d.get("brew", &"")))
+		if tex:
+			var icon := TextureRect.new()
+			icon.texture = tex
+			icon.custom_minimum_size = Vector2(36, 36)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			row.add_child(icon)
 		var title := _label(String(d.get("name", "Dish")), &"SatchelBody")
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(title)
@@ -432,13 +440,18 @@ func _show_result(r: Dictionary) -> void:
 		_reveal.visible = true
 		_reveal_name.text = String(r.name)
 		_reveal_note.text = "“%s”" % rule.note
-		(_reveal_swatch.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = rule.color
+		_reveal_icon.texture = icon_for(rule.id)
 		_outcome.text = describe(r)
 		Juice.bounce_control(_reveal, 0.18)
 		Juice.bounce_control(_found.get_parent() as Control, 0.25)
 	else:
 		_reveal.visible = false
 		_outcome.text = "%s. %s" % [r.name, describe(r)]
+
+
+static func icon_for(brew_id: StringName) -> Texture2D:
+	var path := BREW_ICONS + String(brew_id) + ".webp"
+	return load(path) as Texture2D if brew_id != &"" and ResourceLoader.exists(path) else null
 
 
 static func describe(r: Dictionary) -> String:
@@ -464,7 +477,7 @@ static func describe(r: Dictionary) -> String:
 
 func _small_button(text: String, action: Callable) -> Button:
 	var b := Button.new()
-	b.theme_type_variation = &"SatchelSlot"
+	b.theme_type_variation = &"SatchelTab"
 	b.text = text
 	b.pressed.connect(action)
 	return b

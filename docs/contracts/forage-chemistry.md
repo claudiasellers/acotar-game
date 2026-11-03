@@ -25,8 +25,11 @@ station, and what comes out reaches the world through an element.
   `kitchen`, `bread_oven`, `stillroom` and nodes in group `hearth` (the cottage)
   get a CookingStation child (unlit, not in group `station`).
 - `BrewMenu.open_for(feyre, cooking_station)`; root node name `HearthPanel`.
-- `BrewEffects.scent_scale(player)` (CreatureSenses scent range) and
-  `glow_energy(player)` (BrewAura light on Feyre).
+- `BrewEffects.scent_scale(player)` (CreatureSenses scent range; beasts and
+  lesser fae only, never High Fae, Keeper 2026-11-03).
+- `BrewTells` on Feyre: scene-lit particles for bright (motes), warm (haze)
+  and cool (rime). No lights and no EMISSION: a brew acts on her, nothing
+  comes from her before she is Made (Keeper).
 - ArrowEffects: a fire arrow calls `ElementField.ignite_at(at, 1.2)`, a frost
   arrow `soak_at(at, 1.8)`.
 
@@ -39,5 +42,8 @@ station, and what comes out reaches the world through an element.
 4. A brew's first making shows a discovery card with sparkle, chime and
    bounce, once; the journal keeps it across a save.
 5. Fire arrow lights dry grass in the ElementField; frost arrow puts it out.
-6. Hush draught cuts scent range to <0.5; glow draught lights Feyre (>1.0).
+6. Hush draught cuts scent range to <0.5; a glow draught shows motes round
+   her with 0 lights on her (L62-2).
+8. L62-2: Brew, Drink and Give use the stitched pill; a discovery shows the
+   brew's own bottle icon (27 icons, tools/chemistry/render_brew_icons.gd).
 7. One GUT file (6 tests); neighbouring tests still pass.
