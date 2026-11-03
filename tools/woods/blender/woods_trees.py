@@ -21,10 +21,17 @@ import random
 import sys
 
 import bpy
-from mathutils import Vector, noise
+from mathutils import Vector, kdtree, noise
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
     os.path.dirname(__file__), "..", "..", "..", "world", "spring_court", "shared", "models")
+
+# Triangle budgets (R4, lane L61): every species' near model is capped by
+# SPECIES below (3000, 4500 for the ancient oak landmark); far models 550-600.
+# The near wood (trunk, limbs, twigs) is one Skin-modifier graph, smoothed
+# with Subdivision Surface 2 and decimated to whatever the crown leaves of the
+# cap, never more than WOOD_MAX. Printed per species on every run.
+WOOD_MAX = 2400
 
 # Palette (sRGB): experience-bar.md §2.2. No lime anywhere in the court.
 def hexc(h):
@@ -74,6 +81,10 @@ class Kit:
         self.faces = []
         self.colors = []  # per face: three colours
         self.uvs = []     # per face: three (flex, glow)
+        self.normals = {}  # vert index -> custom shading normal (crowns)
+        # Near models grow their wood as one Skin-modifier graph (lane L61):
+        # every limb and twig joins the trunk in one continuous surface.
+        self.skin = None
 
     def tri_count(self):
         return len(self.faces)
@@ -87,8 +98,18 @@ class Kit:
         self.colors.append(tuple(cols))
         self.uvs.append(tuple(uvs))
 
-    def tube(self, points, radii, sides, col0, col1, flex0=0.0, flex1=0.0, flare=0.0):
-        """A tapered tube along a polyline. Colours and flex run root to tip."""
+    def tube(self, points, radii, sides, col0, col1, flex0=0.0, flex1=0.0, flare=0.0, skin=True):
+        """A tapered tube along a polyline. Colours and flex run root to tip.
+        With a skin graph (near models) it adds the polyline to the graph
+        instead; skin=False keeps the faceted tube (the stump's cut face)."""
+        if self.skin is not None and skin:
+            if flare > 0.0:
+                # Draw what the ring flare would have, so every species keeps
+                # the exact shape (crown, limbs, blossom) it had before.
+                for _ in range(sides):
+                    self.rng.random()
+            self.skin.add_line(points, radii, col0, col1, flex0, flex1, flare)
+            return points[-1]
         rings = []
         n = len(points)
         for i, p in enumerate(points):
@@ -135,6 +156,10 @@ class Kit:
             r = radius * (1.0 + lump * n)
             p = c + Vector((v.x * r, v.y * r, v.z * r * squash))
             idx.append(self.add_vert(p))
+            # Cloud shading (lane L61): the normal of the smooth ellipsoid, not
+            # of the noisy lumps, so a crown lights as one soft mass instead of
+            # a cluster of hexagon facets. Costs no triangles.
+            self.normals[idx[-1]] = Vector((v.x, v.y, v.z / max(squash, 0.05))).normalized()
             h = (v.z + 1.0) * 0.5
             col = mix(bottom, top, h ** 0.8)
             # Little highlights where the lumps bulge: reads as leaf clumps.
@@ -187,6 +212,137 @@ class Kit:
                 self.face(face, cols, uvs)
 
 
+class SkinGraph:
+    """Wood as a graph for the Skin modifier: vertices with radii, edges,
+    and dense colour/flex samples so the skinned surface can be painted
+    afterwards (Skin output carries no attributes). Lines that start on an
+    existing vertex join it, so limbs grow out of the trunk seamlessly."""
+
+    def __init__(self):
+        self.pos, self.rad, self.edges, self.samples, self._key = [], [], [], [], {}
+
+    def vert(self, p, r):
+        k = (round(p[0], 4), round(p[1], 4), round(p[2], 4))
+        i = self._key.get(k)
+        if i is None:
+            i = len(self.pos)
+            self._key[k] = i
+            self.pos.append(Vector(p))
+            self.rad.append(r)
+        else:
+            self.rad[i] = max(self.rad[i], r)
+        return i
+
+    def has(self, p):
+        return (round(p[0], 4), round(p[1], 4), round(p[2], 4)) in self._key
+
+    def add_line(self, points, radii, col0, col1, flex0, flex1, flare):
+        pts = [Vector(p) for p in points]
+        rs = list(radii)
+        cols = [mix(col0, col1, i / (len(pts) - 1)) for i in range(len(pts))]
+        flexes = [flex0 + (flex1 - flex0) * i / (len(pts) - 1) for i in range(len(pts))]
+        if flare > 0.0 and len(pts) > 1:
+            # A buttressed foot: a wide root vertex and a waist just above it.
+            mid = pts[0].lerp(pts[1], 0.3)
+            pts.insert(1, mid)
+            rs.insert(1, rs[0] * (1.0 + flare * 0.35))
+            cols.insert(1, cols[0])
+            flexes.insert(1, flexes[0])
+            rs[0] *= 1.0 + flare * 0.9
+        if pts[0].z <= 0.01 and not self.has(pts[0]):
+            # Sink the root so the rounded skin end never floats above ground.
+            pts.insert(0, pts[0] - Vector((0, 0, 0.35 + rs[0] * 0.5)))
+            rs.insert(0, rs[0])
+            cols.insert(0, cols[0])
+            flexes.insert(0, flexes[0])
+        ids = [self.vert(p, r) for p, r in zip(pts, rs)]
+        for i in range(len(ids) - 1):
+            if ids[i] != ids[i + 1]:
+                self.edges.append((ids[i], ids[i + 1]))
+            for k in range(8):
+                t = k / 8.0
+                self.samples.append((pts[i].lerp(pts[i + 1], t), mix(cols[i], cols[i + 1], t),
+                                     flexes[i] + (flexes[i + 1] - flexes[i]) * t))
+        self.samples.append((pts[-1], cols[-1], flexes[-1]))
+
+
+def skin_wood(kit, budget):
+    """Skins kit.skin (Skin -> Subdivision Surface 2 -> Decimate to `budget`),
+    paints it from the graph samples and appends the triangles to the kit."""
+    g = kit.skin
+    kit.skin = None
+    if not g.edges:
+        return 0
+    mesh = bpy.data.meshes.new("wood")
+    mesh.from_pydata([tuple(p) for p in g.pos], g.edges, [])
+    obj = bpy.data.objects.new("wood", mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    mod = obj.modifiers.new("Skin", "SKIN")
+    mod.use_smooth_shade = True
+    mod.branch_smoothing = 0.6
+    layer = mesh.skin_vertices[0].data
+    # One root per connected piece (the fallen log's root plate is its own).
+    parent = list(range(len(g.pos)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for a, b in g.edges:
+        parent[find(a)] = find(b)
+    rooted = set()
+    for i, r in enumerate(g.rad):
+        layer[i].radius = (r, r)
+        if find(i) not in rooted:
+            rooted.add(find(i))
+            layer[i].use_root = True
+    sub = obj.modifiers.new("Sub", "SUBSURF")
+    sub.levels = 2
+    dg = bpy.context.evaluated_depsgraph_get()
+    m = obj.evaluated_get(dg).to_mesh()
+    m.calc_loop_triangles()
+    n = len(m.loop_triangles)
+    obj.evaluated_get(dg).to_mesh_clear()
+    ratio = 1.0
+    for _ in range(6):
+        if n <= budget:
+            break
+        # Decimate does not land exactly on its ratio; tighten until it fits.
+        ratio *= budget / n * 0.97
+        dec = obj.modifiers.get("Dec") or obj.modifiers.new("Dec", "DECIMATE")
+        dec.ratio = max(0.01, ratio)
+        dg = bpy.context.evaluated_depsgraph_get()
+        m = obj.evaluated_get(dg).to_mesh()
+        m.calc_loop_triangles()
+        n = len(m.loop_triangles)
+        obj.evaluated_get(dg).to_mesh_clear()
+    ev = obj.evaluated_get(dg)
+    m = ev.to_mesh()
+    m.calc_loop_triangles()
+    tree = kdtree.KDTree(len(g.samples))
+    for i, smp in enumerate(g.samples):
+        tree.insert(smp[0], i)
+    tree.balance()
+    base = len(kit.verts)
+    vcol, vflex = [], []
+    for v in m.vertices:
+        kit.add_vert(v.co)
+        _, i, _ = tree.find(v.co)
+        _, col, flex = g.samples[i]
+        # Bark grain instead of the old per-column streaks.
+        vcol.append(shade(col, 1.0 + 0.07 * noise.noise(v.co * 3.1)))
+        vflex.append(flex)
+    for t in m.loop_triangles:
+        ids = tuple(base + i for i in t.vertices)
+        kit.face(ids, tuple(vcol[i] for i in t.vertices), tuple((vflex[i], 0.0) for i in t.vertices))
+    count = len(m.loop_triangles)
+    ev.to_mesh_clear()
+    bpy.data.objects.remove(obj)
+    return count
+
+
 _ICO = {}
 
 
@@ -215,8 +371,10 @@ def icosphere(subdiv):
             ab, bc, ca = mid(a, b), mid(b, c), mid(c, a)
             nf += [(a, ab, ca), (b, bc, ab), (c, ca, bc), (ab, bc, ca)]
         faces = nf
-    # Blender winding: outward-facing counter-clockwise.
-    _ICO[subdiv] = (verts, [(a, c, b) for a, b, c in faces])
+    # Outward-facing counter-clockwise. (Until lane L61 these were swapped to
+    # (a, c, b), which wound every crown inside out; the double-sided foliage
+    # shader hid it, but outward cloud normals on inward faces light dark.)
+    _ICO[subdiv] = (verts, faces)
     return _ICO[subdiv]
 
 
@@ -491,7 +649,8 @@ def leaning_trunk(kit, near):
 
 def stump(kit, near):
     pts = [Vector((0, 0, -0.1)), Vector((0, 0, 0.5)), Vector((0, 0, 0.95))]
-    kit.tube(pts, [0.62, 0.52, 0.5], 10 if near else 6, BARK_DARK, BARK, 0.0, 0.0, flare=0.6 if near else 0.0)
+    kit.tube(pts, [0.62, 0.52, 0.5], 10 if near else 6, BARK_DARK, BARK, 0.0, 0.0, flare=0.6 if near else 0.0,
+             skin=False)
     # The cut face: fawn rings (the tube's cap is the face).
     kit.flower(Vector((0, 0, 0.96)), (0, 0, 1), 10, 0.5, FAWN, shade(FAWN, 0.8), 0.0)
     if near:
@@ -535,7 +694,55 @@ def fallen_log(kit, near):
             kit.tube(sl, [0.12, 0.05], 5, BARK, BARK, 0.0, 0.0)
 
 
-# species: (builder, near tri cap, far tri cap). Rule R4: props <= 3k tris.
+def _bare_crown(kit, base, d, length, radius, depth, col):
+    """Recursive forks for a leafless winter crown: each limb splits into two
+    or three thinner, shorter limbs that curl upward."""
+    line = branch_line(kit, base, d, length, 3, droop=0.04)
+    kit.tube(line, taper(len(line), radius, radius * 0.55), 5, col, col, 0.1 * (3 - depth), 0.1 * (4 - depth))
+    if depth == 0:
+        return
+    for k in range(kit.rng.choice((2, 2, 3))):
+        a = kit.rng.uniform(0, math.tau)
+        nd = (Vector(d).normalized() + Vector((math.cos(a), math.sin(a), 0.35)) * 0.8).normalized()
+        start = line[kit.rng.randint(1, len(line) - 1)]
+        _bare_crown(kit, start, nd, length * kit.rng.uniform(0.55, 0.7), radius * 0.5, depth - 1, col)
+
+
+def winter_bare(kit, near):
+    # The opening film's dark winter wood (human realm, ch1): tall, straight,
+    # leafless; the horror is in what waits under them. Never softened.
+    bark0, bark1 = (0.10, 0.09, 0.10), (0.16, 0.15, 0.17)
+    segs = 6 if near else 2
+    trunk = trunk_line(kit, 13.0, segs, 0.05)
+    kit.tube(trunk, taper(len(trunk), 0.34, 0.1), 8 if near else 5, bark0, bark1, 0.0, 0.05,
+             flare=0.5 if near else 0.0)
+    for i in range(6 if near else 3):
+        a = math.tau * i / 6 + kit.rng.uniform(-0.5, 0.5)
+        start = trunk[kit.rng.randint(len(trunk) // 2, len(trunk) - 1)]
+        d = Vector((math.cos(a), math.sin(a), kit.rng.uniform(0.3, 0.9)))
+        if near:
+            _bare_crown(kit, start, d, kit.rng.uniform(2.2, 3.4), 0.11, 2, bark1)
+        else:
+            line = branch_line(kit, start, d, 3.0, 1)
+            kit.tube(line, [0.1, 0.02], 3, bark1, bark1, 0.1, 0.3)
+
+
+def winter_bough(kit, near):
+    # The low bough that sheds its snow in the opening film: about 2.4 m
+    # along +x from a stub at the origin, forking twice, nearly level.
+    col = (0.12, 0.11, 0.12)
+    line = [Vector((x, 0.0, 0.08 * math.sin(x * 1.3) - 0.03 * x)) for x in (0.0, 0.6, 1.2, 1.8, 2.4)]
+    kit.tube(line, taper(len(line), 0.075, 0.012), 6 if near else 4, col, col, 0.0, 0.4)
+    if near:
+        for k, (i, side) in enumerate(((1, 1), (2, -1), (3, 1))):
+            d = Vector((0.8, side * 0.7, 0.15))
+            fl = branch_line(kit, line[i], d, 0.7 - 0.12 * k, 2)
+            kit.tube(fl, taper(len(fl), 0.03, 0.006), 4, col, col, 0.2, 0.5)
+
+
+# species: (builder, near tri cap, far tri cap[, near wood cap]). Rule R4:
+# props <= 3k tris. Small scatter pieces get a smaller wood cap: thousands
+# of them are on screen, and a stump needs fewer edges than an oak.
 SPECIES = {
     "ancient_oak": (ancient_oak, 4500, 600),  # a handful per region, landmarks
     "oak": (oak, 3000, 550),
@@ -547,14 +754,17 @@ SPECIES = {
     "hawthorn": (hawthorn, 3000, 550),
     "wild_cherry": (wild_cherry, 3000, 550),
     "elder": (elder, 3000, 550),
-    "twisted_dead": (twisted_dead, 3000, 550),
-    "blighted_tree": (blighted_tree, 3000, 550),
+    "twisted_dead": (twisted_dead, 3000, 550, 2000),
+    "blighted_tree": (blighted_tree, 3000, 550, 1800),
     "crab_apple": (crab_apple, 3000, 550),
     "lilac_tree": (lilac_tree, 3000, 550),
     "yew": (yew, 3000, 550),
-    "leaning_trunk": (leaning_trunk, 3000, 550),
-    "stump": (stump, 3000, 550),
-    "fallen_log": (fallen_log, 3000, 550),
+    "leaning_trunk": (leaning_trunk, 3000, 550, 900),
+    "stump": (stump, 3000, 550, 500),
+    "fallen_log": (fallen_log, 3000, 550, 1400),
+    # The opening film's winter wood (lane L61); not in FloraLibrary's scatter.
+    "winter_bare": (winter_bare, 3000, 550),
+    "winter_bough": (winter_bough, 1200, 200, 1000),
 }
 
 
@@ -576,6 +786,9 @@ def to_object(kit, name):
     mesh.color_attributes.active_color = col
     for poly in mesh.polygons:
         poly.use_smooth = True
+    if kit.normals:
+        normals = [kit.normals.get(i) or v.normal.copy() for i, v in enumerate(mesh.vertices)]
+        mesh.normals_split_custom_set_from_vertices([tuple(n) for n in normals])
     mat = bpy.data.materials.get("woods_foliage") or bpy.data.materials.new("woods_foliage")
     mesh.materials.append(mat)
     obj = bpy.data.objects.new(name, mesh)
@@ -583,14 +796,22 @@ def to_object(kit, name):
     return obj
 
 
-def build(species, fn, near_cap, far_cap):
+def build(species, fn, near_cap, far_cap, wood_max=WOOD_MAX):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     seed = sum(ord(c) * (i + 1) for i, c in enumerate(species))
     objs = []
     counts = []
+    woods = []
     for name, near, cap in (("near", True, near_cap), ("far", False, far_cap)):
         kit = Kit(seed)
+        if near:
+            kit.skin = SkinGraph()
         fn(kit, near)
+        if near:
+            # The wood gets whatever the crown leaves of the cap (R4).
+            budget = min(wood_max, cap - kit.tri_count() - 10)
+            wood = skin_wood(kit, budget)
+            woods.append(wood)
         counts.append(kit.tri_count())
         if kit.tri_count() > cap and not os.environ.get("WOODS_NO_CAP"):
             raise SystemExit("%s %s: %d tris over the %d cap" % (species, name, kit.tri_count(), cap))
@@ -603,15 +824,15 @@ def build(species, fn, near_cap, far_cap):
                               export_vertex_color="ACTIVE", export_all_vertex_colors=False,
                               export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
                               export_apply=False, export_animations=False)
-    print("%-14s near %5d tris  far %4d tris  %6.0f KB" % (species, counts[0], counts[1], os.path.getsize(path) / 1024))
+    print("%-14s near %5d tris (wood %4d)  far %4d tris  %6.0f KB" % (species, counts[0], woods[0], counts[1],
+                                                                   os.path.getsize(path) / 1024))
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
     only = sys.argv[2:] if len(sys.argv) > 2 else list(SPECIES)
     for species in only:
-        fn, near_cap, far_cap = SPECIES[species]
-        build(species, fn, near_cap, far_cap)
+        build(species, *SPECIES[species])
 
 
 if __name__ == "__main__":
