@@ -26,7 +26,7 @@ func before_each() -> void:
 	StoryControl.release()
 	PhaseManager.start(TEST_SET)
 	SaveSystem.delete_save(SLOT)
-	SaveSystem.autosave_slot = SLOT
+	SaveSystem.active_slot = SLOT
 	_placement = FakePlacement.new()
 	SaveSystem.register_provider(SaveSystem.PLACEMENT_KEY, _placement)
 	SaveSystem._autosave_due = false
@@ -34,7 +34,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	SaveSystem.unregister_provider(SaveSystem.PLACEMENT_KEY)
-	SaveSystem.autosave_slot = "slot_0"
+	SaveSystem.active_slot = "slot_0"
 	SaveSystem._autosave_due = false
 	SaveSystem._loading = {}
 	SaveSystem._open_spaces.clear()
