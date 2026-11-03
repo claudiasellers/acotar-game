@@ -1,0 +1,4 @@
+from forage-chemistry
+quality look
+shot brew_tells res://tools/chemistry/brew_tells_shot.tscn {out}/brew_tells.png
+shot brew_menu res://tools/chemistry/brew_shot.tscn discover {out}/brew_menu.png
