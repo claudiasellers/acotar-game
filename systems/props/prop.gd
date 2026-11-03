@@ -13,6 +13,9 @@ signal broke(prop: Prop)
 const GROUP := &"prop"
 const STATION_ID := &"prop"
 const WORLD_LAYER := 1 << 0
+## A wet prop (a full bucket) landing at this speed or more splashes.
+const SPLASH_SPEED := 3.0
+const SPLASH_RADIUS := 1.6
 
 @export var data: PropData
 
@@ -128,11 +131,25 @@ func _physics_process(_delta: float) -> void:
 
 
 func _on_body_entered(_body: Node) -> void:
-	if data == null or not data.breakable or carried:
+	if data == null or carried:
+		return
+	var speed := maxf(_last_speed, linear_velocity.length())
+	# A full bucket landing hard throws its WATER: it soaks and douses round it.
+	if wet >= 0.5 and data.wetness >= 0.5 and speed >= SPLASH_SPEED:
+		splash()
+	if not data.breakable:
 		return
 	# The speed it hit at (the solver has already slowed it by now).
-	if maxf(_last_speed, linear_velocity.length()) >= data.break_speed:
+	if speed >= data.break_speed:
 		shatter()
+
+
+## Empties its water onto the ground round it (an element: rule 1 and 2).
+func splash() -> int:
+	wet = 0.0
+	Juice.burst(null, &"pickup", global_position + Vector3.UP * 0.2, 0.8)
+	var field := ElementField.find(get_tree())
+	return field.soak_at(global_position, SPLASH_RADIUS) if field else 0
 
 
 ## Breaks apart in a burst of sparkles (a dropped pot, a thrown jar).

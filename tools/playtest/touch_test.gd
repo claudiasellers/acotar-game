@@ -5,7 +5,8 @@
 ##   route  - build the real manor house, bake its navmesh and send a wolf from
 ##            the entrance hall down the east corridor: it arrives, and walks no more
 ##            than 1.5x the straight line plus the door detour of the nav path
-##   (fire checks join with the chemistry slice)
+##   fire   - light one tuft of dry grass: the fire reaches a neighbour <= 3 s
+##   wet    - try to light wet grass: it will not catch
 ##   tools/mq/godot.sh res://tools/playtest/touch_test.tscn
 ## (a scene, not -s, so the autoloads the manor builder needs are loaded)
 ## Passes when the log ends "TOUCH exit 0".
@@ -28,6 +29,7 @@ func _run() -> void:
 	await _check_push()
 	await _check_throw()
 	await _check_route()
+	await _check_fire()
 	for line in _results:
 		print(line)
 	print("TOUCH exit %d" % _failed)
@@ -112,6 +114,31 @@ func _check_route() -> void:
 			"%s -> %s: arrived %s, walked %.1f m, straight %.1f m, nav path %.1f m, allowed %.1f m"
 			% [_room_at(ROUTE_FROM), _room_at(Vector2(goal.x, goal.z)), arrived, walked, straight, nav_path, allowed])
 	wolf.queue_free()
+
+
+func _check_fire() -> void:
+	var field := ElementField.new()
+	field.follow_world_wind = false
+	_root.add_child(field)
+	field.add_patch(Vector3(-30, 0, 0), 2.0, &"grass", 1.0)
+	var neighbour := field.cells_near(Vector3(-29, 0, 0), 0.1)[0]
+	var lit := field.ignite_at(Vector3(-30, 0, 0), 0.1)
+	var frames := 0
+	while frames < 60 * 4 and not field.is_burning(neighbour):
+		await get_tree().physics_frame
+		frames += 1
+	var seconds := frames / 60.0
+	_record("fire", lit == 1 and field.is_burning(neighbour) and seconds <= 3.0,
+			"dry grass lit %d, neighbour caught after %.1f s (%d flames)" % [lit, seconds, field.get_node("FireFx").flame_count()])
+	var wet_cells := field.add_patch(Vector3(-30, 0, 12), 1.5, &"grass", 1.0, 0.8)
+	var wet_lit := field.ignite_at(Vector3(-30, 0, 12), 1.0)
+	await _physics(60)
+	var burning := 0
+	for id in wet_cells:
+		if field.is_burning(id):
+			burning += 1
+	_record("wet", wet_lit == 0 and burning == 0, "wet grass lit %d, burning after 1 s %d" % [wet_lit, burning])
+	field.queue_free()
 
 
 func _room_at(p: Vector2) -> String:

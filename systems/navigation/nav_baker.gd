@@ -39,8 +39,16 @@ static func make_mesh(aabb: AABB) -> NavigationMesh:
 	return nm
 
 
-## Parses `root`'s static colliders (main thread) into source geometry.
+## Thread of the last parse (tests check it is the main thread).
+static var last_parse_thread: int = -1
+
+
+## Parses `root`'s static colliders into source geometry. Main thread only:
+## it reads the scene tree; only the bake itself goes to a worker thread, and
+## nothing on that thread touches scenes, glTF or CourtAssets (F27, L32-3, F37).
 static func parse(root: Node, aabb: AABB = AABB()) -> NavigationMeshSourceGeometryData3D:
+	last_parse_thread = OS.get_thread_caller_id()
+	assert(last_parse_thread == OS.get_main_thread_id(), "NavBaker.parse off the main thread")
 	var data := NavigationMeshSourceGeometryData3D.new()
 	NavigationServer3D.parse_source_geometry_data(make_mesh(aabb), data, root)
 	return data
@@ -56,11 +64,13 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 		if done.is_valid():
 			done.call()
 		return
-	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void:
+	# The callback may come from the bake thread: hand the result to the main thread.
+	var land := func() -> void:
 		if is_instance_valid(region):
 			region.navigation_mesh = nm
 		if done.is_valid():
-			done.call())
+			done.call()
+	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void: land.call_deferred())
 
 
 ## The manor house's footprint and every level's floor-to-ceiling band, in
