@@ -12,3 +12,6 @@ world/shared/terrain/data/
 .tools/
 _generated/
 __pycache__/
+
+# Perf pass output (tools/perf/frame_pass.sh, make perf)
+tools/perf/out/

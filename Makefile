@@ -2,6 +2,8 @@
 #   make update   pull the latest origin/main, make sure Godot is here, rebuild generated content
 #   make play     run the game (its output goes to .tools/play.log)
 #   make setup    install the git pre-push hook (checks lead/ready-* pushes for missing .uid files)
+#                 and copy in any generated content already built (local or shared cache)
+#   make perf     frame budget pass over tools/shots/canonical.txt -> tools/perf/out/<date>.csv
 #   make clean    free disk: delete Godot's import cache and generated content
 #
 # Godot lives in .tools/ (git-ignored). Generated content is built by
@@ -15,10 +17,15 @@ GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
 
-.PHONY: setup play update clean godot pull generate bake import
+.PHONY: setup play update clean godot pull generate bake import perf
 
 setup:
 	@tools/mq/install_hooks.sh
+	@tools/mq/levels.sh ensure --cached-only
+
+# Real frame times need the Mac GPU; in the cloud only the counts are exact.
+perf: godot bake import
+	@GODOT="$(GODOT)" tools/perf/frame_pass.sh
 
 play: godot bake import
 	@echo "Starting the game. This terminal stays busy until you quit the game. Log: .tools/play.log"

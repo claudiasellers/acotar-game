@@ -23,6 +23,14 @@ const DEFAULTS := {
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
 }
+## Sun shadow budgets (program T1). Godot's DirectionalLight3D offers 1, 2 or
+## 4 PSSM splits, so the Mac profile uses 2 (the brief's 3 does not exist).
+## Only world-scale suns are touched: shadow distance >= WORLD_SUN_MIN_DISTANCE.
+const SHADOW_PROFILES := {
+	"high": {"atlas": 4096, "mode": DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS, "distance": 220.0},
+	"mac": {"atlas": 2048, "mode": DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS, "distance": 160.0},
+}
+const WORLD_SUN_MIN_DISTANCE := 150.0
 ## Sensitivity sliders run 0..1 around this scale; 0.5 on the slider is 1.0x.
 const SENSITIVITY_MIN := 0.25
 const SENSITIVITY_MAX := 2.5
@@ -60,6 +68,11 @@ var reduced_effects: bool:
 func _ready() -> void:
 	_ensure_buses()
 	get_tree().node_added.connect(_route_audio)
+	get_tree().node_added.connect(_apply_shadow_profile_to)
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--shadow-profile="):
+			shadow_profile = a.trim_prefix("--shadow-profile=")
+	apply_shadow_profile()
 	load_settings()
 
 
@@ -124,6 +137,49 @@ func _apply(key: StringName) -> void:
 			get_tree().root.content_scale_factor = TEXT_SCALES[i]
 		&"reduced_effects":
 			Juice.effects_scale = 0.3 if bool(_values[key]) else 1.0
+
+
+## Sun shadow profile (program T1): "auto" (= "mac" on Apple silicon, else
+## "high"), "high" or "mac". Not in the pause menu yet, so not saved; the
+## `--shadow-profile=<name>` user arg sets it for a run.
+var shadow_profile: String = "auto":
+	set(v):
+		shadow_profile = v
+		if is_inside_tree():
+			apply_shadow_profile()
+
+
+func apply_shadow_profile() -> void:
+	RenderingServer.directional_shadow_atlas_set_size(int(get_shadow_profile().atlas), true)
+	for n in get_tree().root.find_children("*", "DirectionalLight3D", true, false):
+		_apply_shadow_profile_to(n)
+
+
+## The resolved profile name: "auto" picks "mac" on Apple silicon.
+func shadow_profile_name() -> String:
+	var v := shadow_profile
+	if SHADOW_PROFILES.has(v):
+		return v
+	return "mac" if is_apple_silicon() else "high"
+
+
+func get_shadow_profile() -> Dictionary:
+	return SHADOW_PROFILES[shadow_profile_name()]
+
+
+static func is_apple_silicon() -> bool:
+	return OS.get_name() == "macOS" and Engine.get_architecture_name().begins_with("arm")
+
+
+func _apply_shadow_profile_to(node: Node) -> void:
+	var sun := node as DirectionalLight3D
+	if sun == null or not sun.shadow_enabled or sun.directional_shadow_max_distance < WORLD_SUN_MIN_DISTANCE:
+		return
+	if not sun.has_meta(&"shadow_profile_base"):
+		sun.set_meta(&"shadow_profile_base", sun.directional_shadow_max_distance)
+	var p := get_shadow_profile()
+	sun.directional_shadow_mode = p.mode
+	sun.directional_shadow_max_distance = minf(float(p.distance), float(sun.get_meta(&"shadow_profile_base")))
 
 
 func _ensure_buses() -> void:
