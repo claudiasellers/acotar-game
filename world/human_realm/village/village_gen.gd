@@ -14,6 +14,10 @@ const REPORT := DIR + "/village_report.json"
 const VILLAGE_ANCHORS := {"PeltCustomerSpot": "act1_fur_stall"}
 
 
+## Building kinds solid enough to occlude (open ones like the tavern and smithy are walked into).
+const OCCLUDER_KINDS: Array[String] = ["house_timber", "house_wattle", "house_long", "house_croft",
+		"house_leanto", "meeting_hall", "debt_house", "barn_abandoned", "mill"]
+
 func _initialize() -> void:
 	var plan_script: GDScript = load("res://world/human_realm/village/village_plan.gd")
 	if plan_script == null or not plan_script.can_instantiate():
@@ -84,6 +88,13 @@ func _build_scene(plan: VillagePlan, saved: Array[ScatterLayer]) -> Node3D:
 	root.add_child(field)
 
 	root.add_child(_build_collision(plan))
+
+	# Occlusion culling (program T1): solid houses hide what is behind them.
+	var occ := ColliderOccluders.new()
+	occ.name = "Occluders"
+	occ.prefixes = PackedStringArray(OCCLUDER_KINDS)
+	occ.exclude = PackedStringArray(["mill_wheel"])
+	root.add_child(occ)
 
 	var lm := Node3D.new()
 	lm.name = "Landmarks"

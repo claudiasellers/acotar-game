@@ -37,3 +37,9 @@ each shader, chosen to reproduce the look each one had before T2.
 Not tunables but switches (compile-time, per shader): `CANDY_SOFT_SPEC` (court
 props' soft power-law gloss instead of GGX), `CANDY_NO_SPEC_LOBE` (foliage: no
 direct highlight), `CANDY_LOBES`/`CANDY_COAT` (per-pixel light rim and clearcoat).
+
+## Shadows (render program T1, L57)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `GameSettings.shadow_profile` | systems/settings/game_settings.gd:SHADOW_PROFILES (`--shadow-profile=` user arg) | auto (mac on Apple silicon: 2048 atlas / 2 splits / 160 m; high: 4096 / 4 splits / 220 m) | high, mac | Sun shadow crispness and reach on world-scale suns (shadow distance ≥150 m) | L57 |

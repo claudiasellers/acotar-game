@@ -1,0 +1,81 @@
+# Rendering and interactivity program (log)
+
+Lead: L57, thread cmsg_01RUxTjNru2LBjPGqrQoMTopHR1HW7NEPydDmVPY6sxUzc. Brief: the owner's
+program brief of 2026-11-03 (§0–§4, P1–P5, T1–T6). Tunables: `docs/tuning.md`.
+Canonical shots: `tools/shots/canonical.txt`. Perf pass: `tools/perf/frame_pass.sh` (`make perf`).
+
+Owner guidance (2026-11-03 19:55Z): good output, mindful of usage, no rabbit holes. So: one
+GUT contract test per new system; acceptance = the brief's checks only; a check that will not
+run headless becomes a Mac step instead of iteration; canonical shots re-rendered at task end only.
+
+## Lanes
+
+| task | lane | branch | state |
+|---|---|---|---|
+| P1–P5, T1 | L57 (lead) | lane/render-program | in progress |
+| T2 surface model | L58 | lane/surface-model | L58-1 413510d handed in 20:48Z; Mac look request shots/req-L58-1 pending |
+| T5 touchable world | L59 | lane/touchable-world | L59-1 ef78672 (props) handed in 20:23Z, director-approved |
+| T3a bounce, T3b grade, T4 hero meshes, T6 housekeeping | — | — | after L58 |
+
+## Readings taken (the brief said: take the most reasonable reading and record it)
+
+- The repo has **39** `*shot*.tscn` scenes (the audit's "67" counted shot scripts and probes). All ten
+  canonical shots map to existing views (`tools/world_shot.gd` ids or shot scenes), so P5 added
+  no new scene. `workshop` = the burnt Archeron estate region (`burnt_estate` view), where the
+  father's workshop stands. Two perf-only views were added: `manor_garden`, `manor_interior`.
+- `shaders/` does not exist; shared shaders live in `world/shared/shaders/`, so T2's candy_lit goes there.
+- Godot's DirectionalLight3D offers 1, 2 or 4 PSSM splits. The brief's Mac profile "3 splits"
+  does not exist; the Mac profile uses **2 splits** (2048 atlas, 160 m).
+- Occluders are **generated at runtime from geometry the game already knows**, not baked in
+  the editor: the manor's wall pieces and floor/ceiling slabs (one OccluderInstance3D per level,
+  `ManorHouseBuilder`), and the village's solid building colliders shrunk inside the drawn hull
+  (`ColliderOccluders`). Nothing is committed or baked (R15), so the `occluders` make target T6
+  asks for is unnecessary; T6 records that instead of adding an empty target.
+  The cottage region has no building colliders (only ≤1.5 m drystone walls) and the cottage is
+  one small house: no occluder there; it is not a draw-call hotspot.
+- R14 (project.godot, autoloads belong to the story/core lane): the owner's brief asks for the
+  occlusion project setting and the T2 importer default directly, so the lead makes those
+  two one-line edits and notes them here.
+- The Makefile no longer runs `git lfs pull` (already fixed on main); T6 has nothing to remove.
+- Free climb and glide: GAME_DESIGN_PLAN.md calls for *marked* climbing (ivy, roots, ledges) and
+  no gliding → **skipped by design** (T5 step 5).
+- `generate_lods` is already true in all 1,375 glb/gltf `.import` files → T1 step 4 needs no
+  change and has no triangle delta.
+- Shadow profile is a GameSettings property (`shadow_profile`, `--shadow-profile=` user arg),
+  not a saved pause-menu setting: adding it to the menu is UI work, a follow-up.
+
+## P1 — cloud render capability
+
+Cloud renders work: Mesa lavapipe (Vulkan, software) under xvfb, Forward+ and Compatibility.
+The container lacked the ICD; `apt-get install mesa-vulkan-drivers` adds it (`lvp_icd.json`).
+Pixel checks of *layout* run in the cloud; *look* checks (light, colour, bloom) and real frame
+times go to the Mac GPU service (docs/SHOTS.md). Frame times in a cloud CSV are not budget numbers;
+draw calls, primitives, objects and material counts are exact.
+
+## P2 — terrain bake cache
+
+`tools/mq/levels.sh` now restores from and publishes to a shared cache
+(`/mnt/project-files/cache/levelcache/<name>/<fingerprint>.tar`, override with
+`MQ_LEVELCACHE_SHARED`, empty = off; the Mac has no such folder, so nothing changes there).
+`make setup` also runs `levels.sh ensure --cached-only`. Measured in a fresh worktree with an empty
+local cache: terrain (80 MB) restored in **0.8 s**; a fresh lane's import is ~100 s, so a lane
+boots a level in **under 2 minutes** instead of ~16.
+
+## T1 — baseline and free performance
+
+(numbers below)
+
+## Mac steps pending
+
+1. `make perf` on the Mac at main after L57-1 merges: the real frame-time baseline (cloud ms are lavapipe).
+2. cottage (`cottage_snow`) crashes lavapipe in Forward+ on both trees: its counts come from the Mac pass.
+3. L58-1 look request `shots/req-L58-1`: the lead's same-prop check across manor / village / forest.
+
+## T2 (L58-1) as handed in
+
+candy_lit.gdshaderinc is the one light(); candy_rim.gdshaderinc holds the shared rim. CandyMaterial +
+MaterialLibrary replace all StandardMaterial3D outside tools/tests (76 scripts, 3 scenes); tools/import/candy_import.gd
+is the importer default and in all 1,378 .import files. Checks reported: 0 StandardMaterial3D by rg; 0 stock
+surfaces in all 1,378 imports; layout pixel delta 0.09–1.12% (< 8%); draw calls identical. Deviation: one line of
+docs/contracts/world.md (glb import_script) changed, flagged to the director under R13. bogge_form and fur_card use
+Godot's built-in RIM and stay untouched (horror values kept). Frame ms: Mac step.
