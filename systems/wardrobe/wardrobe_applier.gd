@@ -41,12 +41,23 @@ func _ready() -> void:
 	_worn.name = "Worn"
 	model.add_child(_worn)
 	wardrobe.changed.connect(apply)
+	wardrobe.piece_granted.connect(_on_granted)
 	apply()
 
 
 func _exit_tree() -> void:
 	if wardrobe != null and wardrobe.changed.is_connected(apply):
 		wardrobe.changed.disconnect(apply)
+	if wardrobe != null and wardrobe.piece_granted.is_connected(_on_granted):
+		wardrobe.piece_granted.disconnect(_on_granted)
+
+
+## R3, L64: every new piece sparkles and chimes once on her (the find card
+## names it). A restock is quiet here; the wardrobe celebrates it once.
+func _on_granted(_piece_id: StringName) -> void:
+	if feyre == null or wardrobe.granting_quietly or not is_inside_tree():
+		return
+	Juice.burst(model, &"outfit")
 
 
 ## The FeyreModel node (feyre_model.gd): `model` itself, or its child holding her scene.

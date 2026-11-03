@@ -1,5 +1,8 @@
 ## Screenshots of the dressing room screen in the real manor (needs a GPU or lavapipe):
-##   godot res://tools/dressing_room_shot.tscn -- <gowns|crowns|vanity|all> [out_dir]
+##   godot res://tools/dressing_room_shot.tscn -- <gowns|crowns|vanity|arrivals|satchel|all> [out_dir]
+## L64: "arrivals" opens the wardrobe on the first visit of phase 3 (New
+## ribbons, the arrivals line, the counter); "satchel" opens it from her
+## satchel wherever she stands.
 ## Feyre walks up to the dressing room's wardrobe (or mirror), opens it and
 ## tries something on; the capture is after the twirl and sparkles.
 extends Node
@@ -9,6 +12,9 @@ const LOOKS := {
 	"gowns": {"station": &"wardrobe", "tab": "Gowns", "wear": [&"ball_gown_rose"]},
 	"crowns": {"station": &"wardrobe", "tab": "Crowns", "wear": [&"butterfly_gown_lilac", &"flower_crown_rose"]},
 	"vanity": {"station": &"dressing_mirror", "tab": "Makeup", "wear": [&"dinner_gown_blush"], "hair": &"crown_braid"},
+	"arrivals": {"station": &"wardrobe", "tab": "", "phase": &"p3_house_and_woods", "seen_through": 2,
+		"wear": [&"ball_gown_rose", &"satin_slippers_pearl", &"tiara_rose", &"pearl_necklace", &"rose_earrings_rose"]},
+	"satchel": {"station": DressingRoom.SATCHEL, "tab": "Crowns", "wear": [&"flower_crown_lilac", &"gold_locket", &"charm_bracelet_gold"]},
 }
 
 
@@ -36,12 +42,17 @@ func _run() -> void:
 	var settle := 4.0 if OS.get_environment("SHOTS_QUALITY") == "look" else 1.0
 	for id in ids:
 		var look: Dictionary = LOOKS[id]
-		_stand_at(feyre, look["station"])
+		if look.has("phase"):
+			PhaseManager.current_phase = look["phase"]
+			WardrobeStock.restock(Gameplay.wardrobe, look["seen_through"])
+			Gameplay.wardrobe.mark_seen()
+		if look["station"] != DressingRoom.SATCHEL:
+			_stand_at(feyre, look["station"])
 		await _frames(20)
 		DressingRoom.open(feyre, look["station"])
 		var view := get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
 		for i in view.tabs.get_tab_count():
-			if String(view.tabs.get_tab_control(i).name) == look["tab"]:
+			if look["tab"] != "" and String(view.tabs.get_tab_control(i).name) == look["tab"]:
 				view.tabs.current_tab = i
 		if look.has("hair"):
 			Gameplay.wardrobe.set_hair(look["hair"])

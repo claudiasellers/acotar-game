@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"elains_ribbon"
+display_name = "Elain's old ribbon"
+description = "Frayed at the ends. She'd want me to look like a girl, just once."
+slots = Array[StringName]([&"head"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/hair_ribbon.glb"
+color = Color(0.624, 0.690, 0.753, 1)
+reaction_tag = &""
+source = &"cottage_chest"
+phase = 0
+canon = "X"

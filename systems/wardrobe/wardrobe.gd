@@ -1,4 +1,5 @@
 ## What Feyre owns and wears: outfit pieces by slot, hairstyle and makeup.
+## Purely aesthetic (owner, L64): what she wears never changes a stat.
 ## Contract: docs/WARDROBE_CONTRACT.md.
 class_name Wardrobe
 extends RefCounted
@@ -7,10 +8,19 @@ signal changed
 signal piece_granted(piece_id: StringName)
 
 const STARTING_PIECES: Array[StringName] = [&"hunter_tunic", &"hunter_trousers", &"hunter_cloak", &"hunter_boots"]
+## Clothes are looks only: she is always dressed for the weather at what the
+## old hunter kit gave (0.2 + 0.1 + 0.4 + 0.1), so cold play is the same in a
+## ball gown as in her patched cloak.
+const DRESSED_WARMTH := 0.8
 
 ## slot -> piece id
 var _equipped: Dictionary = {}
 var _owned: Array[StringName] = []
+## Pieces granted that she hasn't seen in a wardrobe yet (the "New" ribbon).
+var _unseen: Array[StringName] = []
+## True while WardrobeStock restocks: those grants arrive together, so the
+## wardrobe celebrates them once instead of one card and sparkle each.
+var granting_quietly: bool = false
 var hair: StringName = &"braid"
 ## channel -> {"id", "color", "amount", "sheen"}
 var _makeup: Dictionary = {}
@@ -23,15 +33,45 @@ func _init() -> void:
 		if p:
 			for slot in p.slots:
 				_equipped[slot] = id
+	# The rest of the cottage chest is hers from the start, folded away.
+	for p in WardrobeCatalog.all_pieces():
+		if p.source == WardrobeStock.COTTAGE and not _owned.has(p.id):
+			_owned.append(p.id)
 
 
-func grant(piece_id: StringName) -> bool:
+## Gives her a piece. `quiet` (a restock of many at once) still files it in the
+## collection book and marks it New, but leaves the celebration to the caller.
+func grant(piece_id: StringName, quiet: bool = false) -> bool:
 	if _owned.has(piece_id) or WardrobeCatalog.piece(piece_id) == null:
 		return false
 	_owned.append(piece_id)
+	_unseen.append(piece_id)
+	var was_quiet := granting_quietly
+	granting_quietly = quiet or was_quiet
+	if granting_quietly and self == Gameplay.wardrobe:
+		Gameplay.collection.mark(piece_id, &"wardrobe", false)
+		Gameplay.collection.fresh[piece_id] = true
 	piece_granted.emit(piece_id)
+	granting_quietly = was_quiet
 	Gameplay.emit(&"item_acquired", [piece_id, 1])
 	return true
+
+
+## Granted but not yet seen in a wardrobe.
+func unseen() -> Array[StringName]:
+	return _unseen.duplicate()
+
+
+func is_unseen(piece_id: StringName) -> bool:
+	return _unseen.has(piece_id)
+
+
+func mark_seen(ids: Array[StringName] = []) -> void:
+	if ids.is_empty():
+		_unseen.clear()
+	else:
+		for id in ids:
+			_unseen.erase(id)
 
 
 func owns(piece_id: StringName) -> bool:
@@ -118,16 +158,18 @@ func worn_pieces() -> Array[WardrobePiece]:
 	return out
 
 
+## Kept for callers (feyre.gd's cold insulation and run speed): constant in
+## every outfit, because clothes are purely aesthetic.
 func warmth() -> float:
-	return worn_pieces().reduce(func(acc: float, p: WardrobePiece) -> float: return acc + p.warmth, 0.0)
+	return DRESSED_WARMTH
 
 
 func stealth() -> float:
-	return worn_pieces().reduce(func(acc: float, p: WardrobePiece) -> float: return acc + p.stealth, 0.0)
+	return 0.0
 
 
 func swift() -> float:
-	return worn_pieces().reduce(func(acc: float, p: WardrobePiece) -> float: return acc + p.swift, 0.0)
+	return 0.0
 
 
 func save_state() -> Dictionary:
@@ -138,7 +180,8 @@ func save_state() -> Dictionary:
 	for slot: StringName in _equipped:
 		eq[String(slot)] = String(_equipped[slot])
 	return {"owned": _owned.map(func(s: StringName) -> String: return String(s)), "equipped": eq,
-		"hair": String(hair), "makeup": mk}
+		"hair": String(hair), "makeup": mk,
+		"unseen": _unseen.map(func(s: StringName) -> String: return String(s))}
 
 
 func load_state(data: Dictionary) -> void:
@@ -149,6 +192,9 @@ func load_state(data: Dictionary) -> void:
 	var eq: Dictionary = data.get("equipped", {})
 	for slot in eq:
 		_equipped[StringName(slot)] = StringName(eq[slot])
+	_unseen.clear()
+	for id in data.get("unseen", []):
+		_unseen.append(StringName(id))
 	hair = StringName(data.get("hair", "braid"))
 	_makeup.clear()
 	var mk: Dictionary = data.get("makeup", {})

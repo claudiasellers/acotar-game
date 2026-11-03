@@ -3,6 +3,9 @@
 ## gown, a row of colour swatches for its variants) and by category tab. Every
 ## change twirls her, sparkles and chimes while the game stays paused. Drag
 ## the mirror, Q/E or the arrows to turn her. Opened by DressingRoom.open().
+## L64: pieces she hasn't seen yet wear a "New" ribbon and arrive with one
+## sparkle; the header counts the collection; from the satchel only the small
+## things she carries show (SATCHEL_TABS), never a gown.
 class_name DressingRoomView
 extends Control
 
@@ -31,9 +34,17 @@ const CATEGORIES: Array[Dictionary] = [
 const REMOVABLE: Array[StringName] = [&"outer", &"head", &"neck", &"mask", &"ears", &"wrist", &"hands", &"legs_wear"]
 ## Tab -> how close the mirror comes: 1 = her face, 0 = full length.
 const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55, "Masks": 0.8}
+## What she can change from her satchel, out in the world.
+const SATCHEL_TABS: Array[String] = ["Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
+const NEW_PINK := Color(0.93, 0.42, 0.62)
 
 var feyre: Feyre
 var mirror_only: bool = false
+var from_satchel: bool = false
+## Pieces showing that were New when the screen opened; seen when it closes.
+var arrivals: Array[StringName] = []
+var arrivals_label: Label
+var found_label: Label
 var camera: Camera3D
 var tabs: TabContainer
 var wearing: Label
@@ -66,7 +77,8 @@ static func families(pieces: Array[WardrobePiece]) -> Array[Dictionary]:
 	var by_key: Dictionary = {}
 	var order: Array[String] = []
 	for p in pieces:
-		var key := p.mesh_path if p.mesh_path != "" else String(p.id)
+		# Same mesh and same garment name: Elain's ribbon is its own card.
+		var key := (p.mesh_path if p.mesh_path != "" else String(p.id)) + "|" + family_name(p)
 		if not by_key.has(key):
 			by_key[key] = {"name": family_name(p), "pieces": [] as Array[WardrobePiece]}
 			order.append(key)
@@ -95,6 +107,7 @@ static func variant_name(p: WardrobePiece) -> String:
 func setup(who: Feyre, station_id: StringName) -> void:
 	feyre = who
 	mirror_only = station_id == &"dressing_mirror"
+	from_satchel = station_id == DressingRoom.SATCHEL
 	name = "DressingRoomView"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -110,12 +123,14 @@ func _ready() -> void:
 	feyre.model.process_mode = Node.PROCESS_MODE_ALWAYS
 	Gameplay.wardrobe.changed.connect(_refresh)
 	_refresh()
+	_open_on_arrivals()
 	_tab_changed(tabs.current_tab)
 	if _swatches.size() > 0:
 		_swatches[0].grab_focus.call_deferred()
 
 
 func _exit_tree() -> void:
+	Gameplay.wardrobe.mark_seen(arrivals)
 	if Gameplay.wardrobe.changed.is_connected(_refresh):
 		Gameplay.wardrobe.changed.disconnect(_refresh)
 	if is_instance_valid(feyre) and is_instance_valid(feyre.model):
@@ -289,9 +304,24 @@ func _build() -> void:
 	box.add_theme_constant_override(&"separation", 10)
 	panel.add_child(box)
 
-	var title := UiStyle.label("The vanity" if mirror_only else "The dressing room", 30)
+	var title := UiStyle.label("Her satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"), 30)
 	title.add_theme_color_override(&"font_color", Color(0.62, 0.36, 0.52))
-	box.add_child(title)
+	var head := HBoxContainer.new()
+	head.add_child(title)
+	var grow := Control.new()
+	grow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(grow)
+	found_label = UiStyle.label(found_text(), 14)
+	found_label.name = "Found"
+	found_label.modulate.a = 0.8
+	found_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(found_label)
+	box.add_child(head)
+	arrivals_label = UiStyle.label("", 16)
+	arrivals_label.name = "Arrivals"
+	arrivals_label.add_theme_color_override(&"font_color", NEW_PINK)
+	arrivals_label.visible = false
+	box.add_child(arrivals_label)
 	wearing = UiStyle.label("", 15)
 	wearing.modulate.a = 0.85
 	box.add_child(wearing)
@@ -313,11 +343,18 @@ func _build() -> void:
 		tabs.add_child(_hair_tab())
 		tabs.add_child(_makeup_tab())
 		names = ["Crowns", "Jewellery", "Masks"]
+	elif from_satchel:
+		names = SATCHEL_TABS.filter(func(n: String) -> bool: return n != "Hair")
 	for n in names:
 		var here: Array[WardrobePiece] = owned.filter(func(p: WardrobePiece) -> bool: return category_of(p) == n)
 		if not here.is_empty():
 			tabs.add_child(_piece_tab(n, here))
-	if not mirror_only:
+			for p in here:
+				if Gameplay.wardrobe.is_unseen(p.id):
+					arrivals.append(p.id)
+	if from_satchel:
+		tabs.add_child(_hair_tab())
+	elif not mirror_only:
 		tabs.add_child(_hair_tab())
 		tabs.add_child(_makeup_tab())
 
@@ -421,7 +458,14 @@ func _card(fam: Dictionary) -> Control:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 4)
 	card.add_child(col)
-	col.add_child(UiStyle.label(fam["name"], 17))
+	var head := HBoxContainer.new()
+	head.add_child(UiStyle.label(fam["name"], 17))
+	if variants.any(func(p: WardrobePiece) -> bool: return Gameplay.wardrobe.is_unseen(p.id)):
+		var grow := Control.new()
+		grow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		head.add_child(grow)
+		head.add_child(_new_ribbon())
+	col.add_child(head)
 	var about := UiStyle.label(variants[0].description, 12)
 	about.modulate.a = 0.75
 	about.custom_minimum_size = Vector2(0, 34)
@@ -438,6 +482,53 @@ func _card(fam: Dictionary) -> Control:
 		swatches.add_child(sw)
 		_swatches.append(sw)
 	return card
+
+
+## The pink "New" pill on a card she hasn't looked at yet; it bounces in.
+func _new_ribbon() -> Control:
+	var pill := PanelContainer.new()
+	pill.name = "NewRibbon"
+	var box := StyleBoxFlat.new()
+	box.bg_color = NEW_PINK
+	box.set_corner_radius_all(9)
+	box.content_margin_left = 8
+	box.content_margin_right = 8
+	box.content_margin_top = 1
+	box.content_margin_bottom = 1
+	pill.add_theme_stylebox_override(&"panel", box)
+	var word := UiStyle.label("New", 12)
+	word.add_theme_color_override(&"font_color", Color.WHITE)
+	pill.add_child(word)
+	pill.ready.connect(func() -> void:
+		pill.pivot_offset = pill.size * 0.5
+		Juice.bounce_control(pill, 0.3))
+	return pill
+
+
+## "34 of 170 found", the collection page's own count for the wardrobe.
+static func found_text() -> String:
+	var got := Gameplay.wardrobe.owned_pieces().size()
+	var total := WardrobeCatalog.all_pieces().size()
+	if Gameplay.collection:
+		var p := Gameplay.collection.progress(&"wardrobe")
+		got = p.x
+		total = p.y
+	return "%d of %d found" % [got, total]
+
+
+## New pieces: open on the first tab holding one, say what came, and give
+## the arrival its one sparkle and chime.
+func _open_on_arrivals() -> void:
+	if arrivals.is_empty():
+		return
+	arrivals_label.text = WardrobeStock.arrivals_line(arrivals)
+	arrivals_label.visible = true
+	var first := WardrobeCatalog.piece(arrivals[0])
+	for i in tabs.get_tab_count():
+		if first and String(tabs.get_tab_control(i).name) == category_of(first):
+			tabs.current_tab = i
+			break
+	Juice.burst(feyre.model, &"outfit")
 
 
 func _swatch_button(color: Color, tip: String) -> Button:

@@ -332,71 +332,78 @@ def body_hides(mesh, hides):
 	return [h for h in hides if h not in drop]
 
 
-# id, name, slots, hides, colours (None = single), warmth, stealth, swift, reaction, source, phase, canon, mesh, desc
+# id, name, slots, hides, colours (None = single), reaction, source, phase, canon, mesh, desc
+# Purely aesthetic (owner, L64): no piece carries a stat. reaction is looks only
+# (NPC remarks, the bow hidden under a gown).
 PIECES = [
-	("hunter_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"": "6f6a63"}, 0.2, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_tunic", "Worn soft, patched at both elbows."),
-	("hunter_trousers", "Hunting trousers", ["bottom"], ["legs"], {"": "5a5146"}, 0.1, 0.1, 0, "hunter", "cottage_chest", 0, "C", "hunter_trousers", ""),
-	("hunter_cloak", "Heavy patched cloak", ["outer"], [], {"": "4b4f57"}, 0.4, 0.2, 0, "hunter", "cottage_chest", 0, "C", "hunter_cloak", "Hood up, she disappears into the snow."),
-	("hunter_boots", "Old boots", ["feet"], ["feet"], {"": "4a3a2c"}, 0.1, 0.1, 0, "", "cottage_chest", 0, "C", "hunter_boots", ""),
-	("spring_tunic", "Fine tunic", ["top"], ["torso", "arms"], {k: PASTELS[k] for k in ("sage", "cream", "rose", "lilac", "sky")}, 0.0, 0, 0.05, "", "manor_wardrobe", 2, "C", "spring_tunic", "She chooses tunics over gowns whenever she can."),
-	("spring_trousers", "Fine trousers", ["bottom"], ["legs"], {k: PASTELS[k] for k in ("cream", "sage", "pearl")}, 0.0, 0, 0.05, "", "manor_wardrobe", 2, "C", "spring_trousers", ""),
-	("riding_leathers", "Riding leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8a5a3c", "rose": "b9707f"}, 0.1, 0.1, 0.15, "rider", "stables", 2, "X", "riding_leathers", ""),
-	("woods_leathers", "Woods leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "5d6b4a", "mint": "7fa58f"}, 0.1, 0.35, 0.05, "hunter", "seamstress", 4, "X", "woods_leathers", "Green-brown, cut for moving quietly."),
-	("dinner_gown", "Dinner gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "lilac", "ivory", "periwinkle", "blush")}, 0.0, -0.3, 0, "formal", "alis", 2, "C", "gown_dinner", "Flowing, light as breath. Alis insists."),
-	("solstice_gown", "Solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {k: PASTELS[k] for k in ("butter", "mint", "blush", "gold")}, 0.0, -0.3, 0, "fae", "alis_gift", 6, "C?", "gown_solstice", "Made for dancing under the longest day."),
-	("ball_gown", "Ball gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "periwinkle", "pearl", "lilac", "emerald")}, 0.0, -0.5, -0.1, "formal", "manor_wardrobe", 3, "X", "gown_ball", "Layers of tulle, a bodice stitched with tiny roses."),
-	("garden_dress", "Garden tea dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("mint", "butter", "peach", "sky")}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 2, "X", "gown_garden", "Short sleeves and a skirt that swishes."),
-	("starlight_gown", "Starlight gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "c9d6ff", "lilac": "d8c8f4"}, 0.0, -0.4, 0, "fae", "seamstress", 4, "X", "gown_starlight", "It holds a little light of its own after dark."),
-	("rose_petal_gown", "Rose-petal gown", ["top", "bottom"], ["torso", "legs"], {"": "f08aa8", "gold": "f2c879", "pearl": "f7e8ef"}, 0.0, -0.4, 0, "formal", "manor_wardrobe", 4, "X", "gown_rose_petal", "A skirt of layered silk petals."),
-	("painter_smock", "Painter's smock", ["top"], ["torso", "arms"], {"": "e9e0cf", "blush": "f3d6db"}, 0.0, 0, 0, "painter", "painting_room", 4, "X", "painter_smock", "Already smudged, and she loves it."),
-	("velvet_cloak", "Velvet cloak", ["outer"], [], {k: PASTELS[k] for k in ("rose", "lilac", "emerald", "periwinkle")}, 0.3, 0.0, 0, "formal", "manor_wardrobe", 3, "X", "velvet_cloak", ""),
-	("satin_slippers", "Satin slippers", ["feet"], ["feet"], {k: PASTELS[k] for k in ("blush", "pearl", "lilac", "gold", "mint")}, 0.0, 0.1, 0, "formal", "manor_wardrobe", 2, "X", "slippers", ""),
-	("riding_boots", "Riding boots", ["feet"], ["feet"], {"": "6b4a33"}, 0.1, 0, 0.1, "rider", "stables", 2, "X", "riding_boots", ""),
-	("lace_gloves", "Lace gloves", ["hands"], ["hands"], {k: PASTELS[k] for k in ("ivory", "blush", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "gloves_lace", ""),
-	("flower_crown", "Flower crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "mint", "pearl")}, 0.0, 0, 0, "fae", "alis_gift", 2, "C?", "flower_crown", "Woven from the manor's own gardens."),
-	("woven_crown", "Woven crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "pearl", "sky")}, 0.0, 0, 0, "fae", "woven", 0, "X", "woven_crown", "Woven by her own hands from flowers she picked."),
-	("tiara", "Tiara", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3", "pearl": PASTELS["pearl"], "rose": "e8a3b8"}, 0.0, -0.1, 0, "formal", "manor_wardrobe", 3, "X", "tiara", "A delicate band of gilt leaves and seed pearls."),
-	("circlet", "Circlet", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3"}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
-	("pearl_necklace", "Pearl necklace", ["neck"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_pearl", ""),
-	("gold_locket", "Gold locket", ["neck"], [], {"": PASTELS["gold"]}, 0.0, 0, 0, "", "manor_wardrobe", 3, "X", "necklace_locket", ""),
-	("emerald_pendant", "Emerald pendant", ["neck"], [], {"": PASTELS["emerald"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 4, "X", "necklace_pendant", "Spring's green, on a fine chain."),
-	("rose_choker", "Rose choker", ["neck"], [], {k: PASTELS[k] for k in ("rose", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "necklace_choker", ""),
-	("butterfly_mask", "Butterfly mask", ["mask"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_butterfly", "Every revel needs a mask. She isn't cursed to wear one."),
-	("gilded_leaf_mask", "Gilded-leaf mask", ["mask"], [], {"": PASTELS["gold"], "emerald": PASTELS["emerald"]}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_leaf", ""),
-	("outfit_solstice_blue_gown", "Blue solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "a9c6f0"}, 0.0, -0.3, 0, "fae", "story", 6, "C?", "gown_solstice", "The gown for the longest day."),
-	("outfit_mortal_travel_dress", "Travelling dress", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8f8a9e"}, 0.2, 0.0, 0, "formal", "story", 7, "C?", "gown_garden", "A mortal dress for the road home."),
-	("fae_tunic", "Fae silk tunic", ["top"], ["torso", "arms"], {k: PASTELS[k] for k in ("mint", "periwinkle", "blush", "butter", "lilac")}, 0.0, 0.05, 0.05, "fae", "seamstress", 4, "X", "spring_tunic", "Silk that moves like water."),
-	("embroidered_vest", "Embroidered vest", ["outer"], [], {k: PASTELS[k] for k in ("rose", "sage", "periwinkle", "gold")}, 0.1, 0.0, 0, "", "seamstress", 4, "X", "vest", "Vines and roses stitched in gold thread."),
-	("capelet", "Flower capelet", ["outer"], [], {k: PASTELS[k] for k in ("blush", "lilac", "mint", "pearl")}, 0.1, 0.0, 0, "formal", "manor_wardrobe", 3, "X", "capelet", "A short cape with a frill of silk petals."),
-	("moonlit_gown", "Moonlit gown", ["top", "bottom"], ["torso", "legs"], {"": "c9d0f0", "silver": "dfe5ee", "lilac": "cbb8ea"}, 0.0, -0.3, 0, "fae", "seamstress", 4, "X", "gown_dinner", "For walks by the starlight pool."),
-	("butterfly_gown", "Butterfly gown", ["top", "bottom"], ["torso", "arms", "legs"], {k: PASTELS[k] for k in ("sky", "lilac", "butter", "mint")}, 0.0, -0.4, 0, "fae", "seamstress", 5, "X", "gown_solstice", "Sleeves cut like wings."),
-	("princess_gown", "Princess gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "periwinkle", "gold", "pearl", "blush", "lilac")}, 0.0, -0.5, -0.1, "formal", "manor_wardrobe", 4, "X", "gown_ball", "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls."),
-	("picnic_dress", "Picnic dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("peach", "mint", "sky", "rose")}, 0.0, -0.1, 0.05, "", "manor_wardrobe", 2, "X", "gown_garden", "Gingham-light, made for orchards."),
-	("wrap_dress", "Wrap dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("emerald", "rose", "lilac")}, 0.0, -0.1, 0, "", "seamstress", 4, "X", "gown_garden", ""),
-	("stockings", "Silk stockings", ["legs_wear"], [], {k: PASTELS[k] for k in ("pearl", "blush")}, 0.05, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("ankle_boots", "Ribboned ankle boots", ["feet"], ["feet"], {k: PASTELS[k] for k in ("blush", "lilac", "cream")}, 0.05, 0.05, 0.05, "", "seamstress", 4, "X", "riding_boots", ""),
-	("pearl_earrings", "Pearl drops", ["ears"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("gold_hoops", "Little gold hoops", ["ears"], [], {"": PASTELS["gold"]}, 0.0, 0, 0, "", "manor_wardrobe", 3, "X", "", ""),
-	("rose_earrings", "Rosebud earrings", ["ears"], [], {k: PASTELS[k] for k in ("rose", "pearl", "lilac")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("emerald_drops", "Emerald drops", ["ears"], [], {"": PASTELS["emerald"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 4, "X", "", ""),
-	("star_studs", "Starglass studs", ["ears"], [], {"": "cfe0ff"}, 0.0, 0, 0, "fae", "seamstress", 4, "X", "", "They catch light that isn't there."),
-	("gold_bangle", "Gold bangle", ["wrist"], [], {"": PASTELS["gold"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("charm_bracelet", "Charm bracelet", ["wrist"], [], {"": "d9dde3", "gold": PASTELS["gold"]}, 0.0, 0, 0, "", "manor_wardrobe", 3, "X", "", "A rose, a bow, a tiny paintbrush."),
-	("ribbon_cuff", "Ribbon cuff", ["wrist"], [], {k: PASTELS[k] for k in ("rose", "lilac", "mint", "sky")}, 0.0, 0, 0, "", "manor_wardrobe", 2, "X", "", ""),
-	("flower_wristlet", "Flower wristlet", ["wrist"], [], {k: PASTELS[k] for k in ("blush", "butter", "lilac")}, 0.0, 0, 0, "fae", "alis_gift", 6, "X", "", ""),
-	("hair_ribbon", "Silk hair ribbon", ["head"], [], {k: PASTELS[k] for k in ("rose", "sky", "lilac", "mint", "butter", "pearl")}, 0.0, 0, 0, "", "manor_wardrobe", 2, "X", "", ""),
-	("pearl_pins", "Pearl hairpins", ["head"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("butterfly_clips", "Butterfly clips", ["head"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, 0.0, 0, 0, "fae", "seamstress", 4, "X", "", ""),
-	("swan_mask", "Swan mask", ["mask"], [], {"": PASTELS["pearl"], "gold": PASTELS["gold"]}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_butterfly", ""),
-	("rose_mask", "Rose mask", ["mask"], [], {k: PASTELS[k] for k in ("rose", "blush")}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_leaf", ""),
-	("moth_mask", "Moon-moth mask", ["mask"], [], {"": "dfe8f0"}, 0.0, 0.15, 0, "fae", "calanmai", 5, "X", "mask_butterfly", ""),
-	("stag_mask", "Stag mask", ["mask"], [], {"": "8b6b3e"}, 0.0, 0.1, 0, "fae", "calanmai", 5, "X", "mask_fox", "Antlers of gilded wood."),
-	("lace_veil_mask", "Lace veil mask", ["mask"], [], {k: PASTELS[k] for k in ("ivory", "lilac")}, 0.0, 0.05, 0, "formal", "manor_wardrobe", 5, "X", "mask_leaf", ""),
-	("pearl_circlet", "Pearl circlet", ["head"], [], {"": PASTELS["pearl"]}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
-	("star_tiara", "Starlight tiara", ["head"], [], {"": "cfe0ff", "gold": PASTELS["gold"]}, 0.0, 0, 0, "fae", "seamstress", 5, "X", "tiara", ""),
-	("shawl", "Lace shawl", ["outer"], [], {k: PASTELS[k] for k in ("ivory", "blush", "lilac", "mint")}, 0.15, 0, 0, "formal", "manor_wardrobe", 2, "X", "capelet", ""),
-	("ribbon_sash", "Satin sash", ["neck"], [], {k: PASTELS[k] for k in ("rose", "periwinkle", "gold")}, 0.0, 0, 0, "formal", "manor_wardrobe", 3, "X", "", ""),
-	("fox_mask", "Fox mask", ["mask"], [], {"": "d9773b"}, 0.0, 0.1, 0, "fae", "calanmai", 5, "C?", "mask_fox", "Like Lucien's, which may be the point."),
+	("hunter_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"": "6f6a63"}, "hunter", "cottage_chest", 0, "C", "hunter_tunic", "Worn soft, patched at both elbows."),
+	("hunter_trousers", "Hunting trousers", ["bottom"], ["legs"], {"": "5a5146"}, "hunter", "cottage_chest", 0, "C", "hunter_trousers", ""),
+	("hunter_cloak", "Heavy patched cloak", ["outer"], [], {"": "4b4f57"}, "hunter", "cottage_chest", 0, "C", "hunter_cloak", "Hood up against the snow."),
+	("hunter_boots", "Old boots", ["feet"], ["feet"], {"": "4a3a2c"}, "", "cottage_chest", 0, "C", "hunter_boots", ""),
+	# L64, Keeper 2026-11-03: humble human-realm pieces, drab and faded, no dyes. Her
+	# layers (ch 2-3), grey stockings, and a worn ribbon handed down from Elain (ch 2 ribbons).
+	("layer_tunic", "Patched tunic", ["top"], ["torso", "arms"], {"moss": "666b57", "russet": "74604f"}, "hunter", "cottage_chest", 0, "X", "hunter_tunic", "Another of her layers, faded past whatever colour it was."),
+	("wool_stockings", "Wool stockings", ["legs_wear"], [], {"": "8a8580"}, "hunter", "cottage_chest", 0, "X", "stockings", "Grey, darned at both heels."),
+	("elains_ribbon", "Elain's old ribbon", ["head"], [], {"": "9fb0c0"}, "", "cottage_chest", 0, "X", "hair_ribbon", "Frayed at the ends. She'd want me to look like a girl, just once."),
+	("spring_tunic", "Fine tunic", ["top"], ["torso", "arms"], {k: PASTELS[k] for k in ("sage", "cream", "rose", "lilac", "sky")}, "", "manor_wardrobe", 2, "C", "spring_tunic", "She chooses tunics over gowns whenever she can."),
+	("spring_trousers", "Fine trousers", ["bottom"], ["legs"], {k: PASTELS[k] for k in ("cream", "sage", "pearl")}, "", "manor_wardrobe", 2, "C", "spring_trousers", ""),
+	("riding_leathers", "Riding leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8a5a3c", "rose": "b9707f"}, "rider", "stables", 2, "X", "riding_leathers", ""),
+	("woods_leathers", "Woods leathers", ["top", "bottom"], ["torso", "arms", "legs"], {"": "5d6b4a", "mint": "7fa58f"}, "hunter", "seamstress", 4, "X", "woods_leathers", "Green-brown, cut for moving quietly."),
+	("dinner_gown", "Dinner gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "lilac", "ivory", "periwinkle", "blush")}, "formal", "alis", 2, "C", "gown_dinner", "Flowing, light as breath. Alis insists."),
+	("solstice_gown", "Solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {k: PASTELS[k] for k in ("butter", "mint", "blush", "gold")}, "fae", "alis_gift", 6, "C?", "gown_solstice", "Made for dancing under the longest day."),
+	("ball_gown", "Ball gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "periwinkle", "pearl", "lilac", "emerald")}, "formal", "manor_wardrobe", 3, "X", "gown_ball", "Layers of tulle, a bodice stitched with tiny roses."),
+	("garden_dress", "Garden tea dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("mint", "butter", "peach", "sky")}, "formal", "manor_wardrobe", 2, "X", "gown_garden", "Short sleeves and a skirt that swishes."),
+	("starlight_gown", "Starlight gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "c9d6ff", "lilac": "d8c8f4"}, "fae", "seamstress", 4, "X", "gown_starlight", "It holds a little light of its own after dark."),
+	("rose_petal_gown", "Rose-petal gown", ["top", "bottom"], ["torso", "legs"], {"": "f08aa8", "gold": "f2c879", "pearl": "f7e8ef"}, "formal", "manor_wardrobe", 4, "X", "gown_rose_petal", "A skirt of layered silk petals."),
+	("painter_smock", "Painter's smock", ["top"], ["torso", "arms"], {"": "e9e0cf", "blush": "f3d6db"}, "painter", "painting_room", 4, "X", "painter_smock", "Already smudged, and she loves it."),
+	("velvet_cloak", "Velvet cloak", ["outer"], [], {k: PASTELS[k] for k in ("rose", "lilac", "emerald", "periwinkle")}, "formal", "manor_wardrobe", 3, "X", "velvet_cloak", ""),
+	("satin_slippers", "Satin slippers", ["feet"], ["feet"], {k: PASTELS[k] for k in ("blush", "pearl", "lilac", "gold", "mint")}, "formal", "manor_wardrobe", 2, "X", "slippers", ""),
+	("riding_boots", "Riding boots", ["feet"], ["feet"], {"": "6b4a33"}, "rider", "stables", 2, "X", "riding_boots", ""),
+	("lace_gloves", "Lace gloves", ["hands"], ["hands"], {k: PASTELS[k] for k in ("ivory", "blush", "lilac")}, "formal", "manor_wardrobe", 3, "X", "gloves_lace", ""),
+	("flower_crown", "Flower crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "mint", "pearl")}, "fae", "alis_gift", 2, "C?", "flower_crown", "Woven from the manor's own gardens."),
+	("woven_crown", "Woven crown", ["head"], [], {k: PASTELS[k] for k in ("rose", "butter", "lilac", "pearl", "sky")}, "fae", "woven", 0, "X", "woven_crown", "Woven by her own hands from flowers she picked."),
+	("tiara", "Tiara", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3", "pearl": PASTELS["pearl"], "rose": "e8a3b8"}, "formal", "manor_wardrobe", 3, "X", "tiara", "A delicate band of gilt leaves and seed pearls."),
+	("circlet", "Circlet", ["head"], [], {"gold": PASTELS["gold"], "silver": "d9dde3"}, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
+	("pearl_necklace", "Pearl necklace", ["neck"], [], {"": PASTELS["pearl"]}, "formal", "manor_wardrobe", 3, "X", "necklace_pearl", ""),
+	("gold_locket", "Gold locket", ["neck"], [], {"": PASTELS["gold"]}, "", "manor_wardrobe", 3, "X", "necklace_locket", ""),
+	("emerald_pendant", "Emerald pendant", ["neck"], [], {"": PASTELS["emerald"]}, "formal", "manor_wardrobe", 4, "X", "necklace_pendant", "Spring's green, on a fine chain."),
+	("rose_choker", "Rose choker", ["neck"], [], {k: PASTELS[k] for k in ("rose", "lilac")}, "formal", "manor_wardrobe", 3, "X", "necklace_choker", ""),
+	("butterfly_mask", "Butterfly mask", ["mask"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, "fae", "calanmai", 5, "X", "mask_butterfly", "Every revel needs a mask. She isn't cursed to wear one."),
+	("gilded_leaf_mask", "Gilded-leaf mask", ["mask"], [], {"": PASTELS["gold"], "emerald": PASTELS["emerald"]}, "fae", "calanmai", 5, "X", "mask_leaf", ""),
+	("outfit_solstice_blue_gown", "Blue solstice gown", ["top", "bottom"], ["torso", "arms", "legs"], {"": "a9c6f0"}, "fae", "story", 6, "C?", "gown_solstice", "The gown for the longest day."),
+	("outfit_mortal_travel_dress", "Travelling dress", ["top", "bottom"], ["torso", "arms", "legs"], {"": "8f8a9e"}, "formal", "story", 7, "C?", "gown_garden", "A mortal dress for the road home."),
+	("fae_tunic", "Fae silk tunic", ["top"], ["torso", "arms"], {k: PASTELS[k] for k in ("mint", "periwinkle", "blush", "butter", "lilac")}, "fae", "seamstress", 4, "X", "spring_tunic", "Silk that moves like water."),
+	("embroidered_vest", "Embroidered vest", ["outer"], [], {k: PASTELS[k] for k in ("rose", "sage", "periwinkle", "gold")}, "", "seamstress", 4, "X", "vest", "Vines and roses stitched in gold thread."),
+	("capelet", "Flower capelet", ["outer"], [], {k: PASTELS[k] for k in ("blush", "lilac", "mint", "pearl")}, "formal", "manor_wardrobe", 3, "X", "capelet", "A short cape with a frill of silk petals."),
+	("moonlit_gown", "Moonlit gown", ["top", "bottom"], ["torso", "legs"], {"": "c9d0f0", "silver": "dfe5ee", "lilac": "cbb8ea"}, "fae", "seamstress", 4, "X", "gown_dinner", "For walks by the starlight pool."),
+	("butterfly_gown", "Butterfly gown", ["top", "bottom"], ["torso", "arms", "legs"], {k: PASTELS[k] for k in ("sky", "lilac", "butter", "mint")}, "fae", "seamstress", 5, "X", "gown_solstice", "Sleeves cut like wings."),
+	("princess_gown", "Princess gown", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("rose", "periwinkle", "gold", "pearl", "blush", "lilac")}, "formal", "manor_wardrobe", 4, "X", "gown_ball", "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls."),
+	("picnic_dress", "Picnic dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("peach", "mint", "sky", "rose")}, "", "manor_wardrobe", 2, "X", "gown_garden", "Gingham-light, made for orchards."),
+	("wrap_dress", "Wrap dress", ["top", "bottom"], ["torso", "legs"], {k: PASTELS[k] for k in ("emerald", "rose", "lilac")}, "", "seamstress", 4, "X", "gown_garden", ""),
+	("stockings", "Silk stockings", ["legs_wear"], [], {k: PASTELS[k] for k in ("pearl", "blush")}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("ankle_boots", "Ribboned ankle boots", ["feet"], ["feet"], {k: PASTELS[k] for k in ("blush", "lilac", "cream")}, "", "seamstress", 4, "X", "riding_boots", ""),
+	("pearl_earrings", "Pearl drops", ["ears"], [], {"": PASTELS["pearl"]}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("gold_hoops", "Little gold hoops", ["ears"], [], {"": PASTELS["gold"]}, "", "manor_wardrobe", 3, "X", "", ""),
+	("rose_earrings", "Rosebud earrings", ["ears"], [], {k: PASTELS[k] for k in ("rose", "pearl", "lilac")}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("emerald_drops", "Emerald drops", ["ears"], [], {"": PASTELS["emerald"]}, "formal", "manor_wardrobe", 4, "X", "", ""),
+	("star_studs", "Starglass studs", ["ears"], [], {"": "cfe0ff"}, "fae", "seamstress", 4, "X", "", "They catch light that isn't there."),
+	("gold_bangle", "Gold bangle", ["wrist"], [], {"": PASTELS["gold"]}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("charm_bracelet", "Charm bracelet", ["wrist"], [], {"": "d9dde3", "gold": PASTELS["gold"]}, "", "manor_wardrobe", 3, "X", "", "A rose, a bow, a tiny paintbrush."),
+	("ribbon_cuff", "Ribbon cuff", ["wrist"], [], {k: PASTELS[k] for k in ("rose", "lilac", "mint", "sky")}, "", "manor_wardrobe", 2, "X", "", ""),
+	("flower_wristlet", "Flower wristlet", ["wrist"], [], {k: PASTELS[k] for k in ("blush", "butter", "lilac")}, "fae", "alis_gift", 6, "X", "", ""),
+	("hair_ribbon", "Silk hair ribbon", ["head"], [], {k: PASTELS[k] for k in ("rose", "sky", "lilac", "mint", "butter", "pearl")}, "", "manor_wardrobe", 2, "X", "", ""),
+	("pearl_pins", "Pearl hairpins", ["head"], [], {"": PASTELS["pearl"]}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("butterfly_clips", "Butterfly clips", ["head"], [], {k: PASTELS[k] for k in ("lilac", "sky", "gold")}, "fae", "seamstress", 4, "X", "", ""),
+	("swan_mask", "Swan mask", ["mask"], [], {"": PASTELS["pearl"], "gold": PASTELS["gold"]}, "fae", "calanmai", 5, "X", "mask_butterfly", ""),
+	("rose_mask", "Rose mask", ["mask"], [], {k: PASTELS[k] for k in ("rose", "blush")}, "fae", "calanmai", 5, "X", "mask_leaf", ""),
+	("moth_mask", "Moon-moth mask", ["mask"], [], {"": "dfe8f0"}, "fae", "calanmai", 5, "X", "mask_butterfly", ""),
+	("stag_mask", "Stag mask", ["mask"], [], {"": "8b6b3e"}, "fae", "calanmai", 5, "X", "mask_fox", "Antlers of gilded wood."),
+	("lace_veil_mask", "Lace veil mask", ["mask"], [], {k: PASTELS[k] for k in ("ivory", "lilac")}, "formal", "manor_wardrobe", 5, "X", "mask_leaf", ""),
+	("pearl_circlet", "Pearl circlet", ["head"], [], {"": PASTELS["pearl"]}, "formal", "manor_wardrobe", 3, "X", "circlet", ""),
+	("star_tiara", "Starlight tiara", ["head"], [], {"": "cfe0ff", "gold": PASTELS["gold"]}, "fae", "seamstress", 5, "X", "tiara", ""),
+	("shawl", "Lace shawl", ["outer"], [], {k: PASTELS[k] for k in ("ivory", "blush", "lilac", "mint")}, "formal", "manor_wardrobe", 2, "X", "capelet", ""),
+	("ribbon_sash", "Satin sash", ["neck"], [], {k: PASTELS[k] for k in ("rose", "periwinkle", "gold")}, "formal", "manor_wardrobe", 3, "X", "", ""),
+	("fox_mask", "Fox mask", ["mask"], [], {"": "d9773b"}, "fae", "calanmai", 5, "C?", "mask_fox", "Like Lucien's, which may be the point."),
 ]
 HAIR = [
 	("braid", "Hunter's braid", "C", False), ("loose", "Loose", "C", False), ("hunters_knot", "Hunter's knot", "X", False),
@@ -405,6 +412,7 @@ HAIR = [
 	("fishtail_braid", "Fishtail braid", "X", False), ("ballerina_bun", "Ballerina bun", "X", False),
 	("waterfall_braid", "Waterfall braid", "X", False), ("twin_braids", "Twin braids", "X", False),
 	("ribboned_curls", "Ribboned curls", "X", False), ("rose_bun", "Rose bun", "X", True),
+	("calanmai_crown", "Calanmai crown", "X", False, "calanmai_attended"),
 ]
 # id, name, channel, colour, amount, sheen
 MAKEUP = [
@@ -689,7 +697,7 @@ def main():
 
 	clear_rec("data/wardrobe/pieces"); clear_rec("data/wardrobe/hair"); clear_rec("data/wardrobe/makeup")
 	n_pieces = 0
-	for pid, name, slots, hides, colours, warmth, stealth, swift, reaction, source, phase, canon, mesh, desc in PIECES:
+	for pid, name, slots, hides, colours, reaction, source, phase, canon, mesh, desc in PIECES:
 		mesh = mesh or MESH_FOR.get(pid, "")
 		mesh_path = "res://characters/feyre/wardrobe/%s.glb" % mesh if mesh else ""
 		for cname, chex in colours.items():
@@ -698,13 +706,12 @@ def main():
 			lines = ['id = &"%s"' % vid, 'display_name = "%s"' % esc(vname), 'description = "%s"' % esc(desc),
 				"slots = %s" % sn_array(slots), "hides_body_regions = %s" % sn_array(body_hides(mesh, hides)),
 				'mesh_path = "%s"' % mesh_path, "color = %s" % color(chex),
-				"warmth = %s" % float(warmth), "stealth = %s" % float(stealth), "swift = %s" % float(swift),
 				'reaction_tag = &"%s"' % reaction, 'source = &"%s"' % source, "phase = %d" % phase, 'canon = "%s"' % canon]
 			write("data/wardrobe/pieces/%s.tres" % vid, "res://data/wardrobe/wardrobe_piece.gd", "WardrobePiece", lines)
 			n_pieces += 1
-	for hid, name, canon, occ in HAIR:
+	for hid, name, canon, occ, *flag in HAIR:
 		lines = ['id = &"%s"' % hid, 'display_name = "%s"' % esc(name), 'mesh_path = "res://characters/feyre/hair/%s.glb"' % hid,
-			"occupies_head = %s" % str(occ).lower(), 'canon = "%s"' % canon]
+			"occupies_head = %s" % str(occ).lower(), 'canon = "%s"' % canon] + (['require_flag = "%s"' % flag[0]] if flag else [])
 		write("data/wardrobe/hair/%s.tres" % hid, "res://data/wardrobe/hairstyle_data.gd", "HairstyleData", lines)
 	for mid, name, ch, chex, amt, sheen in MAKEUP:
 		lines = ['id = &"%s"' % mid, 'display_name = "%s"' % esc(name), 'channel = &"%s"' % ch, "color = %s" % color(chex),

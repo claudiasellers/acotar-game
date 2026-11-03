@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WardrobePiece" format=3]
+
+[ext_resource type="Script" path="res://data/wardrobe/wardrobe_piece.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wool_stockings"
+display_name = "Wool stockings"
+description = "Grey, darned at both heels."
+slots = Array[StringName]([&"legs_wear"])
+hides_body_regions = Array[StringName]([])
+mesh_path = "res://characters/feyre/wardrobe/stockings.glb"
+color = Color(0.541, 0.522, 0.502, 1)
+reaction_tag = &"hunter"
+source = &"cottage_chest"
+phase = 0
+canon = "X"

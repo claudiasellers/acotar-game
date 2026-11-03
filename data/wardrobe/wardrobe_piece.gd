@@ -21,14 +21,14 @@ const SLOTS: Array[StringName] = [
 ## Skinned mesh, empty until the art lands; the placeholder colour shows.
 @export_file("*.glb", "*.gltf", "*.tscn") var mesh_path: String = ""
 @export var color: Color = Color(0.8, 0.8, 0.8)
-## Gameplay effects (root doc §4.6): warmth, stealth, swift, and NPC reaction.
-@export var warmth: float = 0.0
-@export var stealth: float = 0.0
-@export var swift: float = 0.0
-## Tag NPCs react to: &"hunter", &"formal", &"fae", &"painter"...
+## Purely aesthetic (owner, L64): a piece never carries a stat, buff or gate.
+## Tag for looks only (NPC remarks, the bow hidden under a gown): &"hunter",
+## &"formal", &"fae", &"painter"...
 @export var reaction_tag: StringName = &""
 ## Where it comes from: cottage_chest, manor_wardrobe, alis_gift, seamstress...
+## Every source has a route in WardrobeStock.ROUTES.
 @export var source: StringName = &""
-## Phase it becomes available (manor wardrobe grows per phase).
+## Story phase (the N of PhaseDef "pN_...") from which it can reach her; the
+## dressing room restocks by it (WardrobeStock).
 @export var phase: int = 0
 @export var canon: String = "X"
