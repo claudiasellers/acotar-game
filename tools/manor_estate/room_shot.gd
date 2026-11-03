@@ -1,5 +1,6 @@
 ## Screenshots of furnished manor rooms from two corners each (L38 review shots).
-##   godot res://tools/manor_estate/room_shot.tscn -- <room[@level]>[,<room>...] [out_dir]
+##   godot res://tools/manor_estate/room_shot.tscn -- <room[@level]>[,<room>...] [out_dir] [hour]
+## An hour (0-24, e.g. 20) sets the clock before the shots; without one it is left alone.
 ## A room may name its own views instead of the corners, room-local x/z from
 ## the rect's min corner: entrance_hall:10/1.5=10/20+2/14=18/17 saves _v1, _v2
 ## (from=to; the shots queue takes no '>').
@@ -23,6 +24,9 @@ func _run() -> void:
 	var out := args[1] if args.size() > 1 else OS.get_environment("SHOTS_OUT")
 	if out == "":
 		out = "user://"
+	if args.size() > 2 and args[2].is_valid_float():
+		Clock.time_of_day = args[2].to_float() / 24.0
+		Clock.paused = true
 	var estate := (load(ESTATE) as PackedScene).instantiate()
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
