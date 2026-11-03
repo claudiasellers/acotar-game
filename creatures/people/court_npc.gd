@@ -125,5 +125,7 @@ func _process(delta: float) -> void:
 		var a := _rng.randf() * TAU
 		_target = home + Vector3(cos(a), 0.0, sin(a)) * _rng.randf() * wander_radius
 		return
-	global_position += to.limit_length(walk_speed * delta)
-	rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), clampf(delta * 4.0, 0.0, 1.0))
+	# Round the furniture and walls on the navmesh (T5); straight when there is none.
+	var dir := NavMover.on(self).steer(_target) if to.length() >= NavMover.MIN_DISTANCE else to
+	global_position += dir.normalized() * minf(walk_speed * delta, to.length())
+	rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), clampf(delta * 4.0, 0.0, 1.0))
