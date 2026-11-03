@@ -69,7 +69,6 @@ boots a level in **under 2 minutes** instead of ~16.
 
 1. `make perf` on the Mac at main after L57-1 merges: the real frame-time baseline (cloud ms are lavapipe).
 2. cottage (`cottage_snow`) crashes lavapipe in Forward+ on both trees: its counts come from the Mac pass.
-4. L59: look check of rain, petals and flames; frame time of the paced nav parse when the manor streams in.
 3. L58-1 look request `shots/req-L58-1`: the lead's same-prop check across manor / village / forest.
 4. L59: look check of rain, petals and flames; frame time of the paced nav parse when the manor streams in.
 
