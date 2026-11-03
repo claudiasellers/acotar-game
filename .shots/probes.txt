@@ -1,0 +1,11 @@
+# L61 (render program T4, hero meshes): before. Same request at adb54f80 (before) and 2ec1f6de (after).
+from hero-meshes-before
+quality look
+size 1920x1080
+timeout 900
+shot feyre_closeup res://tools/feyre_face_shot.tscn {out}
+shot wolf_closeup res://tools/creatures/wolf_look_shot.tscn {out}
+shot manor_front res://tools/world_shot.tscn manor_drive {out}/manor_front.png
+shot rose_garden res://tools/world_shot.tscn manor_rose_garden {out}/rose_garden.png
+shot hunting_forest res://tools/world_shot.tscn hunting_forest {out}/hunting_forest.png
+shot opening_film res://tools/film/opening_film_shot.tscn {out} noclip until=177
