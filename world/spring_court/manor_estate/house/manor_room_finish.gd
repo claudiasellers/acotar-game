@@ -107,11 +107,11 @@ static func ceiling_color(room: ManorRoomDef) -> Color:
 
 
 ## Gilt and timber that ignore ambient like the plaster, with the same bounce.
-static func _mat(kind: StringName, color: Color, roughness: float, metallic: float, bounce: float) -> StandardMaterial3D:
+static func _mat(kind: StringName, color: Color, roughness: float, metallic: float, bounce: float) -> CandyMaterial:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _mats.has(key):
 		return _mats[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.resource_name = "finish_" + String(kind)
 	m.albedo_color = color
 	m.roughness = roughness
@@ -124,11 +124,11 @@ static func _mat(kind: StringName, color: Color, roughness: float, metallic: flo
 	return m
 
 
-static func gilt() -> StandardMaterial3D:
+static func gilt() -> CandyMaterial:
 	return _mat(&"gilt", Color(0.90, 0.75, 0.42), 0.35, 0.6, 0.22)
 
 
-static func timber() -> StandardMaterial3D:
+static func timber() -> CandyMaterial:
 	return _mat(&"timber", Color(0.62, 0.44, 0.36), 0.75, 0.0, 0.3)
 
 
@@ -302,7 +302,7 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 		return null
 	drape.generate_normals()
 	var mesh := ManorMeshMerger.commit(drape)
-	var fabric := StandardMaterial3D.new()
+	var fabric := MaterialLibrary.surface()
 	fabric.resource_name = "curtain"
 	fabric.albedo_color = cols[0]
 	fabric.roughness = 0.75
@@ -310,7 +310,7 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 	mesh.surface_set_material(0, fabric)
 	trim.generate_normals()
 	mesh = ManorMeshMerger.commit(trim, mesh)
-	var tm := StandardMaterial3D.new()
+	var tm := MaterialLibrary.surface()
 	tm.resource_name = "curtain_trim"
 	tm.albedo_color = cols[1]
 	tm.roughness = 0.4

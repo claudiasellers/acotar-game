@@ -4,10 +4,15 @@
 // Vertex colour = albedo (linear). UV.x carries the finish: (index + 0.5) / 16.
 // 0 matte, 1 satin, 2 fabric, 3 gold, 4 pearl, 5 glass, 6 mirror, 7 glow, 8 water, 9 leaf.
 
+// Lighting: candy_lit (render program T2) with the stock defaults, so the
+// finishes read exactly as before; rim and clearcoat go through its lobes.
+#define CANDY_LOBES
+#define CANDY_COAT
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
+
 uniform float glow_energy : hint_range(0.0, 8.0) = 2.4;
-// 1 in the court, 0 under dread (GradeDirector): the gilt and pearl sparkle
-// and the glow of flames and faelights withdraw with it (experience bar §1.5).
-global uniform float magic_amount;
+// magic_amount (declared by candy_lit) is 1 in the court, 0 under dread: the gilt
+// and pearl sparkle and the glow of flames and faelights withdraw with it (experience bar §1.5).
 
 varying flat int finish;
 
@@ -41,10 +46,8 @@ void fragment() {
 	ALBEDO = c;
 	ROUGHNESS = rough;
 	METALLIC = metal;
-	RIM = rim;
-	RIM_TINT = rim_tint;
-	CLEARCOAT = coat;
-	CLEARCOAT_ROUGHNESS = coat_rough;
+	candy_lobes(0.5, rim, rim_tint);
+	candy_coat(coat, coat_rough);
 	EMISSION = emit;
 #ifdef CLEAR
 	ALPHA = COLOR.a * (finish == 8 ? 0.82 : 1.0);

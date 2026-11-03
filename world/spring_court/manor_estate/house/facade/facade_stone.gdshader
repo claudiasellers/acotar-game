@@ -4,6 +4,9 @@
 // Albedo stays at or below 0.85 (L18-4 glare rule).
 shader_type spatial;
 render_mode cull_back;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#define CANDY_LOBES
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec3 stone_a : source_color = vec3(0.84, 0.79, 0.78);   // blush alabaster
 uniform vec3 stone_b : source_color = vec3(0.82, 0.79, 0.83);   // lilac alabaster
@@ -65,7 +68,7 @@ void fragment() {
 	vec3 c = mix(base, mortar, j);
 	ALBEDO = min(c, vec3(0.85));
 	ROUGHNESS = mix(0.58, 0.9, j);
-	SPECULAR = 0.35;
+	candy_lobes(0.35, 0.0, 0.5);
 	// faint pearlescent shimmer at grazing angles (R3), kept tiny for glare
 	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.0);
 	EMISSION = vec3(0.10, 0.06, 0.12) * fres * (1.0 - j);

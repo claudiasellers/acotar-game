@@ -31,7 +31,7 @@ func build() -> void:
 	var quad := QuadMesh.new()
 	quad.size = Vector2(1.3, 2.0)
 	shimmer.mesh = quad
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -55,7 +55,7 @@ func build() -> void:
 
 func _process(delta: float) -> void:
 	var p := player()
-	var mat := shimmer.material_override as StandardMaterial3D
+	var mat := shimmer.material_override as CandyMaterial
 	if p == null or not p is Feyre or (p as Feyre).camera == null:
 		return
 	var cam := (p as Feyre).camera

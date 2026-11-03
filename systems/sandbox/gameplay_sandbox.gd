@@ -56,7 +56,7 @@ func _hearth(at: Vector2) -> void:
 	hearth.name = "Campfire"
 	hearth.station = load("res://data/stations/campfire.tres")
 	hearth.position = Vector3(at.x, _y(at.x, at.y), at.y)
-	var stone := StandardMaterial3D.new()
+	var stone := MaterialLibrary.surface()
 	stone.albedo_color = Color(0.62, 0.58, 0.56)
 	for i in 8:
 		var a := TAU * i / 8.0
@@ -80,7 +80,7 @@ func _hearth(at: Vector2) -> void:
 	cone.bottom_radius = 0.25
 	cone.height = 0.5
 	fire.mesh = cone
-	var glow := StandardMaterial3D.new()
+	var glow := MaterialLibrary.surface()
 	glow.emission_enabled = true
 	glow.emission = Color(1.0, 0.55, 0.2)
 	glow.emission_energy_multiplier = 3.0
@@ -108,7 +108,7 @@ func _forage() -> void:
 		bloom.height = 0.16
 		bloom.radial_segments = 8
 		bloom.rings = 4
-		var mat := StandardMaterial3D.new()
+		var mat := MaterialLibrary.surface()
 		mat.albedo_color = item.color if item else Color.WHITE
 		mat.emission_enabled = true
 		mat.emission = mat.albedo_color * 0.25
@@ -145,7 +145,7 @@ func _stone(at: Vector2) -> void:
 	s.radius = 1.2
 	s.height = 1.8
 	mesh.mesh = s
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.66, 0.64, 0.68)
 	mesh.material_override = mat
 	rock.add_child(mesh)
@@ -166,7 +166,7 @@ func _station(id: StringName, at: Vector2, color: Color, size: Vector3) -> void:
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = color
 	mat.metallic = 0.3
 	mat.roughness = 0.35

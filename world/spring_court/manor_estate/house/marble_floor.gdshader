@@ -5,6 +5,10 @@
 // thing in view (light hierarchy, §2.1).
 shader_type spatial;
 render_mode cull_back;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#define CANDY_LOBES
+#define CANDY_COAT
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec4 light_stone : source_color = vec4(0.97, 0.93, 0.92, 1.0);
 uniform vec4 dark_stone : source_color = vec4(0.82, 0.74, 0.84, 1.0);
@@ -43,7 +47,6 @@ void fragment() {
 	ALBEDO = mix(col, joint.rgb, j);
 	ROUGHNESS = mix(0.22, 0.5, j);
 	METALLIC = 0.0;
-	SPECULAR = 0.45;
-	CLEARCOAT = 0.4 * (1.0 - j);
-	CLEARCOAT_ROUGHNESS = 0.2;
+	candy_lobes(0.45, 0.0, 0.5);
+	candy_coat(0.4 * (1.0 - j), 0.2);
 }

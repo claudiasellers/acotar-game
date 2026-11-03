@@ -365,7 +365,7 @@ static func _soften(cols: PackedColorArray) -> PackedColorArray:
 ## the colour: vertex colour as albedo, soft sheen, a warm rim (R3).
 static func dress(root: Node3D) -> void:
 	if _vcol == null:
-		var std := StandardMaterial3D.new()
+		var std := MaterialLibrary.surface()
 		std.resource_name = "satchel_vcol"
 		std.vertex_color_use_as_albedo = true
 		std.roughness = 0.6

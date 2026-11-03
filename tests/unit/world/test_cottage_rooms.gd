@@ -100,4 +100,4 @@ func test_cottage_glbs_import_their_colour() -> void:
 				continue
 			var cfg := ConfigFile.new()
 			assert_eq(cfg.load(dir + f), OK, f)
-			assert_eq(cfg.get_value("params", "import_script/path", ""), "res://world/shared/import/vertex_color_import.gd", f)
+			assert_eq(cfg.get_value("params", "import_script/path", ""), "res://tools/import/candy_vertex_color_import.gd", f)

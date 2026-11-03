@@ -40,8 +40,8 @@ const TRAIL_X := 1.05
 const TRAIL_TO_Z := 6.3
 
 
-static func mat(color: Color, rough: float = 0.6, metal: float = 0.0) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+static func mat(color: Color, rough: float = 0.6, metal: float = 0.0) -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = rough
 	m.metallic = metal
@@ -218,7 +218,7 @@ static func trail(m: Material) -> Node3D:
 	return t
 
 
-static func blood_mat() -> StandardMaterial3D:
+static func blood_mat() -> CandyMaterial:
 	var m := mat(BLOOD, 0.04, 0.0)
 	m.metallic_specular = 0.9
 	m.emission_enabled = true

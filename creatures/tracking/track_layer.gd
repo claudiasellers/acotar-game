@@ -156,7 +156,7 @@ func _mesh_for(kind: StringName, size: float) -> Mesh:
 func _material_for(kind: StringName) -> Material:
 	if _materials.has(kind):
 		return _materials[kind]
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.roughness = 1.0
 	match kind:
 		&"blood":

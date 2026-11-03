@@ -180,7 +180,7 @@ static func _end_face(node: Node3D, f: _Frame, stair: ManorStairDef, room: Manor
 ## laid out from the foot so a whole number of them fills the flight.
 static func _rake_material(room: ManorRoomDef, stair: ManorStairDef, run: float, rise: float, t0: float, foot: Vector2, dir: Vector2) -> Material:
 	var base := ManorRoomLook.wall_material(room)
-	if not base is ShaderMaterial:
+	if not base is ShaderMaterial or base is CandyMaterial:
 		return base
 	var key := "rake_%s" % stair.id
 	if _mats.has(key):
@@ -202,7 +202,7 @@ static func _rake_material(room: ManorRoomDef, stair: ManorStairDef, run: float,
 ## it with the middle one centred on the flight (the niche sits in it).
 static func _end_material(room: ManorRoomDef, stair: ManorStairDef, run: float, outer: float) -> Material:
 	var base := ManorRoomLook.wall_material(room)
-	if not base is ShaderMaterial:
+	if not base is ShaderMaterial or base is CandyMaterial:
 		return base
 	var key := "end_%s" % stair.id
 	if _mats.has(key):
@@ -219,7 +219,7 @@ static func _end_material(room: ManorRoomDef, stair: ManorStairDef, run: float, 
 	return m
 
 
-static func _satin_gold() -> StandardMaterial3D:
+static func _satin_gold() -> CandyMaterial:
 	return EstateKit.mat(EstateKit.GOLD, 0.35, 0.0)
 
 

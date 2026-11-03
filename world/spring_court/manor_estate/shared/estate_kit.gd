@@ -36,11 +36,11 @@ static var _materials: Dictionary = {}
 
 
 ## A cached opaque material. `key` defaults to the colour.
-static func mat(color: Color, roughness: float = 0.85, metallic: float = 0.0, key: String = "") -> StandardMaterial3D:
+static func mat(color: Color, roughness: float = 0.85, metallic: float = 0.0, key: String = "") -> CandyMaterial:
 	var k := key if key != "" else "%s|%.2f|%.2f" % [color.to_html(), roughness, metallic]
 	if _materials.has(k):
 		return _materials[k]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = roughness
 	m.metallic = metallic
@@ -56,11 +56,11 @@ static func mat(color: Color, roughness: float = 0.85, metallic: float = 0.0, ke
 
 
 ## Glossy pearlescent material: a soft rim glow over a clearcoat (R3).
-static func pearl(color: Color = PEARL, key: String = "") -> StandardMaterial3D:
+static func pearl(color: Color = PEARL, key: String = "") -> CandyMaterial:
 	var k := key if key != "" else "pearl|" + color.to_html()
 	if _materials.has(k):
 		return _materials[k]
-	var m := mat(color, 0.18, 0.15, k + "|base").duplicate() as StandardMaterial3D
+	var m := mat(color, 0.18, 0.15, k + "|base").duplicate() as CandyMaterial
 	m.rim_enabled = true
 	m.rim = 0.6
 	m.rim_tint = 0.7
@@ -69,10 +69,10 @@ static func pearl(color: Color = PEARL, key: String = "") -> StandardMaterial3D:
 
 
 ## A cached material that takes its albedo from vertex colours (for MultiMesh tints).
-static func vertex_mat(roughness: float = 0.8, key: String = "vertex") -> StandardMaterial3D:
+static func vertex_mat(roughness: float = 0.8, key: String = "vertex") -> CandyMaterial:
 	if _materials.has(key):
 		return _materials[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.vertex_color_use_as_albedo = true
 	m.roughness = roughness
 	_materials[key] = m

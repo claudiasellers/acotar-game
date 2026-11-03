@@ -5,6 +5,10 @@
 // (the gallery, canon), 4 stone flags.
 shader_type spatial;
 render_mode cull_back;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#define CANDY_LOBES
+#define CANDY_COAT
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform int pattern = 0;
 uniform vec4 base : source_color = vec4(0.80, 0.58, 0.44, 1.0);
@@ -168,7 +172,6 @@ void fragment() {
 	ALBEDO = mix(joint.rgb, col, j);
 	ROUGHNESS = mix(joint_rough, rough * (1.0 - gloss * 0.5), j);
 	METALLIC = (1.0 - j) * joint_metal;
-	SPECULAR = spec;
-	CLEARCOAT = gloss * j * coat_k;
-	CLEARCOAT_ROUGHNESS = 0.25;
+	candy_lobes(spec, 0.0, 0.5);
+	candy_coat(gloss * j * coat_k, 0.25);
 }

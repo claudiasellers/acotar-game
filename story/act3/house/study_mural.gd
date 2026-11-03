@@ -64,7 +64,7 @@ func _build_painting() -> void:
 	var quad := QuadMesh.new()
 	quad.size = PAINT_SIZE
 	painting.mesh = quad
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	if ResourceLoader.exists(TEXTURE):
 		mat.albedo_texture = load(TEXTURE) as Texture2D
 	mat.roughness = 0.75

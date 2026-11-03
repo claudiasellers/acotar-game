@@ -193,7 +193,7 @@ func _rhysand() -> Node3D:
 	smoke.process_material = pm
 	var q := QuadMesh.new()
 	q.size = Vector2(0.7, 0.7)
-	var sm := StandardMaterial3D.new()
+	var sm := MaterialLibrary.surface()
 	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	sm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -218,14 +218,14 @@ func _paint(node: Node, m: Material) -> void:
 ## him away goes (mask, claws), hair blue-black, clothes black with dark
 ## silver at the trims and chains, the eyes violet and faintly lit.
 func _redress(who: Node3D) -> void:
-	var black := StandardMaterial3D.new()
+	var black := MaterialLibrary.surface()
 	black.albedo_color = Color(0.028, 0.026, 0.036)
 	black.roughness = 0.55
-	var silver := StandardMaterial3D.new()
+	var silver := MaterialLibrary.surface()
 	silver.albedo_color = Color(0.36, 0.36, 0.42)
 	silver.metallic = 0.8
 	silver.roughness = 0.35
-	var hair := StandardMaterial3D.new()
+	var hair := MaterialLibrary.surface()
 	hair.albedo_color = Color(0.03, 0.032, 0.05)
 	hair.roughness = 0.42
 	hair.rim_enabled = true
@@ -240,8 +240,8 @@ func _redress(who: Node3D) -> void:
 			var kind := m.resource_name if m else ""
 			if part.begins_with("hair_"):
 				mi.set_surface_override_material(i, hair)
-			elif part == "Eyes" and m is BaseMaterial3D:
-				var eye := (m as BaseMaterial3D).duplicate() as BaseMaterial3D
+			elif part == "Eyes" and m is CandyMaterial:
+				var eye := (m as CandyMaterial).duplicate() as CandyMaterial
 				eye.albedo_color = Color(0.72, 0.52, 1.0)
 				eye.emission_enabled = true
 				eye.emission = VIOLET
@@ -274,7 +274,7 @@ func _eyes(who: Node3D) -> void:
 			sph.radius = 0.014
 			sph.height = 0.02
 			eye.mesh = sph
-			var m := StandardMaterial3D.new()
+			var m := MaterialLibrary.surface()
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			m.albedo_color = Color(0.8, 0.65, 1.0)
 			m.emission_enabled = true

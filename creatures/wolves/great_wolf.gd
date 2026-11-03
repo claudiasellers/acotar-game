@@ -233,6 +233,6 @@ func _set_eye_glow(energy: float) -> void:
 			for i in mi.mesh.get_surface_count():
 				mats.append(mi.get_active_material(i))
 		for m in mats:
-			var mat := m as StandardMaterial3D
+			var mat := m as CandyMaterial
 			if mat and mat.emission_enabled:
 				mat.emission_energy_multiplier = energy

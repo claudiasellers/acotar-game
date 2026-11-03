@@ -237,7 +237,7 @@ func test_decorations_and_draw_budget() -> void:
 ## Manor glare fix: nothing the gardens lay down in the sun is near-white.
 func test_garden_surfaces_stay_below_glare() -> void:
 	for m: Material in [GardenKit.stone(), GardenKit.stone_shade(), GardenKit.paving(), GardenKit.mulch(), GardenKit.lawn()]:
-		var c := (m as StandardMaterial3D).albedo_color
+		var c := (m as CandyMaterial).albedo_color
 		assert_lte(maxf(c.r, maxf(c.g, c.b)), 0.85, "%s albedo" % m.resource_name)
 	assert_eq(GardenKit.walk(), ManorForecourt.drive_gravel(), "walks share the drive's capped gravel")
 

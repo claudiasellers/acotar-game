@@ -167,7 +167,7 @@ static func cling_sparkles(on: Node3D, seconds: float = 9.0) -> void:
 static func _droplet_mesh(tint: Color, glow: bool = false) -> QuadMesh:
 	var q := QuadMesh.new()
 	q.size = Vector2(0.07, 0.07) if not glow else Vector2(0.05, 0.05)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -228,7 +228,7 @@ static func gust_leaves(owner: Node3D, at: Vector3, dir: Vector3) -> void:
 	p.process_material = pm
 	var q := QuadMesh.new()
 	q.size = Vector2(0.09, 0.06)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.vertex_color_use_as_albedo = true
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	m.roughness = 0.7

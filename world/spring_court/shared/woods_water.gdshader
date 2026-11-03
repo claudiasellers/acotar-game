@@ -2,6 +2,8 @@
 // black and still where the horror lives (set the colours and sparkle off).
 shader_type spatial;
 render_mode cull_disabled, depth_draw_always, specular_schlick_ggx;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 global uniform float magic_amount;
 
@@ -27,7 +29,7 @@ void fragment() {
 	EMISSION = vec3(0.0);
 	float r = ripple(flow) * 0.5 + ripple(flow * 2.7) * 0.25;
 	NORMAL = normalize(NORMAL + vec3(r * 0.08, 0.0, ripple(flow.yx) * 0.08));
-	float fresnel = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float fresnel = candy_fresnel(NORMAL, VIEW, 3.0);
 	ALBEDO = mix(shallow_color.rgb, deep_color.rgb, fresnel);
 	if (rainbow > 0.0) {
 		float hue = fract(UV.y * 0.08 + UV.x * 0.3 - TIME * 0.25);

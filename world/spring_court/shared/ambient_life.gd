@@ -198,8 +198,8 @@ func _make(id: String) -> GPUParticles3D:
 ## An unshaded billboard sprite tinted by particle colour, with a soft
 ## round falloff (shared by every mote effect, the falls' spray and the
 ## clearings' shaft motes).
-static func soft_sprite_material() -> StandardMaterial3D:
-	var draw := StandardMaterial3D.new()
+static func soft_sprite_material() -> CandyMaterial:
+	var draw := MaterialLibrary.surface()
 	draw.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	draw.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	draw.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

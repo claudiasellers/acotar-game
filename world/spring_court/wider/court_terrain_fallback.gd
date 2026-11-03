@@ -48,7 +48,7 @@ static func build_nodes(parent: Node3D, chunks: Array[Dictionary]) -> Node3D:
 	parent.add_child(root)
 	var mat: Material = load(MATERIAL) if ResourceLoader.exists(MATERIAL) else null
 	if mat == null:
-		var std := StandardMaterial3D.new()
+		var std := MaterialLibrary.surface()
 		std.vertex_color_use_as_albedo = true
 		std.roughness = 0.9
 		mat = std

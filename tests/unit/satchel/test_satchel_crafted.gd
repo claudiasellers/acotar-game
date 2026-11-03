@@ -38,7 +38,7 @@ func test_model_is_dressed_with_vertex_colour() -> void:
 	assert_not_null(m)
 	var meshes := m.find_children("*", "MeshInstance3D", true, false)
 	assert_gt(meshes.size(), 0)
-	var mat := (meshes[0] as MeshInstance3D).material_override as StandardMaterial3D
+	var mat := (meshes[0] as MeshInstance3D).material_override as CandyMaterial
 	assert_not_null(mat)
 	assert_true(mat.vertex_color_use_as_albedo)
 	assert_gt(SatchelModel.bounds(m).size.length(), 0.0)

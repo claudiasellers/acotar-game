@@ -213,11 +213,11 @@ static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> 
 ## (see sky_ceiling.gdshader) and would muddy them, and carry a soft bounce
 ## of their own colour instead, the same as the plaster ceilings (L38: at the
 ## old 0.08 the pearl coffers read black in every shot, quality audit A4).
-static func _coffer_mat(kind: StringName, color: Color, roughness: float, metallic: float) -> StandardMaterial3D:
+static func _coffer_mat(kind: StringName, color: Color, roughness: float, metallic: float) -> CandyMaterial:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _coffer_mats.has(key):
 		return _coffer_mats[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.resource_name = "coffer_" + String(kind)
 	m.albedo_color = color
 	m.roughness = roughness

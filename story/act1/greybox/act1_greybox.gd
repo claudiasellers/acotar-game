@@ -170,8 +170,8 @@ func _stub_sleep_until_night() -> void:
 
 # --- Building ----------------------------------------------------------------
 
-func _mat(color: Color, roughness: float = 0.9) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+func _mat(color: Color, roughness: float = 0.9) -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = roughness
 	return m
@@ -331,7 +331,7 @@ func _build_wall_and_border_woods() -> void:
 	var plane := QuadMesh.new()
 	plane.size = Vector2(900, 60)
 	haze.mesh = plane
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = Color(0.9, 0.95, 1.0, 0.06)
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -347,7 +347,7 @@ func _build_wall_and_border_woods() -> void:
 	var flower := SphereMesh.new()
 	flower.radius = 0.12
 	flower.height = 0.2
-	var fm := StandardMaterial3D.new()
+	var fm := MaterialLibrary.surface()
 	fm.vertex_color_use_as_albedo = true
 	fm.emission_enabled = true
 	fm.emission = Color(1.0, 0.8, 0.9)

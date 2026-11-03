@@ -386,8 +386,8 @@ static func _limb_mesh() -> ArrayMesh:
 	return st.commit()
 
 
-static func _mat(color: Color, roughness: float, metallic: float = 0.0) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+static func _mat(color: Color, roughness: float, metallic: float = 0.0) -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = roughness
 	m.metallic = metallic

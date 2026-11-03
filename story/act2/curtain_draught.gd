@@ -35,7 +35,7 @@ static func stir(curtains: MeshInstance3D, seconds: float = 4.0) -> Tween:
 	if _shader == null:
 		_shader = Shader.new()
 		_shader.code = SHADER
-	var base := curtains.mesh.surface_get_material(0) as StandardMaterial3D
+	var base := curtains.mesh.surface_get_material(0) as CandyMaterial
 	var mat := ShaderMaterial.new()
 	mat.shader = _shader
 	mat.set_shader_parameter(&"albedo", base.albedo_color if base else Color(0.16, 0.56, 0.40))

@@ -65,7 +65,7 @@ func _build_model() -> Node3D:
 	mesh.radius = 0.16
 	mesh.height = 0.22
 	mi.mesh = mesh
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color("e9dcc4")
 	mi.material_override = mat
 	mi.position.y = 0.11

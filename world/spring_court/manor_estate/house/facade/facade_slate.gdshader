@@ -3,6 +3,9 @@
 // World-space scales laid along each roof face, rows running level.
 shader_type spatial;
 render_mode cull_disabled;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#define CANDY_LOBES
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec3 slate : source_color = vec3(0.60, 0.52, 0.80);
 uniform float row_h = 0.32;
@@ -41,7 +44,7 @@ void fragment() {
 	c *= 1.0 - 0.22 * edge;
 	ALBEDO = min(c, vec3(0.85));
 	ROUGHNESS = 0.42 + 0.2 * edge;
-	SPECULAR = 0.5;
+	candy_lobes(0.5, 0.0, 0.5);
 	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
 	EMISSION = vec3(0.10, 0.07, 0.16) * fres;
 }

@@ -175,7 +175,7 @@ func _base_layer_regions(m: Node3D, hidden: bool) -> Array:
 			var name: String = m.surface_name_of(mi.mesh, i).trim_prefix("shift_")
 			if name == "fabric":
 				continue
-			var mat := mi.get_surface_override_material(i) as BaseMaterial3D
+			var mat := mi.get_surface_override_material(i) as CandyMaterial
 			var clear := mat != null and mat.albedo_color.a == 0.0
 			if clear == hidden:
 				out.append(name)

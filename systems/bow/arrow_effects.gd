@@ -73,7 +73,7 @@ static func rope_anchor(arrow: Arrow, at: Vector3) -> Node3D:
 	mesh.bottom_radius = 0.012
 	mesh.height = maxf(at.distance_to(bottom), 0.1)
 	line.mesh = mesh
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.85, 0.78, 0.62)
 	line.material_override = mat
 	anchor.add_child(line)

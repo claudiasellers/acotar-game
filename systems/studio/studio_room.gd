@@ -70,14 +70,14 @@ static func show_on_easel(easel: Node3D, image: Image, toward: Vector3) -> MeshI
 		var quad := QuadMesh.new()
 		quad.size = VIEW_SIZE
 		view.mesh = quad
-		var mat := StandardMaterial3D.new()
+		var mat := MaterialLibrary.surface()
 		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		mat.roughness = 0.75
 		mat.albedo_texture = ImageTexture.create_from_image(image)
 		view.material_override = mat
 		easel.add_child(view)
 	else:
-		var mat := view.material_override as StandardMaterial3D
+		var mat := view.material_override as CandyMaterial
 		var tex := mat.albedo_texture as ImageTexture
 		if tex and Vector2i(tex.get_size()) == image.get_size():
 			tex.update(image)

@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://world/shared/scatter/scatter_layer.gd" id="2_dqijt"]
 [ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="3_nqila"]
 [ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="4_uoei2"]
+[ext_resource type="Material" path="res://data/render/scene_materials/village_5b804.tres" id="candy_5b804"]
 
 [sub_resource type="Resource" id="Resource_0o0d3"]
 script = ExtResource("2_dqijt")
@@ -1184,34 +1185,8 @@ turbulence_noise_scale = 3.0
 turbulence_influence_min = 0.04
 turbulence_influence_max = 0.14
 
-[sub_resource type="Gradient" id="Gradient_vofn6"]
-offsets = PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1)
-colors = PackedColorArray(1, 1, 1, 0.7, 1, 1, 1, 0.6, 1, 1, 1, 0.38, 1, 1, 1, 0.17, 1, 1, 1, 0.05, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_0b0bn"]
-gradient = SubResource("Gradient_vofn6")
-width = 128
-height = 128
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5b804"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = SubResource("GradientTexture2D_0b0bn")
-disable_receive_shadows = true
-billboard_mode = 3
-billboard_keep_scale = true
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-proximity_fade_enabled = true
-proximity_fade_distance = 0.6
-
 [sub_resource type="QuadMesh" id="QuadMesh_arety"]
-material = SubResource("StandardMaterial3D_5b804")
+material = ExtResource("candy_5b804")
 size = Vector2(2.6, 2.6)
 
 [sub_resource type="FogMaterial" id="FogMaterial_e1g36"]

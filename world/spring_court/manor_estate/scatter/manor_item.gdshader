@@ -4,7 +4,10 @@
 shader_type spatial;
 render_mode cull_disabled;
 
-global uniform float magic_amount;
+// Lighting: candy_lit (render program T2); declares magic_amount.
+#define CANDY_LOBES
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
+
 uniform float glint_strength : hint_range(0.0, 8.0) = 3.0;
 uniform float sway : hint_range(0.0, 0.3) = 0.06;
 
@@ -23,9 +26,7 @@ void vertex() {
 void fragment() {
 	ALBEDO = COLOR.rgb;
 	ROUGHNESS = mix(0.45, 0.2, v_glint);
-	SPECULAR = 0.6;
-	RIM = 0.5;
-	RIM_TINT = 0.6;
+	candy_lobes(0.6, 0.5, 0.6);
 	float tw = 0.55 + 0.45 * sin(TIME * 3.1 + v_phase);
 	EMISSION = COLOR.rgb * v_glint * glint_strength * tw * (0.5 + 0.5 * magic_amount);
 }

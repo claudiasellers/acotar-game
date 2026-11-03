@@ -1,0 +1,42 @@
+[gd_resource type="ShaderMaterial" script_class="CandyMaterial" format=3]
+
+[ext_resource type="Script" path="res://world/shared/shaders/candy_material.gd" id="1_wne4t"]
+[ext_resource type="Shader" path="res://world/shared/shaders/candy_lit.gdshader" id="2_blppt"]
+
+[resource]
+resource_name = "wall_seam_xoqxv"
+render_priority = 0
+shader = ExtResource("2_blppt")
+shader_parameter/wrap = null
+shader_parameter/shade_tint = null
+shader_parameter/light_albedo_mix = null
+shader_parameter/diffuse_gain = null
+shader_parameter/diffuse_burley = null
+shader_parameter/ground_bounce = null
+shader_parameter/ground_bounce_color = null
+shader_parameter/backlight_strength = null
+shader_parameter/rim_color = null
+shader_parameter/rim_strength = null
+shader_parameter/rim_power = null
+shader_parameter/specular = 0.5
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/vertex_color_use_as_albedo = true
+shader_parameter/vertex_color_is_srgb = false
+shader_parameter/roughness = 0.8
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/alpha_scissor_threshold = 0.5
+shader_parameter/grow = null
+shader_parameter/emission_enabled = true
+shader_parameter/emission = Color(1, 0.8, 0.82, 1)
+shader_parameter/emission_energy_multiplier = 0.35
+shader_parameter/rim = null
+shader_parameter/rim_tint = null
+shader_parameter/clearcoat = null
+shader_parameter/clearcoat_roughness = null
+shader_parameter/pearl = null
+shader_parameter/glitter = null
+shader_parameter/glitter_scale = null
+shader_parameter/glitter_color = null
+script = ExtResource("1_wne4t")

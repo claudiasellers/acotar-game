@@ -29,15 +29,15 @@ var camera: Camera3D
 var _light: DirectionalLight3D
 var _env: Environment
 var _cloth: MeshInstance3D
-var _cloth_mat: StandardMaterial3D
+var _cloth_mat: CandyMaterial
 var _icons: Dictionary = {}  # id -> Texture2D
 var _waiting: Dictionary = {}  # id -> [SubViewport, materials...] until keyed
 var _noise := FastNoiseLite.new()
 var _icon_holder := Node.new()
-var _patch_mat: StandardMaterial3D
+var _patch_mat: CandyMaterial
 var _patch_mesh: QuadMesh
 var _wash: MeshInstance3D
-var _wash_mat: StandardMaterial3D
+var _wash_mat: CandyMaterial
 
 
 func _ready() -> void:
@@ -75,7 +75,7 @@ func _ready() -> void:
 	_noise.frequency = 0.22
 	_cloth = MeshInstance3D.new()
 	_cloth.mesh = _cloth_mesh()
-	_cloth_mat = StandardMaterial3D.new()
+	_cloth_mat = MaterialLibrary.surface()
 	_cloth_mat.roughness = 1.0
 	_cloth_mat.normal_enabled = true
 	_cloth_mat.normal_texture = _weave()
@@ -93,7 +93,7 @@ func _ready() -> void:
 		_patch_mesh = QuadMesh.new()
 		_patch_mesh.size = Vector2.ONE
 		_patch_mesh.orientation = PlaneMesh.FACE_Y
-		_patch_mat = StandardMaterial3D.new()
+		_patch_mat = MaterialLibrary.surface()
 		_patch_mat.albedo_texture = patch_tex
 		_patch_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
 		_patch_mat.roughness = 1.0
@@ -141,7 +141,7 @@ func add_card(e: Dictionary) -> Node3D:
 	mesh.size = Vector2.ONE
 	quad.mesh = mesh
 	quad.rotation_degrees.x = -90.0
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_texture = _icon_texture(e, mat)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 	mat.alpha_scissor_threshold = 0.5
@@ -272,7 +272,7 @@ func _build_wash() -> void:
 	q.size = Vector2.ONE
 	q.orientation = PlaneMesh.FACE_Y
 	_wash.mesh = q
-	_wash_mat = StandardMaterial3D.new()
+	_wash_mat = MaterialLibrary.surface()
 	_wash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_wash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_wash_mat.albedo_texture = SatchelTheme.texture(SatchelTheme.WASH_PATH)
@@ -300,7 +300,7 @@ func _weave() -> NoiseTexture2D:
 
 ## The painted icon when there is one, else the drawn ItemIcon rendered once
 ## into a small texture.
-func _icon_texture(e: Dictionary, mat: StandardMaterial3D) -> Texture2D:
+func _icon_texture(e: Dictionary, mat: CandyMaterial) -> Texture2D:
 	var path := SatchelIcon.path_for(e.id, 256.0)
 	if path != "":
 		return load(path) as Texture2D
@@ -341,5 +341,5 @@ func _cut_out(id: StringName) -> void:
 	var tex := ImageTexture.create_from_image(img)
 	_icons[id] = tex
 	for m in list.slice(1):
-		(m as StandardMaterial3D).albedo_texture = tex
+		(m as CandyMaterial).albedo_texture = tex
 	vp.queue_free()

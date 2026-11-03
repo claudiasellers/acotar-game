@@ -355,7 +355,7 @@ func _build_snare_node() -> void:
 	_snare_node.name = "DoubleLoopSnare"
 	add_child(_snare_node)
 	_snare_node.global_position = snare_at
-	var rope := StandardMaterial3D.new()
+	var rope := MaterialLibrary.surface()
 	rope.albedo_color = Color(0.78, 0.66, 0.45)
 	rope.roughness = 0.7
 	var stake := MeshInstance3D.new()
@@ -392,7 +392,7 @@ func _build_snare_node() -> void:
 	var dot := SphereMesh.new()
 	dot.radius = 0.025
 	dot.height = 0.05
-	var glow := StandardMaterial3D.new()
+	var glow := MaterialLibrary.surface()
 	glow.albedo_color = Color(1.0, 0.93, 0.62)
 	glow.emission_enabled = true
 	glow.emission = Color(1.0, 0.9, 0.55)
@@ -414,7 +414,7 @@ func _show_bait() -> void:
 		(_bait_node.mesh as SphereMesh).height = 0.2
 		_bait_node.position = Vector3(0.0, 0.1, 0.0)
 		_snare_node.add_child(_bait_node)
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	var ing := ItemCatalog.get_item(bait_id) as IngredientData
 	mat.albedo_color = ing.color if ing else Color(0.6, 0.3, 0.3)
 	_bait_node.material_override = mat

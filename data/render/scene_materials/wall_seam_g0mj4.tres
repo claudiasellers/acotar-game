@@ -1,0 +1,44 @@
+[gd_resource type="ShaderMaterial" script_class="CandyMaterial" format=3]
+
+[ext_resource type="Script" path="res://world/shared/shaders/candy_material.gd" id="1_vk2tq"]
+[ext_resource type="Shader" path="res://world/shared/shaders/candy/candy_unshaded-alpha-double.gdshader" id="2_ki3q6"]
+
+[sub_resource type="Gradient" id="Gradient_5hsv8"]
+offsets = PackedFloat32Array(0, 1, 0.55)
+colors = PackedColorArray(1, 0.86, 0.42, 1, 0.45, 0.8, 0.42, 0, 0.62, 0.9, 0.4, 0.9)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_l2wc2"]
+gradient = SubResource("Gradient_5hsv8")
+fill = 1
+fill_from = Vector2(0.5, 0.6)
+fill_to = Vector2(1, 0.6)
+
+[resource]
+resource_name = "wall_seam_g0mj4"
+render_priority = 0
+shader = ExtResource("2_ki3q6")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/albedo_texture = SubResource("GradientTexture2D_l2wc2")
+shader_parameter/vertex_color_use_as_albedo = false
+shader_parameter/vertex_color_is_srgb = false
+shader_parameter/roughness = 1.0
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/alpha_scissor_threshold = 0.5
+shader_parameter/grow = null
+shader_parameter/emission_enabled = null
+shader_parameter/emission = null
+shader_parameter/emission_energy_multiplier = null
+shader_parameter/rim = null
+shader_parameter/rim_tint = null
+shader_parameter/clearcoat = null
+shader_parameter/clearcoat_roughness = null
+shader_parameter/pearl = null
+shader_parameter/glitter = null
+shader_parameter/glitter_scale = null
+shader_parameter/glitter_color = null
+script = ExtResource("1_vk2tq")
+transparency = 1
+shading_mode = 0
+cull_mode = 2

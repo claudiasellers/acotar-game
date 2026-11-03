@@ -60,6 +60,9 @@
 [ext_resource type="PackedScene" path="res://world/human_realm/cottage/assets/scarecrow.glb" id="58_8bp26"]
 [ext_resource type="PackedScene" path="res://world/human_realm/cottage/assets/shepherd_hut_ruin.glb" id="59_cv4ka"]
 [ext_resource type="PackedScene" path="res://world/human_realm/shared/assets/flora/tree_dead_snag.glb" id="60_tj5e5"]
+[ext_resource type="Material" path="res://data/render/scene_materials/cottage_sywo0.tres" id="candy_sywo0"]
+[ext_resource type="Material" path="res://data/render/scene_materials/cottage_45yp7.tres" id="candy_45yp7"]
+[ext_resource type="Material" path="res://data/render/scene_materials/cottage_rdr7o.tres" id="candy_rdr7o"]
 
 [sub_resource type="Resource" id="Resource_6u24j"]
 script = ExtResource("2_0ivhl")
@@ -2853,39 +2856,9 @@ turbulence_noise_scale = 3.0
 turbulence_influence_min = 0.04
 turbulence_influence_max = 0.14
 
-[sub_resource type="Gradient" id="Gradient_nfv83"]
-offsets = PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1)
-colors = PackedColorArray(1, 1, 1, 0.7, 1, 1, 1, 0.6, 1, 1, 1, 0.38, 1, 1, 1, 0.17, 1, 1, 1, 0.05, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_7fsj3"]
-gradient = SubResource("Gradient_nfv83")
-width = 128
-height = 128
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sywo0"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = SubResource("GradientTexture2D_7fsj3")
-disable_receive_shadows = true
-billboard_mode = 3
-billboard_keep_scale = true
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-proximity_fade_enabled = true
-proximity_fade_distance = 0.6
-
 [sub_resource type="QuadMesh" id="QuadMesh_j0tho"]
-material = SubResource("StandardMaterial3D_sywo0")
+material = ExtResource("candy_sywo0")
 size = Vector2(2.6, 2.6)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_45yp7"]
-shading_mode = 0
-albedo_color = Color(1, 0.66, 0.34, 1)
 
 [sub_resource type="QuadMesh" id="QuadMesh_11w5c"]
 size = Vector2(0.82, 0.78)
@@ -2894,14 +2867,11 @@ size = Vector2(0.82, 0.78)
 density = 0.12
 albedo = Color(0.82, 0.86, 0.92, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rdr7o"]
-albedo_color = Color(0.36, 0.42, 0.56, 1)
-
 [sub_resource type="ArrayMesh" id="ArrayMesh_qpf4y"]
 _surfaces = [{
 "aabb": AABB(-0.065, 0, -0.06, 0.13, 1e-05, 0.12),
 "format": 34359738375,
-"material": SubResource("StandardMaterial3D_rdr7o"),
+"material": ExtResource("candy_rdr7o"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
 "vertex_count": 48,
@@ -5277,7 +5247,7 @@ draw_pass_1 = SubResource("QuadMesh_j0tho")
 
 [node name="WindowGlow" type="MeshInstance3D" parent="ArcheronCottage" unique_id=947645924]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.3, 3.1)
-material_override = SubResource("StandardMaterial3D_45yp7")
+material_override = ExtResource("candy_45yp7")
 mesh = SubResource("QuadMesh_11w5c")
 
 [node name="WindowSpill" type="OmniLight3D" parent="ArcheronCottage" unique_id=967504140]

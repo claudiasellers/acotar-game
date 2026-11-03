@@ -16,7 +16,7 @@ static func _mesh_body(size: Vector3, color: Color, body: Node3D) -> Node3D:
 	box.size = size
 	mesh.mesh = box
 	mesh.position.y = size.y * 0.5
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = color
 	mesh.material_override = mat
 	body.add_child(mesh)
@@ -98,7 +98,7 @@ static func figure(actor_id: String) -> Node3D:
 		capsule.height = 1.85
 		mesh.mesh = capsule
 		mesh.position.y = 0.925
-		var mat := StandardMaterial3D.new()
+		var mat := MaterialLibrary.surface()
 		mat.albedo_color = tints.get(base, Color(0.6, 0.6, 0.6))
 		mesh.material_override = mat
 		root.add_child(mesh)

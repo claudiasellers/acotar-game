@@ -34,7 +34,7 @@ var body: Node3D
 
 var _figure: Node3D
 var _t: float = 0.0
-var _vein_mat: StandardMaterial3D
+var _vein_mat: CandyMaterial
 
 
 func _ready() -> void:
@@ -72,7 +72,7 @@ func _gild_veins() -> void:
 	var worn: Variant = body.get(&"worn")
 	if not (worn is Dictionary) or not (worn as Dictionary).has(VEINS):
 		return
-	_vein_mat = StandardMaterial3D.new()
+	_vein_mat = MaterialLibrary.surface()
 	_vein_mat.albedo_color = VEIN_GOLD
 	_vein_mat.metallic = 0.9
 	_vein_mat.roughness = 0.25

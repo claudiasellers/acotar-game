@@ -3,6 +3,8 @@
 // for the Starlight Pool (sparkles in bright sunlight, Keeper lore correction).
 shader_type spatial;
 render_mode depth_draw_always, cull_back, diffuse_burley, specular_schlick_ggx;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 #include "res://world/spring_court/wider/fx/shaders/court_fx_common.gdshaderinc"
 
@@ -88,7 +90,7 @@ void fragment() {
 	vec3 water_col = mix(shallow_c, deep_c, depth_f);
 	vec3 col = mix(water_col, behind * shallow_c * 1.2, clarity * (1.0 - depth_f));
 
-	float fres = pow(1.0 - clamp(dot(n, VIEW), 0.0, 1.0), fresnel_power);
+	float fres = candy_fresnel(n, VIEW, fresnel_power);
 	col = mix(col, mix(fresnel_color.rgb, night_shallow.rgb * 1.6, night), fres * 0.6);
 
 	float foam_noise = court_vnoise(wp * 3.0 + vec2(t * 0.3, -t * 0.2));

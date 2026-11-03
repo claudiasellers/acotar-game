@@ -197,7 +197,7 @@ func _ground_side(x0: float, x1: float, layer: int) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "SpringGround" if spring else "SnowGround"
 	mi.mesh = st.commit()
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.vertex_color_use_as_albedo = true
 	mat.vertex_color_is_srgb = true
 	mat.roughness = 0.9 if spring else 0.55
@@ -409,7 +409,7 @@ func _dress(model: Node3D) -> void:
 			copy.global_transform = skeleton.global_transform
 			copy.skeleton = copy.get_path_to(skeleton)
 			var base := copy.mesh.surface_get_material(0)
-			var m: BaseMaterial3D = base.duplicate() if base is BaseMaterial3D else StandardMaterial3D.new()
+			var m: CandyMaterial = base.duplicate() if base is CandyMaterial else MaterialLibrary.surface()
 			m.albedo_color = piece.color
 			copy.set_surface_override_material(0, m)
 		inst.free()
@@ -420,7 +420,7 @@ func _dress(model: Node3D) -> void:
 		var mesh := mesh_instance.mesh as ArrayMesh
 		for s in mesh.get_surface_count():
 			if hidden.has(StringName(mesh.surface_get_name(s))):
-				var clear := StandardMaterial3D.new()
+				var clear := MaterialLibrary.surface()
 				clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 				clear.albedo_color = Color(0, 0, 0, 0)
 				mesh_instance.set_surface_override_material(s, clear)
@@ -432,7 +432,7 @@ func _build_eyes() -> void:
 	_eyes.name = "Eyes"
 	_eyes.position = EYES_AT
 	_eyes.look_at_from_position(EYES_AT, CAMERA_FROM, Vector3.UP)
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = Color(1.0, 0.8, 0.32)
 	mat.emission_enabled = true
@@ -559,7 +559,7 @@ func _particles(id: String, amount: int, lifetime: float, centre: Vector3, exten
 	var ramp := GradientTexture1D.new()
 	ramp.gradient = fade
 	pm.color_ramp = ramp
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES

@@ -20,37 +20,37 @@ const BOOKS := [Color(0.98, 0.55, 0.70), Color(0.80, 0.68, 0.96), Color(0.66, 0.
 static var _cache: Dictionary = {}
 
 
-static func gold() -> StandardMaterial3D:
+static func gold() -> CandyMaterial:
 	return EstateKit.mat(EstateKit.GOLD, 0.22, 0.9, "prop|gold")
 
 
-static func pearl(c: Color = EstateKit.PEARL) -> StandardMaterial3D:
+static func pearl(c: Color = EstateKit.PEARL) -> CandyMaterial:
 	return EstateKit.pearl(c)
 
 
-static func gloss(c: Color) -> StandardMaterial3D:
+static func gloss(c: Color) -> CandyMaterial:
 	return EstateKit.mat(c, 0.28)
 
 
-static func satin(c: Color) -> StandardMaterial3D:
+static func satin(c: Color) -> CandyMaterial:
 	return EstateKit.mat(c, 0.55)
 
 
-static func fabric(c: Color) -> StandardMaterial3D:
+static func fabric(c: Color) -> CandyMaterial:
 	return EstateKit.mat(c, 0.9)
 
 
-static func wood(c: Color) -> StandardMaterial3D:
+static func wood(c: Color) -> CandyMaterial:
 	return EstateKit.mat(c, 0.6)
 
 
-static func metal(c: Color) -> StandardMaterial3D:
+static func metal(c: Color) -> CandyMaterial:
 	return EstateKit.mat(c, 0.3, 0.75)
 
 
 ## The natural material for a catalogue colour: gold stays metallic gold, near-white
 ## goes pearlescent, everything else glossy satin.
-static func body(c: Color) -> StandardMaterial3D:
+static func body(c: Color) -> CandyMaterial:
 	if absf(c.r - EstateKit.GOLD.r) < 0.02 and absf(c.g - EstateKit.GOLD.g) < 0.02 and absf(c.b - EstateKit.GOLD.b) < 0.02:
 		return gold()
 	if c.s < 0.1 and c.v > 0.9:
@@ -60,11 +60,11 @@ static func body(c: Color) -> StandardMaterial3D:
 	return satin(c)
 
 
-static func glow(c: Color, energy: float = 2.0) -> StandardMaterial3D:
+static func glow(c: Color, energy: float = 2.0) -> CandyMaterial:
 	var k := "glow|%s|%.1f" % [c.to_html(), energy]
 	if _cache.has(k):
 		return _cache[k]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = c
 	m.emission_enabled = true
 	m.emission = c
@@ -74,26 +74,26 @@ static func glow(c: Color, energy: float = 2.0) -> StandardMaterial3D:
 	return m
 
 
-static func flame() -> StandardMaterial3D:
+static func flame() -> CandyMaterial:
 	return glow(FLAME, 3.0)
 
 
-static func glass(c: Color = Color(0.92, 0.96, 1.0, 0.3)) -> StandardMaterial3D:
+static func glass(c: Color = Color(0.92, 0.96, 1.0, 0.3)) -> CandyMaterial:
 	var k := "glass|" + c.to_html()
 	if _cache.has(k):
 		return _cache[k]
-	var m := EstateKit.mat(c, 0.05, 0.0, k + "|b").duplicate() as StandardMaterial3D
+	var m := EstateKit.mat(c, 0.05, 0.0, k + "|b").duplicate() as CandyMaterial
 	m.rim_enabled = true
 	m.rim = 0.5
 	_cache[k] = m
 	return m
 
 
-static func crystal() -> StandardMaterial3D:
+static func crystal() -> CandyMaterial:
 	var k := "crystal"
 	if _cache.has(k):
 		return _cache[k]
-	var m := glass(Color(0.96, 0.88, 1.0, 0.6)).duplicate() as StandardMaterial3D
+	var m := glass(Color(0.96, 0.88, 1.0, 0.6)).duplicate() as CandyMaterial
 	m.emission_enabled = true
 	m.emission = Color(1.0, 0.85, 0.95)
 	m.emission_energy_multiplier = 0.35
@@ -101,13 +101,13 @@ static func crystal() -> StandardMaterial3D:
 	return m
 
 
-static func water() -> StandardMaterial3D:
+static func water() -> CandyMaterial:
 	return EstateKit.mat(EstateKit.WATER, 0.04, 0.0, "prop|water")
 
 
-static func mirror() -> StandardMaterial3D:
+static func mirror() -> CandyMaterial:
 	return EstateKit.mat(Color(0.94, 0.90, 0.97), 0.04, 1.0, "prop|mirror")
 
 
-static func book(i: int) -> StandardMaterial3D:
+static func book(i: int) -> CandyMaterial:
 	return satin(BOOKS[posmod(i, BOOKS.size())])

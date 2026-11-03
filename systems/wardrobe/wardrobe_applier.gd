@@ -122,14 +122,14 @@ func _tint(mi: MeshInstance3D, color: Color) -> void:
 		if (mi.mesh as ArrayMesh) and (mi.mesh as ArrayMesh).surface_get_name(s) == "fabric":
 			target = s
 	var base := mi.mesh.surface_get_material(target)
-	var m: BaseMaterial3D = base.duplicate() if base is BaseMaterial3D else StandardMaterial3D.new()
+	var m: CandyMaterial = base.duplicate() if base is CandyMaterial else MaterialLibrary.surface()
 	m.albedo_color = color
 	mi.set_surface_override_material(target, m)
 
 
 ## Simple shapes in the piece's colour on the placeholder capsule.
 func _attach_placeholder(p: WardrobePiece) -> void:
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = p.color
 	mat.roughness = 0.45
 	mat.metallic_specular = 0.7
@@ -229,7 +229,7 @@ func _hide_regions(hidden: Array[StringName]) -> void:
 		for s in mesh.get_surface_count():
 			var region := StringName(mesh.surface_get_name(s))
 			if REGIONS.has(region):
-				var transparent := StandardMaterial3D.new()
+				var transparent := MaterialLibrary.surface()
 				transparent.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 				transparent.albedo_color = Color(0, 0, 0, 0)
 				var skin := head_skin if region == &"head" else body_skin

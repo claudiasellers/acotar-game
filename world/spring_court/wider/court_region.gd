@@ -572,7 +572,7 @@ func _river_mesh() -> Mesh:
 func _water_material(path: String, pool: bool) -> Material:
 	if ResourceLoader.exists(path):
 		return load(path) as Material
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.62, 0.86, 0.95, 0.72) if not pool else Color(0.80, 0.90, 1.0, 0.65)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.roughness = 0.05

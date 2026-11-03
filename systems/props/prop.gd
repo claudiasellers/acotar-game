@@ -86,7 +86,7 @@ static func mesh_for(prop_data: PropData) -> Mesh:
 		# A visible stand-in rather than nothing (never shipped: data points at real glbs).
 		var box := BoxMesh.new()
 		box.size = prop_data.size
-		var m := StandardMaterial3D.new()
+		var m := MaterialLibrary.surface()
 		m.albedo_color = prop_data.sparkle
 		box.material = m
 		mesh = box

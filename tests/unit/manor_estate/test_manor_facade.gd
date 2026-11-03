@@ -112,7 +112,7 @@ func test_glare_cap_and_slate() -> void:
 	assert_eq(found, 3, "three stone tints")
 	var slate := ManorFacade.roof_material(EstateKit.SLATE)
 	assert_true(slate is ShaderMaterial, "lilac roofs get fish-scale slate")
-	assert_false(ManorFacade.roof_material(EstateKit.GOLD) is ShaderMaterial, "gilt stays plain")
+	assert_true(ManorFacade.roof_material(EstateKit.GOLD) is CandyMaterial, "gilt stays plain candy_lit")
 
 
 func test_windows_glow_only_after_sundown() -> void:

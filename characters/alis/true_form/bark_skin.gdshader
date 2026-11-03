@@ -5,6 +5,8 @@
 // `fright` 0..1 blends the bark to pale birch with dark lenticels.
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 uniform vec4 bark_dark : source_color = vec4(0.27, 0.17, 0.11, 1.0);
 uniform vec4 bark_light : source_color = vec4(0.58, 0.41, 0.27, 1.0);
@@ -71,6 +73,6 @@ void fragment() {
 	SPECULAR = 0.25;
 	NORMAL_MAP = mix(bump, vec3(0.0, 0.0, 1.0), f * 0.8) * 0.5 + 0.5;
 	NORMAL_MAP_DEPTH = 1.0;
-	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float rim = candy_fresnel(NORMAL, VIEW, 3.0);
 	EMISSION = rim_color.rgb * rim * rim_amount * 0.35;
 }

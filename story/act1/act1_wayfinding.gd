@@ -287,7 +287,7 @@ func _build_band(line: PackedVector2Array, width: float, band_name: String, stre
 				st.set_color(c)
 				st.set_normal(Vector3.UP)
 				st.add_vertex(rows[v[0]][v[1]])
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.vertex_color_use_as_albedo = true
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.roughness = 1.0
@@ -321,7 +321,7 @@ static func _resample(line: PackedVector2Array, step: float) -> PackedVector2Arr
 
 
 func _build_crows() -> void:
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.05, 0.05, 0.07)
 	mat.roughness = 0.8
 	# Black against the pale sky from the treeline: the winter fog would erase them.
@@ -370,7 +370,7 @@ func _process(delta: float) -> void:
 
 
 func _build_smoke() -> void:
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
@@ -405,9 +405,9 @@ func _build_smoke() -> void:
 ## Lanterns along the cottage road (HumanRealmLayout.ROADS[0]), village side last.
 func _build_lanterns() -> void:
 	var road: PackedVector2Array = HumanRealmLayout.ROADS[0]
-	var wood := StandardMaterial3D.new()
+	var wood := MaterialLibrary.surface()
 	wood.albedo_color = Color(0.25, 0.18, 0.12)
-	var glow := StandardMaterial3D.new()
+	var glow := MaterialLibrary.surface()
 	glow.albedo_color = Color(1.0, 0.78, 0.45)
 	glow.emission_enabled = true
 	glow.emission = Color(1.0, 0.68, 0.32)

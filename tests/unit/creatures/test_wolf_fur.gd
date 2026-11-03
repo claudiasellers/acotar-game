@@ -105,7 +105,7 @@ func test_wolf_budget_and_draw_passes() -> void:
 func test_wolf_eyes_glow_softly_at_rest() -> void:
 	var wolf := preload("res://creatures/wolves/great_wolf.tscn").instantiate() as GreatWolf
 	add_child_autofree(wolf)
-	var eyes := _material(wolf.model, "Eyes") as BaseMaterial3D
+	var eyes := _material(wolf.model, "Eyes") as CandyMaterial
 	assert_not_null(eyes)
 	assert_true(eyes.emission_enabled, "GreatWolf._set_eye_glow drives this")
 	assert_almost_eq(eyes.emission_energy_multiplier, wolf.data.eye_glow, 0.01, "daylight: no more than eye_glow")

@@ -56,7 +56,7 @@ static func _dish(model_id: StringName) -> Node3D:
 		s.radius = 0.04
 		s.height = 0.06
 		mi.mesh = s
-		var mat := StandardMaterial3D.new()
+		var mat := MaterialLibrary.surface()
 		mat.albedo_color = Color(0.95, 0.8, 0.6)
 		mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

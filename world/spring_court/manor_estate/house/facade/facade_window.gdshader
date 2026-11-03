@@ -5,6 +5,8 @@
 // rooms are lit (about 3 in 4) and how warm.
 shader_type spatial;
 render_mode cull_back;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform float glow : hint_range(0.0, 1.0) = 0.0;   // set by ManorFacadeGlow from the clock
 uniform vec3 sky_top : source_color = vec3(0.66, 0.70, 0.92);

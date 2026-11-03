@@ -164,7 +164,7 @@ static func _material_locked(id: StringName) -> Material:
 	if ResourceLoader.exists(path):
 		mat = load(path) as Material
 	if mat == null:
-		var std := StandardMaterial3D.new()
+		var std := MaterialLibrary.surface()
 		std.vertex_color_use_as_albedo = true
 		std.roughness = 0.8
 		mat = std
@@ -202,7 +202,7 @@ static func placeholder(id: StringName) -> Mesh:
 		var box := BoxMesh.new()
 		box.size = Vector3(2.0, 2.5, 2.0)
 		m = box
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = color
 	mat.roughness = 0.7
 	if s.contains("glow") or s.contains("starlight") or s.contains("faelight") or s.contains("moonflower"):

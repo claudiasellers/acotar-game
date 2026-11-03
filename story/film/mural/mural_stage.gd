@@ -286,8 +286,8 @@ func _lit(t: Dictionary, m: ShaderMaterial, own: Material, vcol: bool = false) -
 			l.set_shader_parameter(param, v)
 	l.set_shader_parameter(&"ink_mix", float(m.get_meta(&"ink_mix", figure_ink)))
 	var rough: float = m.get_meta(&"roughness", -1.0)
-	if own is BaseMaterial3D:
-		var b := own as BaseMaterial3D
+	if own is CandyMaterial:
+		var b := own as CandyMaterial
 		l.set_shader_parameter(&"albedo_col", b.albedo_color)
 		if b.albedo_texture:
 			l.set_shader_parameter(&"albedo_tex", b.albedo_texture)
@@ -480,7 +480,7 @@ func _particles(t: Dictionary, at: Vector3, box: Vector3, color: Color, amount: 
 	p.process_material = pm
 	var quad := QuadMesh.new()
 	quad.size = Vector2(size, size)
-	var sm := StandardMaterial3D.new()
+	var sm := MaterialLibrary.surface()
 	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	sm.albedo_color = color
 	sm.albedo_texture = _soft_dot()
@@ -614,7 +614,7 @@ func _build_court(t: Dictionary) -> void:
 	sph.radius = 0.085
 	sph.height = 0.17
 	eye.mesh = sph
-	var em := StandardMaterial3D.new()
+	var em := MaterialLibrary.surface()
 	em.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	em.albedo_color = Color(1.0, 0.8, 0.15)
 	em.emission_enabled = true
@@ -628,7 +628,7 @@ func _build_court(t: Dictionary) -> void:
 	var sb := BoxMesh.new()
 	sb.size = Vector3(0.012, 0.11, 0.02)
 	slit.mesh = sb
-	var sm := StandardMaterial3D.new()
+	var sm := MaterialLibrary.surface()
 	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	sm.albedo_color = Color.BLACK
 	slit.material_override = sm

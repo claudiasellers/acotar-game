@@ -67,7 +67,7 @@ static func build(spec: Dictionary) -> Node3D:
 		head.add_child(mask)
 	var wing_color: Color = spec.get("wings", Color(0, 0, 0, 0))
 	if wing_color.a > 0.0:
-		var wing_mat := StandardMaterial3D.new()
+		var wing_mat := MaterialLibrary.surface()
 		wing_mat.albedo_color = wing_color
 		wing_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		wing_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -95,7 +95,7 @@ static func _cone(radius: float, height: float, mat: Material) -> MeshInstance3D
 	return PlaceholderBody._inst(m, mat)
 
 
-static func _shiny(color: Color) -> StandardMaterial3D:
+static func _shiny(color: Color) -> CandyMaterial:
 	var m := PlaceholderBody._mat(color)
 	m.metallic = 0.7
 	m.roughness = 0.35

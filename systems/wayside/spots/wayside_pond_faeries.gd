@@ -49,7 +49,7 @@ func build() -> void:
 	floor_disc.rings = 1
 	floor_mi.mesh = floor_disc
 	floor_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var deep := StandardMaterial3D.new()
+	var deep := MaterialLibrary.surface()
 	deep.albedo_color = Color(0.06, 0.16, 0.18)
 	deep.roughness = 0.9
 	floor_mi.material_override = deep

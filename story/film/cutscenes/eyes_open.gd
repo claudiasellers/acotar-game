@@ -94,7 +94,7 @@ func _build_set() -> void:
 	motes.process_material = pm
 	var q := QuadMesh.new()
 	q.size = Vector2(0.035, 0.035)
-	var sm := StandardMaterial3D.new()
+	var sm := MaterialLibrary.surface()
 	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	sm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -243,7 +243,7 @@ func _circlet() -> Node3D:
 	tor.inner_radius = 0.105
 	tor.outer_radius = 0.118
 	ring.mesh = tor
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(1.0, 0.86, 0.5, 0.0)
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -282,7 +282,7 @@ func _b_reach() -> void:
 func _b_hide() -> void:
 	pose(feyre_model(), &"kneel", 0.8)
 	if circlet and is_instance_valid(circlet):
-		var m := (circlet as MeshInstance3D).material_override as StandardMaterial3D
+		var m := (circlet as MeshInstance3D).material_override as CandyMaterial
 		create_tween().tween_property(m, ^"albedo_color:a", 0.0, 0.8)
 		create_tween().tween_property(circlet, ^"scale", Vector3.ONE * 0.01, 0.9)
 	if glow_light:

@@ -10,6 +10,8 @@
 // <c>_sheen (0 matte .. 1 glossy shimmer).
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 uniform vec4 albedo : source_color = vec4(0.86, 0.69, 0.57, 1.0);
 uniform float roughness : hint_range(0.0, 1.0) = 0.62;
@@ -109,7 +111,7 @@ void fragment() {
 	float twinkle = smoothstep(0.92, 1.0, fract(g * 7.0 + ndv * 3.0 + g));
 	vec3 glint = (sheen_col / max(sheen, 1e-3) + vec3(0.35)) * twinkle * sheen * shimmer_strength;
 
-	float fres = pow(1.0 - ndv, rim_power);
+	float fres = candy_fresnel(NORMAL, VIEW, rim_power);
 
 	ALBEDO = col;
 	ROUGHNESS = mix(mix(roughness, 0.28, sheen), 0.16, gloss);

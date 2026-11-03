@@ -526,7 +526,7 @@ func _build_opening(root: Node3D) -> void:
 	var q := QuadMesh.new()
 	q.size = Vector2(0.82, 0.78)
 	glow.mesh = q
-	var gm := StandardMaterial3D.new()
+	var gm := MaterialLibrary.surface()
 	gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	gm.albedo_color = Color(1.0, 0.66, 0.34)
 	gm.emission_enabled = true
@@ -572,7 +572,7 @@ static func _trail_prints(trail: PackedVector2Array) -> MultiMeshInstance3D:
 			st.add_vertex(c + Vector3(cos(a1) * 0.03, 0.0, sin(a1) * 0.06))
 			st.add_vertex(c + Vector3(cos(a0) * 0.03, 0.0, sin(a0) * 0.06))
 	st.commit(mesh)
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.36, 0.42, 0.56)
 	mat.roughness = 1.0
 	mesh.surface_set_material(0, mat)

@@ -13,19 +13,13 @@ render_mode cull_disabled, depth_draw_opaque;
 #include "res://world/shared/shaders/foliage_wind.gdshaderinc"
 #include "res://world/spring_court/wider/fx/shaders/court_fx_common.gdshaderinc"
 
-global uniform float magic_amount;
 
 uniform vec4 albedo : source_color = vec4(1.0);
 uniform bool vertex_color_srgb = false;
 uniform float saturation_boost : hint_range(0.0, 2.0) = 1.15;
 uniform float sway_height = 1.5;
 uniform float flutter_amount = 0.02;
-uniform float wrap : hint_range(0.0, 1.0) = 0.5;
-uniform vec4 shade_tint : source_color = vec4(0.62, 0.55, 0.78, 1.0);
-uniform vec4 rim_color : source_color = vec4(1.0, 0.86, 0.72, 1.0);
-uniform float rim_strength : hint_range(0.0, 2.0) = 0.6;
 uniform float translucency : hint_range(0.0, 1.0) = 0.4;
-uniform float backlight_strength : hint_range(0.0, 4.0) = 0.8;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.75;
 uniform float snow_catch : hint_range(0.0, 1.0) = 0.8;
 uniform vec4 snow_color : source_color = vec4(0.93, 0.95, 1.0, 1.0);
@@ -43,6 +37,20 @@ varying float v_blight;
 vec3 to_linear(vec3 c) {
 	return mix(pow((c + vec3(0.055)) * (1.0 / 1.055), vec3(2.4)), c * (1.0 / 12.92), lessThan(c, vec3(0.04045)));
 }
+
+// Lighting: candy_lit (render program T2) with this family's old response as
+// its defaults: wrapped lambert x2, shade tint, sun-behind petal glow, no specular.
+#define CANDY_ALBEDO_MIX_DEFAULT 1.0
+#define CANDY_GAIN_DEFAULT 2.0
+#define CANDY_BURLEY_DEFAULT 0.0
+#define CANDY_WRAP_DEFAULT 0.5
+#define CANDY_SHADE_DEFAULT vec4(0.62, 0.55, 0.78, 1.0)
+#define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.86, 0.72, 1.0)
+#define CANDY_RIM_STRENGTH_DEFAULT 0.6
+#define CANDY_BACKLIGHT_DEFAULT 0.8
+#define CANDY_NO_SPEC_LOBE
+#define CANDY_BACKLIGHT_SCALE (1.0 - v_blight)
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
 	vec4 c = COLOR;
@@ -75,7 +83,7 @@ void fragment() {
 	ROUGHNESS = mix(mix(roughness_value, 0.55, snow), 1.0, v_blight);
 	SPECULAR = 0.3;
 	float alive = 1.0 - v_blight;
-	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = sparkle * magic_amount * alive;
 	if (s > 0.0) {
@@ -87,14 +95,4 @@ void fragment() {
 	float glow = clamp(v_color.a, 0.0, 1.0) * emission_glow * mix(1.0, 0.1, v_blight);
 	EMISSION = (rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) + glint) * alive + col * glow;
 	BACKLIGHT = col * translucency * alive;
-}
-
-void light() {
-	float ndl = dot(NORMAL, LIGHT);
-	float wrapped = clamp((ndl + wrap) / (1.0 + wrap), 0.0, 1.0);
-	vec3 lit = mix(shade_tint.rgb, vec3(1.0), wrapped);
-	DIFFUSE_LIGHT += ALBEDO * lit * LIGHT_COLOR * ATTENUATION * wrapped / PI * 2.0;
-	// Petals glow when the sun is behind them.
-	float back = pow(clamp(dot(VIEW, -LIGHT), 0.0, 1.0), 3.0) * backlight_strength * (1.0 - v_blight);
-	DIFFUSE_LIGHT += ALBEDO * back * LIGHT_COLOR * ATTENUATION / PI * 0.6;
 }

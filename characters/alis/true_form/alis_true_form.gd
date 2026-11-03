@@ -19,7 +19,7 @@ var model: Node3D
 var lifted: bool = false
 var fright: float = 0.0
 var _bark: ShaderMaterial
-var _hair_mat: StandardMaterial3D
+var _hair_mat: CandyMaterial
 var _glamoured: Dictionary = {}  # "head"/"body"/"hair" -> what the model wore
 
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 	model = get_parent() as Node3D
 	_bark = ShaderMaterial.new()
 	_bark.shader = BARK_SHADER
-	_hair_mat = StandardMaterial3D.new()
+	_hair_mat = MaterialLibrary.surface()
 	_hair_mat.albedo_color = HAIR_COLOR
 	_hair_mat.roughness = 0.45
 	_hair_mat.rim_enabled = true

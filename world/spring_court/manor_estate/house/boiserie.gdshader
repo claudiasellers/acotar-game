@@ -7,6 +7,9 @@
 // from the storey's floor (floor0 + n * storey).
 shader_type spatial;
 render_mode cull_back;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#define CANDY_LOBES
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec4 wall_color : source_color = vec4(1.0, 0.88, 0.9, 1.0);
 uniform vec4 frame_color : source_color = vec4(0.984, 0.969, 0.949, 1.0);
@@ -109,5 +112,5 @@ void fragment() {
 	ALBEDO = mix(col * shade, gilt.rgb, g);
 	METALLIC = 0.85 * g;
 	ROUGHNESS = mix(0.82, 0.3, g);
-	SPECULAR = 0.4;
+	candy_lobes(0.4, 0.0, 0.5);
 }

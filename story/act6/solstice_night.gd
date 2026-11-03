@@ -212,7 +212,7 @@ func _open_wisps(_s: SceneSpace) -> void:
 	orb.height = 0.14
 	orb.radial_segments = 8
 	orb.rings = 4
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.vertex_color_use_as_albedo = true
 	m.emission_enabled = true

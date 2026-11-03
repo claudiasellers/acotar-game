@@ -89,7 +89,7 @@ static func arc_token(from: Vector3, collector: Node3D, color: Color) -> MeshIns
 		_token_mesh.height = 0.1
 	var token := MeshInstance3D.new()
 	token.mesh = _token_mesh
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = color.lightened(0.25)
 	mat.emission_enabled = true
@@ -191,7 +191,7 @@ static func _sparkles(spec: Dictionary) -> GPUParticles3D:
 	if _sparkle_mesh == null:
 		_sparkle_mesh = QuadMesh.new()
 		_sparkle_mesh.size = Vector2(0.09, 0.09)
-		var m := StandardMaterial3D.new()
+		var m := MaterialLibrary.surface()
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 		m.vertex_color_use_as_albedo = true

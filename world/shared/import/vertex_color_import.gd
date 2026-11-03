@@ -7,12 +7,13 @@ extends EditorScenePostImport
 
 
 func _post_import(scene: Node) -> Object:
+	CandyMaterial.remap_scene(scene)
 	for n in scene.find_children("*", "MeshInstance3D", true, false):
 		var mesh: Mesh = (n as MeshInstance3D).mesh
 		if mesh == null:
 			continue
 		for s in mesh.get_surface_count():
-			var mat := mesh.surface_get_material(s) as StandardMaterial3D
+			var mat := mesh.surface_get_material(s) as CandyMaterial
 			if mat == null:
 				continue
 			mat.vertex_color_use_as_albedo = true

@@ -192,8 +192,8 @@ static func ground_color(x: float, z: float, h: float) -> Color:
 	return c.lightened(jitter) if jitter > 0.0 else c.darkened(-jitter)
 
 
-static func ground_material() -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+static func ground_material() -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.vertex_color_use_as_albedo = true
 	m.roughness = 0.95
 	var noise := FastNoiseLite.new()

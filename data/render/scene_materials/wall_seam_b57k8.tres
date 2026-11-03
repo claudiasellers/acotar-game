@@ -1,0 +1,33 @@
+[gd_resource type="ShaderMaterial" script_class="CandyMaterial" format=3]
+
+[ext_resource type="Script" path="res://world/shared/shaders/candy_material.gd" id="1_6brux"]
+[ext_resource type="Shader" path="res://world/shared/shaders/candy/candy_unshaded-double-bb_particles.gdshader" id="2_7blxa"]
+
+[resource]
+resource_name = "wall_seam_b57k8"
+render_priority = 0
+shader = ExtResource("2_7blxa")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/vertex_color_use_as_albedo = true
+shader_parameter/vertex_color_is_srgb = false
+shader_parameter/roughness = 1.0
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/alpha_scissor_threshold = 0.5
+shader_parameter/grow = null
+shader_parameter/emission_enabled = null
+shader_parameter/emission = null
+shader_parameter/emission_energy_multiplier = null
+shader_parameter/rim = null
+shader_parameter/rim_tint = null
+shader_parameter/clearcoat = null
+shader_parameter/clearcoat_roughness = null
+shader_parameter/pearl = null
+shader_parameter/glitter = null
+shader_parameter/glitter_scale = null
+shader_parameter/glitter_color = null
+script = ExtResource("1_6brux")
+shading_mode = 0
+cull_mode = 2
+billboard_mode = 3

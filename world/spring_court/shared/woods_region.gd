@@ -74,7 +74,7 @@ var _fingerprint := ""
 var _prepared: Dictionary = {}
 var _jobs: Array[Callable] = []
 var _fields: Dictionary = {}
-var _terrain_mat: StandardMaterial3D
+var _terrain_mat: CandyMaterial
 var _grid := Vector2i.ZERO
 ## The named places inside this region (PlaceComposer settings).
 var _places: Array[PlaceSetting] = []
@@ -459,7 +459,7 @@ func _job_terrain_root() -> void:
 	var root := Node3D.new()
 	root.name = "TerrainFallback"
 	add_child(root)
-	_terrain_mat = StandardMaterial3D.new()
+	_terrain_mat = MaterialLibrary.surface()
 	_terrain_mat.vertex_color_use_as_albedo = true
 	_terrain_mat.vertex_color_is_srgb = true
 	_terrain_mat.roughness = 1.0

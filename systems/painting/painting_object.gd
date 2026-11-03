@@ -18,7 +18,7 @@ static func create(painting: Dictionary) -> PaintingObject:
 	var quad := QuadMesh.new()
 	quad.size = Vector2(WIDTH_M, height)
 	canvas.mesh = quad
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_texture = Gallery.load_texture(painting)
 	mat.roughness = 0.8
 	canvas.material_override = mat
@@ -28,7 +28,7 @@ static func create(painting: Dictionary) -> PaintingObject:
 	var box := BoxMesh.new()
 	box.size = Vector3(WIDTH_M + 0.08, height + 0.08, 0.02)
 	frame.mesh = box
-	var gilt := StandardMaterial3D.new()
+	var gilt := MaterialLibrary.surface()
 	gilt.albedo_color = Color(0.9, 0.74, 0.38)
 	gilt.metallic = 0.9
 	gilt.roughness = 0.3

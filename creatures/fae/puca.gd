@@ -336,7 +336,7 @@ func _build_true_form() -> Node3D:
 	var root := Node3D.new()
 	body.scale = Vector3(0.78, 1.28, 0.78)
 	root.add_child(body)
-	var pale := StandardMaterial3D.new()
+	var pale := MaterialLibrary.surface()
 	pale.albedo_color = PEELED
 	pale.roughness = 0.35
 	pale.emission_enabled = true

@@ -332,7 +332,7 @@ func test_blood_reads_off_the_runner_from_the_first_seconds() -> void:
 	assert_gt(trail.get_child_count(), 10, "a trail from the front doors")
 	for d in trail.get_children():
 		assert_gt(absf((d as Node3D).position.x), TriageProps.RUNNER_HALF - 0.2)
-	var m := (floor_pool as MeshInstance3D).material_override as StandardMaterial3D
+	var m := (floor_pool as MeshInstance3D).material_override as CandyMaterial
 	assert_true(m.emission_enabled, "reads in the dark hall")
 	assert_gt(m.albedo_color.r, 0.4)
 	pool.free()

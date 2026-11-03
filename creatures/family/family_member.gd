@@ -140,7 +140,7 @@ func _build_body() -> void:
 	capsule.radius = 0.2
 	capsule.height = height
 	capsule_body.mesh = capsule
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = color
 	capsule_body.material_override = mat
 	_body.position.y = height * 0.5

@@ -194,7 +194,7 @@ static func _card(size: Vector2, m: Material) -> QuadMesh:
 static var _soft_tex: GradientTexture2D
 
 
-static func _soft_material(glow: bool, energy: float, petal: bool) -> StandardMaterial3D:
+static func _soft_material(glow: bool, energy: float, petal: bool) -> CandyMaterial:
 	if _soft_tex == null:
 		_soft_tex = GradientTexture2D.new()
 		_soft_tex.fill = GradientTexture2D.FILL_RADIAL
@@ -206,7 +206,7 @@ static func _soft_material(glow: bool, energy: float, petal: bool) -> StandardMa
 		_soft_tex.gradient = g
 		_soft_tex.width = 32
 		_soft_tex.height = 32
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.vertex_color_use_as_albedo = true
 	m.albedo_texture = _soft_tex
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

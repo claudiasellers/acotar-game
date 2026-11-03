@@ -36,7 +36,7 @@ static func make() -> GPUParticles3D:
 	p.process_material = pm
 	var q := QuadMesh.new()
 	q.size = Vector2(0.45, 0.45)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

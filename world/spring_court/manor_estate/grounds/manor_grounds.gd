@@ -121,7 +121,7 @@ static func glass() -> Material:
 	var key := "grounds_glass"
 	if EstateKit._materials.has(key):
 		return EstateKit._materials[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = Color(0.86, 0.95, 1.0, 0.22)
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -138,7 +138,7 @@ static func water() -> Material:
 	var key := "grounds_water"
 	if EstateKit._materials.has(key):
 		return EstateKit._materials[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = Color(0.62, 0.70, 1.0, 0.84)
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.roughness = 0.03
@@ -158,7 +158,7 @@ static func glow(color: Color = Color(1.0, 0.9, 0.6)) -> Material:
 	var key := "grounds_glow|" + color.to_html()
 	if EstateKit._materials.has(key):
 		return EstateKit._materials[key]
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.emission_enabled = true
 	m.emission = color

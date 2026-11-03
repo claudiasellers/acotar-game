@@ -2,12 +2,7 @@
 // fog-free hero variant (render_mode can't be a uniform).
 #include "res://world/shared/shaders/foliage_wind.gdshaderinc"
 
-global uniform float magic_amount;
 
-uniform float wrap : hint_range(0.0, 1.0) = 0.55;
-uniform vec4 shade_tint : source_color = vec4(0.66, 0.56, 0.82, 1.0);
-uniform vec4 rim_color : source_color = vec4(1.0, 0.84, 0.76, 1.0);
-uniform float rim_strength : hint_range(0.0, 2.0) = 0.55;
 uniform float translucency : hint_range(0.0, 1.0) = 0.4;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.7;
 uniform float sparkle : hint_range(0.0, 1.0) = 0.0;
@@ -23,6 +18,18 @@ uniform float lime_guard : hint_range(0.0, 1.0) = 0.6;
 
 varying vec3 world_pos;
 varying float v_glow;
+
+// Lighting: candy_lit (render program T2) with this family's old response as
+// its defaults: wrapped lambert x2 on albedo, shade tint, no direct specular.
+#define CANDY_ALBEDO_MIX_DEFAULT 1.0
+#define CANDY_GAIN_DEFAULT 2.0
+#define CANDY_BURLEY_DEFAULT 0.0
+#define CANDY_WRAP_DEFAULT 0.55
+#define CANDY_SHADE_DEFAULT vec4(0.66, 0.56, 0.82, 1.0)
+#define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.84, 0.76, 1.0)
+#define CANDY_RIM_STRENGTH_DEFAULT 0.55
+#define CANDY_NO_SPEC_LOBE
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
 	VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, UV.x * 1.6);
@@ -45,7 +52,7 @@ void fragment() {
 	ALBEDO = col;
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.35;
-	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = (sparkle + v_glow * 0.6) * magic_amount * (1.0 - drain);
 	if (s > 0.0) {
@@ -57,11 +64,4 @@ void fragment() {
 	EMISSION = rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) * (1.0 - drain)
 			+ glint + col * v_glow * glow_energy;
 	BACKLIGHT = col * translucency;
-}
-
-void light() {
-	float ndl = dot(NORMAL, LIGHT);
-	float wrapped = clamp((ndl + wrap) / (1.0 + wrap), 0.0, 1.0);
-	vec3 lit = mix(shade_tint.rgb, vec3(1.0), wrapped);
-	DIFFUSE_LIGHT += ALBEDO * lit * LIGHT_COLOR * ATTENUATION * wrapped / PI * 2.0;
 }

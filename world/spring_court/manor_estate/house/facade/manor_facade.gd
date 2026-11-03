@@ -46,7 +46,7 @@ const FEYRE_WINDOW_X := 23.0
 static var _stone: ShaderMaterial
 static var _window: ShaderMaterial
 static var _view: ShaderMaterial
-static var _glass: StandardMaterial3D
+static var _glass: CandyMaterial
 static var _slates: Dictionary = {}
 static var _plan_cache: Dictionary = {}
 
@@ -96,9 +96,9 @@ static func view_material() -> ShaderMaterial:
 
 
 ## Clear window glass with a faint sheen (was a flat light-blue sheet).
-static func glass() -> StandardMaterial3D:
+static func glass() -> CandyMaterial:
 	if _glass == null:
-		_glass = StandardMaterial3D.new()
+		_glass = MaterialLibrary.surface()
 		_glass.resource_name = "facade_glass"
 		_glass.albedo_color = Color(0.92, 0.95, 1.0, 0.08)
 		_glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

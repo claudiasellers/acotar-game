@@ -97,8 +97,8 @@ static func _bird(data: CreatureData) -> Node3D:
 	return root
 
 
-static func _mat(color: Color) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+static func _mat(color: Color) -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = 0.9
 	return m

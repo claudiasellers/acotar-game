@@ -86,13 +86,13 @@ static func _merge_arrays(candidates: Array[MeshInstance3D], target: Node3D, mes
 			var tint := Color.WHITE
 			var key: Variant = mat
 			if _is_plain(mat):
-				var sm := mat as StandardMaterial3D
+				var sm := mat as CandyMaterial
 				tint = sm.albedo_color
 				key = "vc|%.2f|%.2f|%s" % [sm.roughness, sm.metallic, sm.clearcoat_enabled]
 			if not buckets.has(key):
 				var shared: Material = mat
 				if key is String:
-					shared = _vertex_material(mat as StandardMaterial3D, key)
+					shared = _vertex_material(mat as CandyMaterial, key)
 				buckets[key] = [shared, PackedVector3Array(), PackedVector3Array(), PackedColorArray(), PackedVector2Array(), PackedInt32Array()]
 			var b: Array = buckets[key]
 			var arrays := _arrays_of(mi.mesh, s)
@@ -223,7 +223,7 @@ static func _shape_key(mesh: Mesh) -> String:
 
 ## Plain colour materials fold into one shared vertex-colour material.
 static func _is_plain(mat: Material) -> bool:
-	var sm := mat as StandardMaterial3D
+	var sm := mat as CandyMaterial
 	if sm == null or sm.albedo_texture != null or sm.emission_enabled or sm.rim_enabled:
 		return false
 	return sm.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED and not sm.vertex_color_use_as_albedo
@@ -231,10 +231,10 @@ static func _is_plain(mat: Material) -> bool:
 
 static var _vertex_mats: Dictionary = {}
 
-static func _vertex_material(like: StandardMaterial3D, key: String) -> StandardMaterial3D:
+static func _vertex_material(like: CandyMaterial, key: String) -> CandyMaterial:
 	if _vertex_mats.has(key):
 		return _vertex_mats[key]
-	var m := like.duplicate() as StandardMaterial3D
+	var m := like.duplicate() as CandyMaterial
 	m.albedo_color = Color.WHITE
 	m.vertex_color_use_as_albedo = true
 	m.vertex_color_is_srgb = true

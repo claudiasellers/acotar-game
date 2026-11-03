@@ -21,7 +21,7 @@ static func model(id: StringName) -> MeshInstance3D:
 		var b := BoxMesh.new()
 		b.size = Vector3(0.2, 0.08, 0.2)
 		mi.mesh = b
-		var mat := StandardMaterial3D.new()
+		var mat := MaterialLibrary.surface()
 		mat.albedo_color = Color(0.98, 0.9, 0.92)
 		mi.material_override = mat
 	return mi
@@ -42,7 +42,7 @@ static func glint() -> HouseGlint:
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.09, 0.09)
 	star.mesh = quad
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -72,8 +72,8 @@ static func blood_drop(radius: float = 0.05) -> MeshInstance3D:
 	return mi
 
 
-static func blood_material(alpha: float = 1.0) -> StandardMaterial3D:
-	var mat := StandardMaterial3D.new()
+static func blood_material(alpha: float = 1.0) -> CandyMaterial:
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(BLOOD.r, BLOOD.g, BLOOD.b, alpha)
 	mat.roughness = 0.08
 	mat.metallic_specular = 0.9

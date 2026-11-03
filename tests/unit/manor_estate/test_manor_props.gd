@@ -105,7 +105,7 @@ func test_never_grey_and_always_some_colour() -> void:
 			continue
 		var colourful := false
 		for i in m.get_surface_count():
-			var mat := m.surface_get_material(i) as BaseMaterial3D
+			var mat := m.surface_get_material(i) as CandyMaterial
 			if mat == null:
 				continue
 			var c := mat.albedo_color

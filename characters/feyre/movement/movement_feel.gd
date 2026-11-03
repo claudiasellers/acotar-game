@@ -198,7 +198,7 @@ func _build_trail() -> void:
 	_trail.process_material = mat
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.06, 0.06)
-	var pm := StandardMaterial3D.new()
+	var pm := MaterialLibrary.surface()
 	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	pm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

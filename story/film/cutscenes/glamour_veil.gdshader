@@ -5,6 +5,8 @@
 //   the front (local +z) until nothing is left.
 shader_type spatial;
 render_mode unshaded, cull_disabled, blend_mix, depth_draw_never, shadows_disabled;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 uniform vec3 tint : source_color = vec3(0.3, 0.07, 0.1);
 uniform float amount = 0.0;
@@ -40,7 +42,7 @@ void fragment() {
 	float wet = tear > 0.0 ? smoothstep(0.06, 0.0, d - hole) : 0.0;
 	float weave = noise(q * vec2(80.0, 140.0) + vec2(TIME * 0.4, 0.0));
 	float drift = fbm(q * vec2(3.0, 2.0) + vec2(0.0, TIME * 0.15));
-	float fres = pow(1.0 - clamp(abs(dot(NORMAL, VIEW)), 0.0, 1.0), 1.6);
+	float fres = candy_fresnel(dot(NORMAL, VIEW) < 0.0 ? -NORMAL : NORMAL, VIEW, 1.6);
 	vec3 grey = vec3(0.52, 0.52, 0.56);
 	vec3 col = mix(grey, tint, smoothstep(0.2, 0.9, amount)) * (0.85 + 0.25 * drift);
 	col = mix(col, vec3(0.8, 0.78, 0.82), wet * 0.7);

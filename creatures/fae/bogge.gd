@@ -236,9 +236,9 @@ func _build_form() -> Node3D:
 			if tag == "BoggeEyes":
 				mat.set_shader_parameter(&"is_eye", true)
 				mat.set_shader_parameter(&"eye_color", EYE)
-			elif src is BaseMaterial3D:
-				mat.set_shader_parameter(&"albedo", (src as BaseMaterial3D).albedo_color)
-				mat.set_shader_parameter(&"roughness", (src as BaseMaterial3D).roughness)
+			elif src is CandyMaterial:
+				mat.set_shader_parameter(&"albedo", (src as CandyMaterial).albedo_color)
+				mat.set_shader_parameter(&"roughness", (src as CandyMaterial).roughness)
 			mi.set_surface_override_material(i, mat)
 			_mats.append(mat)
 	_anim = root.find_child("AnimationPlayer", true, false) as AnimationPlayer

@@ -35,6 +35,12 @@ window/stretch/mode="canvas_items"
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 
+[importer_defaults]
+
+scene={
+"import_script/path": "res://tools/import/candy_import.gd"
+}
+
 [input]
 
 move_forward={

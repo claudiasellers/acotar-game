@@ -88,8 +88,8 @@ func _north_dir(from: Vector3) -> Vector3:
 	return d.normalized() if d.length() > 1.0 else -frame.basis.z
 
 
-func _mat(color: Color, rough: float = 0.6) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+func _mat(color: Color, rough: float = 0.6) -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = color
 	m.roughness = rough
 	return m
@@ -325,7 +325,7 @@ func _mountain() -> void:
 	var p := ground(STEPS_OUT)
 	var n := _north_dir(p)
 	var across := n.cross(Vector3.UP)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.albedo_color = Color(0.13, 0.12, 0.17)
 	m.roughness = 1.0
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

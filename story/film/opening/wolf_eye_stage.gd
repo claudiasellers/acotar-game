@@ -41,7 +41,7 @@ func _ready() -> void:
 	moon.light_energy = 0.25
 	moon.rotation_degrees = Vector3(-35, 150, 0)
 	add_child(moon)
-	var snow_mat := StandardMaterial3D.new()
+	var snow_mat := MaterialLibrary.surface()
 	snow_mat.albedo_color = Color(0.55, 0.6, 0.72)
 	snow_mat.roughness = 0.9
 	var ground := MeshInstance3D.new()
@@ -50,7 +50,7 @@ func _ready() -> void:
 	ground.mesh = pm
 	ground.material_override = snow_mat
 	add_child(ground)
-	var bark := StandardMaterial3D.new()
+	var bark := MaterialLibrary.surface()
 	bark.albedo_color = Color(0.06, 0.05, 0.05)
 	for i in 26:
 		var trunk := MeshInstance3D.new()
@@ -87,7 +87,7 @@ func _ready() -> void:
 		# The glTF faces -z; turn it to look into the lens.
 		wolf.rotation_degrees.y = 198.0
 		add_child(wolf)
-		var dark := StandardMaterial3D.new()
+		var dark := MaterialLibrary.surface()
 		dark.albedo_color = Color(0.04, 0.04, 0.05)
 		dark.roughness = 0.8
 		dark.rim_enabled = true
@@ -150,13 +150,13 @@ func _eye(wolf: Node3D) -> Node3D:
 		frame.position = at_model
 	holder.add_child(frame)
 	frame.set_meta(&"model_point", at_model)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.albedo_color = Color(1.0, 0.78, 0.12)
 	m.emission_enabled = true
 	m.emission = Color(1.0, 0.72, 0.08)
 	m.emission_energy_multiplier = 5.0
-	var pm := StandardMaterial3D.new()
+	var pm := MaterialLibrary.surface()
 	pm.albedo_color = Color.BLACK
 	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	for side in [-1.0, 1.0]:
@@ -197,7 +197,7 @@ func _snowfall(at: Vector3, box: Vector3, amount: int, life: float, color: Color
 	p.process_material = pm
 	var q := QuadMesh.new()
 	q.size = Vector2(0.025, 0.025)
-	var sm := StandardMaterial3D.new()
+	var sm := MaterialLibrary.surface()
 	sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	sm.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	sm.albedo_color = color

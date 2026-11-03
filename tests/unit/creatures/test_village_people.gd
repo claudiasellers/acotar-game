@@ -75,7 +75,7 @@ func test_each_villager_is_dressed_with_a_painted_face_inside_the_budget() -> vo
 		for mi in _meshes(m):
 			surfaces += mi.mesh.get_surface_count()
 			for s in mi.mesh.get_surface_count():
-				var mat := mi.mesh.surface_get_material(s) as BaseMaterial3D
+				var mat := mi.mesh.surface_get_material(s) as CandyMaterial
 				if mat != null and mat.albedo_texture != null and mat.albedo_texture.resource_path.contains("_face"):
 					face = true
 		assert_gte(surfaces, 12, id + ": skin, eyes, hair and several garments")

@@ -46,7 +46,7 @@ var _destination: Vector3
 var _route: PackedVector3Array = PackedVector3Array()
 var _route_index: int = 0
 var _lights: Dictionary = {}
-var _eye_mat: StandardMaterial3D
+var _eye_mat: CandyMaterial
 var _breath: float = 0.0
 var _model: Node3D
 ## The cast lane's beast (tamlin_beast_model.gd: play(clip, ground_speed)), or
@@ -305,14 +305,14 @@ func _build_body() -> void:
 func _build_placeholder() -> Node3D:
 	var root := Node3D.new()
 	root.name = "Model"
-	var fur := StandardMaterial3D.new()
+	var fur := MaterialLibrary.surface()
 	fur.albedo_color = Color(0.74, 0.55, 0.27)
 	fur.roughness = 0.95
-	var mane := StandardMaterial3D.new()
+	var mane := MaterialLibrary.surface()
 	mane.albedo_color = Color(0.52, 0.36, 0.17)
-	var horn := StandardMaterial3D.new()
+	var horn := MaterialLibrary.surface()
 	horn.albedo_color = Color(0.86, 0.80, 0.66)
-	_eye_mat = StandardMaterial3D.new()
+	_eye_mat = MaterialLibrary.surface()
 	_eye_mat.albedo_color = Color(0.3, 0.85, 0.35)
 	_eye_mat.emission_enabled = true
 	_eye_mat.emission = Color(0.35, 0.95, 0.4)

@@ -118,7 +118,7 @@ func _build_terrain() -> void:
 			st.add_index(i + count + 1)
 			st.add_index(i + count)
 	st.generate_normals()
-	var material := StandardMaterial3D.new()
+	var material := MaterialLibrary.surface()
 	material.vertex_color_use_as_albedo = true
 	material.roughness = 0.95
 	st.set_material(material)
@@ -156,7 +156,7 @@ func _build_flowers() -> void:
 	bloom.height = 0.1
 	bloom.radial_segments = 6
 	bloom.rings = 3
-	var material := StandardMaterial3D.new()
+	var material := MaterialLibrary.surface()
 	material.vertex_color_use_as_albedo = true
 	bloom.material = material
 	mm.mesh = bloom
@@ -177,7 +177,7 @@ func _build_flowers() -> void:
 
 ## Blocks of rising height near the spawn for testing the mantle.
 func _build_ledges() -> void:
-	var stone := StandardMaterial3D.new()
+	var stone := MaterialLibrary.surface()
 	stone.albedo_color = Color(0.78, 0.74, 0.68)
 	var heights_to_test := [0.9, 1.5, 2.1, 2.8]
 	for i in heights_to_test.size():
@@ -207,7 +207,7 @@ func _build_thorn_gate() -> void:
 	gate.name = "ThornGate"
 	gate.region_id = &"test_meadow"
 	add_child(gate)
-	var thorn := StandardMaterial3D.new()
+	var thorn := MaterialLibrary.surface()
 	thorn.albedo_color = Color(0.20, 0.24, 0.14)
 	var x := -40.0
 	var h := RegionGate.min_height()
@@ -233,7 +233,7 @@ func _build_target() -> void:
 	disc.height = 0.15
 	face.mesh = disc
 	face.rotation_degrees.x = 90.0
-	var straw := StandardMaterial3D.new()
+	var straw := MaterialLibrary.surface()
 	straw.albedo_color = Color(0.86, 0.74, 0.46)
 	face.material_override = straw
 	target.add_child(face)

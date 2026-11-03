@@ -17,7 +17,7 @@ const VANE_HEIGHT := 0.018
 const STEEL := Color(0.62, 0.64, 0.68)
 
 static var _cache: Dictionary = {}
-static var _material: StandardMaterial3D
+static var _material: CandyMaterial
 
 
 ## A mesh `length` long from the nock at `nock_z` to the tip at nock_z - length.
@@ -42,9 +42,9 @@ static func mesh(length: float, nock_z: float, shaft: Color, fletch: Color, head
 	return m
 
 
-static func material() -> StandardMaterial3D:
+static func material() -> CandyMaterial:
 	if _material == null:
-		_material = StandardMaterial3D.new()
+		_material = MaterialLibrary.surface()
 		_material.vertex_color_use_as_albedo = true
 		_material.roughness = 0.55
 		_material.cull_mode = BaseMaterial3D.CULL_DISABLED

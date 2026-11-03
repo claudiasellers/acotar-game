@@ -92,7 +92,7 @@ func _build_horror() -> void:
 	disc.height = 0.01
 	disc.radial_segments = 40
 	stain.mesh = disc
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = Color(0.32, 0.02, 0.04, 0.55)
 	m.roughness = 0.08
@@ -114,7 +114,7 @@ func _build_horror() -> void:
 	var drop := SphereMesh.new()
 	drop.radius = 0.012
 	drop.height = 0.03
-	var dm := StandardMaterial3D.new()
+	var dm := MaterialLibrary.surface()
 	dm.albedo_color = Color(0.36, 0.0, 0.03)
 	dm.roughness = 0.05
 	drop.material = dm

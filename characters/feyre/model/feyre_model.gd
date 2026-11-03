@@ -197,12 +197,12 @@ func _wear_base_layer() -> void:
 	inst.free()
 
 
-var _clear: StandardMaterial3D
+var _clear: CandyMaterial
 
 
-func _clear_material() -> StandardMaterial3D:
+func _clear_material() -> CandyMaterial:
 	if _clear == null:
-		_clear = StandardMaterial3D.new()
+		_clear = MaterialLibrary.surface()
 		_clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_clear.albedo_color = Color(0, 0, 0, 0)
 	return _clear
@@ -260,12 +260,12 @@ func set_makeup(channel: String, color: Color, amount: float, sheen: float = -1.
 		skin_head_material.set_shader_parameter(channel + "_sheen", sheen)
 
 
-var _invisible_material: StandardMaterial3D
+var _invisible_material: CandyMaterial
 
 
-func _invisible() -> StandardMaterial3D:
+func _invisible() -> CandyMaterial:
 	if _invisible_material == null:
-		_invisible_material = StandardMaterial3D.new()
+		_invisible_material = MaterialLibrary.surface()
 		_invisible_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_invisible_material.albedo_color = Color(0, 0, 0, 0)
 	return _invisible_material

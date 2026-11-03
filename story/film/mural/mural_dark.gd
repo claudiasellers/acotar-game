@@ -374,7 +374,7 @@ func _build_terms(t: Dictionary) -> void:
 		d.radial_segments = 4
 		d.rings = 2
 		ice.mesh = d
-		var im := StandardMaterial3D.new()
+		var im := MaterialLibrary.surface()
 		im.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		im.albedo_color = ICE
 		im.emission_enabled = true

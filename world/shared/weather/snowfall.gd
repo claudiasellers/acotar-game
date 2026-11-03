@@ -41,7 +41,7 @@ func _ready() -> void:
 	flake.fill_to = Vector2(1.0, 0.5)
 	flake.width = 32
 	flake.height = 32
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_texture = flake
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES

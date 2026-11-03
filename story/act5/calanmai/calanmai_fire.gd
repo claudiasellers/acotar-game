@@ -136,7 +136,7 @@ func _build_embers() -> void:
 	p.process_material = pm
 	var spark := QuadMesh.new()
 	spark.size = Vector2(0.022, 0.022) * clampf(size, 1.0, 2.0)
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD

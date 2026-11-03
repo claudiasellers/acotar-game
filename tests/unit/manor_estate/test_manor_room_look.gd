@@ -46,15 +46,15 @@ func test_walls_and_ceilings_follow_the_room() -> void:
 			states += 1
 			assert_true(m is ShaderMaterial and (m as ShaderMaterial).shader == ManorRoomLook.BOISERIE, "%s boiserie" % r.id)
 		else:
-			assert_true(m is StandardMaterial3D, "%s plain plaster" % r.id)
+			assert_true(m is CandyMaterial, "%s plain plaster" % r.id)
 	assert_gte(states, 30, "state rooms")
 	for id: StringName in ManorRoomLook.SKY_ROOMS:
 		var found := _find(id)
 		assert_false(found.is_empty(), "sky room %s exists" % id)
-		var plain := StandardMaterial3D.new()
+		var plain := MaterialLibrary.surface()
 		var m := ManorRoomLook.ceiling_material(found[0], plain)
 		assert_ne(m, plain, "%s gets a painted sky" % id)
-	assert_eq(ManorRoomLook.wall_material(_find(&"svc_kitchen")[0]).get_class(), "StandardMaterial3D")
+	assert_true(ManorRoomLook.wall_material(_find(&"svc_kitchen")[0]) is CandyMaterial)
 
 
 func test_hero_light_aims_down_at_the_hero() -> void:
@@ -107,9 +107,9 @@ func test_act2_rooms_have_coffered_ceilings_not_open_sky() -> void:
 		assert_false(found.is_empty(), "coffered room %s exists" % id)
 		var r: ManorRoomDef = found[0]
 		assert_false(ManorRoomLook.has_sky(r), "%s has no painted sky" % id)
-		var plain := StandardMaterial3D.new()
+		var plain := MaterialLibrary.surface()
 		var field := ManorRoomLook.ceiling_material(r, plain)
-		assert_true(field is StandardMaterial3D and field != plain, "%s gets the coffer field" % id)
+		assert_true(field is CandyMaterial and field != plain, "%s gets the coffer field" % id)
 		var node := Node3D.new()
 		var origin := Vector3(r.rect.position.x, 0.0, r.rect.position.y)
 		var ch := ManorHouseBuilder.ceiling_of(r)

@@ -87,7 +87,7 @@ static func _drop_cloth() -> MeshInstance3D:
 	mi.mesh = plane
 	mi.position = Vector3(0, 0.014, 0.05)
 	mi.rotation_degrees.y = 6.0
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_texture = ImageTexture.create_from_image(_cloth_image())
 	mat.roughness = 0.95
 	mi.material_override = mat
@@ -160,7 +160,7 @@ static func _motes() -> CPUParticles3D:
 	p.color_ramp = grad
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.06, 0.06)
-	var m := StandardMaterial3D.new()
+	var m := MaterialLibrary.surface()
 	m.vertex_color_use_as_albedo = true
 	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
@@ -218,7 +218,7 @@ static func _curtain(side: float) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Curtain%s" % ("L" if side > 0 else "R")
 	mi.mesh = st.commit()
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = CURTAIN_COLOR
 	mat.roughness = 0.55
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -262,8 +262,8 @@ static func _rod() -> Node3D:
 	return rod
 
 
-static func _gold() -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
+static func _gold() -> CandyMaterial:
+	var m := MaterialLibrary.surface()
 	m.albedo_color = EstateKit.GOLD
 	m.metallic = 0.8
 	m.roughness = 0.3

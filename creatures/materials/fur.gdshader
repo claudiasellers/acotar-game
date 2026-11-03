@@ -8,6 +8,8 @@
 // pushed out along the normal, combed back and drooped, cut to strands.
 shader_type spatial;
 render_mode cull_back, depth_draw_opaque, diffuse_burley, specular_schlick_ggx;
+// Shared rim curve of the candy_lit family (render program T2).
+#include "res://world/shared/shaders/candy_rim.gdshaderinc"
 
 uniform vec3 coat : source_color = vec3(0.16, 0.16, 0.18);
 uniform vec3 pale : source_color = vec3(0.62, 0.58, 0.5);
@@ -95,7 +97,7 @@ void fragment() {
 	col *= 1.0 - rib_depth * rib * (1.0 - ridge) * (1.0 - layer);
 	// Silver sheen at grazing angles: the "reads silver at a distance" of the
 	// canon coat, and what gives the dark head its planes.
-	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float fres = candy_fresnel(NORMAL, VIEW, 3.0);
 	col = mix(col, tip, sheen * fres * (1.0 - zone.a));
 	// Wet mouth, then black lips, nose and pupils on top.
 	col = mix(col, mouth, zone.a);

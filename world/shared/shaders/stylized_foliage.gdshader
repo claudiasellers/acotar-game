@@ -7,7 +7,6 @@ render_mode cull_disabled, depth_draw_opaque;
 
 #include "res://world/shared/shaders/foliage_wind.gdshaderinc"
 
-global uniform float magic_amount;
 
 uniform vec4 albedo : source_color = vec4(1.0);
 uniform sampler2D albedo_texture : source_color, filter_linear_mipmap, hint_default_white;
@@ -15,10 +14,6 @@ uniform bool use_vertex_color = true;
 // Height (mesh units) at which a vertex sways fully in the wind; 0 at the base.
 uniform float flex_height = 1.0;
 uniform float alpha_scissor : hint_range(0.0, 1.0) = 0.4;
-uniform float wrap : hint_range(0.0, 1.0) = 0.5;
-uniform vec4 shade_tint : source_color = vec4(0.62, 0.55, 0.78, 1.0);
-uniform vec4 rim_color : source_color = vec4(1.0, 0.86, 0.72, 1.0);
-uniform float rim_strength : hint_range(0.0, 2.0) = 0.6;
 uniform float translucency : hint_range(0.0, 1.0) = 0.35;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.75;
 // How much this species takes snow on its upward faces when snow_cover is on.
@@ -59,6 +54,18 @@ float vnoise(vec3 p) {
 float leaf_field(vec3 p) {
 	return vnoise(p) * 0.62 + vnoise(p * 2.7 + 7.1) * 0.38;
 }
+
+// Lighting: candy_lit (render program T2) with this family's old response as
+// its defaults: wrapped lambert x2 on albedo, shade tint, no direct specular.
+#define CANDY_ALBEDO_MIX_DEFAULT 1.0
+#define CANDY_GAIN_DEFAULT 2.0
+#define CANDY_BURLEY_DEFAULT 0.0
+#define CANDY_WRAP_DEFAULT 0.5
+#define CANDY_SHADE_DEFAULT vec4(0.62, 0.55, 0.78, 1.0)
+#define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.86, 0.72, 1.0)
+#define CANDY_RIM_STRENGTH_DEFAULT 0.6
+#define CANDY_NO_SPEC_LOBE
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 void vertex() {
 	// green where the vertex colour is clearly green: leaves, not petals
@@ -101,7 +108,7 @@ void fragment() {
 	ALPHA_SCISSOR_THRESHOLD = alpha_scissor;
 	ROUGHNESS = mix(roughness_value, 0.55, snow);
 	SPECULAR = 0.3;
-	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
+	float rim = candy_fresnel(NORMAL, VIEW, rim_power);
 	vec3 glint = vec3(0.0);
 	float s = sparkle * magic_amount;
 	if (s > 0.0) {
@@ -112,11 +119,4 @@ void fragment() {
 	}
 	EMISSION = rim_color.rgb * rim * rim_strength * mix(0.25, 1.0, magic_amount) + glint + col * emission_glow;
 	BACKLIGHT = col * translucency;
-}
-
-void light() {
-	float ndl = dot(NORMAL, LIGHT);
-	float wrapped = clamp((ndl + wrap) / (1.0 + wrap), 0.0, 1.0);
-	vec3 lit = mix(shade_tint.rgb, vec3(1.0), wrapped);
-	DIFFUSE_LIGHT += ALBEDO * lit * LIGHT_COLOR * ATTENUATION * wrapped / PI * 2.0;
 }

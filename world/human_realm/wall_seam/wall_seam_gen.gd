@@ -242,7 +242,7 @@ func _build_crossing(root: Node3D, layers: Array[ScatterLayer]) -> void:
 	var q := QuadMesh.new()
 	q.size = Vector2(10.0, 9.0)
 	veil.mesh = q
-	var vm := StandardMaterial3D.new()
+	var vm := MaterialLibrary.surface()
 	vm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	vm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var gg := Gradient.new()
@@ -305,7 +305,7 @@ func _build_crossing(root: Node3D, layers: Array[ScatterLayer]) -> void:
 	petals.color = Color(1.0, 0.78, 0.86)
 	var pq := QuadMesh.new()
 	pq.size = Vector2(0.06, 0.045)
-	var pmat := StandardMaterial3D.new()
+	var pmat := MaterialLibrary.surface()
 	pmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	pmat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	pmat.vertex_color_use_as_albedo = true
@@ -354,7 +354,7 @@ static func blossom_bough_mesh(side: float, seed: int) -> ArrayMesh:
 			_puff(st, c, rng.randf_range(0.45, 0.8), pinks[rng.randi() % pinks.size()])
 	st.generate_normals()
 	var m := st.commit()
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.vertex_color_use_as_albedo = true
 	mat.roughness = 0.8
 	mat.emission_enabled = true

@@ -97,7 +97,7 @@ func test_no_albedo_channel_over_the_cap() -> void:
 		for mi in _model(id).find_children("*", "MeshInstance3D", true, false):
 			var mesh := (mi as MeshInstance3D).mesh
 			for s in mesh.get_surface_count():
-				var mat := mesh.surface_get_material(s) as BaseMaterial3D
+				var mat := mesh.surface_get_material(s) as CandyMaterial
 				if mat == null or mat.albedo_texture != null:
 					continue    # textures are capped when they are baked (build_minor_fae.py cap_albedo)
 				var c := mat.albedo_color

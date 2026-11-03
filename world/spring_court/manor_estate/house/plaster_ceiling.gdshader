@@ -6,6 +6,8 @@
 // under 0.85 (L18-4 glare rule); the bounce is well below the lamps.
 shader_type spatial;
 render_mode cull_back, ambient_light_disabled;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec4 color : source_color = vec4(0.85, 0.82, 0.80, 1.0);
 uniform float bounce = 0.32;

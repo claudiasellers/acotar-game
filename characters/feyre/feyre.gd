@@ -749,7 +749,7 @@ func _build_breath() -> void:
 	_breath.process_material = mat
 	var puff := QuadMesh.new()
 	puff.size = Vector2(0.12, 0.12)
-	var pm := StandardMaterial3D.new()
+	var pm := MaterialLibrary.surface()
 	pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	pm.vertex_color_use_as_albedo = true
@@ -786,9 +786,9 @@ func _build_body() -> void:
 		model.add_child((load(MODEL_SCENE) as PackedScene).instantiate())
 		return
 
-	var cloak := StandardMaterial3D.new()
+	var cloak := MaterialLibrary.surface()
 	cloak.albedo_color = Color(0.36, 0.30, 0.24)
-	var skin := StandardMaterial3D.new()
+	var skin := MaterialLibrary.surface()
 	skin.albedo_color = Color(0.92, 0.78, 0.66)
 
 	var body_mesh := MeshInstance3D.new()

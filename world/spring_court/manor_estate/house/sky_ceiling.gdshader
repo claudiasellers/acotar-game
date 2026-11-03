@@ -5,6 +5,8 @@
 // (green), so the ceiling ignores ambient and carries its own soft light.
 shader_type spatial;
 render_mode cull_back, ambient_light_disabled;
+// Lighting: candy_lit (render program T2), stock defaults = the look it had.
+#include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec4 room_rect = vec4(0.0, 0.0, 10.0, 10.0);
 uniform vec4 field : source_color = vec4(0.984, 0.969, 0.949, 1.0);

@@ -329,7 +329,7 @@ func _clean() -> bool:
 		blood_on_hand.material_override = HouseProps.blood_material(maxf(0.0, 1.0 - k))
 		blood_on_hand.visible = cleaned < STEPS_CLEAN
 	if water:
-		(water.material_override as StandardMaterial3D).albedo_color = Color(0.75, 0.88, 1.0, 0.7).lerp(Color(0.55, 0.06, 0.1, 0.85), k * 0.8)
+		(water.material_override as CandyMaterial).albedo_color = Color(0.75, 0.88, 1.0, 0.7).lerp(Color(0.55, 0.06, 0.1, 0.85), k * 0.8)
 	if is_inside_tree():
 		Juice.burst(null, &"pickup", _hand_point(), 0.8 + 0.1 * cleaned)
 	return cleaned >= STEPS_CLEAN
@@ -482,7 +482,7 @@ func _make_water() -> MeshInstance3D:
 	disc.height = 0.05
 	mi.mesh = disc
 	mi.position = Vector3(0, 0.05, 0)
-	var mat := StandardMaterial3D.new()
+	var mat := MaterialLibrary.surface()
 	mat.albedo_color = Color(0.75, 0.88, 1.0, 0.7)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.roughness = 0.05
