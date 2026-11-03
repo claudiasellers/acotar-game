@@ -59,6 +59,9 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void: _see_him(), "she sees him"),
 		Beats.until(func() -> bool: return _see_left <= 0.0, "she knows him"),
 		Beats.run(func(_s: SceneSpace) -> void:
+			# The window framing was only for finding him: going down through the
+			# house to the hedges, the camera is hers again (T067).
+			StoryControl.set_focus(null)
 			if _from_window:
 				aside(&"puca_window"), "my father"),
 		nudged(func() -> bool: return _near_him(), &"puca_come_down", NUDGE_AFTER, "she goes down to him"),
@@ -175,7 +178,6 @@ func _see_him() -> void:
 
 ## He waits (beckoning) until she has come down to him, then limps off.
 func _lure() -> void:
-	StoryControl.set_focus(null)
 	var p := puca()
 	if p:
 		# Through the open gate, the only way out of the walled garden.
