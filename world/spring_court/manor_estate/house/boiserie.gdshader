@@ -9,6 +9,8 @@ shader_type spatial;
 render_mode cull_back;
 // Lighting: candy_lit (render program T2), stock defaults = the look it had.
 #define CANDY_LOBES
+// Room shells are lit by SDFGI; no sun bounce through the walls (T3a).
+#define CANDY_BOUNCE_DEFAULT 0.0
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
 uniform vec4 wall_color : source_color = vec4(1.0, 0.88, 0.9, 1.0);
