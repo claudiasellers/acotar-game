@@ -1,18 +1,27 @@
 ## The touchable world's one hookup in the World scene (T5): for every region
 ## WorldStreamer loads, adds that region's loose props (PropField, from
 ## data/props/placements/<id>.tres, a child of the region so it goes with it),
-## and runs the navmesh tile around Feyre (NavBaker). Later slices add weather
-## visuals and element chemistry here, so World needs just this one node.
+## runs the navmesh tile around Feyre (NavBaker), the element chemistry
+## (ElementField: fire, water, wind) and the spring weather visuals
+## (SpringWeather), so World needs just this one node.
 class_name TouchWorld
 extends Node
 
 var nav: NavBaker
+var elements: ElementField
+var weather: SpringWeather
 
 
 func _ready() -> void:
 	nav = NavBaker.new()
 	nav.name = "NavBaker"
 	add_child(nav)
+	elements = ElementField.new()
+	elements.name = "ElementField"
+	add_child(elements)
+	weather = SpringWeather.new()
+	weather.name = "SpringWeather"
+	add_child(weather)
 	var streamer := Gameplay.autoload(&"WorldStreamer")
 	if streamer == null:
 		return

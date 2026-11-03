@@ -129,6 +129,9 @@ func _wake(i: int) -> void:
 		xf.origin.y = ground
 	prop.global_transform = xf.translated(Vector3.UP * 0.02)
 	prop.broke.connect(_on_broke.bind(i))
+	var elements := ElementField.find(get_tree())
+	if elements and data.flammable:
+		elements.track_prop(prop)
 	_body[i] = prop
 	_set_shown(i, false)
 	if player:
