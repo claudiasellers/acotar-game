@@ -1,6 +1,7 @@
 ## Contract: a Spring region's grass, reeds and hay become ElementField ground
 ## fuel when it streams in (built off the main thread) and are gone when it
-## streams out; winter regions and forageables never burn (T5, L57).
+## streams out; winter regions, forageables and story anchor clearings never
+## burn; burnt grass is hidden under a scorch and grows back (T5, L57).
 extends GutTest
 
 var touch: TouchWorld
@@ -15,7 +16,7 @@ func before_each() -> void:
 
 ## A region root with a 24 m meadow of grass clumps 3 m apart round (10, 0, 10),
 ## a rock outcrop at x 60 and a strawberry drift at x 100.
-func _region(path: String, script_source: String = "") -> Node3D:
+func _region(path: String, script_source: String = "", anchor: String = "") -> Node3D:
 	var root := Node3D.new()
 	if script_source != "":
 		var s := GDScript.new()
@@ -31,6 +32,12 @@ func _region(path: String, script_source: String = "") -> Node3D:
 		_layer(&"forage_ing_wild_strawberry", Vector2(100, 0), 1.0, 5, &"ing_wild_strawberry"),
 	]
 	root.add_child(field)
+	if anchor != "":
+		var m := Marker3D.new()
+		m.name = anchor
+		m.position = Vector3(10, 0, 10)
+		m.add_to_group(&"story_anchor")
+		root.add_child(m)
 	add_child_autofree(root)
 	return root
 
@@ -39,6 +46,7 @@ func _layer(id: StringName, from: Vector2, spacing: float, n: int, ingredient: S
 	var l := ScatterLayer.new()
 	l.id = id
 	l.ingredient_id = ingredient
+	l.mesh = BoxMesh.new()
 	for ix in n:
 		for iz in n:
 			l.add(Vector3(from.x + ix * spacing, 0.0, from.y + iz * spacing), 0.0, 1.0)
@@ -62,6 +70,13 @@ func test_stream_in_registers_grass_and_unload_frees_it() -> void:
 	for i in 40:
 		field.step(ElementField.TICK)
 	assert_gt(field.cell_count(), 30, "the fire ran on through the grass: %d cells" % field.cell_count())
+	assert_gt(field.scorch.hidden_count(), 0, "burnt clumps drop out of the scatter")
+	assert_gt(field.scorch.decal_count(), 0, "and the ground is scorched")
+	var burnt_hidden := field.scorch.hidden_count()
+	assert_eq(field.regrow_due(field.game_hours() + ElementField.REGROW_HOURS - 0.5), 0, "not yet")
+	assert_gt(field.regrow_due(field.game_hours() + ElementField.REGROW_HOURS + 0.1), 0, "the grass grows back")
+	assert_eq(field.scorch.hidden_count(), 0, "all %d clumps show again" % burnt_hidden)
+	assert_gt(field.ignite_at(Vector3(10, 0, 10), 1.2), 0, "and can burn again")
 	assert_eq(field.ignite_at(Vector3(64, 0, 4), 1.2), 0, "the rocks do not burn")
 	assert_eq(field.ignite_at(Vector3(102, 0, 2), 1.2), 0, "nor do forageables (rule 3)")
 	touch._on_region_unloaded(&"test_meadow")
@@ -76,6 +91,20 @@ func test_winter_regions_have_no_ground_fuel() -> void:
 	await _wait_for_ground()
 	assert_false(touch.elements.has_ground(&"village"))
 	assert_eq(touch.elements.ignite_at(Vector3(10, 0, 10), 1.2), 0)
+
+
+func test_story_scenes_are_safe_from_fire() -> void:
+	var field := touch.elements
+	touch.add_ground_fuel(&"test_meadow", _region("res://world/spring_court/test_meadow/test_meadow.tscn", "", "bogge_hunt_path"), false)
+	assert_eq(field.ignite_at(Vector3(10, 0, 10), 1.2), 0, "no fuel within 12 m of a story anchor")
+	assert_eq(field.ignite_at(Vector3(17, 0, 17), 1.2), 0)
+	assert_gt(field.ignite_at(Vector3(21, 0, 21), 1.2), 0, "the meadow beyond burns")
+	field.held = true
+	var before := field.cell_count()
+	for i in 40:
+		field.step(ElementField.TICK)
+	assert_eq(field.burning_count(), 0, "it burnt down")
+	assert_lte(field.cell_count(), before + 8, "without spreading while a scene runs")
 
 
 func test_waits_for_a_region_still_building_its_scatter() -> void:
