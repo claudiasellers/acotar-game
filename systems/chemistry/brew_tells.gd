@@ -15,13 +15,15 @@ const SHOW := 0.3
 const FULL := 3.0
 ## tag -> look (colour, size, count, where, drift)
 const TELLS := {
-	&"bright": {"color": Color(1.0, 0.95, 0.78, 0.8), "size": 0.035, "amount": 40, "lifetime": 3.0,
+	&"bright": {"color": Color(1.0, 0.97, 0.88, 0.9), "size": 0.03, "amount": 40, "lifetime": 3.0,
 		"at": Vector3(0, 1.1, 0), "box": Vector3(1.4, 0.9, 1.4), "velocity": 0.05, "gravity": Vector3(0, 0.02, 0)},
-	&"warm": {"color": Color(1.0, 0.86, 0.8, 0.18), "size": 0.22, "amount": 10, "lifetime": 1.8,
+	&"warm": {"color": Color(1.0, 0.9, 0.86, 0.1), "size": 0.14, "amount": 8, "lifetime": 1.8,
 		"at": Vector3(0, 1.45, 0), "box": Vector3(0.25, 0.05, 0.12), "velocity": 0.25, "gravity": Vector3(0, 0.15, 0)},
-	&"cool": {"color": Color(0.93, 0.97, 1.0, 0.85), "size": 0.018, "amount": 24, "lifetime": 1.6,
+	&"cool": {"color": Color(0.96, 0.98, 1.0, 0.9), "size": 0.016, "amount": 24, "lifetime": 1.6,
 		"at": Vector3(0, 1.05, 0), "box": Vector3(0.38, 0.25, 0.15), "velocity": 0.04, "gravity": Vector3(0, -0.35, 0)},
 }
+
+static var _soft: GradientTexture2D = null
 
 var target: Node3D
 var _fx: Dictionary = {}  # tag -> GPUParticles3D
@@ -97,6 +99,25 @@ static func _particles(look: Dictionary) -> GPUParticles3D:
 	m.vertex_color_use_as_albedo = true
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	m.disable_receive_shadows = true
+	# A soft round fleck, not a square; ambient-lit so it reads pale, not grey.
+	m.albedo_texture = soft_dot()
 	quad.material = m
 	p.draw_pass_1 = quad
 	return p
+
+
+## A round, soft-edged white dot (radial alpha falloff), shared by every tell.
+static func soft_dot() -> GradientTexture2D:
+	if _soft == null:
+		var g := Gradient.new()
+		g.set_color(0, Color(1, 1, 1, 1))
+		g.add_point(0.45, Color(1, 1, 1, 0.7))
+		g.set_color(g.get_point_count() - 1, Color(1, 1, 1, 0))
+		_soft = GradientTexture2D.new()
+		_soft.gradient = g
+		_soft.fill = GradientTexture2D.FILL_RADIAL
+		_soft.fill_from = Vector2(0.5, 0.5)
+		_soft.fill_to = Vector2(0.5, 0.0)
+		_soft.width = 64
+		_soft.height = 64
+	return _soft
