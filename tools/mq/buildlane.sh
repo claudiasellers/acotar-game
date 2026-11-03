@@ -60,10 +60,20 @@ kick_ready() {
 }
 
 done_merged() { # entry-file
-	local e="$1" task; task=$(kv_get "$e" task)
+	local e="$1" task f restacked=""; task=$(kv_get "$e" task)
 	mv "$e" "$MQ_DIR/done/merged/"
+	f="$MQ_DIR/done/merged/$(basename "$e")"
 	[ -d "$MQ_DIR/tasks/$task" ] && kv_set "$MQ_DIR/tasks/$task/meta" status merged
-	mq_event MERGED "$task ${2:-} $(kv_get "$MQ_DIR/done/merged/$(basename "$e")" subject | cut -c1-70)"
+	# The submitted sha isn't in main then: say what is.
+	[ -n "$(kv_get "$f" landed)" ] && restacked=" (restacked: $(kv_get "$f" sha | cut -c1-9) is in main as $(kv_get "$f" landed | cut -c1-9), dropped $(kv_get "$f" dropped))"
+	mq_event MERGED "$task ${2:-} $(kv_get "$f" subject | cut -c1-70)$restacked"
+}
+
+# Where an entry's work is in main: its own sha, or the restacked one.
+landed_sha() { # entry-file
+	local s; s=$(kv_get "$1" landed)
+	[ -n "$s" ] || s=$(kv_get "$1" sha)
+	echo "$s"
 }
 
 reject() { # entry-file reason [logfile]
@@ -108,7 +118,7 @@ recover() {
 		[ -d "$b" ] || continue
 		for e in "$b"/*.entry; do
 			[ -f "$e" ] || continue
-			if git merge-base --is-ancestor "$(kv_get "$e" sha)" "$MQ_MAIN"; then
+			if git merge-base --is-ancestor "$(landed_sha "$e")" "$MQ_MAIN"; then
 				done_merged "$e"
 			else
 				mv "$e" "$MQ_DIR/pending/"
@@ -141,10 +151,45 @@ ensure_baseline() { # sha batch-dir
 	mq_event BASELINE "${sha:0:9} $(wc -l < "$b/baseline/failed" | tr -d ' ') known red"
 }
 
+# A resubmission often sits on a rewritten copy of its own earlier slice, already
+# merged, so its merge conflicts. Drops only the commits whose patch is already in
+# HEAD and picks the rest onto it, as one merge like any other entry. Sets landed=
+# and dropped= on the entry; sha= stays what was submitted. Returns 1 to reject as
+# a conflict, 3 if it couldn't try.
+restack() { # entry-file
+	local e="$1" sha task head marks keep drop n
+	sha=$(kv_get "$e" sha); task=$(kv_get "$e" task)
+	head=$(wt rev-parse HEAD)
+	# A merge can't be replayed without changing the work.
+	[ "$(git rev-list --merges --count "$head..$sha")" = 0 ] || return 1
+	marks=$(git cherry "$head" "$sha") || return 1
+	drop=$(printf '%s\n' "$marks" | sed -n 's/^- //p')
+	[ -n "$drop" ] || return 1
+	keep=$(printf '%s\n' "$marks" | sed -n 's/^+ //p')
+	n=$head
+	if [ -n "$keep" ]; then
+		# shellcheck disable=SC2086
+		if ! wt cherry-pick --keep-redundant-commits $keep >>"$MQ_DIR/buildlane.log" 2>&1; then
+			wt cherry-pick --abort 2>/dev/null
+			goto "$head" || return 3
+			return 1
+		fi
+		n=$(wt rev-parse HEAD)
+		goto "$head" || return 3
+		wt merge -q --no-ff --no-edit -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$n" >>"$MQ_DIR/buildlane.log" 2>&1 || {
+			wt merge --abort 2>/dev/null; return 3; }
+		n=$(wt rev-parse HEAD)
+	fi
+	kv_set "$e" landed "$n"
+	kv_set "$e" dropped "$(printf '%s\n' "$drop" | cut -c1-9 | tr '\n' ' ' | sed 's/ $//')"
+	mq_event RESTACKED "$task ${sha:0:9} dropped $(printf '%s\n' "$drop" | wc -l | tr -d ' ') commit(s) already in main ($(kv_get "$e" dropped)); testing the rest as ${n:0:9}"
+}
+
 # Merges the surviving entries onto base. Fills chain[] with the tip after each
-# entry. Conflicts reject right away. Returns 3 if it couldn't try.
+# entry. Conflicts reject right away, unless restack() clears them. Returns 3 if
+# it couldn't try.
 build_chain() { # base batch-dir
-	local base="$1" b="$2" e sha task hits conf i
+	local base="$1" b="$2" e sha task hits conf i rc
 	chain=(); entries=()
 	goto "$base" || return 3
 	for e in "$b"/*.entry; do
@@ -156,15 +201,21 @@ build_chain() { # base batch-dir
 			reject "$e" "changes built files ($(printf '%s' "$hits" | cut -f1 | head -3 | tr '\n' ' ')). Those are rebuilt from generated.conf: change the recipe or its inputs instead."
 			continue
 		fi
+		kv_set "$e" landed ""; kv_set "$e" dropped ""
 		if ! wt merge -q --no-edit -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$sha" >>"$MQ_DIR/buildlane.log" 2>&1; then
 			if [ -n "$(wt ls-files -u)" ]; then
 				local paths; paths=$(wt ls-files -u | cut -f2 | sort -u | head -5 | tr '\n' ' ')
 				wt merge --abort
-				reject "$e" "conflicts with main in: $paths. Rebase on main, fix it, and submit again."
-				continue
+				restack "$e"; rc=$?
+				[ "$rc" = 3 ] && return 3
+				if [ "$rc" != 0 ]; then
+					reject "$e" "conflicts with main in: $paths. Rebase on main, fix it, and submit again."
+					continue
+				fi
+			else
+				wt merge --abort 2>/dev/null
+				return 3
 			fi
-			wt merge --abort 2>/dev/null
-			return 3
 		fi
 		i=${#entries[@]}
 		entries[$i]="$e"; chain[$i]=$(wt rev-parse HEAD)

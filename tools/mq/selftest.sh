@@ -221,6 +221,59 @@ case_conflict() {
 	expect "second rejected for conflict" grep -q 'REJECTED T2 conflicts' .git/mq/events.log
 }
 
+# A resubmission sitting on a rewritten copy of its own merged first slice, whose
+# next slice edits the same line: printed. The copy has another committer date.
+stacked() { # first-sha name new-line
+	git checkout -q --no-track -B "ch/$2" "$1~1"
+	GIT_COMMITTER_DATE="2001-01-01T00:00:00 +0000" git cherry-pick "$1" >/dev/null
+	echo "$3" > x; git commit -q -am "$2"
+	git rev-parse HEAD
+	git checkout -q --detach origin/main
+}
+
+set_x() { # name line: a commit on main's tip setting x, printed
+	git fetch -q origin; git checkout -q --no-track -B "ch/$1" origin/main
+	echo "$2" > x; git commit -q -am "$1"
+	git rev-parse HEAD
+	git checkout -q --detach origin/main
+}
+
+case_restacked() {
+	newrepo restack
+	local a b landed
+	a=$(change a x)
+	queue "$a" T1; start_lane; drain; stop_lane
+	b=$(stacked "$a" b b); git push -q origin "$b:refs/heads/lead/ready-T9-2"
+	tools/mq/pull_ready.sh
+	start_lane; drain; stop_lane
+	tools/mq/pull_ready.sh
+	expect "not rejected" not rejected T9
+	expect "said so" grep -q "RESTACKED T9 ${b:0:9} dropped 1 commit" .git/mq/events.log
+	landed=$(sed -n 's/^landed=//p' .git/mq/done/merged/*-T9.entry)
+	expect "the rest landed" in_main "$landed"
+	expect "with its change" test "$(git show origin/main:x)" = b
+	expect "submitted sha kept on the entry" grep -q "^sha=$b" .git/mq/done/merged/*-T9.entry
+	expect "MERGED names where it went" grep -q "MERGED T9 .*restacked: ${b:0:9} is in main as ${landed:0:9}" .git/mq/events.log
+	expect "merged tag on the submitted commit" test "$(git ls-remote origin 'refs/tags/merged/T9-2^{}' | cut -f1)" = "$b"
+	expect "tag says where" sh -c "git cat-file -p refs/tags/merged/T9-2 | grep -q 'as $landed'"
+}
+
+# Dropping the copy leaves a real conflict: still rejected, and the batch goes on.
+case_restack_conflict() {
+	newrepo restackconf
+	local a b c d
+	a=$(change a x)
+	queue "$a" T1; start_lane; drain; stop_lane
+	c=$(set_x c c); queue "$c" T3; start_lane; drain; stop_lane
+	b=$(stacked "$a" b b); d=$(change d other)
+	queue "$b" T2; queue "$d" T4
+	start_lane; drain
+	expect "rejected for conflict" grep -q 'REJECTED T2 conflicts' .git/mq/events.log
+	expect "not restacked" not grep -q 'RESTACKED T2' .git/mq/events.log
+	expect "main's line kept" test "$(git show origin/main:x)" = c
+	expect "the next entry merged" in_main "$d"
+}
+
 case_flaky() {
 	newrepo flaky
 	local a
@@ -866,7 +919,7 @@ case_test_when() {
 	gate full; expect "an idle gate (no --base) runs everything" ran gut:tests/test_s.gd
 }
 
-for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict flaky flaky_last \
+for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict restacked restack_conflict flaky flaky_last \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
