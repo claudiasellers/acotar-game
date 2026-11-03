@@ -21,7 +21,10 @@ func test_every_piece_has_a_tab_and_variants_share_a_card() -> void:
 	# "Gowns" is listed in CATEGORIES too; count each tab once.
 	var gowns := all.filter(func(p: WardrobePiece) -> bool: return DressingRoomView.category_of(p) == "Gowns").size()
 	assert_eq(counted - gowns, all.size(), "each piece sits in exactly one tab")
-	var gowns_only: Array[WardrobePiece] = all.filter(func(p: WardrobePiece) -> bool: return p.mesh_path.ends_with("gown_ball.glb"))
+	# L64: a card is one garment (mesh and name): the princess gown shares the
+	# ball gown's mesh but is its own card.
+	var gowns_only: Array[WardrobePiece] = all.filter(func(p: WardrobePiece) -> bool:
+		return p.mesh_path.ends_with("gown_ball.glb") and DressingRoomView.family_name(p) == "Ball gown")
 	var fams := DressingRoomView.families(gowns_only)
 	assert_eq(fams.size(), 1, "the ball gown's colours are one card")
 	assert_gt((fams[0]["pieces"] as Array).size(), 3, "with a swatch per colour")
