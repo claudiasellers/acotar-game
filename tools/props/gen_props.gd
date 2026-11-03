@@ -2,7 +2,7 @@
 ## a handful of anchor zones per region, a few small clusters per zone
 ## (a woodpile, a stack of crates by a door, pots by the glass houses), each
 ## spot checked against the region's own keep-outs. Deterministic (fixed seed).
-##   tools/mq/godot.sh -s tools/generators/gen_props.gd
+##   tools/mq/godot.sh -s tools/props/gen_props.gd
 ## Writes data/props/placements/<region_id>.tres and prints a count per kind.
 extends SceneTree
 

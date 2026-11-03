@@ -1,6 +1,6 @@
 ## Where a region's loose props start (T5): one ScatterLayer per prop kind,
 ## layer id = PropData id, five floats per instance (x, y, z, yaw, scale) in
-## world space. Written by tools/generators/gen_props.gd, read by PropField.
+## world space. Written by tools/props/gen_props.gd, read by PropField.
 class_name PropPlacements
 extends Resource
 
