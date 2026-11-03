@@ -133,6 +133,7 @@ func _build_body() -> void:
 		_body = _model
 		add_child(_model)
 		return
+	PlaceholderBody.stand_in("family member %s" % member_id)
 	var capsule_body := MeshInstance3D.new()
 	_body = capsule_body
 	_body.name = "Body"
