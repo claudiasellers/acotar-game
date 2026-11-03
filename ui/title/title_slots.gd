@@ -129,7 +129,7 @@ func _slot_row(slot: String) -> void:
 	var row := HBoxContainer.new()
 	row.name = slot
 	row.alignment = BoxContainer.ALIGNMENT_END
-	row.add_theme_constant_override(&"separation", 26)
+	row.add_theme_constant_override(&"separation", 70)  # room for the rose marker
 	add_child(row)
 	if mode == Mode.LOAD and not info.is_empty():
 		var del := _button("Delete", 26, _ask.bind(slot), row)
