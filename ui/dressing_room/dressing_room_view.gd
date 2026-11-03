@@ -306,12 +306,12 @@ func _build() -> void:
 
 	var title := UiStyle.label("Her satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"), 30)
 	title.add_theme_color_override(&"font_color", Color(0.62, 0.36, 0.52))
+	# UiStyle labels wrap, so in a row they need the width or they stack letters.
 	var head := HBoxContainer.new()
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
-	var grow := Control.new()
-	grow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(grow)
 	found_label = UiStyle.label(found_text(), 14)
+	found_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	found_label.name = "Found"
 	found_label.modulate.a = 0.8
 	found_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -459,12 +459,13 @@ func _card(fam: Dictionary) -> Control:
 	col.add_theme_constant_override(&"separation", 4)
 	card.add_child(col)
 	var head := HBoxContainer.new()
-	head.add_child(UiStyle.label(fam["name"], 17))
+	var garment := UiStyle.label(fam["name"], 17)
+	garment.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(garment)
 	if variants.any(func(p: WardrobePiece) -> bool: return Gameplay.wardrobe.is_unseen(p.id)):
-		var grow := Control.new()
-		grow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		head.add_child(grow)
-		head.add_child(_new_ribbon())
+		var pill := _new_ribbon()
+		pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		head.add_child(pill)
 	col.add_child(head)
 	var about := UiStyle.label(variants[0].description, 12)
 	about.modulate.a = 0.75
@@ -497,6 +498,7 @@ func _new_ribbon() -> Control:
 	box.content_margin_bottom = 1
 	pill.add_theme_stylebox_override(&"panel", box)
 	var word := UiStyle.label("New", 12)
+	word.autowrap_mode = TextServer.AUTOWRAP_OFF
 	word.add_theme_color_override(&"font_color", Color.WHITE)
 	pill.add_child(word)
 	pill.ready.connect(func() -> void:
