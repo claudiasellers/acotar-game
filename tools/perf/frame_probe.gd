@@ -41,6 +41,9 @@ func _ready() -> void:
 		elif a.begins_with("--perf-csv="):
 			_csv = a.trim_prefix("--perf-csv=")
 	_vp = get_viewport().get_viewport_rid()
+	# Uncapped, or every frame reads as the 16.7 ms vsync interval.
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	Engine.max_fps = 0
 	RenderingServer.viewport_set_measure_render_time(_vp, true)
 	var timeout := OS.get_environment("PERF_TIMEOUT")
 	get_tree().create_timer(float(timeout) if timeout.is_valid_float() else 900.0).timeout.connect(_on_timeout)
