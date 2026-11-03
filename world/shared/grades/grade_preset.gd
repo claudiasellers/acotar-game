@@ -15,8 +15,9 @@ extends Resource
 @export var sun_energy := 0.9
 @export var ambient_color := Color(0.6, 0.66, 0.75)
 @export var ambient_energy := 0.6
-## 0 is all ambient_color, 1 all sky.
-@export_range(0.0, 1.0) var ambient_sky_contribution := 0.6
+## 0 is all ambient_color, 1 all sky. 0.7 outdoors (T3a): the sky tints
+## upward faces and its ground half tints downward ones.
+@export_range(0.0, 1.0) var ambient_sky_contribution := 0.7
 @export_group("Clouds")
 ## Painted clouds in the World sky (painted_sky.gdshader): 0 clear, ~0.3 a few
 ## fair-weather clouds, ~0.8 overcast. Left out of ambient and reflections.
