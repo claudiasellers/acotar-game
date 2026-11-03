@@ -1,0 +1,4 @@
+from wearables-lane
+quality look
+timeout 900
+shot icons res://tools/wardrobe/render_wardrobe_icons.gd out={out}
