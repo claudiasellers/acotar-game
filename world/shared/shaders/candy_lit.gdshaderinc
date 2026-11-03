@@ -7,7 +7,8 @@
 //   band   = ramp(wrap(N.L))         identity until a ramp texture is set
 //   tint   = mix(shade_tint, 1, band)
 //   diffuse = mix(1, ALBEDO, light_albedo_mix) * tint * band * burley * diffuse_gain
-//   + ground_bounce in the shade band (T3a hook, 0 now)
+//   + ground_bounce: the sunlit ground's light thrown back up into the shade band
+//     (T3a; directional lights only, out of the lit band, so lit pixels are unchanged)
 //   + the candy rim: rim_color * candy_fresnel * rim_strength, LIT by each light
 //     (scaled by its colour and shadowing), never an additive glow
 //   + Godot's own light rim (CANDY_LOBES), clearcoat (CANDY_COAT) and GGX specular.
@@ -22,7 +23,7 @@
 //   CANDY_BACKLIGHT_SCALE  expression scaling backlight_strength (e.g. (1.0 - v_blight))
 //   CANDY_WRAP_DEFAULT, CANDY_SHADE_DEFAULT, CANDY_ALBEDO_MIX_DEFAULT,
 //   CANDY_GAIN_DEFAULT, CANDY_BURLEY_DEFAULT, CANDY_RIM_STRENGTH_DEFAULT,
-//   CANDY_RIM_COLOR_DEFAULT, CANDY_BACKLIGHT_DEFAULT: per-family defaults.
+//   CANDY_RIM_COLOR_DEFAULT, CANDY_BACKLIGHT_DEFAULT, CANDY_BOUNCE_DEFAULT: per-family defaults.
 //   CANDY_RIM_SCALE      expression scaling the rim (e.g. (1.0 - v_blight))
 
 #ifndef CANDY_WRAP_DEFAULT
@@ -50,6 +51,10 @@
 #ifndef CANDY_BACKLIGHT_DEFAULT
 #define CANDY_BACKLIGHT_DEFAULT 0.0
 #endif
+#ifndef CANDY_BOUNCE_DEFAULT
+// T3a: every surface outdoors. The manor's room shells set 0: SDFGI lights those rooms.
+#define CANDY_BOUNCE_DEFAULT 0.35
+#endif
 
 // 1 in the court, 0 under dread (GradeDirector).
 global uniform float magic_amount;
@@ -63,9 +68,10 @@ uniform vec4 shade_tint : source_color = CANDY_SHADE_DEFAULT;
 uniform float light_albedo_mix : hint_range(0.0, 1.0) = CANDY_ALBEDO_MIX_DEFAULT;
 uniform float diffuse_gain : hint_range(0.0, 4.0) = CANDY_GAIN_DEFAULT;
 uniform float diffuse_burley : hint_range(0.0, 1.0) = CANDY_BURLEY_DEFAULT;
-// T3a hook: light that the lit ground throws back into the shade band. 0 = off.
-uniform float ground_bounce : hint_range(0.0, 1.0) = 0.0;
-uniform vec4 ground_bounce_color : source_color = vec4(1.0, 0.92, 0.86, 1.0);
+// T3a: light that the sunlit ground throws back up into the shade band. 0 = off.
+uniform float ground_bounce : hint_range(0.0, 1.0) = CANDY_BOUNCE_DEFAULT;
+// Mean albedo of the terrain textures (tools/lighting/terrain_albedo_average.gd).
+uniform vec4 ground_bounce_color : source_color = vec4(0.523, 0.548, 0.545, 1.0);
 uniform float backlight_strength : hint_range(0.0, 4.0) = CANDY_BACKLIGHT_DEFAULT;
 group_uniforms candy_rim;
 uniform vec4 rim_color : source_color = CANDY_RIM_COLOR_DEFAULT;
@@ -130,7 +136,17 @@ void light() {
 	vec3 alb = mix(vec3(1.0), ALBEDO, light_albedo_mix);
 	vec3 tint = mix(shade_tint.rgb, vec3(1.0), band);
 	DIFFUSE_LIGHT += alb * tint * band * burley * lc * diffuse_gain * coat_att;
-	DIFFUSE_LIGHT += ground_bounce * ground_bounce_color.rgb * (1.0 - band) * lc;
+	if (ground_bounce > 0.0 && LIGHT_IS_DIRECTIONAL) {
+		// The ground this light reaches (its height over the horizon), seen by faces
+		// that look down (1) or sideways (0.5). The surface's own shadow doesn't block
+		// light coming up from the ground; the lit band doesn't take it.
+		vec3 nw = normalize((INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
+		vec3 lw = normalize((INV_VIEW_MATRIX * vec4(LIGHT, 0.0)).xyz);
+		float ground_lit = clamp(lw.y, 0.0, 1.0);
+		float sees_ground = clamp(0.5 - 0.5 * nw.y, 0.0, 1.0);
+		float lit_band = band * dot(vec3(ATTENUATION), vec3(1.0 / 3.0));
+		DIFFUSE_LIGHT += ground_bounce * ground_bounce_color.rgb * ground_lit * sees_ground * (1.0 - lit_band) * LIGHT_COLOR / PI;
+	}
 	if (backlight_strength > 0.0) {
 		float back = pow(clamp(dot(VIEW, -LIGHT), 0.0, 1.0), 3.0) * backlight_strength;
 #ifdef CANDY_BACKLIGHT_SCALE
