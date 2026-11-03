@@ -1,0 +1,6 @@
+from render-program-lead
+quality look
+shot perf_manor_front res://tools/perf/frame_probe.tscn manor_drive {out}/manor_front.png --perf-scene=res://tools/world_shot.tscn --perf-name=manor_front --perf-csv={out}/perf.csv
+shot perf_hunting_forest res://tools/perf/frame_probe.tscn hunting_forest {out}/hunting_forest.png --perf-scene=res://tools/world_shot.tscn --perf-name=hunting_forest --perf-csv={out}/perf_hf.csv
+shot perf_manor_garden res://tools/perf/frame_probe.tscn manor_garden_east {out}/manor_garden.png --perf-scene=res://tools/world_shot.tscn --perf-name=manor_garden --perf-csv={out}/perf_mg.csv
+shot perf_rose_garden res://tools/perf/frame_probe.tscn manor_rose_garden {out}/rose_garden.png --perf-scene=res://tools/world_shot.tscn --perf-name=rose_garden --perf-csv={out}/perf_rg.csv
