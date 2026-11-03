@@ -14,6 +14,10 @@ const PRESET_DIR := "res://world/shared/grades/"
 @export var focus: Node3D
 
 var current: GradePreset
+## Weather mist (T5, SpringWeather): added to the preset's volumetric fog
+## density, 0 by default, never above MAX_WEATHER_FOG. Presets stay untouched.
+const MAX_WEATHER_FOG := 0.04
+var weather_fog := 0.0
 ## The snow_cover / magic globals as last applied (global shader params can't
 ## be read back outside the editor).
 static var snow_cover_now := 1.0
@@ -81,6 +85,16 @@ func _process(delta: float) -> void:
 	_update_sun()
 
 
+## Mist from the weather, 0..MAX_WEATHER_FOG on top of the grade's own fog.
+func set_weather_fog(amount: float) -> void:
+	var clamped := clampf(amount, 0.0, MAX_WEATHER_FOG)
+	if is_equal_approx(clamped, weather_fog):
+		return
+	weather_fog = clamped
+	if current:
+		apply(current)
+
+
 static func load_preset(id: StringName) -> GradePreset:
 	var path := PRESET_DIR + String(id) + ".tres"
 	if not ResourceLoader.exists(path):
@@ -146,7 +160,7 @@ func apply(base: GradePreset) -> void:
 	env.fog_aerial_perspective = p.fog_aerial_perspective
 	env.volumetric_fog_anisotropy = p.volumetric_anisotropy
 	env.glow_hdr_threshold = p.glow_hdr_threshold
-	env.volumetric_fog_density = p.volumetric_density
+	env.volumetric_fog_density = p.volumetric_density + weather_fog
 	env.volumetric_fog_albedo = p.volumetric_albedo
 	env.volumetric_fog_ambient_inject = fog_ambient_inject(p.volumetric_ambient_inject, night)
 	env.tonemap_exposure = p.exposure
