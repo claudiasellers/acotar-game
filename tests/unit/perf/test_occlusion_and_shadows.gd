@@ -69,7 +69,9 @@ func test_shadow_profile_applies_to_world_suns_only() -> void:
 	assert_eq(sun.directional_shadow_max_distance, 160.0)
 	assert_eq(sun.directional_shadow_mode, DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS)
 	assert_eq(lamp.directional_shadow_max_distance, 20.0, "satchel/title lights untouched")
+	watch_signals(GameSettings)
 	GameSettings.shadow_profile = "high"
+	assert_signal_emitted_with_parameters(GameSettings, "shadow_profile_changed", ["high"])
 	assert_eq(sun.directional_shadow_max_distance, 220.0, "back to its own reach")
 	assert_eq(sun.directional_shadow_mode, DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS)
 	GameSettings.shadow_profile = old
