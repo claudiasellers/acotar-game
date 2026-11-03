@@ -6,6 +6,8 @@ class_name WolfEyeStage
 extends Node3D
 
 const WOLF := "res://creatures/models/great_wolf.gltf"
+const TREE := "res://world/spring_court/shared/models/winter_bare.glb"
+const BOUGH := "res://world/spring_court/shared/models/winter_bough.glb"
 const SEED := 1702
 
 var camera: Camera3D
@@ -52,25 +54,25 @@ func _ready() -> void:
 	add_child(ground)
 	var bark := MaterialLibrary.surface()
 	bark.albedo_color = Color(0.06, 0.05, 0.05)
+	# Real winter trees (lane L61): tools/woods/blender/woods_trees.py grows
+	# each trunk, limb and twig as one Skin-modifier surface, so nothing here
+	# is a cylinder. Two meshes, shared by every tree.
+	var tree_mesh := _near_mesh(TREE)
+	var bough_mesh := _near_mesh(BOUGH)
 	for i in 26:
-		var trunk := MeshInstance3D.new()
-		var cyl := CylinderMesh.new()
-		cyl.top_radius = rng.randf_range(0.12, 0.25)
-		cyl.bottom_radius = cyl.top_radius * 1.4
-		cyl.height = 14.0
-		trunk.mesh = cyl
-		trunk.material_override = bark
 		var a := rng.randf() * TAU
 		var r := rng.randf_range(2.5, 18.0)
-		trunk.position = Vector3(cos(a) * r, 7.0, sin(a) * r - 2.0)
-		add_child(trunk)
-	# The branch that sheds its snow.
+		var s := rng.randf_range(0.8, 1.2)
+		_tree(tree_mesh, bark, Vector3(cos(a) * r, 0.0, sin(a) * r - 2.0), rng.randf() * TAU, s)
+	# The tree the snow-laden bough grows from, just off the wolf's left.
+	_tree(tree_mesh, bark, Vector3(-2.4, 0.0, -1.2), 0.6, 1.0)
+	# The bough that sheds its snow: it spans x -2.1..0.3 at 2.6 m, the
+	# span the Shed particles cover.
 	var branch := MeshInstance3D.new()
-	var bb := BoxMesh.new()
-	bb.size = Vector3(2.4, 0.08, 0.1)
-	branch.mesh = bb
+	branch.name = "Bough"
+	branch.mesh = bough_mesh
 	branch.material_override = bark
-	branch.position = Vector3(-0.9, 2.6, -1.2)
+	branch.position = Vector3(-2.1, 2.6, -1.2)
 	branch.rotation_degrees.z = -8.0
 	add_child(branch)
 	add_child(_snowfall(Vector3(0, 6, 0), Vector3(8, 0.5, 8), 900, 7.0, Color(0.7, 0.75, 0.9, 0.6)))
@@ -105,6 +107,25 @@ func _ready() -> void:
 	add_child(camera)
 	camera.current = true
 	_aim(wolf_point if eye else Vector3(0, 1.4, -1.6))
+
+
+## The full-detail ("near") mesh of a woods_trees model.
+func _near_mesh(path: String) -> Mesh:
+	var root := (load(path) as PackedScene).instantiate()
+	var near := root.find_child("near", true, false) as MeshInstance3D
+	var mesh := near.mesh if near else null
+	root.free()
+	return mesh
+
+
+func _tree(mesh: Mesh, bark: Material, at: Vector3, yaw: float, s: float) -> void:
+	var trunk := MeshInstance3D.new()
+	trunk.mesh = mesh
+	trunk.material_override = bark
+	trunk.position = at
+	trunk.rotation.y = yaw
+	trunk.scale = Vector3.ONE * s
+	add_child(trunk)
 
 
 ## Frames the eyes: from where the head really is once the idle has posed it.
