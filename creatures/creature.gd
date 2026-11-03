@@ -35,6 +35,8 @@ var senses: CreatureSenses
 var harvestable: Harvestable
 ## Desired motion this frame, set by _think().
 var move_direction: Vector3 = Vector3.ZERO
+## Walk round walls on the navmesh when there is one (T5); off, it steers straight.
+@export var navigate: bool = true
 var move_speed: float = 0.0
 ## While true, scenes drive the creature and its brain is paused.
 var scripted: bool = false
@@ -109,6 +111,10 @@ func _think(_delta: float) -> void:
 
 func _move(delta: float) -> void:
 	var flat := Vector3(move_direction.x, 0.0, move_direction.z)
+	# Brains aim at a point (move_direction = target - position); far ones
+	# go round walls on the navmesh, near ones and bare directions go straight.
+	if navigate and move_speed > 0.0 and flat.length() >= NavMover.MIN_DISTANCE:
+		flat = NavMover.on(self).steer(global_position + flat)
 	var target := flat.normalized() * move_speed if flat.length_squared() > 0.0001 else Vector3.ZERO
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z).move_toward(target, maxf(move_speed, 2.0) * 3.0 * delta)
 	velocity.x = horizontal.x
