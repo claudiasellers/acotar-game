@@ -5,6 +5,7 @@
 [ext_resource type="Material" path="res://world/human_realm/village/materials/village_props.tres" id="3_nqila"]
 [ext_resource type="Material" path="res://world/shared/materials/stylized_flora.tres" id="4_uoei2"]
 [ext_resource type="Material" path="res://data/render/scene_materials/village_5b804.tres" id="candy_5b804"]
+[ext_resource type="Script" path="res://world/shared/occlusion/collider_occluders.gd" id="occl_t1"]
 
 [sub_resource type="Resource" id="Resource_0o0d3"]
 script = ExtResource("2_dqijt")
@@ -5582,3 +5583,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 607.6626, 3.981151, 2152.2988
 size = Vector3(40, 4, 40)
 shape = 0
 material = SubResource("FogMaterial_wlbxk")
+
+[node name="Occluders" type="Node3D" parent="."]
+script = ExtResource("occl_t1")
+prefixes = PackedStringArray("house_timber", "house_wattle", "house_long", "house_croft", "house_leanto", "meeting_hall", "debt_house", "barn_abandoned", "mill")
+exclude = PackedStringArray("mill_wheel")

@@ -1,0 +1,17 @@
+# Canonical shots (program brief P5). The lead judges every visual task
+# against these; tools/perf/frame_pass.sh measures each one.
+# name | scene | user args ({out} = a scratch folder for the scene's own PNGs)
+# world_shot ids are in tools/world_shot.gd SHOTS; the rest are existing shot scenes.
+manor_front    | res://tools/world_shot.tscn                 | manor_drive {out}/manor_front.png
+cottage        | res://tools/world_shot.tscn                 | cottage_snow {out}/cottage.png
+hunting_forest | res://tools/world_shot.tscn                 | hunting_forest {out}/hunting_forest.png
+village        | res://tools/world_shot.tscn                 | village_market {out}/village.png
+workshop       | res://tools/world_shot.tscn                 | burnt_estate {out}/workshop.png
+feyre_closeup  | res://tools/feyre_face_shot.tscn            | {out}
+wolf_closeup   | res://tools/creatures/wolf_look_shot.tscn   | {out}
+opening_film   | res://tools/film/opening_film_shot.tscn     | {out} noclip until=20
+rose_garden    | res://tools/world_shot.tscn                 | manor_rose_garden {out}/rose_garden.png
+spring_vista   | res://tools/world_shot.tscn                 | wall_crossing_spring {out}/spring_vista.png
+# Perf-only views (T1 acceptance: manor garden draw calls; occlusion in the house).
+manor_garden   | res://tools/world_shot.tscn                 | manor_garden_east {out}/manor_garden.png
+manor_interior | res://tools/manor_estate/room_shot.tscn     | entrance_hall {out}

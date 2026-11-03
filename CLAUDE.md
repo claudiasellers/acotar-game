@@ -120,3 +120,13 @@ See `tools/mq/` and `tools/mq/selftest.sh` for the rules they keep.
   LFS endpoint (see `.gitattributes`). Keep each file under 50 MB.
 - Heavy screenshots from the cloud go to the Mac's GPU: `docs/SHOTS.md`.
 - Style and lane rules: `docs/LANES.md`, `docs/contracts/`.
+
+## Rendering program rules (owner, 2026-11-03)
+
+- Godot 4.7.2 only. Never downgrade engine or addons.
+- Hero assets are never built from raw primitives; use the generator pipeline with
+  shade_smooth/Subsurf/Skin, or request an asset.
+- Visual tasks: acceptance is measurable (grep, CSV, pixel delta, GUT). Consistency checks
+  (same object identical across regions, no regression in canonical shots) are done by the
+  lead from shot renders. Taste tuning is deferred to ART.md.
+- Aesthetic values get a row in `docs/tuning.md`; the program log is `docs/program.md`.

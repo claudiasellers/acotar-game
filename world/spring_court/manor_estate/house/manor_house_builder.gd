@@ -105,8 +105,10 @@ static func _root(parent: Node3D) -> Node3D:
 ## The steps of the house, in the order they depend on each other. With a
 ## `pace` they wait for frames: nothing here may then need the scene tree.
 static func _fill(house: Node3D, all: ManorHouseIndex, cache: bool, pace: BuildPace) -> void:
+	_occluders.clear()
 	for room in all.rooms:
 		await _build_room(house, room, all, pace)
+	_emit_occluders(house)
 	for door in all.doors:
 		_build_door_leaf(house, door, all)
 		if pace:
@@ -172,6 +174,26 @@ static func _merge_meshes(house: Node3D, all: ManorHouseIndex, cache: bool, pace
 	await ManorMeshMerger.merge_paced([house], shell, 0.0, keep_apart + [_PropsMarker], "house_shell" if cache else "", pace)
 
 
+## Occlusion culling (program T1): every wall piece and floor/ceiling slab is
+## also a box occluder, one OccluderInstance3D per level, so rooms behind walls
+## and the storeys above and below are culled. Filled while rooms build.
+static var _occluders: Dictionary = {}
+
+
+static func _note_occluder(level: int, center: Vector3, size: Vector3) -> void:
+	if not _occluders.has(level):
+		_occluders[level] = OccluderMesh.new()
+	(_occluders[level] as OccluderMesh).add_box(Transform3D(Basis.IDENTITY, center), size)
+
+
+static func _emit_occluders(house: Node3D) -> void:
+	var levels := _occluders.keys()
+	levels.sort()
+	for level: int in levels:
+		(_occluders[level] as OccluderMesh).build(house, "Occluders_L%d" % level)
+	_occluders.clear()
+
+
 ## Nodes named "Props" hold already-merged prop meshes; the shell pass skips them.
 class _PropsMarker extends Node3D:
 	pass
@@ -190,12 +212,14 @@ static func _build_room(house: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 		for r in _subtract(room.rect, all.stair_holes_on(room.level)):
 			EstateKit.box(node, Vector3(r.get_center().x, y - SLAB * 0.5, r.get_center().y),
 					Vector3(r.size.x, SLAB, r.size.y), floor_mat)
+			_note_occluder(room.level, Vector3(r.get_center().x, y - SLAB * 0.5, r.get_center().y), Vector3(r.size.x, SLAB, r.size.y))
 		var ceil_mat := ManorRoomLook.ceiling_material(room, EstateKit.mat(room.wall_color.lightened(0.25), 0.9))
 		var ch := ceiling_of(room)
 		# Solid: rooms under the roof have nothing else over them, and her jumps reach 9 m.
 		for r in _subtract(room.rect, all.stair_holes_on(room.level + 1) if ch < storey_height(room.level) else []):
 			EstateKit.box(node, Vector3(r.get_center().x, y + ch + 0.05, r.get_center().y),
 					Vector3(r.size.x, 0.1, r.size.y), ceil_mat)
+			_note_occluder(room.level, Vector3(r.get_center().x, y + ch + 0.05, r.get_center().y), Vector3(r.size.x, 0.1, r.size.y))
 		_build_walls(node, room, all, y, ch)
 		ManorRoomFinish.add_curtains(node, room, all, y, ch)
 	var origin := Vector3(room.rect.position.x, y, room.rect.position.y)
@@ -299,6 +323,7 @@ static func _build_walls(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 			var c: Vector2 = a + dir * ((p[0] + p[1]) * 0.5) + n * WALL * 0.5
 			var size := Vector3(absf(dir.x) * seg_len + absf(n.x) * WALL, p[3] - p[2], absf(dir.y) * seg_len + absf(n.y) * WALL)
 			EstateKit.box(node, Vector3(c.x, y + (p[2] + p[3]) * 0.5, c.y), size, mat)
+			_note_occluder(room.level, Vector3(c.x, y + (p[2] + p[3]) * 0.5, c.y), size)
 			if exterior and not all.is_inside_any(room.level, a + dir * ((p[0] + p[1]) * 0.5) - n * 0.8):
 				var sc: Vector2 = a + dir * ((p[0] + p[1]) * 0.5) - n * SKIN * 0.5
 				var ssize := Vector3(absf(dir.x) * seg_len + absf(n.x) * SKIN, p[3] - p[2], absf(dir.y) * seg_len + absf(n.y) * SKIN)
