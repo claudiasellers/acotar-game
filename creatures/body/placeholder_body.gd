@@ -17,17 +17,20 @@ static func build(data: CreatureData) -> Node3D:
 
 ## Lane L61 (render program T4): a code-built body in place of a real model
 ## is a bug now that every species and cast member has one, so it is loud:
-## an error always, and in debug builds an assert stops on it. Tests that
-## mean to build one set `stand_ins_allowed`. The mesh helpers below (_mat,
-## _sphere, _cylinder, _box) stay free to use for props.
+## an error, and the count in `stand_ins_built` (tests/unit/creatures/
+## test_hero_meshes.gd fails on it). No assert: the owner plays debug builds,
+## and a missing file must not stop the game, so the stand-in still renders.
+## Tests that mean to build one set `stand_ins_allowed`. The mesh helpers
+## below (_mat, _sphere, _cylinder, _box) stay free to use for props.
 static var stand_ins_allowed := false
+static var stand_ins_built := 0
 
 
 static func stand_in(what: String) -> void:
 	if stand_ins_allowed:
 		return
+	stand_ins_built += 1
 	push_error("Code-built stand-in for %s: its model is missing" % what)
-	assert(stand_ins_allowed, "Code-built stand-in for %s: its model is missing" % what)
 
 
 static func _quadruped(data: CreatureData) -> Node3D:
