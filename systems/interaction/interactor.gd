@@ -199,8 +199,7 @@ func _nearest(nodes: Array) -> Node3D:
 ## (all are available), everything else goes in the bags.
 func _on_story_item_granted(item_id: StringName, count: int) -> void:
 	if WardrobeCatalog.piece(item_id):
-		if Gameplay.wardrobe.grant(item_id):
-			Juice.burst(feyre, &"outfit")
+		Gameplay.wardrobe.grant(item_id)   # WardrobeApplier sparkles it (L64)
 		return
 	if WardrobeCatalog.hair(item_id):
 		Juice.burst(feyre, &"unlock")

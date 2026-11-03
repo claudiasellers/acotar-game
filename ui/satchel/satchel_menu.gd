@@ -181,6 +181,8 @@ func _input(event: InputEvent) -> void:
 		close()
 	elif event.is_action_pressed(MapSettings.ACTION_OPEN):
 		_to_map()
+	elif _pad(event, JOY_BUTTON_Y) or _key(event, [KEY_W]):
+		_to_wardrobe()
 	elif _pad(event, JOY_BUTTON_LEFT_SHOULDER) or _key(event, [KEY_Q]):
 		flip(-1)
 	elif _pad(event, JOY_BUTTON_RIGHT_SHOULDER) or _key(event, [KEY_R]):
@@ -224,6 +226,15 @@ func _to_sketchbook() -> void:
 	var journal: Variant = load(SKETCHBOOK_SCRIPT)
 	if journal:
 		journal.open_from(tree)
+
+
+## Closes the satchel and opens the wardrobe on what she carries (L64).
+func _to_wardrobe() -> void:
+	var feyre := get_tree().get_first_node_in_group(&"player") as Feyre
+	if feyre == null:
+		return
+	close()
+	DressingRoom.open(feyre, DressingRoom.SATCHEL)
 
 
 func _watch_new() -> void:
@@ -281,6 +292,12 @@ func _build() -> void:
 		book.focus_mode = Control.FOCUS_NONE
 		book.pressed.connect(_to_sketchbook)
 		_flaps.add_child(book)
+	# L64: the small things she carries (crowns, jewellery, masks, cloaks, hair).
+	var dress := _button("Wardrobe", &"SatchelTab")
+	dress.name = "WardrobeFlap"
+	dress.focus_mode = Control.FOCUS_NONE
+	dress.pressed.connect(_to_wardrobe)
+	_flaps.add_child(dress)
 
 	_purse = _label("", &"SatchelSmall")
 	_purse.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -691,6 +708,7 @@ func _build_prompts() -> void:
 		pairs.append(["A" if pad else "E", verb])
 		pairs.append(["X" if pad else "1–4", "Pin"])
 	pairs.append(["LB RB" if pad else "Q R", "Pocket"])
+	pairs.append(["Y" if pad else "W", "Wardrobe"])
 	pairs.append(["B" if pad else "Esc", "Back"])
 	for p in pairs:
 		var row := HBoxContainer.new()
