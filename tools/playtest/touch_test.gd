@@ -8,6 +8,8 @@
 ##   fire   - stream in Blossom Vale, register its grass (TouchWorld), shoot a
 ##            fire arrow at a clump in a meadow: it spreads beyond the first
 ##            cells within 3 s
+##   scorch - the burnt squares' clumps are hidden and scorch decals lie there;
+##            after REGROW_HOURS in-game hours they grow back
 ##   wet    - a frost arrow soaks another meadow: it will not light; unloading
 ##            the region frees every ground cell
 ##   tools/mq/godot.sh res://tools/playtest/touch_test.tscn
@@ -156,6 +158,12 @@ func _check_fire() -> void:
 			"a fire arrow at a grass clump in Blossom Vale (%s) lit %d cells, the fire spread on after %.1f s, %d cells burning or burnt after %.0f s, %d flames, %d fuel squares in the region"
 			% [start.snapped(Vector3.ONE * 0.1), lit, spread_s, _touched(field, start, 20.0), spread_s + 5.0,
 			field.get_node("FireFx").flame_count(), fuel.square_count()])
+	var hidden := field.scorch.hidden_count()
+	var decals := field.scorch.decal_count()
+	var grew := field.regrow_due(field.game_hours() + ElementField.REGROW_HOURS + 0.1)
+	_record("scorch", hidden > 0 and decals > 0 and grew > 0 and field.scorch.hidden_count() == 0,
+			"burnt squares hid %d real grass clumps under %d scorch decals; %.0f in-game hours later %d squares grew back (%d clumps still hidden)"
+			% [hidden, decals, ElementField.REGROW_HOURS, grew, field.scorch.hidden_count()])
 	var wet_at: Vector3 = spots[1]
 	field.soak_at(wet_at, 1.8)  # a frost arrow
 	var wet_lit := field.ignite_at(wet_at, 1.2)
@@ -172,7 +180,10 @@ func _check_fire() -> void:
 ## Grass clumps in the middle of a meadow (every square round them has fuel), 40 m apart.
 func _meadow_spots(region: Node3D, fuel: GroundFuel, n: int) -> Array[Vector3]:
 	var out: Array[Vector3] = []
-	for layer in TouchWorld.scatter_layers(region):
+	var layers := []
+	for f in TouchWorld.scatter_fields(region):
+		layers.append_array((f as ScatterField).layers)
+	for layer in layers:
 		if GroundFuel.code_for(layer) != GroundFuel.GRASS:
 			continue
 		for i in range(0, layer.count(), 7):

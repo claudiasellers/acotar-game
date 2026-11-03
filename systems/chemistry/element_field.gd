@@ -13,7 +13,10 @@
 ## per-thing fire/wet/cold model for Feyre and her things is ElementState.
 ## Ground fuel: each loaded Spring region's grass, reeds and hay
 ## (add_ground / remove_ground, a GroundFuel grid built off the main thread);
-## its squares become cells only where fire or water arrives.
+## its squares become cells only where fire or water arrives. A burnt square
+## loses its clumps under an ash scorch (GroundScorch) and grows back after
+## REGROW_HOURS in-game hours. While a story scene runs (the weather's `held`)
+## fires burn down but do not spread.
 ## Rain raises one shared soak level instead of touching every cell, and the
 ## tick walks only the burning and node-following cells, so a region's worth
 ## of ground costs nothing until something happens there.
@@ -51,6 +54,8 @@ const MATERIALS := {
 	&"stone": {"fuel": 0.0, "flammable": false},
 }
 const MAX_BURNING := 64
+## In-game hours until burnt grass grows back (the scorch fades over the same time).
+const REGROW_HOURS := 4.0
 ## Stations with a live fire (manor hearths, the bread oven) and how far they reach.
 const FIRE_STATIONS: Array[StringName] = [&"hearth", &"bread_oven"]
 const FIRE_STATION_REACH := 1.1
@@ -78,6 +83,12 @@ var _ground: Dictionary = {}  # region id -> GroundFuel
 var _woken: Dictionary = {}  # Vector2i square -> [region id, PackedInt32Array cells]
 var _ground_gen: Dictionary = {}  # region id -> int (a newer add or a remove drops older builds)
 var _ground_tasks: Dictionary = {}  # task id -> true
+var _cell_square: Dictionary = {}  # ground cell id -> Vector2i square
+var _burnt_at: Dictionary = {}  # Vector2i square -> in-game hour it burnt
+## True while a story scene runs (SpringWeather.held): fires do not spread.
+var held := false
+var scorch: GroundScorch
+var _slow_left := 0.0
 ## Horizontal wind in m/s, read from the world each tick unless follow_world_wind is off.
 var wind: Vector3 = Vector3.ZERO
 var follow_world_wind := true
@@ -96,6 +107,9 @@ func _ready() -> void:
 	_fx = FireFx.new()
 	_fx.name = "FireFx"
 	add_child(_fx)
+	scorch = GroundScorch.new()
+	scorch.name = "Scorch"
+	add_child(scorch)
 	ignited.connect(func(id: int) -> void: _fx.light(id, _pos[id], _node[id] as Node3D))
 	extinguished.connect(func(id: int) -> void: _fx.douse(id, true))
 	burnt_out.connect(_on_burnt_out)
@@ -155,6 +169,7 @@ func remove_cell(id: int) -> void:
 		if _fx:
 			_fx.douse(id, false)
 	_tracked.erase(id)
+	_cell_square.erase(id)
 	_alive[id] = 0
 	_node[id] = null
 	_fire[id] = 0.0
@@ -198,31 +213,35 @@ func burning_count() -> int:
 
 # --- ground fuel --------------------------------------------------------------
 
-## Registers a region's flammable scatter (GroundFuel.pick: grass, reeds, hay).
+## Registers a region's flammable scatter (the grass, reeds and hay of its
+## ScatterFields, GroundFuel.pick) with story anchor `clear`ings left out.
 ## The grid is built on a worker thread unless `threaded` is off; until it
 ## lands the region's ground does not burn.
-func add_ground(region_id: StringName, layers: Array, threaded: bool = true) -> void:
+func add_ground(region_id: StringName, fields: Array, clear: Array[Vector3] = [], threaded: bool = true) -> void:
 	var gen: int = _ground_gen.get(region_id, 0) + 1
 	_ground_gen[region_id] = gen
-	var picked := GroundFuel.pick(layers)
-	if picked.is_empty():
+	var picked := GroundFuel.pick(fields)
+	var data: Array = picked["data"]
+	var refs: Array = picked["refs"]
+	if data.is_empty():
 		return
 	if not threaded:
-		_land_ground(region_id, gen, GroundFuel.build(region_id, picked), [-1])
+		_land_ground(region_id, gen, GroundFuel.build(region_id, data, clear), refs, [-1])
 		return
 	var me: WeakRef = weakref(self)
-	var task_box := [-1]  # read on the main thread, after add_task has returned
+	var task_box: Array = [-1]  # read on the main thread, after add_task has returned
 	task_box[0] = WorkerThreadPool.add_task(func() -> void:
-		var fuel := GroundFuel.build(region_id, picked)
+		var fuel := GroundFuel.build(region_id, data, clear)
 		var field := me.get_ref() as ElementField
 		if field:
-			field._land_ground.call_deferred(region_id, gen, fuel, task_box))
+			field._land_ground.call_deferred(region_id, gen, fuel, refs, task_box))
 	_ground_tasks[task_box[0]] = true
 
 
 ## Drops a region's ground and every cell made from it (it streamed out).
 func remove_ground(region_id: StringName) -> void:
 	_ground_gen[region_id] = int(_ground_gen.get(region_id, 0)) + 1
+	scorch.clear_region(region_id, _ground.get(region_id) as GroundFuel)
 	_ground.erase(region_id)
 	for key: Vector2i in _woken.keys():
 		var entry: Array = _woken[key]
@@ -230,6 +249,7 @@ func remove_ground(region_id: StringName) -> void:
 			for id in (entry[1] as PackedInt32Array):
 				remove_cell(id)
 			_woken.erase(key)
+			_burnt_at.erase(key)
 
 
 func has_ground(region_id: StringName) -> bool:
@@ -245,14 +265,41 @@ func ground_pending() -> bool:
 	return not _ground_tasks.is_empty()
 
 
-func _land_ground(region_id: StringName, gen: int, fuel: GroundFuel, task_box: Array) -> void:
+func _land_ground(region_id: StringName, gen: int, fuel: GroundFuel, refs: Array, task_box: Array) -> void:
 	var task: int = task_box[0]
 	if _ground_tasks.has(task):
 		WorkerThreadPool.wait_for_task_completion(task)
 		_ground_tasks.erase(task)
 	if gen != int(_ground_gen.get(region_id, 0)) or fuel.square_count() == 0:
 		return
+	fuel.refs = refs
 	_ground[region_id] = fuel
+
+
+## Burnt squares older than REGROW_HOURS grow back: clumps show, the square's
+## cells go and it can burn again. Returns how many grew back.
+func regrow_due(hours: float) -> int:
+	var n := 0
+	for key: Vector2i in _burnt_at.keys():
+		if hours - float(_burnt_at[key]) < REGROW_HOURS:
+			continue
+		scorch.regrow(key)
+		_burnt_at.erase(key)
+		var entry: Array = _woken.get(key, [])
+		if not entry.is_empty():
+			for id in (entry[1] as PackedInt32Array):
+				remove_cell(id)
+			_woken.erase(key)
+		n += 1
+	return n
+
+
+## The in-game hour (Clock: day x 24 + hour); one real minute per hour without it.
+func game_hours() -> float:
+	var clock := Gameplay.autoload(&"Clock")
+	if clock:
+		return float(clock.get(&"day")) * 24.0 + float(clock.call(&"hour"))
+	return Time.get_ticks_msec() / 60000.0
 
 
 ## Turns the fuel squares within `radius` of `pos` into cells (four per
@@ -277,7 +324,9 @@ func _wake_ground(pos: Vector3, radius: float) -> void:
 				var ids := PackedInt32Array()
 				for q: Vector2 in [Vector2(1, 1), Vector2(3, 1), Vector2(1, 3), Vector2(3, 3)]:
 					var at := Vector3(x * GroundFuel.STEP + q.x * quarter, y, z * GroundFuel.STEP + q.y * quarter)
-					ids.append(add_cell(at, GroundFuel.MATERIALS[code]))
+					var cell := add_cell(at, GroundFuel.MATERIALS[code])
+					_cell_square[cell] = key
+					ids.append(cell)
 				_woken[key] = [region_id, ids]
 				break
 
@@ -336,7 +385,14 @@ func _physics_process(delta: float) -> void:
 	_tick_left += TICK
 	if follow_world_wind:
 		wind = _world_wind()
+	held = _story_held()
 	step(TICK)
+	_slow_left -= TICK
+	if _slow_left <= 0.0:
+		_slow_left = 1.0
+		var hours := game_hours()
+		scorch.fade(hours, REGROW_HOURS)
+		regrow_due(hours)
 	if _overlay and _overlay.visible:
 		_overlay.redraw(self)
 
@@ -371,6 +427,8 @@ func step(dt: float) -> void:
 			burnt_out.emit(id)
 			_sync_node(id)
 			continue
+		if held:
+			continue  # a story scene runs: fires burn down but do not spread
 		# ...and heats and dries the dry neighbours, further downwind (rule 2).
 		for n in cells_near(_pos[id], reach):
 			if n == id or _fire[n] > 0.0 or _fuel[n] <= 0.0:
@@ -481,6 +539,12 @@ func _sync_node(id: int) -> void:
 		prop.wet = _wet[id]
 
 
+## A story scene runs (the spring weather steps aside for it, and so does fire).
+func _story_held() -> bool:
+	var spring := get_tree().get_first_node_in_group(&"spring_weather") if is_inside_tree() else null
+	return spring != null and bool(spring.get(&"held"))
+
+
 ## Wind in m/s: a Weather node's when there is one, else the spring weather's gusts.
 func _world_wind() -> Vector3:
 	if not is_inside_tree():
@@ -496,6 +560,17 @@ func _world_wind() -> Vector3:
 
 func _on_burnt_out(id: int) -> void:
 	_fx.douse(id, false)
+	# Burnt grass: the square's clumps go and the ground is scorched.
+	var key: Variant = _cell_square.get(id)
+	if key != null and not _burnt_at.has(key):
+		var entry: Array = _woken.get(key, [])
+		var fuel := _ground.get(entry[0]) as GroundFuel if not entry.is_empty() else null
+		if fuel:
+			var k: Vector2i = key
+			var at := Vector3((k.x + 0.5) * GroundFuel.STEP, fuel.height_at(k), (k.y + 0.5) * GroundFuel.STEP)
+			var hours := game_hours()
+			_burnt_at[k] = hours
+			scorch.burn(entry[0], fuel, k, at, hours)
 	# A burnt-out crate or log falls to ash.
 	var prop := _node[id] as Prop
 	if prop and is_instance_valid(prop):
