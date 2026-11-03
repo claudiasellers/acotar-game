@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_spit_roast"
+display_name = "Spit roast"
+note = "Crackling skin, fat in the flames. Nothing wasted."
+methods = Array[StringName]([&"roast"])
+kind = &""
+need = {
+&"hunger_relief": 0.15
+}
+forbid = Array[StringName]([])
+priority = 0
+element = &""
+color = Color(0.816, 0.541, 0.306, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_rabbit"])
+canon = "C?"

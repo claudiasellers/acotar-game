@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_starlight_steep"
+display_name = "Starlight steep"
+note = "Pool water at midnight. The arrow burns white where it lands."
+methods = Array[StringName]([&"steep"])
+kind = &""
+need = {
+&"bright": 1.5
+}
+forbid = Array[StringName]([])
+priority = 5
+element = &""
+color = Color(1.000, 0.953, 0.769, 1)
+witness_station = &"starlight_pool"
+witness = Array[StringName]([&"ing_starlight_water", &"ing_honey"])
+canon = "X"

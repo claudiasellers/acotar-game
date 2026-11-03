@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_clear_eye_tea"
+display_name = "Clear-eye tea"
+note = "Sharp and green. Every track in the snow stands up to be read."
+methods = Array[StringName]([&"infuse"])
+kind = &""
+need = {
+&"keen": 1.2
+}
+forbid = Array[StringName]([])
+priority = 6
+element = &""
+color = Color(0.498, 0.627, 0.478, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_pine_needles"])
+canon = "X"

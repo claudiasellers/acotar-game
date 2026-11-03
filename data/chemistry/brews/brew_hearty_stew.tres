@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hearty_stew"
+display_name = "Hearty stew"
+note = "Heavy and good. My arms will thank me at full draw."
+methods = Array[StringName]([&"stew"])
+kind = &""
+need = {
+&"strong": 1.5,
+&"hunger_relief": 0.2
+}
+forbid = Array[StringName]([])
+priority = 4
+element = &""
+color = Color(0.627, 0.384, 0.227, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_venison", &"ing_hazelnut"])
+canon = "X"

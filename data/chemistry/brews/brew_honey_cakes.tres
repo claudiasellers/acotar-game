@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_honey_cakes"
+display_name = "Honey cakes"
+note = "Sticky, golden, gone in three bites."
+methods = Array[StringName]([&"bake"])
+kind = &""
+need = {
+&"heal": 0.2,
+&"swift": 0.5
+}
+forbid = Array[StringName]([])
+priority = 4
+element = &""
+color = Color(0.957, 0.835, 0.553, 1)
+witness_station = &"manor_kitchen"
+witness = Array[StringName]([&"ing_honey", &"ing_cherry_blossom", &"ing_wild_strawberry"])
+canon = "X"

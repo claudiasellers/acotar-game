@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hedgerow_preserve"
+display_name = "Hedgerow preserve"
+note = "Summer in a jar. It will keep long after the fruit is gone."
+methods = Array[StringName]([&"preserve"])
+kind = &""
+need = {
+&"hunger_relief": 0.08
+}
+forbid = Array[StringName]([])
+priority = 0
+element = &""
+color = Color(0.557, 0.231, 0.420, 1)
+witness_station = &"manor_kitchen"
+witness = Array[StringName]([&"ing_blackberry", &"ing_wild_strawberry", &"ing_salt"])
+canon = "X"

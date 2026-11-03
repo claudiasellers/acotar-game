@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_quickfoot_tea"
+display_name = "Quickfoot tea"
+note = "Nectar and sunlight. I could run to the Wall and back."
+methods = Array[StringName]([&"infuse"])
+kind = &""
+need = {
+&"swift": 1.2
+}
+forbid = Array[StringName]([])
+priority = 4
+element = &""
+color = Color(0.965, 0.867, 0.549, 1)
+witness_station = &"manor_kitchen"
+witness = Array[StringName]([&"ing_honeysuckle"])
+canon = "X"

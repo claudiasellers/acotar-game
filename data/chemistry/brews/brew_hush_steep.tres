@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hush_steep"
+display_name = "Hush steep"
+note = "Whatever it touches forgets to stay awake."
+methods = Array[StringName]([&"steep"])
+kind = &""
+need = {
+&"quiet": 1.5
+}
+forbid = Array[StringName]([])
+priority = 5
+element = &""
+color = Color(0.616, 0.561, 0.812, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_hollow_root", &"ing_lavender"])
+canon = "X"

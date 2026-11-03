@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hush_draught"
+display_name = "Hush draught"
+note = "No scent, no sound. Let the wolves sniff at nothing."
+methods = Array[StringName]([&"distill"])
+kind = &""
+need = {
+&"quiet": 2.0
+}
+forbid = Array[StringName]([])
+priority = 5
+element = &""
+color = Color(0.663, 0.604, 0.847, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_lavender", &"ing_wild_hyacinth"])
+canon = "X"

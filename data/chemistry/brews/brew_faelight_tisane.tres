@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_faelight_tisane"
+display_name = "Faelight tisane"
+note = "It glows in the cup. It glows in me. The edges of things go soft."
+methods = Array[StringName]([&"infuse"])
+kind = &""
+need = {
+&"bright": 1.0,
+&"fae_toll": 0.4
+}
+forbid = Array[StringName]([])
+priority = 7
+element = &""
+color = Color(0.851, 0.824, 1.000, 1)
+witness_station = &"fae_potion_room"
+witness = Array[StringName]([&"ing_moonflower", &"ing_glowcap"])
+canon = "X"

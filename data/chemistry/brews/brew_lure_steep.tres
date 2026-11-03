@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_lure_steep"
+display_name = "Lure steep"
+note = "Sweet enough to bring anything hungry to where it lands."
+methods = Array[StringName]([&"steep"])
+kind = &""
+need = {
+&"heal": 0.2
+}
+forbid = Array[StringName]([&"warm", &"cool", &"quiet", &"bright"])
+priority = 1
+element = &""
+color = Color(0.969, 0.659, 0.722, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_honey", &"ing_wild_strawberry"])
+canon = "X"

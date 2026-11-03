@@ -12,6 +12,9 @@ const LIGHT_GROUP := &"arrow_light"
 const LIGHT_SECONDS := 45.0
 const FLAME_SECONDS := 6.0
 const ROPE_MAX_LENGTH := 14.0
+## How far a fire or frost arrow reaches into the ElementField where it lands.
+const FIRE_REACH := 1.2
+const FROST_REACH := 1.8
 
 
 static func apply(arrow: Arrow, target: Node, at: Vector3) -> void:
@@ -27,11 +30,13 @@ static func apply(arrow: Arrow, target: Node, at: Vector3) -> void:
 			if elements:
 				elements.ignite(0.8)
 			_light(arrow, at, Color(1.0, 0.55, 0.2), 2.5, 4.0, FLAME_SECONDS)
+			_to_field(arrow, at, &"fire")
 		&"frost":
 			if elements:
 				elements.soak(0.4)
 				elements.chill(0.6)
 			_light(arrow, at, Color(0.7, 0.9, 1.0), 0.8, 2.5, 2.0)
+			_to_field(arrow, at, &"water")
 		&"light":
 			_light(arrow, at, Color(1.0, 0.95, 0.75), 1.6, 9.0, LIGHT_SECONDS)
 		&"signal":
@@ -39,6 +44,18 @@ static func apply(arrow: Arrow, target: Node, at: Vector3) -> void:
 			Gameplay.emit(&"signal_flare", [at])
 		&"rope":
 			rope_anchor(arrow, at)
+
+
+## L62: a fire steep's arrow lights what is dry and flammable where it lands
+## (L59's ElementField: grass, hay, crates); a rime steep's arrow soaks and
+## puts out fire there. Returns how many cells it reached.
+static func _to_field(arrow: Arrow, at: Vector3, element: StringName) -> int:
+	var field := ElementField.find(arrow.get_tree()) if arrow.is_inside_tree() else null
+	if field == null:
+		return 0
+	if element == &"fire":
+		return field.ignite_at(at, FIRE_REACH)
+	return field.soak_at(at, FROST_REACH, 0.8)
 
 
 ## The target's ElementState: itself, or a direct child of that type.

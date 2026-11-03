@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_iron_will_tincture"
+display_name = "Iron-will tincture"
+note = "Nesta never needed a bottle for this. I do. Glamour slides, and I see the seams."
+methods = Array[StringName]([&"tincture"])
+kind = &""
+need = {
+&"keen": 2.0,
+&"steady": 1.5
+}
+forbid = Array[StringName]([])
+priority = 6
+element = &""
+color = Color(0.561, 0.639, 0.839, 1)
+witness_station = &"fae_potion_room"
+witness = Array[StringName]([&"ing_lilac", &"ing_juniper_berry", &"ing_woad"])
+canon = "X"

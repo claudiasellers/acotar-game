@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_rime_steep"
+display_name = "Rime steep"
+note = "Frost blooms where it lands. Even a fire gives up under it."
+methods = Array[StringName]([&"steep"])
+kind = &""
+need = {
+&"cool": 1.5
+}
+forbid = Array[StringName]([])
+priority = 2
+element = &"water"
+color = Color(0.663, 0.863, 0.949, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_snowdrop", &"ing_wintergreen", &"ing_clay"])
+canon = "X"

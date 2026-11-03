@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_hunters_stew"
+display_name = "Hunter's stew"
+note = "Thick enough to stand a spoon in. Warmth that lasts the whole walk out."
+methods = Array[StringName]([&"stew"])
+kind = &""
+need = {
+&"warm": 2.5,
+&"hunger_relief": 0.2
+}
+forbid = Array[StringName]([])
+priority = 2
+element = &""
+color = Color(0.761, 0.439, 0.239, 1)
+witness_station = &"hearth"
+witness = Array[StringName]([&"ing_venison", &"ing_chaga"])
+canon = "C?"

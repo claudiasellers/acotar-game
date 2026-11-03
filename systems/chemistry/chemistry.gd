@@ -8,6 +8,8 @@
 ##   fae-safe station). It reads as faerie-wine giddiness, not poison.
 ## - Bind is required for salves and steeps; it is structural, not an effect.
 ## - Ash is apply-only: it never goes into the pot (arrows only).
+## Named brews (BrewBook, lane L62) are recognised from the result's effects,
+## not from a recipe: result.brew is the BrewRule id ("" when none matches).
 class_name Chemistry
 extends RefCounted
 
@@ -54,7 +56,7 @@ static func combine(ingredients: Array[IngredientData], station: StationData, me
 		return i.pigment != &"" or i.has_tag(&"bind"))
 	var any_pigment := ingredients.any(func(i: IngredientData) -> bool: return i.pigment != &"")
 	if method == &"infuse" and all_pigment and any_pigment:
-		return _pigment(ingredients)
+		return _with_brew(_pigment(ingredients), ingredients)
 	for i in ingredients:
 		if i.is_apply_only():
 			return fail.call("%s never goes in the pot" % i.display_name)
@@ -110,7 +112,26 @@ static func combine(ingredients: Array[IngredientData], station: StationData, me
 		"kind": _kind(method, nutrition, vital),
 	}
 	result["name"] = dish_name(method, ingredients)
+	return _with_brew(result, ingredients)
+
+
+## Tags the result with the brew it is. A named DishData keeps its name; any
+## other result takes the brew's name instead of a generated one.
+static func _with_brew(result: Dictionary, ingredients: Array[IngredientData]) -> Dictionary:
+	var brew := BrewBook.match_result(result)
+	result["brew"] = brew.id if brew else &""
+	result["element"] = brew.element if brew else &""
+	if brew and result.kind != &"pigment" and not _named_dish(StringName(result.method), ingredients):
+		result["name"] = brew.display_name
 	return result
+
+
+static func _named_dish(method: StringName, ingredients: Array[IngredientData]) -> bool:
+	var ids := ingredients.map(func(i: IngredientData) -> StringName: return i.id)
+	for dish in dishes():
+		if dish.method == method and dish.required.all(func(r: StringName) -> bool: return ids.has(r)):
+			return true
+	return false
 
 
 ## Tag -> reinforced magnitude.

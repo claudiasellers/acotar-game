@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BrewRule" format=3]
+
+[ext_resource type="Script" path="res://data/chemistry/brew_rule.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"brew_healing_salve"
+display_name = "Healing salve"
+note = "For bites that won't close and wounds magic can't mend."
+methods = Array[StringName]([&"salve"])
+kind = &""
+need = {
+&"heal": 0.3
+}
+forbid = Array[StringName]([])
+priority = 1
+element = &""
+color = Color(0.953, 0.780, 0.643, 1)
+witness_station = &"stillroom"
+witness = Array[StringName]([&"ing_willow_bark", &"ing_honey"])
+canon = "C?"
