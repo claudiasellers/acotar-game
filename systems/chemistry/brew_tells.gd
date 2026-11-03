@@ -16,11 +16,13 @@ const FULL := 3.0
 ## tag -> look (colour, size, count, where, drift)
 const TELLS := {
 	&"bright": {"color": Color(1.0, 0.97, 0.88, 0.9), "size": 0.03, "amount": 40, "lifetime": 3.0,
-		"at": Vector3(0, 1.1, 0), "box": Vector3(1.4, 0.9, 1.4), "velocity": 0.05, "gravity": Vector3(0, 0.02, 0)},
+		"at": Vector3(0, 1.1, 0), "box": Vector3(1.4, 0.9, 1.4), "velocity": 0.05, "gravity": Vector3(0, 0.02, 0),
+		"glint": true},
 	&"warm": {"color": Color(1.0, 0.9, 0.86, 0.1), "size": 0.14, "amount": 8, "lifetime": 1.8,
 		"at": Vector3(0, 1.45, 0), "box": Vector3(0.25, 0.05, 0.12), "velocity": 0.25, "gravity": Vector3(0, 0.15, 0)},
 	&"cool": {"color": Color(0.96, 0.98, 1.0, 0.9), "size": 0.016, "amount": 24, "lifetime": 1.6,
-		"at": Vector3(0, 1.05, 0), "box": Vector3(0.38, 0.25, 0.15), "velocity": 0.04, "gravity": Vector3(0, -0.35, 0)},
+		"at": Vector3(0, 1.05, 0), "box": Vector3(0.38, 0.25, 0.15), "velocity": 0.04, "gravity": Vector3(0, -0.35, 0),
+		"glint": true},
 }
 
 static var _soft: GradientTexture2D = null
@@ -82,6 +84,16 @@ static func _particles(look: Dictionary) -> GPUParticles3D:
 	mat.gravity = look.gravity
 	mat.scale_min = 0.6
 	mat.scale_max = 1.3
+	var glint := bool(look.get("glint", false))
+	if glint:
+		# Flecks tumble instead of facing the camera, so each one flashes
+		# pale as it turns into the light, like real dust in a sunbeam, and
+		# never reads as a dark speck against a bright sky when backlit.
+		mat.particle_flag_rotate_y = true
+		mat.angle_min = 0.0
+		mat.angle_max = 360.0
+		mat.angular_velocity_min = -180.0
+		mat.angular_velocity_max = 180.0
 	var grad := Gradient.new()
 	var c: Color = look.color
 	grad.set_color(0, Color(c, 0.0))
@@ -97,7 +109,12 @@ static func _particles(look: Dictionary) -> GPUParticles3D:
 	var m := MaterialLibrary.surface()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.vertex_color_use_as_albedo = true
-	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	if glint:
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		m.roughness = 0.25
+		m.glitter = 0.6
+	else:
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	m.disable_receive_shadows = true
 	# A soft round fleck, not a square; ambient-lit so it reads pale, not grey.
 	m.albedo_texture = soft_dot()
