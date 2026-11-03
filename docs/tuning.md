@@ -43,3 +43,4 @@ direct highlight), `CANDY_LOBES`/`CANDY_COAT` (per-pixel light rim and clearcoat
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | `GameSettings.shadow_profile` | systems/settings/game_settings.gd:SHADOW_PROFILES (`--shadow-profile=` user arg) | auto (mac on Apple silicon: 2048 atlas / 2 splits / 160 m; high: 4096 / 4 splits / 220 m) | high, mac | Sun shadow crispness and reach on world-scale suns (shadow distance ≥150 m) | L57 |
+| `manor_interior` fog/volumetric density, glow, ambient_color, saturation | world/shared/grades/manor_interior.tres | fog 0, volumetric 0, glow 0.3 / bloom 0 / threshold 1.4, ambient (0.92, 0.90, 0.88), saturation 1.05 | volumetric 0..0.008 | Clear indoor air; raise volumetric_density for haze | T075 |
