@@ -18,7 +18,7 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
-const SHOT_PAGES: Array[StringName] = [&"satchel", &"collection", &"map"]
+const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook"]
 
 var feyre: Feyre
 
@@ -108,9 +108,33 @@ func _shots(dir: String) -> void:
 		for i in 90:
 			await get_tree().process_frame
 		await RenderingServer.frame_post_draw
+		_check_overlap(page)
 		var path := dir.path_join("menu_shell_%s.png" % page)
 		get_viewport().get_texture().get_image().save_png(path)
 		print("menu_open_probe: shot ", path)
 		_close()
 		for i in 4:
 			await get_tree().process_frame
+
+
+## Prints how far the tab strip reaches into the page's own panels and titles
+## (0 = clear): every visible Control of the page smaller than the screen.
+func _check_overlap(page: StringName) -> void:
+	var shell := MenuShell.of(get_tree())
+	var strip := shell.get_node(^"ShellRoot/TabStrip") as Control
+	var strip_rect := strip.get_global_rect()
+	var screen := get_viewport().get_visible_rect().size
+	var worst := 0.0
+	var who := ""
+	for c in shell.current.find_children("*", "Control", true, false):
+		var ctl := c as Control
+		if not ctl.is_visible_in_tree() or not (ctl is PanelContainer or ctl is Label):
+			continue
+		var r := ctl.get_global_rect()
+		if r.size.y >= screen.y - 1.0 or r.size.x <= 0.0:
+			continue
+		var hit := r.intersection(strip_rect)
+		if hit.size.y > worst:
+			worst = hit.size.y
+			who = String(ctl.get_path()).get_file()
+	print("menu_open_probe: %-10s strip overlap %.0f px %s (screen %s)" % [page, worst, who, screen])

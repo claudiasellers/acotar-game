@@ -148,7 +148,8 @@ func test_collection_book_opens_on_j_and_closes() -> void:
 	var press := InputEventAction.new()
 	press.action = &"open_collection"
 	press.pressed = true
-	feyre.interactor._unhandled_input(press)
+	# J is the menu shell's: the collection book is its collection tab.
+	MenuShell.of(get_tree())._input(press)
 	assert_true(ui.is_open(), "J opens the book")
 	assert_true(feyre.get_tree().paused)
 	await wait_frames(2)

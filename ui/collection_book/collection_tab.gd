@@ -1,16 +1,24 @@
 ## The collection book as a page of the menu shell (MenuShell): built once,
 ## its grid redrawn only when another of the book's tabs is shown or its
 ## entries changed. J (pad Back) opens it; Z / X (pad LT / RT) flip the book's
-## own tabs, as the satchel's pockets. The look is the book's own (UiStyle).
+## own tabs, as the satchel's pockets. The look is the satchel's (SatchelTheme:
+## framed paper, stitched tabs and slots, the serif); no colours or fonts here.
 class_name CollectionTab
 extends MenuTab
 
 const UI := preload("res://ui/collection_book/collection_book_ui.gd")
-const WIDTH := 980.0
+const WIDTH := 1260.0
+const GRID_HEIGHT := 520.0
+## Clear space under the card.
+const BOTTOM := 40.0
 
-var book: CollectionBook
+## Always the live book (Gameplay.reset makes a new one).
+var book: CollectionBook:
+	get:
+		return Gameplay.collection
 var page: StringName = &""
 
+var _root: Control
 var _card: Control
 var _buttons: Dictionary = {}  # tab -> Button
 var _bar: ProgressBar
@@ -19,6 +27,7 @@ var _reward: Label
 var _grid: GridContainer
 var _detail: Label
 ## The book tab whose tiles are in the grid, and whether they need drawing again.
+var _watched: CollectionBook = null
 var _drawn_tab: StringName = &""
 var _stale: bool = true
 
@@ -45,11 +54,20 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	book = Gameplay.collection
 	_build()
+	_watch()
+
+
+## Redraws (in the background) when the book finds something new.
+func _watch() -> void:
+	if _watched == book:
+		return
+	_watched = book
+	_stale = true
 	book.discovered.connect(func(_id: StringName, _tab: StringName) -> void:
 		_stale = true
-		MenuShell.of(get_tree()).queue_warm(self))
+		if is_inside_tree():
+			MenuShell.of(get_tree()).queue_warm(self))
 
 
 func available() -> bool:
@@ -61,6 +79,8 @@ func has_news() -> bool:
 
 
 func _shown() -> void:
+	_root.theme = SatchelTheme.theme()
+	_watch()
 	FindCard.clear(get_tree())
 	show_page(_first_page())
 	Juice.bounce_control(_card, 0.03)
@@ -81,7 +101,8 @@ func _first_page() -> StringName:
 ## While the shell is closed: lay out the tiles of the page it will open on.
 func warm_jobs() -> Array[Callable]:
 	return [func() -> void:
-		if book and not is_open():
+		if not is_open():
+			_watch()
 			_draw_tiles(_first_page())]
 
 
@@ -132,53 +153,68 @@ func _page_input(event: InputEvent) -> bool:
 
 
 func _build() -> void:
+	_root = Control.new()
+	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.theme = SatchelTheme.theme()
+	add_child(_root)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	center.offset_top = page_top()
+	center.offset_bottom = -BOTTOM
+	_root.add_child(center)
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
+	panel.theme_type_variation = &"SatchelDetail"
 	panel.custom_minimum_size = Vector2(WIDTH, 0)
 	center.add_child(panel)
 	_card = panel
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override(&"separation", 10)
 	panel.add_child(box)
-	box.add_child(UiStyle.label("My collection", 28))
-	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override(&"separation", 6)
+	box.add_child(_label("My collection", &"SatchelHeading"))
+	var tabs := HFlowContainer.new()
+	tabs.add_theme_constant_override(&"h_separation", 8)
+	tabs.add_theme_constant_override(&"v_separation", 6)
 	box.add_child(tabs)
 	_bar = ProgressBar.new()
-	_bar.custom_minimum_size = Vector2(0, 18)
+	_bar.theme_type_variation = &"SatchelMeter"
+	_bar.custom_minimum_size = Vector2(0, 16)
 	_bar.show_percentage = false
-	_bar.add_theme_stylebox_override(&"fill", UI._rounded(UiStyle.ACCENT))
-	_bar.add_theme_stylebox_override(&"background", UI._rounded(Color(1, 1, 1, 0.8)))
 	box.add_child(_bar)
 	var count_row := HBoxContainer.new()
 	box.add_child(count_row)
-	_count = UiStyle.label("", 16)
+	_count = _label("", &"SatchelSmall")
 	_count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_count.autowrap_mode = TextServer.AUTOWRAP_OFF
 	count_row.add_child(_count)
-	_reward = UiStyle.label("", 16)
+	_reward = _label("", &"SatchelWhere")
 	_reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_reward.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_reward.add_theme_color_override(&"font_color", Color(0.72, 0.52, 0.18))
 	count_row.add_child(_reward)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 470)
+	scroll.custom_minimum_size = Vector2(0, GRID_HEIGHT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	_grid = GridContainer.new()
-	_grid.columns = 7
+	_grid.columns = 8
 	_grid.add_theme_constant_override(&"h_separation", 10)
 	_grid.add_theme_constant_override(&"v_separation", 10)
 	scroll.add_child(_grid)
-	_detail = UiStyle.label("", 16)
+	_detail = _label("", &"SatchelBody")
+	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_detail)
 	for tab in CollectionBook.TABS:
-		var b := UiStyle.button("", true)
+		var b := Button.new()
+		b.theme_type_variation = &"SatchelTab"
+		b.toggle_mode = true
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_page.bind(tab))
 		tabs.add_child(b)
 		_buttons[tab] = b
 	UI._refresh_labels(_buttons, book)
+
+
+func _label(text: String, variation: StringName) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.theme_type_variation = variation
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l

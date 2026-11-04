@@ -310,13 +310,10 @@ func _build() -> void:
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.theme = SatchelTheme.theme()
 	add_child(_root)
-	var scrim := ColorRect.new()
-	scrim.color = SatchelTheme.color(&"scrim")
-	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(scrim)
-
+	# The menu shell dims the world; the book sits below its tab strip.
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.offset_top = page_top()
 	_root.add_child(center)
 	var holder := Control.new()
 	holder.custom_minimum_size = Vector2(PAGE.x * 2.0 + SPINE, PAGE.y)

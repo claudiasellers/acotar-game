@@ -51,20 +51,18 @@ static func _refresh_labels(buttons: Dictionary, book: CollectionBook) -> void:
 		(buttons[tab] as Button).text = text
 
 
+## One entry: a stitched slot with its picture (a lilac silhouette until
+## found), its name or where to look, and a "new" pin that bounces once.
 static func _tile(e: Dictionary, detail: Label) -> Control:
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = TILE
-	var style := UiStyle.panel_box()
-	style.set_content_margin_all(8)
-	style.set_corner_radius_all(16)
-	style.shadow_size = 4
-	style.bg_color = Color(1, 1, 1, 0.92) if e.found else Color(0.95, 0.94, 0.96, 0.85)
-	style.border_color = UiStyle.ACCENT if e.new else (ItemIcon.GOLD if e.found and e.rare \
-			else (UiStyle.BORDER if e.found else Color(UiStyle.BORDER, 0.3)))
-	panel.add_theme_stylebox_override(&"panel", style)
+	var slot := Button.new()
+	slot.theme_type_variation = &"SatchelSlot"
+	slot.custom_minimum_size = TILE
+	slot.focus_mode = Control.FOCUS_NONE
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_child(col)
+	col.set_anchors_preset(Control.PRESET_FULL_RECT)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(col)
 	var swatch: Control
 	if e.found and (String(e.image) != "" or e.get("icon") is Texture2D):
 		var tex := TextureRect.new()
@@ -76,36 +74,29 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 		swatch = ItemIcon.make(e.shape, e.color, not e.found, e.shiny)
 	swatch.custom_minimum_size = Vector2(56, 56)
 	swatch.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(swatch)
-	var name_label := UiStyle.label(String(e.name) if e.found else String(e.hint), 13 if e.found else 11)
+	var name_label := Label.new()
+	name_label.text = String(e.name) if e.found else String(e.hint)
+	name_label.theme_type_variation = &"SatchelSmall" if e.found else &"SatchelWhere"
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	if not e.found:
-		name_label.add_theme_color_override(&"font_color", Color(UiStyle.TEXT, 0.6))
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.custom_minimum_size = Vector2(TILE.x - 16, 0)
+	name_label.add_theme_font_size_override(&"font_size", 15 if e.found else 13)
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(name_label)
 	if e.new:
-		var badge := UiStyle.label("new!", 12)
+		var badge := Label.new()
+		badge.text = "new"
+		badge.theme_type_variation = &"SatchelPin"
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		badge.add_theme_color_override(&"font_color", Color(0.93, 0.36, 0.6))
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		col.add_child(badge)
-		panel.ready.connect(func() -> void: Juice.bounce_control(panel, 0.14), CONNECT_ONE_SHOT)
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	panel.mouse_entered.connect(func() -> void:
+		slot.ready.connect(func() -> void:
+			slot.pivot_offset = TILE * 0.5
+			Juice.bounce_control(slot, 0.14), CONNECT_ONE_SHOT)
+	if not e.found:
+		col.modulate.a = 0.75
+	slot.mouse_entered.connect(func() -> void:
 		detail.text = ("%s. %s" % [e.name, e.note]).strip_edges() if e.found else "Not found yet. %s." % e.hint)
-	return panel
-
-
-static func _shortcut(actions: Array[StringName]) -> Shortcut:
-	var s := Shortcut.new()
-	for a in actions:
-		var ev := InputEventAction.new()
-		ev.action = a
-		s.events.append(ev)
-	return s
-
-
-static func _rounded(color: Color) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = color
-	box.set_corner_radius_all(9)
-	return box
-
+	return slot

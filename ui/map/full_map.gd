@@ -70,6 +70,7 @@ func map_rect() -> ColorRect:
 
 
 func _shown() -> void:
+	_root.theme = SatchelTheme.theme()
 	view_center = hud.player_xz
 	view_width = ZOOM_OPEN
 	manor_level = hud.manor.level
@@ -221,22 +222,20 @@ func _landmark_near(point: Vector2) -> String:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = PauseStyle.theme()
+	# The satchel's look (SatchelTheme): framed paper, the serif. The shell
+	# dims the world behind it and keeps the strip above page_top().
+	_root.theme = SatchelTheme.theme()
 	add_child(_root)
-	var veil := ColorRect.new()
-	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
-	veil.color = Color(0.42, 0.24, 0.42, 0.5)
-	_root.add_child(veil)
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + side, 90)
-	for side in ["top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 40)
+	margin.add_theme_constant_override(&"margin_top", int(page_top()))
+	margin.add_theme_constant_override(&"margin_bottom", 40)
 	_root.add_child(margin)
 	_card = PanelContainer.new()
-	_card.add_theme_stylebox_override(&"panel", PauseStyle.card_box())
+	_card.theme_type_variation = &"SatchelDetail"
 	margin.add_child(_card)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 8)
@@ -245,25 +244,23 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override(&"separation", 18)
 	col.add_child(head)
-	var title := PauseStyle.title("Feyre's Map", 40)
+	var title := Label.new()
+	title.text = "Feyre's Map"
+	title.theme_type_variation = &"SatchelHeading"
 	head.add_child(title)
-	_stats = PauseStyle.note("")
+	_stats = Label.new()
+	_stats.theme_type_variation = &"SatchelSmall"
 	_stats.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_stats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	head.add_child(_stats)
 
+	# The painted sheet itself, clipped to its own edge on the framed card.
 	var frame := PanelContainer.new()
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var frame_box := StyleBoxFlat.new()
-	frame_box.bg_color = Color(1.0, 0.97, 0.93)
-	frame_box.border_color = PauseStyle.GOLD
-	frame_box.set_border_width_all(3)
-	frame_box.set_corner_radius_all(18)
-	frame_box.set_content_margin_all(3)
-	frame.add_theme_stylebox_override(&"panel", frame_box)
-	frame.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	frame.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	frame.clip_contents = true
 	col.add_child(frame)
 
 	_map = ColorRect.new()
@@ -288,16 +285,23 @@ func _build() -> void:
 	_manor_page.visible = false
 	frame.add_child(_manor_page)
 
-	_foot = PauseStyle.note(FOOT_LAND)
+	_foot = Label.new()
+	_foot.text = FOOT_LAND
+	_foot.theme_type_variation = &"SatchelSmall"
 	_foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_foot.autowrap_mode = TextServer.AUTOWRAP_OFF
 	col.add_child(_foot)
 
 
+## The page's heading serif, for names written on the sheet.
+func _heading_font() -> Font:
+	return _root.get_theme_font(&"font", &"SatchelHeading")
+
+
 func _draw_marks() -> void:
 	var ci := _overlay
-	var font := PauseStyle.DISPLAY_FONT
-	var body := PauseStyle.body_font(700)
+	var font := _heading_font()
+	var body := _root.get_theme_font(&"font", &"SatchelBody")
 	# Names of the places she has found.
 	for place: MapPlace in hud.found_places():
 		var p := to_map_point(place.label_at)
@@ -350,7 +354,7 @@ func _draw_compass(ci: CanvasItem, at: Vector2) -> void:
 		ci.draw_colored_polygon(PackedVector2Array([tip, at + s * 6.0, at - s * 6.0]),
 			PauseStyle.ROSE if i == 0 else PauseStyle.LILAC)
 	ci.draw_circle(at, 4, PauseStyle.GOLD)
-	var font := PauseStyle.DISPLAY_FONT
+	var font := _heading_font()
 	ci.draw_string(font, at + Vector2(-6, -40), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PauseStyle.PLUM)
 
 

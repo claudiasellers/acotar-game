@@ -62,6 +62,12 @@ func available() -> bool:
 	return true
 
 
+## Where the page's own frame may start: below the shell's tab strip. Every
+## page lays out from here, so the strip never covers a page's title or frame.
+static func page_top() -> float:
+	return MenuShell.PAGE_TOP
+
+
 ## Something new on the page she hasn't looked at yet (a mark on its tab).
 func has_news() -> bool:
 	return false

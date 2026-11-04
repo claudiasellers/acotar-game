@@ -282,7 +282,8 @@ func _build() -> void:
 	mirror.anchor_right = 1.0 - PANEL_FRACTION
 	mirror.anchor_bottom = 1.0
 	mirror.offset_left = 28
-	mirror.offset_top = 28
+	# Below the menu shell's tab strip.
+	mirror.offset_top = MenuTab.page_top()
 	mirror.offset_right = -18
 	mirror.offset_bottom = -28
 	var frame := StyleBoxFlat.new()
@@ -303,7 +304,7 @@ func _build() -> void:
 	panel.anchor_right = 1.0
 	panel.anchor_bottom = 1.0
 	panel.offset_left = 0
-	panel.offset_top = 28
+	panel.offset_top = MenuTab.page_top()
 	panel.offset_right = -28
 	panel.offset_bottom = -28
 	add_child(panel)

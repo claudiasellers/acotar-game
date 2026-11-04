@@ -5,8 +5,12 @@ extends GutTest
 const PAGE_FILES := [
 	"res://ui/satchel/satchel_menu.gd", "res://ui/journal/story_journal.gd",
 	"res://ui/map/full_map.gd", "res://ui/collection_book/collection_tab.gd",
-	"res://ui/menu/wardrobe_tab.gd",
+	"res://ui/collection_book/collection_book_ui.gd", "res://ui/menu/wardrobe_tab.gd",
+	"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd",
 ]
+## One look: page chrome comes from SatchelTheme only. (The wardrobe's gilt
+## mirror and colour swatches in DressingRoomView are its own, by L64-3.)
+const OFF_THEME := "StyleBoxFlat|add_theme_font_override|DISPLAY_FONT|body_font|SystemFont|FontFile|\\.ttf|PauseStyle\\.(title|note|theme|card_box)|UiStyle\\."
 
 
 class Page extends MenuTab:
@@ -139,8 +143,20 @@ func test_strip_button_per_page_and_news_dot() -> void:
 	assert_true((strip.get_node("Tab_a") as Button).button_pressed)
 
 
+func test_pages_wear_one_look() -> void:
+	var bad := RegEx.create_from_string(OFF_THEME)
+	for path: String in PAGE_FILES:
+		var hits := []
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			if not line.strip_edges().begins_with("#") and bad.search(line):
+				hits.append(line.strip_edges())
+		assert_eq(hits, [], "%s styles itself outside SatchelTheme" % path)
+
+
 func test_only_the_shell_pauses() -> void:
 	for path: String in PAGE_FILES:
+		if path.begins_with("res://ui/menu/menu_"):
+			continue
 		var src := FileAccess.get_file_as_string(path)
 		assert_false(src.contains("paused ="), "%s sets pause itself" % path)
 		assert_false(src.contains("mouse_mode ="), "%s sets the mouse itself" % path)
