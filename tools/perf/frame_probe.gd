@@ -6,6 +6,9 @@
 ## Direct form (env carries the probe's own settings; user args go to the scene):
 ##   PERF_SCENE=res://tools/world_shot.tscn PERF_NAME=cottage PERF_CSV=/tmp/x.csv \
 ##     godot --path . res://tools/perf/frame_probe.tscn -- cottage_snow /tmp/c.png
+## The Mac shot listener can't set env, so the same settings also come as user
+## args after the scene's own (the scene ignores them): --perf-scene=res://…
+## --perf-name=<name> --perf-csv=<path>. The PERF line on stdout is the result.
 ## Frame times are real only on a real GPU (the Mac). On lavapipe the counts
 ## (draw calls, primitives, objects, materials) are still exact.
 extends Node
@@ -30,7 +33,17 @@ func _ready() -> void:
 	_name = OS.get_environment("PERF_NAME")
 	_csv = OS.get_environment("PERF_CSV")
 	var scene_path := OS.get_environment("PERF_SCENE")
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--perf-scene="):
+			scene_path = a.trim_prefix("--perf-scene=")
+		elif a.begins_with("--perf-name="):
+			_name = a.trim_prefix("--perf-name=")
+		elif a.begins_with("--perf-csv="):
+			_csv = a.trim_prefix("--perf-csv=")
 	_vp = get_viewport().get_viewport_rid()
+	# Uncapped, or every frame reads as the 16.7 ms vsync interval.
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	Engine.max_fps = 0
 	RenderingServer.viewport_set_measure_render_time(_vp, true)
 	var timeout := OS.get_environment("PERF_TIMEOUT")
 	get_tree().create_timer(float(timeout) if timeout.is_valid_float() else 900.0).timeout.connect(_on_timeout)

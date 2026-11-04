@@ -12,11 +12,13 @@ run headless becomes a Mac step instead of iteration; canonical shots re-rendere
 
 | task | lane | branch | state |
 |---|---|---|---|
-| P1–P5, T1 | L57 (lead) | lane/render-program | in progress |
-| T2 surface model | L58 | lane/surface-model | L58-1 413510d handed in 20:48Z; Mac look request shots/req-L58-1 pending |
-| T5 touchable world | L59 | lane/touchable-world | props merged (8c2ea45); L59-4 e472d51 (navmesh + weather/fire + scene yield) queued; Mac look check of rain/petals/flames left |
-| T3a bounce, T3b grade, T4 hero meshes, T6 housekeeping | — | — | after L58 |
-| T3b grade unification | L63 | lane/grade-unify | L63-1 e920bfa queued; L63-2 (chroma + white roll-off) handed in |
+| P1–P5, T1, T6, playbook | L57 (lead) | lane/render-program | L57-1 merged; L57-4/5 (opening test, signal, probe args, log) queued |
+| T2 surface model | L58 | lane/surface-model | done: L58-1, -2 merged; Mac late-light check passed |
+| T5 touchable world | L59 | lane/touchable-world | done: through L59-7 (props, navmesh, weather, fire, burnable grass); Mac look check of rain/petals/flames/scorch pending |
+| T3a bounce light | L60 | lane/bounce-light | done: L60-2 merged; Mac dark-scene check passed |
+| T4 hero meshes | L61 | lane/hero-meshes | done: L61-1..5 merged |
+| T3b grade unification | L63 | lane/grade-unify | L63-1 merged; L63-2 fa6cb71 (chroma restored via LUT saturation, sky roll-off) queued; Mac before/after shots/req-L63-before-1 / -after-1 pending |
+| (outside the brief) forage chemistry | L62 | lane/forage-chemistry | started from the owner's 21:55Z ask; builds on L59 |
 
 ## Readings taken (the brief said: take the most reasonable reading and record it)
 
@@ -64,7 +66,27 @@ boots a level in **under 2 minutes** instead of ~16.
 
 ## T1 — baseline and free performance
 
-(numbers below)
+Shipped (L57-1 merged, L57-4 queued): occlusion culling with runtime occluders (manor: one OccluderInstance3D per level,
+207/477/448/292/66 boxes for L-1..L3; village: 27 solid houses), 0 of 804 window/doorway points covered; shadow
+profiles (mac on Apple silicon); `make perf`; LODs were already on (no change).
+
+**Baseline counts, main d9e6d95 (cloud lavapipe, Forward+, 1920×1080; counts exact, ms not budget numbers):**
+
+| shot | draw calls | primitives | objects |
+|---|---|---|---|
+| manor_front | 864 | 1,787,097 | 940 |
+| hunting_forest | 786 | 1,009,250 | 827 |
+| village | 327 | 616,152 | 356 |
+| workshop | 334 | 620,749 | 374 |
+| feyre_closeup | 736 | 4,796,677 | 839 |
+| rose_garden | 453 | 1,293,972 | 537 |
+| spring_vista | 501 | 4,511,052 | 595 |
+| cottage, wolf_closeup | lavapipe crash (Mac only) | | |
+| opening_film | film renders with forced draws: probe sees no frames (Mac only) | | |
+
+Real frame times: Mac shot requests `shots/req-L57-3` (pre-program d9e6d95), `req-L57-4` (adb54f80, before L61's
+denser crowns) and `req-L57-2` (main after L57/L58/L59/L60/L61) for manor_front, hunting_forest, manor_garden and
+rose_garden, each through tools/perf/frame_probe.tscn (the PERF line in each label's log).
 
 ## Mac steps pending
 
@@ -182,3 +204,82 @@ Readings:
   art_probe, minor_fae_hall_shot, cottage_room_shot, feyre_gait_shot, render_item_icons (icon art, a non-game
   look), bounce_probe (L60's probe, ACES vs its own reference), calanmai_fire_shot. The views that mimic the
   game should follow AgX in a housekeeping pass.
+
+## T4 (L61) as handed in
+
+woods_trees: one Skin graph per near tree (Skin → Subsurf 2 → Decimate to the R4 cap), smooth-ellipsoid crowns, crown
+winding fixed; manor_flora cherry/apple/crab-apple blobs 20 → 320 faces; rose petals 8 → 18 tris cupped. Opening film:
+the 26 cylinders + box bough replaced by winter_bare / winter_bough models. All 80/80 creature gltfs have a Skeleton3D
+(tools/blender/creatures_rig_graph.py for the 21 that had none). Placeholder body/figure/capsule fallbacks push_error and
+assert in debug; act1 chain and the cast tests log 0 stand-ins. Budget: manor_front 963 → 973 draw calls, 1.814 → 1.860 M
+prims (+2.5%). Mac: opening film mean 17.05 ms (over the 16.6 ms M1 line by 0.45 ms; logged, not acted on).
+Probe table, style notes: plans/render-program/T4-hero-meshes.md.
+
+## T1 results on the Mac (Claudias-Mini, Forward+ look, 1920×1080)
+
+Draw calls / primitives (exact). pre = d9e6d95 (before the program); mid = adb54f80 (L57-1 + L58 + L59, before L61's
+crowns); now = main bde2d78 (+ L60, L61).
+
+| shot | pre draw | mid draw | now draw | Δ pre→now | pre prims | now prims | Δ |
+|---|---|---|---|---|---|---|---|
+| manor_garden | 1,137 | 703 | 703 | **−38%** | 2.69 M | 1.69 M | −37% |
+| manor_front | 884 | 727 | 726 | −18% | 1.92 M | 1.47 M | −23% |
+| hunting_forest | 818 | 555 | 555 | −32% | 1.19 M | 0.76 M | −36% |
+| rose_garden | 473 | 358 | 358 | −24% | 1.43 M | 0.94 M | −34% |
+
+T1 acceptance "manor garden draw calls down ≥30%": **met (−38%)**. The cut comes from occlusion (manor) and the Mac
+shadow profile (2 splits instead of 4 halves the shadow passes; hunting_forest has no occluders and still drops 32%).
+L61's denser crowns cost +0.3% prims (mid→now), well under the director's 10% line.
+Frame time: the first Mac pass ran vsync-capped (every median ≈16.6 ms), so it says only that rose_garden is **over
+budget** and the others hold 60 fps. 
+
+Uncapped frame time (median ms, shots/req-L57-6 pre vs req-L57-5 now, same Mac):
+
+| shot | pre | now | Δ | headroom vs 16.6 ms |
+|---|---|---|---|---|
+| manor_front | 13.85 | 11.70 | −2.15 | +4.9 |
+| manor_garden | 16.59 | 14.85 | −1.74 | +1.8 |
+| hunting_forest | 15.63 | 14.37 | −1.26 | +2.2 |
+| rose_garden | 25.23 | 23.99 | −1.24 | **−7.4 (over)** |
+
+The program made every view faster even after adding bounce, SSAO changes and denser crowns. rose_garden was already
+over budget before the program and still is: a perf task for the director's backlog (likely the 12-hue rose scatter's
+overdraw / shadow casters), not part of this brief. The p95 of 27–37 ms in every view is first-frames shader
+compilation inside the 30-frame window, not steady state.
+
+## T6 — housekeeping (lead)
+
+- `git lfs pull` was already gone from the Makefile; nothing to remove.
+- `make perf` and the shared terrain restore in `make setup` shipped in L57-1. `make luts` comes with T3b (L63).
+  `make lightmaps` is not added (T3a skipped LightmapGI by design) and `make occluders` is not added (occluders are
+  built at runtime from the manor and village geometry; there is nothing to bake).
+- status.md got a "Render budgets" block with the Mac numbers; drift-log has the T6 entry.
+- tools/perf/frame_probe.gd takes its settings as user args (the Mac shot listener can't set env) and runs uncapped,
+  so a shot request can measure frame time:
+  `shot perf_<name> res://tools/perf/frame_probe.tscn <scene args> --perf-scene=res://… --perf-name=<name> --perf-csv={out}/perf.csv`.
+
+---
+
+# Owner playbook: ten numbers that move the look
+
+Everything below is neutral today (it reproduces the pre-program look). Tune one at a time against ART.md and
+`references/`, then re-render the canonical shots in one Mac look request (the `shot` lines in
+`tools/shots/canonical.txt`, sent with `tools/mq/shots_request.sh`). Full table with ranges: `docs/tuning.md`.
+
+| # | tunable | where | now | try | judge on |
+|---|---|---|---|---|---|
+| 1 | `diffuse_ramp` (the 3-band cel look) | candy_lit.gdshaderinc; preset `data/render/candy_ramp_3band.tres` | identity (smooth lambert) | assign the 3-band preset, then move its stops | feyre_closeup, manor_front, village |
+| 2 | `shade_tint` (colour of shadows) | candy_lit.gdshaderinc per family | white on props, lilac on foliage | a blush or periwinkle on props too | rose_garden, manor_front |
+| 3 | `wrap` (how soft the terminator is) | candy_lit.gdshaderinc per family | 0 props, 0.4–0.55 foliage | 0.2–0.4 on props for rounder forms | feyre_closeup, workshop |
+| 4 | `rim_strength` + `rim_color` (warm edge light) | candy_lit.gdshaderinc | 0 props, 0.4–0.6 foliage | 0.1–0.25 on props/gowns; never strong everywhere | feyre_closeup, rose_garden (late light) |
+| 5 | `GradePreset.exposure` (+ `white_level` roll-off on the 11 bright grades) | world/shared/grades/*.tres | re-solved under AgX to hold the T3a lit band (±1%; the 8 brightest 2.6–4.4% under to keep the sky ≤0.97) | ±0.1 steps; raise white_level if you'd rather have brighter grades and some sky clip | spring_vista, manor_front, cottage |
+| 6 | LUT parameters: lift/gamma/gain, hue, saturation curve, `highlight_saturation` | data/grades/luts/*.tres (LutParams, one per grade; `make luts` checks them) | identity look; saturation solved per grade (1.27–1.80 highlights) to keep T3a's pastel chroma under AgX | warm-pink lift; more or less highlight_saturation decides how candy vs soft the pastels read | every canonical shot; this is the big one |
+| 7 | Spring glow / bloom / HDR threshold | Spring GradePresets | ~0.7 / ~0.2 / ~1.0 (R3 spec, T3b) | bloom 0.15–0.3 | spring_vista, rose_garden, manor_front |
+| 8 | `ambient_light_sky_contribution` + `ambient_color` | world.tscn + GradePresets | 0.7 | 0.6–0.8; ambient colour toward lilac | hunting_forest, workshop (shade read) |
+| 9 | `ground_bounce` + colour | candy_lit.gdshaderinc | 0.35, terrain mean grey-green | 0.2–0.5; tint toward blossom pink in Spring | rose_garden, spring_vista (undersides) |
+| 10 | `pearl` / `glitter` on gowns, fountains, magic | candy_surface.gdshaderinc (per material) | 0 | 0.2–0.5 on gowns and glass; keep off horror | feyre_closeup, manor_front |
+
+Guardrails already enforced by tests: albedo ≤ 0.85 per channel (D9), rim is lit (never emissive), no daytime
+emissives, horror grades and materials keep their darkness.
+Known open items for the owner: rose_garden is over the 16.6 ms line on the Mac (vsync median ~26 ms; see T1);
+the wolf-eye pupil shape in the opening film is in the director's owner-decisions list.
