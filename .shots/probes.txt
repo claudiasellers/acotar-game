@@ -1,0 +1,3 @@
+from intro-map
+quality look
+shot film res://tools/film/opening_film_shot.tscn {out} noclip until=88 stills=15,19,86
