@@ -154,9 +154,9 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	panel.add_child(col)
 	var swatch: Control
-	if e.found and String(e.image) != "":
+	if e.found and (String(e.image) != "" or e.get("icon") is Texture2D):
 		var tex := TextureRect.new()
-		tex.texture = Gallery.load_texture({"path": e.image})
+		tex.texture = e.icon if e.get("icon") is Texture2D else Gallery.load_texture({"path": e.image})
 		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		swatch = tex

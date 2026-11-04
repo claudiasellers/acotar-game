@@ -65,7 +65,7 @@ func test_tabs_fill_from_their_sources() -> void:
 	if result.get("ok", false):
 		Gameplay.journal.record(result)
 		assert_true(book.is_found(&"blackberry_tea"), "named dish becomes a recipe entry")
-	assert_eq(book.progress(&"recipes").y, Chemistry.dishes().size())
+	assert_eq(book.progress(&"recipes").y, RecipeUnlocks.all().size(), "brews and dishes")
 
 
 func test_arrows_and_materials_stay_out_of_the_book() -> void:

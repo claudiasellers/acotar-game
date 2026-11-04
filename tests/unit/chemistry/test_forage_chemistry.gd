@@ -148,3 +148,28 @@ func test_drunk_brews_are_felt() -> void:
 	tells._process(0.1)
 	assert_true(tells.showing().has(&"bright"), "a glow draught: motes catch the light round her")
 	assert_eq(tells.find_children("*", "Light3D", true, false).size(), 0, "no light comes from her")
+
+
+func test_gathering_a_whole_combo_unlocks_its_recipe() -> void:
+	var book := Gameplay.collection
+	watch_signals(book)
+	Gameplay.inventory.add(&"ing_lavender")
+	assert_false(book.is_found(&"brew_hush_draught"), "half a combo unlocks nothing")
+	Gameplay.inventory.add(&"ing_wild_hyacinth")
+	assert_true(book.is_found(&"brew_hush_draught"), "the whole combo unlocks it")
+	assert_true(book.is_new(&"brew_hush_draught"))
+	assert_signal_emitted_with_parameters(book, "discovered", [&"brew_hush_draught", &"recipes"])
+	var page: Array = book.entries(&"recipes").filter(func(e: Dictionary) -> bool: return e.id == &"brew_hush_draught")
+	assert_string_contains(String(page[0].note), "lavender + wild hyacinth in the stillroom", "the page says how")
+	assert_not_null(page[0].icon, "with its bottle")
+	var ids := book.entries(&"recipes").map(func(e: Dictionary) -> StringName: return e.id)
+	assert_false(ids.has(&"snowdrop_infusion"), "a dish that is a brew's combo has one page")
+	assert_eq(ids.size(), RecipeUnlocks.all().size())
+	FindCard.clear(get_tree())
+	FindCard.show_find(get_tree(), &"brew_hush_draught", &"recipes")
+	FindCard.show_find(get_tree(), &"roast_venison", &"recipes")
+	assert_eq(FindCard.pending(), 1, "two unlocks at once share one card")
+	FindCard.clear(get_tree())
+	var copy := CollectionBook.new()
+	copy.load_state(book.save_state())
+	assert_eq(copy.new_count(&"recipes"), book.new_count(&"recipes"), "survives a save")

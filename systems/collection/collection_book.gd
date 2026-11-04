@@ -42,8 +42,11 @@ static var _rewards: Array[CollectionReward] = []
 ## would be a cycle that never frees. It reads them through Gameplay instead.
 func watch(inventory: Inventory, journal: ProofJournal, sketchbook: Sketchbook,
 		gallery: Gallery, wardrobe: Wardrobe) -> void:
-	inventory.item_added.connect(func(id: StringName, _n: int, _c: StringName) -> void: mark(id))
+	inventory.item_added.connect(func(id: StringName, _n: int, _c: StringName) -> void:
+		mark(id)
+		unlock_recipes())
 	journal.discovered.connect(func(entry: Dictionary) -> void: _on_recipe(String(entry.get("name", ""))))
+	journal.brew_discovered.connect(func(id: StringName) -> void: mark(id, &"recipes"))
 	sketchbook.sketch_added.connect(func(id: StringName, _t: String) -> void: mark(id, &"sketches"))
 	gallery.painting_added.connect(func(r: Dictionary) -> void: mark(StringName(r.get("id", "")), &"paintings"))
 	wardrobe.piece_granted.connect(func(id: StringName) -> void: mark(id, &"wardrobe"))
@@ -63,6 +66,9 @@ func sync() -> void:
 			_on_recipe(String(Gameplay.journal.entries[key].get("name", "")), false)
 		for t in Gameplay.journal.truths:
 			mark(t, &"truths", false)
+		for id: String in Gameplay.journal.brews:
+			mark(StringName(id), &"recipes", false)
+	unlock_recipes(false)
 	if Gameplay.sketchbook:
 		for id: StringName in Gameplay.sketchbook.sketches:
 			mark(id, &"sketches", false)
@@ -91,6 +97,12 @@ func mark(entry_id: StringName, tab: StringName = &"", is_new: bool = true) -> b
 		Gameplay.emit(&"collection_discovered", [entry_id])
 	check_rewards(tab, is_new)
 	return true
+
+
+## Unlocks every recipe whose ingredients are all in her bags (L62).
+func unlock_recipes(is_new: bool = true) -> void:
+	for id in RecipeUnlocks.newly_ready(Gameplay.inventory, self):
+		mark(id, &"recipes", is_new)
 
 
 func is_found(entry_id: StringName) -> bool:
@@ -146,10 +158,10 @@ func entries(tab: StringName) -> Array[Dictionary]:
 				if item is CollectibleData:
 					out.append(_item_entry(item))
 		&"recipes":
-			for d in Chemistry.dishes():
-				var e := _entry(d.id, d.display_name, Color(1.0, 0.86, 0.62), d.journal_note)
-				e.hint = "%s it, from %d thing%s she has gathered" % [String(d.method).capitalize(), d.required.size(),
-					"" if d.required.size() == 1 else "s"]
+			for r in RecipeUnlocks.all():
+				var e := _entry(r.id, r.name, r.color, ("%s %s" % [RecipeUnlocks.how_to(r), r.note]).strip_edges())
+				e.hint = RecipeUnlocks.hint(r)
+				e.icon = BrewMenu.icon_for(r.id) if r.brew else null
 				out.append(e)
 		&"truths":
 			for id in truth_ids():
@@ -268,7 +280,7 @@ func load_state(data: Dictionary) -> void:
 
 func _on_recipe(dish_name: String, is_new: bool = true) -> void:
 	for d in Chemistry.dishes():
-		if d.display_name == dish_name:
+		if d.display_name == dish_name and not RecipeUnlocks.get_recipe(d.id).is_empty():
 			mark(d.id, &"recipes", is_new)
 
 
@@ -283,7 +295,7 @@ func _item_entry(item: ItemData) -> Dictionary:
 func _entry(id: StringName, entry_name: String, color: Color, note: String, image: String = "") -> Dictionary:
 	return {"id": id, "name": entry_name, "color": color, "found": found.has(id),
 		"new": fresh.has(id), "note": note, "image": image, "hint": "", "shape": &"leaf",
-		"rare": false, "shiny": false}
+		"rare": false, "shiny": false, "icon": null}
 
 
 static func _reward_key(r: CollectionReward) -> String:

@@ -30,6 +30,12 @@ station, and what comes out reaches the world through an element.
 - `BrewTells` on Feyre: scene-lit particles for bright (motes), warm (haze)
   and cool (rime). No lights and no EMISSION: a brew acts on her, nothing
   comes from her before she is Made (Keeper).
+- `RecipeUnlocks` (L62-4): every recipe (27 brews + the DishData not
+  already a brew's witness combo) with `needs`, `how_to()`, `hint()`.
+  `CollectionBook.unlock_recipes()` runs on every `item_added` and marks a
+  recipe found on the Recipes page the first time her bags hold all its
+  needs; `brew_discovered` marks it too. FindCard shows "Recipe unlocked"
+  with the bottle and how to make it; unlocks in one frame share one card.
 - ArrowEffects: a fire arrow calls `ElementField.ignite_at(at, 1.2)`, a frost
   arrow `soak_at(at, 1.8)`.
 
@@ -46,4 +52,7 @@ station, and what comes out reaches the world through an element.
    her with 0 lights on her (L62-2).
 8. L62-2: Brew, Drink and Give use the stitched pill; a discovery shows the
    brew's own bottle icon (27 icons, tools/chemistry/render_brew_icons.gd).
-7. One GUT file (6 tests); neighbouring tests still pass.
+7. One GUT file (7 tests); neighbouring tests still pass.
+9. L62-4: gathering a brew's whole combo unlocks its Recipes page once, with
+   a card naming what to do; half a combo unlocks nothing; 37 pages, no
+   dish duplicated by a brew; the brewing hunch names an unlocked recipe.

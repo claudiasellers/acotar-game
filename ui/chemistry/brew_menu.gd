@@ -4,7 +4,8 @@
 ## satchel's crafted look (L50; SatchelTheme only, no colours here).
 ##
 ## Discovery, not a recipe list: her hunch line only names a brew she has
-## made before, or the tags she has learned from using each ingredient. The
+## made before or unlocked (gathered all of; RecipeUnlocks), or the tags she
+## has learned from using each ingredient. The
 ## first time a named brew comes out of the pot, a card shows its name and
 ## her note, with sparkle, chime and bounce (R3).
 class_name BrewMenu
@@ -157,6 +158,8 @@ func hunch() -> String:
 	var brew_id := StringName(r.get("brew", &""))
 	if brew_id != &"" and Gameplay.journal.has_brew(brew_id):
 		return "%s. I've made this before." % BrewBook.get_rule(brew_id).display_name
+	if brew_id != &"" and Gameplay.collection.is_found(brew_id):
+		return "%s, I think. I know the recipe." % BrewBook.get_rule(brew_id).display_name
 	var words := PackedStringArray()
 	for id in chosen:
 		if Gameplay.journal.known_tags(id).is_empty():

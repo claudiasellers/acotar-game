@@ -17,6 +17,9 @@ static var _showing: bool = false
 static var _font: SystemFont = null
 ## Bumped per held recheck (and by clear) so only the newest one acts.
 static var _held: int = 0
+## Recipes unlocked this frame: one pickup can unlock several, and they share
+## one card.
+static var _recipes: Array[StringName] = []
 
 
 ## The first time something lands in the book.
@@ -43,13 +46,44 @@ static func show_find(tree: SceneTree, entry_id: StringName, tab: StringName) ->
 		card.line = "Written in her journal."
 		card.banner = "A new truth"
 	elif tab == &"recipes":
-		for d in Chemistry.dishes():
-			if d.id == entry_id:
-				card.title = d.display_name
-				card.line = d.journal_note
-		card.banner = "A new recipe"
+		_unlocked(tree, entry_id)
+		return
 	elif tab == &"sketches" or tab == &"paintings":
 		return
+	_push(tree, card)
+
+
+## Recipes unlock when her bags first hold everything one needs (L62). The
+## card says what to do with it. A brew she just made at a pot is skipped:
+## the pot's own reveal card has already shown it.
+static func _unlocked(tree: SceneTree, entry_id: StringName) -> void:
+	var r := RecipeUnlocks.get_recipe(entry_id)
+	if tree == null or r.is_empty() or (r.brew and Gameplay.journal and Gameplay.journal.has_brew(entry_id)):
+		return
+	_recipes.append(entry_id)
+	if _recipes.size() == 1:
+		tree.process_frame.connect(func() -> void: _flush_recipes(tree), CONNECT_ONE_SHOT)
+
+
+static func _flush_recipes(tree: SceneTree) -> void:
+	var ids := _recipes.duplicate()
+	_recipes.clear()
+	if ids.is_empty():
+		return
+	var first := RecipeUnlocks.get_recipe(ids[0])
+	var card := {"shape": &"bowl", "color": first.color, "title": first.name, "line": RecipeUnlocks.how_to(first),
+		"banner": "Recipe unlocked", "gold": false, "shiny": false, "icon": BrewMenu.icon_for(first.id)}
+	if ids.size() > 1:
+		var names := PackedStringArray()
+		for id: StringName in ids:
+			names.append(String(RecipeUnlocks.get_recipe(id).name))
+		card.banner = "%d recipes unlocked" % ids.size()
+		if names.size() == 2:
+			card.title = "%s & %s" % [names[0], names[1]]
+			card.line = "She has everything for both. They're in her book (J)."
+		else:
+			card.title = "New recipes"
+			card.line = "%s. All in her book (J)." % ", ".join(names)
 	_push(tree, card)
 
 
@@ -71,6 +105,7 @@ static func note(tree: SceneTree, text: String) -> void:
 ## Drops anything showing or queued (the book is opening).
 static func clear(tree: SceneTree) -> void:
 	_queue.clear()
+	_recipes.clear()
 	_showing = false
 	_held += 1
 	if tree:
@@ -79,7 +114,7 @@ static func clear(tree: SceneTree) -> void:
 
 
 static func pending() -> int:
-	return _queue.size() + (1 if _showing else 0)
+	return _queue.size() + (1 if _showing else 0) + (1 if not _recipes.is_empty() else 0)
 
 
 static func _push(tree: SceneTree, card: Dictionary) -> void:
@@ -125,7 +160,14 @@ static func _next(tree: SceneTree) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 16)
 	panel.add_child(row)
-	if card.shape != &"":
+	if card.get("icon") is Texture2D:
+		var tex := TextureRect.new()
+		tex.texture = card.icon
+		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tex.custom_minimum_size = Vector2(96, 96)
+		row.add_child(tex)
+	elif card.shape != &"":
 		row.add_child(ItemIcon.make(card.shape, card.color, false, card.shiny, 96.0))
 	var text := VBoxContainer.new()
 	text.alignment = BoxContainer.ALIGNMENT_CENTER
