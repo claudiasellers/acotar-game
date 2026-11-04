@@ -19,6 +19,8 @@ const PAINT := preload("res://story/film/mural/mural_paint.gdshader")
 const MAP := preload("res://story/film/mural/mural_map.gdshader")
 const SKY := preload("res://story/film/mural/mural_sky.gdshader")
 const LIT := preload("res://story/film/mural/mural_lit.gdshader")
+## The land map's icons (lane L67): tools/film/gen_mural_map_detail.py.
+const MAP_DETAIL := "res://art/film/mural/cartography/map_detail.webp"
 const PEOPLE := "res://creatures/models/people/%s.gltf"
 const FAE := "res://creatures/models/fae/%s.gltf"
 const CAST := "res://characters/%s/%s_model.tscn"
@@ -543,6 +545,8 @@ func _build_land(t: Dictionary) -> void:
 	m.shader = MAP
 	m.set_shader_parameter(&"draw", 0.0)
 	m.set_shader_parameter(&"fill", 0.0)
+	m.set_shader_parameter(&"detail", 0.0)
+	m.set_shader_parameter(&"detail_tex", load(MAP_DETAIL))
 	(t.mats as Array).append(m)
 	var plane := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
@@ -556,7 +560,7 @@ func _build_land(t: Dictionary) -> void:
 	_rail(t, Vector3(0.0, 15.5, 10.0), Vector3(0.0, 0.0, 0.5), Vector3(0.0, 12.0, 6.0), Vector3(0.0, 0.0, -0.5), 46.0)
 
 
-## Map plane uniforms, for the director: draw, fill, wall, split, wash.
+## Map plane uniforms, for the director: draw, fill, detail, wall, split, wash.
 func land_material() -> ShaderMaterial:
 	return ((tableaux[&"land"] as Dictionary).mats as Array)[0] as ShaderMaterial
 

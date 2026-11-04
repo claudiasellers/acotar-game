@@ -60,6 +60,13 @@ and the newcomer critic). Data rows are written by `tools/film/gen_film_data.py`
   over. Every other start is unchanged.
 - Skipping in part one goes straight to the game. Skipping in part two hands
   over on the spot.
+- The land map's icons (lane L67): `art/film/mural/cartography/map_detail.webp`
+  (RGB: ink, body, draw-in order) from `tools/film/gen_mural_map_detail.py`
+  over Kenney's Cartography Pack (CC0, `art/film/mural/cartography/kenney/`).
+  `mural_map.gdshader` draws sea icons with the coastline (`draw`) and land
+  icons on `detail` (0 at build; `land_fill` tweens it 0→1 over 9 s; `wall`
+  sets it to 1). At the split the south's icons fade (ch 13: no markers in
+  the human realm). Test: `tests/unit/film/test_mural_map_detail.gd`.
 
 ## Cutscenes A, B, C
 

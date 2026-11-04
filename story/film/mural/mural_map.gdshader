@@ -6,6 +6,11 @@
 // - split 0..1: north of the line blooms in jewel colours and sparkles;
 //   south of it drains to grey and snow.
 // - wash 0..1: the paint runs like wet paint and washes away (the turn).
+// - detail 0..1 (lane L67): the map's icons (Kenney's Cartography Pack, laid
+//   out by tools/film/gen_mural_map_detail.py) draw themselves in, icon by
+//   icon. Sea icons (waves, compass, cartouche) follow the coastline's brush
+//   on `draw`; land icons (peaks, woods, hills, lakes, palaces, temples)
+//   follow `detail`. At the split, the south's icons fade to nothing.
 shader_type spatial;
 render_mode unshaded, cull_disabled;
 
@@ -15,6 +20,9 @@ uniform float wall = 0.0;
 uniform float split = 0.0;
 uniform float wash = 0.0;
 uniform float wall_v = 0.38;
+uniform float detail = 1.0;
+// R ink line, G body, B draw-in order (see the generator).
+uniform sampler2D detail_tex : filter_linear, repeat_disable, hint_default_black;
 uniform vec3 ground : source_color = vec3(0.045, 0.035, 0.09);
 uniform vec3 gold : source_color = vec3(1.0, 0.83, 0.46);
 
@@ -84,9 +92,13 @@ void fragment() {
 	float mountain = 0.0;
 	float mfill = 0.0;
 	float mw = fwidth(p.x) * 1.4;
+	// Ch 13: "a small, snowy mountain range. From it arose a mammoth,
+	// solitary peak. Bald of snow". The range is drawn first and snow-capped;
+	// the bare peak last, in front, and taller than the rest.
+	float snow_cap = 0.0;
 	for (int i = 0; i < 5; i++) {
-		float k = float(i) - 2.0;
-		float h = 0.045 + 0.035 * (1.0 - abs(k) * 0.5);
+		float k = i == 4 ? 0.0 : (i < 2 ? float(i) * 4.0 - 2.0 : float(i) * 2.0 - 5.0);
+		float h = k == 0.0 ? 0.08 : 0.034 + 0.014 * (2.0 - abs(k));
 		vec2 q = p - vec2(0.5 + k * 0.03 + (hash(vec2(k, 2.0)) - 0.5) * 0.01, 0.55 + abs(k) * 0.008);
 		float side = (h - q.y) * 0.62;
 		float in_peak = step(abs(q.x), side) * step(0.0, q.y);
@@ -94,10 +106,29 @@ void fragment() {
 		float hatch = step(0.55, fract((q.x * 0.7 - q.y) * 300.0)) * step(0.0, q.x) * in_peak;
 		mfill = max(mfill, in_peak);
 		mountain = max(mountain * (1.0 - in_peak), max(rim, hatch * 0.45));
+		float cap = in_peak * step(h * 0.6 + 0.004 * sin(q.x * 900.0), q.y) * step(0.5, abs(k));
+		snow_cap = max(snow_cap * (1.0 - in_peak), cap);
 	}
 	mountain *= fill;
 	land = mix(land, vec3(0.06, 0.045, 0.1), mfill * fill);
+	land = mix(land, vec3(0.86, 0.88, 0.96) * 0.7, snow_cap * fill);
 	land += gold * mountain * 0.9;
+	// The map's icons. The wash's runny p carries them with the paint.
+	vec3 dt = texture(detail_tex, vec2(p.x, 1.0 - p.y)).rgb;
+	bool at_sea = dt.b < 0.5;
+	float order = at_sea ? dt.b / 0.45 : (dt.b - 0.5) * 2.0;
+	float clock = at_sea ? draw * 1.02 : detail * 1.06;
+	float shown = clamp((clock - order) / 0.02, 0.0, 1.0);
+	// A bright nib where the line is being drawn, like the coast's tip.
+	float nib = smoothstep(0.02, 0.0, abs(clock - order - 0.01)) * step(clock, 1.04);
+	float north_of = smoothstep(wall_v - 0.004, wall_v + 0.004, p.y);
+	// Ch 13: south of the Wall, "a blur of nothing", no markers.
+	float keep = 1.0 - split * (1.0 - north_of) * 0.92;
+	float ink = dt.r * shown * keep;
+	float body = dt.g * shown * keep;
+	float on_land = at_sea ? 0.0 : 1.0;
+	land = mix(land, vec3(0.07, 0.055, 0.11), body * 0.85 * on_land);
+	land += (gold * ink * 0.95 + vec3(1.0, 0.95, 0.8) * dt.r * nib * keep * 2.0) * on_land;
 	// The Wall's split: north blooms in jewel colours, south drains to snow.
 	float north = smoothstep(wall_v - 0.004, wall_v + 0.004, p.y);
 	vec3 jewel = 0.5 + 0.5 * cos(6.28318 * (fbm(p * 4.0) + vec3(0.0, 0.33, 0.67)));
@@ -112,6 +143,10 @@ void fragment() {
 	// mountain stay legible under the colour, so it still reads as the land.
 	land = mix(land, mix(snow, bloom, north), split * mix(0.55, 0.85, 1.0 - north));
 	col = mix(col, land, inside);
+	// Sea icons stay outside the coast.
+	float sea_side = (1.0 - inside) * (1.0 - on_land);
+	col = mix(col, ground * 0.7, body * 0.8 * sea_side);
+	col += (gold * ink * 0.85 + vec3(1.0, 0.95, 0.8) * dt.r * nib * 2.0) * sea_side;
 	// The coastline in gold, drawn around the island.
 	float coast = smoothstep(0.006, 0.0, abs(d)) * drawn;
 	float tip = smoothstep(0.012, 0.0, abs(ang - draw)) * step(draw, 0.999) * step(abs(d), 0.02);
@@ -121,5 +156,5 @@ void fragment() {
 	col += vec3(1.0, 0.95, 0.9) * line * (2.5 + 0.8 * sin(TIME * 5.0 + p.x * 40.0));
 	col *= 1.0 - smoothstep(0.55, 1.0, wash);
 	ALBEDO = col;
-	EMISSION = gold * (coast * 0.8 + tip * 2.0 + mountain * inside * 0.4) + vec3(1.0) * line * 1.5 + bloom * north * split * inside * 0.12;
+	EMISSION = gold * (ink * 0.3 + dt.r * nib * 1.2) * (on_land * inside + sea_side) + gold * (coast * 0.8 + tip * 2.0 + mountain * inside * 0.4) + vec3(1.0) * line * 1.5 + bloom * north * split * inside * 0.12;
 }

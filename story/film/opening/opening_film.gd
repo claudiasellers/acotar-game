@@ -89,6 +89,9 @@ func _on_beat(beat_name: StringName) -> void:
 			(mural.tableaux[&"land"] as Dictionary).rail = [mural.camera.global_transform,
 					Transform3D(Basis(), Vector3(2.0, 9.0, 4.5)).looking_at(Vector3(0.0, 0.0, -1.0), Vector3.UP)]
 			_tween_shader(land, &"fill", 0.0, 1.0, 6.0)
+			# The map's icons draw in after the woods and rivers, one by one,
+			# until just before the cut to the court (lane L67).
+			_tween_shader(land, &"detail", 0.0, 1.0, 9.0)
 		&"court":
 			mural.play(&"court", 13.0)
 		&"beasts":
@@ -112,6 +115,7 @@ func _on_beat(beat_name: StringName) -> void:
 		&"wall":
 			land.set_shader_parameter(&"draw", 1.0)
 			land.set_shader_parameter(&"fill", 1.0)
+			land.set_shader_parameter(&"detail", 1.0)
 			mural.play(&"land", 8.0, 0.0)
 			(mural.tableaux[&"land"] as Dictionary).rail = [
 					Transform3D(Basis(), Vector3(0.0, 13.0, 8.0)).looking_at(Vector3(0.0, 0.0, 0.0), Vector3.UP),
