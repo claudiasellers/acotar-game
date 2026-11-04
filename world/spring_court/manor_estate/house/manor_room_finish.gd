@@ -260,46 +260,86 @@ static func drape_reach(room: ManorRoomDef) -> float:
 	return DRAPE_OUT + DRAPE_W * 0.5 if has_curtains(room) else 0.0
 
 
-static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> MeshInstance3D:
+## Rooms whose drapes a scene works on (T077: the curtain trap strips the
+## bedroom's trimmings). Kept out of the merge under a ManorLooseProp
+## "Curtains": a "Window<i>" per window holding its "Dressed" mesh and a
+## hidden "Stripped" twin, the drapes hanging loose with no gilt.
+const WORKED_CURTAINS := [&"feyre_bedroom"]
+
+
+static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> Node3D:
 	if not has_curtains(room):
 		return null
 	var cols: Array = CURTAINS.get(room.id, [room.wall_color.darkened(0.18).lerp(Color(0.86, 0.52, 0.66), 0.25),
 			Color(0.90, 0.76, 0.44)])
+	var worked := WORKED_CURTAINS.has(room.id)
+	var windows: Array = []
+	var sides := ManorWindows.sides_of(room.rect)
+	for side in sides:
+		var s: Array = sides[side]
+		for o in ManorWindows.openings(all, room, side):
+			if o[2] == &"window":
+				windows.append([s, o])
+	if windows.is_empty():
+		return null
+	if not worked:
+		var mi := _curtain_mesh(windows, y, h, cols, false)
+		mi.name = "Curtains"
+		node.add_child(mi)
+		return mi
+	var holder := ManorLooseProp.new()
+	holder.name = "Curtains"
+	node.add_child(holder)
+	for i in windows.size():
+		var w := Node3D.new()
+		w.name = "Window%d" % i
+		holder.add_child(w)
+		var dressed := _curtain_mesh([windows[i]], y, h, cols, false)
+		dressed.name = "Dressed"
+		w.add_child(dressed)
+		var stripped := _curtain_mesh([windows[i]], y, h, cols, true)
+		stripped.name = "Stripped"
+		stripped.visible = false
+		w.add_child(stripped)
+	return holder
+
+
+## The drapes and pelmets of `windows` ([side, opening] pairs) as one mesh:
+## fabric, then gilt trim. `stripped`: the trimmings gone (no tie-backs, no
+## gilt bead), so the drapes hang straight and loose; fabric only.
+static func _curtain_mesh(windows: Array, y: float, h: float, cols: Array, stripped: bool) -> MeshInstance3D:
 	var drape := SurfaceTool.new()
 	var trim := SurfaceTool.new()
 	drape.begin(Mesh.PRIMITIVE_TRIANGLES)
 	trim.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var any := false
-	var sides := ManorWindows.sides_of(room.rect)
-	for side in sides:
-		var s: Array = sides[side]
+	for wo: Array in windows:
+		var s: Array = wo[0]
+		var o: Array = wo[1]
 		var a: Vector2 = s[0]
 		var dir: Vector2 = (s[1] - s[0]).normalized()
 		var n: Vector2 = s[2]
-		for o in ManorWindows.openings(all, room, side):
-			if o[2] != &"window":
+		# the pelmet clears the façade's room-side reveal (L42): above sill + 2.8
+		var top := minf(h - 0.5, ManorWindows.SILL + 2.6) + 0.4
+		var face := a + n * (ManorHouseBuilder.WALL + 0.07)
+		for edge in [[o[0] - DRAPE_OUT, -1.0], [o[1] + DRAPE_OUT, 1.0]]:
+			var c: Vector2 = face + dir * float(edge[0])
+			_drape(drape, c, dir, n, y + 0.02, y + top, DRAPE_W, not stripped)
+			if stripped:
 				continue
-			any = true
-			# the pelmet clears the façade's room-side reveal (L42): above sill + 2.8
-			var top := minf(h - 0.5, ManorWindows.SILL + 2.6) + 0.4
-			var face := a + n * (ManorHouseBuilder.WALL + 0.07)
-			for edge in [[o[0] - DRAPE_OUT, -1.0], [o[1] + DRAPE_OUT, 1.0]]:
-				var c: Vector2 = face + dir * float(edge[0])
-				_drape(drape, c, dir, n, y + 0.02, y + top, DRAPE_W)
-				var tie := c + n * 0.06
-				var tb := BoxMesh.new()
-				tb.size = Vector3(absf(dir.x) * 0.5 + absf(n.x) * 0.12, 0.07, absf(dir.y) * 0.5 + absf(n.y) * 0.12)
-				ManorMeshMerger.append(trim, tb, Transform3D(Basis(), Vector3(tie.x, y + 1.05, tie.y)))
-			var mid: Vector2 = face + dir * ((o[0] + o[1]) * 0.5) + n * 0.08
-			var len: float = o[1] - o[0] + 2.0 * (DRAPE_OUT + DRAPE_W * 0.5) + 0.1
-			var pel := BoxMesh.new()
-			pel.size = Vector3(absf(dir.x) * len + absf(n.x) * 0.2, 0.42, absf(dir.y) * len + absf(n.y) * 0.2)
-			ManorMeshMerger.append(drape, pel, Transform3D(Basis(), Vector3(mid.x, y + top + 0.05, mid.y)), false)
-			var bead := BoxMesh.new()
-			bead.size = Vector3(absf(dir.x) * (len + 0.04) + absf(n.x) * 0.23, 0.05, absf(dir.y) * (len + 0.04) + absf(n.y) * 0.23)
-			ManorMeshMerger.append(trim, bead, Transform3D(Basis(), Vector3(mid.x, y + top - 0.16, mid.y)))
-	if not any:
-		return null
+			var tie := c + n * 0.06
+			var tb := BoxMesh.new()
+			tb.size = Vector3(absf(dir.x) * 0.5 + absf(n.x) * 0.12, 0.07, absf(dir.y) * 0.5 + absf(n.y) * 0.12)
+			ManorMeshMerger.append(trim, tb, Transform3D(Basis(), Vector3(tie.x, y + 1.05, tie.y)))
+		var mid: Vector2 = face + dir * ((o[0] + o[1]) * 0.5) + n * 0.08
+		var len: float = o[1] - o[0] + 2.0 * (DRAPE_OUT + DRAPE_W * 0.5) + 0.1
+		var pel := BoxMesh.new()
+		pel.size = Vector3(absf(dir.x) * len + absf(n.x) * 0.2, 0.42, absf(dir.y) * len + absf(n.y) * 0.2)
+		ManorMeshMerger.append(drape, pel, Transform3D(Basis(), Vector3(mid.x, y + top + 0.05, mid.y)), false)
+		if stripped:
+			continue
+		var bead := BoxMesh.new()
+		bead.size = Vector3(absf(dir.x) * (len + 0.04) + absf(n.x) * 0.23, 0.05, absf(dir.y) * (len + 0.04) + absf(n.y) * 0.23)
+		ManorMeshMerger.append(trim, bead, Transform3D(Basis(), Vector3(mid.x, y + top - 0.16, mid.y)))
 	drape.generate_normals()
 	var mesh := ManorMeshMerger.commit(drape)
 	var fabric := MaterialLibrary.surface()
@@ -308,24 +348,25 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 	fabric.roughness = 0.75
 	fabric.cull_mode = BaseMaterial3D.CULL_DISABLED     # pleats read from both sides
 	mesh.surface_set_material(0, fabric)
-	trim.generate_normals()
-	mesh = ManorMeshMerger.commit(trim, mesh)
-	var tm := MaterialLibrary.surface()
-	tm.resource_name = "curtain_trim"
-	tm.albedo_color = cols[1]
-	tm.roughness = 0.4
-	tm.metallic = 0.5
-	mesh.surface_set_material(1, tm)
+	if not stripped:
+		trim.generate_normals()
+		mesh = ManorMeshMerger.commit(trim, mesh)
+		var tm := MaterialLibrary.surface()
+		tm.resource_name = "curtain_trim"
+		tm.albedo_color = cols[1]
+		tm.roughness = 0.4
+		tm.metallic = 0.5
+		mesh.surface_set_material(1, tm)
 	var mi := MeshInstance3D.new()
-	mi.name = "Curtains"
 	mi.mesh = mesh
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	node.add_child(mi)
 	return mi
 
 
-## One drape: a pleated panel `w` wide centred at c, gathered at the tie-back.
-static func _drape(st: SurfaceTool, c: Vector2, dir: Vector2, n: Vector2, y0: float, y1: float, w: float) -> void:
+## One drape: a pleated panel `w` wide centred at c, gathered at the tie-back
+## (or hanging straight, untied, with `tied` false).
+static func _drape(st: SurfaceTool, c: Vector2, dir: Vector2, n: Vector2, y0: float, y1: float, w: float,
+		tied: bool = true) -> void:
 	const PLEATS := 7
 	const ROWS := [0.0, 0.18, 0.3, 0.36, 0.42, 0.6, 1.0]   # tie-back near 0.36 of the height
 	var cols := PLEATS * 2 + 1
@@ -333,7 +374,7 @@ static func _drape(st: SurfaceTool, c: Vector2, dir: Vector2, n: Vector2, y0: fl
 	for ri in ROWS.size():
 		var v: float = ROWS[ri]
 		var yy := lerpf(y0, y1, v)
-		var gather := 1.0 - 0.55 * exp(-pow((v - 0.36) / 0.12, 2.0))
+		var gather := 1.0 - 0.55 * exp(-pow((v - 0.36) / 0.12, 2.0)) if tied else 1.0
 		var row: Array = []
 		for k in cols:
 			var u := float(k) / (cols - 1) - 0.5

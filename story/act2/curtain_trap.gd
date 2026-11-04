@@ -8,9 +8,12 @@
 ## "At least you're willing to put up a fight". Deed: curtain_trap_set, then
 ## fact.alis_tripped in the morning.
 ##
-## Plays the moment `curtain_trap` (E at her window, at night). Play: E at
-## the curtains takes the trimmings (a coil of rope), walk to the door, E
-## rigs it at the light fixture.
+## Plays the moment `curtain_trap` (E at her window, at night). Play (T077):
+## E at a curtain strips its trimmings (its tie-backs and gilt go, the drapes
+## hang loose) and she says so; the card then shows only by a window whose
+## curtains still have theirs, until every window's are off. She braids them
+## (a coil of rope), looks to the door ("Now the light over the door"), walks
+## there, and E rigs it at the light fixture.
 ##
 ## Before it starts (L34-7): at night after dinner, once she's in her room,
 ## the window pulls her: a draught stirs the curtains, the growl that shut
@@ -18,6 +21,8 @@
 ## (ch7's motive, Keeper), then (if she still hasn't gone to the window) the
 ## thought of the trimmings, twice at most. Near the
 ## window the "E   the curtains" card shows. No marker, no objective (R2).
+## The bedroom's drapes are the house's (ManorRoomFinish.WORKED_CURTAINS): a
+## "Window<i>" per window, "Dressed" and a hidden "Stripped" twin.
 class_name CurtainTrap
 extends Act2Space
 
@@ -43,18 +48,34 @@ var rigged: bool = false
 ## pull's steps taken (draught, growl, lock, curtain thoughts).
 var pull_t: float = 0.0
 var pulled: PackedStringArray = []
-var _curtains: MeshInstance3D
+## Windows (indexes into spots()) whose trimmings she has taken tonight.
+var stripped: Array[int] = []
+var _curtains: Node3D
 
 
 func _build_beats() -> Array:
 	rigged = false
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
+			if is_inside_tree():
+				PressCard.hide_on(self)
+			_dress_all()
+			var i := nearest_spot()
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
-			StoryControl.set_focus(_marker(&"curtains"))
+			StoryControl.set_focus(_point(spots()[i]))
+			strip(i)
 			aside(&"trimmings"), "the curtain trimmings"),
 		Beats.wait(1.2),
-		Beats.run(_make_rope, "a rope from the trimmings"),
+		Beats.run(func(_s: SceneSpace) -> void:
+			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.set_focus(null), "the other curtains"),
+		StripBeat.new(&"more_trimmings", NUDGE_AFTER),
+		Beats.run(func(s: SceneSpace) -> void:
+			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			_make_rope(s)
+			StoryControl.set_focus(_marker(&"fixture"))
+			aside(&"rope_made"), "a rope from the trimmings"),
+		Beats.wait(1.5),
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "to the door"),
@@ -103,7 +124,7 @@ func pull(delta: float) -> void:
 	var ready_now := not running and can_start()
 	var here := ready_now and in_room()
 	if is_inside_tree() and not running:
-		var near := here and player_within(moment.entry_radius if moment else 2.5)
+		var near := here and in_reach()
 		if near:
 			PressCard.find_or_make(self).show_text("the curtains")
 		else:
@@ -117,8 +138,8 @@ func pull(delta: float) -> void:
 	pull_t += delta
 	if pull_t >= DRAUGHT_AT and not pulled.has("draught"):
 		pulled.append("draught")
-		if is_inside_tree():
-			CurtainDraught.stir(curtains())
+		for c in curtain_meshes():
+			CurtainDraught.stir(c)
 		aside(&"pull_draught")
 	if pull_t >= GROWL_AT and not pulled.has("growl"):
 		pulled.append("growl")
@@ -144,25 +165,114 @@ func in_room() -> bool:
 	return Vector2(d.x, d.z).length() <= ROOM_RADIUS and absf(d.y) <= arrive_height
 
 
-## The bedroom's own drapes (the house builds a "Curtains" mesh per room).
-func curtains() -> MeshInstance3D:
+## E at an unstripped curtain: within the moment's radius of one, on her floor.
+func in_reach() -> bool:
+	return moment != null and nearest_spot(moment.entry_radius) >= 0
+
+
+## Where each window's curtains hang (their middle, on the floor), in window
+## order; just the "curtains" mark when the house has none (tests, no house).
+func spots() -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	var holder := curtains()
+	if holder:
+		for w in holder.get_children():
+			var dressed := w.get_node_or_null(^"Dressed") as MeshInstance3D
+			if dressed:
+				var c := (dressed.global_transform * dressed.get_aabb()).get_center()
+				out.append(Vector3(c.x, global_position.y, c.z))
+	if out.is_empty():
+		var m := mark(&"curtains")
+		out.append(Vector3(m.x, global_position.y, m.z))
+	return out
+
+
+## The unstripped window nearest her within `radius` (flat, on her floor), or
+## -1; with radius < 0, the nearest unstripped one wherever she is.
+func nearest_spot(radius: float = -1.0) -> int:
+	var p := player()
+	var all := spots()
+	var best := -1
+	var best_d := INF
+	for i in all.size():
+		if stripped.has(i):
+			continue
+		if p == null:
+			return i if radius < 0.0 else -1
+		var d := Vector2(p.global_position.x - all[i].x, p.global_position.z - all[i].z).length()
+		if radius >= 0.0 and (d > radius or absf(p.global_position.y - all[i].y) > arrive_height):
+			continue
+		if d < best_d:
+			best_d = d
+			best = i
+	return best
+
+
+func all_stripped() -> bool:
+	return stripped.size() >= spots().size()
+
+
+## Takes window `i`'s trimmings: its drapes hang loose, its gilt gone.
+func strip(i: int) -> void:
+	if i < 0 or stripped.has(i):
+		return
+	stripped.append(i)
+	var w := _window(i)
+	if w:
+		(w.get_node(^"Dressed") as Node3D).visible = false
+		(w.get_node(^"Stripped") as Node3D).visible = true
+	if is_inside_tree():
+		Juice.burst(null, &"craft", spots()[i] + Vector3.UP * 1.1)
+
+
+## Every window dressed again (a fresh start of the night).
+func _dress_all() -> void:
+	stripped.clear()
+	var holder := curtains()
+	if holder == null:
+		return
+	for w in holder.get_children():
+		(w.get_node(^"Dressed") as Node3D).visible = true
+		(w.get_node(^"Stripped") as Node3D).visible = false
+
+
+func _window(i: int) -> Node3D:
+	var holder := curtains()
+	if holder == null or i >= holder.get_child_count():
+		return null
+	return holder.get_child(i) as Node3D
+
+
+## The bedroom's own drapes (ManorRoomFinish.WORKED_CURTAINS: a "Curtains"
+## holder kept out of the house's merge).
+func curtains() -> Node3D:
 	if _curtains and is_instance_valid(_curtains):
 		return _curtains
 	_curtains = null
 	if not is_inside_tree():
 		return null
-	var best := 6.0
-	for n in get_tree().root.find_children("Curtains", "MeshInstance3D", true, false):
-		var d := (n as Node3D).global_position.distance_to(mark(&"curtains"))
+	var best := ROOM_RADIUS
+	for n in get_tree().root.find_children("Curtains", "ManorLooseProp", true, false):
 		if n.get_parent() and n.get_parent().name == &"feyre_bedroom":
 			_curtains = n
 			break
-		var box := (n as MeshInstance3D).global_transform * (n as MeshInstance3D).get_aabb()
-		d = box.get_center().distance_to(mark(&"curtains"))
+		var d := (n as Node3D).global_position.distance_to(global_position)
 		if d < best:
 			best = d
 			_curtains = n
 	return _curtains
+
+
+## The drapes as they hang now (each window's dressed or stripped mesh).
+func curtain_meshes() -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	var holder := curtains()
+	if holder:
+		for w in holder.get_children():
+			for m in w.get_children():
+				if m is MeshInstance3D and (m as MeshInstance3D).visible:
+					out.append(m)
+	return out
 
 
 func _make_rope(_s: SceneSpace) -> void:
@@ -239,6 +349,17 @@ func _model(model_id: StringName) -> Node3D:
 	return mi
 
 
+## A marker at a world point, for the camera to look at.
+func _point(at: Vector3) -> Node3D:
+	var m := get_node_or_null(^"CurtainSpot") as Node3D
+	if m == null:
+		m = Marker3D.new()
+		m.name = "CurtainSpot"
+		add_child(m)
+	m.global_position = at + Vector3.UP * 1.6
+	return m
+
+
 func _marker(mark_name: StringName) -> Node3D:
 	var node_name := String(mark_name).to_pascal_case()
 	var m := get_node_or_null(NodePath(node_name)) as Node3D
@@ -248,3 +369,37 @@ func _marker(mark_name: StringName) -> Node3D:
 		add_child(m)
 	m.global_position = mark(mark_name)
 	return m
+
+
+## Waits for E at each window still in its trimmings, showing "E   the
+## curtains" by one; each press there strips it. Done when none are left;
+## a thought about the other curtains if she idles (L34-6).
+class StripBeat:
+	extends Act2Space.NudgeBeat
+	var _base: int = 0
+
+	func _init(n: StringName, a: float) -> void:
+		super._init(Callable(), n, a, "until the trimmings are off")
+
+	func enter(space: SceneSpace) -> void:
+		super.enter(space)
+		_base = (space as Act2Space).presses()
+
+	func is_done(space: SceneSpace) -> bool:
+		var trap := space as CurtainTrap
+		var near := trap.nearest_spot(trap.moment.entry_radius if trap.moment else 2.5)
+		if trap.presses() > _base:
+			_base = trap.presses()
+			if near >= 0:
+				trap.strip(near)
+				waited = 0.0
+				near = trap.nearest_spot(trap.moment.entry_radius if trap.moment else 2.5)
+		if trap.all_stripped():
+			return true
+		if trap.is_inside_tree():
+			PressCard.find_or_make(trap).show_text("the curtains" if near >= 0 else "")
+		return false
+
+	func exit(space: SceneSpace) -> void:
+		if space.is_inside_tree():
+			PressCard.hide_on(space)

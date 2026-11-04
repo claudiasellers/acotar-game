@@ -8,7 +8,7 @@
 ##   12. act2_dinner    to her chair, try to rise (one shove), E until the
 ##                      plate is clear and the torte vanishes; first_dinner_eaten
 ##   13. curtain_trap   Return Home (pause menu) to her window, E at night,
-##                      rig the rope at the door; curtain_trap_set, then
+##                      E at each window's curtains, rig the rope at the door; curtain_trap_set, then
 ##                      Alis trips at dawn (fact.alis_tripped)
 ## `t` is the running playtest (its walker, presses and report).
 class_name Act2PlaytestBeats
@@ -139,6 +139,15 @@ func _curtain_trap() -> bool:
 	await t._press(&"interact")
 	if not await t._until(func() -> bool: return trap.running, 20.0):
 		return _fail("E at the window didn't start it (%.1f m from the window, night %s)" % [t._flat(trap.global_position), Clock.is_night()])
+	# Every window's trimmings, E at each (T077).
+	var spots: Array[Vector3] = trap.spots()
+	for i in spots.size():
+		if trap.stripped.has(i):
+			continue
+		await t._walk_to(spots[i] + Vector3(0, 0, 1.0), 1.2, Callable(), 30.0)
+		await t._press(&"interact")
+		if not await t._until(func() -> bool: return trap.stripped.has(i), 3.0):
+			return _fail("E at window %d didn't take its trimmings (%.1f m off)" % [i, t._flat(spots[i])])
 	if not await t._until(func() -> bool: return _label(trap) == "reach door_inside", 20.0):
 		return _fail("no rope (beat '%s')" % _label(trap))
 	await t._walk_to(trap.mark(&"door_inside"), 1.4, Callable(), 30.0)

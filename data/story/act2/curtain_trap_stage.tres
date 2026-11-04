@@ -31,10 +31,12 @@ lines = {
 "feyre_bell": {"text": "It's a warning bell to give me time to run. Not a trap.", "who": "Feyre"},
 "feyre_sorry": {"text": "I'm sorry. I'm so sorry, I didn't—", "who": "Feyre"},
 "locked": {"text": "Then I locked the door.", "who": ""},
+"more_trimmings": {"text": "The other curtains have trimmings too. Not enough for a rope yet.", "who": ""},
+"rope_made": {"text": "Braided, it's long enough. Now the light over the door.", "who": ""},
 "rig_prompt": {"text": "Up to the light fixture, rigged to snap into anyone's face.", "who": ""},
 "screech_thud": {"text": "A screech, and a thud.", "who": ""},
 "trimmings": {"text": "The curtain trimmings. Braided, they'd make a length of rope.", "who": ""}
 }
 extra_require = PackedStringArray()
-invented = PackedStringArray("alis_word", "feyre_sorry", "locked", "rig_prompt", "trimmings", "pull_draught")
+invented = PackedStringArray("alis_word", "feyre_sorry", "locked", "rig_prompt", "trimmings", "pull_draught", "more_trimmings", "rope_made")
 canon = "Ch7 (Keeper 2026-11-01, [C]): the length of rope I'd made from the curtain trimmings, hanging from the light fixture, rigged to snap into anyone's face when the door opens; she locks her door. Alis unlocks it before dawn: a screech and a thud, Alis in a heap; up at once, hissing, brushing her apron; the Cauldron line; Feyre babbles apologies; the breaking-bones sneer; warning bell, not a trap; a barked laugh; the master gave his word she'd live (paraphrase, X wording); the lovely curtains; curtains thrown open on a periwinkle dawn splashed with pumpkin and magenta; at least you're willing to put up a fight. Ch8: Tamlin asks if the trip wire was for him."

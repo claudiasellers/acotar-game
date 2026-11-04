@@ -234,6 +234,93 @@ func test_at_night_the_window_pulls_her_to_the_curtains() -> void:
 	assert_eq(card.text(), "", "gone once the night's done")
 
 
+## The bedroom as the house builds it (T077): its curtains, one Window per
+## window, and the window anchor where the house puts it.
+func _bedroom_curtains() -> Node3D:
+	var all := ManorHouseIndex.new(ManorHouseBuilder.load_layouts())
+	var room: ManorRoomDef
+	for r in all.rooms:
+		if r.id == &"feyre_bedroom":
+			room = r
+	for a in all.anchors:
+		if a.anchor_id == &"feyre_bedroom_window":
+			bedroom.global_position = Vector3(a.position.x, ManorHouseBuilder.floor_y(a.level) + a.position.y, a.position.z)
+	var node := Node3D.new()
+	node.name = "feyre_bedroom"
+	root.add_child(node)
+	return ManorRoomFinish.add_curtains(node, room, all, ManorHouseBuilder.floor_y(room.level), ManorHouseBuilder.ceiling_of(room))
+
+
+func _card_text() -> String:
+	var card := trap().get_node_or_null(^"PressCard") as PressCard
+	return card.text() if card else ""
+
+
+func _tick_trap(seconds: float) -> void:
+	for _i in int(seconds / STEP):
+		trap().tick(STEP)
+		var now := _caption()
+		if now != "" and (heard.is_empty() or heard.back() != now):
+			heard.append(now)
+
+
+## In her room, a step back from window `i`'s curtains.
+func _at_window(i: int) -> void:
+	var spot: Vector3 = trap().spots()[i]
+	feyre.global_position = spot + (Vector3(bedroom.global_position.x, spot.y, bedroom.global_position.z) - spot).limit_length(1.0)
+
+
+func test_each_curtain_strips_once_then_the_door_is_next() -> void:
+	WorldState.set_flag("wall_crossed")
+	WorldState.set_flag("first_dinner_eaten")
+	Clock.from_dict({"time_of_day": 0.95, "day": 3})
+	var holder := _bedroom_curtains()
+	assert_not_null(holder, "the bedroom has curtains")
+	if holder == null:
+		return
+	assert_true(holder is ManorLooseProp, "kept out of the house's merge, so the scene can find them")
+	trap().auto_tick = false
+	var spots := trap().spots()
+	assert_eq(spots.size(), holder.get_child_count(), "a spot per window")
+	assert_gt(spots.size(), 1, "more than one window")
+	_at_window(1)
+	_pull(0.5)
+	assert_eq(_card_text(), "E   the curtains", "the card by a window")
+	assert_true(trap().in_reach())
+	trap().arrive()
+	assert_true(trap().running, "E there starts it")
+	var w1 := holder.get_child(1)
+	assert_false((w1.get_node(^"Dressed") as Node3D).visible, "that window's curtains change")
+	assert_true((w1.get_node(^"Stripped") as Node3D).visible)
+	assert_lt((w1.get_node(^"Stripped") as MeshInstance3D).mesh.get_surface_count(),
+		(w1.get_node(^"Dressed") as MeshInstance3D).mesh.get_surface_count(), "no gilt left on them")
+	_tick_trap(2.0)
+	assert_eq(_card_text(), "", "no E by curtains already stripped")
+	trap().press_interact()
+	_tick_trap(0.5)
+	assert_eq(Array(trap().stripped), [1], "a used curtain gives nothing more")
+	_tick_trap(CurtainTrap.NUDGE_AFTER + 1.0)
+	assert_true(heard.has(_line(trap(), &"more_trimmings")), "she thinks of the other curtains: %s" % [heard])
+	for i in spots.size():
+		if i == 1:
+			continue
+		_at_window(i)
+		_tick_trap(0.3)
+		assert_eq(_card_text(), "E   the curtains", "the card by window %d" % i)
+		trap().press_interact()
+		_tick_trap(0.3)
+		assert_true(trap().stripped.has(i), "window %d stripped" % i)
+	assert_true(trap().all_stripped())
+	assert_eq(_card_text(), "", "no E left once every curtain's used")
+	assert_not_null(trap().coil, "braided into a rope")
+	assert_true(heard.has(_line(trap(), &"rope_made")), "and she says where it goes: %s" % [heard])
+	_tick_trap(2.0)
+	assert_eq(trap().current_beat_label(), "reach door_inside", "next, the door")
+	feyre.global_position = trap().mark(&"door_inside")
+	_tick_trap(0.5)
+	assert_eq(_card_text(), "E   rig the rope")
+
+
 func test_the_morning_after_lucien_asks_her_to_hunt() -> void:
 	for f in ["wall_crossed", "first_dinner_eaten", "curtain_trap_set", "fact.alis_tripped"]:
 		WorldState.set_flag(f)

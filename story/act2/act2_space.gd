@@ -60,12 +60,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"interact"):
 		if running:
 			_presses += 1
-		elif moment and moment.trigger == &"interact" and player_within(moment.entry_radius):
+		elif moment and moment.trigger == &"interact" and in_reach():
 			arrive()
 	elif running:
 		for action: StringName in [&"move_forward", &"move_back", &"move_left", &"move_right"]:
 			if event.is_action_pressed(action):
 				_nudges += 1
+
+
+## Close enough for E to start an "interact" moment.
+func in_reach() -> bool:
+	return moment != null and player_within(moment.entry_radius)
 
 
 func _player_here() -> bool:
