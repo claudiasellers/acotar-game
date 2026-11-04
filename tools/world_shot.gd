@@ -29,6 +29,8 @@ const SHOTS := {
 	"eastern_bogge": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.45, &"bogge"],
 	"eastern_bogge_dusk": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.74, &"bogge"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
+	# L63 look request: Blossom Vale at noon under its own grade.
+	"blossom_vale_noon": [Vector3(930, 0, 1030), Vector3(1000, 0, 950), 0.5, &"grade_blossom_vale"],
 }
 
 
