@@ -107,15 +107,10 @@ static func card_box() -> StyleBoxFlat:
 	return box
 
 
-## Inner gold hairline between the card edge and its contents.
-static func inner_frame() -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.draw_center = false
-	box.border_color = Color(GOLD, 0.5)
-	box.set_border_width_all(1)
-	box.set_corner_radius_all(22)
-	box.set_expand_margin_all(16)
-	return box
+## Inner frame between the card edge and its contents: Kenney's scrolled
+## double-corner border in gold (L65, UiBorders), 16 px in from the card's edge.
+static func inner_frame() -> StyleBox:
+	return UiBorders.card_frame(GOLD, 18.0)
 
 
 ## A section: soft tinted well behind a group of settings.
