@@ -1,0 +1,4 @@
+from planner full from-start chain on main
+quality look
+timeout 1200
+shot chain res://tools/playtest/act1_playtest.tscn --out={out}/chain.json --max-wall=1100 --settle=60
