@@ -75,9 +75,14 @@ func _physics_process(delta: float) -> void:
 
 ## Draw/release logic, separated from input so tests can drive it.
 func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
-	if fire_held and can_shoot() and _available() != &"":
+	var allowed := can_shoot()
+	if fire_held and allowed and _available() != &"":
 		is_drawing = true
 		draw_amount = minf(draw_amount + delta / bow.draw_time, 1.0)
+	elif is_drawing and not allowed:
+		# A scene took the bow mid-draw: let the string down, the arrow stays.
+		is_drawing = false
+		draw_amount = 0.0
 	elif is_drawing:
 		release()
 		is_drawing = false
@@ -100,7 +105,10 @@ static func slow_time_scale(drawing: bool, aiming: bool, stamina: float, draw: f
 
 
 func _update_slow_time(delta: float, aiming: bool) -> void:
-	var scale := slow_time_scale(is_drawing, aiming, feyre.stamina, draw_amount)
+	# Winded (ran dry holding the draw): no slow time until she has her breath
+	# back, or the first sliver of regen would flick it on and off each frame.
+	var breath := 0.0 if feyre.is_winded() else feyre.stamina
+	var scale := slow_time_scale(is_drawing, aiming, breath, draw_amount)
 	slowing = scale < 1.0
 	if slowing:
 		# delta is scaled game time; drain in real seconds.

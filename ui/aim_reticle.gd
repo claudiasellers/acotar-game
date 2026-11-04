@@ -30,11 +30,15 @@ func _process(delta: float) -> void:
 	if not show:
 		return
 	_since += delta / maxf(Engine.time_scale, 0.01)
-	if _since < REFRESH and not impact.is_empty():
-		return
-	_since = 0.0
-	impact = bow.predict_impact()
-	var cam := feyre.camera
+	if _since >= REFRESH or impact.is_empty():
+		_since = 0.0
+		impact = bow.predict_impact()
+	# The camera on screen: a staged lens (Cine, the wolf hunt's tighter lens)
+	# rides hers with another fov, so projecting through hers would put the
+	# ring short of where the arrow lands. Every frame, so it never lags a turn.
+	var cam := get_viewport().get_camera_3d()
+	if cam == null:
+		cam = feyre.camera
 	if cam.is_position_behind(impact.point):
 		visible = false
 		return

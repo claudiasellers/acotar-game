@@ -383,6 +383,12 @@ func _gentle_mode() -> bool:
 	return settings != null and bool(settings.get(&"gentle_mode"))
 
 
+## Ran dry and has not yet caught her breath (35% back): BowController holds
+## slow time off until then.
+func is_winded() -> bool:
+	return _exhausted
+
+
 ## Stamina now only pays for slow-time aiming (drain_stamina); sprinting is free.
 func _update_stamina(delta: float) -> void:
 	if _stamina_cooldown > 0.0:
