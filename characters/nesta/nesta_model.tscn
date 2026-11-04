@@ -10,7 +10,7 @@
 resource_name = "skin_head"
 resource_local_to_scene = true
 shader = ExtResource("3_skin")
-shader_parameter/albedo = Color(0.922, 0.792, 0.737, 1.0)
+shader_parameter/albedo = Color(0.850, 0.730, 0.679, 1.0)
 shader_parameter/makeup_mask_a = ExtResource("4_mask_a")
 shader_parameter/makeup_mask_b = ExtResource("5_mask_b")
 shader_parameter/brows_color = Color(0.431, 0.306, 0.188, 1.0)
@@ -32,7 +32,7 @@ shader_parameter/rim_color = Color(0.902, 0.925, 1.000, 1.0)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
 resource_name = "skin"
 shader = ExtResource("3_skin")
-shader_parameter/albedo = Color(0.922, 0.792, 0.737, 1.0)
+shader_parameter/albedo = Color(0.850, 0.730, 0.679, 1.0)
 shader_parameter/brows_amount = 0.0
 shader_parameter/lips_amount = 0.0
 
