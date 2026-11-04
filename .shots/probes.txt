@@ -1,0 +1,15 @@
+from grade-revert
+quality look
+shot manor_front res://tools/world_shot.tscn manor_drive {out}/manor_front.png
+shot cottage res://tools/world_shot.tscn cottage_snow {out}/cottage.png
+shot hunting_forest res://tools/world_shot.tscn hunting_forest {out}/hunting_forest.png
+shot village res://tools/world_shot.tscn village_market {out}/village.png
+shot workshop res://tools/world_shot.tscn burnt_estate {out}/workshop.png
+shot feyre_closeup res://tools/feyre_face_shot.tscn {out}
+shot wolf_closeup res://tools/creatures/wolf_look_shot.tscn {out}
+shot opening_film res://tools/film/opening_film_shot.tscn {out} noclip until=20
+shot rose_garden res://tools/world_shot.tscn manor_rose_garden {out}/rose_garden.png
+shot spring_vista res://tools/world_shot.tscn wall_crossing_spring {out}/spring_vista.png
+shot manor_garden res://tools/world_shot.tscn manor_garden_east {out}/manor_garden.png
+shot manor_interior res://tools/manor_estate/room_shot.tscn entrance_hall {out}
+shot blossom_vale_noon res://tools/world_shot.tscn blossom_vale_noon {out}/blossom_vale_noon.png
