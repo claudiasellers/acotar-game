@@ -14,9 +14,9 @@ extends SceneTree
 
 const PRESET_DIR := "res://world/shared/grades/"
 const LUT_DIR := "res://data/grades/luts/"
-## Trilinear error is 0 on the affine parts; up to ~1% where a channel clamps
-## inside a cell (high contrast and saturation) and on the old curves' kinks.
-const MAX_ERROR := 0.015
+## Trilinear error is 0 on the affine parts; up to ~1.5% where a channel
+## clamps inside a cell (high contrast and saturation) and on curve kinks.
+const MAX_ERROR := 0.02
 
 
 func _init() -> void:
@@ -56,8 +56,8 @@ func _init() -> void:
 			push_error("make_lut: %s LUT off by %.4f" % [id, err])
 			ok = false
 		rows.append(_row(id, p, ms, err))
-	print("| Preset | exposure | brightness | contrast | saturation | curve (0 / 0.5 / 1) | lift / gamma / gain | hue | sat shadow / highlight | build ms | max err |")
-	print("|---|---|---|---|---|---|---|---|---|---|---|")
+	print("| Preset | exposure | brightness | contrast | saturation | curve (0 / 0.5 / 1) | lift / gamma / gain | hue | sat shadow / highlight | white | build ms | max err |")
+	print("|---|---|---|---|---|---|---|---|---|---|---|---|")
 	for r in rows:
 		print(r)
 	quit(0 if ok else 1)
@@ -105,9 +105,9 @@ static func _row(id: String, p: GradePreset, ms: float, err: float) -> String:
 			var c := l.curve.sample(x)
 			parts.append("(%.3f, %.3f, %.3f)" % [c.r, c.g, c.b])
 		curve = " / ".join(parts)
-	return "| `%s` | %.3f | %.3f | %.3f | %.3f | %s | %s / %s / %s | %.1f | %.2f / %.2f | %.0f | %.4f |" % [
+	return "| `%s` | %.3f | %.3f | %.3f | %.3f | %s | %s / %s / %s | %.1f | %.3f / %.3f | %.2f | %.0f | %.4f |" % [
 		id, p.exposure, l.brightness, l.contrast, l.saturation, curve, _c(l.lift), _c(l.gamma), _c(l.gain),
-		l.hue_shift, l.shadow_saturation, l.highlight_saturation, ms, err]
+		l.hue_shift, l.shadow_saturation, l.highlight_saturation, l.white_level, ms, err]
 
 
 static func _c(c: Color) -> String:

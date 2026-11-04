@@ -7,3 +7,5 @@ script = ExtResource("1_rarnf")
 brightness = 0.92
 contrast = 1.12
 saturation = 0.35
+shadow_saturation = 1.35
+highlight_saturation = 1.394

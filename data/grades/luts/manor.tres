@@ -6,3 +6,5 @@
 script = ExtResource("1_oyhar")
 contrast = 1.15
 saturation = 1.22
+shadow_saturation = 1.35
+highlight_saturation = 1.799

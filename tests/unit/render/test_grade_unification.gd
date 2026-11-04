@@ -1,7 +1,8 @@
 extends GutTest
 ## Contract for grade unification (render program T3b, L63): every grade is
 ## AgX with one grade layer, a 32³ Texture3D LUT built from LutParams; the
-## Spring grades carry R3's soft strong bloom; the horror grades keep theirs.
+## Spring grades carry R3's soft strong bloom; the horror grades keep theirs;
+## the bright day grades roll their whites off below 0.98.
 # gate: when:world/shared/grades/*,data/grades/*,tools/env/make_lut.gd
 
 const SPRING := [&"spring", &"human_spring", &"manor", &"grade_blossom_vale", &"grade_rosewild",
@@ -28,7 +29,15 @@ func test_every_grade_is_agx_with_a_lut_built_from_parameters() -> void:
 		if p.lut_params == null:
 			continue
 		assert_eq(p.lut_params.resource_path, "res://data/grades/luts/%s.tres" % id, "%s: parameters live in data/" % id)
-		assert_true(p.lut_params.is_identity_look(), "%s: lift/gamma/gain, hue and saturation curve ship as identity" % id)
+		var l := p.lut_params
+		assert_true(l.lift == Color(0, 0, 0) and l.gamma == Color(1, 1, 1) and l.gain == Color(1, 1, 1) \
+			and is_zero_approx(l.hue_shift), "%s: lift/gamma/gain and hue ship as identity" % id)
+		# T3b's only look moves: the saturation curve that gives AgX back
+		# today's chroma (rising with luma, where AgX drains it) and the white roll-off.
+		assert_lte(l.shadow_saturation, l.highlight_saturation, "%s: the curve rises with luma" % id)
+		assert_lte(l.shadow_saturation, 1.35, "%s: shadows and mid-tones stay pastel" % id)
+		assert_between(l.highlight_saturation, 1.0, 1.8, "%s: chroma restore stays bounded" % id)
+		assert_between(l.white_level, 0.95, 1.0, id)
 		for k: StringName in [&"saturation", &"contrast", &"brightness"]:
 			assert_eq(p.get(k), 1.0, "%s.%s is folded into the LUT (one grade layer)" % [id, k])
 	var tex := GradeDirector.load_preset(&"spring").lut_texture()
@@ -37,10 +46,13 @@ func test_every_grade_is_agx_with_a_lut_built_from_parameters() -> void:
 
 
 func test_the_lut_is_the_old_grade() -> void:
-	# Spring's old adjustment sliders (contrast 1.15, saturation 1.22), Godot 4.7
-	# maths, on one colour; and identity parameters change nothing.
+	# Spring's old adjustment sliders (contrast 1.15, saturation 1.22), folded
+	# with Godot 4.7's maths, on one colour; identity parameters change nothing.
 	var c := Color(0.62, 0.48, 0.40)
-	var l := (GradeDirector.load_preset(&"spring")).lut_params
+	var spring := (GradeDirector.load_preset(&"spring")).lut_params
+	var l := LutParams.new()
+	l.contrast = spring.contrast
+	l.saturation = spring.saturation
 	var v := (Vector3(c.r, c.g, c.b) - Vector3.ONE * 0.5) * 1.15 + Vector3.ONE * 0.5
 	var avg := (v.x + v.y + v.z) / 3.0
 	v = Vector3(avg, avg, avg).lerp(v, 1.22)
@@ -76,3 +88,15 @@ func test_blends_and_moods_stay_smooth_across_the_lut_switch() -> void:
 	var cold := GradeDirector.with_mood(b, 1.0, &"dread")
 	assert_eq(cold.lut_params, b.lut_params, "a mood keeps the grade's LUT")
 	assert_eq(cold.tonemap_mode, Environment.TONE_MAPPER_AGX)
+
+
+func test_bright_day_grades_never_reach_paper_white() -> void:
+	for id: StringName in [&"grade_blossom_vale", &"grade_starlight_pool_sparkle", &"human_spring", &"grade_solstice"]:
+		var l := GradeDirector.load_preset(id).lut_params
+		var white := l.apply(Color(1, 1, 1))
+		assert_lt(maxf(white.r, maxf(white.g, white.b)), 0.98, "%s: white rolls off under 0.98" % id)
+	var roll := LutParams.new()
+	roll.white_level = 0.97
+	assert_true(roll.apply(Color(0.5, 0.6, 0.79)).is_equal_approx(Color(0.5, 0.6, 0.79)), "nothing below the knee moves")
+	assert_almost_eq(roll.apply(Color(1, 1, 1)).r, 0.97, 0.0001)
+	assert_gt(roll.apply(Color(0.95, 0.95, 0.95)).r, roll.apply(Color(0.9, 0.9, 0.9)).r, "still rising: no flat band")

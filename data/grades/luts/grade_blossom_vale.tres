@@ -11,3 +11,6 @@ script = ExtResource("1_5qryp")
 contrast = 1.12
 saturation = 1.2
 curve = SubResource("Gradient_0b0aa")
+white_level = 0.97
+shadow_saturation = 1.35
+highlight_saturation = 1.577
