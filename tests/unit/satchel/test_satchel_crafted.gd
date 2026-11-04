@@ -80,7 +80,10 @@ func test_handmade_layer_dresses_the_page() -> void:
 	var t := SatchelTheme.theme()
 	for v: StringName in [&"SatchelTab", &"SatchelDetail", &"SatchelChip", &"SatchelKey"]:
 		var style_name := &"panel" if v != &"SatchelTab" else &"normal"
-		assert_true(t.get_stylebox(style_name, v) is StyleBoxTexture, "%s is a crafted texture" % v)
+		var box := t.get_stylebox(style_name, v)
+		if box is FramedStyleBox:  # L65: Kenney's frame drawn over the crafted paper
+			box = (box as FramedStyleBox).base
+		assert_true(box is StyleBoxTexture, "%s is a crafted texture" % v)
 	assert_not_null(SatchelTheme.texture(SatchelTheme.WEAVE_PATH))
 	assert_not_null(SatchelTheme.texture(SatchelTheme.WASH_PATH))
 

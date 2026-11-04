@@ -53,10 +53,11 @@ static func theme() -> Theme:
 		if _fallback_theme == null:
 			_fallback_theme = _fallback()
 		base = _fallback_theme
-	var out := base
+	var out := base.duplicate() as Theme
 	if ResourceLoader.exists(CRAFTED_PATH):
-		out = base.duplicate() as Theme
 		out.merge_with(load(CRAFTED_PATH) as Theme)
+	# Kenney's frames over the main panels (L65, UiBorders), tinted gilt or smoke by act.
+	UiBorders.dress(out, out.get_color(&"line", COLOR_TYPE) if out.has_color(&"line", COLOR_TYPE) else _fallback_colors()[&"line"])
 	_crafted[path] = out
 	return out
 
