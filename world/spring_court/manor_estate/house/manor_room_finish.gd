@@ -267,6 +267,19 @@ static func drape_reach(room: ManorRoomDef) -> float:
 const WORKED_CURTAINS := [&"feyre_bedroom"]
 
 
+## The window's own flag, raised as the trap takes its trimmings (saved with the
+## story, so a half-done trap survives a reload). No canon rehangs them: Alis
+## only throws them open, and later chapters never mention new ones.
+static func stripped_flag(i: int) -> String:
+	return "curtain_stripped.%d" % i
+
+
+## Whether window `i` of a worked room hangs stripped when the house builds:
+## its own flag, or all of them once the trap is set.
+static func curtain_stripped(i: int) -> bool:
+	return WorldState.has_flag("curtain_trap_set") or WorldState.has_flag(stripped_flag(i))
+
+
 static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex, y: float, h: float) -> Node3D:
 	if not has_curtains(room):
 		return null
@@ -299,7 +312,9 @@ static func add_curtains(node: Node3D, room: ManorRoomDef, all: ManorHouseIndex,
 		w.add_child(dressed)
 		var stripped := _curtain_mesh([windows[i]], y, h, cols, true)
 		stripped.name = "Stripped"
-		stripped.visible = false
+		var off := curtain_stripped(i)
+		stripped.visible = off
+		dressed.visible = not off
 		w.add_child(stripped)
 	return holder
 

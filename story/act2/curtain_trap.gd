@@ -59,8 +59,8 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			if is_inside_tree():
 				PressCard.hide_on(self)
-			_dress_all()
-			var i := nearest_spot()
+			_sync_stripped()
+			var i := maxi(nearest_spot(), 0)
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_point(spots()[i]))
 			strip(i)
@@ -217,6 +217,7 @@ func strip(i: int) -> void:
 	if i < 0 or stripped.has(i):
 		return
 	stripped.append(i)
+	WorldState.set_flag(ManorRoomFinish.stripped_flag(i))
 	var w := _window(i)
 	if w:
 		(w.get_node(^"Dressed") as Node3D).visible = false
@@ -225,15 +226,18 @@ func strip(i: int) -> void:
 		Juice.burst(null, &"craft", spots()[i] + Vector3.UP * 1.1)
 
 
-## Every window dressed again (a fresh start of the night).
-func _dress_all() -> void:
+## Each window shows what the story says (a house rebuilt mid-trap keeps the
+## windows already stripped, ManorRoomFinish.curtain_stripped).
+func _sync_stripped() -> void:
 	stripped.clear()
-	var holder := curtains()
-	if holder == null:
-		return
-	for w in holder.get_children():
-		(w.get_node(^"Dressed") as Node3D).visible = true
-		(w.get_node(^"Stripped") as Node3D).visible = false
+	for i in spots().size():
+		var off := ManorRoomFinish.curtain_stripped(i)
+		if off:
+			stripped.append(i)
+		var w := _window(i)
+		if w:
+			(w.get_node(^"Dressed") as Node3D).visible = not off
+			(w.get_node(^"Stripped") as Node3D).visible = off
 
 
 func _window(i: int) -> Node3D:

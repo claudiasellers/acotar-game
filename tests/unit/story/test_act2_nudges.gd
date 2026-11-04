@@ -321,6 +321,27 @@ func test_each_curtain_strips_once_then_the_door_is_next() -> void:
 	assert_eq(_card_text(), "E   rig the rope")
 
 
+func _states(holder: Node3D) -> Array:
+	var out: Array = []
+	for w in holder.get_children():
+		out.append((w.get_node(^"Stripped") as Node3D).visible)
+	return out
+
+
+func test_a_rebuilt_bedroom_keeps_its_curtains_stripped() -> void:
+	var fresh := _bedroom_curtains()
+	assert_not_null(fresh)
+	if fresh == null:
+		return
+	assert_eq(_states(fresh), [false, false, false], "dressed before the trap")
+	# half done: window 1 only, then the house reloads
+	WorldState.set_flag(ManorRoomFinish.stripped_flag(1))
+	assert_eq(_states(_bedroom_curtains()), [false, true, false], "only the window she worked")
+	# done: every window, whether or not each flag was kept
+	WorldState.set_flag("curtain_trap_set")
+	assert_eq(_states(_bedroom_curtains()), [true, true, true], "all stripped once the trap is set")
+
+
 func test_the_morning_after_lucien_asks_her_to_hunt() -> void:
 	for f in ["wall_crossed", "first_dinner_eaten", "curtain_trap_set", "fact.alis_tripped"]:
 		WorldState.set_flag(f)
