@@ -16,7 +16,7 @@ run headless becomes a Mac step instead of iteration; canonical shots re-rendere
 | T2 surface model | L58 | lane/surface-model | L58-1 413510d handed in 20:48Z; Mac look request shots/req-L58-1 pending |
 | T5 touchable world | L59 | lane/touchable-world | props merged (8c2ea45); L59-4 e472d51 (navmesh + weather/fire + scene yield) queued; Mac look check of rain/petals/flames left |
 | T3a bounce, T3b grade, T4 hero meshes, T6 housekeeping | — | — | after L58 |
-| T3b grade unification | L63 | lane/grade-unify | handed in as lead/ready-L63-1 (stacked on L60-1, which needs its resubmit) |
+| T3b grade unification | L63 | lane/grade-unify | L63-1 e920bfa queued; L63-2 (chroma + white roll-off) handed in |
 
 ## Readings taken (the brief said: take the most reasonable reading and record it)
 
@@ -152,14 +152,18 @@ clean worktree at 9efa62e, `tools/env/grade_reference_t3a.json`):
   (its lit band is near black, 1.1% → 2.7% display, and 0.19 keeps the manor ambient floor readable under dread).
 - Estate boundary, same prop under `manor` vs `spring`: 3.2% (T3a 2.9%; both sides were and are one tonemapper).
 - Clip: the probe's sky samples look toward the sun (worst case). Under ACES at T3a these were 1.0 (255) on 9
-  of 20 grades and lit tops clipped too (blush top v = 1.000); under AgX lit tops sit at 0.96, and the toward-sun
-  sky still reaches ≥ 0.98 on the 8 brightest day grades (white pixels: blossom_vale 10.5%, pool_sparkle 9.2%,
-  human_spring 5.9%, glen_day 2.0%, fells 1.4%). Holding the lit band and dropping those skies below 0.98 needs
-  the sun up 3× (tested, rejected as relighting the grade) or a dimmer sky. Left for the canonical-shot check
-  (Mac step 7), where most views do not face the sun.
-- Colour: AgX takes ~30–40% chroma out of bright pastels at an equal lit band (spring: mint top HSV s 0.113 →
-  0.068, sky 0.113 → 0.068, blush 0.118 → 0.098). Not compensated (no look invention); `highlight_saturation`
-  in the LUT is the knob (docs/tuning.md).
+  of 20 grades and lit tops clipped too (blush top v = 1.000). L63-1 under AgX left the toward-sun sky ≥ 0.98 on 8
+  day grades. L63-2 adds a white roll-off to the LUT (above 0.8 each channel bends, slope-matched, to
+  `white_level` 0.97) on the 11 bright day/dusk grades: every grade's sky now ≤ 0.97 and no pixel ≥ 0.98 but one lit white top on `manor` (0.988; no roll-off there); no white
+  pixels. Raising the sun was tested and rejected (3× sun to get there). AgX's own white point
+  (`tonemap_agx_white` 32 or 100) changed nothing in SDR output. The roll-off and the colour cost the 8 brightest
+  grades 2.6–4.4% of lit band (blossom_vale −3.7, glen_day −4.1, pool_sparkle −4.0, human_spring −4.4, rosewild
+  −3.1, spring −3.2, fells −2.6, solstice −0.1), inside the 5% tolerance; the others stay within 1%.
+- Estate boundary after L63-2: 0.7%.
+- Colour (L63-1): AgX took 25–50% of the lit band's chroma out at an equal lit band. L63-2 (director's recommended
+  option, lead's acceptance: within 5% of T3a) gives it back with the LUT saturation curve: shadows ≤1.35,
+  highlights solved per grade (1.27–1.80). Every grade but `dread` (near black) is now within 5% of its T3a chroma
+  (worst human_spring +4.4%). The owner's decision on keep / restore / ACES is open; keep = set the curve to 1 / 1.
 
 Readings:
 - "AgX white 1.0" = `tonemap_white` 1.0 (Godot's default, unused by AgX). `tonemap_agx_white` stays at Godot's

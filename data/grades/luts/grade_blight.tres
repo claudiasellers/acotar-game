@@ -12,3 +12,5 @@ brightness = 0.86
 contrast = 1.18
 saturation = 0.4
 curve = SubResource("Gradient_56tgf")
+shadow_saturation = 1.272
+highlight_saturation = 1.272

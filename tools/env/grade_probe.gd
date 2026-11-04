@@ -5,10 +5,12 @@
 ##         0.85 albedo cap, ground): the lit band
 ##   sky   top and horizon sky pixels, and the frame's brightest channel (clip check)
 ## Modes (GRADE_PROBE env var):
-##   ref    write the lit band of every preset to REFERENCE (run on the state to hold)
+##   ref    write the lit band and its chroma for every preset to REFERENCE (run on the state to hold)
 ##   check  compare against REFERENCE; print per-preset delta, clip and boundary rows
-##   solve  like check, then search each preset's exposure until its lit band is
-##          within 1% of REFERENCE; prints "SOLVE <id> <exposure>" and its sky
+##   solve  like check; where chroma is off by more than CHROMA_TOL, search the
+##          LUT saturation curve (_solve_chroma) that restores it, then the
+##          exposure that brings the lit band within 1% of REFERENCE; prints
+##          "SOLVE <id> <exposure> <saturation>" and what is left
 ## The sky samples look toward the sun (it stands behind the blocks, 35° up):
 ## the worst case for the clip check.
 ## Needs a renderer (xvfb + lavapipe in the cloud, the GPU on a Mac):
@@ -18,6 +20,13 @@ extends Node3D
 
 const REFERENCE := "res://tools/env/grade_reference_t3a.json"
 const SIZE := Vector2i(480, 270)
+## Chroma (max - min channel, mean of the lit samples) is held within this of
+## the reference; grades whose lit band is below DARK are too dark to measure it.
+const CHROMA_TOL := 0.05
+const DARK := 0.05
+const SHADOW_SAT := 1.35
+const MAX_SAT := 1.8
+const LIT_FLOOR := 0.965
 const SKY_SHADER := "res://world/shared/grades/painted_sky.gdshader"
 const GROUND := Color(0.523, 0.548, 0.545)
 const BLUSH := Color(0.92, 0.72, 0.76)
@@ -59,17 +68,38 @@ func _ready() -> void:
 		var p := GradeDirector.load_preset(StringName(id))
 		var m := await _measure(p, p.exposure)
 		lit_now[id] = m.lit
-		out[id] = m.lit
+		out[id] = {lit = m.lit, chroma = m.chroma}
 		if mode == "ref":
 			continue
-		var target: float = ref[id]
+		var target: float = ref[id].lit
+		var chroma_target: float = ref[id].chroma
 		var delta: float = m.lit / target - 1.0
-		print("CHECK %-28s lit %+6.2f%%  sky_top %.3f  sky_hor %.3f  max %.3f  white px %.2f%%  exp %.3f" % [
-			id, delta * 100.0, m.sky_top, m.sky_horizon, m.max, m.clipped * 100.0, p.exposure])
-		if mode == "solve" and absf(delta) > 0.01:
-			var e := await _solve(p, target)
-			var sky := await _measure(p, e)
-			print("SOLVE %s %.4f  sky %.3f / %.3f" % [id, e, sky.sky_top, sky.sky_horizon])
+		var dc: float = m.chroma / maxf(chroma_target, 1e-4) - 1.0
+		print("CHECK %-28s lit %+6.2f%%  chroma %+6.2f%%  sky_top %.3f  sky_hor %.3f  max %.3f  white px %.2f%%  exp %.3f" % [
+			id, delta * 100.0, dc * 100.0, m.sky_top, m.sky_horizon, m.max, m.clipped * 100.0, p.exposure])
+		if mode == "solve" and (absf(delta) > 0.01 or (absf(dc) > CHROMA_TOL and target > DARK)):
+			var q := p
+			var sat: float = p.lut_params.highlight_saturation
+			var lit_target := target
+			var after := {}
+			# If saturation tops out, aim the lit band LIT_FLOOR down (inside the 5%
+			# tolerance) so the brightest samples leave the white roll-off, where no
+			# saturation can bring colour back.
+			# Saturation and exposure each move the other's number a little, so
+			# alternate until both hold.
+			for attempt in 4:
+				if absf(dc) > CHROMA_TOL and target > DARK:
+					sat = await _solve_chroma(q, chroma_target)
+					q = _with_sat(q, sat)
+				q.exposure = await _solve(q, lit_target)
+				after = await _measure(q, q.exposure)
+				dc = after.chroma / maxf(chroma_target, 1e-4) - 1.0
+				if absf(dc) <= CHROMA_TOL or target <= DARK:
+					break
+				if sat >= MAX_SAT - 0.01:
+					lit_target = target * LIT_FLOOR
+			print("SOLVE %s %.4f %.3f  lit %+.2f%%  chroma %+.2f%%  sky %.3f / %.3f" % [id, q.exposure, sat,
+				(after.lit / target - 1.0) * 100.0, dc * 100.0, after.sky_top, after.sky_horizon])
 	if mode == "ref":
 		var f := FileAccess.open(REFERENCE, FileAccess.WRITE)
 		f.store_string(JSON.stringify(out, "\t", true))
@@ -80,6 +110,35 @@ func _ready() -> void:
 			var b: float = lit_now[String(pair[1])]
 			print("BOUNDARY %s -> %s  prop luma delta %.2f%%" % [pair[0], pair[1], absf(a / b - 1.0) * 100.0])
 	get_tree().quit()
+
+
+## Highlight saturation that brings the lit band's chroma to `target` at the
+## preset's exposure (bisection, chroma rises with it). AgX pulls chroma out of
+## the highlights hardest, so the curve rises with luma: shadows take at most
+## SHADOW_SAT (the ~1.35 that mid-lit grades need), highlights up to MAX_SAT.
+func _solve_chroma(p: GradePreset, target: float) -> float:
+	var lo := 0.5
+	var hi := MAX_SAT
+	for i in 9:
+		var mid := 0.5 * (lo + hi)
+		var c: float = (await _measure(_with_sat(p, mid), p.exposure)).chroma
+		if absf(c / target - 1.0) < 0.01:
+			return mid
+		if c < target:
+			lo = mid
+		else:
+			hi = mid
+	return 0.5 * (lo + hi)
+
+
+static func _with_sat(p: GradePreset, s: float) -> GradePreset:
+	var q := GradePreset.mix(p, p, 0.0)
+	q.id = p.id
+	q.exposure = p.exposure
+	q.lut_params = p.lut_params.duplicate()
+	q.lut_params.shadow_saturation = minf(s, SHADOW_SAT)
+	q.lut_params.highlight_saturation = s
+	return q
 
 
 ## Exposure that brings the lit band to `target`: bracket by stops, then
@@ -132,9 +191,13 @@ func _measure(p: GradePreset, exposure: float) -> Dictionary:
 	if not dump.is_empty():
 		img.save_png(dump % String(p.id))
 	var lit := 0.0
+	var chroma := 0.0
 	for key: StringName in LIT:
-		lit += _luma(_sample(img, Vector2i(_cam.unproject_position(LIT[key]))))
+		var c := _sample(img, Vector2i(_cam.unproject_position(LIT[key])))
+		lit += _luma(c)
+		chroma += maxf(c.r, maxf(c.g, c.b)) - minf(c.r, minf(c.g, c.b))
 	lit /= LIT.size()
+	chroma /= LIT.size()
 	var top := _peak(_sample(img, Vector2i(SIZE.x / 2, 6)))
 	var hor_px := Vector2i(_cam.unproject_position(Vector3(0.0, 2.2, -4000.0))) - Vector2i(0, 6)
 	var hor := _peak(_sample(img, hor_px))
@@ -147,7 +210,7 @@ func _measure(p: GradePreset, exposure: float) -> Dictionary:
 			mx = maxf(mx, m)
 			if c.r >= 0.98 and c.g >= 0.98 and c.b >= 0.98:
 				clipped += 1
-	return {lit = lit, sky_top = top, sky_horizon = hor, max = mx, clipped = float(clipped) / (SIZE.x * SIZE.y)}
+	return {lit = lit, chroma = chroma, sky_top = top, sky_horizon = hor, max = mx, clipped = float(clipped) / (SIZE.x * SIZE.y)}
 
 
 func _preset_ids() -> PackedStringArray:

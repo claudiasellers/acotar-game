@@ -9,7 +9,9 @@
 ##   2. lift / gamma / gain per channel
 ##   3. hue shift around the grey axis
 ##   4. saturation curve: shadow and highlight saturation, blended by luma
-## 2 to 4 ship as identity; the owner tunes them.
+##   5. white roll-off: above KNEE each channel eases down to white_level
+## 2 to 5 ship as identity, except where T3b set them to hold today's look
+## under AgX (docs/tuning.md); the owner tunes them.
 class_name LutParams
 extends Resource
 
@@ -29,6 +31,12 @@ const SIZE := 32
 @export_range(-180.0, 180.0) var hue_shift := 0.0
 @export_range(0.0, 2.0) var shadow_saturation := 1.0
 @export_range(0.0, 2.0) var highlight_saturation := 1.0
+@export_group("White")
+## The brightest a channel can come out (1 = off). Below KNEE nothing changes;
+## above it the curve bends smoothly (slope-matched) down to this.
+@export_range(0.9, 1.0) var white_level := 1.0
+
+const KNEE := 0.8
 
 ## Texture3D per distinct parameter set (main thread only).
 static var _cache := {}
@@ -109,6 +117,9 @@ func apply(c: Color) -> Color:
 		var s := lerpf(shadow_saturation, highlight_saturation, smoothstep(0.0, 1.0, luma))
 		v = Vector3(luma, luma, luma).lerp(v, s)
 	v = v.clamp(Vector3.ZERO, Vector3.ONE)
+	# 5. White roll-off: v + (white_level - 1) t², t = 0..1 above the knee.
+	if white_level < 1.0:
+		v = Vector3(_roll(v.x, white_level), _roll(v.y, white_level), _roll(v.z, white_level))
 	return Color(v.x, v.y, v.z)
 
 
@@ -117,6 +128,13 @@ func is_identity_look() -> bool:
 	return lift == Color(0.0, 0.0, 0.0) and gamma == Color(1.0, 1.0, 1.0) and gain == Color(1.0, 1.0, 1.0) \
 		and is_zero_approx(hue_shift) and is_equal_approx(shadow_saturation, 1.0) \
 		and is_equal_approx(highlight_saturation, 1.0)
+
+
+static func _roll(x: float, w: float) -> float:
+	if x <= KNEE:
+		return x
+	var t := (x - KNEE) / (1.0 - KNEE)
+	return x + (w - 1.0) * t * t
 
 
 static func _lgg(x: float, l: float, g: float, gn: float) -> float:
@@ -145,5 +163,5 @@ func _key() -> String:
 	var pts := ""
 	if curve != null:
 		pts = "%s|%s" % [curve.offsets, curve.colors]
-	return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % [brightness, contrast, saturation, lift, gamma, gain,
-		hue_shift, shadow_saturation, highlight_saturation, pts, curve.interpolation_mode if curve else -1]
+	return "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s" % [brightness, contrast, saturation, lift, gamma, gain,
+		hue_shift, shadow_saturation, highlight_saturation, pts, curve.interpolation_mode if curve else -1, white_level]
