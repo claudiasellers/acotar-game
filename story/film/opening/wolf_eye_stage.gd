@@ -28,9 +28,7 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.05, 0.07, 0.12)
 	env.ambient_light_energy = 0.4
-	# AgX like every grade (T3b); 1.8 holds Filmic's mid band (docs/tuning.md).
-	env.tonemap_mode = Environment.TONE_MAPPER_AGX
-	env.tonemap_exposure = 1.8
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.06, 0.08, 0.14)
 	env.fog_density = 0.06

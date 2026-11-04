@@ -17,7 +17,7 @@ run headless becomes a Mac step instead of iteration; canonical shots re-rendere
 | T5 touchable world | L59 | lane/touchable-world | done: through L59-7 (props, navmesh, weather, fire, burnable grass); Mac look check of rain/petals/flames/scorch pending |
 | T3a bounce light | L60 | lane/bounce-light | done: L60-2 merged; Mac dark-scene check passed |
 | T4 hero meshes | L61 | lane/hero-meshes | done: L61-1..5 merged |
-| T3b grade unification | L63 | lane/grade-unify | L63-1 merged; L63-2 fa6cb71 (chroma restored via LUT saturation, sky roll-off) queued; Mac before/after shots/req-L63-before-1 / -after-1 pending |
+| T3b grade unification | L63 | lane/grade-revert | L63-1 and L63-2 merged, then **reverted** on the owner's verdict ("the new one looks horrible"): L63-3 puts every grade file back byte-for-byte as at e4a278d (pre-L63) |
 | (outside the brief) forage chemistry | L62 | lane/forage-chemistry | started from the owner's 21:55Z ask; builds on L59 |
 
 ## Readings taken (the brief said: take the most reasonable reading and record it)
@@ -101,7 +101,7 @@ rose_garden, each through tools/perf/frame_probe.tscn (the PERF line in each lab
 6. L60 look + corner probes: the canonical shots at L60, plus `entrance_hall` and the cottage main room
    (cottage crashes lavapipe), with two samples per room (corner vs wall centre, corner ≥5% darker), and
    `tools/lighting/bounce_probe.tscn` on the GPU (prints the PROBE numbers in the T3a section below).
-7. L63 (T3b) look + clip + perf: the canonical shots at L63 against L60 (lit band, 5 samples each, within 5%; sky,
+7. ~~L63 (T3b) look + clip + perf~~ (T3b reverted in L63-3; shots/req-L63-revert-1 checks the revert against the pre-L63 shots instead): the canonical shots at L63 against L60 (lit band, 5 samples each, within 5%; sky,
    water and window pixels < 0.98 per channel), `GRADE_PROBE=check` of `tools/env/grade_probe.tscn` on the GPU,
    and `make perf` (±0.3 ms; the only per-frame cost added is the colour LUT lookup, and the LUT itself
    builds a slice a frame during a grade blend).
@@ -157,7 +157,14 @@ Readings:
 - "Hue shift toward the ground colour" is measured toward the light leaving the ground (terrain albedo × sun
   colour). The albedo mean alone is near-neutral (snow and ice), and the warm sun dominates the bounce.
 
-## T3b (L63) as handed in
+## T3b (L63) as handed in, then reverted
+
+**Reverted (L63-3, 2026-11-04).** The owner saw L63-1/2 in the game and called the new colour horrible. L63-3
+restores every file L63-1/2 touched to e4a278d (ACES on all grades but `manor_interior`, the old exposures,
+sliders, 1D LUTs and Spring glow 0.3 / bloom 0 / threshold 1.4), and removes LutParams, `make luts`, make_lut,
+the grade probe and the contract test. The unified LUT could not stay: a 32³ trilinear LUT is not pixel-identical
+to the sliders (up to 1.5% per channel where a channel clamps inside a cell). The notes below are what L63 did and
+measured, kept for whoever picks T3b up again; none of it is in the game.
 
 AgX everywhere: all 20 grades (GradePreset default; `manor_interior` was already AgX, so the house → grounds
 tonemapper jump is gone), the mural and wolf-eye film stages and the title (exposure 1.8 / 1.8 / 1.7 holds
@@ -250,7 +257,7 @@ compilation inside the 30-frame window, not steady state.
 ## T6 — housekeeping (lead)
 
 - `git lfs pull` was already gone from the Makefile; nothing to remove.
-- `make perf` and the shared terrain restore in `make setup` shipped in L57-1. `make luts` comes with T3b (L63).
+- `make perf` and the shared terrain restore in `make setup` shipped in L57-1. `make luts` came with T3b (L63) and went with its revert.
   `make lightmaps` is not added (T3a skipped LightmapGI by design) and `make occluders` is not added (occluders are
   built at runtime from the manor and village geometry; there is nothing to bake).
 - status.md got a "Render budgets" block with the Mac numbers; drift-log has the T6 entry.
@@ -272,9 +279,9 @@ Everything below is neutral today (it reproduces the pre-program look). Tune one
 | 2 | `shade_tint` (colour of shadows) | candy_lit.gdshaderinc per family | white on props, lilac on foliage | a blush or periwinkle on props too | rose_garden, manor_front |
 | 3 | `wrap` (how soft the terminator is) | candy_lit.gdshaderinc per family | 0 props, 0.4–0.55 foliage | 0.2–0.4 on props for rounder forms | feyre_closeup, workshop |
 | 4 | `rim_strength` + `rim_color` (warm edge light) | candy_lit.gdshaderinc | 0 props, 0.4–0.6 foliage | 0.1–0.25 on props/gowns; never strong everywhere | feyre_closeup, rose_garden (late light) |
-| 5 | `GradePreset.exposure` (+ `white_level` roll-off on the 11 bright grades) | world/shared/grades/*.tres | re-solved under AgX to hold the T3a lit band (±1%; the 8 brightest 2.6–4.4% under to keep the sky ≤0.97) | ±0.1 steps; raise white_level if you'd rather have brighter grades and some sky clip | spring_vista, manor_front, cottage |
-| 6 | LUT parameters: lift/gamma/gain, hue, saturation curve, `highlight_saturation` | data/grades/luts/*.tres (LutParams, one per grade; `make luts` checks them) | identity look; saturation solved per grade (1.27–1.80 highlights) to keep T3a's pastel chroma under AgX | warm-pink lift; more or less highlight_saturation decides how candy vs soft the pastels read | every canonical shot; this is the big one |
-| 7 | Spring glow / bloom / HDR threshold | Spring GradePresets | ~0.7 / ~0.2 / ~1.0 (R3 spec, T3b) | bloom 0.15–0.3 | spring_vista, rose_garden, manor_front |
+| 5 | `GradePreset.exposure` | world/shared/grades/*.tres | the pre-program values, ACES (T3b's AgX re-solve was reverted) | ±0.1 steps | spring_vista, manor_front, cottage |
+| 6 | `GradePreset` saturation / contrast / brightness and the 1D `lut` | world/shared/grades/*.tres | the pre-program values (T3b's 3D LUT was reverted) | saturation ±0.05 steps decides how candy vs soft the pastels read | every canonical shot; this is the big one |
+| 7 | Spring glow / bloom / HDR threshold | Spring GradePresets | 0.3 / 0 / 1.4 (pre-program; T3b's R3 bloom was reverted) | bloom 0.1–0.2, threshold 1.0–1.2 | spring_vista, rose_garden, manor_front |
 | 8 | `ambient_light_sky_contribution` + `ambient_color` | world.tscn + GradePresets | 0.7 | 0.6–0.8; ambient colour toward lilac | hunting_forest, workshop (shade read) |
 | 9 | `ground_bounce` + colour | candy_lit.gdshaderinc | 0.35, terrain mean grey-green | 0.2–0.5; tint toward blossom pink in Spring | rose_garden, spring_vista (undersides) |
 | 10 | `pearl` / `glitter` on gowns, fountains, magic | candy_surface.gdshaderinc (per material) | 0 | 0.2–0.5 on gowns and glass; keep off horror | feyre_closeup, manor_front |

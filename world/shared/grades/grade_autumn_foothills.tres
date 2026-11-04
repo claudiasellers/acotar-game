@@ -1,7 +1,13 @@
 [gd_resource type="Resource" script_class="GradePreset" format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_jiffx"]
-[ext_resource type="Resource" path="res://data/grades/luts/grade_autumn_foothills.tres" id="1_ntt0v"]
+
+[sub_resource type="Gradient" id="Gradient_htu8i"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.08705883, 0.04941177, 0.0682353, 1, 0.61352944, 0.51235294, 0.45588237, 1, 1, 0.982353, 0.95411766, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_vn0i6"]
+gradient = SubResource("Gradient_htu8i")
 
 [resource]
 script = ExtResource("1_jiffx")
@@ -14,14 +20,16 @@ sun_color = Color(1, 0.8235294, 0.627451, 1)
 sun_energy = 1.4375
 ambient_color = Color(0.8556863, 0.71137255, 0.7152941, 1)
 ambient_energy = 0.54
-cloud_cover = 0.3
 fog_color = Color(0.9647059, 0.78431374, 0.65882355, 1)
 fog_density = 0.0012
 volumetric_density = 0.008
 volumetric_albedo = Color(1, 0.8862745, 0.78431374, 1)
-exposure = 2.051
+exposure = 0.8
+saturation = 1.2
+contrast = 1.12
 glow_intensity = 0.3
 glow_bloom = 0.0
 glow_hdr_threshold = 1.4
-lut_params = ExtResource("1_ntt0v")
+lut = SubResource("GradientTexture1D_vn0i6")
 magic = 0.35
+cloud_cover = 0.30

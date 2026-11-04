@@ -131,9 +131,8 @@ func _build_environment() -> void:
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_sky_contribution = 0.35
 	environment.ambient_light_energy = 0.7
-	# AgX like every grade (T3b): 1.7 = Filmic's 0.95 with the mid band held (docs/tuning.md).
-	environment.tonemap_mode = Environment.TONE_MAPPER_AGX
-	environment.tonemap_exposure = 1.7
+	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.tonemap_exposure = 0.95
 	environment.glow_enabled = true
 	environment.glow_intensity = 0.7
 	environment.glow_bloom = 0.12

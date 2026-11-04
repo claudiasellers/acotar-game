@@ -64,10 +64,7 @@ func _ready() -> void:
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color(0.02, 0.015, 0.04)
-	# AgX like every grade (T3b). Exposure 1.8 holds Filmic's mid band (display
-	# 0.3-0.85, rms 3.7%; docs/tuning.md).
-	environment.tonemap_mode = Environment.TONE_MAPPER_AGX
-	environment.tonemap_exposure = 1.8
+	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.glow_enabled = true
 	# Glow only on the gold itself, kept tight: the Mac's Forward+ glow (far
 	# stronger than the Compatibility renderer's) hazed whole tableaux pale.

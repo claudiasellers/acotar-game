@@ -1,7 +1,13 @@
 [gd_resource type="Resource" script_class="GradePreset" format=3]
 
-[ext_resource type="Resource" path="res://data/grades/luts/grade_solstice_twilight.tres" id="1_k2wg5"]
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1_vhb06"]
+
+[sub_resource type="Gradient" id="Gradient_toup8"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.05411765, 0.04941177, 0.120000005, 1, 0.55941176, 0.49941176, 0.5852941, 1, 1, 0.9705882, 0.982353, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kgu5v"]
+gradient = SubResource("Gradient_toup8")
 
 [resource]
 script = ExtResource("1_vhb06")
@@ -14,16 +20,18 @@ sun_color = Color(1, 0.6666667, 0.6039216, 1)
 sun_energy = 0.5175
 ambient_color = Color(0.66901964, 0.59137255, 0.8859608, 1)
 ambient_energy = 0.48
-cloud_cover = 0.2
-cloud_color = Color(1, 0.86, 0.8, 1)
-cloud_shade = Color(0.62, 0.52, 0.72, 1)
 fog_color = Color(0.78431374, 0.6509804, 0.9019608, 1)
 fog_density = 0.0012
 volumetric_density = 0.008
 volumetric_albedo = Color(0.9098039, 0.8392157, 1, 1)
-exposure = 1.066
+exposure = 0.8
+saturation = 1.2
+contrast = 1.12
 glow_intensity = 0.7
 glow_bloom = 0.04
 glow_hdr_threshold = 1.1
-lut_params = ExtResource("1_k2wg5")
+lut = SubResource("GradientTexture1D_kgu5v")
 magic = 1.0
+cloud_cover = 0.20
+cloud_color = Color(1.00, 0.86, 0.80, 1)
+cloud_shade = Color(0.62, 0.52, 0.72, 1)

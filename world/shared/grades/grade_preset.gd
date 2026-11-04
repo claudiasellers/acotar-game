@@ -46,11 +46,7 @@ extends Resource
 ## Distant terrain takes the sky colour (aerial perspective, depth layers).
 @export_range(0.0, 1.0) var fog_aerial_perspective := 0.5
 @export_group("Post")
-## Tonemapper exposure; per preset only where it holds the lit band (docs/tuning.md).
 @export var exposure := 1.0
-## Brightness, contrast and saturation on top of the LUT (Environment adjustment).
-## 1.0 in every preset: their grade lives in lut_params (one grade layer). Moods,
-## true sight and blends move these away from 1 at run time (see mix()).
 @export var saturation := 1.0
 @export var contrast := 1.0
 @export var brightness := 1.0
@@ -58,7 +54,7 @@ extends Resource
 @export var glow_bloom := 0.05
 @export var glow_hdr_threshold := 1.0
 ## Neither of these blends: like the LUT, they switch at the middle of a mix.
-@export var tonemap_mode := Environment.TONE_MAPPER_AGX
+@export var tonemap_mode := Environment.TONE_MAPPER_ACES
 ## Global illumination, for places closed to the sky. Outdoors it's cost for nothing.
 @export var sdfgi := false
 @export_group("Golden hour")
@@ -68,11 +64,7 @@ extends Resource
 @export var golden_sky_horizon := Color(1.0, 0.66, 0.52)
 @export var golden_sun_color := Color(1.0, 0.72, 0.5)
 @export var golden_sun_energy := 1.0
-## The preset's colour grade (render program T3b): LutParams under
-## data/grades/luts/, built into a 32³ Texture3D at load. Swapped at mid-blend.
-@export var lut_params: LutParams
-## Legacy 1D colour correction. tools/env/make_lut.gd folds it into
-## lut_params.curve and clears it; never shown.
+## The per-region LUT slot (Texture3D or a 1D gradient). Swapped at mid-blend.
 @export var lut: Texture
 @export_group("Shader globals")
 ## 1 = everything snow-capped (human winter), 0 = none.
@@ -96,39 +88,16 @@ const _COLORS := [&"sky_top", &"sky_horizon", &"ground_horizon", &"ground_bottom
 	&"golden_sun_color", &"cloud_color", &"cloud_shade"]
 
 
-## Brightness, contrast and saturation: the grade's value is this preset's
-## field times its LUT's folded one.
-const _GRADE := [&"saturation", &"contrast", &"brightness"]
-
-
-## The Texture3D for lut_params (null without one).
-func lut_texture() -> Texture3D:
-	return lut_params.texture() if lut_params != null else null
-
-
-## The grade value of `key` (one of _GRADE): field × the LUT's folded value.
-func graded(key: StringName) -> float:
-	return float(get(key)) * (float(lut_params.get(key)) if lut_params != null else 1.0)
-
-
 ## A new preset `t` of the way from `a` to `b`. The LUT, tone mapper and GI
-## switch at t = 0.5, or come from `lut_from` when given (a mood laid over a
-## grade keeps the grade's LUT). Brightness, contrast and saturation blend
-## smoothly anyway: they become the blended grade value over the shown LUT's.
-static func mix(a: GradePreset, b: GradePreset, t: float, lut_from: GradePreset = null) -> GradePreset:
+## switch at t = 0.5.
+static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 	var out := GradePreset.new()
-	var src := lut_from if lut_from != null else (b if t >= 0.5 else a)
 	out.id = b.id if t >= 0.5 else a.id
 	for f in _FLOATS:
-		if f in _GRADE:
-			var shown: float = float(src.lut_params.get(f)) if src.lut_params != null else 1.0
-			out.set(f, lerpf(a.graded(f), b.graded(f), t) / maxf(shown, 0.001))
-		else:
-			out.set(f, lerpf(a.get(f), b.get(f), t))
+		out.set(f, lerpf(a.get(f), b.get(f), t))
 	for c in _COLORS:
 		out.set(c, (a.get(c) as Color).lerp(b.get(c), t))
-	out.lut_params = src.lut_params
-	out.lut = src.lut
-	out.tonemap_mode = src.tonemap_mode
-	out.sdfgi = src.sdfgi
+	out.lut = b.lut if t >= 0.5 else a.lut
+	out.tonemap_mode = b.tonemap_mode if t >= 0.5 else a.tonemap_mode
+	out.sdfgi = b.sdfgi if t >= 0.5 else a.sdfgi
 	return out

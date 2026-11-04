@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="GradePreset" format=3]
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
-[ext_resource type="Resource" path="res://data/grades/luts/human_winter.tres" id="1_xy0qp"]
 
 [resource]
 script = ExtResource("1")
@@ -14,25 +13,30 @@ sun_color = Color(0.86, 0.89, 0.96, 1)
 sun_energy = 0.75
 ambient_color = Color(0.58, 0.63, 0.72, 1)
 ambient_energy = 0.55
-cloud_cover = 0.78
-cloud_color = Color(0.86, 0.88, 0.92, 1)
-cloud_shade = Color(0.68, 0.7, 0.76, 1)
 fog_color = Color(0.74, 0.77, 0.82, 1)
 fog_density = 0.006
 volumetric_density = 0.018
 volumetric_albedo = Color(0.88, 0.9, 0.95, 1)
-volumetric_light_energy = 1.5
-fog_sky_affect = 0.3
-fog_height = -6.0
-fog_height_density = 0.02
-fog_aerial_perspective = 0.6
-exposure = 1.726
+exposure = 0.85
+saturation = 0.55
+contrast = 1.08
+brightness = 0.97
 glow_intensity = 0.25
 glow_bloom = 0.02
-glow_hdr_threshold = 0.9
+snow_cover = 1.0
+magic = 0.0
 golden_sky_top = Color(0.38, 0.45, 0.66, 1)
 golden_sky_horizon = Color(0.98, 0.7, 0.58, 1)
 golden_sun_color = Color(1, 0.7, 0.5, 1)
 golden_sun_energy = 3.0
-lut_params = ExtResource("1_xy0qp")
-snow_cover = 1.0
+fog_sky_affect = 0.3
+fog_height = -6.0
+fog_height_density = 0.02
+fog_aerial_perspective = 0.6
+volumetric_anisotropy = 0.6
+volumetric_light_energy = 1.5
+glow_hdr_threshold = 0.9
+; Overcast winter sky over the human lands.
+cloud_cover = 0.78
+cloud_color = Color(0.86, 0.88, 0.92, 1)
+cloud_shade = Color(0.68, 0.70, 0.76, 1)

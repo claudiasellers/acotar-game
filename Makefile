@@ -4,7 +4,6 @@
 #   make setup    install the git pre-push hook (checks lead/ready-* pushes for missing .uid files)
 #                 and copy in any generated content already built (local or shared cache)
 #   make perf     frame budget pass over tools/shots/canonical.txt -> tools/perf/out/<date>.csv
-#   make luts     fold grades into data/grades/luts/ and check every colour LUT (T3b)
 #   make clean    free disk: delete Godot's import cache and generated content
 #
 # Godot lives in .tools/ (git-ignored). Generated content is built by
@@ -18,7 +17,7 @@ GODOT_DIR     := .tools/godot-$(GODOT_VERSION)
 GODOT         := $(GODOT_DIR)/Godot.app/Contents/MacOS/Godot
 GODOT_URL     := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/Godot_v$(GODOT_VERSION)-stable_macos.universal.zip
 
-.PHONY: setup play update clean godot pull generate bake import perf luts
+.PHONY: setup play update clean godot pull generate bake import perf
 
 setup:
 	@tools/mq/install_hooks.sh
@@ -27,12 +26,6 @@ setup:
 # Real frame times need the Mac GPU; in the cloud only the counts are exact.
 perf: godot bake import
 	@GODOT="$(GODOT)" tools/perf/frame_pass.sh
-
-# Grade LUTs (T3b): every GradePreset gets LutParams under data/grades/luts/;
-# the game builds the Texture3D from them at load, so nothing is written but
-# the parameter files and nothing needs ignoring.
-luts: godot
-	@tools/mq/godot.sh -s res://tools/env/make_lut.gd
 
 play: godot bake import
 	@echo "Starting the game. This terminal stays busy until you quit the game. Log: .tools/play.log"

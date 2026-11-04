@@ -13,8 +13,8 @@ func test_presets_load_with_expected_mood() -> void:
 	var winter := GradeDirector.load_preset(&"human_winter")
 	var spring := GradeDirector.load_preset(&"spring")
 	assert_eq(winter.id, &"human_winter")
-	assert_lt(winter.graded(&"saturation"), 0.7, "the human realm is desaturated")
-	assert_gt(spring.graded(&"saturation"), 1.2, "the Spring Court is candy-bright")
+	assert_lt(winter.saturation, 0.7, "the human realm is desaturated")
+	assert_gt(spring.saturation, 1.2, "the Spring Court is candy-bright")
 	assert_eq(winter.snow_cover, 1.0)
 	# Book light (Keeper): nothing glows by day before the glamour lifts (ch 23),
 	# so daytime Spring keeps only a faint rim shimmer.
@@ -26,10 +26,10 @@ func test_wall_swap_reaches_spring_in_two_seconds() -> void:
 	EventBus.grade_swap_requested.emit(&"spring", 2.0)
 	assert_true(director.is_blending())
 	director._process(1.0)
-	assert_between(director.current.graded(&"saturation"), 0.56, 1.34, "half-way at 1 s")
+	assert_between(director.current.saturation, 0.56, 1.34, "half-way at 1 s")
 	director._process(1.01)
 	assert_false(director.is_blending())
-	assert_almost_eq(director.current.graded(&"saturation"), GradeDirector.load_preset(&"spring").graded(&"saturation"), 0.0001)
+	assert_almost_eq(director.current.saturation, GradeDirector.load_preset(&"spring").saturation, 0.0001)
 	assert_eq(director.current.id, &"spring")
 
 
@@ -54,7 +54,7 @@ func test_only_the_house_turns_gi_on() -> void:
 	var manor := GradeDirector.load_preset(&"manor")
 	assert_true(inside.sdfgi)
 	assert_false(manor.sdfgi, "outdoors unchanged")
-	assert_eq(manor.tonemap_mode, Environment.TONE_MAPPER_AGX)
+	assert_eq(manor.tonemap_mode, Environment.TONE_MAPPER_ACES)
 	for f in DirAccess.get_files_at(GradeDirector.PRESET_DIR):
 		if f.ends_with(".tres") and f != "manor_interior.tres":
 			assert_false((load(GradeDirector.PRESET_DIR + f) as GradePreset).sdfgi, f)
@@ -66,9 +66,9 @@ func test_only_the_house_turns_gi_on() -> void:
 func test_mix_switches_lut_at_half() -> void:
 	var a := GradePreset.new()
 	var b := GradePreset.new()
-	b.lut_params = LutParams.new()
-	assert_null(GradePreset.mix(a, b, 0.49).lut_params)
-	assert_eq(GradePreset.mix(a, b, 0.5).lut_params, b.lut_params)
+	b.lut = GradientTexture1D.new()
+	assert_null(GradePreset.mix(a, b, 0.49).lut)
+	assert_eq(GradePreset.mix(a, b, 0.5).lut, b.lut)
 
 
 func test_sun_is_up_at_noon_and_down_at_midnight() -> void:
@@ -85,7 +85,7 @@ func test_dread_darkens_and_desaturates_then_calm_restores() -> void:
 	assert_almost_eq(director.mood_amount, 1.0, 0.001)
 	var base := GradeDirector.load_preset(&"human_winter")
 	var dark := GradeDirector.with_mood(base, director.mood_amount)
-	assert_lt(dark.graded(&"saturation"), base.graded(&"saturation"))
+	assert_lt(dark.saturation, base.saturation)
 	assert_lt(dark.exposure, base.exposure)
 	assert_gt(dark.fog_density, base.fog_density)
 	director._on_mood_requested(&"calm", 0.0, 0.5)
@@ -120,7 +120,7 @@ func test_golden_hour_peaks_at_the_horizon() -> void:
 func test_dread_drains_the_world() -> void:
 	var base := GradeDirector.load_preset(&"spring")
 	var dark := GradeDirector.with_mood(base, 1.0, &"dread")
-	assert_almost_eq(dark.graded(&"saturation"), 0.4, 0.01, "§1.5 saturation")
+	assert_almost_eq(dark.saturation, 0.4, 0.01, "§1.5 saturation")
 	assert_lt(dark.exposure, base.exposure * 0.25, "two stops down or more")
 	assert_eq(dark.magic, 0.0, "sparkles off")
 	assert_gt(dark.fog_height_density, 0.06, "dense low fog")
@@ -133,7 +133,7 @@ func test_dread_keeps_silhouettes_readable_indoors() -> void:
 	var floor_light := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
 	assert_gt(floor_light, 0.035, "shapes still read in the dark")
 	assert_lt(floor_light, 0.12, "but it is still dark")
-	assert_lte(dark.graded(&"contrast"), 1.12, "no crushed blacks")
+	assert_lte(dark.contrast, 1.12, "no crushed blacks")
 
 
 func test_moderate_dread_bites_indoors() -> void:
@@ -147,7 +147,7 @@ func test_moderate_dread_bites_indoors() -> void:
 	var calm_floor := calm.ambient_color.get_luminance() * calm.ambient_energy * calm.exposure
 	var dark_floor := dark.ambient_color.get_luminance() * dark.ambient_energy * dark.exposure
 	assert_lt(dark_floor, calm_floor * 0.3, "ambient fill well over a stop and a half down")
-	assert_lt(dark.graded(&"saturation"), calm.graded(&"saturation") * 0.6, "the pink world leaves")
+	assert_lt(dark.saturation, calm.saturation * 0.6, "the pink world leaves")
 
 
 func test_the_bogge_grade_takes_no_more_dread() -> void:

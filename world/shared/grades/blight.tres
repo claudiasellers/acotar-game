@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="GradePreset" format=3]
+[gd_resource type="Resource" script_class="GradePreset" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://world/shared/grades/grade_preset.gd" id="1"]
-[ext_resource type="Resource" path="res://data/grades/luts/blight.tres" id="1_8jgy3"]
 
 [resource]
 script = ExtResource("1")
@@ -14,22 +13,26 @@ sun_color = Color(0.8, 0.78, 0.74, 1)
 sun_energy = 0.65
 ambient_color = Color(0.5, 0.5, 0.52, 1)
 ambient_energy = 0.5
-cloud_cover = 0.6
-cloud_color = Color(0.62, 0.62, 0.6, 1)
-cloud_shade = Color(0.38, 0.38, 0.4, 1)
 fog_color = Color(0.52, 0.52, 0.52, 1)
 fog_density = 0.009
 volumetric_density = 0.03
 volumetric_albedo = Color(0.6, 0.6, 0.6, 1)
+exposure = 0.9
+saturation = 0.35
+contrast = 1.12
+brightness = 0.92
+glow_intensity = 0.15
+glow_bloom = 0.0
+snow_cover = 0.0
+magic = 0.0
 fog_sky_affect = 0.6
 fog_height = 8.0
 fog_height_density = 0.06
 fog_aerial_perspective = 0.2
-exposure = 1.313
-glow_intensity = 0.15
-glow_bloom = 0.0
 golden_sky_top = Color(0.2, 0.17, 0.24, 1)
 golden_sky_horizon = Color(0.35, 0.31, 0.37, 1)
 golden_sun_color = Color(0.6, 0.55, 0.62, 1)
 golden_sun_energy = 0.3
-lut_params = ExtResource("1_8jgy3")
+cloud_cover = 0.60
+cloud_color = Color(0.62, 0.62, 0.60, 1)
+cloud_shade = Color(0.38, 0.38, 0.40, 1)
