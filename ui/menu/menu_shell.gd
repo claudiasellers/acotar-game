@@ -35,14 +35,19 @@ const WARM_BUDGET_MS := 4.0
 ## Alpha a page is drawn at for its warm-up frames (above the renderer's cull).
 const WARM_ALPHA := 0.01
 const WARM_FRAMES := 2
-## Space the strip leaves at the top of the screen for the pages.
+## The strip's top edge, and where full-screen pages start below it.
 const STRIP_TOP := 14.0
+const PAGE_TOP := 140.0
+## Under every page (the map is 18): the world dims behind the open shell.
+const BACKDROP_LAYER := 17
+const BACKDROP_ALPHA := 0.4
 
 var tabs: Array[MenuTab] = []
 var current: MenuTab = null
 
 var _tree: SceneTree
 var _root: Control
+var _backdrop: CanvasLayer
 var _strip: PanelContainer
 var _row: HBoxContainer
 var _buttons: Dictionary = {}  # MenuTab -> Button
@@ -96,6 +101,7 @@ func _ready() -> void:
 	add_to_group(GROUP)
 	_build()
 	_root.visible = current != null
+	_backdrop.visible = current != null
 	_sync_strip()
 
 
@@ -177,6 +183,7 @@ func close() -> void:
 	tab.shell_hide()
 	if _root:
 		_root.visible = false
+		_backdrop.visible = false
 	_tree.paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	shell_closed.emit()
@@ -199,6 +206,7 @@ func _open_shell() -> void:
 	if _root:
 		_root.theme = SatchelTheme.theme()
 		_root.visible = true
+		_backdrop.visible = true
 
 
 func _available() -> Array[MenuTab]:
@@ -312,6 +320,15 @@ func _build() -> void:
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.theme = SatchelTheme.theme()
 	add_child(_root)
+	_backdrop = CanvasLayer.new()
+	_backdrop.name = "Backdrop"
+	_backdrop.layer = BACKDROP_LAYER
+	add_child(_backdrop)
+	var dim := ColorRect.new()
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dim.color = Color(SatchelTheme.color(&"ink"), BACKDROP_ALPHA)
+	_backdrop.add_child(dim)
 	_strip = PanelContainer.new()
 	_strip.name = "TabStrip"
 	_strip.theme_type_variation = &"SatchelDetail"

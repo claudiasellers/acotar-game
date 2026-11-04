@@ -3,6 +3,7 @@
 ## call, and the slowest of the next frames (the hitch the player sees).
 ##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
 ##     res://tools/ui/menu_open_probe.tscn
+## With `-- shots <dir>` it saves one frame of each page in SHOT_PAGES instead.
 ## (A scene, not a -s script, so the autoloads exist.)
 extends Node
 
@@ -17,6 +18,7 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
+const SHOT_PAGES: Array[StringName] = [&"satchel", &"collection", &"map"]
 
 var feyre: Feyre
 
@@ -44,9 +46,13 @@ func _go() -> void:
 	# Long enough for the shell's warm-up to finish, as behind the loading veil.
 	for i in WARM_FRAMES:
 		await get_tree().process_frame
-	for page in _pages():
-		for n in OPENS:
-			await _time(page, n)
+	var args := OS.get_cmdline_user_args()
+	if args.size() >= 2 and args[0] == "shots":
+		await _shots(args[1])
+	else:
+		for page in _pages():
+			for n in OPENS:
+				await _time(page, n)
 	print("menu_open_probe: done")
 	get_tree().quit()
 
@@ -94,3 +100,17 @@ func _time(page: StringName, n: int) -> void:
 	_close()
 	for i in 4:
 		await get_tree().process_frame
+
+
+func _shots(dir: String) -> void:
+	for page in SHOT_PAGES:
+		_open(page)
+		for i in 90:
+			await get_tree().process_frame
+		await RenderingServer.frame_post_draw
+		var path := dir.path_join("menu_shell_%s.png" % page)
+		get_viewport().get_texture().get_image().save_png(path)
+		print("menu_open_probe: shot ", path)
+		_close()
+		for i in 4:
+			await get_tree().process_frame

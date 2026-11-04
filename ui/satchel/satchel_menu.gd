@@ -251,7 +251,8 @@ func _build() -> void:
 	_root.add_child(_vignette())
 
 	_flaps = HBoxContainer.new()
-	_flaps.position = MARGIN
+	# Below the menu shell's tab strip.
+	_flaps.position = Vector2(MARGIN.x, MenuShell.PAGE_TOP)
 	_flaps.add_theme_constant_override(&"separation", 8)
 	_root.add_child(_flaps)
 	for p: StringName in SatchelEntries.POCKETS:
@@ -267,14 +268,14 @@ func _build() -> void:
 	_purse.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_purse.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_purse.offset_right = -MARGIN.x
-	_purse.offset_top = MARGIN.y + 8
+	_purse.offset_top = MenuShell.PAGE_TOP + 8
 	_root.add_child(_purse)
 
 	_lay = Control.new()
 	_lay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lay.offset_left = MARGIN.x
 	_lay.offset_right = -(MARGIN.x + TAG_COLUMN)
-	_lay.offset_top = MARGIN.y + 88
+	_lay.offset_top = MenuShell.PAGE_TOP + 80
 	_lay.offset_bottom = -(MARGIN.y + 72)
 	_lay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(_lay)
