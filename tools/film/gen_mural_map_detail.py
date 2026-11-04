@@ -39,21 +39,27 @@ SIZE = 2048
 SEED = 20261104
 WALL_V = 0.38
 
+# Trees stay small beside the palaces and temples (at most 0.6 of the
+# smallest one's height) and grow in woods of 3-7, never as single big trees.
+# A forest zone's count is its number of woods.
+TREE_SIZE = (0.016, 0.022)
+WOOD_TREES = (3, 7)
+WOOD_RADIUS = 0.026
 # Zones: (name, category, sprites, count, (x0, x1), (y0, y1), size range, order range, canon)
 # size = sprite height as a fraction of the map; order = when it draws in.
 LAND_ZONES = [
 	("northern_peaks", "mountain", ["rocksMountain", "rocksTall", "rocksA", "rocksMountain"], 9,
 			(0.33, 0.67), (0.645, 0.80), (0.044, 0.056), (0.00, 0.22), "X"),
-	("northern_pines", "forest", ["treePines", "treePine", "treePineLarge", "treePinesSmall"], 8,
-			(0.29, 0.71), (0.58, 0.76), (0.030, 0.038), (0.18, 0.38), "X"),
-	("western_woods", "forest", ["treeRound", "treePines", "treeRound", "treePinesSmall"], 9,
-			(0.28, 0.43), (0.45, 0.66), (0.034, 0.044), (0.30, 0.52), "X"),
+	("northern_pines", "forest", ["treePine", "treePineLarge"], 2,
+			(0.30, 0.70), (0.58, 0.74), TREE_SIZE, (0.18, 0.38), "X"),
+	("western_woods", "forest", ["treeRound", "treePine", "treePineLarge"], 4,
+			(0.29, 0.42), (0.46, 0.64), TREE_SIZE, (0.30, 0.52), "X"),
 	("eastern_hills", "hill", ["rocks", "rocksB", "rocks"], 6,
 			(0.55, 0.72), (0.415, 0.66), (0.032, 0.042), (0.30, 0.50), "X"),
-	("southern_blossom", "forest", ["treeRound", "treeRound", "treePinesSmall"], 8,
-			(0.32, 0.68), (0.405, 0.50), (0.032, 0.040), (0.44, 0.62), "X"),
-	("southern_tip_woods", "forest", ["treePines", "treeRound", "treePinesSmall", "treePine"], 8,
-			(0.36, 0.64), (0.17, 0.355), (0.032, 0.040), (0.50, 0.68), "X"),
+	("southern_blossom", "forest", ["treeRound", "treePine", "treeRound"], 3,
+			(0.31, 0.69), (0.435, 0.53), TREE_SIZE, (0.44, 0.62), "X"),
+	("southern_tip_woods", "forest", ["treePine", "treeRound", "treePineLarge"], 3,
+			(0.37, 0.63), (0.18, 0.345), TREE_SIZE, (0.50, 0.68), "X"),
 	("southern_tip_hills", "hill", ["rocks", "rocksB"], 3,
 			(0.38, 0.62), (0.16, 0.34), (0.034, 0.040), (0.50, 0.66), "X"),
 ]
@@ -172,6 +178,9 @@ def layout():
 		order = 0.94 if cat == "compass" else 0.97  # drawn as the coast closes
 		place(placed, dict(zone=name, category=cat, sprite=spr, order=order, canon=canon), x, y, size, False)
 	for name, cat, sprites, count, (x0, x1), (y0, y1), (s0, s1), (o0, o1), canon in LAND_ZONES:
+		if cat == "forest":
+			_woods(rng, placed, name, sprites, count, (x0, x1), (y0, y1), (s0, s1), (o0, o1), canon)
+			continue
 		got, tries = 0, 0
 		while got < count and tries < 4000:
 			tries += 1
@@ -204,6 +213,43 @@ def layout():
 	if got < count:
 		raise SystemExit("sea placed %d of %d" % (got, count))
 	return placed
+
+
+def _woods(rng, placed, name, sprites, count, xr, yr, sr, orr, canon):
+	"""`count` woods in the zone, each 3-7 small trees tucked together."""
+	woods, tries = 0, 0
+	while woods < count and tries < 4000:
+		tries += 1
+		cx, cy = rng.uniform(*xr), rng.uniform(*yr)
+		r = WOOD_RADIUS
+		if not footprint_ok(cx, cy - r, 2 * r, 2 * r + sr[1], True, 0.035) or not clear_of_reserved(cx, cy - r, 2 * r, 2 * r + sr[1]):
+			continue
+		if overlaps(placed, cx, cy - r, 2 * r, 2 * r + sr[1], -0.012):
+			continue
+		want = rng.randint(*WOOD_TREES)
+		trees = []
+		for _ in range(400):
+			if len(trees) == want:
+				break
+			a, d = rng.uniform(0, 2 * math.pi), r * math.sqrt(rng.random())
+			x, y = cx + math.cos(a) * d, cy + math.sin(a) * d * 0.7
+			spr = sprites[len(trees) % len(sprites)]
+			size = rng.uniform(*sr)
+			wd, ht = extent(spr, size)
+			if not footprint_ok(x, y, wd, ht, True, 0.04) or overlaps(trees, x, y, wd, ht, -0.005):
+				continue
+			item = dict(zone=name, category="forest", sprite=spr, canon=canon)
+			place(trees, item, x, y, size, True)
+		if len(trees) < WOOD_TREES[0]:
+			continue
+		for t in trees:
+			t["wood"] = "%s_%d" % (name, woods)
+			t["order"] = round(orr[0] + (orr[1] - orr[0]) * (1.0 - (t["y"] - yr[0]) / max(1e-6, yr[1] - yr[0])), 4)
+			t["order"] = min(1.0, max(0.0, t["order"]))
+		placed.extend(trees)
+		woods += 1
+	if woods < count:
+		raise SystemExit("zone %s placed %d of %d woods" % (name, woods, count))
 
 
 def render(placed):

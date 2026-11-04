@@ -38,6 +38,23 @@ func test_the_map_is_dense_enough_to_read_as_a_map() -> void:
 	assert_gte(south_fae, 2)
 
 
+func test_trees_are_small_and_grow_in_woods() -> void:
+	# Scale hierarchy (L67-2): a tree is at most 0.6 of the smallest palace
+	# or temple, and trees stand in woods of 3 to 7, never alone.
+	var smallest := INF
+	var woods := {}
+	for p: Dictionary in _manifest().placements:
+		if p.category in ["palace", "temple"]:
+			smallest = minf(smallest, float(p.h))
+	for p: Dictionary in _manifest().placements:
+		if p.category == "forest":
+			assert_lte(float(p.h), smallest * 0.6, "%s tree too big" % p.zone)
+			woods[p.wood] = int(woods.get(p.wood, 0)) + 1
+	assert_gte(woods.size(), 8)
+	for w: String in woods:
+		assert_between(int(woods[w]), 3, 7, w)
+
+
 func test_land_icons_stay_on_land_and_sea_icons_at_sea() -> void:
 	for p: Dictionary in _manifest().placements:
 		var land: bool = p.land

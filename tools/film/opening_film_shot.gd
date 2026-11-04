@@ -1,5 +1,5 @@
 ## The opening film as New Game plays it (lane L33), captured on the Mac GPU:
-##   godot res://tools/film/opening_film_shot.tscn -- <out_dir> [noclip] [until=<s>]
+##   godot res://tools/film/opening_film_shot.tscn -- <out_dir> [noclip] [until=<s>] [stills=<s>,<s>...]
 ## Stills at the script's key shots, a contact sheet, a 4 fps clip and
 ## timing (FilmCapture); a 6 fps clip packed in atlases. Script: /mnt/project-files/plans/film/scripts.md §1.
 extends Node
@@ -26,6 +26,9 @@ func _run() -> void:
 	for a in args:
 		if a.begins_with("until="):
 			cap.quit_after = float(a.substr(6))
+		# stills=15,19,86 replaces the script's key shots (lane L67).
+		if a.begins_with("stills="):
+			cap.stills = PackedFloat32Array(Array(a.substr(7).split(",")).map(func(v: String) -> float: return float(v)))
 	get_tree().root.size = Vector2i(1920, 1080)
 	get_tree().root.add_child(cap)
 	get_tree().change_scene_to_file(OpeningFilm.SCENE)
