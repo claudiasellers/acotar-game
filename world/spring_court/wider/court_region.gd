@@ -461,7 +461,11 @@ func _model(id: StringName) -> Node3D:
 		for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
 			if mi.visible:
 				mi.material_override = CourtAssets.material_for(id)
-		if col == null and not String(id).begins_with("flora_"):
+		# Godot turns `<id>_col-colonly` into a StaticBody3D named `<id>_col`, so the
+		# model already carries its authored collision. Without this check the whole
+		# bounding box was added too, which sealed every arch's opening.
+		var authored := root.find_child("%s_col" % id, true, false) is CollisionObject3D
+		if col == null and not authored and not String(id).begins_with("flora_"):
 			_add_box_collision(root)
 	else:
 		root = Node3D.new()
