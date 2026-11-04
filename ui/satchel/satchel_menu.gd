@@ -11,15 +11,16 @@
 ## wash; the tag is a deckled paper label that also says where and when it
 ## grows and what it is good for. Tabs and keys are stitched leather.
 ##
-## Keys: I / Tab / Esc close, Q / R (pad LB / RB) flip pockets and run on to
-## the map, M opens the map, E / Enter (pad A) uses, 1–4 (pad X) pins.
+## A page of the menu shell (MenuShell): I / Tab opens it; Z / X (pad LT / RT)
+## flip pockets (Dreamlight's filters on the triggers), W (pad Y) is the
+## wardrobe page, Enter / Space / F (pad A) uses, 1–4 (pad X) pins. The shell
+## owns Q / E (LB / RB) for pages and closes it.
+## The cut-outs and models are made once per thing and kept (warmed while the
+## shell is closed), so opening and flipping pockets re-lays, never rebuilds.
 ## Silent by the user's call (T022). Look: theme variations from SatchelTheme
 ## only; no colours or fonts here.
 class_name SatchelMenu
-extends CanvasLayer
-
-signal opened
-signal closed
+extends MenuTab
 
 const MARGIN := Vector2(96, 64)
 const CELL := 220.0
@@ -41,7 +42,6 @@ const TAG_GAP := 72.0
 const TAG_WIDTH := 360.0
 ## The tag keeps its own column on the right; things lie to the left of it.
 const TAG_COLUMN := TAG_WIDTH + TAG_GAP * 2.0
-const SKETCHBOOK_SCRIPT := "res://ui/journal/story_journal.gd"
 
 var bar: QuickBar
 var pocket: StringName = SatchelEntries.ALL
@@ -52,11 +52,14 @@ var _cloth: PanelContainer
 var _table: SatchelTable
 var _flaps: HBoxContainer
 var _pocket_buttons: Dictionary = {}
-var _map_flap: Button
 var _purse: Label
 var _lay: Control
 var _empty: Label
 var _items: Array[Dictionary] = []
+## Every thing's cut-out, kept across opens and pockets: id -> item.
+var _cache: Dictionary = {}
+## Something was made since the last warm-up draw.
+var _warm_dirty: bool = false
 var _tag: PanelContainer
 var _tag_name: Label
 var _tag_line: Label
@@ -79,51 +82,72 @@ var _tag_y: float = -1.0
 func _init(quick_bar: QuickBar = null) -> void:
 	bar = quick_bar if quick_bar else QuickBar.current()
 	name = "SatchelMenu"
+	tab_id = &"satchel"
+	tab_title = "Satchel"
+	tab_order = 0
+	shortcut = SatchelHud.ACTION_OPEN
 
 
 func _ready() -> void:
 	layer = 19
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
-	_root.visible = false
 	bar.changed.connect(_watch_new)
 	_watch_new()
 
 
-## Opens the satchel in whichever scene has one (for the map's own tab).
+## Opens the satchel in whichever scene has one.
 static func open_from(tree: SceneTree) -> void:
-	var found := tree.root.find_children("*", "SatchelMenu", true, false)
-	if found.size() > 0:
-		(found[0] as SatchelMenu).open()
+	MenuShell.open_tab(tree, &"satchel")
 
 
-func is_open() -> bool:
-	return _root.visible
-
-
-func open() -> void:
-	if is_open():
-		return
+func _shown() -> void:
 	_apply_theme()
-	_root.visible = true
-	for n in get_tree().root.find_children("*", "PanelContainer", true, false):
-		if n is ControlsHint:
-			(n as ControlsHint).hide_now()
-	get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh(true)
-	opened.emit()
 
 
-func close() -> void:
-	if not is_open():
-		return
-	_root.visible = false
+func _hidden() -> void:
 	_new_ids.clear()
 	_tag_y = -1.0
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	closed.emit()
+
+
+## While the shell is closed: one thing's cut-out, then its model, a thing
+## per frame, so the satchel opens with everything already made.
+func warm_jobs() -> Array[Callable]:
+	return [_warm_next]
+
+
+func _warm_next() -> void:
+	if _root == null or is_open():
+		return
+	for e in SatchelEntries.list(bar.inventory, SatchelEntries.ALL):
+		var it: Dictionary = _cache.get(e.id, {})
+		if it.is_empty():
+			it = _make_item(e)
+			_hide_item(it)
+		elif it.has("model_tried"):
+			continue
+		else:
+			it.model_tried = true
+			_table.hero_model(it.card, e.id)
+		MenuShell.of(get_tree()).queue_warm(self)
+		return
+	# All made: draw them once, so their first real draw is free too.
+	if _warm_dirty:
+		_warm_dirty = false
+		MenuShell.of(get_tree()).queue_render(self)
+
+
+## For the warm-up draw: every cut-out and model out on the cloth at once.
+func warm_render(on: bool) -> void:
+	if is_open():
+		return
+	var at := Vector2(_lay.size.x * 0.5, _lay.size.y * 0.5)
+	for it: Dictionary in _cache.values():
+		var card := it.card as Node3D
+		card.visible = on
+		if on:
+			_table.place(card, _lay.position + at, it.px, 0.0, 0.0, 0.0)
+		_table.place_model(card, 1.0 if on else 0.0, 0.0)
 
 
 func set_pocket(p: StringName) -> void:
@@ -135,13 +159,10 @@ func set_pocket(p: StringName) -> void:
 	_refresh(true)
 
 
-## Next / previous pocket; past the last one is the map.
+## Next / previous pocket, wrapping round.
 func flip(step: int) -> void:
-	var i := SatchelEntries.POCKETS.find(pocket) + step
-	if i >= SatchelEntries.POCKETS.size():
-		_to_map()
-	elif i >= 0:
-		set_pocket(SatchelEntries.POCKETS[i])
+	var n := SatchelEntries.POCKETS.size()
+	set_pocket(SatchelEntries.POCKETS[posmod(SatchelEntries.POCKETS.find(pocket) + step, n)])
 
 
 func select(id: StringName) -> void:
@@ -173,68 +194,24 @@ func pin_selected(slot: int) -> bool:
 
 # --- input -------------------------------------------------------------------
 
-func _input(event: InputEvent) -> void:
-	if not is_open():
-		return
-	if event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel") \
-			or event.is_action_pressed(SatchelHud.ACTION_OPEN):
-		close()
-	elif event.is_action_pressed(MapSettings.ACTION_OPEN):
-		_to_map()
-	elif _pad(event, JOY_BUTTON_Y) or _key(event, [KEY_W]):
-		_to_wardrobe()
-	elif _pad(event, JOY_BUTTON_LEFT_SHOULDER) or _key(event, [KEY_Q]):
+func _page_input(event: InputEvent) -> bool:
+	if pad_pressed(event, JOY_BUTTON_Y) or key_pressed(event, [KEY_W]):
+		MenuShell.open_tab(get_tree(), &"wardrobe")
+	elif trigger_pulled(event, JOY_AXIS_TRIGGER_LEFT) or key_pressed(event, [KEY_Z]):
 		flip(-1)
-	elif _pad(event, JOY_BUTTON_RIGHT_SHOULDER) or _key(event, [KEY_R]):
+	elif trigger_pulled(event, JOY_AXIS_TRIGGER_RIGHT) or key_pressed(event, [KEY_X]):
 		flip(1)
-	elif _pad(event, JOY_BUTTON_X):
+	elif pad_pressed(event, JOY_BUTTON_X):
 		pin_selected(bar.next_slot_for(selected_id))
-	elif _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]):
+	elif key_pressed(event, [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_F]):
 		use_selected()
 	else:
 		for i in QuickBar.SLOTS:
 			if event.is_action_pressed(SatchelHud.slot_action(i)):
 				pin_selected(i)
-				get_viewport().set_input_as_handled()
-				return
-		return
-	get_viewport().set_input_as_handled()
-
-
-func _pad(event: InputEvent, button: JoyButton) -> bool:
-	return event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == button
-
-
-func _key(event: InputEvent, keys: Array) -> bool:
-	return event is InputEventKey and event.pressed and not event.echo \
-			and (event as InputEventKey).physical_keycode in keys
-
-
-func _to_map() -> void:
-	var huds := get_tree().root.find_children("*", "WorldMapHud", true, false)
-	if huds.is_empty():
-		return
-	close()
-	(huds[0] as WorldMapHud).full_map.open()
-
-
-## Closes the satchel and opens L54's sketchbook (StoryJournal.open_from),
-## loaded by path so the satchel never depends on it being there.
-func _to_sketchbook() -> void:
-	var tree := get_tree()
-	close()
-	var journal: Variant = load(SKETCHBOOK_SCRIPT)
-	if journal:
-		journal.open_from(tree)
-
-
-## Closes the satchel and opens the wardrobe on what she carries (L64).
-func _to_wardrobe() -> void:
-	var feyre := get_tree().get_first_node_in_group(&"player") as Feyre
-	if feyre == null:
-		return
-	close()
-	DressingRoom.open(feyre, DressingRoom.SATCHEL)
+				return true
+		return false
+	return true
 
 
 func _watch_new() -> void:
@@ -244,6 +221,8 @@ func _watch_new() -> void:
 
 func _on_item_added(id: StringName, _n: int, _c: StringName) -> void:
 	_new_ids[id] = true
+	if not _cache.has(id) and is_inside_tree():
+		MenuShell.of(get_tree()).queue_warm(self)
 
 
 # --- build -------------------------------------------------------------------
@@ -282,22 +261,7 @@ func _build() -> void:
 		b.pressed.connect(set_pocket.bind(p))
 		_flaps.add_child(b)
 		_pocket_buttons[p] = b
-	_map_flap = _button("Map", &"SatchelTab")
-	_map_flap.focus_mode = Control.FOCUS_NONE
-	_map_flap.pressed.connect(_to_map)
-	_flaps.add_child(_map_flap)
-	# L54's story sketchbook, once it is in the project.
-	if ResourceLoader.exists(SKETCHBOOK_SCRIPT):
-		var book := _button("Sketchbook", &"SatchelTab")
-		book.focus_mode = Control.FOCUS_NONE
-		book.pressed.connect(_to_sketchbook)
-		_flaps.add_child(book)
-	# L64: the small things she carries (crowns, jewellery, masks, cloaks, hair).
-	var dress := _button("Wardrobe", &"SatchelTab")
-	dress.name = "WardrobeFlap"
-	dress.focus_mode = Control.FOCUS_NONE
-	dress.pressed.connect(_to_wardrobe)
-	_flaps.add_child(dress)
+	# The map, sketchbook and wardrobe are the shell's tabs above (MenuShell).
 
 	_purse = _label("", &"SatchelSmall")
 	_purse.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -427,12 +391,11 @@ func _refresh(settle: bool = false) -> void:
 	var layout := _layout(entries)
 	for i in entries.size():
 		var e := entries[i]
-		var it: Dictionary = old.get(e.id, {})
+		var it: Dictionary = _cache.get(e.id, {})
 		old.erase(e.id)
-		if it.is_empty() or settle:
-			if not it.is_empty():
-				_free_item(it)
+		if it.is_empty():
 			it = _make_item(e)
+		(it.node as Control).visible = true
 		it.home = layout[i]
 		it.entry = e
 		_update_count(it, e)
@@ -441,10 +404,18 @@ func _refresh(settle: bool = false) -> void:
 			it.rot = it.tilt + deg_to_rad(10.0 * _seeded(e.id).x)
 			it.lift = DROP_HEIGHT
 			it.delay = OPEN_STAGGER * i
+			it.show = 0.0
 			(it.card as Node3D).visible = false
 		fresh.append(it)
 	for id in old:
-		_free_item(old[id])
+		_hide_item(old[id])
+	# Things no longer carried at all let go of their cut-out and model.
+	var carried := {}
+	for e in SatchelEntries.list(inv, SatchelEntries.ALL):
+		carried[e.id] = true
+	for id in _cache.keys():
+		if not carried.has(id):
+			_free_item(_cache[id])
 	_items = fresh
 	_empty.visible = entries.is_empty()
 	if not entries.any(func(e: Dictionary) -> bool: return e.id == selected_id):
@@ -524,6 +495,8 @@ func _make_item(e: Dictionary) -> Dictionary:
 		"card": _table.add_card(e), "lift": 0.0, "face": 0.0,
 		"tilt": deg_to_rad(_seeded(e.id).z * TILT_DEG), "at": Vector2.ZERO, "rot": 0.0, "scale": 1.0,
 		"delay": 0.0, "home": Vector2.ZERO, "show": 0.0, "spin": 0.0}
+	_cache[e.id] = it
+	_warm_dirty = true
 	b.focus_entered.connect(select.bind(e.id))
 	b.mouse_entered.connect(func() -> void: b.grab_focus())
 	b.pressed.connect(func() -> void:
@@ -533,8 +506,15 @@ func _make_item(e: Dictionary) -> Dictionary:
 
 
 func _free_item(it: Dictionary) -> void:
+	_cache.erase(it.id)
 	(it.node as Node).queue_free()
 	(it.card as Node).queue_free()
+
+
+## Off this pocket: kept for next time, out of sight.
+func _hide_item(it: Dictionary) -> void:
+	(it.node as Control).visible = false
+	(it.card as Node3D).visible = false
 
 
 func _update_count(it: Dictionary, e: Dictionary) -> void:
@@ -705,9 +685,9 @@ func _build_prompts() -> void:
 	var pairs: Array = []
 	var verb := SatchelUse.verb(selected_id) if selected_id != &"" else ""
 	if verb != "":
-		pairs.append(["A" if pad else "E", verb])
+		pairs.append(["A" if pad else "Enter", verb])
 		pairs.append(["X" if pad else "1–4", "Pin"])
-	pairs.append(["LB RB" if pad else "Q R", "Pocket"])
+	pairs.append(["LT RT" if pad else "Z X", "Pocket"])
 	pairs.append(["Y" if pad else "W", "Wardrobe"])
 	pairs.append(["B" if pad else "Esc", "Back"])
 	for p in pairs:

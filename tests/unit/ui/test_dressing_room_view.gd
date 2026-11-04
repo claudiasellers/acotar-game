@@ -46,7 +46,7 @@ func test_open_wear_twirl_close() -> void:
 	DressingRoom.open(feyre, &"wardrobe")
 	assert_true(DressingRoom.is_open())
 	assert_true(get_tree().paused)
-	var view := get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
+	var view := DressingRoom.view()
 	assert_not_null(view)
 	assert_eq(feyre.model.process_mode, Node.PROCESS_MODE_ALWAYS, "she keeps moving under the pause")
 	assert_true((view.camera as Camera3D).current, "the mirror's camera is live")

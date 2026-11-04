@@ -132,14 +132,9 @@ func test_every_thing_rests_on_a_linen_patch() -> void:
 	assert_lt(patch.global_position.y, card.global_position.y, "the patch lies under the thing")
 
 
-func test_sketchbook_flap_follows_map_only_when_l54_is_in() -> void:
+func test_flaps_are_pockets_only() -> void:
+	# The map, sketchbook and wardrobe are the menu shell's tabs (test_menu_shell).
 	var menu := SatchelMenu.new(QuickBar.new(Inventory.new()))
 	add_child_autofree(menu)
 	var flaps := menu.get(&"_flaps") as HBoxContainer
-	var names: Array[String] = []
-	for b in flaps.get_children():
-		names.append((b as Button).text)
-	var has_book := ResourceLoader.exists(SatchelMenu.SKETCHBOOK_SCRIPT)
-	assert_eq(names.has("Sketchbook"), has_book)
-	if has_book:
-		assert_eq(names.find("Sketchbook"), names.find("Map") + 1)
+	assert_eq(flaps.get_child_count(), SatchelEntries.POCKETS.size())

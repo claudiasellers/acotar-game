@@ -2,7 +2,7 @@
 ## wardrobe hangs on the right. Pieces are grouped by garment (one card per
 ## gown, a row of colour swatches for its variants) and by category tab. Every
 ## change twirls her, sparkles and chimes while the game stays paused. Drag
-## the mirror, Q/E or the arrows to turn her. Opened by DressingRoom.open().
+## the mirror, or A / D, to turn her. Opened by DressingRoom.open().
 ## L64: pieces she hasn't seen yet wear a "New" ribbon and arrive with one
 ## sparkle; the header counts the collection; from the satchel only the small
 ## things she carries show (SATCHEL_TABS), never a gown.
@@ -160,9 +160,10 @@ func _exit_tree() -> void:
 
 func _process(delta: float) -> void:
 	var turn := Input.get_axis(&"dress_turn_left", &"dress_turn_right") if InputMap.has_action(&"dress_turn_left") else 0.0
-	if Input.is_physical_key_pressed(KEY_Q):
+	# Q / E belong to the menu shell (pages), so A / D turn her.
+	if Input.is_physical_key_pressed(KEY_A):
 		turn -= 1.0
-	if Input.is_physical_key_pressed(KEY_E):
+	if Input.is_physical_key_pressed(KEY_D):
 		turn += 1.0
 	if turn != 0.0:
 		_turn(turn * TURN_SPEED * delta)
@@ -386,7 +387,7 @@ func _build() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 18)
 	box.add_child(row)
-	row.add_child(_key_hint("Q  E", "Turn"))
+	row.add_child(_key_hint("A  D", "Turn"))
 	row.add_child(_key_hint("Esc", "Done"))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL

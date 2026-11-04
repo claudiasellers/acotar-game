@@ -118,10 +118,8 @@ func open_full_map() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if get_tree().paused or StoryControl.mode != StoryControl.Mode.FULL:
 		return
-	if event.is_action_pressed(MapSettings.ACTION_OPEN):
-		get_viewport().set_input_as_handled()
-		open_full_map()
-	elif event.is_action_pressed(MapSettings.ACTION_MINIMAP):
+	# M itself is the menu shell's (MenuShell, the map tab's shortcut).
+	if event.is_action_pressed(MapSettings.ACTION_MINIMAP):
 		get_viewport().set_input_as_handled()
 		MapSettings.set_minimap_shown(not MapSettings.minimap_shown())
 

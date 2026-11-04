@@ -31,6 +31,8 @@ func _ready() -> void:
 	Gameplay.collection.discovered.connect(_on_discovered)
 	Gameplay.collection.reward_earned.connect(_on_reward)
 	_ensure_actions()
+	# The collection book is a page of the menu shell, opened with J.
+	CollectionTab.ensure(get_tree())
 	var windows := Timer.new()
 	windows.name = "ForageWindows"
 	windows.wait_time = 4.0
@@ -43,10 +45,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"open_collection") and feyre:
-		get_viewport().set_input_as_handled()
-		COLLECTION_UI.open(feyre)
-	elif event.is_action_pressed(&"weave_crown") and feyre:
+	# J itself is the menu shell's (the collection tab's shortcut).
+	if event.is_action_pressed(&"weave_crown") and feyre:
 		get_viewport().set_input_as_handled()
 		weave_crown()
 

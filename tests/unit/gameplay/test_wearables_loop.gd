@@ -83,7 +83,7 @@ func test_arrivals_and_satchel_screens() -> void:
 	PhaseManager.current_phase = &"p3_house_and_woods"
 	DressingRoom.open(feyre, &"wardrobe")
 	await wait_process_frames(2)
-	var view := get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
+	var view := DressingRoom.view()
 	assert_gt(view.arrivals.size(), 0, "phase 3 hangs new things")
 	assert_true(view.arrivals_label.visible and view.arrivals_label.text.begins_with("%d new" % view.arrivals.size()))
 	assert_gt(view.find_children("NewRibbon", "", true, false).size(), 0, "New ribbons on their cards")
@@ -92,7 +92,7 @@ func test_arrivals_and_satchel_screens() -> void:
 	assert_eq(Gameplay.wardrobe.unseen(), [] as Array[StringName], "seen once she has looked")
 	DressingRoom.open(feyre, DressingRoom.SATCHEL)
 	await wait_process_frames(2)
-	view = get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
+	view = DressingRoom.view()
 	for i in view.tabs.get_tab_count():
 		assert_has(DressingRoomView.SATCHEL_TABS, String(view.tabs.get_tab_control(i).name))
 	assert_false(view.arrivals_label.visible)

@@ -107,8 +107,7 @@ func test_wardrobe_station_opens_the_dressing_room() -> void:
 	var wardrobe := hill.get_node("GameplaySandbox/Wardrobe") as Node3D
 	feyre.global_position = wardrobe.global_position + Vector3(0, -1.0, 1.0)
 	assert_true(feyre.interactor.interact())
-	var room := get_tree().root.get_node_or_null("DressingRoom")
-	assert_not_null(room)
+	assert_true(DressingRoom.is_open(), "the wardrobe page of the menu shell")
 	assert_true(get_tree().paused)
 	assert_true(Gameplay.wardrobe.owns(&"ball_gown_rose"), "the room's gowns are hanging there")
 	assert_true(Gameplay.wardrobe.equip(&"ball_gown_rose"))

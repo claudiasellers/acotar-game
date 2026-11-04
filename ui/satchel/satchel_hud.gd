@@ -92,6 +92,8 @@ func _ready() -> void:
 	SaveSystem.register_provider(QuickBar.SAVE_KEY, bar)
 	menu = SatchelMenu.new(bar)
 	add_child(menu)
+	# The wardrobe on what she carries (L64), the satchel's neighbour page.
+	add_child(WardrobeTab.new())
 	_build_bar()
 	bar.changed.connect(_refresh)
 	bar.used.connect(_on_used)
@@ -144,14 +146,8 @@ func _input(event: InputEvent) -> void:
 			_refresh()
 	if menu.is_open():
 		return
-	if get_tree().paused:
-		_from_map(event)
-		return
-	if not _can_play():
-		return
-	if event.is_action_pressed(ACTION_OPEN):
-		open_satchel()
-		get_viewport().set_input_as_handled()
+	# I / Tab itself is the menu shell's (MenuShell); the LB tap is read here.
+	if get_tree().paused or not _can_play():
 		return
 	if event.is_action(ACTION_CHORD) and not event.is_echo():
 		if event.is_pressed():
@@ -174,19 +170,6 @@ func _input(event: InputEvent) -> void:
 	for i in SLOT_ACTIONS.size():
 		if event.is_action_pressed(SLOT_ACTIONS[i]):
 			use_slot(i)
-			get_viewport().set_input_as_handled()
-			return
-
-
-## I / Tab / LB on the open map flips to the satchel (one menu, two pages).
-func _from_map(event: InputEvent) -> void:
-	if not (event.is_action_pressed(ACTION_OPEN) or event.is_action_pressed(ACTION_CHORD)):
-		return
-	for hud in get_tree().root.find_children("*", "WorldMapHud", true, false):
-		var full_map := (hud as WorldMapHud).full_map
-		if full_map and full_map.is_open():
-			full_map.close()
-			open_satchel()
 			get_viewport().set_input_as_handled()
 			return
 

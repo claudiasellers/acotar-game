@@ -1,9 +1,9 @@
-## The full map: Feyre's sketchbook page of everywhere she has been. Opens
-## with M (pad RB) or from the pause menu, pauses the game, and pans and
-## zooms. Shows the uncovered land, the places she has found (named), the
+## The full map: Feyre's sketchbook page of everywhere she has been. The menu
+## shell's last tab (MenuShell): opens with M (pad RB) or from the pause menu,
+## and pans and zooms. Shows the uncovered land, the places she has found (named), the
 ## landmarks she has seen and where she stands, nothing else (R2).
 class_name FullMap
-extends CanvasLayer
+extends MenuTab
 
 const SHADER := preload("res://ui/map/map_view.gdshader")
 const ManorSketch := preload("res://ui/map/manor_sketch.gd")
@@ -54,29 +54,22 @@ var _foot: Label
 func _init(owner_hud: WorldMapHud) -> void:
 	hud = owner_hud
 	name = "FullMap"
+	tab_id = &"map"
+	tab_title = "Map"
+	tab_order = 4
+	shortcut = MapSettings.ACTION_OPEN
 
 
 func _ready() -> void:
 	layer = 18
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
-	_root.visible = false
 
 
 func map_rect() -> ColorRect:
 	return _map
 
 
-func is_open() -> bool:
-	return _root.visible
-
-
-func open() -> void:
-	if is_open():
-		return
-	_root.visible = true
-	get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+func _shown() -> void:
 	view_center = hud.player_xz
 	view_width = ZOOM_OPEN
 	manor_level = hud.manor.level
@@ -85,41 +78,29 @@ func open() -> void:
 	Juice.bounce_control(_card, 0.03)
 
 
-func close() -> void:
-	if not is_open():
-		return
-	_root.visible = false
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
-
-func _input(event: InputEvent) -> void:
-	if not is_open():
-		return
-	if event.is_action_pressed(MapSettings.ACTION_OPEN) or event.is_action_pressed(&"pause"):
-		close()
-		get_viewport().set_input_as_handled()
-	elif event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_TAB:
+## The map's own keys (the shell has M, Esc and the page keys).
+func _page_input(event: InputEvent) -> bool:
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_TAB:
 		show_manor(not showing_manor)
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"camera_recenter"):
 		view_center = hud.player_xz
 		manor_level = hud.manor.level
-		get_viewport().set_input_as_handled()
 	elif showing_manor and (event.is_action_pressed(&"move_forward") or event.is_action_pressed(&"move_back")):
 		step_floor(1 if event.is_action_pressed(&"move_forward") else -1)
-		get_viewport().set_input_as_handled()
 	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		_pad = true
 		# Pad: A drops the pin under the reticle (or lifts it if it is there); X lifts it.
 		if event.is_action_pressed(&"jump"):
 			toggle_pin_at(view_center, _map.size * 0.5)
-			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"interact"):
 			hud.clear_pin()
-			get_viewport().set_input_as_handled()
-	elif event is InputEventMouse:
-		_pad = false
+		else:
+			return false
+	else:
+		if event is InputEventMouse:
+			_pad = false
+		return false
+	return true
 
 
 ## A click or press on the map: on the pin lifts it, anywhere else drops it.

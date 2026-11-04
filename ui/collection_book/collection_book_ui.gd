@@ -1,15 +1,16 @@
 ## The collection book (J): pastel tabs with progress bars, a swatch tile per
 ## entry (a grey "?" until found), and a pink "new" badge that bounces once
-## and clears when the tab is viewed. Pauses the game while open.
+## and clears when the tab is viewed. The page is the menu shell's collection
+## tab (CollectionTab); these are its entry points and the parts it is built from.
 extends RefCounted
 
 const TILE := Vector2(122, 132)
 
-static var _open: CanvasLayer = null
-
 
 static func is_open() -> bool:
-	return _open != null and is_instance_valid(_open)
+	var loop := Engine.get_main_loop() as SceneTree
+	var tab := MenuShell.of(loop).find(&"collection") if loop else null
+	return tab != null and tab.is_open()
 
 
 static func toggle(feyre: Feyre) -> void:
@@ -20,100 +21,11 @@ static func toggle(feyre: Feyre) -> void:
 
 
 static func open(feyre: Feyre) -> void:
-	if is_open():
-		return
-	FindCard.clear(feyre.get_tree())
-	var book := Gameplay.collection
-	var parts := UiStyle.modal("CollectionBook", 980.0)
-	var layer: CanvasLayer = parts[0]
-	var box: VBoxContainer = parts[1]
-	_open = layer
-	var header := HBoxContainer.new()
-	box.add_child(header)
-	var title := UiStyle.label("My collection", 28)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(title)
-	var close_button := UiStyle.button("Close (J)")
-	close_button.shortcut = _shortcut([&"open_collection", &"ui_cancel"])
-	close_button.pressed.connect(func() -> void: close(feyre))
-	header.add_child(close_button)
-
-	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override(&"separation", 6)
-	box.add_child(tabs)
-	var bar := ProgressBar.new()
-	bar.custom_minimum_size = Vector2(0, 18)
-	bar.show_percentage = false
-	bar.add_theme_stylebox_override(&"fill", _rounded(UiStyle.ACCENT))
-	bar.add_theme_stylebox_override(&"background", _rounded(Color(1, 1, 1, 0.8)))
-	box.add_child(bar)
-	var count_row := HBoxContainer.new()
-	box.add_child(count_row)
-	var count := UiStyle.label("", 16)
-	count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	count.autowrap_mode = TextServer.AUTOWRAP_OFF
-	count_row.add_child(count)
-	var reward := UiStyle.label("", 16)
-	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	reward.autowrap_mode = TextServer.AUTOWRAP_OFF
-	reward.add_theme_color_override(&"font_color", Color(0.72, 0.52, 0.18))
-	count_row.add_child(reward)
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 470)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
-	var grid := GridContainer.new()
-	grid.columns = 7
-	grid.add_theme_constant_override(&"h_separation", 10)
-	grid.add_theme_constant_override(&"v_separation", 10)
-	scroll.add_child(grid)
-	var detail := UiStyle.label("", 16)
-	box.add_child(detail)
-
-	var buttons: Dictionary = {}
-	var show_tab := func(tab: StringName) -> void:
-		for t: StringName in buttons:
-			(buttons[t] as Button).button_pressed = t == tab
-		for c in grid.get_children():
-			c.queue_free()
-		var p := book.progress(tab)
-		if p.y > 0:
-			bar.visible = true
-			bar.max_value = p.y
-			bar.value = p.x
-			count.text = "%d of %d found" % [p.x, p.y]
-		else:
-			bar.visible = false
-			count.text = "%d so far" % p.x if p.x > 0 else "Nothing yet. Keep your eyes open."
-		reward.text = _reward_text(book, tab)
-		for e in book.entries(tab):
-			grid.add_child(_tile(e, detail))
-		book.seen(tab)
-		_refresh_labels(buttons, book)
-	for tab in CollectionBook.TABS:
-		var b := UiStyle.button("", true)
-		b.pressed.connect(func() -> void: show_tab.call(tab))
-		tabs.add_child(b)
-		buttons[tab] = b
-	_refresh_labels(buttons, book)
-
-	feyre.get_tree().root.add_child(layer)
-	var first: StringName = CollectionBook.TABS[0]
-	for tab in CollectionBook.TABS:
-		if book.new_count(tab) > 0:
-			first = tab
-			break
-	show_tab.call(first)
-	feyre.get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	CollectionTab.ensure(feyre.get_tree()).open()
 
 
 static func close(feyre: Feyre) -> void:
-	if is_open():
-		_open.queue_free()
-	_open = null
-	feyre.get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	CollectionTab.ensure(feyre.get_tree()).close()
 
 
 ## "✦ Next: a gold ribbon sash at 60" plus how many of the page's rewards are earned.

@@ -50,7 +50,7 @@ func _run() -> void:
 			_stand_at(feyre, look["station"])
 		await _frames(20)
 		DressingRoom.open(feyre, look["station"])
-		var view := get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
+		var view := DressingRoom.view()
 		for i in view.tabs.get_tab_count():
 			if look["tab"] != "" and String(view.tabs.get_tab_control(i).name) == look["tab"]:
 				view.tabs.current_tab = i

@@ -1,0 +1,96 @@
+## Times opening each menu page, first open and again, on a stocked satchel
+## with Feyre stood on a plain floor. Prints one line per open: the open()
+## call, and the slowest of the next frames (the hitch the player sees).
+##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
+##     res://tools/ui/menu_open_probe.tscn
+## (A scene, not a -s script, so the autoloads exist.)
+extends Node
+
+const FEYRE := "res://characters/feyre/feyre.tscn"
+const STOCK := {
+	&"ing_bilberry": 6, &"ing_chanterelle": 3, &"ing_moonflower": 1, &"ing_primrose": 4,
+	&"ing_rose_hip": 5, &"ing_hazelnut": 8, &"ing_lavender": 2, &"ing_foxglove": 1,
+	&"ing_honey": 1, &"ing_watermint": 3, &"ing_wild_strawberry": 7, &"ing_elderflower": 2,
+	&"col_odd_stone": 1, &"col_river_glass": 2, &"col_blue_jay_feather": 1,
+	&"col_painted_pebble": 1, &"col_robin_egg_shell": 1, &"arrow_wood": 12, &"ing_crow_feather": 3,
+}
+const FRAMES_AFTER := 12
+const OPENS := 3
+const WARM_FRAMES := 120
+
+var feyre: Feyre
+
+
+func _ready() -> void:
+	get_tree().create_timer(300.0, true).timeout.connect(func() -> void:
+		push_error("menu_open_probe: timed out")
+		get_tree().quit(1))
+	_go.call_deferred()
+
+
+func _go() -> void:
+	var floor := CSGBox3D.new()
+	floor.size = Vector3(40, 1, 40)
+	floor.position.y = -0.5
+	floor.use_collision = true
+	add_child(floor)
+	var sun := DirectionalLight3D.new()
+	add_child(sun)
+	feyre = (load(FEYRE) as PackedScene).instantiate() as Feyre
+	add_child(feyre)
+	for id: StringName in STOCK:
+		Gameplay.inventory.add(id, STOCK[id])
+	_setup()
+	# Long enough for the shell's warm-up to finish, as behind the loading veil.
+	for i in WARM_FRAMES:
+		await get_tree().process_frame
+	for page in _pages():
+		for n in OPENS:
+			await _time(page, n)
+	print("menu_open_probe: done")
+	get_tree().quit()
+
+
+## Override point for the scene under test: what to add before timing.
+func _setup() -> void:
+	add_child(SettingsPanel.new())
+	add_child(StoryJournal.new())
+	add_child(WorldMapHud.new())
+	add_child(SatchelHud.new())
+
+
+func _pages() -> Array[StringName]:
+	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"map"]
+
+
+## &"none" times plain frames, the baseline the hitch is read against.
+func _open(page: StringName) -> void:
+	if page != &"none":
+		MenuShell.open_tab(get_tree(), page)
+
+
+func _close() -> void:
+	MenuShell.close_all(get_tree())
+
+
+func _time(page: StringName, n: int) -> void:
+	var t0 := Time.get_ticks_usec()
+	_open(page)
+	var call_ms := (Time.get_ticks_usec() - t0) / 1000.0
+	var frames: Array[float] = []
+	var last := Time.get_ticks_usec()
+	for i in FRAMES_AFTER:
+		await get_tree().process_frame
+		var now := Time.get_ticks_usec()
+		frames.append((now - last) / 1000.0)
+		last = now
+	# The page's own cost per frame (the last frames) against the worst early one.
+	var settled: Array[float] = frames.slice(FRAMES_AFTER - 3)
+	settled.sort()
+	var steady := settled[1]
+	var worst: float = frames.max()
+	print("menu_open_probe: %-10s open#%d  call %6.1f ms  worst %6.1f ms  steady %6.1f ms  hitch %6.1f ms" \
+			% [page, n + 1, call_ms, worst, steady, maxf(0.0, worst - steady)])
+	_close()
+	for i in 4:
+		await get_tree().process_frame

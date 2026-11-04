@@ -1,23 +1,21 @@
 ## Feyre's sketchbook (L54): where she is in the story, what she's after, and
 ## the hints she can think her way to when she's stuck. Opt-in only: L, the
-## pause menu's Journal button, or the satchel's Sketchbook flap open it; the
-## HUD never shows any of it (R2 as amended for L54).
+## pause menu's Journal button, or its tab in the menu shell (MenuShell) open
+## it; the HUD never shows any of it (R2 as amended for L54).
 ##
 ## Left page: the chapter (one per story phase), its drawing and opener, and
 ## what's behind her (a memory per deed done). Right page: the step she's on
 ## ("what I'm after") and up to three hints, gentle to plain. A hint unlocks
 ## with time on the step or failed tries (HintLadder) and shows only when she
-## asks: E / Enter or the "Think on it" tab. Nothing ahead of the current step
+## asks: Enter / Space / F (pad A) or the "Think on it" tab. Nothing ahead of the current step
 ## is ever drawn.
 ##
 ## Look: SatchelTheme (L13's shared theme plus L50's crafted layer), so the
 ## fonts, paper, leather tabs and keys match the satchel and the pause menu.
 ## No colours or fonts are named here.
 class_name StoryJournal
-extends CanvasLayer
+extends MenuTab
 
-signal opened
-signal closed
 signal hint_revealed(entry_id: StringName, index: int)
 
 const BOOK_PATH := "res://data/journal/story_journal.tres"
@@ -60,6 +58,12 @@ var _spaces_seen: Dictionary = {}
 
 func _init(journal_book: JournalBook = null) -> void:
 	name = "StoryJournal"
+	tab_id = &"sketchbook"
+	tab_title = "Sketchbook"
+	tab_order = 3
+	shortcut = ACTION_OPEN
+	# Hints are for when she's stuck, story scene or not.
+	opens_in_story = true
 	book = journal_book
 	if book == null and ResourceLoader.exists(BOOK_PATH):
 		book = load(BOOK_PATH) as JournalBook
@@ -73,11 +77,9 @@ func _init(journal_book: JournalBook = null) -> void:
 
 func _ready() -> void:
 	layer = 19
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group(GROUP)
 	ensure_action()
 	_build()
-	_root.visible = false
 	var bus := Gameplay.autoload(&"EventBus")
 	if bus:
 		bus.connect(&"flag_changed", _on_flag_changed)
@@ -88,6 +90,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	super()
 	var saves := Gameplay.autoload(&"SaveSystem")
 	if saves:
 		saves.call(&"unregister_provider", SAVE_KEY)
@@ -116,6 +119,11 @@ static func open_from(tree: SceneTree) -> void:
 	j.open.call_deferred()
 
 
+## A hint she has earned and not yet read.
+func has_news() -> bool:
+	return entry != null and ladder.unlocked(entry.id, entry.hints.size()) > ladder.shown(entry.id)
+
+
 static func ensure_action() -> void:
 	if InputMap.has_action(ACTION_OPEN):
 		return
@@ -125,18 +133,9 @@ static func ensure_action() -> void:
 	InputMap.action_add_event(ACTION_OPEN, key)
 
 
-func is_open() -> bool:
-	return _root.visible
-
-
-func open() -> void:
-	if is_open():
-		return
+func _shown() -> void:
 	_root.theme = SatchelTheme.theme()
 	refresh()
-	_root.visible = true
-	get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_book_box.modulate.a = 0.0
 	_book_box.position.y = 24.0
 	var tw := create_tween().set_parallel()
@@ -144,16 +143,6 @@ func open() -> void:
 	tw.tween_property(_book_box, ^"position:y", 0.0, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_draw_in(_chapter_sketch, 0.0)
 	_draw_in(_after_sketch, 0.15)
-	opened.emit()
-
-
-func close() -> void:
-	if not is_open():
-		return
-	_root.visible = false
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	closed.emit()
 
 
 ## Re-reads the phase and flags and redraws both pages.
@@ -163,7 +152,7 @@ func refresh() -> void:
 	_fill_right()
 
 
-## E / "Think on it": the next unlocked hint, written in. Returns its index or -1.
+## Enter / "Think on it": the next unlocked hint, written in. Returns its index or -1.
 func think() -> int:
 	if entry == null:
 		return -1
@@ -215,24 +204,11 @@ func _on_space_started(space_id: StringName) -> void:
 	_spaces_seen[key] = true
 
 
-func _input(event: InputEvent) -> void:
-	if not is_open():
-		if event.is_action_pressed(ACTION_OPEN) and not get_tree().paused:
-			open()
-			get_viewport().set_input_as_handled()
-		return
-	if event.is_action_pressed(ACTION_OPEN) or event.is_action_pressed(&"pause") \
-			or event.is_action_pressed(&"ui_cancel"):
-		close()
-	elif event is InputEventKey and event.pressed and not event.echo \
-			and (event as InputEventKey).physical_keycode in [KEY_E, KEY_ENTER, KEY_KP_ENTER]:
+func _page_input(event: InputEvent) -> bool:
+	if key_pressed(event, [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_F]) or pad_pressed(event, JOY_BUTTON_A):
 		think()
-	elif event is InputEventJoypadButton and event.pressed \
-			and (event as InputEventJoypadButton).button_index == JOY_BUTTON_A:
-		think()
-	else:
-		return
-	get_viewport().set_input_as_handled()
+		return true
+	return false
 
 
 # --- pages -------------------------------------------------------------------

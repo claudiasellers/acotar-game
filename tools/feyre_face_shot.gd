@@ -69,7 +69,7 @@ func _run() -> void:
 	Gameplay.wardrobe.clear_makeup()
 	Gameplay.wardrobe.set_hair(&"crown_braid")
 	DressingRoom.open(feyre, &"dressing_mirror")
-	var view := get_tree().root.get_node("DressingRoom/DressingRoomView") as DressingRoomView
+	var view := DressingRoom.view()
 	for i in view.tabs.get_tab_count():
 		if String(view.tabs.get_tab_control(i).name) == "Makeup":
 			view.tabs.current_tab = i
