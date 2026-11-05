@@ -8,6 +8,8 @@ extends Node
 
 signal arrow_type_changed(arrow_item_id: StringName)
 signal bow_changed(bow: BowData)
+## Let go before MIN_LOOSE_DRAW: the bow comes down and the arrow stays nocked.
+signal draw_too_short
 
 ## Time scale while drawing and aiming with stamina left.
 const SLOW_TIME_SCALE := 0.4
@@ -15,6 +17,9 @@ const SLOW_TIME_SCALE := 0.4
 const SLOW_TIME_DRAIN := 28.0
 ## Draw needed before time slows.
 const SLOW_TIME_MIN_DRAW := 0.35
+## Draw needed for a release to loose (T084). A quick click lowers the bow
+## instead of dropping a feeble arrow ten metres off.
+const MIN_LOOSE_DRAW := 0.3
 const ARROW_DIR := "res://data/arrows"
 const BOW_DIR := "res://data/bows"
 ## The only type drawn automatically when the chosen one runs out. Special
@@ -73,7 +78,9 @@ func _physics_process(delta: float) -> void:
 	update_draw(delta, Input.is_action_pressed(&"fire"), Input.is_action_pressed(&"aim"))
 
 
-## Draw/release logic, separated from input so tests can drive it.
+## Draw/release logic, separated from input so tests can drive it. Holding fire
+## alone is enough: drawing brings up the aim view and reticle (Feyre and the
+## reticle read is_drawing), so right-mouse aim is optional.
 func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
 	var allowed := can_shoot()
 	if fire_held and allowed and _available() != &"":
@@ -84,7 +91,10 @@ func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
 		is_drawing = false
 		draw_amount = 0.0
 	elif is_drawing:
-		release()
+		if draw_amount >= MIN_LOOSE_DRAW:
+			release()
+		else:
+			draw_too_short.emit()
 		is_drawing = false
 		draw_amount = 0.0
 	_update_slow_time(delta, aiming)

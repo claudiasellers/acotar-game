@@ -1,7 +1,8 @@
 ## Act I's contextual key prompts (no objectives, no markers; R2): a small card
 ## at the bottom of the screen that names a key only while it matters.
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
-##   RMB aim / LMB draw  prey is near or the hunt is on, until her first shot
+##   LMB draw            prey is near or the hunt is on, until her first shot,
+##                       and again for a moment after a release too short to loose
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
@@ -13,9 +14,10 @@ extends CanvasLayer
 const SECTION := "prompts"
 const NEAR_PREY := 90.0
 const REACH := 3.5
+## Seconds the draw hint shows after a release too short to loose.
+const SHORT_DRAW_HINT := 2.5
 const PROMPTS := {
 	&"ash": ["Q", "ash arrow"],
-	&"aim": ["Right mouse", "hold to aim the bow"],
 	&"draw": ["Left mouse", "hold to draw, let go to loose"],
 	&"skin": ["E", "skin"],
 	&"sell": ["E", "sell the pelt"],
@@ -32,6 +34,8 @@ var _text: Label
 var _alpha: float = 0.0
 var _hunting: bool = false
 var _fire_hooked: bool = false
+## Ticks (ms, real time) until which the draw hint shows again.
+var _short_until: int = 0
 
 
 func _ready() -> void:
@@ -83,8 +87,13 @@ func want() -> StringName:
 	if not _fire_hooked:
 		_fire_hooked = true
 		feyre.arrow_fired.connect(func(_a: Node) -> void:
-			teach(&"aim")
+			_short_until = 0
 			teach(&"draw"))
+		if feyre.bow_controller:
+			feyre.bow_controller.draw_too_short.connect(func() -> void:
+				_short_until = Time.get_ticks_msec() + int(SHORT_DRAW_HINT * 1000.0))
+	if Time.get_ticks_msec() < _short_until and StoryControl.can_shoot():
+		return &"draw"
 	if not taught.get(&"sell", false):
 		for stall in get_tree().get_nodes_in_group(&"station"):
 			if stall is FurStall and (stall as FurStall).has_pelt() and _near(stall, at, REACH):
@@ -110,7 +119,7 @@ func want() -> StringName:
 						return &"ash"
 	if not taught.get(&"draw", false) and feyre.bow_controller and StoryControl.can_shoot() \
 			and Gameplay.inventory.arrow_count() > 0 and (_hunting or _prey_near(at)):
-		return &"draw" if feyre.is_aiming or feyre.is_drawing else &"aim"
+		return &"draw"
 	return &""
 
 
