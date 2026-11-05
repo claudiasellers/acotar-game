@@ -1,0 +1,3 @@
+from wider-court-world
+quality look
+shot depth res://tools/court/court_terrain_shots.tscn {out} exit_north village_pinch brae_top plateau_east rite_crown regions looks=storybook_deep fogs=now,layered,layered_mist src=/Users/claudiasellers/Documents/acotar-game/.git/mq/tmp/polyhaven
