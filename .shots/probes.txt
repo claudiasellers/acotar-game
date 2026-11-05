@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot terrain res://tools/court/court_terrain_shots.tscn {out}
+shot dressed res://tools/court/court_terrain_shots.tscn {out} exit_north glen_saddle the_mound village_pinch plateau_north rite_trench vale_rim western_woods regions
