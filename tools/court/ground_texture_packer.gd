@@ -22,12 +22,17 @@ const SOURCES := {
 const TerrainTextures := preload("res://world/shared/terrain/gen_terrain_textures.gd")
 
 ## Look -> [detail contrast scale, photo colour kept scale, extra blur px,
-## normal flatten 0-1, height contrast, bands (0 = none), use the pastel palette].
+## normal flatten 0-1, height contrast, bands (0 = none), use the pastel palette,
+## optional value scale, optional saturation scale].
 const LOOKS_ALT := {
 	"photo": [1.0, 1.0, 0, 0.0, 1.0, 0, false],
 	"soft": [0.4, 0.35, 2, 0.6, 0.5, 0, false],
 	"pastel": [0.4, 0.3, 2, 0.6, 0.5, 0, true],
 	"storybook": [0.8, 0.15, 4, 0.75, 0.45, 4, true],
+	# Storybook a notch and two notches deeper: lower value, a little more
+	# colour, so far hills keep their edge against the pale sky.
+	"storybook_deep": [0.8, 0.15, 4, 0.75, 0.45, 4, true, 0.84, 1.12],
+	"storybook_deeper": [0.85, 0.15, 4, 0.75, 0.45, 4, true, 0.72, 1.22],
 }
 ## The pastel palette: the ground in the foliage's family (mint canopies,
 ## blossom pinks, lilac shade), lighter and fresher than the old olive.
@@ -112,6 +117,8 @@ func _pack(src: String, slot: String) -> bool:
 			var tint := Color(p.r / maxf(photo_mean.r, 0.01), p.g / maxf(photo_mean.g, 0.01), p.b / maxf(photo_mean.b, 0.01))
 			var photo_col := Color(col.r * tint.r, col.g * tint.g, col.b * tint.b)
 			col = col.lerp(photo_col, keep)
+			if _look.size() > 7:
+				col = Color.from_hsv(col.h, clampf(col.s * float(_look[8]), 0.0, 1.0), col.v * float(_look[7]))
 			var h := clampf((disp.get_pixel(x, y).r - hmin) / maxf(hmax - hmin, 0.01), 0.0, 1.0)
 			h = lerpf(0.5, h, float(_look[4]))
 			albedo.set_pixel(x, y, Color(minf(col.r, ALBEDO_CAP), minf(col.g, ALBEDO_CAP), minf(col.b, ALBEDO_CAP), h))
