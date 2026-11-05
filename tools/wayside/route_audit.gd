@@ -7,7 +7,7 @@
 ## the route maths (`-- --cached`) takes seconds.
 extends SceneTree
 
-const RUN_SPEED := 8.22
+const RUN_SPEED := 10.686
 const STEP := 5.0
 ## A thing counts as "along the way" within this many metres of the line.
 const NEAR := 18.0
