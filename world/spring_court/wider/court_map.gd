@@ -48,6 +48,28 @@ const UNLOCK_PHASE := {
 }
 
 
+const PHASES := "res://data/phases/spring_court_phases.tres"
+
+
+## The RegionGate id for a lock that opens at `region_id`'s UNLOCK_PHASE: the
+## region itself when the phase set unlocks it in that phase, else the first
+## region the phase set does unlock then (the phase set and UNLOCK_PHASE
+## disagree for rosewild and blossom_vale; the gate follows UNLOCK_PHASE).
+## Sealed regions lock on themselves and never open.
+static func gate_lock(region_id: StringName) -> StringName:
+	var phase: StringName = UNLOCK_PHASE.get(region_id, &"")
+	if phase == &"":
+		return region_id
+	var phase_set := load(PHASES) as PhaseSet
+	var p := phase_set.get_phase(phase) if phase_set != null else null
+	if p == null or p.unlocked_regions.is_empty() or p.unlocked_regions.has(String(region_id)):
+		return region_id
+	for r in p.unlocked_regions:
+		if REGIONS.has(StringName(r)):
+			return StringName(r)
+	return StringName(p.unlocked_regions[0])
+
+
 static func region_ids() -> Array[StringName]:
 	var out: Array[StringName] = []
 	for id: StringName in REGIONS:

@@ -15,21 +15,13 @@ const HEIGHT_SCRIPT := "res://world/spring_court/wider/court_height.gd"
 const REGION_SCRIPT := "res://world/spring_court/wider/court_region.gd"
 const COMMON_DECOR := ["flora_grass_clump_a||2.2|", "flora_grass_clump_b||1.6|", "flora_grass_clump_c||1.0|", "rock_mossy_a||0.03|s w0", "rock_pebble_cluster||0.08|w0"]
 
-## Height provider rectangles (min_x, min_z, max_x, max_z): only where we sculpt
-## or set ground textures, never over another lane's ground.
-const PROVIDER_RECTS := {
-	&"court_hill_of_the_rite": [300.0, -1500.0, 1300.0, -700.0],
-	&"court_solstice_meadow": [-600.0, -1350.0, 300.0, -800.0],
-	&"court_starlight_glen": [-1500.0, -500.0, -960.0, 600.0],
-	&"court_fae_village": [-1500.0, -1250.0, -600.0, -500.0],
-	&"court_western_fells": [-2048.0, -900.0, -1500.0, 1400.0],
-	&"court_fells_foot": [-1500.0, 600.0, -960.0, 1400.0],
-	&"court_autumn_foothills": [-2048.0, -2048.0, -600.0, -1250.0],
-	&"court_autumn_west": [-2048.0, -1250.0, -1500.0, -900.0],
-	&"court_blight_north": [-600.0, -2048.0, 1700.0, -1500.0],
-	&"court_blight_west": [-600.0, -1500.0, 300.0, -1350.0],
-	&"court_blight_east": [1300.0, -1500.0, 2048.0, -650.0],
-}
+## Height providers: CourtHeight.DOMAIN, the map north of the Wall minus every
+## other lane's ground, registered with fade 0 (CourtHeight blends to
+## MacroHeight at other lanes' edges itself, so our own seams never dip).
+const PROVIDER_IDS := [
+	&"court_west", &"court_glen_east", &"court_foot_east", &"court_estate_west", &"court_north",
+	&"court_north_east", &"court_east_rim", &"court_vale", &"court_vale_corner",
+]
 
 
 func _initialize() -> void:
@@ -82,6 +74,10 @@ func _content(id: StringName, d: Dictionary) -> CourtRegionContent:
 		c.anchors.append({"id": StringName(a[0]), "position": Vector2(a[1], a[2]), "yaw_degrees": a[3], "clear_radius": a[4]})
 	for g: Array in d.get("gates", []):
 		c.gates.append({"region_id": StringName(g[0]), "position": Vector2(g[1], g[2]), "width": g[3], "yaw_degrees": g[4]})
+	# The terrain's own gates on the ways out, locked until the CourtMap phase
+	# of the region they lead into.
+	for g in CourtHeight.gates_for(id):
+		c.gates.append({"region_id": CourtMap.gate_lock(g["target"]), "position": g["position"], "width": g["width"], "yaw_degrees": g["yaw_degrees"]})
 	for l: Array in d["landmarks"]:
 		c.landmarks.append(_landmark(l))
 	return c
@@ -216,12 +212,12 @@ func _write_providers() -> void:
 		if not String(p.id).begins_with("court_"):
 			kept.append(p)
 	var script := load(HEIGHT_SCRIPT)
-	for pid: StringName in PROVIDER_RECTS:
-		var r: Array = PROVIDER_RECTS[pid]
+	var rects := CourtHeight.domain_rects()
+	for i in rects.size():
 		var p := HeightProvider.new()
-		p.id = pid
-		p.bounds = Rect2(r[0], r[1], r[2] - r[0], r[3] - r[1])
-		p.fade = 64.0
+		p.id = PROVIDER_IDS[i]
+		p.bounds = rects[i]
+		p.fade = 0.0
 		p.height_script = script
 		p.priority = 10
 		kept.append(p)

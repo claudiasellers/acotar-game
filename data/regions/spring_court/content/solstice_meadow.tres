@@ -507,6 +507,12 @@ anchors = Array[Dictionary]([{
 "position": Vector2(-150, -1060),
 "yaw_degrees": 0.0
 }])
+gates = Array[Dictionary]([{
+"position": Vector2(-142, -822),
+"region_id": &"solstice_meadow",
+"width": 12.0,
+"yaw_degrees": -174.80553105240307
+}])
 grade = &"grade_solstice"
 ambient_fx = PackedStringArray("fx_will_o_wisps", "fx_butterflies", "fx_pollen_motes", "fx_cherry_petals", "fx_fireflies")
 notes = "Hill and meadow where the court celebrates midsummer (C?). The will-o'-the-wisps belong here (Keeper). Dance ring, maypole, musicians' bower, long tables. solstice_danced is raised at the dance ring (story lane trigger)."

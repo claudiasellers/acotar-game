@@ -443,6 +443,12 @@ habitats = Array[ExtResource("3_ws1yv")]([SubResource("Resource_5xvps"), SubReso
 forage = Array[ExtResource("2_615m3")]([SubResource("Resource_250iu"), SubResource("Resource_kokyh"), SubResource("Resource_w16gt"), SubResource("Resource_x52wf"), SubResource("Resource_n2t6x"), SubResource("Resource_24b06"), SubResource("Resource_hh1ma"), SubResource("Resource_75a3a"), SubResource("Resource_aytly"), SubResource("Resource_u1c7g"), SubResource("Resource_ru3wf"), SubResource("Resource_ukr1j"), SubResource("Resource_3vmjt"), SubResource("Resource_wv51q"), SubResource("Resource_71t0i"), SubResource("Resource_cmyu5"), SubResource("Resource_f3ham"), SubResource("Resource_nevif"), SubResource("Resource_2ddad"), SubResource("Resource_7yyxj"), SubResource("Resource_2pwp0"), SubResource("Resource_ipi5p"), SubResource("Resource_0u4hc"), SubResource("Resource_oq26w"), SubResource("Resource_owogb"), SubResource("Resource_kwkwu"), SubResource("Resource_n2ia6")])
 decor = Array[ExtResource("1_48whd")]([SubResource("Resource_us66r"), SubResource("Resource_xkkue"), SubResource("Resource_64qxp"), SubResource("Resource_qbjym"), SubResource("Resource_b2p6a"), SubResource("Resource_hae17"), SubResource("Resource_e4v7t"), SubResource("Resource_rdanh"), SubResource("Resource_yj3k7"), SubResource("Resource_5dnve"), SubResource("Resource_bhgk8"), SubResource("Resource_0ftc1"), SubResource("Resource_dfq3i"), SubResource("Resource_70reg"), SubResource("Resource_mn5ey"), SubResource("Resource_fjidp"), SubResource("Resource_xcqxi"), SubResource("Resource_k7wsg")])
 landmarks = Array[ExtResource("4_05uvc")]([SubResource("Resource_1jv6g"), SubResource("Resource_4xinl"), SubResource("Resource_ikeyw")])
+gates = Array[Dictionary]([{
+"position": Vector2(-15, -560),
+"region_id": &"manor_estate",
+"width": 12.0,
+"yaw_degrees": -166.80940279557234
+}])
 grade = &"grade_rosewild"
 ambient_fx = PackedStringArray("fx_rose_petals", "fx_butterflies", "fx_pollen_motes")
 notes = "Wild rose thickets spilling north from the manor gardens: the 'thorns and roses' motif made into a landscape (Keeper expansion region)."

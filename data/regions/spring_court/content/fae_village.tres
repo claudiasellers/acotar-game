@@ -581,6 +581,12 @@ habitats = Array[ExtResource("3_3f73p")]([SubResource("Resource_4uufv"), SubReso
 forage = Array[ExtResource("2_l0vvn")]([SubResource("Resource_oebxf"), SubResource("Resource_lbfyv"), SubResource("Resource_0ftwn"), SubResource("Resource_dtld2"), SubResource("Resource_r7xto"), SubResource("Resource_cun4w"), SubResource("Resource_p6lmy"), SubResource("Resource_apxnf"), SubResource("Resource_pbn53"), SubResource("Resource_1rbh2"), SubResource("Resource_2xbgt"), SubResource("Resource_qf1e3"), SubResource("Resource_0j42s"), SubResource("Resource_rf5ew"), SubResource("Resource_xaaht"), SubResource("Resource_wb7a8"), SubResource("Resource_uakvp"), SubResource("Resource_xfdc0"), SubResource("Resource_xbp2h"), SubResource("Resource_2cdjt"), SubResource("Resource_ypsul"), SubResource("Resource_g3hlb"), SubResource("Resource_28qqj"), SubResource("Resource_1iawf"), SubResource("Resource_6ct7n"), SubResource("Resource_vkaoq"), SubResource("Resource_mkaek"), SubResource("Resource_ekx1g"), SubResource("Resource_sxoim"), SubResource("Resource_milgh"), SubResource("Resource_drehk")])
 decor = Array[ExtResource("1_eetyr")]([SubResource("Resource_4cydj"), SubResource("Resource_8v3ws"), SubResource("Resource_andps"), SubResource("Resource_ciwi3"), SubResource("Resource_dmf42"), SubResource("Resource_1pyh5"), SubResource("Resource_2q2ib"), SubResource("Resource_wxlov"), SubResource("Resource_dt5bk"), SubResource("Resource_am2p5"), SubResource("Resource_gw2n4"), SubResource("Resource_vjm08"), SubResource("Resource_ag7op"), SubResource("Resource_l4oq7"), SubResource("Resource_67yos"), SubResource("Resource_546at"), SubResource("Resource_1akns"), SubResource("Resource_vsklh"), SubResource("Resource_eogss"), SubResource("Resource_wpag4"), SubResource("Resource_nomx6")])
 landmarks = Array[ExtResource("4_gr0g5")]([SubResource("Resource_q2y8u"), SubResource("Resource_bsnuj"), SubResource("Resource_yjo27"), SubResource("Resource_0g0dd"), SubResource("Resource_yigdh"), SubResource("Resource_burwg"), SubResource("Resource_h0nor")])
+gates = Array[Dictionary]([{
+"position": Vector2(-660, -690),
+"region_id": &"fae_village",
+"width": 12.0,
+"yaw_degrees": -131.98773871025952
+}])
 grade = &"grade_fae_village"
 ambient_fx = PackedStringArray("fx_lantern_glow_motes", "fx_butterflies", "fx_pollen_motes", "fx_rose_petals")
 notes = "Masked lesser-fae hamlet on the Thornwater: butter-yellow and mint cottages, lantern-lit. Residents cannot speak of the curse (C). Seamstress (outfits) and potion-maker (fae potion room station) live here."

@@ -6,7 +6,7 @@
 script = ExtResource("1_sxsmn")
 id = &"blossom_vale"
 scene_path = "res://world/spring_court/blossom_vale/blossom_vale.tscn"
-center = Vector3(1000, 15.659533, 950)
+center = Vector3(1000, 2.077432, 950)
 radius = 672.6812
 neighbors = PackedStringArray()
 report_path = "res://world/spring_court/blossom_vale/blossom_vale_report.json"

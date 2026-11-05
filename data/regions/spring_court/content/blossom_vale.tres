@@ -542,6 +542,12 @@ anchors = Array[Dictionary]([{
 "position": Vector2(1150, 660),
 "yaw_degrees": 0.0
 }])
+gates = Array[Dictionary]([{
+"position": Vector2(590, 562),
+"region_id": &"blighted_reaches",
+"width": 12.0,
+"yaw_degrees": 13.600542168664342
+}])
 grade = &"grade_blossom_vale"
 ambient_fx = PackedStringArray("fx_cherry_petals", "fx_butterflies", "fx_pollen_motes", "fx_dandelion_seeds")
 notes = "Orchard valley of ever-blooming fruit trees on the Thornwater south-east of the manor; the court's breadbasket, tended by masked tenants (Keeper expansion region)."

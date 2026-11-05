@@ -6,7 +6,7 @@
 script = ExtResource("1_uqnwf")
 id = &"starlight_glen"
 scene_path = "res://world/spring_court/starlight_glen/starlight_glen.tscn"
-center = Vector3(-1050, 27.932617, 50)
+center = Vector3(-1050, 36.771152, 50)
 radius = 710.63354
 neighbors = PackedStringArray("western_fells", "fae_village", "rosewild")
 report_path = "res://world/spring_court/starlight_glen/starlight_glen_report.json"

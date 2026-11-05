@@ -630,6 +630,12 @@ anchors = Array[Dictionary]([{
 "position": Vector2(-1300, 292),
 "yaw_degrees": 0.0
 }])
+gates = Array[Dictionary]([{
+"position": Vector2(-700, -110),
+"region_id": &"starlight_glen",
+"width": 12.0,
+"yaw_degrees": -79.114557366902
+}])
 grade = &"grade_starlight_glen_day"
 ambient_fx = PackedStringArray("fx_pollen_motes", "fx_butterflies", "fx_water_mist", "fx_starlight_sparkles", "fx_dandelion_seeds")
 notes = "Mirror lakes on the Thornwater west of the manor. The Starlight Pool is a daytime swim Tamlin shows Feyre: it glitters in sunlight (Keeper, chapter-verified). The pool hides under the Glimmerfall."

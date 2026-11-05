@@ -507,6 +507,12 @@ anchors = Array[Dictionary]([{
 "position": Vector2(690, -982),
 "yaw_degrees": 0.0
 }])
+gates = Array[Dictionary]([{
+"position": Vector2(575, -722),
+"region_id": &"hill_of_the_rite",
+"width": 12.0,
+"yaw_degrees": -166.2091491129905
+}])
 grade = &"grade_hill_of_the_rite_dusk"
 ambient_fx = PackedStringArray("fx_pollen_motes", "fx_fireflies")
 notes = "Calanmai (Fire Night, C): bonfires on the hill, drums, the Great Rite in a cave. Rhysand meets Feyre near the bonfires (C). Stones on the summit are [X]. After Calanmai the hill permanently changes (story lane StateVisibility): burnt-out fires, scattered ribbons."

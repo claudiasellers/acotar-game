@@ -39,12 +39,16 @@ func test_map_has_no_overlaps_and_covers_the_court() -> void:
 	assert_eq(unowned, 0, "gap in the court map")
 
 
-func test_height_meets_macro_at_region_edges_and_keeps_the_river() -> void:
-	# Away from our sculpting the provider is the macro height, so seams cannot step.
-	assert_almost_eq(CourtHeight.height_at(-700.0, -1000.0), MacroHeight.height_at(-700.0, -1000.0), 0.05)
-	# The river bed is carved exactly like MacroHeight's.
-	var p := MacroHeight.THORNWATER[1]
-	assert_almost_eq(CourtHeight.height_at(p.x, p.y), MacroHeight.height_at(p.x, p.y), 1.0)
+func test_height_meets_macro_at_other_lanes_edges_and_keeps_the_river() -> void:
+	# On other lanes' ground and at their edges the provider is the macro
+	# height, so seams cannot step (tests/unit/landscape/test_court_terrain.gd
+	# walks every edge).
+	for p: Vector2 in [Vector2(-600.0, -100.0), Vector2(0.0, -500.0), Vector2(-700.0, 1000.0), Vector2(500.0, 1000.0), Vector2(1000.0, -650.0), Vector2(-1200.0, 1400.0)]:
+		assert_almost_eq(CourtHeight.height_at(p.x, p.y), MacroHeight.height_at(p.x, p.y), 0.05, str(p))
+	# The Thornwater keeps its channel: water stands over the bed at the
+	# centreline (test_court_river_level.gd checks the whole river).
+	var q := MacroHeight.THORNWATER[1]
+	assert_between(CourtHeight.river_level_at(q.x, q.y) - CourtHeight.height_at(q.x, q.y), 0.3, 0.8)
 	# The Hill of the Rite stands well above the meadow, the escarpment drops away.
 	assert_gt(CourtHeight.height_at(800.0, -1100.0) - CourtHeight.height_at(200.0, -900.0), 60.0)
 	assert_gt(CourtHeight.height_at(-1760.0, 300.0) - CourtHeight.height_at(-1840.0, 300.0), 60.0)
@@ -61,6 +65,9 @@ func test_lakes_hold_water_below_their_shores() -> void:
 		for k in 8:
 			var shore := c + Vector2.from_angle(k * TAU / 8.0) * float(lake["radius"]) * 1.55
 			if MacroHeight.distance_to_river(shore.x, shore.y) < MacroHeight.RIVER_HALF_WIDTH + MacroHeight.RIVER_BANK:
+				continue
+			# Brooks leave and enter lakes through their shores.
+			if CourtHeight.distance_to_brook(shore.x, shore.y) < 4.0:
 				continue
 			tested += 1
 			assert_gt(CourtHeight.height_at(shore.x, shore.y), float(lake["level"]), "shore above water at %s, %s" % [c, shore])

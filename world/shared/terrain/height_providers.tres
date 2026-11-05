@@ -40,81 +40,76 @@ priority = 11
 
 [sub_resource type="Resource" id="Resource_jxvtp"]
 script = ExtResource("2")
-id = &"court_hill_of_the_rite"
-bounds = Rect2(300, -1500, 1000, 800)
+id = &"court_west"
+bounds = Rect2(-2048, -2048, 1098, 3448)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_jww5m"]
 script = ExtResource("2")
-id = &"court_solstice_meadow"
-bounds = Rect2(-600, -1350, 900, 550)
+id = &"court_glen_east"
+bounds = Rect2(-950, -2048, 250, 2498)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_riann"]
 script = ExtResource("2")
-id = &"court_starlight_glen"
-bounds = Rect2(-1500, -500, 540, 1100)
+id = &"court_foot_east"
+bounds = Rect2(-950, 800, 250, 600)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_dq75o"]
 script = ExtResource("2")
-id = &"court_fae_village"
-bounds = Rect2(-1500, -1250, 900, 750)
+id = &"court_estate_west"
+bounds = Rect2(-700, -2048, 100, 2348)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_bnv7d"]
 script = ExtResource("2")
-id = &"court_western_fells"
-bounds = Rect2(-2048, -900, 548, 2300)
+id = &"court_north"
+bounds = Rect2(-600, -2048, 1250, 1548)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_h70or"]
 script = ExtResource("2")
-id = &"court_fells_foot"
-bounds = Rect2(-1500, 600, 540, 800)
+id = &"court_north_east"
+bounds = Rect2(650, -2048, 1398, 1398)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_kfhkr"]
 script = ExtResource("2")
-id = &"court_autumn_foothills"
-bounds = Rect2(-2048, -2048, 1448, 798)
+id = &"court_east_rim"
+bounds = Rect2(1850, -650, 198, 1200)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_6s3et"]
 script = ExtResource("2")
-id = &"court_autumn_west"
-bounds = Rect2(-2048, -1250, 548, 350)
+id = &"court_vale"
+bounds = Rect2(500, 550, 1548, 850)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [sub_resource type="Resource" id="Resource_mo44j"]
 script = ExtResource("2")
-id = &"court_blight_north"
-bounds = Rect2(-600, -2048, 2300, 548)
-height_script = ExtResource("7_jxvtp")
-priority = 10
-
-[sub_resource type="Resource" id="Resource_l0187"]
-script = ExtResource("2")
-id = &"court_blight_west"
-bounds = Rect2(-600, -1500, 900, 150)
-height_script = ExtResource("7_jxvtp")
-priority = 10
-
-[sub_resource type="Resource" id="Resource_6tbfw"]
-script = ExtResource("2")
-id = &"court_blight_east"
-bounds = Rect2(1300, -1500, 748, 850)
+id = &"court_vale_corner"
+bounds = Rect2(500, 500, 150, 50)
+fade = 0.0
 height_script = ExtResource("7_jxvtp")
 priority = 10
 
 [resource]
 script = ExtResource("1")
-providers = Array[ExtResource("2")]([ExtResource("7_human_realm"), SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade"), SubResource("Resource_jxvtp"), SubResource("Resource_jww5m"), SubResource("Resource_riann"), SubResource("Resource_dq75o"), SubResource("Resource_bnv7d"), SubResource("Resource_h70or"), SubResource("Resource_kfhkr"), SubResource("Resource_6s3et"), SubResource("Resource_mo44j"), SubResource("Resource_l0187"), SubResource("Resource_6tbfw")])
+providers = Array[ExtResource("2")]([ExtResource("7_human_realm"), SubResource("Resource_manor"), SubResource("p_border_woods"), SubResource("p_eastern_woods"), SubResource("p_suriel_glade"), SubResource("Resource_jxvtp"), SubResource("Resource_jww5m"), SubResource("Resource_riann"), SubResource("Resource_dq75o"), SubResource("Resource_bnv7d"), SubResource("Resource_h70or"), SubResource("Resource_kfhkr"), SubResource("Resource_6s3et"), SubResource("Resource_mo44j")])

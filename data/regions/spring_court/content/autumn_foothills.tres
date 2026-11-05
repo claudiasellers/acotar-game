@@ -470,6 +470,12 @@ habitats = Array[ExtResource("3_ebwbl")]([SubResource("Resource_r8itj"), SubReso
 forage = Array[ExtResource("2_pxpmq")]([SubResource("Resource_lr0d1"), SubResource("Resource_bf20x"), SubResource("Resource_y08qp"), SubResource("Resource_0v5mo"), SubResource("Resource_82wgp"), SubResource("Resource_glgpx"), SubResource("Resource_c5iix"), SubResource("Resource_1rxma"), SubResource("Resource_t7t5t"), SubResource("Resource_gdyg7"), SubResource("Resource_6psir"), SubResource("Resource_sesom"), SubResource("Resource_6e4hw"), SubResource("Resource_1anh5"), SubResource("Resource_t3264"), SubResource("Resource_7stvx"), SubResource("Resource_lnhj8"), SubResource("Resource_tv0l2"), SubResource("Resource_sjlr1"), SubResource("Resource_fpf8p"), SubResource("Resource_d02og"), SubResource("Resource_2lswp"), SubResource("Resource_h2yvp"), SubResource("Resource_2y25g"), SubResource("Resource_cro1w"), SubResource("Resource_gtkvv"), SubResource("Resource_2hfnn"), SubResource("Resource_71uwb")])
 decor = Array[ExtResource("1_i5g5k")]([SubResource("Resource_mrro8"), SubResource("Resource_27h0k"), SubResource("Resource_ojtim"), SubResource("Resource_vrltk"), SubResource("Resource_b6528"), SubResource("Resource_k6hn1"), SubResource("Resource_enqqp"), SubResource("Resource_46byj"), SubResource("Resource_d740w"), SubResource("Resource_d1exj"), SubResource("Resource_k0jo0"), SubResource("Resource_kbhf1"), SubResource("Resource_mh7y8"), SubResource("Resource_mymmj"), SubResource("Resource_4wnry"), SubResource("Resource_rupio"), SubResource("Resource_wwvrp"), SubResource("Resource_cnblm")])
 landmarks = Array[ExtResource("4_kdkq7")]([SubResource("Resource_uk1ym"), SubResource("Resource_nf038"), SubResource("Resource_s2fel"), SubResource("Resource_5ugo5")])
+gates = Array[Dictionary]([{
+"position": Vector2(-900, -1278),
+"region_id": &"autumn_foothills",
+"width": 12.0,
+"yaw_degrees": 180.0
+}])
 grade = &"grade_autumn_foothills"
 ambient_fx = PackedStringArray("fx_autumn_leaves", "fx_pollen_motes")
 sealed = true
