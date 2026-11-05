@@ -1,0 +1,3 @@
+from wider-court-world
+quality look
+shot terrain res://tools/court/court_terrain_shots.tscn {out}
