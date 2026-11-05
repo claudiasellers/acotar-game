@@ -171,7 +171,7 @@ const FORMS := [
 ## Flattened ground: [cx, cz, inner radius, outer radius, level (NAN = the
 ## ground there before any pad)], applied in order.
 const PADS := [
-	[-1630.0, -640.0, 60.0, 90.0, NAN],    # the towering hill's crown: tower + sentry range
+	[-1630.0, -645.0, 36.0, 62.0, NAN],    # the towering hill's crown: tower + sentry range
 	[-150.0, -1060.0, 60.0, 95.0, NAN],    # the solstice plateau
 	[620.0, -1055.0, 22.0, 40.0, NAN],     # the first giant bonfire
 	[870.0, -1140.0, 75.0, 120.0, NAN],    # the broad bald crown
@@ -205,7 +205,7 @@ const TRENCH := [470.0, -990.0, 690.0, -982.0, 46.0, 49.5, 4.0, 1.0]
 ## The bonfire terraces on the crown's south-west flank (ch 20: "dozens of
 ## bonfires that popped up along the far hills"): [cx, cz, angle (deg, x->z),
 ## half-angle, inner r, outer r, step, strength].
-const TERRACES := [870.0, -1140.0, 140.5, 38.0, 115.0, 235.0, 7.0, 0.9]
+const TERRACES := [870.0, -1140.0, 140.5, 38.0, 115.0, 235.0, 7.0, 0.7]
 
 ## The Autumn border is sealed in this build: its ground lifts into rougher
 ## hills and stands on a crag band (the Rust Scarp) along every edge it shares.
@@ -275,6 +275,9 @@ const LAKES := [
 ## Paths: [id, half-width, points]. Graded at PATH_GRADE, cut-only: on steep
 ## ground they sink into hollow-ways, through a scarp they cut a notch.
 const PATH_GRADE := 0.28
+## How far a path may sink below the ground (m); the notch roads cut through.
+const PATH_CUT := 1.2
+const NOTCH_PATHS := [&"sealed_road", &"reaches_road"]
 const PATHS := [
 	[&"briar_lane", 2.5, [[0.0, -496.0], [-25.0, -580.0], [-60.0, -650.0], [-110.0, -740.0], [-142.0, -822.0], [-150.0, -930.0], [-150.0, -1010.0]]],
 	[&"wisp_way", 1.5, [[-170.0, -1080.0], [-220.0, -1130.0], [-280.0, -1195.0], [-340.0, -1255.0]]],
@@ -317,7 +320,7 @@ const NO_PAD := [&"potion_house", &"lantern_bridge", &"thornwater_falls", &"seal
 
 ## Pinch knolls either side of each gate: [radius, height, power, gap beyond
 ## the gate's half-width].
-const GATE_PINCH := [30.0, 15.0, 1.9, 3.0]
+const GATE_PINCH := [32.0, 12.0, 1.5, 3.0]
 
 ## Named ground the terrain was shaped for (landmarks, anchors, nooks):
 ## id -> [x, z, region, kind]. Kinds: landmark, anchor, nook, water.
@@ -558,36 +561,38 @@ static func texture_at(x: float, z: float) -> Vector3i:
 		var edge := clampf((pd.x - (pd.y - 0.8)) / 2.0, 0.0, 1.0)
 		return Vector3i(PATH, GRASS, int(edge * 200.0))
 	var kind := _kind_at(x, z)
-	if slope > 42.0:
-		return Vector3i(ROCK, MOSS, 60)
-	var rocky := int(remap(clampf(slope, 30.0, 42.0), 30.0, 42.0, 0.0, 255.0)) if slope > 30.0 else 0
+	# Bare rock only on true crags; steep banks are mossy (candy-soft, not scree).
+	if slope > 52.0:
+		return Vector3i(ROCK, MOSS, 70)
+	var rocky := int(remap(clampf(slope, 40.0, 52.0), 40.0, 52.0, 0.0, 255.0)) if slope > 40.0 else 0
 	var shade := _dip.get_noise_2d(x * 1.7, z * 1.7)
 	match kind:
 		Kind.WOODS:
 			# Moss-covered earth; the dark dips go to bare forest floor.
 			if rocky > 0:
 				return Vector3i(MOSS, ROCK, rocky)
-			return Vector3i(MOSS, FOREST, int(clampf(shade * 1.6 + 0.2, 0.0, 1.0) * 255.0))
+			# Moss everywhere, bare floor only down in the dark dips.
+			return Vector3i(MOSS, FOREST, int(clampf((shade - 0.15) * 1.8, 0.0, 1.0) * 220.0))
 		Kind.AUTUMN, Kind.RIM:
-			if rocky > 0 or slope > 24.0:
-				return Vector3i(FOREST, ROCK, maxi(rocky, int(remap(clampf(slope, 24.0, 30.0), 24.0, 30.0, 40.0, 120.0))))
-			return Vector3i(FOREST, MOSS, int(clampf(shade + 0.4, 0.0, 1.0) * 200.0))
+			if rocky > 0:
+				return Vector3i(MOSS, ROCK, rocky)
+			return Vector3i(MOSS, FOREST, int(clampf(shade + 0.3, 0.0, 1.0) * 160.0))
 		Kind.BLIGHT:
 			# Ordinary hills where the spring has recoiled: withered grass, a
 			# sick patchiness in the hollows. Never a painted-on wasteland.
 			if rocky > 0:
-				return Vector3i(WINTER, ROCK, rocky)
-			return Vector3i(WINTER, BLIGHT if shade > 0.25 else GRASS, int(clampf(absf(shade) * 1.2, 0.0, 1.0) * 170.0))
+				return Vector3i(BLIGHT, ROCK, rocky)
+			return Vector3i(BLIGHT, WINTER if shade > 0.25 else GRASS, int(clampf(absf(shade) * 1.2, 0.0, 1.0) * 150.0))
 		Kind.GLEN, Kind.VILLAGE:
 			if rocky > 0:
 				return Vector3i(GRASS, ROCK, rocky)
 			# Moss on the steep knoll flanks and the north faces.
-			var north := clampf(-gz * 2.5 + slope / 30.0 - 0.3, 0.0, 1.0)
-			return Vector3i(GRASS, MOSS, int(north * 220.0))
+			var north := clampf(-gz * 2.0 + slope / 40.0 - 0.35, 0.0, 1.0)
+			return Vector3i(GRASS, MOSS, int(north * 140.0))
 		_:
 			if rocky > 0:
-				return Vector3i(GRASS, ROCK, rocky)
-			return Vector3i(GRASS, MOSS, int(clampf(shade - 0.2, 0.0, 0.6) * 255.0))
+				return Vector3i(GRASS, MOSS if kind in [Kind.ROSE, Kind.MEADOW, Kind.VALE] else ROCK, rocky)
+			return Vector3i(GRASS, MOSS, int(clampf(shade - 0.25, 0.0, 0.5) * 220.0))
 
 
 ## Lakes and pools: {id, center: Vector2, radius, level}.
@@ -715,6 +720,10 @@ static func _land(x: float, z: float, stage: int) -> float:
 			var dz: float = z - f[2]
 			var r: float = f[3]
 			var d2 := dx * dx + dz * dz
+			if d2 >= r * r * 1.3:
+				continue
+			# Irregular outlines: no knoll is a perfect dome.
+			r *= 1.0 + 0.14 * _warp.get_noise_2d(x * 2.3 + float(i) * 37.0, z * 2.3)
 			if d2 >= r * r:
 				continue
 			var t := 1.0 - d2 / (r * r)
@@ -779,14 +788,18 @@ static func _features(x: float, z: float, h: float) -> float:
 			var step: float = TERRACES[6]
 			var k := h / step
 			var fr := k - floorf(k)
-			var stepped := (floorf(k) + smoothstep(0.72, 1.0, fr)) * step
+			var stepped := (floorf(k) + smoothstep(0.55, 1.0, fr)) * step
 			h = lerpf(h, stepped, m * TERRACES[7])
 	# The Rust Scarp: the Autumn border stands on a crag band.
 	if x < -560.0 and z < -860.0:
 		var din := _autumn_depth(x, z)
 		if din > 0.0:
-			var rise := SCARP_RISE + _crag.get_noise_2d(x, z) * 4.0
-			h += rise * smoothstep(SCARP_IN, SCARP_IN + SCARP_WIDTH, din)
+			var lo := _wobble.get_noise_2d(x * 2.1, z * 2.1)
+			var rise := SCARP_RISE + lo * 5.0 + _crag.get_noise_2d(x, z) * 2.0
+			var face := SCARP_WIDTH + lo * 1.5
+			h += rise * smoothstep(SCARP_IN, SCARP_IN + face, din)
+			# A broken, crag-topped brow rather than a level parapet.
+			h += absf(_crag.get_noise_2d(x * 1.4, z * 1.4)) * 7.0 * smoothstep(SCARP_IN + face, SCARP_IN + face + 14.0, din)
 	return h
 
 
@@ -824,11 +837,18 @@ static func _rim(d: float, x: float, z: float) -> float:
 	if d < -4.0:
 		return 0.0
 	var n := _crag.get_noise_2d(x * 0.5, z * 0.5)
-	return (24.0 + n * 3.0) * smoothstep(0.0, 6.0, d) \
-			+ (26.0 - n * 3.0) * smoothstep(40.0, 46.0, d) \
-			+ (28.0 + n * 3.0) * smoothstep(88.0, 94.0, d) \
-			+ 90.0 * smoothstep(130.0, 330.0, d) \
-			+ absf(_crag.get_noise_2d(x * 0.6, z * 0.6)) * 10.0 * smoothstep(0.0, 60.0, d)
+	var w1 := _wobble.get_noise_2d(x * 1.7, z * 1.7)
+	var w2 := _wobble.get_noise_2d(x * 1.3 + 400.0, z * 1.3 - 300.0)
+	var o2 := 40.0 + w1 * 16.0
+	var o3 := 90.0 + w2 * 24.0
+	var f1 := 6.0 + w2 * 2.0
+	var ridge := 1.0 - absf(_wobble.get_noise_2d(x * 0.9 - 1700.0, z * 0.9 + 900.0))
+	return (25.0 + w1 * 6.0 + n * 2.0) * smoothstep(0.0, f1, d) \
+			+ (24.0 - w2 * 6.0 - n * 2.0) * smoothstep(o2, o2 + 7.0, d) \
+			+ (28.0 + w1 * 6.0) * smoothstep(o3, o3 + 8.0, d) \
+			+ 80.0 * smoothstep(140.0, 340.0, d) \
+			+ ridge * ridge * ridge * 130.0 * smoothstep(120.0, 300.0, d) \
+			+ absf(_crag.get_noise_2d(x * 0.6, z * 0.6)) * 9.0 * smoothstep(0.0, 60.0, d)
 
 
 ## The z of the north rim's front at x.
@@ -1350,6 +1370,11 @@ static func _build() -> void:
 		for k in line.size():
 			raw[k] = _land(line[k].x, line[k].y, Stage.LAKES)
 		var lv := _grade(_smooth(raw, 3), raw, 4.0)
+		# Hollow-ways, not trenches: only the notch roads cut deep.
+		if not (specs[pi][0] in NOTCH_PATHS):
+			var sm := _smooth(raw, 3)
+			for k in lv.size():
+				lv[k] = maxf(lv[k], sm[k] - PATH_CUT)
 		_path_pts.append(line)
 		_path_lvl.append(lv)
 		_path_hw.append(specs[pi][1])

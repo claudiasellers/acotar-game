@@ -27,11 +27,18 @@ const LOOKS := {
 }
 
 
+## Slots packed from CC0 photo textures by tools/court/pack_ground_textures.gd
+## (structure from the photo, colour from LOOKS): this generator leaves them be.
+const PHOTO_SLOTS := ["spring_grass", "moss", "forest_floor", "path", "riverbed", "rock", "blight"]
+
+
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
 	var seed := 900
 	for stem: String in LOOKS:
 		seed += 1
+		if stem in PHOTO_SLOTS:
+			continue
 		_make(stem, LOOKS[stem], seed)
 	print("terrain textures written: %d slots" % LOOKS.size())
 	quit(0)
