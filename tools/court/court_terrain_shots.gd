@@ -7,6 +7,8 @@
 ## `looks` previews ground looks without committing textures: each look is
 ## packed at run time by tools/court/pack_ground_textures.gd and swapped onto
 ## the terrain; "photo" is what the game ships. Files: <view>_<look>.png.
+## `fogs=now,layered,layered_mist` previews depth hazes (FOGS) on an in-memory
+## copy of the view's grade; files <view>[_<look>]_<fog>.png.
 extends Node
 
 ## id: [eye x, eye z, eye height over ground, look x, look z, look height, time 0-1, grade, fov]
@@ -47,10 +49,14 @@ func _run() -> void:
 	var with_regions := args.has("regions")
 	args.erase("regions")
 	var looks: Array = []
+	var fogs: Array = []
 	var src := ""
 	for a: String in args.duplicate():
 		if a.begins_with("looks="):
 			looks = Array(a.substr(6).split(","))
+			args.erase(a)
+		elif a.begins_with("fogs="):
+			fogs = Array(a.substr(5).split(","))
 			args.erase(a)
 		elif a.begins_with("src="):
 			src = a.substr(4)
@@ -93,12 +99,38 @@ func _run() -> void:
 		for look: String in (looks if not looks.is_empty() else [""]):
 			if look != "" and world.terrain != null:
 				world.terrain.set(&"assets", assets_by_look[look])
-			for i in 40:
-				await get_tree().process_frame
-			var path := "%s/%s%s.png" % [out_dir, id, "" if look == "" else "_" + look]
-			root.get_texture().get_image().save_png(path)
-			print("SHOT %s %s -> %s | draw_calls %d" % [id, look, path, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+			for fog: String in (fogs if not fogs.is_empty() else [""]):
+				if fog != "":
+					_apply_fog(world, v[7], fog)
+				for i in 40:
+					await get_tree().process_frame
+				var path := "%s/%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look, "" if fog == "" else "_" + fog]
+				root.get_texture().get_image().save_png(path)
+				print("SHOT %s %s %s -> %s | draw_calls %d" % [id, look, fog, path, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	get_tree().quit(0)
+
+
+## Depth hazes for the preview: fog field -> value. "layered": a cool
+## lilac-blue haze darker than the pink horizon, so far land stays land
+## (background), aerial perspective low so it doesn't take the sky's colour.
+## "layered_mist" adds low valley mist between the ridges (midground).
+const FOGS := {
+	"now": {},
+	"layered": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
+		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0)},
+	"layered_mist": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
+		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0), "fog_height": 30.0, "fog_height_density": 0.045},
+}
+
+
+func _apply_fog(world: World, grade: StringName, fog: String) -> void:
+	var p := (GradeDirector.load_preset(grade) as GradePreset).duplicate() as GradePreset
+	for k: String in FOGS[fog]:
+		p.set(k, FOGS[fog][k])
+	world.grade.current = p
+	world.grade.set(&"_to", p)
+	world.grade.set(&"_t", 1.0)
+	world.grade.apply(p)
 
 
 ## Terrain3D assets with the court's photo slots packed in `look` (every slot
