@@ -80,7 +80,8 @@ func _physics_process(delta: float) -> void:
 
 ## Draw/release logic, separated from input so tests can drive it. Holding fire
 ## alone is enough: drawing brings up the aim view and reticle (Feyre and the
-## reticle read is_drawing), so right-mouse aim is optional.
+## reticle read is_drawing), and slow time with it, so right-mouse aim is
+## optional.
 func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
 	var allowed := can_shoot()
 	if fire_held and allowed and _available() != &"":
@@ -97,7 +98,8 @@ func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
 			draw_too_short.emit()
 		is_drawing = false
 		draw_amount = 0.0
-	_update_slow_time(delta, aiming)
+	# A held draw is aiming too (T085): left mouse alone gets slow time.
+	_update_slow_time(delta, aiming or is_drawing)
 
 
 ## Story control (story lane autoload) can forbid shooting in anchored scenes.

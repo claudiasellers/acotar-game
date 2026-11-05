@@ -4,6 +4,7 @@
 ## mid-draw lowers it instead of loosing the arrow.
 ## T084: one press does it all. Holding fire alone aims and draws, letting go
 ## looses; a click too short to draw lowers the bow and keeps the arrow.
+## T085: that left-only draw slows time and spends breath like right-mouse aim.
 extends GutTest
 
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
@@ -167,3 +168,29 @@ func test_one_long_hold_aims_and_looses_a_full_arrow_into_the_wolf() -> void:
 	assert_eq(hits.size(), 1, "the arrow lands")
 	if not hits.is_empty():
 		assert_eq(hits[0], wolf, "it reaches the wolf at 21 m")
+
+
+func test_a_left_only_hold_slows_time_and_spends_breath() -> void:
+	var bow := feyre.bow_controller
+	var full := feyre.stamina
+	var slowed := false
+	Input.action_press(&"fire")
+	for i in 60:
+		await get_tree().physics_frame
+		slowed = slowed or bow.slowing
+	assert_false(Input.is_action_pressed(&"aim"), "no right mouse")
+	assert_true(slowed, "holding fire alone slows time")
+	assert_lt(feyre.stamina, full, "slow time spends her breath")
+	Input.action_release(&"fire")
+	await wait_physics_frames(2)
+	assert_eq(Engine.time_scale, 1.0, "time runs again after the shot")
+
+
+func test_a_quick_click_never_slows_time() -> void:
+	var bow := feyre.bow_controller
+	for i in 3:
+		bow.update_draw(0.05, true, false)
+		assert_false(bow.slowing, "too short a draw to slow time")
+	bow.update_draw(1.0 / 60.0, false, false)
+	assert_false(bow.slowing)
+	assert_eq(Engine.time_scale, 1.0)
