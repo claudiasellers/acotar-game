@@ -252,7 +252,7 @@ func test_anchors_land_in_their_regions() -> void:
 		var m := r.get_child(0) as Node3D
 		assert_true(m.is_in_group(&"story_anchor"))
 		assert_true(Act3Anchors.ROWS.has(StringName(m.name)), "Act3Anchors hangs a node on %s" % m.name)
-	assert_eq(WiderCourtAnchors.where(&"fells_sentry_range", null), Vector2(-1636.0, -650.0))
+	assert_eq(WiderCourtAnchors.where(&"fells_sentry_range", null), Vector2(-1616.0, -650.0))
 
 
 func test_potion_room_stands_level_on_its_terrace() -> void:

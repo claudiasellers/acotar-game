@@ -406,7 +406,7 @@ priority = 6
 [sub_resource type="Resource" id="Resource_cg2ki"]
 script = ExtResource("3_hno6l")
 tag = &"crown_hill"
-center = Vector2(100, -1180)
+center = Vector2(40, -1235)
 radius = 140.0
 priority = 4
 
@@ -448,7 +448,7 @@ notes = "Ring of low flat stones around a ribboned maypole; the Solstice dance."
 script = ExtResource("4_l3ch1")
 id = &"musicians_bower"
 display_name = "The Musicians' Bower"
-position = Vector2(-100, -1135)
+position = Vector2(-112, -1100)
 asset_ids = PackedStringArray("solstice_musicians_bower")
 offsets = PackedVector2Array()
 height_m = 6.0
@@ -459,7 +459,7 @@ notes = "Flowered bower for the players."
 script = ExtResource("4_l3ch1")
 id = &"arch_avenue"
 display_name = "The Arch Avenue"
-position = Vector2(-240, -1000)
+position = Vector2(-150, -1000)
 asset_ids = PackedStringArray("solstice_flower_arch", "solstice_flower_arch", "solstice_flower_arch", "solstice_flower_arch", "solstice_lantern_string")
 offsets = PackedVector2Array()
 height_m = 5.0
@@ -470,7 +470,7 @@ notes = "A line of flower arches leading up from the Rosewild to the ring."
 script = ExtResource("4_l3ch1")
 id = &"crown_oak"
 display_name = "The Crown Oak"
-position = Vector2(100, -1180)
+position = Vector2(40, -1235)
 asset_ids = PackedStringArray("woods_ancient_oak")
 offsets = PackedVector2Array()
 height_m = 24.0
@@ -481,7 +481,7 @@ notes = "One great oak on the crown of the hill, visible from the manor."
 script = ExtResource("4_l3ch1")
 id = &"long_tables"
 display_name = "The Long Tables"
-position = Vector2(-60, -1040)
+position = Vector2(-100, -1035)
 asset_ids = PackedStringArray("solstice_long_table", "solstice_long_table", "solstice_lantern_string")
 offsets = PackedVector2Array()
 height_m = 2.0
@@ -511,7 +511,7 @@ gates = Array[Dictionary]([{
 "position": Vector2(-142, -822),
 "region_id": &"solstice_meadow",
 "width": 12.0,
-"yaw_degrees": -174.80553105240307
+"yaw_degrees": -158.6820256479424
 }])
 grade = &"grade_solstice"
 ambient_fx = PackedStringArray("fx_will_o_wisps", "fx_butterflies", "fx_pollen_motes", "fx_cherry_petals", "fx_fireflies")

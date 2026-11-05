@@ -1,12 +1,12 @@
 {
   "region": "hill_of_the_rite",
   "types": 28,
-  "placements": 840,
-  "placements_per_km2": 1034,
+  "placements": 826,
+  "placements_per_km2": 1017,
   "empty_cells": 0,
   "cells": 85,
   "landmarks": 4,
   "draw_calls": 353,
-  "decor_instances": 65316,
+  "decor_instances": 65233,
   "area_km2": 0.813
 }

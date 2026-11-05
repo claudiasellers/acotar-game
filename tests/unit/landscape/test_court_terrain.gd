@@ -103,7 +103,7 @@ func test_named_ground_is_usable() -> void:
 		var s: Array = CourtHeight.SITES[id]
 		var p := Vector2(s[0], s[1])
 		var kind: StringName = s[3]
-		if kind == &"water" or id in [&"ember_crown", &"sealed_pass", &"glimmerfall", &"thornwater_spring", &"lantern_bridge", &"potion_house", &"west_brink", &"calanmai_cave_mouth"]:
+		if kind == &"water" or id in [&"ember_crown", &"sealed_pass", &"glimmerfall", &"thornwater_falls", &"thornwater_spring", &"lantern_bridge", &"bonfire_terraces", &"cave_of_the_rite", &"rainbow_cascade", &"summers_window", &"arch_avenue", &"vale_weir", &"thornwater_ford", &"border_markers", &"potion_house", &"west_brink", &"calanmai_cave_mouth"]:
 			continue
 		var limit := 12.0 if kind == &"anchor" else 24.0
 		assert_lt(_slope(p.x, p.y, 2.0), limit, "%s stands on a %.0f° slope" % [id, _slope(p.x, p.y, 2.0)])
@@ -258,6 +258,26 @@ func test_what_you_see_from_where() -> void:
 			assert_false(seen, "%s should be hidden (a triangle in the way)" % name)
 
 
+func test_the_weenies_are_seen_from_the_ways() -> void:
+	# Sampled along every path: the North Watchtower is "the landmark seen from
+	# most places"; the crowns and the village's tree are seen from a good part
+	# of the court; the heart of the blight is stumbled on, not seen from afar.
+	var pts: Array[Vector2] = []
+	for p in CourtHeight.paths():
+		var line: PackedVector2Array = p["points"]
+		for i in range(0, line.size(), 15):
+			pts.append(line[i])
+	var want := {&"north_watchtower": [28.0, 0.5, 1.0], &"ember_crown": [14.0, 0.5, 1.0], &"stone_ring": [14.0, 0.33, 1.0],
+		&"great_lantern_tree": [30.0, 0.3, 1.0], &"blight_heart": [20.0, 0.0, 0.15]}
+	for id: StringName in want:
+		var n := 0
+		for p in pts:
+			if _visible(p, 1.7, CourtHeight.site(id), want[id][0]):
+				n += 1
+		var share := float(n) / pts.size()
+		assert_between(share, want[id][1], want[id][2], "%s seen from %d%% of the ways" % [id, int(share * 100.0)])
+
+
 func test_you_cannot_see_the_whole_court_from_one_place() -> void:
 	# From every gate and clearing on the ways, at most a third of the court's
 	# open ground (sampled every 80 m) is in view.
@@ -273,7 +293,7 @@ func test_you_cannot_see_the_whole_court_from_one_place() -> void:
 	var spots: Array[Vector2] = []
 	for g: Array in CourtHeight.GATES:
 		spots.append(Vector2(g[2], g[3]))
-	for id in [&"solstice_dance_floor", &"rite_crown", &"brae_top", &"village_green", &"the_mound", &"bee_tower", &"blight_heart"]:
+	for id in [&"solstice_dance_floor", &"stone_ring", &"brae_top", &"village_green", &"the_mound", &"bee_tower", &"blight_heart"]:
 		spots.append(CourtHeight.site(id))
 	for p in spots:
 		var n := 0

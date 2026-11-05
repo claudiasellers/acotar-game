@@ -444,7 +444,7 @@ priority = 2
 [sub_resource type="Resource" id="Resource_eqe5p"]
 script = ExtResource("3_exhdv")
 tag = &"silent_hollow"
-center = Vector2(-1250, 1100)
+center = Vector2(-1300, 900)
 radius = 95.0
 priority = 8
 
@@ -472,21 +472,21 @@ priority = 6
 [sub_resource type="Resource" id="Resource_fc7u4"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
-center = Vector2(-1650, -650)
+center = Vector2(-1630, -650)
 radius = 45.0
 priority = 7
 
 [sub_resource type="Resource" id="Resource_x45rc"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
-center = Vector2(-1650, 350)
+center = Vector2(-1650, 300)
 radius = 45.0
 priority = 7
 
 [sub_resource type="Resource" id="Resource_tnjbf"]
 script = ExtResource("3_exhdv")
 tag = &"tower_knoll"
-center = Vector2(-1050, 1250)
+center = Vector2(-1150, 1150)
 radius = 40.0
 priority = 7
 
@@ -515,7 +515,7 @@ priority = 3
 script = ExtResource("4_lw45t")
 id = &"north_watchtower"
 display_name = "The North Watchtower"
-position = Vector2(-1650, -650)
+position = Vector2(-1630, -650)
 asset_ids = PackedStringArray("watchtower")
 offsets = PackedVector2Array()
 height_m = 18.0
@@ -527,7 +527,7 @@ notes = "Sentry tower on a knoll; climb the ivy face to see the Autumn foothills
 script = ExtResource("4_lw45t")
 id = &"middle_watchtower"
 display_name = "The Middle Watchtower"
-position = Vector2(-1650, 350)
+position = Vector2(-1650, 300)
 asset_ids = PackedStringArray("watchtower")
 offsets = PackedVector2Array()
 height_m = 18.0
@@ -539,7 +539,7 @@ notes = "Looks over the Starlight Glen's lakes."
 script = ExtResource("4_lw45t")
 id = &"foot_watchtower"
 display_name = "The Ruined Tower"
-position = Vector2(-1050, 1250)
+position = Vector2(-1150, 1150)
 asset_ids = PackedStringArray("watchtower_ruined")
 offsets = PackedVector2Array()
 height_m = 14.0
@@ -551,7 +551,7 @@ notes = "Broken tower near the Wall; the first height Feyre can reach in the wes
 script = ExtResource("4_lw45t")
 id = &"summers_window"
 display_name = "Summer's Window"
-position = Vector2(-1775, 900)
+position = Vector2(-1762, 700)
 asset_ids = PackedStringArray("fells_overlook_bench", "fells_cairn", "escarpment_rock_a", "escarpment_rock_c")
 offsets = PackedVector2Array()
 height_m = 4.0
@@ -563,7 +563,7 @@ notes = "Bench and cairn at the escarpment edge; the Summer Court's coast shimme
 script = ExtResource("4_lw45t")
 id = &"silent_hollow"
 display_name = "The Silent Hollow"
-position = Vector2(-1250, 1100)
+position = Vector2(-1300, 900)
 asset_ids = PackedStringArray("woods_silver_birch", "shrine_column_broken")
 offsets = PackedVector2Array()
 height_m = 20.0
@@ -574,7 +574,7 @@ notes = "A sunken grove of golden birches where no bird sings and the wind drops
 script = ExtResource("4_lw45t")
 id = &"rainbow_cascade"
 display_name = "The Rainbow Cascade"
-position = Vector2(-1788, 560)
+position = Vector2(-1799.4501, 560)
 asset_ids = PackedStringArray("escarpment_rock_b", "fells_cairn")
 offsets = PackedVector2Array(-46, 0)
 height_m = 60.0

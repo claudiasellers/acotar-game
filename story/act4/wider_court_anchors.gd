@@ -14,8 +14,8 @@ extends RefCounted
 ## anchor id -> [region id, landmark id ("" for none), fallback x/z, offset x/z from the landmark, yaw degrees]
 const PLACES := {
 	&"stables_dusk": [&"manor_estate", &"", Vector2(-130.0, -9.0), Vector2.ZERO, 0.0],
-	&"fells_sentry_range": [&"western_fells", &"north_watchtower", Vector2(-1650.0, -650.0), Vector2(14.0, 0.0), -90.0],
-	&"fae_potion_room": [&"fae_village", &"potion_house", Vector2(-1060.0, -980.0), Vector2(18.0, 20.0), 45.0],
+	&"fells_sentry_range": [&"western_fells", &"north_watchtower", Vector2(-1630.0, -650.0), Vector2(14.0, 0.0), -90.0],
+	&"fae_potion_room": [&"fae_village", &"potion_house", Vector2(-977.0, -853.0), Vector2(18.0, 20.0), 45.0],
 }
 
 

@@ -1,12 +1,12 @@
 {
   "region": "autumn_foothills",
   "types": 28,
-  "placements": 654,
-  "placements_per_km2": 1014,
+  "placements": 665,
+  "placements_per_km2": 1031,
   "empty_cells": 0,
   "cells": 69,
   "landmarks": 4,
-  "draw_calls": 273,
-  "decor_instances": 43530,
+  "draw_calls": 276,
+  "decor_instances": 41423,
   "area_km2": 0.645
 }

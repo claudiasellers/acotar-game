@@ -395,7 +395,7 @@ priority = 4
 [sub_resource type="Resource" id="Resource_iw5bo"]
 script = ExtResource("3_ws1yv")
 tag = &"gardeners_folly"
-center = Vector2(-480, -560)
+center = Vector2(240, -700)
 radius = 40.0
 priority = 7
 
@@ -403,7 +403,7 @@ priority = 7
 script = ExtResource("4_05uvc")
 id = &"rose_spire"
 display_name = "The Rose Spire"
-position = Vector2(0, -700)
+position = Vector2(-320, -660)
 asset_ids = PackedStringArray("flora_rose_thorn_brake", "flora_rose_thorn_brake", "flora_rose_thorn_brake")
 offsets = PackedVector2Array()
 height_m = 16.0
@@ -414,7 +414,7 @@ notes = "A tower of tangled thorn crowned with pink roses, seen from the manor's
 script = ExtResource("4_05uvc")
 id = &"briar_gate"
 display_name = "The Briar Gate"
-position = Vector2(-100, -560)
+position = Vector2(-60, -650)
 asset_ids = PackedStringArray("solstice_flower_arch", "flora_bush_rose", "flora_bush_rose")
 offsets = PackedVector2Array()
 height_m = 7.0
@@ -425,7 +425,7 @@ notes = "A natural thorn arch where the lane from the gardens enters the wild ro
 script = ExtResource("4_05uvc")
 id = &"gardeners_folly"
 display_name = "The Gardener's Folly"
-position = Vector2(-480, -560)
+position = Vector2(240, -700)
 asset_ids = PackedStringArray("shrine_arch", "shrine_column", "flora_ivy_curtain")
 offsets = PackedVector2Array()
 height_m = 8.0
@@ -444,10 +444,10 @@ forage = Array[ExtResource("2_615m3")]([SubResource("Resource_250iu"), SubResour
 decor = Array[ExtResource("1_48whd")]([SubResource("Resource_us66r"), SubResource("Resource_xkkue"), SubResource("Resource_64qxp"), SubResource("Resource_qbjym"), SubResource("Resource_b2p6a"), SubResource("Resource_hae17"), SubResource("Resource_e4v7t"), SubResource("Resource_rdanh"), SubResource("Resource_yj3k7"), SubResource("Resource_5dnve"), SubResource("Resource_bhgk8"), SubResource("Resource_0ftc1"), SubResource("Resource_dfq3i"), SubResource("Resource_70reg"), SubResource("Resource_mn5ey"), SubResource("Resource_fjidp"), SubResource("Resource_xcqxi"), SubResource("Resource_k7wsg")])
 landmarks = Array[ExtResource("4_05uvc")]([SubResource("Resource_1jv6g"), SubResource("Resource_4xinl"), SubResource("Resource_ikeyw")])
 gates = Array[Dictionary]([{
-"position": Vector2(-15, -560),
+"position": Vector2(-60, -650),
 "region_id": &"manor_estate",
 "width": 12.0,
-"yaw_degrees": -166.80940279557234
+"yaw_degrees": -153.434948822922
 }])
 grade = &"grade_rosewild"
 ambient_fx = PackedStringArray("fx_rose_petals", "fx_butterflies", "fx_pollen_motes")

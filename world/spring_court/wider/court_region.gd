@@ -540,6 +540,42 @@ func _build_water() -> void:
 		mi.material_override = _water_material(RIVER_MATERIAL, false)
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		holder.add_child(mi)
+	var brooks := _brook_mesh()
+	if brooks != null:
+		var mi := MeshInstance3D.new()
+		mi.name = "Brooks"
+		mi.mesh = brooks
+		mi.material_override = _water_material(RIVER_MATERIAL, false)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		holder.add_child(mi)
+
+
+## The clear brooks (CourtHeight.brooks): a ribbon at each brook's own water
+## level, only where this region owns the bank.
+func _brook_mesh() -> Mesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var quads := 0
+	for b in CourtHeight.brooks():
+		var pts: PackedVector2Array = b["points"]
+		var lv: PackedFloat32Array = b["levels"]
+		var half: float = float(b["half_width"]) + 0.4
+		for k in pts.size() - 1:
+			var p0 := pts[k]
+			var p1 := pts[k + 1]
+			if not content.owns(p0.lerp(p1, 0.5)):
+				continue
+			var side := (p1 - p0).normalized().orthogonal() * half
+			var v := [Vector3(p0.x + side.x, lv[k], p0.y + side.y), Vector3(p0.x - side.x, lv[k], p0.y - side.y),
+				Vector3(p1.x + side.x, lv[k + 1], p1.y + side.y), Vector3(p1.x - side.x, lv[k + 1], p1.y - side.y)]
+			for idx in [0, 2, 1, 1, 2, 3]:
+				st.set_normal(Vector3.UP)
+				st.set_uv(Vector2(1.0 if idx % 2 == 1 else 0.0, (k + (1 if idx >= 2 else 0)) * 0.3))
+				st.add_vertex(v[idx])
+			quads += 1
+	if quads == 0:
+		return null
+	return st.commit()
 
 
 ## A ribbon over the river channel, only where this region owns the bank.

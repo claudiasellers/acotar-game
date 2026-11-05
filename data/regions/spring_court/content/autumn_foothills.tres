@@ -381,14 +381,14 @@ priority = 7
 [sub_resource type="Resource" id="Resource_idd3u"]
 script = ExtResource("3_ebwbl")
 tag = &"sealed_pass"
-center = Vector2(-1650, -1620)
+center = Vector2(-900, -1292)
 radius = 70.0
 priority = 8
 
 [sub_resource type="Resource" id="Resource_s21nq"]
 script = ExtResource("3_ebwbl")
 tag = &"ember_ridge"
-center = Vector2(-1200, -1450)
+center = Vector2(-1250, -1560)
 radius = 120.0
 priority = 5
 
@@ -417,7 +417,7 @@ priority = 9
 script = ExtResource("4_kdkq7")
 id = &"sealed_pass"
 display_name = "The Sealed Pass"
-position = Vector2(-1650, -1620)
+position = Vector2(-900, -1292)
 asset_ids = PackedStringArray("autumn_pass_gate")
 offsets = PackedVector2Array()
 height_m = 14.0
@@ -428,7 +428,7 @@ notes = "A carved gateway choked with living thorn and ward-light: the road to t
 script = ExtResource("4_kdkq7")
 id = &"ember_crown"
 display_name = "The Ember Crown"
-position = Vector2(-1200, -1450)
+position = Vector2(-1250, -1560)
 asset_ids = PackedStringArray("flora_tree_autumn_maple")
 offsets = PackedVector2Array()
 height_m = 26.0
@@ -450,7 +450,7 @@ notes = "The river's source spilling from a rock face."
 script = ExtResource("4_kdkq7")
 id = &"border_markers"
 display_name = "The Border Stones"
-position = Vector2(-1000, -1280)
+position = Vector2(-1000, -1258)
 asset_ids = PackedStringArray("autumn_border_marker", "autumn_border_marker", "autumn_border_marker")
 offsets = PackedVector2Array()
 height_m = 5.0

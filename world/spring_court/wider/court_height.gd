@@ -144,7 +144,7 @@ const FORMS := [
 	[0, 520.0, -880.0, 34.0, 12.0, 1.6],
 	# The village: the bank the potion house stands on, and the two knolls the
 	# road threads between (they hide the green until the pinch: a triangle).
-	[0, -1007.0, -886.0, 70.0, 14.0, 1.2],
+	[0, -1007.0, -886.0, 70.0, 12.5, 1.2],
 	[0, -770.0, -835.0, 70.0, 20.0, 1.5],
 	[0, -805.0, -660.0, 60.0, 16.0, 1.5],
 	# The glen brae's southern partner: the way west crosses the saddle between.
@@ -175,7 +175,7 @@ const PADS := [
 	[-150.0, -1060.0, 60.0, 95.0, NAN],    # the solstice plateau
 	[620.0, -1055.0, 22.0, 40.0, NAN],     # the first giant bonfire
 	[870.0, -1140.0, 75.0, 120.0, NAN],    # the broad bald crown
-	[-930.0, -800.0, 48.0, 70.0, 44.5],    # the village green
+	[-930.0, -800.0, 56.0, 70.0, 44.5],    # the village green
 	[-1300.0, 262.0, 34.0, 52.0, NAN],     # the starlight clearing
 	[-960.0, -245.0, 55.0, 85.0, NAN],     # the oak glade below the knoll
 	[1150.0, 660.0, 28.0, 45.0, NAN],      # the glamour glade (anchor glamour_lift_glade)
@@ -311,8 +311,9 @@ const GATES := [
 ]
 
 ## Sites that keep their natural slope (no clearing of their own).
-const NO_PAD := [&"potion_house", &"lantern_bridge", &"thornwater_spring", &"sealed_pass", &"calanmai_cave_mouth",
-	&"west_brink", &"glimmerfall", &"looking_lake_isle", &"briar_gate", &"rite_trench", &"bonfire_terraces", &"the_mound"]
+const NO_PAD := [&"potion_house", &"lantern_bridge", &"thornwater_falls", &"sealed_pass", &"calanmai_cave_mouth",
+	&"cave_of_the_rite", &"west_brink", &"glimmerfall", &"rainbow_cascade", &"looking_lake_isle", &"briar_gate",
+	&"rite_trench", &"bonfire_terraces", &"the_mound", &"arch_avenue", &"vale_weir", &"thornwater_ford", &"summers_window"]
 
 ## Pinch knolls either side of each gate: [radius, height, power, gap beyond
 ## the gate's half-width].
@@ -321,27 +322,34 @@ const GATE_PINCH := [30.0, 15.0, 1.9, 3.0]
 ## Named ground the terrain was shaped for (landmarks, anchors, nooks):
 ## id -> [x, z, region, kind]. Kinds: landmark, anchor, nook, water.
 const SITES := {
-	# Western Woods (western_fells)
+	# Western Woods (region id western_fells)
 	&"north_watchtower": [-1630.0, -650.0, &"western_fells", &"landmark"],
 	&"fells_sentry_range": [-1616.0, -650.0, &"western_fells", &"anchor"],
 	&"pond_of_watchers": [-1520.0, -400.0, &"western_fells", &"water"],
 	&"middle_watchtower": [-1650.0, 300.0, &"western_fells", &"landmark"],
 	&"foot_watchtower": [-1150.0, 1150.0, &"western_fells", &"landmark"],
-	&"west_brink": [-1782.0, 180.0, &"western_fells", &"nook"],
-	&"moss_dip": [-1300.0, 900.0, &"western_fells", &"nook"],
+	&"summers_window": [-1762.0, 700.0, &"western_fells", &"landmark"],
+	&"silent_hollow": [-1300.0, 900.0, &"western_fells", &"landmark"],
+	&"rainbow_cascade": [-1786.0, 560.0, &"western_fells", &"landmark"],
+	&"old_shrines": [-1640.0, 120.0, &"western_fells", &"landmark"],
+	&"west_brink": [-1770.0, 180.0, &"western_fells", &"nook"],
 	&"root_cradle": [-1450.0, 1000.0, &"western_fells", &"nook"],
-	&"silent_hollow": [-1700.0, 820.0, &"western_fells", &"nook"],
-	&"watchers_ledge": [-1560.0, -470.0, &"western_fells", &"nook"],
+	&"black_dip": [-1700.0, 820.0, &"western_fells", &"nook"],
+	&"fern_cleft": [-1000.0, 1100.0, &"western_fells", &"nook"],
+	&"watchers_ledge": [-1520.0, -470.0, &"western_fells", &"nook"],
 	# Starlight Glen
 	&"starlight_pool": [-1300.0, 262.0, &"starlight_glen", &"water"],
+	&"glimmerfall": [-1374.0, 262.0, &"starlight_glen", &"landmark"],
 	&"the_mound": [-1208.0, 270.0, &"starlight_glen", &"nook"],
-	&"glimmerfall": [-1380.0, 262.0, &"starlight_glen", &"landmark"],
 	&"oak_knoll": [-865.0, -255.0, &"starlight_glen", &"nook"],
 	&"oak_glade": [-960.0, -245.0, &"starlight_glen", &"landmark"],
 	&"looking_lake": [-1250.0, -140.0, &"starlight_glen", &"water"],
 	&"looking_lake_isle": [-1270.0, -155.0, &"starlight_glen", &"nook"],
 	&"willow_mere": [-1150.0, 430.0, &"starlight_glen", &"water"],
+	&"weeping_lady": [-1125.0, 456.0, &"starlight_glen", &"landmark"],
+	&"heron_stones": [-1105.0, -40.0, &"starlight_glen", &"landmark"],
 	&"brae_top": [-760.0, -70.0, &"starlight_glen", &"nook"],
+	&"knoll_steps": [-1130.0, 140.0, &"starlight_glen", &"nook"],
 	&"thornwater_ford": [-995.0, 105.0, &"starlight_glen", &"nook"],
 	# Village of the Lesser Fae
 	&"village_green": [-930.0, -800.0, &"fae_village", &"landmark"],
@@ -349,10 +357,18 @@ const SITES := {
 	&"potion_house": [-977.0, -853.0, &"fae_village", &"landmark"],
 	&"lantern_bridge": [-1060.0, -762.0, &"fae_village", &"landmark"],
 	&"village_mill": [-1210.0, -985.0, &"fae_village", &"landmark"],
-	&"thornwater_spring": [-1440.0, -1262.0, &"fae_village", &"landmark"],
+	&"seamstress": [-890.0, -835.0, &"fae_village", &"landmark"],
+	&"market": [-895.0, -778.0, &"fae_village", &"landmark"],
+	&"cottages": [-968.0, -760.0, &"fae_village", &"landmark"],
+	&"thornwater_falls": [-1440.0, -1262.0, &"fae_village", &"landmark"],
 	&"lantern_brae_top": [-930.0, -930.0, &"fae_village", &"nook"],
-	&"sealed_pass": [-900.0, -1278.0, &"autumn_foothills", &"landmark"],
+	&"orchard_bank": [-1320.0, -700.0, &"fae_village", &"nook"],
+	&"sealed_road_bend": [-893.0, -1050.0, &"fae_village", &"nook"],
+	# The Autumn border (sealed)
+	&"sealed_pass": [-900.0, -1292.0, &"autumn_foothills", &"landmark"],
 	&"ember_crown": [-1250.0, -1560.0, &"autumn_foothills", &"landmark"],
+	&"thornwater_spring": [-1690.0, -1545.0, &"autumn_foothills", &"landmark"],
+	&"border_markers": [-1000.0, -1258.0, &"autumn_foothills", &"landmark"],
 	# Rosewild
 	&"briar_gate": [-60.0, -650.0, &"rosewild", &"landmark"],
 	&"rose_spire": [-320.0, -660.0, &"rosewild", &"landmark"],
@@ -360,31 +376,47 @@ const SITES := {
 	&"hollow_pool": [150.0, -615.0, &"rosewild", &"water"],
 	&"briar_dell": [-480.0, -560.0, &"rosewild", &"nook"],
 	&"thorn_hollow": [330.0, -760.0, &"rosewild", &"nook"],
+	&"hummock_seat": [420.0, -560.0, &"rosewild", &"nook"],
 	# Solstice Meadow
 	&"solstice_dance_floor": [-150.0, -1060.0, &"solstice_meadow", &"anchor"],
+	&"dance_ring": [-150.0, -1080.0, &"solstice_meadow", &"landmark"],
+	&"musicians_bower": [-112.0, -1100.0, &"solstice_meadow", &"landmark"],
+	&"long_tables": [-100.0, -1035.0, &"solstice_meadow", &"landmark"],
+	&"arch_avenue": [-150.0, -1000.0, &"solstice_meadow", &"landmark"],
+	&"crown_oak": [40.0, -1235.0, &"solstice_meadow", &"landmark"],
 	&"vast_meadow": [-250.0, -1270.0, &"solstice_meadow", &"landmark"],
 	&"wisp_hollow": [-420.0, -1250.0, &"solstice_meadow", &"nook"],
 	&"meadow_hill_east": [150.0, -890.0, &"solstice_meadow", &"nook"],
 	&"meadow_hill_west": [-320.0, -880.0, &"solstice_meadow", &"nook"],
 	# Hill of the Rite
-	&"rite_crown": [870.0, -1140.0, &"hill_of_the_rite", &"landmark"],
+	&"stone_ring": [870.0, -1140.0, &"hill_of_the_rite", &"landmark"],
 	&"calanmai_bonfires": [620.0, -1055.0, &"hill_of_the_rite", &"anchor"],
 	&"calanmai_cave_mouth": [690.0, -982.0, &"hill_of_the_rite", &"anchor"],
+	&"cave_of_the_rite": [692.0, -982.0, &"hill_of_the_rite", &"landmark"],
+	&"bonfire_terraces": [735.0, -1029.0, &"hill_of_the_rite", &"landmark"],
+	&"drum_field": [585.0, -845.0, &"hill_of_the_rite", &"landmark"],
 	&"rite_trench": [600.0, -985.0, &"hill_of_the_rite", &"nook"],
 	&"sycamore_knoll": [520.0, -880.0, &"hill_of_the_rite", &"nook"],
-	&"bonfire_terraces": [730.0, -1030.0, &"hill_of_the_rite", &"landmark"],
+	&"north_foothill": [1080.0, -1360.0, &"hill_of_the_rite", &"nook"],
 	# Blighted Reaches
 	&"the_pass_road": [300.0, -1680.0, &"blighted_reaches", &"anchor"],
-	&"blight_heart": [1000.0, -1640.0, &"blighted_reaches", &"landmark"],
+	&"hollow_steading": [300.0, -1600.0, &"blighted_reaches", &"landmark"],
+	&"dead_sentinel": [900.0, -1600.0, &"blighted_reaches", &"landmark"],
+	&"grey_briar_wall": [-200.0, -1550.0, &"blighted_reaches", &"landmark"],
+	&"blight_heart": [1500.0, -1600.0, &"blighted_reaches", &"landmark"],
 	&"still_hollow": [1500.0, -1100.0, &"blighted_reaches", &"nook"],
 	&"the_long_hill": [1000.0, -1650.0, &"blighted_reaches", &"nook"],
+	&"quiet_knoll": [640.0, -1580.0, &"blighted_reaches", &"nook"],
 	# Blossom Vale
 	&"glamour_lift_glade": [1150.0, 660.0, &"blossom_vale", &"anchor"],
 	&"bee_tower": [760.0, 820.0, &"blossom_vale", &"landmark"],
 	&"cider_mill": [1000.0, 880.0, &"blossom_vale", &"landmark"],
 	&"mill_pond": [1040.0, 875.0, &"blossom_vale", &"water"],
+	&"blossom_cathedral": [900.0, 750.0, &"blossom_vale", &"landmark"],
+	&"vale_weir": [1350.0, 1140.0, &"blossom_vale", &"landmark"],
 	&"vale_head_spring": [1010.0, 578.0, &"blossom_vale", &"nook"],
 	&"orchard_knoll": [1300.0, 1300.0, &"blossom_vale", &"nook"],
+	&"south_meadow": [1100.0, 1300.0, &"blossom_vale", &"nook"],
 }
 
 ## What you see from where (the weenies and the triangles): [from site or
@@ -398,8 +430,8 @@ const SIGHTLINES := [
 	[&"village_green", &"north_watchtower", 28.0, true],
 	[&"the_mound", &"north_watchtower", 28.0, true],
 	# The Rite's crown is the east's; the Ember Crown lures from the north-west.
-	[[0.0, -496.0], &"rite_crown", 12.0, true],
-	[&"solstice_dance_floor", &"rite_crown", 12.0, true],
+	[[0.0, -496.0], &"stone_ring", 12.0, true],
+	[&"solstice_dance_floor", &"stone_ring", 12.0, true],
 	[&"sycamore_knoll", &"calanmai_bonfires", 10.0, true],
 	[&"lantern_brae_top", &"ember_crown", 14.0, true],
 	[&"solstice_dance_floor", &"ember_crown", 14.0, true],
@@ -421,7 +453,7 @@ const SIGHTLINES := [
 	[&"the_mound", &"starlight_pool", 0.0, true],
 	[[-1100.0, 228.0], &"starlight_pool", 0.0, false],
 	# The heart of the blight shows itself from the reaches road.
-	[[1350.0, -1450.0], &"blight_heart", 20.0, true],
+	[[1450.0, -1250.0], &"blight_heart", 20.0, true],
 ]
 
 # --- state (built once, read from any thread) ---------------------------------

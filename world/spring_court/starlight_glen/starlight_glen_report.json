@@ -1,12 +1,12 @@
 {
   "region": "starlight_glen",
   "types": 33,
-  "placements": 880,
-  "placements_per_km2": 954,
+  "placements": 896,
+  "placements_per_km2": 971,
   "empty_cells": 0,
   "cells": 94,
   "landmarks": 5,
-  "draw_calls": 366,
-  "decor_instances": 99702,
+  "draw_calls": 357,
+  "decor_instances": 103112,
   "area_km2": 0.923
 }

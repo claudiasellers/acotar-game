@@ -6,7 +6,7 @@
 script = ExtResource("1_box7p")
 id = &"hill_of_the_rite"
 scene_path = "res://world/spring_court/hill_of_the_rite/hill_of_the_rite.tscn"
-center = Vector3(800, 122.27264, -1075)
+center = Vector3(800, 134.02757, -1075)
 radius = 656.2202
 neighbors = PackedStringArray("rosewild", "solstice_meadow", "blighted_reaches")
 report_path = "res://world/spring_court/hill_of_the_rite/hill_of_the_rite_report.json"

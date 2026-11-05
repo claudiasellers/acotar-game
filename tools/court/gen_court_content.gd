@@ -24,6 +24,19 @@ const PROVIDER_IDS := [
 ]
 
 
+## The models are laid back onto the rebuilt terrain (CourtHeight): each
+## landmark stands on the ground shaped for it (CourtHeight.SITES, same id),
+## the habitats round it move with it, and the water habitats sit on the
+## lakes. Waterfalls keep their crest on the lip and land in the water:
+## id -> offsets (first offset = where the water lands).
+const FALL_OFFSETS := {
+	&"glimmerfall": [Vector2(56.0, 0.0)],
+	&"rainbow_cascade": [Vector2(-46.0, 0.0)],
+}
+## Water habitat tags snapped to the nearest CourtHeight lake.
+const WATER_TAGS := [&"looking_lake", &"willow_mere", &"starlight_pool", &"lakeshore", &"pool_rim"]
+
+
 func _initialize() -> void:
 	var with_report := not OS.get_cmdline_user_args().has("--no-report")
 	DirAccess.make_dir_recursive_absolute(CONTENT_DIR)
@@ -61,8 +74,12 @@ func _content(id: StringName, d: Dictionary) -> CourtRegionContent:
 	c.blight = d.get("blight", 0.0)
 	c.sealed = d.get("sealed", false)
 	c.notes = d.get("notes", "")
+	var moved := {}
+	for l: Array in d["landmarks"]:
+		if CourtHeight.SITES.has(StringName(l[0])):
+			moved[Vector2(l[2], l[3])] = CourtHeight.site(StringName(l[0])) - Vector2(l[2], l[3])
 	for h: Array in d["habitats"]:
-		c.habitats.append(_habitat(h))
+		c.habitats.append(_reseat_habitat(_habitat(h), moved))
 	for spec: String in d["forage"]:
 		c.forage.append(_forage(spec))
 	var decor_specs: Array = d["decor"].duplicate()
@@ -81,6 +98,35 @@ func _content(id: StringName, d: Dictionary) -> CourtRegionContent:
 	for l: Array in d["landmarks"]:
 		c.landmarks.append(_landmark(l))
 	return c
+
+
+## A habitat centred on a landmark that moved moves with it; lake habitats
+## sit on the nearest lake (water exactly on it, its shore ringing it).
+func _reseat_habitat(hab: CourtHabitat, moved: Dictionary) -> CourtHabitat:
+	if hab.shape != CourtHabitat.Shape.CIRCLE and hab.shape != CourtHabitat.Shape.RING:
+		return hab
+	if hab.tag in WATER_TAGS:
+		var best: Dictionary = {}
+		for lake in CourtHeight.lakes():
+			if best.is_empty() or hab.center.distance_to(lake["center"]) < hab.center.distance_to(best["center"]):
+				best = lake
+		if not best.is_empty() and hab.center.distance_to(best["center"]) < 120.0:
+			var r: float = best["radius"]
+			hab.center = best["center"]
+			if hab.shape == CourtHabitat.Shape.CIRCLE:
+				hab.radius = r
+			elif hab.tag == &"pool_rim":
+				hab.inner_radius = r
+				hab.radius = r + 24.0
+			else:
+				hab.inner_radius = r
+				hab.radius = r * 1.4
+		return hab
+	for old: Vector2 in moved:
+		if hab.center.distance_to(old) < 30.0:
+			hab.center += moved[old]
+			break
+	return hab
 
 
 func _habitat(h: Array) -> CourtHabitat:
@@ -154,6 +200,8 @@ func _landmark(l: Array) -> CourtLandmark:
 	m.id = StringName(l[0])
 	m.display_name = l[1]
 	m.position = Vector2(l[2], l[3])
+	if CourtHeight.SITES.has(m.id):
+		m.position = CourtHeight.site(m.id)
 	m.height_m = l[4]
 	m.kind = StringName(l[5])
 	m.asset_ids = PackedStringArray(String(l[6]).split(",", false))
@@ -163,6 +211,15 @@ func _landmark(l: Array) -> CourtLandmark:
 		for pair: String in String(l[9]).split(";", false):
 			var xz := pair.split(":")
 			m.offsets.append(Vector2(float(xz[0]), float(xz[1])))
+	if FALL_OFFSETS.has(m.id):
+		var fo: Array = FALL_OFFSETS[m.id]
+		for i in fo.size():
+			if i < m.offsets.size():
+				m.offsets[i] = fo[i]
+			else:
+				m.offsets.append(fo[i])
+	if m.id == &"rainbow_cascade":
+		m.position.x = CourtHeight.west_lip_x(m.position.y) + 1.5
 	# Recognisable from this far: tall things and things on hills (R1 wants >= 200 m).
 	m.visible_from_m = maxf(200.0, m.height_m * 25.0)
 	return m

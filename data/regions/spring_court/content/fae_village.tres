@@ -444,7 +444,7 @@ priority = 7
 [sub_resource type="Resource" id="Resource_18p51"]
 script = ExtResource("3_3f73p")
 tag = &"village_green"
-center = Vector2(-990, -900)
+center = Vector2(-925, -787)
 radius = 75.0
 priority = 6
 
@@ -474,7 +474,7 @@ priority = 5
 [sub_resource type="Resource" id="Resource_ns54f"]
 script = ExtResource("3_3f73p")
 tag = &"mill_race"
-center = Vector2(-1150, -950)
+center = Vector2(-1210, -985)
 radius = 40.0
 priority = 6
 
@@ -496,7 +496,7 @@ priority = 3
 script = ExtResource("4_gr0g5")
 id = &"great_lantern_tree"
 display_name = "The Great Lantern Tree"
-position = Vector2(-990, -905)
+position = Vector2(-925, -792)
 asset_ids = PackedStringArray("woods_lilac_tree", "fae_lantern_post", "fae_bunting")
 offsets = PackedVector2Array()
 height_m = 22.0
@@ -507,7 +507,7 @@ notes = "A huge lilac tree in the green hung with lanterns; visible glowing at d
 script = ExtResource("4_gr0g5")
 id = &"lantern_bridge"
 display_name = "The Lantern Bridge"
-position = Vector2(-1051, -846)
+position = Vector2(-1060, -762)
 asset_ids = PackedStringArray("fae_footbridge", "fae_lantern_post", "fae_lantern_post")
 offsets = PackedVector2Array()
 height_m = 6.0
@@ -518,7 +518,7 @@ notes = "Arched footbridge over the Thornwater."
 script = ExtResource("4_gr0g5")
 id = &"village_mill"
 display_name = "The Mill"
-position = Vector2(-1150, -950)
+position = Vector2(-1210, -985)
 asset_ids = PackedStringArray("fae_mill")
 offsets = PackedVector2Array()
 height_m = 12.0
@@ -529,7 +529,7 @@ notes = "Waterwheel on the mill race."
 script = ExtResource("4_gr0g5")
 id = &"seamstress"
 display_name = "The Seamstress's Shop"
-position = Vector2(-960, -960)
+position = Vector2(-890, -835)
 asset_ids = PackedStringArray("fae_seamstress_shop")
 offsets = PackedVector2Array()
 height_m = 9.0
@@ -541,7 +541,7 @@ notes = "Outfits and colour variants (systems lane wardrobe station)."
 script = ExtResource("4_gr0g5")
 id = &"potion_house"
 display_name = "The Potion House"
-position = Vector2(-1060, -980)
+position = Vector2(-977, -853)
 asset_ids = PackedStringArray("fae_potion_house")
 offsets = PackedVector2Array()
 kind = &"station"
@@ -551,7 +551,7 @@ notes = "Fae potion room station (P4)."
 script = ExtResource("4_gr0g5")
 id = &"market"
 display_name = "The Market Square"
-position = Vector2(-940, -880)
+position = Vector2(-895, -778)
 asset_ids = PackedStringArray("fae_market_stall_a", "fae_market_stall_b", "fae_market_stall_c", "fae_well", "fae_flower_cart")
 offsets = PackedVector2Array()
 height_m = 5.0
@@ -563,7 +563,7 @@ notes = "Trade, rumours, faerie bread."
 script = ExtResource("4_gr0g5")
 id = &"cottages"
 display_name = "Cottage Row"
-position = Vector2(-1000, -820)
+position = Vector2(-968, -760)
 asset_ids = PackedStringArray("fae_cottage_a", "fae_cottage_b", "fae_cottage_c", "fae_cottage_d", "fae_bakery", "fae_cottage_b", "fae_cottage_a")
 offsets = PackedVector2Array()
 height_m = 8.0
@@ -582,10 +582,10 @@ forage = Array[ExtResource("2_l0vvn")]([SubResource("Resource_oebxf"), SubResour
 decor = Array[ExtResource("1_eetyr")]([SubResource("Resource_4cydj"), SubResource("Resource_8v3ws"), SubResource("Resource_andps"), SubResource("Resource_ciwi3"), SubResource("Resource_dmf42"), SubResource("Resource_1pyh5"), SubResource("Resource_2q2ib"), SubResource("Resource_wxlov"), SubResource("Resource_dt5bk"), SubResource("Resource_am2p5"), SubResource("Resource_gw2n4"), SubResource("Resource_vjm08"), SubResource("Resource_ag7op"), SubResource("Resource_l4oq7"), SubResource("Resource_67yos"), SubResource("Resource_546at"), SubResource("Resource_1akns"), SubResource("Resource_vsklh"), SubResource("Resource_eogss"), SubResource("Resource_wpag4"), SubResource("Resource_nomx6")])
 landmarks = Array[ExtResource("4_gr0g5")]([SubResource("Resource_q2y8u"), SubResource("Resource_bsnuj"), SubResource("Resource_yjo27"), SubResource("Resource_0g0dd"), SubResource("Resource_yigdh"), SubResource("Resource_burwg"), SubResource("Resource_h0nor")])
 gates = Array[Dictionary]([{
-"position": Vector2(-660, -690),
+"position": Vector2(-790, -748),
 "region_id": &"fae_village",
 "width": 12.0,
-"yaw_degrees": -131.98773871025952
+"yaw_degrees": -113.57481188441118
 }])
 grade = &"grade_fae_village"
 ambient_fx = PackedStringArray("fx_lantern_glow_motes", "fx_butterflies", "fx_pollen_motes", "fx_rose_petals")

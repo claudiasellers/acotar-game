@@ -444,16 +444,16 @@ collectible = true
 [sub_resource type="Resource" id="Resource_bsiu2"]
 script = ExtResource("3_k1sbk")
 tag = &"looking_lake"
-center = Vector2(-1230, -170)
-radius = 112.0
+center = Vector2(-1250, -140)
+radius = 85.0
 priority = 10
 exclusive = true
 
 [sub_resource type="Resource" id="Resource_hqygx"]
 script = ExtResource("3_k1sbk")
 tag = &"willow_mere"
-center = Vector2(-1120, 400)
-radius = 55.0
+center = Vector2(-1150, 430)
+radius = 32.0
 priority = 10
 exclusive = true
 
@@ -487,18 +487,18 @@ priority = 6
 script = ExtResource("3_k1sbk")
 tag = &"lakeshore"
 shape = 1
-center = Vector2(-1230, -170)
-radius = 150.0
-inner_radius = 112.0
+center = Vector2(-1250, -140)
+radius = 118.99999999999999
+inner_radius = 85.0
 priority = 8
 
 [sub_resource type="Resource" id="Resource_qn7su"]
 script = ExtResource("3_k1sbk")
 tag = &"lakeshore"
 shape = 1
-center = Vector2(-1120, 400)
-radius = 85.0
-inner_radius = 55.0
+center = Vector2(-1150, 430)
+radius = 44.8
+inner_radius = 32.0
 priority = 8
 
 [sub_resource type="Resource" id="Resource_ngxra"]
@@ -569,9 +569,9 @@ notes = "Hidden pool where Tamlin brings Feyre to swim; glitters in sunlight. Ba
 script = ExtResource("4_kqskx")
 id = &"glimmerfall"
 display_name = "The Rainbow Falls of the Glen"
-position = Vector2(-1300, 212)
+position = Vector2(-1374, 262)
 asset_ids = PackedStringArray("escarpment_rock_a", "pool_glow_crystal")
-offsets = PackedVector2Array(0, 40)
+offsets = PackedVector2Array(56, 0)
 height_m = 22.0
 visible_from_m = 550.0
 kind = &"waterfall"
@@ -582,7 +582,7 @@ notes = "Canon rainbow waterfall (Keeper): a cascade of coloured water off a cry
 script = ExtResource("4_kqskx")
 id = &"looking_lake_isle"
 display_name = "The Isle of the Looking Lake"
-position = Vector2(-1235, -175)
+position = Vector2(-1270, -155)
 asset_ids = PackedStringArray("woods_lilac_tree", "rock_mossy_b")
 offsets = PackedVector2Array()
 height_m = 24.0
@@ -604,7 +604,7 @@ notes = "Three tall mossy stones on the eastern shore; herons stand on them at d
 script = ExtResource("4_kqskx")
 id = &"weeping_lady"
 display_name = "The Weeping Lady"
-position = Vector2(-1100, 345)
+position = Vector2(-1125, 456)
 asset_ids = PackedStringArray("woods_willow")
 offsets = PackedVector2Array()
 height_m = 16.0
@@ -631,10 +631,10 @@ anchors = Array[Dictionary]([{
 "yaw_degrees": 0.0
 }])
 gates = Array[Dictionary]([{
-"position": Vector2(-700, -110),
+"position": Vector2(-790, 12),
 "region_id": &"starlight_glen",
 "width": 12.0,
-"yaw_degrees": -79.114557366902
+"yaw_degrees": -59.981699006570004
 }])
 grade = &"grade_starlight_glen_day"
 ambient_fx = PackedStringArray("fx_pollen_motes", "fx_butterflies", "fx_water_mist", "fx_starlight_sparkles", "fx_dandelion_seeds")

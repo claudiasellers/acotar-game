@@ -1,12 +1,12 @@
 {
   "region": "western_fells",
   "types": 31,
-  "placements": 1061,
-  "placements_per_km2": 829,
+  "placements": 1051,
+  "placements_per_km2": 821,
   "empty_cells": 0,
   "cells": 129,
   "landmarks": 7,
-  "draw_calls": 265,
-  "decor_instances": 121226,
+  "draw_calls": 289,
+  "decor_instances": 120638,
   "area_km2": 1.28
 }

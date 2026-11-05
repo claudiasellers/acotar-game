@@ -1,12 +1,12 @@
 {
   "region": "solstice_meadow",
   "types": 29,
-  "placements": 560,
-  "placements_per_km2": 1131,
+  "placements": 550,
+  "placements_per_km2": 1111,
   "empty_cells": 0,
   "cells": 54,
   "landmarks": 5,
-  "draw_calls": 397,
-  "decor_instances": 77511,
+  "draw_calls": 387,
+  "decor_instances": 77725,
   "area_km2": 0.495
 }

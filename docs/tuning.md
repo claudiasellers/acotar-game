@@ -62,3 +62,19 @@ thrown back up into the shade band. Probe: `tools/lighting/bounce_probe.tscn`.
 | SDFGI outdoors | GradePreset.sdfgi (off outdoors) | off | | Not enabled: waits for the Mac measurement with volumetric fog (`BOUNCE_SDFGI=1 make perf`) | L60 |
 | `ground_bounce` | candy_lit.gdshaderinc (`CANDY_BOUNCE_DEFAULT`) | 0.35; 0.0 on the manor's room shells (boiserie, plaster_ceiling, sky_ceiling: SDFGI lights the rooms) | 0–1 | Bounce strength. Directional lights only, scaled by the light's height over the horizon and by how much the face looks down (1 down, 0.5 sideways, 0 up); the surface's own shadow does not block it; the lit band does not take it | L60 |
 | `ground_bounce_color` | candy_lit.gdshaderinc | (0.523, 0.548, 0.545) sRGB | colour | Mean albedo of the 11 terrain textures, equal weights, averaged in linear light (`tools/lighting/terrain_albedo_average.gd`). Per texture: snow (0.79,0.83,0.91), frozen_earth (0.42,0.39,0.37), rock (0.48,0.50,0.56), winter_grass (0.62,0.59,0.45), spring_grass (0.27,0.36,0.21), moss (0.22,0.43,0.30), forest_floor (0.40,0.31,0.24), path (0.50,0.40,0.31), riverbed (0.50,0.52,0.52), blight (0.46,0.44,0.48), ice (0.72,0.86,0.92). Snow and ice make it near-neutral; a greener Spring bounce is an art-direction call | L60 |
+
+## Wider-court terrain (lane wider-court-world)
+
+Shape values for the court's land, all in `world/spring_court/wider/court_height.gd`.
+Tests (`tests/unit/landscape/test_court_terrain.gd`) hold the seals, sightlines and
+the book's shapes; anything else here is taste.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `ZONES[*][3..5]` roll / hummock / root-ridge amplitude | court_height.gd | woods 3.5/1.4/1.8, glen 12/2.6/0.3, village 9/1.1/0.3, autumn 24/4.5/7, rosewild 5.5/3.6/0, meadow 6/1.4/0, hill 11/2.2/0.4, blight 17/3.2/1, vale 5.5/1.6/0 (m) | 0–30 | How much each region rolls: large swells (380 m), hummocks (46 m), root ridges and dark dips (woods). | wider-court-world |
+| `ZONE_SOFT` | court_height.gd | 150 m | 80–300 | Width of the blend between regions' characters. | wider-court-world |
+| `KNOLL_FIELDS` | court_height.gd | 9 fields, 10–30 knolls each | | The single-tree knolls; count, radius, height, share of hollows. | wider-court-world |
+| `HILLS` heights | court_height.gd | towering hill 138, Rite crown 104, Ember Crown 110, plateau hill 34 (m) | | The weenies' stages; sightline tests hold them. | wider-court-world |
+| `LAKES[*][4]` depth | court_height.gd | 5–28 m | | How bottomless each clear lake reads (shelf, then drop-off). | wider-court-world |
+| `PATH_GRADE` | court_height.gd | 0.28 | 0.15–0.4 | Steepest a path runs; steeper ground sinks it into a hollow-way. | wider-court-world |
+| `BLEND` | court_height.gd | 140 m | 60–200 | How gently our ground meets other lanes' at their edges. | wider-court-world |

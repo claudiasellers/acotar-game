@@ -1,12 +1,12 @@
 {
   "region": "rosewild",
   "types": 27,
-  "placements": 598,
-  "placements_per_km2": 1661,
+  "placements": 596,
+  "placements_per_km2": 1656,
   "empty_cells": 0,
   "cells": 37,
   "landmarks": 3,
-  "draw_calls": 377,
-  "decor_instances": 26303,
+  "draw_calls": 308,
+  "decor_instances": 26313,
   "area_km2": 0.36
 }
