@@ -2,7 +2,11 @@
 ## stripped of every model), several per run so the World loads once. Needs a
 ## GPU (the Mac's shot listener):
 ##   godot res://tools/court/court_terrain_shots.tscn -- <out dir> [view ids...] [regions]
+##        [looks=photo,soft,pastel,storybook src=<folder of Poly Haven 1k maps>]
 ## `regions` also loads the region scenes near each view (models back in).
+## `looks` previews ground looks without committing textures: each look is
+## packed at run time by tools/court/pack_ground_textures.gd and swapped onto
+## the terrain; "photo" is what the game ships. Files: <view>_<look>.png.
 extends Node
 
 ## id: [eye x, eye z, eye height over ground, look x, look z, look height, time 0-1, grade, fov]
@@ -42,6 +46,18 @@ func _run() -> void:
 	var out_dir: String = args.pop_front() if not args.is_empty() else "user://court_shots"
 	var with_regions := args.has("regions")
 	args.erase("regions")
+	var looks: Array = []
+	var src := ""
+	for a: String in args.duplicate():
+		if a.begins_with("looks="):
+			looks = Array(a.substr(6).split(","))
+			args.erase(a)
+		elif a.begins_with("src="):
+			src = a.substr(4)
+			args.erase(a)
+	var assets_by_look := {}
+	for look: String in looks:
+		assets_by_look[look] = _look_assets(look, src)
 	var ids: Array = args if not args.is_empty() else VIEWS.keys()
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	Clock.paused = true
@@ -74,12 +90,50 @@ func _run() -> void:
 					if scene != null:
 						world.regions.add_child(scene.instantiate())
 			await _wait_regions_built(world, 120.0)
-		for i in 40:
-			await get_tree().process_frame
-		var path := "%s/%s.png" % [out_dir, id]
-		root.get_texture().get_image().save_png(path)
-		print("SHOT %s -> %s | draw_calls %d" % [id, path, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+		for look: String in (looks if not looks.is_empty() else [""]):
+			if look != "" and world.terrain != null:
+				world.terrain.set(&"assets", assets_by_look[look])
+			for i in 40:
+				await get_tree().process_frame
+			var path := "%s/%s%s.png" % [out_dir, id, "" if look == "" else "_" + look]
+			root.get_texture().get_image().save_png(path)
+			print("SHOT %s %s -> %s | draw_calls %d" % [id, look, path, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	get_tree().quit(0)
+
+
+## Terrain3D assets with the court's photo slots packed in `look` (every slot
+## as uncompressed, mipmapped RGBA so the texture arrays match).
+func _look_assets(look: String, src: String) -> Resource:
+	var dir := "user://court_looks/%s" % look
+	if look != "photo":
+		DirAccess.make_dir_recursive_absolute(dir)
+		var packer := GroundTexturePacker.new(look, dir)
+		for slot: String in GroundTexturePacker.SOURCES:
+			packer.pack(src, slot)
+	var assets: Resource = ClassDB.instantiate(&"Terrain3DAssets")
+	for i in TerrainSetup.TEXTURES.size():
+		var stem: String = TerrainSetup.TEXTURES[i][0]
+		var tex: Resource = ClassDB.instantiate(&"Terrain3DTextureAsset")
+		tex.set(&"name", stem)
+		for kind in ["albedo", "normal"]:
+			var img: Image = null
+			var own := "%s/%s_%s.png" % [dir, stem, kind]
+			if look != "photo" and FileAccess.file_exists(own):
+				img = Image.load_from_file(own)
+			else:
+				var res := ProjectSettings.globalize_path("%s/%s_%s.png" % [TerrainSetup.TEXTURE_DIR, stem, kind])
+				if FileAccess.file_exists(res):
+					img = Image.load_from_file(res)
+			if img == null:
+				continue
+			if img.is_compressed():
+				img.decompress()
+			img.convert(Image.FORMAT_RGBA8)
+			img.generate_mipmaps()
+			tex.set(&"%s_texture" % kind, ImageTexture.create_from_image(img))
+		tex.set(&"uv_scale", TerrainSetup.TEXTURES[i][1])
+		assets.call(&"set_texture_asset", i, tex)
+	return assets
 
 
 func _region_defs() -> Array[RegionDef]:
