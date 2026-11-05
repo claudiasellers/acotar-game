@@ -173,11 +173,14 @@ func _authored(route: WaysideRoute) -> Array[WaysideSpot]:
 			out.append(lilac)
 		&"manor_starlight_glen":
 			# The pond-faeries [C ch 14]: four shining heads watching from the
-			# bright water. Here, a still pool of the Thornwater below the glen.
-			var pond := Vector2(-965.0, 100.0)
+			# bright water of "a large pond nestled at the foot of a towering
+			# hill": the pond of watchers under the North Watchtower's hill.
+			var lake := _lake(&"pond_of_watchers")
+			var c: Vector2 = lake["center"]
+			var pond := c + (Vector2(-1300.0, -380.0) - c).normalized() * float(lake["radius"]) * 0.45
 			var pf := _spot(&"pond_faeries", "%s_pond_faeries" % route.id, pond, "C", "ch 14")
-			pf.params = {"water_y": _river_water(pond), "spread": 2.4, "pool_radius": 9.0}
-			pf.position.y = _river_water(pond)
+			pf.params = {"water_y": float(lake["level"]), "spread": 2.4, "pool_radius": 9.0}
+			pf.position.y = float(lake["level"])
 			pf.line = "Four heads in the water, watching me. I didn't go any closer."
 			out.append(pf)
 		&"manor_suriel_glade":
@@ -422,6 +425,14 @@ func _highest_near(p: Vector2, radius: float) -> Vector2:
 
 
 ## The Thornwater's surface where the court lays it (CourtHeight.river_level_at).
+## A wider-court lake by id (CourtHeight.lakes): {id, center, radius, level}.
+func _lake(id: StringName) -> Dictionary:
+	for l in CourtHeight.lakes():
+		if l["id"] == id:
+			return l
+	return {}
+
+
 func _river_water(p: Vector2) -> float:
 	return CourtHeight.river_level_at(p.x, p.y)
 

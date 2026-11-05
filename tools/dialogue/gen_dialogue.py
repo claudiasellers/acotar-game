@@ -901,8 +901,9 @@ FV = [("fae_mushroom", "cottages", -6, 4), ("fae_moth", "great_lantern_tree", 5,
       ("fae_fox", "market", -5, 2), ("fae_hedgehog", "market", 4, 5), ("fae_pixie", "seamstress", 4, 3),
       ("fae_satyr", "village_mill", 6, 0), ("fae_rose", "market", 1, -6), ("fae_owl", "great_lantern_tree", -4, 4),
       ("fae_stag", "lantern_bridge", 23, 0), ("fae_nymph", "lantern_bridge", 21, -18),
-      ("fae_birch", "cottages", 5, -4), ("fae_dryad", "potion_house", -5, -3)]
-# The stag and nymph stand on the bridge's east bank, off the river (T040).
+      ("fae_birch", "cottages", 5, -4), ("fae_dryad", "potion_house", 12, 14)]
+# The stag and nymph stand on the bridge's east bank, off the river (T040); the
+# dryad stays below the potion house's bank, on the level green (wider-court terrain).
 # Keeper (ch24): Tamlin's glamour covers his court, so before the lift only
 # humanoid, glamoured folk are seen (the satyr, the High Fae revellers); the
 # non-humanoid village fae appear once it lifts.
@@ -914,12 +915,12 @@ for fid, near, dx, dz in FV:
     else:
         spot("%s_%s" % (fid, near), fid, PEOPLE % fid, "fae_village", x + dx, z + dz, ph(6), req=GL, wander=2.5,
              notes="unseen (glamoured) before the lift, Keeper ch24")
-for i, (near, dx, dz) in enumerate([("market", 6, -3), ("great_lantern_tree", -6, -2), ("lantern_bridge", -3, 4)]):
+for i, (near, dx, dz) in enumerate([("market", 6, -3), ("great_lantern_tree", -6, -2), ("lantern_bridge", 22, 8)]):
     x, z, _r = CP[near]
     spot("reveler_village_%d" % (i + 1), "reveler", PEOPLE % ("reveler_%d" % (i + 1)), "fae_village", x + dx,
          z + dz, ph(4, 5), hours=(8.0, 19.0), wander=2.5, notes="glamoured High Fae villagers before the lift")
 # Revellers: Calanmai night on the hill [C], the Solstice meadow [C].
-for i, (near, dx, dz) in enumerate([("drum_field", -8, 4), ("drum_field", 7, -5), ("stone_ring", 6, 6)]):
+for i, (near, dx, dz) in enumerate([("drum_field", -8, 4), ("drum_field", 3, -4), ("stone_ring", 6, 6)]):
     x, z, _r = CP[near]
     spot("reveler_rite_%d" % (i + 1), "reveler", PEOPLE % ("reveler_%d" % (i + 1)), "hill_of_the_rite",
          x + dx, z + dz, ph(5), hours=(19.0, 5.0), wander=3.0, canon="C")

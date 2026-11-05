@@ -1142,28 +1142,28 @@ radius = 25.4
 script = ExtResource("2")
 id = &"glimmerfall"
 region = &"starlight_glen"
-at = Vector2(-1300.0, 212.0)
+at = Vector2(-1374.0, 262.0)
 radius = 20.5
 
 [sub_resource type="Resource" id="P2"]
 script = ExtResource("2")
 id = &"looking_lake_isle"
 region = &"starlight_glen"
-at = Vector2(-1235.0, -175.0)
+at = Vector2(-1270.0, -155.0)
 radius = 21.0
 
 [sub_resource type="Resource" id="P3"]
 script = ExtResource("2")
 id = &"sealed_pass"
 region = &"autumn_foothills"
-at = Vector2(-1650.0, -1620.0)
+at = Vector2(-900.0, -1292.0)
 radius = 18.5
 
 [sub_resource type="Resource" id="P4"]
 script = ExtResource("2")
 id = &"ember_crown"
 region = &"autumn_foothills"
-at = Vector2(-1200.0, -1450.0)
+at = Vector2(-1250.0, -1560.0)
 radius = 23.200000000000003
 
 [sub_resource type="Resource" id="P5"]
@@ -1177,84 +1177,84 @@ radius = 21.0
 script = ExtResource("2")
 id = &"border_markers"
 region = &"autumn_foothills"
-at = Vector2(-1000.0, -1280.0)
+at = Vector2(-1000.0, -1258.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P7"]
 script = ExtResource("2")
 id = &"rose_spire"
 region = &"rosewild"
-at = Vector2(0.0, -700.0)
+at = Vector2(-320.0, -660.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P8"]
 script = ExtResource("2")
 id = &"briar_gate"
 region = &"rosewild"
-at = Vector2(-100.0, -560.0)
+at = Vector2(-60.0, -650.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P9"]
 script = ExtResource("2")
 id = &"gardeners_folly"
 region = &"rosewild"
-at = Vector2(-480.0, -560.0)
+at = Vector2(240.0, -700.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P10"]
 script = ExtResource("2")
 id = &"musicians_bower"
 region = &"solstice_meadow"
-at = Vector2(-100.0, -1135.0)
+at = Vector2(-112.0, -1100.0)
 radius = 18.0
 
 [sub_resource type="Resource" id="P11"]
 script = ExtResource("2")
 id = &"arch_avenue"
 region = &"solstice_meadow"
-at = Vector2(-240.0, -1000.0)
+at = Vector2(-150.0, -1000.0)
 radius = 28.0
 
 [sub_resource type="Resource" id="P12"]
 script = ExtResource("2")
 id = &"crown_oak"
 region = &"solstice_meadow"
-at = Vector2(100.0, -1180.0)
+at = Vector2(40.0, -1235.0)
 radius = 22.3
 
 [sub_resource type="Resource" id="P13"]
 script = ExtResource("2")
 id = &"long_tables"
 region = &"solstice_meadow"
-at = Vector2(-60.0, -1040.0)
+at = Vector2(-100.0, -1035.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P14"]
 script = ExtResource("2")
 id = &"stone_ring"
 region = &"hill_of_the_rite"
-at = Vector2(800.0, -1100.0)
+at = Vector2(870.0, -1140.0)
 radius = 37.0
 
 [sub_resource type="Resource" id="P15"]
 script = ExtResource("2")
 id = &"cave_of_the_rite"
 region = &"hill_of_the_rite"
-at = Vector2(690.0, -1000.0)
+at = Vector2(692.0, -982.0)
 radius = 30.6
 
 [sub_resource type="Resource" id="P16"]
 script = ExtResource("2")
 id = &"bonfire_terraces"
 region = &"hill_of_the_rite"
-at = Vector2(620.0, -1080.0)
+at = Vector2(735.0, -1029.0)
 radius = 28.0
 
 [sub_resource type="Resource" id="P17"]
 script = ExtResource("2")
 id = &"drum_field"
 region = &"hill_of_the_rite"
-at = Vector2(560.0, -860.0)
+at = Vector2(585.0, -845.0)
 radius = 28.0
 
 [sub_resource type="Resource" id="P18"]
@@ -1296,21 +1296,21 @@ radius = 25.4
 script = ExtResource("2")
 id = &"cider_mill"
 region = &"blossom_vale"
-at = Vector2(1050.0, 1060.0)
+at = Vector2(1000.0, 880.0)
 radius = 21.0
 
 [sub_resource type="Resource" id="P24"]
 script = ExtResource("2")
 id = &"bee_tower"
 region = &"blossom_vale"
-at = Vector2(1250.0, 900.0)
+at = Vector2(760.0, 820.0)
 radius = 18.0
 
 [sub_resource type="Resource" id="P25"]
 script = ExtResource("2")
 id = &"vale_weir"
 region = &"blossom_vale"
-at = Vector2(1350.0, 1150.0)
+at = Vector2(1350.0, 1140.0)
 radius = 21.0
 
 [resource]

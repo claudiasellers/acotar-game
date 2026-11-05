@@ -278,6 +278,32 @@ func test_the_weenies_are_seen_from_the_ways() -> void:
 		assert_between(share, want[id][1], want[id][2], "%s seen from %d%% of the ways" % [id, int(share * 100.0)])
 
 
+func test_people_and_wayside_spots_stand_on_dry_walkable_ground() -> void:
+	# Fixed positions other lanes keep on our ground (the presence roster, the
+	# wayside walks) must follow the terrain when it changes.
+	var points: Array = []
+	var roster := load("res://data/dialogue/presence.tres") as PresenceRoster
+	for s in roster.spots:
+		if s.room == &"" and CourtHeight.own_weight(s.at.x, s.at.y) > 0.0:
+			points.append([String(s.id), s.at, s.wander])
+	var dir := DirAccess.open("res://data/wayside")
+	for f in dir.get_files():
+		if not f.begins_with("manor_") or not f.ends_with(".tres"):
+			continue
+		var route := load("res://data/wayside/" + f)
+		for spot: Resource in route.get(&"spots"):
+			var p: Vector3 = spot.get(&"position")
+			if CourtHeight.own_weight(p.x, p.z) > 0.0 and spot.get(&"kind") not in [&"pond_faeries", &"stepping_stones", &"crossing"]:
+				points.append([String(spot.get(&"id")), Vector2(p.x, p.z), 2.0])
+	assert_gt(points.size(), 20)
+	for e: Array in points:
+		var p: Vector2 = e[1]
+		var clear: float = float(e[2]) + 3.0
+		assert_lt(_slope(p.x, p.y, 2.0), 24.0, "%s stands on a steep bank" % e[0])
+		assert_gt(MacroHeight.distance_to_river(p.x, p.y), CourtHeight.CHANNEL + clear, "%s is in the Thornwater" % e[0])
+		assert_false(_in_lake(p), "%s is in a lake" % e[0])
+
+
 func test_you_cannot_see_the_whole_court_from_one_place() -> void:
 	# From every gate and clearing on the ways, at most a third of the court's
 	# open ground (sampled every 80 m) is in view.

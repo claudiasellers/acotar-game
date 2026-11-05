@@ -35,17 +35,35 @@ params = {
 "model": "stepping_stones",
 "repeat": true,
 "unit_length": 4.4,
-"water_y": 8.019177284262177,
+"water_y": 6.919177284262178,
 "yaw_offset": 1.5707963267948966
 }
 source = "ch 14 (a stream that takes a running leap)"
 
 [sub_resource type="Resource" id="Resource_l8d16"]
 script = ExtResource("2_f0tli")
+kind = &"nook"
+id = &"manor_suriel_glade_00_nook"
+position = Vector3(-96.91587, 7.554366, 39.44991)
+yaw = 0.7746711
+target = Vector3(-96.91587, 7.554366, 39.44991)
+items = PackedStringArray("col_old_arrowhead")
+line = "An arrowhead. Someone hunted here, long ago."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "rock_mossy_a",
+"shell_scale": 1.1545444
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_26qp8"]
+script = ExtResource("2_f0tli")
 kind = &"shimmer"
-id = &"manor_suriel_glade_00_shimmer"
-position = Vector3(-91.26406, 8, 33.531265)
-target = Vector3(-119.54833, 8.4, 5.246994)
+id = &"manor_suriel_glade_01_shimmer"
+position = Vector3(-290.82712, 9.107461, 221.02196)
+target = Vector3(-304.96924, 9.6, 206.87982)
 items = PackedStringArray()
 line = "Only the wind in the leaves."
 require_flags = PackedStringArray()
@@ -57,29 +75,45 @@ params = {
 canon = "C"
 source = "ch 14 (the shimmer in the corner of her eye)"
 
-[sub_resource type="Resource" id="Resource_26qp8"]
+[sub_resource type="Resource" id="Resource_af1em"]
 script = ExtResource("2_f0tli")
-kind = &"rest"
-id = &"manor_suriel_glade_01_rest"
-position = Vector3(-293.98602, 9.1050415, 221.04117)
-yaw = -0.9204671574391375
-target = Vector3(-824.877, 23.965794, 624.90265)
+kind = &"vignette"
+id = &"manor_suriel_glade_02_vignette"
+position = Vector3(-407.781, 8.880139, 311.52948)
+target = Vector3(-407.781, 8.880139, 311.52948)
 items = PackedStringArray()
-line = "Ochre in the grass, and a cool green where it turns to shade."
+line = "A lark going up and up."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"seat": "autumn_fallen_log",
+"count": 2,
+"scene": "res://creatures/ambient/scenes/lark.tscn",
+"sketch": "Watching lark"
+}
+
+[sub_resource type="Resource" id="Resource_5ijfw"]
+script = ExtResource("2_f0tli")
+kind = &"rest"
+id = &"manor_suriel_glade_03_rest"
+position = Vector3(-525.0928, 15.35502, 363.98837)
+yaw = -0.8546116082958612
+target = Vector3(-824.877, 23.965794, 624.90265)
+items = PackedStringArray()
+line = "Pearl in the clouds. Moss, and rust, and that pink again."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fells_overlook_bench",
 "sketch": "A view on the way to suriel glade"
 }
 source = "Keeper: on-voice (she names colours, ch 7)"
 
-[sub_resource type="Resource" id="Resource_af1em"]
+[sub_resource type="Resource" id="Resource_47oh3"]
 script = ExtResource("2_f0tli")
 kind = &"shimmer"
-id = &"manor_suriel_glade_02_shimmer"
-position = Vector3(-429.982, 10.52077, 322.361)
-target = Vector3(-468.61902, 12.552229, 332.71375)
+id = &"manor_suriel_glade_04_shimmer"
+position = Vector3(-641.633, 14.671347, 494.88467)
+target = Vector3(-676.274, 16.915392, 474.88467)
 items = PackedStringArray()
 line = "Only the wind in the leaves."
 require_flags = PackedStringArray()
@@ -90,40 +124,6 @@ params = {
 }
 canon = "C"
 source = "ch 14 (the shimmer in the corner of her eye)"
-
-[sub_resource type="Resource" id="Resource_5ijfw"]
-script = ExtResource("2_f0tli")
-kind = &"vignette"
-id = &"manor_suriel_glade_03_vignette"
-position = Vector3(-558.70557, 13.779681, 395.20422)
-target = Vector3(-558.70557, 13.779681, 395.20422)
-items = PackedStringArray()
-line = "Birds that colour have no business being real."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"count": 3,
-"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
-"sketch": "Watching songbird blue"
-}
-
-[sub_resource type="Resource" id="Resource_47oh3"]
-script = ExtResource("2_f0tli")
-kind = &"nook"
-id = &"manor_suriel_glade_04_nook"
-position = Vector3(-672.5898, 10.65364, 513.81415)
-yaw = 0.49343705
-target = Vector3(-672.5898, 10.65364, 513.81415)
-items = PackedStringArray("col_snail_spiral")
-line = "A snail shell, a perfect spiral."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "lilac",
-"shell": "rock_mossy_c",
-"shell_scale": 0.9959781
-}
-source = "Keeper: hidden nooks fine; never a mask"
 
 [resource]
 script = ExtResource("1_uarud")

@@ -5,79 +5,21 @@
 
 [sub_resource type="Resource" id="Resource_t445d"]
 script = ExtResource("2_liuet")
-kind = &"nook"
-id = &"village_wall_00_nook"
-position = Vector3(317.77164, 1.0734861, 2123.2195)
-yaw = 2.043554
-target = Vector3(317.77164, 1.0734861, 2123.2195)
-items = PackedStringArray("col_snow_owl_down")
-line = "Owl down. Softer than anything we own."
+kind = &"snare"
+id = &"village_wall_00_snare"
+position = Vector3(290.72626, -0.3037734, 2119.3655)
+target = Vector3(290.72626, -0.3037734, 2119.3655)
+items = PackedStringArray()
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
-params = {
-"shell": "res://world/human_realm/shared/assets/flora/log_fallen.glb",
-"shell_scale": 1.1684499
-}
-source = "Keeper: hidden nooks fine; never a mask"
+source = "ch 3 (a brace of rabbits)"
 
 [sub_resource type="Resource" id="Resource_op650"]
 script = ExtResource("2_liuet")
-kind = &"rest"
-id = &"village_wall_01_rest"
-position = Vector3(116.89496, 3.181026, 1919.5638)
-yaw = -2.746026594616136
-target = Vector3(-99.94241, 9.669405, 1400.288)
-items = PackedStringArray()
-line = "Pewter sky. The snow has blue in it, if you look."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"seat": "res://world/human_realm/shared/assets/flora/stump.glb",
-"sketch": "A view on the way to wall"
-}
-source = "Keeper: on-voice (she names colours, ch 7)"
-
-[sub_resource type="Resource" id="Resource_duy75"]
-script = ExtResource("2_liuet")
 kind = &"vignette"
-id = &"village_wall_02_vignette"
-position = Vector3(36.85939, 5.19769, 1773.1743)
-target = Vector3(36.85939, 5.19769, 1773.1743)
-items = PackedStringArray()
-line = "A deer. Too far, and the wind's wrong."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"count": 1,
-"graze": true,
-"scale": 0.9,
-"scene": "res://creatures/models/deer.gltf",
-"sketch": "Watching deer"
-}
-
-[sub_resource type="Resource" id="Resource_qu077"]
-script = ExtResource("2_liuet")
-kind = &"nook"
-id = &"village_wall_03_nook"
-position = Vector3(-27.474728, 2.6405852, 1609.8856)
-yaw = -0.5199444
-target = Vector3(-27.474728, 2.6405852, 1609.8856)
-items = PackedStringArray("ing_red_ochre")
-line = "Red ochre in the bank cut. Paint, if I had oil."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"shell": "res://world/human_realm/shared/assets/flora/log_fallen.glb",
-"shell_scale": 0.9122428
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_fio2p"]
-script = ExtResource("2_liuet")
-kind = &"vignette"
-id = &"village_wall_04_vignette"
-position = Vector3(-97.377174, 0.22036631, 1488.0349)
-target = Vector3(-97.377174, 0.22036631, 1488.0349)
+id = &"village_wall_01_vignette"
+position = Vector3(119.808, 2.6200697, 1928.0381)
+target = Vector3(119.808, 2.6200697, 1928.0381)
 items = PackedStringArray()
 line = "Crows. They always know where the dead things are."
 require_flags = PackedStringArray()
@@ -87,6 +29,57 @@ params = {
 "scene": "res://creatures/ambient/scenes/crow.tscn",
 "sketch": "Watching crow"
 }
+
+[sub_resource type="Resource" id="Resource_duy75"]
+script = ExtResource("2_liuet")
+kind = &"nook"
+id = &"village_wall_02_nook"
+position = Vector3(39.061207, 5.071197, 1786.7657)
+yaw = -1.1861361
+target = Vector3(39.061207, 5.071197, 1786.7657)
+items = PackedStringArray("col_coin_old")
+line = "A copper, frozen in. That's a loaf, nearly."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/stump.glb",
+"shell_scale": 1.1673223
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_qu077"]
+script = ExtResource("2_liuet")
+kind = &"rest"
+id = &"village_wall_03_rest"
+position = Vector3(7.0387955, 3.9221008, 1653.1501)
+yaw = -2.741348459037962
+target = Vector3(-99.94241, 9.669405, 1400.288)
+items = PackedStringArray()
+line = "Bone white, slate, and the black of the trees. Not one warm colour."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "res://world/human_realm/shared/assets/flora/rock_flat.glb",
+"sketch": "A view on the way to wall"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_fio2p"]
+script = ExtResource("2_liuet")
+kind = &"nook"
+id = &"village_wall_04_nook"
+position = Vector3(-76.76392, 3.9714055, 1537.9104)
+yaw = -1.4351951
+target = Vector3(-76.76392, 3.9714055, 1537.9104)
+items = PackedStringArray("col_frost_glass")
+line = "Ice like glass, with a leaf caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"shell": "res://world/human_realm/shared/assets/flora/log_fallen.glb",
+"shell_scale": 1.1919752
+}
+source = "Keeper: hidden nooks fine; never a mask"
 
 [resource]
 script = ExtResource("1_8vr0n")

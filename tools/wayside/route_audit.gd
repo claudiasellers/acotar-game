@@ -31,14 +31,14 @@ var ROUTES := [
 	["wall gap -> sentry gate", [Vector2(-100, 1400), Vector2(0, 280)]],
 	["sentry gate -> manor (drive)", [Vector2(0, 280), M]],
 	["manor -> suriel glade", [M, Vector2(-825, 625)]],
-	["manor -> starlight glen", [M, Vector2(-1050, 50)]],
-	["manor -> fae village", [M, Vector2(-1050, -875)]],
-	["manor -> rose spire", [M, Vector2(0, -700)]],
-	["manor -> solstice meadow", [M, Vector2(-150, -1075)]],
-	["manor -> hill of the rite", [M, Vector2(800, -1100)]],
+	["manor -> starlight glen", [M, Vector2(-596, -90), Vector2(-790, 12), Vector2(-995, 105), Vector2(-1192, 268)]],
+	["manor -> fae village", [M, Vector2(-470, -496), Vector2(-680, -700), Vector2(-790, -748), Vector2(-930, -790)]],
+	["manor -> rose spire", [M, Vector2(0, -496), Vector2(-60, -650), Vector2(-320, -660)]],
+	["manor -> solstice meadow", [M, Vector2(0, -496), Vector2(-60, -650), Vector2(-142, -822), Vector2(-150, -1060)]],
+	["manor -> hill of the rite", [M, Vector2(450, -496), Vector2(572, -640), Vector2(555, -790), Vector2(560, -990), Vector2(620, -1050), Vector2(860, -1140)]],
 	["manor -> eastern woods", [M, Vector2(1250, -50)]],
-	["manor -> blossom vale", [M, Vector2(1000, 950)]],
-	["manor -> fells foot", [M, Vector2(-1100, 1000)]],
+	["manor -> blossom vale", [M, Vector2(560, 302), Vector2(575, 500), Vector2(720, 700), Vector2(1000, 880)]],
+	["manor -> fells foot", [M, Vector2(-1300, 900)]],
 ]
 
 var points: Array = []  # [kind, x, z, label]

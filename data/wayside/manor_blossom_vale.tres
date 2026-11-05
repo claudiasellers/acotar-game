@@ -7,24 +7,41 @@
 script = ExtResource("2_t87dh")
 kind = &"vignette"
 id = &"manor_blossom_vale_00_vignette"
-position = Vector3(89.2141, 8.522651, 76.11817)
-target = Vector3(89.2141, 8.522651, 76.11817)
+position = Vector3(121.584236, 7.4, 58.538876)
+target = Vector3(121.584236, 7.4, 58.538876)
 items = PackedStringArray()
-line = "Squirrels, scolding me from the oak."
+line = "Rabbits. Fat ones. I don't need to hunt them here."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"count": 2,
-"scene": "res://creatures/ambient/scenes/squirrel.tscn",
-"sketch": "Watching squirrel"
+"count": 3,
+"scene": "res://creatures/ambient/scenes/rabbit.tscn",
+"sketch": "Watching rabbit"
 }
 
 [sub_resource type="Resource" id="Resource_u3s0j"]
 script = ExtResource("2_t87dh")
+kind = &"rest"
+id = &"manor_blossom_vale_01_rest"
+position = Vector3(275.08658, 7.4025836, 115.95503)
+yaw = 0.7591443184871922
+target = Vector3(999.8835, 28.19328, 879.84467)
+items = PackedStringArray()
+line = "Ochre in the grass, and a cool green where it turns to shade."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "rock_mossy_b",
+"sketch": "A view on the way to blossom vale"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
+[sub_resource type="Resource" id="Resource_fe8e5"]
+script = ExtResource("2_t87dh")
 kind = &"shimmer"
-id = &"manor_blossom_vale_01_shimmer"
-position = Vector3(206.55634, 7.4, 163.00526)
-target = Vector3(245.19336, 7.4248347, 173.35803)
+id = &"manor_blossom_vale_02_shimmer"
+position = Vector3(382.47614, 8.913461, 204.42819)
+target = Vector3(410.7604, 13.761037, 232.71246)
 items = PackedStringArray()
 line = "Only the wind in the leaves."
 require_flags = PackedStringArray()
@@ -36,112 +53,95 @@ params = {
 canon = "C"
 source = "ch 14 (the shimmer in the corner of her eye)"
 
-[sub_resource type="Resource" id="Resource_fe8e5"]
-script = ExtResource("2_t87dh")
-kind = &"nook"
-id = &"manor_blossom_vale_02_nook"
-position = Vector3(301.27496, 8.051153, 276.50546)
-yaw = 1.019634
-target = Vector3(301.27496, 8.051153, 276.50546)
-items = PackedStringArray("col_acorn_carved")
-line = "A carved acorn. Someone's small, careful work."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "bunting",
-"shell": "rock_mossy_a",
-"shell_scale": 1.0237107
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
 [sub_resource type="Resource" id="Resource_81wul"]
 script = ExtResource("2_t87dh")
-kind = &"rest"
-id = &"manor_blossom_vale_03_rest"
-position = Vector3(438.5005, 16.232468, 369.3713)
-yaw = 0.7686253128821328
-target = Vector3(999.46826, 27.719063, 949.48)
+kind = &"vignette"
+id = &"manor_blossom_vale_03_vignette"
+position = Vector3(546.32043, 15.566576, 279.51187)
+target = Vector3(546.32043, 15.566576, 279.51187)
 items = PackedStringArray()
-line = "Emerald, then jade, then a blue I don't have a name for."
+line = "Rabbits. Fat ones. I don't need to hunt them here."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"seat": "fells_overlook_bench",
-"sketch": "A view on the way to blossom vale"
+"count": 3,
+"scene": "res://creatures/ambient/scenes/rabbit.tscn",
+"sketch": "Watching rabbit"
 }
-source = "Keeper: on-voice (she names colours, ch 7)"
 
 [sub_resource type="Resource" id="Resource_jfd2i"]
 script = ExtResource("2_t87dh")
-kind = &"vignette"
-id = &"manor_blossom_vale_04_vignette"
-position = Vector3(530.6459, 6.7561913, 509.7689)
-target = Vector3(530.6459, 6.7561913, 509.7689)
-items = PackedStringArray()
-line = "Squirrels, scolding me from the oak."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"count": 2,
-"scene": "res://creatures/ambient/scenes/squirrel.tscn",
-"sketch": "Watching squirrel"
-}
-
-[sub_resource type="Resource" id="Resource_f8ier"]
-script = ExtResource("2_t87dh")
 kind = &"nook"
-id = &"manor_blossom_vale_05_nook"
-position = Vector3(656.1163, 0.33708844, 594.7833)
-yaw = 0.37268066
-target = Vector3(656.1163, 0.33708844, 594.7833)
-items = PackedStringArray("ing_woad")
-line = "Woad. Blue, if I'm patient with it."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "",
-"shell": "rock_mossy_a",
-"shell_scale": 1.069036
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_d4jfl"]
-script = ExtResource("2_t87dh")
-kind = &"vignette"
-id = &"manor_blossom_vale_06_vignette"
-position = Vector3(759.9185, 4.4160237, 727.55334)
-target = Vector3(759.9185, 4.4160237, 727.55334)
-items = PackedStringArray()
-line = "Squirrels, scolding me from the oak."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"count": 2,
-"scene": "res://creatures/ambient/scenes/squirrel.tscn",
-"sketch": "Watching squirrel"
-}
-
-[sub_resource type="Resource" id="Resource_kc328"]
-script = ExtResource("2_t87dh")
-kind = &"nook"
-id = &"manor_blossom_vale_07_nook"
-position = Vector3(870.52155, 9.402907, 808.4872)
-yaw = -2.3589907
-target = Vector3(870.52155, 9.402907, 808.4872)
+id = &"manor_blossom_vale_04_nook"
+position = Vector3(554.94, 8.976172, 409.26645)
+yaw = 1.8783658
+target = Vector3(554.94, 8.976172, 409.26645)
 items = PackedStringArray("col_snail_spiral")
 line = "A snail shell, a perfect spiral."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"cue": "bunting",
-"shell": "rock_mossy_d",
-"shell_scale": 0.99608654
+"cue": "",
+"shell": "rock_mossy_c",
+"shell_scale": 0.94636637
 }
 source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_f8ier"]
+script = ExtResource("2_t87dh")
+kind = &"shimmer"
+id = &"manor_blossom_vale_05_shimmer"
+position = Vector3(620.44086, 10.495623, 565.0729)
+target = Vector3(606.2987, 18.086618, 579.215)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
+
+[sub_resource type="Resource" id="Resource_d4jfl"]
+script = ExtResource("2_t87dh")
+kind = &"nook"
+id = &"manor_blossom_vale_06_nook"
+position = Vector3(715.3934, 31.157211, 683.7078)
+yaw = 0.38052535
+target = Vector3(715.3934, 31.157211, 683.7078)
+items = PackedStringArray("ing_madder")
+line = "Madder root. A red worth the digging."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "lilac",
+"shell": "rock_mossy_a",
+"shell_scale": 1.1887224
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_kc328"]
+script = ExtResource("2_t87dh")
+kind = &"rest"
+id = &"manor_blossom_vale_07_rest"
+position = Vector3(863.3246, 24.922562, 740.41956)
+yaw = 0.7750131127934541
+target = Vector3(999.8835, 28.19328, 879.84467)
+items = PackedStringArray()
+line = "Sap green, and gold where the light comes through. Cerulean above it all."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "fae_bench",
+"sketch": "A view on the way to blossom vale"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
 
 [resource]
 script = ExtResource("1_qp1ii")
 id = &"manor_blossom_vale"
 realm = &"spring_court"
-waypoints = PackedVector2Array(0, -28, 1000, 950)
+waypoints = PackedVector2Array(0, -28, 560, 302, 565, 420, 575, 500, 620, 580, 670, 645, 720, 700, 800, 740, 900, 780, 970, 840, 1000, 880)
 spots = Array[ExtResource("2_t87dh")]([SubResource("Resource_dklh6"), SubResource("Resource_u3s0j"), SubResource("Resource_fe8e5"), SubResource("Resource_81wul"), SubResource("Resource_jfd2i"), SubResource("Resource_f8ier"), SubResource("Resource_d4jfl"), SubResource("Resource_kc328")])

@@ -78,7 +78,7 @@ canon = "X"
 [sub_resource type="Resource" id="p9"]
 script = ExtResource("2")
 id = &"western_fells"
-label = "Western Fells"
+label = "The Western Woods"
 rect = Rect2(-1800, -900, 300, 2300)
 label_at = Vector2(-1650, 250)
 canon = "X"
@@ -96,7 +96,7 @@ script = ExtResource("2")
 id = &"fae_village"
 label = "Village of the Lesser Fae"
 rect = Rect2(-1500, -1250, 900, 750)
-label_at = Vector2(-1050, -875)
+label_at = Vector2(-930, -800)
 canon = "X"
 
 [sub_resource type="Resource" id="p12"]
@@ -128,7 +128,7 @@ script = ExtResource("2")
 id = &"hill_of_the_rite"
 label = "The Hill of the Rite"
 rect = Rect2(300, -1500, 1000, 800)
-label_at = Vector2(800, -1100)
+label_at = Vector2(870, -1140)
 canon = "X"
 
 [sub_resource type="Resource" id="p16"]
@@ -144,7 +144,7 @@ script = ExtResource("2")
 id = &"blossom_vale"
 label = "Blossom Vale"
 rect = Rect2(500, 500, 1000, 900)
-label_at = Vector2(1000, 950)
+label_at = Vector2(1000, 880)
 canon = "X"
 
 [resource]

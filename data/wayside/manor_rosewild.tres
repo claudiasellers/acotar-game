@@ -27,7 +27,7 @@ script = ExtResource("2_ptpml")
 kind = &"nook"
 id = &"manor_rosewild_bunting"
 position = Vector3(-40, 8.4591, -250)
-yaw = 2.8801324
+yaw = 2.0621727
 target = Vector3(-40, 8.4591, -250)
 items = PackedStringArray("col_wren_feather")
 line = "Followed the bunting. It left me a feather."
@@ -35,56 +35,21 @@ require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
 "cue": "bunting",
-"shell": "rock_mossy_d",
-"shell_scale": 1.0731637
+"shell": "rock_mossy_a",
+"shell_scale": 1.1155174
 }
 canon = "C?"
 source = "ch 7 (the chirping of a bunting, hyacinth on the breeze)"
 
 [sub_resource type="Resource" id="Resource_wqt78"]
 script = ExtResource("2_ptpml")
-kind = &"shimmer"
-id = &"manor_rosewild_00_shimmer"
-position = Vector3(-10.427225, 6.7140093, -210.53474)
-target = Vector3(-45.068237, 9.466771, -230.53474)
-items = PackedStringArray()
-line = "Only the wind in the leaves."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"lifted_line": "Not the wind. Something small, and quick, and gone.",
-"tree": "flora_tree_spring_oak"
-}
-canon = "C"
-source = "ch 14 (the shimmer in the corner of her eye)"
-
-[sub_resource type="Resource" id="Resource_3h7nj"]
-script = ExtResource("2_ptpml")
-kind = &"nook"
-id = &"manor_rosewild_01_nook"
-position = Vector3(-12.110983, 11.850336, -376.15247)
-yaw = -0.08290076
-target = Vector3(-12.110983, 11.850336, -376.15247)
-items = PackedStringArray("col_stone_garnet")
-line = "A garnet in the moss. Like a drop of wine."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "",
-"shell": "rock_mossy_d",
-"shell_scale": 0.9338139
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_y85v5"]
-script = ExtResource("2_ptpml")
 kind = &"rest"
-id = &"manor_rosewild_02_rest"
-position = Vector3(20.216978, 12.954087, -519.1979)
-yaw = -3.030236966204362
-target = Vector3(0, 14.27338, -700)
+id = &"manor_rosewild_00_rest"
+position = Vector3(6.688394, 8.779044, -228.81902)
+yaw = -2.493631532787733
+target = Vector3(-319.71225, 41.154842, -660)
 items = PackedStringArray()
-line = "If I had paints, I'd start with the sky and never finish."
+line = "Viridian. Rose madder. A violet so deep it could be black."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
@@ -93,9 +58,76 @@ params = {
 }
 source = "Keeper: on-voice (she names colours, ch 7)"
 
+[sub_resource type="Resource" id="Resource_3h7nj"]
+script = ExtResource("2_ptpml")
+kind = &"vignette"
+id = &"manor_rosewild_01_vignette"
+position = Vector3(-12.696135, 11.88165, -374.1189)
+target = Vector3(-12.696135, 11.88165, -374.1189)
+items = PackedStringArray()
+line = "A bunting, somewhere. The air smells of hyacinth."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_rose.tscn",
+"sketch": "Watching songbird rose"
+}
+
+[sub_resource type="Resource" id="Resource_y85v5"]
+script = ExtResource("2_ptpml")
+kind = &"nook"
+id = &"manor_rosewild_02_nook"
+position = Vector3(4.821803, 12.060134, -523.66614)
+yaw = 1.907057
+target = Vector3(4.821803, 12.060134, -523.66614)
+items = PackedStringArray("col_coin_old")
+line = "An old coin, worn smooth. No face left on it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "autumn_fallen_log",
+"shell_scale": 0.9083487
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_dgmpj"]
+script = ExtResource("2_ptpml")
+kind = &"vignette"
+id = &"manor_rosewild_03_vignette"
+position = Vector3(-78.589035, 30.23527, -644.6685)
+target = Vector3(-78.589035, 30.23527, -644.6685)
+items = PackedStringArray()
+line = "A fox. It looked at me like it knew the way."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 1,
+"scene": "res://creatures/ambient/scenes/fox.tscn",
+"sketch": "Watching fox"
+}
+
+[sub_resource type="Resource" id="Resource_jt8yc"]
+script = ExtResource("2_ptpml")
+kind = &"rest"
+id = &"manor_rosewild_04_rest"
+position = Vector3(-220.32526, 20.216982, -668.0132)
+yaw = -1.490344274429834
+target = Vector3(-319.71225, 41.154842, -660)
+items = PackedStringArray()
+line = "Butter yellow on the hill. Periwinkle in the distance."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"seat": "autumn_fallen_log",
+"sketch": "A view on the way to rosewild"
+}
+source = "Keeper: on-voice (she names colours, ch 7)"
+
 [resource]
 script = ExtResource("1_42jox")
 id = &"manor_rosewild"
 realm = &"spring_court"
-waypoints = PackedVector2Array(0, -28, 0, -700)
-spots = Array[ExtResource("2_ptpml")]([SubResource("Resource_k80xy"), SubResource("Resource_kn8hw"), SubResource("Resource_wqt78"), SubResource("Resource_3h7nj"), SubResource("Resource_y85v5")])
+waypoints = PackedVector2Array(0, -28, 0, -496, -25, -580, -60, -650, -190, -660, -320, -660)
+spots = Array[ExtResource("2_ptpml")]([SubResource("Resource_k80xy"), SubResource("Resource_kn8hw"), SubResource("Resource_wqt78"), SubResource("Resource_3h7nj"), SubResource("Resource_y85v5"), SubResource("Resource_dgmpj"), SubResource("Resource_jt8yc")])

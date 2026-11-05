@@ -744,49 +744,49 @@ emotion = &"laugh"
 script = ExtResource("2")
 id = &"great_lantern_tree"
 region = &"fae_village"
-at = Vector2(-990.0, -905.0)
+at = Vector2(-925.0, -792.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P1"]
 script = ExtResource("2")
 id = &"lantern_bridge"
 region = &"fae_village"
-at = Vector2(-1051.0, -846.0)
+at = Vector2(-1060.0, -762.0)
 radius = 22.8
 
 [sub_resource type="Resource" id="P2"]
 script = ExtResource("2")
 id = &"village_mill"
 region = &"fae_village"
-at = Vector2(-1150.0, -950.0)
+at = Vector2(-1210.0, -985.0)
 radius = 18.0
 
 [sub_resource type="Resource" id="P3"]
 script = ExtResource("2")
 id = &"seamstress"
 region = &"fae_village"
-at = Vector2(-960.0, -960.0)
+at = Vector2(-890.0, -835.0)
 radius = 18.0
 
 [sub_resource type="Resource" id="P4"]
 script = ExtResource("2")
 id = &"potion_house"
 region = &"fae_village"
-at = Vector2(-1060.0, -980.0)
+at = Vector2(-977.0, -853.0)
 radius = 18.0
 
 [sub_resource type="Resource" id="P5"]
 script = ExtResource("2")
 id = &"market"
 region = &"fae_village"
-at = Vector2(-940.0, -880.0)
+at = Vector2(-895.0, -778.0)
 radius = 28.0
 
 [sub_resource type="Resource" id="P6"]
 script = ExtResource("2")
 id = &"cottages"
 region = &"fae_village"
-at = Vector2(-1000.0, -820.0)
+at = Vector2(-968.0, -760.0)
 radius = 33.2
 
 [resource]

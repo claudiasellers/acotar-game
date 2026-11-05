@@ -7,11 +7,11 @@
 script = ExtResource("2_vfw2c")
 kind = &"rest"
 id = &"manor_eastern_woods_00_rest"
-position = Vector3(182.68896, 9.225858, -29.541342)
-yaw = 1.589962677458105
+position = Vector3(181.85907, 9.280044, -25.396437)
+yaw = 1.5938272446299533
 target = Vector3(1249.8064, 16.551105, -49.996593)
 items = PackedStringArray()
-line = "Butter yellow on the hill. Periwinkle in the distance."
+line = "Sap green, and gold where the light comes through. Cerulean above it all."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
@@ -22,28 +22,26 @@ source = "Keeper: on-voice (she names colours, ch 7)"
 
 [sub_resource type="Resource" id="Resource_c5nyt"]
 script = ExtResource("2_vfw2c")
-kind = &"nook"
-id = &"manor_eastern_woods_01_nook"
-position = Vector3(336.69125, 8.64454, -48.63161)
-yaw = 0.7674837
-target = Vector3(336.69125, 8.64454, -48.63161)
-items = PackedStringArray("col_stone_quartz")
-line = "A stone with the light caught in it."
+kind = &"vignette"
+id = &"manor_eastern_woods_01_vignette"
+position = Vector3(309.30096, 8.192632, -46.400078)
+target = Vector3(309.30096, 8.192632, -46.400078)
+items = PackedStringArray()
+line = "Rabbits. Fat ones. I don't need to hunt them here."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"cue": "",
-"shell": "rock_mossy_c",
-"shell_scale": 1.0084294
+"count": 3,
+"scene": "res://creatures/ambient/scenes/rabbit.tscn",
+"sketch": "Watching rabbit"
 }
-source = "Keeper: hidden nooks fine; never a mask"
 
 [sub_resource type="Resource" id="Resource_s6y28"]
 script = ExtResource("2_vfw2c")
 kind = &"rest"
 id = &"manor_eastern_woods_02_rest"
-position = Vector3(485.52808, 13.780162, -30.028254)
-yaw = 1.5969174369117984
+position = Vector3(497.8051, 15.084882, -24.627096)
+yaw = 1.6045195131834105
 target = Vector3(1249.8064, 16.551105, -49.996593)
 items = PackedStringArray()
 line = "Sap green, and gold where the light comes through. Cerulean above it all."
@@ -59,42 +57,24 @@ source = "Keeper: on-voice (she names colours, ch 7)"
 script = ExtResource("2_vfw2c")
 kind = &"vignette"
 id = &"manor_eastern_woods_03_vignette"
-position = Vector3(617.7476, 13.533645, -50.077538)
-target = Vector3(617.7476, 13.533645, -50.077538)
+position = Vector3(639.3715, 12.615454, -45.72043)
+target = Vector3(639.3715, 12.615454, -45.72043)
 items = PackedStringArray()
-line = "A lark going up and up."
+line = "A bunting, somewhere. The air smells of hyacinth."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"count": 2,
-"scene": "res://creatures/ambient/scenes/lark.tscn",
-"sketch": "Watching lark"
+"count": 3,
+"scene": "res://creatures/ambient/scenes/songbird_rose.tscn",
+"sketch": "Watching songbird rose"
 }
 
 [sub_resource type="Resource" id="Resource_8vah5"]
 script = ExtResource("2_vfw2c")
-kind = &"nook"
-id = &"manor_eastern_woods_04_nook"
-position = Vector3(789.6639, 12.155301, -31.149155)
-yaw = -2.3922367
-target = Vector3(789.6639, 12.155301, -31.149155)
-items = PackedStringArray("col_coin_old")
-line = "An old coin, worn smooth. No face left on it."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "",
-"shell": "autumn_fallen_log",
-"shell_scale": 1.0637556
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_fgc87"]
-script = ExtResource("2_vfw2c")
 kind = &"shimmer"
-id = &"manor_eastern_woods_05_shimmer"
-position = Vector3(942.6931, 13.171127, -52.925323)
-target = Vector3(981.33014, 15.023319, -63.278084)
+id = &"manor_eastern_woods_04_shimmer"
+position = Vector3(807.36194, 14.638918, -27.554502)
+target = Vector3(824.68243, 15.731958, -17.554502)
 items = PackedStringArray()
 line = "Only the wind in the leaves."
 require_flags = PackedStringArray()
@@ -106,21 +86,41 @@ params = {
 canon = "C"
 source = "ch 14 (the shimmer in the corner of her eye)"
 
-[sub_resource type="Resource" id="Resource_6xeaa"]
+[sub_resource type="Resource" id="Resource_fgc87"]
 script = ExtResource("2_vfw2c")
-kind = &"vignette"
-id = &"manor_eastern_woods_06_vignette"
-position = Vector3(1097.5287, 11.285084, -33.63346)
-target = Vector3(1097.5287, 11.285084, -33.63346)
-items = PackedStringArray()
-line = "A lark going up and up."
+kind = &"nook"
+id = &"manor_eastern_woods_05_nook"
+position = Vector3(968.2508, 14.80161, -58.08246)
+yaw = 2.4084003
+target = Vector3(968.2508, 14.80161, -58.08246)
+items = PackedStringArray("col_silver_leaf")
+line = "A leaf gone silver at the edges."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"count": 2,
-"scene": "res://creatures/ambient/scenes/lark.tscn",
-"sketch": "Watching lark"
+"cue": "bunting",
+"shell": "rock_mossy_d",
+"shell_scale": 1.1998788
 }
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_6xeaa"]
+script = ExtResource("2_vfw2c")
+kind = &"nook"
+id = &"manor_eastern_woods_06_nook"
+position = Vector3(1118.5865, 8.714533, -36.134644)
+yaw = -2.734151
+target = Vector3(1118.5865, 8.714533, -36.134644)
+items = PackedStringArray("col_river_glass")
+line = "River glass. Green as the light under the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.1993444
+}
+source = "Keeper: hidden nooks fine; never a mask"
 
 [resource]
 script = ExtResource("1_div8f")

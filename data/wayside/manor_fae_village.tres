@@ -5,62 +5,10 @@
 
 [sub_resource type="Resource" id="Resource_p6cxp"]
 script = ExtResource("2_mao11")
-kind = &"nook"
-id = &"manor_fae_village_00_nook"
-position = Vector3(-92.47298, 8, -85.45581)
-yaw = -1.8489103
-target = Vector3(-92.47298, 8, -85.45581)
-items = PackedStringArray("col_stone_garnet")
-line = "A garnet in the moss. Like a drop of wine."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "",
-"shell": "rock_mossy_c",
-"shell_scale": 1.1279106
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_6ip7a"]
-script = ExtResource("2_mao11")
-kind = &"vignette"
-id = &"manor_fae_village_01_vignette"
-position = Vector3(-273.33224, 7.354752, -230.39484)
-target = Vector3(-273.33224, 7.354752, -230.39484)
-items = PackedStringArray()
-line = "Birds that colour have no business being real."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"count": 3,
-"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
-"sketch": "Watching songbird blue"
-}
-
-[sub_resource type="Resource" id="Resource_e2dqo"]
-script = ExtResource("2_mao11")
-kind = &"nook"
-id = &"manor_fae_village_02_nook"
-position = Vector3(-384.6593, 10.093215, -329.01593)
-yaw = 1.5168312
-target = Vector3(-384.6593, 10.093215, -329.01593)
-items = PackedStringArray("ing_lapis_shard")
-line = "Lapis. Nesta would sell it. I'd grind it for blue."
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-params = {
-"cue": "lilac",
-"shell": "rock_mossy_d",
-"shell_scale": 1.1497176
-}
-source = "Keeper: hidden nooks fine; never a mask"
-
-[sub_resource type="Resource" id="Resource_tu8iv"]
-script = ExtResource("2_mao11")
 kind = &"shimmer"
-id = &"manor_fae_village_03_shimmer"
-position = Vector3(-496.30792, 9.046963, -439.0686)
-target = Vector3(-496.30792, 10.384515, -419.0686)
+id = &"manor_fae_village_00_shimmer"
+position = Vector3(-98.05277, 7.750376, -106.62886)
+target = Vector3(-108.40553, 9.171481, -145.2659)
 items = PackedStringArray()
 line = "Only the wind in the leaves."
 require_flags = PackedStringArray()
@@ -72,31 +20,65 @@ params = {
 canon = "C"
 source = "ch 14 (the shimmer in the corner of her eye)"
 
-[sub_resource type="Resource" id="Resource_1eojb"]
+[sub_resource type="Resource" id="Resource_6ip7a"]
 script = ExtResource("2_mao11")
 kind = &"vignette"
-id = &"manor_fae_village_04_vignette"
-position = Vector3(-623.0552, 13.252869, -519.3347)
-target = Vector3(-623.0552, 13.252869, -519.3347)
+id = &"manor_fae_village_01_vignette"
+position = Vector3(-216.75449, 7.097122, -260.44052)
+target = Vector3(-216.75449, 7.097122, -260.44052)
 items = PackedStringArray()
-line = "Birds that colour have no business being real."
+line = "Rabbits. Fat ones. I don't need to hunt them here."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
 "count": 3,
-"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
-"sketch": "Watching songbird blue"
+"scene": "res://creatures/ambient/scenes/rabbit.tscn",
+"sketch": "Watching rabbit"
 }
 
-[sub_resource type="Resource" id="Resource_67762"]
+[sub_resource type="Resource" id="Resource_e2dqo"]
+script = ExtResource("2_mao11")
+kind = &"nook"
+id = &"manor_fae_village_02_nook"
+position = Vector3(-341.36084, 9.66667, -351.80157)
+yaw = -2.6154592
+target = Vector3(-341.36084, 9.66667, -351.80157)
+items = PackedStringArray("col_stone_quartz")
+line = "A stone with the light caught in it."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"cue": "bunting",
+"shell": "autumn_fallen_log",
+"shell_scale": 1.0848467
+}
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_tu8iv"]
+script = ExtResource("2_mao11")
+kind = &"vignette"
+id = &"manor_fae_village_03_vignette"
+position = Vector3(-435.4577, 4.2412167, -474.65338)
+target = Vector3(-435.4577, 4.2412167, -474.65338)
+items = PackedStringArray()
+line = "Squirrels, scolding me from the oak."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"count": 2,
+"scene": "res://creatures/ambient/scenes/squirrel.tscn",
+"sketch": "Watching squirrel"
+}
+
+[sub_resource type="Resource" id="Resource_1eojb"]
 script = ExtResource("2_mao11")
 kind = &"rest"
-id = &"manor_fae_village_05_rest"
-position = Vector3(-725.3828, 22.221823, -650.5152)
-yaw = -2.1758122820506567
-target = Vector3(-1049.9689, 27.744717, -874.97485)
+id = &"manor_fae_village_04_rest"
+position = Vector3(-575.90295, 24.512503, -609.3988)
+yaw = -2.0425233466684607
+target = Vector3(-929.819, 56.5, -789.9457)
 items = PackedStringArray()
-line = "Butter yellow on the hill. Periwinkle in the distance."
+line = "Emerald, then jade, then a blue I don't have a name for."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
@@ -105,25 +87,44 @@ params = {
 }
 source = "Keeper: on-voice (she names colours, ch 7)"
 
-[sub_resource type="Resource" id="Resource_8801a"]
+[sub_resource type="Resource" id="Resource_67762"]
 script = ExtResource("2_mao11")
-kind = &"vignette"
-id = &"manor_fae_village_06_vignette"
-position = Vector3(-890.3562, 15.882014, -736.8109)
-target = Vector3(-890.3562, 15.882014, -736.8109)
-items = PackedStringArray()
-line = "Birds that colour have no business being real."
+kind = &"nook"
+id = &"manor_fae_village_05_nook"
+position = Vector3(-692.64685, 45.827682, -716.91943)
+yaw = 2.9418347
+target = Vector3(-692.64685, 45.827682, -716.91943)
+items = PackedStringArray("ing_woad")
+line = "Woad. Blue, if I'm patient with it."
 require_flags = PackedStringArray()
 forbid_flags = PackedStringArray()
 params = {
-"count": 3,
-"scene": "res://creatures/ambient/scenes/songbird_blue.tscn",
-"sketch": "Watching songbird blue"
+"cue": "",
+"shell": "rock_mossy_d",
+"shell_scale": 1.0916891
 }
+source = "Keeper: hidden nooks fine; never a mask"
+
+[sub_resource type="Resource" id="Resource_8801a"]
+script = ExtResource("2_mao11")
+kind = &"shimmer"
+id = &"manor_fae_village_06_shimmer"
+position = Vector3(-853.7042, 42.010616, -757.01404)
+target = Vector3(-819.06323, 45.95731, -777.01404)
+items = PackedStringArray()
+line = "Only the wind in the leaves."
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+params = {
+"lifted_line": "Not the wind. Something small, and quick, and gone.",
+"tree": "flora_tree_spring_oak"
+}
+canon = "C"
+source = "ch 14 (the shimmer in the corner of her eye)"
 
 [resource]
 script = ExtResource("1_0hqfl")
 id = &"manor_fae_village"
 realm = &"spring_court"
-waypoints = PackedVector2Array(0, -28, -1050, -875)
+waypoints = PackedVector2Array(0, -28, -470, -496, -560, -600, -680, -700, -790, -748, -880, -775, -930, -790)
 spots = Array[ExtResource("2_mao11")]([SubResource("Resource_p6cxp"), SubResource("Resource_6ip7a"), SubResource("Resource_e2dqo"), SubResource("Resource_tu8iv"), SubResource("Resource_1eojb"), SubResource("Resource_67762"), SubResource("Resource_8801a")])
