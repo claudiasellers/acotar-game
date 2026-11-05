@@ -1,0 +1,3 @@
+from wider-court-world
+quality look
+shot looks res://tools/court/court_terrain_shots.tscn {out} exit_north glen_saddle village_pinch the_mound regions looks=photo,soft,pastel,storybook src=/Users/claudiasellers/Documents/acotar-game/.git/mq/tmp/polyhaven
