@@ -1,0 +1,3 @@
+from wider-court-world
+quality look
+shot looks res://tools/court/court_terrain_shots.tscn {out} exit_north village_pinch brae_top plateau_east rite_crown regions looks=storybook,storybook_deep,storybook_deeper src=/Users/claudiasellers/Documents/acotar-game/.git/mq/tmp/polyhaven
