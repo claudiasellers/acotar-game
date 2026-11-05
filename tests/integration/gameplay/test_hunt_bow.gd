@@ -2,6 +2,9 @@
 ## on the screen the player sees (the hunt's tighter lens included), slow time
 ## waits for her breath after she runs dry, and a scene taking the bow away
 ## mid-draw lowers it instead of loosing the arrow.
+## T084: one press does it all. Holding fire alone aims and draws, letting go
+## looses; a click too short to draw lowers the bow and keeps the arrow.
+## T085: that left-only draw slows time and spends breath like right-mouse aim.
 extends GutTest
 
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
@@ -85,3 +88,109 @@ func test_losing_the_bow_mid_draw_does_not_loose_the_arrow() -> void:
 	assert_eq(fired.size(), 0, "no arrow loosed into the cutscene")
 	assert_eq(Gameplay.inventory.arrow_count(), before, "the arrow is still in the quiver")
 	assert_eq(Engine.time_scale, 1.0, "slow time ends with the draw")
+
+
+## Turns her camera a step toward `point`, as a mouse would.
+func _turn_toward(point: Vector3) -> void:
+	var cam := feyre.camera
+	var want := (point - cam.global_position).normalized()
+	var have := -cam.global_basis.z
+	var dyaw := wrapf(atan2(-want.x, -want.z) - atan2(-have.x, -have.z), -PI, PI)
+	var dpitch := asin(clampf(want.y, -1, 1)) - asin(clampf(have.y, -1, 1))
+	feyre.nudge_camera(dyaw * 0.5, dpitch * 0.5)
+
+
+## A great-wolf-sized body (its hitbox: 0.55 x 1.25 x 2.04 m) standing
+## broadside `distance` metres east of her, clear of the hill's mantle ledges.
+func _wolf_at(distance: float) -> StaticBody3D:
+	var ahead := Vector3.RIGHT
+	var at := feyre.global_position + ahead * distance
+	at.y = hill.height_at(at.x, at.z)
+	var wolf := StaticBody3D.new()
+	wolf.collision_layer = Creature.TARGET_LAYER
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.04, 1.25, 0.55)
+	shape.shape = box
+	shape.position.y = 0.625
+	wolf.add_child(shape)
+	hill.add_child(wolf)
+	wolf.global_position = at
+	wolf.look_at(at + ahead, Vector3.UP)
+	return wolf
+
+
+func test_a_quick_click_lowers_the_bow_and_keeps_the_arrow() -> void:
+	var fired: Array = []
+	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
+	watch_signals(feyre.bow_controller)
+	var before := Gameplay.inventory.arrow_count()
+	Input.action_press(&"fire")
+	await wait_seconds(0.1)
+	assert_true(feyre.bow_controller.is_drawing, "the click starts a draw")
+	Input.action_release(&"fire")
+	await wait_physics_frames(3)
+	assert_false(feyre.bow_controller.is_drawing, "the bow comes down")
+	assert_eq(fired.size(), 0, "no feeble arrow")
+	assert_eq(Gameplay.inventory.arrow_count(), before, "the arrow is still nocked")
+	assert_signal_emitted(feyre.bow_controller, "draw_too_short", "the draw hint comes back")
+
+
+func test_one_long_hold_aims_and_looses_a_full_arrow_into_the_wolf() -> void:
+	var wolf := _wolf_at(21.0)
+	await wait_physics_frames(2)
+	var fired: Array = []
+	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
+	var before := Gameplay.inventory.arrow_count()
+	var aim_at := wolf.global_position + Vector3.UP * 1.2
+	Input.action_press(&"fire")
+	var held := 0.0
+	var seen_reticle := false
+	while held < 1.0:
+		_turn_toward(aim_at)
+		await get_tree().physics_frame
+		held += get_physics_process_delta_time()
+		seen_reticle = seen_reticle or _reticle().visible
+	assert_false(Input.is_action_pressed(&"aim"), "no right mouse")
+	assert_true(feyre.bow_controller.is_drawing, "holding fire draws")
+	assert_true(seen_reticle, "holding fire alone brings up the reticle")
+	assert_almost_eq(feyre.bow_controller.draw_amount, 1.0, 0.001, "a full draw")
+	var hits: Array = []
+	Input.action_release(&"fire")
+	await wait_physics_frames(2)
+	assert_eq(fired.size(), 1, "letting go looses one arrow")
+	assert_eq(Gameplay.inventory.arrow_count(), before - 1)
+	if fired.is_empty():
+		return
+	(fired[0] as Arrow).hit.connect(func(c: Node, _at: Vector3) -> void:
+		hits.append(c))
+	await wait_until(func() -> bool: return not hits.is_empty(), 2.0)
+	assert_eq(hits.size(), 1, "the arrow lands")
+	if not hits.is_empty():
+		assert_eq(hits[0], wolf, "it reaches the wolf at 21 m")
+
+
+func test_a_left_only_hold_slows_time_and_spends_breath() -> void:
+	var bow := feyre.bow_controller
+	var full := feyre.stamina
+	var slowed := false
+	Input.action_press(&"fire")
+	for i in 60:
+		await get_tree().physics_frame
+		slowed = slowed or bow.slowing
+	assert_false(Input.is_action_pressed(&"aim"), "no right mouse")
+	assert_true(slowed, "holding fire alone slows time")
+	assert_lt(feyre.stamina, full, "slow time spends her breath")
+	Input.action_release(&"fire")
+	await wait_physics_frames(2)
+	assert_eq(Engine.time_scale, 1.0, "time runs again after the shot")
+
+
+func test_a_quick_click_never_slows_time() -> void:
+	var bow := feyre.bow_controller
+	for i in 3:
+		bow.update_draw(0.05, true, false)
+		assert_false(bow.slowing, "too short a draw to slow time")
+	bow.update_draw(1.0 / 60.0, false, false)
+	assert_false(bow.slowing)
+	assert_eq(Engine.time_scale, 1.0)
