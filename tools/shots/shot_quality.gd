@@ -35,7 +35,14 @@ static func default_warmup(quality: StringName) -> float:
 ## Sizes the viewport and, for layout, strips everything expensive under `root`.
 static func apply(quality: StringName, viewport: Viewport, root: Node, size: Vector2i) -> void:
 	if viewport is Window:
-		(viewport as Window).size = size
+		var win := viewport as Window
+		# A quiet Mac render (T087, tools/mq/shots_common.sh) keeps the OS window
+		# small and renders the root at content_scale_size in "viewport" stretch:
+		# size the picture, never the window.
+		if win.content_scale_mode == Window.CONTENT_SCALE_MODE_VIEWPORT:
+			win.content_scale_size = size
+		else:
+			win.size = size
 	elif viewport is SubViewport:
 		(viewport as SubViewport).size = size
 	if quality != LAYOUT:

@@ -64,5 +64,6 @@ After that:
 | `tools/mq/shots.sh --stop` / `--start` | stop or start the listener (it does not restart after a reboot) |
 | `tail -f .git/mq/shots/events.log` | watch it work |
 
-A small window flashes up in the top-left corner while a picture is taken. The listener
+A small window (640 wide) appears in the top-left corner while a picture is taken. It is never kept on top
+and never takes focus, so you can keep typing; the picture is still rendered at full size. The listener
 holds requests while your game is running, and it keeps the Mac awake while it runs.

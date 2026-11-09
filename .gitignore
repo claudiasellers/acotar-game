@@ -15,3 +15,6 @@ __pycache__/
 
 # Perf pass output (tools/perf/frame_pass.sh, make perf)
 tools/perf/out/
+
+# Quiet render windows (tools/mq/shots_common.sh shots_render_cfg), never committed
+/override.cfg
