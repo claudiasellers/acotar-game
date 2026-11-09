@@ -18,7 +18,8 @@
 # Optional lines in .git/mq/config (defaults shown):
 #   SHOTS_POLL=60            seconds between polls of origin (git ls-remote only)
 #   SHOTS_GODOT=             Godot binary (else .tools/godot-*/ from make, PATH, /Applications)
-#   SHOTS_POSITION=40,40     corner the render window opens at
+#   SHOTS_POSITION=40,40     corner the small render window opens at (never on top,
+#                            never focused; the picture is still full size: T087)
 #   SHOTS_WAIT_FOR_PLAY=1    hold requests while the owner's game is running
 #   SHOTS_PUSH=1             0 = render and keep results locally only
 #   SHOTS_KEEP_DAYS=1        delete this machine's own result branches after this
@@ -195,6 +196,7 @@ checkout_request() { # sha
 
 GODOT=""
 GODOT_VERSION=""
+BUNDLE_ID=""
 OUT=""
 RES=""
 SCRATCH=""
@@ -208,13 +210,15 @@ note() { echo "note $*" >>"$RES/result.txt"; }
 # A windowed render's worker threads run above ordinary apps and, with the Metal
 # compiler, otherwise starve everything else on the Mac (T026). The clamp is
 # inherited, so take_shots.sh's Godot gets it too.
+# __CFBundleIdentifier keeps a windowed Godot from taking focus (shots_common.sh).
 godot_env() {
-	local clamp=""
+	local clamp="" bundle=""
 	[ -x /usr/sbin/taskpolicy ] && clamp="/usr/sbin/taskpolicy -c utility"
+	[ -n "$BUNDLE_ID" ] && bundle="__CFBundleIdentifier=$BUNDLE_ID"
 	find "$SCRATCH" -type f ! -path '*shader_cache*' ! -path '*/Library/Caches/*' -exec rm -f {} + 2>/dev/null
 	mkdir -p "$SCRATCH/home" "$SCRATCH/config" "$SCRATCH/data" "$SCRATCH/cache"
 	HOME="$SCRATCH/home" XDG_CONFIG_HOME="$SCRATCH/config" XDG_DATA_HOME="$SCRATCH/data" \
-		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" SHOTS_QUALITY="$QUALITY" $clamp "$@"
+		XDG_CACHE_HOME="$SCRATCH/cache" SHOTS_OUT="$OUT" SHOTS_QUALITY="$QUALITY" ${bundle:+env "$bundle"} $clamp "$@"
 }
 
 # Linux without a display (the cloud self-test) renders through xvfb-run.
@@ -276,8 +280,11 @@ prepare() {
 	echo "prep ok $(($(shots_epoch) - t0))s: $steps" >>"$RES/result.txt"
 }
 
+# A render never covers the owner's screen or takes focus (T087): a small window
+# in the corner, not on top, while override.cfg (written by quiet_render) makes
+# the picture SIZE. Probes capture the root viewport, which is SIZE either way.
 render_args() { # common windowed args for a render run
-	local a="--audio-driver Dummy --windowed --resolution $SIZE --position $POSITION --always-on-top"
+	local a="--audio-driver Dummy $(shots_window_args "$SIZE" "$POSITION")"
 	[ -n "$METHOD" ] && a="$a --rendering-method $METHOD"
 	echo "$a"
 }
@@ -306,6 +313,8 @@ PY
 	return 1
 }
 
+quiet_render() { shots_render_cfg "$WT" "$SIZE"; }
+
 collect() { # label dir -> RES/out/label, skipping big or unknown files
 	local label="$1" dir="$2" f n=0 sz total
 	[ -d "$dir" ] || { echo 0; return; }
@@ -333,6 +342,7 @@ run_probe_line() { # label path args...
 	dir="$OUT/$label"
 	log="$RES/logs/$label.log"
 	mkdir -p "$dir"
+	quiet_render
 	set -- $(for a in "$@"; do echo "$a" | sed "s#{out}#$dir#g"; done)
 	t0=$(shots_epoch)
 	if [ "${path%.gd}" != "$path" ]; then
@@ -357,6 +367,7 @@ run_json() { # the layout-shots runner owns request.json; we just run its wrappe
 		return 1
 	fi
 	mkdir -p "$OUT/request"
+	quiet_render
 	t0=$(shots_epoch)
 	(
 		cd "$WT" || exit 1
@@ -665,6 +676,7 @@ setup_run() {
 	refuse_unless_home
 	GODOT=$(find_godot) || { event "STALLED no Godot found (set SHOTS_GODOT in $CONF)"; shots_die "no Godot found; set SHOTS_GODOT=/path/to/Godot in $CONF"; }
 	GODOT_VERSION=$("$GODOT" --version 2>/dev/null | head -1)
+	BUNDLE_ID=$(shots_bundle_id "$GODOT")
 	cd_lane
 }
 

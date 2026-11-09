@@ -36,14 +36,19 @@ One directive per line, `#` comments. Allowed characters: letters, digits, space
 |---|---|---|
 | `from <text>` | who asked (log only) | |
 | `quality look\|layout` | see "Quality tiers" below | `look` |
-| `size <W>x<H>` | window size, passed as `--resolution` (look: 1920 wide or more) | `1920x1080` |
+| `size <W>x<H>` | picture size: the root viewport renders at W×H (look: 1920 wide or more); the window itself stays small | `1920x1080` |
 | `renderer forward_plus\|mobile\|compatibility` | `--rendering-method` (layout only) | the project's |
 | `timeout <s>` | limit per shot line, max 1200 | `300` |
 | `prep <res://….gd\|.tscn>` | runs headless before the shots, e.g. `res://tools/manor_estate/gen_grounds.tscn` | none |
 | `shot <label> <res://….tscn\|.gd> [args…]` | one Godot run. Between 1 and 40 lines. | |
 
 Each `shot` line runs
-`Godot --path <worktree> --audio-driver Dummy --windowed --resolution W×H --position <corner> --always-on-top [--rendering-method M] <scene> -- <args>`
+`Godot --path <worktree> --audio-driver Dummy --windowed --resolution 640×(640·H/W) --position <corner> [--rendering-method M] <scene> -- <args>`
+with an `override.cfg` in the worktree that sets `display/window/stretch/mode="viewport"` at W×H, so
+`get_viewport().get_texture().get_image()` is W×H while the window on the owner's screen is small, never on top
+and never focused (T087, `shots_common.sh`). A probe that resizes the root window itself should set
+`content_scale_size` instead when `content_scale_mode` is viewport, as `ShotQuality.apply` does.
+Above 1920 wide, 2D UI draws 1:1 in the W×H picture (in the game it would be scaled up from 1920×1080).
 (a `.gd` path is run with `-s`). In args, `{out}` becomes this shot's output folder. `$SHOTS_OUT` is set as well.
 Existing probes work unchanged:
 

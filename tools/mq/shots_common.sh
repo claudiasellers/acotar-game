@@ -112,3 +112,48 @@ shots_ls_remote() {
 		echo "$sha ${ref#"$prefix"}"
 	done
 }
+
+# ---- quiet render windows (T087) --------------------------------------------
+# A GPU render on the owner's Mac must never cover the screen or take focus.
+# The window is small (SHOTS_WINDOW_W wide, the picture's aspect), in a corner
+# and not on top; the picture still renders at the full requested size, because
+# override.cfg puts the root viewport in "viewport" stretch at that size, so
+# get_texture() is W×H whatever the window is. Godot 4.7's macOS build activates
+# itself when it wasn't started by LaunchServices (its "unbundled window
+# activation hack"); setting __CFBundleIdentifier to the app's own id, as
+# LaunchServices would, skips that, so the app starts in the background. It
+# still renders: the window is on screen, just not focused.
+SHOTS_WINDOW_W=640
+
+# shots_window_size <W>x<H> -> the small window, SHOTS_WINDOW_W wide, same aspect.
+shots_window_size() {
+	local w="${1%x*}" h="${1#*x}"
+	echo "${SHOTS_WINDOW_W}x$(((SHOTS_WINDOW_W * h + w / 2) / w))"
+}
+
+# shots_window_args <W>x<H> <x,y> -> windowed, small, in the corner, not on top.
+shots_window_args() {
+	echo "--windowed --resolution $(shots_window_size "$1") --position $2"
+}
+
+# shots_render_cfg <project dir> <W>x<H> [who]: writes <dir>/override.cfg so the
+# picture renders at W×H inside the small window. Never commit it (.gitignore).
+shots_render_cfg() {
+	cat >"$1/override.cfg" <<CFG
+; Written by ${3:-tools/mq/shots.sh} for a quiet render (T087); delete it if it is still here.
+[display]
+window/size/viewport_width=${2%x*}
+window/size/viewport_height=${2#*x}
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+CFG
+}
+
+# shots_bundle_id <godot binary> -> the .app's CFBundleIdentifier (macOS), or nothing.
+shots_bundle_id() {
+	local plist id
+	plist="$(dirname "$(dirname "$1")")/Info.plist"
+	[ "$(uname -s)" = Darwin ] || return 0
+	[ -f "$plist" ] && id=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$plist" 2>/dev/null)
+	echo "${id:-org.godotengine.godot}"
+}

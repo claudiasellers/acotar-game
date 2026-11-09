@@ -27,7 +27,7 @@ jpeg_is_1280_wide() { # stdin
 mkdir -p "$T/bin"
 cat >"$T/bin/godot" <<'G'
 #!/bin/bash
-echo "CALL $* | HOME=$HOME XDG_DATA_HOME=${XDG_DATA_HOME:-}" >>"$FAKE_LOG"
+echo "CALL $* | HOME=$HOME XDG_DATA_HOME=${XDG_DATA_HOME:-} BUNDLE=${__CFBundleIdentifier:-}" >>"$FAKE_LOG"
 [ "$1" = --version ] && { echo 4.7.2.stable.fake; exit 0; }
 path="" prev=""
 for a in "$@"; do [ "$prev" = --path ] && path="$a"; prev="$a"; done
@@ -35,6 +35,9 @@ for a in "$@"; do [ "$a" = --import ] && { mkdir -p "$path/.godot"; exit 0; }; d
 user=() seen=0
 for a in "$@"; do [ "$seen" = 1 ] && user+=("$a"); [ "$a" = -- ] && seen=1; done
 [ "$seen" = 0 ] && exit 0   # generator / prep run
+# What the picture renders at: the override.cfg next to project.godot (T087).
+cfg="${path:-.}/override.cfg"
+[ -f "$cfg" ] && echo "CFG $(sed -n 's/^window\/size\/viewport_width=//p' "$cfg")x$(sed -n 's/^window\/size\/viewport_height=//p' "$cfg") $(sed -n 's/^window\/stretch\/mode=//p' "$cfg") for ${user[0]:-}" >>"$FAKE_LOG"
 [ -f "$XDG_DATA_HOME/godot/app_userdata/game/save.cfg" ] && { echo "stale save from an earlier run"; exit 9; }
 mkdir -p "$XDG_DATA_HOME/godot/app_userdata/game/shader_cache" && echo save >"$XDG_DATA_HOME/godot/app_userdata/game/save.cfg"
 echo c >>"$XDG_DATA_HOME/godot/app_userdata/game/shader_cache/c"
@@ -94,6 +97,9 @@ request() { # key-id n body
 out=$(cd "$T/other" && MQ_HOME_MACHINE=1 bash tools/mq/shots.sh --once 2>&1); rc=$?
 check "refuses without MQ_HOME_MACHINE=1 in .git/mq/config" '[ $rc = 2 ] && echo "$out" | grep -q REFUSED'
 
+# 1b the small window keeps the picture's aspect
+check "the render window is 640 wide with the picture's aspect" '[ "$(. "$HERE/shots_common.sh"; shots_window_size 2560x1440) $(. "$HERE/shots_common.sh"; shots_window_size 1920x1200)" = "640x360 640x400" ]'
+
 # 2 a good request is answered with pictures on an orphan branch
 request A 1 'from selftest\nquality layout\nsize 640x360\nshot cottage res://probe/shot.tscn ok {out}/cottage.png\nshot many res://probe/check.gd two {out}\n'
 once
@@ -101,7 +107,12 @@ check "answers a good request with status ok" 'result A-1 | grep -qx "status ok"
 files=$(git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-A-1)
 check "result holds every picture and stats file" 'echo "$files" | grep -qx out/cottage/cottage.jpg && echo "$files" | grep -qx out/many/two.png && echo "$files" | grep -qx out/many/stats.json'
 check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/origin.git" rev-list --parents -1 refs/heads/shots/res-A-1 | cut -s -d" " -f2)" ] && ! echo "$files" | grep -q project.godot'
-check "renders windowed in the corner, Dummy audio, request size" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40 --always-on-top"'
+check "renders in a small window in the corner, Dummy audio" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40"'
+check "a render window is never kept on top of the owner's apps" '! grep -q -- "--always-on-top" "$FAKE_LOG"'
+check "the picture renders at the request size through override.cfg (viewport stretch)" 'grep -q "^CFG 640x360 \"viewport\" for ok" "$FAKE_LOG"'
+if [ "$(uname -s)" = Darwin ]; then
+	check "a render starts in the background: __CFBundleIdentifier is the app's id" '! grep "probe/shot.tscn" "$FAKE_LOG" | grep -v "BUNDLE=org.godotengine.godot$" | grep -q .'
+fi
 check "script probes run with -s, args after --" 'grep -q -- "-s res://probe/check.gd -- two" "$FAKE_LOG"'
 check "the import ran headless before the shots" 'grep -q -- "--headless --audio-driver Dummy --path .* --import" "$FAKE_LOG"'
 check "generated content comes from the queue's levels.sh, run in the render worktree" 'grep -q "LEVELS ensure in $T/mac/.lanes/shots$" "$FAKE_LOG" && result A-1 | grep -q "generated content .*(levels.sh)" && [ "$(cat "$T/mac/.lanes/shots/gen/_generated/out.res")" = v1 ]'
@@ -148,7 +159,7 @@ W
 (cd "$T/cloud" && git add -A && git commit -qm "runner" && git push -q origin HEAD:refs/heads/lane/x && bash "$REQ" J 2 "$T/req.json") >>"$T/cloud.out" 2>&1
 once
 check "request.json without the runner is answered with the reason" 'result J-1 | grep -q "note request.json needs tools/shots/take_shots.sh"'
-check "request.json runs the commit's take_shots.sh with GODOT and SHOTS_GODOT_ARGS" 'result J-2 | grep -qx "status ok" && git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-J-2 | grep -qx out/request/layout.png && grep "shot_runner" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed"'
+check "request.json runs the commit's take_shots.sh with GODOT and SHOTS_GODOT_ARGS" 'result J-2 | grep -qx "status ok" && git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-J-2 | grep -qx out/request/layout.png && grep "shot_runner" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40" && ! grep "shot_runner" "$FAKE_LOG" | grep -q -- "--always-on-top" && grep -q "^CFG 1920x1080 \"viewport\" for ok" "$FAKE_LOG"'
 
 # 7 moved and junk requests are ignored
 request M 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'
@@ -253,7 +264,8 @@ request L 2 'renderer compatibility\nshot x res://probe/shot.tscn ok {out}/x.png
 request L 3 'size 2560x1440\nshot x res://probe/shot.tscn ok {out}/x.png\n'
 once
 check "quality look refuses a small or cheap render" 'result L-1 | grep -q "note quality look renders at 1920x1080 or larger" && result L-2 | grep -q "note quality look renders with the project"'
-check "quality look keeps the lossless PNG at full size" 'result L-3 | grep -qx "quality look" && git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-L-3 | grep -qx out/x/x.png && grep "L-3" "$FAKE_LOG" >/dev/null; grep -q -- "--resolution 2560x1440" "$FAKE_LOG"'
+check "quality look keeps the lossless PNG at full size" 'result L-3 | grep -qx "quality look" && git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-L-3 | grep -qx out/x/x.png && grep -q "^CFG 2560x1440 \"viewport\"" "$FAKE_LOG"'
+check "a 2560x1440 look shot still opens only a 640x360 window" '! grep -q -- "--resolution 2560x1440" "$FAKE_LOG" && grep -A1 "^CFG 2560x1440" "$FAKE_LOG" >/dev/null && [ "$(grep -c -- "--resolution 640x360" "$FAKE_LOG")" -ge 3 ]'
 check "no art changed since the last import: import skipped" 'result L-3 | grep -q "import skipped"'
 (cd "$T/cloud" && echo v2 >gen/input.txt && echo png2 >probe/art.png && git commit -qam "gen input and art" && git push -q origin HEAD:refs/heads/lane/x) >>"$T/cloud.out" 2>&1
 request G 1 'shot x res://probe/shot.tscn ok {out}/x.png\n'

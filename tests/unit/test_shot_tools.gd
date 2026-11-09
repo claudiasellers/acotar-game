@@ -61,6 +61,20 @@ func test_full_mode_leaves_the_look_alone() -> void:
 	assert_true(sun.shadow_enabled)
 
 
+# Contract (T087): in a quiet Mac render the root window is in "viewport"
+# stretch; apply sizes the picture (content_scale_size), never the OS window.
+func test_quiet_window_sizes_the_picture_not_the_window() -> void:
+	var root := Node3D.new()
+	add_child_autofree(root)
+	var win := Window.new()
+	win.size = Vector2i(640, 360)
+	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	ShotQuality.apply(ShotQuality.FULL, win, root, Vector2i(2560, 1440))
+	assert_eq(win.content_scale_size, Vector2i(2560, 1440))
+	assert_eq(win.size, Vector2i(640, 360))
+	win.free()
+
+
 func test_request_fills_defaults_per_quality() -> void:
 	var req := ShotRequest.new()
 	req.read({"id": "t", "shots": [
