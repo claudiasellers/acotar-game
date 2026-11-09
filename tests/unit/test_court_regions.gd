@@ -121,6 +121,19 @@ func test_region_scene_builds_forage_fields_and_landmarks() -> void:
 	assert_eq(region.get_node("Landmarks").get_child_count(), region.content.landmarks.size())
 	var grade := region.get_node("RegionGrade") as RegionGrade
 	assert_true(ResourceLoader.exists("res://world/shared/grades/%s.tres" % grade.grade), "grade preset exists")
+	# The grass clumps are scattered but not drawn (owner, 2026-11-09); their
+	# layers stay, so the meadow is still fuel for a fire.
+	var clump_chunks := 0
+	for child in region.decor_field.get_children():
+		if String(child.name).contains(CourtRegion.GRASS_CLUMP):
+			clump_chunks += 1
+			assert_false((child as Node3D).visible, "grass clump chunk %s is hidden" % child.name)
+	assert_gt(clump_chunks, 0, "the clumps are still scattered")
+	var fuel := 0
+	for layer in region.decor_field.layers:
+		if String(layer.id).contains(CourtRegion.GRASS_CLUMP):
+			fuel += int(GroundFuel.code_for(layer) == GroundFuel.GRASS)
+	assert_gt(fuel, 0, "the hidden clumps are still the meadow's fuel")
 
 
 func test_story_anchors_from_the_contract_exist() -> void:

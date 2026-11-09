@@ -132,6 +132,8 @@ on the lakes.
 - **Open:** the court grades' LUT lifts the blacks (`LUT_STRENGTH` 0.3 toward
   ramps with dark ends near 0.1). That reads milky in the glen next to the
   estate's grade. It's the fx lane's taste call.
-- **Grass clumps** (`flora_grass_clump_a/b/c`, pale mint) glow against the
-  deeper ground. The owner is choosing whether to keep, tone or remove them.
-  Preview with court_terrain_shots `grass=now,toned,none`.
+- **Grass clumps** (`flora_grass_clump_a/b/c`, pale mint) glowed against the
+  deeper ground. The owner had them taken out (M4WCT-4): `CourtRegion.DRAW_GRASS_CLUMPS`
+  is false, so their chunks are hidden. Their layers stay, because GroundFuel reads them
+  as the meadow's fire fuel. The lookouts' collar no longer uses them. Replacement
+  ground cover is point B (planting for the new relief).

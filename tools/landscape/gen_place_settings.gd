@@ -37,7 +37,7 @@ const THEMES := {
 		"props": [], "light": Color(1.0, 0.6, 0.32), "energy": 2.2, "fx": "bonfire_embers", "sound": "fire", "margin": 3.5},
 	"garden": {"collar": ["flora_bush_rose", "flora_carpet_blush", "flora_bush_hydrangea"], "frame": "flora_bush_boxwood",
 		"props": ["fae_bench"], "light": Color(1.0, 0.82, 0.86), "energy": 1.0, "fx": "butterflies", "sound": "bees", "margin": 3.5},
-	"lookout": {"collar": ["flora_heather_mound", "rock_mossy_b", "flora_grass_clump_b"], "frame": "fells_cairn",
+	"lookout": {"collar": ["flora_heather_mound", "rock_mossy_b"], "frame": "fells_cairn",
 		"props": ["fells_overlook_bench"], "light": Color(1.0, 0.9, 0.7), "energy": 0.6, "fx": "dandelion_seeds", "sound": "wind_birds", "margin": 3.5},
 	"shrine": {"collar": ["flora_fern_b", "flora_carpet_pearl", "rock_mossy_c"], "frame": "shrine_column_broken",
 		"props": [], "light": Color(0.92, 0.9, 1.0), "energy": 0.9, "fx": "faelights", "sound": "shrine_hum", "margin": 3.5},

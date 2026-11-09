@@ -38,6 +38,12 @@ const BRIDGE_HALF_SPAN := MacroHeight.RIVER_HALF_WIDTH + 5.0
 const MAGNET_STEP := 75.0
 const MAGNET_OFFSET := 18.0
 const MAGNET_HEIGHT := 14.0
+## The grass clumps (flora_grass_clump_*) are scattered but not drawn (owner,
+## 2026-11-09): the pale tufts didn't read as grass on the storybook ground.
+## Their layers stay, because GroundFuel reads them as the meadow's fuel, so a
+## fire still runs through the grass; only their chunks are hidden.
+const DRAW_GRASS_CLUMPS := false
+const GRASS_CLUMP := "grass_clump"
 
 var _task := -1
 var _layers := {}
@@ -235,6 +241,8 @@ func _finish() -> void:
 			small.append(layer)
 	forage_field = _field("Forage", forage, SMALL_CHUNK)
 	decor_field = _field("Decor", small, SMALL_CHUNK)
+	if not DRAW_GRASS_CLUMPS:
+		_hide_grass_clumps(decor_field)
 	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
 	_build_landmarks()
 	_build_places()
@@ -248,6 +256,17 @@ func _finish() -> void:
 	_layers.clear()
 	is_built = true
 	built.emit()
+
+
+## Hides the grass clumps' chunks (see DRAW_GRASS_CLUMPS); the layers stay fuel.
+static func _hide_grass_clumps(field: ScatterField) -> void:
+	if not field.is_node_ready():
+		# Built off-tree (tools): its chunks appear when it enters the tree.
+		field.ready.connect(_hide_grass_clumps.bind(field), CONNECT_ONE_SHOT)
+		return
+	for child in field.get_children():
+		if child is MultiMeshInstance3D and String(child.name).contains(GRASS_CLUMP):
+			child.visible = false
 
 
 func _field(node_name: String, layers: Array[ScatterLayer], chunk: float) -> ScatterField:
