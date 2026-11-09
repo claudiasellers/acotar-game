@@ -122,8 +122,10 @@ on the lakes.
 
 - **Ground:** the `storybook_deep` look of `GroundTexturePacker`, the CC0
   photo slots recoloured into soft painted bands, lower value so the near
-  ground stays rich. The terrain slots import lossless: BC3 broke the soft
-  gradients into squares.
+  ground stays rich. The terrain slots import lossless at 256 px (`size_limit`
+  256): BC3 broke the soft gradients into squares, BC7 still showed faint
+  ones, and the soft look loses nothing at half size (wcterrain-10/11/12), so
+  the arrays take about 7 MB, as with BC3 at 512.
 - **Depth haze:** a cool lilac-blue haze darker than the pink horizon, with low
   aerial perspective. You see a green foreground, a teal midground and
   periwinkle hills against the sky. It is in spring.tres, manor.tres (fog
