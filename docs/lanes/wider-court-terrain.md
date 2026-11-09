@@ -117,3 +117,21 @@ on the lakes.
   follow-up.
 - The east rim at x 1850–2048 and the vale's east side (x 1500–2048) were
   unowned macro ground. They are now the court's rim, owned by no region.
+
+## The look (M4WCT-3, owner's picks of 2026-11-09)
+
+- **Ground:** the `storybook_deep` look of `GroundTexturePacker`, the CC0
+  photo slots recoloured into soft painted bands, lower value so the near
+  ground stays rich. The terrain slots import lossless: BC3 broke the soft
+  gradients into squares.
+- **Depth haze:** a cool lilac-blue haze darker than the pink horizon, with low
+  aerial perspective. You see a green foreground, a teal midground and
+  periwinkle hills against the sky. It is in spring.tres, manor.tres (fog
+  only) and every daytime court grade (`build_court_fx.gd` `DEPTH_*`).
+  Dusk, night and the blight keep their own fog.
+- **Open:** the court grades' LUT lifts the blacks (`LUT_STRENGTH` 0.3 toward
+  ramps with dark ends near 0.1). That reads milky in the glen next to the
+  estate's grade. It's the fx lane's taste call.
+- **Grass clumps** (`flora_grass_clump_a/b/c`, pale mint) glow against the
+  deeper ground. The owner is choosing whether to keep, tone or remove them.
+  Preview with court_terrain_shots `grass=now,toned,none`.
