@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://coa4drwv4w5ms"
-path.s3tc="res://.godot/imported/winter_grass_albedo.png-aa7e64db992a415ce7c7b19391f6512f.s3tc.ctex"
+path="res://.godot/imported/winter_grass_albedo.png-aa7e64db992a415ce7c7b19391f6512f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://world/shared/terrain/textures/winter_grass_albedo.png"
-dest_files=["res://.godot/imported/winter_grass_albedo.png-aa7e64db992a415ce7c7b19391f6512f.s3tc.ctex"]
+dest_files=["res://.godot/imported/winter_grass_albedo.png-aa7e64db992a415ce7c7b19391f6512f.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

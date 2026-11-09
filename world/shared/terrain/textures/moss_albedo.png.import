@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d2ymhxcsw0f6a"
-path.s3tc="res://.godot/imported/moss_albedo.png-eac2bc45f9af046041ad7667f6bc838c.s3tc.ctex"
+path="res://.godot/imported/moss_albedo.png-eac2bc45f9af046041ad7667f6bc838c.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://world/shared/terrain/textures/moss_albedo.png"
-dest_files=["res://.godot/imported/moss_albedo.png-eac2bc45f9af046041ad7667f6bc838c.s3tc.ctex"]
+dest_files=["res://.godot/imported/moss_albedo.png-eac2bc45f9af046041ad7667f6bc838c.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b28ropdkhypfx"
-path.s3tc="res://.godot/imported/riverbed_albedo.png-5e946e3e9ecc84a317a176c97e6ba86b.s3tc.ctex"
+path="res://.godot/imported/riverbed_albedo.png-5e946e3e9ecc84a317a176c97e6ba86b.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://world/shared/terrain/textures/riverbed_albedo.png"
-dest_files=["res://.godot/imported/riverbed_albedo.png-5e946e3e9ecc84a317a176c97e6ba86b.s3tc.ctex"]
+dest_files=["res://.godot/imported/riverbed_albedo.png-5e946e3e9ecc84a317a176c97e6ba86b.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

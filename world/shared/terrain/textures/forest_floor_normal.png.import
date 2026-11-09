@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c4cmfyhb1ltij"
-path.s3tc="res://.godot/imported/forest_floor_normal.png-9fe064b7dc00e3a7554a70f1f7603e01.s3tc.ctex"
+path="res://.godot/imported/forest_floor_normal.png-9fe064b7dc00e3a7554a70f1f7603e01.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://world/shared/terrain/textures/forest_floor_normal.png"
-dest_files=["res://.godot/imported/forest_floor_normal.png-9fe064b7dc00e3a7554a70f1f7603e01.s3tc.ctex"]
+dest_files=["res://.godot/imported/forest_floor_normal.png-9fe064b7dc00e3a7554a70f1f7603e01.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

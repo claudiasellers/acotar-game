@@ -3,20 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3dyk7kfrrfki"
-path.s3tc="res://.godot/imported/moss_normal.png-991312d36dc72501ea8c5193afc195c3.s3tc.ctex"
+path="res://.godot/imported/moss_normal.png-991312d36dc72501ea8c5193afc195c3.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://world/shared/terrain/textures/moss_normal.png"
-dest_files=["res://.godot/imported/moss_normal.png-991312d36dc72501ea8c5193afc195c3.s3tc.ctex"]
+dest_files=["res://.godot/imported/moss_normal.png-991312d36dc72501ea8c5193afc195c3.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
