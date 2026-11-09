@@ -60,6 +60,9 @@ const DEPTH_TINT := 0.25
 const DEPTH_DENSITY := 0.0011
 const DEPTH_AERIAL := 0.1
 const DEPTH_SKY_AFFECT := 0.1
+## Volumetric fog by day as thin as the estate's: thicker, it laid a milky veil
+## over every layer and showed its froxels as squares on the ground (wcterrain-6).
+const DEPTH_VOLUMETRIC_DENSITY := 0.002
 
 
 func _initialize() -> void:
@@ -187,6 +190,7 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 		p.set("fog_density", DEPTH_DENSITY)
 		p.set("fog_aerial_perspective", DEPTH_AERIAL)
 		p.set("fog_sky_affect", DEPTH_SKY_AFFECT)
+		p.set("volumetric_density", DEPTH_VOLUMETRIC_DENSITY)
 	p.set("volumetric_density", minf(float(p.get("volumetric_density")), VOLUMETRIC_CAP))
 	p.set("contrast", CONTRAST)
 	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
@@ -247,7 +251,7 @@ func _build_grades() -> int:
 		_save(p, FX + "grades/" + String(r["id"]) + ".tres")
 		md.append("| %s | %s | #%s / #%s | #%s, %.2f | #%s, %.4f, %.3f | %.2f | %.2f | %.2f | %.2f / %.2f | %.1f |" % [
 			r["id"], r["purpose"], r["sky_top"], r["sky_horizon"], r["sun_color"], p.get("sun_energy"),
-			(p.get("fog_color") as Color).to_html(false), p.get("fog_density"), r["volumetric_density"], p.get("exposure"), p.get("saturation"),
+			(p.get("fog_color") as Color).to_html(false), p.get("fog_density"), p.get("volumetric_density"), p.get("exposure"), p.get("saturation"),
 			p.get("contrast"), p.get("glow_intensity"), p.get("glow_bloom"), r["magic"]])
 	md.append("\nSuggested region mapping: starlight_glen -> grade_starlight_glen_day (Starlight Pool area:")
 	md.append("grade_starlight_pool_sparkle, a daytime swim), western_fells -> grade_fells, fae_village ->")

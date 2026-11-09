@@ -13,10 +13,10 @@ sun_color = Color(1.0, 0.88, 0.74, 1)
 sun_energy = 1.2
 ambient_color = Color(0.84, 0.76, 0.90, 1)
 ambient_energy = 0.5
-fog_color = Color(0.92, 0.84, 0.90, 1)
+fog_color = Color(0.70, 0.74, 0.96, 1)
 fog_density = 0.0012
 volumetric_density = 0.002
-volumetric_albedo = Color(0.90, 0.84, 0.90, 1)
+volumetric_albedo = Color(0.85, 0.86, 1.0, 1)
 exposure = 0.78
 saturation = 1.22
 contrast = 1.15
@@ -28,3 +28,8 @@ magic = 0.35
 glow_hdr_threshold = 1.4
 ; A few soft fair-weather clouds over the grounds (painted_sky).
 cloud_cover = 0.30
+; Depth haze (owner, 2026-11-09), fog only: cool lilac-blue, darker than the
+; pink horizon, low aerial perspective, so the court's hills read periwinkle
+; against the sky from the grounds. The colour grade itself is unchanged.
+fog_sky_affect = 0.1
+fog_aerial_perspective = 0.1
