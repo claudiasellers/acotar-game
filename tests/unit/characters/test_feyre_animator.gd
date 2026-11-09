@@ -85,7 +85,7 @@ func test_fast_gaits_take_speed_from_stride_not_cadence() -> void:
 	var a := feyre.model.find_child("FeyreAnimator", true, false) as FeyreAnimator
 	var run := a.loco_blend(feyre.run_speed)
 	var sprint := a.loco_blend(feyre.sprint_speed)
-	assert_lte(run.y, 1.55, "run cadence x%.2f" % run.y)
+	assert_lte(run.y, 1.95, "run cadence x%.2f" % run.y)
 	assert_lte(sprint.y, run.y, "sprint cadence x%.2f no faster than the run's" % sprint.y)
 	assert_lt(sprint.y, FeyreAnimator.MAX_SCALE)
 	assert_almost_eq(run.y, feyre.run_speed / float(a.native_speeds[&"run"]), 0.001, "run feet planted")

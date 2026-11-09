@@ -51,32 +51,32 @@ const CLIMB_HEIGHT := 1.6
 const CLIMB_CENTRE := 0.9
 
 @export var bow: BowData = preload("res://data/bows/hunting_bow.tres")
-@export var walk_speed: float = 3.2
-@export var run_speed: float = 8.22
-@export var sprint_speed: float = 13.10
+@export var walk_speed: float = 4.16
+@export var run_speed: float = 10.686
+@export var sprint_speed: float = 17.03
 ## Ground acceleration (m/s²) from run speed up to sprint speed. Below run speed
 ## she gets the full `acceleration`, so Shift + forward breaks straight into a
 ## run and reaches the sprint in about a quarter of a second.
-@export var sprint_acceleration: float = 24.0
-@export var aim_speed: float = 2.2
+@export var sprint_acceleration: float = 31.2
+@export var aim_speed: float = 2.86
 ## Ground acceleration toward the target speed, per m/s of that speed (1/s):
 ## 14 reaches a run from standing in about 0.07 s.
 @export var acceleration: float = 14.0
 ## Ground stop with no keys held (m/s²): about 0.2 s and 1.5 m from a sprint.
-@export var braking: float = 60.0
+@export var braking: float = 78.0
 ## How fast her running direction swings to a new heading, keeping her speed
 ## (1/s; Unreal's CharacterMovement GroundFriction, whose template uses 8).
 ## A turn no longer dips her speed or slides her sideways.
-@export var turn_friction: float = 10.0
+@export var turn_friction: float = 13.0
 ## Slowest her running direction turns (rad/s): small corrections still land fast.
-const TURN_MIN_RATE := 5.0
+const TURN_MIN_RATE := 6.5
 ## A change of direction wider than this (degrees) is a reversal: she plants and
 ## pushes off the other way instead of running round in a loop.
 const PIVOT_ANGLE := 135.0
 @export var air_control: float = 0.5
 ## How far an air jump (2nd, 3rd) swings her drift toward the stick (0..1).
 @export var air_jump_redirect: float = 0.65
-@export var turn_speed: float = 12.0
+@export var turn_speed: float = 15.6
 @export var max_stamina: float = 100.0
 @export var stamina_regen: float = 16.0
 @export var stamina_regen_delay: float = 0.8

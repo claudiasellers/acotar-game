@@ -5,7 +5,7 @@
 ## this needs no bake.
 extends GutTest
 
-const SPEEDS := [8.22, 13.1]
+const SPEEDS := [10.686, 17.03]
 const MAX_STEP_UP := 0.09       # metres of height change in one physics tick
 const MIN_SPEED_SHARE := 0.9    # of the running speed, along the surface
 const ZONE := 1.0               # measured from this far before the deck to this far after it
