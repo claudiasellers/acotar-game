@@ -57,7 +57,7 @@ func _run() -> void:
 	cap.wait_for_film = true
 	cap.give_up = 900.0
 	cap.quit_after = film.length + 3.0
-	get_tree().root.size = Vector2i(1920, 1080)
+	FilmCapture.size_root(get_tree().root)
 	get_tree().root.add_child(cap)
 	var game := (load(GAME) as PackedScene).instantiate()
 	game.set(&"start_region", stage[1])

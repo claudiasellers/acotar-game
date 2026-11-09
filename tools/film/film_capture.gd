@@ -16,6 +16,16 @@ const CLIP := Vector2i(384, 216)
 const CLIP_COLS := 8
 const CLIP_PER := 64
 
+## Sizes the picture to the film's output size. In a quiet Mac render (T088,
+## tools/mq/shots_common.sh) the OS window stays small and the root is in
+## "viewport" stretch: size the picture (content_scale_size), never the window.
+static func size_root(win: Window, size: Vector2i = Vector2i(1920, 1080)) -> void:
+	if win.content_scale_mode == Window.CONTENT_SCALE_MODE_VIEWPORT:
+		win.content_scale_size = size
+	else:
+		win.size = size
+
+
 var out: String = "user://film_capture"
 var stills: PackedFloat32Array = []
 var fps: float = 4.0

@@ -29,6 +29,6 @@ func _run() -> void:
 		# stills=15,19,86 replaces the script's key shots (lane L67).
 		if a.begins_with("stills="):
 			cap.stills = PackedFloat32Array(Array(a.substr(7).split(",")).map(func(v: String) -> float: return float(v)))
-	get_tree().root.size = Vector2i(1920, 1080)
+	FilmCapture.size_root(get_tree().root)
 	get_tree().root.add_child(cap)
 	get_tree().change_scene_to_file(OpeningFilm.SCENE)
