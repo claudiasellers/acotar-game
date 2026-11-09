@@ -13,10 +13,10 @@ sun_color = Color(1.0, 0.89, 0.74, 1)
 sun_energy = 1.7
 ambient_color = Color(0.80, 0.75, 0.90, 1)
 ambient_energy = 0.42
-fog_color = Color(1.0, 0.86, 0.92, 1)
-fog_density = 0.0005
+fog_color = Color(0.70, 0.74, 0.96, 1)
+fog_density = 0.00078
 volumetric_density = 0.001
-volumetric_albedo = Color(1.0, 0.9, 0.95, 1)
+volumetric_albedo = Color(0.85, 0.86, 1.0, 1)
 exposure = 0.8
 saturation = 1.22
 contrast = 1.15
@@ -29,10 +29,13 @@ golden_sky_top = Color(0.451, 0.380, 0.820, 1)
 golden_sky_horizon = Color(1.000, 0.659, 0.522, 1)
 golden_sun_color = Color(1, 0.78, 0.58, 1)
 golden_sun_energy = 1.4
-fog_sky_affect = 0.12
+fog_sky_affect = 0.1
 fog_height = -4.0
 fog_height_density = 0.025
-fog_aerial_perspective = 0.4
+; Depth haze (owner, 2026-11-09): cool lilac-blue, darker than the pink
+; horizon, low aerial perspective, so the far hills read periwinkle against
+; the sky instead of melting into it. Density stays under the weenie rule.
+fog_aerial_perspective = 0.1
 volumetric_anisotropy = 0.7
 volumetric_light_energy = 1.6
 glow_hdr_threshold = 1.4

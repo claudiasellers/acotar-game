@@ -106,7 +106,13 @@ func test_spring_sky_is_not_eaten_by_fog() -> void:
 	var spring := GradeDirector.load_preset(&"spring")
 	assert_lte(spring.fog_sky_affect, 0.15, "distance fog must leave the sky gradient alone")
 	assert_gt(spring.fog_height_density, 0.0, "mist pools low instead")
-	assert_between(spring.fog_aerial_perspective, 0.3, 0.6, "far layers fade toward the sky, not into it")
+	# Depth haze (owner, 2026-11-09): far layers keep the haze's own colour, a
+	# cool lilac-blue darker than the pink horizon, so the hills stand out from
+	# the sky as foreground, midground and background instead of melting into it.
+	assert_lte(spring.fog_aerial_perspective, 0.2, "far layers keep the haze colour, not the sky's")
+	assert_lt(spring.fog_color.get_luminance(), spring.sky_horizon.get_luminance() - 0.05,
+		"the haze is darker than the horizon, so the far hills read against it")
+	assert_gt(spring.fog_color.b, spring.fog_color.r, "the haze is cool")
 	# The weenie (Great Oak, ~285 m from the wall-crossing frame) stays readable.
 	assert_lt(1.0 - exp(-spring.fog_density * 285.0), 0.2, "≤20% depth fog at the weenie's distance")
 

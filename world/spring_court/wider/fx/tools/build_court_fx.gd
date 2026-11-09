@@ -47,6 +47,19 @@ const GOLDEN_CLOUD_SHADE := Color(0.62, 0.52, 0.72)
 const BLIGHT_CLOUDS := 0.6
 const BLIGHT_CLOUD_COLOR := Color(0.62, 0.62, 0.60)
 const BLIGHT_CLOUD_SHADE := Color(0.38, 0.38, 0.40)
+## Depth haze by day (owner, 2026-11-09, picked from the wcterrain-5 renders):
+## a cool lilac-blue haze, darker than every pink horizon, so the far hills
+## turn periwinkle and stand out against the sky instead of melting into it.
+## Foreground keeps its green, midground goes teal, background periwinkle.
+## Low aerial perspective, so the haze keeps its own colour and doesn't take
+## the sky's. Each region keeps a quarter of its own fog hue; its mood still
+## lives in the sky, sun and LUT. Dusk, night and the blight are untouched.
+const DEPTH_HAZE := Color(0.70, 0.74, 0.96)
+const DEPTH_VOLUMETRIC := Color(0.85, 0.86, 1.0)
+const DEPTH_TINT := 0.25
+const DEPTH_DENSITY := 0.0011
+const DEPTH_AERIAL := 0.1
+const DEPTH_SKY_AFFECT := 0.1
 
 
 func _initialize() -> void:
@@ -169,6 +182,11 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 		p.set("glow_bloom", 0.0)
 		p.set("glow_hdr_threshold", DAY_THRESHOLD)
 		p.set("magic", minf(float(p.get("magic")), DAY_MAGIC))
+		p.set("fog_color", DEPTH_HAZE.lerp(p.get("fog_color"), DEPTH_TINT))
+		p.set("volumetric_albedo", DEPTH_VOLUMETRIC.lerp(p.get("volumetric_albedo"), DEPTH_TINT))
+		p.set("fog_density", DEPTH_DENSITY)
+		p.set("fog_aerial_perspective", DEPTH_AERIAL)
+		p.set("fog_sky_affect", DEPTH_SKY_AFFECT)
 	p.set("volumetric_density", minf(float(p.get("volumetric_density")), VOLUMETRIC_CAP))
 	p.set("contrast", CONTRAST)
 	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
@@ -229,7 +247,7 @@ func _build_grades() -> int:
 		_save(p, FX + "grades/" + String(r["id"]) + ".tres")
 		md.append("| %s | %s | #%s / #%s | #%s, %.2f | #%s, %.4f, %.3f | %.2f | %.2f | %.2f | %.2f / %.2f | %.1f |" % [
 			r["id"], r["purpose"], r["sky_top"], r["sky_horizon"], r["sun_color"], p.get("sun_energy"),
-			r["fog_color"], p.get("fog_density"), r["volumetric_density"], p.get("exposure"), p.get("saturation"),
+			(p.get("fog_color") as Color).to_html(false), p.get("fog_density"), r["volumetric_density"], p.get("exposure"), p.get("saturation"),
 			p.get("contrast"), p.get("glow_intensity"), p.get("glow_bloom"), r["magic"]])
 	md.append("\nSuggested region mapping: starlight_glen -> grade_starlight_glen_day (Starlight Pool area:")
 	md.append("grade_starlight_pool_sparkle, a daytime swim), western_fells -> grade_fells, fae_village ->")

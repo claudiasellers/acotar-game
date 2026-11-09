@@ -9,6 +9,10 @@
 ## the terrain; "photo" is what the game ships. Files: <view>_<look>.png.
 ## `fogs=now,layered,layered_mist` previews depth hazes (FOGS) on an in-memory
 ## copy of the view's grade; files <view>[_<look>]_<fog>.png.
+## `ingame` uses the grade the game would show at the eye (the RegionGrade of
+## the region you stand in, else the view's grade) instead of the view's.
+## `grass=now,toned,none` previews the court's grass clumps (GRASS): as they
+## are, toned into the ground, or left out; files ..._grass-<variant>.png.
 extends Node
 
 ## id: [eye x, eye z, eye height over ground, look x, look z, look height, time 0-1, grade, fov]
@@ -48,6 +52,9 @@ func _run() -> void:
 	var out_dir: String = args.pop_front() if not args.is_empty() else "user://court_shots"
 	var with_regions := args.has("regions")
 	args.erase("regions")
+	var ingame := args.has("ingame")
+	args.erase("ingame")
+	var grasses: Array = []
 	var looks: Array = []
 	var fogs: Array = []
 	var src := ""
@@ -57,6 +64,9 @@ func _run() -> void:
 			args.erase(a)
 		elif a.begins_with("fogs="):
 			fogs = Array(a.substr(5).split(","))
+			args.erase(a)
+		elif a.begins_with("grass="):
+			grasses = Array(a.substr(6).split(","))
 			args.erase(a)
 		elif a.begins_with("src="):
 			src = a.substr(4)
@@ -96,17 +106,24 @@ func _run() -> void:
 					if scene != null:
 						world.regions.add_child(scene.instantiate())
 			await _wait_regions_built(world, 120.0)
+		if ingame:
+			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
 		for look: String in (looks if not looks.is_empty() else [""]):
 			if look != "" and world.terrain != null:
 				world.terrain.set(&"assets", assets_by_look[look])
 			for fog: String in (fogs if not fogs.is_empty() else [""]):
 				if fog != "":
-					_apply_fog(world, v[7], fog)
-				for i in 40:
-					await get_tree().process_frame
-				var path := "%s/%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look, "" if fog == "" else "_" + fog]
-				root.get_texture().get_image().save_png(path)
-				print("SHOT %s %s %s -> %s | draw_calls %d" % [id, look, fog, path, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+					_apply_fog(world, _grade_at(eye, v[7]) if ingame else v[7], fog)
+				for grass: String in (grasses if not grasses.is_empty() else [""]):
+					if grass != "":
+						_apply_grass(world, grass)
+					for i in 40:
+						await get_tree().process_frame
+					var path := "%s/%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
+						"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass]
+					root.get_texture().get_image().save_png(path)
+					print("SHOT %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, path,
+						world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	get_tree().quit(0)
 
 
@@ -121,6 +138,47 @@ const FOGS := {
 	"layered_mist": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0), "fog_height": 30.0, "fog_height_density": 0.045},
 }
+
+
+## The grade the game shows at `eye`: the RegionGrade there, else `fallback`.
+func _grade_at(eye: Vector3, fallback: StringName) -> StringName:
+	for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
+		var rg := node as RegionGrade
+		if rg.contains(eye):
+			return rg.grade
+	return fallback
+
+
+## The court's grass clumps, and the "toned" look: darker, greener and without
+## the warm rim, so a tuft reads as a little sunlit grass on the storybook
+## ground instead of a pale neon sprite.
+const GRASS := [&"flora_grass_clump_a", &"flora_grass_clump_b", &"flora_grass_clump_c"]
+const GRASS_TONED := {"albedo": Color(0.40, 0.60, 0.36), "saturation_boost": 1.0,
+	"rim_strength": 0.15, "backlight_strength": 0.3, "translucency": 0.15}
+var _grass_restore := {}
+
+
+func _apply_grass(world: World, variant: String) -> void:
+	var meshes := {}
+	for id: StringName in GRASS:
+		meshes[CourtAssets.mesh(id)] = id
+		meshes[CourtAssets.mesh(id, true)] = id
+	var toned: ShaderMaterial = null
+	if variant == "toned":
+		toned = (CourtAssets.material_for(GRASS[0]) as ShaderMaterial).duplicate() as ShaderMaterial
+		for k: String in GRASS_TONED:
+			toned.set_shader_parameter(k, GRASS_TONED[k])
+	var n := 0
+	for node in world.find_children("*", "MultiMeshInstance3D", true, false):
+		var mmi := node as MultiMeshInstance3D
+		if mmi.multimesh == null or not meshes.has(mmi.multimesh.mesh):
+			continue
+		if not _grass_restore.has(mmi):
+			_grass_restore[mmi] = mmi.material_override
+		mmi.visible = variant != "none"
+		mmi.material_override = toned if toned != null else _grass_restore[mmi]
+		n += 1
+	print("GRASS %s on %d chunks" % [variant, n])
 
 
 func _apply_fog(world: World, grade: StringName, fog: String) -> void:
