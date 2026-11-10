@@ -53,7 +53,8 @@ var _leap_pending: bool = false
 func _init() -> void:
 	name = "WhiteMare"
 	collision_layer = LAYER
-	collision_mask = WORLD_MASK
+	# Riding past people bumps them like a wall (T092).
+	collision_mask = WORLD_MASK | ActorBody.LAYER
 	floor_snap_length = 0.6
 	for z: float in [0.65, -0.65]:
 		var shape := CollisionShape3D.new()

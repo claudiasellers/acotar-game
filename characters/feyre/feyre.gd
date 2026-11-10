@@ -169,7 +169,8 @@ var _safe_timer: float = 0.0
 func _ready() -> void:
 	add_to_group(&"player")
 	collision_layer = PLAYER_LAYER
-	collision_mask = WORLD_MASK
+	# People and walking creatures block her too (T092); her probes stay world-only.
+	collision_mask = WORLD_MASK | ActorBody.LAYER
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
 	stamina = max_stamina
