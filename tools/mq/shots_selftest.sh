@@ -110,6 +110,7 @@ check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/or
 check "renders in a small window in the corner, Dummy audio" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40"'
 check "a render window is never kept on top of the owner's apps" '! grep -q -- "--always-on-top" "$FAKE_LOG"'
 check "the picture renders at the request size through override.cfg (viewport stretch)" 'grep -q "^CFG 640x360 \"viewport\" for ok" "$FAKE_LOG"'
+check "override.cfg is gone once the request is answered" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 if [ "$(uname -s)" = Darwin ]; then
 	check "a render starts in the background: __CFBundleIdentifier is the app's id" '! grep "probe/shot.tscn" "$FAKE_LOG" | grep -v "BUNDLE=org.godotengine.godot$" | grep -q .'
 fi
@@ -144,6 +145,7 @@ check "one failing probe gives status partial with its exit code" 'result B-1 | 
 check "the failing probe's log is in the answer" 'git --git-dir="$T/origin.git" show refs/heads/shots/res-B-1:logs/bad.log | grep -q "SCRIPT ERROR"'
 check "a hung probe is stopped at its timeout" 'result C-1 | grep -q "^shot slow timeout exit=124"'
 check "a child that ignores TERM is reported as a timeout and is gone" 'result C-2 | grep -q "^shot stuck timeout exit=124" && ! kill -0 "$(cat "$FAKE_HANG")" 2>/dev/null'
+check "override.cfg is removed after a render that timed out" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 check "a malformed request is answered with the reason" 'result D-1 | grep -qx "status error" && result D-1 | grep -q "note unknown line: explode"'
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
 

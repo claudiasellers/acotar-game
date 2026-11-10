@@ -152,6 +152,7 @@ stop_render() {
 	p=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
 	[ -n "$p" ] && shots_stop_group "$p"
 	rm -f "$SHOTS_CHILD_FILE"
+	quiet_render_end
 }
 
 on_stop() {
@@ -314,6 +315,9 @@ PY
 }
 
 quiet_render() { shots_render_cfg "$WT" "$SIZE"; }
+# override.cfg lives only as long as one render: removed when it ends, however it
+# ended (ok, fail, timeout, or the listener being stopped), so nothing reads it later.
+quiet_render_end() { rm -f "$WT/override.cfg"; }
 
 collect() { # label dir -> RES/out/label, skipping big or unknown files
 	local label="$1" dir="$2" f n=0 sz total
@@ -351,6 +355,7 @@ run_probe_line() { # label path args...
 		shots_run_limited "$TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} "$GODOT" --path "$WT" $(render_args) "$path" -- "$@"
 	fi
 	rc=$?
+	quiet_render_end
 	files=$(collect "$label" "$dir")
 	status=ok
 	[ "$rc" != 0 ] && status=fail
@@ -376,6 +381,7 @@ run_json() { # the layout-shots runner owns request.json; we just run its wrappe
 		shots_run_limited "$JSON_TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} bash tools/shots/take_shots.sh .shots/request.json "$OUT/request"
 	)
 	rc=$?
+	quiet_render_end
 	files=$(collect request "$OUT/request")
 	status=ok
 	[ "$rc" != 0 ] && status=fail
