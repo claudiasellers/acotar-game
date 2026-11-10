@@ -46,6 +46,8 @@ ok) { base64 --decode <"$FAKE_PNG" 2>/dev/null || base64 -D <"$FAKE_PNG"; } >"${
 two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.png"; echo '{"n":2}' >"${user[1]}/stats.json" ;;
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
 hang) echo $$ >"$FAKE_HANG"; exec sleep 300 ;;
+grab) # makes itself the frontmost app after <delay>, as Godot 4.7 on macOS does
+	sleep "${user[1]}"; echo "$$ org.godotengine.godot" >"$FAKE_FRONT"; sleep "${user[2]}" ;;
 stubborn) trap '' TERM; sleep 300 & echo $! >"$FAKE_HANG"; wait ;;
 slow) # true for ever more than one at a time, as two listeners would be
 	mkdir "$FAKE_BUSY" 2>/dev/null || echo "COLLISION" >>"$FAKE_LOG"
@@ -286,6 +288,41 @@ request G 3 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
 check "a commit without levels.sh still runs tools/generators" 'result G-3 | grep -q "gen.gd ran"'
 
+# 10 focus guard (T090): a render that makes itself frontmost at launch hands
+# focus straight back; one that is clicked into later keeps it.
+mkdir -p "$T/fakebin"
+cat >"$T/fakebin/lsappinfo" <<'F'
+#!/bin/bash
+read -r pid bid <"$FAKE_FRONT"
+case "$1 ${3:-}" in
+front*) echo "ASN:0x0-0xfake:" ;;
+"info pid") echo "\"pid\"=$pid" ;;
+"info bundleid") echo "\"CFBundleIdentifier\"=\"$bid\"" ;;
+esac
+F
+cat >"$T/fakebin/open" <<'F'
+#!/bin/bash
+echo "OPEN $*" >>"$FAKE_LOG"
+[ "$1" = -b ] && echo "$FAKE_OWNER $2" >"$FAKE_FRONT"
+F
+chmod +x "$T/fakebin/lsappinfo" "$T/fakebin/open"
+sleep 300 &
+export FAKE_OWNER=$! FAKE_FRONT="$T/front"
+echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
+gonce() { (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
+request F 1 'shot early res://probe/shot.tscn grab 0.3 1.5
+'
+gonce
+check "a render that takes focus at launch hands it back to the owner's app" 'grep -q "^OPEN -b com.example.owner" "$FAKE_LOG" && [ "$(cut -d" " -f2 "$FAKE_FRONT")" = com.example.owner ]'
+check "the answer says how long the render held focus" 'result F-1 | grep -Eq "^note focus guard: handed focus back [0-9]+x, render held it [0-9]+ ms"'
+echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
+n=$(grep -c "^OPEN" "$FAKE_LOG")
+printf 'SHOTS_FOCUS_GUARD=1\n' >>"$T/mac/.git/mq/config"
+request F 2 'shot late res://probe/shot.tscn grab 1.6 1
+'
+gonce
+check "after the first seconds the guard leaves Godot alone (the owner clicked into it)" '[ "$(grep -c "^OPEN" "$FAKE_LOG")" = "$n" ] && [ "$(cut -d" " -f2 "$FAKE_FRONT")" = org.godotengine.godot ]'
+kill "$FAKE_OWNER" 2>/dev/null
 
 echo "---"
 echo "$PASSES passed, $FAILS failed"
