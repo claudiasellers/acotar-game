@@ -113,7 +113,7 @@ func _run() -> void:
 		if ingame:
 			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
 		if lineup != "":
-			_lineup(world, eye, at, lineup)
+			_lineup(world, eye, at, lineup, cam)
 		for look: String in (looks if not looks.is_empty() else [""]):
 			if look != "" and world.terrain != null:
 				world.terrain.set(&"assets", assets_by_look[look])
@@ -135,19 +135,20 @@ func _run() -> void:
 
 ## Model lineups: every tree or plant the court plants, in a row on the real
 ## ground under the real grade, with a 1.7 m post (Feyre) at each end for scale.
-## `lineup=trees` stands them 70 m ahead, `lineup=plants` 9 m ahead.
+## `lineup=trees` stands them 60 m ahead, `lineup=plants` 9 m ahead; the
+## camera then stands back from the row at the row's own ground level.
 const LINEUPS := {
-	"trees": {"distance": 70.0, "spacing": 12.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
+	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
 		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
 		&"woods_elder", &"woods_crab_apple", &"flora_tree_rowan", &"flora_tree_autumn_maple"]},
-	"plants": {"distance": 9.0, "spacing": 1.6, "ids": [&"flora_fern_a", &"flora_fern_b", &"flora_heather_mound",
+	"plants": {"distance": 9.0, "spacing": 1.6, "look": 0.4, "ids": [&"flora_fern_a", &"flora_fern_b", &"flora_heather_mound",
 		&"flora_bush_rose", &"flora_bush_hydrangea", &"flora_carpet_rose", &"flora_carpet_butter",
 		&"flora_carpet_periwinkle", &"flora_reeds_bulrush", &"flora_toadstool_ring", &"rock_mossy_a",
 		&"woods_fallen_log"]},
 }
 
 
-func _lineup(world: World, eye: Vector3, at: Vector3, which: String) -> void:
+func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera3D) -> void:
 	var spec: Dictionary = LINEUPS[which]
 	var fwd := Vector3(at.x - eye.x, 0.0, at.z - eye.z).normalized()
 	var side := fwd.cross(Vector3.UP).normalized()
@@ -172,6 +173,12 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String) -> void:
 		mi.position = p
 		mi.rotation.y = atan2(fwd.x, fwd.z)
 		row.add_child(mi)
+	var d := float(spec["distance"])
+	var centre := eye + fwd * d
+	centre.y = WorldHeight.height_at(centre.x, centre.z)
+	var back := centre - fwd * d
+	cam.position = Vector3(back.x, maxf(centre.y + 1.7 + d * 0.06, WorldHeight.height_at(back.x, back.z) + 1.7), back.z)
+	cam.look_at(centre + Vector3.UP * float(spec["look"]))
 	print("LINEUP %s: %s" % [which, ", ".join(ids.map(func(x): return String(x)))])
 
 
