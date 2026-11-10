@@ -165,6 +165,14 @@ const LINEUPS := {
 		"woods_oak@1", "woods_silver_birch@1", "post",
 		"ez:oak_a:photo", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:photo", "ez:ash_a:painted",
 		"ez:ash_b:painted", "ez:aspen_a:painted", "ez:pine_a:painted", "ez:bush_a:painted", "ez:bush_b:painted"]},
+	# Exploration 2: the leaf-card oak, EZ-Tree's oak and ash (repainted), and
+	# Quaternius' Stylized Nature MegaKit trees and bushes as delivered.
+	"explore2": {"distance": 66.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"woods_oak@1", "ez:oak_a:painted", "ez:ash_a:painted", "post",
+		"scene:qtz/CommonTree_1.gltf:12", "scene:qtz/CommonTree_2.gltf:12", "scene:qtz/CommonTree_3.gltf:14",
+		"scene:qtz/CommonTree_4.gltf:14", "scene:qtz/CommonTree_5.gltf:11", "scene:qtz/Pine_1.gltf:12",
+		"scene:qtz/Pine_4.gltf:15", "scene:qtz/TwistedTree_1.gltf:15", "scene:qtz/Bush_Common.gltf:2.5",
+		"scene:qtz/Bush_Common_Flowers.gltf:2.5"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -261,6 +269,17 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				post.height = 1.7
 				mi.mesh = post
 				p.y += 0.85
+			elif item.begins_with("scene:"):
+				# A packed model as delivered (its own materials), scaled to a height.
+				var inst := (load(EZ_DIR + item.get_slice(":", 1)) as PackedScene).instantiate() as Node3D
+				var top := 0.0
+				for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+					top = maxf(top, m.get_aabb().end.y)
+				inst.scale = Vector3.ONE * float(item.get_slice(":", 2)) / maxf(top, 0.01)
+				inst.position = p
+				inst.rotation.y = atan2(fwd.x, fwd.z)
+				row.add_child(inst)
+				continue
 			elif item.begins_with("ez:"):
 				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted")
 				mi.mesh = ez[0]
