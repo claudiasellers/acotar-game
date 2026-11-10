@@ -254,10 +254,13 @@ func _tint(inst: Node, which: String) -> void:
 	var t: Array = TINTS[which]
 	for mi: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 		for i in mi.mesh.get_surface_count():
-			var src := mi.mesh.surface_get_material(i) as BaseMaterial3D
+			# The imported scene may carry its materials as overrides, not on
+			# the mesh: take whichever is active.
+			var src := mi.get_active_material(i) as BaseMaterial3D
 			var mat := ShaderMaterial.new()
 			mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
-			var leaf := src != null and String(src.resource_name).contains("Leaves")
+			var leaf := src != null and (String(src.resource_name).contains("Lea") or (src.albedo_texture != null and String(src.albedo_texture.resource_path).contains("Lea")))
+			print("TINT surface %d material '%s' tex '%s' leaf %s" % [i, src.resource_name if src else "-", src.albedo_texture.resource_path if src and src.albedo_texture else "-", leaf])
 			mat.set_shader_parameter(&"is_leaf", leaf)
 			if src != null:
 				mat.set_shader_parameter(&"tex", src.albedo_texture)
