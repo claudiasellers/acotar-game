@@ -59,8 +59,14 @@ func _run() -> void:
 	var looks: Array = []
 	var fogs: Array = []
 	var src := ""
+	var forest := ""
 	for a: String in args.duplicate():
-		if a.begins_with("looks="):
+		if a.begins_with("--perf-"):
+			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
+		elif a.begins_with("forest="):
+			forest = a.substr(7)
+			args.erase(a)
+		elif a.begins_with("looks="):
 			looks = Array(a.substr(6).split(","))
 			args.erase(a)
 		elif a.begins_with("fogs="):
@@ -114,6 +120,8 @@ func _run() -> void:
 			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
 		if lineup != "":
 			_lineup(world, eye, at, lineup, cam)
+		if forest != "":
+			_forest(world, eye, forest)
 		for look: String in (looks if not looks.is_empty() else [""]):
 			if look != "" and world.terrain != null:
 				world.terrain.set(&"assets", assets_by_look[look])
@@ -238,6 +246,52 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 	cam.position = Vector3(back.x, maxf(centre.y + 1.7 + d * 0.06, WorldHeight.height_at(back.x, back.z) + 1.7), back.z)
 	cam.look_at(centre + Vector3.UP * float(spec["look"]))
 	print("LINEUP %s: %s" % [which, ", ".join(ids.map(func(x): return String(x)))])
+
+
+## A frame-time stress test (plan Track M): a dense wood all round the eye,
+## 150 trees a hectare out to 150 m (about a thousand trees, every one drawn
+## as its near mesh), from five species. `forest=old` uses FloraLibrary's
+## trees as the estate draws them, `forest=cards` the court's leaf-card
+## builds. Run it under tools/perf/frame_probe.tscn for the numbers.
+const FOREST_SPECIES := [&"oak", &"silver_birch", &"yew", &"wild_cherry", &"hawthorn"]
+const FOREST_RADIUS := 150.0
+const FOREST_PER_HA := 150.0
+
+
+func _forest(world: World, eye: Vector3, kind: String) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4242
+	var buckets := {}
+	var n := int(PI * FOREST_RADIUS * FOREST_RADIUS / 10000.0 * FOREST_PER_HA)
+	for i in n:
+		var r := sqrt(rng.randf()) * FOREST_RADIUS
+		if r < 7.0:
+			continue
+		var a := rng.randf() * TAU
+		var p := Vector3(eye.x + cos(a) * r, 0.0, eye.z + sin(a) * r)
+		p.y = WorldHeight.height_at(p.x, p.z)
+		var sp: StringName = FOREST_SPECIES[rng.randi() % FOREST_SPECIES.size()]
+		var v := rng.randi() % CourtAssets.CARD_VARIANTS if kind == "cards" else 0
+		var key := "%s@%d" % [sp, v]
+		if not buckets.has(key):
+			buckets[key] = []
+		buckets[key].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.85, 1.2)), p))
+	var total := 0
+	for key: String in buckets:
+		var sp := StringName(key.get_slice("@", 0))
+		var mesh: Mesh = FloraLibrary.mesh(sp) if kind == "old" else CourtAssets.mesh(CourtAssets.variant_id(StringName("woods_" + String(sp)), int(key.get_slice("@", 1))))
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = mesh
+		var xs: Array = buckets[key]
+		mm.instance_count = xs.size()
+		for i in xs.size():
+			mm.set_instance_transform(i, xs[i])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		world.add_child(mmi)
+		total += xs.size()
+	print("FOREST %s: %d trees in %d batches" % [kind, total, buckets.size()])
 
 
 ## Depth hazes for the preview: fog field -> value. "layered": a cool
