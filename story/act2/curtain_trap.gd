@@ -50,6 +50,12 @@ const GROWL_SOUND := &"beast_snarl"
 ## the upper floor (upper.tres), 1.6 m wide and 2.8 m high.
 const DOOR_AT := Vector3(0.0, 0.0, 18.4)
 const DOOR_SIZE := Vector2(1.6, 2.8)
+## The room's other walls (space frame): x +/-7, north wall at z -1.6.
+const ROOM_HALF_X := 7.0
+const ROOM_NORTH_Z := -1.6
+## A camera this far in from a room's rect edge is in front of the wall's inner
+## face (0.25 m wall) by a near plane's width.
+const WALL_CLEAR := 0.35
 ## How far it swings in when Alis opens it.
 const DOOR_SWING_DEG := 95.0
 
@@ -97,7 +103,11 @@ func _build_beats() -> Array:
 			StoryControl.set_focus(null), "to the door"),
 		reach_nudged(&"door_inside", 2.0, &"rig_now", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_focus(_marker(&"fixture"))
+			# Not the fixture: at the door it is nearly over her head, so turning
+			# to it swung the camera along the south wall and out into the hall
+			# (T093). "rig_view", out past the door, keeps the camera in her room
+			# looking at her, the door and the fixture.
+			StoryControl.set_focus(_marker(&"rig_view"))
 			aside(&"rig_prompt"), "under the light fixture"),
 		wait_press("rig the rope", &"rig_now", NUDGE_AFTER, &"door_inside", 2.6, "until she rigs it"),
 		Beats.run(_rig, "rigged"),
@@ -179,6 +189,15 @@ func in_room() -> bool:
 		return false
 	var d := p.global_position - global_position
 	return Vector2(d.x, d.z).length() <= ROOM_RADIUS and absf(d.y) <= arrive_height
+
+
+## Is `at` (world) inside her bedroom's walls? The room is upper.tres's
+## feyre_bedroom, Rect2(16, -72, 14, 20) at level 1: in this space's frame x
+## -7..7 and z -1.6..18.4 (the door's wall line). By default it must clear the
+## walls' inner faces (ManorHouseBuilder.WALL in) by a lens's width.
+func camera_in_room(at: Vector3, inset: float = WALL_CLEAR) -> bool:
+	var p := to_local(at)
+	return absf(p.x) <= ROOM_HALF_X - inset and p.z >= ROOM_NORTH_Z + inset and p.z <= DOOR_AT.z - inset
 
 
 ## E at an unstripped curtain: within the moment's radius of one, on her floor.
