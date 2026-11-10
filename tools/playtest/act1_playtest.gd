@@ -84,6 +84,9 @@ var stop_after: String = ""
 ## Dev jump (not an acceptance run): --from=manor skips Act I by writing its
 ## deeds and starts at the manor drive with Act II's beats. Reported as "dev_jump".
 var from_beat: String = ""
+## Probe (T091): --rig-shot=<dir> saves views of her bedroom door at the curtain
+## trap's "rig the rope" step, and prints what blocks the doorway.
+var rig_shot: String = ""
 var max_wall: float = 1500.0
 var settle_limit: float = SETTLE_LIMIT
 var _started_at: float = 0.0
@@ -130,6 +133,8 @@ func _ready() -> void:
 			max_wall = float(arg.trim_prefix("--max-wall="))
 		elif arg.begins_with("--from="):
 			from_beat = arg.trim_prefix("--from=")
+		elif arg.begins_with("--rig-shot="):
+			rig_shot = arg.trim_prefix("--rig-shot=")
 	_started_at = Time.get_unix_time_from_system()
 	EventBus.deed_performed.connect(func(flag: String) -> void: _log("deed %s" % flag))
 	EventBus.phase_changed.connect(func(a: StringName, b: StringName) -> void: _log("phase %s -> %s" % [a, b]))

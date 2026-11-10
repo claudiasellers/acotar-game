@@ -60,16 +60,22 @@ func _arrival() -> bool:
 	t._note("the doors open at %s" % t._v(t.feyre.global_position))
 	await t._until(func() -> bool: return _label(arrival).begins_with("lead"), 10.0)
 	var guard := 0
-	while _label(arrival).begins_with("lead") and guard < 40:
+	while _label(arrival).begins_with("lead") and guard < 120:
 		guard += 1
 		var beast := arrival.actor(&"tamlin_beast")
-		if beast:
+		# Already at his heels: wait for him to move on, as a player would. (A
+		# walk that starts within 3 m returns at once, and 40 of those used up
+		# the follow before he reached the hall, T091.)
+		if beast and t._flat(beast.global_position) > 3.0:
 			await t._walk_to(beast.global_position, 3.0, Callable(), 4.0)
 		else:
 			await t._wait(0.5)
 	await t._walk_to(arrival.mark(&"dining_inside"), 2.5, Callable(), 30.0)
 	if not await t._until(func() -> bool: return arrival.actor(&"tamlin") != null, 15.0):
-		return _fail("never became Tamlin (beat '%s', %.0f m from the head chair)" % [_label(arrival), t._flat(arrival.mark(&"tamlin_seat"))])
+		var b := arrival.actor(&"tamlin_beast")
+		return _fail("never became Tamlin (beat '%s', %.0f m from the head chair; beast at %s, %s, %.1f m from head_chair %s)" % [_label(arrival), t._flat(arrival.mark(&"tamlin_seat")),
+				t._v(b.global_position) if b else "-", ("lead index %d" % (arrival.beats[arrival.beat_index] as Act2Space.LeadBeat).index) if arrival.beat_index >= 0 and arrival.beats[arrival.beat_index] is Act2Space.LeadBeat else "",
+				b.global_position.distance_to(arrival.mark(&"head_chair")) if b else -1.0, t._v(arrival.mark(&"head_chair"))])
 	t._note("Tamlin at the head chair; beat '%s'" % _label(arrival))
 	if not await t._until(func() -> bool: return WorldState.has_flag("fact.manor_arrived") and not arrival.running, 90.0):
 		return _fail("the arrival stalled at '%s'" % _label(arrival))
@@ -153,11 +159,71 @@ func _curtain_trap() -> bool:
 	await t._walk_to(trap.mark(&"door_inside"), 1.4, Callable(), 30.0)
 	if not await t._until(func() -> bool: return _label(trap) == "until she rigs it", 5.0):
 		return _fail("not at the door: %.1f m off" % t._flat(trap.mark(&"door_inside")))
+	if t.rig_shot != "":
+		await _door_probe(trap, "rig_step")
 	await t._press(&"interact")
 	if not await t._until(func() -> bool: return WorldState.has_flag("curtain_trap_set"), 10.0):
 		return _fail("rigging didn't raise curtain_trap_set (beat '%s')" % _label(trap))
+	if t.rig_shot != "":
+		await _door_probe(trap, "rigged")
 	if not await t._until(func() -> bool: return WorldState.has_flag("fact.alis_tripped") and not trap.running, 150.0):
 		return _fail("dawn stalled at '%s'" % _label(trap))
 	t._note("phase %s; flags: first_dinner_eaten, curtain_trap_set" % PhaseManager.current_phase)
 	t._pass()
 	return true
+
+
+## T091 probe: her bedroom door at the rig step. The door's wall line is at
+## trap-local z 18.4 (the room's south wall). Prints rays through the doorway
+## and every door leaf or gate within 4 m, and saves the game view plus a view
+## from inside the room.
+func _door_probe(trap: CurtainTrap, tag: String) -> void:
+	await t._wait(3.0)
+	var door := trap.global_transform * Vector3(0, 0, 18.4)
+	var space := trap.get_world_3d().direct_space_state
+	for h: float in [0.4, 1.2, 2.0, 2.6]:
+		var q := PhysicsRayQueryParameters3D.create(trap.global_transform * Vector3(0, h, 17.9), trap.global_transform * Vector3(0, h, 20.0))
+		var hit := space.intersect_ray(q)
+		t._log("T091 %s ray h=%.1f through the doorway: %s" % [tag, h,
+				("hit %s at %.2f m" % [(hit.collider as Node).get_path(), (hit.position as Vector3).distance_to(q.from)]) if hit else "open"])
+	var near := 0
+	for n in t.get_tree().root.find_children("*", "Node3D", true, false):
+		if (n is ManorDoorLeaf or n is RegionGate) and (n as Node3D).global_position.distance_to(door + Vector3.UP * 1.4) < 4.0:
+			near += 1
+			t._log("T091 %s leaf %s visible=%s" % [tag, n.get_path(), (n as Node3D).is_visible_in_tree()])
+	t._log("T091 %s door leaves within 4 m of the doorway: %d; feyre at %s, door line at %s" % [tag, near, t.feyre.global_position, door])
+	var vp := t.get_viewport()
+	_save(vp, "%s_game" % tag)
+	var door_node := trap.door
+	if door_node and tag == "rig_step":
+		# The same view as the house alone builds it: no door (the "before").
+		door_node.visible = false
+		await t._wait(0.5)
+		_save(vp, "%s_game_nodoor" % tag)
+		door_node.visible = true
+	var was := vp.get_camera_3d()
+	var cam := Camera3D.new()
+	t.get_tree().root.add_child(cam)
+	cam.global_position = trap.global_transform * Vector3(-1.5, 1.7, 11.0)
+	cam.look_at(door + Vector3.UP * 1.5)
+	cam.fov = 60.0
+	cam.make_current()
+	await t._wait(1.5)
+	_save(vp, "%s_room" % tag)
+	if door_node and tag == "rig_step":
+		door_node.visible = false
+		await t._wait(0.5)
+		_save(vp, "%s_room_nodoor" % tag)
+		door_node.visible = true
+	cam.queue_free()
+	if was:
+		was.make_current()
+	await t._wait(0.5)
+
+
+func _save(vp: Viewport, file: String) -> void:
+	var image := vp.get_texture().get_image()
+	if image == null:
+		t._log("T091 %s: no image (headless)" % file)
+		return
+	image.save_png(t.rig_shot.path_join(file + ".png"))
