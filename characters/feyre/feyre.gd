@@ -42,6 +42,11 @@ const CLOSE_FROM := 1.8
 const CLOSE_SHOULDER := 0.35
 const ROOM_PULL_IN := 14.0
 const ROOM_LET_OUT := 2.5
+## The lens is a ball this wide (m) to the walls (T094): the spring arm sweeps a
+## sphere, not a ray, so a wall running beside the arm keeps it this far off, and
+## the shoulder offset is swept out from the pivot first, so it never pushes the
+## arm's start into or through a wall beside her.
+const LENS_RADIUS := 0.2
 ## How far up (m) a roof still counts as "indoors".
 const INDOOR_PROBE := 9.0
 ## The body swept along a ledge climb: a touch slimmer than her capsule, feet off
@@ -217,7 +222,8 @@ func _process(delta: float) -> void:
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	_clamp_indoor_pitch()
 	var shoulder := 0.55 if (is_aiming or is_drawing) else close_shoulder(_spring_arm.spring_length)
-	_spring_arm.position.x = lerpf(_spring_arm.position.x, shoulder, 10.0 * delta)
+	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, 10.0 * delta),
+			shoulder_clearance(shoulder))
 	_update_breath(delta)
 	look_input_this_frame = false
 
@@ -587,6 +593,24 @@ func close_shoulder(arm: float) -> float:
 	return CLOSE_SHOULDER * clampf((CLOSE_FROM - arm) / (CLOSE_FROM - ROOM_MIN_ARM), 0.0, 1.0)
 
 
+## How far (m, up to `want`) the arm's start can sit to her right of the pivot with
+## the lens ball clear of walls: a sphere swept out from the pivot. Pulling in is
+## instant (the caller takes the minimum), so no frame peeks past a wall.
+func shoulder_clearance(want: float) -> float:
+	if want <= 0.0:
+		return 0.0
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _spring_arm.shape
+	query.transform = Transform3D(Basis(), _camera_pitch.global_position)
+	query.motion = _camera_pitch.global_basis.x * want
+	query.collision_mask = _spring_arm.collision_mask
+	var skip: Array[RID] = [get_rid()]
+	skip.append_array(_cam_skip)
+	query.exclude = skip
+	var safe := get_world_3d().direct_space_state.cast_motion(query)
+	return want * safe[0]
+
+
 ## Indoors: the longest arm (up to `want`) whose view-edge whiskers clear the walls.
 ## Outdoors (_indoor 0) it allows the full arm, as before.
 func _update_room_arm(delta: float, want: float) -> void:
@@ -838,6 +862,9 @@ func _build_camera() -> void:
 	_spring_arm.spring_length = 3.6
 	_spring_arm.collision_mask = WORLD_MASK
 	_spring_arm.margin = 0.2
+	var lens := SphereShape3D.new()
+	lens.radius = LENS_RADIUS
+	_spring_arm.shape = lens
 	_spring_arm.add_excluded_object(get_rid())
 	_camera_pitch.add_child(_spring_arm)
 	camera = Camera3D.new()
