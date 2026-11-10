@@ -55,6 +55,7 @@ func _run() -> void:
 	var ingame := args.has("ingame")
 	args.erase("ingame")
 	var grasses: Array = []
+	var lineup := ""
 	var looks: Array = []
 	var fogs: Array = []
 	var src := ""
@@ -64,6 +65,9 @@ func _run() -> void:
 			args.erase(a)
 		elif a.begins_with("fogs="):
 			fogs = Array(a.substr(5).split(","))
+			args.erase(a)
+		elif a.begins_with("lineup="):
+			lineup = a.substr(7)
 			args.erase(a)
 		elif a.begins_with("grass="):
 			grasses = Array(a.substr(6).split(","))
@@ -108,6 +112,8 @@ func _run() -> void:
 			await _wait_regions_built(world, 120.0)
 		if ingame:
 			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
+		if lineup != "":
+			_lineup(world, eye, at, lineup)
 		for look: String in (looks if not looks.is_empty() else [""]):
 			if look != "" and world.terrain != null:
 				world.terrain.set(&"assets", assets_by_look[look])
@@ -125,6 +131,48 @@ func _run() -> void:
 					print("SHOT %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, path,
 						world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	get_tree().quit(0)
+
+
+## Model lineups: every tree or plant the court plants, in a row on the real
+## ground under the real grade, with a 1.7 m post (Feyre) at each end for scale.
+## `lineup=trees` stands them 70 m ahead, `lineup=plants` 9 m ahead.
+const LINEUPS := {
+	"trees": {"distance": 70.0, "spacing": 12.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
+		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
+		&"woods_elder", &"woods_crab_apple", &"flora_tree_rowan", &"flora_tree_autumn_maple"]},
+	"plants": {"distance": 9.0, "spacing": 1.6, "ids": [&"flora_fern_a", &"flora_fern_b", &"flora_heather_mound",
+		&"flora_bush_rose", &"flora_bush_hydrangea", &"flora_carpet_rose", &"flora_carpet_butter",
+		&"flora_carpet_periwinkle", &"flora_reeds_bulrush", &"flora_toadstool_ring", &"rock_mossy_a",
+		&"woods_fallen_log"]},
+}
+
+
+func _lineup(world: World, eye: Vector3, at: Vector3, which: String) -> void:
+	var spec: Dictionary = LINEUPS[which]
+	var fwd := Vector3(at.x - eye.x, 0.0, at.z - eye.z).normalized()
+	var side := fwd.cross(Vector3.UP).normalized()
+	var ids: Array = spec["ids"]
+	var row := Node3D.new()
+	row.name = "Lineup"
+	world.add_child(row)
+	var n := ids.size() + 2
+	for i in n:
+		var p := eye + fwd * float(spec["distance"]) + side * (float(i) - float(n - 1) * 0.5) * float(spec["spacing"])
+		p.y = WorldHeight.height_at(p.x, p.z)
+		var mi := MeshInstance3D.new()
+		if i == 0 or i == n - 1:
+			var post := CylinderMesh.new()
+			post.top_radius = 0.12
+			post.bottom_radius = 0.12
+			post.height = 1.7
+			mi.mesh = post
+			p.y += 0.85
+		else:
+			mi.mesh = CourtAssets.mesh(ids[i - 1])  # as the court's scatter draws it
+		mi.position = p
+		mi.rotation.y = atan2(fwd.x, fwd.z)
+		row.add_child(mi)
+	print("LINEUP %s: %s" % [which, ", ".join(ids.map(func(x): return String(x)))])
 
 
 ## Depth hazes for the preview: fog field -> value. "layered": a cool
