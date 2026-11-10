@@ -254,16 +254,16 @@ func _tint(inst: Node, which: String) -> void:
 	var t: Array = TINTS[which]
 	for mi: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 		for i in mi.mesh.get_surface_count():
-			# The imported scene may carry its materials as overrides, not on
-			# the mesh: take whichever is active.
-			var src := mi.get_active_material(i) as BaseMaterial3D
+			# The glTF lists bark then leaves; the imported materials don't come
+			# through as BaseMaterial3D here (wcterrain-26), so go by order and
+			# load the pack's textures directly.
+			var leaf := i == 1
 			var mat := ShaderMaterial.new()
 			mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
-			var leaf := src != null and (String(src.resource_name).contains("Lea") or (src.albedo_texture != null and String(src.albedo_texture.resource_path).contains("Lea")))
-			print("TINT surface %d material '%s' tex '%s' leaf %s" % [i, src.resource_name if src else "-", src.albedo_texture.resource_path if src and src.albedo_texture else "-", leaf])
 			mat.set_shader_parameter(&"is_leaf", leaf)
-			if src != null:
-				mat.set_shader_parameter(&"tex", src.albedo_texture)
+			mat.set_shader_parameter(&"tex", load(EZ_DIR + ("qtz/Leaves_NormalTree_C.png" if leaf else "qtz/Bark_NormalTree.png")))
+			var am := mi.get_active_material(i)
+			print("TINT surface %d %s leaf %s" % [i, am.get_class() if am else "null", leaf])
 			mat.set_shader_parameter(&"leaf_col", t[0])
 			mat.set_shader_parameter(&"leaf_light", t[1])
 			mi.set_surface_override_material(i, mat)
