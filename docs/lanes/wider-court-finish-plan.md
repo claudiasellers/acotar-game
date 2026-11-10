@@ -42,6 +42,29 @@ Phase 0 ran (wcterrain-13/14/15). It found the models are half the problem:
 
 ### Track M — the models (runs beside Phase 1; different files)
 
+**Status (2026-11-10).** M1 is done: the owner picked B, painterly leaf cards
+(wcterrain-17). M2 is done for the court's ten leafy species:
+- `tools/court/blender/court_trees.py`: five builds each, differing in outline
+  (1–3 crown lobes, crowns wider one way), size, lean, limbs, sky holes and greens;
+- `tools/court/gen_leaf_atlas.py`: the painted leaf atlas;
+- `court_leaf_card.gdshader`: a per-tree tint on top of the builds.
+
+They're court only (`CourtAssets.CARD_TREES_ON`), which leaves M3 open.
+
+Frame time on the Mac (M4, wcterrain-19/20/21), median / p95 ms:
+
+| View | Old trees | Card trees |
+|---|---|---|
+| Dense wood, about 1,000 trees, near mesh within the game's distances | 16.6 / 17.8 | 17.0 / 18.6 |
+| Court Western Woods | 16.3 / 23.1 | 16.7 / 17.2 |
+| Court glen | 19.9 / 27.8 | 19.1 / 36.8 (one hitch) |
+
+Card trees draw their near mesh within `CARD_NEAR` (100 m) only, because the
+cards cost overdraw, not triangles. In the first test, near meshes ran out
+to 150 m and the dense wood took 19.8 ms. Frame times sit near 16.6 ms on
+every run, which looks like the window capping at 60 Hz, so the headroom
+below the line isn't measured.
+
 - **M1 — direction test (preview).** Regenerate four species (oak, silver birch,
   wild cherry, yew) two ways, with bpy 5.x headless in the cloud (it installs
   there; the woods scripts may need small 5.x API fixes):

@@ -144,7 +144,7 @@ func _run() -> void:
 ## Model lineups: every tree or plant the court plants, in a row on the real
 ## ground under the real grade, with a 1.7 m post (Feyre) at each end for scale.
 ## `lineup=trees` stands them 60 m ahead, `lineup=plants` 9 m ahead,
-## `lineup=tests` the model direction test (M1); the
+## `lineup=species` / `lineup=builds` the court's leaf-card trees; the
 ## camera then stands back from the row at the row's own ground level.
 const LINEUPS := {
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
@@ -163,42 +163,7 @@ const LINEUPS := {
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
 		"woods_wild_cherry@0", "woods_wild_cherry@1", "woods_wild_cherry@2"]},
-	# Model direction test M1: today's oak, birch, cherry and yew, then the
-	# same four as A (storybook deep) and B (painterly leaf cards), with a
-	# post between the groups.
-	"tests": {"distance": 62.0, "spacing": 11.0, "look": 6.0, "ids": [
-		"now:woods_oak", "now:woods_silver_birch", "now:woods_wild_cherry", "now:woods_yew", "post",
-		"a:oak", "a:silver_birch", "a:wild_cherry", "a:yew", "post",
-		"b:oak", "b:silver_birch", "b:wild_cherry", "b:yew"]},
 }
-const TREE_TESTS := "res://world/spring_court/wider/assets/tree_tests/"
-
-
-## A test tree's mesh with its materials: the woods' tree look with the teal
-## guard down (the test greens are deep on purpose), and the leaf-card
-## shader on B's card surface.
-func _test_tree(style: String, species: String) -> Mesh:
-	var scene := load("%s%s_%s.glb" % [TREE_TESTS, style, species]) as PackedScene
-	var inst := scene.instantiate()
-	var src: MeshInstance3D = inst.find_children("*", "MeshInstance3D", true, false)[0]
-	var mesh := src.mesh.duplicate() as ArrayMesh
-	inst.free()
-	var wood := (FloraLibrary.material(&"tree") as ShaderMaterial).duplicate() as ShaderMaterial
-	wood.set_shader_parameter(&"lime_guard", 0.15)
-	var card := ShaderMaterial.new()
-	card.shader = load(TREE_TESTS + "leaf_card.gdshader")
-	for i in mesh.get_surface_count():
-		# The card surface is the one with card coordinates in UV2 (the glTF
-		# placeholder materials arrive without their names).
-		var uv2: Variant = mesh.surface_get_arrays(i)[Mesh.ARRAY_TEX_UV2]
-		var is_card := false
-		if uv2 != null:
-			for v: Vector2 in uv2:
-				if v.x > 0.5:
-					is_card = true
-					break
-		mesh.surface_set_material(i, card if is_card else wood)
-	return mesh
 
 
 func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera3D) -> void:
@@ -232,8 +197,6 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				p.y += 0.85
 			elif item.begins_with("now:"):
 				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)))
-			elif item.contains(":"):
-				mi.mesh = _test_tree(item.get_slice(":", 0), item.get_slice(":", 1))
 			else:
 				mi.mesh = CourtAssets.mesh(StringName(item))  # as the court's scatter draws it
 		mi.position = p
