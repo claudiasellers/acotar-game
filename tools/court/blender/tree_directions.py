@@ -97,21 +97,23 @@ def env_normal(p, c, rx, rz):
     return Vector((d.x / (rx * rx), d.y / (rx * rx), d.z / (rz * rz))).normalized()
 
 
-def clump_points(kit, c, rx, rz, count, holes, lift=0.15):
+def clump_points(kit, c, rx, rz, count, holes, lift=0.15, floor=-0.55, cone=0.0):
     """Clump centres on the crown's ellipsoid shell, with noise-carved sky
-    holes and a slight bias upward."""
+    holes and a slight bias upward; `cone` narrows the shell toward the top
+    (the yew)."""
     pts = []
     seed = Vector((kit.rng.random() * 40, kit.rng.random() * 40, kit.rng.random() * 40))
     tries = 0
     while len(pts) < count and tries < count * 30:
         tries += 1
         v = Vector((kit.rng.gauss(0, 1), kit.rng.gauss(0, 1), kit.rng.gauss(0, 1) + lift)).normalized()
-        if v.z < -0.55:
+        if v.z < floor:
             continue  # the underside stays open: limbs and shade show
         if noise.noise(v * 2.2 + seed) > holes:
             continue  # a sky hole
         r = kit.rng.uniform(0.62, 0.95)
-        pts.append(c + Vector((v.x * rx * r, v.y * rx * r, v.z * rz * r)))
+        narrow = 1.0 - cone * (v.z + 1.0) * 0.5
+        pts.append(c + Vector((v.x * rx * r * narrow, v.y * rx * r * narrow, v.z * rz * r)))
     return pts
 
 
@@ -210,7 +212,8 @@ def tree(kit, style, spec):
         c = top + Vector((0, 0, spec["rz"] * 0.8))
         rz = spec["rz"] * 1.4
     else:
-        pts = clump_points(kit, c, rx, rz, spec["count"], spec.get("holes", 0.35))
+        pts = clump_points(kit, c, rx, rz, spec["count"], spec.get("holes", 0.35),
+                           floor=spec.get("floor", -0.55), cone=spec.get("cone", 0.0))
     # Limbs to a spread of the clumps (not every one: twigs are implied).
     reach = [p for i, p in enumerate(sorted(pts, key=lambda q: -q.z)) if i % spec.get("limb_every", 3) == 0]
     if not spec.get("birch"):
@@ -240,12 +243,12 @@ def tree(kit, style, spec):
 SPECS = {
     "oak": dict(trunk=4.2, r0=0.62, flare=0.5, rx=5.6, rz=3.8, sit=0.6, pal=GREENS, count=30, holes=0.38,
                 clump=(1.25, 1.9), limbs=8, cards=17),
-    "silver_birch": dict(trunk=8.0, r0=0.24, lean=0.04, rx=2.5, rz=4.2, sit=0.5, pal=BIRCH, count=26, holes=0.28,
-                         clump=(0.65, 1.05), birch=True, cards=13),
+    "silver_birch": dict(trunk=4.6, r0=0.24, lean=0.04, rx=2.6, rz=5.0, sit=0.72, pal=BIRCH, count=28, holes=0.28,
+                         floor=-0.85, clump=(0.6, 1.0), birch=True, cards=12),
     "wild_cherry": dict(trunk=2.8, r0=0.32, lean=0.16, rx=4.4, rz=2.7, sit=0.5, pal=CHERRY, count=26, holes=0.4,
                         clump=(1.0, 1.45), cherry=True, limbs=8, cards=15),
-    "yew": dict(trunk=1.6, r0=0.5, flare=0.5, rx=3.0, rz=3.4, pal=YEW, count=26, tiers=5, clump=(1.0, 1.5),
-                limbs=0, cards=15, bark=(hexc("4A2E2A"), hexc("6E4038"))),
+    "yew": dict(trunk=1.4, r0=0.5, flare=0.5, rx=3.4, rz=4.6, sit=0.85, pal=YEW, count=30, holes=0.6, floor=-0.9,
+                cone=0.75, clump=(0.85, 1.25), limbs=4, cards=14, bark=(hexc("4A2E2A"), hexc("6E4038"))),
 }
 
 
