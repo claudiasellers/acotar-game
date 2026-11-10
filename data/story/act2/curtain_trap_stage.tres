@@ -13,7 +13,8 @@ marks = {
 "curtains_floor": Vector3(0, 0, -0.6),
 "door_inside": Vector3(0, 0, 17.2),
 "feyre_bed": Vector3(-4.2, 0, 10.4),
-"fixture": Vector3(0.5, 3, 17.6)
+"fixture": Vector3(0.5, 3, 17.6),
+"rig_view": Vector3(0, 2.2, 21.4)
 }
 lines = {
 "alis_lucien": {"text": "Lucien's on border patrol today. He'll be at the stables, getting ready to leave.", "who": "Alis"},
