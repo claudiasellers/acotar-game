@@ -1,7 +1,7 @@
 ## A main-cast model standing about in free roam (lane L34): Tamlin or Lucien
 ## at the manor. Real models only (characters/<id>/<id>_model.tscn), so the
 ## playtest's grey-box guard stays clean. It idles, and turns to face Feyre
-## while she is near. No collision: it never blocks a door or a deed.
+## while she is near. Solid (T092): she bumps into it like anyone else.
 class_name PresenceActor
 extends Node3D
 
@@ -25,6 +25,7 @@ static func make(speaker_id: StringName, scene: PackedScene) -> PresenceActor:
 func _ready() -> void:
 	add_to_group(DialogueDirector.PRESENCE_GROUP)
 	set_meta(&"speaker", speaker)
+	ActorBody.attach(self)
 
 
 func _process(delta: float) -> void:

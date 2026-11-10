@@ -8,6 +8,11 @@
 ## Only meshes no bigger than MAX_SIZE fade (never a room shell, terrain or a
 ## scatter field), never Feyre herself, never a mesh in NEVER_GROUP (her mount). Purely presentational.
 ##
+## People (anything with an ActorBody, T092) never fade part by part: a body
+## going see-through while its eyes, teeth and mask stayed solid looked like a
+## skeleton. Instead a person goes wholly invisible, every mesh at once, only
+## while the lens is inside their capsule; otherwise they stay solid.
+##
 ## With no rendering device (headless: tests, world_smoke, the gate) it does
 ## nothing at all, unless a test sets `headless_opt_in` before Feyre enters the
 ## tree; then it looks only at meshes in PROBE_GROUP, never a tree walk.
@@ -29,6 +34,8 @@ const OWN_RADIUS := 0.9
 ## Largest mesh (longest world AABB side, m) that may fade.
 const MAX_SIZE := 3.5
 const FADED := 0.85
+## A person vanishes while the lens is this close to their capsule (m).
+const LENS_MARGIN := 0.15
 ## Seconds for a full fade in or out.
 const FADE_TIME := 0.15
 ## Her own camera only: props (drapes, bed posts, screens) crossing the line from the
@@ -62,12 +69,21 @@ func _process(delta: float) -> void:
 	if own:
 		for g in sight_blockers(cam.global_position, body.global_position + Vector3.UP * SIGHT_HEIGHT):
 			near[g.get_instance_id()] = g
+	var gone := {}
+	for g in people_at_lens(cam.global_position):
+		gone[g.get_instance_id()] = g
 	var step := delta / FADE_TIME
 	for id in near:
 		var g: GeometryInstance3D = near[id]
 		if not _touched.has(id):
 			_touched[id] = g.transparency
 		g.transparency = move_toward(g.transparency, maxf(FADED, _touched[id]), step)
+	for id in gone:
+		var g: GeometryInstance3D = gone[id]
+		near[id] = g
+		if not _touched.has(id):
+			_touched[id] = g.transparency
+		g.transparency = 1.0
 	for id in _touched.keys():
 		if near.has(id):
 			continue
@@ -104,6 +120,19 @@ func near_meshes(at: Vector3, radius: float = RADIUS) -> Array[GeometryInstance3
 	return out
 
 
+## Every mesh of each person whose capsule holds the lens (`at`): they vanish whole.
+func people_at_lens(at: Vector3) -> Array[GeometryInstance3D]:
+	var out: Array[GeometryInstance3D] = []
+	for n in get_tree().get_nodes_in_group(ActorBody.GROUP):
+		var body := n as ActorBody
+		if body == null or not body.lens_inside(at, LENS_MARGIN):
+			continue
+		var root := body.get_parent()
+		for m in root.find_children("*", "GeometryInstance3D", true, false):
+			out.append(m as GeometryInstance3D)
+	return out
+
+
 ## Fadeable meshes whose bounds cross the segment `from` -> `to` (lens to her chest).
 func sight_blockers(from: Vector3, to: Vector3) -> Array[GeometryInstance3D]:
 	var out: Array[GeometryInstance3D] = []
@@ -121,7 +150,7 @@ func _fadeable_box(g: GeometryInstance3D) -> AABB:
 		return AABB()
 	if _owner_root and _owner_root.is_ancestor_of(g):
 		return AABB()
-	if g.is_in_group(NEVER_GROUP):
+	if g.is_in_group(NEVER_GROUP) or ActorBody.is_actor_part(g):
 		return AABB()
 	var box := g.global_transform * g.get_aabb()
 	if maxf(box.size.x, maxf(box.size.y, box.size.z)) > MAX_SIZE:

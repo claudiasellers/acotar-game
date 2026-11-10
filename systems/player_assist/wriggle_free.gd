@@ -40,8 +40,9 @@ static func find_spot(body: CharacterBody3D, safe_spots: Array[Vector3] = []) ->
 ## Floor under `at` (probing from above) with room for her capsule, or null.
 static func _standing_spot(space: PhysicsDirectSpaceState3D, at: Vector3, mask: int, exclude: RID) -> Variant:
 	for start in PROBE_STARTS:
+		# Floors only: never a spot on someone's head (people, T092).
 		var query := PhysicsRayQueryParameters3D.create(
-				at + Vector3.UP * start, at + Vector3.DOWN * PROBE_DOWN, mask, [exclude])
+				at + Vector3.UP * start, at + Vector3.DOWN * PROBE_DOWN, mask & ~ActorBody.LAYER, [exclude])
 		var hit := space.intersect_ray(query)
 		if hit.is_empty() or (hit.normal as Vector3).y < MIN_FLOOR_Y:
 			continue

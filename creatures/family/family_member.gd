@@ -24,6 +24,9 @@ var activity: StringName = &"idle"
 var target_spot: StringName = &""
 
 var _body: Node3D
+## Its capsule on the actors layer (T092); off while asleep or away.
+var actor_body: ActorBody
+var _yield_t: float = 0.0
 var _destination: Vector3
 ## The cast model when there is one; it plays idle/walk from our ground speed.
 var _model: Node3D
@@ -33,6 +36,8 @@ func _ready() -> void:
 	add_to_group(GROUP)
 	_destination = global_position if is_inside_tree() else position
 	_build_body()
+	# Solid: Feyre bumps into them (T092).
+	actor_body = ActorBody.attach(self)
 	if EventBus.has_signal(&"story_actor_cue"):
 		EventBus.connect(&"story_actor_cue", _on_cue)
 
@@ -50,7 +55,15 @@ func _process(delta: float) -> void:
 	var to := _destination - global_position
 	to.y = 0.0
 	var speed := 0.0
-	if to.length() > 0.05:
+	# Feyre in the way: wait up to ActorBody.YIELD_TIME, then walk on regardless.
+	var moving := to.length() > 0.05
+	var blocked := moving and _yield_t < ActorBody.YIELD_TIME \
+			and ActorBody.player_blocks(get_tree(), global_position, to)
+	if blocked:
+		_yield_t += delta
+	elif not moving:
+		_yield_t = 0.0
+	if moving and not blocked:
 		global_position += to.limit_length(walk_speed * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 8.0 * delta)
 		speed = walk_speed if delta > 0.0 else 0.0
@@ -106,6 +119,8 @@ func _pose() -> void:
 	if _body == null:
 		return
 	visible = activity != &"away"
+	if actor_body:
+		actor_body.set_solid(activity != &"away" and activity != &"sleep")
 	if _model:
 		_body.rotation.x = -PI * 0.5 if activity == &"sleep" else (0.2 if activity == &"plead" else 0.0)
 		_body.position.y = 0.55 if activity == &"sleep" else 0.0

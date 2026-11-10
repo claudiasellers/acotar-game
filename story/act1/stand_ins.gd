@@ -103,4 +103,7 @@ static func figure(actor_id: String) -> Node3D:
 		mesh.material_override = mat
 		root.add_child(mesh)
 	root.name = "StandIn_%s" % actor_id
+	if not root is CollisionObject3D:
+		# Solid: Feyre bumps into story cast like anyone else (T092).
+		ActorBody.attach(root)
 	return root
