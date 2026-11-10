@@ -15,11 +15,6 @@ uniform float drain : hint_range(0.0, 1.0) = 0.0;
 // chroma and leans teal, so sunlight and the spring grade's saturation
 // boost can't push it into #00FF00-#7FFF00.
 uniform float lime_guard : hint_range(0.0, 1.0) = 0.6;
-// Painted canopy (preview, 2026-11-10): soft world-space value bands, like the
-// storybook ground's brushwork, so a crown reads as painted leaves, not a
-// smooth blob. 0 = off (the look until the owner picks).
-uniform float paint_strength : hint_range(0.0, 1.0) = 0.0;
-uniform float paint_scale : hint_range(0.1, 8.0) = 1.4;
 
 varying vec3 world_pos;
 varying float v_glow;
@@ -47,14 +42,6 @@ float hash3(vec3 p) {
 	return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
 }
 
-float vnoise3(vec3 p) {
-	vec3 i = floor(p);
-	vec3 f = fract(p);
-	f = f * f * (3.0 - 2.0 * f);
-	return mix(mix(mix(hash3(i), hash3(i + vec3(1, 0, 0)), f.x), mix(hash3(i + vec3(0, 1, 0)), hash3(i + vec3(1, 1, 0)), f.x), f.y),
-		mix(mix(hash3(i + vec3(0, 0, 1)), hash3(i + vec3(1, 0, 1)), f.x), mix(hash3(i + vec3(0, 1, 1)), hash3(i + vec3(1, 1, 1)), f.x), f.y), f.z);
-}
-
 void fragment() {
 	vec3 col = pow(COLOR.rgb, vec3(2.2));
 	float grey = dot(col, vec3(0.3, 0.59, 0.11));
@@ -63,11 +50,6 @@ void fragment() {
 	float greenness = clamp((col.g - max(col.r, col.b)) / max(col.g, 0.001), 0.0, 1.0) * lime_guard;
 	col = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), greenness);
 	col.b += greenness * col.g * 0.35;
-	if (paint_strength > 0.0) {
-		vec3 q = world_pos * paint_scale;
-		float n = vnoise3(q) * 0.6 + vnoise3(q * 2.7 + 7.1) * 0.4;
-		col *= mix(1.0, 0.72 + 0.56 * smoothstep(0.25, 0.75, n), paint_strength);
-	}
 	ALBEDO = col;
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.35;

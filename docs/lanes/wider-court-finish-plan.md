@@ -19,7 +19,57 @@ in order, with the owner's "see it first" gate on every look change.
   triangles near the camera: ~150/ha within 120 m is ~700 trees, ~1 M tris, the size
   of a manor view.
 
-## Phase 0 — baseline (lead, half a day)
+## Owner's call (2026-11-10): planting first, and revisit the models
+
+Phase 0 ran (wcterrain-13/14/15). It found the models are half the problem:
+
+- **The trees are candy cloud blobs.** `tools/woods/blender/woods_trees.py` (rule R3)
+  builds smooth icosphere canopies with pale mint tops (`LEAF_GOLD` B5E3C0), lighter
+  than the new storybook ground. They read as pale cut-outs with no silhouette: the
+  grass clumps' failure, but bigger.
+- **Colour lives in the vertex colours.** A material-only restyle changed almost
+  nothing (wcterrain-15): lower candy gain, no teal guard, more form, brushwork on
+  the crowns. The fix has to be in the models.
+- **The palette is confetti.** A red maple, a lime rowan, white birch puffs, pink
+  cherries and mint oaks all stand side by side.
+- **Scale.** The trees are 5–12 m on hills of 30–200 m.
+- **The `woods_*` trees are shared** with the estate, the Eastern and Border Woods and
+  the Suriel glade. Changing them changes those places too.
+- Also seen:
+  - the fells grade turns the Western Woods teal (`grade_fells` LUT);
+  - a tree trunk sits on the vale-rim viewpoint (`vale_rim`, a planting bug);
+  - the glen is milky (Phase 3).
+
+### Track M — the models (runs beside Phase 1; different files)
+
+- **M1 — direction test (preview).** Regenerate four species (oak, silver birch,
+  wild cherry, yew) two ways, with bpy 5.x headless in the cloud (it installs
+  there; the woods scripts may need small 5.x API fixes):
+  - (A) **Storybook deep:** the same soft storybook shapes, with
+    - deep painted greens (crowns darker than the sunlit ground, light only on top);
+    - crowns broken into many clumps, with sky holes;
+    - visible limbs, and blossom as accents rather than whole crowns.
+  - (B) **Painterly leaf cards:** crowns of painted leaf-card clusters. The
+    silhouette is more organic but there's more overdraw.
+  - Show both in the lineup (`court_terrain_shots lineup=trees`) next to today's
+    trees, and the owner picks.
+- **M2 — roll out.** Every court tree species gets the chosen look:
+  - near, far and impostor meshes inside the tri budgets (3000, or 4500 for the
+    ancient oak);
+  - shrubs, ferns, heather, bushes and flower carpets in the same palette;
+  - one palette rule for autumn and blossom accents, instead of confetti.
+- **M3 — shared or court-only.** Either the new trees replace the `woods_*` ones
+  everywhere (one consistent Spring Court; the estate and woods change too), or the
+  court gets its own species set. That's the owner's call, with renders of the
+  estate both ways.
+- **M4 — scale bands** come in through Phase 1 planting.
+- The landmark models stay a later track.
+
+Order: M1, then Phase 1 planting and M2 side by side (`court_content_table.gd` and
+the generator vs `woods_trees.py` and the flora generator), then Phase 2 ground
+cover, then the grades (glen, fells).
+
+## Phase 0 — baseline (done: wcterrain-13/14)
 
 - Render the 18 `court_terrain_shots` views with `regions ingame` on the Mac at current
   `main`, plus `tools/perf/frame_probe` on 3 court views (glen, meadow, woods). That's

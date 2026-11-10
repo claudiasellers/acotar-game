@@ -56,7 +56,6 @@ func _run() -> void:
 	args.erase("ingame")
 	var grasses: Array = []
 	var lineup := ""
-	var tree_looks: Array = []
 	var looks: Array = []
 	var fogs: Array = []
 	var src := ""
@@ -66,9 +65,6 @@ func _run() -> void:
 			args.erase(a)
 		elif a.begins_with("fogs="):
 			fogs = Array(a.substr(5).split(","))
-			args.erase(a)
-		elif a.begins_with("trees="):
-			tree_looks = Array(a.substr(6).split(","))
 			args.erase(a)
 		elif a.begins_with("lineup="):
 			lineup = a.substr(7)
@@ -127,52 +123,14 @@ func _run() -> void:
 				for grass: String in (grasses if not grasses.is_empty() else [""]):
 					if grass != "":
 						_apply_grass(world, grass)
-					for tl: String in (tree_looks if not tree_looks.is_empty() else [""]):
-						if tl != "":
-							_apply_tree_look(tl)
-						for i in 40:
-							await get_tree().process_frame
-						var path := "%s/%s%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
-							"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass,
-							"" if tl == "" else "_trees-" + tl]
-						root.get_texture().get_image().save_png(path)
-						print("SHOT %s %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, tl, path,
-							world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+					for i in 40:
+						await get_tree().process_frame
+					var path := "%s/%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
+						"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass]
+					root.get_texture().get_image().save_png(path)
+					print("SHOT %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, path,
+						world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
 	get_tree().quit(0)
-
-
-## Tree looks for the preview, set on the shared tree materials (the woods'
-## FloraLibrary "tree" look and the court's flora tree copy):
-## "deep": canopies keep their green (lime guard down), lose the x2 candy gain,
-## and get form (less wrap, deeper shade, softer rim), so a crown is darker
-## than the sunlit ground and reads as a silhouette; "painted" adds soft
-## brushwork value bands on the crowns, like the storybook ground.
-const TREE_LOOKS := {
-	"now": {},
-	"deep": {"lime_guard": 0.1, "diffuse_gain": 1.25, "wrap": 0.3, "shade_tint": Color(0.46, 0.44, 0.62),
-		"rim_strength": 0.22, "translucency": 0.25, "saturation": 1.1},
-	"painted": {"lime_guard": 0.1, "diffuse_gain": 1.25, "wrap": 0.3, "shade_tint": Color(0.46, 0.44, 0.62),
-		"rim_strength": 0.22, "translucency": 0.25, "saturation": 1.1, "paint_strength": 0.85},
-}
-var _tree_defaults := {}
-
-
-func _apply_tree_look(which: String) -> void:
-	var mats: Array = [FloraLibrary.material(&"tree"), CourtAssets.material_for(&"flora_tree_spring_oak")]
-	for m: ShaderMaterial in mats:
-		if not _tree_defaults.has(m):
-			var d := {}
-			for k: String in ["lime_guard", "diffuse_gain", "wrap", "shade_tint", "rim_strength", "translucency", "saturation", "paint_strength"]:
-				d[k] = m.get_shader_parameter(k)
-			_tree_defaults[m] = d
-		var base: Dictionary = _tree_defaults[m]
-		for k: String in base:
-			m.set_shader_parameter(k, base[k])
-		var look: Dictionary = TREE_LOOKS[which]
-		for k: String in look:
-			if k == "paint_strength" and m != mats[0]:
-				continue  # the court flora shader has no brushwork uniform
-			m.set_shader_parameter(k, look[k])
 
 
 ## Model lineups: every tree or plant the court plants, in a row on the real
