@@ -124,9 +124,48 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		all.append_array(PlaceComposer.layers(places, content.seed, mesh_for, ground, content.owns))
 	var out: Array[ScatterLayer] = []
 	for layer in all:
-		if layer.count() > 0:
+		if layer.count() == 0:
+			continue
+		if layer.tags.has("tree"):
+			out.append_array(_split_builds(layer))
+		else:
 			out.append(layer)
 	return out
+
+
+## A leaf-card tree's layer split over its builds (CourtAssets.variants):
+## each tree takes a build from a hash of where it stands, so neighbours
+## differ and a region rebuilds the same. Other layers come back as they are.
+static func _split_builds(layer: ScatterLayer) -> Array[ScatterLayer]:
+	var id := StringName(String(layer.id).substr(String(layer.id).find("_", 6) + 1))
+	var n := CourtAssets.variants(id)
+	var parts: Array[ScatterLayer] = []
+	if n <= 1:
+		parts.append(layer)
+		return parts
+	for v in n:
+		var part := ScatterLayer.new()
+		part.id = StringName("%s@%d" % [layer.id, v])
+		part.mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v))
+		part.impostor_mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v), true)
+		part.impostor_distance = layer.impostor_distance
+		part.draw_distance = layer.draw_distance
+		part.wind = layer.wind
+		part.cast_shadow = layer.cast_shadow
+		part.tags = layer.tags
+		part.material = layer.material
+		part.ingredient_id = layer.ingredient_id
+		parts.append(part)
+	for i in layer.count():
+		var p := layer.position_of(i)
+		var o := i * ScatterLayer.STRIDE
+		var v := absi(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0)))) % n
+		parts[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
+	var kept: Array[ScatterLayer] = []
+	for part in parts:
+		if part.count() > 0:
+			kept.append(part)
+	return kept
 
 
 ## One non-tree decoration entry, placed by its composition role: weighted by

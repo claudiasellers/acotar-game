@@ -146,6 +146,15 @@ const LINEUPS := {
 		&"flora_bush_rose", &"flora_bush_hydrangea", &"flora_carpet_rose", &"flora_carpet_butter",
 		&"flora_carpet_periwinkle", &"flora_reeds_bulrush", &"flora_toadstool_ring", &"rock_mossy_a",
 		&"woods_fallen_log"]},
+	# The leaf-card trees: one of each species, then the five builds of the
+	# oak and three of the birch and cherry.
+	"species": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"woods_ancient_oak@0", "woods_oak@0", "woods_silver_birch@0", "woods_wild_cherry@0", "woods_crab_apple@0",
+		"woods_lilac_tree@0", "woods_willow@0", "woods_hawthorn@0", "woods_elder@0", "woods_yew@0"]},
+	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
+		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
+		"woods_wild_cherry@0", "woods_wild_cherry@1", "woods_wild_cherry@2"]},
 	# Model direction test M1: today's oak, birch, cherry and yew, then the
 	# same four as A (storybook deep) and B (painterly leaf cards), with a
 	# post between the groups.

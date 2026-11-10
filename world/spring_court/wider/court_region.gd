@@ -74,6 +74,10 @@ static func prewarm(c: CourtRegionContent) -> void:
 		CourtAssets.mesh(d.mesh_id)
 		if d.is_tree:
 			CourtAssets.mesh(d.mesh_id, true)
+			# Leaf-card trees: every build the scatter splits them over.
+			for v in CourtAssets.variants(d.mesh_id) if CourtAssets.variants(d.mesh_id) > 1 else 0:
+				CourtAssets.mesh(CourtAssets.variant_id(d.mesh_id, v))
+				CourtAssets.mesh(CourtAssets.variant_id(d.mesh_id, v), true)
 	PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), c.bounding_rect()))
 
 
