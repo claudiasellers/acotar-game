@@ -68,6 +68,11 @@ shots_run_limited() {
 	pid=$!
 	set +m
 	[ -n "${SHOTS_CHILD_FILE:-}" ] && echo "$pid" >"$SHOTS_CHILD_FILE"
+	local g=""
+	if [ -n "${SHOTS_FOCUS_GUARD:-}" ] && command -v lsappinfo >/dev/null 2>&1; then
+		shots_focus_guard "$pid" "$SHOTS_FOCUS_GUARD" "${SHOTS_FOCUS_LOG:-/dev/null}" </dev/null 2>/dev/null &
+		g=$!
+	fi
 	(
 		fired=0
 		trap 'exit $fired' TERM
@@ -86,6 +91,7 @@ shots_run_limited() {
 	wait "$w" 2>/dev/null
 	wrc=$?
 	shots_stop_group "$pid"
+	[ -n "$g" ] && { kill -TERM "$g" 2>/dev/null; wait "$g" 2>/dev/null; }
 	[ -n "${SHOTS_CHILD_FILE:-}" ] && rm -f "$SHOTS_CHILD_FILE"
 	[ "$wrc" = 124 ] && return 124
 	return "$rc"
@@ -156,4 +162,57 @@ shots_bundle_id() {
 	[ "$(uname -s)" = Darwin ] || return 0
 	[ -f "$plist" ] && id=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$plist" 2>/dev/null)
 	echo "${id:-org.godotengine.godot}"
+}
+
+# ---- focus guard (T090) ----------------------------------------------------
+# Godot 4.7 on macOS makes itself the frontmost app as it starts, whatever it is
+# launched with (bundle id env, display/window/size/no_focus and open -g were all
+# measured frontmost 0.3 s after launch), and then stays frontmost for the whole
+# render. So while a render starts, the listener hands focus straight back: it
+# polls the frontmost app every 0.1 s and, when that app is a process of this
+# render (its process group), reopens the app that was frontmost just before.
+# It acts only in the first <secs> seconds after launch, the self-activation;
+# after that the owner can click into the Godot window and keep it.
+# shots_focus_guard <pgid> <secs> <log>: runs until killed or <secs> pass.
+shots_focus_ms() { perl -MTime::HiRes=time -e 'printf "%d", time * 1000' 2>/dev/null || echo $(($(date +%s) * 1000)); }
+
+shots_front_info() { # -> "<pid> <bundle id or ->" of the frontmost app
+	local asn pid bid
+	asn=$(lsappinfo front 2>/dev/null) || return 1
+	[ -n "$asn" ] || return 1
+	pid=$(lsappinfo info -only pid "$asn" 2>/dev/null | sed -n 's/.*=\([0-9][0-9]*\).*/\1/p')
+	bid=$(lsappinfo info -only bundleid "$asn" 2>/dev/null | sed -n 's/.*="\(.*\)"$/\1/p')
+	[ -n "$pid" ] || return 1
+	echo "$pid ${bid:--}"
+}
+
+shots_focus_guard() {
+	local pgid="$1" secs="$2" log="$3" t0 now fpid fbid prev_bid="" grabbed=0 lost=0 since=0 hands=0 last=0
+	t0=$(shots_focus_ms)
+	trap 'shots_focus_report' TERM
+	shots_focus_report() {
+		[ "$grabbed" = 1 ] && lost=$((lost + $(shots_focus_ms) - since))
+		[ "$hands" -gt 0 ] || [ "$lost" -gt 0 ] && echo "focus guard: handed focus back ${hands}x, render held it ${lost} ms" >>"$log"
+		exit 0
+	}
+	while :; do
+		now=$(shots_focus_ms)
+		[ $((now - t0)) -ge $((secs * 1000)) ] && break
+		if set -- $(shots_front_info); then
+			fpid="$1" fbid="$2"
+			if [ "$(ps -o pgid= -p "$fpid" 2>/dev/null | tr -d ' ')" = "$pgid" ]; then
+				[ "$grabbed" = 0 ] && { grabbed=1; since=$now; }
+				if [ -n "$prev_bid" ] && [ "$prev_bid" != - ] && [ $((now - last)) -ge 500 ]; then
+					open -b "$prev_bid" >/dev/null 2>&1
+					hands=$((hands + 1))
+					last=$now
+				fi
+			else
+				[ "$grabbed" = 1 ] && { lost=$((lost + now - since)); grabbed=0; }
+				prev_bid="$fbid"
+			fi
+		fi
+		sleep 0.1
+	done
+	shots_focus_report
 }

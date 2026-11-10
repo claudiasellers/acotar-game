@@ -20,6 +20,8 @@
 #   SHOTS_GODOT=             Godot binary (else .tools/godot-*/ from make, PATH, /Applications)
 #   SHOTS_POSITION=40,40     corner the small render window opens at (never on top,
 #                            never focused; the picture is still full size: T087)
+#   SHOTS_FOCUS_GUARD=8      for this many seconds after a render starts, hand focus
+#                            back to the owner's app if the render takes it (0 = off)
 #   SHOTS_WAIT_FOR_PLAY=1    hold requests while the owner's game is running
 #   SHOTS_PUSH=1             0 = render and keep results locally only
 #   SHOTS_KEEP_DAYS=1        delete this machine's own result branches after this
@@ -53,6 +55,7 @@ PUSH=$(conf SHOTS_PUSH 1)
 KEEP_DAYS=$(conf SHOTS_KEEP_DAYS 1)
 LAYOUT_WIDTH=$(conf SHOTS_LAYOUT_WIDTH 1280)
 LAYOUT_JPEG=$(conf SHOTS_LAYOUT_JPEG 80)
+FOCUS_GUARD=$(conf SHOTS_FOCUS_GUARD 8)
 
 event() {
 	mkdir -p "$S"
@@ -152,6 +155,7 @@ stop_render() {
 	p=$(cat "$SHOTS_CHILD_FILE" 2>/dev/null)
 	[ -n "$p" ] && shots_stop_group "$p"
 	rm -f "$SHOTS_CHILD_FILE"
+	quiet_render_end
 }
 
 on_stop() {
@@ -314,6 +318,22 @@ PY
 }
 
 quiet_render() { shots_render_cfg "$WT" "$SIZE"; }
+# override.cfg lives only as long as one render: removed when it ends, however it
+# ended (ok, fail, timeout, or the listener being stopped), so nothing reads it later.
+quiet_render_end() { rm -f "$WT/override.cfg"; }
+# The windowed render's own steps run under the focus guard (shots_common.sh).
+guarded() { # log cmd... ; reports what the guard did as a note
+	local log="$1" rc
+	shift
+	if [ "$FOCUS_GUARD" != 0 ] && command -v lsappinfo >/dev/null 2>&1; then
+		SHOTS_FOCUS_GUARD="$FOCUS_GUARD" SHOTS_FOCUS_LOG="$log" "$@"
+	else
+		"$@"
+	fi
+	rc=$?
+	grep '^focus guard:' "$log" 2>/dev/null | tail -1 | sed 's/^/note /' >>"$RES/result.txt"
+	return "$rc"
+}
 
 collect() { # label dir -> RES/out/label, skipping big or unknown files
 	local label="$1" dir="$2" f n=0 sz total
@@ -346,11 +366,12 @@ run_probe_line() { # label path args...
 	set -- $(for a in "$@"; do echo "$a" | sed "s#{out}#$dir#g"; done)
 	t0=$(shots_epoch)
 	if [ "${path%.gd}" != "$path" ]; then
-		shots_run_limited "$TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} "$GODOT" --path "$WT" $(render_args) -s "$path" -- "$@"
+		guarded "$log" shots_run_limited "$TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} "$GODOT" --path "$WT" $(render_args) -s "$path" -- "$@"
 	else
-		shots_run_limited "$TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} "$GODOT" --path "$WT" $(render_args) "$path" -- "$@"
+		guarded "$log" shots_run_limited "$TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} "$GODOT" --path "$WT" $(render_args) "$path" -- "$@"
 	fi
 	rc=$?
+	quiet_render_end
 	files=$(collect "$label" "$dir")
 	status=ok
 	[ "$rc" != 0 ] && status=fail
@@ -373,9 +394,10 @@ run_json() { # the layout-shots runner owns request.json; we just run its wrappe
 		cd "$WT" || exit 1
 		SHOTS_GODOT_ARGS=$(render_args)
 		export GODOT SHOTS_GODOT_ARGS
-		shots_run_limited "$JSON_TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} bash tools/shots/take_shots.sh .shots/request.json "$OUT/request"
+		guarded "$log" shots_run_limited "$JSON_TIMEOUT" "$log" godot_env ${DISP[@]+"${DISP[@]}"} bash tools/shots/take_shots.sh .shots/request.json "$OUT/request"
 	)
 	rc=$?
+	quiet_render_end
 	files=$(collect request "$OUT/request")
 	status=ok
 	[ "$rc" != 0 ] && status=fail

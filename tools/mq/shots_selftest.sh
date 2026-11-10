@@ -46,6 +46,8 @@ ok) { base64 --decode <"$FAKE_PNG" 2>/dev/null || base64 -D <"$FAKE_PNG"; } >"${
 two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.png"; echo '{"n":2}' >"${user[1]}/stats.json" ;;
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
 hang) echo $$ >"$FAKE_HANG"; exec sleep 300 ;;
+grab) # makes itself the frontmost app after <delay>, as Godot 4.7 on macOS does
+	sleep "${user[1]}"; echo "$$ org.godotengine.godot" >"$FAKE_FRONT"; sleep "${user[2]}" ;;
 stubborn) trap '' TERM; sleep 300 & echo $! >"$FAKE_HANG"; wait ;;
 slow) # true for ever more than one at a time, as two listeners would be
 	mkdir "$FAKE_BUSY" 2>/dev/null || echo "COLLISION" >>"$FAKE_LOG"
@@ -110,6 +112,7 @@ check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/or
 check "renders in a small window in the corner, Dummy audio" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40"'
 check "a render window is never kept on top of the owner's apps" '! grep -q -- "--always-on-top" "$FAKE_LOG"'
 check "the picture renders at the request size through override.cfg (viewport stretch)" 'grep -q "^CFG 640x360 \"viewport\" for ok" "$FAKE_LOG"'
+check "override.cfg is gone once the request is answered" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 if [ "$(uname -s)" = Darwin ]; then
 	check "a render starts in the background: __CFBundleIdentifier is the app's id" '! grep "probe/shot.tscn" "$FAKE_LOG" | grep -v "BUNDLE=org.godotengine.godot$" | grep -q .'
 fi
@@ -144,6 +147,7 @@ check "one failing probe gives status partial with its exit code" 'result B-1 | 
 check "the failing probe's log is in the answer" 'git --git-dir="$T/origin.git" show refs/heads/shots/res-B-1:logs/bad.log | grep -q "SCRIPT ERROR"'
 check "a hung probe is stopped at its timeout" 'result C-1 | grep -q "^shot slow timeout exit=124"'
 check "a child that ignores TERM is reported as a timeout and is gone" 'result C-2 | grep -q "^shot stuck timeout exit=124" && ! kill -0 "$(cat "$FAKE_HANG")" 2>/dev/null'
+check "override.cfg is removed after a render that timed out" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 check "a malformed request is answered with the reason" 'result D-1 | grep -qx "status error" && result D-1 | grep -q "note unknown line: explode"'
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
 
@@ -284,6 +288,41 @@ request G 3 'shot x res://probe/shot.tscn ok {out}/x.png\n'
 once
 check "a commit without levels.sh still runs tools/generators" 'result G-3 | grep -q "gen.gd ran"'
 
+# 10 focus guard (T090): a render that makes itself frontmost at launch hands
+# focus straight back; one that is clicked into later keeps it.
+mkdir -p "$T/fakebin"
+cat >"$T/fakebin/lsappinfo" <<'F'
+#!/bin/bash
+read -r pid bid <"$FAKE_FRONT"
+case "$1 ${3:-}" in
+front*) echo "ASN:0x0-0xfake:" ;;
+"info pid") echo "\"pid\"=$pid" ;;
+"info bundleid") echo "\"CFBundleIdentifier\"=\"$bid\"" ;;
+esac
+F
+cat >"$T/fakebin/open" <<'F'
+#!/bin/bash
+echo "OPEN $*" >>"$FAKE_LOG"
+[ "$1" = -b ] && echo "$FAKE_OWNER $2" >"$FAKE_FRONT"
+F
+chmod +x "$T/fakebin/lsappinfo" "$T/fakebin/open"
+sleep 300 &
+export FAKE_OWNER=$! FAKE_FRONT="$T/front"
+echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
+gonce() { (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
+request F 1 'shot early res://probe/shot.tscn grab 0.3 1.5
+'
+gonce
+check "a render that takes focus at launch hands it back to the owner's app" 'grep -q "^OPEN -b com.example.owner" "$FAKE_LOG" && [ "$(cut -d" " -f2 "$FAKE_FRONT")" = com.example.owner ]'
+check "the answer says how long the render held focus" 'result F-1 | grep -Eq "^note focus guard: handed focus back [0-9]+x, render held it [0-9]+ ms"'
+echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
+n=$(grep -c "^OPEN" "$FAKE_LOG")
+printf 'SHOTS_FOCUS_GUARD=1\n' >>"$T/mac/.git/mq/config"
+request F 2 'shot late res://probe/shot.tscn grab 1.6 1
+'
+gonce
+check "after the first seconds the guard leaves Godot alone (the owner clicked into it)" '[ "$(grep -c "^OPEN" "$FAKE_LOG")" = "$n" ] && [ "$(cut -d" " -f2 "$FAKE_FRONT")" = org.godotengine.godot ]'
+kill "$FAKE_OWNER" 2>/dev/null
 
 echo "---"
 echo "$PASSES passed, $FAILS failed"
