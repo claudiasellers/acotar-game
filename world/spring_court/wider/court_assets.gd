@@ -20,6 +20,12 @@ const CARD_TREES := {
 	&"woods_willow": "willow", &"woods_hawthorn": "hawthorn", &"woods_elder": "elder", &"woods_yew": "yew",
 }
 const CARD_VARIANTS := 5
+## The switch: false puts every court tree back on FloraLibrary's models.
+const CARD_TREES_ON := true
+## Leaf-card trees draw their near mesh this close, their far mesh (fewer,
+## bigger cards) out to the impostor range: cards cost overdraw, not
+## triangles (the wcterrain-19 dense-wood test).
+const CARD_NEAR := 100.0
 const CARD_DIR := "res://world/spring_court/shared/models/cards/"
 const CARD_SHADER := "res://world/spring_court/shared/court_leaf_card.gdshader"
 
@@ -53,6 +59,8 @@ static func has_model(id: StringName) -> bool:
 
 ## The leaf-card species behind `id` ("woods_oak" or "woods_oak@3"), or "".
 static func card_tree(id: StringName) -> String:
+	if not CARD_TREES_ON:
+		return ""
 	return CARD_TREES.get(StringName(String(id).get_slice("@", 0)), "")
 
 

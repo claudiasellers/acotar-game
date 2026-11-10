@@ -249,8 +249,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 
 
 ## A frame-time stress test (plan Track M): a dense wood all round the eye,
-## 150 trees a hectare out to 150 m (about a thousand trees, every one drawn
-## as its near mesh), from five species. `forest=old` uses FloraLibrary's
+## 150 trees a hectare out to 150 m (about a thousand trees, near and far
+## meshes switched at the game's own distances), from five species. `forest=old` uses FloraLibrary's
 ## trees as the estate draws them, `forest=cards` the court's leaf-card
 ## builds. Run it under tools/perf/frame_probe.tscn for the numbers.
 const FOREST_SPECIES := [&"oak", &"silver_birch", &"yew", &"wild_cherry", &"hawthorn"]
@@ -272,14 +272,22 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		p.y = WorldHeight.height_at(p.x, p.z)
 		var sp: StringName = FOREST_SPECIES[rng.randi() % FOREST_SPECIES.size()]
 		var v := rng.randi() % CourtAssets.CARD_VARIANTS if kind == "cards" else 0
-		var key := "%s@%d" % [sp, v]
+		# The game's own switch to the far mesh: 260 m for today's trees
+		# (TREE_DRAW), CARD_NEAR for the leaf-card trees.
+		var far := r > (CourtAssets.CARD_NEAR if kind == "cards" else 260.0)
+		var key := "%s@%d%s" % [sp, v, "@far" if far else ""]
 		if not buckets.has(key):
 			buckets[key] = []
 		buckets[key].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.85, 1.2)), p))
 	var total := 0
 	for key: String in buckets:
 		var sp := StringName(key.get_slice("@", 0))
-		var mesh: Mesh = FloraLibrary.mesh(sp) if kind == "old" else CourtAssets.mesh(CourtAssets.variant_id(StringName("woods_" + String(sp)), int(key.get_slice("@", 1))))
+		var far := key.ends_with("@far")
+		var mesh: Mesh
+		if kind == "old":
+			mesh = FloraLibrary.far_mesh(sp) if far else FloraLibrary.mesh(sp)
+		else:
+			mesh = CourtAssets.mesh(CourtAssets.variant_id(StringName("woods_" + String(sp)), int(key.get_slice("@", 1))), far)
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.mesh = mesh

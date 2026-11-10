@@ -52,7 +52,7 @@ BROAD, SMALL, LONG, BLOSSOM = 0, 1, 2, 3
 GREENS = dict(shadow=hexc("1E3E37"), mid=hexc("386C47"), light=hexc("5C9152"), sun=hexc("84AB62"))
 OLD_GREENS = dict(shadow=hexc("1A3833"), mid=hexc("2F6043"), light=hexc("4F844E"), sun=hexc("78A05C"))
 BIRCH = dict(shadow=hexc("32563B"), mid=hexc("528445"), light=hexc("82AA5C"), sun=hexc("A6C070"))
-YEW = dict(shadow=hexc("12302E"), mid=hexc("1E4B44"), light=hexc("356A54"), sun=hexc("588560"))
+YEW = dict(shadow=hexc("183B36"), mid=hexc("29594D"), light=hexc("467B5C"), sun=hexc("6C9568"))
 WILLOW = dict(shadow=hexc("2C4F3C"), mid=hexc("4C7E4C"), light=hexc("7DA563"), sun=hexc("A3BE77"))
 SHRUB = dict(shadow=hexc("23443A"), mid=hexc("3E7149"), light=hexc("62935A"), sun=hexc("88AD66"))
 # Blossom: the colour of the outer cards (petals) over the tree's greens.
@@ -279,12 +279,14 @@ def grow(kit, s, near):
         n = s.get("limbs", 7) if near else max(2, s.get("limbs", 7) // 2)
         for i, t in enumerate(reach[:n]):
             limbs_to(kit, tops[i % len(tops)], [t], s["r0"] * 0.5, bark, 6 if near else 3)
-    if near:
-        kit.slot = 0
-        kit.blob(c, min(rx, rz) * 0.55, rz / max(rx, 0.01) * 0.9, s["pal"]["shadow"], shade(s["pal"]["shadow"], 0.85),
-                 1, 0.35)
     kit.slot = 1
     lo, hi = s["cluster"]
+    if near:
+        # Inner clusters instead of a solid core (a smooth dark core showed
+        # through the sky holes up close): deep, shaded leaves fill the crown.
+        inner = cluster_points(kit, c, rx * 0.55, rz * 0.55, max(4, s["count"] // 4), 0.9, floor=-0.7)
+        for p in inner:
+            leaf_cluster(kit, s, p, kit.rng.uniform(lo, hi) * 1.2, max(4, s["cards"] // 2), c, rx, rz, 0.4)
     for p in pts:
         if near:
             leaf_cluster(kit, s, p, kit.rng.uniform(lo, hi) * 1.25, s["cards"], c, rx, rz, 0.5)

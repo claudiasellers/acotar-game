@@ -149,7 +149,7 @@ static func _split_builds(layer: ScatterLayer) -> Array[ScatterLayer]:
 		part.mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v))
 		part.impostor_mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v), true)
 		part.impostor_distance = layer.impostor_distance
-		part.draw_distance = layer.draw_distance
+		part.draw_distance = minf(layer.draw_distance, CourtAssets.CARD_NEAR)
 		part.wind = layer.wind
 		part.cast_shadow = layer.cast_shadow
 		part.tags = layer.tags
