@@ -64,6 +64,9 @@ After that:
 | `tools/mq/shots.sh --stop` / `--start` | stop or start the listener (it does not restart after a reboot) |
 | `tail -f .git/mq/shots/events.log` | watch it work |
 
-A small window (640 wide) appears in the top-left corner while a picture is taken. It is never kept on top
-and never takes focus, so you can keep typing; the picture is still rendered at full size. The listener
+A small window (640 wide) appears in the top-left corner while a picture is taken; it is never kept on top,
+and the picture is still rendered at full size. Godot makes itself the front app about 0.3 s after each launch,
+and the listener hands focus straight back to the app you were using, so a keystroke or two may go astray.
+It only does that in the first seconds after a launch (`SHOTS_FOCUS_GUARD=8` in `.git/mq/config`, `0` turns it
+off), so if you click into the render window later, it stays yours. The listener
 holds requests while your game is running, and it keeps the Mac awake while it runs.
