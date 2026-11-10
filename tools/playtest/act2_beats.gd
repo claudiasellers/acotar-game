@@ -153,11 +153,51 @@ func _curtain_trap() -> bool:
 	await t._walk_to(trap.mark(&"door_inside"), 1.4, Callable(), 30.0)
 	if not await t._until(func() -> bool: return _label(trap) == "until she rigs it", 5.0):
 		return _fail("not at the door: %.1f m off" % t._flat(trap.mark(&"door_inside")))
+	if t.rig_shot != "":
+		await _door_probe(trap, "rig_step")
 	await t._press(&"interact")
 	if not await t._until(func() -> bool: return WorldState.has_flag("curtain_trap_set"), 10.0):
 		return _fail("rigging didn't raise curtain_trap_set (beat '%s')" % _label(trap))
+	if t.rig_shot != "":
+		await _door_probe(trap, "rigged")
 	if not await t._until(func() -> bool: return WorldState.has_flag("fact.alis_tripped") and not trap.running, 150.0):
 		return _fail("dawn stalled at '%s'" % _label(trap))
 	t._note("phase %s; flags: first_dinner_eaten, curtain_trap_set" % PhaseManager.current_phase)
 	t._pass()
 	return true
+
+
+## T091 probe: her bedroom door at the rig step. The door's wall line is at
+## trap-local z 18.4 (the room's south wall). Prints rays through the doorway
+## and every door leaf or gate within 4 m, and saves the game view plus a view
+## from inside the room.
+func _door_probe(trap: CurtainTrap, tag: String) -> void:
+	await t._wait(3.0)
+	var door := trap.global_transform * Vector3(0, 0, 18.4)
+	var space := trap.get_world_3d().direct_space_state
+	for h: float in [0.4, 1.2, 2.0, 2.6]:
+		var q := PhysicsRayQueryParameters3D.create(trap.global_transform * Vector3(0, h, 17.9), trap.global_transform * Vector3(0, h, 20.0))
+		var hit := space.intersect_ray(q)
+		t._log("T091 %s ray h=%.1f through the doorway: %s" % [tag, h,
+				("hit %s at %.2f m" % [(hit.collider as Node).get_path(), (hit.position as Vector3).distance_to(q.from)]) if hit else "open"])
+	var near := 0
+	for n in t.get_tree().root.find_children("*", "Node3D", true, false):
+		if (n is ManorDoorLeaf or n is RegionGate) and (n as Node3D).global_position.distance_to(door + Vector3.UP * 1.4) < 4.0:
+			near += 1
+			t._log("T091 %s leaf %s visible=%s" % [tag, n.get_path(), (n as Node3D).is_visible_in_tree()])
+	t._log("T091 %s door leaves within 4 m of the doorway: %d; feyre at %s, door line at %s" % [tag, near, t.feyre.global_position, door])
+	var vp := t.get_viewport()
+	vp.get_texture().get_image().save_png(t.rig_shot.path_join("%s_game.png" % tag))
+	var was := vp.get_camera_3d()
+	var cam := Camera3D.new()
+	t.get_tree().root.add_child(cam)
+	cam.global_position = trap.global_transform * Vector3(-1.5, 1.7, 11.0)
+	cam.look_at(door + Vector3.UP * 1.5)
+	cam.fov = 60.0
+	cam.make_current()
+	await t._wait(1.5)
+	vp.get_texture().get_image().save_png(t.rig_shot.path_join("%s_room.png" % tag))
+	cam.queue_free()
+	if was:
+		was.make_current()
+	await t._wait(0.5)
