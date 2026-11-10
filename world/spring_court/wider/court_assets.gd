@@ -21,7 +21,9 @@ const CARD_TREES := {
 }
 const CARD_VARIANTS := 5
 ## The switch: false puts every court tree back on FloraLibrary's models.
-const CARD_TREES_ON := true
+## Off (owner, 2026-11-10: they read tropical) while the court's trees are
+## chosen between these, EZ-Tree and Quaternius (docs/lanes/wider-court-finish-plan.md).
+const CARD_TREES_ON := false
 ## Leaf-card trees draw their near mesh this close, their far mesh (fewer,
 ## bigger cards) out to the impostor range: cards cost overdraw, not
 ## triangles (the wcterrain-19 dense-wood test).
