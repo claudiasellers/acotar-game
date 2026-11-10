@@ -129,25 +129,50 @@ func test_alis_bathes_her_and_dresses_her_in_the_tunic() -> void:
 	assert_true(dinner().running or dinner().can_start(), "the dinner opens")
 
 
+## T091: at the rig step the rope is tied at a real door: shut, solid, filling
+## her doorway on the bedroom's south wall, with visible meshes.
+func _assert_door_at_rig_step() -> void:
+	var door := trap().door
+	assert_true(trap().door_closed(), "her door is shut at the rig step")
+	if door == null:
+		return
+	var at := door.global_position
+	assert_almost_eq(at.x, 23.0, 0.05, "in her doorway (x)")
+	assert_almost_eq(at.z, -52.0, 0.05, "in her doorway, on the south wall line (z)")
+	assert_lt(at.distance_to(trap().mark(&"door_inside")), 2.0, "where she rigs the rope")
+	var meshes := door.find_children("*", "MeshInstance3D", true, false).filter(
+			func(m: Node) -> bool: return (m as MeshInstance3D).is_visible_in_tree())
+	assert_gte(meshes.size(), 3, "a leaf you can see, with panels and a knob")
+	var shape := door.get_node(^"Hinge/Leaf/Shape") as CollisionShape3D
+	assert_false(shape.disabled, "solid while shut")
+	assert_almost_eq((shape.shape as BoxShape3D).size.x, trap().DOOR_SIZE.x, 0.1, "fills the 1.6 m doorway")
+
+
 func test_the_curtain_trap_rigs_at_night_and_trips_alis_at_dawn() -> void:
 	WorldState.set_flag("wall_crossed")
 	WorldState.set_flag("first_dinner_eaten")
 	Clock.from_dict({"time_of_day": 0.95, "day": 3})
 	assert_true(trap().can_start())
+	assert_null(trap().get_node_or_null(^"BedroomDoor"), "no door in her doorway before the scene")
 	feyre.global_position = bedroom.global_position
 	assert_true(trap().start())
+	assert_true(trap().door_closed(), "her door hangs shut from the start of the night")
 	assert_true(_tick_all(5.0, func() -> bool: return trap().coil != null), "a coil of rope from the trimmings")
 	assert_true(_tick_all(2.0, func() -> bool: return trap().current_beat_label() == "reach door_inside"))
 	feyre.global_position = trap().mark(&"door_inside")
 	assert_true(_tick_all(2.0, func() -> bool: return trap().current_beat_label() == "until she rigs it"))
 	assert_false(WorldState.has_flag("curtain_trap_set"))
+	_assert_door_at_rig_step()
 	trap().press_interact()
 	assert_true(_tick_all(2.0, func() -> bool: return WorldState.has_flag("curtain_trap_set")))
 	assert_true(trap().rigged)
 	assert_not_null(trap().get_node_or_null(^"Raise_curtain_trap_set") as ActionTrigger)
 	assert_true(_tick_all(5.0, func() -> bool: return trap().actor(&"alis") != null), "dawn: Alis at the door")
 	assert_true(Clock.time_of_day < 0.3, "before dawn")
+	assert_true(trap().door_closed(), "locked all night, until Alis opens it")
+	assert_true(_tick_all(5.0, func() -> bool: return not trap().door_closed()), "Alis opens it: it swings in")
 	assert_true(_tick_all(90.0, func() -> bool: return not trap().running))
+	assert_null(trap().door, "the scene's door goes with the scene")
 	assert_true(WorldState.has_flag("fact.alis_tripped"))
 	assert_null(trap().actor(&"alis"))
 	assert_false(trap().can_start(), "never replays")

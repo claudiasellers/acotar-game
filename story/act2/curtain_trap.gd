@@ -23,6 +23,12 @@
 ## window the "E   the curtains" card shows. No marker, no objective (R2).
 ## The bedroom's drapes are the house's (ManorRoomFinish.WORKED_CURTAINS): a
 ## "Window<i>" per window, "Dressed" and a hidden "Stripped" twin.
+##
+## Her door (T091): the house leaves her bedroom doorway an open frame, so the
+## scene hangs a real oak door in it while it runs, closed and solid from the
+## first trimmings through the rigging, the lock and the night; Alis opening it
+## at dawn swings it in and snaps the rope. When the scene ends the door goes,
+## and the doorway is as the house built it.
 class_name CurtainTrap
 extends Act2Space
 
@@ -40,6 +46,12 @@ const CURTAINS_AT := 22.0
 ## The growl that shut Lucien up, from down the hall past her door (space frame).
 const DOWN_THE_HALL := Vector3(0.0, 0.0, 26.0)
 const GROWL_SOUND := &"beast_snarl"
+## Her doorway (space frame): the bedroom's south wall line, at (23, -52) on
+## the upper floor (upper.tres), 1.6 m wide and 2.8 m high.
+const DOOR_AT := Vector3(0.0, 0.0, 18.4)
+const DOOR_SIZE := Vector2(1.6, 2.8)
+## How far it swings in when Alis opens it.
+const DOOR_SWING_DEG := 95.0
 
 var coil: Node3D
 var rope: Node3D
@@ -51,10 +63,14 @@ var pulled: PackedStringArray = []
 ## Windows (indexes into spots()) whose trimmings she has taken tonight.
 var stripped: Array[int] = []
 var _curtains: Node3D
+## The door hung for the scene ("BedroomDoor"), or null outside it.
+var door: Node3D
+var door_shut: bool = false
 
 
 func _build_beats() -> Array:
 	rigged = false
+	_hang_door()
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			if is_inside_tree():
@@ -306,6 +322,7 @@ func _before_dawn() -> void:
 
 ## The door swings, the rope snaps into her face, and Alis goes down in a heap.
 func _snap(_s: SceneSpace) -> void:
+	_swing_door()
 	if rope and is_instance_valid(rope):
 		if rope.is_inside_tree():
 			var tween := rope.create_tween()
@@ -407,3 +424,62 @@ class StripBeat:
 	func exit(space: SceneSpace) -> void:
 		if space.is_inside_tree():
 			PressCard.hide_on(space)
+
+
+func _finish() -> void:
+	_take_door()
+	super._finish()
+
+
+## True while the scene's door is in the doorway, shut and solid.
+func door_closed() -> bool:
+	return door_shut and door != null and is_instance_valid(door)
+
+
+## An oak door, hinged at its left jamb: a solid leaf with two raised panels
+## a side over each other, and a brass knob on both faces.
+func _hang_door() -> void:
+	_take_door()
+	door = Node3D.new()
+	door.name = "BedroomDoor"
+	add_child(door)
+	door.position = DOOR_AT
+	door_shut = true
+	var hinge := Node3D.new()
+	hinge.name = "Hinge"
+	hinge.position = Vector3(-DOOR_SIZE.x * 0.5, 0.0, 0.0)
+	door.add_child(hinge)
+	var w := DOOR_SIZE.x - 0.04
+	var h := DOOR_SIZE.y - 0.03
+	var oak := EstateKit.mat(EstateKit.OAK, 0.55, 0.0, "front_door")
+	var leaf := EstateKit.box(hinge, Vector3(w * 0.5 + 0.02, h * 0.5 + 0.01, 0.0), Vector3(w, h, 0.07), oak)
+	leaf.name = "Leaf"
+	for c in leaf.get_children():
+		if c is CollisionShape3D:
+			c.name = "Shape"
+	var panel := EstateKit.mat(EstateKit.OAK_DARK, 0.6, 0.0, "door_frame")
+	for side: float in [-1.0, 1.0]:
+		for row: float in [0.28, 0.72]:
+			EstateKit.box(leaf, Vector3(0.0, (row - 0.5) * h, side * 0.04), Vector3(w * 0.7, h * 0.34, 0.015), panel, false)
+		EstateKit.box(leaf, Vector3(w * 0.5 - 0.12, 1.0 - h * 0.5, side * 0.06), Vector3(0.07, 0.07, 0.05),
+				EstateKit.mat(EstateKit.GOLD, 0.3, 0.9, "brass"), false)
+
+
+## Alis opens it: it swings into the room and stops being solid.
+func _swing_door() -> void:
+	if door == null or not is_instance_valid(door):
+		return
+	door_shut = false
+	var hinge := door.get_node(^"Hinge") as Node3D
+	(door.get_node(^"Hinge/Leaf/Shape") as CollisionShape3D).set_deferred(&"disabled", true)
+	if hinge.is_inside_tree():
+		hinge.create_tween().tween_property(hinge, ^"rotation_degrees:y", DOOR_SWING_DEG, 0.25).set_trans(Tween.TRANS_QUAD)
+	else:
+		hinge.rotation_degrees.y = DOOR_SWING_DEG
+
+
+func _take_door() -> void:
+	if door and is_instance_valid(door):
+		door.queue_free()
+	door = null
+	door_shut = false
