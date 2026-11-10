@@ -159,11 +159,77 @@ const LINEUPS := {
 	"species": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_ancient_oak@0", "woods_oak@0", "woods_silver_birch@0", "woods_wild_cherry@0", "woods_crab_apple@0",
 		"woods_lilac_tree@0", "woods_willow@0", "woods_hawthorn@0", "woods_elder@0", "woods_yew@0"]},
+	# Tree exploration (owner, 2026-11-10): today's leaf-card oak and birch for
+	# reference, then EZ-Tree's trees with their photo leaves and repainted.
+	"explore": {"distance": 66.0, "spacing": 10.5, "look": 6.0, "ids": [
+		"woods_oak@1", "woods_silver_birch@1", "post",
+		"ez:oak_a:photo", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:photo", "ez:ash_a:painted",
+		"ez:ash_b:painted", "ez:aspen_a:painted", "ez:pine_a:painted", "ez:bush_a:painted", "ez:bush_b:painted"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
 		"woods_wild_cherry@0", "woods_wild_cherry@1", "woods_wild_cherry@2"]},
 }
+
+
+## EZ-Tree previews (world/spring_court/wider/assets/tree_explore): name ->
+## [leaf texture, bark texture, height in metres].
+const EZ_DIR := "res://world/spring_court/wider/assets/tree_explore/"
+const EZ_TREES := {
+	"oak_a": ["oak", "oak", 13.0], "oak_b": ["oak", "oak", 16.0], "ash_a": ["ash", "oak", 13.0],
+	"ash_b": ["ash", "oak", 9.0], "aspen_a": ["aspen", "birch", 14.0], "pine_a": ["pine", "pine", 13.0],
+	"bush_a": ["oak", "oak", 3.0], "bush_b": ["ash", "oak", 2.6],
+}
+
+
+## [mesh, scale] for an EZ-Tree preview tree, its leaves photo or repainted.
+func _ez_tree(name: String, painted: bool) -> Array:
+	var spec: Array = EZ_TREES[name]
+	var inst := (load("%sez_%s.glb" % [EZ_DIR, name]) as PackedScene).instantiate()
+	var meshes: Array = inst.find_children("*", "MeshInstance3D", true, false)
+	# One ArrayMesh from the bark and leaf meshes (the export keeps them apart).
+	var st := SurfaceTool.new()
+	var out := ArrayMesh.new()
+	var leaf := ShaderMaterial.new()
+	leaf.shader = load(EZ_DIR + "ez_leaf.gdshader")
+	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [EZ_DIR, spec[0]]))
+	leaf.set_shader_parameter(&"painted", 1.0 if painted else 0.0)
+	var bark := StandardMaterial3D.new()
+	bark.albedo_texture = load("%sbark_%s.jpg" % [EZ_DIR, spec[1]])
+	bark.uv1_scale = Vector3(1, 10, 1)
+	bark.roughness = 0.9
+	var aabb := AABB()
+	for mi: MeshInstance3D in meshes:
+		var m := mi.mesh
+		var xf: Transform3D = mi.global_transform if mi.is_inside_tree() else _local_to_root(mi, inst)
+		for i in m.get_surface_count():
+			st.clear()
+			st.create_from(m, i)
+			var mat := m.surface_get_material(i)
+			var is_leaf := mat != null and String(mat.resource_name).contains("leaves")
+			if mat == null:
+				is_leaf = String(mi.name).to_lower().contains("lea")
+			st.set_material(leaf if is_leaf else bark)
+			var arr := st.commit_to_arrays()
+			var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			for k in verts.size():
+				verts[k] = xf * verts[k]
+				aabb = aabb.expand(verts[k]) if k > 0 or out.get_surface_count() > 0 else AABB(verts[k], Vector3.ZERO)
+			arr[Mesh.ARRAY_VERTEX] = verts
+			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+			out.surface_set_material(out.get_surface_count() - 1, leaf if is_leaf else bark)
+	inst.free()
+	return [out, float(spec[2]) / maxf(aabb.size.y, 0.01)]
+
+
+func _local_to_root(n: Node3D, root: Node) -> Transform3D:
+	var xf := n.transform
+	var p := n.get_parent()
+	while p != null and p != root:
+		if p is Node3D:
+			xf = (p as Node3D).transform * xf
+		p = p.get_parent()
+	return xf
 
 
 func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera3D) -> void:
@@ -195,6 +261,10 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				post.height = 1.7
 				mi.mesh = post
 				p.y += 0.85
+			elif item.begins_with("ez:"):
+				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted")
+				mi.mesh = ez[0]
+				mi.scale = Vector3.ONE * float(ez[1])
 			elif item.begins_with("now:"):
 				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)))
 			else:
