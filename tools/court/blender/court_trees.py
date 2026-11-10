@@ -125,6 +125,11 @@ def vary(spec, v, rng):
     s["count"] = max(8, int(round(spec["count"] * rng.uniform(0.85, 1.12))))
     s["holes"] = spec.get("holes", 0.35) + rng.uniform(-0.08, 0.08)
     s["limbs"] = max(2, spec.get("limbs", 7) + rng.choice((-2, -1, 0, 1, 1)))
+    # Silhouette: one, two or three crown lobes, and a crown wider one way
+    # than the other, so builds differ in outline, not only in size.
+    if not spec.get("cone"):
+        s["lobes"] = rng.choice((1, 2, 2, 3)) if not spec.get("birch") else rng.choice((1, 2))
+    s["ax"], s["ay"] = rng.uniform(0.8, 1.2), rng.uniform(0.8, 1.2)
     # A small shift in the greens: some trees a touch warmer, some cooler.
     warm = rng.uniform(-1.0, 1.0)
     k = rng.uniform(0.93, 1.06)
@@ -272,8 +277,24 @@ def grow(kit, s, near):
     top = sum(tops, Vector()) / len(tops)
     c = top + Vector((0, 0, s["rz"] * s.get("sit", 0.55)))
     rx, rz = s["rx"], s["rz"]
-    pts = cluster_points(kit, c, rx, rz, s["count"] if near else max(6, s["count"] // 3), s.get("holes", 0.35),
-                         floor=s.get("floor", -0.55), cone=s.get("cone", 0.0))
+    total = s["count"] if near else max(6, s["count"] // 3)
+    lobes = s.get("lobes", 1)
+    pts = []
+    if lobes == 1:
+        pts = cluster_points(kit, c, rx, rz, total, s.get("holes", 0.35),
+                             floor=s.get("floor", -0.55), cone=s.get("cone", 0.0))
+    else:
+        # Lobes about the crown's centre; the light still follows the whole
+        # crown (crown_colour uses c, rx, rz), so it reads as one tree.
+        a0 = kit.rng.uniform(0, math.tau)
+        for i in range(lobes):
+            a = a0 + math.tau * i / lobes + kit.rng.uniform(-0.4, 0.4)
+            lc = c + Vector((math.cos(a) * rx * 0.42, math.sin(a) * rx * 0.42, kit.rng.uniform(-0.25, 0.25) * rz))
+            lrx, lrz = rx * kit.rng.uniform(0.55, 0.72), rz * kit.rng.uniform(0.62, 0.85)
+            pts += cluster_points(kit, lc, lrx, lrz, max(3, total // lobes), s.get("holes", 0.35) + 0.08,
+                                  floor=s.get("floor", -0.55))
+    ax, ay = s.get("ax", 1.0), s.get("ay", 1.0)
+    pts = [Vector((c.x + (p.x - c.x) * ax, c.y + (p.y - c.y) * ay, p.z)) for p in pts]
     if not s.get("birch"):
         reach = [p for i, p in enumerate(sorted(pts, key=lambda q: -q.z)) if i % 3 == 0]
         n = s.get("limbs", 7) if near else max(2, s.get("limbs", 7) // 2)

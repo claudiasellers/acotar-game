@@ -32,7 +32,7 @@ varying float v_tree;
 #define CANDY_WRAP_DEFAULT 0.55
 #define CANDY_SHADE_DEFAULT vec4(0.66, 0.56, 0.82, 1.0)
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.84, 0.76, 1.0)
-#define CANDY_RIM_STRENGTH_DEFAULT 0.35
+#define CANDY_RIM_STRENGTH_DEFAULT 0.12
 #define CANDY_NO_SPEC_LOBE
 #define CANDY_RIM_SCALE (1.0 - drain)
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
