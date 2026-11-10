@@ -1,7 +1,8 @@
 ## Contract (T092): people are solid. Feyre walking into someone standing still
 ## stops at about the two capsule radii and never passes through; a person never
 ## fades part by part (that showed their eyes and teeth like a skeleton), only
-## vanishes whole while the lens is inside them.
+## vanishes whole while the lens is inside them. Nobody traps her: after a
+## moment of pushing she squeezes past.
 extends GutTest
 
 const FEYRE := preload("res://characters/feyre/feyre.tscn")
@@ -37,12 +38,26 @@ func test_feyre_bumps_into_a_standing_person() -> void:
 	assert_not_null(ActorBody.find_on(npc), "a villager has a body")
 	var f := FEYRE.instantiate() as Feyre
 	add_child_autofree(f)
-	f.global_position = Vector3(0, 0.05, 5)
+	f.global_position = Vector3(0, 0.05, 1.6)
 	Input.action_press(&"move_forward")
-	await wait_physics_frames(150)
+	await wait_physics_frames(50)
 	var gap := Vector2(f.global_position.x, f.global_position.z).length()
 	assert_gt(f.global_position.z, 0.0, "never passed through")
 	assert_almost_eq(gap, 0.3 + ActorBody.RADIUS, 0.15, "stopped about two radii from their centre")
+
+
+func test_nobody_traps_her_she_squeezes_past() -> void:
+	_floor()
+	var npc := _villager(Vector3.ZERO)
+	var f := FEYRE.instantiate() as Feyre
+	add_child_autofree(f)
+	f.global_position = Vector3(0, 0.05, 2)
+	Input.action_press(&"move_forward")
+	await wait_physics_frames(240)
+	assert_lt(f.global_position.z, -1.0, "after a moment of pushing she gets past")
+	Input.action_release(&"move_forward")
+	await wait_physics_frames(5)
+	assert_true(ActorBody.find_on(npc).is_solid(), "solid again once she is clear")
 
 
 func test_a_hidden_person_is_not_solid() -> void:

@@ -9,6 +9,9 @@
 ##
 ## Feyre's ray probes (ledges, steps, aim) stay world-only, so she never climbs
 ## onto a head. The navmesh bakes the world layer only, so people leave no holes.
+## Nobody ever traps her (a doorway, a corridor, a story mark): after
+## SQUEEZE_TIME of her pushing into someone, they let her squeeze past, and are
+## solid again once she is clear.
 ## The camera does not collide with people; CameraFade hides a person whole
 ## while the lens is inside them (`lens_inside`) and never fades one part by part.
 class_name ActorBody
@@ -25,11 +28,19 @@ const RADIUS := 0.3
 const HEIGHT := 1.75
 ## A walker waits this long for Feyre to step out of its way, then walks on.
 const YIELD_TIME := 1.5
+## Seconds of Feyre pushing into a person before they let her squeeze past.
+const SQUEEZE_TIME := 1.0
+## Feyre's capsule radius (characters/feyre/feyre.gd _build_body).
+const FEYRE_RADIUS := 0.3
 
 var radius: float = RADIUS
 var height: float = HEIGHT
 var shape_node: CollisionShape3D
 var _want_solid: bool = true
+## Letting her squeeze past (see SQUEEZE_TIME).
+var squeezing: bool = false
+var _pushed: float = 0.0
+var _unpushed: float = 0.0
 
 
 ## Puts a person-sized capsule under `root` (its feet at root's origin).
@@ -111,7 +122,39 @@ func set_solid(on: bool) -> void:
 
 
 func is_solid() -> bool:
-	return _want_solid and is_visible_in_tree()
+	return _want_solid and not squeezing and is_visible_in_tree()
+
+
+func _physics_process(delta: float) -> void:
+	var feyre := get_tree().get_first_node_in_group(&"player") as CharacterBody3D
+	if feyre == null:
+		return
+	var to := feyre.global_position - global_position
+	var flat := Vector2(to.x, to.z).length()
+	if squeezing:
+		if flat > radius + FEYRE_RADIUS + 0.25:
+			squeezing = false
+			_pushed = 0.0
+			_refresh()
+		return
+	if flat > radius + FEYRE_RADIUS + 0.2:
+		_pushed = 0.0
+		return
+	var pushing := false
+	for i in feyre.get_slide_collision_count():
+		if feyre.get_slide_collision(i).get_collider() == self:
+			pushing = true
+			break
+	if pushing:
+		_pushed += delta
+		_unpushed = 0.0
+	else:
+		_unpushed += delta
+		if _unpushed > 0.3:
+			_pushed = 0.0
+	if _pushed >= SQUEEZE_TIME:
+		squeezing = true
+		_refresh()
 
 
 func _notification(what: int) -> void:
