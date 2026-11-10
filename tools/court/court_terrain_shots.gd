@@ -173,6 +173,9 @@ const LINEUPS := {
 		"scene:qtz/CommonTree_4.gltf:14", "scene:qtz/CommonTree_5.gltf:11", "scene:qtz/Pine_1.gltf:12",
 		"scene:qtz/Pine_4.gltf:15", "scene:qtz/TwistedTree_1.gltf:15", "scene:qtz/Bush_Common.gltf:2.5",
 		"scene:qtz/Bush_Common_Flowers.gltf:2.5"]},
+	# One Quaternius tree as delivered, then tinted two ways (owner asked).
+	"tint": {"distance": 26.0, "spacing": 13.0, "look": 6.0, "ids": [
+		"scene:qtz/CommonTree_3.gltf:13", "scene:qtz/CommonTree_3.gltf:13:spring", "scene:qtz/CommonTree_3.gltf:13:deep"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -240,6 +243,29 @@ func _local_to_root(n: Node3D, root: Node) -> Transform3D:
 	return xf
 
 
+## Court tints for a Quaternius preview tree: leaf green, its sunlit green.
+const TINTS := {
+	"spring": [Color(0.42, 0.62, 0.30), Color(0.64, 0.78, 0.42)],
+	"deep": [Color(0.27, 0.48, 0.30), Color(0.46, 0.64, 0.38)],
+}
+
+
+func _tint(inst: Node, which: String) -> void:
+	var t: Array = TINTS[which]
+	for mi: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+		for i in mi.mesh.get_surface_count():
+			var src := mi.mesh.surface_get_material(i) as BaseMaterial3D
+			var mat := ShaderMaterial.new()
+			mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+			var leaf := src != null and String(src.resource_name).contains("Leaves")
+			mat.set_shader_parameter(&"is_leaf", leaf)
+			if src != null:
+				mat.set_shader_parameter(&"tex", src.albedo_texture)
+			mat.set_shader_parameter(&"leaf_col", t[0])
+			mat.set_shader_parameter(&"leaf_light", t[1])
+			mi.set_surface_override_material(i, mat)
+
+
 func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera3D) -> void:
 	var spec: Dictionary = LINEUPS[which]
 	var fwd := Vector3(at.x - eye.x, 0.0, at.z - eye.z).normalized()
@@ -276,6 +302,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 					top = maxf(top, m.get_aabb().end.y)
 				inst.scale = Vector3.ONE * float(item.get_slice(":", 2)) / maxf(top, 0.01)
+				if item.get_slice_count(":") > 3:
+					_tint(inst, item.get_slice(":", 3))
 				inst.position = p
 				inst.rotation.y = atan2(fwd.x, fwd.z)
 				row.add_child(inst)
