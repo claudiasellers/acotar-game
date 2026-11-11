@@ -55,6 +55,7 @@ and its status. Details for each item are in the phase sections further down.
 | P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
 | P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
 | P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting | owner's yes |
+| F0 | Parked (owner, 2026-11-11): Dapplemesh "Cozy Woodland Groundcover" (Fab; painterly moss, fern, leafy plants, flowers; new seller, no reviews, AI-made) for the woodland floor. Revisit when it has reviews | — | parked | |
 | F1 | Florals: candidate flower sets (Quaternius free plants; a named-species pack; our own generator for climbing roses, wisteria, foxgloves, lupins) rendered in the court palette, as the trees were (owner, 2026-11-10: "such a GIANT part of the court") | — | **researching** | a lineup render per candidate; licence line per file |
 | F2 | Florals build: species by habitat (P1) and region | F1 (owner's pick), P2 | waiting | flowers/ha per region in the coverage report; frame time as T7 |
 | G1 | Ground cover preview: Quaternius plants vs shader grass vs none | — | ready | renders of the three, plus each one's frame-time cost |
