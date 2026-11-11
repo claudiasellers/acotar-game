@@ -3,7 +3,7 @@ extends GutTest
 ## ground exactly, has no seams, keeps its named ground usable, seals the
 ## Autumn border and the court's outer edge against Feyre's whole jump chain,
 ## and its water stands where water can stand. Reads the height field only.
-# gate: when:world/spring_court/wider/*,world/shared/terrain/*,tools/court/*
+# gate: when:world/spring_court/wider/*,world/shared/terrain/*,tools/court/*,world/spring_court/*terrain*,world/human_realm/shared/human_realm_height_provider*,data/dialogue/presence.tres,systems/dialogue/presence_roster.gd,data/wayside/*,systems/wayside/wayside_route.gd
 
 const MANOR := Rect2(-600.0, -500.0, 1200.0, 1000.0)
 ## Feyre: walkable floor up to 50 degrees; from a floor she can reach a ledge

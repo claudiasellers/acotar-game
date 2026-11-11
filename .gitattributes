@@ -4,6 +4,13 @@
 # to the LFS endpoint (lfs.github.com returns 403). Keep every file under
 # 50 MB (GitHub rejects files over 100 MB); large reproducible outputs stay
 # out of git and are rebuilt by generators (engineering rule R15).
+# Append-only logs: two lanes adding to the end of one conflict every time, and
+# keeping both sides is right. `union` is built into git (no config), and the
+# build lane's merge and cherry-pick both honour it. Only used where git would
+# otherwise conflict; two edits to the same existing line keep both versions.
+docs/program.md merge=union
+docs/tuning.md merge=union
+
 *.glb binary
 *.gltf.bin binary
 *.blend binary

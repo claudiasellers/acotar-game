@@ -15,6 +15,10 @@ extends Resource
 @export var lookouts: Dictionary = {}
 ## Rooms on the page before the map counts as drawn (with all five marks).
 @export var min_rooms: int = 12
-## Mapping starts with this deed (the night after the puca, ch12).
-@export var start_flag: String = "puca_resisted"
+## Mapping starts with this flag: the morning Alis trips her rope (owner,
+## 2026-11-11; the book's ch12 map moved earlier) and runs beside the other
+## beats until the map is drawn.
+@export var start_flag: String = "fact.alis_tripped"
+## Her thought the first time a room goes on her page: why she maps at all.
+@export var first_thought: String = ""
 @export_multiline var canon: String = ""

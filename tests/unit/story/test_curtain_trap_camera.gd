@@ -4,7 +4,7 @@
 ## real Feyre camera, in a box with the bedroom's south wall and doorway where
 ## upper.tres puts them (0.25 m wall, inner face at trap-local z 18.15, a 1.6 m
 ## opening at x 0) and Feyre where the playtest stops her at the door.
-# gate: when:story/act2/curtain_trap.gd,data/story/act2/curtain_trap_stage.tres,characters/feyre/*,story/act2/act2_space.gd
+# gate: when:story/act2/curtain_trap.gd,story/act2/act2_spaces.gd,data/story/moments/curtain_trap.tres,data/story/act2/curtain_trap_stage.tres,art/bedroom/*,characters/feyre/*
 extends GutTest
 
 const FEYRE := preload("res://characters/feyre/feyre.tscn")

@@ -1,4 +1,4 @@
-## Proof clip for how she moves (SteerFrame and Feyre._ground_or_air): she
+## Proof clip for how she moves (SteerFrame and GroundMotor.horizontal): she
 ## breaks straight into a run, the camera is swung round her for her (as the
 ## follow-behind does) and she keeps her line, the mouse turns only the camera
 ## (or her too, with "Turning the camera steers her while moving"), a quarter

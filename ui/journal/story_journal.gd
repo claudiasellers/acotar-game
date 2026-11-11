@@ -34,6 +34,8 @@ var has_flag: Callable
 var phase_getter: Callable
 var entry: JournalEntry = null
 var chapter: JournalChapter = null
+## Ongoing steps beside the current one ("Still on my mind").
+var side: Array[JournalEntry] = []
 
 var _root: Control
 var _book_box: Control
@@ -49,6 +51,8 @@ var _after_sketch: JournalSketch
 var _after: Label
 var _hints_head: Label
 var _hints: VBoxContainer
+var _side_head: Label
+var _side: VBoxContainer
 var _think: Button
 var _status: Label
 var _sparkles: CPUParticles2D
@@ -178,6 +182,13 @@ func think() -> int:
 func _pick() -> void:
 	chapter = book.chapter_for(phase_getter.call()) if book else null
 	entry = chapter.current(has_flag) if chapter else null
+	side.clear()
+	if book:
+		side = book.ongoing(has_flag)
+	# With nothing open in the chapter yet, the ongoing thread is what she's after
+	# (and its hints are hers to think through); a step not ready is never shown.
+	if not side.is_empty() and (entry == null or not entry.is_ready(has_flag)):
+		entry = side.pop_front()
 
 
 func _process(delta: float) -> void:
@@ -246,6 +257,7 @@ func _fill_left() -> void:
 func _fill_right() -> void:
 	for c in _hints.get_children():
 		c.queue_free()
+	_fill_side()
 	if entry == null:
 		_after.text = "Nothing presses on me right now. I could just breathe, for once."
 		_after_sketch.set_motif(&"sun")
@@ -261,6 +273,22 @@ func _fill_right() -> void:
 	for i in shown:
 		_hints.add_child(_hint_row(i, false))
 	_sync_think()
+
+
+func _fill_side() -> void:
+	for c in _side.get_children():
+		c.queue_free()
+	_side_head.visible = not side.is_empty()
+	for e in side:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 12)
+		row.add_child(JournalSketch.new(e.sketch, 40.0))
+		var l := _label(e.after, &"SatchelBody")
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(l)
+		_side.add_child(row)
 
 
 func _sync_think() -> void:
@@ -391,6 +419,13 @@ func _build() -> void:
 	_hints = VBoxContainer.new()
 	_hints.add_theme_constant_override(&"separation", 10)
 	rc.add_child(_hints)
+	rc.add_child(_gap(18))
+	_side_head = _label("Still on my mind", &"SatchelSmall")
+	_side_head.uppercase = true
+	rc.add_child(_side_head)
+	_side = VBoxContainer.new()
+	_side.add_theme_constant_override(&"separation", 6)
+	rc.add_child(_side)
 	var fill := Control.new()
 	fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	rc.add_child(fill)

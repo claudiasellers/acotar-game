@@ -86,3 +86,9 @@ the book's shapes; anything else here is taste.
 | Leaf-card light | world/spring_court/shared/court_leaf_card.gdshader | rim 0.12, lime guard 0.25, tree value spread 0.12, warmth spread 0.06 | rim ≤0.2 | A low rim, so dark leaves seen edge-on don't turn tan; the spreads give each tree its own shade. | wider-court-world |
 | `DRAW_GRASS_CLUMPS` | world/spring_court/wider/court_region.gd | false (owner, 2026-11-09) | bool | The pale mint grass clumps are scattered but hidden: they didn't read as grass on the storybook ground. They still count as fire fuel. | wider-court-world |
 | Depth haze, court by day | world/spring_court/wider/fx/tools/build_court_fx.gd `DEPTH_*` | haze (0.70,0.74,0.96), tint 0.25, density 0.0011, aerial 0.1, sky affect 0.1 | tint 0–0.5 | The same layering in each daytime region grade, keeping a quarter of the region's own fog hue. Dusk, night and the blight keep their own fog. | wider-court-world |
+
+## Bow feel (T101)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `nock_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds from raising the bow (RMB) until it is nocked. After that every left click looses a full-power arrow (Zelda style, no hold-to-strengthen). A click during the nock is queued and fires when it completes. Upgrades can shorten it. | T101 |

@@ -205,7 +205,7 @@ func _line_up() -> void:
 	var cam: Variant = feyre.get(&"camera") if feyre else null
 	var want := false
 	if wolf and bow is BowController and cam is Camera3D and not bool(space.get(&"wolf_dead")):
-		var drawing := (bow as BowController).is_drawing and Input.is_action_pressed(&"aim")
+		var drawing := (bow as BowController).is_drawing
 		var off := aim_off_degrees(cam as Camera3D, _chest(wolf))
 		want = drawing and off <= (AIM_OFF_DEG if aiming else AIM_ON_DEG)
 	if want and not aiming:

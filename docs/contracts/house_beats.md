@@ -8,6 +8,14 @@ Book order (Keeper): her map of the halls comes first, then the night Tamlin
 kills the Bogge (he comes to her, she dresses his hand), then the study mural.
 All of it is before the Suriel.
 
+Owner change (2026-11-11, canon V): the map of the halls starts the morning
+Alis trips her rope (`fact.alis_tripped`, ch7) and runs beside the other p2/p3
+beats as an ongoing thread. It is drawn (`manor_map_drawn`) once all five marks
+and enough rooms are on her page. Setting it down on the foyer table at night
+opens the Bogge night, which still waits for `puca_resisted`. Her first room
+gives her one thought (`HallMapPlan.first_thought`). The sketchbook lists the
+map under "Still on my mind" (`JournalEntry.ongoing`).
+
 ## Where it plugs in
 `Act3Anchors.ROWS` (story/act3/act3_anchors.gd) hangs one node per row:
 
@@ -31,11 +39,11 @@ the worktable in the infirmary).
 ## Facts written (WorldState) and the deeds the moments raise from them
 | fact | when | moment -> deed |
 |---|---|---|
-| `fact.hall_room.<room>.<level>` | she walks into a room after `puca_resisted` | |
-| `fact.hall_rooms_enough` | `HallMapPlan.min_rooms` (10) rooms on her page | |
+| `fact.hall_room.<room>.<level>` | she walks into a room after `fact.alis_tripped`, outside staged scenes | |
+| `fact.hall_rooms_enough` | `HallMapPlan.min_rooms` (10) rooms on her page | `manor_map` (with all 5 marks) -> `manor_map_drawn` |
 | `fact.hall_view.<tower room>` | a tower top's view sketched onto the world map | |
 | `fact.hall_x_<n>` | E at hall mark n (X or circle) | `hall_mark_<n>` -> `fact.hall_mark_<n>` |
-| `fact.hall_map_set_down` | E at the foyer table, night, all marks and enough rooms | `manor_map` -> `manor_map_drawn` |
+| `fact.hall_map_set_down` | E at the foyer table, night, all marks, enough rooms and `puca_resisted` | (opens WoundDressing) |
 | `fact.tamlin_knows_she_cannot_read` | he glances at her map | |
 | `fact.tamlin_hand_bound` | the bowl of bloody water is poured away | `wound_dressing` -> `tamlin_wound_dressed` |
 | `fact.mural_studied` | three mural details noticed | `study_mural` -> `study_mural_seen` (+ Lucien, `fact.suriel_method_known`) |

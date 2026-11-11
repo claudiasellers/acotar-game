@@ -116,6 +116,18 @@ memory = "My rope caught Alis, not a monster."
 sketch = &"moon"
 canon = "A"
 
+[sub_resource type="Resource" id="e_map"]
+script = ExtResource("3_entry")
+id = &"map"
+done_flag = "manor_map_drawn"
+require_flags = PackedStringArray("fact.alis_tripped")
+after = "If I'm going to be stuck here, I need to know my way around this house."
+hints = PackedStringArray("Every room I walk into goes on my page. Crosses and circles mark the doors that matter, since I can't write.", "The front doors, the marble stairs, the garden doors, the kitchen door, the servants' stair. The towers show the grounds.", "Walk into enough rooms, and at each of the five places, mark my map (E).")
+memory = "My map of the halls: crosses, circles and little pictures."
+ongoing = true
+sketch = &"door"
+canon = "V"
+
 [sub_resource type="Resource" id="e_stables"]
 script = ExtResource("3_entry")
 id = &"stables"
@@ -157,26 +169,15 @@ numeral = "Chapter Three"
 title = "Across the Wall"
 opener = "Spring, in the dead of winter. Everything here is lovely, and none of it is safe."
 sketch = &"rose"
-entries = Array[ExtResource("3_entry")]([SubResource("e_arrive"), SubResource("e_bathe"), SubResource("e_dinner"), SubResource("e_curtain_trap"), SubResource("e_stables"), SubResource("e_bogge"), SubResource("e_puca")])
-
-[sub_resource type="Resource" id="e_map"]
-script = ExtResource("3_entry")
-id = &"map"
-done_flag = "manor_map_drawn"
-require_flags = PackedStringArray("puca_resisted")
-after = "If I ever have to run, I need this house by heart."
-hints = PackedStringArray("Mark the halls my own way: crosses and circles, since I can't write.", "Walk the halls and mark the doors that matter. The towers show the grounds.", "Make all five marks and draw enough rooms, then set my map down on the foyer table at night (E).")
-memory = "My map of the halls: crosses, circles and little pictures."
-sketch = &"door"
-canon = "A"
+entries = Array[ExtResource("3_entry")]([SubResource("e_arrive"), SubResource("e_bathe"), SubResource("e_dinner"), SubResource("e_curtain_trap"), SubResource("e_map"), SubResource("e_stables"), SubResource("e_bogge"), SubResource("e_puca")])
 
 [sub_resource type="Resource" id="e_wound"]
 script = ExtResource("3_entry")
 id = &"wound"
 done_flag = "tamlin_wound_dressed"
-require_flags = PackedStringArray("manor_map_drawn")
-after = "He's hurt, and nobody is helping him."
-hints = PackedStringArray("The infirmary. There'll be something in the cabinets.", "Sort the bowl, linen and bandage from the cabinets, then clean and bind his hand (E).")
+require_flags = PackedStringArray("manor_map_drawn", "puca_resisted")
+after = "Sleepless again. I could take my map down to the foyer and look it over."
+hints = PackedStringArray("The long table in the foyer, after dark.", "If someone comes in hurt, the infirmary will have bowls and bandages in its cabinets.", "At night, set my map down on the foyer table (E). Then clean and bind whatever needs it.")
 memory = "I bound his hand. He saw I couldn't read."
 sketch = &"flame"
 canon = "A"
@@ -230,9 +231,9 @@ script = ExtResource("2_chap")
 phase = &"p3_house_and_woods"
 numeral = "Chapter Four"
 title = "The House and the Woods"
-opener = "A prisoner should know her cage. I'll learn every hall of this one."
+opener = "Spring outside my window, and still I can't sleep. The halls are never quite quiet at night."
 sketch = &"door"
-entries = Array[ExtResource("3_entry")]([SubResource("e_map"), SubResource("e_wound"), SubResource("e_mural"), SubResource("e_suriel"), SubResource("e_naga"), SubResource("e_summer_faerie")])
+entries = Array[ExtResource("3_entry")]([SubResource("e_wound"), SubResource("e_mural"), SubResource("e_suriel"), SubResource("e_naga"), SubResource("e_summer_faerie")])
 
 [sub_resource type="Resource" id="e_starlight"]
 script = ExtResource("3_entry")

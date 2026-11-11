@@ -62,11 +62,11 @@ func test_release_uses_a_wood_arrow_never_the_ash_by_fallback() -> void:
 	Gameplay.inventory.remove(&"arrow_wood", 100)
 	Gameplay.inventory.add(&"arrow_ash")
 	feyre.bow_controller.selected = &"arrow_wood"
-	feyre.bow_controller.update_draw(0.5, true, false)
+	feyre.bow_controller.update_bow(0.5, true, false)
 	assert_false(feyre.bow_controller.is_drawing, "won't draw the ash arrow unless chosen")
 	feyre.bow_controller.cycle_arrow()
 	assert_eq(feyre.bow_controller.selected, &"arrow_ash")
-	feyre.bow_controller.update_draw(0.5, true, false)
+	feyre.bow_controller.update_bow(0.5, true, false)
 	var arrow := feyre.bow_controller.release()
 	assert_not_null(arrow)
 	assert_eq(arrow.arrow_id, &"ash")
@@ -96,10 +96,10 @@ func test_arrows_break_on_stone_by_chance() -> void:
 
 
 func test_slow_time_while_aiming_a_draw_then_stamina_runs_out() -> void:
-	feyre.bow_controller.update_draw(0.5, true, true)
+	feyre.bow_controller.update_bow(0.5, true, false)
 	assert_eq(Engine.time_scale, BowController.SLOW_TIME_SCALE)
 	feyre.stamina = 0.0
-	feyre.bow_controller.update_draw(0.1, true, true)
+	feyre.bow_controller.update_bow(0.1, true, false)
 	assert_eq(Engine.time_scale, 1.0)
 
 
@@ -216,7 +216,7 @@ func test_bow_is_stowed_indoors_and_comes_out_to_aim() -> void:
 	var visual := feyre.bow_controller.find_child("BowVisual", true, false) as BowVisual
 	await wait_frames(2)
 	assert_true(visual.bow_root.visible, "outdoors in hunting clothes")
-	feyre.set(&"_indoor", 1.0)
+	feyre.camera_control.indoor = 1.0
 	visual.raised = 0.0
 	visual._place()
 	assert_false(visual.bow_root.visible or visual.quiver.visible, "stowed under a roof (D1)")

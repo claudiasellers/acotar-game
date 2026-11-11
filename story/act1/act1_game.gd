@@ -21,6 +21,9 @@ const TITLE_SCENE := "res://ui/title/title_screen.tscn"
 @export var opening_shot_seconds: float = 4.0
 ## Give up waiting for the start anchor after this long and drop Feyre in.
 @export var spawn_timeout: float = 15.0
+## How long she is held at the anchor waiting for ground before she is let go.
+const GROUND_WAIT_SECONDS := 10.0
+const GROUND_POLL := 0.05
 
 var world: Node3D
 var feyre: Feyre
@@ -127,11 +130,32 @@ func _spawn_at(anchor: Node3D) -> void:
 	if anchor:
 		feyre.global_position = anchor.global_position + Vector3.UP * 0.1
 		feyre.model.rotation.y = anchor.global_rotation.y
+	_release_on_ground(GROUND_WAIT_SECONDS)
+
+
+## The region's anchor can land before the ground under it can be stood on:
+## Terrain3D builds its collision around her after she moves there, a few
+## frames later (T104: now and then she dropped through on the first frame and
+## fell forever). Hold her still until a ray under her hits, then let her go.
+func _release_on_ground(time_left: float) -> void:
+	if not is_instance_valid(feyre):
+		return
+	if not has_ground_under(feyre) and time_left > 0.0:
+		get_tree().create_timer(GROUND_POLL, true, true).timeout.connect(
+				_release_on_ground.bind(time_left - GROUND_POLL))
+		return
 	feyre.set_physics_process(true)
 	# Straight after New Game the opening film plays its last part here (L33).
 	if OpeningFilmWorld.take(self, feyre, _first_thought):
 		return
 	_play_opening_shot()
+
+
+## Is there something she would stand on just under her feet?
+static func has_ground_under(who: CharacterBody3D) -> bool:
+	var from := who.global_position + Vector3.UP * 1.0
+	var q := PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 3.0, who.collision_mask, [who.get_rid()])
+	return not who.get_world_3d().direct_space_state.intersect_ray(q).is_empty()
 
 
 func _play_opening_shot() -> void:
