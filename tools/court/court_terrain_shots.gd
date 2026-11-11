@@ -9,6 +9,11 @@
 ## the terrain; "photo" is what the game ships. Files: <view>_<look>.png.
 ## `fogs=now,layered,layered_mist` previews depth hazes (FOGS) on an in-memory
 ## copy of the view's grade; files <view>[_<look>]_<fog>.png.
+## `luts=now,deep,green,both` previews the grade's colour ramp (finish plan C1)
+## on an in-memory copy of the grade at the eye: deep lowers the dark end
+## (the milky glen), green takes the blue cast out of the dark and middle stops
+## (the teal Western Woods); files <view>_lut-<variant>.png. Every shot prints
+## the ramp's dark stop and the ground's mean colour and hue (the lower band).
 ## `ingame` uses the grade the game would show at the eye (the RegionGrade of
 ## the region you stand in, else the view's grade) instead of the view's.
 ## `grass=now,toned,none` previews the court's grass clumps (GRASS): as they
@@ -58,6 +63,7 @@ func _run() -> void:
 	var lineup := ""
 	var looks: Array = []
 	var fogs: Array = []
+	var luts: Array = []
 	var src := ""
 	var forest := ""
 	for a: String in args.duplicate():
@@ -71,6 +77,9 @@ func _run() -> void:
 			args.erase(a)
 		elif a.begins_with("fogs="):
 			fogs = Array(a.substr(5).split(","))
+			args.erase(a)
+		elif a.begins_with("luts="):
+			luts = Array(a.substr(5).split(","))
 			args.erase(a)
 		elif a.begins_with("lineup="):
 			lineup = a.substr(7)
@@ -131,13 +140,19 @@ func _run() -> void:
 				for grass: String in (grasses if not grasses.is_empty() else [""]):
 					if grass != "":
 						_apply_grass(world, grass)
-					for i in 40:
-						await get_tree().process_frame
-					var path := "%s/%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
-						"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass]
-					root.get_texture().get_image().save_png(path)
-					print("SHOT %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, path,
-						world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+					for lut: String in (luts if not luts.is_empty() else [""]):
+						if lut != "":
+							_apply_lut(world, _grade_at(eye, v[7]) if ingame else v[7], lut)
+						for i in 40:
+							await get_tree().process_frame
+						var path := "%s/%s%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
+							"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass,
+							"" if lut == "" else "_lut-" + lut]
+						var img := root.get_texture().get_image()
+						img.save_png(path)
+						print("SHOT %s %s %s %s %s -> %s | grade %s | draw_calls %d | %s" % [id, look, fog, grass, lut, path,
+							world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+							_colour_read(world.grade.current as GradePreset, img)])
 	get_tree().quit(0)
 
 
@@ -599,6 +614,58 @@ func _apply_fog(world: World, grade: StringName, fog: String) -> void:
 	world.grade.set(&"_to", p)
 	world.grade.set(&"_t", 1.0)
 	world.grade.apply(p)
+
+
+## The grade's ramp with the dark end lowered and/or the blue cast taken out.
+## deep: dark stop x LUT_DEEP (about 0.1 to 0.03); green: the dark and middle
+## stops' blue no higher than their red/green mean.
+const LUT_DEEP := 0.3
+
+
+func _apply_lut(world: World, grade: StringName, variant: String) -> void:
+	var p := (GradeDirector.load_preset(grade) as GradePreset).duplicate() as GradePreset
+	var gt := p.lut as GradientTexture1D
+	if variant != "now" and gt != null and gt.gradient != null:
+		var g := gt.gradient.duplicate() as Gradient
+		var cols := g.colors
+		for i in mini(cols.size(), 2):
+			var c := cols[i]
+			if variant == "deep" or variant == "both":
+				c = c * LUT_DEEP if i == 0 else c
+			if variant == "green" or variant == "both":
+				c.b = minf(c.b, (c.r + c.g) * 0.5)
+			c.a = 1.0
+			cols[i] = c
+		g.colors = cols
+		var out := GradientTexture1D.new()
+		out.gradient = g
+		out.width = gt.width
+		p.lut = out
+	world.grade.current = p
+	world.grade.set(&"_to", p)
+	world.grade.set(&"_t", 1.0)
+	world.grade.apply(p)
+
+
+## "lut dark (r,g,b) | ground (r,g,b) hue h": the ramp's dark stop, and the
+## mean colour of the frame's lower fifth (the ground underfoot) with its hue.
+func _colour_read(p: GradePreset, img: Image) -> String:
+	var dark := "none"
+	var gt := p.lut as GradientTexture1D if p != null else null
+	if gt != null and gt.gradient != null:
+		var c := gt.gradient.colors[0]
+		dark = "(%.3f,%.3f,%.3f)" % [c.r, c.g, c.b]
+	var sum := Color(0, 0, 0)
+	var n := 0
+	var w := img.get_width()
+	var h := img.get_height()
+	for y in range(int(h * 0.8), h, 4):
+		for x in range(0, w, 4):
+			var c := img.get_pixel(x, y)
+			sum += Color(c.r, c.g, c.b, 0.0)
+			n += 1
+	var m := Color(sum.r / n, sum.g / n, sum.b / n)
+	return "lut dark %s | ground (%.3f,%.3f,%.3f) hue %.0f" % [dark, m.r, m.g, m.b, m.h * 360.0]
 
 
 ## Terrain3D assets with the court's photo slots packed in `look` (every slot
