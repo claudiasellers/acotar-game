@@ -37,42 +37,66 @@ Owner: "keep a list of the plan items, organise them by dependency, and move for
 with the ones that make sense for now." Each item below has an id, its dependencies,
 and its status. Details for each item are in the phase sections further down.
 
-| Id | Item | Depends on | Status |
-|---|---|---|---|
-| T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **ready** |
-| T2 | Budgets: near ≤ 4.5k tris, far ≤ 600 | T1 | waiting |
-| T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | waiting |
-| T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | waiting |
-| T5 | Willow of our own | D1, T4 | waiting |
-| T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | waiting |
-| T7 | Frame time on a dense mixed wood and the court views | T6 | waiting |
-| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | waiting |
-| P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings and viewpoints kept open | — | **ready** |
-| P2 | Region recipes on the new roles | P1, T6 | waiting |
-| P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting |
-| P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting |
-| G1 | Ground cover preview: Quaternius plants vs shader grass vs none | — | **ready** |
-| G2 | Ground cover build; becomes the fire fuel | G1 (owner's pick) | waiting |
-| C1 | Grade previews: the milky glen, the teal Western Woods | — | **ready** |
-| C2 | Grade change | C1 (owner's pick) | waiting |
-| E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting |
-| E2 | Apply the estate decision | E1, D2 | waiting |
-| V1 | Tavern and well on the village green | P2 (same content file) | waiting |
-| H1 | Housekeeping: drop the previews and the card trees | T8 | waiting |
-| L | Landmark models | owner (later) | deferred |
+| Id | Item | Depends on | Status | Accept when (measured) |
+|---|---|---|---|---|
+| R0 | Canonical check: the estate and Spring shots before and after the haze change (M4WCT-3 touched `manor.tres`, `spring.tres`) | — | **started** | the four outdoor Spring canonical shots rendered on both commits; the differences are the haze only |
+| T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **started** | every file has a licence line; no file over 5 MB; triangles per model in a CSV |
+| T2 | Detail steps: near (≤ 4.5k tris) to 80 m, mid (≤ 1.2k) to 260 m, far card (≤ 24) to 600 m | T1 | waiting | triangles in view at 150/ha (near + mid + far) ≤ 3 M, from the CSV |
+| T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | waiting | no two neighbouring trees share build, yaw and scale (GUT) |
+| T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | waiting | each role's mean leaf colour inside its row in `docs/tuning.md` (CSV) |
+| T5 | Willow of our own (generator pipeline, `woods_trees.py` Kit) | D1, T4 | waiting | as T2 and T4 |
+| T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | waiting | GUT: every role id resolves to near, mid and far meshes |
+| T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | waiting | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
+| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | waiting | owner's yes |
+| P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **started** | GUT: habitat fractions per region; every keep-open zone has no tree in it |
+| P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
+| P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
+| P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting | owner's yes |
+| G1 | Ground cover preview: Quaternius plants vs shader grass vs none | — | ready | renders of the three, plus each one's frame-time cost |
+| G2 | Ground cover build; becomes the fire fuel | G1 (owner's pick) | waiting | GroundFuel tests pass on the new layer; frame time as T7 |
+| C1 | Grade previews: the milky glen, the teal Western Woods | — | ready | LUT black level and ground hue printed for now and the preview |
+| C2 | Grade change | C1 (owner's pick) | waiting | the grade director's tests; the printed numbers as picked |
+| E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting | renders, same views |
+| E2 | Apply the estate decision | E1, D2 | waiting | canonical shots: no change but the trees |
+| V1 | Tavern and well on the village green (generator pipeline or asset request) | P2 (same content file) | waiting | on the green, clear of the paths (GUT) |
+| H1 | Housekeeping: drop the previews and the card trees | T8 | waiting | nothing references them (grep) |
+| L | Landmark models | owner (later) | deferred | |
 
 Owner decisions:
 
 | Id | Decision | Status |
 |---|---|---|
 | D1 | Willow: make our own, or skip | open |
-| D2 | Estate: new trees everywhere, or court only (after E1) | open, after E1 |
+| D2 | Estate: new trees everywhere, or court only (after E1). The program's rule is that the same object looks the same in every region, so "everywhere" is the expected answer | open, after E1 |
 | D3 | Borders: seal every region border, or only the Autumn border and the edge | open |
 | D4 | Opening times: phase table vs `CourtMap.UNLOCK_PHASE` (Rosewild, Blossom Vale) | open (story lane) |
 
-The critical path is T1 → T2/T3/T4 → T6 → P2 → P3 → P4. P1, G1 and C1 can run beside
-T1 now. They touch different files: P1 is `court_height.gd` and the habitat code, G1
-and C1 are preview tooling, and T1 is the new asset folder.
+The critical path is T1 → T2/T3/T4 → T6 → T7 → P2 → P3 → P4. P1, G1 and C1 can run
+beside T1 now. They touch different files: P1 is `court_height.gd` and the habitat code,
+G1 and C1 are preview tooling, and T1 is the new asset folder.
+
+### Fit with the overall program (checked 2026-11-10)
+
+The M4 brief (`wider-court-terrain.md`) asked for the highlands stripped of every model,
+the ground rebuilt, "then the models layered back". The terrain half is done; this plan
+is the layering half. Five fixes came out of checking it against the brief, `world.md`,
+`wider_court.md`, `program.md` and the rendering rules in CLAUDE.md:
+
+1. **Density vs detail.** At 150 trees/ha, full trees to 260 m are about 3,200 trees and
+   up to 14 M triangles, and the far band adds about 14,000 more. Hence three detail
+   steps in T2 with a triangle sum as acceptance, and P2 waits on T7's measured
+   ceiling. Godot's own mesh LOD picks per MultiMesh chunk, not per tree.
+2. **One look everywhere.** The program's consistency rule makes the estate decision (D2)
+   lean to "everywhere". Until then the new trees live in the court's folder
+   (`world/spring_court/wider/assets/trees/`), not the woods lane's `shared/`.
+3. **Canonical shots.** M4WCT-3 changed the estate's and Spring's fog and the canonical
+   shots were not re-rendered. R0 does that.
+4. **Story spots.** P1 keeps open the sentry range's firing lane east of the watchtower,
+   the potion room's terrace and the starlight pool's rim
+   (`wider_court.md`).
+5. **Measured acceptance.** Every item has a number to pass (the column above), and
+   each look value (the palette, the role colours, the densities) gets a row in
+   `docs/tuning.md`.
 
 ## Phase T — the new trees in the game (next)
 
@@ -87,13 +111,14 @@ and C1 are preview tooling, and T1 is the new asset folder.
        style) and show they look the same.
      - EZ bark: Poly Haven CC0 (oak, willow); check texturecan's terms (birch, pine)
        or swap in a Poly Haven bark.
-   - Home: `world/spring_court/shared/models/court_trees/`, textures at 512–1024 px,
-     each file well under the 50 MB limit.
-2. **Budget.**
-   - Near meshes ≤ 4,500 tris: the Blender decimate pass for Quaternius (the twisted
-     trees are about 10k), lite settings for EZ-Tree.
-   - Far meshes ≤ 600 tris.
-   - The court's impostor range past `TREE_DRAW` stays.
+   - Home: `world/spring_court/wider/assets/trees/` (the court's folder until D2),
+     textures at 512 px, each file under 5 MB.
+2. **Detail steps.**
+   - Near meshes ≤ 4,500 tris to 80 m: the Blender decimate pass for Quaternius (the
+     twisted trees are about 10k), lite settings for EZ-Tree.
+   - Mid meshes ≤ 1,200 tris to 260 m (`TREE_DRAW`).
+   - Far: a crossed card (≤ 24 tris) baked from the tree, to 600 m (`TREE_FAR`).
+   - Acceptance: near + mid + far triangles in view at 150/ha ≤ 3 M.
 3. **Variety stays natural.**
    - The packs keep their own looks (owner).
    - On top: random yaw and scale, a small per-tree shade from where it stands, and
@@ -125,7 +150,9 @@ and C1 are preview tooling, and T1 is the new asset folder.
    - crest/ridge, knoll crown, slope by steepness, hollow, valley floor;
    - brook and river bank, lake shore, path verge;
    - clearings (pads, sites, gates) stay open, and so do the named viewpoints (fixes
-     `vale_rim` and `western_woods`).
+     `vale_rim` and `western_woods`);
+   - the story spots stay open too (`wider_court.md`): the sentry range's firing lane
+     east of the watchtower, the potion room's terrace, the starlight pool's rim.
 2. **Region recipes** (`tools/court/court_content_table.gd`, one task), from the
    owner's terrain table:
    - **Western Woods:** a closed ancient wood of 150–200/ha, twisted oaks among the
