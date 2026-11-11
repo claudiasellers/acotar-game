@@ -40,6 +40,14 @@ if [ -n "$hits" ]; then
 	refuse "the change adds or edits built files; change the recipe instead and let levels.sh build them: $(printf '%s' "$hits" | cut -f1 | head -3 | tr '\n' ' ')"
 fi
 
+# A builder script with no recipe line is the commonest rejection. Read from the
+# commit's tree, so it covers cloud commits too; the on-disk levels check also
+# catches an unignored output or an unmarked world test.
+out=$("$here/precheck.sh" --builders "$sha" 2>&1) || refuse "$(printf '%s' "$out" | sed 's/^precheck: //' | head -3 | tr '\n' ' ')"
+if [ "$source" = lane ] && [ "$(git rev-parse HEAD)" = "$sha" ]; then
+	out=$("$here/levels.sh" check 2>&1) || refuse "levels check failed: $(printf '%s' "$out" | head -3 | tr '\n' ' ')"
+fi
+
 # The parse check needs the commit on disk. Cloud commits aren't, so their
 # parse runs in the gate.
 if [ "$source" = lane ] && [ "$(git rev-parse HEAD)" = "$sha" ]; then

@@ -10,7 +10,8 @@ extends Node3D
 
 const ArrowModel := preload("res://systems/bow/arrow_model.gd")
 
-## Seconds the bow stays up after Q, F or a shot, with no aim held.
+## Seconds the bow stays up after Q or F, with no aim held. After a shot it
+## comes straight down (T096).
 const READY_HOLD := 2.5
 const SWING_SPEED := 6.0
 ## How far (rad) the bow arm may swing from the way she faces while she turns.
@@ -55,7 +56,6 @@ func _ready() -> void:
 	_attach_pose.call_deferred()
 	if controller:
 		controller.arrow_type_changed.connect(func(_id: StringName) -> void: hold_ready())
-		controller.feyre.arrow_fired.connect(func(_a: Node) -> void: hold_ready(1.2))
 
 
 ## True when what she's wearing is no outfit for a bow on her back: a formal
@@ -77,7 +77,7 @@ static func stowed_for(wardrobe: Wardrobe) -> bool:
 	return false
 
 
-## Keeps the bow up for `seconds` (Q, F, a shot) without aiming.
+## Keeps the bow up for `seconds` (Q, F) without aiming.
 func hold_ready(seconds: float = READY_HOLD) -> void:
 	ready_timer = maxf(ready_timer, seconds)
 

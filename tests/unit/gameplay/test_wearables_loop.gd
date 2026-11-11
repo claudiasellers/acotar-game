@@ -1,4 +1,4 @@
-# gate: when:systems/wardrobe/*,data/wardrobe/*,ui/dressing_room/*,tools/gen_gameplay_data.py
+# gate: when:systems/wardrobe/*,data/wardrobe/*,ui/dressing_room/*,tools/gen_gameplay_data.py,data/recipes/*,systems/gameplay.gd,characters/feyre/feyre.gd
 ## Contract for the wearables loop (L64): clothes are purely aesthetic, every
 ## piece has a way to reach Feyre, and the wardrobe restocks with the story.
 extends GutTest

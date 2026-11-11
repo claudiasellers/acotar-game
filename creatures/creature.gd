@@ -12,6 +12,8 @@ signal died(cause: StringName)
 const TARGET_LAYER := 1 << 3
 const WORLD_MASK := 1 << 0
 const GROUP := &"creatures"
+## Creatures at least this tall (m) are solid to Feyre while alive (T092).
+const SOLID_HEIGHT := 0.6
 ## Special arrows (gameplay lane, Arrow.arrow_effect): how long each lasts.
 const SLEEP_TIME := 25.0
 const SLOW_TIME := 15.0
@@ -64,6 +66,9 @@ func _ready() -> void:
 		creature_id = StringName(name)
 	health = data.max_health
 	collision_layer = TARGET_LAYER
+	# Big enough to walk into (a lamb and up): Feyre bumps it (T092).
+	if data.body_height >= SOLID_HEIGHT:
+		collision_layer |= ActorBody.LAYER
 	collision_mask = WORLD_MASK
 	floor_snap_length = 0.5
 	floor_max_angle = deg_to_rad(55.0)
@@ -209,6 +214,8 @@ func die(cause: StringName) -> void:
 	alive = false
 	health = 0.0
 	velocity = Vector3.ZERO
+	# A carcass lies flat: she steps over it, not into a standing box.
+	collision_layer &= ~ActorBody.LAYER
 	if animator:
 		animator.die()
 	else:

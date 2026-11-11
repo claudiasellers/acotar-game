@@ -57,7 +57,11 @@ Follow `.claude/agents/lane-worker.md`. Run only the tests that exercise the fil
 You can't reach the home machine, so git carries the messages. Never run
 `submit.sh` or start a build lane. Run only the tests that exercise the files you changed; the seat and dinner tests (`tests/unit/story/test_act2_seated.gd`, `test_act2_first_dinner.gd` and similar) run only when you change seats, poses, furniture or those scenes, and only the build lane runs the gate.
 
-1. Finish on your own branch with `origin/main` merged in, and push.
+1. Finish on your own branch with `origin/main` merged in. Run `tools/mq/precheck.sh`
+   before you push: it catches the common rejections (conflict markers, a script
+   without its `.uid`, built files in the change, a new `tools/generators/X.gd`
+   with no recipe line in `tools/mq/generated.conf`). A new generator needs that
+   recipe; the message shows an example line. Then push.
 2. Push a branch at that exact commit: `git push origin <commit>:refs/heads/lead/ready-<TASK-ID>-<n>`.
    This is the main form. Tags can also work (`ready/<TASK-ID>-<n>`), but tags
    pushed from the cloud don't land reliably.

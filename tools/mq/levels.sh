@@ -212,6 +212,9 @@ check_one() {
 	done
 }
 
+# Said with every "builder not in generated.conf" failure, here and in precheck.sh.
+RECIPE_HELP='Add one recipe line to tools/mq/generated.conf: name | git-ignored output folder(s) | build command | inputs. Example: world_map | ui/map/_generated | "$MQ_BIN/godot.sh" -s tools/generators/world_map.gd | tools/generators/world_map.gd :(glob)ui/map/** . Put the output folder in .gitignore and never commit its files.'
+
 CACHED_ONLY=0
 case "${1:-}" in
 	ensure)
@@ -231,7 +234,7 @@ case "${1:-}" in
 		each_line check_one
 		for g in tools/generators/*.gd; do
 			[ -f "$g" ] || continue
-			grep -q "$g" "$CONF" || { echo "levels: builder $g is not in generated.conf" >&2; CHECK_FAILED=1; }
+			grep -q "$g" "$CONF" || { echo "levels: builder $g is not in generated.conf. $RECIPE_HELP" >&2; CHECK_FAILED=1; }
 		done
 		# Only World loads the bake, so a test that loads it must wait for the build.
 		for t in $(grep -rlE 'world/shared/world/world\.tscn|load.*act1_game\.tscn' tests 2>/dev/null); do

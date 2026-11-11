@@ -1,5 +1,12 @@
-## The hunting bow (root doc §4.3) as a component of Feyre: draw, sway,
-## slow time while stamina lasts, choose an arrow type, release, craft.
+## The hunting bow (root doc §4.3) as a component of Feyre: raise, draw, sway,
+## slow time while stamina lasts, choose an arrow type, shoot, craft.
+##
+## Controls (T096, the owner's scheme): hold aim (right mouse / left trigger)
+## to raise the bow and draw; press fire (left mouse / right trigger) while it
+## is up to loose one arrow. Letting go of aim lowers the bow and looses
+## nothing. After a shot the bow comes down until aim is pressed afresh.
+## Fire is taken from the press event, not polled, so a click shorter than a
+## physics frame still shoots.
 ##
 ## Reads arrows from Gameplay.inventory's quiver. Body state adds sway and
 ## bow-hand tremor; wet clothing makes wet fletching.
@@ -8,18 +15,13 @@ extends Node
 
 signal arrow_type_changed(arrow_item_id: StringName)
 signal bow_changed(bow: BowData)
-## Let go before MIN_LOOSE_DRAW: the bow comes down and the arrow stays nocked.
-signal draw_too_short
 
-## Time scale while drawing and aiming with stamina left.
+## Time scale while the bow is up and drawn with stamina left.
 const SLOW_TIME_SCALE := 0.4
 ## Stamina per real second while time is slowed.
 const SLOW_TIME_DRAIN := 28.0
 ## Draw needed before time slows.
 const SLOW_TIME_MIN_DRAW := 0.35
-## Draw needed for a release to loose (T084). A quick click lowers the bow
-## instead of dropping a feeble arrow ten metres off.
-const MIN_LOOSE_DRAW := 0.3
 const ARROW_DIR := "res://data/arrows"
 const BOW_DIR := "res://data/bows"
 ## The only type drawn automatically when the chosen one runs out. Special
@@ -32,6 +34,9 @@ static var _arrow_data: Dictionary = {}
 var feyre: Feyre
 var bow: BowData
 var draw_amount: float = 0.0
+## The bow is up (aim held, not spent by a shot, the scene allows it).
+var is_aiming: bool = false
+## Up with an arrow nocked: the string is drawing.
 var is_drawing: bool = false
 var selected: StringName = &"arrow_wood"
 var slowing: bool = false
@@ -40,6 +45,10 @@ var visual: BowVisual
 var quiver_card: QuiverCard
 
 var _time: float = 0.0
+## A shot was loosed with aim still held: the bow stays down until aim is let go.
+var _spent: bool = false
+## Fire pressed since the last physics tick.
+var _fire_pressed: bool = false
 
 
 func _ready() -> void:
@@ -63,6 +72,14 @@ func _exit_tree() -> void:
 		Engine.time_scale = 1.0
 
 
+## Fire is caught in _input, before any GUI or other handler can mark the click
+## handled (Feyre's own first click captures the mouse). It is never consumed
+## here, so scene choices that listen for fire still hear it.
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"fire") and not event.is_echo():
+		_fire_pressed = true
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"cycle_arrow"):
 		cycle_arrow()
@@ -75,31 +92,30 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	_time += delta
-	update_draw(delta, Input.is_action_pressed(&"fire"), Input.is_action_pressed(&"aim"))
+	var fire := _fire_pressed
+	_fire_pressed = false
+	update_bow(delta, Input.is_action_pressed(&"aim"), fire)
 
 
-## Draw/release logic, separated from input so tests can drive it. Holding fire
-## alone is enough: drawing brings up the aim view and reticle (Feyre and the
-## reticle read is_drawing), and slow time with it, so right-mouse aim is
-## optional.
-func update_draw(delta: float, fire_held: bool, aiming: bool) -> void:
-	var allowed := can_shoot()
-	if fire_held and allowed and _available() != &"":
-		is_drawing = true
-		draw_amount = minf(draw_amount + delta / bow.draw_time, 1.0)
-	elif is_drawing and not allowed:
-		# A scene took the bow mid-draw: let the string down, the arrow stays.
+## One tick of the bow, separated from input so tests can drive it. `aim_held`:
+## the aim button is down; `fire_pressed`: fire was pressed since the last tick.
+## Returns the arrow loosed this tick, if any.
+func update_bow(delta: float, aim_held: bool, fire_pressed: bool) -> Arrow:
+	if not aim_held:
+		_spent = false
+	is_aiming = aim_held and not _spent and can_shoot()
+	is_drawing = is_aiming and _available() != &""
+	draw_amount = minf(draw_amount + delta / bow.draw_time, 1.0) if is_drawing else 0.0
+	var arrow: Arrow = null
+	if fire_pressed and is_drawing:
+		arrow = release()
+		# The bow comes down after the shot; a fresh aim press raises it again.
+		_spent = true
+		is_aiming = false
 		is_drawing = false
 		draw_amount = 0.0
-	elif is_drawing:
-		if draw_amount >= MIN_LOOSE_DRAW:
-			release()
-		else:
-			draw_too_short.emit()
-		is_drawing = false
-		draw_amount = 0.0
-	# A held draw is aiming too (T085): left mouse alone gets slow time.
-	_update_slow_time(delta, aiming or is_drawing)
+	_update_slow_time(delta)
+	return arrow
 
 
 ## Story control (story lane autoload) can forbid shooting in anchored scenes.
@@ -110,17 +126,17 @@ func can_shoot() -> bool:
 	return true
 
 
-static func slow_time_scale(drawing: bool, aiming: bool, stamina: float, draw: float) -> float:
-	if drawing and aiming and stamina > 0.0 and draw >= SLOW_TIME_MIN_DRAW:
+static func slow_time_scale(drawing: bool, stamina: float, draw: float) -> float:
+	if drawing and stamina > 0.0 and draw >= SLOW_TIME_MIN_DRAW:
 		return SLOW_TIME_SCALE
 	return 1.0
 
 
-func _update_slow_time(delta: float, aiming: bool) -> void:
+func _update_slow_time(delta: float) -> void:
 	# Winded (ran dry holding the draw): no slow time until she has her breath
 	# back, or the first sliver of regen would flick it on and off each frame.
 	var breath := 0.0 if feyre.is_winded() else feyre.stamina
-	var scale := slow_time_scale(is_drawing, aiming, breath, draw_amount)
+	var scale := slow_time_scale(is_drawing, breath, draw_amount)
 	slowing = scale < 1.0
 	if slowing:
 		# delta is scaled game time; drain in real seconds.

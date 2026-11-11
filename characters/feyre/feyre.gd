@@ -1,5 +1,5 @@
-## Feyre: third-person movement, sprint with stamina, jumping, ledge
-## mantling, a mouse/stick camera that R recentres behind her, plus her
+## Feyre: third-person movement, sprint with stamina, jumping, a crouch to
+## sneak (CrouchMotor), ledge mantling, a mouse/stick camera that R recentres behind her, plus her
 ## gameplay components (systems/): the bow, interaction,
 ## body state, element state, notice moments and wardrobe.
 ##
@@ -42,6 +42,11 @@ const CLOSE_FROM := 1.8
 const CLOSE_SHOULDER := 0.35
 const ROOM_PULL_IN := 14.0
 const ROOM_LET_OUT := 2.5
+## The lens is a ball this wide (m) to the walls (T094): the spring arm sweeps a
+## sphere, not a ray, so a wall running beside the arm keeps it this far off, and
+## the shoulder offset is swept out from the pivot first, so it never pushes the
+## arm's start into or through a wall beside her.
+const LENS_RADIUS := 0.2
 ## How far up (m) a roof still counts as "indoors".
 const INDOOR_PROBE := 9.0
 ## The body swept along a ledge climb: a touch slimmer than her capsule, feet off
@@ -97,7 +102,10 @@ const PIVOT_ANGLE := 135.0
 @export var follow_speed: float = 2.4
 
 var stamina: float = 100.0
-var is_aiming: bool = false
+## The bow is up (BowController: aim held, not spent by a shot).
+var is_aiming: bool:
+	get:
+		return bow_controller.is_aiming if bow_controller else false
 ## True on frames where the player moved the camera (cancels notice drifts).
 var look_input_this_frame: bool = false
 
@@ -118,6 +126,8 @@ var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
+## The hunter's crouch: Left Ctrl / gamepad B, slower and quieter (CrouchMotor).
+var crouch := CrouchMotor.new()
 ## Running total of camera yaw turns the player didn't make (follow-behind,
 ## story glances, recentre, nudges); SteerFrame takes them out of steering.
 var camera_auto_yaw: float = 0.0
@@ -169,7 +179,8 @@ var _safe_timer: float = 0.0
 func _ready() -> void:
 	add_to_group(&"player")
 	collision_layer = PLAYER_LAYER
-	collision_mask = WORLD_MASK
+	# People and walking creatures block her too (T092); her probes stay world-only.
+	collision_mask = WORLD_MASK | ActorBody.LAYER
 	floor_snap_length = 0.4
 	floor_max_angle = deg_to_rad(50.0)
 	stamina = max_stamina
@@ -192,12 +203,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look(event.relative.x * s, event.relative.y * s)
 	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
 		recenter_camera(deg_to_rad(recenter_max_turn))
+	if event.is_action_pressed(CrouchMotor.ACTION) and StoryControl.can_move() and not is_mantling:
+		crouch.toggle(is_on_floor())
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
 		interactor.interact()
 
 
 func _process(delta: float) -> void:
-	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift - crouch.camera_drop())
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
 		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
@@ -216,15 +229,17 @@ func _process(delta: float) -> void:
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
 	_clamp_indoor_pitch()
 	var shoulder := 0.55 if (is_aiming or is_drawing) else close_shoulder(_spring_arm.spring_length)
-	_spring_arm.position.x = lerpf(_spring_arm.position.x, shoulder, 10.0 * delta)
+	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, 10.0 * delta),
+			shoulder_clearance(shoulder))
 	_update_breath(delta)
 	look_input_this_frame = false
 
 
 func _physics_process(delta: float) -> void:
+	crouch.step(delta)
 	if is_mantling:
+		crouch.set_crouched(false)
 		return
-	is_aiming = Input.is_action_pressed(&"aim")
 
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	if not StoryControl.can_move():
@@ -232,9 +247,13 @@ func _physics_process(delta: float) -> void:
 	var yaw := _camera_rig.rotation.y
 	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
+	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
+	if crouch.crouched and (Input.is_action_just_pressed(&"sprint") or Input.is_action_just_pressed(&"jump")
+			or not StoryControl.can_move() or (jump_motor.airborne and not is_on_floor())):
+		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
-			and not is_drawing and not is_aiming
+			and not is_drawing and not is_aiming and not crouch.crouched
 	_running = sprinting
 	_update_stamina(delta)
 
@@ -245,6 +264,7 @@ func _physics_process(delta: float) -> void:
 		speed = sprint_speed
 	elif input.length() < 0.5:
 		speed = walk_speed
+	speed = crouch.limit_speed(speed)
 	speed *= Gameplay.inventory.speed_multiplier() * (1.0 + Gameplay.wardrobe.swift() * 0.5)
 	if body_state:
 		body_state.exertion = 1.0 if sprinting else (0.6 if is_drawing else 0.0)
@@ -586,6 +606,24 @@ func close_shoulder(arm: float) -> float:
 	return CLOSE_SHOULDER * clampf((CLOSE_FROM - arm) / (CLOSE_FROM - ROOM_MIN_ARM), 0.0, 1.0)
 
 
+## How far (m, up to `want`) the arm's start can sit to her right of the pivot with
+## the lens ball clear of walls: a sphere swept out from the pivot. Pulling in is
+## instant (the caller takes the minimum), so no frame peeks past a wall.
+func shoulder_clearance(want: float) -> float:
+	if want <= 0.0:
+		return 0.0
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _spring_arm.shape
+	query.transform = Transform3D(Basis(), _camera_pitch.global_position)
+	query.motion = _camera_pitch.global_basis.x * want
+	query.collision_mask = _spring_arm.collision_mask
+	var skip: Array[RID] = [get_rid()]
+	skip.append_array(_cam_skip)
+	query.exclude = skip
+	var safe := get_world_3d().direct_space_state.cast_motion(query)
+	return want * safe[0]
+
+
 ## Indoors: the longest arm (up to `want`) whose view-edge whiskers clear the walls.
 ## Outdoors (_indoor 0) it allows the full arm, as before.
 func _update_room_arm(delta: float, want: float) -> void:
@@ -691,6 +729,7 @@ func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
 
 
 func _build_components() -> void:
+	CrouchMotor.ensure_action()
 	if Gameplay.inventory.arrow_count() == 0 and starting_arrows > 0:
 		Gameplay.inventory.add(&"arrow_wood", starting_arrows)
 	Gameplay.register_save_providers()
@@ -837,6 +876,9 @@ func _build_camera() -> void:
 	_spring_arm.spring_length = 3.6
 	_spring_arm.collision_mask = WORLD_MASK
 	_spring_arm.margin = 0.2
+	var lens := SphereShape3D.new()
+	lens.radius = LENS_RADIUS
+	_spring_arm.shape = lens
 	_spring_arm.add_excluded_object(get_rid())
 	_camera_pitch.add_child(_spring_arm)
 	camera = Camera3D.new()

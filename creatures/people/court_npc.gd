@@ -23,6 +23,8 @@ const GROUP := &"court_npc"
 var glamoured_layer: GlamourLayer
 var true_layer: GlamourLayer
 var home: Vector3
+## Its capsule on the actors layer (T092).
+var body: ActorBody
 ## One per rigged model (both glamour layers).
 var animators: Array[PersonAnimator] = []
 
@@ -30,6 +32,8 @@ var _target: Vector3
 var _pause: float = 0.0
 var _t: float = 0.0
 var _rng := RandomNumberGenerator.new()
+## Seconds spent waiting for Feyre to step out of the way.
+var _yield_t: float = 0.0
 
 
 func _ready() -> void:
@@ -38,6 +42,8 @@ func _ready() -> void:
 		npc_id = StringName(name.to_snake_case())
 	_rng.seed = hash(npc_id)
 	home = global_position if is_inside_tree() else position
+	# Solid: Feyre bumps into them (T092).
+	body = ActorBody.attach(self)
 	_target = home
 	if true_model_scene:
 		glamoured_layer = _layer(GlamourLayer.Layer.GLAMOURED, model_scene)
@@ -127,5 +133,13 @@ func _process(delta: float) -> void:
 		return
 	# Round the furniture and walls on the navmesh (T5); straight when there is none.
 	var dir := NavMover.on(self).steer(_target) if to.length() >= NavMover.MIN_DISTANCE else to
+	# Feyre in the way: wait a moment, then stroll somewhere else.
+	if ActorBody.player_blocks(get_tree(), global_position, dir):
+		_yield_t += delta
+		if _yield_t > ActorBody.YIELD_TIME:
+			_yield_t = 0.0
+			_target = global_position
+		return
+	_yield_t = 0.0
 	global_position += dir.normalized() * minf(walk_speed * delta, to.length())
 	rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), clampf(delta * 4.0, 0.0, 1.0))

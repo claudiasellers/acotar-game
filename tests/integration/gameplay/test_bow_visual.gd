@@ -58,13 +58,16 @@ func test_q_raises_the_bow_and_shows_the_arrow_card() -> void:
 
 func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
 	var v := _visual()
+	var arrows := Gameplay.inventory.arrow_count(&"arrow_wood")
+	Gameplay.inventory.remove(&"arrow_wood", arrows)
 	Input.action_press(&"aim")
 	await wait_seconds(0.5)
+	assert_false(feyre.bow_controller.is_drawing, "no arrow, nothing to draw")
 	var hand_at_rest := v.pose.string_hand_world()
 	var grip := v.pose.bow_hand_world()
 	var aim := v.aim_direction()
 	assert_gt((grip - (feyre.global_position + Vector3.UP * 1.3)).dot(aim), 0.4, "the bow arm reaches down the aim")
-	Input.action_press(&"fire")
+	Gameplay.inventory.add(&"arrow_wood", arrows)
 	await wait_seconds(1.5)
 	assert_true(feyre.bow_controller.is_drawing)
 	var head := feyre.global_position + Vector3.UP * 1.45
@@ -73,23 +76,32 @@ func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
 	assert_lt(v.bow_root.global_position.distance_to(v.pose.bow_hand_world()), 0.2, "the bow is in her hand")
 	watch_signals(feyre)
 	var before := feyre.quiver
-	Input.action_release(&"fire")
+	_click()
 	await wait_physics_frames(3)
 	assert_signal_emitted(feyre, "arrow_fired")
 	assert_eq(feyre.quiver, before - 1, "she loosed one arrow")
-	Input.action_release(&"aim")
 	await wait_seconds(0.4)
-	assert_gt(_visual().raised, 0.9, "the bow stays up a moment after the shot")
+	assert_lt(_visual().raised, 0.1, "the bow comes down after the shot (T096)")
+	Input.action_release(&"aim")
+
+
+## A fire press and release, as events (the bow reads the press, not the hold).
+func _click() -> void:
+	for down in [true, false]:
+		var e := InputEventAction.new()
+		e.action = &"fire"
+		e.pressed = down
+		Input.parse_input_event(e)
+		Input.flush_buffered_events()
 
 
 ## F43: every draw logged "det == 0" inverting a degenerate bow transform.
 func test_ten_draws_log_no_errors() -> void:
 	for k in 10:
 		Input.action_press(&"aim")
-		await wait_physics_frames(4)
-		Input.action_press(&"fire")
 		await wait_seconds(0.4)
-		Input.action_release(&"fire")
+		_click()
+		await wait_physics_frames(2)
 		Input.action_release(&"aim")
 		await wait_physics_frames(6)
 	assert_engine_error_count(0, "no invert errors while drawing")

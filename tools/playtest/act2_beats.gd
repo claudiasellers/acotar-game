@@ -192,6 +192,9 @@ func _door_probe(trap: CurtainTrap, tag: String) -> void:
 			near += 1
 			t._log("T091 %s leaf %s visible=%s" % [tag, n.get_path(), (n as Node3D).is_visible_in_tree()])
 	t._log("T091 %s door leaves within 4 m of the doorway: %d; feyre at %s, door line at %s" % [tag, near, t.feyre.global_position, door])
+	var game_cam: Camera3D = t.feyre.camera
+	t._log("T093 %s camera at %s (trap-local %s), feyre trap-local %s, in bedroom %s" % [tag, game_cam.global_position,
+			trap.to_local(game_cam.global_position), trap.to_local(t.feyre.global_position), trap.camera_in_room(game_cam.global_position)])
 	var vp := t.get_viewport()
 	_save(vp, "%s_game" % tag)
 	var door_node := trap.door
