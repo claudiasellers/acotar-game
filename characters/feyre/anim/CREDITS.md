@@ -46,7 +46,7 @@ licence; the same rotation-transfer method as `retarget_moves.py`.
 
 | Feyre clip    | Source file | Source clip    | Notes |
 |---------------|-------------|----------------|-------|
-| `crouch_idle` | base        | `Crouch_Idle`  | loop, 3.67 s; trunk lean 43° → 30°, head lifted 28° so she watches ahead instead of the floor |
-| `sneak`       | base        | `Crouch_Walk`  | loop, 1.57 s (source x1.6), stride-warped x1.5, stance-foot lock (worst slide 1.7 cm); native 1.01 m/s; lean 30°, head +24° |
+| `crouch_idle` | base        | `Crouch_Idle`  | loop, 3.67 s; trunk lean 43° → 30°, head lifted 28° so she watches ahead instead of the floor; hips kept ≥ 0.54 of standing (legs re-solved) so the cloak hem clears the floor |
+| `sneak`       | base        | `Crouch_Walk`  | loop, 1.57 s (source x1.6), stride-warped x1.5, stance-foot lock (worst slide 1.7 cm); native 1.01 m/s; a half-crouch, not the source's near-kneel: hips ≥ 0.63 of standing, knees ≥ 0.15 m, lean ≤ 34° (mean 24°), head +18° |
 
 Each clip carries its native ground speed as `native_speed` metadata.

@@ -22,8 +22,8 @@ const SNEAK_SPEED := 1.8
 ## Seconds for the drop into the crouch, and for standing back up.
 const DROP_TIME := 0.24
 const RISE_TIME := 0.2
-## How far the camera pivot sinks at full crouch (m).
-const CAMERA_DROP := 0.55
+## How far the camera pivot sinks at full crouch (m), in proportion to a half-crouch.
+const CAMERA_DROP := 0.38
 ## Stealth at full crouch: multipliers on the noise she makes and on how easily
 ## she is picked out by sight.
 const NOISE_CROUCHED := 0.35

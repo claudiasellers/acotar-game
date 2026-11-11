@@ -30,12 +30,15 @@ const CLIPS := [
 ]
 
 ## Degrees: target mean trunk lean from vertical, and how far the head lifts.
+## hips: lowest the hips may sit, as a fraction of her standing hip height; lower
+## frames lift the hips and re-solve the legs with IK so the feet stay put (the
+## performer's sneak is a near-kneel; hers is a half-crouch).
 ## stride: stride warp factor (longer steps at the same cadence, legs re-solved
 ## with IK); rate: plays the source this much faster (a brisker cadence). Together
 ## they lift the performer's slow 0.39 m/s creep to a sneak that keeps up with play.
 const POSTURE := {
-	"crouch_idle": {"lean": 30.0, "head": 28.0},
-	"sneak": {"lean": 30.0, "head": 24.0, "stride": 1.5, "rate": 1.6},
+	"crouch_idle": {"lean": 30.0, "head": 28.0, "hips": 0.54},
+	"sneak": {"lean": 24.0, "head": 18.0, "stride": 1.5, "rate": 1.6, "hips": 0.63},
 }
 
 var _src_rest_world: Dictionary = {}
@@ -83,6 +86,12 @@ func _init() -> void:
 			var speed := _gait_stats(frames, tgt_skel, tgt_xf).x
 			var locked := _lock_feet(tgt_skel, tgt_xf, frames, speed)
 			print("  stance lock at %.3f m/s: %d frames" % [speed, locked])
+		if posture.has("hips"):
+			var raised := _raise_hips(tgt_skel, tgt_xf, frames, float(posture["hips"]))
+			print("  hips kept >= %.2f of standing: %d frames lifted, %d legs clamped" % [
+					posture["hips"], raised.x, raised.y])
+		var shape := _shape_stats(tgt_skel, tgt_xf, frames)
+		print("  lowest hips %.2f of standing, lowest knee %.3f m, max lean %.1f deg" % [shape.x, shape.y, shape.z])
 		var anim := _key(frames, tgt_skel, tgt_xf, prefix, n, spec[6])
 		var stats := _gait_stats(frames, tgt_skel, tgt_xf)
 		anim.set_meta(&"native_speed", stats.x)
@@ -425,6 +434,47 @@ func _solve_leg(tgt: Skeleton3D, tgt_xf: Transform3D, local: Array, side: String
 	_set_rot(local, lo, (w_up.inverse() * w_lo).normalized())
 	_set_rot(local, ft, (w_lo.inverse() * w_ft).normalized())
 	return ok
+
+
+## Lifts the hips to at least `frac` of their standing height and re-solves both
+## legs so the ankles stay where they were. Returns (frames lifted, clamped legs).
+func _raise_hips(tgt: Skeleton3D, tgt_xf: Transform3D, frames: Array, frac: float) -> Vector2i:
+	var hips := tgt.find_bone("Hips")
+	var parent := tgt.get_bone_parent(hips)
+	var stand := (_tgt_rest_world["Hips"] as Transform3D).origin.y
+	var lifted := 0
+	var clamps := 0
+	for local: Array in frames:
+		var g := _globals(tgt, tgt_xf, local)
+		var dh := frac * stand - (g[hips] as Transform3D).origin.y
+		if dh <= 0.0:
+			continue
+		lifted += 1
+		var parent_world: Transform3D = tgt_xf if parent < 0 else g[parent]
+		var hx: Transform3D = local[hips]
+		hx.origin = parent_world.affine_inverse() * (parent_world * hx.origin + Vector3.UP * dh)
+		local[hips] = hx
+		for side in ["Left", "Right"]:
+			if not _solve_leg(tgt, tgt_xf, local, side, Vector3.DOWN * dh):
+				clamps += 1
+		_ground(tgt, tgt_xf, local, hips, parent)
+	return Vector2i(lifted, clamps)
+
+
+## (lowest hips / standing hips, lowest knee height m, largest trunk lean deg).
+func _shape_stats(tgt: Skeleton3D, tgt_xf: Transform3D, frames: Array) -> Vector3:
+	var hips := tgt.find_bone("Hips")
+	var neck := tgt.find_bone("Neck")
+	var stand := (_tgt_rest_world["Hips"] as Transform3D).origin.y
+	var out := Vector3(INF, INF, 0.0)
+	for local: Array in frames:
+		var g := _globals(tgt, tgt_xf, local)
+		var h := (g[hips] as Transform3D).origin
+		out.x = minf(out.x, h.y / stand)
+		for b in ["LeftLowerLeg", "RightLowerLeg"]:
+			out.y = minf(out.y, (g[tgt.find_bone(b)] as Transform3D).origin.y)
+		out.z = maxf(out.z, rad_to_deg(((g[neck] as Transform3D).origin - h).angle_to(Vector3.UP)))
+	return out
 
 
 func _set_rot(local: Array, bone: int, q: Quaternion) -> void:
