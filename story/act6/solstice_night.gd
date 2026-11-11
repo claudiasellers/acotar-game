@@ -159,13 +159,13 @@ func drink() -> void:
 		return
 	drank = true
 	note_mood()
-	EventBus.mood_requested.emit(&"enchanted_sleep", 0.32, 2.0, 0.0)
+	EventBus.mood_requested.emit(&"enchanted_sleep", 0.32, 2.0)
 	EventBus.story_item_granted.emit(&"ing_faerie_wine", 0)
 	Juice.burst(player(), &"craft")
 	aside(&"wine_thought")
 	get_tree().create_timer(50.0).timeout.connect(func() -> void:
 		if is_inside_tree():
-			EventBus.mood_requested.emit(&"calm", 0.0, 6.0, 0.0))
+			EventBus.mood_requested.emit(&"calm", 0.0, 6.0))
 	get_tree().create_timer(3.5).timeout.connect(func() -> void:
 		if is_inside_tree() and running:
 			aside(&"lucien_nursemaid"))
