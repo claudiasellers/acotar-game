@@ -981,12 +981,14 @@ case_test_when() {
 # Short tests share one engine; a red shard splits so blame stays per file.
 case_gut_shards() {
 	bake_repo shards
-	commit_build 'mkdir tests; : > tests/test_p.gd; : > tests/test_q.gd; : > tests/test_r.gd; echo "@gut tests" >> tools/mq/gate.conf'
+	commit_build 'mkdir tests; : > tests/test_p.gd; : > tests/test_q.gd; : > tests/test_r.gd; echo "# gate: alone" > tests/test_z.gd; echo "@gut tests" >> tools/mq/gate.conf'
 	gate first; expect "first gate passes" test "$?" = 0
 	expect "a test with no time yet runs alone" not grep -q '^SHARD' "$GATE_OUT/plan.txt"
 	gate shard; expect "sharded gate passes" test "$?" = 0
 	expect "short tests with a time share a shard" grep -q '^SHARD shard:1 .*gut:tests/test_p.gd.*' "$GATE_OUT/plan.txt"
 	expect "the shard passes" said PASS shard:1
+	expect "a test marked alone stays out of shards" not grep -q '^SHARD.*test_z' "$GATE_OUT/plan.txt"
+	expect "and runs on its own" said PASS gut:tests/test_z.gd
 	expect "and each test in it passes" said PASS gut:tests/test_q.gd
 	expect "the build lines don't shard" ran late
 	commit_build 'touch fail_test_q'

@@ -4,6 +4,12 @@ extends GutTest
 const DEMO := preload("res://creatures/demo/hunt_demo.tscn")
 
 
+# The demo's test hill starts the test phase ladder; leave the story as found.
+func after_each() -> void:
+	PhaseManager.phase_set = null
+	PhaseManager.current_phase = &""
+
+
 func test_demo_loads_and_creatures_stand_on_the_ground() -> void:
 	WorldState.clear()
 	var demo := DEMO.instantiate()

@@ -32,6 +32,11 @@ DURATIONS="${MQ_DURATIONS:-$MQ_DIR/durations}"  # a copy, for a trial run
 CONF=tools/mq/gate.conf
 [ -f "$CONF" ] || CONF="$here/gate.conf"
 
+# A trial run keeps its events out of the live queue's log.
+if [ -n "${MQ_EVENTS:-}" ]; then
+	mq_event() { local k="$1"; shift; printf '%s %s %s\n' "$(mq_now)" "$k" "$*" >> "$MQ_EVENTS"; }
+fi
+
 mq_engine >/dev/null || { echo "gate: no engine" >&2; exit 3; }
 
 changed=""
@@ -62,6 +67,7 @@ matches_on() { # matches "a/*,*.x": true when the change touches a match
 
 gut_cmd() { echo "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=$1"; }
 
+alone=" "
 first_names=(); first_cmds=(); names=(); cmds=(); needs=()
 add() { # add first|rest name command [needed-line]
 	if [ "$1" = first ]; then
@@ -78,6 +84,7 @@ while IFS= read -r line; do
 		for t in $(find "${line#* }" -name 'test_*.gd' 2>/dev/null | sort); do
 			need=$(sed -n 's/^#* *gate: needs:\([a-z_-]*\).*/\1/p' "$t" | head -1)
 			when=$(sed -n 's/^#* *gate: when:\([^ ]*\).*/\1/p' "$t" | head -1)
+			grep -qE '^#* *gate: alone' "$t" && alone="$alone gut:$t "
 			# The test's own file always counts as touching it.
 			if [ -n "$when" ] && ! matches "$when,$t"; then echo "SKIP gut:$t (change touches no $when)" >> "$out/plan.txt"; continue; fi
 			add rest "gut:$t" "$(gut_cmd "res://$t")" "$need"
@@ -134,8 +141,8 @@ record() { echo "$2 $1 ${3:-0}s${4:+ $4}" >> "$out/results.txt"; }
 
 # Short @gut tests share an engine: booting one costs about 4 s, more than most
 # of them take. Tests up to SHARD_MAX seconds last time are packed into shards
-# of about SHARD_SECS. A test with no time yet, with a needs:, known red, or
-# needed by a line runs alone. A red shard splits: each test in it runs alone,
+# of about SHARD_SECS. A test with no time yet, with a needs:, known red,
+# needed by a line, or marked `# gate: alone` runs alone. A red shard splits: each test in it runs alone,
 # with the usual retry, so blame stays per file. MQ_SHARD_SECS=0 turns it off.
 SHARD_SECS=$(mq_config_or MQ_SHARD_SECS 60)
 SHARD_MAX=$(mq_config_or MQ_SHARD_MAX 20)
@@ -146,7 +153,7 @@ if [ "$SHARD_SECS" -gt 0 ] && [ -z "$only" ]; then
 		nm=${names[$i]}
 		case "$nm" in
 			(gut:*) d=$(kv_get "$DURATIONS" "$(slug "$nm")")
-				case "$needed" in (*" $nm "*) d="" ;; esac
+				case "$needed$alone" in (*" $nm "*) d="" ;; esac
 				if [ -n "$d" ] && [ "$d" -le "$SHARD_MAX" ] && [ -z "${needs[$i]}" ] && ! is_known "$nm"; then
 					echo "$d $i"
 				fi ;;
@@ -343,7 +350,7 @@ for n in $splits; do
 	done
 	if [ "$bad" = 0 ]; then
 		record "${names[$n]}" FLAKY 0
-		mq_event FLAKY "${names[$n]} red together, every test in it passed alone: ${mems[$n]}"
+		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); see its log: ${mems[$n]}"
 	fi
 done
 
