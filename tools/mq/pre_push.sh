@@ -17,8 +17,10 @@ while read -r lref lsha rref rsha; do
 	if [ -n "$base" ]; then out=$("$here/check_uids.sh" --added-since "$base" "$lsha" 2>&1)
 	else out=$("$here/check_uids.sh" "$lsha" 2>&1); fi
 	rc=$?
+	bout=$("$here/precheck.sh" --builders "$lsha" 2>&1) || { rc=1; out="$out
+$bout"; }
 	if [ "$rc" != 0 ]; then
-		echo "pre-push: refusing ${rref#refs/heads/}: the queue would reject it for missing .uid files." >&2
+		echo "pre-push: refusing ${rref#refs/heads/}: the queue would reject it (missing .uid files or a builder not in generated.conf)." >&2
 		printf '%s\n' "$out" >&2
 		fail=1
 	fi

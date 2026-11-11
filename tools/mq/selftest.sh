@@ -73,7 +73,8 @@ b = "$MQ_BIN/godot.sh" check b
 c = "$MQ_BIN/godot.sh" check c
 EOF
 	: > tools/mq/generated.conf
-	[ -n "${2:-}" ] && touch "$2"
+	[ -n "${2:-}" ] && { mkdir -p "$(dirname "$2")"; touch "$2"; }
+	cp "$SRC/../../.gitattributes" .gitattributes 2>/dev/null
 	git add -A; git commit -q -m "base"; git push -q origin main
 	git checkout -q --detach
 	tools/mq/setup_lanes.sh --home >/dev/null
@@ -362,6 +363,36 @@ case_built_file() {
 	git checkout -q --no-track -b gen origin/main; echo x > sub/_generated/out.res; git add -f sub; git commit -q -m gen
 	a=$(git rev-parse HEAD); git checkout -q --detach origin/main
 	expect "submit refuses" not queue "$a" T1
+}
+
+# Two lanes appending to the end of docs/program.md merge: .gitattributes says union.
+case_union_log() {
+	newrepo union docs/program.md
+	local a b
+	a=$(change a docs/program.md); b=$(change b docs/program.md)
+	queue "$a" T1; queue "$b" T2
+	start_lane; drain
+	expect "first merged" in_main "$a"
+	expect "second merged, not a conflict" in_main "$b"
+	git fetch -q origin; git checkout -q --detach origin/main
+	expect "both lines kept" sh -c 'grep -qx a docs/program.md && grep -qx b docs/program.md'
+}
+
+# A new generator with no recipe line is refused, with the fix in the message;
+# the same commit with its recipe is accepted. precheck.sh agrees.
+case_builder_recipe() {
+	newrepo builder
+	local a b
+	git checkout -q --no-track -b ch/gen origin/main
+	mkdir -p tools/generators; echo 'extends SceneTree' > tools/generators/g.gd; echo 'uid://b1234567890ab' > tools/generators/g.gd.uid
+	git add -A; git commit -q -m gen; a=$(git rev-parse HEAD)
+	expect "precheck refuses" not tools/mq/precheck.sh "$a"
+	expect "and says how to fix it" sh -c "tools/mq/precheck.sh $a 2>&1 | grep -q 'Add one recipe line'"
+	echo 'gen | out/_g | "$MQ_BIN/godot.sh" -s tools/generators/g.gd | tools/generators/g.gd' >> tools/mq/generated.conf
+	git add -A; git commit -q --amend -m genrecipe; b=$(git rev-parse HEAD)
+	git checkout -q --detach origin/main
+	expect "submit refuses a generator with no recipe" not queue "$a" T1
+	expect "submit accepts it with the recipe" queue "$b" T2
 }
 
 case_ready_merged() {
@@ -923,7 +954,7 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check script_uid miss_message stamp_without_output \
+		build_known_red needs_nothing marker_check script_uid union_log builder_recipe miss_message stamp_without_output \
 		import_before_build stale_class_cache parse_error_fails_fast test_when; do
 	scenario "$c"
 done
