@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { Tree } from '/node_modules/@dgreenheck/ez-tree/build/ez-tree.es.js';
+const merge = (a, b) => { for (const k of Object.keys(b)) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) { a[k] = a[k] || {}; merge(a[k], b[k]); } else a[k] = b[k]; } return a; };
+window.make = async (preset, seed, lite, over) => {
+  const tree = new Tree();
+  tree.loadPreset(preset);
+  tree.options.seed = seed;
+  if (over) merge(tree.options, over);
+  if (lite) {
+    // Game budget: one-sided leaf cards, fewer but bigger, and fewer
+    // segments round and along the branches.
+    const o = tree.options;
+    o.leaves.billboard = 'single';
+    o.leaves.count = Math.max(4, Math.round(o.leaves.count * lite.leaves));
+    o.leaves.size *= lite.leafSize;
+    for (const k of Object.keys(o.branch.sections)) o.branch.sections[k] = Math.max(1, Math.round(o.branch.sections[k] * lite.sections));
+    for (const k of Object.keys(o.branch.segments)) o.branch.segments[k] = Math.max(3, Math.round(o.branch.segments[k] * lite.segments));
+  }
+  tree.generate();
+  await new Promise(r => setTimeout(r, 300));
+  let tris = 0;
+  tree.traverse(o => { if (o.isMesh) { const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } });
+  // Geometry only: Godot gives the bark and leaves their materials.
+  tree.traverse(o => { if (o.isMesh) {
+    const leaf = o.material && o.material.alphaTest > 0;
+    o.material = new THREE.MeshStandardMaterial({ name: leaf ? 'ez_leaves' : 'ez_bark' });
+  } });
+  const glb = await new GLTFExporter().parseAsync(tree, { binary: true, embedImages: false });
+  const bytes = new Uint8Array(glb);
+  let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  const box = new THREE.Box3().setFromObject(tree); const size = new THREE.Vector3(); box.getSize(size);
+  return { b64: btoa(s), tris, size: [size.x, size.y, size.z] };
+};
+window.ready = true;
+</script></body></html>
