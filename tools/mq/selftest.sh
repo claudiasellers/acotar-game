@@ -74,7 +74,7 @@ c = "$MQ_BIN/godot.sh" check c
 EOF
 	: > tools/mq/generated.conf
 	[ -n "${2:-}" ] && { mkdir -p "$(dirname "$2")"; touch "$2"; }
-	cp "$SRC/../../.gitattributes" .gitattributes 2>/dev/null
+	[ -n "${2:-}" ] && cp "$SRC/../../.gitattributes" .gitattributes 2>/dev/null
 	git add -A; git commit -q -m "base"; git push -q origin main
 	git checkout -q --detach
 	tools/mq/setup_lanes.sh --home >/dev/null
