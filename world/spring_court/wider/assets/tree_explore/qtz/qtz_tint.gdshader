@@ -9,7 +9,7 @@ uniform sampler2D tex : source_color, filter_linear_mipmap;
 uniform bool is_leaf = true;
 uniform vec4 leaf_col : source_color = vec4(0.42, 0.62, 0.30, 1.0);
 uniform vec4 leaf_light : source_color = vec4(0.62, 0.76, 0.40, 1.0);
-uniform vec4 bark_col : source_color = vec4(0.40, 0.31, 0.24, 1.0);
+uniform vec4 bark_col : source_color = vec4(0.50, 0.42, 0.36, 1.0);
 uniform float bark_mean = 0.42;
 
 varying float v_tree;

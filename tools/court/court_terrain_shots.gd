@@ -176,6 +176,11 @@ const LINEUPS := {
 	# One Quaternius tree as delivered, then tinted two ways (owner asked).
 	"tint": {"distance": 26.0, "spacing": 13.0, "look": 6.0, "ids": [
 		"scene:qtz/CommonTree_3.gltf:13", "scene:qtz/CommonTree_3.gltf:13:spring", "scene:qtz/CommonTree_3.gltf:13:deep"]},
+	# The mixed set side by side, all in the court palette.
+	"mix": {"distance": 60.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"scene:qtz/CommonTree_1.gltf:12:deep", "scene:qtz/CommonTree_3.gltf:14:deep", "scene:qtz/CommonTree_4.gltf:14:deep",
+		"scene:qtz/TwistedTree_1.gltf:15:deep", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:painted",
+		"ez:ash_b:painted", "ez:aspen_a:painted", "scene:qtz/Bush_Common.gltf:2.4:deep", "ez:bush_b:painted"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -205,10 +210,13 @@ func _ez_tree(name: String, painted: bool) -> Array:
 	leaf.shader = load(EZ_DIR + "ez_leaf.gdshader")
 	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [EZ_DIR, spec[0]]))
 	leaf.set_shader_parameter(&"painted", 1.0 if painted else 0.0)
-	var bark := StandardMaterial3D.new()
-	bark.albedo_texture = load("%sbark_%s.jpg" % [EZ_DIR, spec[1]])
-	bark.uv1_scale = Vector3(1, 10, 1)
-	bark.roughness = 0.9
+	for k: String in MIX_LEAF:
+		leaf.set_shader_parameter(k, MIX_LEAF[k])
+	var bark := ShaderMaterial.new()
+	bark.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+	bark.set_shader_parameter(&"is_leaf", false)
+	bark.set_shader_parameter(&"tex", load("%sbark_%s.jpg" % [EZ_DIR, spec[1]]))
+	bark.set_shader_parameter(&"bark_col", MIX_BARK)
 	var aabb := AABB()
 	for mi: MeshInstance3D in meshes:
 		var m := mi.mesh
@@ -298,6 +306,16 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				post.height = 1.7
 				mi.mesh = post
 				p.y += 0.85
+			elif item.begins_with("scene:") and item.get_slice_count(":") > 3:
+				# Tinted: the same mesh the mixed wood draws (_qtz_mesh).
+				var q := _qtz_mesh(item.get_slice(":", 1))
+				var tm := MeshInstance3D.new()
+				tm.mesh = q[0]
+				var top := ((q[1] as Transform3D) * (q[0] as Mesh).get_aabb()).end.y
+				var sc := float(item.get_slice(":", 2)) / maxf(top, 0.01)
+				tm.transform = Transform3D(Basis(Vector3.UP, atan2(fwd.x, fwd.z)).scaled(Vector3.ONE * sc), p) * (q[1] as Transform3D)
+				row.add_child(tm)
+				continue
 			elif item.begins_with("scene:"):
 				# A packed model as delivered (its own materials), scaled to a height.
 				var inst := (load(EZ_DIR + item.get_slice(":", 1)) as PackedScene).instantiate() as Node3D
@@ -341,7 +359,57 @@ const FOREST_RADIUS := 150.0
 const FOREST_PER_HA := 150.0
 
 
+## The mixed wood (owner, 2026-11-10: "a mix of the EZ trees... we don't
+## have to stick to one group"): Quaternius and EZ-Tree models in one court
+## palette. Deeper green leaves, a soft grey-brown bark, the same on both.
+const MIX_LEAF := {"shadow_col": Color(0.17, 0.32, 0.21), "mid_col": Color(0.27, 0.48, 0.30),
+	"light_col": Color(0.46, 0.64, 0.38)}
+const MIX_BARK := Color(0.50, 0.42, 0.36)
+const MIX_TINT := "deep"
+## [source, weight, height in metres]; qtz/<file> or ez:<name>.
+const MIX := [
+	["qtz/CommonTree_1.gltf", 3, 12.0], ["qtz/CommonTree_2.gltf", 3, 12.0], ["qtz/CommonTree_3.gltf", 3, 14.0],
+	["qtz/CommonTree_4.gltf", 3, 14.0], ["qtz/CommonTree_5.gltf", 3, 11.0], ["qtz/TwistedTree_1.gltf", 1, 15.0],
+	["ez:oak_a", 2, 13.0], ["ez:oak_b", 1, 16.0], ["ez:ash_a", 2, 13.0], ["ez:ash_b", 2, 9.0], ["ez:aspen_a", 2, 14.0],
+	["qtz/Bush_Common.gltf", 3, 2.4], ["qtz/Bush_Common_Flowers.gltf", 2, 2.4], ["ez:bush_b", 2, 2.6],
+]
+
+
+## [mesh, local transform] for a Quaternius model, tinted into the court palette.
+func _qtz_mesh(file: String) -> Array:
+	var inst := (load(EZ_DIR + file) as PackedScene).instantiate()
+	var mi: MeshInstance3D = inst.find_children("*", "MeshInstance3D", true, false)[0]
+	var xf := _local_to_root(mi, inst)
+	var mesh := mi.mesh.duplicate() as Mesh
+	inst.free()
+	var fam := "Twisted" if file.contains("Twisted") or file.contains("Bush_Common.gltf") else ("Pine" if file.contains("Pine") else "Normal")
+	var leaf_tex: String = {"Twisted": "Leaves_TwistedTree_C.png", "Pine": "Leaf_Pine_C.png", "Normal": "Leaves_NormalTree_C.png"}[fam]
+	var bark_tex := "Bark_TwistedTree.png" if fam == "Twisted" else "Bark_NormalTree.png"
+	var t: Array = TINTS[MIX_TINT]
+	for i in mesh.get_surface_count():
+		var leaf := i == 1 or mesh.get_surface_count() == 1
+		if file.contains("Flowers") and i == 1:
+			leaf = true
+		var mat := ShaderMaterial.new()
+		mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+		mat.set_shader_parameter(&"is_leaf", leaf)
+		mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/" + (leaf_tex if leaf else bark_tex)))
+		mat.set_shader_parameter(&"leaf_col", t[0])
+		mat.set_shader_parameter(&"leaf_light", t[1])
+		mat.set_shader_parameter(&"bark_col", MIX_BARK)
+		if file.contains("Flowers") and i == 1:
+			# The flowering bush's second surface is its blossom.
+			mat.set_shader_parameter(&"leaf_col", Color(0.93, 0.80, 0.86))
+			mat.set_shader_parameter(&"leaf_light", Color(1.0, 0.94, 0.96))
+			mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/Flowers.png"))
+		mesh.surface_set_material(i, mat)
+	return [mesh, xf]
+
+
 func _forest(world: World, eye: Vector3, kind: String) -> void:
+	if kind == "mix":
+		_mixed_wood(world, eye)
+		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 4242
 	var buckets := {}
@@ -383,6 +451,61 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		world.add_child(mmi)
 		total += xs.size()
 	print("FOREST %s: %d trees in %d batches" % [kind, total, buckets.size()])
+
+
+func _mixed_wood(world: World, eye: Vector3) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 777
+	var models := []
+	var total_w := 0
+	for m: Array in MIX:
+		var mesh: Mesh
+		var base := Transform3D()
+		var unit := 1.0
+		if String(m[0]).begins_with("ez:"):
+			var ez := _ez_tree(String(m[0]).substr(3), true)
+			mesh = ez[0]
+			unit = float(ez[1]) / float(EZ_TREES[String(m[0]).substr(3)][2])
+		else:
+			var q := _qtz_mesh(m[0])
+			mesh = q[0]
+			base = q[1]
+			var top := (base * mesh.get_aabb()).end.y
+			unit = 1.0 / maxf(top, 0.01)
+		models.append({"mesh": mesh, "base": base, "unit": unit, "h": float(m[2]), "xs": []})
+		total_w += int(m[1])
+	var n := int(PI * 120.0 * 120.0 / 10000.0 * 120.0)
+	for i in n:
+		var r := sqrt(rng.randf()) * 120.0
+		if r < 8.0:
+			continue
+		var a := rng.randf() * TAU
+		var p := Vector3(eye.x + cos(a) * r, 0.0, eye.z + sin(a) * r)
+		p.y = WorldHeight.height_at(p.x, p.z)
+		var pick := rng.randi() % total_w
+		var k := 0
+		while pick >= int(MIX[k][1]):
+			pick -= int(MIX[k][1])
+			k += 1
+		var md: Dictionary = models[k]
+		var sc := float(md["h"]) * float(md["unit"]) * rng.randf_range(0.8, 1.2)
+		md["xs"].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * sc), p) * (md["base"] as Transform3D))
+	var count := 0
+	for md: Dictionary in models:
+		var xs: Array = md["xs"]
+		if xs.is_empty():
+			continue
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = md["mesh"]
+		mm.instance_count = xs.size()
+		for i in xs.size():
+			mm.set_instance_transform(i, xs[i])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		world.add_child(mmi)
+		count += xs.size()
+	print("FOREST mix: %d trees and bushes from %d models" % [count, models.size()])
 
 
 ## Depth hazes for the preview: fog field -> value. "layered": a cool
