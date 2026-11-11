@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/*,core/*,story/*,world/*,systems/*,creatures/*,ui/*,data/*,tests/integration/play/*
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/settings_panel.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the woods, from New Game, driven by real key and pad
 ## events (tests/integration/play/README.md). The cottage in the human realm:
 ## she wakes there, her family is in the room, the woods are outside the door.

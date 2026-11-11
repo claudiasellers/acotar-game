@@ -1,4 +1,4 @@
-# gate: when:characters/*,systems/*,tests/integration/play/*
+# gate: when:tests/integration/play/test_play_shoot.gd
 ## Play test (T097): shooting the bow with real input. A stub for now: T096 is
 ## rewriting the bow (characters/feyre/feyre.gd) and the follow-up writes this
 ## once it lands, on the same harness (play_harness.gd).
