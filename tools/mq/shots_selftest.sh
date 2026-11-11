@@ -142,6 +142,9 @@ request C 1 'timeout 2\nshot slow res://probe/shot.tscn hang\n'
 request C 2 'timeout 2\nsize 1920x1080\nshot stuck res://probe/shot.tscn stubborn\n'
 request D 1 'shot x res://probe/shot.tscn ok\nexplode now\n'
 request E 1 'shot x res://probe/missing.tscn ok\n'
+request Y 1 'from world-lead canonical check (R0: estate/spring fog after M4WCT-3)\nfrom world-lead P1 keep-open zones (trees out of standpoints, sentry lane) it'"'"'s *\nquality layout\nsize 640x360\nshot x res://probe/shot.tscn ok {out}/x.png\n'
+request Y 2 'from ok\nshot x res://probe/shot.tscn ok `id`\n'
+request Y 3 'from bad\001label\nshot x res://probe/shot.tscn ok\n'
 once
 check "one failing probe gives status partial with its exit code" 'result B-1 | grep -qx "status partial" && result B-1 | grep -q "^shot bad fail exit=1"'
 check "the failing probe's log is in the answer" 'git --git-dir="$T/origin.git" show refs/heads/shots/res-B-1:logs/bad.log | grep -q "SCRIPT ERROR"'
@@ -150,6 +153,9 @@ check "a child that ignores TERM is reported as a timeout and is gone" 'result C
 check "override.cfg is removed after a render that timed out" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 check "a malformed request is answered with the reason" 'result D-1 | grep -qx "status error" && result D-1 | grep -q "note unknown line: explode"'
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
+check "a from line with ordinary punctuation is accepted" 'result Y-1 | grep -qx "status ok"'
+check "a backtick in a shot line is refused, naming the character" 'result Y-2 | grep -q "note unsupported character .\`. in: shot x"'
+check "a control character in a from line is refused" 'result Y-3 | grep -q "note unsupported character .*in from line"'
 
 # 6 request.json route
 printf '{"id":"J","quality":"full"}' >"$T/req.json"

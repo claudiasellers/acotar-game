@@ -415,14 +415,27 @@ TIMEOUT=300
 JSON_TIMEOUT=1800
 PREPS=""
 parse_probes() {
-	local f="$WT/.shots/probes.txt" kw a b n=0 labels=" " line
+	local f="$WT/.shots/probes.txt" kw a b n=0 labels=" " line bad
 	SIZE=1920x1080 METHOD="" TIMEOUT=300 PREPS="" QUALITY=look
 	: >"$RES/plan.txt"
 	while IFS= read -r line || [ -n "$line" ]; do
 		line=$(echo "$line" | sed 's/[[:space:]]*$//')
 		case "$line" in '' | '#'*) continue ;; esac
-		if echo "$line" | grep -q '[^A-Za-z0-9_.,:=/+@{} -]'; then
-			echo "unsupported character in: $line"; return 1
+		case "$line" in
+		from | from[[:space:]]*)
+			# A free-text label: never run or used as a path. Printable ASCII
+			# only (no control characters), at most 200 characters.
+			bad=$(printf '%s' "$line" | LC_ALL=C grep -o '[^ -~]' | head -n1)
+			if [ -n "$bad" ] || [ "${#line}" -gt 200 ]; then
+				if [ -n "$bad" ]; then echo "unsupported character $(printf '%s' "$bad" | od -An -c | tr -d ' ') in from line (printable ASCII only)"
+				else echo "from line is longer than 200 characters"; fi
+				return 1
+			fi
+			continue ;;
+		esac
+		bad=$(printf '%s' "$line" | LC_ALL=C grep -o '[^A-Za-z0-9_.,:=/+@{} -]' | head -n1)
+		if [ -n "$bad" ]; then
+			echo "unsupported character '$bad' in: $line"; return 1
 		fi
 		set -- $line
 		kw="$1"; shift
