@@ -1,0 +1,7 @@
+from wider-court-world
+quality look
+shot v1 res://tools/court/court_terrain_shots.tscn {out} western_woods tower_hill regions ingame
+shot v2 res://tools/court/court_terrain_shots.tscn {out} glen_saddle the_mound regions ingame
+shot v3 res://tools/court/court_terrain_shots.tscn {out} village_green plateau_north regions ingame
+shot v4 res://tools/court/court_terrain_shots.tscn {out} vale_rim rite_way regions ingame
+shot v5 res://tools/court/court_terrain_shots.tscn {out} reaches sealed_pass regions ingame
