@@ -706,7 +706,7 @@ func _select_arrow(id: StringName) -> void:
 	_note("cycle_arrow never selected %s (selected %s)" % [id, bow.get(&"selected")])
 
 
-## Turns the camera onto the target (as a mouse would), holds aim and draws.
+## Turns the camera onto the target (as a mouse would), holds aim to draw, clicks fire.
 func _shoot_at(target: Node3D) -> bool:
 	Input.action_press(&"aim")
 	for i in 180:
@@ -719,14 +719,18 @@ func _shoot_at(target: Node3D) -> bool:
 	if not StoryControl.can_shoot() or Gameplay.inventory.arrow_count() == 0:
 		Input.action_release(&"aim")
 		return false
-	Input.action_press(&"fire")
+	# T096: aim held draws; a fire press (an event, as a click) looses.
 	for i in 75:
 		if is_instance_valid(target):
 			_turn_camera_to(_lead(target))
 		await get_tree().physics_frame
 	_last_landing = Vector3.INF
 	_shots += 1
-	Input.action_release(&"fire")
+	for down in [true, false]:
+		var click := InputEventAction.new()
+		click.action = &"fire"
+		click.pressed = down
+		Input.parse_input_event(click)
 	await get_tree().physics_frame
 	Input.action_release(&"aim")
 	await _until(func() -> bool: return _last_landing != Vector3.INF, 2.0)

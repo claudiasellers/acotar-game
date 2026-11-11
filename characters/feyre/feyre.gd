@@ -102,7 +102,10 @@ const PIVOT_ANGLE := 135.0
 @export var follow_speed: float = 2.4
 
 var stamina: float = 100.0
-var is_aiming: bool = false
+## The bow is up (BowController: aim held, not spent by a shot).
+var is_aiming: bool:
+	get:
+		return bow_controller.is_aiming if bow_controller else false
 ## True on frames where the player moved the camera (cancels notice drifts).
 var look_input_this_frame: bool = false
 
@@ -231,7 +234,6 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	if is_mantling:
 		return
-	is_aiming = Input.is_action_pressed(&"aim")
 
 	var input := Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
 	if not StoryControl.can_move():
