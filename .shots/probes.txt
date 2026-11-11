@@ -1,0 +1,7 @@
+from wider-court-world
+quality look
+shot forest_set res://tools/perf/frame_probe.tscn {out} western_woods forest=set --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_set --perf-csv={out}/perf.csv
+shot forest_old res://tools/perf/frame_probe.tscn {out} western_woods forest=old --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_old --perf-csv={out}/perf.csv
+shot court_woods res://tools/perf/frame_probe.tscn {out} western_woods regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=court_woods_set --perf-csv={out}/perf.csv
+shot court_glen res://tools/perf/frame_probe.tscn {out} glen_saddle regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=court_glen_set --perf-csv={out}/perf.csv
+shot court_meadow res://tools/perf/frame_probe.tscn {out} plateau_east regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=court_meadow_set --perf-csv={out}/perf.csv
