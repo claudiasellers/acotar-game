@@ -193,15 +193,25 @@ def spray_rose(cv, rng):
     main = twig(rng, 24, 70.0)
     cv.line(main, 4.0, rgb(STEM))
     branches = [main] + side(cv, main, rng, 5, 150)
-    rose_leaves(cv, branches, rng)
+    rose_leaves(cv, branches, rng, 0.85)
+    # A bush in full flower (owner 2026-11-11: it should read as roses, not a
+    # green shrub with pink flecks): a cluster of three or four big blooms at
+    # every tip and a bloom or a bud at every joint, so pink outweighs green.
     for i, br in enumerate(branches):
         p, a = along(br, 1.0)
-        rose_bloom(cv, p, rng.uniform(22, 30), cols, rng)
-        q, qa = along(br, 0.72)
-        if i % 2 == 0:
-            rose_bud(cv, (q[0] + rng.uniform(-10, 10), q[1]), qa + rng.uniform(-0.6, 0.6), rng.uniform(10, 13), cols)
-        else:
-            rose_bloom(cv, (q[0] + rng.uniform(-18, 18), q[1] - 6), rng.uniform(15, 19), cols, rng)
+        n = 3 + (i % 2)
+        for k in range(n):
+            ang = a + math.tau * k / n + rng.uniform(-0.3, 0.3)
+            off = 0.0 if k == 0 else rng.uniform(22, 30)
+            c = (p[0] + math.cos(ang) * off, p[1] + math.sin(ang) * off)
+            rose_bloom(cv, c, rng.uniform(26, 34) if k == 0 else rng.uniform(20, 27), cols, rng)
+        for t in (0.45, 0.7):
+            q, qa = along(br, t)
+            q = (q[0] + rng.uniform(-16, 16), q[1] - 6)
+            if rng.uniform() < 0.35:
+                rose_bud(cv, q, qa + rng.uniform(-0.6, 0.6), rng.uniform(11, 14), cols)
+            else:
+                rose_bloom(cv, q, rng.uniform(19, 25), cols, rng)
 
 
 def spray_wildrose(cv, rng):
