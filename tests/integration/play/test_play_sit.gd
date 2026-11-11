@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:story/act2/first_dinner.gd,story/act2/act2_space.gd,story/act2/dinner_table.gd,story/framework/scene_space.gd,story/film/film_pose*,story/film/seat_skin_fit.gd,data/story/act2/first_dinner_stage.tres,data/story/moments/first_dinner.tres,tests/integration/play/play_harness.gd
+# gate: when:story/act2/first_dinner.gd,story/act2/act2_spaces.gd,story/act2/dinner_table.gd,story/framework/scene_space.gd,story/film/film_pose*,story/film/seat_skin_fit.gd,data/story/act2/first_dinner_stage.tres,data/story/moments/first_dinner.tres,tests/integration/play/play_harness.gd
 ## Play test (T097): sitting and standing, the one place the game seats her in
 ## free play so far: the first dinner (story/act2/first_dinner.gd). Continue
 ## from a save after Alis's bath, in the dining hall; walk to the table, to her
