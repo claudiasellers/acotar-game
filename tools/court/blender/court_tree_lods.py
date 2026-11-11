@@ -23,6 +23,8 @@ Run (headless Blender, `pip install bpy`):
 import math
 import os
 import random
+import json
+import struct
 import sys
 import zlib
 
@@ -248,10 +250,48 @@ def export(objs, path):
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
         o.select_set(True)
+
     bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", use_selection=True, export_yup=True,
                               export_vertex_color="ACTIVE", export_all_vertex_colors=False,
                               export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
                               export_apply=False, export_animations=False)
+    name_materials(path, objs)
+
+
+def name_materials(path, objs):
+    """Writes the slot names into the .glb. PLACEHOLDER export keeps the vertex
+    colours (EXPORT dropped them on most Quaternius models) but leaves the
+    primitives without materials; they come out one per used slot, in slot
+    order, so each gets its slot's named material back for CourtAssets."""
+    with open(path, "rb") as fh:
+        data = bytearray(fh.read())
+    jlen = struct.unpack_from("<I", data, 12)[0]
+    j = json.loads(data[20:20 + jlen])
+    names = []
+    for o in objs:
+        for sl in o.material_slots:
+            n = sl.material.name if sl.material else "none"
+            n = n.split(".")[0]
+            if n not in names:
+                names.append(n)
+    j["materials"] = [{"name": n} for n in names]
+    by_mesh = {o.data.name: o for o in objs}
+    for m in j["meshes"]:
+        o = by_mesh.get(m.get("name"))
+        if o is None:
+            continue
+        used = sorted({p.material_index for p in o.data.polygons})
+        for prim, slot in zip(m["primitives"], used):
+            mat = o.material_slots[slot].material
+            prim["material"] = names.index(mat.name.split(".")[0] if mat else "none")
+    js = json.dumps(j, separators=(",", ":")).encode()
+    js += b" " * ((4 - len(js) % 4) % 4)
+    rest = data[20 + jlen:]
+    out = bytearray(data[:12])
+    out += struct.pack("<I", len(js)) + b"JSON" + js + rest
+    struct.pack_into("<I", out, 8, len(out))
+    with open(path, "wb") as fh:
+        fh.write(out)
 
 
 def main():
