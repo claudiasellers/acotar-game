@@ -36,3 +36,17 @@ her leg length and made in place (no root motion), feet grounded each frame, a
 stance-foot lock and hip surge on the gait loops, swing-leg clearance on the run, and
 trimming and retiming as listed above. Native ground speeds for the gait loops are in
 `data/animation/feyre_moves_speeds.txt`.
+
+## Crouch clips (`feyre_crouch.res`)
+
+`feyre_crouch.res` is an AnimationLibrary built by
+`tools/generators/feyre_crouch_retarget.gd` (Godot, deterministic; rerun it with the
+two Mesh2Motion files above in a folder to rebuild). Same source commit and CC0
+licence; the same rotation-transfer method as `retarget_moves.py`.
+
+| Feyre clip    | Source file | Source clip    | Notes |
+|---------------|-------------|----------------|-------|
+| `crouch_idle` | base        | `Crouch_Idle`  | loop, 3.67 s; trunk lean 43° → 30°, head lifted 28° so she watches ahead instead of the floor |
+| `sneak`       | base        | `Crouch_Walk`  | loop, 1.57 s (source x1.6), stride-warped x1.5, stance-foot lock (worst slide 1.7 cm); native 1.01 m/s; lean 30°, head +24° |
+
+Each clip carries its native ground speed as `native_speed` metadata.
