@@ -11,7 +11,8 @@
 //   mode 2 EZ-Tree leaves: the painted spray's value in soft bands from
 //          shadow_col through mid_col to light_col.
 //   mode 3 blossom spray: the painted spray's own colours (gen_ez_blossoms.py).
-//   mode 4 far crown: leaf_col lit by its normal, no texture (the far step).
+//   mode 4 far crown: leaf_col lit by its normal, no texture (the far step);
+//          its trunk (vertex alpha 0) is bark_col.
 shader_type spatial;
 render_mode cull_disabled, depth_draw_opaque;
 
@@ -73,9 +74,10 @@ void fragment() {
 			discard;
 		}
 		col = t.rgb * (0.92 + 0.16 * v_tree);
+	} else if (COLOR.a < 0.5) {
+		col = bark_col.rgb * 0.8;
 	} else {
-		float up = clamp(NORMAL.y * 0.5 + 0.5, 0.0, 1.0);
-		col = mix(leaf_col.rgb, leaf_light.rgb, up * 0.6);
+		col = mix(leaf_col.rgb, leaf_light.rgb, 0.35);
 	}
 	if (mode != 2 && mode != 3) {
 		col *= 1.0 + tree_value_spread * (v_tree * 2.0 - 1.0);

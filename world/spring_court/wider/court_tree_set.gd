@@ -40,7 +40,7 @@ const ROLES := {
 	&"birch": {"builds": ["ez/aspen_a", "ez/aspen_b", "ez/aspen_c", "ez/aspen_d"],
 		"bark_col": Color(0.88, 0.86, 0.82)},
 	&"cherry": {"builds": ["qtz/CommonTree_1.gltf", "qtz/CommonTree_3.gltf", "qtz/CommonTree_4.gltf",
-		"qtz/CommonTree_5.gltf"], "leaf_col": Color(0.86, 0.55, 0.66), "leaf_light": Color(0.98, 0.80, 0.86)},
+		"qtz/CommonTree_5.gltf"], "leaf_col": Color(0.88, 0.46, 0.62), "leaf_light": Color(0.99, 0.74, 0.84)},
 	&"apple": {"builds": ["qtz/CommonTree_2.gltf", "qtz/CommonTree_3.gltf", "qtz/CommonTree_5.gltf"],
 		"leaf_col": Color(0.86, 0.80, 0.80), "leaf_light": Color(1.0, 0.96, 0.94)},
 	&"lilac": {"builds": ["ez/lilac_a", "ez/lilac_b", "qtz/CommonTree_4.gltf"],
@@ -223,8 +223,11 @@ static func _lod_mesh(model: String, near: bool) -> Mesh:
 	return m
 
 
-## A far crown of 24 triangles: a six-sided double cone with a middle band,
-## fitted to the leaves' extent (or the whole tree's when it has none).
+## A far crown of 24 triangles: a five-sided double cone with a middle band
+## (20), fitted to the leaves' extent (or the whole tree's when it has none),
+## with round normals so it shades like a soft mass, and a trunk of two
+## crossed quads (4) under it. Vertex alpha tells the shader crown (1) from
+## trunk (0).
 static func _far_crown(out: ArrayMesh, src: Mesh, s: float, aabb: AABB) -> void:
 	var box := AABB()
 	var first := true
@@ -234,37 +237,44 @@ static func _far_crown(out: ArrayMesh, src: Mesh, s: float, aabb: AABB) -> void:
 		for v: Vector3 in src.surface_get_arrays(i)[Mesh.ARRAY_VERTEX]:
 			box = AABB(v, Vector3.ZERO) if first else box.expand(v)
 			first = false
-	var c := box.get_center()
-	var lo := Vector3(c.x * s, (box.position.y - aabb.position.y) * s, c.z * s)
-	var hi := Vector3(c.x * s, (box.end.y - aabb.position.y) * s, c.z * s)
+	var cx := box.get_center().x * s
+	var cz := box.get_center().z * s
+	var y0 := (box.position.y - aabb.position.y) * s
+	var y1 := (box.end.y - aabb.position.y) * s
+	var mid := Vector3(cx, (y0 + y1) * 0.5, cz)
 	var rx := box.size.x * 0.5 * s
 	var rz := box.size.z * 0.5 * s
+	var lo := Vector3(cx, y0, cz)
+	var hi := Vector3(cx, y1, cz)
 	var rings: Array[PackedVector3Array] = []
-	for f in [0.3, 0.65]:
+	for f in [0.32, 0.68]:
 		var ring := PackedVector3Array()
-		var y := lerpf(lo.y, hi.y, f)
-		var w := 0.92 if f < 0.5 else 0.82
-		for k in 6:
-			var a := TAU * (float(k) + (0.5 if f > 0.5 else 0.0)) / 6.0
-			ring.append(Vector3(c.x * s + cos(a) * rx * w, y, c.z * s + sin(a) * rz * w))
+		var y := lerpf(y0, y1, f)
+		var w := 0.95 if f < 0.5 else 0.85
+		for k in 5:
+			var a := TAU * (float(k) + (0.5 if f > 0.5 else 0.0)) / 5.0
+			ring.append(Vector3(cx + cos(a) * rx * w, y, cz + sin(a) * rz * w))
 		rings.append(ring)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for k in 6:
-		var k2 := (k + 1) % 6
-		st.add_vertex(lo)
-		st.add_vertex(rings[0][k2])
-		st.add_vertex(rings[0][k])
-		st.add_vertex(rings[0][k])
-		st.add_vertex(rings[0][k2])
-		st.add_vertex(rings[1][k])
-		st.add_vertex(rings[1][k])
-		st.add_vertex(rings[0][k2])
-		st.add_vertex(rings[1][k2])
-		st.add_vertex(hi)
-		st.add_vertex(rings[1][k])
-		st.add_vertex(rings[1][k2])
-	st.generate_normals()
+	var crown := func(p: Vector3) -> void:
+		st.set_color(Color(1, 1, 1, 1))
+		st.set_normal((p - mid).normalized())
+		st.add_vertex(p)
+	for k in 5:
+		var k2 := (k + 1) % 5
+		for p in [lo, rings[0][k2], rings[0][k], rings[0][k], rings[0][k2], rings[1][k],
+				rings[1][k], rings[0][k2], rings[1][k2], hi, rings[1][k], rings[1][k2]]:
+			crown.call(p)
+	var tw := maxf(rx, rz) * 0.12
+	var ty := y0 + (y1 - y0) * 0.3
+	for d: Vector3 in [Vector3(tw, 0, 0), Vector3(0, 0, tw)]:
+		var a: Vector3 = Vector3(cx, 0.0, cz) - d
+		var b: Vector3 = Vector3(cx, 0.0, cz) + d
+		for p in [a, b, b + Vector3(0, ty, 0), a, b + Vector3(0, ty, 0), a + Vector3(0, ty, 0)]:
+			st.set_color(Color(1, 1, 1, 0))
+			st.set_normal(Vector3.UP)
+			st.add_vertex(p)
 	st.commit(out)
 
 
