@@ -1,33 +1,33 @@
-file,source,licence,tris,bark_tris,leaf_tris,width_m,height_m,bytes
-qtz/Bush_Common.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,900,0,900,2.0,1.6,93901
-qtz/Bush_Common_Flowers.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,1368,0,1368,2.0,1.6,132582
-qtz/CommonTree_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,6265,4345,1920,4.6,7.3,495445
-qtz/CommonTree_2.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,5648,4310,1338,4.5,7.6,426890
-qtz/CommonTree_3.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3505,1705,1800,4.2,9.4,300848
-qtz/CommonTree_4.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,4066,3280,786,3.8,9.4,311461
-qtz/CommonTree_5.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3182,1882,1300,4.2,7.0,256856
-qtz/Pine_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3947,3177,770,4.9,7.3,279324
-qtz/Pine_4.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3370,2160,1210,5.8,10.2,258675
-qtz/TwistedTree_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,9564,7212,2352,13.5,16.7,736275
-qtz/TwistedTree_3.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,10089,7389,2700,11.5,16.1,774993
-ez/ez_ash_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,7408,4208,3200,66.3,66.5,367052
-ez/ez_ash_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,3942,2358,1584,43.9,48.4,184016
-ez/ez_ash_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,7408,4208,3200,68.4,80.8,367044
-ez/ez_ash_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,3942,2358,1584,42.0,45.6,184012
-ez/ez_aspen_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,41.0,72.0,110820
-ez/ez_aspen_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,38.8,72.2,110772
-ez/ez_aspen_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,38.9,70.3,110772
-ez/ez_aspen_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1364,1044,320,24.9,39.8,56140
-ez/ez_bush_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6168,4632,1536,31.6,33.2,254100
-ez/ez_bush_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1904,1464,440,33.2,29.6,80396
-ez/ez_bush_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9944,8280,1664,37.7,24.1,380292
-ez/ez_dead_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1894,1894,0,48.7,61.5,76380
-ez/ez_dead_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4208,4208,0,61.9,74.0,141964
-ez/ez_dead_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1550,1550,0,33.8,46.1,53708
-ez/ez_oak_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4974,1894,3080,58.3,66.3,293068
-ez/ez_oak_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9890,6530,3360,109.8,103.2,454712
-ez/ez_oak_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4974,1894,3080,59.2,66.1,293072
-ez/ez_oak_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9890,6530,3360,107.7,97.6,454716
-ez/ez_pine_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6794,4006,2788,31.5,50.3,314988
-ez/ez_pine_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6794,4006,2788,32.9,50.1,314984
-ez/ez_pine_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6622,4438,2184,18.6,41.0,285376
+file,source,licence,tris,bark_tris,leaf_tris,width_m,height_m,bytes,near_tris,mid_tris
+qtz/Bush_Common.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,900,0,900,2.0,1.6,93901,900,900
+qtz/Bush_Common_Flowers.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,1368,0,1368,2.0,1.6,132582,1368,1200
+qtz/CommonTree_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,6265,4345,1920,4.6,7.3,495445,4500,1200
+qtz/CommonTree_2.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,5648,4310,1338,4.5,7.6,426890,4500,1200
+qtz/CommonTree_3.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3505,1705,1800,4.2,9.4,300848,3505,1200
+qtz/CommonTree_4.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,4066,3280,786,3.8,9.4,311461,4066,1200
+qtz/CommonTree_5.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3182,1882,1300,4.2,7.0,256856,3182,1200
+qtz/Pine_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3947,3177,770,4.9,7.3,279324,3947,1200
+qtz/Pine_4.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,3370,2160,1210,5.8,10.2,258675,3370,1200
+qtz/TwistedTree_1.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,9564,7212,2352,13.5,16.7,736275,4500,1200
+qtz/TwistedTree_3.gltf,Quaternius Stylized Nature MegaKit (free),CC0 1.0,10089,7389,2700,11.5,16.1,774993,4499,1198
+ez/ez_ash_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,7408,4208,3200,66.3,66.5,367052,4498,1200
+ez/ez_ash_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,3942,2358,1584,43.9,48.4,184016,3942,1200
+ez/ez_ash_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,7408,4208,3200,68.4,80.8,367044,4498,1200
+ez/ez_ash_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,3942,2358,1584,42.0,45.6,184012,3942,1200
+ez/ez_aspen_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,41.0,72.0,110820,2776,1200
+ez/ez_aspen_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,38.8,72.2,110772,2776,1200
+ez/ez_aspen_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,2776,2160,616,38.9,70.3,110772,2776,1199
+ez/ez_aspen_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1364,1044,320,24.9,39.8,56140,1364,1199
+ez/ez_bush_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6168,4632,1536,31.6,33.2,254100,4500,1199
+ez/ez_bush_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1904,1464,440,33.2,29.6,80396,1904,1198
+ez/ez_bush_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9944,8280,1664,37.7,24.1,380292,4499,1200
+ez/ez_dead_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1894,1894,0,48.7,61.5,76380,1894,1200
+ez/ez_dead_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4208,4208,0,61.9,74.0,141964,4208,1200
+ez/ez_dead_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,1550,1550,0,33.8,46.1,53708,1550,1199
+ez/ez_oak_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4974,1894,3080,58.3,66.3,293068,4500,1198
+ez/ez_oak_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9890,6530,3360,109.8,103.2,454712,4499,1199
+ez/ez_oak_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,4974,1894,3080,59.2,66.1,293072,4500,1198
+ez/ez_oak_d.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,9890,6530,3360,107.7,97.6,454716,4499,1199
+ez/ez_pine_a.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6794,4006,2788,31.5,50.3,314988,4499,1198
+ez/ez_pine_b.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6794,4006,2788,32.9,50.1,314984,4499,1199
+ez/ez_pine_c.glb,EZ-Tree by Daniel Greenheck (tools/court/eztree),MIT (code); geometry ours,6622,4438,2184,18.6,41.0,285376,4500,1199

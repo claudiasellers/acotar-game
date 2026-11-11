@@ -1,11 +1,22 @@
 ## The court's tree set (finish plan T1/T2): one CSV row per model with its
-## source, licence, triangles (bark and leaves), size and file bytes, written to
-## world/spring_court/wider/assets/trees/trees.csv. Fails on a file over 5 MB.
+## source, licence, triangles (bark and leaves), size and file bytes, and its
+## detail steps (lod/<model>.glb: near and mid triangles), written to
+## world/spring_court/wider/assets/trees/trees.csv. Fails on a file over 5 MB
+## or a step over its budget, and prints T2's triangle sum at 150 trees/ha.
 ## tools/mq/godot.sh -s tools/court/court_tree_intake.gd
 extends SceneTree
 
 const DIR := "res://world/spring_court/wider/assets/trees/"
 const MAX_BYTES := 5 * 1024 * 1024
+## T2's steps: near to NEAR_TO m, mid to MID_TO m, the far card to FAR_TO m.
+const NEAR_BUDGET := 4500
+const MID_BUDGET := 1200
+const FAR_BUDGET := 24
+const NEAR_TO := 80.0
+const MID_TO := 260.0
+const FAR_TO := 600.0
+const DENSITY := 150.0  # trees per hectare, the closed wood
+const VIEW_DEG := 75.0  # horizontal field of view
 const SOURCES := {
 	"qtz": ["Quaternius Stylized Nature MegaKit (free)", "CC0 1.0"],
 	"ez": ["EZ-Tree by Daniel Greenheck (tools/court/eztree)", "MIT (code); geometry ours"],
@@ -13,8 +24,11 @@ const SOURCES := {
 
 
 func _initialize() -> void:
-	var rows: PackedStringArray = ["file,source,licence,tris,bark_tris,leaf_tris,width_m,height_m,bytes"]
+	var rows: PackedStringArray = ["file,source,licence,tris,bark_tris,leaf_tris,width_m,height_m,bytes,near_tris,mid_tris"]
 	var too_big: PackedStringArray = []
+	var near_sum := 0
+	var mid_sum := 0
+	var models := 0
 	for sub: String in SOURCES:
 		var d := DIR + sub + "/"
 		var files := Array(DirAccess.get_files_at(d))
@@ -32,17 +46,46 @@ func _initialize() -> void:
 			if f.ends_with(".gltf") and FileAccess.file_exists(d + f.get_basename() + ".bin"):
 				model_bytes += FileAccess.get_file_as_bytes(d + f.get_basename() + ".bin").size()
 			var aabb: AABB = counts[3]
-			rows.append("%s/%s,%s,%s,%d,%d,%d,%.1f,%.1f,%d" % [sub, f, SOURCES[sub][0], SOURCES[sub][1],
-				counts[0] + counts[1], counts[0], counts[1], maxf(aabb.size.x, aabb.size.z), aabb.size.y, model_bytes])
+			var steps := _steps(f.get_basename())
+			if steps[0] > NEAR_BUDGET or steps[1] > MID_BUDGET or steps[0] == 0:
+				too_big.append("%s/%s steps near %d mid %d" % [sub, f, steps[0], steps[1]])
+			near_sum += steps[0]
+			mid_sum += steps[1]
+			models += 1
+			rows.append("%s/%s,%s,%s,%d,%d,%d,%.1f,%.1f,%d,%d,%d" % [sub, f, SOURCES[sub][0], SOURCES[sub][1],
+				counts[0] + counts[1], counts[0], counts[1], maxf(aabb.size.x, aabb.size.z), aabb.size.y, model_bytes,
+				steps[0], steps[1]])
 	var out := FileAccess.open(DIR + "trees.csv", FileAccess.WRITE)
 	out.store_string("\n".join(rows) + "\n")
 	out.close()
 	print("\n".join(rows))
+	# T2's acceptance: triangles at DENSITY in each band, the mean model in each.
+	var per_ha := DENSITY / 10000.0
+	var near_n := PI * NEAR_TO * NEAR_TO * per_ha
+	var mid_n := PI * (MID_TO * MID_TO - NEAR_TO * NEAR_TO) * per_ha
+	var far_n := PI * (FAR_TO * FAR_TO - MID_TO * MID_TO) * per_ha
+	var ring := near_n * near_sum / models + mid_n * mid_sum / models + far_n * FAR_BUDGET
+	print("T2 at %d/ha: near %d trees x %d, mid %d x %d, far %d x %d: %.2f M triangles all round, %.2f M in a %d-degree view" % [
+		DENSITY, near_n, near_sum / models, mid_n, mid_sum / models, far_n, FAR_BUDGET, ring / 1e6, ring * VIEW_DEG / 360.0 / 1e6, VIEW_DEG])
 	if not too_big.is_empty():
-		push_error("files over 5 MB: %s" % ", ".join(too_big))
+		push_error("over budget: %s" % ", ".join(too_big))
 		quit(1)
 		return
 	quit()
+
+
+## [near tris, mid tris] from lod/<model>.glb (0 when it's missing).
+func _steps(model: String) -> Array:
+	var path := DIR + "lod/" + model + ".glb"
+	if not ResourceLoader.exists(path):
+		return [0, 0]
+	var inst := (load(path) as PackedScene).instantiate()
+	var out := [0, 0]
+	for mi: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+		var c := _count(mi)
+		out[0 if String(mi.name).begins_with("near") else 1] += c[0] + c[1]
+	inst.free()
+	return out
 
 
 ## [bark tris, leaf tris, surfaces, aabb] over every mesh in the scene. A
@@ -52,8 +95,11 @@ func _count(root: Node) -> Array:
 	var leaves := 0
 	var aabb := AABB()
 	var first := true
-	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
-		var xf := _to_root(mi, root)
+	var found: Array = root.find_children("*", "MeshInstance3D", true, false)
+	if root is MeshInstance3D:
+		found.append(root)
+	for mi: MeshInstance3D in found:
+		var xf := _to_root(mi, root) if mi != root else Transform3D()
 		var box := xf * mi.mesh.get_aabb()
 		aabb = box if first else aabb.merge(box)
 		first = false

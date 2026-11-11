@@ -40,8 +40,8 @@ and its status. Details for each item are in the phase sections further down.
 | Id | Item | Depends on | Status | Accept when (measured) |
 |---|---|---|---|---|
 | R0 | Canonical check: the estate and Spring shots before and after the haze change (M4WCT-3 touched `manor.tres`, `spring.tres`) | — | **started** | the four outdoor Spring canonical shots rendered on both commits; the differences are the haze only |
-| T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **started** | every file has a licence line; no file over 5 MB; triangles per model in a CSV |
-| T2 | Detail steps: near (≤ 4.5k tris) to 80 m, mid (≤ 1.2k) to 260 m, far card (≤ 24) to 600 m | T1 | waiting | triangles in view at 150/ha (near + mid + far) ≤ 3 M, from the CSV |
+| T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **done** (render pending) | every file has a licence line; no file over 5 MB; triangles per model in a CSV |
+| T2 | Detail steps: near (≤ 4.5k tris) to 80 m, mid (≤ 1.2k) to 260 m, far card (≤ 24) to 600 m | T1 | near and mid **done**; the far card is baked from the dressed trees after T4 | triangles in view at 150/ha (near + mid + far) ≤ 3 M, from the CSV |
 | T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | waiting | no two neighbouring trees share build, yaw and scale (GUT) |
 | T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | waiting | each role's mean leaf colour inside its row in `docs/tuning.md` (CSV) |
 | T5 | Willow of our own (generator pipeline, `woods_trees.py` Kit) | D1, T4 | waiting | as T2 and T4 |
@@ -99,6 +99,17 @@ is the layering half. Five fixes came out of checking it against the brief, `wor
    `docs/tuning.md`.
 
 ## Phase T — the new trees in the game (next)
+
+**As built (2026-11-10).**
+- T1: `world/spring_court/wider/assets/trees/` holds the 11 Quaternius models and 21
+  EZ-Tree builds (`CREDITS.md`, `trees.csv`). EZ-Tree's photos are replaced by painted
+  leaf sprays and barks (`tools/court/gen_ez_textures.py`), matched in coverage and
+  value; render: lineup `intake`.
+- T2: `tools/court/blender/court_tree_lods.py` writes `lod/<model>.glb` with a near
+  (≤ 4,500) and a mid (≤ 1,200) mesh: the bark keeps its biggest pieces then
+  decimates, the leaves thin by whole cards grown to keep the crown's cover.
+  `tools/court/court_tree_intake.gd` checks the budgets and prints the sum: at 150/ha,
+  1.0 M triangles in a 75° view (4.9 M all round, which is what shadows can see).
 
 1. **Intake.**
    - Quaternius models: CommonTree 1–5, TwistedTree 1–5, Pine 1–5, DeadTree 1–5,
