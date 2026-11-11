@@ -79,7 +79,8 @@ func test_right_held_and_a_left_click_looses_exactly_one_arrow() -> void:
 
 func test_a_quick_click_right_after_raising_still_fires() -> void:
 	await _aim_and_click(2)
-	assert_eq(fired.size(), 1, "a click while the bow is up always fires")
+	await wait_physics_frames(40)
+	assert_eq(fired.size(), 1, "a click during the nock is queued, not dropped")
 
 
 func test_letting_go_of_right_mouse_lowers_the_bow_and_fires_nothing() -> void:
@@ -124,7 +125,7 @@ func test_ten_aim_and_shoot_cycles_all_fire() -> void:
 	var before := Gameplay.inventory.arrow_count()
 	assert_gte(before, 10, "the hill gives her enough arrows")
 	for i in 10:
-		await _aim_and_click(8 + i % 3 * 6)
+		await _aim_and_click(24 + i % 3 * 6)
 		_mouse(MOUSE_BUTTON_RIGHT, false)
 		await wait_physics_frames(2)
 		assert_eq(fired.size(), i + 1, "cycle %d fired" % (i + 1))
@@ -151,3 +152,44 @@ func test_q_cycles_the_arrow_types_she_has_and_skips_empty_ones() -> void:
 	assert_eq(fired.size(), 1)
 	if not fired.is_empty():
 		assert_eq((fired[0] as Arrow).data.item_id, have[1], "the chosen type flies")
+
+
+## T101 (Zelda style): a click during the nock is queued and looses the moment
+## the nock completes, never earlier and never dropped.
+func test_click_during_nock_fires_after_nock_not_before() -> void:
+	var bow := feyre.bow_controller
+	var nock := bow.bow.nock_time
+	bow.update_bow(0.01, true, false)
+	var early := bow.update_bow(0.01, true, true)
+	assert_null(early, "still nocking: nothing flies yet")
+	assert_eq(fired.size(), 0)
+	var got: Arrow = null
+	var t := 0.02
+	while got == null and t < nock + 0.5:
+		got = bow.update_bow(1.0 / 60.0, true, false)
+		t += 1.0 / 60.0
+	assert_not_null(got, "the queued click fires when the nock completes")
+	assert_almost_eq(t, nock, 0.05, "right at the end of the nock")
+
+
+func test_click_after_nock_fires_at_full_speed() -> void:
+	var bow := feyre.bow_controller
+	bow.update_bow(bow.bow.nock_time + 0.05, true, false)
+	var arrow := bow.update_bow(1.0 / 60.0, true, true)
+	assert_not_null(arrow, "nocked: the click fires at once")
+	assert_almost_eq(arrow.linear_velocity.length(),
+		bow.bow.max_speed, 0.5, "full speed")
+
+
+func test_arrow_speed_is_the_same_for_a_short_and_a_long_hold() -> void:
+	var bow := feyre.bow_controller
+	var speeds: Array[float] = []
+	for hold in [0.35, 3.0]:
+		bow.update_bow(0.0, false, false)
+		bow.update_bow(hold, true, false)
+		var arrow := bow.update_bow(1.0 / 60.0, true, true)
+		assert_not_null(arrow, "fires after a %.2f s hold" % hold)
+		if arrow:
+			speeds.append(arrow.linear_velocity.length())
+	assert_eq(speeds.size(), 2)
+	assert_almost_eq(speeds[0], speeds[1], 0.001, "holding longer adds no power")

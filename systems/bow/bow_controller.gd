@@ -1,9 +1,11 @@
 ## The hunting bow (root doc §4.3) as a component of Feyre: raise, draw, sway,
 ## slow time while stamina lasts, choose an arrow type, shoot, craft.
 ##
-## Controls (T096, the owner's scheme): hold aim (right mouse / left trigger)
-## to raise the bow and draw; press fire (left mouse / right trigger) while it
-## is up to loose one arrow. Letting go of aim lowers the bow and looses
+## Controls (T096, the owner's scheme, T101 Zelda style): hold aim (right mouse /
+## left trigger) to raise the bow; after a short nock (BowData.nock_time) every
+## fire press (left mouse / right trigger) looses one arrow at full power. A
+## press during the nock is queued and looses the moment the nock completes.
+## Holding longer adds nothing. Letting go of aim lowers the bow and looses
 ## nothing. After a shot the bow comes down until aim is pressed afresh.
 ## Fire is taken from the press event, not polled, so a click shorter than a
 ## physics frame still shoots.
@@ -20,8 +22,8 @@ signal bow_changed(bow: BowData)
 const SLOW_TIME_SCALE := 0.4
 ## Stamina per real second while time is slowed.
 const SLOW_TIME_DRAIN := 28.0
-## Draw needed before time slows.
-const SLOW_TIME_MIN_DRAW := 0.35
+## Nock progress needed before time slows (fully nocked, so the nock itself runs in real time).
+const SLOW_TIME_MIN_DRAW := 1.0
 const ARROW_DIR := "res://data/arrows"
 const BOW_DIR := "res://data/bows"
 ## The only type drawn automatically when the chosen one runs out. Special
@@ -33,6 +35,7 @@ static var _arrow_data: Dictionary = {}
 
 var feyre: Feyre
 var bow: BowData
+## 0..1 progress of the nock (visuals, sway, slow time). Never scales a shot.
 var draw_amount: float = 0.0
 ## The bow is up (aim held, not spent by a shot, the scene allows it).
 var is_aiming: bool = false
@@ -49,6 +52,8 @@ var _time: float = 0.0
 var _spent: bool = false
 ## Fire pressed since the last physics tick.
 var _fire_pressed: bool = false
+## Fire pressed while the bow was still nocking: loosed when the nock completes.
+var _fire_queued: bool = false
 
 
 func _ready() -> void:
@@ -103,12 +108,20 @@ func _physics_process(delta: float) -> void:
 func update_bow(delta: float, aim_held: bool, fire_pressed: bool) -> Arrow:
 	if not aim_held:
 		_spent = false
+		_fire_queued = false
 	is_aiming = aim_held and not _spent and can_shoot()
 	is_drawing = is_aiming and _available() != &""
-	draw_amount = minf(draw_amount + delta / bow.draw_time, 1.0) if is_drawing else 0.0
+	draw_amount = minf(draw_amount + delta / maxf(bow.nock_time, 0.001), 1.0) if is_drawing else 0.0
+	if not is_drawing:
+		_fire_queued = false
 	var arrow: Arrow = null
-	if fire_pressed and is_drawing:
-		arrow = release()
+	if is_drawing and (fire_pressed or _fire_queued):
+		if is_nocked():
+			arrow = release()
+		else:
+			_fire_queued = true
+	if arrow:
+		_fire_queued = false
 		# The bow comes down after the shot; a fresh aim press raises it again.
 		_spent = true
 		is_aiming = false
@@ -116,6 +129,11 @@ func update_bow(delta: float, aim_held: bool, fire_pressed: bool) -> Arrow:
 		draw_amount = 0.0
 	_update_slow_time(delta)
 	return arrow
+
+
+## The nock is done: a fire press looses a full-power arrow.
+func is_nocked() -> bool:
+	return is_drawing and draw_amount >= 1.0
 
 
 ## Story control (story lane autoload) can forbid shooting in anchored scenes.
@@ -231,16 +249,14 @@ func muzzle() -> Vector3:
 
 
 ## Where an arrow released now would land (F5): the same gravity, drag and
-## wind as the real flight, stepped and ray-checked, before sway. `draw` < 0
-## uses the current draw, or a full draw when only aiming. The flight itself
-## stays real physics; this only shows the drop.
-func predict_impact(draw: float = -1.0) -> Dictionary:
-	if draw < 0.0:
-		draw = draw_amount if is_drawing else 1.0
+## wind as the real flight, stepped and ray-checked, before sway. Every shot is
+## full power, so there is no draw to pass (the old argument is ignored). The
+## flight itself stays real physics; this only shows the drop.
+func predict_impact(_unused_draw: float = -1.0) -> Dictionary:
 	var item := _available()
 	var d: ArrowData = arrow_data().get(item if item != &"" else FALLBACK_ARROW)
 	var wet := feyre.element_state != null and feyre.element_state.is_wet()
-	var speed := lerpf(bow.min_speed, bow.max_speed, draw) * (d.wet_speed_multiplier if wet and d else 1.0)
+	var speed := bow.max_speed * (d.wet_speed_multiplier if wet and d else 1.0)
 	var drag := (d.drag * (d.wet_drag_multiplier if wet else 1.0)) if d else 0.0022
 	var from := muzzle()
 	var wind := get_tree().get_first_node_in_group(&"wind_source")
@@ -285,7 +301,7 @@ func release() -> Arrow:
 	feyre.get_parent().add_child(arrow)
 	arrow.add_collision_exception_with(feyre)
 	var wet := feyre.element_state != null and feyre.element_state.is_wet()
-	arrow.launch(muzzle, direction, lerpf(bow.min_speed, bow.max_speed, draw_amount), wet)
+	arrow.launch(muzzle, direction, bow.max_speed, wet)
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
 	feyre.arrow_fired.emit(arrow)
 	feyre.bow_released.emit(muzzle, bow.loudness)
