@@ -1,4 +1,4 @@
-# gate: when:story/*,core/*,systems/*,characters/*,data/story/*,data/wardrobe/*,data/regions/spring_court/*,world/spring_court/manor_estate/*,art/film/*,project.godot
+# gate: when:story/*,core/*,systems/*,characters/*,data/story/*,data/wardrobe/*,data/regions/spring_court/*,data/bows/*,world/spring_court/manor_estate/*,art/film/*,project.godot
 ## The first dinner (ch7) contract: she walks to her chair, the magic holds
 ## her there (a move press shoves her back), three bites clear her plate in
 ## book order (chicken first), reaching for the torte makes the food vanish,
