@@ -9,11 +9,19 @@ unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE MQ_SCRATCH
 SRC=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(mktemp -d "${TMPDIR:-/tmp}/mq-selftest.XXXXXX")
 PASSED=0; FAILED=0; ONLY="${1:-}"
-cleanup_all() {
+# Scenarios each get their own repo, so they run side by side.
+JOBS=${MQ_SELFTEST_JOBS:-6}
+stop_repo() { # repo: kills the loops it started
 	local f
 	for f in lock/pid cleanup.pid shots/lock/pid; do
-		[ -f "$REPO/.git/mq/$f" ] 2>/dev/null && kill "$(cat "$REPO/.git/mq/$f")" 2>/dev/null
+		[ -f "$1/.git/mq/$f" ] 2>/dev/null && kill "$(cat "$1/.git/mq/$f")" 2>/dev/null
 	done
+}
+cleanup_all() {
+	local r p
+	for p in $(jobs -p); do kill "$p" 2>/dev/null; done
+	for r in "$ROOT"/*/repo; do [ -d "$r" ] && stop_repo "$r"; done
+	wait 2>/dev/null
 	rm -rf "$ROOT"
 }
 REPO=""
@@ -31,9 +39,17 @@ while [ "$#" -gt 0 ]; do
 			exit 0 ;;
 		-s) s="$2"; shift 2 ;;
 		check) t="$2"; shift 2 ;;
+		-gtest=*) g="${1#-gtest=}"; shift ;;
 		*) shift ;;
 	esac
 done
+# GUT: fail_<test> fails that test; clash fails any engine that runs two.
+if [ -n "${g:-}" ]; then
+	case "$g" in *,*) [ -f clash ] && { echo "tests clashed"; exit 1; } ;; esac
+	for x in $(echo "$g" | tr , ' '); do
+		x=$(basename "$x" .gd); [ -f "fail_$x" ] && { echo "fake $x failed"; exit 1; }
+	done
+fi
 case "${s:-}" in *parse_check.gd) exit 0 ;; esac
 [ -f slow ] && sleep 30
 [ "${t:-}" = a ] && [ -f race_me ] && [ -x "$(dirname "$0")/race.sh" ] && "$(dirname "$0")/race.sh" >/dev/null 2>&1
@@ -137,15 +153,17 @@ expect() { # description, then a command
 }
 not() { ! "$@"; }
 
+# Runs one scenario in a subshell of its own; its output goes to $ROOT/out.NAME
+# and its exit says whether it passed.
 scenario() {
-	local name="$1"
-	[ -n "$ONLY" ] && [ "$ONLY" != "$name" ] && return
+	local name="$1" t0=$SECONDS
 	CASE_OK=1
-	( cd "$ROOT" )
+	cd "$ROOT" || exit 1
+	trap '[ -n "$REPO" ] && stop_repo "$REPO"' EXIT
 	"case_$name"
 	stop_lane 2>/dev/null
-	if [ "$CASE_OK" = 1 ]; then echo "ok   $name"; PASSED=$((PASSED + 1))
-	else echo "FAIL $name"; FAILED=$((FAILED + 1)); fi
+	if [ "$CASE_OK" = 1 ]; then echo "ok   $name ($((SECONDS - t0))s)"; exit 0
+	else echo "FAIL $name ($((SECONDS - t0))s)"; exit 1; fi
 }
 
 # Four changes with one bad: first, middle, last. Each batch must take two runs
@@ -756,7 +774,7 @@ EOF
 in_build() { ( cd "$REPO/.lanes/build" && "$@" ); }
 commit_build() { in_build sh -c "$1; git add -A; git -c user.name=s -c user.email=s@example.invalid commit -q -m step"; }
 gate() { # out-name gate-args: the installed gate, in the build worktree
-	GATE_OUT="$ROOT/gate-$1"; shift
+	GATE_OUT="$REPO/../gate-$1"; shift
 	in_build /bin/bash "$REPO/.git/mq/bin/gate.sh" --out "$GATE_OUT" "$@"
 }
 said() { grep -q "^$1 $2 " "$GATE_OUT/results.txt"; }
@@ -923,7 +941,14 @@ case_parse_error_fails_fast() {
 	expect "and the class" grep -q 'ManorSitePlan' "$ROOT/parse.err"
 	expect "nothing is stamped" test ! -f .git/mq-levels/terrain
 	perl -e 'select(undef,undef,undef,2.5)'
-	expect "and the hung builder isn't left running" not pgrep -f 'bash tools/bake.sh'
+	expect "and the hung builder isn't left running" not bake_running_in "$(pwd -P)"
+}
+bake_running_in() { # dir: a bake.sh whose cwd is under it (other scenarios bake too)
+	local p
+	for p in $(pgrep -f 'bash tools/bake.sh'); do
+		lsof -a -p "$p" -d cwd -Fn 2>/dev/null | grep -q "^n$1" && return 0
+	done
+	return 1
 }
 
 case_test_when() {
@@ -943,6 +968,9 @@ case_test_when() {
 	commit_build 'echo three > b.x'
 	gate ext --base "$base"; expect "a second pattern in the list runs it" ran gut:tests/test_s.gd
 	in_build git checkout -q --detach "$base"
+	commit_build 'mkdir -p zone/deep; echo six > zone/deep/a'
+	gate deep --base "$base"; expect "a file deeper under the pattern runs it (the pattern isn't globbed)" ran gut:tests/test_s.gd
+	in_build git checkout -q --detach "$base"
 	commit_build 'echo four > tests/test_s.gd'
 	gate own --base "$base"; expect "a change to the test file itself runs it" ran gut:tests/test_s.gd
 	in_build git checkout -q --detach "$base"
@@ -950,13 +978,48 @@ case_test_when() {
 	gate full; expect "an idle gate (no --base) runs everything" ran gut:tests/test_s.gd
 }
 
+# Short tests share one engine; a red shard splits so blame stays per file.
+case_gut_shards() {
+	bake_repo shards
+	commit_build 'mkdir tests; : > tests/test_p.gd; : > tests/test_q.gd; : > tests/test_r.gd; echo "# gate: alone" > tests/test_z.gd; echo "@gut tests" >> tools/mq/gate.conf'
+	gate first; expect "first gate passes" test "$?" = 0
+	expect "a test with no time yet runs alone" not grep -q '^SHARD' "$GATE_OUT/plan.txt"
+	gate shard; expect "sharded gate passes" test "$?" = 0
+	expect "short tests with a time share a shard" grep -q '^SHARD shard:1 .*gut:tests/test_p.gd.*' "$GATE_OUT/plan.txt"
+	expect "the shard passes" said PASS shard:1
+	expect "a test marked alone stays out of shards" not grep -q '^SHARD.*test_z' "$GATE_OUT/plan.txt"
+	expect "and runs on its own" said PASS gut:tests/test_z.gd
+	expect "and each test in it passes" said PASS gut:tests/test_q.gd
+	expect "the build lines don't shard" ran late
+	commit_build 'touch fail_test_q'
+	gate red; expect "a red test in a shard fails the gate" test "$?" = 1
+	expect "the shard splits" said SPLIT shard:1
+	expect "the red test is named on its own" grep -qx gut:tests/test_q.gd "$GATE_OUT/failed"
+	commit_build 'rm fail_test_q; touch clash'
+	gate clash; expect "red only together passes" test "$?" = 0
+	expect "the shard split" said SPLIT shard:1
+	expect "and is called flaky" said FLAKY shard:1
+	expect "every test passed alone" said PASS gut:tests/test_r.gd
+	expect "the flake is an event" grep -q 'FLAKY shard:1 red together' .git/mq/events.log
+}
+
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict restacked restack_conflict flaky flaky_last \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
 		build_known_red needs_nothing marker_check script_uid union_log builder_recipe miss_message stamp_without_output \
-		import_before_build stale_class_cache parse_error_fails_fast test_when; do
-	scenario "$c"
+		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards; do
+	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
+	# bash 3.2 has no wait -n: poll for a free slot.
+	while [ "$(jobs -pr | wc -l)" -ge "$JOBS" ]; do perl -e 'select(undef,undef,undef,0.2)'; done
+	( scenario "$c" ) > "$ROOT/out.$c" 2>&1 &
+	eval "pid_$c=$!"
+	ran_cases="${ran_cases:-} $c"
+done
+for c in ${ran_cases:-}; do
+	eval "wait \$pid_$c"; rc=$?
+	cat "$ROOT/out.$c"
+	if [ "$rc" = 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
 leftovers() {

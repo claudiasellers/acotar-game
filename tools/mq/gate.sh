@@ -28,9 +28,14 @@ mkdir -p "$out/logs" "$out/scratch"
 
 JOBS=$(mq_config_or MQ_JOBS 4)
 LINE_TIMEOUT=$(mq_config_or MQ_LINE_TIMEOUT 1800)
-DURATIONS="$MQ_DIR/durations"
+DURATIONS="${MQ_DURATIONS:-$MQ_DIR/durations}"  # a copy, for a trial run
 CONF=tools/mq/gate.conf
 [ -f "$CONF" ] || CONF="$here/gate.conf"
+
+# A trial run keeps its events out of the live queue's log.
+if [ -n "${MQ_EVENTS:-}" ]; then
+	mq_event() { local k="$1"; shift; printf '%s %s %s\n' "$(mq_now)" "$k" "$*" >> "$MQ_EVENTS"; }
+fi
 
 mq_engine >/dev/null || { echo "gate: no engine" >&2; exit 3; }
 
@@ -40,7 +45,11 @@ export MQ_GATE_BASE="$base"
 
 slug() { printf '%s' "$1" | tr '/: ' '___'; }
 
-matches() { # matches "a/*,*.x": true when the change touches a match
+# The patterns must stay patterns: unquoted, bash would glob them against the
+# worktree, and `world/*` would turn into `world/spring_court`, which no file
+# under it matches.
+matches() { set -f; matches_on "$@"; local r=$?; set +f; return "$r"; }
+matches_on() { # matches "a/*,*.x": true when the change touches a match
 	local pats="$1" p f
 	[ -n "$base" ] || return 0
 	local IFS=,
@@ -56,6 +65,9 @@ matches() { # matches "a/*,*.x": true when the change touches a match
 	return 1
 }
 
+gut_cmd() { echo "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=$1"; }
+
+alone=" "
 first_names=(); first_cmds=(); names=(); cmds=(); needs=()
 add() { # add first|rest name command [needed-line]
 	if [ "$1" = first ]; then
@@ -72,9 +84,10 @@ while IFS= read -r line; do
 		for t in $(find "${line#* }" -name 'test_*.gd' 2>/dev/null | sort); do
 			need=$(sed -n 's/^#* *gate: needs:\([a-z_-]*\).*/\1/p' "$t" | head -1)
 			when=$(sed -n 's/^#* *gate: when:\([^ ]*\).*/\1/p' "$t" | head -1)
+			grep -qE '^#* *gate: alone' "$t" && alone="$alone gut:$t "
 			# The test's own file always counts as touching it.
 			if [ -n "$when" ] && ! matches "$when,$t"; then echo "SKIP gut:$t (change touches no $when)" >> "$out/plan.txt"; continue; fi
-			add rest "gut:$t" "\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://$t" "$need"
+			add rest "gut:$t" "$(gut_cmd "res://$t")" "$need"
 		done
 		continue
 	fi
@@ -124,7 +137,65 @@ for d in $needed; do
 done
 
 is_known() { grep -qxF "$1" "$known" 2>/dev/null; }
-record() { echo "$2 $1 ${3:-0}s" >> "$out/results.txt"; }
+record() { echo "$2 $1 ${3:-0}s${4:+ $4}" >> "$out/results.txt"; }
+
+# Short @gut tests share an engine: booting one costs about 4 s, more than most
+# of them take. Tests up to SHARD_MAX seconds last time are packed into shards
+# of about SHARD_SECS. A test with no time yet, with a needs:, known red,
+# needed by a line, or marked `# gate: alone` runs alone. A red shard splits: each test in it runs alone,
+# with the usual retry, so blame stays per file. MQ_SHARD_SECS=0 turns it off.
+SHARD_SECS=$(mq_config_or MQ_SHARD_SECS 60)
+SHARD_MAX=$(mq_config_or MQ_SHARD_MAX 20)
+mems=(); est=(); i=0
+while [ "$i" -lt "${#names[@]}" ]; do mems[$i]=""; est[$i]=""; i=$((i + 1)); done
+if [ "$SHARD_SECS" -gt 0 ] && [ -z "$only" ]; then
+	cand=$(i=0; while [ "$i" -lt "${#names[@]}" ]; do
+		nm=${names[$i]}
+		case "$nm" in
+			(gut:*) d=$(kv_get "$DURATIONS" "$(slug "$nm")")
+				case "$needed$alone" in (*" $nm "*) d="" ;; esac
+				if [ -n "$d" ] && [ "$d" -le "$SHARD_MAX" ] && [ -z "${needs[$i]}" ] && ! is_known "$nm"; then
+					echo "$d $i"
+				fi ;;
+		esac
+		i=$((i + 1))
+	done | sort -rn)
+	# First fit, longest first.
+	sidx=(); ssum=(); insh=" "
+	while read -r d i; do
+		[ -n "$i" ] || continue
+		k=0
+		while [ "$k" -lt "${#ssum[@]}" ] && [ $((${ssum[$k]} + d)) -gt "$SHARD_SECS" ]; do k=$((k + 1)); done
+		if [ "$k" = "${#ssum[@]}" ]; then sidx[$k]=""; ssum[$k]=0; fi
+		sidx[$k]="${sidx[$k]} $i"; ssum[$k]=$((${ssum[$k]} + d))
+	done <<EOF_CAND
+$cand
+EOF_CAND
+	k=0
+	while [ "$k" -lt "${#sidx[@]}" ]; do
+		set -- ${sidx[$k]}
+		if [ "$#" -gt 1 ]; then
+			list=""; m=""
+			for i in "$@"; do insh="$insh$i "; m="$m ${names[$i]}"; list="$list,res://${names[$i]#gut:}"; done
+			j=${#names[@]}
+			names[$j]="shard:$((k + 1))"; cmds[$j]=$(gut_cmd "${list#,}"); needs[$j]=""
+			mems[$j]="${m# }"; est[$j]=${ssum[$k]}
+			echo "SHARD shard:$((k + 1)) (${ssum[$k]}s): ${m# }" >> "$out/plan.txt"
+		fi
+		k=$((k + 1))
+	done
+	# The sharded tests leave the plan as lines of their own.
+	kn=(); kc=(); kd=(); km=(); ke=(); i=0
+	while [ "$i" -lt "${#names[@]}" ]; do
+		case "$insh" in
+			*" $i "*) ;;
+			*) j=${#kn[@]}; kn[$j]="${names[$i]}"; kc[$j]="${cmds[$i]}"; kd[$j]="${needs[$i]}"; km[$j]="${mems[$i]}"; ke[$j]="${est[$i]}" ;;
+		esac
+		i=$((i + 1))
+	done
+	names=(${kn[@]+"${kn[@]}"}); cmds=(${kc[@]+"${kc[@]}"}); needs=(${kd[@]+"${kd[@]}"})
+	mems=(${km[@]+"${km[@]}"}); est=(${ke[@]+"${ke[@]}"})
+fi
 
 start_line() { # sets started_pid
 	local name="$1" cmd="$2" s; s=$(slug "$name")
@@ -209,12 +280,13 @@ only_builds_left() {
 
 # Longest first, by what the last runs took. Needed builds before everything.
 order=$(i=0; while [ "$i" -lt "${#names[@]}" ]; do
-	d=$(kv_get "$DURATIONS" "$(slug "${names[$i]}")")
+	d=${est[$i]}
+	[ -n "$d" ] || d=$(kv_get "$DURATIONS" "$(slug "${names[$i]}")")
 	case "$needed" in (*" ${names[$i]} "*) d=999999 ;; esac
 	echo "${d:-999} $i"; i=$((i + 1))
 done | sort -rn | cut -d' ' -f2)
 
-pids=(); idxs=(); starts=(); failures=""; queue=" $(echo $order) "
+pids=(); idxs=(); starts=(); failures=""; splits=""; queue=" $(echo $order) "
 failed_stop=0
 while :; do
 	# Launch.
@@ -234,9 +306,21 @@ while :; do
 		fi
 		wait "$p"; rc=$?
 		n=${idxs[$j]}; secs=$(( $(date +%s) - ${starts[$j]} ))
-		if [ "$rc" = 0 ]; then
+		if [ "$rc" = 0 ] && [ -n "${mems[$n]}" ]; then
+			record "${names[$n]}" PASS "$secs"
+			for m in ${mems[$n]}; do record "$m" PASS 0 "${names[$n]}"; done
+		elif [ "$rc" = 0 ]; then
 			record "${names[$n]}" PASS "$secs"
 			kv_set "$DURATIONS" "$(slug "${names[$n]}")" "$secs"
+		elif [ -n "${mems[$n]}" ] && [ "$rc" != 125 ]; then
+			# Red together: each test goes again alone, first in the queue.
+			record "${names[$n]}" SPLIT "$secs"
+			splits="$splits $n"
+			for m in ${mems[$n]}; do
+				j=${#names[@]}
+				names[$j]=$m; cmds[$j]=$(gut_cmd "res://${m#gut:}"); needs[$j]=""; mems[$j]=""; est[$j]=""
+				queue=" $j$queue"
+			done
 		else
 			failures="$failures $n:$rc:$secs"
 			failed_stop=1
@@ -255,6 +339,19 @@ while :; do
 		continue
 	fi
 	/usr/bin/perl -e 'select(undef,undef,undef,0.2)'
+done
+
+# A shard that was red although each of its tests passed alone: the tests
+# disturb each other, which isn't the change's fault. Say so, like a flake.
+for n in $splits; do
+	bad=0
+	for m in ${mems[$n]}; do
+		grep -qE "^(FAIL|FLAKY|KNOWNRED|BLOCKED) $m " "$out/results.txt" && bad=1
+	done
+	if [ "$bad" = 0 ]; then
+		record "${names[$n]}" FLAKY 0
+		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); see its log: ${mems[$n]}"
+	fi
 done
 
 [ -s "$out/failed" ] && exit 1
