@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/*,core/*,story/*,world/*,systems/*,creatures/*,ui/*,data/*,tests/integration/play/*
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/*,data/mount/*,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/settings_panel.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the Spring Court, through Continue from a save after the
 ## first dinner (the mare ridden once, so the whistle works), driven by real
 ## key and pad events (tests/integration/play/README.md). Indoors in the manor,
