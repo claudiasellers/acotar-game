@@ -214,6 +214,11 @@ const LINEUPS := {
 		"scene:qtz/CommonTree_4.gltf:14:deep", "scene:qtz/CommonTree_5.gltf:11:deep", "scene:qtz/TwistedTree_1.gltf:15:deep",
 		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
 		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
+	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
+	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7", "scene:/plants/qtz/Clover_1.gltf:0.15", "scene:/plants/qtz/Clover_2.gltf:0.18", "scene:/plants/qtz/Fern_1.gltf:0.8", "scene:/plants/qtz/Plant_1.gltf:0.5", "scene:/plants/qtz/Plant_1_Big.gltf:1.0", "scene:/plants/qtz/Plant_7.gltf:0.4", "scene:/plants/qtz/Plant_7_Big.gltf:0.8", "scene:/plants/qtz/Flower_3_Single.gltf:0.45", "scene:/plants/qtz/Flower_3_Group.gltf:0.5", "scene:/plants/qtz/Flower_4_Single.gltf:0.45", "scene:/plants/qtz/Flower_4_Group.gltf:0.5", "scene:/plants/qtz/Mushroom_Common.gltf:0.25", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35"]},
+	# The re-downloaded Quaternius trees: twisted oaks and pines in the deep tint,
+	# the dead trees as delivered.
+	"newtrees": {"distance": 70.0, "spacing": 10.0, "look": 6.0, "ids": ["scene:/trees/qtz/TwistedTree_2.gltf:15:deep", "scene:/trees/qtz/TwistedTree_4.gltf:15:deep", "scene:/trees/qtz/TwistedTree_5.gltf:15:deep", "scene:/trees/qtz/Pine_2.gltf:13:deep", "scene:/trees/qtz/Pine_3.gltf:14:deep", "scene:/trees/qtz/Pine_5.gltf:9:deep", "scene:/trees/qtz/DeadTree_1.gltf:11", "scene:/trees/qtz/DeadTree_2.gltf:12", "scene:/trees/qtz/DeadTree_3.gltf:11", "scene:/trees/qtz/DeadTree_4.gltf:10", "scene:/trees/qtz/DeadTree_5.gltf:9"]},
 	# Florals test (F1): EZ flowering shrubs among the mixed wood's trees.
 	"bloom": {"distance": 11.0, "spacing": 3.0, "look": 1.4, "ids": [
 		"ez:rose_a", "ez:rose_b", "ez:wildrose_a", "ez:lilac_a", "ez:hydrangea_a", "ez:hydrangea_b",
@@ -381,7 +386,9 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				continue
 			elif item.begins_with("scene:"):
 				# A packed model as delivered (its own materials), scaled to a height.
-				var inst := (load(EZ_DIR + item.get_slice(":", 1)) as PackedScene).instantiate() as Node3D
+				var sp := item.get_slice(":", 1)
+				var path := ("res://world/spring_court/wider/assets" + sp) if sp.begins_with("/") else EZ_DIR + sp
+				var inst := (load(path) as PackedScene).instantiate() as Node3D
 				var top := 0.0
 				for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 					top = maxf(top, m.get_aabb().end.y)
