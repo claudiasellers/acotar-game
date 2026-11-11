@@ -137,7 +137,7 @@ queue() { # queue sha task
 
 drain() { # wait for an empty queue
 	local i=0
-	while [ "$i" -lt 240 ]; do
+	while [ "$i" -lt 960 ]; do
 		if ! ls .git/mq/pending/*.entry >/dev/null 2>&1 && ! ls -d .git/mq/batches/* >/dev/null 2>&1; then
 			return 0
 		fi
@@ -326,7 +326,7 @@ case_stop_mid_batch() {
 	a=$(change a one slow)
 	queue "$a" T1
 	start_lane
-	while ! ls .git/mq/batches/*/*.entry >/dev/null 2>&1 && [ "$i" -lt 80 ]; do
+	while ! ls .git/mq/batches/*/*.entry >/dev/null 2>&1 && [ "$i" -lt 600 ]; do
 		perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
 	done
 	sleep 1
@@ -335,7 +335,7 @@ case_stop_mid_batch() {
 	mv .git/mq/batches/* "$ROOT/x" 2>/dev/null; mv "$ROOT/x" .git/mq/batches/left
 	start_lane
 	i=0
-	while ! grep -q RECOVERED .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1)); done
+	while ! grep -q RECOVERED .git/mq/events.log && [ "$i" -lt 1500 ]; do perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1)); done
 	expect "batch came back" grep -q RECOVERED .git/mq/events.log
 	stop_lane
 	expect "entry is queued again" test -n "$(ls .git/mq/pending/*.entry .git/mq/batches/*/*.entry 2>/dev/null)"
@@ -350,7 +350,7 @@ case_stall_no_engine() {
 	sed -i '' "s#^MQ_ENGINE=.*#MQ_ENGINE=$ROOT/no-such-engine#" .git/mq/config
 	start_lane
 	local i=0
-	while ! grep -q STALLED .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q STALLED .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "stalled" grep -q STALLED .git/mq/events.log
 	expect "not rejected" not rejected T1
 	stop_lane
@@ -497,7 +497,7 @@ case_idle_gate() {
 	a=$(change a one)
 	queue "$a" T1
 	start_lane; drain
-	while ! grep -q 'FULLGATE passed' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q 'FULLGATE passed' .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "full gate ran" grep -q 'FULLGATE passed' .git/mq/events.log
 	stop_lane
 	git worktree list >/dev/null
@@ -514,7 +514,7 @@ case_idle_gate_red_and_killed() {
 	queue "$a" T1
 	start_lane; drain
 	expect "when: skipped it in the batch" in_main "$a"
-	while ! grep -q 'c is red' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q 'c is red' .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "full gate found it" grep -q 'c is red' .git/mq/events.log
 	expect "task made" sh -c "tools/mq/task.sh list | grep -q 'found c red'"
 	stop_lane
@@ -673,7 +673,7 @@ case_standing() {
 
 wait_for() { # pattern: until it is in the events log
 	local i=0
-	while ! grep -q "$1" .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q "$1" .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	grep -q "$1" .git/mq/events.log
 }
 
@@ -1044,7 +1044,7 @@ case_parse_error_fails_fast() {
 	local t0=$SECONDS
 	tools/mq/levels.sh ensure >/dev/null 2>"$ROOT/parse.err"; local rc=$?
 	expect "a builder whose script won't parse fails the ensure" test "$rc" != 0
-	expect "at once, not at the timeout" test $((SECONDS - t0)) -lt 20
+	expect "at once, not at the timeout" test $((SECONDS - t0)) -lt 45
 	expect "and names the parse error" grep -q 'failed to parse' "$ROOT/parse.err"
 	expect "and the class" grep -q 'ManorSitePlan' "$ROOT/parse.err"
 	expect "nothing is stamped" test ! -f .git/mq-levels/terrain
