@@ -1,0 +1,6 @@
+from wider-court-world
+quality look
+shot court res://tools/court/court_terrain_shots.tscn {out} western_woods tower_hill the_mound glen_saddle regions ingame
+shot manor_front res://tools/world_shot.tscn manor_drive {out}/manor_front.png
+shot rose_garden res://tools/world_shot.tscn manor_rose_garden {out}/rose_garden.png
+shot manor_garden res://tools/world_shot.tscn manor_garden_east {out}/manor_garden.png
