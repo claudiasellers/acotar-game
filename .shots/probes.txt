@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot steps res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=tree_steps
+shot rolescol res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=roles_colour
