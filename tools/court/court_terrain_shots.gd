@@ -214,6 +214,10 @@ const LINEUPS := {
 		"scene:qtz/CommonTree_4.gltf:14:deep", "scene:qtz/CommonTree_5.gltf:11:deep", "scene:qtz/TwistedTree_1.gltf:15:deep",
 		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
 		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
+	# Florals test (F1): EZ flowering shrubs among the mixed wood's trees.
+	"bloom": {"distance": 22.0, "spacing": 5.0, "look": 2.0, "ids": [
+		"scene:qtz/CommonTree_3.gltf:12:deep", "ez:rose_a", "ez:rose_b", "ez:lilac_a", "ez:hydrangea_a",
+		"ez:hydrangea_b", "ez:lilac_b", "ez:rose_a", "ez:oak_a:painted"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -236,15 +240,23 @@ const EZ_TREES := {
 	"dead_c": ["oak", "oak", 9.0],
 }
 const TREES_EZ := "res://world/spring_court/wider/assets/trees/ez/"
+## Florals test (finish plan F1): EZ-Tree shapes wearing painted blossom sprays
+## (tools/court/gen_ez_blossoms.py), drawn in their own colours. [spray, height].
+const BLOOM_DIR := "res://world/spring_court/wider/assets/tree_explore/bloom/"
+const BLOOMS := {
+	"rose_a": ["rose", 1.6], "rose_b": ["rose", 1.9], "lilac_a": ["lilac", 4.2], "lilac_b": ["lilac", 3.6],
+	"hydrangea_a": ["hydrangea", 1.4], "hydrangea_b": ["hydrangea", 1.6],
+}
 
 
 ## [mesh, scale] for an EZ-Tree preview tree, its leaves photo or repainted.
 ## intake: the court's set (assets/trees/ez/) with its painted leaf and bark
 ## textures, in place of the exploration copies and EZ-Tree's photos.
 func _ez_tree(name: String, painted: bool, intake := false) -> Array:
-	var spec: Array = EZ_TREES[name]
-	var dir := TREES_EZ if intake else EZ_DIR
-	var ext := "png" if intake else "jpg"
+	var bloom := BLOOMS.has(name)
+	var spec: Array = ["", "oak", BLOOMS[name][1]] if bloom else EZ_TREES[name]
+	var dir := BLOOM_DIR if bloom else (TREES_EZ if intake else EZ_DIR)
+	var ext := "png" if intake or bloom else "jpg"
 	var inst := (load("%sez_%s.glb" % [dir, name]) as PackedScene).instantiate()
 	var meshes: Array = inst.find_children("*", "MeshInstance3D", true, false)
 	# One ArrayMesh from the bark and leaf meshes (the export keeps them apart).
@@ -252,8 +264,11 @@ func _ez_tree(name: String, painted: bool, intake := false) -> Array:
 	var out := ArrayMesh.new()
 	var leaf := ShaderMaterial.new()
 	leaf.shader = load(EZ_DIR + "ez_leaf.gdshader")
-	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [dir, spec[0]]))
-	leaf.set_shader_parameter(&"painted", 1.0 if painted else 0.0)
+	if bloom:
+		leaf.set_shader_parameter(&"leaf_tex", load("%sblossom_%s.png" % [dir, BLOOMS[name][0]]))
+	else:
+		leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [dir, spec[0]]))
+	leaf.set_shader_parameter(&"painted", 0.0 if bloom else (1.0 if painted else 0.0))
 	for k: String in MIX_LEAF:
 		leaf.set_shader_parameter(k, MIX_LEAF[k])
 	var bark := ShaderMaterial.new()
