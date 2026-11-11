@@ -322,10 +322,7 @@ func test_pause_saves_and_continue_puts_her_back() -> void:
 	await h.shutdown()
 	booted = await h.boot_slot(SAVED_SLOT)
 	assert_true(booted, "Continue gives her control")
-	# Finding F3 (T097): now and then, freeing the game and Continuing logs
-	# "Lambda capture at index 0 was freed" (a game callback outlives its node).
-	if h.excuse_errors("Lambda capture at index 0 was freed") > 0:
-		pending("F3: after the game is freed and Continue runs, a callback fires with a freed capture")
+	# F3 (T097, fixed by T110): the freed-lambda error no longer fires here.
 	if not booted:
 		return
 	assert_lt(PlayHarness.flat_distance(at, h.feyre.global_position), 0.5,

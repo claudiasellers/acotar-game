@@ -9,7 +9,7 @@ system's parts; these prove "it passes" means "it plays".
 | `test_play_woods.gd` | the cottage and the woods, from New Game | wake on the ground at the door, walk in and talk to her family, N minimap, walk/run/sprint and stop, the cottage wall, the whistle refused south of the Wall, pause + save + Continue |
 | `test_play_court.gd` | the manor and stable yard, through Continue | wake in her bedroom, a wall, talk to Alis, a person blocks then lets her squeeze past (T092), N minimap, walk/run/sprint and stop, whistle + mount + ride + gallop + get down, pause + save + Continue |
 | `test_play_sit.gd` | the dining hall, through Continue | the first dinner: walk in, sit, the shove, E to eat, stand and walk away |
-| `test_play_shoot.gd` | | pending until T096's bow lands |
+| `test_play_shoot.gd` | the woods and the court | the Zelda-style bow: hold aim, nock, one click one full arrow, release lowers with no shot, fresh aim after a shot, Q cycles types |
 
 Each file boots the game once in `before_all` and runs its tests in order in
 that one game; setup moves her with `place_on_ground` (never the verb tested).
