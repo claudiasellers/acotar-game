@@ -44,13 +44,13 @@ and its status. Details for each item are in the phase sections further down.
 |---|---|---|---|---|
 | R0 | Canonical check: the estate and Spring shots before and after the haze change (M4WCT-3 touched `manor.tres`, `spring.tres`) | — | **started** | the four outdoor Spring canonical shots rendered on both commits; the differences are the haze only |
 | T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **done** (render pending) | every file has a licence line; no file over 5 MB; triangles per model in a CSV |
-| T2 | Detail steps: near (≤ 4.5k tris) to 80 m, mid (≤ 1.2k) to 260 m, far card (≤ 24) to 600 m | T1 | near and mid **done**; the far card is baked from the dressed trees after T4 | triangles in view at 150/ha (near + mid + far) ≤ 3 M, from the CSV |
-| T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | waiting | no two neighbouring trees share build, yaw and scale (GUT) |
-| T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | waiting | each role's mean leaf colour inside its row in `docs/tuning.md` (CSV) |
+| T2 | Detail steps: near (≤ 4.5k tris) to 80 m, mid (≤ 1.2k) to 260 m, far card (≤ 24) to 600 m | T1 | **done** (far: a 24-triangle crown and trunk, CourtTreeSet) | triangles in view at 150/ha (near + mid + far) ≤ 3 M, from the CSV |
+| T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | **done**: 1.5% of neighbour pairs share a build (Western Woods) | no two neighbouring trees share build, yaw and scale (GUT) |
+| T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | **done** (14 roles, `docs/tuning.md`) | each role's mean leaf colour inside its row in `docs/tuning.md` (CSV) |
 | T5 | Willow of our own (generator pipeline, `woods_trees.py` Kit) | D1, T4 | waiting | as T2 and T4 |
-| T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | waiting | GUT: every role id resolves to near, mid and far meshes |
-| T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | waiting | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
-| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | waiting | owner's yes |
+| T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | **done** (`CourtTreeSet`, on the lane) | GUT: every role id resolves to near, mid and far meshes |
+| T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | **measured**: court views hold; 150/ha does not yet (below) | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
+| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | **with the owner** (wcterrain-43/44/45/46) | owner's yes |
 | P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **done** (submitted) | GUT: habitat fractions per region; every keep-open zone has no tree in it |
 | P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
 | P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
@@ -160,6 +160,21 @@ is the layering half. Five fixes came out of checking it against the brief, `wor
    window seems to cap at 60 Hz, so also note draw calls and triangles.
 7. **Gate:** a lineup of every role and a dense wood, rendered for the owner; then
    submit.
+
+**T7 frame time (2026-11-11, Mac mini M4, median / p95 ms, draw calls; wcterrain-47/48).**
+
+| View | FloraLibrary trees | Tree set |
+|---|---|---|
+| Court woods | 15.6 / 23.4, 388 | 17.4 / 22.5, 454 |
+| Court glen | 25.1 / 145.5, 476 | 18.8 / 26.1, 551 |
+| Court meadow | 18.1 / 31.4, 861 | 17.0 / 32.9, 944 |
+| Dense wood, 150/ha | 15.4 / 21.4, 76 | 24.1 / 25.9, 437 |
+
+At today's planting the tree set costs about the same (the glen is faster). A
+dense wood at 150/ha is 24 ms against the 16.6 budget: the alpha-cut leaves and the
+extra builds per chunk cost more than the old opaque crowns. Before P2 raises the
+density: mid steps cast no shadow past the shadow range, and fewer builds per chunk
+(T7b); P2's ceiling is what then holds.
 
 ## Phase P — planting follows the land (after T; the big one)
 
