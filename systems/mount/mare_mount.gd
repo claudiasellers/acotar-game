@@ -52,6 +52,7 @@ var _leap_pending: bool = false
 
 func _init() -> void:
 	name = "WhiteMare"
+	add_to_group(WallBarrier.GROUP)  # she can't be ridden across the Wall either
 	collision_layer = LAYER
 	# Riding past people bumps them like a wall (T092).
 	collision_mask = WORLD_MASK | ActorBody.LAYER
