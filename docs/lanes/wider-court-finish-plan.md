@@ -29,7 +29,10 @@ exploration ("make a plan for what comes next based on everything else"). The te
   - no ground cover;
   - the glen reads milky (LUT lifts the blacks);
   - the Western Woods grade turns the ground teal;
-  - a tree stands on two viewpoints (`vale_rim`, `western_woods`).
+  - a tree stands on two viewpoints (`vale_rim`, `western_woods`) (fixed by P1);
+  - the estate's lawn went flat bright green with the storybook ground (R0: the
+    manor team's softened spring_grass of L56-2 was repacked too). Owner
+    (2026-11-10): leave it until it can be judged with the new trees in.
 
 ## Work list by dependency (2026-11-10)
 
