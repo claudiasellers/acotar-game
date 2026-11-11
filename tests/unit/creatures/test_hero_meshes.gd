@@ -1,7 +1,7 @@
 ## Contract (lane L61, render program T4): hero meshes are real models.
 ## The opening film's winter wood is grown trees, not cylinders; every
 ## creature model has a skeleton; every species names a real model.
-# gate: when:story/film/opening/*,world/spring_court/shared/models/*,tools/woods/blender/*,creatures/*,data/creatures/*,characters/*
+# gate: when:story/film/opening/*,world/spring_court/shared/models/*,tools/woods/blender/*,creatures/*,data/creatures/*,characters/nesta/*,characters/elain/*,characters/father/*,characters/summer_faerie/*
 extends GutTest
 
 const PUCA := preload("res://creatures/fae/puca.tscn")
