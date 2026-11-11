@@ -66,13 +66,9 @@ func _anchor(id: StringName) -> Node3D:
 func test_she_wakes_on_the_ground() -> void:
 	if not booted:
 		return
-	if boot_fell:
-		# Finding F1 (T097): Act1Game turns her physics on at the dawn anchor (the
-		# cottage's front door) as soon as the cottage region is loaded, before
-		# the ground under her has collision (the ray under her is empty on that
-		# frame); now and then she drops through and falls forever.
-		pending("F1: New Game sometimes drops her through the ground at the cottage door (fell to y=%.1f)" % fell_to)
-		return
+	# F1 (T097, fixed by T104): New Game used to drop her through the ground
+	# at the cottage door now and then.
+	assert_false(boot_fell, "New Game sets her down on solid ground (fell to y=%.1f)" % fell_to)
 	assert_true(h.on_solid_ground(), "standing on the ground at the cottage door")
 
 
