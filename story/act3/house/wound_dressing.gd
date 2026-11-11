@@ -53,8 +53,10 @@ var _flash: ColorRect
 
 func _init() -> void:
 	space_id = &"wound_dressing_night"
+	# The map may be drawn long before (it starts the morning after the rope),
+	# but the Bogge night is after the puca (ch12).
 	require_flags = PackedStringArray(["fact.hall_x_1", "fact.hall_x_2", "fact.hall_x_3", "fact.hall_x_4",
-			"fact.hall_x_5", HallMap.ENOUGH_FACT])
+			"fact.hall_x_5", HallMap.ENOUGH_FACT, "puca_resisted"])
 	done_flags = PackedStringArray(["fact.tamlin_hand_bound"])
 	night_only = true
 	arrive_radius = 2.4

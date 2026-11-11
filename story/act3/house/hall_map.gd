@@ -1,4 +1,5 @@
-## Feyre's map of the halls (ch12, L28): from the night after the puca, every
+## Feyre's map of the halls (ch12, L28): from the morning Alis trips her rope
+## (plan.start_flag; owner 2026-11-11), beside every other beat, each
 ## room she walks into is inked onto her page (HallMapPage), with a little
 ## picture instead of a name, since she can't write. From the four tower tops
 ## she sketches what she sees from the windows onto the world map
@@ -52,6 +53,9 @@ static func load_rooms() -> Array[Dictionary]:
 func _physics_process(delta: float) -> void:
 	if not auto_tick or not mapping():
 		return
+	# Not while a scene holds her (Alis at the door, dinner): she maps on her own time.
+	if StoryControl.mode != StoryControl.Mode.FULL:
+		return
 	_t += delta
 	if _t < CHECK_EVERY:
 		return
@@ -64,7 +68,7 @@ func _physics_process(delta: float) -> void:
 	check_at(house.to_local(p.global_position))
 
 
-## Mapping runs from the night after the puca on (ch12) and never stops.
+## Mapping runs from plan.start_flag on and never stops.
 func mapping() -> bool:
 	return plan != null and WorldState.has_flag(plan.start_flag)
 
@@ -79,10 +83,13 @@ func check_at(local: Vector3) -> StringName:
 	var id := StringName(room["id"])
 	if WorldState.has_flag(room_fact(room)):
 		return &""
+	var first := sketched_count() == 0
 	WorldState.set_flag(room_fact(room))
 	room_sketched.emit(id)
 	if is_inside_tree():
 		HallMapPage.find_or_make(self).sketch_room(id)
+		if first and plan.first_thought != "":
+			Act2Caption.find_or_make(self).say("", plan.first_thought)
 	if sketched_count() >= plan.min_rooms and not WorldState.has_flag(ENOUGH_FACT):
 		WorldState.set_flag(ENOUGH_FACT)
 	if plan.lookouts.has(id) or plan.lookouts.has(String(id)):

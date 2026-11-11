@@ -162,7 +162,12 @@ LOOKOUTS = {"observatory": ["rosewild", "fae_village", "autumn_foothills"],
             "lantern_lookout": ["western_fells"], "moon_tower": ["blossom_vale"]}
 MIN_ROOMS = 10
 PLAN_CANON = ("Ch12 [C]: sleepless, she maps the manor halls with X marks; she can't write, so the page has Xs and circles "
-              "for the doors, the windows, the marble stairs. Room pictures, the five marked places and the tower views: X.")
+              "for the doors, the windows, the marble stairs. Room pictures, the five marked places and the tower views: X. "
+              "Start moved earlier by the owner (2026-11-11), V: from the morning Alis trips her rope (ch7) it runs "
+              "beside the other beats; the Bogge night at the foyer table stays after the puca (ch12).")
+# Owner, 2026-11-11: the mapping starts the morning after the rope (fact.alis_tripped).
+START_FLAG = "fact.alis_tripped"
+FIRST_THOUGHT = "If I'm going to be stuck here, I need to know my way around this house."
 
 
 def write_plan(anch):
@@ -178,7 +183,8 @@ def write_plan(anch):
             'script = ExtResource("1")',
             "marks = Array[Dictionary]([%s])" % ", ".join(marks),
             "pictograms = {%s}" % pics, "lookouts = {%s}" % looks, "min_rooms = %d" % MIN_ROOMS,
-            'start_flag = "puca_resisted"', "canon = %s" % gd_str(PLAN_CANON)]
+            'start_flag = %s' % gd_str(START_FLAG), "first_thought = %s" % gd_str(FIRST_THOUGHT),
+            "canon = %s" % gd_str(PLAN_CANON)]
     open(os.path.join(OUT, "hall_map_plan.tres"), "w").write("\n".join(body) + "\n")
 
 

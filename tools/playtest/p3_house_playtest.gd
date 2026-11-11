@@ -116,7 +116,9 @@ func _play() -> void:
 		return _fail("only %d rooms sketched" % map.sketched_count())
 	_pass()
 
-	_begin("map_drawn", "back to the foyer table; at night she sets the map down: manor_map_drawn")
+	# The map is drawn with the fifth mark and enough rooms (owner, 2026-11-11);
+	# setting it down at night opens the Bogge night.
+	_begin("map_drawn", "back to the foyer table; at night she sets the map down")
 	if not await _walk_route(BACK_TO_FOYER):
 		return _fail("couldn't get back to the foyer")
 	await _walk_to(wound.mark(&"foyer_table"), 1.4)
@@ -124,8 +126,8 @@ func _play() -> void:
 		return _fail("the night never started at the table (can_start %s, night %s)" % [wound.can_start(), Clock.is_night()])
 	await _walk_to(wound.mark(&"foyer_map"), 1.0)
 	await _press(&"interact")
-	if not await _until(func() -> bool: return WorldState.has_flag("manor_map_drawn"), 8.0):
-		return _fail("manor_map_drawn never raised (set down %s)" % WorldState.has_flag("fact.hall_map_set_down"))
+	if not await _until(func() -> bool: return WorldState.has_flag("fact.hall_map_set_down") and WorldState.has_flag("manor_map_drawn"), 8.0):
+		return _fail("map not set down (%s) or not drawn (%s)" % [WorldState.has_flag("fact.hall_map_set_down"), WorldState.has_flag("manor_map_drawn")])
 	_pass()
 
 	_begin("the_beast", "the beast limps in from the garden doors, the flash, Tamlin; he knows she can't write")

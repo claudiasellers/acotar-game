@@ -25,6 +25,15 @@ func all_entries() -> Array[JournalEntry]:
 	return out
 
 
+## Ongoing steps she has started and not finished, from any chapter, in story order.
+func ongoing(has_flag: Callable) -> Array[JournalEntry]:
+	var out: Array[JournalEntry] = []
+	for e in all_entries():
+		if e.ongoing and e.is_ready(has_flag) and not e.is_done(has_flag):
+			out.append(e)
+	return out
+
+
 ## Fills guide-backed entries from the G thoughts once.
 func _link() -> void:
 	if _linked:

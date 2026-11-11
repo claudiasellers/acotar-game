@@ -10,7 +10,7 @@ extends Node
 const PHASES := preload("res://data/phases/spring_court_phases.tres")
 const GAME := "res://story/act1/act1_game.tscn"
 const DONE_BEFORE := ["wolf_killed", "pelt_sold", "beast_claim_accepted", "wall_crossed",
-		"first_dinner_eaten", "curtain_trap_set", "bogge_survived", "puca_resisted"]
+		"first_dinner_eaten", "curtain_trap_set", "fact.alis_tripped", "bogge_survived", "puca_resisted"]
 const START_ANCHOR := &"hall_mark_1"
 ## Late evening: sleepless, she walks the halls (ch12).
 const EVENING := 0.82

@@ -1,7 +1,7 @@
 ## One of the five places she notes on her map of the halls (ch12, L28):
 ## "a few Xs and circles to signify the doors, the windows, the marble stairs"
 ## (Keeper, [C]). Hung on each hall_mark_<n> anchor by Act3Anchors. From the
-## night after the puca a soft glint shows the spot; E within reach makes the
+## morning Alis trips her rope (HallMapPlan.start_flag) a soft glint shows the spot; E within reach makes the
 ## mark: she looks at the door or stair, a line of her thought, the quill
 ## scratch, a sparkle, and the X or circle appears on her page.
 ## Fact: fact.hall_x_<n> (the hall_mark_<n> moment turns it into fact.hall_mark_<n>).
