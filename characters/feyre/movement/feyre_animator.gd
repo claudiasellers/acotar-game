@@ -7,10 +7,17 @@
 ## the ground (each clip's native speed comes from the retarget generator);
 ## the air states follow JumpMotor (take-off, double, flourish, rise, fall,
 ## land, hero landing). Lean and squash live in MovementFeel.
+## Crouched, a second blend space (crouch_idle, sneak) mixes in through a Blend2
+## driven by CrouchMotor.amount, so the drop into the crouch and the rise out of
+## it are one eased pose blend at any speed.
 class_name FeyreAnimator
 extends Node
 
 const MOVES_SCENE := "res://characters/feyre/anim/feyre_moves.glb"
+## Crouch clips (crouch_idle, sneak), built by tools/generators/feyre_crouch_retarget.gd
+## from the same CC0 source; each carries its native ground speed as "native_speed" meta.
+const CROUCH_LIBRARY := "res://characters/feyre/anim/feyre_crouch.res"
+const CROUCH_CLIPS: Array[StringName] = [&"crouch_idle", &"sneak"]
 const SPEEDS_FILE := "res://data/animation/feyre_moves_speeds.txt"
 const LIBRARY := &"moves"
 const LOCO_CLIPS: Array[StringName] = [&"idle", &"walk", &"run", &"sprint"]
@@ -40,6 +47,8 @@ var native_speeds: Dictionary = {}
 var clip_lengths: Dictionary = {}
 ## Game ground speed (m/s) at which each gait clip plays pure (blend-space points).
 var gait_points: Dictionary = {}
+## Game speed (m/s) where the sneak clip plays pure.
+var sneak_point: float = CrouchMotor.SNEAK_SPEED
 
 var _mover: CharacterBody3D
 var _motor: JumpMotor
@@ -81,7 +90,12 @@ static func load_library() -> AnimationLibrary:
 	inst.free()
 	if lib == null:
 		return null
-	for clip: StringName in LOCO_CLIPS + [&"jump_rise", &"jump_fall"]:
+	if ResourceLoader.exists(CROUCH_LIBRARY):
+		var crouch := load(CROUCH_LIBRARY) as AnimationLibrary
+		for clip in CROUCH_CLIPS:
+			if crouch != null and crouch.has_animation(clip) and not lib.has_animation(clip):
+				lib.add_animation(clip, crouch.get_animation(clip))
+	for clip: StringName in LOCO_CLIPS + CROUCH_CLIPS + [&"jump_rise", &"jump_fall"]:
 		if lib.has_animation(clip):
 			lib.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 	return lib
@@ -103,6 +117,12 @@ func _process(delta: float) -> void:
 	var blend := loco_blend(speed)
 	tree.set(&"parameters/Loco/space/blend_position", blend.x)
 	tree.set(&"parameters/Loco/scale/scale", blend.y)
+	var crouch_amount := (_mover as Feyre).crouch.amount if _mover is Feyre else 0.0
+	tree.set(&"parameters/Loco/crouch/blend_amount", crouch_amount)
+	if crouch_amount > 0.0:
+		var cb := crouch_blend(speed)
+		tree.set(&"parameters/Loco/crouch_space/blend_position", cb.x)
+		tree.set(&"parameters/Loco/crouch_scale/scale", cb.y)
 
 	var airborne := _motor != null and _motor.airborne and not _mover.is_on_floor()
 	match _state:
@@ -154,6 +174,18 @@ func loco_blend(speed: float) -> Vector2:
 	return Vector2(gait_points[last], clampf(speed / float(native_speeds[last]), 0.5, MAX_SCALE))
 
 
+## Crouch blend-space position and playback rate: crouch_idle at 0, the sneak at
+## `sneak_point`, the rate matching the sneak clip's native speed so her planted
+## feet stay put.
+func crouch_blend(speed: float) -> Vector2:
+	var native: float = native_speeds.get(&"sneak", 0.0)
+	if speed <= STAND_SPEED or native <= 0.0:
+		return Vector2(0.0, 1.0)
+	if speed < SLOW_WALK:
+		return Vector2(speed / SLOW_WALK * sneak_point, SLOW_WALK / native)
+	return Vector2(sneak_point, clampf(speed / native, 0.5, MAX_SCALE))
+
+
 ## Take-off is already happening this frame, so jump 1 goes straight to the
 ## rising pose (the crouch clip would read as a delay).
 func _on_jumped(index: int) -> void:
@@ -187,11 +219,15 @@ func _read_gait_points(mover: CharacterBody3D) -> void:
 	gait_points[&"walk"] = SLOW_WALK_POINT
 	gait_points[&"run"] = float(mover.get(&"run_speed")) if mover is Feyre else 5.5
 	gait_points[&"sprint"] = float(mover.get(&"sprint_speed")) if mover is Feyre else 9.0
+	if mover is Feyre:
+		sneak_point = (mover as Feyre).crouch.sneak_speed
 
 
 func _read_speeds(lib: AnimationLibrary) -> void:
 	for clip in lib.get_animation_list():
 		clip_lengths[clip] = lib.get_animation(clip).length
+		if lib.get_animation(clip).has_meta(&"native_speed"):
+			native_speeds[clip] = float(lib.get_animation(clip).get_meta(&"native_speed"))
 	var text := FileAccess.get_file_as_string(SPEEDS_FILE)
 	for line in text.split("\n"):
 		var parts := line.strip_edges().split(" ", false)
@@ -216,7 +252,25 @@ func _build_tree(anim: AnimationPlayer) -> void:
 	loco.add_node(&"space", space)
 	loco.add_node(&"scale", AnimationNodeTimeScale.new())
 	loco.connect_node(&"scale", 0, &"space")
-	loco.connect_node(&"output", 0, &"scale")
+	var crouch_space := AnimationNodeBlendSpace1D.new()
+	crouch_space.min_space = 0.0
+	crouch_space.max_space = maxf(sneak_point * 2.0, 4.0)
+	crouch_space.sync = true
+	for clip in CROUCH_CLIPS:
+		if not anim.has_animation(LIBRARY + "/" + clip):
+			continue
+		var node := AnimationNodeAnimation.new()
+		node.animation = LIBRARY + "/" + clip
+		crouch_space.add_blend_point(node, 0.0 if clip == &"crouch_idle" else sneak_point, -1, clip)
+	loco.add_node(&"crouch_space", crouch_space)
+	loco.add_node(&"crouch_scale", AnimationNodeTimeScale.new())
+	loco.connect_node(&"crouch_scale", 0, &"crouch_space")
+	var mix := AnimationNodeBlend2.new()
+	mix.sync = false
+	loco.add_node(&"crouch", mix)
+	loco.connect_node(&"crouch", 0, &"scale")
+	loco.connect_node(&"crouch", 1, &"crouch_scale")
+	loco.connect_node(&"output", 0, &"crouch")
 	sm.add_node(&"Loco", loco)
 	var states: Array[StringName] = [&"Loco"]
 	for clip in AIR_STATES:

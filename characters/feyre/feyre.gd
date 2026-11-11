@@ -1,5 +1,5 @@
-## Feyre: third-person movement, sprint with stamina, jumping, ledge
-## mantling, a mouse/stick camera that R recentres behind her, plus her
+## Feyre: third-person movement, sprint with stamina, jumping, a crouch to
+## sneak (CrouchMotor), ledge mantling, a mouse/stick camera that R recentres behind her, plus her
 ## gameplay components (systems/): the bow, interaction,
 ## body state, element state, notice moments and wardrobe.
 ##
@@ -123,6 +123,8 @@ var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
+## The hunter's crouch: Left Ctrl / gamepad B, slower and quieter (CrouchMotor).
+var crouch := CrouchMotor.new()
 ## Running total of camera yaw turns the player didn't make (follow-behind,
 ## story glances, recentre, nudges); SteerFrame takes them out of steering.
 var camera_auto_yaw: float = 0.0
@@ -198,12 +200,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look(event.relative.x * s, event.relative.y * s)
 	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
 		recenter_camera(deg_to_rad(recenter_max_turn))
+	if event.is_action_pressed(CrouchMotor.ACTION) and StoryControl.can_move() and not is_mantling:
+		crouch.toggle(is_on_floor())
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
 		interactor.interact()
 
 
 func _process(delta: float) -> void:
-	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift)
+	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift - crouch.camera_drop())
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
 		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
@@ -229,7 +233,9 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	crouch.step(delta)
 	if is_mantling:
+		crouch.set_crouched(false)
 		return
 	is_aiming = Input.is_action_pressed(&"aim")
 
@@ -239,9 +245,13 @@ func _physics_process(delta: float) -> void:
 	var yaw := _camera_rig.rotation.y
 	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
+	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
+	if crouch.crouched and (Input.is_action_just_pressed(&"sprint") or Input.is_action_just_pressed(&"jump")
+			or not StoryControl.can_move() or (jump_motor.airborne and not is_on_floor())):
+		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
-			and not is_drawing and not is_aiming
+			and not is_drawing and not is_aiming and not crouch.crouched
 	_running = sprinting
 	_update_stamina(delta)
 
@@ -252,6 +262,7 @@ func _physics_process(delta: float) -> void:
 		speed = sprint_speed
 	elif input.length() < 0.5:
 		speed = walk_speed
+	speed = crouch.limit_speed(speed)
 	speed *= Gameplay.inventory.speed_multiplier() * (1.0 + Gameplay.wardrobe.swift() * 0.5)
 	if body_state:
 		body_state.exertion = 1.0 if sprinting else (0.6 if is_drawing else 0.0)
@@ -716,6 +727,7 @@ func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
 
 
 func _build_components() -> void:
+	CrouchMotor.ensure_action()
 	if Gameplay.inventory.arrow_count() == 0 and starting_arrows > 0:
 		Gameplay.inventory.add(&"arrow_wood", starting_arrows)
 	Gameplay.register_save_providers()
