@@ -591,6 +591,18 @@ case_cleanup() {
 	expect "lane.sh recreates lane 5" tools/mq/lane.sh lane5 again "$d"
 	expect "lane 5 on its branch" test "$(git -C .lanes/lane5 symbolic-ref --short HEAD)" = lane5/again
 	expect "lane 7 refused (past MQ_LANES)" not tools/mq/lane.sh lane7 x "$d"
+	# A lane marked after one task, then given a second, is released after the second ends; and an
+	# unmarked idle clean lane is marked by cleanup itself.
+	m5=.git/mq/cleanup/marks/lane-$(printf lane5 | cksum | cut -d' ' -f1).mark
+	printf 'MQ_LANE_IDLE_SECS=3600\n' >> .git/mq/config
+	tools/mq/mark.sh lane lane5; sed -i '' 's/^after=.*/after=1/' "$m5"
+	tools/mq/mark.sh lane lane5
+	expect "second merge refreshes the lane mark" test "$(sed -n 's/^after=//p' "$m5")" -gt 1000000000
+	rm -f "$m5"; tools/mq/task.sh set "$d" status merged >/dev/null; touch -t 202001010000 .git/mq/tasks/$d/meta
+	for g in "$(git -C .lanes/lane5 rev-parse --absolute-git-dir)"/HEAD "$(git -C .lanes/lane5 rev-parse --absolute-git-dir)"/logs/HEAD; do touch -t 202001010000 "$g"; done
+	sed -i '' 's/^MQ_LANE_IDLE_SECS=3600/MQ_LANE_IDLE_SECS=0/' .git/mq/config
+	tools/mq/cleanup.sh
+	expect "unmarked idle clean lane gets marked and released" test ! -e .lanes/lane5
 }
 
 # Stands in for tools/mq/shots.sh: the same --start and --stop.

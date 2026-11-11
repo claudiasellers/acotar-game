@@ -23,6 +23,9 @@ lane_mark() { # laneN: only lanes above MQ_LANES_KEEP ever go
 	local n="${1#lane}"
 	case "$n" in ""|*[!0-9]*) return 0 ;; esac
 	[ "$n" -gt "$(mq_config_or MQ_LANES_KEEP 4)" ] || return 0
+	# Refreshed, not deduped: a lane that took another task must wait its grace again from the
+	# latest task end, or a stale mark meets a lane that merely looks busy and is dropped.
+	rm -f "$MARKS/lane-$(printf '%s' "$1" | cksum | cut -d' ' -f1).mark"
 	add lane "$1" "$(mq_config_or MQ_LANE_IDLE_SECS 7200)" "lane idle after its task ended"
 }
 

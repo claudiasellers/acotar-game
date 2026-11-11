@@ -154,8 +154,11 @@ do_lane() {
 	if [ "$n" -le "$LANE_KEEP" ] || [ ! -e "$wt/.git" ]; then drop "$f"; return 0; fi
 	why=$(lane_blocker "$lane" "$wt")
 	if [ -n "$why" ]; then
-		# Not logged as a deletion; the next task to end there marks the lane again.
-		say "keep lane worktree $lane: $why"; drop "$f"; return 0
+		# Not logged as a deletion; the next task to end there marks the lane again. A lane
+		# that only looks busy keeps its mark, renewed, so it is looked at again later.
+		[ "$why" = "busy again" ] && [ "$DRY" = 0 ] && MQ_MARKS="$MARKS" "$here/mark.sh" lane "$lane"
+		say "keep lane worktree $lane: $why"
+		[ "$why" = "busy again" ] || drop "$f"; return 0
 	fi
 	kb=$(du -sk "$wt" 2>/dev/null | cut -f1)
 	say "remove lane worktree $lane (idle $((LANE_IDLE / 60)) min, merged, clean; frees $(( ${kb:-0} / 1024 )) MB)"
@@ -271,8 +274,24 @@ backfill() {
 	done
 }
 
+# Idle clean lanes above LANE_KEEP that no producer marked (their task merged before marks
+# existed, or the mark was dropped) get one. Dirty or active lanes are left alone, unlogged.
+mark_idle_lanes() {
+	local wt lane n why
+	for wt in "$MQ_LANES_DIR"/lane[0-9]*; do
+		[ -e "$wt/.git" ] || continue
+		lane=$(basename "$wt"); n=${lane#lane}
+		case "$n" in ""|*[!0-9]*) continue ;; esac
+		[ "$n" -gt "$LANE_KEEP" ] || continue
+		[ -f "$MARKS/lane-$(printf '%s' "$lane" | cksum | cut -d' ' -f1).mark" ] && continue
+		why=$(lane_blocker "$lane" "$wt")
+		case "$why" in ""|"busy again") [ "$DRY" = 1 ] || MQ_MARKS="$MARKS" "$here/mark.sh" lane "$lane" ;; esac
+	done
+}
+
 pass() {
 	mq_is_home || return 0
+	mark_idle_lanes
 	process_marks
 }
 
