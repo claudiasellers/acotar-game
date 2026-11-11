@@ -396,6 +396,37 @@ case_union_log() {
 	expect "both lines kept" sh -c 'grep -qx a docs/program.md && grep -qx b docs/program.md'
 }
 
+# T109: a merge that dies with no conflict ("fatal: stash failed", a stat race
+# on this Mac) is tried once more, not a stall. A git shim fails the first entry
+# merge in the build worktree exactly as git did. The build lane's git also
+# ignores ctime.
+case_merge_retry() {
+	newrepo mretry
+	local a b real shim="$ROOT/mretry/shim" oldpath="$PATH"
+	real=$(command -v git)
+	mkdir -p "$shim"
+	cat > "$shim/git" <<EOF
+#!/bin/bash
+case " \$* " in *" merge -q --no-edit "*)
+	if [ ! -f "$shim/failed" ]; then touch "$shim/failed"; echo "fatal: stash failed" >&2; exit 128; fi ;;
+esac
+case " \$* " in *" core.trustctime=false "*) touch "$shim/noctime" ;; esac
+exec "$real" "\$@"
+EOF
+	chmod +x "$shim/git"
+	a=$(change a one); b=$(change b two)
+	queue "$a" T1; queue "$b" T2
+	export PATH="$shim:$PATH"
+	start_lane; drain
+	export PATH="$oldpath"
+	expect "the shim did fail a merge" test -f "$shim/failed"
+	expect "first merged" in_main "$a"
+	expect "second merged" in_main "$b"
+	expect "no stall" not grep -q STALLED .git/mq/events.log
+	expect "nobody rejected" not grep -q REJECTED .git/mq/events.log
+	expect "the build lane's git ignores ctime" test -f "$shim/noctime"
+}
+
 # A new generator with no recipe line is refused, with the fix in the message;
 # the same commit with its recipe is accepted. precheck.sh agrees.
 case_builder_recipe() {
@@ -1007,7 +1038,7 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check script_uid union_log builder_recipe miss_message stamp_without_output \
+		build_known_red needs_nothing marker_check script_uid union_log merge_retry builder_recipe miss_message stamp_without_output \
 		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards; do
 	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
 	# bash 3.2 has no wait -n: poll for a free slot.
