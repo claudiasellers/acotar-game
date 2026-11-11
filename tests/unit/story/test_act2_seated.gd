@@ -1,4 +1,4 @@
-# gate: when:story/*,core/*,systems/*,characters/*,data/story/*,data/wardrobe/*,data/regions/spring_court/*,data/bows/*,world/spring_court/manor_estate/*,art/film/*,project.godot
+# gate: when:story/*,core/*,systems/*,characters/*,data/story/*,data/wardrobe/*,data/regions/spring_court/*,world/spring_court/manor_estate/*,art/film/*,project.godot
 ## Seated actors at the manor's long table (T039, T041): Tamlin's oversized
 ## head chair, Lucien's side chair and Feyre's at the far end. A seated actor
 ## stands on the floor at the chair's centre, faces out from the chair's back,
