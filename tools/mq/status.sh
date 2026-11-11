@@ -45,7 +45,11 @@ while [ "$i" -le "$(mq_config_or MQ_LANES 4)" ]; do
 		[ -f "$m" ] || continue
 		if [ "$(kv_get "$m" status)" = active ] && [ "$(kv_get "$m" lane)" = "$lane" ]; then task=$(kv_get "$m" id); fi
 	done
-	br=$(git -C "$MQ_LANES_DIR/$lane" symbolic-ref -q --short HEAD 2>/dev/null || echo "(free)")
+	if [ -e "$MQ_LANES_DIR/$lane/.git" ]; then
+		br=$(git -C "$MQ_LANES_DIR/$lane" symbolic-ref -q --short HEAD 2>/dev/null || echo "(free)")
+	else
+		br="(free, not on disk)"
+	fi
 	printf '  %-6s %-6s %s\n' "$lane" "${task:--}" "$br"
 	i=$((i + 1))
 done
