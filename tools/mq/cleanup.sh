@@ -170,6 +170,50 @@ do_lane() {
 	drop "$f"
 }
 
+# A plain file a producer marked: an old log or a gate baseline, only inside .git/mq.
+# The baseline for main itself is never taken: the next gate needs it.
+do_file() {
+	local f="$1" t="$2" base
+	case "$t" in
+		"$MQ_DIR"/logs/*|"$MQ_DIR"/idlegate/logs/*|"$MQ_DIR"/baseline/*) ;;
+		*) say "keep $t: not a log or baseline"; drop "$f"; return 0 ;;
+	esac
+	case "$t" in *..*) drop "$f"; return 0 ;; esac
+	case "$t" in
+		"$MQ_DIR"/baseline/*)
+			base=$(basename "$t")
+			if [ "$base" = "$(git rev-parse -q --verify "$MQ_MAIN" 2>/dev/null)" ]; then
+				say "keep baseline ${base:0:9}: it is main's"; drop "$f"; return 0
+			fi ;;
+	esac
+	if [ -f "$t" ]; then
+		say "delete $(basename "$t") ($(kv_get "$f" why))"
+		[ "$DRY" = 1 ] && return 0
+		rm -f "$t"
+	fi
+	drop "$f"
+}
+
+# A superseded level build: target is <name>/<fingerprint> in the level cache. Never one that
+# any worktree's stamp still names (the terrain bake in use, main's, a lane's), one being
+# built, or the newest for its name.
+do_level() {
+	local f="$1" t="$2" name fp d s newest
+	name=${t%%/*}; fp=${t#*/}
+	case "$name$fp" in ""|*/*|*..*|.*) drop "$f"; return 0 ;; esac
+	d="$MQ_LEVELCACHE/$name/$fp"
+	[ -d "$d" ] || { drop "$f"; return 0; }
+	for s in "$MQ_GIT/mq-levels/$name" "$MQ_GIT"/worktrees/*/mq-levels/"$name"; do
+		if [ -f "$s" ] && [ "$(cat "$s" 2>/dev/null)" = "$fp" ]; then say "keep level $name $fp: a worktree still uses it"; drop "$f"; return 0; fi
+	done
+	if [ -d "$d.lock" ]; then return 0; fi
+	newest=$(ls -t "$MQ_LEVELCACHE/$name" 2>/dev/null | grep -vE '\.(lock|tmp)|^\.' | head -1)
+	if [ "$newest" = "$fp" ]; then say "keep level $name $fp: newest build"; drop "$f"; return 0; fi
+	say "delete level build $name $fp ($(kv_get "$f" why))"
+	[ "$DRY" = 1 ] && return 0
+	rm -rf "$d"; drop "$f"
+}
+
 process_marks() {
 	local f kind target after now needs_net=0
 	[ -d "$MARKS" ] || return 0
@@ -187,6 +231,8 @@ process_marks() {
 			dir) do_dir "$f" "$target" ;;
 			entry) do_entry "$f" "$target" ;;
 			lane) do_lane "$f" "$target" ;;
+			file) do_file "$f" "$target" ;;
+			level) do_level "$f" "$target" ;;
 			*) drop "$f" ;;
 		esac
 	done

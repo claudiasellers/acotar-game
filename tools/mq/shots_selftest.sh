@@ -107,6 +107,8 @@ request A 1 'from selftest\nquality layout\nsize 640x360\nshot cottage res://pro
 once
 check "answers a good request with status ok" 'result A-1 | grep -qx "status ok"'
 files=$(git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-A-1)
+mk="$T/mac/.git/mq/cleanup/marks"
+check "an answered request marks its req and res branches for cleanup, three days on" 'grep -qx "target=shots/req-A-1" "$mk"/remote_branch-*.mark && grep -qx "target=shots/res-A-1" "$mk"/remote_branch-*.mark && [ "$(sed -n s/^after=//p "$mk"/remote_branch-*.mark | head -1)" -gt "$(( $(date +%s) + 250000 ))" ]'
 check "result holds every picture and stats file" 'echo "$files" | grep -qx out/cottage/cottage.jpg && echo "$files" | grep -qx out/many/two.png && echo "$files" | grep -qx out/many/stats.json'
 check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/origin.git" rev-list --parents -1 refs/heads/shots/res-A-1 | cut -s -d" " -f2)" ] && ! echo "$files" | grep -q project.godot'
 check "renders in a small window in the corner, Dummy audio" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40"'
