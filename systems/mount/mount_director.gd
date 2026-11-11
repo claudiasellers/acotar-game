@@ -248,6 +248,9 @@ func _out_of_sight(p: Node3D, dist: float) -> Vector3:
 			if is_nan(y):
 				continue
 			at.y = y + 0.05
+			# Never from the far side of the Wall (T107): she couldn't get through.
+			if WorldMap.is_in_prythian(at) != WorldMap.is_in_prythian(p.global_position):
+				continue
 			if absf(y - p.global_position.y) < d * 0.6 and dread_at(at) <= 0.15 and not _roofed(at):
 				return at
 	return p.global_position + behind * 6.0
