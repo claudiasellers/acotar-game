@@ -56,12 +56,16 @@ const VIEWPOINTS := {
 	&"brae_top": [-760.0, -70.0], &"the_mound": [-1208.0, 270.0], &"village_pinch": [-700.0, -705.0],
 	&"village_green": [-930.0, -780.0], &"plateau_north": [-180.0, -1112.0], &"plateau_east": [-120.0, -1060.0],
 	&"rite_way": [555.0, -800.0], &"rite_trench": [520.0, -986.0], &"rite_crown": [870.0, -1140.0],
-	&"vale_rim": [720.0, 700.0], &"tower_hill": [-1630.0, -650.0], &"western_woods": [-1500.0, 900.0],
+	&"vale_rim": [734.0, 707.0], &"tower_hill": [-1630.0, -650.0], &"western_woods": [-1500.0, 900.0],
 	&"west_brink": [-1782.0, 180.0], &"sealed_pass": [-900.0, -1180.0], &"reaches": [1450.0, -1250.0],
 }
 
+## Zones are bucketed on this grid (m) so a query only tests its neighbours.
+const BUCKET := 64.0
+
 static var _mutex := Mutex.new()
 static var _zones: Array[Dictionary] = []
+static var _buckets := {}
 
 
 ## The landform at a point (Form). Water and the bands round it come first,
@@ -129,7 +133,10 @@ static func keep_open(x: float, z: float) -> bool:
 ## "path".
 static func keep_open_reason(x: float, z: float) -> StringName:
 	var p := Vector2(x, z)
-	for zn in zones():
+	zones()
+	var key := Vector2i(floori(x / BUCKET), floori(z / BUCKET))
+	for i: int in _buckets.get(key, []):
+		var zn := _zones[i]
 		if _in_zone(zn, p):
 			return zn["id"]
 	if path_distance(x, z) < PATH_CLEAR:
@@ -144,7 +151,23 @@ static func keep_open_reason(x: float, z: float) -> StringName:
 static func zones() -> Array[Dictionary]:
 	_mutex.lock()
 	if _zones.is_empty():
-		_zones = _build_zones()
+		var built := _build_zones()
+		var buckets := {}
+		for i in built.size():
+			var zn := built[i]
+			var a: Vector2 = zn["a"]
+			var b: Vector2 = zn["b"]
+			var r: float = zn["r"]
+			var lo := Vector2(minf(a.x, b.x), minf(a.y, b.y)) - Vector2(r, r)
+			var hi := Vector2(maxf(a.x, b.x), maxf(a.y, b.y)) + Vector2(r, r)
+			for bx in range(floori(lo.x / BUCKET), floori(hi.x / BUCKET) + 1):
+				for bz in range(floori(lo.y / BUCKET), floori(hi.y / BUCKET) + 1):
+					var k := Vector2i(bx, bz)
+					if not buckets.has(k):
+						buckets[k] = []
+					(buckets[k] as Array).append(i)
+		_buckets = buckets
+		_zones = built
 	var out := _zones
 	_mutex.unlock()
 	return out
