@@ -162,11 +162,11 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"lucien")
 			StoryControl.set_focus(actor(&"tamlin"))
-			EventBus.mood_requested.emit(&"dread", 0.35, 3.0, 0.0), "Lucien is gone"),
+			EventBus.mood_requested.emit(&"dread", 0.35, 3.0), "Lucien is gone"),
 		say(&"tamlin_court_posturing"),
 		say(&"tamlin_still_safe"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			EventBus.mood_requested.emit(&"calm", 0.0, 4.0, 0.0)
+			EventBus.mood_requested.emit(&"calm", 0.0, 4.0)
 			if tins:
 				delight(&"pickup", &"", tins)
 				tins.queue_free()
@@ -181,7 +181,7 @@ func _build_beats() -> Array:
 
 func _sting(_s: SceneSpace) -> void:
 	note_mood()
-	EventBus.mood_requested.emit(&"dread", 0.92, 0.35, 0.35)
+	EventBus.mood_requested.emit(&"dread", 0.92, 0.35)
 	SoundDirector.cue(&"horror_wrong", head_point())
 	SoundDirector.cue(&"beast_heartbeat")
 	EventBus.face_requested.emit(&"feyre", &"horror", 1.0, 4.0)
@@ -263,7 +263,7 @@ class DreadApproach:
 		if not is_equal_approx(want, _last):
 			_last = want
 			s.note_mood()
-			EventBus.mood_requested.emit(&"dread", want, 1.2, 0.0)
+			EventBus.mood_requested.emit(&"dread", want, 1.2)
 		return d <= FountainHead.RIM
 
 

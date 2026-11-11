@@ -22,6 +22,14 @@ func before_each() -> void:
 	_inside = _root.find_child("Interior", true, false) as Node3D
 
 
+## The cottage's Act I anchors make the one-per-game RideNorth under StoryDirector; it outlives the
+## cottage, and its staging stays on EventBus.mood_requested for every test after this one.
+func after_each() -> void:
+	var ride := StoryDirector.get_node_or_null(^"RideNorth")
+	if ride:
+		ride.free()
+
+
 func _local(n: String) -> Vector3:
 	var node := _inside.get_parent().find_child(n, true, false) as Node3D   # the cottage (door) or the interior
 	assert_not_null(node, n)
