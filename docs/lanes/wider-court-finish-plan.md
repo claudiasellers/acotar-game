@@ -31,6 +31,49 @@ exploration ("make a plan for what comes next based on everything else"). The te
   - the Western Woods grade turns the ground teal;
   - a tree stands on two viewpoints (`vale_rim`, `western_woods`).
 
+## Work list by dependency (2026-11-10)
+
+Owner: "keep a list of the plan items, organise them by dependency, and move forward
+with the ones that make sense for now." Each item below has an id, its dependencies,
+and its status. Details for each item are in the phase sections further down.
+
+| Id | Item | Depends on | Status |
+|---|---|---|---|
+| T1 | Tree intake: Quaternius models, EZ-Tree seeds, licences (repaint EZ leaves, check bark) | — | **ready** |
+| T2 | Budgets: near ≤ 4.5k tris, far ≤ 600 | T1 | waiting |
+| T3 | Variety layer: yaw, scale, per-tree shade, EZ builds | T1 | waiting |
+| T4 | Roles and recolours: blossom, birch bark, autumn, the flowering bush fixed | T1 | waiting |
+| T5 | Willow of our own | D1, T4 | waiting |
+| T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | waiting |
+| T7 | Frame time on a dense mixed wood and the court views | T6 | waiting |
+| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | waiting |
+| P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings and viewpoints kept open | — | **ready** |
+| P2 | Region recipes on the new roles | P1, T6 | waiting |
+| P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting |
+| P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting |
+| G1 | Ground cover preview: Quaternius plants vs shader grass vs none | — | **ready** |
+| G2 | Ground cover build; becomes the fire fuel | G1 (owner's pick) | waiting |
+| C1 | Grade previews: the milky glen, the teal Western Woods | — | **ready** |
+| C2 | Grade change | C1 (owner's pick) | waiting |
+| E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting |
+| E2 | Apply the estate decision | E1, D2 | waiting |
+| V1 | Tavern and well on the village green | P2 (same content file) | waiting |
+| H1 | Housekeeping: drop the previews and the card trees | T8 | waiting |
+| L | Landmark models | owner (later) | deferred |
+
+Owner decisions:
+
+| Id | Decision | Status |
+|---|---|---|
+| D1 | Willow: make our own, or skip | open |
+| D2 | Estate: new trees everywhere, or court only (after E1) | open, after E1 |
+| D3 | Borders: seal every region border, or only the Autumn border and the edge | open |
+| D4 | Opening times: phase table vs `CourtMap.UNLOCK_PHASE` (Rosewild, Blossom Vale) | open (story lane) |
+
+The critical path is T1 → T2/T3/T4 → T6 → P2 → P3 → P4. P1, G1 and C1 can run beside
+T1 now. They touch different files: P1 is `court_height.gd` and the habitat code, G1
+and C1 are preview tooling, and T1 is the new asset folder.
+
 ## Phase T — the new trees in the game (next)
 
 1. **Intake.**
