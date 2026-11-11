@@ -159,4 +159,4 @@ func test_indoors_furniture_behind_her_does_not_shove_the_camera_in() -> void:
 func test_a_short_arm_moves_her_off_centre() -> void:
 	var f := _feyre()
 	assert_eq(f.close_shoulder(2.4), 0.0, "the usual arm is centred")
-	assert_almost_eq(f.close_shoulder(Feyre.ROOM_MIN_ARM), Feyre.CLOSE_SHOULDER, 0.001, "the shortest is over her shoulder")
+	assert_almost_eq(f.close_shoulder(FeyreCamera.ROOM_MIN_ARM), FeyreCamera.CLOSE_SHOULDER, 0.001, "the shortest is over her shoulder")

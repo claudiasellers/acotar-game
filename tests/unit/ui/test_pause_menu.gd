@@ -108,7 +108,7 @@ func test_r_recentres_the_camera_behind_her_quickly() -> void:
 	for i in 20:  # a third of a second at 60 fps
 		f._process(1.0 / 60.0)
 	assert_almost_eq(angle_difference(f.camera_yaw(), 0.4), 0.0, 0.02)
-	assert_almost_eq(f.camera_pitch(), Feyre.DEFAULT_PITCH, 0.02)
+	assert_almost_eq(f.camera_pitch(), FeyreCamera.DEFAULT_PITCH, 0.02)
 
 
 func test_r_press_is_a_short_shift_the_short_way_round() -> void:

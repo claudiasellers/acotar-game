@@ -5,12 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"manor_map"
-chapters = "12"
+chapters = "7-12"
 anchor_id = &""
 region_id = &"manor_house"
-require_flags = PackedStringArray("puca_resisted")
+require_flags = PackedStringArray("fact.alis_tripped")
 night_only = false
 trigger = &"auto"
 entry_radius = 6.0
-steps = Array[Dictionary]([{"do": "until_flag", "flag": "fact.hall_mark_1"}, {"do": "until_flag", "flag": "fact.hall_mark_2"}, {"do": "until_flag", "flag": "fact.hall_mark_3"}, {"do": "until_flag", "flag": "fact.hall_mark_4"}, {"do": "until_flag", "flag": "fact.hall_mark_5"}, {"do": "until_flag", "flag": "fact.hall_map_set_down"}, {"do": "raise", "flag": "manor_map_drawn"}, {"do": "celebrate", "kind": "map"}])
-notes = "Global: all five marks made and the map set down on the foyer table (WoundDressing)."
+steps = Array[Dictionary]([{"do": "until_flag", "flag": "fact.hall_mark_1"}, {"do": "until_flag", "flag": "fact.hall_mark_2"}, {"do": "until_flag", "flag": "fact.hall_mark_3"}, {"do": "until_flag", "flag": "fact.hall_mark_4"}, {"do": "until_flag", "flag": "fact.hall_mark_5"}, {"do": "until_flag", "flag": "fact.hall_rooms_enough"}, {"do": "raise", "flag": "manor_map_drawn"}, {"do": "celebrate", "kind": "map"}])
+notes = "Global and ongoing: all five marks made and enough rooms on her page (HallMap)."

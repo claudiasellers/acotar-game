@@ -77,6 +77,9 @@ push_result() { # sigf tagname message
 	if mq_timeout "$NET" git push -q "$REMOTE" "refs/tags/$tag"; then
 		kv_set "$sigf" state done
 		mq_event RESULT "$tag"
+		# The answer is out: the ready branch can go once it has aged.
+		case "$(kv_get "$sigf" ref)" in refs/heads/lead/ready-*)
+			"$here/mark.sh" add remote_branch "lead/ready-${tag#*/}" 259200 "answered $tag" ;; esac
 	elif [ -z "$(kv_get "$sigf" pushfail)" ]; then
 		# Never undoes a merge. Logged once, retried on the next pass.
 		kv_set "$sigf" pushfail 1

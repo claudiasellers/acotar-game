@@ -4,10 +4,10 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
-## Seconds to reach a full draw.
-@export var draw_time: float = 0.8
-## Arrow launch speed in m/s at a minimal and at a full draw.
-@export var min_speed: float = 15.0
+## Seconds from raising the bow until it is nocked (T101). After that every
+## shot is full power; upgrades can shorten this.
+@export var nock_time: float = 0.3
+## Arrow launch speed in m/s. Every shot is full power.
 @export var max_speed: float = 48.0
 ## Degrees of aim sway at full draw before body state modifies it.
 @export var sway_degrees: float = 1.5

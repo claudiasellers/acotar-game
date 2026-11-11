@@ -159,3 +159,45 @@ func test_hint_state_saves_and_loads() -> void:
 	k.load_state(saved)
 	assert_eq(k.ladder.shown(&"bathe"), 1)
 	assert_true(SaveSystem.snapshot().get("providers", {}).has(StoryJournal.SAVE_KEY), "registered with SaveSystem")
+
+
+func test_the_map_runs_beside_the_other_steps_until_drawn() -> void:
+	var book := _book()
+	var p2 := book.chapter_for(&"p2_grounds")
+	for f in ["wall_crossed", "fact.manor_arrived", "fact.alis_bathed", "first_dinner_eaten", "curtain_trap_set"]:
+		_flags[f] = true
+	assert_eq(book.ongoing(_has), [], "no map before Alis trips the rope")
+	_flags["fact.alis_tripped"] = true
+	assert_eq(p2.current(_has).id, &"stables", "the ongoing map is never the current step")
+	var side := book.ongoing(_has)
+	assert_eq(side.size(), 1)
+	assert_eq(side[0].id, &"map")
+	assert_true(side[0].after.contains("know my way around"))
+	for f in ["fact.hunt_invited", "bogge_survived", "puca_resisted"]:
+		_flags[f] = true
+	assert_eq(book.ongoing(_has)[0].id, &"map", "still on her mind into the next chapter")
+	var p3 := book.chapter_for(&"p3_house_and_woods")
+	assert_false(p3.current(_has).is_ready(_has), "the Bogge night waits for the map")
+	_flags["manor_map_drawn"] = true
+	assert_eq(book.ongoing(_has), [], "done once drawn")
+	assert_eq(p3.current(_has).id, &"wound")
+	assert_true(p3.current(_has).is_ready(_has))
+
+
+func test_panel_shows_the_ongoing_map_and_never_a_step_ahead() -> void:
+	var j := StoryJournal.new(_book())
+	j.has_flag = _has
+	j.phase_getter = func() -> StringName: return &"p2_grounds"
+	add_child_autofree(j)
+	for f in ["wall_crossed", "fact.manor_arrived", "fact.alis_bathed", "first_dinner_eaten", "curtain_trap_set",
+			"fact.alis_tripped", "fact.hunt_invited", "bogge_survived"]:
+		_flags[f] = true
+	j.phase_getter = func() -> StringName: return &"p2_grounds"
+	j.refresh()
+	assert_eq(j.entry.id, &"puca", "p2's last step is still what she's after")
+	assert_eq(j.side.size(), 1, "with the map beside it")
+	_flags["puca_resisted"] = true
+	j.phase_getter = func() -> StringName: return &"p3_house_and_woods"
+	j.refresh()
+	assert_eq(j.entry.id, &"map", "in p3 the map is what she's after until it's drawn, not the Bogge night")
+	assert_eq(j.side, [])

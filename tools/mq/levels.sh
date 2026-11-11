@@ -174,6 +174,21 @@ ensure_one() {
 		return 1
 	fi
 	echo "$fp" > "$stamp"
+	mark_superseded "$name" "$fp" "$log"
+}
+
+# Marks, never deletes: the log after its retention, and every older build of this
+# recipe after a week. cleanup.sh re-checks that no worktree's stamp still names one.
+mark_superseded() { # name fp log
+	local d
+	local mk="$MQ_BIN/mark.sh"; [ -x "$mk" ] || mk="$here/mark.sh"
+	[ -f "$3" ] && "$mk" add file "$3" $(( $(mq_config_or MQ_CLEANUP_LOG_DAYS 14) * 86400 )) "build log" || true
+	for d in "$MQ_LEVELCACHE/$1"/*/; do
+		d=$(basename "$d")
+		[ "$d" = "$2" ] || [ "$d" = '*' ] && continue
+		case "$d" in *.lock|.*) continue ;; esac
+		"$mk" add level "$1/$d" "$(mq_config_or MQ_LEVEL_KEEP_SECS 604800)" "superseded by $2" || true
+	done
 }
 
 # What a builder's log says when it can't see a project class: a missing or

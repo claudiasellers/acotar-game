@@ -64,6 +64,19 @@ event() {
 	return 0
 }
 
+# Marks the answered branches for cleanup.sh (written directly: this script runs from a
+# copy without mark.sh). Same file name and format as mark.sh's remote_branch marks.
+mark_answered() { # key
+	local b f keep now
+	keep=$(conf MQ_SHOTS_KEEP_SECS 259200); now=$(shots_epoch)
+	mkdir -p "$MQ/cleanup/marks"
+	for b in "shots/req-$1" "shots/res-$1"; do
+		f="$MQ/cleanup/marks/remote_branch-$(printf '%s' "$b" | cksum | cut -d' ' -f1).mark"
+		[ -f "$f" ] && continue
+		printf 'kind=remote_branch\ntarget=%s\nafter=%s\nwhy=%s\n' "$b" "$((now + keep))" "shots answered" >"$f.tmp" && mv "$f.tmp" "$f"
+	done
+}
+
 home_machine() { [ "$(conf MQ_HOME_MACHINE 0)" = 1 ]; }
 
 refuse_unless_home() {
@@ -415,14 +428,27 @@ TIMEOUT=300
 JSON_TIMEOUT=1800
 PREPS=""
 parse_probes() {
-	local f="$WT/.shots/probes.txt" kw a b n=0 labels=" " line
+	local f="$WT/.shots/probes.txt" kw a b n=0 labels=" " line bad
 	SIZE=1920x1080 METHOD="" TIMEOUT=300 PREPS="" QUALITY=look
 	: >"$RES/plan.txt"
 	while IFS= read -r line || [ -n "$line" ]; do
 		line=$(echo "$line" | sed 's/[[:space:]]*$//')
 		case "$line" in '' | '#'*) continue ;; esac
-		if echo "$line" | grep -q '[^A-Za-z0-9_.,:=/+@{} -]'; then
-			echo "unsupported character in: $line"; return 1
+		case "$line" in
+		from | from[[:space:]]*)
+			# A free-text label: never run or used as a path. Printable ASCII
+			# only (no control characters), at most 200 characters.
+			bad=$(printf '%s' "$line" | LC_ALL=C grep -o '[^ -~]' | head -n1)
+			if [ -n "$bad" ] || [ "${#line}" -gt 200 ]; then
+				if [ -n "$bad" ]; then echo "unsupported character $(printf '%s' "$bad" | od -An -c | tr -d ' ') in from line (printable ASCII only)"
+				else echo "from line is longer than 200 characters"; fi
+				return 1
+			fi
+			continue ;;
+		esac
+		bad=$(printf '%s' "$line" | LC_ALL=C grep -o '[^A-Za-z0-9_.,:=/+@{} -]' | head -n1)
+		if [ -n "$bad" ]; then
+			echo "unsupported character '$bad' in: $line"; return 1
 		fi
 		set -- $line
 		kw="$1"; shift
@@ -548,6 +574,7 @@ handle() { # key sha
 		mkdir -p "$S/done"
 		echo "$sha reused $(shots_epoch)" >"$S/done/$key"
 		rm -rf "${S:?}/work/${key:?}"
+		mark_answered "$key"
 		event "ANSWERED $key from $prev (same code and request)"
 		return 0
 	fi
@@ -601,6 +628,7 @@ handle() { # key sha
 	echo "$sha $status $(shots_epoch)" >"$S/done/$key"
 	[ "$status" = ok ] && echo "$key" >"$S/bytree/$tree"
 	rm -rf "${S:?}/work/${key:?}"
+	mark_answered "$key"
 	event "ANSWERED $key $status in $(($(shots_epoch) - t0))s"
 	return 0
 }

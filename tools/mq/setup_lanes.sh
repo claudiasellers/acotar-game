@@ -65,11 +65,15 @@ make_worktrees() {
 	i=1
 	while [ "$i" -le "$NLANES" ]; do
 		wt="$MQ_LANES_DIR/lane$i"
-		if [ ! -d "$wt" ]; then
-			git -C "$MQ_REPO" worktree add -q --detach "$wt" "$MQ_MAIN"
+		# Lanes 1..MQ_LANES_KEEP (default 4) always exist. Higher ones are made
+		# on demand by lane.sh and released by cleanup.sh once idle for a long
+		# time; MQ_LANES_EAGER=1 makes them all here instead.
+		if [ -e "$wt/.git" ]; then
+			git -C "$MQ_REPO" worktree lock --reason "mq: lane$i" "$wt" 2>/dev/null
+			seed_worktree "$wt"
+		elif [ "$i" -le "$(mq_config_or MQ_LANES_KEEP 4)" ] || [ "$(mq_config_or MQ_LANES_EAGER 0)" = 1 ]; then
+			"$here/lane.sh" --make "lane$i"
 		fi
-		git -C "$MQ_REPO" worktree lock --reason "mq: lane$i" "$wt" 2>/dev/null
-		seed_worktree "$wt"
 		i=$((i + 1))
 	done
 }

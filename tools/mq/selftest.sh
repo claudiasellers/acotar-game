@@ -9,11 +9,19 @@ unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE MQ_SCRATCH
 SRC=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(mktemp -d "${TMPDIR:-/tmp}/mq-selftest.XXXXXX")
 PASSED=0; FAILED=0; ONLY="${1:-}"
-cleanup_all() {
+# Scenarios each get their own repo, so they run side by side.
+JOBS=${MQ_SELFTEST_JOBS:-6}
+stop_repo() { # repo: kills the loops it started
 	local f
 	for f in lock/pid cleanup.pid shots/lock/pid; do
-		[ -f "$REPO/.git/mq/$f" ] 2>/dev/null && kill "$(cat "$REPO/.git/mq/$f")" 2>/dev/null
+		[ -f "$1/.git/mq/$f" ] 2>/dev/null && kill "$(cat "$1/.git/mq/$f")" 2>/dev/null
 	done
+}
+cleanup_all() {
+	local r p
+	for p in $(jobs -p); do kill "$p" 2>/dev/null; done
+	for r in "$ROOT"/*/repo; do [ -d "$r" ] && stop_repo "$r"; done
+	wait 2>/dev/null
 	rm -rf "$ROOT"
 }
 REPO=""
@@ -31,9 +39,17 @@ while [ "$#" -gt 0 ]; do
 			exit 0 ;;
 		-s) s="$2"; shift 2 ;;
 		check) t="$2"; shift 2 ;;
+		-gtest=*) g="${1#-gtest=}"; shift ;;
 		*) shift ;;
 	esac
 done
+# GUT: fail_<test> fails that test; clash fails any engine that runs two.
+if [ -n "${g:-}" ]; then
+	case "$g" in *,*) [ -f clash ] && { echo "tests clashed"; exit 1; } ;; esac
+	for x in $(echo "$g" | tr , ' '); do
+		x=$(basename "$x" .gd); [ -f "fail_$x" ] && { echo "fake $x failed"; exit 1; }
+	done
+fi
 case "${s:-}" in *parse_check.gd) exit 0 ;; esac
 [ -f slow ] && sleep 30
 [ "${t:-}" = a ] && [ -f race_me ] && [ -x "$(dirname "$0")/race.sh" ] && "$(dirname "$0")/race.sh" >/dev/null 2>&1
@@ -88,6 +104,7 @@ MQ_CLEANUP_OFF=1
 MQ_SUBMIT_NO_START=1
 MQ_CLOUD=1
 MQ_FETCH_TIMEOUT=20
+MQ_LANES_EAGER=1
 EOF
 	tools/mq/setup_lanes.sh >/dev/null
 	# The lane starts detached: wait for its lock, or the stop can miss it.
@@ -120,7 +137,7 @@ queue() { # queue sha task
 
 drain() { # wait for an empty queue
 	local i=0
-	while [ "$i" -lt 240 ]; do
+	while [ "$i" -lt 960 ]; do
 		if ! ls .git/mq/pending/*.entry >/dev/null 2>&1 && ! ls -d .git/mq/batches/* >/dev/null 2>&1; then
 			return 0
 		fi
@@ -137,15 +154,17 @@ expect() { # description, then a command
 }
 not() { ! "$@"; }
 
+# Runs one scenario in a subshell of its own; its output goes to $ROOT/out.NAME
+# and its exit says whether it passed.
 scenario() {
-	local name="$1"
-	[ -n "$ONLY" ] && [ "$ONLY" != "$name" ] && return
+	local name="$1" t0=$SECONDS
 	CASE_OK=1
-	( cd "$ROOT" )
+	cd "$ROOT" || exit 1
+	trap '[ -n "$REPO" ] && stop_repo "$REPO"' EXIT
 	"case_$name"
 	stop_lane 2>/dev/null
-	if [ "$CASE_OK" = 1 ]; then echo "ok   $name"; PASSED=$((PASSED + 1))
-	else echo "FAIL $name"; FAILED=$((FAILED + 1)); fi
+	if [ "$CASE_OK" = 1 ]; then echo "ok   $name ($((SECONDS - t0))s)"; exit 0
+	else echo "FAIL $name ($((SECONDS - t0))s)"; exit 1; fi
 }
 
 # Four changes with one bad: first, middle, last. Each batch must take two runs
@@ -307,7 +326,7 @@ case_stop_mid_batch() {
 	a=$(change a one slow)
 	queue "$a" T1
 	start_lane
-	while ! ls .git/mq/batches/*/*.entry >/dev/null 2>&1 && [ "$i" -lt 80 ]; do
+	while ! ls .git/mq/batches/*/*.entry >/dev/null 2>&1 && [ "$i" -lt 600 ]; do
 		perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1))
 	done
 	sleep 1
@@ -316,7 +335,7 @@ case_stop_mid_batch() {
 	mv .git/mq/batches/* "$ROOT/x" 2>/dev/null; mv "$ROOT/x" .git/mq/batches/left
 	start_lane
 	i=0
-	while ! grep -q RECOVERED .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1)); done
+	while ! grep -q RECOVERED .git/mq/events.log && [ "$i" -lt 1500 ]; do perl -e 'select(undef,undef,undef,0.1)'; i=$((i + 1)); done
 	expect "batch came back" grep -q RECOVERED .git/mq/events.log
 	stop_lane
 	expect "entry is queued again" test -n "$(ls .git/mq/pending/*.entry .git/mq/batches/*/*.entry 2>/dev/null)"
@@ -331,7 +350,7 @@ case_stall_no_engine() {
 	sed -i '' "s#^MQ_ENGINE=.*#MQ_ENGINE=$ROOT/no-such-engine#" .git/mq/config
 	start_lane
 	local i=0
-	while ! grep -q STALLED .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q STALLED .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "stalled" grep -q STALLED .git/mq/events.log
 	expect "not rejected" not rejected T1
 	stop_lane
@@ -376,6 +395,37 @@ case_union_log() {
 	expect "second merged, not a conflict" in_main "$b"
 	git fetch -q origin; git checkout -q --detach origin/main
 	expect "both lines kept" sh -c 'grep -qx a docs/program.md && grep -qx b docs/program.md'
+}
+
+# T109: a merge that dies with no conflict ("fatal: stash failed", a stat race
+# on this Mac) is tried once more, not a stall. A git shim fails the first entry
+# merge in the build worktree exactly as git did. The build lane's git also
+# ignores ctime.
+case_merge_retry() {
+	newrepo mretry
+	local a b real shim="$ROOT/mretry/shim" oldpath="$PATH"
+	real=$(command -v git)
+	mkdir -p "$shim"
+	cat > "$shim/git" <<EOF
+#!/bin/bash
+case " \$* " in *" merge -q --no-edit "*)
+	if [ ! -f "$shim/failed" ]; then touch "$shim/failed"; echo "fatal: stash failed" >&2; exit 128; fi ;;
+esac
+case " \$* " in *" core.trustctime=false "*) touch "$shim/noctime" ;; esac
+exec "$real" "\$@"
+EOF
+	chmod +x "$shim/git"
+	a=$(change a one); b=$(change b two)
+	queue "$a" T1; queue "$b" T2
+	export PATH="$shim:$PATH"
+	start_lane; drain
+	export PATH="$oldpath"
+	expect "the shim did fail a merge" test -f "$shim/failed"
+	expect "first merged" in_main "$a"
+	expect "second merged" in_main "$b"
+	expect "no stall" not grep -q STALLED .git/mq/events.log
+	expect "nobody rejected" not grep -q REJECTED .git/mq/events.log
+	expect "the build lane's git ignores ctime" test -f "$shim/noctime"
 }
 
 # A new generator with no recipe line is refused, with the fix in the message;
@@ -447,7 +497,7 @@ case_idle_gate() {
 	a=$(change a one)
 	queue "$a" T1
 	start_lane; drain
-	while ! grep -q 'FULLGATE passed' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q 'FULLGATE passed' .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "full gate ran" grep -q 'FULLGATE passed' .git/mq/events.log
 	stop_lane
 	git worktree list >/dev/null
@@ -464,7 +514,7 @@ case_idle_gate_red_and_killed() {
 	queue "$a" T1
 	start_lane; drain
 	expect "when: skipped it in the batch" in_main "$a"
-	while ! grep -q 'c is red' .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q 'c is red' .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	expect "full gate found it" grep -q 'c is red' .git/mq/events.log
 	expect "task made" sh -c "tools/mq/task.sh list | grep -q 'found c red'"
 	stop_lane
@@ -487,27 +537,72 @@ case_idle_gate_red_and_killed() {
 
 case_cleanup() {
 	newrepo clean2
-	local a b
-	a=$(change merged one); git push -q origin "$a:refs/heads/lane/merged"
-	b=$(change open two); git push -q origin "$b:refs/heads/lane/open"
-	git push -q origin "$b:refs/heads/lead/ready-T7-1"
-	git push -q origin "$b:refs/heads/vendor/keep"
+	local a b d
+	mark() { tools/mq/mark.sh add "$@"; }
+	a=$(change merged one fa); git push -q origin "$a:refs/heads/lane/merged"
+	git push -q origin "$a:refs/heads/lane/later"
 	queue "$a" T1; start_lane; drain; stop_lane
+	b=$(change open two fb); git push -q origin "$b:refs/heads/lane/open"
+	git push -q origin "$b:refs/heads/vendor/keep"
 	echo keep > untracked_file
-	kv="MQ_CLEANUP_MIN_AGE=0"; echo "$kv" >> .git/mq/config
+	git fetch -q origin
+	# Nothing marked: nothing goes, however old or merged.
 	tools/mq/cleanup.sh
-	expect "merged lane branch gone" test -z "$(git ls-remote origin refs/heads/lane/merged)"
-	expect "open lane branch kept" test -n "$(git ls-remote origin refs/heads/lane/open)"
-	expect "ready branch kept" test -n "$(git ls-remote origin refs/heads/lead/ready-T7-1)"
+	expect "no marks: merged branch kept" test -n "$(git ls-remote origin refs/heads/lane/merged)"
+	# mark -> delete; unmerged kept; retention respected.
+	mark remote_branch lane/merged 0 test
+	mark remote_branch lane/open 0 test
+	mark remote_branch vendor/keep 0 test
+	mark remote_branch lane/later 3600 test
+	tools/mq/cleanup.sh
+	expect "marked merged branch deleted" test -z "$(git ls-remote origin refs/heads/lane/merged)"
+	expect "marked unmerged branch kept" test -n "$(git ls-remote origin refs/heads/lane/open)"
+	expect "unmerged keep logged" grep -q "keep remote branch lane/open" .git/mq/events.log
 	expect "other branch kept" test -n "$(git ls-remote origin refs/heads/vendor/keep)"
+	expect "inside retention: kept" test -n "$(git ls-remote origin refs/heads/lane/later)"
+	expect "inside retention: mark waits" test -f .git/mq/cleanup/marks/remote_branch-$(printf lane/later | cksum | cut -d' ' -f1).mark
+	expect "deletion logged" grep -q "CLEANUP delete remote branch lane/merged" .git/mq/events.log
 	expect "untracked file kept" test -f untracked_file
 	rm -f untracked_file
-	ls .git/mq/pending/*.entry >/dev/null 2>&1
+	# What is left: the retention-held mark and the build lane's own entry mark (14 days).
+	expect "build lane marked the merged entry" ls .git/mq/cleanup/marks/entry-*.mark
+	expect "refused marks are dropped" test "$(ls .git/mq/cleanup/marks | grep -vc '^file-')" = 2
+	# A queued commit is never taken, even when marked.
 	touch .git/mq/pending/busy
-	git push -q origin "$a:refs/heads/lane/merged2"
+	git push -q origin "$a:refs/heads/lane/merged2"; mark remote_branch lane/merged2 0 test
 	tools/mq/cleanup.sh
-	expect "not idle: nothing deleted" test -n "$(git ls-remote origin refs/heads/lane/merged2)"
 	rm -f .git/mq/pending/busy
+	# Lanes: 1..MQ_LANES_KEEP stay; above that, removed once marked and idle, and recreated on demand.
+	printf 'MQ_LANES=6\nMQ_LANE_IDLE_SECS=0\nMQ_LANES_KEEP=4\n' >> .git/mq/config
+	tools/mq/lane.sh --make lane5 >/dev/null; tools/mq/lane.sh --make lane1 >/dev/null
+	tools/mq/mark.sh lane lane1; tools/mq/mark.sh lane lane5
+	expect "lane 1 is never marked" test ! -f .git/mq/cleanup/marks/lane-$(printf lane1 | cksum | cut -d' ' -f1).mark
+	echo wip > .lanes/lane5/wip.txt
+	tools/mq/cleanup.sh
+	expect "lane with uncommitted work kept" test -f .lanes/lane5/wip.txt
+	expect "keep reason logged" grep -q "keep lane worktree lane5: uncommitted" .git/mq/events.log
+	rm -f .lanes/lane5/wip.txt
+	tools/mq/mark.sh lane lane5; tools/mq/cleanup.sh
+	expect "idle clean lane 5 removed" test ! -e .lanes/lane5
+	expect "lane 5 removal logged" grep -q "CLEANUP remove lane worktree lane5" .git/mq/events.log
+	expect "lane 1 still there" test -e .lanes/lane1/.git
+	d=$(tools/mq/task.sh add "t")
+	expect "status copes with a missing lane" sh -c "tools/mq/status.sh | grep -q 'lane5 .*not on disk'"
+	expect "lane.sh recreates lane 5" tools/mq/lane.sh lane5 again "$d"
+	expect "lane 5 on its branch" test "$(git -C .lanes/lane5 symbolic-ref --short HEAD)" = lane5/again
+	expect "lane 7 refused (past MQ_LANES)" not tools/mq/lane.sh lane7 x "$d"
+	# A lane marked after one task, then given a second, is released after the second ends; and an
+	# unmarked idle clean lane is marked by cleanup itself.
+	m5=.git/mq/cleanup/marks/lane-$(printf lane5 | cksum | cut -d' ' -f1).mark
+	printf 'MQ_LANE_IDLE_SECS=3600\n' >> .git/mq/config
+	tools/mq/mark.sh lane lane5; sed -i '' 's/^after=.*/after=1/' "$m5"
+	tools/mq/mark.sh lane lane5
+	expect "second merge refreshes the lane mark" test "$(sed -n 's/^after=//p' "$m5")" -gt 1000000000
+	rm -f "$m5"; tools/mq/task.sh set "$d" status merged >/dev/null; touch -t 202001010000 .git/mq/tasks/$d/meta
+	for g in "$(git -C .lanes/lane5 rev-parse --absolute-git-dir)"/HEAD "$(git -C .lanes/lane5 rev-parse --absolute-git-dir)"/logs/HEAD; do touch -t 202001010000 "$g"; done
+	sed -i '' 's/^MQ_LANE_IDLE_SECS=3600/MQ_LANE_IDLE_SECS=0/' .git/mq/config
+	tools/mq/cleanup.sh
+	expect "unmarked idle clean lane gets marked and released" test ! -e .lanes/lane5
 }
 
 # Stands in for tools/mq/shots.sh: the same --start and --stop.
@@ -590,7 +685,7 @@ case_standing() {
 
 wait_for() { # pattern: until it is in the events log
 	local i=0
-	while ! grep -q "$1" .git/mq/events.log && [ "$i" -lt 80 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
+	while ! grep -q "$1" .git/mq/events.log && [ "$i" -lt 600 ]; do perl -e 'select(undef,undef,undef,0.25)'; i=$((i + 1)); done
 	grep -q "$1" .git/mq/events.log
 }
 
@@ -756,7 +851,7 @@ EOF
 in_build() { ( cd "$REPO/.lanes/build" && "$@" ); }
 commit_build() { in_build sh -c "$1; git add -A; git -c user.name=s -c user.email=s@example.invalid commit -q -m step"; }
 gate() { # out-name gate-args: the installed gate, in the build worktree
-	GATE_OUT="$ROOT/gate-$1"; shift
+	GATE_OUT="$REPO/../gate-$1"; shift
 	in_build /bin/bash "$REPO/.git/mq/bin/gate.sh" --out "$GATE_OUT" "$@"
 }
 said() { grep -q "^$1 $2 " "$GATE_OUT/results.txt"; }
@@ -866,6 +961,49 @@ case_miss_message() {
 	expect "stdout stays empty on a hit" test ! -s "$ROOT/hit.out"
 }
 
+case_marks_from_levels() {
+	bake_repo levelmarks
+	echo 0 > bake_secs
+	local fa fb mk=.git/mq/cleanup/marks
+	tools/mq/levels.sh ensure 2>/dev/null
+	fa=$(tools/mq/levels.sh fingerprint terrain)
+	expect "the first build marks nothing but its log" test "$(ls $mk | grep -c '^level-')" = 0
+	expect "the build log is marked for rotation" grep -q "^target=.*build-terrain-$fa.log" $mk/file-*.mark
+	echo two > bake_input
+	tools/mq/levels.sh ensure 2>/dev/null
+	fb=$(tools/mq/levels.sh fingerprint terrain)
+	expect "the replaced build is marked" grep -qx "target=terrain/$fa" $mk/level-*.mark
+	expect "the current build is not marked" not grep -qx "target=terrain/$fb" $mk/level-*.mark
+	# A build a worktree's stamp still names is never taken, even when marked and due.
+	sed -i '' 's/^after=.*/after=0/' $mk/level-*.mark
+	echo "$fa" > .git/mq-levels/terrain
+	tools/mq/cleanup.sh
+	expect "a stamped build survives its mark" test -d ".git/levelcache/terrain/$fa"
+	echo "$fb" > .git/mq-levels/terrain
+	tools/mq/mark.sh add level "terrain/$fa" 0 test
+	tools/mq/cleanup.sh
+	expect "an unused superseded build goes" test ! -d ".git/levelcache/terrain/$fa"
+	expect "the newest build stays" test -d ".git/levelcache/terrain/$fb"
+}
+
+case_marks_from_baselines() {
+	newrepo basemarks
+	local a b mk=.git/mq/cleanup/marks tipa tipb
+	a=$(change a one); b=$(change b two)
+	queue "$a" T1; start_lane; drain
+	tipa=$(git rev-parse origin/main)
+	expect "first landing leaves a baseline" test -f .git/mq/baseline/$tipa
+	queue "$b" T2; drain
+	tipb=$(git rev-parse origin/main)
+	expect "the replaced main's baseline is marked" grep -qx "target=$(pwd -P)/.git/mq/baseline/$tipa" $mk/file-*.mark
+	expect "the current main's baseline is not marked" not grep -qx "target=$(pwd -P)/.git/mq/baseline/$tipb" $mk/file-*.mark
+	# Marked and due, main's own baseline is still kept.
+	tools/mq/mark.sh add file "$(pwd -P)/.git/mq/baseline/$tipb" 0 test
+	tools/mq/cleanup.sh
+	expect "main's baseline survives a mark" test -f .git/mq/baseline/$tipb
+	stop_lane
+}
+
 case_stamp_without_output() {
 	bake_repo restore
 	echo 0 > bake_secs
@@ -918,12 +1056,19 @@ case_parse_error_fails_fast() {
 	local t0=$SECONDS
 	tools/mq/levels.sh ensure >/dev/null 2>"$ROOT/parse.err"; local rc=$?
 	expect "a builder whose script won't parse fails the ensure" test "$rc" != 0
-	expect "at once, not at the timeout" test $((SECONDS - t0)) -lt 20
+	expect "at once, not at the timeout" test $((SECONDS - t0)) -lt 45
 	expect "and names the parse error" grep -q 'failed to parse' "$ROOT/parse.err"
 	expect "and the class" grep -q 'ManorSitePlan' "$ROOT/parse.err"
 	expect "nothing is stamped" test ! -f .git/mq-levels/terrain
 	perl -e 'select(undef,undef,undef,2.5)'
-	expect "and the hung builder isn't left running" not pgrep -f 'bash tools/bake.sh'
+	expect "and the hung builder isn't left running" not bake_running_in "$(pwd -P)"
+}
+bake_running_in() { # dir: a bake.sh whose cwd is under it (other scenarios bake too)
+	local p
+	for p in $(pgrep -f 'bash tools/bake.sh'); do
+		lsof -a -p "$p" -d cwd -Fn 2>/dev/null | grep -q "^n$1" && return 0
+	done
+	return 1
 }
 
 case_test_when() {
@@ -943,6 +1088,9 @@ case_test_when() {
 	commit_build 'echo three > b.x'
 	gate ext --base "$base"; expect "a second pattern in the list runs it" ran gut:tests/test_s.gd
 	in_build git checkout -q --detach "$base"
+	commit_build 'mkdir -p zone/deep; echo six > zone/deep/a'
+	gate deep --base "$base"; expect "a file deeper under the pattern runs it (the pattern isn't globbed)" ran gut:tests/test_s.gd
+	in_build git checkout -q --detach "$base"
 	commit_build 'echo four > tests/test_s.gd'
 	gate own --base "$base"; expect "a change to the test file itself runs it" ran gut:tests/test_s.gd
 	in_build git checkout -q --detach "$base"
@@ -950,13 +1098,48 @@ case_test_when() {
 	gate full; expect "an idle gate (no --base) runs everything" ran gut:tests/test_s.gd
 }
 
+# Short tests share one engine; a red shard splits so blame stays per file.
+case_gut_shards() {
+	bake_repo shards
+	commit_build 'mkdir tests; : > tests/test_p.gd; : > tests/test_q.gd; : > tests/test_r.gd; echo "# gate: alone" > tests/test_z.gd; echo "@gut tests" >> tools/mq/gate.conf'
+	gate first; expect "first gate passes" test "$?" = 0
+	expect "a test with no time yet runs alone" not grep -q '^SHARD' "$GATE_OUT/plan.txt"
+	gate shard; expect "sharded gate passes" test "$?" = 0
+	expect "short tests with a time share a shard" grep -q '^SHARD shard:1 .*gut:tests/test_p.gd.*' "$GATE_OUT/plan.txt"
+	expect "the shard passes" said PASS shard:1
+	expect "a test marked alone stays out of shards" not grep -q '^SHARD.*test_z' "$GATE_OUT/plan.txt"
+	expect "and runs on its own" said PASS gut:tests/test_z.gd
+	expect "and each test in it passes" said PASS gut:tests/test_q.gd
+	expect "the build lines don't shard" ran late
+	commit_build 'touch fail_test_q'
+	gate red; expect "a red test in a shard fails the gate" test "$?" = 1
+	expect "the shard splits" said SPLIT shard:1
+	expect "the red test is named on its own" grep -qx gut:tests/test_q.gd "$GATE_OUT/failed"
+	commit_build 'rm fail_test_q; touch clash'
+	gate clash; expect "red only together passes" test "$?" = 0
+	expect "the shard split" said SPLIT shard:1
+	expect "and is called flaky" said FLAKY shard:1
+	expect "every test passed alone" said PASS gut:tests/test_r.gd
+	expect "the flake is an event" grep -q 'FLAKY shard:1 red together' .git/mq/events.log
+}
+
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict restacked restack_conflict flaky flaky_last \
 		stop_mid_batch stall_no_engine origin_ahead built_file ready_merged \
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
-		build_known_red needs_nothing marker_check script_uid union_log builder_recipe miss_message stamp_without_output \
-		import_before_build stale_class_cache parse_error_fails_fast test_when; do
-	scenario "$c"
+		build_known_red needs_nothing marker_check script_uid union_log merge_retry builder_recipe miss_message stamp_without_output \
+		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards marks_from_levels marks_from_baselines; do
+	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
+	# bash 3.2 has no wait -n: poll for a free slot.
+	while [ "$(jobs -pr | wc -l)" -ge "$JOBS" ]; do perl -e 'select(undef,undef,undef,0.2)'; done
+	( scenario "$c" ) > "$ROOT/out.$c" 2>&1 &
+	eval "pid_$c=$!"
+	ran_cases="${ran_cases:-} $c"
+done
+for c in ${ran_cases:-}; do
+	eval "wait \$pid_$c"; rc=$?
+	cat "$ROOT/out.$c"
+	if [ "$rc" = 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 done
 # A finished run leaves nothing running from its temp root, by command or cwd.
 leftovers() {

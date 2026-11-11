@@ -65,14 +65,19 @@ moment("puca", "10-11", "garden_gate", "manor_grounds", ["bogge_survived"], [
 # marks), HallMap (rooms on her page), WoundDressing (the night of the Bogge:
 # the map on the foyer table, the beast, the infirmary) and StudyMural (her
 # painter's eye). These moments only turn their facts into the phase deeds.
+# The map of the halls starts the morning Alis trips her rope (owner,
+# 2026-11-11) and runs beside the p2/p3 beats; it is drawn once all five marks
+# and enough rooms are on her page. Setting it down on the foyer table opens
+# the night of the Bogge, which still waits for the puca.
+MAP_START = "fact.alis_tripped"
 for i in range(1, 6):
-    moment("hall_mark_%d" % i, "12", "hall_mark_%d" % i, "manor_house", ["puca_resisted"], [
+    moment("hall_mark_%d" % i, "12", "hall_mark_%d" % i, "manor_house", [MAP_START], [
         UF("fact.hall_x_%d" % i), R("fact.hall_mark_%d" % i)], trigger="auto",
         notes="Played by HallMark: an X or a circle on her map of the halls.")
-moment("manor_map", "12", "", "manor_house", ["puca_resisted"],
-    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [UF("fact.hall_map_set_down"), R("manor_map_drawn"), CEL("map")],
-    trigger="auto", notes="Global: all five marks made and the map set down on the foyer table (WoundDressing).")
-moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["manor_map_drawn"], [
+moment("manor_map", "7-12", "", "manor_house", [MAP_START],
+    [UF("fact.hall_mark_%d" % i) for i in range(1, 6)] + [UF("fact.hall_rooms_enough"), R("manor_map_drawn"), CEL("map")],
+    trigger="auto", notes="Global and ongoing: all five marks made and enough rooms on her page (HallMap).")
+moment("wound_dressing", "12", "manor_infirmary", "manor_house", ["manor_map_drawn", "puca_resisted"], [
     UF("fact.tamlin_hand_bound"), R("tamlin_wound_dressed"),
 ], trigger="auto", notes="Played by WoundDressing: clean, bind and wrap his Bogge-bitten hand in the small infirmary.")
 moment("study_mural", "13", "manor_study_mural", "manor_house", ["tamlin_wound_dressed"], [

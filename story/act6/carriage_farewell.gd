@@ -56,14 +56,14 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.NONE)
 			note_mood()
-			EventBus.mood_requested.emit(&"enchanted_sleep", 1.0, 3.0, 0.0)
+			EventBus.mood_requested.emit(&"enchanted_sleep", 1.0, 3.0)
 			stamp("fact.carriage_boarded"), "she gets in"),
 		say(&"sleep_thought"),
 		Beats.wait(3.0),
 		Beats.run(_away, "the road south"),
 		Beats.wait(1.5),
 		Beats.run(func(_s: SceneSpace) -> void:
-			EventBus.mood_requested.emit(&"calm", 0.0, 3.0, 0.0)
+			EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
 			StoryControl.release(), "she wakes"),
 	]
 

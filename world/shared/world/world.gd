@@ -40,6 +40,8 @@ func _ready() -> void:
 	if has_node(^"/root/WorldStreamer") and WorldStreamer.has_signal(&"region_loaded"):
 		WorldStreamer.region_loaded.connect(_on_region_loaded)
 	_disable_fallbacks(self)
+	# The Wall: see through it, never walk across it (T107).
+	add_child(WallBarrier.new())
 	# Regions build their stand-in ground on worker jobs, often after
 	# region_loaded has fired; catch those too, or the 4 m vertex-colour chunks
 	# z-fight Terrain3D and read as hard triangular colour patches.

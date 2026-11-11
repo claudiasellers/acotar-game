@@ -47,6 +47,9 @@ two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.p
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
 hang) echo $$ >"$FAKE_HANG"; exec sleep 300 ;;
 grab) # makes itself the frontmost app after <delay>, as Godot 4.7 on macOS does
+	# Count the delay from the guard's first poll (it starts a little after the
+	# render, more so on a loaded machine), not from launch: T114.
+	for _ in $(seq 1 200); do [ -e "$FAKE_FRONT.polled" ] && break; sleep 0.1; done
 	sleep "${user[1]}"; echo "$$ org.godotengine.godot" >"$FAKE_FRONT"; sleep "${user[2]}" ;;
 stubborn) trap '' TERM; sleep 300 & echo $! >"$FAKE_HANG"; wait ;;
 slow) # true for ever more than one at a time, as two listeners would be
@@ -107,6 +110,8 @@ request A 1 'from selftest\nquality layout\nsize 640x360\nshot cottage res://pro
 once
 check "answers a good request with status ok" 'result A-1 | grep -qx "status ok"'
 files=$(git --git-dir="$T/origin.git" ls-tree -r --name-only refs/heads/shots/res-A-1)
+mk="$T/mac/.git/mq/cleanup/marks"
+check "an answered request marks its req and res branches for cleanup, three days on" 'grep -qx "target=shots/req-A-1" "$mk"/remote_branch-*.mark && grep -qx "target=shots/res-A-1" "$mk"/remote_branch-*.mark && [ "$(sed -n s/^after=//p "$mk"/remote_branch-*.mark | head -1)" -gt "$(( $(date +%s) + 250000 ))" ]'
 check "result holds every picture and stats file" 'echo "$files" | grep -qx out/cottage/cottage.jpg && echo "$files" | grep -qx out/many/two.png && echo "$files" | grep -qx out/many/stats.json'
 check "result is an orphan commit (no game files)" '[ -z "$(git --git-dir="$T/origin.git" rev-list --parents -1 refs/heads/shots/res-A-1 | cut -s -d" " -f2)" ] && ! echo "$files" | grep -q project.godot'
 check "renders in a small window in the corner, Dummy audio" 'grep "probe/shot.tscn" "$FAKE_LOG" | grep -q -- "--audio-driver Dummy --windowed --resolution 640x360 --position 40,40"'
@@ -142,6 +147,9 @@ request C 1 'timeout 2\nshot slow res://probe/shot.tscn hang\n'
 request C 2 'timeout 2\nsize 1920x1080\nshot stuck res://probe/shot.tscn stubborn\n'
 request D 1 'shot x res://probe/shot.tscn ok\nexplode now\n'
 request E 1 'shot x res://probe/missing.tscn ok\n'
+request Y 1 'from world-lead canonical check (R0: estate/spring fog after M4WCT-3)\nfrom world-lead P1 keep-open zones (trees out of standpoints, sentry lane) it'"'"'s *\nquality layout\nsize 640x360\nshot x res://probe/shot.tscn ok {out}/x.png\n'
+request Y 2 'from ok\nshot x res://probe/shot.tscn ok `id`\n'
+request Y 3 'from bad\001label\nshot x res://probe/shot.tscn ok\n'
 once
 check "one failing probe gives status partial with its exit code" 'result B-1 | grep -qx "status partial" && result B-1 | grep -q "^shot bad fail exit=1"'
 check "the failing probe's log is in the answer" 'git --git-dir="$T/origin.git" show refs/heads/shots/res-B-1:logs/bad.log | grep -q "SCRIPT ERROR"'
@@ -150,6 +158,9 @@ check "a child that ignores TERM is reported as a timeout and is gone" 'result C
 check "override.cfg is removed after a render that timed out" '[ ! -e "$T/mac/.lanes/shots/override.cfg" ]'
 check "a malformed request is answered with the reason" 'result D-1 | grep -qx "status error" && result D-1 | grep -q "note unknown line: explode"'
 check "a probe missing from the commit is named" 'result E-1 | grep -q "note no such file in the commit: res://probe/missing.tscn"'
+check "a from line with ordinary punctuation is accepted" 'result Y-1 | grep -qx "status ok"'
+check "a backtick in a shot line is refused, naming the character" 'result Y-2 | grep -q "note unsupported character .\`. in: shot x"'
+check "a control character in a from line is refused" 'result Y-3 | grep -q "note unsupported character .*in from line"'
 
 # 6 request.json route
 printf '{"id":"J","quality":"full"}' >"$T/req.json"
@@ -294,6 +305,7 @@ mkdir -p "$T/fakebin"
 cat >"$T/fakebin/lsappinfo" <<'F'
 #!/bin/bash
 read -r pid bid <"$FAKE_FRONT"
+: >"$FAKE_FRONT.polled"
 case "$1 ${3:-}" in
 front*) echo "ASN:0x0-0xfake:" ;;
 "info pid") echo "\"pid\"=$pid" ;;
@@ -309,7 +321,7 @@ chmod +x "$T/fakebin/lsappinfo" "$T/fakebin/open"
 sleep 300 &
 export FAKE_OWNER=$! FAKE_FRONT="$T/front"
 echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
-gonce() { (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
+gonce() { rm -f "$FAKE_FRONT.polled"; (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
 request F 1 'shot early res://probe/shot.tscn grab 0.3 1.5
 '
 gonce

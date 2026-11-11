@@ -20,6 +20,10 @@ func before_each() -> void:
 	market = load(MARKET) as MarketSet
 	Gameplay.reset()
 	WorldState.clear()
+	# Winter, where the market starts: an earlier script in the same engine may
+	# have left the story on another phase.
+	PhaseManager.phase_set = null
+	PhaseManager.current_phase = &""
 	sales.clear()
 	EventBus.item_sold.connect(_on_sold)
 
