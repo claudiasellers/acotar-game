@@ -46,7 +46,28 @@ keep_awake() {
 	fi
 }
 
-wt() { git -C "$MQ_BUILD" "$@"; }
+# ctime isn't trusted in the build worktree: a macOS background process rewrites
+# the ctime of files a merge has just written, about a second later, without
+# touching them. git then sees them as changed, and the next merge's internal
+# `stash create` exits 1 with nothing said: "fatal: stash failed" (T109).
+# mtime, size and inode still catch real edits.
+wt() { git -c core.trustctime=false -C "$MQ_BUILD" "$@"; }
+
+# One merge into the build worktree. Returns 0 merged, 1 conflict (left in
+# place for the caller), 3 failed for another reason. A failure with no conflict
+# is tried once more after an index refresh: it can be a stat race, not the work.
+merge_into() { # merge-args...
+	local try
+	for try in 1 2; do
+		wt merge -q --no-edit "$@" >>"$MQ_DIR/buildlane.log" 2>&1 && return 0
+		[ -n "$(wt ls-files -u)" ] && return 1
+		wt merge --abort 2>/dev/null
+		wt reset -q --hard HEAD 2>/dev/null
+		wt update-index -q --refresh >/dev/null 2>&1
+		[ "$try" = 1 ] && echo "$(date '+%F %T') merge failed without a conflict; trying once more" >>"$MQ_DIR/buildlane.log"
+	done
+	return 3
+}
 
 # Puts the build worktree exactly at a commit. Ignored caches stay.
 goto() {
@@ -176,7 +197,7 @@ restack() { # entry-file
 		fi
 		n=$(wt rev-parse HEAD)
 		goto "$head" || return 3
-		wt merge -q --no-ff --no-edit -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$n" >>"$MQ_DIR/buildlane.log" 2>&1 || {
+		merge_into --no-ff -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$n" || {
 			wt merge --abort 2>/dev/null; return 3; }
 		n=$(wt rev-parse HEAD)
 	fi
@@ -202,8 +223,9 @@ build_chain() { # base batch-dir
 			continue
 		fi
 		kv_set "$e" landed ""; kv_set "$e" dropped ""
-		if ! wt merge -q --no-edit -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$sha" >>"$MQ_DIR/buildlane.log" 2>&1; then
-			if [ -n "$(wt ls-files -u)" ]; then
+		merge_into -m "$task merge: $(kv_get "$e" subject | cut -c1-60)" "$sha"; rc=$?
+		if [ "$rc" != 0 ]; then
+			if [ "$rc" = 1 ]; then
 				local paths; paths=$(wt ls-files -u | cut -f2 | sort -u | head -5 | tr '\n' ' ')
 				wt merge --abort
 				restack "$e"; rc=$?
