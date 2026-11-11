@@ -64,6 +64,19 @@ event() {
 	return 0
 }
 
+# Marks the answered branches for cleanup.sh (written directly: this script runs from a
+# copy without mark.sh). Same file name and format as mark.sh's remote_branch marks.
+mark_answered() { # key
+	local b f keep now
+	keep=$(conf MQ_SHOTS_KEEP_SECS 259200); now=$(shots_epoch)
+	mkdir -p "$MQ/cleanup/marks"
+	for b in "shots/req-$1" "shots/res-$1"; do
+		f="$MQ/cleanup/marks/remote_branch-$(printf '%s' "$b" | cksum | cut -d' ' -f1).mark"
+		[ -f "$f" ] && continue
+		printf 'kind=remote_branch\ntarget=%s\nafter=%s\nwhy=%s\n' "$b" "$((now + keep))" "shots answered" >"$f.tmp" && mv "$f.tmp" "$f"
+	done
+}
+
 home_machine() { [ "$(conf MQ_HOME_MACHINE 0)" = 1 ]; }
 
 refuse_unless_home() {
@@ -561,6 +574,7 @@ handle() { # key sha
 		mkdir -p "$S/done"
 		echo "$sha reused $(shots_epoch)" >"$S/done/$key"
 		rm -rf "${S:?}/work/${key:?}"
+		mark_answered "$key"
 		event "ANSWERED $key from $prev (same code and request)"
 		return 0
 	fi
@@ -614,6 +628,7 @@ handle() { # key sha
 	echo "$sha $status $(shots_epoch)" >"$S/done/$key"
 	[ "$status" = ok ] && echo "$key" >"$S/bytree/$tree"
 	rm -rf "${S:?}/work/${key:?}"
+	mark_answered "$key"
 	event "ANSWERED $key $status in $(($(shots_epoch) - t0))s"
 	return 0
 }

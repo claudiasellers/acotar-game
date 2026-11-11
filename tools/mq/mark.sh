@@ -5,7 +5,7 @@
 #   mark.sh add <kind> <target> <delay-secs> <why>
 #   mark.sh done <entry-file> <merged|rejected>   everything a finished entry leaves
 #   mark.sh lane <laneN>                          a lane worktree to release when idle
-# kinds: remote_branch local_branch dir entry lane
+# kinds: remote_branch local_branch dir entry lane file level
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/common.sh"

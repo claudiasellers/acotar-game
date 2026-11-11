@@ -566,7 +566,7 @@ case_cleanup() {
 	rm -f untracked_file
 	# What is left: the retention-held mark and the build lane's own entry mark (14 days).
 	expect "build lane marked the merged entry" ls .git/mq/cleanup/marks/entry-*.mark
-	expect "refused marks are dropped" test "$(ls .git/mq/cleanup/marks | wc -l | tr -d ' ')" = 2
+	expect "refused marks are dropped" test "$(ls .git/mq/cleanup/marks | grep -vc '^file-')" = 2
 	# A queued commit is never taken, even when marked.
 	touch .git/mq/pending/busy
 	git push -q origin "$a:refs/heads/lane/merged2"; mark remote_branch lane/merged2 0 test
@@ -949,6 +949,49 @@ case_miss_message() {
 	expect "stdout stays empty on a hit" test ! -s "$ROOT/hit.out"
 }
 
+case_marks_from_levels() {
+	bake_repo levelmarks
+	echo 0 > bake_secs
+	local fa fb mk=.git/mq/cleanup/marks
+	tools/mq/levels.sh ensure 2>/dev/null
+	fa=$(tools/mq/levels.sh fingerprint terrain)
+	expect "the first build marks nothing but its log" test "$(ls $mk | grep -c '^level-')" = 0
+	expect "the build log is marked for rotation" grep -q "^target=.*build-terrain-$fa.log" $mk/file-*.mark
+	echo two > bake_input
+	tools/mq/levels.sh ensure 2>/dev/null
+	fb=$(tools/mq/levels.sh fingerprint terrain)
+	expect "the replaced build is marked" grep -qx "target=terrain/$fa" $mk/level-*.mark
+	expect "the current build is not marked" not grep -qx "target=terrain/$fb" $mk/level-*.mark
+	# A build a worktree's stamp still names is never taken, even when marked and due.
+	sed -i '' 's/^after=.*/after=0/' $mk/level-*.mark
+	echo "$fa" > .git/mq-levels/terrain
+	tools/mq/cleanup.sh
+	expect "a stamped build survives its mark" test -d ".git/levelcache/terrain/$fa"
+	echo "$fb" > .git/mq-levels/terrain
+	tools/mq/mark.sh add level "terrain/$fa" 0 test
+	tools/mq/cleanup.sh
+	expect "an unused superseded build goes" test ! -d ".git/levelcache/terrain/$fa"
+	expect "the newest build stays" test -d ".git/levelcache/terrain/$fb"
+}
+
+case_marks_from_baselines() {
+	newrepo basemarks
+	local a b mk=.git/mq/cleanup/marks tipa tipb
+	a=$(change a one); b=$(change b two)
+	queue "$a" T1; start_lane; drain
+	tipa=$(git rev-parse origin/main)
+	expect "first landing leaves a baseline" test -f .git/mq/baseline/$tipa
+	queue "$b" T2; drain
+	tipb=$(git rev-parse origin/main)
+	expect "the replaced main's baseline is marked" grep -qx "target=$(pwd -P)/.git/mq/baseline/$tipa" $mk/file-*.mark
+	expect "the current main's baseline is not marked" not grep -qx "target=$(pwd -P)/.git/mq/baseline/$tipb" $mk/file-*.mark
+	# Marked and due, main's own baseline is still kept.
+	tools/mq/mark.sh add file "$(pwd -P)/.git/mq/baseline/$tipb" 0 test
+	tools/mq/cleanup.sh
+	expect "main's baseline survives a mark" test -f .git/mq/baseline/$tipb
+	stop_lane
+}
+
 case_stamp_without_output() {
 	bake_repo restore
 	echo 0 > bake_secs
@@ -1073,7 +1116,7 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
 		build_known_red needs_nothing marker_check script_uid union_log merge_retry builder_recipe miss_message stamp_without_output \
-		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards; do
+		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards marks_from_levels marks_from_baselines; do
 	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
 	# bash 3.2 has no wait -n: poll for a free slot.
 	while [ "$(jobs -pr | wc -l)" -ge "$JOBS" ]; do perl -e 'select(undef,undef,undef,0.2)'; done

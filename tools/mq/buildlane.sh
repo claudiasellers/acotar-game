@@ -291,6 +291,12 @@ land() { # tip base batch-dir known
 	# Reds that are still red carry over; fixed ones drop off. A line excused as
 	# flaky for this batch isn't one.
 	grep -E '^KNOWNRED ' "$b/gate/results.txt" 2>/dev/null | cut -d' ' -f2 | grep -xFf "$known" > "$MQ_DIR/baseline/$tip"
+	# Baselines of earlier mains are no longer what a gate compares against; the
+	# one for the current main is never taken (cleanup.sh checks that again).
+	for bl in "$MQ_DIR"/baseline/*; do
+		[ -f "$bl" ] && [ "$(basename "$bl")" != "$tip" ] && \
+			"$here/mark.sh" add file "$bl" "$(mq_config_or MQ_BASELINE_KEEP_SECS 259200)" "baseline of a main that was replaced"
+	done
 	for e in "$b"/*.entry; do
 		[ -f "$e" ] && done_merged "$e" "$merged_to"
 	done
