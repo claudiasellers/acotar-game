@@ -16,11 +16,12 @@ extends Resource
 ## The step she's on: the furthest open one in story order (a later step that
 ## is ready means the story moved on), else the first not done, so a step
 ## done out of order never hides the rest. Null when all are done.
+## Ongoing steps run beside the others and are never the current one.
 func current(has_flag: Callable) -> JournalEntry:
 	var ready: JournalEntry = null
 	var fallback: JournalEntry = null
 	for e in entries:
-		if e.is_done(has_flag):
+		if e.ongoing or e.is_done(has_flag):
 			continue
 		if e.is_ready(has_flag):
 			ready = e

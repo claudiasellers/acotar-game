@@ -19,6 +19,10 @@ extends Resource
 @export var guide_thread: StringName = &""
 ## Which of her little drawings sits beside it (JournalSketch.MOTIFS).
 @export var sketch: StringName = &"rose"
+## A thread that runs beside the main steps until it's done (her map of the
+## halls): the chapter's current() skips it and the sketchbook lists it under
+## "Still on my mind" (JournalBook.ongoing), whichever chapter she's in.
+@export var ongoing: bool = false
 ## "A" book-verified, "V" adapted, "X" invented where the book is silent (R7).
 @export var canon: String = "X"
 

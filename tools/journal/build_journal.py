@@ -55,6 +55,14 @@ CHAPTERS = [
                     "The curtains by my window have long trimmings.",
                     "At my window at night, the curtains (E): a rope of trimmings to snap into anyone's face."],
              memory="My rope caught Alis, not a monster.", canon="A"),
+        # Owner, 2026-11-11: the map of the halls starts the morning after the
+        # rope and stays on her mind beside the other steps until it's drawn.
+        dict(id="map", done="manor_map_drawn", req=["fact.alis_tripped"], ongoing=True,
+             after="If I'm going to be stuck here, I need to know my way around this house.",
+             hints=["Every room I walk into goes on my page. Crosses and circles mark the doors that matter, since I can't write.",
+                    "The front doors, the marble stairs, the garden doors, the kitchen door, the servants' stair. The towers show the grounds.",
+                    "Walk into enough rooms, and at each of the five places, mark my map (E)."],
+             memory="My map of the halls: crosses, circles and little pictures.", canon="V"),
         dict(id="stables", done="fact.hunt_invited", req=["curtain_trap_set"],
              after="There has to be a loophole in the Treaty. Lucien might know one.",
              hints=["Alis says he rides out on border patrol, from the stables.",
@@ -73,17 +81,12 @@ CHAPTERS = [
                     "At the gates, when Tamlin tells me to, look again."],
              memory="It wore my father's face. It wasn't him.", canon="A"),
     ]),
-    ("p3_house_and_woods", "Chapter Four", "The House and the Woods", "A prisoner should know her cage. I'll learn every hall of this one.", [
-        dict(id="map", done="manor_map_drawn", req=["puca_resisted"],
-             after="If I ever have to run, I need this house by heart.",
-             hints=["Mark the halls my own way: crosses and circles, since I can't write.",
-                    "Walk the halls and mark the doors that matter. The towers show the grounds.",
-                    "Make all five marks and draw enough rooms, then set my map down on the foyer table at night (E)."],
-             memory="My map of the halls: crosses, circles and little pictures.", canon="A"),
-        dict(id="wound", done="tamlin_wound_dressed", req=["manor_map_drawn"],
-             after="He's hurt, and nobody is helping him.",
-             hints=["The infirmary. There'll be something in the cabinets.",
-                    "Sort the bowl, linen and bandage from the cabinets, then clean and bind his hand (E)."],
+    ("p3_house_and_woods", "Chapter Four", "The House and the Woods", "Spring outside my window, and still I can't sleep. The halls are never quite quiet at night.", [
+        dict(id="wound", done="tamlin_wound_dressed", req=["manor_map_drawn", "puca_resisted"],
+             after="Sleepless again. I could take my map down to the foyer and look it over.",
+             hints=["The long table in the foyer, after dark.",
+                    "If someone comes in hurt, the infirmary will have bowls and bandages in its cabinets.",
+                    "At night, set my map down on the foyer table (E). Then clean and bind whatever needs it."],
              memory="I bound his hand. He saw I couldn't read.", canon="A"),
         dict(id="mural", done="study_mural_seen", req=["tamlin_wound_dressed"],
              after="There's a painted wall in the study I can't stop thinking about.",
@@ -256,6 +259,8 @@ def main() -> None:
                 out.append(f'memory = {q(s["memory"])}')
             if s.get("guide"):
                 out.append(f'guide_thread = &"{s["guide"]}"')
+            if s.get("ongoing"):
+                out.append("ongoing = true")
             out.append(f'sketch = &"{SKETCH.get(s["id"], "rose")}"')
             out += [f'canon = {q(s.get("canon", "X"))}', ""]
         cid = f"c_{ci}"

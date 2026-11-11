@@ -101,13 +101,16 @@ func test_stage_marks_follow_the_layout_anchors() -> void:
 
 # --- her map of the halls ------------------------------------------------------------
 
-func test_rooms_go_on_her_page_only_from_the_night_after_the_puca() -> void:
+func test_rooms_go_on_her_page_from_the_morning_alis_trips_the_rope() -> void:
 	var a := _hang(&"hall_mark_1")
 	var map := a.get_node(^"HallMap") as HallMap
 	map.auto_tick = false
 	var hall := Vector3(0, ManorHouseBuilder.floor_y(0) + 0.1, -36)
-	assert_eq(map.check_at(hall), &"", "nothing before p3")
-	WorldState.set_flag("puca_resisted")
+	WorldState.set_flag("first_dinner_eaten")
+	WorldState.set_flag("curtain_trap_set")
+	assert_eq(map.check_at(hall), &"", "nothing before Alis trips the rope")
+	WorldState.set_flag("fact.alis_tripped")
+	assert_false(WorldState.has_flag("puca_resisted"), "long before the puca (owner, 2026-11-11)")
 	assert_eq(map.check_at(hall), &"entrance_hall")
 	assert_eq(map.check_at(hall), &"", "a room goes on once")
 	assert_eq(map.check_at(Vector3(23, ManorHouseBuilder.floor_y(1) + 0.1, -70)), &"feyre_bedroom", "upstairs by height")
@@ -116,7 +119,7 @@ func test_rooms_go_on_her_page_only_from_the_night_after_the_puca() -> void:
 
 
 func test_enough_rooms_and_tower_views_reveal_map_places() -> void:
-	WorldState.set_flag("puca_resisted")
+	WorldState.set_flag("fact.alis_tripped")
 	var a := _hang(&"hall_mark_1")
 	var map := a.get_node(^"HallMap") as HallMap
 	map.auto_tick = false
@@ -149,8 +152,8 @@ func test_a_hall_mark_needs_her_there_and_raises_its_fact() -> void:
 	var mark := a.get_node(^"HallMark") as HallMark
 	feyre.global_position = a.global_position + Vector3(1, 0, 0)
 	mark.press_interact()
-	assert_false(mark.running, "not before the night after the puca")
-	WorldState.set_flag("puca_resisted")
+	assert_false(mark.running, "not before Alis trips the rope")
+	WorldState.set_flag("fact.alis_tripped")
 	feyre.global_position = a.global_position + Vector3(6, 0, 0)
 	mark.press_interact()
 	assert_false(mark.running, "not from across the hall")
@@ -169,6 +172,7 @@ func _ready_for_the_night() -> void:
 	for i in range(1, 6):
 		WorldState.set_flag("fact.hall_x_%d" % i)
 	WorldState.set_flag(HallMap.ENOUGH_FACT)
+	WorldState.set_flag("fact.alis_tripped")
 	WorldState.set_flag("puca_resisted")
 	Clock.from_dict({"time_of_day": 0.95, "day": 1})
 
@@ -225,6 +229,10 @@ func test_the_night_waits_for_the_marks_and_the_dark() -> void:
 	WorldState.set_flag("fact.hall_x_4", false)
 	assert_false(wound.can_start(), "one mark missing")
 	WorldState.set_flag("fact.hall_x_4")
+	WorldState.set_flag("puca_resisted", false)
+	assert_false(wound.can_start(), "a finished map waits for the night after the puca")
+	assert_false(wound.waits_only_for_time(), "and the foyer table doesn't shine for it")
+	WorldState.set_flag("puca_resisted")
 	Clock.from_dict({"time_of_day": 0.5, "day": 1})
 	assert_false(wound.can_start(), "not by day")
 	assert_true(wound.waits_only_for_time(), "by day the night comes to her at the table")
@@ -297,11 +305,16 @@ func test_looking_away_notices_nothing() -> void:
 
 func test_moments_chain_the_house_deeds_in_book_order() -> void:
 	var wound := StoryDirector.get_moment(&"wound_dressing")
-	assert_eq(Array(wound.require_flags), ["manor_map_drawn"], "the map comes first (Keeper, ch12)")
+	assert_eq(Array(wound.require_flags), ["manor_map_drawn", "puca_resisted"], "the map comes first (Keeper, ch12)")
 	var map := StoryDirector.get_moment(&"manor_map")
+	assert_eq(Array(map.require_flags), ["fact.alis_tripped"], "the map starts the morning after the rope")
 	var waits := []
 	for step in map.steps:
 		if step.get("do") == "until_flag":
 			waits.append(String(step["flag"]))
-	assert_true(waits.has("fact.hall_map_set_down"))
+	assert_true(waits.has(HallMap.ENOUGH_FACT), "drawn once enough rooms are on her page")
+	assert_false(waits.has("fact.hall_map_set_down"), "setting it down opens the Bogge night; it doesn't finish the map")
+	for i in range(1, 6):
+		var mark := StoryDirector.get_moment(StringName("hall_mark_%d" % i))
+		assert_eq(Array(mark.require_flags), ["fact.alis_tripped"])
 	assert_eq(Array(StoryDirector.get_moment(&"study_mural").require_flags), ["tamlin_wound_dressed"])
