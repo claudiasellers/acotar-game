@@ -1,4 +1,4 @@
-# gate: when:story/*,data/story/*,data/regions/spring_court/manor_estate/house/*,world/spring_court/manor_estate/props/*,world/spring_court/manor_estate/house/*,characters/*/model/*,characters/*/*_model.tscn,characters/feyre/feyre.tscn,project.godot
+# gate: when:story/*,data/story/*,data/regions/spring_court/manor_estate/house/*,world/spring_court/manor_estate/props/*,world/spring_court/manor_estate/house/*,characters/tamlin/tamlin_model.tscn,characters/lucien/lucien_model.tscn,characters/feyre/feyre.tscn,project.godot
 ## Every place the manor's scenes and films put someone (T062). A seat stands on a
 ## chair FilmPose can fit; anyone else stands clear of the furniture, and a thing set
 ## on a table is over one. Read off the stage data, the films' own constants and the
