@@ -48,7 +48,7 @@ and its status. Details for each item are in the phase sections further down.
 | T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | waiting | GUT: every role id resolves to near, mid and far meshes |
 | T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | waiting | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
 | T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | waiting | owner's yes |
-| P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **started** | GUT: habitat fractions per region; every keep-open zone has no tree in it |
+| P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **done** (submitted) | GUT: habitat fractions per region; every keep-open zone has no tree in it |
 | P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
 | P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
 | P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting | owner's yes |
@@ -145,6 +145,18 @@ is the layering half. Five fixes came out of checking it against the brief, `wor
    submit.
 
 ## Phase P — planting follows the land (after T; the big one)
+
+**P1 as built (2026-11-10).** `CourtLandHabitats` (`world/spring_court/wider/
+court_land_habitats.gd`) reads the ground at any point as one of floor, slope,
+steep, valley, hollow, crest, knoll, verge, brook bank, river bank, shore or water,
+and lists 105 keep-open zones (every clearing, gate, standpoint and the three story
+spots). Tree placement already skips the zones, paths and water: 161 of the court's
+7,842 trees moved out (2%), including the ones on `vale_rim` and `western_woods`.
+Shares per region come from `tools/court/court_habitat_report.gd`. The file avoids
+the terrain bake's globs (`*terrain*`, `*height*`): it reads CourtHeight's built
+clearings and path lines instead of adding to CourtHeight. A query costs about
+250 µs (form) and 50 µs (keep-open), so P2 samples the form on a grid per region on
+the worker rather than per tree.
 
 1. **Terrain habitats** from `CourtHeight`:
    - crest/ridge, knoll crown, slope by steepness, hollow, valley floor;

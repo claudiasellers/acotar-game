@@ -426,6 +426,10 @@ static func _add_tree(content: CourtRegionContent, layers: Dictionary, layout: D
 		return
 	if content.in_anchor_clearing(p):
 		return
+	# The land's keep-open zones (finish plan P1): clearings, gates, paths,
+	# water, standpoints and the story's spots.
+	if CourtLandHabitats.keep_open(p.x, p.y):
+		return
 	# Trees stand back from a place's forecourt so it reads as a clearing.
 	if PlaceComposer.blocks(layout.get("places", [] as Array[PlaceSetting]), p, PLACE_TREE_MARGIN):
 		return
