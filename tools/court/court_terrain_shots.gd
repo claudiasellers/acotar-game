@@ -215,7 +215,7 @@ const LINEUPS := {
 		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
 		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
-	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7", "scene:/plants/qtz/Clover_1.gltf:0.15", "scene:/plants/qtz/Clover_2.gltf:0.18", "scene:/plants/qtz/Fern_1.gltf:0.8", "scene:/plants/qtz/Plant_1.gltf:0.5", "scene:/plants/qtz/Plant_1_Big.gltf:1.0", "scene:/plants/qtz/Plant_7.gltf:0.4", "scene:/plants/qtz/Plant_7_Big.gltf:0.8", "scene:/plants/qtz/Flower_3_Single.gltf:0.45", "scene:/plants/qtz/Flower_3_Group.gltf:0.5", "scene:/plants/qtz/Flower_4_Single.gltf:0.45", "scene:/plants/qtz/Flower_4_Group.gltf:0.5", "scene:/plants/qtz/Mushroom_Common.gltf:0.25", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35"]},
+	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35:fit", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6:fit", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4:fit", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7:fit", "scene:/plants/qtz/Clover_1.gltf:0.15:fit", "scene:/plants/qtz/Clover_2.gltf:0.18:fit", "scene:/plants/qtz/Fern_1.gltf:0.8:fit", "scene:/plants/qtz/Plant_1.gltf:0.5:fit", "scene:/plants/qtz/Plant_1_Big.gltf:1.0:fit", "scene:/plants/qtz/Plant_7.gltf:0.4:fit", "scene:/plants/qtz/Plant_7_Big.gltf:0.8:fit", "scene:/plants/qtz/Flower_3_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_3_Group.gltf:0.5:fit", "scene:/plants/qtz/Flower_4_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_4_Group.gltf:0.5:fit", "scene:/plants/qtz/Mushroom_Common.gltf:0.25:fit", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35:fit"]},
 	# The re-downloaded Quaternius trees: twisted oaks and pines in the deep tint,
 	# the dead trees as delivered.
 	"newtrees": {"distance": 70.0, "spacing": 10.0, "look": 6.0, "ids": ["scene:/trees/qtz/TwistedTree_2.gltf:15:deep", "scene:/trees/qtz/TwistedTree_4.gltf:15:deep", "scene:/trees/qtz/TwistedTree_5.gltf:15:deep", "scene:/trees/qtz/Pine_2.gltf:13:deep", "scene:/trees/qtz/Pine_3.gltf:14:deep", "scene:/trees/qtz/Pine_5.gltf:9:deep", "scene:/trees/qtz/DeadTree_1.gltf:11", "scene:/trees/qtz/DeadTree_2.gltf:12", "scene:/trees/qtz/DeadTree_3.gltf:11", "scene:/trees/qtz/DeadTree_4.gltf:10", "scene:/trees/qtz/DeadTree_5.gltf:9"]},
@@ -386,14 +386,16 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				continue
 			elif item.begins_with("scene:"):
 				# A packed model as delivered (its own materials), scaled to a height.
-				var sp := item.get_slice(":", 1)
-				var path := ("res://world/spring_court/wider/assets" + sp) if sp.begins_with("/") else EZ_DIR + sp
-				var inst := (load(path) as PackedScene).instantiate() as Node3D
+				var inst := (load(_asset_path(item.get_slice(":", 1))) as PackedScene).instantiate() as Node3D
 				var top := 0.0
+				var wide := 0.0
 				for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
 					top = maxf(top, m.get_aabb().end.y)
-				inst.scale = Vector3.ONE * float(item.get_slice(":", 2)) / maxf(top, 0.01)
-				if item.get_slice_count(":") > 3:
+					wide = maxf(wide, maxf(m.get_aabb().size.x, m.get_aabb().size.z))
+				# ":fit" sizes a low, wide plant by its largest dimension, not its height.
+				var size := maxf(top, wide) if item.ends_with(":fit") else top
+				inst.scale = Vector3.ONE * float(item.get_slice(":", 2)) / maxf(size, 0.01)
+				if item.get_slice_count(":") > 3 and item.get_slice(":", 3) != "fit":
 					_tint(inst, item.get_slice(":", 3))
 				inst.position = p
 				inst.rotation.y = atan2(fwd.x, fwd.z)
@@ -446,8 +448,14 @@ const MIX := [
 
 
 ## [mesh, local transform] for a Quaternius model, tinted into the court palette.
+## A lineup path: "/x/y" is under the court's assets, anything else under EZ_DIR.
+func _asset_path(sp: String) -> String:
+	return ("res://world/spring_court/wider/assets" + sp) if sp.begins_with("/") else EZ_DIR + sp
+
+
 func _qtz_mesh(file: String) -> Array:
-	var inst := (load(EZ_DIR + file) as PackedScene).instantiate()
+	var inst := (load(_asset_path(file)) as PackedScene).instantiate()
+	var tex_dir := _asset_path(file).get_base_dir() + "/"
 	var mi: MeshInstance3D = inst.find_children("*", "MeshInstance3D", true, false)[0]
 	var xf := _local_to_root(mi, inst)
 	var mesh := mi.mesh.duplicate() as Mesh
@@ -463,7 +471,7 @@ func _qtz_mesh(file: String) -> Array:
 		var mat := ShaderMaterial.new()
 		mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
 		mat.set_shader_parameter(&"is_leaf", leaf)
-		mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/" + (leaf_tex if leaf else bark_tex)))
+		mat.set_shader_parameter(&"tex", load(tex_dir + (leaf_tex if leaf else bark_tex)))
 		mat.set_shader_parameter(&"leaf_col", t[0])
 		mat.set_shader_parameter(&"leaf_light", t[1])
 		mat.set_shader_parameter(&"bark_col", MIX_BARK)
@@ -471,7 +479,7 @@ func _qtz_mesh(file: String) -> Array:
 			# The flowering bush's second surface is its blossom.
 			mat.set_shader_parameter(&"leaf_col", Color(0.93, 0.80, 0.86))
 			mat.set_shader_parameter(&"leaf_light", Color(1.0, 0.94, 0.96))
-			mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/Flowers.png"))
+			mat.set_shader_parameter(&"tex", load(tex_dir + "Flowers.png"))
 		mesh.surface_set_material(i, mat)
 	return [mesh, xf]
 
