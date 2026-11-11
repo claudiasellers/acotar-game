@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot plants res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=qtz_plants
+shot newtrees res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=newtrees
