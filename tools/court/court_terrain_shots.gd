@@ -689,8 +689,25 @@ func _colour_read(p: GradePreset, img: Image) -> String:
 
 ## Terrain3D assets with the court's photo slots packed in `look` (every slot
 ## as uncompressed, mipmapped RGBA so the texture arrays match).
+## Moss looks (finish plan C1): the Western Woods' teal is its ground, 93% the
+## moss slot (hue 160, the spring grass is 127), not the grade's ramp. These
+## keep the committed textures and turn only the moss albedo's hue to this many
+## degrees (value and saturation kept), so the fix can be judged in place.
+const MOSS_LOOKS := {"moss_green": 128.0, "moss_olive": 110.0}
+
+
+func _moss_recolour(img: Image, hue_deg: float) -> void:
+	for y in img.get_height():
+		for x in img.get_width():
+			var c := img.get_pixel(x, y)
+			img.set_pixel(x, y, Color.from_hsv(hue_deg / 360.0, c.s, c.v, c.a))
+
+
 func _look_assets(look: String, src: String) -> Resource:
 	var dir := "user://court_looks/%s" % look
+	var moss_hue: float = MOSS_LOOKS.get(look, -1.0)
+	if moss_hue >= 0.0:
+		look = "photo"  # the committed textures, but for the moss
 	if look != "photo":
 		DirAccess.make_dir_recursive_absolute(dir)
 		var packer := GroundTexturePacker.new(look, dir)
@@ -715,6 +732,8 @@ func _look_assets(look: String, src: String) -> Resource:
 			if img.is_compressed():
 				img.decompress()
 			img.convert(Image.FORMAT_RGBA8)
+			if moss_hue >= 0.0 and stem == "moss" and kind == "albedo":
+				_moss_recolour(img, moss_hue)
 			img.generate_mipmaps()
 			tex.set(&"%s_texture" % kind, ImageTexture.create_from_image(img))
 		tex.set(&"uv_scale", TerrainSetup.TEXTURES[i][1])
