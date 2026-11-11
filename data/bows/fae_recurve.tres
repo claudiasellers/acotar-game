@@ -6,8 +6,7 @@
 script = ExtResource("1")
 id = &"fae_recurve"
 display_name = "Fae recurve"
-draw_time = 0.55
-min_speed = 16.0
+nock_time = 0.2
 max_speed = 54.0
 sway_degrees = 1.1
 loudness = 0.25

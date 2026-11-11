@@ -112,11 +112,11 @@ func test_bows_each_trade_something() -> void:
 	var hunting := load("res://data/bows/hunting_bow.tres") as BowData
 	for id in ["yew_longbow", "fae_recurve", "sentry_warbow", "gilded_bow"]:
 		var b := load("res://data/bows/%s.tres" % id) as BowData
-		var better := b.max_speed > hunting.max_speed or b.draw_time < hunting.draw_time or b.sway_degrees < hunting.sway_degrees
+		var better := b.max_speed > hunting.max_speed or b.nock_time < hunting.nock_time or b.sway_degrees < hunting.sway_degrees
 		assert_true(better, "%s improves on something" % id)
 		assert_true(ItemCatalog.has(StringName("bow_" + id)))
 	var war := load("res://data/bows/sentry_warbow.tres") as BowData
-	assert_gt(war.draw_time, hunting.draw_time, "the warbow's power costs draw time")
+	assert_gt(war.nock_time, hunting.nock_time, "the warbow's power costs nock time")
 	var fae := load("res://data/bows/fae_recurve.tres") as BowData
 	assert_lt(fae.loudness, hunting.loudness)
 
