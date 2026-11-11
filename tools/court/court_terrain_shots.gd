@@ -181,6 +181,24 @@ const LINEUPS := {
 		"scene:qtz/CommonTree_1.gltf:12:deep", "scene:qtz/CommonTree_3.gltf:14:deep", "scene:qtz/CommonTree_4.gltf:14:deep",
 		"scene:qtz/TwistedTree_1.gltf:15:deep", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:painted",
 		"ez:ash_b:painted", "ez:aspen_a:painted", "scene:qtz/Bush_Common.gltf:2.4:deep", "ez:bush_b:painted"]},
+	# Finish plan T1: each EZ tree with its photo leaves and bark, then with the
+	# painted ones that replace them (assets/trees/ez/), side by side.
+	"intake": {"distance": 44.0, "spacing": 9.0, "look": 6.0, "ids": [
+		"ez:oak_a:painted", "ez:oak_a:painted:intake", "post", "ez:ash_a:painted", "ez:ash_a:painted:intake", "post",
+		"ez:aspen_a:painted", "ez:aspen_a:painted:intake", "post", "ez:pine_a:painted", "ez:pine_a:painted:intake", "post",
+		"ez:bush_b:painted", "ez:bush_b:painted:intake"]},
+	# Every build in the intake folder, painted textures, Quaternius in the deep tint.
+	"intake_all": {"distance": 80.0, "spacing": 9.0, "look": 6.0, "ids": [
+		"ez:oak_a:painted:intake", "ez:oak_b:painted:intake", "ez:oak_c:painted:intake", "ez:oak_d:painted:intake",
+		"ez:ash_a:painted:intake", "ez:ash_b:painted:intake", "ez:ash_c:painted:intake", "ez:ash_d:painted:intake",
+		"ez:aspen_a:painted:intake", "ez:aspen_b:painted:intake", "ez:aspen_c:painted:intake", "ez:aspen_d:painted:intake",
+		"ez:pine_a:painted:intake", "ez:pine_b:painted:intake", "ez:pine_c:painted:intake",
+		"ez:dead_a:painted:intake", "ez:dead_b:painted:intake", "ez:dead_c:painted:intake",
+		"ez:bush_a:painted:intake", "ez:bush_b:painted:intake", "ez:bush_c:painted:intake", "post",
+		"scene:qtz/CommonTree_1.gltf:12:deep", "scene:qtz/CommonTree_2.gltf:12:deep", "scene:qtz/CommonTree_3.gltf:14:deep",
+		"scene:qtz/CommonTree_4.gltf:14:deep", "scene:qtz/CommonTree_5.gltf:11:deep", "scene:qtz/TwistedTree_1.gltf:15:deep",
+		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
+		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -195,27 +213,38 @@ const EZ_TREES := {
 	"oak_a": ["oak", "oak", 13.0], "oak_b": ["oak", "oak", 16.0], "ash_a": ["ash", "oak", 13.0],
 	"ash_b": ["ash", "oak", 9.0], "aspen_a": ["aspen", "birch", 14.0], "pine_a": ["pine", "pine", 13.0],
 	"bush_a": ["oak", "oak", 3.0], "bush_b": ["ash", "oak", 2.6],
+	# Finish plan T1 (assets/trees/ez/ only).
+	"oak_c": ["oak", "oak", 13.0], "oak_d": ["oak", "oak", 17.0], "ash_c": ["ash", "oak", 14.0],
+	"ash_d": ["ash", "oak", 10.0], "aspen_b": ["aspen", "birch", 14.0], "aspen_c": ["aspen", "birch", 13.0],
+	"aspen_d": ["aspen", "birch", 9.0], "pine_b": ["pine", "pine", 13.0], "pine_c": ["pine", "pine", 10.0],
+	"bush_c": ["oak", "oak", 2.4], "dead_a": ["oak", "oak", 12.0], "dead_b": ["ash", "oak", 14.0],
+	"dead_c": ["oak", "oak", 9.0],
 }
+const TREES_EZ := "res://world/spring_court/wider/assets/trees/ez/"
 
 
 ## [mesh, scale] for an EZ-Tree preview tree, its leaves photo or repainted.
-func _ez_tree(name: String, painted: bool) -> Array:
+## intake: the court's set (assets/trees/ez/) with its painted leaf and bark
+## textures, in place of the exploration copies and EZ-Tree's photos.
+func _ez_tree(name: String, painted: bool, intake := false) -> Array:
 	var spec: Array = EZ_TREES[name]
-	var inst := (load("%sez_%s.glb" % [EZ_DIR, name]) as PackedScene).instantiate()
+	var dir := TREES_EZ if intake else EZ_DIR
+	var ext := "png" if intake else "jpg"
+	var inst := (load("%sez_%s.glb" % [dir, name]) as PackedScene).instantiate()
 	var meshes: Array = inst.find_children("*", "MeshInstance3D", true, false)
 	# One ArrayMesh from the bark and leaf meshes (the export keeps them apart).
 	var st := SurfaceTool.new()
 	var out := ArrayMesh.new()
 	var leaf := ShaderMaterial.new()
 	leaf.shader = load(EZ_DIR + "ez_leaf.gdshader")
-	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [EZ_DIR, spec[0]]))
+	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [dir, spec[0]]))
 	leaf.set_shader_parameter(&"painted", 1.0 if painted else 0.0)
 	for k: String in MIX_LEAF:
 		leaf.set_shader_parameter(k, MIX_LEAF[k])
 	var bark := ShaderMaterial.new()
 	bark.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
 	bark.set_shader_parameter(&"is_leaf", false)
-	bark.set_shader_parameter(&"tex", load("%sbark_%s.jpg" % [EZ_DIR, spec[1]]))
+	bark.set_shader_parameter(&"tex", load("%sbark_%s.%s" % [dir, spec[1], ext]))
 	bark.set_shader_parameter(&"bark_col", MIX_BARK)
 	var aabb := AABB()
 	for mi: MeshInstance3D in meshes:
@@ -330,7 +359,7 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				row.add_child(inst)
 				continue
 			elif item.begins_with("ez:"):
-				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted")
+				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
 				mi.mesh = ez[0]
 				mi.scale = Vector3.ONE * float(ez[1])
 			elif item.begins_with("now:"):

@@ -23,6 +23,12 @@ window.make = async (preset, seed, lite, over) => {
   }
   tree.generate();
   await new Promise(r => setTimeout(r, 300));
+  // A bare tree (overrides leaves.count = 0): the leaf meshes go entirely.
+  if (over && over.leaves && over.leaves.count === 0) {
+    const leafy = [];
+    tree.traverse(o => { if (o.isMesh && o.material && o.material.alphaTest > 0) leafy.push(o); });
+    for (const o of leafy) o.parent.remove(o);
+  }
   let tris = 0;
   tree.traverse(o => { if (o.isMesh) { const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } });
   // Geometry only: Godot gives the bark and leaves their materials.
