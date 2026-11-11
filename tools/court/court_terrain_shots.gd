@@ -9,6 +9,11 @@
 ## the terrain; "photo" is what the game ships. Files: <view>_<look>.png.
 ## `fogs=now,layered,layered_mist` previews depth hazes (FOGS) on an in-memory
 ## copy of the view's grade; files <view>[_<look>]_<fog>.png.
+## `luts=now,deep,green,both` previews the grade's colour ramp (finish plan C1)
+## on an in-memory copy of the grade at the eye: deep lowers the dark end
+## (the milky glen), green takes the blue cast out of the dark and middle stops
+## (the teal Western Woods); files <view>_lut-<variant>.png. Every shot prints
+## the ramp's dark stop and the ground's mean colour and hue (the lower band).
 ## `ingame` uses the grade the game would show at the eye (the RegionGrade of
 ## the region you stand in, else the view's grade) instead of the view's.
 ## `grass=now,toned,none` previews the court's grass clumps (GRASS): as they
@@ -30,7 +35,7 @@ const VIEWS := {
 	"rite_way": [555.0, -800.0, 1.7, 620.0, -1055.0, 20.0, 0.72, &"spring", 70.0],
 	"rite_trench": [520.0, -986.0, 1.7, 690.0, -982.0, 4.0, 0.72, &"spring", 70.0],
 	"rite_crown": [870.0, -1140.0, 1.7, 0.0, -400.0, -60.0, 0.6, &"spring", 70.0],
-	"vale_rim": [720.0, 700.0, 1.7, 1000.0, 1000.0, -10.0, 0.5, &"spring", 70.0],
+	"vale_rim": [734.0, 707.0, 1.7, 1000.0, 1000.0, -10.0, 0.5, &"spring", 70.0],  # just past the vale gate (not in its lock)
 	"tower_hill": [-1630.0, -650.0, 1.7, -900.0, -300.0, -60.0, 0.4, &"spring", 70.0],
 	"western_woods": [-1500.0, 900.0, 1.7, -1700.0, 700.0, 4.0, 0.45, &"spring", 70.0],
 	"west_brink": [-1782.0, 180.0, 1.7, -1990.0, 160.0, 40.0, 0.62, &"spring", 70.0],
@@ -58,6 +63,7 @@ func _run() -> void:
 	var lineup := ""
 	var looks: Array = []
 	var fogs: Array = []
+	var luts: Array = []
 	var src := ""
 	var forest := ""
 	for a: String in args.duplicate():
@@ -71,6 +77,9 @@ func _run() -> void:
 			args.erase(a)
 		elif a.begins_with("fogs="):
 			fogs = Array(a.substr(5).split(","))
+			args.erase(a)
+		elif a.begins_with("luts="):
+			luts = Array(a.substr(5).split(","))
 			args.erase(a)
 		elif a.begins_with("lineup="):
 			lineup = a.substr(7)
@@ -131,13 +140,19 @@ func _run() -> void:
 				for grass: String in (grasses if not grasses.is_empty() else [""]):
 					if grass != "":
 						_apply_grass(world, grass)
-					for i in 40:
-						await get_tree().process_frame
-					var path := "%s/%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
-						"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass]
-					root.get_texture().get_image().save_png(path)
-					print("SHOT %s %s %s %s -> %s | grade %s | draw_calls %d" % [id, look, fog, grass, path,
-						world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)])
+					for lut: String in (luts if not luts.is_empty() else [""]):
+						if lut != "":
+							_apply_lut(world, _grade_at(eye, v[7]) if ingame else v[7], lut)
+						for i in 40:
+							await get_tree().process_frame
+						var path := "%s/%s%s%s%s%s.png" % [out_dir, id, "" if look == "" else "_" + look,
+							"" if fog == "" else "_" + fog, "" if grass == "" else "_grass-" + grass,
+							"" if lut == "" else "_lut-" + lut]
+						var img := root.get_texture().get_image()
+						img.save_png(path)
+						print("SHOT %s %s %s %s %s -> %s | grade %s | draw_calls %d | %s" % [id, look, fog, grass, lut, path,
+							world.grade.current.id, RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+							_colour_read(world.grade.current as GradePreset, img)])
 	get_tree().quit(0)
 
 
@@ -159,11 +174,151 @@ const LINEUPS := {
 	"species": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_ancient_oak@0", "woods_oak@0", "woods_silver_birch@0", "woods_wild_cherry@0", "woods_crab_apple@0",
 		"woods_lilac_tree@0", "woods_willow@0", "woods_hawthorn@0", "woods_elder@0", "woods_yew@0"]},
+	# Tree exploration (owner, 2026-11-10): today's leaf-card oak and birch for
+	# reference, then EZ-Tree's trees with their photo leaves and repainted.
+	"explore": {"distance": 66.0, "spacing": 10.5, "look": 6.0, "ids": [
+		"woods_oak@1", "woods_silver_birch@1", "post",
+		"ez:oak_a:photo", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:photo", "ez:ash_a:painted",
+		"ez:ash_b:painted", "ez:aspen_a:painted", "ez:pine_a:painted", "ez:bush_a:painted", "ez:bush_b:painted"]},
+	# Exploration 2: the leaf-card oak, EZ-Tree's oak and ash (repainted), and
+	# Quaternius' Stylized Nature MegaKit trees and bushes as delivered.
+	"explore2": {"distance": 66.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"woods_oak@1", "ez:oak_a:painted", "ez:ash_a:painted", "post",
+		"scene:qtz/CommonTree_1.gltf:12", "scene:qtz/CommonTree_2.gltf:12", "scene:qtz/CommonTree_3.gltf:14",
+		"scene:qtz/CommonTree_4.gltf:14", "scene:qtz/CommonTree_5.gltf:11", "scene:qtz/Pine_1.gltf:12",
+		"scene:qtz/Pine_4.gltf:15", "scene:qtz/TwistedTree_1.gltf:15", "scene:qtz/Bush_Common.gltf:2.5",
+		"scene:qtz/Bush_Common_Flowers.gltf:2.5"]},
+	# One Quaternius tree as delivered, then tinted two ways (owner asked).
+	"tint": {"distance": 26.0, "spacing": 13.0, "look": 6.0, "ids": [
+		"scene:qtz/CommonTree_3.gltf:13", "scene:qtz/CommonTree_3.gltf:13:spring", "scene:qtz/CommonTree_3.gltf:13:deep"]},
+	# The mixed set side by side, all in the court palette.
+	"mix": {"distance": 60.0, "spacing": 10.0, "look": 6.0, "ids": [
+		"scene:qtz/CommonTree_1.gltf:12:deep", "scene:qtz/CommonTree_3.gltf:14:deep", "scene:qtz/CommonTree_4.gltf:14:deep",
+		"scene:qtz/TwistedTree_1.gltf:15:deep", "ez:oak_a:painted", "ez:oak_b:painted", "ez:ash_a:painted",
+		"ez:ash_b:painted", "ez:aspen_a:painted", "scene:qtz/Bush_Common.gltf:2.4:deep", "ez:bush_b:painted"]},
+	# Finish plan T1: each EZ tree with its photo leaves and bark, then with the
+	# painted ones that replace them (assets/trees/ez/), side by side.
+	"intake": {"distance": 44.0, "spacing": 9.0, "look": 6.0, "ids": [
+		"ez:oak_a:painted", "ez:oak_a:painted:intake", "post", "ez:ash_a:painted", "ez:ash_a:painted:intake", "post",
+		"ez:aspen_a:painted", "ez:aspen_a:painted:intake", "post", "ez:pine_a:painted", "ez:pine_a:painted:intake", "post",
+		"ez:bush_b:painted", "ez:bush_b:painted:intake"]},
+	# Every build in the intake folder, painted textures, Quaternius in the deep tint.
+	"intake_all": {"distance": 80.0, "spacing": 9.0, "look": 6.0, "ids": [
+		"ez:oak_a:painted:intake", "ez:oak_b:painted:intake", "ez:oak_c:painted:intake", "ez:oak_d:painted:intake",
+		"ez:ash_a:painted:intake", "ez:ash_b:painted:intake", "ez:ash_c:painted:intake", "ez:ash_d:painted:intake",
+		"ez:aspen_a:painted:intake", "ez:aspen_b:painted:intake", "ez:aspen_c:painted:intake", "ez:aspen_d:painted:intake",
+		"ez:pine_a:painted:intake", "ez:pine_b:painted:intake", "ez:pine_c:painted:intake",
+		"ez:dead_a:painted:intake", "ez:dead_b:painted:intake", "ez:dead_c:painted:intake",
+		"ez:bush_a:painted:intake", "ez:bush_b:painted:intake", "ez:bush_c:painted:intake", "post",
+		"scene:qtz/CommonTree_1.gltf:12:deep", "scene:qtz/CommonTree_2.gltf:12:deep", "scene:qtz/CommonTree_3.gltf:14:deep",
+		"scene:qtz/CommonTree_4.gltf:14:deep", "scene:qtz/CommonTree_5.gltf:11:deep", "scene:qtz/TwistedTree_1.gltf:15:deep",
+		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
+		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
 		"woods_wild_cherry@0", "woods_wild_cherry@1", "woods_wild_cherry@2"]},
 }
+
+
+## EZ-Tree previews (world/spring_court/wider/assets/tree_explore): name ->
+## [leaf texture, bark texture, height in metres].
+const EZ_DIR := "res://world/spring_court/wider/assets/tree_explore/"
+const EZ_TREES := {
+	"oak_a": ["oak", "oak", 13.0], "oak_b": ["oak", "oak", 16.0], "ash_a": ["ash", "oak", 13.0],
+	"ash_b": ["ash", "oak", 9.0], "aspen_a": ["aspen", "birch", 14.0], "pine_a": ["pine", "pine", 13.0],
+	"bush_a": ["oak", "oak", 3.0], "bush_b": ["ash", "oak", 2.6],
+	# Finish plan T1 (assets/trees/ez/ only).
+	"oak_c": ["oak", "oak", 13.0], "oak_d": ["oak", "oak", 17.0], "ash_c": ["ash", "oak", 14.0],
+	"ash_d": ["ash", "oak", 10.0], "aspen_b": ["aspen", "birch", 14.0], "aspen_c": ["aspen", "birch", 13.0],
+	"aspen_d": ["aspen", "birch", 9.0], "pine_b": ["pine", "pine", 13.0], "pine_c": ["pine", "pine", 10.0],
+	"bush_c": ["oak", "oak", 2.4], "dead_a": ["oak", "oak", 12.0], "dead_b": ["ash", "oak", 14.0],
+	"dead_c": ["oak", "oak", 9.0],
+}
+const TREES_EZ := "res://world/spring_court/wider/assets/trees/ez/"
+
+
+## [mesh, scale] for an EZ-Tree preview tree, its leaves photo or repainted.
+## intake: the court's set (assets/trees/ez/) with its painted leaf and bark
+## textures, in place of the exploration copies and EZ-Tree's photos.
+func _ez_tree(name: String, painted: bool, intake := false) -> Array:
+	var spec: Array = EZ_TREES[name]
+	var dir := TREES_EZ if intake else EZ_DIR
+	var ext := "png" if intake else "jpg"
+	var inst := (load("%sez_%s.glb" % [dir, name]) as PackedScene).instantiate()
+	var meshes: Array = inst.find_children("*", "MeshInstance3D", true, false)
+	# One ArrayMesh from the bark and leaf meshes (the export keeps them apart).
+	var st := SurfaceTool.new()
+	var out := ArrayMesh.new()
+	var leaf := ShaderMaterial.new()
+	leaf.shader = load(EZ_DIR + "ez_leaf.gdshader")
+	leaf.set_shader_parameter(&"leaf_tex", load("%sleaf_%s.png" % [dir, spec[0]]))
+	leaf.set_shader_parameter(&"painted", 1.0 if painted else 0.0)
+	for k: String in MIX_LEAF:
+		leaf.set_shader_parameter(k, MIX_LEAF[k])
+	var bark := ShaderMaterial.new()
+	bark.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+	bark.set_shader_parameter(&"is_leaf", false)
+	bark.set_shader_parameter(&"tex", load("%sbark_%s.%s" % [dir, spec[1], ext]))
+	bark.set_shader_parameter(&"bark_col", MIX_BARK)
+	var aabb := AABB()
+	for mi: MeshInstance3D in meshes:
+		var m := mi.mesh
+		var xf: Transform3D = mi.global_transform if mi.is_inside_tree() else _local_to_root(mi, inst)
+		for i in m.get_surface_count():
+			st.clear()
+			st.create_from(m, i)
+			var mat := m.surface_get_material(i)
+			var is_leaf := mat != null and String(mat.resource_name).contains("leaves")
+			if mat == null:
+				is_leaf = String(mi.name).to_lower().contains("lea")
+			st.set_material(leaf if is_leaf else bark)
+			var arr := st.commit_to_arrays()
+			var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			for k in verts.size():
+				verts[k] = xf * verts[k]
+				aabb = aabb.expand(verts[k]) if k > 0 or out.get_surface_count() > 0 else AABB(verts[k], Vector3.ZERO)
+			arr[Mesh.ARRAY_VERTEX] = verts
+			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+			out.surface_set_material(out.get_surface_count() - 1, leaf if is_leaf else bark)
+	inst.free()
+	return [out, float(spec[2]) / maxf(aabb.size.y, 0.01)]
+
+
+func _local_to_root(n: Node3D, root: Node) -> Transform3D:
+	var xf := n.transform
+	var p := n.get_parent()
+	while p != null and p != root:
+		if p is Node3D:
+			xf = (p as Node3D).transform * xf
+		p = p.get_parent()
+	return xf
+
+
+## Court tints for a Quaternius preview tree: leaf green, its sunlit green.
+const TINTS := {
+	"spring": [Color(0.42, 0.62, 0.30), Color(0.64, 0.78, 0.42)],
+	"deep": [Color(0.27, 0.48, 0.30), Color(0.46, 0.64, 0.38)],
+}
+
+
+func _tint(inst: Node, which: String) -> void:
+	var t: Array = TINTS[which]
+	for mi: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+		for i in mi.mesh.get_surface_count():
+			# The glTF lists bark then leaves; the imported materials don't come
+			# through as BaseMaterial3D here (wcterrain-26), so go by order and
+			# load the pack's textures directly.
+			var leaf := i == 1
+			var mat := ShaderMaterial.new()
+			mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+			mat.set_shader_parameter(&"is_leaf", leaf)
+			mat.set_shader_parameter(&"tex", load(EZ_DIR + ("qtz/Leaves_NormalTree_C.png" if leaf else "qtz/Bark_NormalTree.png")))
+			var am := mi.get_active_material(i)
+			print("TINT surface %d %s leaf %s" % [i, am.get_class() if am else "null", leaf])
+			mat.set_shader_parameter(&"leaf_col", t[0])
+			mat.set_shader_parameter(&"leaf_light", t[1])
+			mi.set_surface_override_material(i, mat)
 
 
 func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera3D) -> void:
@@ -195,6 +350,33 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				post.height = 1.7
 				mi.mesh = post
 				p.y += 0.85
+			elif item.begins_with("scene:") and item.get_slice_count(":") > 3:
+				# Tinted: the same mesh the mixed wood draws (_qtz_mesh).
+				var q := _qtz_mesh(item.get_slice(":", 1))
+				var tm := MeshInstance3D.new()
+				tm.mesh = q[0]
+				var top := ((q[1] as Transform3D) * (q[0] as Mesh).get_aabb()).end.y
+				var sc := float(item.get_slice(":", 2)) / maxf(top, 0.01)
+				tm.transform = Transform3D(Basis(Vector3.UP, atan2(fwd.x, fwd.z)).scaled(Vector3.ONE * sc), p) * (q[1] as Transform3D)
+				row.add_child(tm)
+				continue
+			elif item.begins_with("scene:"):
+				# A packed model as delivered (its own materials), scaled to a height.
+				var inst := (load(EZ_DIR + item.get_slice(":", 1)) as PackedScene).instantiate() as Node3D
+				var top := 0.0
+				for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+					top = maxf(top, m.get_aabb().end.y)
+				inst.scale = Vector3.ONE * float(item.get_slice(":", 2)) / maxf(top, 0.01)
+				if item.get_slice_count(":") > 3:
+					_tint(inst, item.get_slice(":", 3))
+				inst.position = p
+				inst.rotation.y = atan2(fwd.x, fwd.z)
+				row.add_child(inst)
+				continue
+			elif item.begins_with("ez:"):
+				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
+				mi.mesh = ez[0]
+				mi.scale = Vector3.ONE * float(ez[1])
 			elif item.begins_with("now:"):
 				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)))
 			else:
@@ -221,7 +403,57 @@ const FOREST_RADIUS := 150.0
 const FOREST_PER_HA := 150.0
 
 
+## The mixed wood (owner, 2026-11-10: "a mix of the EZ trees... we don't
+## have to stick to one group"): Quaternius and EZ-Tree models in one court
+## palette. Deeper green leaves, a soft grey-brown bark, the same on both.
+const MIX_LEAF := {"shadow_col": Color(0.17, 0.32, 0.21), "mid_col": Color(0.27, 0.48, 0.30),
+	"light_col": Color(0.46, 0.64, 0.38)}
+const MIX_BARK := Color(0.50, 0.42, 0.36)
+const MIX_TINT := "deep"
+## [source, weight, height in metres]; qtz/<file> or ez:<name>.
+const MIX := [
+	["qtz/CommonTree_1.gltf", 3, 12.0], ["qtz/CommonTree_2.gltf", 3, 12.0], ["qtz/CommonTree_3.gltf", 3, 14.0],
+	["qtz/CommonTree_4.gltf", 3, 14.0], ["qtz/CommonTree_5.gltf", 3, 11.0], ["qtz/TwistedTree_1.gltf", 1, 15.0],
+	["ez:oak_a", 2, 13.0], ["ez:oak_b", 1, 16.0], ["ez:ash_a", 2, 13.0], ["ez:ash_b", 2, 9.0], ["ez:aspen_a", 2, 14.0],
+	["qtz/Bush_Common.gltf", 3, 2.4], ["qtz/Bush_Common_Flowers.gltf", 2, 2.4], ["ez:bush_b", 2, 2.6],
+]
+
+
+## [mesh, local transform] for a Quaternius model, tinted into the court palette.
+func _qtz_mesh(file: String) -> Array:
+	var inst := (load(EZ_DIR + file) as PackedScene).instantiate()
+	var mi: MeshInstance3D = inst.find_children("*", "MeshInstance3D", true, false)[0]
+	var xf := _local_to_root(mi, inst)
+	var mesh := mi.mesh.duplicate() as Mesh
+	inst.free()
+	var fam := "Twisted" if file.contains("Twisted") or file.contains("Bush_Common.gltf") else ("Pine" if file.contains("Pine") else "Normal")
+	var leaf_tex: String = {"Twisted": "Leaves_TwistedTree_C.png", "Pine": "Leaf_Pine_C.png", "Normal": "Leaves_NormalTree_C.png"}[fam]
+	var bark_tex := "Bark_TwistedTree.png" if fam == "Twisted" else "Bark_NormalTree.png"
+	var t: Array = TINTS[MIX_TINT]
+	for i in mesh.get_surface_count():
+		var leaf := i == 1 or mesh.get_surface_count() == 1
+		if file.contains("Flowers") and i == 1:
+			leaf = true
+		var mat := ShaderMaterial.new()
+		mat.shader = load(EZ_DIR + "qtz/qtz_tint.gdshader")
+		mat.set_shader_parameter(&"is_leaf", leaf)
+		mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/" + (leaf_tex if leaf else bark_tex)))
+		mat.set_shader_parameter(&"leaf_col", t[0])
+		mat.set_shader_parameter(&"leaf_light", t[1])
+		mat.set_shader_parameter(&"bark_col", MIX_BARK)
+		if file.contains("Flowers") and i == 1:
+			# The flowering bush's second surface is its blossom.
+			mat.set_shader_parameter(&"leaf_col", Color(0.93, 0.80, 0.86))
+			mat.set_shader_parameter(&"leaf_light", Color(1.0, 0.94, 0.96))
+			mat.set_shader_parameter(&"tex", load(EZ_DIR + "qtz/Flowers.png"))
+		mesh.surface_set_material(i, mat)
+	return [mesh, xf]
+
+
 func _forest(world: World, eye: Vector3, kind: String) -> void:
+	if kind == "mix":
+		_mixed_wood(world, eye)
+		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 4242
 	var buckets := {}
@@ -263,6 +495,61 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		world.add_child(mmi)
 		total += xs.size()
 	print("FOREST %s: %d trees in %d batches" % [kind, total, buckets.size()])
+
+
+func _mixed_wood(world: World, eye: Vector3) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 777
+	var models := []
+	var total_w := 0
+	for m: Array in MIX:
+		var mesh: Mesh
+		var base := Transform3D()
+		var unit := 1.0
+		if String(m[0]).begins_with("ez:"):
+			var ez := _ez_tree(String(m[0]).substr(3), true)
+			mesh = ez[0]
+			unit = float(ez[1]) / float(EZ_TREES[String(m[0]).substr(3)][2])
+		else:
+			var q := _qtz_mesh(m[0])
+			mesh = q[0]
+			base = q[1]
+			var top := (base * mesh.get_aabb()).end.y
+			unit = 1.0 / maxf(top, 0.01)
+		models.append({"mesh": mesh, "base": base, "unit": unit, "h": float(m[2]), "xs": []})
+		total_w += int(m[1])
+	var n := int(PI * 120.0 * 120.0 / 10000.0 * 120.0)
+	for i in n:
+		var r := sqrt(rng.randf()) * 120.0
+		if r < 8.0:
+			continue
+		var a := rng.randf() * TAU
+		var p := Vector3(eye.x + cos(a) * r, 0.0, eye.z + sin(a) * r)
+		p.y = WorldHeight.height_at(p.x, p.z)
+		var pick := rng.randi() % total_w
+		var k := 0
+		while pick >= int(MIX[k][1]):
+			pick -= int(MIX[k][1])
+			k += 1
+		var md: Dictionary = models[k]
+		var sc := float(md["h"]) * float(md["unit"]) * rng.randf_range(0.8, 1.2)
+		md["xs"].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * sc), p) * (md["base"] as Transform3D))
+	var count := 0
+	for md: Dictionary in models:
+		var xs: Array = md["xs"]
+		if xs.is_empty():
+			continue
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = md["mesh"]
+		mm.instance_count = xs.size()
+		for i in xs.size():
+			mm.set_instance_transform(i, xs[i])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		world.add_child(mmi)
+		count += xs.size()
+	print("FOREST mix: %d trees and bushes from %d models" % [count, models.size()])
 
 
 ## Depth hazes for the preview: fog field -> value. "layered": a cool
@@ -327,6 +614,58 @@ func _apply_fog(world: World, grade: StringName, fog: String) -> void:
 	world.grade.set(&"_to", p)
 	world.grade.set(&"_t", 1.0)
 	world.grade.apply(p)
+
+
+## The grade's ramp with the dark end lowered and/or the blue cast taken out.
+## deep: dark stop x LUT_DEEP (about 0.1 to 0.03); green: the dark and middle
+## stops' blue no higher than their red/green mean.
+const LUT_DEEP := 0.3
+
+
+func _apply_lut(world: World, grade: StringName, variant: String) -> void:
+	var p := (GradeDirector.load_preset(grade) as GradePreset).duplicate() as GradePreset
+	var gt := p.lut as GradientTexture1D
+	if variant != "now" and gt != null and gt.gradient != null:
+		var g := gt.gradient.duplicate() as Gradient
+		var cols := g.colors
+		for i in mini(cols.size(), 2):
+			var c := cols[i]
+			if variant == "deep" or variant == "both":
+				c = c * LUT_DEEP if i == 0 else c
+			if variant == "green" or variant == "both":
+				c.b = minf(c.b, (c.r + c.g) * 0.5)
+			c.a = 1.0
+			cols[i] = c
+		g.colors = cols
+		var out := GradientTexture1D.new()
+		out.gradient = g
+		out.width = gt.width
+		p.lut = out
+	world.grade.current = p
+	world.grade.set(&"_to", p)
+	world.grade.set(&"_t", 1.0)
+	world.grade.apply(p)
+
+
+## "lut dark (r,g,b) | ground (r,g,b) hue h": the ramp's dark stop, and the
+## mean colour of the frame's lower fifth (the ground underfoot) with its hue.
+func _colour_read(p: GradePreset, img: Image) -> String:
+	var dark := "none"
+	var gt := p.lut as GradientTexture1D if p != null else null
+	if gt != null and gt.gradient != null:
+		var c := gt.gradient.colors[0]
+		dark = "(%.3f,%.3f,%.3f)" % [c.r, c.g, c.b]
+	var sum := Color(0, 0, 0)
+	var n := 0
+	var w := img.get_width()
+	var h := img.get_height()
+	for y in range(int(h * 0.8), h, 4):
+		for x in range(0, w, 4):
+			var c := img.get_pixel(x, y)
+			sum += Color(c.r, c.g, c.b, 0.0)
+			n += 1
+	var m := Color(sum.r / n, sum.g / n, sum.b / n)
+	return "lut dark %s | ground (%.3f,%.3f,%.3f) hue %.0f" % [dark, m.r, m.g, m.b, m.h * 360.0]
 
 
 ## Terrain3D assets with the court's photo slots packed in `look` (every slot
