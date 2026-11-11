@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot bloom res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=bloom
+shot bloomfar res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=bloom_far
