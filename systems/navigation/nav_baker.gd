@@ -65,9 +65,13 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 			done.call()
 		return
 	# The callback may come from the bake thread: hand the result to the main thread.
+	# Hold the region weakly: a lambda capturing a freed node logs "Lambda capture
+	# at index 0 was freed" when the scene is freed before the bake lands (T110).
+	var region_ref: WeakRef = weakref(region)
 	var land := func() -> void:
-		if is_instance_valid(region):
-			region.navigation_mesh = nm
+		var r := region_ref.get_ref() as NavigationRegion3D
+		if r != null:
+			r.navigation_mesh = nm
 		if done.is_valid():
 			done.call()
 	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void: land.call_deferred())
@@ -175,7 +179,11 @@ func _bake_tile(at: Vector3) -> void:
 		return
 	_baking = true
 	tile_centre = at
-	bake(tile_region, source, aabb, true, func() -> void: _baking = false)
+	var me: WeakRef = weakref(self)
+	bake(tile_region, source, aabb, true, func() -> void:
+		var b := me.get_ref() as NavBaker
+		if b != null:
+			b._baking = false)
 
 
 func _terrain() -> Node:
