@@ -4,9 +4,13 @@
 extends GutTest
 
 const MANOR := "res://world/spring_court/manor_estate/manor_estate.tscn"
-## Headless on a busy gate. One-frame builds were 3400 to 6700 ms.
-const MAX_FRAME_MSEC := 400
-const MAX_BUILD_SECONDS := 60.0
+## T098: no wall-clock bars. The build is paced by wall time, so a busy machine
+## only makes it take more, shorter-work frames, never fewer; what is asserted
+## is the outcome (it finished, over many frames, to the same manor). A one-frame
+## build (3400 to 6700 ms on one frame) is 1 frame, unloaded ~150, under load
+## more. MAX_BUILD_SECONDS is only a hang guard: at load 17 a build took over 60 s.
+const MIN_FRAMES := 30
+const MAX_BUILD_SECONDS := 600.0
 
 
 func _manor(stream_id: StringName) -> ManorEstate:
@@ -43,7 +47,7 @@ func test_builds_across_frames_into_the_same_manor() -> void:
 	assert_null(manor.get_node_or_null(^"House"), "nothing is in the tree yet")
 	var started := Time.get_ticks_msec()
 	var frame_at := started
-	var longest := 0
+	var longest := 0  # logged only
 	var frames := 0
 	while manor.is_in_group(ManorEstate.BUSY_GROUP) and (Time.get_ticks_msec() - started) / 1000.0 < MAX_BUILD_SECONDS:
 		await wait_frames(1)
@@ -52,7 +56,7 @@ func test_builds_across_frames_into_the_same_manor() -> void:
 		frames += 1
 	gut.p("built in %d ms over %d frames, longest frame %d ms" % [Time.get_ticks_msec() - started, frames, longest])
 	assert_false(manor.is_in_group(ManorEstate.BUSY_GROUP), "finishes")
-	assert_lt(longest, MAX_FRAME_MSEC, "no frame pays for the build")
+	assert_gte(frames, MIN_FRAMES, "the build is spread over frames, not paid in one")
 	assert_not_null(manor.house, "the estate has its parts")
 	assert_not_null(manor.scatter)
 	var built := _signature(manor)
