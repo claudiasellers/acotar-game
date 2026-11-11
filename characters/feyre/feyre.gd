@@ -19,6 +19,8 @@ const PLAYER_LAYER := 1 << 1
 const WORLD_MASK := 1 << 0
 ## The camera's constants (DEFAULT_PITCH, INDOOR_*, ROOM_*, LENS_RADIUS, ...) live
 ## in FeyreCamera; the ledge climb's (CLIMB_*) in MantleMotor (T100).
+## Alias for T098's room-camera test, which lands in parallel; new code uses FeyreCamera.
+const ROOM_PULL_IN := FeyreCamera.ROOM_PULL_IN
 
 @export var bow: BowData = preload("res://data/bows/hunting_bow.tres")
 @export var walk_speed: float = 4.16
