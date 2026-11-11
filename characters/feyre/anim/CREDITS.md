@@ -40,7 +40,7 @@ trimming and retiming as listed above. Native ground speeds for the gait loops a
 ## Crouch clips (`feyre_crouch.res`)
 
 `feyre_crouch.res` is an AnimationLibrary built by
-`tools/generators/feyre_crouch_retarget.gd` (Godot, deterministic; rerun it with the
+`tools/animation/feyre_crouch_retarget.gd` (Godot, deterministic; rerun it with the
 two Mesh2Motion files above in a folder to rebuild). Same source commit and CC0
 licence; the same rotation-transfer method as `retarget_moves.py`.
 

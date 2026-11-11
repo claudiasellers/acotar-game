@@ -14,7 +14,7 @@ class_name FeyreAnimator
 extends Node
 
 const MOVES_SCENE := "res://characters/feyre/anim/feyre_moves.glb"
-## Crouch clips (crouch_idle, sneak), built by tools/generators/feyre_crouch_retarget.gd
+## Crouch clips (crouch_idle, sneak), built by tools/animation/feyre_crouch_retarget.gd
 ## from the same CC0 source; each carries its native ground speed as "native_speed" meta.
 const CROUCH_LIBRARY := "res://characters/feyre/anim/feyre_crouch.res"
 const CROUCH_CLIPS: Array[StringName] = [&"crouch_idle", &"sneak"]

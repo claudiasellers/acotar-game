@@ -7,7 +7,7 @@
 ## frame the feet are grounded (her lowest foot or toe joint sits at its rest height)
 ## and her knees are kept off the floor. Jaw, eyes, braid and Root stay at rest.
 ##
-##   godot --headless --path . -s tools/generators/feyre_crouch_retarget.gd -- SOURCE_DIR
+##   godot --headless --path . -s tools/animation/feyre_crouch_retarget.gd -- SOURCE_DIR
 ## SOURCE_DIR holds human-base-animations.glb and human-addon-animations.glb from Mesh2Motion
 ## (github.com/scottpetrovic/mesh2motion-app, commit
 ## eef2de986dab53283cb636f860d502d64b8073e7, static/animations/, CC0 1.0).
