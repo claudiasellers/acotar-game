@@ -52,7 +52,7 @@
 #define CANDY_BACKLIGHT_DEFAULT 0.0
 #endif
 #ifndef CANDY_BOUNCE_DEFAULT
-// T3a: every surface outdoors. The manor's room shells set 0: SDFGI lights those rooms.
+// T3a: every surface outdoors. The manor's room shells set 0: the flat interior ambient lights those rooms.
 #define CANDY_BOUNCE_DEFAULT 0.35
 #endif
 

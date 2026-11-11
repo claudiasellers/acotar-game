@@ -34,7 +34,7 @@ func _ready() -> void:
 	apply_now()
 
 
-## GradeDirector sets SDFGI from the grade every frame; this runs after it.
+## Measurement only: the grades never touch SDFGI, so this keeps it on.
 func _process(_delta: float) -> void:
 	if environment != null and environment.environment != null:
 		environment.environment.sdfgi_enabled = true
