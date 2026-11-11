@@ -31,6 +31,10 @@ static var _forage_models: Dictionary = {}
 @export_range(0.0, 1.0) var wind := 0.0
 ## Fully drawn up to this distance (metres).
 @export var draw_distance := 120.0
+## Where the mesh starts drawing (0: from the camera). A layer can stand in
+## for another past it, so one tree has a near mesh to one distance and a
+## lighter one beyond (the wider court's detail steps, finish plan T2/T6).
+@export var draw_from := 0.0
 ## Optional camera-facing impostor drawn from draw_distance to impostor_distance.
 ## Optional material_override for every instance, usually a ShaderMaterial on
 ## world/shared/shaders/stylized_foliage.gdshader (default: the mesh's own).

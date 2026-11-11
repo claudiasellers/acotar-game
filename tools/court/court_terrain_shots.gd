@@ -214,6 +214,12 @@ const LINEUPS := {
 		"scene:qtz/CommonTree_4.gltf:14:deep", "scene:qtz/CommonTree_5.gltf:11:deep", "scene:qtz/TwistedTree_1.gltf:15:deep",
 		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
 		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
+	# Finish plan T8: every role of the court's tree set (CourtTreeSet) as the
+	# game draws it, a few builds each; roles_green the woods, roles_colour the
+	# blossom, autumn and blight. tree_steps: near, mid and far of four builds.
+	"roles_green": {"distance": 46.0, "spacing": 6.0, "look": 5.0, "ids": ["set:woods_oak:0", "set:woods_oak:3", "set:woods_oak:5", "set:woods_oak:9", "post", "set:woods_ancient_oak:0", "set:woods_ancient_oak:2", "set:woods_ancient_oak:4", "post", "set:woods_silver_birch:0", "set:woods_silver_birch:3", "post", "set:woods_yew:0", "set:woods_yew:2", "set:woods_yew:5", "post", "set:woods_hawthorn:0", "set:woods_hawthorn:1", "post", "set:woods_elder:0", "set:woods_elder:2"]},
+	"roles_colour": {"distance": 46.0, "spacing": 6.0, "look": 4.0, "ids": ["set:woods_wild_cherry:0", "set:woods_wild_cherry:2", "post", "set:woods_crab_apple:0", "set:woods_crab_apple:1", "post", "set:woods_lilac_tree:0", "set:woods_lilac_tree:1", "set:woods_lilac_tree:2", "post", "set:flora_tree_autumn_oak:0", "set:flora_tree_autumn_oak:2", "post", "set:flora_tree_autumn_maple:0", "set:flora_tree_autumn_maple:2", "post", "set:flora_tree_golden_birch:0", "set:flora_tree_golden_birch:2", "post", "set:flora_tree_rowan:0", "set:flora_tree_rowan:1", "post", "set:woods_blighted_tree:0", "set:woods_blighted_tree:5", "post", "set:woods_twisted_dead:2", "set:woods_twisted_dead:7"]},
+	"tree_steps": {"distance": 34.0, "spacing": 6.5, "look": 5.0, "ids": ["set:woods_oak:5:0", "set:woods_oak:5:1", "set:woods_oak:5:2", "post", "set:woods_oak:0:0", "set:woods_oak:0:1", "set:woods_oak:0:2", "post", "set:woods_ancient_oak:0:0", "set:woods_ancient_oak:0:1", "set:woods_ancient_oak:0:2", "post", "set:woods_wild_cherry:0:0", "set:woods_wild_cherry:0:1", "set:woods_wild_cherry:0:2"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
 	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35:fit", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6:fit", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4:fit", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7:fit", "scene:/plants/qtz/Clover_1.gltf:0.15:fit", "scene:/plants/qtz/Clover_2.gltf:0.18:fit", "scene:/plants/qtz/Fern_1.gltf:0.8:fit", "scene:/plants/qtz/Flower_3_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_3_Group.gltf:0.5:fit", "scene:/plants/qtz/Flower_4_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_4_Group.gltf:0.5:fit", "scene:/plants/qtz/Mushroom_Common.gltf:0.25:fit", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35:fit"]},
 	# The re-downloaded Quaternius trees: twisted oaks and pines in the deep tint,
@@ -401,6 +407,11 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				inst.rotation.y = atan2(fwd.x, fwd.z)
 				row.add_child(inst)
 				continue
+			elif item.begins_with("set:"):
+				# The game's own tree: CourtTreeSet's build at a detail step
+				# (set:<id>:<build>[:<step>]), already at the id's height.
+				var step := int(item.get_slice(":", 3)) if item.get_slice_count(":") > 3 else 0
+				mi.mesh = CourtTreeSet.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)), step)
 			elif item.begins_with("ez:"):
 				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
 				mi.mesh = ez[0]
@@ -424,8 +435,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 ## A frame-time stress test (plan Track M): a dense wood all round the eye,
 ## 150 trees a hectare out to 150 m (about a thousand trees, near and far
 ## meshes switched at the game's own distances), from five species. `forest=old` uses FloraLibrary's
-## trees as the estate draws them, `forest=cards` the court's leaf-card
-## builds. Run it under tools/perf/frame_probe.tscn for the numbers.
+## trees as the estate draws them, `forest=set` the court's tree set (CourtTreeSet) at its three
+## detail steps. Run it under tools/perf/frame_probe.tscn for the numbers.
 const FOREST_SPECIES := [&"oak", &"silver_birch", &"yew", &"wild_cherry", &"hawthorn"]
 const FOREST_RADIUS := 150.0
 const FOREST_PER_HA := 150.0
@@ -500,23 +511,27 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		var p := Vector3(eye.x + cos(a) * r, 0.0, eye.z + sin(a) * r)
 		p.y = WorldHeight.height_at(p.x, p.z)
 		var sp: StringName = FOREST_SPECIES[rng.randi() % FOREST_SPECIES.size()]
-		var v := rng.randi() % CourtAssets.CARD_VARIANTS if kind == "cards" else 0
-		# The game's own switch to the far mesh: 260 m for today's trees
-		# (TREE_DRAW), CARD_NEAR for the leaf-card trees.
-		var far := r > (CourtAssets.CARD_NEAR if kind == "cards" else 260.0)
-		var key := "%s@%d%s" % [sp, v, "@far" if far else ""]
+		# set: the court's tree set (CourtTreeSet), its builds and its three
+		# detail steps at the game's own distances; old: FloraLibrary's trees.
+		var nb := CourtTreeSet.builds(StringName("woods_" + String(sp))) if kind == "set" else 0
+		var v := rng.randi() % nb if nb > 0 else 0
+		var step := 0 if r < CourtTreeSet.NEAR else (1 if r < 260.0 else 2)
+		if kind != "set" or nb == 0:
+			step = 2 if r > 260.0 else 0
+		var key := "%s@%d@%d" % [sp, v, step]
 		if not buckets.has(key):
 			buckets[key] = []
 		buckets[key].append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.85, 1.2)), p))
 	var total := 0
 	for key: String in buckets:
 		var sp := StringName(key.get_slice("@", 0))
-		var far := key.ends_with("@far")
+		var step := int(key.get_slice("@", 2))
+		var far := step == 2
 		var mesh: Mesh
-		if kind == "old":
-			mesh = FloraLibrary.far_mesh(sp) if far else FloraLibrary.mesh(sp)
+		if kind == "set" and CourtTreeSet.builds(StringName("woods_" + String(sp))) > 0:
+			mesh = CourtTreeSet.mesh(StringName("woods_" + String(sp)), int(key.get_slice("@", 1)), step)
 		else:
-			mesh = CourtAssets.mesh(CourtAssets.variant_id(StringName("woods_" + String(sp)), int(key.get_slice("@", 1))), far)
+			mesh = FloraLibrary.far_mesh(sp) if far else FloraLibrary.mesh(sp)
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.mesh = mesh

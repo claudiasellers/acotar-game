@@ -64,6 +64,9 @@ func add_chunk(layer: ScatterLayer, key: Vector2i, ids: PackedInt32Array, buffer
 	var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], _multimesh(layer.draw_mesh(), ids.size(), buffer), origin)
 	node.visibility_range_end = layer.draw_distance
 	node.visibility_range_end_margin = 8.0
+	if layer.draw_from > 0.0:
+		node.visibility_range_begin = layer.draw_from
+		node.visibility_range_begin_margin = 8.0
 	if layer.is_forage():
 		node.add_to_group(FORAGE_GROUP)
 		node.set_meta(&"ingredient_id", layer.ingredient_id)

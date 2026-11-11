@@ -87,6 +87,9 @@ func _build_layer(layer: ScatterLayer) -> void:
 		var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], mm, origin)
 		node.visibility_range_end = layer.draw_distance
 		node.visibility_range_end_margin = 8.0
+		if layer.draw_from > 0.0:
+			node.visibility_range_begin = layer.draw_from
+			node.visibility_range_begin_margin = 8.0
 		if layer.is_forage():
 			node.add_to_group(FORAGE_GROUP)
 			node.set_meta(&"ingredient_id", layer.ingredient_id)

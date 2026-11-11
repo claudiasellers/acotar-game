@@ -133,39 +133,77 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	return out
 
 
-## A leaf-card tree's layer split over its builds (CourtAssets.variants):
-## each tree takes a build from a hash of where it stands, so neighbours
-## differ and a region rebuilds the same. Other layers come back as they are.
+## A tree layer from the court's tree set (CourtTreeSet) split over its
+## builds and detail steps: each build gets a near layer (to CourtTreeSet.NEAR)
+## and a mid layer (from there to TREE_DRAW) with the far crown past it. A tree
+## takes the build its position hashes to unless a neighbour within
+## NEIGHBOUR_GAP has it, then the next free one (finish plan T3: no two
+## neighbours alike). Trees outside the set keep their one layer.
+const NEIGHBOUR_GAP := 9.0
+
+
 static func _split_builds(layer: ScatterLayer) -> Array[ScatterLayer]:
 	var id := StringName(String(layer.id).substr(String(layer.id).find("_", 6) + 1))
-	var n := CourtAssets.variants(id)
+	var n := CourtTreeSet.builds(id)
 	var parts: Array[ScatterLayer] = []
-	if n <= 1:
+	if n <= 0:
 		parts.append(layer)
 		return parts
+	var near: Array[ScatterLayer] = []
+	var mid: Array[ScatterLayer] = []
 	for v in n:
-		var part := ScatterLayer.new()
-		part.id = StringName("%s@%d" % [layer.id, v])
-		part.mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v))
-		part.impostor_mesh = CourtAssets.mesh(CourtAssets.variant_id(id, v), true)
-		part.impostor_distance = layer.impostor_distance
-		part.draw_distance = minf(layer.draw_distance, CourtAssets.CARD_NEAR)
-		part.wind = layer.wind
-		part.cast_shadow = layer.cast_shadow
-		part.tags = layer.tags
-		part.material = layer.material
-		part.ingredient_id = layer.ingredient_id
-		parts.append(part)
+		for step in [CourtTreeSet.Step.NEAR, CourtTreeSet.Step.MID]:
+			var part := ScatterLayer.new()
+			part.id = StringName("%s@%d%s" % [layer.id, v, "" if step == CourtTreeSet.Step.NEAR else "m"])
+			part.mesh = CourtTreeSet.mesh(id, v, step)
+			if step == CourtTreeSet.Step.NEAR:
+				part.draw_distance = CourtTreeSet.NEAR
+				near.append(part)
+			else:
+				part.draw_from = CourtTreeSet.NEAR
+				part.draw_distance = layer.draw_distance
+				part.impostor_mesh = CourtTreeSet.mesh(id, v, CourtTreeSet.Step.FAR)
+				part.impostor_distance = layer.impostor_distance
+				mid.append(part)
+			part.wind = layer.wind
+			part.cast_shadow = layer.cast_shadow
+			part.tags = layer.tags
+			part.ingredient_id = layer.ingredient_id
+	var taken := {}
 	for i in layer.count():
 		var p := layer.position_of(i)
 		var o := i * ScatterLayer.STRIDE
-		var v := absi(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0)))) % n
-		parts[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
+		var v := _free_build(taken, p, absi(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0)))) % n, n)
+		near[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
+		mid[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
 	var kept: Array[ScatterLayer] = []
-	for part in parts:
-		if part.count() > 0:
-			kept.append(part)
+	for k in near.size():
+		if near[k].count() > 0:
+			kept.append(near[k])
+			kept.append(mid[k])
 	return kept
+
+
+## The first build from `want` that no tree within NEIGHBOUR_GAP has, which
+## it then records in `taken` (cells of NEIGHBOUR_GAP: key -> [[pos, build]]).
+static func _free_build(taken: Dictionary, p: Vector3, want: int, n: int) -> int:
+	var cell := Vector2i(floori(p.x / NEIGHBOUR_GAP), floori(p.z / NEIGHBOUR_GAP))
+	var near_builds := {}
+	for dx in range(-1, 2):
+		for dz in range(-1, 2):
+			for t: Array in taken.get(cell + Vector2i(dx, dz), []):
+				if Vector2((t[0] as Vector3).x - p.x, (t[0] as Vector3).z - p.z).length() < NEIGHBOUR_GAP:
+					near_builds[t[1]] = true
+	var v := want
+	for k in n:
+		var c := (want + k) % n
+		if not near_builds.has(c):
+			v = c
+			break
+	if not taken.has(cell):
+		taken[cell] = []
+	(taken[cell] as Array).append([p, v])
+	return v
 
 
 ## One non-tree decoration entry, placed by its composition role: weighted by
@@ -495,7 +533,7 @@ static func estimate_draw_calls(content: CourtRegionContent, forage: Array[Scatt
 		for k: Vector2i in keys:
 			var centre := Vector2((k.x + 0.5) * chunk, (k.y + 0.5) * chunk)
 			var d := centre.distance_to(cam) - chunk * 0.71
-			if d < layer.draw_distance:
+			if d < layer.draw_distance and d + chunk * 1.42 >= layer.draw_from:
 				calls += 1
 			elif layer.impostor_mesh != null and d < layer.impostor_distance:
 				calls += 1

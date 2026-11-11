@@ -8,28 +8,9 @@ const FLORA_DIR := "res://world/spring_court/wider/assets/flora/"
 const PROPS_DIR := "res://world/spring_court/wider/assets/props/"
 const MATERIAL_DIR := "res://world/spring_court/wider/fx/materials/"
 const WOODS_PREFIX := "woods_"
-## The court's leafy trees are leaf-card models (owner's pick 2026-11-10;
-## tools/court/blender/court_trees.py), five builds per species. A decor
-## entry names the woods id ("woods_oak"); the scatter splits its trees over
-## the builds as "woods_oak@0".."woods_oak@4" (court_scatter_generator.gd).
-## Court only: the estate and the woods keep FloraLibrary's trees until the
-## owner has seen them side by side (plan M3).
-const CARD_TREES := {
-	&"woods_ancient_oak": "ancient_oak", &"woods_oak": "oak", &"woods_silver_birch": "silver_birch",
-	&"woods_wild_cherry": "wild_cherry", &"woods_crab_apple": "crab_apple", &"woods_lilac_tree": "lilac_tree",
-	&"woods_willow": "willow", &"woods_hawthorn": "hawthorn", &"woods_elder": "elder", &"woods_yew": "yew",
-}
-const CARD_VARIANTS := 5
-## The switch: false puts every court tree back on FloraLibrary's models.
-## Off (owner, 2026-11-10: they read tropical) while the court's trees are
-## chosen between these, EZ-Tree and Quaternius (docs/lanes/wider-court-finish-plan.md).
-const CARD_TREES_ON := false
-## Leaf-card trees draw their near mesh this close, their far mesh (fewer,
-## bigger cards) out to the impostor range: cards cost overdraw, not
-## triangles (the wcterrain-19 dense-wood test).
-const CARD_NEAR := 100.0
-const CARD_DIR := "res://world/spring_court/shared/models/cards/"
-const CARD_SHADER := "res://world/spring_court/shared/court_leaf_card.gdshader"
+## The court's trees are CourtTreeSet's mixed wood (finish plan T6); the
+## leaf-card trees are gone (M4WCT-7: they read tropical). A tree id outside
+## the set (the willow, the leaning trunk) stays FloraLibrary's.
 
 const PASTELS := [
 	Color(0.98, 0.62, 0.76), Color(0.99, 0.80, 0.85), Color(0.80, 0.68, 0.95),
@@ -56,24 +37,7 @@ static func scene_path(id: StringName) -> String:
 
 
 static func has_model(id: StringName) -> bool:
-	return scene_path(id) != "" or woods_species(id) != &"" or card_tree(id) != ""
-
-
-## The leaf-card species behind `id` ("woods_oak" or "woods_oak@3"), or "".
-static func card_tree(id: StringName) -> String:
-	if not CARD_TREES_ON:
-		return ""
-	return CARD_TREES.get(StringName(String(id).get_slice("@", 0)), "")
-
-
-## How many builds a decor id has (1 for anything but a leaf-card tree).
-static func variants(id: StringName) -> int:
-	return CARD_VARIANTS if card_tree(id) != "" else 1
-
-
-## The id of build `v` of a leaf-card tree.
-static func variant_id(id: StringName, v: int) -> StringName:
-	return StringName("%s@%d" % [String(id).get_slice("@", 0), v])
+	return scene_path(id) != "" or woods_species(id) != &"" or CourtTreeSet.has(id)
 
 
 ## "woods_<species>" ids are the woods lane's Blender tree archetypes, used
@@ -105,11 +69,15 @@ static func _mesh_locked(id: StringName, lod: bool) -> Mesh:
 	var key := "%s%s" % [id, "_LOD1" if lod else ""]
 	if _meshes.has(key):
 		return _meshes[key]
-	if card_tree(id) != "":
-		var cm := _card_mesh_locked(id, lod)
-		if cm != null:
-			_meshes[key] = cm
-			return cm
+	if CourtTreeSet.has(id):
+		# A set tree asked for by its plain id (landmarks, places, tools):
+		# its first build, near or far.
+		var parts := String(id).split("@")
+		var tm := CourtTreeSet.mesh(id, int(parts[1]) if parts.size() > 1 else 0,
+			CourtTreeSet.Step.FAR if lod else CourtTreeSet.Step.NEAR)
+		if tm != null:
+			_meshes[key] = tm
+			return tm
 	var species := woods_species(StringName(String(id).get_slice("@", 0)))
 	if species != &"":
 		var wm: Mesh = FloraLibrary.far_mesh(species) if lod else null
@@ -135,43 +103,6 @@ static func _mesh_locked(id: StringName, lod: bool) -> Mesh:
 	_apply_material(id, m)
 	_meshes[key] = m
 	return m
-
-
-## A leaf-card tree's near or far mesh, with the woods' tree material on the
-## trunk and core and the leaf-card material on the cards (the surface whose
-## UV2 holds card coordinates; glTF placeholder materials lose their names).
-static func _card_mesh_locked(id: StringName, lod: bool) -> Mesh:
-	var parts := String(id).split("@")
-	var v := int(parts[1]) if parts.size() > 1 else 0
-	var path := "%s%s_v%d.glb" % [CARD_DIR, card_tree(id), clampi(v, 0, CARD_VARIANTS - 1)]
-	var packed := load(path) as PackedScene
-	if packed == null:
-		return null
-	var root := packed.instantiate()
-	var node := root.find_child("far" if lod else "near", true, false) as MeshInstance3D
-	var m: ArrayMesh = (node.mesh.duplicate() as ArrayMesh) if node != null and node.mesh != null else null
-	root.free()
-	if m == null:
-		return null
-	for i in m.get_surface_count():
-		var uv2: Variant = m.surface_get_arrays(i)[Mesh.ARRAY_TEX_UV2]
-		var card := false
-		if uv2 != null:
-			for p: Vector2 in uv2:
-				if p.x > 0.0 or p.y > 0.0:
-					card = true
-					break
-		m.surface_set_material(i, _leaf_card_material_locked() if card else FloraLibrary.material(&"tree"))
-	return m
-
-
-static func _leaf_card_material_locked() -> ShaderMaterial:
-	if not _materials.has(&"_leaf_card"):
-		var mat := ShaderMaterial.new()
-		mat.shader = load(CARD_SHADER)
-		mat.set_shader_parameter(&"leaf_atlas", load(CARD_DIR + "leaf_atlas.png"))
-		_materials[&"_leaf_card"] = mat
-	return _materials[&"_leaf_card"]
 
 
 ## The whole model scene (landmarks: mesh + `<id>_col` collision mesh).
