@@ -1,6 +1,6 @@
 ## Contract (T094): a wall beside her never lets the lens graze or pass it. The
 ## over-the-shoulder offset is swept out from the pivot and the arm sweeps a ball
-## Feyre.LENS_RADIUS wide, so the camera keeps a margin from a wall on the shoulder
+## FeyreCamera.LENS_RADIUS wide, so the camera keeps a margin from a wall on the shoulder
 ## side; in the open the full shoulder offset is untouched.
 extends GutTest
 

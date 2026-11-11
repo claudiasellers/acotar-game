@@ -216,7 +216,7 @@ func test_bow_is_stowed_indoors_and_comes_out_to_aim() -> void:
 	var visual := feyre.bow_controller.find_child("BowVisual", true, false) as BowVisual
 	await wait_frames(2)
 	assert_true(visual.bow_root.visible, "outdoors in hunting clothes")
-	feyre.set(&"_indoor", 1.0)
+	feyre.camera_control.indoor = 1.0
 	visual.raised = 0.0
 	visual._place()
 	assert_false(visual.bow_root.visible or visual.quiver.visible, "stowed under a roof (D1)")
