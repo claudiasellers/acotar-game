@@ -55,10 +55,16 @@ case "${1:-}" in
 			[ -f "$m" ] || continue
 			[ "$(kv_get "$m" status)" = active ] && busy="$busy$(kv_get "$m" lane) "
 		done
-		i=1; n=$(mq_config_or MQ_LANES 4)
-		while [ "$i" -le "$n" ]; do
-			case "$busy" in *" lane$i "*) ;; *) echo "lane$i"; exit 0 ;; esac
-			i=$((i + 1))
+		# A free lane already on disk first; lane.sh makes a missing one.
+		n=$(mq_config_or MQ_LANES 4)
+		for pass in disk any; do
+			i=1
+			while [ "$i" -le "$n" ]; do
+				case "$busy" in *" lane$i "*) ;; *)
+					if [ "$pass" = any ] || [ -e "$MQ_LANES_DIR/lane$i/.git" ]; then echo "lane$i"; exit 0; fi ;;
+				esac
+				i=$((i + 1))
+			done
 		done ;;
 	unmet)
 		[ -d "$TASKS/${2:-}" ] || { echo "mq: no task ${2:-}" >&2; exit 1; }

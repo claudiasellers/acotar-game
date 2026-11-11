@@ -104,6 +104,7 @@ MQ_CLEANUP_OFF=1
 MQ_SUBMIT_NO_START=1
 MQ_CLOUD=1
 MQ_FETCH_TIMEOUT=20
+MQ_LANES_EAGER=1
 EOF
 	tools/mq/setup_lanes.sh >/dev/null
 	# The lane starts detached: wait for its lock, or the stop can miss it.
@@ -536,27 +537,60 @@ case_idle_gate_red_and_killed() {
 
 case_cleanup() {
 	newrepo clean2
-	local a b
-	a=$(change merged one); git push -q origin "$a:refs/heads/lane/merged"
-	b=$(change open two); git push -q origin "$b:refs/heads/lane/open"
-	git push -q origin "$b:refs/heads/lead/ready-T7-1"
-	git push -q origin "$b:refs/heads/vendor/keep"
+	local a b d
+	mark() { tools/mq/mark.sh add "$@"; }
+	a=$(change merged one fa); git push -q origin "$a:refs/heads/lane/merged"
+	git push -q origin "$a:refs/heads/lane/later"
 	queue "$a" T1; start_lane; drain; stop_lane
+	b=$(change open two fb); git push -q origin "$b:refs/heads/lane/open"
+	git push -q origin "$b:refs/heads/vendor/keep"
 	echo keep > untracked_file
-	kv="MQ_CLEANUP_MIN_AGE=0"; echo "$kv" >> .git/mq/config
+	git fetch -q origin
+	# Nothing marked: nothing goes, however old or merged.
 	tools/mq/cleanup.sh
-	expect "merged lane branch gone" test -z "$(git ls-remote origin refs/heads/lane/merged)"
-	expect "open lane branch kept" test -n "$(git ls-remote origin refs/heads/lane/open)"
-	expect "ready branch kept" test -n "$(git ls-remote origin refs/heads/lead/ready-T7-1)"
+	expect "no marks: merged branch kept" test -n "$(git ls-remote origin refs/heads/lane/merged)"
+	# mark -> delete; unmerged kept; retention respected.
+	mark remote_branch lane/merged 0 test
+	mark remote_branch lane/open 0 test
+	mark remote_branch vendor/keep 0 test
+	mark remote_branch lane/later 3600 test
+	tools/mq/cleanup.sh
+	expect "marked merged branch deleted" test -z "$(git ls-remote origin refs/heads/lane/merged)"
+	expect "marked unmerged branch kept" test -n "$(git ls-remote origin refs/heads/lane/open)"
+	expect "unmerged keep logged" grep -q "keep remote branch lane/open" .git/mq/events.log
 	expect "other branch kept" test -n "$(git ls-remote origin refs/heads/vendor/keep)"
+	expect "inside retention: kept" test -n "$(git ls-remote origin refs/heads/lane/later)"
+	expect "inside retention: mark waits" test -f .git/mq/cleanup/marks/remote_branch-$(printf lane/later | cksum | cut -d' ' -f1).mark
+	expect "deletion logged" grep -q "CLEANUP delete remote branch lane/merged" .git/mq/events.log
 	expect "untracked file kept" test -f untracked_file
 	rm -f untracked_file
-	ls .git/mq/pending/*.entry >/dev/null 2>&1
+	# What is left: the retention-held mark and the build lane's own entry mark (14 days).
+	expect "build lane marked the merged entry" ls .git/mq/cleanup/marks/entry-*.mark
+	expect "refused marks are dropped" test "$(ls .git/mq/cleanup/marks | wc -l | tr -d ' ')" = 2
+	# A queued commit is never taken, even when marked.
 	touch .git/mq/pending/busy
-	git push -q origin "$a:refs/heads/lane/merged2"
+	git push -q origin "$a:refs/heads/lane/merged2"; mark remote_branch lane/merged2 0 test
 	tools/mq/cleanup.sh
-	expect "not idle: nothing deleted" test -n "$(git ls-remote origin refs/heads/lane/merged2)"
 	rm -f .git/mq/pending/busy
+	# Lanes: 1..MQ_LANES_KEEP stay; above that, removed once marked and idle, and recreated on demand.
+	printf 'MQ_LANES=6\nMQ_LANE_IDLE_SECS=0\nMQ_LANES_KEEP=4\n' >> .git/mq/config
+	tools/mq/lane.sh --make lane5 >/dev/null; tools/mq/lane.sh --make lane1 >/dev/null
+	tools/mq/mark.sh lane lane1; tools/mq/mark.sh lane lane5
+	expect "lane 1 is never marked" test ! -f .git/mq/cleanup/marks/lane-$(printf lane1 | cksum | cut -d' ' -f1).mark
+	echo wip > .lanes/lane5/wip.txt
+	tools/mq/cleanup.sh
+	expect "lane with uncommitted work kept" test -f .lanes/lane5/wip.txt
+	expect "keep reason logged" grep -q "keep lane worktree lane5: uncommitted" .git/mq/events.log
+	rm -f .lanes/lane5/wip.txt
+	tools/mq/mark.sh lane lane5; tools/mq/cleanup.sh
+	expect "idle clean lane 5 removed" test ! -e .lanes/lane5
+	expect "lane 5 removal logged" grep -q "CLEANUP remove lane worktree lane5" .git/mq/events.log
+	expect "lane 1 still there" test -e .lanes/lane1/.git
+	d=$(tools/mq/task.sh add "t")
+	expect "status copes with a missing lane" sh -c "tools/mq/status.sh | grep -q 'lane5 .*not on disk'"
+	expect "lane.sh recreates lane 5" tools/mq/lane.sh lane5 again "$d"
+	expect "lane 5 on its branch" test "$(git -C .lanes/lane5 symbolic-ref --short HEAD)" = lane5/again
+	expect "lane 7 refused (past MQ_LANES)" not tools/mq/lane.sh lane7 x "$d"
 }
 
 # Stands in for tools/mq/shots.sh: the same --start and --stop.

@@ -88,6 +88,7 @@ done_merged() { # entry-file
 	# The submitted sha isn't in main then: say what is.
 	[ -n "$(kv_get "$f" landed)" ] && restacked=" (restacked: $(kv_get "$f" sha | cut -c1-9) is in main as $(kv_get "$f" landed | cut -c1-9), dropped $(kv_get "$f" dropped))"
 	mq_event MERGED "$task ${2:-} $(kv_get "$f" subject | cut -c1-70)$restacked"
+	"$here/mark.sh" done "$f" merged
 }
 
 # Where an entry's work is in main: its own sha, or the restacked one.
@@ -105,6 +106,7 @@ reject() { # entry-file reason [logfile]
 	mv "$e" "$MQ_DIR/done/rejected/"
 	[ -d "$MQ_DIR/tasks/$task" ] && kv_set "$MQ_DIR/tasks/$task/meta" status rejected
 	mq_event REJECTED "$task $reason"
+	"$here/mark.sh" done "$MQ_DIR/done/rejected/$id.entry" rejected
 	kick_ready
 }
 
