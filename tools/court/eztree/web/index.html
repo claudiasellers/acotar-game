@@ -21,6 +21,9 @@ window.make = async (preset, seed, lite, over) => {
     for (const k of Object.keys(o.branch.sections)) o.branch.sections[k] = Math.max(1, Math.round(o.branch.sections[k] * lite.sections));
     for (const k of Object.keys(o.branch.segments)) o.branch.segments[k] = Math.max(3, Math.round(o.branch.segments[k] * lite.segments));
   }
+  // Fuller crowns (flowering shrubs): leafMul and leafSizeMul scale the lite counts.
+  if (over && over.leafMul) tree.options.leaves.count = Math.round(tree.options.leaves.count * over.leafMul);
+  if (over && over.leafSizeMul) tree.options.leaves.size *= over.leafSizeMul;
   tree.generate();
   await new Promise(r => setTimeout(r, 300));
   // A bare tree (overrides leaves.count = 0): the leaf meshes go entirely.

@@ -215,9 +215,13 @@ const LINEUPS := {
 		"scene:qtz/TwistedTree_3.gltf:15:deep", "scene:qtz/Pine_1.gltf:12:deep", "scene:qtz/Pine_4.gltf:14:deep",
 		"scene:qtz/Bush_Common.gltf:2.4:deep", "scene:qtz/Bush_Common_Flowers.gltf:2.4:deep"]},
 	# Florals test (F1): EZ flowering shrubs among the mixed wood's trees.
-	"bloom": {"distance": 22.0, "spacing": 5.0, "look": 2.0, "ids": [
-		"scene:qtz/CommonTree_3.gltf:12:deep", "ez:rose_a", "ez:rose_b", "ez:lilac_a", "ez:hydrangea_a",
-		"ez:hydrangea_b", "ez:lilac_b", "ez:rose_a", "ez:oak_a:painted"]},
+	"bloom": {"distance": 11.0, "spacing": 3.0, "look": 1.4, "ids": [
+		"ez:rose_a", "ez:rose_b", "ez:wildrose_a", "ez:lilac_a", "ez:hydrangea_a", "ez:hydrangea_b",
+		"ez:wildrose_b", "ez:lilac_b"]},
+	# The same shrubs further off, with the mixed wood's trees for scale.
+	"bloom_far": {"distance": 26.0, "spacing": 5.0, "look": 2.5, "ids": [
+		"scene:qtz/CommonTree_3.gltf:12:deep", "ez:rose_a", "ez:wildrose_a", "ez:lilac_a", "ez:hydrangea_a",
+		"ez:rose_b", "ez:lilac_b", "ez:wildrose_b", "ez:oak_a:painted"]},
 	"builds": {"distance": 62.0, "spacing": 10.0, "look": 6.0, "ids": [
 		"woods_oak@0", "woods_oak@1", "woods_oak@2", "woods_oak@3", "woods_oak@4", "post",
 		"woods_silver_birch@0", "woods_silver_birch@1", "woods_silver_birch@2", "post",
@@ -244,8 +248,8 @@ const TREES_EZ := "res://world/spring_court/wider/assets/trees/ez/"
 ## (tools/court/gen_ez_blossoms.py), drawn in their own colours. [spray, height].
 const BLOOM_DIR := "res://world/spring_court/wider/assets/tree_explore/bloom/"
 const BLOOMS := {
-	"rose_a": ["rose", 1.6], "rose_b": ["rose", 1.9], "lilac_a": ["lilac", 4.2], "lilac_b": ["lilac", 3.6],
-	"hydrangea_a": ["hydrangea", 1.4], "hydrangea_b": ["hydrangea", 1.6],
+	"rose_a": ["rose", 1.6], "rose_b": ["rose", 1.9], "wildrose_a": ["wildrose", 2.2], "wildrose_b": ["wildrose", 1.8],
+	"lilac_a": ["lilac", 4.2], "lilac_b": ["lilac", 3.6], "hydrangea_a": ["hydrangea", 1.4], "hydrangea_b": ["hydrangea", 1.6],
 }
 
 

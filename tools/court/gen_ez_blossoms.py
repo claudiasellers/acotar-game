@@ -8,7 +8,8 @@ their own colour: the court's leaf greens (the mixed wood's shadow, mid and
 light, wcterrain-28) and the flower's colour, drawn with the shader's
 painted = 0 path.
 
-    rose       five-leaflet leaves, open blooms and buds (blush pink)
+    rose       garden rose: compound leaves, cupped blooms spiralling in, buds
+    wildrose   dog rose: five flat notched petals, gold stamens (the Rosewild)
     lilac      heart leaves, cone panicles of tiny four-petal florets
     hydrangea  broad leaves, round mophead heads (periwinkle to lilac)
 
@@ -34,7 +35,8 @@ MID = (0.27, 0.48, 0.30)
 LIGHT = (0.46, 0.64, 0.38)
 STEM = (0.30, 0.26, 0.22)
 FLOWERS = {
-    "rose": [(0.86, 0.52, 0.62), (0.95, 0.72, 0.78), (0.99, 0.88, 0.90)],
+    "rose": [(0.80, 0.36, 0.50), (0.93, 0.62, 0.70), (0.99, 0.86, 0.88)],
+    "wildrose": [(0.90, 0.58, 0.68), (0.97, 0.78, 0.83), (1.0, 0.92, 0.93)],
     "lilac": [(0.56, 0.44, 0.72), (0.72, 0.60, 0.86), (0.88, 0.80, 0.96)],
     "hydrangea": [(0.50, 0.56, 0.84), (0.68, 0.70, 0.94), (0.86, 0.84, 0.98)],
 }
@@ -93,15 +95,64 @@ def floret(cv, c, r, cols, rng, petals=4):
     cv.disc(c, r * 0.16, rgb(mix(cols[0], (0.9, 0.85, 0.5), 0.4)))
 
 
+def petal(cv, c, ang, length, width, light, dark, notch=False):
+    """A rounded petal from the flower's heart outward: dark at the base,
+    light at the rim (a cupped petal catches the light on its edge)."""
+    pts = []
+    for i in range(25):
+        t = i / 24.0
+        th = math.pi * (t - 0.5)  # -90 .. 90 degrees across the petal's end
+        r = length * (0.55 + 0.45 * math.cos(th) ** 0.5)
+        if notch:
+            r *= 1.0 - 0.18 * math.exp(-(th / 0.25) ** 2)
+        pts.append((r * math.cos(th) * 1.0, r * math.sin(th) * width / length))
+    pts = [(0.0, -width * 0.18)] + pts + [(0.0, width * 0.18)]
+    cv.poly(place(pts, c, ang), rgb(light))
+    inner = [(x * 0.72, y * 0.72) for x, y in pts]
+    cv.poly(place(inner, c, ang), rgb(mix(dark, light, 0.45)))
+    base = [(x * 0.42, y * 0.42) for x, y in pts]
+    cv.poly(place(base, c, ang), rgb(dark))
+    # The petal's edge, so overlapping petals read apart.
+    edge = place(pts[1:-1], c, ang)
+    cv.line(edge, max(1.0, length * 0.05), rgb(mix(dark, light, 0.25)))
+
+
 def rose_bloom(cv, c, r, cols, rng):
-    for k, (f, t) in enumerate([(1.0, 0.0), (0.78, 0.35), (0.56, 0.6), (0.34, 0.85)]):
-        off = (rng.uniform(-1, 1) * r * 0.06, rng.uniform(-1, 1) * r * 0.06 - k * r * 0.04)
-        cv.disc((c[0] + off[0], c[1] + off[1]), r * f, rgb(mix(cols[0], cols[2], t)))
-    # The swirl at the heart.
-    for k in range(3):
-        a0 = rng.uniform(0, math.tau)
-        pts = [(c[0] + math.cos(a0 + t * 2.4) * r * (0.3 - 0.08 * t), c[1] - r * 0.15 + math.sin(a0 + t * 2.4) * r * (0.3 - 0.08 * t)) for t in np.linspace(0, 1, 8)]
-        cv.line(pts, max(1.0, r * 0.07), rgb(cols[0], 0.85))
+    """A garden rose seen from above: a scalloped ring of broad outer petals,
+    a second ring between them, then curled cup petals round a deep heart."""
+    deep = mix(cols[0], (0.55, 0.18, 0.30), 0.35)
+    rot = rng.uniform(0, math.tau)
+    for k in range(6):
+        petal(cv, c, rot + math.tau * k / 6, r, r * 0.85, mix(cols[1], cols[2], 0.55), cols[0])
+    for k in range(5):
+        petal(cv, c, rot + math.tau * (k + 0.5) / 5, r * 0.7, r * 0.62, cols[1], deep)
+    for k in range(4):  # cup petals: crescents, each lit on its outer lip
+        a = rot + 0.6 + k * math.tau / 4
+        rr = r * (0.36 - 0.05 * k)
+        arc = [(c[0] + math.cos(a + t) * rr, c[1] + math.sin(a + t) * rr) for t in np.linspace(-1.1, 1.1, 10)]
+        cv.line(arc, max(1.5, r * 0.16), rgb(mix(cols[0], cols[1], 0.5)))
+        cv.line([(c[0] + (x - c[0]) * 1.08, c[1] + (y - c[1]) * 1.08) for x, y in arc], max(1.0, r * 0.06), rgb(cols[2]))
+    cv.disc(c, r * 0.12, rgb(deep, 0.75))
+
+
+def rose_bud(cv, p, ang, r, cols):
+    """A half-open bud: a closed teardrop of petal over green sepals."""
+    tear = [(0, 0)] + [(r * (1 - math.cos(t)) * 1.1, r * 0.55 * math.sin(t)) for t in np.linspace(0.2, math.pi - 0.2, 12)]
+    cv.poly(place([(x * 1.15, y * 1.5) for x, y in tear], p, ang), rgb(MID))
+    cv.poly(place(tear, p, ang), rgb(cols[0]))
+    cv.poly(place([(x * 0.6 + r * 0.6, y * 0.5) for x, y in tear], p, ang), rgb(cols[1]))
+
+
+def wild_rose(cv, c, r, cols, rng):
+    """A dog rose: five flat notched petals and a ring of gold stamens."""
+    rot = rng.uniform(0, math.tau)
+    for k in range(5):
+        petal(cv, c, rot + math.tau * k / 5, r, r * 1.15, cols[2], cols[1], notch=True)
+    cv.disc(c, r * 0.3, rgb((0.92, 0.80, 0.36)))
+    for k in range(14):
+        a = math.tau * k / 14
+        cv.disc((c[0] + math.cos(a) * r * 0.32, c[1] + math.sin(a) * r * 0.32), max(1.0, r * 0.07), rgb((0.80, 0.58, 0.20)))
+    cv.disc(c, r * 0.14, rgb((0.70, 0.78, 0.40)))
 
 
 def twig(rng, bend=26.0, top_y=22.0):
@@ -125,28 +176,44 @@ def side(cv, main, rng, n, reach, t0=0.18, t1=0.82):
     return out
 
 
-def spray_rose(cv, rng):
-    cols = FLOWERS["rose"]
-    main = twig(rng)
-    cv.line(main, 4.0, rgb(STEM))
-    branches = [main] + side(cv, main, rng, 4, 150)
+def rose_leaves(cv, branches, rng, size=1.0):
     for br in branches:
-        for k in range(4):  # compound leaves: a leaflet pair or two and a tip
+        for k in range(4):  # compound leaves: leaflet pairs and a tip leaflet
             q, qa = along(br, 0.2 + 0.18 * k)
             s = 1 if k % 2 == 0 else -1
             ra = qa + s * 1.0
             for j, f in enumerate((0.0, 0.45, 0.85)):
-                p = (q[0] + math.cos(ra) * 30 * f, q[1] + math.sin(ra) * 30 * f)
+                p = (q[0] + math.cos(ra) * 30 * f * size, q[1] + math.sin(ra) * 30 * f * size)
                 for t in ((-1, 1) if j < 2 else (0,)):
-                    leaf(cv, "ash", p, ra + t * 0.9, 34, 19, rng)
-    for br in branches:
+                    leaf(cv, "ash", p, ra + t * 0.9, 34 * size, 19 * size, rng)
+
+
+def spray_rose(cv, rng):
+    cols = FLOWERS["rose"]
+    main = twig(rng, 24, 70.0)
+    cv.line(main, 4.0, rgb(STEM))
+    branches = [main] + side(cv, main, rng, 5, 150)
+    rose_leaves(cv, branches, rng)
+    for i, br in enumerate(branches):
         p, a = along(br, 1.0)
-        rose_bloom(cv, p, rng.uniform(26, 34), cols, rng)
-        if rng.uniform() < 0.7:
-            q, _ = along(br, 0.7)
-            q = (q[0] + rng.uniform(-14, 14), q[1] - 8)
-            cv.disc(q, 9, rgb(cols[0], 0.92))  # a bud
-            cv.disc((q[0], q[1] + 7), 6, rgb(MID))
+        rose_bloom(cv, p, rng.uniform(22, 30), cols, rng)
+        q, qa = along(br, 0.72)
+        if i % 2 == 0:
+            rose_bud(cv, (q[0] + rng.uniform(-10, 10), q[1]), qa + rng.uniform(-0.6, 0.6), rng.uniform(10, 13), cols)
+        else:
+            rose_bloom(cv, (q[0] + rng.uniform(-18, 18), q[1] - 6), rng.uniform(15, 19), cols, rng)
+
+
+def spray_wildrose(cv, rng):
+    cols = FLOWERS["wildrose"]
+    main = twig(rng, 30, 60.0)
+    cv.line(main, 3.5, rgb(STEM))
+    branches = [main] + side(cv, main, rng, 6, 160)
+    rose_leaves(cv, branches, rng, 0.9)
+    for br in branches:
+        for t in (1.0, 0.62):
+            p, a = along(br, t)
+            wild_rose(cv, (p[0] + rng.uniform(-12, 12), p[1] + rng.uniform(-8, 8)), rng.uniform(17, 24), cols, rng)
 
 
 def spray_lilac(cv, rng):
@@ -193,7 +260,7 @@ def spray_hydrangea(cv, rng):
             floret(cv, p, rng.uniform(8, 11), cols, rng)
 
 
-PAINTERS = {"rose": spray_rose, "lilac": spray_lilac, "hydrangea": spray_hydrangea}
+PAINTERS = {"rose": spray_rose, "wildrose": spray_wildrose, "lilac": spray_lilac, "hydrangea": spray_hydrangea}
 
 
 def main():
