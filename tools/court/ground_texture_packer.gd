@@ -39,7 +39,9 @@ const LOOKS_ALT := {
 ## slot -> [base, accent].
 const PASTEL := {
 	"spring_grass": [Color(0.33, 0.56, 0.36), Color(0.56, 0.74, 0.48)],
-	"moss": [Color(0.30, 0.56, 0.47), Color(0.60, 0.58, 0.78)],
+	# Olive (owner 2026-11-11, wcterrain-37): hue 160 read teal in the Western
+	# Woods; tools/court/recolour_moss.py turned the packed texture the same way.
+	"moss": [Color(0.343, 0.56, 0.30), Color(0.613, 0.78, 0.58)],
 	"forest_floor": [Color(0.44, 0.38, 0.34), Color(0.62, 0.50, 0.54)],
 	"path": [Color(0.68, 0.54, 0.44), Color(0.86, 0.70, 0.68)],
 	"riverbed": [Color(0.58, 0.63, 0.67), Color(0.75, 0.77, 0.83)],

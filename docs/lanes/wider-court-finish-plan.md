@@ -59,8 +59,8 @@ and its status. Details for each item are in the phase sections further down.
 | F2 | Florals build: species by habitat (P1) and region | F1 (owner's pick), P2 | waiting | flowers/ha per region in the coverage report; frame time as T7 |
 | G1 | Ground cover preview: Quaternius plants vs shader grass vs none | — | ready | renders of the three, plus each one's frame-time cost |
 | G2 | Ground cover build; becomes the fire fuel | G1 (owner's pick) | waiting | GroundFuel tests pass on the new layer; frame time as T7 |
-| C1 | Grade previews: the milky glen, the teal Western Woods | — | ready | LUT black level and ground hue printed for now and the preview |
-| C2 | Grade change | C1 (owner's pick) | waiting | the grade director's tests; the printed numbers as picked |
+| C1 | Grade previews: the milky glen, the teal Western Woods | — | **done**: the teal is the moss ground (hue 160), not the ramp; the glen's darks barely matter | LUT black level and ground hue printed for now and the preview |
+| C2 | Moss turned olive (owner's pick, wcterrain-37); the glen left as is | C1 (owner's pick) | **started** | the grade director's tests; the printed numbers as picked |
 | E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting | renders, same views |
 | E2 | Apply the estate decision | E1, D2 | waiting | canonical shots: no change but the trees |
 | V1 | Tavern and well on the village green (generator pipeline or asset request) | P2 (same content file) | waiting | on the green, clear of the paths (GUT) |
