@@ -47,6 +47,9 @@ two) printf '\211PNG' >"${user[1]}/one.png"; printf '\211PNG' >"${user[1]}/two.p
 fail) echo "SCRIPT ERROR: boom"; exit 1 ;;
 hang) echo $$ >"$FAKE_HANG"; exec sleep 300 ;;
 grab) # makes itself the frontmost app after <delay>, as Godot 4.7 on macOS does
+	# Count the delay from the guard's first poll (it starts a little after the
+	# render, more so on a loaded machine), not from launch: T114.
+	for _ in $(seq 1 200); do [ -e "$FAKE_FRONT.polled" ] && break; sleep 0.1; done
 	sleep "${user[1]}"; echo "$$ org.godotengine.godot" >"$FAKE_FRONT"; sleep "${user[2]}" ;;
 stubborn) trap '' TERM; sleep 300 & echo $! >"$FAKE_HANG"; wait ;;
 slow) # true for ever more than one at a time, as two listeners would be
@@ -302,6 +305,7 @@ mkdir -p "$T/fakebin"
 cat >"$T/fakebin/lsappinfo" <<'F'
 #!/bin/bash
 read -r pid bid <"$FAKE_FRONT"
+: >"$FAKE_FRONT.polled"
 case "$1 ${3:-}" in
 front*) echo "ASN:0x0-0xfake:" ;;
 "info pid") echo "\"pid\"=$pid" ;;
@@ -317,7 +321,7 @@ chmod +x "$T/fakebin/lsappinfo" "$T/fakebin/open"
 sleep 300 &
 export FAKE_OWNER=$! FAKE_FRONT="$T/front"
 echo "$FAKE_OWNER com.example.owner" >"$FAKE_FRONT"
-gonce() { (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
+gonce() { rm -f "$FAKE_FRONT.polled"; (cd "$T/mac" && PATH="$T/fakebin:$PATH" bash "$MAC" --once) >>"$T/mac.out" 2>&1; }
 request F 1 'shot early res://probe/shot.tscn grab 0.3 1.5
 '
 gonce
