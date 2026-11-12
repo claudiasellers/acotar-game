@@ -194,8 +194,9 @@ const LINEUPS := {
 	"candyfloss": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"woods_candyfloss_tree"]},
 	"candyfloss_row": {"distance": 30.0, "spacing": 6.5, "look": 5.0, "ids": [&"woods_candyfloss_tree", &"woods_candyfloss_tree",
 		&"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree"]},
-	# the near tree beside its far step: the same colours in the same places
-	"candyfloss_steps": {"distance": 16.0, "spacing": 7.5, "look": 5.0, "ids": [&"woods_candyfloss_tree", &"far:woods_candyfloss_tree"]},
+	# its far step on the very spot `candyfloss` stands the near tree (a tree's colours
+	# go by where it stands): the two shots show the same colours in the same places
+	"candyfloss_far": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"far:woods_candyfloss_tree"]},
 	"candyfloss_close": {"distance": 8.0, "spacing": 7.0, "look": 5.4, "ids": [&"woods_candyfloss_tree"]},
 	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
