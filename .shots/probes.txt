@@ -1,0 +1,6 @@
+from special-trees
+quality look
+shot w1 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_1 --perf-csv={out}/perf.csv
+shot w2 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_2 --perf-csv={out}/perf.csv
+shot w3 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_3 --perf-csv={out}/perf.csv
+shot w4 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_4 --perf-csv={out}/perf.csv
