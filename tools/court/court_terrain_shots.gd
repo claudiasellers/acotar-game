@@ -67,6 +67,10 @@ func _run() -> void:
 	var src := ""
 	var forest := ""
 	for a: String in args.duplicate():
+		if a.begins_with("density="):
+			forest_per_ha = float(a.substr(8))  # forest test: trees per hectare
+			args.erase(a)
+			continue
 		if a.begins_with("--perf-"):
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
 		elif a.begins_with("forest="):
@@ -495,6 +499,9 @@ func _qtz_mesh(file: String) -> Array:
 	return [mesh, xf]
 
 
+var forest_per_ha := FOREST_PER_HA
+
+
 func _forest(world: World, eye: Vector3, kind: String) -> void:
 	if kind == "mix":
 		_mixed_wood(world, eye)
@@ -502,7 +509,7 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 4242
 	var buckets := {}
-	var n := int(PI * FOREST_RADIUS * FOREST_RADIUS / 10000.0 * FOREST_PER_HA)
+	var n := int(PI * FOREST_RADIUS * FOREST_RADIUS / 10000.0 * forest_per_ha)
 	for i in n:
 		var r := sqrt(rng.randf()) * FOREST_RADIUS
 		if r < 7.0:
