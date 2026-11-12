@@ -364,14 +364,14 @@ STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
 
 def candyfloss_tree(kit, near):
     # The wood: a curving pearl-rose trunk, limbs sweeping out and up to each cloud.
-    bark0, bark1 = hexc("8E6A78"), hexc("C99AA6")
+    bark0, bark1 = hexc("A9808C"), hexc("D6A9B3")
     trunk = [Vector((0, 0, 0))]
     lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized()
-    for i, (z, k) in enumerate(((1.3, 0.28), (2.6, -0.12), (3.7, 0.2), (4.5, 0.3))):
+    for i, (z, k) in enumerate(((1.1, 0.26), (2.2, -0.12), (3.1, 0.18), (3.8, 0.28))):
         trunk.append(Vector((lean.x * k, lean.y * k, z)) + Vector((kit.rng.uniform(-0.06, 0.06), kit.rng.uniform(-0.06, 0.06), 0.0)))
     if not near:
         trunk = trunk[::2]
-    kit.tube(trunk, taper(len(trunk), 0.44, 0.24), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
+    kit.tube(trunk, taper(len(trunk), 0.52, 0.3), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
     top = trunk[-1]
     seats = []   # (centre, radius, palette index)
     limbs = 6
@@ -381,13 +381,13 @@ def candyfloss_tree(kit, near):
         heading = Vector((math.cos(a), math.sin(a), 0.0))
         low = i % 2 == 0
         base = at(trunk, 0.8) if low else top
-        limb = sweep(kit, base, heading, 26.0 if low else 44.0, 62.0, kit.rng.uniform(2.5, 3.0) * (1.0 if low else 0.85), 4 if near else 2, 0.12)
-        kit.tube(limb, taper(len(limb), 0.2, 0.08), 6 if near else 4, bark1, hexc("D9AEB8"), 0.1, 0.35)
-        r = kit.rng.uniform(1.5, 1.85)
+        limb = sweep(kit, base, heading, 14.0 if low else 36.0, 52.0, kit.rng.uniform(3.0, 3.5) * (1.0 if low else 0.8), 4 if near else 2, 0.12)
+        kit.tube(limb, taper(len(limb), 0.22, 0.09), 6 if near else 4, bark1, hexc("E2BCC4"), 0.1, 0.35)
+        r = kit.rng.uniform(1.7, 2.05)
         seats.append((limb[-1] + UP * r * 0.45, r, i))
     crown = sweep(kit, top, lean, 78.0, 86.0, 1.5, 2, 0.08)
-    kit.tube(crown, taper(len(crown), 0.2, 0.1), 6 if near else 4, bark1, hexc("D9AEB8"), 0.1, 0.3)
-    seats.append((crown[-1] + UP * 1.0, 2.05, limbs + 1))
+    kit.tube(crown, taper(len(crown), 0.22, 0.1), 6 if near else 4, bark1, hexc("E2BCC4"), 0.1, 0.3)
+    seats.append((crown[-1] + UP * 1.1, 2.3, limbs + 1))
 
     clouds = []   # (cloud, palette, main?)
     for centre, r, i in seats:
@@ -416,21 +416,21 @@ def candyfloss_tree(kit, near):
         return False
 
     for c, _, main in clouds:
-        want = (9 if main else 3) if near else (3 if main else 0)
+        want = (12 if main else 3) if near else (4 if main else 0)
         placed = 0
         tries = 0
         while placed < want and tries < want * 6:
             tries += 1
             a = kit.rng.uniform(0.0, math.tau)
-            z = kit.rng.uniform(-0.15, 1.0) ** 1.0
-            z = max(-0.15, min(0.98, z))
+            # all round the cloud, sides as well as top: they are seen from the ground
+            z = kit.rng.uniform(-0.55, 0.97)
             ring_r = math.sqrt(max(0.0, 1.0 - z * z))
             d = Vector((math.cos(a) * ring_r, math.sin(a) * ring_r, z))
             p = c["surface"](d)
             if covered(p, c):
                 continue
             n = Vector((d.x, d.y, d.z / c["squash"])).normalized()
-            size = (kit.rng.uniform(0.2, 0.3) + 0.14 * max(z, 0.0)) * (1.0 if main else 0.8) * (1.0 if near else 1.5)
+            size = (kit.rng.uniform(0.26, 0.4) + 0.1 * max(z, 0.0)) * (1.0 if main else 0.8) * (1.0 if near else 1.4)
             roll = kit.rng.random()
             petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.2 else STAR_BLUSH if roll < 0.4 else STAR_PEARL
             star(kit, p + n * 0.03, n, size, petal_c, tip_c, heart_c, 0.42)
