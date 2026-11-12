@@ -385,29 +385,8 @@ def golden_chain(kit, near):
     wisteria_tree(kit, near, chain=(BUTTER, SUNNY, GOLD), leaves=(BUSH, BUSH_DEEP), count=30)
 
 
-def magnolia(kit, near):
-    """Open vase of pearly branches carrying oversized cupped blooms, pearl
-    fading to blush and rose at the base, with a few mint leaf puffs."""
-    trunk = _trunk(kit, near, 1.6, 0.32, 0.2, 0.1, hexc("A88E96"), BARK_PEARL, 0.35)
-    tips = []
-    for i in range(7 if near else 5):
-        a = math.tau * i / 7 + kit.rng.uniform(-0.3, 0.3)
-        d = Vector((math.cos(a) * 0.55, math.sin(a) * 0.55, 1.0))
-        line = branch_line(kit, trunk[-1], d, kit.rng.uniform(3.4, 4.4), 3 if near else 2, 0.0)
-        kit.tube(line, taper(len(line), 0.2, 0.07), 5 if near else 4, hexc("B99AA4"), BARK_PEARL, 0.1, 0.45)
-        tips.append(line[-1])
-        tips += [line[1] + (line[2] - line[1]) * 0.5 + Vector((math.cos(a), math.sin(a), 0.3)) * 0.8]
-        if near:  # twig fork
-            tw = branch_line(kit, line[2], d + Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.2)), 1.3, 2)
-            kit.tube(tw, taper(len(tw), 0.06, 0.02), 4, BARK_PEARL, BARK_PEARL, 0.4, 0.6)
-            tips.append(tw[-1])
-    for i, t in enumerate(tips[:4]):  # a few fresh leaf tufts low in the crown
-        kit.blob(Vector(t) - Vector((0, 0, 1.0)), 0.45, 0.6, LEAF, LEAF_DEEP, 1 if near else 0, 0.5, lump=0.15)
-    blooms = tips + [Vector(t) + Vector((0.5, 0.3, -0.6)) for t in tips[::2]]
-    for t in (blooms if near else blooms[::2]):
-        cols = kit.rng.choice([(PEARL, BLUSH), (BLUSH, ROSE), (PEARL, ROSE), (hexc("F3E3F7"), LILAC)])
-        cup(kit, Vector(t) + Vector((0, 0, 0.15)), Vector((kit.rng.uniform(-0.3, 0.3), kit.rng.uniform(-0.3, 0.3), 1.0)),
-            0.62, 6, 2 if near else 1, cols[0], cols[1], BUTTER if near else None, 0.6, openness=0.15)
+# The magnolia is one of the special trees now: tools/woods/blender/special_trees.py
+# builds magnolia.glb and magnolia_harlequin.glb.
 
 
 # -------------------------------------------------------------- shrubs ----
@@ -835,7 +814,6 @@ SPECIES = {
     "candyfloss_tree": (candyfloss_tree, TREE),
     "wisteria_tree": (wisteria_tree, TREE),
     "golden_chain": (golden_chain, TREE),
-    "magnolia": (magnolia, TREE),
     # New shrubs
     "peony_bush": (peony_bush, SHRUB),
     "hydrangea": (hydrangea, SHRUB),

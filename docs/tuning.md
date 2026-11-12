@@ -119,6 +119,18 @@ the clump pictures. The owner approved the set on 2026-11-12.
 | `TREE_CHUNK` | manor_scatter.gd | 320 m | 128–400 m | The size of a tree draw chunk. Larger chunks keep the draw count down now that each species is several builds (104 tree draws; one build in 128 m chunks was 146). | estate-trees |
 | `TRUNK_RADIUS` | estate_trees.gd | oak 0.74 m, willow 0.5, pear 0.28, birch 0.27, cherry 0.27, apple 0.25, crab apple 0.22 | | The trunk you bump into, per species, matching the model's trunk at chest height. | estate-trees |
 
+## Special trees (owner, 2026-11-12: "these are special")
+
+The woods' candy flowering trees, rebuilt one at a time with the owner
+(`tools/woods/blender/special_trees.py`; FloraLibrary draws the models as before).
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Magnolia shape | special_trees.py `magnolia()` | trunk 1.25 m; 5 limbs of 3.3–3.9 m rising 24–36° and turning up to 66°; a leader; about 53 flowers | near ≤ 6,000 triangles, far ≤ 1,500 | A vase of pearl limbs like a candelabra, every twig ending in an upright flower: open stars high and outside, goblets below, buds on the spurs. | special-trees |
+| Rose magnolia colours | special_trees.py `ROSE_PEARL` | petals rose at the foot, blush, pearl at the tip; a lilac flower about one in seven | | The magnolia the owner approved first; `magnolia.glb`. | special-trees |
+| Harlequin magnolia colours | special_trees.py `HARLEQUIN`, `HARLEQUIN_ODDS` | each flower one of rose, coral, lilac, periwinkle, apricot, mint, hot pink, with a heart of petals in a second colour standing out of the cup | | The multicoloured magnolia (owner: "i liked how the original one was multicolored"); `magnolia_harlequin.glb`. | special-trees |
+| Where the magnolias grow | tools/woods/spring_flora_mix.py | Border Woods: both kinds, equal weights (bluebell glade 0.6 + 0.6, foxglove clearing 0.4 + 0.4); Eastern Woods: the rose one alone (stream glen 0.8, woods edge 0.6) | | One wood has the mix, the other one kind (owner, 2026-11-12). | special-trees |
+
 ## Bow feel (T101)
 
 | Tunable | Where | Default | Range | What it does | Lane |
