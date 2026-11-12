@@ -1,0 +1,7 @@
+from wider-court-world
+quality look
+shot a res://tools/court/court_terrain_shots.tscn {out} western_woods tower_hill village_pinch regions ingame
+shot p_western_woods res://tools/perf/frame_probe.tscn {out} western_woods regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near60_western_woods --perf-csv={out}/perf.csv
+shot p_tower_hill res://tools/perf/frame_probe.tscn {out} tower_hill regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near60_tower_hill --perf-csv={out}/perf.csv
+shot p_glen_saddle res://tools/perf/frame_probe.tscn {out} glen_saddle regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near60_glen_saddle --perf-csv={out}/perf.csv
+shot p_village_green res://tools/perf/frame_probe.tscn {out} village_green regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near60_village_green --perf-csv={out}/perf.csv
