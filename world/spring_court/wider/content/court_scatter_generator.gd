@@ -14,6 +14,9 @@ const DECOR_CELL := 10.0
 const REPORT_CELL := 100.0
 const SMALL_CHUNK := 64.0
 const TREE_CHUNK := 256.0
+## The near step's trees are drawn from smaller chunks: a near chunk is in
+## range whenever one of its trees could be within CourtTreeSet.NEAR.
+const NEAR_CHUNK := 64.0
 ## Share of ground the drift mask keeps, and the noise cut that gives it.
 const DRIFT_KEEP := 0.35
 const DRIFT_CUT := 0.12
@@ -157,11 +160,13 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 			var part := ScatterLayer.new()
 			part.id = StringName("%s@%d%s" % [layer.id, v, "" if step == CourtTreeSet.Step.NEAR else "m"])
 			part.mesh = CourtTreeSet.mesh(id, v, step)
+			# Each tree switches step at its own distance in the shader
+			# (court_tree.gdshader lod_begin / lod_end); a chunk only has to be
+			# drawn while any of its trees could be inside the step's window.
 			if step == CourtTreeSet.Step.NEAR:
-				part.draw_distance = CourtTreeSet.NEAR
+				part.draw_distance = CourtTreeSet.NEAR + NEAR_CHUNK * 0.71 + 2.0
 				near.append(part)
 			else:
-				part.draw_from = CourtTreeSet.NEAR
 				part.draw_distance = layer.draw_distance
 				part.impostor_mesh = CourtTreeSet.mesh(id, v, CourtTreeSet.Step.FAR)
 				part.impostor_distance = layer.impostor_distance
@@ -170,7 +175,7 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 			# Past the near step a tree's shadow is a few blurred texels of the
 			# far cascade, but costs a whole alpha-cut pass (T7): near only.
 			part.cast_shadow = layer.cast_shadow and step == CourtTreeSet.Step.NEAR
-			part.tags = layer.tags
+			part.tags = PackedStringArray(["tree", "near" if step == CourtTreeSet.Step.NEAR else "mid"])
 			part.ingredient_id = layer.ingredient_id
 	var taken := {}
 	for i in layer.count():
@@ -525,8 +530,8 @@ static func report(content: CourtRegionContent, forage: Array[ScatterLayer], dec
 	var tree_layers: Array[ScatterLayer] = []
 	for layer in decor:
 		decor_instances += layer.count()
-		# near and mid steps hold the same trees: count the near (or the one) layer
-		if layer.tags.has("tree") and layer.draw_from <= 0.0:
+		# near and mid steps hold the same trees: count the near (or the only) layer
+		if layer.tags.has("tree") and not layer.tags.has("mid"):
 			tree_layers.append(layer)
 	# Planting against the land (finish plan P2; the recipe's ranges are the content's).
 	var planting := CourtPlanting.report(content, tree_layers, 16.0)
@@ -559,7 +564,9 @@ static func estimate_draw_calls(content: CourtRegionContent, forage: Array[Scatt
 	var cam := content.landmarks[0].position if not content.landmarks.is_empty() else content.bounding_rect().get_center()
 	var calls := 0
 	for layer in forage + decor:
-		var chunk := TREE_CHUNK if layer.tags.has("tree") else SMALL_CHUNK
+		var chunk := SMALL_CHUNK
+		if layer.tags.has("tree"):
+			chunk = NEAR_CHUNK if layer.tags.has("near") else TREE_CHUNK
 		var keys := {}
 		for i in layer.count():
 			var p := layer.position_of(i)

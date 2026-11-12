@@ -27,6 +27,7 @@ var is_built: bool = false
 var forage_field: ScatterField
 var decor_field: ScatterField
 var tree_field: ScatterField
+var near_tree_field: ScatterField
 
 ## The arched footbridge (tools/court/blender/props_shapes_b.py fae_footbridge).
 const BRIDGE_ASSET := &"fae_footbridge"
@@ -236,8 +237,11 @@ func _finish() -> void:
 	CourtTerrainFallback.build_nodes(self, terrain)
 	var small: Array[ScatterLayer] = []
 	var trees: Array[ScatterLayer] = []
+	var near_trees: Array[ScatterLayer] = []
 	for layer in decor:
-		if layer.tags.has("tree"):
+		if layer.tags.has("near"):
+			near_trees.append(layer)
+		elif layer.tags.has("tree"):
 			trees.append(layer)
 		else:
 			small.append(layer)
@@ -246,6 +250,8 @@ func _finish() -> void:
 	if not DRAW_GRASS_CLUMPS:
 		_hide_grass_clumps(decor_field)
 	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
+	# the near step in smaller chunks (each tree switches step at its own distance)
+	near_tree_field = _field("TreesNear", near_trees, CourtScatterGenerator.NEAR_CHUNK)
 	_build_landmarks()
 	_build_places()
 	_build_magnets()

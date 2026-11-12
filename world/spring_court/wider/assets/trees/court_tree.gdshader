@@ -31,6 +31,13 @@ uniform float bands : hint_range(2.0, 8.0) = 4.0;
 // The model's height in its own units, for the painted leaves' height shading
 // and the wind's flex (set per build by CourtTreeSet).
 uniform float model_height = 12.0;
+// The detail step's own distance window, measured tree by tree from the game's
+// camera (m): a near tree is drawn to lod_end, its mid step from lod_begin.
+// The scatter's chunks are too coarse to switch on (a chunk's centre can be
+// 180 m from a tree at your feet), so the chunk only has to be in range and
+// each tree outside its window folds to a point.
+uniform float lod_begin = 0.0;
+uniform float lod_end = 100000.0;
 // Per-tree value spread (a tree a little lighter or darker than its neighbour).
 uniform float tree_value_spread : hint_range(0.0, 0.3) = 0.08;
 // 0 = eternal spring; 1 = colour drained (the Blight), as woods_foliage.
@@ -43,7 +50,10 @@ void vertex() {
 	vec3 o = MODEL_MATRIX[3].xyz;
 	v_tree = fract(sin(dot(o.xz, vec2(12.9898, 78.233))) * 43758.5453);
 	v_height = clamp(VERTEX.y / max(model_height, 0.01), 0.0, 1.0);
-	if (mode != 0) {
+	float away = distance(o, MAIN_CAM_INV_VIEW_MATRIX[3].xyz);
+	if (away < lod_begin || away >= lod_end) {
+		VERTEX = vec3(0.0);
+	} else if (mode != 0) {
 		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.25, 1.0, v_height));
 	}
 }

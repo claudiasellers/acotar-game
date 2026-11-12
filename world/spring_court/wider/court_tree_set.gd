@@ -197,7 +197,7 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 	var out := ArrayMesh.new()
 	if step == Step.FAR:
 		_far_crown(out, src, s, aabb)
-		out.surface_set_material(0, _material(r, model, "far", s, h))
+		out.surface_set_material(0, _material(r, model, "far", s, h, Step.FAR))
 		return out
 	var leaves := PackedVector3Array()
 	for i in src.get_surface_count():
@@ -213,10 +213,10 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 			continue
 		arr[Mesh.ARRAY_VERTEX] = verts
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
-		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, kind, s, h))
+		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, kind, s, h, step))
 	if not leaves.is_empty():
 		_mid_crown(out, leaves, b)
-		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, "far", s, h))
+		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, "far", s, h, Step.MID))
 	return out
 
 
@@ -393,14 +393,21 @@ static func _far_crown(out: ArrayMesh, src: Mesh, s: float, aabb: AABB) -> void:
 	st.commit(out)
 
 
-static func _material(r: StringName, model: String, kind: String, s: float, h: float) -> ShaderMaterial:
+## One material per role, model, part and detail step: the step is its
+## distance window in the shader (the near step to NEAR, the mid step from it;
+## each tree switches at its own distance, whatever chunk it is drawn from).
+static func _material(r: StringName, model: String, kind: String, s: float, h: float, step: int) -> ShaderMaterial:
 	var ez := model.begins_with("ez/")
-	var key := "%s|%s|%s" % [r, model, kind]
+	var key := "%s|%s|%s|%d" % [r, model, kind, step]
 	if _materials.has(key):
 		return _materials[key]
 	var spec: Dictionary = ROLES[r]
 	var mat := ShaderMaterial.new()
 	mat.shader = load(SHADER)
+	if step == Step.NEAR:
+		mat.set_shader_parameter(&"lod_end", NEAR)
+	elif step == Step.MID:
+		mat.set_shader_parameter(&"lod_begin", NEAR)
 	for k: String in DEEP:
 		mat.set_shader_parameter(k, spec.get(k, DEEP[k]))
 	mat.set_shader_parameter(&"drain", spec.get("drain", 0.0))

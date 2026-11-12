@@ -442,6 +442,12 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				# (set:<id>:<build>[:<step>]), already at the id's height.
 				var step := int(item.get_slice(":", 3)) if item.get_slice_count(":") > 3 else 0
 				mi.mesh = CourtTreeSet.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)), step)
+				# a lineup shows a step at any distance: without its own distance window
+				for si in mi.mesh.get_surface_count():
+					var shown := mi.mesh.surface_get_material(si).duplicate() as ShaderMaterial
+					shown.set_shader_parameter(&"lod_begin", 0.0)
+					shown.set_shader_parameter(&"lod_end", 100000.0)
+					mi.set_surface_override_material(si, shown)
 			elif item.begins_with("estate:"):
 				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
 			elif item.begins_with("ez:"):

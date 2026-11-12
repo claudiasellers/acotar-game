@@ -78,11 +78,21 @@ func test_the_scatter_splits_trees_over_builds_and_steps_and_neighbours_differ()
 			continue
 		if String(layer.id).ends_with("m"):
 			mid += layer.count()
-			assert_eq(layer.draw_from, CourtTreeSet.NEAR, "%s starts past the near step" % layer.id)
+			# Each tree switches step at its own distance, in the shader: the mid
+			# step's materials start at NEAR, the near step's end there.
+			assert_true(layer.tags.has("mid"))
+			assert_eq(layer.draw_from, 0.0, "%s: its chunk is drawn from the camera out" % layer.id)
 			assert_not_null(layer.impostor_mesh, "%s has its far crown" % layer.id)
+			for i in layer.mesh.get_surface_count():
+				assert_eq(float((layer.mesh.surface_get_material(i) as ShaderMaterial).get_shader_parameter(&"lod_begin")), CourtTreeSet.NEAR,
+					"%s starts past the near step" % layer.id)
 			continue
 		near += layer.count()
-		assert_eq(layer.draw_distance, CourtTreeSet.NEAR, "%s is the near step" % layer.id)
+		assert_true(layer.tags.has("near"))
+		assert_gt(layer.draw_distance, CourtTreeSet.NEAR + CourtScatterGenerator.NEAR_CHUNK * 0.7, "%s: a near chunk is drawn while a tree of it could be near" % layer.id)
+		for i in layer.mesh.get_surface_count():
+			assert_eq(float((layer.mesh.surface_get_material(i) as ShaderMaterial).get_shader_parameter(&"lod_end")), CourtTreeSet.NEAR,
+				"%s is the near step" % layer.id)
 		var base := String(layer.id).get_slice("@", 0)
 		for i in layer.count():
 			var o := i * ScatterLayer.STRIDE
