@@ -16,6 +16,10 @@ magnolia   A saucer magnolia in full flower on bare pearl wood: a short
            upright. Open stars of nine petals at the top of the crown,
            goblets below them, pointed buds on the spurs along the limbs.
            Each petal is rose at its foot, blush, then pearl at its tip.
+magnolia_harlequin
+           The same tree with every flower its own pair of candy colours: a
+           cream, blush, lilac, apricot or mint cup round rose, coral, lilac
+           or periwinkle petals.
 """
 
 import math
@@ -134,27 +138,46 @@ def heart(kit, centre, axis, r, h, col, flex):
         kit.face((base[k], base[(k + 1) % 5], point), (col, col, hexc("FFF3C4")), ((flex, 0),) * 3)
 
 
-# Petal colours, foot to tip.
-BLOOMS = [
-    (hexc("E8739A"), hexc("F4A6C0"), hexc("FBE3E6")),   # rose foot, blush, pearl tip
-    (hexc("DE6494"), hexc("F2A0BE"), hexc("F9D9E0")),   # deeper rose
-    (hexc("B58FDD"), hexc("D8BDF0"), hexc("F1E4F8")),   # a lilac one now and then
-    (hexc("EE8AAE"), hexc("F8C3D2"), hexc("FCEDE8")),   # blush
+# Petal colours, foot to tip. A flower is (its outer ring, its inner ring).
+ROSE_PEARL = [
+    ((hexc("E8739A"), hexc("F4A6C0"), hexc("FBE3E6")), (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))),   # rose foot, pearl tip
+    ((hexc("DE6494"), hexc("F2A0BE"), hexc("F9D9E0")), (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))),   # deeper rose
+    ((hexc("EE8AAE"), hexc("F8C3D2"), hexc("FCEDE8")), (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))),   # blush
+    ((hexc("B58FDD"), hexc("D8BDF0"), hexc("F1E4F8")), (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))),   # a lilac one now and then
 ]
-INNER = (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))
+ROSE_PEARL_ODDS = None   # a lilac flower about one time in seven, see bloom()
 BUD = (hexc("D2588F"), hexc("E983AE"), hexc("F4B3CB"))
+# The harlequin: every flower its own pair of candy colours, a cream or pastel
+# cup round a brighter heart of petals, as the first magnolia had (owner,
+# 2026-11-12: "i liked how the original one was multicolored").
+CREAM_CUP = (hexc("F3D58C"), hexc("FAE9B4"), hexc("FBF4E2"))
+HARLEQUIN = [
+    (CREAM_CUP, (hexc("E8739A"), hexc("F4A6C0"), hexc("FBD9E2"))),                                           # cream round rose
+    (CREAM_CUP, (hexc("EE7C66"), hexc("F7A08C"), hexc("FBD3C2"))),                                           # cream round coral
+    (CREAM_CUP, (hexc("A77FDB"), hexc("C8A8E9"), hexc("E9DBF6"))),                                           # cream round lilac
+    ((hexc("F4A6C0"), hexc("FAD4DC"), hexc("FBF0EC")), (hexc("E25A8A"), hexc("EE7FB0"), hexc("F9C3D8"))),   # blush round hot pink
+    ((hexc("C8A8E9"), hexc("E3D0F4"), hexc("F5EDFA")), (hexc("8F9DEB"), hexc("A7B5F2"), hexc("DCE2FB"))),   # lilac round periwinkle
+    ((hexc("F6B877"), hexc("FBD9A8"), hexc("FCEFD9")), (hexc("EE7C66"), hexc("F7A08C"), hexc("FBD3C2"))),   # apricot round coral
+    ((hexc("9FD9C0"), hexc("CDEEDD"), hexc("F0FAF3")), (hexc("E8739A"), hexc("F4A6C0"), hexc("FBD9E2"))),   # mint round rose
+]
+HARLEQUIN_ODDS = [0.2, 0.16, 0.16, 0.14, 0.14, 0.12, 0.08]
 GOLD = hexc("F6CF6A")
 
 
-def bloom(kit, base, axis, size, stage, near, flex):
+def bloom(kit, base, axis, size, stage, near, flex, palette, odds):
     """A magnolia flower standing on `axis`: stage 2 an open star (six petals
-    spread wide round three upright ones and a gold heart), 1 a goblet, 0 a
-    pointed bud."""
+    spread wide round three upright ones and a gold star heart), 1 a goblet,
+    0 a pointed bud. Its colours are one pair from `palette`."""
     axis = axis.normalized()
     side = axis.orthogonal().normalized()
     fwd = axis.cross(side).normalized()
     turn = kit.rng.uniform(0.0, math.tau)
-    cols = kit.rng.choice(BLOOMS[:2] + BLOOMS[3:] if kit.rng.random() > 0.14 else BLOOMS[2:3])
+    if palette is ROSE_PEARL:
+        # (drawn this way so the rose magnolia stays the tree the owner approved)
+        outer, inner = kit.rng.choice(ROSE_PEARL[:3] if kit.rng.random() > 0.14 else ROSE_PEARL[3:])
+    else:
+        outer, inner = kit.rng.choices(palette, weights=odds)[0]
+
     def ring(count, offset, length, width, tilt, cup, colours, rows):
         rows = rows if near else 1
         for k in range(count):
@@ -164,18 +187,21 @@ def bloom(kit, base, axis, size, stage, near, flex):
             petal(kit, base, axis, out, length * size * j, width * size, tilt * kit.rng.uniform(0.9, 1.1), cup, colours, flex, rows)
 
     if stage == 2:
-        ring(6, 0.0, 0.62, 0.22, 64.0, 0.6, cols, 4)
-        ring(3, math.pi / 6, 0.5, 0.19, 24.0, 0.5, INNER, 3)
+        ring(6, 0.0, 0.62, 0.22, 64.0, 0.6, outer, 4)
+        ring(3, math.pi / 6, 0.5, 0.19, 24.0, 0.5, inner, 3)
         if near:
             heart(kit, base + axis * 0.03 * size, axis, 0.05 * size, 0.2 * size, GOLD, flex)
     elif stage == 1:
-        ring(3, 0.0, 0.58, 0.22, 34.0, 1.0, cols, 3)
-        ring(3, math.pi / 3, 0.54, 0.21, 24.0, 1.1, (cols[0], cols[1], INNER[2]), 3)
-    else:
+        ring(3, 0.0, 0.58, 0.22, 34.0, 1.0, outer, 3)
+        ring(3, math.pi / 3, 0.54, 0.21, 24.0, 1.1, (outer[0], outer[1] if palette is ROSE_PEARL else inner[1], inner[2]), 3)
+    elif palette is ROSE_PEARL:
         ring(3, 0.0, 0.4, 0.14, 20.0, 2.0, BUD, 2)
+    else:
+        # a bud shows the colour its flower will open to
+        ring(3, 0.0, 0.4, 0.14, 20.0, 2.0, (wt.shade(inner[0], 0.9), inner[0], inner[1]), 2)
 
 
-def magnolia(kit, near):
+def magnolia(kit, near, palette=ROSE_PEARL, odds=ROSE_PEARL_ODDS):
     trunk_top = Vector((kit.rng.uniform(-0.08, 0.08), kit.rng.uniform(-0.08, 0.08), 1.25))
     trunk = [Vector((0, 0, 0)), trunk_top * 0.5 + Vector((0.03, -0.02, 0)), trunk_top]
     kit.tube(trunk, [0.3, 0.25, 0.22], 8 if near else 5, MAUVE_WOOD, PEARL_WOOD, 0.0, 0.04, flare=0.4 if near else 0.0)
@@ -240,7 +266,7 @@ def magnolia(kit, near):
             stage = 2 if kit.rng.random() < 0.8 else 1
         size = (1.0 if stage == 2 else 0.9 if stage == 1 else 0.8) * kit.rng.uniform(0.92, 1.12)
         flex = 0.3 + 0.3 * (p.z / top)
-        bloom(kit, p + ax * 0.02, ax, size, stage, near, flex)
+        bloom(kit, p + ax * 0.02, ax, size, stage, near, flex, palette, odds)
 
     # A few young mint leaves low on the limbs: the leaves come after the flowers.
     if near:
@@ -252,8 +278,13 @@ def magnolia(kit, near):
                 sf.leaf(kit, p - UP * kit.rng.uniform(0.2, 0.32), d, kit.rng.uniform(0.42, 0.55), 0.13, hexc("8FDDB0"), hexc("C9F2D6"), 0.3, 0.45)
 
 
+def magnolia_harlequin(kit, near):
+    magnolia(kit, near, HARLEQUIN, HARLEQUIN_ODDS)
+
+
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
+    "magnolia_harlequin": (magnolia_harlequin, SPECIAL),
 }
 
 

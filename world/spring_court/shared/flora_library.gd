@@ -44,6 +44,9 @@ const SPECIES := {
 	&"wisteria_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.35, "range": 600.0, "canon": "C", "shadow": false},
 	&"golden_chain": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.3, "range": 600.0, "canon": "X", "shadow": false},
 	&"magnolia": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.25, "range": 550.0, "canon": "X", "shadow": false},
+	# The special trees (tools/woods/blender/special_trees.py): the magnolia above is rebuilt there;
+	# the harlequin is the same tree with every flower its own pair of candy colours.
+	&"magnolia_harlequin": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.25, "range": 550.0, "canon": "X", "shadow": false},
 	# Shrubs and big ground features
 	&"fern": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"bracken": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X"},
