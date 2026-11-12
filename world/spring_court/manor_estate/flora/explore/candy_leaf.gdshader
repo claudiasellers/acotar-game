@@ -61,7 +61,7 @@ void fragment() {
 			NORMAL = -NORMAL;
 		}
 		if (part == 2) {
-			col = shadow_col.rgb * 0.8;
+			col = mix(shadow_col.rgb, mid_col.rgb, 0.3);
 		} else {
 			vec4 t = texture(tex, UV);
 			ALPHA = t.a;
