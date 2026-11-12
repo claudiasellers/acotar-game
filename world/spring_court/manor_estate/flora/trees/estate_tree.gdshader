@@ -22,6 +22,7 @@ uniform sampler2D tex : source_color, filter_linear_mipmap, repeat_enable;
 uniform int part = 1;
 uniform bool own_colour = false;
 uniform bool hanging = false;
+uniform int xp = 0;
 // bark and heart patterns: repeats per metre
 uniform float pattern_scale = 0.3;
 uniform vec4 shadow_col : source_color = vec4(0.30, 0.56, 0.44, 1.0);
@@ -65,7 +66,11 @@ void vertex() {
 	v_obj = VERTEX;
 	v_objn = NORMAL;
 	v_world_up = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz).y;
-	if (part != 0) {
+	// xp 1: no tree; 2: no tree shadows; 3: leaf cards cast none; 4: no leaf cards; 5: cards and fronds cast none
+	bool card = part == 1 && !hanging;
+	if (xp == 1 || (xp == 2 && IN_SHADOW_PASS) || (xp == 3 && card && IN_SHADOW_PASS) || (xp == 4 && card) || (xp == 5 && part == 1 && IN_SHADOW_PASS)) {
+		VERTEX = vec3(0.0);
+	} else if (part != 0) {
 		// UV.y runs from a frond's seat (0) to its tip (1)
 		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, hanging ? UV.y * 0.9 : smoothstep(0.25, 1.0, v_height));
 	}

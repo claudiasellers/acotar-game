@@ -77,6 +77,12 @@ func _run() -> void:
 	for a: String in args.duplicate():
 		if a.begins_with("--perf-"):
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
+		elif a.begins_with("xp="):
+			for sp: StringName in EstateTrees.LOOKS:
+				for part: StringName in EstateTrees.PARTS:
+					if not (sp == &"willow" and part == &"leaves"):
+						EstateTrees.material(sp, part).set_shader_parameter(&"xp", int(a.trim_prefix("xp=")))
+			args.erase(a)
 		elif a.begins_with("forest="):
 			forest = a.substr(7)
 			args.erase(a)
