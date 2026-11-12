@@ -20,7 +20,7 @@ const ON := true
 const DIR := "res://world/spring_court/wider/assets/trees/"
 const SHADER := "res://world/spring_court/wider/assets/trees/court_tree.gdshader"
 ## Near step's reach (m); the mid step runs from here to TREE_DRAW.
-const NEAR := 80.0
+const NEAR := 50.0
 ## A region plants at most this many of a role's builds (each build and step
 ## is a draw call per chunk; T7: 13 broadleaf builds cost more than the eye
 ## gains). Different regions take different builds, so the court as a whole
