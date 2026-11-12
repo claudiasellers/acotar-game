@@ -30,6 +30,10 @@ wisteria_tree
            small florets, pale where they have opened at the top and deep
            violet in the bud at the tip. Young leaves and a few star
            blossoms lie on top of the limbs.
+golden_chain
+           The wisteria's gold sister, as it was at first: the same parasol
+           a little taller and narrower, its chains butter at the top and
+           gold at the tip.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of

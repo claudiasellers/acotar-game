@@ -7,13 +7,13 @@ extends GutTest
 const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
 ## The special trees (tools/woods/blender/special_trees.py), rebuilt one at a
 ## time with the owner: planted sparsely, on the estate trees' budget.
-const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree", &"wisteria_tree"]
+const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree", &"wisteria_tree", &"golden_chain"]
 const SPECIAL_BUDGET := 6000
 ## A candyfloss tree is wood plus meshes of floss and fuzz (FloraLibrary.FLOSSED):
 ## all together stay inside this.
 const FLOSSED_BUDGET := 9000
 const NEW := [
-	&"golden_chain", &"magnolia",
+	&"magnolia",
 	&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump", &"goldenrod",
 	&"lupin_clump", &"sugarberry_bush", &"spire_bed",
 	&"tulip_patch", &"daffodil", &"maidens_lace", &"forget_me_not", &"allium", &"pansy_patch",
