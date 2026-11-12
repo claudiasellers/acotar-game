@@ -44,9 +44,10 @@ const VIEWS := {
 	# The estate's trees (finish plan D2/E2): a parkland grove on the south
 	# lawns, the oaks and birches of the north hills from the deer park, the
 	# walled orchard's rows, the pond willows.
-	"estate_lawns": [-10.0, 190.0, 1.7, -130.0, 235.0, 4.0, 0.45, &"manor", 70.0],
+	"estate_lawns": [-30.0, 165.0, 1.7, -130.0, 245.0, 4.0, 0.45, &"manor", 70.0],
 	"estate_north": [40.0, -300.0, 1.7, -40.0, -470.0, 8.0, 0.45, &"manor", 70.0],
-	"estate_orchard": [-160.0, 140.0, 1.7, -250.0, 160.0, 3.0, 0.45, &"manor", 70.0],
+	"estate_orchard": [-160.0, 150.0, 14.0, -250.0, 155.0, 0.0, 0.45, &"manor", 70.0],
+	"estate_avenue": [9.0, 285.0, 1.7, 0.0, 60.0, 4.0, 0.45, &"manor", 70.0],
 	"estate_air": [0.0, 320.0, 90.0, -60.0, -120.0, 0.0, 0.45, &"manor", 70.0],
 	# From above, to read the whole shape.
 	"air_west": [-400.0, 300.0, 420.0, -1300.0, -400.0, 0.0, 0.45, &"spring", 75.0],
