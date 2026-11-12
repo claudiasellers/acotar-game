@@ -46,7 +46,9 @@ func test_every_tree_species_has_its_builds_within_budget() -> void:
 			assert_lte(_tris(m), 6000, "%s#%d within the tree budget" % [sp, b])
 			for i in m.get_surface_count():
 				var mat := m.surface_get_material(i) as ShaderMaterial
-				assert_eq(mat.shader.resource_path, EstateTrees.SHADER, "%s#%d surface %d on the estate tree shader" % [sp, b, i])
+				# cut-out leaves and fronds; everything else solid
+				assert_eq(mat.shader.resource_path, EstateTrees.SHADER if _parts(m)[i] == 1 else EstateTrees.SHADER_SOLID,
+					"%s#%d surface %d on its estate tree shader" % [sp, b, i])
 				assert_eq(mat, FloraLib.mesh(sp, 0).surface_get_material(i) if b > 0 and _parts(m) == _parts(FloraLib.mesh(sp, 0)) else mat,
 					"%s#%d shares the species' materials" % [sp, b])
 		assert_same(FloraLib.mesh(sp), FloraLib.mesh(sp, 0), "%s default is build a" % sp)

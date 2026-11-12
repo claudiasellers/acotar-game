@@ -42,8 +42,8 @@ func test_meshes_use_the_shared_shader_with_wind_flex() -> void:
 		for i in m.get_surface_count():
 			var sm := m.surface_get_material(i) as ShaderMaterial
 			if EstateTrees.has(id):
-				# the trees are EstateTrees' (their own shader, the same lighting and wind)
-				if sm == null or sm.shader == null or sm.shader.resource_path != EstateTrees.SHADER:
+				# the trees are EstateTrees' (their own shaders, the same lighting and wind)
+				if sm == null or sm.shader == null or sm.shader.resource_path not in [EstateTrees.SHADER, EstateTrees.SHADER_SOLID]:
 					bad.append("%s surface %d not on the estate tree shader" % [id, i])
 				elif absf(float(sm.get_shader_parameter(&"model_height")) - FloraLib.height_of(id)) > 0.01:
 					bad.append("%s model_height is not its height" % id)

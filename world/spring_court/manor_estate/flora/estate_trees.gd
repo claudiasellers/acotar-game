@@ -9,11 +9,16 @@ extends RefCounted
 ##
 ## A model is one mesh with a surface per part (tree_bark, tree_leaves,
 ## tree_core, tree_fruit, tree_fronds); each goes on its own material of
-## trees/estate_tree.gdshader, shared by the species' builds. FloraLib.mesh()
+## trees/estate_tree.gdshader (leaves, fronds) or estate_tree_solid.gdshader
+## (the rest), shared by the species' builds. FloraLib.mesh()
 ## and FloraLib.builds() route the tree species here.
 
 const DIR := "res://world/spring_court/manor_estate/flora/trees/"
+## The leaf-clump cards and the fronds are cut out; wood, hearts and fruit are
+## solid, on a shader of their own (a shader that cuts out anywhere is drawn as
+## a cut-out everywhere, which cost about 3 ms a frame in the orchard).
 const SHADER := DIR + "estate_tree.gdshader"
+const SHADER_SOLID := DIR + "estate_tree_solid.gdshader"
 ## The painted barks are the court's (tools/court/gen_ez_textures.py).
 const BARK_DIR := "res://world/spring_court/wider/assets/trees/ez/"
 const LETTERS := "abcdefgh"
@@ -93,8 +98,9 @@ static func material(species: StringName, part: StringName) -> ShaderMaterial:
 		return _materials[key]
 	var look: Array = LOOKS[species]
 	var m := ShaderMaterial.new()
-	m.shader = load(SHADER) as Shader
-	m.set_shader_parameter(&"part", PARTS.get(part, 2))
+	var number: int = PARTS.get(part, 2)
+	m.shader = load(SHADER if number == 1 else SHADER_SOLID) as Shader
+	m.set_shader_parameter(&"part", number)
 	var tex := "%spuff_%s.png" % [DIR, species]
 	if part == &"bark":
 		tex = BARK_DIR + ("bark_birch.png" if species == &"birch" else "bark_oak.png")
