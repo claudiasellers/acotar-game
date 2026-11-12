@@ -1,0 +1,5 @@
+from estate-trees-explore
+quality look
+shot green res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=candy_green
+shot blossom res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=candy_blossom
+shot greenn res://tools/court/court_terrain_shots.tscn {out} estate_north lineup=candy_green
