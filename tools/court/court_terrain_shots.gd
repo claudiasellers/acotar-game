@@ -184,6 +184,7 @@ const LINEUPS := {
 	# and Border Woods): candyfloss, wisteria, golden chain, magnolia.
 	"candy_trees": {"distance": 24.0, "spacing": 8.5, "look": 3.4, "ids": [&"woods_candyfloss_tree", &"woods_wisteria_tree",
 		&"woods_golden_chain", &"woods_magnolia"]},
+	"magnolia": {"distance": 9.5, "spacing": 7.0, "look": 3.2, "ids": [&"woods_magnolia"]},
 	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
 		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
