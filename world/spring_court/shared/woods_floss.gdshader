@@ -6,9 +6,11 @@
 // tufts, so every billow has a soft broken edge instead of an outline.
 //
 // The mesh carries no colour of its own: COLOR.r is a tone (deep in the
-// creases between billows, light on their tops) and each tree takes one pair
-// of colours, pale over deep, picked from where it stands. A grove is a mix
-// of pink, rose, lilac and pearl trees from one model. UV.x is the wind
+// creases between billows, light on their tops) and each tree takes its
+// colours, pale over deep, from where it stands: most trees one pair, and
+// multi_share of them a pair to each tuft (COLOR.g says which of four a
+// billow's tuft is). A grove is a mix of pink, rose, lilac and pearl trees
+// and trees of all four, from one model. UV.x is the wind
 // flex, UV.y marks the fuzz. Lit like the woods' flora.
 shader_type spatial;
 render_mode depth_draw_opaque;
@@ -30,9 +32,11 @@ uniform vec4 deep_3 : source_color = vec4(0.941, 0.553, 0.698, 1.0);
 // how far up from the deep colour to the pale one the lightest fluff goes
 uniform float colour_lift : hint_range(0.0, 1.0) = 0.72;
 // how much the cotton's light and dark shows in the fluff
-uniform float mottle : hint_range(0.0, 1.0) = 0.35;
+uniform float mottle : hint_range(0.0, 1.0) = 0.22;
+// the share of trees whose tufts are each their own colour
+uniform float multi_share : hint_range(0.0, 1.0) = 0.4;
 // the fuzz is this much paler than the billow under it
-uniform float fuzz_pale : hint_range(0.0, 1.0) = 0.1;
+uniform float fuzz_pale : hint_range(0.0, 1.0) = 0.06;
 uniform float translucency : hint_range(0.0, 1.0) = 0.3;
 // sugar crystals catching the light
 uniform float sparkle : hint_range(0.0, 1.0) = 0.5;
@@ -43,6 +47,7 @@ varying vec3 v_obj;
 varying vec3 v_objn;
 varying float v_fuzz;
 varying float v_pick;
+varying float v_multi;
 
 #define CANDY_ALBEDO_MIX_DEFAULT 1.0
 #define CANDY_GAIN_DEFAULT 2.0
@@ -57,6 +62,7 @@ varying float v_pick;
 void vertex() {
 	vec2 o = MODEL_MATRIX[3].xz;
 	v_pick = fract(sin(dot(o, vec2(12.9898, 78.233))) * 43758.5453);
+	v_multi = step(fract(sin(dot(o, vec2(39.346, 11.135))) * 24634.6345), multi_share);
 	v_obj = VERTEX;
 	v_objn = NORMAL;
 	v_fuzz = UV.y;
@@ -83,13 +89,15 @@ void fragment() {
 	}
 	vec3 top = top_0.rgb;
 	vec3 deep = deep_0.rgb;
-	if (v_pick > 0.75) {
+	// a tree of many colours: each tuft its own, turned by the tree's pick so no two trees match
+	float pick = v_multi > 0.5 ? fract(COLOR.g + floor(v_pick * 4.0) * 0.25) : v_pick;
+	if (pick > 0.75) {
 		top = top_3.rgb;
 		deep = deep_3.rgb;
-	} else if (v_pick > 0.5) {
+	} else if (pick > 0.5) {
 		top = top_2.rgb;
 		deep = deep_2.rgb;
-	} else if (v_pick > 0.25) {
+	} else if (pick > 0.25) {
 		top = top_1.rgb;
 		deep = deep_1.rgb;
 	}

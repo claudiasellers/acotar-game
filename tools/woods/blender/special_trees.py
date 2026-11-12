@@ -20,8 +20,9 @@ candyfloss_tree
            One tall cone of candyfloss on a straight pearl-rose trunk: a
            heap of soft billows, big low down and small toward the tip, with
            a fuzz standing off them, and a few star blossoms resting on top.
-           Each tree is one colour (blush, rose, lilac or pearl), given by
-           the shader from where it stands.
+           The shader colours it from where it stands: most trees one
+           colour (blush, rose, lilac or pearl), some with a different
+           colour to each of seven tufts.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
@@ -316,7 +317,7 @@ def cone(t):
     return 1.0 - 0.78 * ((t - 0.26) / 0.74) ** 1.1
 
 
-def billow(fk, lumps, i, scale, subdiv, fuzz):
+def billow(fk, lumps, i, scale, subdiv, fuzz, tufts):
     """One billow of the heap into kit `fk`: a lumpy ball. Its tone is light
     on top and deep where it meets its neighbours; `scale` > 1 with `fuzz`
     makes its fuzz skin."""
@@ -324,6 +325,9 @@ def billow(fk, lumps, i, scale, subdiv, fuzz):
     verts, faces = wt.icosphere(subdiv)
     first = len(fk.faces)
     idx, tones = [], []
+    # which tuft of the tree it belongs to: the nearest one's colour (COLOR.g,
+    # one of four; the shader uses it only on a tree of many colours)
+    pick = (min(tufts, key=lambda tuft: (tuft[0] - c).length)[1] + 0.5) / 4.0
     # no two billows the same: each a little squashed its own way, and lumpy
     squash = Vector((0.9 + 0.2 * (seed.x % 1.0), 0.9 + 0.2 * (seed.y % 1.0), 0.86 + 0.2 * (seed.z % 1.0)))
     for v in verts:
@@ -335,10 +339,10 @@ def billow(fk, lumps, i, scale, subdiv, fuzz):
         gap = min(((p - oc).length - orad * scale) / r for j, (oc, orad, _) in enumerate(lumps) if j != i)
         crease = min(max(gap / 0.32, 0.0), 1.0)
         tone = (0.3 + 0.7 * (0.5 + 0.5 * v.z) ** 0.9) * (0.42 + 0.58 * crease)
-        tones.append(min(1.0, tone + (0.1 if fuzz else 0.0)))
+        tones.append(min(1.0, tone + (0.04 if fuzz else 0.0)))
     flex = 0.16 + 0.3 * min(1.0, max(0.0, (c.z - FLOSS_FOOT) / FLOSS_HEIGHT))
     for f in faces:
-        fk.face(tuple(idx[k] for k in f), tuple((tones[k],) * 3 for k in f), tuple((flex, 1.0 if fuzz else 0.0) for _ in f))
+        fk.face(tuple(idx[k] for k in f), tuple((tones[k], pick, 0.0) for k in f), tuple((flex, 1.0 if fuzz else 0.0) for _ in f))
     fk.blobs.append((c, r * scale * 0.9, 0.95, 0.2, first, len(fk.faces)))
 
 
@@ -384,15 +388,26 @@ def candyfloss_tree(kit, near):
         lumps[outer:outer] = kids
         outer += len(kids)
 
+    # The tufts: seven places on the cone, each with one of the four colours;
+    # a billow belongs to the nearest. (Owner: "the original had a multicolor
+    # option where there were a variety of colored tufts in one tree".)
+    tufts = []
+    order = [0, 1, 2, 3, 0, 2, 1]
+    kit.rng.shuffle(order)
+    for k, colour in enumerate(order):
+        t = (k + kit.rng.uniform(0.25, 0.75)) / len(order)
+        a = k * 2.2 + kit.rng.uniform(-0.5, 0.5)
+        tufts.append((Vector((math.cos(a) * FLOSS_RADIUS * cone(t), math.sin(a) * FLOSS_RADIUS * cone(t), FLOSS_FOOT + t * FLOSS_HEIGHT)), colour))
+
     base = wt.Kit(1)
     for i in range(len(lumps)):
-        billow(base, lumps, i, 1.0, 1, False)
+        billow(base, lumps, i, 1.0, 1, False, tufts)
     base.cull_buried()
     kit.floss = base
     if near:
         skin = wt.Kit(2)
         for i in range(outer):   # every billow but the hidden middle ones
-            billow(skin, lumps, i, FUZZ, 1, True)
+            billow(skin, lumps, i, FUZZ, 1, True, tufts)
         skin.cull_buried()
         offset = len(base.verts)
         base.verts.extend(skin.verts)
@@ -421,7 +436,7 @@ def candyfloss_tree(kit, near):
             continue
         roll = kit.rng.random()
         petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.25 else STAR_BLUSH if roll < 0.5 else STAR_PEARL
-        star(kit, p, d, kit.rng.uniform(0.3, 0.46) * (1.0 if near else 1.5), petal_c, tip_c, heart_c, 0.3)
+        star(kit, p, d, kit.rng.uniform(0.26, 0.4) * (1.0 if near else 1.5), petal_c, tip_c, heart_c, 0.3)
         placed += 1
 
 
