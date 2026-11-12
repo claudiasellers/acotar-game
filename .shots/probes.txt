@@ -1,0 +1,6 @@
+from wider-court-world
+quality look
+shot fq res://tools/perf/frame_probe.tscn {out} western_woods forest=set_qtz --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_qtz --perf-csv={out}/perf.csv
+shot fe res://tools/perf/frame_probe.tscn {out} western_woods forest=set_ez --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_ez --perf-csv={out}/perf.csv
+shot fs res://tools/perf/frame_probe.tscn {out} western_woods forest=set --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_set --perf-csv={out}/perf.csv
+shot fo res://tools/perf/frame_probe.tscn {out} western_woods forest=old --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=forest_old --perf-csv={out}/perf.csv
