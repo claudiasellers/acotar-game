@@ -71,10 +71,17 @@ func test_the_scatter_splits_trees_over_builds_and_steps_and_neighbours_differ()
 	var content := load(CONTENT_DIR + "western_fells.tres") as CourtRegionContent
 	var near := 0
 	var mid := 0
+	var shade := 0
 	var by_build := {}
 	var points: Array = []
 	for layer in CourtScatterGenerator.decor_layers(content):
 		if not layer.tags.has("tree") or not String(layer.id).contains("@"):
+			continue
+		if layer.tags.has("shadow"):
+			# what a near tree casts its shadow with: its solid stand-in, in the shadow maps only
+			shade += layer.count()
+			assert_true(layer.shadow_only and layer.cast_shadow, "%s is drawn into the shadow maps only" % layer.id)
+			assert_lt(_tris(layer.mesh), 1300, "%s is the solid tree" % layer.id)
 			continue
 		if String(layer.id).ends_with("m"):
 			mid += layer.count()
@@ -89,6 +96,7 @@ func test_the_scatter_splits_trees_over_builds_and_steps_and_neighbours_differ()
 			continue
 		near += layer.count()
 		assert_true(layer.tags.has("near"))
+		assert_false(layer.cast_shadow, "%s: the leaves cast no shadow themselves" % layer.id)
 		assert_gt(layer.draw_distance, CourtTreeSet.NEAR + CourtScatterGenerator.NEAR_CHUNK * 0.7, "%s: a near chunk is drawn while a tree of it could be near" % layer.id)
 		for i in layer.mesh.get_surface_count():
 			assert_eq(float((layer.mesh.surface_get_material(i) as ShaderMaterial).get_shader_parameter(&"lod_end")), CourtTreeSet.NEAR,
@@ -100,6 +108,7 @@ func test_the_scatter_splits_trees_over_builds_and_steps_and_neighbours_differ()
 				layer.instances[o + 3], layer.instances[o + 4], base])
 	assert_gt(near, 1000, "the Western Woods has its trees")
 	assert_eq(mid, near, "every tree has a near and a mid step")
+	assert_eq(shade, near, "and every near tree its shadow")
 	# Neighbours (within the gap, same species) on the same build.
 	var same := 0
 	var pairs := 0

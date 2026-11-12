@@ -26,7 +26,10 @@ const NEAR := 80.0
 ## gains). Different regions take different builds, so the court as a whole
 ## still shows them all.
 const MAX_BUILDS := 6
-enum Step { NEAR, MID, FAR }
+## SHADOW is the mid step's solid tree with the near step's window: what a near
+## tree casts its shadow with (a solid crown's shadow costs a third of the
+## leaves' and no cut-out pass).
+enum Step { NEAR, MID, FAR, SHADOW }
 
 ## The mixed wood's palette (wcterrain-28, owner-approved): "deep" leaves,
 ## painted EZ bands, taupe bark.
@@ -157,7 +160,7 @@ static func mesh(id: StringName, b: int, step: int) -> Mesh:
 static func prewarm(ids: Array) -> void:
 	for id: StringName in ids:
 		for b in builds(id):
-			for step in [Step.NEAR, Step.MID, Step.FAR]:
+			for step in [Step.NEAR, Step.MID, Step.FAR, Step.SHADOW]:
 				mesh(id, b, step)
 
 
@@ -206,7 +209,7 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 		var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
 		for k in verts.size():
 			verts[k] = Vector3(verts[k].x * s, (verts[k].y - aabb.position.y) * s, verts[k].z * s)
-		if step == Step.MID and kind != "bark":
+		if (step == Step.MID or step == Step.SHADOW) and kind != "bark":
 			# The mid step's crown is solid (T7: cut-out leaves cost the dense
 			# wood its frame time; a solid crown at 80 m+ reads the same).
 			leaves.append_array(verts)
@@ -216,7 +219,7 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, kind, s, h, step))
 	if not leaves.is_empty():
 		_mid_crown(out, leaves, b)
-		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, "far", s, h, Step.MID))
+		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, "far", s, h, step))
 	return out
 
 
@@ -404,7 +407,7 @@ static func _material(r: StringName, model: String, kind: String, s: float, h: f
 	var spec: Dictionary = ROLES[r]
 	var mat := ShaderMaterial.new()
 	mat.shader = load(SHADER)
-	if step == Step.NEAR:
+	if step == Step.NEAR or step == Step.SHADOW:
 		mat.set_shader_parameter(&"lod_end", NEAR)
 	elif step == Step.MID:
 		mat.set_shader_parameter(&"lod_begin", NEAR)

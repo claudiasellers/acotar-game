@@ -117,6 +117,8 @@ func _make_instance(layer: ScatterLayer, node_name: String, mm: MultiMesh, origi
 	node.multimesh = mm
 	node.position = origin
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if layer.cast_shadow else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if layer.shadow_only:
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 	if layer.material != null:
 		node.material_override = layer.material
 	add_child(node)

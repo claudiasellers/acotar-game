@@ -25,6 +25,9 @@ static var _forage_models: Dictionary = {}
 @export var tags: PackedStringArray = []
 @export var instances: PackedFloat32Array = []
 @export var cast_shadow := true
+## Drawn into the shadow maps only: a cheaper stand-in that casts for a layer
+## which casts none itself.
+@export var shadow_only := false
 ## Sway amount for the shared GPU wind (0 = rigid, e.g. rocks). Informational:
 ## set `wind_amount` on the layer's material (instance uniforms would overflow
 ## the global instance buffer with thousands of chunks).

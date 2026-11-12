@@ -155,10 +155,14 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 		return parts
 	var near: Array[ScatterLayer] = []
 	var mid: Array[ScatterLayer] = []
+	var shade: Array[ScatterLayer] = []
 	for v: int in chosen:
-		for step in [CourtTreeSet.Step.NEAR, CourtTreeSet.Step.MID]:
+		for step in [CourtTreeSet.Step.NEAR, CourtTreeSet.Step.MID, CourtTreeSet.Step.SHADOW]:
+			if step == CourtTreeSet.Step.SHADOW and not layer.cast_shadow:
+				shade.append(null)
+				continue
 			var part := ScatterLayer.new()
-			part.id = StringName("%s@%d%s" % [layer.id, v, "" if step == CourtTreeSet.Step.NEAR else "m"])
+			part.id = StringName("%s@%d%s" % [layer.id, v, ["", "m", "", "s"][step]])
 			part.mesh = CourtTreeSet.mesh(id, v, step)
 			# Each tree switches step at its own distance in the shader
 			# (court_tree.gdshader lod_begin / lod_end); a chunk only has to be
@@ -166,6 +170,10 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 			if step == CourtTreeSet.Step.NEAR:
 				part.draw_distance = CourtTreeSet.NEAR + NEAR_CHUNK * 0.71 + 2.0
 				near.append(part)
+			elif step == CourtTreeSet.Step.SHADOW:
+				part.draw_distance = CourtTreeSet.NEAR + NEAR_CHUNK * 0.71 + 2.0
+				part.shadow_only = true
+				shade.append(part)
 			else:
 				part.draw_distance = layer.draw_distance
 				part.impostor_mesh = CourtTreeSet.mesh(id, v, CourtTreeSet.Step.FAR)
@@ -173,9 +181,13 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 				mid.append(part)
 			part.wind = layer.wind
 			# Past the near step a tree's shadow is a few blurred texels of the
-			# far cascade, but costs a whole alpha-cut pass (T7): near only.
-			part.cast_shadow = layer.cast_shadow and step == CourtTreeSet.Step.NEAR
-			part.tags = PackedStringArray(["tree", "near" if step == CourtTreeSet.Step.NEAR else "mid"])
+			# far cascade: near trees only. And a near tree casts with its
+			# solid stand-in (Step.SHADOW), not its cut-out leaves: about a
+			# third of the triangles and no cut-out pass in each shadow map.
+			part.cast_shadow = step == CourtTreeSet.Step.SHADOW
+			part.tags = PackedStringArray(["tree", ["near", "mid", "", "shadow"][step]])
+			if step == CourtTreeSet.Step.SHADOW:
+				part.tags.append("near")   # drawn from the near step's chunks
 			part.ingredient_id = layer.ingredient_id
 	var taken := {}
 	for i in layer.count():
@@ -184,11 +196,15 @@ static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[Scat
 		var v := _free_build(taken, p, absi(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0)))) % n, n)
 		near[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
 		mid[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
+		if shade[v] != null:
+			shade[v].add(p, layer.instances[o + 3], layer.instances[o + 4])
 	var kept: Array[ScatterLayer] = []
 	for k in near.size():
 		if near[k].count() > 0:
 			kept.append(near[k])
 			kept.append(mid[k])
+			if shade[k] != null:
+				kept.append(shade[k])
 	return kept
 
 
@@ -531,7 +547,7 @@ static func report(content: CourtRegionContent, forage: Array[ScatterLayer], dec
 	for layer in decor:
 		decor_instances += layer.count()
 		# near and mid steps hold the same trees: count the near (or the only) layer
-		if layer.tags.has("tree") and not layer.tags.has("mid"):
+		if layer.tags.has("tree") and not layer.tags.has("mid") and not layer.tags.has("shadow"):
 			tree_layers.append(layer)
 	# Planting against the land (finish plan P2; the recipe's ranges are the content's).
 	var planting := CourtPlanting.report(content, tree_layers, 16.0)
