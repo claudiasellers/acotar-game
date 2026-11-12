@@ -313,6 +313,9 @@ def tile_sheet(tiles, path, cols, tile=640, tmp=None):
         os.remove(f)
         r, c = divmod(k, cols)
         canvas[r * tile:(r + 1) * tile, c * tile:(c + 1) * tile] = np.flipud(a)
+    for k in range(len(tiles), rows * cols):     # spare cells take the backdrop, not a grey block
+        r, c = divmod(k, cols)
+        canvas[r * tile:(r + 1) * tile, c * tile:(c + 1) * tile] = canvas[2, 2]
     os.rmdir(tmp)
     img = bpy.data.images.new("sheet", cols * tile, rows * tile, alpha=False)
     img.pixels = np.flipud(canvas).ravel().tolist()
