@@ -1,0 +1,9 @@
+from wider-court-world
+quality look
+shot d40 res://tools/perf/frame_probe.tscn {out} western_woods forest=set density=40 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=set_40 --perf-csv={out}/perf.csv
+shot d70 res://tools/perf/frame_probe.tscn {out} western_woods forest=set density=70 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=set_70 --perf-csv={out}/perf.csv
+shot d100 res://tools/perf/frame_probe.tscn {out} western_woods forest=set density=100 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=set_100 --perf-csv={out}/perf.csv
+shot d150 res://tools/perf/frame_probe.tscn {out} western_woods forest=set density=150 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=set_150 --perf-csv={out}/perf.csv
+shot o100 res://tools/perf/frame_probe.tscn {out} western_woods forest=old density=100 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=old_100 --perf-csv={out}/perf.csv
+shot steps res://tools/court/court_terrain_shots.tscn {out} glen_saddle regions ingame lineup=tree_steps
+shot wood res://tools/court/court_terrain_shots.tscn {out} western_woods forest=set density=100
