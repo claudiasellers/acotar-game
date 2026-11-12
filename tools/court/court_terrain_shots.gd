@@ -241,6 +241,8 @@ const LINEUPS := {
 	# estate's colours), then option 2 (hybrid: EZ branches wearing candy puffs).
 	"candy_green": {"distance": 58.0, "spacing": 11.0, "look": 6.5, "ids": ["estate:oak:0", "candy_ez:oak", "hybrid:oak", "post",
 		"estate:birch:0", "candy_ez:birch", "hybrid:birch"]},
+	# One tree at a time: today's oak beside the half-and-half oak.
+	"candy_oak": {"distance": 34.0, "spacing": 18.0, "look": 7.5, "ids": ["estate:oak:0", "hybrid:oak"]},
 	"candy_blossom": {"distance": 30.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:cherry_blossom:0", "candy_ez:cherry_blossom",
 		"hybrid:cherry_blossom", "post", "estate:apple_blossom:0", "candy_ez:apple_blossom", "hybrid:apple_blossom"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
