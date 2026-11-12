@@ -10,8 +10,9 @@ Out:  art/wider_world/<id>.glb (+ "<id>_lod1") and wider_world_manifest.json
 All [X] (the plan's regions; the book names none of these objects). The
 village is the candy-pastel princess look at full strength (R3); the blight
 props are the opposite and stay frightening: drained colour, thorns, bone.
-Climbables carry one shared marker so "marked climbing" reads everywhere:
-small butter-yellow star flowers (ivy, ledges, holds) or glowcaps (roots).
+Climbables carry one shared tell so a way up reads everywhere, and it is part
+of the surface, never a marker floating on it (R2): butter-yellow lichen and
+chalk-worn patches on rock and root, butter-variegated leaves in the ivy.
 """
 import math
 import os
@@ -52,11 +53,18 @@ def stripes(cols, freq, axis="x"):
     return shade
 
 
-def marker_flower(p, m, r=0.035):
-    """The shared climb marker: a butter star flower with a glowing heart."""
-    for i in range(5):
-        p.add(K.petal(r, r * 0.6, cup=0.15, curl=-0.05), BUTTER, "fabric", m @ R("Z", 72 * i))
-    p.add(sphere(r * 0.3, 6, 4), (0.85, 0.80, 0.45), "glow", m @ S(1, 1, 0.6))
+TELL = BUTTER                 # the climb tell's colour
+
+
+def tell_tint(scale=1.0, seed=0.0, where=None):
+    """Tint for U.stone_shade: butter lichen grown into the stone in soft
+    irregular patches. where(co) -> 0..1 limits it (a hold's top, a ledge's lip)."""
+    def tint(co, col):
+        n = (math.sin(co.x * 9.0 * scale + seed) * math.cos(co.y * 7.0 * scale + seed * 1.7)
+             + 0.6 * math.sin(co.z * 11.0 * scale + co.x * 5.0 * scale + seed * 0.6))
+        k = clamp(0.5 + n * 0.9) * (where(co) if where else 1.0)
+        return K.mix(col, TELL, clamp(k * 1.6) * 0.9)
+    return tint
 
 
 # ------------------------------------------------------------------ the seamstress
@@ -160,8 +168,9 @@ def seam_fabric_bolts(p):
             p.add(lathe([(0.0, 0.0), (0.022, 0.0), (0.022, ln + 0.02), (0.0, ln + 0.02)], 5), CREAM, "matte", m @ T(0, 0, -0.01))
             if k % 6 == 2:
                 path = [(r, 0.0), (r + 0.01, -0.06), (r - 0.02, -0.2), (r + 0.01, -0.3)]
-                p.add(U.ribbon([(a, b) for a, b in path], ln * 0.9, 0.004), col, "fabric", T(x - r + 0.0, d / 2 - ln / 2, z0 + r) @ S(0, 1, 1) @ T(0, 0, 0)
-                      if False else T(x, d / 2 + 0.005, z0 + r) @ R("Z", 90) @ T(-r, 0, 0) @ S(1, 0.9 * 0.207 / (ln * 0.9), 1), shade=sh)
+                # a loose end of cloth hanging over the shelf's edge
+                p.add(U.ribbon(path, ln * 0.9, 0.004), col, "fabric",
+                      T(x, d / 2 + 0.005, z0 + r) @ R("Z", 90) @ T(-r, 0, 0) @ S(1, 0.9 * 0.207 / (ln * 0.9), 1), shade=sh)
             k += 1
 
 
@@ -435,7 +444,7 @@ def potion_counter(p):
 
 def climb_ivy_panel(p):
     """A 2 x 4 m sheet of climbable ivy for manor walls and cliff faces,
-    starred with the butter marker flowers. Hangs in the wall's plane."""
+    threaded with butter-variegated leaves (the climb tell). Hangs in the wall's plane."""
     rng = random.Random(7381)
     for k in range(7):
         x = -0.85 + k * 0.28 + rng.uniform(-0.06, 0.06)
@@ -453,14 +462,14 @@ def climb_ivy_panel(p):
                 col = K.mix(GREEN, GREEN_DEEP, rng.random())
                 m = T(q.x + rng.uniform(-0.14, 0.14), 0.05 + rng.uniform(0, 0.05), q.z) @ FRONT @ R("Z", rng.uniform(200, 340)) @ R("Y", rng.uniform(-25, 5))
                 p.add(K.leaf(sz, sz * 0.8), col, "leaf", m)
-                p.add(K.leaf(sz * 0.7, sz * 0.5), K.lighter(col, 0.12), "leaf", m @ R("Z", rng.choice((-60, 60))))
-    for k in range(11):
-        marker_flower(p, T(rng.uniform(-0.8, 0.8), 0.11, 0.4 + k * 0.33 + rng.uniform(-0.08, 0.08)) @ FRONT @ R("Z", rng.uniform(0, 72)), 0.05)
+                # the tell: about one spray in four has a butter-variegated second leaf
+                second = K.mix(TELL, K.lighter(col, 0.12), 0.15) if (i * 2 + j + k) % 4 == 0 else K.lighter(col, 0.12)
+                p.add(K.leaf(sz * 0.7, sz * 0.5), second, "leaf", m @ R("Z", rng.choice((-60, 60))))
 
 
 def climb_root_ladder(p):
     """Climbable roots hanging down a bank or cliff: thick risers with
-    cross-roots for rungs, moss, and glowcaps marking the way up."""
+    cross-roots for rungs, moss, and butter lichen worn onto every rung."""
     rng = random.Random(7382)
     root = K.mix(BARK, (0.62, 0.50, 0.42), 0.5)
     xs = (-0.5, -0.18, 0.16, 0.52)
@@ -478,52 +487,40 @@ def climb_root_ladder(p):
         if x1 - x0 < 0.4:
             x0, x1 = xs[0], xs[3] if i % 2 else xs[2]
         pts = [(x0, 0.07, z), ((x0 + x1) / 2, 0.11, z + rng.uniform(-0.08, 0.08)), (x1, 0.07, z + rng.uniform(-0.05, 0.05))]
-        p.add(tube(pts, [0.03, 0.036, 0.028], 5), K.lighter(root, 0.08), "matte")
+        pts = [pts[0], tuple((Vector(pts[0]) + Vector(pts[1])) / 2), pts[1], tuple((Vector(pts[1]) + Vector(pts[2])) / 2), pts[2]]
+        mid = (x0 + x1) / 2
+        p.add(tube(pts, [0.03, 0.034, 0.036, 0.033, 0.028], 5), K.lighter(root, 0.08), "matte",
+              shade=lambda co, mid=mid, half=(x1 - x0) / 2: K.mix(K.lighter(root, 0.08), TELL, 0.85 * clamp(1.5 - abs(co.x - mid) / half * 2.2) * clamp(0.5 + (co.y - 0.07) * 20)))
         if i % 2 == 0:
             p.add(sphere(0.06, 7, 4), K.mix(MINT, GREEN, 0.5), "leaf", T((x0 + x1) / 2, 0.12, z + 0.02) @ S(1.6, 0.6, 0.5))
-    for k in range(7):
-        x, z = rng.choice(xs) + rng.uniform(-0.05, 0.05), 0.5 + k * 0.5
-        m = T(x, 0.1, z) @ R("X", -40)
-        p.add(lathe([(0.006, 0.0), (0.005, 0.035)], 4, False, False), CREAM, "matte", m)
-        p.add(lathe([(0.0, 0.05), (0.02, 0.042), (0.026, 0.03), (0.0, 0.032)], 7), (0.60, 0.85, 0.80), "glow", m)
 
 
 def climb_ledge(p):
     """A mantle ledge: a jutting shelf of fell rock with a worn pale lip, a
-    tuft of grass and the marker flowers."""
+    tuft of grass, and butter lichen along the lip you grab."""
     rng = random.Random(7383)
-    bm = U.rock(1.0, 2, 3.7, 0.16)
-    for v in bm.verts:
-        v.co.x *= 1.15
-        v.co.y = v.co.y * 0.55 + 0.1
-        v.co.z = min(v.co.z * 0.42, 0.14 + 0.02 * math.sin(v.co.x * 5))
-    p.add(bm, ROCK, "matte", T(0, 0, 0.36), sharp_deg=38.0,
-          shade=lambda co: K.mix(K.mix(K.darker(ROCK, 0.3), ROCK, clamp(0.6 + co.z * 2)), (0.82, 0.78, 0.74), clamp((co.z - 0.1) * 14) * clamp((co.y - 0.3) * 4)))
+    bm = U.weathered_rock(1.0, 4, 3.7, 0.16, lambda co: Vector((co.x * 1.15, co.y * 0.55 + 0.1, min(co.z * 0.42, 0.14 + 0.02 * math.sin(co.x * 5)))),
+                          strata=0.07, beds=5.0)
+    lip = lambda co: clamp((co.z - 0.08) * 12) * clamp((co.y - 0.25) * 4)  # noqa: E731
+    p.add(bm, ROCK, "matte", T(0, 0, 0.36), sharp_deg=50.0, shade=U.stone_shade(bm, ROCK, 0.45, 0.3, (5.0, 0.1), tell_tint(1.0, 2.0, lip)))
     for k in range(9):
         x = rng.uniform(-0.8, 0.8)
         for j in range(3):
             p.add(K.leaf(rng.uniform(0.16, 0.28), 0.03), K.mix(GREEN, GREEN_DEEP, rng.random()), "leaf",
                   T(x, rng.uniform(-0.25, 0.1), 0.5) @ R("Z", rng.uniform(0, 360)) @ R("Y", -rng.uniform(55, 80)))
-    for x in (-0.6, 0.05, 0.62):
-        marker_flower(p, T(x, 0.52, 0.47) @ R("X", -50) @ R("Z", rng.uniform(0, 72)), 0.045)
-        p.add(tube([(x, 0.5, 0.44), (x, 0.52, 0.47)], 0.004, 3), GREEN_DEEP, "leaf")
 
 
 def climb_handholds(p):
     """A run of handholds up a rock face: seven knobs and pockets, each with
-    a chalk-pale worn top and a marker flower beside the awkward ones."""
+    a chalk-worn top with butter lichen grown into it."""
     rng = random.Random(7384)
     spots = [(-0.35, 0.25), (0.3, 0.6), (-0.15, 1.05), (0.4, 1.45), (-0.4, 1.8), (0.1, 2.25), (-0.2, 2.7)]
     for k, (x, z) in enumerate(spots):
-        bm = U.rock(0.13, 2, k * 2.9, 0.2)
-        for v in bm.verts:
-            v.co.y = max(v.co.y * 0.8, -0.01)
-            v.co.z *= 0.6
-            v.co.x *= rng.uniform(1.0, 1.02) * (1.5 if k % 3 == 0 else 1.0)
-        p.add(bm, ROCK, "matte", T(x, 0, z), sharp_deg=38.0,
-              shade=lambda co: K.mix(K.darker(ROCK, 0.25), (0.82, 0.80, 0.76), clamp(co.z * 16 + 0.2) * clamp(co.y * 12)))
-        if k % 2 == 0:
-            marker_flower(p, T(x + 0.17, 0.02, z + 0.02) @ FRONT @ R("Z", rng.uniform(0, 72)), 0.04)
+        wide = 1.5 if k % 3 == 0 else 1.0
+        bm = U.weathered_rock(0.13, 3, k * 2.9, 0.2, lambda co, wide=wide: Vector((co.x * wide, max(co.y * 0.8, -0.01), co.z * 0.6)))
+        top = lambda co: clamp(co.z * 16 + 0.3) * clamp(co.y * 12)  # noqa: E731
+        chalk = lambda co, col, top=top, tell=tell_tint(9.0, k * 1.3, top): tell(co, K.mix(col, (0.82, 0.80, 0.76), 0.6 * top(co)))  # noqa: E731
+        p.add(bm, ROCK, "matte", T(x, 0, z), sharp_deg=50.0, shade=U.stone_shade(bm, ROCK, 0.45, 0.25, tint=chalk))
 
 
 def cliff_rope_anchor(p):
@@ -531,8 +528,9 @@ def cliff_rope_anchor(p):
     an iron ring and a frayed end of line, wedged in rock."""
     rng = random.Random(7385)
     for k in range(4):
-        p.add(U.rock(rng.uniform(0.18, 0.3), 2, k * 1.9, 0.2), K.mix(ROCK, K.darker(ROCK, 0.25), rng.random()), "matte",
-              T(math.cos(k * 1.6) * 0.26, math.sin(k * 1.6) * 0.26, 0.08) @ S(1, 1, 0.6), sharp_deg=38.0)
+        bm = U.weathered_rock(rng.uniform(0.18, 0.3), 3, k * 1.9, 0.2, lambda co: Vector((co.x, co.y, co.z * 0.6)))
+        base = K.mix(ROCK, K.darker(ROCK, 0.25), rng.random())
+        p.add(bm, base, "matte", T(math.cos(k * 1.6) * 0.26, math.sin(k * 1.6) * 0.26, 0.08), sharp_deg=50.0, shade=U.stone_shade(bm, base, 0.45, 0.25))
     # a squared mooring bitt with a cross-pin and a pyramid cap, not a round post
     lean = R("Y", 5)
     p.add(box(0.2, 0.2, 1.05, bevel=0.02), OAK, "matte", lean @ T(0, 0, 0.525), shade=U.grain(OAK, 0.25, 20.0))
@@ -549,7 +547,9 @@ def cliff_rope_anchor(p):
     p.add(torus(0.03, 0.016, 8, 5), rope, "fabric", T(0.075, 0.17, 0.77) @ R("Y", 90))
     for k in range(5):
         p.add(tube([(0.22, 0.38, 0.08), (0.27 + rng.uniform(-0.03, 0.03), 0.42 + rng.uniform(-0.03, 0.03), 0.03)], [0.006, 0.001], 3), rope, "fabric")
-    marker_flower(p, T(-0.02, 0.105, 1.0) @ FRONT, 0.035)
+    # the tell: butter lichen on the face a rope arrow is shot at, 2 mm proud of the wood
+    for dx, dz, r in ((-0.02, 0.98, 0.06), (0.04, 0.78, 0.04), (-0.05, 0.6, 0.03)):
+        p.add(U.splat(r, r * 1.2, 9, rng, 0.35, 0.003), TELL, "matte", lean @ T(dx, 0.101, dz) @ FRONT)
 
 
 # ------------------------------------------------------------------ the fells
@@ -796,18 +796,54 @@ def blight_carcass(p):
 
 
 def blight_dry_fountain(p):
-    """A garden fountain in the Reaches: dry, split, its finial fallen, a
-    black scum where the water was, dead creeper over the rim."""
+    """A garden fountain in the Reaches: dry, its rim chipped and split by
+    cracks that run down the wall, the finial fallen, a pale stain line where
+    the water stood and black scum below it, dead creeper over the rim."""
     rng = random.Random(7404)
     stone = (0.50, 0.47, 0.50)
-    sh = lambda co: K.mix(K.darker(stone, 0.35), stone, clamp(0.45 + co.z * 0.7 + 0.25 * math.sin(co.x * 6 + co.y * 5)))  # noqa: E731
-    p.add(lathe([(0.0, 0.0), (1.05, 0.0), (1.1, 0.06), (1.02, 0.12), (1.05, 0.34), (1.12, 0.4), (1.0, 0.42), (0.92, 0.36), (0.9, 0.14), (0.0, 0.12)], 16),
-          stone, "matte", shade=sh)
-    p.add(U.splat(0.86, 0.86, 16, rng, 0.12, 0.01), ROT, "pearl", T(0, 0, 0.125))
-    p.add(lathe([(0.0, 0.12), (0.22, 0.12), (0.24, 0.2), (0.12, 0.3), (0.1, 0.8), (0.16, 0.86), (0.5, 0.96), (0.52, 1.02), (0.44, 1.02), (0.12, 0.94),
-                 (0.0, 0.94)], 12), stone, "matte", R("Y", 4), shade=sh)
+    cracks = [0.5, 1.9, 2.75, 4.1, 5.35]
+    angles = sorted([2 * math.pi * i / 28 for i in range(28) if all(abs(2 * math.pi * i / 28 - c) > 0.14 for c in cracks)]
+                    + [c + d for c in cracks for d in (-0.07, 0.0, 0.07)])
+    #          foot                      outer wall                    rim                      inner wall (stain line at 0.27)        floor
+    prof = [(1.05, 0.0), (1.1, 0.06), (1.02, 0.12), (1.04, 0.24), (1.05, 0.34), (1.12, 0.4), (1.06, 0.425), (1.0, 0.42), (0.93, 0.37), (0.915, 0.275),
+            (0.912, 0.255), (0.9, 0.14), (0.45, 0.125), (0.02, 0.12)]
+
+    def mod(a, r, z, k):
+        cav = 0.5 + 0.22 * math.sin(a * 5.0 + k * 0.9) + 0.15 * math.sin(a * 11.0 - k * 1.7)
+        r *= 1.0 + 0.012 * math.sin(a * 7.0 + z * 9.0)
+        if 4 <= k <= 8:                                   # the weathered rim: worn low and chipped
+            z -= 0.022 * max(0.0, math.sin(a * 3.0 + 1.0)) + 0.03 * max(0.0, math.sin(a * 13.0 + k)) ** 4
+        for ci, c in enumerate(cracks):
+            if abs(a - c) < 1e-6 and 2 <= k <= 10:        # a crack: the middle of three close columns cut in and down
+                depth = 1.0 if 4 <= k <= 8 else 0.55
+                r += (-0.05 if k <= 5 else 0.05) * depth
+                z -= (0.07 if ci % 2 == 0 else 0.035) * depth * (1.0 if 4 <= k <= 8 else 0.0)
+                cav = 0.0
+        return r, z, clamp(cav)
+
+    basin = U.lathe_var(prof, angles, mod)
+
+    def stain(co, col):
+        r = math.hypot(co.x, co.y)
+        if r < 0.99 and co.z < 0.3:
+            if co.z > 0.25:
+                return K.mix(col, (0.74, 0.70, 0.62), 0.75)       # the dry tide line, pale mineral crust
+            return K.mix(col, ROT, 0.55 + 0.25 * clamp(1.0 - r))  # the scum below it
+        return col
+
+    p.add(basin, stone, "matte", sharp_deg=55.0, shade=U.stone_shade(basin, stone, 0.5, 0.3, (4.0, 0.08), stain))
+    under = lathe([(0.0, 0.0), (1.05, 0.0)], 14, True, False)
+    p.add(under, K.darker(stone, 0.4), "matte", T(0, 0, 0.002))
+    stem = [(0.24, 0.12), (0.25, 0.2), (0.13, 0.3), (0.1, 0.55), (0.1, 0.8), (0.16, 0.86), (0.5, 0.96), (0.53, 1.02), (0.45, 1.025), (0.3, 0.97), (0.12, 0.94), (0.02, 0.94)]
+    stem_a = [2 * math.pi * i / 14 for i in range(14)]
+
+    def stem_mod(a, r, z, k):
+        chip = 0.05 * max(0.0, math.sin(a * 2.0 + 0.6)) ** 3 if 6 <= k <= 8 else 0.0
+        return r * (1.0 + 0.02 * math.sin(a * 5.0 + k)) - chip, z - chip * 0.5, clamp(0.5 + 0.25 * math.sin(a * 4.0 + k * 1.3) - chip * 8.0)
+    bowl = U.lathe_var(stem, stem_a, stem_mod)
+    p.add(bowl, stone, "matte", R("Y", 4), sharp_deg=55.0, shade=U.stone_shade(bowl, stone, 0.5, 0.3, (4.0, 0.08)))
     fin = lathe([(0.0, 0.0), (0.1, 0.0), (0.12, 0.08), (0.06, 0.16), (0.1, 0.3), (0.05, 0.42), (0.0, 0.46)], 8)
-    p.add(fin, stone, "matte", T(0.55, 0.5, 0.2) @ R("X", 100) @ R("Z", 40), shade=sh)
+    p.add(fin, stone, "matte", T(0.55, 0.5, 0.2) @ R("X", 100) @ R("Z", 40), shade=U.stone_shade(fin, stone, 0.5, 0.3))
     for k in range(7):
         a = rng.uniform(0, 6.283)
         pts = [(math.cos(a) * 1.08, math.sin(a) * 1.08, 0.41)]
@@ -818,7 +854,7 @@ def blight_dry_fountain(p):
     for k in range(5):
         a0 = rng.uniform(0, 6.283)
         pts = [(math.cos(a0 + i * 0.22) * (1.07 + 0.05 * math.sin(i * 1.7)), math.sin(a0 + i * 0.22) * (1.07 + 0.05 * math.sin(i * 1.7)),
-                0.43 + 0.04 * math.sin(i * 2.1) - (0.12 * i if k % 2 else 0.0)) for i in range(7)]
+                max(0.03, 0.43 + 0.04 * math.sin(i * 2.1) - (0.12 * i if k % 2 else 0.0))) for i in range(7)]
         _thorn_cane(p, pts, 0.014, rng, 4)
         for j in range(4):
             q = Vector(pts[rng.randrange(7)])

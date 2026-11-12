@@ -26,8 +26,10 @@ the five steeped arrows in `art/arms/`.
 
 Climbables: `climb_ivy_panel` (2 m wide, 3 m tall, tiles upward),
 `climb_root_ladder`, `climb_ledge`, `climb_handholds`. Each carries the same
-tell so a climbable reads at a glance: small butter-yellow star flowers (glowcaps
-on the roots). They stand upright on the origin, growing up +Y, to be pushed against their wall.
+tell so a way up reads at a glance, and it is part of the surface rather than
+a marker on it (R2): butter-yellow lichen and chalk wear on rock, rungs and the
+anchor post, butter-variegated leaves in the ivy. No tell geometry sits more
+than 1 cm off its host. They stand upright on the origin, growing up +Y, to be pushed against their wall.
 `cliff_rope_anchor` is where a rope arrow bites.
 
 Sentry dressing: `signal_brazier`, `sentry_weapon_rack`, `sentry_banner`,

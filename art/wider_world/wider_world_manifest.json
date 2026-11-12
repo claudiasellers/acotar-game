@@ -157,7 +157,7 @@
    "tris_lod1": 919
   },
   {
-   "bytes": 207980,
+   "bytes": 149152,
    "climbable": true,
    "file": "climb_ivy_panel.glb",
    "id": "climb_ivy_panel",
@@ -168,11 +168,11 @@
     4.201,
     0.172
    ],
-   "tris": 2544,
-   "tris_lod1": 1272
+   "tris": 1708,
+   "tris_lod1": 854
   },
   {
-   "bytes": 59408,
+   "bytes": 52156,
    "climbable": true,
    "file": "climb_root_ladder.glb",
    "id": "climb_root_ladder",
@@ -183,52 +183,52 @@
     4.021,
     0.205
    ],
-   "tris": 1196,
-   "tris_lod1": 597
+   "tris": 1104,
+   "tris_lod1": 551
   },
   {
-   "bytes": 34988,
+   "bytes": 73748,
    "climbable": true,
    "file": "climb_ledge.glb",
    "id": "climb_ledge",
    "mount": "wall",
    "place": "western_fells",
    "size_m": [
-    2.188,
-    0.805,
-    1.114
+    2.486,
+    0.838,
+    1.197
    ],
-   "tris": 440,
-   "tris_lod1": 217
+   "tris": 1388,
+   "tris_lod1": 694
   },
   {
-   "bytes": 48408,
+   "bytes": 114024,
    "climbable": true,
    "file": "climb_handholds.glb",
    "id": "climb_handholds",
    "mount": "wall",
    "place": "western_fells",
    "size_m": [
-    1.14,
-    2.613,
-    0.131
+    1.176,
+    2.628,
+    0.138
    ],
-   "tris": 864,
-   "tris_lod1": 432
+   "tris": 2240,
+   "tris_lod1": 1120
   },
   {
-   "bytes": 45228,
+   "bytes": 86856,
    "file": "cliff_rope_anchor.glb",
    "id": "cliff_rope_anchor",
    "place": "western_fells",
    "rope_target": true,
    "size_m": [
-    0.948,
-    1.229,
-    0.979
+    0.996,
+    1.244,
+    0.996
    ],
-   "tris": 902,
-   "tris_lod1": 445
+   "tris": 1813,
+   "tris_lod1": 900
   },
   {
    "bytes": 56512,
@@ -325,18 +325,18 @@
    "tris_lod1": 582
   },
   {
-   "bytes": 69584,
+   "bytes": 119360,
    "file": "blight_dry_fountain.glb",
    "horror": true,
    "id": "blight_dry_fountain",
    "place": "blighted_reaches",
    "size_m": [
-    2.986,
-    1.346,
-    2.84
+    2.564,
+    1.082,
+    2.81
    ],
-   "tris": 1290,
-   "tris_lod1": 622
+   "tris": 2070,
+   "tris_lod1": 1011
   },
   {
    "bytes": 70516,

@@ -26,6 +26,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 import bpy  # noqa: E402,F401,I001
+import bmesh  # noqa: E402,I001
 from mathutils import Vector  # noqa: E402
 import prop_kit as K  # noqa: E402
 import upcoming_kit as U  # noqa: E402
@@ -148,14 +149,25 @@ def trunk_gowns(p):
 
 
 def raw_ruby(p):
-    """[C] the uncut ruby the size of a duck's egg on Father's desk."""
-    rng = random.Random(7323)
-    bm = K.ico(0.034, 2)
-    for v in bm.verts:
-        n = v.co.normalized()
-        v.co = Vector((n.x * 0.031, n.y * 0.028, n.z * 0.036)) * (1.0 + 0.16 * math.sin(n.x * 5 + 1) * math.cos(n.z * 4) + rng.uniform(-0.06, 0.06))
-    p.add(bm, RUBY, "pearl", T(0, 0, 0.034), sharp_deg=16.0,
-          shade=lambda co: K.mix(K.darker(RUBY, 0.45), (0.85, 0.2, 0.32), clamp(0.5 + co.z * 12 + co.x * 9)))
+    """[C] the "uncut ruby the size of a duck's egg" on Father's desk: a raw
+    corundum crystal as it comes out of the ground, a six-sided barrel with
+    flat ends and growth lines round its faces. Never a cut stone."""
+    prof = [(0.0, 0.0), (0.0135, 0.0)]
+    body = [(0.0185, 0.007), (0.0215, 0.016), (0.023, 0.026), (0.0232, 0.036), (0.0218, 0.046), (0.0192, 0.055), (0.015, 0.062)]
+    for k, (r, z) in enumerate(body):                 # growth striations: a fine step at every ring
+        prof.append((r, z))
+        if k < len(body) - 1:
+            prof.append((r - 0.0011, z + 0.0012))
+    prof += [(0.0105, 0.0645), (0.0, 0.0645)]
+    deep, bright = K.darker(RUBY, 0.5), (0.85, 0.22, 0.34)
+
+    def shade(co):
+        r = math.hypot(co.x, co.y)
+        a = math.atan2(co.y, co.x)
+        edge = abs(math.cos(a * 3.0))                 # 1 on the six edges, 0 at a face's middle
+        return K.mix(K.mix(deep, RUBY, clamp(r / 0.02)), bright, 0.55 * edge * clamp(co.z / 0.05 + 0.2))
+
+    p.add(lathe(prof, 6), RUBY, "pearl", sharp_deg=12.0, shade=shade)
 
 
 def gold_scale(p):
@@ -737,59 +749,125 @@ def dagger(p):
 
 def cave_mouth_pass(p):
     """[C] "a slender cave mouth" in "the hollow between two hills": two
-    leaning shoulders of cold dark rock and a black slot between them, the
+    leaning shoulders of cold bedded rock and a black slot between them, the
     mountain's "pale stone" just showing inside. Frightening, never pretty."""
     rng = random.Random(7351)
 
     def shoulder(seed, sx):
-        bm = U.rock(1.0, 3, seed, 0.22)
-        for v in bm.verts:
-            v.co.x *= 1.65
-            v.co.y *= 2.0
-            v.co.z = max(0.0, (v.co.z + 0.35) * 5.4)       # flat foot: nothing buried
-            v.co.x += -sx * max(0.0, v.co.z - 1.5) * 0.09         # lean in toward the top
-        def shade(co):
-            f = clamp(0.5 + 0.5 * math.sin(co.z * 1.7 + co.x * 2.3) * math.cos(co.y * 1.9))
-            c = K.mix(K.darker(COLD_STONE, 0.4), COLD_STONE, f)
+        def shape(co):
+            z = max(0.0, (co.z + 0.35) * 5.4)                     # flat foot: nothing buried
+            return Vector((co.x * 1.65 - sx * max(0.0, z - 1.5) * 0.09, co.y * 2.0, z))
+        bm = U.weathered_rock(1.0, 4, seed, 0.22, shape, strata=0.11, beds=0.42, cut_foot=True)
+
+        def pale(co, col):
             inner = clamp(1.0 - abs(co.x * sx + 1.7) * 1.1) * clamp(0.9 - co.y * 0.7)
-            return K.mix(c, PALE_STONE, inner * 0.55)
-        p.add(bm, COLD_STONE, "matte", T(sx * 2.35, 0, 0), sharp_deg=35.0, shade=shade)
+            return K.mix(col, PALE_STONE, inner * 0.5)
+        p.add(bm, COLD_STONE, "matte", T(sx * 2.35, 0, 0), sharp_deg=50.0,
+              shade=U.stone_shade(bm, COLD_STONE, 0.55, 0.42, (0.42, 0.14), pale))
 
     shoulder(1.3, -1)
     shoulder(4.1, 1)
     p.add(box(1.9, 0.4, 5.4), (0.015, 0.015, 0.02), "matte", T(0, 0.55, 2.7))
-    lintel = U.rock(1.0, 2, 7.7, 0.2)
-    p.add(lintel, K.darker(COLD_STONE, 0.2), "matte", T(0, -0.2, 6.4) @ S(1.9, 1.6, 0.9), sharp_deg=35.0)
-    for k in range(9):
-        r = rng.uniform(0.18, 0.5)
-        p.add(U.rock(r, 1, k * 3.1, 0.25), K.mix(COLD_STONE, PALE_STONE, rng.random() * 0.4), "matte",
-              T(rng.choice((-1, 1)) * rng.uniform(0.9, 3.4), rng.uniform(1.2, 2.6), r * 1.25), sharp_deg=35.0)
+    lintel = U.weathered_rock(1.0, 3, 7.7, 0.2, lambda co: Vector((co.x * 1.9, co.y * 1.6, co.z * 0.9)), strata=0.1, beds=1.1)
+    p.add(lintel, COLD_STONE, "matte", T(0, -0.2, 6.4), sharp_deg=50.0, shade=U.stone_shade(lintel, COLD_STONE, 0.55, 0.42, (1.1, 0.12)))
+    for k in range(5):
+        r = rng.uniform(0.22, 0.5)
+        bm = U.weathered_rock(r, 2, k * 3.1, 0.25)
+        base = K.mix(COLD_STONE, PALE_STONE, rng.random() * 0.4)
+        p.add(bm, base, "matte", T(rng.choice((-1, 1)) * rng.uniform(0.9, 3.4), rng.uniform(1.2, 2.6), r * 1.25), sharp_deg=50.0,
+              shade=U.stone_shade(bm, base, 0.5, 0.35))
     # the worn threshold of the "ancient shortcut"
     p.add(box(1.1, 1.6, 0.16, bevel=0.05), K.mix(COLD_STONE, PALE_STONE, 0.5), "matte", T(0, 0.9, 0.06))
 
 
 def shrine_stone_worn(p):
     """[X] "once considered sacred, but no more": a leaning marker stone, its
-    carving weathered almost flat, lichen, a cracked offering bowl."""
+    spiral and three strokes cut into the face and weathered almost flat, the
+    edges worn round, lichen grown into it, a cracked offering bowl."""
     rng = random.Random(7352)
     stone = (0.42, 0.42, 0.48)
-    bm = U.rock(0.5, 2, 2.9, 0.12)
-    for v in bm.verts:
-        v.co.x *= 0.75
-        v.co.y *= 0.4
-        v.co.z = (v.co.z + 0.42) * 1.9
-    m = T(0, 0, 0) @ R("Y", 9) @ R("X", -5)
-    p.add(bm, stone, "matte", m, sharp_deg=40.0,
-          shade=lambda co: K.mix(K.darker(stone, 0.3), stone, clamp(0.4 + co.z * 0.4 + 0.2 * math.sin(co.x * 9 + co.z * 5))))
-    p.add(K.scroll(0.17, 2.2, 22, 0.012), K.darker(stone, 0.28), "matte", m @ T(0, 0.19, 1.05))
-    for k in range(3):
-        p.add(tube([(-0.2 + k * 0.2, 0.2, 0.52), (-0.2 + k * 0.2, 0.2, 0.7)], 0.01, 3), K.darker(stone, 0.28), "matte", m)
-    for k in range(8):
-        a = rng.uniform(0, 6.283)
-        p.add(U.splat(rng.uniform(0.04, 0.1), rng.uniform(0.04, 0.09), 7, rng, 0.4, 0.004), K.mix((0.50, 0.62, 0.52), (0.70, 0.66, 0.42), rng.random()), "matte",
-              m @ T(rng.uniform(-0.3, 0.3), 0.2 + rng.uniform(-0.01, 0.0), rng.uniform(0.2, 1.5)) @ FRONT @ R("Z", math.degrees(a)))
+    H, W, TH, NU = 1.7, 0.36, 0.17, 24
+    # rows are packed where the carving is, so the grooves have mesh to sit in
+    VS = [0.38 / H * k / 12 for k in range(12)] + [(0.38 + 1.02 * k / 34) / H for k in range(34)] + [(1.4 + 0.3 * k / 8) / H for k in range(9)]
+    NV = len(VS) - 1
+    patches = [(-0.24, 0.3, 0.11, 0.2), (0.2, 0.22, 0.07, 0.8), (0.24, 0.82, 0.08, 0.5), (-0.17, 1.5, 0.09, 0.9)]     # lichen, clear of the carving
+    cx, cz = 0.0, 1.08
+
+    def halfw(v, side):
+        top = math.sqrt(max(0.0, 1.0 - max(0.0, (v - 0.78) / 0.22) ** 2))
+        chip = 0.13 * math.exp(-((v - (0.56 if side < 0 else 0.3)) / 0.05) ** 2)      # a bite out of each edge
+        return W * (1.0 - 0.12 * v + 0.04 * math.sin(v * 7.0 + side)) * (0.3 + 0.7 * top) * (1.0 - chip)
+
+    def carve(x, z):
+        dx, dz = x - cx, z - cz
+        r = math.hypot(dx, dz)
+        g = 0.0
+        if 0.03 < r < 0.3:
+            q = (r - 0.03) / 0.13 - math.atan2(dz, dx) / (2.0 * math.pi)
+            g = clamp(1.3 - abs(q - round(q)) * 0.13 / 0.03)
+        if 0.42 < z < 0.68:
+            for sx in (-0.16, 0.0, 0.16):
+                g = max(g, clamp(1.3 - abs(x - sx) / 0.03) * clamp((z - 0.42) / 0.03) * clamp((0.68 - z) / 0.03))
+        worn = clamp(0.62 + 0.5 * math.sin(x * 9.0 + z * 6.0))        # some of it is rubbed nearly away
+        return g * g * (3.0 - 2.0 * g) * worn
+
+    bm = bmesh.new()
+    cav = bm.verts.layers.float.new("cav")
+    grid = []
+    for j in range(NV + 1):
+        v = VS[j]
+        row = []
+        for i in range(NU + 1):
+            u = -1.0 + 2.0 * i / NU
+            x0 = u * (halfw(v, -1) * (1 - u) / 2 + halfw(v, 1) * (1 + u) / 2)
+            z = v * H
+            t = TH * max(0.0, 1.0 - u * u) ** 0.45 * math.sqrt(max(0.0, 1.0 - max(0.0, (v - 0.8) / 0.2) ** 2))
+            g = carve(x0, z)
+            bed0 = z * 2.3 + 0.3 * math.sin(x0 * 3.0)
+            bed0 -= math.floor(bed0)
+            rough = 0.008 * (math.sin(x0 * 13.7 + z * 5.1) + 0.6 * math.sin(z * 9.3 - x0 * 4.7 + 1.0) + 0.4 * math.sin(x0 * 27.1 + z * 21.3))
+            edge = 0.0 if (i in (0, NU) or j == NV) else 1.0
+            vert = bm.verts.new((x0 + z * 0.16, (t - 0.024 * g + rough + 0.01 * bed0) * edge - z * 0.08, z))
+            bed = z * 2.3 + 0.3 * math.sin(x0 * 3.0)
+            bed -= math.floor(bed)
+            broad = math.sin(x0 * 4.3 + z * 2.9 + 0.7) + 0.6 * math.sin(z * 6.1 - x0 * 2.3)
+            vert[cav] = clamp(0.52 + 0.3 * (bed - 0.5) + 0.2 * broad + rough * 9.0 - 0.65 * g)
+            row.append(vert)
+        grid.append(row)
+    for j in range(NV):
+        for i in range(NU):
+            bm.faces.new((grid[j][i], grid[j + 1][i], grid[j + 1][i + 1], grid[j][i + 1]))
+    mids = []
+    for j in range(NV + 1):
+        v = VS[j]
+        if j == NV:
+            mids.append(grid[j][NU // 2])
+            continue
+        z = v * H
+        t = TH * 0.8 * math.sqrt(max(0.0, 1.0 - max(0.0, (v - 0.8) / 0.2) ** 2))
+        m = bm.verts.new((z * 0.16 + 0.02 * math.sin(v * 9.0), -t - z * 0.08, z))
+        m[cav] = 0.45 + 0.2 * math.sin(v * 13.0)
+        mids.append(m)
+    for j in range(NV):
+        bm.faces.new((grid[j][0], mids[j], mids[j + 1], grid[j + 1][0]))
+        if j == NV - 1:
+            bm.faces.new((mids[j], grid[j][NU], grid[j + 1][NU], mids[j + 1]))
+        else:
+            bm.faces.new((mids[j], grid[j][NU], grid[j + 1][NU], mids[j + 1]))
+
+    def lichen(co, col):
+        x, z = co.x - co.z * 0.16, co.z
+        if co.y + z * 0.08 < 0.0:
+            return col                                   # the sheltered back stays bare
+        for px, pz, pr, hue in patches:
+            d = math.hypot(x - px, (z - pz) * 0.8) / pr + 0.35 * math.sin(x * 37.0 + z * 29.0 + hue * 6.0)
+            if d < 1.0:
+                col = K.mix(col, K.mix((0.50, 0.62, 0.52), (0.70, 0.66, 0.42), hue), clamp((1.0 - d) * 2.5) * 0.65)
+        return col
+
+    p.add(bm, stone, "matte", sharp_deg=62.0, shade=U.stone_shade(bm, stone, 0.6, 0.3, (2.2, 0.1), lichen))
     bowl = lathe([(0.0, 0.0), (0.09, 0.0), (0.15, 0.05), (0.17, 0.1), (0.15, 0.1), (0.13, 0.06), (0.07, 0.02), (0.0, 0.02)], 12)
-    p.add(bowl, K.lighter(stone, 0.15), "matte", T(0.5, 0.35, 0.03) @ R("X", 68) @ R("Z", 30))
+    p.add(bowl, K.lighter(stone, 0.15), "matte", T(0.5, 0.35, 0.12) @ R("X", 68) @ R("Z", 30), shade=U.stone_shade(bowl, K.lighter(stone, 0.15), 0.45, 0.2))
     p.add(U.shard(rng, 0.09), K.lighter(stone, 0.15), "matte", T(0.3, 0.52, 0.006) @ FLAT)
     p.add(U.shard(rng, 0.06), K.lighter(stone, 0.15), "matte", T(0.68, 0.5, 0.006) @ FLAT @ R("Y", 40))
 

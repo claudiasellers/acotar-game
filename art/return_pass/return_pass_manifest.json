@@ -29,18 +29,18 @@
    "tris_lod1": 1269
   },
   {
-   "bytes": 19908,
+   "bytes": 10448,
    "canon": "C",
    "file": "raw_ruby.glb",
    "id": "raw_ruby",
    "scene": "return",
    "size_m": [
-    0.059,
-    0.071,
-    0.065
+    0.046,
+    0.064,
+    0.04
    ],
-   "tris": 80,
-   "tris_lod1": 48
+   "tris": 180,
+   "tris_lod1": 108
   },
   {
    "bytes": 37516,
@@ -362,34 +362,34 @@
    "tris_lod1": 291
   },
   {
-   "bytes": 78404,
+   "bytes": 132008,
    "canon": "C",
    "file": "cave_mouth_pass.glb",
    "horror": true,
    "id": "cave_mouth_pass",
    "scene": "pass",
    "size_m": [
-    8.639,
-    8.009,
-    4.978
+    8.632,
+    7.996,
+    5.268
    ],
-   "tris": 1020,
-   "tris_lod1": 510
+   "tris": 2643,
+   "tris_lod1": 1321
   },
   {
-   "bytes": 30172,
+   "bytes": 138500,
    "canon": "X",
    "file": "shrine_stone_worn.glb",
    "horror": true,
    "id": "shrine_stone_worn",
    "scene": "pass",
    "size_m": [
-    1.005,
-    1.874,
-    0.701
+    1.073,
+    1.7,
+    0.797
    ],
-   "tris": 558,
-   "tris_lod1": 275
+   "tris": 2984,
+   "tris_lod1": 1491
   }
  ]
 }

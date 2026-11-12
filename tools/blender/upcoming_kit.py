@@ -415,3 +415,96 @@ def shard(rng, size):
         rr = size * rng.uniform(0.35, 1.0)
         out.append((math.cos(a) * rr, math.sin(a) * rr * rng.uniform(0.4, 1.0)))
     return slab(out, size * 0.06)
+
+
+# ---------------------------------------------------------------- weathered stone
+
+
+def _smooth(a, b, t):
+    t = max(0.0, min(1.0, (t - a) / (b - a)))
+    return t * t * (3.0 - 2.0 * t)
+
+
+def _cav_layer(bm):
+    return bm.verts.layers.float.get("cav") or bm.verts.layers.float.new("cav")
+
+
+def weathered_rock(r, sub, seed, amp=0.18, shape=None, strata=0.0, beds=1.0, cut_foot=False):
+    """A boulder with bedding: an icosphere displaced by layered noise, shaped
+    by `shape(co) -> co`, then stepped into beds (`beds` per metre of height,
+    each bed overhanging the one below by `strata`). Each vertex remembers how
+    proud or sunken it is in the "cav" layer for stone_shade. `cut_foot` drops
+    the faces flattened onto the ground (z <= 0)."""
+    bm = K.ico(r, sub)
+    cav = _cav_layer(bm)
+    for v in bm.verts:
+        n = v.co.normalized()
+        d = (math.sin(n.x * 3.1 + seed) * math.cos(n.y * 2.7 + seed * 1.3)
+             + 0.5 * math.sin(n.z * 5.3 + seed * 0.7 + n.x * 4.1)
+             + 0.25 * math.sin(n.y * 9.0 + n.z * 7.0 + seed * 2.1)
+             + 0.18 * math.sin(n.x * 17.0 + n.y * 13.0 + seed * 3.3) * math.sin(n.z * 15.0 + seed))
+        v.co = n * r * (1.0 + amp * d)
+        v[cav] = max(0.0, min(1.0, 0.5 + d / 2.6))
+    if shape:
+        for v in bm.verts:
+            v.co = shape(v.co.copy())
+    if strata:
+        for v in bm.verts:
+            s = v.co.z * beds + 0.35 * math.sin(v.co.x * 1.1 + seed) + 0.25 * math.sin(v.co.y * 1.7 + seed * 2.0)
+            f = s - math.floor(s)
+            k = 1.0 + strata * (f * f - 0.4)
+            v.co.x *= k
+            v.co.y *= k
+            v[cav] = max(0.0, min(1.0, v[cav] * 0.55 + 0.45 * f * f))
+    if cut_foot:
+        flat = [f for f in bm.faces if all(v.co.z <= 1e-6 for v in f.verts)]
+        bmesh.ops.delete(bm, geom=flat, context="FACES")
+        loose = [v for v in bm.verts if not v.link_faces]
+        bmesh.ops.delete(bm, geom=loose, context="VERTS")
+    return bm
+
+
+def stone_shade(bm, base, dark=0.5, lit=0.3, band=(0.0, 0.0), tint=None):
+    """Vertex shade for weathered stone in three value bands: lit tops, the
+    mid body, dark crevices and undersides. Reads the mesh as it stands (call
+    it after the last deformation and pass the result to Prop.add as shade).
+    band = (beds per metre, amount) adds faint bedding stripes; tint(co, rgb)
+    -> rgb paints over the result (a stain line, lichen)."""
+    bm.normal_update()
+    cav = bm.verts.layers.float.get("cav")
+    darkc, litc = K.darker(base, dark), K.lighter(base, lit)
+    table = {}
+    for v in bm.verts:
+        c = v[cav] if cav else 0.5
+        t = 0.5 * c + 0.5 * (v.normal.z * 0.5 + 0.5)
+        col = K.mix(K.mix(darkc, base, _smooth(0.27, 0.43, t)), litc, _smooth(0.58, 0.74, t))
+        if band[1]:
+            col = K.darker(col, band[1] * (0.5 + 0.5 * math.sin(v.co.z * band[0] * 6.2832 + 1.3 * math.sin(v.co.x * 0.9))))
+        if tint:
+            col = tint(v.co, col)
+        table[(round(v.co.x, 5), round(v.co.y, 5), round(v.co.z, 5))] = col
+    return lambda co: table[(round(co.x, 5), round(co.y, 5), round(co.z, 5))]
+
+
+def lathe_var(profile, angles, mod=None):
+    """A lathe with its own angular sampling, so detail can be cut where it is
+    needed (a crack, a chipped rim). profile = [(radius, z)] bottom to top, no
+    zero radii; angles ascending in radians. mod(a, r, z, ring) -> (r, z, cav)
+    reshapes each vertex. Open at both ends."""
+    bm = bmesh.new()
+    cav = _cav_layer(bm)
+    rings = []
+    for k, (r, z) in enumerate(profile):
+        ring = []
+        for a in angles:
+            rr, zz, c = mod(a, r, z, k) if mod else (r, z, 0.5)
+            v = bm.verts.new((rr * math.cos(a), rr * math.sin(a), zz))
+            v[cav] = c
+            ring.append(v)
+        rings.append(ring)
+    n = len(angles)
+    for a, b in zip(rings, rings[1:]):
+        for i in range(n):
+            j = (i + 1) % n
+            bm.faces.new((a[i], a[j], b[j], b[i]))
+    return bm
