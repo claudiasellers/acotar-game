@@ -94,6 +94,7 @@ RECIPES = {
         whorls=[(0.3, 4, 0.36, 50, -18, 1), (0.4, 4, 0.32, 62, -12, 1), (0.49, 3, 0.25, 74, -4, 1)],
         leader=0.57, top=0.07, kink=14, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
         weep=(9, 0.15, 0.12, 0.11),
+        variants=[("d", dict(trail=0.3)), ("e", dict(trail=1.0))],
     ),
 }
 
@@ -268,11 +269,13 @@ def foliage(sid, clouds, rng):
     return leaves, normals, core
 
 
-def curtain(sid, sk, rng):
+def curtain(sid, sk, rng, trail=0.0):
     """The willow's fronds. Each is a ribbon of hanging strands that leaves a
     limb, rolls outward over a shoulder and falls: thick along the limbs'
     outer reach and at their tips, so the crown's top is the limbs' arch
-    draped in strands and the rest is a curtain to near the ground."""
+    draped in strands and the rest is a curtain to near the ground.
+    trail: the share of strands that fall all the way to the ground (0 the
+    curtain stops short, 0.3 some trail, 1 every strand is that long)."""
     n, width, reach, foot = RECIPES[sid]["weep"]
     fronds = bmesh.new()
     uv = fronds.loops.layers.uv.new("UVMap")
@@ -292,36 +295,58 @@ def curtain(sid, sk, rng):
     tip = sk.pos[-1]
     for _ in range(n):      # the leader's top: a fountain all round
         seats.append((tip.copy(), Vector((0, 0, 1)), 1.0))
-    for at, along, t in seats:
-        flat = Vector((along.x, along.y, 0.0))
-        a = (math.atan2(flat.y, flat.x) if flat.length > 1e-4 else rng.uniform(0, math.tau)) + rng.uniform(-1.0, 1.0) * (1.3 if flat.length > 1e-4 else math.pi)
-        d = Vector((math.cos(a), math.sin(a), 0.0))
-        side = d.cross(UP).normalized()
-        side = (side + d * rng.uniform(-0.35, 0.35)).normalized()
-        w = width * rng.uniform(0.85, 1.2) * 0.5
-        r = reach * rng.uniform(0.7, 1.3)
-        low = foot * rng.uniform(0.7, 3.0) + (0.0 if t > 0.7 else at.z * rng.uniform(0.2, 0.5))
-        low = min(low, at.z - r)
-        # leave the limb, rise a little, roll over the shoulder, fall
-        spine = [at, at + d * r * 0.4 + UP * r * 0.3, at + d * r * 0.9 + UP * r * 0.22, at + d * r * 1.3 - UP * r * 0.35]
-        spine.append(Vector((spine[-1].x + d.x * r * 0.1, spine[-1].y + d.y * r * 0.1, low)))
-        lens = [0.0]
-        for q0, q1 in zip(spine, spine[1:]):
-            lens.append(lens[-1] + (q1 - q0).length)
-        half = rng.random() < 0.5
-        u0, u1 = (0.0, 0.5) if half else (0.5, 1.0)
-        tone = 0.92 + 0.16 * rng.random()
-        rows = []
-        for q, ln in zip(spine, lens):
-            v = 1.0 - ln / lens[-1]
-            rows.append((fronds.verts.new(q - side * w), fronds.verts.new(q + side * w), v))
-            # shade: the shoulder faces the sky, the fall faces out
-            normals += [(d * (0.35 + 0.5 * (1.0 - v)) + UP * (0.25 + 0.7 * v)).normalized()] * 2
-        for (l0, r0, v0), (l1, r1, v1) in zip(rows, rows[1:]):
-            face = fronds.faces.new((l0, r0, r1, l1))
-            for loop, st in zip(face.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))):
-                loop[uv].uv = st
-                loop[col] = (tone, tone, tone, 1.0)
+    def hang(at, along, t):
+            flat = Vector((along.x, along.y, 0.0))
+            a = (math.atan2(flat.y, flat.x) if flat.length > 1e-4 else rng.uniform(0, math.tau)) + rng.uniform(-1.0, 1.0) * (1.3 if flat.length > 1e-4 else math.pi)
+            d = Vector((math.cos(a), math.sin(a), 0.0))
+            side = d.cross(UP).normalized()
+            side = (side + d * rng.uniform(-0.35, 0.35)).normalized()
+            w = width * rng.uniform(0.85, 1.2) * 0.5
+            r = reach * rng.uniform(0.7, 1.3)
+            low = foot * rng.uniform(0.7, 3.0) + (0.0 if t > 0.7 else at.z * rng.uniform(0.2, 0.5))
+            if trail > 0.0 and rng.random() < trail:
+                low = rng.uniform(-0.012, 0.012)    # to the grass
+            low = min(low, at.z - r)
+            # leave the limb, rise a little, roll over the shoulder, fall
+            spine = [at, at + d * r * 0.4 + UP * r * 0.3, at + d * r * 0.9 + UP * r * 0.22, at + d * r * 1.3 - UP * r * 0.35]
+            spine.append(Vector((spine[-1].x + d.x * r * 0.1, spine[-1].y + d.y * r * 0.1, low)))
+            lens = [0.0]
+            for q0, q1 in zip(spine, spine[1:]):
+                lens.append(lens[-1] + (q1 - q0).length)
+            half = rng.random() < 0.5
+            u0, u1 = (0.0, 0.5) if half else (0.5, 1.0)
+            tone = 0.92 + 0.16 * rng.random()
+            rows = []
+            for q, ln in zip(spine, lens):
+                v = 1.0 - ln / lens[-1]
+                rows.append((fronds.verts.new(q - side * w), fronds.verts.new(q + side * w), v))
+                # shade: the shoulder faces the sky, the fall faces out
+                normals.extend([(d * (0.35 + 0.5 * (1.0 - v)) + UP * (0.25 + 0.7 * v)).normalized()] * 2)
+            for (l0, r0, v0), (l1, r1, v1) in zip(rows, rows[1:]):
+                face = fronds.faces.new((l0, r0, r1, l1))
+                for loop, st in zip(face.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))):
+                    loop[uv].uv = st
+                    loop[col] = (tone, tone, tone, 1.0)
+
+    for seat in seats:
+        hang(*seat)
+    # The wood along the crown's top wears strands too (owner, 2026-11-12: "i
+    # want that brown branch covered just a little bit more"): short ones
+    # leave from just above it and fall to either side.
+    crown_top = max(q.z for q, _, _ in seats)
+    flip = 1
+    for a, b in sk.edges:
+        pa, pb = sk.pos[a], sk.pos[b]
+        if (pa.z + pb.z) * 0.5 < crown_top * 0.72:
+            continue
+        steps = max(1, round((pb - pa).length / 0.045))
+        for k in range(steps):
+            f = (k + 0.5) / steps
+            q = pa.lerp(pb, f) + UP * (sk.rad[a] + (sk.rad[b] - sk.rad[a]) * f + 0.006)
+            along = pb - pa
+            across = Vector((-along.y, along.x, 0.0)) * flip
+            flip = -flip
+            hang(q, across if across.length > 1e-4 else Vector((0, 0, 1)), 0.5)
     return fronds, normals
 
 
@@ -338,7 +363,7 @@ def pears(sid, clouds, rng):
     return fruit
 
 
-def build(sid, letter, seed):
+def build(sid, letter, seed, **opts):
     kind, h, col = MF.species()[sid]
     name = f"tree_{sid}_{letter}"
     rng = random.Random(seed)
@@ -350,7 +375,7 @@ def build(sid, letter, seed):
     rc = RECIPES[sid]
     weep = "weep" in rc
     leaves, normals, core = foliage(sid, clouds, rng) if not weep else (None, [], None)
-    fronds, frond_normals = curtain(sid, sk, rng) if weep else (None, [])
+    fronds, frond_normals = curtain(sid, sk, rng, opts.get("trail", 0.0)) if weep else (None, [])
     fruit = pears(sid, clouds, rng) if "fruit" in rc else None
     # to the species height, standing on the ground (the root stays buried)
     crown = [fronds] if weep else [leaves, core.bm]
@@ -389,6 +414,10 @@ def main():
     for sid in only:
         for k in range(seeds):
             build(sid, "abcdef"[k], sum(map(ord, sid)) * 7 + 101 * k)
+        # the willow's longer curtains (owner, 2026-11-12: "one being SOME
+        # strands going to the ground and then one being all very very long")
+        for k, (letter, opts) in enumerate(RECIPES[sid].get("variants", [])):
+            build(sid, letter, sum(map(ord, sid)) * 7 + 101 * (seeds + k), **opts)
 
 
 if __name__ == "__main__":

@@ -255,6 +255,10 @@ const LINEUPS := {
 	# tree, then three seeds.
 	"new_birch": {"distance": 34.0, "spacing": 9.0, "look": 6.0, "ids": ["estate:birch:0", "tree:tree_birch_a:birch", "tree:tree_birch_b:birch", "tree:tree_birch_c:birch"]},
 	"new_willow": {"distance": 34.0, "spacing": 14.0, "look": 4.5, "ids": ["estate:willow:0", "tree:tree_willow_a:willow", "tree:tree_willow_b:willow", "tree:tree_willow_c:willow"]},
+	# the willow's curtains: short (a, b, c), some strands to the ground (d), every strand to the ground (e)
+	"new_willow_curtains": {"distance": 38.0, "spacing": 14.5, "look": 4.5, "ids": ["tree:tree_willow_a:willow", "tree:tree_willow_b:willow", "tree:tree_willow_c:willow", "tree:tree_willow_d:willow", "tree:tree_willow_e:willow"]},
+	"new_willow_long": {"distance": 24.0, "spacing": 15.0, "look": 4.5, "ids": ["tree:tree_willow_d:willow", "tree:tree_willow_e:willow"]},
+	"new_willow_a": {"distance": 20.0, "spacing": 15.0, "look": 5.0, "ids": ["tree:tree_willow_a:willow"]},
 	"new_cherry": {"distance": 24.0, "spacing": 10.0, "look": 3.2, "ids": ["estate:cherry_blossom:0", "tree:tree_cherry_blossom_a:cherry_blossom", "tree:tree_cherry_blossom_b:cherry_blossom", "tree:tree_cherry_blossom_c:cherry_blossom"]},
 	"new_apple": {"distance": 22.0, "spacing": 9.0, "look": 2.8, "ids": ["estate:apple_blossom:0", "tree:tree_apple_blossom_a:apple_blossom", "tree:tree_apple_blossom_b:apple_blossom", "tree:tree_apple_blossom_c:apple_blossom"]},
 	"new_crab": {"distance": 22.0, "spacing": 8.0, "look": 2.8, "ids": ["estate:crab_apple:0", "tree:tree_crab_apple_a:crab_apple", "tree:tree_crab_apple_b:crab_apple", "tree:tree_crab_apple_c:crab_apple"]},
