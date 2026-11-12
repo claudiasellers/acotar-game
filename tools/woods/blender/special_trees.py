@@ -30,6 +30,7 @@ magnolia_harlequin
 """
 
 import math
+import random
 import os
 import sys
 
@@ -317,23 +318,32 @@ def cone(t):
     return 1.0 - 0.78 * ((t - 0.26) / 0.74) ** 1.1
 
 
-def billow(fk, lumps, i, scale, subdiv, fuzz, tufts):
+def tuft_pick(lumps, i, tufts):
+    """The colour (COLOR.g, one of four) of billow i: its nearest tuft's.
+    The shader uses it only on a tree of many colours."""
+    return (min(tufts, key=lambda tuft: (tuft[0] - lumps[i][0]).length)[1] + 0.5) / 4.0
+
+
+def billow(fk, lumps, i, scale, subdiv, fuzz, tufts, like=None):
     """One billow of the heap into kit `fk`: a lumpy ball. Its tone is light
     on top and deep where it meets its neighbours; `scale` > 1 with `fuzz`
-    makes its fuzz skin."""
+    makes its fuzz skin. `like` is the near tree's billows [(centre, radius,
+    colour)]: the far tree's few big billows take, face by face, the colour
+    of the near billow that stands there, so a tree keeps its colours as the
+    step swaps."""
     c, r, seed = lumps[i]
     verts, faces = wt.icosphere(subdiv)
     first = len(fk.faces)
     idx, tones = [], []
-    # which tuft of the tree it belongs to: the nearest one's colour (COLOR.g,
-    # one of four; the shader uses it only on a tree of many colours)
-    pick = (min(tufts, key=lambda tuft: (tuft[0] - c).length)[1] + 0.5) / 4.0
+    pick = tuft_pick(lumps, i, tufts)
+    spots = []
     # no two billows the same: each a little squashed its own way, and lumpy
     squash = Vector((0.9 + 0.2 * (seed.x % 1.0), 0.9 + 0.2 * (seed.y % 1.0), 0.86 + 0.2 * (seed.z % 1.0)))
     for v in verts:
         rr = r * scale * (1.0 + 0.2 * wt.noise.noise(v * 1.3 + seed))
         p = c + Vector((v.x * squash.x, v.y * squash.y, v.z * squash.z)) * rr
         idx.append(fk.add_vert(p))
+        spots.append(p)
         fk.normals[idx[-1]] = v.copy()
         # deep in the creases: how far this point is from the nearest neighbour's skin
         gap = min(((p - oc).length - orad * scale) / r for j, (oc, orad, _) in enumerate(lumps) if j != i)
@@ -342,8 +352,35 @@ def billow(fk, lumps, i, scale, subdiv, fuzz, tufts):
         tones.append(min(1.0, tone + (0.04 if fuzz else 0.0)))
     flex = 0.16 + 0.3 * min(1.0, max(0.0, (c.z - FLOSS_FOOT) / FLOSS_HEIGHT))
     for f in faces:
+        if like:
+            mid = (spots[f[0]] + spots[f[1]] + spots[f[2]]) / 3.0
+            pick = min(like, key=lambda b: (mid - b[0]).length - b[1])[2]
         fk.face(tuple(idx[k] for k in f), tuple((tones[k], pick, 0.0) for k in f), tuple((flex, 1.0 if fuzz else 0.0) for _ in f))
     fk.blobs.append((c, r * scale * 0.9, 0.95, 0.2, first, len(fk.faces)))
+
+
+TUFTS = 9
+NEAR_BILLOWS = []   # the near tree's outer billows, kept for the far tree's colours
+
+
+def floss_tufts():
+    """[(place on the cone, colour 0..3)]: a spiral up the cone, no tuft the
+    colour of the one below it, the same for every build of the tree."""
+    rng = random.Random(1907)
+    tufts, last = [], -1
+    bag = []
+    for k in range(TUFTS):
+        if not bag:
+            bag = [0, 1, 2, 3]
+            rng.shuffle(bag)
+        colour = next(c for c in bag if c != last)
+        bag.remove(colour)
+        last = colour
+        t = (k + rng.uniform(0.3, 0.7)) / TUFTS
+        a = k * 2.39996 + rng.uniform(-0.3, 0.3)
+        ring = FLOSS_RADIUS * cone(t)
+        tufts.append((Vector((math.cos(a) * ring, math.sin(a) * ring, FLOSS_FOOT + t * FLOSS_HEIGHT)), colour))
+    return tufts
 
 
 def candyfloss_tree(kit, near):
@@ -388,20 +425,19 @@ def candyfloss_tree(kit, near):
         lumps[outer:outer] = kids
         outer += len(kids)
 
-    # The tufts: seven places on the cone, each with one of the four colours;
+    # The tufts: nine places up the cone, each with one of the four colours;
     # a billow belongs to the nearest. (Owner: "the original had a multicolor
-    # option where there were a variety of colored tufts in one tree".)
-    tufts = []
-    order = [0, 1, 2, 3, 0, 2, 1]
-    kit.rng.shuffle(order)
-    for k, colour in enumerate(order):
-        t = (k + kit.rng.uniform(0.25, 0.75)) / len(order)
-        a = k * 2.2 + kit.rng.uniform(-0.5, 0.5)
-        tufts.append((Vector((math.cos(a) * FLOSS_RADIUS * cone(t), math.sin(a) * FLOSS_RADIUS * cone(t), FLOSS_FOOT + t * FLOSS_HEIGHT)), colour))
+    # option where there were a variety of colored tufts in one tree".) They
+    # are drawn apart from the tree's own dice, so the near tree and the far
+    # one are coloured alike and nothing changes colour as the step swaps.
+    tufts = floss_tufts()
 
+    # (the near tree is built first: build_flossed. Its outer billows colour the far one.)
+    if near:
+        NEAR_BILLOWS[:] = [(lumps[i][0], lumps[i][1], tuft_pick(lumps, i, tufts)) for i in range(outer)]
     base = wt.Kit(1)
     for i in range(len(lumps)):
-        billow(base, lumps, i, 1.0, 1, False, tufts)
+        billow(base, lumps, i, 1.0, 1, False, tufts, None if near else NEAR_BILLOWS)
     base.cull_buried()
     kit.floss = base
     if near:

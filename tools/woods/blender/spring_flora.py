@@ -335,24 +335,8 @@ def _limbs(kit, near, start, count, length, rise, r, droop=0.0, col=BARK):
     return tips
 
 
-def candyfloss_tree(kit, near):
-    """Cotton-candy blossom tree: a curvy pearl-rose trunk under a cluster
-    of round pom canopies in pink, blush and lilac, dotted with blossoms."""
-    trunk = _trunk(kit, near, 4.2, 0.42, 0.26, 0.22, BARK, hexc("B98A92"), 0.45)
-    top = trunk[-1]
-    tips = _limbs(kit, near, trunk[-2], 5, 2.6, 0.55, 0.2)
-    palette = [(BLUSH, ROSE), (ROSE, HOT_PINK), (hexc("E3CCF5"), LILAC), (PEARL, BLUSH)]
-    poms = tips + [top + Vector((0, 0, 1.4))]
-    for i, t in enumerate(poms):
-        ca, cb = palette[i % len(palette)]
-        r = kit.rng.uniform(1.6, 2.0) * (1.0 if i < len(tips) else 1.25)
-        pom(kit, t + Vector((0, 0, r * 0.35)), r * (1.0 if near else 1.1), ca, cb, 0.4,
-            subdiv=2 if near else 1, squash=0.85, lump=0.12)
-    if near:
-        for t in poms:
-            for _ in range(7):
-                p, n = on_dome(kit, Vector(t) + Vector((0, 0, 0.6)), 1.9, 0.85)
-                fan(kit, p, n, 5, 0.32, PEARL, GOLD, 0.5, tip=BLUSH)
+# The candyfloss tree is one of the special trees now:
+# tools/woods/blender/special_trees.py builds candyfloss_tree.glb.
 
 
 def wisteria_tree(kit, near, chain=(LILAC, WISTERIA, WISTERIA_DEEP), leaves=(BUSH, BUSH_DEEP), count=32):
@@ -811,7 +795,6 @@ TREE, SHRUB, FLOWER = (3000, 1500), (700, 400), (180, 100)
 
 SPECIES = {
     # New trees
-    "candyfloss_tree": (candyfloss_tree, TREE),
     "wisteria_tree": (wisteria_tree, TREE),
     "golden_chain": (golden_chain, TREE),
     # New shrubs

@@ -7,10 +7,13 @@ extends GutTest
 const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
 ## The special trees (tools/woods/blender/special_trees.py), rebuilt one at a
 ## time with the owner: planted sparsely, on the estate trees' budget.
-const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin"]
+const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree"]
 const SPECIAL_BUDGET := 6000
+## A candyfloss tree is wood plus a second mesh of floss (FloraLibrary.FLOSSED):
+## the two together stay inside this.
+const FLOSSED_BUDGET := 9000
 const NEW := [
-	&"candyfloss_tree", &"wisteria_tree", &"golden_chain", &"magnolia",
+	&"wisteria_tree", &"golden_chain", &"magnolia",
 	&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump", &"goldenrod",
 	&"lupin_clump", &"sugarberry_bush", &"spire_bed",
 	&"tulip_patch", &"daffodil", &"maidens_lace", &"forget_me_not", &"allium", &"pansy_patch",
@@ -32,8 +35,17 @@ func _tris(root: Node, name: String) -> int:
 	return (idx.size() if idx != null else (a[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()) / 3
 
 
+## Triangles of one detail step: the "near"/"far" mesh, plus its floss mesh
+## on a flossed species.
+func _step_tris(root: Node, species: StringName, step: String) -> int:
+	var n := _tris(root, step)
+	if n < 0 or species not in FloraLibrary.FLOSSED:
+		return n
+	return n + maxi(_tris(root, step + "_floss"), 0)
+
+
 func test_kit_is_big_enough() -> void:
-	var trees := NEW.filter(func(s: StringName) -> bool: return FloraLibrary.info(s)["layer"] == "tree")
+	var trees := (NEW + SPECIAL).filter(func(s: StringName) -> bool: return FloraLibrary.info(s)["layer"] == "tree")
 	var shrubs := NEW.filter(func(s: StringName) -> bool: return FloraLibrary.info(s)["layer"] == "shrub")
 	var flowers := NEW.filter(func(s: StringName) -> bool: return FloraLibrary.info(s)["layer"] == "detail")
 	assert_gte(trees.size(), 4, "new trees")
@@ -47,10 +59,14 @@ func test_every_species_loads_from_blender_inside_budget() -> void:
 		assert_true(FloraLibrary.has(s), "%s in FloraLibrary" % s)
 		assert_true(FloraLibrary.has_model(s), "%s has a Blender model" % s)
 		var root := (load(FloraLibrary.MODELS % s) as PackedScene).instantiate()
-		var near := _tris(root, "near")
-		var far := _tris(root, "far")
+		var near := _step_tris(root, s, "near")
+		var far := _step_tris(root, s, "far")
 		root.free()
-		var cap: int = SPECIAL_BUDGET if s in SPECIAL else BUDGET[FloraLibrary.info(s)["layer"]]
+		var cap: int = BUDGET[FloraLibrary.info(s)["layer"]]
+		if s in FloraLibrary.FLOSSED:
+			cap = FLOSSED_BUDGET
+		elif s in SPECIAL:
+			cap = SPECIAL_BUDGET
 		assert_between(near, 1, cap, "%s near tris" % s)
 		assert_between(far, 1, 1500 if s in SPECIAL else int(near * 0.65), "%s LOD1 tris" % s)
 		assert_gt((FloraLibrary.mesh(s) as ArrayMesh).get_surface_count(), 0, "%s mesh" % s)
@@ -65,6 +81,66 @@ func test_models_carry_vertex_colour_and_stay_small() -> void:
 		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s wind/glow UV" % s)
 
 
+func test_a_flossed_tree_draws_its_floss_as_a_second_surface() -> void:
+	for s: StringName in FloraLibrary.FLOSSED:
+		assert_true(s in SPECIAL, "%s is one of the special trees" % s)
+		var root := (load(FloraLibrary.MODELS % s) as PackedScene).instantiate()
+		assert_gt(_tris(root, "near_floss"), 0, "%s near floss mesh" % s)
+		assert_gt(_tris(root, "far_floss"), 0, "%s far floss mesh" % s)
+		assert_lt(_tris(root, "far_floss"), _tris(root, "near_floss"), "%s far floss is the lighter one" % s)
+		root.free()
+		var m := FloraLibrary.mesh(s) as ArrayMesh
+		assert_eq(m.get_surface_count(), 2, "%s wood and floss surfaces" % s)
+		var floss := m.surface_get_material(1) as ShaderMaterial
+		assert_not_null(floss, "%s floss material" % s)
+		assert_eq(floss.shader.resource_path, FloraLibrary.FLOSS_SHADER, "%s floss shader" % s)
+		assert_not_null(floss.get_shader_parameter(&"cotton"), "%s cotton texture" % s)
+		var a: Array = m.surface_get_arrays(1)
+		assert_not_null(a[Mesh.ARRAY_COLOR], "%s floss tone and tuft colour" % s)
+		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s floss wind and fuzz UV" % s)
+
+
+## The tuft colour seen from outside, by where round the tree and how high:
+## {bin: colour 0..3} of the floss point furthest out in each bin.
+func _outer_tufts(arrays: Array) -> Dictionary:
+	var v: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var c: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
+	var bounds := AABB(v[0], Vector3.ZERO)
+	for p in v:
+		bounds = bounds.expand(p)
+	var out := {}
+	var reach := {}
+	for i in v.size():
+		var p := v[i]
+		var bin := Vector2i(int((atan2(p.z, p.x) + PI) / TAU * 12.0) % 12,
+			mini(int((p.y - bounds.position.y) / bounds.size.y * 8.0), 7))
+		var r := Vector2(p.x, p.z).length()
+		if r > float(reach.get(bin, -1.0)):
+			reach[bin] = r
+			out[bin] = int(c[i].g * 4.0)
+	return out
+
+
+## A tree of many colours keeps them as it swaps to its far step: seen from
+## outside, the far floss has the near floss's colour in the same place.
+func test_a_flossed_tree_is_coloured_alike_near_and_far() -> void:
+	for s: StringName in FloraLibrary.FLOSSED:
+		var near := _outer_tufts((FloraLibrary.mesh(s) as ArrayMesh).surface_get_arrays(1))
+		var far := _outer_tufts((FloraLibrary.far_mesh(s) as ArrayMesh).surface_get_arrays(1))
+		var colours := {}
+		var same := 0
+		var both := 0
+		for bin: Vector2i in far:
+			colours[far[bin]] = true
+			if near.has(bin):
+				both += 1
+				if near[bin] == far[bin]:
+					same += 1
+		assert_eq(colours.size(), 4, "%s far floss shows all four tuft colours" % s)
+		assert_gt(both, 60, "%s near and far floss fill the same cone" % s)
+		assert_gte(float(same) / float(maxi(both, 1)), 0.7, "%s far tufts match the near ones (%d of %d places)" % [s, same, both])
+
+
 func test_spring_biomes_use_the_new_kit_and_every_listed_species_exists() -> void:
 	for id in BIOMES:
 		var def: WoodsRegionDef = load("res://data/regions/spring_court/%s_biomes.tres" % id)
@@ -73,6 +149,6 @@ func test_spring_biomes_use_the_new_kit_and_every_listed_species_exists() -> voi
 			for dict: Dictionary in [b.trees, b.shrubs, b.detail]:
 				for k: StringName in dict:
 					assert_true(FloraLibrary.has(k), "%s/%s lists %s" % [id, b.id, k])
-					if k in NEW:
+					if k in NEW or k in SPECIAL:
 						used[k] = true
 		assert_gte(used.size(), 8, "%s new L21 species in use" % id)

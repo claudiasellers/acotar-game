@@ -194,6 +194,8 @@ const LINEUPS := {
 	"candyfloss": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"woods_candyfloss_tree"]},
 	"candyfloss_row": {"distance": 30.0, "spacing": 6.5, "look": 5.0, "ids": [&"woods_candyfloss_tree", &"woods_candyfloss_tree",
 		&"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree"]},
+	# the near tree beside its far step: the same colours in the same places
+	"candyfloss_steps": {"distance": 16.0, "spacing": 7.5, "look": 5.0, "ids": [&"woods_candyfloss_tree", &"far:woods_candyfloss_tree"]},
 	"candyfloss_close": {"distance": 8.0, "spacing": 7.0, "look": 5.4, "ids": [&"woods_candyfloss_tree"]},
 	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
@@ -472,6 +474,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				mi.scale = Vector3.ONE * float(ez[1])
 			elif item.begins_with("now:"):
 				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)))
+			elif item.begins_with("far:"):
+				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)), true)  # its far step, up close
 			else:
 				mi.mesh = CourtAssets.mesh(StringName(item))  # as the court's scatter draws it
 		mi.position = p
