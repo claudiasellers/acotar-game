@@ -243,6 +243,12 @@ const LINEUPS := {
 		"estate:birch:0", "candy_ez:birch", "hybrid:birch"]},
 	# One tree at a time: today's oak beside the half-and-half oak.
 	"candy_oak": {"distance": 34.0, "spacing": 18.0, "look": 7.5, "ids": ["estate:oak:0", "hybrid:oak"]},
+	# ... and the oak with the court trees' detail: the same puffs built from
+	# leaf-clump cards (candy_leafy.py). Today's, smooth puffs, leafy puffs.
+	"candy_oak_leafy": {"distance": 36.0, "spacing": 17.0, "look": 7.5, "ids": ["estate:oak:0", "hybrid:oak", "leafy:oak"]},
+	"candy_oak_close": {"distance": 22.0, "spacing": 17.0, "look": 8.0, "ids": ["leafy:oak"]},
+	# beside a court oak (Quaternius) and a court EZ oak, for the level of detail
+	"candy_oak_court": {"distance": 36.0, "spacing": 17.0, "look": 7.5, "ids": ["set:woods_oak:0", "leafy:oak", "set:woods_oak:5"]},
 	"candy_blossom": {"distance": 30.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:cherry_blossom:0", "candy_ez:cherry_blossom",
 		"hybrid:cherry_blossom", "post", "estate:apple_blossom:0", "candy_ez:apple_blossom", "hybrid:apple_blossom"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
@@ -301,6 +307,51 @@ const CANDY_EZ := {
 	&"cherry_blossom": ["ez_ash_b", "blossom_cherry", "oak", 3, []],
 	&"apple_blossom": ["ez_ash_d", "blossom_apple", "oak", 3, []],
 }
+
+
+## Estate option 2 with leaf detail (preview): candy_leafy.py's three parts on
+## their materials: the court's painted bark in the estate's rose-taupe, the
+## leaf-clump cards and the puff cores on explore/candy_leaf.gdshader.
+func _candy_leafy(sp: StringName) -> Mesh:
+	var inst := (load(CANDY_DIR + "candy_%s.glb" % sp) as PackedScene).instantiate()
+	var pal: Array = CANDY_EZ[sp][4]
+	var h := FloraLib.height_of(sp)
+	var mats := {}
+	for part: String in ["bark", "leaves", "core"]:
+		var m := ShaderMaterial.new()
+		if part == "bark":
+			m.shader = load(CourtTreeSet.SHADER) as Shader
+			m.set_shader_parameter(&"mode", 0)
+			m.set_shader_parameter(&"tex", load(TREES_EZ + "bark_%s.png" % CANDY_EZ[sp][2]))
+			m.set_shader_parameter(&"bark_col", Color(0.95, 0.93, 0.90) if sp == &"birch" else Color(0.62, 0.46, 0.47))
+		else:
+			m.shader = load(CANDY_DIR + "candy_leaf.gdshader") as Shader
+			m.set_shader_parameter(&"core", part == "core")
+			m.set_shader_parameter(&"tex", load(CANDY_DIR + "puff_%s.png" % sp))
+			m.set_shader_parameter(&"shadow_col", pal[0])
+			m.set_shader_parameter(&"mid_col", pal[1])
+			m.set_shader_parameter(&"light_col", pal[2])
+		m.set_shader_parameter(&"model_height", h)
+		mats[part] = m
+	var out := ArrayMesh.new()
+	for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+		var xf := _local_to_root(m, inst)
+		var part := String(m.name).get_slice("_", String(m.name).get_slice_count("_") - 1)
+		for i in m.mesh.get_surface_count():
+			var arr := m.mesh.surface_get_arrays(i)
+			var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			var norms: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+			for k in verts.size():
+				verts[k] = xf * verts[k]
+				norms[k] = (xf.basis * norms[k]).normalized()
+			arr[Mesh.ARRAY_VERTEX] = verts
+			arr[Mesh.ARRAY_NORMAL] = norms
+			arr[Mesh.ARRAY_TANGENT] = null
+			arr[Mesh.ARRAY_COLOR] = null
+			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+			out.surface_set_material(out.get_surface_count() - 1, mats.get(part, mats["core"]))
+	inst.free()
+	return out
 
 
 func _candy_ez(sp: StringName) -> Array:
@@ -499,6 +550,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				var ce := _candy_ez(sp)
 				mi.mesh = ce[0]
 				mi.scale = Vector3.ONE * float(ce[1])
+			elif item.begins_with("leafy:"):
+				mi.mesh = _candy_leafy(StringName(item.get_slice(":", 1)))
 			elif item.begins_with("hybrid:"):
 				var sp := StringName(item.get_slice(":", 1))
 				var hy := PropModels.pair(CANDY_DIR + "hybrid_%s.glb" % sp, "hybrid_%s" % sp, FloraLib.foliage_material(sp))
