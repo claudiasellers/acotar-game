@@ -300,8 +300,9 @@ def magnolia_harlequin(kit, near):
 # like this texture"). One tall cone of candyfloss on a straight trunk: a heap
 # of soft billows, big low down and small toward the tip, with a second skin
 # standing a little off them that the shader cuts into fuzz
-# (world/spring_court/shared/woods_floss.gdshader). The floss is its own mesh
-# ("near_floss" / "far_floss", FloraLibrary.FLOSSED) and carries a tone, not
+# (world/spring_court/shared/woods_floss_fuzz.gdshader). The floss and the
+# fuzz are meshes of their own ("near_floss" / "far_floss", "near_fuzz";
+# FloraLibrary.FLOSSED) and carry a tone, not
 # a colour: the shader gives each tree one of the first tree's colours.
 
 FLOSS_HEIGHT = 7.0     # the cone, foot to tip
@@ -440,17 +441,14 @@ def candyfloss_tree(kit, near):
         billow(base, lumps, i, 1.0, 1, False, tufts, None if near else NEAR_BILLOWS)
     base.cull_buried()
     kit.floss = base
+    # The fuzz: a second skin a little off every billow but the hidden middle
+    # ones. Its own mesh, for the cut-out shader (the billows are drawn solid).
+    kit.fuzz = None
     if near:
-        skin = wt.Kit(2)
-        for i in range(outer):   # every billow but the hidden middle ones
-            billow(skin, lumps, i, FUZZ, 1, True, tufts)
-        skin.cull_buried()
-        offset = len(base.verts)
-        base.verts.extend(skin.verts)
-        base.normals.update({k + offset: n for k, n in skin.normals.items()})
-        base.faces.extend(tuple(v + offset for v in f) for f in skin.faces)
-        base.colors.extend(skin.colors)
-        base.uvs.extend(skin.uvs)
+        kit.fuzz = wt.Kit(2)
+        for i in range(outer):
+            billow(kit.fuzz, lumps, i, FUZZ, 1, True, tufts)
+        kit.fuzz.cull_buried()
 
     # Star blossoms resting on the billows (owner: "we also have to add the stars").
     def covered(p, own):
@@ -505,20 +503,24 @@ def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
 
 def build_flossed(species, fn, near_cap, far_cap):
     """wt.build for a tree with candyfloss: near and far as usual (the wood,
-    the stars), and near_floss / far_floss beside them. The caps count both."""
+    the stars), near_floss / far_floss beside them, and near_fuzz (the far
+    tree has none). The caps count all of it."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
     seed = sum(ord(c) * (i + 1) for i, c in enumerate(species))
     objs, report = [], []
     for name, near, cap in (("near", True, near_cap), ("far", False, far_cap)):
         kit = wt.grow(fn, seed, near, set())
-        floss = kit.floss
-        wood = wt.skin_wood(kit, min(700, cap - kit.tri_count() - floss.tri_count() - 10)) if near else 0
-        total = kit.tri_count() + floss.tri_count()
+        floss, fuzz = kit.floss, kit.fuzz
+        soft = floss.tri_count() + (fuzz.tri_count() if fuzz else 0)
+        wood = wt.skin_wood(kit, min(700, cap - kit.tri_count() - soft - 10)) if near else 0
+        total = kit.tri_count() + soft
         if total > cap:
             raise SystemExit("%s %s: %d tris over the %d cap" % (species, name, total, cap))
-        report.append((total, wood, floss.tri_count()))
+        report.append((total, wood, floss.tri_count(), fuzz.tri_count() if fuzz else 0))
         objs.append(wt.to_object(kit, name))
         objs.append(wt.to_object(floss, name + "_floss"))
+        if fuzz:
+            objs.append(wt.to_object(fuzz, name + "_fuzz"))
     path = os.path.join(OUT, species + ".glb")
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
@@ -527,8 +529,9 @@ def build_flossed(species, fn, near_cap, far_cap):
                               export_vertex_color="ACTIVE", export_all_vertex_colors=False,
                               export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
                               export_apply=False, export_animations=False)
-    print("%-14s near %5d tris (wood %4d, floss %4d)  far %4d tris (floss %4d)  %6.0f KB" % (
-        species, report[0][0], report[0][1], report[0][2], report[1][0], report[1][2], os.path.getsize(path) / 1024))
+    print("%-14s near %5d tris (wood %4d, floss %4d, fuzz %4d)  far %4d tris (floss %4d)  %6.0f KB" % (
+        species, report[0][0], report[0][1], report[0][2], report[0][3], report[1][0], report[1][2],
+        os.path.getsize(path) / 1024))
 
 
 FLOSSED = ("candyfloss_tree",)

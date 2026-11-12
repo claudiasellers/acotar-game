@@ -9,8 +9,8 @@ const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
 ## time with the owner: planted sparsely, on the estate trees' budget.
 const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree"]
 const SPECIAL_BUDGET := 6000
-## A candyfloss tree is wood plus a second mesh of floss (FloraLibrary.FLOSSED):
-## the two together stay inside this.
+## A candyfloss tree is wood plus meshes of floss and fuzz (FloraLibrary.FLOSSED):
+## all together stay inside this.
 const FLOSSED_BUDGET := 9000
 const NEW := [
 	&"wisteria_tree", &"golden_chain", &"magnolia",
@@ -35,13 +35,13 @@ func _tris(root: Node, name: String) -> int:
 	return (idx.size() if idx != null else (a[Mesh.ARRAY_VERTEX] as PackedVector3Array).size()) / 3
 
 
-## Triangles of one detail step: the "near"/"far" mesh, plus its floss mesh
-## on a flossed species.
+## Triangles of one detail step: the "near"/"far" mesh, plus its floss and
+## fuzz meshes on a flossed species.
 func _step_tris(root: Node, species: StringName, step: String) -> int:
 	var n := _tris(root, step)
 	if n < 0 or species not in FloraLibrary.FLOSSED:
 		return n
-	return n + maxi(_tris(root, step + "_floss"), 0)
+	return n + maxi(_tris(root, step + "_floss"), 0) + maxi(_tris(root, step + "_fuzz"), 0)
 
 
 func test_kit_is_big_enough() -> void:
@@ -81,23 +81,36 @@ func test_models_carry_vertex_colour_and_stay_small() -> void:
 		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s wind/glow UV" % s)
 
 
-func test_a_flossed_tree_draws_its_floss_as_a_second_surface() -> void:
+func test_a_flossed_tree_draws_solid_floss_and_cut_out_fuzz() -> void:
 	for s: StringName in FloraLibrary.FLOSSED:
 		assert_true(s in SPECIAL, "%s is one of the special trees" % s)
 		var root := (load(FloraLibrary.MODELS % s) as PackedScene).instantiate()
 		assert_gt(_tris(root, "near_floss"), 0, "%s near floss mesh" % s)
+		assert_gt(_tris(root, "near_fuzz"), 0, "%s near fuzz mesh" % s)
 		assert_gt(_tris(root, "far_floss"), 0, "%s far floss mesh" % s)
 		assert_lt(_tris(root, "far_floss"), _tris(root, "near_floss"), "%s far floss is the lighter one" % s)
+		assert_eq(_tris(root, "far_fuzz"), -1, "%s has no fuzz far away" % s)
 		root.free()
 		var m := FloraLibrary.mesh(s) as ArrayMesh
-		assert_eq(m.get_surface_count(), 2, "%s wood and floss surfaces" % s)
+		assert_eq(m.get_surface_count(), 3, "%s wood, floss and fuzz surfaces" % s)
+		assert_eq((FloraLibrary.far_mesh(s) as ArrayMesh).get_surface_count(), 2, "%s far: wood and floss" % s)
+		# Only the fuzz is a cut-out: a shader that writes ALPHA anywhere is
+		# drawn as one everywhere, so the billows have a shader of their own.
 		var floss := m.surface_get_material(1) as ShaderMaterial
-		assert_not_null(floss, "%s floss material" % s)
+		var fuzz := m.surface_get_material(2) as ShaderMaterial
 		assert_eq(floss.shader.resource_path, FloraLibrary.FLOSS_SHADER, "%s floss shader" % s)
-		assert_not_null(floss.get_shader_parameter(&"cotton"), "%s cotton texture" % s)
-		var a: Array = m.surface_get_arrays(1)
-		assert_not_null(a[Mesh.ARRAY_COLOR], "%s floss tone and tuft colour" % s)
-		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s floss wind and fuzz UV" % s)
+		assert_eq(fuzz.shader.resource_path, FloraLibrary.FUZZ_SHADER, "%s fuzz shader" % s)
+		assert_false(floss.shader.code.contains("FLOSS_FUZZ"), "%s billows are drawn solid" % s)
+		assert_true(fuzz.shader.code.contains("#define FLOSS_FUZZ"), "%s fuzz is the cut-out" % s)
+		var body := FileAccess.get_file_as_string("res://world/spring_court/shared/woods_floss.gdshaderinc")
+		assert_eq(body.count("ALPHA = "), 1, "the floss body writes ALPHA once")
+		assert_lt(body.find("#ifdef FLOSS_FUZZ", body.find("void fragment")), body.find("ALPHA = "), "and only for the fuzz")
+		for surface in [1, 2]:
+			var mat := m.surface_get_material(surface) as ShaderMaterial
+			assert_not_null(mat.get_shader_parameter(&"cotton"), "%s cotton texture on surface %d" % [s, surface])
+			var a: Array = m.surface_get_arrays(surface)
+			assert_not_null(a[Mesh.ARRAY_COLOR], "%s tone and tuft colour on surface %d" % [s, surface])
+			assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s wind UV on surface %d" % [s, surface])
 
 
 ## The tuft colour seen from outside, by where round the tree and how high:

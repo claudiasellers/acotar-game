@@ -34,8 +34,8 @@ func test_every_biome_the_provider_returns_has_data() -> void:
 func test_every_species_and_forage_visual_builds_a_mesh() -> void:
 	for species in FloraLibrary.SPECIES:
 		var m := FloraLibrary.mesh(species)
-		# (a flossed tree draws its floss as a second surface)
-		var surfaces := 2 if species in FloraLibrary.FLOSSED else 1
+		# (a flossed tree draws its floss and its fuzz as further surfaces)
+		var surfaces := 3 if species in FloraLibrary.FLOSSED else 1
 		assert_true(m != null and m.get_surface_count() == surfaces, "mesh for %s" % species)
 	for id in REGIONS:
 		var def := _def(id)
