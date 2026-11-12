@@ -1,0 +1,6 @@
+from estate-trees-explore
+quality look
+shot all res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_all
+shot apple res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_apple
+shot crab res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_crab
+shot cherry res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_cherry
