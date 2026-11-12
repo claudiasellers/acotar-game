@@ -795,7 +795,8 @@ TREE, SHRUB, FLOWER = (3000, 1500), (700, 400), (180, 100)
 
 SPECIES = {
     # New trees
-    "wisteria_tree": (wisteria_tree, TREE),
+    # (the wisteria is one of the special trees now: special_trees.py builds
+    # wisteria_tree.glb; golden_chain below still grows on the old form)
     "golden_chain": (golden_chain, TREE),
     # New shrubs
     "peony_bush": (peony_bush, SHRUB),

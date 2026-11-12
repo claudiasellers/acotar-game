@@ -22,7 +22,14 @@ candyfloss_tree
            a fuzz standing off them, and a few star blossoms resting on top.
            The shader colours it from where it stands: most trees one
            colour (blush, rose, lilac or pearl), some with a different
-           colour to each of seven tufts.
+           colour to each of nine tufts.
+wisteria_tree
+           An old wisteria grown as a parasol: two stems twined round each
+           other, limbs arching out level and dipping at the rim, and a
+           curtain of long flower chains hanging from them, each a string of
+           small florets, pale where they have opened at the top and deep
+           violet in the bud at the tip. Young leaves and a few star
+           blossoms lie on top of the limbs.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
@@ -501,6 +508,186 @@ def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
         kit.face((mid, a, b), (heart_c, ca, cb), ((flex, 0.0),) * 3)
 
 
+# ------------------------------------------------------------- wisteria ----
+# The wisteria (owner, 2026-11-12: one special tree at a time). The first one
+# hung fat lilac crystals under a few leaf discs. This is an old wisteria
+# trained as a parasol: twined stems, limbs arching out and dipping at the
+# rim, and a curtain of flower chains you can walk in under.
+
+WIST_BARK = (hexc("6B5464"), hexc("B9A2B4"))    # plum at the foot, silver-lilac in the limbs
+WIST_TWIG = hexc("C9B6C8")
+# A chain's colours, top (open flowers) to tip (buds), and its florets' lip.
+WIST_CHAINS = [
+    (hexc("EADDF8"), hexc("B79BEA"), hexc("7A5FD0"), hexc("F6EEFC")),   # wisteria: the first tree's lilacs
+    (hexc("E6DCF9"), hexc("A996EC"), hexc("6A58CC"), hexc("F4EEFD")),   # bluer
+    (hexc("F1DDF6"), hexc("CFA2E8"), hexc("9466CF"), hexc("FBEFFB")),   # orchid
+]
+WIST_CHAIN_ODDS = [0.55, 0.25, 0.2]
+WIST_LEAF = (hexc("7FCB8E"), hexc("C8EDB4"))    # young leaves: fresh green to pale gold-green
+WIST_HEIGHT = 3.3      # where the stems open into limbs
+WIST_REACH = 4.3       # how far a limb arches out
+WIST_CLEAR = 1.25      # no chain hangs lower than this
+
+
+def twine(height, turns, phase, hr0, hr1, lean, steps):
+    """One stem of the twined trunk: a helix round the trunk's line, which
+    leans a little as it rises."""
+    pts = []
+    for i in range(steps + 1):
+        t = i / steps
+        a = phase + turns * math.tau * t
+        hr = hr0 + (hr1 - hr0) * t
+        mid = lean * (t ** 1.4)
+        pts.append(Vector((mid.x + math.cos(a) * hr, mid.y + math.sin(a) * hr, height * t)))
+    return pts
+
+
+def chain(kit, top, length, width, cols, near, sway):
+    """A wisteria flower chain hanging from `top`: whorls of small florets on a
+    thread, full at the shoulder and running down to a point of buds. Pale at
+    the top where the flowers have opened, deep at the tip. The far one is a
+    plain spindle in the same colours."""
+    pale, mid_c, deep, lip = cols
+    turn = kit.rng.uniform(0.0, math.tau)
+
+    def spot(t):
+        # the thread: straight down, drifting a little the way the chain sways
+        return Vector(top) + Vector((sway.x * t * t, sway.y * t * t, -length * t))
+
+    def girth(t):
+        shoulder = math.sin(math.pi * 0.5 * min(t / 0.22, 1.0))
+        return width * (0.3 + 0.7 * shoulder) * (1.0 - t) ** 0.75 + 0.02
+
+    def colour(t):
+        return mix(pale, mid_c, t / 0.45) if t < 0.45 else mix(mid_c, deep, (t - 0.45) / 0.55)
+
+    if not near:
+        rings = []
+        for r, t in enumerate((0.0, 0.2, 0.6)):
+            c = spot(t)
+            ring = []
+            for k in range(4):
+                a = turn + math.tau * k / 4 + r * 0.6
+                d = Vector((math.cos(a), math.sin(a), 0.0))
+                v = kit.add_vert(c + d * (girth(t) if r else width * 0.35))
+                kit.normals[v] = (d + UP * (0.5 if r == 0 else 0.0)).normalized()
+                ring.append(v)
+            rings.append((ring, colour(t), 0.3 + 0.6 * t))
+        tip = kit.add_vert(spot(1.0))
+        kit.normals[tip] = -UP
+        for r in range(2):
+            (a, ca, fa), (b, cb, fb) = rings[r], rings[r + 1]
+            for k in range(4):
+                kit.face((a[k], b[(k + 1) % 4], a[(k + 1) % 4]), (ca, cb, ca), ((fa, 0), (fb, 0), (fa, 0)))
+                kit.face((a[k], b[k], b[(k + 1) % 4]), (ca, cb, cb), ((fa, 0), (fb, 0), (fb, 0)))
+        last, cl, fl = rings[-1]
+        for k in range(4):
+            kit.face((last[k], tip, last[(k + 1) % 4]), (cl, deep, cl), ((fl, 0), (0.95, 0.35), (fl, 0)))
+        return
+
+    whorls = max(5, round(length / 0.21))
+    per = 4
+    for w in range(whorls):
+        t = (w + 0.5) / whorls
+        c = spot(t)
+        r = girth(t)
+        drop = length / whorls * 1.25
+        col = colour(t)
+        flex = 0.3 + 0.6 * t
+        # the buds at the tip catch a little faelight
+        glow = 0.35 * max(0.0, (t - 0.72) / 0.28)
+        for k in range(per):
+            a = turn + math.tau * (k + 0.5 * (w % 2)) / per + kit.rng.uniform(-0.2, 0.2)
+            d = Vector((math.cos(a), math.sin(a), 0.0))
+            side = Vector((-d.y, d.x, 0.0))
+            size = r * kit.rng.uniform(0.9, 1.15)
+            foot = kit.add_vert(c + UP * drop * 0.25)
+            # a blunt shield, not a spike: broad low shoulders, a short lip
+            left = kit.add_vert(c + d * size * 0.8 + side * size * 0.72 - UP * drop * 0.42)
+            right = kit.add_vert(c + d * size * 0.8 - side * size * 0.72 - UP * drop * 0.42)
+            point = kit.add_vert(c + d * size * 1.0 - UP * drop * 0.86)
+            kit.normals[foot] = (d * 0.5 + UP * 0.8).normalized()
+            kit.normals[left] = (d * 0.75 + side * 0.55 + UP * 0.2).normalized()
+            kit.normals[right] = (d * 0.75 - side * 0.55 + UP * 0.2).normalized()
+            kit.normals[point] = (d * 0.9 - UP * 0.3).normalized()
+            inner = wt.shade(col, 0.86)
+            edge = mix(col, lip, 0.55 * (1.0 - t))
+            # (wound to face out, the way their normals point)
+            kit.face((foot, point, left), (inner, edge, col), ((flex, glow),) * 3)
+            kit.face((foot, right, point), (inner, col, edge), ((flex, glow),) * 3)
+
+
+def wisteria_tree(kit, near):
+    lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized() * 0.35
+    phase = kit.rng.uniform(0.0, math.tau)
+    steps = 9 if near else 4
+    # Two stems twined round each other, and a young vine round them both.
+    stem_a = twine(WIST_HEIGHT, 1.1, phase, 0.2, 0.1, lean, steps)
+    stem_b = twine(WIST_HEIGHT * 0.97, 1.1, phase + math.pi, 0.2, 0.12, lean, steps)
+    kit.tube(stem_a, taper(len(stem_a), 0.24, 0.17), 7 if near else 5, WIST_BARK[0], WIST_BARK[1], 0.0, 0.05, flare=0.5 if near else 0.0)
+    kit.tube(stem_b, taper(len(stem_b), 0.19, 0.14), 7 if near else 5, WIST_BARK[0], WIST_BARK[1], 0.0, 0.05, flare=0.4 if near else 0.0)
+    if near:
+        vine = twine(WIST_HEIGHT * 0.8, 1.9, phase + 1.4, 0.36, 0.2, lean * 0.8, 12)
+        kit.tube(vine, taper(len(vine), 0.07, 0.04), 5, WIST_BARK[1], WIST_TWIG, 0.0, 0.05)
+    crown = Vector((lean.x, lean.y, WIST_HEIGHT))
+
+    # The parasol: limbs leave the stems rising, run out level and dip at the rim.
+    hangs = []    # (point, share of the way out to the rim)
+    tops = []     # points on top of the limbs, for leaves and stars
+    limbs = 7
+    for i in range(limbs):
+        a = phase + math.tau * i / limbs + kit.rng.uniform(-0.2, 0.2)
+        heading = Vector((math.cos(a), math.sin(a), 0.0))
+        base = (stem_a if i % 2 == 0 else stem_b)[-1 - (i % 3 == 2)]
+        reach = WIST_REACH * kit.rng.uniform(0.85, 1.08)
+        limb = sweep(kit, base, heading, kit.rng.uniform(34.0, 46.0), -24.0, reach * 1.08, 6 if near else 3, 0.16)
+        kit.tube(limb, taper(len(limb), 0.13, 0.035), 6 if near else 4, WIST_BARK[1], WIST_TWIG, 0.05, 0.5)
+        lines = [(limb, 0.18, 1.0)]
+        # side arms, alternate sides, arching the same way
+        for k, t in enumerate((0.36, 0.62) if near else (0.5,)):
+            p = at(limb, t)
+            sideways = Vector((-heading.y, heading.x, 0.0)) * (1 if (i + k) % 2 else -1)
+            arm = sweep(kit, p, (heading * 0.6 + sideways * 0.8).normalized(), kit.rng.uniform(14.0, 26.0), -28.0,
+                        reach * kit.rng.uniform(0.4, 0.5), 4 if near else 2, 0.18)
+            kit.tube(arm, taper(len(arm), 0.06, 0.025), 5 if near else 3, WIST_TWIG, WIST_TWIG, 0.25 + 0.2 * t, 0.6)
+            lines.append((arm, 0.2, 1.0))
+        for line, t0, t1 in lines:
+            span = sum((line[j + 1] - line[j]).length for j in range(len(line) - 1)) * (t1 - t0)
+            count = max(2, round(span / (0.8 if near else 1.25)))
+            for j in range(count):
+                t = t0 + (t1 - t0) * (j + kit.rng.uniform(0.25, 0.75)) / count
+                p = at(line, t)
+                hangs.append((p + Vector((kit.rng.uniform(-0.14, 0.14), kit.rng.uniform(-0.14, 0.14), -0.03)),
+                              min(1.0, flat(p - crown).dot(p - crown) / WIST_REACH)))
+                tops.append((p, flat(line[-1] - line[0])))
+
+    # The curtain: short chains by the stems so the trunk shows, the longest at the rim.
+    for p, out in hangs:
+        length = (1.05 + 1.5 * out) * kit.rng.uniform(0.8, 1.2)
+        if kit.rng.random() < 0.12:
+            length *= 1.3
+        length = min(length, p.z - WIST_CLEAR)
+        if length < 0.6:
+            continue
+        cols = kit.rng.choices(WIST_CHAINS, weights=WIST_CHAIN_ODDS)[0]
+        width = kit.rng.uniform(0.2, 0.26) * (1.0 if near else 1.25)
+        sway = Vector((kit.rng.uniform(-0.12, 0.12), kit.rng.uniform(-0.12, 0.12), 0.0))
+        chain(kit, p, length, width, cols, near, sway)
+
+    # Young leaves along the tops of the limbs, in pairs, and a few star blossoms among them.
+    for n, (p, along) in enumerate(tops if near else tops[::3]):
+        sideways = Vector((-along.y, along.x, 0.0))
+        # a spray of three: one to each side and one standing up along the limb
+        for s in (-1, 1, 0) if near else (-1, 1):
+            d = (along * (kit.rng.uniform(0.2, 0.7) if s else 0.9) + sideways * s + UP * kit.rng.uniform(0.25, 0.6) * (1 if s else 1.8)).normalized()
+            sf.leaf(kit, p + UP * 0.03, d, kit.rng.uniform(0.5, 0.7) * (1.0 if near else 1.5), 0.16 * (1.0 if near else 1.5),
+                    WIST_LEAF[0], WIST_LEAF[1], 0.35, 0.6)
+        if near and n % 7 == 3:
+            up = (UP + along * 0.25 + sideways * kit.rng.uniform(-0.3, 0.3)).normalized()
+            petal_c, tip_c, heart_c = STAR_PEARL if kit.rng.random() < 0.6 else STAR_GOLD
+            star(kit, p + up * 0.14, up, kit.rng.uniform(0.2, 0.28), petal_c, tip_c, heart_c, 0.4)
+
+
 def build_flossed(species, fn, near_cap, far_cap):
     """wt.build for a tree with candyfloss: near and far as usual (the wood,
     the stars), near_floss / far_floss beside them, and near_fuzz (the far
@@ -535,9 +722,12 @@ def build_flossed(species, fn, near_cap, far_cap):
 
 
 FLOSSED = ("candyfloss_tree",)
+# The most triangles a tree's wood may take of its cap (the rest is flowers).
+WOOD = {"wisteria_tree": 900}
 
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
+    "wisteria_tree": (wisteria_tree, SPECIAL),
     # (twice the billows of any other crown, and its fuzz: a cap of its own)
     "candyfloss_tree": (candyfloss_tree, (9000, 1500)),
     "magnolia_harlequin": (magnolia_harlequin, SPECIAL),
@@ -550,7 +740,10 @@ def main():
     only = [a for a in sys.argv[1:] if a in SPECIES] or list(SPECIES)
     for species in only:
         fn, (near_cap, far_cap) = SPECIES[species]
-        (build_flossed if species in FLOSSED else wt.build)(species, fn, near_cap, far_cap)
+        if species in FLOSSED:
+            build_flossed(species, fn, near_cap, far_cap)
+        else:
+            wt.build(species, fn, near_cap, far_cap, WOOD.get(species, wt.WOOD_MAX))
 
 
 if __name__ == "__main__":
