@@ -94,7 +94,7 @@ RECIPES = {
         whorls=[(0.3, 4, 0.36, 50, -18, 1), (0.4, 4, 0.32, 62, -12, 1), (0.49, 3, 0.25, 74, -4, 1)],
         leader=0.57, top=0.07, kink=14, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
         weep=(9, 0.15, 0.12, 0.11),
-        variants=[("d", dict(trail=0.3)), ("e", dict(trail=1.0))],
+        variants=[("d", dict(trail=0.2)), ("e", dict(trail=1.0))],
     ),
 }
 
