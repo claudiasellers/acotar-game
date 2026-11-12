@@ -41,7 +41,17 @@ const VIEWS := {
 	"west_brink": [-1782.0, 180.0, 1.7, -1990.0, 160.0, 40.0, 0.62, &"spring", 70.0],
 	"sealed_pass": [-900.0, -1180.0, 1.7, -900.0, -1300.0, 10.0, 0.6, &"spring", 70.0],
 	"reaches": [1450.0, -1250.0, 1.7, 1000.0, -1640.0, 10.0, 0.55, &"blight", 70.0],
-	# The estate's trees (finish plan D2/E2): a parkland grove on the south
+	# From above, to read the whole shape.
+	"air_west": [-400.0, 300.0, 420.0, -1300.0, -400.0, 0.0, 0.45, &"spring", 75.0],
+	"air_north": [200.0, -300.0, 420.0, 100.0, -1300.0, 0.0, 0.45, &"spring", 75.0],
+	"air_vale": [600.0, 300.0, 300.0, 1100.0, 1000.0, 0.0, 0.45, &"spring", 75.0],
+}
+
+## The estate's tree views (finish plan D2/E2), by name only (never part of a
+## run of every view): the estate is not court land, so these are not the
+## court's standpoints (CourtLandHabitats.VIEWPOINTS).
+const ESTATE_VIEWS := {
+	# A parkland grove on the south
 	# lawns, the oaks and birches of the north hills from the deer park, the
 	# walled orchard's rows, the pond willows.
 	"estate_lawns": [-30.0, 165.0, 1.7, -130.0, 245.0, 4.0, 0.45, &"manor", 70.0],
@@ -49,10 +59,6 @@ const VIEWS := {
 	"estate_orchard": [-160.0, 150.0, 14.0, -250.0, 155.0, 0.0, 0.45, &"manor", 70.0],
 	"estate_avenue": [9.0, 285.0, 1.7, 0.0, 60.0, 4.0, 0.45, &"manor", 70.0],
 	"estate_air": [0.0, 320.0, 90.0, -60.0, -120.0, 0.0, 0.45, &"manor", 70.0],
-	# From above, to read the whole shape.
-	"air_west": [-400.0, 300.0, 420.0, -1300.0, -400.0, 0.0, 0.45, &"spring", 75.0],
-	"air_north": [200.0, -300.0, 420.0, 100.0, -1300.0, 0.0, 0.45, &"spring", 75.0],
-	"air_vale": [600.0, 300.0, 300.0, 1100.0, 1000.0, 0.0, 0.45, &"spring", 75.0],
 }
 
 
@@ -114,7 +120,7 @@ func _run() -> void:
 	world.add_child(cam)
 	cam.make_current()
 	for id in ids:
-		var v: Array = VIEWS[id]
+		var v: Array = VIEWS[id] if VIEWS.has(id) else ESTATE_VIEWS[id]
 		Clock.time_of_day = v[6]
 		world.grade.swap_to(v[7], 0.0)
 		var eye := Vector3(v[0], 0.0, v[1])
