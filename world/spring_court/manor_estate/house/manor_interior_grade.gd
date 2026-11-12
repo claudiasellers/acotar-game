@@ -1,5 +1,5 @@
-## The grade inside the house: GI and a softer tone that only a closed room
-## needs (T043). It sits ahead of the grounds' RegionGrade and covers the rooms
+## The grade inside the house: a flat, even ambient that only a closed room
+## needs, with no GI (T117). It sits ahead of the grounds' RegionGrade and covers the rooms
 ## by height too, so the lawn over a cellar stays outdoors.
 class_name ManorInteriorGrade
 extends RegionGrade

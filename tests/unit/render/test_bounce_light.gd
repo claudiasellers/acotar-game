@@ -6,7 +6,7 @@ extends GutTest
 # gate: when:world/shared/grades/*,world/shared/world/*,world/shared/shaders/candy_lit*,systems/settings/*
 
 const GRADES := "res://world/shared/grades/"
-## Closed rooms keep their own GI-led ambient (T043, the owner's look).
+## Closed rooms use a flat ambient of their own (no GI, T117).
 const INTERIOR_GRADES: Array[StringName] = [&"manor_interior"]
 
 

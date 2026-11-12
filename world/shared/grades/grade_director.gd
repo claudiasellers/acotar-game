@@ -151,7 +151,6 @@ func apply(base: GradePreset) -> void:
 	env.ambient_light_energy = p.ambient_energy
 	env.ambient_light_sky_contribution = p.ambient_sky_contribution
 	env.tonemap_mode = p.tonemap_mode
-	env.sdfgi_enabled = p.sdfgi
 	env.fog_light_color = p.fog_color
 	env.fog_density = p.fog_density
 	env.fog_sky_affect = p.fog_sky_affect
@@ -203,7 +202,6 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	cold.id = p.id
 	cold.lut = p.lut
 	cold.tonemap_mode = p.tonemap_mode
-	cold.sdfgi = p.sdfgi
 	cold.snow_cover = p.snow_cover
 	return cold
 

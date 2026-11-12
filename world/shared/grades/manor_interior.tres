@@ -11,13 +11,12 @@ ground_horizon = Color(0.98, 0.86, 0.8, 1)
 ground_bottom = Color(0.55, 0.7, 0.45, 1)
 sun_color = Color(1.0, 0.88, 0.74, 1)
 sun_energy = 1.2
-; GI carries the room's light, so the ambient is all sky, and it only reaches
-; what SDFGI finds open (T043, the look the owner chose).
-sdfgi = true
-tonemap_mode = 4
+; No GI indoors (T117): a flat, even ambient lights the rooms, and the tone
+; mapper is the manor's own (it doesn't blend, so a different one would pop at
+; every doorway).
 ambient_color = Color(0.92, 0.90, 0.88, 1)
-ambient_energy = 1.2
-ambient_sky_contribution = 1.0
+ambient_energy = 1.1
+ambient_sky_contribution = 0.0
 fog_color = Color(0.92, 0.90, 0.88, 1)
 fog_density = 0.0
 volumetric_density = 0.0

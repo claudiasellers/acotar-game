@@ -53,10 +53,8 @@ extends Resource
 @export var glow_intensity := 0.4
 @export var glow_bloom := 0.05
 @export var glow_hdr_threshold := 1.0
-## Neither of these blends: like the LUT, they switch at the middle of a mix.
+## Doesn't blend: like the LUT, it switches at the middle of a mix.
 @export var tonemap_mode := Environment.TONE_MAPPER_ACES
-## Global illumination, for places closed to the sky. Outdoors it's cost for nothing.
-@export var sdfgi := false
 @export_group("Golden hour")
 ## Sky and sun when the sun is low (dawn and dusk). GradeDirector blends
 ## toward these as the sun nears the horizon.
@@ -99,5 +97,4 @@ static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 		out.set(c, (a.get(c) as Color).lerp(b.get(c), t))
 	out.lut = b.lut if t >= 0.5 else a.lut
 	out.tonemap_mode = b.tonemap_mode if t >= 0.5 else a.tonemap_mode
-	out.sdfgi = b.sdfgi if t >= 0.5 else a.sdfgi
 	return out

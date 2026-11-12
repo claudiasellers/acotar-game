@@ -49,18 +49,13 @@ func test_a_story_swap_holds_off_the_region_grade_until_released() -> void:
 	assert_eq(director.target_id(), &"manor", "released, the region's grade takes over")
 
 
-func test_only_the_house_turns_gi_on() -> void:
+func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
 	var inside := GradeDirector.load_preset(&"manor_interior")
 	var manor := GradeDirector.load_preset(&"manor")
-	assert_true(inside.sdfgi)
-	assert_false(manor.sdfgi, "outdoors unchanged")
-	assert_eq(manor.tonemap_mode, Environment.TONE_MAPPER_ACES)
-	for f in DirAccess.get_files_at(GradeDirector.PRESET_DIR):
-		if f.ends_with(".tres") and f != "manor_interior.tres":
-			assert_false((load(GradeDirector.PRESET_DIR + f) as GradePreset).sdfgi, f)
-	assert_false(GradePreset.mix(inside, manor, 0.6).sdfgi, "GI switches at the middle of the blend")
-	assert_true(GradePreset.mix(manor, inside, 0.6).sdfgi)
-	assert_true(GradeDirector.with_mood(inside, 1.0).sdfgi, "dread keeps the room's GI")
+	assert_false("sdfgi" in inside, "GradePreset has no GI switch, so no grade can turn it on")
+	assert_eq(inside.tonemap_mode, manor.tonemap_mode, "the tone mapper doesn't blend, so it must not pop at a doorway")
+	assert_eq(inside.ambient_sky_contribution, 0.0, "flat ambient, not sky-fed")
+	assert_gt(inside.ambient_energy, 0.8, "rooms stay readable")
 
 
 func test_mix_switches_lut_at_half() -> void:
