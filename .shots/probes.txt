@@ -1,0 +1,5 @@
+from estate-trees-explore
+quality look
+shot five res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_willow_curtains
+shot long res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_willow_long
+shot a res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_willow_a
