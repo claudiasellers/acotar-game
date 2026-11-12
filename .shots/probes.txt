@@ -1,0 +1,14 @@
+from wider-court-world
+quality look
+shot p1 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame  --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=none_1 --perf-csv={out}/perf.csv
+shot p2 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=near --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near_1 --perf-csv={out}/perf.csv
+shot p3 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=mid --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=mid_1 --perf-csv={out}/perf.csv
+shot p4 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=trees --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=trees_1 --perf-csv={out}/perf.csv
+shot p5 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=shadows --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=shadows_1 --perf-csv={out}/perf.csv
+shot p6 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=decor --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=decor_1 --perf-csv={out}/perf.csv
+shot p7 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame  --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=none_2 --perf-csv={out}/perf.csv
+shot p8 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=near --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near_2 --perf-csv={out}/perf.csv
+shot p9 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=mid --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=mid_2 --perf-csv={out}/perf.csv
+shot p10 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=trees --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=trees_2 --perf-csv={out}/perf.csv
+shot p11 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=shadows --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=shadows_2 --perf-csv={out}/perf.csv
+shot p12 res://tools/perf/frame_probe.tscn {out} western_woods regions ingame without=decor --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=decor_2 --perf-csv={out}/perf.csv
