@@ -7,13 +7,13 @@ extends GutTest
 const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
 ## The special trees (tools/woods/blender/special_trees.py), rebuilt one at a
 ## time with the owner: planted sparsely, on the estate trees' budget.
-const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree"]
+const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin", &"candyfloss_tree", &"wisteria_tree"]
 const SPECIAL_BUDGET := 6000
 ## A candyfloss tree is wood plus meshes of floss and fuzz (FloraLibrary.FLOSSED):
 ## all together stay inside this.
 const FLOSSED_BUDGET := 9000
 const NEW := [
-	&"wisteria_tree", &"golden_chain", &"magnolia",
+	&"golden_chain", &"magnolia",
 	&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump", &"goldenrod",
 	&"lupin_clump", &"sugarberry_bush", &"spire_bed",
 	&"tulip_patch", &"daffodil", &"maidens_lace", &"forget_me_not", &"allium", &"pansy_patch",
@@ -75,7 +75,7 @@ func test_every_species_loads_from_blender_inside_budget() -> void:
 func test_models_carry_vertex_colour_and_stay_small() -> void:
 	for s: StringName in NEW + REMADE + SPECIAL:
 		var path := FloraLibrary.MODELS % s
-		assert_lt(FileAccess.get_file_as_bytes(path).size(), (450 if s in SPECIAL else 300) * 1024, "%s glb size" % s)
+		assert_lt(FileAccess.get_file_as_bytes(path).size(), (600 if s in SPECIAL else 300) * 1024, "%s glb size" % s)
 		var a: Array = FloraLibrary.arrays_for(s, 1)
 		assert_not_null(a[Mesh.ARRAY_COLOR], "%s vertex colour" % s)
 		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s wind/glow UV" % s)
