@@ -1,0 +1,9 @@
+from wider-court-world
+quality look
+shot a res://tools/court/court_terrain_shots.tscn {out} western_woods tower_hill west_brink glen_saddle the_mound brae_top regions ingame
+shot b res://tools/court/court_terrain_shots.tscn {out} village_pinch village_green plateau_north plateau_east rite_way rite_trench exit_west exit_north regions ingame
+shot p_western_woods res://tools/perf/frame_probe.tscn {out} western_woods regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=lod_western_woods --perf-csv={out}/perf.csv
+shot p_glen_saddle res://tools/perf/frame_probe.tscn {out} glen_saddle regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=lod_glen_saddle --perf-csv={out}/perf.csv
+shot p_village_green res://tools/perf/frame_probe.tscn {out} village_green regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=lod_village_green --perf-csv={out}/perf.csv
+shot p_plateau_north res://tools/perf/frame_probe.tscn {out} plateau_north regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=lod_plateau_north --perf-csv={out}/perf.csv
+shot p_rite_way res://tools/perf/frame_probe.tscn {out} rite_way regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=lod_rite_way --perf-csv={out}/perf.csv
