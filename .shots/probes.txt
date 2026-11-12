@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot p_western_woods res://tools/perf/frame_probe.tscn {out} western_woods regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near80_western_woods --perf-csv={out}/perf.csv
+shot p_tower_hill res://tools/perf/frame_probe.tscn {out} tower_hill regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=near80_tower_hill --perf-csv={out}/perf.csv
