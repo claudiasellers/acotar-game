@@ -35,7 +35,7 @@ OUT = H.OUT
 # card: clump card size x height; cover: card area over puff area (shingles);
 # rim: standing cards per shingle card; core: core radius x puff radius
 LEAFY = {
-    "oak": dict(card=0.115, cover=1.5, rim=0.5, core=0.74),
+    "oak": dict(card=0.092, cover=2.1, rim=0.3, core=0.66),
 }
 
 
@@ -114,11 +114,12 @@ def build(sid):
             if rng.random() < ly["rim"]:
                 # a card standing out from the puff: stem in, leaves out
                 side = d.cross(jit).normalized() if d.cross(jit).length > 1e-3 else d.orthogonal().normalized()
-                normals += card(leaves, uv, cc + d * (r * 0.9 + s * 0.2), side, side.cross(d), s, shade)
+                normals += card(leaves, uv, cc + d * (r * 0.9 + s * 0.08), side, side.cross(d), s, shade)
 
     core = K.Prop("core")
     for cc, r, main in placed:
-        MF.blob(core, cc.x, cc.y, cc.z, r * ly["core"], (1, 1, 1), rng, 1, 0.9, fine=1)
+        if main:
+            MF.blob(core, cc.x, cc.y, cc.z, r * ly["core"], (1, 1, 1), rng, 1, 0.9, fine=1)
 
     # scale to the species height, standing on the ground
     zs = [v.co.z for b in (bark, leaves, core.bm) for v in b.verts]

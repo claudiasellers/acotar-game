@@ -23,8 +23,8 @@ import gen_ez_textures as G  # noqa: E402
 SIZE = G.SIZE
 # kind: (leaf outline, leaves, leaf length px, leaf width / length)
 KINDS = {
-    "oak": ("oak", 86, 92.0, 0.6),
-    "birch": ("aspen", 120, 62.0, 0.82),
+    "oak": ("oak", 170, 62.0, 0.62),
+    "birch": ("aspen", 200, 46.0, 0.82),
 }
 
 

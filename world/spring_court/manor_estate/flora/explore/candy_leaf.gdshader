@@ -11,9 +11,9 @@ render_mode cull_disabled, depth_draw_opaque;
 
 uniform sampler2D tex : source_color, filter_linear_mipmap;
 uniform bool core = false;
-uniform vec4 shadow_col : source_color = vec4(0.29, 0.55, 0.45, 1.0);
-uniform vec4 mid_col : source_color = vec4(0.45, 0.74, 0.50, 1.0);
-uniform vec4 light_col : source_color = vec4(0.72, 0.90, 0.70, 1.0);
+uniform vec4 shadow_col : source_color = vec4(0.30, 0.56, 0.44, 1.0);
+uniform vec4 mid_col : source_color = vec4(0.50, 0.79, 0.56, 1.0);
+uniform vec4 light_col : source_color = vec4(0.78, 0.95, 0.72, 1.0);
 uniform float bands : hint_range(2.0, 8.0) = 4.0;
 uniform float model_height = 12.0;
 uniform float tree_value_spread : hint_range(0.0, 0.3) = 0.08;
@@ -39,14 +39,14 @@ void fragment() {
 	}
 	vec3 col;
 	if (core) {
-		col = mix(shadow_col.rgb, mid_col.rgb, 0.15) * 0.9;
+		col = shadow_col.rgb * 0.82;
 	} else {
 		vec4 t = texture(tex, UV);
 		ALPHA = t.a;
 		ALPHA_SCISSOR_THRESHOLD = 0.5;
 		float v = dot(t.rgb, vec3(0.3, 0.59, 0.11));
 		// lighter on a puff's top and up the tree, deeper underneath
-		float k = clamp(v * 1.6 * (0.62 + 0.3 * v_height + 0.28 * v_up), 0.0, 1.0);
+		float k = clamp(v * 1.6 * (0.56 + 0.26 * v_height + 0.42 * v_up), 0.0, 1.0);
 		k = floor(k * bands + 0.5) / bands * 0.7 + k * 0.3;
 		col = k < 0.5 ? mix(shadow_col.rgb, mid_col.rgb, k * 2.0) : mix(mid_col.rgb, light_col.rgb, (k - 0.5) * 2.0);
 	}
