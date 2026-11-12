@@ -513,8 +513,10 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		var sp: StringName = FOREST_SPECIES[rng.randi() % FOREST_SPECIES.size()]
 		# set: the court's tree set (CourtTreeSet), its builds and its three
 		# detail steps at the game's own distances; old: FloraLibrary's trees.
-		var nb := CourtTreeSet.builds(StringName("woods_" + String(sp))) if kind == "set" else 0
-		var v := rng.randi() % nb if nb > 0 else 0
+		# The builds the Western Woods plants (CourtTreeSet.region_builds).
+		var chosen := CourtTreeSet.region_builds(StringName("woods_" + String(sp)), &"western_fells") if kind == "set" else PackedInt32Array()
+		var nb := chosen.size()
+		var v := chosen[rng.randi() % nb] if nb > 0 else 0
 		var step := 0 if r < CourtTreeSet.NEAR else (1 if r < 260.0 else 2)
 		if kind != "set" or nb == 0:
 			step = 2 if r > 260.0 else 0
@@ -541,6 +543,10 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 			mm.set_instance_transform(i, xs[i])
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
+		# As the game: only the near step casts shadows (the tree set's mid and
+		# far, FloraLibrary's impostors).
+		if step > 0 and (kind == "set" or far):
+			mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		world.add_child(mmi)
 		total += xs.size()
 	print("FOREST %s: %d trees in %d batches" % [kind, total, buckets.size()])

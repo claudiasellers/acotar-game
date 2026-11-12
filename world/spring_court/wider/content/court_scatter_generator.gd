@@ -127,7 +127,7 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		if layer.count() == 0:
 			continue
 		if layer.tags.has("tree"):
-			out.append_array(_split_builds(layer))
+			out.append_array(_split_builds(layer, content.region_id))
 		else:
 			out.append(layer)
 	return out
@@ -142,16 +142,17 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 const NEIGHBOUR_GAP := 9.0
 
 
-static func _split_builds(layer: ScatterLayer) -> Array[ScatterLayer]:
+static func _split_builds(layer: ScatterLayer, region: StringName) -> Array[ScatterLayer]:
 	var id := StringName(String(layer.id).substr(String(layer.id).find("_", 6) + 1))
-	var n := CourtTreeSet.builds(id)
+	var chosen := CourtTreeSet.region_builds(id, region)
+	var n := chosen.size()
 	var parts: Array[ScatterLayer] = []
 	if n <= 0:
 		parts.append(layer)
 		return parts
 	var near: Array[ScatterLayer] = []
 	var mid: Array[ScatterLayer] = []
-	for v in n:
+	for v: int in chosen:
 		for step in [CourtTreeSet.Step.NEAR, CourtTreeSet.Step.MID]:
 			var part := ScatterLayer.new()
 			part.id = StringName("%s@%d%s" % [layer.id, v, "" if step == CourtTreeSet.Step.NEAR else "m"])
@@ -166,7 +167,9 @@ static func _split_builds(layer: ScatterLayer) -> Array[ScatterLayer]:
 				part.impostor_distance = layer.impostor_distance
 				mid.append(part)
 			part.wind = layer.wind
-			part.cast_shadow = layer.cast_shadow
+			# Past the near step a tree's shadow is a few blurred texels of the
+			# far cascade, but costs a whole alpha-cut pass (T7): near only.
+			part.cast_shadow = layer.cast_shadow and step == CourtTreeSet.Step.NEAR
 			part.tags = layer.tags
 			part.ingredient_id = layer.ingredient_id
 	var taken := {}

@@ -21,6 +21,11 @@ const DIR := "res://world/spring_court/wider/assets/trees/"
 const SHADER := "res://world/spring_court/wider/assets/trees/court_tree.gdshader"
 ## Near step's reach (m); the mid step runs from here to TREE_DRAW.
 const NEAR := 80.0
+## A region plants at most this many of a role's builds (each build and step
+## is a draw call per chunk; T7: 13 broadleaf builds cost more than the eye
+## gains). Different regions take different builds, so the court as a whole
+## still shows them all.
+const MAX_BUILDS := 6
 enum Step { NEAR, MID, FAR }
 
 ## The mixed wood's palette (wcterrain-28, owner-approved): "deep" leaves,
@@ -116,6 +121,22 @@ static func has(id: StringName) -> bool:
 static func builds(id: StringName) -> int:
 	var r := role(id)
 	return (ROLES[r]["builds"] as Array).size() if r != &"" else 0
+
+
+## The builds a region plants of `id`: all of them up to MAX_BUILDS, else
+## MAX_BUILDS of them, starting where the region's name hashes to.
+static func region_builds(id: StringName, region: StringName) -> PackedInt32Array:
+	var n := builds(id)
+	var out := PackedInt32Array()
+	if n <= MAX_BUILDS:
+		for b in n:
+			out.append(b)
+		return out
+	var start := absi(hash(String(region) + "|" + String(id).get_slice("@", 0))) % n
+	for k in MAX_BUILDS:
+		out.append((start + k * n / MAX_BUILDS) % n)
+	out.sort()
+	return out
 
 
 ## The mesh for build `b` of `id` at a detail step, scaled to the id's height.

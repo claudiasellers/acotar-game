@@ -51,28 +51,27 @@ void vertex() {
 void fragment() {
 	vec4 t = texture(tex, UV);
 	vec3 col;
+	// Cut-outs go through the alpha scissor (opaque pass, depth prepass), not
+	// discard (T7: the leaves' overdraw was the dense wood's cost).
+	ALPHA = 1.0;
+	ALPHA_SCISSOR_THRESHOLD = 0.5;
 	if (mode == 0) {
 		float v = dot(t.rgb, vec3(0.3, 0.59, 0.11)) / bark_mean;
 		col = bark_col.rgb * v * (0.6 + 0.4 * dot(COLOR.rgb, vec3(0.333)));
 	} else if (mode == 1) {
-		if (t.a < 0.2) {
-			discard;
-		}
+		ALPHA = t.a;
+		ALPHA_SCISSOR_THRESHOLD = 0.2;
 		float shade = dot(COLOR.rgb, vec3(0.333));
 		col = mix(leaf_col.rgb, leaf_light.rgb, smoothstep(0.55, 1.0, shade)) * (0.55 + 0.45 * shade);
 	} else if (mode == 2) {
-		if (t.a < 0.5) {
-			discard;
-		}
+		ALPHA = t.a;
 		float v = dot(t.rgb, vec3(0.3, 0.59, 0.11));
 		float k = clamp(v * 1.6 * (0.75 + 0.45 * v_height), 0.0, 1.0);
 		k = floor(k * bands + 0.5) / bands * 0.7 + k * 0.3;
 		col = k < 0.5 ? mix(shadow_col.rgb, mid_col.rgb, k * 2.0) : mix(mid_col.rgb, light_col.rgb, (k - 0.5) * 2.0);
 		col *= 0.92 + 0.16 * v_tree;
 	} else if (mode == 3) {
-		if (t.a < 0.5) {
-			discard;
-		}
+		ALPHA = t.a;
 		col = t.rgb * (0.92 + 0.16 * v_tree);
 	} else if (COLOR.a < 0.5) {
 		col = bark_col.rgb * 0.8;
