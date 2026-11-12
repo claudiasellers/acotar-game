@@ -5,6 +5,10 @@ extends GutTest
 ## and every species the woods biomes list has a mesh.
 
 const BUDGET := {"tree": 3000, "shrub": 700, "detail": 180}
+## The special trees (tools/woods/blender/special_trees.py), rebuilt one at a
+## time with the owner: planted sparsely, on the estate trees' budget.
+const SPECIAL: Array[StringName] = [&"magnolia", &"magnolia_harlequin"]
+const SPECIAL_BUDGET := 6000
 const NEW := [
 	&"candyfloss_tree", &"wisteria_tree", &"golden_chain", &"magnolia",
 	&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump", &"goldenrod",
@@ -39,23 +43,23 @@ func test_kit_is_big_enough() -> void:
 
 
 func test_every_species_loads_from_blender_inside_budget() -> void:
-	for s: StringName in NEW + REMADE:
+	for s: StringName in NEW + REMADE + SPECIAL:
 		assert_true(FloraLibrary.has(s), "%s in FloraLibrary" % s)
 		assert_true(FloraLibrary.has_model(s), "%s has a Blender model" % s)
 		var root := (load(FloraLibrary.MODELS % s) as PackedScene).instantiate()
 		var near := _tris(root, "near")
 		var far := _tris(root, "far")
 		root.free()
-		var cap: int = BUDGET[FloraLibrary.info(s)["layer"]]
+		var cap: int = SPECIAL_BUDGET if s in SPECIAL else BUDGET[FloraLibrary.info(s)["layer"]]
 		assert_between(near, 1, cap, "%s near tris" % s)
-		assert_between(far, 1, int(near * 0.65), "%s LOD1 tris" % s)
+		assert_between(far, 1, 1500 if s in SPECIAL else int(near * 0.65), "%s LOD1 tris" % s)
 		assert_gt((FloraLibrary.mesh(s) as ArrayMesh).get_surface_count(), 0, "%s mesh" % s)
 
 
 func test_models_carry_vertex_colour_and_stay_small() -> void:
-	for s: StringName in NEW + REMADE:
+	for s: StringName in NEW + REMADE + SPECIAL:
 		var path := FloraLibrary.MODELS % s
-		assert_lt(FileAccess.get_file_as_bytes(path).size(), 300 * 1024, "%s glb size" % s)
+		assert_lt(FileAccess.get_file_as_bytes(path).size(), (450 if s in SPECIAL else 300) * 1024, "%s glb size" % s)
 		var a: Array = FloraLibrary.arrays_for(s, 1)
 		assert_not_null(a[Mesh.ARRAY_COLOR], "%s vertex colour" % s)
 		assert_not_null(a[Mesh.ARRAY_TEX_UV], "%s wind/glow UV" % s)
