@@ -78,7 +78,7 @@ void fragment() {
 		}
 		if (part == 2) {
 			// the heart: leaves in shade, not a smooth ball
-			col = mix(shadow_col.rgb * 0.82, mid_col.rgb, clamp(pattern(v_obj * 1.7, v_objn) * 1.3, 0.0, 1.0) * 0.5);
+			col = mix(shadow_col.rgb * 0.9, mid_col.rgb, clamp(pattern(v_obj * 1.7, v_objn) * 2.2, 0.0, 1.0) * 0.65);
 		} else {
 			vec4 t = texture(tex, UV);
 			ALPHA = t.a;

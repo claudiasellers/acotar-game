@@ -199,8 +199,8 @@ def foliage(sid, clouds, rng):
         n = max(10, round(4 * math.pi * r * r * rc["cover"] / (rc["card"] ** 2)))
         for i in range(n):
             z = 1.0 - 2.0 * (i + 0.5) / n
-            if z < -0.45:
-                continue   # a cloud's flat underside: the heart shows, shaded
+            if z < -0.45 and rng.random() < 0.4:
+                continue   # thinner on a cloud's underside
             a = i * 2.39996 + rng.uniform(-0.3, 0.3)
             d = Vector((math.sqrt(1 - z * z) * math.cos(a), math.sqrt(1 - z * z) * math.sin(a), z))
             at = cc + flat @ (d * r * 0.92)
@@ -214,7 +214,7 @@ def foliage(sid, clouds, rng):
                 side = side.normalized() if side.length > 1e-3 else d.orthogonal().normalized()
                 card(leaves, uv, col, at + d * s * 0.1, side, side.cross(d), s, tone)
                 normals += [shade] * 4
-        MF.blob(core, cc.x, cc.y, cc.z, r * 0.7, (1, 1, 1), rng, 1, rc["flat"], fine=1)
+        MF.blob(core, cc.x, cc.y, cc.z, r * 0.62, (1, 1, 1), rng, 1, rc["flat"], fine=1)
     return leaves, normals, core
 
 
