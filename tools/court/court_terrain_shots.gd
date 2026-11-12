@@ -200,6 +200,7 @@ const LINEUPS := {
 	"candyfloss_far": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"far:woods_candyfloss_tree"]},
 	"candyfloss_close": {"distance": 8.0, "spacing": 7.0, "look": 5.4, "ids": [&"woods_candyfloss_tree"]},
 	"wisteria": {"distance": 15.0, "spacing": 8.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_golden_chain"]},
+	"golden_chain_close": {"distance": 7.5, "spacing": 7.0, "look": 3.9, "ids": [&"woods_golden_chain"]},
 	"wisteria_close": {"distance": 7.5, "spacing": 7.0, "look": 3.6, "ids": [&"woods_wisteria_tree"]},
 	"wisteria_row": {"distance": 26.0, "spacing": 7.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_wisteria_tree",
 		&"woods_golden_chain", &"woods_wisteria_tree", &"woods_wisteria_tree"]},

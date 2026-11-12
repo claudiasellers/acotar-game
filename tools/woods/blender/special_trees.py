@@ -484,6 +484,7 @@ def candyfloss_tree(kit, near):
 STAR_PEARL = (hexc("FBF1DC"), hexc("FFFBF2"), hexc("F2C94C"))   # petal, tip, heart
 STAR_GOLD = (hexc("F8DF94"), hexc("FCF0C2"), hexc("E8A93A"))
 STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
+STAR_LILAC = (hexc("EBDDF8"), hexc("FBF6FE"), hexc("F2C94C"))
 
 
 def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
@@ -527,6 +528,12 @@ WIST_LEAF = (hexc("7FCB8E"), hexc("C8EDB4"))    # young leaves: fresh green to p
 WIST_HEIGHT = 3.3      # where the stems open into limbs
 WIST_REACH = 4.3       # how far a limb arches out
 WIST_CLEAR = 1.25      # no chain hangs lower than this
+# The wisteria's look; golden_chain() has the same form in its own.
+WISTERIA_LOOK = {
+    "height": WIST_HEIGHT, "reach": WIST_REACH, "clear": WIST_CLEAR, "short": 1.05, "long": 2.55, "girth": 1.0,
+    "bark": WIST_BARK, "twig": WIST_TWIG, "leaf": WIST_LEAF, "chains": WIST_CHAINS, "odds": WIST_CHAIN_ODDS,
+    "stars": None,   # set below, once the stars' colours are defined
+}
 
 
 def twine(height, turns, phase, hr0, hr1, lean, steps):
@@ -617,19 +624,22 @@ def chain(kit, top, length, width, cols, near, sway):
             kit.face((foot, right, point), (inner, col, edge), ((flex, glow),) * 3)
 
 
-def wisteria_tree(kit, near):
+def wisteria_tree(kit, near, look=None):
+    look = look or WISTERIA_LOOK
+    height, spread, clear = look["height"], look["reach"], look["clear"]
+    bark, twig, leaf_c = look["bark"], look["twig"], look["leaf"]
     lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized() * 0.35
     phase = kit.rng.uniform(0.0, math.tau)
     steps = 9 if near else 4
     # Two stems twined round each other, and a young vine round them both.
-    stem_a = twine(WIST_HEIGHT, 1.1, phase, 0.2, 0.1, lean, steps)
-    stem_b = twine(WIST_HEIGHT * 0.97, 1.1, phase + math.pi, 0.2, 0.12, lean, steps)
-    kit.tube(stem_a, taper(len(stem_a), 0.24, 0.17), 7 if near else 5, WIST_BARK[0], WIST_BARK[1], 0.0, 0.05, flare=0.5 if near else 0.0)
-    kit.tube(stem_b, taper(len(stem_b), 0.19, 0.14), 7 if near else 5, WIST_BARK[0], WIST_BARK[1], 0.0, 0.05, flare=0.4 if near else 0.0)
+    stem_a = twine(height, 1.1, phase, 0.2, 0.1, lean, steps)
+    stem_b = twine(height * 0.97, 1.1, phase + math.pi, 0.2, 0.12, lean, steps)
+    kit.tube(stem_a, taper(len(stem_a), 0.24, 0.17), 7 if near else 5, bark[0], bark[1], 0.0, 0.05, flare=0.5 if near else 0.0)
+    kit.tube(stem_b, taper(len(stem_b), 0.19, 0.14), 7 if near else 5, bark[0], bark[1], 0.0, 0.05, flare=0.4 if near else 0.0)
     if near:
-        vine = twine(WIST_HEIGHT * 0.8, 1.9, phase + 1.4, 0.36, 0.2, lean * 0.8, 12)
-        kit.tube(vine, taper(len(vine), 0.07, 0.04), 5, WIST_BARK[1], WIST_TWIG, 0.0, 0.05)
-    crown = Vector((lean.x, lean.y, WIST_HEIGHT))
+        vine = twine(height * 0.8, 1.9, phase + 1.4, 0.36, 0.2, lean * 0.8, 12)
+        kit.tube(vine, taper(len(vine), 0.07, 0.04), 5, bark[1], twig, 0.0, 0.05)
+    crown = Vector((lean.x, lean.y, height))
 
     # The parasol: limbs leave the stems rising, run out level and dip at the rim.
     hangs = []    # (point, share of the way out to the rim)
@@ -639,9 +649,9 @@ def wisteria_tree(kit, near):
         a = phase + math.tau * i / limbs + kit.rng.uniform(-0.2, 0.2)
         heading = Vector((math.cos(a), math.sin(a), 0.0))
         base = (stem_a if i % 2 == 0 else stem_b)[-1 - (i % 3 == 2)]
-        reach = WIST_REACH * kit.rng.uniform(0.85, 1.08)
+        reach = spread * kit.rng.uniform(0.85, 1.08)
         limb = sweep(kit, base, heading, kit.rng.uniform(34.0, 46.0), -24.0, reach * 1.08, 6 if near else 3, 0.16)
-        kit.tube(limb, taper(len(limb), 0.13, 0.035), 6 if near else 4, WIST_BARK[1], WIST_TWIG, 0.05, 0.5)
+        kit.tube(limb, taper(len(limb), 0.13, 0.035), 6 if near else 4, bark[1], twig, 0.05, 0.5)
         lines = [(limb, 0.18, 1.0)]
         # side arms, alternate sides, arching the same way
         for k, t in enumerate((0.36, 0.62) if near else (0.5,)):
@@ -649,7 +659,7 @@ def wisteria_tree(kit, near):
             sideways = Vector((-heading.y, heading.x, 0.0)) * (1 if (i + k) % 2 else -1)
             arm = sweep(kit, p, (heading * 0.6 + sideways * 0.8).normalized(), kit.rng.uniform(14.0, 26.0), -28.0,
                         reach * kit.rng.uniform(0.4, 0.5), 4 if near else 2, 0.18)
-            kit.tube(arm, taper(len(arm), 0.06, 0.025), 5 if near else 3, WIST_TWIG, WIST_TWIG, 0.25 + 0.2 * t, 0.6)
+            kit.tube(arm, taper(len(arm), 0.06, 0.025), 5 if near else 3, twig, twig, 0.25 + 0.2 * t, 0.6)
             lines.append((arm, 0.2, 1.0))
         for line, t0, t1 in lines:
             span = sum((line[j + 1] - line[j]).length for j in range(len(line) - 1)) * (t1 - t0)
@@ -658,19 +668,19 @@ def wisteria_tree(kit, near):
                 t = t0 + (t1 - t0) * (j + kit.rng.uniform(0.25, 0.75)) / count
                 p = at(line, t)
                 hangs.append((p + Vector((kit.rng.uniform(-0.14, 0.14), kit.rng.uniform(-0.14, 0.14), -0.03)),
-                              min(1.0, flat(p - crown).dot(p - crown) / WIST_REACH)))
+                              min(1.0, flat(p - crown).dot(p - crown) / spread)))
                 tops.append((p, flat(line[-1] - line[0])))
 
     # The curtain: short chains by the stems so the trunk shows, the longest at the rim.
     for p, out in hangs:
-        length = (1.05 + 1.5 * out) * kit.rng.uniform(0.8, 1.2)
+        length = (look["short"] + (look["long"] - look["short"]) * out) * kit.rng.uniform(0.8, 1.2)
         if kit.rng.random() < 0.12:
             length *= 1.3
-        length = min(length, p.z - WIST_CLEAR)
+        length = min(length, p.z - clear)
         if length < 0.6:
             continue
-        cols = kit.rng.choices(WIST_CHAINS, weights=WIST_CHAIN_ODDS)[0]
-        width = kit.rng.uniform(0.2, 0.26) * (1.0 if near else 1.25)
+        cols = kit.rng.choices(look["chains"], weights=look["odds"])[0]
+        width = kit.rng.uniform(0.2, 0.26) * look["girth"] * (1.0 if near else 1.25)
         sway = Vector((kit.rng.uniform(-0.12, 0.12), kit.rng.uniform(-0.12, 0.12), 0.0))
         chain(kit, p, length, width, cols, near, sway)
 
@@ -681,12 +691,32 @@ def wisteria_tree(kit, near):
         for s in (-1, 1, 0) if near else (-1, 1):
             d = (along * (kit.rng.uniform(0.2, 0.7) if s else 0.9) + sideways * s + UP * kit.rng.uniform(0.25, 0.6) * (1 if s else 1.8)).normalized()
             sf.leaf(kit, p + UP * 0.03, d, kit.rng.uniform(0.5, 0.7) * (1.0 if near else 1.5), 0.16 * (1.0 if near else 1.5),
-                    WIST_LEAF[0], WIST_LEAF[1], 0.35, 0.6)
+                    leaf_c[0], leaf_c[1], 0.35, 0.6)
         if near and n % 7 == 3:
             up = (UP + along * 0.25 + sideways * kit.rng.uniform(-0.3, 0.3)).normalized()
-            petal_c, tip_c, heart_c = STAR_PEARL if kit.rng.random() < 0.6 else STAR_GOLD
+            petal_c, tip_c, heart_c = look["stars"][0] if kit.rng.random() < 0.6 else look["stars"][1]
             star(kit, p + up * 0.14, up, kit.rng.uniform(0.2, 0.28), petal_c, tip_c, heart_c, 0.4)
 
+
+
+# The golden chain: the wisteria's gold sister, as the first one was (the
+# same form in butter and gold). A little taller and narrower, its chains
+# shorter and fuller, so a grove of the two is not one tree in two colours.
+GOLD_CHAINS = [
+    (hexc("FDF4CC"), hexc("FFD85A"), hexc("EBAE34"), hexc("FFFBE6")),   # butter to gold: the first tree's yellows
+    (hexc("FBF6D2"), hexc("F7E37A"), hexc("E3C23C"), hexc("FFFCEA")),   # lemon
+    (hexc("FDEFC6"), hexc("FBC85C"), hexc("E8963A"), hexc("FFF8E2")),   # apricot gold
+]
+GOLDEN_LOOK = {
+    "height": 3.8, "reach": 3.7, "clear": 1.5, "short": 0.9, "long": 2.1, "girth": 1.12,
+    "bark": (hexc("6E5A52"), hexc("C2AE9E")), "twig": hexc("D4C4B0"),
+    "leaf": (hexc("86D0A0"), hexc("CDEFC0")), "chains": GOLD_CHAINS, "odds": [0.55, 0.25, 0.2],
+    "stars": None,   # set below, once the stars' colours are defined
+}
+
+
+def golden_chain(kit, near):
+    wisteria_tree(kit, near, GOLDEN_LOOK)
 
 def build_flossed(species, fn, near_cap, far_cap):
     """wt.build for a tree with candyfloss: near and far as usual (the wood,
@@ -721,13 +751,17 @@ def build_flossed(species, fn, near_cap, far_cap):
         os.path.getsize(path) / 1024))
 
 
+WISTERIA_LOOK["stars"] = (STAR_PEARL, STAR_GOLD)
+GOLDEN_LOOK["stars"] = (STAR_PEARL, STAR_LILAC)
+
 FLOSSED = ("candyfloss_tree",)
 # The most triangles a tree's wood may take of its cap (the rest is flowers).
-WOOD = {"wisteria_tree": 900}
+WOOD = {"wisteria_tree": 900, "golden_chain": 900}
 
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
     "wisteria_tree": (wisteria_tree, SPECIAL),
+    "golden_chain": (golden_chain, SPECIAL),
     # (twice the billows of any other crown, and its fuzz: a cap of its own)
     "candyfloss_tree": (candyfloss_tree, (9000, 1500)),
     "magnolia_harlequin": (magnolia_harlequin, SPECIAL),
