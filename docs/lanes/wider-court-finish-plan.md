@@ -50,7 +50,7 @@ and its status. Details for each item are in the phase sections further down.
 | T5 | Willow of our own (generator pipeline, `woods_trees.py` Kit) | D1, T4 | waiting | as T2 and T4 |
 | T6 | Wiring: `CourtAssets` by role id; the card trees go | T2, T3, T4 | **done** (`CourtTreeSet`, on the lane) | GUT: every role id resolves to near, mid and far meshes |
 | T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | **measured**: court views hold; 150/ha does not yet (below) | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
-| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | **with the owner** (wcterrain-43/44/45/46) | owner's yes |
+| T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | **done**: merged M4WCT-10 (owner: "submit") | owner's yes |
 | P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **done** (submitted) | GUT: habitat fractions per region; every keep-open zone has no tree in it |
 | P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
 | P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
@@ -171,10 +171,26 @@ is the layering half. Five fixes came out of checking it against the brief, `wor
 | Dense wood, 150/ha | 15.4 / 21.4, 76 | 24.1 / 25.9, 437 |
 
 At today's planting the tree set costs about the same (the glen is faster). A
-dense wood at 150/ha is 24 ms against the 16.6 budget: the alpha-cut leaves and the
-extra builds per chunk cost more than the old opaque crowns. Before P2 raises the
-density: mid steps cast no shadow past the shadow range, and fewer builds per chunk
-(T7b); P2's ceiling is what then holds.
+dense wood at 150/ha was 24 ms against the 16.6 budget.
+
+**T7b/c (lane, wcterrain-49..53).** At most 6 builds of a role per region, shadows
+from the near step only, leaves cut by the alpha scissor: draw calls 437 → 244 and
+triangles 6.4 M → 4.2 M, but the frame time held (by pack: Quaternius 21.5 ms,
+EZ-Tree 24.3 ms; the cut-out leaves themselves were the cost). Then the mid step's
+crown went solid (7 rounded lumps from the leaves, no cut-outs past 80 m):
+
+| Dense wood | ms (median) |
+|---|---|
+| 40/ha | 16.3 |
+| 70/ha | 16.9 |
+| 90/ha | 18.4 |
+| 100/ha | 17.5 |
+| 150/ha | 21.1 |
+| FloraLibrary 100/ha | 15.7 |
+
+(±1 ms between runs.) **P2's ceiling: about 80/ha for a closed wood**, with
+understory and ground cover making up the rest of the "closed" read; more needs a
+cheaper near step (50–60 m, or fewer leaf cards).
 
 ## Phase P — planting follows the land (after T; the big one)
 
