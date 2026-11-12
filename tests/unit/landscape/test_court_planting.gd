@@ -117,3 +117,62 @@ func test_rosewild_meadow_village_and_rite() -> void:
 		for i in layer.count():
 			var p := layer.position_of(i)
 			assert_gt(Vector2(p.x, p.z).distance_to(Vector2(800.0, -1100.0)), 60.0, "no tree on the Rite's crown")
+
+
+## Finish plan P3: every tree as a crown (a drum from a quarter of its height
+## to its top, three tenths of its height in radius), bucketed for the rays.
+func _crowns() -> Dictionary:
+	var cells := {}
+	for id: StringName in layers:
+		for layer: ScatterLayer in layers[id]:
+			var decor_id := StringName(String(layer.id).substr(9))
+			var tall := CourtTreeSet.target_height(decor_id) if CourtTreeSet.has(decor_id) else 9.0
+			for i in layer.count():
+				var p := layer.position_of(i)
+				var k := Vector2i(floori(p.x / 16.0), floori(p.z / 16.0))
+				if not cells.has(k):
+					cells[k] = []
+				cells[k].append([p, tall * layer.instances[i * ScatterLayer.STRIDE + 4]])
+	return cells
+
+
+func test_the_landmarks_stay_seen_past_the_trees() -> void:
+	# CourtHeight.SIGHTLINES holds the land to what you see from where
+	# (test_court_terrain); the trees must not close what the land leaves
+	# open. A hidden line stays hidden: trees only add cover.
+	var crowns := _crowns()
+	for line: Array in CourtHeight.SIGHTLINES:
+		if not line[3]:
+			continue
+		var from: Vector2 = CourtHeight.site(line[0]) if line[0] is StringName else Vector2(line[0][0], line[0][1])
+		var to := CourtHeight.site(line[1])
+		var a := Vector3(from.x, WorldHeight.height_at(from.x, from.y) + 1.7, from.y)
+		var b := Vector3(to.x, WorldHeight.height_at(to.x, to.y) + float(line[2]) + 0.5, to.y)
+		var d := Vector2(b.x - a.x, b.z - a.z).length()
+		var blocker := ""
+		for s in range(2, int(d) - 8, 3):
+			var q := a.lerp(b, s / d)
+			var k := Vector2i(floori(q.x / 16.0), floori(q.z / 16.0))
+			for dx in range(-1, 2):
+				for dz in range(-1, 2):
+					for t: Array in crowns.get(k + Vector2i(dx, dz), []):
+						var at: Vector3 = t[0]
+						var tall: float = t[1]
+						if Vector2(at.x - q.x, at.z - q.z).length() < tall * 0.3 and q.y > at.y + tall * 0.25 and q.y < at.y + tall:
+							blocker = "a %.0f m tree %d m along" % [tall, s]
+		assert_eq(blocker, "", "%s -> %s is not closed by a tree" % [str(line[0]), line[1]])
+
+
+func test_paths_gates_and_viewpoints_stay_clear_of_trunks() -> void:
+	var inside := 0
+	var first := ""
+	for id: StringName in layers:
+		for layer: ScatterLayer in layers[id]:
+			for i in layer.count():
+				var p := layer.position_of(i)
+				var why := CourtLandHabitats.keep_open_reason(p.x, p.z)
+				if why != &"":
+					inside += 1
+					if first == "":
+						first = "%s in %s at %s" % [layer.id, why, p]
+	assert_eq(inside, 0, "no trunk in a keep-open place (first: %s)" % first)
