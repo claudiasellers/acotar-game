@@ -199,15 +199,109 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 		_far_crown(out, src, s, aabb)
 		out.surface_set_material(0, _material(r, model, "far", s, h))
 		return out
+	var leaves := PackedVector3Array()
 	for i in src.get_surface_count():
+		var kind := _surface_kind(src, i, model)
 		var arr := src.surface_get_arrays(i)
 		var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
 		for k in verts.size():
 			verts[k] = Vector3(verts[k].x * s, (verts[k].y - aabb.position.y) * s, verts[k].z * s)
+		if step == Step.MID and kind != "bark":
+			# The mid step's crown is solid (T7: cut-out leaves cost the dense
+			# wood its frame time; a solid crown at 80 m+ reads the same).
+			leaves.append_array(verts)
+			continue
 		arr[Mesh.ARRAY_VERTEX] = verts
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
-		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, _surface_kind(src, i, model), s, h))
+		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, kind, s, h))
+	if not leaves.is_empty():
+		_mid_crown(out, leaves, b)
+		out.surface_set_material(out.get_surface_count() - 1, _material(r, model, "far", s, h))
 	return out
+
+
+## The mid step's solid crown: the leaves gathered into CROWN_LUMPS clusters
+## (k-means on the leaf vertices), each a rounded lump sized to its cluster,
+## with round normals. Vertex alpha 1 (crown), as the far crown's.
+const CROWN_LUMPS := 7
+const LUMP_SEGMENTS := 6
+
+
+static func _mid_crown(out: ArrayMesh, pts: PackedVector3Array, seed_b: int) -> void:
+	var k := mini(CROWN_LUMPS, maxi(1, pts.size() / 12))
+	var centres: Array[Vector3] = []
+	var step := maxi(1, pts.size() / k)
+	for i in k:
+		centres.append(pts[(i * step + seed_b * 7) % pts.size()])
+	var sums: Array[Vector3] = []
+	var counts := PackedInt32Array()
+	var spread := PackedFloat32Array()
+	for it in 8:
+		sums.clear()
+		counts.resize(0)
+		counts.resize(k)
+		for i in k:
+			sums.append(Vector3.ZERO)
+		for p in pts:
+			var best := 0
+			var bd := INF
+			for i in k:
+				var d := p.distance_squared_to(centres[i])
+				if d < bd:
+					bd = d
+					best = i
+			sums[best] += p
+			counts[best] += 1
+		for i in k:
+			if counts[i] > 0:
+				centres[i] = sums[i] / counts[i]
+	# Each lump's radii: the cluster's spread on each axis.
+	var ext: Array[Vector3] = []
+	for i in k:
+		ext.append(Vector3.ZERO)
+	for p in pts:
+		var best := 0
+		var bd := INF
+		for i in k:
+			var d := p.distance_squared_to(centres[i])
+			if d < bd:
+				bd = d
+				best = i
+		var d3 := (p - centres[best]).abs()
+		ext[best] = Vector3(maxf(ext[best].x, d3.x), maxf(ext[best].y, d3.y), maxf(ext[best].z, d3.z))
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_color(Color(1, 1, 1, 1))
+	for i in k:
+		if counts[i] == 0:
+			continue
+		var rad := ext[i] * 0.78
+		rad = Vector3(maxf(rad.x, 0.3), maxf(rad.y, 0.3), maxf(rad.z, 0.3))
+		_lump(st, centres[i], rad)
+	st.commit(out)
+
+
+## A rounded lump: LUMP_SEGMENTS around, three bands (top cap, two rings,
+## bottom cap): 4 * LUMP_SEGMENTS triangles.
+static func _lump(st: SurfaceTool, c: Vector3, rad: Vector3) -> void:
+	var rings: Array[PackedVector3Array] = []
+	for lat in [0.45, -0.35]:
+		var ring := PackedVector3Array()
+		for j in LUMP_SEGMENTS:
+			var a := TAU * (float(j) + (0.5 if lat < 0.0 else 0.0)) / LUMP_SEGMENTS
+			var cl := cos(lat * PI * 0.5)
+			ring.append(Vector3(cos(a) * cl, sin(lat * PI * 0.5), sin(a) * cl))
+		rings.append(ring)
+	var top := Vector3.UP
+	var bottom := Vector3.DOWN
+	var put := func(u: Vector3) -> void:
+		st.set_normal(u.normalized())
+		st.add_vertex(c + u * rad)
+	for j in LUMP_SEGMENTS:
+		var j2 := (j + 1) % LUMP_SEGMENTS
+		for u: Vector3 in [top, rings[0][j2], rings[0][j], rings[0][j], rings[0][j2], rings[1][j],
+				rings[1][j], rings[0][j2], rings[1][j2], bottom, rings[1][j], rings[1][j2]]:
+			put.call(u)
 
 
 ## "bark", "leaf", "flowers" for a surface of a model, from its material name.
