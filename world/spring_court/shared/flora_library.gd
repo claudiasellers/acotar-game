@@ -14,12 +14,12 @@ extends RefCounted
 const FOLIAGE_SHADER := preload("res://world/spring_court/shared/woods_foliage.gdshader")
 ## Blender models that replace a procedural builder (tools/woods/blender/).
 const MODELS := "res://world/spring_court/shared/models/%s.glb"
-## Species whose model carries spun-sugar wisps: a second mesh "<near|far>_wisps"
-## of cards, drawn as a second surface on woods_floss.gdshader
-## (tools/woods/blender/special_trees.py).
-const WISPED: Array[StringName] = [&"candyfloss_tree"]
+## Species whose model carries candyfloss: a second mesh "<near|far>_floss",
+## drawn as a second surface on woods_floss.gdshader, which colours it per
+## tree (tools/woods/blender/special_trees.py).
+const FLOSSED: Array[StringName] = [&"candyfloss_tree"]
 const FLOSS_SHADER := "res://world/spring_court/shared/woods_floss.gdshader"
-const FLOSS_WISPS := "res://world/spring_court/shared/models/floss_wisp.png"
+const FLOSS_COTTON := "res://world/spring_court/shared/models/floss_cotton.png"
 
 ## layer: tree | shrub | ground | detail | find
 ## scale: random uniform scale range; radius: trunk collision radius (m) at
@@ -313,20 +313,20 @@ static func _to_mesh(species: StringName, arrays: Array, detail: int = 1) -> Arr
 	var m := ArrayMesh.new()
 	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	m.surface_set_material(0, material(look_of(species)))
-	if species in WISPED:
-		var wisps := _model_arrays(species, detail, "_wisps")
-		if not wisps.is_empty():
-			m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, wisps)
+	if species in FLOSSED:
+		var floss := _model_arrays(species, detail, "_floss")
+		if not floss.is_empty():
+			m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, floss)
 			m.surface_set_material(1, floss_material())
 	return m
 
 
-## The spun-sugar wisps' material (woods_floss.gdshader).
+## The candyfloss material (woods_floss.gdshader).
 static func floss_material() -> ShaderMaterial:
 	if not _materials.has(&"floss"):
 		var m := ShaderMaterial.new()
 		m.shader = load(FLOSS_SHADER) as Shader
-		m.set_shader_parameter(&"wisps", load(FLOSS_WISPS))
+		m.set_shader_parameter(&"cotton", load(FLOSS_COTTON))
 		_materials[&"floss"] = m
 	return _materials[&"floss"]
 

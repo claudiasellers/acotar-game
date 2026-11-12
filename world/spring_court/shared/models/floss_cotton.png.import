@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd7g6omstnrye"
-path="res://.godot/imported/floss_wisp.png-743388352cc0e87e010bf0a5efa15d8c.ctex"
+uid="uid://cypvhy8faow2m"
+path="res://.godot/imported/floss_cotton.png-a7390055796cdce20b4e6a55a2b90ae4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://world/spring_court/shared/models/floss_wisp.png"
-dest_files=["res://.godot/imported/floss_wisp.png-743388352cc0e87e010bf0a5efa15d8c.ctex"]
+source_file="res://world/spring_court/shared/models/floss_cotton.png"
+dest_files=["res://.godot/imported/floss_cotton.png-a7390055796cdce20b4e6a55a2b90ae4.ctex"]
 
 [params]
 

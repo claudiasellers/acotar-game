@@ -17,11 +17,11 @@ magnolia   A saucer magnolia in full flower on bare pearl wood: a short
            goblets below them, pointed buds on the spurs along the limbs.
            Each petal is rose at its foot, blush, then pearl at its tip.
 candyfloss_tree
-           A bouquet of candyfloss on sticks: a curving pearl-rose trunk,
-           each limb a stick with a tuft of spun sugar wound on it (blush,
-           rose, lilac, pearl, peach): a dense heart in the deep colour
-           wrapped in pale wisps of painted threads, with five-pointed star
-           blossoms nestled in the floss.
+           One tall cone of candyfloss on a straight pearl-rose trunk: a
+           heap of soft billows, big low down and small toward the tip, with
+           a fuzz standing off them, and a few star blossoms resting on top.
+           Each tree is one colour (blush, rose, lilac or pearl), given by
+           the shader from where it stands.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
@@ -293,103 +293,130 @@ def magnolia_harlequin(kit, near):
 
 
 # ------------------------------------------------------ candyfloss tree ----
-# Owner, 2026-11-12: the first rebuild "looks really similar ... what should a
-# candyfloss tree's texture be?" Spun sugar: no hard outline, threads wound
-# round a stick, pale where the light comes through and deep in the dense
-# middle. So each limb is a stick with a tuft of floss wound on it: a solid
-# heart in the deep colour, wrapped in wisps (cards of painted threads,
-# tools/woods/gen_floss_wisp.py, drawn by woods_floss.gdshader) laid along
-# the winding, some standing off as a fringe, a few pulled out into tails.
+# Third build, from scratch (owner, 2026-11-12, with a picture of candyfloss
+# trees: "remake this from scratch just using the same colors ... almost more
+# like this texture"). One tall cone of candyfloss on a straight trunk: a heap
+# of soft billows, big low down and small toward the tip, with a second skin
+# standing a little off them that the shader cuts into fuzz
+# (world/spring_court/shared/woods_floss.gdshader). The floss is its own mesh
+# ("near_floss" / "far_floss", FloraLibrary.FLOSSED) and carries a tone, not
+# a colour: the shader gives each tree one of the first tree's colours.
 
-class Tuft:
-    """Floss wound on a stick from `foot` to `top`: thin where it grips the
-    stick, swelling to `radius` about three fifths of the way up, domed."""
-
-    def __init__(self, kit, foot, top, radius, hand):
-        self.foot = Vector(foot)
-        self.axis = (Vector(top) - self.foot).normalized()
-        self.length = (Vector(top) - self.foot).length
-        self.radius = radius
-        self.side = self.axis.orthogonal().normalized()
-        self.fwd = self.axis.cross(self.side).normalized()
-        self.hand = hand
-        self.phase = kit.rng.uniform(0.0, math.tau)
-
-    def swell(self, t):
-        t = min(max(t, 0.0), 1.0)
-        return 0.1 * (1.0 - t) + 0.9 * math.sin(math.pi * t ** 1.45) ** 0.75
-
-    def out(self, a):
-        return self.side * math.cos(a) + self.fwd * math.sin(a)
-
-    def at(self, t, a, k=1.0):
-        """The point at height t (0..1) and angle a, k times the heart's radius out."""
-        ridge = 1.0 + 0.07 * math.sin(3.0 * a - self.hand * 9.0 * t + self.phase)
-        return self.foot + self.axis * (t * self.length) + self.out(a) * (self.radius * self.swell(t) * ridge * k)
-
-    def normal(self, t, a):
-        e = 0.02
-        slope = (self.swell(t + e) - self.swell(t - e)) / (2.0 * e) * self.radius / self.length
-        return (self.out(a) - self.axis * slope).normalized()
-
-    def winding(self, t, a, pitch):
-        """The way the sugar was wound here: round the stick, climbing a little."""
-        round_ = self.axis.cross(self.out(a)).normalized() * self.hand
-        return (round_ * math.cos(pitch) + self.axis * math.sin(pitch)).normalized()
+FLOSS_HEIGHT = 6.6     # the cone, foot to tip
+FLOSS_FOOT = 2.4       # where it starts up the trunk
+FLOSS_RADIUS = 2.2     # at its widest, a quarter of the way up
+FUZZ = 1.12            # the fuzz skin stands this far off a billow
 
 
-def floss_heart(kit, tuft, top, deep, flex, rows, segs):
-    """The dense middle of a tuft: the deep colour, a little paler up top."""
-    rings = []
-    for r in range(rows + 1):
-        t = r / rows
-        ring = []
-        for k in range(segs):
-            a = math.tau * k / segs + 0.3 * r
-            v = kit.add_vert(tuft.at(t, a, 0.94) if 0 < r < rows else tuft.foot + tuft.axis * (t * tuft.length))
-            kit.normals[v] = tuft.normal(t, a) if 0 < r < rows else (tuft.axis if r else -tuft.axis)
-            ring.append(v)
-        rings.append((ring, mix(deep, top, 0.3 + 0.55 * t ** 1.2), flex + 0.08 * t))
-    for r in range(rows):
-        (a, ca, fa), (b, cb, fb) = rings[r], rings[r + 1]
-        for k in range(segs):
-            k2 = (k + 1) % segs
-            kit.face((a[k], a[k2], b[k2]), (ca, ca, cb), ((fa, 0), (fa, 0), (fb, 0)))
-            kit.face((a[k], b[k2], b[k]), (ca, cb, cb), ((fa, 0), (fb, 0), (fb, 0)))
+def cone(t):
+    """The cone's radius (of FLOSS_RADIUS) at height t, 0 foot to 1 tip:
+    rounded in under the foot, widest at a quarter, tapering to a soft tip."""
+    if t < 0.26:
+        return 0.62 + 0.38 * math.sin(math.pi * 0.5 * t / 0.26)
+    return 1.0 - 0.72 * ((t - 0.26) / 0.74) ** 1.1
 
 
-def wisp(kit, centre, along, normal, length, height, shade_normal, colour, flex, lift=0.0):
-    """One card of spun threads: `along` its length, facing `normal`, lit as
-    `shade_normal` (the tuft's); `lift` raises its upper edge off the tuft."""
-    along = along.normalized()
-    up = normal.cross(along).normalized()
-    up = (up + normal * lift).normalized()
-    cell = kit.rng.randrange(4)
-    u0, v0 = (cell % 2) * 0.5, (cell // 2) * 0.5
-    us = (u0 + 0.004, u0 + 0.496) if kit.rng.random() < 0.5 else (u0 + 0.496, u0 + 0.004)
-    vs = (v0 + 0.004, v0 + 0.496) if kit.rng.random() < 0.5 else (v0 + 0.496, v0 + 0.004)
-    corners = []
-    for sx, sy, u, v in ((-1, -1, us[0], vs[0]), (1, -1, us[1], vs[0]), (1, 1, us[1], vs[1]), (-1, 1, us[0], vs[1])):
-        corners.append((centre + along * (sx * length * 0.5) + up * (sy * height * 0.5), (u, v)))
-    kit.wisps.append((corners, tuple(shade_normal), (colour[0], colour[1], colour[2], flex)))
+def billow(fk, lumps, i, scale, subdiv, fuzz):
+    """One billow of the heap into kit `fk`: a lumpy ball. Its tone is light
+    on top and deep where it meets its neighbours; `scale` > 1 with `fuzz`
+    makes its fuzz skin."""
+    c, r, seed = lumps[i]
+    verts, faces = wt.icosphere(subdiv)
+    first = len(fk.faces)
+    idx, tones = [], []
+    for v in verts:
+        rr = r * scale * (1.0 + 0.1 * wt.noise.noise(v * 1.7 + seed))
+        p = c + v * rr
+        idx.append(fk.add_vert(p))
+        fk.normals[idx[-1]] = v.copy()
+        # deep in the creases: how far this point is from the nearest neighbour's skin
+        gap = min(((p - oc).length - orad * scale) / r for j, (oc, orad, _) in enumerate(lumps) if j != i)
+        crease = min(max(gap / 0.32, 0.0), 1.0)
+        tone = (0.3 + 0.7 * (0.5 + 0.5 * v.z) ** 0.9) * (0.42 + 0.58 * crease)
+        tones.append(min(1.0, tone + (0.1 if fuzz else 0.0)))
+    flex = 0.16 + 0.3 * min(1.0, max(0.0, (c.z - FLOSS_FOOT) / FLOSS_HEIGHT))
+    for f in faces:
+        fk.face(tuple(idx[k] for k in f), tuple((tones[k],) * 3 for k in f), tuple((flex, 1.0 if fuzz else 0.0) for _ in f))
+    fk.blobs.append((c, r * scale, 1.0, 0.1, first, len(fk.faces)))
 
 
-FLOSS = [
-    (hexc("FAD4DC"), hexc("EE7FA8")),   # blush over rose
-    (hexc("F7B3CB"), hexc("E25A8A")),   # rose over hot pink
-    (hexc("E9D6F7"), hexc("A77FDB")),   # pale lilac over lilac
-    (hexc("FBEDEA"), hexc("F08DB2")),   # pearl over blush rose
-    (hexc("FBD9C8"), hexc("EE8A8A")),   # peach over coral rose
-]
+def candyfloss_tree(kit, near):
+    # A straight pearl-rose trunk, running up inside the floss.
+    bark0, bark1 = hexc("A9808C"), hexc("D6A9B3")
+    lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized() * 0.06
+    trunk = [Vector((0, 0, 0)), Vector((lean.x, lean.y, 1.3)), Vector((-lean.x * 0.5, -lean.y * 0.5, 2.7)), Vector((0, 0, 4.4))]
+    if not near:
+        trunk = [trunk[0], trunk[2], trunk[3]]
+    kit.tube(trunk, taper(len(trunk), 0.36, 0.18), 8 if near else 5, bark0, bark1, 0.0, 0.06, flare=0.4 if near else 0.0)
+
+    # The heap: billows up a spiral round the cone, each bulging out of it.
+    count = 40 if near else 13
+    lumps = []
+    for i in range(count):
+        t = (i + kit.rng.uniform(0.2, 0.8)) / count
+        a = i * 2.39996 + kit.rng.uniform(-0.35, 0.35)
+        ring = FLOSS_RADIUS * cone(t)
+        r = min(max(ring * kit.rng.uniform(0.44, 0.62) * (1.0 if near else 1.45), 0.38), 1.25 if near else 1.7)
+        out = max(ring - r * 0.55, 0.0)
+        c = Vector((math.cos(a) * out, math.sin(a) * out, FLOSS_FOOT + t * FLOSS_HEIGHT + kit.rng.uniform(-0.12, 0.12)))
+        lumps.append((c, r, Vector((kit.rng.random() * 50, kit.rng.random() * 50, kit.rng.random() * 50))))
+    # the tip, and the middle of the foot so the underside is closed
+    lumps.append((Vector((0, 0, FLOSS_FOOT + FLOSS_HEIGHT)), 0.55, Vector((7.0, 3.0, 1.0))))
+    lumps.append((Vector((0, 0, FLOSS_FOOT + 0.5)), FLOSS_RADIUS * 0.55, Vector((2.0, 9.0, 4.0))))
+    for t in (0.3, 0.52, 0.74):   # the heap's middle, so no gap shows the trunk
+        lumps.append((Vector((0, 0, FLOSS_FOOT + t * FLOSS_HEIGHT)), FLOSS_RADIUS * cone(t) * 0.62, Vector((t * 9.0, 1.0, 5.0))))
+
+    base = wt.Kit(1)
+    biggest = sorted(range(count), key=lambda i: -lumps[i][1])[:8 if near else 0]
+    for i in range(len(lumps)):
+        billow(base, lumps, i, 1.0, 2 if i in biggest else 1, False)
+    base.cull_buried()
+    kit.floss = base
+    if near:
+        skin = wt.Kit(2)
+        for i in range(count + 1):   # the outer billows and the tip
+            billow(skin, lumps, i, FUZZ, 1, True)
+        skin.cull_buried()
+        offset = len(base.verts)
+        base.verts.extend(skin.verts)
+        base.normals.update({k + offset: n for k, n in skin.normals.items()})
+        base.faces.extend(tuple(v + offset for v in f) for f in skin.faces)
+        base.colors.extend(skin.colors)
+        base.uvs.extend(skin.uvs)
+
+    # A few star blossoms resting on the tops of the billows.
+    def covered(p, own):
+        return any(j != own and (p - oc).length < orad * FUZZ for j, (oc, orad, _) in enumerate(lumps))
+
+    placed = 0
+    tries = 0
+    while placed < (14 if near else 4) and tries < 200:
+        tries += 1
+        i = kit.rng.randrange(count)
+        c, r, _ = lumps[i]
+        a = kit.rng.uniform(0.0, math.tau)
+        z = kit.rng.uniform(0.1, 0.9)
+        d = Vector((math.cos(a) * math.sqrt(1 - z * z), math.sin(a) * math.sqrt(1 - z * z), z))
+        if d.x * c.x + d.y * c.y < 0.0:
+            continue   # facing in toward the trunk
+        p = c + d * r * (FUZZ + 0.06)
+        if covered(p, i):
+            continue
+        roll = kit.rng.random()
+        petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.25 else STAR_BLUSH if roll < 0.5 else STAR_PEARL
+        star(kit, p, d, kit.rng.uniform(0.2, 0.3) * (1.0 if near else 1.6), petal_c, tip_c, heart_c, 0.3)
+        placed += 1
+
+
 STAR_PEARL = (hexc("FBF1DC"), hexc("FFFBF2"), hexc("F2C94C"))   # petal, tip, heart
 STAR_GOLD = (hexc("F8DF94"), hexc("FCF0C2"), hexc("E8A93A"))
 STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
 
 
 def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
-    """A five-pointed star blossom lying in the floss: a raised gold heart,
-    pale petals drawn out to points that lift a little off the sugar.
-    (Pointed on purpose: the owner's "stars on them".)"""
+    """A five-pointed star blossom resting on the floss: a raised gold heart,
+    pale petals drawn out to points that lift a little. (Pointed on purpose:
+    the owner's "stars on them".)"""
     n, side, up = sf.frame(normal)
     c = Vector(centre)
     turn = kit.rng.uniform(0.0, math.tau)
@@ -408,145 +435,22 @@ def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
         kit.face((mid, a, b), (heart_c, ca, cb), ((flex, 0.0),) * 3)
 
 
-def floss(kit, tuft, top, deep, near):
-    """Winds a tuft: its heart, the wisps laid along the winding, the fringe
-    standing off it, the pulled tails, and its stars."""
-    flex = 0.34
-    floss_heart(kit, tuft, top, deep, flex, 9 if near else 5, 10 if near else 6)
-    pale = mix(top, hexc("FFFFFF"), 0.25)
-    r = tuft.radius
-
-    def colour(t):
-        # the heart's colour at this height, a step paler
-        return mix(mix(deep, top, 0.3 + 0.55 * t ** 1.2), pale, 0.4)
-
-    # laid wisps: a spiral of cards over the whole tuft, more where it is fat
-    want = 52 if near else 10
-    placed = 0
-    i = 0
-    while placed < want:
-        i += 1
-        t = kit.rng.uniform(0.04, 0.97)
-        if kit.rng.random() > tuft.swell(t) + 0.12:
-            continue
-        a = i * 2.39996 + kit.rng.uniform(-0.3, 0.3)
-        n = tuft.normal(t, a)
-        along = tuft.winding(t, a, math.radians(kit.rng.uniform(10.0, 32.0)))
-        size = r * kit.rng.uniform(0.8, 1.15) * (1.0 if near else 1.7)
-        wisp(kit, tuft.at(t, a, kit.rng.uniform(1.0, 1.08)), along, n, size, size * kit.rng.uniform(0.44, 0.54), n,
-             colour(t), flex + 0.1 * t, lift=kit.rng.uniform(0.05, 0.32))
-        placed += 1
-    # the fringe: wisps standing out from the tuft along the winding, so every outline is threads
-    for k in range(12 if near else 3):
-        t = kit.rng.uniform(0.2, 0.92)
-        a = kit.rng.uniform(0.0, math.tau)
-        n = tuft.normal(t, a)
-        along = tuft.winding(t, a, math.radians(kit.rng.uniform(8.0, 26.0)))
-        size = r * kit.rng.uniform(0.9, 1.3)
-        wisp(kit, tuft.at(t, a, 1.1), along, along.cross(n).normalized(), size * 0.85, size * 0.38, n, mix(colour(t), hexc("FFFFFF"), 0.12), flex + 0.14)
-    # tails: sugar pulled out of the foot down the stick, and a wisp or two streaming off the top
-    for k in range(3 if near else 1):
-        a = kit.rng.uniform(0.0, math.tau)
-        n = tuft.out(a)
-        down = (-tuft.axis * 0.8 - UP * 0.5 + n * 0.25).normalized()
-        size = r * kit.rng.uniform(0.9, 1.3)
-        wisp(kit, tuft.at(0.1, a, 1.1) + down * size * 0.3, down, n, size, size * 0.3, n, mix(deep, top, 0.5), flex)
-    for k in range(2 if near else 0):
-        a = kit.rng.uniform(0.0, math.tau)
-        n = (tuft.axis * 0.5 + tuft.out(a)).normalized()
-        away = (tuft.out(a + 1.2) * 0.8 + tuft.axis * 0.6).normalized()
-        size = r * kit.rng.uniform(0.9, 1.2)
-        wisp(kit, tuft.at(0.93, a, 1.0) + away * size * 0.3, away, n, size, size * 0.34, n, pale, flex + 0.2)
-    # the stars, nestled in the floss
-    for k in range(7 if near else 2):
-        t = kit.rng.uniform(0.3, 0.97)
-        a = kit.rng.uniform(0.0, math.tau)
-        n = tuft.normal(t, a)
-        size = kit.rng.uniform(0.2, 0.32) * (1.0 if near else 1.5)
-        roll = kit.rng.random()
-        petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.22 else STAR_BLUSH if roll < 0.45 else STAR_PEARL
-        star(kit, tuft.at(t, a, 1.1), n, size, petal_c, tip_c, heart_c, flex + 0.1)
-
-
-def candyfloss_tree(kit, near):
-    kit.wisps = []
-    # The wood: a curving pearl-rose trunk, each limb a stick for its tuft.
-    bark0, bark1, stick = hexc("A9808C"), hexc("D6A9B3"), hexc("E6C6CC")
-    trunk = [Vector((0, 0, 0))]
-    lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized()
-    for z, k in ((1.1, 0.26), (2.2, -0.12), (3.1, 0.18), (3.8, 0.28)):
-        trunk.append(Vector((lean.x * k, lean.y * k, z)) + Vector((kit.rng.uniform(-0.06, 0.06), kit.rng.uniform(-0.06, 0.06), 0.0)))
-    if not near:
-        trunk = trunk[::2]
-    kit.tube(trunk, taper(len(trunk), 0.5, 0.28), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
-    top = trunk[-1]
-    limbs = 5
-    start = kit.rng.uniform(0.0, math.tau)
-    for i in range(limbs):
-        a = start + math.tau * i / limbs + kit.rng.uniform(-0.15, 0.15)
-        heading = Vector((math.cos(a), math.sin(a), 0.0))
-        low = i % 2 == 0
-        base = at(trunk, 0.82) if low else top
-        limb = sweep(kit, base, heading, 18.0 if low else 30.0, 46.0 if low else 52.0, kit.rng.uniform(3.2, 3.6) * (1.0 if low else 0.9), 5 if near else 3, 0.08)
-        kit.tube(limb, taper(len(limb), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.34)
-        foot = at(limb, 0.42)
-        # the stick: the way the limb is going, a little more upright
-        axis = ((limb[-1] - at(limb, 0.5)).normalized() + UP * 0.25).normalized()
-        length = kit.rng.uniform(2.8, 3.2)
-        ca, cb = FLOSS[i % len(FLOSS)]
-        floss(kit, Tuft(kit, foot, foot + axis * length, length * kit.rng.uniform(0.4, 0.44), 1 if i % 2 else -1), ca, cb, near)
-    # the crown: the biggest tuft, on the leader
-    lead = sweep(kit, top, lean, 80.0, 86.0, 3.0, 3 if near else 2, 0.06)
-    kit.tube(lead, taper(len(lead), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.3)
-    foot = at(lead, 0.4)
-    ca, cb = FLOSS[(limbs + 2) % len(FLOSS)]
-    floss(kit, Tuft(kit, foot, foot + (lead[-1] - foot).normalized() * 3.6, 1.5, 1), ca, cb, near)
-
-
-def wisp_object(kit, name):
-    """The wisps as their own mesh: quads with the picture's UVs, the tuft's
-    normals, the tuft's colour in COLOR.rgb and the wind flex in COLOR.a."""
-    verts, faces = [], []
-    for corners, _, _ in kit.wisps:
-        faces.append(tuple(range(len(verts), len(verts) + 4)))
-        verts.extend(tuple(p) for p, _ in corners)
-    mesh = bpy.data.meshes.new(name)
-    mesh.from_pydata(verts, [], faces)
-    mesh.update()
-    col = mesh.color_attributes.new("Col", "FLOAT_COLOR", "CORNER")
-    uv = mesh.uv_layers.new(name="UVMap")
-    for poly, (corners, _, colour) in zip(mesh.polygons, kit.wisps):
-        for k, li in enumerate(poly.loop_indices):
-            col.data[li].color = colour
-            u, v = corners[k][1]
-            uv.data[li].uv = (u, 1.0 - v)
-        poly.use_smooth = True
-    mesh.color_attributes.active_color = col
-    mesh.normals_split_custom_set_from_vertices([n for _, n, _ in kit.wisps for _ in range(4)])
-    mat = bpy.data.materials.get("woods_floss") or bpy.data.materials.new("woods_floss")
-    mesh.materials.append(mat)
-    obj = bpy.data.objects.new(name, mesh)
-    bpy.context.scene.collection.objects.link(obj)
-    return obj
-
-
-def build_wisped(species, fn, near_cap, far_cap):
-    """wt.build for a tree with wisps: near and far as usual, and
-    near_wisps / far_wisps beside them (FloraLibrary.WISPED). The caps count
-    both."""
+def build_flossed(species, fn, near_cap, far_cap):
+    """wt.build for a tree with candyfloss: near and far as usual (the wood,
+    the stars), and near_floss / far_floss beside them. The caps count both."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
     seed = sum(ord(c) * (i + 1) for i, c in enumerate(species))
     objs, report = [], []
     for name, near, cap in (("near", True, near_cap), ("far", False, far_cap)):
         kit = wt.grow(fn, seed, near, set())
-        cards = 2 * len(kit.wisps)
-        wood = wt.skin_wood(kit, min(wt.WOOD_MAX, cap - kit.tri_count() - cards - 10)) if near else 0
-        total = kit.tri_count() + cards
+        floss = kit.floss
+        wood = wt.skin_wood(kit, min(700, cap - kit.tri_count() - floss.tri_count() - 10)) if near else 0
+        total = kit.tri_count() + floss.tri_count()
         if total > cap:
             raise SystemExit("%s %s: %d tris over the %d cap" % (species, name, total, cap))
-        report.append((total, wood, len(kit.wisps)))
+        report.append((total, wood, floss.tri_count()))
         objs.append(wt.to_object(kit, name))
-        objs.append(wisp_object(kit, name + "_wisps"))
+        objs.append(wt.to_object(floss, name + "_floss"))
     path = os.path.join(OUT, species + ".glb")
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
@@ -555,11 +459,11 @@ def build_wisped(species, fn, near_cap, far_cap):
                               export_vertex_color="ACTIVE", export_all_vertex_colors=False,
                               export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
                               export_apply=False, export_animations=False)
-    print("%-14s near %5d tris (wood %4d, %3d wisps)  far %4d tris (%2d wisps)  %6.0f KB" % (
+    print("%-14s near %5d tris (wood %4d, floss %4d)  far %4d tris (floss %4d)  %6.0f KB" % (
         species, report[0][0], report[0][1], report[0][2], report[1][0], report[1][2], os.path.getsize(path) / 1024))
 
 
-WISPED = ("candyfloss_tree",)
+FLOSSED = ("candyfloss_tree",)
 
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
@@ -574,7 +478,7 @@ def main():
     only = [a for a in sys.argv[1:] if a in SPECIES] or list(SPECIES)
     for species in only:
         fn, (near_cap, far_cap) = SPECIES[species]
-        (build_wisped if species in WISPED else wt.build)(species, fn, near_cap, far_cap)
+        (build_flossed if species in FLOSSED else wt.build)(species, fn, near_cap, far_cap)
 
 
 if __name__ == "__main__":
