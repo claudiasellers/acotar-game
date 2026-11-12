@@ -1,0 +1,5 @@
+from estate-trees-explore
+quality look
+shot three res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=candy_oak_leafy
+shot close res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=candy_oak_close
+shot court res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=candy_oak_court
