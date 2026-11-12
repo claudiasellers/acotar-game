@@ -1,12 +1,25 @@
 {
+  "trees": 858,
+  "trees_per_ha": 10.6,
+  "trees_per_ha_by_form": {
+    "floor": 1.5,
+    "slope": 17.8,
+    "steep": 23.6,
+    "valley": 2.5,
+    "hollow": 0.7,
+    "crest": 0.3,
+    "knoll": 0.0,
+    "verge": 0.0
+  },
+  "densest_hectare": 61,
   "region": "hill_of_the_rite",
   "types": 28,
-  "placements": 826,
-  "placements_per_km2": 1017,
+  "placements": 827,
+  "placements_per_km2": 1018,
   "empty_cells": 0,
   "cells": 85,
   "landmarks": 4,
-  "draw_calls": 353,
-  "decor_instances": 65235,
+  "draw_calls": 652,
+  "decor_instances": 66674,
   "area_km2": 0.813
 }

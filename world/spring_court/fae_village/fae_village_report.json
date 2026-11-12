@@ -1,12 +1,28 @@
 {
+  "trees": 677,
+  "trees_per_ha": 10.0,
+  "trees_per_ha_by_form": {
+    "floor": 7.3,
+    "slope": 12.2,
+    "steep": 6.5,
+    "valley": 6.5,
+    "hollow": 7.3,
+    "crest": 10.6,
+    "knoll": 19.5,
+    "verge": 54.3,
+    "brook_bank": 13.0,
+    "river_bank": 0.8,
+    "water": 0.0
+  },
+  "densest_hectare": 46,
   "region": "fae_village",
   "types": 31,
-  "placements": 767,
-  "placements_per_km2": 1136,
+  "placements": 768,
+  "placements_per_km2": 1138,
   "empty_cells": 0,
   "cells": 72,
   "landmarks": 7,
-  "draw_calls": 464,
-  "decor_instances": 71428,
+  "draw_calls": 679,
+  "decor_instances": 72089,
   "area_km2": 0.675
 }

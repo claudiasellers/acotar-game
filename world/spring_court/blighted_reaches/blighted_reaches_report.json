@@ -1,12 +1,25 @@
 {
+  "trees": 796,
+  "trees_per_ha": 8.8,
+  "trees_per_ha_by_form": {
+    "floor": 8.9,
+    "slope": 8.9,
+    "steep": 1.6,
+    "valley": 10.6,
+    "hollow": 9.7,
+    "crest": 8.4,
+    "knoll": 3.8,
+    "verge": 4.3
+  },
+  "densest_hectare": 47,
   "region": "blighted_reaches",
   "types": 26,
-  "placements": 769,
-  "placements_per_km2": 840,
+  "placements": 771,
+  "placements_per_km2": 843,
   "empty_cells": 0,
   "cells": 96,
   "landmarks": 4,
-  "draw_calls": 198,
-  "decor_instances": 29015,
+  "draw_calls": 325,
+  "decor_instances": 29620,
   "area_km2": 0.915
 }

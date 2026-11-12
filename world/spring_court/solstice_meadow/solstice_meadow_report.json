@@ -1,12 +1,26 @@
 {
+  "trees": 420,
+  "trees_per_ha": 8.6,
+  "trees_per_ha_by_form": {
+    "floor": 2.3,
+    "slope": 40.4,
+    "steep": 6.9,
+    "valley": 0.0,
+    "hollow": 0.0,
+    "crest": 0.0,
+    "knoll": 0.0,
+    "verge": 6.8,
+    "brook_bank": 6.5
+  },
+  "densest_hectare": 51,
   "region": "solstice_meadow",
   "types": 29,
-  "placements": 550,
-  "placements_per_km2": 1111,
+  "placements": 575,
+  "placements_per_km2": 1162,
   "empty_cells": 0,
   "cells": 54,
   "landmarks": 5,
-  "draw_calls": 387,
-  "decor_instances": 77726,
+  "draw_calls": 564,
+  "decor_instances": 77957,
   "area_km2": 0.495
 }

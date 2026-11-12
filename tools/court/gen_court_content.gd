@@ -73,6 +73,15 @@ func _content(id: StringName, d: Dictionary) -> CourtRegionContent:
 	c.ambient_fx = PackedStringArray(d.get("fx", []))
 	c.blight = d.get("blight", 0.0)
 	c.sealed = d.get("sealed", false)
+	c.land = PackedStringArray(d.get("land", []))
+	for b: Array in d.get("bare", []):
+		c.bare.append(Vector3(b[0], b[1], b[2]))
+	c.knoll_tree = d.get("knoll_tree", &"")
+	var range: Array = d.get("trees_per_ha", [0.0, 0.0])
+	c.trees_per_ha = Vector2(range[0], range[1])
+	var by_form: Dictionary = d.get("form_per_ha", {})
+	for form: String in by_form:
+		c.form_per_ha[form] = Vector2(by_form[form][0], by_form[form][1])
 	c.notes = d.get("notes", "")
 	var moved := {}
 	for l: Array in d["landmarks"]:
@@ -192,6 +201,9 @@ func _decor(spec: String, c: CourtRegionContent) -> CourtDecorEntry:
 		e.scale_min = 0.8
 		e.scale_max = 1.3
 		e.max_slope = 30.0
+	for flag in flags.split(" ", false):
+		if flag.begins_with("x") and flag.substr(1).is_valid_float():
+			e.max_slope = float(flag.substr(1))
 	return e
 
 

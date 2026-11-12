@@ -52,7 +52,7 @@ and its status. Details for each item are in the phase sections further down.
 | T7 | Frame time on a dense mixed wood and the court views; sets the density ceiling | T6 | **measured**: court views hold; 150/ha does not yet (below) | median ≤ 16.6 ms, draw calls ≤ 1500; the highest density that holds goes into P2 |
 | T8 | Gate: role lineup and dense-wood render to the owner, then submit | T7 | **done**: merged M4WCT-10 (owner: "submit") | owner's yes |
 | P1 | Terrain habitats (ridge, knoll, hollow, bank, shore, verge); clearings, viewpoints and the story spots kept open | — | **done** (submitted) | GUT: habitat fractions per region; every keep-open zone has no tree in it |
-| P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | waiting | trees/ha per region and habitat in the coverage report, inside each recipe's range |
+| P2 | Region recipes on the new roles, at or under T7's ceiling | P1, T6, **T7** | **built** (on the lane; frame check and renders next): `CourtPlanting`, recipes in `court_content_table.gd`, numbers below | trees/ha per region and habitat in the coverage report, inside each recipe's range (`test_court_planting`) |
 | P3 | Depth and weenie rules; sightline tests against tree crowns | P2 | waiting | the court terrain's sightline table still passes with crowns as blockers |
 | P4 | Gate: before and after renders of the 18 views, then submit | P3, T8 | waiting | owner's yes |
 | F0 | Parked (owner, 2026-11-11): Dapplemesh "Cozy Woodland Groundcover" (Fab; painterly moss, fern, leafy plants, flowers; new seller, no reviews, AI-made) for the woodland floor. Revisit when it has reviews | — | parked | |
@@ -205,6 +205,35 @@ the terrain bake's globs (`*terrain*`, `*height*`): it reads CourtHeight's built
 clearings and path lines instead of adding to CourtHeight. A query costs about
 250 µs (form) and 50 µs (keep-open), so P2 samples the form on a grid per region on
 the worker rather than per tree.
+
+**P2 as built (2026-11-12).** `CourtPlanting` (`world/spring_court/wider/content/
+court_planting.gd`) lets a region's recipe name the landforms that take over from its
+default habitat for trees: an entry that lists `@hollow` grows in the hollows, a named
+form with no entry stays bare, `<habitat>@steep` does the same inside an authored
+habitat, `knoll_tree` stands one big tree on each knoll top and `bare` discs keep a
+place clear. The authored habitats (a copse, an orchard, the green) keep their own
+planting. The ground's shape comes from an 8 m grid of cached heights (under a second
+a region); the bands by water and paths are read exactly. No grove is planted denser
+than 80 trees a hectare (`CEILING`, T7): a habitat asked for more spreads its trees
+over more of its ground, which is also what closes a wood's canopy. Hedges and
+bank-side lines may stand closer (`BAND_CEILING`), being narrow.
+
+| Region | Recipe (terrain table) | Trees before → now | per ha | Densest hectare |
+|---|---|---|---|---|
+| Western Woods | closed ancient wood: oak, twisted oaks, a few pines; dark hollows; glades at the pads; the tower hill's crown bare | 1,047 → 5,391 | 41.7 | 88 |
+| Starlight Glen | birch and willow on the brooks, river and shores; one big oak on each knoll (45); open floor; the mound bare | 1,002 → 782 | 8.5 | 78 |
+| Village | orchard rows; hawthorn and elder hedges on the road verges; the green open | 558 → 677 | 10.0 | 46 |
+| Autumn border | red and gold woods up to 40° of slope; the crags bare | 460 → 1,275 | 19.8 | 47 |
+| Rosewild | hawthorn thickets in the hollows; hummocks (knolls, crests) open | 405 → 305 | 8.3 | 28 |
+| Solstice Meadow | oak wood on the descent; the plateau and the vast meadow open | 175 → 420 | 8.6 | 51 |
+| Hill of the Rite | oak on the foothill slopes; pines on the steep banks and the trench; the crown bald | 158 → 858 | 10.6 | 61 |
+| Blighted Reaches | dead trees, as before | 801 → 796 | 8.8 | 47 |
+| Blossom Vale | blossom rows, as before (groves now held to the ceiling) | 3,075 → 3,153 | 37.2 | 80 |
+
+`tools/court/court_tree_report.gd` prints trees per hectare by landform for every
+region (`map=<dir>` draws each region's landforms with a dot per tree). The same
+numbers are in each region's coverage report (`trees_per_ha_by_form`). The willow by
+the glen's water is still FloraLibrary's (D1).
 
 1. **Terrain habitats** from `CourtHeight`:
    - crest/ridge, knoll crown, slope by steepness, hollow, valley floor;

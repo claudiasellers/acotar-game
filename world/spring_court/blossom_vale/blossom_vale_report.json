@@ -1,12 +1,29 @@
 {
+  "trees": 3153,
+  "trees_per_ha": 37.2,
+  "trees_per_ha_by_form": {
+    "floor": 40.7,
+    "slope": 38.2,
+    "steep": 7.8,
+    "valley": 25.5,
+    "hollow": 28.5,
+    "crest": 31.2,
+    "knoll": 57.1,
+    "verge": 25.5,
+    "brook_bank": 74.4,
+    "river_bank": 14.1,
+    "shore": 43.9,
+    "water": 0.0
+  },
+  "densest_hectare": 80,
   "region": "blossom_vale",
   "types": 29,
-  "placements": 768,
-  "placements_per_km2": 896,
+  "placements": 764,
+  "placements_per_km2": 891,
   "empty_cells": 0,
   "cells": 90,
   "landmarks": 4,
-  "draw_calls": 302,
-  "decor_instances": 122577,
+  "draw_calls": 442,
+  "decor_instances": 126198,
   "area_km2": 0.858
 }

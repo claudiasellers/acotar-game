@@ -1,12 +1,28 @@
 {
+  "trees": 305,
+  "trees_per_ha": 8.3,
+  "trees_per_ha_by_form": {
+    "floor": 6.3,
+    "slope": 5.3,
+    "steep": 0.0,
+    "valley": 4.0,
+    "hollow": 47.2,
+    "crest": 4.2,
+    "knoll": 0.0,
+    "verge": 7.5,
+    "brook_bank": 25.4,
+    "shore": 24.4,
+    "water": 0.0
+  },
+  "densest_hectare": 28,
   "region": "rosewild",
   "types": 27,
-  "placements": 596,
-  "placements_per_km2": 1656,
+  "placements": 595,
+  "placements_per_km2": 1653,
   "empty_cells": 0,
   "cells": 37,
   "landmarks": 3,
-  "draw_calls": 306,
-  "decor_instances": 26318,
+  "draw_calls": 416,
+  "decor_instances": 26444,
   "area_km2": 0.36
 }

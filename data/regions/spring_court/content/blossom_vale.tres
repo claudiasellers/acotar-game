@@ -550,4 +550,7 @@ gates = Array[Dictionary]([{
 }])
 grade = &"grade_blossom_vale"
 ambient_fx = PackedStringArray("fx_cherry_petals", "fx_butterflies", "fx_pollen_motes", "fx_dandelion_seeds")
+land = PackedStringArray()
+bare = PackedVector3Array()
+trees_per_ha = Vector2(25, 50)
 notes = "Orchard valley of ever-blooming fruit trees on the Thornwater south-east of the manor; the court's breadbasket, tended by masked tenants (Keeper expansion region)."

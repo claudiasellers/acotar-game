@@ -1,12 +1,27 @@
 {
+  "trees": 1275,
+  "trees_per_ha": 19.8,
+  "trees_per_ha_by_form": {
+    "floor": 33.7,
+    "slope": 28.3,
+    "steep": 14.0,
+    "valley": 47.3,
+    "hollow": 27.7,
+    "crest": 17.6,
+    "knoll": 17.5,
+    "verge": 0.0,
+    "river_bank": 0.0,
+    "water": 0.0
+  },
+  "densest_hectare": 47,
   "region": "autumn_foothills",
   "types": 28,
-  "placements": 665,
-  "placements_per_km2": 1031,
+  "placements": 688,
+  "placements_per_km2": 1067,
   "empty_cells": 0,
   "cells": 69,
   "landmarks": 4,
-  "draw_calls": 274,
-  "decor_instances": 41244,
+  "draw_calls": 427,
+  "decor_instances": 43288,
   "area_km2": 0.645
 }

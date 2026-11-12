@@ -1,12 +1,28 @@
 {
+  "trees": 5391,
+  "trees_per_ha": 41.7,
+  "trees_per_ha_by_form": {
+    "floor": 47.2,
+    "slope": 44.2,
+    "steep": 2.0,
+    "valley": 50.0,
+    "hollow": 29.8,
+    "crest": 25.7,
+    "knoll": 33.8,
+    "verge": 6.3,
+    "river_bank": 136.7,
+    "shore": 7.1,
+    "water": 0.0
+  },
+  "densest_hectare": 88,
   "region": "western_fells",
   "types": 31,
-  "placements": 1051,
-  "placements_per_km2": 821,
+  "placements": 988,
+  "placements_per_km2": 772,
   "empty_cells": 0,
   "cells": 129,
   "landmarks": 7,
-  "draw_calls": 289,
-  "decor_instances": 120639,
+  "draw_calls": 523,
+  "decor_instances": 131192,
   "area_km2": 1.28
 }

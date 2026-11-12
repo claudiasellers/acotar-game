@@ -419,4 +419,7 @@ gates = Array[Dictionary]([{
 grade = &"grade_blight"
 ambient_fx = PackedStringArray("fx_blight_ash")
 blight = 0.85
+land = PackedStringArray()
+bare = PackedVector3Array()
+trees_per_ha = Vector2(5, 14)
 notes = "Where the blight (C) is worst: grey petals, dead glamours, silent birds. Horror region: genuinely dark, never pastel. The blight value spreads toward the court as phases advance (story lane drives it)."

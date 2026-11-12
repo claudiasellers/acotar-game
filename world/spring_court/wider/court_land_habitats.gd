@@ -77,13 +77,29 @@ static func form_at(x: float, z: float) -> int:
 		return water
 	if path_distance(x, z) < VERGE_BAND:
 		return Form.VERGE
-	var slope := slope_deg(x, z)
+	var ring := PackedFloat32Array()
+	ring.resize(8)
+	for k in 8:
+		var a := TAU * float(k) / 8.0
+		ring[k] = CourtHeight.height_at(x + cos(a) * RING, z + sin(a) * RING)
+	var wide := func() -> float:
+		var sum := 0.0
+		for k in 8:
+			var a := TAU * (float(k) + 0.5) / 8.0
+			sum += CourtHeight.height_at(x + cos(a) * WIDE_RING, z + sin(a) * WIDE_RING)
+		return sum / 8.0
+	return shape_of(h, ring, slope_deg(x, z), wide)
+
+
+## The ground's shape (FLOOR .. KNOLL) from heights already read: h at the
+## point, the eight heights round it at RING, the slope in degrees; `wide`
+## gives the mean height at WIDE_RING and is only called on gentle ground.
+## form_at reads the heights itself; CourtPlanting reads them from a grid.
+static func shape_of(h: float, ring: PackedFloat32Array, slope: float, wide: Callable) -> int:
 	var above := 0
 	var below := 0
 	var mean := 0.0
-	for k in 8:
-		var a := TAU * float(k) / 8.0
-		var hk := CourtHeight.height_at(x + cos(a) * RING, z + sin(a) * RING)
+	for hk in ring:
 		mean += hk
 		if hk < h - RISE * 0.5:
 			above += 1
@@ -99,13 +115,8 @@ static func form_at(x: float, z: float) -> int:
 		return Form.HOLLOW
 	if slope >= STEEP_DEG:
 		return Form.STEEP
-	if slope < VALLEY_SLOPE:
-		var wide := 0.0
-		for k in 8:
-			var a := TAU * (float(k) + 0.5) / 8.0
-			wide += CourtHeight.height_at(x + cos(a) * WIDE_RING, z + sin(a) * WIDE_RING)
-		if wide / 8.0 - h > VALLEY_DROP:
-			return Form.VALLEY
+	if slope < VALLEY_SLOPE and float(wide.call()) - h > VALLEY_DROP:
+		return Form.VALLEY
 	if slope >= SLOPE_DEG:
 		return Form.SLOPE
 	return Form.FLOOR

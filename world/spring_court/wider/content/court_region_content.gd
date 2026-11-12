@@ -33,6 +33,19 @@ extends Resource
 @export var blight: float = 0.0
 ## Region never unlocks in this build (the Autumn pass).
 @export var sealed: bool = false
+## Planting by the shape of the land (finish plan P2, CourtPlanting). The
+## landforms (CourtLandHabitats names) that take over from the default habitat
+## for trees: a tree entry that lists "@<form>" among its habitats grows there,
+## and a listed form with no such entry stays bare.
+@export var land: PackedStringArray = []
+## Tree-free discs, Vector3(x, z, radius): a bare mound, a bald crown.
+@export var bare: PackedVector3Array = []
+## One big tree of this decor id on the top of every knoll ("" = none).
+@export var knoll_tree: StringName = &""
+## The recipe's ranges in trees per hectare: over the whole region, and per
+## landform name (Vector2(min, max)). CourtPlanting.report() measures them.
+@export var trees_per_ha: Vector2 = Vector2.ZERO
+@export var form_per_ha: Dictionary = {}
 @export_multiline var notes: String
 
 

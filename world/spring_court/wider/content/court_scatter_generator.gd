@@ -355,6 +355,8 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places
 			if _fits(e.habitats, tag, content):
 				fits.append(di)
 				total += e.density
+		if total <= 0.0:
+			fits.clear()   # entries at density 0 (a knoll's one tree) plant nothing here
 		var table: Array = []
 		var acc := 0.0
 		for di: int in fits:
@@ -369,18 +371,23 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places
 				if content.decor[int(String(t[1]))].mesh_id == entry[1]:
 					edge.append([entry[0], t[1]])
 					break
-		var info := {"table": table, "edge": edge, "density": total / 100.0}
+		# held to the frame-time ceiling (CourtPlanting.CEILING)
+		var density := CourtPlanting.capped(total / 100.0, tag)
+		var info := {"table": table, "edge": edge, "density": density, "open": CourtPlanting.open_share(density, tag)}
 		habs[tag] = info
 		return info
 	var classify := func(p: Vector2) -> StringName:
 		if not content.owns(p):
 			return &""
-		var tag := content.habitat_at(p)
+		# the land's own habitats take over on the default ground (CourtPlanting)
+		var tag := CourtPlanting.tree_tag(content, content.habitat_at(p), p)
+		if tag == &"":
+			return &""
 		var h: Dictionary = hab_of.call(tag)
 		return tag if not h["table"].is_empty() and not LandscapeLayout.is_formal(tag) else &""
 	var weigh := func(tag: StringName, p: Vector2) -> float:
 		var h: Dictionary = hab_of.call(tag)
-		var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))
+		var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), float(h["open"]))
 		return LandscapeLayout.tree_weight(zn)
 	var means := LandscapeLayout.mean_weights(layout, r, classify, weigh)
 	# Planted rows first: a block of rows per habitat, one fruit per row patch.
@@ -401,19 +408,27 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places
 		if not info["table"].is_empty():
 			# Default ground that is planted: rows in parcels (the stand map's
 			# groves), meadow strips between them.
-			var open := LandscapeLayout.open_share(info["density"])
+			var open := float(info["open"])
 			for p in LandscapeLayout.rows(content.seed, content.default_habitat, r, info["density"] / (1.0 - open)):
 				if content.owns(p) and content.habitat_at(p) == content.default_habitat \
 						and LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), open)["grove"] > 0.5:
 					var di := int(String(LandscapeLayout.pick(info["table"], clampf((layout["patch"] as FastNoiseLite).get_noise_2d(p.x, p.y) * 0.5 + 0.5, 0.0, 0.9999))))
 					_add_tree(content, layers, layout, di, p, hash([content.seed, "row", p]), 0.6)
+	# One big tree on the top of each knoll (finish plan P2: small landmarks).
+	if content.knoll_tree != &"":
+		for di: int in layers:
+			if content.decor[di].mesh_id == content.knoll_tree:
+				for top in CourtPlanting.knoll_tops(content):
+					if CourtPlanting.tree_tag(content, content.habitat_at(top), top) != &"":
+						_add_tree(content, layers, layout, di, top, hash([content.seed, "knoll", top]), 1.0, true)
+				break
 	# Specimen clumps in the open.
 	var open_at := func(p: Vector2) -> float:
 		var tag: StringName = classify.call(p)
 		if tag == &"":
 			return 0.0
 		var h: Dictionary = hab_of.call(tag)
-		return 1.0 - LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))["grove"]
+		return 1.0 - LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), float(h["open"]))["grove"]
 	var rate_at := func(p: Vector2) -> float:
 		var tag: StringName = classify.call(p)
 		if tag == &"":
@@ -451,7 +466,7 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places
 			if tag == &"":
 				continue
 			var h: Dictionary = hab_of.call(tag)
-			var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), LandscapeLayout.open_share(h["density"]))
+			var zn := LandscapeLayout.zone(LandscapeLayout.stand_at(layout, p.x, p.y), float(h["open"]))
 			if roll >= h["density"] * cell * cell * LandscapeLayout.tree_weight(zn) / float(means.get(tag, 1.0)):
 				continue
 			var di := int(String(LandscapeLayout.tree_species(layout, h["table"], h["edge"], p.x, p.y, zn["edge"], r1, r2)))
@@ -461,7 +476,7 @@ static func _tree_layers(content: CourtRegionContent, layers: Dictionary, places
 ## One tree of entry `di` at p if the ground and spacing allow; `size` < 1
 ## skews its scale towards the entry's minimum.
 static func _add_tree(content: CourtRegionContent, layers: Dictionary, layout: Dictionary, di: int, p: Vector2,
-		tree_seed: int, size: float) -> void:
+		tree_seed: int, size: float, biggest: bool = false) -> void:
 	var e := content.decor[di]
 	if MacroHeight.distance_to_river(p.x, p.y) < MacroHeight.RIVER_HALF_WIDTH + 1.0 and not e.habitats.has("river"):
 		return
@@ -483,7 +498,9 @@ static func _add_tree(content: CourtRegionContent, layers: Dictionary, layout: D
 	rng.seed = tree_seed
 	var hab := content.habitat_at(p)
 	var layer: ScatterLayer = layers[di]
-	layer.add(Vector3(p.x, _ground_y(content, hab, p), p.y), rng.randf() * TAU, lerpf(e.scale_min, e.scale_max, rng.randf() * size))
+	var yaw := rng.randf() * TAU
+	var sc := e.scale_max * 1.15 if biggest else lerpf(e.scale_min, e.scale_max, rng.randf() * size)
+	layer.add(Vector3(p.x, _ground_y(content, hab, p), p.y), yaw, sc)
 
 
 ## Report in the keys tools/world_smoke.gd reads, over the region's own cells.
@@ -505,9 +522,23 @@ static func report(content: CourtRegionContent, forage: Array[ScatterLayer], dec
 			empty += 1
 	var area := content.area_m2()
 	var decor_instances := 0
+	var tree_layers: Array[ScatterLayer] = []
 	for layer in decor:
 		decor_instances += layer.count()
+		# near and mid steps hold the same trees: count the near (or the one) layer
+		if layer.tags.has("tree") and layer.draw_from <= 0.0:
+			tree_layers.append(layer)
+	# Planting against the land (finish plan P2; the recipe's ranges are the content's).
+	var planting := CourtPlanting.report(content, tree_layers, 16.0)
+	var by_form := {}
+	for f in CourtLandHabitats.NAMES.size():
+		if float(planting["form_ha"][f]) > 0.05:
+			by_form[String(CourtLandHabitats.NAMES[f])] = snappedf(float(planting["form_per_ha"][f]), 0.1)
 	return {
+		"trees": planting["trees"],
+		"trees_per_ha": snappedf(float(planting["per_ha"]), 0.1),
+		"trees_per_ha_by_form": by_form,
+		"densest_hectare": planting["densest_ha"],
 		"region": String(content.region_id),
 		"types": types.size(),
 		"placements": placements,
@@ -564,7 +595,7 @@ static func _open_for(content: CourtRegionContent, tag: StringName) -> float:
 	for e in content.decor:
 		if e.is_tree and _fits(e.habitats, tag, content):
 			total += e.density
-	return LandscapeLayout.open_share(total / 100.0) if total > 0.0 else 2.0
+	return CourtPlanting.open_share(CourtPlanting.capped(total / 100.0)) if total > 0.0 else 2.0
 
 
 ## (open, edge, core) shares at `p` for the habitat there.
