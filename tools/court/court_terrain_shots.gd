@@ -514,11 +514,19 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		# set: the court's tree set (CourtTreeSet), its builds and its three
 		# detail steps at the game's own distances; old: FloraLibrary's trees.
 		# The builds the Western Woods plants (CourtTreeSet.region_builds).
-		var chosen := CourtTreeSet.region_builds(StringName("woods_" + String(sp)), &"western_fells") if kind == "set" else PackedInt32Array()
+		var chosen := CourtTreeSet.region_builds(StringName("woods_" + String(sp)), &"western_fells") if kind.begins_with("set") else PackedInt32Array()
+		# set_qtz / set_ez: only one pack's builds (where the frame time goes).
+		if kind == "set_qtz" or kind == "set_ez":
+			var keep := PackedInt32Array()
+			var models: Array = CourtTreeSet.ROLES[CourtTreeSet.role(StringName("woods_" + String(sp)))]["builds"]
+			for b in CourtTreeSet.builds(StringName("woods_" + String(sp))):
+				if String(models[b]).begins_with(kind.substr(4) + "/"):
+					keep.append(b)
+			chosen = keep if not keep.is_empty() else chosen
 		var nb := chosen.size()
 		var v := chosen[rng.randi() % nb] if nb > 0 else 0
 		var step := 0 if r < CourtTreeSet.NEAR else (1 if r < 260.0 else 2)
-		if kind != "set" or nb == 0:
+		if not kind.begins_with("set") or nb == 0:
 			step = 2 if r > 260.0 else 0
 		var key := "%s@%d@%d" % [sp, v, step]
 		if not buckets.has(key):
@@ -530,7 +538,7 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		var step := int(key.get_slice("@", 2))
 		var far := step == 2
 		var mesh: Mesh
-		if kind == "set" and CourtTreeSet.builds(StringName("woods_" + String(sp))) > 0:
+		if kind.begins_with("set") and CourtTreeSet.builds(StringName("woods_" + String(sp))) > 0:
 			mesh = CourtTreeSet.mesh(StringName("woods_" + String(sp)), int(key.get_slice("@", 1)), step)
 		else:
 			mesh = FloraLibrary.far_mesh(sp) if far else FloraLibrary.mesh(sp)
@@ -545,7 +553,7 @@ func _forest(world: World, eye: Vector3, kind: String) -> void:
 		mmi.multimesh = mm
 		# As the game: only the near step casts shadows (the tree set's mid and
 		# far, FloraLibrary's impostors).
-		if step > 0 and (kind == "set" or far):
+		if step > 0 and (kind.begins_with("set") or far):
 			mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		world.add_child(mmi)
 		total += xs.size()
