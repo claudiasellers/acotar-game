@@ -325,7 +325,7 @@ def tile_sheet(tiles, path, cols, tile=640, tmp=None):
 
 def run_family(builders, out_dir, manifest, argv, sheets=None, caps=None):
     """The shared main for a family of single-mesh props.
-    builders: id -> (fn(prop), (w, h, d) metres, meta dict).
+    builders: id -> (fn(prop), (w, h, d) metres or None for as-modelled, meta dict).
     sheets: [(file name, [ids], cols, az, el, dark)] for --sheet DIR."""
     caps = caps or {}
     if "--sheet" in argv:
@@ -337,7 +337,8 @@ def run_family(builders, out_dir, manifest, argv, sheets=None, caps=None):
             for pid in ids:
                 p = Prop(pid)
                 builders[pid][0](p)
-                p.fit(builders[pid][1])
+                if builders[pid][1]:
+                    p.fit(builders[pid][1])
                 tiles.append(([p.to_object(pid)], az, el))
             preview_materials()
             studio(ground_z=0.0, dark=dark)
@@ -354,6 +355,8 @@ def run_family(builders, out_dir, manifest, argv, sheets=None, caps=None):
         fn(p)
         lo_, hi_ = p.bounds()
         ext = hi_ - lo_
+        if size is None:       # modelled at true size: only centre it on its base
+            size = (round(ext.x, 3), round(ext.z, 3), round(ext.y, 3))
         sc = (size[0] / ext.x, size[1] / ext.z, size[2] / ext.y)
         p.fit(size)
         ob, lo = finish_single(p, pid)

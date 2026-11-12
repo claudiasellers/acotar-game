@@ -1,0 +1,395 @@
+{
+ "assets": [
+  {
+   "bytes": 167648,
+   "canon": "C",
+   "file": "trunk_gold.glb",
+   "id": "trunk_gold",
+   "scene": "return",
+   "size_m": [
+    1.121,
+    1.045,
+    1.173
+   ],
+   "tris": 2660,
+   "tris_lod1": 1330
+  },
+  {
+   "bytes": 119688,
+   "canon": "C",
+   "file": "trunk_gowns.glb",
+   "id": "trunk_gowns",
+   "scene": "return",
+   "size_m": [
+    1.043,
+    1.096,
+    0.955
+   ],
+   "tris": 2550,
+   "tris_lod1": 1269
+  },
+  {
+   "bytes": 19908,
+   "canon": "C",
+   "file": "raw_ruby.glb",
+   "id": "raw_ruby",
+   "scene": "return",
+   "size_m": [
+    0.059,
+    0.071,
+    0.065
+   ],
+   "tris": 80,
+   "tris_lod1": 48
+  },
+  {
+   "bytes": 37516,
+   "canon": "C",
+   "file": "gold_scale.glb",
+   "id": "gold_scale",
+   "scene": "return",
+   "size_m": [
+    0.356,
+    0.275,
+    0.15
+   ],
+   "tris": 682,
+   "tris_lod1": 334
+  },
+  {
+   "bytes": 141828,
+   "canon": "C",
+   "file": "tulip_bed.glb",
+   "id": "tulip_bed",
+   "scene": "return",
+   "size_m": [
+    1.81,
+    0.648,
+    1.81
+   ],
+   "tris": 2464,
+   "tris_lod1": 1232
+  },
+  {
+   "bytes": 57276,
+   "canon": "C",
+   "file": "dug_plot.glb",
+   "id": "dug_plot",
+   "scene": "return",
+   "size_m": [
+    1.5,
+    1.101,
+    1.5
+   ],
+   "tris": 1162,
+   "tris_lod1": 577
+  },
+  {
+   "bytes": 86080,
+   "canon": "C",
+   "file": "bulb_crate.glb",
+   "id": "bulb_crate",
+   "scene": "return",
+   "size_m": [
+    0.814,
+    0.33,
+    0.423
+   ],
+   "tris": 1758,
+   "tris_lod1": 878
+  },
+  {
+   "bytes": 48912,
+   "canon": "C",
+   "file": "watering_can.glb",
+   "id": "watering_can",
+   "scene": "return",
+   "size_m": [
+    0.668,
+    0.44,
+    0.308
+   ],
+   "tris": 917,
+   "tris_lod1": 451
+  },
+  {
+   "bytes": 55876,
+   "canon": "C",
+   "file": "garden_trug.glb",
+   "id": "garden_trug",
+   "scene": "return",
+   "size_m": [
+    0.675,
+    0.417,
+    0.54
+   ],
+   "tris": 1138,
+   "tris_lod1": 569
+  },
+  {
+   "bytes": 24024,
+   "canon": "C",
+   "file": "iron_bracelet.glb",
+   "id": "iron_bracelet",
+   "scene": "return",
+   "size_m": [
+    0.075,
+    0.012,
+    0.063
+   ],
+   "tris": 472,
+   "tris_lod1": 236
+  },
+  {
+   "bytes": 134980,
+   "canon": "X",
+   "file": "ball_flower_stand.glb",
+   "id": "ball_flower_stand",
+   "scene": "return",
+   "size_m": [
+    0.756,
+    1.899,
+    0.74
+   ],
+   "tris": 1968,
+   "tris_lod1": 984
+  },
+  {
+   "bytes": 136444,
+   "canon": "X",
+   "file": "estate_gate.glb",
+   "id": "estate_gate",
+   "scene": "return",
+   "size_m": [
+    4.96,
+    3.32,
+    0.76
+   ],
+   "tris": 2819,
+   "tris_lod1": 1409
+  },
+  {
+   "bytes": 46856,
+   "canon": "C",
+   "file": "supply_satchel.glb",
+   "id": "supply_satchel",
+   "scene": "return",
+   "size_m": [
+    0.641,
+    0.561,
+    0.249
+   ],
+   "tris": 1024,
+   "tris_lod1": 512
+  },
+  {
+   "bytes": 182544,
+   "canon": "C",
+   "file": "garden_tangle.glb",
+   "id": "garden_tangle",
+   "scene": "return",
+   "size_m": [
+    1.784,
+    0.994,
+    1.5
+   ],
+   "tris": 2340,
+   "tris_lod1": 1158
+  },
+  {
+   "bytes": 54784,
+   "canon": "C",
+   "file": "cottage_window_cracked.glb",
+   "id": "cottage_window_cracked",
+   "scene": "return",
+   "size_m": [
+    0.7,
+    0.7,
+    0.07
+   ],
+   "tris": 1092,
+   "tris_lod1": 544
+  },
+  {
+   "bytes": 164892,
+   "canon": "X",
+   "file": "beddor_ruin.glb",
+   "horror": true,
+   "id": "beddor_ruin",
+   "scene": "return",
+   "size_m": [
+    5.324,
+    5.375,
+    4.273
+   ],
+   "tris": 2888,
+   "tris_lod1": 1444
+  },
+  {
+   "bytes": 39020,
+   "canon": "C",
+   "file": "door_shattered.glb",
+   "horror": true,
+   "id": "door_shattered",
+   "scene": "pass",
+   "size_m": [
+    1.392,
+    2.532,
+    1.629
+   ],
+   "tris": 664,
+   "tris_lod1": 326
+  },
+  {
+   "bytes": 98232,
+   "canon": "C",
+   "file": "table_wrecked.glb",
+   "horror": true,
+   "id": "table_wrecked",
+   "scene": "pass",
+   "size_m": [
+    5.124,
+    0.954,
+    2.389
+   ],
+   "tris": 2084,
+   "tris_lod1": 1041
+  },
+  {
+   "bytes": 108724,
+   "canon": "C",
+   "file": "curtain_shredded.glb",
+   "horror": true,
+   "id": "curtain_shredded",
+   "scene": "pass",
+   "size_m": [
+    2.779,
+    3.127,
+    0.64
+   ],
+   "tris": 2342,
+   "tris_lod1": 1143
+  },
+  {
+   "bytes": 44752,
+   "canon": "C",
+   "file": "glass_shards.glb",
+   "horror": true,
+   "id": "glass_shards",
+   "scene": "pass",
+   "size_m": [
+    1.626,
+    0.078,
+    1.524
+   ],
+   "tris": 664,
+   "tris_lod1": 286
+  },
+  {
+   "bytes": 53156,
+   "canon": "C",
+   "decal": "wall",
+   "file": "claw_gouges.glb",
+   "horror": true,
+   "id": "claw_gouges",
+   "scene": "pass",
+   "size_m": [
+    1.305,
+    1.336,
+    0.057
+   ],
+   "tris": 835,
+   "tris_lod1": 417
+  },
+  {
+   "bytes": 21688,
+   "canon": "C",
+   "decal": "floor",
+   "file": "blood_puddle.glb",
+   "horror": true,
+   "id": "blood_puddle",
+   "scene": "pass",
+   "size_m": [
+    1.986,
+    0.007,
+    1.723
+   ],
+   "tris": 201,
+   "tris_lod1": 120
+  },
+  {
+   "bytes": 58176,
+   "canon": "C",
+   "decal": "wall",
+   "file": "blood_smear_wall.glb",
+   "horror": true,
+   "id": "blood_smear_wall",
+   "scene": "pass",
+   "size_m": [
+    1.27,
+    1.379,
+    0.005
+   ],
+   "tris": 802,
+   "tris_lod1": 400
+  },
+  {
+   "bytes": 45648,
+   "canon": "C",
+   "file": "alis_satchel.glb",
+   "id": "alis_satchel",
+   "scene": "pass",
+   "size_m": [
+    0.921,
+    0.565,
+    0.93
+   ],
+   "tris": 926,
+   "tris_lod1": 461
+  },
+  {
+   "bytes": 28208,
+   "canon": "C",
+   "file": "dagger.glb",
+   "id": "dagger",
+   "scene": "pass",
+   "size_m": [
+    0.104,
+    0.34,
+    0.026
+   ],
+   "tris": 586,
+   "tris_lod1": 291
+  },
+  {
+   "bytes": 78404,
+   "canon": "C",
+   "file": "cave_mouth_pass.glb",
+   "horror": true,
+   "id": "cave_mouth_pass",
+   "scene": "pass",
+   "size_m": [
+    8.639,
+    8.009,
+    4.978
+   ],
+   "tris": 1020,
+   "tris_lod1": 510
+  },
+  {
+   "bytes": 30172,
+   "canon": "X",
+   "file": "shrine_stone_worn.glb",
+   "horror": true,
+   "id": "shrine_stone_worn",
+   "scene": "pass",
+   "size_m": [
+    1.005,
+    1.874,
+    0.701
+   ],
+   "tris": 558,
+   "tris_lod1": 275
+  }
+ ]
+}
