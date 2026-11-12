@@ -77,6 +77,20 @@ def finish(cv):
     return Image.fromarray(img.astype(np.uint8), "RGBA"), float(m.mean())
 
 
+# the leaves under the blossom: the estate's fresh mint (the court's deeper
+# greens speckle a white crown dark from a distance)
+LEAF_SHADE, LEAF_MID, LEAF_LIGHT = (0.38, 0.64, 0.44), (0.56, 0.8, 0.54), (0.78, 0.94, 0.68)
+
+
+def soft_leaf(cv, at, ang, length, width, rng):
+    tone = rng.uniform(-0.15, 0.15)
+    out = B.leaf_outline("aspen", length, width, rng)
+    cv.poly(B.place(out, at, ang), B.rgb(B.mix(LEAF_SHADE, LEAF_MID, 0.4 + tone)))
+    cv.poly(B.place([(x * 0.92 + length * 0.08, y * 0.78) for x, y in out], at, ang), B.rgb(B.mix(LEAF_MID, LEAF_LIGHT, 0.2 + tone)))
+    cv.poly(B.place([(x * 0.55 + length * 0.42, y * 0.5 + width * 0.06) for x, y in out], at, ang), B.rgb(B.mix(LEAF_MID, LEAF_LIGHT, 0.8 + tone)))
+    cv.line(B.place([(length * 0.05, 0), (length * 0.85, 0)], at, ang), max(1.0, width * 0.05), B.rgb(LEAF_SHADE))
+
+
 def blossom_clump(cv, rng, kind):
     """Blossoms over a few leaves: the shaded heart first, the sunlit rim last."""
     cols, n, leaves, buds, bud_col = BLOSSOMS[kind]
@@ -85,7 +99,7 @@ def blossom_clump(cv, rng, kind):
         a = k * 2.39996 + rng.uniform(-0.3, 0.3)
         r = rad * (0.45 + 0.6 * math.sqrt((k + 0.5) / leaves))
         at = (cx + r * 0.72 * math.cos(a), cy + r * 0.72 * math.sin(a))
-        B.leaf(cv, "aspen", at, a + rng.uniform(-0.5, 0.5), rng.uniform(52, 70), rng.uniform(26, 34), rng)
+        soft_leaf(cv, at, a + rng.uniform(-0.5, 0.5), rng.uniform(52, 70), rng.uniform(26, 34), rng)
     spots = []
     for k in range(n):
         r = rad * math.sqrt((k + 0.5) / n) * rng.uniform(0.92, 1.06)

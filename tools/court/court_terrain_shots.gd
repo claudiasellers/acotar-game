@@ -334,8 +334,8 @@ const CANDY_LEAFY := {
 	&"pear_tree": [Color(0.34, 0.60, 0.40), Color(0.56, 0.80, 0.50), Color(0.82, 0.94, 0.64)],
 	&"willow": [Color(0.33, 0.60, 0.46), Color(0.52, 0.80, 0.52), Color(0.80, 0.95, 0.66)],
 	&"cherry_blossom": [Color(0.80, 0.42, 0.60), Color(0.96, 0.66, 0.80), Color(1.0, 0.9, 0.95)],
-	&"apple_blossom": [Color(0.80, 0.60, 0.66), Color(0.97, 0.86, 0.88), Color(1.0, 0.98, 0.97)],
-	&"crab_apple": [Color(0.82, 0.66, 0.70), Color(0.98, 0.92, 0.92), Color(1.0, 0.99, 0.98)],
+	&"apple_blossom": [Color(0.88, 0.72, 0.76), Color(0.98, 0.9, 0.91), Color(1.0, 0.98, 0.97)],
+	&"crab_apple": [Color(0.9, 0.78, 0.8), Color(0.99, 0.94, 0.94), Color(1.0, 0.99, 0.98)],
 }
 const CANDY_BLOSSOM: Array[StringName] = [&"cherry_blossom", &"apple_blossom", &"crab_apple"]
 
