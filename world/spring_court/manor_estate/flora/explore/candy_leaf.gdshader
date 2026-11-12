@@ -30,7 +30,7 @@ uniform float tree_value_spread : hint_range(0.0, 0.3) = 0.08;
 #define CANDY_WRAP_DEFAULT 0.5
 #define CANDY_SHADE_DEFAULT vec4(0.62, 0.55, 0.78, 1.0)
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.86, 0.72, 1.0)
-#define CANDY_RIM_STRENGTH_DEFAULT 0.6
+#define CANDY_RIM_STRENGTH_DEFAULT 0.2
 #define CANDY_NO_SPEC_LOBE
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
@@ -52,7 +52,8 @@ void vertex() {
 void fragment() {
 	vec3 col;
 	if (part == 0) {
-		col = bark_col.rgb * mix(1.0, dot(texture(tex, UV).rgb, vec3(0.3, 0.59, 0.11)) / bark_mean, 0.75);
+		// the texture is read as colour (linear): back to its painted value
+		col = bark_col.rgb * mix(1.0, pow(dot(texture(tex, UV).rgb, vec3(0.3, 0.59, 0.11)), 0.4545) / bark_mean, 0.8);
 	} else {
 		// A card seen from behind keeps its puff's normal: the crown shades
 		// as clouds whichever way a card faces.
@@ -65,9 +66,9 @@ void fragment() {
 			vec4 t = texture(tex, UV);
 			ALPHA = t.a;
 			ALPHA_SCISSOR_THRESHOLD = 0.5;
-			float v = dot(t.rgb, vec3(0.3, 0.59, 0.11));
+			float v = pow(dot(t.rgb, vec3(0.3, 0.59, 0.11)), 0.4545);
 			// lighter on a puff's top and up the tree, deeper underneath
-			float k = clamp(v * 1.6 * (0.56 + 0.26 * v_height + 0.42 * v_up), 0.0, 1.0);
+			float k = clamp(v * 1.5 * (0.56 + 0.26 * v_height + 0.42 * v_up), 0.0, 1.0);
 			k = floor(k * bands + 0.5) / bands * 0.7 + k * 0.3;
 			col = k < 0.5 ? mix(shadow_col.rgb, mid_col.rgb, k * 2.0) : mix(mid_col.rgb, light_col.rgb, (k - 0.5) * 2.0);
 		}
