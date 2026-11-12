@@ -16,6 +16,12 @@ magnolia   A saucer magnolia in full flower on bare pearl wood: a short
            upright. Open stars of nine petals at the top of the crown,
            goblets below them, pointed buds on the spurs along the limbs.
            Each petal is rose at its foot, blush, then pearl at its tip.
+candyfloss_tree
+           Cotton candy on a curving pearl-rose trunk: seven billowing clouds
+           of spun sugar (blush, rose, lilac, pearl, peach; pale on top, the
+           colour gathering underneath), each with smaller puffs on its
+           shoulders, scattered with five-pointed star blossoms in pearl,
+           blush and gold.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
@@ -286,8 +292,154 @@ def magnolia_harlequin(kit, near):
     magnolia(kit, near, HARLEQUIN, HARLEQUIN_ODDS)
 
 
+# ------------------------------------------------------ candyfloss tree ----
+
+def cloud(kit, centre, radius, squash, top, bottom, subdiv, flex, lump, fixed=False):
+    """A cotton-candy cloud: Kit.blob's lumpy icosphere (same shading, same
+    part in the crown's budget and burial), but it hands back how far its
+    surface stands out in any direction, so the stars can sit on it."""
+    if not fixed and len(kit.blob_radii) in kit.fine:
+        subdiv = min(2, subdiv + 1)
+    # (a fixed cloud is listed as already fine, so the build never refines it:
+    # the small puffs stay light and the wood keeps its share of the budget)
+    kit.blob_radii.append((radius, 2 if fixed else subdiv))
+    verts, faces = wt.icosphere(subdiv)
+    first = len(kit.faces)
+    seed = Vector((kit.rng.random() * 50, kit.rng.random() * 50, kit.rng.random() * 50))
+    tint = kit.rng.uniform(-0.04, 0.04)
+    c = Vector(centre)
+
+    def surface(d):
+        r = radius * (1.0 + lump * wt.noise.noise(d * 1.8 + seed))
+        return c + Vector((d.x * r, d.y * r, d.z * r * squash))
+
+    idx, cols = [], []
+    for v in verts:
+        idx.append(kit.add_vert(surface(v)))
+        kit.normals[idx[-1]] = Vector((v.x, v.y, v.z / max(squash, 0.05))).normalized()
+        h = (v.z + 1.0) * 0.5
+        # spun sugar: pale on top, the deep colour gathering underneath, faint swirls
+        swirl = 0.05 * math.sin(v.z * 7.0 + math.atan2(v.y, v.x) * 2.0 + seed.x)
+        cols.append(wt.shade(mix(bottom, top, h ** 0.75), 1.0 + tint + swirl))
+    for f in faces:
+        kit.face(tuple(idx[i] for i in f), tuple(cols[i] for i in f), tuple((flex, 0.0) for _ in f))
+    kit.blobs.append((c, radius, squash, lump, first, len(kit.faces)))
+    return {"centre": c, "radius": radius, "squash": squash, "surface": surface}
+
+
+def star(kit, centre, normal, radius, petal, tip, heart, flex):
+    """A five-pointed star blossom lying on a cloud: a raised gold heart,
+    pale petals drawn out to points that lift a little off the sugar.
+    (Pointed on purpose: the owner's "stars on them".)"""
+    n, side, up = sf.frame(normal)
+    c = Vector(centre)
+    turn = kit.rng.uniform(0.0, math.tau)
+    mid = kit.add_vert(c + n * radius * 0.16)
+    kit.normals[mid] = n.copy()
+    ring = []
+    for i in range(10):
+        a = turn + math.tau * i / 10
+        d = side * math.cos(a) + up * math.sin(a)
+        point = i % 2 == 0
+        v = kit.add_vert(c + d * radius * (1.0 if point else 0.4) + n * radius * (0.2 if point else 0.03))
+        kit.normals[v] = (n * 0.9 + d * 0.3).normalized()
+        ring.append((v, tip if point else petal))
+    for i in range(10):
+        (a, ca), (b, cb) = ring[i], ring[(i + 1) % 10]
+        kit.face((mid, a, b), (heart, ca, cb), ((flex, 0.0),) * 3)
+
+
+# Clouds, top colour then the deep colour underneath.
+FLOSS = [
+    (hexc("FAD4DC"), hexc("F08DB2")),   # blush over rose
+    (hexc("F7B3CB"), hexc("E86AA0")),   # rose over hot pink
+    (hexc("E9D6F7"), hexc("B892E6")),   # pale lilac over lilac
+    (hexc("FBF1EE"), hexc("F4A6C0")),   # pearl over blush
+    (hexc("FBD9C8"), hexc("F28FA0")),   # peach over rose
+]
+STAR_PEARL = (hexc("FBF1DC"), hexc("FFFBF2"), hexc("F2C94C"))   # petal, tip, heart
+STAR_GOLD = (hexc("F8DF94"), hexc("FCF0C2"), hexc("E8A93A"))
+STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
+
+
+def candyfloss_tree(kit, near):
+    # The wood: a curving pearl-rose trunk, limbs sweeping out and up to each cloud.
+    bark0, bark1 = hexc("8E6A78"), hexc("C99AA6")
+    trunk = [Vector((0, 0, 0))]
+    lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized()
+    for i, (z, k) in enumerate(((1.3, 0.28), (2.6, -0.12), (3.7, 0.2), (4.5, 0.3))):
+        trunk.append(Vector((lean.x * k, lean.y * k, z)) + Vector((kit.rng.uniform(-0.06, 0.06), kit.rng.uniform(-0.06, 0.06), 0.0)))
+    if not near:
+        trunk = trunk[::2]
+    kit.tube(trunk, taper(len(trunk), 0.44, 0.24), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
+    top = trunk[-1]
+    seats = []   # (centre, radius, palette index)
+    limbs = 6
+    start = kit.rng.uniform(0.0, math.tau)
+    for i in range(limbs):
+        a = start + math.tau * i / limbs + kit.rng.uniform(-0.25, 0.25)
+        heading = Vector((math.cos(a), math.sin(a), 0.0))
+        low = i % 2 == 0
+        base = at(trunk, 0.8) if low else top
+        limb = sweep(kit, base, heading, 26.0 if low else 44.0, 62.0, kit.rng.uniform(2.5, 3.0) * (1.0 if low else 0.85), 4 if near else 2, 0.12)
+        kit.tube(limb, taper(len(limb), 0.2, 0.08), 6 if near else 4, bark1, hexc("D9AEB8"), 0.1, 0.35)
+        r = kit.rng.uniform(1.5, 1.85)
+        seats.append((limb[-1] + UP * r * 0.45, r, i))
+    crown = sweep(kit, top, lean, 78.0, 86.0, 1.5, 2, 0.08)
+    kit.tube(crown, taper(len(crown), 0.2, 0.1), 6 if near else 4, bark1, hexc("D9AEB8"), 0.1, 0.3)
+    seats.append((crown[-1] + UP * 1.0, 2.05, limbs + 1))
+
+    clouds = []   # (cloud, palette, main?)
+    for centre, r, i in seats:
+        ca, cb = FLOSS[i % len(FLOSS)]
+        flex = 0.36
+        clouds.append((cloud(kit, centre, r, 0.84, ca, cb, 1, flex, 0.11), (ca, cb), True))
+        # the billows: smaller puffs of the same sugar on its shoulders
+        out = flat(centre - top)
+        for k in range(2 if near else 1):
+            a = kit.rng.uniform(0.3, 1.3) * (1 if k else -1)
+            d = (out * math.cos(a) + Vector((-out.y, out.x, 0.0)) * math.sin(a)).normalized()
+            rr = r * kit.rng.uniform(0.48, 0.6)
+            pos = centre + d * r * 0.78 + UP * r * kit.rng.uniform(-0.18, 0.42)
+            clouds.append((cloud(kit, pos, rr, 0.88, mix(ca, hexc("FFFFFF"), 0.25), mix(cb, ca, 0.3), 1 if near else 0, flex + 0.05, 0.1, True), (ca, cb), False))
+
+    # The stars: scattered over the tops and shoulders of the clouds, bigger on
+    # the crowns, never where another cloud covers them.
+    def covered(p, own):
+        for other, _, _ in clouds:
+            if other is own:
+                continue
+            q = p - other["centre"]
+            q = Vector((q.x, q.y, q.z / other["squash"]))
+            if q.length < other["radius"] * 0.98:
+                return True
+        return False
+
+    for c, _, main in clouds:
+        want = (9 if main else 3) if near else (3 if main else 0)
+        placed = 0
+        tries = 0
+        while placed < want and tries < want * 6:
+            tries += 1
+            a = kit.rng.uniform(0.0, math.tau)
+            z = kit.rng.uniform(-0.15, 1.0) ** 1.0
+            z = max(-0.15, min(0.98, z))
+            ring_r = math.sqrt(max(0.0, 1.0 - z * z))
+            d = Vector((math.cos(a) * ring_r, math.sin(a) * ring_r, z))
+            p = c["surface"](d)
+            if covered(p, c):
+                continue
+            n = Vector((d.x, d.y, d.z / c["squash"])).normalized()
+            size = (kit.rng.uniform(0.2, 0.3) + 0.14 * max(z, 0.0)) * (1.0 if main else 0.8) * (1.0 if near else 1.5)
+            roll = kit.rng.random()
+            petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.2 else STAR_BLUSH if roll < 0.4 else STAR_PEARL
+            star(kit, p + n * 0.03, n, size, petal_c, tip_c, heart_c, 0.42)
+            placed += 1
+
+
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
+    "candyfloss_tree": (candyfloss_tree, SPECIAL),
     "magnolia_harlequin": (magnolia_harlequin, SPECIAL),
 }
 
