@@ -1,0 +1,4 @@
+from special-trees
+quality look
+shot near res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candyfloss floss_multi=1
+shot far res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candyfloss_far floss_multi=1
