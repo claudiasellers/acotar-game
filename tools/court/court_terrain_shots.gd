@@ -428,7 +428,7 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				var step := int(item.get_slice(":", 3)) if item.get_slice_count(":") > 3 else 0
 				mi.mesh = CourtTreeSet.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)), step)
 			elif item.begins_with("estate:"):
-				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)))
+				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
 			elif item.begins_with("ez:"):
 				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
 				mi.mesh = ez[0]

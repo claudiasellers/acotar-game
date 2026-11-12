@@ -556,6 +556,150 @@ def tree(p, h, col, rng, kind):
                  fine=fine)
 
 
+# ------------------------------------------------------------ tree builds (wider-court D2)
+#
+# The estate keeps its cotton-candy trees (owner, 2026-11-12: "i love the
+# cotton candy honestly i just want to refine them"). Build 0 is tree() above,
+# unchanged; builds 1 and 2 are the same puffed crowns grown to a different
+# habit, so neighbours stop being clones: an upright crown and a spreading,
+# leaning one, a forked trunk on some, the crown thrown to one side on others.
+# Exported as <species>_b<n>.glb; FloraLib.mesh(species, build) loads them and
+# the scatter hands neighbours different builds (ManorScatter.tree_builds).
+TREE_BUILDS = 3
+# family -> build -> habit. spread/tall scale the crown's width and height,
+# trunk the clear stem, lean tips the trunk (fraction of height), skew throws
+# the crown along the lean, fork splits the trunk into two leaders, skirt is
+# the oak's low ring of blobs (count, radius as a fraction of height).
+HABITS = {
+    "blossom": {1: dict(spread=0.9, tall=1.5, trunk=1.0, lean=0.03, skew=0.0, fork=True, skirt=0, tint=0.12),
+                2: dict(spread=1.18, tall=0.6, trunk=0.8, lean=0.08, skew=0.2, fork=False, skirt=0, tint=-0.14)},
+    "oak": {1: dict(spread=0.86, tall=1.6, trunk=1.12, lean=0.02, skew=0.0, fork=False, skirt=3, tint=0.1),
+            2: dict(spread=1.04, tall=0.75, trunk=0.85, lean=0.06, skew=0.16, fork=True, skirt=6, tint=-0.1)},
+    "birch": {1: dict(spread=0.92, tall=2.6, trunk=0.72, lean=0.02, skew=0.0, fork=False, skirt=0, tint=0.1),
+              2: dict(spread=1.0, tall=1.9, trunk=0.8, lean=0.11, skew=0.3, fork=False, skirt=0, tint=-0.1)},
+    "pear_tree": {1: dict(spread=0.78, tall=2.0, trunk=1.0, lean=0.02, skew=0.0, fork=False, skirt=0, tint=0.1),
+                  2: dict(spread=1.15, tall=0.8, trunk=0.9, lean=0.06, skew=0.14, fork=True, skirt=0, tint=-0.1)},
+}
+# a build's colour drifts a little: tint > 0 deeper (blossom) or cooler (leaf), < 0 paler or warmer
+BLOSSOM_DEEP = {"cherry_blossom": (0.97, 0.6, 0.78), "apple_blossom": (1.0, 0.8, 0.86), "crab_apple": (1.0, 0.84, 0.9)}
+LEAF_WARM = (0.66, 0.84, 0.48)
+
+
+def build_tint(col, kind, t, blossom):
+    if t > 0:
+        return mix(col, BLOSSOM_DEEP.get(kind, col), t * 2.5) if blossom else mix(col, SAGE_DEEP, t)
+    return mix(col, WHITE, -t * 1.5) if blossom else mix(col, LEAF_WARM, -t * 1.5)
+
+
+def tree_build(p, h, col, rng, kind, v):
+    """Build v (1, 2) of an estate tree: tree()'s look, another habit."""
+    if kind == "willow":
+        willow_build(p, h, col, rng, v)
+        return
+    blossom = kind in ("cherry_blossom", "apple_blossom", "crab_apple")
+    hb = HABITS["blossom" if blossom else kind][v]
+    col = build_tint(col, kind, hb["tint"], blossom)
+    bark = (0.95, 0.93, 0.9) if kind == "birch" else BARK
+    trunk_h = h * {"oak": 0.35, "birch": 0.5}.get(kind, 0.38) * hb["trunk"]
+    la = rng.uniform(0, 2 * math.pi)
+    ld = Vector((math.cos(la), math.sin(la), 0.0))
+    side = Vector((-ld.y, ld.x, 0.0))
+    lean = ld * (hb["lean"] * h)
+    spread = {"oak": 0.32, "birch": 0.17, "pear_tree": 0.2}.get(kind, 0.26) * hb["spread"]
+    top = Vector((lean.x, lean.y, trunk_h * 1.1))
+    # the trunk bows with the lean (a soft S on the leaning birch)
+    mid = Vector((lean.x * 0.35, lean.y * 0.35, trunk_h * 0.55)) - side * (h * 0.012 if kind == "birch" else 0.0)
+    for k in range(3):
+        a = 2 * math.pi * k / 3 + 0.5
+        p.add(tube([(0, 0, 0.0), (h * 0.04 * math.cos(a), h * 0.04 * math.sin(a), -h * 0.01)], [h * 0.025, h * 0.01], 4), bark, F)
+    crown_z = trunk_h + h * 0.28
+    centre = Vector((lean.x, lean.y, crown_z)) + ld * (hb["skew"] * h * spread)
+    if hb["fork"]:
+        fork = Vector((lean.x * 0.6, lean.y * 0.6, trunk_h * 0.62))
+        p.add(tube([(0, 0, 0), tuple(mid * 0.9), tuple(fork)], [h * 0.035, h * 0.028, h * 0.022], 7), bark, F)
+        heads = [centre + side * (h * spread * 0.42), centre - side * (h * spread * 0.38)]
+        for hd in heads:
+            tip = Vector((hd.x, hd.y, max(trunk_h * 1.05, hd.z - h * spread * 0.25)))
+            p.add(tube([tuple(fork), tuple(fork.lerp(tip, 0.55) + Vector((0, 0, h * 0.02))), tuple(tip)], [h * 0.02, h * 0.016, h * 0.012], 6), bark, F)
+    else:
+        p.add(tube([(0, 0, 0), tuple(mid), tuple(top)], [h * 0.035, h * 0.025, h * 0.018], 7), bark, F)
+        heads = [centre]
+    n = 7 if kind == "oak" else 6
+    blobs = n + 1 + hb["skirt"] + (5 if kind == "oak" and not hb["skirt"] else 0)
+    fine = 2 if blobs * 320 + 700 <= BUDGET["tree"] else 1
+    base = Vector((top.x * 0.9, top.y * 0.9, trunk_h * 0.95))
+    for i in range(n):
+        hd = heads[i % len(heads)]
+        a = 2 * math.pi * i / n + rng.uniform(-0.3, 0.3)
+        # stacked through the crown's height: low blobs wide, high ones in
+        t = (i + rng.uniform(0.1, 0.9)) / n
+        rr = h * spread * 0.75 * (1.0 - 0.25 * max(0.0, t - 0.45) * hb["tall"]) * rng.uniform(0.88, 1.08)
+        z = hd.z + (t - 0.3) * h * spread * 1.05 * hb["tall"] - h * 0.03
+        x, y = hd.x + rr * math.cos(a), hd.y + rr * math.sin(a)
+        b0 = base if not hb["fork"] else Vector((hd.x, hd.y, max(trunk_h * 1.05, hd.z - h * spread * 0.25)))
+        p.add(tube([tuple(b0), (x * 0.8 + b0.x * 0.2, y * 0.8 + b0.y * 0.2, z - h * 0.05)], [h * 0.015, h * 0.008], 4), bark, F)
+        c = col if i % 2 else (lighter(col, 0.15) if blossom else mix(col, SAGE_DEEP, 0.35))
+        r = h * spread * 0.62 * rng.uniform(0.85, 1.15) * (1.0 + 0.1 * abs(1.0 - hb["tall"]))
+        blob(p, x, y, z, r, c, rng, 1, 0.8 if hb["tall"] >= 1.0 else 0.72, fine=fine)
+    # a core puff (one level coarser, mostly hidden) keeps the stretched
+    # crowns one soft mass instead of separate balls
+    for hd in heads:
+        blob(p, hd.x, hd.y, hd.z + h * spread * 0.4 * max(0.0, hb["tall"] - 1.0), h * spread * 0.72 / len(heads) ** 0.3, mix(col, SAGE_DEEP, 0.2) if not blossom else col,
+             rng, 1, 0.8 * hb["tall"], fine=1)
+    crown_top = centre.z + h * spread * (0.35 + 0.75 * max(0.0, hb["tall"] - 1.0))
+    blob(p, centre.x, centre.y, crown_top, h * spread * 0.75, lighter(col, 0.08), rng, 1, 0.8, fine=fine)
+    if blossom or kind == "pear_tree":
+        for i in range(16 - 3 * len(heads)):
+            a = rng.uniform(0, 2 * math.pi)
+            e = rng.uniform(-0.2, 1.2)
+            r = h * spread * 1.05
+            x, y = centre.x + r * math.cos(a) * math.cos(e), centre.y + r * math.sin(a) * math.cos(e)
+            z = centre.z + r * 0.75 * math.sin(e) * (0.6 + 0.4 * hb["tall"])
+            if kind == "pear_tree":
+                p.add(lathe([(0, 0), (h * 0.02, h * 0.012), (h * 0.012, h * 0.035), (0, h * 0.045)], 6), (0.85, 0.92, 0.5), F, T(x, y, z - h * 0.05))
+            else:
+                p.add(sphere(h * 0.045, 6, 4), WHITE if i % 3 == 0 else lighter(col, 0.2), F, T(x, y, z))
+    skirt = hb["skirt"] or (5 if kind == "oak" else 0)
+    for i in range(skirt):
+        a = 2 * math.pi * i / skirt + 0.3 + rng.uniform(-0.25, 0.25)
+        rr = h * (0.42 if skirt <= 5 else 0.46) * hb["spread"]
+        blob(p, centre.x + rr * math.cos(a), centre.y + rr * math.sin(a), centre.z - h * 0.04 - h * 0.02 * (i % 2), h * 0.14 * rng.uniform(0.85, 1.15),
+             mix(col, SAGE_DEEP, 0.3), rng, 1, 0.75, fine=fine)
+
+
+def willow_build(p, h, col, rng, v):
+    """Willow builds: 1 a broad dome with a fuller curtain, 2 a leaning bank
+    willow, lopsided, its curtain reaching further down on the low side."""
+    trunk_h = h * (0.42 if v == 1 else 0.34)
+    la = rng.uniform(0, 2 * math.pi)
+    ld = Vector((math.cos(la), math.sin(la), 0.0))
+    lean = ld * (h * (0.03 if v == 1 else 0.12))
+    p.add(tube([(0, 0, 0), (lean.x * 0.4, lean.y * 0.4, trunk_h * 0.6), (lean.x, lean.y, trunk_h * 1.1)], [h * 0.038, h * 0.027, h * 0.019], 7), BARK, F)
+    for k in range(3):
+        a = 2 * math.pi * k / 3 + 0.5
+        p.add(tube([(0, 0, 0.0), (h * 0.04 * math.cos(a), h * 0.04 * math.sin(a), -h * 0.01)], [h * 0.025, h * 0.01], 4), BARK, F)
+    nb = 6 if v == 1 else 5
+    fine = 2 if nb * 320 + 700 + 22 * 12 <= BUDGET["tree"] else 1
+    ring = h * (0.18 if v == 1 else 0.15)
+    centre = Vector((lean.x, lean.y, trunk_h + h * 0.25)) + ld * (h * 0.05 * (v - 1))
+    for i in range(nb):
+        a = 2 * math.pi * i / nb + rng.uniform(-0.2, 0.2)
+        rr = ring * (1.25 if v == 2 and math.cos(a - la) > 0.3 else 1.0)
+        blob(p, centre.x + rr * math.cos(a), centre.y + rr * math.sin(a), centre.z + rng.uniform(-0.03, 0.03) * h, h * 0.17 * rng.uniform(0.9, 1.1),
+             col if i % 2 else SAGE_LIGHT, rng, 1, 0.7 if v == 1 else 0.75, fine=fine)
+    nc = 22 if v == 1 else 18
+    for i in range(nc):
+        a = 2 * math.pi * i / nc + rng.uniform(-0.05, 0.05)
+        low = math.cos(a - la)   # 1 on the side the tree leans to
+        r0 = h * (0.25 if v == 1 else 0.22) * (1.0 + (0.2 * low if v == 2 else 0.0))
+        foot = h * (0.1 if v == 1 else max(0.02, 0.1 - 0.08 * low))
+        cx, cy = centre.x, centre.y
+        pts = [(cx + r0 * math.cos(a), cy + r0 * math.sin(a), centre.z + h * 0.05),
+               (cx + r0 * 1.35 * math.cos(a), cy + r0 * 1.35 * math.sin(a), centre.z - h * 0.15),
+               (cx + r0 * 1.5 * math.cos(a), cy + r0 * 1.5 * math.sin(a), foot)]
+        p.add(tube(pts, [h * 0.03, h * 0.025, h * 0.008], 3, caps=False), col if i % 2 else SAGE_LIGHT, F)
+
+
 # ------------------------------------------------------------ garden flowers (L35)
 
 
@@ -676,8 +820,8 @@ def allium(p, h, col, rng):
 # ------------------------------------------------------------ table
 
 
-def build_species(sid, kind, h, col, rng):
-    p = K.Prop(sid)
+def build_species(sid, kind, h, col, rng, v=0):
+    p = K.Prop(sid if not v else f"{sid}_b{v}")
     c = col[:3]
     if sid.startswith("rose_") and kind == "bush":
         rose_bush(p, h, c, rng)
@@ -763,7 +907,10 @@ def build_species(sid, kind, h, col, rng):
         water_lily(p, h, c, rng)
     elif kind == "tree":
         foliage = c if sid in ("cherry_blossom", "apple_blossom", "crab_apple") else mix(c, (0.49, 0.76, 0.6), 0.6)   # pull toward sage
-        tree(p, h, foliage, rng, sid)
+        if v:
+            tree_build(p, h, foliage, rng, sid, v)
+        else:
+            tree(p, h, foliage, rng, sid)
     else:
         rose_bush(p, h, c, rng)
     # uniform scale to the species height; base stays at the origin
@@ -784,24 +931,27 @@ def main():
     for sid, (kind, h, col) in sorted(species().items()):
         if only is not None and sid not in only:
             continue
-        rng = random.Random(sum(map(ord, sid)))
-        p = build_species(sid, kind, h, col, rng)
-        ob = p.to_object(sid)
-        n0 = K.mesh_tris(ob)
-        lo = K.lod(ob, 0.5)
-        lo.name = sid + "_lod1"
-        print(f"  {sid:20s} {kind:11s} {n0:5d} tris  lod1 {K.mesh_tris(lo):5d}")
-        if n0 > BUDGET[kind]:
-            over.append((sid, n0))
-        objs += [ob, lo]
-        if not prev:
-            K.export_glb([ob, lo], os.path.join(OUT, f"{sid}.glb"))
+        for v in range(TREE_BUILDS if kind == "tree" else 1):
+            name = sid if not v else f"{sid}_b{v}"
+            rng = random.Random(sum(map(ord, sid)) + 7919 * v)
+            p = build_species(sid, kind, h, col, rng, v)
+            ob = p.to_object(name)
+            n0 = K.mesh_tris(ob)
+            lo = K.lod(ob, 0.5)
+            lo.name = name + "_lod1"
+            print(f"  {name:20s} {kind:11s} {n0:5d} tris  lod1 {K.mesh_tris(lo):5d}")
+            if n0 > BUDGET[kind]:
+                over.append((name, n0))
+            objs += [ob, lo]
+            if not prev:
+                K.export_glb([ob, lo], os.path.join(OUT, f"{name}.glb"))
     if prev:
         import manor_props
         for o in objs:
             if o.name.endswith("_lod1"):
                 o.hide_render = True
-        manor_props.preview([o for o in objs if not o.name.endswith("_lod1")], os.path.join(prev, "flora.png"), 7)
+        shown = [o for o in objs if not o.name.endswith("_lod1")]
+        manor_props.preview(shown, os.path.join(prev, "flora.png"), TREE_BUILDS * 3 if len(shown) % TREE_BUILDS == 0 and only else 7)
     print(f"{len(objs) // 2} species; over budget: {over}")
     if over:
         sys.exit(1)

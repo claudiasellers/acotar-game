@@ -33,11 +33,18 @@ uniform float leaf_lump = 0.0;
 // Petals pale toward their edges where they turn from view, a thin lit rim
 // rather than a cut-out edge (the non-green parts). Off at 0.
 uniform float petal_rim : hint_range(0.0, 1.0) = 0.0;
+// Per-plant variety (the estate's trees, wider-court D2): each instance a
+// little lighter or darker (instance_value) and warmer or cooler
+// (instance_hue), hashed from where it stands, so a grove of one build is not
+// one flat colour. Off at 0.
+uniform float instance_value : hint_range(0.0, 0.3) = 0.0;
+uniform float instance_hue : hint_range(0.0, 1.0) = 0.0;
 
 varying vec3 world_normal;
 varying vec3 world_pos;
 varying vec3 leaf_pos;
 varying float leafiness;
+varying vec2 v_inst;
 
 float hash3(vec3 p) {
 	return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
@@ -70,6 +77,8 @@ float leaf_field(vec3 p) {
 void vertex() {
 	// green where the vertex colour is clearly green: leaves, not petals
 	leafiness = leaf_noise * smoothstep(1.15, 1.5, COLOR.g / max(max(COLOR.r, COLOR.b), 0.01));
+	vec2 o = MODEL_MATRIX[3].xz;
+	v_inst = vec2(fract(sin(dot(o, vec2(12.9898, 78.233))) * 43758.5453), fract(sin(dot(o, vec2(39.346, 11.135))) * 24634.6345));
 	// pattern fixed to the plant (not swimming with the wind), offset per instance
 	leaf_pos = VERTEX + MODEL_MATRIX[3].xyz * 0.37;
 	if (leaf_lump > 0.0) {
@@ -99,6 +108,11 @@ void fragment() {
 	if (petal_rim > 0.0) {
 		float edge = pow(1.0 - abs(dot(NORMAL, VIEW)), 2.0);
 		col = mix(col, min(col * 1.28 + vec3(0.07), vec3(1.0)), edge * petal_rim * (1.0 - leafiness));
+	}
+	if (instance_value > 0.0 || instance_hue > 0.0) {
+		float k = v_inst.y * 2.0 - 1.0;
+		col *= mix(vec3(1.0), k > 0.0 ? vec3(1.07, 1.03, 0.88) : vec3(0.93, 0.99, 1.07), instance_hue * abs(k));
+		col *= 1.0 + instance_value * (v_inst.x * 2.0 - 1.0);
 	}
 	float up = clamp(world_normal.y, 0.0, 1.0);
 	float snow = smoothstep(0.35, 0.8, up) * snow_cover * snow_catch;

@@ -4,6 +4,10 @@
 ## stylized procedural mesh (flora_shapes.gd). Both draw with the shared foliage
 ## shader world/shared/shaders/stylized_foliage.gdshader.
 ## Callers use mesh(), impostor(), height_of() and SPECIES. Meshes stand on y = 0.
+## Trees come in builds (wider-court D2, owner 2026-11-12: keep the cotton
+## candy, refine it): build 0 is <species>.glb, builds 1.. are <species>_b<n>.glb,
+## the same puffed crowns grown to another habit; mesh(species, build) picks one
+## and ManorScatter hands neighbouring trees different builds.
 class_name FloraLib
 extends RefCounted
 
@@ -86,6 +90,13 @@ const IMPOSTOR_DISTANCE := 120.0
 
 static var _cache: Dictionary = {}
 static var _impostors: Dictionary = {}
+static var _materials: Dictionary = {}
+static var _builds: Dictionary = {}
+
+## Per-tree shade (wider-court D2): each estate tree a little lighter or darker,
+## warmer or cooler than its neighbour (stylized_foliage instance_value / instance_hue).
+const TREE_VALUE_SPREAD := 0.09
+const TREE_HUE_SPREAD := 0.55
 
 
 static func has(species: StringName) -> bool:
@@ -100,7 +111,29 @@ static func height_of(species: StringName) -> float:
 	return float(SPECIES.get(species, [&"bush", 1.0, Color.WHITE])[1])
 
 
-static func mesh(species: StringName) -> Mesh:
+## How many builds a species has (1 unless it is a tree with <species>_b<n>.glb).
+static func builds(species: StringName) -> int:
+	if _builds.has(species):
+		return _builds[species]
+	var n := 1
+	while ResourceLoader.exists(_model_path(species, n)):
+		n += 1
+	_builds[species] = n
+	return n
+
+
+static func _model_path(species: StringName, build: int) -> String:
+	return PropModels.FLORA_DIR + String(species) + ("_b%d" % build if build > 0 else "") + ".glb"
+
+
+## The species' mesh; `build` picks one of a tree's builds (0, the original, when out of range).
+static func mesh(species: StringName, build: int = 0) -> Mesh:
+	if build > 0 and build < builds(species):
+		var key := StringName("%s_b%d" % [species, build])
+		if not _cache.has(key):
+			var pair := PropModels.pair(_model_path(species, build), String(key), foliage_material(species))
+			_cache[key] = pair[0] if not pair.is_empty() else mesh(species)
+		return _cache[key]
 	if _cache.has(species):
 		return _cache[species]
 	var model := PropModels.pair(PropModels.FLORA_DIR + String(species) + ".glb", String(species), foliage_material(species))
@@ -144,9 +177,12 @@ static func is_rose_cushion(species: StringName) -> bool:
 
 
 ## One stylized_foliage material per modelled species (colour from vertex colours,
-## sway from height).
+## sway from height), shared by its builds.
 static func foliage_material(species: StringName) -> ShaderMaterial:
+	if _materials.has(species):
+		return _materials[species]
 	var m := ShaderMaterial.new()
+	_materials[species] = m
 	m.shader = FOLIAGE_SHADER
 	m.set_shader_parameter(&"use_vertex_color", true)
 	m.set_shader_parameter(&"alpha_scissor", 0.0)
@@ -155,6 +191,9 @@ static func foliage_material(species: StringName) -> ShaderMaterial:
 	m.set_shader_parameter(&"sparkle", SPARKLE.get(species, 0.0))
 	var kind := kind_of(species)
 	m.set_shader_parameter(&"translucency", 0.45 if kind in [&"flower", &"climber", &"reed"] else 0.3)
+	if kind == &"tree":
+		m.set_shader_parameter(&"instance_value", TREE_VALUE_SPREAD)
+		m.set_shader_parameter(&"instance_hue", TREE_HUE_SPREAD)
 	if is_rose_cushion(species):
 		# clipped rose-leaf texture and soft petal rims (L35-10)
 		m.set_shader_parameter(&"leaf_noise", 1.0)

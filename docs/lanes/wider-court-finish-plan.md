@@ -63,7 +63,7 @@ and its status. Details for each item are in the phase sections further down.
 | C1 | Grade previews: the milky glen, the teal Western Woods | — | **done**: the teal is the moss ground (hue 160), not the ramp; the glen's darks barely matter | LUT black level and ground hue printed for now and the preview |
 | C2 | Moss turned olive (owner's pick, wcterrain-37); the glen left as is | C1 (owner's pick) | **started** | the grade director's tests; the printed numbers as picked |
 | E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting | renders, same views |
-| E2 | Apply the estate decision | E1, D2 | waiting | canonical shots: no change but the trees |
+| E2 | Apply the estate decision | E1, D2 | **started** (estate-trees): three builds per species, neighbours differ, per-tree shade; renders to the owner first | canonical shots: no change but the trees |
 | V1 | Tavern and well on the village green (generator pipeline or asset request) | P2 (same content file) | waiting | on the green, clear of the paths (GUT) |
 | H1 | Housekeeping: drop the previews and the card trees | T8 | waiting | nothing references them (grep) |
 | L | Landmark models | owner (later) | deferred | |
@@ -73,7 +73,7 @@ Owner decisions:
 | Id | Decision | Status |
 |---|---|---|
 | D1 | Willow: make our own, or skip | open |
-| D2 | Estate: new trees everywhere, or court only (after E1). The program's rule is that the same object looks the same in every region, so "everywhere" is the expected answer | open, after E1 |
+| D2 | Estate: new trees everywhere, or court only (after E1). The program's rule is that the same object looks the same in every region, so "everywhere" is the expected answer | **decided 2026-11-12: the estate keeps its cotton-candy trees, refined** (owner: "i love the cotton candy honestly i just want to refine them like we have these"). Three builds per species, neighbours on different builds, a per-tree shade; see E2 |
 | D3 | Borders: seal every region border, or only the Autumn border and the edge | open |
 | D4 | Opening times: phase table vs `CourtMap.UNLOCK_PHASE` (Rosewild, Blossom Vale) | open (story lane) |
 
