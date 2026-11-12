@@ -352,7 +352,7 @@ def candyfloss_tree(kit, near):
     kit.tube(trunk, taper(len(trunk), 0.36, 0.18), 8 if near else 5, bark0, bark1, 0.0, 0.06, flare=0.4 if near else 0.0)
 
     # The heap: billows up a spiral round the cone, each bulging out of it.
-    count = 34 if near else 13
+    count = 30 if near else 13
     lumps = []
     for i in range(count):
         t = (i + kit.rng.uniform(0.2, 0.8)) / count
@@ -374,7 +374,7 @@ def candyfloss_tree(kit, near):
     outer = count + 1
     if near:
         kids = []
-        for i in sorted(range(count), key=lambda i: -lumps[i][1])[:14]:
+        for i in sorted(range(count), key=lambda i: -lumps[i][1])[:10]:
             c, r, _ = lumps[i]
             away = flat(c)
             for k in range(2):
@@ -391,8 +391,8 @@ def candyfloss_tree(kit, near):
     kit.floss = base
     if near:
         skin = wt.Kit(2)
-        for i in range(outer):   # every billow but the hidden middle ones; the small ones' fuzz is coarse
-            billow(skin, lumps, i, FUZZ, 1 if i <= count else 0, True)
+        for i in range(outer):   # every billow but the hidden middle ones
+            billow(skin, lumps, i, FUZZ, 1, True)
         skin.cull_buried()
         offset = len(base.verts)
         base.verts.extend(skin.verts)
@@ -401,18 +401,18 @@ def candyfloss_tree(kit, near):
         base.colors.extend(skin.colors)
         base.uvs.extend(skin.uvs)
 
-    # A few star blossoms resting on the tops of the billows.
+    # Star blossoms resting on the billows (owner: "we also have to add the stars").
     def covered(p, own):
         return any(j != own and (p - oc).length < orad * FUZZ for j, (oc, orad, _) in enumerate(lumps))
 
     placed = 0
     tries = 0
-    while placed < (14 if near else 4) and tries < 200:
+    while placed < (24 if near else 6) and tries < 400:
         tries += 1
-        i = kit.rng.randrange(count)
+        i = kit.rng.randrange(outer)
         c, r, _ = lumps[i]
         a = kit.rng.uniform(0.0, math.tau)
-        z = kit.rng.uniform(0.1, 0.9)
+        z = kit.rng.uniform(-0.1, 0.9)   # on the tops and the sides: seen from the ground
         d = Vector((math.cos(a) * math.sqrt(1 - z * z), math.sin(a) * math.sqrt(1 - z * z), z))
         if d.x * c.x + d.y * c.y < 0.0:
             continue   # facing in toward the trunk
@@ -421,7 +421,7 @@ def candyfloss_tree(kit, near):
             continue
         roll = kit.rng.random()
         petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.25 else STAR_BLUSH if roll < 0.5 else STAR_PEARL
-        star(kit, p, d, kit.rng.uniform(0.2, 0.3) * (1.0 if near else 1.6), petal_c, tip_c, heart_c, 0.3)
+        star(kit, p, d, kit.rng.uniform(0.3, 0.46) * (1.0 if near else 1.5), petal_c, tip_c, heart_c, 0.3)
         placed += 1
 
 
