@@ -302,10 +302,10 @@ def magnolia_harlequin(kit, near):
 # ("near_floss" / "far_floss", FloraLibrary.FLOSSED) and carries a tone, not
 # a colour: the shader gives each tree one of the first tree's colours.
 
-FLOSS_HEIGHT = 6.6     # the cone, foot to tip
+FLOSS_HEIGHT = 7.0     # the cone, foot to tip
 FLOSS_FOOT = 2.4       # where it starts up the trunk
-FLOSS_RADIUS = 2.2     # at its widest, a quarter of the way up
-FUZZ = 1.12            # the fuzz skin stands this far off a billow
+FLOSS_RADIUS = 2.3     # at its widest, a quarter of the way up
+FUZZ = 1.09            # the fuzz skin stands this far off a billow
 
 
 def cone(t):
@@ -313,7 +313,7 @@ def cone(t):
     rounded in under the foot, widest at a quarter, tapering to a soft tip."""
     if t < 0.26:
         return 0.62 + 0.38 * math.sin(math.pi * 0.5 * t / 0.26)
-    return 1.0 - 0.72 * ((t - 0.26) / 0.74) ** 1.1
+    return 1.0 - 0.78 * ((t - 0.26) / 0.74) ** 1.1
 
 
 def billow(fk, lumps, i, scale, subdiv, fuzz):
@@ -324,9 +324,11 @@ def billow(fk, lumps, i, scale, subdiv, fuzz):
     verts, faces = wt.icosphere(subdiv)
     first = len(fk.faces)
     idx, tones = [], []
+    # no two billows the same: each a little squashed its own way, and lumpy
+    squash = Vector((0.9 + 0.2 * (seed.x % 1.0), 0.9 + 0.2 * (seed.y % 1.0), 0.86 + 0.2 * (seed.z % 1.0)))
     for v in verts:
-        rr = r * scale * (1.0 + 0.1 * wt.noise.noise(v * 1.7 + seed))
-        p = c + v * rr
+        rr = r * scale * (1.0 + 0.2 * wt.noise.noise(v * 1.3 + seed))
+        p = c + Vector((v.x * squash.x, v.y * squash.y, v.z * squash.z)) * rr
         idx.append(fk.add_vert(p))
         fk.normals[idx[-1]] = v.copy()
         # deep in the creases: how far this point is from the nearest neighbour's skin
@@ -337,7 +339,7 @@ def billow(fk, lumps, i, scale, subdiv, fuzz):
     flex = 0.16 + 0.3 * min(1.0, max(0.0, (c.z - FLOSS_FOOT) / FLOSS_HEIGHT))
     for f in faces:
         fk.face(tuple(idx[k] for k in f), tuple((tones[k],) * 3 for k in f), tuple((flex, 1.0 if fuzz else 0.0) for _ in f))
-    fk.blobs.append((c, r * scale, 1.0, 0.1, first, len(fk.faces)))
+    fk.blobs.append((c, r * scale * 0.9, 0.95, 0.2, first, len(fk.faces)))
 
 
 def candyfloss_tree(kit, near):
@@ -350,14 +352,14 @@ def candyfloss_tree(kit, near):
     kit.tube(trunk, taper(len(trunk), 0.36, 0.18), 8 if near else 5, bark0, bark1, 0.0, 0.06, flare=0.4 if near else 0.0)
 
     # The heap: billows up a spiral round the cone, each bulging out of it.
-    count = 40 if near else 13
+    count = 34 if near else 13
     lumps = []
     for i in range(count):
         t = (i + kit.rng.uniform(0.2, 0.8)) / count
         a = i * 2.39996 + kit.rng.uniform(-0.35, 0.35)
         ring = FLOSS_RADIUS * cone(t)
-        r = min(max(ring * kit.rng.uniform(0.44, 0.62) * (1.0 if near else 1.45), 0.38), 1.25 if near else 1.7)
-        out = max(ring - r * 0.55, 0.0)
+        r = min(max(ring * kit.rng.uniform(0.4, 0.62) * (1.0 if near else 1.45), 0.38), 1.25 if near else 1.7)
+        out = max(ring - r * kit.rng.uniform(0.4, 0.7), 0.0)
         c = Vector((math.cos(a) * out, math.sin(a) * out, FLOSS_FOOT + t * FLOSS_HEIGHT + kit.rng.uniform(-0.12, 0.12)))
         lumps.append((c, r, Vector((kit.rng.random() * 50, kit.rng.random() * 50, kit.rng.random() * 50))))
     # the tip, and the middle of the foot so the underside is closed
@@ -366,16 +368,31 @@ def candyfloss_tree(kit, near):
     for t in (0.3, 0.52, 0.74):   # the heap's middle, so no gap shows the trunk
         lumps.append((Vector((0, 0, FLOSS_FOOT + t * FLOSS_HEIGHT)), FLOSS_RADIUS * cone(t) * 0.62, Vector((t * 9.0, 1.0, 5.0))))
 
+    # Billows on the billows, as candyfloss heaps: two smaller ones on the
+    # outward side of each of the bigger ones. (They go in ahead of the
+    # hidden middle ones, so the fuzz below takes them too.)
+    outer = count + 1
+    if near:
+        kids = []
+        for i in sorted(range(count), key=lambda i: -lumps[i][1])[:14]:
+            c, r, _ = lumps[i]
+            away = flat(c)
+            for k in range(2):
+                a = kit.rng.uniform(-1.2, 1.2)
+                d = (away * math.cos(a) + Vector((-away.y, away.x, 0.0)) * math.sin(a) + UP * kit.rng.uniform(-0.5, 0.9)).normalized()
+                kids.append((c + d * r * 0.78, r * kit.rng.uniform(0.42, 0.56), Vector((kit.rng.random() * 50, kit.rng.random() * 50, kit.rng.random() * 50))))
+        lumps[outer:outer] = kids
+        outer += len(kids)
+
     base = wt.Kit(1)
-    biggest = sorted(range(count), key=lambda i: -lumps[i][1])[:8 if near else 0]
     for i in range(len(lumps)):
-        billow(base, lumps, i, 1.0, 2 if i in biggest else 1, False)
+        billow(base, lumps, i, 1.0, 1, False)
     base.cull_buried()
     kit.floss = base
     if near:
         skin = wt.Kit(2)
-        for i in range(count + 1):   # the outer billows and the tip
-            billow(skin, lumps, i, FUZZ, 1, True)
+        for i in range(outer):   # every billow but the hidden middle ones; the small ones' fuzz is coarse
+            billow(skin, lumps, i, FUZZ, 1 if i <= count else 0, True)
         skin.cull_buried()
         offset = len(base.verts)
         base.verts.extend(skin.verts)
@@ -467,7 +484,8 @@ FLOSSED = ("candyfloss_tree",)
 
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
-    "candyfloss_tree": (candyfloss_tree, SPECIAL),
+    # (twice the billows of any other crown, and its fuzz: a cap of its own)
+    "candyfloss_tree": (candyfloss_tree, (9000, 1500)),
     "magnolia_harlequin": (magnolia_harlequin, SPECIAL),
 }
 

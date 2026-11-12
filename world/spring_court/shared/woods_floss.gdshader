@@ -17,7 +17,7 @@ render_mode depth_draw_opaque;
 
 uniform sampler2D cotton : source_color, filter_linear_mipmap, repeat_enable;
 // repeats of the cotton picture per metre
-uniform float cotton_scale = 0.8;
+uniform float cotton_scale = 0.45;
 // The trees' colours, pale then deep (the first candyfloss tree's).
 uniform vec4 top_0 : source_color = vec4(0.980, 0.831, 0.863, 1.0);
 uniform vec4 deep_0 : source_color = vec4(0.933, 0.498, 0.659, 1.0);
@@ -27,11 +27,13 @@ uniform vec4 top_2 : source_color = vec4(0.914, 0.839, 0.969, 1.0);
 uniform vec4 deep_2 : source_color = vec4(0.655, 0.498, 0.859, 1.0);
 uniform vec4 top_3 : source_color = vec4(0.984, 0.929, 0.918, 1.0);
 uniform vec4 deep_3 : source_color = vec4(0.941, 0.553, 0.698, 1.0);
+// how far up from the deep colour to the pale one the lightest fluff goes
+uniform float colour_lift : hint_range(0.0, 1.0) = 0.72;
 // how much the cotton's light and dark shows in the fluff
 uniform float mottle : hint_range(0.0, 1.0) = 0.35;
 // the fuzz is this much paler than the billow under it
-uniform float fuzz_pale : hint_range(0.0, 1.0) = 0.3;
-uniform float translucency : hint_range(0.0, 1.0) = 0.45;
+uniform float fuzz_pale : hint_range(0.0, 1.0) = 0.1;
+uniform float translucency : hint_range(0.0, 1.0) = 0.3;
 // sugar crystals catching the light
 uniform float sparkle : hint_range(0.0, 1.0) = 0.5;
 uniform vec4 sparkle_color : source_color = vec4(1.0, 0.95, 0.9, 1.0);
@@ -48,7 +50,7 @@ varying float v_pick;
 #define CANDY_WRAP_DEFAULT 0.7
 #define CANDY_SHADE_DEFAULT vec4(0.74, 0.64, 0.86, 1.0)
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.9, 0.88, 1.0)
-#define CANDY_RIM_STRENGTH_DEFAULT 0.4
+#define CANDY_RIM_STRENGTH_DEFAULT 0.25
 #define CANDY_NO_SPEC_LOBE
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
@@ -92,7 +94,8 @@ void fragment() {
 		deep = deep_1.rgb;
 	}
 	float tone = clamp(COLOR.r * (1.0 - mottle * 0.6 + mottle * value), 0.0, 1.0);
-	vec3 col = mix(deep, top, tone);
+	// (the light is generous: the pale colour is held back so the floss keeps its pink)
+	vec3 col = mix(deep, top, tone * colour_lift);
 	if (fuzz) {
 		col = mix(col, mix(top, vec3(1.0), 0.4), fuzz_pale);
 	}
