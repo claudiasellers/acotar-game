@@ -42,11 +42,55 @@ UP = Vector((0, 0, 1))
 #           reach = limb length, rise0/rise1 = angle above level at root/tip
 #   kink: how far a limb's heading wanders per segment (the oak's gnarl)
 #   cloud: cloud radius; flat: its height over its width; card: leaf-clump size
+#   optional: flare (root radius x trunk, 1.9), limb (limb radius x trunk, 0.62),
+#   top (the leader's last reach, 0.13), top_cloud (x cloud, 1.15),
+#   weep (the willow's curtain: fronds per cloud, frond width, how near the
+#   ground they hang), fruit (pears per cloud)
 RECIPES = {
+    # the parkland oak: stout, four long low limbs, a broad tiered crown (owner: "a bit broader", "those look good")
     "oak": dict(
         trunk=0.046, clear=0.25, lean=0.025,
         whorls=[(0.25, 4, 0.44, 12, 38, 2), (0.39, 3, 0.33, 38, 60, 1)],
         leader=0.62, kink=22, cloud=0.12, flat=0.8, card=0.085, cover=2.1, rim=0.26,
+    ),
+    # the birch: a slender white stem that keeps going, short upswept limbs
+    # ring after ring, small airy clouds in a narrow crown
+    "birch": dict(
+        trunk=0.021, clear=0.36, lean=0.045, flare=1.5, limb=0.5,
+        whorls=[(0.36, 3, 0.2, 30, 58, 1), (0.5, 3, 0.18, 36, 62, 0), (0.63, 3, 0.15, 42, 66, 0), (0.75, 2, 0.12, 48, 70, 0)],
+        leader=0.83, top=0.07, top_cloud=1.0, kink=10, cloud=0.072, flat=0.9, card=0.07, cover=1.6, rim=0.3,
+    ),
+    # the cherry: a short trunk opening into a wide vase, blossom clouds
+    "cherry_blossom": dict(
+        trunk=0.038, clear=0.27, lean=0.03, flare=1.7,
+        whorls=[(0.27, 4, 0.46, 26, 50, 2), (0.39, 3, 0.36, 46, 66, 1)],
+        leader=0.56, top=0.15, kink=16, cloud=0.15, flat=0.82, card=0.12, cover=2.1, rim=0.26,
+    ),
+    # the apple: low, round and gnarled
+    "apple_blossom": dict(
+        trunk=0.042, clear=0.25, lean=0.04, flare=1.8,
+        whorls=[(0.25, 4, 0.4, 18, 44, 2), (0.37, 3, 0.3, 42, 62, 1)],
+        leader=0.5, top=0.13, kink=28, cloud=0.16, flat=0.8, card=0.13, cover=2.1, rim=0.26,
+    ),
+    # the crab apple: smaller in the limb and more upright, a tight round head
+    "crab_apple": dict(
+        trunk=0.036, clear=0.28, lean=0.03, flare=1.7,
+        whorls=[(0.28, 3, 0.34, 34, 58, 2), (0.41, 3, 0.27, 50, 68, 1)],
+        leader=0.52, top=0.14, kink=20, cloud=0.155, flat=0.86, card=0.13, cover=2.1, rim=0.26,
+    ),
+    # the pear: upright, an oval crown, pears hanging under the leaves
+    "pear_tree": dict(
+        trunk=0.04, clear=0.26, lean=0.02, flare=1.6,
+        whorls=[(0.26, 3, 0.27, 38, 66, 1), (0.42, 3, 0.23, 46, 70, 1), (0.57, 3, 0.17, 54, 74, 0)],
+        leader=0.7, top=0.12, kink=14, cloud=0.118, flat=0.92, card=0.1, cover=2.1, rim=0.26, fruit=1.4,
+    ),
+    # the willow: a short leaning trunk, limbs that arch up and over, a low
+    # dome of narrow leaves and a curtain of fronds hanging from it
+    "willow": dict(
+        trunk=0.052, clear=0.24, lean=0.07, flare=1.8,
+        whorls=[(0.24, 4, 0.36, 58, 4, 1), (0.36, 3, 0.3, 68, 16, 1)],
+        leader=0.5, top=0.12, kink=14, cloud=0.105, flat=0.7, card=0.1, cover=1.7, rim=0.2,
+        weep=(9, 0.15, 0.1),
     ),
 }
 
@@ -90,7 +134,7 @@ def grow(sid, rng):
     lean = heading(lean_az, 0.0) * rc["lean"]
     top_z = rc["leader"]
     # the trunk: buried a little, flared at the root, a slow bend to the lean
-    stem = [sk.node((0, 0, -0.02), r * 1.9)]
+    stem = [sk.node((0, 0, -0.02), r * rc.get("flare", 1.9))]
     for z, k in ((0.035, 1.35), (0.11, 1.06), (rc["clear"] * 0.62, 0.98)):
         stem.append(sk.node(lean * (z / top_z) ** 1.5 + Vector((0, 0, z)), r * k, stem[-1]))
     az0 = rng.uniform(0, math.tau)
@@ -102,7 +146,7 @@ def grow(sid, rng):
         for i in range(n):
             az = az0 + math.tau * (i + 0.5 * wi) / n + rng.uniform(-0.22, 0.22)
             ln = reach * rng.uniform(0.88, 1.12)
-            lr = r * (0.62 - 0.12 * wi)
+            lr = r * (rc.get("limb", 0.62) - 0.12 * wi)
             limb = sk.limb(hub, az, rise0 + rng.uniform(-6, 6), rise1 + rng.uniform(-6, 6), ln, lr, lr * 0.5, rc["kink"], rng)
             seats.append((limb[-1], rc["cloud"] * rng.uniform(0.95, 1.15)))
             # each limb forks: side limbs off its middle, shorter, still rising
@@ -113,8 +157,8 @@ def grow(sid, rng):
                 seats.append((sub[-1], rc["cloud"] * rng.uniform(0.8, 1.0)))
     # the leader: the trunk's own top, one cloud over the crown
     tip = sk.node(lean + Vector((rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.02), top_z)), r * 0.5, stem[-1])
-    top2 = sk.node(sk.pos[tip] + Vector((rng.uniform(-0.03, 0.03), rng.uniform(-0.03, 0.03), 0.13)), r * 0.3, tip)
-    seats.append((top2, rc["cloud"] * 1.15))
+    top2 = sk.node(sk.pos[tip] + Vector((rng.uniform(-0.03, 0.03), rng.uniform(-0.03, 0.03), rc.get("top", 0.13))), r * 0.3, tip)
+    seats.append((top2, rc["cloud"] * rc.get("top_cloud", 1.15)))
     # every limb ends inside its cloud: the cloud sits just past the tip
     clouds = []
     for idx, cr in seats:
@@ -170,15 +214,17 @@ def wood(sk, name):
     return out
 
 
-def card(bm, uv, col, centre, normal, up, size, tone):
+def card(bm, uv, col, centre, normal, up, size, tone, u0=0.0, u1=1.0):
+    """A card facing `normal`, its picture's top towards `up`; size is a
+    side or (width, height); u0..u1 picks a strip of the picture."""
     u = up.cross(normal)
     if u.length < 1e-4:
         u = Vector((1, 0, 0)).cross(normal)
     u.normalize()
     v = normal.cross(u).normalized()
-    h = size * 0.5
-    f = bm.faces.new([bm.verts.new(centre + u * sx * h + v * sy * h) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))])
-    for loop, st in zip(f.loops, ((0, 0), (1, 0), (1, 1), (0, 1))):
+    w, h = (size[0] * 0.5, size[1] * 0.5) if isinstance(size, tuple) else (size * 0.5, size * 0.5)
+    f = bm.faces.new([bm.verts.new(centre + u * sx * w + v * sy * h) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))])
+    for loop, st in zip(f.loops, ((u0, 0), (u1, 0), (u1, 1), (u0, 1))):
         loop[uv].uv = st
         loop[col] = (tone, tone, tone, 1.0)
 
@@ -218,6 +264,44 @@ def foliage(sid, clouds, rng):
     return leaves, normals, core
 
 
+def curtain(sid, clouds, rng):
+    """The willow's fronds: tall cards of hanging strands around every cloud
+    on the crown's rim, from the dome down towards the ground."""
+    n, width, foot = RECIPES[sid]["weep"]
+    crown = sum((c * r for c, r in clouds), Vector()) / sum(r for _, r in clouds)
+    fronds = bmesh.new()
+    uv = fronds.loops.layers.uv.new("UVMap")
+    col = fronds.loops.layers.float_color.new("Col")
+    normals = []
+    for cc, r in clouds:
+        out = Vector((cc.x - crown.x, cc.y - crown.y, 0.0))
+        inner = out.length < r * 1.2    # a cloud over the trunk hangs fewer, shorter
+        for i in range(n // 3 if inner else n):
+            a = (math.atan2(out.y, out.x) if not inner else 0.0) + rng.uniform(-1.0, 1.0) * (math.pi if inner else 1.9)
+            d = Vector((math.cos(a), math.sin(a), 0.0))
+            top = cc + d * r * rng.uniform(0.55, 0.95) + UP * r * rng.uniform(-0.1, 0.25)
+            low = foot * rng.uniform(0.6, 2.2) + (0.14 if inner else 0.0)
+            length = max(top.z - low, r)
+            face = (d + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.0))).normalized()
+            half = rng.random() < 0.5
+            card(fronds, uv, col, top - UP * length * 0.5, face, UP, (width * rng.uniform(0.85, 1.2), length), 0.92 + 0.16 * rng.random(), 0.0 if half else 0.5, 0.5 if half else 1.0)
+            normals += [(d * 0.75 + UP * 0.5).normalized()] * 4
+    return fronds, normals
+
+
+def pears(sid, clouds, rng):
+    """Pears hanging under the pear's clouds."""
+    fruit = K.Prop("fruit")
+    for cc, r in clouds:
+        for _ in range(int(RECIPES[sid]["fruit"] + rng.random())):
+            a = rng.uniform(0, math.tau)
+            at = cc + Vector((math.cos(a), math.sin(a), 0.0)) * r * rng.uniform(0.3, 0.85) - UP * r * RECIPES[sid]["flat"] * rng.uniform(0.7, 0.95)
+            s = rng.uniform(0.85, 1.15)
+            fruit.add(K.lathe([(0, 0), (0.021 * s, 0.012 * s), (0.012 * s, 0.036 * s), (0, 0.047 * s)], 6), (0.86, 0.9, 0.46) if rng.random() < 0.7 else (0.95, 0.84, 0.5), MF.F,
+                      K.T(at.x, at.y, at.z - 0.04 * s))
+    return fruit
+
+
 def build(sid, letter, seed):
     kind, h, col = MF.species()[sid]
     name = f"tree_{sid}_{letter}"
@@ -228,19 +312,23 @@ def build(sid, letter, seed):
     settle(clouds)
     bark = wood(sk, name)
     leaves, normals, core = foliage(sid, clouds, rng)
+    rc = RECIPES[sid]
+    fronds, frond_normals = curtain(sid, clouds, rng) if "weep" in rc else (None, [])
+    fruit = pears(sid, clouds, rng) if "fruit" in rc else None
     # to the species height, standing on the ground (the root stays buried)
     top = max(v.co.z for b in (leaves, core.bm) for v in b.verts)
     m = K.S(h / top)
-    for b in (bark, leaves, core.bm):
+    meshes = [("bark", bark, None), ("leaves", leaves, normals)] + ([("fronds", fronds, frond_normals)] if fronds else [])
+    for b in [b for _, b, _ in meshes] + [core.bm] + ([fruit.bm] if fruit else []):
         bmesh.ops.transform(b, matrix=m, verts=b.verts)
     objs = []
-    for part, b in (("bark", bark), ("leaves", leaves)):
+    for part, b, part_normals in meshes:
         me = bpy.data.meshes.new(f"{name}_{part}")
         b.to_mesh(me)
         for poly in me.polygons:
             poly.use_smooth = True
-        if part == "leaves":
-            me.normals_split_custom_set_from_vertices([tuple(n) for n in normals])
+        if part_normals:
+            me.normals_split_custom_set_from_vertices([tuple(n) for n in part_normals])
             me.color_attributes.active_color_name = "Col"
             me.attributes.default_color_name = "Col"
         me.materials.append(bpy.data.materials.new(f"tree_{part}"))
@@ -248,8 +336,10 @@ def build(sid, letter, seed):
         bpy.context.scene.collection.objects.link(ob)
         objs.append(ob)
     objs.append(core.to_object(f"{name}_core"))
-    tris = [K.mesh_tris(o) for o in objs]
-    print(f"  {name:18s} {sum(tris):5d} tris (bark {tris[0]}, leaves {tris[1]}, core {tris[2]}; {len(clouds)} clouds)")
+    if fruit:
+        objs.append(fruit.to_object(f"{name}_fruit"))
+    tris = {o.name.rsplit("_", 1)[-1]: K.mesh_tris(o) for o in objs}
+    print(f"  {name:24s} {sum(tris.values()):5d} tris ({', '.join(f'{k} {v}' for k, v in tris.items())}; {len(clouds)} clouds)")
     K.export_glb(objs, os.path.join(OUT, f"{name}.glb"))
 
 

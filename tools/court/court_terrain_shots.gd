@@ -251,6 +251,16 @@ const LINEUPS := {
 	"candy_oak_court": {"distance": 36.0, "spacing": 17.0, "look": 7.5, "ids": ["set:woods_oak:0", "leafy:oak", "set:woods_oak:5"]},
 	# The estate tree-builder, from scratch (estate_tree.py): today's oak, then three seeds.
 	"new_oak": {"distance": 46.0, "spacing": 17.0, "look": 7.5, "ids": ["estate:oak:0", "tree:tree_oak_a:oak", "tree:tree_oak_b:oak", "tree:tree_oak_c:oak"]},
+	# ... and the rest of the estate's trees from the same builder: today's
+	# tree, then three seeds.
+	"new_birch": {"distance": 34.0, "spacing": 9.0, "look": 6.0, "ids": ["estate:birch:0", "tree:tree_birch_a:birch", "tree:tree_birch_b:birch", "tree:tree_birch_c:birch"]},
+	"new_willow": {"distance": 34.0, "spacing": 14.0, "look": 4.5, "ids": ["estate:willow:0", "tree:tree_willow_a:willow", "tree:tree_willow_b:willow", "tree:tree_willow_c:willow"]},
+	"new_cherry": {"distance": 24.0, "spacing": 10.0, "look": 3.2, "ids": ["estate:cherry_blossom:0", "tree:tree_cherry_blossom_a:cherry_blossom", "tree:tree_cherry_blossom_b:cherry_blossom", "tree:tree_cherry_blossom_c:cherry_blossom"]},
+	"new_apple": {"distance": 22.0, "spacing": 9.0, "look": 2.8, "ids": ["estate:apple_blossom:0", "tree:tree_apple_blossom_a:apple_blossom", "tree:tree_apple_blossom_b:apple_blossom", "tree:tree_apple_blossom_c:apple_blossom"]},
+	"new_crab": {"distance": 22.0, "spacing": 8.0, "look": 2.8, "ids": ["estate:crab_apple:0", "tree:tree_crab_apple_a:crab_apple", "tree:tree_crab_apple_b:crab_apple", "tree:tree_crab_apple_c:crab_apple"]},
+	"new_pear": {"distance": 24.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:pear_tree:0", "tree:tree_pear_tree_a:pear_tree", "tree:tree_pear_tree_b:pear_tree", "tree:tree_pear_tree_c:pear_tree"]},
+	# the family: one of each
+	"new_all": {"distance": 52.0, "spacing": 12.5, "look": 5.5, "ids": ["tree:tree_oak_a:oak", "tree:tree_birch_a:birch", "tree:tree_willow_a:willow", "tree:tree_cherry_blossom_a:cherry_blossom", "tree:tree_apple_blossom_a:apple_blossom", "tree:tree_crab_apple_a:crab_apple", "tree:tree_pear_tree_a:pear_tree"]},
 	"new_oak_close": {"distance": 23.0, "spacing": 17.0, "look": 8.0, "ids": ["tree:tree_oak_a:oak"]},
 	"new_oak_court": {"distance": 38.0, "spacing": 17.0, "look": 7.5, "ids": ["set:woods_oak:0", "tree:tree_oak_b:oak", "set:woods_oak:5"]},
 	"candy_blossom": {"distance": 30.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:cherry_blossom:0", "candy_ez:cherry_blossom",
@@ -316,23 +326,40 @@ const CANDY_EZ := {
 ## Estate option 2 with leaf detail (preview): candy_leafy.py's three parts on
 ## their materials: the court's painted bark in the estate's rose-taupe, the
 ## leaf-clump cards and the puff cores on explore/candy_leaf.gdshader.
+## Per species: [shadow, mid, light] for the leaf bands (for blossom, the
+## heart's deep and mid tones), the bark texture, the bark colour.
 const CANDY_LEAFY := {
 	&"oak": [Color(0.30, 0.56, 0.44), Color(0.50, 0.79, 0.56), Color(0.78, 0.95, 0.72)],
+	&"birch": [Color(0.36, 0.62, 0.42), Color(0.60, 0.84, 0.52), Color(0.86, 0.97, 0.66)],
+	&"pear_tree": [Color(0.34, 0.60, 0.40), Color(0.56, 0.80, 0.50), Color(0.82, 0.94, 0.64)],
+	&"willow": [Color(0.33, 0.60, 0.46), Color(0.52, 0.80, 0.52), Color(0.80, 0.95, 0.66)],
+	&"cherry_blossom": [Color(0.80, 0.42, 0.60), Color(0.96, 0.66, 0.80), Color(1.0, 0.9, 0.95)],
+	&"apple_blossom": [Color(0.80, 0.60, 0.66), Color(0.97, 0.86, 0.88), Color(1.0, 0.98, 0.97)],
+	&"crab_apple": [Color(0.82, 0.66, 0.70), Color(0.98, 0.92, 0.92), Color(1.0, 0.99, 0.98)],
 }
+const CANDY_BLOSSOM: Array[StringName] = [&"cherry_blossom", &"apple_blossom", &"crab_apple"]
 
 
 func _candy_leafy(sp: StringName, file: String = "") -> Mesh:
 	var inst := (load(CANDY_DIR + (file if file != "" else "candy_%s" % sp) + ".glb") as PackedScene).instantiate()
-	var pal: Array = CANDY_LEAFY.get(sp, CANDY_EZ[sp][4])
+	var pal: Array = CANDY_LEAFY[sp]
 	var h := FloraLib.height_of(sp)
 	var mats := {}
-	var parts := ["bark", "leaves", "core"]
+	# part -> the shader's part number (fronds are leaves on the frond picture)
+	var parts := {"bark": 0, "leaves": 1, "core": 2, "fruit": 3, "fronds": 1}
 	for part: String in parts:
 		var m := ShaderMaterial.new()
 		m.shader = load(CANDY_DIR + "candy_leaf.gdshader") as Shader
-		m.set_shader_parameter(&"part", parts.find(part))
-		m.set_shader_parameter(&"tex", load(TREES_EZ + "bark_%s.png" % CANDY_EZ[sp][2]) if part == "bark" else load(CANDY_DIR + "puff_%s.png" % sp))
-		m.set_shader_parameter(&"bark_col", Color(0.95, 0.93, 0.90) if sp == &"birch" else Color(0.56, 0.42, 0.43))
+		m.set_shader_parameter(&"part", parts[part])
+		var tex := CANDY_DIR + "puff_%s.png" % sp
+		if part == "bark":
+			tex = TREES_EZ + ("bark_birch.png" if sp == &"birch" else "bark_oak.png")
+		elif part == "fronds":
+			tex = CANDY_DIR + "frond_willow.png"
+		m.set_shader_parameter(&"tex", load(tex))
+		m.set_shader_parameter(&"own_colour", sp in CANDY_BLOSSOM and part == "leaves")
+		m.set_shader_parameter(&"bark_col", Color(0.93, 0.91, 0.88) if sp == &"birch" else Color(0.56, 0.42, 0.43))
+		m.set_shader_parameter(&"bark_mean", 0.582 if sp == &"birch" else 0.338)
 		m.set_shader_parameter(&"shadow_col", pal[0])
 		m.set_shader_parameter(&"mid_col", pal[1])
 		m.set_shader_parameter(&"light_col", pal[2])
@@ -352,7 +379,7 @@ func _candy_leafy(sp: StringName, file: String = "") -> Mesh:
 			arr[Mesh.ARRAY_VERTEX] = verts
 			arr[Mesh.ARRAY_NORMAL] = norms
 			arr[Mesh.ARRAY_TANGENT] = null
-			if part != "leaves":
+			if part in ["bark", "core"]:
 				arr[Mesh.ARRAY_COLOR] = null
 			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
 			out.surface_set_material(out.get_surface_count() - 1, mats.get(part, mats["core"]))
