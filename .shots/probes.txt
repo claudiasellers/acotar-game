@@ -1,0 +1,6 @@
+from special-trees
+quality look
+shot w1 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_1 --perf-csv={out}/perf.csv
+shot close res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candyfloss_close floss_multi=1
+shot row res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candyfloss_row floss_multi=1
+shot w2 res://tools/perf/frame_probe.tscn {out} --perf-scene=res://tools/woods/spring_flora_shot.tscn --perf-name=woods_2 --perf-csv={out}/perf.csv
