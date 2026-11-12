@@ -180,6 +180,11 @@ func _run() -> void:
 ## `lineup=species` / `lineup=builds` the court's leaf-card trees; the
 ## camera then stands back from the row at the row's own ground level.
 const LINEUPS := {
+	# The woods' candy flowering trees (tools/woods/blender/spring_flora.py; they grow in the Eastern
+	# and Border Woods): candyfloss, wisteria, golden chain, magnolia.
+	"candy_trees": {"distance": 24.0, "spacing": 8.5, "look": 3.4, "ids": [&"woods_candyfloss_tree", &"woods_wisteria_tree",
+		&"woods_golden_chain", &"woods_magnolia"]},
+	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
 		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
 		&"woods_elder", &"woods_crab_apple", &"flora_tree_rowan", &"flora_tree_autumn_maple"]},
