@@ -224,7 +224,7 @@ static func _build_locked(id: StringName, b: int, step: int) -> Mesh:
 ## (k-means on the leaf vertices), each a rounded lump sized to its cluster,
 ## with round normals. Vertex alpha 1 (crown), as the far crown's.
 const CROWN_LUMPS := 7
-const LUMP_SEGMENTS := 6
+const LUMP_SEGMENTS := 8
 
 
 static func _mid_crown(out: ArrayMesh, pts: PackedVector3Array, seed_b: int) -> void:

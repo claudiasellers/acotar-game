@@ -76,7 +76,7 @@ void fragment() {
 	} else if (COLOR.a < 0.5) {
 		col = bark_col.rgb * 0.8;
 	} else {
-		col = mix(leaf_col.rgb, leaf_light.rgb, 0.35);
+		col = mix(leaf_col.rgb, leaf_light.rgb, 0.55);
 	}
 	if (mode != 2 && mode != 3) {
 		col *= 1.0 + tree_value_spread * (v_tree * 2.0 - 1.0);
