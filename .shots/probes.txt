@@ -1,0 +1,17 @@
+from estate-trees-final
+quality look
+shot p_orchard_x0_9211 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=0 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x0_9211 --perf-csv={out}/perf.csv
+shot p_air_x0_25421 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=0 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x0_25421 --perf-csv={out}/perf.csv
+shot p_orchard_x1 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=1 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x1 --perf-csv={out}/perf.csv
+shot p_air_x1 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=1 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x1 --perf-csv={out}/perf.csv
+shot p_orchard_x2 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=2 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x2 --perf-csv={out}/perf.csv
+shot p_air_x2 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=2 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x2 --perf-csv={out}/perf.csv
+shot p_orchard_x3 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=3 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x3 --perf-csv={out}/perf.csv
+shot p_air_x3 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=3 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x3 --perf-csv={out}/perf.csv
+shot p_orchard_x4 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=4 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x4 --perf-csv={out}/perf.csv
+shot p_air_x4 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=4 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x4 --perf-csv={out}/perf.csv
+shot p_orchard_x5 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=5 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x5 --perf-csv={out}/perf.csv
+shot p_air_x5 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=5 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x5 --perf-csv={out}/perf.csv
+shot p_orchard_x0_395 res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame xp=0 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=orchard_x0_395 --perf-csv={out}/perf.csv
+shot p_air_x0_8224 res://tools/perf/frame_probe.tscn {out} estate_air regions ingame xp=0 --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=air_x0_8224 --perf-csv={out}/perf.csv
+shot look3 res://tools/court/court_terrain_shots.tscn {out} estate_orchard estate_north regions ingame xp=3
