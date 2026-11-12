@@ -199,6 +199,10 @@ const LINEUPS := {
 	# go by where it stands): the two shots show the same colours in the same places
 	"candyfloss_far": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"far:woods_candyfloss_tree"]},
 	"candyfloss_close": {"distance": 8.0, "spacing": 7.0, "look": 5.4, "ids": [&"woods_candyfloss_tree"]},
+	"wisteria": {"distance": 15.0, "spacing": 8.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_golden_chain"]},
+	"wisteria_close": {"distance": 7.5, "spacing": 7.0, "look": 3.6, "ids": [&"woods_wisteria_tree"]},
+	"wisteria_row": {"distance": 26.0, "spacing": 7.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_wisteria_tree",
+		&"woods_golden_chain", &"woods_wisteria_tree", &"woods_wisteria_tree"]},
 	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
 		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
