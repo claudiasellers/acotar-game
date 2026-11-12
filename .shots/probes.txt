@@ -1,0 +1,5 @@
+from special-trees
+quality look
+shot pair res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=wisteria
+shot close res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=wisteria_close
+shot row res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=wisteria_row
