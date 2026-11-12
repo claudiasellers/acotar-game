@@ -1,0 +1,4 @@
+from estate-trees
+quality look
+shot views1 res://tools/court/court_terrain_shots.tscn {out} estate_lawns estate_orchard regions ingame
+shot views2 res://tools/court/court_terrain_shots.tscn {out} estate_north estate_air regions ingame
