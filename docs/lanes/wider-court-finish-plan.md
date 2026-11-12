@@ -221,14 +221,26 @@ bank-side lines may stand closer (`BAND_CEILING`), being narrow.
 | Region | Recipe (terrain table) | Trees before → now | per ha | Densest hectare |
 |---|---|---|---|---|
 | Western Woods | closed ancient wood: oak, twisted oaks, a few pines; dark hollows; glades at the pads; the tower hill's crown bare | 1,047 → 5,391 | 41.7 | 88 |
-| Starlight Glen | birch and willow on the brooks, river and shores; one big oak on each knoll (45); open floor; the mound bare | 1,002 → 782 | 8.5 | 78 |
-| Village | orchard rows; hawthorn and elder hedges on the road verges; the green open | 558 → 677 | 10.0 | 46 |
+| Starlight Glen | birch and willow on the brooks, river and shores; one big oak on each knoll (45); open floor; the mound bare; no pines round the starlight pool | 1,002 → 767 | 8.3 | 78 |
+| Village | orchard rows; hawthorn and elder hedges on the road verges and through the pinch; the green open | 558 → 718 | 10.7 | 46 |
 | Autumn border | red and gold woods up to 40° of slope; the crags bare | 460 → 1,275 | 19.8 | 47 |
 | Rosewild | hawthorn thickets in the hollows; hummocks (knolls, crests) open | 405 → 305 | 8.3 | 28 |
 | Solstice Meadow | oak wood on the descent; the plateau and the vast meadow open | 175 → 420 | 8.6 | 51 |
 | Hill of the Rite | oak on the foothill slopes; pines on the steep banks and the trench; the crown bald | 158 → 858 | 10.6 | 61 |
 | Blighted Reaches | dead trees, as before | 801 → 796 | 8.8 | 47 |
 | Blossom Vale | blossom rows, as before (groves now held to the ceiling) | 3,075 → 3,153 | 37.2 | 80 |
+
+Frame time on the Mac (median ms, 1080p; wcterrain-55 before, wcterrain-56 after):
+Western Woods 15.5 → 20.2 (it was nearly bare; it is now a wood at the ceiling), glen
+saddle 18.0 → 18.0, village green 17.2 → 17.2, plateau north 20.4 → 21.1, Rite way
+14.6 → 14.6. The Western Woods is over the 16.6 budget: lower `CEILING` or the near
+step's reach (`CourtTreeSet.NEAR`) if the owner wants it back.
+
+**Each tree switches detail step at its own distance (2026-11-12).** The near and mid
+steps used to switch on the scatter chunk's distance, and a tree chunk is 256 m: a tree
+at your feet could draw as the mid step's solid lumps (T7c made that visible; P2's wood
+made it obvious). The step is now a distance window in `court_tree.gdshader`, the near
+step is drawn from 64 m chunks (`TreesNear`).
 
 `tools/court/court_tree_report.gd` prints trees per hectare by landform for every
 region (`map=<dir>` draws each region's landforms with a dot per tree). The same

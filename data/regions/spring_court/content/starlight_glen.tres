@@ -88,7 +88,7 @@ max_slope = 30.0
 [sub_resource type="Resource" id="Resource_ouidx"]
 script = ExtResource("1_oiwpk")
 mesh_id = &"woods_yew"
-habitats = PackedStringArray("birch_copse", "glimmer_hollow")
+habitats = PackedStringArray("birch_copse")
 density = 0.04
 scale_max = 1.3
 wind = 0.25

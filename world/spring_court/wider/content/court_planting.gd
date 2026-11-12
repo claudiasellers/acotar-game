@@ -82,15 +82,23 @@ static func form_name(content: CourtRegionContent, p: Vector2, bands: bool = fal
 	if bands or _names_a_band(content):
 		var w := CourtLandHabitats._water_form(p.x, p.y, CourtHeight.height_at(p.x, p.y))
 		if w >= 0:
-			if bands or content.land.has(String(CourtLandHabitats.NAMES[w])):
+			if bands or _names_form(content, CourtLandHabitats.NAMES[w]):
 				return CourtLandHabitats.NAMES[w]
-		elif (bands or content.land.has("verge")) and CourtLandHabitats.path_distance(p.x, p.y) < CourtLandHabitats.VERGE_BAND:
+		elif (bands or _names_form(content, &"verge")) and CourtLandHabitats.path_distance(p.x, p.y) < CourtLandHabitats.VERGE_BAND:
 			return &"verge"
 	var g := grid(content)
 	var r: Rect2 = g["rect"]
 	var ix := clampi(floori((p.x - r.position.x) / STEP), 0, int(g["nx"]) - 1)
 	var iz := clampi(floori((p.y - r.position.y) / STEP), 0, int(g["nz"]) - 1)
 	return CourtLandHabitats.NAMES[(g["forms"] as PackedByteArray)[iz * int(g["nx"]) + ix]]
+
+
+## True if the recipe names the form, on the default ground or on a habitat.
+static func _names_form(content: CourtRegionContent, form: StringName) -> bool:
+	for l in content.land:
+		if l == String(form) or l.ends_with("@" + form):
+			return true
+	return false
 
 
 static func _names_a_band(content: CourtRegionContent) -> bool:
