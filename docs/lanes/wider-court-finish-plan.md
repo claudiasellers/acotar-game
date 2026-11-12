@@ -236,6 +236,28 @@ saddle 18.0 → 18.0, village green 17.2 → 17.2, plateau north 20.4 → 21.1, 
 14.6 → 14.6. The Western Woods is over the 16.6 budget: lower `CEILING` or the near
 step's reach (`CourtTreeSet.NEAR`) if the owner wants it back.
 
+**Where the Western Woods' frame time goes (2026-11-12, wcterrain-58..64).** The owner
+asked for a shorter leafy distance. Measured first, on the `western_woods` view
+(`without=` in the shot tool leaves parts out; two runs each, about 1 ms of noise):
+
+| Left out | Median ms |
+|---|---|
+| nothing | 21.2 to 23.5 |
+| the leafy near step | 16.2, 16.8 |
+| the solid mid and far steps | 21.2, 20.4 |
+| every tree | 16.6, 16.7 |
+| the near step's shadows | 19.9, 20.0 |
+| all other scatter | 20.3, 20.6 |
+
+So the leafy near step is the whole cost, about 5 ms, and about 1 ms of that is its
+shadows. `NEAR` at 60 m gave 20.6 and at 50 m 20.0 against 20.2 to 21.5 at 80 m: the
+cost is the leafy trees close to you, not the ones between 50 and 80 m, so a shorter
+leafy distance buys under 1 ms for an earlier switch to solid crowns. **Not applied.**
+Casting the near trees' shadows with their solid stand-ins (branch
+`lane/court-tree-shadows`, parked) gave 0.9 ms in the Western Woods and nothing on the
+tower hill. **Not applied.** What is left: fewer trees in a grove (`CourtPlanting.CEILING`;
+the cost follows the trees near you), or lighter near models (fewer leaf cards).
+
 **Each tree switches detail step at its own distance (2026-11-12).** The near and mid
 steps used to switch on the scatter chunk's distance, and a tree chunk is 256 m: a tree
 at your feet could draw as the mid step's solid lumps (T7c made that visible; P2's wood
