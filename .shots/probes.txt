@@ -1,0 +1,4 @@
+from special-trees
+quality look
+shot one res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=magnolia_harlequin
+shot both res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=magnolias
