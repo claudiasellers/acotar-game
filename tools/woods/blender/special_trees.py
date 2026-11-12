@@ -17,9 +17,9 @@ magnolia   A saucer magnolia in full flower on bare pearl wood: a short
            goblets below them, pointed buds on the spurs along the limbs.
            Each petal is rose at its foot, blush, then pearl at its tip.
 magnolia_harlequin
-           The same tree with every flower its own pair of candy colours: a
-           cream, blush, lilac, apricot or mint cup round rose, coral, lilac
-           or periwinkle petals.
+           The same tree with every flower its own candy colour (rose,
+           coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
+           petals in another standing up out of the cup.
 """
 
 import math
@@ -147,20 +147,20 @@ ROSE_PEARL = [
 ]
 ROSE_PEARL_ODDS = None   # a lilac flower about one time in seven, see bloom()
 BUD = (hexc("D2588F"), hexc("E983AE"), hexc("F4B3CB"))
-# The harlequin: every flower its own pair of candy colours, a cream or pastel
-# cup round a brighter heart of petals, as the first magnolia had (owner,
-# 2026-11-12: "i liked how the original one was multicolored").
-CREAM_CUP = (hexc("F3D58C"), hexc("FAE9B4"), hexc("FBF4E2"))
-HARLEQUIN = [
-    (CREAM_CUP, (hexc("E8739A"), hexc("F4A6C0"), hexc("FBD9E2"))),                                           # cream round rose
-    (CREAM_CUP, (hexc("EE7C66"), hexc("F7A08C"), hexc("FBD3C2"))),                                           # cream round coral
-    (CREAM_CUP, (hexc("A77FDB"), hexc("C8A8E9"), hexc("E9DBF6"))),                                           # cream round lilac
-    ((hexc("F4A6C0"), hexc("FAD4DC"), hexc("FBF0EC")), (hexc("E25A8A"), hexc("EE7FB0"), hexc("F9C3D8"))),   # blush round hot pink
-    ((hexc("C8A8E9"), hexc("E3D0F4"), hexc("F5EDFA")), (hexc("8F9DEB"), hexc("A7B5F2"), hexc("DCE2FB"))),   # lilac round periwinkle
-    ((hexc("F6B877"), hexc("FBD9A8"), hexc("FCEFD9")), (hexc("EE7C66"), hexc("F7A08C"), hexc("FBD3C2"))),   # apricot round coral
-    ((hexc("9FD9C0"), hexc("CDEEDD"), hexc("F0FAF3")), (hexc("E8739A"), hexc("F4A6C0"), hexc("FBD9E2"))),   # mint round rose
-]
-HARLEQUIN_ODDS = [0.2, 0.16, 0.16, 0.14, 0.14, 0.12, 0.08]
+# The harlequin: every flower its own candy colour, with a heart of petals in
+# another standing up out of the cup, as the first magnolia had (owner,
+# 2026-11-12: "i liked how the original one was multicolored"). The cup is
+# the colour: it is what you see from the ground.
+CREAM = (hexc("F3D58C"), hexc("FAE9B4"), hexc("FBF4E2"))
+ROSE = (hexc("E8739A"), hexc("F4A6C0"), hexc("FBD9E2"))
+CORAL = (hexc("EE7C66"), hexc("F7A08C"), hexc("FBD3C2"))
+LILAC = (hexc("A77FDB"), hexc("C8A8E9"), hexc("E9DBF6"))
+PERI = (hexc("8F9DEB"), hexc("A7B5F2"), hexc("DCE2FB"))
+APRICOT = (hexc("F0B45E"), hexc("F8D28A"), hexc("FBEBC4"))
+MINT = (hexc("7FCFAA"), hexc("B5E8CD"), hexc("E6F7EC"))
+HOT_PINK = (hexc("E25A8A"), hexc("EE7FB0"), hexc("F9C3D8"))
+HARLEQUIN = [(ROSE, CREAM), (CORAL, APRICOT), (LILAC, ROSE), (PERI, LILAC), (APRICOT, CORAL), (MINT, ROSE), (HOT_PINK, CREAM)]
+HARLEQUIN_ODDS = [0.17, 0.15, 0.16, 0.15, 0.14, 0.09, 0.14]
 GOLD = hexc("F6CF6A")
 
 
@@ -188,7 +188,11 @@ def bloom(kit, base, axis, size, stage, near, flex, palette, odds):
 
     if stage == 2:
         ring(6, 0.0, 0.62, 0.22, 64.0, 0.6, outer, 4)
-        ring(3, math.pi / 6, 0.5, 0.19, 24.0, 0.5, inner, 3)
+        if palette is ROSE_PEARL:
+            ring(3, math.pi / 6, 0.5, 0.19, 24.0, 0.5, inner, 3)
+        else:
+            # the heart's petals stand up out of the cup, to show their colour
+            ring(3, math.pi / 6, 0.66, 0.2, 17.0, 0.45, inner, 3)
         if near:
             heart(kit, base + axis * 0.03 * size, axis, 0.05 * size, 0.2 * size, GOLD, flex)
     elif stage == 1:
@@ -198,7 +202,7 @@ def bloom(kit, base, axis, size, stage, near, flex, palette, odds):
         ring(3, 0.0, 0.4, 0.14, 20.0, 2.0, BUD, 2)
     else:
         # a bud shows the colour its flower will open to
-        ring(3, 0.0, 0.4, 0.14, 20.0, 2.0, (wt.shade(inner[0], 0.9), inner[0], inner[1]), 2)
+        ring(3, 0.0, 0.4, 0.14, 20.0, 2.0, (wt.shade(outer[0], 0.9), outer[0], outer[1]), 2)
 
 
 def magnolia(kit, near, palette=ROSE_PEARL, odds=ROSE_PEARL_ODDS):
