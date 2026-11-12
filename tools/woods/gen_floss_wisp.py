@@ -70,9 +70,9 @@ def wisp(seed, threads, spread, wave):
     rows = np.array([rng.random() for _ in range(H * SS // 3 + 2)], np.float32)
     bend = 0.012 * np.sin(u * math.tau * 1.3 + seed)
     streak = np.interp(((v + bend) * (H * SS / 3.0)).ravel(), np.arange(rows.size), rows).reshape(v.shape)
-    lens = 1.3 - ((u - 0.5) / 0.47) ** 2 - ((v - 0.5) / (spread * 2.5)) ** 2
+    lens = 1.45 - ((u - 0.5) / 0.49) ** 2 - ((v - 0.5) / 0.44) ** 2
     body = np.clip(lens, 0.0, 1.0)
-    fleece = np.clip((body - streak * (1.15 - 0.75 * body)) * 3.0, 0.0, 1.0)
+    fleece = np.clip((body - streak * (1.1 - 0.85 * body)) * 3.0, 0.0, 1.0)
     cover = 1.0 - (1.0 - cover) * (1.0 - fleece)
     light += fleece * (0.62 + 0.3 * streak)
     weight += fleece
@@ -88,7 +88,7 @@ def main():
     here = os.path.dirname(os.path.abspath(__file__))
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(here, "..", "..", "world", "spring_court", "shared", "models", "floss_wisp.png")
     sheet = Image.new("RGBA", (W * 2, H * 2), (190, 190, 190, 0))
-    recipes = [(11, 150, 0.15, 0.03), (23, 120, 0.13, 0.05), (37, 170, 0.17, 0.025), (41, 90, 0.11, 0.07)]
+    recipes = [(11, 170, 0.2, 0.03), (23, 140, 0.18, 0.05), (37, 190, 0.21, 0.025), (41, 120, 0.17, 0.06)]
     for i, (seed, threads, spread, wave) in enumerate(recipes):
         sheet.paste(wisp(seed, threads, spread, wave), ((i % 2) * W, (i // 2) * H))
     # colour under the clear parts so the edges do not darken when the picture is shrunk

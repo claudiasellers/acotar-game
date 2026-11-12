@@ -14,10 +14,10 @@ render_mode cull_disabled, depth_draw_opaque;
 
 uniform sampler2D wisps : source_color, filter_linear_mipmap, repeat_disable;
 // how far the light threads go toward white
-uniform float pale : hint_range(0.0, 1.0) = 0.5;
+uniform float pale : hint_range(0.0, 1.0) = 0.3;
 // how much deeper the dark threads are
-uniform float thread_depth : hint_range(0.0, 1.0) = 0.3;
-uniform float translucency : hint_range(0.0, 1.0) = 0.7;
+uniform float thread_depth : hint_range(0.0, 1.0) = 0.16;
+uniform float translucency : hint_range(0.0, 1.0) = 0.4;
 // sugar crystals catching the light
 uniform float sparkle : hint_range(0.0, 1.0) = 0.6;
 uniform vec4 sparkle_color : source_color = vec4(1.0, 0.95, 0.9, 1.0);
@@ -30,7 +30,7 @@ varying vec3 world_pos;
 #define CANDY_WRAP_DEFAULT 0.6
 #define CANDY_SHADE_DEFAULT vec4(0.7, 0.6, 0.84, 1.0)
 #define CANDY_RIM_COLOR_DEFAULT vec4(1.0, 0.88, 0.84, 1.0)
-#define CANDY_RIM_STRENGTH_DEFAULT 0.6
+#define CANDY_RIM_STRENGTH_DEFAULT 0.35
 #define CANDY_NO_SPEC_LOBE
 #include "res://world/shared/shaders/candy_lit.gdshaderinc"
 
@@ -55,7 +55,7 @@ void fragment() {
 	float v = pow(dot(t.rgb, vec3(0.3, 0.59, 0.11)), 0.4545);
 	vec3 base = pow(COLOR.rgb, vec3(2.2));
 	vec3 col = mix(base * (1.0 - thread_depth), mix(base, vec3(0.94, 0.9, 0.92), pale), smoothstep(0.5, 0.92, v));
-	col = mix(col, vec3(0.94, 0.9, 0.92), (1.0 - smoothstep(0.45, 0.9, t.a)) * 0.3);
+	col = mix(col, vec3(0.94, 0.9, 0.92), (1.0 - smoothstep(0.45, 0.9, t.a)) * 0.12);
 	ALBEDO = col;
 	ROUGHNESS = 0.8;
 	SPECULAR = 0.2;

@@ -346,10 +346,10 @@ def floss_heart(kit, tuft, top, deep, flex, rows, segs):
         ring = []
         for k in range(segs):
             a = math.tau * k / segs + 0.3 * r
-            v = kit.add_vert(tuft.at(t, a, 0.86) if 0 < r < rows else tuft.foot + tuft.axis * (t * tuft.length))
+            v = kit.add_vert(tuft.at(t, a, 0.94) if 0 < r < rows else tuft.foot + tuft.axis * (t * tuft.length))
             kit.normals[v] = tuft.normal(t, a) if 0 < r < rows else (tuft.axis if r else -tuft.axis)
             ring.append(v)
-        rings.append((ring, mix(deep, top, 0.55 * t ** 1.3), flex + 0.08 * t))
+        rings.append((ring, mix(deep, top, 0.3 + 0.55 * t ** 1.2), flex + 0.08 * t))
     for r in range(rows):
         (a, ca, fa), (b, cb, fb) = rings[r], rings[r + 1]
         for k in range(segs):
@@ -413,14 +413,15 @@ def floss(kit, tuft, top, deep, near):
     standing off it, the pulled tails, and its stars."""
     flex = 0.34
     floss_heart(kit, tuft, top, deep, flex, 9 if near else 5, 10 if near else 6)
-    pale = mix(top, hexc("FFFFFF"), 0.4)
+    pale = mix(top, hexc("FFFFFF"), 0.25)
     r = tuft.radius
 
     def colour(t):
-        return mix(mix(deep, top, 0.45), pale, min(1.0, 0.25 + 0.9 * t))
+        # the heart's colour at this height, a step paler
+        return mix(mix(deep, top, 0.3 + 0.55 * t ** 1.2), pale, 0.4)
 
     # laid wisps: a spiral of cards over the whole tuft, more where it is fat
-    want = 34 if near else 9
+    want = 52 if near else 10
     placed = 0
     i = 0
     while placed < want:
@@ -431,20 +432,20 @@ def floss(kit, tuft, top, deep, near):
         a = i * 2.39996 + kit.rng.uniform(-0.3, 0.3)
         n = tuft.normal(t, a)
         along = tuft.winding(t, a, math.radians(kit.rng.uniform(10.0, 32.0)))
-        size = r * kit.rng.uniform(0.95, 1.4) * (1.0 if near else 1.6)
-        wisp(kit, tuft.at(t, a, kit.rng.uniform(1.0, 1.12)), along, n, size, size * kit.rng.uniform(0.4, 0.5), n,
-             colour(t), flex + 0.1 * t, lift=kit.rng.uniform(0.15, 0.5))
+        size = r * kit.rng.uniform(0.8, 1.15) * (1.0 if near else 1.7)
+        wisp(kit, tuft.at(t, a, kit.rng.uniform(1.0, 1.08)), along, n, size, size * kit.rng.uniform(0.44, 0.54), n,
+             colour(t), flex + 0.1 * t, lift=kit.rng.uniform(0.05, 0.32))
         placed += 1
     # the fringe: wisps standing out from the tuft along the winding, so every outline is threads
-    for k in range(9 if near else 3):
+    for k in range(12 if near else 3):
         t = kit.rng.uniform(0.2, 0.92)
         a = kit.rng.uniform(0.0, math.tau)
         n = tuft.normal(t, a)
         along = tuft.winding(t, a, math.radians(kit.rng.uniform(8.0, 26.0)))
         size = r * kit.rng.uniform(0.9, 1.3)
-        wisp(kit, tuft.at(t, a, 1.12), along, along.cross(n).normalized(), size, size * 0.42, n, mix(colour(t), hexc("FFFFFF"), 0.2), flex + 0.14)
+        wisp(kit, tuft.at(t, a, 1.1), along, along.cross(n).normalized(), size * 0.85, size * 0.38, n, mix(colour(t), hexc("FFFFFF"), 0.12), flex + 0.14)
     # tails: sugar pulled out of the foot down the stick, and a wisp or two streaming off the top
-    for k in range(4 if near else 1):
+    for k in range(3 if near else 1):
         a = kit.rng.uniform(0.0, math.tau)
         n = tuft.out(a)
         down = (-tuft.axis * 0.8 - UP * 0.5 + n * 0.25).normalized()
@@ -464,7 +465,7 @@ def floss(kit, tuft, top, deep, near):
         size = kit.rng.uniform(0.2, 0.32) * (1.0 if near else 1.5)
         roll = kit.rng.random()
         petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.22 else STAR_BLUSH if roll < 0.45 else STAR_PEARL
-        star(kit, tuft.at(t, a, 1.14), n, size, petal_c, tip_c, heart_c, flex + 0.1)
+        star(kit, tuft.at(t, a, 1.1), n, size, petal_c, tip_c, heart_c, flex + 0.1)
 
 
 def candyfloss_tree(kit, near):
@@ -479,26 +480,27 @@ def candyfloss_tree(kit, near):
         trunk = trunk[::2]
     kit.tube(trunk, taper(len(trunk), 0.5, 0.28), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
     top = trunk[-1]
-    limbs = 6
+    limbs = 5
     start = kit.rng.uniform(0.0, math.tau)
     for i in range(limbs):
-        a = start + math.tau * i / limbs + kit.rng.uniform(-0.2, 0.2)
+        a = start + math.tau * i / limbs + kit.rng.uniform(-0.15, 0.15)
         heading = Vector((math.cos(a), math.sin(a), 0.0))
         low = i % 2 == 0
         base = at(trunk, 0.82) if low else top
-        limb = sweep(kit, base, heading, 16.0 if low else 38.0, 70.0 if low else 62.0, kit.rng.uniform(3.4, 3.9) * (1.0 if low else 0.88), 5 if near else 3, 0.1)
+        limb = sweep(kit, base, heading, 18.0 if low else 30.0, 46.0 if low else 52.0, kit.rng.uniform(3.2, 3.6) * (1.0 if low else 0.9), 5 if near else 3, 0.08)
         kit.tube(limb, taper(len(limb), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.34)
-        foot = at(limb, 0.5)
-        axis = (limb[-1] - at(limb, 0.6)).normalized()
-        length = kit.rng.uniform(2.7, 3.2)
+        foot = at(limb, 0.42)
+        # the stick: the way the limb is going, a little more upright
+        axis = ((limb[-1] - at(limb, 0.5)).normalized() + UP * 0.25).normalized()
+        length = kit.rng.uniform(2.8, 3.2)
         ca, cb = FLOSS[i % len(FLOSS)]
-        floss(kit, Tuft(kit, foot, foot + axis * length, length * kit.rng.uniform(0.4, 0.45), 1 if i % 2 else -1), ca, cb, near)
+        floss(kit, Tuft(kit, foot, foot + axis * length, length * kit.rng.uniform(0.4, 0.44), 1 if i % 2 else -1), ca, cb, near)
     # the crown: the biggest tuft, on the leader
-    lead = sweep(kit, top, lean, 80.0, 86.0, 2.6, 3 if near else 2, 0.06)
+    lead = sweep(kit, top, lean, 80.0, 86.0, 3.0, 3 if near else 2, 0.06)
     kit.tube(lead, taper(len(lead), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.3)
-    foot = at(lead, 0.3)
-    ca, cb = FLOSS[(limbs + 1) % len(FLOSS)]
-    floss(kit, Tuft(kit, foot, foot + (lead[-1] - foot).normalized() * 3.7, 1.6, 1), ca, cb, near)
+    foot = at(lead, 0.4)
+    ca, cb = FLOSS[(limbs + 2) % len(FLOSS)]
+    floss(kit, Tuft(kit, foot, foot + (lead[-1] - foot).normalized() * 3.6, 1.5, 1), ca, cb, near)
 
 
 def wisp_object(kit, name):
