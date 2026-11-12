@@ -1,0 +1,3 @@
+from wider-court-world
+quality look
+shot a res://tools/court/court_terrain_shots.tscn {out} village_pinch the_mound tower_hill exit_west regions ingame
