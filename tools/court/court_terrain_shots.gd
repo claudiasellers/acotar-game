@@ -249,6 +249,10 @@ const LINEUPS := {
 	"candy_oak_close": {"distance": 22.0, "spacing": 17.0, "look": 8.0, "ids": ["leafy:oak"]},
 	# beside a court oak (Quaternius) and a court EZ oak, for the level of detail
 	"candy_oak_court": {"distance": 36.0, "spacing": 17.0, "look": 7.5, "ids": ["set:woods_oak:0", "leafy:oak", "set:woods_oak:5"]},
+	# The estate tree-builder, from scratch (estate_tree.py): today's oak, then three seeds.
+	"new_oak": {"distance": 46.0, "spacing": 17.0, "look": 7.5, "ids": ["estate:oak:0", "tree:tree_oak_a:oak", "tree:tree_oak_b:oak", "tree:tree_oak_c:oak"]},
+	"new_oak_close": {"distance": 23.0, "spacing": 17.0, "look": 8.0, "ids": ["tree:tree_oak_a:oak"]},
+	"new_oak_court": {"distance": 38.0, "spacing": 17.0, "look": 7.5, "ids": ["set:woods_oak:0", "tree:tree_oak_b:oak", "set:woods_oak:5"]},
 	"candy_blossom": {"distance": 30.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:cherry_blossom:0", "candy_ez:cherry_blossom",
 		"hybrid:cherry_blossom", "post", "estate:apple_blossom:0", "candy_ez:apple_blossom", "hybrid:apple_blossom"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
@@ -317,8 +321,8 @@ const CANDY_LEAFY := {
 }
 
 
-func _candy_leafy(sp: StringName) -> Mesh:
-	var inst := (load(CANDY_DIR + "candy_%s.glb" % sp) as PackedScene).instantiate()
+func _candy_leafy(sp: StringName, file: String = "") -> Mesh:
+	var inst := (load(CANDY_DIR + (file if file != "" else "candy_%s" % sp) + ".glb") as PackedScene).instantiate()
 	var pal: Array = CANDY_LEAFY.get(sp, CANDY_EZ[sp][4])
 	var h := FloraLib.height_of(sp)
 	var mats := {}
@@ -348,7 +352,8 @@ func _candy_leafy(sp: StringName) -> Mesh:
 			arr[Mesh.ARRAY_VERTEX] = verts
 			arr[Mesh.ARRAY_NORMAL] = norms
 			arr[Mesh.ARRAY_TANGENT] = null
-			arr[Mesh.ARRAY_COLOR] = null
+			if part != "leaves":
+				arr[Mesh.ARRAY_COLOR] = null
 			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
 			out.surface_set_material(out.get_surface_count() - 1, mats.get(part, mats["core"]))
 	inst.free()
@@ -551,6 +556,9 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				var ce := _candy_ez(sp)
 				mi.mesh = ce[0]
 				mi.scale = Vector3.ONE * float(ce[1])
+			elif item.begins_with("tree:"):
+				# the from-scratch estate tree (estate_tree.py): tree:<file>:<species>
+				mi.mesh = _candy_leafy(StringName(item.get_slice(":", 2)), item.get_slice(":", 1))
 			elif item.begins_with("leafy:"):
 				mi.mesh = _candy_leafy(StringName(item.get_slice(":", 1)))
 			elif item.begins_with("hybrid:"):

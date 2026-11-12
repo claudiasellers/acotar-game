@@ -13,7 +13,9 @@ render_mode cull_disabled, depth_draw_opaque;
 
 #include "res://world/shared/shaders/foliage_wind.gdshaderinc"
 
-uniform sampler2D tex : source_color, filter_linear_mipmap;
+uniform sampler2D tex : source_color, filter_linear_mipmap, repeat_enable;
+// bark and heart patterns are laid on from three sides (no UVs, no seams): repeats per metre
+uniform float pattern_scale = 0.3;
 uniform int part = 1;
 uniform vec4 shadow_col : source_color = vec4(0.30, 0.56, 0.44, 1.0);
 uniform vec4 mid_col : source_color = vec4(0.50, 0.79, 0.56, 1.0);
@@ -37,6 +39,8 @@ uniform float tree_value_spread : hint_range(0.0, 0.3) = 0.08;
 varying float v_tree;
 varying float v_height;
 varying float v_up;
+varying vec3 v_obj;
+varying vec3 v_objn;
 
 void vertex() {
 	vec3 o = MODEL_MATRIX[3].xyz;
@@ -44,16 +48,28 @@ void vertex() {
 	v_height = clamp(VERTEX.y / max(model_height, 0.01), 0.0, 1.0);
 	// the puff's own top and underside (the normal is the puff's, not the card's)
 	v_up = NORMAL.y;
+	v_obj = VERTEX;
+	v_objn = NORMAL;
 	if (part != 0) {
 		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.25, 1.0, v_height));
 	}
 }
 
+// The pattern's painted value from three sides, blended by the facing (the
+// texture is read as colour, linear: back to its painted value).
+float pattern(vec3 p, vec3 n) {
+	vec3 w = pow(abs(n), vec3(4.0));
+	w /= w.x + w.y + w.z;
+	vec4 a = texture(tex, p.zy * pattern_scale) * w.x + texture(tex, p.xz * pattern_scale) * w.y + texture(tex, p.xy * pattern_scale) * w.z;
+	return pow(dot(a.rgb, vec3(0.3, 0.59, 0.11)), 0.4545);
+}
+
 void fragment() {
 	vec3 col;
 	if (part == 0) {
-		// the texture is read as colour (linear): back to its painted value
-		col = bark_col.rgb * mix(1.0, pow(dot(texture(tex, UV).rgb, vec3(0.3, 0.59, 0.11)), 0.4545) / bark_mean, 0.8);
+		col = bark_col.rgb * mix(1.0, pattern(v_obj, v_objn) / bark_mean, 0.8);
+		// the limbs darken up into the crown's shade
+		col *= mix(1.0, 0.8, smoothstep(0.3, 0.6, v_height));
 	} else {
 		// A card seen from behind keeps its puff's normal: the crown shades
 		// as clouds whichever way a card faces.
@@ -61,7 +77,8 @@ void fragment() {
 			NORMAL = -NORMAL;
 		}
 		if (part == 2) {
-			col = mix(shadow_col.rgb, mid_col.rgb, 0.3);
+			// the heart: leaves in shade, not a smooth ball
+			col = mix(shadow_col.rgb * 0.82, mid_col.rgb, clamp(pattern(v_obj * 1.7, v_objn) * 1.3, 0.0, 1.0) * 0.5);
 		} else {
 			vec4 t = texture(tex, UV);
 			ALPHA = t.a;
@@ -71,6 +88,7 @@ void fragment() {
 			float k = clamp(v * 1.5 * (0.56 + 0.26 * v_height + 0.42 * v_up), 0.0, 1.0);
 			k = floor(k * bands + 0.5) / bands * 0.7 + k * 0.3;
 			col = k < 0.5 ? mix(shadow_col.rgb, mid_col.rgb, k * 2.0) : mix(mid_col.rgb, light_col.rgb, (k - 0.5) * 2.0);
+			col *= COLOR.r;   // each cloud a touch lighter or deeper
 		}
 		BACKLIGHT = col * 0.3;
 	}
