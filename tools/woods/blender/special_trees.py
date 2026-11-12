@@ -97,8 +97,8 @@ def petal(kit, centre, axis, out, length, width, tilt, cup, cols, flex, rows):
         for v in ring[-1]:
             n = (kit.verts[v] - centre)
             n = n.normalized() if n.length > 1e-4 else axis
-            # mostly up the flower's axis: the cup takes the light evenly, inside and out
-            kit.normals[v] = (n * 0.45 + axis * 0.8).normalized()
+            # round the flower: lit on top, soft shade under the cup where the rose shows
+            kit.normals[v] = (n * 0.85 + axis * 0.22).normalized()
         ring[-1] = (ring[-1], col, flex + 0.05 * t)
     for r in range(rows):
         (a, ca, fa), (b, cb, fb) = ring[r], ring[r + 1]
@@ -136,14 +136,14 @@ def heart(kit, centre, axis, r, h, col, flex):
 
 # Petal colours, foot to tip.
 BLOOMS = [
-    (hexc("E86AA0"), hexc("F7BCD3"), hexc("FFF4F2")),   # rose foot, pearl tip
-    (hexc("D95C9B"), hexc("F3A9CB"), hexc("FCE4EC")),   # deeper rose
-    (hexc("C98BE0"), hexc("E8CBF4"), hexc("FBF2FD")),   # a lilac one now and then
-    (hexc("F08DB2"), hexc("FBD3DF"), hexc("FFFAF4")),   # blush
+    (hexc("E8739A"), hexc("F4A6C0"), hexc("FBE3E6")),   # rose foot, blush, pearl tip
+    (hexc("DE6494"), hexc("F2A0BE"), hexc("F9D9E0")),   # deeper rose
+    (hexc("B58FDD"), hexc("D8BDF0"), hexc("F1E4F8")),   # a lilac one now and then
+    (hexc("EE8AAE"), hexc("F8C3D2"), hexc("FCEDE8")),   # blush
 ]
-INNER = (hexc("F9C9DA"), hexc("FFF1F0"), hexc("FFFDF8"))
-BUD = (hexc("C94F8E"), hexc("E77FB0"), hexc("F6B8D2"))
-GOLD = hexc("FFD166")
+INNER = (hexc("F6BFD0"), hexc("FBE3E6"), hexc("FBF3EC"))
+BUD = (hexc("D2588F"), hexc("E983AE"), hexc("F4B3CB"))
+GOLD = hexc("F6CF6A")
 
 
 def bloom(kit, base, axis, size, stage, near, flex):
