@@ -1,0 +1,4 @@
+from special-trees
+quality look
+shot one res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candyfloss
+shot pair res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candy_close
