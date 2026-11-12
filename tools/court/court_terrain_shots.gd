@@ -358,6 +358,7 @@ func _candy_leafy(sp: StringName, file: String = "") -> Mesh:
 			tex = CANDY_DIR + "frond_willow.png"
 		m.set_shader_parameter(&"tex", load(tex))
 		m.set_shader_parameter(&"own_colour", sp in CANDY_BLOSSOM and part == "leaves")
+		m.set_shader_parameter(&"hanging", part == "fronds")
 		m.set_shader_parameter(&"bark_col", Color(0.93, 0.91, 0.88) if sp == &"birch" else Color(0.56, 0.42, 0.43))
 		m.set_shader_parameter(&"bark_mean", 0.582 if sp == &"birch" else 0.338)
 		m.set_shader_parameter(&"shadow_col", pal[0])

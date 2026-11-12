@@ -20,6 +20,8 @@ uniform float pattern_scale = 0.3;
 uniform int part = 1;
 // blossom clumps are painted in their own colours; leaf clumps are a value the shader bands
 uniform bool own_colour = false;
+// the willow's fronds hang: they sway most at their tips (the picture's foot), not up the tree
+uniform bool hanging = false;
 uniform vec4 shadow_col : source_color = vec4(0.30, 0.56, 0.44, 1.0);
 uniform vec4 mid_col : source_color = vec4(0.50, 0.79, 0.56, 1.0);
 uniform vec4 light_col : source_color = vec4(0.78, 0.95, 0.72, 1.0);
@@ -54,7 +56,7 @@ void vertex() {
 	v_obj = VERTEX;
 	v_objn = NORMAL;
 	if (part != 0) {
-		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, smoothstep(0.25, 1.0, v_height));
+		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, hanging ? UV.y * 0.9 : smoothstep(0.25, 1.0, v_height));
 	}
 }
 

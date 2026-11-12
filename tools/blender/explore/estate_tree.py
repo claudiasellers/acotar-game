@@ -44,8 +44,7 @@ UP = Vector((0, 0, 1))
 #   cloud: cloud radius; flat: its height over its width; card: leaf-clump size
 #   optional: flare (root radius x trunk, 1.9), limb (limb radius x trunk, 0.62),
 #   top (the leader's last reach, 0.13), top_cloud (x cloud, 1.15),
-#   weep (the willow's curtain: fronds per cloud, frond width, how near the
-#   ground they hang), fruit (pears per cloud)
+#   weep (the willow: fronds instead of leaf clouds, see its recipe), fruit (pears per cloud)
 RECIPES = {
     # the parkland oak: stout, four long low limbs, a broad tiered crown (owner: "a bit broader", "those look good")
     "oak": dict(
@@ -84,13 +83,17 @@ RECIPES = {
         whorls=[(0.26, 3, 0.27, 38, 66, 1), (0.42, 3, 0.23, 46, 70, 1), (0.57, 3, 0.17, 54, 74, 0)],
         leader=0.7, top=0.12, kink=14, cloud=0.118, flat=0.92, card=0.1, cover=2.1, rim=0.26, fruit=1.4,
     ),
-    # the willow: a short leaning trunk, limbs that arch up and over, a low
-    # dome of narrow leaves and a curtain of fronds hanging from it
+    # the willow: a short leaning trunk, slender limbs that climb, arch over
+    # and droop, and nothing on them but fronds: strands that leave the limb,
+    # roll over a shoulder and fall towards the ground (owner, 2026-11-12: "i
+    # love the cascading leaves ... but i dont like the clumps at the top ...
+    # thats not what actual willows look like"). No leaf clouds.
+    #   weep: fronds per limb, frond width, the shoulder's reach, how near the ground they hang
     "willow": dict(
-        trunk=0.052, clear=0.24, lean=0.07, flare=1.8,
-        whorls=[(0.24, 4, 0.36, 58, 4, 1), (0.36, 3, 0.3, 68, 16, 1)],
-        leader=0.5, top=0.12, kink=14, cloud=0.105, flat=0.7, card=0.1, cover=1.7, rim=0.2,
-        weep=(9, 0.15, 0.1),
+        trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
+        whorls=[(0.3, 4, 0.36, 50, -18, 1), (0.4, 4, 0.32, 62, -12, 1), (0.49, 3, 0.25, 74, -4, 1)],
+        leader=0.57, top=0.07, kink=14, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
+        weep=(9, 0.15, 0.12, 0.11),
     ),
 }
 
@@ -101,7 +104,7 @@ def heading(az, rise):
 
 class Skeleton:
     def __init__(self):
-        self.pos, self.rad, self.edges, self.tips = [], [], [], []
+        self.pos, self.rad, self.edges, self.tips, self.limbs = [], [], [], [], []
 
     def node(self, p, r, parent=None):
         self.pos.append(Vector(p))
@@ -122,6 +125,7 @@ class Skeleton:
             at = at + heading(a, math.radians(rise0 + (rise1 - rise0) * t ** 0.8)) * (length / segs)
             prev = self.node(at, r0 + (r1 - r0) * t, prev)
             out.append(prev)
+        self.limbs.append([start] + out)
         return out
 
 
@@ -264,28 +268,60 @@ def foliage(sid, clouds, rng):
     return leaves, normals, core
 
 
-def curtain(sid, clouds, rng):
-    """The willow's fronds: tall cards of hanging strands around every cloud
-    on the crown's rim, from the dome down towards the ground."""
-    n, width, foot = RECIPES[sid]["weep"]
-    crown = sum((c * r for c, r in clouds), Vector()) / sum(r for _, r in clouds)
+def curtain(sid, sk, rng):
+    """The willow's fronds. Each is a ribbon of hanging strands that leaves a
+    limb, rolls outward over a shoulder and falls: thick along the limbs'
+    outer reach and at their tips, so the crown's top is the limbs' arch
+    draped in strands and the rest is a curtain to near the ground."""
+    n, width, reach, foot = RECIPES[sid]["weep"]
     fronds = bmesh.new()
     uv = fronds.loops.layers.uv.new("UVMap")
     col = fronds.loops.layers.float_color.new("Col")
     normals = []
-    for cc, r in clouds:
-        out = Vector((cc.x - crown.x, cc.y - crown.y, 0.0))
-        inner = out.length < r * 1.2    # a cloud over the trunk hangs fewer, shorter
-        for i in range(n // 3 if inner else n):
-            a = (math.atan2(out.y, out.x) if not inner else 0.0) + rng.uniform(-1.0, 1.0) * (math.pi if inner else 1.9)
-            d = Vector((math.cos(a), math.sin(a), 0.0))
-            top = cc + d * r * rng.uniform(0.55, 0.95) + UP * r * rng.uniform(-0.1, 0.25)
-            low = foot * rng.uniform(0.6, 2.2) + (0.14 if inner else 0.0)
-            length = max(top.z - low, r)
-            face = (d + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.0))).normalized()
-            half = rng.random() < 0.5
-            card(fronds, uv, col, top - UP * length * 0.5, face, UP, (width * rng.uniform(0.85, 1.2), length), 0.92 + 0.16 * rng.random(), 0.0 if half else 0.5, 0.5 if half else 1.0)
-            normals += [(d * 0.75 + UP * 0.5).normalized()] * 4
+    seats = []
+    for limb in sk.limbs:
+        pts = [sk.pos[i] for i in limb]
+        for k in range(n):
+            # along the limb's outer two thirds, crowding towards the tip
+            t = 0.2 + 0.8 * ((k + rng.random()) / n) ** 0.8
+            f = t * (len(pts) - 1)
+            i = min(int(f), len(pts) - 2)
+            seats.append((pts[i].lerp(pts[i + 1], f - i) + UP * rng.uniform(-0.012, 0.02), pts[i + 1] - pts[i], t))
+        for _ in range(3):
+            seats.append((pts[-1].copy(), pts[-1] - pts[-2], 1.0))
+    tip = sk.pos[-1]
+    for _ in range(n):      # the leader's top: a fountain all round
+        seats.append((tip.copy(), Vector((0, 0, 1)), 1.0))
+    for at, along, t in seats:
+        flat = Vector((along.x, along.y, 0.0))
+        a = (math.atan2(flat.y, flat.x) if flat.length > 1e-4 else rng.uniform(0, math.tau)) + rng.uniform(-1.0, 1.0) * (1.3 if flat.length > 1e-4 else math.pi)
+        d = Vector((math.cos(a), math.sin(a), 0.0))
+        side = d.cross(UP).normalized()
+        side = (side + d * rng.uniform(-0.35, 0.35)).normalized()
+        w = width * rng.uniform(0.85, 1.2) * 0.5
+        r = reach * rng.uniform(0.7, 1.3)
+        low = foot * rng.uniform(0.7, 3.0) + (0.0 if t > 0.7 else at.z * rng.uniform(0.2, 0.5))
+        low = min(low, at.z - r)
+        # leave the limb, rise a little, roll over the shoulder, fall
+        spine = [at, at + d * r * 0.4 + UP * r * 0.3, at + d * r * 0.9 + UP * r * 0.22, at + d * r * 1.3 - UP * r * 0.35]
+        spine.append(Vector((spine[-1].x + d.x * r * 0.1, spine[-1].y + d.y * r * 0.1, low)))
+        lens = [0.0]
+        for q0, q1 in zip(spine, spine[1:]):
+            lens.append(lens[-1] + (q1 - q0).length)
+        half = rng.random() < 0.5
+        u0, u1 = (0.0, 0.5) if half else (0.5, 1.0)
+        tone = 0.92 + 0.16 * rng.random()
+        rows = []
+        for q, ln in zip(spine, lens):
+            v = 1.0 - ln / lens[-1]
+            rows.append((fronds.verts.new(q - side * w), fronds.verts.new(q + side * w), v))
+            # shade: the shoulder faces the sky, the fall faces out
+            normals += [(d * (0.35 + 0.5 * (1.0 - v)) + UP * (0.25 + 0.7 * v)).normalized()] * 2
+        for (l0, r0, v0), (l1, r1, v1) in zip(rows, rows[1:]):
+            face = fronds.faces.new((l0, r0, r1, l1))
+            for loop, st in zip(face.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))):
+                loop[uv].uv = st
+                loop[col] = (tone, tone, tone, 1.0)
     return fronds, normals
 
 
@@ -311,15 +347,17 @@ def build(sid, letter, seed):
     sk, clouds = grow(sid, rng)
     settle(clouds)
     bark = wood(sk, name)
-    leaves, normals, core = foliage(sid, clouds, rng)
     rc = RECIPES[sid]
-    fronds, frond_normals = curtain(sid, clouds, rng) if "weep" in rc else (None, [])
+    weep = "weep" in rc
+    leaves, normals, core = foliage(sid, clouds, rng) if not weep else (None, [], None)
+    fronds, frond_normals = curtain(sid, sk, rng) if weep else (None, [])
     fruit = pears(sid, clouds, rng) if "fruit" in rc else None
     # to the species height, standing on the ground (the root stays buried)
-    top = max(v.co.z for b in (leaves, core.bm) for v in b.verts)
+    crown = [fronds] if weep else [leaves, core.bm]
+    top = max(v.co.z for b in crown for v in b.verts)
     m = K.S(h / top)
-    meshes = [("bark", bark, None), ("leaves", leaves, normals)] + ([("fronds", fronds, frond_normals)] if fronds else [])
-    for b in [b for _, b, _ in meshes] + [core.bm] + ([fruit.bm] if fruit else []):
+    meshes = [("bark", bark, None)] + ([("fronds", fronds, frond_normals)] if weep else [("leaves", leaves, normals)])
+    for b in [b for _, b, _ in meshes] + ([core.bm] if core else []) + ([fruit.bm] if fruit else []):
         bmesh.ops.transform(b, matrix=m, verts=b.verts)
     objs = []
     for part, b, part_normals in meshes:
@@ -335,7 +373,8 @@ def build(sid, letter, seed):
         ob = bpy.data.objects.new(f"{name}_{part}", me)
         bpy.context.scene.collection.objects.link(ob)
         objs.append(ob)
-    objs.append(core.to_object(f"{name}_core"))
+    if core:
+        objs.append(core.to_object(f"{name}_core"))
     if fruit:
         objs.append(fruit.to_object(f"{name}_fruit"))
     tris = {o.name.rsplit("_", 1)[-1]: K.mesh_tris(o) for o in objs}
