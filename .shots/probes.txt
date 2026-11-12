@@ -1,0 +1,4 @@
+from wider-court-world
+quality look
+shot line res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candy_trees
+shot close res://tools/court/court_terrain_shots.tscn {out} western_woods lineup=candy_close
