@@ -87,6 +87,10 @@ func _run() -> void:
 			continue
 		if a.begins_with("--perf-"):
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
+		elif a.begins_with("floss_multi="):
+			# the share of candyfloss trees with a colour to each tuft (0 none, 1 all), for a lineup
+			FloraLibrary.floss_material().set_shader_parameter(&"multi_share", float(a.substr(12)))
+			args.erase(a)
 		elif a.begins_with("forest="):
 			forest = a.substr(7)
 			args.erase(a)
