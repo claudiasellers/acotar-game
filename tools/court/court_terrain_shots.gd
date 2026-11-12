@@ -87,6 +87,9 @@ func _run() -> void:
 			continue
 		if a.begins_with("--perf-"):
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
+		elif a.begins_with("without="):
+			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
+			args.erase(a)
 		elif a.begins_with("forest="):
 			forest = a.substr(7)
 			args.erase(a)
@@ -143,6 +146,7 @@ func _run() -> void:
 					if scene != null:
 						world.regions.add_child(scene.instantiate())
 			await _wait_regions_built(world, 120.0)
+			_leave_out(world, without)
 		if ingame:
 			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
 		if lineup != "":
@@ -536,6 +540,28 @@ func _qtz_mesh(file: String) -> Array:
 			mat.set_shader_parameter(&"tex", load(tex_dir + "Flowers.png"))
 		mesh.surface_set_material(i, mat)
 	return [mesh, xf]
+
+
+var without := ""
+
+
+## Frame-time breakdown (`without=`): hides parts of the built regions so a
+## frame probe shows what each costs. near = the trees' leafy near step, mid =
+## their solid mid and far steps, trees = both, shadows = the near step casts
+## none, decor = every other scatter field.
+func _leave_out(world: World, what: String) -> void:
+	if what == "":
+		return
+	var parts := what.split(",")
+	for field: ScatterField in world.regions.find_children("*", "ScatterField", true, false):
+		var near := field.name == &"TreesNear"
+		var mid := field.name == &"Trees"
+		if (near and (parts.has("near") or parts.has("trees"))) or (mid and (parts.has("mid") or parts.has("trees"))) \
+				or (not near and not mid and parts.has("decor")):
+			field.visible = false
+		if near and parts.has("shadows"):
+			for mmi: MultiMeshInstance3D in field.find_children("*", "MultiMeshInstance3D", true, false):
+				mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 var forest_per_ha := FOREST_PER_HA
