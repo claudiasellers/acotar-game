@@ -236,6 +236,13 @@ const LINEUPS := {
 	"estate_blossom": {"distance": 34.0, "spacing": 7.0, "look": 3.5, "ids": ["estate:cherry_blossom:0", "estate:cherry_blossom:1",
 		"estate:cherry_blossom:2", "post", "estate:apple_blossom:0", "estate:apple_blossom:1", "estate:apple_blossom:2", "post",
 		"estate:crab_apple:0", "estate:crab_apple:1", "estate:crab_apple:2"]},
+	# Estate tree options (owner 2026-11-11, "show me an option of both 1 and
+	# 2"): today's tree, then option 1 (candy_ez: the court's EZ tree in the
+	# estate's colours), then option 2 (hybrid: EZ branches wearing candy puffs).
+	"candy_green": {"distance": 58.0, "spacing": 11.0, "look": 6.5, "ids": ["estate:oak:0", "candy_ez:oak", "hybrid:oak", "post",
+		"estate:birch:0", "candy_ez:birch", "hybrid:birch"]},
+	"candy_blossom": {"distance": 30.0, "spacing": 7.5, "look": 3.2, "ids": ["estate:cherry_blossom:0", "candy_ez:cherry_blossom",
+		"hybrid:cherry_blossom", "post", "estate:apple_blossom:0", "candy_ez:apple_blossom", "hybrid:apple_blossom"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
 	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35:fit", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6:fit", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4:fit", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7:fit", "scene:/plants/qtz/Clover_1.gltf:0.15:fit", "scene:/plants/qtz/Clover_2.gltf:0.18:fit", "scene:/plants/qtz/Fern_1.gltf:0.8:fit", "scene:/plants/qtz/Flower_3_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_3_Group.gltf:0.5:fit", "scene:/plants/qtz/Flower_4_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_4_Group.gltf:0.5:fit", "scene:/plants/qtz/Mushroom_Common.gltf:0.25:fit", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35:fit"]},
 	# The re-downloaded Quaternius trees: twisted oaks and pines in the deep tint,
@@ -278,6 +285,63 @@ const BLOOMS := {
 	"rose_a": ["rose", 1.6], "rose_b": ["rose", 1.9], "wildrose_a": ["wildrose", 2.2], "wildrose_b": ["wildrose", 1.8],
 	"lilac_a": ["lilac", 4.2], "lilac_b": ["lilac", 3.6], "hydrangea_a": ["hydrangea", 1.4], "hydrangea_b": ["hydrangea", 1.6],
 }
+
+
+## Estate option 1 (preview): the court's EZ-Tree build in the estate's
+## cotton-candy colours on the court tree shader: mint-sage painted bands for
+## the green trees, the painted cherry and apple blossom sprays
+## (gen_ez_blossoms.py) for the blossom trees, the estate's rose-taupe bark.
+## species: [EZ build, leaf texture (assets/trees/ez/ or CANDY_DIR), bark, mode, palette]
+const CANDY_DIR := "res://world/spring_court/manor_estate/flora/explore/"
+const CANDY_EZ := {
+	&"oak": ["ez_oak_a", "leaf_oak", "oak", 2, [Color(0.29, 0.55, 0.45), Color(0.45, 0.74, 0.50), Color(0.72, 0.90, 0.70)]],
+	&"birch": ["ez_aspen_a", "leaf_aspen", "birch", 2, [Color(0.35, 0.62, 0.48), Color(0.57, 0.82, 0.56), Color(0.80, 0.95, 0.74)]],
+	&"cherry_blossom": ["ez_ash_b", "blossom_cherry", "oak", 3, []],
+	&"apple_blossom": ["ez_ash_d", "blossom_apple", "oak", 3, []],
+}
+
+
+func _candy_ez(sp: StringName) -> Array:
+	var spec: Array = CANDY_EZ[sp]
+	var inst := (load(TREES_EZ + String(spec[0]) + ".glb") as PackedScene).instantiate()
+	var shader := load(CourtTreeSet.SHADER) as Shader
+	var leaf_path: String = (CANDY_DIR if int(spec[3]) == 3 else TREES_EZ) + String(spec[1]) + ".png"
+	var leaf := ShaderMaterial.new()
+	leaf.shader = shader
+	leaf.set_shader_parameter(&"mode", int(spec[3]))
+	leaf.set_shader_parameter(&"tex", load(leaf_path))
+	var pal: Array = spec[4]
+	if not pal.is_empty():
+		leaf.set_shader_parameter(&"shadow_col", pal[0])
+		leaf.set_shader_parameter(&"mid_col", pal[1])
+		leaf.set_shader_parameter(&"light_col", pal[2])
+	var bark := ShaderMaterial.new()
+	bark.shader = shader
+	bark.set_shader_parameter(&"mode", 0)
+	bark.set_shader_parameter(&"tex", load(TREES_EZ + "bark_%s.png" % spec[2]))
+	bark.set_shader_parameter(&"bark_col", Color(0.95, 0.93, 0.90) if sp == &"birch" else Color(0.56, 0.42, 0.43))
+	var out := ArrayMesh.new()
+	var top := 0.0
+	var st := SurfaceTool.new()
+	for m: MeshInstance3D in inst.find_children("*", "MeshInstance3D", true, false):
+		var xf := _local_to_root(m, inst)
+		for i in m.mesh.get_surface_count():
+			st.clear()
+			st.create_from(m.mesh, i)
+			var mat := m.mesh.surface_get_material(i)
+			var is_leaf := mat != null and String(mat.resource_name).contains("leaves")
+			var arr := st.commit_to_arrays()
+			var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			for k in verts.size():
+				verts[k] = xf * verts[k]
+				top = maxf(top, verts[k].y)
+			arr[Mesh.ARRAY_VERTEX] = verts
+			out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+			out.surface_set_material(out.get_surface_count() - 1, leaf if is_leaf else bark)
+	inst.free()
+	leaf.set_shader_parameter(&"model_height", top)
+	bark.set_shader_parameter(&"model_height", top)
+	return [out, FloraLib.height_of(sp) / maxf(top, 0.01)]
 
 
 ## [mesh, scale] for an EZ-Tree preview tree, its leaves photo or repainted.
@@ -428,6 +492,15 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				# (set:<id>:<build>[:<step>]), already at the id's height.
 				var step := int(item.get_slice(":", 3)) if item.get_slice_count(":") > 3 else 0
 				mi.mesh = CourtTreeSet.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)), step)
+			elif item.begins_with("candy_ez:"):
+				var sp := StringName(item.get_slice(":", 1))
+				var ce := _candy_ez(sp)
+				mi.mesh = ce[0]
+				mi.scale = Vector3.ONE * float(ce[1])
+			elif item.begins_with("hybrid:"):
+				var sp := StringName(item.get_slice(":", 1))
+				var hy := PropModels.pair(CANDY_DIR + "hybrid_%s.glb" % sp, "hybrid_%s" % sp, FloraLib.foliage_material(sp))
+				mi.mesh = hy[0]
 			elif item.begins_with("estate:"):
 				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
 			elif item.begins_with("ez:"):

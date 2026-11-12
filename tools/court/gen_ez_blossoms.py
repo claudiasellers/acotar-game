@@ -12,6 +12,9 @@ painted = 0 path.
     wildrose   dog rose: five flat notched petals, gold stamens (the Rosewild)
     lilac      heart leaves, cone panicles of tiny four-petal florets
     hydrangea  broad leaves, round mophead heads (periwinkle to lilac)
+    cherry     the estate's cotton-candy cherry: bare twigs smothered in
+               five-petal blossom clusters, a few bronze-green new leaves
+    apple      apple blossom: white cups blushed pink, pink buds, fresh leaves
 
     python3 tools/court/gen_ez_blossoms.py <out dir> [--sheet]
 
@@ -39,6 +42,9 @@ FLOWERS = {
     "wildrose": [(0.90, 0.58, 0.68), (0.97, 0.78, 0.83), (1.0, 0.92, 0.93)],
     "lilac": [(0.56, 0.44, 0.72), (0.72, 0.60, 0.86), (0.88, 0.80, 0.96)],
     "hydrangea": [(0.50, 0.56, 0.84), (0.68, 0.70, 0.94), (0.86, 0.84, 0.98)],
+    # the estate's cotton candy (manor flora: cherry (1.0, 0.75, 0.86), apple (1.0, 0.90, 0.92))
+    "cherry": [(0.90, 0.52, 0.70), (0.99, 0.74, 0.86), (1.0, 0.90, 0.95)],
+    "apple": [(0.90, 0.62, 0.70), (0.99, 0.90, 0.91), (1.0, 0.98, 0.97)],
 }
 
 
@@ -270,7 +276,56 @@ def spray_hydrangea(cv, rng):
             floret(cv, p, rng.uniform(8, 11), cols, rng)
 
 
-PAINTERS = {"rose": spray_rose, "wildrose": spray_wildrose, "lilac": spray_lilac, "hydrangea": spray_hydrangea}
+def blossom5(cv, c, r, cols, rng, heart=(0.98, 0.82, 0.55)):
+    """A five-petal fruit blossom: round, slightly notched petals, a pale
+    heart and a few stamens."""
+    rot = rng.uniform(0, math.tau)
+    shade = rng.uniform(0.0, 1.0)
+    rim = mix(cols[1], cols[2], shade)
+    base = mix(cols[0], cols[1], shade * 0.5)
+    for k in range(5):
+        petal(cv, c, rot + math.tau * k / 5, r, r * 1.2, rim, base, notch=True)
+    cv.disc(c, r * 0.24, rgb(mix(base, heart, 0.5)))
+    for k in range(7):
+        a = rot + math.tau * k / 7
+        cv.disc((c[0] + math.cos(a) * r * 0.24, c[1] + math.sin(a) * r * 0.24), max(1.0, r * 0.06), rgb(mix(cols[0], (0.75, 0.45, 0.35), 0.5)))
+
+
+def fruit_spray(cv, rng, cols, leaves, buds):
+    main = twig(rng, 30, 40.0)
+    cv.line(main, 4.0, rgb((0.42, 0.30, 0.30)))
+    branches = [main] + side(cv, main, rng, 6, 170)
+    for br in branches:
+        for k in range(leaves):
+            p, a = along(br, 0.25 + 0.5 * k / max(leaves, 1))
+            s = 1 if k % 2 == 0 else -1
+            leaf(cv, "aspen", p, a + s * 0.9, 34, 22, rng)
+    # Blossom all along every twig, densest at the tips, so the spray reads
+    # as a puff of colour, not a twig with flecks.
+    for br in branches:
+        for t in np.linspace(0.3, 1.0, 6):
+            p, a = along(br, float(t))
+            n = 3 if t < 0.95 else 5
+            for k in range(n):
+                ang = rng.uniform(0, math.tau)
+                off = 0.0 if k == 0 else rng.uniform(12, 24)
+                c = (p[0] + math.cos(ang) * off, p[1] + math.sin(ang) * off)
+                if buds and rng.uniform() < 0.18:
+                    cv.disc(c, rng.uniform(6, 8), rgb(cols[0]))
+                    cv.disc((c[0] - 1.5, c[1] - 1.5), rng.uniform(3, 4), rgb(cols[1]))
+                else:
+                    blossom5(cv, c, rng.uniform(13, 19), cols, rng)
+
+
+def spray_cherry(cv, rng):
+    fruit_spray(cv, rng, FLOWERS["cherry"], 1, False)
+
+
+def spray_apple(cv, rng):
+    fruit_spray(cv, rng, FLOWERS["apple"], 3, True)
+
+
+PAINTERS = {"rose": spray_rose, "wildrose": spray_wildrose, "lilac": spray_lilac, "hydrangea": spray_hydrangea, "cherry": spray_cherry, "apple": spray_apple}
 
 
 def main():
