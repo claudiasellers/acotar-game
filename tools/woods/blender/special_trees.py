@@ -17,11 +17,11 @@ magnolia   A saucer magnolia in full flower on bare pearl wood: a short
            goblets below them, pointed buds on the spurs along the limbs.
            Each petal is rose at its foot, blush, then pearl at its tip.
 candyfloss_tree
-           Cotton candy on a curving pearl-rose trunk: seven billowing clouds
-           of spun sugar (blush, rose, lilac, pearl, peach; pale on top, the
-           colour gathering underneath), each with smaller puffs on its
-           shoulders, scattered with five-pointed star blossoms in pearl,
-           blush and gold.
+           A bouquet of candyfloss on sticks: a curving pearl-rose trunk,
+           each limb a stick with a tuft of spun sugar wound on it (blush,
+           rose, lilac, pearl, peach): a dense heart in the deep colour
+           wrapped in pale wisps of painted threads, with five-pointed star
+           blossoms nestled in the floss.
 magnolia_harlequin
            The same tree with every flower its own candy colour (rose,
            coral, lilac, periwinkle, apricot, mint, hot pink) and a heart of
@@ -293,42 +293,101 @@ def magnolia_harlequin(kit, near):
 
 
 # ------------------------------------------------------ candyfloss tree ----
+# Owner, 2026-11-12: the first rebuild "looks really similar ... what should a
+# candyfloss tree's texture be?" Spun sugar: no hard outline, threads wound
+# round a stick, pale where the light comes through and deep in the dense
+# middle. So each limb is a stick with a tuft of floss wound on it: a solid
+# heart in the deep colour, wrapped in wisps (cards of painted threads,
+# tools/woods/gen_floss_wisp.py, drawn by woods_floss.gdshader) laid along
+# the winding, some standing off as a fringe, a few pulled out into tails.
 
-def cloud(kit, centre, radius, squash, top, bottom, subdiv, flex, lump, fixed=False):
-    """A cotton-candy cloud: Kit.blob's lumpy icosphere (same shading, same
-    part in the crown's budget and burial), but it hands back how far its
-    surface stands out in any direction, so the stars can sit on it."""
-    if not fixed and len(kit.blob_radii) in kit.fine:
-        subdiv = min(2, subdiv + 1)
-    # (a fixed cloud is listed as already fine, so the build never refines it:
-    # the small puffs stay light and the wood keeps its share of the budget)
-    kit.blob_radii.append((radius, 2 if fixed else subdiv))
-    verts, faces = wt.icosphere(subdiv)
-    first = len(kit.faces)
-    seed = Vector((kit.rng.random() * 50, kit.rng.random() * 50, kit.rng.random() * 50))
-    tint = kit.rng.uniform(-0.04, 0.04)
-    c = Vector(centre)
+class Tuft:
+    """Floss wound on a stick from `foot` to `top`: thin where it grips the
+    stick, swelling to `radius` about three fifths of the way up, domed."""
 
-    def surface(d):
-        r = radius * (1.0 + lump * wt.noise.noise(d * 1.8 + seed))
-        return c + Vector((d.x * r, d.y * r, d.z * r * squash))
+    def __init__(self, kit, foot, top, radius, hand):
+        self.foot = Vector(foot)
+        self.axis = (Vector(top) - self.foot).normalized()
+        self.length = (Vector(top) - self.foot).length
+        self.radius = radius
+        self.side = self.axis.orthogonal().normalized()
+        self.fwd = self.axis.cross(self.side).normalized()
+        self.hand = hand
+        self.phase = kit.rng.uniform(0.0, math.tau)
 
-    idx, cols = [], []
-    for v in verts:
-        idx.append(kit.add_vert(surface(v)))
-        kit.normals[idx[-1]] = Vector((v.x, v.y, v.z / max(squash, 0.05))).normalized()
-        h = (v.z + 1.0) * 0.5
-        # spun sugar: pale on top, the deep colour gathering underneath, faint swirls
-        swirl = 0.05 * math.sin(v.z * 7.0 + math.atan2(v.y, v.x) * 2.0 + seed.x)
-        cols.append(wt.shade(mix(bottom, top, h ** 0.75), 1.0 + tint + swirl))
-    for f in faces:
-        kit.face(tuple(idx[i] for i in f), tuple(cols[i] for i in f), tuple((flex, 0.0) for _ in f))
-    kit.blobs.append((c, radius, squash, lump, first, len(kit.faces)))
-    return {"centre": c, "radius": radius, "squash": squash, "surface": surface}
+    def swell(self, t):
+        t = min(max(t, 0.0), 1.0)
+        return 0.1 * (1.0 - t) + 0.9 * math.sin(math.pi * t ** 1.45) ** 0.75
+
+    def out(self, a):
+        return self.side * math.cos(a) + self.fwd * math.sin(a)
+
+    def at(self, t, a, k=1.0):
+        """The point at height t (0..1) and angle a, k times the heart's radius out."""
+        ridge = 1.0 + 0.07 * math.sin(3.0 * a - self.hand * 9.0 * t + self.phase)
+        return self.foot + self.axis * (t * self.length) + self.out(a) * (self.radius * self.swell(t) * ridge * k)
+
+    def normal(self, t, a):
+        e = 0.02
+        slope = (self.swell(t + e) - self.swell(t - e)) / (2.0 * e) * self.radius / self.length
+        return (self.out(a) - self.axis * slope).normalized()
+
+    def winding(self, t, a, pitch):
+        """The way the sugar was wound here: round the stick, climbing a little."""
+        round_ = self.axis.cross(self.out(a)).normalized() * self.hand
+        return (round_ * math.cos(pitch) + self.axis * math.sin(pitch)).normalized()
 
 
-def star(kit, centre, normal, radius, petal, tip, heart, flex):
-    """A five-pointed star blossom lying on a cloud: a raised gold heart,
+def floss_heart(kit, tuft, top, deep, flex, rows, segs):
+    """The dense middle of a tuft: the deep colour, a little paler up top."""
+    rings = []
+    for r in range(rows + 1):
+        t = r / rows
+        ring = []
+        for k in range(segs):
+            a = math.tau * k / segs + 0.3 * r
+            v = kit.add_vert(tuft.at(t, a, 0.86) if 0 < r < rows else tuft.foot + tuft.axis * (t * tuft.length))
+            kit.normals[v] = tuft.normal(t, a) if 0 < r < rows else (tuft.axis if r else -tuft.axis)
+            ring.append(v)
+        rings.append((ring, mix(deep, top, 0.55 * t ** 1.3), flex + 0.08 * t))
+    for r in range(rows):
+        (a, ca, fa), (b, cb, fb) = rings[r], rings[r + 1]
+        for k in range(segs):
+            k2 = (k + 1) % segs
+            kit.face((a[k], a[k2], b[k2]), (ca, ca, cb), ((fa, 0), (fa, 0), (fb, 0)))
+            kit.face((a[k], b[k2], b[k]), (ca, cb, cb), ((fa, 0), (fb, 0), (fb, 0)))
+
+
+def wisp(kit, centre, along, normal, length, height, shade_normal, colour, flex, lift=0.0):
+    """One card of spun threads: `along` its length, facing `normal`, lit as
+    `shade_normal` (the tuft's); `lift` raises its upper edge off the tuft."""
+    along = along.normalized()
+    up = normal.cross(along).normalized()
+    up = (up + normal * lift).normalized()
+    cell = kit.rng.randrange(4)
+    u0, v0 = (cell % 2) * 0.5, (cell // 2) * 0.5
+    us = (u0 + 0.004, u0 + 0.496) if kit.rng.random() < 0.5 else (u0 + 0.496, u0 + 0.004)
+    vs = (v0 + 0.004, v0 + 0.496) if kit.rng.random() < 0.5 else (v0 + 0.496, v0 + 0.004)
+    corners = []
+    for sx, sy, u, v in ((-1, -1, us[0], vs[0]), (1, -1, us[1], vs[0]), (1, 1, us[1], vs[1]), (-1, 1, us[0], vs[1])):
+        corners.append((centre + along * (sx * length * 0.5) + up * (sy * height * 0.5), (u, v)))
+    kit.wisps.append((corners, tuple(shade_normal), (colour[0], colour[1], colour[2], flex)))
+
+
+FLOSS = [
+    (hexc("FAD4DC"), hexc("EE7FA8")),   # blush over rose
+    (hexc("F7B3CB"), hexc("E25A8A")),   # rose over hot pink
+    (hexc("E9D6F7"), hexc("A77FDB")),   # pale lilac over lilac
+    (hexc("FBEDEA"), hexc("F08DB2")),   # pearl over blush rose
+    (hexc("FBD9C8"), hexc("EE8A8A")),   # peach over coral rose
+]
+STAR_PEARL = (hexc("FBF1DC"), hexc("FFFBF2"), hexc("F2C94C"))   # petal, tip, heart
+STAR_GOLD = (hexc("F8DF94"), hexc("FCF0C2"), hexc("E8A93A"))
+STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
+
+
+def star(kit, centre, normal, radius, petal, tip, heart_c, flex):
+    """A five-pointed star blossom lying in the floss: a raised gold heart,
     pale petals drawn out to points that lift a little off the sugar.
     (Pointed on purpose: the owner's "stars on them".)"""
     n, side, up = sf.frame(normal)
@@ -346,96 +405,159 @@ def star(kit, centre, normal, radius, petal, tip, heart, flex):
         ring.append((v, tip if point else petal))
     for i in range(10):
         (a, ca), (b, cb) = ring[i], ring[(i + 1) % 10]
-        kit.face((mid, a, b), (heart, ca, cb), ((flex, 0.0),) * 3)
+        kit.face((mid, a, b), (heart_c, ca, cb), ((flex, 0.0),) * 3)
 
 
-# Clouds, top colour then the deep colour underneath.
-FLOSS = [
-    (hexc("FAD4DC"), hexc("F08DB2")),   # blush over rose
-    (hexc("F7B3CB"), hexc("E86AA0")),   # rose over hot pink
-    (hexc("E9D6F7"), hexc("B892E6")),   # pale lilac over lilac
-    (hexc("FBF1EE"), hexc("F4A6C0")),   # pearl over blush
-    (hexc("FBD9C8"), hexc("F28FA0")),   # peach over rose
-]
-STAR_PEARL = (hexc("FBF1DC"), hexc("FFFBF2"), hexc("F2C94C"))   # petal, tip, heart
-STAR_GOLD = (hexc("F8DF94"), hexc("FCF0C2"), hexc("E8A93A"))
-STAR_BLUSH = (hexc("FBE3E6"), hexc("FFF7F5"), hexc("F2C94C"))
+def floss(kit, tuft, top, deep, near):
+    """Winds a tuft: its heart, the wisps laid along the winding, the fringe
+    standing off it, the pulled tails, and its stars."""
+    flex = 0.34
+    floss_heart(kit, tuft, top, deep, flex, 9 if near else 5, 10 if near else 6)
+    pale = mix(top, hexc("FFFFFF"), 0.4)
+    r = tuft.radius
+
+    def colour(t):
+        return mix(mix(deep, top, 0.45), pale, min(1.0, 0.25 + 0.9 * t))
+
+    # laid wisps: a spiral of cards over the whole tuft, more where it is fat
+    want = 34 if near else 9
+    placed = 0
+    i = 0
+    while placed < want:
+        i += 1
+        t = kit.rng.uniform(0.04, 0.97)
+        if kit.rng.random() > tuft.swell(t) + 0.12:
+            continue
+        a = i * 2.39996 + kit.rng.uniform(-0.3, 0.3)
+        n = tuft.normal(t, a)
+        along = tuft.winding(t, a, math.radians(kit.rng.uniform(10.0, 32.0)))
+        size = r * kit.rng.uniform(0.95, 1.4) * (1.0 if near else 1.6)
+        wisp(kit, tuft.at(t, a, kit.rng.uniform(1.0, 1.12)), along, n, size, size * kit.rng.uniform(0.4, 0.5), n,
+             colour(t), flex + 0.1 * t, lift=kit.rng.uniform(0.15, 0.5))
+        placed += 1
+    # the fringe: wisps standing out from the tuft along the winding, so every outline is threads
+    for k in range(9 if near else 3):
+        t = kit.rng.uniform(0.2, 0.92)
+        a = kit.rng.uniform(0.0, math.tau)
+        n = tuft.normal(t, a)
+        along = tuft.winding(t, a, math.radians(kit.rng.uniform(8.0, 26.0)))
+        size = r * kit.rng.uniform(0.9, 1.3)
+        wisp(kit, tuft.at(t, a, 1.12), along, along.cross(n).normalized(), size, size * 0.42, n, mix(colour(t), hexc("FFFFFF"), 0.2), flex + 0.14)
+    # tails: sugar pulled out of the foot down the stick, and a wisp or two streaming off the top
+    for k in range(4 if near else 1):
+        a = kit.rng.uniform(0.0, math.tau)
+        n = tuft.out(a)
+        down = (-tuft.axis * 0.8 - UP * 0.5 + n * 0.25).normalized()
+        size = r * kit.rng.uniform(0.9, 1.3)
+        wisp(kit, tuft.at(0.1, a, 1.1) + down * size * 0.3, down, n, size, size * 0.3, n, mix(deep, top, 0.5), flex)
+    for k in range(2 if near else 0):
+        a = kit.rng.uniform(0.0, math.tau)
+        n = (tuft.axis * 0.5 + tuft.out(a)).normalized()
+        away = (tuft.out(a + 1.2) * 0.8 + tuft.axis * 0.6).normalized()
+        size = r * kit.rng.uniform(0.9, 1.2)
+        wisp(kit, tuft.at(0.93, a, 1.0) + away * size * 0.3, away, n, size, size * 0.34, n, pale, flex + 0.2)
+    # the stars, nestled in the floss
+    for k in range(7 if near else 2):
+        t = kit.rng.uniform(0.3, 0.97)
+        a = kit.rng.uniform(0.0, math.tau)
+        n = tuft.normal(t, a)
+        size = kit.rng.uniform(0.2, 0.32) * (1.0 if near else 1.5)
+        roll = kit.rng.random()
+        petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.22 else STAR_BLUSH if roll < 0.45 else STAR_PEARL
+        star(kit, tuft.at(t, a, 1.14), n, size, petal_c, tip_c, heart_c, flex + 0.1)
 
 
 def candyfloss_tree(kit, near):
-    # The wood: a curving pearl-rose trunk, limbs sweeping out and up to each cloud.
-    bark0, bark1 = hexc("A9808C"), hexc("D6A9B3")
+    kit.wisps = []
+    # The wood: a curving pearl-rose trunk, each limb a stick for its tuft.
+    bark0, bark1, stick = hexc("A9808C"), hexc("D6A9B3"), hexc("E6C6CC")
     trunk = [Vector((0, 0, 0))]
     lean = Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.0)).normalized()
-    for i, (z, k) in enumerate(((1.1, 0.26), (2.2, -0.12), (3.1, 0.18), (3.8, 0.28))):
+    for z, k in ((1.1, 0.26), (2.2, -0.12), (3.1, 0.18), (3.8, 0.28)):
         trunk.append(Vector((lean.x * k, lean.y * k, z)) + Vector((kit.rng.uniform(-0.06, 0.06), kit.rng.uniform(-0.06, 0.06), 0.0)))
     if not near:
         trunk = trunk[::2]
-    kit.tube(trunk, taper(len(trunk), 0.52, 0.3), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
+    kit.tube(trunk, taper(len(trunk), 0.5, 0.28), 8 if near else 5, bark0, bark1, 0.0, 0.08, flare=0.45 if near else 0.0)
     top = trunk[-1]
-    seats = []   # (centre, radius, palette index)
     limbs = 6
     start = kit.rng.uniform(0.0, math.tau)
     for i in range(limbs):
-        a = start + math.tau * i / limbs + kit.rng.uniform(-0.25, 0.25)
+        a = start + math.tau * i / limbs + kit.rng.uniform(-0.2, 0.2)
         heading = Vector((math.cos(a), math.sin(a), 0.0))
         low = i % 2 == 0
-        base = at(trunk, 0.8) if low else top
-        limb = sweep(kit, base, heading, 14.0 if low else 36.0, 52.0, kit.rng.uniform(3.0, 3.5) * (1.0 if low else 0.8), 4 if near else 2, 0.12)
-        kit.tube(limb, taper(len(limb), 0.22, 0.09), 6 if near else 4, bark1, hexc("E2BCC4"), 0.1, 0.35)
-        r = kit.rng.uniform(1.7, 2.05)
-        seats.append((limb[-1] + UP * r * 0.45, r, i))
-    crown = sweep(kit, top, lean, 78.0, 86.0, 1.5, 2, 0.08)
-    kit.tube(crown, taper(len(crown), 0.22, 0.1), 6 if near else 4, bark1, hexc("E2BCC4"), 0.1, 0.3)
-    seats.append((crown[-1] + UP * 1.1, 2.3, limbs + 1))
-
-    clouds = []   # (cloud, palette, main?)
-    for centre, r, i in seats:
+        base = at(trunk, 0.82) if low else top
+        limb = sweep(kit, base, heading, 16.0 if low else 38.0, 70.0 if low else 62.0, kit.rng.uniform(3.4, 3.9) * (1.0 if low else 0.88), 5 if near else 3, 0.1)
+        kit.tube(limb, taper(len(limb), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.34)
+        foot = at(limb, 0.5)
+        axis = (limb[-1] - at(limb, 0.6)).normalized()
+        length = kit.rng.uniform(2.7, 3.2)
         ca, cb = FLOSS[i % len(FLOSS)]
-        flex = 0.36
-        clouds.append((cloud(kit, centre, r, 0.84, ca, cb, 1, flex, 0.11), (ca, cb), True))
-        # the billows: smaller puffs of the same sugar on its shoulders
-        out = flat(centre - top)
-        for k in range(2 if near else 1):
-            a = kit.rng.uniform(0.3, 1.3) * (1 if k else -1)
-            d = (out * math.cos(a) + Vector((-out.y, out.x, 0.0)) * math.sin(a)).normalized()
-            rr = r * kit.rng.uniform(0.48, 0.6)
-            pos = centre + d * r * 0.78 + UP * r * kit.rng.uniform(-0.18, 0.42)
-            clouds.append((cloud(kit, pos, rr, 0.88, mix(ca, hexc("FFFFFF"), 0.25), mix(cb, ca, 0.3), 1 if near else 0, flex + 0.05, 0.1, True), (ca, cb), False))
+        floss(kit, Tuft(kit, foot, foot + axis * length, length * kit.rng.uniform(0.4, 0.45), 1 if i % 2 else -1), ca, cb, near)
+    # the crown: the biggest tuft, on the leader
+    lead = sweep(kit, top, lean, 80.0, 86.0, 2.6, 3 if near else 2, 0.06)
+    kit.tube(lead, taper(len(lead), 0.2, 0.06), 6 if near else 4, bark1, stick, 0.1, 0.3)
+    foot = at(lead, 0.3)
+    ca, cb = FLOSS[(limbs + 1) % len(FLOSS)]
+    floss(kit, Tuft(kit, foot, foot + (lead[-1] - foot).normalized() * 3.7, 1.6, 1), ca, cb, near)
 
-    # The stars: scattered over the tops and shoulders of the clouds, bigger on
-    # the crowns, never where another cloud covers them.
-    def covered(p, own):
-        for other, _, _ in clouds:
-            if other is own:
-                continue
-            q = p - other["centre"]
-            q = Vector((q.x, q.y, q.z / other["squash"]))
-            if q.length < other["radius"] * 0.98:
-                return True
-        return False
 
-    for c, _, main in clouds:
-        want = (12 if main else 3) if near else (4 if main else 0)
-        placed = 0
-        tries = 0
-        while placed < want and tries < want * 6:
-            tries += 1
-            a = kit.rng.uniform(0.0, math.tau)
-            # all round the cloud, sides as well as top: they are seen from the ground
-            z = kit.rng.uniform(-0.55, 0.97)
-            ring_r = math.sqrt(max(0.0, 1.0 - z * z))
-            d = Vector((math.cos(a) * ring_r, math.sin(a) * ring_r, z))
-            p = c["surface"](d)
-            if covered(p, c):
-                continue
-            n = Vector((d.x, d.y, d.z / c["squash"])).normalized()
-            size = (kit.rng.uniform(0.26, 0.4) + 0.1 * max(z, 0.0)) * (1.0 if main else 0.8) * (1.0 if near else 1.4)
-            roll = kit.rng.random()
-            petal_c, tip_c, heart_c = STAR_GOLD if roll < 0.2 else STAR_BLUSH if roll < 0.4 else STAR_PEARL
-            star(kit, p + n * 0.03, n, size, petal_c, tip_c, heart_c, 0.42)
-            placed += 1
+def wisp_object(kit, name):
+    """The wisps as their own mesh: quads with the picture's UVs, the tuft's
+    normals, the tuft's colour in COLOR.rgb and the wind flex in COLOR.a."""
+    verts, faces = [], []
+    for corners, _, _ in kit.wisps:
+        faces.append(tuple(range(len(verts), len(verts) + 4)))
+        verts.extend(tuple(p) for p, _ in corners)
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    col = mesh.color_attributes.new("Col", "FLOAT_COLOR", "CORNER")
+    uv = mesh.uv_layers.new(name="UVMap")
+    for poly, (corners, _, colour) in zip(mesh.polygons, kit.wisps):
+        for k, li in enumerate(poly.loop_indices):
+            col.data[li].color = colour
+            u, v = corners[k][1]
+            uv.data[li].uv = (u, 1.0 - v)
+        poly.use_smooth = True
+    mesh.color_attributes.active_color = col
+    mesh.normals_split_custom_set_from_vertices([n for _, n, _ in kit.wisps for _ in range(4)])
+    mat = bpy.data.materials.get("woods_floss") or bpy.data.materials.new("woods_floss")
+    mesh.materials.append(mat)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    return obj
 
+
+def build_wisped(species, fn, near_cap, far_cap):
+    """wt.build for a tree with wisps: near and far as usual, and
+    near_wisps / far_wisps beside them (FloraLibrary.WISPED). The caps count
+    both."""
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    seed = sum(ord(c) * (i + 1) for i, c in enumerate(species))
+    objs, report = [], []
+    for name, near, cap in (("near", True, near_cap), ("far", False, far_cap)):
+        kit = wt.grow(fn, seed, near, set())
+        cards = 2 * len(kit.wisps)
+        wood = wt.skin_wood(kit, min(wt.WOOD_MAX, cap - kit.tri_count() - cards - 10)) if near else 0
+        total = kit.tri_count() + cards
+        if total > cap:
+            raise SystemExit("%s %s: %d tris over the %d cap" % (species, name, total, cap))
+        report.append((total, wood, len(kit.wisps)))
+        objs.append(wt.to_object(kit, name))
+        objs.append(wisp_object(kit, name + "_wisps"))
+    path = os.path.join(OUT, species + ".glb")
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in objs:
+        o.select_set(True)
+    bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", use_selection=True, export_yup=True,
+                              export_vertex_color="ACTIVE", export_all_vertex_colors=False,
+                              export_normals=True, export_texcoords=True, export_materials="PLACEHOLDER",
+                              export_apply=False, export_animations=False)
+    print("%-14s near %5d tris (wood %4d, %3d wisps)  far %4d tris (%2d wisps)  %6.0f KB" % (
+        species, report[0][0], report[0][1], report[0][2], report[1][0], report[1][2], os.path.getsize(path) / 1024))
+
+
+WISPED = ("candyfloss_tree",)
 
 SPECIES = {
     "magnolia": (magnolia, SPECIAL),
@@ -450,7 +572,7 @@ def main():
     only = [a for a in sys.argv[1:] if a in SPECIES] or list(SPECIES)
     for species in only:
         fn, (near_cap, far_cap) = SPECIES[species]
-        wt.build(species, fn, near_cap, far_cap)
+        (build_wisped if species in WISPED else wt.build)(species, fn, near_cap, far_cap)
 
 
 if __name__ == "__main__":

@@ -14,6 +14,12 @@ extends RefCounted
 const FOLIAGE_SHADER := preload("res://world/spring_court/shared/woods_foliage.gdshader")
 ## Blender models that replace a procedural builder (tools/woods/blender/).
 const MODELS := "res://world/spring_court/shared/models/%s.glb"
+## Species whose model carries spun-sugar wisps: a second mesh "<near|far>_wisps"
+## of cards, drawn as a second surface on woods_floss.gdshader
+## (tools/woods/blender/special_trees.py).
+const WISPED: Array[StringName] = [&"candyfloss_tree"]
+const FLOSS_SHADER := "res://world/spring_court/shared/woods_floss.gdshader"
+const FLOSS_WISPS := "res://world/spring_court/shared/models/floss_wisp.png"
 
 ## layer: tree | shrub | ground | detail | find
 ## scale: random uniform scale range; radius: trunk collision radius (m) at
@@ -235,7 +241,7 @@ static func mesh(species: StringName) -> Mesh:
 			# map's painter does): hand back an empty mesh but cache nothing,
 			# or every tree of the species would stay invisible all session.
 			return ArrayMesh.new()
-		_near[species] = _to_mesh(species, arrays)
+		_near[species] = _to_mesh(species, arrays, 1)
 	return _near[species]
 
 
@@ -247,7 +253,7 @@ static func far_mesh(species: StringName) -> Mesh:
 		var arrays := arrays_for(species, 0)
 		if arrays.is_empty():
 			return ArrayMesh.new()  # off the main thread: see mesh()
-		_far[species] = _to_mesh(species, arrays)
+		_far[species] = _to_mesh(species, arrays, 0)
 	return _far[species]
 
 
@@ -288,12 +294,12 @@ static func arrays_for(species: StringName, detail: int) -> Array:
 
 ## Surface arrays from the species' Blender model (tools/woods/blender/),
 ## mesh "near" for detail 1 and "far" for 0; empty when there is no model.
-static func _model_arrays(species: StringName, detail: int) -> Array:
+static func _model_arrays(species: StringName, detail: int, part: String = "") -> Array:
 	var path := MODELS % species
 	if not ResourceLoader.exists(path):
 		return []
 	var root := (load(path) as PackedScene).instantiate()
-	var mi := root.find_child("near" if detail > 0 else "far", true, false) as MeshInstance3D
+	var mi := root.find_child(("near" if detail > 0 else "far") + part, true, false) as MeshInstance3D
 	var arrays: Array = mi.mesh.surface_get_arrays(0) if mi != null else []
 	root.free()
 	return arrays
@@ -303,11 +309,26 @@ static func has_model(species: StringName) -> bool:
 	return ResourceLoader.exists(MODELS % species)
 
 
-static func _to_mesh(species: StringName, arrays: Array) -> ArrayMesh:
+static func _to_mesh(species: StringName, arrays: Array, detail: int = 1) -> ArrayMesh:
 	var m := ArrayMesh.new()
 	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	m.surface_set_material(0, material(look_of(species)))
+	if species in WISPED:
+		var wisps := _model_arrays(species, detail, "_wisps")
+		if not wisps.is_empty():
+			m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, wisps)
+			m.surface_set_material(1, floss_material())
 	return m
+
+
+## The spun-sugar wisps' material (woods_floss.gdshader).
+static func floss_material() -> ShaderMaterial:
+	if not _materials.has(&"floss"):
+		var m := ShaderMaterial.new()
+		m.shader = load(FLOSS_SHADER) as Shader
+		m.set_shader_parameter(&"wisps", load(FLOSS_WISPS))
+		_materials[&"floss"] = m
+	return _materials[&"floss"]
 
 
 static func _has_builder(builder: String) -> bool:
