@@ -47,6 +47,20 @@ const VIEWS := {
 	"air_vale": [600.0, 300.0, 300.0, 1100.0, 1000.0, 0.0, 0.45, &"spring", 75.0],
 }
 
+## The estate's tree views (finish plan D2/E2), by name only (never part of a
+## run of every view): the estate is not court land, so these are not the
+## court's standpoints (CourtLandHabitats.VIEWPOINTS).
+const ESTATE_VIEWS := {
+	# A parkland grove on the south
+	# lawns, the oaks and birches of the north hills from the deer park, the
+	# walled orchard's rows, the pond willows.
+	"estate_lawns": [-30.0, 165.0, 1.7, -130.0, 245.0, 4.0, 0.45, &"manor", 70.0],
+	"estate_north": [40.0, -300.0, 1.7, -40.0, -470.0, 8.0, 0.45, &"manor", 70.0],
+	"estate_orchard": [-160.0, 150.0, 14.0, -250.0, 155.0, 0.0, 0.45, &"manor", 70.0],
+	"estate_avenue": [9.0, 285.0, 1.7, 0.0, 60.0, 4.0, 0.45, &"manor", 70.0],
+	"estate_air": [0.0, 320.0, 90.0, -60.0, -120.0, 0.0, 0.45, &"manor", 70.0],
+}
+
 
 func _ready() -> void:
 	_run.call_deferred()
@@ -110,7 +124,7 @@ func _run() -> void:
 	world.add_child(cam)
 	cam.make_current()
 	for id in ids:
-		var v: Array = VIEWS[id]
+		var v: Array = VIEWS[id] if VIEWS.has(id) else ESTATE_VIEWS[id]
 		Clock.time_of_day = v[6]
 		world.grade.swap_to(v[7], 0.0)
 		var eye := Vector3(v[0], 0.0, v[1])
@@ -224,6 +238,18 @@ const LINEUPS := {
 	"roles_green": {"distance": 46.0, "spacing": 6.0, "look": 5.0, "ids": ["set:woods_oak:0", "set:woods_oak:3", "set:woods_oak:5", "set:woods_oak:9", "post", "set:woods_ancient_oak:0", "set:woods_ancient_oak:2", "set:woods_ancient_oak:4", "post", "set:woods_silver_birch:0", "set:woods_silver_birch:3", "post", "set:woods_yew:0", "set:woods_yew:2", "set:woods_yew:5", "post", "set:woods_hawthorn:0", "set:woods_hawthorn:1", "post", "set:woods_elder:0", "set:woods_elder:2"]},
 	"roles_colour": {"distance": 46.0, "spacing": 6.0, "look": 4.0, "ids": ["set:woods_wild_cherry:0", "set:woods_wild_cherry:2", "post", "set:woods_crab_apple:0", "set:woods_crab_apple:1", "post", "set:woods_lilac_tree:0", "set:woods_lilac_tree:1", "set:woods_lilac_tree:2", "post", "set:flora_tree_autumn_oak:0", "set:flora_tree_autumn_oak:2", "post", "set:flora_tree_autumn_maple:0", "set:flora_tree_autumn_maple:2", "post", "set:flora_tree_golden_birch:0", "set:flora_tree_golden_birch:2", "post", "set:flora_tree_rowan:0", "set:flora_tree_rowan:1", "post", "set:woods_blighted_tree:0", "set:woods_blighted_tree:5", "post", "set:woods_twisted_dead:2", "set:woods_twisted_dead:7"]},
 	"tree_steps": {"distance": 34.0, "spacing": 6.5, "look": 5.0, "ids": ["set:woods_oak:5:0", "set:woods_oak:5:1", "set:woods_oak:5:2", "post", "set:woods_oak:0:0", "set:woods_oak:0:1", "set:woods_oak:0:2", "post", "set:woods_ancient_oak:0:0", "set:woods_ancient_oak:0:1", "set:woods_ancient_oak:0:2", "post", "set:woods_wild_cherry:0:0", "set:woods_wild_cherry:0:1", "set:woods_wild_cherry:0:2"]},
+	# The estate's trees, every build (finish plan D2/E2; EstateTrees):
+	# estate:<species>:<build> is FloraLib.mesh() as the estate draws it.
+	"estate_green": {"distance": 62.0, "spacing": 12.0, "look": 6.0, "ids": ["estate:oak:0", "estate:oak:1", "estate:oak:2", "post",
+		"estate:birch:0", "estate:birch:1", "estate:birch:2", "post", "estate:pear_tree:0", "estate:pear_tree:1", "estate:pear_tree:2"]},
+	"estate_willow": {"distance": 38.0, "spacing": 14.5, "look": 4.5, "ids": ["estate:willow:0", "estate:willow:1", "estate:willow:2",
+		"estate:willow:3", "estate:willow:4"]},
+	"estate_blossom": {"distance": 36.0, "spacing": 9.0, "look": 3.5, "ids": ["estate:cherry_blossom:0", "estate:cherry_blossom:1",
+		"estate:cherry_blossom:2", "post", "estate:apple_blossom:0", "estate:apple_blossom:1", "estate:apple_blossom:2", "post",
+		"estate:crab_apple:0", "estate:crab_apple:1", "estate:crab_apple:2"]},
+	# one of each
+	"estate_family": {"distance": 52.0, "spacing": 12.5, "look": 5.5, "ids": ["estate:oak:0", "estate:birch:0", "estate:willow:0",
+		"estate:cherry_blossom:0", "estate:apple_blossom:0", "estate:crab_apple:0", "estate:pear_tree:0"]},
 	# The Quaternius ground plants and flowers (finish plan F1/G1), as delivered.
 	"qtz_plants": {"distance": 4.5, "spacing": 0.75, "look": 0.4, "ids": ["scene:/plants/qtz/Grass_Common_Short.gltf:0.35:fit", "scene:/plants/qtz/Grass_Common_Tall.gltf:0.6:fit", "scene:/plants/qtz/Grass_Wispy_Short.gltf:0.4:fit", "scene:/plants/qtz/Grass_Wispy_Tall.gltf:0.7:fit", "scene:/plants/qtz/Clover_1.gltf:0.15:fit", "scene:/plants/qtz/Clover_2.gltf:0.18:fit", "scene:/plants/qtz/Fern_1.gltf:0.8:fit", "scene:/plants/qtz/Flower_3_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_3_Group.gltf:0.5:fit", "scene:/plants/qtz/Flower_4_Single.gltf:0.45:fit", "scene:/plants/qtz/Flower_4_Group.gltf:0.5:fit", "scene:/plants/qtz/Mushroom_Common.gltf:0.25:fit", "scene:/plants/qtz/Mushroom_Laetiporus.gltf:0.35:fit"]},
 	# The re-downloaded Quaternius trees: twisted oaks and pines in the deep tint,
@@ -416,6 +442,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				# (set:<id>:<build>[:<step>]), already at the id's height.
 				var step := int(item.get_slice(":", 3)) if item.get_slice_count(":") > 3 else 0
 				mi.mesh = CourtTreeSet.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)), step)
+			elif item.begins_with("estate:"):
+				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
 			elif item.begins_with("ez:"):
 				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
 				mi.mesh = ez[0]

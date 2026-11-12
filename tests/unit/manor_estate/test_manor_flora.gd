@@ -1,6 +1,6 @@
 ## Every flora species has a mesh (Blender model, else procedural) on the shared
-## foliage shader, swaying from the base, within its triangle budget and height,
-## plus tree impostors.
+## foliage shader (the trees on EstateTrees' own), swaying from the base, within
+## its triangle budget and height, plus tree impostors.
 extends GutTest
 
 const SHADER_PATH := "res://world/shared/shaders/stylized_foliage.gdshader"
@@ -41,6 +41,14 @@ func test_meshes_use_the_shared_shader_with_wind_flex() -> void:
 		var root_flex := 0.0
 		for i in m.get_surface_count():
 			var sm := m.surface_get_material(i) as ShaderMaterial
+			if EstateTrees.has(id):
+				# the trees are EstateTrees' (their own shaders, the same lighting and wind)
+				if sm == null or sm.shader == null or sm.shader.resource_path not in [EstateTrees.SHADER, EstateTrees.SHADER_SOLID]:
+					bad.append("%s surface %d not on the estate tree shader" % [id, i])
+				elif absf(float(sm.get_shader_parameter(&"model_height")) - FloraLib.height_of(id)) > 0.01:
+					bad.append("%s model_height is not its height" % id)
+				max_flex = 1.0
+				continue
 			if sm == null or sm.shader == null or sm.shader.resource_path != SHADER_PATH:
 				bad.append("%s surface %d not on the foliage shader" % [id, i])
 			if FloraLib.is_model(id):
