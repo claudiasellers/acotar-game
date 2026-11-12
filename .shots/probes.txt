@@ -1,0 +1,4 @@
+from estate-trees-explore
+quality look
+shot four res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_oak
+shot close res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=new_oak_close
