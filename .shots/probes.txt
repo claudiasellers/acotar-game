@@ -1,0 +1,10 @@
+from estate-trees-final
+quality look
+shot family res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=estate_family
+shot willow res://tools/court/court_terrain_shots.tscn {out} estate_lawns lineup=estate_willow
+shot views1 res://tools/court/court_terrain_shots.tscn {out} estate_lawns estate_avenue estate_orchard regions ingame
+shot views2 res://tools/court/court_terrain_shots.tscn {out} estate_north estate_air regions ingame
+shot p_lawns res://tools/perf/frame_probe.tscn {out} estate_lawns regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=after_lawns --perf-csv={out}/perf.csv
+shot p_orchard res://tools/perf/frame_probe.tscn {out} estate_orchard regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=after_orchard --perf-csv={out}/perf.csv
+shot p_avenue res://tools/perf/frame_probe.tscn {out} estate_avenue regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=after_avenue --perf-csv={out}/perf.csv
+shot p_air res://tools/perf/frame_probe.tscn {out} estate_air regions ingame --perf-scene=res://tools/court/court_terrain_shots.tscn --perf-name=after_air --perf-csv={out}/perf.csv
