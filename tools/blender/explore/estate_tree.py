@@ -44,9 +44,9 @@ UP = Vector((0, 0, 1))
 #   cloud: cloud radius; flat: its height over its width; card: leaf-clump size
 RECIPES = {
     "oak": dict(
-        trunk=0.046, clear=0.22, lean=0.025,
-        whorls=[(0.22, 3, 0.40, 16, 40, 2), (0.37, 3, 0.31, 40, 62, 1)],
-        leader=0.60, kink=22, cloud=0.118, flat=0.82, card=0.085, cover=2.3, rim=0.28,
+        trunk=0.046, clear=0.25, lean=0.025,
+        whorls=[(0.25, 4, 0.44, 12, 38, 2), (0.39, 3, 0.33, 38, 60, 1)],
+        leader=0.62, kink=22, cloud=0.12, flat=0.8, card=0.085, cover=2.1, rim=0.26,
     ),
 }
 
@@ -161,7 +161,7 @@ def wood(sk, name):
     sub.levels = 1
     # the subdivided body is rounder than it needs triangles for
     dec = ob.modifiers.new("dec", "DECIMATE")
-    dec.ratio = 0.4
+    dec.ratio = 0.33
     done = ob.evaluated_get(bpy.context.evaluated_depsgraph_get())
     out = bmesh.new()
     out.from_mesh(done.to_mesh())
