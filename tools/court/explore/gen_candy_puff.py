@@ -30,7 +30,7 @@ KINDS = {
 
 def clump(cv, rng, kind):
     shape, n, length, wide = KINDS[kind]
-    cx, cy, rad = SIZE / 2, SIZE * 0.52, SIZE * 0.36
+    cx, cy, rad = SIZE / 2, SIZE * 0.51, SIZE * 0.42
     root = (cx, cy + rad * 0.55)   # the leaves fan up and out from below the heart
     leaves = []
     for k in range(n):

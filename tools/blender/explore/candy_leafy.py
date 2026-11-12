@@ -35,7 +35,7 @@ OUT = H.OUT
 # card: clump card size x height; cover: card area over puff area (shingles);
 # rim: standing cards per shingle card; core: core radius x puff radius
 LEAFY = {
-    "oak": dict(card=0.092, cover=2.1, rim=0.3, core=0.66),
+    "oak": dict(card=0.092, cover=2.6, rim=0.3, core=0.6),
 }
 
 

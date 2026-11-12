@@ -322,21 +322,16 @@ func _candy_leafy(sp: StringName) -> Mesh:
 	var pal: Array = CANDY_LEAFY.get(sp, CANDY_EZ[sp][4])
 	var h := FloraLib.height_of(sp)
 	var mats := {}
-	for part: String in ["bark", "leaves", "core"]:
+	var parts := ["bark", "leaves", "core"]
+	for part: String in parts:
 		var m := ShaderMaterial.new()
-		if part == "bark":
-			m.shader = load(CourtTreeSet.SHADER) as Shader
-			m.set_shader_parameter(&"mode", 0)
-			m.set_shader_parameter(&"tex", load(TREES_EZ + "bark_%s.png" % CANDY_EZ[sp][2]))
-			m.set_shader_parameter(&"bark_col", Color(0.95, 0.93, 0.90) if sp == &"birch" else Color(0.68, 0.51, 0.51))
-			m.set_shader_parameter(&"bark_mean", 0.338)
-		else:
-			m.shader = load(CANDY_DIR + "candy_leaf.gdshader") as Shader
-			m.set_shader_parameter(&"core", part == "core")
-			m.set_shader_parameter(&"tex", load(CANDY_DIR + "puff_%s.png" % sp))
-			m.set_shader_parameter(&"shadow_col", pal[0])
-			m.set_shader_parameter(&"mid_col", pal[1])
-			m.set_shader_parameter(&"light_col", pal[2])
+		m.shader = load(CANDY_DIR + "candy_leaf.gdshader") as Shader
+		m.set_shader_parameter(&"part", parts.find(part))
+		m.set_shader_parameter(&"tex", load(TREES_EZ + "bark_%s.png" % CANDY_EZ[sp][2]) if part == "bark" else load(CANDY_DIR + "puff_%s.png" % sp))
+		m.set_shader_parameter(&"bark_col", Color(0.95, 0.93, 0.90) if sp == &"birch" else Color(0.56, 0.42, 0.43))
+		m.set_shader_parameter(&"shadow_col", pal[0])
+		m.set_shader_parameter(&"mid_col", pal[1])
+		m.set_shader_parameter(&"light_col", pal[2])
 		m.set_shader_parameter(&"model_height", h)
 		mats[part] = m
 	var out := ArrayMesh.new()
