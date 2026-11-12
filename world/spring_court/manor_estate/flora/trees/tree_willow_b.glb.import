@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c81n5p67ctu63"
-path="res://.godot/imported/pear_tree.glb-0864b1151d44ce4bfc6ff8242d581a8f.scn"
+uid="uid://birwhaajuil4u"
+path="res://.godot/imported/tree_willow_b.glb-8e60ad8d175d3798ad2f7298221fcfd0.scn"
 
 [deps]
 
-source_file="res://world/spring_court/manor_estate/flora/models/pear_tree.glb"
-dest_files=["res://.godot/imported/pear_tree.glb-0864b1151d44ce4bfc6ff8242d581a8f.scn"]
+source_file="res://world/spring_court/manor_estate/flora/trees/tree_willow_b.glb"
+dest_files=["res://.godot/imported/tree_willow_b.glb-8e60ad8d175d3798ad2f7298221fcfd0.scn"]
 
 [params]
 

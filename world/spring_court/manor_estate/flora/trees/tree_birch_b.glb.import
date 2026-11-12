@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://mqyedqafauib"
-path="res://.godot/imported/cherry_blossom.glb-6e6ff1d64e592244e2d9de1f6e0e05eb.scn"
+uid="uid://cwx453kd3r1h0"
+path="res://.godot/imported/tree_birch_b.glb-c72be033c88966e5514b8bc14e156690.scn"
 
 [deps]
 
-source_file="res://world/spring_court/manor_estate/flora/models/cherry_blossom.glb"
-dest_files=["res://.godot/imported/cherry_blossom.glb-6e6ff1d64e592244e2d9de1f6e0e05eb.scn"]
+source_file="res://world/spring_court/manor_estate/flora/trees/tree_birch_b.glb"
+dest_files=["res://.godot/imported/tree_birch_b.glb-c72be033c88966e5514b8bc14e156690.scn"]
 
 [params]
 

@@ -784,6 +784,10 @@ def main():
     for sid, (kind, h, col) in sorted(species().items()):
         if only is not None and sid not in only:
             continue
+        if kind == "tree":
+            # the trees are tools/blender/estate_tree.py's (wider-court D2/E2);
+            # tree() above made the first cotton-candy ones
+            continue
         rng = random.Random(sum(map(ord, sid)))
         p = build_species(sid, kind, h, col, rng)
         ob = p.to_object(sid)

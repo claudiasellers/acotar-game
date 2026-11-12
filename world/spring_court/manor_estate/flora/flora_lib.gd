@@ -4,6 +4,9 @@
 ## stylized procedural mesh (flora_shapes.gd). Both draw with the shared foliage
 ## shader world/shared/shaders/stylized_foliage.gdshader.
 ## Callers use mesh(), impostor(), height_of() and SPECIES. Meshes stand on y = 0.
+## The tree species are EstateTrees' (wider-court D2/E2): each comes in several
+## builds, mesh(species, build) picks one and ManorScatter hands neighbouring
+## trees different builds.
 class_name FloraLib
 extends RefCounted
 
@@ -100,7 +103,15 @@ static func height_of(species: StringName) -> float:
 	return float(SPECIES.get(species, [&"bush", 1.0, Color.WHITE])[1])
 
 
-static func mesh(species: StringName) -> Mesh:
+## How many builds a species has (1 unless it is one of EstateTrees' trees).
+static func builds(species: StringName) -> int:
+	return EstateTrees.builds(species) if EstateTrees.has(species) else 1
+
+
+## The species' mesh; `build` picks one of a tree's builds.
+static func mesh(species: StringName, build: int = 0) -> Mesh:
+	if EstateTrees.has(species):
+		return EstateTrees.mesh(species, build)
 	if _cache.has(species):
 		return _cache[species]
 	var model := PropModels.pair(PropModels.FLORA_DIR + String(species) + ".glb", String(species), foliage_material(species))
@@ -134,7 +145,7 @@ static func impostor(species: StringName) -> Mesh:
 
 ## True when the species draws its Blender model rather than the procedural mesh.
 static func is_model(species: StringName) -> bool:
-	return ResourceLoader.exists(PropModels.FLORA_DIR + String(species) + ".glb")
+	return EstateTrees.has(species) or ResourceLoader.exists(PropModels.FLORA_DIR + String(species) + ".glb")
 
 
 ## The clipped rose bushes and peonies (L35-8): leafy cushions set with blooms.

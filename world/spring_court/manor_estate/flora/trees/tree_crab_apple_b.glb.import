@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cs6625beyujrc"
-path="res://.godot/imported/crab_apple.glb-198d19aefbca9a7d02cdf76983283889.scn"
+uid="uid://bl43pje1d7rya"
+path="res://.godot/imported/tree_crab_apple_b.glb-372315ba1eb0a460e0ddfe2eac71f29b.scn"
 
 [deps]
 
-source_file="res://world/spring_court/manor_estate/flora/models/crab_apple.glb"
-dest_files=["res://.godot/imported/crab_apple.glb-198d19aefbca9a7d02cdf76983283889.scn"]
+source_file="res://world/spring_court/manor_estate/flora/trees/tree_crab_apple_b.glb"
+dest_files=["res://.godot/imported/tree_crab_apple_b.glb-372315ba1eb0a460e0ddfe2eac71f29b.scn"]
 
 [params]
 

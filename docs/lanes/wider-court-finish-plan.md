@@ -62,8 +62,8 @@ and its status. Details for each item are in the phase sections further down.
 | G2 | Ground cover build; becomes the fire fuel | G1 (owner's pick) | waiting | GroundFuel tests pass on the new layer; frame time as T7 |
 | C1 | Grade previews: the milky glen, the teal Western Woods | — | **done**: the teal is the moss ground (hue 160), not the ramp; the glen's darks barely matter | LUT black level and ground hue printed for now and the preview |
 | C2 | Moss turned olive (owner's pick, wcterrain-37); the glen left as is | C1 (owner's pick) | **started** | the grade director's tests; the printed numbers as picked |
-| E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | waiting | renders, same views |
-| E2 | Apply the estate decision | E1, D2 | waiting | canonical shots: no change but the trees |
+| E1 | Estate and Eastern Woods renders, new trees vs today's | T6 | **done** for the estate (the owner chose from lineups, tree by tree, 2026-11-12); Eastern Woods waits on P2 | renders, same views |
+| E2 | Apply the estate decision: the estate tree-builder's trees replace the cotton-candy models (`EstateTrees`, `tools/blender/estate_tree.py`; 23 builds, each ≤ 6,000 triangles; `docs/tuning.md` "Estate trees") | E1, D2 | **submitted** (M4WCT-11) | GUT: `test_manor_tree_builds`; tree draws 104 (was 146); canonical shots: no change but the trees |
 | V1 | Tavern and well on the village green (generator pipeline or asset request) | P2 (same content file) | waiting | on the green, clear of the paths (GUT) |
 | H1 | Housekeeping: drop the previews and the card trees | T8 | waiting | nothing references them (grep) |
 | L | Landmark models | owner (later) | deferred | |
@@ -73,7 +73,7 @@ Owner decisions:
 | Id | Decision | Status |
 |---|---|---|
 | D1 | Willow: make our own, or skip | open |
-| D2 | Estate: new trees everywhere, or court only (after E1). The program's rule is that the same object looks the same in every region, so "everywhere" is the expected answer | open, after E1 |
+| D2 | Estate: new trees everywhere, or court only (after E1). The program's rule is that the same object looks the same in every region, so "everywhere" is the expected answer | **decided** (owner, 2026-11-12): neither. The owner loves the estate's cotton-candy shapes and wanted them refined, not replaced by the court's trees: the estate gets its own trees, built from scratch (cotton-candy clouds made of leaf clumps), and the court keeps the Quaternius and EZ trees. The estate's willow is a candidate for D1 |
 | D3 | Borders: seal every region border, or only the Autumn border and the edge | open |
 | D4 | Opening times: phase table vs `CourtMap.UNLOCK_PHASE` (Rosewild, Blossom Vale) | open (story lane) |
 

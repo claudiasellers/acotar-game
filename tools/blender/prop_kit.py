@@ -178,6 +178,11 @@ class Prop:
         me = bpy.data.meshes.new(name or self.name)
         self.bm.normal_update()
         self.bm.to_mesh(me)
+        # newer glTF exporters (Blender 5.3) write COLOR_0 only from the active
+        # colour attribute; 5.0 took the only one there was
+        if me.color_attributes:
+            me.color_attributes.active_color_name = me.color_attributes[0].name
+            me.attributes.default_color_name = me.color_attributes[0].name
         uv = me.uv_layers.new(name="finish")
         for poly in me.polygons:
             fi = poly.material_index

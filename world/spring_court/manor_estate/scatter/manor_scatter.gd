@@ -485,12 +485,24 @@ static func save_all(list: Array[ScatterLayer]) -> void:
 const CHUNK := 64.0
 const WIDE_CHUNK := 128.0
 const SPARSE_PER_CHUNK := 12
+## Trees draw in a field of their own (wider-court D2): each species is split
+## over its builds (FloraLib.builds) so neighbours differ, and 320 m chunks keep
+## the split inside the draw budget (102 tree chunk draws for three builds, 146
+## for one build in 128 m chunks). A chunk is judged from its centre, so the
+## draw distance grows by the extra half-diagonal: trees still appear no nearer
+## than they did in 128 m chunks.
+const TREE_CHUNK := 320.0
+const TREE_DRAW_PAD := (TREE_CHUNK - WIDE_CHUNK) * 0.71
+## Same-species trees closer than this take different builds where they can.
+const TREE_NEIGHBOUR_GAP := 16.0
 
 
 ## Trees and sparse layers (fewer than SPARSE_PER_CHUNK instances per 64 m chunk) go in a
 ## second field with 128 m chunks, so a lone feather is not a draw call of its own.
 static func chunk_size_for(l: ScatterLayer) -> float:
-	if l.tags.has("tree") or l.tags.has("wide"):
+	if l.tags.has("tree"):
+		return TREE_CHUNK
+	if l.tags.has("wide"):
 		return WIDE_CHUNK
 	var keys := {}
 	for i in l.count():
@@ -522,8 +534,11 @@ static func add_field_paced(parent: Node3D, pace: BuildPace) -> void:
 static func _fields(parent: Node3D, list: Array[ScatterLayer]) -> Array[ScatterField]:
 	var near: Array[ScatterLayer] = []
 	var wide: Array[ScatterLayer] = []
+	var trees: Array[ScatterLayer] = []
 	for l in list:
-		if chunk_size_for(l) == CHUNK:
+		if l.tags.has("tree"):
+			trees.append_array(split_trees(l))
+		elif chunk_size_for(l) == CHUNK:
 			near.append(l)
 		else:
 			wide.append(l)
@@ -539,23 +554,97 @@ static func _fields(parent: Node3D, list: Array[ScatterLayer]) -> Array[ScatterF
 	wide_field.layers = wide
 	wide_field.chunk_size = WIDE_CHUNK
 	parent.add_child(wide_field)
+	var tree_field := ScatterField.new()
+	tree_field.name = "ScatterFieldTrees"
+	tree_field.region_id = REGION_ID
+	tree_field.layers = trees
+	tree_field.chunk_size = TREE_CHUNK
+	parent.add_child(tree_field)
 	var trunks := StaticBody3D.new()
 	trunks.name = "TreeTrunks"
 	trunks.collision_layer = EstateKit.WORLD_LAYER
 	trunks.collision_mask = 0
-	var shape := CylinderShape3D.new()
-	shape.radius = 0.45
-	shape.height = 4.0
 	for l in list:
 		if not l.tags.has("tree"):
 			continue
+		# one shape per species: an oak's trunk is three times a crab apple's
+		var shape := CylinderShape3D.new()
+		shape.radius = EstateTrees.TRUNK_RADIUS.get(species_of(l), 0.45)
+		shape.height = 4.0
 		for i in l.count():
 			var cs := CollisionShape3D.new()
 			cs.shape = shape
 			cs.position = l.position_of(i) + Vector3.UP * 2.0
 			trunks.add_child(cs)
 	parent.add_child(trunks)
-	return [field, wide_field]
+	return [field, wide_field, tree_field]
+
+
+# --- Tree builds (wider-court D2) ---------------------------------------------
+
+## The species a tree layer draws.
+static func species_of(l: ScatterLayer) -> StringName:
+	var spec: Dictionary = specs().get(l.id, {})
+	var look: Array = spec.get("look", [])
+	return look[1] if look.size() > 1 and look[0] == &"flora" else &""
+
+
+## Each tree's build: the first free one, starting from a hash of its spot,
+## that no same-species tree within TREE_NEIGHBOUR_GAP already has (nearer
+## neighbours weigh more when every build is taken). Deterministic.
+static func tree_builds(l: ScatterLayer, n: int) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	out.resize(l.count())
+	if n <= 1:
+		return out
+	var grid := {}
+	for i in l.count():
+		var p := l.position_of(i)
+		var cell := Vector2i(floori(p.x / TREE_NEIGHBOUR_GAP), floori(p.z / TREE_NEIGHBOUR_GAP))
+		var taken := PackedFloat32Array()
+		taken.resize(n)
+		for dx in range(-1, 2):
+			for dz in range(-1, 2):
+				for j: int in grid.get(cell + Vector2i(dx, dz), []):
+					var d := p.distance_to(l.position_of(j))
+					if d < TREE_NEIGHBOUR_GAP:
+						taken[out[j]] += TREE_NEIGHBOUR_GAP - d
+		var start := posmod(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0))), n)
+		var best := start
+		for k in n:
+			var b := (start + k) % n
+			if taken[b] < taken[best]:
+				best = b
+		out[i] = best
+		if not grid.has(cell):
+			grid[cell] = []
+		(grid[cell] as Array).append(i)
+	return out
+
+
+## A tree layer as one draw layer per build ("<id>@<build>"), each on its own
+## build's mesh, drawn from the tree field's TREE_CHUNK chunks.
+static func split_trees(l: ScatterLayer) -> Array[ScatterLayer]:
+	var species := species_of(l)
+	var n := FloraLib.builds(species) if species != &"" else 1
+	var which := tree_builds(l, n)
+	var out: Array[ScatterLayer] = []
+	for b in n:
+		var sub := ScatterLayer.new()
+		sub.id = StringName("%s@%d" % [l.id, b]) if n > 1 else l.id
+		sub.ingredient_id = l.ingredient_id
+		sub.tags = l.tags
+		sub.wind = l.wind
+		sub.cast_shadow = l.cast_shadow
+		sub.draw_distance = l.draw_distance + TREE_DRAW_PAD
+		sub.mesh = FloraLib.mesh(species, b) if species != &"" else l.mesh
+		for i in l.count():
+			if which[i] == b:
+				var o := i * ScatterLayer.STRIDE
+				sub.add(l.position_of(i), l.instances[o + 3], l.instances[o + 4])
+		if sub.count() > 0:
+			out.append(sub)
+	return out
 
 
 ## Distinct zones a layer's instances fall in.
@@ -571,16 +660,34 @@ static func zones_of(l: ScatterLayer) -> PackedStringArray:
 	return out
 
 
+## A layer as the fields draw it: [chunk size, draw distance, {chunk key: true}]
+## per draw layer (a tree layer once per build, split_trees()).
+static func chunk_groups(l: ScatterLayer, fixed_chunk: float = 0.0) -> Array:
+	var chunk := fixed_chunk if fixed_chunk > 0.0 else chunk_size_for(l)
+	var tree := l.tags.has("tree")
+	var species := species_of(l) if tree else &""
+	var n := FloraLib.builds(species) if species != &"" else 1
+	var which := tree_builds(l, n)
+	var groups: Array[Dictionary] = []
+	for b in n:
+		groups.append({})
+	for i in l.count():
+		var p := l.position_of(i)
+		groups[which[i]][Vector2i(floori(p.x / chunk), floori(p.z / chunk))] = true
+	var draw := l.draw_distance + (TREE_DRAW_PAD if tree else 0.0)
+	var out := []
+	for g in groups:
+		if not g.is_empty():
+			out.append([chunk, draw, g])
+	return out
+
+
 ## Estimated draw calls of the scatter: one per chunk multimesh (and impostor).
 static func chunk_draws(list: Array[ScatterLayer], fixed_chunk: float = 0.0) -> int:
 	var n := 0
 	for l in list:
-		var chunk_size := fixed_chunk if fixed_chunk > 0.0 else chunk_size_for(l)
-		var keys := {}
-		for i in l.count():
-			var p := l.position_of(i)
-			keys[Vector2i(floori(p.x / chunk_size), floori(p.z / chunk_size))] = true
-		n += keys.size() * (2 if l.impostor_mesh != null else 1)
+		for g: Array in chunk_groups(l, fixed_chunk):
+			n += (g[2] as Dictionary).size() * (2 if l.impostor_mesh != null else 1)
 	return n
 
 
@@ -588,17 +695,14 @@ static func chunk_draws(list: Array[ScatterLayer], fixed_chunk: float = 0.0) -> 
 ## chunks beyond a layer's draw_distance (plus half a chunk diagonal) are
 ## culled by their visibility range. Viewpoints on a 50 m grid; returns [max, at].
 static func visible_chunk_draws(list: Array[ScatterLayer]) -> Array:
-	var centers := []    # per layer: [draw distance, PackedVector2Array of chunk centres]
+	var centers := []    # per draw layer: [draw distance, PackedVector2Array of chunk centres]
 	for l in list:
-		var chunk_size := chunk_size_for(l)
-		var keys := {}
-		for i in l.count():
-			var p := l.position_of(i)
-			keys[Vector2i(floori(p.x / chunk_size), floori(p.z / chunk_size))] = true
-		var pts := PackedVector2Array()
-		for k: Vector2i in keys:
-			pts.append(Vector2((k.x + 0.5) * chunk_size, (k.y + 0.5) * chunk_size))
-		centers.append([l.draw_distance + chunk_size * 0.71, pts])
+		for g: Array in chunk_groups(l):
+			var chunk_size: float = g[0]
+			var pts := PackedVector2Array()
+			for k: Vector2i in g[2]:
+				pts.append(Vector2((k.x + 0.5) * chunk_size, (k.y + 0.5) * chunk_size))
+			centers.append([float(g[1]) + chunk_size * 0.71, pts])
 	var b := ManorSitePlan.BOUNDS
 	var best := 0
 	var at := Vector2.ZERO

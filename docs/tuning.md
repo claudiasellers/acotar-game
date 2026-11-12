@@ -95,6 +95,27 @@ the book's shapes; anything else here is taste.
 | `DRAW_GRASS_CLUMPS` | world/spring_court/wider/court_region.gd | false (owner, 2026-11-09) | bool | The pale mint grass clumps are scattered but hidden: they didn't read as grass on the storybook ground. They still count as fire fuel. | wider-court-world |
 | Depth haze, court by day | world/spring_court/wider/fx/tools/build_court_fx.gd `DEPTH_*` | haze (0.70,0.74,0.96), tint 0.25, density 0.0011, aerial 0.1, sky affect 0.1 | tint 0–0.5 | The same layering in each daytime region grade, keeping a quarter of the region's own fog hue. Dusk, night and the blight keep their own fog. | wider-court-world |
 
+## Estate trees (finish plan D2/E2, lane estate-trees)
+
+The estate's trees come from the estate tree-builder (`tools/blender/estate_tree.py`):
+a skinned trunk and limbs, each limb ending in a cloud of leaf-clump cards, the willow
+all fronds. Rebuild with the builder, then `tools/court/gen_estate_tree_clumps.py` for
+the clump pictures. The owner approved the set on 2026-11-12.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Estate tree shapes | tools/blender/estate_tree.py `RECIPES` | per species: trunk, clear stem, lean, whorls (height, limbs, reach, rise, forks), leader, cloud and card sizes | every build ≤ 6,000 triangles (`BUDGET`) | The shape of each species; lengths are fractions of the species height in FloraLib. Oak broad and low, birch slender with small high clouds, pear upright, the blossom trees round, the willow arching. | estate-trees |
+| Builds per species | tools/blender/estate_tree.py `main()` | 3 (a–c), from seeds | 1–8 | The same recipe from another seed, so neighbours differ. | estate-trees |
+| Willow curtains | tools/blender/estate_tree.py willow `weep`, `variants` | a–c stop above the grass; d trails a fifth of its strands to the ground (`trail` 0.2); e trails all of them (`trail` 1.0) | trail 0–1 | How long the willow's fronds hang (owner, 2026-11-12: "cut the trailing share from a third to about a fifth"). The willow has no leaf clouds: strands also drape over the crown-top wood. | estate-trees |
+| Estate tree colours | world/spring_court/manor_estate/flora/estate_trees.gd `LOOKS` | shadow / mid / light per species: oak (0.30,0.56,0.44) (0.50,0.79,0.56) (0.78,0.95,0.72); birch (0.36,0.62,0.42) (0.60,0.84,0.52) (0.86,0.97,0.66); pear (0.34,0.60,0.40) (0.56,0.80,0.50) (0.82,0.94,0.64); willow (0.33,0.60,0.46) (0.52,0.80,0.52) (0.80,0.95,0.66); cherry heart (0.80,0.42,0.60) (0.96,0.66,0.80); apple heart (0.88,0.72,0.76) (0.98,0.90,0.91); crab apple heart (0.90,0.78,0.80) (0.99,0.94,0.94) | pastel; light ≤ 1.0 | The three leaf bands of a green tree. A blossom tree's clumps keep their painted colours and these tint only the heart of each cloud. | estate-trees |
+| Estate bark | estate_trees.gd `BARK_ROSE`, `BARK_WHITE` | rose-brown (0.56,0.42,0.43); birch white (0.93,0.91,0.88) | | The bark colour; the court's painted bark picture gives its light and dark. | estate-trees |
+| `bands` | world/spring_court/manor_estate/flora/trees/estate_tree.gdshader | 4 | 2–8 | How many steps the leaf value is banded into between shadow and light. | estate-trees |
+| `tree_value_spread`, `tree_hue_spread` | estate_tree.gdshader | 0.08, 0.4 | 0–0.3, 0–1 | Each tree a little lighter or darker, warmer or cooler than its neighbour, from where it stands. | estate-trees |
+| Estate tree light | estate_tree.gdshader `CANDY_*` | wrap 0.5, shade (0.62,0.55,0.78), rim (1.0,0.86,0.72) at 0.2, backlight 0.3 | rim ≤ 0.3 | The lilac shade and soft warm rim, as the estate's other foliage; the rim is low so the leaf clumps stay readable. | estate-trees |
+| `TREE_NEIGHBOUR_GAP` | world/spring_court/manor_estate/scatter/manor_scatter.gd | 16 m | 8–30 m | A tree takes a build that no tree of its species within this distance has. | estate-trees |
+| `TREE_CHUNK` | manor_scatter.gd | 320 m | 128–400 m | The size of a tree draw chunk. Larger chunks keep the draw count down now that each species is several builds (104 tree draws; one build in 128 m chunks was 146). | estate-trees |
+| `TRUNK_RADIUS` | estate_trees.gd | oak 0.74 m, willow 0.5, pear 0.28, birch 0.27, cherry 0.27, apple 0.25, crab apple 0.22 | | The trunk you bump into, per species, matching the model's trunk at chest height. | estate-trees |
+
 ## Bow feel (T101)
 
 | Tunable | Where | Default | Range | What it does | Lane |

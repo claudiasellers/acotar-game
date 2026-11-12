@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bf8gd1mtgwgki"
-path="res://.godot/imported/oak.glb-afc948af9c5d43c1f37da6f7e9d2b579.scn"
+uid="uid://oq4meuk04eyx"
+path="res://.godot/imported/tree_oak_c.glb-2caacf6991da87d6627191c094e26e8a.scn"
 
 [deps]
 
-source_file="res://world/spring_court/manor_estate/flora/models/oak.glb"
-dest_files=["res://.godot/imported/oak.glb-afc948af9c5d43c1f37da6f7e9d2b579.scn"]
+source_file="res://world/spring_court/manor_estate/flora/trees/tree_oak_c.glb"
+dest_files=["res://.godot/imported/tree_oak_c.glb-2caacf6991da87d6627191c094e26e8a.scn"]
 
 [params]
 
