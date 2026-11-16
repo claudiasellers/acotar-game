@@ -71,6 +71,14 @@ CROCUS = {"height": 0.2, "petal": 0.085, "stems": 3, "leaf_deep": (0.24, 0.50, 0
           "white": (0.93, 0.92, 0.96), "gold": (0.98, 0.72, 0.22),
           "colours": [(hexc("5B3FA8"), hexc("8F6FD8"), hexc("CDB8F2")), (hexc("5B3FA8"), hexc("8F6FD8"), hexc("CDB8F2")),
                       (hexc("E0A020"), hexc("F6C83C"), hexc("FCE48A")), (hexc("D4CCE8"), hexc("F4F1FA"), hexc("FFFFFF"))]}
+# kingcups (marsh marigold): the Golden Ford's, the only gold in the glen
+KINGCUP = {"height": 0.24, "petal": 0.085, "leaf_size": 0.17, "stems": 4, "leaves": 10, "leaf_deep": (0.18, 0.46, 0.30),
+           "leaf": (0.36, 0.66, 0.36), "stem": (0.52, 0.72, 0.36), "gold_deep": (0.96, 0.68, 0.10), "gold": (1.0, 0.84, 0.18),
+           "gold_light": (1.0, 0.92, 0.40), "heart": (0.88, 0.58, 0.08)}
+# fallen petals: white under the brae's thorn gate, pink under the Blossom Knoll's cherry
+PETALS_WHITE = {"petals": 34, "radius": 0.75, "petal": 0.055, "colours": [(0.97, 0.95, 0.94), (0.99, 0.97, 0.96), (0.96, 0.90, 0.92)],
+                "tip": (1.0, 1.0, 1.0)}
+PETALS_PINK = dict(PETALS_WHITE, colours=[(0.97, 0.72, 0.82), (0.99, 0.82, 0.89), (0.94, 0.62, 0.76)], tip=(1.0, 0.93, 0.96))
 FERN = {"fronds": 9, "height": 0.75, "deep": (0.18, 0.44, 0.33), "mid": (0.34, 0.64, 0.42), "light": (0.60, 0.83, 0.50)}
 
 # plant -> (kind, sheet, form or None). The trees here are studies, built only
@@ -98,6 +106,10 @@ PLANTS = {
     "crocus_patch_a": ("patch", CROCUS, ("crocus", 6, 0.34)),
     "crocus_patch_b": ("patch", CROCUS, ("crocus", 6, 0.34)),
     "crocus_patch_c": ("patch", CROCUS, ("crocus", 4, 0.26)),
+    "kingcup_patch_a": ("patch", KINGCUP, ("kingcup", 6, 0.3)),
+    "kingcup_patch_b": ("patch", KINGCUP, ("kingcup", 3, 0.17)),
+    "petals_white": ("litter", PETALS_WHITE, None),
+    "petals_pink": ("litter", PETALS_PINK, None),
     "fern_a": ("fern", FERN, None),
     "fern_b": ("fern", FERN, None),
     "fern_c": ("fern", FERN, None),
@@ -115,8 +127,10 @@ FAR = {
                              G.mix(sh["bell_deep"], sh["bell_light"], 0.7), G.mix(sh["leaf"], sh["bell_light"], 0.45)], sh["height"] * 0.6),
     "snowdrop": lambda sh: ([sh["white"], G.mix(sh["leaf"], sh["white"], 0.6), G.mix(sh["leaf"], sh["white"], 0.4)], sh["height"] * 0.8),
     "crocus": lambda sh: ([G.mix(sh["leaf"], c[1], 0.75) for c in sh["colours"]] + [sh["leaf"]], sh["height"] * 0.7),
+    "kingcup": lambda sh: ([sh["gold"], G.mix(sh["leaf"], sh["gold"], 0.7), G.mix(sh["leaf"], sh["gold_light"], 0.55), sh["leaf"]],
+                           sh["height"] * 0.75),
 }
-SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "fern": G.fern}
+SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "kingcup": G.kingcup, "litter": G.litter, "fern": G.fern}
 
 
 def build(name, out_dir):

@@ -46,7 +46,7 @@ COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
 # estate's species' far forms live with the court's too: the estate draws its own way.
 FAR_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/far")
 COURT = {"pillar_birch": 18.0, "great_oak": 22.0, "great_sycamore": 28.0, "great_elm": 25.0, "aspen_spire": 27.0, "old_thorn": 7.0,
-         "thorn_bush": 3.2, "weeping_lady": 36.0}
+         "thorn_bush": 3.2, "weeping_lady": 36.0, "great_cherry": 15.0}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
 BUDGET = 6000
 UP = Vector((0, 0, 1))
@@ -158,10 +158,23 @@ RECIPES = {
         leader=0.9, top=0.07, top_cloud=0.9, kink=6, cloud=0.062, flat=1.9, card=0.05, cover=1.8, rim=0.3,
         wood=0.2, budget=7000, sink=0.02,
     ),
+    # The great cherry (the Blossom Knoll on the glen's Knoll Walk: the one pink
+    # tree on the way; built with --seeds 1, there is only the one). Wider than
+    # it is tall: a short dark bole that divides low into great boughs, which
+    # arch out level over your head, blossom in billows along their whole
+    # length, so you walk in under it.
+    "great_cherry": dict(
+        trunk=0.062, clear=0.22, lean=0.03, flare=2.1, limb=0.66,
+        whorls=[(0.22, 5, 0.74, 30, 0, 2), (0.36, 4, 0.52, 48, 14, 2), (0.5, 3, 0.32, 60, 42, 1)],
+        leader=0.6, top=0.14, top_cloud=1.2, kink=20, cloud=0.17, flat=0.62, card=0.12, cover=2.1, rim=0.26,
+        along=0.95, wood=0.24, budget=12000, sink=0.02,
+    ),
     # the old thorn: a hawthorn the wind has made. It leans hard, every limb
-    # is pulled round to the lee side, and the may lies in flat plates
+    # is pulled round to the lee side, and the may lies in flat plates.
+    # It leans toward +X whatever the build, so the planting can turn every
+    # thorn the wind's way (and the two at the brae's gate toward each other).
     "old_thorn": dict(
-        trunk=0.06, clear=0.3, lean=0.22, flare=2.0,
+        trunk=0.06, clear=0.3, lean=0.22, lean_az=0.0, flare=2.0,
         whorls=[(0.3, 4, 0.5, 14, 26, 2), (0.44, 3, 0.36, 30, 40, 1)],
         leader=0.5, top=0.1, kink=40, cloud=0.15, flat=0.42, card=0.1, cover=2.1, rim=0.26,
         sweep=0.8, sink=0.03,

@@ -23,8 +23,7 @@ extends RefCounted
 ##              comes down to the water, open where you come to it
 ##   the mere   Willow Mere willows all round, open toward the Weeping Lady
 ##              and on the side you come to it from
-##   the brae   a clump either side of the way just over the crest, so the
-##              glen appears between trunks
+##   the brae   (now CourtGlenPlaces: the Thorn Gate)
 ##   thorn      a thorn bush or two at the outer edge of every clump (a wood's
 ##              edge is where the thorn grows)
 ##   flowers    the book's three (ch 18: crocuses, snowdrops, bluebells) pool
@@ -35,6 +34,12 @@ extends RefCounted
 ##              here"); the same flower in a crescent at each knoll's shaded
 ##              north foot; a drift of crocuses on a path's verge now and then
 ## The open glade between is the sward's (CourtSward), laid round the player.
+##
+## Since 2026-11-16 the glen is being composed place by place, as the pool was
+## (owner: "make the ENTIRE thing here look intentional ... to make the person
+## FEEL something as they walk through"; the plan is in the lane doc, "The whole
+## glen, composed"). CourtGlenPlaces holds the composed places and claims their
+## ground: the rules above plant only what it has not claimed.
 
 const ID := &"glen"
 const POOL := Vector2(-1300.0, 262.0)
@@ -195,6 +200,18 @@ class Plan:
 			mid.wind = 0.6
 		l.add(ground(p), yaw, size)
 
+	## Fallen petals (tools/grove): they lie where they fall, on a path too.
+	func litter(colour: String, p: Vector2, yaw: float, size: float) -> void:
+		if not content.owns(p):
+			return
+		var l := _layer(StringName("place_litter_" + colour))
+		if l.mesh == null:
+			l.mesh = CourtPlacePlants.glade("petals_" + colour)
+			l.draw_distance = 70.0
+			l.cast_shadow = false
+			l.tags = PackedStringArray(["fine", "place"])
+		l.add(ground(p), yaw, size)
+
 	## A fern (tools/grove), one of three.
 	func fern(which: int, p: Vector2, yaw: float, size: float) -> void:
 		if not content.owns(p):
@@ -260,12 +277,12 @@ static func layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	var groups: Array[Dictionary] = []
 	var steps: Array[Callable] = [
 		func() -> void: _pool_ring(plan, rng, groups),
+		func() -> void: CourtGlenPlaces.plant(plan, groups),
 		func() -> void: _knolls(plan, rng, groups),
 		func() -> void: _brooks(plan, rng, groups),
 		func() -> void: _river(plan, rng, groups),
 		func() -> void: _lake(plan, rng, groups),
 		func() -> void: _mere(plan, rng, groups),
-		func() -> void: _brae(plan, rng, groups),
 		func() -> void: _thorn(plan, rng, groups),
 		func() -> void: _hollow_ground(plan, rng, wave),
 		func() -> void: _shade_flowers(plan, rng, wave, groups),
@@ -453,7 +470,8 @@ static func _knolls(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictio
 	var placed: Array = []   # [top, kind index]
 	for top in knoll_tops(plan.content):
 		if top.distance_to(MOUND) < 40.0 or top.distance_to(GLIMMERFALL_KNOLL) < 30.0 or top.distance_to(POOL) < FLOOR + 20.0 \
-				or CourtLandHabitats.keep_open(top.x, top.y) or CourtLandHabitats.path_distance(top.x, top.y) < 9.0:
+				or CourtLandHabitats.keep_open(top.x, top.y) or CourtLandHabitats.path_distance(top.x, top.y) < 9.0 \
+				or CourtGlenPlaces.claims(top) or CourtGlenPlaces.crowns(top):
 			continue
 		var kind := rng.randi() % KNOLL_KINDS.size()
 		# not the kind of either of its two nearest neighbours
@@ -471,7 +489,8 @@ static func _knolls(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictio
 		for n in int(k[3]):
 			var p := top if n == 0 else top + Vector2.from_angle(TAU * float(n) / float(k[3]) + rng.randf()) * rng.randf_range(2.6, 4.2)
 			var size := float(k[1]) * (rng.randf_range(0.94, 1.08) if n == 0 else rng.randf_range(0.78, 0.95))
-			if plan.tree(k[0], rng.randi(), p, rng.randf() * TAU, size):
+			# (a thorn leans the wind's way, as every thorn in the glen does)
+			if plan.tree(k[0], rng.randi(), p, CourtGlenPlaces.wind_yaw(rng) if k[0] == &"old_thorn" else rng.randf() * TAU, size):
 				trunks.append(p)
 				reach.append(float(k[2]))
 		if not trunks.is_empty():
@@ -486,17 +505,22 @@ static func _knoll_crescents(plan: Plan, rng: RandomNumberGenerator, wave: FastN
 			continue
 		var top: Vector2 = g["knoll"]
 		var patches: Array = PATCHES[g["flower"]]
+		# (a composed knoll's crescent lies on the side the way passes; the others' at the shaded north foot)
+		var bearing: float = g.get("toward", -PI * 0.5)
+		var down := Vector2.from_angle(bearing)
 		var foot := 30.0
 		var r := 9.0
 		while r < 60.0:
-			if CourtHeight.height_at(top.x, top.y - r + 3.0) - CourtHeight.height_at(top.x, top.y - r) < 0.36:
+			var a := top + down * (r - 3.0)
+			var b := top + down * r
+			if CourtHeight.height_at(a.x, a.y) - CourtHeight.height_at(b.x, b.y) < 0.36:
 				foot = r
 				break
 			r += 3.0
 		for i in int(foot * 20.0):
 			var turn := rng.randfn(0.0, 0.6)
 			var out := rng.randfn(0.0, 4.5)
-			var p := top + Vector2.from_angle(-PI * 0.5 + turn) * (foot + 2.0 + out)
+			var p := top + Vector2.from_angle(bearing + turn) * (foot + 2.0 + out)
 			if wave.get_noise_2d(p.x * 4.0, p.y * 4.0) < -0.2 or p.distance_to(POOL) < FLOOR + 30.0 or not growable(p, 1.2):
 				continue
 			var full := absf(turn) < 0.6 and absf(out) < 4.0
@@ -510,6 +534,8 @@ static func _clump(plan: Plan, rng: RandomNumberGenerator, heart: Vector2, count
 		spread: float) -> Array:
 	var stood: Array = []
 	var tries := 0
+	if CourtGlenPlaces.claims(heart):
+		return stood   # a composed place's ground
 	while stood.size() < count and tries < 24:
 		tries += 1
 		var p := heart if tries == 1 else heart + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(spread * 0.6, spread * 1.5)
@@ -724,24 +750,12 @@ static func _mere(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictiona
 			rng.randf() * TAU, rng.randf_range(0.9, 1.35), 320.0)
 
 
-## The brae: a clump either side of the line you look along as you come over
-## the crest, so the glen appears between trunks.
-static func _brae(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
-	var top := CourtHeight.site(&"brae_top")
-	var look := (Vector2(-1400.0, -300.0) - top).normalized()
-	for side: float in [-1.0, 1.0]:
-		var heart := top + look * rng.randf_range(36.0, 48.0) + look.orthogonal() * side * rng.randf_range(15.0, 21.0)
-		var trunks := _clump(plan, rng, heart, 4, &"oak" if side < 0.0 else &"birch", 1.05, 4.5)
-		if not trunks.is_empty():
-			groups.append(_group(trunks, 9.0, &"bluebell"))
-
-
 ## Thorn bushes, white with may: one or two at the outer edge of every clump
 ## of trees, and now and then a pair down a lone tree's knoll.
 static func _thorn(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
 	for g in groups:
 		var trunks: Array = g["trunks"]
-		if trunks.is_empty() or g.has("hollow") or (trunks.size() == 1 and rng.randf() > 0.4):
+		if trunks.is_empty() or g.has("hollow") or g.has("composed") or (trunks.size() == 1 and rng.randf() > 0.4):
 			continue
 		var mid := Vector2.ZERO
 		for t: Vector2 in trunks:
@@ -763,6 +777,8 @@ static func _thorn(plan: Plan, rng: RandomNumberGenerator, groups: Array[Diction
 ## A drift of crocuses on a path's verge now and then.
 static func _verges(plan: Plan, rng: RandomNumberGenerator) -> void:
 	for path: Dictionary in CourtHeight.paths():
+		if path.get("id", &"") == CourtGlenPlaces.WAY:
+			continue   # the main walk's verges are its places'
 		var pts: PackedVector2Array = path["points"]
 		var half: float = path["half_width"]
 		var until := rng.randf_range(20.0, 60.0)

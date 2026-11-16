@@ -711,6 +711,18 @@ func _build_fx() -> void:
 		fx.position = Vector3(spot.x, WorldHeight.height_at(spot.x, spot.y) + 1.5, spot.y)
 		holder.add_child(fx)
 		placed += 1
+	# a composed place's own (CourtGlenPlaces: petals falling at the Thorn Gate and the Blossom Knoll)
+	for e: Array in CourtGlenPlaces.effects(content):
+		var path := "%s%s.tscn" % [FX_DIR, e[0]]
+		if not ResourceLoader.exists(path):
+			continue
+		var fx := (load(path) as PackedScene).instantiate() as Node3D
+		if fx == null:
+			continue
+		var at: Vector3 = e[1]
+		fx.name = "%s_place_%d" % [e[0], holder.get_child_count()]
+		fx.position = Vector3(at.x, WorldHeight.height_at(at.x, at.z) + at.y, at.z)
+		holder.add_child(fx)
 
 
 ## The creatures lane's spawners (data only: a table per region, plus the

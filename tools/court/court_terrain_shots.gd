@@ -91,6 +91,20 @@ const STUDY_VIEWS := {
 	"knoll_foot": [-1005.0, 150.0, 1.7, -1028.0, 192.0, 5.0, 0.45, &"spring", 70.0],
 	"brook_walk": [-880.0, -110.0, 1.7, -900.0, 30.0, 1.0, 0.45, &"spring", 68.0],
 	"air_glen": [-820.0, 330.0, 230.0, -1180.0, 30.0, 0.0, 0.45, &"spring", 70.0],
+	# The glen's main walk, in the order you walk it (CourtGlenPlaces): the climb to the Thorn Gate, through it,
+	# down to Brook Dell, the crossing, out into the sun, the Ford, the far landing, the Knoll Walk, the
+	# Blossom Knoll, the great oak before the mound.
+	"walk_01_climb": [-696.9, -41.5, 1.7, -745.5, -13.7, 5.0, 0.45, &"spring", 70.0],
+	"walk_02_gate": [-730.0, -22.7, 1.7, -786.2, 9.8, 1.5, 0.45, &"spring", 70.0],
+	"walk_03_descent": [-796.4, 14.0, 1.7, -886.0, 42.2, 2.0, 0.45, &"spring", 70.0],
+	"walk_04_dell_in": [-863.2, 34.8, 1.7, -902.9, 48.6, 3.0, 0.45, &"spring", 70.0],
+	"walk_05_crossing": [-889.7, 43.7, 1.7, -916.0, 53.5, 5.0, 0.45, &"spring", 70.0],
+	"walk_06_dell_out": [-921.6, 55.6, 1.7, -970.6, 80.6, 1.2, 0.45, &"spring", 70.0],
+	"walk_07_ford": [-960.7, 70.7, 1.7, -1027.0, 192.0, 3.0, 0.45, &"spring", 70.0],
+	"walk_08_landing": [-983.3, 93.3, 1.7, -1045.5, 155.5, 3.0, 0.45, &"spring", 70.0],
+	"walk_09_knolls": [-1025.7, 135.7, 1.7, -1105.9, 208.0, 4.0, 0.45, &"spring", 70.0],
+	"walk_10_cherry": [-1065.8, 174.8, 1.7, -1126.0, 145.0, 5.0, 0.45, &"spring", 70.0],
+	"walk_11_oak": [-1108.9, 210.5, 1.7, -1179.3, 259.8, 5.0, 0.45, &"spring", 70.0],
 	# on the floor, looking up into a group of slope birches
 	"under_birches": [-1277.0, 282.0, 1.7, -1264.0, 294.0, 4.5, 0.45, &"spring", 65.0],
 	# from across the water, looking back at the way in and the mound

@@ -24,7 +24,7 @@ const GLADE_PLANTS := [
 	"grass_sward_a", "grass_sward_b", "grass_sward_c", "grass_sward_far_a", "grass_sward_far_b", "grass_sward_far_c",
 	"grass_glade_a", "grass_glade_b", "grass_glade_c", "grass_tall_a", "grass_tall_b",
 	"bluebell_patch_a", "bluebell_patch_c", "bluebell_white", "snowdrop_patch_a", "snowdrop_patch_b", "crocus_patch_a",
-	"crocus_patch_c", "fern_a", "fern_b", "fern_c",
+	"crocus_patch_c", "kingcup_patch_a", "kingcup_patch_b", "petals_white", "petals_pink", "fern_a", "fern_b", "fern_c",
 ]
 ## The trees a place may plant: the court's own and the estate's that have a far form.
 const ESTATE_TREES: Array[StringName] = [&"willow", &"birch", &"oak", &"cherry_blossom"]
@@ -124,7 +124,7 @@ static func glade(plant: String) -> Mesh:
 	if not _meshes.has(plant):
 		var found := _first_mesh(GLADE % plant)
 		if found != null:
-			found.surface_set_material(0, _look(0.0 if plant.begins_with("grass") or plant.ends_with("_far") else FLOWER_RIM))
+			found.surface_set_material(0, _look(0.0 if plant.begins_with("grass") or plant.begins_with("petals") or plant.ends_with("_far") else FLOWER_RIM))
 			# (one material for all the grass and cushions, one for all the flowers: they batch)
 		_meshes[plant] = found
 	var m: Mesh = _meshes[plant]

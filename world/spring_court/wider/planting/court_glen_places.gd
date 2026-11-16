@@ -1,0 +1,496 @@
+class_name CourtGlenPlaces
+extends RefCounted
+## The Starlight Glen's composed places (docs/lanes/court-planting-by-place.md,
+## "The whole glen, composed"; owner, 2026-11-16: "make the ENTIRE thing here
+## look intentional ... to make the person FEEL something as they walk
+## through", "make sure to make each place feel a little special").
+##
+## Each place has one feeling, a first sight, ground kept open, and one thing no
+## other place has. The glen's colours stay silver, blue and white; a place
+## takes one accent and keeps it. This file holds the main walk, the way in
+## from the estate to the pool along `glen_way`:
+##   1 the Brae gate   bare, windy turf, then two old thorns in full may leaning
+##                     in over the way on the crest: the Thorn Gate, the first
+##                     thing on the skyline as you climb from the estate; their
+##                     petals lie on the path. Thorn bushes down the lee side.
+##   2 Brook Dell      close, cool and green: a great elm over the crossing,
+##                     birches along the brook and by the way, and the glen's
+##                     only floor of fern; mossed stones; snowdrops in ribbons
+##                     at the water (white overhead on the brae, white underfoot
+##                     here). The fern starts before you see the water.
+##   3 the Ford        full sun and wide water. Willows in a row on the far
+##                     bank, parted where the way lands; iris at the water; and
+##                     kingcups on both banks, the only gold in the glen. The
+##                     first of them stand in the dell's mouth.
+##   4 the Knoll Walk  the knolls beside the way crowned each its own way, in
+##                     order: an old thorn, three white birches, two aspens, the
+##                     great cherry at Knoll Steps (the one pink tree on the
+##                     way, its petals falling), and last a great oak, the
+##                     darkest thing, before the bare mound, the lightest. A
+##                     crescent of bluebells at each knoll's foot on the side
+##                     the way passes.
+##   5 the Mound       nothing over the knee, so the climb shows only sky; a
+##                     ring of daisies on the crown, where you stand to look.
+## Everything is found from the land (the way's own line, where it meets the
+## brook and the river, the knolls' tops), so a change to the land moves the
+## planting with it. The rules in CourtGlenPlanting plant only ground this
+## file has not claimed.
+
+const WAY := &"glen_way"
+## The rules plant no tree and no verge this near the main walk.
+const CLAIM := 70.0
+## The way every old thorn in the glen leans: east and a little north, the
+## wind off the fells. (The two at the brae's gate lean toward each other.)
+const WIND := Vector2(0.94, -0.34)
+
+## The Thorn Gate: how far past the brae's crest it stands (m along the way),
+## each trunk's distance from the way's middle, and the thorns' size (an old
+## thorn is 7 m at size 1).
+const GATE_PAST_CREST := 6.0
+const GATE_HALF := 5.6
+const GATE_SIZE := 1.55
+## Thorn bushes down the brae's lee side: how many, over how many metres of way.
+const LEE_BUSHES := 10
+const LEE_REACH := 78.0
+
+## Brook Dell. Birches along the brae brook: [metres along the brook from the
+## crossing (downstream is +), side (+1 the east bank), metres back from the
+## water, trees]; and pairs by the way on the dell's east side, this many
+## metres before the crossing.
+const DELL_BIRCHES := [
+	[-56.0, 1.0, 7.0, 2], [-41.0, -1.0, 8.0, 1], [-27.0, 1.0, 6.5, 2], [-13.0, -1.0, 9.5, 1],
+	[17.0, 1.0, 7.0, 2], [31.0, -1.0, 7.5, 1], [46.0, 1.0, 8.0, 2], [62.0, -1.0, 7.0, 1],
+]
+const DELL_DOORS := [46.0, 31.0, 17.0]
+const DELL_FERNS := 1500
+## The fern floor's half-width at the brook (m) and how far it runs up and down it.
+const DELL_HALF := 26.0
+const DELL_UP := 62.0
+const DELL_DOWN := 72.0
+
+## The Ford. Willows on the far bank: metres along the river from the crossing
+## (downstream +); none within the gap where the way lands.
+const FORD_WILLOWS := [-67.0, -53.0, -40.0, -28.0, -16.0, 17.0, 28.0, 40.0, 53.0, 66.0]
+const FORD_GOLD := 620
+## How far up and down the river the gold runs, and how far back from the water.
+const FORD_REACH := 58.0
+const FORD_BACK := 7.5
+
+## The Knoll Walk, and the knolls round it. [near x, near z (the knoll's top is
+## found from the land), species, trees, size, the shade each throws (m; 0: no
+## flowers), flower]. In the order you pass them.
+const KNOLLS := [
+	[-1027.0, 192.0, &"old_thorn", 1, 1.6, 8.0],        # south of the way, the first at hand: the mark from mid-river
+	[-1082.0, 44.0, &"pillar_birch", 3, 1.0, 8.0],      # north, far off: white stems, the pool's tree seen before the pool
+	[-1023.0, 257.0, &"aspen_spire", 2, 1.0, 6.0],      # south, far off: two columns
+	[-1128.0, 142.0, &"great_cherry", 1, 1.0, 12.0],    # Knoll Steps: the Blossom Knoll
+	[-1159.0, 218.0, &"great_oak", 1, 1.08, 15.0],      # hard by the way, the last and darkest
+	[-1231.0, 198.0, &"pillar_birch", 2, 0.95, 8.0],    # north of the mound, toward the pool
+	[-779.0, 113.0, &"old_thorn", 1, 1.5, 0.0],         # the brae's outer knolls: a thorn each, leaning with the wind
+	[-815.0, -89.0, &"old_thorn", 1, 1.45, 0.0],
+]
+const KNOLL_SNAP := 14.0
+const CHERRY_PETALS := 190
+
+## The Mound's daisy ring: its radius and how many daisies.
+const RING := 3.4
+const RING_DAISIES := 46
+
+
+static var _lock := Mutex.new()
+static var _way := PackedVector2Array()
+static var _lengths := PackedFloat32Array()
+
+
+## The main walk's line (glen_way), and the length along it to each point.
+static func way() -> PackedVector2Array:
+	_lock.lock()
+	if _way.is_empty():
+		for path: Dictionary in CourtHeight.paths():
+			if path["id"] == WAY:
+				_way = path["points"]
+		var run := 0.0
+		_lengths.resize(_way.size())
+		for i in _way.size():
+			if i > 0:
+				run += _way[i].distance_to(_way[i - 1])
+			_lengths[i] = run
+	var w := _way
+	_lock.unlock()
+	return w
+
+
+static func way_length() -> float:
+	way()
+	return _lengths[_lengths.size() - 1] if not _lengths.is_empty() else 0.0
+
+
+## The point `s` metres along the way from the estate.
+static func at(s: float) -> Vector2:
+	var w := way()
+	if w.is_empty():
+		return Vector2.ZERO
+	s = clampf(s, 0.0, way_length())
+	for i in range(1, w.size()):
+		if _lengths[i] >= s:
+			var span := _lengths[i] - _lengths[i - 1]
+			return w[i - 1].lerp(w[i], (s - _lengths[i - 1]) / span if span > 0.001 else 0.0)
+	return w[w.size() - 1]
+
+
+## The way's heading there (toward the pool).
+static func heading(s: float) -> Vector2:
+	var d := at(s + 3.0) - at(s - 3.0)
+	return d.normalized() if d.length() > 0.01 else Vector2.RIGHT
+
+
+## How far along the way its nearest point to `p` lies, and how far off `p` is: [s, distance].
+static func along(p: Vector2) -> Array:
+	var w := way()
+	var best := INF
+	var s := 0.0
+	for i in range(1, w.size()):
+		var q := Geometry2D.get_closest_point_to_segment(p, w[i - 1], w[i])
+		var d := q.distance_to(p)
+		if d < best:
+			best = d
+			s = _lengths[i - 1] + w[i - 1].distance_to(q)
+	return [s, best]
+
+
+## Ground a composed place holds: the rules plant no tree here. (The way's own
+## sides, and the ford's reach of the river.)
+static func claims(p: Vector2) -> bool:
+	if way().is_empty():
+		return false
+	if float(along(p)[1]) < CLAIM:
+		return true
+	var f := ford()
+	return not f.is_empty() and p.distance_to(f[1]) < FORD_REACH + 45.0
+
+
+## Whether a knoll's top is one this file crowns (further from the way than it claims).
+static func crowns(top: Vector2) -> bool:
+	for k: Array in KNOLLS:
+		if top.distance_to(Vector2(k[0], k[1])) < KNOLL_SNAP:
+			return true
+	return false
+
+
+## The turn that leans an old thorn toward `to` (its model leans to +X).
+static func lean_yaw(to: Vector2) -> float:
+	return atan2(-to.y, to.x)
+
+
+static func wind_yaw(rng: RandomNumberGenerator) -> float:
+	return lean_yaw(WIND) + rng.randf_range(-0.14, 0.14)
+
+
+## Where the way tops the brae (the highest point of its first stretch).
+static func crest() -> float:
+	var best := 0.0
+	var high := -INF
+	var s := 0.0
+	while s < minf(320.0, way_length()):
+		var p := at(s)
+		var h := WorldHeight.height_at(p.x, p.y)
+		if h > high + 0.05:
+			high = h
+			best = s
+		s += 3.0
+	return best
+
+
+## Where the way crosses the brae brook: [s along the way, the brook's line, the index of its nearest point].
+static func brook_crossing() -> Array:
+	for brook: Dictionary in CourtHeight.brooks():
+		if brook["id"] != &"brae_brook":
+			continue
+		var pts: PackedVector2Array = brook["points"]
+		var best := INF
+		var at_i := 0
+		var s := 0.0
+		for i in pts.size():
+			var a := along(pts[i])
+			if float(a[1]) < best:
+				best = a[1]
+				at_i = i
+				s = a[0]
+		return [s, pts, at_i, float(brook["half_width"])]
+	return []
+
+
+## Where the way crosses the Thornwater: [s along the way, the point, the river's heading there (downstream)].
+static func ford() -> Array:
+	var line: Array = MacroHeight.THORNWATER
+	var w := way()
+	for i in range(1, w.size()):
+		for k in line.size() - 1:
+			var hit: Variant = Geometry2D.segment_intersects_segment(w[i - 1], w[i], line[k], line[k + 1])
+			if hit != null:
+				return [_lengths[i - 1] + w[i - 1].distance_to(hit), hit as Vector2, ((line[k + 1] as Vector2) - (line[k] as Vector2)).normalized()]
+	return []
+
+
+## The point `t` metres along a line from its point `from` (negative: back along it), and the line's heading there.
+static func _on_line(pts: PackedVector2Array, from: int, t: float) -> Array:
+	var i := from
+	var left := absf(t)
+	var step := 1 if t >= 0.0 else -1
+	while i + step >= 0 and i + step < pts.size():
+		var d := pts[i].distance_to(pts[i + step])
+		if d >= left and d > 0.001:
+			var dir := (pts[i + step] - pts[i]).normalized()
+			return [pts[i] + dir * left, dir * float(step)]
+		left -= d
+		i += step
+	var j := clampi(i - step, 0, pts.size() - 1)
+	var end_dir := (pts[i] - pts[j]).normalized() if i != j else Vector2.DOWN
+	return [pts[i], end_dir * float(step)]
+
+
+## The nearest ground to `want` (within `reach`) a trunk may stand on: the
+## region's own, open, not rock, `brook` metres clear of a brook and
+## `path` metres from any path's middle. Vector2.INF if there is none.
+static func _spot(plan: CourtGlenPlanting.Plan, want: Vector2, reach: float, path: float, brook: float, apart: float = 3.2) -> Vector2:
+	for ring in 9:
+		var r := reach * float(ring) / 8.0
+		for k in maxi(1, ring * 6):
+			var p := want + Vector2.from_angle(TAU * float(k) / float(maxi(1, ring * 6)) + float(ring) * 0.7) * r
+			if not plan.content.owns(p) or CourtLandHabitats.keep_open(p.x, p.y) or CourtGlenPlanting.steep(p) \
+					or CourtGlenPlanting.wet(p, brook) or CourtLandHabitats.path_distance(p.x, p.y) < path:
+				continue
+			var clear := true
+			for q in plan.trunks:
+				if q.distance_to(p) < apart:
+					clear = false
+					break
+			if clear:
+				return p
+	return Vector2.INF
+
+
+## The composed places, into the glen's plan. Their flower groups join `groups`
+## (CourtGlenPlanting pools each group's flower in its shade).
+static func plant(plan: CourtGlenPlanting.Plan, groups: Array[Dictionary]) -> void:
+	if way().is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([plan.content.seed, "glen places"])
+	_brae_gate(plan, rng)
+	_brook_dell(plan, rng)
+	_the_ford(plan, rng)
+	_knoll_walk(plan, rng, groups)
+	_the_mound(plan, rng)
+
+
+# --- 1: the Brae gate ---------------------------------------------------------
+
+static func _brae_gate(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var s := crest() + GATE_PAST_CREST
+	var mid := at(s)
+	var d := heading(s)
+	var n := d.orthogonal()
+	var stood := 0
+	for side: float in [-1.0, 1.0]:
+		var p := _spot(plan, mid + n * side * GATE_HALF + d * rng.randf_range(-0.8, 0.8), 3.0, GATE_HALF - 1.0, 2.0)
+		if p != Vector2.INF and plan.tree(&"old_thorn", 0 if side < 0.0 else 1, p, lean_yaw(-n * side) + rng.randf_range(-0.1, 0.1),
+				GATE_SIZE * rng.randf_range(0.97, 1.05)):
+			stood += 1
+	# their petals on the turf and on the path beneath
+	if stood > 0:
+		for i in 110:
+			var p := mid + d * rng.randfn(0.0, 4.2) + n * rng.randfn(0.0, 3.4)
+			plan.litter("white", p, rng.randf() * TAU, rng.randf_range(0.8, 1.3))
+	# thorn bushes down the lee side, thickening toward the dell: the height between the turf and the dell's crowns
+	var from := s + 34.0
+	for i in LEE_BUSHES:
+		var t := float(i) / float(LEE_BUSHES - 1)
+		var on := from + LEE_REACH * pow(t, 0.8)
+		var side := 1.0 if i % 2 == 0 else -1.0
+		var want := at(on) + heading(on).orthogonal() * side * rng.randf_range(6.5, lerpf(24.0, 12.0, t))
+		var p := _spot(plan, want, 5.0, 5.0, 1.5)
+		if p != Vector2.INF and plan.tree(&"thorn_bush", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.85, 1.3)):
+			plan.trunks.resize(plan.trunks.size() - 1)   # a bush is no trunk to grow long grass round
+
+
+# --- 2: Brook Dell ------------------------------------------------------------
+
+static func _brook_dell(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var x := brook_crossing()
+	if x.is_empty():
+		return
+	var s: float = x[0]
+	var pts: PackedVector2Array = x[1]
+	var i0: int = x[2]
+	var half: float = x[3]
+	var cross := pts[i0]
+	var down: Vector2 = _on_line(pts, i0, 1.0)[1]
+	var east := down.orthogonal() * (1.0 if down.orthogonal().x > 0.0 else -1.0)
+	# the great elm: on the west bank just upstream, its crown over the crossing
+	var elm := _spot(plan, cross - down * 11.0 - east * 8.5, 6.0, 8.0, 4.0)
+	if elm != Vector2.INF:
+		plan.tree(&"great_elm", 0, elm, rng.randf() * TAU, 1.0)
+	# birches along the brook, alternate banks
+	for b: Array in DELL_BIRCHES:
+		var on: Array = _on_line(pts, i0, b[0])
+		var side: Vector2 = (on[1] as Vector2).orthogonal()
+		side *= (1.0 if side.dot(east) > 0.0 else -1.0) * float(b[1])
+		var heart := (on[0] as Vector2) + side * (half + float(b[2]))
+		for k in int(b[3]):
+			var p := _spot(plan, heart + (Vector2.ZERO if k == 0 else Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.6, 3.8)), 4.0, 6.5, 3.0, 2.6)
+			if p != Vector2.INF and (elm == Vector2.INF or p.distance_to(elm) > 9.0):
+				plan.tree(&"birch", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.2) if k == 0 else rng.randf_range(0.8, 0.95))
+	# and by the way as you come down into it: you walk in under them
+	for back: float in DELL_DOORS:
+		for side: float in [-1.0, 1.0]:
+			var on := s - back + rng.randf_range(-2.0, 2.0)
+			var p := _spot(plan, at(on) + heading(on).orthogonal() * side * rng.randf_range(6.6, 8.2), 3.0, 6.2, 3.0)
+			if p != Vector2.INF:
+				plan.tree(&"birch", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.25))
+	# the fern floor: thick at the water, thinning to nothing at the dell's edge; it reaches up the way toward the brae
+	for i in DELL_FERNS:
+		var p: Vector2
+		var edge: float
+		if i % 4 == 0:
+			var on := s + rng.randf_range(-40.0, 26.0)
+			var off := rng.randfn(0.0, 6.5)
+			p = at(on) + heading(on).orthogonal() * off
+			edge = absf(off) / 16.0
+		else:
+			var t := rng.randf_range(-DELL_UP, DELL_DOWN)
+			var on: Array = _on_line(pts, i0, t)
+			var off := rng.randfn(0.0, DELL_HALF * 0.42)
+			p = (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * off
+			edge = maxf(absf(off) / DELL_HALF, (absf(t) - 40.0) / 30.0)
+		if rng.randf() < edge or not CourtGlenPlanting.growable(p, 0.9):
+			continue
+		plan.fern(rng.randi(), p, rng.randf() * TAU, lerpf(1.25, 0.7, clampf(edge, 0.0, 1.0)) * rng.randf_range(0.85, 1.15))
+	# mossed stones and moss at the water
+	for i in 70:
+		var on: Array = _on_line(pts, i0, rng.randf_range(-DELL_UP, DELL_DOWN))
+		var p := (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * (half + absf(rng.randfn(0.0, 2.6))) * (1.0 if rng.randf() < 0.5 else -1.0)
+		if CourtLandHabitats.path_distance(p.x, p.y) < 2.6:
+			continue
+		if i % 4 == 0:
+			plan.plant(&"mossy_rock", p, rng.randf() * TAU, rng.randf_range(0.6, 1.3), 220.0, true)
+		else:
+			plan.plant(&"moss_mound", p, rng.randf() * TAU, rng.randf_range(0.8, 1.4), 150.0)
+	# snowdrops in ribbons along both banks
+	var run := -DELL_UP
+	while run < DELL_DOWN:
+		var on: Array = _on_line(pts, i0, run)
+		for bank: float in [-1.0, 1.0]:
+			if rng.randf() < 0.72 and sin(run * 0.19 + bank) > -0.55:
+				var p := (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * bank * (half + rng.randf_range(0.8, 3.4))
+				if CourtGlenPlanting.growable(p, 0.5):
+					plan.flower("snowdrop_patch_" + "ab"[rng.randi() % 2], p, rng.randf() * TAU, rng.randf_range(1.0, 1.45))
+		run += 0.85
+
+
+# --- 3: the Ford ----------------------------------------------------------------
+
+static func _the_ford(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var f := ford()
+	if f.is_empty():
+		return
+	var s: float = f[0]
+	var c: Vector2 = f[1]
+	var down: Vector2 = f[2]
+	var west := Vector2(-down.y, down.x)
+	if west.dot(heading(s)) < 0.0:
+		west = -west   # the far bank is the one the way goes on to
+	var half := MacroHeight.RIVER_HALF_WIDTH
+	# willows in a row on the far bank, parted where the way lands
+	for t: float in FORD_WILLOWS:
+		var want := c + down * (t + rng.randf_range(-2.5, 2.5)) + west * (half + rng.randf_range(4.6, 6.4))
+		var p := _spot(plan, want, 7.0, 6.0, 0.0)
+		if p != Vector2.INF:
+			plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.98, 1.28))
+	# kingcups on both banks: thickest at the landings, thinning up and down the river and back from the water
+	for i in FORD_GOLD:
+		var t := clampf(rng.randfn(0.0, FORD_REACH * 0.42), -FORD_REACH, FORD_REACH)
+		var back := absf(rng.randfn(0.0, FORD_BACK * 0.5))
+		if back > FORD_BACK:
+			continue
+		var p := c + down * t + west * (1.0 if rng.randf() < 0.5 else -1.0) * (half + 0.2 + back)
+		if not CourtGlenPlanting.growable(p, 0.0):
+			continue
+		plan.flower("kingcup_patch_a" if back < FORD_BACK * 0.45 else "kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(1.0, 1.45))
+	# iris at the water's edge, away from the landings
+	for i in 34:
+		var t := rng.randf_range(-FORD_REACH, FORD_REACH)
+		if absf(t) < 9.0:
+			continue
+		var p := c + down * t + west * (1.0 if rng.randf() < 0.5 else -1.0) * (half + rng.randf_range(-0.4, 0.7))
+		plan.plant(&"iris_clump" if i % 5 != 0 else &"reed_clump", p, rng.randf() * TAU, rng.randf_range(0.85, 1.25), 320.0)
+	# gold on the way's verges: the first in the dell's mouth, the last forty metres past the far landing
+	var x := brook_crossing()
+	var from: float = (float(x[0]) + 28.0) if not x.is_empty() else s - 50.0
+	for i in 90:
+		var on := rng.randf_range(from, s + 44.0)
+		var far := (s - on) / maxf(s - from, 1.0) if on < s else (on - s) / 44.0
+		if rng.randf() < far * 0.85:
+			continue
+		var p := at(on) + heading(on).orthogonal() * (1.0 if rng.randf() < 0.5 else -1.0) * (3.0 + absf(rng.randfn(0.0, 2.2)))
+		if CourtGlenPlanting.growable(p, 0.5):
+			plan.flower("kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(0.95, 1.35))
+
+
+# --- 4: the Knoll Walk ----------------------------------------------------------
+
+static func _knoll_walk(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var tops := CourtGlenPlanting.knoll_tops(plan.content)
+	for k: Array in KNOLLS:
+		var near := Vector2(k[0], k[1])
+		var top := near
+		var best := KNOLL_SNAP
+		for t in tops:
+			if t.distance_to(near) < best:
+				best = t.distance_to(near)
+				top = t
+		var species: StringName = k[2]
+		var a: Array = along(top)
+		var toward := (at(a[0]) - top).normalized()
+		var trunks: Array = []
+		var reach: Array = []
+		for n in int(k[3]):
+			var want := top if n == 0 else top + Vector2.from_angle(TAU * float(n) / float(k[3]) + rng.randf()) * rng.randf_range(2.8, 4.4)
+			var p := _spot(plan, want, 12.0, 9.0, 2.5)
+			if p == Vector2.INF:
+				continue
+			var yaw := wind_yaw(rng) if species == &"old_thorn" else rng.randf() * TAU
+			var size := float(k[4]) * (rng.randf_range(0.97, 1.05) if n == 0 else rng.randf_range(0.8, 0.94))
+			if plan.tree(species, rng.randi(), p, yaw, size):
+				trunks.append(p)
+				reach.append(float(k[5]))
+		if trunks.is_empty() or float(k[5]) <= 0.0:
+			continue
+		groups.append({"trunks": trunks, "reach": reach, "flower": &"bluebell", "knoll": top, "toward": toward.angle(), "composed": true})
+		if species == &"great_cherry":
+			# its petals on the grass beneath, thickest at the trunk
+			for i in CHERRY_PETALS:
+				var p: Vector2 = (trunks[0] as Vector2) + Vector2.from_angle(rng.randf() * TAU) * absf(rng.randfn(0.0, 5.5))
+				plan.litter("pink", p, rng.randf() * TAU, rng.randf_range(0.8, 1.35))
+
+
+# --- 5: the Mound ---------------------------------------------------------------
+
+static func _the_mound(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var crown := CourtHeight.site(&"the_mound")
+	for i in RING_DAISIES:
+		var p := crown + Vector2.from_angle(TAU * (float(i) + rng.randf_range(-0.25, 0.25)) / float(RING_DAISIES)) * (RING + rng.randfn(0.0, 0.13))
+		plan.plant(&"daisy", p, rng.randf() * TAU, rng.randf_range(1.0, 1.4), 120.0)
+
+
+## Falling petals: [particle scene id, where (x, metres over the ground, z)].
+static func effects(content: CourtRegionContent) -> Array:
+	var out: Array = []
+	if not CourtGlenPlanting.applies(content) or way().is_empty():
+		return out
+	var gate := at(crest() + GATE_PAST_CREST)
+	out.append([&"fx_cherry_petals", Vector3(gate.x, 5.5, gate.y)])
+	for k: Array in KNOLLS:
+		if k[2] == &"great_cherry":
+			out.append([&"fx_cherry_petals", Vector3(k[0], 7.0, k[1])])
+	return out

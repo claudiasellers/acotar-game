@@ -66,6 +66,12 @@ const TREES := {
 		"puff": "res://world/spring_court/manor_estate/flora/trees/frond_willow.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
 		"bark_col": Color(0.27, 0.22, 0.36), "bark_mean": 0.338, "trunk": 1.8, "faces": &"willow_mere"},
+	# the great cherry: the Blossom Knoll's, the one pink tree on the glen's main walk (CourtGlenPlaces)
+	&"great_cherry": {"height": 15.0, "blossom": true,
+		"bands": [Color(0.80, 0.50, 0.64), Color(0.96, 0.72, 0.83), Color(1.0, 0.90, 0.94)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_cherry_blossom.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.36, 0.26, 0.31), "bark_mean": 0.338, "trunk": 0.93},
 	&"thorn_bush": {"height": 3.2, "blossom": true,
 		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",

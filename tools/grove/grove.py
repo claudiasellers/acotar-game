@@ -546,6 +546,51 @@ def crocus(sheet, rng):
     return soft
 
 
+def kingcup(sheet, rng):
+    """A marsh marigold: a low mound of round, glossy leaves on short stalks,
+    and wide gold cups of five petals held just over them. It grows with its
+    feet in the water."""
+    soft = Soft()
+    for k in range(sheet.get("leaves", 6)):
+        az = rng.uniform(0, math.tau)
+        out = heading(az, 0.0)
+        base = out * rng.uniform(0.01, 0.05)
+        top = base + UP * sheet["height"] * rng.uniform(0.3, 0.7) + out * rng.uniform(0.03, 0.1)
+        stalk(soft, [base, top], 0.005, sheet["leaf_deep"], sheet["leaf"], 0.05, 0.35)
+        leaf(soft, OUTLINES["hazel"], top - out * sheet["leaf_size"] * 0.3, (out + UP * rng.uniform(0.1, 0.4)).normalized(), UP,
+             sheet["leaf_size"] * rng.uniform(0.8, 1.15), sheet["leaf_deep"], sheet["leaf"], 0.4, (UP * 0.9 + out * 0.2).normalized(), 0.1)
+    for k in range(sheet.get("stems", 3)):
+        az = rng.uniform(0, math.tau)
+        out = heading(az, 0.0)
+        hgt = sheet["height"] * rng.uniform(0.85, 1.15)
+        head = out * rng.uniform(0.02, 0.12) + UP * hgt
+        stalk(soft, [out * 0.02, out * 0.04 + UP * hgt * 0.5, head], 0.006, sheet["leaf"], sheet["stem"], 0.1, 0.5)
+        rot = rng.uniform(0, math.tau)
+        for j in range(5):
+            d = heading(rot + j * math.tau / 5, 0.0)
+            leaf(soft, OUTLINES["petal"], head, (d + UP * 0.38).normalized(), UP, sheet["petal"] * rng.uniform(0.92, 1.06),
+                 sheet["gold_deep"], sheet["gold_light"] if j % 2 else sheet["gold"], 0.5, (UP + d * 0.35).normalized(), 0.3, 0.12)
+        heart = soft.vert(head + UP * sheet["petal"] * 0.22, UP)
+        ring = [soft.vert(head + UP * 0.004 + heading(j * 2.094, 0) * 0.012, heading(j * 2.094, 0)) for j in range(3)]
+        for j in range(3):
+            soft.face((ring[j], ring[(j + 1) % 3], heart), (sheet["heart"],) * 3, 0.5, 0.15)
+    return soft
+
+
+def litter(sheet, rng):
+    """Fallen petals: a handful lying where they came down, each a small
+    cupped flake just over the ground, turned its own way."""
+    soft = Soft()
+    for k in range(sheet["petals"]):
+        az, rr = rng.uniform(0, math.tau), sheet["radius"] * rng.random() ** 0.7
+        at = Vector((math.cos(az) * rr, math.sin(az) * rr, rng.uniform(0.012, 0.03)))
+        d = heading(rng.uniform(0, math.tau), 0.0)
+        c = rng.choice(sheet["colours"])
+        leaf(soft, OUTLINES["petal"], at, (d + UP * rng.uniform(-0.08, 0.16)).normalized(), UP, sheet["petal"] * rng.uniform(0.8, 1.2),
+             c, mix(c, sheet["tip"], 0.6), 0.0, UP, 0.25)
+    return soft
+
+
 def fern(sheet, rng):
     soft = Soft()
     n = sheet["fronds"]
