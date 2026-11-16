@@ -4,8 +4,8 @@ extends GutTest
 ## (CourtPlanting). Every region's trees per hectare sit inside its recipe's
 ## ranges, overall and on the landforms the recipe names; no hectare is
 ## planted past the frame-time ceiling (T7); the land's own rules show: a
-## closed Western Woods, one big tree on each knoll of the glen with the mound
-## bare, hedges on the village's road verges, thickets in Rosewild's hollows
+## closed Western Woods, the glen planted by place (a tree on each knoll, the
+## mound bare, its flowers under its trees), hedges on the village's road verges, thickets in Rosewild's hollows
 ## and open hummocks, the meadow open below a wooded descent, pines on the
 ## Rite's steep banks under a bald crown.
 
@@ -84,25 +84,127 @@ func test_the_western_woods_are_a_closed_wood() -> void:
 			assert_gt(Vector2(p.x, p.z).distance_to(Vector2(-1630.0, -650.0)), 8.0, "no tree on the tower hill's crown")
 
 
-func test_the_glen_has_a_tree_on_each_knoll_and_an_open_floor() -> void:
+## The glen is planted by place (CourtGlenPlanting; docs/lanes/
+## court-planting-by-place.md): every tree answers to something on the land.
+func test_the_glen_is_planted_by_place() -> void:
 	var glen := _content(&"starlight_glen")
-	var tops := CourtPlanting.knoll_tops(glen)
-	assert_gt(tops.size(), 15, "the glen is a valley of knolls")
-	var oaks: ScatterLayer = null
+	assert_eq(glen.place_planting, CourtGlenPlanting.ID)
+	var trunks := PackedVector2Array()
 	for layer: ScatterLayer in layers[&"starlight_glen"]:
-		if String(layer.id).ends_with("woods_oak"):
-			oaks = layer
-	assert_not_null(oaks)
-	assert_between(oaks.count(), tops.size() / 2, tops.size(), "one oak a knoll (standpoints and paths stay clear)")
-	for i in oaks.count():
-		var p := oaks.position_of(i)
-		var best := 1e9
-		for t in tops:
-			best = minf(best, t.distance_to(Vector2(p.x, p.z)))
-		assert_lt(best, 0.5, "the oak stands on a knoll's top")
-		assert_gt(oaks.transform_of(i).basis.get_scale().y, 1.3, "and is a big one")
-		assert_gt(Vector2(p.x, p.z).distance_to(Vector2(-1208.0, 270.0)), 40.0, "not on the mound")
-	assert_gt(_per_ha(&"starlight_glen", &"brook_bank"), _per_ha(&"starlight_glen", &"floor") * 2.5, "birch and willow gather by the brooks")
+		assert_true(layer.tags.has("place"), "%s is the place's own" % layer.id)
+		assert_not_null(layer.mesh, "%s has its mesh" % layer.id)
+		assert_not_null(layer.impostor_mesh, "%s has a far form" % layer.id)
+		for i in layer.count():
+			var p := layer.position_of(i)
+			trunks.append(Vector2(p.x, p.z))
+	# one tree (or one clump) on a knoll's top
+	var tops := CourtGlenPlanting.knoll_tops(glen)
+	assert_gt(tops.size(), 40, "the glen is a valley of knolls")
+	var crowned := 0
+	for top in tops:
+		for q in trunks:
+			if q.distance_to(top) < 0.5:
+				crowned += 1
+				break
+	assert_gt(crowned, tops.size() * 3 / 4, "a tree on the top of most knolls (the mound, the fall's knoll and the kept-open ones stay bare)")
+	# the pool: a ring of birches, open where you come down from the mound; the mound bare
+	var ring := 0
+	for q in trunks:
+		assert_gt(q.distance_to(CourtGlenPlanting.MOUND), 40.0, "no tree on the mound")
+		var from_pool := q.distance_to(CourtGlenPlanting.POOL)
+		assert_gt(from_pool, CourtGlenPlanting.POOL_RADIUS + 5.0, "no trunk at the water's edge")
+		if from_pool < 40.0:
+			ring += 1
+			assert_gt(absf(angle_difference((q - CourtGlenPlanting.POOL).angle(), CourtGlenPlanting.ARRIVAL)), 0.3, "the way in to the pool is open")
+	assert_between(ring, 18, 45, "the pool's ring of birches")
+	assert_gt(_per_ha(&"starlight_glen", &"brook_bank"), _per_ha(&"starlight_glen", &"floor") * 2.5, "trees gather by the brooks")
+	assert_gt(_per_ha(&"starlight_glen", &"knoll"), _per_ha(&"starlight_glen", &"floor") * 2.5, "and on the knolls: the floor is open glade")
+
+
+## The glen's flowers belong to its trees (owner, 2026-11-16: "a bluebell
+## grove", not "someone dumped a bunch of flowers here"): most bluebells lie in
+## a tree's shade (the rest are the crescents at the knolls' feet), none on a
+## path or in a brook's bed.
+func test_the_glens_flowers_pool_under_its_trees() -> void:
+	var glen := _content(&"starlight_glen")
+	var all := CourtGlenPlanting.layers(glen)
+	var grid := {}
+	for layer in all:
+		if layer.tags.has("tree") and not String(layer.id).contains("thorn_bush"):
+			for i in layer.count():
+				var p := layer.position_of(i)
+				var k := Vector2i(floori(p.x / 16.0), floori(p.z / 16.0))
+				if not grid.has(k):
+					grid[k] = PackedVector2Array()
+				(grid[k] as PackedVector2Array).append(Vector2(p.x, p.z))
+	var bluebells := 0
+	var under := 0
+	var misplaced := 0
+	for layer in all:
+		var id := String(layer.id)
+		if not id.begins_with("place_flower_") or id.ends_with("_mid"):
+			continue
+		assert_not_null(layer.mesh, "%s has its mesh" % id)
+		for i in layer.count():
+			var p3 := layer.position_of(i)
+			var p := Vector2(p3.x, p3.z)
+			if not CourtGlenPlanting.dry(p, 0.3):
+				misplaced += 1
+			if not id.contains("bluebell"):
+				continue
+			bluebells += 1
+			var k := Vector2i(floori(p.x / 16.0), floori(p.y / 16.0))
+			var shaded := false
+			for dx in range(-1, 2):
+				for dz in range(-1, 2):
+					for q: Vector2 in grid.get(k + Vector2i(dx, dz), PackedVector2Array()):
+						if q.distance_to(p) < 15.5:
+							shaded = true
+			if shaded:
+				under += 1
+	assert_gt(bluebells, 5000, "the glen has its bluebells")
+	assert_gt(under, bluebells / 2, "most bluebell patches lie in a tree's shade")
+	assert_eq(misplaced, 0, "no flower on a path or in a brook's bed")
+	# every patch has its middle-distance form over the same patches
+	for layer in all:
+		var id := String(layer.id)
+		if id.begins_with("place_flower_") and id.ends_with("_mid"):
+			var near: ScatterLayer = null
+			for other in all:
+				if String(other.id) == id.trim_suffix("_mid"):
+					near = other
+			assert_not_null(near, "%s stands in for a near layer" % id)
+			assert_eq(layer.count(), near.count())
+			assert_almost_eq(layer.draw_from, near.draw_distance, 0.01, "%s takes over where the near patch stops" % id)
+			assert_not_null(layer.impostor_mesh, "%s has its far cushion" % id)
+
+
+## The sward grows a cell from the land: grass on open ground, none in the
+## pool or on a path, and the same cell every time.
+func test_the_sward_reads_the_land() -> void:
+	var glen := _content(&"starlight_glen")
+	var sward := CourtSward.new()
+	sward.content = glen
+	add_child_autofree(sward)
+	var open_cell := Vector2i(floori(-1266.0 / CourtSward.CELL), floori(270.0 / CourtSward.CELL))
+	var grown := sward._grow(open_cell)
+	var tufts: int = (grown["sward"] as PackedFloat32Array).size() / 12
+	assert_gt(tufts, 300, "an open cell by the pool is grass")
+	assert_eq(grown["sward"], sward._grow(open_cell)["sward"], "a cell grows the same every time")
+	var in_pool := Vector2i(floori(-1300.0 / CourtSward.CELL), floori(262.0 / CourtSward.CELL))
+	var wet := sward._grow(in_pool)
+	var mid: Vector3 = wet["mid"]
+	for kind: String in ["sward", "fine", "tall", "daisy"]:
+		var buffer: PackedFloat32Array = wet[kind]
+		for i in buffer.size() / 12:
+			var at := Vector2(buffer[i * 12 + 3] + mid.x, buffer[i * 12 + 11] + mid.z)
+			assert_gt(at.distance_to(CourtGlenPlanting.POOL), CourtGlenPlanting.POOL_RADIUS, "no grass in the pool")
+	sward.settle(Vector3(-1266.0, 0.0, 270.0))
+	var census := sward.census()
+	assert_gt(int(census["cells"]), 60, "the sward is laid round a standpoint")
+	assert_eq(int(census["growing"]), 0)
+	assert_true(CourtMotes.out_at(0.8), "the hollow's lights are out at dusk")
+	assert_false(CourtMotes.out_at(0.45), "and gone by late morning")
 
 
 func test_rosewild_meadow_village_and_rite() -> void:
@@ -127,6 +229,10 @@ func _crowns() -> Dictionary:
 		for layer: ScatterLayer in layers[id]:
 			var decor_id := StringName(String(layer.id).substr(9))
 			var tall := CourtTreeSet.target_height(decor_id) if CourtTreeSet.has(decor_id) else 9.0
+			if layer.tags.has("place"):
+				# place_tree_<species>_<build letter>
+				var species := StringName(String(layer.id).trim_prefix("place_tree_").left(-2))
+				tall = CourtGreatTrees.height_of(species) if CourtGreatTrees.has(species) else FloraLib.height_of(species)
 			for i in layer.count():
 				var p := layer.position_of(i)
 				var k := Vector2i(floori(p.x / 16.0), floori(p.z / 16.0))
@@ -171,6 +277,9 @@ func test_paths_gates_and_viewpoints_stay_clear_of_trunks() -> void:
 			for i in layer.count():
 				var p := layer.position_of(i)
 				var why := CourtLandHabitats.keep_open_reason(p.x, p.z)
+				# (the starlight pool's birches ring the pool: they stand in its clearing, clear of the story's rim)
+				if layer.tags.has("place") and String(why).begins_with("clearing_") and Vector2(p.x, p.z).distance_to(CourtGlenPlanting.POOL) < 40.0:
+					why = &""
 				if why != &"":
 					inside += 1
 					if first == "":

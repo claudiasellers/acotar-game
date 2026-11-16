@@ -368,7 +368,7 @@ static func _hollow_ground(plan: Plan, rng: RandomNumberGenerator, wave: FastNoi
 			# a ragged edge, and gaps inside
 			if wave.get_noise_2d(p.x * 6.0, p.y * 6.0) < -0.25:
 				continue
-			if p.distance_to(POOL) < POOL_RADIUS + 1.0 or steep(p) or wet(p, 0.6):
+			if p.distance_to(POOL) < POOL_RADIUS + 1.0 or steep(p) or not dry(p, 0.6):
 				continue
 			var full := absf(u) < 0.6 and absf(v) < 0.6
 			var patch: String = (patches[0] as Array)[rng.randi() % (patches[0] as Array).size()] if full else patches[1]
@@ -379,7 +379,7 @@ static func _hollow_ground(plan: Plan, rng: RandomNumberGenerator, wave: FastNoi
 		var d := p.distance_to(MOUND)
 		if d < 4.0 or rng.randf() > lerpf(1.0, 0.15, clampf((d - 14.0) / 16.0, 0.0, 1.0)):
 			continue
-		if wave.get_noise_2d(p.x * 6.0, p.y * 6.0) > 0.3 and not steep(p):
+		if wave.get_noise_2d(p.x * 6.0, p.y * 6.0) > 0.3 and dry(p, 0.6) and not steep(p):
 			plan.flower("crocus_patch_" + "ac"[rng.randi() % 2], p, rng.randf() * TAU, rng.randf_range(0.85, 1.4))
 	# the pool's far banks; the bank you arrive at is left to the grass
 	var kinds := {&"iris_clump": 26, &"reed_clump": 20, &"cattail": 10, &"fern": 30, &"water_mint": 24, &"mossy_rock": 9, &"moss_mound": 12}
@@ -590,7 +590,10 @@ static func _brooks(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictio
 				# snowdrops beside it, in stretches
 				var stretch := sin(far * 0.22) > 0.1 if own else sin(on.x * 0.07 + on.y * 0.05) > 0.45
 				if stretch and rng.randf() < (0.75 * thin if own else 0.5):
-					plan.flower("snowdrop_patch_" + "ab"[rng.randi() % 2], on + b * (half + rng.randf_range(0.7, 3.2)), yaw, rng.randf_range(1.0, 1.4))
+					var at := on + b * (half + rng.randf_range(0.7, 3.2))
+					var size := rng.randf_range(1.0, 1.4)
+					if dry(at, 0.5):
+						plan.flower("snowdrop_patch_" + "ab"[rng.randi() % 2], at, yaw, size)
 
 
 ## Willows and birches in clumps along the Thornwater, on the first dry, open
@@ -867,10 +870,15 @@ static func water(p: Vector2) -> bool:
 	return CourtLandHabitats._water_form(p.x, p.y, CourtHeight.height_at(p.x, p.y)) == CourtLandHabitats.Form.WATER
 
 
+## Clear of the paths and `brook` metres clear of a brook (the cheap half of growable).
+static func dry(p: Vector2, brook: float) -> bool:
+	return CourtLandHabitats.path_distance(p.x, p.y) >= 0.6 and not wet(p, brook)
+
+
 ## Ground a small plant can stand on: not water, not a path, not rock, and
 ## `brook` metres clear of a brook.
 static func growable(p: Vector2, brook: float) -> bool:
-	return CourtLandHabitats.path_distance(p.x, p.y) >= 0.6 and not wet(p, brook) and not water(p) and not steep(p)
+	return dry(p, brook) and not water(p) and not steep(p)
 
 
 ## Whether a spot lies in one of the hollow's laid drifts (each kind keeps to itself).

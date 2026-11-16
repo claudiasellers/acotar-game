@@ -143,7 +143,7 @@ The woods' candy flowering trees, rebuilt one at a time with the owner
 
 ## Court planting by place (owner, 2026-11-15/16; docs/lanes/court-planting-by-place.md)
 
-Not yet the game's planting: the trees and small plants the places need, and the studies that stand a place up whole for a picture.
+The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSward); the other places still by their decor recipes.
 
 | Name | Where | Value | Range | What it does | Owner |
 |---|---|---|---|---|---|
@@ -153,13 +153,17 @@ Not yet the game's planting: the trees and small plants the places need, and the
 | The Weeping Lady | tools/blender/estate_tree.py `weeping_lady`; court_great_trees.gd `TREES`, `BLOOM_GLOW` | 36 m; fronds shadow / mid / light (0.40,0.48,0.76) (0.68,0.77,0.95) (0.93,0.96,1.0); bole (0.27,0.22,0.36); blossom chains (0.99,0.86,0.93) to (0.95,0.46,0.72) to (0.66,0.18,0.60), the drop (1.0,0.80,0.38); 3 chains a limb, 4–11.5 m long; `BLOOM_GLOW` 2.2 | | Willow Mere's landmark (owner: "markedly distinct from the other trees in color size etc."; "a few flowering strands"). Silver-lilac where every other tree is green, three times a willow's height. | wider-court-world |
 | Glade greens | tools/grove/plants.py `TURF`, `GRASS_*` | turf foot (0.30,0.60,0.31); sward blade (0.31,0.63,0.31) tip (0.52,0.80,0.40); glade blade (0.33,0.65,0.32) tip (0.54,0.81,0.42) | | Every blade's foot is near the ground's own green, so the grass grows out of it. | wider-court-world |
 | Glade flowers | tools/grove/plants.py `BLUEBELL`, `SNOWDROP`, `CROCUS` | bluebell bells (0.33,0.35,0.80) to (0.64,0.68,0.97); snowdrop white (0.95,0.96,0.93); crocus purple 5B3FA8 / 8F6FD8, gold F6C83C, white F4F1FA | | The glen's three flowers (book ch 18). | wider-court-world |
-| Sward rim, sparkle | tools/court/study_pool_hollow.gd `_look` | rim 0, sparkle 0 on grass and far cushions; rim 0.12, sparkle 0 on flowers | rim 0–0.2 | A blade seen along the ground is all rim, and the woods' rim is cream: a floor of straw. The twinkle lights a 14 cm cell: a white shard on a blade. | wider-court-world |
-| `FLOWERS_NEAR` / `NEAR` | study_pool_hollow.gd, study_glen.gd | 75 m | 60–95 m | A flower patch is drawn flower by flower within this, and as its far cushion beyond. | wider-court-world |
-| Sward ranges | study_pool_hollow.gd `_floor` | sward 80 m, fine grass 40 m, tall grass 110 m | | How far each grass is drawn from the eye. | wider-court-world |
-| Shade reach | study_pool_hollow.gd `_shade`; study_glen.gd `KNOLL_KINDS` | ring birch 9.5 m, slope birch 7.5 m; great oak 15, sycamore 12, others 8–10 | | How far from a trunk its flowers reach: thick in the heart, feathering to the edge. | wider-court-world |
-| `ARRIVAL_MOUTH` | study_pool_hollow.gd | 0.42 rad | 0.3–0.6 | The gap in the pool's ring of birches where you come down from the mound. | wider-court-world |
-| Clump spacing | study_glen.gd `_brooks`, `_river` | brooks every 34–62 m, the river every 42–76 m, alternate banks; no trunk within 9 m of a path | | How often trees gather along the water. | wider-court-world |
-| Knoll tops | study_glen.gd `knoll_tops` | 4 m over the ground 36 m round; tops at least 30 m apart | | What counts as a knoll that carries a tree. | wider-court-world |
+| Sward rim, sparkle | world/spring_court/wider/planting/court_place_plants.gd `_look`, `FLOWER_RIM` | rim 0, sparkle 0 on grass and far cushions; rim 0.12, sparkle 0 on flowers | rim 0–0.2 | A blade seen along the ground is all rim, and the woods' rim is cream: a floor of straw. The twinkle lights a 14 cm cell: a white shard on a blade. | wider-court-world |
+| Flower steps | planting/court_glen_planting.gd `FLOWER_NEAR`, `FLOWER_MID`, `FLOWER_FAR`, `FINE_CHUNK` | 60 m, 110 m, 220 m; chunk 24 m | near 45–75 | A flower patch is drawn flower by flower to NEAR, as its mid form (about a third of the triangles) to MID, as its far cushion to FAR. A layer switches by the chunk, so each step falls within 17 m of its number. | wider-court-world |
+| Tree steps | court_glen_planting.gd `TREE_NEAR`, `TREE_FAR` | 180 m, 800 m | | A tree is its full self to NEAR (by the 64 m chunk: 135–225 m) and its far form (the same outline, a twentieth of the triangles) to FAR. | wider-court-world |
+| Sward | planting/court_sward.gd `CELL`, `REACH`, `DROP`, `DENSITY`, `FULL`, `FAR_SHARE`, `FINE_REACH` | 16 m cells; laid to 84 m, let go past 100 m; 4.6 tufts tried per m2; full to 34 m, then the far sward thinning to 0.4 of its tufts at 84 m; fine grass within 40 m | DENSITY 3–6 | The grass of a place, laid round the player by the cell. DENSITY and REACH are the frame-time levers. | wider-court-world |
+| Shade reach | court_glen_planting.gd `KNOLL_KINDS`, `_pool_ring`, `_group` | ring birch 9.5 m, slope birch 7.5 m; great oak 15, sycamore and elm 12, thorn 9, birch clump 8, aspen 6, cherry 10; brookside and lake clumps 7.5–9 | | How far from a trunk its flowers reach: thick in the heart, feathering to the edge. | wider-court-world |
+| `SHADE_TRIES` | court_glen_planting.gd | 2.1 patches tried per m2 of shade | 1.5–3 | How thick the flowers lie under a tree at their thickest. | wider-court-world |
+| `ARRIVAL_MOUTH` | court_glen_planting.gd | 0.42 rad | 0.3–0.6 | The gap in the pool's ring of birches where you come down from the mound. | wider-court-world |
+| Clump spacing | court_glen_planting.gd `_brooks`, `_river`, `_clump` | brooks every 34–62 m, the river every 42–76 m, alternate banks; no trunk within 9 m of a path | | How often trees gather along the water. | wider-court-world |
+| Knoll kinds | court_glen_planting.gd `KNOLL_KINDS`, `KNOLL_GAP` | great oak, great sycamore, great elm, two aspens, old thorn (x1.5), three pillar birches, cherry (x1.9); never the kind of either nearest neighbour; tops 30 m apart | | One tree or clump a knoll, each with its own outline, so you find your way by them. | wider-court-world |
+| Lake shores | world/spring_court/wider/court_height.gd `LAKE_SHORES` | Looking Lake: a 26 m shore at grade 0.1, then 0.42; Willow Mere: 12 m at 0.12, then 0.35 | | The banks eased down to the water (owner, 2026-11-16: Looking Lake lay in a pit). Cut-only. | wider-court-world |
+| Motes | planting/court_motes.gd `COUNT`, `GLOW` | 280 lights, (2.6, 2.5, 1.9) | | The hollow's lights in the air, out from the golden hour through the night. | wider-court-world |
 
 ## Bow feel (T101)
 

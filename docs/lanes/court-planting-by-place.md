@@ -742,3 +742,52 @@ planting in the game has changed yet.
 - *Meadow flowers* for the open glade; great blossom trees (the knolls'
   cherry and crab apple are still the estate's, grown to 1.9x).
 - *The Weeping Lady* as a real giant willow (offered; the owner has not said).
+
+## The glen in the game (2026-11-16)
+
+Owner: remake the Weeping Lady "markedly distinct ... in color size etc.",
+"then go for the rest"; and "we dont need to anchor SO much on the old design
+we want to optimize for end result".
+
+**Merged (M4WCT-16-1):** the trees each built their own way (great oak wide,
+great sycamore a tower of billows, great elm a vase, aspen spire a column, old
+thorn wind-blown, thorn bush many-stemmed), and the Weeping Lady: a 36 m
+silver willow bowed over Willow Mere on a dark bole with roots, her strands in
+the water, hung with chains of blossom that each end in a drop of light
+(`great_weeping_lady` as the landmark's asset; landmarks can use the court's
+great trees, turned to face the site they bow to).
+
+**How the glen is planted now** (`world/spring_court/wider/planting/`):
+
+| Piece | What it does |
+|---|---|
+| `CourtGlenPlanting` | The rules, read from the land, as scatter layers: the pool's ring and slope birches, a tree a knoll, clumps by the brooks and the river, the lake's wood and willows, the mere's willows, the brae's clumps, thorn at the edges, flowers in the shade and at the knolls' feet, the banks' plants, crocuses on the verges. The glen's content names it (`place_planting = &"glen"`) and its decor recipe keeps only what is not a plant of the place. |
+| `CourtPlacePlants` | The plants by name with their materials: the glade plants (`tools/grove`), the trees near and far, the woods' plants. Prewarmed on the main thread. |
+| `CourtSward` | The grass, laid round the player in 16 m cells grown on worker threads from the land, let go behind them. Near cells are the sward; past 34 m its far form (a third of the blades) thinning out to 84 m. |
+| `CourtMotes` | The hollow's lights in the air, out from the golden hour through the night. |
+
+A tree is refused where the court keeps open (paths, gates, viewpoints, the
+story's spots, water, clearings: the pool's birches alone stand in their own
+clearing) and where its crown would close one of the court's sightlines.
+
+Steps of detail: a tree is itself to about 180 m and its far form (the same
+outline, a twentieth of the triangles: `estate_tree.py --far`) to 800 m; a
+flower patch is flowers to 60 m, a mid form (fewer, bigger plants) to 110 m and
+a cushion to 220 m.
+
+**The land:** Looking Lake's and Willow Mere's banks are eased down to the
+water (`CourtHeight.LAKE_SHORES`). The lake's brook (`lake_run`) now runs from
+the Thornwater down into the lake: the lake lies 6 m under the river, and as
+the lake's outflow the brook had been held up at the river's level, a causeway
+across the lake's east rim where the lake walk arrives.
+
+**Left out, on purpose or for later:**
+
+- The old habitat map still places the glen's forage (pickable plants), so a
+  forage plant can stand where the old birch copses were. Forage by place is
+  its own piece of work.
+- The court's trees have no trunk colliders (they never had: only the woods'
+  and the manor's do).
+- Meadow flowers for the open glade; great blossom trees (the knolls' cherry
+  is the estate's, grown to 1.9x).
+- The other places are still planted by their decor recipes.
