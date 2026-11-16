@@ -53,7 +53,7 @@ UP = Vector((0, 0, 1))
 #   kink: how far a limb's heading wanders per segment (the oak's gnarl)
 #   cloud: cloud radius; flat: its height over its width; card: leaf-clump size
 #   optional: flare (root radius x trunk, 1.9), limb (limb radius x trunk, 0.62),
-#   sink (how far the root is buried, 0.006), wood (share of the skinned wood's
+#   sink (the whole tree set this far into the ground, 0), wood (share of the skinned wood's
 #   triangles kept, 0.33), budget (the tree's triangle limit, BUDGET),
 #   top (the leader's last reach, 0.13), top_cloud (x cloud, 1.15),
 #   weep (the willow: fronds instead of leaf clouds, see its recipe), fruit (pears per cloud)
@@ -105,11 +105,11 @@ RECIPES = {
     # straight as pillars"): a dead-straight white stem with nothing on it for
     # most of its height, and a small light crown of short limbs at the top
     "pillar_birch": dict(
-        trunk=0.0125, clear=0.6, lean=0.012, flare=2.0, limb=0.46,
-        whorls=[(0.6, 3, 0.14, 30, 56, 1), (0.68, 3, 0.135, 36, 60, 1), (0.76, 3, 0.12, 42, 64, 1), (0.83, 3, 0.1, 48, 68, 0),
-                (0.89, 3, 0.08, 54, 72, 0)],
-        leader=0.94, top=0.045, top_cloud=1.0, kink=8, cloud=0.05, flat=1.0, card=0.05, cover=1.7, rim=0.3,
-        wood=0.17, budget=7000, sink=0.03,   # sunk deep: it stands on the hollow's slopes
+        trunk=0.0125, clear=0.6, lean=0.012, flare=1.6, limb=0.46,
+        # (four whorls: a fifth, closer under the leader, crashes Blender's Skin modifier)
+        whorls=[(0.6, 3, 0.14, 30, 56, 1), (0.69, 3, 0.13, 38, 62, 1), (0.77, 3, 0.115, 44, 66, 1), (0.85, 3, 0.095, 52, 70, 0)],
+        leader=0.92, top=0.05, top_cloud=1.0, kink=8, cloud=0.05, flat=1.0, card=0.05, cover=1.7, rim=0.3,
+        wood=0.17, budget=7000, sink=0.025,   # set 0.45 m into the ground: it stands on the hollow's slopes
     ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
@@ -163,7 +163,7 @@ def grow(sid, rng):
     lean = heading(lean_az, 0.0) * rc["lean"]
     top_z = rc["leader"]
     # the trunk: buried a little, flared at the root, a slow bend to the lean
-    stem = [sk.node((0, 0, -rc.get("sink", 0.006)), r * rc.get("flare", 1.9))]
+    stem = [sk.node((0, 0, -0.006), r * rc.get("flare", 1.9))]
     for z, k in ((0.035, 1.35), (0.11, 1.06), (rc["clear"] * 0.62, 0.98)):
         stem.append(sk.node(lean * (z / top_z) ** 1.5 + Vector((0, 0, z)), r * k, stem[-1]))
     az0 = rng.uniform(0, math.tau)
@@ -404,6 +404,9 @@ def build(sid, letter, seed, **opts):
     crown = [fronds] if weep else [leaves, core.bm]
     top = max(v.co.z for b in crown for v in b.verts)
     m = K.S(h / top)
+    if "sink" in rc:
+        # a deep foot: the whole tree set down into the ground, for standing on a slope
+        m = Matrix.Translation((0.0, 0.0, -rc["sink"] * h)) @ m
     meshes = [("bark", bark, None)] + ([("fronds", fronds, frond_normals)] if weep else [("leaves", leaves, normals)])
     for b in [b for _, b, _ in meshes] + ([core.bm] if core else []) + ([fruit.bm] if fruit else []):
         bmesh.ops.transform(b, matrix=m, verts=b.verts)
