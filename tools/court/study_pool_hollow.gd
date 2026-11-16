@@ -18,9 +18,12 @@ extends RefCounted
 ##             kind in drifts of its own, with daisies through the grass
 ##   the bank  iris, reeds, fern, water mint and mossed stones on the pool's
 ##             far sides; the near bank, where you arrive, left clear
-##   the ring  the pillar birches (book ch 14) round the pool
+##   the ring  the pillar birches (book ch 14) round the pool, and more of
+##             them in twos and threes up the inner slopes behind, bluebells
+##             at their feet
 ##   knolls    one tree on each knoll, and each a different kind; the mound
 ##             bare (it is the overlook), the Glimmerfall's knoll its own
+##   the mound its top in sward and crocus, and no tree: it is the overlook
 ##   glow      starmoss, glowcaps and faelights by the water, and small
 ##             lights adrift in the air over the floor
 
@@ -44,6 +47,15 @@ const KNOLL_TREES := [
 ]
 const RING_RADIUS := 30.0
 const RING_COUNT := 16
+const MOUND := Vector2(-1208.0, 270.0)
+## Bearings from the pool kept clear of slope birches, [bearing, half-angle]:
+## the way in from the mound, and the Glimmerfall.
+const OPEN_LINES := [[0.09, 0.42], [PI, 0.3]]
+## Groups of birches up the inner slopes: [bearing, distance from the pool, trees].
+const SLOPE_GROUPS := [
+	[0.72, 47.0, 3], [1.25, 55.0, 2], [1.75, 46.0, 3], [2.3, 52.0, 3], [2.72, 44.0, 2],
+	[-2.7, 46.0, 3], [-2.2, 54.0, 2], [-1.7, 45.0, 3], [-1.15, 52.0, 3], [-0.68, 46.0, 2],
+]
 
 
 static func build(world: Node3D) -> void:
@@ -56,9 +68,11 @@ static func build(world: Node3D) -> void:
 	wave.seed = 7
 	wave.frequency = 0.035
 	var trunks := _ring(root, rng)
+	var slope_trunks := _slopes(root, rng)
 	_knolls(root)
 	_floor(root, rng, wave, trunks)
-	_flowers(root, rng, wave)
+	_flowers(root, rng, wave, slope_trunks)
+	_mound(root, rng, wave)
 	_bank(root, rng)
 	_glow(root, rng)
 
@@ -81,6 +95,55 @@ static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 		mi.scale = Vector3.ONE * rng.randf_range(0.9, 1.12)
 		root.add_child(mi)
 	return trunks
+
+
+## Birches in twos and threes up the hollow's inner slopes, behind the ring:
+## they close the hollow in, and their trunks stand at different heights.
+static func _slopes(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
+	var trunks: Array[Vector2] = []
+	var build := 0
+	for g: Array in SLOPE_GROUPS:
+		var mid := POOL + Vector2.from_angle(g[0]) * float(g[1])
+		for k in int(g[2]):
+			var p := mid + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, 6.5)
+			if _steep(p):
+				continue
+			trunks.append(p)
+			var mi := MeshInstance3D.new()
+			mi.mesh = CourtGreatTrees.mesh(&"pillar_birch", build)
+			build += 1
+			mi.position = _ground(p) - Vector3(0.0, 0.25, 0.0)
+			mi.rotation.y = rng.randf() * TAU
+			mi.scale = Vector3.ONE * rng.randf_range(0.78, 1.05)
+			root.add_child(mi)
+	return trunks
+
+
+## The mound you arrive on: sward and crocuses over its top, tall grass at the
+## brow, and no tree.
+static func _mound(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite) -> void:
+	var sward: Array = [[], [], []]
+	var tall: Array = [[], []]
+	var crocus: Array = [[], [], []]
+	for i in 13000:
+		var p := MOUND + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * 30.0
+		var d := p.distance_to(MOUND)
+		if rng.randf() > lerpf(1.0, 0.15, clampf((d - 14.0) / 16.0, 0.0, 1.0)) or _steep(p):
+			continue
+		var size := rng.randf_range(0.85, 1.4)
+		var x := Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.3), size)), _ground(p))
+		var n := wave.get_noise_2d(p.x * 6.0, p.y * 6.0)
+		if n > 0.3 and d > 4.0 and rng.randf() < 0.2:
+			crocus[rng.randi() % 3].append(x)
+		elif d > 9.0 and rng.randf() < 0.06:
+			tall[rng.randi() % 2].append(x)
+		else:
+			sward[rng.randi() % 3].append(x)
+	for k in 3:
+		_cells(root, "MoundSward%d" % k, _glade("grass_sward_" + "abc"[k]), sward[k], 80.0)
+		_cells(root, "MoundCrocus%d" % k, _glade("crocus_patch_" + "abc"[k]), crocus[k], 150.0)
+	for k in 2:
+		_cells(root, "MoundTall%d" % k, _glade("grass_tall_" + "ab"[k]), tall[k], 110.0)
 
 
 static func _knolls(root: Node3D) -> void:
@@ -126,14 +189,14 @@ static func _floor(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 		else:
 			short[rng.randi() % 3].append(x)
 	for k in 3:
-		_cells(root, "Sward%d" % k, _glade("grass_sward_" + "abc"[k]), short[k], 70.0)
+		_cells(root, "Sward%d" % k, _glade("grass_sward_" + "abc"[k]), short[k], 80.0)
 		_cells(root, "Fine%d" % k, _glade("grass_glade_" + "abc"[k]), fine[k], 40.0)
 	for k in 2:
 		_cells(root, "TallGrass%d" % k, _glade("grass_tall_" + "ab"[k]), tall[k], 110.0)
 
 
 ## The book's three, each in drifts of its own, and daisies through the grass.
-static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite) -> void:
+static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, slope_trunks: Array[Vector2]) -> void:
 	# [species, bearing from the pool, distance, length, depth, plants per m2]
 	var drifts := [
 		# bluebells under the birches, the widest drifts, most of the way round
@@ -168,6 +231,20 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 			if not by_kind.has(dr[0]):
 				by_kind[dr[0]] = []
 			by_kind[dr[0]].append(x)
+	# bluebells and fern at the feet of the birches up the slopes
+	var ferns: Array = [[], [], []]
+	for t in slope_trunks:
+		for i in 26:
+			var p := t + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * 5.5
+			if _steep(p):
+				continue
+			var x := Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(1.0, 1.5)), _ground(p))
+			if i < 2:
+				ferns[rng.randi() % 3].append(x)
+			else:
+				by_kind[&"bluebell"].append(x)
+	for k in 3:
+		_cells(root, "SlopeFern%d" % k, _glade("fern_" + "abc"[k]), ferns[k], 150.0)
 	var daisies: Array = []
 	for i in 900:
 		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(POOL_RADIUS + 1.5, FLOOR + 6.0)
@@ -228,8 +305,8 @@ static func _glow(root: Node3D, rng: RandomNumberGenerator) -> void:
 			xs.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.9, 1.4)), _ground(p)))
 		_multi(root, "Glow_%s" % spec[0], FloraLibrary.mesh(spec[0]), xs)
 	var mote := SphereMesh.new()
-	mote.radius = 0.028
-	mote.height = 0.056
+	mote.radius = 0.045
+	mote.height = 0.09
 	mote.radial_segments = 6
 	mote.rings = 3
 	var lit := StandardMaterial3D.new()
@@ -237,8 +314,9 @@ static func _glow(root: Node3D, rng: RandomNumberGenerator) -> void:
 	lit.albedo_color = Color(2.6, 2.5, 1.9)
 	mote.material = lit
 	var motes: Array = []
-	for i in 170:
-		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * (FLOOR + 4.0)
+	for i in 280:
+		# most over the water and the bluebells, a few out across the floor
+		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * rng.randf() * (FLOOR + 4.0)
 		var at := _ground(p)
 		at.y = maxf(at.y, WorldHeight.height_at(POOL.x + POOL_RADIUS + 1.0, POOL.y)) + rng.randf_range(0.35, 3.2)
 		motes.append(Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * rng.randf_range(0.6, 1.5)), at))
@@ -266,7 +344,8 @@ static var _glade_meshes := {}
 
 
 ## A glade plant's mesh (tools/grove): its "soft" body under the woods'
-## foliage material.
+## foliage material. Grass takes no rim light (a blade seen along the ground
+## is all rim, and the rim is warm cream: a floor of straw); flowers a little.
 static func _glade(plant: String) -> Mesh:
 	if not _glade_meshes.has(plant):
 		var scene := (load(GLADE % plant) as PackedScene).instantiate()
@@ -275,9 +354,22 @@ static func _glade(plant: String) -> Mesh:
 			found = mi.mesh
 			break
 		scene.free()
-		found.surface_set_material(0, FloraLibrary.material(&"bloom"))
+		found.surface_set_material(0, _look(0.0 if plant.begins_with("grass") else 0.12))
 		_glade_meshes[plant] = found
 	return _glade_meshes[plant]
+
+
+static var _looks := {}
+
+
+static func _look(rim: float) -> ShaderMaterial:
+	if not _looks.has(rim):
+		var m := FloraLibrary.material(&"bloom").duplicate() as ShaderMaterial
+		m.set_shader_parameter(&"rim_strength", rim)
+		if rim == 0.0:
+			m.set_shader_parameter(&"lime_guard", 0.4)   # the lit undersides of blades go neon without it
+		_looks[rim] = m
+	return _looks[rim]
 
 
 ## Small plants by the cell, each cell drawn only within `far` metres: the

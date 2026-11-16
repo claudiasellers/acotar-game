@@ -531,7 +531,7 @@ def crocus(sheet, rng):
                   sheet["leaf_deep"], sheet["leaf"], rng, 0.5, 2)
         col_deep, col, col_light = rng.choice(sheet["colours"])
         hgt = sheet["height"] * rng.uniform(0.45, 0.6)
-        stalk(soft, [off, off + UP * hgt], 0.006, sheet["white"], mix(sheet["white"], col, 0.5), 0.1, 0.4)
+        stalk(soft, [off, off + UP * hgt], 0.006, sheet["leaf"], mix(sheet["white"], col, 0.5), 0.1, 0.4)
         cup_open = rng.uniform(0.18, 0.5)
         rot = rng.uniform(0, math.tau)
         for j in range(6):   # a goblet of six petals, three inside three
