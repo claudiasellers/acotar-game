@@ -31,8 +31,11 @@ const MOUND := Vector2(-1208.0, 270.0)
 const HOLLOW := 118.0
 const NEAR := 75.0
 ## The knolls' trees, [species, size], taken in turn so neighbours differ.
-const KNOLL_KINDS := [[&"oak", 1.15], [&"cherry_blossom", 1.3], [&"birch", 1.0], [&"crab_apple", 1.35], [&"pear_tree", 1.3],
-	[&"apple_blossom", 1.35]]
+## They are the estate's garden trees grown half as big again and more, to
+## hold a knoll thirty metres across: stand-ins for the great oak, sycamore
+## and thorn the plan lists as missing.
+const KNOLL_KINDS := [[&"oak", 1.7], [&"cherry_blossom", 1.9], [&"birch", 1.5], [&"crab_apple", 1.95], [&"pear_tree", 1.9],
+	[&"apple_blossom", 1.95]]
 const FLOWERS := [&"bluebell", &"snowdrop", &"crocus"]
 ## A flower's patches: [the full ones, the small one at a pool's edge].
 const PATCHES := {
@@ -89,7 +92,7 @@ static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dict
 		var k: Array = KNOLL_KINDS[kind]
 		_estate(root, rng, k[0], top, float(k[1]) * rng.randf_range(0.92, 1.1))
 		var flower: StringName = FLOWERS[placed.size() % 3]
-		groups.append({"trunks": [top], "reach": 10.0 if k[0] == &"oak" else 7.5, "flower": flower})
+		groups.append({"trunks": [top], "reach": 13.0 if k[0] == &"oak" else 10.0, "flower": flower})
 		# the knoll's north foot, where its slope eases: the same flower in a crescent, in its shade
 		var foot := 30.0
 		var r := 9.0
@@ -98,10 +101,10 @@ static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dict
 				foot = r
 				break
 			r += 3.0
-		for i in int(foot * 9.0):
-			var turn := rng.randfn(0.0, 0.5)
-			var out := rng.randfn(0.0, 3.0)
-			crescents.append([top + Vector2.from_angle(-PI * 0.5 + turn) * (foot + 1.5 + out), flower, absf(turn) < 0.45 and absf(out) < 2.5])
+		for i in int(foot * 20.0):
+			var turn := rng.randfn(0.0, 0.6)
+			var out := rng.randfn(0.0, 4.5)
+			crescents.append([top + Vector2.from_angle(-PI * 0.5 + turn) * (foot + 2.0 + out), flower, absf(turn) < 0.6 and absf(out) < 4.0])
 	print("STUDY glen knolls: ", placed.size())
 	return crescents
 
@@ -442,9 +445,14 @@ static func sward_round(world: Node3D, eye: Vector3) -> void:
 		var x := Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.3), size)),
 			StudyPoolHollow._ground(p))
 		var roll := rng.randf()
-		if StudyPoolHollow._wet(p, 1.6) and roll < 0.5:
-			tall[rng.randi() % 2].append(x)
-		elif roll < 0.012 and wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > 0.05:
+		# the dips hold the long grass; the slopes that face the sun hold the daisies
+		var h := CourtHeight.height_at(p.x, p.y)
+		var dip := (CourtHeight.height_at(p.x + 14.0, p.y) + CourtHeight.height_at(p.x - 14.0, p.y) + CourtHeight.height_at(p.x, p.y + 14.0)
+			+ CourtHeight.height_at(p.x, p.y - 14.0)) * 0.25 - h
+		var sunny := h - CourtHeight.height_at(p.x, p.y + 3.0) > 0.25
+		if (StudyPoolHollow._wet(p, 1.6) and roll < 0.5) or (dip > 0.8 and roll < 0.5):
+			tall[rng.randi() % 2].append(x.scaled_local(Vector3(1.2, 1.25, 1.2)) if dip > 0.8 else x)
+		elif roll < (0.07 if sunny else 0.008) and wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > -0.1:
 			daisies.append(x)
 		elif roll < 0.3:
 			fine[rng.randi() % 3].append(x)
