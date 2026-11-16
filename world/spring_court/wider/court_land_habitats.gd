@@ -190,8 +190,17 @@ static func _build_zones() -> Array[Dictionary]:
 		out.append({"id": id, "kind": kind, "a": c, "b": c, "r": r})
 	var i := 0
 	CourtHeight.prewarm()
+	var pool := Vector2.INF
+	var pool_rim := 0.0
+	for l: Dictionary in CourtHeight.lakes():
+		if l["id"] == &"starlight_pool":
+			pool = l["center"]
+			pool_rim = float(l["radius"]) + POOL_RIM
 	for pd: Array in CourtHeight._pads:  # PADS plus a small clearing at each site
-		disc.call(StringName("clearing_%d" % i), &"clearing", Vector2(pd[0], pd[1]), float(pd[2]))
+		var c := Vector2(pd[0], pd[1])
+		# The starlight pool's level floor is wider than what must stay open: its birches
+		# ring the pool on it (CourtGlenPlanting). Open is the story's rim, no more.
+		disc.call(StringName("clearing_%d" % i), &"clearing", c, minf(float(pd[2]), pool_rim) if c.distance_to(pool) < 1.0 else float(pd[2]))
 		i += 1
 	for g: Array in CourtHeight.GATES:
 		disc.call(StringName("gate_%s" % g[0]), &"gate", Vector2(g[2], g[3]), float(g[4]) * 0.5 + GATE_CLEAR)

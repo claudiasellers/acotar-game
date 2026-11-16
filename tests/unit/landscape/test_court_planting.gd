@@ -277,9 +277,6 @@ func test_paths_gates_and_viewpoints_stay_clear_of_trunks() -> void:
 			for i in layer.count():
 				var p := layer.position_of(i)
 				var why := CourtLandHabitats.keep_open_reason(p.x, p.z)
-				# (the starlight pool's birches ring the pool: they stand in its clearing, clear of the story's rim)
-				if layer.tags.has("place") and String(why).begins_with("clearing_") and Vector2(p.x, p.z).distance_to(CourtGlenPlanting.POOL) < 40.0:
-					why = &""
 				if why != &"":
 					inside += 1
 					if first == "":

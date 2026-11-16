@@ -151,13 +151,9 @@ class Plan:
 	## A tree: its near mesh, its far form beyond. Returns false off the region's
 	## ground, wherever the court keeps open (CourtLandHabitats: a path, a gate,
 	## a viewpoint, a story's spot, water, a clearing), and where its crown
-	## would close one of the court's sightlines. `own_clearing`: the tree
-	## belongs to the clearing it stands in (the pool's birches ring the pool).
-	func tree(species: StringName, build: int, p: Vector2, yaw: float, size: float, sink: float = 0.0, own_clearing: bool = false) -> bool:
-		if not content.owns(p):
-			return false
-		var why := String(CourtLandHabitats.keep_open_reason(p.x, p.y))
-		if why != "" and not (own_clearing and why.begins_with("clearing_")):
+	## would close one of the court's sightlines.
+	func tree(species: StringName, build: int, p: Vector2, yaw: float, size: float, sink: float = 0.0) -> bool:
+		if not content.owns(p) or CourtLandHabitats.keep_open(p.x, p.y):
 			return false
 		var tall := (CourtGreatTrees.height_of(species) if CourtPlacePlants.is_great(species) else FloraLib.height_of(species)) * size
 		if closes_a_sightline(p, tall):
@@ -322,7 +318,7 @@ static func _pool_ring(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dic
 			# no clump stands in the mouth of the way in: you come down to the pool across open grass
 			if absf(angle_difference((heart - POOL).angle(), ARRIVAL)) < ARRIVAL_MOUTH:
 				continue
-			if plan.tree(&"pillar_birch", build, p, turn, size, 0.0, true):
+			if plan.tree(&"pillar_birch", build, p, turn, size):
 				trunks.append(p)
 				reach.append(9.5)
 	for g: Array in SLOPE_GROUPS:
@@ -334,7 +330,7 @@ static func _pool_ring(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dic
 				continue
 			build += 1
 			# set a little into the slope
-			if plan.tree(&"pillar_birch", build, p, rng.randf() * TAU, rng.randf_range(0.78, 1.05), 0.25, true):
+			if plan.tree(&"pillar_birch", build, p, rng.randf() * TAU, rng.randf_range(0.78, 1.05), 0.25):
 				trunks.append(p)
 				reach.append(7.5)
 				stood_here.append(p)

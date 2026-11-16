@@ -767,8 +767,8 @@ great trees, turned to face the site they bow to).
 | `CourtMotes` | The hollow's lights in the air, out from the golden hour through the night. |
 
 A tree is refused where the court keeps open (paths, gates, viewpoints, the
-story's spots, water, clearings: the pool's birches alone stand in their own
-clearing) and where its crown would close one of the court's sightlines.
+story's spots, water, clearings; the starlight pool's clearing is its story
+rim, 24 m, so its birches ring the pool outside it) and where its crown would close one of the court's sightlines.
 
 Steps of detail: a tree is itself to about 180 m and its far form (the same
 outline, a twentieth of the triangles: `estate_tree.py --far`) to 800 m; a
