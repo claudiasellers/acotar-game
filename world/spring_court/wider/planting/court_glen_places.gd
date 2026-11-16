@@ -13,9 +13,10 @@ extends RefCounted
 ##                     in over the way on the crest: the Thorn Gate, the first
 ##                     thing on the skyline as you climb from the estate; their
 ##                     petals lie on the path. Thorn bushes down the lee side.
-##   2 Brook Dell      close, cool and green: a great elm over the crossing,
-##                     birches along the brook and by the way, and the glen's
-##                     only floor of fern; mossed stones; snowdrops in ribbons
+##   2 Brook Dell      close, cool and green: two great elms over the crossing,
+##                     oaks and birches by the way so you walk in under them,
+##                     birches along the brook, and the glen's only floor of
+##                     fern; mossed stones; snowdrops in ribbons
 ##                     at the water (white overhead on the brae, white underfoot
 ##                     here). The fern starts before you see the water.
 ##   3 the Ford        full sun and wide water. Willows in a row on the far
@@ -28,7 +29,8 @@ extends RefCounted
 ##                     way, its petals falling), and last a great oak, the
 ##                     darkest thing, before the bare mound, the lightest. A
 ##                     crescent of bluebells at each knoll's foot on the side
-##                     the way passes.
+##                     the way passes, and from the near knolls a spill of them
+##                     down to the way's edge.
 ##   5 the Mound       nothing over the knee, so the climb shows only sky; a
 ##                     ring of daisies on the crown, where you stand to look.
 ## Everything is found from the land (the way's own line, where it meets the
@@ -61,7 +63,14 @@ const DELL_BIRCHES := [
 	[-56.0, 1.0, 7.0, 2], [-41.0, -1.0, 8.0, 1], [-27.0, 1.0, 6.5, 2], [-13.0, -1.0, 9.5, 1],
 	[17.0, 1.0, 7.0, 2], [31.0, -1.0, 7.5, 1], [46.0, 1.0, 8.0, 2], [62.0, -1.0, 7.0, 1],
 ]
-const DELL_DOORS := [46.0, 31.0, 17.0]
+## The trees you walk in under: [metres along the way from the crossing (before
+## it is -), side, species]. Oaks for the shade, birches for the white stems.
+const DELL_WAY := [
+	[-52.0, -1.0, &"birch"], [-51.0, 1.0, &"birch"], [-38.0, -1.0, &"oak"], [-35.0, 1.0, &"birch"], [-23.0, 1.0, &"oak"],
+	[-21.0, -1.0, &"birch"], [14.0, 1.0, &"oak"], [16.0, -1.0, &"birch"], [28.0, -1.0, &"oak"], [31.0, 1.0, &"birch"],
+]
+## And a second rank behind them, so the dell is a grove and not a row: [along, side, metres off the way].
+const DELL_BACK := [[-45.0, -1.0, 18.0], [-29.0, 1.0, 19.0], [-12.0, -1.0, 21.0], [21.0, 1.0, 18.0], [23.0, -1.0, 20.0], [40.0, 1.0, 16.0]]
 const DELL_FERNS := 1500
 ## The fern floor's half-width at the brook (m) and how far it runs up and down it.
 const DELL_HALF := 26.0
@@ -70,8 +79,10 @@ const DELL_DOWN := 72.0
 
 ## The Ford. Willows on the far bank: metres along the river from the crossing
 ## (downstream +); none within the gap where the way lands.
-const FORD_WILLOWS := [-67.0, -53.0, -40.0, -28.0, -16.0, 17.0, 28.0, 40.0, 53.0, 66.0]
-const FORD_GOLD := 620
+const FORD_WILLOWS := [-67.0, -53.0, -40.0, -28.0, -16.0, 30.0, 43.0, 56.0, 69.0]
+## No willow this near the way on the far bank: the landing is open, and no frond hangs in your face.
+const FORD_GAP := 20.0
+const FORD_GOLD := 900
 ## How far up and down the river the gold runs, and how far back from the water.
 const FORD_REACH := 58.0
 const FORD_BACK := 7.5
@@ -90,6 +101,9 @@ const KNOLLS := [
 	[-815.0, -89.0, &"old_thorn", 1, 1.45, 0.0],
 ]
 const KNOLL_SNAP := 14.0
+## A knoll this near the way spills its bluebells down to it; patches tried per metre of the spill.
+const SPILL_REACH := 70.0
+const SPILL_TRIES := 9.0
 const CHERRY_PETALS := 190
 
 ## The Mound's daisy ring: its radius and how many daisies.
@@ -327,10 +341,13 @@ static func _brook_dell(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 	var cross := pts[i0]
 	var down: Vector2 = _on_line(pts, i0, 1.0)[1]
 	var east := down.orthogonal() * (1.0 if down.orthogonal().x > 0.0 else -1.0)
-	# the great elm: on the west bank just upstream, its crown over the crossing
+	# two great elms, their plates of leaves over the crossing: on the west bank just upstream and the east bank just down
 	var elm := _spot(plan, cross - down * 11.0 - east * 8.5, 6.0, 8.0, 4.0)
 	if elm != Vector2.INF:
 		plan.tree(&"great_elm", 0, elm, rng.randf() * TAU, 1.0)
+	var elm_two := _spot(plan, cross + down * 13.0 + east * 9.0, 6.0, 8.0, 4.0)
+	if elm_two != Vector2.INF:
+		plan.tree(&"great_elm", 1, elm_two, rng.randf() * TAU, 0.9)
 	# birches along the brook, alternate banks
 	for b: Array in DELL_BIRCHES:
 		var on: Array = _on_line(pts, i0, b[0])
@@ -339,15 +356,21 @@ static func _brook_dell(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 		var heart := (on[0] as Vector2) + side * (half + float(b[2]))
 		for k in int(b[3]):
 			var p := _spot(plan, heart + (Vector2.ZERO if k == 0 else Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.6, 3.8)), 4.0, 6.5, 3.0, 2.6)
-			if p != Vector2.INF and (elm == Vector2.INF or p.distance_to(elm) > 9.0):
+			if p != Vector2.INF and (elm == Vector2.INF or p.distance_to(elm) > 9.0) and (elm_two == Vector2.INF or p.distance_to(elm_two) > 9.0):
 				plan.tree(&"birch", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.2) if k == 0 else rng.randf_range(0.8, 0.95))
 	# and by the way as you come down into it: you walk in under them
-	for back: float in DELL_DOORS:
-		for side: float in [-1.0, 1.0]:
-			var on := s - back + rng.randf_range(-2.0, 2.0)
-			var p := _spot(plan, at(on) + heading(on).orthogonal() * side * rng.randf_range(6.6, 8.2), 3.0, 6.2, 3.0)
-			if p != Vector2.INF:
-				plan.tree(&"birch", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.25))
+	for w: Array in DELL_WAY:
+		var on := s + float(w[0]) + rng.randf_range(-1.5, 1.5)
+		var oak: bool = w[2] == &"oak"
+		var p := _spot(plan, at(on) + heading(on).orthogonal() * float(w[1]) * (rng.randf_range(8.0, 9.2) if oak else rng.randf_range(6.6, 8.0)),
+			4.0, 7.0 if oak else 6.2, 3.0, 5.0 if oak else 3.2)
+		if p != Vector2.INF:
+			plan.tree(w[2], rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.9, 1.05) if oak else rng.randf_range(0.95, 1.25))
+	for w: Array in DELL_BACK:
+		var on := s + float(w[0]) + rng.randf_range(-2.0, 2.0)
+		var p := _spot(plan, at(on) + heading(on).orthogonal() * float(w[1]) * (float(w[2]) + rng.randf_range(-1.5, 1.5)), 5.0, 7.0, 3.0, 5.5)
+		if p != Vector2.INF:
+			plan.tree(&"oak", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.85, 1.05))
 	# the fern floor: thick at the water, thinning to nothing at the dell's edge; it reaches up the way toward the brae
 	for i in DELL_FERNS:
 		var p: Vector2
@@ -365,7 +388,7 @@ static func _brook_dell(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 			edge = maxf(absf(off) / DELL_HALF, (absf(t) - 40.0) / 30.0)
 		if rng.randf() < edge or not CourtGlenPlanting.growable(p, 0.9):
 			continue
-		plan.fern(rng.randi(), p, rng.randf() * TAU, lerpf(1.25, 0.7, clampf(edge, 0.0, 1.0)) * rng.randf_range(0.85, 1.15))
+		plan.fern(rng.randi(), p, rng.randf() * TAU, lerpf(1.9, 0.9, clampf(edge, 0.0, 1.0)) * rng.randf_range(0.8, 1.15))
 	# mossed stones and moss at the water
 	for i in 70:
 		var on: Array = _on_line(pts, i0, rng.randf_range(-DELL_UP, DELL_DOWN))
@@ -405,7 +428,7 @@ static func _the_ford(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) 
 	for t: float in FORD_WILLOWS:
 		var want := c + down * (t + rng.randf_range(-2.5, 2.5)) + west * (half + rng.randf_range(4.6, 6.4))
 		var p := _spot(plan, want, 7.0, 6.0, 0.0)
-		if p != Vector2.INF:
+		if p != Vector2.INF and float(along(p)[1]) >= FORD_GAP:
 			plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.98, 1.28))
 	# kingcups on both banks: thickest at the landings, thinning up and down the river and back from the water
 	for i in FORD_GOLD:
@@ -416,7 +439,7 @@ static func _the_ford(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) 
 		var p := c + down * t + west * (1.0 if rng.randf() < 0.5 else -1.0) * (half + 0.2 + back)
 		if not CourtGlenPlanting.growable(p, 0.0):
 			continue
-		plan.flower("kingcup_patch_a" if back < FORD_BACK * 0.45 else "kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(1.0, 1.45))
+		plan.flower("kingcup_patch_a" if back < FORD_BACK * 0.45 else "kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(1.15, 1.7))
 	# iris at the water's edge, away from the landings
 	for i in 34:
 		var t := rng.randf_range(-FORD_REACH, FORD_REACH)
@@ -427,14 +450,14 @@ static func _the_ford(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) 
 	# gold on the way's verges: the first in the dell's mouth, the last forty metres past the far landing
 	var x := brook_crossing()
 	var from: float = (float(x[0]) + 28.0) if not x.is_empty() else s - 50.0
-	for i in 90:
+	for i in 170:
 		var on := rng.randf_range(from, s + 44.0)
 		var far := (s - on) / maxf(s - from, 1.0) if on < s else (on - s) / 44.0
 		if rng.randf() < far * 0.85:
 			continue
-		var p := at(on) + heading(on).orthogonal() * (1.0 if rng.randf() < 0.5 else -1.0) * (3.0 + absf(rng.randfn(0.0, 2.2)))
+		var p := at(on) + heading(on).orthogonal() * (1.0 if rng.randf() < 0.5 else -1.0) * (3.0 + absf(rng.randfn(0.0, 2.6)))
 		if CourtGlenPlanting.growable(p, 0.5):
-			plan.flower("kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(0.95, 1.35))
+			plan.flower("kingcup_patch_a" if i % 3 == 0 else "kingcup_patch_b", p, rng.randf() * TAU, rng.randf_range(1.1, 1.6))
 
 
 # --- 4: the Knoll Walk ----------------------------------------------------------
@@ -467,6 +490,20 @@ static func _knoll_walk(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 		if trunks.is_empty() or float(k[5]) <= 0.0:
 			continue
 		groups.append({"trunks": trunks, "reach": reach, "flower": &"bluebell", "knoll": top, "toward": toward.angle(), "composed": true})
+		# a knoll within reach of the way spills its bluebells down to it: you walk past blue at hand, and a
+		# ribbon of it leads up to the tree
+		if float(a[1]) < SPILL_REACH:
+			var far: float = a[1]
+			for i in int(far * SPILL_TRIES):
+				var out := rng.randf_range(7.0, far - 2.6)
+				var wide := lerpf(3.2, 5.0, out / far)
+				var off := rng.randfn(0.0, wide)
+				var p := top + toward * out + toward.orthogonal() * (off + 5.0 * sin(out * 0.11 + top.x))
+				if absf(off) > wide * 1.9 or not CourtGlenPlanting.growable(p, 1.2) or p.distance_to(CourtGlenPlanting.POOL) < CourtGlenPlanting.FLOOR + 30.0:
+					continue
+				var full := absf(off) < wide * 0.9
+				plan.flower("bluebell_patch_a" if full else "bluebell_patch_c", p, rng.randf() * TAU,
+					rng.randf_range(1.0, 1.4) if full else rng.randf_range(0.7, 1.05))
 		if species == &"great_cherry":
 			# its petals on the grass beneath, thickest at the trunk
 			for i in CHERRY_PETALS:

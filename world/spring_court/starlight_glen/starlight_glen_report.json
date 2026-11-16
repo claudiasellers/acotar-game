@@ -1,17 +1,17 @@
 {
-  "trees": 479,
-  "trees_per_ha": 5.2,
+  "trees": 485,
+  "trees_per_ha": 5.3,
   "trees_per_ha_by_form": {
     "floor": 1.2,
-    "slope": 3.1,
+    "slope": 3.2,
     "steep": 0.0,
     "valley": 9.2,
     "hollow": 0.0,
-    "crest": 4.5,
+    "crest": 4.6,
     "knoll": 47.5,
     "verge": 0.9,
-    "brook_bank": 28.8,
-    "river_bank": 19.1,
+    "brook_bank": 29.6,
+    "river_bank": 18.8,
     "shore": 69.7,
     "water": 0.0
   },
@@ -23,7 +23,7 @@
   "empty_cells": 0,
   "cells": 94,
   "landmarks": 5,
-  "draw_calls": 1337,
-  "decor_instances": 117873,
+  "draw_calls": 1344,
+  "decor_instances": 120497,
   "area_km2": 0.923
 }
