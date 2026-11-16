@@ -323,8 +323,8 @@ const LINEUPS := {
 		"estate:birch:0", "estate:birch:1", "estate:birch:2", "post", "estate:pear_tree:0", "estate:pear_tree:1", "estate:pear_tree:2"]},
 	# The court's great trees (CourtGreatTrees), each beside its nearest relation for scale.
 	# the knolls' great trees and the thorn, beside a pillar birch for size
-	"great_trees": {"distance": 62.0, "spacing": 22.0, "look": 10.0, "ids": ["great:great_oak:0", "great:great_sycamore:0",
-		"great:old_thorn:0", "great:thorn_bush:0", "great:thorn_bush:1", "great:pillar_birch:0"]},
+	"great_trees": {"distance": 78.0, "spacing": 24.0, "look": 11.0, "ids": ["great:great_oak:0", "great:great_sycamore:0",
+		"great:great_elm:0", "great:aspen_spire:0", "great:old_thorn:0", "great:thorn_bush:0", "great:pillar_birch:0"]},
 	"pillar_birch": {"distance": 34.0, "spacing": 7.0, "look": 8.0, "ids": ["great:pillar_birch:0", "great:pillar_birch:1",
 		"great:pillar_birch:2", "post", "estate:birch:0"]},
 	"estate_willow": {"distance": 38.0, "spacing": 14.5, "look": 4.5, "ids": ["estate:willow:0", "estate:willow:1", "estate:willow:2",

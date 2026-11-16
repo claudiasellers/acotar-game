@@ -23,25 +23,39 @@ const TREES := {
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_birch.png",
 		"bark_col": Color(0.93, 0.91, 0.88), "bark_mean": 0.582, "trunk": 0.225},
 	# The knolls' trees (the glen: one to a knoll, and you find your way by them).
-	# the great oak: grown alone on a hilltop, wider than tall
-	&"great_oak": {"height": 24.0,
+	# Each is built its own way, so no two share an outline (owner, 2026-11-16).
+	# the great oak: wider than tall, heavy level boughs
+	&"great_oak": {"height": 22.0,
 		"bands": [Color(0.30, 0.56, 0.44), Color(0.50, 0.79, 0.56), Color(0.78, 0.95, 0.72)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_oak.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
 		"bark_col": Color(0.56, 0.42, 0.43), "bark_mean": 0.338, "trunk": 1.2},
-	# book ch 6: a lone sycamore on a knoll. A grey bole, a tall full dome, a yellower green
-	&"great_sycamore": {"height": 26.0,
+	# book ch 6: a lone sycamore on a knoll. A tall grey bole, a tower of a few great billows, a yellower green
+	&"great_sycamore": {"height": 28.0,
 		"bands": [Color(0.34, 0.58, 0.36), Color(0.57, 0.81, 0.46), Color(0.85, 0.96, 0.60)],
-		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_oak.png",
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_pear_tree.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_birch.png",
 		"bark_col": Color(0.74, 0.71, 0.74), "bark_mean": 0.582, "trunk": 1.04},
-	# the old thorn, white with may, and the thorn bush that stands between the grass and the crowns
-	&"old_thorn": {"height": 7.5, "blossom": true,
+	# book ch 10: "an elm with a coarse trunk". A vase: limbs climbing out of a high bole, the leaves in plates
+	# across the top; a deep cool green
+	&"great_elm": {"height": 25.0,
+		"bands": [Color(0.24, 0.50, 0.42), Color(0.42, 0.72, 0.54), Color(0.70, 0.91, 0.70)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_oak.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.46, 0.38, 0.42), "bark_mean": 0.338, "trunk": 1.0},
+	# the aspen spire: a column, a pale stem, a silvered green
+	&"aspen_spire": {"height": 27.0,
+		"bands": [Color(0.40, 0.62, 0.52), Color(0.64, 0.84, 0.66), Color(0.88, 0.97, 0.82)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_birch.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_birch.png",
+		"bark_col": Color(0.84, 0.86, 0.80), "bark_mean": 0.582, "trunk": 0.49},
+	# the old thorn, wind-made and white with may, and the thorn bush that stands between the grass and the crowns
+	&"old_thorn": {"height": 7.0, "blossom": true,
 		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
 		"bark_col": Color(0.50, 0.40, 0.42), "bark_mean": 0.338, "trunk": 0.41},
-	&"thorn_bush": {"height": 3.4, "blossom": true,
+	&"thorn_bush": {"height": 3.2, "blossom": true,
 		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",

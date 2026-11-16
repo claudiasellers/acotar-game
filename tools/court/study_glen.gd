@@ -31,12 +31,12 @@ const MOUND := Vector2(-1208.0, 270.0)
 const HOLLOW := 118.0
 const NEAR := 75.0
 ## The knolls' trees, [species, size, the shade it throws (m), how many stand
-## together], taken in turn so neighbours differ. The great oak, the great
-## sycamore and the old thorn are the court's own (CourtGreatTrees); the
-## blossom trees are still the estate's garden trees grown near twice their
-## size, until the court has great ones.
-const KNOLL_KINDS := [[&"great_oak", 1.0, 15.0, 1], [&"cherry_blossom", 1.9, 10.0, 1], [&"great_sycamore", 1.0, 12.0, 1],
-	[&"old_thorn", 1.5, 9.0, 1], [&"pillar_birch", 1.0, 8.0, 3], [&"crab_apple", 1.95, 10.0, 1]]
+## together], taken in turn so neighbours differ. Each has its own outline:
+## the oak wide, the sycamore a tower of billows, the elm a vase, the aspen a
+## column, the thorn wind-blown, the birches a clump of white stems; and one
+## blossom tree, still the estate's cherry grown near twice its size.
+const KNOLL_KINDS := [[&"great_oak", 1.0, 15.0, 1], [&"great_sycamore", 1.0, 12.0, 1], [&"great_elm", 1.0, 12.0, 1],
+	[&"aspen_spire", 1.0, 6.0, 2], [&"old_thorn", 1.5, 9.0, 1], [&"pillar_birch", 1.0, 8.0, 3], [&"cherry_blossom", 1.9, 10.0, 1]]
 const FLOWERS := [&"bluebell", &"snowdrop", &"crocus"]
 ## A flower's patches: [the full ones, the small one at a pool's edge].
 const PATCHES := {

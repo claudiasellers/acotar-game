@@ -41,7 +41,8 @@ OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/trees")
 # not have"): grown by the same recipes so they stand beside the estate's as
 # family, but they are the court's and live with its trees. species -> height (m).
 COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
-COURT = {"pillar_birch": 18.0, "great_oak": 24.0, "great_sycamore": 26.0, "old_thorn": 7.5, "thorn_bush": 3.4}
+COURT = {"pillar_birch": 18.0, "great_oak": 22.0, "great_sycamore": 28.0, "great_elm": 25.0, "aspen_spire": 27.0, "old_thorn": 7.0,
+         "thorn_bush": 3.2}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
 BUDGET = 6000
 UP = Vector((0, 0, 1))
@@ -57,6 +58,13 @@ UP = Vector((0, 0, 1))
 #   triangles kept, 0.33), budget (the tree's triangle limit, BUDGET),
 #   top (the leader's last reach, 0.13), top_cloud (x cloud, 1.15),
 #   weep (the willow: fronds instead of leaf clouds, see its recipe), fruit (pears per cloud)
+#   The court's trees also differ in how they are built, not only in their numbers
+#   (owner, 2026-11-16: "vary the tree design a little more they are looking very
+#   derivative of each other"):
+#   along (a second cloud two thirds out along every limb, x cloud: a bough that carries
+#   its leaves along its length), sweep (0..1: the wind's work, limbs pulled round to the
+#   lee side and longer there, the clouds blown that way), stems + spread (no trunk:
+#   that many stems from the ground, leaning out by spread)
 RECIPES = {
     # the parkland oak: stout, four long low limbs, a broad tiered crown (owner: "a bit broader", "those look good")
     "oak": dict(
@@ -112,36 +120,54 @@ RECIPES = {
         wood=0.17, budget=7000, sink=0.025,   # set 0.45 m into the ground: it stands on the hollow's slopes
     ),
     # The knolls' great trees (the glen: one tree to a knoll, and you find your
-    # way by them). The great oak: grown alone on a hilltop, wider than tall,
-    # a short thick bole and heavy boughs that leave it low and run out level.
+    # way by them, so each is built its own way and no two share an outline).
+    # The great oak: wider than tall. A short thick bole, heavy boughs that
+    # leave it low and run out level, carrying their leaves along their length.
     "great_oak": dict(
-        trunk=0.05, clear=0.2, lean=0.02, flare=2.0,
-        whorls=[(0.2, 4, 0.52, 6, 32, 2), (0.34, 4, 0.42, 30, 54, 2), (0.48, 3, 0.3, 46, 66, 1)],
-        leader=0.6, top=0.14, kink=24, cloud=0.105, flat=0.78, card=0.072, cover=2.1, rim=0.26,
-        budget=10000, sink=0.02,
+        trunk=0.054, clear=0.16, lean=0.02, flare=2.1,
+        whorls=[(0.16, 4, 0.62, 2, 22, 2), (0.3, 3, 0.46, 30, 50, 2), (0.44, 3, 0.3, 50, 68, 1)],
+        leader=0.56, top=0.12, kink=26, cloud=0.105, flat=0.7, card=0.075, cover=2.0, rim=0.26,
+        along=0.85, budget=12000, sink=0.02,
     ),
-    # the great sycamore (book ch 6: a lone sycamore on a knoll): a clean grey
-    # bole and a tall full dome, taller than it is wide
+    # the great sycamore (book ch 6: a lone sycamore on a knoll): a tall clean
+    # grey bole and a towering crown of a few great billows, big-leaved
     "great_sycamore": dict(
-        trunk=0.04, clear=0.28, lean=0.015, flare=1.8,
-        whorls=[(0.28, 4, 0.36, 26, 54, 2), (0.42, 4, 0.32, 38, 62, 1), (0.56, 3, 0.25, 50, 70, 1)],
-        leader=0.72, top=0.12, kink=12, cloud=0.115, flat=0.92, card=0.078, cover=2.1, rim=0.26,
-        budget=9000, sink=0.02,
+        trunk=0.036, clear=0.36, lean=0.012, flare=1.7,
+        whorls=[(0.36, 3, 0.26, 34, 62, 1), (0.52, 3, 0.2, 48, 70, 0)],
+        leader=0.74, top=0.1, top_cloud=1.25, kink=10, cloud=0.19, flat=1.05, card=0.11, cover=1.9, rim=0.3,
+        budget=8000, sink=0.02,
     ),
-    # the old thorn: a hawthorn bent by the wind, low and wide, white with may
+    # the great elm (book ch 10: "an elm with a coarse trunk"): a vase. The
+    # bole divides high into four limbs that climb and lean out, and the
+    # leaves lie in plates across the top, the limbs bare beneath them
+    "great_elm": dict(
+        trunk=0.04, clear=0.4, lean=0.015, flare=2.0, limb=0.7,
+        whorls=[(0.4, 4, 0.5, 74, 48, 2)],
+        leader=0.46, top=0.06, top_cloud=0.9, kink=14, cloud=0.12, flat=0.5, card=0.07, cover=2.0, rim=0.28,
+        along=0.7, budget=8000, sink=0.02,
+    ),
+    # the aspen spire: a column. A thin pale stem leaved almost to the ground,
+    # short limbs held close, each cloud taller than it is wide
+    "aspen_spire": dict(
+        trunk=0.018, clear=0.14, lean=0.01, flare=1.6, limb=0.45,
+        whorls=[(0.14, 3, 0.1, 62, 80, 0), (0.34, 3, 0.1, 64, 80, 0), (0.54, 3, 0.09, 66, 82, 0), (0.72, 3, 0.07, 68, 82, 0)],
+        leader=0.9, top=0.07, top_cloud=0.9, kink=6, cloud=0.062, flat=1.9, card=0.05, cover=1.8, rim=0.3,
+        wood=0.2, budget=7000, sink=0.02,
+    ),
+    # the old thorn: a hawthorn the wind has made. It leans hard, every limb
+    # is pulled round to the lee side, and the may lies in flat plates
     "old_thorn": dict(
-        trunk=0.055, clear=0.24, lean=0.13, flare=2.0,
-        whorls=[(0.24, 4, 0.56, 10, 34, 2), (0.38, 3, 0.42, 34, 54, 1)],
-        leader=0.5, top=0.14, kink=38, cloud=0.17, flat=0.62, card=0.13, cover=2.1, rim=0.26,
-        sink=0.03,
+        trunk=0.06, clear=0.3, lean=0.22, flare=2.0,
+        whorls=[(0.3, 4, 0.5, 14, 26, 2), (0.44, 3, 0.36, 30, 40, 1)],
+        leader=0.5, top=0.1, kink=40, cloud=0.15, flat=0.42, card=0.1, cover=2.1, rim=0.26,
+        sweep=0.8, sink=0.03,
     ),
-    # a thorn bush: the same may, stemmed from the ground, head high and a
-    # little over: the height between the grass and the crowns
+    # a thorn bush: no trunk, five stems from the ground leaning out, a mound
+    # of may head high: the height between the grass and the crowns
     "thorn_bush": dict(
-        trunk=0.05, clear=0.1, lean=0.06, flare=1.4,
-        whorls=[(0.1, 5, 0.6, 22, 50, 1), (0.32, 4, 0.44, 40, 62, 1)],
-        leader=0.46, top=0.2, kink=30, cloud=0.27, flat=0.72, card=0.2, cover=2.0, rim=0.26,
-        wood=0.13, budget=4200, sink=0.05,
+        trunk=0.035, clear=0.0, lean=0.0, whorls=[], stems=5, spread=0.55,
+        leader=0.8, kink=28, cloud=0.3, flat=0.75, card=0.2, cover=2.0, rim=0.26,
+        wood=0.2, budget=4200, sink=0.04,
     ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
@@ -195,6 +221,23 @@ def grow(sid, rng):
     lean = heading(lean_az, 0.0) * rc["lean"]
     top_z = rc["leader"]
     # the trunk: buried a little, flared at the root, a slow bend to the lean
+    if "stems" in rc:
+        # no trunk: stems from the ground, each leaning out its own way, a cloud at its
+        # head, one at its middle and one on a side shoot
+        root = sk.node((0, 0, -0.012), r * 1.5)
+        az0 = rng.uniform(0, math.tau)
+        seats = []
+        for si in range(rc["stems"]):
+            az = az0 + math.tau * si / rc["stems"] + rng.uniform(-0.3, 0.3)
+            ln = top_z * rng.uniform(0.75, 1.05)
+            rise = 90.0 - 55.0 * rc["spread"] * rng.uniform(0.7, 1.1)
+            stalk = sk.limb(root, az, rise + 8, rise - 14, ln, r, r * 0.45, rc["kink"], rng, 4)
+            seats.append((stalk[-1], rc["cloud"] * rng.uniform(0.9, 1.1)))
+            seats.append((stalk[1], rc["cloud"] * rng.uniform(0.75, 0.95)))
+            shoot = sk.limb(stalk[1], az + rng.choice((-1, 1)) * math.radians(rng.uniform(40, 70)), rise - 20, rise - 30, ln * 0.5,
+                            r * 0.6, r * 0.35, rc["kink"], rng, 2)
+            seats.append((shoot[-1], rc["cloud"] * rng.uniform(0.75, 0.95)))
+        return sk, [[sk.pos[i] + UP * cr * 0.3 * rc["flat"], cr] for i, cr in seats]
     stem = [sk.node((0, 0, -0.006), r * rc.get("flare", 1.9))]
     for z, k in ((0.035, 1.35), (0.11, 1.06), (rc["clear"] * 0.62, 0.98)):
         stem.append(sk.node(lean * (z / top_z) ** 1.5 + Vector((0, 0, z)), r * k, stem[-1]))
@@ -206,9 +249,15 @@ def grow(sid, rng):
         for i in range(n):
             az = az0 + math.tau * (i + 0.5 * wi) / n + rng.uniform(-0.22, 0.22)
             ln = reach * rng.uniform(0.88, 1.12)
+            if "sweep" in rc:
+                off = math.atan2(math.sin(az - lean_az), math.cos(az - lean_az))
+                az = lean_az + off * (1.0 - 0.7 * rc["sweep"])
+                ln *= 1.0 + 0.45 * rc["sweep"] * math.cos(off)
             lr = r * (rc.get("limb", 0.62) - 0.12 * wi)
             limb = sk.limb(hub, az, rise0 + rng.uniform(-6, 6), rise1 + rng.uniform(-6, 6), ln, lr, lr * 0.5, rc["kink"], rng)
             seats.append((limb[-1], rc["cloud"] * rng.uniform(0.95, 1.15)))
+            if "along" in rc:
+                seats.append((limb[1], rc["cloud"] * rc["along"] * rng.uniform(0.9, 1.05)))
             # each limb forks: side limbs off its middle, shorter, still rising
             for f in range(forks):
                 sgn = 1 if f % 2 == 0 else -1
@@ -224,6 +273,8 @@ def grow(sid, rng):
     for idx, cr in seats:
         out = Vector((sk.pos[idx].x, sk.pos[idx].y, 0.0))
         c = sk.pos[idx] + (out.normalized() * cr * 0.25 if out.length > 1e-5 else Vector()) + UP * cr * 0.35 * rc["flat"]
+        if "sweep" in rc:
+            c += heading(lean_az, 0.0) * cr * 0.6 * rc["sweep"]
         clouds.append([c, cr])
     return sk, clouds
 
