@@ -185,27 +185,30 @@ const ROW_STEP := 14.5
 const ROW_HALF := 6.4
 ## The Oak Glade: great oaks in the ring and oaks in the rank behind, the
 ## rings' radii (the clearing kept open is 55 m), and no trunk this near a path.
-const GLADE_OAKS := 13
-const GLADE_RING := 64.0
-const GLADE_BACK := 17
-const GLADE_BACK_RING := 81.0
-const GLADE_DOOR := 9.0
+const GLADE_OAKS := 14
+const GLADE_RING := 66.0
+const GLADE_BACK := 16
+const GLADE_BACK_RING := 88.0
+const GLADE_DOOR := 9.5
+## The ring's oaks are grown to this (a great oak is 22 m at size 1): a 30 m
+## oak's crown is 38 m across, so fourteen of them on the ring close overhead.
+const GLADE_SIZE := 1.36
 ## Looking Lake's far wood: trees, its half-arc (radians) round the shore from
 ## straight across, and how far back from the water it runs (m).
-const LAKE_WOOD := 78
+const LAKE_WOOD := 72
 const LAKE_ARC := 1.25
 const LAKE_DEPTH := 40.0
 ## Its reflection, as the water paints it: the wood's front rank's distance
 ## from the shore, the height of its crowns over the water, its colour.
 const MIRROR_BACK := 7.0
-const MIRROR_HEIGHT := 19.0
-const MIRROR_COLOUR := Color(0.07, 0.25, 0.2)
-const MIRROR_STRENGTH := 0.8
+const MIRROR_HEIGHT := 27.0
+const MIRROR_COLOUR := Color(0.09, 0.34, 0.23)
+const MIRROR_STRENGTH := 0.88
 ## The Heron Stones' reed bed: reeds, its inner and outer radii, the partings' half-width (radians).
-const REEDS := 520
+const REEDS := 1150
 const REED_INNER := 6.5
-const REED_OUTER := 21.0
-const REED_PARTING := 0.13
+const REED_OUTER := 18.0
+const REED_PARTING := 0.11
 
 static var _lock := Mutex.new()
 static var _way := PackedVector2Array()
@@ -810,24 +813,36 @@ static func _oak_glade(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator,
 	var centre := CourtHeight.site(&"oak_glade")
 	var trunks: Array = []
 	var reach: Array = []
+	# the doors: where the road crosses the ring, an oak close on either side of it, so you go in between two trunks
+	var road := path(&"river_road")
+	for i in range(1, road.size()):
+		var inside := road[i].distance_to(centre) < GLADE_RING
+		if inside == (road[i - 1].distance_to(centre) < GLADE_RING):
+			continue
+		var along_road := (road[i] - road[i - 1]).normalized()
+		for side: float in [-1.0, 1.0]:
+			var p := _spot(plan, road[i] + along_road.orthogonal() * side * (GLADE_DOOR + 1.5), 3.0, GLADE_DOOR, 3.0, 9.0)
+			if p != Vector2.INF and plan.tree(&"great_oak", trunks.size(), p, rng.randf() * TAU, GLADE_SIZE * rng.randf_range(0.96, 1.04)):
+				trunks.append(p)
+				reach.append(19.0)
 	for i in GLADE_OAKS:
-		var a := TAU * (float(i) + rng.randf_range(-0.16, 0.16)) / float(GLADE_OAKS)
-		var want := centre + Vector2.from_angle(a) * (GLADE_RING + rng.randf_range(-1.5, 3.0))
+		var a := TAU * (float(i) + rng.randf_range(-0.14, 0.14)) / float(GLADE_OAKS)
+		var want := centre + Vector2.from_angle(a) * (GLADE_RING + rng.randf_range(-1.0, 3.0))
 		if CourtLandHabitats.path_distance(want.x, want.y) < GLADE_DOOR:
-			continue   # the road goes in and out between two trunks
-		var p := _spot(plan, want, 4.0, GLADE_DOOR, 3.0, 9.0)
-		if p != Vector2.INF and plan.tree(&"great_oak", i, p, rng.randf() * TAU, rng.randf_range(0.98, 1.14)):
+			continue   # (the doors' oaks stand here)
+		var p := _spot(plan, want, 4.0, GLADE_DOOR, 3.0, 15.0)
+		if p != Vector2.INF and plan.tree(&"great_oak", trunks.size(), p, rng.randf() * TAU, GLADE_SIZE * rng.randf_range(0.92, 1.08)):
 			trunks.append(p)
-			reach.append(15.0)
+			reach.append(19.0)
 	for i in GLADE_BACK:
 		var a := TAU * (float(i) + 0.5 + rng.randf_range(-0.2, 0.2)) / float(GLADE_BACK)
 		var want := centre + Vector2.from_angle(a) * (GLADE_BACK_RING + rng.randf_range(-3.0, 5.0))
 		if CourtLandHabitats.path_distance(want.x, want.y) < GLADE_DOOR:
 			continue
-		var p := _spot(plan, want, 5.0, GLADE_DOOR, 3.0, 6.5)
-		if p != Vector2.INF and plan.tree(&"oak", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.2)):
+		var p := _spot(plan, want, 5.0, GLADE_DOOR, 3.0, 9.0)
+		if p != Vector2.INF and plan.tree(&"oak", rng.randi(), p, rng.randf() * TAU, rng.randf_range(1.25, 1.5)):
 			trunks.append(p)
-			reach.append(9.0)
+			reach.append(11.0)
 	if not trunks.is_empty():
 		groups.append({"trunks": trunks, "reach": reach, "flower": &"anemone", "composed": true})
 	# foxgloves in the light at the clearing's rim, in stands
@@ -881,21 +896,22 @@ static func _looking_lake(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerat
 		var p := centre + Vector2.from_angle(a) * (radius + back)
 		if back > LAKE_DEPTH or CourtLandHabitats.keep_open(p.x, p.y) or CourtGlenPlanting.steep(p):
 			continue
-		var great := back > 11.0 and rng.randf() < 0.3
+		# oaks at the water, their boughs over it; great elms and great oaks standing over them from just behind
+		var great := back > 7.0 and rng.randf() < 0.72
 		var ok := true
 		for q: Vector2 in wood:
-			if q.distance_to(p) < (7.0 if great else 4.6):
+			if q.distance_to(p) < (7.5 if great else 5.0):
 				ok = false
 				break
 		if not ok:
 			continue
-		var species: StringName = (&"great_elm" if rng.randf() < 0.62 else &"great_oak") if great else &"oak"
-		if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.9, 1.2) if not great else rng.randf_range(0.9, 1.05)):
+		var species: StringName = (&"great_elm" if rng.randf() < 0.68 else &"great_oak") if great else &"oak"
+		if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(1.1, 1.4) if not great else rng.randf_range(1.05, 1.32)):
 			wood.append(p)
 	if not wood.is_empty():
 		var each: Array = []
 		each.resize(wood.size())
-		each.fill(8.5)
+		each.fill(9.5)
 		groups.append({"trunks": wood, "reach": each, "flower": &"bluebell", "composed": true})
 	# reeds in two bays only, either side of the open near shore
 	var kinds: Array[StringName] = [&"reed_clump", &"cattail", &"iris_clump"]
