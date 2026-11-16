@@ -639,15 +639,15 @@ static func _lake(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictiona
 	var far_side := come + PI
 	var wood: Array = []
 	var tries := 0
-	while wood.size() < 52 and tries < 900:
+	while wood.size() < LAKE_WOOD and tries < 1600:
 		tries += 1
 		var a := far_side + rng.randfn(0.0, 0.62)
 		if absf(angle_difference(a, far_side)) > 1.45:
 			continue
 		# thick at the water, thinning back from it
-		var back := 3.0 + absf(rng.randfn(0.0, 13.0))
+		var back := 3.0 + absf(rng.randfn(0.0, 15.0))
 		var p := centre + Vector2.from_angle(a) * (radius + back)
-		if back > 36.0 or CourtLandHabitats.keep_open(p.x, p.y) or steep(p):
+		if back > 44.0 or CourtLandHabitats.keep_open(p.x, p.y) or steep(p):
 			continue
 		var ok := true
 		for q: Vector2 in wood:
@@ -656,6 +656,9 @@ static func _lake(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictiona
 		if not ok:
 			continue
 		var species: StringName = &"willow" if back < 7.0 and rng.randf() < 0.6 else (&"oak" if rng.randf() < 0.4 else &"birch")
+		# and a great tree here and there, back from the water, to stand over the rest in the reflection
+		if back > 12.0 and rng.randf() < 0.1:
+			species = &"great_elm" if rng.randf() < 0.5 else &"great_oak"
 		if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.85, 1.15)):
 			wood.append(p)
 	groups.append(_group(wood, 8.5, &"bluebell"))
@@ -691,8 +694,9 @@ static func _lake(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictiona
 			rng.randf_range(0.95, 1.4), 320.0)
 
 
-## Where the lake walk reaches Looking Lake.
+## Where the lake walk reaches Looking Lake, and how many trees its far wood holds.
 const LAKE_WALK_END := Vector2(-1150.0, -200.0)
+const LAKE_WOOD := 90
 
 
 ## Willow Mere: willows all round, open toward the Weeping Lady and on the
