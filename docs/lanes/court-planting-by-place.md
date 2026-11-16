@@ -655,3 +655,41 @@ Frame time on the Mac, look quality, 1920x1080, standing on the east bank:
 bare land 17.6 ms; today's planting 24.1 ms; the study 28.9 ms (26.6 ms among
 the birches; 25.3 ms from the mound). So it costs about 4 ms more than what
 stands there today, nearly all of it the sward.
+
+## The rest of the Starlight Glen, by rule (study, 2026-11-16)
+
+After the owner passed the pool's hollow ("it looks perfect"), the same
+approach across the glen: `tools/court/study_glen.gd`, `study=glen` in the shot
+tool. Still a picture; the pool's hollow keeps its own study inside 118 m.
+
+Every plant answers to something on the land, found from the land itself:
+
+| Rule | What it reads | What it plants |
+|---|---|---|
+| Knolls | high points 4 m over the ground 36 m round (50 found) | one tree on each, neighbours never alike; its flower pooled in its shade and in a crescent at the knoll's north foot |
+| Brooks | `CourtHeight.brooks()` | a clump of willow or birch every 34-62 m on alternate banks; iris, mint, fern, stones at the water; snowdrops beside it in stretches |
+| The river | the Thornwater's line | clumps of willow and birch every 42-76 m, on the first open ground back from the water |
+| Looking Lake | the lake, its level, the lake walk's end | a wood of 52 on the far side; willows wherever the bank comes down to the water; reeds in the shallows |
+| Willow Mere | the mere, the Weeping Lady | willows all round, open to the Lady and to the side you come from; reeds in the shallows |
+| The brae | `brae_top` and its line of sight | a clump either side of the line, 36-48 m over the crest |
+| Paths | `CourtHeight.paths()` | a drift of crocuses on one verge every 70-120 m |
+| Open glade | the standpoint | sward round the eye; long grass in the dips; daisies on slopes that face the sun |
+
+No trunk stands where `CourtLandHabitats.keep_open` says none may, or within
+9 m of a path.
+
+What it found:
+
+- **Looking Lake lies in a pit.** Its water is 23-26 m below its west bank and
+  about 5 m below where the lake walk reaches it, so "wooded to the water, for
+  the reflection" cannot be planted: the far wood crowns a cliff. Willow Mere's
+  banks are 2-5 m sheer as well. This is the land's, not the planting's.
+- **The isle has its tree already** (a landmark), so the study adds none.
+- **The knolls need great trees.** The estate's garden trees are grown to 1.5-
+  1.95 times their size to hold a knoll 30 m across: stand-ins for the great
+  oak, sycamore and thorn on the missing list.
+- **The open glade is still the thinnest part**: sward, a tree per knoll and
+  its flowers. It wants the missing shrub and meadow drifts.
+- Frame time at `brae_top`, Mac, look quality: today's planting 21.9 ms, the
+  study 26.9 ms. It draws 1337 batches against 485: every tree is its own
+  object and has no far form, which the game's version must fix.
