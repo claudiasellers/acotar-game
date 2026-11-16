@@ -103,7 +103,7 @@ const KNOLLS := [
 const KNOLL_SNAP := 14.0
 ## A knoll this near the way spills its bluebells down to it; patches tried per metre of the spill.
 const SPILL_REACH := 70.0
-const SPILL_TRIES := 9.0
+const SPILL_TRIES := 16.0
 const CHERRY_PETALS := 190
 
 ## The Mound's daisy ring: its radius and how many daisies.
@@ -496,7 +496,7 @@ static func _knoll_walk(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 			var far: float = a[1]
 			for i in int(far * SPILL_TRIES):
 				var out := rng.randf_range(7.0, far - 2.6)
-				var wide := lerpf(3.2, 5.0, out / far)
+				var wide := lerpf(3.6, 6.0, out / far)
 				var off := rng.randfn(0.0, wide)
 				var p := top + toward * out + toward.orthogonal() * (off + 5.0 * sin(out * 0.11 + top.x))
 				if absf(off) > wide * 1.9 or not CourtGlenPlanting.growable(p, 1.2) or p.distance_to(CourtGlenPlanting.POOL) < CourtGlenPlanting.FLOOR + 30.0:

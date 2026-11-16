@@ -105,6 +105,10 @@ const STUDY_VIEWS := {
 	"walk_09_knolls": [-1025.7, 135.7, 1.7, -1105.9, 208.0, 4.0, 0.45, &"spring", 70.0],
 	"walk_10_cherry": [-1065.8, 174.8, 1.7, -1126.0, 145.0, 5.0, 0.45, &"spring", 70.0],
 	"walk_11_oak": [-1108.9, 210.5, 1.7, -1179.3, 259.8, 5.0, 0.45, &"spring", 70.0],
+	"walk_02_gate_dusk": [-730.0, -22.7, 1.7, -786.2, 9.8, 1.5, 0.8, &"spring", 70.0],
+	"walk_05_crossing_dusk": [-889.7, 43.7, 1.7, -916.0, 53.5, 5.0, 0.8, &"spring", 70.0],
+	"walk_07_ford_dusk": [-960.7, 70.7, 1.7, -1027.0, 192.0, 3.0, 0.8, &"spring", 70.0],
+	"walk_09_knolls_dusk": [-1025.7, 135.7, 1.7, -1105.9, 208.0, 4.0, 0.8, &"spring", 70.0],
 	# on the floor, looking up into a group of slope birches
 	"under_birches": [-1277.0, 282.0, 1.7, -1264.0, 294.0, 4.5, 0.45, &"spring", 65.0],
 	# from across the water, looking back at the way in and the mound
