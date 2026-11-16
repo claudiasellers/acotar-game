@@ -693,3 +693,25 @@ What it found:
 - Frame time at `brae_top`, Mac, look quality: today's planting 21.9 ms, the
   study 26.9 ms. It draws 1337 batches against 485: every tree is its own
   object and has no far form, which the game's version must fix.
+
+## Owner's decisions, 2026-11-16 (after the glen's first pass)
+
+1. Looking Lake's banks: "whatever lets you accomplish the best outcome". The
+   land there may change so the far wood comes down to the water.
+2. "If you need to make the assets before submitting do that." The missing
+   pieces are made first; then the glen goes into the game and is submitted.
+
+The order of work from here:
+
+1. **Assets the glen lacks:** the great knoll trees (oak, sycamore, thorn) in
+   `tools/blender/estate_tree.py` as court species (`CourtGreatTrees`); a
+   blossoming thorn bush for the height between grass and crowns; meadow
+   flowers for the open glade (`tools/grove`); the Weeping Lady as a real
+   giant willow (asked about by the owner; offered, not yet confirmed).
+2. **Looking Lake:** ease its west and north banks in `court_height.gd` so the
+   water is reached on the wooded side.
+3. **Into the game:** the study's rules become the glen's planting (baked by a
+   generator recipe, not built at load: the study takes ~15 s to stand up),
+   with far forms for the trees, the sward laid by the cell round the player,
+   and the old glen recipes for trees and small plants retired. Then tests,
+   `docs/tuning.md` rows, precheck and `lead/ready-M4WCT-15-1`.
