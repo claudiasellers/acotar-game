@@ -8,6 +8,7 @@ const FLORA_DIR := "res://world/spring_court/wider/assets/flora/"
 const PROPS_DIR := "res://world/spring_court/wider/assets/props/"
 const MATERIAL_DIR := "res://world/spring_court/wider/fx/materials/"
 const WOODS_PREFIX := "woods_"
+const GREAT_PREFIX := "great_"
 ## The court's trees are CourtTreeSet's mixed wood (finish plan T6); the
 ## leaf-card trees are gone (M4WCT-7: they read tropical). A tree id outside
 ## the set (the willow, the leaning trunk) stays FloraLibrary's.
@@ -37,7 +38,17 @@ static func scene_path(id: StringName) -> String:
 
 
 static func has_model(id: StringName) -> bool:
-	return scene_path(id) != "" or woods_species(id) != &"" or CourtTreeSet.has(id)
+	return scene_path(id) != "" or woods_species(id) != &"" or CourtTreeSet.has(id) or great_species(id) != &""
+
+
+## "great_<species>" ids are the court's own great trees (CourtGreatTrees),
+## built at their true height with their own materials.
+static func great_species(id: StringName) -> StringName:
+	var s := String(id)
+	if not s.begins_with(GREAT_PREFIX):
+		return &""
+	var species := StringName(s.substr(GREAT_PREFIX.length()))
+	return species if CourtGreatTrees.has(species) else &""
 
 
 ## "woods_<species>" ids are the woods lane's Blender tree archetypes, used

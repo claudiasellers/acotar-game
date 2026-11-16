@@ -316,6 +316,9 @@ func _build_landmarks() -> void:
 				_scale_to_height(piece, lm.height_m)
 			piece.position = Vector3(offset.x, ground - y, offset.y)
 			piece.rotation.y = atan2(-offset.x, -offset.y) if n > 4 and offset != Vector2.ZERO else 0.0
+			var great := CourtAssets.great_species(StringName(lm.asset_ids[i]))
+			if great != &"":
+				piece.rotation.y = CourtGreatTrees.facing(great, world) - node.rotation.y
 			node.add_child(piece)
 
 
@@ -464,7 +467,19 @@ func _model(id: StringName) -> Node3D:
 	var packed := CourtAssets.scene(id)
 	var root: Node3D
 	var species := CourtAssets.woods_species(id)
-	if species != &"":
+	var great := CourtAssets.great_species(id)
+	if great != &"":
+		# one of the court's great trees: its own mesh at its true height, and its bole to walk into
+		root = Node3D.new()
+		var tree := MeshInstance3D.new()
+		tree.name = "near"
+		tree.mesh = CourtGreatTrees.mesh(great)
+		root.add_child(tree)
+		var bole := CylinderShape3D.new()
+		bole.radius = float(CourtGreatTrees.TREES[great]["trunk"])
+		bole.height = 6.0
+		_add_collision(root, bole, Transform3D(Basis(), Vector3(0, 3.0, 0)))
+	elif species != &"":
 		root = Node3D.new()
 		var tree := MeshInstance3D.new()
 		tree.name = "near"

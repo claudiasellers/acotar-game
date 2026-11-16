@@ -12,6 +12,9 @@ extends RefCounted
 
 const DIR := "res://world/spring_court/wider/assets/trees/great/"
 const LETTERS := "abcdefgh"
+## The long fronds' shader (the picture repeats down a strand), and how brightly blossom chains glow.
+const FROND_SHADER := "res://world/spring_court/wider/court_frond.gdshader"
+const BLOOM_GLOW := 2.2
 ## species -> height (m, the builder's COURT table), leaf bands [shadow, mid,
 ## light], the leaf-clump picture, the bark picture with its tint and painted
 ## mean, and the trunk's radius at chest height (m) for colliders.
@@ -55,6 +58,14 @@ const TREES := {
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
 		"bark_col": Color(0.50, 0.40, 0.42), "bark_mean": 0.338, "trunk": 0.41},
+	# The Weeping Lady, Willow Mere's landmark: silver where every other tree is green, on a dark bole, three
+	# times a willow's height; among her fronds hang chains of blossom, each ending in a drop of light
+	# (the "bloom" surface: the woods' foliage shader, its own colours, and it glows).
+	&"weeping_lady": {"height": 36.0,
+		"bands": [Color(0.52, 0.60, 0.80), Color(0.80, 0.87, 0.98), Color(1.0, 1.0, 1.0)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/frond_willow.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.27, 0.22, 0.36), "bark_mean": 0.338, "trunk": 1.8, "faces": &"willow_mere"},
 	&"thorn_bush": {"height": 3.2, "blossom": true,
 		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
@@ -83,6 +94,16 @@ static func builds(species: StringName) -> int:
 
 static func path(species: StringName, build: int) -> String:
 	return "%stree_%s_%s.glb" % [DIR, species, LETTERS[build]]
+
+
+## The turn (rotation.y) that sets a leaning tree's lean (its +X) toward the
+## site it bows to, from where it stands; 0 for a tree that faces nowhere.
+static func facing(species: StringName, from: Vector2) -> float:
+	var t: Dictionary = TREES.get(species, {})
+	if not t.has("faces"):
+		return 0.0
+	var to := CourtHeight.site(t["faces"]) - from
+	return atan2(-to.y, to.x)
 
 
 static func height_of(species: StringName) -> float:
@@ -118,15 +139,23 @@ static func material(species: StringName, part: StringName) -> ShaderMaterial:
 	var key := "%s/%s" % [species, part]
 	if _materials.has(key):
 		return _materials[key]
+	if part == &"bloom":
+		# blossom chains: the woods' foliage in its own colours, lit a little from within
+		var b := FloraLibrary.material(&"bloom").duplicate() as ShaderMaterial
+		b.set_shader_parameter(&"sparkle", 0.0)
+		b.set_shader_parameter(&"rim_strength", 0.1)
+		b.set_shader_parameter(&"glow_energy", BLOOM_GLOW)
+		_materials[key] = b
+		return b
 	var t: Dictionary = TREES[species]
 	var number: int = EstateTrees.PARTS.get(part, 2)
 	var m := ShaderMaterial.new()
-	m.shader = load(EstateTrees.SHADER if number == 1 else EstateTrees.SHADER_SOLID) as Shader
+	m.shader = load(FROND_SHADER if part == &"fronds" else (EstateTrees.SHADER if number == 1 else EstateTrees.SHADER_SOLID)) as Shader
 	m.set_shader_parameter(&"part", number)
 	m.set_shader_parameter(&"tex", load(String(t["bark"]) if part == &"bark" else String(t["puff"])))
 	# a blossom tree's clumps are painted in their own colours (as the estate's are)
 	m.set_shader_parameter(&"own_colour", bool(t.get("blossom", false)) and part == &"leaves")
-	m.set_shader_parameter(&"hanging", false)
+	m.set_shader_parameter(&"hanging", part == &"fronds")
 	m.set_shader_parameter(&"bark_col", t["bark_col"])
 	m.set_shader_parameter(&"bark_mean", t["bark_mean"])
 	var bands: Array = t["bands"]

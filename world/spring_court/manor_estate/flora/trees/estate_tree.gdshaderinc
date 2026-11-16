@@ -54,8 +54,14 @@ void vertex() {
 	v_objn = NORMAL;
 	v_world_up = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz).y;
 	if (part != 0) {
+#ifdef FROND_TILED
+		// a long frond's picture repeats down it (UV.y is the picture's), so how far down
+		// the frond a point hangs rides in the colour's green: seat 0, tip 1
+		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, hanging ? COLOR.g * 0.9 : smoothstep(0.25, 1.0, v_height));
+#else
 		// UV.y runs from a frond's seat (0) to its tip (1)
 		VERTEX = foliage_wind(VERTEX, MODEL_MATRIX, hanging ? UV.y * 0.9 : smoothstep(0.25, 1.0, v_height));
+#endif
 	}
 }
 

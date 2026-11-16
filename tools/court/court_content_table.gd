@@ -118,7 +118,7 @@ static func regions() -> Dictionary:
 				["glimmerfall", "The Rainbow Falls of the Glen", -1300.0, 212.0, 22.0, "waterfall", "escarpment_rock_a,pool_glow_crystal", "C", "Canon rainbow waterfall (Keeper): a cascade of coloured water off a crystal-veined crag into the Starlight Pool; its rainbow mist is visible from the lake.", "0:40"],
 				["looking_lake_isle", "The Isle of the Looking Lake", -1235.0, -175.0, 24.0, "landmark", "woods_lilac_tree,rock_mossy_b", "X", "One great lilac tree on an islet; its reflection gives the lake its name."],
 				["heron_stones", "The Heron Stones", -1105.0, -40.0, 9.0, "landmark", "rock_mossy_c,rock_mossy_d,rock_mossy_c", "X", "Three tall mossy stones on the eastern shore; herons stand on them at dawn."],
-				["weeping_lady", "The Weeping Lady", -1100.0, 345.0, 16.0, "landmark", "woods_willow", "X", "Giant willow trailing into Willow Mere."],
+				["weeping_lady", "The Weeping Lady", -1100.0, 345.0, 36.0, "landmark", "great_weeping_lady", "X", "A giant silver willow bowed over Willow Mere, her strands in the water, hung with chains of blossom that end in drops of light."],
 			],
 		},
 		&"western_fells": {

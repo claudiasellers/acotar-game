@@ -325,6 +325,8 @@ const LINEUPS := {
 	# the knolls' great trees and the thorn, beside a pillar birch for size
 	"great_trees": {"distance": 78.0, "spacing": 24.0, "look": 11.0, "ids": ["great:great_oak:0", "great:great_sycamore:0",
 		"great:great_elm:0", "great:aspen_spire:0", "great:old_thorn:0", "great:thorn_bush:0", "great:pillar_birch:0"]},
+	# the Weeping Lady beside a great oak, for size
+	"lady": {"distance": 86.0, "spacing": 38.0, "look": 16.0, "ids": ["great:weeping_lady:0", "great:great_oak:0"]},
 	"pillar_birch": {"distance": 34.0, "spacing": 7.0, "look": 8.0, "ids": ["great:pillar_birch:0", "great:pillar_birch:1",
 		"great:pillar_birch:2", "post", "estate:birch:0"]},
 	"estate_willow": {"distance": 38.0, "spacing": 14.5, "look": 4.5, "ids": ["estate:willow:0", "estate:willow:1", "estate:willow:2",

@@ -616,11 +616,11 @@ script = ExtResource("4_kqskx")
 id = &"weeping_lady"
 display_name = "The Weeping Lady"
 position = Vector2(-1125, 456)
-asset_ids = PackedStringArray("woods_willow")
+asset_ids = PackedStringArray("great_weeping_lady")
 offsets = PackedVector2Array()
-height_m = 16.0
-visible_from_m = 400.0
-notes = "Giant willow trailing into Willow Mere."
+height_m = 36.0
+visible_from_m = 900.0
+notes = "A giant silver willow bowed over Willow Mere, her strands in the water, hung with chains of blossom that end in drops of light."
 
 [resource]
 script = ExtResource("5_t25h7")

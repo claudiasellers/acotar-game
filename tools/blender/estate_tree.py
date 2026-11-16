@@ -42,7 +42,7 @@ OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/trees")
 # family, but they are the court's and live with its trees. species -> height (m).
 COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
 COURT = {"pillar_birch": 18.0, "great_oak": 22.0, "great_sycamore": 28.0, "great_elm": 25.0, "aspen_spire": 27.0, "old_thorn": 7.0,
-         "thorn_bush": 3.2}
+         "thorn_bush": 3.2, "weeping_lady": 36.0}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
 BUDGET = 6000
 UP = Vector((0, 0, 1))
@@ -169,6 +169,24 @@ RECIPES = {
         leader=0.8, kink=28, cloud=0.3, flat=0.75, card=0.2, cover=2.0, rim=0.26,
         wood=0.2, budget=4200, sink=0.04,
     ),
+    # The Weeping Lady (Willow Mere's landmark; owner, 2026-11-16: "markedly
+    # distinct from the other trees in color size etc. so that it stands out
+    # from everything else. maybe add a few flowering strands too"). Not the
+    # estate's willow grown large: three times its height, bowed out over the
+    # water on a great dark leaning bole with roots running into the mere,
+    # silver where every other tree is green, her strands falling the whole
+    # way down and into the water, and among them chains of blossom that end
+    # each in a drop of light. She leans along +X: the world turns her to the mere.
+    "weeping_lady": dict(
+        trunk=0.05, clear=0.2, lean=0.17, lean_az=0.0, flare=2.2, limb=0.56, roots=5,
+        whorls=[(0.2, 5, 0.5, 44, -16, 1), (0.33, 4, 0.42, 58, -12, 1), (0.46, 4, 0.3, 72, -6, 1)],
+        leader=0.56, top=0.08, kink=20, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
+        sweep=0.35, weep=(20, 0.05, 0.1, 0.02), trail=0.85, frond_tile=0.3, dip=0.13,
+        # chains per limb, shortest and longest, a floret's size; top, middle, tip, and the tear
+        tears=(4, 0.1, 0.3, 0.0085),
+        tear_colours=((0.99, 0.90, 0.95), (0.95, 0.50, 0.74), (0.70, 0.22, 0.62), (1.0, 0.92, 0.66)),
+        wood=0.3, budget=42000, sink=0.012,
+    ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
         whorls=[(0.3, 4, 0.36, 50, -18, 1), (0.4, 4, 0.32, 62, -12, 1), (0.49, 3, 0.25, 74, -4, 1)],
@@ -218,6 +236,7 @@ def grow(sid, rng):
     sk = Skeleton()
     r = rc["trunk"]
     lean_az = rng.uniform(0, math.tau)
+    lean_az = rc.get("lean_az", lean_az)   # a landmark leans a way the world can turn to face
     lean = heading(lean_az, 0.0) * rc["lean"]
     top_z = rc["leader"]
     # the trunk: buried a little, flared at the root, a slow bend to the lean
@@ -241,6 +260,11 @@ def grow(sid, rng):
     stem = [sk.node((0, 0, -0.006), r * rc.get("flare", 1.9))]
     for z, k in ((0.035, 1.35), (0.11, 1.06), (rc["clear"] * 0.62, 0.98)):
         stem.append(sk.node(lean * (z / top_z) ** 1.5 + Vector((0, 0, z)), r * k, stem[-1]))
+    for k in range(rc.get("roots", 0)):
+        # great roots running out from the foot and down into the ground (or the water)
+        sk.limb(stem[1], lean_az + math.tau * (k + 0.5) / rc["roots"] + rng.uniform(-0.3, 0.3), -6, -30, rng.uniform(0.09, 0.15),
+                r * 0.62, r * 0.2, 16, rng, 3)
+    root_limbs = len(sk.limbs)
     az0 = rng.uniform(0, math.tau)
     seats = []
     for wi, (wh, n, reach, rise0, rise1, forks) in enumerate(rc["whorls"]):
@@ -276,6 +300,8 @@ def grow(sid, rng):
         if "sweep" in rc:
             c += heading(lean_az, 0.0) * cr * 0.6 * rc["sweep"]
         clouds.append([c, cr])
+    if root_limbs:
+        sk.limbs = sk.limbs[root_limbs:]   # nothing hangs from a root
     return sk, clouds
 
 
@@ -383,6 +409,8 @@ def curtain(sid, sk, rng, trail=0.0):
     trail: the share of strands that fall all the way to the ground (0 the
     curtain stops short, 0.3 some trail, 1 every strand is that long)."""
     n, width, reach, foot = RECIPES[sid]["weep"]
+    tile = RECIPES[sid].get("frond_tile")
+    dip, dip_az = RECIPES[sid].get("dip", 0.0), RECIPES[sid].get("lean_az", 0.0)
     fronds = bmesh.new()
     uv = fronds.loops.layers.uv.new("UVMap")
     col = fronds.loops.layers.float_color.new("Col")
@@ -412,10 +440,17 @@ def curtain(sid, sk, rng, trail=0.0):
             low = foot * rng.uniform(0.7, 3.0) + (0.0 if t > 0.7 else at.z * rng.uniform(0.2, 0.5))
             if trail > 0.0 and rng.random() < trail:
                 low = rng.uniform(0.0, 0.012)    # to the grass
+                if dip and at.x * math.cos(dip_az) + at.y * math.sin(dip_az) > 0.1:
+                    low = -dip * rng.uniform(0.75, 1.0)    # past the bank, into the water she leans over
             low = min(low, at.z - r)
             # leave the limb, rise a little, roll over the shoulder, fall
             spine = [at, at + d * r * 0.4 + UP * r * 0.3, at + d * r * 0.9 + UP * r * 0.22, at + d * r * 1.3 - UP * r * 0.35]
             spine.append(Vector((spine[-1].x + d.x * r * 0.1, spine[-1].y + d.y * r * 0.1, low)))
+            if tile:
+                # a long fall is cut into lengths, so the wind can move along it
+                a0, a1 = spine[-2], spine[-1]
+                cuts = max(1, int((a0.z - a1.z) / 0.06))
+                spine = spine[:-1] + [a0.lerp(a1, (c + 1) / cuts) for c in range(cuts)]
             lens = [0.0]
             for q0, q1 in zip(spine, spine[1:]):
                 lens.append(lens[-1] + (q1 - q0).length)
@@ -425,14 +460,16 @@ def curtain(sid, sk, rng, trail=0.0):
             rows = []
             for q, ln in zip(spine, lens):
                 v = 1.0 - ln / lens[-1]
-                rows.append((fronds.verts.new(q - side * w), fronds.verts.new(q + side * w), v))
+                # tiled: the picture repeats down the strand at its own size, and how far
+                # down the strand a point hangs rides in the colour's green
+                rows.append((fronds.verts.new(q - side * w), fronds.verts.new(q + side * w), 1.0 - ln / tile if tile else v, 1.0 - v))
                 # shade: the shoulder faces the sky, the fall faces out
                 normals.extend([(d * (0.35 + 0.5 * (1.0 - v)) + UP * (0.25 + 0.7 * v)).normalized()] * 2)
-            for (l0, r0, v0), (l1, r1, v1) in zip(rows, rows[1:]):
+            for (l0, r0, v0, h0), (l1, r1, v1, h1) in zip(rows, rows[1:]):
                 face = fronds.faces.new((l0, r0, r1, l1))
-                for loop, st in zip(face.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))):
+                for loop, st, hg in zip(face.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1)), (h0, h0, h1, h1)):
                     loop[uv].uv = st
-                    loop[col] = (tone, tone, tone, 1.0)
+                    loop[col] = (tone, hg, tone, 1.0) if tile else (tone, tone, tone, 1.0)
 
     for seat in seats:
         hang(*seat)
@@ -454,6 +491,58 @@ def curtain(sid, sk, rng, trail=0.0):
             flip = -flip
             hang(q, across if across.length > 1e-4 else Vector((0, 0, 1)), 0.5)
     return fronds, normals
+
+
+def tears(sid, sk, rng):
+    """The Weeping Lady's flowering strands: chains of blossom hanging among
+    the fronds, each floret two crossed petals, full at the top and thinning
+    to the tip, where one drop of light hangs (her tears). Made for the woods'
+    foliage shader, not the estate's: the colour is the vertex's own, UV.x is
+    how far down the chain a floret hangs (the wind's hold on it) and UV.y how
+    much it glows."""
+    per_limb, lo, hi, size = RECIPES[sid]["tears"]
+    top_c, mid_c, tip_c, drop_c = RECIPES[sid]["tear_colours"]
+    bm = bmesh.new()
+    uv = bm.loops.layers.uv.new("UVMap")
+    col = bm.loops.layers.float_color.new("Col")
+
+    def petal(at, yaw, s, c, flex, glow):
+        # two crossed diamonds: a point above, a longer point below
+        for turn in (0.0, math.pi * 0.5):
+            side = Vector((math.cos(yaw + turn), math.sin(yaw + turn), 0.0)) * s * 0.42
+            quad = [bm.verts.new(q) for q in (at + UP * s * 0.5, at + side, at - UP * s * 0.7, at - side)]
+            face = bm.faces.new(quad)
+            for loop in face.loops:
+                # (glTF turns V over: 1 - glow here is glow in the game)
+                loop[uv].uv = (flex, 1.0 - glow)
+                loop[col] = (c[0], c[1], c[2], 1.0)
+
+    def mix3(t):
+        a, b, f = (top_c, mid_c, t * 2.0) if t < 0.5 else (mid_c, tip_c, t * 2.0 - 1.0)
+        return tuple(a[i] + (b[i] - a[i]) * f for i in range(3))
+
+    for limb in sk.limbs:
+        pts = [sk.pos[i] for i in limb]
+        for k in range(per_limb + 1):
+            t = 1.0 if k == per_limb else 0.25 + 0.75 * (k + rng.random()) / per_limb
+            f = t * (len(pts) - 1)
+            i = min(int(f), len(pts) - 2)
+            a = rng.uniform(0, math.tau)
+            start = pts[i].lerp(pts[i + 1], f - i) + Vector((math.cos(a), math.sin(a), 0.0)) * rng.uniform(0.01, 0.05) - UP * 0.01
+            length = min(rng.uniform(lo, hi), start.z - 0.02)
+            if length < size * 4:
+                continue
+            drift = Vector((math.cos(a), math.sin(a), 0.0)) * rng.uniform(0.0, 0.02)
+            count = max(4, int(length / (size * 1.25)))
+            for j in range(count):
+                u = j / (count - 1)
+                s = size * (1.05 - 0.55 * u) * rng.uniform(0.85, 1.15)
+                off = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.0)) * s * 0.45
+                c = mix3(min(1.0, max(0.0, u + rng.uniform(-0.12, 0.12))))
+                petal(start - UP * length * u + drift * u + off, rng.uniform(0, math.tau), s, c, min(1.0, length * u / 0.3), 0.1 + 0.2 * u)
+            # the tear
+            petal(start - UP * (length + size * 1.4) + drift, rng.uniform(0, math.tau), size * 1.7, drop_c, min(1.0, length / 0.3), 1.0)
+    return bm
 
 
 def pears(sid, clouds, rng):
@@ -481,8 +570,9 @@ def build(sid, letter, seed, **opts):
     bark = wood(sk, name, rc.get("wood", 0.33))
     weep = "weep" in rc
     leaves, normals, core = foliage(sid, clouds, rng) if not weep else (None, [], None)
-    fronds, frond_normals = curtain(sid, sk, rng, opts.get("trail", 0.0)) if weep else (None, [])
+    fronds, frond_normals = curtain(sid, sk, rng, opts.get("trail", rc.get("trail", 0.0))) if weep else (None, [])
     fruit = pears(sid, clouds, rng) if "fruit" in rc else None
+    bloom = tears(sid, sk, rng) if "tears" in rc else None
     # to the species height, standing on the ground (the root stays buried)
     crown = [fronds] if weep else [leaves, core.bm]
     top = max(v.co.z for b in crown for v in b.verts)
@@ -491,9 +581,10 @@ def build(sid, letter, seed, **opts):
         # a deep foot: the whole tree set down into the ground, for standing on a slope
         m = Matrix.Translation((0.0, 0.0, -rc["sink"] * h)) @ m
     meshes = [("bark", bark, None)] + ([("fronds", fronds, frond_normals)] if weep else [("leaves", leaves, normals)])
-    for b in [b for _, b, _ in meshes] + ([core.bm] if core else []) + ([fruit.bm] if fruit else []):
+    for b in [b for _, b, _ in meshes] + ([core.bm] if core else []) + ([fruit.bm] if fruit else []) + ([bloom] if bloom else []):
         bmesh.ops.transform(b, matrix=m, verts=b.verts)
     parts = meshes + ([("core", core.bm, None)] if core else []) + ([("fruit", fruit.bm, None)] if fruit else [])
+    parts += [("bloom", bloom, None)] if bloom else []
     ob, tris = assemble(name, parts)
     total = sum(tris.values())
     print(f"  {name:24s} {total:5d} tris ({', '.join(f'{k} {v}' for k, v in tris.items())}; {len(clouds)} seats)")
