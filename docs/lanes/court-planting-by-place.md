@@ -940,5 +940,32 @@ Numbers (my own probe, not the gate): 485 trees, 5.3 a hectare; 59 of 67 knoll
 tops crowned; 54% of bluebell patches within 15.5 m of a trunk; no trunk on
 kept-open ground; 1344 batches of the 1500 allowed.
 
-Still to do, in order: the south loop (6, 7 with F to H), the north loop (8 to
-11 with I to K), the rims (12 with L).
+Still to do then: the south loop, the north loop, the rims.
+
+### State: the south loop is composed (2026-11-16, night)
+
+M4WCT-19-1 (the main walk) is in `origin/main`. Places 6 and 7 and
+transitions F to H are in `CourtGlenPlaces` too: the Glimmer Brook's groups
+and white ribbon on its outer bank, its string of lights (`CourtMotes` draws
+them, warm and haloed, from the golden hour), Willow Mere's curtain two deep
+with its one parting, and the mere run left open to a pair of willows at the
+river. The shot tool has `glimmer_01` to `glimmer_04`, `mere_parting`,
+`mere_outside`, `mere_run_01` and three evening views.
+
+What changed against the plan:
+
+- The lights are real lights. Faelights and glowcaps alone were white dots
+  among white snowdrops at dusk; the string had to be warm and in the air.
+- A rule crescent of bluebells from a knoll south of the brook lies across
+  the bank you walk near the bend. It stays: it is the rule's, and the blue
+  is the pool's handing over.
+- The estate's cherry came out of the knoll rule's kinds, so the Blossom
+  Knoll's is the only pink tree in the glen.
+
+Numbers (my probe): 481 trees, 5.2 a hectare; 59 of 67 knoll tops crowned;
+53% of bluebell patches within 15.5 m of a trunk; 1367 batches of 1500.
+Frame time on the Mac, look quality: the dell 23.7 ms, the ford 23.9, the
+mere's parting 24.0, the pool 27.8 (as before).
+
+Still to do, in order: the north loop (8 to 11 with I to K), the rims (12
+with L).
