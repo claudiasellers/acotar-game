@@ -287,27 +287,34 @@ Checked against the court's tree set (`CourtTreeSet.ROLES`), the court's flora
 and props (`wider/assets`), the woods' plants (`FloraLibrary`), the estate's
 trees and flora, and each landmark's pieces in `court_content_table.gd`.
 
-**Plants that do not exist anywhere in the game**
+**Plants that do not exist anywhere in the game** (revised against the book;
+how each should look is under "How each missing asset should look")
 
 | Asset | For |
 |---|---|
-| Giant old forest tree (very tall, thick trunk, high crown, big roots) | Western Woods; the wall of trunks at its door |
-| Wind-bent pine | the towering hill's upper slopes; crests |
-| Old gnarled thorn tree that arches over a path | the Rite's processional way; crests |
-| Great sycamore (one hero tree) | the sycamore's knoll |
-| Tall arching cherry | the Blossom Cathedral's nave |
-| Pollard willow | the vale stream; the village river |
-| Rose thicket and briar hedge in runs, in several colours, head-high | Rosewild's rooms |
-| Hedgerow in runs | village lanes; between the vale's orchards |
-| Tall meadow flowers in drifts (poppy, cornflower, ox-eye daisy) | the vast meadow |
-| Half-turned trees (half dead; half autumn) | the edge of the Reaches; the Sealed Pass |
-| Hanging moss on old trees (optional) | Western Woods |
+| The great oak (and, grown largest, the Crown Oak) | Western Woods; Solstice Meadow |
+| The pillar elm | Western Woods; the wall of trunks at its door |
+| The pillar birch | the starlight pool's ring; the Suriel's glen; Looking Lake's isle |
+| The great sycamore (one hero tree) | its knoll |
+| The old thorn, arching over a path | the Rite's processional way; crests and high ground |
+| The cathedral cherry | the Blossom Cathedral's nave |
+| The pollard willow | the vale stream; the village river |
+| The rose brake, in runs, in four colours | Rosewild's rooms; the Briar Gate |
+| The hedgerow, in runs | village lanes; between the vale's orchards |
+| Meadow drifts in pink, white and blue | the vast meadow |
+| The frost-withered tree, and its half-turned form | Blighted Reaches |
+| The turning tree (half Spring, half Autumn; a recolour) | the Sealed Pass |
+| The shimmer (an effect) | dips, hollows, the special trees |
+| The cave's garland | Hill of the Rite |
+
+Dropped after reading the book: the wind-bent pine and hanging moss (no
+conifer and no such moss in the book's Spring); the yew is the owner's call.
 
 **In the game, but not usable in the court yet**
 
 | Asset | Where it is now |
 |---|---|
-| Yew | the woods have one; the court draws a pine in its place (`CourtTreeSet`: `woods_yew` to `conifer`) |
+| Yew (only if the owner wants it; not in the book) | the woods have one; the court draws a pine in its place (`CourtTreeSet`: `woods_yew` to `conifer`) |
 | Orchard-shaped apple, cherry and pear | the estate's tree set; the court uses ordinary trees recoloured |
 | Short glade grass, clover, small flowers, mushrooms | Quaternius' plant models are downloaded (`wider/assets/plants/qtz`) and not planted (phase G) |
 | Cottage-garden flowers (hollyhock, delphinium, catmint), vegetable rows, bee skeps | the estate only |
@@ -342,6 +349,227 @@ bramble, rose bushes, heather, lavender, hydrangea, azalea, iris, reeds, lily
 pads; bluebell and the other woodland flowers; flower carpets in six colours;
 moss, logs, root arches, rocks; rose and cherry petals in the air.
 
+## What the book gives us (owner, 2026-11-15: "looking into how the book actually describes things")
+
+Read back from chapter summaries and recaps of book 1 (sources at the end), not
+from our own design notes. The book says little about plants, and what it says
+is plain, real, and specific:
+
+| Where | What the book has |
+|---|---|
+| The manor (ch 5-7) | pale walls veiled in roses and ivy; amethyst irises, pale snowdrops and butter-yellow daffodils at the front; a grander garden behind; a rose garden of white roses, with thorns; hedges; hydrangeas indoors |
+| The road west (ch 14) | cultivated gardens, then wild rolling grassy hills, then clear streams, then the spring woods; a lone sycamore on top of a knoll; a large pond at the foot of a towering hill |
+| The western woods (ch 10, 14) | balmy spring woods full of thrushes, squirrels and moths; a sturdy, dense oak in vivid leaf; an elm with a coarse trunk; the Suriel's glen, a ring of white birches "tall and straight as pillars", by running water |
+| Magic (ch 14 and throughout) | a shimmer at the corner of the eye that turns out to be sun on a stream or wind in leaves; magic lies strongest in the land's dips and hollows; near the Bogge the spring woods recoil, wither and freeze |
+| The glen (ch 18) | down a hill to a stream; knolls; a small pool whose water is starlight and feels like warm silk; crocuses, snowdrops and bluebells; golden light on grass |
+| Fire Night (ch 20) | foothills; a giant bonfire on top of the first hill; a knoll; a trench-like hollow with steep banks between two hills; at its end a cave mouth in a soft hillside, dressed with flowers, branches and leaves |
+| The solstice (ch 25) | fields beyond the garden; a plateau; bonfires and maypoles on the hills; damp grass; a garland of pink, white and blue wildflowers; a meadow where will-o'-the-wisps drift; dawn from a high place |
+| The village (later books) | mostly destroyed; a tavern and a well at its centre rebuilt |
+
+Not re-read directly: chapter 18. Its row is from the terrain brief and the
+summaries; whether it names a willow is unconfirmed.
+
+### What that changes
+
+- **Real plants, a little too perfect.** Every tree the book names is an
+  ordinary one (oak, elm, birch, sycamore), in fresh leaf. The magic is in how
+  the place behaves and how the light falls, not in strange shapes. The
+  special trees stay the exception, and they belong where the book puts magic:
+  in dips and hollows.
+- **The western woods are bright.** Spring woods in vivid new leaf, with
+  birdsong: pillars under a green roof, not gloom.
+- **No conifer is named anywhere in Spring.** The wind-bent pine and the yew
+  are dropped unless the owner wants them; thorn and stunted oak do the pine's
+  work on high ground.
+- **The meadow's flowers are pink, white and blue.** No red poppies.
+- **The blight is spring stopped,** withered and frozen where it stood. Not
+  grey rot.
+- **The cave is dressed for a festival:** flowers, branches and leaves round
+  its mouth.
+- **The lone sycamore stands on the road west** (ch 14), on a knoll between
+  the estate and the western woods. Our map has "the sycamore's knoll" at the
+  Hill of the Rite; chapter 20's knoll has no named tree. Owner's call which
+  knoll gets it.
+
+## How each missing asset should look
+
+Sizes are for the grown tree in the game. "Book" says what the design rests
+on; where the book is silent that is said, and the design keeps to the book's
+key (real, fresh, a little too perfect).
+
+### Trees
+
+**The great oak** (Western Woods; one grown larger is the Crown Oak)
+- Book: the sturdy, dense oak in vivid leaf that hides Feyre.
+- Look: 24 m tall and wider than tall. A trunk 2 m through, standing on mossy
+  root buttresses you could sit between. The first boughs leave at 3 to 4 m,
+  nearly level, each as thick as an ordinary tree, so it reads as climbable.
+  A dense, domed crown you cannot see through, in bright yellow-green new
+  leaf. Moss on the upper side of every bough; ferns in the forks.
+
+**The pillar elm** (Western Woods: the forest's columns; the wall at its door)
+- Book: the elm with the coarse trunk.
+- Look: 32 m tall. A straight clean trunk, 1.4 m through, with deep coarse
+  ridged bark, no branch for the first 12 m, then a fork into a tall vase of
+  boughs that open like a fountain. Its crown is high and airy, so light
+  comes down between the pillars in spots.
+
+**The pillar birch** (the starlight pool's ring; the Suriel's glen)
+- Book: the ring of white birches "tall and straight as pillars".
+- Look: 18 m tall, a dead-straight white trunk 0.4 m through with few black
+  marks and no low branches, and a small light crown of fine drooping twigs
+  near the top. Planted in a ring they read as a colonnade. Ours today are
+  shorter and branch low.
+
+**The great sycamore** (one tree, on its knoll)
+- Book: the lone sycamore on top of a knoll.
+- Look: 25 m tall and as wide. A patchwork trunk, 1.8 m through, flaking in
+  cream, olive and grey; the upper limbs bare-barked and almost white, so
+  the tree shows against any sky and glows at dusk. A broad open crown of big
+  hand-shaped leaves in fresh lime, with seed balls hanging on threads.
+
+**The old thorn** (the Rite's way; high and windy ground everywhere)
+- Book: silent on the tree. Fire Night is May eve and the hawthorn is the May
+  tree: this one is our reading, not the book's.
+- Look: 5 to 7 m. A twisted, fluted, leaning trunk and a flat-topped crown
+  swept one way by the wind, solid with white blossom going pink as it ages.
+  On the processional way they stand in pairs leaning toward each other, so
+  their crowns meet overhead. On Fire Night they carry what the book puts on
+  the cave: garlands of flowers and leaves.
+
+**The cathedral cherry** (Blossom Vale's nave)
+- Book: silent; the vale is ours.
+- Look: 14 m. A tall clean trunk with dark, glossy, banded bark; boughs that
+  rise steeply and then arch over, so two rows 8 m apart meet in a pointed
+  vault at about 12 m. Blossom in pale pink-white clouds, thickest on the
+  vault's underside. Petals lie in drifts on the floor of the nave.
+
+**Orchard apple, cherry and pear** (Blossom Vale; the village's west bank)
+- Book: silent.
+- Look: 4 to 5 m, kept low and open in the middle like a goblet. A short
+  leaning trunk with old pruning scars and grey-green lichen; blossom along
+  short spurs on every branch (apple white from pink buds, cherry pink, pear
+  pure white). In loose rows, never a grid.
+
+**The pollard willow** (the vale stream; the village river)
+- Book: silent.
+- Look: a short, thick, leaning trunk 2.5 m tall ending in a knobbly head,
+  and from the head a burst of straight young shoots in gold-green. Old ones
+  are hollow, with ferns growing in the hollow. In rows along water. They are
+  the mark of a place that somebody tends.
+
+**The frost-withered tree** (Blighted Reaches; half-turned at its edge)
+- Book: near the Bogge the spring woods recoil, wither and freeze.
+- Look: an ordinary spring tree caught mid-recoil. Its boughs bend away from
+  the Heart. The leaves are still on, curled and brown-black, and rimed white
+  on the side facing the Heart. Nothing has rotted or fallen. At the edge of
+  the Reaches a tree is half this and half in fresh leaf, with the line
+  between running through its crown.
+
+**The turning tree** (the Sealed Pass)
+- Book: later books give Autumn forests of red, gold and orange.
+- Look: a Spring tree whose crown is green on the Spring side and flame on
+  the Autumn side. A recolour of trees we have.
+
+### Hedges and thickets
+
+**The rose brake** (Rosewild)
+- Book: roses and thorns everywhere at the manor; the rose garden is white.
+- Look: a mound of long arching canes 2 to 3 m high and twice as wide, with
+  real thorns and single, open, five-petalled flowers with gold centres (the
+  wild rose; the estate keeps the full garden rose). White first, then blush,
+  pink and deep red, one colour to a hollow. Ivy through its foot; red hips
+  among the flowers. Mounds overlap into walls, and where canes from two
+  mounds meet over a path they make an arch.
+
+**The hedgerow** (village lanes; between the orchards)
+- Book: hedges at the manor only.
+- Look: a laid hedge 1.8 m high and 1.2 m thick: hawthorn, hazel, wild rose
+  and honeysuckle woven together, with a taller tree left standing every 20
+  to 30 m, gaps at gates, and primroses and white lace flowers along its foot.
+
+### Flowers and ground
+
+**Meadow drifts** (the vast meadow)
+- Book: a garland of pink, white and blue wildflowers; damp grass.
+- Look: knee-high drifts in those three colours only (pink campion and
+  clover, white ox-eye daisy and lace flower, blue cornflower and
+  forget-me-not), each drift tens of metres long and one colour, in tall soft
+  grass. Dandelion clocks among them: at dusk their seed lifts and glows.
+
+**Glade grass and the first flowers** (the glen; clearings everywhere)
+- Book: crocuses, snowdrops and bluebells; golden light on grass; irises and
+  daffodils at the manor.
+- Look: short, fine, even grass like a lawn nobody mows, with those flowers
+  in patches, each kind keeping to itself. The flowers exist; the grass does
+  not (the downloaded Quaternius grass is the candidate).
+
+### Light
+
+**The shimmer** (everywhere magic is near)
+- Book: a shimmer at the corner of the eye that turns out to be nothing.
+- Look: a brief glint at the edge of the screen, in dips and hollows and near
+  the special trees, that is gone when you turn to it. This is the book's own
+  picture of magic and we have nothing like it.
+
+**Light through the trees** (Western Woods)
+- Book: sunlight dancing on water; the woods are bright.
+- Look: soft shafts in the gaps between the pillars. The woods lane has this
+  already; the court's Western Woods does not.
+
+### Landmarks
+
+**The garlanded cave** (Hill of the Rite)
+- Book: a cave mouth in a soft hillside, dressed with flowers, branches and
+  leaves.
+- Look: the cave we have, with a thick wreath round its mouth of green
+  boughs, white blossom and wildflowers, and more strewn on the ground before
+  it. Not on the missing list before; the book asks for it.
+
+**The Crown Oak** (Solstice Meadow)
+- Book: the great oak above, and the meadow of will-o'-the-wisps.
+- Look: the great oak at its largest: 26 m tall, 40 m across, a hollow trunk
+  4 m through, lower boughs that sweep down to the grass and rise again. At
+  night the wisps gather in its crown.
+
+**The Rose Spire** (Rosewild)
+- Book: silent; ours. Roses, ivy and thorns are the manor's own plants.
+- Look: a single giant white climbing rose that has swallowed whatever once
+  stood there, 20 m high, with stems as thick as an arm at the foot, and its
+  flowers flushing pink toward the top.
+
+**The Great Lantern Tree** (the village green)
+- Book: silent; ours.
+- Look: a lilac grown impossibly large: many trunks twined together, a broad
+  dome 22 m high, flower spikes standing upright all over it, and lanterns
+  hung through the crown at every height on ribbons.
+
+**The Bee Tower** (Blossom Vale)
+- Book: silent; ours.
+- Look: an old round stone tower split down one side, gold comb hanging in
+  sheets inside the split, roses and ivy up its walls as on the manor, and
+  straw skeps round its foot.
+
+**The Heart of the Blight** (Blighted Reaches)
+- Book: the recoiling, freezing woods; the masks.
+- Look: a shallow hollow where spring stopped. A ring of frost-withered
+  trees all bent outward; bare frost-cracked ground inside; at the centre a
+  drift of masks half buried. No rot, no movement, no sound.
+
+**The Ember Crown** (Autumn border)
+- Book: Autumn's red and gold forests (later books).
+- Look: a ring of flame maples round the hilltop, red at the top and gold
+  lower down, always shedding leaves that glow on the wind like embers.
+
+**The smaller ones**
+- Briar Gate: two rose brakes whose canes meet in a natural arch over the path.
+- Gardener's Folly: a small open stone pavilion, roofless, with a white rose
+  through its columns.
+- Cider Mill: a low stone press-house with a waterwheel on the vale stream,
+  apple crates and a cart.
+- Vale Weir: a low curved stone weir with a plank walk along its crest.
+- Looking Lake's isle: a rock with one pillar birch.
+
 ## Decisions for the owner
 
 1. Are the feel lines right, place by place?
@@ -351,3 +579,13 @@ moss, logs, root arches, rocks; rose and cherry petals in the air.
    if the flowers should come first.
 3. Are the other woods and the estate part of this, or the nine court places
    only?
+
+## Sources for the book's descriptions
+
+- Chapter 14 recap (the road west, the sycamore, the oak, the birch ring, the pond): https://www.goodreads.com/author_blog_posts/24097795-a-court-of-jealousy-and-haters-acotar-chapter-14-or-wait-did-feyre-j
+- Chapter 20 recap (Fire Night: foothills, bonfire, trench, cave): https://www.goodreads.com/author_blog_posts/24139050-a-court-of-jealousy-and-haters-acotar-chapter-20-or-or-worse
+- Chapter 25 recap (the solstice: plateau, maypoles, wildflowers, meadow): https://www.goodreads.com/author_blog_posts/24172130-a-court-of-jealousy-and-haters-acotar-chapter-25-or-the-chapter-that-d
+- Chapter 10 recap (the Bogge; the elm): https://www.goodreads.com/author_blog_posts/24069536-a-court-of-jealousy-and-haters-acotar-chapter-10-or-no-she-didn-t-cop
+- SparkNotes, chapters 18-20 (the pool; crocuses, snowdrops, bluebells; white roses; the cave): https://www.sparknotes.com/lit/a-court-of-thorns-and-roses/section6
+- Wiki, Tamlin's Manor: https://acourtofthornsandroses.fandom.com/wiki/Tamlin%27s_Manor
+- Wiki, Spring Court (hills, lakes, dips and hollows, the village): https://acourtofthornsandroses.fandom.com/wiki/Spring_Court
