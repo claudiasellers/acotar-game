@@ -272,14 +272,59 @@ Looks are the owner's call from renders. The rest is measured:
 - the place's heaviest view holds the frame-time target (16.6 ms) on the Mac;
 - each place's plant list and colour are rows in `docs/tuning.md`.
 
-### What carries over from the work so far
+### Clean sheet (owner, 2026-11-15)
 
-The tools stay: the land forms (`CourtLandHabitats`), the planting ceiling and
-report (`CourtPlanting`), the tree set and its detail steps, the special trees,
-the sightline and keep-open tests. What changes is what they are asked to do:
-today each region has a recipe of densities by habitat; this plan gives each
-place a map with a purpose. Where a recipe already does what the map asks, it
-stays.
+"I want you to replan everything and not go based on how things are already put
+together." So nothing below assumes today's tree sets, generators, shaders or
+scatter. The terrain stays; everything that grows on it is planned again.
+
+Today the game has five ways of making a tree (Quaternius, EZ-Tree, the woods
+kit, the estate builder, the special trees), four tree shaders, three flower
+systems, and planting by density inside an area. Each was made well for its own
+corner. That is why the whole does not read as one place.
+
+**One way of making, shading, and placing everything that grows:**
+
+1. **The look comes first, on one small piece of land.** About 150 m square
+   with a knoll, a stream and a wood's edge, finished completely: three trees,
+   a shrub, a rose, grass, five flowers, moss, fern, rock, in day and dusk.
+   The owner approves the look there before anything is made in quantity.
+2. **One builder for every plant.** Trees, shrubs, hedges, flowers, grass and
+   moss all come from the same builder, each from a species sheet (how it
+   branches, its bark, its leaf, its colours). Bark, leaves, wind, and what it
+   looks like at 2 m, 20 m and 200 m are then made the same way for all of them.
+3. **A species has forms, not one model.** The same oak is broad and low in
+   the open, tall and clean-trunked in a wood, flagged by wind on a ridge,
+   leaning to the light by water, and young, grown or ancient. "The pillar
+   elm" is an elm that grew in a forest. "The Crown Oak" is an oak, ancient,
+   grown alone. The land picks the form.
+4. **States, not separate assets.** Blight, the turn to Autumn, night glow and
+   the shimmer are things the world does to every plant in a region, grass and
+   flowers included: one frost-wither that creeps over whatever stands in the
+   Reaches, one turning of colour toward the pass.
+5. **Plants go down as communities.** An old spring wood is its canopy, its
+   young trees, its shrubs, its bluebells, its moss and its leaf litter laid
+   together; so are a rose brake, a water meadow, an orchard, a hedged lane.
+   A place is a mosaic of communities.
+6. **Placement reads the land, then the design.** From the terrain: how wet,
+   how sunny, how steep, how exposed. From the place's map: where it is closed
+   and open, the edges, the single trees, the lines to keep clear, and lines,
+   rows and rings where the design wants them.
+7. **The ground belongs to what stands on it.** Litter and moss under a wood,
+   worn earth on a path, flowers thicker in sun, the foot of every trunk
+   settled into its ground.
+8. **Distance is designed, not left over.** Full detail near, simpler in the
+   middle, whole stands as one shape far away, and the horizon's tree line
+   painted from the same plants. The frame-time target is held at each step.
+
+**What that replaces:** in the court, all of today's trees, shrubs, flowers and
+the recipes that plant them. Whether the estate's trees and the five special
+trees are re-made in the new builder (keeping their approved shapes and
+colours as the brief) or left as they are is the owner's call.
+
+**Order:** the look slice; then the builder widened to the full species list;
+then the communities; then the places one at a time from their maps (pilot
+first); then the old sets retired place by place as each is replaced.
 
 ## Assets we do not have (checked 2026-11-15)
 
