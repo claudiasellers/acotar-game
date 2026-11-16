@@ -20,6 +20,9 @@ extends RefCounted
 ##             thinning to nothing in the open, with trails of grass winding
 ##             through (owner, 2026-11-16: a bluebell grove, not flowers
 ##             dumped on a lawn)
+##   the brook the Glimmer Brook comes down into the pool from the south: iris,
+##             water mint, fern and mossed stones along its banks, snowdrops
+##             beside it, and nothing growing in its bed
 ##   the bank  iris, reeds, fern, water mint and mossed stones on the pool's
 ##             far sides; the near bank, where you arrive, left clear
 ##   the ring  the pillar birches (book ch 14) round the pool, standing in
@@ -85,6 +88,7 @@ static func build(world: Node3D) -> void:
 	_mound(root, rng, wave)
 	_between(root, rng, slope_trunks)
 	_bank(root, rng)
+	_brook(root, rng)
 	_glow(root, rng)
 
 
@@ -96,8 +100,8 @@ static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 	var build := 0
 	for i in RING_COUNT:
 		var a := TAU * (float(i) + rng.randf_range(-0.28, 0.28)) / float(RING_COUNT)
-		if absf(angle_difference(a, ARRIVAL)) < 0.2:
-			continue    # the way in stays open
+		if absf(angle_difference(a, ARRIVAL)) < 0.2 or absf(angle_difference(a, PI)) < 0.17:
+			continue    # the way in stays open, and the line from it to the Glimmerfall
 		var heart := POOL + Vector2.from_angle(a) * (RING_RADIUS + rng.randf_range(-1.5, 4.0))
 		var count := [1, 2, 2, 3, 3][rng.randi() % 5] as int
 		var stood: Array[Vector2] = []
@@ -105,7 +109,7 @@ static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 		while stood.size() < count and tries < 30:
 			tries += 1
 			var p := heart if stood.is_empty() else heart + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.4, 5.2)
-			var ok := p.distance_to(POOL) > POOL_RADIUS + 6.0
+			var ok := p.distance_to(POOL) > POOL_RADIUS + 6.0 and not _wet(p, 3.0)
 			for q in stood:
 				if p.distance_to(q) < 2.4:
 					ok = false
@@ -121,6 +125,7 @@ static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 			# the clump's first tree the tallest, its fellows slighter
 			mi.scale = Vector3.ONE * (rng.randf_range(0.98, 1.14) if stood.size() == 1 else rng.randf_range(0.76, 0.98))
 			root.add_child(mi)
+	print("STUDY ring trunks: ", trunks)
 	return trunks
 
 
@@ -133,7 +138,7 @@ static func _slopes(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 		var mid := POOL + Vector2.from_angle(g[0]) * float(g[1])
 		for k in int(g[2]):
 			var p := mid + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, 6.5)
-			if _steep(p):
+			if _steep(p) or _wet(p, 3.0):
 				continue
 			trunks.append(p)
 			var mi := MeshInstance3D.new()
@@ -219,9 +224,9 @@ static func _floor(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 		# thick on the floor, thinner up the slopes, in soft patches everywhere
 		var up := clampf((d - FLOOR) / (reach - FLOOR), 0.0, 1.0)
 		var keep := lerpf(1.0, 0.1, sqrt(up)) * (0.84 + 0.16 * wave.get_noise_2d(p.x * 2.0, p.y * 2.0))
-		if rng.randf() > keep or _steep(p):
+		if rng.randf() > keep or _steep(p) or _wet(p, 0.15):
 			continue
-		var by_water := d < POOL_RADIUS + 2.4 and absf(angle_difference((p - POOL).angle(), ARRIVAL)) > 0.3
+		var by_water := (d < POOL_RADIUS + 2.4 and absf(angle_difference((p - POOL).angle(), ARRIVAL)) > 0.3) or _wet(p, 1.5)
 		var by_trunk := false
 		for t in trunks:
 			if p.distance_to(t) < 1.6:
@@ -268,7 +273,7 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 			# a ragged edge, and gaps inside
 			if wave.get_noise_2d(p.x * 6.0, p.y * 6.0) < -0.25:
 				continue
-			if p.distance_to(POOL) < POOL_RADIUS + 1.0 or _steep(p):
+			if p.distance_to(POOL) < POOL_RADIUS + 1.0 or _steep(p) or _wet(p, 0.6):
 				continue
 			var size := rng.randf_range(1.0, 1.5)
 			var x := Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * size), _ground(p))
@@ -279,7 +284,7 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 	var daisies: Array = []
 	for i in 900:
 		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(POOL_RADIUS + 1.5, FLOOR + 6.0)
-		if wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > 0.05 and _shade(p, ring_trunks, slope_trunks) < 0.15:
+		if wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > 0.05 and _shade(p, ring_trunks, slope_trunks) < 0.15 and not _wet(p, 0.5):
 			daisies.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.7, 1.1)), _ground(p)))
 	by_kind[&"daisy"] = daisies
 	for kind: StringName in by_kind:
@@ -333,7 +338,7 @@ static func _bluebells(root: Node3D, rng: RandomNumberGenerator, wave: FastNoise
 	for i in int(PI * reach * reach * 2.1):
 		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * reach
 		var shade := _shade(p, ring_trunks, slope_trunks)
-		if shade <= 0.02 or p.distance_to(POOL) < POOL_RADIUS + 5.5 or _steep(p) or _in_drift(p, drifts):
+		if shade <= 0.02 or p.distance_to(POOL) < POOL_RADIUS + 5.5 or _steep(p) or _in_drift(p, drifts) or _wet(p, 1.2):
 			continue
 		var foot := INF
 		for t in ring_trunks:
@@ -421,6 +426,65 @@ static func _bank(root: Node3D, rng: RandomNumberGenerator) -> void:
 		_multi(root, "Bank_%s" % kind, FloraLibrary.mesh(kind), xs, kind in [&"mossy_rock", &"moss_mound"])
 
 
+## The Glimmer Brook where it comes down into the pool: iris and water mint at
+## the water, fern and mossed stones on the banks, snowdrops beside it in
+## stretches, taller grass along it. Thickest near the pool, thinning upstream.
+static func _brook(root: Node3D, rng: RandomNumberGenerator) -> void:
+	var by_kind := {&"iris_clump": [], &"water_mint": [], &"reed_clump": [], &"mossy_rock": [], &"moss_mound": []}
+	var ferns: Array = [[], [], []]
+	var snow: Array = [[], []]
+	for brook: Dictionary in CourtHeight.brooks():
+		if brook["id"] != &"glimmer_brook":
+			continue
+		var pts: PackedVector2Array = brook["points"]
+		var half: float = brook["half_width"]
+		for k in pts.size() - 1:
+			var along := pts[k + 1] - pts[k]
+			var side := along.normalized().orthogonal()
+			# a place to plant every half metre of bank or so, however finely the brook's line is cut
+			var want := along.length() / 0.5
+			var steps := int(want) + (1 if rng.randf() < fmod(want, 1.0) else 0)
+			for j in steps:
+				var on := pts[k] + along * rng.randf()
+				var far := on.distance_to(POOL)
+				if far > 95.0 or far < POOL_RADIUS + 0.5:
+					continue
+				var thin := clampf(1.0 - (far - 30.0) / 65.0, 0.25, 1.0)
+				var bank := side * (1.0 if rng.randf() < 0.5 else -1.0)
+				var roll := rng.randf() / thin
+				var at := func(d0: float, d1: float, s0: float, s1: float) -> Transform3D:
+					var p := on + bank * (half + rng.randf_range(d0, d1))
+					return Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(s0, s1)), _ground(p))
+				if roll < 0.2:
+					by_kind[&"iris_clump"].append(at.call(-0.3, 0.5, 0.8, 1.2))
+				elif roll < 0.42:
+					by_kind[&"water_mint"].append(at.call(-0.4, 0.4, 0.9, 1.4))
+				elif roll < 0.47:
+					by_kind[&"reed_clump"].append(at.call(-0.5, 0.1, 0.6, 0.9))
+				elif roll < 0.62:
+					ferns[rng.randi() % 3].append(at.call(0.3, 1.8, 0.5, 0.85))
+				elif roll < 0.67:
+					by_kind[&"mossy_rock"].append(at.call(-0.6, 0.8, 0.5, 1.0))
+				elif roll < 0.74:
+					by_kind[&"moss_mound"].append(at.call(0.0, 1.2, 0.7, 1.2))
+				# snowdrops beside it, in stretches
+				if sin(far * 0.22) > 0.1 and rng.randf() < 0.75 * thin:
+					snow[rng.randi() % 2].append(at.call(0.7, 3.2, 1.0, 1.4))
+	for kind: StringName in by_kind:
+		_multi(root, "Brook_%s" % kind, FloraLibrary.mesh(kind), by_kind[kind], kind == &"mossy_rock")
+	for k in 3:
+		_cells(root, "Brook_fern%d" % k, _glade("fern_" + "abc"[k]), ferns[k], 150.0)
+	for k in 2:
+		var patch := "snowdrop_patch_" + "ab"[k]
+		_cells(root, "Brook_snowdrop%d" % k, _glade(patch), snow[k], FLOWERS_NEAR)
+		_cells(root, "Brook_snowdrop%d_far" % k, _glade(patch + "_far"), snow[k], 420.0, FLOWERS_NEAR)
+
+
+## Whether a spot is in a brook or within `margin` metres of its edge.
+static func _wet(p: Vector2, margin: float) -> bool:
+	return CourtHeight.distance_to_brook(p.x, p.y) < margin
+
+
 ## What glows: starmoss, glowcaps and faelights near the water, and small
 ## lights adrift over the floor (they show at dusk).
 static func _glow(root: Node3D, rng: RandomNumberGenerator) -> void:
@@ -492,8 +556,8 @@ static func _look(rim: float) -> ShaderMaterial:
 	if not _looks.has(rim):
 		var m := FloraLibrary.material(&"bloom").duplicate() as ShaderMaterial
 		m.set_shader_parameter(&"rim_strength", rim)
-		# the twinkle lights a whole 14 cm cell: on a blade at your feet that is a white shard
-		m.set_shader_parameter(&"sparkle", 0.0 if rim == 0.0 else 0.15)
+		# the twinkle lights a whole 14 cm cell: on a blade or a bell at your feet that is a white shard
+		m.set_shader_parameter(&"sparkle", 0.0)
 		_looks[rim] = m
 	return _looks[rim]
 
