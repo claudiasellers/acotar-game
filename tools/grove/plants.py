@@ -62,6 +62,7 @@ GRASS_SWARD = {"blades": 44, "radius": 0.46, "height": 0.25, "lean": 46.0, "widt
                "foot": TURF, "blade": (0.31, 0.63, 0.31), "tip": (0.52, 0.80, 0.40)}
 BLUEBELL = {"height": 0.42, "bell": 0.05, "leaf_deep": (0.22, 0.50, 0.36), "leaf": (0.38, 0.68, 0.44), "stem": (0.42, 0.44, 0.62),
             "bell_deep": (0.33, 0.35, 0.80), "bell_light": (0.64, 0.68, 0.97)}
+BLUEBELL_WHITE = dict(BLUEBELL, stem=(0.50, 0.66, 0.52), bell_deep=(0.86, 0.88, 0.95), bell_light=(0.98, 0.98, 1.0))
 SNOWDROP = {"height": 0.24, "petal": 0.055, "stems": 3, "leaf_deep": (0.26, 0.52, 0.42), "leaf": (0.46, 0.72, 0.56),
             "white": (0.95, 0.96, 0.93), "white_tip": (1.0, 1.0, 0.98), "green_mark": (0.45, 0.74, 0.42)}
 CROCUS = {"height": 0.2, "petal": 0.085, "stems": 3, "leaf_deep": (0.24, 0.50, 0.36), "leaf": (0.44, 0.70, 0.46),
@@ -85,6 +86,8 @@ PLANTS = {
     "bluebell_patch_a": ("patch", BLUEBELL, ("bluebell", 9, 0.42)),
     "bluebell_patch_b": ("patch", BLUEBELL, ("bluebell", 9, 0.42)),
     "bluebell_patch_c": ("patch", BLUEBELL, ("bluebell", 6, 0.34)),
+    # the odd white one among the blue
+    "bluebell_white": ("patch", BLUEBELL_WHITE, ("bluebell", 3, 0.16)),
     "snowdrop_patch_a": ("patch", SNOWDROP, ("snowdrop", 6, 0.3)),
     "snowdrop_patch_b": ("patch", SNOWDROP, ("snowdrop", 4, 0.24)),
     "crocus_patch_a": ("patch", CROCUS, ("crocus", 6, 0.34)),

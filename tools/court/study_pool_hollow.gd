@@ -15,12 +15,16 @@ extends RefCounted
 ##   floor     short glade grass over the whole floor, thinning up the slopes;
 ##             taller tufts at the water and round the birches' feet
 ##   flowers   the book's three (ch 18: crocuses, snowdrops, bluebells), each
-##             kind in drifts of its own, with daisies through the grass
+##             kind keeping to itself, with daisies through the grass. The
+##             bluebells are the birches' own: thick in each clump's shade,
+##             thinning to nothing in the open, with trails of grass winding
+##             through (owner, 2026-11-16: a bluebell grove, not flowers
+##             dumped on a lawn)
 ##   the bank  iris, reeds, fern, water mint and mossed stones on the pool's
 ##             far sides; the near bank, where you arrive, left clear
-##   the ring  the pillar birches (book ch 14) round the pool, and more of
-##             them in twos and threes up the inner slopes behind, bluebells
-##             at their feet
+##   the ring  the pillar birches (book ch 14) round the pool, standing in
+##             clumps of one to three with gaps between, and more of them in
+##             twos and threes up the inner slopes behind
 ##   knolls    one tree on each knoll, and each a different kind; the mound
 ##             bare (it is the overlook), the Glimmerfall's knoll its own
 ##   between   fern and a stand of foxgloves with each group of slope
@@ -77,30 +81,46 @@ static func build(world: Node3D) -> void:
 	var slope_trunks := _slopes(root, rng)
 	_knolls(root)
 	_floor(root, rng, wave, trunks)
-	_flowers(root, rng, wave, slope_trunks)
+	_flowers(root, rng, wave, trunks, slope_trunks)
 	_mound(root, rng, wave)
 	_between(root, rng, slope_trunks)
 	_bank(root, rng)
 	_glow(root, rng)
 
 
-## The pillar birches round the pool: their builds in turn, each turned and
-## sized a little differently, a little in or out of the true circle.
+## The pillar birches round the pool, in clumps of one to three with gaps
+## between: a ring you can see is a ring from the mound, and a grove when you
+## stand in it. Their builds in turn, each turned and sized its own way.
 static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 	var trunks: Array[Vector2] = []
+	var build := 0
 	for i in RING_COUNT:
-		var a := TAU * (float(i) + rng.randf_range(-0.2, 0.2)) / float(RING_COUNT)
-		if absf(angle_difference(a, ARRIVAL)) < 0.16:
+		var a := TAU * (float(i) + rng.randf_range(-0.28, 0.28)) / float(RING_COUNT)
+		if absf(angle_difference(a, ARRIVAL)) < 0.2:
 			continue    # the way in stays open
-		var r := RING_RADIUS + rng.randf_range(-2.5, 2.5)
-		var p := POOL + Vector2(cos(a), sin(a)) * r
-		trunks.append(p)
-		var mi := MeshInstance3D.new()
-		mi.mesh = CourtGreatTrees.mesh(&"pillar_birch", i)
-		mi.position = _ground(p)
-		mi.rotation.y = rng.randf() * TAU
-		mi.scale = Vector3.ONE * rng.randf_range(0.9, 1.12)
-		root.add_child(mi)
+		var heart := POOL + Vector2.from_angle(a) * (RING_RADIUS + rng.randf_range(-1.5, 4.0))
+		var count := [1, 2, 2, 3, 3][rng.randi() % 5] as int
+		var stood: Array[Vector2] = []
+		var tries := 0
+		while stood.size() < count and tries < 30:
+			tries += 1
+			var p := heart if stood.is_empty() else heart + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.4, 5.2)
+			var ok := p.distance_to(POOL) > POOL_RADIUS + 6.0
+			for q in stood:
+				if p.distance_to(q) < 2.4:
+					ok = false
+			if not ok:
+				continue
+			stood.append(p)
+			trunks.append(p)
+			var mi := MeshInstance3D.new()
+			mi.mesh = CourtGreatTrees.mesh(&"pillar_birch", build)
+			build += 1
+			mi.position = _ground(p)
+			mi.rotation.y = rng.randf() * TAU
+			# the clump's first tree the tallest, its fellows slighter
+			mi.scale = Vector3.ONE * (rng.randf_range(0.98, 1.14) if stood.size() == 1 else rng.randf_range(0.76, 0.98))
+			root.add_child(mi)
 	return trunks
 
 
@@ -222,18 +242,16 @@ static func _floor(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 
 
 ## The book's three, each in drifts of its own, and daisies through the grass.
-static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, slope_trunks: Array[Vector2]) -> void:
+static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, ring_trunks: Array[Vector2],
+		slope_trunks: Array[Vector2]) -> void:
+	# The drifts that lie where the ground puts them:
 	# [species, bearing from the pool, distance, length, depth, plants per m2]
 	var drifts := [
-		# bluebells under the birches, the widest drifts, most of the way round
-		[&"bluebell", 1.2, 31.0, 34.0, 13.0, 1.5], [&"bluebell", 2.75, 30.5, 38.0, 13.0, 1.5],
-		[&"bluebell", -2.25, 31.5, 32.0, 12.0, 1.5], [&"bluebell", -0.85, 31.0, 26.0, 11.0, 1.5],
-		# snowdrops close to the water, in the birches' shade
-		[&"snowdrop", 2.0, 23.5, 16.0, 5.0, 2.4], [&"snowdrop", -1.5, 24.0, 18.0, 5.0, 2.4], [&"snowdrop", 0.8, 23.0, 10.0, 4.0, 2.4],
+		# snowdrops close to the water
+		[&"snowdrop", 2.0, 23.0, 16.0, 4.5, 2.4], [&"snowdrop", -1.5, 23.0, 18.0, 4.5, 2.4], [&"snowdrop", 0.8, 22.5, 10.0, 4.0, 2.4],
 		[&"snowdrop", -0.55, 22.5, 8.0, 3.5, 2.4],
-		# crocuses out in the open, where you come in and across the far side
-		[&"crocus", 0.45, 39.0, 18.0, 8.0, 1.9], [&"crocus", -0.3, 41.0, 16.0, 7.0, 1.9], [&"crocus", 3.6, 39.0, 18.0, 7.0, 1.9],
-		[&"crocus", 0.1, 30.0, 9.0, 5.0, 1.9],
+		# crocuses out in the open, where you come in
+		[&"crocus", 0.45, 40.0, 18.0, 8.0, 1.9], [&"crocus", -0.3, 42.0, 16.0, 7.0, 1.9], [&"crocus", 0.1, 30.0, 9.0, 5.0, 1.9],
 	]
 	var by_kind := {}
 	for dr: Array in drifts:
@@ -257,25 +275,11 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 			if not by_kind.has(dr[0]):
 				by_kind[dr[0]] = []
 			by_kind[dr[0]].append(x)
-	# bluebells and fern at the feet of the birches up the slopes
-	var ferns: Array = [[], [], []]
-	for t in slope_trunks:
-		for i in 40:
-			# thick at the trunk, thinning out
-			var p := t + Vector2.from_angle(rng.randf() * TAU) * (0.5 + rng.randf() * 5.0)
-			if _steep(p):
-				continue
-			var x := Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(1.0, 1.5)), _ground(p))
-			if i < 3:
-				ferns[rng.randi() % 3].append(x)
-			else:
-				by_kind[&"bluebell"].append(x)
-	for k in 3:
-		_cells(root, "SlopeFern%d" % k, _glade("fern_" + "abc"[k]), ferns[k], 150.0)
+	_bluebells(root, rng, wave, ring_trunks, slope_trunks, drifts)
 	var daisies: Array = []
 	for i in 900:
 		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(POOL_RADIUS + 1.5, FLOOR + 6.0)
-		if wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > 0.05:
+		if wave.get_noise_2d(p.x * 3.0, p.y * 3.0) > 0.05 and _shade(p, ring_trunks, slope_trunks) < 0.15:
 			daisies.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * rng.randf_range(0.7, 1.1)), _ground(p)))
 	by_kind[&"daisy"] = daisies
 	for kind: StringName in by_kind:
@@ -293,6 +297,99 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 			var patch := "%s_patch_%s" % [kind, "abc"[k]]
 			_cells(root, "Drift_%s%d" % [kind, k], _glade(patch), split[k], FLOWERS_NEAR)
 			_cells(root, "Drift_%s%d_far" % [kind, k], _glade(patch + "_far"), split[k], 420.0, FLOWERS_NEAR)
+
+
+## How far under the birches a spot is, 0 in the open to 1 in a clump's heart:
+## each trunk shades about nine metres round it, and neighbours add up.
+static func _shade(p: Vector2, ring_trunks: Array[Vector2], slope_trunks: Array[Vector2]) -> float:
+	var sum := 0.0
+	for t in ring_trunks:
+		sum += pow(clampf(1.0 - p.distance_to(t) / 9.5, 0.0, 1.0), 1.4)
+	for t in slope_trunks:
+		sum += pow(clampf(1.0 - p.distance_to(t) / 7.5, 0.0, 1.0), 1.4)
+	return minf(sum, 1.0)
+
+
+## The bluebells are the birches' own. They are thickest and tallest in the
+## heart of each clump's shade and thin to a few small outliers at its edge,
+## so the blue pools under the trees and the open floor stays grass. Trails of
+## grass wind through them, as if something walks there; ferns and moss take
+## the trunks' feet; here and there a white one; and the blue is deeper in one
+## part of the grove and paler in another.
+static func _bluebells(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, ring_trunks: Array[Vector2],
+		slope_trunks: Array[Vector2], drifts: Array) -> void:
+	var trail := FastNoiseLite.new()
+	trail.seed = 31
+	trail.frequency = 0.045
+	trail.fractal_octaves = 2
+	var heart: Array = [[], []]      # the two full patches
+	var heart_tint: Array = [[], []]
+	var edge: Array = []             # the small patch
+	var edge_tint: Array = []
+	var white: Array = []
+	var ferns: Array = [[], [], []]
+	var moss: Array = []
+	var reach := 66.0
+	for i in int(PI * reach * reach * 2.1):
+		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * reach
+		var shade := _shade(p, ring_trunks, slope_trunks)
+		if shade <= 0.02 or p.distance_to(POOL) < POOL_RADIUS + 5.5 or _steep(p) or _in_drift(p, drifts):
+			continue
+		var foot := INF
+		for t in ring_trunks:
+			foot = minf(foot, p.distance_to(t))
+		for t in slope_trunks:
+			foot = minf(foot, p.distance_to(t))
+		var at := Transform3D(Basis(Vector3.UP, rng.randf() * TAU), _ground(p))
+		if foot < 1.1:
+			# the roots' own ground: fern and moss, no flowers
+			if rng.randf() < 0.1:
+				ferns[rng.randi() % 3].append(at.scaled_local(Vector3.ONE * rng.randf_range(0.5, 0.8)))
+			elif rng.randf() < 0.04:
+				moss.append(at.scaled_local(Vector3.ONE * rng.randf_range(0.6, 1.0)))
+			continue
+		# trails of grass winding through, and soft thin places
+		var on_trail := absf(trail.get_noise_2d(p.x, p.y)) < 0.06
+		var thick := pow(shade, 1.3) * (0.62 + 0.38 * wave.get_noise_2d(p.x * 3.0, p.y * 3.0)) * (0.04 if on_trail else 1.0)
+		if rng.randf() > thick:
+			if shade > 0.45 and not on_trail and rng.randf() < 0.012:
+				ferns[rng.randi() % 3].append(at.scaled_local(Vector3.ONE * rng.randf_range(0.6, 0.95)))
+			continue
+		# deeper blue in one part of the grove, paler in another
+		var deep := clampf(0.5 + 0.9 * wave.get_noise_2d(p.x * 1.3 + 300.0, p.y * 1.3), 0.0, 1.0)
+		var tint := Color(1.0, 1.0, 1.0).lerp(Color(0.8, 0.8, 0.98), deep)
+		if thick > 0.42:
+			if rng.randf() < 0.014:
+				white.append(at.scaled_local(Vector3.ONE * rng.randf_range(1.0, 1.3)))
+				continue
+			var k := rng.randi() % 2
+			# tallest in the heart
+			heart[k].append(at.scaled_local(Vector3.ONE * lerpf(1.0, 1.55, shade) * rng.randf_range(0.9, 1.1)))
+			heart_tint[k].append(tint)
+		else:
+			edge.append(at.scaled_local(Vector3.ONE * rng.randf_range(0.7, 1.05)))
+			edge_tint.append(tint)
+	for k in 2:
+		var patch := "bluebell_patch_" + "ab"[k]
+		_cells(root, "Bluebells_heart%d" % k, _glade(patch), heart[k], FLOWERS_NEAR, 0.0, heart_tint[k])
+		_cells(root, "Bluebells_heart%d_far" % k, _glade(patch + "_far"), heart[k], 420.0, FLOWERS_NEAR, heart_tint[k])
+	_cells(root, "Bluebells_edge", _glade("bluebell_patch_c"), edge, FLOWERS_NEAR, 0.0, edge_tint)
+	_cells(root, "Bluebells_edge_far", _glade("bluebell_patch_c_far"), edge, 420.0, FLOWERS_NEAR, edge_tint)
+	_cells(root, "Bluebells_white", _glade("bluebell_white"), white, FLOWERS_NEAR)
+	for k in 3:
+		_cells(root, "GroveFern%d" % k, _glade("fern_" + "abc"[k]), ferns[k], 150.0)
+	_cells(root, "GroveMoss", FloraLibrary.mesh(&"moss_mound"), moss, 150.0)
+
+
+## Whether a spot lies in one of the laid drifts (each kind keeps to itself).
+static func _in_drift(p: Vector2, drifts: Array) -> bool:
+	for dr: Array in drifts:
+		var rel := p - (POOL + Vector2.from_angle(dr[1]) * float(dr[2]))
+		var u := rel.dot(Vector2.from_angle(float(dr[1]) + PI * 0.5)) / (float(dr[3]) * 0.5)
+		var v := rel.dot(Vector2.from_angle(dr[1])) / (float(dr[4]) * 0.5)
+		if u * u + v * v < 0.75:
+			return true
+	return false
 
 
 ## The pool's far banks: iris, reeds, fern, water mint, mossed stones. The
@@ -403,24 +500,30 @@ static func _look(rim: float) -> ShaderMaterial:
 
 ## Small plants by the cell, each cell drawn only within `far` metres: the
 ## way the floor of a place has to be laid to be affordable.
-static func _cells(root: Node3D, name: String, mesh: Mesh, xforms: Array, far: float, near: float = 0.0, cell: float = 16.0) -> void:
+static func _cells(root: Node3D, name: String, mesh: Mesh, xforms: Array, far: float, near: float = 0.0, tints: Array = [],
+		cell: float = 16.0) -> void:
 	var by_cell := {}
-	for x: Transform3D in xforms:
-		var key := Vector2i(floori(x.origin.x / cell), floori(x.origin.z / cell))
+	for i in xforms.size():
+		var o: Vector3 = (xforms[i] as Transform3D).origin
+		var key := Vector2i(floori(o.x / cell), floori(o.z / cell))
 		if not by_cell.has(key):
 			by_cell[key] = []
-		by_cell[key].append(x)
+		by_cell[key].append(i)
 	for key: Vector2i in by_cell:
 		var mid := Vector3((key.x + 0.5) * cell, 0.0, (key.y + 0.5) * cell)
 		mid.y = WorldHeight.height_at(mid.x, mid.z)
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_colors = not tints.is_empty()   # the shaders read COLOR, which the instance's colour multiplies
 		mm.mesh = mesh
-		mm.instance_count = (by_cell[key] as Array).size()
-		for i in mm.instance_count:
-			var x: Transform3D = by_cell[key][i]
+		var ids: Array = by_cell[key]
+		mm.instance_count = ids.size()
+		for n in ids.size():
+			var x: Transform3D = xforms[ids[n]]
 			x.origin -= mid
-			mm.set_instance_transform(i, x)
+			mm.set_instance_transform(n, x)
+			if mm.use_colors:
+				mm.set_instance_color(n, tints[ids[n]])
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
 		mmi.position = mid
