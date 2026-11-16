@@ -249,10 +249,9 @@ sides are agreed:
    place must deliver (its arrival, its picture, its landmark). The owner
    approves the map before anything is planted. One place at a time.
 3. **What is missing.** Each map lists the plants it needs that the game does
-   not have yet. Known already: a giant old forest tree; a rose thicket and
-   briar hedge; orchard-shaped apple and cherry; a pollard willow; a great
-   sycamore; a yew for the court. The flower and ground-cover work (plan items
-   F1, F2 and phase G) becomes part of each place, not a separate pass.
+   not have yet; the checked list as of 2026-11-15 is under "Assets we do not
+   have" below. The flower and ground-cover work (plan items F1, F2 and phase
+   G) becomes part of each place, not a separate pass.
 4. **A pilot place, built fully.** Trees, shrubs, flowers and ground, shown at
    its views against the bare land and against today's planting. This proves
    the method and the tools before the other eight.
@@ -281,6 +280,67 @@ the sightline and keep-open tests. What changes is what they are asked to do:
 today each region has a recipe of densities by habitat; this plan gives each
 place a map with a purpose. Where a recipe already does what the map asks, it
 stays.
+
+## Assets we do not have (checked 2026-11-15)
+
+Checked against the court's tree set (`CourtTreeSet.ROLES`), the court's flora
+and props (`wider/assets`), the woods' plants (`FloraLibrary`), the estate's
+trees and flora, and each landmark's pieces in `court_content_table.gd`.
+
+**Plants that do not exist anywhere in the game**
+
+| Asset | For |
+|---|---|
+| Giant old forest tree (very tall, thick trunk, high crown, big roots) | Western Woods; the wall of trunks at its door |
+| Wind-bent pine | the towering hill's upper slopes; crests |
+| Old gnarled thorn tree that arches over a path | the Rite's processional way; crests |
+| Great sycamore (one hero tree) | the sycamore's knoll |
+| Tall arching cherry | the Blossom Cathedral's nave |
+| Pollard willow | the vale stream; the village river |
+| Rose thicket and briar hedge in runs, in several colours, head-high | Rosewild's rooms |
+| Hedgerow in runs | village lanes; between the vale's orchards |
+| Tall meadow flowers in drifts (poppy, cornflower, ox-eye daisy) | the vast meadow |
+| Half-turned trees (half dead; half autumn) | the edge of the Reaches; the Sealed Pass |
+| Hanging moss on old trees (optional) | Western Woods |
+
+**In the game, but not usable in the court yet**
+
+| Asset | Where it is now |
+|---|---|
+| Yew | the woods have one; the court draws a pine in its place (`CourtTreeSet`: `woods_yew` to `conifer`) |
+| Orchard-shaped apple, cherry and pear | the estate's tree set; the court uses ordinary trees recoloured |
+| Short glade grass, clover, small flowers, mushrooms | Quaternius' plant models are downloaded (`wider/assets/plants/qtz`) and not planted (phase G) |
+| Cottage-garden flowers (hollyhock, delphinium, catmint), vegetable rows, bee skeps | the estate only |
+| Light shafts under trees | the woods lane only (`woods_light_shaft.gdshader`) |
+
+**Landmarks that are stand-ins** (the owner deferred the landmark models; the
+places' pictures lean on the first seven)
+
+| Landmark | What stands there today |
+|---|---|
+| Rose Spire | three thorn brakes |
+| Great Lantern Tree | a lilac tree with lantern posts and bunting |
+| Crown Oak | the woods' ancient oak grown to 24 m |
+| Bee Tower | the ruined watchtower |
+| Heart of the Blight | a mask pile, a rock and a blighted tree |
+| Ember Crown | one autumn maple |
+| Blossom Cathedral | four wild cherries |
+| Cider Mill | the village mill and a market stall |
+| Briar Gate | a flower arch and two rose bushes |
+| Gardener's Folly | a shrine arch, a column and an ivy curtain |
+| Vale Weir | stepping stones and a footbridge |
+| Looking Lake's isle | a lilac tree and a rock |
+
+**Not models, but needed:** planting along a line (hedges, avenues, orchard
+rows), in a ring (the birches round the pool) and leaning away from a point
+(the Reaches). Today's scatter plants by density inside a habitat.
+
+**Already covered:** silver birch, oak, beech, elm, alder, willow (three
+kinds), hazel, hawthorn, crab apple, lilac, pine, rowan, the autumn trees, dead
+and blighted trees, the leaning trunk, the five special trees; ferns, bracken,
+bramble, rose bushes, heather, lavender, hydrangea, azalea, iris, reeds, lily
+pads; bluebell and the other woodland flowers; flower carpets in six colours;
+moss, logs, root arches, rocks; rose and cherry petals in the air.
 
 ## Decisions for the owner
 
