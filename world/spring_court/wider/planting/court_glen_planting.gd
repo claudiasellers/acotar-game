@@ -19,8 +19,7 @@ extends RefCounted
 ##   brooks     trees gathered in clumps along the brooks, on alternate banks;
 ##              iris, mint, fern and stones at the water, snowdrops beside it
 ##   the river  willows and birches in clumps along the Thornwater
-##   the lake   Looking Lake wooded on its far side, willows where the bank
-##              comes down to the water, open where you come to it
+##   the lake   (now CourtGlenPlaces: the dark wood and its mirror)
 ##   the mere   (now CourtGlenPlaces: the curtain and its parting)
 ##   the brae   (now CourtGlenPlaces: the Thorn Gate)
 ##   thorn      a thorn bush or two at the outer edge of every clump (a wood's
@@ -83,6 +82,8 @@ const PATCHES := {
 	&"bluebell": [["bluebell_patch_a"], "bluebell_patch_c"],
 	&"snowdrop": [["snowdrop_patch_a"], "snowdrop_patch_b"],
 	&"crocus": [["crocus_patch_a"], "crocus_patch_c"],
+	# the Oak Glade's own (CourtGlenPlaces): one patch, full size in the heart and small at the edge
+	&"anemone": [["anemone_patch_a"], "anemone_patch_a"],
 }
 ## A tree is its full self within TREE_NEAR and its far form beyond, to TREE_FAR.
 ## (A layer switches by the chunk, CourtScatterGenerator.NEAR_CHUNK: a tree
@@ -281,7 +282,6 @@ static func layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		func() -> void: _knolls(plan, rng, groups),
 		func() -> void: _brooks(plan, rng, groups),
 		func() -> void: _river(plan, rng, groups),
-		func() -> void: _lake(plan, rng, groups),
 		func() -> void: _thorn(plan, rng, groups),
 		func() -> void: _hollow_ground(plan, rng, wave),
 		func() -> void: _shade_flowers(plan, rng, wave, groups),
@@ -644,80 +644,6 @@ static func _river(plan: Plan, rng: RandomNumberGenerator, groups: Array[Diction
 				if not trunks.is_empty():
 					groups.append(_group(trunks, 8.0, &"snowdrop" if willow else &"bluebell"))
 				break
-
-
-## Looking Lake: a wood on the far side from where the lake walk reaches it,
-## willows wherever the bank comes down to the water, open on the near side;
-## reeds and iris in the shallows.
-static func _lake(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
-	var lake := _lake_named(&"looking_lake")
-	if lake.is_empty():
-		return
-	var centre: Vector2 = lake["center"]
-	var radius: float = lake["radius"]
-	var level: float = lake["level"]
-	var come := (LAKE_WALK_END - centre).angle()
-	var far_side := come + PI
-	var wood: Array = []
-	var tries := 0
-	while wood.size() < LAKE_WOOD and tries < 1600:
-		tries += 1
-		var a := far_side + rng.randfn(0.0, 0.62)
-		if absf(angle_difference(a, far_side)) > 1.45:
-			continue
-		# thick at the water, thinning back from it
-		var back := 3.0 + absf(rng.randfn(0.0, 15.0))
-		var p := centre + Vector2.from_angle(a) * (radius + back)
-		if back > 44.0 or CourtLandHabitats.keep_open(p.x, p.y) or steep(p):
-			continue
-		var ok := true
-		for q: Vector2 in wood:
-			if q.distance_to(p) < 4.2:
-				ok = false
-		if not ok:
-			continue
-		var species: StringName = &"willow" if back < 7.0 and rng.randf() < 0.6 else (&"oak" if rng.randf() < 0.4 else &"birch")
-		# and a great tree here and there, back from the water, to stand over the rest in the reflection
-		if back > 12.0 and rng.randf() < 0.1:
-			species = &"great_elm" if rng.randf() < 0.5 else &"great_oak"
-		if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.85, 1.15)):
-			wood.append(p)
-	groups.append(_group(wood, 8.5, &"bluebell"))
-	# willows at the water wherever the bank comes down to it
-	var low: Array = []
-	for i in 72:
-		var a := TAU * float(i) / 72.0
-		var p := centre + Vector2.from_angle(a) * (radius + rng.randf_range(3.0, 5.0))
-		if CourtHeight.height_at(p.x, p.y) - level > 2.2 or absf(angle_difference(a, come)) < 0.35 or CourtLandHabitats.keep_open(p.x, p.y):
-			continue
-		var ok := low.size() < 8
-		for q: Vector2 in low:
-			if q.distance_to(p) < 10.0:
-				ok = false
-		for q: Vector2 in wood:
-			if q.distance_to(p) < 5.0:
-				ok = false
-		if ok and plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.2)):
-			low.append(p)
-	if not low.is_empty():
-		groups.append(_group(low, 7.5, &"snowdrop"))
-	# the shallows: thick on the wooded side, a few groups on the open one, none under a cliff
-	var kinds: Array[StringName] = [&"reed_clump", &"cattail", &"iris_clump", &"water_mint"]
-	for i in 620:
-		var a := rng.randf() * TAU
-		var wooded := absf(angle_difference(a, far_side)) < 1.5
-		if (not wooded and sin(a * 7.0) < 0.6) or absf(angle_difference(a, come)) < 0.35:
-			continue
-		var edge := centre + Vector2.from_angle(a) * (radius + 2.0)
-		if CourtHeight.height_at(edge.x, edge.y) - level > 3.0:
-			continue
-		plan.plant(kinds[rng.randi() % 4], centre + Vector2.from_angle(a) * (radius + rng.randf_range(-2.6, -0.4)), rng.randf() * TAU,
-			rng.randf_range(0.95, 1.4), 320.0)
-
-
-## Where the lake walk reaches Looking Lake, and how many trees its far wood holds.
-const LAKE_WALK_END := Vector2(-1150.0, -200.0)
-const LAKE_WOOD := 90
 
 
 ## Thorn bushes, white with may: one or two at the outer edge of every clump

@@ -591,6 +591,36 @@ def litter(sheet, rng):
     return soft
 
 
+def anemone(sheet, rng):
+    """A wood anemone: one white star of six petals on a hair of a stalk over
+    a low collar of cut leaves. Alone it is nothing; in a sheet under oaks it
+    is a floor of stars."""
+    soft = Soft()
+    for k in range(sheet.get("stems", 2)):
+        off = Vector((rng.uniform(-0.06, 0.06), rng.uniform(-0.06, 0.06), 0.0))
+        hgt = sheet["height"] * rng.uniform(0.8, 1.2)
+        lean = heading(rng.uniform(0, math.tau), 0.0) * rng.uniform(0.0, 0.03)
+        collar = off + UP * hgt * 0.55 + lean * 0.5
+        stalk(soft, [off, collar, off + UP * hgt + lean], 0.004, sheet["leaf_deep"], sheet["stem"], 0.1, 0.5)
+        turn = rng.uniform(0, math.tau)
+        for j in range(3):   # the collar: three leaves held out level
+            d = heading(turn + j * math.tau / 3, 0.0)
+            leaf(soft, OUTLINES["oak"], collar, (d + UP * 0.12).normalized(), UP, sheet["leaf_size"] * rng.uniform(0.85, 1.15),
+                 sheet["leaf_deep"], sheet["leaf"], 0.3, (UP + d * 0.2).normalized(), 0.1)
+        head = off + UP * hgt + lean
+        rot = rng.uniform(0, math.tau)
+        tilt = rng.uniform(0.3, 0.6)   # a shallow cup, so it shows white from the side as well as from above
+        for j in range(6):
+            d = heading(rot + j * math.tau / 6, 0.0)
+            leaf(soft, OUTLINES["petal"], head, (d + UP * tilt).normalized(), UP, sheet["petal"] * rng.uniform(0.9, 1.08),
+                 sheet["white_deep"], sheet["white"], 0.5, (UP + d * 0.3).normalized(), 0.22, 0.1)
+        heart = soft.vert(head + UP * sheet["petal"] * 0.2, UP)
+        ring = [soft.vert(head + UP * 0.003 + heading(j * 2.094, 0) * 0.008, heading(j * 2.094, 0)) for j in range(3)]
+        for j in range(3):
+            soft.face((ring[j], ring[(j + 1) % 3], heart), (sheet["gold"],) * 3, 0.5, 0.15)
+    return soft
+
+
 def fern(sheet, rng):
     soft = Soft()
     n = sheet["fronds"]

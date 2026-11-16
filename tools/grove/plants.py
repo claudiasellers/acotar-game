@@ -79,6 +79,9 @@ KINGCUP = {"height": 0.24, "petal": 0.085, "leaf_size": 0.17, "stems": 4, "leave
 PETALS_WHITE = {"petals": 34, "radius": 0.75, "petal": 0.055, "colours": [(0.97, 0.95, 0.94), (0.99, 0.97, 0.96), (0.96, 0.90, 0.92)],
                 "tip": (1.0, 1.0, 1.0)}
 PETALS_PINK = dict(PETALS_WHITE, colours=[(0.97, 0.72, 0.82), (0.99, 0.82, 0.89), (0.94, 0.62, 0.76)], tip=(1.0, 0.93, 0.96))
+# wood anemones: the Oak Glade's floor of white stars
+ANEMONE = {"height": 0.13, "petal": 0.075, "leaf_size": 0.12, "stems": 3, "leaf_deep": (0.16, 0.42, 0.28), "leaf": (0.32, 0.62, 0.36),
+           "stem": (0.52, 0.56, 0.44), "white_deep": (0.90, 0.90, 0.94), "white": (1.0, 1.0, 0.98), "gold": (0.96, 0.80, 0.24)}
 FERN = {"fronds": 9, "height": 0.75, "deep": (0.18, 0.44, 0.33), "mid": (0.34, 0.64, 0.42), "light": (0.60, 0.83, 0.50)}
 
 # plant -> (kind, sheet, form or None). The trees here are studies, built only
@@ -110,6 +113,7 @@ PLANTS = {
     "kingcup_patch_b": ("patch", KINGCUP, ("kingcup", 3, 0.17)),
     "petals_white": ("litter", PETALS_WHITE, None),
     "petals_pink": ("litter", PETALS_PINK, None),
+    "anemone_patch_a": ("patch", ANEMONE, ("anemone", 8, 0.42)),
     "fern_a": ("fern", FERN, None),
     "fern_b": ("fern", FERN, None),
     "fern_c": ("fern", FERN, None),
@@ -127,10 +131,12 @@ FAR = {
                              G.mix(sh["bell_deep"], sh["bell_light"], 0.7), G.mix(sh["leaf"], sh["bell_light"], 0.45)], sh["height"] * 0.6),
     "snowdrop": lambda sh: ([sh["white"], G.mix(sh["leaf"], sh["white"], 0.6), G.mix(sh["leaf"], sh["white"], 0.4)], sh["height"] * 0.8),
     "crocus": lambda sh: ([G.mix(sh["leaf"], c[1], 0.75) for c in sh["colours"]] + [sh["leaf"]], sh["height"] * 0.7),
+    "anemone": lambda sh: ([sh["white"], sh["white_deep"], G.mix(sh["leaf"], sh["white"], 0.6), G.mix(sh["leaf"], sh["white"], 0.4)],
+                           sh["height"] * 0.9),
     "kingcup": lambda sh: ([sh["gold"], G.mix(sh["leaf"], sh["gold"], 0.7), G.mix(sh["leaf"], sh["gold_light"], 0.55), sh["leaf"]],
                            sh["height"] * 0.75),
 }
-SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "kingcup": G.kingcup, "litter": G.litter, "fern": G.fern}
+SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "kingcup": G.kingcup, "anemone": G.anemone, "litter": G.litter, "fern": G.fern}
 
 
 def build(name, out_dir):

@@ -2,7 +2,8 @@
 // sky-blue sheen at low angles, procedural ripples, a thin foam line at the
 // waterline, screen-space refraction and an optional daylight "starlight"
 // sun-glitter mode for the Starlight Pool (sparkles in bright sunlight, Keeper
-// lore correction).
+// lore correction). A lake can carry the painted reflection of a wood on its
+// far shore (mirror_*).
 // The water keeps its own colour at every angle (owner, 2026-11-16: clear
 // colours, never washed out). Seen along the surface, a lake used to turn into
 // a sheet of the pale pink horizon: a mirror-smooth surface reflects all of
@@ -44,6 +45,17 @@ uniform float foam_strength : hint_range(0.0, 2.0) = 0.6;
 uniform float fresnel_power = 4.0;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.1;
 uniform float blight_affect : hint_range(0.0, 1.0) = 1.0;
+
+// A wood's reflection, painted (the water does not mirror trees): Looking
+// Lake's far wood lying on the water (CourtGlenPlaces.mirror; CourtRegion sets
+// these on the lake's own mesh). The wood is taken as a wall round part of a
+// circle: xy the circle's middle (world x, z), z its radius, w the wood's
+// height over the water. mirror_arc: x the bearing of the wood's middle, y its
+// half-arc (radians). mirror_colour: rgb the colour, a how far the water goes
+// to it (0: no reflection, the default).
+instance uniform vec4 mirror_wood = vec4(0.0, 0.0, 0.0, 0.0);
+instance uniform vec2 mirror_arc = vec2(0.0, 0.0);
+instance uniform vec4 mirror_colour : source_color = vec4(0.07, 0.25, 0.2, 0.0);
 
 uniform bool starlight_mode = false;
 uniform float glitter_density = 6.0;
@@ -106,6 +118,33 @@ void fragment() {
 
 	float fres = candy_fresnel(n, VIEW, fresnel_power);
 	col = mix(col, mix(fresnel_color.rgb, night_shallow.rgb * 1.6, night), fres * mix(sheen, 0.6, night));
+
+	if (mirror_colour.a > 0.0) {
+		// where the eye's ray, turned back off the rippled surface, meets the wood
+		vec3 view_w = normalize((INV_VIEW_MATRIX * vec4(VIEW, 0.0)).xyz);
+		vec3 n_w = normalize(vec3(-slope.x * 0.22, 1.0, -slope.y * 0.22));
+		vec3 r = reflect(-view_w, n_w);
+		float flat_len = length(r.xz);
+		if (r.y > 0.0 && flat_len > 0.0001) {
+			vec2 d = r.xz / flat_len;
+			vec2 o = wp - mirror_wood.xy;
+			float ob = dot(o, d);
+			float disc = ob * ob - dot(o, o) + mirror_wood.z * mirror_wood.z;
+			if (disc > 0.0) {
+				float reach = -ob + sqrt(disc);
+				vec2 hit = o + d * reach;
+				// (the bearing as an offset from the wood's middle, so it does not wrap inside the arc)
+				float off = mod(atan(hit.y, hit.x) - mirror_arc.x + PI, TAU) - PI;
+				float in_arc = 1.0 - smoothstep(mirror_arc.y - 0.22, mirror_arc.y, abs(off));
+				// the crowns' own outline: round heads of different heights along the wood
+				float along = off * mirror_wood.z;
+				float crowns = mirror_wood.w * (0.62 + 0.3 * court_vnoise(vec2(along * 0.11, 3.7)) + 0.12 * court_vnoise(vec2(along * 0.42, 9.1)));
+				float up = reach * r.y / flat_len;
+				float under = 1.0 - smoothstep(crowns - 1.2, crowns + 0.4, up);
+				col = mix(col, mirror_colour.rgb * mix(0.8, 1.15, court_vnoise(vec2(along * 0.3, up * 0.35))), in_arc * under * mirror_colour.a * (1.0 - night));
+			}
+		}
+	}
 
 	float foam_noise = court_vnoise(wp * 3.0 + vec2(t * 0.3, -t * 0.2));
 	float foam = (1.0 - smoothstep(0.0, foam_width, water_depth)) * smoothstep(0.25, 0.75, foam_noise + 0.3);

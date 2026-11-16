@@ -49,6 +49,27 @@ extends RefCounted
 ##                     the ground (snowdrops under the willows).
 ##     the mere run    out through open sward to the river, a pair of willows
 ##                     where it meets it.
+## And the north loop, the dell to the oaks to the lake and back:
+##   8 River Road      easy company. Where the road runs beside the brae brook
+##                     north of the dell, aspens stand in pairs either side of
+##                     it: the Aspen Row, the glen's one avenue, 27 m columns
+##                     that carry you toward the oaks' dark mass ahead.
+##   9 Oak Glade       age and shelter, a hall. Great oaks in a ring round the
+##                     clearing with a second rank of oaks behind, parted
+##                     where the road goes in and out between two trunks; under
+##                     them the only closed shade in the glen and a floor of
+##                     white wood anemones, foxgloves in the light at the
+##                     clearing's rim. The oldest oak stands alone on the knoll
+##                     by the oak knoll.
+##  10 Looking Lake    stillness. The lake walk ends between two great elms on
+##                     the rim, the whole lake below at once. The far shore is
+##                     a dark wood of oak and elm down to the water, and its
+##                     reflection lies on the lake (mirror(): the water paints
+##                     it). The near shore is open short sward; reeds stand in
+##                     two bays only.
+##  11 Heron Stones    watching and waiting: the glen's one reed bed, taller
+##                     than you, round the stones, with a narrow parting through
+##                     it from the lake's side and another toward the Knoll Walk.
 ## Everything is found from the land (the way's own line, where it meets the
 ## brook and the river, the knolls' tops), so a change to the land moves the
 ## planting with it. The rules in CourtGlenPlanting plant only ground this
@@ -105,7 +126,8 @@ const FORD_BACK := 7.5
 
 ## The Knoll Walk, and the knolls round it. [near x, near z (the knoll's top is
 ## found from the land), species, trees, size, the shade each throws (m; 0: no
-## flowers), flower]. In the order you pass them.
+## flowers); then, for a knoll off the main walk, its flower and the site its
+## flowers face]. In the order you pass them.
 const KNOLLS := [
 	[-1027.0, 192.0, &"old_thorn", 1, 1.6, 8.0],        # south of the way, the first at hand: the mark from mid-river
 	[-1082.0, 44.0, &"pillar_birch", 3, 1.0, 8.0],      # north, far off: white stems, the pool's tree seen before the pool
@@ -115,6 +137,7 @@ const KNOLLS := [
 	[-1231.0, 198.0, &"pillar_birch", 2, 0.95, 8.0],    # north of the mound, toward the pool
 	[-779.0, 113.0, &"old_thorn", 1, 1.5, 0.0],         # the brae's outer knolls: a thorn each, leaning with the wind
 	[-815.0, -89.0, &"old_thorn", 1, 1.45, 0.0],
+	[-885.0, -267.0, &"great_oak", 1, 1.3, 16.0, &"anemone", &"oak_glade"],   # by the oak knoll: the oldest oak, alone, looking down on the glade
 ]
 const KNOLL_SNAP := 14.0
 ## A knoll this near the way spills its bluebells down to it; patches tried per metre of the spill.
@@ -152,6 +175,37 @@ const MERE_WILLOWS := 25
 const MERE_PARTING := 0.2
 const MERE_LADY := 0.56
 const MERE_OUTLET := 0.13
+
+## The Aspen Row: along the river road, from this far north of where it leaves
+## the main walk to this far (m), a pair every so often, each this far from the
+## road's middle.
+const ROW_FROM := 88.0
+const ROW_TO := 250.0
+const ROW_STEP := 14.5
+const ROW_HALF := 6.4
+## The Oak Glade: great oaks in the ring and oaks in the rank behind, the
+## rings' radii (the clearing kept open is 55 m), and no trunk this near a path.
+const GLADE_OAKS := 13
+const GLADE_RING := 64.0
+const GLADE_BACK := 17
+const GLADE_BACK_RING := 81.0
+const GLADE_DOOR := 9.0
+## Looking Lake's far wood: trees, its half-arc (radians) round the shore from
+## straight across, and how far back from the water it runs (m).
+const LAKE_WOOD := 78
+const LAKE_ARC := 1.25
+const LAKE_DEPTH := 40.0
+## Its reflection, as the water paints it: the wood's front rank's distance
+## from the shore, the height of its crowns over the water, its colour.
+const MIRROR_BACK := 7.0
+const MIRROR_HEIGHT := 19.0
+const MIRROR_COLOUR := Color(0.07, 0.25, 0.2)
+const MIRROR_STRENGTH := 0.8
+## The Heron Stones' reed bed: reeds, its inner and outer radii, the partings' half-width (radians).
+const REEDS := 520
+const REED_INNER := 6.5
+const REED_OUTER := 21.0
+const REED_PARTING := 0.13
 
 static var _lock := Mutex.new()
 static var _way := PackedVector2Array()
@@ -232,12 +286,37 @@ static func claims(p: Vector2) -> bool:
 	var mere := CourtGlenPlanting._lake_named(&"willow_mere")
 	if not mere.is_empty() and p.distance_to(mere["center"]) < float(mere["radius"]) + MERE_CLAIM:
 		return true
-	for id: StringName in [&"glimmer_brook", &"mere_run"]:
-		var pts := brook(id)
-		for i in range(1, pts.size()):
-			if Geometry2D.get_closest_point_to_segment(p, pts[i - 1], pts[i]).distance_to(p) < BROOK_CLAIM:
-				return true
+	for id: StringName in [&"glimmer_brook", &"mere_run", &"lake_run"]:
+		if _near(p, brook(id), BROOK_CLAIM):
+			return true
+	# the north loop: the Aspen Row, the Oak Glade's rings, the lake walk's bare rise, the lake's shores, the reed bed
+	var lake := CourtGlenPlanting._lake_named(&"looking_lake")
+	if not lake.is_empty() and p.distance_to(lake["center"]) < float(lake["radius"]) + LAKE_DEPTH + 12.0:
+		return true
+	if p.distance_to(CourtHeight.site(&"oak_glade")) < GLADE_BACK_RING + 16.0 or p.distance_to(CourtHeight.site(&"heron_stones")) < REED_OUTER + 14.0:
+		return true
+	if _near(p, path(&"lake_walk"), 40.0):
+		return true
+	var road := path(&"river_road")
+	if not road.is_empty() and _near(p, road, 30.0):
+		var from_start := p.distance_to(road[road.size() - 1])
+		return from_start > ROW_FROM - 25.0 and from_start < ROW_TO + 25.0
 	return false
+
+
+static func _near(p: Vector2, line: PackedVector2Array, within: float) -> bool:
+	for i in range(1, line.size()):
+		if Geometry2D.get_closest_point_to_segment(p, line[i - 1], line[i]).distance_to(p) < within:
+			return true
+	return false
+
+
+## A path's line by name (empty if the land has none).
+static func path(id: StringName) -> PackedVector2Array:
+	for q: Dictionary in CourtHeight.paths():
+		if q["id"] == id:
+			return q["points"]
+	return PackedVector2Array()
 
 
 ## A brook's line by name (empty if the land has none).
@@ -364,6 +443,10 @@ static func plant(plan: CourtGlenPlanting.Plan, groups: Array[Dictionary]) -> vo
 	_glimmer_brook(plan, rng, groups)
 	_willow_mere(plan, rng, groups)
 	_mere_run(plan, rng, groups)
+	_river_road(plan, rng)
+	_oak_glade(plan, rng, groups)
+	_looking_lake(plan, rng, groups)
+	_heron_stones(plan, rng)
 
 
 # --- 1: the Brae gate ---------------------------------------------------------
@@ -543,6 +626,8 @@ static func _knoll_walk(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 		var species: StringName = k[2]
 		var a: Array = along(top)
 		var toward := (at(a[0]) - top).normalized()
+		if k.size() > 7:
+			toward = (CourtHeight.site(k[7]) - top).normalized()   # (its flowers face the place it belongs to)
 		var trunks: Array = []
 		var reach: Array = []
 		for n in int(k[3]):
@@ -557,10 +642,11 @@ static func _knoll_walk(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator
 				reach.append(float(k[5]))
 		if trunks.is_empty() or float(k[5]) <= 0.0:
 			continue
-		groups.append({"trunks": trunks, "reach": reach, "flower": &"bluebell", "knoll": top, "toward": toward.angle(), "composed": true})
+		groups.append({"trunks": trunks, "reach": reach, "flower": k[6] if k.size() > 6 else &"bluebell", "knoll": top, "toward": toward.angle(),
+			"composed": true})
 		# a knoll within reach of the way spills its bluebells down to it: you walk past blue at hand, and a
 		# ribbon of it leads up to the tree
-		if float(a[1]) < SPILL_REACH:
+		if float(a[1]) < SPILL_REACH and k.size() <= 6:
 			var far: float = a[1]
 			for i in int(far * SPILL_TRIES):
 				var out := rng.randf_range(7.0, far - 2.6)
@@ -698,6 +784,168 @@ static func _mere_run(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, 
 			trunks.append(p)
 	if not trunks.is_empty():
 		groups.append({"trunks": trunks, "reach": [7.5, 7.5].slice(0, trunks.size()), "flower": &"snowdrop", "composed": true})
+
+
+# --- 8: River Road ----------------------------------------------------------------
+
+static func _river_road(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var road := path(&"river_road")
+	if road.size() < 2:
+		return
+	# (the road's line runs south to the main walk: its last point is where it leaves it)
+	var run := ROW_FROM
+	while run <= ROW_TO:
+		var on: Array = _on_line(road, road.size() - 1, -run)
+		var side: Vector2 = (on[1] as Vector2).orthogonal()
+		for s: float in [-1.0, 1.0]:
+			var p := _spot(plan, (on[0] as Vector2) + side * s * ROW_HALF + (on[1] as Vector2) * rng.randf_range(-0.6, 0.6), 2.5, 5.2, 2.2, 4.0)
+			if p != Vector2.INF:
+				plan.tree(&"aspen_spire", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.82, 0.98))
+		run += ROW_STEP
+
+
+# --- 9: Oak Glade -----------------------------------------------------------------
+
+static func _oak_glade(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var centre := CourtHeight.site(&"oak_glade")
+	var trunks: Array = []
+	var reach: Array = []
+	for i in GLADE_OAKS:
+		var a := TAU * (float(i) + rng.randf_range(-0.16, 0.16)) / float(GLADE_OAKS)
+		var want := centre + Vector2.from_angle(a) * (GLADE_RING + rng.randf_range(-1.5, 3.0))
+		if CourtLandHabitats.path_distance(want.x, want.y) < GLADE_DOOR:
+			continue   # the road goes in and out between two trunks
+		var p := _spot(plan, want, 4.0, GLADE_DOOR, 3.0, 9.0)
+		if p != Vector2.INF and plan.tree(&"great_oak", i, p, rng.randf() * TAU, rng.randf_range(0.98, 1.14)):
+			trunks.append(p)
+			reach.append(15.0)
+	for i in GLADE_BACK:
+		var a := TAU * (float(i) + 0.5 + rng.randf_range(-0.2, 0.2)) / float(GLADE_BACK)
+		var want := centre + Vector2.from_angle(a) * (GLADE_BACK_RING + rng.randf_range(-3.0, 5.0))
+		if CourtLandHabitats.path_distance(want.x, want.y) < GLADE_DOOR:
+			continue
+		var p := _spot(plan, want, 5.0, GLADE_DOOR, 3.0, 6.5)
+		if p != Vector2.INF and plan.tree(&"oak", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.2)):
+			trunks.append(p)
+			reach.append(9.0)
+	if not trunks.is_empty():
+		groups.append({"trunks": trunks, "reach": reach, "flower": &"anemone", "composed": true})
+	# foxgloves in the light at the clearing's rim, in stands
+	for stand in 9:
+		var a := TAU * (float(stand) + rng.randf_range(-0.3, 0.3)) / 9.0
+		var heart := centre + Vector2.from_angle(a) * rng.randf_range(47.0, 53.0)
+		if CourtLandHabitats.path_distance(heart.x, heart.y) < 7.0:
+			continue
+		for n in 5 + rng.randi() % 4:
+			var p := heart + Vector2.from_angle(rng.randf() * TAU) * absf(rng.randfn(0.0, 1.9))
+			if CourtGlenPlanting.growable(p, 1.0):
+				plan.plant(&"foxglove", p, rng.randf() * TAU, rng.randf_range(1.0, 1.5), 180.0)
+
+
+# --- 10: Looking Lake ---------------------------------------------------------------
+
+## Where the lake walk reaches Looking Lake, and the bearing from the lake's middle straight across from there.
+static func lake_arrival() -> Array:
+	var lake := CourtGlenPlanting._lake_named(&"looking_lake")
+	var walk := path(&"lake_walk")
+	if lake.is_empty() or walk.is_empty():
+		return []
+	var centre: Vector2 = lake["center"]
+	var end := walk[0] if walk[0].distance_to(centre) < walk[walk.size() - 1].distance_to(centre) else walk[walk.size() - 1]
+	return [end, (end - centre).angle() + PI]
+
+
+static func _looking_lake(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var lake := CourtGlenPlanting._lake_named(&"looking_lake")
+	var arrival := lake_arrival()
+	if lake.is_empty() or arrival.is_empty():
+		return
+	var centre: Vector2 = lake["center"]
+	var radius: float = lake["radius"]
+	var end: Vector2 = arrival[0]
+	var far_side: float = arrival[1]
+	var come := far_side - PI
+	# two great elms on the rim where the walk ends: the lake between them
+	var down := (centre - end).normalized()
+	for side: float in [-1.0, 1.0]:
+		var p := _spot(plan, end + down * 5.0 + down.orthogonal() * side * 12.5, 5.0, 7.5, 3.0, 8.0)
+		if p != Vector2.INF:
+			plan.tree(&"great_elm", 0 if side < 0.0 else 2, p, rng.randf() * TAU, rng.randf_range(0.98, 1.08))
+	# the dark wood across the water: oak at the shore, elms and great oaks standing over them behind
+	var wood: Array = []
+	var tries := 0
+	while wood.size() < LAKE_WOOD and tries < 1800:
+		tries += 1
+		var a := far_side + clampf(rng.randfn(0.0, LAKE_ARC * 0.5), -LAKE_ARC, LAKE_ARC)
+		var back := 2.5 + absf(rng.randfn(0.0, LAKE_DEPTH * 0.36))
+		var p := centre + Vector2.from_angle(a) * (radius + back)
+		if back > LAKE_DEPTH or CourtLandHabitats.keep_open(p.x, p.y) or CourtGlenPlanting.steep(p):
+			continue
+		var great := back > 11.0 and rng.randf() < 0.3
+		var ok := true
+		for q: Vector2 in wood:
+			if q.distance_to(p) < (7.0 if great else 4.6):
+				ok = false
+				break
+		if not ok:
+			continue
+		var species: StringName = (&"great_elm" if rng.randf() < 0.62 else &"great_oak") if great else &"oak"
+		if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.9, 1.2) if not great else rng.randf_range(0.9, 1.05)):
+			wood.append(p)
+	if not wood.is_empty():
+		var each: Array = []
+		each.resize(wood.size())
+		each.fill(8.5)
+		groups.append({"trunks": wood, "reach": each, "flower": &"bluebell", "composed": true})
+	# reeds in two bays only, either side of the open near shore
+	var kinds: Array[StringName] = [&"reed_clump", &"cattail", &"iris_clump"]
+	for bay: float in [come + 1.05, come - 1.15]:
+		for i in 70:
+			var a := bay + rng.randfn(0.0, 0.1)
+			plan.plant(kinds[rng.randi() % 3], centre + Vector2.from_angle(a) * (radius + rng.randf_range(-2.8, -0.3)), rng.randf() * TAU,
+				rng.randf_range(0.95, 1.45), 320.0)
+
+
+## The far wood's reflection for a lake's water (CourtRegion hands it to the
+## water's shader): {center, radius (of the wood's front rank), bearing, half
+## (its half-arc), height (its crowns over the water), colour, strength}.
+## Empty for a lake with no wood across it.
+static func mirror(content: CourtRegionContent, lake: Dictionary) -> Dictionary:
+	if not CourtGlenPlanting.applies(content) or lake.get("id", &"") != &"looking_lake":
+		return {}
+	var arrival := lake_arrival()
+	if arrival.is_empty():
+		return {}
+	return {"center": lake["center"], "radius": float(lake["radius"]) + MIRROR_BACK, "bearing": float(arrival[1]), "half": LAKE_ARC * 0.86,
+		"height": MIRROR_HEIGHT, "colour": MIRROR_COLOUR, "strength": MIRROR_STRENGTH}
+
+
+# --- 11: Heron Stones -----------------------------------------------------------------
+
+static func _heron_stones(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator) -> void:
+	var stones := CourtHeight.site(&"heron_stones")
+	var lake := CourtGlenPlanting._lake_named(&"looking_lake")
+	# the partings: toward the lake's near shore, and toward the Blossom Knoll (the way back to the Knoll Walk)
+	var doors: Array[float] = []
+	if not lake.is_empty():
+		doors.append(((lake["center"] as Vector2) - stones).angle())
+	doors.append((CourtHeight.site(&"knoll_steps") - stones).angle())
+	for i in REEDS:
+		var a := rng.randf() * TAU
+		var open := false
+		for door in doors:
+			if absf(angle_difference(a, door)) < REED_PARTING:
+				open = true
+		if open:
+			continue
+		var r := lerpf(REED_INNER, REED_OUTER, sqrt(rng.randf()))
+		var p := stones + Vector2.from_angle(a) * r
+		if not CourtGlenPlanting.growable(p, 0.5):
+			continue
+		# tallest in the bed's heart, falling away at its edge
+		# (a reed clump stands 1.4 to 2.4 m at size 1)
+		var tall := lerpf(1.4, 0.85, clampf((r - REED_INNER) / (REED_OUTER - REED_INNER), 0.0, 1.0)) * rng.randf_range(0.88, 1.12)
+		plan.plant(&"cattail" if i % 6 == 0 else &"reed_clump", p, rng.randf() * TAU, tall, 320.0)
 
 
 ## The Glimmer Brook's string of lights, as CourtMotes draws them from the

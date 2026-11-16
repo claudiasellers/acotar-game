@@ -590,6 +590,14 @@ func _build_water() -> void:
 		var pool := float(lake["radius"]) < 30.0
 		mi.material_override = _water_material(POOL_MATERIAL if pool else WATER_MATERIAL, pool)
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# a wood across the water lies on it (CourtGlenPlaces: Looking Lake's mirror)
+		var mirror := CourtGlenPlaces.mirror(content, lake)
+		if not mirror.is_empty():
+			var at: Vector2 = mirror["center"]
+			var colour: Color = mirror["colour"]
+			mi.set_instance_shader_parameter(&"mirror_wood", Vector4(at.x, at.y, mirror["radius"], mirror["height"]))
+			mi.set_instance_shader_parameter(&"mirror_arc", Vector2(mirror["bearing"], mirror["half"]))
+			mi.set_instance_shader_parameter(&"mirror_colour", Color(colour.r, colour.g, colour.b, mirror["strength"]))
 		holder.add_child(mi)
 	var river := _river_mesh()
 	if river != null:
