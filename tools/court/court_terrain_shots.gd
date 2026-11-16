@@ -819,9 +819,6 @@ const FOGS := {
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0)},
 	"layered_mist": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0), "fog_height": 30.0, "fog_height_density": 0.045},
-	# PREVIEW (clear colours): the court's day grades as they were.
-	"before": {"exposure": 0.8, "lut_keep": 4.0, "fog_density": 0.0011, "volumetric_density": 0.002, "glow_intensity": 0.3,
-		"contrast": 1.12},
 }
 
 
@@ -869,22 +866,7 @@ func _apply_grass(world: World, variant: String) -> void:
 func _apply_fog(world: World, grade: StringName, fog: String) -> void:
 	var p := (GradeDirector.load_preset(grade) as GradePreset).duplicate() as GradePreset
 	for k: String in FOGS[fog]:
-		if k == "lut_keep":
-			var gt := p.lut as GradientTexture1D
-			if gt == null:
-				continue
-			var g := gt.gradient.duplicate() as Gradient
-			var cols := g.colors
-			for i in cols.size():
-				var v := g.offsets[i]
-				cols[i] = Color(v, v, v).lerp(cols[i], float(FOGS[fog][k]))
-			g.colors = cols
-			var out := GradientTexture1D.new()
-			out.gradient = g
-			out.width = gt.width
-			p.lut = out
-		else:
-			p.set(k, FOGS[fog][k])
+		p.set(k, FOGS[fog][k])
 	world.grade.current = p
 	world.grade.set(&"_to", p)
 	world.grade.set(&"_t", 1.0)
