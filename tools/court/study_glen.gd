@@ -7,14 +7,17 @@ extends RefCounted
 ## Nothing here is placed by area. Every plant answers to something on the
 ## land (docs/lanes/court-planting-by-place.md, Starlight Glen):
 ##   knolls    one tree on each knoll top, and neighbours never the same kind,
-##             so you find your way by them; a pool of one flower in its shade
+##             so you find your way by them; a pool of one flower in its
+##             shade, and the same flower in a crescent round the knoll's
+##             shaded north foot
 ##   brooks    trees gathered in clumps along the brooks, on alternate banks;
 ##             iris, mint, fern and stones at the water, snowdrops beside it
 ##   the river willows and birches in clumps along the Thornwater
 ##   the lake  Looking Lake wooded to the water on its far side, for the
-##             reflection, and open where you come to it; its isle one clump
-##             of pillar birches
+##             reflection, and open where you come to it (its isle has its
+##             tree already); reeds and iris only where the bank is low
 ##   the mere  Willow Mere willows all round, open toward the Weeping Lady
+##             and on the side you come to it from
 ##   the brae  a clump either side of the way just over the crest, so the
 ##             glen appears between trunks
 ##   paths     a drift of crocuses on the verge now and then
@@ -50,13 +53,13 @@ static func build(world: Node3D) -> void:
 	wave.frequency = 0.035
 	# every group of trees, with the flower that pools in its shade: {trunks, reach, flower}
 	var groups: Array[Dictionary] = []
-	_knolls(root, rng, groups)
+	var crescents := _knolls(root, rng, groups)
 	_brooks(root, rng, groups)
 	_river(root, rng, groups)
 	_lake(root, rng, groups)
 	_mere(root, rng, groups)
 	_brae(root, rng, groups)
-	_shade_flowers(root, rng, wave, groups)
+	_shade_flowers(root, rng, wave, groups, crescents)
 	_verges(root, rng)
 	var trees := 0
 	for g in groups:
@@ -67,7 +70,8 @@ static func build(world: Node3D) -> void:
 # --- the rules ------------------------------------------------------------------
 
 ## One tree on each knoll top, neighbours never the same kind.
-static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> Array:
+	var crescents: Array = []   # [spot, flower, heart of the crescent or not]
 	var placed: Array = []   # [top, kind index]
 	for top: Vector2 in knoll_tops():
 		if top.distance_to(POOL) < HOLLOW or CourtLandHabitats.keep_open(top.x, top.y):
@@ -84,8 +88,22 @@ static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dict
 		placed.append([top, kind])
 		var k: Array = KNOLL_KINDS[kind]
 		_estate(root, rng, k[0], top, float(k[1]) * rng.randf_range(0.92, 1.1))
-		groups.append({"trunks": [top], "reach": 10.0 if k[0] == &"oak" else 7.5, "flower": FLOWERS[placed.size() % 3]})
+		var flower: StringName = FLOWERS[placed.size() % 3]
+		groups.append({"trunks": [top], "reach": 10.0 if k[0] == &"oak" else 7.5, "flower": flower})
+		# the knoll's north foot, where its slope eases: the same flower in a crescent, in its shade
+		var foot := 30.0
+		var r := 9.0
+		while r < 60.0:
+			if CourtHeight.height_at(top.x, top.y - r + 3.0) - CourtHeight.height_at(top.x, top.y - r) < 0.36:
+				foot = r
+				break
+			r += 3.0
+		for i in int(foot * 9.0):
+			var turn := rng.randfn(0.0, 0.5)
+			var out := rng.randfn(0.0, 3.0)
+			crescents.append([top + Vector2.from_angle(-PI * 0.5 + turn) * (foot + 1.5 + out), flower, absf(turn) < 0.45 and absf(out) < 2.5])
 	print("STUDY glen knolls: ", placed.size())
+	return crescents
 
 
 ## Trees gathered in clumps along the brooks, on alternate banks, and the
@@ -183,6 +201,10 @@ static func _lake(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 	var centre := CourtHeight.site(&"looking_lake")
 	var radius := 85.0
 	var come := (Vector2(-1150.0, -200.0) - centre).angle()   # the lake walk's end
+	var level := 0.0
+	for l: Dictionary in CourtHeight.lakes():
+		if l["id"] == &"looking_lake":
+			level = l["level"]
 	var far_side := come + PI
 	var wood: Array = []
 	var tries := 0
@@ -206,14 +228,22 @@ static func _lake(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 		var species: StringName = &"willow" if back < 7.0 and rng.randf() < 0.6 else (&"oak" if rng.randf() < 0.4 else &"birch")
 		_estate(root, rng, species, p, rng.randf_range(0.85, 1.15))
 	groups.append({"trunks": wood, "reach": 8.5, "flower": &"bluebell"})
-	# the isle
-	var isle := CourtHeight.site(&"looking_lake_isle")
-	var on_isle: Array = []
-	for k in 3:
-		var p := isle + Vector2.from_angle(TAU * float(k) / 3.0 + rng.randf()) * rng.randf_range(1.5, 4.0)
-		on_isle.append(p)
-		_great(root, rng, p, rng.randf_range(0.8, 1.05) if k > 0 else 1.1)
-	groups.append({"trunks": on_isle, "reach": 7.0, "flower": &"snowdrop"})
+	# willows at the water wherever the bank comes down to it (the far bank is a cliff: its wood crowns it)
+	var low: Array = []
+	for i in 72:
+		var a := TAU * float(i) / 72.0
+		var p := centre + Vector2.from_angle(a) * (radius + rng.randf_range(3.0, 5.0))
+		if CourtHeight.height_at(p.x, p.y) - level > 2.2 or absf(angle_difference(a, come)) < 0.35 or CourtLandHabitats.keep_open(p.x, p.y):
+			continue
+		var ok := low.size() < 8
+		for q: Vector2 in low:
+			if q.distance_to(p) < 10.0:
+				ok = false
+		if ok:
+			low.append(p)
+			_estate(root, rng, &"willow", p, rng.randf_range(0.95, 1.2))
+	if not low.is_empty():
+		groups.append({"trunks": low, "reach": 7.5, "flower": &"snowdrop"})
 	# the shore: thick on the wooded side, a few groups on the open one
 	var shore := {&"reed_clump": [], &"cattail": [], &"iris_clump": [], &"water_mint": []}
 	for i in 620:
@@ -223,8 +253,12 @@ static func _lake(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 			continue
 		if absf(angle_difference(a, come)) < 0.35:
 			continue    # where you come to the water stays clear
+		# they stand in the shallows on the lake's shelf, and not under the west cliff
+		var edge := centre + Vector2.from_angle(a) * (radius + 2.0)
+		if CourtHeight.height_at(edge.x, edge.y) - level > 9.0:
+			continue
 		var kind: StringName = shore.keys()[rng.randi() % 4]
-		shore[kind].append(_at(rng, centre + Vector2.from_angle(a) * (radius + rng.randf_range(-1.5, 1.2)), 0.85, 1.3))
+		shore[kind].append(_at(rng, centre + Vector2.from_angle(a) * (radius + rng.randf_range(-2.6, -0.4)), 0.95, 1.4))
 	for kind: StringName in shore:
 		StudyPoolHollow._cells(root, "Lake_%s" % kind, FloraLibrary.mesh(kind), shore[kind], 320.0)
 
@@ -238,7 +272,7 @@ static func _mere(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 	var willows: Array = []
 	for i in 13:
 		var a := TAU * (float(i) + rng.randf_range(-0.3, 0.3)) / 13.0
-		if absf(angle_difference(a, lady)) < 0.5 or absf(angle_difference(a, 0.0)) < 0.22:
+		if absf(angle_difference(a, lady)) < 0.5 or absf(angle_difference(a, 0.0)) < 0.22 or absf(angle_difference(a, lady + PI)) < 0.42:
 			continue
 		var p := centre + Vector2.from_angle(a) * (radius + rng.randf_range(2.5, 6.5))
 		if CourtLandHabitats.keep_open(p.x, p.y):
@@ -252,7 +286,7 @@ static func _mere(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 		if absf(angle_difference(a, lady)) < 0.35:
 			continue
 		var kind: StringName = shore.keys()[rng.randi() % 3]
-		shore[kind].append(_at(rng, centre + Vector2.from_angle(a + rng.randfn(0.0, 0.04)) * (radius + rng.randf_range(-1.2, 1.0)), 0.85, 1.3))
+		shore[kind].append(_at(rng, centre + Vector2.from_angle(a + rng.randfn(0.0, 0.04)) * (radius + rng.randf_range(-2.2, -0.3)), 0.9, 1.35))
 	for kind: StringName in shore:
 		StudyPoolHollow._cells(root, "Mere_%s" % kind, FloraLibrary.mesh(kind), shore[kind], 320.0)
 
@@ -299,7 +333,8 @@ static func _verges(root: Node3D, rng: RandomNumberGenerator) -> void:
 ## Each group's flower pools in its shade: thick and tall in the heart,
 ## feathering to small outliers at the edge, trails of grass through it, fern
 ## and moss at the trunks' feet (the pool's bluebells, for any tree and flower).
-static func _shade_flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, groups: Array[Dictionary]) -> void:
+static func _shade_flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite, groups: Array[Dictionary],
+		crescents: Array) -> void:
 	var trail := FastNoiseLite.new()
 	trail.seed = 31
 	trail.frequency = 0.045
@@ -354,6 +389,17 @@ static func _shade_flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastN
 					out[patch] = [[], []]
 				out[patch][0].append(at)
 				out[patch][1].append(tint)
+	for c: Array in crescents:
+		var p: Vector2 = c[0]
+		if StudyPoolHollow._steep(p) or StudyPoolHollow._wet(p, 1.2) or _water(p) or CourtLandHabitats.path_distance(p.x, p.y) < 0.6 \
+				or p.distance_to(POOL) < HOLLOW or wave.get_noise_2d(p.x * 4.0, p.y * 4.0) < -0.2:
+			continue
+		var patches: Array = PATCHES[c[1]]
+		var patch: String = (patches[0] as Array)[rng.randi() % (patches[0] as Array).size()] if c[2] else patches[1]
+		if not out.has(patch):
+			out[patch] = [[], []]
+		out[patch][0].append(_at(rng, p, 1.0 if c[2] else 0.7, 1.4 if c[2] else 1.05))
+		out[patch][1].append(Color(0.92, 0.92, 1.0))
 	for patch: String in out:
 		StudyPoolHollow._cells(root, "Shade_" + patch, StudyPoolHollow._glade(patch), out[patch][0], NEAR, 0.0, out[patch][1])
 		StudyPoolHollow._cells(root, "Shade_%s_far" % patch, StudyPoolHollow._glade(patch + "_far"), out[patch][0], 420.0, NEAR, out[patch][1])
@@ -478,7 +524,9 @@ static func _clump(root: Node3D, rng: RandomNumberGenerator, heart: Vector2, cou
 	while stood.size() < count and tries < 24:
 		tries += 1
 		var p := heart if tries == 1 else heart + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(spread * 0.6, spread * 1.5)
-		var ok := not CourtLandHabitats.keep_open(p.x, p.y) and not StudyPoolHollow._steep(p) and not StudyPoolHollow._wet(p, 2.5)
+		# clear of the water, and far enough from a path that no crown hangs over it
+		var ok := not CourtLandHabitats.keep_open(p.x, p.y) and not StudyPoolHollow._steep(p) and not StudyPoolHollow._wet(p, 2.5) \
+				and CourtLandHabitats.path_distance(p.x, p.y) > 9.0
 		for q: Vector2 in stood:
 			if q.distance_to(p) < spread * 0.6:
 				ok = false

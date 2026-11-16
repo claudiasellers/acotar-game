@@ -79,13 +79,14 @@ const STUDY_VIEWS := {
 	# on the Glimmer Brook's bank, looking down it into the pool
 	"brook_in": [-1319.0, 322.0, 1.7, -1301.0, 268.0, 1.0, 0.45, &"spring", 66.0],
 	# the rest of the glen (study=glen): Looking Lake from where the lake walk reaches it
-	"lake_shore": [-1175.0, -185.0, 1.7, -1270.0, -155.0, 7.0, 0.45, &"spring", 70.0],
-	"lake_dusk": [-1175.0, -185.0, 1.7, -1270.0, -155.0, 7.0, 0.8, &"spring", 70.0],
+	"lake_shore": [-1152.0, -199.0, 1.7, -1270.0, -155.0, 3.0, 0.45, &"spring", 70.0],
+	"lake_dusk": [-1152.0, -199.0, 1.7, -1270.0, -155.0, 3.0, 0.8, &"spring", 70.0],
 	# Willow Mere, across the water to the Weeping Lady
-	"mere": [-1180.5, 398.5, 1.7, -1125.0, 456.0, 4.0, 0.45, &"spring", 70.0],
-	"mere_dusk": [-1180.5, 398.5, 1.7, -1125.0, 456.0, 4.0, 0.8, &"spring", 70.0],
+	"mere": [-1175.0, 404.1, 1.7, -1125.0, 456.0, 4.0, 0.45, &"spring", 70.0],
+	"mere_dusk": [-1175.0, 404.1, 1.7, -1125.0, 456.0, 4.0, 0.8, &"spring", 70.0],
 	# on the glen way among the knolls; down the brae brook; the glen from the air
 	"knoll_way": [-1050.0, 165.0, 1.7, -1132.0, 140.0, 8.0, 0.45, &"spring", 70.0],
+	"knoll_foot": [-1005.0, 150.0, 1.7, -1028.0, 192.0, 5.0, 0.45, &"spring", 70.0],
 	"brook_walk": [-880.0, -110.0, 1.7, -900.0, 30.0, 1.0, 0.45, &"spring", 68.0],
 	"air_glen": [-820.0, 330.0, 230.0, -1180.0, 30.0, 0.0, 0.45, &"spring", 70.0],
 	# on the floor, looking up into a group of slope birches
