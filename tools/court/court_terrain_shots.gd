@@ -69,6 +69,12 @@ const STUDY_VIEWS := {
 	"pool_side": [-1266.0, 270.0, 1.7, -1312.0, 256.0, 7.0, 0.45, &"spring", 70.0],
 	"pool_dusk": [-1266.0, 270.0, 1.7, -1312.0, 256.0, 7.0, 0.8, &"spring", 70.0],
 	"mound_dusk": [-1208.0, 270.0, 1.7, -1300.0, 262.0, -6.0, 0.8, &"spring", 70.0],
+	"mound_day": [-1208.0, 270.0, 1.7, -1300.0, 262.0, -6.0, 0.45, &"spring", 70.0],
+	# kneeling in the bluebells under the birches, the pool beyond
+	"pool_low": [-1288.5, 297.5, 0.75, -1302.0, 262.0, 1.6, 0.45, &"spring", 62.0],
+	"pool_low_dusk": [-1288.5, 297.5, 0.75, -1302.0, 262.0, 1.6, 0.8, &"spring", 62.0],
+	# from across the water, looking back at the way in and the mound
+	"pool_back": [-1331.0, 250.0, 1.7, -1262.0, 268.0, 5.0, 0.45, &"spring", 70.0],
 }
 
 
@@ -99,6 +105,9 @@ func _run() -> void:
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
 		elif a.begins_with("without="):
 			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
+			args.erase(a)
+		elif a.begins_with("study="):
+			study = a.substr(6)   # one place planted whole, for a look: study=pool_hollow
 			args.erase(a)
 		elif a.begins_with("ring="):
 			rings.append(a.substr(5))   # a ring of great trees round a site: ring=<species>,<site>,<radius m>,<count>
@@ -171,6 +180,10 @@ func _run() -> void:
 			_lineup(world, eye, at, lineup, cam)
 		for ring: String in rings:
 			_ring(world, ring)
+		if study == "pool_hollow" and world.get_node_or_null(^"StudyPoolHollow") == null:
+			StudyPoolHollow.build(world)
+		if study == "pool_hollow":
+			StudyPoolHollow.at_time(world, v[6])
 		if forest != "":
 			_forest(world, eye, forest)
 		for look: String in (looks if not looks.is_empty() else [""]):
@@ -607,6 +620,7 @@ func _leave_out(world: World, what: String) -> void:
 
 
 var rings: Array[String] = []
+var study := ""
 
 
 ## A ring of one of the court's great trees round a named site, for a look at a
