@@ -90,6 +90,9 @@ func _run() -> void:
 		elif a.begins_with("without="):
 			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
 			args.erase(a)
+		elif a.begins_with("ring="):
+			rings.append(a.substr(5))   # a ring of great trees round a site: ring=<species>,<site>,<radius m>,<count>
+			args.erase(a)
 		elif a.begins_with("floss_multi="):
 			# the share of candyfloss trees with a colour to each tuft (0 none, 1 all), for a lineup
 			for m: ShaderMaterial in [FloraLibrary.floss_material(), FloraLibrary.fuzz_material()]:
@@ -156,6 +159,8 @@ func _run() -> void:
 			world.grade.swap_to(_grade_at(eye, v[7]), 0.0)
 		if lineup != "":
 			_lineup(world, eye, at, lineup, cam)
+		for ring: String in rings:
+			_ring(world, ring)
 		if forest != "":
 			_forest(world, eye, forest)
 		for look: String in (looks if not looks.is_empty() else [""]):
@@ -589,6 +594,49 @@ func _leave_out(world: World, what: String) -> void:
 		if near and parts.has("shadows"):
 			for mmi: MultiMeshInstance3D in field.find_children("*", "MultiMeshInstance3D", true, false):
 				mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+var rings: Array[String] = []
+
+
+## A ring of one of the court's great trees round a named site, for a look at a
+## planting idea before any planting rule exists (`ring=pillar_birch,starlight_pool,30,16`):
+## the builds in turn, each turned and sized a little differently, standing a
+## little in or out of the true circle, and none on a path.
+func _ring(world: World, spec: String) -> void:
+	var f := spec.split(",")
+	var species := StringName(f[0])
+	var centre := CourtHeight.site(StringName(f[1]))
+	var radius := float(f[2])
+	var count := int(f[3])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(spec)
+	var node := Node3D.new()
+	node.name = "Ring"
+	world.add_child(node)
+	var stood := 0
+	for i in count:
+		var a := TAU * (float(i) + rng.randf_range(-0.22, 0.22)) / float(count)
+		var r := radius + rng.randf_range(-2.5, 2.5)
+		var p := Vector3(centre.x + cos(a) * r, 0.0, centre.y + sin(a) * r)
+		var on_path := false
+		for path: Dictionary in CourtHeight.paths():
+			var pts: PackedVector2Array = path["points"]
+			for k in pts.size() - 1:
+				var q := Geometry2D.get_closest_point_to_segment(Vector2(p.x, p.z), pts[k], pts[k + 1])
+				if q.distance_to(Vector2(p.x, p.z)) < float(path["half_width"]) + 3.5:
+					on_path = true
+		if on_path:
+			continue
+		p.y = WorldHeight.height_at(p.x, p.z)
+		var mi := MeshInstance3D.new()
+		mi.mesh = CourtGreatTrees.mesh(species, i)
+		mi.position = p
+		mi.rotation.y = rng.randf() * TAU
+		mi.scale = Vector3.ONE * rng.randf_range(0.9, 1.12)
+		node.add_child(mi)
+		stood += 1
+	print("RING %s: %d of %d stand" % [spec, stood, count])
 
 
 var forest_per_ha := FOREST_PER_HA
