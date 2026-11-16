@@ -507,6 +507,6 @@ place_planting = &"glen"
 form_per_ha = {
 "brook_bank": Vector2(4, 60),
 "floor": Vector2(0, 5),
-"knoll": Vector2(1, 30)
+"knoll": Vector2(1, 70)
 }
 notes = "Mirror lakes on the Thornwater west of the manor. The Starlight Pool is a daytime swim Tamlin shows Feyre: it glitters in sunlight (Keeper, chapter-verified). The pool hides under the Glimmerfall."
