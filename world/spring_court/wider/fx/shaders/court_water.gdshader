@@ -1,6 +1,14 @@
-// Spring Court water: pastel depth tint, fresnel, procedural ripples, soft foam,
-// screen-space refraction and an optional daylight "starlight" sun-glitter mode
-// for the Starlight Pool (sparkles in bright sunlight, Keeper lore correction).
+// Spring Court water: a clear depth tint (aqua shallows over blue depths), a
+// sky-blue sheen at low angles, procedural ripples, a thin foam line at the
+// waterline, screen-space refraction and an optional daylight "starlight"
+// sun-glitter mode for the Starlight Pool (sparkles in bright sunlight, Keeper
+// lore correction).
+// The water keeps its own colour at every angle (owner, 2026-11-16: clear
+// colours, never washed out). Seen along the surface, a lake used to turn into
+// a sheet of the pale pink horizon: a mirror-smooth surface reflects all of
+// the sky there, and the sheen colour was the horizon's too. So the sheen is
+// the sky's blue, and the mirror is held to `mirror` (the most of the sky the
+// surface gives back at the lowest angle is about 50 x 0.16 x mirror^2).
 shader_type spatial;
 render_mode depth_draw_always, cull_back, diffuse_burley, specular_schlick_ggx;
 // Shared rim curve of the candy_lit family (render program T2).
@@ -13,9 +21,13 @@ uniform sampler2D depth_tex : hint_depth_texture, filter_nearest, repeat_disable
 
 uniform float blight : hint_range(0.0, 1.0) = 0.0;
 
-uniform vec4 shallow_color : source_color = vec4(0.62, 0.93, 0.88, 1.0);
-uniform vec4 deep_color : source_color = vec4(0.52, 0.56, 0.92, 1.0);
-uniform vec4 fresnel_color : source_color = vec4(1.0, 0.86, 0.94, 1.0);
+uniform vec4 shallow_color : source_color = vec4(0.38, 0.78, 0.76, 1.0);
+uniform vec4 deep_color : source_color = vec4(0.22, 0.38, 0.76, 1.0);
+uniform vec4 fresnel_color : source_color = vec4(0.50, 0.66, 0.95, 1.0);
+// How far the surface goes to fresnel_color at the lowest angle.
+uniform float sheen : hint_range(0.0, 1.0) = 0.4;
+// The surface as a mirror of the sky (SPECULAR); see the note at the top.
+uniform float mirror : hint_range(0.0, 1.0) = 0.2;
 uniform vec4 foam_color : source_color = vec4(1.0, 0.98, 1.0, 1.0);
 uniform float depth_scale = 2.5;
 uniform float clarity : hint_range(0.0, 1.0) = 0.55;
@@ -25,10 +37,12 @@ uniform float ripple_strength : hint_range(0.0, 2.0) = 0.45;
 uniform vec2 flow_dir = vec2(0.0, 0.0);
 uniform float flow_speed = 0.0;
 uniform float ripple_speed = 0.25;
-uniform float foam_width = 0.45;
-uniform float foam_strength : hint_range(0.0, 2.0) = 0.8;
+// Metres of water (along the view) the foam line fades over: a line at the
+// waterline. On an eased shore 0.45 was a white band metres wide.
+uniform float foam_width = 0.14;
+uniform float foam_strength : hint_range(0.0, 2.0) = 0.6;
 uniform float fresnel_power = 4.0;
-uniform float roughness_value : hint_range(0.0, 1.0) = 0.06;
+uniform float roughness_value : hint_range(0.0, 1.0) = 0.1;
 uniform float blight_affect : hint_range(0.0, 1.0) = 1.0;
 
 uniform bool starlight_mode = false;
@@ -91,7 +105,7 @@ void fragment() {
 	vec3 col = mix(water_col, behind * shallow_c * 1.2, clarity * (1.0 - depth_f));
 
 	float fres = candy_fresnel(n, VIEW, fresnel_power);
-	col = mix(col, mix(fresnel_color.rgb, night_shallow.rgb * 1.6, night), fres * 0.6);
+	col = mix(col, mix(fresnel_color.rgb, night_shallow.rgb * 1.6, night), fres * mix(sheen, 0.6, night));
 
 	float foam_noise = court_vnoise(wp * 3.0 + vec2(t * 0.3, -t * 0.2));
 	float foam = (1.0 - smoothstep(0.0, foam_width, water_depth)) * smoothstep(0.25, 0.75, foam_noise + 0.3);
@@ -130,7 +144,7 @@ void fragment() {
 	col = court_blight_mix(col, b) * mix(1.0, 0.45, b);
 	ALBEDO = col;
 	ROUGHNESS = mix(roughness_value, 0.6, b);
-	SPECULAR = 0.6 * (1.0 - 0.6 * night);
+	SPECULAR = mix(mirror, 0.24, night);
 	METALLIC = 0.0;
 	EMISSION = emit * (1.0 - b) + foam * foam_color.rgb * 0.05;
 }
