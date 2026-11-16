@@ -103,10 +103,10 @@ STUDIES = {
 }
 # what a patch's far cushion is topped with, and how high it stands: kind -> (colours, height)
 FAR = {
-    "bluebell": lambda sh: ([sh["bell_deep"], G.mix(sh["bell_deep"], sh["bell_light"], 0.5), G.mix(sh["bell_deep"], sh["bell_light"], 0.5),
-                             G.mix(sh["leaf"], sh["bell_light"], 0.6)], sh["height"] * 0.85),
-    "snowdrop": lambda sh: ([sh["white"], sh["white"], G.mix(sh["leaf"], sh["white"], 0.5)], sh["height"] * 0.95),
-    "crocus": lambda sh: ([c[1] for c in sh["colours"]] + [sh["leaf"]], sh["height"] * 0.85),
+    "bluebell": lambda sh: ([G.mix(sh["leaf"], sh["bell_deep"], 0.6), G.mix(sh["bell_deep"], sh["bell_light"], 0.5),
+                             G.mix(sh["bell_deep"], sh["bell_light"], 0.7), G.mix(sh["leaf"], sh["bell_light"], 0.45)], sh["height"] * 0.6),
+    "snowdrop": lambda sh: ([sh["white"], G.mix(sh["leaf"], sh["white"], 0.6), G.mix(sh["leaf"], sh["white"], 0.4)], sh["height"] * 0.8),
+    "crocus": lambda sh: ([G.mix(sh["leaf"], c[1], 0.75) for c in sh["colours"]] + [sh["leaf"]], sh["height"] * 0.7),
 }
 SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "fern": G.fern}
 

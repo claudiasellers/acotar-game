@@ -23,6 +23,8 @@ extends RefCounted
 ##             at their feet
 ##   knolls    one tree on each knoll, and each a different kind; the mound
 ##             bare (it is the overlook), the Glimmerfall's knoll its own
+##   between   hazel, bracken and foxgloves with each group of slope birches:
+##             the height between the grass and the crowns
 ##   the mound its top in sward and crocus, and no tree: it is the overlook
 ##   glow      starmoss, glowcaps and faelights by the water, and small
 ##             lights adrift in the air over the floor
@@ -50,7 +52,7 @@ const RING_COUNT := 16
 const MOUND := Vector2(-1208.0, 270.0)
 ## A flower patch is drawn flower by flower within this many metres, and as
 ## its far cushion beyond.
-const FLOWERS_NEAR := 64.0
+const FLOWERS_NEAR := 92.0
 ## Bearings from the pool kept clear of slope birches, [bearing, half-angle]:
 ## the way in from the mound, and the Glimmerfall.
 const OPEN_LINES := [[0.09, 0.42], [PI, 0.3]]
@@ -76,6 +78,7 @@ static func build(world: Node3D) -> void:
 	_floor(root, rng, wave, trunks)
 	_flowers(root, rng, wave, slope_trunks)
 	_mound(root, rng, wave)
+	_between(root, rng, slope_trunks)
 	_bank(root, rng)
 	_glow(root, rng)
 
@@ -120,6 +123,39 @@ static func _slopes(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 			mi.scale = Vector3.ONE * rng.randf_range(0.78, 1.05)
 			root.add_child(mi)
 	return trunks
+
+
+## The height between the grass and the crowns: with each group of slope
+## birches a hazel on its outer side, bracken at its feet, foxgloves in the
+## light at its inner edge; and a mossed boulder here and there at the slopes'
+## foot.
+static func _between(root: Node3D, rng: RandomNumberGenerator, slope_trunks: Array[Vector2]) -> void:
+	var by_kind := {&"hazel": [], &"bracken": [], &"foxglove": [], &"boulder": [], &"moss_mound": []}
+	for g: Array in SLOPE_GROUPS:
+		var out := Vector2.from_angle(g[0])
+		var side := out.orthogonal()
+		var mid := POOL + out * float(g[1])
+		by_kind[&"hazel"].append([mid + out * rng.randf_range(5.0, 8.0) + side * rng.randf_range(-4.0, 4.0), rng.randf_range(0.9, 1.25)])
+		for k in 3:
+			by_kind[&"bracken"].append([mid + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, 7.0), rng.randf_range(0.8, 1.2)])
+		var stand := mid - out * rng.randf_range(5.0, 8.0) + side * rng.randf_range(-5.0, 5.0)
+		for k in 5:
+			by_kind[&"foxglove"].append([stand + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(0.2, 1.8), rng.randf_range(0.85, 1.3)])
+		if rng.randf() < 0.6:
+			var at := mid - out * rng.randf_range(1.0, 5.0) + side * rng.randf_range(-8.0, 8.0)
+			by_kind[&"boulder"].append([at, rng.randf_range(0.7, 1.3)])
+			by_kind[&"moss_mound"].append([at + Vector2.from_angle(rng.randf() * TAU) * 0.9, rng.randf_range(0.9, 1.3)])
+	for kind: StringName in by_kind:
+		var xs: Array = []
+		for e: Array in by_kind[kind]:
+			var p: Vector2 = e[0]
+			var clear := true
+			for t in slope_trunks:
+				if p.distance_to(t) < 1.2:
+					clear = false
+			if clear and not _steep(p):
+				xs.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * float(e[1])), _ground(p)))
+		_multi(root, "Between_%s" % kind, FloraLibrary.mesh(kind), xs, true)
 
 
 ## The mound you arrive on: sward and crocuses over its top, tall grass at the

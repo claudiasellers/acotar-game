@@ -73,6 +73,8 @@ const STUDY_VIEWS := {
 	# kneeling in the bluebells under the birches, the pool beyond
 	"pool_low": [-1288.5, 297.5, 0.75, -1302.0, 262.0, 1.6, 0.45, &"spring", 62.0],
 	"pool_low_dusk": [-1288.5, 297.5, 0.75, -1302.0, 262.0, 1.6, 0.8, &"spring", 62.0],
+	# on the floor, looking up into a group of slope birches
+	"under_birches": [-1277.0, 282.0, 1.7, -1264.0, 294.0, 4.5, 0.45, &"spring", 65.0],
 	# from across the water, looking back at the way in and the mound
 	"pool_back": [-1331.0, 250.0, 1.7, -1262.0, 268.0, 5.0, 0.45, &"spring", 70.0],
 }
