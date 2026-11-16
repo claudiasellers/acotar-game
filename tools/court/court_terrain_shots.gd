@@ -84,6 +84,8 @@ const STUDY_VIEWS := {
 	# Willow Mere, across the water to the Weeping Lady
 	"mere": [-1175.0, 404.1, 1.7, -1125.0, 456.0, 4.0, 0.45, &"spring", 70.0],
 	"mere_dusk": [-1175.0, 404.1, 1.7, -1125.0, 456.0, 4.0, 0.8, &"spring", 70.0],
+	# the Weeping Lady from the side: how she bows over the water
+	"mere_side": [-1082.0, 416.0, 1.7, -1128.0, 452.0, 13.0, 0.45, &"spring", 70.0],
 	# on the glen way among the knolls; down the brae brook; the glen from the air
 	"knoll_way": [-1050.0, 165.0, 1.7, -1132.0, 140.0, 8.0, 0.45, &"spring", 70.0],
 	"knoll_foot": [-1005.0, 150.0, 1.7, -1028.0, 192.0, 5.0, 0.45, &"spring", 70.0],

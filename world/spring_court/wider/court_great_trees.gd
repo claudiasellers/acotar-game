@@ -62,7 +62,7 @@ const TREES := {
 	# times a willow's height; among her fronds hang chains of blossom, each ending in a drop of light
 	# (the "bloom" surface: the woods' foliage shader, its own colours, and it glows).
 	&"weeping_lady": {"height": 36.0,
-		"bands": [Color(0.52, 0.60, 0.80), Color(0.80, 0.87, 0.98), Color(1.0, 1.0, 1.0)],
+		"bands": [Color(0.40, 0.48, 0.76), Color(0.68, 0.77, 0.95), Color(0.93, 0.96, 1.0)],
 		"puff": "res://world/spring_court/manor_estate/flora/trees/frond_willow.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
 		"bark_col": Color(0.27, 0.22, 0.36), "bark_mean": 0.338, "trunk": 1.8, "faces": &"willow_mere"},

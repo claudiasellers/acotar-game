@@ -178,14 +178,15 @@ RECIPES = {
     # way down and into the water, and among them chains of blossom that end
     # each in a drop of light. She leans along +X: the world turns her to the mere.
     "weeping_lady": dict(
-        trunk=0.05, clear=0.2, lean=0.17, lean_az=0.0, flare=2.2, limb=0.56, roots=5,
-        whorls=[(0.2, 5, 0.5, 44, -16, 1), (0.33, 4, 0.42, 58, -12, 1), (0.46, 4, 0.3, 72, -6, 1)],
-        leader=0.56, top=0.08, kink=20, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
-        sweep=0.35, weep=(20, 0.05, 0.1, 0.02), trail=0.85, frond_tile=0.3, dip=0.13,
+        trunk=0.05, clear=0.26, lean=0.17, lean_az=0.0, flare=2.2, limb=0.5, limb_tip=0.16, limb_segs=6, roots=5,
+        # boughs that climb, arch over and come down again
+        whorls=[(0.26, 5, 0.56, 52, -38, 1), (0.4, 4, 0.48, 62, -34, 1), (0.53, 4, 0.36, 72, -28, 1)],
+        leader=0.64, top=0.08, kink=16, cloud=0.1, flat=0.7, card=0.1, cover=1.7, rim=0.2,
+        sweep=0.35, weep=(30, 0.062, 0.085, 0.02), trail=0.6, frond_tile=0.3, dip=0.13, drape_from=0.4,
         # chains per limb, shortest and longest, a floret's size; top, middle, tip, and the tear
-        tears=(4, 0.1, 0.3, 0.0085),
-        tear_colours=((0.99, 0.90, 0.95), (0.95, 0.50, 0.74), (0.70, 0.22, 0.62), (1.0, 0.92, 0.66)),
-        wood=0.3, budget=42000, sink=0.012,
+        tears=(3, 0.12, 0.32, 0.013),
+        tear_colours=((0.99, 0.86, 0.93), (0.95, 0.46, 0.72), (0.66, 0.18, 0.60), (1.0, 0.80, 0.38)),
+        wood=0.3, budget=60000, sink=0.012,
     ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
@@ -278,14 +279,15 @@ def grow(sid, rng):
                 az = lean_az + off * (1.0 - 0.7 * rc["sweep"])
                 ln *= 1.0 + 0.45 * rc["sweep"] * math.cos(off)
             lr = r * (rc.get("limb", 0.62) - 0.12 * wi)
-            limb = sk.limb(hub, az, rise0 + rng.uniform(-6, 6), rise1 + rng.uniform(-6, 6), ln, lr, lr * 0.5, rc["kink"], rng)
+            segs = rc.get("limb_segs", 3)
+            limb = sk.limb(hub, az, rise0 + rng.uniform(-6, 6), rise1 + rng.uniform(-6, 6), ln, lr, lr * rc.get("limb_tip", 0.5), rc["kink"], rng, segs)
             seats.append((limb[-1], rc["cloud"] * rng.uniform(0.95, 1.15)))
             if "along" in rc:
                 seats.append((limb[1], rc["cloud"] * rc["along"] * rng.uniform(0.9, 1.05)))
             # each limb forks: side limbs off its middle, shorter, still rising
             for f in range(forks):
                 sgn = 1 if f % 2 == 0 else -1
-                at = limb[0 if f == 0 else 1]
+                at = limb[(segs // 3) * (1 if f == 0 else 2) - 1]
                 sub = sk.limb(at, az + sgn * math.radians(rng.uniform(42, 62)), rise0 + 14, rise1 + 6, ln * rng.uniform(0.5, 0.62), lr * 0.62, lr * 0.36, rc["kink"] * 0.7, rng, 2)
                 seats.append((sub[-1], rc["cloud"] * rng.uniform(0.8, 1.0)))
     # the leader: the trunk's own top, one cloud over the crown
@@ -480,7 +482,7 @@ def curtain(sid, sk, rng, trail=0.0):
     flip = 1
     for a, b in sk.edges:
         pa, pb = sk.pos[a], sk.pos[b]
-        if (pa.z + pb.z) * 0.5 < crown_top * 0.72:
+        if (pa.z + pb.z) * 0.5 < crown_top * RECIPES[sid].get("drape_from", 0.72):
             continue
         steps = max(1, round((pb - pa).length / 0.045))
         for k in range(steps):
@@ -527,8 +529,10 @@ def tears(sid, sk, rng):
             t = 1.0 if k == per_limb else 0.25 + 0.75 * (k + rng.random()) / per_limb
             f = t * (len(pts) - 1)
             i = min(int(f), len(pts) - 2)
-            a = rng.uniform(0, math.tau)
-            start = pts[i].lerp(pts[i + 1], f - i) + Vector((math.cos(a), math.sin(a), 0.0)) * rng.uniform(0.01, 0.05) - UP * 0.01
+            on = pts[i].lerp(pts[i + 1], f - i)
+            # outside the curtain of fronds, where they show: past where the fronds fall
+            a = math.atan2(on.y, on.x) + rng.uniform(-0.5, 0.5)
+            start = on + Vector((math.cos(a), math.sin(a), 0.0)) * (RECIPES[sid]["weep"][2] * rng.uniform(1.45, 1.75)) - UP * rng.uniform(0.0, 0.04)
             length = min(rng.uniform(lo, hi), start.z - 0.02)
             if length < size * 4:
                 continue
@@ -541,7 +545,7 @@ def tears(sid, sk, rng):
                 c = mix3(min(1.0, max(0.0, u + rng.uniform(-0.12, 0.12))))
                 petal(start - UP * length * u + drift * u + off, rng.uniform(0, math.tau), s, c, min(1.0, length * u / 0.3), 0.1 + 0.2 * u)
             # the tear
-            petal(start - UP * (length + size * 1.4) + drift, rng.uniform(0, math.tau), size * 1.7, drop_c, min(1.0, length / 0.3), 1.0)
+            petal(start - UP * (length + size * 1.3) + drift, rng.uniform(0, math.tau), size * 1.5, drop_c, min(1.0, length / 0.3), 0.5)
     return bm
 
 
