@@ -33,6 +33,22 @@ extends RefCounted
 ##                     down to the way's edge.
 ##   5 the Mound       nothing over the knee, so the climb shows only sky; a
 ##                     ring of daisies on the crown, where you stand to look.
+## And the south loop, pool to mere to river:
+##   6 Glimmer Brook   being beckoned. Little lights (faelights, glowcaps) down
+##                     the brook's outer bank only, with snowdrops, from the
+##                     pool's ring to the mere: at dusk a string of lights going
+##                     round the bend ahead of you. A group of three trees at
+##                     intervals on that bank, birches by the pool giving way to
+##                     willows one for one toward the mere. The inner bank, the
+##                     one you walk, stays sward.
+##   7 Willow Mere     hush. Willows all round as a curtain, two deep, so you do
+##                     not see the water until you step through the one parting
+##                     where the brook leaves; from there the Weeping Lady
+##                     stands across the water. Nothing between them and her:
+##                     no willow near her, no reed in the line. Only white on
+##                     the ground (snowdrops under the willows).
+##     the mere run    out through open sward to the river, a pair of willows
+##                     where it meets it.
 ## Everything is found from the land (the way's own line, where it meets the
 ## brook and the river, the knolls' tops), so a change to the land moves the
 ## planting with it. The rules in CourtGlenPlanting plant only ground this
@@ -111,6 +127,30 @@ const RING := 3.4
 const RING_DAISIES := 46
 
 
+## Glimmer Brook's tree groups, on its outer bank: [metres down the brook from
+## the mere, species of each of the three].
+const GLIMMER_GROUPS := [
+	[214.0, [&"pillar_birch", &"pillar_birch", &"pillar_birch"]],
+	[152.0, [&"birch", &"birch", &"willow"]],
+	[97.0, [&"birch", &"willow", &"willow"]],
+	[46.0, [&"willow", &"willow", &"willow"]],
+]
+## The lights: a cluster this often along the brook (m), from this far down it
+## (just outside the pool's ring) to this near the mere.
+const GLIMMER_STEP := 2.3
+const GLIMMER_FROM := 252.0
+const GLIMMER_TO := 12.0
+## The rules plant no clump this near the Glimmer Brook or the mere run, or this far out from the mere's shore.
+const BROOK_CLAIM := 45.0
+const MERE_CLAIM := 34.0
+## Willow Mere's curtain: willows in the inner ring, the half-width (radians)
+## of the parting, of the ground kept clear before the Weeping Lady, and of
+## the gap the mere run leaves by.
+const MERE_WILLOWS := 25
+const MERE_PARTING := 0.2
+const MERE_LADY := 0.56
+const MERE_OUTLET := 0.13
+
 static var _lock := Mutex.new()
 static var _way := PackedVector2Array()
 static var _lengths := PackedFloat32Array()
@@ -172,15 +212,38 @@ static func along(p: Vector2) -> Array:
 	return [s, best]
 
 
-## Ground a composed place holds: the rules plant no tree here. (The way's own
-## sides, and the ford's reach of the river.)
-static func claims(p: Vector2) -> bool:
+## Ground the main walk holds (its own sides, and the ford's reach of the
+## river): the rules crown no knoll and plant no clump here.
+static func claims_way(p: Vector2) -> bool:
 	if way().is_empty():
 		return false
 	if float(along(p)[1]) < CLAIM:
 		return true
 	var f := ford()
 	return not f.is_empty() and p.distance_to(f[1]) < FORD_REACH + 45.0
+
+
+## Ground any composed place holds: the rules plant no clump of trees here.
+static func claims(p: Vector2) -> bool:
+	if claims_way(p):
+		return true
+	var mere := CourtGlenPlanting._lake_named(&"willow_mere")
+	if not mere.is_empty() and p.distance_to(mere["center"]) < float(mere["radius"]) + MERE_CLAIM:
+		return true
+	for id: StringName in [&"glimmer_brook", &"mere_run"]:
+		var pts := brook(id)
+		for i in range(1, pts.size()):
+			if Geometry2D.get_closest_point_to_segment(p, pts[i - 1], pts[i]).distance_to(p) < BROOK_CLAIM:
+				return true
+	return false
+
+
+## A brook's line by name (empty if the land has none).
+static func brook(id: StringName) -> PackedVector2Array:
+	for b: Dictionary in CourtHeight.brooks():
+		if b["id"] == id:
+			return b["points"]
+	return PackedVector2Array()
 
 
 ## Whether a knoll's top is one this file crowns (further from the way than it claims).
@@ -296,6 +359,9 @@ static func plant(plan: CourtGlenPlanting.Plan, groups: Array[Dictionary]) -> vo
 	_the_ford(plan, rng)
 	_knoll_walk(plan, rng, groups)
 	_the_mound(plan, rng)
+	_glimmer_brook(plan, rng, groups)
+	_willow_mere(plan, rng, groups)
+	_mere_run(plan, rng, groups)
 
 
 # --- 1: the Brae gate ---------------------------------------------------------
@@ -518,6 +584,116 @@ static func _the_mound(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator)
 	for i in RING_DAISIES:
 		var p := crown + Vector2.from_angle(TAU * (float(i) + rng.randf_range(-0.25, 0.25)) / float(RING_DAISIES)) * (RING + rng.randfn(0.0, 0.13))
 		plan.plant(&"daisy", p, rng.randf() * TAU, rng.randf_range(1.0, 1.4), 120.0)
+
+
+# --- 6: Glimmer Brook -----------------------------------------------------------
+
+static func _glimmer_brook(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var pts := brook(&"glimmer_brook")
+	if pts.size() < 2:
+		return
+	var half := 1.6
+	for b: Dictionary in CourtHeight.brooks():
+		if b["id"] == &"glimmer_brook":
+			half = b["half_width"]
+	# (the brook's line runs from the mere down to the pool; its outer bank is on the left of that)
+	for g: Array in GLIMMER_GROUPS:
+		var on: Array = _on_line(pts, 0, g[0])
+		var outer: Vector2 = (on[1] as Vector2).orthogonal()
+		var heart := (on[0] as Vector2) + outer * (half + 7.0)
+		var kinds: Array = g[1]
+		var trunks: Array = []
+		for k in kinds.size():
+			var want := heart + (on[1] as Vector2) * (float(k) - 1.0) * rng.randf_range(4.2, 5.4) + outer * rng.randf_range(-1.0, 2.6)
+			var p := _spot(plan, want, 6.0, 6.0, half + 2.4, 3.4)
+			if p == Vector2.INF:
+				continue
+			var species: StringName = kinds[k]
+			if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.9, 1.15) if species != &"pillar_birch" else rng.randf_range(0.85, 1.0)):
+				trunks.append(p)
+		if not trunks.is_empty():
+			var each: Array = []
+			each.resize(trunks.size())
+			each.fill(7.5)
+			groups.append({"trunks": trunks, "reach": each, "flower": &"snowdrop", "composed": true})
+	# the lights, and the snowdrops among them, down the outer bank
+	var run := GLIMMER_TO
+	while run < GLIMMER_FROM:
+		var on: Array = _on_line(pts, 0, run + rng.randf_range(-0.6, 0.6))
+		var outer: Vector2 = (on[1] as Vector2).orthogonal()
+		for k in 1 + rng.randi() % 3:
+			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.5, 2.8)) + (on[1] as Vector2) * rng.randf_range(-0.8, 0.8)
+			if CourtGlenPlanting.growable(p, 0.2):
+				plan.plant(&"faelight_dandelion", p, rng.randf() * TAU, rng.randf_range(0.95, 1.5))
+		if int(run / GLIMMER_STEP) % 5 == 0:
+			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.3, 1.4))
+			plan.plant(&"glowcap", p, rng.randf() * TAU, rng.randf_range(1.0, 1.5))
+		if int(run / GLIMMER_STEP) % 7 == 3:
+			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(-0.3, 0.6))
+			plan.plant(&"mossy_rock", p, rng.randf() * TAU, rng.randf_range(0.5, 0.9), 220.0, true)
+			plan.plant(&"starmoss", p + outer * 0.4, rng.randf() * TAU, rng.randf_range(0.9, 1.3))
+		for k in 3:
+			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.7, 4.2)) + (on[1] as Vector2) * rng.randf_range(-1.2, 1.2)
+			if rng.randf() < 0.8 and CourtGlenPlanting.growable(p, 0.5) and p.distance_to(CourtGlenPlanting.POOL) > CourtGlenPlanting.POOL_RADIUS + 6.0:
+				plan.flower("snowdrop_patch_" + "ab"[rng.randi() % 2], p, rng.randf() * TAU, rng.randf_range(1.0, 1.45))
+		run += GLIMMER_STEP
+
+
+# --- 7: Willow Mere -------------------------------------------------------------
+
+static func _willow_mere(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var mere := CourtGlenPlanting._lake_named(&"willow_mere")
+	if mere.is_empty():
+		return
+	var centre: Vector2 = mere["center"]
+	var radius: float = mere["radius"]
+	var lady := (CourtHeight.site(&"weeping_lady") - centre).angle()
+	# the parting is where the Glimmer Brook leaves; the outlet where the mere run does
+	var glimmer := brook(&"glimmer_brook")
+	var parting := (glimmer[0] - centre).angle() if not glimmer.is_empty() else PI
+	var mere_run := brook(&"mere_run")
+	var outlet := (mere_run[0] - centre).angle() if not mere_run.is_empty() else 0.0
+	var willows: Array = []
+	for ring in 2:
+		var n := MERE_WILLOWS if ring == 0 else MERE_WILLOWS / 2
+		for i in n:
+			var a := TAU * (float(i) + (0.5 if ring == 1 else 0.0) + rng.randf_range(-0.22, 0.22)) / float(n)
+			if absf(angle_difference(a, parting)) < MERE_PARTING * (1.0 if ring == 0 else 1.5) or absf(angle_difference(a, lady)) < MERE_LADY \
+					or absf(angle_difference(a, outlet)) < MERE_OUTLET:
+				continue
+			var back := rng.randf_range(3.0, 5.4) if ring == 0 else rng.randf_range(11.0, 15.0)
+			var p := _spot(plan, centre + Vector2.from_angle(a) * (radius + back), 3.0, 6.0, 2.6, 5.2)
+			if p != Vector2.INF and plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.25) if ring == 0 else rng.randf_range(0.85, 1.1)):
+				willows.append(p)
+	if not willows.is_empty():
+		var each: Array = []
+		each.resize(willows.size())
+		each.fill(7.0)
+		groups.append({"trunks": willows, "reach": each, "flower": &"snowdrop", "composed": true})
+	# reeds and cattails in the shallows, none in the line from the parting to the Lady
+	var kinds: Array[StringName] = [&"reed_clump", &"cattail"]
+	for i in 80:
+		var a := rng.randf() * TAU
+		if absf(angle_difference(a, lady)) < 0.45 or absf(angle_difference(a, parting)) < 0.4:
+			continue
+		plan.plant(kinds[rng.randi() % 2], centre + Vector2.from_angle(a + rng.randfn(0.0, 0.04)) * (radius + rng.randf_range(-2.2, -0.3)),
+			rng.randf() * TAU, rng.randf_range(0.9, 1.35), 320.0)
+
+
+## The mere run: open sward all the way to the river, and a pair of willows where it meets it.
+static func _mere_run(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var pts := brook(&"mere_run")
+	if pts.size() < 2:
+		return
+	var mouth := pts[pts.size() - 1]
+	var into: Vector2 = _on_line(pts, pts.size() - 1, -1.0)[1]   # the way it runs, into the river
+	var trunks: Array = []
+	for side: float in [-1.0, 1.0]:
+		var p := _spot(plan, mouth - into * 7.0 + into.orthogonal() * side * 9.5, 6.0, 6.0, 3.0, 5.0)
+		if p != Vector2.INF and plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(1.05, 1.25)):
+			trunks.append(p)
+	if not trunks.is_empty():
+		groups.append({"trunks": trunks, "reach": [7.5, 7.5].slice(0, trunks.size()), "flower": &"snowdrop", "composed": true})
 
 
 ## Falling petals: [particle scene id, where (x, metres over the ground, z)].

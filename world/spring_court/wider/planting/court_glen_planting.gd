@@ -21,8 +21,7 @@ extends RefCounted
 ##   the river  willows and birches in clumps along the Thornwater
 ##   the lake   Looking Lake wooded on its far side, willows where the bank
 ##              comes down to the water, open where you come to it
-##   the mere   Willow Mere willows all round, open toward the Weeping Lady
-##              and on the side you come to it from
+##   the mere   (now CourtGlenPlaces: the curtain and its parting)
 ##   the brae   (now CourtGlenPlaces: the Thorn Gate)
 ##   thorn      a thorn bush or two at the outer edge of every clump (a wood's
 ##              edge is where the thorn grows)
@@ -72,10 +71,11 @@ const HOLLOW_DRIFTS := [
 ## The knolls' trees, [species, size, the shade it throws (m), how many stand
 ## together], taken in turn so neighbours differ. Each has its own outline:
 ## the oak wide, the sycamore a tower of billows, the elm a vase, the aspen a
-## column, the thorn wind-blown, the birches a clump of white stems; and one
-## blossom tree, the estate's cherry grown near twice its size.
+## column, the thorn wind-blown, the birches a clump of white stems. No
+## blossom tree: the glen's one pink tree is the Blossom Knoll's great cherry
+## (CourtGlenPlaces), and it stays the only one.
 const KNOLL_KINDS := [[&"great_oak", 1.0, 15.0, 1], [&"great_sycamore", 1.0, 12.0, 1], [&"great_elm", 1.0, 12.0, 1],
-	[&"aspen_spire", 1.0, 6.0, 2], [&"old_thorn", 1.5, 9.0, 1], [&"pillar_birch", 1.0, 8.0, 3], [&"cherry_blossom", 1.9, 10.0, 1]]
+	[&"aspen_spire", 1.0, 6.0, 2], [&"old_thorn", 1.5, 9.0, 1], [&"pillar_birch", 1.0, 8.0, 3]]
 const KNOLL_GAP := 30.0
 const FLOWERS: Array[StringName] = [&"bluebell", &"snowdrop", &"crocus"]
 ## A flower's patches: [the full ones, the small one at a pool's edge].
@@ -282,7 +282,6 @@ static func layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		func() -> void: _brooks(plan, rng, groups),
 		func() -> void: _river(plan, rng, groups),
 		func() -> void: _lake(plan, rng, groups),
-		func() -> void: _mere(plan, rng, groups),
 		func() -> void: _thorn(plan, rng, groups),
 		func() -> void: _hollow_ground(plan, rng, wave),
 		func() -> void: _shade_flowers(plan, rng, wave, groups),
@@ -471,7 +470,7 @@ static func _knolls(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictio
 	for top in knoll_tops(plan.content):
 		if top.distance_to(MOUND) < 40.0 or top.distance_to(GLIMMERFALL_KNOLL) < 30.0 or top.distance_to(POOL) < FLOOR + 20.0 \
 				or CourtLandHabitats.keep_open(top.x, top.y) or CourtLandHabitats.path_distance(top.x, top.y) < 9.0 \
-				or CourtGlenPlaces.claims(top) or CourtGlenPlaces.crowns(top):
+				or CourtGlenPlaces.claims_way(top) or CourtGlenPlaces.crowns(top):
 			continue
 		var kind := rng.randi() % KNOLL_KINDS.size()
 		# not the kind of either of its two nearest neighbours
@@ -719,35 +718,6 @@ static func _lake(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictiona
 ## Where the lake walk reaches Looking Lake, and how many trees its far wood holds.
 const LAKE_WALK_END := Vector2(-1150.0, -200.0)
 const LAKE_WOOD := 90
-
-
-## Willow Mere: willows all round, open toward the Weeping Lady and on the
-## side you come to it from; reeds and cattails in the shallows.
-static func _mere(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
-	var mere := _lake_named(&"willow_mere")
-	if mere.is_empty():
-		return
-	var centre: Vector2 = mere["center"]
-	var radius: float = mere["radius"]
-	var lady := (CourtHeight.site(&"weeping_lady") - centre).angle()
-	var willows: Array = []
-	for i in 13:
-		var a := TAU * (float(i) + rng.randf_range(-0.3, 0.3)) / 13.0
-		if absf(angle_difference(a, lady)) < 0.62 or absf(angle_difference(a, 0.0)) < 0.22 or absf(angle_difference(a, lady + PI)) < 0.42:
-			continue
-		var p := centre + Vector2.from_angle(a) * (radius + rng.randf_range(2.5, 6.5))
-		if CourtLandHabitats.keep_open(p.x, p.y):
-			continue
-		if plan.tree(&"willow", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.9, 1.2)):
-			willows.append(p)
-	groups.append(_group(willows, 7.5, &"snowdrop"))
-	var kinds: Array[StringName] = [&"reed_clump", &"cattail", &"iris_clump"]
-	for i in 90:
-		var a := rng.randf() * TAU
-		if absf(angle_difference(a, lady)) < 0.35:
-			continue
-		plan.plant(kinds[rng.randi() % 3], centre + Vector2.from_angle(a + rng.randfn(0.0, 0.04)) * (radius + rng.randf_range(-2.2, -0.3)),
-			rng.randf() * TAU, rng.randf_range(0.9, 1.35), 320.0)
 
 
 ## Thorn bushes, white with may: one or two at the outer edge of every clump

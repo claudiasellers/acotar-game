@@ -105,6 +105,18 @@ const STUDY_VIEWS := {
 	"walk_09_knolls": [-1025.7, 135.7, 1.7, -1105.9, 208.0, 4.0, 0.45, &"spring", 70.0],
 	"walk_10_cherry": [-1065.8, 174.8, 1.7, -1126.0, 145.0, 5.0, 0.45, &"spring", 70.0],
 	"walk_11_oak": [-1108.9, 210.5, 1.7, -1179.3, 259.8, 5.0, 0.45, &"spring", 70.0],
+	# The south loop (CourtGlenPlaces): up the Glimmer Brook from the pool, to the willows' curtain, through
+	# the parting to the Weeping Lady, the mere from outside, and out along the mere run.
+	"glimmer_01": [-1297.0, 291.0, 1.7, -1326.0, 334.0, 2.0, 0.45, &"spring", 70.0],
+	"glimmer_02": [-1322.0, 345.0, 1.7, -1316.0, 400.0, 1.5, 0.45, &"spring", 70.0],
+	"glimmer_03": [-1304.0, 398.0, 1.7, -1216.0, 427.0, 1.5, 0.45, &"spring", 70.0],
+	"glimmer_04": [-1226.0, 420.0, 1.7, -1182.0, 432.0, 3.0, 0.45, &"spring", 70.0],
+	"mere_parting": [-1186.0, 430.0, 1.7, -1125.0, 456.0, 12.0, 0.45, &"spring", 70.0],
+	"mere_outside": [-1150.0, 352.0, 1.7, -1150.0, 430.0, 4.0, 0.45, &"spring", 70.0],
+	"mere_run_01": [-1102.0, 423.0, 1.7, -980.0, 408.0, 2.0, 0.45, &"spring", 70.0],
+	"glimmer_02_dusk": [-1322.0, 345.0, 1.7, -1316.0, 400.0, 1.5, 0.8, &"spring", 70.0],
+	"glimmer_03_dusk": [-1304.0, 398.0, 1.7, -1216.0, 427.0, 1.5, 0.8, &"spring", 70.0],
+	"mere_parting_dusk": [-1186.0, 430.0, 1.7, -1125.0, 456.0, 12.0, 0.8, &"spring", 70.0],
 	"walk_02_gate_dusk": [-730.0, -22.7, 1.7, -786.2, 9.8, 1.5, 0.8, &"spring", 70.0],
 	"walk_05_crossing_dusk": [-889.7, 43.7, 1.7, -916.0, 53.5, 5.0, 0.8, &"spring", 70.0],
 	"walk_07_ford_dusk": [-960.7, 70.7, 1.7, -1027.0, 192.0, 3.0, 0.8, &"spring", 70.0],
