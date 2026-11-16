@@ -78,6 +78,16 @@ const STUDY_VIEWS := {
 	"grove_walk_dusk": [-1314.0, 285.0, 1.7, -1328.0, 254.0, 3.0, 0.8, &"spring", 68.0],
 	# on the Glimmer Brook's bank, looking down it into the pool
 	"brook_in": [-1319.0, 322.0, 1.7, -1301.0, 268.0, 1.0, 0.45, &"spring", 66.0],
+	# the rest of the glen (study=glen): Looking Lake from where the lake walk reaches it
+	"lake_shore": [-1175.0, -185.0, 1.7, -1270.0, -155.0, 7.0, 0.45, &"spring", 70.0],
+	"lake_dusk": [-1175.0, -185.0, 1.7, -1270.0, -155.0, 7.0, 0.8, &"spring", 70.0],
+	# Willow Mere, across the water to the Weeping Lady
+	"mere": [-1180.5, 398.5, 1.7, -1125.0, 456.0, 4.0, 0.45, &"spring", 70.0],
+	"mere_dusk": [-1180.5, 398.5, 1.7, -1125.0, 456.0, 4.0, 0.8, &"spring", 70.0],
+	# on the glen way among the knolls; down the brae brook; the glen from the air
+	"knoll_way": [-1050.0, 165.0, 1.7, -1132.0, 140.0, 8.0, 0.45, &"spring", 70.0],
+	"brook_walk": [-880.0, -110.0, 1.7, -900.0, 30.0, 1.0, 0.45, &"spring", 68.0],
+	"air_glen": [-820.0, 330.0, 230.0, -1180.0, 30.0, 0.0, 0.45, &"spring", 70.0],
 	# on the floor, looking up into a group of slope birches
 	"under_birches": [-1277.0, 282.0, 1.7, -1264.0, 294.0, 4.5, 0.45, &"spring", 65.0],
 	# from across the water, looking back at the way in and the mound
@@ -114,7 +124,7 @@ func _run() -> void:
 			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
 			args.erase(a)
 		elif a.begins_with("study="):
-			study = a.substr(6)   # one place planted whole, for a look: study=pool_hollow
+			study = a.substr(6)   # planted whole, for a look: study=pool_hollow (the pool's hollow), study=glen (the whole glen)
 			args.erase(a)
 		elif a.begins_with("ring="):
 			rings.append(a.substr(5))   # a ring of great trees round a site: ring=<species>,<site>,<radius m>,<count>
@@ -187,10 +197,14 @@ func _run() -> void:
 			_lineup(world, eye, at, lineup, cam)
 		for ring: String in rings:
 			_ring(world, ring)
-		if study == "pool_hollow" and world.get_node_or_null(^"StudyPoolHollow") == null:
+		if study != "" and world.get_node_or_null(^"StudyPoolHollow") == null:
 			StudyPoolHollow.build(world)
-		if study == "pool_hollow":
+			if study == "glen":
+				StudyGlen.build(world)
+		if study != "":
 			StudyPoolHollow.at_time(world, v[6])
+		if study == "glen":
+			StudyGlen.sward_round(world, eye)
 		if forest != "":
 			_forest(world, eye, forest)
 		for look: String in (looks if not looks.is_empty() else [""]):
