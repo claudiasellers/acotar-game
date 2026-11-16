@@ -62,6 +62,16 @@ const ESTATE_VIEWS := {
 }
 
 
+## Standpoints for looking at one planting idea up close (not the court's
+## canonical views, which are VIEWS and its tests'): same fields as VIEWS.
+const STUDY_VIEWS := {
+	# the starlight pool from its east bank, inside the ring of birches, by day and at dusk
+	"pool_side": [-1266.0, 270.0, 1.7, -1312.0, 256.0, 7.0, 0.45, &"spring", 70.0],
+	"pool_dusk": [-1266.0, 270.0, 1.7, -1312.0, 256.0, 7.0, 0.8, &"spring", 70.0],
+	"mound_dusk": [-1208.0, 270.0, 1.7, -1300.0, 262.0, -6.0, 0.8, &"spring", 70.0],
+}
+
+
 func _ready() -> void:
 	_run.call_deferred()
 
@@ -135,7 +145,7 @@ func _run() -> void:
 	world.add_child(cam)
 	cam.make_current()
 	for id in ids:
-		var v: Array = VIEWS[id] if VIEWS.has(id) else ESTATE_VIEWS[id]
+		var v: Array = VIEWS[id] if VIEWS.has(id) else (ESTATE_VIEWS[id] if ESTATE_VIEWS.has(id) else STUDY_VIEWS[id])
 		Clock.time_of_day = v[6]
 		world.grade.swap_to(v[7], 0.0)
 		var eye := Vector3(v[0], 0.0, v[1])
