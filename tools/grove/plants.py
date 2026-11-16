@@ -54,12 +54,12 @@ BIRCH = {
 }
 
 GRASS_GLADE = {"blades": 18, "radius": 0.17, "height": 0.2, "lean": 42.0, "width": 0.022,
-               "foot": TURF, "blade": (0.38, 0.70, 0.36), "tip": (0.60, 0.85, 0.47)}
+               "foot": TURF, "blade": (0.33, 0.65, 0.32), "tip": (0.54, 0.81, 0.42)}
 GRASS_TALL = {"blades": 14, "radius": 0.14, "height": 0.62, "lean": 30.0, "width": 0.02,
               "foot": TURF, "blade": (0.40, 0.70, 0.38), "tip": (0.74, 0.88, 0.52)}
 # the sward: what covers the floor between everything else, broad soft blades in a wide low tuft
 GRASS_SWARD = {"blades": 44, "radius": 0.46, "height": 0.25, "lean": 46.0, "width": 0.036,
-               "foot": TURF, "blade": (0.36, 0.68, 0.35), "tip": (0.62, 0.86, 0.48)}
+               "foot": TURF, "blade": (0.31, 0.63, 0.31), "tip": (0.52, 0.80, 0.40)}
 BLUEBELL = {"height": 0.42, "bell": 0.05, "leaf_deep": (0.22, 0.50, 0.36), "leaf": (0.38, 0.68, 0.44), "stem": (0.42, 0.44, 0.62),
             "bell_deep": (0.33, 0.35, 0.80), "bell_light": (0.64, 0.68, 0.97)}
 SNOWDROP = {"height": 0.24, "petal": 0.055, "stems": 3, "leaf_deep": (0.26, 0.52, 0.42), "leaf": (0.46, 0.72, 0.56),
@@ -101,6 +101,13 @@ STUDIES = {
     "snowdrop_a": ("snowdrop", SNOWDROP, None),
     "crocus_a": ("crocus", CROCUS, None),
 }
+# what a patch's far cushion is topped with, and how high it stands: kind -> (colours, height)
+FAR = {
+    "bluebell": lambda sh: ([sh["bell_deep"], G.mix(sh["bell_deep"], sh["bell_light"], 0.5), G.mix(sh["bell_deep"], sh["bell_light"], 0.5),
+                             G.mix(sh["leaf"], sh["bell_light"], 0.6)], sh["height"] * 0.85),
+    "snowdrop": lambda sh: ([sh["white"], sh["white"], G.mix(sh["leaf"], sh["white"], 0.5)], sh["height"] * 0.95),
+    "crocus": lambda sh: ([c[1] for c in sh["colours"]] + [sh["leaf"]], sh["height"] * 0.85),
+}
 SMALL = {"grass": G.grass, "bluebell": G.bluebell, "snowdrop": G.snowdrop, "crocus": G.crocus, "fern": G.fern}
 
 
@@ -118,6 +125,13 @@ def build(name, out_dir):
         soft = G.patch(SMALL[of], sheet, rng, count, radius)
         objs = [G.soft_object(soft)]
         note = "soft %6d" % soft.tris()
+        size = G.export(name, objs, out_dir)
+        print("%-16s %s  %5.0f KB" % (name, note, size / 1024.0))
+        # and the same patch from far off
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        tops, height = FAR[of](sheet)
+        far = G.far_patch(tops, G.mix(sheet["leaf_deep"], sheet["leaf"], 0.5), height, radius, rng)
+        name, objs, note = name + "_far", [G.soft_object(far)], "soft %6d" % far.tris()
     else:
         soft = SMALL[kind](sheet, rng)
         objs = [G.soft_object(soft)]

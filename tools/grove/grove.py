@@ -601,3 +601,27 @@ def patch(make, sheet, rng, count, radius, size=(0.8, 1.2)):
             soft.cols.append(c)
             soft.uvs.append(u)
     return soft
+
+
+def far_patch(tops, leaf, height, radius, rng):
+    """What a patch of flowers is from far off: a low faceted cushion, the
+    flowers' colours over its top and the leaves' round its skirt. A flower is
+    less than a pixel wide past sixty metres; the drift's colour still has to
+    carry across a valley."""
+    soft = Soft()
+    n = 6
+    turn = rng.uniform(0, math.tau)
+    top = soft.vert((0.0, 0.0, height), UP)
+    mid, rim = [], []
+    for k in range(n):
+        d = heading(turn + k * math.tau / n + rng.uniform(-0.2, 0.2), 0.0)
+        lit = (d * 0.3 + UP).normalized()
+        mid.append(soft.vert(d * radius * rng.uniform(0.5, 0.7) + UP * height * rng.uniform(0.7, 0.95), lit))
+        rim.append(soft.vert(d * radius * rng.uniform(0.95, 1.15) + UP * 0.03, lit))
+    for k in range(n):
+        j = (k + 1) % n
+        c = rng.choice(tops)
+        soft.face((top, mid[k], mid[j]), (c, c, c), 0.0)
+        c2 = mix(rng.choice(tops), leaf, 0.25)
+        soft.face((mid[k], rim[k], rim[j], mid[j]), (c2, leaf, leaf, c2), 0.0)
+    return soft

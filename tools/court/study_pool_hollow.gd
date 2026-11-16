@@ -48,6 +48,9 @@ const KNOLL_TREES := [
 const RING_RADIUS := 30.0
 const RING_COUNT := 16
 const MOUND := Vector2(-1208.0, 270.0)
+## A flower patch is drawn flower by flower within this many metres, and as
+## its far cushion beyond.
+const FLOWERS_NEAR := 64.0
 ## Bearings from the pool kept clear of slope birches, [bearing, half-angle]:
 ## the way in from the mound, and the Glimmerfall.
 const OPEN_LINES := [[0.09, 0.42], [PI, 0.3]]
@@ -141,7 +144,8 @@ static func _mound(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 			sward[rng.randi() % 3].append(x)
 	for k in 3:
 		_cells(root, "MoundSward%d" % k, _glade("grass_sward_" + "abc"[k]), sward[k], 80.0)
-		_cells(root, "MoundCrocus%d" % k, _glade("crocus_patch_" + "abc"[k]), crocus[k], 150.0)
+		_cells(root, "MoundCrocus%d" % k, _glade("crocus_patch_" + "abc"[k]), crocus[k], FLOWERS_NEAR)
+		_cells(root, "MoundCrocus%d_far" % k, _glade("crocus_patch_%s_far" % "abc"[k]), crocus[k], 420.0, FLOWERS_NEAR)
 	for k in 2:
 		_cells(root, "MoundTall%d" % k, _glade("grass_tall_" + "ab"[k]), tall[k], 110.0)
 
@@ -164,7 +168,7 @@ static func _floor(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 	var fine: Array = [[], [], []]
 	var tall: Array = [[], []]
 	var reach := 74.0
-	var tries := int(PI * reach * reach * 4.2)
+	var tries := int(PI * reach * reach * 5.4)
 	for i in tries:
 		var p := POOL + Vector2.from_angle(rng.randf() * TAU) * sqrt(rng.randf()) * reach
 		var d := p.distance_to(POOL)
@@ -172,7 +176,7 @@ static func _floor(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLite
 			continue
 		# thick on the floor, thinner up the slopes, in soft patches everywhere
 		var up := clampf((d - FLOOR) / (reach - FLOOR), 0.0, 1.0)
-		var keep := lerpf(1.0, 0.1, sqrt(up)) * (0.74 + 0.26 * wave.get_noise_2d(p.x * 2.0, p.y * 2.0))
+		var keep := lerpf(1.0, 0.1, sqrt(up)) * (0.84 + 0.16 * wave.get_noise_2d(p.x * 2.0, p.y * 2.0))
 		if rng.randf() > keep or _steep(p):
 			continue
 		var by_water := d < POOL_RADIUS + 2.4 and absf(angle_difference((p - POOL).angle(), ARRIVAL)) > 0.3
@@ -263,7 +267,9 @@ static func _flowers(root: Node3D, rng: RandomNumberGenerator, wave: FastNoiseLi
 		for i in (by_kind[kind] as Array).size():
 			split[i % n].append(by_kind[kind][i])
 		for k in n:
-			_cells(root, "Drift_%s%d" % [kind, k], _glade("%s_patch_%s" % [kind, "abc"[k]]), split[k], 150.0)
+			var patch := "%s_patch_%s" % [kind, "abc"[k]]
+			_cells(root, "Drift_%s%d" % [kind, k], _glade(patch), split[k], FLOWERS_NEAR)
+			_cells(root, "Drift_%s%d_far" % [kind, k], _glade(patch + "_far"), split[k], 420.0, FLOWERS_NEAR)
 
 
 ## The pool's far banks: iris, reeds, fern, water mint, mossed stones. The
@@ -354,7 +360,7 @@ static func _glade(plant: String) -> Mesh:
 			found = mi.mesh
 			break
 		scene.free()
-		found.surface_set_material(0, _look(0.0 if plant.begins_with("grass") else 0.12))
+		found.surface_set_material(0, _look(0.0 if plant.begins_with("grass") or plant.ends_with("_far") else 0.12))
 		_glade_meshes[plant] = found
 	return _glade_meshes[plant]
 
@@ -366,15 +372,15 @@ static func _look(rim: float) -> ShaderMaterial:
 	if not _looks.has(rim):
 		var m := FloraLibrary.material(&"bloom").duplicate() as ShaderMaterial
 		m.set_shader_parameter(&"rim_strength", rim)
-		if rim == 0.0:
-			m.set_shader_parameter(&"lime_guard", 0.4)   # the lit undersides of blades go neon without it
+		# the twinkle lights a whole 14 cm cell: on a blade at your feet that is a white shard
+		m.set_shader_parameter(&"sparkle", 0.0 if rim == 0.0 else 0.15)
 		_looks[rim] = m
 	return _looks[rim]
 
 
 ## Small plants by the cell, each cell drawn only within `far` metres: the
 ## way the floor of a place has to be laid to be affordable.
-static func _cells(root: Node3D, name: String, mesh: Mesh, xforms: Array, far: float, cell: float = 16.0) -> void:
+static func _cells(root: Node3D, name: String, mesh: Mesh, xforms: Array, far: float, near: float = 0.0, cell: float = 16.0) -> void:
 	var by_cell := {}
 	for x: Transform3D in xforms:
 		var key := Vector2i(floori(x.origin.x / cell), floori(x.origin.z / cell))
@@ -396,8 +402,8 @@ static func _cells(root: Node3D, name: String, mesh: Mesh, xforms: Array, far: f
 		mmi.multimesh = mm
 		mmi.position = mid
 		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mmi.visibility_range_begin = near
 		mmi.visibility_range_end = far
-		mmi.visibility_range_end_margin = 6.0
 		root.add_child(mmi)
 	print("STUDY %s: %d in %d cells" % [name, xforms.size(), by_cell.size()])
 
