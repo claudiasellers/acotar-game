@@ -171,6 +171,23 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Lake shores | world/spring_court/wider/court_height.gd `LAKE_SHORES` | Looking Lake: a 26 m shore at grade 0.1, then 0.42; Willow Mere: 12 m at 0.12, then 0.35 | | The banks eased down to the water (owner, 2026-11-16: Looking Lake lay in a pit). Cut-only. | wider-court-world |
 | Motes | planting/court_motes.gd `COUNT`, `GLOW` | 280 lights, (2.6, 2.5, 1.9) | | The hollow's lights in the air, out from the golden hour through the night. | wider-court-world |
 
+### The glen composed (owner, 2026-11-16: "make the ENTIRE thing here look intentional"; CourtGlenPlaces)
+
+| Name | Where | Value | Range | What it does | Owner |
+|---|---|---|---|---|---|
+| Claimed ground | court_glen_places.gd `CLAIM`, `claims` | 70 m either side of `glen_way`; the ford's reach of the river + 45 m | 50–100 | The rules (a tree per knoll, clumps by the water, verge drifts) plant nothing here: the composed places hold it. | wider-court-world |
+| The wind's lean | court_glen_places.gd `WIND` | (0.94, -0.34): east and a little north | | The way every old thorn in the glen leans (tools/blender/estate_tree.py: an old thorn leans to +X). The two at the brae's gate lean toward each other. | wider-court-world |
+| The Thorn Gate | court_glen_places.gd `GATE_PAST_CREST`, `GATE_HALF`, `GATE_SIZE` | 6 m past the brae's crest; trunks 5.6 m from the way's middle; size 1.55 (10.9 m tall) | half 5–7; size 1.4–1.8 | Two old thorns leaning in over the way: an arch of may on the skyline as you climb from the estate. 110 scatters of white petals beneath; `fx_cherry_petals` falling. | wider-court-world |
+| The brae's lee | court_glen_places.gd `LEE_BUSHES`, `LEE_REACH` | 10 thorn bushes over 78 m of way, 6.5 m and more off it, closing in toward the dell | | White overhead on the way down, before the dell's white underfoot. | wider-court-world |
+| Brook Dell's trees | court_glen_places.gd `DELL_WAY`, `DELL_BACK`, `DELL_BIRCHES` | by the way: 4 oaks and 6 birches, 6.6–9.2 m off it; behind: 6 oaks 16–21 m off; along the brook: 8 groups of 1–2 birches; 2 great elms at the crossing | | The glen's one grove you walk in under: the oaks make the shade, the birches the white stems. | wider-court-world |
+| Brook Dell's fern floor | court_glen_places.gd `DELL_FERNS`, `DELL_HALF`, `DELL_UP`, `DELL_DOWN` | 1500 tried (about 1350 stand); 26 m either side of the brook, 62 m up it and 72 m down; size 1.9 at the water to 0.9 at the edge | | The only fern floor in the glen. A quarter of it lies along the way, from 40 m before the crossing, so you meet fern before water. | wider-court-world |
+| The Ford's willows | court_glen_places.gd `FORD_WILLOWS`, `FORD_GAP` | 9 on the far bank, 16–69 m up and down the river; none within 20 m of the way | gap 15–30 | A row, parted where the way lands. | wider-court-world |
+| The Ford's gold | court_glen_places.gd `FORD_GOLD`, `FORD_REACH`, `FORD_BACK`; tools/grove/plants.py `KINGCUP` | 900 tried on the banks within 58 m of the crossing and 7.5 m of the water; 170 on the way's verges from the dell's mouth to 44 m past the far landing; gold (1.0, 0.84, 0.18) | | Kingcups: the only gold in the glen. | wider-court-world |
+| The Knoll Walk | court_glen_places.gd `KNOLLS` | in the order you pass them: an old thorn (size 1.6), three pillar birches, two aspens, the great cherry (15 m) at Knoll Steps, a great oak (1.08) hard by the way; two birches north of the mound; an old thorn on each of the brae's outer knolls | | Each knoll its own tree; the darkest last, before the bare mound. | wider-court-world |
+| Bluebell spills | court_glen_places.gd `SPILL_REACH`, `SPILL_TRIES` | from a knoll within 70 m of the way, 16 patches tried per metre, 3.6 m wide at the knoll to 6 m at the way | | The knoll's bluebells run down to the way's edge. | wider-court-world |
+| The great cherry | tools/blender/estate_tree.py `great_cherry`; court_great_trees.gd | 15 m; bands (0.80,0.50,0.64) (0.96,0.72,0.83) (1.0,0.90,0.94); 190 scatters of pink petals beneath; `fx_cherry_petals` | | The Blossom Knoll's: the one pink tree on the main walk. | wider-court-world |
+| The Mound's daisy ring | court_glen_places.gd `RING`, `RING_DAISIES` | 3.4 m, 46 daisies | | Where you stand to look at the pool. | wider-court-world |
+
 ## Bow feel (T101)
 
 | Tunable | Where | Default | Range | What it does | Lane |

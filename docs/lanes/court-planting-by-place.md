@@ -912,3 +912,33 @@ replaces the scattered clumps; it does not go on top of them.
 
 Each is shown as a walk: pictures in order along the route, the transitions
 among them, never a single piece on bare ground.
+
+### State: the main walk is composed (2026-11-16, late)
+
+Owner: "go". Places 1 to 5 and transitions A to E are in `CourtGlenPlaces`
+(`world/spring_court/wider/planting/court_glen_places.gd`), which claims the
+ground 70 m either side of `glen_way` and the ford's reach of the river; the
+rules in `CourtGlenPlanting` plant what it has not claimed. Made for it:
+kingcups and fallen petals (`tools/grove`), the great cherry (a court species),
+and old thorns that all lean to +X so the planting can turn them. The shot
+tool has the walk in order: `walk_01_climb` to `walk_11_oak`, then `mound_day`.
+
+What the land decided, against the plan:
+
+- The Thorn Gate stands on the brae's crest (6 m past its highest point), not
+  at the gate site 45 m on: on the crest it is the first thing on the skyline
+  from the estate. The gate site keeps its briar lock.
+- The knolls do not flank the way in a neat alternation. As you pass them: an
+  old thorn close on the south, three birches far to the north, the cherry on
+  Knoll Steps 62 m north with two aspens opposite it 90 m south, and the great
+  oak 24 m north just before the mound. The cherry is a mark from the way and
+  a place to go up to, not a tree you pass under.
+- One elm did not close Brook Dell: it took two, with oaks by the way and a
+  second rank behind, before the ground went dark.
+
+Numbers (my own probe, not the gate): 485 trees, 5.3 a hectare; 59 of 67 knoll
+tops crowned; 54% of bluebell patches within 15.5 m of a trunk; no trunk on
+kept-open ground; 1344 batches of the 1500 allowed.
+
+Still to do, in order: the south loop (6, 7 with F to H), the north loop (8 to
+11 with I to K), the rims (12 with L).
