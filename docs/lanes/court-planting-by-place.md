@@ -601,3 +601,44 @@ key (real, fresh, a little too perfect).
 - SparkNotes, chapters 18-20 (the pool; crocuses, snowdrops, bluebells; white roses; the cave): https://www.sparknotes.com/lit/a-court-of-thorns-and-roses/section6
 - Wiki, Tamlin's Manor: https://acourtofthornsandroses.fandom.com/wiki/Tamlin%27s_Manor
 - Wiki, Spring Court (hills, lakes, dips and hollows, the village): https://acourtofthornsandroses.fandom.com/wiki/Spring_Court
+
+## Pilot study: the starlight pool's hollow (2026-11-16)
+
+One spot planted whole, as a picture for the owner, before any planting rule is
+written: `tools/court/study_pool_hollow.gd`, stood up by the shot tool with
+`study=pool_hollow` over the court with today's scatter hidden
+(`regions ingame without=trees,decor`). Nothing here is in the game yet.
+
+What stands there, from the ground up:
+
+| Layer | What | From |
+|---|---|---|
+| Floor | sward over the level floor, thinning up the slopes, none on rock; taller tufts at the water and the birches' feet | `tools/grove` (new) |
+| Flowers | bluebells under the birches, snowdrops by the water, crocuses in the open and on the mound; each kind in drifts of its own | `tools/grove` (new) |
+| Bank | iris, reeds, cattail, water mint, fern, mossed stones on the far banks; the arrival bank left to grass | woods kit, grove fern |
+| The ring | 16 pillar birches round the pool, open toward the mound | `CourtGreatTrees` |
+| Slopes | 26 more birches in twos and threes behind the ring, open toward the mound and the Glimmerfall; bluebells, fern and a stand of foxgloves with each group | as above |
+| Knolls | one tree on each of six knolls, each a different kind; the mound bare | estate trees |
+| Glow | starmoss, glowcaps, faelights by the water; small lights in the air from dusk | woods kit |
+
+What it taught:
+
+- **Grass takes no rim light.** A blade seen along the ground is all rim, and
+  the woods' rim is warm cream: the first render was a floor of straw.
+- **No twinkle on grass either.** The twinkle lights a whole 14 cm cell, which
+  on a blade at your feet is a white shard.
+- **A drift needs a far form.** A flower is under a pixel wide past 60 m, so a
+  drift vanished from the mound. Each flower patch has a far cushion (18
+  triangles, the flowers' colours over the leaves') drawn beyond 75 m.
+- **Small plants go down by the cell**, each cell drawn only within its range
+  (sward 80 m, fine grass 40 m, flowers to 75 m then cushions).
+- **There is no shrub fit for the glen.** The woods kit's hazel and bracken are
+  too crude beside the new plants. A blossoming shrub (hawthorn or blackthorn)
+  joins the missing list.
+- **The knolls' rock faces and the land between them are still bare** from
+  inside the hollow; that is the rest of the glen's work, not this spot's.
+
+Frame time on the Mac, look quality, 1920x1080, standing on the east bank:
+bare land 17.6 ms; today's planting 24.1 ms; the study 28.4 ms (the same from
+the bluebells; 25.3 ms from the mound). So it costs about 4 ms more than what
+stands there today, nearly all of it the sward.
