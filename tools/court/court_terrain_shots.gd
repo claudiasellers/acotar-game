@@ -90,6 +90,11 @@ func _run() -> void:
 		elif a.begins_with("without="):
 			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
 			args.erase(a)
+		elif a.begins_with("floss_multi="):
+			# the share of candyfloss trees with a colour to each tuft (0 none, 1 all), for a lineup
+			for m: ShaderMaterial in [FloraLibrary.floss_material(), FloraLibrary.fuzz_material()]:
+				m.set_shader_parameter(&"multi_share", float(a.substr(12)))
+			args.erase(a)
 		elif a.begins_with("forest="):
 			forest = a.substr(7)
 			args.erase(a)
@@ -188,6 +193,21 @@ const LINEUPS := {
 	# and Border Woods): candyfloss, wisteria, golden chain, magnolia.
 	"candy_trees": {"distance": 24.0, "spacing": 8.5, "look": 3.4, "ids": [&"woods_candyfloss_tree", &"woods_wisteria_tree",
 		&"woods_golden_chain", &"woods_magnolia"]},
+	"magnolia": {"distance": 7.5, "spacing": 7.0, "look": 3.6, "ids": [&"woods_magnolia"]},
+	"magnolia_harlequin": {"distance": 7.5, "spacing": 7.0, "look": 3.6, "ids": [&"woods_magnolia_harlequin"]},
+	"magnolias": {"distance": 12.5, "spacing": 7.5, "look": 3.4, "ids": [&"woods_magnolia", &"woods_magnolia_harlequin"]},
+	"candyfloss": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"woods_candyfloss_tree"]},
+	"candyfloss_row": {"distance": 30.0, "spacing": 6.5, "look": 5.0, "ids": [&"woods_candyfloss_tree", &"woods_candyfloss_tree",
+		&"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree", &"woods_candyfloss_tree"]},
+	# its far step on the very spot `candyfloss` stands the near tree (a tree's colours
+	# go by where it stands): the two shots show the same colours in the same places
+	"candyfloss_far": {"distance": 16.0, "spacing": 7.0, "look": 5.0, "ids": [&"far:woods_candyfloss_tree"]},
+	"candyfloss_close": {"distance": 8.0, "spacing": 7.0, "look": 5.4, "ids": [&"woods_candyfloss_tree"]},
+	"wisteria": {"distance": 15.0, "spacing": 8.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_golden_chain"]},
+	"golden_chain_close": {"distance": 7.5, "spacing": 7.0, "look": 3.9, "ids": [&"woods_golden_chain"]},
+	"wisteria_close": {"distance": 7.5, "spacing": 7.0, "look": 3.6, "ids": [&"woods_wisteria_tree"]},
+	"wisteria_row": {"distance": 26.0, "spacing": 7.0, "look": 3.4, "ids": [&"woods_wisteria_tree", &"woods_wisteria_tree",
+		&"woods_golden_chain", &"woods_wisteria_tree", &"woods_wisteria_tree"]},
 	"candy_close": {"distance": 11.0, "spacing": 7.0, "look": 2.6, "ids": [&"woods_magnolia", &"woods_candyfloss_tree"]},
 	"trees": {"distance": 60.0, "spacing": 9.0, "look": 5.0, "ids": [&"woods_ancient_oak", &"woods_oak", &"woods_yew",
 		&"woods_silver_birch", &"woods_wild_cherry", &"woods_lilac_tree", &"woods_willow", &"woods_hawthorn",
@@ -465,6 +485,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 				mi.scale = Vector3.ONE * float(ez[1])
 			elif item.begins_with("now:"):
 				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)))
+			elif item.begins_with("far:"):
+				mi.mesh = CourtAssets.mesh(StringName(item.substr(4)), true)  # its far step, up close
 			else:
 				mi.mesh = CourtAssets.mesh(StringName(item))  # as the court's scatter draws it
 		mi.position = p

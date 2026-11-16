@@ -335,24 +335,8 @@ def _limbs(kit, near, start, count, length, rise, r, droop=0.0, col=BARK):
     return tips
 
 
-def candyfloss_tree(kit, near):
-    """Cotton-candy blossom tree: a curvy pearl-rose trunk under a cluster
-    of round pom canopies in pink, blush and lilac, dotted with blossoms."""
-    trunk = _trunk(kit, near, 4.2, 0.42, 0.26, 0.22, BARK, hexc("B98A92"), 0.45)
-    top = trunk[-1]
-    tips = _limbs(kit, near, trunk[-2], 5, 2.6, 0.55, 0.2)
-    palette = [(BLUSH, ROSE), (ROSE, HOT_PINK), (hexc("E3CCF5"), LILAC), (PEARL, BLUSH)]
-    poms = tips + [top + Vector((0, 0, 1.4))]
-    for i, t in enumerate(poms):
-        ca, cb = palette[i % len(palette)]
-        r = kit.rng.uniform(1.6, 2.0) * (1.0 if i < len(tips) else 1.25)
-        pom(kit, t + Vector((0, 0, r * 0.35)), r * (1.0 if near else 1.1), ca, cb, 0.4,
-            subdiv=2 if near else 1, squash=0.85, lump=0.12)
-    if near:
-        for t in poms:
-            for _ in range(7):
-                p, n = on_dome(kit, Vector(t) + Vector((0, 0, 0.6)), 1.9, 0.85)
-                fan(kit, p, n, 5, 0.32, PEARL, GOLD, 0.5, tip=BLUSH)
+# The candyfloss tree is one of the special trees now:
+# tools/woods/blender/special_trees.py builds candyfloss_tree.glb.
 
 
 def wisteria_tree(kit, near, chain=(LILAC, WISTERIA, WISTERIA_DEEP), leaves=(BUSH, BUSH_DEEP), count=32):
@@ -385,29 +369,8 @@ def golden_chain(kit, near):
     wisteria_tree(kit, near, chain=(BUTTER, SUNNY, GOLD), leaves=(BUSH, BUSH_DEEP), count=30)
 
 
-def magnolia(kit, near):
-    """Open vase of pearly branches carrying oversized cupped blooms, pearl
-    fading to blush and rose at the base, with a few mint leaf puffs."""
-    trunk = _trunk(kit, near, 1.6, 0.32, 0.2, 0.1, hexc("A88E96"), BARK_PEARL, 0.35)
-    tips = []
-    for i in range(7 if near else 5):
-        a = math.tau * i / 7 + kit.rng.uniform(-0.3, 0.3)
-        d = Vector((math.cos(a) * 0.55, math.sin(a) * 0.55, 1.0))
-        line = branch_line(kit, trunk[-1], d, kit.rng.uniform(3.4, 4.4), 3 if near else 2, 0.0)
-        kit.tube(line, taper(len(line), 0.2, 0.07), 5 if near else 4, hexc("B99AA4"), BARK_PEARL, 0.1, 0.45)
-        tips.append(line[-1])
-        tips += [line[1] + (line[2] - line[1]) * 0.5 + Vector((math.cos(a), math.sin(a), 0.3)) * 0.8]
-        if near:  # twig fork
-            tw = branch_line(kit, line[2], d + Vector((kit.rng.uniform(-1, 1), kit.rng.uniform(-1, 1), 0.2)), 1.3, 2)
-            kit.tube(tw, taper(len(tw), 0.06, 0.02), 4, BARK_PEARL, BARK_PEARL, 0.4, 0.6)
-            tips.append(tw[-1])
-    for i, t in enumerate(tips[:4]):  # a few fresh leaf tufts low in the crown
-        kit.blob(Vector(t) - Vector((0, 0, 1.0)), 0.45, 0.6, LEAF, LEAF_DEEP, 1 if near else 0, 0.5, lump=0.15)
-    blooms = tips + [Vector(t) + Vector((0.5, 0.3, -0.6)) for t in tips[::2]]
-    for t in (blooms if near else blooms[::2]):
-        cols = kit.rng.choice([(PEARL, BLUSH), (BLUSH, ROSE), (PEARL, ROSE), (hexc("F3E3F7"), LILAC)])
-        cup(kit, Vector(t) + Vector((0, 0, 0.15)), Vector((kit.rng.uniform(-0.3, 0.3), kit.rng.uniform(-0.3, 0.3), 1.0)),
-            0.62, 6, 2 if near else 1, cols[0], cols[1], BUTTER if near else None, 0.6, openness=0.15)
+# The magnolia is one of the special trees now: tools/woods/blender/special_trees.py
+# builds magnolia.glb and magnolia_harlequin.glb.
 
 
 # -------------------------------------------------------------- shrubs ----
@@ -832,10 +795,8 @@ TREE, SHRUB, FLOWER = (3000, 1500), (700, 400), (180, 100)
 
 SPECIES = {
     # New trees
-    "candyfloss_tree": (candyfloss_tree, TREE),
-    "wisteria_tree": (wisteria_tree, TREE),
-    "golden_chain": (golden_chain, TREE),
-    "magnolia": (magnolia, TREE),
+    # (the wisteria and the golden chain are special trees now:
+    # special_trees.py builds wisteria_tree.glb and golden_chain.glb)
     # New shrubs
     "peony_bush": (peony_bush, SHRUB),
     "hydrangea": (hydrangea, SHRUB),

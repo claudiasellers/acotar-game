@@ -9,6 +9,11 @@ woods stay oak, elm and beech; the candy-coloured trees and flowering
 shrubs gather in clearings, glades, edges and by water. Horror biomes
 (reed marsh, dread margin, Bogge's wood, blight edge, naga reeds) get
 nothing, so the contrast holds (R3).
+
+The magnolias (tools/woods/blender/special_trees.py; owner, 2026-11-12: "a
+mix of both ... or one region that has a mix and one region has only one
+kind"): the Border Woods grow the rose magnolia and the harlequin together,
+the Eastern Woods the rose one alone.
 """
 
 import os
@@ -24,12 +29,12 @@ MIX = {
             "detail": {"forget_me_not": 1.2, "tulip_patch": 0.6, "pansy_patch": 0.5},
         },
         "bluebell_glade": {
-            "trees": {"magnolia": 1.0, "candyfloss_tree": 0.6},
+            "trees": {"magnolia": 0.6, "magnolia_harlequin": 0.6, "candyfloss_tree": 0.6},
             "shrubs": {"hydrangea": 0.6, "iris_clump": 0.6},
             "detail": {"forget_me_not": 2.0, "allium": 0.6},
         },
         "foxglove_clearing": {
-            "trees": {"golden_chain": 0.8, "magnolia": 0.6},
+            "trees": {"golden_chain": 0.8, "magnolia": 0.4, "magnolia_harlequin": 0.4},
             "shrubs": {"spire_bed": 2.2, "lupin_clump": 0, "goldenrod": 0, "lavender_mound": 0, "peony_bush": 0.6},
             "detail": {"tulip_patch": 1.2, "daffodil": 0.8, "maidens_lace": 1.0, "pansy_patch": 0.5},
         },

@@ -6,7 +6,7 @@
 ## clearing, a low look at the ground flowers, and a raised view.
 extends Node
 
-const NEW_TREES := [&"candyfloss_tree", &"wisteria_tree", &"golden_chain", &"magnolia"]
+const NEW_TREES := [&"candyfloss_tree", &"wisteria_tree", &"golden_chain", &"magnolia", &"magnolia_harlequin"]
 const NEW_SHRUBS := [&"peony_bush", &"hydrangea", &"azalea", &"lavender_mound", &"iris_clump",
 		&"goldenrod", &"lupin_clump", &"sugarberry_bush"]
 

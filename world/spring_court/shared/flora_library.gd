@@ -14,6 +14,14 @@ extends RefCounted
 const FOLIAGE_SHADER := preload("res://world/spring_court/shared/woods_foliage.gdshader")
 ## Blender models that replace a procedural builder (tools/woods/blender/).
 const MODELS := "res://world/spring_court/shared/models/%s.glb"
+## Species whose model carries candyfloss: a mesh "<near|far>_floss" (the
+## billows, solid, woods_floss.gdshader) and "near_fuzz" (the fuzz skin, cut
+## out, woods_floss_fuzz.gdshader), drawn as further surfaces. The shaders
+## colour the floss per tree (tools/woods/blender/special_trees.py).
+const FLOSSED: Array[StringName] = [&"candyfloss_tree"]
+const FLOSS_SHADER := "res://world/spring_court/shared/woods_floss.gdshader"
+const FUZZ_SHADER := "res://world/spring_court/shared/woods_floss_fuzz.gdshader"
+const FLOSS_COTTON := "res://world/spring_court/shared/models/floss_cotton.png"
 
 ## layer: tree | shrub | ground | detail | find
 ## scale: random uniform scale range; radius: trunk collision radius (m) at
@@ -44,6 +52,9 @@ const SPECIES := {
 	&"wisteria_tree": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.35, "range": 600.0, "canon": "C", "shadow": false},
 	&"golden_chain": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.3, "range": 600.0, "canon": "X", "shadow": false},
 	&"magnolia": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.25, "range": 550.0, "canon": "X", "shadow": false},
+	# The special trees (tools/woods/blender/special_trees.py): the magnolia above is rebuilt there;
+	# the harlequin is the same tree with every flower its own pair of candy colours.
+	&"magnolia_harlequin": {"layer": "tree", "scale": Vector2(0.85, 1.2), "radius": 0.25, "range": 550.0, "canon": "X", "shadow": false},
 	# Shrubs and big ground features
 	&"fern": {"layer": "shrub", "scale": Vector2(0.7, 1.4), "radius": 0.0, "range": 140.0, "canon": "X"},
 	&"bracken": {"layer": "shrub", "scale": Vector2(0.8, 1.3), "radius": 0.0, "range": 140.0, "canon": "X"},
@@ -232,7 +243,7 @@ static func mesh(species: StringName) -> Mesh:
 			# map's painter does): hand back an empty mesh but cache nothing,
 			# or every tree of the species would stay invisible all session.
 			return ArrayMesh.new()
-		_near[species] = _to_mesh(species, arrays)
+		_near[species] = _to_mesh(species, arrays, 1)
 	return _near[species]
 
 
@@ -244,7 +255,7 @@ static func far_mesh(species: StringName) -> Mesh:
 		var arrays := arrays_for(species, 0)
 		if arrays.is_empty():
 			return ArrayMesh.new()  # off the main thread: see mesh()
-		_far[species] = _to_mesh(species, arrays)
+		_far[species] = _to_mesh(species, arrays, 0)
 	return _far[species]
 
 
@@ -285,12 +296,12 @@ static func arrays_for(species: StringName, detail: int) -> Array:
 
 ## Surface arrays from the species' Blender model (tools/woods/blender/),
 ## mesh "near" for detail 1 and "far" for 0; empty when there is no model.
-static func _model_arrays(species: StringName, detail: int) -> Array:
+static func _model_arrays(species: StringName, detail: int, part: String = "") -> Array:
 	var path := MODELS % species
 	if not ResourceLoader.exists(path):
 		return []
 	var root := (load(path) as PackedScene).instantiate()
-	var mi := root.find_child("near" if detail > 0 else "far", true, false) as MeshInstance3D
+	var mi := root.find_child(("near" if detail > 0 else "far") + part, true, false) as MeshInstance3D
 	var arrays: Array = mi.mesh.surface_get_arrays(0) if mi != null else []
 	root.free()
 	return arrays
@@ -300,11 +311,36 @@ static func has_model(species: StringName) -> bool:
 	return ResourceLoader.exists(MODELS % species)
 
 
-static func _to_mesh(species: StringName, arrays: Array) -> ArrayMesh:
+static func _to_mesh(species: StringName, arrays: Array, detail: int = 1) -> ArrayMesh:
 	var m := ArrayMesh.new()
 	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	m.surface_set_material(0, material(look_of(species)))
+	if species in FLOSSED:
+		for part: Array in [["_floss", floss_material()], ["_fuzz", fuzz_material()]]:
+			var arrays_of := _model_arrays(species, detail, part[0])
+			if not arrays_of.is_empty():
+				m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays_of)
+				m.surface_set_material(m.get_surface_count() - 1, part[1])
 	return m
+
+
+## The candyfloss material: the billows, solid (woods_floss.gdshader).
+static func floss_material() -> ShaderMaterial:
+	return _floss(&"floss", FLOSS_SHADER)
+
+
+## The candyfloss fuzz: a cut-out skin over the billows (woods_floss_fuzz.gdshader).
+static func fuzz_material() -> ShaderMaterial:
+	return _floss(&"floss_fuzz", FUZZ_SHADER)
+
+
+static func _floss(key: StringName, shader: String) -> ShaderMaterial:
+	if not _materials.has(key):
+		var m := ShaderMaterial.new()
+		m.shader = load(shader) as Shader
+		m.set_shader_parameter(&"cotton", load(FLOSS_COTTON))
+		_materials[key] = m
+	return _materials[key]
 
 
 static func _has_builder(builder: String) -> bool:

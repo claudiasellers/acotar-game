@@ -1,0 +1,308 @@
+{
+ "assets": [
+  {
+   "bytes": 106064,
+   "file": "bow_hunting_bow.glb",
+   "grip_half": 0.07,
+   "half_length": 0.62,
+   "id": "bow_hunting_bow",
+   "kind": "bow",
+   "size_m": [
+    0.05,
+    0.156,
+    1.245
+   ],
+   "tip_bottom": [
+    0.0,
+    -0.1222,
+    -0.5991
+   ],
+   "tip_top": [
+    0.0,
+    -0.1222,
+    0.5991
+   ],
+   "tris": 1614,
+   "tris_lod1": 806
+  },
+  {
+   "bytes": 127216,
+   "file": "bow_yew_longbow.glb",
+   "grip_half": 0.08,
+   "half_length": 0.85,
+   "id": "bow_yew_longbow",
+   "kind": "bow",
+   "size_m": [
+    0.047,
+    0.198,
+    1.748
+   ],
+   "tip_bottom": [
+    0.0,
+    -0.1492,
+    -0.8207
+   ],
+   "tip_top": [
+    0.0,
+    -0.1492,
+    0.8207
+   ],
+   "tris": 2047,
+   "tris_lod1": 1022
+  },
+  {
+   "bytes": 173200,
+   "file": "bow_fae_recurve.glb",
+   "grip_half": 0.09,
+   "half_length": 0.62,
+   "id": "bow_fae_recurve",
+   "kind": "bow",
+   "size_m": [
+    0.093,
+    0.178,
+    1.255
+   ],
+   "tip_bottom": [
+    0.0,
+    0.0138,
+    -0.5999
+   ],
+   "tip_top": [
+    0.0,
+    0.0138,
+    0.5999
+   ],
+   "tris": 2980,
+   "tris_lod1": 1490
+  },
+  {
+   "bytes": 171724,
+   "file": "bow_sentry_warbow.glb",
+   "grip_half": 0.1,
+   "half_length": 0.8,
+   "id": "bow_sentry_warbow",
+   "kind": "bow",
+   "size_m": [
+    0.081,
+    0.228,
+    1.717
+   ],
+   "tip_bottom": [
+    0.0,
+    -0.1604,
+    -0.7734
+   ],
+   "tip_top": [
+    0.0,
+    -0.1604,
+    0.7734
+   ],
+   "tris": 2911,
+   "tris_lod1": 1454
+  },
+  {
+   "bytes": 167956,
+   "file": "bow_gilded_bow.glb",
+   "grip_half": 0.09,
+   "half_length": 0.72,
+   "id": "bow_gilded_bow",
+   "kind": "bow",
+   "size_m": [
+    0.09,
+    0.153,
+    1.466
+   ],
+   "tip_bottom": [
+    0.0,
+    -0.069,
+    -0.6961
+   ],
+   "tip_top": [
+    0.0,
+    -0.069,
+    0.6961
+   ],
+   "tris": 2870,
+   "tris_lod1": 1432
+  },
+  {
+   "bytes": 22448,
+   "file": "arrow_wood.glb",
+   "id": "arrow_wood",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.041,
+    0.83,
+    0.036
+   ],
+   "tris": 418,
+   "tris_lod1": 208
+  },
+  {
+   "bytes": 29540,
+   "file": "arrow_ash.glb",
+   "id": "arrow_ash",
+   "kind": "arrow",
+   "length": 0.9,
+   "size_m": [
+    0.048,
+    0.9,
+    0.042
+   ],
+   "tris": 532,
+   "tris_lod1": 266
+  },
+  {
+   "bytes": 25172,
+   "file": "arrow_barbed.glb",
+   "id": "arrow_barbed",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.041,
+    0.83,
+    0.04
+   ],
+   "tris": 466,
+   "tris_lod1": 232
+  },
+  {
+   "bytes": 65316,
+   "file": "arrow_rope.glb",
+   "id": "arrow_rope",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.066,
+    0.83,
+    0.055
+   ],
+   "tris": 1422,
+   "tris_lod1": 710
+  },
+  {
+   "bytes": 46568,
+   "file": "arrow_signal.glb",
+   "id": "arrow_signal",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.07,
+    0.83,
+    0.048
+   ],
+   "tris": 946,
+   "tris_lod1": 472
+  },
+  {
+   "bytes": 41352,
+   "file": "arrow_sleep.glb",
+   "id": "arrow_sleep",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.042,
+    0.83,
+    0.043
+   ],
+   "tris": 700,
+   "tris_lod1": 349
+  },
+  {
+   "bytes": 43476,
+   "file": "arrow_lure.glb",
+   "id": "arrow_lure",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.041,
+    0.83,
+    0.043
+   ],
+   "tris": 756,
+   "tris_lod1": 377
+  },
+  {
+   "bytes": 39188,
+   "file": "arrow_fire.glb",
+   "id": "arrow_fire",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.041,
+    0.831,
+    0.036
+   ],
+   "tris": 670,
+   "tris_lod1": 334
+  },
+  {
+   "bytes": 37828,
+   "file": "arrow_frost.glb",
+   "id": "arrow_frost",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.048,
+    0.83,
+    0.05
+   ],
+   "tris": 656,
+   "tris_lod1": 327
+  },
+  {
+   "bytes": 38308,
+   "file": "arrow_light.glb",
+   "id": "arrow_light",
+   "kind": "arrow",
+   "length": 0.83,
+   "size_m": [
+    0.058,
+    0.83,
+    0.05
+   ],
+   "tris": 664,
+   "tris_lod1": 325
+  },
+  {
+   "bytes": 119160,
+   "file": "quiver_hunting.glb",
+   "id": "quiver_hunting",
+   "kind": "quiver",
+   "size_m": [
+    0.125,
+    0.205,
+    0.567
+   ],
+   "tris": 2388,
+   "tris_lod1": 1193
+  },
+  {
+   "bytes": 143184,
+   "file": "quiver_spring.glb",
+   "id": "quiver_spring",
+   "kind": "quiver",
+   "size_m": [
+    0.158,
+    0.242,
+    0.601
+   ],
+   "tris": 2796,
+   "tris_lod1": 1398
+  },
+  {
+   "bytes": 119576,
+   "file": "arrow_bundle.glb",
+   "id": "arrow_bundle",
+   "kind": "pickup",
+   "size_m": [
+    0.095,
+    0.867,
+    0.09
+   ],
+   "tris": 2438,
+   "tris_lod1": 1218
+  }
+ ]
+}
