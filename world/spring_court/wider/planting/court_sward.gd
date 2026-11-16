@@ -59,9 +59,10 @@ func _ready() -> void:
 	_wave.frequency = 0.035
 	for t in trunks:
 		var key := Vector2i(floori(t.x / 4.0), floori(t.y / 4.0))
+		# (Arrays: a packed array taken out of a Dictionary is a copy, and appending to it is lost)
 		if not _trunk_grid.has(key):
-			_trunk_grid[key] = PackedVector2Array()
-		(_trunk_grid[key] as PackedVector2Array).append(t)
+			_trunk_grid[key] = []
+		(_trunk_grid[key] as Array).append(t)
 
 
 func _exit_tree() -> void:

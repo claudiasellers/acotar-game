@@ -134,9 +134,10 @@ func test_the_glens_flowers_pool_under_its_trees() -> void:
 			for i in layer.count():
 				var p := layer.position_of(i)
 				var k := Vector2i(floori(p.x / 16.0), floori(p.z / 16.0))
+				# (an Array: a packed array taken out of a Dictionary is a copy, and appending to it is lost)
 				if not grid.has(k):
-					grid[k] = PackedVector2Array()
-				(grid[k] as PackedVector2Array).append(Vector2(p.x, p.z))
+					grid[k] = []
+				(grid[k] as Array).append(Vector2(p.x, p.z))
 	var bluebells := 0
 	var under := 0
 	var misplaced := 0
@@ -157,7 +158,7 @@ func test_the_glens_flowers_pool_under_its_trees() -> void:
 			var shaded := false
 			for dx in range(-1, 2):
 				for dz in range(-1, 2):
-					for q: Vector2 in grid.get(k + Vector2i(dx, dz), PackedVector2Array()):
+					for q: Vector2 in grid.get(k + Vector2i(dx, dz), []):
 						if q.distance_to(p) < 15.5:
 							shaded = true
 			if shaded:
