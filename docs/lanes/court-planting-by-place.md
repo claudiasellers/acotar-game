@@ -791,3 +791,27 @@ across the lake's east rim where the lake walk arrives.
 - Meadow flowers for the open glade; great blossom trees (the knolls' cherry
   is the estate's, grown to 1.9x).
 - The other places are still planted by their decor recipes.
+
+## State, 2026-11-16 night
+
+**In `origin/main`:** M4WCT-16-1 (the trees each built their own way, the
+Weeping Lady) and M4WCT-17-3 (the Starlight Glen planted by place in the game:
+`CourtGlenPlanting`, `CourtPlacePlants`, `CourtSward`, `CourtMotes`; the trees'
+far forms and the flowers' mid forms; Looking Lake's and Willow Mere's banks
+eased; `lake_run` running into the lake). 17-1 and 17-2 were rejected: the
+pool's birches stood in the clearing drawn from the pool's whole floor (the
+clearing is now the story's rim, 24 m), then a check of mine lost its trunks
+to a copied packed array (the sward's trunk lookup had the same slip).
+
+Frame time on the Mac, look quality, 1920x1080: the pool's east bank 26.7 ms
+(today's planting was 24.1, the picture 28.9); the brae 24.8 ms (21.9, 26.9).
+
+**Open with the owner:** the lakes' water whitens seen from a low shore (its
+glancing-angle colour is pale pink and it mirrors the day sky), and its foam
+band, drawn where the water is under 0.45 m deep, is metres wide on the eased
+shores. Proposed: hold the water's colour at shallow angles, narrow the foam
+to the waterline, deepen the Weeping Lady's shadow side. The water is the
+whole court's, so it waits for a yes.
+
+**Next:** meadow flowers and great blossom trees for the glen's open glade;
+then the next place (the Western Woods has its oak and elm).
