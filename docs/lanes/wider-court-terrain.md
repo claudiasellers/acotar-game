@@ -131,9 +131,13 @@ on the lakes.
   periwinkle hills against the sky. It is in spring.tres, manor.tres (fog
   only) and every daytime court grade (`build_court_fx.gd` `DEPTH_*`).
   Dusk, night and the blight keep their own fog.
-- **Open:** the court grades' LUT lifts the blacks (`LUT_STRENGTH` 0.3 toward
-  ramps with dark ends near 0.1). That reads milky in the glen next to the
-  estate's grade. It's the fx lane's taste call.
+- **Clear colours by day (owner, 2026-11-16):** the court's day grades came
+  down to the estate's light (exposure 0.6), their ramps keep a quarter of
+  their pull (black 0.026, was 0.1), the haze halved (0.0005) and the contrast
+  went up a step; the water keeps its own colour at every angle. The haze's
+  colour and layering are as picked. Rows in docs/tuning.md; before and after
+  in the clear-1..4 renders. spring.tres and manor.tres are untouched: every
+  court standpoint is inside a region's grade.
 - **Grass clumps** (`flora_grass_clump_a/b/c`, pale mint) glowed against the
   deeper ground. The owner had them taken out (M4WCT-4): `CourtRegion.DRAW_GRASS_CLUMPS`
   is false, so their chunks are hidden. Their layers stay, because GroundFuel reads them

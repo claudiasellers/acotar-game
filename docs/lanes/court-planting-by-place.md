@@ -806,12 +806,18 @@ to a copied packed array (the sward's trunk lookup had the same slip).
 Frame time on the Mac, look quality, 1920x1080: the pool's east bank 26.7 ms
 (today's planting was 24.1, the picture 28.9); the brae 24.8 ms (21.9, 26.9).
 
-**Open with the owner:** the lakes' water whitens seen from a low shore (its
-glancing-angle colour is pale pink and it mirrors the day sky), and its foam
-band, drawn where the water is under 0.45 m deep, is metres wide on the eased
-shores. Proposed: hold the water's colour at shallow angles, narrow the foam
-to the waterline, deepen the Weeping Lady's shadow side. The water is the
-whole court's, so it waits for a yes.
+**Clear colours (owner, 2026-11-16: "clear colors and not have it look misty
+or washed out or overly bright"; M4WCT-18):** the white lakes were three
+things at once. The water mirrored the pale pink horizon at low angles and
+its sheen was that pink too; its foam band was metres wide on the eased
+shores; and the court's day grades stood a third brighter than the estate's
+under a ramp that lifted black to 0.1. Now the water is aqua over azure with
+a sky-blue sheen and a held mirror, the foam is a line at the waterline, and
+every court day grade stands at the estate's light with a quarter of its
+ramp and half its haze (`build_court_fx.gd` `DAY_*`, `DEPTH_*`; rows in
+docs/tuning.md). The Weeping Lady needed no change: against azure water and
+a deeper sky she stands out as she is. Evening and night under a day grade
+came down with the day: deeper, and still clear in the renders.
 
 **Next:** meadow flowers and great blossom trees for the glen's open glade;
 then the next place (the Western Woods has its oak and elm).
