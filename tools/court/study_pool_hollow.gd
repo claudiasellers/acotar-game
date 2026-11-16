@@ -44,6 +44,8 @@ const FLOOR := 42.0
 ## from the pool, and the half-angle kept clear of tall bank plants.
 const ARRIVAL := 0.14
 const ARRIVAL_HALF := 0.55
+## The half-angle of the gap in the ring of birches where you come in.
+const ARRIVAL_MOUTH := 0.42
 const GLADE := "res://world/spring_court/wider/assets/flora/glade/%s.glb"
 ## Knoll tops round the hollow (surveyed), and the one tree each carries:
 ## [x, z, "estate" or "great", species, build, size].
@@ -116,14 +118,19 @@ static func _ring(root: Node3D, rng: RandomNumberGenerator) -> Array[Vector2]:
 			if not ok:
 				continue
 			stood.append(p)
+			var turn := rng.randf() * TAU
+			# the clump's first tree the tallest, its fellows slighter
+			var size := rng.randf_range(0.98, 1.14) if stood.size() == 1 else rng.randf_range(0.76, 0.98)
+			build += 1
+			# no clump stands in the mouth of the way in: you come down to the pool across open grass
+			if absf(angle_difference((heart - POOL).angle(), ARRIVAL)) < ARRIVAL_MOUTH:
+				continue
 			trunks.append(p)
 			var mi := MeshInstance3D.new()
 			mi.mesh = CourtGreatTrees.mesh(&"pillar_birch", build)
-			build += 1
 			mi.position = _ground(p)
-			mi.rotation.y = rng.randf() * TAU
-			# the clump's first tree the tallest, its fellows slighter
-			mi.scale = Vector3.ONE * (rng.randf_range(0.98, 1.14) if stood.size() == 1 else rng.randf_range(0.76, 0.98))
+			mi.rotation.y = turn
+			mi.scale = Vector3.ONE * size
 			root.add_child(mi)
 	print("STUDY ring trunks: ", trunks)
 	return trunks
