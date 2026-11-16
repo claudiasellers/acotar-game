@@ -10,6 +10,11 @@ const POOL := CourtGlenPlanting.POOL
 const COUNT := 280
 ## Lit from within, past the bloom's threshold.
 const GLOW := Color(2.6, 2.5, 1.9)
+## The brook's lights: warm, so they stand out from the snowdrops they hang
+## over, each with a soft halo (the day grades' glow is too slight to give one).
+const BROOK_GLOW := Color(3.2, 2.5, 1.25)
+const BROOK_HALO := Color(1.0, 0.8, 0.42, 0.5)
+const BROOK_HALO_SIZE := 1.5
 
 ## Left to the clock when < 0; else 0 hides them and 1 shows them.
 var shown := -1.0
@@ -49,25 +54,54 @@ static func build(region: Node3D, content: CourtRegionContent) -> void:
 	node.visibility_range_end = 260.0
 	node.visible = false
 	region.add_child(node)
-	# the brook's: bigger and steadier, one after another along the bank, seen from further off
+	# the brook's: bigger, warm and steadier, one after another along the bank, seen from further off
 	var string := CourtGlenPlaces.lights(content)
 	if string.is_empty():
 		return
-	var along := MultiMesh.new()
-	along.transform_format = MultiMesh.TRANSFORM_3D
-	along.mesh = mote
-	along.instance_count = string.size()
+	var lamp := mote.duplicate() as SphereMesh
+	var warm := lit.duplicate() as StandardMaterial3D
+	warm.albedo_color = BROOK_GLOW
+	lamp.material = warm
+	var halo := QuadMesh.new()
+	halo.size = Vector2.ONE * BROOK_HALO_SIZE
+	var soft := StandardMaterial3D.new()
+	soft.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	soft.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	soft.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	soft.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	soft.billboard_keep_scale = true
+	soft.no_depth_test = false
+	soft.albedo_color = BROOK_HALO
+	var ramp := Gradient.new()
+	ramp.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+	ramp.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.28), Color(1, 1, 1, 0)])
+	var disc := GradientTexture2D.new()
+	disc.gradient = ramp
+	disc.fill = GradientTexture2D.FILL_RADIAL
+	disc.fill_from = Vector2(0.5, 0.5)
+	disc.fill_to = Vector2(1.0, 0.5)
+	disc.width = 64
+	disc.height = 64
+	soft.albedo_texture = disc
+	halo.material = soft
 	var mid := string[string.size() / 2]
-	for i in string.size():
-		along.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * rng.randf_range(1.5, 2.3)), string[i] - mid))
-	var brook := CourtMotes.new()
-	brook.name = "MotesBrook"
-	brook.multimesh = along
-	brook.position = mid
-	brook.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	brook.visibility_range_end = 420.0
-	brook.visible = false
-	region.add_child(brook)
+	for part: Array in [["MotesBrook", lamp, 2.6, 3.6], ["MotesBrookHalo", halo, 0.8, 1.25]]:
+		var along := MultiMesh.new()
+		along.transform_format = MultiMesh.TRANSFORM_3D
+		along.mesh = part[1]
+		along.instance_count = string.size()
+		var sizes := RandomNumberGenerator.new()
+		sizes.seed = hash([content.seed, "brook lights"])
+		for i in string.size():
+			along.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * sizes.randf_range(part[2], part[3])), string[i] - mid))
+		var brook := CourtMotes.new()
+		brook.name = part[0]
+		brook.multimesh = along
+		brook.position = mid
+		brook.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		brook.visibility_range_end = 420.0
+		brook.visible = false
+		region.add_child(brook)
 
 
 func _process(delta: float) -> void:

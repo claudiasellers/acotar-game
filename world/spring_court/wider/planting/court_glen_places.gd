@@ -702,7 +702,7 @@ static func _mere_run(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, 
 
 ## The Glimmer Brook's string of lights, as CourtMotes draws them from the
 ## golden hour through the night: one every few steps down the outer bank,
-## knee to waist high, from just outside the pool's ring to the mere.
+## waist to shoulder high, from just outside the pool's ring to the mere.
 static func lights(content: CourtRegionContent) -> PackedVector3Array:
 	var out := PackedVector3Array()
 	var pts := brook(&"glimmer_brook")
@@ -715,7 +715,7 @@ static func lights(content: CourtRegionContent) -> PackedVector3Array:
 		var on: Array = _on_line(pts, 0, run + rng.randf_range(-0.7, 0.7))
 		var p := (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * rng.randf_range(2.6, 4.4)
 		if content.owns(p):
-			out.append(Vector3(p.x, WorldHeight.height_at(p.x, p.y) + rng.randf_range(0.45, 1.05), p.y))
+			out.append(Vector3(p.x, WorldHeight.height_at(p.x, p.y) + rng.randf_range(0.7, 1.5), p.y))
 		run += LIGHT_STEP
 	return out
 
