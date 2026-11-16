@@ -4,7 +4,7 @@
 
 [sub_resource type="Gradient" id="Gradient_b6hk0"]
 offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(0.10588236, 0.08705883, 0.15764707, 1, 0.6217647, 0.54882354, 0.5935294, 1, 1, 0.9941176, 0.98470587, 1)
+colors = PackedColorArray(0.02647059, 0.021764707, 0.03941177, 1, 0.53044116, 0.5122059, 0.52338237, 1, 1, 0.99852943, 0.9961765, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_qs5xo"]
 gradient = SubResource("Gradient_b6hk0")
@@ -21,15 +21,15 @@ sun_energy = 1.6099999999999999
 ambient_color = Color(0.83435297, 0.73803926, 0.9259608, 1)
 cloud_cover = 0.3
 fog_color = Color(0.7730392, 0.777549, 0.95921564, 1)
-fog_density = 0.0011
-volumetric_density = 0.002
+fog_density = 0.0005
+volumetric_density = 0.0008
 volumetric_albedo = Color(0.88750005, 0.88029414, 0.99509805, 1)
 fog_sky_affect = 0.1
 fog_aerial_perspective = 0.1
-exposure = 0.8
+exposure = 0.6
 saturation = 1.2
-contrast = 1.12
-glow_intensity = 0.3
+contrast = 1.16
+glow_intensity = 0.1
 glow_bloom = 0.0
 glow_hdr_threshold = 1.4
 lut = SubResource("GradientTexture1D_qs5xo")

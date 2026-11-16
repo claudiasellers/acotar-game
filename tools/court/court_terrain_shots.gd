@@ -819,12 +819,8 @@ const FOGS := {
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0)},
 	"layered_mist": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0), "fog_height": 30.0, "fog_height_density": 0.045},
-	# PREVIEW (clear colours): whole looks. "lut_keep" is how much of the ramp's pull from identity stays.
-	"clear_a": {"exposure": 0.68, "lut_keep": 0.4, "fog_density": 0.0006, "volumetric_density": 0.001, "glow_intensity": 0.15},
-	"clear_b": {"exposure": 0.6, "lut_keep": 0.25, "fog_density": 0.0005, "volumetric_density": 0.0008, "glow_intensity": 0.1,
-		"contrast": 1.16},
-	"clear_c": {"exposure": 0.76, "sun_energy": 1.4, "ambient_energy": 0.5, "lut_keep": 0.4, "fog_density": 0.0006,
-		"volumetric_density": 0.001, "glow_intensity": 0.15},
+	# PREVIEW (clear colours): the open court's grade at the day grades' new light.
+	"clear": {"exposure": 0.6, "fog_density": 0.0005, "volumetric_density": 0.0008, "glow_intensity": 0.1},
 }
 
 
@@ -874,6 +870,8 @@ func _apply_fog(world: World, grade: StringName, fog: String) -> void:
 	for k: String in FOGS[fog]:
 		if k == "lut_keep":
 			var gt := p.lut as GradientTexture1D
+			if gt == null:
+				continue
 			var g := gt.gradient.duplicate() as Gradient
 			var cols := g.colors
 			for i in cols.size():

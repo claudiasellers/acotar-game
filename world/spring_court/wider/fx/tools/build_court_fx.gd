@@ -14,9 +14,22 @@ const GRADE_SCRIPT := "res://world/shared/grades/grade_preset.gd"
 const LUT_STRENGTH := 0.3
 const FOG_CAP := 0.0012
 const CONTRAST := 1.12
+## Clear colours by day (owner, 2026-11-16: "clear colors and not have it look
+## misty or washed out or overly bright"). The day grades stood a third brighter
+## than the estate's (sun x exposure 1.29 against the manor grade's 0.94), so
+## every pale leaf, bank and stretch of water went to white; their ramps lifted
+## black to 0.1 and the middle to 0.6, a veil over everything; and the haze took
+## a fifth of the colour at 200 m. By day the exposure comes down to the
+## estate's light, the ramp keeps a quarter of its pull (the lilac in the
+## shadows, without the lift), the contrast goes up a step and the haze
+## halves: the far hills are still periwinkle, the middle distance is clear.
+## Dusk and night grades keep the values above.
+const DAY_EXPOSURE_CAP := 0.6
+const DAY_LUT_STRENGTH := 0.075
+const DAY_CONTRAST := 1.16
 ## Glow: daylight blooms only real highlights (threshold above white, no
 ## bloom wash); golden hour and night keep a soft glow for fire and lanterns.
-const DAY_GLOW := 0.3
+const DAY_GLOW := 0.1
 const DAY_THRESHOLD := 1.4
 const NIGHT_GLOW := 0.7
 const NIGHT_BLOOM := 0.04
@@ -57,12 +70,12 @@ const BLIGHT_CLOUD_SHADE := Color(0.38, 0.38, 0.40)
 const DEPTH_HAZE := Color(0.70, 0.74, 0.96)
 const DEPTH_VOLUMETRIC := Color(0.85, 0.86, 1.0)
 const DEPTH_TINT := 0.25
-const DEPTH_DENSITY := 0.0011
+const DEPTH_DENSITY := 0.0005
 const DEPTH_AERIAL := 0.1
 const DEPTH_SKY_AFFECT := 0.1
 ## Volumetric fog by day as thin as the estate's: thicker, it laid a milky veil
 ## over every layer and showed its froxels as squares on the ground (wcterrain-6).
-const DEPTH_VOLUMETRIC_DENSITY := 0.002
+const DEPTH_VOLUMETRIC_DENSITY := 0.0008
 
 
 func _initialize() -> void:
@@ -163,10 +176,10 @@ func _grade_rows() -> Array[Dictionary]:
 
 func _tame(p: Resource, ramp: PackedColorArray) -> void:
 	var identity := [Color(0, 0, 0), Color(0.5, 0.5, 0.5), Color(1, 1, 1)]
-	for i in ramp.size():
-		ramp[i] = (identity[i] as Color).lerp(ramp[i], LUT_STRENGTH)
 	# Day skies toward the bar's #6B94FA top, golden-hour ones toward #7361D1.
 	var golden := float(p.get("sun_energy")) < 1.0
+	for i in ramp.size():
+		ramp[i] = (identity[i] as Color).lerp(ramp[i], LUT_STRENGTH if golden else DAY_LUT_STRENGTH)
 	p.set("sky_top", (p.get("sky_top") as Color).lerp(Color("7361D1") if golden else Color("6B94FA"), 0.5))
 	p.set("fog_density", minf(float(p.get("fog_density")), FOG_CAP))
 	# Book light (Keeper, lore/08-aesthetic/tone-and-palette.md): rich, warm and
@@ -192,12 +205,12 @@ func _tame(p: Resource, ramp: PackedColorArray) -> void:
 		p.set("fog_sky_affect", DEPTH_SKY_AFFECT)
 		p.set("volumetric_density", DEPTH_VOLUMETRIC_DENSITY)
 	p.set("volumetric_density", minf(float(p.get("volumetric_density")), VOLUMETRIC_CAP))
-	p.set("contrast", CONTRAST)
+	p.set("contrast", CONTRAST if golden else DAY_CONTRAST)
 	p.set("sun_energy", minf(float(p.get("sun_energy")) * SUN_GAIN, SUN_CAP))
 	p.set("ambient_energy", float(p.get("ambient_energy")) * AMBIENT_SCALE)
 	p.set("ambient_color", (p.get("ambient_color") as Color).lerp(LILAC_SHADOW, SHADOW_TINT))
 	p.set("saturation", minf(float(p.get("saturation")), SATURATION_CAP))
-	p.set("exposure", minf(float(p.get("exposure")), EXPOSURE_CAP))
+	p.set("exposure", minf(float(p.get("exposure")), EXPOSURE_CAP if golden else DAY_EXPOSURE_CAP))
 	p.set("brightness", minf(float(p.get("brightness")), BRIGHTNESS_CAP))
 
 
