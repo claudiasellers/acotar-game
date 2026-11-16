@@ -60,6 +60,8 @@ GRASS_TALL = {"blades": 14, "radius": 0.14, "height": 0.62, "lean": 30.0, "width
 # the sward: what covers the floor between everything else, broad soft blades in a wide low tuft
 GRASS_SWARD = {"blades": 44, "radius": 0.46, "height": 0.25, "lean": 46.0, "width": 0.036,
                "foot": TURF, "blade": (0.31, 0.63, 0.31), "tip": (0.52, 0.80, 0.40)}
+# the sward from further off (CourtSward draws it past its near cells): a third of the blades, broader
+GRASS_SWARD_FAR = dict(GRASS_SWARD, blades=15, width=0.085)
 BLUEBELL = {"height": 0.42, "bell": 0.05, "leaf_deep": (0.22, 0.50, 0.36), "leaf": (0.38, 0.68, 0.44), "stem": (0.42, 0.44, 0.62),
             "bell_deep": (0.33, 0.35, 0.80), "bell_light": (0.64, 0.68, 0.97)}
 BLUEBELL_WHITE = dict(BLUEBELL, stem=(0.50, 0.66, 0.52), bell_deep=(0.86, 0.88, 0.95), bell_light=(0.98, 0.98, 1.0))
@@ -82,6 +84,9 @@ PLANTS = {
     "grass_sward_a": ("grass", GRASS_SWARD, None),
     "grass_sward_b": ("grass", GRASS_SWARD, None),
     "grass_sward_c": ("grass", GRASS_SWARD, None),
+    "grass_sward_far_a": ("grass", GRASS_SWARD_FAR, None),
+    "grass_sward_far_b": ("grass", GRASS_SWARD_FAR, None),
+    "grass_sward_far_c": ("grass", GRASS_SWARD_FAR, None),
     # the glen's three flowers (book ch 18), as the patches a drift is laid from: (kind, sheet, plants, radius m)
     "bluebell_patch_a": ("patch", BLUEBELL, ("bluebell", 9, 0.42)),
     "bluebell_patch_b": ("patch", BLUEBELL, ("bluebell", 9, 0.42)),
@@ -134,7 +139,12 @@ def build(name, out_dir):
         bpy.ops.wm.read_factory_settings(use_empty=True)
         tops, height = FAR[of](sheet)
         far = G.far_patch(tops, G.mix(sheet["leaf_deep"], sheet["leaf"], 0.5), height, radius, rng)
-        name, objs, note = name + "_far", [G.soft_object(far)], "soft %6d" % far.tris()
+        size = G.export(name + "_far", [G.soft_object(far)], out_dir)
+        print("%-16s soft %6d  %5.0f KB" % (name + "_far", far.tris(), size / 1024.0))
+        # and from the middle distance: fewer plants, each a third bigger, over the same ground
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        mid = G.patch(SMALL[of], sheet, rng, max(2, round(count / 2.4)), radius, size=(1.2, 1.5))
+        name, objs, note = name + "_mid", [G.soft_object(mid)], "soft %6d" % mid.tris()
     else:
         soft = SMALL[kind](sheet, rng)
         objs = [G.soft_object(soft)]

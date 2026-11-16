@@ -45,6 +45,11 @@ extends Resource
 ## The recipe's ranges in trees per hectare: over the whole region, and per
 ## landform name (Vector2(min, max)). CourtPlanting.report() measures them.
 @export var trees_per_ha: Vector2 = Vector2.ZERO
+## The place's own planting, by name (docs/lanes/court-planting-by-place.md):
+## its trees and small plants come from that planting's rules, read from the
+## land, in place of decor recipes; its grass is a CourtSward. Empty: the
+## decor recipes plant the region. &"glen": CourtGlenPlanting.
+@export var place_planting: StringName = &""
 @export var form_per_ha: Dictionary = {}
 @export_multiline var notes: String
 

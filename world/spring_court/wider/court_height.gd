@@ -252,7 +252,9 @@ const BROOKS := [
 	[&"brae_brook", 1.4, [[-800.0, -430.0], [-850.0, -300.0], [-878.0, -170.0], [-892.0, -40.0], [-905.0, 80.0], [-938.0, 148.0]]],
 	[&"glimmer_brook", 1.6, [[-1180.0, 432.0], [-1260.0, 424.0], [-1318.0, 400.0], [-1332.0, 345.0], [-1316.0, 306.0], [-1303.0, 281.0]]],
 	[&"mere_run", 1.8, [[-1116.0, 430.0], [-1040.0, 418.0], [-960.0, 405.0], [-872.0, 400.0]]],
-	[&"lake_run", 1.8, [[-1172.0, -140.0], [-1120.0, -132.0], [-1070.0, -126.0], [-1042.0, -122.0]]],
+	# (it runs from the Thornwater down into Looking Lake: the lake lies 6 m under the river, and as the
+	# lake's outflow the brook was held up at the river's level, a causeway across the lake's east rim)
+	[&"lake_run", 1.8, [[-1042.0, -122.0], [-1070.0, -126.0], [-1120.0, -132.0], [-1172.0, -140.0]]],
 	[&"briar_brook", 1.2, [[-180.0, -880.0], [-140.0, -790.0], [-80.0, -710.0], [0.0, -660.0], [80.0, -628.0], [133.0, -616.0]]],
 	[&"vale_stream", 2.2, [[1010.0, 590.0], [1005.0, 700.0], [995.0, 800.0], [990.0, 900.0], [992.0, 990.0]]],
 	[&"mill_brook", 1.4, [[-1150.0, -1236.0], [-1172.0, -1150.0], [-1192.0, -1060.0], [-1203.0, -1012.0]]],
@@ -270,6 +272,16 @@ const LAKES := [
 	[&"hollow_pool", 150.0, -615.0, 20.0, 6.0, 0.0, 0.0, 0.0],
 	[&"mill_pond", 1040.0, 875.0, 18.0, 5.0, 0.0, 0.0, 0.0],
 ]
+## Lakes whose banks are eased down to the water (owner, 2026-11-16: Looking
+## Lake lay in a pit, its water 25 m under a sheer west bank, so no wood could
+## come down to it and nothing was reflected; Willow Mere stood in a 2-5 m
+## wall). id -> [the shore's width (m), its grade, the grade of the slope
+## behind it]. Cut-only: where the land already comes down to the water
+## nothing changes.
+const LAKE_SHORES := {
+	&"looking_lake": [26.0, 0.1, 0.42],
+	&"willow_mere": [12.0, 0.12, 0.35],
+}
 
 # --- ways ---------------------------------------------------------------------
 ## Paths: [id, half-width, points]. Graded at PATH_GRADE, cut-only: on steep
@@ -506,6 +518,8 @@ static var _lake_level := PackedFloat32Array()
 ## Build stages: how much of the land _land() applies (for precomputing).
 enum Stage { BASE, RIVER, BROOKS, LAKES, PATHS }
 static var _stage_cap: int = Stage.PATHS
+## True once the lakes have their levels: only then can their shores be eased.
+static var _shores_ready := false
 
 
 # ==============================================================================
@@ -753,6 +767,8 @@ static func _land(x: float, z: float, stage: int) -> float:
 	h = _features(x, z, h)
 	if stage >= Stage.RIVER:
 		h = _river_carve(x, z, h, ci)
+		if _shores_ready:
+			h = _lake_shore(x, z, h)
 	if stage >= Stage.BROOKS:
 		h = _brook_carve(x, z, h)
 	if stage >= Stage.LAKES:
@@ -993,6 +1009,31 @@ static func _brook_carve(x: float, z: float, h: float) -> float:
 
 
 # --- lakes --------------------------------------------------------------------
+
+## The eased banks (LAKE_SHORES): outside a lake's rim the land may stand no
+## higher than a low lip at the water, a gentle shore, then a steeper slope up
+## to whatever the land was. Brooks and paths are laid after it.
+static func _lake_shore(x: float, z: float, h: float) -> float:
+	for i in LAKES.size():
+		var l: Array = LAKES[i]
+		if not LAKE_SHORES.has(l[0]):
+			continue
+		var spec: Array = LAKE_SHORES[l[0]]
+		var s := Vector2(x - float(l[1]), z - float(l[2])).length() - float(l[3])
+		if s <= -1.0 or s > 200.0:
+			continue   # (from a little inside the rim, so no sliver stands between the shore and the carve)
+		s = maxf(s, 0.0)
+		var w: float = spec[0]
+		var rise := 0.05 + 0.1 * minf(s, 3.0)
+		if s > 3.0:
+			rise += float(spec[1]) * (minf(s, w) - 3.0)
+		if s > w:
+			rise += float(spec[2]) * (s - w)
+		# not a perfect bowl
+		rise += _hum.get_noise_2d(x * 0.5, z * 0.5) * 0.5 * smoothstep(3.0, 14.0, s)
+		h = minf(h, _lake_level[i] + rise)
+	return h
+
 
 static func _lake_carve(x: float, z: float, h: float) -> float:
 	for i in LAKES.size():
@@ -1293,6 +1334,7 @@ static func _build() -> void:
 		_add_capsule(_b_river, i, pts[i], pts[i + 1], CHANNEL + 220.0)
 	# Pad levels from the ground before any pad.
 	_stage_cap = Stage.BASE
+	_shores_ready = false
 	_pad_levels.resize(_pads.size())
 	for i in _pads.size():
 		_pad_levels[i] = 0.0
@@ -1318,6 +1360,7 @@ static func _build() -> void:
 				lowest = minf(lowest, _land(q.x, q.y, Stage.RIVER))
 		_lake_level[i] = lowest - 0.7
 		_lakes.append({"id": l[0], "center": c, "radius": float(l[3]), "level": _lake_level[i]})
+	_shores_ready = true
 	# Brooks: downhill only, never above a lake they leave or enter.
 	_brook_pts.clear()
 	_brook_lvl.clear()

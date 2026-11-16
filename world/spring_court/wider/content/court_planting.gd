@@ -251,6 +251,13 @@ static func report(content: CourtRegionContent, layers: Array[ScatterLayer] = []
 
 ## The region's tree layers, one per tree entry, before they are split over builds.
 static func tree_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
+	if CourtGlenPlanting.applies(content):
+		# a place with its own planting: its trees as it lays them
+		var place: Array[ScatterLayer] = []
+		for layer in CourtGlenPlanting.layers(content):
+			if layer.tags.has("tree"):
+				place.append(layer)
+		return place
 	var trees := {}
 	for di in content.decor.size():
 		var e := content.decor[di]

@@ -121,7 +121,12 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 		if BuildCancel.requested(content.region_id):
 			return []
 		_ground_layer(content, di, all[di], canopy, places)
-	if not BuildCancel.requested(content.region_id):
+	if CourtGlenPlanting.applies(content):
+		# A place with its own planting: its trees, flowers and bank plants come from
+		# the land (and its landmarks' collars with them: no carpets ringed round a thing).
+		if not BuildCancel.requested(content.region_id):
+			all.append_array(CourtGlenPlanting.layers(content))
+	elif not BuildCancel.requested(content.region_id):
 		var mesh_for := func(id: StringName) -> Mesh: return CourtAssets.mesh(id)
 		var ground := func(p: Vector2) -> float: return WorldHeight.height_at(p.x, p.y)
 		all.append_array(PlaceComposer.layers(places, content.seed, mesh_for, ground, content.owns))
@@ -129,7 +134,7 @@ static func decor_layers(content: CourtRegionContent) -> Array[ScatterLayer]:
 	for layer in all:
 		if layer.count() == 0:
 			continue
-		if layer.tags.has("tree"):
+		if layer.tags.has("tree") and not layer.tags.has("place"):
 			out.append_array(_split_builds(layer, content.region_id))
 		else:
 			out.append(layer)
@@ -567,6 +572,8 @@ static func estimate_draw_calls(content: CourtRegionContent, forage: Array[Scatt
 		var chunk := SMALL_CHUNK
 		if layer.tags.has("tree"):
 			chunk = NEAR_CHUNK if layer.tags.has("near") else TREE_CHUNK
+		elif layer.tags.has("fine"):
+			chunk = CourtGlenPlanting.FINE_CHUNK
 		var keys := {}
 		for i in layer.count():
 			var p := layer.position_of(i)

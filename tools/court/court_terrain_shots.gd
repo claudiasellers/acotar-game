@@ -78,7 +78,7 @@ const STUDY_VIEWS := {
 	"grove_walk_dusk": [-1314.0, 285.0, 1.7, -1328.0, 254.0, 3.0, 0.8, &"spring", 68.0],
 	# on the Glimmer Brook's bank, looking down it into the pool
 	"brook_in": [-1319.0, 322.0, 1.7, -1301.0, 268.0, 1.0, 0.45, &"spring", 66.0],
-	# the rest of the glen (study=glen): Looking Lake from where the lake walk reaches it
+	# the rest of the glen: Looking Lake from where the lake walk reaches it
 	"lake_shore": [-1152.0, -199.0, 1.7, -1270.0, -155.0, 3.0, 0.45, &"spring", 70.0],
 	"lake_dusk": [-1152.0, -199.0, 1.7, -1270.0, -155.0, 3.0, 0.8, &"spring", 70.0],
 	# Willow Mere, across the water to the Weeping Lady
@@ -125,9 +125,6 @@ func _run() -> void:
 			args.erase(a)  # tools/perf/frame_probe.tscn's own settings
 		elif a.begins_with("without="):
 			without = a.substr(8)   # frame-time breakdown: near, mid, trees, shadows, decor (comma-separated)
-			args.erase(a)
-		elif a.begins_with("study="):
-			study = a.substr(6)   # planted whole, for a look: study=pool_hollow (the pool's hollow), study=glen (the whole glen)
 			args.erase(a)
 		elif a.begins_with("ring="):
 			rings.append(a.substr(5))   # a ring of great trees round a site: ring=<species>,<site>,<radius m>,<count>
@@ -200,14 +197,12 @@ func _run() -> void:
 			_lineup(world, eye, at, lineup, cam)
 		for ring: String in rings:
 			_ring(world, ring)
-		if study != "" and world.get_node_or_null(^"StudyPoolHollow") == null:
-			StudyPoolHollow.build(world)
-			if study == "glen":
-				StudyGlen.build(world)
-		if study != "":
-			StudyPoolHollow.at_time(world, v[6])
-		if study == "glen":
-			StudyGlen.sward_round(world, eye)
+		# a place's grass is laid round the player as they walk: lay it round this standpoint now
+		for sward: CourtSward in get_tree().get_nodes_in_group(CourtSward.GROUP):
+			sward.settle(eye)
+		for motes: CourtMotes in world.find_children("Motes", "MultiMeshInstance3D", true, false):
+			motes.shown = 1.0 if CourtMotes.out_at(v[6]) else 0.0
+			motes.visible = motes.shown > 0.5
 		if forest != "":
 			_forest(world, eye, forest)
 		for look: String in (looks if not looks.is_empty() else [""]):
@@ -649,7 +644,6 @@ func _leave_out(world: World, what: String) -> void:
 
 
 var rings: Array[String] = []
-var study := ""
 
 
 ## A ring of one of the court's great trees round a named site, for a look at a

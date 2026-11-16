@@ -41,6 +41,10 @@ OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/trees")
 # not have"): grown by the same recipes so they stand beside the estate's as
 # family, but they are the court's and live with its trees. species -> height (m).
 COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
+# Every tree's far form (--far): the same skeleton and clouds at a twentieth of the
+# triangles, for the court's planting to draw past FAR_FROM (CourtGreatTrees). The
+# estate's species' far forms live with the court's too: the estate draws its own way.
+FAR_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/far")
 COURT = {"pillar_birch": 18.0, "great_oak": 22.0, "great_sycamore": 28.0, "great_elm": 25.0, "aspen_spire": 27.0, "old_thorn": 7.0,
          "thorn_bush": 3.2, "weeping_lady": 36.0}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
@@ -589,11 +593,75 @@ def build(sid, letter, seed, **opts):
         bmesh.ops.transform(b, matrix=m, verts=b.verts)
     parts = meshes + ([("core", core.bm, None)] if core else []) + ([("fruit", fruit.bm, None)] if fruit else [])
     parts += [("bloom", bloom, None)] if bloom else []
+    if opts.get("far"):
+        return far_form(sid, name, sk, clouds, rng, m, fronds)
     ob, tris = assemble(name, parts)
     total = sum(tris.values())
     print(f"  {name:24s} {total:5d} tris ({', '.join(f'{k} {v}' for k, v in tris.items())}; {len(clouds)} seats)")
     K.export_glb([ob], os.path.join(COURT_OUT if sid in COURT else OUT, f"{name}.glb"))
     return total
+
+
+def far_form(sid, name, sk, clouds, rng, m, fronds):
+    """The tree from far off: its wood at a fraction of the triangles, each
+    cloud one coarse ball at the cloud's full size (so the outline is the near
+    tree's), and a weeping tree's fronds thinned to every fourth, widened to
+    keep the veil. Two surfaces: tree_bark and tree_core (or tree_fronds)."""
+    rc = RECIPES[sid]
+    bark = wood(sk, name + "_far", rc.get("wood", 0.33) * 0.12)
+    bmesh.ops.transform(bark, matrix=m, verts=bark.verts)
+    parts = [("bark", bark, None)]
+    if fronds is not None:
+        # every fourth strand (a strand is a run of quads sharing no vert with the next), four times as wide
+        thin = bmesh.new()
+        uv = thin.loops.layers.uv.new("UVMap")
+        col = thin.loops.layers.float_color.new("Col")
+        fuv, fcol = fronds.loops.layers.uv.active, fronds.loops.layers.float_color.active
+        fronds.verts.ensure_lookup_table()
+        seen, strand = set(), 0
+        for f in fronds.faces:
+            if f.index in seen:
+                continue
+            # walk this strand: the faces linked through shared edges
+            stack, run = [f], []
+            while stack:
+                g = stack.pop()
+                if g.index in seen:
+                    continue
+                seen.add(g.index)
+                run.append(g)
+                for e in g.edges:
+                    stack.extend(h for h in e.link_faces if h.index not in seen)
+            strand += 1
+            if strand % 4:
+                continue
+            for g in run:
+                mid = sum((v.co for v in g.verts), Vector()) / len(g.verts)
+                # widen across the strand only: keep each vert's height
+                vs = [thin.verts.new(Vector((mid.x + (v.co.x - mid.x) * 4.0, mid.y + (v.co.y - mid.y) * 4.0, v.co.z))) for v in g.verts]
+                h = thin.faces.new(vs)
+                for src, dst in zip(g.loops, h.loops):
+                    dst[uv].uv = src[fuv].uv
+                    dst[col] = src[fcol]
+        thin.verts.index_update()
+        thin.normal_update()
+        normals = []
+        for v in thin.verts:
+            out = Vector((v.co.x, v.co.y, 0.0))
+            normals.append(((out.normalized() if out.length > 1e-4 else Vector((1, 0, 0))) * 0.6 + UP * 0.6).normalized())
+        parts.append(("fronds", thin, normals))
+    else:
+        core = K.Prop("core")
+        for cc, r in clouds:
+            MF.blob(core, cc.x, cc.y, cc.z, r * 0.97, (1, 1, 1), rng, 1, rc["flat"])
+        bmesh.ops.transform(core.bm, matrix=m, verts=core.bm.verts)
+        parts.append(("core", core.bm, None))
+    ob, tris = assemble(name + "_far", parts)
+    total = sum(tris.values())
+    print(f"  {name + '_far':24s} {total:5d} tris ({', '.join(f'{k} {v}' for k, v in tris.items())})")
+    os.makedirs(FAR_OUT, exist_ok=True)
+    K.export_glb([ob], os.path.join(FAR_OUT, f"{name}_far.glb"))
+    return 0
 
 
 def assemble(name, parts):
@@ -637,11 +705,12 @@ def main():
     # (the court's great trees are built by name: a plain run rebuilds the estate's only)
     only = sys.argv[sys.argv.index("--only") + 1].split(",") if "--only" in sys.argv else [r for r in RECIPES if r not in COURT]
     seeds = int(sys.argv[sys.argv.index("--seeds") + 1]) if "--seeds" in sys.argv else 3
+    far = "--far" in sys.argv   # the far forms of the same builds, and nothing else
     over = []
     for sid in only:
         jobs = [("abcdef"[k], {}) for k in range(seeds)] + RECIPES[sid].get("variants", [])
         for k, (letter, opts) in enumerate(jobs):
-            total = build(sid, letter, sum(map(ord, sid)) * 7 + 101 * k, **opts)
+            total = build(sid, letter, sum(map(ord, sid)) * 7 + 101 * k, far=far, **opts)
             if total > RECIPES[sid].get("budget", BUDGET):
                 over.append((sid, letter, total))
     if over:

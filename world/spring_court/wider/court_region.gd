@@ -28,6 +28,9 @@ var forage_field: ScatterField
 var decor_field: ScatterField
 var tree_field: ScatterField
 var near_tree_field: ScatterField
+## A place planted by place (content.place_planting): its small plants, and its grass.
+var place_field: ScatterField
+var sward: CourtSward
 
 ## The arched footbridge (tools/court/blender/props_shapes_b.py fae_footbridge).
 const BRIDGE_ASSET := &"fae_footbridge"
@@ -78,6 +81,8 @@ static func prewarm(c: CourtRegionContent) -> void:
 			# The tree set: every build and step the scatter splits them over.
 			CourtTreeSet.prewarm([d.mesh_id])
 	PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), c.bounding_rect()))
+	if c.place_planting != &"":
+		CourtPlacePlants.prewarm()
 
 
 func _start() -> void:
@@ -238,8 +243,11 @@ func _finish() -> void:
 	var small: Array[ScatterLayer] = []
 	var trees: Array[ScatterLayer] = []
 	var near_trees: Array[ScatterLayer] = []
+	var fine: Array[ScatterLayer] = []
 	for layer in decor:
-		if layer.tags.has("near"):
+		if layer.tags.has("fine"):
+			fine.append(layer)
+		elif layer.tags.has("near"):
 			near_trees.append(layer)
 		elif layer.tags.has("tree"):
 			trees.append(layer)
@@ -252,6 +260,15 @@ func _finish() -> void:
 	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
 	# the near step in smaller chunks (each tree switches step at its own distance)
 	near_tree_field = _field("TreesNear", near_trees, CourtScatterGenerator.NEAR_CHUNK)
+	if content.place_planting != &"":
+		# a place's own small plants, by the small chunk, and its grass round the player
+		place_field = _field("PlacePlants", fine, CourtGlenPlanting.FINE_CHUNK)
+		sward = CourtSward.new()
+		sward.name = "Sward"
+		sward.content = content
+		sward.trunks = CourtGlenPlanting.trunks(content.region_id)
+		add_child(sward)
+		CourtMotes.build(self, content)
 	_build_landmarks()
 	_build_places()
 	_build_magnets()

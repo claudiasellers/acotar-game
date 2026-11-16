@@ -77,6 +77,7 @@ func _content(id: StringName, d: Dictionary) -> CourtRegionContent:
 	for b: Array in d.get("bare", []):
 		c.bare.append(Vector3(b[0], b[1], b[2]))
 	c.knoll_tree = d.get("knoll_tree", &"")
+	c.place_planting = d.get("planting", &"")
 	var range: Array = d.get("trees_per_ha", [0.0, 0.0])
 	c.trees_per_ha = Vector2(range[0], range[1])
 	var by_form: Dictionary = d.get("form_per_ha", {})

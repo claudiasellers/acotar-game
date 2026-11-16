@@ -32,13 +32,15 @@ static func regions() -> Dictionary:
 			"seed": 4101,
 			"anchors": [["starlight_pool", -1300.0, 292.0, 0.0, 14.0]],
 			"default": &"glen_meadow",
-			# The glen (terrain table): birch and willow by the water, one big tree
-			# on each knoll, an open floor, the mound bare.
+			# The glen is planted by place (CourtGlenPlanting; docs/lanes/
+			# court-planting-by-place.md): every tree and flower answers to
+			# something on the land, and the decor below is only what is not a
+			# plant of the place (the fuel grass, stones, the lakes' lily pads).
+			"planting": &"glen",
 			"land": ["knoll", "brook_bank", "river_bank", "shore"],
-			"knoll_tree": &"woods_oak",
 			"bare": [[-1208.0, 270.0, 40.0]],
-			"trees_per_ha": [5.0, 16.0],
-			"form_per_ha": {"floor": [0.0, 9.0], "knoll": [1.0, 45.0], "brook_bank": [12.0, 90.0]},
+			"trees_per_ha": [2.0, 7.0],
+			"form_per_ha": {"floor": [0.0, 5.0], "knoll": [1.0, 70.0], "brook_bank": [4.0, 60.0]},
 			"grade": &"grade_starlight_glen_day",
 			"fx": ["fx_pollen_motes", "fx_butterflies", "fx_water_mist", "fx_starlight_sparkles", "fx_dandelion_seeds"],
 			"notes": "Mirror lakes on the Thornwater west of the manor. The Starlight Pool is a daytime swim Tamlin shows Feyre: it glitters in sunlight (Keeper, chapter-verified). The pool hides under the Glimmerfall.",
@@ -94,24 +96,7 @@ static func regions() -> Dictionary:
 				"col_beetle_jewel|birch_copse,glen_meadow|0.4|1-1|c",
 			],
 			"decor": [
-				"woods_silver_birch|birch_copse|0.5|t s",
-				"woods_silver_birch|riverbank,lakeshore,@brook_bank,@river_bank,@shore|0.22|t s",
-				"woods_willow|lakeshore,riverbank,@brook_bank,@shore|0.1|t s",
-				"woods_lilac_tree|glimmer_hollow,glen_meadow|0.015|t s",
-				"woods_yew|birch_copse|0.04|t s",
-				"woods_ancient_oak|glimmer_hollow|0.006|t s",
-				"woods_oak|@knoll|0|t s",
-				"woods_fallen_log|birch_copse,glimmer_hollow|0.05|s w0",
-				"woods_stump|birch_copse|0.03|s w0",
-				"flora_carpet_periwinkle|glen_meadow,violet_dell|6|",
-				"flora_carpet_pearl|glen_meadow,glimmer_hollow|1|",
-				"flora_carpet_lilac|violet_dell,birch_copse|1.4|",
-				"flora_fern_a|birch_copse,glimmer_hollow|1.2|",
-				"flora_fern_b|glimmer_hollow,pool_rim|0.8|",
-				"flora_reeds_bulrush|lakeshore,riverbank|3|",
 				"flora_lily_pads|looking_lake,willow_mere|1.2|w0",
-				"flora_bush_hydrangea|glen_meadow|0.08|s",
-				"flora_toadstool_ring|birch_copse|0.03|w0",
 			],
 			"landmarks": [
 				["starlight_pool", "The Starlight Pool", -1300.0, 262.0, 4.0, "set_piece", "starlight_pool_rim_stone_a,starlight_pool_rim_stone_b,starlight_pool_rim_stone_c,pool_glow_crystal", "C?", "Hidden pool where Tamlin brings Feyre to swim; glitters in sunlight. Bathing here is the pool_found deed."],
