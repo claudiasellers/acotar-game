@@ -821,3 +821,94 @@ came down with the day: deeper, and still clear in the renders.
 
 **Next:** meadow flowers and great blossom trees for the glen's open glade;
 then the next place (the Western Woods has its oak and elm).
+
+## The whole glen, composed (plan, 2026-11-16 late; not yet planted)
+
+Owner, after the clear-colour pass: the Starlight Pool's "placement and
+foliage look great. but honestly the rest of the screenshots dont give me the
+same impression. can we make the ENTIRE thing here look intentional ... to
+make the person FEEL something as they walk through the areas?" Then: "you
+should probably make a plan for each before just planting! also plans for
+transitions too", and "make sure to make each place feel a little special".
+
+Why the pool works and the rest does not: the pool was composed (a ring, a
+way in kept open, drifts laid by bearing, one flower per kind of ground). The
+rest was planted by rule (a tree per knoll, a clump every 34-62 m of brook, a
+wood of 90 on the lake's far side): correct, and about nothing. So every
+place below gets what the pool has: one feeling, a first sight, a frame, a
+floor, ground kept open, and one thing no other place has. The glen's colours
+stay silver, blue and white; each place takes one accent and keeps it to
+itself.
+
+The land it is drawn on (scratch map from `CourtHeight`): `glen_way` comes in
+from the estate between two knolls of the brae (the gate, -790, 12), drops to
+the brae brook (-905, 20), crosses the Thornwater at the ford (-995, 105),
+runs south-west between five knolls to the mound (-1208, 270) and stops; the
+pool is below it. `river_road` leaves `glen_way` at the brook and runs north
+by the oak glade (-960, -245) to the village; `lake_walk` leaves it there,
+crosses the river and ends above Looking Lake (-1160, -210). The glimmer
+brook runs from Willow Mere to the pool, the mere run from the mere to the
+river. Nothing leads to the mere, the heron stones or the lake's south shore
+but the land.
+
+### The places
+
+| # | Place | Feeling | First sight | Planted with | Its own thing | Stays open |
+|---|---|---|---|---|---|---|
+| 1 | The Brae gate (-790, 12) | a threshold: wind, then a held breath | the glen's knolls and the river's shine, framed | bare turf on the crest; two old thorns in full may, one on each knoll's shoulder, leaning in over the way; thorn bushes down the lee side | the Thorn Gate: the only arch of blossom, white petals on the path | the way itself; the line from `brae_top` to the North Watchtower |
+| 2 | Brook Dell (-905, 20) | close, cool, green: you lower your voice | the brook under a leaning tree | one great elm arching over the crossing, birches behind; a floor of fern and mossed stones; snowdrops in ribbons along the water | the only fern floor in the glen | the crossing; the brook's own line of sight up and down |
+| 3 | The Ford (-995, 105) | release: full sun, wide water, a place to stop | the river end to end, willows trailing on the far bank | willows on the far bank in a row, parted where the way lands; iris at the water; gold flowers on the bars and banks | the Golden Ford: the only gold in the glen (kingcups; to make) | both landings; the river's reach up and down |
+| 4 | The Knoll Walk (ford to mound) | wonder, and being led: what is on the next one? | the first knoll's tree from mid-ford | five knolls flank the way in turn, each crowned differently and in order: a thorn, three birches, two aspens, the blossom tree on Knoll Steps, last a great oak; a bluebell crescent at each foot on the side the way passes | the Blossom Knoll at Knoll Steps: the one pink tree on the way, petals falling (a great blossom tree; to make) | the way; the glade between knolls stays sward |
+| 5 | The Mound (-1208, 270) | exposure, then awe | sky only, until the top | nothing over the knee: close turf, daisies | a daisy ring on the crown, where you stand to look | all of it |
+| - | The Starlight Pool | enchantment | (passed by the owner; stays as it is) | | | |
+| 6 | Glimmer Brook (pool to mere) | being beckoned: follow the lights | lights along one bank, going round a bend | faelights and starmoss down one bank only; snowdrops; three birches at each bend, giving way to willows one for one toward the mere | the string of lights (they glow at dusk) | the bank you walk |
+| 7 | Willow Mere (-1150, 430) | hush, a little sorrow, a secret kept | the Weeping Lady across the water, through a parting in the willows | willows all round as a curtain, one parting where the brook leaves; lilies; only white on the ground | the Lady, and that you cannot see the water until you part the curtain | the parting; the water between it and the Lady |
+| 8 | River Road (ford to oak glade) | easy company: the river beside you | a colonnade | aspens in a row along the brae brook where road and brook run together; willows in pairs on the river's outer bends; long open sward between | the Aspen Row: the one avenue | the road; the inner bends as meadow |
+| 9 | Oak Glade (-960, -245) | age and shelter: a hall | the road going into shade between two trunks | great oaks in a ring round the clearing, crowns almost meeting; white wood anemones and fern beneath; foxgloves in the light at the rim; the oldest oak alone on oak knoll | the only closed canopy in the glen, over a floor of white stars (wood anemone; to make) | the clearing's heart (55 m, the story's) |
+| 10 | Looking Lake (-1250, -140) | stillness: the biggest sky, the stillest water | the whole lake at once from the end of the lake walk, between two elms | a dark wood of oak and elm down to the water on the far shore; the near shore open short sward; reeds in two bays only; the isle's one tree | the mirror: the far wood's reflection lying on the water (painted into the water; to make) | the near shore; the line to the isle |
+| 11 | Heron Stones (-1105, -40) | watching, waiting | reeds taller than you, one parting | the glen's one reed bed, cattails within it, a narrow way through to the stones | the reed bed you walk through | the parting; the stones |
+| 12 | Watchers' Run and the west rim | lonelier, wilder: the glen letting go | long pale grass moving | long grass, thorn bushes, old thorns all leaning the same way; oaks and elms gathering toward the Western Woods | the wind's lean | the brook's line; the ridge views |
+
+Knolls off the walks keep one tree each (they are how you find your way), but
+the tree is its place's: thorn and aspen toward the rim, birch round the
+pool, willow nowhere but water.
+
+### The transitions
+
+| | From, to | How it hands over |
+|---|---|---|
+| A | Estate to the Brae | the estate's last tree, then 80 m of bare, windy turf rising: nothing, on purpose. The Thorn Gate is the first thing in it. |
+| B | Brae gate to Brook Dell | going down, crowns close and the light goes green; white overhead becomes white underfoot (may to snowdrops); fern begins 30 m before the water, so you know it before you see it. |
+| C | Dell to the Ford | the trees stop at the terrace's edge in one step: shade to full sun. The first gold flowers stand in the dell's mouth. |
+| D | Ford to the Knoll Walk | the far willows part where you land; the first knoll's thorn is the mark from mid-river; gold gives way to blue inside 40 m. |
+| E | Knoll Walk to the Mound to the Pool | the great oak (the darkest thing) is last before the bare mound (the lightest); the climb shows only sky; the pool appears at the top, and the way down is the pool's own open arrival. |
+| F | Pool to Glimmer Brook | the birch ring is open where the brook comes in; the lights start at the ring's edge. |
+| G | Glimmer Brook to the Mere | birch gives way to willow tree by tree; the banks close; the curtain. |
+| H | Mere to the river to the Ford | the mere run leaves through open sward, the sky comes back, willows mark where it meets the river; upstream is the ford's gold. The south loop closes. |
+| I | Dell to River Road to Oak Glade | the Aspen Row carries you; the oaks' dark mass shows ahead over it; the road goes in between two trunks. |
+| J | Oak Glade to Looking Lake | out of the shade, over the river, up a low rise with nothing on it; the lake all at once between two elms. |
+| K | Lake to Heron Stones to the Knoll Walk | short sward to reeds to knolls; the Blossom Knoll is the mark that brings you back to the way. The north loop closes. |
+| L | The rims | west: clumps of oak and elm thicken over 150 m into the Western Woods; north: the river road's willows carry on to the village. No line. |
+
+### To make first
+
+- Kingcups (gold, at water): `tools/grove`, near, mid and far forms.
+- Wood anemone (white, low, in sheets): `tools/grove`, the same three forms.
+- A great blossom tree for Knoll Steps: a court species in
+  `tools/blender/estate_tree.py` (the estate's cherry at 1.9 times its size
+  stands there now); the court's petal particles over it.
+- The lake's painted reflection: a dark, wavering band on the water under
+  the far wood, in `court_water.gdshader` (the water does not mirror trees).
+
+### Order, and how it is shown
+
+The glen draws 1318 of its 1500 allowed batches now, so composed planting
+replaces the scattered clumps; it does not go on top of them.
+
+1. The main walk: 1 to 5 with A to E.
+2. The south loop: 6, 7 with F to H.
+3. The north loop: 8 to 11 with I to K.
+4. The rims: 12 with L.
+
+Each is shown as a walk: pictures in order along the route, the transitions
+among them, never a single piece on bare ground.
