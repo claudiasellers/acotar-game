@@ -30,12 +30,13 @@ const MOUND := Vector2(-1208.0, 270.0)
 ## The pool's hollow is StudyPoolHollow's: nothing of this study inside it.
 const HOLLOW := 118.0
 const NEAR := 75.0
-## The knolls' trees, [species, size], taken in turn so neighbours differ.
-## They are the estate's garden trees grown half as big again and more, to
-## hold a knoll thirty metres across: stand-ins for the great oak, sycamore
-## and thorn the plan lists as missing.
-const KNOLL_KINDS := [[&"oak", 1.7], [&"cherry_blossom", 1.9], [&"birch", 1.5], [&"crab_apple", 1.95], [&"pear_tree", 1.9],
-	[&"apple_blossom", 1.95]]
+## The knolls' trees, [species, size, the shade it throws (m), how many stand
+## together], taken in turn so neighbours differ. The great oak, the great
+## sycamore and the old thorn are the court's own (CourtGreatTrees); the
+## blossom trees are still the estate's garden trees grown near twice their
+## size, until the court has great ones.
+const KNOLL_KINDS := [[&"great_oak", 1.0, 15.0, 1], [&"cherry_blossom", 1.9, 10.0, 1], [&"great_sycamore", 1.0, 12.0, 1],
+	[&"old_thorn", 1.5, 9.0, 1], [&"pillar_birch", 1.0, 8.0, 3], [&"crab_apple", 1.95, 10.0, 1]]
 const FLOWERS := [&"bluebell", &"snowdrop", &"crocus"]
 ## A flower's patches: [the full ones, the small one at a pool's edge].
 const PATCHES := {
@@ -62,6 +63,7 @@ static func build(world: Node3D) -> void:
 	_lake(root, rng, groups)
 	_mere(root, rng, groups)
 	_brae(root, rng, groups)
+	_bushes(root, rng, groups)
 	_shade_flowers(root, rng, wave, groups, crescents)
 	_verges(root, rng)
 	var trees := 0
@@ -90,9 +92,17 @@ static func _knolls(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dict
 			kind = (kind + 1) % KNOLL_KINDS.size()
 		placed.append([top, kind])
 		var k: Array = KNOLL_KINDS[kind]
-		_estate(root, rng, k[0], top, float(k[1]) * rng.randf_range(0.92, 1.1))
+		var trunks: Array = []
+		for n in int(k[3]):
+			var p := top if n == 0 else top + Vector2.from_angle(TAU * float(n) / float(k[3]) + rng.randf()) * rng.randf_range(2.6, 4.2)
+			trunks.append(p)
+			var size := float(k[1]) * (rng.randf_range(0.94, 1.08) if n == 0 else rng.randf_range(0.78, 0.95))
+			if CourtGreatTrees.TREES.has(k[0]):
+				_great(root, rng, k[0], p, size)
+			else:
+				_estate(root, rng, k[0], p, size)
 		var flower: StringName = FLOWERS[placed.size() % 3]
-		groups.append({"trunks": [top], "reach": 13.0 if k[0] == &"oak" else 10.0, "flower": flower})
+		groups.append({"trunks": trunks, "reach": float(k[2]), "flower": flower})
 		# the knoll's north foot, where its slope eases: the same flower in a crescent, in its shade
 		var foot := 30.0
 		var r := 9.0
@@ -304,6 +314,33 @@ static func _brae(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictio
 		var trunks := _clump(root, rng, heart, 4, &"oak" if side < 0.0 else &"birch", 1.05, 4.5)
 		if not trunks.is_empty():
 			groups.append({"trunks": trunks, "reach": 9.0, "flower": &"bluebell"})
+
+
+## Thorn bushes, white with may: one or two at the outer edge of every clump
+## of trees (a wood's edge is where the thorn grows), and now and then a pair
+## on a lone tree's knoll, down its flank.
+static func _bushes(root: Node3D, rng: RandomNumberGenerator, groups: Array[Dictionary]) -> void:
+	var stood := 0
+	for g in groups:
+		var trunks: Array = g["trunks"]
+		if trunks.is_empty() or (trunks.size() == 1 and rng.randf() > 0.4):
+			continue
+		var mid := Vector2.ZERO
+		for t: Vector2 in trunks:
+			mid += t / float(trunks.size())
+		var wide := 0.0
+		for t: Vector2 in trunks:
+			wide = maxf(wide, t.distance_to(mid))
+		for n in (2 if trunks.size() == 1 else 1 + rng.randi() % 2):
+			for attempt in 6:
+				var p := mid + Vector2.from_angle(rng.randf() * TAU) * (wide + rng.randf_range(4.5, 8.0) + (6.0 if trunks.size() == 1 else 0.0))
+				if CourtLandHabitats.keep_open(p.x, p.y) or StudyPoolHollow._steep(p) or StudyPoolHollow._wet(p, 1.5) \
+						or CourtLandHabitats.path_distance(p.x, p.y) < 4.0 or p.distance_to(POOL) < HOLLOW:
+					continue
+				_great(root, rng, &"thorn_bush", p, rng.randf_range(0.8, 1.25))
+				stood += 1
+				break
+	print("STUDY glen thorn bushes: ", stood)
 
 
 ## A drift of crocuses on a path's verge now and then.
@@ -554,9 +591,9 @@ static func _estate(root: Node3D, rng: RandomNumberGenerator, species: StringNam
 	root.add_child(mi)
 
 
-static func _great(root: Node3D, rng: RandomNumberGenerator, p: Vector2, size: float) -> void:
+static func _great(root: Node3D, rng: RandomNumberGenerator, species: StringName, p: Vector2, size: float) -> void:
 	var mi := MeshInstance3D.new()
-	mi.mesh = CourtGreatTrees.mesh(&"pillar_birch", rng.randi() % 3)
+	mi.mesh = CourtGreatTrees.mesh(species, rng.randi() % maxi(1, CourtGreatTrees.builds(species)))
 	mi.position = StudyPoolHollow._ground(p)
 	mi.rotation.y = rng.randf() * TAU
 	mi.scale = Vector3.ONE * size

@@ -41,7 +41,7 @@ OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/trees")
 # not have"): grown by the same recipes so they stand beside the estate's as
 # family, but they are the court's and live with its trees. species -> height (m).
 COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
-COURT = {"pillar_birch": 18.0}
+COURT = {"pillar_birch": 18.0, "great_oak": 24.0, "great_sycamore": 26.0, "old_thorn": 7.5, "thorn_bush": 3.4}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
 BUDGET = 6000
 UP = Vector((0, 0, 1))
@@ -110,6 +110,38 @@ RECIPES = {
         whorls=[(0.6, 3, 0.14, 30, 56, 1), (0.69, 3, 0.13, 38, 62, 1), (0.77, 3, 0.115, 44, 66, 1), (0.85, 3, 0.095, 52, 70, 0)],
         leader=0.92, top=0.05, top_cloud=1.0, kink=8, cloud=0.05, flat=1.0, card=0.05, cover=1.7, rim=0.3,
         wood=0.17, budget=7000, sink=0.025,   # set 0.45 m into the ground: it stands on the hollow's slopes
+    ),
+    # The knolls' great trees (the glen: one tree to a knoll, and you find your
+    # way by them). The great oak: grown alone on a hilltop, wider than tall,
+    # a short thick bole and heavy boughs that leave it low and run out level.
+    "great_oak": dict(
+        trunk=0.05, clear=0.2, lean=0.02, flare=2.0,
+        whorls=[(0.2, 4, 0.52, 6, 32, 2), (0.34, 4, 0.42, 30, 54, 2), (0.48, 3, 0.3, 46, 66, 1)],
+        leader=0.6, top=0.14, kink=24, cloud=0.105, flat=0.78, card=0.072, cover=2.1, rim=0.26,
+        budget=10000, sink=0.02,
+    ),
+    # the great sycamore (book ch 6: a lone sycamore on a knoll): a clean grey
+    # bole and a tall full dome, taller than it is wide
+    "great_sycamore": dict(
+        trunk=0.04, clear=0.28, lean=0.015, flare=1.8,
+        whorls=[(0.28, 4, 0.36, 26, 54, 2), (0.42, 4, 0.32, 38, 62, 1), (0.56, 3, 0.25, 50, 70, 1)],
+        leader=0.72, top=0.12, kink=12, cloud=0.115, flat=0.92, card=0.078, cover=2.1, rim=0.26,
+        budget=9000, sink=0.02,
+    ),
+    # the old thorn: a hawthorn bent by the wind, low and wide, white with may
+    "old_thorn": dict(
+        trunk=0.055, clear=0.24, lean=0.13, flare=2.0,
+        whorls=[(0.24, 4, 0.56, 10, 34, 2), (0.38, 3, 0.42, 34, 54, 1)],
+        leader=0.5, top=0.14, kink=38, cloud=0.17, flat=0.62, card=0.13, cover=2.1, rim=0.26,
+        sink=0.03,
+    ),
+    # a thorn bush: the same may, stemmed from the ground, head high and a
+    # little over: the height between the grass and the crowns
+    "thorn_bush": dict(
+        trunk=0.05, clear=0.1, lean=0.06, flare=1.4,
+        whorls=[(0.1, 5, 0.6, 22, 50, 1), (0.32, 4, 0.44, 40, 62, 1)],
+        leader=0.46, top=0.2, kink=30, cloud=0.27, flat=0.72, card=0.2, cover=2.0, rim=0.26,
+        wood=0.13, budget=4200, sink=0.05,
     ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,

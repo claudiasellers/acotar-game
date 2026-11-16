@@ -22,6 +22,30 @@ const TREES := {
 		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_birch.png",
 		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_birch.png",
 		"bark_col": Color(0.93, 0.91, 0.88), "bark_mean": 0.582, "trunk": 0.225},
+	# The knolls' trees (the glen: one to a knoll, and you find your way by them).
+	# the great oak: grown alone on a hilltop, wider than tall
+	&"great_oak": {"height": 24.0,
+		"bands": [Color(0.30, 0.56, 0.44), Color(0.50, 0.79, 0.56), Color(0.78, 0.95, 0.72)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_oak.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.56, 0.42, 0.43), "bark_mean": 0.338, "trunk": 1.2},
+	# book ch 6: a lone sycamore on a knoll. A grey bole, a tall full dome, a yellower green
+	&"great_sycamore": {"height": 26.0,
+		"bands": [Color(0.34, 0.58, 0.36), Color(0.57, 0.81, 0.46), Color(0.85, 0.96, 0.60)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_oak.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_birch.png",
+		"bark_col": Color(0.74, 0.71, 0.74), "bark_mean": 0.582, "trunk": 1.04},
+	# the old thorn, white with may, and the thorn bush that stands between the grass and the crowns
+	&"old_thorn": {"height": 7.5, "blossom": true,
+		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.50, 0.40, 0.42), "bark_mean": 0.338, "trunk": 0.41},
+	&"thorn_bush": {"height": 3.4, "blossom": true,
+		"bands": [Color(0.86, 0.80, 0.80), Color(0.98, 0.95, 0.94), Color(1.0, 0.99, 0.98)],
+		"puff": "res://world/spring_court/manor_estate/flora/trees/puff_crab_apple.png",
+		"bark": "res://world/spring_court/wider/assets/trees/ez/bark_oak.png",
+		"bark_col": Color(0.50, 0.40, 0.42), "bark_mean": 0.338, "trunk": 0.17},
 }
 
 static var _meshes: Dictionary = {}
@@ -86,7 +110,8 @@ static func material(species: StringName, part: StringName) -> ShaderMaterial:
 	m.shader = load(EstateTrees.SHADER if number == 1 else EstateTrees.SHADER_SOLID) as Shader
 	m.set_shader_parameter(&"part", number)
 	m.set_shader_parameter(&"tex", load(String(t["bark"]) if part == &"bark" else String(t["puff"])))
-	m.set_shader_parameter(&"own_colour", false)
+	# a blossom tree's clumps are painted in their own colours (as the estate's are)
+	m.set_shader_parameter(&"own_colour", bool(t.get("blossom", false)) and part == &"leaves")
 	m.set_shader_parameter(&"hanging", false)
 	m.set_shader_parameter(&"bark_col", t["bark_col"])
 	m.set_shader_parameter(&"bark_mean", t["bark_mean"])
