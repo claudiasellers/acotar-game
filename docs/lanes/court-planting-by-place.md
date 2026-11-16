@@ -306,7 +306,7 @@ how each should look is under "How each missing asset should look")
 |---|---|
 | The great oak (and, grown largest, the Crown Oak) | Western Woods; Solstice Meadow |
 | The pillar elm | Western Woods; the wall of trunks at its door |
-| The pillar birch | the starlight pool's ring; the Suriel's glen; Looking Lake's isle |
+| The pillar birch (**built as a preview 2026-11-16**, three builds, `CourtGreatTrees`; shown to the owner as a ring round the pool, not yet in the game) | the starlight pool's ring; the Suriel's glen; Looking Lake's isle |
 | The great sycamore (one hero tree) | its knoll |
 | The old thorn, arching over a path | the Rite's processional way; crests and high ground |
 | The cathedral cherry | the Blossom Cathedral's nave |
