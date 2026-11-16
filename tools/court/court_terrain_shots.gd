@@ -819,8 +819,9 @@ const FOGS := {
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0)},
 	"layered_mist": {"fog_color": Color(0.70, 0.74, 0.96), "fog_density": 0.0011, "fog_aerial_perspective": 0.1,
 		"fog_sky_affect": 0.1, "volumetric_albedo": Color(0.85, 0.86, 1.0), "fog_height": 30.0, "fog_height_density": 0.045},
-	# PREVIEW (clear colours): the open court's grade at the day grades' new light.
-	"clear": {"exposure": 0.6, "fog_density": 0.0005, "volumetric_density": 0.0008, "glow_intensity": 0.1},
+	# PREVIEW (clear colours): the court's day grades as they were.
+	"before": {"exposure": 0.8, "lut_keep": 4.0, "fog_density": 0.0011, "volumetric_density": 0.002, "glow_intensity": 0.3,
+		"contrast": 1.12},
 }
 
 

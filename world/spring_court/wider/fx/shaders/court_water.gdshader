@@ -21,7 +21,7 @@ uniform sampler2D depth_tex : hint_depth_texture, filter_nearest, repeat_disable
 
 uniform float blight : hint_range(0.0, 1.0) = 0.0;
 
-uniform vec4 shallow_color : source_color = vec4(0.38, 0.78, 0.76, 1.0);
+uniform vec4 shallow_color : source_color = vec4(0.30, 0.70, 0.74, 1.0);
 uniform vec4 deep_color : source_color = vec4(0.16, 0.44, 0.76, 1.0);
 uniform vec4 fresnel_color : source_color = vec4(0.46, 0.72, 0.95, 1.0);
 // How far the surface goes to fresnel_color at the lowest angle.
