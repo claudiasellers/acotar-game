@@ -37,6 +37,11 @@ import prop_kit as K  # noqa: E402
 import manor_flora as MF  # noqa: E402
 
 OUT = os.path.join(K.ROOT, "world/spring_court/manor_estate/flora/trees")
+# The court's great trees (docs/lanes/court-planting-by-place.md, "Assets we do
+# not have"): grown by the same recipes so they stand beside the estate's as
+# family, but they are the court's and live with its trees. species -> height (m).
+COURT_OUT = os.path.join(K.ROOT, "world/spring_court/wider/assets/trees/great")
+COURT = {"pillar_birch": 18.0}
 # the tree limit the game holds models to (tests/unit/manor_estate/test_manor_flora.gd)
 BUDGET = 6000
 UP = Vector((0, 0, 1))
@@ -94,6 +99,16 @@ RECIPES = {
     # love the cascading leaves ... but i dont like the clumps at the top ...
     # thats not what actual willows look like"). No leaf clouds.
     #   weep: fronds per limb, frond width, the shoulder's reach, how near the ground they hang
+    # the pillar birch (court; book ch 14: a ring of white birches "tall and
+    # straight as pillars"): a dead-straight white stem with nothing on it for
+    # most of its height, and a small light crown of short limbs at the top
+    "pillar_birch": dict(
+        trunk=0.0125, clear=0.6, lean=0.012, flare=1.6, limb=0.46,
+        whorls=[(0.6, 3, 0.14, 30, 56, 1), (0.68, 3, 0.135, 36, 60, 1), (0.76, 3, 0.12, 42, 64, 1), (0.83, 3, 0.1, 48, 68, 0),
+                (0.89, 3, 0.08, 54, 72, 0)],
+        leader=0.94, top=0.045, top_cloud=1.0, kink=8, cloud=0.05, flat=1.0, card=0.05, cover=1.7, rim=0.3,
+        wood=0.17, budget=7000,
+    ),
     "willow": dict(
         trunk=0.046, clear=0.3, lean=0.07, flare=1.8, limb=0.5,
         whorls=[(0.3, 4, 0.36, 50, -18, 1), (0.4, 4, 0.32, 62, -12, 1), (0.49, 3, 0.25, 74, -4, 1)],
@@ -192,7 +207,7 @@ def settle(clouds):
                     q[0] += d.normalized() * (want - d.length) * 0.25
 
 
-def wood(sk, name):
+def wood(sk, name, keep=0.33):
     """The skeleton skinned and subdivided: one smooth body."""
     bm = bmesh.new()
     layer = bm.verts.layers.skin.verify()
@@ -216,7 +231,7 @@ def wood(sk, name):
     sub.levels = 1
     # the subdivided body is rounder than it needs triangles for
     dec = ob.modifiers.new("dec", "DECIMATE")
-    dec.ratio = 0.33
+    dec.ratio = keep
     done = ob.evaluated_get(bpy.context.evaluated_depsgraph_get())
     out = bmesh.new()
     out.from_mesh(done.to_mesh())
@@ -370,15 +385,15 @@ def pears(sid, clouds, rng):
 
 
 def build(sid, letter, seed, **opts):
-    kind, h, col = MF.species()[sid]
+    h = COURT[sid] if sid in COURT else MF.species()[sid][1]
     name = f"tree_{sid}_{letter}"
     rng = random.Random(seed)
     for o in list(bpy.data.objects):
         bpy.data.objects.remove(o, do_unlink=True)
     sk, clouds = grow(sid, rng)
     settle(clouds)
-    bark = wood(sk, name)
     rc = RECIPES[sid]
+    bark = wood(sk, name, rc.get("wood", 0.33))
     weep = "weep" in rc
     leaves, normals, core = foliage(sid, clouds, rng) if not weep else (None, [], None)
     fronds, frond_normals = curtain(sid, sk, rng, opts.get("trail", 0.0)) if weep else (None, [])
@@ -394,7 +409,7 @@ def build(sid, letter, seed, **opts):
     ob, tris = assemble(name, parts)
     total = sum(tris.values())
     print(f"  {name:24s} {total:5d} tris ({', '.join(f'{k} {v}' for k, v in tris.items())}; {len(clouds)} seats)")
-    K.export_glb([ob], os.path.join(OUT, f"{name}.glb"))
+    K.export_glb([ob], os.path.join(COURT_OUT if sid in COURT else OUT, f"{name}.glb"))
     return total
 
 
@@ -436,14 +451,15 @@ def assemble(name, parts):
 
 def main():
     K.reset()
-    only = sys.argv[sys.argv.index("--only") + 1].split(",") if "--only" in sys.argv else list(RECIPES)
+    # (the court's great trees are built by name: a plain run rebuilds the estate's only)
+    only = sys.argv[sys.argv.index("--only") + 1].split(",") if "--only" in sys.argv else [r for r in RECIPES if r not in COURT]
     seeds = int(sys.argv[sys.argv.index("--seeds") + 1]) if "--seeds" in sys.argv else 3
     over = []
     for sid in only:
         jobs = [("abcdef"[k], {}) for k in range(seeds)] + RECIPES[sid].get("variants", [])
         for k, (letter, opts) in enumerate(jobs):
             total = build(sid, letter, sum(map(ord, sid)) * 7 + 101 * k, **opts)
-            if total > BUDGET:
+            if total > RECIPES[sid].get("budget", BUDGET):
                 over.append((sid, letter, total))
     if over:
         sys.exit(f"over the {BUDGET}-triangle tree budget: {over}")

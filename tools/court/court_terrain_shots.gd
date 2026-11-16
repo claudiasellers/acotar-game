@@ -271,6 +271,9 @@ const LINEUPS := {
 	# estate:<species>:<build> is FloraLib.mesh() as the estate draws it.
 	"estate_green": {"distance": 62.0, "spacing": 12.0, "look": 6.0, "ids": ["estate:oak:0", "estate:oak:1", "estate:oak:2", "post",
 		"estate:birch:0", "estate:birch:1", "estate:birch:2", "post", "estate:pear_tree:0", "estate:pear_tree:1", "estate:pear_tree:2"]},
+	# The court's great trees (CourtGreatTrees), each beside its nearest relation for scale.
+	"pillar_birch": {"distance": 34.0, "spacing": 7.0, "look": 8.0, "ids": ["great:pillar_birch:0", "great:pillar_birch:1",
+		"great:pillar_birch:2", "post", "estate:birch:0"]},
 	"estate_willow": {"distance": 38.0, "spacing": 14.5, "look": 4.5, "ids": ["estate:willow:0", "estate:willow:1", "estate:willow:2",
 		"estate:willow:3", "estate:willow:4"]},
 	"estate_blossom": {"distance": 36.0, "spacing": 9.0, "look": 3.5, "ids": ["estate:cherry_blossom:0", "estate:cherry_blossom:1",
@@ -479,6 +482,8 @@ func _lineup(world: World, eye: Vector3, at: Vector3, which: String, cam: Camera
 					mi.set_surface_override_material(si, shown)
 			elif item.begins_with("estate:"):
 				mi.mesh = FloraLib.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
+			elif item.begins_with("great:"):
+				mi.mesh = CourtGreatTrees.mesh(StringName(item.get_slice(":", 1)), int(item.get_slice(":", 2)))
 			elif item.begins_with("ez:"):
 				var ez := _ez_tree(item.get_slice(":", 1), item.get_slice(":", 2) == "painted", item.get_slice(":", 3) == "intake")
 				mi.mesh = ez[0]
