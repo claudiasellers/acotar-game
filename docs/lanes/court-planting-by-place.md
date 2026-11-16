@@ -616,7 +616,7 @@ What stands there, from the ground up:
 | Floor | sward over the level floor, thinning up the slopes, none on rock; taller tufts at the water and the birches' feet | `tools/grove` (new) |
 | Flowers | bluebells under the birches, snowdrops by the water, crocuses in the open and on the mound; each kind in drifts of its own | `tools/grove` (new) |
 | Bank | iris, reeds, cattail, water mint, fern, mossed stones on the far banks; the arrival bank left to grass | woods kit, grove fern |
-| The ring | 16 pillar birches round the pool, open toward the mound | `CourtGreatTrees` |
+| The ring | about 26 pillar birches round the pool in clumps of one to three, open toward the mound and the Glimmerfall | `CourtGreatTrees` |
 | Slopes | 26 more birches in twos and threes behind the ring, open toward the mound and the Glimmerfall; bluebells, fern and a stand of foxgloves with each group | as above |
 | Knolls | one tree on each of six knolls, each a different kind; the mound bare | estate trees |
 | Glow | starmoss, glowcaps, faelights by the water; small lights in the air from dusk | woods kit |
@@ -632,6 +632,19 @@ What it taught:
   triangles, the flowers' colours over the leaves') drawn beyond 75 m.
 - **Small plants go down by the cell**, each cell drawn only within its range
   (sward 80 m, fine grass 40 m, flowers to 75 m then cushions).
+- **A flower belongs to something.** The first bluebells were laid as broad
+  bands along the ring and read as flowers dumped on a lawn (owner,
+  2026-11-16). Now they are the birches' own: the ring stands in clumps of one
+  to three, and the bluebells follow the clumps' shade, thick and tall in the
+  heart, feathering to small outliers at the edge, with trails of grass
+  through, fern and moss at the trunks' feet, the odd white one, and the blue
+  deeper here and paler there. The open floor stays grass. The rule for every
+  place: a drift is placed by what it grows under or beside, never by area.
+- **Look for the water first.** The Glimmer Brook runs into the pool from the
+  south; the first pass planted straight across it. Its bed is kept clear, its
+  banks carry iris, mint, fern and snowdrops, and no trunk stands within 3 m.
+- **The way in is open.** No clump stands within 0.42 rad of the line from the
+  mound, nor on the line from there to the Glimmerfall.
 - **There is no shrub fit for the glen.** The woods kit's hazel and bracken are
   too crude beside the new plants. A blossoming shrub (hawthorn or blackthorn)
   joins the missing list.
@@ -639,6 +652,6 @@ What it taught:
   inside the hollow; that is the rest of the glen's work, not this spot's.
 
 Frame time on the Mac, look quality, 1920x1080, standing on the east bank:
-bare land 17.6 ms; today's planting 24.1 ms; the study 28.4 ms (the same from
-the bluebells; 25.3 ms from the mound). So it costs about 4 ms more than what
+bare land 17.6 ms; today's planting 24.1 ms; the study 28.9 ms (26.6 ms among
+the birches; 25.3 ms from the mound). So it costs about 4 ms more than what
 stands there today, nearly all of it the sward.
