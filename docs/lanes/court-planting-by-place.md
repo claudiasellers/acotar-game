@@ -715,3 +715,30 @@ The order of work from here:
    with far forms for the trees, the sward laid by the cell round the player,
    and the old glen recipes for trees and small plants retired. Then tests,
    `docs/tuning.md` rows, precheck and `lead/ready-M4WCT-15-1`.
+
+## State, 2026-11-16 evening
+
+**In the game's main branch (M4WCT-15-1, merged):** the great oak, great
+sycamore, old thorn and thorn bush beside the pillar birch (`CourtGreatTrees`);
+the glade's sward, flower patches with their far cushions and ferns
+(`tools/grove`); the two studies and the shot tool's `study=`; this plan. No
+planting in the game has changed yet.
+
+**Not done:**
+
+- *The glen in the game.* The game plants a region from its content's decor
+  entries (`CourtScatterGenerator.decor_layers`: trees first, then ground
+  layers that read the canopy, then the places' collars), as `ScatterLayer`s
+  drawn by `ScatterField` in chunks, each layer with `draw_from` /
+  `draw_distance` and an impostor. The studies' rules have to produce those
+  layers for `starlight_glen` in place of its decor entries: trees as near and
+  far layers (the great trees have no far form yet), a flower patch and its
+  cushion as two layers on one set of instances (a layer carries position, yaw
+  and one scale: the bluebells' tint and the grass's uneven height go), and the
+  sward laid by the cell round the player, since a layer of it over the whole
+  glen would be millions of instances. The region's reports, quotas and
+  draw-call estimates read the decor layers and will need to read these.
+- *Looking Lake's banks* (owner: free to change the land).
+- *Meadow flowers* for the open glade; great blossom trees (the knolls'
+  cherry and crab apple are still the estate's, grown to 1.9x).
+- *The Weeping Lady* as a real giant willow (offered; the owner has not said).
