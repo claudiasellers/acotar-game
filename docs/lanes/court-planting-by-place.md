@@ -272,59 +272,26 @@ Looks are the owner's call from renders. The rest is measured:
 - the place's heaviest view holds the frame-time target (16.6 ms) on the Mac;
 - each place's plant list and colour are rows in `docs/tuning.md`.
 
-### Clean sheet (owner, 2026-11-15)
+### Scope (owner, 2026-11-15)
 
-"I want you to replan everything and not go based on how things are already put
-together." So nothing below assumes today's tree sets, generators, shaders or
-scatter. The terrain stays; everything that grows on it is planned again.
+"I want to just throw out whatever rules are currently used for planting
+trees, fauna, foliage, all of it ... and I want to strategically rethink it.
+I've already rethought the land and landmarks."
 
-Today the game has five ways of making a tree (Quaternius, EZ-Tree, the woods
-kit, the estate builder, the special trees), four tree shaders, three flower
-systems, and planting by density inside an area. Each was made well for its own
-corner. That is why the whole does not read as one place.
+- **Thrown out:** every rule that decides what is planted where in the court:
+  the per-region recipes (so many trees per hectare in each kind of ground),
+  the habitat densities, the ceilings, the species mixes. This plan replaces
+  them.
+- **Kept:** the land, the paths, the water, the landmarks and where they stand.
+- **Kept:** the plants themselves. The trees, shrubs and flowers the game has
+  stay as they are, including the estate's trees and the special trees. A new
+  plant is made only where the plan needs one the game lacks ("Assets we do
+  not have"), in whatever way suits that plant.
 
-**One way of making, shading, and placing everything that grows:**
-
-1. **The look comes first, on one small piece of land.** About 150 m square
-   with a knoll, a stream and a wood's edge, finished completely: three trees,
-   a shrub, a rose, grass, five flowers, moss, fern, rock, in day and dusk.
-   The owner approves the look there before anything is made in quantity.
-2. **One builder for every plant.** Trees, shrubs, hedges, flowers, grass and
-   moss all come from the same builder, each from a species sheet (how it
-   branches, its bark, its leaf, its colours). Bark, leaves, wind, and what it
-   looks like at 2 m, 20 m and 200 m are then made the same way for all of them.
-3. **A species has forms, not one model.** The same oak is broad and low in
-   the open, tall and clean-trunked in a wood, flagged by wind on a ridge,
-   leaning to the light by water, and young, grown or ancient. "The pillar
-   elm" is an elm that grew in a forest. "The Crown Oak" is an oak, ancient,
-   grown alone. The land picks the form.
-4. **States, not separate assets.** Blight, the turn to Autumn, night glow and
-   the shimmer are things the world does to every plant in a region, grass and
-   flowers included: one frost-wither that creeps over whatever stands in the
-   Reaches, one turning of colour toward the pass.
-5. **Plants go down as communities.** An old spring wood is its canopy, its
-   young trees, its shrubs, its bluebells, its moss and its leaf litter laid
-   together; so are a rose brake, a water meadow, an orchard, a hedged lane.
-   A place is a mosaic of communities.
-6. **Placement reads the land, then the design.** From the terrain: how wet,
-   how sunny, how steep, how exposed. From the place's map: where it is closed
-   and open, the edges, the single trees, the lines to keep clear, and lines,
-   rows and rings where the design wants them.
-7. **The ground belongs to what stands on it.** Litter and moss under a wood,
-   worn earth on a path, flowers thicker in sun, the foot of every trunk
-   settled into its ground.
-8. **Distance is designed, not left over.** Full detail near, simpler in the
-   middle, whole stands as one shape far away, and the horizon's tree line
-   painted from the same plants. The frame-time target is held at each step.
-
-**What that replaces:** in the court, all of today's trees, shrubs, flowers and
-the recipes that plant them. Whether the estate's trees and the five special
-trees are re-made in the new builder (keeping their approved shapes and
-colours as the brief) or left as they are is the owner's call.
-
-**Order:** the look slice; then the builder widened to the full species list;
-then the communities; then the places one at a time from their maps (pilot
-first); then the old sets retired place by place as each is replaced.
+Withdrawn: an earlier draft of this section proposed re-making every plant
+with one new builder so that they would match. The owner asked why, and there
+was no good reason: plants match through shared colour, light and scale and
+through how they are placed, not through the tool that made them.
 
 ## Assets we do not have (checked 2026-11-15)
 
