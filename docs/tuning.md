@@ -141,6 +141,25 @@ The woods' candy flowering trees, rebuilt one at a time with the owner
 | Wisteria leaves and stars | special_trees.py `WIST_LEAF`, `wisteria_tree()` | a spray of three young leaves over every chain; a star blossom at one spray in seven | | The top of the parasol: fresh green going pale gold, with a few of the special trees' stars. | special-trees |
 | Golden chain | special_trees.py `GOLDEN_LOOK`, `GOLD_CHAINS`, `golden_chain()` | the wisteria's form in gold: stems to 3.8 m, limbs out 3.7 m, chains 0.9–2.1 m and 1.12 as full, none below 1.5 m; butter at the top to gold at the tip (the first tree's yellows 0.55, lemon 0.25, apricot gold 0.2) | same budget as the wisteria | The first golden chain was the wisteria in yellow; it still is, a little taller and narrower so a grove of the two is not one tree twice (owner, 2026-11-12: "do we have all the colors that were in the game"). | special-trees |
 
+## Court planting by place (owner, 2026-11-15/16; docs/lanes/court-planting-by-place.md)
+
+Not yet the game's planting: the trees and small plants the places need, and the studies that stand a place up whole for a picture.
+
+| Name | Where | Value | Range | What it does | Owner |
+|---|---|---|---|---|---|
+| Great tree heights | tools/blender/estate_tree.py `COURT`; world/spring_court/wider/court_great_trees.gd `TREES` | pillar birch 18 m, great oak 24, great sycamore 26, old thorn 7.5, thorn bush 3.4 | | How tall each of the court's own trees stands. | wider-court-world |
+| Great tree colours | court_great_trees.gd `TREES` bands | shadow / mid / light: pillar birch and great oak as the estate's birch and oak; great sycamore (0.34,0.58,0.36) (0.57,0.81,0.46) (0.85,0.96,0.60); thorn (0.86,0.80,0.80) (0.98,0.95,0.94) (1.0,0.99,0.98) | | The sycamore a yellower green than the oak; the thorn white with may. | wider-court-world |
+| Great tree bark | court_great_trees.gd `TREES` bark_col | birch white (0.93,0.91,0.88); oak rose-brown (0.56,0.42,0.43); sycamore grey (0.74,0.71,0.74) on the birch picture; thorn (0.50,0.40,0.42) | | The bark tint over the court's painted bark. | wider-court-world |
+| Glade greens | tools/grove/plants.py `TURF`, `GRASS_*` | turf foot (0.30,0.60,0.31); sward blade (0.31,0.63,0.31) tip (0.52,0.80,0.40); glade blade (0.33,0.65,0.32) tip (0.54,0.81,0.42) | | Every blade's foot is near the ground's own green, so the grass grows out of it. | wider-court-world |
+| Glade flowers | tools/grove/plants.py `BLUEBELL`, `SNOWDROP`, `CROCUS` | bluebell bells (0.33,0.35,0.80) to (0.64,0.68,0.97); snowdrop white (0.95,0.96,0.93); crocus purple 5B3FA8 / 8F6FD8, gold F6C83C, white F4F1FA | | The glen's three flowers (book ch 18). | wider-court-world |
+| Sward rim, sparkle | tools/court/study_pool_hollow.gd `_look` | rim 0, sparkle 0 on grass and far cushions; rim 0.12, sparkle 0 on flowers | rim 0–0.2 | A blade seen along the ground is all rim, and the woods' rim is cream: a floor of straw. The twinkle lights a 14 cm cell: a white shard on a blade. | wider-court-world |
+| `FLOWERS_NEAR` / `NEAR` | study_pool_hollow.gd, study_glen.gd | 75 m | 60–95 m | A flower patch is drawn flower by flower within this, and as its far cushion beyond. | wider-court-world |
+| Sward ranges | study_pool_hollow.gd `_floor` | sward 80 m, fine grass 40 m, tall grass 110 m | | How far each grass is drawn from the eye. | wider-court-world |
+| Shade reach | study_pool_hollow.gd `_shade`; study_glen.gd `KNOLL_KINDS` | ring birch 9.5 m, slope birch 7.5 m; great oak 15, sycamore 12, others 8–10 | | How far from a trunk its flowers reach: thick in the heart, feathering to the edge. | wider-court-world |
+| `ARRIVAL_MOUTH` | study_pool_hollow.gd | 0.42 rad | 0.3–0.6 | The gap in the pool's ring of birches where you come down from the mound. | wider-court-world |
+| Clump spacing | study_glen.gd `_brooks`, `_river` | brooks every 34–62 m, the river every 42–76 m, alternate banks; no trunk within 9 m of a path | | How often trees gather along the water. | wider-court-world |
+| Knoll tops | study_glen.gd `knoll_tops` | 4 m over the ground 36 m round; tops at least 30 m apart | | What counts as a knoll that carries a tree. | wider-court-world |
+
 ## Bow feel (T101)
 
 | Tunable | Where | Default | Range | What it does | Lane |
