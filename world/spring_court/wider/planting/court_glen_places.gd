@@ -138,6 +138,8 @@ const GLIMMER_GROUPS := [
 ## The lights: a cluster this often along the brook (m), from this far down it
 ## (just outside the pool's ring) to this near the mere.
 const GLIMMER_STEP := 2.3
+## And a light in the air this often (CourtMotes draws them from dusk).
+const LIGHT_STEP := 2.8
 const GLIMMER_FROM := 252.0
 const GLIMMER_TO := 12.0
 ## The rules plant no clump this near the Glimmer Brook or the mere run, or this far out from the mere's shore.
@@ -624,7 +626,7 @@ static func _glimmer_brook(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenera
 		for k in 1 + rng.randi() % 3:
 			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.5, 2.8)) + (on[1] as Vector2) * rng.randf_range(-0.8, 0.8)
 			if CourtGlenPlanting.growable(p, 0.2):
-				plan.plant(&"faelight_dandelion", p, rng.randf() * TAU, rng.randf_range(0.95, 1.5))
+				plan.plant(&"faelight_dandelion", p, rng.randf() * TAU, rng.randf_range(1.3, 2.0))
 		if int(run / GLIMMER_STEP) % 5 == 0:
 			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.3, 1.4))
 			plan.plant(&"glowcap", p, rng.randf() * TAU, rng.randf_range(1.0, 1.5))
@@ -632,10 +634,12 @@ static func _glimmer_brook(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenera
 			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(-0.3, 0.6))
 			plan.plant(&"mossy_rock", p, rng.randf() * TAU, rng.randf_range(0.5, 0.9), 220.0, true)
 			plan.plant(&"starmoss", p + outer * 0.4, rng.randf() * TAU, rng.randf_range(0.9, 1.3))
-		for k in 3:
-			var p := (on[0] as Vector2) + outer * (half + rng.randf_range(0.7, 4.2)) + (on[1] as Vector2) * rng.randf_range(-1.2, 1.2)
-			if rng.randf() < 0.8 and CourtGlenPlanting.growable(p, 0.5) and p.distance_to(CourtGlenPlanting.POOL) > CourtGlenPlanting.POOL_RADIUS + 6.0:
-				plan.flower("snowdrop_patch_" + "ab"[rng.randi() % 2], p, rng.randf() * TAU, rng.randf_range(1.0, 1.45))
+		# a white ribbon by day, thick at the water and feathering back
+		for k in 9:
+			var back := absf(rng.randfn(0.0, 2.2))
+			var p := (on[0] as Vector2) + outer * (half + 0.6 + back) + (on[1] as Vector2) * rng.randf_range(-1.2, 1.2)
+			if back < 5.5 and CourtGlenPlanting.growable(p, 0.5) and p.distance_to(CourtGlenPlanting.POOL) > CourtGlenPlanting.POOL_RADIUS + 6.0:
+				plan.flower("snowdrop_patch_a" if back < 2.4 else "snowdrop_patch_b", p, rng.randf() * TAU, rng.randf_range(1.05, 1.5))
 		run += GLIMMER_STEP
 
 
@@ -694,6 +698,26 @@ static func _mere_run(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, 
 			trunks.append(p)
 	if not trunks.is_empty():
 		groups.append({"trunks": trunks, "reach": [7.5, 7.5].slice(0, trunks.size()), "flower": &"snowdrop", "composed": true})
+
+
+## The Glimmer Brook's string of lights, as CourtMotes draws them from the
+## golden hour through the night: one every few steps down the outer bank,
+## knee to waist high, from just outside the pool's ring to the mere.
+static func lights(content: CourtRegionContent) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	var pts := brook(&"glimmer_brook")
+	if not CourtGlenPlanting.applies(content) or pts.size() < 2:
+		return out
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([content.seed, "glimmer lights"])
+	var run := GLIMMER_TO
+	while run < GLIMMER_FROM:
+		var on: Array = _on_line(pts, 0, run + rng.randf_range(-0.7, 0.7))
+		var p := (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * rng.randf_range(2.6, 4.4)
+		if content.owns(p):
+			out.append(Vector3(p.x, WorldHeight.height_at(p.x, p.y) + rng.randf_range(0.45, 1.05), p.y))
+		run += LIGHT_STEP
+	return out
 
 
 ## Falling petals: [particle scene id, where (x, metres over the ground, z)].

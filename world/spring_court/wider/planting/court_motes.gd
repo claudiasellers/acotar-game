@@ -1,8 +1,10 @@
 class_name CourtMotes
 extends MultiMeshInstance3D
-## The small lights adrift in the air over the starlight pool's hollow: they
-## come out as the day goes and are gone by full morning (the game's Clock;
-## a still picture sets `shown` itself).
+## The small lights adrift in the air over the starlight pool's hollow, and
+## the string of them down the Glimmer Brook's outer bank from the pool to
+## Willow Mere (CourtGlenPlaces: "follow the lights"). They come out as the
+## day goes and are gone by full morning (the game's Clock; a still picture
+## sets `shown` itself).
 
 const POOL := CourtGlenPlanting.POOL
 const COUNT := 280
@@ -47,6 +49,25 @@ static func build(region: Node3D, content: CourtRegionContent) -> void:
 	node.visibility_range_end = 260.0
 	node.visible = false
 	region.add_child(node)
+	# the brook's: bigger and steadier, one after another along the bank, seen from further off
+	var string := CourtGlenPlaces.lights(content)
+	if string.is_empty():
+		return
+	var along := MultiMesh.new()
+	along.transform_format = MultiMesh.TRANSFORM_3D
+	along.mesh = mote
+	along.instance_count = string.size()
+	var mid := string[string.size() / 2]
+	for i in string.size():
+		along.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * rng.randf_range(1.5, 2.3)), string[i] - mid))
+	var brook := CourtMotes.new()
+	brook.name = "MotesBrook"
+	brook.multimesh = along
+	brook.position = mid
+	brook.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	brook.visibility_range_end = 420.0
+	brook.visible = false
+	region.add_child(brook)
 
 
 func _process(delta: float) -> void:

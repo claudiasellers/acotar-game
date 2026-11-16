@@ -113,7 +113,7 @@ const STUDY_VIEWS := {
 	"glimmer_04": [-1226.0, 420.0, 1.7, -1182.0, 432.0, 3.0, 0.45, &"spring", 70.0],
 	"mere_parting": [-1186.0, 430.0, 1.7, -1125.0, 456.0, 12.0, 0.45, &"spring", 70.0],
 	"mere_outside": [-1150.0, 352.0, 1.7, -1150.0, 430.0, 4.0, 0.45, &"spring", 70.0],
-	"mere_run_01": [-1102.0, 423.0, 1.7, -980.0, 408.0, 2.0, 0.45, &"spring", 70.0],
+	"mere_run_01": [-1080.0, 418.0, 1.7, -960.0, 405.0, 2.0, 0.45, &"spring", 70.0],
 	"glimmer_02_dusk": [-1322.0, 345.0, 1.7, -1316.0, 400.0, 1.5, 0.8, &"spring", 70.0],
 	"glimmer_03_dusk": [-1304.0, 398.0, 1.7, -1216.0, 427.0, 1.5, 0.8, &"spring", 70.0],
 	"mere_parting_dusk": [-1186.0, 430.0, 1.7, -1125.0, 456.0, 12.0, 0.8, &"spring", 70.0],
@@ -230,7 +230,7 @@ func _run() -> void:
 		# a place's grass is laid round the player as they walk: lay it round this standpoint now
 		for sward: CourtSward in get_tree().get_nodes_in_group(CourtSward.GROUP):
 			sward.settle(eye)
-		for motes: CourtMotes in world.find_children("Motes", "MultiMeshInstance3D", true, false):
+		for motes: CourtMotes in world.find_children("Motes*", "MultiMeshInstance3D", true, false):
 			motes.shown = 1.0 if CourtMotes.out_at(v[6]) else 0.0
 			motes.visible = motes.shown > 0.5
 		if forest != "":
