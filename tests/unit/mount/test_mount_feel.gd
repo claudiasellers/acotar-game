@@ -72,9 +72,18 @@ func test_an_override_aims_a_bone() -> void:
 	var b := sk.find_bone(&"RightUpperArm")
 	var c := sk.find_bone(&"RightLowerArm")
 	pose.set_override(&"RightUpperArm", 1.0, 0.0, 0.0, 1.0)  # straight ahead
-	await wait_process_frames(2)
-	var dir := (sk.get_bone_global_pose(c).origin - sk.get_bone_global_pose(b).origin).normalized()
-	assert_gt(dir.dot(pose.forward), 0.95, "the arm points where it was told")
+	assert_true(pose.has_overrides())
+	assert_almost_eq(pose.override_dir(&"RightUpperArm", 1.0, 0.0, 0.0).dot(pose.forward), 1.0, 0.001)
+	# Modifier results only hold inside the skeleton's update: read them there.
+	var seen: Array[Vector3] = []
+	var read := func() -> void:
+		seen.append((sk.get_bone_global_pose(c).origin - sk.get_bone_global_pose(b).origin).normalized())
+	sk.skeleton_updated.connect(read)
+	await wait_process_frames(3)
+	sk.skeleton_updated.disconnect(read)
+	assert_gt(seen.size(), 0, "the skeleton updated")
+	if not seen.is_empty():
+		assert_gt(seen.back().dot(pose.forward), 0.95, "the arm points where it was told")
 	pose.set_override(&"RightUpperArm", 0, 0, 0, 0.0)
 	assert_false(pose.has_overrides())
 
