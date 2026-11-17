@@ -56,6 +56,7 @@ var _trail: MareTrail
 const PRESENT_GAP := 1.55
 ## Within this of the rider she starts curving in to present her side (m).
 const PRESENT_FROM := 14.0
+var _top_speed: float = -1.0
 
 
 func _init() -> void:
@@ -117,7 +118,9 @@ func heading() -> Vector3:
 
 ## Called: she comes to `point`. With `rider` she pulls up side-on, her near
 ## (left) side to the rider, a stride from her, as a horse is brought to be mounted.
-func call_to(point: Vector3, rider: Node3D = null) -> void:
+## Comes to `point` (at a gallop, easing in; no faster than `top_speed` m/s when it's set).
+func call_to(point: Vector3, rider: Node3D = null, top_speed: float = -1.0) -> void:
+	_top_speed = top_speed
 	goal = point
 	_rider = rider
 	_present_yaw = NAN
@@ -143,6 +146,7 @@ func presenting_spot(from: Vector3, rider_at: Vector3) -> Array:
 
 
 func go_home() -> void:
+	_top_speed = -1.0
 	goal = data.home
 	state = State.GOING_HOME
 
@@ -180,6 +184,7 @@ func nicker() -> void:
 ## Lays her dress-up and groomed shine on her (MareLook); called on spawn and after changes.
 func refresh_look() -> void:
 	if horse:
+		MareSaddle.set_saddled(horse, MareTack.saddled())
 		MareLook.apply(horse, MareTack.outfit(), MareCare.shine())
 
 
@@ -216,7 +221,7 @@ func _wish() -> Array:
 			if d < (0.45 if state == State.COMING and not is_nan(_present_yaw) else data.call_stop):
 				return [0.0, Vector3.ZERO]
 			# Gallop in, ease to a trot and a walk for the last metres.
-			var v := clampf(d * 0.9, data.walk_speed, data.gallop_speed * 0.85)
+			var v := clampf(d * 0.9, data.walk_speed, data.gallop_speed * 0.85 if _top_speed <= 0.0 else _top_speed)
 			var dir := to / d
 			# Curve in: aim at a point behind the stop along her final heading.
 			if not is_nan(_present_yaw) and d > 0.6:

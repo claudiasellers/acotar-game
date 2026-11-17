@@ -23,6 +23,7 @@ static func seat(rider: Node3D) -> RidePose:
 		return null
 	var pose := RidePose.attach(sk)
 	pose.amount = 1.0
+	pose.reins = 0.0
 	var hips := sk.find_bone(&"Hips")
 	var drop := 0.9
 	if hips >= 0:
@@ -38,6 +39,18 @@ static func place(rider: Node3D, horse: WhiteHorse) -> void:
 	var model := rider.get(&"model") as Node3D
 	if model:
 		model.rotation = Vector3(0.0, horse.global_rotation.y, 0.0)
+	# Hands on the reins: her arms reach to the horse's grip points and the
+	# reins run to the same points (MareReins), eased in after the vault (L47-8).
+	var sk := skeleton_of(rider)
+	var pose := sk.get_node_or_null(^"RidePose") as RidePose if sk else null
+	if pose:
+		pose.hand_l = horse.rein_grip(true)
+		pose.hand_r = horse.rein_grip(false)
+		pose.reins = move_toward(pose.reins, 1.0, 0.08)
+		pose.bareback = move_toward(pose.bareback, 1.0 if horse.bareback else 0.0, 0.05)
+		horse.rein_hands[0] = pose.hand_l
+		horse.rein_hands[1] = pose.hand_r
+		horse.rein_held_frame = Engine.get_process_frames()
 
 
 static func unseat(rider: Node3D) -> void:
@@ -46,5 +59,6 @@ static func unseat(rider: Node3D) -> void:
 	if pose:
 		pose.amount = 0.0
 		pose.lean = 0.0
+		pose.reins = 0.0
 	if rider and rider.has_meta(HIP_DROP):
 		rider.remove_meta(HIP_DROP)

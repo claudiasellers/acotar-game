@@ -28,7 +28,9 @@ of blooms are the R3 look (X).
 - After it, the mare waits saddled in the stable yard (`MountData.home`)
   whenever Feyre is within 220 m of it.
 - Mounting her the first time fires an `ActionTrigger` with the fact
-  `fact.mare_ridden` (never a phase flag). From then on the whistle works.
+  `fact.mare_ridden` (never a phase flag). From then on the whistle works,
+  within the bond's hearing range, and she carries Feyre as far as the bond
+  allows (`MareBond`, docs/contracts/mare_bond.md, L47-8).
 - After the first dismount a one-time card teaches the whistle key (kept in
   `WorldDeltas` region `mount`, not a story flag).
 

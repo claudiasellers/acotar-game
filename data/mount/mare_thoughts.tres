@@ -1,0 +1,101 @@
+[gd_resource type="Resource" script_class="DialogueBook" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"mare_too_far"
+speaker = &"feyre"
+who = ""
+text = "Too far. She can't hear me from here."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_bond_too_far"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"weary"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"mare_trusted"
+speaker = &"feyre"
+who = ""
+text = "She came before I'd finished whistling. As if she'd been listening for me."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_bond_trusted"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"tender"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"mare_bareback"
+speaker = &"feyre"
+who = ""
+text = "No saddle. Only her warmth and her stride under me, and she doesn't let me slip."
+canon = "A"
+trigger = 4
+where = &""
+deed = &"fact.mare_bond_bareback"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"mare_heart"
+speaker = &"feyre"
+who = ""
+text = "She'd come for me anywhere now. I've never had anything that would."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_bond_heart"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"tender"
+
+[resource]
+script = ExtResource("3")
+area = &"mare_bond"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3")])

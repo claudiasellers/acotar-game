@@ -16,13 +16,7 @@ const TINTED := ["DecorBloom", "DecorRibbon"]
 
 
 static func _mesh(horse: WhiteHorse) -> MeshInstance3D:
-	if horse == null or horse.model == null:
-		return null
-	for m in horse.model.find_children("*", "MeshInstance3D", true, false):
-		var mi := m as MeshInstance3D
-		if mi.mesh and mi.mesh.get_surface_count() > 6 and not String(mi.name).begins_with(DECOR_PREFIX):
-			return mi
-	return null
+	return MareSaddle.mesh_of(horse)
 
 
 static func _surface_index(mi: MeshInstance3D) -> Dictionary:
@@ -45,18 +39,28 @@ static func apply(horse: WhiteHorse, outfit: Dictionary, shine: float = 0.0) -> 
 	if mi == null:
 		return
 	var idx := _surface_index(mi)
+	# Her own mesh and the saddle's (L47-8: the cloth and gold live on it now).
+	var meshes: Array[MeshInstance3D] = [mi]
+	meshes.append_array(MareSaddle.saddle_meshes(horse))
 	# Start from her own look, then lay each piece over it.
-	for i in mi.mesh.get_surface_count():
-		mi.set_surface_override_material(i, null)
+	for each in meshes:
+		for i in each.mesh.get_surface_count():
+			each.set_surface_override_material(i, null)
+	var reins := horse.get_node_or_null(^"MareReins") as MareReins
+	if reins:
+		reins.material_override = null
 	for slot: StringName in outfit:
 		var p := outfit[slot] as MareDecor
 		if p and p.model == "" and not p.colors.is_empty():
 			for k in p.tint_surfaces.size():
 				var name := p.tint_surfaces[k]
-				if not idx.has(name):
-					continue
 				var c := p.colors[mini(k, p.colors.size() - 1)]
-				mi.set_surface_override_material(idx[name], _tinted(mi.mesh.surface_get_material(idx[name]), c, p.pearl, p.glitter))
+				for each in meshes:
+					var at := _surface_index(each)
+					if at.has(name):
+						each.set_surface_override_material(at[name], _tinted(each.mesh.surface_get_material(at[name]), c, p.pearl, p.glitter))
+				if name == "Gold" and reins and reins.strap:
+					reins.material_override = _tinted(reins.strap, c, p.pearl, p.glitter)
 	if idx.has("Coat") and shine > 0.01:
 		var coat := mi.mesh.surface_get_material(idx["Coat"])
 		var base_pearl := float(coat.get(&"pearl")) if coat and &"pearl" in coat else 0.0

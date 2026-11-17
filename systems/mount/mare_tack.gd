@@ -122,6 +122,7 @@ static func make(p: MareDecor, inventory: Inventory) -> bool:
 	var have: Array = (WorldDeltas.get_region_value(DELTAS, OWNED_KEY, []) as Array).duplicate()
 	have.append(String(p.id))
 	WorldDeltas.set_region_value(DELTAS, OWNED_KEY, have)
+	MareBond.earn(&"piece")  # something new made for her is a deed of the bond
 	return true
 
 
@@ -133,6 +134,16 @@ static func wear(p: MareDecor) -> bool:
 	w[String(p.slot)] = String(p.id)
 	WorldDeltas.set_region_value(DELTAS, WORN_KEY, w)
 	return true
+
+
+## True with the saddle on (the default); false riding bareback (L47-8: the
+## bond's third step, offered on the Tack tab once she trusts Feyre, MareBond).
+static func saddled() -> bool:
+	return bool(WorldDeltas.get_region_value(DELTAS, "saddled", true))
+
+
+static func set_saddled(on: bool) -> void:
+	WorldDeltas.set_region_value(DELTAS, "saddled", on)
 
 
 ## Takes the piece in `slot` off (only the optional slots go bare).

@@ -189,17 +189,17 @@ func _on(x: float) -> Array:
 		# Hands up to the pommel and mane, then pushing down as she rises over.
 		var push := seg(u, 0.38, 0.55)
 		for arm: StringName in [&"LeftUpperArm", &"RightUpperArm"]:
-			pose.set_override(arm, lerpf(0.75, 0.35, push), lerpf(0.45, -0.9, push), lerpf(0.05, 0.22, push), reach)
+			pose.set_override(arm, lerpf(0.75, 0.35, push), lerpf(0.45, -0.9, push), lerpf(-0.05, -0.22, push), reach)
 		for arm: StringName in [&"LeftLowerArm", &"RightLowerArm"]:
-			pose.set_override(arm, lerpf(0.9, 0.5, push), lerpf(0.25, -0.75, push), -0.15, reach)
+			pose.set_override(arm, lerpf(0.9, 0.5, push), lerpf(0.25, -0.75, push), 0.15, reach)
 		# The dip: knees bend.
 		var dip := seg(u, 0.16, 0.32) * (1.0 - seg(u, 0.36, 0.48))
 		var swing := bell(u, 0.38, 0.74)
 		var tuck := bell(u, 0.36, 0.7)
-		pose.set_override(&"RightUpperLeg", lerpf(0.55, -0.55, swing), lerpf(-0.85, 0.35, swing), lerpf(0.1, 0.85, swing), maxf(dip, swing))
-		pose.set_override(&"RightLowerLeg", lerpf(-0.45, -0.75, swing), lerpf(-0.9, -0.1, swing), lerpf(0.0, 0.55, swing), maxf(dip, swing))
-		pose.set_override(&"LeftUpperLeg", lerpf(0.55, 0.8, tuck), lerpf(-0.85, -0.35, tuck), lerpf(0.1, 0.5, tuck), maxf(dip, tuck))
-		pose.set_override(&"LeftLowerLeg", lerpf(-0.45, -0.3, tuck), -0.9, 0.15, maxf(dip, tuck))
+		pose.set_override(&"RightUpperLeg", lerpf(0.55, -0.55, swing), lerpf(-0.85, 0.35, swing), lerpf(-0.1, -0.85, swing), maxf(dip, swing))
+		pose.set_override(&"RightLowerLeg", lerpf(-0.45, -0.75, swing), lerpf(-0.9, -0.1, swing), lerpf(0.0, -0.55, swing), maxf(dip, swing))
+		pose.set_override(&"LeftUpperLeg", lerpf(0.55, 0.8, tuck), lerpf(-0.85, -0.35, tuck), lerpf(-0.1, -0.5, tuck), maxf(dip, tuck))
+		pose.set_override(&"LeftLowerLeg", lerpf(-0.45, -0.3, tuck), -0.9, -0.15, maxf(dip, tuck))
 	return [hips, yaw]
 
 
@@ -225,16 +225,16 @@ func _off(x: float) -> Array:
 	if pose:
 		pose.amount = 1.0 - seg(u, 0.25, 0.6)
 		var swing := bell(u, 0.05, 0.55)
-		pose.set_override(&"RightUpperLeg", -0.55, 0.3, 0.85, swing)
-		pose.set_override(&"RightLowerLeg", -0.7, -0.15, 0.55, swing)
+		pose.set_override(&"RightUpperLeg", -0.55, 0.3, -0.85, swing)
+		pose.set_override(&"RightLowerLeg", -0.7, -0.15, -0.55, swing)
 		var hold := seg(u, 0.05, 0.2) * (1.0 - seg(u, 0.55, 0.75))
 		for arm: StringName in [&"LeftUpperArm", &"RightUpperArm"]:
-			pose.set_override(arm, 0.45, -0.75, 0.2, hold)
+			pose.set_override(arm, 0.45, -0.75, -0.2, hold)
 		var bend := bell(u, 0.55, 1.0)
 		for leg: StringName in [&"LeftUpperLeg", &"RightUpperLeg"]:
 			if leg == &"RightUpperLeg" and swing > bend:
 				continue
-			pose.set_override(leg, 0.55, -0.85, 0.12, bend)
+			pose.set_override(leg, 0.55, -0.85, -0.12, bend)
 		for leg: StringName in [&"LeftLowerLeg", &"RightLowerLeg"]:
 			if leg == &"RightLowerLeg" and swing > bend:
 				continue

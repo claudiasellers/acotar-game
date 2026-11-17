@@ -22,6 +22,14 @@
 ## Controls in the saddle: move steers (light stick walks, full canters),
 ## sprint gallops, jump leaps, E picks what's in reach from the saddle or,
 ## with nothing in reach, gets down (hold E to get down anyway).
+##
+## The bond (MareBond, L47-8) sets how far she hears the whistle and how far
+## from the stables she carries Feyre: at the edge she slows, snorts and turns
+## for home; whistled from beyond her hearing, only the wind answers. Each new
+## step plays a moment when Feyre is next beside her (head lowered to her, a
+## nicker, a sparkle) and Feyre's own thought (data/mount/mare_thoughts.tres,
+## a dialogue line on the bond fact). From the second step she trots out to meet
+## Feyre coming home.
 class_name MountDirector
 extends Node
 
@@ -99,6 +107,29 @@ var _use_user: Node
 const GESTURE_TIME := 0.95
 const ANSWER_DELAY := 0.55
 
+## Feyre's thoughts on the bond, added to the free-roam dialogue.
+const THOUGHTS := "res://data/mount/mare_thoughts.tres"
+## A new bond step's moment plays when Feyre is this near her, on foot.
+const MOMENT_NEAR := 6.0
+## How often the ride checks which region they are in (s).
+const REGION_CHECK := 1.0
+## The edge of her range: she won't go past it, and the snort repeats only
+## after Feyre has come this far back inside.
+const EDGE_RESET := 40.0
+## Coming home from away, she trots out to meet Feyre this far from the stables
+## (and not nearer than MEET_NEAR to her).
+const MEET_NEAR := 16.0
+const MEET_PACE := 5.0
+
+var _tier_triggers: Dictionary = {}
+var _moment: int = -1
+var _last_ride_at: Vector3 = Vector3.INF
+var _region_t: float = 0.0
+var _at_edge: bool = false
+var _away: bool = false
+var _met: bool = false
+var _gust: AudioStreamPlayer
+
 
 func _ready() -> void:
 	name = "MountDirector"
@@ -125,6 +156,24 @@ func _ready() -> void:
 	_unlock.fire_on_body_enter = false
 	_unlock.monitoring = false
 	add_child(_unlock)
+	for t in MareBond.TIERS.slice(2):
+		var trig := ActionTrigger.new()
+		trig.name = "MareBondTrigger_%s" % String(t["fact"]).get_slice(".", 1)
+		trig.flag = t["fact"]
+		trig.fire_on_body_enter = false
+		trig.monitoring = false
+		add_child(trig)
+		_tier_triggers[t["fact"]] = trig
+	MareBond.raise = _raise_fact
+	if not MareCare.on_care.has(MareBond.on_care):
+		MareCare.on_care.append(MareBond.on_care)
+	if not MareBond.on_tier.has(_on_tier):
+		MareBond.on_tier.append(_on_tier)
+	_gust = AudioStreamPlayer.new()
+	_gust.stream = WIND
+	_gust.volume_db = -14.0
+	add_child(_gust)
+	_add_thoughts.call_deferred()
 
 
 static func _ensure_action() -> void:
@@ -240,13 +289,70 @@ func whistle() -> bool:
 	_gesture(p)
 	last_block = block_reason(p.global_position)
 	var ok := last_block == &"" and unlocked()
-	if ok:
+	if ok and call_distance(p.global_position) > MareBond.hear_range():
+		ok = false
+		last_block = &"too_far"
+		_too_far()
+	elif ok:
+		MareBond.earn(&"answered")
 		_answer(p)
 	elif last_block == &"" and available():
 		# She doesn't know Feyre's whistle yet: only a far whinny from the stables.
 		_answer_in = ANSWER_DELAY
 	whistled.emit(ok)
 	return ok
+
+
+## How far the whistle has to carry to her: to her where she stands, or to
+## the stables when she's home (not out in the world).
+func call_distance(from: Vector3) -> float:
+	var at := mare.global_position if mare and is_instance_valid(mare) else data.home
+	return Vector2(at.x - from.x, at.z - from.z).length()
+
+
+## Called from beyond her hearing: nothing comes but the wind (and, the first
+## time, Feyre's thought, a dialogue line on TOO_FAR_FACT).
+func _too_far() -> void:
+	if _gust:
+		_gust.play()
+	if not WorldState.has_flag(MareBond.TOO_FAR_FACT):
+		WorldState.set_flag(MareBond.TOO_FAR_FACT, true)
+
+
+func _raise_fact(fact: String) -> void:
+	var t := _tier_triggers.get(fact) as ActionTrigger
+	if t:
+		t.fire()
+	else:
+		WorldState.set_flag(fact, true)
+
+
+func _on_tier(_tier: int) -> void:
+	_moment = _tier
+
+
+## Feyre's bond thoughts join the free-roam dialogue (its DEED lines on the facts).
+func _add_thoughts() -> void:
+	if not is_inside_tree() or not ResourceLoader.exists(THOUGHTS):
+		return
+	var dd := get_tree().get_first_node_in_group(DialogueDirector.GROUP) as DialogueDirector
+	var book := load(THOUGHTS) as DialogueBook
+	if dd and book and not dd.by_id.has(book.lines.front().id if not book.lines.is_empty() else &""):
+		dd.add_book(book)
+
+
+## A new step: she lowers her head to Feyre, nickers, and the air sparkles.
+func _play_moment(p: Node3D) -> bool:
+	if _moment < 0 or mare == null or not is_instance_valid(mare) or mare.state != MareMount.State.STANDING:
+		return false
+	if mare.global_position.distance_to(p.global_position) > MOMENT_NEAR:
+		return false
+	_moment = -1
+	if mare.horse and mare.horse.animator:
+		mare.horse.animator.nibble()
+	mare.nicker()
+	Juice.burst(mare, &"outfit")
+	return true
 
 
 ## Fingers to her lips for the whistle (RidePose overrides, on foot).
@@ -268,8 +374,8 @@ func _tick_gesture(p: Node3D, delta: float) -> void:
 		_gesture_t = -1.0
 		return
 	var w := MountMotion.seg(_gesture_t, 0.0, 0.22) * (1.0 - MountMotion.seg(_gesture_t, GESTURE_TIME - 0.3, GESTURE_TIME))
-	pose.set_override(&"RightUpperArm", 0.55, -0.05, 0.85, w)
-	pose.set_override(&"RightLowerArm", 0.35, 0.6, -0.72, w)
+	pose.set_override(&"RightUpperArm", 0.55, -0.05, -0.85, w)
+	pose.set_override(&"RightLowerArm", 0.35, 0.6, 0.72, w)
 	if _gesture_t >= GESTURE_TIME:
 		_gesture_t = -1.0
 		pose.set_override(&"RightUpperArm", 0, 0, 0, 0.0)
@@ -622,13 +728,17 @@ func _process(delta: float) -> void:
 			dismount(true)
 			return
 		_steer()
+		_keep_in_range()
+		_count_ride(delta)
 		_place_rider(delta)
 		_speed_feel(p, delta)
 		_follow_camera(p, delta)
 		return
+	_last_ride_at = Vector3.INF
 	if tending:
 		return
 	_keep_mare(p)
+	_play_moment(p)
 	_update_prompt(p)
 
 
@@ -639,6 +749,49 @@ func _physics_process(delta: float) -> void:
 	if _sweep <= 0.0:
 		_sweep = TRIGGER_SWEEP
 		sweep_triggers()
+
+
+## At the edge of how far she'll carry Feyre she won't go on: she slows,
+## snorts and turns for home (MareBond.carry_range, from the stables).
+func _keep_in_range() -> void:
+	if mare == null:
+		return
+	var carry := MareBond.carry_range()
+	if is_inf(carry):
+		return
+	var out := mare.global_position - data.home
+	out.y = 0.0
+	var d := out.length()
+	if d < carry - EDGE_RESET:
+		_at_edge = false
+	if d < carry or d < 1.0:
+		return
+	out /= d
+	var away := mare.steer.dot(out)
+	if away > -0.2:
+		mare.steer = (mare.steer - out * (away + 0.6)).limit_length(0.45)
+		mare.gallop = false
+	if not _at_edge:
+		_at_edge = true
+		mare.snort()
+
+
+## Distance ridden together and the regions they reach (the bond's deeds).
+func _count_ride(delta: float) -> void:
+	if mare == null:
+		return
+	var at := mare.global_position
+	if _last_ride_at != Vector3.INF:
+		var step := Vector2(at.x - _last_ride_at.x, at.z - _last_ride_at.z).length()
+		if step < 30.0:  # a jump, not a ride
+			MareBond.ride(step, mare.horse != null and mare.horse.bareback)
+	_last_ride_at = at
+	_region_t -= delta
+	if _region_t <= 0.0:
+		_region_t = REGION_CHECK
+		var region := WorldStreamer.region_at(at)
+		if region:
+			MareBond.reach_region(region.id)
 
 
 func _steer() -> void:
@@ -697,6 +850,10 @@ func _ride_camera(p: Node, on: bool) -> void:
 
 
 func _exit_tree() -> void:
+	MareBond.on_tier.erase(_on_tier)
+	MareCare.on_care.erase(MareBond.on_care)
+	if MareBond.raise == _raise_fact:
+		MareBond.raise = Callable()
 	# Never leave her camera lifted if the director goes while she rides.
 	var p := _player()
 	if riding and p and &"camera_lift" in p:
@@ -767,11 +924,31 @@ func _keep_mare(p: Node3D) -> void:
 			free_mare()  # she has gone home to the stables
 		elif mare.state == MareMount.State.COMING and mare.stuck_for() > 3.0:
 			mare.global_position = _out_of_sight(p, 8.0)
+		elif _away and not _met:
+			_meet(p, far)
 		return
+	if p.global_position.distance_to(data.home) > HOME_RADIUS + 20.0:
+		_away = true
+		_met = false
 	if p.global_position.distance_to(data.home) <= HOME_RADIUS:
 		var y := ground_at(data.home.x, data.home.z)
 		if not is_nan(y):
 			spawn_mare(Vector3(data.home.x, y + 0.05, data.home.z), data.home_yaw)
+
+
+## Feyre coming home from away: from the second step, the mare trots out to meet her.
+func _meet(p: Node3D, far: float) -> void:
+	if MareBond.tier() < 2 or mare.state != MareMount.State.STANDING or block_reason(p.global_position) != &"":
+		return
+	if mare.global_position.distance_to(data.home) > 30.0:
+		_met = true  # she isn't at home: nothing to meet from
+		return
+	if far < MEET_NEAR or far > minf(MareBond.hear_range(), HOME_RADIUS):
+		return
+	_met = true
+	_away = false
+	mare.call_to(p.global_position + _side_of(p) * 2.2, p, MEET_PACE)
+	mare.nicker()
 
 
 func _add_prompt() -> void:

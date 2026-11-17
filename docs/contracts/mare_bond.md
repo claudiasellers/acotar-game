@@ -1,7 +1,7 @@
 # Contract: tending the white mare, and her bond with Feyre (L47-7, L47-8)
 
 Owner: the mount lane (L47). Paths: `systems/mount/`, `data/mount/`,
-`tools/mount/`, `tools/blender/white_mare.py`, `tools/blender/mare_decor.py`,
+`tools/mount/`, `tools/blender/white_mare.py`, `tools/blender/mare_decor.py`, `tools/blender/mare_saddle.py`,
 `systems/mount/models/`, `ui/mare/`, `tests/unit/mount/`,
 `tools/playtest/mare_feel_clip.*`, this file. Changing a name or rule here
 needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
@@ -54,33 +54,66 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
   `shine`, `shine_day`, `brushed_day`, `treats_day`, `treats_count`), never
   in story flags.
 
-## The bond (L47-8, next)
+## The bond (L47-8)
 
-Runs beside the main story, never touches a phase flag (R2). Bond facts are
-WorldState keys under `fact.mare_bond_*`, raised by deeds through an
-ActionTrigger; points are a WorldDeltas count.
+`MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story and never
+touches a phase flag (R2). Bond facts are WorldState keys under
+`fact.mare_bond_*`, raised by deeds through the director's ActionTriggers
+(`MareBondTrigger_*`); points, today's counts, metres ridden and regions reached
+live in WorldDeltas region `mount` (`bond_points`, `bond_day`, `bond_today`,
+`ride_m`, `bareback_m`, `bond_regions`).
 
 | tier | fact | earned by (deeds) | she hears the whistle from | she carries Feyre out to |
 |---|---|---|---|---|
 | 0 | (first_dinner_eaten) | — | the stable yard only (a far whinny, she doesn't come) | — |
-| 1 | `fact.mare_ridden` | the first ride, at the stables (canon ch 9) | 150 m | 600 m from the manor |
+| 1 | `fact.mare_ridden` | the first ride, at the stables (canon ch 9) | 150 m | 600 m from the stables |
 | 2 | `fact.mare_bond_trusted` | 12 points | 400 m | 1.5 km (the near woods) |
-| 3 | `fact.mare_bond_bareback` | 30 points and a bareback ride of 300 m (canon ch 20) | 1 km | 4 km (the whole court) |
-| 4 | `fact.mare_bond_heart` | 55 points and riding out on Calanmai night (`calanmai_attended`) | anywhere north of the Wall | anywhere she may go |
+| 3 | `fact.mare_bond_bareback` | 30 points and 300 m ridden bareback (canon ch 20) | 1 km | 4 km (the whole court) |
+| 4 | `fact.mare_bond_heart` | 55 points and `calanmai_attended` | anywhere north of the Wall | anywhere she may go |
 
-Points (capped a day so it can't be ground out): brushing to full shine 3,
-a treat 1 (3 a day), a new piece made 2, every 400 m ridden 1 (8 a day), a
-region reached together for the first time 3, a whistle she answers 1 (2 a day).
+"Hears from" is measured to her where she stands, or to the stables when
+she's home. "Carries out to" is measured from the stables.
 
-What the player sees instead of text (R2): at the edge of her range she
-slows, flicks her ears back and turns for home; called from beyond earshot,
-nothing comes but the wind (once, Feyre's thought: "Too far. She can't hear
-me from here."). At each tier she lowers her head to Feyre with a soft
-nicker and a heart-sparkle, and a line of Feyre's own thought marks it. From
-tier 2 she trots out to meet Feyre when she comes home within earshot; from
-tier 3 the saddle can come off (the Tack tab) and the bareback ride lifts
-the seat pose's stirrups.
+Points per deed (daily cap in brackets): brushing to full shine 3 (1), a treat
+1 (3), a new piece made 2 (3), each 400 m ridden together 1 (8), a region
+reached on her back the first time 3, a whistle she answers 1 (2). Nothing
+counts before the first ride.
+
+Bareback: the saddle can come off from tier 2 (a "Saddle" card on the Tack
+tab, WorldDeltas `mount/saddled`). Riding bareback counts toward tier 3, and
+the seat pose lets her legs hang long (`RidePose.bareback`), sitting lower
+(`WhiteHorse.BAREBACK_DROP`).
+
+What the player sees instead of text (R2):
+- At the edge of her range she won't go on: she drops to a walk, snorts once and
+  turns for home (`MountDirector._keep_in_range`).
+- Whistled from beyond her hearing, only the wind answers. The first time,
+  Feyre thinks "Too far. She can't hear me from here." (`fact.mare_bond_too_far`).
+- At each new step, the next time Feyre is beside her on foot, she lowers her
+  head to her with a nicker and a sparkle. Feyre's own thought marks the step:
+  `data/mount/mare_thoughts.tres`, DEED lines on the facts, which the director
+  adds to the free-roam dialogue.
+- From tier 2, coming home from away, Feyre finds her trotting out to meet her.
+
+## Saddle, seat and reins (L47-8, from the slice 1 look review)
+
+- `tools/blender/mare_saddle.py` builds `systems/mount/models/mare_saddle.gltf`
+  (2.6k tris). It has a dished seat with a pommel and cantle, gold piping,
+  skirts, a scalloped rose cloth, a girth, and leathers with gold irons. It is
+  fitted over her coat from the rest mesh.
+- `MareSaddle.dress` (called by `WhiteHorse._ready`, so the story horse
+  matches) strips the old flat seat, its gold trim and the baked reins from her
+  mesh, hangs the saddle on `spine`, and adds `MareReins`.
+- The cloth and tack dress-up slots recolour the saddle's `SaddleCloth` and
+  `Gold` surfaces and the reins.
+- Her pelvis sits over the saddle centre (`MareSaddle.CENTRE`, within 5 cm
+  side-on). Her hands reach the horse's rein grips (`WhiteHorse.rein_grip`,
+  a two-bone reach in RidePose), and the reins run from the bit rings to
+  those grips (within 8 cm). Check: `tools/mount/mare_seat_shot.tscn`.
+- `RidePose` had its left/right axis mirrored, so every outward aim crossed her
+  legs under the mare. The frame is fixed; the tuned overrides (vault, whistle)
+  were negated to keep their look.
 
 Proof: `tools/playtest/mare_feel_clip.tscn` (beat `tend`), cloud looks
 `tools/mount/mare_decor_shot.tscn`, `tools/mount/mare_tend_shot.tscn`.
-Tests: `tests/unit/mount/test_mare_tack.gd`.
+Tests: `tests/unit/mount/test_mare_tack.gd`, `tests/unit/mount/test_mare_bond.gd`.

@@ -207,3 +207,13 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | `nock_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds from raising the bow (RMB) until it is nocked. After that every left click looses a full-power arrow (Zelda style, no hold-to-strengthen). A click during the nock is queued and fires when it completes. Upgrades can shorten it. | T101 |
+
+## White mare saddle and seat (L47-8)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| SaddleCloth colour | `tools/blender/mare_saddle.py` `mats()` | (0.85, 0.58, 0.68) | ≤ 0.85 | the rose saddle cloth before any cloth piece is worn | L47 |
+| SaddleSeat colour | `tools/blender/mare_saddle.py` `mats()` | (0.85, 0.78, 0.74) | ≤ 0.85 | the pearl leather seat, skirts, girth and leathers | L47 |
+| Gold colour | `tools/blender/mare_saddle.py` `mats()` | (0.85, 0.70, 0.42) | ≤ 0.85 | saddle piping and stirrup irons before a tack piece | L47 |
+| `REIN_GRIP` | `creatures/fae/white_horse.gd` | (±0.09, 2.15, -0.48) | — | where Feyre's hands hold the reins over the pommel | L47 |
+| `SAG_HELD` / `SAG_SLACK` | `systems/mount/mare_reins.gd` | 0.07 / 0.16 m | 0–0.3 | how much the reins droop held and lying loose | L47 |

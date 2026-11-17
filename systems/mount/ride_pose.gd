@@ -7,23 +7,37 @@
 ## (positive: toward her left). Overrides (set_override) aim single bones on
 ## top of everything with their own weight, even at amount 0: the swing up
 ## into the saddle, the slide down, the whistle to her lips (L47-6).
+## `reins` 0..1 puts her hands on the reins: each arm reaches its hand to
+## `hand_l` / `hand_r` (world points, set by Saddle.place from the horse's grip
+## points) with a two-bone reach, elbows out and down. `bareback` 0..1 lets
+## her legs hang long down the mare's flanks with no stirrups (L47-8).
 class_name RidePose
 extends SkeletonModifier3D
 
 ## [bone, child, forward, up, outward]: the bone points from its head toward its
 ## child along this direction (outward is toward her left for Left* bones).
+## Thighs out over the saddle skirt and down the flank, shins straight down
+## to the stirrups, heels a touch down (L47-8: fitted to the mare's barrel).
 const AIMS := [
-	[&"LeftUpperLeg", &"LeftLowerLeg", 0.25, -0.5, 0.95],
-	[&"RightUpperLeg", &"RightLowerLeg", 0.25, -0.5, 0.95],
-	[&"LeftLowerLeg", &"LeftFoot", -0.15, -0.92, 0.45],
-	[&"RightLowerLeg", &"RightFoot", -0.15, -0.92, 0.45],
-	[&"LeftFoot", &"LeftToes", 0.9, -0.25, 0.25],
-	[&"RightFoot", &"RightToes", 0.9, -0.25, 0.25],
+	[&"LeftUpperLeg", &"LeftLowerLeg", 0.36, -0.72, 0.62],
+	[&"RightUpperLeg", &"RightLowerLeg", 0.36, -0.72, 0.62],
+	[&"LeftLowerLeg", &"LeftFoot", -0.12, -0.98, 0.22],
+	[&"RightLowerLeg", &"RightFoot", -0.12, -0.98, 0.22],
+	[&"LeftFoot", &"LeftToes", 0.92, -0.05, 0.25],
+	[&"RightFoot", &"RightToes", 0.92, -0.05, 0.25],
 	[&"LeftUpperArm", &"LeftLowerArm", 0.42, -0.85, 0.22],
 	[&"RightUpperArm", &"RightLowerArm", 0.42, -0.85, 0.22],
 	[&"LeftLowerArm", &"LeftHand", 0.9, -0.15, -0.38],
 	[&"RightLowerArm", &"RightHand", 0.9, -0.15, -0.38],
 ]
+## Bareback (no stirrups): the same bones, legs long and hanging, toes easy.
+const BAREBACK_AIMS := {
+	&"LeftUpperLeg": [0.32, -0.74, 0.62], &"RightUpperLeg": [0.32, -0.74, 0.62],
+	&"LeftLowerLeg": [-0.22, -0.96, 0.24], &"RightLowerLeg": [-0.22, -0.96, 0.24],
+	&"LeftFoot": [0.7, -0.62, 0.2], &"RightFoot": [0.7, -0.62, 0.2],
+}
+## Which way her elbows bend when she reaches for the reins: out, down and back.
+const ELBOW_POLE := Vector3(-0.35, -0.55, 0.8)  # forward, up, out
 const LEAN_BONES := {&"Spine": 10.0, &"Chest": 8.0, &"Neck": -8.0}
 ## Into a turn: spine and chest roll toward the inside, the neck keeps the head level.
 const BANK_BONES := {&"Spine": 7.0, &"Chest": 5.0, &"Neck": -9.0}
@@ -42,6 +56,11 @@ const CHILD_OF := {&"LeftUpperLeg": &"LeftLowerLeg", &"RightUpperLeg": &"RightLo
 var amount: float = 0.0
 var lean: float = 0.0
 var bank: float = 0.0
+var reins: float = 0.0
+var bareback: float = 0.0
+## Where her hands hold the reins (world space; used while `reins` > 0).
+var hand_l := Vector3.ZERO
+var hand_r := Vector3.ZERO
 ## The skeleton-space frame: x = her forward, y = up, z = her left.
 var forward := Vector3.FORWARD
 var up := Vector3.UP
@@ -49,7 +68,8 @@ var left := Vector3.LEFT
 ## Height of her hips above her feet in the rest pose (skeleton space, metres).
 var hip_height: float = 0.95
 
-var _aims: Array = []  # [bone, child, Vector3 want]
+var _aims: Array = []  # [bone, child, Vector3 want, Vector3 bareback want]
+var _arms: Array = []  # [upper, lower, hand, side]
 var _lean: Dictionary = {}  # bone -> radians
 var _bank: Dictionary = {}  # bone -> radians
 var _over: Dictionary = {}  # bone name -> [fwd, up, out, weight]
@@ -81,9 +101,11 @@ func _read_frame(sk: Skeleton3D) -> void:
 	left = (left - up * left.dot(up)).normalized()
 	forward = up.cross(left).normalized()
 	var toe_dir: Vector3 = p.call(toes) - p.call(foot)
+	# `left` comes from her own hips, so it is already right; only the facing
+	# can come out backwards from the cross product (her rig faces +Z). Flipping
+	# `left` too mirrored every outward aim: her legs crossed under the mare (L47-8).
 	if toe_dir.dot(forward) < 0.0:
 		forward = -forward
-		left = -left
 	hip_height = (p.call(hips) - p.call(foot)).dot(up)
 	_aims.clear()
 	for a: Array in AIMS:
@@ -93,7 +115,16 @@ func _read_frame(sk: Skeleton3D) -> void:
 			continue
 		var side := 1.0 if String(a[0]).begins_with("Left") else -1.0
 		var want: Vector3 = (forward * float(a[2]) + up * float(a[3]) + left * side * float(a[4])).normalized()
-		_aims.append([b, c, want])
+		var bb: Array = BAREBACK_AIMS.get(a[0], [a[2], a[3], a[4]])
+		var bare: Vector3 = (forward * float(bb[0]) + up * float(bb[1]) + left * side * float(bb[2])).normalized()
+		_aims.append([b, c, want, bare])
+	_arms.clear()
+	for side_name: String in ["Left", "Right"]:
+		var u := sk.find_bone(side_name + "UpperArm")
+		var l := sk.find_bone(side_name + "LowerArm")
+		var h := sk.find_bone(side_name + "Hand")
+		if mini(u, mini(l, h)) >= 0:
+			_arms.append([u, l, h, 1.0 if side_name == "Left" else -1.0])
 	_lean.clear()
 	for bone: StringName in LEAN_BONES:
 		var i := sk.find_bone(bone)
@@ -195,4 +226,36 @@ func _seat_pose(sk: Skeleton3D) -> void:
 			sk.set_bone_pose_rotation(i, Quaternion(axis, -float(_bank[i]) * bank * amount) * q)
 	# Aims, parents first (the table is ordered that way).
 	for a: Array in _aims:
-		_aim(sk, a[0], a[1], a[2], amount)
+		var want: Vector3 = a[2]
+		if bareback > 0.001:
+			want = (a[2] as Vector3).slerp(a[3], clampf(bareback, 0.0, 1.0)).normalized()
+		_aim(sk, a[0], a[1], want, amount)
+	if reins > 0.001:
+		var to_sk := sk.global_transform.affine_inverse()
+		for arm: Array in _arms:
+			_reach(sk, arm, to_sk * (hand_l if float(arm[3]) > 0.0 else hand_r), float(arm[3]), reins * amount)
+
+
+## Two-bone reach: the hand to `target` (skeleton space), the elbow bent
+## toward ELBOW_POLE, blended in by `w`.
+func _reach(sk: Skeleton3D, arm: Array, target: Vector3, side: float, w: float) -> void:
+	var s := sk.get_bone_global_pose(arm[0]).origin
+	var e := sk.get_bone_global_pose(arm[1]).origin
+	var h := sk.get_bone_global_pose(arm[2]).origin
+	var l1 := s.distance_to(e)
+	var l2 := e.distance_to(h)
+	var to := target - s
+	var d := clampf(to.length(), absf(l1 - l2) + 0.01, l1 + l2 - 0.005)
+	if to.length_squared() < 1e-8:
+		return
+	var n := to.normalized()
+	var pole := forward * ELBOW_POLE.x + up * ELBOW_POLE.y + left * side * ELBOW_POLE.z
+	pole = (pole - n * pole.dot(n))
+	if pole.length_squared() < 1e-6:
+		pole = -up - n * (-up).dot(n)
+	pole = pole.normalized()
+	var a := (l1 * l1 - l2 * l2 + d * d) / (2.0 * d)
+	var elbow := s + n * a + pole * sqrt(maxf(l1 * l1 - a * a, 0.0))
+	_aim(sk, arm[0], arm[1], (elbow - s).normalized(), w)
+	var e2 := sk.get_bone_global_pose(arm[1]).origin
+	_aim(sk, arm[1], arm[2], (s + n * d - e2).normalized(), w)

@@ -231,6 +231,8 @@ func _build_slot(slot: StringName) -> void:
 	grid.add_theme_constant_override(&"v_separation", 8)
 	_body.add_child(grid)
 	var now := MareTack.worn_in(slot)
+	if slot == &"tack" and MareBond.can_ride_bareback():
+		grid.add_child(_card_saddle())
 	if slot in MareTack.OPTIONAL:
 		grid.add_child(_card_none(slot, now == null))
 	for p in MareTack.in_slot(slot):
@@ -271,6 +273,27 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 		b.text = "Make it"
 		b.disabled = not MareTack.can_make(p, inventory)
 		b.pressed.connect(_make.bind(p))
+	col.add_child(b)
+	return card
+
+
+## Once she trusts Feyre (MareBond), the saddle can come off: bareback (L47-8, canon ch 20).
+func _card_saddle() -> Control:
+	var card := PanelContainer.new()
+	card.theme_type_variation = &"SatchelCard"
+	card.custom_minimum_size = Vector2(CARD_W, 0)
+	var col := VBoxContainer.new()
+	card.add_child(col)
+	var on := MareTack.saddled()
+	col.add_child(_label("Saddle", &"SatchelBody"))
+	col.add_child(_label("She'll carry you without it now." if on else "Just her back and your knees.", &"SatchelSmall"))
+	var b := Button.new()
+	b.theme_type_variation = &"SatchelSlot"
+	b.text = "Ride bareback" if on else "Saddle her"
+	b.pressed.connect(func() -> void:
+		MareTack.set_saddled(not MareTack.saddled())
+		_apply(true)
+		_show(_tab))
 	col.add_child(b)
 	return card
 
@@ -325,6 +348,7 @@ func _feed(id: StringName, button: Button) -> void:
 ## Re-lays her look; `celebrate` adds the dress-up sparkle, chime and a toss of her head.
 func _apply(celebrate: bool) -> void:
 	if mare and mare.horse:
+		MareSaddle.set_saddled(mare.horse, MareTack.saddled())
 		MareLook.apply(mare.horse, MareTack.outfit(), MareCare.shine())
 		_last_applied = MareCare.shine()
 		if celebrate:
