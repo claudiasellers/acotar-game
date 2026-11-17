@@ -152,8 +152,13 @@ func test_map_shows_pairs_on_sketched_ground_and_marks_differ() -> void:
 	assert_has(ids, &"cider_mill", "a pair she marked always shows")
 	var flags_before := WorldState.all_flags().duplicate()
 	var c := Control.new()
+	c.size = Vector2(64, 64)
+	var drawn: Array[int] = []
+	c.draw.connect(func() -> void:
+		drawn.append(WhorlMapMarks.draw_all(c, reveal, func(xz: Vector2) -> Vector2: return xz,
+			func(_p: Vector2) -> bool: return true, 10.0, 0.0)))
 	add_child_autofree(c)
-	var n := WhorlMapMarks.draw_all(c, reveal, func(xz: Vector2) -> Vector2: return xz,
-		func(_p: Vector2) -> bool: return true, 10.0, 0.0)
-	assert_eq(n, 2, "draws each shown pair")
+	c.queue_redraw()
+	await wait_until(func() -> bool: return not drawn.is_empty(), 2.0)
+	assert_eq(drawn, [2], "draws each shown pair (inside the canvas's draw)")
 	assert_eq(WorldState.all_flags(), flags_before, "R2: drawing writes no flag")
