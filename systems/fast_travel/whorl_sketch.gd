@@ -55,7 +55,8 @@ func _all() -> Array[WhorlStoneDef]:
 func _draw() -> void:
 	var ink := SatchelTheme.color(&"ink")
 	var accent := SatchelTheme.color(&"accent")
-	var font := get_theme_font(&"font", &"SatchelSmall")
+	# Place names in the satchel serif (the heading face) at the small size.
+	var font := get_theme_font(&"font", &"SatchelHeading")
 	var fsize := get_theme_font_size(&"font_size", &"SatchelSmall")
 	if here and picked:
 		_ride_line(map_point(here.position), map_point(picked.position), accent)

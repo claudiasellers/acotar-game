@@ -3,7 +3,9 @@
 Owner: the fast-travel lane (L74). Paths: `systems/fast_travel/`,
 `data/fast_travel/`, `art/fast_travel/`, `tools/fast_travel/`,
 `tools/blender/whorl_stones.py`, `tests/unit/fast_travel/`, this file.
-One line outside: `add_child(WhorlStones.new())` in `story/act1/act1_game.gd`.
+Outside: `add_child(WhorlStones.new())` in `story/act1/act1_game.gd`, and
+one `WhorlMapMarks.draw_all(...)` call each in L07's `ui/map/full_map.gd` and
+`ui/map/minimap.gd` (owner ask, 2026-11-17: "set a marker for them on the map").
 
 ## Canon
 
@@ -77,9 +79,15 @@ None in the sealed `autumn_foothills` or in `suriel_glade` (a dread place).
   (SatchelDetail paper with L65's framed edge, SatchelHeading/Small labels,
   SatchelTab buttons, the theme's ink and accent): no StyleBoxFlat and no
   fonts of their own.
-- **R2:** never writes a WorldState flag, never changes phase, no markers, no
-  objective text. Not added to the world map (that is L07's; a spiral
-  pictogram there is a follow-up).
+- **Map:** `WhorlMapMarks` draws a spiral pictogram on the minimap and full
+  map for each pair whose ground is sketched (`MapReveal.is_seen` at its
+  position) or that she has marked; never on unsketched land. Unmarked: thin
+  plum whorl on a lilac rim. Marked: rose whorl on a gold rim with a soft
+  shimmer and her little rose beside it. The full map names them "Whorl
+  stones" when zoomed in as far as landmark names show.
+- **R2:** never writes a WorldState flag, never changes phase, no objective
+  text, no world markers or beacons. The map pictograms show only what she has
+  seen (the owner asked for them).
 
 ## API
 

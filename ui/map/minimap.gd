@@ -233,6 +233,8 @@ func _draw_marks() -> void:
 		var p := to_local_point(Vector2(lm.x, lm.z))
 		if p.distance_to(c) <= inner:
 			MapMarks.draw_landmark(ci, p, StringName(lm.kind), 9.0, float(_glow.get(id, 0.0)))
+	if not in_house:
+		WhorlMapMarks.draw_all(ci, hud.reveal, to_local_point, func(p: Vector2) -> bool: return p.distance_to(c) <= inner, 9.0, _t)
 	_draw_pin(ci, c, inner, in_house)
 	MapMarks.draw_feyre(ci, c, hud.manor.angle if in_house else hud.player_angle, 10.0, _t)
 

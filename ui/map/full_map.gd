@@ -323,6 +323,10 @@ func _draw_marks() -> void:
 			var at := p + Vector2(-w * 0.5, 30)
 			ci.draw_string_outline(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 6, Color(1.0, 0.97, 0.99, 0.95))
 			ci.draw_string(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, PauseStyle.PLUM_SOFT)
+	# The whorl stones on ground she has sketched (L74).
+	var bounds := Rect2(Vector2.ZERO, _map.size).grow(20)
+	WhorlMapMarks.draw_all(ci, hud.reveal, to_map_point, func(p: Vector2) -> bool: return bounds.has_point(p), 12.0, _t,
+		body if view_width < LANDMARK_NAMES_BELOW else null)
 	if hud.pin.active:
 		MapMarks.draw_pin(ci, to_map_point(hud.pin.xz), 16.0, _t)
 	MapMarks.draw_feyre(ci, to_map_point(hud.player_xz), hud.player_angle, 13.0, _t)

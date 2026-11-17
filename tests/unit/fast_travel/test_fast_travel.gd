@@ -1,6 +1,6 @@
 extends GutTest
 ## Contract test for fast travel by the whorl stones (L74, docs/contracts/fast_travel.md).
-# gate: when:systems/fast_travel/*,data/fast_travel/*,art/fast_travel/*,tools/fast_travel/*,tools/blender/whorl_stones.py,story/act1/act1_game.gd,data/map/map_places.tres,data/phases/*
+# gate: when:systems/fast_travel/*,data/fast_travel/*,art/fast_travel/*,tools/fast_travel/*,tools/blender/whorl_stones.py,story/act1/act1_game.gd,data/map/map_places.tres,data/phases/*,ui/map/full_map.gd,ui/map/minimap.gd,ui/map/map_reveal.gd
 
 const PLACER := preload("res://tools/fast_travel/place_whorl_stones.gd")
 ## Every open Spring Court region gets one pair; the sealed Autumn border and
@@ -138,3 +138,22 @@ func test_only_mark_says_so_instead_of_an_empty_card() -> void:
 	WhorlStones.spawn_for(&"manor_estate", root)
 	(root.get_child(0) as WhorlStone).use(_player)
 	assert_false(WhorlTravelCard.is_open(), "nowhere to ride yet")
+
+
+func test_map_shows_pairs_on_sketched_ground_and_marks_differ() -> void:
+	var reveal := MapReveal.new()
+	assert_eq(WhorlMapMarks.shown(reveal).size(), 0, "nothing on an unsketched map")
+	var briar := WhorlStones.get_def(&"briar_gate")
+	reveal.reveal(briar.position.x, briar.position.y)
+	var ids: Array = WhorlMapMarks.shown(reveal).map(func(d: WhorlStoneDef) -> StringName: return d.id)
+	assert_eq(ids, [&"briar_gate"], "only the pair on ground she has sketched")
+	WhorlStones.mark(&"cider_mill")
+	ids = WhorlMapMarks.shown(reveal).map(func(d: WhorlStoneDef) -> StringName: return d.id)
+	assert_has(ids, &"cider_mill", "a pair she marked always shows")
+	var flags_before := WorldState.all_flags().duplicate()
+	var c := Control.new()
+	add_child_autofree(c)
+	var n := WhorlMapMarks.draw_all(c, reveal, func(xz: Vector2) -> Vector2: return xz,
+		func(_p: Vector2) -> bool: return true, 10.0, 0.0)
+	assert_eq(n, 2, "draws each shown pair")
+	assert_eq(WorldState.all_flags(), flags_before, "R2: drawing writes no flag")
