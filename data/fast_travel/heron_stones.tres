@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_my6i1"]
+
+[resource]
+script = ExtResource("1_my6i1")
+id = &"heron_stones"
+region_id = &"starlight_glen"
+place_id = &"starlight_glen"
+position = Vector2(-1079.5, -24.5)
+yaw_degrees = 20.0
+notes = "Below the heron stones in Starlight Glen. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

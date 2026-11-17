@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_nhtyi"]
+
+[resource]
+script = ExtResource("1_nhtyi")
+id = &"briar_gate"
+region_id = &"rosewild"
+place_id = &"rosewild"
+position = Vector2(-28.5, -622.5)
+notes = "Inside the briar gate of the Rosewild. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_wtcor"]
+
+[resource]
+script = ExtResource("1_wtcor")
+id = &"manor_drive"
+region_id = &"manor_estate"
+place_id = &"manor_estate"
+position = Vector2(22.5, 238)
+notes = "South lawn beside the drive, inside the sentry gate: the way home from every ride. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

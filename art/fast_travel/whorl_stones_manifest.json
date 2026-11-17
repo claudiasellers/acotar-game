@@ -1,0 +1,28 @@
+{
+ "assets": [
+  {
+   "canon": "C form, X placement",
+   "file": "whorl_stones.glb",
+   "horror": false,
+   "id": "whorl_stones",
+   "tris": 2444,
+   "tris_lod1": 1222
+  },
+  {
+   "canon": "C form, X placement",
+   "file": "whorl_stones_blight.glb",
+   "horror": true,
+   "id": "whorl_stones_blight",
+   "tris": 2444,
+   "tris_lod1": 1222
+  },
+  {
+   "canon": "X",
+   "file": "whorl_mark.glb",
+   "horror": false,
+   "id": "whorl_mark",
+   "tris": 104,
+   "tris_lod1": 62
+  }
+ ]
+}

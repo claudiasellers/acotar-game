@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_7eqt1"]
+
+[resource]
+script = ExtResource("1_7eqt1")
+id = &"cider_mill"
+region_id = &"blossom_vale"
+place_id = &"blossom_vale"
+position = Vector2(971, 859)
+notes = "By the cider mill in Blossom Vale. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

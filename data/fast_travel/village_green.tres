@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_mhf6e"]
+
+[resource]
+script = ExtResource("1_mhf6e")
+id = &"village_green"
+region_id = &"fae_village"
+place_id = &"fae_village"
+position = Vector2(-940, -828)
+yaw_degrees = 10.0
+notes = "On the green of the lesser-fae village, below the great lantern tree. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_3ybfx"]
+
+[resource]
+script = ExtResource("1_3ybfx")
+id = &"drum_field"
+region_id = &"hill_of_the_rite"
+place_id = &"hill_of_the_rite"
+position = Vector2(584, -829)
+yaw_degrees = 40.0
+notes = "On the drum field below the Hill of the Rite. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

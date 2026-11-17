@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_wv3bq"]
+
+[resource]
+script = ExtResource("1_wv3bq")
+id = &"arch_avenue"
+region_id = &"solstice_meadow"
+place_id = &"solstice_meadow"
+position = Vector2(-132, -1005)
+notes = "At the foot of the arch avenue into the Solstice Meadow. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

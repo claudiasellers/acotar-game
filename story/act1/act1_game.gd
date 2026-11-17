@@ -89,6 +89,7 @@ func _ready() -> void:
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
 	add_child(MountDirector.new())
+	add_child(WhorlStones.new())
 
 
 ## Restores the story before anything is built, behind the loading veil. A save

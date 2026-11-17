@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_gxf7m"]
+
+[resource]
+script = ExtResource("1_gxf7m")
+id = &"wall_gate"
+region_id = &"border_woods"
+place_id = &"border_woods"
+position = Vector2(-121, 1361)
+notes = "The canon pair (ch 31) by the gap in the Wall, beside the old waystone. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

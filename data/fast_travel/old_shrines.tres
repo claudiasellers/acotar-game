@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WhorlStoneDef" format=3]
+
+[ext_resource type="Script" path="res://systems/fast_travel/whorl_stone_def.gd" id="1_saifm"]
+
+[resource]
+script = ExtResource("1_saifm")
+id = &"old_shrines"
+region_id = &"western_fells"
+place_id = &"western_fells"
+position = Vector2(-1614, 159)
+yaw_degrees = -20.0
+notes = "Up on the fells by the old shrines, between them and the middle watchtower. Form canon (ch 31); placement canon:\"X\". Written by tools/fast_travel/place_whorl_stones.gd."

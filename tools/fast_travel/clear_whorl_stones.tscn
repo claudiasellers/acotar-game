@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tools/fast_travel/clear_whorl_stones.gd" id="1"]
+
+[node name="ClearWhorlStones" type="Node"]
+script = ExtResource("1")
