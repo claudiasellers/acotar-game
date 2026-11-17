@@ -1,12 +1,13 @@
-## The drift of petals and glints the white mare leaves when she is called
-## (lane L47-6, R3: petals and sparkles). Blush, lilac, butter and pearl
-## petals kicked up from her hooves, tumbling and fading behind her; a few gold
-## glints among them. World-space, so the trail stays where she passed.
+## The drift of petals the white mare leaves when she is called (lane L47-6,
+## R3: petals). Blush, lilac, butter and pearl petals kicked up from her
+## hooves, tumbling and fading behind her. World-space, so the trail stays
+## where she passed. Sunlit, no emission; albedo capped at 0.85.
 class_name MareTrail
 extends GPUParticles3D
 
-const COLORS: Array[Color] = [Color(1.0, 0.8, 0.88), Color(0.86, 0.78, 1.0),
-	Color(1.0, 0.94, 0.72), Color(1.0, 0.97, 0.95)]
+## Albedo stays at or under 0.85 a channel (the project's albedo cap).
+const COLORS: Array[Color] = [Color(0.85, 0.68, 0.75), Color(0.73, 0.66, 0.85),
+	Color(0.85, 0.8, 0.61), Color(0.85, 0.82, 0.81)]
 
 static var _mesh: QuadMesh
 
@@ -64,10 +65,8 @@ static func _petal_mesh() -> QuadMesh:
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.emission_enabled = true
-	mat.emission = Color(1.0, 0.9, 0.95)
-	mat.emission_energy_multiplier = 0.35
+	# Lit by the sun like everything else: no emission in daylight (project rule).
+	mat.roughness = 0.55
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_mesh.material = mat
 	return _mesh
