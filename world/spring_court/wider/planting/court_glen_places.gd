@@ -70,6 +70,12 @@ extends RefCounted
 ##  11 Heron Stones    watching and waiting: the glen's one reed bed, taller
 ##                     than you, round the stones, with a narrow parting through
 ##                     it from the lake's side and another toward the Knoll Walk.
+## And the rims, where the glen lets go:
+##  12 Watchers' Run   lonelier and wilder. Long pale grass along the brook,
+##                     thorn bushes, and on the rim's knolls old thorns and
+##                     aspens only, every thorn leaning the wind's way. To the
+##                     west, clumps of oak and elm gather over 150 m into the
+##                     Western Woods, so there is no line where the glen stops.
 ## Everything is found from the land (the way's own line, where it meets the
 ## brook and the river, the knolls' tops), so a change to the land moves the
 ## planting with it. The rules in CourtGlenPlanting plant only ground this
@@ -193,6 +199,10 @@ const GLADE_DOOR := 9.5
 ## The ring's oaks are grown to this (a great oak is 22 m at size 1): a 30 m
 ## oak's crown is 38 m across, so fourteen of them on the ring close overhead.
 const GLADE_SIZE := 1.36
+## The floor of white stars under the ring: anemone patches tried, between these radii.
+const GLADE_STARS := 3400
+const GLADE_STARS_FROM := 49.0
+const GLADE_STARS_TO := 92.0
 ## Looking Lake's far wood: trees, its half-arc (radians) round the shore from
 ## straight across, and how far back from the water it runs (m).
 const LAKE_WOOD := 72
@@ -202,13 +212,29 @@ const LAKE_DEPTH := 40.0
 ## from the shore, the height of its crowns over the water, its colour.
 const MIRROR_BACK := 7.0
 const MIRROR_HEIGHT := 27.0
-const MIRROR_COLOUR := Color(0.09, 0.34, 0.23)
-const MIRROR_STRENGTH := 0.88
+const MIRROR_COLOUR := Color(0.10, 0.42, 0.22)
+const MIRROR_STRENGTH := 0.92
 ## The Heron Stones' reed bed: reeds, its inner and outer radii, the partings' half-width (radians).
 const REEDS := 1150
 const REED_INNER := 6.5
 const REED_OUTER := 18.0
 const REED_PARTING := 0.11
+
+## The rims. Watchers' Run: long pale grass this far either side of the brook
+## (tufts tried), a thorn bush every so often. The west rim: clumps of oak and
+## elm gathering over RIM_DEPTH metres toward the Western Woods.
+const RUN_GRASS := 2400
+const RUN_HALF := 15.0
+const RUN_BUSH_STEP := 27.0
+const RIM_CLUMPS := 22
+const RIM_DEPTH := 150.0
+## Knolls keep one tree each, but the tree is its place's (indices into
+## CourtGlenPlanting.KNOLL_KINDS): white birches within this of the pool, thorn
+## and aspen on the rims.
+const POOL_KNOLLS := 185.0
+const RIM_WEST := -1385.0
+const RIM_NORTH := -335.0
+const RIM_SOUTH := 485.0
 
 static var _lock := Mutex.new()
 static var _way := PackedVector2Array()
@@ -289,7 +315,7 @@ static func claims(p: Vector2) -> bool:
 	var mere := CourtGlenPlanting._lake_named(&"willow_mere")
 	if not mere.is_empty() and p.distance_to(mere["center"]) < float(mere["radius"]) + MERE_CLAIM:
 		return true
-	for id: StringName in [&"glimmer_brook", &"mere_run", &"lake_run"]:
+	for id: StringName in [&"glimmer_brook", &"mere_run", &"lake_run", &"watchers_run"]:
 		if _near(p, brook(id), BROOK_CLAIM):
 			return true
 	# the north loop: the Aspen Row, the Oak Glade's rings, the lake walk's bare rise, the lake's shores, the reed bed
@@ -450,6 +476,7 @@ static func plant(plan: CourtGlenPlanting.Plan, groups: Array[Dictionary]) -> vo
 	_oak_glade(plan, rng, groups)
 	_looking_lake(plan, rng, groups)
 	_heron_stones(plan, rng)
+	_the_rims(plan, rng, groups)
 
 
 # --- 1: the Brae gate ---------------------------------------------------------
@@ -845,6 +872,18 @@ static func _oak_glade(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator,
 			reach.append(11.0)
 	if not trunks.is_empty():
 		groups.append({"trunks": trunks, "reach": reach, "flower": &"anemone", "composed": true})
+	# the floor of white stars: a sheet under the whole ring, thinning toward the light on both sides, in soft drifts
+	var drift := FastNoiseLite.new()
+	drift.seed = 53
+	drift.frequency = 0.05
+	var mid := (GLADE_STARS_FROM + GLADE_STARS_TO) * 0.5
+	for i in GLADE_STARS:
+		var r := clampf(rng.randfn(GLADE_RING + 6.0, 11.0), GLADE_STARS_FROM, GLADE_STARS_TO)
+		var p := centre + Vector2.from_angle(rng.randf() * TAU) * r
+		if drift.get_noise_2d(p.x, p.y) < -0.28 or not CourtGlenPlanting.growable(p, 1.2):
+			continue
+		var edge := absf(r - mid) / (GLADE_STARS_TO - mid)
+		plan.flower("anemone_patch_a", p, rng.randf() * TAU, lerpf(1.45, 0.85, edge) * rng.randf_range(0.9, 1.1))
 	# foxgloves in the light at the clearing's rim, in stands
 	for stand in 9:
 		var a := TAU * (float(stand) + rng.randf_range(-0.3, 0.3)) / 9.0
@@ -962,6 +1001,67 @@ static func _heron_stones(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerat
 		# (a reed clump stands 1.4 to 2.4 m at size 1)
 		var tall := lerpf(1.4, 0.85, clampf((r - REED_INNER) / (REED_OUTER - REED_INNER), 0.0, 1.0)) * rng.randf_range(0.88, 1.12)
 		plan.plant(&"cattail" if i % 6 == 0 else &"reed_clump", p, rng.randf() * TAU, tall, 320.0)
+
+
+# --- 12: the rims ---------------------------------------------------------------------
+
+## The kinds of tree a knoll's top may carry by where it stands (indices into
+## CourtGlenPlanting.KNOLL_KINDS; empty: any).
+static func knoll_kinds(top: Vector2) -> Array[int]:
+	if top.distance_to(CourtGlenPlanting.POOL) < POOL_KNOLLS:
+		return [5]            # white birches: the pool's tree
+	if top.x < RIM_WEST or top.y < RIM_NORTH or top.y > RIM_SOUTH:
+		return [4, 3]         # an old thorn, or two aspens
+	return []
+
+
+static func _the_rims(plan: CourtGlenPlanting.Plan, rng: RandomNumberGenerator, _groups: Array[Dictionary]) -> void:
+	# Watchers' Run: long pale grass either side of the brook, thickest at the water
+	var run := brook(&"watchers_run")
+	if run.size() >= 2:
+		var length := 0.0
+		for i in range(1, run.size()):
+			length += run[i].distance_to(run[i - 1])
+		for i in RUN_GRASS:
+			var on: Array = _on_line(run, 0, rng.randf() * length)
+			var off := rng.randfn(0.0, RUN_HALF * 0.45)
+			var p := (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * off
+			if absf(off) > RUN_HALF or absf(off) < 1.6 or not CourtGlenPlanting.growable(p, 0.4):
+				continue
+			plan.long_grass(p, rng.randf() * TAU, lerpf(1.9, 1.1, absf(off) / RUN_HALF) * rng.randf_range(0.85, 1.2))
+		var at_run := 12.0
+		var side := 1.0
+		while at_run < length:
+			var on: Array = _on_line(run, 0, at_run)
+			side = -side
+			var p := _spot(plan, (on[0] as Vector2) + (on[1] as Vector2).orthogonal() * side * rng.randf_range(5.0, 10.0), 4.0, 4.0, 2.0, 3.0)
+			if p != Vector2.INF and plan.tree(&"thorn_bush", rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.8, 1.3)):
+				plan.trunks.resize(plan.trunks.size() - 1)
+			at_run += RUN_BUSH_STEP * rng.randf_range(0.7, 1.3)
+	# the west rim: clumps of oak and elm, more of them and closer the nearer the Western Woods
+	var rect := plan.content.bounding_rect()
+	var west := rect.position.x
+	var tries := 0
+	var stood := 0
+	while stood < RIM_CLUMPS and tries < 900:
+		tries += 1
+		var deep := pow(rng.randf(), 1.7)          # 0 at the glen's edge, 1 where the gathering begins
+		var heart := Vector2(west + 6.0 + deep * RIM_DEPTH, rng.randf_range(rect.position.y + 20.0, rect.end.y - 20.0))
+		if not plan.content.owns(heart) or claims(heart) or heart.distance_to(CourtGlenPlanting.POOL) < CourtGlenPlanting.FLOOR + 90.0 \
+				or CourtLandHabitats.path_distance(heart.x, heart.y) < 12.0 or CourtGlenPlanting.wet(heart, 6.0):
+			continue
+		var count := 2 + int(round((1.0 - deep) * 4.0 * rng.randf_range(0.6, 1.0)))
+		var trunks: Array = []
+		for n in count:
+			var p := _spot(plan, heart + Vector2.from_angle(rng.randf() * TAU) * (0.0 if n == 0 else rng.randf_range(5.0, 11.0)), 5.0, 9.0, 3.0, 5.5)
+			if p == Vector2.INF:
+				continue
+			var species: StringName = &"great_elm" if n == 0 and rng.randf() < 0.45 else &"oak"
+			if plan.tree(species, rng.randi(), p, rng.randf() * TAU, rng.randf_range(0.95, 1.3) if species == &"oak" else rng.randf_range(0.9, 1.05)):
+				trunks.append(p)
+		# (no flowers under them: the rim is grass and thorn, and the glen's blue stays with its knolls and its pool)
+		if not trunks.is_empty():
+			stood += 1
 
 
 ## The Glimmer Brook's string of lights, as CourtMotes draws them from the

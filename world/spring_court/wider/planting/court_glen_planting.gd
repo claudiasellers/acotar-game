@@ -213,6 +213,19 @@ class Plan:
 			l.tags = PackedStringArray(["fine", "place"])
 		l.add(ground(p), yaw, size)
 
+	## Long pale grass (tools/grove's tall tuft), for a place that wants it thick.
+	func long_grass(p: Vector2, yaw: float, size: float) -> void:
+		if not content.owns(p):
+			return
+		var l := _layer(&"place_long_grass")
+		if l.mesh == null:
+			l.mesh = CourtPlacePlants.glade("grass_tall_a")
+			l.draw_distance = 120.0
+			l.cast_shadow = false
+			l.tags = PackedStringArray(["place"])
+			l.wind = 0.7
+		l.add(ground(p), yaw, size)
+
 	## A fern (tools/grove), one of three.
 	func fern(which: int, p: Vector2, yaw: float, size: float) -> void:
 		if not content.owns(p):
@@ -481,6 +494,14 @@ static func _knolls(plan: Plan, rng: RandomNumberGenerator, groups: Array[Dictio
 			taken.append(near[n][1])
 		while kind in taken:
 			kind = (kind + 1) % KNOLL_KINDS.size()
+		# and its place's own: white birches round the pool, thorn and aspen on the rims (CourtGlenPlaces)
+		var own := CourtGlenPlaces.knoll_kinds(top)
+		if not own.is_empty() and not kind in own:
+			kind = own[rng.randi() % own.size()]
+			for candidate in own:
+				if not candidate in taken:
+					kind = candidate
+					break
 		placed.append([top, kind])
 		var k: Array = KNOLL_KINDS[kind]
 		var trunks: Array = []
