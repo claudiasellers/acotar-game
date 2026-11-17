@@ -12,11 +12,16 @@ const LOCO: Array[StringName] = [&"walk", &"trot", &"gallop"]
 const LOOPS: Array[StringName] = [&"idle", &"walk", &"trot", &"gallop", &"graze"]
 ## Gait thresholds (m/s): below WALK_MIN she stands; trot from TROT_FROM; gallop from GALLOP_FROM.
 const WALK_MIN := 0.25
-const TROT_FROM := 3.0
-const GALLOP_FROM := 7.0
+const TROT_FROM := 2.6
+const GALLOP_FROM := 6.5
 ## Cadence limits, so the legs never look frantic or treacly.
-const MIN_RATE := 0.55
-const MAX_RATE := 1.45
+const MIN_RATE := 0.6
+const MAX_RATE := 1.7
+## The gallop clip strides 9 m (made for 16 m/s): played foot-locked at a canter
+## it lopes in slow motion. Its cadence follows speed only by this power, never
+## below GALLOP_MIN_RATE: a quicker beat with a shorter-seeming stride (L47-6).
+const GALLOP_CADENCE := 0.55
+const GALLOP_MIN_RATE := 0.8
 const FADE := 0.22
 const GRAZE_AFTER := 6.0
 
@@ -63,6 +68,8 @@ func gait_for(v: float) -> Array:
 	if v < WALK_MIN:
 		return [&"idle", 1.0]
 	var c := &"walk" if v < TROT_FROM else (&"trot" if v < GALLOP_FROM else &"gallop")
+	if c == &"gallop":
+		return [c, clampf(pow(v / float(native_speeds[c]), GALLOP_CADENCE), GALLOP_MIN_RATE, 1.15)]
 	return [c, clampf(v / float(native_speeds[c]), MIN_RATE, MAX_RATE)]
 
 

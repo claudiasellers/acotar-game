@@ -48,6 +48,14 @@ var _clop_i: int = 0
 var _balk_cool: float = 0.0
 var _stuck: float = 0.0
 var _leap_pending: bool = false
+var _rider: Node3D
+var _present_yaw: float = NAN
+var _trail: MareTrail
+
+## How far from the rider's side she stops when called (m, centre to rider).
+const PRESENT_GAP := 1.55
+## Within this of the rider she starts curving in to present her side (m).
+const PRESENT_FROM := 14.0
 
 
 func _init() -> void:
@@ -106,10 +114,31 @@ func heading() -> Vector3:
 	return -global_basis.z
 
 
-func call_to(point: Vector3) -> void:
+## Called: she comes to `point`. With `rider` she pulls up side-on, her near
+## (left) side to the rider, a stride from her, as a horse is brought to be mounted.
+func call_to(point: Vector3, rider: Node3D = null) -> void:
 	goal = point
+	_rider = rider
+	_present_yaw = NAN
 	state = State.COMING
 	_stuck = 0.0
+	if _trail == null:
+		_trail = MareTrail.new()
+		add_child(_trail)
+	_trail.emitting = true
+
+
+## Where she stops for the rider: a stride off Feyre's side, heading on past her
+## so Feyre is on her left; and that heading. [centre, heading].
+func presenting_spot(from: Vector3, rider_at: Vector3) -> Array:
+	var t := Vector3(rider_at.x - from.x, 0.0, rider_at.z - from.z)
+	if t.length_squared() < 0.01:
+		t = -heading()
+	t = t.normalized()
+	var f := t.cross(Vector3.UP).normalized()  # the way she faces at the stop
+	# f x up is her right; the rider sits on her left, so she stops right of the rider.
+	var centre := rider_at + f.cross(Vector3.UP).normalized() * PRESENT_GAP
+	return [Vector3(centre.x, rider_at.y, centre.z), f]
 
 
 func go_home() -> void:
@@ -118,6 +147,10 @@ func go_home() -> void:
 
 
 func stand() -> void:
+	if state == State.RIDDEN or state == State.GOING_HOME:
+		_present_yaw = NAN
+	if _trail:
+		_trail.emitting = false
 	state = State.STANDING
 	steer = Vector3.ZERO
 	gallop = false
@@ -152,14 +185,29 @@ func _wish() -> Array:
 			var v := data.gallop_speed if gallop else (data.walk_speed if amount < 0.5 else data.canter_speed)
 			return [v, steer.normalized()]
 		State.COMING, State.GOING_HOME:
+			if state == State.COMING and _rider and is_instance_valid(_rider):
+				var rd := Vector2(_rider.global_position.x - global_position.x, _rider.global_position.z - global_position.z).length()
+				if rd < PRESENT_FROM and is_nan(_present_yaw):
+					var spot := presenting_spot(global_position, _rider.global_position)
+					goal = spot[0]
+					_present_yaw = atan2(-(spot[1] as Vector3).x, -(spot[1] as Vector3).z)
 			var to := goal - global_position
 			to.y = 0.0
 			var d := to.length()
-			if d < data.call_stop:
+			if d < (0.45 if state == State.COMING and not is_nan(_present_yaw) else data.call_stop):
 				return [0.0, Vector3.ZERO]
 			# Gallop in, ease to a trot and a walk for the last metres.
 			var v := clampf(d * 0.9, data.walk_speed, data.gallop_speed * 0.85)
-			return [v, to / d]
+			var dir := to / d
+			# Curve in: aim at a point behind the stop along her final heading.
+			if not is_nan(_present_yaw) and d > 0.6:
+				var f := Vector3(-sin(_present_yaw), 0.0, -cos(_present_yaw))
+				var lead := goal - f * clampf(d * 0.55, 0.0, 4.0)
+				var la := lead - global_position
+				la.y = 0.0
+				if la.length() > 0.3:
+					dir = la.normalized()
+			return [v, dir]
 	return [0.0, Vector3.ZERO]
 
 
@@ -217,11 +265,23 @@ func _physics_process(delta: float) -> void:
 	if state == State.COMING or state == State.GOING_HOME:
 		var left := Vector2(goal.x - global_position.x, goal.z - global_position.z).length()
 		_stuck = _stuck + delta if (speed < 0.5 and left > data.call_stop) else 0.0
-		if left <= data.call_stop and speed < 0.3:
+		var stop := 0.45 if not is_nan(_present_yaw) else data.call_stop
+		if left <= stop and speed < 0.3:
 			var was := state
 			stand()
 			if was == State.COMING:
+				if _trail:
+					_trail.emitting = false
 				arrived.emit()
+	# Stood after a call: turn on the spot to present her side.
+	if state == State.STANDING and not is_nan(_present_yaw):
+		var diff := wrapf(_present_yaw - rotation.y, -PI, PI)
+		if absf(diff) < 0.03:
+			_present_yaw = NAN
+		else:
+			rotation.y += clampf(diff, -1.4 * delta, 1.4 * delta)
+	if state != State.RIDDEN and horse and horse.model:
+		horse.model.rotation.z = lerpf(horse.model.rotation.z, 0.0, clampf(5.0 * delta, 0.0, 1.0))
 	if horse:
 		horse.speed_override = speed
 		if horse.animator:

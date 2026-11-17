@@ -8,7 +8,7 @@ extends Resource
 @export var home: Vector3 = Vector3(-130.0, 0.0, -16.0)
 @export var home_yaw: float = 0.0
 ## Ground speeds (m/s): stick held lightly, held fully, and with sprint.
-@export var walk_speed: float = 2.2
+@export var walk_speed: float = 1.8
 @export var canter_speed: float = 10.0
 ## Capped at 15 by the director (L40 streaming: ~20 s of look-ahead); the
 ## speed is sold with FOV, hoof cadence and wind, not raw speed.

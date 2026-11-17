@@ -13,6 +13,12 @@
 ## trigger: every ActionTrigger the mare passes through fires as if Feyre
 ## walked it.
 ##
+## Getting on and off is one motion (MountMotion, L47-6): a vault up from her
+## near side and a slide down it, never a teleport. The whistle is a gesture
+## (fingers to her lips) and she answers from where she is with a whinny; called,
+## she comes at a gallop with a drift of petals and pulls up side-on, her near
+## side to Feyre. Before she knows Feyre's whistle she only answers from the stables.
+##
 ## Controls in the saddle: move steers (light stick walks, full canters),
 ## sprint gallops, jump leaps, E picks what's in reach from the saddle or,
 ## with nothing in reach, gets down (hold E to get down anyway).
@@ -72,6 +78,18 @@ var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
 var _cam_tween: Tween
 var _steer_frame := SteerFrame.new()
+## The vault on or the slide off while it plays (null otherwise).
+var motion: MountMotion
+var _off_at: Vector3
+var _gesture_t: float = -1.0
+var _answer_in: float = -1.0
+var _far_voice: AudioStreamPlayer3D
+var _last_yaw: float = NAN
+var _bank: float = 0.0
+
+## The whistle gesture's length (s), and when she answers after it (s).
+const GESTURE_TIME := 0.95
+const ANSWER_DELAY := 0.55
 
 
 func _ready() -> void:
@@ -79,8 +97,8 @@ func _ready() -> void:
 	_ensure_action()
 	EventBus.scene_space_started.connect(func(id: StringName) -> void:
 		_spaces[id] = true
-		if riding:
-			dismount())
+		if riding or motion:
+			dismount(true))
 	EventBus.scene_space_finished.connect(func(id: StringName) -> void: _spaces.erase(id))
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
@@ -208,26 +226,76 @@ func whistle() -> bool:
 	var p := _player()
 	if p == null or riding:
 		return false
+	if motion:
+		return false
 	_whistle.play()
+	_gesture(p)
 	last_block = block_reason(p.global_position)
 	var ok := last_block == &"" and unlocked()
 	if ok:
 		_answer(p)
+	elif last_block == &"" and available():
+		# She doesn't know Feyre's whistle yet: only a far whinny from the stables.
+		_answer_in = ANSWER_DELAY
 	whistled.emit(ok)
 	return ok
+
+
+## Fingers to her lips for the whistle (RidePose overrides, on foot).
+func _gesture(p: Node3D) -> void:
+	var sk := Saddle.skeleton_of(p)
+	if sk == null:
+		return
+	RidePose.attach(sk)
+	_gesture_t = 0.0
+
+
+func _tick_gesture(p: Node3D, delta: float) -> void:
+	if _gesture_t < 0.0:
+		return
+	_gesture_t += delta
+	var sk := Saddle.skeleton_of(p)
+	var pose := sk.get_node_or_null(^"RidePose") as RidePose if sk else null
+	if pose == null:
+		_gesture_t = -1.0
+		return
+	var w := MountMotion.seg(_gesture_t, 0.0, 0.22) * (1.0 - MountMotion.seg(_gesture_t, GESTURE_TIME - 0.3, GESTURE_TIME))
+	pose.set_override(&"RightUpperArm", 0.55, -0.05, 0.85, w)
+	pose.set_override(&"RightLowerArm", 0.35, 0.6, -0.72, w)
+	if _gesture_t >= GESTURE_TIME:
+		_gesture_t = -1.0
+		pose.set_override(&"RightUpperArm", 0, 0, 0, 0.0)
+		pose.set_override(&"RightLowerArm", 0, 0, 0, 0.0)
+
+
+## A whinny from the stables, heard from far off (she isn't coming yet).
+func _far_answer() -> void:
+	if mare and is_instance_valid(mare) and mare.state != MareMount.State.RIDDEN:
+		mare.neigh()
+		return
+	if _far_voice == null:
+		_far_voice = AudioStreamPlayer3D.new()
+		_far_voice.stream = MareMount.WHINNY
+		_far_voice.unit_size = 60.0
+		_far_voice.max_db = -2.0
+		_far_voice.volume_db = -4.0
+		add_child(_far_voice)
+	var y := ground_at(data.home.x, data.home.z)
+	_far_voice.global_position = Vector3(data.home.x, (0.0 if is_nan(y) else y) + 1.6, data.home.z)
+	_far_voice.play()
 
 
 func _answer(p: Node3D) -> void:
 	var beside := p.global_position + _side_of(p) * 2.2
 	if mare and is_instance_valid(mare) and mare.global_position.distance_to(p.global_position) <= NEAR_CALL:
-		mare.call_to(beside)
-		mare.neigh()
+		mare.call_to(beside, p)
+		_answer_in = ANSWER_DELAY
 		return
 	free_mare()
 	var start := _out_of_sight(p, data.call_distance)
 	spawn_mare(start, atan2(-(beside - start).x, -(beside - start).z))
-	mare.call_to(beside)
-	mare.neigh()
+	mare.call_to(beside, p)
+	_answer_in = ANSWER_DELAY
 
 
 ## Feyre's right, flat (where the mare draws up).
@@ -263,9 +331,9 @@ func can_mount() -> bool:
 	return p != null and not riding and mare != null and block_reason(p.global_position) == &""
 
 
-func mount(user: Node = null) -> bool:
+func mount(user: Node = null, instant: bool = false) -> bool:
 	var p := _player() if user == null else user as Node3D
-	if p == null or mare == null or riding:
+	if p == null or mare == null or riding or motion:
 		return false
 	last_block = block_reason(p.global_position)
 	if last_block != &"":
@@ -282,11 +350,21 @@ func mount(user: Node = null) -> bool:
 	mare.state = MareMount.State.RIDDEN
 	mare.set_mountable(false)
 	pose = Saddle.seat(p)
+	_gesture_t = -1.0
+	if _prompt and is_instance_valid(_prompt):
+		_prompt.visible = false
 	if pose:
+		pose.clear_overrides()
 		pose.amount = 0.0
-		create_tween().tween_property(pose, ^"amount", 1.0, 0.25)
 	_inside.clear()
-	_place_rider(0.0)
+	if not instant and pose and mare.horse:
+		motion = MountMotion.new()
+		motion.begin_on(p, mare.horse, pose, ground_at)
+		motion.tick(0.0)
+	else:
+		if pose:
+			pose.amount = 1.0
+		_place_rider(0.0)
 	_ride_camera(p, true)
 	if first:
 		_unlock.fire()
@@ -296,26 +374,54 @@ func mount(user: Node = null) -> bool:
 	return true
 
 
-func dismount() -> void:
+## Gets her down: the slide off her near side (MountMotion), or at once when
+## `instant` (a scene starting, the Wall, a story beat).
+func dismount(instant: bool = false) -> void:
+	if motion and motion.kind == MountMotion.Kind.OFF:
+		if instant:
+			motion.restore_mare()
+			motion = null
+			_finish_dismount(_off_at)
+		return
 	if not riding:
 		return
 	riding = false
 	var p := _player()
+	if motion:
+		motion.restore_mare()
+		motion = null
 	if mare and is_instance_valid(mare):
 		mare.stand()
+	if p == null:
+		_finish_dismount(Vector3.INF)
+		return
+	_off_at = _landing(p)
+	if instant or pose == null or mare == null or not is_instance_valid(mare) or mare.horse == null:
+		_finish_dismount(_off_at)
+		return
+	_calm_feel()
+	motion = MountMotion.new()
+	motion.begin_off(p, mare.horse, pose, _off_at)
+	motion.tick(0.0)
+
+
+func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
+	var p := _player()
+	if mare and is_instance_valid(mare):
 		mare.set_mountable(true)
 		if p:
 			mare.remove_collision_exception_with(p)
-	if p:
-		var at := _landing(p)
+	if p and at != Vector3.INF:
 		p.global_position = at
 		if p is CharacterBody3D:
 			(p as CharacterBody3D).velocity = Vector3.ZERO
-		if p.get(&"model") is Node3D and mare:
+		if face_mare and p.get(&"model") is Node3D and mare:
 			(p.get(&"model") as Node3D).rotation = Vector3(0.0, mare.rotation.y, 0.0)
 		p.set_physics_process(true)
 	_set_bow(true)
 	_calm_feel()
+	if pose:
+		pose.clear_overrides()
 	if p:
 		Saddle.unseat(p)
 		_ride_camera(p, false)
@@ -355,14 +461,22 @@ func seat_point() -> Vector3:
 	return mare.horse.seat_point()
 
 
-func _place_rider(_delta: float) -> void:
+func _place_rider(delta: float) -> void:
 	var p := _player()
 	if p == null or mare == null or mare.horse == null:
 		return
 	Saddle.place(p, mare.horse)
+	# Into a turn both lean: her body to the inside, the mare a little roll.
+	var yaw := mare.rotation.y
+	var rate := 0.0 if is_nan(_last_yaw) or delta <= 0.0 else wrapf(yaw - _last_yaw, -PI, PI) / delta
+	_last_yaw = yaw
+	_bank = lerpf(_bank, clampf(rate * mare.speed / 14.0, -1.0, 1.0), clampf(6.0 * delta, 0.0, 1.0))
+	if mare.horse.model:
+		mare.horse.model.rotation.z = _bank * 0.09
 	if pose:
 		var lean := clampf((mare.speed - data.canter_speed * 0.6) / maxf(data.gallop_speed - data.canter_speed * 0.6, 0.1), 0.0, 1.0)
 		pose.lean = lerpf(pose.lean, lean, 0.1)
+		pose.bank = _bank
 
 
 # ------------------------------------------------------------------ input and frame
@@ -400,8 +514,10 @@ func _tap_interact() -> void:
 	var interactor := p.get(&"interactor") as Interactor if p else null
 	if interactor and (interactor.pick_up_arrow() or interactor._harvest() or interactor._forage() or interactor._field()):
 		return
-	dismount()
-	if interactor and _station_near(p):
+	# A station in reach: straight down to use it; otherwise the slide off.
+	var station := interactor != null and _station_near(p)
+	dismount(station)
+	if station:
 		interactor.interact.call_deferred()
 
 
@@ -420,6 +536,28 @@ func _process(delta: float) -> void:
 	var p := _player()
 	if p == null:
 		return
+	_tick_gesture(p, delta)
+	if _answer_in >= 0.0:
+		_answer_in -= delta
+		if _answer_in < 0.0:
+			if unlocked() and mare and is_instance_valid(mare) and mare.state == MareMount.State.COMING:
+				mare.neigh()
+			else:
+				_far_answer()
+	if motion:
+		if mare:
+			mare.steer = Vector3.ZERO
+			mare.gallop = false
+		if not motion.tick(delta):
+			var was := motion.kind
+			motion = null
+			if was == MountMotion.Kind.OFF:
+				_finish_dismount(_off_at, false)
+			else:
+				_last_yaw = NAN
+		elif riding and block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+			dismount(true)
+		return
 	if riding:
 		if _e_down >= 0.0:
 			_e_down += delta
@@ -428,7 +566,7 @@ func _process(delta: float) -> void:
 				dismount()
 				return
 		if block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
-			dismount()
+			dismount(true)
 			return
 		_steer()
 		_place_rider(delta)
@@ -440,7 +578,7 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not riding:
+	if not riding or motion:
 		return
 	_sweep -= delta
 	if _sweep <= 0.0:
