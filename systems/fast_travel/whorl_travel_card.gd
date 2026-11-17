@@ -40,21 +40,33 @@ static func open(tree: SceneTree, here: WhorlStoneDef, dests: Array[WhorlStoneDe
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.theme = SatchelTheme.theme()
+	add_child(root)
+	var scrim := ColorRect.new()
+	scrim.color = SatchelTheme.color(&"scrim")
+	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(scrim)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	root.add_child(center)
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
-	panel.custom_minimum_size = Vector2(820, 0)
+	panel.theme_type_variation = &"SatchelDetail"
+	panel.custom_minimum_size = Vector2(840, 0)
 	center.add_child(panel)
+	var margin := MarginContainer.new()
+	for side in [&"margin_left", &"margin_right", &"margin_top", &"margin_bottom"]:
+		margin.add_theme_constant_override(side, 30)
+	panel.add_child(margin)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 10)
-	panel.add_child(box)
-	var title := UiStyle.label("The stones I've marked", 24)
+	box.add_theme_constant_override(&"separation", 14)
+	margin.add_child(box)
+	var title := _label("The stones I've marked", &"SatchelHeading")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 16)
+	row.add_theme_constant_override(&"separation", 18)
 	box.add_child(row)
 	sketch = WhorlSketch.new()
 	sketch.here = from
@@ -62,30 +74,46 @@ func _ready() -> void:
 	sketch.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(sketch)
 	var list := VBoxContainer.new()
-	list.custom_minimum_size = Vector2(300, 0)
+	list.custom_minimum_size = Vector2(290, 0)
 	list.add_theme_constant_override(&"separation", 8)
 	row.add_child(list)
+	list.add_child(_label("From %s" % WhorlStones.place_label(from), &"SatchelSmall"))
 	for d in to:
-		var b := UiStyle.button(WhorlStones.place_label(d))
+		var b := _tab(WhorlStones.place_label(d))
 		b.name = "Ride_%s" % d.id
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.add_theme_color_override(&"font_focus_color", UiStyle.TEXT)
-		b.add_theme_color_override(&"font_hover_pressed_color", UiStyle.TEXT)
 		var dest := d
 		b.focus_entered.connect(func() -> void: sketch.pick(dest))
 		b.mouse_entered.connect(func() -> void: sketch.pick(dest))
 		b.pressed.connect(func() -> void: choose(dest))
 		list.add_child(b)
 		buttons.append(b)
-	var stay := UiStyle.button("Stay")
+	var stay := _tab("Stay")
 	stay.name = "Stay"
-	stay.add_theme_color_override(&"font_focus_color", UiStyle.TEXT)
 	stay.pressed.connect(close)
 	list.add_child(stay)
 	if not buttons.is_empty():
 		buttons[0].grab_focus.call_deferred()
 		sketch.pick(to[0])
+	panel.pivot_offset = panel.custom_minimum_size * 0.5
 	Juice.bounce_control(panel, 0.05)
+
+
+func _label(text: String, variation: StringName) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.theme_type_variation = variation
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
+
+
+func _tab(text: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.theme_type_variation = &"SatchelTab"
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.focus_mode = Control.FOCUS_ALL
+	b.pressed.connect(func() -> void: Juice.bounce_control(b, 0.06))
+	return b
 
 
 func _unhandled_input(event: InputEvent) -> void:

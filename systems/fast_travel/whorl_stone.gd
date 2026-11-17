@@ -127,9 +127,14 @@ func paint_mark() -> void:
 		tw.tween_property(mark_node, ^"scale", Vector3.ONE, 0.16)
 	Juice.burst(null, &"unlock", global_transform * MARK_AT)
 	# A second, softer shower over the way between the stones, a beat later.
-	get_tree().create_timer(0.18).timeout.connect(func() -> void:
-		if is_inside_tree():
-			Juice.burst(null, &"pickup", global_transform * Vector3(0.0, 1.6, 0.4), 1.25))
+	var later := Timer.new()
+	later.one_shot = true
+	later.wait_time = 0.18
+	add_child(later)
+	later.timeout.connect(func() -> void:
+		Juice.burst(null, &"pickup", global_transform * Vector3(0.0, 1.6, 0.4), 1.25)
+		later.queue_free())
+	later.start()
 	Gameplay.sketchbook.add(StringName("whorl_%s" % def.id), "Whorl stones: %s" % WhorlStones.place_label(def))
 	if is_inside_tree():
 		FindCard.note(get_tree(), WhorlStones.mark_line())

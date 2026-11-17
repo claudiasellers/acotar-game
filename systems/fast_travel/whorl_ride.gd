@@ -1,18 +1,21 @@
 ## The ride between two pairs of whorl stones, off screen (Keeper: "a ride, not
-## a teleport"; the white mare or a court rider takes her, ch 20). The screen
-## fades to a warm dusk with the place's name and a far hoofbeat rhythm, she is
-## held still by the stones until the ground there has loaded, and it fades
-## back. Lives under the root, since the region she leaves unloads.
+## a teleport"; the white mare or a court rider takes her, ch 20). One short
+## beat (about 2.3 s when the ground is ready): the screen fades to the satchel
+## paper, the whorl is inked stroke by stroke, the place's name comes up in the
+## serif, the mare's canter runs under it, and it fades into the arrival. She
+## is held still by the stones until the ground there has loaded. Lives under
+## the root, since the region she leaves unloads. Look from SatchelTheme only.
 class_name WhorlRide
 extends CanvasLayer
 
-const FADE := 0.8
-## How long she stands settled on loaded ground before the veil lifts.
-const SETTLE := 0.6
-## The veil holds at least this long, so the name can be read.
-const MIN_HOLD := 1.2
-const VEIL := Color(0.30, 0.20, 0.30)
-const INK := Color(1.0, 0.94, 0.90)
+const FADE_IN := 0.45
+const FADE_OUT := 0.55
+const INK_TIME := 0.7
+const NAME_TIME := 0.35
+## How long she stands settled on loaded ground before the paper lifts.
+const SETTLE := 0.4
+## The paper holds at least this long after she is sent: the whorl and the name.
+const MIN_HOLD := INK_TIME + NAME_TIME + 0.25
 ## The mare's hooves under the veil, far off: a canter's three beats and a rest.
 const CLOPS: Array[String] = ["res://systems/mount/sounds/clop_1.wav", "res://systems/mount/sounds/clop_2.wav",
 	"res://systems/mount/sounds/clop_3.wav"]
@@ -24,7 +27,8 @@ var timeout: float = 45.0
 var sent: bool = false
 var arrived: bool = false
 
-var _veil: ColorRect
+var _veil: Control
+var _whorl: WhorlInk
 var _title: Label
 var _waited: float = 0.0
 var _settle: float = 0.0
@@ -44,25 +48,44 @@ static func go(tree: SceneTree, dest: WhorlStoneDef) -> WhorlRide:
 func _ready() -> void:
 	layer = 31
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_veil = ColorRect.new()
-	_veil.color = VEIL
+	_veil = Control.new()
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_veil.theme = SatchelTheme.theme()
 	_veil.modulate.a = 0.0
 	add_child(_veil)
-	_title = UiStyle.label(WhorlStones.place_label(to), 34)
-	_title.add_theme_color_override(&"font_color", INK)
+	var paper := PanelContainer.new()
+	paper.theme_type_variation = &"SatchelDetail"
+	paper.set_anchors_preset(Control.PRESET_FULL_RECT)
+	paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_veil.add_child(paper)
+	var center := CenterContainer.new()
+	paper.add_child(center)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 18)
+	center.add_child(col)
+	_whorl = WhorlInk.new()
+	_whorl.custom_minimum_size = Vector2(150, 150)
+	_whorl.ink = SatchelTheme.color(&"ink")
+	_whorl.width = 5.0
+	_whorl.progress = 0.0
+	col.add_child(_whorl)
+	_title = Label.new()
+	_title.text = WhorlStones.place_label(to)
+	_title.theme_type_variation = &"SatchelHeading"
+	_title.add_theme_font_size_override(&"font_size", 46)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_title.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_veil.add_child(_title)
+	_title.modulate.a = 0.0
+	col.add_child(_title)
 	_hooves = AudioStreamPlayer.new()
 	_hooves.volume_db = -16.0
 	add_child(_hooves)
 	var tw := create_tween()
 	tw.set_ignore_time_scale(true)
-	tw.tween_property(_veil, ^"modulate:a", 1.0, FADE)
+	tw.tween_property(_veil, ^"modulate:a", 1.0, FADE_IN).set_trans(Tween.TRANS_SINE)
 	tw.tween_callback(_send)
+	tw.tween_property(_whorl, ^"progress", 1.0, INK_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_property(_title, ^"modulate:a", 1.0, NAME_TIME)
 
 
 func _send() -> void:
@@ -128,7 +151,7 @@ func _done() -> void:
 			p.call(&"recenter_camera")
 	var tw := create_tween()
 	tw.set_ignore_time_scale(true)
-	tw.tween_property(_veil, ^"modulate:a", 0.0, FADE * 1.4)
+	tw.tween_property(_veil, ^"modulate:a", 0.0, FADE_OUT).set_trans(Tween.TRANS_SINE)
 	tw.tween_callback(queue_free)
 
 
