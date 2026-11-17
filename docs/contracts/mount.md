@@ -63,7 +63,7 @@ so position-based checks (wayside, exit conditions, the streamer) see her.
 |---|---|---|
 | H / pad share (`call_mount`, added at runtime) | whistle | |
 | E (`interact`) | on the mare: mount | tap: pick what's in reach from the saddle (forage, arrows, a carcass); a station (bench, nook, snare) or nothing in reach: get down (and use the station). Hold 0.35 s: get down |
-| move | | steer, camera-relative; light stick walks (2.2 m/s), full canters (10) |
+| move | | steer, camera-relative; light stick walks (1.8 m/s), full canters (10) |
 | sprint | | gallop, 15 m/s (capped for streaming: ~20 s look-ahead); the lens widens 12° and the wind rises |
 | jump | | a leap (from 3 m/s) |
 
@@ -72,6 +72,34 @@ and drawn back 1.6 m (`Feyre.camera_lift` / `camera_arm_extra`, eased over
 0.6 s each way) so it looks down past Feyre to the mare's neck and ears; after
 0.8 s without look input it swings in behind her and settles to -18° pitch. The white horse's meshes are in `CameraFade.NEVER_GROUP`,
 so the chase camera's sight-line fade never turns her see-through.
+
+## Feel (L47-6)
+
+- **Getting on and off** is one motion (`MountMotion`, `systems/mount/mount_motion.gd`),
+  never a teleport: the vault on (1.3 s: step to her near side, reach for the
+  pommel, dip, spring, swing the right leg over, settle while the mare dips
+  under her weight) and the slide off (0.9 s: leg back over, down her near side,
+  land on bent knees). At 60 fps no frame moves Feyre's hips more than 0.16 m.
+  A scene, a story beat or the Wall takes her down at once (`dismount(true)`).
+  Steering and the trigger sweep wait while it plays.
+- **The whistle** is a gesture (fingers to her lips, `RidePose` overrides) and
+  she answers ~0.55 s later with a whinny from where she is. Before
+  `fact.mare_ridden` she only answers from the stables and doesn't come.
+- **Called, she presents**: within 14 m of Feyre she curves in to stop 1.55 m
+  off, heading on past her, her near (left) side to Feyre
+  (`MareMount.presenting_spot`), then squares up on the spot. She leaves a
+  drift of pastel petals (`MareTrail`) while she comes.
+- **Gaits**: walk below 2.6 m/s, trot to 6.5, then the gallop clip, whose
+  cadence follows speed by a 0.55 power, never below 0.8 (a canter, not a
+  slow-motion lope). Into a turn Feyre leans to the inside (`RidePose.bank`)
+  and the mare rolls a little.
+- `RidePose.set_override(bone, fwd, up, out, weight)` aims single bones on
+  top of everything, even at `amount` 0 (the vault, the whistle).
+- `WhiteHorse.seat_point()` reads the spine bone's live pose (no attachment lag).
+
+Proof: `tools/playtest/mare_feel_clip.tscn` (real scene, 24 fps frames of
+whistle, mount, ride, dismount, with the numbers); cloud look-dev:
+`tools/mount/mare_stage.tscn`. Test: `tests/unit/mount/test_mount_feel.gd`.
 
 ## Nodes
 

@@ -24,7 +24,8 @@ var speed_override: float = -1.0
 var _destination: Vector3
 var _t: float = 0.0
 var _last: Vector3 = Vector3.INF
-var _seat: BoneAttachment3D
+var _seat_sk: Skeleton3D
+var _seat_bone: int = -1
 
 
 func _ready() -> void:
@@ -45,16 +46,16 @@ func _ready() -> void:
 
 ## Where a rider's hips sit, riding the spine bone through each stride.
 func seat_point() -> Vector3:
-	if _seat == null and model:
+	# Read straight from the spine bone's current pose: a BoneAttachment made
+	# on first use reports the skeleton's origin until its next update (L47-6).
+	if _seat_sk == null and model:
 		var sks := model.find_children("*", "Skeleton3D", true, false)
-		if not sks.is_empty() and (sks.front() as Skeleton3D).find_bone(&"spine") >= 0:
-			_seat = BoneAttachment3D.new()
-			_seat.name = "Seat"
-			_seat.bone_name = "spine"
-			(sks.front() as Skeleton3D).add_child(_seat)
+		if not sks.is_empty():
+			_seat_sk = sks.front() as Skeleton3D
+			_seat_bone = _seat_sk.find_bone(&"spine")
 	var base := global_position + Vector3.UP * 1.25
-	if _seat and _seat.is_inside_tree():
-		base = _seat.global_position
+	if _seat_sk and _seat_bone >= 0 and _seat_sk.is_inside_tree():
+		base = _seat_sk.global_transform * _seat_sk.get_bone_global_pose(_seat_bone).origin
 	return base + global_basis * SEAT_OFFSET
 
 

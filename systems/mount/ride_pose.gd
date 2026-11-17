@@ -3,7 +3,10 @@
 ## Skeleton3D after the AnimationTree and aims each bone at a direction in her
 ## own frame (forward, up, her left), read from the rest pose, so it works on
 ## the shared cast rig whatever its bone axes. `amount` 0..1 eases it in and out;
-## `lean` 0..1 tips the upper body forward; `bounce` is the gait's lift (m).
+## `lean` 0..1 tips the upper body forward; `bank` -1..1 tips it into a turn
+## (positive: toward her left). Overrides (set_override) aim single bones on
+## top of everything with their own weight, even at amount 0: the swing up
+## into the saddle, the slide down, the whistle to her lips (L47-6).
 class_name RidePose
 extends SkeletonModifier3D
 
@@ -22,9 +25,23 @@ const AIMS := [
 	[&"RightLowerArm", &"RightHand", 0.9, -0.15, -0.38],
 ]
 const LEAN_BONES := {&"Spine": 10.0, &"Chest": 8.0, &"Neck": -8.0}
+## Into a turn: spine and chest roll toward the inside, the neck keeps the head level.
+const BANK_BONES := {&"Spine": 7.0, &"Chest": 5.0, &"Neck": -9.0}
+## Parents before children: the order overrides are applied in.
+const OVERRIDE_ORDER: Array[StringName] = [&"Hips", &"Spine", &"Chest", &"Neck", &"Head",
+	&"LeftUpperLeg", &"RightUpperLeg", &"LeftLowerLeg", &"RightLowerLeg", &"LeftFoot", &"RightFoot",
+	&"LeftShoulder", &"RightShoulder", &"LeftUpperArm", &"RightUpperArm", &"LeftLowerArm", &"RightLowerArm",
+	&"LeftHand", &"RightHand"]
+## Each bone's child, for aiming it.
+const CHILD_OF := {&"LeftUpperLeg": &"LeftLowerLeg", &"RightUpperLeg": &"RightLowerLeg",
+	&"LeftLowerLeg": &"LeftFoot", &"RightLowerLeg": &"RightFoot", &"LeftFoot": &"LeftToes",
+	&"RightFoot": &"RightToes", &"LeftUpperArm": &"LeftLowerArm", &"RightUpperArm": &"RightLowerArm",
+	&"LeftLowerArm": &"LeftHand", &"RightLowerArm": &"RightHand", &"Spine": &"Chest", &"Chest": &"Neck",
+	&"Neck": &"Head"}
 
 var amount: float = 0.0
 var lean: float = 0.0
+var bank: float = 0.0
 ## The skeleton-space frame: x = her forward, y = up, z = her left.
 var forward := Vector3.FORWARD
 var up := Vector3.UP
@@ -34,6 +51,8 @@ var hip_height: float = 0.95
 
 var _aims: Array = []  # [bone, child, Vector3 want]
 var _lean: Dictionary = {}  # bone -> radians
+var _bank: Dictionary = {}  # bone -> radians
+var _over: Dictionary = {}  # bone name -> [fwd, up, out, weight]
 
 
 static func attach(sk: Skeleton3D) -> RidePose:
@@ -80,6 +99,35 @@ func _read_frame(sk: Skeleton3D) -> void:
 		var i := sk.find_bone(bone)
 		if i >= 0:
 			_lean[i] = deg_to_rad(float(LEAN_BONES[bone]))
+	_bank.clear()
+	for bone: StringName in BANK_BONES:
+		var i := sk.find_bone(bone)
+		if i >= 0:
+			_bank[i] = deg_to_rad(float(BANK_BONES[bone]))
+
+
+## Aims `bone` at a direction in her own frame (forward, up, and out to that
+## bone's side: her left for Left* bones, her right for Right* ones), blended
+## over whatever else posed it by `weight` 0..1. Weight 0 removes it.
+func set_override(bone: StringName, fwd: float, up_amount: float, out: float, weight: float) -> void:
+	if weight <= 0.001:
+		_over.erase(bone)
+	else:
+		_over[bone] = [fwd, up_amount, out, minf(weight, 1.0)]
+
+
+func clear_overrides() -> void:
+	_over.clear()
+
+
+func has_overrides() -> bool:
+	return not _over.is_empty()
+
+
+## The world-free direction an override asks for, in skeleton space.
+func override_dir(bone: StringName, fwd: float, up_amount: float, out: float) -> Vector3:
+	var side := 1.0 if String(bone).begins_with("Left") else (-1.0 if String(bone).begins_with("Right") else 0.0)
+	return (forward * fwd + up * up_amount + left * side * out).normalized()
 
 
 ## The bone each aim drives, for tests.
@@ -92,11 +140,41 @@ func driven_bones() -> PackedStringArray:
 
 
 func _process_modification() -> void:
-	if amount <= 0.001:
-		return
 	var sk := get_skeleton()
 	if sk == null:
 		return
+	if amount > 0.001:
+		_seat_pose(sk)
+	if not _over.is_empty():
+		_apply_overrides(sk)
+
+
+func _apply_overrides(sk: Skeleton3D) -> void:
+	for bone: StringName in OVERRIDE_ORDER:
+		if not _over.has(bone) or not CHILD_OF.has(bone):
+			continue
+		var o: Array = _over[bone]
+		var b := sk.find_bone(bone)
+		var c := sk.find_bone(CHILD_OF[bone])
+		if b < 0 or c < 0:
+			continue
+		_aim(sk, b, c, override_dir(bone, o[0], o[1], o[2]), float(o[3]))
+
+
+func _aim(sk: Skeleton3D, b: int, c: int, target: Vector3, w: float) -> void:
+	var g := sk.get_bone_global_pose(b)
+	var cur := sk.get_bone_global_pose(c).origin - g.origin
+	if cur.length_squared() < 1e-8:
+		return
+	cur = cur.normalized()
+	var want: Vector3 = cur.slerp(target, w).normalized()
+	var turn := Quaternion(cur, want) if cur.dot(want) > -0.999 else Quaternion(up, PI)
+	var parent := sk.get_bone_parent(b)
+	var pg := sk.get_bone_global_pose(parent) if parent >= 0 else Transform3D.IDENTITY
+	sk.set_bone_pose_rotation(b, (pg.basis.inverse() * (Basis(turn) * g.basis)).get_rotation_quaternion())
+
+
+func _seat_pose(sk: Skeleton3D) -> void:
 	# Lean: pitch forward about her left axis (in each bone's parent space).
 	if lean > 0.001:
 		for i: int in _lean:
@@ -106,19 +184,15 @@ func _process_modification() -> void:
 				axis = (sk.get_bone_global_pose(parent).basis.inverse() * left).normalized()
 			var q := sk.get_bone_pose_rotation(i)
 			sk.set_bone_pose_rotation(i, Quaternion(axis, float(_lean[i]) * lean * amount) * q)
+	# Bank: roll about her forward axis toward the inside of the turn.
+	if absf(bank) > 0.001:
+		for i: int in _bank:
+			var parent := sk.get_bone_parent(i)
+			var axis := forward
+			if parent >= 0:
+				axis = (sk.get_bone_global_pose(parent).basis.inverse() * forward).normalized()
+			var q := sk.get_bone_pose_rotation(i)
+			sk.set_bone_pose_rotation(i, Quaternion(axis, -float(_bank[i]) * bank * amount) * q)
 	# Aims, parents first (the table is ordered that way).
 	for a: Array in _aims:
-		var b: int = a[0]
-		var c: int = a[1]
-		var g := sk.get_bone_global_pose(b)
-		var child := sk.get_bone_global_pose(c)
-		var cur := child.origin - g.origin
-		if cur.length_squared() < 1e-8:
-			continue
-		cur = cur.normalized()
-		var want: Vector3 = cur.slerp(a[2], amount).normalized()
-		var turn := Quaternion(cur, want) if cur.dot(want) > -0.999 else Quaternion(up, PI)
-		var parent := sk.get_bone_parent(b)
-		var pg := sk.get_bone_global_pose(parent) if parent >= 0 else Transform3D.IDENTITY
-		var new_global := Basis(turn) * g.basis
-		sk.set_bone_pose_rotation(b, (pg.basis.inverse() * new_global).get_rotation_quaternion())
+		_aim(sk, a[0], a[1], a[2], amount)
