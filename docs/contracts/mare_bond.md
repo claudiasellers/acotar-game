@@ -2,7 +2,7 @@
 
 Owner: the mount lane (L47). Paths: `systems/mount/`, `data/mount/`,
 `tools/mount/`, `tools/blender/white_mare.py`, `tools/blender/mare_decor.py`,
-`creatures/models/fae/mare_decor/`, `ui/mare/`, `tests/unit/mount/`,
+`systems/mount/models/`, `ui/mare/`, `tests/unit/mount/`,
 `tools/playtest/mare_feel_clip.*`, this file. Changing a name or rule here
 needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
 

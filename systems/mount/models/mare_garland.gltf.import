@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bb1i8lb6fln3t"
-path="res://.godot/imported/mare_tail_bow.gltf-f8f852eed7c021bb97e5169c5d3ce8da.scn"
+uid="uid://cyvts083jfi7r"
+path="res://.godot/imported/mare_garland.gltf-24d4903e4ef5b503937f878359b03746.scn"
 
 [deps]
 
-source_file="res://creatures/models/fae/mare_decor/mare_tail_bow.gltf"
-dest_files=["res://.godot/imported/mare_tail_bow.gltf-f8f852eed7c021bb97e5169c5d3ce8da.scn"]
+source_file="res://systems/mount/models/mare_garland.gltf"
+dest_files=["res://.godot/imported/mare_garland.gltf-24d4903e4ef5b503937f878359b03746.scn"]
 
 [params]
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bxfq5usjudl4t"
-path="res://.godot/imported/mare_mane_bows.gltf-3969aff785fd7baac9358f354fa78b4a.scn"
+uid="uid://cr8a1cslkeydl"
+path="res://.godot/imported/mare_tail_bow.gltf-6d65b1eb51c020adc691d3dd2ef98596.scn"
 
 [deps]
 
-source_file="res://creatures/models/fae/mare_decor/mare_mane_bows.gltf"
-dest_files=["res://.godot/imported/mare_mane_bows.gltf-3969aff785fd7baac9358f354fa78b4a.scn"]
+source_file="res://systems/mount/models/mare_tail_bow.gltf"
+dest_files=["res://.godot/imported/mare_tail_bow.gltf-6d65b1eb51c020adc691d3dd2ef98596.scn"]
 
 [params]
 

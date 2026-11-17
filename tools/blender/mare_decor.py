@@ -3,7 +3,7 @@ a garland of oversized blooms round her neck, ribbon bows down her mane and a
 big bow at her tail. R3 princess dress-up [X]: nothing in the book.
 
 Run:  /opt/bpyenv/bin/python tools/blender/mare_decor.py [out_dir]
-Out:  creatures/models/fae/mare_decor/<piece>.gltf, each in the white horse's
+Out:  systems/mount/models/<piece>.gltf (props, not creatures: no skeleton), each in the white horse's
       own model space (feet at origin, facing -Z in Godot), so the game hangs a
       piece on a bone of hers without any offset (systems/mount/mare_look.gd).
 
@@ -27,7 +27,7 @@ import creatures as base  # noqa: E402
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, "..", ".."))
 HORSE = os.path.join(REPO, "creatures", "models", "fae", "white_horse.gltf")
-base.OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "creatures", "models", "fae", "mare_decor")
+base.OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "systems", "mount", "models")
 
 # Godot-space bone heads (feet at origin, -Z forward) from the horse's rig;
 # Blender space is (x, -z, y).

@@ -6,7 +6,7 @@
 extends SceneTree
 
 const OUT := "res://data/mount/decor"
-const MODELS := "res://creatures/models/fae/mare_decor/"
+const MODELS := "res://systems/mount/models/"
 
 ## The R3 candy palette, each under the cap.
 const ROSE := Color(0.85, 0.6, 0.7)
