@@ -67,7 +67,17 @@ func test_the_look_recolours_her_and_hangs_pieces() -> void:
 	MareLook.apply(horse, outfit, 1.0)
 	var mi := MareLook._mesh(horse)
 	var idx := MareLook._surface_index(mi)
-	var cloth := mi.get_surface_override_material(idx["SaddleCloth"])
+	# The cloth is on the saddle now (MareSaddle, L47-8), not her own mesh.
+	var saddle: MeshInstance3D = null
+	var at := -1
+	for m in MareSaddle.saddle_meshes(horse):
+		if MareLook._surface_index(m).has("SaddleCloth"):
+			saddle = m
+			at = MareLook._surface_index(m)["SaddleCloth"]
+	assert_not_null(saddle, "the saddle has a cloth")
+	if saddle == null:
+		return
+	var cloth := saddle.get_surface_override_material(at)
 	assert_not_null(cloth, "the saddle cloth is recoloured")
 	assert_almost_eq((cloth.get(&"albedo_color") as Color).g, MareTack.piece(&"cloth_mint").colors[0].g, 0.01)
 	assert_not_null(mi.get_surface_override_material(idx["Coat"]), "her groomed coat")
@@ -75,7 +85,7 @@ func test_the_look_recolours_her_and_hangs_pieces() -> void:
 	assert_has(MareLook.hung(horse), "tail")
 	MareLook.apply(horse, {}, 0.0)
 	assert_eq(MareLook.hung(horse).size(), 0, "pieces come off")
-	assert_null(mi.get_surface_override_material(idx["SaddleCloth"]), "back to her own")
+	assert_null(saddle.get_surface_override_material(at), "back to her own")
 
 
 func test_brushing_shines_and_fades() -> void:
