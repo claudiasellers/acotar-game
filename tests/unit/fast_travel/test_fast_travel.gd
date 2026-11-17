@@ -51,7 +51,8 @@ func test_one_pair_per_open_region_on_flat_named_ground() -> void:
 		regions[d.region_id] = true
 		assert_true(REGIONS.has(d.region_id), "%s is an open Spring region" % d.region_id)
 		assert_eq(d.canon, "X", "placement tagged canon X (%s)" % d.id)
-		assert_ne(WhorlStones.place_label(d), String(d.place_id).capitalize(), "%s names a map place" % d.id)
+		var places := (load(WhorlStones.PLACES_PATH) as MapPlaceSet).places.map(func(m: MapPlace) -> StringName: return m.id)
+		assert_has(places, d.place_id, "%s names a map place" % d.id)
 		assert_lte(PLACER.footprint_slope(d.position, d.yaw_degrees), PLACER.MAX_SLOPE, "%s stands on flat ground" % d.id)
 		assert_eq(d.blight, d.region_id == &"blighted_reaches", "only the Reaches' pair is blighted")
 
