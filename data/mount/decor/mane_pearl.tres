@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_b1qh6"]
+
+[resource]
+script = ExtResource("1_b1qh6")
+id = &"mane_pearl"
+display_name = "Pearl-white mane"
+slot = &"mane"
+tint_surfaces = PackedStringArray("ManeBlush", "ManeLilac", "ManeRose")
+colors = PackedColorArray(0.84, 0.82, 0.8, 1, 0.8, 0.8, 0.84, 1, 0.85, 0.72, 0.76, 1)
+pearl = 0.35
+inputs = {
+"ing_chalk": 1,
+"tag:bloom_pearl": 3
+}

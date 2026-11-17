@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_dnag2"]
+
+[resource]
+script = ExtResource("1_dnag2")
+id = &"hooves_bare"
+display_name = "Bare hooves"
+slot = &"hooves"
+blurb = "Clean and oiled."
+tint_surfaces = PackedStringArray("Hoof")
+colors = PackedColorArray()

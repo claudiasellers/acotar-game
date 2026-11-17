@@ -145,4 +145,38 @@ func _play() -> void:
 		return _fail("still in the saddle")
 	_note("slide off %.2f s, peak hip speed %.1f m/s" % [dm.t if dm else -1.0, dm.max_hip_speed if dm else -1.0])
 	_pass()
+
+	_begin("tend", "hold E: brush her to a gleam, feed her, make and put on a garland, bows and a lilac saddle cloth")
+	for id: String in ["ing_lilac", "ing_lavender", "ing_crocus", "ing_heather"]:
+		Gameplay.inventory.add(StringName(id), 3)
+	Gameplay.inventory.add(&"ing_spider_silk", 6)
+	Gameplay.inventory.add(&"ing_manor_fruit", 2)
+	var v := director.open_tending()
+	if v == null:
+		return _fail("tending would not open (mare state %s)" % director.mare.state)
+	_record("tend")
+	await _wait(0.8)
+	for i in 48:
+		v._brush_at = Vector2(v.size.x * (0.18 + 0.12 * sin(i * 0.4)), v.size.y * 0.45)
+		v._stroke(0.2)
+		await get_tree().process_frame
+	await _wait(0.6)
+	v._feed(&"ing_manor_fruit", null)
+	await _wait(1.6)
+	for id: StringName in [&"garland_lilac", &"bows_lilac", &"cloth_lilac"]:
+		var piece := MareTack.piece(id)
+		v._show(MareTack.SLOT_NAMES[piece.slot])
+		await _wait(0.5)
+		if not MareTack.owned(id) and not MareTack.make(piece, Gameplay.inventory):
+			_note("  could not make %s" % id)
+			continue
+		MareTack.wear(piece)
+		v._apply(true)
+		v._show(MareTack.SLOT_NAMES[piece.slot])
+		await _wait(1.2)
+	_note("shine %.2f, worn %s, hung %s" % [MareCare.shine(), MareTack.worn(), MareLook.hung(director.mare.horse)])
+	v.close()
+	await _wait(1.0)
+	_stop_recording()
+	_pass()
 	_finish(0)

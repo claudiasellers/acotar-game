@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_w1ihm"]
+
+[resource]
+script = ExtResource("1_w1ihm")
+id = &"cloth_rose"
+display_name = "Rose saddle cloth"
+slot = &"cloth"
+blurb = "The cloth she came to me in."
+tint_surfaces = PackedStringArray("SaddleCloth")
+colors = PackedColorArray()

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_0y53d"]
+
+[resource]
+script = ExtResource("1_0y53d")
+id = &"bows_sky"
+display_name = "Periwinkle mane bows"
+slot = &"bows"
+tint_surfaces = PackedStringArray()
+model = "res://creatures/models/fae/mare_decor/mare_mane_bows.gltf"
+bone = &"neck"
+colors = PackedColorArray(0.62, 0.68, 0.85, 1)
+pearl = 0.3
+inputs = {
+"tag:bloom_sky": 1,
+"tag:cordage": 2
+}

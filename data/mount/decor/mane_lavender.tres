@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_nl6u7"]
+
+[resource]
+script = ExtResource("1_nl6u7")
+id = &"mane_lavender"
+display_name = "Lavender-mist mane"
+slot = &"mane"
+tint_surfaces = PackedStringArray("ManeBlush", "ManeLilac", "ManeRose")
+colors = PackedColorArray(0.72, 0.62, 0.84, 1, 0.78, 0.7, 0.85, 1, 0.66, 0.56, 0.8, 1)
+pearl = 0.35
+inputs = {
+"ing_violet": 1,
+"tag:bloom_lilac": 3
+}

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_hlhex"]
+
+[resource]
+script = ExtResource("1_hlhex")
+id = &"tack_pearl"
+display_name = "Pearl tack"
+slot = &"tack"
+tint_surfaces = PackedStringArray("Gold")
+colors = PackedColorArray(0.84, 0.8, 0.78, 1)
+pearl = 0.5
+inputs = {
+"ing_chalk": 1,
+"ing_snail_shell": 2
+}

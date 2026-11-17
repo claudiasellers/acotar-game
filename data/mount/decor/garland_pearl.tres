@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_fhp81"]
+
+[resource]
+script = ExtResource("1_fhp81")
+id = &"garland_pearl"
+display_name = "Pearl neck garland"
+slot = &"garland"
+tint_surfaces = PackedStringArray()
+model = "res://creatures/models/fae/mare_decor/mare_garland.gltf"
+bone = &"neck"
+colors = PackedColorArray(0.84, 0.82, 0.8, 1)
+inputs = {
+"tag:bloom_pearl": 5,
+"tag:cordage": 1
+}

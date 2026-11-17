@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_tcmyi"]
+
+[resource]
+script = ExtResource("1_tcmyi")
+id = &"tail_rose"
+display_name = "Rose tail bow"
+slot = &"tail"
+tint_surfaces = PackedStringArray()
+model = "res://creatures/models/fae/mare_decor/mare_tail_bow.gltf"
+bone = &"tail0"
+colors = PackedColorArray(0.85, 0.6, 0.7, 1)
+pearl = 0.3
+inputs = {
+"tag:bloom_rose": 2,
+"tag:cordage": 1
+}

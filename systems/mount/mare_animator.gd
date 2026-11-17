@@ -84,6 +84,15 @@ func balk() -> void:
 		_busy = anim.get_animation(c).length / 0.8 * 0.8
 
 
+## Head down to take a treat from Feyre's hand: a moment of the graze clip.
+func nibble() -> void:
+	if anim == null or not anim.has_animation(&"graze"):
+		return
+	anim.play(&"graze", 0.2, 1.3)
+	clip = &"graze"
+	_busy = 1.6
+
+
 func _process(delta: float) -> void:
 	if anim == null:
 		return

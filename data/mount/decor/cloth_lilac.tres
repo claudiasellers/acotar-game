@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_oced2"]
+
+[resource]
+script = ExtResource("1_oced2")
+id = &"cloth_lilac"
+display_name = "Lilac saddle cloth"
+slot = &"cloth"
+tint_surfaces = PackedStringArray("SaddleCloth")
+colors = PackedColorArray(0.72, 0.62, 0.84, 1)
+pearl = 0.25
+inputs = {
+"tag:bloom_lilac": 4,
+"tag:cordage": 1
+}

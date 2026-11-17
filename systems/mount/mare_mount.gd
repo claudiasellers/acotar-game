@@ -82,6 +82,7 @@ func _ready() -> void:
 	horse = HORSE_SCENE.instantiate() as WhiteHorse
 	horse.actor_id = &"white_mare"  # never answers the ch5 ride's cues
 	add_child(horse)
+	refresh_look.call_deferred()
 	_voice = _player("Voice", -4.0)
 	_hooves = _player("Hooves", -10.0)
 	set_mountable(state != State.RIDDEN)
@@ -162,6 +163,24 @@ func neigh() -> void:
 
 func snort() -> void:
 	_say(SNORT)
+
+
+## A soft, pleased nicker: her whinny low and quiet (tended, fed, dressed).
+func nicker() -> void:
+	if _voice and _voice.is_inside_tree():
+		_voice.stream = WHINNY
+		_voice.pitch_scale = randf_range(0.78, 0.86)
+		_voice.volume_db = -14.0
+		_voice.play()
+		get_tree().create_timer(1.2).timeout.connect(func() -> void:
+			if is_instance_valid(_voice):
+				_voice.volume_db = -4.0)
+
+
+## Lays her dress-up and groomed shine on her (MareLook); called on spawn and after changes.
+func refresh_look() -> void:
+	if horse:
+		MareLook.apply(horse, MareTack.outfit(), MareCare.shine())
 
 
 func request_leap() -> void:

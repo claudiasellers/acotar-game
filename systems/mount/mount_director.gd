@@ -87,6 +87,14 @@ var _far_voice: AudioStreamPlayer3D
 var _last_yaw: float = NAN
 var _bank: float = 0.0
 
+## Hold E this long beside her to tend her instead of mounting (s).
+const HOLD_TEND := 0.4
+const TEND_HINT := "Hold E beside her to brush her, feed her and dress her up."
+
+var tending: MareTendingView
+var _use_held: float = -1.0
+var _use_user: Node
+
 ## The whistle gesture's length (s), and when she answers after it (s).
 const GESTURE_TIME := 0.95
 const ANSWER_DELAY := 0.55
@@ -198,7 +206,7 @@ func spawn_mare(at: Vector3, yaw: float) -> MareMount:
 	parent.add_child(mare)
 	mare.global_position = at
 	mare.rotation.y = yaw
-	mare.used.connect(func(user: Node) -> void: mount(user))
+	mare.used.connect(_on_used)
 	_add_prompt()
 	return mare
 
@@ -224,7 +232,7 @@ func ground_at(x: float, z: float) -> float:
 ## The whistle. Returns true when she answers.
 func whistle() -> bool:
 	var p := _player()
-	if p == null or riding:
+	if p == null or riding or tending:
 		return false
 	if motion:
 		return false
@@ -325,6 +333,47 @@ func _out_of_sight(p: Node3D, dist: float) -> Vector3:
 
 
 # ------------------------------------------------------------------ saddle
+
+## E on her: a tap mounts, a hold opens tending (decided on release or at HOLD_TEND).
+func _on_used(user: Node) -> void:
+	if riding or motion or tending:
+		return
+	if not Input.is_action_pressed(&"interact"):
+		mount(user)  # a press already released (or a scripted use)
+		return
+	_use_held = 0.0
+	_use_user = user
+
+
+func _tick_use(delta: float) -> void:
+	if _use_held < 0.0:
+		return
+	if Input.is_action_pressed(&"interact"):
+		_use_held += delta
+		if _use_held >= HOLD_TEND:
+			_use_held = -1.0
+			open_tending()
+	else:
+		_use_held = -1.0
+		mount(_use_user)
+
+
+## Opens the tending screen beside her (brush, treats, dress-up). Null if she isn't standing by.
+func open_tending() -> MareTendingView:
+	var p := _player()
+	if p == null or mare == null or riding or motion or tending or mare.state != MareMount.State.STANDING:
+		return null
+	if block_reason(p.global_position) in [&"scene", &"story"]:
+		return null
+	if _prompt and is_instance_valid(_prompt):
+		_prompt.visible = false
+	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
+	tending.closed.connect(func() -> void:
+		tending = null
+		if mare and is_instance_valid(mare):
+			mare.refresh_look())
+	return tending
+
 
 func can_mount() -> bool:
 	var p := _player()
@@ -429,6 +478,9 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
 		FindCard.note(get_tree(), HINT)
+	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
+		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
+		FindCard.note(get_tree(), TEND_HINT)
 	dismounted.emit()
 
 
@@ -537,6 +589,7 @@ func _process(delta: float) -> void:
 	if p == null:
 		return
 	_tick_gesture(p, delta)
+	_tick_use(delta)
 	if _answer_in >= 0.0:
 		_answer_in -= delta
 		if _answer_in < 0.0:
@@ -572,6 +625,8 @@ func _process(delta: float) -> void:
 		_place_rider(delta)
 		_speed_feel(p, delta)
 		_follow_camera(p, delta)
+		return
+	if tending:
 		return
 	_keep_mare(p)
 	_update_prompt(p)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_b1ljw"]
+
+[resource]
+script = ExtResource("1_b1ljw")
+id = &"hooves_pearl"
+display_name = "Pearl hoof polish"
+slot = &"hooves"
+tint_surfaces = PackedStringArray("Hoof")
+colors = PackedColorArray(0.84, 0.82, 0.8, 1)
+pearl = 0.8
+inputs = {
+"ing_snail_shell": 1
+}

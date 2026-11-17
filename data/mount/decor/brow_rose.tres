@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MareDecor" format=3]
+
+[ext_resource type="Script" path="res://data/mount/mare_decor.gd" id="1_rytt6"]
+
+[resource]
+script = ExtResource("1_rytt6")
+id = &"brow_rose"
+display_name = "Rose brow blooms"
+slot = &"brow"
+tint_surfaces = PackedStringArray("BloomRose", "BloomButter", "BloomPeri")
+colors = PackedColorArray(0.85, 0.6, 0.7, 1, 0.85, 0.72, 0.76, 1, 0.85, 0.6, 0.7, 1)
+pearl = 0.2
+inputs = {
+"tag:bloom_rose": 3
+}
