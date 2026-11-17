@@ -967,5 +967,42 @@ Numbers (my probe): 481 trees, 5.2 a hectare; 59 of 67 knoll tops crowned;
 Frame time on the Mac, look quality: the dell 23.7 ms, the ford 23.9, the
 mere's parting 24.0, the pool 27.8 (as before).
 
-Still to do, in order: the north loop (8 to 11 with I to K), the rims (12
-with L).
+Still to do then: the north loop and the rims.
+
+### State: the whole glen is composed (2026-11-17)
+
+Owner, on the main walk and the south loop: "looks great go ahead and push".
+M4WCT-20-1 (the south loop) is in `origin/main`. Places 8 to 12 and
+transitions I to L are in `CourtGlenPlaces`: the Aspen Row, the Oak Glade's
+ring, doors and floor of anemones, Looking Lake's two elms, far wood and
+painted mirror, the Heron Stones' reed bed, Watchers' Run and the west rim's
+gathering clumps. `CourtGlenPlanting` keeps the pool's hollow, the rule knolls
+(now by place: birch round the pool, thorn and aspen on the rims), the brooks'
+bank plants and the river's clumps; its lake, mere and brae rules are gone.
+Made for it: wood anemones (`tools/grove`), the mirror in `court_water.gdshader`
+(instance uniforms on the lake's mesh). Views: `road_01_row` to
+`oak_03_floor`, `lake_01_rise` to `lake_03_shore`, `heron_01`, `heron_02`,
+`rim_01_run` to `rim_03_west`.
+
+Where it falls short of the plan, said plainly:
+
+- **The Oak Glade is a ring, not a roof.** The story's clearing is 110 m
+  across and stays open, so the hall is the ring of shade round it; you stand
+  in light looking at a wall of oak. Closing it overhead would mean shrinking
+  the clearing, which is the story's.
+- **The mirror is a shade on the water, not a picture of the trees**: a dark
+  band with a crown-shaped upper edge, bluer than the wood. It reads as a
+  reflection from the walk's end and from the shore; it does not show trunks.
+- **The reed bed is straw-coloured** (the woods' reed, as it comes) on dry
+  ground: the Heron Stones stand 90 m from any water.
+- **The long grass on Watchers' Run hardly shows** against the sward at
+  walking distance; the thorn bushes carry that place.
+
+Numbers (my probe): 555 trees, 6.0 a hectare (the table allows 2 to 7); 59 of
+67 knoll tops crowned; 55% of bluebell patches within 15.5 m of a trunk; no
+trunk on kept-open ground; 1419 batches of 1500. Frame time on the Mac, look
+quality: the oak glade 23.4 ms, the lake's shore 20.5, the pool 26.7, the
+brae 23.1.
+
+Next: the next place (the Western Woods has its oak and elm), on the same
+method: a plan per place and per transition, then the walk.
