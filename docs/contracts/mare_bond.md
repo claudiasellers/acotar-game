@@ -98,7 +98,7 @@ What the player sees instead of text (R2):
 ## Saddle, seat and reins (L47-8, from the slice 1 look review)
 
 - `tools/blender/mare_saddle.py` builds `systems/mount/models/mare_saddle.gltf`
-  (2.6k tris). It has a dished seat with a pommel and cantle, gold piping,
+  (1.8k tris, inside the mare's 15k creature budget). It has a dished seat with a pommel and cantle, gold piping,
   skirts, a scalloped rose cloth, a girth, and leathers with gold irons. It is
   fitted over her coat from the rest mesh.
 - `MareSaddle.dress` (called by `WhiteHorse._ready`, so the story horse

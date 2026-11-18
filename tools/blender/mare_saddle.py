@@ -14,8 +14,9 @@ Out:  systems/mount/models/mare_saddle.gltf (a prop, not a creature), in the whi
 It is fitted to her body: every surface is laid at a set height over her coat,
 read from the imported white_horse.gltf rest pose, so nothing floats or sinks.
 The game recolours surfaces by material name: SaddleCloth (the cloth slot),
-Gold (the tack slot); SaddleSeat stays pearl leather. Props budget: under 3k
-tris (R4). Smooth-shaded, the seat built with Subsurf.
+Gold (the tack slot); SaddleSeat stays pearl leather. Props budget: under 2k
+tris, because it counts toward the mare's 15k creature budget (R4, test_mount.gd).
+Smooth-shaded throughout.
 """
 
 import math
@@ -163,7 +164,7 @@ def modify(obj, kind, **kw):
 
 def cloth(coat, m):
     """The rose saddle cloth: a rounded pad over her back, scalloped hem."""
-    rows, cols = 10, 16
+    rows, cols = 8, 14
     y0, y1 = CENTRE_Y - 0.30, CENTRE_Y + 0.33
     amax = math.radians(68)
 
@@ -202,7 +203,7 @@ SEAT_Y = (CENTRE_Y - 0.25, CENTRE_Y + 0.27)
 def seat(coat, m):
     """The seat: dished in the middle, a pommel rising at the front and a
     cantle at the back, the leather narrowing toward the pommel."""
-    rows, cols = 7, 6
+    rows, cols = 10, 8
     y0, y1 = SEAT_Y
 
     def point(i, j):
@@ -213,7 +214,6 @@ def seat(coat, m):
     obj = grid_object("SaddleSeat", rows, cols, point, m)
     outward(obj)
     modify(obj, "SOLIDIFY", thickness=0.03, offset=-1.0)
-    modify(obj, "SUBSURF", levels=1, render_levels=1)
     return obj
 
 
@@ -281,8 +281,8 @@ def rolls(coat, m):
     y0, y1 = SEAT_Y
     for v in (0.0, 1.0):
         pts = []
-        for k in range(13):
-            u = k / 12 * 2 - 1
+        for k in range(9):
+            u = k / 8 * 2 - 1
             pts.append(coat.at(y0 + (y1 - y0) * v, u * seat_width(v), seat_lift(v, u) + 0.004))
         parts.append(tube("Roll", pts, 0.014, m))
     return parts
@@ -325,7 +325,7 @@ def main():
     parts += stirrups(coat, m["seat"], m["gold"])
     joined = base.join(parts, "mare_saddle")
     n = base.tris([joined])
-    assert n <= 3000, f"mare_saddle: {n} tris over the 3k props budget"
+    assert n <= 2000, f"mare_saddle: {n} tris over its 2k share of the mare's budget"
     base.export("mare_saddle", [joined])
 
 
