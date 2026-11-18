@@ -20,7 +20,7 @@ sys.path.insert(0, HERE)
 import va_checkpoint as ck  # noqa: E402
 import va_directions as vd  # noqa: E402
 import va_pictos as vp  # noqa: E402
-from va_common import HORROR, SPRING, arc_d, circ, f, g, leaf, line, mix, path, pol, pts_d, star4, svg  # noqa: E402
+from va_common import HORROR, SPRING, arc_d, circ, f, g, leaf, line, mix, path, pol, pts_d, rose, star4, svg  # noqa: E402
 
 S, H, C = SPRING, HORROR, 128
 OUT = {}
@@ -29,26 +29,33 @@ BLUR = ('<filter id="b2" x="-40%" y="-40%" width="180%" height="180%"><feGaussia
 
 
 def pal_white():
+    """Fine white line glyphs with a faint fill: the polished, readable-at-a-glance look."""
     p = dict(S)
     for k in list(p):
-        if k not in ("gold", "gold_dk", "gold_lt"):
-            p[k] = "#FFFFFF"
-    p.update({"ink": "rgba(52,28,64,0.62)", "wood": "#FFFFFF", "cake": "#FFFFFF", "deep": "#FFD0E0", "amber": "#FFE7A8", "coral": "#FFD2C4", "leaf": "#E4FFEA"})
+        p[k] = "rgba(255,255,255,0.16)"
+    p.update({"ink": "#FFFFFF", "white": "rgba(255,255,255,0.3)", "deep": "rgba(255,190,214,0.75)", "amber": "rgba(255,226,150,0.8)",
+              "butter": "rgba(255,236,170,0.55)", "gold": "#F3DFA2", "gold_dk": "#F3DFA2", "gold_lt": "#FFFFFF"})
     return p
+
+
+GOLD = "#EBD08A"
 
 
 def chip(tag, frac=0.7):
     if tag in vd.BUFF_FN:
         fn, key = vd.BUFF_FN[tag]
         col = S[key] if key != "pearl" else "#F6D4E2"
-        defs = BLUR + (f'<radialGradient id="tg" cx="0.5" cy="0.85" r="0.9"><stop offset="0" stop-color="{col}" stop-opacity="0.85"/>'
-                       f'<stop offset="0.7" stop-color="{mix(col, "#2A1838", 0.55)}" stop-opacity="0.62"/><stop offset="1" stop-color="#2A1838" stop-opacity="0.55"/></radialGradient>')
-        body = circ(C, C, 92, "url(#tg)") + circ(C, C, 92, "none", "#FFFFFF", 2.5, 'opacity="0.55"')
-        body += path(arc_d(C, C, 92, 0, 360 * frac - 0.01), "none", "#FFF3C4", 7, 'filter="url(#b2)" opacity="0.8"') + path(
-            arc_d(C, C, 92, 0, 360 * frac - 0.01), "none", "#FFFFFF", 5)
-        body += g(vp.at(fn(pal_white()), 0.7), extra='filter="url(#b2)" opacity="0.35"') + vp.at(fn(pal_white()), 0.7)
-        x, y = pol(C, C, 92, 360 * frac)
-        body += star4(x, y, 15, "#FFFFFF")
+        defs = BLUR + (f'<radialGradient id="tg" cx="0.5" cy="0.85" r="0.9"><stop offset="0" stop-color="{mix(col, "#2A1838", 0.35)}" stop-opacity="0.9"/>'
+                       f'<stop offset="0.75" stop-color="{mix(col, "#1E1230", 0.78)}" stop-opacity="0.74"/><stop offset="1" stop-color="#1E1230" stop-opacity="0.7"/></radialGradient>')
+        body = circ(C, C, 88, "url(#tg)") + circ(C, C, 88, "none", GOLD, 2.2, 'opacity="0.85"') + circ(C, C, 100, "none", "#FFFFFF", 1.4, 'opacity="0.35"')
+        body += path(arc_d(C, C, 100, 0, 360 * frac - 0.01), "none", "#FFF3C4", 7, 'filter="url(#b2)" opacity="0.7"') + path(
+            arc_d(C, C, 100, 0, 360 * frac - 0.01), "none", GOLD, 4.5)
+        for a in (90, 180, 270):
+            x, y = pol(C, C, 88, a)
+            body += path(pts_d([(x, y - 6), (x + 6, y), (x, y + 6), (x - 6, y)], True), GOLD)
+        body += g(vp.at(fn(pal_white()), 0.64), extra='filter="url(#b2)" opacity="0.4"') + vp.at(fn(pal_white()), 0.64)
+        x, y = pol(C, C, 100, 360 * frac)
+        body += g(star4(x, y, 20, "#FFFFFF"), extra='filter="url(#b2)"') + star4(x, y, 15, "#FFFFFF")
     else:
         fn, _ = vd.DEB_FN[tag]
         glow = vd.GLOW[tag]
@@ -83,26 +90,36 @@ def health(name, hp, lag=None, notch=None, venom=False):
                    '<radialGradient id="vg" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#C6CF8A"/><stop offset="0.5" stop-color="#8E3A62"/><stop offset="1" stop-color="#2A1024"/></radialGradient>'
                    '<radialGradient id="gl" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFF" stop-opacity="0.95"/><stop offset="1" stop-color="#FFF" stop-opacity="0"/></radialGradient>'
                    '<filter id="rb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>')
-    rr = lambda xe: f"M{x0} {y} H{f(xe - h / 2)} A{h / 2} {h / 2} 0 0 1 {f(xe - h / 2)} {y + h} H{x0}Z"
-    body = path(f"M{x0 - 6} {y - 5} H{x1 - 10} A15 15 0 0 1 {x1 - 10} {y + h + 5} H{x0 - 6}Z", "rgba(34,20,46,0.52)", "#FFFFFF", 2, 'stroke-opacity="0.5"')
+    tip = lambda xe, yy0, yy1, t=12: f"M{x0} {yy0} H{f(xe - t)} L{f(xe)} {(yy0 + yy1) / 2} L{f(xe - t)} {yy1} H{x0}Z"
+    body = path(tip(x1 + 8, y - 5, y + h + 5, 18), "rgba(30,18,48,0.6)") + path(tip(x1 + 8, y - 5, y + h + 5, 18), "none", GOLD, 2, 'opacity="0.9"')
+    body += path(f"M{x0 + 40} {y - 12} H{x1 - 60} M{x0 + 40} {y + h + 12} H{x1 - 60}", "none", "#FFFFFF", 1.3, 'opacity="0.4"')
     if lag:
-        body += path(rr(xa(lag)), "#FFF4F8", extra='opacity="0.85"')
-    body += path(rr(xa(hp)), c1, extra='filter="url(#b2)" opacity="0.7"') + path(rr(xa(hp)), "url(#hf)")
-    body += path(f"M{x0 + 30} {y + 5} H{f(xa(hp) - 16)}", "none", "#FFFFFF", 3, 'opacity="0.65"')
+        body += path(tip(xa(lag), y, y + h), "#FFF4F8", extra='opacity="0.85"')
+    body += path(tip(xa(hp), y, y + h), c1, extra='filter="url(#b2)" opacity="0.7"') + path(tip(xa(hp), y, y + h), "url(#hf)")
+    body += path(f"M{x0 + 30} {y + 5} H{f(xa(hp) - 22)}", "none", "#FFFFFF", 3, 'opacity="0.6"')
     if venom:
         rng = random.Random(3)
         v = ""
         for sy in (y + 5, y + 11, y + 16):
             pts = [(x0 + 20, sy)]
-            while pts[-1][0] < xa(hp) - 12:
+            while pts[-1][0] < xa(hp) - 16:
                 pts.append((pts[-1][0] + rng.uniform(10, 22), min(y + h - 2, max(y + 2, pts[-1][1] + rng.uniform(-6, 6)))))
             v += line(pts, "#07050A", 2.6)
         body += v
     for t in (25, 50, 75):
-        body += line([(xa(t), y + 2), (xa(t), y + h - 2)], "#FFFFFF", 1.6, 'opacity="0.35"')
+        xx = xa(t)
+        body += path(pts_d([(xx, y - 9), (xx + 4, y - 5), (xx, y - 1), (xx - 4, y - 5)], True), GOLD, extra='opacity="0.9"')
     if notch:
-        body += leaf(xa(notch), y - 4, 22, 8, 0, S["gold_lt"], S["gold_dk"], 2)
-    body += vd.b_rose(70, y + h / 2, 38, "full", venom)
+        body += leaf(xa(notch), y + h + 26, 20, 7, 0, S["gold_lt"], GOLD, 1.6)
+    cx, cy = 62, y + h / 2
+    dia = pts_d([(cx, cy - 46), (cx + 46, cy), (cx, cy + 46), (cx - 46, cy)], True)
+    dia2 = pts_d([(cx, cy - 56), (cx + 56, cy), (cx, cy + 56), (cx - 56, cy)], True)
+    emblem = "#FFB7D0" if not venom else "#B9C27A"
+    body += path(dia, "rgba(30,18,48,0.82)", GOLD, 2.4) + path(dia2, "none", "#FFFFFF", 1.3, 'opacity="0.45"')
+    body += g(rose(cx, cy, 24, "rgba(255,255,255,0.10)", "rgba(255,255,255,0.2)", emblem, 2.4), extra='filter="url(#b2)" opacity="0.6"')
+    body += rose(cx, cy, 24, "rgba(255,255,255,0.10)", "rgba(255,255,255,0.2)", emblem, 2.2)
+    if venom:
+        body += line([(cx - 30, cy + 20), (cx - 8, cy + 2), (cx + 4, cy - 14), (cx + 22, cy - 26)], "#07050A", 3)
     OUT[name] = svg(900, 120, body, defs)
 
 
@@ -110,7 +127,7 @@ def wheel(name, frac, petals=0, low=False):
     K = 192
     c0, c1 = ("#FFE9A8", "#F58AB0") if not low else ("#FFC2A8", "#EE5A44")
     defs = BLUR + f'<linearGradient id="wf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{c0}"/><stop offset="1" stop-color="{c1}"/></linearGradient>'
-    body = circ(K, K, 100, "none", "rgba(34,20,46,0.5)", 18) + circ(K, K, 110, "none", "#FFFFFF", 1.6, 'opacity="0.5"') + circ(K, K, 90, "none", "#FFFFFF", 1.6, 'opacity="0.5"')
+    body = circ(K, K, 100, "none", "rgba(34,20,46,0.5)", 18) + circ(K, K, 110, "none", GOLD, 1.8, 'opacity="0.85"') + circ(K, K, 90, "none", "#FFFFFF", 1.3, 'opacity="0.4"')
     body += path(arc_d(K, K, 100, 0, 360 * frac), "none", c1, 14, 'filter="url(#b2)" opacity="0.7"') + path(arc_d(K, K, 100, 0, 360 * frac), "none", "url(#wf)", 12)
     for k in range(5):
         a0 = k * 72 + 8
@@ -165,11 +182,18 @@ def hud(bg, A, night, wheel_xy):
     if not night:
         # Pickup feed: slides in at the left edge, stacks, fades after a few seconds.
         for i, (t, n) in enumerate((("Moonflower", "×2"), ("Bluebell", "×1"))):
-            y = 520 + i * 52
-            glass(L, (40, y, 330, y + 42), 21, 120 - i * 30)
-            ck.put(L, A["d_chip_heal" if i == 0 else "d_chip_well_rested"], (46, y + 3), 36)
-            d.text((94, y + 6), t, font=ck.font(26, "Medium"), fill=(255, 255, 255, 240 - i * 60))
-            d.text((290, y + 6), n, font=ck.font(26, "Medium"), fill=(255, 243, 196, 240 - i * 60))
+            y = 520 + i * 50
+            band = Image.new("RGBA", (380, 40), (30, 18, 48, 0))
+            bp = band.load()
+            for xx in range(380):
+                al = int((150 - i * 45) * min(1.0, (380 - xx) / 190))
+                for yy in range(40):
+                    bp[xx, yy] = (30, 18, 48, al)
+            L.alpha_composite(band, (36, y))
+            d.line((36, y, 36, y + 40), fill=(235, 208, 138, 240 - i * 70), width=3)
+            ck.put(L, A["d_chip_heal" if i == 0 else "d_chip_well_rested"], (48, y + 3), 34)
+            d.text((94, y + 4), t, font=ck.font(26, "Medium"), fill=(255, 255, 255, 240 - i * 70))
+            d.text((280, y + 4), n, font=ck.font(26, "Medium"), fill=(243, 223, 162, 240 - i * 70))
         # Contextual prompt by the thing she's facing.
         glass(L, (1010, 372, 1196, 414), 21, 130)
         d.ellipse((1016, 378, 1046, 408), fill=(255, 255, 255, 235))
@@ -181,9 +205,9 @@ def hud(bg, A, night, wheel_xy):
 def strip(A):
     st = ck.paper(1920, 560)
     dr = ImageDraw.Draw(st)
-    title = "Direction D · Faelight glass"
+    title = "Direction D2 · Genshin × ACOTAR"
     dr.text((40, 14), title, font=ck.font(50), fill=S["ink"])
-    dr.text((44 + dr.textlength(title, font=ck.font(50)) + 20, 36), "thin translucent pieces, white glyphs, health and buffs low centre, stamina by her shoulder",
+    dr.text((44 + dr.textlength(title, font=ck.font(50)) + 20, 36), "polished pass: fine line glyphs on dark glass, hairline gold, a tapered health bar with a rose-diamond crest",
             font=ck.font(26, "MediumItalic"), fill=S["ink_soft"])
     day = ck.plate("spring_day.png").crop((0, 0, 1920, 760)).resize((920, 400)).filter(ImageFilter.GaussianBlur(5))
     st.paste(day, (40, 86))
@@ -209,10 +233,10 @@ def main():
     board = Image.new("RGB", (1920, 1640))
     board.paste(hud(ck.plate("spring_day.png"), A, False, (1040, 530)), (0, 0))
     board.paste(strip(A), (0, 1080))
-    board.save(os.path.join(out_dir, "direction_d_faelight_glass.jpg"), quality=92)
+    board.save(os.path.join(out_dir, "direction_d2_genshin_x_acotar.jpg"), quality=92)
     n = hud(vd.night_plate(), A, True, (1056, 510))
-    vd.chip(n, "Direction D · Faelight glass", "night: dread 0.7, venom, drowsy")
-    n.save(os.path.join(out_dir, "direction_d_night_horror.jpg"), quality=92)
+    vd.chip(n, "Direction D2 · Genshin × ACOTAR", "night: dread 0.7, venom, drowsy")
+    n.save(os.path.join(out_dir, "direction_d2_night_horror.jpg"), quality=92)
     print("direction D in", out_dir)
 
 
