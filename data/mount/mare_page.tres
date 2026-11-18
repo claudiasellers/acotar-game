@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="MarePageData" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://systems/mount/mare_bond_note.gd" id="1"]
+[ext_resource type="Script" path="res://systems/mount/mare_page_data.gd" id="2"]
+
+[sub_resource type="Resource" id="N0"]
+script = ExtResource("1")
+id = &"answered"
+require_flags = PackedStringArray()
+after = "I want her to come when I whistle, the way she came for him."
+hints = PackedStringArray("She can't know my whistle if she can't hear it. Nearer the stables, then, and out from under any roof.", "Out in the open by the stables, I put my fingers to my lips and whistle for her.", "Press H (Share on a pad) outdoors near the stables, and she'll come.")
+memory = "She came when I whistled. Ears up, at a trot, as if she'd been listening for me."
+canon = "X"
+
+[sub_resource type="Resource" id="N1"]
+script = ExtResource("1")
+id = &"gleam"
+require_flags = PackedStringArray()
+after = "Her coat's dull from the paddock. I'd like to see it shine."
+hints = PackedStringArray("A brush, and patience.", "Beside her, I can take up the brush and work her coat until it gleams.", "Hold E beside her, then drag over her coat (or hold A and move the stick) until it reads Gleaming.")
+memory = "I brushed her until she shone like snow under the moon."
+canon = "X"
+
+[sub_resource type="Resource" id="N2"]
+script = ExtResource("1")
+id = &"honeyplum"
+require_flags = PackedStringArray()
+after = "Alis swears she'd do anything for a honeyplum. They grow only in Blossom Vale, south and east, farther than she'll carry me yet."
+hints = PackedStringArray("She'll take me part of the way. I can walk the rest.", "Ride her south-east until she turns for home, then walk on into Blossom Vale and look in the orchards.", "Pick a honeyplum in Blossom Vale, bring it back, hold E beside her and feed it to her on the Care tab.")
+memory = "She ate a honeyplum from my palm and nosed my hand for more. She knows me now."
+canon = "X"
+
+[sub_resource type="Resource" id="N3"]
+script = ExtResource("1")
+id = &"edge"
+require_flags = PackedStringArray()
+after = "I want to know how far she'll take me."
+hints = PackedStringArray("Out, and keep going.", "Ride away from the stables in one direction until she slows and won't go on.", "Keep riding away from the stables until she snorts and turns for home.")
+memory = "She took me as far as she dared, then turned for home. Farther next time."
+canon = "X"
+
+[sub_resource type="Resource" id="N4"]
+script = ExtResource("1")
+id = &"places"
+require_flags = PackedStringArray()
+after = "I want to see the court from her back. So far she's carried me to {places} places."
+hints = PackedStringArray("Somewhere I haven't been on her.", "Ride her into a part of the court she hasn't carried me to before.", "Ride into three different regions on her back.")
+memory = "Woods, gardens, hills. She's carried me through all of it."
+canon = "X"
+
+[sub_resource type="Resource" id="N5"]
+script = ExtResource("1")
+id = &"bareback_run"
+require_flags = PackedStringArray("fact.mare_bond_trusted")
+after = "Tamlin says to take the saddle off: I'll feel what she means to do before she does it."
+hints = PackedStringArray("No saddle. Just her back and my knees.", "Take the saddle off her, then ride a good long way without getting down.", "Hold E beside her, choose Ride bareback on the Tack tab, then ride 300 m in one go without dismounting.")
+memory = "No saddle, a long way, and she never once let me slip."
+canon = "X"
+
+[sub_resource type="Resource" id="N6"]
+script = ExtResource("1")
+id = &"balked"
+require_flags = PackedStringArray()
+after = "There's grey country north-east, past the hills. I haven't taken her that way."
+hints = PackedStringArray("North-east, where the colour goes out of things.", "Ride her north-east, toward the Blighted Reaches.", "Ride to the edge of the Blighted Reaches.")
+memory = "She wouldn't set a hoof on the grey ground. Ears flat, the way the horses were in the woods."
+canon = "X"
+
+[sub_resource type="Resource" id="N7"]
+script = ExtResource("1")
+id = &"blight_ride"
+require_flags = PackedStringArray()
+after = "It's the smell of whatever's loose in there she hates. If I could hide it from her nose, she might carry me in."
+hints = PackedStringArray("Something strong-smelling on her muzzle. Lavender, honey to bind it, and something stronger.", "Mugwort grows only up on the Western Fells. Mugwort, lavender and honey, mixed at her side.", "Hold E beside her and make the Sweetbalm on the Care tab (mugwort, lavender, honey), then ride 200 m into the Blighted Reaches.")
+memory = "With the balm on, she carried me onto the grey ground and never balked."
+canon = "X"
+
+[sub_resource type="Resource" id="N8"]
+script = ExtResource("1")
+id = &"reunion"
+require_flags = PackedStringArray("calanmai_attended")
+after = "I left her on the hill on Calanmai. I should go to her."
+hints = PackedStringArray("The stables.", "Go down to the stables and find her.", "Walk up beside her at the stables.")
+memory = "She was home before me, as if she'd never been anywhere else, and she nickered when she saw me."
+canon = "X"
+
+[resource]
+script = ExtResource("2")
+now = PackedStringArray("She isn't mine. The stable hands lead her out and never look at me.", "She comes if I whistle from the stable yard or the lawns. She'll take me as far as the rose wilds, then turns for home.", "She hears me from across the grounds now, and she'll carry me through the near woods. When I've been away, she trots out to meet me.", "She hears me from a long way off and will go anywhere in the court with me, except onto the grey ground of the Reaches.", "She'd come for me anywhere. Where I go, she goes.")
+notes = Array[ExtResource("1")]([SubResource("N0"), SubResource("N1"), SubResource("N2"), SubResource("N3"), SubResource("N4"), SubResource("N5"), SubResource("N6"), SubResource("N7"), SubResource("N8")])

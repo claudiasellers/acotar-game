@@ -54,46 +54,62 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
   `shine`, `shine_day`, `brushed_day`, `treats_day`, `treats_count`), never
   in story flags.
 
-## The bond (L47-8)
+## The bond (L47-8, redesigned 2026-11-18)
 
 `MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story and never
-touches a phase flag (R2). Bond facts are WorldState keys under
-`fact.mare_bond_*`, raised by deeds through the director's ActionTriggers
-(`MareBondTrigger_*`); points, today's counts, metres ridden and regions reached
-live in WorldDeltas region `mount` (`bond_points`, `bond_day`, `bond_today`,
-`ride_m`, `bareback_m`, `bond_regions`).
+touches a phase flag (R2). It grows on what Feyre and the mare do together,
+never on days: there are no points, no daily caps and no time gates. Each step
+opens when its milestones are done (`MareBond.MILESTONES`), one-off deeds of
+which the last is a threshold behind a real barrier. A milestone can be done
+early, but a step still needs the one before it. Bond facts are WorldState
+keys under `fact.mare_bond_*`, raised through the director's ActionTriggers
+(`MareBondTrigger_*`); each milestone also raises `fact.mare_did_<id>`. State
+lives in WorldDeltas region `mount` (`bond_done`, `bond_regions`,
+`bareback_run_m`, `balks`, `balm`, `blight_m`, `page_hints`).
 
-| tier | fact | earned by (deeds) | she hears the whistle from | she carries Feyre out to |
+| tier | fact | milestones (the last is the barrier) | hears the whistle from | carries Feyre out to |
 |---|---|---|---|---|
-| 0 | (first_dinner_eaten) | — | the stable yard only (a far whinny, she doesn't come) | — |
+| 0 | (first_dinner_eaten) | — | the stable yard only (a far whinny) | — |
 | 1 | `fact.mare_ridden` | the first ride, at the stables (canon ch 9) | 150 m | 600 m from the stables |
-| 2 | `fact.mare_bond_trusted` | 12 points | 400 m | 1.5 km (the near woods) |
-| 3 | `fact.mare_bond_bareback` | 30 points and 300 m ridden bareback (canon ch 20) | 1 km | 4 km (the whole court) |
-| 4 | `fact.mare_bond_heart` | 55 points and `calanmai_attended` | anywhere north of the Wall | anywhere she may go |
+| 2 | `fact.mare_bond_trusted` | she comes to the whistle; brushed to a gleam; **a honeyplum from Feyre's hand** (grows only in Blossom Vale, beyond her 600 m) | 400 m | 1.5 km |
+| 3 | `fact.mare_bond_bareback` | turned back at the edge of her range; 3 places on her back; **300 m in one bareback ride** (a dismount or the saddle ends it; Tamlin's lessons, canon ch 20) | 1 km | 4 km (the whole court) |
+| 4 | `fact.mare_bond_heart` | balked at the Blighted Reaches; **200 m into the Reaches with the sweetbalm on**; the reunion after `calanmai_attended` (left at the Rite, canon ch 21) | anywhere north of the Wall | anywhere she may go |
 
-"Hears from" is measured to her where she stands, or to the stables when
-she's home. "Carries out to" is measured from the stables.
+Barriers:
+- **Honeyplum** (`MareCare.HONEYPLUM`): the only treat she takes past her daily fill.
+- **Bareback**: the saddle can come off from tier 2 (the "Saddle" card on the
+  Tack tab, WorldDeltas `mount/saddled`). `MareBond.ride` counts the unbroken run;
+  `ride_ended()` (on dismount) and any saddled stretch reset it.
+- **The blight** (`MareBond.BLIGHT_REGION`): without the balm she won't step into
+  the Reaches. She plants her feet, snorts and backs off (`MountDirector._keep_off_blight`),
+  as horses do at the Bogge (ch 9 to 10). What frightens her is the smell of what's
+  loose there, not the ground (Keeper 2026-11-18: the blight never poisons land or
+  animals). A whistle from inside the Reaches gets only a far whinny. The
+  **sweetbalm** (`BALM_NEEDS`: mugwort, which grows only in the Western Fells,
+  lavender and honey; `quiet` tag) is made at her side on the Care tab once she's
+  balked. It lasts until she's next home at the stables.
 
-Points per deed (daily cap in brackets): brushing to full shine 3 (1), a treat
-1 (3), a new piece made 2 (3), each 400 m ridden together 1 (8), a region
-reached on her back the first time 3, a whistle she answers 1 (2). Nothing
-counts before the first ride.
+Grooming stays grooming: her shine still fades (`FADE_PER_DAY`) and she takes
+3 treats a day. Neither feeds or gates the bond. Making dress-up pieces is no
+longer a bond deed.
 
-Bareback: the saddle can come off from tier 2 (a "Saddle" card on the Tack
-tab, WorldDeltas `mount/saddled`). Riding bareback counts toward tier 3, and
-the seat pose lets her legs hang long (`RidePose.bareback`), sitting lower
-(`WhiteHorse.BAREBACK_DROP`).
-
-What the player sees instead of text (R2):
-- At the edge of her range she won't go on: she drops to a walk, snorts once and
-  turns for home (`MountDirector._keep_in_range`).
-- Whistled from beyond her hearing, only the wind answers. The first time,
-  Feyre thinks "Too far. She can't hear me from here." (`fact.mare_bond_too_far`).
-- At each new step, the next time Feyre is beside her on foot, she lowers her
-  head to her with a nicker and a sparkle. Feyre's own thought marks the step:
-  `data/mount/mare_thoughts.tres`, DEED lines on the facts, which the director
-  adds to the free-roam dialogue.
-- From tier 2, coming home from away, Feyre finds her trotting out to meet her.
+What the player sees instead of markers (R2):
+- **Her page** ("Her" tab on the tending screen, `MarePage`, `data/mount/mare_page.tres`):
+  in Feyre's hand, it says what she does now (in landmarks), what Feyre means to try
+  next (the first ready, undone milestone), and the memories of what's done. Hints
+  follow the journal's `HintLadder` (unpaused play time on the milestone, or failed
+  tries: each balk and each turn for home) and show only on "Think on it". Only the
+  last hint names a key. Opt-in, like the story journal.
+- **Her behaviour**: whistled from too far, only the wind answers (the first time,
+  `fact.mare_bond_too_far` and a thought). At the edge of her range she snorts and
+  turns for home. At the blight she balks. At each new step she lowers her head with
+  a nicker and a sparkle. From tier 2 she trots out to meet Feyre coming home.
+- **Voices** (`data/mount/mare_thoughts.tres`): Alis on honeyplums (after the first
+  ride, until one is fed); Tamlin on taking the saddle off (tier 2 and
+  `starlight_pool_found`, until bareback); Lucien on the blight ("Even the horses
+  know better"; it has to be literally true, because fae can't lie). Feyre's
+  thoughts: entering Blossom Vale while the honeyplum is owed, entering the Fells
+  once she's balked, and a line at each deed or step.
 
 ## Saddle, seat and reins (L47-8, from the slice 1 look review)
 

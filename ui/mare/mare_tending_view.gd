@@ -20,6 +20,8 @@ const CAMERA_SHIFT := 1.25
 const CARD_W := 210.0
 ## Pad brushing: stick travel per second while A is held, in screen widths.
 const PAD_BRUSH := 1.6
+## Her page (MarePage): what Feyre knows of her, what to try, what she remembers.
+const PAGE_TAB := "Her"
 
 var mare: MareMount
 var feyre: Node3D
@@ -151,7 +153,7 @@ func _build() -> void:
 
 
 func _tab_names() -> Array[String]:
-	var out: Array[String] = ["Care"]
+	var out: Array[String] = ["Care", PAGE_TAB]
 	for s in MareTack.SLOTS:
 		out.append(MareTack.SLOT_NAMES[s])
 	return out
@@ -182,6 +184,8 @@ func _show(tab: String) -> void:
 	_shine_bar = null
 	if tab == "Care":
 		_build_care()
+	elif tab == PAGE_TAB:
+		_build_page()
 	else:
 		_build_slot(_slot_of(tab))
 
@@ -201,7 +205,7 @@ func _build_care() -> void:
 	_body.add_child(HSeparator.new())
 	_body.add_child(_label("Treats", &"SatchelSmall"))
 	var have := MareCare.treats_in(inventory)
-	if MareCare.treats_today() >= MareCare.TREATS_PER_DAY:
+	if MareCare.full():
 		_body.add_child(_label("She has had her fill today. She noses your hand anyway."))
 	elif have.is_empty():
 		_body.add_child(_label("Nothing sweet in the satchel. She likes orchard fruit, berries, clover and dandelions."))
@@ -212,9 +216,64 @@ func _build_care() -> void:
 		var b := Button.new()
 		b.theme_type_variation = &"SatchelSlot"
 		b.text = "%s  ×%d" % [MareTack._item_name(row[0]), row[1]]
-		b.disabled = MareCare.treats_today() >= MareCare.TREATS_PER_DAY
+		b.disabled = MareCare.full() and row[0] != MareCare.HONEYPLUM
 		b.pressed.connect(_feed.bind(row[0], b))
 		grid.add_child(b)
+	if MareBond.done(&"balked") and not MareBond.balmed():
+		_body.add_child(HSeparator.new())
+		_body.add_child(_card_balm())
+
+
+## The sweetbalm: masks the smell of the blight so she'll carry Feyre in (MareBond).
+func _card_balm() -> Control:
+	var card := PanelContainer.new()
+	card.theme_type_variation = &"SatchelCard"
+	var col := VBoxContainer.new()
+	card.add_child(col)
+	col.add_child(_label("Sweetbalm", &"SatchelBody"))
+	var needs := PackedStringArray()
+	for id in MareBond.BALM_NEEDS:
+		needs.append("%s %s" % [MareTack._item_name(id), "✓" if inventory and inventory.count(id) > 0 else "·"])
+	col.add_child(_label("Rubbed on her muzzle, so the grey ground smells of nothing. " + ", ".join(needs), &"SatchelSmall"))
+	var b := Button.new()
+	b.theme_type_variation = &"SatchelSlot"
+	b.text = "Make it and put it on"
+	b.disabled = not MareBond.can_make_balm(inventory)
+	b.pressed.connect(func() -> void:
+		if MareBond.put_balm(inventory):
+			Juice.burst(mare, &"craft")
+			if mare:
+				mare.nicker()
+			_show(_tab))
+	col.add_child(b)
+	return card
+
+
+## Her page, in Feyre's hand (MarePage).
+func _build_page() -> void:
+	_body.add_child(_label("What I know of her", &"SatchelSmall"))
+	_body.add_child(_label(MarePage.now_line()))
+	var after := MarePage.after_line()
+	if after != "":
+		_body.add_child(HSeparator.new())
+		_body.add_child(_label("What I mean to try", &"SatchelSmall"))
+		_body.add_child(_label(after))
+		for h in MarePage.hints_shown():
+			_body.add_child(_label(h, &"SatchelSmall"))
+		var think := Button.new()
+		think.theme_type_variation = &"SatchelTab"
+		think.text = "Think on it"
+		think.disabled = not MarePage.can_think()
+		think.pressed.connect(func() -> void:
+			MarePage.think()
+			_show(_tab))
+		_body.add_child(think)
+	var kept := MarePage.memories()
+	if not kept.is_empty():
+		_body.add_child(HSeparator.new())
+		_body.add_child(_label("Remembered", &"SatchelSmall"))
+		for m in kept:
+			_body.add_child(_label(m, &"SatchelSmall"))
 
 
 func _refresh_shine() -> void:

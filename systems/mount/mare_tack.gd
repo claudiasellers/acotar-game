@@ -122,7 +122,6 @@ static func make(p: MareDecor, inventory: Inventory) -> bool:
 	var have: Array = (WorldDeltas.get_region_value(DELTAS, OWNED_KEY, []) as Array).duplicate()
 	have.append(String(p.id))
 	WorldDeltas.set_region_value(DELTAS, OWNED_KEY, have)
-	MareBond.earn(&"piece")  # something new made for her is a deed of the bond
 	return true
 
 

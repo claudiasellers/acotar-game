@@ -17,8 +17,11 @@ const TREATS_PER_DAY := 3
 const TREATS: Array[StringName] = [&"ing_manor_fruit", &"ing_honeyplum", &"ing_quince", &"ing_cherry",
 	&"ing_blackberry", &"ing_bilberry", &"ing_hawthorn_haw", &"ing_clover", &"ing_dandelion", &"ing_candied_flowers"]
 
+## Her favourite, which grows only in Blossom Vale (MareBond's second step).
+const HONEYPLUM := &"ing_honeyplum"
+
 ## Called with (kind, amount) for every act of care: &"brushed" (once a day, when
-## she reaches full shine) and &"treat". The bond (slice 3) connects here.
+## she reaches full shine), &"treat" and &"honeyplum". The bond (slice 3) connects here.
 static var on_care: Array[Callable] = []
 
 
@@ -53,6 +56,11 @@ static func treats_today() -> int:
 	return int(WorldDeltas.get_region_value(DELTAS, "treats_count", 0))
 
 
+## She has had her fill today (she's never too full for a honeyplum).
+static func full() -> bool:
+	return treats_today() >= TREATS_PER_DAY
+
+
 static func is_treat(id: StringName) -> bool:
 	return TREATS.has(id)
 
@@ -70,15 +78,17 @@ static func treats_in(inventory: Inventory) -> Array:
 
 
 ## Feeds her one `id` from the satchel. False if it isn't a treat, Feyre has
-## none, or she has had her fill today (then nothing is used).
+## none, or she has had her fill today (then nothing is used), except a honeyplum.
 static func feed(id: StringName, inventory: Inventory) -> bool:
-	if not is_treat(id) or inventory == null or inventory.count(id) <= 0 or treats_today() >= TREATS_PER_DAY:
+	if not is_treat(id) or inventory == null or inventory.count(id) <= 0 or (full() and id != HONEYPLUM):
 		return false
 	var had := treats_today()
 	inventory.remove(id, 1)
 	WorldDeltas.set_region_value(DELTAS, "treats_day", _day())
 	WorldDeltas.set_region_value(DELTAS, "treats_count", had + 1)
 	_tell(&"treat", 1)
+	if id == HONEYPLUM:
+		_tell(&"honeyplum", 1)  # the bond's far-forage deed (MareBond)
 	return true
 
 

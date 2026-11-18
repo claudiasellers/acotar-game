@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueBook" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="DialogueBook" load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
 [ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
@@ -95,7 +95,191 @@ follow_up = &""
 delivery = "inner voice: dry, quiet, close"
 emotion = &"tender"
 
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"mare_honeyplum"
+speaker = &"feyre"
+who = ""
+text = "Juice down my wrist and her whiskers in my palm. Worth the walk."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_did_honeyplum"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: warm, a little surprised"
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"mare_balked"
+speaker = &"feyre"
+who = ""
+text = "She won't set a hoof on it. Ears flat, the way the horses were in the woods. Whatever she smells in there, I can't."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_balked_blight"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, uneasy"
+emotion = &"weary"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"mare_reunion"
+speaker = &"feyre"
+who = ""
+text = "She found her own way home from the hill. Of course she did."
+canon = "X"
+trigger = 4
+where = &""
+deed = &"fact.mare_did_reunion"
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: soft, relieved"
+emotion = &"tender"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"mare_vale_plums"
+speaker = &"feyre"
+who = ""
+text = "Honeyplums, heavy on the branch. I should take one back for her."
+canon = "X"
+trigger = 0
+where = &"blossom_vale"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray("fact.mare_ridden")
+forbid_flags = PackedStringArray("fact.mare_did_honeyplum")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: bright, to herself"
+emotion = &"happy"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"mare_fells_mugwort"
+speaker = &"feyre"
+who = ""
+text = "Mugwort, grey-green all over the slopes. Strong enough to drown out anything."
+canon = "X"
+trigger = 0
+where = &"western_fells"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray("fact.mare_balked_blight")
+forbid_flags = PackedStringArray("fact.mare_did_blight_ride")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: thinking it through"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"mare_alis_honeyplum"
+speaker = &"alis"
+who = "Alis"
+text = "That mare of yours would follow you into the sea for a honeyplum. Pity they only grow down in the Vale."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray("fact.mare_ridden")
+forbid_flags = PackedStringArray("fact.mare_did_honeyplum")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "dry, sidelong, fond underneath"
+emotion = &"smirk"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"mare_tamlin_bareback"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "Take the saddle off her. You'll feel what she means to do before she does it."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray("fact.mare_bond_trusted", "starlight_pool_found")
+forbid_flags = PackedStringArray("fact.mare_bond_bareback")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "gruff, few words, a half-smile"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"mare_lucien_blight"
+speaker = &"lucien"
+who = "Lucien"
+text = "She balked at the Reaches? Even the horses know better."
+canon = "X"
+trigger = 3
+where = &""
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray("fact.mare_balked_blight")
+forbid_flags = PackedStringArray("fact.mare_did_blight_ride")
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 240.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "wry, then quieter"
+emotion = &"smirk"
+
 [resource]
 script = ExtResource("3")
 area = &"mare_bond"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11")])

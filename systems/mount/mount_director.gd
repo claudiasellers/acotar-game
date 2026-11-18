@@ -116,6 +116,9 @@ const REGION_CHECK := 1.0
 ## The edge of her range: she won't go past it, and the snort repeats only
 ## after Feyre has come this far back inside.
 const EDGE_RESET := 40.0
+## How far ahead (m) she smells the blight, and how long (s) she holds off after.
+const BLIGHT_LOOK := 6.0
+const BALK_HOLD := 1.5
 ## Coming home from away, she trots out to meet Feyre this far from the stables
 ## (and not nearer than MEET_NEAR to her).
 const MEET_NEAR := 16.0
@@ -126,6 +129,8 @@ var _moment: int = -1
 var _last_ride_at: Vector3 = Vector3.INF
 var _region_t: float = 0.0
 var _at_edge: bool = false
+var _balking: bool = false
+var _balk_t: float = 0.0
 var _away: bool = false
 var _met: bool = false
 var _gust: AudioStreamPlayer
@@ -293,8 +298,13 @@ func whistle() -> bool:
 		ok = false
 		last_block = &"too_far"
 		_too_far()
+	elif ok and in_blight(p.global_position) and not MareBond.balmed():
+		# She hears, but she won't come onto that ground: a far whinny only.
+		ok = false
+		last_block = &"blight"
+		_answer_in = ANSWER_DELAY
 	elif ok:
-		MareBond.earn(&"answered")
+		MareBond.answered()
 		_answer(p)
 	elif last_block == &"" and available():
 		# She doesn't know Feyre's whistle yet: only a far whinny from the stables.
@@ -343,9 +353,14 @@ func _add_thoughts() -> void:
 
 ## A new step: she lowers her head to Feyre, nickers, and the air sparkles.
 func _play_moment(p: Node3D) -> bool:
-	if _moment < 0 or mare == null or not is_instance_valid(mare) or mare.state != MareMount.State.STANDING:
+	if mare == null or not is_instance_valid(mare) or mare.state != MareMount.State.STANDING:
 		return false
+	if mare.global_position.distance_to(data.home) < 30.0:
+		MareBond.balm_off()  # home at the stables: the balm has worn off
 	if mare.global_position.distance_to(p.global_position) > MOMENT_NEAR:
+		return false
+	MareBond.beside()
+	if _moment < 0:
 		return false
 	_moment = -1
 	if mare.horse and mare.horse.animator:
@@ -575,6 +590,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 		p.set_physics_process(true)
 	_set_bow(true)
 	_calm_feel()
+	MareBond.ride_ended()
 	if pose:
 		pose.clear_overrides()
 	if p:
@@ -688,6 +704,8 @@ func _station_near(p: Node3D) -> bool:
 
 func _process(delta: float) -> void:
 	_since_look += delta
+	if not get_tree().paused and MareBond.tier() >= 1:
+		MarePage.tick(delta)  # her page's hints unlock with play time
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look.length() > 0.1:
 		_since_look = 0.0
@@ -729,6 +747,8 @@ func _process(delta: float) -> void:
 			return
 		_steer()
 		_keep_in_range()
+		_keep_off_blight()
+		_balk_t -= delta
 		_count_ride(delta)
 		_place_rider(delta)
 		_speed_feel(p, delta)
@@ -774,6 +794,41 @@ func _keep_in_range() -> void:
 	if not _at_edge:
 		_at_edge = true
 		mare.snort()
+		MareBond.reached_edge()
+		MarePage.fail()
+
+
+## True on the ground she won't set a hoof on without the balm (the Blighted
+## Reaches: the smell of what's loose there, Keeper 2026-11-18).
+func in_blight(at: Vector3) -> bool:
+	var region := WorldStreamer.region_at(at)
+	return region != null and region.id == MareBond.BLIGHT_REGION
+
+
+## At the blight she plants her feet and backs off, ears flat, as horses do at
+## the Bogge (ch 9-10), unless the sweetbalm masks the smell.
+func _keep_off_blight() -> void:
+	if mare == null or MareBond.balmed():
+		_balking = false
+		return
+	var at := mare.global_position
+	var ahead := at + Vector3(mare.steer.x, 0.0, mare.steer.z).normalized() * BLIGHT_LOOK
+	if not in_blight(ahead) and not in_blight(at):
+		if _balking and _balk_t <= 0.0:
+			_balking = false
+		return
+	var region := WorldStreamer.region_at(ahead if in_blight(ahead) else at)
+	var out := at - region.center
+	out.y = 0.0
+	out = out.normalized() if out.length() > 0.1 else -mare.heading()
+	mare.steer = out * 0.35
+	mare.gallop = false
+	_balk_t = BALK_HOLD
+	if not _balking:
+		_balking = true
+		mare.snort()
+		MareBond.balked()
+		MarePage.fail()
 
 
 ## Distance ridden together and the regions they reach (the bond's deeds).
@@ -785,6 +840,8 @@ func _count_ride(delta: float) -> void:
 		var step := Vector2(at.x - _last_ride_at.x, at.z - _last_ride_at.z).length()
 		if step < 30.0:  # a jump, not a ride
 			MareBond.ride(step, mare.horse != null and mare.horse.bareback)
+			if in_blight(at):
+				MareBond.blight_ride(step)
 	_last_ride_at = at
 	_region_t -= delta
 	if _region_t <= 0.0:
