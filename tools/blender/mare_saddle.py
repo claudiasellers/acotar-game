@@ -75,6 +75,10 @@ class Coat:
             ev.to_mesh_clear()
         for o in list(bpy.context.scene.objects):
             bpy.data.objects.remove(o, do_unlink=True)
+        # Drop her imported materials too, or ours come out as "SaddleCloth.001"
+        # and the game can't find them by name.
+        for m in list(bpy.data.materials):
+            bpy.data.materials.remove(m)
         self.pts = [p for p in pts if -0.5 < p.y < 0.9 and p.z > 0.9]
         self.cache = {}
 

@@ -24,7 +24,12 @@ static func _surface_index(mi: MeshInstance3D) -> Dictionary:
 	for i in mi.mesh.get_surface_count():
 		var mat := mi.mesh.surface_get_material(i)
 		if mat:
-			out[String(mat.resource_name)] = i
+			# Blender may suffix a reused name ("Gold.001"): match on the base name.
+			var n := String(mat.resource_name)
+			var dot := n.rfind(".")
+			if dot > 0 and n.substr(dot + 1).is_valid_int():
+				n = n.substr(0, dot)
+			out[n] = i
 	return out
 
 
