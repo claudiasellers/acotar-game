@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="HostileSiteData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/naga_roamer.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"naga_reed_marsh"
+family = &"naga"
+display_name = "Reed Marsh"
+region_id = &"eastern_woods"
+core = Vector2(1180.0, 330.0)
+territory_radius = 45.0
+leash_scale = 1.6
+member_scene = ExtResource("2")
+count = 4
+require_flags = PackedStringArray("naga_survived")
+canon = "X"

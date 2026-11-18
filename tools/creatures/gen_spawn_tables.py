@@ -25,7 +25,7 @@ SCENES = {
 for _name in ("water_sprites", "unseen_shimmer", "lark", "hen", "owl", "hawk", "crow", "fox", "cat", "squirrel", "sheep", "fireflies"):
     SCENES[_name] = f"res://creatures/ambient/scenes/{_name}.tscn"
 
-# (entry id, scene, count per group, groups, cluster radius, start, end, on_water, canon[, glamour])
+# (entry id, scene, count per group, groups, cluster radius, start, end, on_water, canon[, glamour[, require_flags]])
 # glamour: 0 any, 1 only while glamoured, 2 only once it lifts.
 GLAMOURED = 1
 DAY = (7.0, 19.0)
@@ -125,6 +125,21 @@ TABLES = {
 }
 
 
+# Hostile sites (lane L75, docs/contracts/hostiles.md): one all-day entry per
+# site, gated on its flags; the site moves itself to its core when it spawns.
+try:
+    import gen_hostile_sites
+except ImportError:
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(__file__))
+    import gen_hostile_sites
+for _region, _sites in gen_hostile_sites.SPAWN.items():
+    for _site in _sites:
+        SCENES[_site["id"]] = _site["scene"]
+        TABLES.setdefault(_region, []).append(
+            (_site["id"], _site["id"], 1, 1, 0.0, *ALL, False, _site["canon"], 0, _site["require_flags"]))
+
+
 def write(region, entries):
     used = sorted({e[1] for e in entries})
     ids = {name: i + 2 for i, name in enumerate(used)}
@@ -138,6 +153,7 @@ def write(region, entries):
     for i, entry in enumerate(entries):
         eid, scene, count, groups, radius, start, end, water, canon = entry[:9]
         glamour = entry[9] if len(entry) > 9 else 0
+        flags = entry[10] if len(entry) > 10 else []
         # Swarms gather at landmarks (glades, follies, hero trees), not evenly.
         near = "landmark" if scene in ("butterflies", "faelights", "fireflies") else ""
         lines += [
@@ -153,6 +169,10 @@ def write(region, entries):
             f"on_water = {'true' if water else 'false'}",
             f'canon = "{canon}"',
             f"glamour = {glamour}",
+        ]
+        if flags:
+            lines.append("require_flags = PackedStringArray(%s)" % ", ".join(f'"{x}"' for x in flags))
+        lines += [
             f'near_group = &"{near}"',
             "",
         ]
