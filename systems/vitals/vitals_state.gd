@@ -47,6 +47,8 @@ const DREAD_FALL := 0.06
 const GRAB_PRESS_STAMINA := 12.0
 const COLD_EXPOSURE_AT := 0.85
 const COLD_EXPOSURE_AFTER := 20.0
+## A fall is measured from where she last stood to where she lands, so a jump
+## that comes back down to the same ground never hurts, however high it went.
 const FALL_SAFE_M := 4.0
 const FALL_KNOCKDOWN_M := 16.0
 const STUFFED_SECONDS := 180.0
@@ -93,7 +95,8 @@ var _heal_rate: float = 0.0
 var _down_left: float = 0.0
 var _cold_over: float = 0.0
 var _hazard_tick: Dictionary = {}
-var _fall_speed: float = 0.0
+## Height of the ground she last stood on (-INF until she first stands).
+var _stood_y: float = -INF
 var _was_on_floor: bool = true
 var _mood_sent: Vector2 = Vector2(-1.0, -1.0)
 var _mood_clock: float = 0.0
@@ -599,24 +602,23 @@ func _step_fall() -> void:
 	if body3 == null or not body3.is_inside_tree():
 		return
 	var on_floor := body3.is_on_floor()
-	if not on_floor:
-		_fall_speed = maxf(_fall_speed, -body3.velocity.y)
-	elif not _was_on_floor:
-		var g := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-		var height := _fall_speed * _fall_speed / (2.0 * g)
+	var y := body3.global_position.y
+	if on_floor and not _was_on_floor:
+		var height := _stood_y - y
 		if height > FALL_SAFE_M:
 			var row := AttackTable.resolve(&"fall").duplicate() as AttackData
 			row.can_knock_down = height > FALL_KNOCKDOWN_M
 			if height <= 8.0:
 				row.reaction = &"light"
 			take_hit(&"fall", row, height - FALL_SAFE_M)
-		_fall_speed = 0.0
+	if on_floor:
+		_stood_y = y
 	_was_on_floor = on_floor
 
 
-## A teleport is not a fall: the speed she had in the air stays behind.
+## A teleport is not a fall: the ground she left stays behind.
 func forget_fall() -> void:
-	_fall_speed = 0.0
+	_stood_y = player.global_position.y if player is Node3D and (player as Node3D).is_inside_tree() else -INF
 	_was_on_floor = true
 
 

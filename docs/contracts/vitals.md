@@ -132,7 +132,7 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | fire | 6 per 0.5 s | fire | light | — | — | 0.05 · floor 10 |
 | cold_exposure | 1 per 5 s | cold | none | — | — | 0 · floor 30 (Spring) / 15 (human realm) |
 | venom_drain | 0.4 per s | venom | none | — | — | 0 · floor 10 |
-| fall | (h − 4 m) × 8 | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
+| fall | (h − 4 m) × 8, h = drop below where she last stood | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
 | generic_hit | 10 | blunt | light | — | — | 0.1 |
 
 ## 4. Status tags (BodyState.effects, extended)

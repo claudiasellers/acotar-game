@@ -214,10 +214,11 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 
 
 func test_a_teleport_mid_fall_lands_her_unhurt() -> void:
-	v._fall_speed = 30.0
+	player.global_position = Vector3(0, 2, 0)
+	v._stood_y = 40.0
 	v._was_on_floor = false
 	v.forget_fall()
-	assert_eq(v._fall_speed, 0.0, "the drop she was in stays behind")
+	assert_eq(v._stood_y, 2.0, "the drop she was in stays behind")
 	assert_true(v._was_on_floor, "no landing is pending")
 
 
