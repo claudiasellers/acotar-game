@@ -427,6 +427,7 @@ def main():
         report += C.after_warp(ctx, W) or []
     if getattr(C, "GAIT", "female") == "male":
         feyre_anims.GAITS = male_gaits()
+    feyre_anims.ARM_CLEAR = getattr(C, "ARM_CLEAR", 0.0)
     clips = feyre_anims.add_actions(arm)
     if hasattr(C, "extra_clips"):
         clips += C.extra_clips(ctx)

@@ -437,7 +437,7 @@ def build(name, p):
     # their weight, talk with their hands, flinch and bow.
     arm = person_rig.build_armature(g, H, hr)
     person_rig.weight(joined, arm, H, g.points[g.names["neck"]][2] + hr * 0.25)
-    person_rig.animate(name, joined, arm, g, H)
+    person_rig.animate(name, joined, arm, g, H, arm_out=p.get("arm_out", -0.03))
     base.export(name, [joined, arm])
 
 
@@ -485,7 +485,7 @@ CAST = {
                  "outfit": "armor", "cloak": (0.45, 0.25, 0.2), "legs": (0.3, 0.28, 0.22), "hair": (0.85, 0.5, 0.25),
                  "hair_style": "braid", "extras": ["spear"], "mask": (0.5, 0.55, 0.4)},
     # --- the gardeners (keeper, ch24): insect masks, iridescent buzzing wings
-    "gardener_1": {"height": 1.7, "skin": (0.55, 0.62, 0.42), "cloth": (0.42, 0.5, 0.36), "apron": (0.62, 0.5, 0.36),
+    "gardener_1": {"arm_out": 0.0, "height": 1.7, "skin": (0.55, 0.62, 0.42), "cloth": (0.42, 0.5, 0.36), "apron": (0.62, 0.5, 0.36),
                    "outfit": "tunic", "legs": (0.38, 0.32, 0.24), "hair": (0.3, 0.25, 0.15), "hair_style": "short",
                    "mask": (0.3, 0.45, 0.32), "mask_style": "insect", "mask_eye": (0.3, 0.75, 0.6),
                    "extras": ["wings", "basket"], "wing": (0.75, 0.95, 0.9)},
@@ -494,7 +494,7 @@ CAST = {
                    "mask": (0.55, 0.42, 0.2), "mask_style": "insect", "mask_eye": (0.75, 0.45, 0.85),
                    "extras": ["wings"], "wing": (0.9, 0.82, 1.0)},
     # --- the green-and-brown, long-limbed kinds Feyre sees in the halls (unnamed)
-    "fae_greenbrown": {"height": 1.85, "build": 0.85, "limb": 0.8, "hands": 1.5, "skin": (0.45, 0.55, 0.32), "skin_rough": 0.9,
+    "fae_greenbrown": {"arm_out": 0.0, "height": 1.85, "build": 0.85, "limb": 0.8, "hands": 1.5, "skin": (0.45, 0.55, 0.32), "skin_rough": 0.9,
                        "cloth": (0.5, 0.38, 0.24), "outfit": "robe", "hair": (0.32, 0.24, 0.14), "hair_style": "long",
                        "ears": "long", "mask": SPRING_MASK, "extras": ["leaves"], "leaf": (0.55, 0.62, 0.3)},
     "fae_longlimb": {"height": 2.15, "build": 0.75, "limb": 0.75, "hands": 1.8, "skin": (0.52, 0.42, 0.3), "skin_rough": 0.9,
@@ -527,9 +527,9 @@ CAST = {
                      "outfit": "tunic", "hair_style": "none", "ears": "round", "extras": ["mushroom"]},
     "fae_moth": {"height": 1.6, "skin": (0.92, 0.9, 0.82), "cloth": (0.75, 0.68, 0.55), "outfit": "dress", "hair": (0.85, 0.8, 0.7),
                  "hair_style": "bun", "eyes": (0.1, 0.1, 0.12), "extras": ["wings", "feathers"], "wing": (0.82, 0.75, 0.6)},
-    "fae_fox": {"height": 1.7, "skin": (0.95, 0.85, 0.75), "cloth": (0.3, 0.45, 0.25), "outfit": "tunic", "legs": (0.5, 0.4, 0.3),
+    "fae_fox": {"arm_out": 0.0, "height": 1.7, "skin": (0.95, 0.85, 0.75), "cloth": (0.3, 0.45, 0.25), "outfit": "tunic", "legs": (0.5, 0.4, 0.3),
                 "hair": (0.9, 0.45, 0.18), "hair_style": "short", "ears": "fox", "extras": ["tail"], "tail_tip": (0.98, 0.96, 0.92)},
-    "fae_stag": {"height": 2.0, "build": 1.15, "skin": (0.7, 0.55, 0.42), "cloth": (0.45, 0.35, 0.25), "outfit": "tunic",
+    "fae_stag": {"arm_out": 0.04, "height": 2.0, "build": 1.15, "skin": (0.7, 0.55, 0.42), "cloth": (0.45, 0.35, 0.25), "outfit": "tunic",
                  "legs": (0.35, 0.28, 0.2), "hair": (0.4, 0.3, 0.2), "hair_style": "short", "beard": True, "extras": ["antlers"]},
     "fae_nymph": {"height": 1.7, "skin": (0.62, 0.82, 0.86), "cloth": (0.4, 0.7, 0.75), "outfit": "gown", "hair": (0.2, 0.45, 0.55),
                   "hair_style": "long", "ears": "long", "sleeves": (False, False), "extras": ["scales"], "scale": (0.45, 0.8, 0.8)},
