@@ -1183,12 +1183,15 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
 	# bash 3.2 has no wait -n: poll for a free slot.
 	while [ "$(jobs -pr | wc -l)" -ge "$JOBS" ]; do perl -e 'select(undef,undef,undef,0.2)'; done
-	( scenario "$c" ) > "$ROOT/out.$c" 2>&1 &
+	# The rc goes to a file: a finished job reaped by the jobs poll above can make a later
+	# `wait <pid>` return 127 under bash 3.2, so wait's own status is not trusted.
+	( ( scenario "$c" ); echo $? > "$ROOT/rc.$c" ) > "$ROOT/out.$c" 2>&1 &
 	eval "pid_$c=$!"
 	ran_cases="${ran_cases:-} $c"
 done
 for c in ${ran_cases:-}; do
-	eval "wait \$pid_$c"; rc=$?
+	eval "wait \$pid_$c" 2>/dev/null
+	rc=$(cat "$ROOT/rc.$c" 2>/dev/null); rc=${rc:-missing}
 	cat "$ROOT/out.$c"
 	if [ "$rc" = 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 done
