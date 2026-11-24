@@ -3,9 +3,10 @@
 ##   SAID     anyone speaking aloud, Feyre included, in play and in films: a
 ##            smear of shadow, the name in gold capitals, plain upright type.
 ##   THOUGHT  everything in Feyre's head: a slip of her page in her hand,
-##            marked with her whorl, in the top left corner beside her
-##            bookmark (the whorl and the G key). It slides out from the
-##            bookmark and its whorl inks itself in, so a new one is seen.
+##            in the top left corner beside her bookmark (the whorl and the
+##            G key). It slides out from the bookmark while the bookmark's
+##            whorl inks itself in, so a new one is seen. One whorl, never
+##            two: the slip draws its own only while the bookmark is hidden.
 ##   TOLD     a film's narration: her hand, large, on the smear, no name.
 ##   WHISPER  a voice inside her head that is not hers (the Bogge): bare bone
 ##            words in a thin hand, in the middle of her view, that tremble
@@ -89,6 +90,11 @@ const CENTRE: Array[Place] = [Place.MIDDLE, Place.PAGE]
 var _stands: Dictionary[Place, Stand] = {}
 var _latest: Place = Place.LANE
 var _arrival: Tween
+var _inking: WhorlInk
+
+## The whorl of her bookmark in HudLayout's THOUGHT zone (GuideJournal sets
+## it): while it shows, it is a thought's mark and the slip draws none.
+var bookmark: WhorlInk
 
 ## The words on screen now, said or thought ("" when none), and the voice
 ## they are in: the newest of the lane's line and her thought.
@@ -162,12 +168,15 @@ func say(in_voice: Voice, who: String, text: String, from: Node = null, seconds:
 	_lay_lane()
 	if row.place in [Place.LANE, Place.CORNER]:
 		_latest = row.place
-	if row.get("arrives", false) and _stands[row.place].showing != text:
-		_arrive(_stands[row.place])
+	var arriving: bool = row.get("arrives", false) and _stands[row.place].showing != text
 	for place: Place in _stands:
 		if place != row.place and (row.get("alone", false) or (place in CENTRE and row.place in CENTRE)):
 			_stands[place].cut()
-	return _stands[row.place].say(in_voice, who, text, from, seconds)
+	var seconds_up := _stands[row.place].say(in_voice, who, text, from, seconds)
+	_mark_thought()
+	if arriving:
+		_arrive(_stands[row.place])
+	return seconds_up
 
 
 ## Takes every line off now (with the usual fade).
@@ -194,22 +203,35 @@ func _front() -> Stand:
 	return _stands[other] if _stands[_latest].showing == "" and _stands[other].showing != "" else _stands[_latest]
 
 
-## A new thought slides out from her bookmark while its whorl inks itself in:
-## movement in the corner of the eye, and no sound. With reduced effects it
-## only fades in.
+## True while her bookmark is on screen.
+func bookmark_shown() -> bool:
+	return is_instance_valid(bookmark) and bookmark.is_visible_in_tree()
+
+
+## One whorl marks a thought: the bookmark's while it shows, else the slip's.
+func _mark_thought() -> void:
+	var stand := _stands[Place.CORNER]
+	stand.whorl.visible = stand.marked and not bookmark_shown()
+
+
+## A new thought slides out from her bookmark while the whorl that marks it
+## inks itself in: movement in the corner of the eye, and no sound. With
+## reduced effects it only fades in.
 func _arrive(stand: Stand) -> void:
 	if _arrival and _arrival.is_valid():
 		_arrival.kill()
+	if is_instance_valid(_inking):
+		_inking.progress = 1.0
 	var box := stand.get_parent() as Control
 	box.offset_left = CORNER.x
-	stand.whorl.progress = 1.0
 	if GameSettings.reduced_effects or not is_inside_tree():
 		return
+	_inking = bookmark if bookmark_shown() else stand.whorl
 	box.offset_left = CORNER.x - ARRIVE
-	stand.whorl.progress = 0.0
+	_inking.progress = 0.0
 	_arrival = create_tween().set_parallel()
 	_arrival.tween_property(box, ^"offset_left", CORNER.x, ARRIVE_SECONDS * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_arrival.tween_property(stand.whorl, ^"progress", 1.0, ARRIVE_SECONDS)
+	_arrival.tween_property(_inking, ^"progress", 1.0, ARRIVE_SECONDS)
 
 
 ## True while a line stands in the lane (the strap steps aside for it).
@@ -252,6 +274,7 @@ func _process(delta: float) -> void:
 	# A screen (the book, a station) pauses the tree: the lines step aside and
 	# wait rather than sitting on top of it.
 	visible = not get_tree().paused
+	_mark_thought()
 	if visible:
 		for stand: Stand in _stands.values():
 			stand.tick(delta)
@@ -266,6 +289,8 @@ class Stand:
 	var whorl: WhorlInk
 	var showing: String = ""
 	var voice: Voice = Voice.SAID
+	## Whether this voice wears her whorl.
+	var marked: bool = false
 	## Scales the voice's own tremble (the Bogge's pleas grow more frantic).
 	var tremble: float = 1.0
 	var _row: Dictionary = {}
@@ -321,7 +346,8 @@ class Stand:
 		who_label.theme_type_variation = _row.get("name_type", &"LineName")
 		who_label.visible = _row.get("named", false) and who != ""
 		_hint.visible = _row.get("held", false)
-		whorl.visible = _row.get("whorl", false)
+		marked = _row.get("whorl", false)
+		whorl.visible = marked
 		whorl.ink = JournalTheme.color(&"line")
 		text_label.text = text
 		text_label.visible_ratio = 0.0 if _row.has("written") else 1.0

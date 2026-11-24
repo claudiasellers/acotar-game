@@ -170,8 +170,12 @@ lane went unseen, and it shared its spot with speech). A slip starts at
 tab (`GuideJournal.TAB_WIDTH`), reads left to right and wraps at
 `CORNER_WIDTH` (460 px), so it stays clear of the notices at the top centre.
 A new thought is seen arriving and makes no sound: the slip slides `ARRIVE`
-px out from the bookmark while its whorl inks itself in (`ARRIVE_SECONDS`);
-with reduced effects it only fades in. A thought is not in the lane, so the
+px out from the bookmark while the whorl that marks it inks itself in
+(`ARRIVE_SECONDS`); with reduced effects it only fades in. One whorl marks a
+thought, never two: while the bookmark shows (`bookmark_shown()`;
+`GuideJournal` hands its whorl to `LinePresenter.bookmark`) it is the
+bookmark's and the slip draws none, and while the bookmark is hidden (a
+staged scene, the HUD off) the slip draws its own. A thought is not in the lane, so the
 strap stays, and what she thinks and what is said can be up together. In a
 film the corner sits under the top letterbox bar. `showing` and `voice` are
 the newest of the lane's line and her thought.

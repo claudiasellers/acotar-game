@@ -236,6 +236,7 @@ func _build() -> void:
 	_mark.pivot_offset = Vector2(MARK, MARK) * 0.5
 	_mark.width = 3.0
 	plate.add_child(_mark)
+	LinePresenter.of(get_tree()).bookmark = _mark
 	var key := BookKit.key_cap("G")
 	key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_tab.add_child(key)

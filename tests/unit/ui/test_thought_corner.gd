@@ -8,6 +8,7 @@ const PATH := "user://test_thought_corner.cfg"
 
 var lines: LinePresenter
 var _saved_path: String
+var _saved_bookmark: WhorlInk
 
 
 func before_each() -> void:
@@ -16,6 +17,8 @@ func before_each() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
 	GameSettings.load_settings()
 	lines = LinePresenter.of(get_tree())
+	_saved_bookmark = lines.bookmark
+	lines.bookmark = null
 	lines.clear()
 	get_tree().paused = false
 	await _settle()
@@ -23,6 +26,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	lines.clear()
+	lines.bookmark = _saved_bookmark
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
 	GameSettings.settings_path = _saved_path
 	GameSettings.load_settings()
@@ -65,10 +69,33 @@ func test_what_she_thinks_and_what_is_said_stand_together() -> void:
 	assert_eq(lines.voice, V.SAID)
 
 
+## One whorl marks a thought. While her bookmark shows it is the bookmark's,
+## which inks itself in as the slip arrives, and the slip draws none.
+func test_beside_the_bookmark_the_slip_has_no_whorl_and_the_bookmark_inks() -> void:
+	var mark := WhorlInk.new()
+	add_child_autofree(mark)
+	lines.bookmark = mark
+	var stand := lines.stand_of(V.THOUGHT)
+	lines.say(V.THOUGHT, "", "Last loaf's gone.", null, 30.0)
+	assert_false(stand.whorl.visible, "no second whorl")
+	assert_lt(mark.progress, 0.1, "the bookmark's whorl draws itself")
+	assert_lt((stand.get_parent() as Control).offset_left, LinePresenter.CORNER.x)
+	await _settle()
+	assert_almost_eq(mark.progress, 1.0, 0.01)
+	assert_false(stand.whorl.visible)
+	mark.visible = false
+	lines._process(0.0)
+	assert_true(stand.whorl.visible, "the HUD hid the bookmark: the slip wears her whorl itself")
+	assert_almost_eq(stand.whorl.progress, 1.0, 0.01)
+
+
+## With the bookmark hidden (a staged scene, the HUD off) the slip's own whorl
+## is the mark, and it is the one that inks in.
 func test_a_new_thought_slides_out_and_inks_its_whorl() -> void:
 	var stand := lines.stand_of(V.THOUGHT)
 	var box := stand.get_parent() as Control
 	lines.say(V.THOUGHT, "", "Last loaf's gone.", null, 30.0)
+	assert_true(stand.whorl.visible)
 	assert_lt(box.offset_left, LinePresenter.CORNER.x, "it starts nearer the bookmark")
 	assert_lt(stand.whorl.progress, 0.1, "its whorl not yet drawn")
 	await _settle()
