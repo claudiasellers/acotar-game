@@ -383,6 +383,16 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
                         segs=12, rings=6)
     for fc in tongue:
         fc.material_index = 2
+    # A UV layer, though the mouth's materials are flat colours: Godot's importer generates
+    # tangents for every surface and logs "UVs are required to generate tangents" once per
+    # surface and shape key (156 lines a cast glb) when a mesh has none.  A front projection
+    # with a little depth mixed in keeps the triangles from collapsing to zero UV area.
+    uv = bm.loops.layers.uv.new("UVMap")
+    span = 4.0 * hw
+    for fc in bm.faces:
+        for lp in fc.loops:
+            x, y, z = lp.vert.co
+            lp[uv].uv = (0.5 + (x + 0.5 * (y - lip_y)) / span, 0.5 + (z - z_line + 0.5 * (y - lip_y)) / span)
     bm.to_mesh(me)
     bm.free()
     for m in mats + [mats[1]]:          # slot 3: the lower row, same enamel
