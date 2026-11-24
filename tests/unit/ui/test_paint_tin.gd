@@ -103,3 +103,38 @@ func test_the_pickup_log_names_what_she_picked() -> void:
 	assert_eq(log.lines().size(), 0, "rows go after a few seconds")
 	var right := HudLayout.CORNERS[HudLayout.Zone.PICKUPS][1].x + PickupLog.WIDTH as float
 	assert_lte(right, HudLayout.LANE_LEFT, "the log keeps left of the lane lines stand in")
+
+
+## A pan's name sits wholly inside the tin's own rect in every state: at
+## rest, with the pans standing proud under LB, and over the end pans.
+func test_a_pans_name_stays_inside_the_tin() -> void:
+	var tin := satchel._tin
+	for chord: bool in [false, true]:
+		satchel._set_chord(chord)
+		await wait_seconds(0.4)
+		for i in tin.pans.size():
+			tin.name_pan(i, "Wild strawberries and cream")
+			await wait_process_frames(2)
+			var tag := Rect2(tin._name.position, tin._name.size)
+			assert_true(Rect2(Vector2.ZERO, tin.size).encloses(tag), "pan %d, chord %s: %s in %s" % [i, chord, tag, tin.size])
+			var pan := tin.pans[i]
+			assert_lte(tag.end.y, pan.position.y, "the name clears pan %d's rim" % i)
+	satchel._set_chord(false)
+	assert_lte(SatchelHud.bar_size().y, 132.0, "the bar is no taller than its zone allows")
+
+
+## A landmark seen is a note at most once every 20 s; the rest are dropped.
+func test_landmark_notes_are_rare_and_dropped_not_queued() -> void:
+	var map := WorldMapHud.new()
+	FindCard.clear(get_tree())
+	map.notice(get_tree(), "The old mill", false)
+	map.notice(get_tree(), "A cairn", false)
+	map.notice(get_tree(), "The split oak", false)
+	assert_eq(FindCard.pending(), 1, "one note, the other two dropped")
+	assert_false(map.landmark_note_due())
+	map._landmark_noted_at -= int(WorldMapHud.LANDMARK_NOTE_GAP * 1000.0)
+	assert_true(map.landmark_note_due(), "due again after the gap")
+	map.notice(get_tree(), "Elmhollow", true)
+	assert_eq(FindCard.pending(), 2, "a place found is still a heading")
+	FindCard.clear(get_tree())
+	map.free()

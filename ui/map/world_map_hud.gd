@@ -24,6 +24,8 @@ const NODES_EVERY := 1.5
 ## nothing solid stands between, or anywhere this close.
 const SEE_DISTANCE := 280.0
 const NEAR_DISTANCE := 40.0
+## The least time between two landmark notes, in seconds.
+const LANDMARK_NOTE_GAP := 20.0
 const LOOKS_PER_CHECK := 8
 ## Uncovered round a landmark when she sees it from afar (she sketches it).
 const SKETCH_RADIUS := 28.0
@@ -46,6 +48,8 @@ var manor_house: Node3D
 var places: MapPlaceSet
 ## id -> {label, kind, x, z}
 var seen_landmarks: Dictionary = {}
+## When the last landmark note went up (ticks, ms); -1 for never.
+var _landmark_noted_at: int = -1
 var found: Dictionary = {}
 var player_xz: Vector2 = Vector2.ZERO
 ## Facing on the map, radians, 0 = north (up), clockwise.
@@ -424,14 +428,25 @@ func _mark_seen(id: String, c: Dictionary, from_afar: bool) -> void:
 	_celebrate(String(c.label), id, false)
 
 
-## A place found is a chapter heading; a landmark seen is a note. Both go
-## through the one notice queue, and the minimap sparkles.
+## A place found is a chapter heading; a landmark seen for the first time is a
+## note, at most one every LANDMARK_NOTE_GAP seconds: the rest are dropped,
+## not queued (the minimap still sparkles for each).
 func _celebrate(text: String, landmark_id: String, big: bool) -> void:
 	minimap.celebrate(landmark_id)
+	notice(get_tree(), text, big)
+
+
+## The name of what she found, on the notice queue.
+func notice(tree: SceneTree, text: String, big: bool) -> void:
 	if big:
-		FindCard.heading(get_tree(), text)
-	else:
-		FindCard.note(get_tree(), text)
+		FindCard.heading(tree, text)
+	elif landmark_note_due():
+		_landmark_noted_at = Time.get_ticks_msec()
+		FindCard.note(tree, text)
+
+
+func landmark_note_due() -> bool:
+	return _landmark_noted_at < 0 or Time.get_ticks_msec() - _landmark_noted_at >= int(LANDMARK_NOTE_GAP * 1000.0)
 
 
 # --- Stats -----------------------------------------------------------------------

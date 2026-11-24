@@ -132,9 +132,10 @@ static func act() -> Act:
 	return Act.HUMAN if is_human_realm() else Act.SPRING
 
 
-## A colour token for the act the story is in.
+## A colour token: the act's own, or one that is the same in both acts.
 static func color(token: StringName) -> Color:
-	return COLORS[act()][token]
+	var of_act: Dictionary = COLORS[act()]
+	return of_act[token] if of_act.has(token) else HORROR[token]
 
 
 static func colors(of_act: Act) -> Dictionary:

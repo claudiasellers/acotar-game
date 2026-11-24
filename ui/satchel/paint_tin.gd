@@ -8,8 +8,8 @@ class_name PaintTin
 extends Control
 
 const TIN := Vector2(468, 84)
-## Room above the tin for a pan's name.
-const NAME_ROOM := 28.0
+## Room above the tin for a pan's name, with the pan standing proud.
+const NAME_ROOM := 38.0
 const CORNER := 16.0
 const BOOK := Vector2(46, 56)
 const BOOK_AT := Vector2(18, 14)
@@ -65,7 +65,14 @@ func _process(delta: float) -> void:
 	_name.modulate.a = move_toward(_name.modulate.a, 1.0 if _name_left > 0.0 else 0.0, delta * 5.0)
 	if _name_pan >= 0:
 		var pan := pans[_name_pan]
-		_name.position = Vector2(pan.position.x + Pan.RADIUS - _name.size.x * 0.5, pan.position.y + pan.rise() - _name.size.y - 4.0)
+		_name.position = name_at(pan)
+
+
+## Where the name sits: centred over its pan, clear of its rim, and never
+## outside the tin's own rect.
+func name_at(pan: Pan) -> Vector2:
+	var x := clampf(pan.position.x + Pan.RADIUS - _name.size.x * 0.5, 0.0, maxf(size.x - _name.size.x, 0.0))
+	return Vector2(x, maxf(pan.position.y - Pan.PROUD - _name.size.y - 4.0, 0.0))
 
 
 func _draw() -> void:

@@ -190,3 +190,15 @@ func _scan(dir: String, word: String, out: Array[String]) -> void:
 	for f in DirAccess.get_files_at(dir):
 		if f.ends_with(".gd") and FileAccess.get_file_as_string(dir.path_join(f)).contains(word):
 			out.append(dir.path_join(f))
+
+
+## Act I's milestone layer builds (its hush wears the horror palette's pall)
+## and its headings go through the notice queue.
+func test_act_one_milestones_are_headings_in_the_queue() -> void:
+	assert_eq(JournalTheme.color(&"pall"), JournalTheme.HORROR[&"pall"], "a token both acts share")
+	var ms := Act1Milestones.new()
+	add_child_autofree(ms)
+	ms._quiet_for = 0.0
+	assert_true(ms.trigger(&"scene:wolf_kill"))
+	assert_false(ms.trigger(&"scene:wolf_kill"), "once")
+	assert_eq((_cards()[0].get_node(^"Title") as Label).text, "The Wolf in the Snow")
