@@ -3,8 +3,8 @@
 ## over the health bar, Feyre's bow as its crest; the top left is her
 ## thought card's), the grab ring in the centre, and her screen edges
 ## under everything. It reads her VitalsState and shows only what matters:
-## meters appear when they change and fade at rest (Auto), or stay
-## (Always), or go (Off: the grab ring and the edges stay). Nothing shows in
+## meters stay (Always, the default), or appear when they change and fade
+## at rest (Auto), or go (Off: the grab ring and the edges stay). Nothing shows in
 ## menus, staged story moments or while she is down. No words, no objectives.
 ## Add one to an entry scene: add_child(VitalsHud.new()).
 class_name VitalsHud
@@ -263,7 +263,7 @@ func _can_play() -> bool:
 
 
 func _mode() -> int:
-	return clampi(int(_setting(&"hud_mode", Mode.CONTEXTUAL)), 0, 2)
+	return clampi(int(_setting(&"hud_mode", Mode.ALWAYS)), 0, 2)
 
 
 func _setting(key: StringName, default: Variant) -> Variant:
