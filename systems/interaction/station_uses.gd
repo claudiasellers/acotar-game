@@ -189,7 +189,7 @@ static func _any(lines: PackedStringArray) -> String:
 ## Her thought, on the corner card (docs/contracts/ui-frame.md: her voice).
 static func _think(interactor: Interactor, text: String) -> void:
 	if text != "" and interactor.is_inside_tree():
-		LinePresenter.of(interactor.get_tree()).say(LinePresenter.Voice.THOUGHT, "", text, interactor.feyre)
+		DialogueDirector.staged(interactor, &"station_thought", "", text)
 
 
 static func _load() -> void:
