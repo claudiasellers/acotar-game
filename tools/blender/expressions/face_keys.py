@@ -101,7 +101,15 @@ class Face:
         self.mouth_half = float(obj.get("mouth_half", 0.0))   # the cut slit's half-width (mouth.cut)
         self.d = {k: _co(me, kb[k]) - self.P for k in BASE_KEYS if k in kb}
         P = self.P
-        mag = {k: np.linalg.norm(v, axis=1) for k, v in self.d.items()}
+        # the mouth bag (mouth.add_bag) is part of the Body but no part of the face: it is left out of
+        # every landmark and mask, and mouth.fit_bag gives it its keys
+        self.bag = np.zeros(len(P), dtype=bool)
+        att = me.attributes.get("mouth_bag")
+        if att is not None and len(att.data) == len(P):
+            flag = np.empty(len(P), dtype=np.int32)
+            att.data.foreach_get("value", flag)
+            self.bag = flag != 0
+        mag = {k: np.linalg.norm(v, axis=1) * ~self.bag for k, v in self.d.items()}
         self.eye = {}
         for side, k in ((1, "blink_L"), (-1, "blink_R")):
             m = mag[k]
@@ -112,6 +120,11 @@ class Face:
         sm = mag["smile"]
         sw = sm * (sm > 0.5 * sm.max())
         self.corner_x = float(_centroid(np.abs(P), sw)[0])
+        # mouth.open_mouth pins the mouth's landmarks as the uncut face had them: its edits of the lips'
+        # own keys must not slide every expression field round the mouth
+        if "landmark_mouth" in obj:
+            self.mouth = np.array(obj["landmark_mouth"], dtype=float)
+            self.corner_x = float(obj["landmark_corner_x"])
         bu = mag["brow_up"]
         self.brow = _centroid(P, bu * (bu > 0.5 * bu.max()))
         self.sh = (self.eye[1][0] - self.eye[-1][0]) / (2.0 * REF_EYE_X)
@@ -119,7 +132,7 @@ class Face:
         self.sv = (eye_z - self.mouth[2]) / REF_EYE_TO_MOUTH
         self.eye_z = eye_z
         # The head: everything the base face keys touch, plus the Head/Jaw-weighted skin.
-        self.head = _group_weights(obj, ("Head", "Jaw")) * (P[:, 2] > self.mouth[2] - 0.09 * self.sv)
+        self.head = _group_weights(obj, ("Head", "Jaw")) * (P[:, 2] > self.mouth[2] - 0.09 * self.sv) * ~self.bag
         # Front of the face: ahead of the eyes' depth, fading to the ears.
         face_y = 0.5 * (self.eye[1][1] + self.eye[-1][1])
         self.front = _smooth(face_y + 0.045 * self.sh, face_y + 0.01 * self.sh, P[:, 1]) * self.head
@@ -298,9 +311,9 @@ def transfer_keys(body, f, other, names=EXPRESSION_KEYS, force=False):
     if force:
         names = tuple(FACE_BASE_KEYS) + tuple(n for n in names if n not in FACE_BASE_KEYS)
     from mathutils.kdtree import KDTree
-    tree = KDTree(len(f.P))
-    for i, p in enumerate(f.P):
-        tree.insert(p, i)
+    tree = KDTree(int((~f.bag).sum()))
+    for i in np.where(~f.bag)[0]:
+        tree.insert(f.P[i], int(i))
     tree.balance()
     kb = other.data.shape_keys.key_blocks
     Q = _co(other.data, kb["Basis"])

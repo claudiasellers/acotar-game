@@ -8,13 +8,19 @@ the visemes only stretch skin, and nothing can show teeth.  This module:
 2. rolls each lip edge a few millimetres into the head (the inner lip);
 3. fixes the base shape keys on the new vertices, so the lower lip rides the
    jaw and the upper lip stays: jaw_open and the visemes now part the lips;
-4. builds "Mouth": a dark mouth bag, an upper and a lower row of teeth (with
-   fangs where asked) and a tongue, skinned to Head (upper) and Jaw (lower), with
-   the face keys the lower half needs (jaw_open and every key's jaw component).
+4. finishes the cut where it crossed over, closes the notches and pinholes it
+   leaves, lays the inner lips flat and dark, and makes the lip edges move with
+   their own lips;
+5. closes the opening with a dark mouth bag that is part of the Body (its first
+   ring is the lip edge, so no gap opens between lip and bag);
+6. builds "Mouth": an upper and a lower row of teeth (with fangs where asked) and
+   a tongue, skinned to Head (upper) and Jaw (lower), with the face keys the lower
+   half needs (jaw_open and every key's jaw component).
 
-Landmarks come from the base keys (see face_keys.Face).  Run before
-face_keys.add_expression_keys (apply_face_keys.py does).  Idempotent: a body
-already cut (custom property "mouth_cut") is left alone and only Mouth is rebuilt.
+Landmarks come from the base keys (see face_keys.Face); the mouth's are pinned
+on the first run.  Run before face_keys.add_expression_keys, then hold_upper_lip
+and fit_bag after it (apply_face_keys.py does).  Idempotent: a body
+already cut (custom property "mouth_cut") is not cut again; the bag and Mouth are rebuilt.
 """
 
 import math
@@ -22,6 +28,7 @@ import math
 import bmesh
 import bpy
 import numpy as np
+from mathutils import Vector
 
 import face_keys as fk
 
@@ -194,12 +201,29 @@ def _mark_sides(me, z_line):
     return side
 
 
+def _wind_like_neighbours(faces):
+    """Wind each new face as the faces it joins: a shared edge runs one way in one face and the other way
+    in the next.  (A neighbour's normal is no guide at the lip edge, where the inner lip faces into the
+    mouth.)  A face wound backwards turns its back and shows as a dark shard through the lip."""
+    for g in faces:
+        same = opp = 0
+        for lp in g.loops:
+            for other in lp.edge.link_loops:
+                if other.face is not g:
+                    if other.vert is lp.vert:
+                        same += 1
+                    else:
+                        opp += 1
+        if same > opp:
+            g.normal_flip()
+
+
 def finish_cut(body, z_line, f):
     """Finish the cut where it stopped short.  Along a few stretches of the seam the two copies of a seam
     vertex went to the wrong lips, so a face (a flat one on the seam, or a piece of the rolled inner lip)
     runs from one lip at one end to the other lip at the other: as the jaw opens it stretches into a pale
     flap across the mouth and over the teeth.  Each such face is rebuilt once for each lip that holds two
-    or more of its corners, with every corner of the other lip swapped for the nearest vertex of this one,
+    or more of its corners, with every other corner swapped for the nearest vertex of this one,
     so both lips keep a whole edge and roll; a vertex left joining two fans of faces is split in two, so
     the opening stays one clean loop.  Then every seam vertex is marked with its lip in "mouth_side".
     Returns the faces rebuilt."""
@@ -221,43 +245,61 @@ def finish_cut(body, z_line, f):
     if bridge:
         trees = {}
         for L in (1, -1):
-            vs = [v for v in bm.verts if zone(v) and lip(v) == L]
-            t = KDTree(len(vs))
+            # stand-ins come from near the seam: one from high on the lip folds the face over the lip
+            vs = [v for v in bm.verts if zone(v) and lip(v) == L and abs(v.co.z - z_line) < 0.0015 * f.sv]
+            flat, full = KDTree(len(vs)), KDTree(len(vs))
             for k, v in enumerate(vs):
-                t.insert((v.co.x, v.co.y, 0.0), k)
-            t.balance()
-            trees[L] = (t, vs)
+                flat.insert((v.co.x, v.co.y, 0.0), k)
+                full.insert(v.co, k)
+            flat.balance()
+            full.balance()
+            trees[L] = ((flat, lambda c: (c.x, c.y, 0.0)), (full, lambda c: c), vs)
         uv = bm.loops.layers.uv.active
+        made = []
+        bm.normal_update()
         for fc in bridge:
             corners = [(lp.vert, lp[uv].uv.copy() if uv is not None else None) for lp in fc.loops]
             for L in (1, -1):
                 if sum(lip(v) == L for v, _ in corners) < 2:
                     continue
-                t, vs = trees[L]
-                verts, uvs = [], []
-                kept = {v for v, _ in corners if lip(v) != -L}
-                for v, u in corners:
-                    w = v
-                    if lip(v) == -L:
-                        # the nearest of this lip; of a stack of coincident copies, one joined to the face's
-                        # own corners, or the lip edge would fork
-                        _, _, d = t.find((v.co.x, v.co.y, 0.0))
-                        cand = [vs[k] for _, k, _ in t.find_range((v.co.x, v.co.y, 0.0), d + 1e-6)]
-                        joined = [c for c in cand if any(e.other_vert(c) in kept for e in c.link_edges)]
-                        w = (joined or cand)[0]
-                    if w not in verts:
-                        verts.append(w)
-                        uvs.append(u)
+                kept = {v for v, _ in corners if lip(v) == L}
+                # every other corner swapped for the nearest of this lip, seen from the front (so a stack
+                # of seam copies counts as one point); if that folds the face over, the nearest in space
+                for t, key in trees[L][:2]:
+                    vs = trees[L][2]
+                    verts, uvs = [], []
+                    for v, u in corners:
+                        w = v
+                        if lip(v) != L:     # the other lip's, or one on neither (it would stay as a needle)
+                            # of a stack of coincident copies, one joined to the face's own corners, or the
+                            # lip edge would fork
+                            _, _, d = t.find(key(v.co))
+                            cand = [vs[k] for _, k, _ in t.find_range(key(v.co), d + 1e-6)]
+                            joined = [c for c in cand if any(e.other_vert(c) in kept for e in c.link_edges)]
+                            w = (joined or cand)[0]
+                        if w not in verts:
+                            verts.append(w)
+                            uvs.append(u)
+                    if len(verts) >= 3:
+                        q = [w.co for w in verts]
+                        nrm = sum(((q[i] - q[0]).cross(q[i + 1] - q[0]) for i in range(1, len(q) - 1)), Vector())
+                        if nrm.dot(fc.normal) > 0.0:
+                            break
                 if len(verts) < 3 or bm.faces.get(verts) is not None:
                     continue
                 busy = [bm.edges.get((verts[i - 1], verts[i])) for i in range(len(verts))]
                 if any(e is not None and len([g for g in e.link_faces if g not in bridge]) >= 2 for e in busy):
                     continue        # that lip is whole there already
                 g = bm.faces.new(verts, fc)
+                made.append(g)
                 if uv is not None:
                     for lp, u in zip(g.loops, uvs):
                         lp[uv].uv = u
         bmesh.ops.delete(bm, geom=bridge, context="FACES_ONLY")
+        # a swapped corner can mirror a face: wind each one as the skin it joins, edge by edge (a shared
+        # edge runs the opposite way in each of its two faces), or it turns its back and shows as a dark
+        # shard through the lip
+        _wind_like_neighbours(made)
         loose = [v for v in bm.verts if not v.link_faces]
         if loose:
             bmesh.ops.delete(bm, geom=loose, context="VERTS")
@@ -272,8 +314,9 @@ def finish_cut(body, z_line, f):
 
 
 def seal_slivers(body, z_line, f):
-    """Fill the three- and four-vertex holes the cut leaves in a lip where a split edge met a subdivision
-    vertex: shut, they are invisible, but every key that parts the lips pulls them open into pinholes
+    """Fill the small holes (up to ten vertices) the cut leaves in a lip, where a split edge met a
+    subdivision vertex or where closing a notch cut one off: shut, they are invisible, but every key
+    that parts the lips pulls them open into pinholes
     through the lip.  No vertices are added, so weights and keys stand.  Returns how many were filled."""
     me = body.data
     bm = bmesh.new()
@@ -297,9 +340,31 @@ def seal_slivers(body, z_line, f):
                         left.discard(g)
                         todo.append(g)
         vs = {v for e in loop for v in e.verts}
-        if len(vs) <= 6 and len({lip(v) for v in vs} - {0}) < 2:
-            keep += loop
-    made = bmesh.ops.holes_fill(bm, edges=keep, sides=6)["faces"] if keep else []
+        if len(vs) <= 10 and len({lip(v) for v in vs} - {0}) < 2:
+            keep.append(vs)
+
+    made = []
+    for vs in keep:         # one loop at a time: holes_fill skips some pinholes edgeloop_fill closes
+        ring = [e for e in bm.edges if e.is_boundary and all(v in vs for v in e.verts)]
+        if len(ring) >= 3:
+            try:
+                got = bmesh.ops.edgeloop_fill(bm, edges=ring)["faces"]
+            except RuntimeError:
+                got = []
+            if not got:
+                order = [ring[0].verts[0]]
+                while len(order) < len(ring):
+                    nxt = [e.other_vert(order[-1]) for e in order[-1].link_edges if e in ring]
+                    nxt = [v for v in nxt if v not in order]
+                    if not nxt:
+                        break
+                    order.append(nxt[0])
+                try:
+                    got = [bm.faces.new(order)] if len(order) == len(ring) else []
+                except ValueError:
+                    got = []
+            made += bmesh.ops.triangulate(bm, faces=got, quad_method="BEAUTY", ngon_method="BEAUTY")["faces"] \
+                if any(len(g.verts) > 4 for g in got) else got
     uv = bm.loops.layers.uv.active
     for fc in made:
         nb = [g for e in fc.edges for g in e.link_faces if g is not fc]
@@ -311,16 +376,274 @@ def seal_slivers(body, z_line, f):
                 other = [l for l in lp.vert.link_loops if l.face is not fc]
                 if other:
                     lp[uv].uv = other[0][uv].uv
-    bm.normal_update()
-    for fc in made:                      # face the same way as the skin around it
-        nb = [g for e in fc.edges for g in e.link_faces if g is not fc]
-        if nb and fc.normal.dot(nb[0].normal) < 0:
-            fc.normal_flip()
+    # a pinhole that touches the opening at one vertex is part of its boundary walk: find it as a short
+    # cycle of boundary edges through that vertex
+    for v in [v for v in bm.verts if near(v) and sum(e.is_boundary for e in v.link_edges) > 2]:
+        if not v.is_valid:
+            continue
+        nb = {e.other_vert(v) for e in v.link_edges if e.is_boundary}
+        done = False
+        for a in nb:
+            for b in nb:
+                if done or a is b:
+                    continue
+                cyc = None
+                if bm.edges.get((a, b)) is not None and bm.edges.get((a, b)).is_boundary:
+                    cyc = [v, a, b]
+                else:
+                    for e in a.link_edges:
+                        c = e.other_vert(a)
+                        if e.is_boundary and c not in (v, b) and bm.edges.get((c, b)) is not None \
+                                and bm.edges.get((c, b)).is_boundary:
+                            cyc = [v, a, c, b]
+                            break
+                if cyc and len({lip(u) for u in cyc} - {0}) < 2 and bm.faces.get(cyc) is None:
+                    try:
+                        made.append(bm.faces.new(cyc))
+                        done = True
+                    except ValueError:
+                        pass
+    _wind_like_neighbours(made)          # face the same way as the skin around it
     if made:
         bm.to_mesh(me)
         me.update()
     bm.free()
     return len(made)
+
+
+def close_notches(body, z_line, f, passes=20):
+    """Close the notches the cut leaves in the opening's edge.  Along most of its length the edge is the
+    inner lip's rolled rim, deep behind the lips' fronts; where a piece of that roll is missing, the
+    edge runs out to the seam at the lips' front and back again (Nesta's upper left lip, Rhysand's
+    upper lip each side of a strip that then hangs loose across the opening).  Through such a notch
+    the teeth and the mouth's dark show at rest.  A notch is a run of edge vertices on one lip, each at
+    least 0.6 mm ahead of its lip's rim, between two rim vertices of that lip no more than 10 mm apart:
+    it is filled with faces.  Returns the notches closed."""
+    me = body.data
+    n = 0
+    for _ in range(passes):
+        side = _mark_sides(me, z_line)
+        loop = _lip_loop(body, f, z_line)
+        V = me.vertices
+        L = len(loop)
+
+        def lip(i):
+            dz = V[i].co.z - z_line
+            return 1 if dz > 1e-4 else -1 if dz < -1e-4 else int(side[i])
+        lips = [lip(i) for i in loop]
+        rim = {s_: float(np.median([V[i].co.y for i, l in zip(loop, lips) if l == s_] or [0.0])) for s_ in (1, -1)}
+        shallow = [l != 0 and V[i].co.y < rim[l] - 0.0006 * f.sh for i, l in zip(loop, lips)]
+        found = None
+        for k in range(L):
+            if shallow[k] or not shallow[(k + 1) % L]:
+                continue
+            run, j = [], (k + 1) % L
+            while shallow[j] and len(run) < L:
+                run.append(j)
+                j = (j + 1) % L
+            ends = (k, j)
+            if len({lips[x] for x in run + list(ends)}) == 1 and \
+                    (V[loop[k]].co - V[loop[j]].co).length < 0.010 * f.sh:
+                found = [loop[k]] + [loop[x] for x in run] + [loop[j]]
+                break
+        if found is None:
+            break
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        bm.verts.ensure_lookup_table()
+        vs = [bm.verts[i] for i in found]
+        if (vs[0].co - vs[-1].co).length < 1e-6 and len(vs) == 3:
+            bmesh.ops.pointmerge(bm, verts=[vs[0], vs[-1]], merge_co=vs[0].co)
+        else:
+            if (vs[0].co - vs[-1].co).length < 1e-6:
+                bmesh.ops.pointmerge(bm, verts=[vs[0], vs[-1]], merge_co=vs[0].co)
+                vs = vs[:-1]
+            try:
+                g = bm.faces.new(vs)
+            except ValueError:
+                bm.free()
+                break
+            ref = [h for e in g.edges for h in e.link_faces if h is not g]
+            made = bmesh.ops.triangulate(bm, faces=[g], quad_method="BEAUTY", ngon_method="BEAUTY")["faces"]
+            uv = bm.loops.layers.uv.active
+            for t in made:
+                if ref:
+                    t.material_index = ref[0].material_index
+                    t.smooth = ref[0].smooth
+                if uv is not None:
+                    for lp in t.loops:
+                        other = [l for l in lp.vert.link_loops if l.face not in made]
+                        if other:
+                            lp[uv].uv = other[0][uv].uv
+            _wind_like_neighbours(made)
+        bm.to_mesh(me)
+        bm.free()
+        me.update()
+        n += 1
+    _mark_sides(me, z_line)
+    return n
+
+
+CORNER_SOFTEN = 12              # smoothing passes over the key deltas round each mouth corner
+INNER_LIP_DEPTH = 0.0008         # a face this far behind its seam corner is inner lip, dark (m, times the scale)
+ROLL_RISE = 0.0002               # the inner lip's edge, above or below its lip's seam at rest (m, times the scale)
+
+
+def tuck_rolls(body, z_line, f):
+    """Lay the rolled inner lips flat.  roll_lips set each inner edge 1.6 mm above or below the seam and
+    7% nearer the middle, so an open mouth shows a pale band inside each lip and a pale wall at each end,
+    all round the opening, like a box cut into the face.  Each inner-edge vertex goes straight behind
+    its seam vertex, ROLL_RISE above or below it, so from the front the inner lip is seen edge-on; in the
+    rest shape and in every key alike (their deltas stand).  Idempotent.  Returns the vertices moved."""
+    me = body.data
+    n = len(me.vertices)
+    P = np.empty(n * 3)
+    me.vertices.foreach_get("co", P)
+    P = P.reshape(-1, 3)
+    count = {}
+    for p in me.polygons:
+        for ek in p.edge_keys:
+            count[ek] = count.get(ek, 0) + 1
+    nbr = [[] for _ in range(n)]
+    for e in me.edges:
+        a, b = e.vertices
+        nbr[a].append(b)
+        nbr[b].append(a)
+    region = (np.abs(P[:, 0]) < 1.6 * f.corner_x) & (np.abs(P[:, 2] - z_line) < 0.02 * f.sv) & (f.front > 0.3)
+    plane = np.abs(P[:, 2] - z_line) < 1e-4
+    inner = {i for (a, b), c in count.items() if c == 1 for i in (a, b) if region[i] and not plane[i]}
+    shift = np.zeros((n, 3))
+    for r in inner:
+        seam = [j for j in nbr[r] if plane[j] and j not in inner]
+        dz = P[r, 2] - z_line
+        if not seam or abs(dz) > 0.0025 * f.sv:
+            continue
+        shift[r, 0] = P[seam[0], 0] - P[r, 0]
+        shift[r, 2] = z_line + math.copysign(ROLL_RISE * f.sv, dz) - P[r, 2]
+    moved = int((np.abs(shift).max(1) > 1e-7).sum())
+    if moved:
+        for k in me.shape_keys.key_blocks:
+            c = np.empty(n * 3)
+            k.data.foreach_get("co", c)
+            k.data.foreach_set("co", (c.reshape(-1, 3) + shift).ravel())
+        me.vertices.foreach_set("co", (P + shift).ravel())
+        me.update()
+    return moved
+
+
+def darken_inner_lips(body, z_line, f):
+    """Give the rolled inner lips the mouth's own dark: each is a strip running back from the seam into
+    the head, and in skin it shows inside an open mouth as a pale frame round the opening and as pale
+    shards where a corner folds in.  A face counts when it has a corner on the seam and another at least
+    INNER_LIP_DEPTH further back than that one, lies within 2.5 mm of the lip line and no further out than
+    the opening's corners (the cheek also crosses the lip line's plane), and is not turned to the viewer
+    (the lips' own fronts).  Returns the faces changed."""
+    me = body.data
+    reach = float(max(abs(me.vertices[i].co.x) for i in _lip_loop(body, f, z_line))) + 0.0015 * f.sh
+    mat = _material("mouth_inside", DARK, 0.6)
+    if mat.name not in me.materials:
+        me.materials.append(mat)
+    slot = list(me.materials).index(mat)
+    depth = INNER_LIP_DEPTH * f.sh
+    n = 0
+    for p in me.polygons:
+        co = [me.vertices[i].co for i in p.vertices]
+        seam = [c.y for c in co if abs(c.z - z_line) < 1e-4]
+        if (seam and all(abs(c.x) < reach and abs(c.z - z_line) <= 0.0025 * f.sv for c in co)
+                and max(c.y for c in co) - min(seam) >= depth
+                and p.normal.y > -0.2 and p.material_index != slot):
+            p.material_index = slot
+            n += 1
+    return n
+
+
+UPPER_LIP_SAG = 0.0004           # the most a key opening the jaw drops the upper lip's edge (m, times the scale)
+
+
+def hold_upper_lip(body, z_line, f):
+    """In a key that opens the jaw, the upper lip's edge stays up: a kit key that drags it down (Rhysand's
+    vis_AA, 3 mm on one side and 1 mm on the other) hangs a slanted strip of lip across the opening.
+    Its drop is held to UPPER_LIP_SAG over the middle of the opening, fading to the key's own at the
+    corners, which close with the jaw.  Returns {key: vertices held}."""
+    me = body.data
+    kb = me.shape_keys.key_blocks
+    N = len(me.vertices)
+    base = np.empty(N * 3)
+    kb["Basis"].data.foreach_get("co", base)
+    base = base.reshape(-1, 3)
+    bag = f.bag if len(f.bag) == N else np.zeros(N, dtype=bool)
+    side = np.zeros(N, dtype=np.int32)
+    att = me.attributes.get("mouth_side")
+    if att is not None:
+        att.data.foreach_get("value", side)
+    loop = _lip_loop(body, f, z_line)
+    half = float(np.abs(base[loop, 0]).max())
+    yf = float(f.mouth[1])
+    dz = base[:, 2] - z_line
+    upper = (dz > 1e-4) | ((np.abs(dz) <= 1e-4) & (side == 1))
+    region = upper & (dz < 0.004 * f.sv) & (base[:, 1] < yf + 0.003 * f.sh) & ~bag
+    w = np.clip((0.95 * half - np.abs(base[:, 0])) / (0.35 * half), 0.0, 1.0) * region
+    idx = np.where(w > 0)[0]
+    piv, ang, chin, ref = _jaw(f, z_line)
+    floor = -UPPER_LIP_SAG * f.sv
+    done = {}
+    for k in kb[1:]:
+        c = np.empty(N * 3)
+        k.data.foreach_get("co", c)
+        c = c.reshape(-1, 3)
+        d = c - base
+        amt = float(np.dot(d[chin].mean(0), ref) / max(np.dot(ref, ref), 1e-12))
+        if amt < 0.15:
+            continue
+        low = d[idx, 2] < floor
+        if not low.any():
+            continue
+        j = idx[low]
+        c[j, 2] = base[j, 2] + (1.0 - w[j]) * d[j, 2] + w[j] * floor
+        k.data.foreach_set("co", c.ravel())
+        done[k.name] = int(low.sum())
+    me.update()
+    return done
+
+
+def soften_corners(body, z_line, f, iters=CORNER_SOFTEN):
+    """Ease the step at each mouth corner.  Past the opening the jaw keys carry the lower lip down as one
+    piece while the upper lip stays, so the skin between them shears into a pale wall standing at each
+    end of an open mouth.  Each key's deltas there are smoothed over the mesh (the opening itself has no
+    edges across it, so the two lips stay apart); the lips inside the opening, which settle_lip_edges
+    owns, and everything away from the mouth keep theirs.  The rest shape is untouched.  Returns the
+    vertices eased."""
+    me = body.data
+    n = len(me.vertices)
+    P = np.empty(n * 3)
+    me.vertices.foreach_get("co", P)
+    P = P.reshape(-1, 3)
+    half = float(body.get("mouth_half", f.corner_x))
+    free = ((np.abs(P[:, 0]) > 0.7 * half) & (np.abs(P[:, 0]) < 1.8 * f.corner_x)
+            & (np.abs(P[:, 2] - z_line) < 0.012 * f.sv) & (f.front > 0.3))
+    idx = np.where(free)[0]
+    if not len(idx):
+        return 0
+    E = np.empty(len(me.edges) * 2, dtype=np.int64)
+    me.edges.foreach_get("vertices", E)
+    E = E.reshape(-1, 2)
+    deg = np.bincount(E.ravel(), minlength=n).astype(float)
+    kb = me.shape_keys.key_blocks
+    base = np.empty(n * 3)
+    kb["Basis"].data.foreach_get("co", base)
+    base = base.reshape(-1, 3)
+    for k in kb[1:]:
+        c = np.empty(n * 3)
+        k.data.foreach_get("co", c)
+        d = c.reshape(-1, 3) - base
+        for _ in range(iters):
+            acc = np.zeros_like(d)
+            np.add.at(acc, E[:, 0], d[E[:, 1]])
+            np.add.at(acc, E[:, 1], d[E[:, 0]])
+            mean = acc / np.maximum(deg, 1.0)[:, None]
+            d[idx] = 0.5 * d[idx] + 0.5 * mean[idx]
+        k.data.foreach_set("co", (base + d).ravel())
+    return len(idx)
 
 
 def settle_lip_edges(body, z_line, f):
@@ -331,7 +654,8 @@ def settle_lip_edges(body, z_line, f):
     stretches into pale skin flaps across the open mouth.  Here every lower-lip vertex near the line takes
     the delta of the lower lip a few millimetres down and every upper-lip vertex near it that of the upper
     lip a few millimetres up (both fading out toward the corners, which fix_seam_keys keeps sealed), upper
-    seam copies take their own lip's mean, and every inner-lip vertex takes its seam copy's delta.  Idempotent; the rest shape is untouched.  Returns the vertices moved."""
+    seam copies take their own lip's mean, and every inner-lip vertex takes its seam copy's delta.
+    Idempotent; the rest shape is untouched.  Returns the vertices moved."""
     me = body.data
     n = len(me.vertices)
     P = np.empty(n * 3)
@@ -351,16 +675,18 @@ def settle_lip_edges(body, z_line, f):
         nbr[a].append(b)
         nbr[b].append(a)
     region = (np.abs(P[:, 0]) < 1.6 * f.corner_x) & (np.abs(P[:, 2] - z_line) < 0.02 * f.sv) & (f.front > 0.3)
-    inner = sorted({i for (a, b), c in count.items() if c == 1 for i in (a, b) if region[i]})
-    inner_set = set(inner)
-    if not inner:
-        return 0
-    half = float(np.abs(P[inner, 0]).max())
     plane = np.abs(P[:, 2] - z_line) < 1e-4
+    edge = sorted({i for (a, b), c in count.items() if c == 1 for i in (a, b) if region[i]})
+    if not edge:
+        return 0
+    half = float(np.abs(P[edge, 0]).max())
+    inner = [i for i in edge if not plane[i]]      # a seam vertex left on the edge moves with its own lip
+    inner_set = set(inner)
     corner = np.clip((np.abs(P[:, 0]) - 0.5 * half) / (0.5 * half), 0.0, 1.0)
     # the lower lip near the line, and where each one takes its motion from: the lower lip 2.5-6 mm down
     lower = [i for i in np.where(region & (np.abs(P[:, 0]) < half))[0]
-             if i not in inner_set and ((plane[i] and side[i] < 0) or (z_line - 0.002 * f.sv < P[i, 2] < z_line - 1e-5))]
+             if i not in inner_set
+             and ((plane[i] and side[i] < 0) or (z_line - 0.002 * f.sv < P[i, 2] < z_line - 1e-5))]
     pool = np.where(region & (P[:, 2] < z_line - 0.0025 * f.sv) & (P[:, 2] > z_line - 0.006 * f.sv))[0]
     from mathutils.kdtree import KDTree
     tree = KDTree(len(pool))
@@ -500,7 +826,7 @@ def _jaw(f, z_line):
     ref = f.d["jaw_open"][chin].mean(0)
     # the hinge sits back by the ears at about the height of the nose's base
     piv = np.array([0.0, float(f.P[f.head > 0.5, 1].mean()) + 0.01 * f.sh, z_line + 0.035 * f.sv])
-    mag = np.linalg.norm(f.d["jaw_open"], axis=1)
+    mag = np.linalg.norm(f.d["jaw_open"], axis=1) * ~f.bag
     tip = int(np.argmax(mag))                     # the chin point the key moves most: the jaw's full swing
     ang = float(mag[tip] / max(np.linalg.norm(f.P[tip] - piv), 1e-6))
     return piv, ang, chin, ref
@@ -578,8 +904,11 @@ def _ellipsoid(bm, c, r, segs=14, rings=8):
 
 
 def _lip_loop(body, f, z_line):
-    """The opening's edge: the cut's boundary loop near the mouth, in order.  Returns body vertex indices."""
+    """The opening's edge: the cut's boundary loop near the mouth, in order.  Returns body vertex indices.
+    Once the bag closes the opening (add_bag), the loop it was built on."""
     me = body.data
+    if me.attributes.get("mouth_bag") is not None and body.get("mouth_loop"):
+        return [int(i) for i in body["mouth_loop"]]
     near = lambda v: abs(v.co.x) < 1.6 * f.corner_x and abs(v.co.z - z_line) < 0.02 * f.sv and f.front[v.index] > 0.3
     nbr = {}
     count = {}
@@ -624,7 +953,10 @@ BAG_FLOOR_SHALLOW = 0.15        # the floor rides the jaw: kept shallow so it st
 SKIN_CLEARANCE = 0.002          # the bag and tongue keep this far inside the skin in every key (m, times the scale):
                                 # the bag's faces are long, and a straight face between two vertices inside
                                 # the hollow under the lower lip still cuts through it
-TEETH_BEHIND_RIM = 0.0045       # the tooth rows' front, behind the lip edge at the middle (m, times the face's scale)
+TEETH_BEHIND_RIM = 0.003        # the tooth rows' front, behind the lip edge at the middle (m, times the face's scale)
+TEETH_ARC_BACK = 0.003          # how far the rows' ends curve back from their middle (m, times the scale)
+TEETH_SPAN = 0.96               # the rows' half-width, as a share of the opening's
+TOOTH_BOXINESS = 0.45           # 1 is an egg; lower squares a tooth's sides and biting edge
 
 
 def _loop_angles(Q):
@@ -646,11 +978,12 @@ def _loop_angles(Q):
     return ang
 
 
-def _bag(bm, body, f, z_line, hw):
+def _bag_rings(body, f, z_line, hw):
     """The inside of the mouth: a dark sock whose open end is the lip opening itself (so no corner can show
-    past it), widening behind the lips to hold the teeth, then closing
-    deep in the head.  Faces point inward.  Returns (faces, rim, y_mid): rim = [(bag vertex, body vertex,
-    weight)] for the rings that follow the lips (RIM_FOLLOW), y_mid the lip edge's depth at the middle."""
+    past it), widening behind the lips to hold the teeth, then closing deep in the head.  Returns
+    (loop, rings, tip, y_mid): loop the opening's body vertices (ring 0), rings the rest positions of
+    the rings behind it (one (n, 3) array each), tip the closing point, y_mid the lip edge's depth at
+    the middle."""
     sh, sv = f.sh, f.sv
     loop = _lip_loop(body, f, z_line)
     Q = np.array([body.data.vertices[i].co[:] for i in loop])
@@ -661,88 +994,246 @@ def _bag(bm, body, f, z_line, hw):
     # each lip vertex keeps its place round the opening on every ring: the corners at angles 0 and pi, the
     # upper lip spread by its length over the bag's roof and the lower lip over its floor
     ang = _loop_angles(Q)
-    # the rim sits exactly on the lip edge: any tuck opens a slit between the two that a downward look
-    # into an open mouth passes straight through
-    R0 = Q.copy()
-    y_back = float(R0[:, 1].max())                     # the rings behind the rim are flat, behind all of it
-    ring_vs = []
-    for k, (dy, blend, g) in enumerate(BAG_PROFILE):
-        if k == 0:
-            pts = R0
-        else:
-            ca, sa = np.cos(ang), np.sin(ang)
-            cx_ = np.sign(ca) * np.abs(ca) ** (2.0 / BAG_SQUARENESS)     # a rounded box, so the tooth rows'
-            sz_ = np.sign(sa) * np.abs(sa) ** (2.0 / BAG_SQUARENESS)     # ends fit at every height
-            floor = np.where(sa < 0.0, 1.0 - BAG_FLOOR_SHALLOW, 1.0)
-            e = np.stack([ax * g * cx_, np.zeros(len(Q)), zc + bz * g * sz_ * floor], 1)
-            pts = (1.0 - blend) * R0 + blend * e
-            pts[:, 1] = (1.0 - blend) * R0[:, 1] + blend * y_back + dy * sh   # curved like the lips, then flat
-        ring_vs.append([bm.verts.new(tuple(p)) for p in pts])
-    tip = bm.verts.new((0.0, y_back + BAG_DEPTH * sh, zc))
-    faces = []
-    n = len(Q)
-    for k in range(len(ring_vs) - 1):
-        a, b = ring_vs[k], ring_vs[k + 1]
-        for i in range(n):
-            faces.append(bm.faces.new((a[i], a[(i + 1) % n], b[(i + 1) % n], b[i])))
-    last = ring_vs[-1]
-    for i in range(n):
-        faces.append(bm.faces.new((last[i], last[(i + 1) % n], tip)))
-    # inward: a face's normal points at the bag's axis
-    bm.normal_update()
-    axis_pt = lambda c: np.array([0.0, c[1], zc])
-    deep = faces[3 * n:]                # past the collar the bag is a plain ellipsoid: vote there
-    votes = sum(1 if np.dot(np.array(fc.normal[:]), axis_pt(fc.calc_center_median()) - np.array(fc.calc_center_median()[:])) > 0 else -1
-                for fc in deep)
-    if votes < 0:
-        for fc in faces:
-            fc.normal_flip()
-    bm.verts.index_update()
-    rim = [(v.index, bi, w) for ring, w in zip(ring_vs, RIM_FOLLOW) for v, bi in zip(ring, loop)]
+    y_back = float(Q[:, 1].max())                      # the rings behind the rim are flat, behind all of it
+    rings = []
+    for dy, blend, g in BAG_PROFILE[1:]:
+        ca, sa = np.cos(ang), np.sin(ang)
+        cx_ = np.sign(ca) * np.abs(ca) ** (2.0 / BAG_SQUARENESS)     # a rounded box, so the tooth rows'
+        sz_ = np.sign(sa) * np.abs(sa) ** (2.0 / BAG_SQUARENESS)     # ends fit at every height
+        floor = np.where(sa < 0.0, 1.0 - BAG_FLOOR_SHALLOW, 1.0)
+        e = np.stack([ax * g * cx_, np.zeros(len(Q)), zc + bz * g * sz_ * floor], 1)
+        pts = (1.0 - blend) * Q + blend * e
+        pts[:, 1] = (1.0 - blend) * Q[:, 1] + blend * y_back + dy * sh   # curved like the lips, then flat
+        rings.append(pts)
+    tip = np.array([0.0, y_back + BAG_DEPTH * sh, zc])
     y_mid = float(np.median(Q[np.abs(Q[:, 0]) < 0.3 * half_open, 1]))     # the lip edge at the middle
-    return faces, rim, y_mid
+    return loop, rings, tip, y_mid
 
 
-def _keep_inside(co, idx, body_co, polys, sh):
+def remove_bag(body):
+    """Take an earlier build's bag off the Body (its vertices carry "mouth_bag"), leaving the lip opening
+    as the cut made it.  Returns the vertices removed."""
+    me = body.data
+    att = me.attributes.get("mouth_bag")
+    if att is None:
+        return 0
+    flag = np.zeros(len(me.vertices), dtype=np.int32)
+    att.data.foreach_get("value", flag)
+    n = int(flag.sum())
+    if n:
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        bm.verts.ensure_lookup_table()
+        bmesh.ops.delete(bm, geom=[bm.verts[i] for i in np.where(flag)[0]], context="VERTS")
+        bm.to_mesh(me)
+        bm.free()
+        me.update()
+    me.attributes.remove(me.attributes["mouth_bag"])
+    if "mouth_loop" in body:
+        del body["mouth_loop"]
+    return n
+
+
+def add_bag(body, f, z_line, hw):
+    """Close the lip opening with the mouth bag, as part of the Body: a sock of rings in the mouth's dark
+    whose first ring is the lip opening's own edge, so nothing can open between lip and bag.  The rings
+    just behind ride the lips in every key and the pose (RIM_FOLLOW), the rest ride the jaw, and none
+    pokes out through the skin (_keep_inside).  On the Body, the Mouth itself holds only the teeth and
+    tongue and so never widens with the lips.  Returns y_mid (see _bag_rings)."""
+    sh, sv = f.sh, f.sv
+    me = body.data
+    loop, rings, tip, y_mid = _bag_rings(body, f, z_line, hw)
+    n, m = len(loop), len(rings)
+    R = np.concatenate(rings + [tip[None]])            # rest positions of the new vertices
+    follow, lip_of = _bag_follow(loop, m)
+    lower = R[:, 2] < z_line - 0.001 * sv
+    nb = len(me.vertices)
+    base = np.array([v.co[:] for v in me.vertices])
+    polys = [tuple(p.vertices) for p in me.polygons]   # the skin, all of it, or a ray can leave by a cut edge
+    # the rest shape too: a fold of the collar can rise into the lip
+    _keep_inside(R, list(range(len(R))), base, polys, sh, **_bag_hold(follow, z_line, sv, base[lip_of], sh))
+    # build it
+    mat = _material("mouth_inside", DARK, 0.6)
+    if mat.name not in me.materials:
+        me.materials.append(mat)
+    slot = list(me.materials).index(mat)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bm.verts.ensure_lookup_table()
+    shapes = {L.name: L for L in bm.verts.layers.shape.values()}
+    dl = bm.verts.layers.deform.active
+    uv = bm.loops.layers.uv.active
+    hi, ji = body.vertex_groups.get("Head"), body.vertex_groups.get("Jaw")
+    ring0 = [bm.verts[i] for i in loop]
+    lipw = {i: dict(bm.verts[i][dl].items()) for i in set(lip_of.tolist())} if dl is not None else {}
+    new = []
+    for j, p in enumerate(R):
+        v = bm.verts.new(tuple(p))
+        for L in shapes.values():
+            v[L] = tuple(p)                    # fit_bag gives the keys
+        if dl is not None:
+            if follow[j] == 1.0:
+                for g, w in lipw[lip_of[j]].items():
+                    v[dl][g] = w
+            elif (ji if lower[j] else hi) is not None:
+                v[dl][(ji if lower[j] else hi).index] = 1.0
+        new.append(v)
+    grid = [ring0] + [new[k * n:(k + 1) * n] for k in range(m)]
+    tipv = new[-1]
+    faces = []
+    for k in range(m):
+        a_, b_ = grid[k], grid[k + 1]
+        for i in range(n):
+            faces.append(bm.faces.new((a_[i], a_[(i + 1) % n], b_[(i + 1) % n], b_[i])))
+    for i in range(n):
+        faces.append(bm.faces.new((grid[-1][i], grid[-1][(i + 1) % n], tipv)))
+    # inward: a face's normal points at the bag's axis (voted past the collar, where it is a plain sock)
+    bm.normal_update()
+    zc = z_line - 0.002 * sv
+    votes = sum(1 if fc.normal.dot(Vector((0.0, fc.calc_center_median().y, zc)) - fc.calc_center_median()) > 0 else -1
+                for fc in faces[3 * n:])
+    lip_y = y_mid
+    span = 4.0 * hw
+    for fc in faces:
+        if votes < 0:
+            fc.normal_flip()
+        fc.material_index = slot
+        fc.smooth = True
+        if uv is not None:
+            for lp in fc.loops:
+                x, y, z = lp.vert.co
+                lp[uv].uv = (0.5 + (x + 0.5 * (y - lip_y)) / span, 0.5 + (z - z_line + 0.5 * (y - lip_y)) / span)
+    bm.to_mesh(me)
+    bm.free()
+    me.update()
+    flag = np.zeros(len(me.vertices), dtype=np.int32)
+    flag[nb:] = 1
+    att = me.attributes.get("mouth_bag") or me.attributes.new("mouth_bag", "INT", "POINT")
+    att.data.foreach_set("value", flag)
+    body["mouth_loop"] = list(map(int, loop))
+    fit_bag(body, fk.Face(body), z_line)     # measured afresh: the face now has the bag (left out of its landmarks)
+    return y_mid
+
+
+def _bag_follow(loop, m):
+    """Per bag vertex (ring-major, then the tip): how much it rides its lip vertex, and which one."""
+    n = len(loop)
+    follow = np.concatenate([np.full(n, w) for w in RIM_FOLLOW[1:]] + [np.zeros(n * (m - len(RIM_FOLLOW) + 1) + 1)])
+    lip_of = np.concatenate([np.array(loop)] * m + [np.array([loop[0]])])
+    return follow, lip_of
+
+
+def _bag_hold(follow, z_line, sv, lip_co, sh):
+    """_keep_inside's collar rule for the bag; lip_co: each bag vertex's lip vertex in this shape."""
+    return dict(collar=set(np.where(follow == 1.0)[0].tolist()), z_line=z_line, lips=0.004 * sv,
+                anchor=lip_co + np.array([0.0, 0.0006 * sh, 0.0]))
+
+
+def fit_bag(body, f, z_line):
+    """Give the bag's vertices every shape key from the skin's own: the rings behind the lips ride their lip
+    vertex (RIM_FOLLOW), the rest turn with the jaw, and none pokes out through the skin.  Run it again
+    after anything rewrites the Body's keys (face_keys.add_expression_keys).  Returns the keys fitted."""
+    me = body.data
+    att = me.attributes.get("mouth_bag")
+    if att is None or "mouth_loop" not in body:
+        return 0
+    flag = np.empty(len(me.vertices), dtype=np.int32)
+    att.data.foreach_get("value", flag)
+    bag = np.where(flag != 0)[0]
+    loop = list(body["mouth_loop"])
+    n = len(loop)
+    m = (len(bag) - 1) // n
+    follow, lip_of = _bag_follow(loop, m)
+    sh, sv = f.sh, f.sv
+    kb = me.shape_keys.key_blocks
+    N = len(me.vertices)
+    base = np.empty(N * 3)
+    kb["Basis"].data.foreach_get("co", base)
+    base = base.reshape(-1, 3)
+    R = base[bag]
+    lower = R[:, 2] < z_line - 0.001 * sv
+    skin = flag == 0
+    polys = [tuple(p.vertices) for p in me.polygons if skin[list(p.vertices)].all()]
+    every = list(range(len(R)))
+    piv, ang, chin, ref = _jaw(f, z_line)
+    for k in kb[1:]:
+        c = np.empty(N * 3)
+        k.data.foreach_get("co", c)
+        c = c.reshape(-1, 3)
+        d = c - base
+        amt = float(np.dot(d[chin].mean(0), ref) / max(np.dot(ref, ref), 1e-12))
+        a = ang * amt
+        q = R - piv
+        co = R.copy()
+        co[lower, 1] = (piv[1] + q[:, 1] * math.cos(a) - q[:, 2] * math.sin(a))[lower]
+        co[lower, 2] = (piv[2] + q[:, 1] * math.sin(a) + q[:, 2] * math.cos(a))[lower]
+        co = (1.0 - follow[:, None]) * co + follow[:, None] * (R + d[lip_of])   # the collar rides its lip vertex
+        _keep_inside(co, every, c, polys, sh, **_bag_hold(follow, z_line, sv, c[lip_of], sh))
+        c[bag] = co
+        k.data.foreach_set("co", c.ravel())
+    me.update()
+    return len(kb) - 1
+
+
+_RAYS = [Vector(d).normalized() for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 1), (0, 1, -1), (0, 0, -1))]
+
+
+def _skin_bvh(body_co, polys):
+    from mathutils.bvhtree import BVHTree
+    tris = [(p[0], p[k], p[k + 1]) for p in polys for k in range(1, len(p) - 1)]
+    return BVHTree.FromPolygons([Vector(v) for v in body_co], tris)
+
+
+def _inside(bvh, p):
+    """Inside the skin: most rays from p, all aimed away from the lip opening, cross it an odd number of
+    times."""
+    odd = 0
+    for d in _RAYS:
+        n, q = 0, Vector(p)
+        for _ in range(16):
+            hit, _, _, _ = bvh.ray_cast(q, d)
+            if hit is None:
+                break
+            n += 1
+            q = hit + d * 1e-6
+        odd += n % 2
+    return odd * 2 > len(_RAYS)
+
+
+def _keep_inside(co, idx, body_co, polys, sh, collar=(), z_line=0.0, lips=0.0, anchor=None):
     """Pull the vertices idx of co back under the skin body_co (the Body in one key): the bag and tongue
     turn with the jaw as one piece while the chin's skin bends, so an open jaw would push the bag's floor
     out under the chin, and the mouth's materials are two-sided.  A vertex is outside when most rays
     from it, all aimed away from the lip opening, cross the skin an even number of times; an outside
     vertex, or one inside but nearer the skin than SKIN_CLEARANCE, goes to that depth under the nearest
-    skin."""
-    from mathutils import Vector
-    from mathutils.bvhtree import BVHTree
-    tris = [(p[0], p[k], p[k + 1]) for p in polys for k in range(1, len(p) - 1)]
-    bvh = BVHTree.FromPolygons([Vector(v) for v in body_co], tris)
-    dirs = [Vector(d).normalized() for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 1), (0, 1, -1), (0, 0, -1))]
+    skin.  A collar vertex (one that rides the lip edge) only answers to skin more than `lips` from the
+    lip line: near the slit the nearest skin can be the other lip, and pushing under it folds the collar
+    down across the teeth.  A collar vertex found outside goes to anchor[i] instead (just behind its lip
+    vertex), for the same reason."""
+    bvh = _skin_bvh(body_co, polys)
     clear = SKIN_CLEARANCE * sh
-
-    def crossings(p, d):
-        n, q = 0, p.copy()
-        for _ in range(16):
-            hit, _, _, _ = bvh.ray_cast(q, d)
-            if hit is None:
-                return n
-            n += 1
-            q = hit + d * 1e-6
-        return n
-
     moved = 0
     for i in idx:
         p = Vector(co[i])
         hit, nrm, _, dist = bvh.find_nearest(p)
         if hit is None:
             continue
-        if sum(crossings(p, d) % 2 for d in dirs) * 2 > len(dirs):          # inside
-            if dist >= clear or (p - hit).dot(nrm) > 0.0:
-                continue    # deep enough, or behind a lip's rolled edge (which faces into the mouth)
+        inside = _inside(bvh, p)
+        if i in collar and abs(hit.z - z_line) < lips:
+            if not inside and anchor is not None:
+                co[i] = anchor[i]
+                moved += 1
+            continue
+        if inside and (dist >= clear or (p - hit).dot(nrm) > 0.0):
+            continue        # deep enough, or behind a lip's rolled edge (which faces into the mouth)
         co[i] = (hit - nrm * clear)[:]
         moved += 1
     return moved
 
 
 def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fangs=0.0):
-    """Mouth bag, teeth and tongue as one skinned mesh "Mouth".  fangs: extra canine length (m)."""
+    """The mouth bag on the Body (add_bag), then teeth and tongue as one skinned mesh "Mouth".  fangs:
+    extra canine length (m)."""
     old = bpy.data.objects.get("Mouth")
     if old is not None:
         old_me = old.data
@@ -751,31 +1242,53 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
             bpy.data.meshes.remove(old_me)      # else the rebuild is named "Mouth.001" in the glb
     sh, sv = f.sh, f.sv
     hw = mouth_hw(f)
+    loop = _lip_loop(body, f, z_line)
+    half_open = float(np.abs(np.array([body.data.vertices[i].co.x for i in loop])).max())
+    BP = np.array([v.co[:] for v in body.data.vertices])
+    polys = [tuple(p.vertices) for p in body.data.polygons]     # the skin, before the bag closes it
+    y_rim = add_bag(body, f, z_line, hw)               # y_rim: the lip edge's depth at the middle
+    skin = _skin_bvh(BP, polys)
     me = bpy.data.meshes.new("Mouth")
     bm = bmesh.new()
     mats = [_material("mouth_inside", DARK, 0.6), _material("teeth", teeth_rgb, 0.25),
             _material("tongue", (0.55, 0.16, 0.20), 0.45)]
     lip_y = y_line + 0.0035 * sh                  # just behind the lips' surface
-    # the bag, sealed to the inner lips (its first ring rides the lip edge in every key)
-    bag, rim, y_rim = _bag(bm, body, f, z_line, hw)    # y_rim: the lip edge's depth at the middle
-    for fc in bag:
-        fc.material_index = 0
-    # teeth along an arc
+    # teeth along an arc as wide as the opening, so the rows fill it from corner to corner
     teeth = []
     n = 10
+    span = max(0.82 * hw, TEETH_SPAN * half_open)
     for row, (dz, h) in enumerate(((-0.0019 * sv, 0.0078 * sv), (0.0008 * sv, 0.0066 * sv))):
         for i in range(n):
             t = (i + 0.5) / n * 2 - 1                       # -1..1 across the arc
-            x = t * 0.80 * hw
-            y = y_rim + (TEETH_BEHIND_RIM + 0.0022) * sh + 0.006 * sh * t * t     # the arc curves back
-            w = 0.82 * hw * 2 / n * 0.86                     # neighbours just touch: a pearly row
-            x = t * 0.82 * hw
+            x = t * span
+            y = y_rim + (TEETH_BEHIND_RIM + 0.0022) * sh + TEETH_ARC_BACK * sh * t * t     # the arc curves back
+            w = 1.08 * span / n                              # half a tooth, a little over: no gaps
             hh = h * (1.0 - 0.18 * abs(t))
             canine = row == 0 and abs(abs(t) - 0.5) < 0.1 and fangs > 0
             extra = fangs if canine else 0.0
             zc = z_line + (dz + hh * 0.5 - extra if row == 0 else dz - hh * 0.5)
-            fcs = _ellipsoid(bm, (x, y, zc), (w * (0.8 if canine else 1.0), 0.0022 * sh, 0.5 * hh + extra),
-                             segs=8, rings=5)
+            r = (w, 0.0022 * sh, 0.5 * hh + extra)
+            fcs = _ellipsoid(bm, (x, y, zc), r, segs=8, rings=5)
+            # a rounded box, not an egg: square biting edges meet in a straight line, where eggs leave
+            # a sawtooth of notches; a fang instead narrows to its point
+            tip = -1.0 if row == 0 else 1.0
+            for v in {v for fc in fcs for v in fc.verts}:
+                ux, uz = (v.co.x - x) / r[0], (v.co.z - zc) / r[2]
+                along = min(1.0, max(0.0, (uz * tip + 1.0) * 0.5))     # 0 at the root, 1 at the biting end
+                ux = math.copysign(abs(ux) ** TOOTH_BOXINESS, ux)
+                uz = math.copysign(abs(uz) ** TOOTH_BOXINESS, uz)
+                if canine:      # as wide as its neighbours down to their biting edge, then a point
+                    t0 = hh / (hh + 2.0 * extra)
+                    ux *= 1.0 - 0.85 * (max(0.0, along - t0) / (1.0 - t0)) ** 0.8
+                v.co.x, v.co.z = x + ux * r[0], zc + uz * r[2]
+            # at the corners the lips curve back faster than the arc: a tooth that would show through
+            # the skin of a closed mouth steps back until it is inside
+            tv = list({v for fc in fcs for v in fc.verts})
+            for _ in range(16):
+                if all(_inside(skin, v.co) for v in tv):
+                    break
+                for v in tv:
+                    v.co.y += 0.0003 * sh
             for fc in fcs:
                 fc.material_index = 1 if row == 0 else 3
             teeth.append((row, fcs))
@@ -783,6 +1296,9 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
                         segs=12, rings=6)
     for fc in tongue:
         fc.material_index = 2
+    # _ellipsoid winds its faces inward: turn every tooth and the tongue outward, or the enamel is lit
+    # from inside and a back-face-culled renderer sees only the far side of each tooth
+    bmesh.ops.reverse_faces(bm, faces=list(bm.faces))
     # A UV layer, though the mouth's materials are flat colours: Godot's importer generates
     # tangents for every surface and logs "UVs are required to generate tangents" once per
     # surface and shape key (156 lines a cast glb) when a mesh has none.  A front projection
@@ -804,15 +1320,12 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
     obj.parent = arm
     mod = obj.modifiers.new("Armature", "ARMATURE")
     mod.object = arm
-    # what must stay under the skin: the bag past its first ring (which is the lip edge), and the tongue
-    collar = {vi for vi, bi, w in rim[:len(rim) // len(RIM_FOLLOW)]}
-    inside = sorted({v for p in me.polygons if p.material_index in (0, 2) for v in p.vertices} - collar)
-    BP = np.array([v.co[:] for v in body.data.vertices])
-    polys = [tuple(p.vertices) for p in body.data.polygons]     # all of it, or a ray can leave by a cut edge
+    # the tongue stays under the skin (inside the head; the bag shares its rule)
+    inside = sorted({v for p in me.polygons if p.material_index == 2 for v in p.vertices})
     V = np.array([v.co[:] for v in me.vertices])
-    _keep_inside(V, inside, BP, polys, sh)          # the rest shape too: a fold of the collar can rise into the lip
+    _keep_inside(V, inside, BP, polys, sh)
     me.vertices.foreach_set("co", V.ravel())
-    # skin: upper half on Head, lower half (lower teeth, tongue, bag floor) on Jaw
+    # skin: upper teeth on Head, lower teeth and tongue on Jaw
     tooth_row = np.full(len(V), -1)
     for p in me.polygons:
         if p.material_index in (1, 3):
@@ -822,16 +1335,6 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
     gh, gj = obj.vertex_groups.new(name="Head"), obj.vertex_groups.new(name="Jaw")
     for i in range(len(V)):
         (gj if lower[i] else gh).add([i], 1.0, "REPLACE")
-    # the rim takes its lip vertex's own Head/Jaw split, so pose and keys move both together
-    hi, ji = body.vertex_groups.get("Head"), body.vertex_groups.get("Jaw")
-    for vi, bi, w in rim:
-        if w < 1.0:
-            continue
-        gw = {g.group: g.weight for g in body.data.vertices[bi].groups}
-        h, j = gw.get(hi.index, 0.0) if hi else 1.0, gw.get(ji.index, 0.0) if ji else 0.0
-        tot = max(h + j, 1e-6)
-        gh.add([vi], h / tot, "REPLACE")
-        gj.add([vi], j / tot, "REPLACE")
     # face keys: the lower half follows the jaw part of every key, the upper half never moves
     obj.shape_key_add(name="Basis", from_mix=False)
     piv, ang, chin, ref = _jaw(f, z_line)
@@ -848,8 +1351,6 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
         co = V.copy()
         co[lower, 1] = (piv[1] + y2)[lower]
         co[lower, 2] = (piv[2] + z2)[lower]
-        for vi, bi, w in rim:                       # the collar rides the lip edge it hangs from
-            co[vi] = (1.0 - w) * co[vi] + w * (V[vi] + keys[name][bi])
         _keep_inside(co, inside, BP + keys[name], polys, sh)
         sk = obj.shape_key_add(name=name, from_mix=False)
         sk.data.foreach_set("co", co.ravel())
@@ -857,7 +1358,7 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
     return obj
 
 
-def open_mouth(body, f, arm, fangs=0.0, teeth_rgb=(0.97, 0.95, 0.92)):
+def open_mouth(body, f, arm, fangs=0.0, teeth_rgb=(0.97, 0.95, 0.92), soften=True):
     """Cut, fix keys, roll the lips and build the Mouth.  Returns (seam vertices, Mouth object)."""
     if not body.get("mouth_cut"):
         smooth_corners(body, f)
@@ -869,9 +1370,19 @@ def open_mouth(body, f, arm, fangs=0.0, teeth_rgb=(0.97, 0.95, 0.92)):
         roll_lips(body, z_line, 0.0025 * f.sh)
         rejaw(body, z_line)
     zc = float(body.get("mouth_z", z_line))       # the plane the cut was made on
+    if "landmark_mouth" not in body:               # see face_keys.Face
+        f0 = fk.Face(body)
+        body["landmark_mouth"] = [float(x) for x in f0.mouth]
+        body["landmark_corner_x"] = f0.corner_x
+    remove_bag(body)                               # an earlier build's: the steps below need the bare opening
     finish_cut(body, zc, fk.Face(body))
-    seal_slivers(body, zc, fk.Face(body))
+    close_notches(body, zc, fk.Face(body))
+    seal_slivers(body, zc, fk.Face(body))         # after the notches: closing one can leave a pinhole
+    tuck_rolls(body, zc, fk.Face(body))
     settle_lip_edges(body, zc, fk.Face(body))
+    if soften:
+        soften_corners(body, zc, fk.Face(body))
+    darken_inner_lips(body, zc, fk.Face(body))
     f2 = fk.Face(body)
     mouth = build_mouth(body, f2, arm, z_line, y_line, teeth_rgb=teeth_rgb, fangs=fangs)
     return n, mouth, f2

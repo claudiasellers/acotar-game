@@ -27,11 +27,14 @@ import mouth  # noqa: E402
 # Teeth per face: fangs = extra canine length (m) [C: Tamlin's fangs when furious, ch11];
 # Lucien's grin is "too-white" [C ch8-9]; the father's are a poor man's.
 TEETH = {
-    "tamlin": dict(fangs=0.0045, teeth_rgb=(0.97, 0.95, 0.90)),
+    "tamlin": dict(fangs=0.003, teeth_rgb=(0.97, 0.95, 0.90)),
     "lucien": dict(teeth_rgb=(1.0, 1.0, 0.99)),
     "father": dict(teeth_rgb=(0.86, 0.80, 0.68)),
     "nesta": dict(teeth_rgb=(0.99, 0.98, 0.96)),
     "elain": dict(teeth_rgb=(0.99, 0.98, 0.96)),
+    # Feyre's face is co-designed with the owner: only the inside of her mouth changes, so her corners
+    # keep their keys (mouth.soften_corners reaches out into the cheek)
+    "feyre": dict(soften=False),
 }
 
 
@@ -97,6 +100,9 @@ def run(char):
     lod_hidden = {}
     seam, mouth_obj, _ = mouth.open_mouth(body, face_keys.Face(body), arm, **TEETH.get(char, {}))
     f, rep = face_keys.add_expression_keys(body)
+    mouth.hold_upper_lip(body, float(body["mouth_z"]), f)     # opening the jaw never drags the upper lip down
+    f = face_keys.Face(body)                           # the riders take the keys as they now stand
+    mouth.fit_bag(body, f, float(body["mouth_z"]))     # the bag's own keys, from the refreshed ones
     riders = []
     for o in bpy.data.objects:
         # lashes are handled below; once a first run gives them blink_L they would pass this gate
