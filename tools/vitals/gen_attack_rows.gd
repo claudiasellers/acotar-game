@@ -36,6 +36,28 @@ const ROWS := [
 	[&"generic_hit", &"", false, 10.0, &"blunt", &"light", 0.0, &"", 0.0, 0.0, 0.1, true, 0.0],
 ]
 
+## Tell to contact, s (bestiary; floors in AttackData.windup_s). Hazards have none.
+const WINDUP := {
+	&"naga_claw": 0.55,
+	&"naga_lunge": 0.8,
+	&"naga_coil": 0.6,
+	&"puca_grab": 0.6,
+	&"briarling_lash": 0.4,
+	&"briarling_snare": 0.6,
+	&"lampwing_swarm": 0.6,
+	&"crow_peck": 0.4,
+	&"crow_dive": 0.45,
+	&"hob_swat": 0.9,
+	&"hob_stomp": 1.0,
+	&"blackvein_bite": 0.45,
+	&"blackvein_drop": 0.6,
+	&"martax_maul": 0.85,
+	&"martax_charge": 2.0,
+	&"martax_roar": 0.6,
+	&"prowler_grab": 0.6,
+	&"wolf_bite": 0.55,
+}
+
 
 func _init() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
@@ -55,6 +77,7 @@ func _init() -> void:
 		row.dread_spike = r[10]
 		row.can_knock_down = r[11]
 		row.floor_hp = r[12]
+		row.windup_s = float(WINDUP.get(row.id, 0.0))
 		if ResourceSaver.save(row, OUT + "%s.tres" % row.id) == OK:
 			written += 1
 	print("gen_attack_rows: wrote %d rows to %s" % [written, OUT])

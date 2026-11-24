@@ -246,3 +246,21 @@ func test_a_held_her_keeps_the_others_off() -> void:
 	assert_eq(n.fight, NagaRoamer.Fight.CIRCLE)
 	assert_true(hits.is_empty())
 	EventBus.player_released.emit(&"someone_else")
+
+
+## Every creature move carries its tell on its row, at or over the floor for
+## its reaction (health-interactions §3.5 #4); hazards have none.
+func test_every_move_has_its_wind_up_on_its_row() -> void:
+	var floors := {&"light": 0.4, &"medium": 0.55, &"heavy": 0.8, &"none": 0.6}
+	for f in DirAccess.get_files_at("res://data/combat/attacks/"):
+		if not f.ends_with(".tres"):
+			continue
+		var row := load("res://data/combat/attacks/" + f) as AttackData
+		if row.family == &"":
+			assert_eq(row.windup_s, 0.0, "%s is a hazard: no tell" % row.id)
+		else:
+			assert_gte(row.windup_s, float(floors[row.reaction]), "%s tells at least the %s floor" % [row.id, row.reaction])
+	assert_almost_eq(NagaRoamer.windup_of(NagaRoamer.CLAW), 0.55, 0.001)
+	assert_almost_eq(NagaRoamer.windup_of(NagaRoamer.LUNGE_ATTACK), 0.8, 0.001)
+	assert_almost_eq(NagaRoamer.windup_of(NagaRoamer.COIL), 0.6, 0.001)
+	assert_false(FileAccess.get_file_as_string("res://creatures/hostile/naga_roamer.gd").contains("const WINDUP"), "one home: the row")

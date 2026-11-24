@@ -100,6 +100,7 @@ static func is_lit(player: Node) -> bool  # a glow draught, a held faelight or a
 @export var dread_spike: float = 0.1            # added to dread, before dread_gain_scale
 @export var can_knock_down: bool = true         # false: can't take her below floor_hp
 @export var floor_hp: float = 0.0
+@export var windup_s: float = 0.0       # tell to contact, s; the one home for a move's wind-up (hostile-fae). Floors: light 0.4, medium 0.55, heavy 0.8, none 0.6; 0 for hazards
 @export var canon: String = "X"
 ```
 

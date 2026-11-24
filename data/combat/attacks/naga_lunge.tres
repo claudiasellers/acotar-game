@@ -11,3 +11,4 @@ damage_kind = &"blunt"
 reaction = &"heavy"
 knockback_m = 4.0
 dread_spike = 0.2
+windup_s = 0.8

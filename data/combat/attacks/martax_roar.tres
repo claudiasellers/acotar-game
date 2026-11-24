@@ -13,3 +13,4 @@ status_tag = &"roar_shake"
 status_magnitude = 0.8
 status_seconds = 6.0
 dread_spike = 0.25
+windup_s = 0.6

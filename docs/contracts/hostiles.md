@@ -79,7 +79,7 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   of a site keeps watch at full senses).
 - Engaged (`Fight`): charge; with no token, or while another member holds
   her, **circle** at 4–6 m. With a token it winds up one of three rows
-  (`WINDUP`, bestiary §2; HF moves these onto `AttackData.windup_s`):
+  (its tell lasts the row's `AttackData.windup_s`, bestiary §2):
   - `naga_lunge` (30, blunt, heavy) from 4–6 m, once per engagement and once
     per camp until it calms: 0.8 s
     tell, then a 0.5 s leap that lands if she's within reach;

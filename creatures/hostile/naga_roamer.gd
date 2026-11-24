@@ -16,9 +16,6 @@ enum Fight { CHARGE, STRIKE, RECOVER, CIRCLE, LUNGE, LEAP, HOLD }
 const CLAW := &"naga_claw"
 const LUNGE_ATTACK := &"naga_lunge"
 const COIL := &"naga_coil"
-## Seconds from the start of the tell to contact (bestiary §2). HF moves these
-## onto AttackData.windup_s; until then they live here.
-const WINDUP := {&"naga_claw": 0.55, &"naga_lunge": 0.8, &"naga_coil": 0.6}
 ## The lunge opens from this far, once per engagement (health-interactions §4).
 const LUNGE_MIN := 4.0
 const LUNGE_MAX := 6.0
@@ -336,10 +333,16 @@ static func facing_node(player: Node3D) -> Node3D:
 	return m if m and m.is_inside_tree() else player
 
 
+## Tell to contact for a row: AttackData.windup_s, the one home.
+static func windup_of(attack: StringName) -> float:
+	var row := AttackTable.resolve(attack)
+	return row.windup_s if row else 0.55
+
+
 func _wind_up(next: Fight, attack: StringName) -> void:
 	fight = next
 	_attack = attack
-	_fight_left = float(WINDUP.get(attack, 0.55))
+	_fight_left = NagaRoamer.windup_of(attack)
 	_anim(&"play_attack", [attack])
 
 
