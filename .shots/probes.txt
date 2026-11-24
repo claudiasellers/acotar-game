@@ -1,0 +1,4 @@
+from arms-lane
+quality look
+size 1920x1080
+shot stand res://tools/creatures/stand_shot.tscn {out} feyre lucien tamlin elain human_man mortal_woman
