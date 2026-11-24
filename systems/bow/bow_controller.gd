@@ -448,7 +448,7 @@ func release() -> Arrow:
 	feyre.get_parent().add_child(arrow)
 	arrow.add_collision_exception_with(feyre)
 	var wet := feyre.element_state != null and feyre.element_state.is_wet()
-	arrow.launch(muzzle, direction, bow.max_speed, wet)
+	arrow.launch(muzzle, direction, bow.max_speed, wet, bow.id)
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
 	feyre.arrow_fired.emit(arrow)
 	feyre.bow_released.emit(muzzle, bow.loudness)

@@ -28,6 +28,8 @@ var rng := RandomNumberGenerator.new()
 var _wind_source: Node = null
 ## Where the arrow was last physics frame, for the swept ray check.
 var _last_pos: Vector3 = Vector3.INF
+## Its flight direction on the last step it flew free.
+var _flight_dir: Vector3 = Vector3.ZERO
 
 
 static func create(arrow_data: ArrowData = null) -> Arrow:
@@ -62,12 +64,23 @@ func _ready() -> void:
 	_wind_source = get_tree().get_first_node_in_group(&"wind_source")
 
 
-func launch(from: Vector3, direction: Vector3, speed: float, is_wet: bool = false) -> void:
+## What a hit carries for whatever it strikes (read in on_arrow_hit and
+## on_arrow_effect), as meta on the arrow:
+##   impact         Vector3, global: where it actually struck
+##   impact_normal  Vector3: the surface's normal there
+##   direction      Vector3, unit: its flight direction at the hit
+##   speed          float, m/s: the speed it left the bow at
+##   bow_id         StringName: the BowData that loosed it (&"" if none)
+func launch(from: Vector3, direction: Vector3, speed: float, is_wet: bool = false,
+		bow_id: StringName = &"") -> void:
 	wet = is_wet
 	if wet:
 		speed *= data.wet_speed_multiplier
+	set_meta(&"speed", speed)
+	set_meta(&"bow_id", bow_id)
 	global_position = from
 	_last_pos = from
+	_flight_dir = direction.normalized()
 	_face(direction)
 	linear_velocity = direction.normalized() * speed
 
@@ -115,8 +128,10 @@ func _sweep() -> void:
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	_last_pos = global_position
 	if hit.is_empty():
+		_flight_dir = linear_velocity.normalized()
 		return
 	var dir := linear_velocity.normalized()
+	_note_impact(hit.position, hit.normal, dir)
 	global_position = hit.position - dir * LENGTH * 0.35
 	linear_velocity = Vector3.ZERO
 	_on_body_entered(hit.collider as Node)
@@ -126,6 +141,8 @@ func _on_body_entered(body: Node) -> void:
 	if stuck:
 		return
 	stuck = true
+	if not has_meta(&"impact"):
+		_note_contact()
 	hit.emit(body, global_position)
 	if body != null and body.has_method(&"on_arrow_hit"):
 		body.on_arrow_hit(self)
@@ -136,6 +153,26 @@ func _on_body_entered(body: Node) -> void:
 		return
 	ArrowEffects.apply(self, body, global_position)
 	_stick.call_deferred(body)
+
+
+## A physics contact got there before the sweep, and has already knocked the
+## arrow about: find where it struck along the line it was flying.
+func _note_contact() -> void:
+	var dir := _flight_dir if _flight_dir != Vector3.ZERO else -global_basis.z
+	var from := _last_pos if _last_pos != Vector3.INF else global_position - dir * LENGTH
+	if is_inside_tree():
+		var query := PhysicsRayQueryParameters3D.create(from, from + dir * (LENGTH + 3.0), collision_mask, [get_rid()])
+		var struck := get_world_3d().direct_space_state.intersect_ray(query)
+		if not struck.is_empty():
+			_note_impact(struck.position, struck.normal, dir)
+			return
+	_note_impact(global_position + dir * LENGTH * 0.5, -dir, dir)
+
+
+func _note_impact(at: Vector3, normal: Vector3, direction: Vector3) -> void:
+	set_meta(&"impact", at)
+	set_meta(&"impact_normal", normal)
+	set_meta(&"direction", direction)
 
 
 static func is_stone(body: Node) -> bool:

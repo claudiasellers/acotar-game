@@ -137,3 +137,14 @@ func test_a_steady_aim_and_a_full_draw_put_an_arrow_into_the_wolf() -> void:
 	assert_eq(hits.size(), 1, "the arrow lands")
 	if not hits.is_empty():
 		assert_eq(hits[0], wolf, "it reaches the wolf at 21 m")
+	# What the hit carries for whatever it struck (Arrow.launch's contract).
+	var arrow := fired[0] as Arrow
+	var impact: Vector3 = arrow.get_meta(&"impact")
+	var box := wolf.to_local(impact)
+	assert_almost_eq(absf(box.z), 0.275, 0.05, "the impact is on his flank, not %.2f m back along the shaft" % Arrow.LENGTH)
+	assert_between(box.y, 0.0, 1.3, "at the height it struck")
+	assert_almost_eq((arrow.get_meta(&"direction") as Vector3).length(), 1.0, 0.001)
+	assert_gt((arrow.get_meta(&"direction") as Vector3).dot(Vector3.RIGHT), 0.9, "flying east into him")
+	assert_lt((arrow.get_meta(&"impact_normal") as Vector3).dot(arrow.get_meta(&"direction")), 0.0, "the normal faces the shot")
+	assert_eq(float(arrow.get_meta(&"speed")), feyre.bow_controller.bow.max_speed)
+	assert_eq(arrow.get_meta(&"bow_id"), feyre.bow_controller.bow.id)
