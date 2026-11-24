@@ -8,7 +8,8 @@
 ## The cold and hunger gauges (StatusRules.GAUGES) are always there: a good pan
 ## with the ring filled to the level, glow when calm and accent when uneasy,
 ## turning to the dark cracked pan, with a shudder, when they reach danger.
-## Each chip is taught once: the first time a status ever shows, a slip above
+## Each chip is taught once (a gauge when it first turns uneasy, the health
+## bar and the bow when each first changes): the first time, a slip above
 ## the row names it and says what it does (StatusRules.INFO), then never
 ## again (user://settings.cfg [status_taught]). With the pointer free, resting
 ## on a chip names it too.
@@ -85,12 +86,13 @@ func set_statuses(visible_list: Array[Dictionary]) -> void:
 		now[s.tag] = true
 		if not _born.has(s.tag):
 			_born[s.tag] = 0.0
-			if not taught.has(s.tag) and s.tag != teaching and not teach_queue.has(s.tag):
-				teach_queue.append(s.tag)
 			if not StatusRules.is_debuff(s.tag) and StatusRules.kind(s.tag) != StatusRules.Kind.GAUGE:
 				_chime.stream = Juice.chime(&"pickup")
 				_chime.pitch_scale = 1.25
 				_chime.play()
+		# A gauge is taught when it starts to bite (uneasy), not while calm.
+		if StatusRules.kind(s.tag) != StatusRules.Kind.GAUGE or int(s.get("stage", 0)) >= 1:
+			offer(s.tag)
 		if int(s.get("stage", 0)) >= 2:
 			if not _dire.has(s.tag):
 				_dire[s.tag] = 0.0
@@ -120,10 +122,10 @@ func _process(delta: float) -> void:
 func _step_teach(delta: float) -> void:
 	if teaching != &"":
 		_teach_left -= delta
-		if _teach_left <= 0.0 or not _born.has(teaching):
+		if _teach_left <= 0.0 or not _is_up(teaching):
 			teaching = &""
 	if teaching == &"":
-		while not teach_queue.is_empty() and not _born.has(teach_queue[0]):
+		while not teach_queue.is_empty() and not _is_up(teach_queue[0]):
 			teach_queue.pop_front()
 		if not teach_queue.is_empty():
 			teach(teach_queue.pop_front())
@@ -135,6 +137,18 @@ func _step_teach(delta: float) -> void:
 ## Tips.show_again: every chip teaches itself once more.
 func forget_taught() -> void:
 	taught.clear()
+
+
+## Queues `tag`'s slip if it has never been taught: a status, or one of the
+## meters (StatusRules.METERS, offered by VitalsHud when each first changes).
+func offer(tag: StringName) -> void:
+	if not taught.has(tag) and tag != teaching and not teach_queue.has(tag):
+		teach_queue.append(tag)
+
+
+## A slip only shows while what it names is on screen.
+func _is_up(tag: StringName) -> bool:
+	return _born.has(tag) or StatusRules.METERS.has(tag)
 
 
 ## Shows `tag`'s slip now and remembers it is taught.

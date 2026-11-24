@@ -28,7 +28,6 @@ const ROWS: Array[Array] = [
 	[&"journal_open", "Sketchbook", "", ""],
 	[&"map_open", "Map", "", ""],
 	[&"map_minimap", "Minimap on and off", "", ""],
-	[&"pause", "Pause and settings", "", ""],
 ]
 const WORDS_WIDTH := 300.0
 const BOARD_WIDTH := 190.0
@@ -54,6 +53,7 @@ func refresh() -> void:
 	for spec: Array in ROWS:
 		if InputMap.has_action(spec[0]):
 			rows.add_child(_row(spec))
+	rows.add_child(_row([ScreenStack.PAUSE, "Pause and settings", "", ""]))
 
 
 ## What is on a row: [what it does, keyboard words, pad words].

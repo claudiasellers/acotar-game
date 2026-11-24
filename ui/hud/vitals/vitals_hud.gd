@@ -25,6 +25,14 @@ const STAMINA_FULL_LINGER := 1.2
 const BUFF_SHOW_SECONDS := 5.0
 const BUFF_TAIL_SECONDS := 15.0
 const FADE_SPEED := 3.0
+## Her thought on waking after a knockdown, by how she wakes (wake_line).
+const WAKE_LINES := {
+	&"human": "Cold woke me. The light had moved; I'd lost hours I didn't have. Up.",
+	&"spring": "I came round on the ground, aching all over. Hours gone.",
+	&"carried": "Someone must have carried me in. My head still rang.",
+	&"gentle": "That knocked the air out of me. Up, slowly.",
+}
+const WAKE_LINE_SECONDS := 6.0
 const HIT_FADE := 1.2
 const EDGE_STRENGTH: Array[float] = [1.0, 0.5, 0.0]
 
@@ -69,6 +77,11 @@ func _ready() -> void:
 	health_bar = VitalsHealthBar.new()
 	health_bar.position = BAR_AT
 	_root.add_child(health_bar)
+	# Resting the pointer on a meter names it, like a chip.
+	for meter: Array in [[health_bar, &"health"], [stamina_bow, &"stamina"]]:
+		var c := meter[0] as Control
+		c.mouse_filter = Control.MOUSE_FILTER_PASS
+		c.tooltip_text = "%s\n%s" % [StatusRules.title(meter[1]), StatusRules.blurb(meter[1])]
 	grab_prompt = VitalsGrabPrompt.new()
 	grab_prompt.visible = false
 	hud.place(grab_prompt, HudLayout.Zone.WORLD, self)
@@ -130,6 +143,12 @@ func _update_meters(delta: float, mode: int, play: bool) -> void:
 	_stamina_alpha = move_toward(_stamina_alpha, want_stamina, delta * FADE_SPEED)
 	health_bar.modulate.a = _health_alpha
 	stamina_bow.modulate.a = _stamina_alpha
+	# Each meter is taught once, the first time it moves while she can see it.
+	if play and mode != Mode.OFF:
+		if v.health < VitalsState.MAX_HEALTH - 0.05:
+			status_row.offer(&"health")
+		if stamina < max_st - 0.05:
+			status_row.offer(&"stamina")
 
 
 func _on_health_changed(_health: float, _max_health: float, _delta: float, _source: StringName) -> void:
@@ -247,6 +266,22 @@ func _attach() -> void:
 	v.health_changed.connect(_on_health_changed)
 	v.hit_taken.connect(_on_hit_taken)
 	v.grab_press.connect(func(_left: int) -> void: grab_prompt.press())
+	v.woke.connect(_on_woke)
+
+
+## Her first thought on coming round after a knockdown (UX review G10).
+func _on_woke(rest_id: StringName) -> void:
+	LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", wake_line(rest_id), self, WAKE_LINE_SECONDS)
+
+
+## Which waking thought fits: carried to a rest point, Gentle Mode (no time
+## lost), or where she fell, in the human lands or past the wall.
+func wake_line(rest_id: StringName) -> String:
+	if rest_id != &"":
+		return WAKE_LINES[&"carried"]
+	if bool(_setting(&"gentle_mode", false)):
+		return WAKE_LINES[&"gentle"]
+	return WAKE_LINES[&"human" if _vitals and _vitals.in_human_realm() else &"spring"]
 
 
 func _mode() -> int:

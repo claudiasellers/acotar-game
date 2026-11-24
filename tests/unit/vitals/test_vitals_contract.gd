@@ -221,6 +221,35 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
+func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
+	var path := "user://test_gauge_taught.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var row := VitalsStatusRow.new()
+	row.settings_path = path
+	add_child_autofree(row)
+	var calm: Array[Dictionary] = [{"tag": &"cold", "magnitude": 0.1, "seconds_left": -1.0, "total": -1.0, "stage": 0}]
+	row.set_statuses(calm)
+	row._process(0.1)
+	assert_eq(row.teaching, &"", "a calm gauge waits")
+	var uneasy: Array[Dictionary] = [{"tag": &"cold", "magnitude": 0.5, "seconds_left": -1.0, "total": -1.0, "stage": 1}]
+	row.set_statuses(uneasy)
+	row._process(0.1)
+	assert_eq(row.teaching, &"cold")
+	row.offer(&"health")
+	row._process(VitalsStatusRow.TEACH_SECONDS + 0.1)
+	row._process(0.1)
+	assert_eq(row.teaching, &"health", "a meter is taught on offer")
+	assert_ne(StatusRules.blurb(&"stamina"), "")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func test_she_has_a_thought_on_waking() -> void:
+	var hud := VitalsHud.new()
+	add_child_autofree(hud)
+	assert_eq(hud.wake_line(&"manor_bed"), VitalsHud.WAKE_LINES[&"carried"])
+	assert_ne(hud.wake_line(&""), "", "where she fell")
+
+
 func test_every_status_tag_has_an_icon() -> void:
 	for tag: StringName in StatusRules.ORDER:
 		assert_true(Icons.has(Icons.STATUS, tag), String(tag))
