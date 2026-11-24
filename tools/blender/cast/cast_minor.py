@@ -114,7 +114,7 @@ DESIGNS = {
                        brows="8E7E66", lips="A68A84", style=("tamlin", "style_loose"),
                        outfit=[("tunic", "1E3530", "86A39A", False), ("trousers", "141C1A"), ("boots", "101412")]),
     # -- the masked household, true forms (lesser fae under the bird masks, ch 6-9, 24) ---------------
-    "servant_maid_true": dict(canon="X", body="female", height=1.66, skin="A9D6A6", iris="5A3A20", hair="3E6B4A",
+    "servant_maid_true": dict(arm_clear=2.0, canon="X", body="female", height=1.66, skin="A9D6A6", iris="5A3A20", hair="3E6B4A",
                               brows="2E4F36", lips="C78A8A", style=("feyre", "ballerina_bun"),
                               outfit=[("dress", "93A7D6", "6F84B8"), ("apron",), ("slippers", "6F84B8")],
                               mask=("bird", "C29A48", "E2C277")),
@@ -195,7 +195,7 @@ DESIGNS = {
     "mortal_man": dict(canon="X", body="human_m", height=1.76, skin="D9A688", iris="4A3018", hair="3A2416",
                        brows="2E1C12", lips="A87068", style=("rhysand", "style_short"),
                        outfit=[("tunic", "7A6A52", "5A4A38", False), ("trousers", "4A3E30"), ("boots", "3A2E22")]),
-    "mortal_woman": dict(canon="X", body="human", height=1.64, skin="F1D3BE", iris="5A7A9A", hair="6A4A2A",
+    "mortal_woman": dict(arm_clear=2.0, canon="X", body="human", height=1.64, skin="F1D3BE", iris="5A7A9A", hair="6A4A2A",
                          brows="4A3420", lips="B07070", style=("feyre", "braid"),
                          outfit=[("dress", "8A7A62", "6A5A48"), ("apron",), ("slippers", "4A3A2E")]),
     "mortal_youth": dict(canon="X", body="human_m", height=1.62, skin="B98060", iris="3A2414", hair="1A1210",

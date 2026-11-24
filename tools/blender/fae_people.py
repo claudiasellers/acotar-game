@@ -494,7 +494,7 @@ CAST = {
                    "mask": (0.55, 0.42, 0.2), "mask_style": "insect", "mask_eye": (0.75, 0.45, 0.85),
                    "extras": ["wings"], "wing": (0.9, 0.82, 1.0)},
     # --- the green-and-brown, long-limbed kinds Feyre sees in the halls (unnamed)
-    "fae_greenbrown": {"height": 1.85, "build": 0.85, "limb": 0.8, "hands": 1.5, "skin": (0.45, 0.55, 0.32), "skin_rough": 0.9,
+    "fae_greenbrown": {"arm_out": 0.0, "height": 1.85, "build": 0.85, "limb": 0.8, "hands": 1.5, "skin": (0.45, 0.55, 0.32), "skin_rough": 0.9,
                        "cloth": (0.5, 0.38, 0.24), "outfit": "robe", "hair": (0.32, 0.24, 0.14), "hair_style": "long",
                        "ears": "long", "mask": SPRING_MASK, "extras": ["leaves"], "leaf": (0.55, 0.62, 0.3)},
     "fae_longlimb": {"height": 2.15, "build": 0.75, "limb": 0.75, "hands": 1.8, "skin": (0.52, 0.42, 0.3), "skin_rough": 0.9,
