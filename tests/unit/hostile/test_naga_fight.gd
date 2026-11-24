@@ -33,6 +33,11 @@ var hits: Array = []
 func before_each() -> void:
 	StoryControl.release()
 	hits.clear()
+	# In the gate's long shared run an earlier file can leave a body in group
+	# player (an orphan Feyre); a naga hunts the first one it finds, so only
+	# hers may be in it here.
+	for stale in get_tree().get_nodes_in_group(&"player"):
+		stale.remove_from_group(&"player")
 	her = FakeHer.new()
 	her.add_to_group(&"player")
 	add_child_autofree(her)
@@ -115,8 +120,9 @@ func _tick(site: HostileSite) -> void:
 ## Why, for a rejection log read without the machine: each member's fight
 ## state, ladder, flat distance to her, height, token, and the hits so far.
 func _why(site: HostileSite, ticks: int) -> String:
-	var out := "after %d ticks (%.1f s), her at %s, grabbed=%s down=%s; hits %s; " % [
-		ticks, ticks * DT, her.global_position, v.is_grabbed(), v.is_down, hits]
+	var hunted := get_tree().get_first_node_in_group(&"player")
+	var out := "after %d ticks (%.1f s), her at %s (hunted is her: %s), grabbed=%s down=%s; hits %s; " % [
+		ticks, ticks * DT, her.global_position, hunted == her, v.is_grabbed(), v.is_down, hits]
 	for m in site.members:
 		var r := m as NagaRoamer
 		if r == null or not is_instance_valid(r):
