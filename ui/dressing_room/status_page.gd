@@ -1,0 +1,145 @@
+## "How I am": the page of the wardrobe that says how Feyre is. Her health and
+## stamina as meters with their numbers, then every status on her now, each
+## with the chip the HUD shows for it (VitalsStatusRow.draw_chip), its name and
+## what it does (StatusRules.title and blurb: one wording, here and in play).
+## Cold and hunger are always listed; the rest come and go.
+## Read-only: it shows VitalsState, it never changes it.
+class_name StatusPage
+extends ScrollContainer
+
+## Its tab in the dressing room.
+const TAB := "How I am"
+const CHIP := 60.0
+const SCROLL_ROOM := 18
+## What a gauge's stage is called beside its name (StatusRules.stage).
+const STAGE_WORDS: Array[String] = ["Fine", "Rising", "Danger"]
+
+var health: ProgressBar
+var health_count: Label
+var heals_to: Label
+var stamina: ProgressBar
+var stamina_count: Label
+var rows: VBoxContainer
+
+
+func _init() -> void:
+	name = TAB
+	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	# Clear of the scroll bar.
+	var inset := MarginContainer.new()
+	inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inset.add_theme_constant_override(&"margin_right", SCROLL_ROOM)
+	add_child(inset)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 6)
+	inset.add_child(col)
+	var h := _meter(col, "Health", &"HealthMeter")
+	health = h[0]
+	health_count = h[1]
+	heals_to = BookKit.label("", &"SatchelSmall", true)
+	heals_to.name = "HealsTo"
+	col.add_child(heals_to)
+	col.add_child(BookKit.gap(6))
+	var s := _meter(col, "Stamina", &"StaminaMeter")
+	stamina = s[0]
+	stamina_count = s[1]
+	col.add_child(BookKit.gap(10))
+	col.add_child(BookKit.section("Right now"))
+	rows = VBoxContainer.new()
+	rows.name = "Rows"
+	rows.add_theme_constant_override(&"separation", 12)
+	col.add_child(rows)
+
+
+## The page for `feyre` as she is this moment.
+static func of(feyre: Feyre) -> StatusPage:
+	var page := StatusPage.new()
+	var vitals := Vitals.of(feyre)
+	if vitals:
+		page.show_vitals(vitals, feyre.stamina, feyre.max_stamina)
+	return page
+
+
+func show_vitals(vitals: VitalsState, stamina_now: float, stamina_max: float) -> void:
+	health.max_value = VitalsState.MAX_HEALTH
+	health.value = vitals.health
+	health_count.text = "%d of %d" % [roundi(vitals.health), roundi(VitalsState.MAX_HEALTH)]
+	heals_to.text = "Heals on its own up to %d. Food, a salve or a bed does the rest." % roundi(vitals.regen_cap())
+	stamina.max_value = stamina_max
+	stamina.value = stamina_now
+	stamina_count.text = "%d of %d" % [roundi(stamina_now), roundi(stamina_max)]
+	for old in rows.get_children():
+		old.free()
+	for s in vitals.statuses():
+		rows.add_child(_row(s))
+
+
+## What stands beside a status's name: a gauge's stage, venom's strength, or
+## how long a timed one has left.
+static func state_of(s: Dictionary) -> String:
+	if StatusRules.kind(s.tag) == StatusRules.Kind.GAUGE:
+		return STAGE_WORDS[clampi(int(s.get("stage", 0)), 0, 2)]
+	if s.tag == &"venom":
+		return "%d%%" % roundi(float(s.magnitude) * 100.0)
+	var left := float(s.seconds_left)
+	if left <= 0.0:
+		return ""
+	return "%d min left" % ceili(left / 60.0) if left >= 60.0 else "%d s left" % ceili(left)
+
+
+func _meter(col: VBoxContainer, title: String, variation: StringName) -> Array:
+	var head := HBoxContainer.new()
+	var label := BookKit.label(title, &"SatchelBody")
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(label)
+	var count := BookKit.label("", &"SatchelSmall")
+	count.name = title + "Count"
+	head.add_child(count)
+	col.add_child(head)
+	var bar := ProgressBar.new()
+	bar.name = title
+	bar.theme_type_variation = variation
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 14)
+	col.add_child(bar)
+	return [bar, count]
+
+
+func _row(s: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.name = String(s.tag)
+	row.add_theme_constant_override(&"separation", 14)
+	var chip := Chip.new()
+	chip.status = s
+	row.add_child(chip)
+	var words := VBoxContainer.new()
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	words.add_theme_constant_override(&"separation", 0)
+	row.add_child(words)
+	var head := HBoxContainer.new()
+	var title := BookKit.label(StatusRules.title(s.tag), &"SatchelBody")
+	title.name = "Title"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	var state := BookKit.label(state_of(s), &"SatchelSmall")
+	state.name = "State"
+	head.add_child(state)
+	words.add_child(head)
+	var blurb := BookKit.label(StatusRules.blurb(s.tag), &"SatchelSmall", true)
+	blurb.name = "Blurb"
+	words.add_child(blurb)
+	return row
+
+
+## A status's chip, as the HUD draws it.
+class Chip extends Control:
+	var status: Dictionary
+
+	func _init() -> void:
+		custom_minimum_size = Vector2(StatusPage.CHIP, StatusPage.CHIP)
+		size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		VitalsStatusRow.draw_chip(self, size * 0.5, minf(size.x, size.y) * 0.5, status,
+				Icons.texture(Icons.STATUS, status.tag))

@@ -1,9 +1,8 @@
-# gate: when:ui/hud/key_prompt.gd,ui/collection_book/find_card.gd,ui/theme/*,ui/frame/*,systems/interaction/*,systems/bow/quiver_card.gd,story/act1/key_prompts.gd,story/act1/act1_milestones.gd,ui/chemistry/brew_prompt.gd,ui/market/market_prompt.gd
+# gate: when:ui/hud/key_prompt.gd,ui/hud/chapter_heading.gd,ui/hud/pickup_log.gd,ui/theme/*,ui/frame/*,systems/interaction/*,systems/bow/quiver_card.gd,story/act1/key_prompts.gd,story/act1/act1_milestones.gd,ui/chemistry/brew_prompt.gd,ui/market/market_prompt.gd
 ## Notices and prompts (plan step 8a). Every key prompt in play is one
 ## KeyPrompt: a slip of paper with an ink key cap that reads on snow, naming the
-## key as it is bound on what she is holding. Every notice goes through one
-## queue: finds, rewards and notes are dark pills that wait out dread, and a
-## chapter heading is a title that does not wait.
+## key as it is bound on what she is holding. What she gains is the log's to
+## tell and a chapter heading stands alone at the top (test_pickup_log.gd).
 extends GutTest
 
 const WHITE := Color(1, 1, 1)
@@ -16,7 +15,7 @@ func before_each() -> void:
 	SatchelHud.pad_active = false
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
-	FindCard.clear(get_tree())
+	ChapterHeading.clear(get_tree())
 	keeper = Node.new()
 	add_child_autofree(keeper)
 	prompt = KeyPrompt.make(keeper)
@@ -25,7 +24,7 @@ func before_each() -> void:
 func after_each() -> void:
 	SatchelHud.pad_active = false
 	StoryControl.set_mode(StoryControl.Mode.FULL)
-	FindCard.clear(get_tree())
+	ChapterHeading.clear(get_tree())
 
 
 func test_a_prompt_is_a_key_cap_and_its_words_on_a_slip() -> void:
@@ -94,61 +93,24 @@ func test_pills_read_on_snow_in_both_acts() -> void:
 		assert_gt(JournalTheme.contrast(c.paper, pill), 7.0, "%s: words on a dark pill" % who)
 		assert_gt(JournalTheme.contrast(c.ink, c.paper), 7.0, "%s: a prompt's words on its slip, and the key on its cap" % who)
 		assert_gt(JournalTheme.contrast(c.line, WHITE), 3.0, "%s: the slip's rim on snow" % who)
-		assert_gt(JournalTheme.contrast(c.glow, pill), 4.5, "%s: a notice's kicker" % who)
+		assert_gt(JournalTheme.contrast(c.glow, pill), 4.5, "%s: a row's kicker in the log" % who)
 		assert_gt(JournalTheme.contrast(pill, WHITE), 7.0, "%s: the pill itself on snow" % who)
 	var theme := JournalTheme.build(JournalTheme.Act.HUMAN)
-	for v: StringName in [&"PromptText", &"BowText", &"SatchelKeyLabel", &"NoticeKicker", &"NoticeBody"]:
+	for v: StringName in [&"PromptText", &"BowText", &"SatchelKeyLabel", &"PickupKicker", &"PickupLine"]:
 		assert_gte(theme.get_font_size(&"font_size", v), 14, "%s is readable" % v)
 
-
-
-func _cards() -> Array[Node]:
-	return get_tree().get_nodes_in_group(FindCard.GROUP).filter(func(n: Node) -> bool: return not n.is_queued_for_deletion())
-
-
-func test_a_find_is_a_dark_pill_and_a_rare_one_has_a_gold_rim() -> void:
-	FindCard.show_find(get_tree(), &"ing_bilberry", &"ingredients")
-	var card := _cards()[0] as PanelContainer
-	assert_eq(card.theme_type_variation, &"NoticeCard")
-	assert_eq(card.get_parent(), HudLayout.of(get_tree()).zone(HudLayout.Zone.NOTICE))
-	assert_eq((card.find_child("Title", true, false) as Label).theme_type_variation, &"NoticeTitle")
-	var line := card.find_child("Line", true, false) as Label
-	assert_eq(line.theme_type_variation, &"NoticeBody")
-	assert_between(line.custom_minimum_size.x, 40.0, FindCard.LINE_WIDTH, "the line is as wide as its words, to a limit")
-	FindCard.clear(get_tree())
-	await wait_frames(2)
-	FindCard.show_find(get_tree(), &"ing_rose_gold", &"ingredients")
-	assert_eq((_cards()[0] as PanelContainer).theme_type_variation, &"NoticeRare")
-
-
-func test_a_heading_is_a_title_that_does_not_wait_on_a_staged_moment() -> void:
-	StoryControl.set_mode(StoryControl.Mode.LOOK)
-	FindCard.note(get_tree(), "A rabbit. Something, at least.")
-	assert_eq(_cards().size(), 0, "the note waits")
-	FindCard.heading(get_tree(), "The Beast at the Door")
-	assert_eq(_cards().size(), 1)
-	var card := _cards()[0] as PanelContainer
-	assert_eq(card.theme_type_variation, &"LineBand")
-	var title := card.get_node(^"Title") as Label
-	assert_eq(title.theme_type_variation, &"ChapterTitle")
-	assert_eq(title.text, "The Beast at the Door")
-	assert_eq(FindCard.pending(), 2, "the note is still queued behind it")
-	StoryControl.set_mode(StoryControl.Mode.FULL)
-	await wait_seconds(FindCard.HEADING_HOLD + FindCard.HEADING_FADE * 2.0 + 0.3)
-	assert_eq(_cards().size(), 1, "then the note has its turn")
-	assert_eq((_cards()[0] as PanelContainer).theme_type_variation, &"NoticeCard")
 
 
 ## A note says what she got or what she sees, never what is left to do (R2):
 ## no count of what remains, no "more ... for", no "to go".
 func test_no_note_counts_what_is_left_to_do() -> void:
 	var callers: Array[String] = []
-	_scan("res://", "FindCard.note(", callers)
+	_scan("res://", ".note(", callers)
 	assert_gt(callers.size(), 3)
 	var left := RegEx.create_from_string("(?i)%d|\\bmore\\b|\\bto go\\b|\\bleft to\\b|\\bstill need|\\bremaining\\b")
 	for path in callers:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
-			if line.contains("FindCard.note(") and not line.strip_edges().begins_with("#"):
+			if line.contains("PickupLog.of(") and line.contains(".note(") and not line.strip_edges().begins_with("#"):
 				assert_null(left.search(line), "%s: %s" % [path, line.strip_edges()])
 
 
@@ -163,7 +125,7 @@ func test_one_prompt_piece_and_no_looks_of_their_own() -> void:
 	for path: String in ["res://ui/hud/key_prompt.gd", "res://systems/interaction/press_card.gd",
 			"res://systems/bow/quiver_card.gd",
 			"res://story/act1/key_prompts.gd", "res://ui/chemistry/brew_prompt.gd",
-			"res://ui/market/market_prompt.gd", "res://ui/collection_book/find_card.gd"]:
+			"res://ui/market/market_prompt.gd", "res://ui/hud/chapter_heading.gd", "res://ui/hud/pickup_log.gd"]:
 		var lines := FileAccess.get_file_as_string(path).split("\n")
 		assert_gt(lines.size(), 1, "%s exists" % path)
 		for i in lines.size():
@@ -183,12 +145,13 @@ func _scan(dir: String, word: String, out: Array[String]) -> void:
 
 
 ## Act I's milestone layer builds (its hush wears the horror palette's pall)
-## and its headings go through the notice queue.
-func test_act_one_milestones_are_headings_in_the_queue() -> void:
+## and its headings are chapter headings.
+func test_act_one_milestones_are_chapter_headings() -> void:
 	assert_eq(JournalTheme.color(&"pall"), JournalTheme.HORROR[&"pall"], "a token both acts share")
 	var ms := Act1Milestones.new()
 	add_child_autofree(ms)
 	ms._quiet_for = 0.0
 	assert_true(ms.trigger(&"scene:wolf_kill"))
 	assert_false(ms.trigger(&"scene:wolf_kill"), "once")
-	assert_eq((_cards()[0].get_node(^"Title") as Label).text, "The Wolf in the Snow")
+	var card := get_tree().get_first_node_in_group(ChapterHeading.GROUP)
+	assert_eq((card.get_node(^"Title") as Label).text, "The Wolf in the Snow")

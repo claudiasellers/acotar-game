@@ -1,5 +1,5 @@
 ## The in-play screen: every HUD piece sits in a HudLayout zone, the zones
-## show by UiMode, and celebrations wait out dread and staged moments.
+## show by UiMode. (What waits out dread is in test_pickup_log.gd.)
 ## Contract: docs/contracts/ui-frame.md.
 extends GutTest
 
@@ -15,7 +15,7 @@ const PIECES: Array[String] = [
 	"res://systems/interaction/press_card.gd", "res://systems/interaction/forage_focus.gd",
 	"res://story/act1/key_prompts.gd", "res://story/act1/act1_milestones.gd",
 	"res://ui/chemistry/brew_prompt.gd", "res://ui/market/market_prompt.gd",
-	"res://ui/collection_book/find_card.gd", "res://ui/guide/guide_journal.gd",
+	"res://ui/hud/chapter_heading.gd", "res://ui/hud/pickup_log.gd", "res://ui/guide/guide_journal.gd",
 	"res://ui/hud/controls_hint.gd", "res://ui/debug_hud.gd",
 ]
 
@@ -24,7 +24,7 @@ const KEEPERS: Array[String] = [
 	"res://ui/hud/vitals/vitals_hud.gd", "res://ui/satchel/satchel_hud.gd", "res://ui/map/world_map_hud.gd",
 	"res://systems/bow/quiver_card.gd", "res://systems/bow/bow_controller.gd",
 	"res://ui/hud/key_prompt.gd", "res://story/act1/act1_milestones.gd",
-	"res://ui/collection_book/find_card.gd",
+	"res://ui/hud/chapter_heading.gd", "res://ui/hud/pickup_log.gd",
 	"res://ui/guide/guide_journal.gd", "res://ui/menu/settings_tab.gd", "res://ui/debug_hud.gd",
 ]
 
@@ -38,17 +38,13 @@ func before_each() -> void:
 	hud = HudLayout.of(get_tree())
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
-	FindCard.clear(get_tree())
+	ChapterHeading.clear(get_tree())
 
 
 func after_each() -> void:
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
-	FindCard.clear(get_tree())
-
-
-func _cards_on_screen() -> int:
-	return get_tree().get_nodes_in_group(FindCard.GROUP).size()
+	ChapterHeading.clear(get_tree())
 
 
 func test_one_layout_on_the_hud_layer() -> void:
@@ -152,48 +148,6 @@ func test_the_controls_slip_keeps_clear_of_the_strap() -> void:
 		assert_gte(apart, CLEAR_OF_STRAP, "text scale %.2f: slip %s, strap %s" % [scale, a, b])
 		assert_true(get_viewport().get_visible_rect().encloses(a), "and on the screen at %.2f" % scale)
 	get_tree().root.content_scale_factor = was
-
-
-func test_dread_holds_a_card_and_calm_lets_it_show() -> void:
-	EventBus.mood_requested.emit(&"dread", 0.6, 2.0)
-	assert_true(hud.dread())
-	assert_true(UiMode.quiet(get_tree()))
-	FindCard.show_find(get_tree(), &"fact.suriel_home", &"truths")
-	await wait_seconds(1.2)
-	assert_eq(_cards_on_screen(), 0, "no card while the Suriel is frightening")
-	assert_eq(FindCard.pending(), 1, "the card is queued, not dropped")
-	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
-	assert_false(UiMode.quiet(get_tree()))
-	await wait_seconds(FindCard.RECHECK + 0.2)
-	assert_eq(_cards_on_screen(), 1, "the card shows once the dread clears")
-	assert_eq(get_tree().get_first_node_in_group(FindCard.GROUP).get_parent(), hud.zone(HudLayout.Zone.NOTICE))
-
-
-func test_a_staged_moment_holds_cards() -> void:
-	StoryControl.set_mode(StoryControl.Mode.LOOK)
-	FindCard.note(get_tree(), "Something true.")
-	await wait_seconds(0.8)
-	assert_eq(_cards_on_screen(), 0)
-	StoryControl.set_mode(StoryControl.Mode.FULL)
-	await wait_seconds(FindCard.RECHECK + 0.2)
-	assert_eq(_cards_on_screen(), 1)
-
-
-func test_a_held_queue_shows_one_card_at_a_time() -> void:
-	EventBus.mood_requested.emit(&"dread", 1.0, 0.5)
-	FindCard.note(get_tree(), "one")
-	FindCard.note(get_tree(), "two")
-	await wait_seconds(1.1)
-	EventBus.mood_requested.emit(&"calm", 0.0, 1.0)
-	await wait_seconds(FindCard.RECHECK + 0.2)
-	assert_eq(_cards_on_screen(), 1, "never two cards stacked after the hold")
-	assert_eq(FindCard.pending(), 2)
-
-
-func test_calm_play_shows_a_card_at_once() -> void:
-	FindCard.note(get_tree(), "A rabbit. Something, at least.")
-	await wait_frames(2)
-	assert_eq(_cards_on_screen(), 1)
 
 
 ## The frame owns each piece's layer, its place on screen and its mode: no

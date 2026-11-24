@@ -6,15 +6,15 @@ extends GutTest
 const VARIATIONS := {
 	&"PanelContainer": [
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
-		&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
+		&"PromptPill", &"BowCard",
 	],
 	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
-		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
+		&"SatchelKeyLabel", &"SatchelCount", &"SlotKey", &"NewTag", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
 		&"NotifyText", &"ThoughtText", &"CoverKicker", &"CoverTitle",
 	],
-	&"ProgressBar": [&"SatchelMeter"],
+	&"ProgressBar": [&"SatchelMeter", &"HealthMeter", &"StaminaMeter"],
 }
 const TOKENS: Array[StringName] = [
 	&"paper", &"paper_deep", &"ink", &"ink_soft", &"accent", &"glow", &"rare", &"danger",
@@ -138,7 +138,7 @@ func test_type_on_the_page_reads() -> void:
 				assert_gte(JournalTheme.contrast(c[ink], c[paper]), 4.5, "act %d: %s on %s" % [act, ink, paper])
 		var t := JournalTheme.build(act)
 		for v: StringName in [&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall",
-				&"SatchelWhere", &"SatchelKeyLabel", &"SatchelCount", &"SatchelPin"]:
+				&"SatchelWhere", &"SatchelKeyLabel", &"SatchelCount"]:
 			assert_gte(t.get_font_size(&"font_size", v), 16, "act %d: %s" % [act, v])
 			var tint := t.get_color(&"font_color", v)
 			if v != &"SatchelKeyLabel":  # paper type on a dark key cap

@@ -100,13 +100,3 @@ func test_weave_a_crown_and_wear_it() -> void:
 	assert_eq(Gameplay.wardrobe.equipped_in(&"head"), piece, "worn at once")
 	assert_eq(inv.count(&"ing_rose_red") + inv.count(&"ing_primrose") + inv.count(&"ing_dandelion"), 0)
 
-
-func test_find_cards_queue_without_pausing() -> void:
-	FindCard.clear(get_tree())
-	FindCard.show_find(get_tree(), &"ing_rose_gold", &"ingredients")
-	FindCard.show_find(get_tree(), &"ing_acorn", &"ingredients")
-	assert_eq(FindCard.pending(), 2)
-	assert_false(get_tree().paused)
-	await wait_seconds(FindCard.HOLD + FindCard.FADE * 2.0 + 0.2)
-	assert_eq(FindCard.pending(), 1, "one at a time, 1.2 s each")
-	FindCard.clear(get_tree())

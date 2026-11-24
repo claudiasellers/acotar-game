@@ -47,20 +47,20 @@ func use(_user: Node) -> void:
 	var day := Clock.day
 	if set_day() < 0:
 		Wayside.mark_found(spot.id, day)
-		FindCard.note(get_tree(), String(spot.param("set_line", "Set. The rabbits run through here.")))
+		PickupLog.of(get_tree()).note(String(spot.param("set_line", "Set. The rabbits run through here.")))
 	elif day <= set_day():
-		FindCard.note(get_tree(), "Nothing yet. Tomorrow.")
+		PickupLog.of(get_tree()).note("Nothing yet. Tomorrow.")
 	else:
 		var n := catch_on(day)
 		Wayside.mark_found(spot.id, day)
 		if n == 0:
-			FindCard.note(get_tree(), "Sprung and empty. Reset it.")
+			PickupLog.of(get_tree()).note("Sprung and empty. Reset it.")
 		else:
 			var items := PackedStringArray()
 			for i in n:
 				items.append(String(CATCH))
 			give(items)
-			FindCard.note(get_tree(), "A brace of rabbits." if n == 2 else "A rabbit. Something, at least.")
+			PickupLog.of(get_tree()).note("A brace of rabbits." if n == 2 else "A rabbit. Something, at least.")
 	_refresh()
 
 

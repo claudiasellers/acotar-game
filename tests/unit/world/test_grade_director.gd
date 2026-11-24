@@ -246,3 +246,45 @@ func test_night_fog_takes_the_ambient_instead_of_going_black() -> void:
 	director.night = 1.0
 	director.apply(GradeDirector.load_preset(&"human_winter"))
 	assert_gt(env.volumetric_fog_ambient_inject, 0.3, "the winter night fog is lit by the ambient")
+
+
+func test_winter_day_dread_stays_readable_and_night_dread_is_unchanged() -> void:
+	# The wolf hunt (L18-11): its dread 0.5 took the winter day toward the night
+	# horror preset (purple-black sky, exposure 0.85 -> 0.36) and the user found
+	# it "dark ALL around". By day human_winter now takes its own dread look.
+	var winter := GradeDirector.load_preset(&"human_winter")
+	assert_eq(winter.dread_day_look, &"dread_winter_day")
+	var day := GradeDirector.with_mood(winter, 0.5, &"dread", 0.0)
+	assert_gt(day.exposure, 0.55, "by day the hunt keeps most of its light")
+	assert_lt(day.exposure, winter.exposure, "but dread still takes some")
+	assert_lt(day.saturation, winter.saturation * 0.75, "colour drains")
+	assert_gt(day.fog_density, winter.fog_density * 1.5, "the fog closes in")
+	assert_gt(day.sky_top.get_luminance(), 0.35, "a grey overcast, not a black sky")
+	assert_gt(day.volumetric_ambient_inject, 0.3, "the closing fog is pale, not a black wall")
+	assert_almost_eq(day.magic, 0.0, 0.0001)
+	# Night scenes (the beast at the door, L55's measured rig) keep the dread preset.
+	var night := GradeDirector.with_mood(winter, 1.0, &"dread", 1.0)
+	var dread := GradeDirector.load_preset(&"dread")
+	assert_almost_eq(night.exposure, dread.exposure, 0.0001, "night dread is the dread preset")
+	assert_eq(night.sky_top, dread.sky_top)
+	# Grades without a day look (spring, manor) are unchanged by day or night.
+	var spring := GradeDirector.load_preset(&"spring")
+	assert_almost_eq(GradeDirector.with_mood(spring, 1.0, &"dread", 0.0).exposure, dread.exposure, 0.0001)
+	# A blend into human_winter carries its day look past the middle.
+	var mixed := GradePreset.mix(spring, winter, 0.6)
+	assert_eq(mixed.dread_day_look, &"dread_winter_day")
+
+
+func test_the_director_picks_the_dread_look_by_the_sun() -> void:
+	var env := Environment.new()
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child_autofree(we)
+	director.environment = we
+	director.mood_amount = 0.5
+	director.night = 0.0
+	director.apply(GradeDirector.load_preset(&"human_winter"))
+	var by_day := env.tonemap_exposure
+	director.night = 1.0
+	director.apply(GradeDirector.load_preset(&"human_winter"))
+	assert_gt(by_day, env.tonemap_exposure * 1.5, "the day hunt is far brighter than night dread")

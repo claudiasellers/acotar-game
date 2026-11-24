@@ -53,7 +53,7 @@ static func _refresh_labels(buttons: Dictionary, book: CollectionBook) -> void:
 
 
 ## One entry: its picture over a blot of wash (a lilac silhouette until
-## found), its name or where to look, and a "new" pin that bounces once.
+## found), its name or where to look, and a NEW ribbon that bounces once.
 static func _tile(e: Dictionary, detail: Label) -> Control:
 	var slot := Button.new()
 	slot.theme_type_variation = &"SatchelSlot"
@@ -87,7 +87,7 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(name_label)
 	if e.new:
-		var badge := BookKit.label("new", &"SatchelPin")
+		var badge := BookKit.new_badge()
 		badge.position = Vector2(4, 4)
 		slot.add_child(badge)
 		slot.ready.connect(func() -> void:
