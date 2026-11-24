@@ -32,6 +32,8 @@ const IDLE_ALPHA := 0.55
 const MAX_FLIGHTS := 6
 ## How far (degrees) the tin's book shakes its head when her bags have no room.
 const FULL_SHAKE := 7.0
+const CROWN_THOUGHT := "Five blooms, three of them one colour. Enough to weave a crown."
+const CROWN_FLAG := "thought_crown_blooms"
 
 ## Last input came from a gamepad (prompts switch glyphs).
 static var pad_active: bool = false
@@ -289,10 +291,19 @@ func _sparkle(target: Control) -> void:
 
 
 ## A pickup flies from Feyre into the tin's book, which bounces and sings.
+## Her thought the first time her blooms would make a crown (once a story).
+func _think_of_a_crown() -> void:
+	if WorldState.has_flag(CROWN_FLAG) or CrownWeaver.best_recipe(Gameplay.inventory) == null:
+		return
+	WorldState.set_flag(CROWN_FLAG)
+	LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", CROWN_THOUGHT, self)
+
+
 func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	_idle = 0.0
 	_refresh()
 	pickups.add(id, count)
+	_think_of_a_crown()
 	if not _bar_root.is_visible_in_tree() or _flights >= MAX_FLIGHTS:
 		return
 	var feyre := _player()

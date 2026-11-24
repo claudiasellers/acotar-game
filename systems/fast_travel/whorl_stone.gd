@@ -144,3 +144,5 @@ func paint_mark() -> void:
 	Gameplay.sketchbook.add(StringName("whorl_%s" % def.id), "Whorl stones: %s" % WhorlStones.place_label(def))
 	if is_inside_tree():
 		PickupLog.of(get_tree()).note(WhorlStones.mark_line())
+		if WhorlStones.marked_ids().size() == 2:
+			LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", WhorlStones.RIDE_THOUGHT, self)
