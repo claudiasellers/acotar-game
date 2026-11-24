@@ -2213,7 +2213,7 @@ canon = "C"
 rect = Rect2(64, -41, 10, 7)
 wall_color = Color(0.99, 0.96, 0.94, 1)
 props = Array[ExtResource("5_d7hx6")]([SubResource("Resource_art8t"), SubResource("Resource_je7bn"), SubResource("Resource_4ykum"), SubResource("Resource_no8rb"), SubResource("Resource_m2rmp"), SubResource("Resource_vup1e"), SubResource("Resource_3e5lo"), SubResource("Resource_tpx5v"), SubResource("Resource_ivo44"), SubResource("Resource_gxt00"), SubResource("Resource_s4yyf"), SubResource("Resource_bfbvu"), SubResource("Resource_08qbi"), SubResource("Resource_dbt3q"), SubResource("Resource_4m20w"), SubResource("Resource_8c41f"), SubResource("Resource_j5njl"), SubResource("Resource_midfd")])
-notes = "Small infirmary: cots and bandage shelves. Feyre dresses Tamlin's Bogge-bitten hand here (ch12)."
+notes = "Small infirmary: 'more of a supply closet with a worktable' (ch12, Keeper: no cots). Feyre dresses Tamlin's Bogge-bitten hand here."
 
 [sub_resource type="Resource" id="Resource_tpivc"]
 script = ExtResource("5_d7hx6")
@@ -3938,9 +3938,9 @@ prop_id = &"stillroom_bench"
 [sub_resource type="Resource" id="Resource_prk4t"]
 script = ExtResource("9_agin8")
 station_id = &"infirmary"
-display_name = "Infirmary Cot"
-position = Vector3(71.4, 0, -34.8)
-prop_id = &"infirmary_cot"
+display_name = "Infirmary Supplies"
+position = Vector3(71.4, 0, -34.25)
+prop_id = &"bandage_shelf"
 canon = "C"
 
 [resource]

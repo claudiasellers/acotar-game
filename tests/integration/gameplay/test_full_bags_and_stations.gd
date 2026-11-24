@@ -194,7 +194,7 @@ func test_a_night_in_her_bed_rests_her_until_morning() -> void:
 	assert_eq(vitals.health, VitalsState.MAX_HEALTH, "VitalsState.rest() ran")
 	assert_eq(Clock.day, day + 1)
 	assert_almost_eq(Clock.hour(), StationUses.MORNING, 0.2)
-	assert_eq(vitals.well_rested_left, 0.0, "a fitful night outside p5 (Keeper: ch 7, ch 12)")
+	assert_gt(vitals.well_rested_left, 0.0, "every night in her bed leaves her Well rested (the user, 2026-11-24)")
 	assert_true(StoryControl.holders().is_empty(), "her hands are hers again")
 
 
