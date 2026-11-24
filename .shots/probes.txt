@@ -1,0 +1,3 @@
+from shots/l79-probe
+quality look
+shot mouth res://tools/faces/mouth_uv_shot.tscn {out}
