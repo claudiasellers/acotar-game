@@ -48,3 +48,19 @@ Probe on a cloud box (lavapipe software GPU, so steady frames are slow; the hitc
 | sketchbook | 4 ms / 109 ms | 3 ms / 7 ms |
 
 Idle frames on the same box jitter by 5 to 19 ms.
+
+## Loose pages
+
+A station she uses with E (the stillroom, a stall, the whorl stones, the
+easel, the mare) is not a tab: it is a loose page of the same journal, laid
+over the world where she stands. `LoosePage.lay(layer, width)` gives the
+scrim, the paper (`LoosePage` theme variation), a column to write in,
+`head()` for the name and a count, `set_hints()` for key caps along the foot
+and `LoosePage.button()` for a choice. `LoosePage.paper()` is the sheet alone,
+for a station that places its own (the mare beside her, the ride's
+whole-screen leaf). The station owns its content and its `ScreenStack` push;
+it builds no scrim, card or key caps itself (`test_loose_page.gd`).
+`tools/ui/loose_page_probe.tscn -- <dir> [phase]` saves a frame of each.
+
+`UiStyle` is left only for the play-time cards (find card, prompts, caption,
+quiver card) and goes when they move, in step 8.

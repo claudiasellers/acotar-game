@@ -74,7 +74,7 @@ const LABELS := {
 	&"ThoughtText": [24, "hand", 500, &"ink"],
 }
 const PANELS: Array[StringName] = [
-	&"SatchelCard", &"SatchelDetail", &"NotifyCard", &"SatchelChip", &"SatchelKey",
+	&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
@@ -162,7 +162,7 @@ static func build(of_act: Act) -> Theme:
 	for v in PANELS:
 		t.set_type_variation(v, &"PanelContainer")
 	t.set_stylebox(&"panel", &"SatchelCard", _paper(PAPER_PAGE, c.paper, 40, 28))
-	t.set_stylebox(&"panel", &"SatchelDetail", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
+	t.set_stylebox(&"panel", &"LoosePage", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
 	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 14))
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
@@ -235,6 +235,12 @@ static func build(of_act: Act) -> Theme:
 	t.set_icon(&"unchecked", &"CheckBox", _check_box(false, c.ink, c.paper))
 	t.set_icon(&"checked", &"CheckBox", _check_box(true, c.ink, c.paper))
 	t.set_constant(&"h_separation", &"CheckBox", 10)
+	# A line to write on: the easel's title.
+	t.set_stylebox(&"normal", &"LineEdit", _pill(c.paper, Color(c.line, 0.7), 1, Vector2(12, 6), 10))
+	t.set_stylebox(&"focus", &"LineEdit", _pill(c.paper, c.accent, 2, Vector2(12, 6), 10))
+	t.set_color(&"font_color", &"LineEdit", c.ink)
+	t.set_color(&"font_placeholder_color", &"LineEdit", c.ink_soft)
+	t.set_color(&"caret_color", &"LineEdit", c.ink)
 	t.set_stylebox(&"slider", &"HSlider", _pill(Color(c.line, 0.3), Color(0, 0, 0, 0), 0, Vector2(0, 3)))
 	for area in [&"grabber_area", &"grabber_area_highlight"]:
 		t.set_stylebox(area, &"HSlider", _pill(c.accent, Color(0, 0, 0, 0), 0, Vector2(0, 3)))

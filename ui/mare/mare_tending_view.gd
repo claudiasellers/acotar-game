@@ -122,8 +122,7 @@ func _frame_camera() -> void:
 # ------------------------------------------------------------------ layout
 
 func _build() -> void:
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"SatchelDetail"
+	var panel := LoosePage.paper()
 	panel.anchor_left = 1.0 - PANEL_FRACTION
 	panel.anchor_right = 1.0
 	panel.anchor_top = 0.0
@@ -136,7 +135,7 @@ func _build() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 10)
 	panel.add_child(col)
-	var title := _label("Tending her", &"SatchelHeading")
+	var title := BookKit.label("Tending her", &"SatchelHeading", true)
 	col.add_child(title)
 	_tabs = HFlowContainer.new()
 	_tabs.add_theme_constant_override(&"h_separation", 6)
@@ -158,9 +157,7 @@ func _build() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body.add_theme_constant_override(&"separation", 8)
 	scroll.add_child(_body)
-	var done := Button.new()
-	done.text = "Done"
-	done.theme_type_variation = &"SatchelTab"
+	var done := LoosePage.button("Done")
 	done.pressed.connect(close)
 	col.add_child(done)
 
@@ -177,14 +174,6 @@ func _slot_of(tab: String) -> StringName:
 		if MareTack.SLOT_NAMES[s] == tab:
 			return s
 	return &""
-
-
-func _label(text: String, variation: StringName = &"SatchelBody") -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	return l
 
 
 func _show(tab: String) -> void:
@@ -204,7 +193,7 @@ func _show(tab: String) -> void:
 
 
 func _build_care() -> void:
-	_body.add_child(_label("Her coat", &"SatchelSmall"))
+	_body.add_child(BookKit.label("Her coat", &"SatchelSmall", true))
 	_shine_bar = ProgressBar.new()
 	_shine_bar.theme_type_variation = &"SatchelMeter"
 	_shine_bar.min_value = 0.0
@@ -212,16 +201,16 @@ func _build_care() -> void:
 	_shine_bar.show_percentage = false
 	_shine_bar.custom_minimum_size = Vector2(0, 18)
 	_body.add_child(_shine_bar)
-	_shine_label = _label("", &"SatchelSmall")
+	_shine_label = BookKit.label("", &"SatchelSmall", true)
 	_body.add_child(_shine_label)
 	_refresh_shine()
 	_body.add_child(HSeparator.new())
-	_body.add_child(_label("Treats", &"SatchelSmall"))
+	_body.add_child(BookKit.label("Treats", &"SatchelSmall", true))
 	var have := MareCare.treats_in(inventory)
 	if MareCare.full():
-		_body.add_child(_label("She has had her fill today. She noses your hand anyway."))
+		_body.add_child(BookKit.label("She has had her fill today. She noses your hand anyway.", &"SatchelBody", true))
 	elif have.is_empty():
-		_body.add_child(_label("Nothing sweet in the satchel. She likes orchard fruit, berries, clover and dandelions."))
+		_body.add_child(BookKit.label("Nothing sweet in the satchel. She likes orchard fruit, berries, clover and dandelions.", &"SatchelBody", true))
 	var grid := HFlowContainer.new()
 	grid.add_theme_constant_override(&"h_separation", 8)
 	_body.add_child(grid)
@@ -243,11 +232,11 @@ func _card_balm() -> Control:
 	card.theme_type_variation = &"SatchelCard"
 	var col := VBoxContainer.new()
 	card.add_child(col)
-	col.add_child(_label("Sweetbalm", &"SatchelBody"))
+	col.add_child(BookKit.label("Sweetbalm", &"SatchelBody", true))
 	var needs := PackedStringArray()
 	for id in MareBond.BALM_NEEDS:
 		needs.append("%s %s" % [MareTack._item_name(id), "✓" if inventory and inventory.count(id) > 0 else "·"])
-	col.add_child(_label("Rubbed on her muzzle, so the grey ground smells of nothing. " + ", ".join(needs), &"SatchelSmall"))
+	col.add_child(BookKit.label("Rubbed on her muzzle, so the grey ground smells of nothing. " + ", ".join(needs), &"SatchelSmall", true))
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	b.text = "Make it and put it on"
@@ -264,15 +253,15 @@ func _card_balm() -> Control:
 
 ## Her page, in Feyre's hand (MarePage).
 func _build_page() -> void:
-	_body.add_child(_label("What I know of her", &"SatchelSmall"))
-	_body.add_child(_label(MarePage.now_line()))
+	_body.add_child(BookKit.label("What I know of her", &"SatchelSmall", true))
+	_body.add_child(BookKit.label(MarePage.now_line(), &"SatchelBody", true))
 	var after := MarePage.after_line()
 	if after != "":
 		_body.add_child(HSeparator.new())
-		_body.add_child(_label("What I mean to try", &"SatchelSmall"))
-		_body.add_child(_label(after))
+		_body.add_child(BookKit.label("What I mean to try", &"SatchelSmall", true))
+		_body.add_child(BookKit.label(after, &"SatchelBody", true))
 		for h in MarePage.hints_shown():
-			_body.add_child(_label(h, &"SatchelSmall"))
+			_body.add_child(BookKit.label(h, &"SatchelSmall", true))
 		var think := Button.new()
 		think.theme_type_variation = &"SatchelTab"
 		think.text = "Think on it"
@@ -284,9 +273,9 @@ func _build_page() -> void:
 	var kept := MarePage.memories()
 	if not kept.is_empty():
 		_body.add_child(HSeparator.new())
-		_body.add_child(_label("Remembered", &"SatchelSmall"))
+		_body.add_child(BookKit.label("Remembered", &"SatchelSmall", true))
 		for m in kept:
-			_body.add_child(_label(m, &"SatchelSmall"))
+			_body.add_child(BookKit.label(m, &"SatchelSmall", true))
 
 
 func _refresh_shine() -> void:
@@ -323,11 +312,11 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 	swatch.custom_minimum_size = Vector2(22, 22)
 	swatch.color = p.colors[0] if not p.colors.is_empty() else Color(0.85, 0.72, 0.76)
 	row.add_child(swatch)
-	var name := _label(p.display_name, &"SatchelBody")
+	var name := BookKit.label(p.display_name, &"SatchelBody", true)
 	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(name)
 	if p.blurb != "":
-		col.add_child(_label(p.blurb, &"SatchelSmall"))
+		col.add_child(BookKit.label(p.blurb, &"SatchelSmall", true))
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	if wearing:
@@ -338,7 +327,7 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 		b.pressed.connect(_wear.bind(p))
 	else:
 		for need: Array in MareTack.needs(p, inventory):
-			var l := _label("%s  %d / %d" % [need[0], mini(need[1], need[2]), need[2]], &"SatchelSmall")
+			var l := BookKit.label("%s  %d / %d" % [need[0], mini(need[1], need[2]), need[2]], &"SatchelSmall", true)
 			if int(need[1]) < int(need[2]):
 				l.modulate = Color(1, 1, 1, 0.55)
 			col.add_child(l)
@@ -357,8 +346,8 @@ func _card_saddle() -> Control:
 	var col := VBoxContainer.new()
 	card.add_child(col)
 	var on := MareTack.saddled()
-	col.add_child(_label("Saddle", &"SatchelBody"))
-	col.add_child(_label("She'll carry you without it now." if on else "Just her back and your knees.", &"SatchelSmall"))
+	col.add_child(BookKit.label("Saddle", &"SatchelBody", true))
+	col.add_child(BookKit.label("She'll carry you without it now." if on else "Just her back and your knees.", &"SatchelSmall", true))
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	b.text = "Ride bareback" if on else "Saddle her"
@@ -376,7 +365,7 @@ func _card_none(slot: StringName, bare: bool) -> Control:
 	card.custom_minimum_size = Vector2(CARD_W, 0)
 	var col := VBoxContainer.new()
 	card.add_child(col)
-	col.add_child(_label("Nothing", &"SatchelBody"))
+	col.add_child(BookKit.label("Nothing", &"SatchelBody", true))
 	var b := Button.new()
 	b.theme_type_variation = &"SatchelSlot"
 	b.text = "Bare" if bare else "Take it off"
