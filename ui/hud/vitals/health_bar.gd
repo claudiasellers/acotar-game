@@ -1,4 +1,4 @@
-## The health bar beside the stamina rose (bottom left): a rounded rose fill
+## The health bar beside Feyre's bow (bottom left): a rounded rose fill
 ## over a dark track, a pearl lag fill that drains after a hit, a gold notch at
 ## the walk-it-off regen cap, a pink sheen while healing, bile veins under venom
 ## and a heartbeat pulse when she is badly hurt (plan §15 A2).

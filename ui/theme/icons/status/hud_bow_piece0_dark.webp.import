@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dus22d6joaxl0"
-path="res://.godot/imported/hud_rose_heart.webp-83c2502bfa296334fd1277dd01113934.ctex"
+uid="uid://dqof1q62ijjhp"
+path="res://.godot/imported/hud_bow_piece0_dark.webp-811e51a5b54458fe5d40a1653e302030.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/theme/icons/status/hud_rose_heart.webp"
-dest_files=["res://.godot/imported/hud_rose_heart.webp-83c2502bfa296334fd1277dd01113934.ctex"]
+source_file="res://ui/theme/icons/status/hud_bow_piece0_dark.webp"
+dest_files=["res://.godot/imported/hud_bow_piece0_dark.webp-811e51a5b54458fe5d40a1653e302030.ctex"]
 
 [params]
 

@@ -1,6 +1,6 @@
 ## Feyre's play HUD (plan §14, the chosen look in ui/icon-directions/
 ## CHOSEN_cute_thin_plum_line.png): one vitals block bottom left (status chips
-## over the health bar, the stamina rose as its crest; the top left is her
+## over the health bar, Feyre's bow as its crest; the top left is her
 ## thought card's), the grab ring in the centre, and her screen edges
 ## under everything. It reads her VitalsState and shows only what matters:
 ## meters appear when they change and fade at rest (Auto), or stay
@@ -13,7 +13,8 @@ extends CanvasLayer
 enum Mode { CONTEXTUAL, ALWAYS, OFF }
 
 ## Clear of the controls pill (bottom left, y 1018 up) and the quick bar.
-const ROSE_AT := Vector2(40, 910)
+## The bow's arrow points into the bar's start, level with it.
+const BOW_AT := Vector2(56, 910)
 const BAR_AT := Vector2(146, 950)
 ## Chips sit on the bar, their left edge on its start.
 const STATUS_AT := Vector2(138, 856)
@@ -29,7 +30,7 @@ const HIT_FADE := 1.2
 const EDGE_STRENGTH: Array[float] = [1.0, 0.5, 0.0]
 
 var health_bar: VitalsHealthBar
-var stamina_rose: VitalsStaminaRose
+var stamina_bow: VitalsStaminaBow
 var status_row: VitalsStatusRow
 var grab_prompt: VitalsGrabPrompt
 var edge_fx: VitalsEdgeFx
@@ -66,9 +67,9 @@ func _ready() -> void:
 	status_row = VitalsStatusRow.new()
 	status_row.position = STATUS_AT
 	_root.add_child(status_row)
-	stamina_rose = VitalsStaminaRose.new()
-	stamina_rose.position = ROSE_AT
-	_root.add_child(stamina_rose)
+	stamina_bow = VitalsStaminaBow.new()
+	stamina_bow.position = BOW_AT
+	_root.add_child(stamina_bow)
 	health_bar = VitalsHealthBar.new()
 	health_bar.position = BAR_AT
 	_root.add_child(health_bar)
@@ -76,7 +77,7 @@ func _ready() -> void:
 	grab_prompt.position = GRAB_AT - grab_prompt.size * 0.5
 	grab_prompt.visible = false
 	_root.add_child(grab_prompt)
-	for c: CanvasItem in [status_row, stamina_rose, health_bar]:
+	for c: CanvasItem in [status_row, stamina_bow, health_bar]:
 		c.modulate.a = 0.0
 
 
@@ -110,9 +111,9 @@ func _update_meters(delta: float, mode: int, play: bool) -> void:
 	health_bar.healing = v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"heal")
 	var stamina := float(_player.get(&"stamina")) if "stamina" in _player else 100.0
 	var max_st := v.max_stamina()
-	stamina_rose.fraction = clampf(stamina / max_st, 0.0, 1.0)
-	stamina_rose.winded = _player.has_method(&"is_winded") and bool(_player.call(&"is_winded"))
-	stamina_rose.set_buds(int(floor((max_st - 100.0) / 10.0 + 0.001)))
+	stamina_bow.fraction = clampf(stamina / max_st, 0.0, 1.0)
+	stamina_bow.winded = _player.has_method(&"is_winded") and bool(_player.call(&"is_winded"))
+	stamina_bow.set_buds(int(floor((max_st - 100.0) / 10.0 + 0.001)))
 	_health_timer = maxf(_health_timer - delta, 0.0)
 	if v.health < VitalsState.MAX_HEALTH - 0.05:
 		_health_timer = maxf(_health_timer, HEALTH_FULL_LINGER)
@@ -127,12 +128,12 @@ func _update_meters(delta: float, mode: int, play: bool) -> void:
 	elif mode == Mode.OFF or not play:
 		want_health = 0.0
 		want_stamina = 0.0
-	# The rose is the bar's crest: it shows whenever the bar does.
+	# The bow is the bar's crest: it shows whenever the bar does.
 	want_stamina = maxf(want_stamina, want_health)
 	_health_alpha = move_toward(_health_alpha, want_health, delta * FADE_SPEED)
 	_stamina_alpha = move_toward(_stamina_alpha, want_stamina, delta * FADE_SPEED)
 	health_bar.modulate.a = _health_alpha
-	stamina_rose.modulate.a = _stamina_alpha
+	stamina_bow.modulate.a = _stamina_alpha
 
 
 func _on_health_changed(_health: float, _max_health: float, _delta: float, _source: StringName) -> void:

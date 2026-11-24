@@ -1,4 +1,4 @@
-// Feyre's status medallion glyphs and vitals HUD pieces, in the chosen icon
+// Feyre's status medallion glyphs, in the chosen icon
 // style (Cute, thin plum line): ui/icon-directions/CHOSEN_cute_thin_plum_line.png.
 // Writes ui/theme/icons/status/<tag>.png at 256 px; status_icons.py turns them
 // into .webp and removes the .png.
@@ -17,11 +17,10 @@ const OUT = path.resolve(HERE, '../../../ui/theme/icons/status');
 const SIZE = 256;
 // The chosen settings (icon_style/README.md), with the plum line baked in like the item icons.
 const CUTEO = { set: 'cute', noDetail: true, goo: true, lw: 3.6, dk: 2.8, dkf: 2.4 };
-// The item icons' plum line. Medallion glyphs take it half again as heavy:
-// they read at 48 px on the paper disc mid-play, and the line carries the
-// silhouette's contrast. The rose's pieces keep the item weight.
-const PLUM = { color: '#3A2444', w: 0.8 };
-const PLUM_MEDALLION = { ...PLUM, w: 1.2 };
+// The item icons' plum line (w 0.8), half again as heavy: medallion glyphs
+// read at 48 px on the paper disc mid-play, and the line carries the
+// silhouette's contrast.
+const PLUM_MEDALLION = { color: '#3A2444', w: 1.2 };
 
 const f = n => +n.toFixed(2);
 const R = deg => `rotate(${deg} 24 24)`;
@@ -133,9 +132,6 @@ export const STATUS = {
     B(rr(3.5, 19.5, 41, 5, 2.5), C.brown),
     sh(13, 30, 1.6),
   ] },
-  // HUD pieces: the stamina rose's petal (rotated in-engine) and its heart.
-  hud_petal: { name: 'Stamina petal', main: C.rose, parts: [B(petal, C.rose)] },
-  hud_rose_heart: { name: 'Stamina rose heart', main: C.gold, parts: [Cc(24, 24, 5.4, C.gold), sh(22.6, 22.6, 1.4)] },
 };
 
 Object.assign(CUTE, STATUS);
@@ -148,7 +144,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: SIZE + 64, height: SIZE + 64 }, deviceScaleFactor: 1 });
 for (const id of Object.keys(STATUS)) {
   const pad = SIZE * 0.08;
-  const svg = icon(id, 'flat', { ...CUTEO, size: SIZE - 2 * pad, x: pad, y: pad, outline: id.startsWith('hud_') ? PLUM : PLUM_MEDALLION });
+  const svg = icon(id, 'flat', { ...CUTEO, size: SIZE - 2 * pad, x: pad, y: pad, outline: PLUM_MEDALLION });
   const html = `<!doctype html><html><body style="margin:0;background:transparent">${FILTERS}<svg id="i" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></body></html>`;
   await page.setContent(html);
   await page.locator('#i').screenshot({ path: path.join(OUT, `${id}.png`), omitBackground: true });

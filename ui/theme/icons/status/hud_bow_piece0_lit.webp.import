@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b04etb2eyci0w"
-path="res://.godot/imported/hud_petal.webp-1b699ad2651dd33690c79b595535b61a.ctex"
+uid="uid://bfgoahup6ak7s"
+path="res://.godot/imported/hud_bow_piece0_lit.webp-d2c7da37828b76de1c32b15fa84d02cf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/theme/icons/status/hud_petal.webp"
-dest_files=["res://.godot/imported/hud_petal.webp-1b699ad2651dd33690c79b595535b61a.ctex"]
+source_file="res://ui/theme/icons/status/hud_bow_piece0_lit.webp"
+dest_files=["res://.godot/imported/hud_bow_piece0_lit.webp-d2c7da37828b76de1c32b15fa84d02cf.ctex"]
 
 [params]
 
