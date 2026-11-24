@@ -207,6 +207,13 @@ class Rig:
 # --------------------------------------------------------------------------
 # Upper body layers
 # --------------------------------------------------------------------------
+# Degrees a body's arms hang further out than the rest of the cast's, to clear
+# what it wears at the hip: a wide skirt, an apron, a sword. Set by the builder
+# from the character (ARM_CLEAR in cast_<id>.py, arm_clear in a DESIGNS row);
+# measured with tools/creatures/arm_clip_probe.gd.
+ARM_CLEAR = 0.0
+
+
 def relaxed_arms(fr: Frame, swing: tuple[float, float], elbow: tuple[float, float],
                  lower: float = 82.0, curl: float = 1.0, out: float = 0.0) -> None:
     """Arms down from the T-pose; swing deg (+ = forward), elbow flex deg per side.
@@ -216,7 +223,7 @@ def relaxed_arms(fr: Frame, swing: tuple[float, float], elbow: tuple[float, floa
     and past 86 the hands sink into tunics and skirts."""
     for i, (side, s) in enumerate(SIDES):
         fr.add(side + "Shoulder", qy(5.0) @ qz(-3.0), s)
-        fr.add(side + "UpperArm", qx(-swing[i]) @ qy(lower - 5.0 - out) @ qz(-8.0), s)
+        fr.add(side + "UpperArm", qx(-swing[i]) @ qy(lower - 5.0 - out - ARM_CLEAR) @ qz(-8.0), s)
         fr.add(side + "LowerArm", qz(-elbow[i]) @ qx(15.0), s)        # pronate (palms back), then flex
         fr.add(side + "Hand", qz(-6.0) @ qy(10.0 * curl), s)
         for k, f in enumerate(FINGERS):
@@ -255,8 +262,10 @@ IDLE_FRAMES = 150
 STANCE = {"Left": Vector((0.022, -0.035, 0.0)), "Right": Vector((-0.018, 0.045, 0.0))}
 
 
-def idle_frame(phase: float, look: float = 0.0, look_tilt: float = 0.0, still: float = 0.0) -> Frame:
-    """Braced, coiled stance. look = head/eye yaw (deg, + left); still damps breathing."""
+def idle_frame(phase: float, look: float = 0.0, look_tilt: float = 0.0, still: float = 0.0,
+               lower: float = 82.0) -> Frame:
+    """Braced, coiled stance. look = head/eye yaw (deg, + left); still damps breathing;
+    lower = relaxed_arms' arm drop, for a pose built on this one with its hands placed."""
     fr = Frame()
     breath = math.sin(2.0 * math.pi * 2.0 * phase) * (1.0 - 0.75 * still)  # two breaths per loop
     shift = math.sin(2.0 * math.pi * phase)                                   # one weight shift
@@ -269,7 +278,8 @@ def idle_frame(phase: float, look: float = 0.0, look_tilt: float = 0.0, still: f
     for side, s in SIDES:
         fr.add(side + "Eye", qz(look * 0.4), 1.0)
     sw = 2.0 * shift
-    relaxed_arms(fr, swing=(4.0 + sw, 6.0 - sw), elbow=(20.0 + 1.5 * breath, 24.0 + 1.5 * breath))
+    relaxed_arms(fr, swing=(4.0 + sw, 6.0 - sw), elbow=(20.0 + 1.5 * breath, 24.0 + 1.5 * breath),
+                 lower=lower)
     lag = [math.sin(2.0 * math.pi * (phase - 0.04 * (i + 1))) for i in range(4)]
     braid(fr, 4.0, [0.6 * breath] * 4, [-3.0 * v for v in lag])
     return fr

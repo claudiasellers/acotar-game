@@ -122,7 +122,7 @@ def _men(shirt, vest, trim, trousers, shoe, coat, lining, patch_a, patch_b):
 DESIGNS = {
     # -- a plump, pretty farmer's wife selling eggs, wealthy enough for "a full necklace of braided iron"
     #    (ch 3): peat-brown dress, undyed apron, a faded-madder capelet
-    "human_woman": dict(canon="C", body="v_plump", height=1.60, skin="EDC6AC", iris="6A5A3A", hair="7A5634",
+    "human_woman": dict(arm_clear=8.0, canon="C", body="v_plump", height=1.60, skin="EDC6AC", iris="6A5A3A", hair="7A5634",
                         brows="5A3E28", lips="B98078", style=("alis", "style_bun"),
                         outfit=[("dress", PEAT, PEAT_D), ("apron",), ("slippers", "3E3028"),
                                 ("shawl", MADDER, "74424A"), ("iron_braid",)]),
@@ -137,7 +137,7 @@ DESIGNS = {
                         outfit=[("dress", SLATE, SLATE_D), ("apron",), ("slippers", "3E342E"),
                                 ("cloak_worn", ASH, ASH, 0.36), ("iron_charm",)]),
     # -- the young man by the tavern, shorter and slighter: undyed shirt, rust vest, a slate cape
-    "human_youth": dict(canon="X", body="v_slight", height=1.64, skin="E2B494", iris="5A4630", hair="4A3626",
+    "human_youth": dict(arm_clear=10.0, canon="X", body="v_slight", height=1.64, skin="E2B494", iris="5A4630", hair="4A3626",
                         brows="3A2A1E", lips="B48A7C", style=("village", "style_bob"),
                         outfit=[("layers", dict(_men(UNDYED, RUST, "6E4230", PEAT, "3E3028", PEAT, OAT, OAT, OAT),
                                                 no_coat=True)),
@@ -150,16 +150,16 @@ DESIGNS = {
     # -- the Children of the Blessed (ch 3): plain floor-length pale blue robes, cord belt, real silver,
     #    bells at the wrist, long uncut hair, bare heads; spotless.  The speaker is a young woman with
     #    brown eyes and a clean, glowing face; five acolytes behind her, young men and women both.
-    "blessed": dict(canon="C", body="v_female", height=1.68, skin="F4E6E0", iris="6A4A30", hair="2E2420",
+    "blessed": dict(arm_clear=10.0, canon="C", body="v_female", height=1.68, skin="F4E6E0", iris="6A4A30", hair="2E2420",
                     brows="2A201C", lips="D4949C", style=("feyre", "loose"), face="glow",
                     outfit=[("robe", BLESSED_BLUE), ("slippers", BLESSED_PALE), ("cord_belt",),
                             ("silver", "charm_bracelet"), ("silver", "necklace_pendant")]),
-    "blessed_2": dict(canon="C", body="v_acolyte", height=1.78, skin="F2E2D8", iris="4E5E70", hair="5A3E28",
+    "blessed_2": dict(arm_clear=10.0, canon="C", body="v_acolyte", height=1.78, skin="F2E2D8", iris="4E5E70", hair="5A3E28",
                       brows="3E2A1C", lips="B88A80", style=("rhysand", "style_short"), face="glow",
                       outfit=[("robe", BLESSED_PALE), ("slippers", BLESSED_PALE), ("cord_belt",),
                               ("silver", "charm_bracelet")]),
     # -- the mercenary at the broken fountain: heavy peat coat with a rust lining, sword and long knife
-    "mercenary": dict(canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="3A2418", hair="241A16",
+    "mercenary": dict(arm_clear=2.0, canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="3A2418", hair="241A16",
                       brows="1E1612", lips="A8705E", style=("village", "style_bob"),
                       outfit=[("layers", _men("BDB2A0", "3E3A36", "2E2A26", "3A3632", "2A2420", PEAT_D, RUST,
                                               "5A4A3E", "6A5A4A")),
@@ -442,6 +442,7 @@ def install(cm, vid):
     cm.SHAPE = shapes(cm)[body]
     cm.WARP = warp(cm, body, cm.HEIGHT)
     cm.GAIT = "female" if cm.KIND in ("female", "round") else "male"
+    cm.ARM_CLEAR = D.get("arm_clear", 0.0)
     cm.SKIN_SRGB = D["skin"]
     cm.SKIN_LINEAR = cc.srgb(D["skin"])
     cm.BLACK_EYES = False

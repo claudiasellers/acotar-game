@@ -91,7 +91,7 @@ def warp(height, kind):
 # ---------------------------------------------------------------------------
 DESIGNS = {
     # -- Calanmai revellers: masked Spring High Fae in their festival best (ch 20) ------------------
-    "reveler_1": dict(canon="X", body="female", height=1.74, skin="F3CDB9", iris="3F7A5A", hair="8A3A22",
+    "reveler_1": dict(arm_clear=10.0, canon="X", body="female", height=1.74, skin="F3CDB9", iris="3F7A5A", hair="8A3A22",
                       lips="D9707E", brows="6E3420", style=("feyre", "rose_bun"),
                       outfit=[("gown", "gown_garden", "F7E2A0", "FFF6E4"), ("slippers", "E9C27A")],
                       mask=("stag", "D8B25A", "FFF3DC"), extras=[("earrings", "earrings_pearl")]),
@@ -99,7 +99,7 @@ DESIGNS = {
                       brows="2E1C12", lips="B47A68", style=("lucien", "style_half_up"),
                       outfit=[("tunic", "8F9DE2", "E9D49A", True), ("trousers", "F2EBDD"), ("boots", "8C6446")],
                       mask=("hawk", "D4AE5E", "F6E7C4")),
-    "reveler_3": dict(canon="X", body="female", height=1.70, skin="F7DCCD", iris="6C8FC8", hair="EFE2C6",
+    "reveler_3": dict(arm_clear=10.0, canon="X", body="female", height=1.70, skin="F7DCCD", iris="6C8FC8", hair="EFE2C6",
                       lips="E58AA0", brows="B8A07C", style=("feyre", "soft_curls"),
                       outfit=[("gown", "gown_ball", "CDB4F2", "FFF4FA"), ("slippers", "E7D6FA")],
                       mask=("hare", "E8E6EE", "F4C6D8"), extras=[("earrings", "earrings_drop")]),
@@ -123,25 +123,25 @@ DESIGNS = {
                                  outfit=[("tunic", "5E8A68", "E2C277", True), ("trousers", "F1EADA"),
                                          ("boots", "4A3A2E")],
                                  mask=("bird", "C9A14E", "E9CF88")),
-    "servant_cook_true": dict(canon="X", body="round", height=1.58, skin="9BAA84", iris="4A3018", hair="5A4630",
+    "servant_cook_true": dict(arm_clear=2.0, canon="X", body="round", height=1.58, skin="9BAA84", iris="4A3018", hair="5A4630",
                               brows="3E3020", lips="A87068", style=("alis", "style_bun"),
                               outfit=[("dress", "D9B26F", "B08C50"), ("apron",), ("slippers", "5E4632")],
                               mask=("bird", "B98E40", "DDBB70")),
     # -- border sentries, High Fae (wolf masks: Tamlin turns sentries into wolves) --------------------
-    "sentry_1": dict(canon="X", body="broad", height=1.92, skin="E2B596", iris="6A5A2A", hair="5A3A22",
+    "sentry_1": dict(arm_clear=10.0, canon="X", body="broad", height=1.92, skin="E2B596", iris="6A5A2A", hair="5A3A22",
                      brows="4A2E1A", lips="B07A66", style=("rhysand", "style_short"),
                      outfit=[("leathers", "7C8F62", "C9A55A"), ("boots", "4E3A28"), ("cloak", "4F6B44")],
                      mask=("wolf", "C9CDD6", "8E94A2")),
-    "sentry_2": dict(canon="X", body="broad", height=1.88, skin="EED8C2", iris="4A6A8A", hair="C9A46A",
+    "sentry_2": dict(arm_clear=10.0, canon="X", body="broad", height=1.88, skin="EED8C2", iris="4A6A8A", hair="C9A46A",
                      brows="9A7A48", lips="BE8676", style=("tamlin", "style_loose"),
                      outfit=[("leathers", "8A8A80", "D9BE72"), ("boots", "3E3022"), ("cloak", "6A5A84")],
                      mask=("wolf", "D2C6A8", "9A8A62")),
     # -- solstice dancers, true forms "shaped and colored and built so strangely and differently" (ch 25) --
-    "fae_rose": dict(canon="X", body="female", height=1.72, skin="D99AA8", iris="7A1E34", hair="8E1630",
+    "fae_rose": dict(arm_clear=10.0, canon="X", body="female", height=1.72, skin="D99AA8", iris="7A1E34", hair="8E1630",
                      brows="6E1024", lips="B0304E", style=("feyre", "soft_curls"),
                      outfit=[("gown", "gown_rose_petal", "C8304E", "D98A9A"), ("slippers", "B02844")],
                      mask=("hawk", "D4AE5E", "D9B0B8"), extras=[("crown", "flower")]),
-    "fae_nymph": dict(canon="X", body="female", height=1.70, skin="9CC8D2", iris="1E5A6E", hair="2E6A80",
+    "fae_nymph": dict(arm_clear=10.0, canon="X", body="female", height=1.70, skin="9CC8D2", iris="1E5A6E", hair="2E6A80",
                       brows="24505E", lips="5E8EA8", style=("feyre", "loose"),
                       outfit=[("gown", "gown_starlight", "6FB2BC", "C8D9D6"), ("slippers", "5E9AA6")],
                       mask=("hare", "B8C8D2", "D9C8D0"), extras=[("earrings", "earrings_pearl")]),
@@ -153,40 +153,40 @@ DESIGNS = {
     # The High Fae who ruled before the Wall (ch 3, 6, 13) [C]: "ornate depictions of the beings who
     # had once ruled", starry and golden in the mural; unmasked (the masks are the curse, 49 years
     # old).  Their looks and clothes are [X].
-    "old_court_lord": dict(canon="X", body="trio", height=2.06, skin="F2E6DA", iris="C9A040", hair="EDE3CF",
+    "old_court_lord": dict(arm_clear=10.0, canon="X", body="trio", height=2.06, skin="F2E6DA", iris="C9A040", hair="EDE3CF",
                            brows="B8A47C", lips="B48A80", style=("lucien", "style_half_up"),
                            outfit=[("tunic", "1E1A3A", "E2C277", True), ("trousers", "2A2440"), ("boots", "1A1626"),
                                    ("cloak", "3A2A5E")]),
-    "old_court_lady": dict(canon="X", body="female", height=1.86, skin="F5E4D6", iris="6C8FC8", hair="1A1420",
+    "old_court_lady": dict(arm_clear=10.0, canon="X", body="female", height=1.86, skin="F5E4D6", iris="6C8FC8", hair="1A1420",
                            brows="1A1420", lips="B05A6A", style=("feyre", "loose"),
                            outfit=[("gown", "gown_starlight", "2A2F6A", "E2C277"), ("slippers", "E2C277")],
                            extras=[("earrings", "earrings_drop")]),
-    "old_court_lady_2": dict(canon="X", body="female", height=1.82, skin="E8C8A8", iris="3F7A5A", hair="C9A46A",
+    "old_court_lady_2": dict(arm_clear=10.0, canon="X", body="female", height=1.82, skin="E8C8A8", iris="3F7A5A", hair="C9A46A",
                              brows="9A7A48", lips="C0707A", style=("feyre", "crown_braid"),
                              outfit=[("gown", "gown_ball", "E8C676", "FFF4DC"), ("slippers", "E8C676")],
                              extras=[("earrings", "earrings_pearl")]),
     # The War (ch 13 mural) [C]: "High Fae in their glimmering armor"; armour cut [X].
-    "war_fae_1": dict(canon="X", body="broad", height=1.96, skin="EED8C2", iris="C9A040", hair="EDE3CF",
+    "war_fae_1": dict(arm_clear=10.0, canon="X", body="broad", height=1.96, skin="EED8C2", iris="C9A040", hair="EDE3CF",
                       brows="B8A47C", lips="BE8676", style=("tamlin", "style_loose"),
                       outfit=[("leathers", "C8CCD6", "E2C277"), ("boots", "8E94A2"), ("cloak", "5E6A8A")]),
-    "war_fae_2": dict(canon="X", body="broad", height=1.92, skin="D9A688", iris="4A6A8A", hair="3A2416",
+    "war_fae_2": dict(arm_clear=10.0, canon="X", body="broad", height=1.92, skin="D9A688", iris="4A6A8A", hair="3A2416",
                       brows="2E1C12", lips="B07A66", style=("rhysand", "style_short"),
                       outfit=[("leathers", "AEB4C2", "D9BE72"), ("boots", "6A6E7A"), ("cloak", "7A2A2A")]),
     # The six mortal queens of the Treaty (ch 3) [C]; their looks are [X]: silver gowns, crowns.
-    "mortal_queen_1": dict(canon="X", body="human", height=1.70, skin="F1D3BE", iris="5A7A9A", hair="3A2416",
+    "mortal_queen_1": dict(arm_clear=10.0, canon="X", body="human", height=1.70, skin="F1D3BE", iris="5A7A9A", hair="3A2416",
                            brows="2E1C12", lips="B86A70", style=("feyre", "crown_braid"),
                            outfit=[("gown", "gown_ball", "C9CED8", "F4F6FA"), ("slippers", "C9CED8")],
                            extras=[("earrings", "earrings_pearl")]),
-    "mortal_queen_2": dict(canon="X", body="human", height=1.74, skin="B98060", iris="4A3018", hair="1A1210",
+    "mortal_queen_2": dict(arm_clear=4.0, canon="X", body="human", height=1.74, skin="B98060", iris="4A3018", hair="1A1210",
                            brows="1A1210", lips="9A5A50", style=("feyre", "ballerina_bun"),
                            outfit=[("gown", "gown_dinner", "AEB6C6", "E6EAF2"), ("slippers", "AEB6C6")],
                            extras=[("earrings", "earrings_drop")]),
-    "mortal_queen_3": dict(canon="X", body="human", height=1.66, skin="7E4E36", iris="3A2414", hair="C9C2B8",
+    "mortal_queen_3": dict(arm_clear=10.0, canon="X", body="human", height=1.66, skin="7E4E36", iris="3A2414", hair="C9C2B8",
                            brows="6A5E54", lips="7A4038", style=("feyre", "soft_curls"),
                            outfit=[("gown", "gown_solstice", "D8DCE4", "9AA4B8"), ("slippers", "D8DCE4")]),
     # The Archerons' mother (ch 2, 4, 7, 30) [C]: Nesta's cold face and blue-grey eyes, Feyre's
     # straight nose, the sisters' gold-brown hair [X], dressed for the peerage she dazzled.
-    "archeron_mother": dict(canon="C", body="human", height=1.72, skin="EBCABC", iris="7E9098", hair="B08552",
+    "archeron_mother": dict(arm_clear=4.0, canon="C", body="human", height=1.72, skin="EBCABC", iris="7E9098", hair="B08552",
                             brows="7A5A38", lips="B07078", style=("nesta", "style_chignon"),
                             outfit=[("gown", "gown_dinner", "3E4A66", "C9CED8"), ("slippers", "3E4A66")],
                             extras=[("earrings", "earrings_pearl")]),
@@ -219,6 +219,7 @@ SHAPE = {"female": FEMALE, "male": MALE, "trio": TRIO, "round": ROUND, "broad": 
 WARP = warp(HEIGHT, {"female": "female", "male": "male", "trio": "trio", "round": "round", "broad": "broad",
                      "human": "female", "human_m": "male"}[KIND])
 GAIT = "female" if KIND in ("female", "round", "human") else "male"
+ARM_CLEAR = D.get("arm_clear", 0.0)
 SKIN_SRGB = D["skin"]
 SKIN_LINEAR = cc.srgb(SKIN_SRGB)
 BLACK_EYES = D["iris"] == "black"
