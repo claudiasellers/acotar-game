@@ -351,6 +351,8 @@ for n in $splits; do
 	if [ "$bad" = 0 ]; then
 		record "${names[$n]}" FLAKY 0
 		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); see its log: ${mems[$n]}"
+		# Then name the leaker, off to the side: it never holds or fails the gate.
+		mq_detach "$out/bisect.log" /bin/bash "$here/bisect.sh" "$out" "${names[$n]}" "${mems[$n]}"
 	fi
 done
 
