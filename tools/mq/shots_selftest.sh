@@ -272,6 +272,17 @@ echo "SHOTS_KEEP_DAYS=0" >>"$T/mac/.git/mq/config"
 sleep 1; once
 check "the Mac prunes its own old answers, and leaves requests alone" '! res B-1 && git --git-dir="$T/origin.git" rev-parse -q --verify refs/heads/shots/req-B-1 >/dev/null'
 
+# a result branch deleted from origin elsewhere: prune drops the local ref, no push error
+sed -i.bak '/SHOTS_KEEP_DAYS=0/d' "$T/mac/.git/mq/config"
+request P 1 'shot good res://probe/shot.tscn ok {out}/g.png\n'
+once
+git --git-dir="$T/origin.git" update-ref -d refs/heads/shots/res-P-1
+echo "SHOTS_KEEP_DAYS=0" >>"$T/mac/.git/mq/config"
+sleep 1
+: >"$T/mac/.git/mq/shots/listener.log"
+once
+check "prune drops the local ref of a result already gone from origin, with no push error" '! git -C "$T/mac" rev-parse -q --verify refs/mq/shots/res/P-1 >/dev/null && ! grep -q "stale info" "$T/mac/.git/mq/shots/listener.log"'
+
 # 11 quality tiers, generated-content cache, import skipping, reuse
 sed -i.bak '/SHOTS_KEEP_DAYS=0/d' "$T/mac/.git/mq/config"
 request L 1 'size 640x360\nshot x res://probe/shot.tscn ok {out}/x.png\n'
