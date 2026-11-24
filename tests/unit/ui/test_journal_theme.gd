@@ -135,23 +135,11 @@ func test_type_on_the_page_reads() -> void:
 		var c := JournalTheme.colors(act)
 		for ink: StringName in [&"ink", &"ink_soft"]:
 			for paper: StringName in [&"paper", &"paper_deep"]:
-				assert_gte(_contrast(c[ink], c[paper]), 4.5, "act %d: %s on %s" % [act, ink, paper])
+				assert_gte(JournalTheme.contrast(c[ink], c[paper]), 4.5, "act %d: %s on %s" % [act, ink, paper])
 		var t := JournalTheme.build(act)
 		for v: StringName in [&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall",
 				&"SatchelWhere", &"SatchelKeyLabel", &"SatchelCount", &"SatchelPin"]:
 			assert_gte(t.get_font_size(&"font_size", v), 16, "act %d: %s" % [act, v])
 			var tint := t.get_color(&"font_color", v)
 			if v != &"SatchelKeyLabel":  # paper type on a dark key cap
-				assert_gte(_contrast(tint, c[&"paper"]), 4.5, "act %d: %s colour on the page" % [act, v])
-
-
-## WCAG contrast ratio of two opaque colours.
-func _contrast(a: Color, b: Color) -> float:
-	var la := _luminance(a)
-	var lb := _luminance(b)
-	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
-
-
-func _luminance(c: Color) -> float:
-	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
-	return 0.2126 * float(lin.call(c.r)) + 0.7152 * float(lin.call(c.g)) + 0.0722 * float(lin.call(c.b))
+				assert_gte(JournalTheme.contrast(tint, c[&"paper"]), 4.5, "act %d: %s colour on the page" % [act, v])

@@ -91,25 +91,15 @@ func test_pills_read_on_snow_in_both_acts() -> void:
 		var c := JournalTheme.colors(act)
 		var pill: Color = WHITE.lerp(c.ink, JournalTheme.PILL_DEPTH)
 		var who: String = JournalTheme.Act.keys()[act]
-		assert_gt(_contrast(c.paper, pill), 7.0, "%s: words on a dark pill" % who)
-		assert_gt(_contrast(c.ink, c.paper), 7.0, "%s: a prompt's words on its slip, and the key on its cap" % who)
-		assert_gt(_contrast(c.line, WHITE), 3.0, "%s: the slip's rim on snow" % who)
-		assert_gt(_contrast(c.glow, pill), 4.5, "%s: a notice's kicker" % who)
-		assert_gt(_contrast(pill, WHITE), 7.0, "%s: the pill itself on snow" % who)
+		assert_gt(JournalTheme.contrast(c.paper, pill), 7.0, "%s: words on a dark pill" % who)
+		assert_gt(JournalTheme.contrast(c.ink, c.paper), 7.0, "%s: a prompt's words on its slip, and the key on its cap" % who)
+		assert_gt(JournalTheme.contrast(c.line, WHITE), 3.0, "%s: the slip's rim on snow" % who)
+		assert_gt(JournalTheme.contrast(c.glow, pill), 4.5, "%s: a notice's kicker" % who)
+		assert_gt(JournalTheme.contrast(pill, WHITE), 7.0, "%s: the pill itself on snow" % who)
 	var theme := JournalTheme.build(JournalTheme.Act.HUMAN)
 	for v: StringName in [&"PromptText", &"BowText", &"SatchelKeyLabel", &"NoticeKicker", &"NoticeBody"]:
 		assert_gte(theme.get_font_size(&"font_size", v), 14, "%s is readable" % v)
 
-
-func _contrast(a: Color, b: Color) -> float:
-	var la := _luminance(a)
-	var lb := _luminance(b)
-	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
-
-
-func _luminance(c: Color) -> float:
-	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
-	return 0.2126 * lin.call(c.r) + 0.7152 * lin.call(c.g) + 0.0722 * lin.call(c.b)
 
 
 func _cards() -> Array[Node]:

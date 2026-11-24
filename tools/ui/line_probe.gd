@@ -53,6 +53,8 @@ func _go() -> void:
 	var lines := LinePresenter.of(get_tree())
 	for label: String in LINES:
 		lines.clear()
+		# Each frame shows one voice: the last line is gone before the next.
+		await get_tree().create_timer(LinePresenter.FADE * 2.5).timeout
 		lines.say(LINES[label][0], LINES[label][1], LINES[label][2], null, 30.0)
 		# A voice that moves is caught early, while it is still writing.
 		for i in (12 if LinePresenter.VOICES[LINES[label][0]].has("tremble") else SETTLE_FRAMES):
@@ -66,6 +68,12 @@ func _go() -> void:
 					await get_tree().process_frame
 				await RenderingServer.frame_post_draw
 				get_viewport().get_texture().get_image().save_png("%s/line_%s_f%d.png" % [dir, label, n])
+		# A voice that writes itself out is caught again once it has finished.
+		var writing := LinePresenter.writing_time(LINES[label][0], LINES[label][2])
+		if writing > 0.0:
+			await get_tree().create_timer(writing + LinePresenter.FADE).timeout
+			await RenderingServer.frame_post_draw
+			get_viewport().get_texture().get_image().save_png("%s/line_%s_settled.png" % [dir, label])
 		print("line_probe: saved ", label)
 	print("line_probe: done")
 	get_tree().quit()

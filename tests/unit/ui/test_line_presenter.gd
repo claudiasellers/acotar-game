@@ -145,23 +145,13 @@ func test_said_type_reads_on_bright_ground() -> void:
 	for act: JournalTheme.Act in [JournalTheme.Act.HUMAN, JournalTheme.Act.SPRING]:
 		var c := JournalTheme.colors(act)
 		var under := Color.WHITE.lerp(Color(c[&"ink"], 1.0), JournalTheme.BAND_DEPTH)
-		assert_gte(_contrast(c[&"paper"], under), 4.5, "act %d: said type on snow" % act)
-		assert_gte(_contrast(c[&"glow"], under), 3.0, "act %d: the name on snow" % act)
+		assert_gte(JournalTheme.contrast(c[&"paper"], under), 4.5, "act %d: said type on snow" % act)
+		assert_gte(JournalTheme.contrast(c[&"glow"], under), 3.0, "act %d: the name on snow" % act)
 		var t := JournalTheme.build(act)
 		# Marcellus capitals stand 0.7 of the size tall.
 		assert_gte(t.get_font_size(&"font_size", &"LineName") * 0.7, 16.0, "act %d: the name's capitals" % act)
 		assert_gte(t.get_font_size(&"font_size", &"LineSaid"), 24)
 
-
-func _contrast(a: Color, b: Color) -> float:
-	var la := _luminance(a)
-	var lb := _luminance(b)
-	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
-
-
-func _luminance(c: Color) -> float:
-	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
-	return 0.2126 * lin.call(c.r) + 0.7152 * lin.call(c.g) + 0.0722 * lin.call(c.b)
 
 
 ## A film's words go through the same presenter: narration is told, a

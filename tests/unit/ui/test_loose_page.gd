@@ -74,7 +74,7 @@ func test_type_on_a_loose_page_reads() -> void:
 		var t := JournalTheme.build(act)
 		for v: StringName in [&"SatchelHeading", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelCount"]:
 			assert_gte(t.get_font_size(&"font_size", v), 16, "act %d: %s" % [act, v])
-			assert_gte(_contrast(t.get_color(&"font_color", v), c[&"paper_deep"]), 4.5, "act %d: %s on the loose page" % [act, v])
+			assert_gte(JournalTheme.contrast(t.get_color(&"font_color", v), c[&"paper_deep"]), 4.5, "act %d: %s on the loose page" % [act, v])
 		# Thin strokes never reach their full colour on screen: small type is bold.
 		var small := t.get_font(&"font", &"SatchelSmall") as FontVariation
 		assert_gte(int(small.variation_opentype.get(TextServerManager.get_primary_interface().name_to_tag("wght"), 0)), 700, "act %d: small type is bold" % act)
@@ -118,14 +118,3 @@ func _users_of(dir: String, word: String, out: Array[String]) -> void:
 	for f in DirAccess.get_files_at(dir):
 		if f.ends_with(".gd") and FileAccess.get_file_as_string(dir.path_join(f)).contains(word):
 			out.append(dir.path_join(f))
-
-
-func _contrast(a: Color, b: Color) -> float:
-	var la := _luminance(a)
-	var lb := _luminance(b)
-	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
-
-
-func _luminance(c: Color) -> float:
-	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
-	return 0.2126 * float(lin.call(c.r)) + 0.7152 * float(lin.call(c.g)) + 0.0722 * float(lin.call(c.b))

@@ -31,7 +31,7 @@ func test_the_menu_reads_over_the_brightest_backdrop() -> void:
 		var scrim: Color = c[&"scrim"]
 		var behind := Color.WHITE.lerp(Color(scrim, 1.0), scrim.a).lerp(c[&"ink"], JournalTheme.BAND_DEPTH)
 		for token: StringName in [&"paper", &"glow"]:
-			assert_gte(_contrast(c[token], behind), 4.5, "act %d: %s on the smear" % [act, token])
+			assert_gte(JournalTheme.contrast(c[token], behind), 4.5, "act %d: %s on the smear" % [act, token])
 
 
 ## Every word on the stories page and on the question is 16 px or more and
@@ -52,17 +52,6 @@ func test_the_small_print_on_the_first_page_reads() -> void:
 			if w.is_queued_for_deletion():
 				continue
 			assert_gte(w.get_theme_font_size(&"font_size"), 16, "%s: %s" % [view, w.get(&"text")])
-			assert_gte(_contrast(w.get_theme_color(&"font_color"), paper), 4.5, "%s: %s" % [view, w.get(&"text")])
+			assert_gte(JournalTheme.contrast(w.get_theme_color(&"font_color"), paper), 4.5, "%s: %s" % [view, w.get(&"text")])
 	slots.close()
 	await wait_process_frames(2)
-
-
-func _contrast(a: Color, b: Color) -> float:
-	var la := _luminance(a)
-	var lb := _luminance(b)
-	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
-
-
-func _luminance(c: Color) -> float:
-	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
-	return 0.2126 * float(lin.call(c.r)) + 0.7152 * float(lin.call(c.g)) + 0.0722 * float(lin.call(c.b))
