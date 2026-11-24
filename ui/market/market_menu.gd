@@ -12,6 +12,8 @@ signal sold(item_id: StringName, count: int, coin: int)
 signal closed
 
 const WIDTH := 620.0
+## The yellow wash: coppers.
+const WASH := 3
 const ICON := 64.0
 
 var buyer: MarketBuyer
@@ -130,7 +132,7 @@ func _move(by: int) -> void:
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_page = LoosePage.lay(self, WIDTH, 14)
+	_page = LoosePage.lay(self, WIDTH, WASH, 14)
 	_root = _page.root
 	var col := _page.column
 	var head := _page.head()

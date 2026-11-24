@@ -15,6 +15,8 @@ signal brewed(result: Dictionary)
 signal closed
 
 const WIDTH := 780.0
+## The green wash: leaves in the pot.
+const WASH := 2
 const ICON := 52.0
 const COLUMNS := 6
 ## The scene-tree name, kept from the M1 panel (tests and tools look for it).
@@ -185,7 +187,7 @@ func _input(event: InputEvent) -> void:
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_page = LoosePage.lay(self, WIDTH)
+	_page = LoosePage.lay(self, WIDTH, WASH)
 	_root = _page.root
 	_root.visible = false
 	var col := _page.column
@@ -208,7 +210,7 @@ func _build() -> void:
 	var pot_row := HBoxContainer.new()
 	pot_row.add_theme_constant_override(&"separation", 12)
 	col.add_child(pot_row)
-	pot_row.add_child(BookKit.label("In the pot", &"SatchelSmall"))
+	pot_row.add_child(BookKit.label("In the pot", &"PageSection"))
 	_pot = HBoxContainer.new()
 	_pot.add_theme_constant_override(&"separation", 6)
 	_pot.custom_minimum_size = Vector2(0, ICON)
@@ -251,7 +253,7 @@ func _build() -> void:
 	_outcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_outcome)
 
-	col.add_child(BookKit.label("Made", &"SatchelSmall"))
+	col.add_child(BookKit.label("Made", &"PageSection"))
 	_dishes = VBoxContainer.new()
 	_dishes.add_theme_constant_override(&"separation", 4)
 	col.add_child(_dishes)

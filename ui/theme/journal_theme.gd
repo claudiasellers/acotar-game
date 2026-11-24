@@ -65,7 +65,7 @@ const LABELS := {
 	&"MenuTitle": [40, "display", 400, &"ink"],
 	&"PageSection": [18, "display", 400, &"ink_soft"],
 	&"SatchelBody": [20, "body", 500, &"ink"],
-	&"SatchelSmall": [16, "body", 600, &"ink_soft"],
+	&"SatchelSmall": [16, "body", 700, &"ink"],
 	&"SatchelWhere": [20, "hand", 500, &"ink_soft"],
 	&"SatchelKeyLabel": [16, "body", 800, &"paper"],
 	&"QuickBarKey": [15, "body", 800, &"ink_soft"],

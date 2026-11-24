@@ -4,22 +4,32 @@
 ## at its foot. The station owns what is written on the page and its place on
 ## ScreenStack; this owns how every loose page looks, so no station builds a
 ## scrim, a card or a footer of its own. Looks come from JournalTheme only.
+## Each page carries one mark of the journal it came from: a dab of her
+## watercolour under its name, in the station's own wash.
 class_name LoosePage
 extends RefCounted
 
 ## The paper's theme variation.
 const SHEET := &"LoosePage"
+## The dab under a page's name: how wide, and how far it sits up and left of
+## the first letter (inside the paper's edge).
+const DAB := 92.0
+const DAB_AT := Vector2(-12.0, -14.0)
 
 var root: Control
 var sheet: PanelContainer
 var column: VBoxContainer
+## Which of the journal's washes this station's dab is painted in.
+var wash: int = 0
 var _hints: HBoxContainer
 
 
-## Lays a page `width` wide on `layer`, hidden or shown by root.visible.
-static func lay(layer: CanvasLayer, width: float, separation: int = 12) -> LoosePage:
+## Lays a page `width` wide on `layer`, hidden or shown by root.visible, with
+## its dab in the nth wash.
+static func lay(layer: CanvasLayer, width: float, wash_index: int, separation: int = 12) -> LoosePage:
 	layer.layer = UiLayers.SCREEN
 	var page := LoosePage.new()
+	page.wash = wash_index
 	page.root = Control.new()
 	page.root.name = "Page"
 	page.root.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -52,12 +62,23 @@ static func paper() -> PanelContainer:
 	return p
 
 
+## A page's name, with the dab of paint under where it starts.
+static func heading(text: String, wash_index: int) -> Label:
+	var title := BookKit.label(text, &"SatchelHeading")
+	var dab := BookKit.wash(DAB, wash_index)
+	dab.name = "Dab"
+	dab.position = DAB_AT
+	dab.show_behind_parent = true
+	title.add_child(dab)
+	return title
+
+
 ## The heading row: the page's name, and a small count at its right.
 ## Returns [name, count].
 func head() -> Array[Label]:
 	var row := HBoxContainer.new()
 	column.add_child(row)
-	var title := BookKit.label("", &"SatchelHeading")
+	var title := heading("", wash)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(title)
 	var chip := PanelContainer.new()
@@ -80,7 +101,7 @@ func set_hints(pairs: Array) -> void:
 		column.add_child(_hints)
 	for c in _hints.get_children():
 		_hints.remove_child(c)
-		c.queue_free()
+		c.free()
 	for p: Array in pairs:
 		_hints.add_child(BookKit.key_hint(p[0], p[1]))
 

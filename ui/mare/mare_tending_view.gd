@@ -22,6 +22,8 @@ const CARD_W := 210.0
 const PAD_BRUSH := 1.6
 ## Her page (MarePage): what Feyre knows of her, what to try, what she remembers.
 const PAGE_TAB := "Her"
+## The lilac wash.
+const WASH := 1
 
 var mare: MareMount
 var feyre: Node3D
@@ -135,7 +137,7 @@ func _build() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 10)
 	panel.add_child(col)
-	var title := BookKit.label("Tending her", &"SatchelHeading", true)
+	var title := LoosePage.heading("Tending her", WASH)
 	col.add_child(title)
 	_tabs = HFlowContainer.new()
 	_tabs.add_theme_constant_override(&"h_separation", 6)

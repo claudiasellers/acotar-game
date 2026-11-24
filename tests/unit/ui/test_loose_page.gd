@@ -13,7 +13,7 @@ const STATIONS: Array[String] = [
 func test_a_page_is_paper_on_a_scrim_with_a_column_to_write_in() -> void:
 	var layer := CanvasLayer.new()
 	add_child_autofree(layer)
-	var page := LoosePage.lay(layer, 600.0)
+	var page := LoosePage.lay(layer, 600.0, 2)
 	assert_eq(layer.layer, UiLayers.SCREEN, "on the screen layer")
 	assert_eq(page.sheet.theme_type_variation, LoosePage.SHEET)
 	assert_eq(page.sheet.custom_minimum_size.x, 600.0)
@@ -25,11 +25,15 @@ func test_a_page_is_paper_on_a_scrim_with_a_column_to_write_in() -> void:
 func test_heading_and_key_caps() -> void:
 	var layer := CanvasLayer.new()
 	add_child_autofree(layer)
-	var page := LoosePage.lay(layer, 600.0)
+	var page := LoosePage.lay(layer, 600.0, 2)
 	var head := page.head()
 	head[0].text = "Stillroom"
 	head[1].text = "3 / 27"
 	assert_eq(head[0].theme_type_variation, &"SatchelHeading")
+	var dab := head[0].get_node_or_null(^"Dab") as TextureRect
+	assert_not_null(dab, "one dab of her paint under the page's name")
+	assert_eq(dab.modulate, JournalTheme.wash(2), "in the station's wash")
+	assert_true(dab.show_behind_parent, "under the letters, not over them")
 	page.set_hints([["E", "Brew"], ["Esc", "Step away"]])
 	var hints := page.column.get_node(^"Hints")
 	assert_eq(hints.get_child_count(), 2)
@@ -60,3 +64,71 @@ func test_the_old_card_look_makes_no_screens() -> void:
 	var src := FileAccess.get_file_as_string("res://ui/ui_style.gd")
 	assert_false(src.contains("func modal"), "no modal: screens are loose pages or the book")
 	assert_false(src.contains("func button"), "no buttons of its own")
+
+
+## Small type on a loose page reads: 16 px or more, and 4.5 to 1 on the
+## loose page's paper in both acts (the director's look pass on step 6).
+func test_type_on_a_loose_page_reads() -> void:
+	for act: JournalTheme.Act in [JournalTheme.Act.HUMAN, JournalTheme.Act.SPRING]:
+		var c := JournalTheme.colors(act)
+		var t := JournalTheme.build(act)
+		for v: StringName in [&"SatchelHeading", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelCount"]:
+			assert_gte(t.get_font_size(&"font_size", v), 16, "act %d: %s" % [act, v])
+			assert_gte(_contrast(t.get_color(&"font_color", v), c[&"paper_deep"]), 4.5, "act %d: %s on the loose page" % [act, v])
+		# Thin strokes never reach their full colour on screen: small type is bold.
+		var small := t.get_font(&"font", &"SatchelSmall") as FontVariation
+		assert_gte(int(small.variation_opentype.get("wght", 0)), 700, "act %d: small type is bold" % act)
+
+
+## No two names on the stones' sketch touch, and none sits on another whorl.
+func test_names_on_the_stones_sketch_keep_apart() -> void:
+	var defs := WhorlStones.defs()
+	assert_gte(defs.size(), 5, "the land has stones to draw")
+	var sketch := WhorlSketch.new()
+	add_child_autofree(sketch)
+	sketch.here = defs[0]
+	sketch.stones = defs.slice(1)
+	sketch.size = Vector2(500, 380)
+	var rects := sketch.label_rects()
+	assert_eq(rects.size(), defs.size(), "every stone is named")
+	var ids := rects.keys()
+	for i in ids.size():
+		assert_true(Rect2(Vector2.ZERO, sketch.size).encloses(rects[ids[i]]), "%s is on the sketch" % ids[i])
+		for j in range(i + 1, ids.size()):
+			assert_false((rects[ids[i]] as Rect2).intersects(rects[ids[j]]), "%s and %s" % [ids[i], ids[j]])
+		for d in defs:
+			if d.id != ids[i]:
+				var mark := sketch.mark_rect(d)
+				assert_false((rects[ids[i]] as Rect2).intersects(mark), "%s is clear of the whorl at %s" % [ids[i], d.id])
+
+
+## The old card look gains no new users before step 8 deletes it.
+func test_the_old_card_look_gains_no_users() -> void:
+	var allowed := ["res://ui/ui_style.gd", "res://ui/collection_book/find_card.gd", "res://ui/guide/guide_journal.gd",
+		"res://story/act1/act1_milestones.gd", "res://story/act1/key_prompts.gd", "res://story/act2/act2_caption.gd",
+		"res://systems/interaction/press_card.gd", "res://systems/bow/quiver_card.gd", "res://tools/fast_travel/whorl_proof.gd"]
+	var users: Array[String] = []
+	_users_of("res://", "UiStyle", users)
+	for path in users:
+		assert_has(allowed, path, "%s uses UiStyle: write it on JournalTheme" % path)
+
+
+func _users_of(dir: String, word: String, out: Array[String]) -> void:
+	for d in DirAccess.get_directories_at(dir):
+		if d.begins_with(".") or d in ["addons", "tests"]:
+			continue
+		_users_of(dir.path_join(d), word, out)
+	for f in DirAccess.get_files_at(dir):
+		if f.ends_with(".gd") and FileAccess.get_file_as_string(dir.path_join(f)).contains(word):
+			out.append(dir.path_join(f))
+
+
+func _contrast(a: Color, b: Color) -> float:
+	var la := _luminance(a)
+	var lb := _luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+
+func _luminance(c: Color) -> float:
+	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
+	return 0.2126 * float(lin.call(c.r)) + 0.7152 * float(lin.call(c.g)) + 0.0722 * float(lin.call(c.b))

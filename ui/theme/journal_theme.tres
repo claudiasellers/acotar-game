@@ -738,7 +738,7 @@ corner_radius_bottom_left = 12
 [sub_resource type="FontVariation" id="FontVariation_f7sc5"]
 base_font = ExtResource("1_pt4dc")
 variation_opentype = {
-"wght": 600
+"wght": 700
 }
 
 [sub_resource type="FontVariation" id="FontVariation_1aub7"]
@@ -1074,7 +1074,7 @@ SatchelSlot/styles/hover_pressed = SubResource("StyleBoxFlat_cgmui")
 SatchelSlot/styles/normal = SubResource("StyleBoxFlat_6j72k")
 SatchelSlot/styles/pressed = SubResource("StyleBoxFlat_3pj8a")
 SatchelSmall/base_type = &"Label"
-SatchelSmall/colors/font_color = Color(0.35686275, 0.30980393, 0.41960785, 1)
+SatchelSmall/colors/font_color = Color(0.22745098, 0.18431373, 0.2901961, 1)
 SatchelSmall/font_sizes/font_size = 16
 SatchelSmall/fonts/font = SubResource("FontVariation_f7sc5")
 SatchelTab/base_type = &"Button"

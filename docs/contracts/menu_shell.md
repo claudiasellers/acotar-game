@@ -55,7 +55,9 @@ A station she uses with E (the stillroom, a stall, the whorl stones, the
 easel, the mare) is not a tab: it is a loose page of the same journal, laid
 over the world where she stands. `LoosePage.lay(layer, width)` gives the
 scrim, the paper (`LoosePage` theme variation), a column to write in,
-`head()` for the name and a count, `set_hints()` for key caps along the foot
+`head()` for the name and a count (the name sits on one dab of her
+watercolour in the station's wash, `LoosePage.heading()`: one mark of the
+journal per page), `set_hints()` for key caps along the foot
 and `LoosePage.button()` for a choice. `LoosePage.paper()` is the sheet alone,
 for a station that places its own (the mare beside her, the ride's
 whole-screen leaf). The station owns its content and its `ScreenStack` push;

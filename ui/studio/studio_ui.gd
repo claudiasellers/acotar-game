@@ -9,6 +9,8 @@ extends RefCounted
 
 ## The paints, the canvas and the brushes side by side, with the paper's edge.
 const WIDTH := 1440.0
+## The pink wash: paint.
+const WASH := 0
 const DISPLAY_SCALE := 0.78
 const SWATCH := 34
 const WELL := 56
@@ -36,7 +38,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 	_session = s
 	var layer := CanvasLayer.new()
 	layer.name = "StudioUI"
-	var page := LoosePage.lay(layer, WIDTH, 10)
+	var page := LoosePage.lay(layer, WIDTH, WASH, 10)
 	var box := page.column
 	_open = layer
 	s.layer = layer

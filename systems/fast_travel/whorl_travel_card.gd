@@ -7,6 +7,8 @@ extends CanvasLayer
 
 const NODE_NAME := "WhorlTravelCard"
 const WIDTH := 840.0
+## The blue wash: far country.
+const WASH := 4
 
 static var _open: WhorlTravelCard
 
@@ -38,11 +40,9 @@ static func open(tree: SceneTree, here: WhorlStoneDef, dests: Array[WhorlStoneDe
 
 
 func _ready() -> void:
-	var page := LoosePage.lay(self, WIDTH, 14)
+	var page := LoosePage.lay(self, WIDTH, WASH, 14)
 	var box := page.column
-	var title := BookKit.label("The stones I've marked", &"SatchelHeading")
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
+	box.add_child(LoosePage.heading("The stones I've marked", WASH))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 18)
 	box.add_child(row)
@@ -55,7 +55,7 @@ func _ready() -> void:
 	list.custom_minimum_size = Vector2(290, 0)
 	list.add_theme_constant_override(&"separation", 8)
 	row.add_child(list)
-	list.add_child(BookKit.label("From %s" % WhorlStones.place_label(from), &"SatchelSmall"))
+	list.add_child(BookKit.label("From %s" % WhorlStones.place_label(from), &"PageSection"))
 	for d in to:
 		var b := _tab(WhorlStones.place_label(d))
 		b.name = "Ride_%s" % d.id
