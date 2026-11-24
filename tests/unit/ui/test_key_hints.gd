@@ -109,6 +109,26 @@ func test_her_first_find_names_the_satchel_and_a_second_bow_the_bow_key() -> voi
 	assert_eq(hints.wanted(), &"satchel")
 
 
+func test_her_first_collection_entry_names_its_key() -> void:
+	hints._process(0.016)
+	Gameplay.collection.discovered.emit(&"ing_rose_red", &"flora")
+	assert_eq(hints.wanted(), &"collection")
+	assert_eq(KeyHints.row(&"collection")[0][1], "open the collection")
+	Gameplay.reset()
+	hints.forget_taught()
+	hints._nudged.clear()
+	hints._process(0.016)
+	Gameplay.collection.discovered.emit(&"ing_rose_red", &"flora")
+	assert_eq(hints.wanted(), &"collection", "a new story's book is heard too")
+
+
+func test_a_thought_and_arrow_makings_nudge_their_keys() -> void:
+	assert_true(FileAccess.get_file_as_string("res://ui/guide/guide_journal.gd").contains("nudge(&\"thought\")"))
+	assert_true(FileAccess.get_file_as_string("res://ui/satchel/satchel_hud.gd").contains("nudge(&\"craft\")"))
+	for id: StringName in [&"thought", &"craft"]:
+		assert_true(KeyHints.ROWS.has(id))
+
+
 func test_act_one_holds_its_rows_through_the_table() -> void:
 	var src := FileAccess.get_file_as_string("res://story/act1/key_prompts.gd")
 	for gone: String in ["KeyPrompt.make", "ConfigFile", "const PROMPTS", "GameSettings"]:

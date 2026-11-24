@@ -150,6 +150,7 @@ func show_thought(thread: GuideThread, tier: int, _asked: bool) -> void:
 	LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", line, self, _hold)
 	showing = true
 	Juice.bounce_control(_mark, 0.12)
+	KeyHints.of(get_tree()).nudge(&"thought")
 
 
 ## The bookmark: there whenever thoughts are on and Feyre is free; a gentle
