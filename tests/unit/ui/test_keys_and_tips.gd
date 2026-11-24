@@ -76,7 +76,7 @@ class Taught extends Node:
 
 func test_show_tips_again_forgets_everything_taught_once() -> void:
 	var cfg := ConfigFile.new()
-	cfg.set_value(KeyPrompts.SECTION, "aim", true)
+	cfg.set_value(KeyHints.SECTION, "aim", true)
 	cfg.set_value(VitalsStatusRow.TAUGHT_SECTION, "cold", true)
 	cfg.set_value("audio", "music_volume", 0.4)
 	cfg.save(CFG)
@@ -86,7 +86,7 @@ func test_show_tips_again_forgets_everything_taught_once() -> void:
 	Tips.show_again(get_tree(), CFG)
 	var after := ConfigFile.new()
 	after.load(CFG)
-	assert_false(after.has_section(KeyPrompts.SECTION))
+	assert_false(after.has_section(KeyHints.SECTION))
 	assert_false(after.has_section(VitalsStatusRow.TAUGHT_SECTION))
 	assert_eq(after.get_value("audio", "music_volume"), 0.4, "nothing else is touched")
 	assert_false(WorldState.has_flag(TabNote.FLAG % &"map"), "a journal page says its line again")

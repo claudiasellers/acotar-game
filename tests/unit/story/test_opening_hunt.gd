@@ -9,6 +9,7 @@ const SETTINGS := "user://test_opening_settings.cfg"
 const RABBIT: CreatureData = preload("res://data/story/act1/hare_ch1.tres")
 
 var prompts: KeyPrompts
+var hints: KeyHints
 var feyre: Feyre
 var _saved_path: String
 
@@ -19,8 +20,9 @@ func before_each() -> void:
 	_saved_path = GameSettings.settings_path
 	GameSettings.settings_path = SETTINGS
 	GameSettings.load_settings()
+	hints = KeyHints.of(get_tree())
+	hints.use_settings(CFG)
 	prompts = KeyPrompts.new()
-	prompts.settings_path = CFG
 	add_child_autofree(prompts)
 	feyre = load("res://characters/feyre/feyre.tscn").instantiate()
 	add_child_autofree(feyre)
@@ -29,6 +31,7 @@ func before_each() -> void:
 
 func after_each() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(CFG))
+	hints.use_settings("user://settings.cfg")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS))
 	GameSettings.settings_path = _saved_path
 	GameSettings.load_settings()
@@ -52,20 +55,18 @@ func test_walk_and_look_are_offered_only_to_a_player_who_has_not() -> void:
 	assert_eq(prompts.want(), &"walk", "1.5 m isn't walking yet")
 	feyre.global_position += Vector3(1.0, 0, 0)
 	prompts._learn(0.1)
-	assert_true(prompts.taught.get(&"walk", false), "2 m walked")
+	assert_true(hints.taught.get(&"walk", false), "2 m walked")
 	assert_eq(prompts.want(), &"", "look waits for 8 s")
 	prompts._learn(3.0)
 	assert_eq(prompts.want(), &"look")
 	feyre.camera_look_yaw += 0.2
 	feyre.camera_control.rig.rotation.y += 0.2
 	prompts._learn(0.1)
-	assert_true(prompts.taught.get(&"look", false), "0.15 rad turned")
+	assert_true(hints.taught.get(&"look", false), "0.15 rad turned")
 	assert_eq(prompts.want(), &"")
-	var again := KeyPrompts.new()
-	again.settings_path = CFG
-	add_child_autofree(again)
-	again._control = 60.0
-	assert_eq(again.want(), &"", "never again once done")
+	hints.use_settings(CFG)
+	prompts._control = 60.0
+	assert_eq(prompts.want(), &"", "never again once done, read back from the file")
 
 
 func test_a_player_who_moves_at_once_never_sees_walk_or_look() -> void:
@@ -112,7 +113,7 @@ func test_the_snare_prompt_shows_in_reach_and_checking_it_brings_the_rabbit() ->
 	assert_not_null(hunt.rabbit)
 	assert_true(hunt.rabbit.is_in_group(OpeningHunt.RABBIT_GROUP))
 	prompts._learn(0.016)
-	assert_true(prompts.taught.get(&"snare", false))
+	assert_true(hints.taught.get(&"snare", false))
 	assert_ne(prompts.want(), &"snare", "checked once")
 	(hunt.snare as OpeningSnare).use(feyre)
 	assert_eq(get_tree().get_nodes_in_group(OpeningHunt.RABBIT_GROUP).size(), 1, "one rabbit, however often she looks")
@@ -183,7 +184,7 @@ func test_retrieve_shows_beside_a_stuck_arrow_and_is_taught_by_the_pickup() -> v
 	Gameplay.inventory.add(&"arrow_wood", 1)
 	stuck.remove_from_group(Arrow.STUCK_GROUP)
 	prompts._learn(0.016)
-	assert_true(prompts.taught.get(&"retrieve", false))
+	assert_true(hints.taught.get(&"retrieve", false))
 	stuck.add_to_group(Arrow.STUCK_GROUP)
 	assert_eq(prompts.want(), &"", "taught once")
 
@@ -201,13 +202,13 @@ func test_crouch_is_offered_near_the_doe_until_she_crouches() -> void:
 	assert_eq(prompts.want(), &"", "she is crouching")
 	prompts._learn(0.016)
 	feyre.crouch.set_crouched(false)
-	assert_true(prompts.taught.get(&"crouch", false))
+	assert_true(hints.taught.get(&"crouch", false))
 	assert_eq(prompts.want(), &"")
 
 
 func test_focus_is_offered_nocked_in_the_wolf_hunt_once_he_is_seen() -> void:
-	prompts.teach(&"ash")
-	prompts.teach(&"draw")
+	hints.learn(&"ash")
+	hints.learn(&"draw")
 	feyre.bow_controller.is_nocked = true
 	assert_eq(prompts.want(), &"", "no hunt")
 	EventBus.scene_space_started.emit(&"wolf_kill")
@@ -219,7 +220,7 @@ func test_focus_is_offered_nocked_in_the_wolf_hunt_once_he_is_seen() -> void:
 	feyre.bow_controller.is_nocked = true
 	feyre.bow_controller.is_focused = true
 	prompts._learn(0.016)
-	assert_true(prompts.taught.get(&"focus", false), "taught by the first held breath")
+	assert_true(hints.taught.get(&"focus", false), "taught by the first held breath")
 	assert_eq(prompts.want(), &"")
 	EventBus.scene_space_finished.emit(&"wolf_kill")
 
@@ -239,12 +240,12 @@ func test_hints_off_hides_every_taught_key() -> void:
 
 
 func test_every_prompt_names_a_key() -> void:
-	for id: StringName in KeyPrompts.PROMPTS:
-		for pair: Array in KeyPrompts.row(id):
-			if (KeyPrompts.PROMPTS[id] as Array).size() == 1:
+	for id: StringName in KeyHints.ROWS:
+		for pair: Array in KeyHints.row(id):
+			if (KeyHints.ROWS[id] as Array).size() == 1:
 				assert_ne(pair[0], "", "%s has a key cap" % id)
-	assert_eq(KeyPrompts.cap(&"move"), String(InputSettings.SCHEME_NAMES[InputSettings.scheme]), "the keys she chose")
-	assert_eq(KeyPrompts.cap(&"look"), "Mouse")
+	assert_eq(KeyHints.cap(&"move"), String(InputSettings.SCHEME_NAMES[InputSettings.scheme]), "the keys she chose")
+	assert_eq(KeyHints.cap(&"look"), "Mouse")
 
 
 func test_chapter_one_starts_with_two_plain_arrows_and_the_ash() -> void:

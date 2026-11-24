@@ -304,6 +304,13 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	_refresh()
 	pickups.add(id, count)
 	_think_of_a_crown()
+	# The keys these finds answer, each named once (KeyHints).
+	var hints := KeyHints.of(get_tree())
+	if String(id).begins_with("bow_"):
+		if bar.inventory.contents(Inventory.BOWS).size() >= 2:
+			hints.nudge(&"bow")
+	elif not String(id).begins_with("arrow_"):
+		hints.nudge(&"satchel")
 	if not _bar_root.is_visible_in_tree() or _flights >= MAX_FLIGHTS:
 		return
 	var feyre := _player()

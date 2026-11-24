@@ -77,7 +77,7 @@ func _go() -> void:
 			UsePrompt.of(tree).offer(feyre, "ride"),
 		"prompt_row": func() -> void:
 			UsePrompt.of(tree).offer(feyre, "")
-			keys.says(KeyPrompts.row(&"beast")),
+			keys.says(KeyHints.row(&"beast")),
 		"quiver": func() -> void:
 			keys.clear()
 			feyre.bow_controller.quiver_card.show_card(),
