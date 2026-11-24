@@ -1,0 +1,6 @@
+from L80-bow-hunt
+quality look
+size 1920x1080
+timeout 900
+shot lost res://tools/playtest/wolf_lost_clip.tscn --out={out}/report.json
+shot hunt res://tools/playtest/wolf_hunt_clip.tscn --out={out}/report.json
