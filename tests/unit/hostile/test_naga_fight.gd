@@ -112,6 +112,22 @@ func _tick(site: HostileSite) -> void:
 	v._step_grab(DT)
 
 
+## Why, for a rejection log read without the machine: each member's fight
+## state, ladder, flat distance to her, height, token, and the hits so far.
+func _why(site: HostileSite, ticks: int) -> String:
+	var out := "after %d ticks (%.1f s), her at %s, grabbed=%s down=%s; hits %s; " % [
+		ticks, ticks * DT, her.global_position, v.is_grabbed(), v.is_down, hits]
+	for m in site.members:
+		var r := m as NagaRoamer
+		if r == null or not is_instance_valid(r):
+			continue
+		out += "[%s alive=%s fight=%s ladder=%s flat=%.2f dy=%.2f token=%s flee=%.1f stagger=%.1f] " % [
+			r.name, r.alive, NagaRoamer.Fight.keys()[r.fight], HostileLadder.State.keys()[r.ladder.state],
+			Creature.flat_distance(r.global_position, her.global_position), r.global_position.y - her.global_position.y,
+			r.has_token(), r._flee_left, r.stagger_left]
+	return out
+
+
 func _attacking(site: HostileSite) -> int:
 	var n := 0
 	for m in site.members:
@@ -126,7 +142,9 @@ func test_four_naga_never_attack_more_than_two_at_once() -> void:
 	assert_eq(site.members.size(), 4)
 	assert_eq(site.token_count(), 2)
 	var most_tokens := 0
+	var ticks := 0
 	for i in int(60.0 / DT):
+		ticks += 1
 		v.health = VitalsState.MAX_HEALTH
 		_tick(site)
 		var n := _attacking(site)
@@ -137,19 +155,21 @@ func test_four_naga_never_attack_more_than_two_at_once() -> void:
 		if n > 2:
 			break
 	assert_eq(most_tokens, 2, "both tokens get used")
-	assert_gt(hits.size(), 4, "they do fight")
+	assert_gt(hits.size(), 4, "they do fight: " + _why(site, ticks))
 
 
 func test_standing_still_takes_at_least_four_seconds() -> void:
 	var site := _camp()
 	var first := -1.0
 	var t := 0.0
+	var ticks := 0
 	while t < 40.0 and not v.is_down:
 		_tick(site)
 		t += DT
+		ticks += 1
 		if first < 0.0 and v.health < VitalsState.MAX_HEALTH:
 			first = t
-	assert_true(v.is_down, "a 4-naga camp does put her down")
+	assert_true(v.is_down, "a 4-naga camp does put her down: health %.0f, " % v.health + _why(site, ticks))
 	assert_gt(first, 0.0)
 	assert_gte(t - first, 4.0, "from the first wound to the ground is at least 4 s")
 
