@@ -21,6 +21,8 @@ extends Act2Space
 const STAGE_PATH := "res://data/story/act3/house/wound_dressing_stage.tres"
 const USE_REACH := 1.8
 const TABLE_REACH := 2.2
+## The map lies on the table this long before her journal opens at it.
+const MAP_DOWN_SECONDS := 0.8
 const SUPPLIES: Array[StringName] = [&"porcelain_bowl", &"linen_folded", &"bandage_roll"]
 const SOURCE_MARKS := {&"porcelain_bowl": &"src_bowl", &"linen_folded": &"src_linen", &"bandage_roll": &"src_bandage"}
 const TRAY_SLOTS := {&"porcelain_bowl": &"b", &"linen_folded": &"c", &"bandage_roll": &"d"}
@@ -112,6 +114,9 @@ func _foyer_beats() -> Array:
 				_show_glint(mark(&"foyer_map") + Vector3.UP * 0.25), "at the foyer table"),
 			_use_at(&"foyer_map", TABLE_REACH, "until she sets the map down"),
 			Beats.run(_set_map_down, "the map on the table"),
+			Beats.wait(MAP_DOWN_SECONDS),
+			Beats.run(func(_s: SceneSpace) -> void: _open_her_map(), "her journal opens at the map"),
+			Beats.until(func() -> bool: return not _map_open(), "her map is closed again"),
 			say(&"set_down"),
 			Beats.wait(2.0),
 		]
@@ -119,8 +124,6 @@ func _foyer_beats() -> Array:
 		beats.append(Beats.run(func(_s: SceneSpace) -> void: _set_map_down(null, false), "the map is on the table"))
 	beats += [
 		Beats.run(func(_s: SceneSpace) -> void:
-			if is_inside_tree():
-				HallMapPage.find_or_make(self).close()
 			EventBus.mood_requested.emit(&"dread", 0.75, 2.5)
 			note_mood()
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
@@ -157,7 +160,7 @@ func _foyer_beats() -> Array:
 	return beats
 
 
-func _set_map_down(_s: SceneSpace, open_page: bool = true) -> void:
+func _set_map_down(_s: SceneSpace, just_now: bool = true) -> void:
 	if map_prop == null or not is_instance_valid(map_prop):
 		map_prop = HouseProps.model(&"feyre_hall_map")
 		add_child(map_prop)
@@ -165,9 +168,20 @@ func _set_map_down(_s: SceneSpace, open_page: bool = true) -> void:
 	if not WorldState.has_flag("fact.hall_map_set_down"):
 		raise("fact.hall_map_set_down")
 	_hide_glint()
-	if open_page and is_inside_tree():
+	if just_now and is_inside_tree():
 		Juice.burst(map_prop, &"craft")
-		HallMapPage.find_or_make(self).open_full()
+		HallMap.note_on_map(self)
+
+
+## Her journal opens at the Map tab, on her plan of the house, and the scene
+## waits until she closes it.
+func _open_her_map() -> void:
+	if is_inside_tree():
+		MenuShell.open_tab(get_tree(), &"map")
+
+
+func _map_open() -> bool:
+	return is_inside_tree() and MenuShell.is_shell_open(get_tree())
 
 
 ## The blinding flash, her eyes shut, darkness coming back; beast to fae.

@@ -57,6 +57,9 @@ var fog_texture: ImageTexture
 var map_texture: Texture2D
 
 ## id -> {label, kind, pos: Vector3}
+## Something new on her plan of the house she hasn't looked at (note_sketch).
+var plan_news: bool = false
+var _quill: AudioStreamPlayer
 var _candidates: Dictionary = {}
 var _fog_version: int = -1
 var _last_reveal: Vector2 = Vector2.INF
@@ -112,6 +115,41 @@ func on_minimap_setting(shown: bool) -> void:
 
 func open_full_map() -> void:
 	full_map.open()
+
+
+## She has just drawn on her plan of the house (a room, one of her marks, the
+## page set down): the quill scratches, the minimap nudges, and the Map tab
+## carries its news mark until she opens it.
+func note_sketch() -> void:
+	plan_news = true
+	Juice.bounce_control(minimap, 0.06)
+	if _quill == null:
+		_quill = AudioStreamPlayer.new()
+		_quill.stream = _quill_sound()
+		_quill.volume_db = -14.0
+		add_child(_quill)
+	_quill.play()
+
+
+## A soft quill scratch: filtered noise, 0.25 s.
+static func _quill_sound() -> AudioStreamWAV:
+	var rate := 22050
+	var n := int(rate * 0.25)
+	var data := PackedByteArray()
+	data.resize(n * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var last := 0.0
+	for i in n:
+		var t := float(i) / n
+		last = lerpf(last, rng.randf_range(-1.0, 1.0), 0.35)
+		var env := sin(t * PI) * (0.6 + 0.4 * sin(t * 40.0))
+		data.encode_s16(i * 2, int(clampf(last * env * 0.35, -1.0, 1.0) * 32767.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.data = data
+	return wav
 
 
 func _unhandled_input(event: InputEvent) -> void:

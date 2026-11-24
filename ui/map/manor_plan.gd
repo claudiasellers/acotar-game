@@ -1,7 +1,8 @@
 ## Feyre's own plan of the manor's inside: the rooms she has walked into,
 ## sketched in pencil as she goes, inked once she has drawn the hall map
 ## (manor_map_drawn), and growing after that. No names (she cannot read yet):
-## lines, Xs for doors, circles for windows, a few pictures. Her own rooms are
+## lines, Xs for doors, circles for windows, a few pictures, and in rose the
+## five places she marked on her map of the halls (HallMark). Her own rooms are
 ## known from the night she arrives; the rest only once she has been in them,
 ## so the cellars and Lucien's rooms stay off until she finds them (R2: it
 ## never shows her where the story wants her). Owned by WorldMapHud and saved
@@ -14,6 +15,10 @@ const WAY_HOME: Array[StringName] = [&"entrance_hall", &"upper_hall", &"east_cor
 const KNOWN_FLAG := "fact.manor_arrived"
 const INKED_FLAG := "manor_map_drawn"
 const LEVELS: Array[int] = [-1, 0, 1, 2, 3]
+## Where the five places she marks are written down (HallMapPlan.marks:
+## {n, shape "x" or "o", x, z} in house space, all on the ground floor).
+const MARKS_PATH := "res://data/story/act3/house/hall_map_plan.tres"
+const MARKS_LEVEL := 0
 ## She is on a level once her feet are within this of its floor.
 const STEP := 0.6
 
@@ -27,6 +32,9 @@ var room: StringName = &""
 var at: Vector2 = Vector2.ZERO
 ## Her facing in house space, radians, 0 = north (-Z), clockwise.
 var angle: float = 0.0
+## The five places, read once from MARKS_PATH (tests set it).
+var marks: Array[Dictionary] = []
+var _marks_read: bool = false
 ## Story facts, injectable for tests.
 var has_flag: Callable = func(flag: String) -> bool: return WorldState.has_flag(flag)
 
@@ -132,6 +140,22 @@ func stairs_on(l: int) -> Array[ManorStairDef]:
 			if r.rect.intersects(s.rect):
 				out.append(s)
 				break
+	return out
+
+
+## Her marks on a level: the ones she has made so far.
+func marks_on(l: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if l != MARKS_LEVEL:
+		return out
+	if not _marks_read:
+		_marks_read = true
+		if marks.is_empty() and ResourceLoader.exists(MARKS_PATH):
+			marks.assign(load(MARKS_PATH).get(&"marks"))
+	for m in marks:
+		var n := int(m.get("n", 0))
+		if has_flag.call("fact.hall_x_%d" % n) or has_flag.call("fact.hall_mark_%d" % n):
+			out.append(m)
 	return out
 
 

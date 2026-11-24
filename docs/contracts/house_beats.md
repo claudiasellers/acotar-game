@@ -54,7 +54,12 @@ the worktable in the infirmary).
   autumn_foothills), rose_bower (solstice_meadow, hill_of_the_rite,
   eastern_woods), lantern_lookout (western_fells), moon_tower (blossom_vale).
 - Journal: `EventBus.journal_entry_added(&"mural_<detail>")` per mural detail.
-- UI: `HallMapPage` (CanvasLayer, group `hall_map_page`): her wordless page.
+- UI: her wordless page is the plan of the house in the journal's Map tab
+  and on the minimap (`ManorPlan`, drawn by `ManorSketch`), with her five
+  marks in rose. A new room or mark calls `HallMap.note_on_map` (quill
+  scratch, the minimap nudges, news on the Map tab). At the foyer table the
+  map goes down, then her journal opens at the Map tab and the scene waits
+  until she closes it. There is no separate page.
 - Mood: `dread` while the beast is in the hall, `calm` in the infirmary.
 
 ## Inputs read

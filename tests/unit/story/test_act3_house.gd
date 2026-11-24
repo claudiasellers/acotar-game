@@ -33,8 +33,6 @@ func after_each() -> void:
 		(global_space as SceneSpace).auto_tick = true
 	StoryControl.release()
 	Clock.paused = false
-	for page in get_tree().get_nodes_in_group(HallMapPage.GROUP):
-		page.queue_free()
 
 
 ## A house anchor where the manor lane puts it (layout position, floor height, yaw).
