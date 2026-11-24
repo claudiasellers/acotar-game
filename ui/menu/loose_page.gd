@@ -15,6 +15,9 @@ const SHEET := &"LoosePage"
 ## the first letter (inside the paper's edge).
 const DAB := 92.0
 const DAB_AT := Vector2(-12.0, -14.0)
+## The dab's paint is laid on thicker than a blot behind a drawing (the wash
+## texture is thin at its thickest), so the heading's colour reads at a glance.
+const DAB_LIFT := 1.5
 
 var root: Control
 var sheet: PanelContainer
@@ -68,6 +71,7 @@ static func heading(text: String, wash_index: int) -> Label:
 	var dab := BookKit.wash(DAB, wash_index)
 	dab.name = "Dab"
 	dab.position = DAB_AT
+	dab.modulate.a = DAB_LIFT
 	dab.show_behind_parent = true
 	title.add_child(dab)
 	return title

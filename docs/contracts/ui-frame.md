@@ -123,10 +123,10 @@ may slide or a strap may lift inside its root.
 | `WORLD` | full screen | aim reticle, grab ring, the dev overlay (F3) |
 | `WAY` | full screen | the player's own pin marker, and nothing the game sets (R2) |
 | `THOUGHT` | top left | Feyre's thought and its tab |
-| `NOTICE` | top centre | first finds, rewards, chapter cards |
+| `NOTICE` | top centre | the notice queue (`FindCard`): first finds, rewards and notes, and chapter headings |
 | `MINIMAP` | top right | minimap |
 | `VITALS` | bottom left | status chips over the bow and the health bar |
-| `PROMPT` | bottom centre, over the strap | what a key does here: press card, forage card, brew, trade, Act I's key prompts |
+| `PROMPT` | bottom centre, over the strap | what a key does here: every piece is a `KeyPrompt` (press card, pick card, brew, trade, Act I's key prompts) |
 | `STRAP` | bottom centre | the quick strap |
 | `BOW` | right, low | the quiver card |
 | `CONTROLS` | bottom right corner, under `BOW` | the controls hint: three short lines, at least 24 px clear of the strap at every text size |
@@ -245,6 +245,7 @@ every piece's script.
 | step 7b | a film's words (Told and Said), the Bogge's whisper and the Suriel's voice are rows of the same table; the lane moves under Feyre's feet and the strap steps aside for it; Feyre's questions to the Suriel are said aloud before each answer | `story/film/film_captions.gd`, `story/act2/act2_whisper.gd`, `story/act3/suriel/suriel_voice.gd`; `UiLayers.OVER_VEIL` | `test_line_presenter.gd`: nothing names the four old presenters |
 | step 7c | Feyre's guide thoughts: `GuideJournal` shows them as Thought lines and keeps only the bookmark (her whorl and the G key, `ThoughtMark`) in the `THOUGHT` zone; a thought waits while another line has the lane, and the guide never clears a line that isn't its own | the card half of `guide_journal.gd`, `ui/guide/guide_vignette.gd`, `ui/guide/cartouche_style_box.gd` | `test_line_presenter.gd`: nothing names the card's parts |
 | step 7d | the lines scripts typed themselves (the triage, the grave, the hall map and its five marks, the sentries' tag) are rows of the line sheet, spoken with `DialogueDirector.line(self, id)`; a line whose speaker is `note` is Read | the typed strings; `HallMapPlan.first_thought` and each mark's `thought` | `test_line_presenter.gd`: no script under `story/` or `systems/` types a line into a `LinePresenter` call; every id a moment speaks is in the books and the sheet |
+| step 8a | notices and prompts. One `KeyPrompt` (`ui/hud/key_prompt.gd`) shows every key prompt: a dark pill, a paper key cap named from the InputMap for the keyboard or the pad, and what the key does. One notice queue (`FindCard`) shows finds, rewards and notes as dark pills that wait out dread, and chapter headings (`FindCard.heading`) that do not wait. Act I's milestones are headings only: what a key does is `KeyPrompts`' to say (the beast's three choices are its row) and what to do next is never said (R2) | `ui/ui_style.gd`; the milestone card with its instruction lines, `Act1Milestones.CARDS`, `expand`, `key_name`; `PressCard.make_card`; the key rows `BrewPrompt`, `MarketPrompt` and `KeyPrompts` each built; the find card's system script fonts | `test_notices_and_prompts.gd`: only `key_prompt.gd` places in `PROMPT`, no notice or prompt script carries a colour, font or box of its own, the pills pass 7 to 1 on snow in both acts, a heading shows during a staged moment while a note waits; `test_loose_page.gd`: `UiStyle` is gone |
 
 ## Files outside `ui/` the frame edits
 

@@ -1,6 +1,6 @@
-## A small card in HudLayout's BOW zone (low on the right) naming the nocked arrow and how
-## many are left, for a moment after Q (or a shot), so changing arrows always
-## answers. "No arrows" when the quiver is empty.
+## A small dark pill in HudLayout's BOW zone (low on the right) naming the
+## nocked arrow and how many are left, for a moment after Q (or a shot), so
+## changing arrows always answers. "No arrows" when the quiver is empty.
 class_name QuiverCard
 extends Node
 
@@ -20,11 +20,10 @@ func _init(bow_controller: BowController = null) -> void:
 
 func _ready() -> void:
 	_panel = PanelContainer.new()
-	_panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
+	_panel.theme_type_variation = &"PromptPill"
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	HudLayout.of(get_tree()).place(_panel, HudLayout.Zone.BOW, self)
-	_label = UiStyle.label("", 22)
-	_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_label = BookKit.label("", &"PromptText")
 	_panel.add_child(_label)
 	_panel.visible = false
 	if controller:

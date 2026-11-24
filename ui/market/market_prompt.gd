@@ -1,6 +1,5 @@
 ## "E  Trade with the clothier": the key hint by a market buyer (lane L53),
-## drawn like the satchel's leather keys, in HudLayout's PROMPT zone. Shown
-## only within reach of someone
+## a KeyPrompt in HudLayout's PROMPT zone. Shown only within reach of someone
 ## who buys, never from afar (R2: a hint at arm's length, not a marker). At
 ## the fur stall with the wolf's pelt, Act I's own "sell the pelt" prompt
 ## (KeyPrompts) speaks instead.
@@ -8,12 +7,9 @@ class_name MarketPrompt
 extends Node
 
 const REACH := 2.5
-const FADE := 0.2
 
 var showing: StringName = &""
-var _row: HBoxContainer
-var _glyph: Label
-var _word: Label
+var _prompt: KeyPrompt
 
 
 func _init() -> void:
@@ -21,35 +17,14 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	_row = HBoxContainer.new()
-	_row.add_theme_constant_override(&"separation", 10)
-	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_row.modulate.a = 0.0
-	_row.visible = false
-	HudLayout.of(get_tree()).place(_row, HudLayout.Zone.PROMPT, self)
-	var chip := PanelContainer.new()
-	chip.theme_type_variation = &"SatchelKey"
-	_row.add_child(chip)
-	_glyph = Label.new()
-	_glyph.theme_type_variation = &"SatchelKeyLabel"
-	chip.add_child(_glyph)
-	_word = Label.new()
-	_word.theme_type_variation = &"SatchelBody"
-	_word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_row.add_child(_word)
+	_prompt = KeyPrompt.make(self)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var who := target()
-	var on := who != null
-	if on:
-		_glyph.text = "A" if SatchelHud.pad_active else "E"
-		_word.text = "Trade with %s" % _buyer_of(who).display_name
-		showing = _buyer_of(who).id
-	else:
-		showing = &""
-	_row.modulate.a = move_toward(_row.modulate.a, 1.0 if on else 0.0, delta / FADE)
-	_row.visible = _row.modulate.a > 0.01
+	var buyer := _buyer_of(who) if who else null
+	showing = buyer.id if buyer else &""
+	_prompt.say(KeyPrompt.key(&"interact"), "Trade with %s" % buyer.display_name if buyer else "")
 
 
 ## The buyer station Feyre is within reach of, or null.

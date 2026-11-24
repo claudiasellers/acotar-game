@@ -14,8 +14,7 @@ var focus: Dictionary = {}
 
 var _since := 0.0
 var _glint: GPUParticles3D
-var _card: PanelContainer
-var _label: Label
+var _card: KeyPrompt
 
 
 func _init(owner_interactor: Interactor = null) -> void:
@@ -26,8 +25,7 @@ func _init(owner_interactor: Interactor = null) -> void:
 func _ready() -> void:
 	_glint = _make_glint()
 	add_child(_glint)
-	_card = PressCard.make_card(self)
-	_label = _card.get_node(^"Label") as Label
+	_card = KeyPrompt.make(self)
 
 
 func _process(delta: float) -> void:
@@ -46,10 +44,8 @@ func _process(delta: float) -> void:
 		_glint.global_position = focus.position + Vector3.UP * 0.35
 		glow.global_position = focus.position + Vector3.UP * 0.04
 	var in_reach: bool = not focus.is_empty() and focus.distance <= Interactor.REACH
-	_card.visible = in_reach
-	if in_reach:
-		var item := ItemCatalog.get_item(focus.id)
-		_label.text = "E   pick %s" % (item.display_name.to_lower() if item else String(focus.id))
+	var item := ItemCatalog.get_item(focus.id) if in_reach else null
+	_card.say(KeyPrompt.key(&"interact"), "pick %s" % (item.display_name.to_lower() if item else String(focus.id)) if in_reach else "")
 
 
 ## The nearest unpicked, in-window forage instance within `radius` of `at`.

@@ -11,6 +11,7 @@ const PIECES: Array[String] = [
 	"res://ui/satchel/satchel_hud.gd", "res://ui/satchel/quick_strap.gd",
 	"res://ui/map/world_map_hud.gd", "res://ui/map/minimap.gd", "res://ui/map/pin_marker.gd",
 	"res://systems/bow/quiver_card.gd", "res://ui/aim_reticle.gd",
+	"res://ui/hud/key_prompt.gd",
 	"res://systems/interaction/press_card.gd", "res://systems/interaction/forage_focus.gd",
 	"res://story/act1/key_prompts.gd", "res://story/act1/act1_milestones.gd",
 	"res://ui/chemistry/brew_prompt.gd", "res://ui/market/market_prompt.gd",
@@ -22,9 +23,8 @@ const PIECES: Array[String] = [
 const KEEPERS: Array[String] = [
 	"res://ui/hud/vitals/vitals_hud.gd", "res://ui/satchel/satchel_hud.gd", "res://ui/map/world_map_hud.gd",
 	"res://systems/bow/quiver_card.gd", "res://systems/bow/bow_controller.gd",
-	"res://systems/interaction/press_card.gd", "res://story/act1/key_prompts.gd",
-	"res://story/act1/act1_milestones.gd", "res://ui/chemistry/brew_prompt.gd",
-	"res://ui/market/market_prompt.gd", "res://ui/collection_book/find_card.gd",
+	"res://ui/hud/key_prompt.gd", "res://story/act1/act1_milestones.gd",
+	"res://ui/collection_book/find_card.gd",
 	"res://ui/guide/guide_journal.gd", "res://ui/menu/settings_tab.gd", "res://ui/debug_hud.gd",
 ]
 

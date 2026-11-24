@@ -1,17 +1,14 @@
 ## "E  Brew at the kitchen range": the key hint within arm's reach of any
-## station that brews (lane L62), drawn like the satchel's leather keys, in
-## HudLayout's PROMPT zone. A hint at arm's length, never a marker (R2). It also gives Feyre her brew
+## station that brews (lane L62), a KeyPrompt in HudLayout's PROMPT zone. A
+## hint at arm's length, never a marker (R2). It also gives Feyre her brew
 ## tells (BrewTells), so a brew shows however she drank it.
 class_name BrewPrompt
 extends Node
 
 const REACH := 2.5
-const FADE := 0.2
 
 var showing: Node3D = null
-var _row: HBoxContainer
-var _glyph: Label
-var _word: Label
+var _prompt: KeyPrompt
 
 
 func _init() -> void:
@@ -19,34 +16,15 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	_row = HBoxContainer.new()
-	_row.add_theme_constant_override(&"separation", 10)
-	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_row.modulate.a = 0.0
-	_row.visible = false
-	HudLayout.of(get_tree()).place(_row, HudLayout.Zone.PROMPT, self)
-	var chip := PanelContainer.new()
-	chip.theme_type_variation = &"SatchelKey"
-	_row.add_child(chip)
-	_glyph = Label.new()
-	_glyph.theme_type_variation = &"SatchelKeyLabel"
-	chip.add_child(_glyph)
-	_word = Label.new()
-	_word.theme_type_variation = &"SatchelBody"
-	_word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_row.add_child(_word)
+	_prompt = KeyPrompt.make(self)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre:
 		BrewTells.ensure(feyre)
 	showing = target(feyre)
-	if showing:
-		_glyph.text = "A" if SatchelHud.pad_active else "E"
-		_word.text = "Brew at the %s" % label_for(showing).to_lower()
-	_row.modulate.a = move_toward(_row.modulate.a, 1.0 if showing else 0.0, delta / FADE)
-	_row.visible = _row.modulate.a > 0.01
+	_prompt.say(KeyPrompt.key(&"interact"), "Brew at the %s" % label_for(showing).to_lower() if showing else "")
 
 
 ## The brewing station Feyre is within reach of, or null.

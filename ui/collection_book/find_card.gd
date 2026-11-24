@@ -1,9 +1,12 @@
-## The first-find card (experience-bar §1.4.2): a big card in HudLayout's
-## NOTICE zone (top centre) with the illustrated icon, the name in a script face and one line of
-## flavour, held 1.2 s. The game keeps running underneath. Cards queue, so a
-## handful picked together show one after another. Page rewards and small
-## notes use the same queue. Under dread or a staged moment the queue waits
-## (UiMode.quiet; R3: a pastel card never lands on the Suriel or the beast).
+## The notices: everything the game tells her at the top of the screen, one at
+## a time, in HudLayout's NOTICE zone. The first-find card (experience-bar
+## §1.4.2) is a dark pill with the illustrated icon, the name in her hand and
+## one line of flavour, held 1.2 s; page rewards and small notes are the same
+## pill. A chapter heading is a title on the said line's smear. The game keeps
+## running underneath and notices queue, so a handful picked together show one
+## after another. Under dread or a staged moment the cards wait (UiMode.quiet;
+## R3: a find never lands on the Suriel or the beast); a heading does not,
+## because a heading is how a staged moment opens.
 class_name FindCard
 extends RefCounted
 
@@ -12,12 +15,15 @@ const FADE := 0.18
 const GROUP := &"find_card"
 ## How often a held queue asks again.
 const RECHECK := 0.5
-const SCRIPT_FONTS: Array[String] = ["Snell Roundhand", "Apple Chancery", "Brush Script MT",
-	"Z003", "URW Chancery L", "Lobster", "cursive"]
+## How long a chapter heading stays, and how slowly it comes and goes.
+const HEADING_HOLD := 3.2
+const HEADING_FADE := 0.6
+const ICON := 96.0
+## The widest a card's line runs before it wraps.
+const LINE_WIDTH := 420.0
 
 static var _queue: Array[Dictionary] = []
 static var _showing: bool = false
-static var _font: SystemFont = null
 ## Bumped per held recheck (and by clear) so only the newest one acts.
 static var _held: int = 0
 ## Recipes unlocked this frame: one pickup can unlock several, and they share
@@ -29,7 +35,7 @@ static var _recipes: Array[StringName] = []
 static func show_find(tree: SceneTree, entry_id: StringName, tab: StringName) -> void:
 	var item := ItemCatalog.get_item(entry_id)
 	var piece := WardrobeCatalog.piece(entry_id)
-	var card := {"shape": ItemIcon.shape_for(entry_id, tab), "color": Color(0.95, 0.8, 0.88),
+	var card := {"shape": ItemIcon.shape_for(entry_id, tab), "color": JournalTheme.wash(0),
 		"title": String(entry_id).capitalize(), "line": "", "banner": "First find", "gold": false, "shiny": false}
 	if item:
 		card.color = item.color
@@ -102,7 +108,12 @@ static func show_reward(tree: SceneTree, reward: CollectionReward) -> void:
 
 ## A short line in the same place (no icon), e.g. "Two more flowers for a crown".
 static func note(tree: SceneTree, text: String) -> void:
-	_push(tree, {"shape": &"", "title": "", "line": text, "banner": "", "gold": false, "shiny": false, "color": Color.WHITE})
+	_push(tree, {"shape": &"", "title": "", "line": text, "banner": "", "gold": false, "shiny": false})
+
+
+## A chapter heading: "The Wolf in the Snow". It never waits on dread.
+static func heading(tree: SceneTree, title: String) -> void:
+	_push(tree, {"heading": title})
 
 
 ## Drops anything showing or queued (the book is opening).
@@ -132,75 +143,78 @@ static func _next(tree: SceneTree) -> void:
 	if _queue.is_empty() or tree == null or tree.root == null:
 		_showing = false
 		return
-	# Held cards wait their turn. Only the newest recheck acts, so a push
-	# while held never starts a second chain.
+	# Held cards wait their turn; a heading goes past them. Only the newest
+	# recheck acts, so a push while held never starts a second chain.
+	var at := 0
 	if UiMode.quiet(tree):
-		_showing = false
-		_held += 1
-		var ticket := _held
-		tree.create_timer(RECHECK).timeout.connect(func() -> void:
-			if ticket == _held and not _showing:
-				_next(tree))
-		return
+		at = _queue.find_custom(func(c: Dictionary) -> bool: return c.has("heading"))
+		if at < 0:
+			_showing = false
+			_held += 1
+			var ticket := _held
+			tree.create_timer(RECHECK).timeout.connect(func() -> void:
+				if ticket == _held and not _showing:
+					_next(tree))
+			return
 	_showing = true
-	var card: Dictionary = _queue.pop_front()
-	var panel := PanelContainer.new()
+	var card: Dictionary = _queue.pop_at(at)
+	var is_heading := card.has("heading")
+	var panel := _heading(card.heading) if is_heading else _card(card)
 	panel.add_to_group(GROUP)
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := UiStyle.panel_box()
-	style.set_content_margin_all(14)
-	style.set_corner_radius_all(26)
-	if card.gold:
-		style.border_color = ItemIcon.GOLD
-		style.set_border_width_all(5)
-		style.bg_color = Color(1.0, 0.97, 0.88, 0.96)
-	panel.add_theme_stylebox_override(&"panel", style)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 16)
-	panel.add_child(row)
-	if card.get("icon") is Texture2D:
-		var tex := TextureRect.new()
-		tex.texture = card.icon
-		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tex.custom_minimum_size = Vector2(96, 96)
-		row.add_child(tex)
-	elif card.shape != &"":
-		row.add_child(ItemIcon.make(card.shape, card.color, false, card.shiny, 96.0))
-	var text := VBoxContainer.new()
-	text.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_child(text)
-	if card.banner != "":
-		var banner := UiStyle.label(String(card.banner).to_upper(), 13)
-		banner.autowrap_mode = TextServer.AUTOWRAP_OFF
-		banner.add_theme_color_override(&"font_color", Color(0.72, 0.52, 0.18) if card.gold else UiStyle.ACCENT.darkened(0.2))
-		text.add_child(banner)
-	if card.title != "":
-		var title := UiStyle.label(card.title, 34)
-		title.autowrap_mode = TextServer.AUTOWRAP_OFF
-		title.add_theme_font_override(&"font", _script_font())
-		text.add_child(title)
-	if card.line != "":
-		var line := UiStyle.label(card.line, 16)
-		line.custom_minimum_size = Vector2(minf(420.0, 9.0 * String(card.line).length()), 0)
-		text.add_child(line)
 	HudLayout.of(tree).place(panel, HudLayout.Zone.NOTICE)
 	panel.pivot_offset = Vector2(panel.size.x * 0.5, 0)
 	panel.modulate.a = 0.0
-	panel.scale = Vector2.ONE * 0.85
+	var fade := HEADING_FADE if is_heading else FADE
 	var tween := panel.create_tween()
-	tween.tween_property(panel, ^"modulate:a", 1.0, FADE)
-	tween.parallel().tween_property(panel, ^"scale", Vector2.ONE, FADE * 1.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_interval(HOLD)
-	tween.tween_property(panel, ^"modulate:a", 0.0, FADE)
+	tween.tween_property(panel, ^"modulate:a", 1.0, fade)
+	if not is_heading:
+		panel.scale = Vector2.ONE * 0.85
+		tween.parallel().tween_property(panel, ^"scale", Vector2.ONE, FADE * 1.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(HEADING_HOLD if is_heading else HOLD)
+	tween.tween_property(panel, ^"modulate:a", 0.0, fade)
 	tween.tween_callback(func() -> void:
 		panel.queue_free()
 		_next(tree))
 
 
-static func _script_font() -> SystemFont:
-	if _font == null:
-		_font = SystemFont.new()
-		_font.font_names = PackedStringArray(SCRIPT_FONTS)
-		_font.font_italic = true
-	return _font
+## A find, a reward or a note: icon, kicker, name and one line on a dark pill.
+static func _card(card: Dictionary) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.theme_type_variation = &"NoticeRare" if card.gold else &"NoticeCard"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", 16)
+	panel.add_child(row)
+	if card.get("icon") is Texture2D:
+		row.add_child(BookKit.picture(card.icon, Vector2(ICON, ICON)))
+	elif card.shape != &"":
+		row.add_child(ItemIcon.make(card.shape, card.color, false, card.shiny, ICON))
+	var text := VBoxContainer.new()
+	text.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(text)
+	if card.banner != "":
+		text.add_child(BookKit.label(String(card.banner).to_upper(), &"NoticeKicker"))
+	if card.title != "":
+		var title := BookKit.label(card.title, &"NoticeTitle")
+		title.name = "Title"
+		text.add_child(title)
+	if card.line != "":
+		var line := BookKit.label(card.line, &"NoticeBody", true)
+		line.name = "Line"
+		var font := line.get_theme_font(&"font")
+		var wide := font.get_string_size(card.line, HORIZONTAL_ALIGNMENT_LEFT, -1, line.get_theme_font_size(&"font_size")).x
+		line.custom_minimum_size = Vector2(minf(LINE_WIDTH, wide + 2.0), 0)
+		text.add_child(line)
+	return panel
+
+
+## A chapter heading: the title alone, on the said line's smear.
+static func _heading(title: String) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.theme_type_variation = &"LineBand"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var label := BookKit.label(title, &"ChapterTitle")
+	label.name = "Title"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(label)
+	return panel

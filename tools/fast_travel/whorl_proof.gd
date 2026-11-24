@@ -101,7 +101,7 @@ func _caption_layer() -> void:
 	layer.layer = 40
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(layer)
-	_caption = UiStyle.label("", 20)
+	_caption = BookKit.label("", &"LineSaid", true)
 	_caption.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_caption.offset_top = -44
 	_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

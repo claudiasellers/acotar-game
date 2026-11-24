@@ -102,15 +102,12 @@ func test_names_on_the_stones_sketch_keep_apart() -> void:
 				assert_false((rects[ids[i]] as Rect2).intersects(mark), "%s is clear of the whorl at %s" % [ids[i], d.id])
 
 
-## The old card look gains no new users before step 8 deletes it.
-func test_the_old_card_look_gains_no_users() -> void:
-	var allowed := ["res://ui/ui_style.gd", "res://ui/collection_book/find_card.gd",
-		"res://story/act1/act1_milestones.gd", "res://story/act1/key_prompts.gd",
-		"res://systems/interaction/press_card.gd", "res://systems/bow/quiver_card.gd", "res://tools/fast_travel/whorl_proof.gd"]
+## The old card look is gone: nothing in the game names it.
+func test_the_old_card_look_is_gone() -> void:
+	assert_false(FileAccess.file_exists("res://ui/ui_style.gd"))
 	var users: Array[String] = []
 	_users_of("res://", "UiStyle", users)
-	for path in users:
-		assert_has(allowed, path, "%s uses UiStyle: write it on JournalTheme" % path)
+	assert_eq(users, [] as Array[String], "write it on JournalTheme")
 
 
 func _users_of(dir: String, word: String, out: Array[String]) -> void:

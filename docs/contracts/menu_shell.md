@@ -63,6 +63,3 @@ for a station that places its own (the mare beside her, the ride's
 whole-screen leaf). The station owns its content and its `ScreenStack` push;
 it builds no scrim, card or key caps itself (`test_loose_page.gd`).
 `tools/ui/loose_page_probe.tscn -- <dir> [phase]` saves a frame of each.
-
-`UiStyle` is left only for the play-time cards (find card, prompts,
-quiver card) and goes when they move, in step 8.

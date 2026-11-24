@@ -1,41 +1,42 @@
-## Act I's contextual key prompts (no objectives, no markers; R2): a small card
+## Act I's contextual key prompts (no objectives, no markers; R2): a KeyPrompt
 ## in HudLayout's PROMPT zone that names a key only while it matters.
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
 ##   RMB aim, LMB shoot  prey is near or the hunt is on, until her first shot
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
+##   E  knife, LMB bracelets, or neither   while the beast waits on her answer
 ## Each one is taught once: after its first use it never shows again (saved in
-## user://settings.cfg under [prompts]).
+## user://settings.cfg under [prompts]). The beast's is never taught: it shows
+## for as long as he waits.
 class_name KeyPrompts
 extends Node
 
 const SECTION := "prompts"
 const NEAR_PREY := 90.0
 const REACH := 3.5
+## Prompt -> its row of [action, what the key does]. No action is words alone.
 const PROMPTS := {
-	&"ash": ["Q", "ash arrow"],
-	&"draw": ["Right mouse", "hold to aim, left click to shoot"],
-	&"skin": ["E", "skin"],
-	&"sell": ["E", "sell the pelt"],
-	&"sleep": ["E", "sleep until night"],
+	&"ash": [[&"cycle_arrow", "ash arrow"]],
+	&"draw": [[&"aim", "hold to aim"], [&"fire", "shoot"]],
+	&"skin": [[&"interact", "skin"]],
+	&"sell": [[&"interact", "sell the pelt"]],
+	&"sleep": [[&"interact", "sleep until night"]],
+	&"beast": [[&"interact", "throw the knife"], [&"fire", "the bracelets"], [&"", "or stand still"]],
 }
 
 var settings_path: String = "user://settings.cfg"
 var taught: Dictionary = {}
 var current: StringName = &""
 
-var _card: PanelContainer
-var _key: Label
-var _text: Label
-var _alpha: float = 0.0
+var _prompt: KeyPrompt
 var _hunting: bool = false
 var _fire_hooked: bool = false
 
 
 func _ready() -> void:
 	_load()
-	_build()
+	_prompt = KeyPrompt.make(self)
 	EventBus.creature_harvested.connect(func(_id: StringName, kind: StringName, _items: PackedStringArray) -> void:
 		if kind == &"great_wolf":
 			teach(&"skin"))
@@ -61,15 +62,17 @@ func teach(id: StringName) -> void:
 	cfg.save(settings_path)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	current = want()
-	if current != &"":
-		var spec: Array = PROMPTS[current]
-		_key.text = spec[0]
-		_text.text = spec[1]
-	_alpha = move_toward(_alpha, 1.0 if current != &"" else 0.0, delta * 4.0)
-	_card.modulate.a = _alpha
-	_card.visible = _alpha > 0.01
+	_prompt.says(row(current))
+
+
+## A prompt's row with each action named as its key is bound.
+static func row(id: StringName) -> Array:
+	var out: Array = []
+	for pair: Array in PROMPTS.get(id, []):
+		out.append([KeyPrompt.key(pair[0]) if pair[0] != &"" else "", pair[1]])
+	return out
 
 
 ## The prompt that applies right now, or &"" for none.
@@ -81,6 +84,10 @@ func want() -> StringName:
 	if not _fire_hooked:
 		_fire_hooked = true
 		feyre.arrow_fired.connect(func(_a: Node) -> void: teach(&"draw"))
+	# The decision has no flag of its own: watch the door's beat.
+	for door in get_tree().get_nodes_in_group(BeastDoor.GROUP):
+		if (door as BeastDoor).running and (door as BeastDoor).current_beat_label().begins_with("decision"):
+			return &"beast"
 	if not taught.get(&"sell", false):
 		for stall in get_tree().get_nodes_in_group(&"station"):
 			if stall is FurStall and (stall as FurStall).has_pelt() and _near(stall, at, REACH):
@@ -130,37 +137,3 @@ func _load() -> void:
 	for id: StringName in PROMPTS:
 		taught[id] = bool(cfg.get_value(SECTION, String(id), false))
 
-
-func _build() -> void:
-	_card = PanelContainer.new()
-	var box := UiStyle.panel_box()
-	box.set_content_margin_all(10)
-	box.content_margin_left = 16
-	box.content_margin_right = 20
-	_card.add_theme_stylebox_override(&"panel", box)
-	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	HudLayout.of(get_tree()).place(_card, HudLayout.Zone.PROMPT, self)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 12)
-	_card.add_child(row)
-	var chip := PanelContainer.new()
-	var chip_box := StyleBoxFlat.new()
-	chip_box.bg_color = Color.WHITE
-	chip_box.border_color = UiStyle.BORDER
-	chip_box.set_border_width_all(2)
-	chip_box.set_corner_radius_all(8)
-	chip_box.content_margin_left = 10
-	chip_box.content_margin_right = 10
-	chip_box.content_margin_top = 2
-	chip_box.content_margin_bottom = 2
-	chip.add_theme_stylebox_override(&"panel", chip_box)
-	row.add_child(chip)
-	_key = Label.new()
-	_key.add_theme_color_override(&"font_color", UiStyle.TEXT)
-	_key.add_theme_font_size_override(&"font_size", 24)
-	chip.add_child(_key)
-	_text = Label.new()
-	_text.add_theme_color_override(&"font_color", UiStyle.TEXT)
-	_text.add_theme_font_size_override(&"font_size", 24)
-	row.add_child(_text)
-	_card.visible = false
