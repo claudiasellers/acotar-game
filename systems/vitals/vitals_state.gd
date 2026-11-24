@@ -614,6 +614,12 @@ func _step_fall() -> void:
 	_was_on_floor = on_floor
 
 
+## A teleport is not a fall: the speed she had in the air stays behind.
+func forget_fall() -> void:
+	_fall_speed = 0.0
+	_was_on_floor = true
+
+
 ## True once every `period` seconds while a hazard lasts.
 func _tick(key: StringName, delta: float, period: float) -> bool:
 	var t := float(_hazard_tick.get(key, period)) + delta

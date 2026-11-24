@@ -213,6 +213,14 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01)
 
 
+func test_a_teleport_mid_fall_lands_her_unhurt() -> void:
+	v._fall_speed = 30.0
+	v._was_on_floor = false
+	v.forget_fall()
+	assert_eq(v._fall_speed, 0.0, "the drop she was in stays behind")
+	assert_true(v._was_on_floor, "no landing is pending")
+
+
 func test_a_load_lets_go_of_her() -> void:
 	EventBus.player_grabbed.emit(&"puca", 3, 4.0)
 	v.load_state(v.save_state())

@@ -247,6 +247,7 @@ func teleport(pos: Vector3) -> void:
 	velocity = Vector3.ZERO
 	steer_frame.release()
 	global_position = pos
+	vitals.forget_fall()
 	camera_control.snap_to(pos)
 	if _camera_fade:
 		_camera_fade.restore_all()
