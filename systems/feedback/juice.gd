@@ -98,19 +98,23 @@ static func arc_token(from: Vector3, collector: Node3D, color: Color) -> MeshIns
 	token.material_override = mat
 	collector.get_parent().add_child(token)
 	token.global_position = from
+	var collector_ref: WeakRef = weakref(collector)
 	var arc := func(t: float) -> void:
-		if not is_instance_valid(collector) or not collector.is_inside_tree():
+		var col := collector_ref.get_ref() as Node3D
+		if col == null or not col.is_inside_tree():
 			return
 		# The satchel sits at her right hip and moves with her as she walks.
-		var to := collector.global_position + collector.global_basis * Vector3(0.18, 0.95, 0.05)
+		var to := col.global_position + col.global_basis * Vector3(0.18, 0.95, 0.05)
 		var mid := (from + to) * 0.5 + Vector3.UP * (0.5 + from.distance_to(to) * 0.25)
 		token.global_position = from.lerp(mid, t).lerp(mid.lerp(to, t), t)
 		token.scale = Vector3.ONE * lerpf(1.0, 0.45, t)
 	var tween := token.create_tween()
 	tween.tween_method(arc, 0.0, 1.0, ARC_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	tween.tween_callback(func() -> void:
-		var model := collector.get_node_or_null(^"Model") as Node3D
-		bounce(model if model else collector, 0.05)
+		var live := collector_ref.get_ref() as Node3D
+		if live:
+			var model := live.get_node_or_null(^"Model") as Node3D
+			bounce(model if model else live, 0.05)
 		token.queue_free())
 	return token
 

@@ -196,15 +196,18 @@ func insert_shot(at: Vector3, far: float, near: float, drop: float, seconds: flo
 	cam.look_at(at, Vector3.UP)
 	cam.current = true
 	var tw := create_tween()
+	var cam_ref: WeakRef = weakref(cam)
 	tw.tween_method(func(t: float) -> void:
-		if is_instance_valid(cam):
-			cam.global_position = from.lerp(to, t)
-			cam.look_at(at, Vector3.UP), 0.0, 1.0, seconds) \
+		var c := cam_ref.get_ref() as Camera3D
+		if c:
+			c.global_position = from.lerp(to, t)
+			c.look_at(at, Vector3.UP), 0.0, 1.0, seconds) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tw.tween_callback(func() -> void:
-		if is_instance_valid(cam):
-			cam.current = false
-			cam.queue_free()
+		var c := cam_ref.get_ref() as Camera3D
+		if c:
+			c.current = false
+			c.queue_free()
 		var f := player() as Feyre
 		if f and f.camera:
 			f.camera.current = true)
