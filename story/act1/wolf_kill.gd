@@ -24,6 +24,11 @@ extends SceneSpace
 ## terrain's 64 m collision ring round her: farther out, the doe and the wolf
 ## would drop through ground that has no collision yet.
 @export var start_radius: float = 58.0
+## Inside start_radius the hunt waits until no trunk or bough stands within
+## sight_margin of her line to the doe's spot, so her eye finds a doe she can
+## see. From sure_radius in (the clearing's own open ground) it starts anyway.
+@export var sure_radius: float = 32.0
+@export var sight_margin: float = 2.0
 ## Seconds with the arrow she needs neither in her quiver nor in the world (it
 ## broke on stone or fell through the ground) before one is quietly given back,
 ## so wolf_killed can always rise.
@@ -46,6 +51,9 @@ var wolf_dead: bool = false
 var _arrow_gone_for: float = 0.0
 var _creep_left: float = 0.0
 var _doe_shot: bool = false
+## Trunks and rocks round the clearing (Vector3(x, z, radius)), read once.
+var _trees: Array[Vector3] = []
+var _trees_read: bool = false
 
 
 func _init() -> void:
@@ -69,6 +77,34 @@ func _ready() -> void:
 	add_child(WolfHuntLighting.new())
 	# Her thoughts on each beat (lane L34, systems/dialogue/scene_guides/).
 	add_child(WolfHuntGuide.new())
+
+
+func _player_here() -> bool:
+	if not super._player_here():
+		return false
+	var p := player()
+	if p == null:
+		return true
+	var spot := global_transform * doe_offset
+	var from := Vector2(p.global_position.x, p.global_position.z)
+	var to := Vector2(spot.x, spot.z)
+	return from.distance_to(to) <= sure_radius or sees_doe_spot(from)
+
+
+## Stepping into the Entry area starts nothing either until she can see the doe.
+func arrive() -> bool:
+	return _player_here() and super.arrive()
+
+
+## Nothing in the wood stands on or near the line from `from` to the doe's spot.
+func sees_doe_spot(from: Vector2) -> bool:
+	var spot := global_transform * doe_offset
+	var to := Vector2(spot.x, spot.z)
+	if _trees.is_empty() and not _trees_read:
+		_trees_read = true
+		_trees = Act1Wayfinding.trail_obstacles(PackedVector2Array([
+			to - Vector2.ONE * start_radius, to + Vector2.ONE * start_radius]))
+	return Act1Wayfinding.sight_open(from, to, _trees) >= sight_margin
 
 
 func _build_beats() -> Array:

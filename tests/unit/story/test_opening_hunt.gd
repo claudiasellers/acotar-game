@@ -309,7 +309,7 @@ func test_the_rabbit_wears_a_brown_coat_that_reads_on_snow() -> void:
 	for mesh: MeshInstance3D in meshes:
 		for i in mesh.get_surface_override_material_count():
 			var mat := mesh.get_active_material(i) as BaseMaterial3D
-			if mat and mat.albedo_color.get_luminance() > 0.6:
+			if mat and mat.albedo_color.get_luminance() > 0.45:
 				pale += 1
 	assert_gt(meshes.size(), 0, "it has a model")
 	assert_eq(pale, 0, "no pale surface left on it")

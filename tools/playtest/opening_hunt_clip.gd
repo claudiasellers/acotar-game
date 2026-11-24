@@ -34,7 +34,7 @@ func _play() -> void:
 	var near := Act1Wayfinding.trail_obstacles(PackedVector2Array([spot, OpeningHunt.rabbit_spot()]))
 	_note("snare %s with %.1f m of open ground round it; rabbit %.1f m on, %.1f m clear of her line, %.2f m over the snow" % [spot,
 		OpeningHunt._open_round(spot, near), spot.distance_to(OpeningHunt.rabbit_spot()),
-		OpeningHunt._sight_open(spot, OpeningHunt.rabbit_spot(), near),
+		Act1Wayfinding.sight_open(spot, OpeningHunt.rabbit_spot(), near),
 		OpeningHunt._seen_over_snow(spot, OpeningHunt.rabbit_spot())])
 	var seen: Array = []
 	var watch := func() -> void:
