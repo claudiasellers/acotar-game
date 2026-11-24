@@ -145,4 +145,4 @@ func paint_mark() -> void:
 	if is_inside_tree():
 		PickupLog.of(get_tree()).note(WhorlStones.mark_line())
 		if WhorlStones.marked_ids().size() == 2:
-			LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", WhorlStones.RIDE_THOUGHT, self)
+			DialogueDirector.staged(self, &"whorl_ride_thought", "", WhorlStones.RIDE_THOUGHT)
