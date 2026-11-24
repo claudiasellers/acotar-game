@@ -9,7 +9,7 @@ const PHASES := preload("res://data/phases/spring_court_phases.tres")
 ## id: [phase, where (x, z), facing point (x, z), time of day]
 const VIEWS := {
 	"spring_noon": [&"p3_house_and_woods", Vector2(0, 120), Vector2(0, 40), 0.5],
-	"spring_dusk": [&"p3_house_and_woods", Vector2(30, -150), Vector2(0, -90), 0.74],
+	"spring_dusk": [&"p3_house_and_woods", Vector2(0, 120), Vector2(0, 40), 0.71],
 	"human_winter": [&"p0_winter", Vector2(-137.5, 2181.6), Vector2(-151, 2158), 0.42],
 }
 
@@ -74,7 +74,7 @@ func _view(id: String, path: String) -> void:
 			EventBus.player_hit.emit(&"shot", &"briarling_lash", 1.0, _feyre.global_position + Vector3(4, 0, 0))
 		"spring_dusk":
 			v.ease = 0.2
-			EventBus.mood_requested.emit(&"dread", 0.8, 1.0)
+			EventBus.mood_requested.emit(&"dread", 0.6, 1.0)
 			EventBus.player_status_applied.emit(&"shot", &"venom", 0.7, 1.0)
 			EventBus.player_status_applied.emit(&"shot", &"drowsy", 0.75, 1.0)
 			EventBus.player_hit.emit(&"shot", &"martax_roar", 1.0, _feyre.global_position + Vector3(-6, 0, -6))
@@ -92,4 +92,7 @@ func _view(id: String, path: String) -> void:
 	await get_tree().create_timer(1.6).timeout
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(path)
-	print("VITALS_SHOT %s health=%.0f statuses=%s" % [path, v.health, v.statuses().map(func(s: Dictionary) -> String: return String(s.tag))])
+	var hud := _game.find_children("*", "VitalsHud", true, false)
+	var edges: Dictionary = (hud[0] as VitalsHud).edge_fx.target if not hud.is_empty() else {}
+	print("VITALS_SHOT %s health=%.0f dread=%.2f statuses=%s edges=%s" % [path, v.health, v.dread,
+		v.statuses().map(func(s: Dictionary) -> String: return String(s.tag)), edges])

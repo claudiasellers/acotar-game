@@ -1,11 +1,12 @@
-## Her statuses, top left: up to six round medallions, danger first, then "+n".
+## Her statuses, over the health bar: up to five round medallions, danger
+## first, then "+n" (five keeps the row clear of the quick bar).
 ## Each carries its icon and a ring: a timer ring that drains for timed effects
 ## (blinking in the last 3 s), a creep ring for venom, a full ring for live
 ## states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
 class_name VitalsStatusRow
 extends Control
 
-const MAX_SHOWN := 6
+const MAX_SHOWN := 5
 const STEP := 92.0
 const RADIUS := 38.0
 const ICON := 48.0

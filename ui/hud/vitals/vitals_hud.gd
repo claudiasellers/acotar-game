@@ -1,6 +1,7 @@
 ## Feyre's play HUD (plan §14, the chosen look in ui/icon-directions/
-## CHOSEN_cute_thin_plum_line.png): statuses top left, the stamina rose and the
-## health bar bottom left, the grab ring in the centre, and her screen edges
+## CHOSEN_cute_thin_plum_line.png): one vitals block bottom left (status chips
+## over the health bar, the stamina rose as its crest; the top left is her
+## thought card's), the grab ring in the centre, and her screen edges
 ## under everything. It reads her VitalsState and shows only what matters:
 ## meters appear when they change and fade at rest (Contextual), or stay
 ## (Always), or go (Off: the grab ring and the edges stay). Nothing shows in
@@ -11,9 +12,11 @@ extends CanvasLayer
 
 enum Mode { CONTEXTUAL, ALWAYS, OFF }
 
-const ROSE_AT := Vector2(40, 942)
-const BAR_AT := Vector2(146, 984)
-const STATUS_AT := Vector2(46, 46)
+## Clear of the controls pill (bottom left, y 1018 up) and the quick bar.
+const ROSE_AT := Vector2(40, 910)
+const BAR_AT := Vector2(146, 950)
+## Chips sit on the bar, their left edge on its start.
+const STATUS_AT := Vector2(138, 856)
 ## Screen centre (the low third is the dialogue lane).
 const GRAB_AT := Vector2(960, 540)
 const HEALTH_SHOW_SECONDS := 4.0

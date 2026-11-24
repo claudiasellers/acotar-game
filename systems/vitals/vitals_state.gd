@@ -268,8 +268,6 @@ func apply_status(_source_id: StringName, tag: StringName, magnitude: float, sec
 		if body:
 			body.add_effect(tag, magnitude, seconds)
 		return
-	if tag == &"drowsy":
-		magnitude *= dread_gain_scale() / maxf(dread_gain_scale(), 0.001)  # gear hooks land here
 	var was := afflictions.has(tag)
 	afflictions[tag] = StatusRules.stack(tag, afflictions.get(tag, {}), magnitude, seconds)
 	if not was:
@@ -722,3 +720,7 @@ func load_state(data: Dictionary) -> void:
 	_ease_seen.clear()
 	for key in data.get("ease_seen", []):
 		_ease_seen[String(key)] = true
+	# Nothing that held her or was healing her comes across a load.
+	if is_grabbed():
+		_end_grab()
+	_heal_pending = 0.0

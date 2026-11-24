@@ -213,6 +213,12 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01)
 
 
+func test_a_load_lets_go_of_her() -> void:
+	EventBus.player_grabbed.emit(&"puca", 3, 4.0)
+	v.load_state(v.save_state())
+	assert_false(v.is_grabbed(), "no hold survives a load")
+
+
 func test_ease_raises_max_stamina_and_dread_follows_mood() -> void:
 	v.ease = 0.4
 	v.step(0.1)
