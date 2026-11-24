@@ -195,12 +195,13 @@ func release(action: StringName) -> void:
 	Input.parse_input_event(event_for(action, false))
 
 
-## A tap: down, `frames` process frames, up, then one frame for it to land.
+## A tap: down, `frames` physics frames, up, then one frame for it to land.
+## Physics frames, so a tap always spans a tick _physics_process polls on.
 func press(action: StringName, frames: int = 2) -> void:
 	hold(action)
-	await test.wait_process_frames(maxi(frames, 1))
+	await test.wait_physics_frames(maxi(frames, 1))
 	release(action)
-	await test.wait_process_frames(1)
+	await test.wait_physics_frames(1)
 
 
 ## Holds `action` for `frames` physics frames, then lets go.
@@ -292,12 +293,18 @@ func mouse_move(relative: Vector2) -> void:
 
 # --- waiting -----------------------------------------------------------------
 
-## Waits process frames until `cond` is true. Returns false if it never was.
+## Waits physics ticks (not process frames: movement, stopping and landing are
+## physics, and headless process frames can run ~10x faster than ticks) until
+## `cond` is true. `max_frames` ticks = max_frames / 60 s of game time.
+## Returns false if it never was.
 func wait_until(cond: Callable, max_frames: int) -> bool:
-	for i in max_frames:
+	# Counted off Engine.get_physics_frames, not loop passes: GUT's
+	# wait_physics_frames(1) takes 2 ticks, so a pass count would double it.
+	var end := Engine.get_physics_frames() + max_frames
+	while Engine.get_physics_frames() < end:
 		if cond.call():
 			return true
-		await test.wait_process_frames(1)
+		await test.wait_physics_frames(1)
 	return bool(cond.call())
 
 
