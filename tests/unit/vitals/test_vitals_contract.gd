@@ -195,6 +195,32 @@ func test_gauges_escalate_and_always_show() -> void:
 		"Auto shows a calm gauge")
 
 
+func test_every_status_tag_has_a_name_and_a_line() -> void:
+	for tag: StringName in StatusRules.ORDER:
+		assert_true(StatusRules.INFO.has(tag), String(tag))
+		assert_ne(StatusRules.blurb(tag), "", String(tag))
+
+
+func test_a_chip_is_taught_once_then_named_on_hover() -> void:
+	var path := "user://test_status_taught.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var row := VitalsStatusRow.new()
+	row.settings_path = path
+	add_child_autofree(row)
+	var list: Array[Dictionary] = [{"tag": &"steady", "magnitude": 1.0, "seconds_left": 30.0, "total": 60.0}]
+	row.set_statuses(list)
+	row._process(0.1)
+	assert_eq(row.teaching, &"steady", "its first showing teaches it")
+	assert_string_contains(row._get_tooltip(row._slot(0)), "Steady")
+	var again := VitalsStatusRow.new()
+	again.settings_path = path
+	add_child_autofree(again)
+	again.set_statuses(list)
+	again._process(0.1)
+	assert_eq(again.teaching, &"", "never taught twice")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
 func test_every_status_tag_has_an_icon() -> void:
 	for tag: StringName in StatusRules.ORDER:
 		assert_true(Icons.has(Icons.STATUS, tag), String(tag))

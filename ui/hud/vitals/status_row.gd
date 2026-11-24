@@ -8,6 +8,10 @@
 ## The cold and hunger gauges (StatusRules.GAUGES) are always there: a good pan
 ## with the ring filled to the level, glow when calm and accent when uneasy,
 ## turning to the dark cracked pan, with a shudder, when they reach danger.
+## Each chip is taught once: the first time a status ever shows, a slip above
+## the row names it and says what it does (StatusRules.INFO), then never
+## again (user://settings.cfg [status_taught]). With the pointer free, resting
+## on a chip names it too.
 class_name VitalsStatusRow
 extends Control
 
@@ -24,6 +28,11 @@ const RIM := 0.1
 const CRACKS := [[Vector2(-0.75, -0.3), Vector2(-0.2, 0.1)], [Vector2(-0.2, 0.1), Vector2(-0.35, 0.7)],
 	[Vector2(0.8, -0.15), Vector2(0.3, 0.25)], [Vector2(0.3, 0.25), Vector2(0.45, 0.72)]]
 const POP_SECONDS := 0.35
+const TAUGHT_SECTION := "status_taught"
+## How long a teaching slip stays, and its fade.
+const TEACH_SECONDS := 7.0
+const TEACH_FADE := 0.8
+const TEACH_WIDTH := 330.0
 
 ## What to draw this frame: [{tag, magnitude, seconds_left, total}].
 var shown: Array[Dictionary] = []
@@ -34,6 +43,15 @@ var _born: Dictionary = {}
 ## gauge tag -> seconds since it reached danger (stage 2), for its shudder.
 var _dire: Dictionary = {}
 var _chime: AudioStreamPlayer
+var settings_path: String = "user://settings.cfg"
+## tag -> true once its slip has shown.
+var taught: Dictionary = {}
+## Tags waiting for their slip, oldest first.
+var teach_queue: Array[StringName] = []
+var teaching: StringName = &""
+var _teach_left: float = 0.0
+var _slip: PanelContainer
+var _slip_label: Label
 
 
 func _init() -> void:
@@ -45,6 +63,19 @@ func _ready() -> void:
 	_chime = AudioStreamPlayer.new()
 	_chime.volume_db = -14.0
 	add_child(_chime)
+	_slip = PanelContainer.new()
+	_slip.theme_type_variation = &"NotifyCard"
+	_slip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_slip_label = BookKit.label("", &"SatchelSmall", true)
+	# A wrapping label sizes its height from its own width, so give it one.
+	_slip_label.custom_minimum_size.x = TEACH_WIDTH
+	_slip.add_child(_slip_label)
+	_slip.visible = false
+	add_child(_slip)
+	var cfg := ConfigFile.new()
+	if cfg.load(settings_path) == OK and cfg.has_section(TAUGHT_SECTION):
+		for key in cfg.get_section_keys(TAUGHT_SECTION):
+			taught[StringName(key)] = true
 
 
 func set_statuses(visible_list: Array[Dictionary]) -> void:
@@ -53,6 +84,8 @@ func set_statuses(visible_list: Array[Dictionary]) -> void:
 		now[s.tag] = true
 		if not _born.has(s.tag):
 			_born[s.tag] = 0.0
+			if not taught.has(s.tag) and s.tag != teaching and not teach_queue.has(s.tag):
+				teach_queue.append(s.tag)
 			if not StatusRules.is_debuff(s.tag) and StatusRules.kind(s.tag) != StatusRules.Kind.GAUGE:
 				_chime.stream = Juice.chime(&"pickup")
 				_chime.pitch_scale = 1.25
@@ -70,6 +103,7 @@ func set_statuses(visible_list: Array[Dictionary]) -> void:
 			_dire.erase(tag)
 	shown = visible_list.slice(0, MAX_SHOWN)
 	overflow = maxi(visible_list.size() - MAX_SHOWN, 0)
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if shown.is_empty() else Control.MOUSE_FILTER_PASS
 
 
 func _process(delta: float) -> void:
@@ -77,7 +111,57 @@ func _process(delta: float) -> void:
 		_born[tag] = float(_born[tag]) + delta
 	for tag: StringName in _dire:
 		_dire[tag] = float(_dire[tag]) + delta
+	_step_teach(delta)
 	queue_redraw()
+
+
+## Shows the next untaught status's slip, one at a time, while its chip is up.
+func _step_teach(delta: float) -> void:
+	if teaching != &"":
+		_teach_left -= delta
+		if _teach_left <= 0.0 or not _born.has(teaching):
+			teaching = &""
+	if teaching == &"":
+		while not teach_queue.is_empty() and not _born.has(teach_queue[0]):
+			teach_queue.pop_front()
+		if not teach_queue.is_empty():
+			teach(teach_queue.pop_front())
+	_slip.visible = teaching != &""
+	_slip.modulate.a = clampf(_teach_left / TEACH_FADE, 0.0, 1.0)
+	_slip.position = Vector2(0.0, _top() - _slip.size.y - 8.0)
+
+
+## Shows `tag`'s slip now and remembers it is taught.
+func teach(tag: StringName) -> void:
+	teaching = tag
+	_teach_left = TEACH_SECONDS
+	_slip_label.text = "%s: %s" % [StatusRules.title(tag), StatusRules.blurb(tag)]
+	_slip.reset_size()
+	taught[tag] = true
+	var cfg := ConfigFile.new()
+	cfg.load(settings_path)
+	cfg.set_value(TAUGHT_SECTION, String(tag), true)
+	cfg.save(settings_path)
+
+
+## The top of the chips in use.
+func _top() -> float:
+	@warning_ignore("integer_division")
+	var rows := maxi((shown.size() + PER_ROW - 1) / PER_ROW, 1)
+	return _slot((rows - 1) * PER_ROW).y - RADIUS
+
+
+## The status under `at`, or &"".
+func chip_at(at: Vector2) -> StringName:
+	for i in shown.size():
+		if at.distance_to(_slot(i)) <= RADIUS:
+			return shown[i].tag
+	return &""
+
+
+func _get_tooltip(at: Vector2) -> String:
+	var tag := chip_at(at)
+	return "" if tag == &"" else "%s\n%s" % [StatusRules.title(tag), StatusRules.blurb(tag)]
 
 
 func _draw() -> void:
