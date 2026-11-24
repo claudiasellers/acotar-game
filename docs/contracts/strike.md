@@ -1,0 +1,34 @@
+# Strike: the bow bash and the boot knife (slice HK)
+
+Plan: `plans/hostile-fae/health-interactions.md` §2.2, §13 row 5 and §14.2; bow design §3.
+Code: `systems/strike/strike_controller.gd` (`StrikeController`, a child of
+Feyre named `Strike`). Input action `strike`: F, pad Y (north).
+
+One press, in this order:
+1. **Held** (`Vitals.of(player).is_grabbed()`): the knife cuts her free at
+   once. It emits `EventBus.player_released(source)`, so VitalsState and the
+   holder end the hold. The holder is open to a finisher for `FREED_WINDOW`
+   (2 s), and so is anything she broke free from by mashing.
+2. **A creature within `REACH` (1.8 m)**, the most hurt first, then the nearest:
+   - `knife_kind()` is `&"finisher"` (asleep, mortally wounded, or just freed
+     from) x6; `&"sneak"` (awareness under 0.4, within 1.5 m, and she's behind
+     it or crouched) x4; otherwise `&"knife"` x1. The multiplier is a
+     `weapon_mult` on one wood arrow's damage (`data.arrow_damage`), through
+     `Creature.apply_hit(&"knife", &"knife", mult, &"body", at)`. A knife
+     wound that doesn't kill staggers it for 1.2 s. One stab per 0.7 s.
+   - **Bow raised** (`player.is_aiming`) and the kind is plain `&"knife"`:
+     a bow bash instead. It costs 15 stamina (not while winded), goes through
+     `apply_hit(&"bow_bash", &"bow_bash", 0.0, ...)`, does no damage and never
+     finishes a mortal wound (`resolve_hit` with mult 0), and staggers 1 s.
+3. **Something in group `&"knife_cuttable"`** within reach with a
+   `cut(by: Node3D) -> bool` method (snares, the Hob's charm): the knife cuts it.
+
+A press that does none of these is left unhandled, so F still reaches the bow's
+`craft_arrow` until that moves into the quiver wheel (bow design §3).
+
+`Creature.stagger(seconds)` stands a creature still for that long and loses
+its wind-up. Brains with their own fight state override it: `Naga` (story)
+reels back, `NagaRoamer` drops its strike into RECOVER.
+
+Signal `struck(kind, target)`: `&"knife"`, `&"sneak"`, `&"finisher"`,
+`&"bash"`, `&"cut_free"`, `&"cut"`, for animation, sound and HitStop (HF).

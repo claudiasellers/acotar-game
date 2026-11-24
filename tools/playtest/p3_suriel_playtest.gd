@@ -139,8 +139,8 @@ func _play() -> void:
 		if target == null:
 			await _wait(0.5)
 			continue
-		if target.global_position.distance_to(feyre.global_position) <= NagaAmbush.KNIFE_REACH:
-			await _press(&"interact")
+		if target.global_position.distance_to(feyre.global_position) <= StrikeController.REACH:
+			await _press(StrikeController.ACTION)
 			await _wait(0.3)
 		elif target.global_position.distance_to(feyre.global_position) > 18.0:
 			await _wait(0.2)  # out of a sure shot: let it come

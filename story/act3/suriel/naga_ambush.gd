@@ -8,7 +8,8 @@
 ##   - Five strikes and she falls: black, then she wakes by the waiting oak
 ##     and the naga are back in the reeds. Try again (the answers are kept).
 ##   - Arrows: two wood arrows or one ash arrow kill (naga data).
-##   - E with a naga in reach: her boot knife (canon, ch 15).
+##   - Strike with a naga in reach: her boot knife (canon, ch 15;
+##     StrikeController, so the wounded one takes the blade first).
 ##   - An arrow into the snare's tether frees the Suriel; it bursts out and
 ##     staggers every naga near it (canon: she shoots the snare).
 ##   - Once she has killed one herself, Tamlin comes out of the trees at her
@@ -31,11 +32,6 @@ const JOIN_EVERY := 7.0
 const STRIKES_TO_FALL := 5
 ## After a blow lands she has this long before the next can (a stagger, not a stun-lock).
 const STRIKE_GRACE := 1.8
-const KNIFE_REACH := 2.4
-## Two stabs kill a naga (16 health): close work, but it finishes them.
-const KNIFE_DAMAGE := 8.0
-## A boot knife is close and slow: one stab per this many seconds.
-const KNIFE_COOLDOWN := 0.7
 const TETHER_REACH := 2.0
 const STAGGER_RADIUS := 14.0
 const STAGGER_SECONDS := 2.5
@@ -69,7 +65,6 @@ var _since_kill: float = -1.0
 var _falling: float = -1.0
 var _fail: bool = false
 var _hooked_player: Node = null
-var _knife_cd: float = 0.0
 var _grace: float = 0.0
 ## After a fall: seconds before the naga come again (old ones must be gone).
 var _rest: float = 0.0
@@ -107,7 +102,6 @@ func _build_beats() -> Array:
 	fought_back = false
 	_t = 0.0
 	_last_join = 0.0
-	_knife_cd = 0.0
 	_grace = 0.0
 	_cued = 0
 	_since_kill = -1.0
@@ -167,46 +161,6 @@ func arrow_landed(at: Vector3) -> void:
 			EventBus.story_actor_cue.emit(id, &"stagger")
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	super._unhandled_input(event)
-	if running and event.is_action_pressed(&"interact"):
-		knife()
-
-
-## Her boot knife, into the naga in reach she has already cut (finish what
-## she started), else the nearest. Returns true on a hit.
-func knife() -> bool:
-	var p := player()
-	if p == null or not running:
-		return false
-	var best: Creature = null
-	var best_key := INF
-	for id: StringName in naga:
-		var c := naga[id] as Creature
-		if c == null or not is_instance_valid(c) or not c.alive:
-			continue
-		var d := c.global_position.distance_to(p.global_position)
-		if d > KNIFE_REACH:
-			continue
-		# Health first, distance to break ties: the wounded one dies first.
-		var key := c.health * 10.0 + d
-		if key < best_key:
-			best = c
-			best_key = key
-	if best == null or _knife_cd > 0.0:
-		return false
-	_knife_cd = KNIFE_COOLDOWN
-	best.health -= KNIFE_DAMAGE
-	EventBus.creature_hit.emit(best.creature_id, best.data.kind, &"knife", &"body")
-	if best.health <= 0.0:
-		best.die(&"knife")
-	else:
-		best._on_wounded(p.global_position, &"knife")
-		# The blade drives it back a step: room to nock an arrow.
-		EventBus.story_actor_cue.emit(best.creature_id, &"stagger")
-	return true
-
-
 func _on_struck(_who: Node3D = null) -> void:
 	strike()
 
@@ -251,7 +205,6 @@ func _fight(delta: float) -> bool:
 			return false
 		return false
 	_t += delta
-	_knife_cd = maxf(0.0, _knife_cd - delta)
 	_grace = maxf(0.0, _grace - delta)
 	if _cued < NAGA_IDS.size():
 		var due := _t >= _cued * ATTACK_GAP if _cued < FIRST_WAVE else \
