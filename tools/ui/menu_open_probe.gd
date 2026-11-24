@@ -155,8 +155,9 @@ func _dress_hud() -> void:
 	add_child(VitalsHud.new())
 	var vitals := Vitals.of(feyre)
 	if vitals:
-		for tag: StringName in [&"venom", &"chilled", &"steady", &"swift", &"warm", &"well_fed"]:
+		for tag: StringName in [&"venom", &"steady", &"swift", &"warm"]:
 			vitals.apply_status(&"probe", tag, 0.6, 60.0)
+		feyre.body_state.cold = 0.8
 	for verb: String in ["step in", "the curtains"]:
 		var keeper := Node.new()
 		add_child(keeper)

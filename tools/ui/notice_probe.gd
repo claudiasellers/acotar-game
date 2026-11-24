@@ -12,7 +12,7 @@ const FEYRE := "res://characters/feyre/feyre.tscn"
 ## this long after they are asked for.
 const CATCH_SECONDS := 0.7
 ## Two good statuses and two bad, for the vitals frame.
-const VITALS_SHOWN: Array[StringName] = [&"heal", &"at_ease", &"drowsy", &"chilled"]
+const VITALS_SHOWN: Array[StringName] = [&"heal", &"at_ease", &"drowsy", &"roar_shake"]
 ## The brightest ground each act has: noon snow, and a Spring path at noon.
 const GROUND := {"p1": Color(0.97, 0.98, 1.0), "p3": Color(0.62, 0.93, 0.5)}
 

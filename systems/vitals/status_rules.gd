@@ -4,16 +4,24 @@
 class_name StatusRules
 extends RefCounted
 
-enum Kind { BUFF, HALF, DEBUFF }
+enum Kind { BUFF, HALF, DEBUFF, GAUGE }
 
-## Debuffs first, then the half-buff, then buffs: the row reads danger first.
+## The gauges hold the first slots, then debuffs, the half-buff and buffs:
+## the row reads danger first.
 const ORDER: Array[StringName] = [
-	&"venom", &"drowsy", &"roar_shake", &"chilled", &"starving",
+	&"cold", &"hunger",
+	&"venom", &"drowsy", &"roar_shake",
 	&"giddy",
 	&"heal", &"steady", &"swift", &"strong", &"warm", &"quiet", &"bright", &"keen", &"cool",
-	&"well_rested", &"well_fed", &"stuffed", &"at_ease",
+	&"well_rested", &"stuffed", &"at_ease",
 ]
-const DEBUFFS: Array[StringName] = [&"venom", &"drowsy", &"roar_shake", &"chilled", &"starving"]
+## Always on screen, calm to danger, so nothing about her body is a surprise
+## (the owner, 2026-11-24): BodyState.cold and BodyState.hunger, 0..1.
+const GAUGES: Array[StringName] = [&"cold", &"hunger"]
+## Where each gauge turns uneasy, then dangerous. Cold from 0.7 is "chilled":
+## from 0.85 for 20 s it costs health. Hunger from 0.9 is "starving".
+const STAGES := {&"cold": Vector2(0.4, 0.7), &"hunger": Vector2(0.5, 0.9)}
+const DEBUFFS: Array[StringName] = [&"venom", &"drowsy", &"roar_shake"]
 const HALF: Array[StringName] = [&"giddy"]
 ## Brew tags that live in BodyState.effects (Chemistry results).
 const BREW_TAGS: Array[StringName] = [&"steady", &"swift", &"strong", &"warm", &"quiet", &"bright", &"keen", &"cool"]
@@ -24,6 +32,8 @@ const MAX_BREW_TAGS := 3
 
 
 static func kind(tag: StringName) -> Kind:
+	if GAUGES.has(tag):
+		return Kind.GAUGE
 	if DEBUFFS.has(tag):
 		return Kind.DEBUFF
 	if HALF.has(tag):
@@ -33,6 +43,12 @@ static func kind(tag: StringName) -> Kind:
 
 static func is_debuff(tag: StringName) -> bool:
 	return DEBUFFS.has(tag)
+
+
+## A gauge's stage at `magnitude`: 0 calm, 1 uneasy, 2 danger.
+static func stage(tag: StringName, magnitude: float) -> int:
+	var at: Vector2 = STAGES.get(tag, Vector2(INF, INF))
+	return 2 if magnitude >= at.y else (1 if magnitude >= at.x else 0)
 
 
 static func sort_key(tag: StringName) -> int:
