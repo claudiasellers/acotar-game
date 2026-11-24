@@ -51,15 +51,15 @@ func _play() -> void:
 	await _watch_and_shoot(hunt)
 
 
-## Spawns, walks to the clearing and starts recording as the hunt begins.
-## Null (the beat already failed) if any of that didn't happen.
-func _enter_hunt() -> WolfKill:
+## Waits for her at the cottage with control, and listens for her lines.
+## False (the beat already failed) if she never got there.
+func _spawn_in() -> bool:
 	_frames_dir = out_path.get_base_dir()
 	DirAccess.make_dir_recursive_absolute(_frames_dir)
 	_begin("spawn", "Feyre at the cottage, controllable")
 	if not await _until(func() -> bool: return game.spawned, 30.0):
 		_fail("never spawned")
-		return null
+		return false
 	feyre = game.feyre
 	feyre.arrow_fired.connect(func(arrow: Node) -> void:
 		arrow.hit.connect(func(collider: Node, at: Vector3) -> void:
@@ -69,11 +69,19 @@ func _enter_hunt() -> WolfKill:
 	var director := get_tree().get_first_node_in_group(DialogueDirector.GROUP) as DialogueDirector
 	if director == null:
 		_fail("no DialogueDirector in the game")
-		return null
+		return false
 	director.line_spoken.connect(func(id: StringName, _s: StringName, text: String, _at: Vector3, _inner: bool) -> void:
 		spoken.append(String(id))
 		_note("%5.1f s  [%s] %s" % [_secs(), id, text]))
 	_pass()
+	return true
+
+
+## Spawns, walks to the clearing and starts recording as the hunt begins.
+## Null (the beat already failed) if any of that didn't happen.
+func _enter_hunt() -> WolfKill:
+	if not await _spawn_in():
+		return null
 
 	_begin("walk_in", "walk to the clearing until the hunt starts")
 	var clearing := _anchor(&"act1_wolf_clearing")

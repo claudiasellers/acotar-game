@@ -32,6 +32,10 @@ const SNARE_ALONG := 80.0
 const SNARE_SIDE := 2.4
 const RABBIT_AHEAD := 20.0
 const RABBIT_SIDE := 3.5
+## Metres either way of RABBIT_AHEAD tried for a spot in plain sight of the
+## snare, and how far a trunk or rock must stand off that line.
+const RABBIT_TRIES: Array[float] = [0.0, -1.0, 1.0, -2.0, 2.0]
+const SIGHT_MARGIN := 1.0
 ## The snare is built once she's this close (inside the terrain's collision ring).
 const BUILD_RADIUS := 60.0
 ## The rabbit ignores her until she's this close or she nocks.
@@ -43,6 +47,8 @@ const GONE_SECONDS := 10.0
 const WINDED_AT := 0.4
 const DONE_FLAG := "fact.wolf_spotted"
 const SAVE_KEY := "opening_hunt"
+
+static var _rabbit_spot := Vector2.INF
 
 var snare: Node3D
 var rabbit: Prey
@@ -81,9 +87,31 @@ static func snare_spot() -> Vector2:
 	return _along_trail(SNARE_ALONG, SNARE_SIDE)
 
 
-## Where the rabbit grazes: RABBIT_AHEAD metres past the snare.
+## Where the rabbit grazes: about RABBIT_AHEAD metres past the snare, at the
+## first spot beside the trail she can see from the snare with no trunk or
+## rock on the line (so the shot she misses is hers to miss).
 static func rabbit_spot() -> Vector2:
-	return _along_trail(SNARE_ALONG + RABBIT_AHEAD, -RABBIT_SIDE)
+	if _rabbit_spot != Vector2.INF:
+		return _rabbit_spot
+	var from := snare_spot()
+	var obstacles := Act1Wayfinding.trail_obstacles(PackedVector2Array([from, _along_trail(SNARE_ALONG + RABBIT_AHEAD, 0.0)]))
+	_rabbit_spot = _along_trail(SNARE_ALONG + RABBIT_AHEAD, -RABBIT_SIDE)
+	for ahead: float in RABBIT_TRIES:
+		for side: float in [-RABBIT_SIDE, RABBIT_SIDE]:
+			var spot := _along_trail(SNARE_ALONG + RABBIT_AHEAD + ahead, side)
+			if _sight_clear(from, spot, obstacles):
+				_rabbit_spot = spot
+				return spot
+	return _rabbit_spot
+
+
+## No obstacle (Vector3(x, z, radius)) within SIGHT_MARGIN of the line a to b.
+static func _sight_clear(a: Vector2, b: Vector2, obstacles: Array[Vector3]) -> bool:
+	for o in obstacles:
+		var at := Vector2(o.x, o.y)
+		if at.distance_to(Geometry2D.get_closest_point_to_segment(at, a, b)) < o.z + SIGHT_MARGIN:
+			return false
+	return true
 
 
 static func _along_trail(metres: float, side: float) -> Vector2:
