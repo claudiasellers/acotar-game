@@ -25,10 +25,14 @@ extends SceneSpace
 ## would drop through ground that has no collision yet.
 @export var start_radius: float = 58.0
 ## Inside start_radius the hunt waits until no trunk or bough stands within
-## sight_margin of her line to the doe's spot, so her eye finds a doe she can
-## see. From sure_radius in (the clearing's own open ground) it starts anyway.
-@export var sure_radius: float = 32.0
+## sight_margin of her line to the doe's spot, and none within lens_margin of
+## the camera, so her eye finds a doe she can see. From sure_radius in (the
+## clearing's own open ground) it starts anyway.
+@export var sure_radius: float = 26.0
 @export var sight_margin: float = 2.0
+## The lens itself must stand this far from any trunk too, so none fills the
+## frame beside it while the scene holds her eye on the doe.
+@export var lens_margin: float = 1.5
 ## Seconds with the arrow she needs neither in her quiver nor in the world (it
 ## broke on stone or fell through the ground) before one is quietly given back,
 ## so wolf_killed can always rise.
@@ -88,7 +92,11 @@ func _player_here() -> bool:
 	var spot := global_transform * doe_offset
 	var from := Vector2(p.global_position.x, p.global_position.z)
 	var to := Vector2(spot.x, spot.z)
-	return from.distance_to(to) <= sure_radius or sees_doe_spot(from)
+	if from.distance_to(to) <= sure_radius:
+		return true
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() else null
+	var lens := Vector2(cam.global_position.x, cam.global_position.z) if cam else from
+	return sees_doe_spot(from) and Act1Wayfinding.sight_open(lens, lens, _trees) >= lens_margin
 
 
 ## Stepping into the Entry area starts nothing either until she can see the doe.
