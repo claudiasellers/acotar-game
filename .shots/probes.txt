@@ -1,0 +1,2 @@
+shot hunt res://tools/playtest/wolf_hunt_clip.tscn -- --out={out}/report.json
+shot lost res://tools/playtest/wolf_lost_clip.tscn -- --out={out}/report.json
