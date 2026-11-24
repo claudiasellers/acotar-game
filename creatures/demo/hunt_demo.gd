@@ -118,6 +118,7 @@ func _build_label() -> void:
 	_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	_label.position = Vector2(24, 1020)
 	_label.add_theme_font_size_override(&"font_size", 20)
+	_label.add_theme_color_override(&"font_color", Color.WHITE)
 	_label.add_theme_color_override(&"font_shadow_color", Color(0, 0, 0, 0.8))
 	layer.add_child(_label)
 

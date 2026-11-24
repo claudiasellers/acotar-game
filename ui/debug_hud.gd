@@ -17,18 +17,21 @@ func _ready() -> void:
 	_info = Label.new()
 	_info.position = Vector2(24, 20)
 	_info.add_theme_font_size_override(&"font_size", 18)
+	_info.add_theme_color_override(&"font_color", Color.WHITE)
 	_info.add_theme_color_override(&"font_shadow_color", Color(0, 0, 0, 0.7))
 	_info.visible = debug_visible
 	add_child(_info)
 	_crosshair = Label.new()
 	_crosshair.text = "+"
 	_crosshair.add_theme_font_size_override(&"font_size", 28)
+	_crosshair.add_theme_color_override(&"font_color", Color.WHITE)
 	_crosshair.set_anchors_preset(Control.PRESET_CENTER)
 	add_child(_crosshair)
 	_deed = Label.new()
 	_deed.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_deed.position.y = 80
 	_deed.add_theme_font_size_override(&"font_size", 22)
+	_deed.add_theme_color_override(&"font_color", Color.WHITE)
 	add_child(_deed)
 	EventBus.phase_changed.connect(func(_p: StringName, current: StringName) -> void:
 		_show("Phase: %s" % current))

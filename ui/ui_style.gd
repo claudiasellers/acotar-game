@@ -34,6 +34,7 @@ static func button(text: String, toggle: bool = false) -> Button:
 		box.border_color = BORDER if state != "normal" else Color(BORDER, 0.5)
 		box.set_border_width_all(2)
 		b.add_theme_stylebox_override(state, box)
+	b.add_theme_font_size_override(&"font_size", 16)
 	b.add_theme_color_override(&"font_color", TEXT)
 	b.add_theme_color_override(&"font_pressed_color", TEXT)
 	b.add_theme_color_override(&"font_hover_color", TEXT)
