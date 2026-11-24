@@ -461,10 +461,12 @@ func muzzle() -> Vector3:
 
 
 ## The direction an arrow loosed this instant would leave the bow: the aim
-## turned by the sway. The reticle and the shot both use it, so the ring is
-## where the arrow goes.
+## turned by the sway, then by soft aim on a pad. The reticle and the shot
+## both use it, so the ring is where the arrow goes.
 func shot_direction() -> Vector3:
-	return sway_offset((feyre.aim_point() - muzzle()).normalized())
+	var from := muzzle()
+	var aim := (feyre.aim_point() - from).normalized()
+	return SoftAim.bend(get_tree(), from, aim, sway_offset(aim))
 
 
 ## Where an arrow released now would land (F5): the same gravity, drag, wind

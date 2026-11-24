@@ -119,6 +119,9 @@ func update(delta: float) -> void:
 	_update_indoor(delta)
 	var aiming := f.is_aiming
 	var target_length := 1.7 if aiming else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
+	# A hostile after her and close: a step back, so she sees what is coming.
+	if f.is_inside_tree() and SoftAim.engaged_near(f.get_tree(), f.global_position):
+		target_length += SoftAim.PULL_BACK
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
 	# The arm and the shoulder ease on real seconds, so the aim framing

@@ -166,7 +166,8 @@ func _process(delta: float) -> void:
 	if look != Vector2.ZERO and StoryControl.can_look():
 		# Real seconds: Focus and hit-stop slow the world, never her aim (the
 		# mouse is event-based and already is).
-		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale()
+		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale() \
+				* _stick_friction()
 		_look(look.x * s, look.y * s)
 	sidestep.wait(TimeScale.real(delta), hit_stop != null and hit_stop.active())
 	camera_control.update(delta)
@@ -384,6 +385,13 @@ func _try_mantle() -> bool:
 ## Look speed is lower with the bow raised (BowTuning.aim_sensitivity).
 func _aim_look_scale() -> float:
 	return bow_controller.tuning.aim_sensitivity if is_aiming else 1.0
+
+
+## On a pad with the bow raised, her aim slows as it crosses a hostile (SoftAim).
+func _stick_friction() -> float:
+	if not _bow_raised() or camera == null:
+		return 1.0
+	return SoftAim.friction(get_tree(), camera.global_position, -camera.global_basis.z)
 
 
 ## Player look input (already scaled); applies the invert settings.
