@@ -23,7 +23,7 @@ waits on the class cache). `h.dispose()` in `after_all`.
   each returns true once she has control (`has_control()`). `shutdown()`.
 - Input (all through `Input.parse_input_event`, the real road):
   `press(action, frames)`, `hold(action)`, `release(action)`,
-  `hold_for(action, physics_frames)`, `release_all()`; left stick `stick(v)`,
+  `hold_for(action, physics_frames)`, `settle()` (wait until parsed input has reached the game), `release_all()`; left stick `stick(v)`,
   `stick_toward(point, amount)` (under 0.5 walks); right stick `look_stick(v)`,
   `look_toward(point)`; `mouse_move(rel)`. `event_for(action)` builds the
   player's first binding: key, else mouse button, else pad button.

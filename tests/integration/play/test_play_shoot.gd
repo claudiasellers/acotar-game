@@ -91,7 +91,8 @@ func _play_the_bow() -> void:
 	await h.press(&"fire", 2)
 	assert_eq(fired.size(), 1, "one click looses one arrow")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 1, "and costs one arrow")
-	assert_almost_eq(fired[0], bc.bow.max_speed, bc.bow.max_speed * 0.02, "at full power")
+	if fired.size() > 0:
+		assert_almost_eq(fired[0], bc.bow.max_speed, bc.bow.max_speed * 0.02, "at full power")
 
 	# After a shot the bow is down although aim is still held; clicks do nothing.
 	assert_false(bc.is_aiming, "after a shot the bow comes down")
@@ -102,18 +103,21 @@ func _play_the_bow() -> void:
 
 	# A fresh press of aim raises it again and one more click looses one more.
 	h.release(&"aim")
-	await wait_physics_frames(3)
+	await h.settle()
+	await wait_physics_frames(2)
 	assert_true(await _raise_and_nock(), "a fresh aim press raises and nocks again")
 	await h.press(&"fire", 2)
 	assert_eq(fired.size(), 2, "a second click looses a second arrow")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 2, "two arrows spent")
 	h.release(&"aim")
-	await wait_physics_frames(3)
+	await h.settle()
+	await wait_physics_frames(2)
 
 	# Raise and let go: the bow lowers and looses nothing.
 	assert_true(await _raise_and_nock(), "raised and nocked for the third time")
 	h.release(&"aim")
-	await wait_physics_frames(3)
+	await h.settle()
+	await wait_physics_frames(2)
 	assert_false(bc.is_aiming, "letting go of aim lowers the bow")
 	assert_eq(fired.size(), 2, "and looses nothing")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 2, "no arrow spent")
