@@ -1,0 +1,9 @@
+from ui-frame
+quality look
+shot title res://tools/pause_menu_shot.tscn title {out}/title_shut.png
+shot title_load res://tools/pause_menu_shot.tscn title_load {out}/title_stories.png
+shot title_ask res://tools/pause_menu_shot.tscn title_overwrite {out}/title_ask.png
+shot lines_human res://tools/ui/line_probe.tscn {out} p1_woods
+shot lines_spring res://tools/ui/line_probe.tscn {out} p3_house
+shot pages res://tools/ui/loose_page_probe.tscn {out} p3_house
+shot notices res://tools/ui/notice_probe.tscn {out} p3_house
