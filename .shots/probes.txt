@@ -1,0 +1,1 @@
+shot opening res://tools/playtest/opening_hunt_clip.tscn -- --out={out}/report.json
