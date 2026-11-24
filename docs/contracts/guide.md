@@ -19,7 +19,7 @@ One row, "Feyre's thoughts", three choices from `GuideSettings.LABELS`:
 
 ## On screen (L77, step 7c)
 A thought is a line in the Thought voice of `LinePresenter` (`docs/contracts/ui-frame.md`, "Line voices"):
-the slip of her page in the lane, like every other thought she has. `GuideJournal.show_thought(thread, tier, asked)`
-shows it and `GuideJournal.line` is its text; `can_show()` is false while play isn't calm or another line has the
-lane. The bookmark (her whorl on a dark tab, the G key under it) rests in `HudLayout`'s `THOUGHT` zone, glows while
+the slip of her page in the top left corner beside her bookmark, like every other thought she has. `GuideJournal.show_thought(thread, tier, asked)`
+shows it and `GuideJournal.line` is its text; `can_show()` is false while play isn't calm or any other
+words are up. The bookmark (her whorl on a dark tab, the G key under it) rests in `HudLayout`'s `THOUGHT` zone, glows while
 the current need's thought is unread, and can be clicked. G brings the thought back; again while it shows, a plainer one.
