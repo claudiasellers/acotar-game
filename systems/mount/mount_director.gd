@@ -62,7 +62,7 @@ const LOOK_GRACE := 0.8
 const TRIGGER_SWEEP := 0.1
 const PROMPT_RADIUS := 3.0
 const DELTAS := &"mount"
-const HINT := "Whistle for her with H (share on a pad), and she'll come."
+const HINT := "Whistle for her with %s, and she'll come."
 
 var data: MountData = DATA
 var mare: MareMount
@@ -599,7 +599,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
-		PickupLog.of(get_tree()).note(HINT)
+		PickupLog.of(get_tree()).note(HINT % KeyPrompt.key(ACTION))
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
 		PickupLog.of(get_tree()).note(TEND_HINT)
