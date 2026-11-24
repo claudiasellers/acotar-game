@@ -4,13 +4,15 @@
 ## Writes mouth_uv.png: one row per character, one column per pose.
 extends Node
 
-const TILE := Vector2i(640, 640)
+const TILE := Vector2i(480, 480)
 const CAST := [["feyre", "res://characters/feyre/feyre.tscn"],
 	["tamlin", "res://characters/tamlin/tamlin_model.tscn"],
 	["lucien", "res://characters/lucien/lucien_model.tscn"],
 	["nesta", "res://characters/nesta/nesta_model.tscn"],
 	["elain", "res://characters/elain/elain_model.tscn"],
-	["rhysand", "res://characters/rhysand/rhysand_model.tscn"]]
+	["rhysand", "res://characters/rhysand/rhysand_model.tscn"],
+	["alis", "res://characters/alis/alis_model.tscn"],
+	["father", "res://characters/father/father_model.tscn"]]
 const POSES := [{}, {"vis_AA": 1.0}, {"lip_press": 1.0}, {"vis_E": 1.0, "smile": 0.5}]
 
 var _cam: Camera3D
@@ -70,7 +72,7 @@ func _stage() -> void:
 	rim.rotation_degrees = Vector3(-20, 150, 0)
 	add_child(rim)
 	_cam = Camera3D.new()
-	_cam.fov = 22.0
+	_cam.fov = 9.0      # L79-2: a tighter crop, the mouth fills the tile
 	add_child(_cam)
 	_cam.make_current()
 
