@@ -1,0 +1,3179 @@
+{
+"col_acorn_cap": {
+"cat": "items",
+"file": "data/collectibles/col_acorn_cap.tres",
+"name": "Acorn cap",
+"desc": "A perfect little cup.",
+"hex": "#8B6B3E",
+"icon": "berry",
+"mesh": ""
+},
+"col_acorn_carved": {
+"cat": "items",
+"file": "data/collectibles/col_acorn_carved.tres",
+"name": "Carved acorn",
+"desc": "A tiny face carved into it.",
+"hex": "#8B6B3E",
+"icon": "trinket",
+"mesh": ""
+},
+"col_antler_tine": {
+"cat": "items",
+"file": "data/collectibles/col_antler_tine.tres",
+"name": "Antler tine",
+"desc": "A tip snapped from a shed antler.",
+"hex": "#D8CBB2",
+"icon": "twig",
+"mesh": ""
+},
+"col_beetle_jewel": {
+"cat": "items",
+"file": "data/collectibles/col_beetle_jewel.tres",
+"name": "Jewel beetle wing",
+"desc": "Iridescent green.",
+"hex": "#2E8B57",
+"icon": "gem",
+"mesh": ""
+},
+"col_blighted_bloom": {
+"cat": "items",
+"file": "data/collectibles/col_blighted_bloom.tres",
+"name": "Petrified bloom",
+"desc": "A rose turned to grey stone. It's cold.",
+"hex": "#6E6A5F",
+"icon": "flower",
+"mesh": ""
+},
+"col_blue_jay_feather": {
+"cat": "items",
+"file": "data/collectibles/col_blue_jay_feather.tres",
+"name": "Blue jay feather",
+"desc": "Blue on one side, grey on the other.",
+"hex": "#3F6FB5",
+"icon": "feather",
+"mesh": ""
+},
+"col_bone_bleached": {
+"cat": "items",
+"file": "data/collectibles/col_bone_bleached.tres",
+"name": "Bleached bone",
+"desc": "Small, white, unsettling.",
+"hex": "#EAE5D8",
+"icon": "twig",
+"mesh": ""
+},
+"col_bone_charm": {
+"cat": "items",
+"file": "data/collectibles/col_bone_charm.tres",
+"name": "Bone charm",
+"desc": "A carved knot of bone on a thong.",
+"hex": "#E8E0CC",
+"icon": "trinket",
+"mesh": ""
+},
+"col_calanmai_ribbon": {
+"cat": "items",
+"file": "data/collectibles/col_calanmai_ribbon.tres",
+"name": "Calanmai ribbon",
+"desc": "Singed at one end.",
+"hex": "#C0392B",
+"icon": "trinket",
+"mesh": ""
+},
+"col_candle_stub": {
+"cat": "items",
+"file": "data/collectibles/col_candle_stub.tres",
+"name": "Candle stub",
+"desc": "Beeswax, still faintly sweet.",
+"hex": "#E9D8A6",
+"icon": "trinket",
+"mesh": ""
+},
+"col_carved_bird": {
+"cat": "items",
+"file": "data/collectibles/col_carved_bird.tres",
+"name": "Carved wooden bird",
+"desc": "One of her father's figures, unsold.",
+"hex": "#B48A5A",
+"icon": "trinket",
+"mesh": ""
+},
+"col_coin_old": {
+"cat": "items",
+"file": "data/collectibles/col_coin_old.tres",
+"name": "Old copper coin",
+"desc": "Older than the Wall, maybe.",
+"hex": "#B87333",
+"icon": "trinket",
+"mesh": ""
+},
+"col_dandelion_clock": {
+"cat": "items",
+"file": "data/collectibles/col_dandelion_clock.tres",
+"name": "Faelight seed head",
+"desc": "Held carefully, it glows for a day.",
+"hex": "#FFF4B0",
+"icon": "flower",
+"mesh": ""
+},
+"col_driftwood": {
+"cat": "items",
+"file": "data/collectibles/col_driftwood.tres",
+"name": "Driftwood",
+"desc": "Silver and smooth.",
+"hex": "#B9B2A4",
+"icon": "twig",
+"mesh": ""
+},
+"col_fae_bell": {
+"cat": "items",
+"file": "data/collectibles/col_fae_bell.tres",
+"name": "Tiny bell",
+"desc": "Rings without being touched, sometimes.",
+"hex": "#E3C46B",
+"icon": "trinket",
+"mesh": ""
+},
+"col_feather_heron": {
+"cat": "items",
+"file": "data/collectibles/col_feather_heron.tres",
+"name": "Heron feather",
+"desc": "Slate grey and soft.",
+"hex": "#8A96A0",
+"icon": "feather",
+"mesh": ""
+},
+"col_feather_kingfisher": {
+"cat": "items",
+"file": "data/collectibles/col_feather_kingfisher.tres",
+"name": "Kingfisher feather",
+"desc": "A flash of impossible blue.",
+"hex": "#1F8FBF",
+"icon": "feather",
+"mesh": ""
+},
+"col_feather_pheasant": {
+"cat": "items",
+"file": "data/collectibles/col_feather_pheasant.tres",
+"name": "Pheasant feather",
+"desc": "Copper and black bars.",
+"hex": "#A65A2A",
+"icon": "feather",
+"mesh": ""
+},
+"col_feather_swan": {
+"cat": "items",
+"file": "data/collectibles/col_feather_swan.tres",
+"name": "Swan feather",
+"desc": "Long, white, perfect.",
+"hex": "#F7F7F2",
+"icon": "feather",
+"mesh": ""
+},
+"col_glass_bead": {
+"cat": "items",
+"file": "data/collectibles/col_glass_bead.tres",
+"name": "Sea-green glass bead",
+"desc": "Fae work: there is a light inside it.",
+"hex": "#7FD1B9",
+"icon": "gem",
+"mesh": ""
+},
+"col_heart_stone": {
+"cat": "items",
+"file": "data/collectibles/col_heart_stone.tres",
+"name": "Heart-shaped stone",
+"desc": "She'd scoff at it. She keeps it.",
+"hex": "#A09080",
+"icon": "gem",
+"mesh": ""
+},
+"col_horseshoe": {
+"cat": "items",
+"file": "data/collectibles/col_horseshoe.tres",
+"name": "Old horseshoe",
+"desc": "Iron. Villagers nail these over doors.",
+"hex": "#5B5B60",
+"icon": "trinket",
+"mesh": ""
+},
+"col_leaf_gilded": {
+"cat": "items",
+"file": "data/collectibles/col_leaf_gilded.tres",
+"name": "Gilded leaf",
+"desc": "Real gold leaf, or a glamour.",
+"hex": "#D4AF37",
+"icon": "leaf",
+"mesh": ""
+},
+"col_mask_shard": {
+"cat": "items",
+"file": "data/collectibles/col_mask_shard.tres",
+"name": "Mask shard",
+"desc": "A chip of gilded mask from the revels.",
+"hex": "#D4AF37",
+"icon": "gem",
+"mesh": ""
+},
+"col_mural_chip": {
+"cat": "items",
+"file": "data/collectibles/col_mural_chip.tres",
+"name": "Mural chip",
+"desc": "Painted plaster from the old shrines: a human hand in chains.",
+"hex": "#A67B5B",
+"icon": "trinket",
+"mesh": ""
+},
+"col_odd_stone": {
+"cat": "items",
+"file": "data/collectibles/col_odd_stone.tres",
+"name": "Odd stone",
+"desc": "A stone with a hole worn clean through.",
+"hex": "#8C8C8C",
+"icon": "gem",
+"mesh": ""
+},
+"col_old_arrowhead": {
+"cat": "items",
+"file": "data/collectibles/col_old_arrowhead.tres",
+"name": "Old arrowhead",
+"desc": "Iron, rusted, from some hunt long ago.",
+"hex": "#6D5A4A",
+"icon": "trinket",
+"mesh": ""
+},
+"col_painted_pebble": {
+"cat": "items",
+"file": "data/collectibles/col_painted_pebble.tres",
+"name": "Painted pebble",
+"desc": "Someone painted a tiny flower on it. Maybe her, years ago.",
+"hex": "#D9A0A0",
+"icon": "gem",
+"mesh": ""
+},
+"col_pinecone": {
+"cat": "items",
+"file": "data/collectibles/col_pinecone.tres",
+"name": "Pinecone",
+"desc": "Perfectly whole.",
+"hex": "#6B4B2A",
+"icon": "twig",
+"mesh": ""
+},
+"col_ribbon_scrap": {
+"cat": "items",
+"file": "data/collectibles/col_ribbon_scrap.tres",
+"name": "Ribbon scrap",
+"desc": "A bit of Nesta's ribbon. She'd never admit it was hers.",
+"hex": "#C06C84",
+"icon": "trinket",
+"mesh": ""
+},
+"col_river_glass": {
+"cat": "items",
+"file": "data/collectibles/col_river_glass.tres",
+"name": "River glass",
+"desc": "Frosted green glass, smooth as soap.",
+"hex": "#9FD8C0",
+"icon": "gem",
+"mesh": ""
+},
+"col_river_pearl": {
+"cat": "items",
+"file": "data/collectibles/col_river_pearl.tres",
+"name": "River pearl",
+"desc": "Lumpy and lovely.",
+"hex": "#EFE9DF",
+"icon": "gem",
+"mesh": ""
+},
+"col_robin_egg_shell": {
+"cat": "items",
+"file": "data/collectibles/col_robin_egg_shell.tres",
+"name": "Robin's egg shell",
+"desc": "The exact blue she can never mix.",
+"hex": "#9FD3E6",
+"icon": "shell",
+"mesh": ""
+},
+"col_rose_petal_pressed": {
+"cat": "items",
+"file": "data/collectibles/col_rose_petal_pressed.tres",
+"name": "Pressed rose petal",
+"desc": "Red, dried thin as paper.",
+"hex": "#B8203A",
+"icon": "flower",
+"mesh": ""
+},
+"col_seed_packet": {
+"cat": "items",
+"file": "data/collectibles/col_seed_packet.tres",
+"name": "Elain's seed packet",
+"desc": "Paper twist of seeds for a garden that might grow.",
+"hex": "#C9B37A",
+"icon": "trinket",
+"mesh": ""
+},
+"col_seed_pod": {
+"cat": "items",
+"file": "data/collectibles/col_seed_pod.tres",
+"name": "Seed pod",
+"desc": "Rattles when shaken.",
+"hex": "#A08A5A",
+"icon": "berry",
+"mesh": ""
+},
+"col_shell_river_mussel": {
+"cat": "items",
+"file": "data/collectibles/col_shell_river_mussel.tres",
+"name": "Mussel shell",
+"desc": "Mother-of-pearl inside.",
+"hex": "#4A5A6A",
+"icon": "shell",
+"mesh": ""
+},
+"col_silver_leaf": {
+"cat": "items",
+"file": "data/collectibles/col_silver_leaf.tres",
+"name": "Silver leaf",
+"desc": "A leaf that dried silver instead of brown.",
+"hex": "#C9CFD6",
+"icon": "leaf",
+"mesh": ""
+},
+"col_snail_spiral": {
+"cat": "items",
+"file": "data/collectibles/col_snail_spiral.tres",
+"name": "Spiral shell",
+"desc": "A perfect spiral, pink at the lip.",
+"hex": "#ECCFC0",
+"icon": "shell",
+"mesh": ""
+},
+"col_snake_skin": {
+"cat": "items",
+"file": "data/collectibles/col_snake_skin.tres",
+"name": "Shed snake skin",
+"desc": "Whole, papery, patterned.",
+"hex": "#CBBF9A",
+"icon": "pelt",
+"mesh": ""
+},
+"col_solstice_bead": {
+"cat": "items",
+"file": "data/collectibles/col_solstice_bead.tres",
+"name": "Solstice bead",
+"desc": "Gold glass, warm in the hand.",
+"hex": "#E8B730",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_amber": {
+"cat": "items",
+"file": "data/collectibles/col_stone_amber.tres",
+"name": "Amber",
+"desc": "A gnat caught in gold.",
+"hex": "#E0952B",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_fossil": {
+"cat": "items",
+"file": "data/collectibles/col_stone_fossil.tres",
+"name": "Fossil",
+"desc": "A shell from before the sea left.",
+"hex": "#BFAE92",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_garnet": {
+"cat": "items",
+"file": "data/collectibles/col_stone_garnet.tres",
+"name": "Garnet",
+"desc": "A drop of dark red.",
+"hex": "#7B1E2B",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_obsidian": {
+"cat": "items",
+"file": "data/collectibles/col_stone_obsidian.tres",
+"name": "Obsidian",
+"desc": "Black glass from the Rite hills.",
+"hex": "#1B1B22",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_quartz": {
+"cat": "items",
+"file": "data/collectibles/col_stone_quartz.tres",
+"name": "Quartz",
+"desc": "Clear as frozen water.",
+"hex": "#EEF0F2",
+"icon": "gem",
+"mesh": ""
+},
+"col_stone_starglass": {
+"cat": "items",
+"file": "data/collectibles/col_stone_starglass.tres",
+"name": "Starglass",
+"desc": "Glows faintly at night.",
+"hex": "#CFE0FF",
+"icon": "gem",
+"mesh": ""
+},
+"col_wool_tuft": {
+"cat": "items",
+"file": "data/collectibles/col_wool_tuft.tres",
+"name": "Wool tuft",
+"desc": "Caught on a thorn by the shepherds' path.",
+"hex": "#EFE8DC",
+"icon": "pelt",
+"mesh": ""
+},
+"col_wren_feather": {
+"cat": "items",
+"file": "data/collectibles/col_wren_feather.tres",
+"name": "Wren feather",
+"desc": "Tiny and barred. Too small to fletch, too pretty to drop.",
+"hex": "#8A6A48",
+"icon": "feather",
+"mesh": ""
+},
+"ing_acorn": {
+"cat": "items",
+"file": "data/ingredients/ing_acorn.tres",
+"name": "Acorns",
+"desc": "Bitter until leached. The hungry eat them anyway.",
+"hex": "#8B6B3E",
+"icon": "berry",
+"mesh": ""
+},
+"ing_ash_wood": {
+"cat": "items",
+"file": "data/ingredients/ing_ash_wood.tres",
+"name": "Ash wood",
+"desc": "Pale, straight-grained ash. The one wood the fae fear.",
+"hex": "#D9CBB0",
+"icon": "twig",
+"mesh": ""
+},
+"ing_ashen_rose": {
+"cat": "items",
+"file": "data/ingredients/ing_ashen_rose.tres",
+"name": "Ashen rose",
+"desc": "A rose drained of colour.",
+"hex": "#8D8A86",
+"icon": "flower",
+"mesh": ""
+},
+"ing_bilberry": {
+"cat": "items",
+"file": "data/ingredients/ing_bilberry.tres",
+"name": "Bilberry",
+"desc": "Dusky berries that stain the fingers.",
+"hex": "#3B3F78",
+"icon": "berry",
+"mesh": ""
+},
+"ing_birch_bark": {
+"cat": "items",
+"file": "data/ingredients/ing_birch_bark.tres",
+"name": "Birch bark",
+"desc": "Papery bark that lights even when damp.",
+"hex": "#EAE7DF",
+"icon": "twig",
+"mesh": ""
+},
+"ing_blackberry": {
+"cat": "items",
+"file": "data/ingredients/ing_blackberry.tres",
+"name": "Blackberry",
+"desc": "In winter, a few shrivelled berries still on the cane. In Spring, hedges heavy with them.",
+"hex": "#2B1B3A",
+"icon": "berry",
+"mesh": ""
+},
+"ing_blighted_petals": {
+"cat": "items",
+"file": "data/ingredients/ing_blighted_petals.tres",
+"name": "Blighted petals",
+"desc": "Grey petals that crumble like ash.",
+"hex": "#6E6A5F",
+"icon": "flower",
+"mesh": ""
+},
+"ing_bulrush_root": {
+"cat": "items",
+"file": "data/ingredients/ing_bulrush_root.tres",
+"name": "Bulrush root",
+"desc": "Starchy root from the shallows.",
+"hex": "#C9B38A",
+"icon": "twig",
+"mesh": ""
+},
+"ing_chaga": {
+"cat": "items",
+"file": "data/ingredients/ing_chaga.tres",
+"name": "Chaga",
+"desc": "A charred-looking growth on birch; makes a warming tea.",
+"hex": "#3A2A1E",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_chalk": {
+"cat": "items",
+"file": "data/ingredients/ing_chalk.tres",
+"name": "Chalk",
+"desc": "Soft white stone; a white for painting.",
+"hex": "#F2F0E8",
+"icon": "gem",
+"mesh": ""
+},
+"ing_chamomile": {
+"cat": "items",
+"file": "data/ingredients/ing_chamomile.tres",
+"name": "Chamomile",
+"desc": "Apple-scented daisies.",
+"hex": "#FBF5D6",
+"icon": "flower",
+"mesh": ""
+},
+"ing_chanterelle": {
+"cat": "items",
+"file": "data/ingredients/ing_chanterelle.tres",
+"name": "Chanterelle",
+"desc": "Apricot-scented gold mushrooms.",
+"hex": "#F0A830",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_charcoal": {
+"cat": "items",
+"file": "data/ingredients/ing_charcoal.tres",
+"name": "Charcoal",
+"desc": "From the burnt estate's beams. Draws, and burns again.",
+"hex": "#1C1C1C",
+"icon": "gem",
+"mesh": ""
+},
+"ing_cherry": {
+"cat": "items",
+"file": "data/ingredients/ing_cherry.tres",
+"name": "Cherry",
+"desc": "Dark sweet cherries.",
+"hex": "#A31621",
+"icon": "berry",
+"mesh": ""
+},
+"ing_cherry_blossom": {
+"cat": "items",
+"file": "data/ingredients/ing_cherry_blossom.tres",
+"name": "Orchard blossom",
+"desc": "Blossom that never quite falls.",
+"hex": "#F7C6D4",
+"icon": "flower",
+"mesh": ""
+},
+"ing_clay": {
+"cat": "items",
+"file": "data/ingredients/ing_clay.tres",
+"name": "Clay",
+"desc": "Riverbank clay for sealing and for binding pigment.",
+"hex": "#9C8770",
+"icon": "gem",
+"mesh": ""
+},
+"ing_clover": {
+"cat": "items",
+"file": "data/ingredients/ing_clover.tres",
+"name": "Clover",
+"desc": "Sweet pink heads in the grass.",
+"hex": "#E4A5C0",
+"icon": "flower",
+"mesh": ""
+},
+"ing_cornflower": {
+"cat": "items",
+"file": "data/ingredients/ing_cornflower.tres",
+"name": "Cornflower",
+"desc": "The bluest blue in the meadows.",
+"hex": "#4F74D9",
+"icon": "flower",
+"mesh": ""
+},
+"ing_cowslip": {
+"cat": "items",
+"file": "data/ingredients/ing_cowslip.tres",
+"name": "Cowslip",
+"desc": "Nodding yellow bells on the downs.",
+"hex": "#F2D24B",
+"icon": "flower",
+"mesh": ""
+},
+"ing_crocus": {
+"cat": "items",
+"file": "data/ingredients/ing_crocus.tres",
+"name": "Crocus",
+"desc": "The first purple through the leaf litter.",
+"hex": "#A58FE0",
+"icon": "flower",
+"mesh": ""
+},
+"ing_crow_feather": {
+"cat": "items",
+"file": "data/ingredients/ing_crow_feather.tres",
+"name": "Crow feather",
+"desc": "Common, black, serviceable fletching.",
+"hex": "#1A1A22",
+"icon": "feather",
+"mesh": ""
+},
+"ing_dandelion": {
+"cat": "items",
+"file": "data/ingredients/ing_dandelion.tres",
+"name": "Dandelion",
+"desc": "Bitter greens, bright heads.",
+"hex": "#F7D038",
+"icon": "flower",
+"mesh": ""
+},
+"ing_dead_chicken": {
+"cat": "items",
+"file": "data/ingredients/ing_dead_chicken.tres",
+"name": "Dead chicken",
+"desc": "From the manor kitchen's larder. Bait for something that can't resist fresh meat.",
+"hex": "#E9DCC4",
+"icon": "meat",
+"mesh": ""
+},
+"ing_dreamcap": {
+"cat": "items",
+"file": "data/ingredients/ing_dreamcap.tres",
+"name": "Dreamcap",
+"desc": "A pale mushroom that only shows at night.",
+"hex": "#A9A2E8",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_elderflower": {
+"cat": "items",
+"file": "data/ingredients/ing_elderflower.tres",
+"name": "Elderflower",
+"desc": "Creamy umbels at the orchard's edge.",
+"hex": "#F6F1D8",
+"icon": "flower",
+"mesh": ""
+},
+"ing_ember_maple_leaf": {
+"cat": "items",
+"file": "data/ingredients/ing_ember_maple_leaf.tres",
+"name": "Ember maple leaf",
+"desc": "A leaf from over the Autumn border, warm to touch.",
+"hex": "#C8401E",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_faelight_dandelion": {
+"cat": "items",
+"file": "data/ingredients/ing_faelight_dandelion.tres",
+"name": "Faelight dandelion",
+"desc": "Its seeds drift off as little lights.",
+"hex": "#FFF4B0",
+"icon": "flower",
+"mesh": ""
+},
+"ing_fire_lily": {
+"cat": "items",
+"file": "data/ingredients/ing_fire_lily.tres",
+"name": "Fire lily",
+"desc": "Blooms around the bonfire fields.",
+"hex": "#F26A1B",
+"icon": "flower",
+"mesh": ""
+},
+"ing_flint": {
+"cat": "items",
+"file": "data/ingredients/ing_flint.tres",
+"name": "Flint",
+"desc": "Knaps into arrowheads, and strikes sparks.",
+"hex": "#4A4A52",
+"icon": "gem",
+"mesh": ""
+},
+"ing_fly_agaric": {
+"cat": "items",
+"file": "data/ingredients/ing_fly_agaric.tres",
+"name": "Fly agaric",
+"desc": "Red cap, white spots. No.",
+"hex": "#D7263D",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_foxglove": {
+"cat": "items",
+"file": "data/ingredients/ing_foxglove.tres",
+"name": "Foxglove",
+"desc": "Beautiful and poisonous. For steeps, not stews.",
+"hex": "#B45FA6",
+"icon": "flower",
+"mesh": ""
+},
+"ing_frozen_reed": {
+"cat": "items",
+"file": "data/ingredients/ing_frozen_reed.tres",
+"name": "Frozen reeds",
+"desc": "Hollow reeds locked in the river ice; good for snare work and whistles.",
+"hex": "#B5A77A",
+"icon": "twig",
+"mesh": ""
+},
+"ing_glowcap": {
+"cat": "items",
+"file": "data/ingredients/ing_glowcap.tres",
+"name": "Glowcap",
+"desc": "A mushroom that gives off a soft green light.",
+"hex": "#9FE3C4",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_grey_lichen": {
+"cat": "items",
+"file": "data/ingredients/ing_grey_lichen.tres",
+"name": "Grey lichen",
+"desc": "Creeps over everything in the blight.",
+"hex": "#8A8C84",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_hare_pelt": {
+"cat": "items",
+"file": "data/ingredients/ing_hare_pelt.tres",
+"name": "Hare pelt",
+"desc": "A soft pelt; lines a glove.",
+"hex": "#B3A48A",
+"icon": "pelt",
+"mesh": ""
+},
+"ing_hawk_feather": {
+"cat": "items",
+"file": "data/ingredients/ing_hawk_feather.tres",
+"name": "Hawk feather",
+"desc": "Stiff barred flight feather. True fletching.",
+"hex": "#8B5A2B",
+"icon": "feather",
+"mesh": ""
+},
+"ing_hawthorn_haw": {
+"cat": "items",
+"file": "data/ingredients/ing_hawthorn_haw.tres",
+"name": "Hawthorn haws",
+"desc": "Mealy red haws left on the hedge for the birds.",
+"hex": "#9B1D20",
+"icon": "berry",
+"mesh": ""
+},
+"ing_hazelnut": {
+"cat": "items",
+"file": "data/ingredients/ing_hazelnut.tres",
+"name": "Hazelnuts",
+"desc": "A squirrel's cache, found under the snow.",
+"hex": "#A0743F",
+"icon": "berry",
+"mesh": ""
+},
+"ing_heather": {
+"cat": "items",
+"file": "data/ingredients/ing_heather.tres",
+"name": "Heather",
+"desc": "Purple across the fells.",
+"hex": "#9B5A8C",
+"icon": "flower",
+"mesh": ""
+},
+"ing_hide": {
+"cat": "items",
+"file": "data/ingredients/ing_hide.tres",
+"name": "Deer hide",
+"desc": "Scraped and sold, or kept against the cold.",
+"hex": "#8A6A4A",
+"icon": "pelt",
+"mesh": ""
+},
+"ing_hollow_root": {
+"cat": "items",
+"file": "data/ingredients/ing_hollow_root.tres",
+"name": "Hollow-root",
+"desc": "A pale root that swallows sound and scent.",
+"hex": "#8C7B65",
+"icon": "twig",
+"mesh": ""
+},
+"ing_holly_berry": {
+"cat": "items",
+"file": "data/ingredients/ing_holly_berry.tres",
+"name": "Holly berries",
+"desc": "Bright and poisonous. The red is worth crushing for paint.",
+"hex": "#C1121F",
+"icon": "berry",
+"mesh": ""
+},
+"ing_honey": {
+"cat": "items",
+"file": "data/ingredients/ing_honey.tres",
+"name": "Honey",
+"desc": "Sweetness, and a binder for salves.",
+"hex": "#D9A521",
+"icon": "drop",
+"mesh": ""
+},
+"ing_honeyplum": {
+"cat": "items",
+"file": "data/ingredients/ing_honeyplum.tres",
+"name": "Honeyplum",
+"desc": "Plums that taste of honey.",
+"hex": "#C25A8A",
+"icon": "berry",
+"mesh": ""
+},
+"ing_honeysuckle": {
+"cat": "items",
+"file": "data/ingredients/ing_honeysuckle.tres",
+"name": "Honeysuckle",
+"desc": "Sweet nectar from the hedges.",
+"hex": "#F2D68A",
+"icon": "flower",
+"mesh": ""
+},
+"ing_ice_moss": {
+"cat": "items",
+"file": "data/ingredients/ing_ice_moss.tres",
+"name": "Ice moss",
+"desc": "Silvery moss in the river's frozen spray.",
+"hex": "#9CB7B0",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_iron_filings": {
+"cat": "items",
+"file": "data/ingredients/ing_iron_filings.tres",
+"name": "Iron filings",
+"desc": "Villagers swear iron wards off faeries. It doesn't; only humans believe it.",
+"hex": "#5B5B60",
+"icon": "gem",
+"mesh": ""
+},
+"ing_juniper_berry": {
+"cat": "items",
+"file": "data/ingredients/ing_juniper_berry.tres",
+"name": "Juniper berries",
+"desc": "Resinous blue berries that clear the head.",
+"hex": "#3D4F7A",
+"icon": "berry",
+"mesh": ""
+},
+"ing_lapis_shard": {
+"cat": "items",
+"file": "data/ingredients/ing_lapis_shard.tres",
+"name": "Lapis shard",
+"desc": "Ultramarine, the rarest blue.",
+"hex": "#26619C",
+"icon": "gem",
+"mesh": ""
+},
+"ing_lavender": {
+"cat": "items",
+"file": "data/ingredients/ing_lavender.tres",
+"name": "Lavender",
+"desc": "Masks scent; calms the hands.",
+"hex": "#9A83C9",
+"icon": "flower",
+"mesh": ""
+},
+"ing_lilac": {
+"cat": "items",
+"file": "data/ingredients/ing_lilac.tres",
+"name": "Lilac",
+"desc": "The scent sharpens everything.",
+"hex": "#C8A2C8",
+"icon": "flower",
+"mesh": ""
+},
+"ing_madder": {
+"cat": "items",
+"file": "data/ingredients/ing_madder.tres",
+"name": "Madder root",
+"desc": "A root that bleeds red dye.",
+"hex": "#A83226",
+"icon": "twig",
+"mesh": ""
+},
+"ing_marsh_marigold": {
+"cat": "items",
+"file": "data/ingredients/ing_marsh_marigold.tres",
+"name": "Marsh marigold",
+"desc": "Gold cups at the lake margins.",
+"hex": "#F6C12B",
+"icon": "flower",
+"mesh": ""
+},
+"ing_meadowsweet": {
+"cat": "items",
+"file": "data/ingredients/ing_meadowsweet.tres",
+"name": "Meadowsweet",
+"desc": "Frothy cream flowers in damp meadows.",
+"hex": "#F4ECD2",
+"icon": "flower",
+"mesh": ""
+},
+"ing_mirror_reed": {
+"cat": "items",
+"file": "data/ingredients/ing_mirror_reed.tres",
+"name": "Mirror reed",
+"desc": "Reeds that hold a reflection a moment too long.",
+"hex": "#BCD6D0",
+"icon": "twig",
+"mesh": ""
+},
+"ing_mistletoe": {
+"cat": "items",
+"file": "data/ingredients/ing_mistletoe.tres",
+"name": "Mistletoe",
+"desc": "Villagers say the fae love it. Feyre leaves it where it grows, mostly.",
+"hex": "#D7E2C0",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_moonflower": {
+"cat": "items",
+"file": "data/ingredients/ing_moonflower.tres",
+"name": "Moonflower",
+"desc": "Opens only at night by the Starlight Pool.",
+"hex": "#EEF2FF",
+"icon": "flower",
+"mesh": ""
+},
+"ing_moss": {
+"cat": "items",
+"file": "data/ingredients/ing_moss.tres",
+"name": "Starmoss",
+"desc": "Moss flecked with pinprick lights.",
+"hex": "#7FBF9A",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_mugwort": {
+"cat": "items",
+"file": "data/ingredients/ing_mugwort.tres",
+"name": "Mugwort",
+"desc": "Grows thick around the old shrines.",
+"hex": "#8FA38A",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_nettle": {
+"cat": "items",
+"file": "data/ingredients/ing_nettle.tres",
+"name": "Nettle",
+"desc": "Stings, then feeds.",
+"hex": "#3F6B35",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_nightshade": {
+"cat": "items",
+"file": "data/ingredients/ing_nightshade.tres",
+"name": "Nightshade",
+"desc": "Purple berries at the blight's edge.",
+"hex": "#4B2A5C",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_oak_gall": {
+"cat": "items",
+"file": "data/ingredients/ing_oak_gall.tres",
+"name": "Oak gall",
+"desc": "Hard little galls; good for ink.",
+"hex": "#8A6D45",
+"icon": "berry",
+"mesh": ""
+},
+"ing_old_mans_beard": {
+"cat": "items",
+"file": "data/ingredients/ing_old_mans_beard.tres",
+"name": "Old man's beard",
+"desc": "Grey-green lichen streaming from old branches; packs a wound.",
+"hex": "#B8C4A8",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_owl_feather": {
+"cat": "items",
+"file": "data/ingredients/ing_owl_feather.tres",
+"name": "Owl feather",
+"desc": "Soft-edged. An arrow fletched with it barely whispers.",
+"hex": "#C2A27A",
+"icon": "feather",
+"mesh": ""
+},
+"ing_pine_needles": {
+"cat": "items",
+"file": "data/ingredients/ing_pine_needles.tres",
+"name": "Pine needles",
+"desc": "A bitter, bright tea against the cold.",
+"hex": "#2F5233",
+"icon": "twig",
+"mesh": ""
+},
+"ing_pine_resin": {
+"cat": "items",
+"file": "data/ingredients/ing_pine_resin.tres",
+"name": "Pine resin",
+"desc": "Amber resin for fletching glue and torches.",
+"hex": "#C98D2C",
+"icon": "drop",
+"mesh": ""
+},
+"ing_primrose": {
+"cat": "items",
+"file": "data/ingredients/ing_primrose.tres",
+"name": "Primrose",
+"desc": "Pale yellow, everywhere in Spring.",
+"hex": "#F6E58D",
+"icon": "flower",
+"mesh": ""
+},
+"ing_quince": {
+"cat": "items",
+"file": "data/ingredients/ing_quince.tres",
+"name": "Quince",
+"desc": "Hard and fragrant; sets jellies.",
+"hex": "#E8CF55",
+"icon": "berry",
+"mesh": ""
+},
+"ing_red_ochre": {
+"cat": "items",
+"file": "data/ingredients/ing_red_ochre.tres",
+"name": "Red ochre",
+"desc": "Earth red from the riverbank cut.",
+"hex": "#A4472D",
+"icon": "gem",
+"mesh": ""
+},
+"ing_red_poppy": {
+"cat": "items",
+"file": "data/ingredients/ing_red_poppy.tres",
+"name": "Red poppy",
+"desc": "Papery red, a drowsy sap.",
+"hex": "#D62828",
+"icon": "flower",
+"mesh": ""
+},
+"ing_rite_spring": {
+"cat": "items",
+"file": "data/ingredients/ing_rite_spring.tres",
+"name": "Rite spring water",
+"desc": "From the spring in the cave of the Rite.",
+"hex": "#A9C9D6",
+"icon": "drop",
+"mesh": ""
+},
+"ing_river_silt": {
+"cat": "items",
+"file": "data/ingredients/ing_river_silt.tres",
+"name": "River silt",
+"desc": "Fine silt; an ochre pigment and a binder.",
+"hex": "#9A7B4F",
+"icon": "drop",
+"mesh": ""
+},
+"ing_rose_gold": {
+"cat": "items",
+"file": "data/ingredients/ing_rose_gold.tres",
+"name": "Gold rose",
+"desc": "Rare, deep in the gardens. The colour of a certain mask.",
+"hex": "#E8B730",
+"icon": "flower",
+"mesh": ""
+},
+"ing_rose_hip": {
+"cat": "items",
+"file": "data/ingredients/ing_rose_hip.tres",
+"name": "Rose hips",
+"desc": "Hips only form where time moves: winter hedges, and the blight's edge in Spring.",
+"hex": "#C0392B",
+"icon": "berry",
+"mesh": ""
+},
+"ing_rose_maze_dew": {
+"cat": "items",
+"file": "data/ingredients/ing_rose_maze_dew.tres",
+"name": "Rose-maze dew",
+"desc": "Morning dew gathered in the hedge maze.",
+"hex": "#E8F2F0",
+"icon": "drop",
+"mesh": ""
+},
+"ing_rose_red": {
+"cat": "items",
+"file": "data/ingredients/ing_rose_red.tres",
+"name": "Red rose",
+"desc": "The court's signature bloom. Warm in the hand, somehow.",
+"hex": "#B8203A",
+"icon": "flower",
+"mesh": ""
+},
+"ing_rose_white": {
+"cat": "items",
+"file": "data/ingredients/ing_rose_white.tres",
+"name": "White rose",
+"desc": "Cool petals that settle a racing pulse.",
+"hex": "#F3EFE6",
+"icon": "flower",
+"mesh": ""
+},
+"ing_rowan_berry": {
+"cat": "items",
+"file": "data/ingredients/ing_rowan_berry.tres",
+"name": "Rowan berry",
+"desc": "Bright clusters at the autumn edge.",
+"hex": "#E0521B",
+"icon": "berry",
+"mesh": ""
+},
+"ing_salt": {
+"cat": "items",
+"file": "data/ingredients/ing_salt.tres",
+"name": "Salt",
+"desc": "Bought dear at the market. Keeps meat through the winter.",
+"hex": "#F4F4F4",
+"icon": "drop",
+"mesh": ""
+},
+"ing_shed_antler": {
+"cat": "items",
+"file": "data/ingredients/ing_shed_antler.tres",
+"name": "Shed antler",
+"desc": "Dropped by a stag. Carves into toggles, handles, even points.",
+"hex": "#D8CBB2",
+"icon": "twig",
+"mesh": ""
+},
+"ing_sloe": {
+"cat": "items",
+"file": "data/ingredients/ing_sloe.tres",
+"name": "Sloes",
+"desc": "Frost-sweetened, still mouth-puckering.",
+"hex": "#2E3047",
+"icon": "berry",
+"mesh": ""
+},
+"ing_snail_shell": {
+"cat": "items",
+"file": "data/ingredients/ing_snail_shell.tres",
+"name": "Snail shells",
+"desc": "Ground fine, they make a pearly white.",
+"hex": "#E9DCC6",
+"icon": "shell",
+"mesh": ""
+},
+"ing_snowdrop": {
+"cat": "items",
+"file": "data/ingredients/ing_snowdrop.tres",
+"name": "Snowdrop",
+"desc": "The only flower in the winter forest. Feyre always notices them.",
+"hex": "#F5F8FA",
+"icon": "flower",
+"mesh": ""
+},
+"ing_snowmelt_water": {
+"cat": "items",
+"file": "data/ingredients/ing_snowmelt_water.tres",
+"name": "Snowmelt water",
+"desc": "Melted over the fire, it is the base of every stew.",
+"hex": "#DFEEF7",
+"icon": "drop",
+"mesh": ""
+},
+"ing_spider_silk": {
+"cat": "items",
+"file": "data/ingredients/ing_spider_silk.tres",
+"name": "Spider silk",
+"desc": "Dewy silk from the thorn brakes. Twisted, it makes a fine strong line.",
+"hex": "#F1F1F1",
+"icon": "drop",
+"mesh": ""
+},
+"ing_spring_apple": {
+"cat": "items",
+"file": "data/ingredients/ing_spring_apple.tres",
+"name": "Spring apple",
+"desc": "Crisp, always in season.",
+"hex": "#9CC94A",
+"icon": "berry",
+"mesh": ""
+},
+"ing_starlight_water": {
+"cat": "items",
+"file": "data/ingredients/ing_starlight_water.tres",
+"name": "Starlight water",
+"desc": "Water from the pool at night. Gone flat and ordinary by dawn.",
+"hex": "#CFE0FF",
+"icon": "drop",
+"mesh": ""
+},
+"ing_sweet_woodruff": {
+"cat": "items",
+"file": "data/ingredients/ing_sweet_woodruff.tres",
+"name": "Sweet woodruff",
+"desc": "Smells of new hay once dried.",
+"hex": "#D5EAD0",
+"icon": "twig",
+"mesh": ""
+},
+"ing_thornbriar_sap": {
+"cat": "items",
+"file": "data/ingredients/ing_thornbriar_sap.tres",
+"name": "Thornbriar sap",
+"desc": "Sticky, bitter sap from the thorn brakes.",
+"hex": "#6B4B2A",
+"icon": "drop",
+"mesh": ""
+},
+"ing_tinder_fungus": {
+"cat": "items",
+"file": "data/ingredients/ing_tinder_fungus.tres",
+"name": "Tinder fungus",
+"desc": "Hoof-shaped bracket that holds an ember for hours.",
+"hex": "#7A5A3A",
+"icon": "mushroom",
+"mesh": ""
+},
+"ing_trout": {
+"cat": "items",
+"file": "data/ingredients/ing_trout.tres",
+"name": "Trout",
+"desc": "Speckled trout from the streams, or through the river ice.",
+"hex": "#9AA9A0",
+"icon": "meat",
+"mesh": ""
+},
+"ing_violet": {
+"cat": "items",
+"file": "data/ingredients/ing_violet.tres",
+"name": "Sweet violet",
+"desc": "Shy purple flowers in the glen.",
+"hex": "#7B4FB0",
+"icon": "flower",
+"mesh": ""
+},
+"ing_water_lily": {
+"cat": "items",
+"file": "data/ingredients/ing_water_lily.tres",
+"name": "Water lily",
+"desc": "Opens on the still pools.",
+"hex": "#F6E3EF",
+"icon": "flower",
+"mesh": ""
+},
+"ing_watermint": {
+"cat": "items",
+"file": "data/ingredients/ing_watermint.tres",
+"name": "Water mint",
+"desc": "Crushed underfoot at the stream's edge.",
+"hex": "#4F9A6A",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_wild_garlic": {
+"cat": "items",
+"file": "data/ingredients/ing_wild_garlic.tres",
+"name": "Wild garlic",
+"desc": "Carpets the shade; smells for miles.",
+"hex": "#E9F2DF",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_wild_hyacinth": {
+"cat": "items",
+"file": "data/ingredients/ing_wild_hyacinth.tres",
+"name": "Wild hyacinth",
+"desc": "Bluebells carpet the Border Woods.",
+"hex": "#5A6FD6",
+"icon": "flower",
+"mesh": ""
+},
+"ing_wild_strawberry": {
+"cat": "items",
+"file": "data/ingredients/ing_wild_strawberry.tres",
+"name": "Wild strawberry",
+"desc": "Tiny, sun-warm, everywhere in the meadows.",
+"hex": "#E0393E",
+"icon": "berry",
+"mesh": ""
+},
+"ing_wild_thyme": {
+"cat": "items",
+"file": "data/ingredients/ing_wild_thyme.tres",
+"name": "Wild thyme",
+"desc": "Tiny and fierce-scented.",
+"hex": "#8F7FB0",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_willow_bark": {
+"cat": "items",
+"file": "data/ingredients/ing_willow_bark.tres",
+"name": "Willow bark",
+"desc": "Stream-bank bark that dulls pain when steeped.",
+"hex": "#7D6A4F",
+"icon": "twig",
+"mesh": ""
+},
+"ing_wintergreen": {
+"cat": "items",
+"file": "data/ingredients/ing_wintergreen.tres",
+"name": "Wintergreen",
+"desc": "Glossy leaves under the snow, with a sharp minty bite.",
+"hex": "#2E6B4F",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_wisteria": {
+"cat": "items",
+"file": "data/ingredients/ing_wisteria.tres",
+"name": "Wisteria",
+"desc": "Lilac drapes over the manor walls.",
+"hex": "#B9A0E0",
+"icon": "flower",
+"mesh": ""
+},
+"ing_woad": {
+"cat": "items",
+"file": "data/ingredients/ing_woad.tres",
+"name": "Woad",
+"desc": "Dried leaves that make a deep blue.",
+"hex": "#2F4F8F",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_wolf_pelt": {
+"cat": "items",
+"file": "data/ingredients/ing_wolf_pelt.tres",
+"name": "Wolf pelt",
+"desc": "A grey winter pelt. Worth good coin at the market.",
+"hex": "#6B6B6B",
+"icon": "pelt",
+"mesh": ""
+},
+"ing_wood_sorrel": {
+"cat": "items",
+"file": "data/ingredients/ing_wood_sorrel.tres",
+"name": "Wood sorrel",
+"desc": "Lemony clover-leaves.",
+"hex": "#B7E08F",
+"icon": "leaf",
+"mesh": ""
+},
+"ing_yarrow": {
+"cat": "items",
+"file": "data/ingredients/ing_yarrow.tres",
+"name": "Yarrow",
+"desc": "Feathery leaves for wounds.",
+"hex": "#EFE9DC",
+"icon": "flower",
+"mesh": ""
+},
+"obj_white_roses": {
+"cat": "items",
+"file": "data/items/obj_white_roses.tres",
+"name": "White roses",
+"desc": "A bundle of white roses.",
+"hex": "#F6F3EC",
+"icon": "",
+"mesh": ""
+},
+"obj_wolf_pelt": {
+"cat": "items",
+"file": "data/items/obj_wolf_pelt.tres",
+"name": "The great wolf's pelt",
+"desc": "Too big for any wolf. It sells for more than she's seen in years.",
+"hex": "#8D8A84",
+"icon": "",
+"mesh": ""
+},
+"ankle_boots_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ankle_boots_blush.tres",
+"name": "Ribboned ankle boots (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "riding_boots.glb"
+},
+"ankle_boots_cream": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ankle_boots_cream.tres",
+"name": "Ribboned ankle boots (cream)",
+"desc": "",
+"hex": "#F3EAD6",
+"icon": "",
+"mesh": "riding_boots.glb"
+},
+"ankle_boots_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ankle_boots_lilac.tres",
+"name": "Ribboned ankle boots (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "riding_boots.glb"
+},
+"ball_gown_emerald": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ball_gown_emerald.tres",
+"name": "Ball gown (emerald)",
+"desc": "Layers of tulle, a bodice stitched with tiny roses.",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"ball_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ball_gown_lilac.tres",
+"name": "Ball gown (lilac)",
+"desc": "Layers of tulle, a bodice stitched with tiny roses.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"ball_gown_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ball_gown_pearl.tres",
+"name": "Ball gown (pearl)",
+"desc": "Layers of tulle, a bodice stitched with tiny roses.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"ball_gown_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ball_gown_periwinkle.tres",
+"name": "Ball gown (periwinkle)",
+"desc": "Layers of tulle, a bodice stitched with tiny roses.",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"ball_gown_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ball_gown_rose.tres",
+"name": "Ball gown (rose)",
+"desc": "Layers of tulle, a bodice stitched with tiny roses.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"butterfly_clips_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_clips_gold.tres",
+"name": "Butterfly clips (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "butterfly_clips.glb"
+},
+"butterfly_clips_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_clips_lilac.tres",
+"name": "Butterfly clips (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "butterfly_clips.glb"
+},
+"butterfly_clips_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_clips_sky.tres",
+"name": "Butterfly clips (sky)",
+"desc": "",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "butterfly_clips.glb"
+},
+"butterfly_gown_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_gown_butter.tres",
+"name": "Butterfly gown (butter)",
+"desc": "Sleeves cut like wings.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"butterfly_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_gown_lilac.tres",
+"name": "Butterfly gown (lilac)",
+"desc": "Sleeves cut like wings.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"butterfly_gown_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_gown_mint.tres",
+"name": "Butterfly gown (mint)",
+"desc": "Sleeves cut like wings.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"butterfly_gown_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_gown_sky.tres",
+"name": "Butterfly gown (sky)",
+"desc": "Sleeves cut like wings.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"butterfly_mask_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_mask_gold.tres",
+"name": "Butterfly mask (gold)",
+"desc": "Every revel needs a mask. She isn't cursed to wear one.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"butterfly_mask_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_mask_lilac.tres",
+"name": "Butterfly mask (lilac)",
+"desc": "Every revel needs a mask. She isn't cursed to wear one.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"butterfly_mask_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/butterfly_mask_sky.tres",
+"name": "Butterfly mask (sky)",
+"desc": "Every revel needs a mask. She isn't cursed to wear one.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"capelet_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/capelet_blush.tres",
+"name": "Flower capelet (blush)",
+"desc": "A short cape with a frill of silk petals.",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"capelet_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/capelet_lilac.tres",
+"name": "Flower capelet (lilac)",
+"desc": "A short cape with a frill of silk petals.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"capelet_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/capelet_mint.tres",
+"name": "Flower capelet (mint)",
+"desc": "A short cape with a frill of silk petals.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"capelet_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/capelet_pearl.tres",
+"name": "Flower capelet (pearl)",
+"desc": "A short cape with a frill of silk petals.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"charm_bracelet": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/charm_bracelet.tres",
+"name": "Charm bracelet",
+"desc": "A rose, a bow, a tiny paintbrush.",
+"hex": "#D9DDE3",
+"icon": "",
+"mesh": "charm_bracelet.glb"
+},
+"charm_bracelet_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/charm_bracelet_gold.tres",
+"name": "Charm bracelet (gold)",
+"desc": "A rose, a bow, a tiny paintbrush.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "charm_bracelet.glb"
+},
+"circlet_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/circlet_gold.tres",
+"name": "Circlet (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "circlet.glb"
+},
+"circlet_silver": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/circlet_silver.tres",
+"name": "Circlet (silver)",
+"desc": "",
+"hex": "#D9DDE3",
+"icon": "",
+"mesh": "circlet.glb"
+},
+"dinner_gown_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/dinner_gown_blush.tres",
+"name": "Dinner gown (blush)",
+"desc": "Flowing, light as breath. Alis insists.",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"dinner_gown_ivory": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/dinner_gown_ivory.tres",
+"name": "Dinner gown (ivory)",
+"desc": "Flowing, light as breath. Alis insists.",
+"hex": "#FBF6EA",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"dinner_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/dinner_gown_lilac.tres",
+"name": "Dinner gown (lilac)",
+"desc": "Flowing, light as breath. Alis insists.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"dinner_gown_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/dinner_gown_periwinkle.tres",
+"name": "Dinner gown (periwinkle)",
+"desc": "Flowing, light as breath. Alis insists.",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"dinner_gown_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/dinner_gown_rose.tres",
+"name": "Dinner gown (rose)",
+"desc": "Flowing, light as breath. Alis insists.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"elains_ribbon": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/elains_ribbon.tres",
+"name": "Elain's old ribbon",
+"desc": "Frayed at the ends. She'd want me to look like a girl, just once.",
+"hex": "#9FB0C0",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"embroidered_vest_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/embroidered_vest_gold.tres",
+"name": "Embroidered vest (gold)",
+"desc": "Vines and roses stitched in gold thread.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "vest.glb"
+},
+"embroidered_vest_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/embroidered_vest_periwinkle.tres",
+"name": "Embroidered vest (periwinkle)",
+"desc": "Vines and roses stitched in gold thread.",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "vest.glb"
+},
+"embroidered_vest_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/embroidered_vest_rose.tres",
+"name": "Embroidered vest (rose)",
+"desc": "Vines and roses stitched in gold thread.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "vest.glb"
+},
+"embroidered_vest_sage": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/embroidered_vest_sage.tres",
+"name": "Embroidered vest (sage)",
+"desc": "Vines and roses stitched in gold thread.",
+"hex": "#B7C9A8",
+"icon": "",
+"mesh": "vest.glb"
+},
+"emerald_drops": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/emerald_drops.tres",
+"name": "Emerald drops",
+"desc": "",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "earrings_drop.glb"
+},
+"emerald_pendant": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/emerald_pendant.tres",
+"name": "Emerald pendant",
+"desc": "Spring's green, on a fine chain.",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "necklace_pendant.glb"
+},
+"fae_tunic_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fae_tunic_blush.tres",
+"name": "Fae silk tunic (blush)",
+"desc": "Silk that moves like water.",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"fae_tunic_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fae_tunic_butter.tres",
+"name": "Fae silk tunic (butter)",
+"desc": "Silk that moves like water.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"fae_tunic_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fae_tunic_lilac.tres",
+"name": "Fae silk tunic (lilac)",
+"desc": "Silk that moves like water.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"fae_tunic_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fae_tunic_mint.tres",
+"name": "Fae silk tunic (mint)",
+"desc": "Silk that moves like water.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"fae_tunic_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fae_tunic_periwinkle.tres",
+"name": "Fae silk tunic (periwinkle)",
+"desc": "Silk that moves like water.",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"flower_crown_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_crown_butter.tres",
+"name": "Flower crown (butter)",
+"desc": "Woven from the manor's own gardens.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "flower_crown.glb"
+},
+"flower_crown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_crown_lilac.tres",
+"name": "Flower crown (lilac)",
+"desc": "Woven from the manor's own gardens.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "flower_crown.glb"
+},
+"flower_crown_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_crown_mint.tres",
+"name": "Flower crown (mint)",
+"desc": "Woven from the manor's own gardens.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "flower_crown.glb"
+},
+"flower_crown_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_crown_pearl.tres",
+"name": "Flower crown (pearl)",
+"desc": "Woven from the manor's own gardens.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "flower_crown.glb"
+},
+"flower_crown_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_crown_rose.tres",
+"name": "Flower crown (rose)",
+"desc": "Woven from the manor's own gardens.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "flower_crown.glb"
+},
+"flower_wristlet_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_wristlet_blush.tres",
+"name": "Flower wristlet (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "flower_wristlet.glb"
+},
+"flower_wristlet_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_wristlet_butter.tres",
+"name": "Flower wristlet (butter)",
+"desc": "",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "flower_wristlet.glb"
+},
+"flower_wristlet_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/flower_wristlet_lilac.tres",
+"name": "Flower wristlet (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "flower_wristlet.glb"
+},
+"fox_mask": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/fox_mask.tres",
+"name": "Fox mask",
+"desc": "Like Lucien's, which may be the point.",
+"hex": "#D9773B",
+"icon": "",
+"mesh": "mask_fox.glb"
+},
+"garden_dress_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/garden_dress_butter.tres",
+"name": "Garden tea dress (butter)",
+"desc": "Short sleeves and a skirt that swishes.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"garden_dress_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/garden_dress_mint.tres",
+"name": "Garden tea dress (mint)",
+"desc": "Short sleeves and a skirt that swishes.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"garden_dress_peach": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/garden_dress_peach.tres",
+"name": "Garden tea dress (peach)",
+"desc": "Short sleeves and a skirt that swishes.",
+"hex": "#F9C9A8",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"garden_dress_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/garden_dress_sky.tres",
+"name": "Garden tea dress (sky)",
+"desc": "Short sleeves and a skirt that swishes.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"gilded_leaf_mask": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/gilded_leaf_mask.tres",
+"name": "Gilded-leaf mask",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"gilded_leaf_mask_emerald": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/gilded_leaf_mask_emerald.tres",
+"name": "Gilded-leaf mask (emerald)",
+"desc": "",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"gold_bangle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/gold_bangle.tres",
+"name": "Gold bangle",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "bangle.glb"
+},
+"gold_hoops": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/gold_hoops.tres",
+"name": "Little gold hoops",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "earrings_hoop.glb"
+},
+"gold_locket": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/gold_locket.tres",
+"name": "Gold locket",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "necklace_locket.glb"
+},
+"hair_ribbon_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_butter.tres",
+"name": "Silk hair ribbon (butter)",
+"desc": "",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hair_ribbon_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_lilac.tres",
+"name": "Silk hair ribbon (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hair_ribbon_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_mint.tres",
+"name": "Silk hair ribbon (mint)",
+"desc": "",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hair_ribbon_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_pearl.tres",
+"name": "Silk hair ribbon (pearl)",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hair_ribbon_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_rose.tres",
+"name": "Silk hair ribbon (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hair_ribbon_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hair_ribbon_sky.tres",
+"name": "Silk hair ribbon (sky)",
+"desc": "",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "hair_ribbon.glb"
+},
+"hunter_boots": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hunter_boots.tres",
+"name": "Old boots",
+"desc": "",
+"hex": "#4A3A2C",
+"icon": "",
+"mesh": "hunter_boots.glb"
+},
+"hunter_cloak": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hunter_cloak.tres",
+"name": "Heavy patched cloak",
+"desc": "Hood up against the snow.",
+"hex": "#4B4F57",
+"icon": "",
+"mesh": "hunter_cloak.glb"
+},
+"hunter_trousers": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hunter_trousers.tres",
+"name": "Hunting trousers",
+"desc": "",
+"hex": "#5A5146",
+"icon": "",
+"mesh": "hunter_trousers.glb"
+},
+"hunter_tunic": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/hunter_tunic.tres",
+"name": "Patched tunic",
+"desc": "Worn soft, patched at both elbows.",
+"hex": "#6F6A63",
+"icon": "",
+"mesh": "hunter_tunic.glb"
+},
+"lace_gloves_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/lace_gloves_blush.tres",
+"name": "Lace gloves (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "gloves_lace.glb"
+},
+"lace_gloves_ivory": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/lace_gloves_ivory.tres",
+"name": "Lace gloves (ivory)",
+"desc": "",
+"hex": "#FBF6EA",
+"icon": "",
+"mesh": "gloves_lace.glb"
+},
+"lace_gloves_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/lace_gloves_lilac.tres",
+"name": "Lace gloves (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gloves_lace.glb"
+},
+"lace_veil_mask_ivory": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/lace_veil_mask_ivory.tres",
+"name": "Lace veil mask (ivory)",
+"desc": "",
+"hex": "#FBF6EA",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"lace_veil_mask_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/lace_veil_mask_lilac.tres",
+"name": "Lace veil mask (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"layer_tunic_moss": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/layer_tunic_moss.tres",
+"name": "Patched tunic (moss)",
+"desc": "Another of her layers, faded past whatever colour it was.",
+"hex": "#666B57",
+"icon": "",
+"mesh": "hunter_tunic.glb"
+},
+"layer_tunic_russet": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/layer_tunic_russet.tres",
+"name": "Patched tunic (russet)",
+"desc": "Another of her layers, faded past whatever colour it was.",
+"hex": "#74604F",
+"icon": "",
+"mesh": "hunter_tunic.glb"
+},
+"moonlit_gown": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/moonlit_gown.tres",
+"name": "Moonlit gown",
+"desc": "For walks by the starlight pool.",
+"hex": "#C9D0F0",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"moonlit_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/moonlit_gown_lilac.tres",
+"name": "Moonlit gown (lilac)",
+"desc": "For walks by the starlight pool.",
+"hex": "#CBB8EA",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"moonlit_gown_silver": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/moonlit_gown_silver.tres",
+"name": "Moonlit gown (silver)",
+"desc": "For walks by the starlight pool.",
+"hex": "#DFE5EE",
+"icon": "",
+"mesh": "gown_dinner.glb"
+},
+"moth_mask": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/moth_mask.tres",
+"name": "Moon-moth mask",
+"desc": "",
+"hex": "#DFE8F0",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"outfit_mortal_travel_dress": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/outfit_mortal_travel_dress.tres",
+"name": "Travelling dress",
+"desc": "A mortal dress for the road home.",
+"hex": "#8F8A9E",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"outfit_solstice_blue_gown": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/outfit_solstice_blue_gown.tres",
+"name": "Blue solstice gown",
+"desc": "The gown for the longest day.",
+"hex": "#A9C6F0",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"painter_smock": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/painter_smock.tres",
+"name": "Painter's smock",
+"desc": "Already smudged, and she loves it.",
+"hex": "#E9E0CF",
+"icon": "",
+"mesh": "painter_smock.glb"
+},
+"painter_smock_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/painter_smock_blush.tres",
+"name": "Painter's smock (blush)",
+"desc": "Already smudged, and she loves it.",
+"hex": "#F3D6DB",
+"icon": "",
+"mesh": "painter_smock.glb"
+},
+"pearl_circlet": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/pearl_circlet.tres",
+"name": "Pearl circlet",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "circlet.glb"
+},
+"pearl_earrings": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/pearl_earrings.tres",
+"name": "Pearl drops",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "earrings_pearl.glb"
+},
+"pearl_necklace": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/pearl_necklace.tres",
+"name": "Pearl necklace",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "necklace_pearl.glb"
+},
+"pearl_pins": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/pearl_pins.tres",
+"name": "Pearl hairpins",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "pearl_pins.glb"
+},
+"picnic_dress_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/picnic_dress_mint.tres",
+"name": "Picnic dress (mint)",
+"desc": "Gingham-light, made for orchards.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"picnic_dress_peach": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/picnic_dress_peach.tres",
+"name": "Picnic dress (peach)",
+"desc": "Gingham-light, made for orchards.",
+"hex": "#F9C9A8",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"picnic_dress_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/picnic_dress_rose.tres",
+"name": "Picnic dress (rose)",
+"desc": "Gingham-light, made for orchards.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"picnic_dress_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/picnic_dress_sky.tres",
+"name": "Picnic dress (sky)",
+"desc": "Gingham-light, made for orchards.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"princess_gown_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_blush.tres",
+"name": "Princess gown (blush)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"princess_gown_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_gold.tres",
+"name": "Princess gown (gold)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"princess_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_lilac.tres",
+"name": "Princess gown (lilac)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"princess_gown_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_pearl.tres",
+"name": "Princess gown (pearl)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"princess_gown_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_periwinkle.tres",
+"name": "Princess gown (periwinkle)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"princess_gown_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/princess_gown_rose.tres",
+"name": "Princess gown (rose)",
+"desc": "The full fairy-tale: a bell skirt, a sweetheart bodice, a hundred tiny pearls.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "gown_ball.glb"
+},
+"ribbon_cuff_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_cuff_lilac.tres",
+"name": "Ribbon cuff (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "ribbon_cuff.glb"
+},
+"ribbon_cuff_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_cuff_mint.tres",
+"name": "Ribbon cuff (mint)",
+"desc": "",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "ribbon_cuff.glb"
+},
+"ribbon_cuff_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_cuff_rose.tres",
+"name": "Ribbon cuff (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "ribbon_cuff.glb"
+},
+"ribbon_cuff_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_cuff_sky.tres",
+"name": "Ribbon cuff (sky)",
+"desc": "",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "ribbon_cuff.glb"
+},
+"ribbon_sash_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_sash_gold.tres",
+"name": "Satin sash (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "ribbon_sash.glb"
+},
+"ribbon_sash_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_sash_periwinkle.tres",
+"name": "Satin sash (periwinkle)",
+"desc": "",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "ribbon_sash.glb"
+},
+"ribbon_sash_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/ribbon_sash_rose.tres",
+"name": "Satin sash (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "ribbon_sash.glb"
+},
+"riding_boots": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/riding_boots.tres",
+"name": "Riding boots",
+"desc": "",
+"hex": "#6B4A33",
+"icon": "",
+"mesh": "riding_boots.glb"
+},
+"riding_leathers": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/riding_leathers.tres",
+"name": "Riding leathers",
+"desc": "",
+"hex": "#8A5A3C",
+"icon": "",
+"mesh": "riding_leathers.glb"
+},
+"riding_leathers_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/riding_leathers_rose.tres",
+"name": "Riding leathers (rose)",
+"desc": "",
+"hex": "#B9707F",
+"icon": "",
+"mesh": "riding_leathers.glb"
+},
+"rose_choker_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_choker_lilac.tres",
+"name": "Rose choker (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "necklace_choker.glb"
+},
+"rose_choker_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_choker_rose.tres",
+"name": "Rose choker (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "necklace_choker.glb"
+},
+"rose_earrings_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_earrings_lilac.tres",
+"name": "Rosebud earrings (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "earrings_rose.glb"
+},
+"rose_earrings_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_earrings_pearl.tres",
+"name": "Rosebud earrings (pearl)",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "earrings_rose.glb"
+},
+"rose_earrings_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_earrings_rose.tres",
+"name": "Rosebud earrings (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "earrings_rose.glb"
+},
+"rose_mask_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_mask_blush.tres",
+"name": "Rose mask (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"rose_mask_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_mask_rose.tres",
+"name": "Rose mask (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "mask_leaf.glb"
+},
+"rose_petal_gown": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_petal_gown.tres",
+"name": "Rose-petal gown",
+"desc": "A skirt of layered silk petals.",
+"hex": "#F08AA8",
+"icon": "",
+"mesh": "gown_rose_petal.glb"
+},
+"rose_petal_gown_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_petal_gown_gold.tres",
+"name": "Rose-petal gown (gold)",
+"desc": "A skirt of layered silk petals.",
+"hex": "#F2C879",
+"icon": "",
+"mesh": "gown_rose_petal.glb"
+},
+"rose_petal_gown_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/rose_petal_gown_pearl.tres",
+"name": "Rose-petal gown (pearl)",
+"desc": "A skirt of layered silk petals.",
+"hex": "#F7E8EF",
+"icon": "",
+"mesh": "gown_rose_petal.glb"
+},
+"satin_slippers_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/satin_slippers_blush.tres",
+"name": "Satin slippers (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "slippers.glb"
+},
+"satin_slippers_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/satin_slippers_gold.tres",
+"name": "Satin slippers (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "slippers.glb"
+},
+"satin_slippers_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/satin_slippers_lilac.tres",
+"name": "Satin slippers (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "slippers.glb"
+},
+"satin_slippers_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/satin_slippers_mint.tres",
+"name": "Satin slippers (mint)",
+"desc": "",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "slippers.glb"
+},
+"satin_slippers_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/satin_slippers_pearl.tres",
+"name": "Satin slippers (pearl)",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "slippers.glb"
+},
+"shawl_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/shawl_blush.tres",
+"name": "Lace shawl (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"shawl_ivory": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/shawl_ivory.tres",
+"name": "Lace shawl (ivory)",
+"desc": "",
+"hex": "#FBF6EA",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"shawl_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/shawl_lilac.tres",
+"name": "Lace shawl (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"shawl_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/shawl_mint.tres",
+"name": "Lace shawl (mint)",
+"desc": "",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "capelet.glb"
+},
+"solstice_gown_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/solstice_gown_blush.tres",
+"name": "Solstice gown (blush)",
+"desc": "Made for dancing under the longest day.",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"solstice_gown_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/solstice_gown_butter.tres",
+"name": "Solstice gown (butter)",
+"desc": "Made for dancing under the longest day.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"solstice_gown_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/solstice_gown_gold.tres",
+"name": "Solstice gown (gold)",
+"desc": "Made for dancing under the longest day.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"solstice_gown_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/solstice_gown_mint.tres",
+"name": "Solstice gown (mint)",
+"desc": "Made for dancing under the longest day.",
+"hex": "#B5EAD7",
+"icon": "",
+"mesh": "gown_solstice.glb"
+},
+"spring_trousers_cream": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_trousers_cream.tres",
+"name": "Fine trousers (cream)",
+"desc": "",
+"hex": "#F3EAD6",
+"icon": "",
+"mesh": "spring_trousers.glb"
+},
+"spring_trousers_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_trousers_pearl.tres",
+"name": "Fine trousers (pearl)",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "spring_trousers.glb"
+},
+"spring_trousers_sage": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_trousers_sage.tres",
+"name": "Fine trousers (sage)",
+"desc": "",
+"hex": "#B7C9A8",
+"icon": "",
+"mesh": "spring_trousers.glb"
+},
+"spring_tunic_cream": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_tunic_cream.tres",
+"name": "Fine tunic (cream)",
+"desc": "She chooses tunics over gowns whenever she can.",
+"hex": "#F3EAD6",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"spring_tunic_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_tunic_lilac.tres",
+"name": "Fine tunic (lilac)",
+"desc": "She chooses tunics over gowns whenever she can.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"spring_tunic_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_tunic_rose.tres",
+"name": "Fine tunic (rose)",
+"desc": "She chooses tunics over gowns whenever she can.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"spring_tunic_sage": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_tunic_sage.tres",
+"name": "Fine tunic (sage)",
+"desc": "She chooses tunics over gowns whenever she can.",
+"hex": "#B7C9A8",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"spring_tunic_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/spring_tunic_sky.tres",
+"name": "Fine tunic (sky)",
+"desc": "She chooses tunics over gowns whenever she can.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "spring_tunic.glb"
+},
+"stag_mask": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/stag_mask.tres",
+"name": "Stag mask",
+"desc": "Antlers of gilded wood.",
+"hex": "#8B6B3E",
+"icon": "",
+"mesh": "mask_fox.glb"
+},
+"star_studs": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/star_studs.tres",
+"name": "Starglass studs",
+"desc": "They catch light that isn't there.",
+"hex": "#CFE0FF",
+"icon": "",
+"mesh": "earrings_star.glb"
+},
+"star_tiara": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/star_tiara.tres",
+"name": "Starlight tiara",
+"desc": "",
+"hex": "#CFE0FF",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"star_tiara_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/star_tiara_gold.tres",
+"name": "Starlight tiara (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"starlight_gown": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/starlight_gown.tres",
+"name": "Starlight gown",
+"desc": "It holds a little light of its own after dark.",
+"hex": "#C9D6FF",
+"icon": "",
+"mesh": "gown_starlight.glb"
+},
+"starlight_gown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/starlight_gown_lilac.tres",
+"name": "Starlight gown (lilac)",
+"desc": "It holds a little light of its own after dark.",
+"hex": "#D8C8F4",
+"icon": "",
+"mesh": "gown_starlight.glb"
+},
+"stockings_blush": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/stockings_blush.tres",
+"name": "Silk stockings (blush)",
+"desc": "",
+"hex": "#F7CFD8",
+"icon": "",
+"mesh": "stockings.glb"
+},
+"stockings_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/stockings_pearl.tres",
+"name": "Silk stockings (pearl)",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "stockings.glb"
+},
+"swan_mask": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/swan_mask.tres",
+"name": "Swan mask",
+"desc": "",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"swan_mask_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/swan_mask_gold.tres",
+"name": "Swan mask (gold)",
+"desc": "",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "mask_butterfly.glb"
+},
+"tiara_gold": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/tiara_gold.tres",
+"name": "Tiara (gold)",
+"desc": "A delicate band of gilt leaves and seed pearls.",
+"hex": "#E6C06A",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"tiara_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/tiara_pearl.tres",
+"name": "Tiara (pearl)",
+"desc": "A delicate band of gilt leaves and seed pearls.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"tiara_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/tiara_rose.tres",
+"name": "Tiara (rose)",
+"desc": "A delicate band of gilt leaves and seed pearls.",
+"hex": "#E8A3B8",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"tiara_silver": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/tiara_silver.tres",
+"name": "Tiara (silver)",
+"desc": "A delicate band of gilt leaves and seed pearls.",
+"hex": "#D9DDE3",
+"icon": "",
+"mesh": "tiara.glb"
+},
+"velvet_cloak_emerald": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/velvet_cloak_emerald.tres",
+"name": "Velvet cloak (emerald)",
+"desc": "",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "velvet_cloak.glb"
+},
+"velvet_cloak_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/velvet_cloak_lilac.tres",
+"name": "Velvet cloak (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "velvet_cloak.glb"
+},
+"velvet_cloak_periwinkle": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/velvet_cloak_periwinkle.tres",
+"name": "Velvet cloak (periwinkle)",
+"desc": "",
+"hex": "#A7B8F2",
+"icon": "",
+"mesh": "velvet_cloak.glb"
+},
+"velvet_cloak_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/velvet_cloak_rose.tres",
+"name": "Velvet cloak (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "velvet_cloak.glb"
+},
+"woods_leathers": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woods_leathers.tres",
+"name": "Woods leathers",
+"desc": "Green-brown, cut for moving quietly.",
+"hex": "#5D6B4A",
+"icon": "",
+"mesh": "woods_leathers.glb"
+},
+"woods_leathers_mint": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woods_leathers_mint.tres",
+"name": "Woods leathers (mint)",
+"desc": "Green-brown, cut for moving quietly.",
+"hex": "#7FA58F",
+"icon": "",
+"mesh": "woods_leathers.glb"
+},
+"wool_stockings": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/wool_stockings.tres",
+"name": "Wool stockings",
+"desc": "Grey, darned at both heels.",
+"hex": "#8A8580",
+"icon": "",
+"mesh": "stockings.glb"
+},
+"woven_crown_butter": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woven_crown_butter.tres",
+"name": "Woven crown (butter)",
+"desc": "Woven by her own hands from flowers she picked.",
+"hex": "#FBE7A1",
+"icon": "",
+"mesh": "woven_crown.glb"
+},
+"woven_crown_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woven_crown_lilac.tres",
+"name": "Woven crown (lilac)",
+"desc": "Woven by her own hands from flowers she picked.",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "woven_crown.glb"
+},
+"woven_crown_pearl": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woven_crown_pearl.tres",
+"name": "Woven crown (pearl)",
+"desc": "Woven by her own hands from flowers she picked.",
+"hex": "#F6F1EA",
+"icon": "",
+"mesh": "woven_crown.glb"
+},
+"woven_crown_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woven_crown_rose.tres",
+"name": "Woven crown (rose)",
+"desc": "Woven by her own hands from flowers she picked.",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "woven_crown.glb"
+},
+"woven_crown_sky": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/woven_crown_sky.tres",
+"name": "Woven crown (sky)",
+"desc": "Woven by her own hands from flowers she picked.",
+"hex": "#B9DCF5",
+"icon": "",
+"mesh": "woven_crown.glb"
+},
+"wrap_dress_emerald": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/wrap_dress_emerald.tres",
+"name": "Wrap dress (emerald)",
+"desc": "",
+"hex": "#4FAE86",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"wrap_dress_lilac": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/wrap_dress_lilac.tres",
+"name": "Wrap dress (lilac)",
+"desc": "",
+"hex": "#C8A8E9",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"wrap_dress_rose": {
+"cat": "wardrobe",
+"file": "data/wardrobe/pieces/wrap_dress_rose.tres",
+"name": "Wrap dress (rose)",
+"desc": "",
+"hex": "#F4A6C0",
+"icon": "",
+"mesh": "gown_garden.glb"
+},
+"brew_bitter_draught": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_bitter_draught.tres",
+"name": "Bitter draught",
+"desc": "",
+"hex": "#5D4A6E",
+"icon": "",
+"mesh": ""
+},
+"brew_burn_salve": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_burn_salve.tres",
+"name": "Burn salve",
+"desc": "",
+"hex": "#CFE8E1",
+"icon": "",
+"mesh": ""
+},
+"brew_clear_eye_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_clear_eye_tea.tres",
+"name": "Clear-eye tea",
+"desc": "",
+"hex": "#7FA07A",
+"icon": "",
+"mesh": ""
+},
+"brew_faelight_tisane": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_faelight_tisane.tres",
+"name": "Faelight tisane",
+"desc": "",
+"hex": "#D9D2FF",
+"icon": "",
+"mesh": ""
+},
+"brew_firebrand_steep": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_firebrand_steep.tres",
+"name": "Firebrand steep",
+"desc": "",
+"hex": "#FF8A3D",
+"icon": "",
+"mesh": ""
+},
+"brew_giddy_tincture": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_giddy_tincture.tres",
+"name": "Giddy tincture",
+"desc": "",
+"hex": "#F0A6D8",
+"icon": "",
+"mesh": ""
+},
+"brew_glow_draught": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_glow_draught.tres",
+"name": "Glow draught",
+"desc": "",
+"hex": "#B6F2D4",
+"icon": "",
+"mesh": ""
+},
+"brew_healing_salve": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_healing_salve.tres",
+"name": "Healing salve",
+"desc": "",
+"hex": "#F3C7A4",
+"icon": "",
+"mesh": ""
+},
+"brew_hearthwarm_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hearthwarm_tea.tres",
+"name": "Hearth-warm tea",
+"desc": "",
+"hex": "#C9653C",
+"icon": "",
+"mesh": ""
+},
+"brew_hearty_stew": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hearty_stew.tres",
+"name": "Hearty stew",
+"desc": "",
+"hex": "#A0623A",
+"icon": "",
+"mesh": ""
+},
+"brew_hedgerow_preserve": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hedgerow_preserve.tres",
+"name": "Hedgerow preserve",
+"desc": "",
+"hex": "#8E3B6B",
+"icon": "",
+"mesh": ""
+},
+"brew_honey_cakes": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_honey_cakes.tres",
+"name": "Honey cakes",
+"desc": "",
+"hex": "#F4D58D",
+"icon": "",
+"mesh": ""
+},
+"brew_hunters_stew": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hunters_stew.tres",
+"name": "Hunter's stew",
+"desc": "",
+"hex": "#C2703D",
+"icon": "",
+"mesh": ""
+},
+"brew_hush_draught": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hush_draught.tres",
+"name": "Hush draught",
+"desc": "",
+"hex": "#A99AD8",
+"icon": "",
+"mesh": ""
+},
+"brew_hush_steep": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_hush_steep.tres",
+"name": "Hush steep",
+"desc": "",
+"hex": "#9D8FCF",
+"icon": "",
+"mesh": ""
+},
+"brew_iron_will_tincture": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_iron_will_tincture.tres",
+"name": "Iron-will tincture",
+"desc": "",
+"hex": "#8FA3D6",
+"icon": "",
+"mesh": ""
+},
+"brew_lure_steep": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_lure_steep.tres",
+"name": "Lure steep",
+"desc": "",
+"hex": "#F7A8B8",
+"icon": "",
+"mesh": ""
+},
+"brew_mending_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_mending_tea.tres",
+"name": "Mending tea",
+"desc": "",
+"hex": "#E7A3A8",
+"icon": "",
+"mesh": ""
+},
+"brew_oakheart_draught": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_oakheart_draught.tres",
+"name": "Oakheart draught",
+"desc": "",
+"hex": "#9B7A4C",
+"icon": "",
+"mesh": ""
+},
+"brew_painters_colours": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_painters_colours.tres",
+"name": "Painter's colours",
+"desc": "",
+"hex": "#5B7BD6",
+"icon": "",
+"mesh": ""
+},
+"brew_quickfoot_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_quickfoot_tea.tres",
+"name": "Quickfoot tea",
+"desc": "",
+"hex": "#F6DD8C",
+"icon": "",
+"mesh": ""
+},
+"brew_rime_steep": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_rime_steep.tres",
+"name": "Rime steep",
+"desc": "",
+"hex": "#A9DCF2",
+"icon": "",
+"mesh": ""
+},
+"brew_snowmelt_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_snowmelt_tea.tres",
+"name": "Snowmelt tea",
+"desc": "",
+"hex": "#BFE3E6",
+"icon": "",
+"mesh": ""
+},
+"brew_spit_roast": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_spit_roast.tres",
+"name": "Spit roast",
+"desc": "",
+"hex": "#D08A4E",
+"icon": "",
+"mesh": ""
+},
+"brew_spring_feast": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_spring_feast.tres",
+"name": "Spring feast",
+"desc": "",
+"hex": "#F2B8C6",
+"icon": "",
+"mesh": ""
+},
+"brew_starlight_steep": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_starlight_steep.tres",
+"name": "Starlight steep",
+"desc": "",
+"hex": "#FFF3C4",
+"icon": "",
+"mesh": ""
+},
+"brew_steadying_tea": {
+"cat": "brews",
+"file": "data/chemistry/brews/brew_steadying_tea.tres",
+"name": "Steadying tea",
+"desc": "",
+"hex": "#EEF3F6",
+"icon": "",
+"mesh": ""
+}
+}
