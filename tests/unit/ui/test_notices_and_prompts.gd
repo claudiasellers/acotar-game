@@ -1,6 +1,6 @@
 # gate: when:ui/hud/key_prompt.gd,ui/collection_book/find_card.gd,ui/theme/*,ui/frame/*,systems/interaction/*,systems/bow/quiver_card.gd,story/act1/key_prompts.gd,story/act1/act1_milestones.gd,ui/chemistry/brew_prompt.gd,ui/market/market_prompt.gd
 ## Notices and prompts (plan step 8a). Every key prompt in play is one
-## KeyPrompt: a dark pill with a paper key cap that reads on snow, naming the
+## KeyPrompt: a slip of paper with an ink key cap that reads on snow, naming the
 ## key as it is bound on what she is holding. Every notice goes through one
 ## queue: finds, rewards and notes are dark pills that wait out dread, and a
 ## chapter heading is a title that does not wait.
@@ -28,7 +28,7 @@ func after_each() -> void:
 	FindCard.clear(get_tree())
 
 
-func test_a_prompt_is_a_key_cap_and_its_words_on_a_dark_pill() -> void:
+func test_a_prompt_is_a_key_cap_and_its_words_on_a_slip() -> void:
 	assert_false(prompt.visible, "hidden until told")
 	assert_eq(prompt.get_parent(), HudLayout.of(get_tree()).zone(HudLayout.Zone.PROMPT))
 	prompt.say("E", "step in")
@@ -36,7 +36,7 @@ func test_a_prompt_is_a_key_cap_and_its_words_on_a_dark_pill() -> void:
 	assert_eq(prompt.theme_type_variation, &"PromptPill")
 	assert_eq(prompt.text(), "E   step in")
 	var row := prompt.get_node(^"Row")
-	assert_eq((row.get_child(0) as Control).theme_type_variation, &"PromptKey")
+	assert_eq((row.get_child(0) as Control).theme_type_variation, &"SatchelKey")
 	assert_eq((row.get_child(1) as Label).theme_type_variation, &"PromptText")
 	prompt.say("E", "")
 	assert_eq(prompt.text(), "", "no words, no prompt")
@@ -49,7 +49,7 @@ func test_a_row_of_keys_and_words_alone() -> void:
 	assert_eq(prompt.text(), "E   throw the knife  ·  Left mouse   the bracelets  ·  or stand still")
 	var caps := 0
 	for c in prompt.get_node(^"Row").get_children():
-		if (c as Control).theme_type_variation == &"PromptKey":
+		if (c as Control).theme_type_variation == &"SatchelKey":
 			caps += 1
 	assert_eq(caps, 2, "standing still has no key")
 	prompt.clear()
@@ -72,7 +72,7 @@ func test_keys_are_named_as_bound_on_what_she_holds() -> void:
 		assert_ne(KeyPrompts.row(id)[0][0], "", "%s opens on a key" % id)
 
 
-func test_the_press_card_and_the_quiver_card_wear_the_same_pill() -> void:
+func test_the_press_card_is_a_key_prompt_and_the_quiver_card_a_dark_pill() -> void:
 	var card := PressCard.find_or_make(keeper)
 	card.show_text("eat")
 	assert_eq(card.text(), "E   eat")
@@ -80,8 +80,8 @@ func test_the_press_card_and_the_quiver_card_wear_the_same_pill() -> void:
 	assert_eq(card.text(), "")
 	var quiver := QuiverCard.new()
 	add_child_autofree(quiver)
-	assert_eq(quiver._panel.theme_type_variation, &"PromptPill")
-	assert_eq(quiver._label.theme_type_variation, &"PromptText")
+	assert_eq(quiver._panel.theme_type_variation, &"BowCard")
+	assert_eq(quiver._label.theme_type_variation, &"BowText")
 	assert_eq(quiver._panel.get_parent(), HudLayout.of(get_tree()).zone(HudLayout.Zone.BOW))
 
 
@@ -91,12 +91,13 @@ func test_pills_read_on_snow_in_both_acts() -> void:
 		var c := JournalTheme.colors(act)
 		var pill: Color = WHITE.lerp(c.ink, JournalTheme.PILL_DEPTH)
 		var who: String = JournalTheme.Act.keys()[act]
-		assert_gt(_contrast(c.paper, pill), 7.0, "%s: words on the pill" % who)
-		assert_gt(_contrast(c.ink, c.paper), 7.0, "%s: the key on its cap" % who)
+		assert_gt(_contrast(c.paper, pill), 7.0, "%s: words on a dark pill" % who)
+		assert_gt(_contrast(c.ink, c.paper), 7.0, "%s: a prompt's words on its slip, and the key on its cap" % who)
+		assert_gt(_contrast(c.line, WHITE), 3.0, "%s: the slip's rim on snow" % who)
 		assert_gt(_contrast(c.glow, pill), 4.5, "%s: a notice's kicker" % who)
 		assert_gt(_contrast(pill, WHITE), 7.0, "%s: the pill itself on snow" % who)
 	var theme := JournalTheme.build(JournalTheme.Act.HUMAN)
-	for v: StringName in [&"PromptText", &"PromptKeyLabel", &"NoticeKicker", &"NoticeBody"]:
+	for v: StringName in [&"PromptText", &"BowText", &"SatchelKeyLabel", &"NoticeKicker", &"NoticeBody"]:
 		assert_gte(theme.get_font_size(&"font_size", v), 14, "%s is readable" % v)
 
 

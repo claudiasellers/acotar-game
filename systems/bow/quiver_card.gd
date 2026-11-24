@@ -20,10 +20,10 @@ func _init(bow_controller: BowController = null) -> void:
 
 func _ready() -> void:
 	_panel = PanelContainer.new()
-	_panel.theme_type_variation = &"PromptPill"
+	_panel.theme_type_variation = &"BowCard"
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	HudLayout.of(get_tree()).place(_panel, HudLayout.Zone.BOW, self)
-	_label = BookKit.label("", &"PromptText")
+	_label = BookKit.label("", &"BowText")
 	_panel.add_child(_label)
 	_panel.visible = false
 	if controller:

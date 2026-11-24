@@ -1,4 +1,4 @@
-## The one key prompt: a dark pill in HudLayout's PROMPT zone with a key cap
+## The one key prompt: a slip of paper in HudLayout's PROMPT zone with a key cap
 ## and what the key does here ("E  pick rose hips"), or a few of them in a row.
 ## It says what a key does, never what to do next (R2). Every prompt in play
 ## is one of these: the press card, the pick card, the stations' hints and
@@ -79,11 +79,7 @@ func says(pairs: Array) -> void:
 			space.custom_minimum_size.x = BETWEEN - 2 * _row.get_theme_constant(&"separation")
 			_row.add_child(space)
 		if String(pair[0]) != "":
-			var cap := PanelContainer.new()
-			cap.theme_type_variation = &"PromptKey"
-			cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			cap.add_child(BookKit.label(String(pair[0]), &"PromptKeyLabel"))
-			_row.add_child(cap)
+			_row.add_child(BookKit.key_cap(String(pair[0])))
 		var words := BookKit.label(String(pair[1]), &"PromptText")
 		words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		_row.add_child(words)

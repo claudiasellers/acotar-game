@@ -86,16 +86,16 @@ const LABELS := {
 	&"LineTold": [34, "hand", 600, &"paper"],
 	&"LineWhisper": [40, "hand", 600, &"bone"],
 	&"LineDread": [28, "display", 400, &"bone"],
-	&"PromptText": [20, "body", 700, &"paper"],
-	&"PromptKeyLabel": [17, "body", 800, &"ink"],
+	&"PromptText": [20, "body", 700, &"ink"],
+	&"BowText": [20, "body", 700, &"paper"],
 	&"NoticeKicker": [14, "body", 800, &"glow"],
-	&"NoticeTitle": [32, "hand", 600, &"paper"],
+	&"NoticeTitle": [30, "display", 400, &"paper"],
 	&"NoticeBody": [17, "body", 600, &"paper"],
 	&"ChapterTitle": [44, "display", 400, &"paper"],
 }
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
-	&"PromptPill", &"PromptKey", &"NoticeCard", &"NoticeRare",
+	&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
@@ -106,8 +106,10 @@ const RIBBON_TAB := &"BookRibbon"
 ## Side of a check box and of a slider's knob, in px.
 const CHECK_SIZE := 24
 const KNOB_SIZE := 22
-## How dark the pills that sit on the world are: prompts and notices.
+## How dark the pills that sit on the world are: notices and the bow card.
 const PILL_DEPTH := 0.88
+## How dark the shadow under a key prompt is.
+const PROMPT_SHADOW := 0.45
 ## How dark the smear behind a said line is, and how far its edge fades.
 const BAND_DEPTH := 0.8
 const SMEAR_EDGE := 40
@@ -206,9 +208,15 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"ThoughtMark", _pill(c.ink, c.line, 2, Vector2(12, 12), 14))
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
-	# What sits on the world, not on paper: dark pills, so they read on snow.
-	t.set_stylebox(&"panel", &"PromptPill", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(14, 8)))
-	t.set_stylebox(&"panel", &"PromptKey", _pill(c.paper, c.line, 1, Vector2(10, 2), 8))
+	# What sits on the world. A key prompt is a slip of her paper with a brass
+	# rim and a shadow under it, so its edge holds on snow; notices and the bow
+	# card are dark pills.
+	var prompt := _pill(c.paper, c.line, 2, Vector2(12, 7))
+	prompt.shadow_color = Color(c.ink, PROMPT_SHADOW)
+	prompt.shadow_size = 6
+	prompt.shadow_offset = Vector2(0, 2)
+	t.set_stylebox(&"panel", &"PromptPill", prompt)
+	t.set_stylebox(&"panel", &"BowCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(18, 8)))
 	t.set_stylebox(&"panel", &"NoticeCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(22, 14), 20))
 	t.set_stylebox(&"panel", &"NoticeRare", _pill(Color(c.ink, PILL_DEPTH), c.glow, 3, Vector2(22, 14), 20))
 	t.set_stylebox(&"panel", &"QuickBarSlot", _pill(Color(c.paper, 0.92), c.line, 2, Vector2(6, 6)))
