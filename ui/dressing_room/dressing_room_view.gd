@@ -379,6 +379,9 @@ func _build() -> void:
 		t.toggle_mode = true
 		var index := i
 		t.pressed.connect(func() -> void: tabs.current_tab = index)
+		# The Crowns tab is marked while she has the blooms to weave one.
+		if t.text == WEAVE_TAB and CrownWeaver.best_recipe(Gameplay.inventory) != null:
+			t.add_child(NewsDot.new())
 		_tab_row.add_child(t)
 
 	var row := HBoxContainer.new()

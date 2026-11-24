@@ -22,6 +22,8 @@ const MARK_LINES: Array[String] = [
 	"A whorl, worn almost flat. I traced it with a finger, and painted a rose beside it.",
 	"Another pair of stones, the same faint whorl. My rose goes beside it.",
 ]
+## Her thought when the second pair is marked and there is somewhere to ride.
+const RIDE_THOUGHT := "Two marked now. I could ride between them blind."
 
 static var _defs: Array[WhorlStoneDef] = []
 static var _places: MapPlaceSet
