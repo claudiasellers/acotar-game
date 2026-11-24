@@ -132,8 +132,10 @@ func _when_calm(entry: Callable) -> void:
 
 ## The row under `key`, made at the foot of the log if it is not showing.
 func _row(key: StringName) -> Row:
-	var row := _rows.get(key) as Row
-	if row == null or not is_instance_valid(row) or row.leaving():
+	# A row that faded and freed itself is still in the book under its key.
+	var kept: Variant = _rows.get(key)
+	var row: Row = kept if is_instance_valid(kept) else null
+	if row == null or row.leaving():
 		row = Row.new()
 		_rows[key] = row
 		add_child(row)
