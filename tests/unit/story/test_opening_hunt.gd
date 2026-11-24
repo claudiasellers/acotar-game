@@ -120,20 +120,25 @@ func test_the_snare_prompt_shows_in_reach_and_checking_it_brings_the_rabbit() ->
 
 func test_the_rabbit_can_never_be_killed_or_skinned() -> void:
 	assert_eq(RABBIT.harvest_items.size(), 0)
-	var arrows := DirAccess.get_files_at("res://data/items")
+	var hunt := OpeningHunt.new()
+	add_child_autofree(hunt)
+	hunt.check_snare()
+	var rabbit := hunt.rabbit
+	rabbit.set_physics_process(false)
 	var tried := 0
-	for file in arrows:
-		if not file.begins_with("arrow_") or not file.ends_with(".tres"):
+	# Every arrow type, through the hit an arrow really makes on it.
+	for file in DirAccess.get_files_at("res://data/arrows"):
+		if not file.trim_suffix(".remap").ends_with(".tres"):
 			continue
+		var arrow_data := load("res://data/arrows/" + file.trim_suffix(".remap")) as ArrowData
 		tried += 1
-		var id := StringName(file.get_basename())
-		var health := RABBIT.max_health
-		for i in 100:
-			var out := Creature.resolve_arrow(RABBIT, health, id, false)
-			health = out.health
-			assert_false(out.killed or out.mortal, "%s, hit %d" % [id, i])
-			if out.killed or out.mortal:
-				break
+		var arrow := Node3D.new()
+		add_child_autofree(arrow)
+		arrow.global_position = rabbit.global_position
+		arrow.set_meta(&"arrow_id", arrow_data.id)
+		for i in 30:
+			rabbit.on_arrow_hit(arrow)
+		assert_true(rabbit.alive and not rabbit.mortally_wounded, "%s never kills it" % arrow_data.id)
 	assert_gt(tried, 5, "every arrow type")
 
 
