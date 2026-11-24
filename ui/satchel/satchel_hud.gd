@@ -207,9 +207,15 @@ func _follow_inventory() -> void:
 
 # --- the bar -----------------------------------------------------------------
 
+## The room the strap and its rings take in the STRAP zone.
+static func bar_size() -> Vector2:
+	return Vector2(RING_START + RING_STEP * QuickBar.SLOTS - RING_STEP * 0.5 + 20.0,
+			QuickStrap.BAND + QuickRing.TAB.y + QuickRing.RADIUS * 2.0 + 12.0 + CHORD_LIFT)
+
+
 func _build_bar() -> void:
-	var length := RING_START + RING_STEP * QuickBar.SLOTS - RING_STEP * 0.5 + 20.0
-	var height := QuickStrap.BAND + QuickRing.TAB.y + QuickRing.RADIUS * 2.0 + 12.0
+	var length := bar_size().x
+	var height := bar_size().y - CHORD_LIFT
 	_bar_root = Control.new()
 	_bar_root.name = "QuickBar"
 	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE

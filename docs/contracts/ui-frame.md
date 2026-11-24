@@ -130,7 +130,7 @@ may slide or a strap may lift inside its root.
 | `PROMPT` | bottom centre, over the strap | what a key does here: press card, forage card, brew, trade, Act I's key prompts |
 | `STRAP` | bottom centre | the quick strap |
 | `BOW` | right, low | the quiver card |
-| `CONTROLS` | bottom right corner, under `BOW` | the controls hint |
+| `CONTROLS` | bottom right corner, under `BOW` | the controls hint: three short lines, at least 24 px clear of the strap at every text size |
 
 Corner zones stack their pieces away from their corner, so two prompts at
 once sit one above the other. Mouse clicks pass through a zone to its pieces.

@@ -28,6 +28,9 @@ const KEEPERS: Array[String] = [
 	"res://ui/guide/guide_journal.gd", "res://ui/menu/settings_tab.gd", "res://ui/debug_hud.gd",
 ]
 
+## Pixels between the controls slip and the strap's box, at the least.
+const CLEAR_OF_STRAP := 24.0
+
 var hud: HudLayout
 
 
@@ -127,6 +130,28 @@ func test_the_status_row_stops_short_of_the_line_lane() -> void:
 	var left := HudLayout.CORNERS[HudLayout.Zone.VITALS][1].x + VitalsHud.STATUS_AT.x as float
 	for i in VitalsStatusRow.MAX_SHOWN + 1:
 		assert_lte(left + row._slot(i).x + VitalsStatusRow.RADIUS, HudLayout.LANE_LEFT, "chip %d" % i)
+
+
+## The controls slip sits beside the strap, never under it, at every text size.
+func test_the_controls_slip_keeps_clear_of_the_strap() -> void:
+	var keeper := Node.new()
+	add_child_autofree(keeper)
+	var slip := ControlsHint.new()
+	hud.place(slip, HudLayout.Zone.CONTROLS, keeper)
+	var strap := Control.new()
+	strap.custom_minimum_size = SatchelHud.bar_size()
+	hud.place(strap, HudLayout.Zone.STRAP, keeper)
+	var was := get_tree().root.content_scale_factor
+	for scale: float in GameSettings.TEXT_SCALES:
+		get_tree().root.content_scale_factor = scale
+		slip.show_for(20.0)
+		await wait_process_frames(4)
+		var a := slip.get_global_rect()
+		var b := strap.get_global_rect()
+		var apart := maxf(maxf(a.position.x - b.end.x, b.position.x - a.end.x), maxf(a.position.y - b.end.y, b.position.y - a.end.y))
+		assert_gte(apart, CLEAR_OF_STRAP, "text scale %.2f: slip %s, strap %s" % [scale, a, b])
+		assert_true(get_viewport().get_visible_rect().encloses(a), "and on the screen at %.2f" % scale)
+	get_tree().root.content_scale_factor = was
 
 
 func test_dread_holds_a_card_and_calm_lets_it_show() -> void:

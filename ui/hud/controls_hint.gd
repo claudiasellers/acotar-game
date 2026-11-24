@@ -1,6 +1,8 @@
 ## A slip of paper in HudLayout's CONTROLS zone naming the controls. It shows
 ## for the first moments of a new game and briefly after the book closes on
 ## its settings page, then fades. A loaded game does not teach them again.
+## Three short lines, so the slip stays in its corner, clear of the strap, at
+## every text size.
 class_name ControlsHint
 extends PanelContainer
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	theme_type_variation = &"NotifyCard"
 	_label = BookKit.label("", &"SatchelSmall")
+	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	add_child(_label)
 	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: refresh())
 	EventBus.game_loaded.connect(func(_slot: String) -> void: hide_now())
@@ -31,7 +34,7 @@ func text() -> String:
 func refresh() -> void:
 	if _label == null:
 		return
-	_label.text = "Move — %s   ·   Sprint — hold Shift   ·   Camera — mouse / right stick   ·   R recenter   ·   Esc menu" \
+	_label.text = "Move — %s   ·   Sprint — hold Shift\nCamera — mouse / right stick\nR recenter   ·   Esc menu" \
 			% InputSettings.SCHEME_NAMES[InputSettings.scheme]
 
 
