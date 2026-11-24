@@ -291,7 +291,7 @@ func _draw_marks() -> void:
 		var p := to_map_point(place.label_at)
 		var fs := clampi(int(26.0 * 1500.0 / view_width), 14, 34)
 		var w := font.get_string_size(place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-		ci.draw_string_outline(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Color(1.0, 0.97, 0.99, 0.9))
+		ci.draw_string_outline(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Color(JournalTheme.color(&"paper"), 0.9))
 		ci.draw_string(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, JournalTheme.color(&"ink"))
 	# Landmarks she has seen, named when close enough to read.
 	for id: String in hud.seen_landmarks:
@@ -305,7 +305,7 @@ func _draw_marks() -> void:
 			var label := String(lm.label)
 			var w := body.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x
 			var at := p + Vector2(-w * 0.5, 30)
-			ci.draw_string_outline(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 6, Color(1.0, 0.97, 0.99, 0.95))
+			ci.draw_string_outline(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 6, Color(JournalTheme.color(&"paper"), 0.95))
 			ci.draw_string(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, JournalTheme.color(&"ink_soft"))
 	# The whorl stones on ground she has sketched (L74).
 	var bounds := Rect2(Vector2.ZERO, _map.size).grow(20)
@@ -332,7 +332,7 @@ func _draw_reticle(ci: CanvasItem, at: Vector2) -> void:
 
 
 func _draw_compass(ci: CanvasItem, at: Vector2) -> void:
-	ci.draw_circle(at, 34, Color(1.0, 0.97, 0.99, 0.85))
+	ci.draw_circle(at, 34, Color(JournalTheme.color(&"paper"), 0.85))
 	ci.draw_arc(at, 34, 0, TAU, 48, JournalTheme.color(&"line"), 2.0, true)
 	for i in 4:
 		var a := TAU * i / 4.0

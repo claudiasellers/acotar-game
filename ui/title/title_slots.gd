@@ -134,7 +134,7 @@ func _slot_row(slot: String) -> void:
 		del.pressed.connect(_ask.bind(slot))
 		row.add_child(del)
 	if not info.is_empty():
-		var note := BookKit.label(details(info), &"SatchelWhere")
+		var note := BookKit.label(details(info), &"SatchelSmall")
 		note.name = slot + "_details"
 		add_child(note)
 	add_child(BookKit.gap(8))
@@ -155,7 +155,7 @@ func _ask(slot: String) -> void:
 	var question := ("Begin anew in %s?" if overwrite else "Let %s go?") % slot_name(slot)
 	add_child(BookKit.label(question, &"SatchelHeading"))
 	add_child(HSeparator.new())
-	add_child(BookKit.label("The story saved there will be lost." if overwrite else "It can't be brought back.", &"SatchelWhere"))
+	add_child(BookKit.label("The story saved there will be lost." if overwrite else "It can't be brought back.", &"SatchelBody"))
 	add_child(BookKit.gap(18))
 	var yes := _button("Begin anew" if overwrite else "Delete it", _confirmed.bind(slot))
 	yes.name = "Yes"

@@ -103,7 +103,7 @@ func _sparkles(count: int, life: float, one_shot: bool) -> CPUParticles3D:
 	quad.material = m
 	p.mesh = quad
 	var ramp := Gradient.new()
-	ramp.set_color(0, Color(1.0, 0.84, 0.42, 1.0))
-	ramp.set_color(1, Color(0.95, 0.5, 0.7, 0.0))
+	ramp.set_color(0, JournalTheme.color(&"glow"))
+	ramp.set_color(1, Color(JournalTheme.color(&"accent"), 0.0))
 	p.color_ramp = ramp
 	return p

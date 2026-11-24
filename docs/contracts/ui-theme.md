@@ -13,6 +13,16 @@ as a token and builds one `Theme` from them. That theme is the project theme
 
 - No script sets `.theme`, makes a `Theme` or touches `ThemeDB`. A search test
   in `tests/unit/ui/test_journal_theme.gd` keeps that, with no exceptions.
+- No UI script carries a colour or a typeface of its own: no colour written
+  out (numbers, a hex string, a named colour other than the neutral
+  `Color.WHITE` and `Color.TRANSPARENT`), no font file, no
+  `add_theme_font_override`. A colour is a token (`Color(token, alpha)` is
+  fine); type is a variation or `JournalTheme.font()`. The search test
+  `tests/unit/ui/test_one_look.gd` walks every script under `ui/` and the UI
+  pieces that live elsewhere (its `UI_ELSEWHERE` list). The only scripts let
+  off are the ones that paint a picture, named in its `PICTURES` list with
+  why: the map's sheet, marks and manor plan, the item pictures, the title's
+  3D backdrop and the satchel's 3D model.
 - A Control picks its look with `theme_type_variation`, never with a style
   override of its own.
 - Code that draws by hand (`_draw`) reads colours with

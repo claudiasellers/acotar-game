@@ -102,28 +102,13 @@ func _ready() -> void:
 	_sparkles.scale_amount_max = 4.5
 	_sparkles.texture = JournalTheme.soft_dot(16)
 	var ramp := Gradient.new()
-	ramp.set_color(0, Color(1.0, 0.92, 0.66, 1.0))
-	ramp.set_color(1, Color(1.0, 0.75, 0.88, 0.0))
+	ramp.set_color(0, JournalTheme.color(&"glow"))
+	ramp.set_color(1, Color(JournalTheme.wash(0), 0.0))
 	_sparkles.color_ramp = ramp
 	add_child(_sparkles)
 
-	_pill = Label.new()
-	_pill.text = "M   map"
+	_pill = BookKit.label("M   map", &"SatchelCount")
 	_pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pill.add_theme_font_override(&"font", JournalTheme.font("body", 700))
-	_pill.add_theme_font_size_override(&"font_size", 14)
-	_pill.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
-	var pill_box := StyleBoxFlat.new()
-	pill_box.bg_color = Color(1.0, 0.95, 0.97, 0.86)
-	pill_box.border_color = Color(JournalTheme.color(&"line"), 0.8)
-	pill_box.set_border_width_all(2)
-	pill_box.set_corner_radius_all(12)
-	pill_box.content_margin_left = 12
-	pill_box.content_margin_right = 12
-	pill_box.content_margin_top = 2
-	pill_box.content_margin_bottom = 2
-	_pill.add_theme_stylebox_override(&"normal", pill_box)
-	_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_pill)
 	_pill.reset_size()
 	_pill.position = Vector2((DIAMETER - _pill.size.x) * 0.5, DIAMETER - 6.0)
@@ -202,13 +187,13 @@ func _draw_marks() -> void:
 	var r := DIAMETER * 0.5
 	# Gold ring with a pearl bevel, like the guide's medallion.
 	ci.draw_arc(c, r - RING * 0.5, 0.0, TAU, 96, JournalTheme.color(&"line"), RING, true)
-	ci.draw_arc(c, r - RING - 1.0, 0.0, TAU, 96, Color(1.0, 0.97, 0.99, 0.9), 2.0, true)
+	ci.draw_arc(c, r - RING - 1.0, 0.0, TAU, 96, Color(JournalTheme.color(&"paper"), 0.9), 2.0, true)
 	ci.draw_arc(c, r - 1.5, 0.0, TAU, 96, JournalTheme.color(&"glow"), 1.5, true)
 	# Little pearls round the ring, and a fleur at north.
 	for i in 12:
 		var a := TAU * i / 12.0
 		var p := c + Vector2(sin(a), -cos(a)) * (r - RING * 0.5)
-		ci.draw_circle(p, 2.6 if i % 3 else 3.4, Color(1.0, 0.97, 0.99))
+		ci.draw_circle(p, 2.6 if i % 3 else 3.4, JournalTheme.color(&"paper"))
 	var n := c + Vector2(0, -r + RING * 0.5)
 	ci.draw_colored_polygon(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2)]), JournalTheme.color(&"accent"))
 	ci.draw_polyline(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2), n + Vector2(0, -15)]), JournalTheme.color(&"line"), 1.5, true)

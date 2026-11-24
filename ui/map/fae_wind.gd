@@ -62,18 +62,18 @@ func _ready() -> void:
 	m.set_shader_parameter(&"petal", petal_texture())
 	quad.material = m
 	_stream.mesh = quad
-	set_colours(Color(1.0, 0.75, 0.86), Color(1.0, 0.93, 0.7))
+	set_colours(JournalTheme.wash(0))
 	add_child(_stream)
 
 
 ## Petal colours from the realm's theme (blush and rose in Spring), deepened
 ## a little so they read against snow; white blossom mixed in.
-func set_colours(tint: Color, _glow: Color = Color.WHITE) -> void:
+func set_colours(tint: Color) -> void:
 	var rose := Color.from_hsv(tint.h, clampf(tint.s * 1.5, 0.0, 1.0), tint.v * 0.95)
 	var ramp := Gradient.new()
 	ramp.set_color(0, Color(rose, 0.0))
 	ramp.add_point(0.1, Color(rose, 1.0))
-	ramp.add_point(0.75, Color(rose.lerp(Color(1.0, 0.95, 0.96), 0.35), 1.0))
+	ramp.add_point(0.75, Color(rose.lerp(JournalTheme.color(&"paper"), 0.35), 1.0))
 	ramp.set_color(ramp.get_point_count() - 1, Color(rose, 0.0))
 	_stream.color_ramp = ramp
 

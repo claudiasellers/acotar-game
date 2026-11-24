@@ -2,11 +2,8 @@
 class_name StudioFx
 extends RefCounted
 
-const COLORS := [Color(1.0, 0.82, 0.92), Color(1.0, 0.95, 0.7), Color(0.85, 0.8, 1.0)]
-
-
 ## Sparkles at a point in `parent`'s space, a chime, and a bounce on `bounce`.
-static func burst(parent: Control, at: Vector2, kind: StringName = &"craft", tint: Color = Color(1, 1, 1),
+static func burst(parent: Control, at: Vector2, kind: StringName = &"craft", tint: Color = Color.WHITE,
 		bounce: Control = null, amount: int = 28) -> void:
 	if parent == null or not parent.is_inside_tree():
 		return
@@ -24,8 +21,8 @@ static func burst(parent: Control, at: Vector2, kind: StringName = &"craft", tin
 	p.scale_amount_max = 1.3
 	p.texture = Juice._star_texture()
 	var grad := Gradient.new()
-	grad.set_color(0, tint.lerp(COLORS[0], 0.4))
-	grad.set_color(1, Color(COLORS[1], 0.0))
+	grad.set_color(0, tint.lerp(JournalTheme.wash(0), 0.4))
+	grad.set_color(1, Color(JournalTheme.wash(3), 0.0))
 	p.color_ramp = grad
 	p.position = at
 	parent.add_child(p)

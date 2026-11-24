@@ -312,7 +312,7 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 	col.add_child(row)
 	var swatch := ColorRect.new()
 	swatch.custom_minimum_size = Vector2(22, 22)
-	swatch.color = p.colors[0] if not p.colors.is_empty() else Color(0.85, 0.72, 0.76)
+	swatch.color = p.colors[0] if not p.colors.is_empty() else JournalTheme.wash(0)
 	row.add_child(swatch)
 	var name := BookKit.label(p.display_name, &"SatchelBody", true)
 	name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -331,7 +331,7 @@ func _card(p: MareDecor, wearing: bool) -> Control:
 		for need: Array in MareTack.needs(p, inventory):
 			var l := BookKit.label("%s  %d / %d" % [need[0], mini(need[1], need[2]), need[2]], &"SatchelSmall", true)
 			if int(need[1]) < int(need[2]):
-				l.modulate = Color(1, 1, 1, 0.55)
+				l.modulate.a = 0.55
 			col.add_child(l)
 		b.text = "Make it"
 		b.disabled = not MareTack.can_make(p, inventory)
@@ -514,6 +514,6 @@ func _make_sparkles() -> CPUParticles2D:
 	p.scale_amount_min = 2.0
 	p.scale_amount_max = 4.5
 	var g := Gradient.new()
-	g.colors = PackedColorArray([Color(1.0, 0.95, 0.8, 1.0), Color(1.0, 0.8, 0.9, 0.0)])
+	g.colors = PackedColorArray([JournalTheme.color(&"glow"), Color(JournalTheme.wash(0), 0.0)])
 	p.color_ramp = g
 	return p

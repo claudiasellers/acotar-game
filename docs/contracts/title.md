@@ -7,7 +7,7 @@ Look: Feyre's journal, shut (`ClosedBook`, `ui/title/closed_book.gd`), over the 
 - The cover is clothbound, with the game's name pressed into it in gold foil: `A COURT OF` / `THORNS AND ROSES`, a thorned rose, `THE SPRING COURT` (`ClosedBook.KICKER`, `NAME`, `COURT`; the opening film's title card reads the same three). Her five index tabs show along the top of the pages and the ribbon at their foot.
 - Its colours are `JournalTheme.BOOK` (`cloth`, `cloth_deep`, `foil`, `night`), the same in both acts as the open book's art is. Its type is the `CoverKicker` and `CoverTitle` variations. Nothing on the title carries a colour or a font of its own.
 - `lift(seconds)` swings the cover open on its spine: the night-sky endpaper with her yellow whorls comes over to the left, and the first page lies open on the right. `close(seconds)` shuts it. `open_now` says which; `lifted` and `shut` are emitted when the swing ends. `page_rect()` is the first page's writing area on the screen.
-- The menu stands beside the shut book as lines of type (`TitleChoice` variation: paper, gold and underlined in focus), under the Treaty's line, "A life for a life." The whole layout is drawn for 1920 x 1080 and shrinks with `BookLayout.fit` on a smaller screen.
+- The menu stands beside the shut book as lines of type (`TitleChoice` variation: paper, gold and underlined in focus), under the Treaty's line, "A life for a life." Both are written on a `LineBand` smear (node `Band`), so they read at 4.5 to 1 over the brightest thing the backdrop shows. The whole layout is drawn for 1920 x 1080 and shrinks with `BookLayout.fit` on a smaller screen.
 - Starting a story (Continue, a story picked, a new one begun) lifts the cover and the first page washes up over the screen in the theme's `paper`. `LoadingVeil` is the same paper with "Returning…" in her hand (`ReadText`), so the title runs straight into it.
 
 ## Boot
@@ -29,4 +29,4 @@ Look: Feyre's journal, shut (`ClosedBook`, `ui/title/closed_book.gd`), over the 
 - The settings page's "Save & Title" opens `res://ui/title/title_screen.tscn` (`SettingsTab.TITLE_SCENE`).
 
 ## Test
-`tests/unit/ui/test_title_contract.gd` and `tests/unit/ui/test_save_slots.gd` check the menu and the slots; `tests/unit/ui/test_closed_book.gd` checks the book, the page the stories lie on and the wash to the loading page. `tests/integration/test_continue_contract.gd` checks Continue replays no earlier beat and keeps to its time budget.
+`tests/unit/ui/test_title_contract.gd` and `tests/unit/ui/test_save_slots.gd` check the menu and the slots; `tests/unit/ui/test_title_reads.gd` checks the menu's contrast and the first page's small print; `tests/unit/ui/test_closed_book.gd` checks the book, the page the stories lie on and the wash to the loading page. `tests/integration/test_continue_contract.gd` checks Continue replays no earlier beat and keeps to its time budget.

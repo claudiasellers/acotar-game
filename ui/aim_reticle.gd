@@ -5,9 +5,11 @@
 class_name AimReticle
 extends Control
 
-const RING := Color(1.0, 0.86, 0.5, 0.95)
-const RING_MISS := Color(1.0, 1.0, 1.0, 0.45)
-const LINE := Color(1.0, 0.8, 0.9, 0.35)
+## How strongly the ring shows where the arrow lands, and where it won't;
+## and the line down to it.
+const RING := 0.95
+const RING_MISS := 0.45
+const LINE := 0.35
 ## Seconds between predictions (the path is ~180 short ray casts).
 const REFRESH := 1.0 / 30.0
 
@@ -51,7 +53,7 @@ func _draw() -> void:
 		return
 	var centre := size * 0.5
 	if _screen.distance_to(centre) > 6.0:
-		draw_dashed_line(centre, _screen, LINE, 1.5, 5.0, true)
-	var hit: bool = impact.hit
-	draw_arc(_screen, 9.0, 0.0, TAU, 28, RING if hit else RING_MISS, 2.0, true)
-	draw_circle(_screen, 2.0, RING if hit else RING_MISS)
+		draw_dashed_line(centre, _screen, Color(JournalTheme.wash(0), LINE), 1.5, 5.0, true)
+	var ring := Color(JournalTheme.color(&"glow"), RING) if impact.hit else Color(JournalTheme.color(&"paper"), RING_MISS)
+	draw_arc(_screen, 9.0, 0.0, TAU, 28, ring, 2.0, true)
+	draw_circle(_screen, 2.0, ring)

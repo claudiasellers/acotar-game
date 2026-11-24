@@ -187,7 +187,7 @@ func _process(delta: float) -> void:
 		MapMarks.pin_in_spring = in_spring
 		if pin.active:
 			beacon.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
-			wind.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
+			wind.set_colours(MapMarks.beacon_colours().accent)
 	_update_pin()
 	if pin.active and UiMode.current(get_tree()) == UiMode.Mode.PLAY:
 		wind.follow(feyre.global_position, pin.xz, delta)
@@ -244,7 +244,7 @@ func _sync_beacon() -> void:
 	var colours := MapMarks.beacon_colours()
 	beacon.set_colours(colours.accent, colours.glow)
 	if wind:
-		wind.set_colours(colours.accent, colours.glow)
+		wind.set_colours(colours.accent)
 	beacon.show_at(Vector3(pin.xz.x, WorldHeight.height_at(pin.xz.x, pin.xz.y), pin.xz.y))
 	beacon.set_distance(player_xz.distance_to(pin.xz))
 

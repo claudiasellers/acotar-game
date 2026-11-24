@@ -24,6 +24,9 @@ const BOOK_OPEN := Vector2(960, 140)
 const MENU_AT := Vector2(1230, 392)
 const TAGLINE_AT := Vector2(1234, 318)
 const CHOICE_SIZE := Vector2(340, 60)
+## The dark smear the menu is written on, so it reads over the flowers and
+## the pale path: how far it reaches past the type on each side.
+const BAND_PAD := Vector2(64, 44)
 const INTRO_SECONDS := 2.2
 ## The page washing up to fill the screen, once the cover is open.
 const WASH_SECONDS := 0.9
@@ -34,6 +37,7 @@ var book: ClosedBook
 var buttons: Dictionary = {}
 var _menu: VBoxContainer
 var _tagline: Label
+var _band: PanelContainer
 var _veil: ColorRect
 var _settings: SettingsTab
 var _slots: TitleSlots
@@ -112,8 +116,7 @@ func _open_slots(mode: TitleSlots.Mode) -> void:
 		_slots.closed.connect(_on_slots_closed)
 		add_child(_slots)
 		move_child(_slots, _veil.get_index())
-	_menu.visible = false
-	_tagline.visible = false
+	_show_beside(false)
 	_lift()
 	_place()
 	_slots.modulate.a = 0.0
@@ -132,8 +135,7 @@ func _on_slot_chosen(slot: String) -> void:
 func _on_slots_closed() -> void:
 	book.close()
 	_slide_book(BOOK_SHUT, ClosedBook.LIFT_SECONDS * 0.6)
-	_menu.visible = true
-	_tagline.visible = true
+	_show_beside(true)
 	if has_save() != buttons.has("Continue"):
 		_rebuild_menu()
 	var opener := "Load" if _slots.mode == TitleSlots.Mode.LOAD and buttons.has("Load") else "New Game"
@@ -167,8 +169,13 @@ func _on_settings_closed() -> void:
 
 func _show_shut_book(on: bool) -> void:
 	book.visible = on
-	_menu.visible = on
-	_tagline.visible = on
+	_show_beside(on)
+
+
+## The menu, the line over it and the smear under both.
+func _show_beside(on: bool) -> void:
+	for part: Control in [_band, _tagline, _menu]:
+		part.visible = on
 
 
 func _on_quit() -> void:
@@ -187,8 +194,7 @@ func _enter_game() -> void:
 	_leaving = true
 	Juice.bounce_control(_menu, 0.04)
 	var fade := create_tween().set_parallel()
-	fade.tween_property(_menu, ^"modulate:a", 0.0, 0.4)
-	fade.tween_property(_tagline, ^"modulate:a", 0.0, 0.4)
+	fade.tween_method(_set_beside, _menu.modulate.a, 0.0, 0.4)
 	if _slots != null:
 		fade.tween_property(_slots, ^"modulate:a", 0.0, 0.4)
 	var wait := 0.0 if book.open_now else ClosedBook.LIFT_SECONDS
@@ -237,6 +243,12 @@ func _build() -> void:
 	book = ClosedBook.new()
 	add_child(book)
 
+	_band = PanelContainer.new()
+	_band.name = "Band"
+	_band.theme_type_variation = &"LineBand"
+	_band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_band)
+
 	_tagline = BookKit.label(TAGLINE, &"LineTold")
 	_tagline.name = "Tagline"
 	add_child(_tagline)
@@ -275,6 +287,7 @@ func _rebuild_menu() -> void:
 		b.queue_free()
 	buttons.clear()
 	_fill_menu()
+	_place()
 
 
 func _button(text: String, callback: Callable) -> Button:
@@ -294,11 +307,13 @@ func _button(text: String, callback: Callable) -> Button:
 ## Lays the book, the menu and the stories' page out for the screen's size.
 func _place() -> void:
 	var fit := BookLayout.fit(get_viewport_rect().size)
-	for part: Control in [book, _menu, _tagline]:
+	for part: Control in [book, _band, _menu, _tagline]:
 		part.scale = Vector2.ONE * fit
 	book.position = _on_screen(BOOK_OPEN if book.open_now else BOOK_SHUT)
 	_menu.position = _on_screen(MENU_AT)
 	_tagline.position = _on_screen(TAGLINE_AT)
+	_band.position = _on_screen(TAGLINE_AT - BAND_PAD)
+	_band.size = Vector2(CHOICE_SIZE.x, MENU_AT.y - TAGLINE_AT.y + buttons.size() * (CHOICE_SIZE.y + 4.0)) + BAND_PAD * 2.0
 	if _slots != null:
 		_slots.scale = Vector2.ONE * fit
 		_slots.position = _on_screen(BOOK_OPEN + ClosedBook.PAGE.position)
@@ -321,8 +336,8 @@ func _intro() -> void:
 
 ## How strongly the menu and the line over it show beside the book.
 func _set_beside(alpha: float) -> void:
-	_menu.modulate.a = alpha
-	_tagline.modulate.a = alpha
+	for part: Control in [_band, _tagline, _menu]:
+		part.modulate.a = alpha
 
 
 # --- helpers -----------------------------------------------------------------------

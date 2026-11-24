@@ -180,7 +180,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 					status.text = why
 				elif s.opened_gallery:
 					s.opened_gallery = false
-					StudioFx.burst(tex, event.position, &"unlock", Color(1, 0.9, 0.7), null, 36)
+					StudioFx.burst(tex, event.position, &"unlock", JournalTheme.color(&"glow"), null, 36)
 			else:
 				s.end_stroke()
 		elif event is InputEventMouseMotion and s.canvas.painting:
@@ -197,7 +197,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 		s.finish(title.text)
 		# Hold the finished canvas on screen a moment while it sparkles.
 		(tex.texture as ImageTexture).update(done)
-		StudioFx.burst(frame, frame.size * 0.5, &"outfit", Color(1, 0.85, 0.95), frame, 70)
+		StudioFx.burst(frame, frame.size * 0.5, &"outfit", JournalTheme.wash(0), frame, 70)
 		status.text = "Finished."
 		await tree.create_timer(0.8, true).timeout
 		close())

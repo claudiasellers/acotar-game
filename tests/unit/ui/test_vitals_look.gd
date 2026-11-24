@@ -1,23 +1,8 @@
 # gate: when:ui/hud/vitals/*,ui/theme/*
 ## The vitals pieces in their final art (plan step 8b): every colour is a
-## JournalTheme token, a status is a pan like the paint tin's (dark and
-## cracked for a bad one) and the health bar says how much she has in figures.
+## JournalTheme token (test_one_look.gd keeps that for every UI script), a
+## status is a pan like the paint tin's (dark and cracked for a bad one) and the health bar says how much she has in figures.
 extends GutTest
-
-const PIECES: Array[String] = [
-	"res://ui/hud/vitals/vitals_hud.gd", "res://ui/hud/vitals/health_bar.gd", "res://ui/hud/vitals/status_row.gd",
-	"res://ui/hud/vitals/stamina_bow.gd", "res://ui/hud/vitals/grab_prompt.gd", "res://ui/hud/vitals/edge_fx.gd",
-]
-
-
-func test_no_vitals_piece_carries_a_colour_of_its_own() -> void:
-	var own := RegEx.create_from_string("Color\\(\\s*\"#|Color\\(\\s*[0-9.]+\\s*,\\s*[0-9.]+\\s*,")
-	for path in PIECES:
-		var lines := FileAccess.get_file_as_string(path).split("\n")
-		assert_gt(lines.size(), 1, "%s exists" % path)
-		for i in lines.size():
-			if not lines[i].strip_edges().begins_with("#"):
-				assert_null(own.search(lines[i]), "%s:%d: %s" % [path, i + 1, lines[i].strip_edges()])
 
 
 func test_both_acts_carry_the_same_vitals_tokens() -> void:

@@ -708,7 +708,7 @@ func _build_backdrop() -> void:
 	_backdrop.add_child(ground)
 	var lamp := OmniLight3D.new()
 	lamp.name = "Lamp"
-	lamp.light_color = Color(1.0, 0.96, 0.9)
+	lamp.light_color = JournalTheme.color(&"paper")
 	lamp.light_energy = LAMP_ENERGY
 	lamp.omni_range = 9.0
 	lamp.position = Vector3(0.9, 1.9, CAMERA_DISTANCE * 0.8)
