@@ -28,9 +28,15 @@ static func make_mesh(aabb: AABB) -> NavigationMesh:
 	var nm := NavigationMesh.new()
 	nm.agent_radius = 0.25
 	nm.agent_height = 1.5
-	nm.agent_max_climb = 0.5
+	# One cell (0.25 = cell_height) and triangles only: at two cells (0.5) over
+	# stepped terrain, and with merged 6-vertex polygons, the bake leaves three
+	# polygons on one edge and the server logs "Navigation region synchronization
+	# had N edge error(s)" (T129; the stable-yard hills, e.g. tiles centred (60,-40)).
+	# Stairs are smooth ramps and risers are 0.19, so nothing walkable is lost.
+	nm.agent_max_climb = 0.25
 	nm.agent_max_slope = 46.0
 	nm.cell_size = 0.25
+	nm.vertices_per_polygon = 3.0
 	nm.cell_height = 0.25
 	nm.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
 	nm.geometry_collision_mask = WORLD_LAYER
