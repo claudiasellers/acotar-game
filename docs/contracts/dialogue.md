@@ -23,6 +23,16 @@ No choices, no objective text, no quest markers.
 | Talking hands | `CourtNpc.set_talking(true)` for the length of the line |
 | On screen | `LinePresenter` (`docs/contracts/ui-frame.md`, "Line voices"). Inner lines are the Thought voice: her page slip, no name. Everything else is Said. `show_fn(who, text, inner)` is the test seam |
 
+## A moment's own lines
+
+A scene that speaks at its own beat calls `DialogueDirector.line(self, &"<line_id>", seconds = -1, speaker = null)`.
+The line is a `SCENE` row of the `moments` book (`tools/dialogue/gen_dialogue.py`, `moment(...)`), so it has its
+row in the line sheet, its voice file, ducking and faces like any other, and it belongs to the caller's scene
+(it clears when that scene ends). No line of words is typed into a script. Returns the seconds on screen, 0 when
+there is no director (a moment run bare in a test). A line whose speaker is `note` is written, not spoken: it
+shows in the Read voice, a page held until she puts it back, with `who` as what it is ("A tag on the hasp").
+`DialogueDirector.of(tree)` finds the director.
+
 ## When it stays quiet
 
 Staged scenes always win. Nothing is said while `StoryControl.mode` isn't `FULL` (staged moments

@@ -41,7 +41,8 @@ const FRONT_DOORS := Vector2(0.0, -28.6)
 ## With nothing to dress the stumps, she thinks of the infirmary shelves this
 ## long after he is laid down (the herbs restock daily, gen_service.gd).
 const HINT_AFTER := 3.5
-const SHELF_HINT := "Herbs. The infirmary shelves, past the kitchens. If I run."
+## Her thought when there is nothing to dress him with (a line of the sheet).
+const SHELF_HINT := &"triage_shelves"
 
 var state: TriageState
 var faerie: Node3D
@@ -133,7 +134,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open(_s: SceneSpace = null) -> void:
 	note_mood()
 	EventBus.mood_requested.emit(&"dread", 0.55, 1.5)
-	say("Tamlin", "The table. Clear it off!")
+	say(&"triage_table")
 	# Lucien shoves the vase off; glass and petals across the marble.
 	if _vase:
 		_vase.visible = false
@@ -162,10 +163,10 @@ func _open(_s: SceneSpace = null) -> void:
 			Vector3(FRONT_DOORS.x + 1.2, global_position.y, FRONT_DOORS.y))
 
 
-## Every line goes through the one presenter with this scene as its owner, so
-## it clears when the scene ends or the phase changes (L24-10).
-func say(who: String, text: String, seconds: float = -1.0) -> void:
-	LinePresenter.line(self, who, text, seconds)
+## Every line is the sheet's, spoken by the director with this scene as its
+## owner, so it clears when the scene ends or the phase changes (L24-10).
+func say(line_id: StringName, seconds: float = -1.0) -> void:
+	DialogueDirector.line(self, line_id, seconds)
 
 
 # --- Presses ----------------------------------------------------------------
@@ -229,9 +230,9 @@ func press_interact() -> void:
 
 func _read_line(wound: int) -> void:
 	if wound == 0:
-		say("", "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.")
+		say(&"triage_stumps")
 	else:
-		say("", "A tourniquet. But there is nothing to tie it to, and no time.")
+		say(&"triage_tourniquet")
 
 
 func _take_hand() -> void:
@@ -240,7 +241,7 @@ func _take_hand() -> void:
 	StoryControl.set_focus(faerie)
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"hand_held")
 	if can_hear:
-		say("Feyre", "You'll get your wings back. I promise.")
+		say(&"triage_promise")
 
 
 func _let_go() -> void:
@@ -266,7 +267,7 @@ func _take_linen_strip() -> void:
 func _on_came_round() -> void:
 	spoke = true
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"speaks")
-	say("Summer faerie", TriageState.SPOKEN_LINE, 3.5)
+	say(TriageState.SPOKEN_LINE, 3.5)
 
 
 ## Runs the clock one tick: steps she's working, the bleeding, the puddle.
@@ -279,7 +280,7 @@ func step_clock(delta: float) -> void:
 	if not hinted and state.elapsed >= HINT_AFTER:
 		hinted = true
 		if float(TriageMath.best_dressing(inventory).rating) <= 0.0:
-			say("", SHELF_HINT, 4.0)
+			say(SHELF_HINT, 4.0)
 	if lucien_exit:
 		lucien_exit.tick(delta)
 	var was_rag := state.has_rag
@@ -311,7 +312,7 @@ func _at_death(_s: SceneSpace = null) -> void:
 		StoryControl.set_focus(faerie)
 		EventBus.story_actor_cue.emit(&"tamlin", &"holds_other_hand")
 		# Said while she still holds his hand ("awhile after"): it ends with the scene.
-		say("Feyre", "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.", AFTER_SECONDS)
+		say(&"triage_alone", AFTER_SECONDS)
 	else:
 		EventBus.story_actor_cue.emit(&"tamlin", &"holds_him_alone")
 

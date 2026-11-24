@@ -4,10 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-marks = Array[Dictionary]([{"n": 1, "shape": "x", "what": "the front doors", "thought": "The front doors. An X.", "x": 4, "z": -31}, {"n": 2, "shape": "o", "what": "the marble stairs", "thought": "The marble stairs. A circle.", "x": 7, "z": -38}, {"n": 3, "shape": "x", "what": "the glass garden doors", "thought": "The garden doors. An X.", "x": 7, "z": -56}, {"n": 4, "shape": "x", "what": "the kitchen door", "thought": "The kitchen door. An X.", "x": 52, "z": -51}, {"n": 5, "shape": "o", "what": "the servants' stair", "thought": "The servants' stair. A circle.", "x": 62, "z": -51}])
+marks = Array[Dictionary]([{"n": 1, "shape": "x", "what": "the front doors", "x": 4, "z": -31}, {"n": 2, "shape": "o", "what": "the marble stairs", "x": 7, "z": -38}, {"n": 3, "shape": "x", "what": "the glass garden doors", "x": 7, "z": -56}, {"n": 4, "shape": "x", "what": "the kitchen door", "x": 52, "z": -51}, {"n": 5, "shape": "o", "what": "the servants' stair", "x": 62, "z": -51}])
 pictograms = {&"armory": "bow", &"dining_hall": "cup", &"dressing_room": "crown", &"entrance_hall": "stair", &"feyre_bedroom": "bed", &"gallery": "brush", &"garden_saloon": "flower", &"map_room": "key", &"painting_room": "brush", &"svc_infirmary": "bandage", &"svc_stillroom": "bottle", &"tamlin_study": "book"}
 lookouts = {&"lantern_lookout": PackedStringArray("western_fells"), &"moon_tower": PackedStringArray("blossom_vale"), &"observatory": PackedStringArray("rosewild", "fae_village", "autumn_foothills"), &"rose_bower": PackedStringArray("solstice_meadow", "hill_of_the_rite", "eastern_woods")}
 min_rooms = 10
 start_flag = "fact.alis_tripped"
-first_thought = "If I'm going to be stuck here, I need to know my way around this house."
 canon = "Ch12 [C]: sleepless, she maps the manor halls with X marks; she can't write, so the page has Xs and circles for the doors, the windows, the marble stairs. Room pictures, the five marked places and the tower views: X. Start moved earlier by the owner (2026-11-11), V: from the morning Alis trips her rope (ch7) it runs beside the other beats; the Bogge night at the foyer table stays after the puca (ch12)."

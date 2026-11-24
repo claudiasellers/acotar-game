@@ -794,6 +794,50 @@ for _area, _l in LINES:
 
 
 # =============================================================================
+# Lines a moment speaks itself (L77, step 7d): the script calls
+# DialogueDirector.line(self, id) at its own beat, so the line gets its voice
+# file, ducking and faces like any other. They were typed into the scripts
+# before; the words are unchanged. Canon tags to be confirmed by the Keeper.
+# =============================================================================
+A = "moments"
+
+
+def moment(lid, scene, text, speaker="feyre", inner=True, canon="X", who=None, delivery="", **kw):
+    if inner and not delivery:
+        delivery = "inner voice: dry, quiet, close"
+    line(A, lid, speaker, text, "scene", scene + "." + lid, (), inner=inner, canon=canon, who=who,
+         delivery=delivery, once=False, cd=0.0, **kw)
+
+
+# The Summer faerie on the dining table (ch 17).
+moment("triage_table", "summer_faerie_triage", "The table. Clear it off!", speaker="tamlin", inner=False, canon="A",
+       delivery="a roar, carrying him in")
+moment("triage_stumps", "summer_faerie_triage",
+       "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.", canon="A")
+moment("triage_tourniquet", "summer_faerie_triage", "A tourniquet. But there is nothing to tie it to, and no time.")
+moment("triage_promise", "summer_faerie_triage", "You'll get your wings back. I promise.", inner=False, canon="A",
+       delivery="low, a lie told kindly")
+moment("triage_wings", "summer_faerie_triage", "She took my wings.", speaker="summer_faerie", inner=False, canon="V",
+       who="Summer faerie", delivery="a whisper, fading")
+moment("triage_shelves", "summer_faerie_triage", "Herbs. The infirmary shelves, past the kitchens. If I run.")
+moment("triage_alone", "summer_faerie_triage",
+       "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.",
+       inner=False, canon="A", delivery="quiet, to Tamlin, not looking at him")
+moment("grave_hand", "summer_faerie_grave", "Someone should have held his hand. I should have.")
+
+# Her map of the halls (ch 12): why she maps at all, then one thought a mark.
+moment("hall_map_why", "hall_map", "If I'm going to be stuck here, I need to know my way around this house.")
+for _n, _what, _shape in [(1, "The front doors", "An X"), (2, "The marble stairs", "A circle"),
+                          (3, "The garden doors", "An X"), (4, "The kitchen door", "An X"),
+                          (5, "The servants' stair", "A circle")]:
+    moment("hall_mark_%d" % _n, "hall_map", "%s. %s." % (_what, _shape))
+
+# The sentries' chest (Act IV): the tag she reads on its hasp. A "note" is read,
+# not heard: LinePresenter holds it up as a loose page until she puts it back.
+moment("sentry_chest_tag", "sentry_chest", "For whoever puts an arrow in all three butts.", speaker="note",
+       inner=False, who="A tag on the hasp", delivery="not voiced: written")
+
+# =============================================================================
 # Who stands where (CastPresence). House spots are in house space (x, z) on the
 # room's storey; cottage spots are relative to the act1_cottage_interior anchor.
 # =============================================================================

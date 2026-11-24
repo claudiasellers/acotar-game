@@ -11,12 +11,16 @@
 ##   DREAD    a thing that should not speak (the Suriel): bone capitals that
 ##            write themselves out, never quite still, on black that floods
 ##            up from the foot of the screen with no edge and no corner.
-## The last two are the horror palette on purpose (R3: horror is never dressed
+##   READ     a tag, a note, a sign: a loose page held up in the middle of
+##            the screen, what it is in small capitals over the words, until
+##            she puts it back with E.
+## Whisper and Dread are the horror palette on purpose (R3: horror is never dressed
 ## up as the pretty UI). A new kind of line is one row in VOICES.
 ##
-## A line stands in one of two places. The lane runs low across the screen
+## A line stands in one of three places. The lane runs low across the screen
 ## under Feyre's feet, and the strap steps aside while a line is there; in a
-## film the lane stands on the letterbox instead. The middle is the whisper's.
+## film the lane stands on the letterbox instead. The middle is the whisper's,
+## and a page is held at the centre.
 ## Each place holds one line at a time. A line never outlives the scene that
 ## spoke it: it clears when that scene finishes or leaves the tree, on a phase
 ## change and on a load, and it steps aside while a screen pauses play.
@@ -26,8 +30,8 @@
 class_name LinePresenter
 extends CanvasLayer
 
-enum Voice { SAID, THOUGHT, TOLD, WHISPER, DREAD }
-enum Place { LANE, MIDDLE }
+enum Voice { SAID, THOUGHT, TOLD, WHISPER, DREAD, READ }
+enum Place { LANE, MIDDLE, PAGE }
 
 const NODE := ^"ScreenStack/LinePresenter"
 const FADE := 0.35
@@ -38,13 +42,16 @@ const LANE_TOP := 0.805
 const FILM_LIFT := 40.0
 ## The whisper's band of the screen, top and bottom.
 const MIDDLE := Vector2(0.36, 0.5)
+## Where a held page's middle sits (a share of the screen's height).
+const PAGE_AT := 0.46
 ## The widest a line's text runs before it wraps, in px.
 const TEXT_WIDTH := 860.0
 const WHORL := 26.0
 ## Voice -> where it stands, its sheet (a PanelContainer variation) and its
 ## type (a Label variation); then what it wears and how it moves: the
-## speaker's name, her whorl, a tremble in px, letters written per second and
-## how many fades it takes to leave.
+## speaker's name (and the type it is in), her whorl, a tremble in px, letters
+## written per second, how many fades it takes to leave, a narrower wrap, and
+## whether it is held until she puts it back.
 const VOICES := {
 	Voice.SAID: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineSaid", "named": true},
 	Voice.THOUGHT: {"place": Place.LANE, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true},
@@ -52,7 +59,11 @@ const VOICES := {
 	Voice.WHISPER: {"place": Place.MIDDLE, "sheet": &"LineBare", "type": &"LineWhisper", "tremble": 1.6,
 		"linger": 2.0},
 	Voice.DREAD: {"place": Place.LANE, "sheet": &"LineFlood", "type": &"LineDread", "tremble": 0.8, "written": 38.0},
+	Voice.READ: {"place": Place.PAGE, "sheet": &"LoosePage", "type": &"ReadText", "named": true,
+		"name_type": &"PageSection", "width": 520.0, "held": true},
 }
+## The key that puts a held page back.
+const PUT_BACK := &"interact"
 
 var _stands: Dictionary[Place, Stand] = {}
 
@@ -104,6 +115,10 @@ func _init() -> void:
 	middle.anchor_top = MIDDLE.x
 	middle.anchor_bottom = MIDDLE.y
 	middle.alignment = BoxContainer.ALIGNMENT_CENTER
+	var page := _stands[Place.PAGE].get_parent() as VBoxContainer
+	page.anchor_top = PAGE_AT - 0.3
+	page.anchor_bottom = PAGE_AT + 0.3
+	page.alignment = BoxContainer.ALIGNMENT_CENTER
 	_lay_lane()
 
 
@@ -147,6 +162,14 @@ func stand_of(in_voice: Voice) -> Stand:
 ## True while a line stands in the lane (the strap steps aside for it).
 func in_lane() -> bool:
 	return visible and _stands[Place.LANE].showing != ""
+
+
+## A held page goes back on E (or Esc), and the key does nothing else.
+func _input(event: InputEvent) -> void:
+	var page := _stands[Place.PAGE]
+	if page.showing != "" and visible and (event.is_action_pressed(PUT_BACK) or event.is_action_pressed(&"ui_cancel")):
+		page.clear()
+		get_viewport().set_input_as_handled()
 
 
 ## Hangs the lane under her feet, or stands it on a film's letterbox.
@@ -193,6 +216,7 @@ class Stand:
 	var _shift: Vector2
 	var _source: SceneSpace
 	var _tween: Tween
+	var _hint: Control
 
 	func _init() -> void:
 		name = "Sheet"
@@ -225,6 +249,10 @@ class Stand:
 		# A line that writes itself out is laid out whole: its sheet doesn't grow.
 		text_label.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 		col.add_child(text_label)
+		_hint = BookKit.key_hint(BookKit.key_word(PUT_BACK), "Put it back")
+		_hint.name = "Hint"
+		_hint.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(_hint)
 
 	func say(in_voice: Voice, who: String, text: String, from: Node, seconds: float) -> float:
 		_row = VOICES[in_voice]
@@ -232,7 +260,9 @@ class Stand:
 		theme_type_variation = _row.sheet
 		text_label.theme_type_variation = _row.type
 		who_label.text = who
+		who_label.theme_type_variation = _row.get("name_type", &"LineName")
 		who_label.visible = _row.get("named", false) and who != ""
+		_hint.visible = _row.get("held", false)
 		whorl.visible = _row.get("whorl", false)
 		whorl.ink = JournalTheme.color(&"line")
 		text_label.text = text
@@ -240,10 +270,12 @@ class Stand:
 		# A short line's sheet is as wide as its words; a long one wraps.
 		var words := text_label.get_theme_font(&"font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 				text_label.get_theme_font_size(&"font_size")).x
-		text_label.custom_minimum_size.x = minf(ceilf(words) + 2.0, TEXT_WIDTH)
+		text_label.custom_minimum_size.x = minf(ceilf(words) + 2.0, _row.get("width", TEXT_WIDTH))
 		showing = text
 		_t = 0.0
 		_left = seconds if seconds > 0.0 else LinePresenter.reading_time(text) + LinePresenter.writing_time(in_voice, text)
+		if _row.get("held", false):
+			_left = 0.0  # no clock: it stays until it is put back
 		_set_source(_space_of(from))
 		_fade_to(1.0, FADE)
 		return _left

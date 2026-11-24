@@ -80,6 +80,7 @@ const LABELS := {
 	&"QuickBarCount": [15, "body", 800, &"ink"],
 	&"NotifyText": [20, "body", 600, &"ink"],
 	&"ThoughtText": [26, "hand", 600, &"ink"],
+	&"ReadText": [30, "hand", 600, &"ink"],
 	&"LineSaid": [24, "body", 600, &"paper"],
 	&"LineName": [23, "display", 400, &"glow"],
 	&"LineTold": [34, "hand", 600, &"paper"],

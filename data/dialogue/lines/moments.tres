@@ -1,0 +1,356 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"triage_table"
+speaker = &"tamlin"
+who = "Tamlin"
+text = "The table. Clear it off!"
+canon = "A"
+trigger = 6
+where = &"summer_faerie_triage.triage_table"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "a roar, carrying him in"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L1"]
+script = ExtResource("1")
+id = &"triage_stumps"
+speaker = &"feyre"
+who = ""
+text = "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit."
+canon = "A"
+trigger = 6
+where = &"summer_faerie_triage.triage_stumps"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L2"]
+script = ExtResource("1")
+id = &"triage_tourniquet"
+speaker = &"feyre"
+who = ""
+text = "A tourniquet. But there is nothing to tie it to, and no time."
+canon = "X"
+trigger = 6
+where = &"summer_faerie_triage.triage_tourniquet"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L3"]
+script = ExtResource("1")
+id = &"triage_promise"
+speaker = &"feyre"
+who = "Feyre"
+text = "You'll get your wings back. I promise."
+canon = "A"
+trigger = 6
+where = &"summer_faerie_triage.triage_promise"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "low, a lie told kindly"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L4"]
+script = ExtResource("1")
+id = &"triage_wings"
+speaker = &"summer_faerie"
+who = "Summer faerie"
+text = "She took my wings."
+canon = "V"
+trigger = 6
+where = &"summer_faerie_triage.triage_wings"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "a whisper, fading"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L5"]
+script = ExtResource("1")
+id = &"triage_shelves"
+speaker = &"feyre"
+who = ""
+text = "Herbs. The infirmary shelves, past the kitchens. If I run."
+canon = "X"
+trigger = 6
+where = &"summer_faerie_triage.triage_shelves"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L6"]
+script = ExtResource("1")
+id = &"triage_alone"
+speaker = &"feyre"
+who = "Feyre"
+text = "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that."
+canon = "A"
+trigger = 6
+where = &"summer_faerie_triage.triage_alone"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "quiet, to Tamlin, not looking at him"
+emotion = &"neutral"
+
+[sub_resource type="Resource" id="L7"]
+script = ExtResource("1")
+id = &"grave_hand"
+speaker = &"feyre"
+who = ""
+text = "Someone should have held his hand. I should have."
+canon = "X"
+trigger = 6
+where = &"summer_faerie_grave.grave_hand"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L8"]
+script = ExtResource("1")
+id = &"hall_map_why"
+speaker = &"feyre"
+who = ""
+text = "If I'm going to be stuck here, I need to know my way around this house."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_map_why"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L9"]
+script = ExtResource("1")
+id = &"hall_mark_1"
+speaker = &"feyre"
+who = ""
+text = "The front doors. An X."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_mark_1"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L10"]
+script = ExtResource("1")
+id = &"hall_mark_2"
+speaker = &"feyre"
+who = ""
+text = "The marble stairs. A circle."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_mark_2"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L11"]
+script = ExtResource("1")
+id = &"hall_mark_3"
+speaker = &"feyre"
+who = ""
+text = "The garden doors. An X."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_mark_3"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
+id = &"hall_mark_4"
+speaker = &"feyre"
+who = ""
+text = "The kitchen door. An X."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_mark_4"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
+id = &"hall_mark_5"
+speaker = &"feyre"
+who = ""
+text = "The servants' stair. A circle."
+canon = "X"
+trigger = 6
+where = &"hall_map.hall_mark_5"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("1")
+id = &"sentry_chest_tag"
+speaker = &"note"
+who = "A tag on the hasp"
+text = "For whoever puts an arrow in all three butts."
+canon = "X"
+trigger = 6
+where = &"sentry_chest.sentry_chest_tag"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = false
+follow_up = &""
+delivery = "not voiced: written"
+emotion = &"neutral"
+
+[resource]
+script = ExtResource("3")
+area = &"moments"
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14")])
+places = Array[ExtResource("2")]([])

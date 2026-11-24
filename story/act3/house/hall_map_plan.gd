@@ -5,7 +5,7 @@
 class_name HallMapPlan
 extends Resource
 
-## One per hall_mark anchor, in order: {"n": 1, "shape": "x"|"o", "what": "the front doors", "thought": "..."}.
+## One per hall_mark anchor, in order: {"n": 1, "shape": "x"|"o", "what": "the front doors"}. Her thought at each is line hall_mark_<n> of the sheet.
 @export var marks: Array[Dictionary] = []
 ## Room id -> pictogram (book, bed, pot, harp, flower, star, cup, bath, brush,
 ## bow, crown, bandage, key, bottle, needle, candle). Rooms not listed get one
@@ -19,6 +19,4 @@ extends Resource
 ## 2026-11-11; the book's ch12 map moved earlier) and runs beside the other
 ## beats until the map is drawn.
 @export var start_flag: String = "fact.alis_tripped"
-## Her thought the first time a room goes on her page: why she maps at all.
-@export var first_thought: String = ""
 @export_multiline var canon: String = ""

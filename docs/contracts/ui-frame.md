@@ -153,17 +153,19 @@ fired it, and each is one row of `LinePresenter.VOICES`:
 | `TOLD` | a film's narration | lane | `LineBand`, no name | `LineTold`, her hand, large |
 | `WHISPER` | a voice in her head that is not hers (the Bogge) | middle | `LineBare`: none | `LineWhisper`: bone in a thin italic hand, red only as the bleed around it, trembling |
 | `DREAD` | a thing that should not speak (the Suriel) | lane | `LineFlood`: black that floods up from the foot of the screen, edge to edge, no sheet and no corner | `LineDread`: bone Marcellus, writing itself out at 38 letters a second, never still |
+| `READ` | a tag, a note, a sign | page | `LoosePage`, what it is in small capitals (`PageSection`), the key that puts it back under the words | `ReadText`, her hand; held until E (`interact`) or Esc, and the key does nothing else that press |
 
-The last two wear the horror palette (`JournalTheme.HORROR`) on purpose (R3).
+Whisper and Dread wear the horror palette (`JournalTheme.HORROR`) on purpose (R3).
 
-Two places, one line at a time in each. **The lane** runs between
+Three places, one line at a time in each. **The lane** runs between
 `HudLayout.LANE_LEFT` and its mirror and hangs from `LANE_TOP` (0.805 of the
 screen's height) downwards: under Feyre's feet in the follow camera and under
 the `PROMPT` zone. The strap sits there, so `HudLayout` fades the `STRAP` zone
 out while a line is in the lane (`in_lane()`) and back after. While a film
 plays the lane stands on the bottom letterbox bar instead (`FILM_LIFT` above
 it). **The middle** (0.36 to 0.5 of the height) is the whisper's, so a whisper
-and her own thought can be up together. Text wraps at 860 px.
+and her own thought can be up together. **The page** is held at the centre
+(0.46 of the height) and wraps at 520 px. Lane text wraps at 860 px.
 
 Calls: `say(voice, who, text, from, seconds)` returns the seconds the line
 stays; `LinePresenter.line(from, who, text, seconds)` is the same for a
@@ -173,8 +175,7 @@ lane's line ("" when none); `stand_of(voice)` is where a voice stands (its
 `showing`, labels and `tremble` scale); `reading_time(text)` and
 `writing_time(voice, text)`. `from` (or the `SceneSpace` above it) owns the
 line: it clears when that scene finishes or leaves the tree, on a phase change
-and on a load, and every line hides while a screen pauses the tree. Read (tags
-and notes) joins the table later in step 7.
+and on a load, and every line hides while a screen pauses the tree.
 
 ## UiMode
 
@@ -243,6 +244,7 @@ every piece's script.
 | step 7a | lines said and thought: `LinePresenter` and its voice table; `DialogueDirector`, the scene spaces and the scripts that typed a line themselves all show through it | `story/act2/act2_caption.gd` and its test | `test_line_presenter.gd`: nothing names the old caption |
 | step 7b | a film's words (Told and Said), the Bogge's whisper and the Suriel's voice are rows of the same table; the lane moves under Feyre's feet and the strap steps aside for it; Feyre's questions to the Suriel are said aloud before each answer | `story/film/film_captions.gd`, `story/act2/act2_whisper.gd`, `story/act3/suriel/suriel_voice.gd`; `UiLayers.OVER_VEIL` | `test_line_presenter.gd`: nothing names the four old presenters |
 | step 7c | Feyre's guide thoughts: `GuideJournal` shows them as Thought lines and keeps only the bookmark (her whorl and the G key, `ThoughtMark`) in the `THOUGHT` zone; a thought waits while another line has the lane, and the guide never clears a line that isn't its own | the card half of `guide_journal.gd`, `ui/guide/guide_vignette.gd`, `ui/guide/cartouche_style_box.gd` | `test_line_presenter.gd`: nothing names the card's parts |
+| step 7d | the lines scripts typed themselves (the triage, the grave, the hall map and its five marks, the sentries' tag) are rows of the line sheet, spoken with `DialogueDirector.line(self, id)`; a line whose speaker is `note` is Read | the typed strings; `HallMapPlan.first_thought` and each mark's `thought` | `test_line_presenter.gd`: no script under `story/` or `systems/` types a line into a `LinePresenter` call; every id a moment speaks is in the books and the sheet |
 
 ## Files outside `ui/` the frame edits
 

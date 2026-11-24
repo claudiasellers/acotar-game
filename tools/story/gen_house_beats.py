@@ -148,11 +148,11 @@ MURAL_CANON = ("Ch13 [C]: the study, candles lit by magic, a mural of Prythian's
 
 # --- her map of the halls (ch12) ------------------------------------------------------
 MARKS = [
-    (1, "x", "the front doors", "The front doors. An X."),
-    (2, "o", "the marble stairs", "The marble stairs. A circle."),
-    (3, "x", "the glass garden doors", "The garden doors. An X."),
-    (4, "x", "the kitchen door", "The kitchen door. An X."),
-    (5, "o", "the servants' stair", "The servants' stair. A circle."),
+    (1, "x", "the front doors"),
+    (2, "o", "the marble stairs"),
+    (3, "x", "the glass garden doors"),
+    (4, "x", "the kitchen door"),
+    (5, "o", "the servants' stair"),
 ]
 PICTOGRAMS = {"entrance_hall": "stair", "garden_saloon": "flower", "tamlin_study": "book", "map_room": "key",
               "svc_infirmary": "bandage", "svc_stillroom": "bottle", "dining_hall": "cup", "feyre_bedroom": "bed",
@@ -167,15 +167,13 @@ PLAN_CANON = ("Ch12 [C]: sleepless, she maps the manor halls with X marks; she c
               "beside the other beats; the Bogge night at the foyer table stays after the puca (ch12).")
 # Owner, 2026-11-11: the mapping starts the morning after the rope (fact.alis_tripped).
 START_FLAG = "fact.alis_tripped"
-FIRST_THOUGHT = "If I'm going to be stuck here, I need to know my way around this house."
 
 
 def write_plan(anch):
     marks = []
-    for n, shape, what, thought in MARKS:
+    for n, shape, what in MARKS:
         (x, _y, z), _yaw = anch["hall_mark_%d" % n]
-        marks.append('{"n": %d, "shape": "%s", "what": %s, "thought": %s, "x": %g, "z": %g}' % (
-            n, shape, gd_str(what), gd_str(thought), x, z))
+        marks.append('{"n": %d, "shape": "%s", "what": %s, "x": %g, "z": %g}' % (n, shape, gd_str(what), x, z))
     pics = ", ".join("&%s: %s" % (gd_str(k), gd_str(v)) for k, v in sorted(PICTOGRAMS.items()))
     looks = ", ".join("&%s: PackedStringArray(%s)" % (gd_str(k), ", ".join(gd_str(p) for p in v)) for k, v in sorted(LOOKOUTS.items()))
     body = ['[gd_resource type="Resource" script_class="HallMapPlan" format=3]', "",
@@ -183,7 +181,7 @@ def write_plan(anch):
             'script = ExtResource("1")',
             "marks = Array[Dictionary]([%s])" % ", ".join(marks),
             "pictograms = {%s}" % pics, "lookouts = {%s}" % looks, "min_rooms = %d" % MIN_ROOMS,
-            'start_flag = %s' % gd_str(START_FLAG), "first_thought = %s" % gd_str(FIRST_THOUGHT),
+            'start_flag = %s' % gd_str(START_FLAG),
             "canon = %s" % gd_str(PLAN_CANON)]
     open(os.path.join(OUT, "hall_map_plan.tres"), "w").write("\n".join(body) + "\n")
 

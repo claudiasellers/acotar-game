@@ -18,7 +18,7 @@ const LINEN_STRIPS := 3
 const LUCID_BLOOD := 30.0
 ## From her taking his hand to his last breath.
 const FADE_SECONDS := 22.0
-const SPOKEN_LINE := "She took my wings."
+const SPOKEN_LINE := &"triage_wings"
 
 var blood: float = START_BLOOD
 var wounds: Array[TriageWound] = [TriageWound.new(&"left"), TriageWound.new(&"right")]

@@ -44,7 +44,7 @@ func unavailable_reason() -> String:
 func use(_user: Node = null) -> void:
 	if unavailable_reason() != "":
 		if is_inside_tree() and not WorldState.has_flag(TAKEN):
-			LinePresenter.line(self, "", "Locked. A tag on the hasp: for whoever puts an arrow in all three butts.")
+			DialogueDirector.line(self, &"sentry_chest_tag")
 		return
 	var trigger := ActionTrigger.new()
 	trigger.name = "Raise_sentry_warbow_taken"

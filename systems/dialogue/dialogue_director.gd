@@ -16,6 +16,8 @@ extends Node
 ## res://audio/voice/<line_id>.ogg exists.
 signal line_spoken(line_id: StringName, speaker: StringName, text: String, at: Vector3, inner: bool)
 
+## The "speaker" of a line that is written, not spoken: a tag, a note, a sign.
+const NOTE := &"note"
 const GROUP := &"dialogue_director"
 const PRESENCE_GROUP := &"presence_actor"
 const LINES_DIR := "res://data/dialogue/lines/"
@@ -96,6 +98,10 @@ var _holds: Dictionary = {}
 var _scene_queue: Array[Dictionary] = []
 var _scene_next: float = 0.0
 var _voice_flat: AudioStreamPlayer
+## The line being shown, and for say_line the scene it belongs to and its time.
+var _speaking: DialogueLine
+var _from: Node
+var _seconds: float = -1.0
 
 
 func _init() -> void:
@@ -237,6 +243,34 @@ func _pump_scene() -> void:
 	var node: Node = next["node"] if is_instance_valid(next["node"]) else null
 	_speak(next["line"], node)
 	_scene_next = _busy_until + FOLLOW_PAUSE
+
+
+## The director of this tree, or null (a moment run bare, with no game around it).
+static func of(tree: SceneTree) -> DialogueDirector:
+	return tree.get_first_node_in_group(GROUP) as DialogueDirector if tree else null
+
+
+## A moment speaks one line of the sheet itself, now: DialogueDirector.line(self,
+## &"grave_hand"). `from` (or the SceneSpace above it) owns the line, so it
+## clears with the scene; `seconds` overrides the reading time; `speaker` is
+## the node whose hands and face talk. Returns the seconds on screen, 0 when
+## there is no director or no such line.
+static func line(from: Node, id: StringName, seconds: float = -1.0, speaker: Node = null) -> float:
+	var d := of(from.get_tree()) if from.is_inside_tree() else null
+	return d.say_line(id, from, seconds, speaker) if d else 0.0
+
+
+func say_line(id: StringName, from: Node = null, seconds: float = -1.0, speaker: Node = null) -> float:
+	var found := by_id.get(id) as DialogueLine
+	if found == null:
+		push_warning("DialogueDirector: no line '%s' in the sheet" % id)
+		return 0.0
+	_from = from
+	_seconds = seconds
+	_speak(found, speaker)
+	_from = null
+	_seconds = -1.0
+	return _busy_until - _now
 
 
 ## Staged scenes, films, narrowed control and other captions all win.
@@ -621,6 +655,7 @@ func _speak(line: DialogueLine, node: Node) -> DialogueLine:
 	var who := line.who
 	if who == "" and not line.inner and node is CourtNpc:
 		who = (node as CourtNpc).display_name
+	_speaking = line
 	var seconds: float = show_fn.call(who, line.text, line.inner)
 	_busy_until = _now + seconds
 	last_line = line
@@ -640,10 +675,12 @@ func _speak(line: DialogueLine, node: Node) -> DialogueLine:
 	return line
 
 
-## Her thoughts are the page slip; everything said aloud is the band.
+## Her thoughts are the page slip, a note is read, everything else is said.
 func _show_line(who: String, text: String, inner: bool) -> float:
-	return LinePresenter.of(get_tree()).say(
-			LinePresenter.Voice.THOUGHT if inner else LinePresenter.Voice.SAID, who, text, self)
+	var voice := LinePresenter.Voice.THOUGHT if inner else LinePresenter.Voice.SAID
+	if _speaking != null and _speaking.speaker == NOTE:
+		voice = LinePresenter.Voice.READ
+	return LinePresenter.of(get_tree()).say(voice, who, text, _from if _from else self, _seconds)
 
 
 func _set_talking(node: Node, seconds: float) -> void:

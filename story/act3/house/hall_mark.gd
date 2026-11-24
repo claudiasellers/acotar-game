@@ -96,9 +96,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.set_mode(StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_look)
-			var thought := String(info().get("thought", ""))
-			if thought != "" and is_inside_tree():
-				LinePresenter.line(self, "", thought), "she looks"),
+			DialogueDirector.line(self, StringName("hall_mark_%d" % n)), "she looks"),
 		Beats.wait(1.0),
 		Beats.run(func(_s: SceneSpace) -> void:
 			raise("fact.hall_x_%d" % n)

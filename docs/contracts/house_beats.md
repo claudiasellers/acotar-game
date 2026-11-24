@@ -13,7 +13,7 @@ Alis trips her rope (`fact.alis_tripped`, ch7) and runs beside the other p2/p3
 beats as an ongoing thread. It is drawn (`manor_map_drawn`) once all five marks
 and enough rooms are on her page. Setting it down on the foyer table at night
 opens the Bogge night, which still waits for `puca_resisted`. Her first room
-gives her one thought (`HallMapPlan.first_thought`). The sketchbook lists the
+gives her one thought (line `hall_map_why` of the sheet). The sketchbook lists the
 map under "Still on my mind" (`JournalEntry.ongoing`).
 
 ## Where it plugs in

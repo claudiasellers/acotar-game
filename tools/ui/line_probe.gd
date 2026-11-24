@@ -16,6 +16,7 @@ const LINES := {
 	"thought_long": [LinePresenter.Voice.THOUGHT, "", "Eight days of snow, and the doe is the first thing I have seen worth an arrow. If I miss, there is nothing for the pot tonight and nothing to sell tomorrow."],
 	"told": [LinePresenter.Voice.TOLD, "", "The forest had become a labyrinth of snow and ice."],
 	"whisper": [LinePresenter.Voice.WHISPER, "", "Please. Look at me. I will be gentle."],
+	"read": [LinePresenter.Voice.READ, "A tag on the hasp", "For whoever puts an arrow in all three butts."],
 	"dread": [LinePresenter.Voice.DREAD, "", "Stay with the High Lord, human. That is all you can do. Do not go looking for answers after today."],
 }
 ## The brightest ground each act has: noon snow, and a Spring path at noon.

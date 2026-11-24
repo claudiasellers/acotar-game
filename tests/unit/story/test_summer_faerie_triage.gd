@@ -22,6 +22,10 @@ func before_each() -> void:
 	feyre.add_to_group(&"player")
 	root.add_child(feyre)
 	inv = Inventory.new()
+	# The scene's lines are the sheet's, spoken by the director.
+	var director := DialogueDirector.new()
+	director.auto_tick = false
+	root.add_child(director)
 	journal.clear()
 	EventBus.journal_entry_added.connect(_on_journal)
 
@@ -248,7 +252,9 @@ func test_with_nothing_to_dress_she_thinks_of_the_infirmary_shelves() -> void:
 	for _i in 50:
 		t.tick(STEP)
 	assert_true(t.hinted)
-	assert_eq(LinePresenter.of(get_tree()).showing, SummerFaerieTriage.SHELF_HINT, "she thinks of the shelves")
+	var hint := DialogueDirector.of(get_tree()).by_id[SummerFaerieTriage.SHELF_HINT] as DialogueLine
+	assert_eq(LinePresenter.of(get_tree()).showing, hint.text, "she thinks of the shelves")
+	assert_eq(LinePresenter.of(get_tree()).voice, LinePresenter.Voice.THOUGHT)
 	var defs := load("res://data/regions/spring_court/manor_estate/house/service.tres")
 	var found := []
 	for d in defs.get(&"secrets"):

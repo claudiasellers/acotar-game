@@ -314,6 +314,93 @@ func test_guide_thoughts_are_slips_and_the_bookmark_brings_them_back() -> void:
 	assert_eq(hits, [], "the old card's parts are gone")
 
 
+## A tag is read, not heard: a loose page held up at the centre, what it is in
+## small capitals, until she puts it back with E. The key does nothing else.
+func test_a_note_is_a_page_held_until_she_puts_it_back() -> void:
+	lines.say(LinePresenter.Voice.READ, "A tag on the hasp", "For whoever puts an arrow in all three butts.")
+	var page := lines.stand_of(LinePresenter.Voice.READ)
+	assert_eq(page.theme_type_variation, &"LoosePage")
+	assert_eq(page.who_label.theme_type_variation, &"PageSection")
+	assert_true(page.who_label.visible and page.who_label.uppercase)
+	assert_true((page.find_child("Hint", true, false) as Control).visible, "the key that puts it back is shown")
+	await wait_seconds(0.3)
+	var view := get_viewport().get_visible_rect().size
+	assert_almost_eq(page.get_global_rect().get_center().y / view.y, LinePresenter.PAGE_AT, 0.02, "mid-screen")
+	assert_eq(lines.showing, "", "the lane is free under it")
+	await wait_seconds(LinePresenter.reading_time(page.showing) + 0.5)
+	assert_ne(page.showing, "", "no clock: it is held")
+	var e := InputEventAction.new()
+	e.action = LinePresenter.PUT_BACK
+	e.pressed = true
+	lines._input(e)
+	assert_eq(page.showing, "", "E puts it back")
+
+
+## A moment speaks the sheet's line by its id, through the director: it gets
+## the voice the line calls for, belongs to the moment's scene, and every line
+## a moment speaks this way has its row in the sheet.
+func test_a_moment_speaks_the_sheets_line_by_id() -> void:
+	var s := _space(&"line_test_moment")
+	assert_eq(DialogueDirector.line(s, &"grave_hand"), 0.0, "no director, no line (a moment run bare)")
+	var d := DialogueDirector.new()
+	d.auto_tick = false
+	add_child_autofree(d)
+	assert_gt(DialogueDirector.line(s, &"grave_hand", 4.5), 4.0)
+	assert_eq(lines.showing, (d.by_id[&"grave_hand"] as DialogueLine).text)
+	assert_eq(lines.voice, LinePresenter.Voice.THOUGHT)
+	DialogueDirector.line(s, &"triage_table")
+	assert_eq(lines.voice, LinePresenter.Voice.SAID)
+	assert_eq(lines.stand_of(LinePresenter.Voice.SAID).who_label.text, "Tamlin")
+	EventBus.scene_space_finished.emit(&"line_test_moment")
+	assert_eq(lines.showing, "", "the line goes with the moment's scene")
+	DialogueDirector.line(s, &"sentry_chest_tag")
+	var page := lines.stand_of(LinePresenter.Voice.READ)
+	assert_eq(page.showing, (d.by_id[&"sentry_chest_tag"] as DialogueLine).text, "a note is read")
+	assert_eq(page.who_label.text, "A tag on the hasp")
+	var sheet := FileAccess.get_file_as_string("res://data/dialogue/sheet/line_sheet.csv")
+	var asked := RegEx.create_from_string("DialogueDirector\\.line\\([^,]+, &\"([a-z0-9_]+)\"")
+	var ids: Array[String] = []
+	_ids_in("res://story", asked, ids)
+	_ids_in("res://story/act3/summer", RegEx.create_from_string("&\"()(triage_[a-z]+)\""), ids, 2)
+	for n in 5:
+		ids.append("hall_mark_%d" % (n + 1))
+	assert_gte(ids.size(), 15, "the grave, the tag, the hall map and its five marks, the seven triage lines: %s" % [ids])
+	for id in ids:
+		assert_true(d.by_id.has(StringName(id)), "%s is a line of the books" % id)
+		assert_true(sheet.contains("\n%s," % id), "%s has its row in the line sheet" % id)
+
+
+func _ids_in(dir: String, asked: RegEx, ids: Array[String], group: int = 1) -> void:
+	for sub in DirAccess.get_directories_at(dir):
+		_ids_in(dir.path_join(sub), asked, ids, group)
+	for file in DirAccess.get_files_at(dir):
+		if file.ends_with(".gd"):
+			for m in asked.search_all(FileAccess.get_file_as_string(dir.path_join(file))):
+				ids.append(m.get_string(group))
+
+
+## No scene types a line into its script: LinePresenter.line and say are for
+## the director, a scene's own stage sheet, a film's sheet and the guide.
+func test_no_script_types_its_own_line() -> void:
+	var typed := RegEx.create_from_string("LinePresenter\\.(line|of\\([^)]*\\)\\.say)\\([^\\n]*\"[A-Z][^\"]*\\s[^\"]*\\s[^\"]*\"")
+	var hits: Array[String] = []
+	_typed_in("res://story", typed, hits)
+	_typed_in("res://systems", typed, hits)
+	assert_eq(hits, [], "a line of words typed into a script instead of the sheet")
+
+
+func _typed_in(dir: String, typed: RegEx, hits: Array[String]) -> void:
+	for sub in DirAccess.get_directories_at(dir):
+		_typed_in(dir.path_join(sub), typed, hits)
+	for file in DirAccess.get_files_at(dir):
+		if file.ends_with(".gd"):
+			var n := 0
+			for l in FileAccess.get_file_as_string(dir.path_join(file)).split("\n"):
+				n += 1
+				if typed.search(l):
+					hits.append("%s:%d" % [dir.path_join(file), n])
+
+
 ## The director sends her thoughts to the slip and speech to the band.
 func test_the_director_picks_the_voice_from_the_line() -> void:
 	var d := DialogueDirector.new()
