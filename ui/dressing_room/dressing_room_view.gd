@@ -45,6 +45,8 @@ const REMOVABLE: Array[StringName] = [&"outer", &"head", &"neck", &"mask", &"ear
 const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55, "Masks": 0.8}
 ## What she can change from her satchel, out in the world.
 const SATCHEL_TABS: Array[String] = [StatusPage.TAB, "Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
+## The tab she weaves a flower crown on.
+const WEAVE_TAB := "Crowns"
 const COLUMNS := 3
 const THUMB := 104.0
 const SWATCH := 30.0
@@ -352,7 +354,8 @@ func _build() -> void:
 		names = SATCHEL_TABS.filter(func(n: String) -> bool: return n != "Hair")
 	for n in names:
 		var here: Array[WardrobePiece] = owned.filter(func(p: WardrobePiece) -> bool: return category_of(p) == n)
-		if not here.is_empty():
+		# Crowns is always there: it is where she weaves one.
+		if not here.is_empty() or n == WEAVE_TAB:
 			tabs.add_child(_piece_tab(n, here))
 			for p in here:
 				if Gameplay.wardrobe.is_unseen(p.id):
@@ -443,10 +446,59 @@ func _piece_tab(tab_name: String, pieces: Array[WardrobePiece]) -> Control:
 		off.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		off.pressed.connect(func() -> void: take_off(slots))
 		col.add_child(off)
+	if tab_name == WEAVE_TAB:
+		col.add_child(_weave_row())
 	var grid := _grid(col)
 	for fam in families(pieces):
 		grid.add_child(_card(fam))
 	return parts[0]
+
+
+## Weaving a flower crown from the blooms she carries (CrownWeaver): a chip
+## when she has enough of one colour, and a line that says so when she has
+## not (what she has, never what is left to find, R2).
+func _weave_row() -> Control:
+	var row := HBoxContainer.new()
+	row.name = "Weave"
+	row.add_theme_constant_override(&"separation", 12)
+	var can := CrownWeaver.best_recipe(Gameplay.inventory) != null
+	var chip := BookKit.chip("Weave a crown", false)
+	chip.name = "WeaveChip"
+	chip.focus_mode = Control.FOCUS_ALL
+	chip.disabled = not can
+	chip.pressed.connect(weave_crown)
+	row.add_child(chip)
+	var line := _label("" if can else "Not enough flowers for a crown.", &"SatchelSmall")
+	line.name = "WeaveLine"
+	row.add_child(line)
+	return row
+
+
+## Weaves a crown from her blooms, puts it on and hangs it with the others.
+func weave_crown() -> StringName:
+	var piece := CrownWeaver.weave(Gameplay.inventory, Gameplay.wardrobe)
+	if piece == &"":
+		return &""
+	for i in tabs.get_tab_count():
+		var old := tabs.get_tab_control(i)
+		if String(old.name) != WEAVE_TAB:
+			continue
+		_swatches = _swatches.filter(func(sw: Button) -> bool: return not old.is_ancestor_of(sw))
+		tabs.remove_child(old)
+		old.queue_free()
+		var crowns: Array[WardrobePiece] = []
+		for id in Gameplay.wardrobe.owned_pieces():
+			var p := WardrobeCatalog.piece(id)
+			if p and category_of(p) == WEAVE_TAB:
+				crowns.append(p)
+		var hung := _piece_tab(WEAVE_TAB, crowns)
+		tabs.add_child(hung)
+		tabs.move_child(hung, i)
+		tabs.current_tab = i
+		break
+	_refresh()
+	_celebrate()
+	return piece
 
 
 ## One garment: its rendered thumbnail (New pinned on it while unseen), its
