@@ -56,10 +56,17 @@ ROAMERS = {
             ("sight_range", "36.0"),
             ("hearing_range", "40.0"),
             ("scent_range", "98.0"),
-            # 6 plain wood arrows to the body, 2 to the throat, 1 ash.
+            # 6 plain wood arrows to the body, 2 to the throat (the top 22%
+            # of its height), 1 ash: a mortal wound that kills in 4 s, or at
+            # once on any other hit (health-interactions §2.2).
             ("max_health", "48.0"),
             ("arrow_damage", "8.0"),
             ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
+            ("lethal_delay", "4.0"),
+            ("weak_zone_height", "0.78"),
+            ("weak_zone_name", '&"throat"'),
+            # Burns at 6 HP/s; burning reeds within 3 m send it running.
+            ("burn_dps", "6.0"),
             ("leaves_prints", "true"),
             ("stride", "0.9"),
             ("print_size", "0.12"),

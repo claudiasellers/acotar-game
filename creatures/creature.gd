@@ -20,6 +20,20 @@ const SLOW_TIME := 15.0
 const SLOW_FACTOR := 0.55
 ## How far a lure arrow's scent carries.
 const LURE_RADIUS := 35.0
+## The one damage rule's bow term: a bow at this launch speed (m/s, the hunting
+## bow) hits 1.0; each BOW_SPEED_STEP faster adds 1.0, capped at BOW_MULT_CAP,
+## so plain arrows take many on every bow (health-interactions §2.2) [D].
+const BOW_BASE_SPEED := 48.0
+const BOW_SPEED_STEP := 72.0
+const BOW_MULT_CAP := 1.3
+const ARROW_DIR := "res://data/arrows"
+const BOW_DIR := "res://data/bows"
+## Burning ground this close sets it alight (if it burns at all).
+const FIRE_BURN_RADIUS := 1.2
+## Seconds between looks at the ElementField for fire.
+const FIRE_SCAN := 0.3
+## A fire arrow in the body burns this long.
+const ARROW_BURN_SECONDS := 2.0
 
 @export var data: CreatureData
 ## Stable id for saves and story events. Defaults to the node name.
@@ -32,6 +46,15 @@ var bleeding: float = 0.0
 var mortally_wounded: bool = false
 var mortal_cause: StringName = &""
 var _mortal_left: float = 0.0
+## Lethal-arrow hits taken so far, toward CreatureData.ash_hits.
+var ash_taken: int = 0
+## Seconds left burning (fire arrow, burning ground).
+var burn_left: float = 0.0
+## Where the last hit landed: &"weak" (its weak spot) or &"body".
+var last_zone: StringName = &"body"
+var _fire_scan_left: float = 0.0
+static var _arrow_mults: Dictionary = {}
+static var _bow_mults: Dictionary = {}
 var model: Node3D
 var senses: CreatureSenses
 var harvestable: Harvestable
@@ -112,6 +135,8 @@ func _physics_process(delta: float) -> void:
 		_think(delta)
 		if leash:
 			leash.steer(delta)
+	if not _step_fire(delta):
+		return
 	if slowed_left > 0.0:
 		slowed_left -= delta
 		move_speed *= SLOW_FACTOR
@@ -151,33 +176,59 @@ func face_towards(point: Vector3, delta: float) -> void:
 	rotation.y = lerp_angle(rotation.y, yaw, clampf(data.turn_speed * delta, 0.0, 1.0))
 
 
-## Called by Arrow when it strikes this body.
+## Called by Arrow when it strikes this body. Where it struck, the arrow's head
+## and the bow that loosed it all go into the one damage rule (apply_hit).
 func on_arrow_hit(arrow: Node3D) -> void:
 	if not alive:
 		return
 	var arrow_id := read_arrow_id(arrow)
-	var result := resolve_arrow(data, health, arrow_id, mortally_wounded)
+	var at := Creature.read_impact(arrow)
+	var mult := Creature.arrow_mult(arrow_id) * Creature.bow_mult_of(Creature.read_bow_id(arrow))
+	apply_hit(StringName("arrow_%s" % arrow_id), arrow_id, mult, hit_zone(at), at)
+
+
+## Every hit on a creature goes through here: arrows, the knife, the bow bash,
+## stomps. `weapon_mult` scales one arrow's damage (data.arrow_damage); the
+## weak spot multiplies it again. Returns the resolve_hit result.
+func apply_hit(cause: StringName, weapon_id: StringName, weapon_mult: float, zone: StringName,
+		at: Vector3) -> Dictionary:
+	if not alive:
+		return {"health": 0.0, "killed": false, "mortal": false, "ash_taken": ash_taken}
+	var zone_mult := data.weak_zone_mult if zone == &"weak" else 1.0
+	var result := resolve_hit(data, health, weapon_id, weapon_mult * zone_mult, ash_taken, mortally_wounded)
+	var damaged := float(result.health) < health or bool(result.killed) or bool(result.mortal)
 	health = result.health
-	var cause := StringName("arrow_%s" % arrow_id)
+	ash_taken = result.ash_taken
+	last_zone = zone
 	if EventBus.has_signal(&"creature_hit"):
 		EventBus.emit_signal(&"creature_hit", creature_id, data.kind, cause, _hit_part(result.killed))
 	if animator:
-		animator.hit(arrow.global_position)
+		animator.hit(at)
 	if result.killed:
 		# The lethal arrow is what killed it, whatever finished it.
 		die(mortal_cause if mortally_wounded else cause)
-		return
+		return result
 	if result.mortal and not mortally_wounded:
 		mortally_wounded = true
 		mortal_cause = cause
 		_mortal_left = data.lethal_delay
-	bleeding = maxf(bleeding, 40.0)
+	if damaged:
+		bleeding = maxf(bleeding, 40.0)
 	wounded.emit(cause)
-	_on_wounded(arrow.global_position, cause)
+	_on_wounded(at, cause)
+	return result
+
+
+## Where on its body a point is: &"weak" inside its weak-spot band, else &"body".
+func hit_zone(at: Vector3) -> StringName:
+	if data.weak_zone_height <= 0.0 or not is_inside_tree():
+		return &"body"
+	return &"weak" if to_local(at).y >= data.body_height * data.weak_zone_height else &"body"
 
 
 ## Called by Arrow for special heads. Sleep drops it where it stands (fae
-## shrug most of it off), barbed bleeds and slows, lure draws everything near.
+## shrug most of it off), barbed bleeds and slows, lure draws everything near,
+## fire sets it burning (if it burns) and sends it from the flame.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 	if not alive:
 		return
@@ -191,6 +242,15 @@ func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 		&"lure":
 			if is_inside_tree():
 				Creature.lure(get_tree(), arrow.global_position)
+		&"fire":
+			ignite(ARROW_BURN_SECONDS)
+			_on_fire_near(arrow.global_position)
+
+
+## Sets it burning for `seconds`, if fire takes hold on it (CreatureData.burn_dps).
+func ignite(seconds: float) -> void:
+	if data.burn_dps > 0.0:
+		burn_left = maxf(burn_left, seconds)
 
 
 ## A lure arrow landed at `at`: every living creature in reach is drawn to it.
@@ -208,9 +268,63 @@ func _on_lured(_at: Vector3) -> void:
 	pass
 
 
-## Where an arrow landed, for story beats that care (no hit zones yet).
+## Brain hook: burning ground (or a fire arrow) at `from`, inside its
+## fire_fear_radius. Default: ignore it.
+func _on_fire_near(_from: Vector3) -> void:
+	pass
+
+
+## Burning and the fear of fire, every physics frame. Returns false if the
+## fire killed it.
+func _step_fire(delta: float) -> bool:
+	if burn_left > 0.0:
+		burn_left -= delta
+		health -= data.burn_dps * delta
+		if data.only_lethal_kills:
+			health = maxf(health, 1.0)
+		if health <= 0.0:
+			die(&"fire")
+			return false
+	if data.fire_fear_radius <= 0.0 and data.burn_dps <= 0.0:
+		return true
+	_fire_scan_left -= delta
+	if _fire_scan_left > 0.0 or not is_inside_tree():
+		return true
+	_fire_scan_left = FIRE_SCAN
+	var field := ElementField.find(get_tree())
+	if field == null:
+		return true
+	var reach := maxf(data.fire_fear_radius, FIRE_BURN_RADIUS)
+	if not Creature.any_burning(field, global_position, reach):
+		return true
+	if Creature.any_burning(field, global_position, FIRE_BURN_RADIUS):
+		ignite(FIRE_SCAN * 2.0)
+	if data.fire_fear_radius > 0.0:
+		_on_fire_near(Creature.fire_side(field, global_position, global_position - global_basis.z))
+	return true
+
+
+static func any_burning(field: ElementField, at: Vector3, radius: float) -> bool:
+	for id in field.cells_near(at, radius):
+		if field.is_burning(id):
+			return true
+	return false
+
+
+## Which way the fire is: the first of eight points 1.5 m out that has fire
+## near it, or `fallback` (ahead of it) when the flames are all round.
+static func fire_side(field: ElementField, at: Vector3, fallback: Vector3) -> Vector3:
+	for i in 8:
+		var p := at + Vector3.FORWARD.rotated(Vector3.UP, TAU * float(i) / 8.0) * 1.5
+		if Creature.any_burning(field, p, 1.5):
+			return p
+	return fallback
+
+
+## Where the last hit landed, for story beats and sound: its weak spot's name
+## (data.weak_zone_name) or &"body".
 func _hit_part(_killing: bool) -> StringName:
-	return &"body"
+	return data.weak_zone_name if last_zone == &"weak" else &"body"
 
 
 ## Brain hook for a non-lethal hit.
@@ -254,21 +368,73 @@ static func read_arrow_id(arrow: Object) -> StringName:
 	return &"wood"
 
 
-## Pure rule for one arrow hit: {health, killed, mortal}. A lethal arrow kills
-## at once, or with a lethal_delay leaves a mortal wound; any hit on a mortally
-## wounded creature kills it.
-static func resolve_arrow(creature: CreatureData, current_health: float, arrow_id: StringName,
-		already_mortal: bool = false) -> Dictionary:
+## The bow that loosed an arrow (meta `bow_id`, set by Arrow), or &"" when
+## there wasn't one (a test arrow, a thrown one).
+static func read_bow_id(arrow: Object) -> StringName:
+	if arrow != null and arrow.has_meta(&"bow_id"):
+		return StringName(arrow.get_meta(&"bow_id"))
+	return &""
+
+
+## Where an arrow truly struck (meta `impact`, the ray hit before the arrow is
+## pulled back to stick), else where it is now.
+static func read_impact(arrow: Node3D) -> Vector3:
+	if arrow == null:
+		return Vector3.ZERO
+	if arrow.has_meta(&"impact"):
+		return arrow.get_meta(&"impact") as Vector3
+	return arrow.global_position if arrow.is_inside_tree() else arrow.position
+
+
+## An arrow head's damage against one wood arrow (ArrowData.damage): wood 1.0,
+## barbed 1.4, sleep 0.4 and so on. 1.0 for an id with no data.
+static func arrow_mult(arrow_id: StringName) -> float:
+	if not _arrow_mults.has(arrow_id):
+		var path := ARROW_DIR.path_join("%s.tres" % arrow_id)
+		var d := load(path) as ArrowData if ResourceLoader.exists(path) else null
+		_arrow_mults[arrow_id] = d.damage if d else 1.0
+	return float(_arrow_mults[arrow_id])
+
+
+## How much harder a bow hits than the hunting bow, from its launch speed
+## (health-interactions §2.2) [D 2026-11-24]. 1.0 for no bow.
+static func bow_mult(max_speed: float) -> float:
+	return clampf(1.0 + (max_speed - BOW_BASE_SPEED) / BOW_SPEED_STEP, 1.0, BOW_MULT_CAP)
+
+
+static func bow_mult_of(bow_id: StringName) -> float:
+	if bow_id == &"":
+		return 1.0
+	if not _bow_mults.has(bow_id):
+		var path := BOW_DIR.path_join("%s.tres" % bow_id)
+		var b := load(path) as BowData if ResourceLoader.exists(path) else null
+		_bow_mults[bow_id] = Creature.bow_mult(b.max_speed) if b else 1.0
+	return float(_bow_mults[bow_id])
+
+
+## The one damage rule (health-interactions §2.2), pure: {health, killed,
+## mortal, ash_taken}. Damage is data.arrow_damage x `mult` (the weapon, the bow
+## and the zone). A lethal arrow (ash on fae) counts toward data.ash_hits; the
+## hit that reaches it kills at once, or with a lethal_delay leaves a mortal
+## wound. Any hit on a mortally wounded creature kills it. With
+## only_lethal_kills nothing else takes it below 1.
+static func resolve_hit(creature: CreatureData, current_health: float, weapon_id: StringName,
+		mult: float = 1.0, ash_so_far: int = 0, already_mortal: bool = false) -> Dictionary:
 	if already_mortal:
-		return {"health": 0.0, "killed": true, "mortal": true}
-	if arrow_id in creature.lethal_arrow_ids:
-		if creature.lethal_delay > 0.0:
-			return {"health": maxf(current_health - creature.arrow_damage, 1.0), "killed": false, "mortal": true}
-		return {"health": 0.0, "killed": true, "mortal": true}
-	var remaining := current_health - creature.arrow_damage
+		return {"health": 0.0, "killed": true, "mortal": true, "ash_taken": ash_so_far}
+	var remaining := current_health - creature.arrow_damage * maxf(mult, 0.0)
+	var ash := ash_so_far
+	if weapon_id in creature.lethal_arrow_ids:
+		ash += 1
+		if ash >= maxi(creature.ash_hits, 1):
+			if creature.lethal_delay > 0.0:
+				return {"health": maxf(remaining, 1.0), "killed": false, "mortal": true, "ash_taken": ash}
+			return {"health": 0.0, "killed": true, "mortal": true, "ash_taken": ash}
+		# Short of the count it is only a hard hit; it can't kill a fae alone.
+		return {"health": maxf(remaining, 1.0), "killed": false, "mortal": false, "ash_taken": ash}
 	if creature.only_lethal_kills:
-		return {"health": maxf(remaining, 1.0), "killed": false, "mortal": false}
-	return {"health": maxf(remaining, 0.0), "killed": remaining <= 0.0, "mortal": false}
+		return {"health": maxf(remaining, 1.0), "killed": false, "mortal": false, "ash_taken": ash}
+	return {"health": maxf(remaining, 0.0), "killed": remaining <= 0.0, "mortal": false, "ash_taken": ash}
 
 
 ## Points away from a threat on the ground plane.
