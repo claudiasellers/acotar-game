@@ -140,7 +140,7 @@ func _process(delta: float) -> void:
 	if speaking:
 		idle = 0.0
 		return
-	# Real seconds: the bow's slow draw slows the world, not her thinking.
+	# Real seconds: Focus slows the world, not her thinking.
 	idle += delta / maxf(Engine.time_scale, 0.01)
 	tick()
 
@@ -186,7 +186,7 @@ func _watch_bow() -> void:
 	var feyre := get_tree().get_first_node_in_group(&"player")
 	var bow: Variant = feyre.get(&"bow_controller") if feyre else null
 	if bow is BowController:
-		note_draw((bow as BowController).is_drawing)
+		note_draw((bow as BowController).is_nocked)
 
 
 func _stop_heart() -> void:

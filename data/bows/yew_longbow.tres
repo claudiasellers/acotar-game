@@ -6,7 +6,8 @@
 script = ExtResource("1")
 id = &"yew_longbow"
 display_name = "Yew longbow"
-nock_time = 0.4
+draw_time = 0.4
 max_speed = 60.0
 sway_degrees = 1.3
 loudness = 0.5
+kick_degrees = 0.35

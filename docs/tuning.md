@@ -202,11 +202,30 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | The rims | court_glen_places.gd `RUN_GRASS`, `RUN_HALF`, `RUN_BUSH_STEP`, `RIM_CLUMPS`, `RIM_DEPTH` | Watchers' Run: 2400 long-grass tufts tried within 15 m of the brook, a thorn bush about every 27 m on alternate banks; the west rim: 22 clumps of 2–6 oaks (a great elm leading some) within 150 m of the region's west edge, more and closer toward it; no flowers under them | | The glen letting go: no line where it stops. | wider-court-world |
 | Knolls by place | court_glen_places.gd `POOL_KNOLLS`, `RIM_WEST`, `RIM_NORTH`, `RIM_SOUTH` | white birches on knolls within 185 m of the pool; an old thorn or two aspens on knolls west of x -1385, north of z -335 or south of z 485 | | A knoll's one tree is its place's. | wider-court-world |
 
-## Bow feel (T101)
+## Bow feel (L80, plans/combat/bow-combat-design.md §10)
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `nock_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds from raising the bow (RMB) until it is nocked. After that every left click looses a full-power arrow (Zelda style, no hold-to-strengthen). A click during the nock is queued and fires when it completes. Upgrades can shorten it. | T101 |
+| `draw_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds of holding fire (LMB / RT) to draw the string. Releasing at full draw looses a full-power arrow; earlier lets the string down. No weak shots | L80 |
+| `kick_degrees` | data/bows/*.tres (BowData) | hunting 0.35; yew 0.35, fae 0.2, warbow 0.6, gilded 0.3 | 0–1 | Camera kick on release; off under Reduced Effects | L80 |
+| `follow_through_s` | data/bows/bow_tuning.tres (BowTuning) | 0.25 | 0.15–0.4 | Seconds after a shot before the next draw can start: shot-to-shot rhythm | L80 |
+| `release_buffer_s` | bow_tuning.tres | 0.15 | 0.1–0.2 | A release this close to full draw still looses, at full draw | L80 |
+| `settle_s` / `settle_floor` | bow_tuning.tres | 0.6 / 0.35 | 0.3–1.0 / 0.2–0.6 | Sway falls from 1.0 to the floor over this long held still: the reward for patience | L80 |
+| `settle_reset_turn_dps` / `unsettle_rate` | bow_tuning.tres | 30 / 3.0 | 15–60 / 1–6 | Turning faster than this (deg/s) or moving unsettles the aim, at this rate per second | L80 |
+| `settle_after_shot` | bow_tuning.tres | 0.7 | 0.35–1.0 | A shot's recoil leaves the aim at least this unsettled | L80 |
+| `fatigue_after_s` / `fatigue_rate` / `fatigue_max` | bow_tuning.tres | 3.0 / 0.25 / 2.0 | | How long a full draw holds before the arm trembles, how fast, and the cap | L80 |
+| `hold_drain` | bow_tuning.tres | 6/s | 0–10 | Stamina per second while the arm trembles | L80 |
+| `stance_*` | bow_tuning.tres | still 1.0, crouched 0.8, walking 1.6, crouch-walking 1.3 | | Sway multiplier by stance | L80 |
+| `breath_low` / `breath_winded` (+tremor) | bow_tuning.tres | 1.5 below 25% stamina / 2.0 + 0.4° winded | | Stamina's tie to aim | L80 |
+| `focus_scale` | bow_tuning.tres | 0.4 | 0.25–0.6 | Time scale while Focus is held (TimeScale request `bow_slow`) | L80 |
+| `focus_drain` / `focus_dread_drain` | bow_tuning.tres | 28/s real / 0.5 | 18–40 | Stamina per real second of Focus, times (1 + 0.5 × dread) | L80 |
+| `focus_sway` / `focus_sway_panic` / `panic_dread` | bow_tuning.tres | 0.4 / 0.6 / 0.6 | | How steady Focus is, and above what dread it's the shakier kind | L80 |
+| `focus_settle_speed` | bow_tuning.tres | 2.0 | 1–3 | Settle runs this much faster in Focus | L80 |
+| `focus_hold_after_release_s` | bow_tuning.tres | 0.3 | 0–0.5 | The hush holds this long after a Focused shot | L80 |
+| `fov_raised` / `fov_focus` | bow_tuning.tres | −10 / −16 | | FOV change from 70 while raised and while Focused (MovementFeel applies it) | L80 |
+| `aim_sensitivity` | bow_tuning.tres | 0.7 | 0.4–1.0 | Look speed while the bow is raised | L80 |
+| `kick_rise_s` / `kick_fall_s` | bow_tuning.tres | 0.06 / 0.15 | | Timing of the release kick | L80 |
+| `ring_unsettled_grow` | bow_tuning.tres | 0.3 | 0–0.5 | The reticle ring is this much larger while fully unsettled | L80 |
 
 ## White mare saddle and seat (L47-8)
 
