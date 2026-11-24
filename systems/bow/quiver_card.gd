@@ -28,10 +28,19 @@ func _ready() -> void:
 	_panel.visible = false
 	if controller:
 		controller.arrow_type_changed.connect(func(_id: StringName) -> void: show_card())
+	Gameplay.listen(&"story_item_granted", _on_granted)
 
 
-func show_card() -> void:
-	text = describe()
+## An arrow the story hands her (the hunt's one given back) is named as it
+## lands, so her count never changes with nothing to show why.
+func _on_granted(item_id: StringName, _count: int) -> void:
+	if String(item_id).begins_with("arrow_"):
+		show_card.call_deferred(item_id)
+
+
+## Shows the nocked arrow and its count, or those of `item_id` when given.
+func show_card(item_id: StringName = &"") -> void:
+	text = describe(item_id)
 	_label.text = text
 	_left = SHOW_SECONDS
 	_panel.visible = true
@@ -39,10 +48,10 @@ func show_card() -> void:
 
 
 ## "Wood arrow  ×12", or "No arrows".
-func describe() -> String:
+func describe(item_id: StringName = &"") -> String:
 	if controller == null:
 		return ""
-	var id := controller._available()
+	var id := item_id if item_id != &"" else controller._available()
 	if id == &"":
 		return "No arrows"
 	var data: ArrowData = BowController.arrow_data().get(id)

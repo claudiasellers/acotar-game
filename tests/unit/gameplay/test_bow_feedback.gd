@@ -254,3 +254,16 @@ func test_her_first_early_release_gets_one_thought_ever() -> void:
 	_hold(bow.bow.draw_time + 0.05, true, true)
 	_hold(0.05, true, false)
 	assert_eq(shown.size(), 1, "and never for a loosed arrow")
+
+
+func test_an_arrow_the_story_hands_her_is_named_on_the_quiver_card() -> void:
+	var card := bow.quiver_card
+	card._left = 0.0
+	card._panel.visible = false
+	var before := Gameplay.inventory.count(&"arrow_ash")
+	EventBus.story_item_granted.emit(&"arrow_ash", 1)
+	await wait_physics_frames(2)
+	assert_true(card._panel.visible, "the card shows as it lands")
+	assert_string_contains(card.text, "×%d" % (before + 1))
+	var ash: ArrowData = BowController.arrow_data().get(&"arrow_ash")
+	assert_string_contains(card.text, ash.display_name)
