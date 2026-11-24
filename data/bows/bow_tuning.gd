@@ -58,6 +58,8 @@ extends Resource
 @export_group("Feedback")
 ## The share of her draw she keeps when a blow lands on her.
 @export var draw_kept_when_hit: float = 0.5
+## The share of her draw she keeps through a sidestep.
+@export var draw_kept_when_sidestepping: float = 0.5
 ## The ring's draw arc: how far outside the ring it sits (px) and how long the
 ## catch at full draw and the pulse on a creature hit last (real seconds).
 @export var draw_arc_gap: float = 5.0
