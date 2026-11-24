@@ -53,6 +53,12 @@ func _on_wounded(from: Vector3, _cause: StringName) -> void:
 	_start_flee(from)
 
 
+## Burning ground near it (Creature._step_fire): it bolts from the flame.
+func _on_fire_near(from: Vector3) -> void:
+	if state != State.FLEE:
+		_start_flee(from)
+
+
 ## Calm prey wander over to the lure's scent; frightened ones ignore it.
 func _on_lured(at: Vector3) -> void:
 	if state == State.FLEE:

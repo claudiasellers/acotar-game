@@ -14,3 +14,4 @@ status_tag = &"drowsy"
 status_magnitude = 0.15
 status_seconds = 6.0
 dread_spike = 0.05
+windup_s = 0.6

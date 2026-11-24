@@ -83,6 +83,8 @@ var is_drawing: bool:
 
 var bow_controller: BowController
 var interactor: Interactor
+## Strike, V / pad Y: the bow bash or her boot knife (systems/strike).
+var strike: StrikeController
 var body_state: BodyState
 ## Health, afflictions, dread and ease, knockdown (systems/vitals). Sets max_stamina.
 var vitals: VitalsState
@@ -421,6 +423,10 @@ func _build_components() -> void:
 	_camera_fade = CameraFade.new()
 	_camera_fade.name = "CameraFade"
 	add_child(_camera_fade)
+	# Last child, so a Strike that lands takes the press before the bow sees it.
+	strike = StrikeController.new()
+	strike.name = "Strike"
+	add_child(strike)
 	_build_breath()
 
 

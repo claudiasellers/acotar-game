@@ -238,13 +238,13 @@ C = [
 	("col_snow_owl_down", "Owl down", [W, WALLH], "A wisp of white down caught on bark.", "f5f2ea", "common"),
 ]
 
-def _arrow(id, name, effect="", drag=0.0022, brk=0.35, dmg=1.0, shaft="8c6a45", fletch="d9d2c3", price=1, fae=False, mass=0.03, desc="", canon="X"):
+def _arrow(id, name, effect="", drag=0.0022, brk=0.35, dmg=1.0, shaft="8c6a45", fletch="d9d2c3", price=1, mass=0.03, desc="", canon="X"):
 	return dict(id=id, item_id="arrow_" + id, name=name, effect=effect, mass=mass, drag=drag, wet=1.7, wspeed=0.92,
-		brk=brk, fae=fae, dmg=dmg, shaft=shaft, fletch=fletch, price=price, desc=desc, canon=canon)
+		brk=brk, dmg=dmg, shaft=shaft, fletch=fletch, price=price, desc=desc, canon=canon)
 
 ARROWS = [
 	_arrow("wood", "Wood arrow", desc="Hazel shaft, feather fletching, a flint or iron head."),
-	_arrow("ash", "Ash arrow", drag=0.0020, brk=0.2, dmg=1.5, shaft="e3d6bd", fletch="8b5a2b", price=0, fae=True, mass=0.034, canon="C",
+	_arrow("ash", "Ash arrow", drag=0.0020, brk=0.2, dmg=1.5, shaft="e3d6bd", fletch="8b5a2b", price=0, mass=0.034, canon="C",
 		desc="Mountain-ash shaft, iron head, bought from a travelling peddler. The one thing the fae truly fear. She keeps it for faeries."),
 	_arrow("barbed", "Barbed arrow", "barbed", drag=0.0024, brk=0.3, dmg=1.4, fletch="7a5a3a", price=2, desc="Antler barbs that don't pull free."),
 	_arrow("rope", "Rope arrow", "rope", drag=0.0034, brk=0.15, dmg=0.3, fletch="c9b38a", price=2, mass=0.05, desc="Trails a line of sinew and silk; it holds when it bites into wood or stone."),
@@ -666,7 +666,7 @@ def main():
 		lines = ['id = &"%s"' % a["id"], 'item_id = &"%s"' % a["item_id"], 'display_name = "%s"' % a["name"],
 			"mass = %s" % a["mass"], "drag = %s" % a["drag"], "wet_drag_multiplier = %s" % a["wet"],
 			"wet_speed_multiplier = %s" % a["wspeed"], "stone_break_chance = %s" % a["brk"],
-			"fae_lethal = %s" % str(a["fae"]).lower(), "damage = %s" % a["dmg"], 'effect = &"%s"' % a["effect"],
+			"damage = %s" % a["dmg"], 'effect = &"%s"' % a["effect"],
 			"shaft_color = %s" % color(a["shaft"]), "fletching_color = %s" % color(a["fletch"])]
 		write("data/arrows/%s.tres" % a["id"], "res://data/arrows/arrow_data.gd", "ArrowData", lines)
 		# The arrow as an inventory item.

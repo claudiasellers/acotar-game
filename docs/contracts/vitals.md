@@ -72,8 +72,8 @@ static func is_hurt_scent(player: Node) -> bool     # health < 0.5: blood on her
 ```
 
 **What they fold in** (hostiles never re-apply these):
-- `sight_scale`: crouch (`CrouchMotor.sight_scale`), movement (still 0.7, walk 1.0, sprint 1.3), light at night (glow draught or held light ×2 vs night families, applied by the hostile with `Vitals.is_lit(player)`), gear perks, imbues.
-- `noise_scale`: crouch (`CrouchMotor.noise_scale`), movement (still 0.0, walk 0.4, run 0.8, sprint 1.0, plus landing spikes), dread > 0.7 adds +0.15 (her ragged breathing), gear perks, imbues. One-off loud events (bow release) keep their own emit path (`bow_released`).
+- `sight_scale`: crouch (`CrouchMotor.sight_scale`), gear perks, imbues. **Not her speed**: `CreatureSenses` scales sight by her speed itself (0.3 still to 1.0 at 4 m/s), so movement counts once (H0, 2026-11-24). Light at night (glow draught or held light ×2 vs night families) is applied by the hostile with `Vitals.is_lit(player)`.
+- `noise_scale`: crouch (`CrouchMotor.noise_scale`), dread > 0.7 adds +0.15 (her ragged breathing), gear perks, imbues. **Not her speed**: `CreatureSenses` makes her steps louder with speed itself. One-off loud events (bow release) keep their own emit path (`bow_released`). Rain (`ElementField.rain` > 0.3) is the senses' too: hearing ×0.7, scent ×0.5.
 - `scent_scale`: `BrewEffects.scent_scale`, wet (×0.6 when ElementState.wet > 0.5), hurt (×1.3), gear perks, imbues.
 - `dread_gain_scale`: ease baseline (×(1 − 0.3·ease)), steadying tea (×0.8), gear perks, imbues.
 - `damage_taken_scale`: Gentle Mode (×0.6), gear and imbue resistances by kind. There is **no flat armour**: resistances exist only for the kinds `thorn`, `fire`, `cold`, `venom`, `fall`. `bite`, `blunt` and `claw` always return 1.0 (×0.6 in Gentle Mode).
@@ -87,7 +87,7 @@ static func is_lit(player: Node) -> bool  # a glow draught, a held faelight or a
 `class_name AttackData extends Resource` in `systems/vitals/attack_data.gd`. Rows live in `data/combat/attacks/<family>_<move>.tres`. Hostile-fae owns the rows for its families (files prefixed with its family ids) and may add or retune them without asking. The vitals lane owns the class and the hazard rows.
 
 ```gdscript
-@export var id: StringName              # &"naga_bite"
+@export var id: StringName              # &"naga_claw"
 @export var family: StringName          # &"naga"; a hit whose id equals a family resolves to that family's is_default row
 @export var is_default: bool = false
 @export var damage: float = 10.0        # health points (her max is 100)
@@ -100,6 +100,7 @@ static func is_lit(player: Node) -> bool  # a glow draught, a held faelight or a
 @export var dread_spike: float = 0.1            # added to dread, before dread_gain_scale
 @export var can_knock_down: bool = true         # false: can't take her below floor_hp
 @export var floor_hp: float = 0.0
+@export var windup_s: float = 0.0       # tell to contact, s; the one home for a move's wind-up (hostile-fae). Floors: light 0.4, medium 0.55, heavy 0.8, none 0.6; 0 for hazards
 @export var canon: String = "X"
 ```
 
@@ -109,8 +110,8 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 
 | id | dmg | kind | reaction | knockback | status | dread |
 |---|---|---|---|---|---|---|
-| naga_bite (default) | 22 | bite | medium | 2 m | — | 0.15 |
-| naga_lunge | 30 | claw | heavy | 4 m | — | 0.2 |
+| naga_claw (default) | 22 | claw | medium | 2 m | — | 0.15 |
+| naga_lunge | 30 | blunt | heavy | 4 m | — | 0.2 |
 | naga_coil | 0 | — | none (grab: 6 presses, 3 s) | — | — | 0.25 |
 | puca_grab (default) | 0 | — | none (grab: 5 presses, 4 s) | — | — | 0.3 |
 | briarling_lash (default) | 8 | thorn | light | 0.5 m | — | 0.1 |
