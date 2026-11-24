@@ -58,7 +58,9 @@ func test_the_slip_is_her_hand_on_paper_above_the_book() -> void:
 	var note := shell.note
 	assert_eq(note.theme_type_variation, &"NotifyCard")
 	assert_eq((note.get_child(0) as Label).theme_type_variation, &"ThoughtText")
-	assert_lt(note.position.y + note.size.y, 0.0, "clear of the book's top edge")
+	assert_almost_eq(note.position.y + note.size.y, TabNote.TUCK, 0.5, "its foot tucked over the book's cloth edge")
+	assert_lt(TabNote.TUCK + BookLayout.TABS_AT.y, BookLayout.RIGHT.position.y, "short of the paper's writing")
+	assert_ne(note.rotation_degrees, 0.0, "slipped in at a tilt")
 	assert_almost_eq(note.position.x + note.size.x, BookLayout.SIZE.x - BookLayout.TABS_AT.x * 2.0, 0.5, "by the book's right end")
 	var tabs := shell.find_child("Tabs", true, false) as Control
 	assert_gt(note.position.x, tabs.position.x + tabs.size.x, "past the last index tab")
