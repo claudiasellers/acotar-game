@@ -47,8 +47,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = 19
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = UiLayers.SCREEN
 	_build()
 	_root.visible = false
 
@@ -66,9 +65,7 @@ func open(for_buyer: MarketBuyer, who: Node3D = null) -> void:
 	_refresh()
 	_says.text = "“%s”" % (buyer.greeting if not offers.is_empty() else buyer.nothing)
 	_talk(true)
-	if is_inside_tree():
-		get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.push(self)
 	Juice.bounce_control(_card, 0.05)
 
 
@@ -77,10 +74,18 @@ func close() -> void:
 		return
 	_root.visible = false
 	_talk(false)
-	if is_inside_tree():
-		get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	ScreenStack.pop(self)
 	closed.emit()
+
+
+## Esc or B while the stall is the top screen.
+func screen_cancel() -> void:
+	close()
+
+
+## The offer list keeps its own focus (see _refresh).
+func screen_focus() -> void:
+	pass
 
 
 ## Sells `count` of the selected row (0 = all of it). Returns coppers earned.
@@ -105,10 +110,7 @@ func sell_selected(count: int = 1) -> int:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
-	if event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel") \
-			or _pad(event, JOY_BUTTON_B):
-		close()
-	elif _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_A):
+	if _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_A):
 		sell_selected(1)
 	elif _key(event, [KEY_R]) or _pad(event, JOY_BUTTON_Y):
 		sell_selected(0)

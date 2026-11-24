@@ -26,6 +26,7 @@ class Entry:
 	var flags: int
 	var process_mode_before: Node.ProcessMode
 	var focus_before: Control
+	var cancel: Callable
 	var on_exit: Callable
 
 
@@ -36,7 +37,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
-func push(screen: Node, flags: int = Flag.PAUSES | Flag.MOUSE) -> void:
+## `cancel` is for a screen built without a script of its own; a screen
+## with one implements screen_cancel() instead.
+func push(screen: Node, flags: int = Flag.PAUSES | Flag.MOUSE, cancel: Callable = Callable()) -> void:
 	if has(screen):
 		return
 	assert(_entries.size() < MAX_DEPTH, "too many screens open at once")
@@ -45,6 +48,7 @@ func push(screen: Node, flags: int = Flag.PAUSES | Flag.MOUSE) -> void:
 	e.flags = flags
 	e.process_mode_before = screen.process_mode
 	e.focus_before = get_viewport().gui_get_focus_owner()
+	e.cancel = cancel
 	e.on_exit = pop.bind(screen)
 	screen.tree_exiting.connect(e.on_exit)
 	screen.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -141,21 +145,32 @@ func _first_focusable(node: Node) -> Control:
 	return null
 
 
+## Whether `event` is a press the stack answers (Esc, Start, B). A screen that
+## swallows the rest of the input while it is open lets these through.
+func answers(event: InputEvent) -> bool:
+	return not event.is_echo() \
+			and (event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel"))
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_echo():
+	var click := event as InputEventMouseButton
+	if click and click.pressed and not mouse_shown() \
+			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		# The window lost the pointer (alt-tab, a web canvas): a click takes it back.
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		get_viewport().set_input_as_handled()
 		return
-	var pause := event.is_action_pressed(&"pause")
-	if not pause and not event.is_action_pressed(&"ui_cancel"):
+	if not answers(event):
 		return
 	if _entries.is_empty():
-		# A screen not yet on the stack (hand-in 1b moves the last of them)
-		# still pauses for itself and answers its own Esc.
-		if pause and not get_tree().paused:
+		if event.is_action_pressed(&"pause"):
 			pause_requested.emit()
 			get_viewport().set_input_as_handled()
 		return
 	var screen := top()
-	if screen.has_method(&"screen_cancel"):
+	if _entries[-1].cancel.is_valid():
+		_entries[-1].cancel.call()
+	elif screen.has_method(&"screen_cancel"):
 		screen.call(&"screen_cancel")
 	else:
 		pop(screen)

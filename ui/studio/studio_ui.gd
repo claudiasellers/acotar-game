@@ -1,7 +1,7 @@
 ## Feyre's easel (L30): the canvas in the middle, her paints and six mixing
 ## wells on the left, brushes and the finish on the right. Pick a paint and
 ## paint, or pick a paint and tap a well to mix it in. Right-click a well to
-## wipe it. Pauses the game while open (UiStyle.modal).
+## wipe it. A screen on ScreenStack, which pauses the game while it is open.
 ##   StudioUi.open(feyre, easel)   # interactor, station_id "easel"
 class_name StudioUi
 extends RefCounted
@@ -208,8 +208,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 
 	tree.process_frame.connect(s.tick)
 	tree.root.add_child(layer)
-	tree.paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.push(layer, ScreenStack.Flag.PAUSES | ScreenStack.Flag.MOUSE, StudioUi.close)
 	StudioFx.chime(layer, &"pickup", 0.8)
 
 
@@ -221,12 +220,11 @@ static func close() -> void:
 		if tree:
 			if tree.process_frame.is_connected(s.tick):
 				tree.process_frame.disconnect(s.tick)
-			tree.paused = false
 	if is_open():
+		ScreenStack.pop(_open)
 		_open.queue_free()
 	_open = null
 	_session = null
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 ## A round paint blob (a button) in `color`.

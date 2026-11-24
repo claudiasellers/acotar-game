@@ -82,11 +82,13 @@ static func when(unix: int) -> String:
 func open(new_mode: Mode) -> void:
 	mode = new_mode
 	visible = true
+	ScreenStack.push(self, ScreenStack.Flag.MOUSE)
 	_show_list()
 
 
 func close() -> void:
 	visible = false
+	ScreenStack.pop(self)
 	asking = ""
 	closed.emit()
 
@@ -101,10 +103,14 @@ func back() -> void:
 		close()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if visible and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause")):
-		back()
-		get_viewport().set_input_as_handled()
+## Esc or B while the slot list is the top screen.
+func screen_cancel() -> void:
+	back()
+
+
+## The list focuses its own slot (see _show_list).
+func screen_focus() -> void:
+	pass
 
 
 func _clear() -> void:

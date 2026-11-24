@@ -43,7 +43,6 @@ var _last_applied: float = -1.0
 ## Opens the screen over `parent` for `mare`. Feyre stands still while it's open.
 static func open(parent: Node, p_mare: MareMount, p_feyre: Node3D, p_inventory: Inventory) -> MareTendingView:
 	var layer := CanvasLayer.new()
-	layer.layer = 40
 	layer.name = "MareTending"
 	parent.add_child(layer)
 	var v := MareTendingView.new()
@@ -63,14 +62,29 @@ func _ready() -> void:
 		feyre.set_physics_process(false)
 		if feyre is CharacterBody3D:
 			(feyre as CharacterBody3D).velocity = Vector3.ZERO
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	# The mare keeps moving under the brush, so the game is not paused.
+	ScreenStack.push(self, ScreenStack.Flag.MOUSE)
+	var layer := get_parent() as CanvasLayer
+	if layer:
+		layer.layer = ScreenStack.layer_of(self)
 	_build()
 	_sparkles = _make_sparkles()
 	add_child(_sparkles)
 	_show(_tab)
 
 
+## Esc or B while the tending screen is the top screen.
+func screen_cancel() -> void:
+	close()
+
+
+## Her tabs take their own focus when they are shown.
+func screen_focus() -> void:
+	pass
+
+
 func close() -> void:
+	ScreenStack.pop(self)
 	if camera and is_instance_valid(camera):
 		camera.current = false
 		camera.queue_free()
@@ -435,11 +449,14 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"interact") or event.is_action_pressed(&"pause"):
+	if event.is_action_pressed(&"interact"):
 		get_viewport().set_input_as_handled()
 		close()
 		return
-	# Nothing else reaches the game while she's being tended.
+	# Nothing else reaches the game while she's being tended; ScreenStack
+	# still hears Esc.
+	if ScreenStack.answers(event):
+		return
 	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		get_viewport().set_input_as_handled()
 
