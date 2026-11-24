@@ -141,7 +141,9 @@ func test_talking_to_alis_shows_a_line_and_leaves_her_free() -> void:
 	dd.line_spoken.connect(on_line)
 	await h.look_toward(alis.global_position)
 	await h.walk_to(alis.global_position, 2.5, 300, false, 0.4)
-	var spoke := await h.wait_until(func() -> bool: return heard.has(&"alis"), 60 * 15)
+	# Her greeting queues behind Feyre's own room lines (each about 5 s on screen
+	# plus the 5 s gap), so it can come 20 s in, not 15 (T126).
+	var spoke := await h.wait_until(func() -> bool: return heard.has(&"alis"), 60 * 45)
 	dd.line_spoken.disconnect(on_line)
 	assert_true(spoke, "Alis says something when Feyre walks up (heard %s)" % [heard])
 	assert_true(h.has_control(), "a line never takes the controls")

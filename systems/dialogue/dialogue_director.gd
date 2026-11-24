@@ -653,9 +653,14 @@ func _set_talking(node: Node, seconds: float) -> void:
 		node.call(&"set_talking", true)
 		var tree := get_tree() if is_inside_tree() else null
 		if tree:
+			# A weak ref, not `node` itself: a lambda that captured a node freed
+			# before the timer fires makes the engine raise an error on the call,
+			# whatever the body checks (T126: Alis despawned mid-line).
+			var who: WeakRef = weakref(node)
 			tree.create_timer(seconds).timeout.connect(func() -> void:
-				if is_instance_valid(node) and _talking == node:
-					node.call(&"set_talking", false))
+				var n: Node = who.get_ref() as Node
+				if n != null and _talking == n:
+					n.call(&"set_talking", false))
 
 
 ## Faces (L36) listen on EventBus.line_spoken(actor, text, emotion, seconds),

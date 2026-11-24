@@ -123,9 +123,15 @@ func _let_go() -> Prop:
 	prop.sleeping = false
 	if body is PhysicsBody3D:
 		var b := body as PhysicsBody3D
+		# Weak refs: a lambda capturing a node freed before the timer fires
+		# raises an engine error on the call, whatever the body checks.
+		var prop_ref: WeakRef = weakref(prop)
+		var b_ref: WeakRef = weakref(b)
 		get_tree().create_timer(IGNORE_SECONDS).timeout.connect(func() -> void:
-			if is_instance_valid(prop) and is_instance_valid(b):
-				prop.remove_collision_exception_with(b))
+			var p: Prop = prop_ref.get_ref() as Prop
+			var other: PhysicsBody3D = b_ref.get_ref() as PhysicsBody3D
+			if p != null and other != null:
+				p.remove_collision_exception_with(other))
 	return prop
 
 
