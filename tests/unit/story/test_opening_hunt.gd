@@ -92,7 +92,9 @@ func test_the_snare_sits_early_on_the_doe_trail() -> void:
 	assert_between(along, 75.0, 85.0, "80 m down the trail from its start")
 	assert_gt(spot.distance_to(HumanRealmLayout.DOE_CLEARING), 300.0, "well before the doe")
 	var gap := OpeningHunt.rabbit_spot().distance_to(spot)
-	assert_between(gap, 18.0, 22.5, "the rabbit grazes a little farther on")
+	assert_between(gap, 10.0, 16.5, "the rabbit grazes a little farther on")
+	assert_gte(OpeningHunt._seen_over_snow(spot, OpeningHunt.rabbit_spot()), OpeningHunt.SEEN_OVER,
+		"no rise of snow hides it from the snare")
 
 
 func test_the_snare_prompt_shows_in_reach_and_checking_it_brings_the_rabbit() -> void:
@@ -296,3 +298,33 @@ func test_her_empty_belly_is_thought_once_when_she_first_runs_low() -> void:
 	for path: String in OpeningHunt.THOUGHTS.values():
 		assert_true(ResourceLoader.exists(path), path)
 		assert_true(load(path) is GuideThread, path)
+
+
+func test_the_rabbit_wears_a_brown_coat_that_reads_on_snow() -> void:
+	var hunt := OpeningHunt.new()
+	add_child_autofree(hunt)
+	hunt.check_snare()
+	var pale := 0
+	var meshes := hunt.rabbit.find_children("*", "MeshInstance3D", true, false)
+	for mesh: MeshInstance3D in meshes:
+		for i in mesh.get_surface_override_material_count():
+			var mat := mesh.get_active_material(i) as BaseMaterial3D
+			if mat and mat.albedo_color.get_luminance() > 0.6:
+				pale += 1
+	assert_gt(meshes.size(), 0, "it has a model")
+	assert_eq(pale, 0, "no pale surface left on it")
+
+
+func test_a_rabbit_that_has_run_its_distance_is_gone_not_grazing_again() -> void:
+	var hunt := OpeningHunt.new()
+	add_child_autofree(hunt)
+	hunt.check_snare()
+	var rabbit := hunt.rabbit
+	rabbit.set_physics_process(false)
+	feyre.global_position = rabbit.global_position + Vector3(12, 0, 0)
+	rabbit.state = Prey.State.FLEE
+	hunt._steer_rabbit(feyre, 0.5)
+	assert_false(hunt.rabbit_done, "still running")
+	rabbit.state = Prey.State.ALERT
+	hunt._steer_rabbit(feyre, 0.016)
+	assert_true(hunt.rabbit_done, "gone once it stops")

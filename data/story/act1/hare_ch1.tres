@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]
 ; ch1 opening rabbit (L80, Keeper (b)): it bolts at release and can never be
 ; killed or skinned, so the hunt stays "fruitless" until the doe. canon of the
-; beat: adapted.
+; beat: adapted. A brown coat, so she reads against the snow.
 
 [ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://creatures/models/hare.gltf" id="2"]
@@ -14,8 +14,8 @@ canon = "C"
 body_length = 0.5
 body_height = 0.32
 body_width = 0.18
-coat_color = Color(0.78, 0.76, 0.72, 1)
-belly_color = Color(0.92, 0.9, 0.86, 1)
+coat_color = Color(0.4, 0.3, 0.22, 1)
+belly_color = Color(0.62, 0.52, 0.42, 1)
 walk_speed = 0.8
 run_speed = 12.0
 zigzag = 0.9
