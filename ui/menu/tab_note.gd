@@ -1,5 +1,5 @@
 ## The line in Feyre's hand on a slip tucked into her journal the first time
-## a page is opened: what the page is to her, never what to do with it (R2).
+## a page is opened, slipped in at the book's top right corner: what the page is to her, never what to do with it (R2).
 ## Each shows once in a story (a WorldState flag, saved with it) and stays
 ## while she is on that page. The lore keeper's wording, true in both acts.
 class_name TabNote
@@ -15,8 +15,10 @@ const LINES := {
 }
 const FLAG := "journal_note_%s"
 const FADE := 0.4
-## How far the slip stands clear of the book's top edge.
-const LIFT := 10.0
+## The slip is tucked into the journal: how far its foot lies over the book's
+## cloth edge (short of the paper and a page's own heading), and its tilt.
+const TUCK := 24.0
+const TILT_DEGREES := -2.5
 
 var _label: Label
 var _fade: Tween
@@ -50,7 +52,9 @@ func turn_to(tab_id: StringName, right: float) -> void:
 		return
 	_label.text = line
 	size = get_combined_minimum_size()
-	position = Vector2(right - size.x, -size.y - LIFT)
+	position = Vector2(right - size.x, TUCK - size.y)
+	pivot_offset = size
+	rotation_degrees = TILT_DEGREES
 	modulate.a = 0.0
 	_fade = create_tween()
 	_fade.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
