@@ -24,6 +24,9 @@ enum State { STALK, RUSH, HOLD_PREY, STARE, RETREAT, DYING }
 ## How long he waits at strike distance before he bursts out: the player's window.
 @export var hold_before_rush: float = 8.0
 @export var dying_time: float = 2.5
+## A trot (m/s) as he backs off from a wood arrow. How far is the leash's
+## business: FollowLeash turns him back before he is out of her reach.
+@export var back_off_speed: float = 4.5
 
 var state: State = State.STALK
 var prey: Node3D
@@ -105,6 +108,9 @@ func _think(delta: float) -> void:
 		prey = _find_prey()
 	# Head down over the doe while he holds her; a plain gait otherwise.
 	gait_hint = &"graze" if state == State.HOLD_PREY else &""
+	# Looking at her or dying, he stays where he is.
+	if leash:
+		leash.paused = state in [State.STARE, State.DYING]
 	match state:
 		State.STALK:
 			_stalk(delta)
@@ -121,7 +127,12 @@ func _think(delta: float) -> void:
 				took_prey.emit(prey)
 		State.HOLD_PREY:
 			move_speed = 0.0
-			if prey:
+			if prey and global_position.distance_to(prey.global_position) > data.body_length:
+				# The leash drew him off after her: back to his kill at a walk.
+				gait_hint = &""
+				move_direction = prey.global_position - global_position
+				move_speed = data.walk_speed
+			elif prey:
 				face_towards(prey.global_position, delta)
 		State.STARE:
 			move_speed = 0.0
@@ -137,9 +148,9 @@ func _think(delta: float) -> void:
 			var to := _retreat_to - global_position
 			to.y = 0.0
 			move_direction = to
-			move_speed = data.run_speed * 0.6 if to.length() > 1.0 else 0.0
+			move_speed = back_off_speed if to.length() > 1.0 else 0.0
 			_timer -= delta
-			if to.length() <= 1.0 and _timer <= 0.0:
+			if _timer <= 0.0:
 				state = State.STALK
 		State.DYING:
 			move_speed = 0.0

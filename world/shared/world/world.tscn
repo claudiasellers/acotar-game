@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://world/shared/world/world.gd" id="1"]
 [ext_resource type="Script" path="res://world/shared/grades/grade_director.gd" id="2"]
 [ext_resource type="Script" path="res://world/shared/weather/wind_driver.gd" id="3"]
-[ext_resource type="Script" path="res://world/shared/weather/snow_prints.gd" id="4"]
+[ext_resource type="Script" path="res://creatures/tracking/track_layer.gd" id="4"]
 [ext_resource type="Script" path="res://world/shared/weather/snowfall.gd" id="5"]
 [ext_resource type="Script" path="res://world/shared/weather/winter_weather.gd" id="6"]
 [ext_resource type="Shader" uid="uid://cx4e1fim4qxqt" path="res://world/shared/grades/painted_sky.gdshader" id="7"]
@@ -79,16 +79,16 @@ sun = NodePath("../Sun")
 [node name="WindDriver" type="Node" parent="."]
 script = ExtResource("3")
 
-[node name="SnowPrints" type="Node3D" parent="."]
+[node name="TrackLayer" type="Node3D" parent="."]
 script = ExtResource("4")
 
 [node name="Snowfall" type="GPUParticles3D" parent="." node_paths=PackedStringArray("prints")]
 script = ExtResource("5")
-prints = NodePath("../SnowPrints")
+prints = NodePath("../TrackLayer")
 
 [node name="WinterWeather" type="Node" parent="." node_paths=PackedStringArray("prints", "snowfall_node", "wind")]
 script = ExtResource("6")
-prints = NodePath("../SnowPrints")
+prints = NodePath("../TrackLayer")
 snowfall_node = NodePath("../Snowfall")
 wind = NodePath("../WindDriver")
 

@@ -6,9 +6,9 @@
 ##   doe and the lens closes a little, no bars, so the player sees what she's
 ##   hunting before anything else happens.
 ## - Lining up the shot (L34-4): while she holds the bow drawn and aimed on
-##   him, the lens tightens and the bars edge in; the bow's own slow draw
-##   slows the world (BowController, unchanged: this never touches time or
-##   the arrow). It lets go when she looses, lowers or looks away.
+##   him, the lens tightens and the bars edge in. Slowing the world is her
+##   Focus (BowController through TimeScale); this never touches time or the
+##   arrow. It lets go when she lowers the bow or looks away.
 ## - His eyes (the scene's focus on him): the lens tightens on him through
 ##   Feyre's own camera, she keeps full control to draw, and the bars come in
 ##   halfway. They ease out when the focus lets go.
@@ -192,7 +192,7 @@ func _end() -> void:
 
 func _process(delta: float) -> void:
 	if stage == &"fall" or stage == &"breaths":
-		_since += delta / maxf(Engine.time_scale, 0.01)
+		_since += TimeScale.real(delta)
 	elif stage == &"" and _running() and not _noticing and not _on_doe:
 		_line_up()
 
@@ -205,7 +205,7 @@ func _line_up() -> void:
 	var cam: Variant = feyre.get(&"camera") if feyre else null
 	var want := false
 	if wolf and bow is BowController and cam is Camera3D and not bool(space.get(&"wolf_dead")):
-		var drawing := (bow as BowController).is_drawing
+		var drawing := (bow as BowController).is_nocked
 		var off := aim_off_degrees(cam as Camera3D, _chest(wolf))
 		want = drawing and off <= (AIM_OFF_DEG if aiming else AIM_ON_DEG)
 	if want and not aiming:

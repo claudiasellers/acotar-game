@@ -259,6 +259,29 @@ emotion = &"guarded"
 
 [sub_resource type="Resource" id="L11"]
 script = ExtResource("1")
+id = &"wh_lost"
+speaker = &"feyre"
+who = ""
+text = "Where is he? Head clear. Breathing steady. Listen."
+canon = "A"
+trigger = 6
+where = &"wolf_kill.lost"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice, barely breathed, talking herself calm"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L12"]
+script = ExtResource("1")
 id = &"wh_wood"
 speaker = &"feyre"
 who = ""
@@ -280,7 +303,7 @@ follow_up = &""
 delivery = "inner voice: low, held breath, hunting"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L12"]
+[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"wh_miss"
 speaker = &"feyre"
@@ -303,7 +326,7 @@ follow_up = &""
 delivery = "inner voice, sharp with herself"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L13"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"wh_ash"
 speaker = &"feyre"
@@ -326,7 +349,7 @@ follow_up = &""
 delivery = "inner voice, cold, very fast"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L15"]
 script = ExtResource("1")
 id = &"wh_dying"
 speaker = &"feyre"
@@ -349,7 +372,7 @@ follow_up = &""
 delivery = "inner voice, shaken"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L15"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("1")
 id = &"wh_still"
 speaker = &"feyre"
@@ -375,5 +398,5 @@ emotion = &"guarded"
 [resource]
 script = ExtResource("3")
 area = &"wolf_hunt"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16")])
 places = Array[ExtResource("2")]([])
