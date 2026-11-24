@@ -254,6 +254,27 @@ func _begin_load(id: String) -> void:
 	_pending[id] = region.scene_path
 
 
+## Quitting (New Game's relaunch, a test run's end): a region still loading on
+## the loader's threads is waited for here, so the engine never shuts down
+## under it (an exit abort: "recursive_mutex lock failed").
+func _exit_tree() -> void:
+	join_loads()
+
+
+## Blocks until every threaded load the streamer started, wanted or not, is done.
+func join_loads() -> void:
+	var paths: Array[String] = _orphaned.duplicate()
+	for path: String in _pending.values():
+		if not paths.has(path):
+			paths.append(path)
+	for path in paths:
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS or status == ResourceLoader.THREAD_LOAD_LOADED:
+			ResourceLoader.load_threaded_get(path)
+	_orphaned.clear()
+	_pending.clear()
+
+
 func _collect_orphans() -> void:
 	for path in _orphaned.duplicate():
 		if _pending.values().has(path):
