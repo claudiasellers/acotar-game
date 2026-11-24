@@ -121,6 +121,10 @@ map_minimap={
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":78)]
 }
 
+[navigation]
+
+3d/merge_rasterizer_cell_scale=0.01
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

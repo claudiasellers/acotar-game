@@ -92,6 +92,9 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 ## itself. The navigation server then logs "Navigation region synchronization had
 ## N edge error(s)" (an error to GUT) and the edge connects wrongly (T129). Drops
 ## the smallest polygon of any such edge, to 1 cm; returns how many it dropped.
+## Still needed after T142: rare, but measured (three triangles on one vertex
+## pair, court tile at (-222,-104)). The commoner cause of that warning, distinct
+## vertices sharing one server edge key, is navigation/3d/merge_rasterizer_cell_scale.
 ## Pure data on `nm`, so it is safe on the bake thread.
 static func drop_overlapping_polygons(nm: NavigationMesh) -> int:
 	var verts := nm.get_vertices()
