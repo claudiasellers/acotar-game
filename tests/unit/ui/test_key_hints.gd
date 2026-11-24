@@ -122,10 +122,11 @@ func test_her_first_collection_entry_names_its_key() -> void:
 	assert_eq(hints.wanted(), &"collection", "a new story's book is heard too")
 
 
-func test_a_thought_and_arrow_makings_nudge_their_keys() -> void:
+func test_a_thought_arrow_makings_and_a_found_place_nudge_their_keys() -> void:
 	assert_true(FileAccess.get_file_as_string("res://ui/guide/guide_journal.gd").contains("nudge(&\"thought\")"))
 	assert_true(FileAccess.get_file_as_string("res://ui/satchel/satchel_hud.gd").contains("nudge(&\"craft\")"))
-	for id: StringName in [&"thought", &"craft"]:
+	assert_true(FileAccess.get_file_as_string("res://ui/map/world_map_hud.gd").contains("nudge(&\"map\")"))
+	for id: StringName in [&"thought", &"craft", &"map"]:
 		assert_true(KeyHints.ROWS.has(id))
 
 
