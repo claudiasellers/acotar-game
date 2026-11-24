@@ -18,7 +18,7 @@ Clips (glTF animations, in place; the game moves the body):
 | clip | loops | what |
 |---|---|---|
 | `idle` | yes | breath, head scan, ear flicks, tail |
-| `walk`, `trot`, `gallop` | yes | gaits; paws planted by IK in the generator |
+| `walk`, `trot`, `gallop` | yes | gaits; paws planted by IK in the generator. Every gait starts its cycle on the left hind paw, and a paw lifts and lands already moving back at stance speed |
 | `stalk` | yes | wolves only: belly-low creep |
 | `graze` | yes | head to the ground (graze, feed, hold a kill) |
 | `hit_l`, `hit_r` | no | an arrow strikes the left / right side |
@@ -27,15 +27,29 @@ Clips (glTF animations, in place; the game moves the body):
 Each model's native gait speeds and clip lengths are in
 `data/animation/creatures/<model>_gaits.txt`, written by the generator:
 `name native_speed_mps duration_s loop` (`-` = not a locomotion clip).
-Regenerate with `/opt/bpyenv/bin/python tools/blender/creatures.py creatures/models [names…]`.
+Regenerate with `/opt/bpyenv/bin/python tools/blender/creatures.py <out_dir> [names…]`.
+
+To change clips without touching a model's looks, export to a scratch folder and
+splice only the animations in:
+`python3 tools/blender/splice_clips.py <out_dir>/great_wolf.gltf creatures/models/great_wolf.gltf`.
+A re-export from another Blender build splits the mesh differently; the splice
+keeps every mesh, material and skin byte.
 
 ## Game side (`creatures/anim/creature_animator.gd`)
 
 `Creature._ready` calls `CreatureAnimator.attach(self)`; it returns null for an
 unrigged model, which keeps the old `_topple`. With an animator:
 
-- Ground speed drives the gait blend; playback is 1x between gait points and
-  scaled past the gallop up to `MAX_RATE`.
+- The body's real ground speed (`get_real_velocity`, not what the brain asked
+  for) picks one gait, walk, trot or gallop, with hysteresis at the midpoints
+  of their native speeds, and cross-fades over a quarter second. Every gait
+  clip runs at one cadence (strides per second) so they stay in step, and the
+  cadence is the ground speed over the stride of what is playing: a planted
+  paw stays where it landed at any speed up to `MAX_RATE`. From standing the
+  stride grows with the speed. `animator.gait`, `gait_rate()`, `cadence`.
+- Brains set only `move_direction`, `move_speed` and `gait_hint`, and move
+  through `Creature._move`. Don't write `global_position`, `velocity` or the
+  model's rotation on a moving creature in view: it reads as a slide.
 - `Creature.gait_hint`: brains set `&"stalk"`, `&"graze"` or `&""` every think.
   A stalk at speed 0 freezes mid-step.
 - `Creature.on_arrow_hit` → `animator.hit(arrow.global_position)` plays the
@@ -49,6 +63,11 @@ unrigged model, which keeps the old `_topple`. With an animator:
 
 Proof probe: `tools/creatures/creature_motion_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/creatures/test_creature_animator.gd`.
+
+Do the feet plant? `tools/mq/godot.sh --fixed-fps 60 res://tools/creatures/gait_plant_probe.tscn -- [names]`
+walks creatures and cast models over flat ground at set speeds, headless, and
+prints how far a planted foot drifts per metre travelled (0 = nailed down,
+1 = no steps at all). Run it after any change to clips, speeds or animators.
 
 ## People (`tools/blender/fae_people.py` + `tools/blender/person_rig.py`)
 
@@ -85,6 +104,20 @@ Regenerate with `ONLY=a,b /opt/bpyenv/bin/python tools/blender/fae_people.py`.
 
 Proof probe: `tools/creatures/people_motion_shot.tscn -- <out> [numbers]`.
 Test: `tests/unit/creatures/test_person_animator.gd`.
+
+### The main cast walk by how they are moved (`characters/feyre/model/feyre_model.gd`)
+
+A cast model (anything on Feyre's rig that is not driven by her mocap tree)
+measures how far it was moved each frame and plays its own `walk`, `run` or
+`sprint` at the rate that keeps planted feet still; moved backwards, the gait
+runs in reverse; stopped, it idles. Whoever moves it (a tween, a story beat, a
+routine) only moves it: don't call `play_locomotion` or play `walk` from a
+scene. How fast each clip walks is measured from the clip (`GaitMeter`,
+`creatures/anim/gait_meter.gd`), so a model with its own walk (the father's
+`walk_limp`) needs no number. It keeps its hands off the player while a scene
+has another clip on it (a bow, a roar), doesn't walk when lifted off the
+ground (a saddle), and treats a move of more than 1.5 m in a frame as a
+placement, not a step.
 
 ### Cast cues (`creatures/anim/cast_cues.gd`)
 

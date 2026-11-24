@@ -17,7 +17,6 @@ const HEAVES := [1.2, 1.3]    # seconds per retch
 const STEADY := 0.7           # a breath, upright-ish, before he turns away
 const TURN_SECONDS := 0.6
 const WALK_SPEED := 1.6       # shaken, not hurrying
-const WALK_CLIP_SPEED := 3.2  # the walk clip's authored ground speed
 const AWAY := 9.0
 ## Within this of the manor's front doors he is in the hall and leaves by them.
 const HALL_REACH := 16.0
@@ -54,10 +53,6 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 		return
 	if cue == &"leaves_sick" and stage in [&"", &"gone"]:
 		_leave_sick()
-
-
-func _anim() -> AnimationPlayer:
-	return _model.get(&"anim") as AnimationPlayer if &"anim" in _model else null
 
 
 func _notice(on: bool) -> void:
@@ -101,9 +96,6 @@ func _leave_sick() -> void:
 	_from = me
 	_t = 0.0
 	stage = &"back"
-	var anim := _anim()
-	if anim and anim.has_animation(&"walk"):
-		anim.play(&"walk", 0.25, -(BACK_STEPS / BACK_SECONDS) / WALK_CLIP_SPEED * 1.4)
 
 
 func _face(dir: Vector3) -> void:
@@ -114,7 +106,6 @@ func _process(delta: float) -> void:
 	if stage in [&"", &"gone"]:
 		return
 	_t += delta
-	var anim := _anim()
 	match stage:
 		&"back":
 			# Unsteady: fast off the mark, slowing, a small stagger to the side.
@@ -127,8 +118,6 @@ func _process(delta: float) -> void:
 			if k >= 1.0:
 				stage = &"retch"
 				_t = 0.0
-				if anim and anim.has_animation(&"idle"):
-					anim.play(&"idle", 0.3, 1.0)
 		&"retch":
 			# Two heaves: bent double fast, held, half up; the second weaker.
 			var total := 0.0
@@ -155,8 +144,6 @@ func _process(delta: float) -> void:
 				_yaw_from = _model.rotation.y
 				var to := Vector3(_exit.x - _model.global_position.x, 0.0, _exit.z - _model.global_position.z)
 				_yaw_to = atan2(-to.x, -to.z)
-				if anim and anim.has_animation(&"walk"):
-					anim.play(&"walk", 0.3, WALK_SPEED / WALK_CLIP_SPEED)
 		&"turn":
 			var k := clampf(_t / TURN_SECONDS, 0.0, 1.0)
 			_model.rotation.y = lerp_angle(_yaw_from, _yaw_to, smoothstep(0.0, 1.0, k))
@@ -183,7 +170,4 @@ func _gone() -> void:
 	stage = &"gone"
 	if hunch:
 		hunch.amount = 0.0
-	var anim := _anim()
-	if anim and anim.has_animation(&"idle"):
-		anim.play(&"idle")
 	_model.visible = false

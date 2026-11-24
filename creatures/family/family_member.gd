@@ -54,7 +54,6 @@ func _process(delta: float) -> void:
 				_destination = node.global_position
 	var to := _destination - global_position
 	to.y = 0.0
-	var speed := 0.0
 	# Feyre in the way: wait up to ActorBody.YIELD_TIME, then walk on regardless.
 	var moving := to.length() > 0.05
 	var blocked := moving and _yield_t < ActorBody.YIELD_TIME \
@@ -66,9 +65,6 @@ func _process(delta: float) -> void:
 	if moving and not blocked:
 		global_position += to.limit_length(walk_speed * delta)
 		rotation.y = lerp_angle(rotation.y, atan2(-to.x, -to.z), 8.0 * delta)
-		speed = walk_speed if delta > 0.0 else 0.0
-	if _model and _model.has_method(&"play_locomotion"):
-		_model.play_locomotion(speed, true, delta)
 	_pose()
 
 

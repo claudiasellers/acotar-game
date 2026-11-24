@@ -48,14 +48,44 @@ func test_gait_speeds_come_from_the_generator_and_rise_with_the_gait() -> void:
 	assert_gt(walk, 0.3)
 	assert_gt(trot, walk)
 	assert_gt(gallop, trot)
-	# Planted paws match the ground: rate 1 between gait points, scaled past the
-	# gallop up to the cadence cap, slowed for the first steps.
-	assert_eq(a.loco_rate((walk + trot) * 0.5), 1.0)
-	assert_almost_eq(a.loco_rate(gallop * 1.2), 1.2, 0.001)
-	assert_eq(a.loco_rate(gallop * 5.0), CreatureAnimator.MAX_RATE)
-	assert_almost_eq(a.loco_rate(walk * 0.7), 0.7, 0.001)
-	# His run speed is within the cadence cap, so his paws don't skate.
-	assert_lte(_spawn(GREAT_WOLF).data.run_speed / gallop, CreatureAnimator.MAX_RATE)
+	# One gait at a time, picked from the ground speed and held across a
+	# boundary, so it never flickers between two.
+	assert_eq(a.gait_for(walk, 0), 0)
+	assert_eq(a.gait_for(trot, 0), 1)
+	assert_eq(a.gait_for(gallop, 0), 2)
+	assert_eq(a.gait_for(walk, 2), 0)
+	var edge := sqrt(walk * trot)
+	assert_eq(a.gait_for(edge, 0), 0, "a walk stays a walk at the boundary")
+	assert_eq(a.gait_for(edge, 1), 1, "a trot stays a trot at the boundary")
+	# The speeds his brain moves him at are within the cadence cap, so his paws don't skate.
+	var data := _spawn(GREAT_WOLF).data
+	assert_lte(data.run_speed / gallop, CreatureAnimator.MAX_RATE)
+	assert_lte(data.walk_speed / walk, CreatureAnimator.MAX_RATE)
+
+
+func test_a_living_creature_plays_its_gait_at_the_speed_of_the_ground() -> void:
+	var floor_body := StaticBody3D.new()
+	floor_body.collision_layer = Creature.WORLD_MASK
+	var shape := CollisionShape3D.new()
+	shape.shape = WorldBoundaryShape3D.new()
+	floor_body.add_child(shape)
+	add_child_autofree(floor_body)
+	var c := _spawn(GREAT_WOLF)
+	var a := c.animator
+	c.scripted = true
+	c.navigate = false
+	var thigh := a.skeleton.find_bone("upper_fl_l")
+	var standing := a.skeleton.get_bone_pose_rotation(thigh)
+	# A walk at its native speed: one cycle of the clip covers one stride of ground.
+	var walk: float = a.native_speeds[&"walk"]
+	c.move_direction = Vector3.FORWARD
+	c.move_speed = walk
+	await wait_physics_frames(90)
+	assert_eq(a.tree.get(&"parameters/life/current_state"), "alive", "the tree plays while he lives, not only when he dies")
+	assert_eq(a.gait, 0, "walking")
+	assert_almost_eq(a.gait_rate(), 1.0, 0.05, "paws match the ground at the walk's own speed")
+	assert_almost_eq(a.cadence * float(a.strides[&"walk"]), walk, 0.05, "strides per second x stride = ground speed")
+	assert_false(standing.is_equal_approx(a.skeleton.get_bone_pose_rotation(thigh)), "his legs move")
 
 
 func test_an_arrow_flinches_the_side_it_struck() -> void:

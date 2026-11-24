@@ -299,7 +299,8 @@ static func anim_of(who: Node) -> AnimationPlayer:
 	return who.find_child("AnimationPlayer", true, false) as AnimationPlayer
 
 
-## Walks `who` to `local` over `seconds`, its walk clip under it, then idle.
+## Walks `who` to `local` over `seconds`. A cast model steps to the ground it
+## covers by itself (feyre_model.gd), then stands.
 func walk(who: Node3D, local: Vector3, seconds: float) -> void:
 	if who == null:
 		return
@@ -310,17 +311,8 @@ func walk(who: Node3D, local: Vector3, seconds: float) -> void:
 	var d := Vector3(to.x - from.x, 0.0, to.z - from.z)
 	if d.length() > 0.05:
 		who.global_basis = Basis.looking_at(d.normalized(), Vector3.UP)
-	var ap := anim_of(who)
-	var speed := d.length() / maxf(seconds, 0.1)
-	if ap and ap.has_animation(&"walk"):
-		ap.play(&"walk", 0.25)
-		ap.speed_scale = clampf(speed / 1.4, 0.4, 1.4)
 	var tw := create_tween()
 	tw.tween_property(who, ^"global_position", to, seconds).set_trans(Tween.TRANS_LINEAR)
-	tw.tween_callback(func() -> void:
-		if ap and ap.has_animation(&"idle"):
-			ap.speed_scale = 1.0
-			ap.play(&"idle", 0.4))
 
 
 ## Turns `who` to face `face_local` over `seconds`.

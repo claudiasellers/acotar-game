@@ -481,10 +481,15 @@ def _ground_offsets(rig, locals_, ground_frame):
 
 GAITS = {
     # name: period (s, wolf scale), duty, stance travel (x leg length), lift (x H), leg phases
-    "walk": dict(T=1.0, duty=0.64, D=0.6, lift=0.09, phase={"hl_l": 0.0, "fl_l": 0.25, "hl_r": 0.5, "fl_r": 0.75}),
-    "trot": dict(T=0.6, duty=0.45, D=0.8, lift=0.12, phase={"fl_l": 0.0, "hl_r": 0.0, "fl_r": 0.5, "hl_l": 0.5}),
-    "gallop": dict(T=0.36, duty=0.32, D=1.1, lift=0.16, phase={"hl_l": 0.0, "hl_r": 0.1, "fl_l": 0.5, "fl_r": 0.6}),
-    "stalk": dict(T=1.2, duty=0.75, D=0.85, lift=0.06, phase={"hl_l": 0.0, "fl_l": 0.25, "hl_r": 0.5, "fl_r": 0.75}),
+    # Sized so a wolf-sized animal walks near 1.1 m/s, trots near 3 and gallops
+    # near 8 (the great wolf: 1.4, 3.9, 10), the speeds the brains move them at.
+    # Every table starts its cycle on the left hind paw, so the game can run the
+    # gaits in step and cross-fade between them: from walk to trot only the
+    # front paws shift, by a quarter beat.
+    "walk": dict(T=0.85, duty=0.62, D=0.85, lift=0.09, phase={"hl_l": 0.0, "fl_l": 0.25, "hl_r": 0.5, "fl_r": 0.75}),
+    "trot": dict(T=0.52, duty=0.42, D=0.95, lift=0.12, phase={"hl_l": 0.0, "fl_r": 0.0, "hl_r": 0.5, "fl_l": 0.5}),
+    "gallop": dict(T=0.36, duty=0.28, D=1.15, lift=0.16, phase={"hl_l": 0.0, "hl_r": 0.1, "fl_l": 0.5, "fl_r": 0.6}),
+    "stalk": dict(T=1.1, duty=0.72, D=0.9, lift=0.06, phase={"hl_l": 0.0, "fl_l": 0.25, "hl_r": 0.5, "fl_r": 0.75}),
 }
 HOP = {
     "walk": dict(T=0.8, duty=0.55, D=0.5, lift=0.10, phase={"hl_l": 0.0, "hl_r": 0.0, "fl_l": 0.55, "fl_r": 0.6}),
@@ -513,8 +518,13 @@ def _foot(rig, leg, p, g, lift_scale=1.0, D_scale=1.0):
         pitch = -rad(25.0 if front else 18.0) * smooth(seg(q, 0.75, 1.0))
     else:
         s = (p - duty) / (1.0 - duty)
-        y = c0.y - D * 0.5 + D * smooth(s)
-        z = c0.z + lift * math.sin(math.pi * clamp01(s * 1.1)) ** (0.8 if front else 1.0)
+        # The paw leaves the ground and meets it again moving back exactly as
+        # fast as it does in the stance (m, per unit of swing), so it never
+        # drags forward with the body at lift-off or skids at touchdown: it
+        # trails a little, swings through, and is already drawing back when it lands.
+        m = -D * (1.0 - duty) / duty
+        y = c0.y - D * 0.5 + D * smooth(s) + m * (s * (1.0 - s) ** 5 - (1.0 - s) * s ** 5)
+        z = c0.z + lift * math.sin(math.pi * s) ** (0.8 if front else 1.0)
         # Swing: the paw folds back (the front carpus much more), then reaches.
         fold = rad(95.0 if front else 45.0) * math.sin(math.pi * clamp01(s / 0.75))
         reach = rad(12.0) * smooth(seg(s, 0.7, 1.0)) * (1.0 - smooth(seg(s, 0.95, 1.0)))
