@@ -28,7 +28,10 @@ waits on the class cache). `h.dispose()` in `after_all`.
   `look_toward(point)`; `mouse_move(rel)`. `event_for(action)` builds the
   player's first binding: key, else mouse button, else pad button.
 - Waiting: `wait_until(cond, max_frames)`, `walk_to(point, radius, max_frames, sprint, amount)`,
-  `wait_still()`. Frames and conditions only, never wall-clock.
+  `wait_still()`. Frames and conditions only, never wall-clock. After a wait,
+  `h.last_wait` says how many physics ticks and milliseconds its frames really
+  were and what could have held the game (fps cap, time scale, pause); put it
+  in the message of an assert that fails on a wait.
 - Looking: `flat_speed()`, `flat_distance(a, b)`, `child_of(Type)`,
   `nearest_in_group(group)`, `ground_y(x, z, from_y)`, `on_solid_ground()`,
   `place_on_ground(x, z, drop, max_frames, from_y)`.

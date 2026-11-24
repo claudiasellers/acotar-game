@@ -29,6 +29,9 @@ var _held: Dictionary = {}  ## action -> the pressed event we sent
 var _stick := Vector2.ZERO
 var _look := Vector2.ZERO
 var _old_max_fps: int = 0
+## What the last wait_until saw, for a failing assert's message: how much game
+## time its frames really were, and what could have held the game.
+var last_wait: String = ""
 
 
 func _init(gut_test: GutTest) -> void:
@@ -281,11 +284,21 @@ func mouse_move(relative: Vector2) -> void:
 
 ## Waits process frames until `cond` is true. Returns false if it never was.
 func wait_until(cond: Callable, max_frames: int) -> bool:
+	var physics_before := Engine.get_physics_frames()
+	var drawn_before := Engine.get_process_frames()
+	var clock_before := Time.get_ticks_msec()
+	var ok := false
 	for i in max_frames:
 		if cond.call():
-			return true
+			ok = true
+			break
 		await test.wait_process_frames(1)
-	return bool(cond.call())
+	ok = ok or bool(cond.call())
+	last_wait = "waited %d frames: %d physics ticks, %d engine frames, %d ms; fps cap %d, time x%.2f, paused %s, on floor %s" % [
+			max_frames, Engine.get_physics_frames() - physics_before, Engine.get_process_frames() - drawn_before,
+			Time.get_ticks_msec() - clock_before, Engine.max_fps, Engine.time_scale, test.get_tree().paused,
+			feyre.is_on_floor() if feyre != null and is_instance_valid(feyre) else false]
+	return ok
 
 
 ## Steers her to `point` (flat distance under `radius`) with the stick, at most
