@@ -64,7 +64,7 @@ const ROOM_PULL_IN := FeyreCamera.ROOM_PULL_IN
 @export var follow_speed: float = 2.4
 
 var stamina: float = 100.0
-## The bow is up (BowController: aim held, not spent by a shot).
+## The bow is up (BowController: aim held).
 var is_aiming: bool:
 	get:
 		return bow_controller.is_aiming if bow_controller else false
@@ -143,7 +143,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
 			and StoryControl.can_look():
-		var s := mouse_sensitivity * GameSettings.mouse_sensitivity
+		var s := mouse_sensitivity * GameSettings.mouse_sensitivity * _aim_look_scale()
 		_look(event.relative.x * s, event.relative.y * s)
 	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
 		recenter_camera(deg_to_rad(recenter_max_turn))
@@ -157,7 +157,7 @@ func _process(delta: float) -> void:
 	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift - crouch.camera_drop())
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
-		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta
+		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta * _aim_look_scale()
 		_look(look.x * s, look.y * s)
 	camera_control.update(delta)
 	if _breath:
@@ -178,7 +178,9 @@ func _physics_process(delta: float) -> void:
 	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
-	if crouch.crouched and (Input.is_action_just_pressed(&"sprint") or Input.is_action_just_pressed(&"jump")
+	# With the bow raised the sprint key is Focus, and she stays down.
+	if crouch.crouched and ((Input.is_action_just_pressed(&"sprint") and not is_aiming)
+			or Input.is_action_just_pressed(&"jump")
 			or not StoryControl.can_move() or (jump_motor.airborne and not is_on_floor())):
 		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
@@ -314,19 +316,19 @@ func _gentle_mode() -> bool:
 
 
 ## Ran dry and has not yet caught her breath (35% back): BowController holds
-## slow time off until then.
+## Focus off until then.
 func is_winded() -> bool:
 	return _exhausted
 
 
-## Stamina now only pays for slow-time aiming (drain_stamina); sprinting is free.
+## Stamina pays for Focus and a long-held draw (drain_stamina); sprinting is free.
 func _update_stamina(delta: float) -> void:
 	if _stamina_cooldown > 0.0:
 		_stamina_cooldown -= delta
 	else:
 		var regen := stamina_regen * (body_state.stamina_regen_multiplier() if body_state else 1.0)
 		stamina = minf(stamina + regen * delta, max_stamina)
-	# After running dry aiming, slow time waits until she has caught her breath.
+	# After running dry aiming, Focus waits until she has caught her breath.
 	if _exhausted and stamina >= max_stamina * 0.35:
 		_exhausted = false
 
@@ -334,6 +336,11 @@ func _update_stamina(delta: float) -> void:
 ## Climbs onto a ledge in front of Feyre between knee and reach height.
 func _try_mantle() -> bool:
 	return mantle.try_climb()
+
+
+## Look speed is lower with the bow raised (BowTuning.aim_sensitivity).
+func _aim_look_scale() -> float:
+	return bow_controller.tuning.aim_sensitivity if is_aiming else 1.0
 
 
 ## Player look input (already scaled); applies the invert settings.

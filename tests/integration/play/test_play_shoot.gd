@@ -1,14 +1,10 @@
 # gate: needs:terrain
 # gate: when:systems/bow/*,data/bows/*,data/arrows/*,characters/feyre/feyre.gd,tests/integration/play/play_harness.gd
-## Play test (T111): the Zelda-style bow (T096, T101) with real input, in the
-## woods (New Game) and in the Spring Court (Continue). Hold right mouse to
-## raise the bow; after the nock (BowData.nock_time) one left click looses one
-## full-power arrow; letting go of aim lowers it and shoots nothing; after a
-## shot the bow stays down until aim is pressed afresh; Q cycles owned types.
-##
-## Headless, the mouse is never captured and Feyre's own handler eats the first
-## click to capture it. The bow reads fire in _input (before that handler), so a
-## click still shoots; the harness needs no workaround beyond real mouse events.
+## Play test (T111): the bow with real input, in the woods (New Game) and in
+## the Spring Court (Continue). Hold right mouse to raise the bow; hold left
+## mouse to draw (BowData.draw_time) and let go to loose one full-power arrow;
+## the bow stays up for the next; letting go of aim lowers it and shoots
+## nothing; Q cycles owned types.
 extends GutTest
 
 const PlayHarness := preload("res://tests/integration/play/play_harness.gd")
@@ -59,12 +55,18 @@ func _on_arrow(arrow: Arrow) -> void:
 	fired.append(arrow.linear_velocity.length())
 
 
-## Hold right mouse until the bow is up and nocked.
-func _raise_and_nock() -> bool:
+## Hold right mouse until the bow is up with an arrow on the string.
+func _raise() -> bool:
 	h.hold(&"aim")
-	if not await h.wait_until(func() -> bool: return _bow().is_aiming, 30):
-		return false
-	return await h.wait_until(func() -> bool: return _bow().is_nocked(), 120)
+	return await h.wait_until(func() -> bool: return _bow().is_nocked, 30)
+
+
+## Hold left mouse through a full draw, then let go.
+func _draw_and_loose() -> void:
+	h.hold(&"fire")
+	await h.wait_until(func() -> bool: return _bow().draw_amount >= 1.0, 120)
+	h.release(&"fire")
+	await h.settle()
 
 
 ## The whole bow story, where she stands now.
@@ -78,44 +80,36 @@ func _play_the_bow() -> void:
 	h.feyre.arrow_fired.connect(_on_arrow)
 	var start := Gameplay.inventory.arrow_count(&"arrow_wood")
 
-	# Raise: the bow comes up but is not nocked yet; a click in the nock is held
-	# back until the nock is done, then looses.
-	h.hold(&"aim")
-	await h.wait_until(func() -> bool: return bc.is_aiming, 30)
-	assert_true(bc.is_aiming, "holding aim raises the bow")
-	assert_false(bc.is_nocked(), "and it is not nocked the instant it rises")
-	assert_true(await h.wait_until(func() -> bool: return bc.is_nocked(), 120), "after the nock time it is nocked")
-	assert_eq(fired.size(), 0, "nothing has been loosed by raising and nocking")
+	# Raise: the bow comes up with an arrow on the string, and nothing flies.
+	assert_true(await _raise(), "holding aim raises the bow")
+	assert_false(bc.is_drawing, "the string waits for left mouse")
+	assert_eq(fired.size(), 0, "nothing has been loosed by raising")
 
-	# One click, one full-power arrow.
+	# A quick tap is an early release: the string comes down, no weak shot.
 	await h.press(&"fire", 2)
-	assert_eq(fired.size(), 1, "one click looses one arrow")
+	await wait_physics_frames(30)
+	assert_eq(fired.size(), 0, "a tap looses nothing")
+	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start, "and costs nothing")
+
+	# Hold to full draw, let go: one full-power arrow.
+	await _draw_and_loose()
+	assert_eq(fired.size(), 1, "a full draw looses one arrow")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 1, "and costs one arrow")
 	if fired.size() > 0:
 		assert_almost_eq(fired[0], bc.bow.max_speed, bc.bow.max_speed * 0.02, "at full power")
 
-	# After a shot the bow is down although aim is still held; clicks do nothing.
-	assert_false(bc.is_aiming, "after a shot the bow comes down")
-	await h.press(&"fire", 2)
-	await h.press(&"fire", 2)
-	assert_eq(fired.size(), 1, "and clicking again shoots nothing while aim is held")
-	assert_false(bc.is_aiming, "it stays down until aim is pressed afresh")
-
-	# A fresh press of aim raises it again and one more click looses one more.
-	h.release(&"aim")
-	await h.settle()
-	await wait_physics_frames(2)
-	assert_true(await _raise_and_nock(), "a fresh aim press raises and nocks again")
-	await h.press(&"fire", 2)
-	assert_eq(fired.size(), 2, "a second click looses a second arrow")
+	# The bow stays up with aim held, and the next draw looses the next arrow.
+	assert_true(bc.is_aiming, "after a shot the bow stays up")
+	await _draw_and_loose()
+	assert_eq(fired.size(), 2, "a second draw looses a second arrow")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 2, "two arrows spent")
+
+	# Let go of aim mid-draw: the bow lowers and looses nothing.
+	h.hold(&"fire")
+	await h.wait_until(func() -> bool: return bc.draw_amount >= 1.0, 120)
 	h.release(&"aim")
 	await h.settle()
-	await wait_physics_frames(2)
-
-	# Raise and let go: the bow lowers and looses nothing.
-	assert_true(await _raise_and_nock(), "raised and nocked for the third time")
-	h.release(&"aim")
+	h.release(&"fire")
 	await h.settle()
 	await wait_physics_frames(2)
 	assert_false(bc.is_aiming, "letting go of aim lowers the bow")
@@ -133,14 +127,14 @@ func _play_the_bow() -> void:
 	h.feyre.arrow_fired.disconnect(_on_arrow)
 
 
-func test_woods_the_bow_raises_nocks_looses_and_lowers() -> void:
+func test_woods_the_bow_raises_draws_looses_and_lowers() -> void:
 	if not booted:
 		return
 	assert_true(h.on_solid_ground() or await h.wait_still(120), "standing in the woods")
 	await _play_the_bow()
 
 
-func test_court_the_bow_raises_nocks_looses_and_lowers() -> void:
+func test_court_the_bow_raises_draws_looses_and_lowers() -> void:
 	if not booted:
 		return
 	await h.shutdown()
