@@ -1,7 +1,9 @@
-## Title screen: the first thing on launch. A living 3D backdrop of the Wall at
-## dusk (TitleBackdrop), the title set in gilt EB Garamond, and the menu:
-## Continue and Load (only when a save exists), New Game, Settings, Quit.
-## Starting pushes the camera through the Wall into spring, then loads Act I.
+## Title screen: the first thing on launch. Feyre's journal lies shut
+## (ClosedBook) over a living backdrop of the Wall at dusk (TitleBackdrop),
+## with the menu beside it: Continue and Load (only when a save exists), New
+## Game, Settings, Quit. Load and New Game lift the cover and list the stories
+## on the first page; starting lifts it and the page fills the screen, which
+## is the paper LoadingVeil goes on from.
 ##
 ## Interface (docs/contracts/title.md): New Game and Continue both open
 ## GAME_SCENE unchanged; Continue first sets GameSettings.pending_load_slot to
@@ -12,24 +14,26 @@ extends Control
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
 ## Carries a new story's slot across the fresh program New Game starts after a game.
 const NEW_STORY_ARG := "--new-story="
-const TITLE := "Prythian"
-const SUBTITLE := "The Spring Court"
 ## The beast's Treaty rule, ch. 4 (Storykeeper's pick; verbatim).
 const TAGLINE := "A life for a life."
-const CROSS_SECONDS := 2.4
 
-const FONT_MEDIUM := preload("res://ui/title/fonts/EBGaramond-Medium.ttf")
-const FONT_SEMIBOLD := preload("res://ui/title/fonts/EBGaramond-SemiBold.ttf")
-const FONT_ITALIC := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
-const GILT_SHADER := preload("res://ui/title/gilt_text.gdshader")
-
-const SHADOW := Color(0.12, 0.08, 0.18, 0.75)
+## Where things lie on a 1920 x 1080 screen (BookLayout.fit shrinks a smaller one).
+const BOOK_SHUT := Vector2(400, 140)
+## Lifted, the spine is the screen's middle: endpaper left, first page right.
+const BOOK_OPEN := Vector2(960, 140)
+const MENU_AT := Vector2(1230, 392)
+const TAGLINE_AT := Vector2(1234, 318)
+const CHOICE_SIZE := Vector2(340, 60)
+const INTRO_SECONDS := 2.2
+## The page washing up to fill the screen, once the cover is open.
+const WASH_SECONDS := 0.9
+const QUIT_SECONDS := 0.6
 
 var backdrop: TitleBackdrop
+var book: ClosedBook
 var buttons: Dictionary = {}
 var _menu: VBoxContainer
-var _heading: Control
-var _marker: TextureRect
+var _tagline: Label
 var _veil: ColorRect
 var _settings: SettingsTab
 var _slots: TitleSlots
@@ -47,9 +51,9 @@ func _ready() -> void:
 	_play_ambience()
 	var carried := new_story_from(OS.get_cmdline_user_args())
 	if carried != "":
-		# The program before already crossed the Wall; go on from its cream wash.
+		# The program before already opened the book; go on from its page.
 		_leaving = true
-		_veil.color = Color(1.0, 0.95, 0.86, 1.0)
+		_veil.color = JournalTheme.color(&"paper")
 		SaveSystem.begin_new(carried)
 		_load_game.call_deferred()
 		return
@@ -72,19 +76,16 @@ func screen_cancel() -> void:
 	pass
 
 
-## The menu focuses its own first button once it has faded in.
+## The menu focuses its own first choice when it is built.
 func screen_focus() -> void:
 	pass
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _leaving or (_settings != null and _settings.is_open()) or (_slots != null and _slots.visible):
-		return
 	# Any key or click during the fade-in skips it.
-	if event.is_pressed() and _veil.color.a > 0.05 and not _leaving:
+	if event.is_pressed() and not _leaving and _veil.color.a > 0.05:
 		_veil.color.a = 0.0
-		_heading.modulate.a = 1.0
-		_menu.modulate.a = 1.0
+		_set_beside(1.0)
 
 
 func _on_continue() -> void:
@@ -106,17 +107,17 @@ func _on_new_game() -> void:
 
 func _open_slots(mode: TitleSlots.Mode) -> void:
 	if _slots == null:
-		_slots = TitleSlots.new(_on_focus)
-		_slots.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-		_slots.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-		_slots.grow_vertical = Control.GROW_DIRECTION_BEGIN
-		_slots.offset_right = _menu.offset_right
-		_slots.offset_bottom = _menu.offset_bottom
+		_slots = TitleSlots.new()
 		_slots.chosen.connect(_on_slot_chosen)
 		_slots.closed.connect(_on_slots_closed)
 		add_child(_slots)
-		move_child(_slots, _marker.get_index())
+		move_child(_slots, _veil.get_index())
 	_menu.visible = false
+	_tagline.visible = false
+	_lift()
+	_place()
+	_slots.modulate.a = 0.0
+	create_tween().tween_property(_slots, ^"modulate:a", 1.0, 0.3).set_delay(ClosedBook.LIFT_SECONDS * 0.7)
 	_slots.open(mode)
 
 
@@ -129,7 +130,10 @@ func _on_slot_chosen(slot: String) -> void:
 
 
 func _on_slots_closed() -> void:
+	book.close()
+	_slide_book(BOOK_SHUT, ClosedBook.LIFT_SECONDS * 0.6)
 	_menu.visible = true
+	_tagline.visible = true
 	if has_save() != buttons.has("Continue"):
 		_rebuild_menu()
 	var opener := "Load" if _slots.mode == TitleSlots.Mode.LOAD and buttons.has("Load") else "New Game"
@@ -144,47 +148,56 @@ func _start_new(slot: String) -> void:
 	_enter_game()
 
 
+## Settings is a page of the open book (MenuShell draws it), so the shut one
+## steps aside while it is read.
 func _on_settings() -> void:
 	if _settings == null:
 		_settings = SettingsTab.new()
 		_settings.in_game = false
 		_settings.closed.connect(_on_settings_closed)
 		add_child(_settings)
-	_menu.visible = false
-	_marker.visible = false
+	_show_shut_book(false)
 	_settings.open()
 
 
 func _on_settings_closed() -> void:
-	_menu.visible = true
-	_marker.visible = true
+	_show_shut_book(true)
 	(buttons["Settings"] as Button).grab_focus()
+
+
+func _show_shut_book(on: bool) -> void:
+	book.visible = on
+	_menu.visible = on
+	_tagline.visible = on
 
 
 func _on_quit() -> void:
 	_leaving = true
 	var tw := create_tween()
-	tw.tween_property(_veil, ^"color", Color(0.05, 0.04, 0.08, 1.0), 0.6)
+	tw.tween_property(_veil, ^"color", JournalTheme.color(&"ink"), QUIT_SECONDS)
 	tw.tween_callback(get_tree().quit)
 
 
-## The world's autoload state belongs to any game just left, so a new game
-## after Save & Title starts a fresh copy of the program.
+## The cover lifts and the first page washes up over the screen. The world's
+## autoload state belongs to any game just left, so a new game after Save &
+## Title starts a fresh copy of the program.
 func _enter_game() -> void:
 	if _leaving:
 		return
 	_leaving = true
 	Juice.bounce_control(_menu, 0.04)
 	var fade := create_tween().set_parallel()
-	fade.tween_property(_menu, ^"modulate:a", 0.0, 0.5)
-	fade.tween_property(_heading, ^"modulate:a", 0.0, 0.9)
-	fade.tween_property(_marker, ^"modulate:a", 0.0, 0.3)
+	fade.tween_property(_menu, ^"modulate:a", 0.0, 0.4)
+	fade.tween_property(_tagline, ^"modulate:a", 0.0, 0.4)
 	if _slots != null:
-		fade.tween_property(_slots, ^"modulate:a", 0.0, 0.5)
-	backdrop.cross_over(CROSS_SECONDS)
+		fade.tween_property(_slots, ^"modulate:a", 0.0, 0.4)
+	var wait := 0.0 if book.open_now else ClosedBook.LIFT_SECONDS
+	_lift()
+	var paper := JournalTheme.color(&"paper")
+	_veil.color = Color(paper, 0.0)
 	var wash := create_tween()
-	wash.tween_interval(CROSS_SECONDS * 0.55)
-	wash.tween_property(_veil, ^"color", Color(1.0, 0.95, 0.86, 1.0), CROSS_SECONDS * 0.45)
+	wash.tween_interval(wait)
+	wash.tween_property(_veil, ^"color", paper, WASH_SECONDS).set_ease(Tween.EASE_IN)
 	wash.tween_callback(_load_game)
 
 
@@ -197,49 +210,52 @@ func _load_game() -> void:
 	get_tree().change_scene_to_file(OpeningFilm.route(GameSettings.pending_load_slot))
 
 
+func _lift() -> void:
+	if book.open_now:
+		return
+	book.lift()
+	_slide_book(BOOK_OPEN, ClosedBook.LIFT_SECONDS)
+
+
+func _slide_book(to: Vector2, seconds: float) -> void:
+	var tw := create_tween()
+	tw.tween_property(book, ^"position", _on_screen(to), seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
 # --- build -----------------------------------------------------------------------
 
 func _build() -> void:
-	# A soft vignette keeps the type readable over the bright spring side.
-	var shade := TextureRect.new()
-	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	shade.texture = _vignette()
-	shade.stretch_mode = TextureRect.STRETCH_SCALE
-	add_child(shade)
+	# The dim every page of the book lies on, so the foil and type read over
+	# the bright spring side.
+	var dim := ColorRect.new()
+	dim.name = "Dim"
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dim.color = JournalTheme.color(&"scrim")
+	add_child(dim)
 
-	_heading = _build_heading()
-	add_child(_heading)
+	book = ClosedBook.new()
+	add_child(book)
+
+	_tagline = BookKit.label(TAGLINE, &"LineTold")
+	_tagline.name = "Tagline"
+	add_child(_tagline)
 
 	_menu = VBoxContainer.new()
 	_menu.name = "Menu"
 	_menu.add_theme_constant_override(&"separation", 4)
-	_menu.alignment = BoxContainer.ALIGNMENT_END
-	_menu.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	_menu.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_menu.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_menu.offset_right = -150.0
-	_menu.offset_bottom = -130.0
 	add_child(_menu)
 	_fill_menu()
-
-	_marker = TextureRect.new()
-	_marker.name = "RoseMarker"
-	_marker.texture = JournalTheme.soft_dot(30)
-	_marker.modulate = Color("#f4a6c0")
-	_marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_marker.size = Vector2(30, 30)
-	add_child(_marker)
 
 	_veil = ColorRect.new()
 	_veil.name = "Veil"
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_veil.color = Color(0.05, 0.04, 0.08, 1.0)
+	_veil.color = JournalTheme.color(&"ink")
 	add_child(_veil)
 
-	var first: Button = buttons.get("Continue", buttons["New Game"])
-	first.grab_focus.call_deferred()
+	_place()
+	get_viewport().size_changed.connect(_place)
 
 
 func _fill_menu() -> void:
@@ -248,6 +264,8 @@ func _fill_menu() -> void:
 		if e[0] in ["Continue", "Load"] and not has_save():
 			continue
 		buttons[e[0]] = _button(e[0], e[1])
+	var first: Button = buttons.get("Continue", buttons["New Game"])
+	first.grab_focus.call_deferred()
 
 
 ## After the last story is deleted, Continue and Load go.
@@ -259,138 +277,55 @@ func _rebuild_menu() -> void:
 	_fill_menu()
 
 
-func _build_heading() -> Control:
-	var col := VBoxContainer.new()
-	col.name = "Heading"
-	col.add_theme_constant_override(&"separation", 0)
-	col.position = Vector2(118, 74)
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	var title_font := FontVariation.new()
-	title_font.base_font = FONT_SEMIBOLD
-	title_font.spacing_glyph = 22
-	var stack := Control.new()
-	stack.custom_minimum_size = Vector2(1000, 170)
-	stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_child(stack)
-	var text := TITLE.to_upper()
-	# Halo + drop shadow behind, plain gilt in front.
-	var halo := _label(text, title_font, 136, Color(0, 0, 0, 0))
-	halo.add_theme_color_override(&"font_outline_color", Color(1.0, 0.86, 0.6, 0.16))
-	halo.add_theme_constant_override(&"outline_size", 26)
-	halo.add_theme_color_override(&"font_shadow_color", SHADOW)
-	halo.add_theme_constant_override(&"shadow_offset_y", 4)
-	halo.add_theme_constant_override(&"shadow_outline_size", 10)
-	stack.add_child(halo)
-	var gilt := _label(text, title_font, 136, Color.WHITE)
-	var mat := ShaderMaterial.new()
-	mat.shader = GILT_SHADER
-	mat.set_shader_parameter(&"label_height", 170.0)
-	mat.set_shader_parameter(&"label_width", 1000.0)
-	gilt.material = mat
-	stack.add_child(gilt)
-
-	var sub_font := FontVariation.new()
-	sub_font.base_font = FONT_MEDIUM
-	sub_font.spacing_glyph = 12
-	var sub := _label(SUBTITLE.to_upper(), sub_font, 30, Color(0.97, 0.91, 0.80))
-	_shadowed(sub)
-	col.add_child(sub)
-	var rule := TextureRect.new()
-	rule.texture = _rule_texture()
-	rule.custom_minimum_size = Vector2(520, 14)
-	rule.stretch_mode = TextureRect.STRETCH_SCALE
-	rule.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_child(rule)
-	var tag := _label(TAGLINE, FONT_ITALIC, 36, Color(0.99, 0.95, 0.90))
-	_shadowed(tag)
-	col.add_child(tag)
-	return col
-
-
 func _button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.name = text.replace(" ", "")
 	b.text = text
-	b.custom_minimum_size = Vector2(320, 58)
-	TitleSlots.style(b, 42)
-	b.focus_entered.connect(_on_focus.bind(b))
+	b.theme_type_variation = JournalTheme.TITLE_CHOICE
+	b.custom_minimum_size = CHOICE_SIZE
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.focus_mode = Control.FOCUS_ALL
+	b.mouse_entered.connect(b.grab_focus)
 	b.pressed.connect(callback)
 	_menu.add_child(b)
 	return b
 
 
-func _on_focus(b: Button) -> void:
-	if not is_inside_tree():
-		return
-	_place_marker.call_deferred(b)
+## Lays the book, the menu and the stories' page out for the screen's size.
+func _place() -> void:
+	var fit := BookLayout.fit(get_viewport_rect().size)
+	for part: Control in [book, _menu, _tagline]:
+		part.scale = Vector2.ONE * fit
+	book.position = _on_screen(BOOK_OPEN if book.open_now else BOOK_SHUT)
+	_menu.position = _on_screen(MENU_AT)
+	_tagline.position = _on_screen(TAGLINE_AT)
+	if _slots != null:
+		_slots.scale = Vector2.ONE * fit
+		_slots.position = _on_screen(BOOK_OPEN + ClosedBook.PAGE.position)
+		_slots.size = ClosedBook.PAGE.size
 
 
-func _place_marker(b: Button) -> void:
-	var font := b.get_theme_font(&"font")
-	var w := font.get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size(&"font_size")).x
-	var target := Vector2(b.global_position.x + b.size.x - w - 46.0, b.global_position.y + b.size.y * 0.5 - 15.0)
-	var tw := create_tween()
-	tw.tween_property(_marker, ^"position", target, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	Juice.bounce_control(_marker, 0.35)
+## A point of the 1920 x 1080 layout, on this screen.
+func _on_screen(at: Vector2) -> Vector2:
+	var view := get_viewport_rect().size
+	var fit := BookLayout.fit(view)
+	return ((view - BookLayout.SCREEN * fit) * 0.5 + at * fit).round()
 
 
 func _intro() -> void:
-	_heading.modulate.a = 0.0
-	_menu.modulate.a = 0.0
-	_marker.modulate.a = 0.0
+	_set_beside(0.0)
 	var tw := create_tween()
-	tw.tween_property(_veil, ^"color:a", 0.0, 2.2).set_ease(Tween.EASE_OUT)
-	tw.parallel().tween_property(_heading, ^"modulate:a", 1.0, 1.6).set_delay(1.0)
-	tw.tween_property(_menu, ^"modulate:a", 1.0, 0.8)
-	tw.parallel().tween_property(_marker, ^"modulate:a", 1.0, 0.8)
+	tw.tween_property(_veil, ^"color:a", 0.0, INTRO_SECONDS).set_ease(Tween.EASE_OUT)
+	tw.tween_method(_set_beside, 0.0, 1.0, 0.8)
+
+
+## How strongly the menu and the line over it show beside the book.
+func _set_beside(alpha: float) -> void:
+	_menu.modulate.a = alpha
+	_tagline.modulate.a = alpha
 
 
 # --- helpers -----------------------------------------------------------------------
-
-func _label(text: String, font: Font, size: int, color: Color) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_font_override(&"font", font)
-	l.add_theme_font_size_override(&"font_size", size)
-	l.add_theme_color_override(&"font_color", color)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
-
-
-func _shadowed(l: Label) -> void:
-	l.add_theme_color_override(&"font_shadow_color", SHADOW)
-	l.add_theme_constant_override(&"shadow_offset_y", 2)
-	l.add_theme_constant_override(&"shadow_outline_size", 8)
-
-
-func _rule_texture() -> GradientTexture2D:
-	var g := Gradient.new()
-	g.set_color(0, Color(0.91, 0.77, 0.44, 0.0))
-	g.add_point(0.15, Color(0.91, 0.77, 0.44, 0.9))
-	g.set_color(g.get_point_count() - 1, Color(0.91, 0.77, 0.44, 0.0))
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.width = 256
-	t.height = 2
-	return t
-
-
-func _vignette() -> GradientTexture2D:
-	var g := Gradient.new()
-	g.set_color(0, Color(0, 0, 0, 0))
-	g.add_point(0.62, Color(0.08, 0.05, 0.14, 0.0))
-	g.set_color(g.get_point_count() - 1, Color(0.08, 0.05, 0.14, 0.55))
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill = GradientTexture2D.FILL_RADIAL
-	t.fill_from = Vector2(0.55, 0.5)
-	t.fill_to = Vector2(1.15, 1.05)
-	t.width = 256
-	t.height = 256
-	return t
-
 
 ## Wind over snow: a looping band of soft filtered noise (no audio files).
 func _play_ambience() -> void:

@@ -3,8 +3,7 @@
 ## wood under falling snow, with two golden eyes in the brush; the spring side
 ## (x < 0, screen right) is meadow, blossom trees and gold haze under a pastel sunset. A
 ## thorned rose reaches across the line, and Feyre stands at the edge of the
-## snow, facing spring. The camera drifts slowly; cross_over() pushes it
-## through the Wall for New Game / Continue.
+## snow, facing spring. The camera drifts slowly.
 ##
 ## Built in code from existing world assets (fixed seed), MultiMesh per mesh.
 class_name TitleBackdrop
@@ -35,15 +34,11 @@ const GLOBALS := {&"snow_cover": 1.0, &"wind_strength": 0.35, &"magic_amount": 0
 
 const CAMERA_FROM := Vector3(2.7, 1.5, -3.6)
 const LOOK_AT := Vector3(-1.5, 1.75, 30.0)
-const CROSS_TO := Vector3(-1.6, 1.55, 9.5)
-const CROSS_LOOK := Vector3(-9.0, 1.9, 26.0)
 const FEYRE_AT := Vector3(0.85, 0.0, 7.2)
 const EYES_AT := Vector3(6.4, 0.72, 14.0)
 
 var camera: Camera3D
 var environment: Environment
-## 0 = the title view, 1 = through the Wall into spring.
-var cross := 0.0
 var _sky: ShaderMaterial
 var _time := 0.0
 var _eyes: Node3D
@@ -94,16 +89,6 @@ func _process(delta: float) -> void:
 		var tw := create_tween()
 		tw.tween_property(_eyes, ^"scale:y", 0.05, 0.07)
 		tw.tween_property(_eyes, ^"scale:y", 1.0, 0.09)
-
-
-## Pushes the camera through the Wall into the spring grade. Returns the tween.
-func cross_over(seconds: float = 2.4) -> Tween:
-	var tw := create_tween().set_parallel()
-	tw.tween_property(self, ^"cross", 1.0, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tw.tween_method(func(v: float) -> void: _sky.set_shader_parameter(&"spring_all", v), 0.0, 1.0, seconds * 0.6) \
-			.set_delay(seconds * 0.35)
-	tw.tween_property(environment, ^"tonemap_exposure", 1.35, seconds).set_ease(Tween.EASE_IN)
-	return tw
 
 
 ## Ground height (m) at x, z: soft snow drifts on the human side, a meadow on
@@ -478,10 +463,7 @@ func _place_camera() -> void:
 	if camera == null:
 		return
 	var drift := Vector3(sin(_time * 0.07) * 0.5, sin(_time * 0.05) * 0.1, sin(_time * 0.045) * 0.7)
-	var e := cross * cross * (3.0 - 2.0 * cross)
-	var pos := (CAMERA_FROM + drift).lerp(CROSS_TO, e)
-	var look := (LOOK_AT + Vector3(sin(_time * 0.06) * 0.8, 0.0, 0.0)).lerp(CROSS_LOOK, e)
-	camera.look_at_from_position(pos, look, Vector3.UP)
+	camera.look_at_from_position(CAMERA_FROM + drift, LOOK_AT + Vector3(sin(_time * 0.06) * 0.8, 0.0, 0.0), Vector3.UP)
 
 
 # --- helpers -----------------------------------------------------------------------

@@ -1,8 +1,9 @@
-## The title's story slots (SaveSystem.SLOTS, shown as Story 1 to 3), in the
-## menu's own place and type. Load lists them to play one; New Game lists them
-## to begin in one. Each used slot shows where the story is, the play time and
-## when it was saved. Overwriting or deleting a story asks first, here on the
-## title: the question replaces the list, and Keep it is where the focus starts.
+## The title's story slots (SaveSystem.SLOTS, shown as Story 1 to 3), written
+## on the first page of the journal once its cover is lifted. Load lists them
+## to play one; New Game lists them to begin in one. Each used slot shows
+## where the story is, the play time and when it was saved. Overwriting or
+## deleting a story asks first, here on the page: the question replaces the
+## list, and Keep it is where the focus starts.
 class_name TitleSlots
 extends VBoxContainer
 
@@ -11,46 +12,18 @@ signal closed
 
 enum Mode { LOAD, NEW }
 
-const FONT_MEDIUM := preload("res://ui/title/fonts/EBGaramond-Medium.ttf")
-const FONT_ITALIC := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
-const PEARL := Color(0.95, 0.92, 0.96)
-const BUTTER := Color(1.0, 0.91, 0.62)
-const SHADOW := Color(0.12, 0.08, 0.18, 0.75)
 const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+## The blot of wash before each story's name, in px.
+const BLOT := 34.0
 
 var mode: Mode = Mode.LOAD
 ## The slot a question is about, while one is asked.
 var asking: String = ""
-var _on_focus: Callable
 
 
-func _init(on_focus: Callable = Callable()) -> void:
+func _init() -> void:
 	name = "Slots"
-	_on_focus = on_focus
-	alignment = BoxContainer.ALIGNMENT_END
 	add_theme_constant_override(&"separation", 6)
-
-
-## The title's menu look: Garamond, pearl going butter on focus, no box.
-static func style(b: Button, font_size: int) -> void:
-	b.flat = true
-	b.focus_mode = Control.FOCUS_ALL
-	b.alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	b.add_theme_font_override(&"font", FONT_MEDIUM)
-	b.add_theme_font_size_override(&"font_size", font_size)
-	for state: StringName in [&"font_color", &"font_pressed_color"]:
-		b.add_theme_color_override(state, PEARL)
-	for state: StringName in [&"font_hover_color", &"font_focus_color", &"font_hover_pressed_color"]:
-		b.add_theme_color_override(state, BUTTER)
-	b.add_theme_color_override(&"font_disabled_color", Color(PEARL, 0.45))
-	b.add_theme_color_override(&"font_outline_color", SHADOW)
-	b.add_theme_constant_override(&"outline_size", 6)
-	var empty := StyleBoxEmpty.new()
-	for box: StringName in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
-		b.add_theme_stylebox_override(box, empty)
-	b.mouse_entered.connect(func() -> void:
-		if not b.disabled:
-			b.grab_focus())
 
 
 static func slot_name(slot: String) -> String:
@@ -122,10 +95,13 @@ func _clear() -> void:
 func _show_list() -> void:
 	asking = ""
 	_clear()
-	add_child(_label("Continue which story?" if mode == Mode.LOAD else "Begin in which story?", FONT_ITALIC, 30))
+	add_child(BookKit.label("Continue which story?" if mode == Mode.LOAD else "Begin in which story?", &"SatchelHeading"))
+	add_child(HSeparator.new())
+	add_child(BookKit.gap(10))
 	for slot in SaveSystem.SLOTS:
 		_slot_row(slot)
-	var back_button := _button("Back", 34, close)
+	add_child(BookKit.spring())
+	var back_button := _button("Back", close)
 	back_button.name = "Back"
 	_focus_first()
 
@@ -134,25 +110,34 @@ func _slot_row(slot: String) -> void:
 	var info := SaveSystem.slot_info(slot)
 	var row := HBoxContainer.new()
 	row.name = slot
-	row.alignment = BoxContainer.ALIGNMENT_END
-	row.add_theme_constant_override(&"separation", 70)  # room for the rose marker
+	row.add_theme_constant_override(&"separation", 12)
 	add_child(row)
-	if mode == Mode.LOAD and not info.is_empty():
-		var del := _button("Delete", 26, _ask.bind(slot), row)
-		del.name = "Delete"
-		del.add_theme_font_override(&"font", FONT_ITALIC)
+	var blot := BookKit.wash(BLOT, SaveSystem.SLOTS.find(slot))
+	blot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(blot)
 	var title := slot_name(slot)
 	if info.is_empty():
 		title += "  ·  Empty"
 	elif String(info.phase) != "":
 		title += "  ·  " + String(info.phase)
-	var main := _button(title, 38, _pick.bind(slot), row)
+	var main := _button(title, _pick.bind(slot), row)
 	main.name = "Pick"
 	main.disabled = mode == Mode.LOAD and (info.is_empty() or not info.readable)
+	if mode == Mode.LOAD and not info.is_empty():
+		var room := Control.new()
+		room.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(room)
+		var del := BookKit.chip("Delete", false)
+		del.name = "Delete"
+		del.focus_mode = Control.FOCUS_ALL
+		del.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		del.pressed.connect(_ask.bind(slot))
+		row.add_child(del)
 	if not info.is_empty():
-		var note := _label(details(info), FONT_ITALIC, 22)
+		var note := BookKit.label(details(info), &"SatchelWhere")
 		note.name = slot + "_details"
 		add_child(note)
+	add_child(BookKit.gap(8))
 
 
 func _pick(slot: String) -> void:
@@ -162,17 +147,19 @@ func _pick(slot: String) -> void:
 		chosen.emit(slot)
 
 
-## The in-game confirm: overwriting (New Game) or deleting (Load) a story.
+## Asked on the page: overwriting (New Game) or deleting (Load) a story.
 func _ask(slot: String) -> void:
 	_clear()
 	asking = slot
 	var overwrite := mode == Mode.NEW
 	var question := ("Begin anew in %s?" if overwrite else "Let %s go?") % slot_name(slot)
-	add_child(_label(question, FONT_MEDIUM, 40))
-	add_child(_label("The story saved there will be lost." if overwrite else "It can't be brought back.", FONT_ITALIC, 26))
-	var yes := _button("Begin anew" if overwrite else "Delete it", 38, _confirmed.bind(slot))
+	add_child(BookKit.label(question, &"SatchelHeading"))
+	add_child(HSeparator.new())
+	add_child(BookKit.label("The story saved there will be lost." if overwrite else "It can't be brought back.", &"SatchelWhere"))
+	add_child(BookKit.gap(18))
+	var yes := _button("Begin anew" if overwrite else "Delete it", _confirmed.bind(slot))
 	yes.name = "Yes"
-	var keep := _button("Keep it", 38, back)
+	var keep := _button("Keep it", back)
 	keep.name = "Keep"
 	keep.grab_focus.call_deferred()
 
@@ -202,26 +189,16 @@ func _focus_slot(slot: String) -> void:
 		b.grab_focus.call_deferred()
 
 
-func _button(text: String, font_size: int, callback: Callable, parent: Node = self) -> Button:
+func _button(text: String, callback: Callable, parent: Node = self) -> Button:
 	var b := Button.new()
 	b.text = text
-	style(b, font_size)
-	if _on_focus.is_valid():
-		b.focus_entered.connect(_on_focus.bind(b))
+	b.theme_type_variation = JournalTheme.PAGE_CHOICE
+	b.focus_mode = Control.FOCUS_ALL
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	b.mouse_entered.connect(func() -> void:
+		if not b.disabled:
+			b.grab_focus())
 	b.pressed.connect(callback)
 	parent.add_child(b)
 	return b
-
-
-func _label(text: String, font: Font, font_size: int) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	l.add_theme_font_override(&"font", font)
-	l.add_theme_font_size_override(&"font_size", font_size)
-	l.add_theme_color_override(&"font_color", Color(0.99, 0.95, 0.90))
-	l.add_theme_color_override(&"font_shadow_color", SHADOW)
-	l.add_theme_constant_override(&"shadow_offset_y", 2)
-	l.add_theme_constant_override(&"shadow_outline_size", 8)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l

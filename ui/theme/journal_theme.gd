@@ -68,6 +68,15 @@ const VITALS := {
 	Act.SPRING: {&"health": Color("#f0668c"), &"frost": Color(0.86, 0.90, 1.0), &"bile": Color("#6f7f3a")},
 }
 
+## The journal itself, the same in both acts as its art is: its cloth boards,
+## the gold foil pressed into them, and the night sky of its endpapers.
+const BOOK := {
+	&"cloth": Color("#761828"),
+	&"cloth_deep": Color("#56101a"),
+	&"foil": Color("#dcb45c"),
+	&"night": Color("#2a3b67"),
+}
+
 ## The pastel washes she paints with: one per index tab of the book, and the
 ## blot behind a thing drawn on a page. The same in both acts.
 const WASHES: Array[Color] = [
@@ -99,6 +108,8 @@ const LABELS := {
 	&"NoticeTitle": [30, "display", 400, &"paper"],
 	&"NoticeBody": [17, "body", 600, &"paper"],
 	&"ChapterTitle": [44, "display", 400, &"paper"],
+	&"CoverKicker": [22, "display", 400, &"foil"],
+	&"CoverTitle": [40, "display", 400, &"foil"],
 }
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
@@ -123,6 +134,12 @@ const SMEAR_EDGE := 40
 const FLOOD_REACH := 4000
 ## How far above its words the black thins out, in px.
 const FLOOD_RISE := 90
+## A choice written as a line of type, with no box: on the world beside the
+## closed book (the title's menu), and on a page of it (the stories).
+const TITLE_CHOICE := &"TitleChoice"
+const PAGE_CHOICE := &"PageChoice"
+## How far apart the cover's foil capitals are set, in px.
+const FOIL_SPACING := 5
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
@@ -146,7 +163,9 @@ static func color(token: StringName) -> Color:
 	if of_act.has(token):
 		return of_act[token]
 	var vitals: Dictionary = VITALS[act()]
-	return vitals[token] if vitals.has(token) else HORROR[token]
+	if vitals.has(token):
+		return vitals[token]
+	return BOOK[token] if BOOK.has(token) else HORROR[token]
 
 
 static func colors(of_act: Act) -> Dictionary:
@@ -203,6 +222,7 @@ static func build(of_act: Act) -> Theme:
 	t.default_font_size = 20
 	for token: StringName in c:
 		t.set_color(token, COLOR_TYPE, c[token])
+	c.merge(BOOK)
 	t.set_color(&"font_color", &"Label", c.ink)
 
 	for v in PANELS:
@@ -283,6 +303,35 @@ static func build(of_act: Act) -> Theme:
 	for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
 		t.set_color(state, RIBBON_TAB, c.ink)
 
+	# A choice written as type. On the world it is paper with an inked edge and
+	# turns gold; on a page it is ink and turns to the act's accent. The one in
+	# focus is underlined.
+	for v: StringName in [TITLE_CHOICE, PAGE_CHOICE]:
+		var on_world := v == TITLE_CHOICE
+		var rest: Color = c.paper if on_world else c.ink
+		var lit: Color = c.glow if on_world else c.accent
+		t.set_type_variation(v, &"Button")
+		var plain := StyleBoxEmpty.new()
+		plain.set_content_margin_all(4)
+		for state in BUTTON_STATES:
+			t.set_stylebox(state, v, plain)
+		var under := StyleBoxFlat.new()
+		under.draw_center = false
+		under.border_width_bottom = 2
+		under.border_color = lit
+		under.set_content_margin_all(4)
+		t.set_stylebox(&"focus", v, under)
+		t.set_font(&"font", v, font("display"))
+		t.set_font_size(&"font_size", v, 40 if on_world else 28)
+		for state in [&"font_color", &"font_pressed_color"]:
+			t.set_color(state, v, rest)
+		for state in [&"font_hover_color", &"font_focus_color", &"font_hover_pressed_color"]:
+			t.set_color(state, v, lit)
+		t.set_color(&"font_disabled_color", v, Color(rest, 0.4))
+		if on_world:
+			t.set_color(&"font_outline_color", v, Color(c.ink, 0.8))
+			t.set_constant(&"outline_size", v, 6)
+
 	# A setting on a page: an inked box that fills when it is on, and a brass
 	# rule with a knob. Focus is the same gold ring the chips wear.
 	var no_box := StyleBoxEmpty.new()
@@ -321,6 +370,11 @@ static func build(of_act: Act) -> Theme:
 	spaced.base_font = font("display")
 	spaced.spacing_glyph = 3
 	t.set_font(&"font", &"LineName", spaced)
+	var foil := FontVariation.new()
+	foil.base_font = font("display")
+	foil.spacing_glyph = FOIL_SPACING
+	for v in [&"CoverKicker", &"CoverTitle"]:
+		t.set_font(&"font", v, foil)
 	for v in [&"LineSaid", &"LineName", &"LineTold", &"ChapterTitle"]:
 		t.set_color(&"font_shadow_color", v, Color(c.ink, 0.8))
 		t.set_constant(&"shadow_offset_x", v, 0)

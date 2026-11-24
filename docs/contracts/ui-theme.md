@@ -57,7 +57,7 @@ deckled edge, tinted to a paper token. Made by
 |---|---|
 | SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, NoticeCard, NoticeRare, PickupRow, SatchelChip, SatchelKey | PanelContainer |
 | SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle | Label |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle, CoverKicker, CoverTitle | Label |
 | SatchelMeter | ProgressBar |
 
 `CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
@@ -89,6 +89,12 @@ drew at Nunito's lightest cut (200) until step 7a found it.
 the vitals HUD and the screen's edges through `JournalTheme.color()`.
 
 ## The horror palette
+
+`JournalTheme.BOOK` (`cloth`, `cloth_deep`, `foil`, `night`) is the journal
+itself, the same in both acts as its art is: the shut book on the title, the
+film's title card and skip ring read it. `TitleChoice` and `PageChoice` are
+choices written as type with no box (the title's menu on the world, the
+stories on a page); the one in focus is underlined.
 
 `JournalTheme.HORROR` (`bone`, `pall`, `blood`) is the same in both acts and
 is worn only by the `LineWhisper`, `LineDread` and `LineFlood` variations (R3:

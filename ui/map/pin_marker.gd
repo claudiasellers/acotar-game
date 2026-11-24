@@ -13,13 +13,9 @@ const EDGE := 64.0
 const SIZE := 15.0
 ## Hidden this close (she is there; the arrival sparkles take over).
 const NEAR := 12.0
-## Her sketchbook's charcoal, its paper, and a blush watercolour wash.
-const CHARCOAL := Color(0.19, 0.16, 0.18)
-const PAPER := Color(0.99, 0.96, 0.93)
-const WASH := Color(0.95, 0.66, 0.74)
-const HAND := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
 
 var hud: Node
+var _hand: Font = JournalTheme.font("hand")
 var _t: float = 0.0
 ## Where the icon was drawn last (for tests): screen point and whether it is on the edge.
 var shown_at: Vector2 = Vector2.ZERO
@@ -108,13 +104,13 @@ func _stroke(points: PackedVector2Array, width: float) -> void:
 		for i in points.size():
 			var j := Vector2(sin(i * 3.7 + pass_i * 1.3), cos(i * 2.9 + pass_i)) * 0.7
 			line.append(points[i] + o + j)
-		var c := Color(CHARCOAL, 0.85 - pass_i * 0.22)
+		var c := Color(JournalTheme.color(&"ink"), 0.85 - pass_i * 0.22)
 		draw_polyline(line, c, width * (1.0 - pass_i * 0.25), true)
 
 
 ## A paper halo so the charcoal reads on dark ground as well as on snow.
 func _halo(points: PackedVector2Array, width: float) -> void:
-	draw_polyline(points, Color(PAPER, 0.75), width + 5.0, true)
+	draw_polyline(points, Color(JournalTheme.color(&"paper"), 0.75), width + 5.0, true)
 
 
 func _draw_chevron(tip: Vector2, dir: Vector2) -> void:
@@ -141,10 +137,10 @@ func _draw_pin(at: Vector2) -> void:
 	outline.append(outline[0])
 	var fill := PackedVector2Array(outline)
 	fill.remove_at(fill.size() - 1)
-	draw_colored_polygon(fill, Color(PAPER, 0.9))
-	draw_circle(head + Vector2(1.5, 1.0), s * 0.55, Color(WASH, 0.55))
+	draw_colored_polygon(fill, Color(JournalTheme.color(&"paper"), 0.9))
+	draw_circle(head + Vector2(1.5, 1.0), s * 0.55, Color(JournalTheme.wash(0), 0.55))
 	_stroke(outline, 2.2)
-	draw_circle(head, s * 0.18, Color(CHARCOAL, 0.85))
+	draw_circle(head, s * 0.18, Color(JournalTheme.color(&"ink"), 0.85))
 	_stroke(PackedVector2Array([tipp + Vector2(-s * 0.45, 2.0), tipp + Vector2(s * 0.45, 1.0)]), 1.6)
 
 
@@ -152,10 +148,10 @@ func _draw_pin(at: Vector2) -> void:
 func _draw_distance(centre: Vector2, d: float) -> void:
 	var label := "%d m" % roundi(d)
 	var fs := 17
-	var w := HAND.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	var w := _hand.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 	var lp := Vector2(-w * 0.5, fs * 0.3)
 	draw_set_transform(centre, -0.04, Vector2.ONE)
-	draw_string_outline(HAND, lp, label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(PAPER, 0.8))
-	draw_string(HAND, lp + Vector2(0.6, 0.4), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(CHARCOAL, 0.35))
-	draw_string(HAND, lp, label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(CHARCOAL, 0.9))
+	draw_string_outline(_hand, lp, label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(JournalTheme.color(&"paper"), 0.8))
+	draw_string(_hand, lp + Vector2(0.6, 0.4), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(JournalTheme.color(&"ink"), 0.35))
+	draw_string(_hand, lp, label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(JournalTheme.color(&"ink"), 0.9))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

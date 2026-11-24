@@ -1,13 +1,10 @@
-## The screen between Continue and play: the cream the title's crossing washes
-## to, so the crossing runs straight into it, with a line saying what's going
-## on, breathing while the world builds behind it. Lifts once Feyre has ground
+## The screen between Continue and play: the journal's first page, which the
+## title washes up to as its cover lifts, with a line in her hand saying
+## what's going on, breathing while the world builds behind it. Lifts once Feyre has ground
 ## under her. Regions that build in one long frame stall the breath, not the look.
 class_name LoadingVeil
 extends CanvasLayer
 
-const CREAM := Color(1.0, 0.95, 0.86, 1.0)
-const INK := Color(0.42, 0.29, 0.34)
-const FONT := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
 const LINE := "Returning…"
 const FADE_SECONDS := 0.6
 const BREATH_SECONDS := 2.4
@@ -30,16 +27,12 @@ func _ready() -> void:
 	_started_msec = Time.get_ticks_msec()
 	_fill = ColorRect.new()
 	_fill.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_fill.color = CREAM
+	_fill.color = JournalTheme.color(&"paper")
 	add_child(_fill)
-	_label = Label.new()
-	_label.text = LINE
+	_label = BookKit.label(LINE, &"ReadText")
 	_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_label.add_theme_font_override(&"font", FONT)
-	_label.add_theme_font_size_override(&"font_size", 44)
-	_label.add_theme_color_override(&"font_color", INK)
 	_fill.add_child(_label)
 
 

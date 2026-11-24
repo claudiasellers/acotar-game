@@ -8,11 +8,11 @@ const VARIATIONS := {
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
 		&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
 	],
-	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon"],
+	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
 		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
-		&"NotifyText", &"ThoughtText",
+		&"NotifyText", &"ThoughtText", &"CoverKicker", &"CoverTitle",
 	],
 	&"ProgressBar": [&"SatchelMeter"],
 }

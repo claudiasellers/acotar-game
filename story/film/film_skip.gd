@@ -1,4 +1,4 @@
-## Hold-to-skip for films: any confirm or escape input shows a small gilt ring
+## Hold-to-skip for films: any confirm or escape input shows a small foil ring
 ## in the corner; holding it HOLD seconds, or pressing twice within DOUBLE
 ## seconds, skips. The ring fades when untouched. Emits `skip`.
 class_name FilmSkip
@@ -9,10 +9,9 @@ signal skip
 const HOLD := 0.8
 const DOUBLE := 0.6
 const ACTIONS: Array[StringName] = [&"interact", &"ui_accept", &"pause", &"ui_cancel", &"fire"]
-const GOLD := Color(0.96, 0.84, 0.52)
-const FONT := preload("res://ui/title/fonts/EBGaramond-MediumItalic.ttf")
 
 var held: float = 0.0
+var _hand: Font = JournalTheme.font("hand")
 var _shown: float = 0.0
 var _last_press_ms: int = -100000
 var _done: bool = false
@@ -78,8 +77,9 @@ func _draw() -> void:
 	var c := Vector2(vs.x - 70.0, vs.y - bar * 0.5 - 2.0)
 	if bar < 40.0:
 		c.y = vs.y - 60.0
-	draw_arc(c, 15.0, 0.0, TAU, 48, Color(GOLD, 0.25), 2.0, true)
+	var foil := JournalTheme.color(&"foil")
+	draw_arc(c, 15.0, 0.0, TAU, 48, Color(foil, 0.25), 2.0, true)
 	var k := clampf(held / HOLD, 0.0, 1.0)
 	if k > 0.0:
-		draw_arc(c, 15.0, -PI * 0.5, -PI * 0.5 + TAU * k, 48, GOLD, 3.0, true)
-	draw_string(FONT, c + Vector2(-150.0, 7.0), "hold to skip", HORIZONTAL_ALIGNMENT_RIGHT, 120.0, 20, Color(GOLD, 0.85))
+		draw_arc(c, 15.0, -PI * 0.5, -PI * 0.5 + TAU * k, 48, foil, 3.0, true)
+	draw_string(_hand, c + Vector2(-150.0, 7.0), "hold to skip", HORIZONTAL_ALIGNMENT_RIGHT, 120.0, 20, Color(foil, 0.85))
