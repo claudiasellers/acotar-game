@@ -2,7 +2,11 @@
 
 Plan: `plans/hostile-fae/health-interactions.md` §2.2, §13 row 5 and §14.2; bow design §3.
 Code: `systems/strike/strike_controller.gd` (`StrikeController`, a child of
-Feyre named `Strike`). Input action `strike`: F, pad Y (north).
+Feyre named `Strike`). Input action `strike`: V on the keyboard. No pad button yet: all four
+face buttons are taken (A jump, B crouch, X interact, Y guide), so the pad
+layout is the owner's call. Strike shares no event with any other gameplay
+action; `tests/unit/test_input_overlap.gd` fails if two do (allow-list:
+sprint/focus).
 
 One press, in this order:
 1. **Held** (`Vitals.of(player).is_grabbed()`): the knife cuts her free at
@@ -23,8 +27,7 @@ One press, in this order:
 3. **Something in group `&"knife_cuttable"`** within reach with a
    `cut(by: Node3D) -> bool` method (snares, the Hob's charm): the knife cuts it.
 
-A press that does none of these is left unhandled, so F still reaches the bow's
-`craft_arrow` until that moves into the quiver wheel (bow design §3).
+A press that does none of these is left unhandled.
 
 `Creature.stagger(seconds)` stands a creature still for that long and loses
 its wind-up. Brains with their own fight state override it: `Naga` (story)

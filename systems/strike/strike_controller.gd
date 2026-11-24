@@ -1,4 +1,4 @@
-## Strike (F / pad Y): one key, two contexts (bow design §3, health-interactions
+## Strike (V; no pad button yet): one key, two contexts (bow design §3, health-interactions
 ## §2.2, slice HK). Feyre's boot knife is always in her boot, so it's never a
 ## menu choice [C ch8-15].
 ##   - Held in a hold (a coil, a grab): the knife cuts her free at once, and
@@ -12,8 +12,8 @@
 ##     just broken free from), x1 otherwise.
 ##   - Nothing to strike, but a cuttable thing in reach (group
 ##     &"knife_cuttable": snares, the Hob's charm): the knife cuts it.
-## A press that does nothing is left unhandled, so the same key still reaches
-## whatever else listens to it.
+## Strike shares its key with no other gameplay action (tests/unit/test_input_overlap.gd).
+## A press that does nothing is left unhandled.
 class_name StrikeController
 extends Node
 

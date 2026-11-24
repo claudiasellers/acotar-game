@@ -83,7 +83,7 @@ var is_drawing: bool:
 
 var bow_controller: BowController
 var interactor: Interactor
-## Strike, F / pad Y: the bow bash or her boot knife (systems/strike).
+## Strike, V: the bow bash or her boot knife (systems/strike).
 var strike: StrikeController
 var body_state: BodyState
 ## Health, afflictions, dread and ease, knockdown (systems/vitals). Sets max_stamina.

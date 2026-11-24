@@ -38,7 +38,7 @@ the place is sketched and named, with no celebration (horror beat).
   she tries to rig the snare with none.
 - Wind: group `wind_source` `wind_at(pos)`; calm air falls back to the glade
   breeze `SurielSnare.GLADE_BREEZE`.
-- Input: `interact` (rig, bait); `strike` (F / pad Y) for the knife
+- Input: `interact` (rig, bait); `strike` (V) for the knife
   (`StrikeController`, docs/contracts/strike.md). Arrows through Feyre's `arrow_fired` ->
   `Arrow.hit` (tether shot).
 

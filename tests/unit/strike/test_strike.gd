@@ -223,7 +223,7 @@ func test_the_knife_cuts_a_snare_in_reach() -> void:
 	assert_true(s.was_cut)
 
 
-func test_strike_is_f_and_pad_north() -> void:
+func test_strike_is_v() -> void:
 	assert_true(ProjectSettings.has_setting("input/strike"), "strike is in project.godot")
 	var keys := []
 	var buttons := []
@@ -232,8 +232,8 @@ func test_strike_is_f_and_pad_north() -> void:
 			keys.append((e as InputEventKey).physical_keycode)
 		elif e is InputEventJoypadButton:
 			buttons.append((e as InputEventJoypadButton).button_index)
-	assert_has(keys, KEY_F)
-	assert_has(buttons, JOY_BUTTON_Y)
+	assert_has(keys, KEY_V)
+	assert_eq(buttons, [], "no pad button until the owner picks the layout")
 
 
 ## R18: one knife. The ambush's own is gone, and Feyre carries Strike.
