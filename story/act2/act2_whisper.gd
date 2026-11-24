@@ -1,6 +1,6 @@
 ## A voice inside Feyre's head (the Bogge's pleas): no panel, no speaker,
 ## just words in the middle of her view that tremble and bleed in and out.
-## Deliberately unlike Act2Caption's soft pastel card (R3: horror is never
+## Deliberately unlike the soft lines LinePresenter shows (R3: horror is never
 ## dressed up as the pretty UI). Never a choice (R2).
 class_name Act2Whisper
 extends CanvasLayer

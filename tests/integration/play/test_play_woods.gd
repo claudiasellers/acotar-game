@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,ui/frame/screen_stack.gd,ui/frame/hud_layout.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,ui/frame/screen_stack.gd,ui/frame/hud_layout.gd,ui/lines/*,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the woods, from New Game, driven by real key and pad
 ## events (tests/integration/play/README.md). The cottage in the human realm:
 ## she wakes there, her family is in the room, the woods are outside the door.
@@ -116,10 +116,9 @@ func test_talking_to_her_family_shows_a_line_and_leaves_her_free() -> void:
 					dd.busy(), dd._greeted.get(n3.get_instance_id(), false)])
 	assert_true(spoke, "one of her family speaks when she comes up to them (heard %s)" % [heard])
 	assert_true(h.has_control(), "a line never takes the controls")
-	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
-	if caption:
-		assert_true(await h.wait_until(func() -> bool: return caption.showing == "", 60 * 20),
-				"the caption goes away by itself")
+	var lines := LinePresenter.of(get_tree())
+	assert_true(await h.wait_until(func() -> bool: return lines.showing == "", 60 * 20),
+			"the line goes away by itself")
 	var before := h.feyre.global_position
 	await h.hold_for(&"move_back", 20)
 	assert_gt(PlayHarness.flat_distance(before, h.feyre.global_position), 0.3, "and she walks on afterwards")

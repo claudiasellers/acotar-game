@@ -311,7 +311,7 @@ func aside(line_id: StringName) -> void:
 	var spoken: Dictionary = stage.line(line_id) if stage else {}
 	if spoken.is_empty() or not is_inside_tree():
 		return
-	Act2Caption.find_or_make(self).say(String(spoken.get("who", "")), String(spoken.get("text", "")))
+	LinePresenter.line(self, String(spoken.get("who", "")), String(spoken.get("text", "")))
 
 
 ## Beats: fade to dark, move the Clock to `to` (fraction of the day), run
@@ -446,9 +446,9 @@ class SayBeat:
 			push_warning("Act2Space %s: no line '%s'" % [space.space_id, line_id])
 			_left = 0.0
 			return
-		_left = Act2Caption.reading_time(text)
+		_left = LinePresenter.reading_time(text)
 		if space.is_inside_tree():
-			Act2Caption.find_or_make(space).say(String(spoken.get("who", "")), text, _left)
+			LinePresenter.line(space, String(spoken.get("who", "")), text, _left)
 
 	func tick(_space: SceneSpace, delta: float) -> bool:
 		_left -= delta

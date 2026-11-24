@@ -98,7 +98,7 @@ func _build_beats() -> Array:
 			StoryControl.set_focus(_look)
 			var thought := String(info().get("thought", ""))
 			if thought != "" and is_inside_tree():
-				Act2Caption.find_or_make(self).say("", thought), "she looks"),
+				LinePresenter.line(self, "", thought), "she looks"),
 		Beats.wait(1.0),
 		Beats.run(func(_s: SceneSpace) -> void:
 			raise("fact.hall_x_%d" % n)

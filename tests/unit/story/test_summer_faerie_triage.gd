@@ -184,8 +184,7 @@ func test_hall_space_held_to_the_end_raises_the_deed() -> void:
 	assert_false(WorldState.has_flag("fact.summer_faerie_died_alone"))
 	assert_has(journal, &"summer_faerie_wings")
 	assert_false(t.can_start(), "it never plays twice")
-	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
-	assert_eq(caption.showing, "", "no triage text remains after he dies (L30's p4 house showed the herbs hint)")
+	assert_eq(LinePresenter.of(get_tree()).showing, "", "no triage text remains after he dies (L30's p4 house showed the herbs hint)")
 
 
 func test_leaving_him_he_dies_alone_and_the_grave_vigil_mends_it_by_day() -> void:
@@ -199,7 +198,7 @@ func test_leaving_him_he_dies_alone_and_the_grave_vigil_mends_it_by_day() -> voi
 			break
 		t.tick(STEP)
 	assert_eq(t.outcome, &"alone")
-	assert_eq((get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption).showing, "",
+	assert_eq(LinePresenter.of(get_tree()).showing, "",
 		"the shelves hint is gone once he is dead")
 	assert_true(WorldState.has_flag("fact.summer_faerie_died_alone"))
 	assert_false(WorldState.has_flag("fact.summer_faerie_farewell"), "the deed is lost here")
@@ -249,7 +248,7 @@ func test_with_nothing_to_dress_she_thinks_of_the_infirmary_shelves() -> void:
 	for _i in 50:
 		t.tick(STEP)
 	assert_true(t.hinted)
-	assert_eq(t.caption.showing, SummerFaerieTriage.SHELF_HINT, "she thinks of the shelves")
+	assert_eq(LinePresenter.of(get_tree()).showing, SummerFaerieTriage.SHELF_HINT, "she thinks of the shelves")
 	var defs := load("res://data/regions/spring_court/manor_estate/house/service.tres")
 	var found := []
 	for d in defs.get(&"secrets"):

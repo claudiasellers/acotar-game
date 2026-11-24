@@ -49,7 +49,6 @@ var tamlin: Node3D
 var outcome: StringName = &""
 var spoke: bool = false
 var props: Node3D
-var caption: Act2Caption
 var inventory: Inventory = Gameplay.inventory
 
 var _pool: Node3D
@@ -163,11 +162,10 @@ func _open(_s: SceneSpace = null) -> void:
 			Vector3(FRONT_DOORS.x + 1.2, global_position.y, FRONT_DOORS.y))
 
 
-## Every line goes through the shared caption with this scene as its owner,
-## so it clears when the scene ends or the phase changes (Act2Caption, L24-10).
+## Every line goes through the one presenter with this scene as its owner, so
+## it clears when the scene ends or the phase changes (L24-10).
 func say(who: String, text: String, seconds: float = -1.0) -> void:
-	caption = Act2Caption.find_or_make(self)
-	caption.say(who, text, seconds)
+	LinePresenter.line(self, who, text, seconds)
 
 
 # --- Presses ----------------------------------------------------------------

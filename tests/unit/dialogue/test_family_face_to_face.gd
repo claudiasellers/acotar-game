@@ -23,7 +23,7 @@ func before_each() -> void:
 	director = DialogueDirector.new()
 	director.books_dir = ""
 	director.auto_tick = false
-	director.show_fn = func(_who: String, text: String) -> float:
+	director.show_fn = func(_who: String, text: String, _inner: bool) -> float:
 		shown.append(text)
 		return 2.0
 	director.view_fn = func() -> Array: return view

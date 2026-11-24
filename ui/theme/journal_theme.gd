@@ -71,10 +71,12 @@ const LABELS := {
 	&"QuickBarKey": [15, "body", 800, &"ink_soft"],
 	&"QuickBarCount": [15, "body", 800, &"ink"],
 	&"NotifyText": [20, "body", 600, &"ink"],
-	&"ThoughtText": [24, "hand", 500, &"ink"],
+	&"ThoughtText": [26, "hand", 600, &"ink"],
+	&"LineSaid": [24, "body", 600, &"paper"],
+	&"LineName": [18, "display", 400, &"glow"],
 }
 const PANELS: Array[StringName] = [
-	&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
+	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"SatchelChip", &"SatchelKey",
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
@@ -120,7 +122,8 @@ static func font(face: String, weight: int = 500) -> Font:
 		return file
 	var cut := FontVariation.new()
 	cut.base_font = file
-	cut.variation_opentype = {"wght": weight}
+	# Keyed by the tag's number: a name as the key is silently ignored.
+	cut.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): weight}
 	return cut
 
 
@@ -164,6 +167,7 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"SatchelCard", _paper(PAPER_PAGE, c.paper, 40, 28))
 	t.set_stylebox(&"panel", &"LoosePage", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
 	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 14))
+	t.set_stylebox(&"panel", &"LineBand", _band(c.ink))
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
 	t.set_stylebox(&"panel", &"QuickBarSlot", _pill(Color(c.paper, 0.92), c.line, 2, Vector2(6, 6)))
@@ -254,6 +258,16 @@ static func build(of_act: Act) -> Theme:
 		t.set_font_size(&"font_size", v, spec[0])
 		t.set_font(&"font", v, font(spec[1], spec[2]))
 		t.set_color(&"font_color", v, c[spec[3]])
+	# Said lines sit on the world, not on paper: a soft drop keeps them read.
+	var spaced := FontVariation.new()
+	spaced.base_font = font("display")
+	spaced.spacing_glyph = 3
+	t.set_font(&"font", &"LineName", spaced)
+	for v in [&"LineSaid", &"LineName"]:
+		t.set_color(&"font_shadow_color", v, Color(c.ink, 0.8))
+		t.set_constant(&"shadow_offset_x", v, 0)
+		t.set_constant(&"shadow_offset_y", v, 1)
+		t.set_constant(&"shadow_outline_size", v, 4)
 	# Count and pin sit on their own small chip.
 	for v in [&"SatchelCount", &"SatchelPin"]:
 		t.set_type_variation(v, &"Label")
@@ -289,6 +303,29 @@ static func _paper(path: String, tint: Color, edge: int, margin: int) -> StyleBo
 	box.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
 	box.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
 	box.modulate_color = tint
+	return box
+
+
+## The band behind a line said aloud: a smear of shadow with no edge, so the
+## words read over any ground and nothing looks like a box.
+static func _band(ink: Color) -> StyleBoxTexture:
+	var fade := Gradient.new()
+	fade.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+	fade.colors = PackedColorArray([Color(ink, 0.62), Color(ink, 0.5), Color(ink, 0.0)])
+	var smear := GradientTexture2D.new()
+	smear.gradient = fade
+	smear.fill = GradientTexture2D.FILL_RADIAL
+	smear.fill_from = Vector2(0.5, 0.5)
+	smear.fill_to = Vector2(1.0, 0.5)
+	smear.width = 128
+	smear.height = 64
+	var box := StyleBoxTexture.new()
+	box.texture = smear
+	box.set_content_margin_all(10)
+	box.set_expand_margin(SIDE_LEFT, 110)
+	box.set_expand_margin(SIDE_RIGHT, 110)
+	box.set_expand_margin(SIDE_TOP, 26)
+	box.set_expand_margin(SIDE_BOTTOM, 30)
 	return box
 
 

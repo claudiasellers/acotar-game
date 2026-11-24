@@ -90,7 +90,7 @@ func check_at(local: Vector3) -> StringName:
 	if is_inside_tree():
 		note_on_map(self)
 		if first and plan.first_thought != "":
-			Act2Caption.find_or_make(self).say("", plan.first_thought)
+			LinePresenter.line(self, "", plan.first_thought)
 	if sketched_count() >= plan.min_rooms and not WorldState.has_flag(ENOUGH_FACT):
 		WorldState.set_flag(ENOUGH_FACT)
 	if plan.lookouts.has(id) or plan.lookouts.has(String(id)):

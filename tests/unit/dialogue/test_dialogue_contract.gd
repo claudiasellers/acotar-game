@@ -25,7 +25,7 @@ func before_each() -> void:
 func _all_director() -> DialogueDirector:
 	var d := DialogueDirector.new()
 	d.auto_tick = false
-	d.show_fn = func(who: String, text: String) -> float:
+	d.show_fn = func(who: String, text: String, _inner: bool) -> float:
 		shown.append([who, text])
 		return 1.0
 	add_child_autofree(d)
@@ -36,7 +36,7 @@ func _bare_director() -> DialogueDirector:
 	var d := DialogueDirector.new()
 	d.auto_tick = false
 	d.books_dir = ""
-	d.show_fn = func(who: String, text: String) -> float:
+	d.show_fn = func(who: String, text: String, _inner: bool) -> float:
 		shown.append([who, text])
 		return 1.0
 	add_child_autofree(d)

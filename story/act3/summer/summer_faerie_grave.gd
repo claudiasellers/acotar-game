@@ -102,7 +102,7 @@ func step_vigil(delta: float) -> void:
 		vigil += delta
 		# Her thought comes near the end of the vigil, while the scene still owns the caption.
 		if before < VIGIL_SECONDS - 5.0 and vigil >= VIGIL_SECONDS - 5.0:
-			Act2Caption.find_or_make(self).say("", "Someone should have held his hand. I should have.", 4.5)
+			LinePresenter.line(self, "", "Someone should have held his hand. I should have.", 4.5)
 
 
 func _mourned(_s: SceneSpace = null) -> void:

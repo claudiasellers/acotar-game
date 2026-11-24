@@ -43,7 +43,7 @@ func before_each() -> void:
 func after_each() -> void:
 	StoryControl.release()
 	Clock.paused = false
-	Act2Caption.clear_all(get_tree())
+	LinePresenter.of(get_tree()).clear()
 
 
 func _anchor(id: String, at: Vector3) -> Marker3D:
@@ -74,8 +74,7 @@ func dinner() -> FirstDinner:
 
 
 func _caption() -> String:
-	var c := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
-	return c.showing if c else ""
+	return LinePresenter.of(get_tree()).showing
 
 
 func _tick_all(seconds: float, until: Callable = Callable()) -> bool:

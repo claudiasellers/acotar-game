@@ -253,7 +253,7 @@ func _caption(line_id: StringName) -> void:
 	var spoken := stage.line(line_id)
 	var text := String(spoken.get("text", ""))
 	if text != "":
-		Act2Caption.find_or_make(self).say(String(spoken.get("who", "")), text, 3.2)
+		LinePresenter.line(self, String(spoken.get("who", "")), text, 3.2)
 
 
 func _move_lucien(delta: float) -> void:

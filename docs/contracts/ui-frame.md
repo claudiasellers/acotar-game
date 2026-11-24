@@ -140,6 +140,30 @@ along the bottom between `VITALS` and `BOW`. The lane starts at
 `HudLayout.LANE_LEFT` (384 px). The status chips stop short of it: three
 across, then a second row above.
 
+## Line voices
+
+`LinePresenter` (`ui/lines/line_presenter.gd`, under `ScreenStack`, reached
+with `LinePresenter.of(tree)`) is the only thing that puts a line of words on
+screen. It shows one line at a time in the lane, standing on
+`LANE_FOOT` (0.8 of the screen's height), wrapping at 860 px. The voice is
+chosen by what kind of line it is, never by which script fired it, and each is
+one row of `LinePresenter.VOICES`:
+
+| Voice | When | Sheet | Type |
+|---|---|---|---|
+| `SAID` | anyone speaking aloud, Feyre included | `LineBand`: a smear of shadow with no edge; the name over it in gold spaced capitals (`LineName`) | `LineSaid`, upright |
+| `THOUGHT` | everything in Feyre's head | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
+
+Calls: `say(voice, who, text, from, seconds)` returns the seconds the line
+stays; `LinePresenter.line(from, who, text, seconds)` is the same for a
+scene's own sheet, where a line with a name is said and one without is her
+thought; `clear()`; `showing` is the text on screen ("" when none);
+`reading_time(text)`. `from` (or the `SceneSpace` above it) owns the line: it
+clears when that scene finishes or leaves the tree, on a phase change and on
+a load, and it hides while a screen pauses the tree. Told (film narration),
+Read (tags and notes) and the two horror voices join the table in the rest of
+step 7.
+
 ## UiMode
 
 Not a state anyone sets. One function that reads what the game already knows:
@@ -204,6 +228,7 @@ every piece's script.
 | step 4 | the pause and the settings: `SettingsTab`, a page of the book on its ribbon; the title opens the same page | `ui/settings_panel.gd`, `ui/title/title_settings.gd`, `ui/pause_menu/` (PauseStyle), `ui/theme/ui_borders.gd`, `framed_style_box.gd` and the two pause fonts | the theme search test has no exceptions left |
 | step 5 | her map of the halls: the Map tab's manor page draws her five marks, `WorldMapHud.note_sketch()` is the one "she drew something" signal, and the foyer table opens the book at the Map tab | `story/act3/house/hall_map_page.gd` (its own layer, colours, toast and full page) | none new |
 | step 6 | the stations she opens with E: the stillroom, a stall, the whorl stones' card and ride, the easel and the mare are loose pages laid by `LoosePage` (`ui/menu/loose_page.gd`) | each station's own scrim, card, footer, `_label`, `_key` and `_pad`; `UiStyle.modal` and `UiStyle.button`; the `SatchelDetail` variation (now `LoosePage`) | `test_loose_page.gd`: no station frames itself |
+| step 7a | lines said and thought: `LinePresenter` and its voice table; `DialogueDirector`, the scene spaces and the scripts that typed a line themselves all show through it | `story/act2/act2_caption.gd` and its test | `test_line_presenter.gd`: nothing names the old caption |
 
 ## Files outside `ui/` the frame edits
 

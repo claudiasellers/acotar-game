@@ -21,7 +21,7 @@ No choices, no objective text, no quest markers.
 | Voice files | `res://audio/voice/<line_id>.ogg`. When one exists the director plays it (positional at the speaker, flat for inner lines) on the `Sound` bus. The sheet for the voice tool is `data/dialogue/sheet/line_sheet.csv` (one row per line, delivery notes and target file) |
 | `EventBus.line_spoken(actor, text, emotion, seconds)` | Also emitted for every line, once L01-11 adds that signal to EventBus (L36's faces listen). `actor` is the speaking node (Feyre's for her thoughts), and `emotion` comes from `DialogueLine.emotion`. **Two signals share the name:** the director's own `line_spoken(line_id, ...)` carries the id for voice files and ducking, and EventBus's carries the actor for faces |
 | Talking hands | `CourtNpc.set_talking(true)` for the length of the line |
-| Caption | The shared `Act2Caption` (`say(who, text)`). Inner lines show no name |
+| On screen | `LinePresenter` (`docs/contracts/ui-frame.md`, "Line voices"). Inner lines are the Thought voice: her page slip, no name. Everything else is Said. `show_fn(who, text, inner)` is the test seam |
 
 ## When it stays quiet
 

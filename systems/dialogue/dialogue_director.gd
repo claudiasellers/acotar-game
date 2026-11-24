@@ -62,7 +62,7 @@ var room_id: StringName = &""
 var last_line: DialogueLine
 var spoken_log: Array[StringName] = []
 ## Overridable for tests: shows a line, returns its seconds on screen.
-var show_fn: Callable = _show_caption
+var show_fn: Callable = _show_line
 ## Tests turn this off and call step() directly.
 var auto_tick: bool = true
 ## Where the books load from on ready ("" loads none: tests add their own).
@@ -248,8 +248,8 @@ func busy() -> bool:
 		return true
 	if _now < _busy_until or not _scene_queue.is_empty():
 		return true
-	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption if is_inside_tree() else null
-	return caption != null and caption.showing != "" and (last_line == null or caption.showing != last_line.text)
+	var on_screen := LinePresenter.of(get_tree()).showing if is_inside_tree() else ""
+	return on_screen != "" and (last_line == null or on_screen != last_line.text)
 
 
 func _ctx() -> Dictionary:
@@ -621,7 +621,7 @@ func _speak(line: DialogueLine, node: Node) -> DialogueLine:
 	var who := line.who
 	if who == "" and not line.inner and node is CourtNpc:
 		who = (node as CourtNpc).display_name
-	var seconds: float = show_fn.call(who, line.text)
+	var seconds: float = show_fn.call(who, line.text, line.inner)
 	_busy_until = _now + seconds
 	last_line = line
 	spoken_log.append(line.id)
@@ -640,9 +640,10 @@ func _speak(line: DialogueLine, node: Node) -> DialogueLine:
 	return line
 
 
-func _show_caption(who: String, text: String) -> float:
-	var caption := Act2Caption.find_or_make(self)
-	return caption.say(who, text)
+## Her thoughts are the page slip; everything said aloud is the band.
+func _show_line(who: String, text: String, inner: bool) -> float:
+	return LinePresenter.of(get_tree()).say(
+			LinePresenter.Voice.THOUGHT if inner else LinePresenter.Voice.SAID, who, text, self)
 
 
 func _set_talking(node: Node, seconds: float) -> void:

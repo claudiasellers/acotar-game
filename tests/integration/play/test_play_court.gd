@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/*,data/mount/*,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,ui/frame/screen_stack.gd,ui/frame/hud_layout.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/*,data/mount/*,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,ui/frame/screen_stack.gd,ui/frame/hud_layout.gd,ui/lines/*,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the Spring Court, through Continue from a save after the
 ## first dinner (the mare ridden once, so the whistle works), driven by real
 ## key and pad events (tests/integration/play/README.md). Indoors in the manor,
@@ -147,10 +147,9 @@ func test_talking_to_alis_shows_a_line_and_leaves_her_free() -> void:
 	dd.line_spoken.disconnect(on_line)
 	assert_true(spoke, "Alis says something when Feyre walks up (heard %s)" % [heard])
 	assert_true(h.has_control(), "a line never takes the controls")
-	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
-	if caption:
-		assert_true(await h.wait_until(func() -> bool: return caption.showing == "", 60 * 20),
-				"the caption goes away by itself")
+	var lines := LinePresenter.of(get_tree())
+	assert_true(await h.wait_until(func() -> bool: return lines.showing == "", 60 * 20),
+			"the line goes away by itself")
 
 
 func test_a_person_blocks_her_then_lets_her_squeeze_past() -> void:

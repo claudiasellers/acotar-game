@@ -37,6 +37,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	JournalTheme.follow_story()
 	add_child(HudLayout.new())
+	add_child(LinePresenter.new())
 
 
 ## `cancel` is for a screen built without a script of its own; a screen

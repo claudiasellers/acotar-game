@@ -87,7 +87,7 @@ func speak(line_id: StringName, emotion: StringName = &"") -> Array:
 			if actor_id == &"" or not is_inside_tree():
 				return
 			var text := String(spoken.get("text", ""))
-			var secs := Act2Caption.reading_time(text)
+			var secs := LinePresenter.reading_time(text)
 			if emotion != &"":
 				EventBus.face_requested.emit(actor_id, emotion, 0.8, secs)
 			EventBus.line_spoken.emit(actor_id, text, emotion, secs), "voice %s" % line_id),

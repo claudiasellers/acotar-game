@@ -105,7 +105,7 @@ func test_names_on_the_stones_sketch_keep_apart() -> void:
 ## The old card look gains no new users before step 8 deletes it.
 func test_the_old_card_look_gains_no_users() -> void:
 	var allowed := ["res://ui/ui_style.gd", "res://ui/collection_book/find_card.gd", "res://ui/guide/guide_journal.gd",
-		"res://story/act1/act1_milestones.gd", "res://story/act1/key_prompts.gd", "res://story/act2/act2_caption.gd",
+		"res://story/act1/act1_milestones.gd", "res://story/act1/key_prompts.gd",
 		"res://systems/interaction/press_card.gd", "res://systems/bow/quiver_card.gd", "res://tools/fast_travel/whorl_proof.gd"]
 	var users: Array[String] = []
 	_users_of("res://", "UiStyle", users)
