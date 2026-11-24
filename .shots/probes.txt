@@ -1,0 +1,4 @@
+from ui-theme
+quality look
+shot human res://tools/ui/menu_open_probe.tscn shots {out}
+shot spring res://tools/ui/menu_open_probe.tscn shots {out} p2_manor
