@@ -36,6 +36,7 @@ const ROWS := {
 	&"craft": [[&"craft_arrow", "make an arrow"]],
 	&"satchel": [[&"satchel_open", "open the satchel"]],
 	&"collection": [[&"open_collection", "open the collection"]],
+	&"map": [[&"map_open", "open the map"]],
 	&"thought": [[&"guide_open", "think on it again"]],
 }
 ## Never learnt and never off: a choice she has to see for as long as it waits.
