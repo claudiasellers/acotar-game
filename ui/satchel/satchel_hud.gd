@@ -30,6 +30,8 @@ const CHORD_LIFT := 8.0
 const IDLE_SECONDS := 6.0
 const IDLE_ALPHA := 0.55
 const MAX_FLIGHTS := 6
+## How far (degrees) the tin's book shakes its head when her bags have no room.
+const FULL_SHAKE := 7.0
 
 ## Last input came from a gamepad (prompts switch glyphs).
 static var pad_active: bool = false
@@ -197,6 +199,7 @@ func _process(delta: float) -> void:
 func _follow_inventory() -> void:
 	if bar == QuickBar.current() and not bar.inventory.item_added.is_connected(_on_item_added):
 		bar.inventory.item_added.connect(_on_item_added)
+		bar.inventory.refused.connect(_on_refused)
 		_refresh()
 
 
@@ -315,6 +318,21 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 		_flights -= 1
 		Juice.bounce_control(_tin.book, 0.2 * Juice.effects_scale)
 		SatchelSounds.play(&"pickup", self))
+
+
+## No room for what she reached for: the tin wakes and its book shakes its
+## head (the log says so in words).
+func _on_refused(_id: StringName, _container: StringName) -> void:
+	_idle = 0.0
+	if not _bar_root.is_visible_in_tree():
+		return
+	var book := _tin.book
+	book.pivot_offset = book.size * 0.5
+	var turn := deg_to_rad(FULL_SHAKE) * Juice.effects_scale
+	var t := book.create_tween()
+	for side: float in [-1.0, 1.0, -0.5]:
+		t.tween_property(book, ^"rotation", turn * side, 0.07)
+	t.tween_property(book, ^"rotation", 0.0, 0.1)
 
 
 func _quad(a: Vector2, b: Vector2, c: Vector2, k: float) -> Vector2:
