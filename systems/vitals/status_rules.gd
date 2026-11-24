@@ -28,7 +28,7 @@ const METERS: Array[StringName] = [&"health", &"stamina"]
 ## teaches and the Wardrobe's "How I am" page shows. Every tag in ORDER has a line.
 const INFO := {
 	&"health": ["Health", "My health, the long bar. Hits, hard falls and deep cold take it. It mends on its own after a while, and food mends it further. If it runs out, I go down."],
-	&"stamina": ["Stamina", "My stamina, the bow. Holding my aim in slow time and fighting free of a grip spend it, and it comes back quickly. If it runs dry, the bow greys until I catch my breath."],
+	&"stamina": ["Stamina", "My stamina, the bow. Holding a drawn bow spends it, Focus spends it fast, and so does fighting free of a grip. It comes back quickly; if it runs dry, the bow greys until I catch my breath."],
 	&"cold": ["Cold", "How cold I am. Cold shakes my aim and slows my stamina; deep cold costs me health. A fire or a warm brew helps."],
 	&"hunger": ["Hunger", "How hungry I am. Hunger slows my stamina, and at home it keeps my health from mending far. Bread would help."],
 	&"venom": ["Venom", "Poison, creeping. My health won't mend while it's in me, and once it's strong it drains me. A salve draws it out."],
