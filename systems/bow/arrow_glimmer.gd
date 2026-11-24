@@ -11,14 +11,15 @@ const GROUP := &"arrow_glimmer"
 ## Warm gold with a deep amber rim: reads on white snow and in dusk shade.
 const CORE := Color(1.0, 0.82, 0.25)
 const RIM := Color(1.0, 0.42, 0.05)
-## Screen size of the glint, in pixels-ish (fixed_size keeps it the same at any distance).
-const ASH_GLINT := 0.05
-const WOOD_GLINT := 0.02
+## Glint pixel_size with fixed_size on a 64 px texture: about 20 px on a 1080p screen
+## at any distance (0.0003 x 64 = 0.02 of the screen height). Colours stay <= 1.0, under the glow threshold.
+const ASH_GLINT := 0.00030
+const WOOD_GLINT := 0.00008
 const PULSE_HZ := 1.1
-const LIGHT_ENERGY := 2.5
-const LIGHT_RANGE := 6.0
-const BEACON_HEIGHT := 6.0
-const BEACON_WIDTH := 0.35
+const LIGHT_ENERGY := 0.8
+const LIGHT_RANGE := 1.8
+const BEACON_HEIGHT := 4.0
+const BEACON_WIDTH := 0.10
 ## At most this many non-ash arrows glimmer at once; ash always does.
 const WOOD_CAP := 3
 
@@ -98,11 +99,11 @@ func _process(delta: float) -> void:
 	_t += delta * TAU * PULSE_HZ
 	var pulse := 0.5 + 0.5 * sin(_t)
 	_glint.modulate = Color(1, 1, 1, 0.55 + 0.45 * pulse)
-	_glint.scale = Vector3.ONE * (0.8 + 0.5 * pulse)
+	_glint.scale = Vector3.ONE * (0.7 + 0.6 * pulse)
 	if light:
 		light.light_energy = LIGHT_ENERGY * (0.5 + 0.5 * pulse)
 	if _beacon:
-		(_beacon.mesh as QuadMesh).material.albedo_color = Color(1, 1, 1, 0.35 + 0.4 * pulse)
+		(_beacon.mesh as QuadMesh).material.albedo_color = Color(1, 1, 1, 0.5 + 0.5 * pulse)
 
 
 func _remove() -> void:
@@ -113,8 +114,8 @@ func _remove() -> void:
 
 static func _radial() -> GradientTexture2D:
 	var grad := Gradient.new()
-	grad.offsets = PackedFloat32Array([0.0, 0.25, 0.6, 1.0])
-	grad.colors = PackedColorArray([Color(1, 1, 0.85, 1), CORE, Color(RIM, 0.8), Color(RIM, 0.0)])
+	grad.offsets = PackedFloat32Array([0.0, 0.12, 0.3, 0.5])
+	grad.colors = PackedColorArray([Color(1, 0.97, 0.8, 1), Color(CORE, 1.0), Color(RIM, 0.35), Color(RIM, 0.0)])
 	var tex := GradientTexture2D.new()
 	tex.gradient = grad
 	tex.fill = GradientTexture2D.FILL_RADIAL
@@ -129,7 +130,7 @@ static func _radial() -> GradientTexture2D:
 static func _beam_texture() -> GradientTexture2D:
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
-	grad.colors = PackedColorArray([Color(RIM, 0.0), Color(CORE, 0.6), Color(RIM, 0.0)])
+	grad.colors = PackedColorArray([Color(RIM, 0.0), Color(CORE, 0.9), Color(RIM, 0.0)])
 	var tex := GradientTexture2D.new()
 	tex.gradient = grad
 	tex.fill = GradientTexture2D.FILL_LINEAR
