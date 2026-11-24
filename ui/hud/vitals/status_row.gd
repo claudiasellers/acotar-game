@@ -165,20 +165,14 @@ func _get_tooltip(at: Vector2) -> String:
 
 
 func _draw() -> void:
-	var ink := JournalTheme.color(&"ink")
-	var paper := JournalTheme.color(&"paper")
-	var line := JournalTheme.color(&"line")
 	var glow := JournalTheme.color(&"glow")
-	var danger := JournalTheme.color(&"danger")
-	var pall := JournalTheme.color(&"pall")
 	for i in shown.size():
 		var s: Dictionary = shown[i]
 		var tag: StringName = s.tag
 		var c := _slot(i)
 		var age := float(_born.get(tag, 1.0))
 		var gauge := StatusRules.kind(tag) == StatusRules.Kind.GAUGE
-		var stage := int(s.get("stage", 0))
-		var debuff := StatusRules.is_debuff(tag) or (gauge and stage >= 2)
+		var debuff := is_dark(s)
 		var scale := 1.0
 		if age < POP_SECONDS:
 			var t := age / POP_SECONDS
@@ -187,34 +181,7 @@ func _draw() -> void:
 		if debuff and shudder < 0.45:
 			c.x += sin(shudder * 70.0) * 3.0 * (1.0 - shudder / 0.45) * Juice.effects_scale
 		var r := RADIUS * scale
-		draw_circle(c, r, danger if debuff else line, true, -1.0, true)
-		draw_circle(c, r * (1.0 - RIM), pall.lerp(ink, 0.5) if debuff else paper, true, -1.0, true)
-		if debuff:
-			for crack: Array in CRACKS:
-				draw_line(c + (crack[0] as Vector2) * r, c + (crack[1] as Vector2) * r, Color(danger, 0.8), 1.5, true)
-		var ring_r := r * (1.0 - RIM) - RING_W * 0.5
-		draw_arc(c, ring_r, 0.0, TAU, 48, Color(paper if debuff else ink, 0.16), RING_W, true)
-		var frac := 1.0
-		var col := danger.lightened(0.25) if debuff else glow
-		var total := float(s.total)
-		var left := float(s.seconds_left)
-		if gauge:
-			frac = clampf(float(s.magnitude), 0.0, 1.0)
-			if stage == 1:
-				col = JournalTheme.color(&"accent")
-		elif tag == &"venom":
-			frac = clampf(float(s.magnitude), 0.0, 1.0)
-			col = (JournalTheme.color(&"bile") as Color).lightened(0.2)
-		elif total > 0.0:
-			frac = clampf(left / total, 0.0, 1.0)
-			if left < 3.0 and fmod(left, 0.5) < 0.25:
-				col.a *= 0.35
-		if frac > 0.0:
-			draw_arc(c, ring_r, -PI * 0.5, -PI * 0.5 + TAU * frac, maxi(int(48 * frac), 2), col, RING_W, true)
-		var tex := _icon(tag)
-		if tex:
-			var sz := ICON * scale
-			draw_texture_rect(tex, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false)
+		draw_chip(self, c, r, s, _icon(tag))
 		if not debuff and not gauge and age < 0.6:
 			var k := age / 0.6
 			for j in 6:
@@ -227,8 +194,51 @@ func _draw() -> void:
 		var font := get_theme_default_font()
 		var at := _slot(shown.size()) + Vector2(-RADIUS + 8.0, 10.0)
 		var text := "+%d" % overflow
-		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, paper)
-		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ink)
+		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, JournalTheme.color(&"paper"))
+		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, JournalTheme.color(&"ink"))
+
+## A bad status, or a gauge in danger, wears the dark cracked pan.
+static func is_dark(s: Dictionary) -> bool:
+	return StatusRules.is_debuff(s.tag) or (StatusRules.kind(s.tag) == StatusRules.Kind.GAUGE and int(s.get("stage", 0)) >= 2)
+
+
+## One chip, radius `r` at `c` on `on`: the pan, its ring and `icon`. The one
+## look a status has, here and on the journal's page (StatusPage).
+static func draw_chip(on: CanvasItem, c: Vector2, r: float, s: Dictionary, icon: Texture2D) -> void:
+	var ink := JournalTheme.color(&"ink")
+	var paper := JournalTheme.color(&"paper")
+	var danger := JournalTheme.color(&"danger")
+	var tag: StringName = s.tag
+	var gauge := StatusRules.kind(tag) == StatusRules.Kind.GAUGE
+	var debuff := is_dark(s)
+	on.draw_circle(c, r, danger if debuff else JournalTheme.color(&"line"), true, -1.0, true)
+	on.draw_circle(c, r * (1.0 - RIM), (JournalTheme.color(&"pall") as Color).lerp(ink, 0.5) if debuff else paper, true, -1.0, true)
+	if debuff:
+		for crack: Array in CRACKS:
+			on.draw_line(c + (crack[0] as Vector2) * r, c + (crack[1] as Vector2) * r, Color(danger, 0.8), 1.5, true)
+	var ring_w := RING_W * r / RADIUS
+	var ring_r := r * (1.0 - RIM) - ring_w * 0.5
+	on.draw_arc(c, ring_r, 0.0, TAU, 48, Color(paper if debuff else ink, 0.16), ring_w, true)
+	var frac := 1.0
+	var col: Color = danger.lightened(0.25) if debuff else JournalTheme.color(&"glow")
+	var total := float(s.total)
+	var left := float(s.seconds_left)
+	if gauge:
+		frac = clampf(float(s.magnitude), 0.0, 1.0)
+		if int(s.get("stage", 0)) == 1:
+			col = JournalTheme.color(&"accent")
+	elif tag == &"venom":
+		frac = clampf(float(s.magnitude), 0.0, 1.0)
+		col = (JournalTheme.color(&"bile") as Color).lightened(0.2)
+	elif total > 0.0:
+		frac = clampf(left / total, 0.0, 1.0)
+		if left < 3.0 and fmod(left, 0.5) < 0.25:
+			col.a *= 0.35
+	if frac > 0.0:
+		on.draw_arc(c, ring_r, -PI * 0.5, -PI * 0.5 + TAU * frac, maxi(int(48 * frac), 2), col, ring_w, true)
+	if icon:
+		var sz := ICON * r / RADIUS
+		on.draw_texture_rect(icon, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false)
 
 
 ## The sparkle diamond at `p`, half-height `rs`. Empty when it is too small to

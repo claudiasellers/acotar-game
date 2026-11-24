@@ -179,7 +179,7 @@ func _flush_recipes() -> void:
 	_when_calm(func() -> void:
 		var row := _row(&"recipes")
 		var bottle := Icons.texture(Icons.BREWS, first.id)
-		row.picture(BookKit.picture(bottle, Vector2(ICON, ICON)) if bottle
+		row.picture(ItemIcon.of_picture(bottle, ICON) if bottle
 				else ItemIcon.make(&"bowl", first.color, false, false, ICON))
 		row.named(title).read(kicker, line))
 

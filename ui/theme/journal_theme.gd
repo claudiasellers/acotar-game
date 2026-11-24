@@ -437,6 +437,12 @@ static func build(of_act: Act) -> Theme:
 	t.set_type_variation(&"SatchelMeter", &"ProgressBar")
 	t.set_stylebox(&"background", &"SatchelMeter", _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
 	t.set_stylebox(&"fill", &"SatchelMeter", _pill(c.accent, Color(0, 0, 0, 0), 0, Vector2(0, 4)))
+	# Her health and stamina on the wardrobe's page, in the colours the HUD's
+	# bar and bow have.
+	for meter: Array in [[&"HealthMeter", VITALS[of_act][&"health"]], [&"StaminaMeter", c.glow]]:
+		t.set_type_variation(meter[0], &"ProgressBar")
+		t.set_stylebox(&"background", meter[0], _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
+		t.set_stylebox(&"fill", meter[0], _pill(meter[1], Color(c.line, 0.5), 1, Vector2(0, 4)))
 	return t
 
 
