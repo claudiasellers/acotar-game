@@ -192,7 +192,7 @@ func _end() -> void:
 
 func _process(delta: float) -> void:
 	if stage == &"fall" or stage == &"breaths":
-		_since += delta / maxf(Engine.time_scale, 0.01)
+		_since += TimeScale.real(delta)
 	elif stage == &"" and _running() and not _noticing and not _on_doe:
 		_line_up()
 

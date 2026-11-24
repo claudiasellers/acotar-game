@@ -157,7 +157,9 @@ func _process(delta: float) -> void:
 	_camera_rig.global_position = global_position + Vector3.UP * (1.5 + camera_lift - crouch.camera_drop())
 	var look := Input.get_vector(&"look_left", &"look_right", &"look_up", &"look_down")
 	if look != Vector2.ZERO and StoryControl.can_look():
-		var s := stick_sensitivity * GameSettings.stick_sensitivity * delta * _aim_look_scale()
+		# Real seconds: Focus and hit-stop slow the world, never her aim (the
+		# mouse is event-based and already is).
+		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale()
 		_look(look.x * s, look.y * s)
 	camera_control.update(delta)
 	if _breath:

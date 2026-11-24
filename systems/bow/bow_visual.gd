@@ -103,7 +103,7 @@ func _attach_pose() -> void:
 
 func _process(delta: float) -> void:
 	ready_timer = maxf(ready_timer - delta, 0.0)
-	var real := delta / maxf(Engine.time_scale, 0.01)
+	var real := TimeScale.real(delta)
 	raised = move_toward(raised, 1.0 if wants_raised() else 0.0, real * SWING_SPEED)
 	if pose:
 		pose.influence = smoothstep(0.0, 1.0, raised)

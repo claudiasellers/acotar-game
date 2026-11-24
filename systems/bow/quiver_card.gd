@@ -53,7 +53,7 @@ func describe() -> String:
 func _process(delta: float) -> void:
 	if _left <= 0.0:
 		return
-	_left -= delta / maxf(Engine.time_scale, 0.01)
+	_left -= TimeScale.real(delta)
 	_panel.modulate.a = clampf(_left / 0.4, 0.0, 1.0)
 	if _left <= 0.0:
 		_panel.visible = false

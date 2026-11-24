@@ -129,7 +129,7 @@ func _physics_process(delta: float) -> void:
 ## real time, so in the Focus hush the world slows and she does not. Returns the arrow loosed this
 ## tick, if any.
 func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool = false) -> Arrow:
-	var real := delta / maxf(Engine.time_scale, 0.01)
+	var real := TimeScale.real(delta)
 	_time += delta
 	_recover = maxf(_recover - real, 0.0)
 	is_aiming = aim_held and can_shoot()
