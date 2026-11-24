@@ -1,10 +1,10 @@
 # wolf clips (creatures/models/wolf.gltf), 30 fps. Written by tools/blender/creature_rig.py.
 # name native_speed_mps duration_s loop(0/1)   ('-' = not a locomotion clip)
 idle 0.000 4.000 1
-walk 0.645 1.000 1
-trot 2.039 0.600 1
-gallop 6.569 0.360 1
-stalk 0.650 1.200 1
+walk 1.110 0.850 1
+trot 2.993 0.520 1
+gallop 7.849 0.360 1
+stalk 0.782 1.100 1
 graze - 4.000 1
 hit_l - 0.800 0
 hit_r - 0.800 0

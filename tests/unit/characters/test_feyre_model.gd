@@ -40,7 +40,12 @@ func test_clips_loop_and_never_t_pose() -> void:
 	assert_eq(m.anim.current_animation, &"idle", "she starts in idle, not the rest T-pose")
 	m.play_locomotion(5.5, true)
 	assert_eq(m.anim.current_animation, &"run")
-	assert_almost_eq(m.anim.speed_scale, 1.0, 0.01)
+	# The run plays at the rate that keeps planted feet still: ground speed over
+	# the clip's own speed, measured from the clip.
+	var feet: Array[StringName] = [&"LeftFoot", &"RightFoot"]
+	var native := GaitMeter.native_speed(m.anim.get_animation(&"run"), m.skeleton, feet)
+	assert_almost_eq(native, 5.5, 0.6, "the run clip runs at about 5.5 m/s")
+	assert_almost_eq(m.anim.speed_scale, 5.5 / native, 0.01)
 	m.play_locomotion(8.0, true)
 	assert_eq(m.anim.current_animation, &"sprint")
 

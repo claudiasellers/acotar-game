@@ -157,8 +157,6 @@ func _follow_her(delta: float) -> bool:
 			t.global_position = to
 		elif t.global_position.distance_to(to) > 0.4:
 			CalanmaiSpace.step_toward(t, to, 2.6, delta)
-		elif t.has_method(&"play_locomotion"):
-			t.call(&"play_locomotion", 0.0, true, delta)
 	var easel := find_anchor(EASEL_ANCHOR)
 	if easel == null:
 		return true

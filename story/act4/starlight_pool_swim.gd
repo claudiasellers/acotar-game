@@ -229,4 +229,3 @@ func _swim_out() -> void:
 	out.y = (level - 1.15) if not is_nan(level) else p.y
 	who.global_position = out
 	Act4Walk.face(who, p)
-	Act4Walk.idle(who)
