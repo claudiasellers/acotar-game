@@ -1,7 +1,7 @@
 ## Saves one frame of each notice and key prompt over the brightest ground the
 ## act has (noon snow, a Spring path at noon), with Feyre in the follow camera
 ## and the in-play HUD: a find, a rare find, a note, a chapter heading, the
-## press prompt, the beast's row of keys, the quiver card, the pickup log and the paint tin.
+## press prompt, the use prompt, the beast's row of keys, the quiver card, the pickup log and the paint tin.
 ##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
 ##     res://tools/ui/notice_probe.tscn -- <dir> [phase]
 ## (A scene, not a -s script, so the autoloads exist.)
@@ -72,8 +72,11 @@ func _go() -> void:
 		"note": func() -> void: PickupLog.of(tree).note("Two more flowers for a crown."),
 		"heading": func() -> void: ChapterHeading.show(tree, "The Wolf in the Snow"),
 		"prompt": func() -> void: press.show_text("step in"),
-		"prompt_row": func() -> void:
+		"use": func() -> void:
 			press.show_text("")
+			UsePrompt.of(tree).offer(feyre, "ride"),
+		"prompt_row": func() -> void:
+			UsePrompt.of(tree).offer(feyre, "")
 			keys.says(KeyPrompts.row(&"beast")),
 		"quiver": func() -> void:
 			keys.clear()
