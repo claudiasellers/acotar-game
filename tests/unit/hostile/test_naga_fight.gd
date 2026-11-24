@@ -107,11 +107,19 @@ func _ground(c: Creature) -> void:
 
 
 ## One tick of the camp: every member knows where she is.
+## move_and_slide moves by the engine's delta, not ours: outside a physics frame
+## that is the process delta, which on a loaded run is up to 0.15 s (9x DT), so
+## every step overshoots and a naga slides out of reach mid wind-up. Collisions
+## are off here, so rescaling the step to DT is exact.
 func _tick(site: HostileSite) -> void:
+	var engine_dt := get_physics_process_delta_time() if Engine.is_in_physics_frame() else get_process_delta_time()
 	for m in site.members:
 		if is_instance_valid(m) and m.alive:
 			m.senses.awareness = 1.0
+			var before := m.global_position
 			m._physics_process(DT)
+			if engine_dt > 0.0:
+				m.global_position = before + (m.global_position - before) * (DT / engine_dt)
 			_ground(m)
 	v._iframes = maxf(v._iframes - DT, 0.0)
 	v._step_grab(DT)
