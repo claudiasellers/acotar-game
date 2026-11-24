@@ -57,6 +57,12 @@ func _view(id: String, path: String) -> void:
 		model.rotation.y = atan2(-d.x, -d.y)
 	WorldStreamer.update_for(_feyre.global_position)
 	await get_tree().create_timer(12.0).timeout
+	# The first view can land before the avenue's region has streamed in.
+	var waited := 0.0
+	while waited < 30.0 and Array(WorldStreamer.wanted_at(_feyre.global_position)).any(
+			func(id: String) -> bool: return not WorldStreamer.is_ready(StringName(id))):
+		await get_tree().create_timer(0.5).timeout
+		waited += 0.5
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	var v := _feyre.vitals
 	var body := _feyre.body_state
