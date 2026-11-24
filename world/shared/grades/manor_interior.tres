@@ -13,9 +13,12 @@ sun_color = Color(1.0, 0.88, 0.74, 1)
 sun_energy = 1.2
 ; No GI indoors (T117): a flat, even ambient lights the rooms, and the tone
 ; mapper is the manor's own (it doesn't blend, so a different one would pop at
-; every doorway).
+; every doorway). The ambient is a fill, not the key (L18-12): at 1.1 it lit
+; every face the same and the pale rooms clipped to white (dining hall 37%);
+; windows, lamps and hero lights model the rooms, and at night the rooms blend
+; to manor_interior_night.
 ambient_color = Color(0.92, 0.90, 0.88, 1)
-ambient_energy = 1.1
+ambient_energy = 0.45
 ambient_sky_contribution = 0.0
 fog_color = Color(0.92, 0.90, 0.88, 1)
 fog_density = 0.0
@@ -23,7 +26,7 @@ volumetric_density = 0.0
 volumetric_albedo = Color(0.92, 0.90, 0.88, 1)
 exposure = 1.0
 saturation = 1.05
-contrast = 1.0
+contrast = 1.05
 brightness = 1.0
 glow_intensity = 0.3
 glow_bloom = 0.0
@@ -31,3 +34,4 @@ glow_hdr_threshold = 1.4
 snow_cover = 0.0
 magic = 0.35
 cloud_cover = 0.30
+night_look = &"manor_interior_night"

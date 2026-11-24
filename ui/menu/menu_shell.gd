@@ -54,6 +54,8 @@ var _ribbon_row: HBoxContainer
 var _buttons: Dictionary = {}  # MenuTab -> Button
 var _prev_cap: PanelContainer
 var _next_cap: PanelContainer
+## Her line on a page's first opening, tucked in at the book's top right.
+var note: TabNote
 var _window := ShaderMaterial.new()
 var _jobs: Array[Callable] = []
 var _render_queue: Array[MenuTab] = []
@@ -170,6 +172,8 @@ func show_tab(tab: MenuTab) -> void:
 	current = tab
 	tab.shell_show()
 	_sync_strip()
+	if note:
+		note.turn_to(tab.tab_id, BookLayout.SIZE.x - BookLayout.TABS_AT.x * 2.0)
 	if _buttons.has(tab) and was_open:
 		Juice.bounce_control(_buttons[tab] as Control, 0.12)
 	tab_changed.emit(tab.tab_id)
@@ -370,6 +374,8 @@ func _build() -> void:
 	_prev_cap = BookKit.key_cap("Q")
 	_row.add_child(_prev_cap)
 	_next_cap = BookKit.key_cap("E")
+	note = TabNote.new()
+	_strip.add_child(note)
 	# The ribbon's tab hangs from the book's foot, centred on the ribbon.
 	_ribbon = Control.new()
 	_ribbon.name = "Ribbon"
