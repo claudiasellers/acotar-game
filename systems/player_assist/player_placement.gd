@@ -35,7 +35,8 @@ static func saved_position(data: Dictionary) -> Vector3:
 
 func save_state() -> Dictionary:
 	var p := _player.get_ref() as Node3D
-	if p == null:
+	# Out of the tree (her scene leaving) she has no place in the world.
+	if p == null or not p.is_inside_tree():
 		return {}
 	var model := p.get(&"model") as Node3D
 	return {

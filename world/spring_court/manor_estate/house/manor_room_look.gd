@@ -119,7 +119,9 @@ static func floor_material(room: ManorRoomDef, plain: Material) -> Material:
 ## `plain` is kept for callers that pass one; plaster replaces it.
 static func ceiling_material(room: ManorRoomDef, plain: Material = null) -> Material:
 	if is_coffered(room):
-		return _coffer_mat(&"field", room.wall_color.lerp(EstateKit.BLUSH, 0.25).lerp(Color(0.98, 0.95, 0.92), 0.35), 0.85, 0.0)
+		# A shade under the walls (L18-13): with no self-light the ceiling is lit
+		# like the room, and a ceiling reads as the room's darkest plane by day.
+		return _coffer_mat(&"field", room.wall_color.lerp(EstateKit.BLUSH, 0.25).lerp(Color(0.98, 0.95, 0.92), 0.1) * Color(0.88, 0.88, 0.88), 0.85, 0.0)
 	if not has_sky(room):
 		return ManorRoomFinish.plaster(ManorRoomFinish.ceiling_color(room))
 	if _skies.has(room.id):
@@ -209,10 +211,9 @@ static func _beam(beams: SurfaceTool, gilt: SurfaceTool, r: Rect2, y: float) -> 
 	ManorMeshMerger.append(gilt, strip, Transform3D(Basis(), center - Vector3(0.0, BEAM_DEPTH * 0.5 + 0.005, 0.0)))
 
 
-## Coffer materials ignore ambient light, which from below is the lawn green
-## (see sky_ceiling.gdshader) and would muddy them, and carry a soft bounce
-## of their own colour instead, the same as the plaster ceilings (L38: at the
-## old 0.08 the pearl coffers read black in every shot, quality audit A4).
+## Coffer materials, lit by the flat interior ambient and the room's lamps like
+## the plaster ceilings. No emission (L18-13): the old self-light made the
+## coffered ceiling the brightest surface in the dining hall by day.
 static func _coffer_mat(kind: StringName, color: Color, roughness: float, metallic: float) -> CandyMaterial:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _coffer_mats.has(key):
@@ -222,10 +223,6 @@ static func _coffer_mat(kind: StringName, color: Color, roughness: float, metall
 	m.albedo_color = color
 	m.roughness = roughness
 	m.metallic = metallic
-	m.disable_ambient_light = true
-	m.emission_enabled = true
-	m.emission = color
-	m.emission_energy_multiplier = 0.3 if kind != &"gilt" else 0.22
 	_coffer_mats[key] = m
 	return m
 

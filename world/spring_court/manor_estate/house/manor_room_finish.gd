@@ -87,7 +87,7 @@ static func floor_material(room: ManorRoomDef) -> Material:
 	return m
 
 
-## Plaster that ignores the green ambient (plaster_ceiling.gdshader).
+## Plaster for the ceilings (plaster_ceiling.gdshader).
 static func plaster(color: Color) -> ShaderMaterial:
 	var c := Color(minf(color.r, 0.85), minf(color.g, 0.85), minf(color.b, 0.85))
 	var key := c.to_html(false)
@@ -103,11 +103,12 @@ static func plaster(color: Color) -> ShaderMaterial:
 
 ## The ceiling field colour for a plain room: pearl warmed by the walls.
 static func ceiling_color(room: ManorRoomDef) -> Color:
-	return room.wall_color.lerp(Color(0.98, 0.95, 0.92), 0.6)
+	# A shade under the walls (L18-13): lit like the room, not self-lit.
+	return room.wall_color.lerp(Color(0.98, 0.95, 0.92), 0.3) * Color(0.9, 0.9, 0.9)
 
 
-## Gilt and timber that ignore ambient like the plaster, with the same bounce.
-static func _mat(kind: StringName, color: Color, roughness: float, metallic: float, bounce: float) -> CandyMaterial:
+## Gilt and timber trim, lit by the room like the plaster (no emission, L18-13).
+static func _mat(kind: StringName, color: Color, roughness: float, metallic: float) -> CandyMaterial:
 	var key := "%s|%s" % [kind, color.to_html()]
 	if _mats.has(key):
 		return _mats[key]
@@ -116,20 +117,16 @@ static func _mat(kind: StringName, color: Color, roughness: float, metallic: flo
 	m.albedo_color = color
 	m.roughness = roughness
 	m.metallic = metallic
-	m.disable_ambient_light = true
-	m.emission_enabled = true
-	m.emission = color
-	m.emission_energy_multiplier = bounce
 	_mats[key] = m
 	return m
 
 
 static func gilt() -> CandyMaterial:
-	return _mat(&"gilt", Color(0.90, 0.75, 0.42), 0.35, 0.6, 0.22)
+	return _mat(&"gilt", Color(0.90, 0.75, 0.42), 0.35, 0.6)
 
 
 static func timber() -> CandyMaterial:
-	return _mat(&"timber", Color(0.62, 0.44, 0.36), 0.75, 0.0, 0.3)
+	return _mat(&"timber", Color(0.62, 0.44, 0.36), 0.75, 0.0)
 
 
 # --- ceiling trim ---------------------------------------------------------------

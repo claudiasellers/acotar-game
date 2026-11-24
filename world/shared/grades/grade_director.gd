@@ -23,8 +23,8 @@ var weather_fog := 0.0
 static var snow_cover_now := 1.0
 static var magic_now := 0.0
 static var _dread_preset: GradePreset
-## Daylight dread looks (GradePreset.dread_day_look) by id, loaded once.
-static var _day_looks: Dictionary = {}
+## Presets other grades name (dread_day_look, night_look) by id, loaded once.
+static var _named_looks: Dictionary = {}
 var _from: GradePreset
 var _to: GradePreset
 var _t := 1.0
@@ -125,7 +125,7 @@ func target_id() -> StringName:
 
 
 func apply(base: GradePreset) -> void:
-	var p := with_mood(with_true_sight(base, sight), mood_amount, mood, night)
+	var p := with_mood(with_true_sight(with_night(base, night), sight), mood_amount, mood, night)
 	snow_cover_now = p.snow_cover
 	magic_now = p.magic
 	RenderingServer.global_shader_parameter_set(&"snow_cover", p.snow_cover)
@@ -210,6 +210,22 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread",
 	return cold
 
 
+## `p` as the sun goes down: blended toward its night look (GradePreset.
+## night_look) by `night_weight`; unchanged for grades without one.
+static func with_night(p: GradePreset, night_weight: float) -> GradePreset:
+	if p.night_look == &"" or night_weight <= 0.0:
+		return p
+	if not _named_looks.has(p.night_look):
+		_named_looks[p.night_look] = load_preset(p.night_look)
+	var dark := GradePreset.mix(p, _named_looks[p.night_look], clampf(night_weight, 0.0, 1.0))
+	dark.id = p.id
+	dark.lut = p.lut
+	dark.tonemap_mode = p.tonemap_mode
+	dark.dread_day_look = p.dread_day_look
+	dark.night_look = p.night_look
+	return dark
+
+
 ## The preset dread blends `p` toward: the grade's daylight look while the sun
 ## is up, easing into the dread preset as night falls.
 static func dread_look(p: GradePreset, night_weight: float) -> GradePreset:
@@ -217,9 +233,9 @@ static func dread_look(p: GradePreset, night_weight: float) -> GradePreset:
 		_dread_preset = load_preset(&"dread")
 	if p.dread_day_look == &"" or night_weight >= 1.0:
 		return _dread_preset
-	if not _day_looks.has(p.dread_day_look):
-		_day_looks[p.dread_day_look] = load_preset(p.dread_day_look)
-	var day: GradePreset = _day_looks[p.dread_day_look]
+	if not _named_looks.has(p.dread_day_look):
+		_named_looks[p.dread_day_look] = load_preset(p.dread_day_look)
+	var day: GradePreset = _named_looks[p.dread_day_look]
 	return day if night_weight <= 0.0 else GradePreset.mix(day, _dread_preset, night_weight)
 
 
