@@ -62,7 +62,7 @@ func _ready() -> void:
 	EventBus.creature_killed.connect(_on_creature_killed)
 	# Camera, lens and timing for the hunt (lane L22, story/staging/).
 	add_child(WolfKillStaging.new())
-	# A break in the overcast and cold rims, so the hunt reads (lane L18-11).
+	# Cold rims on the doe and the wolf (lane L18).
 	add_child(WolfHuntLighting.new())
 	# Her thoughts on each beat (lane L34, systems/dialogue/scene_guides/).
 	add_child(WolfHuntGuide.new())
