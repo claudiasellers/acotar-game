@@ -62,13 +62,31 @@ func test_parse_runs_on_the_main_thread_and_bake_callback_lands() -> void:
 	var region := NavigationRegion3D.new()
 	_root.add_child(region)
 	var done := [false]
-	NavBaker.bake(region, source, AABB(Vector3(-10, -1, -6), Vector3(20, 5, 12)), true, func() -> void: done[0] = true)
+	var job := NavBaker.bake(region, source, AABB(Vector3(-10, -1, -6), Vector3(20, 5, 12)), true, func() -> void: done[0] = true)
 	for i in 300:
 		if done[0]:
 			break
 		await wait_physics_frames(1)
 	assert_true(done[0], "async bake finished")
+	assert_eq(int(job[0]), -1, "landing claimed the pool task")
 	assert_gt(region.navigation_mesh.get_polygon_count() if region.navigation_mesh else 0, 0)
+
+
+## T146 contract: a NavBaker leaving the tree never leaves its tile bake running
+## on a thread (one finishing during engine shutdown aborted the process).
+func test_leaving_the_tree_waits_for_the_tile_bake() -> void:
+	_two_rooms()
+	var baker := NavBaker.new()
+	_root.add_child(baker)
+	var aabb := AABB(Vector3(-10, -1, -6), Vector3(20, 5, 12))
+	baker._bake_job = NavBaker.bake(baker.tile_region, NavBaker.parse(_root), aabb, true)
+	var job := baker._bake_job
+	assert_gte(int(job[0]), 0, "a threaded bake hands back its pool task")
+	var t0 := Time.get_ticks_msec()
+	_root.remove_child(baker)
+	assert_eq(int(job[0]), -1, "leaving the tree claimed the bake")
+	assert_lt(Time.get_ticks_msec() - t0, 2000, "and only waited for the bake itself")
+	baker.free()
 
 
 func test_without_a_navmesh_it_steers_straight() -> void:
