@@ -194,3 +194,14 @@ func _scripts(dir: String) -> PackedStringArray:
 		if not d.begins_with("."):
 			out.append_array(_scripts(dir.path_join(d)))
 	return out
+
+
+## A row that faded and freed itself is forgotten: the next pickup of the same
+## thing makes a new row (the mare's ride test freed one under the log).
+func test_a_row_that_is_gone_is_made_again() -> void:
+	log.add(&"ing_bilberry", 1)
+	assert_eq(_rows().size(), 1)
+	log.get_child(0).free()
+	log.add(&"ing_bilberry", 2)
+	assert_eq(_rows().size(), 1)
+	assert_eq(_rows()[0].count, 2)
