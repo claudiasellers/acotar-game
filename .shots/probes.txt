@@ -1,0 +1,7 @@
+from ui-frame
+quality look
+shot notices_human res://tools/ui/notice_probe.tscn {out} p1_woods
+shot notices_spring res://tools/ui/notice_probe.tscn {out} p3_house
+shot lines_human res://tools/ui/line_probe.tscn {out} p1_woods
+shot pages_human res://tools/ui/menu_open_probe.tscn shots {out} p1_woods
+shot pages_spring res://tools/ui/menu_open_probe.tscn shots {out} p3_house
