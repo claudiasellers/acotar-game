@@ -1,6 +1,6 @@
 // The game's file icons in Gilded Enamel: contact sheets and the webp files the game loads.
 //
-//   node gefull.mjs rv <SET>        contact sheets for one set (FLOWERS, FORAGE, KEEP, BREWS, WARDROBE) into $OUT
+//   node gefull.mjs rv <SET>        contact sheets for one set (FLOWERS, FORAGE, KEEP, BREWS, WARDROBE, COURT) into $OUT
 //   node gefull.mjs export [id...]  write <id>.webp for every drawing (or just the ids given) into $ICON_DIR/{items,brews,wardrobe}
 //
 // Needs Playwright (set PW to its index.js if it is not resolvable) and, for export, python3 with Pillow.
@@ -19,6 +19,8 @@ const ICON_DIR = process.env.ICON_DIR || path.resolve(HERE, '../../../ui/theme/i
 const SIZE = { items: 256, brews: 256, wardrobe: 192 }, MARGIN = +(process.env.MARGIN || 5);
 const SETS = {};
 for (const [file, key] of [['set_flowers', 'FLOWERS'], ['set_forage', 'FORAGE'], ['set_keep', 'KEEP'], ['set_brews', 'BREWS'], ['set_wardrobe', 'WARDROBE']]) SETS[key] = (await import(`./${file}.mjs`))[key];
+// Court pieces (gowns, masks, jewellery) have sharp drawings that replace the round ones of the same id.
+SETS.COURT = (await import('./set_court.mjs')).COURT;
 const ALL = Object.assign({}, ...Object.values(SETS));
 const opt = JSON.parse(process.env.OPT || '{}');
 const page = (body, bg, css = '') => `<!doctype html><html><head><meta charset="utf8"><style>*{box-sizing:border-box}html,body{margin:0;font-family:sans-serif;background:${bg}}.rv{width:1560px;padding:22px;display:grid;grid-template-columns:repeat(8,1fr);gap:20px 8px;font-size:11px;text-align:center;color:#4a3a52;background:${bg}}.rv svg{margin:6px auto;display:block}${css}</style></head><body>${FILTERS}${body}`;

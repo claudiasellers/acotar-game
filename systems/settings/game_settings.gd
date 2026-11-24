@@ -24,7 +24,8 @@ const DEFAULTS := {
 	&"mouse_steers": false,
 	&"gentle_mode": false, &"reduced_effects": false,
 	## Feyre's HUD (ui/hud/vitals): HUD_MODES index, EDGE_FX_LEVELS index, hit marks.
-	&"hud_mode": 0, &"edge_fx": 0, &"hit_marks": true,
+	## Always by default, so a new player sees her health and bow from the start.
+	&"hud_mode": 1, &"edge_fx": 0, &"hit_marks": true,
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
 }
