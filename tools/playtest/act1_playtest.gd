@@ -706,7 +706,8 @@ func _select_arrow(id: StringName) -> void:
 	_note("cycle_arrow never selected %s (selected %s)" % [id, bow.get(&"selected")])
 
 
-## Turns the camera onto the target (as a mouse would), holds aim to draw, clicks fire.
+## Turns the camera onto the target (as a mouse would), holds aim, then holds fire
+## through a full draw and lets go.
 func _shoot_at(target: Node3D) -> bool:
 	Input.action_press(&"aim")
 	for i in 180:
@@ -719,18 +720,24 @@ func _shoot_at(target: Node3D) -> bool:
 	if not StoryControl.can_shoot() or Gameplay.inventory.arrow_count() == 0:
 		Input.action_release(&"aim")
 		return false
-	# T096: aim held draws; a fire press (an event, as a click) looses.
+	# Aim held, let the sway settle; then fire held through the draw, and let go.
 	for i in 75:
 		if is_instance_valid(target):
 			_turn_camera_to(_lead(target))
 		await get_tree().physics_frame
+	Input.action_press(&"fire")
+	for i in 60:
+		if is_instance_valid(target):
+			_turn_camera_to(_lead(target))
+		await get_tree().physics_frame
+		if float(feyre.bow_controller.get(&"draw_amount")) >= 1.0:
+			break
 	_last_landing = Vector3.INF
 	_shots += 1
-	for down in [true, false]:
-		var click := InputEventAction.new()
-		click.action = &"fire"
-		click.pressed = down
-		Input.parse_input_event(click)
+	var bc: BowController = feyre.bow_controller
+	_note("loosing with %.2f deg of sway (unsettled %.2f, body x%.2f, tremor %.2f, dread %.2f)" % [bc.sway_degrees(),
+		bc.unsettled(), feyre.body_state.sway_multiplier(), feyre.body_state.tremor_degrees(), feyre.vitals.dread])
+	Input.action_release(&"fire")
 	await get_tree().physics_frame
 	Input.action_release(&"aim")
 	await _until(func() -> bool: return _last_landing != Vector3.INF, 2.0)

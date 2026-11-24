@@ -66,6 +66,12 @@ var _recenter_t: float = 0.0
 var _recenter_from := Vector2.ZERO
 var _recenter_to := Vector2.ZERO
 var _since_look: float = 0.0
+## The bow's release kick: degrees of pitch at its peak, real seconds since it
+## began (negative when idle), and its rise and fall times.
+var _kick_peak: float = 0.0
+var _kick_t: float = -1.0
+var _kick_rise: float = 0.06
+var _kick_fall: float = 0.15
 
 
 ## Builds the rig under `feyre` (as her child, named CameraRig).
@@ -105,16 +111,47 @@ func update(delta: float) -> void:
 	var shake := StoryControl.shake * (0.0 if GameSettings.reduced_effects else 1.0)
 	camera.h_offset = randf_range(-0.04, 0.04) * shake
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
+	_update_kick(delta)
 	_update_indoor(delta)
-	var aiming := f.is_aiming or f.is_drawing
+	var aiming := f.is_aiming
 	var target_length := 1.7 if aiming else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
-	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
+	# The arm and the shoulder ease on real seconds, so the aim framing
+	# arrives as fast inside the Focus hush as outside it.
+	var ease := minf(10.0 * TimeScale.real(delta), 1.0)
+	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, ease)
 	_clamp_indoor_pitch()
 	var shoulder := 0.55 if aiming else close_shoulder(_spring_arm.spring_length)
-	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, 10.0 * delta),
+	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, ease),
 			shoulder_clearance(shoulder))
+
+
+## The bow's release kick: the lens tips up `degrees` over `rise` seconds and
+## eases back over `fall`. The aim itself (yaw, pitch) is untouched. Off under
+## Reduced Effects.
+func kick(degrees: float, rise: float, fall: float) -> void:
+	if GameSettings.reduced_effects or degrees <= 0.0:
+		return
+	_kick_peak = degrees
+	_kick_rise = maxf(rise, 0.001)
+	_kick_fall = maxf(fall, 0.001)
+	_kick_t = 0.0
+
+
+func _update_kick(delta: float) -> void:
+	if _kick_t < 0.0:
+		return
+	# Real time: a kick in the Focus hush is as quick as any other.
+	_kick_t += TimeScale.real(delta)
+	var amount := 0.0
+	if _kick_t < _kick_rise:
+		amount = _kick_t / _kick_rise
+	elif _kick_t < _kick_rise + _kick_fall:
+		amount = 1.0 - ease((_kick_t - _kick_rise) / _kick_fall, 0.5)
+	else:
+		_kick_t = -1.0
+	camera.rotation.x = deg_to_rad(_kick_peak) * amount
 
 
 ## Eases the camera toward behind her, turning at most `max_turn` radians

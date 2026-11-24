@@ -28,14 +28,10 @@ func before_all() -> void:
 	all = ManorHouseIndex.new(ManorHouseBuilder.load_layouts())
 	f = FEYRE.instantiate() as Feyre
 	estate.add_child(f)
-	Engine.max_physics_steps_per_frame = 16
-	Engine.time_scale = 8.0
 	await wait_physics_frames(5)
 
 
 func after_all() -> void:
-	Engine.time_scale = 1.0
-	Engine.max_physics_steps_per_frame = 8
 	estate.free()
 
 

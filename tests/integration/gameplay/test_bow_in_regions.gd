@@ -2,7 +2,7 @@
 # gate: when:systems/bow/*,characters/feyre/*,core/story_control.gd,story/act1/act1_game*
 ## T096: the bow works the same in the real game in both places the owner
 ## shoots: the woods at the start of Act I and the Spring Court (a Continue
-## into the manor). Hold right mouse, left click: one arrow; let go: none.
+## into the manor). Hold right mouse, hold left to draw, let go: one arrow.
 extends GutTest
 
 const GAME := "res://story/act1/act1_game.tscn"
@@ -22,7 +22,7 @@ func before_each() -> void:
 func after_each() -> void:
 	_mouse(MOUSE_BUTTON_LEFT, false)
 	_mouse(MOUSE_BUTTON_RIGHT, false)
-	Engine.time_scale = 1.0
+	TimeScale.reset()
 	GameSettings.pending_load_slot = ""
 	SaveSystem.delete_save(SLOT)
 	WorldStreamer.track(null)
@@ -53,32 +53,42 @@ func _start(game: Node) -> Feyre:
 	await wait_until(func() -> bool: return StoryControl.mode == StoryControl.Mode.FULL, 20.0)
 	await wait_physics_frames(5)
 	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
-	if Gameplay.inventory.arrow_count() < 3:
+	if Gameplay.inventory.arrow_count() < 4:
 		Gameplay.inventory.add(&"arrow_wood", 3)
 	return feyre
 
 
-## Three aim-and-click shots and one aim-and-let-go; the scene must allow the bow.
+## Aim held throughout: three draws held to full and let go loose three
+## arrows with the bow staying up between them; a tap looses nothing; letting
+## go of aim lowers the bow. The scene must allow the bow.
 func _shoot_and_check(feyre: Feyre, where: String) -> void:
 	assert_true(feyre.is_physics_processing(), "%s: she has control" % where)
 	assert_true(StoryControl.can_shoot(), "%s: free play allows the bow (mode %d, scenes %s)"
 			% [where, StoryControl.mode, _running_scenes()])
-	for i in 3:
-		_mouse(MOUSE_BUTTON_RIGHT, true)
-		await wait_physics_frames(15)
-		assert_true(feyre.is_aiming, "%s: right mouse raises the bow" % where)
-		_mouse(MOUSE_BUTTON_LEFT, true)
-		_mouse(MOUSE_BUTTON_LEFT, false)
-		await wait_physics_frames(2)
-		assert_eq(fired.size(), i + 1, "%s: shot %d fired" % [where, i + 1])
-		assert_false(feyre.is_aiming, "%s: the bow comes down after the shot" % where)
-		_mouse(MOUSE_BUTTON_RIGHT, false)
-		await wait_physics_frames(2)
+	var bow := feyre.bow_controller
+	var full_draw := ceili((bow.bow.draw_time + 0.15) * 60.0)
+	var recover := ceili((bow.tuning.follow_through_s + 0.1) * 60.0)
 	_mouse(MOUSE_BUTTON_RIGHT, true)
 	await wait_physics_frames(15)
+	assert_true(feyre.is_aiming, "%s: right mouse raises the bow" % where)
+	assert_true(bow.is_nocked, "%s: with an arrow on the string" % where)
+	for i in 3:
+		_mouse(MOUSE_BUTTON_LEFT, true)
+		await wait_physics_frames(full_draw)
+		assert_eq(fired.size(), i, "%s: holding the draw looses nothing" % where)
+		_mouse(MOUSE_BUTTON_LEFT, false)
+		await wait_physics_frames(2)
+		assert_eq(fired.size(), i + 1, "%s: letting go looses shot %d" % [where, i + 1])
+		assert_true(feyre.is_aiming, "%s: the bow stays up after the shot" % where)
+		await wait_physics_frames(recover)
+	_mouse(MOUSE_BUTTON_LEFT, true)
+	await wait_physics_frames(2)
+	_mouse(MOUSE_BUTTON_LEFT, false)
+	await wait_physics_frames(full_draw)
+	assert_eq(fired.size(), 3, "%s: a tap is a let-down, not a weak shot" % where)
 	_mouse(MOUSE_BUTTON_RIGHT, false)
 	await wait_physics_frames(3)
-	assert_eq(fired.size(), 3, "%s: letting go fires nothing" % where)
+	assert_eq(fired.size(), 3, "%s: letting go of aim fires nothing" % where)
 	assert_false(feyre.is_aiming, "%s: and lowers the bow" % where)
 
 

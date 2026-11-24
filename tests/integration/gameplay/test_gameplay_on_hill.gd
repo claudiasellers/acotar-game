@@ -19,7 +19,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-	Engine.time_scale = 1.0
+	TimeScale.reset()
 
 
 func test_feyre_has_her_components_and_arrows() -> void:
@@ -62,11 +62,11 @@ func test_release_uses_a_wood_arrow_never_the_ash_by_fallback() -> void:
 	Gameplay.inventory.remove(&"arrow_wood", 100)
 	Gameplay.inventory.add(&"arrow_ash")
 	feyre.bow_controller.selected = &"arrow_wood"
-	feyre.bow_controller.update_bow(0.5, true, false)
+	feyre.bow_controller.update_bow(0.5, true, true)
 	assert_false(feyre.bow_controller.is_drawing, "won't draw the ash arrow unless chosen")
 	feyre.bow_controller.cycle_arrow()
 	assert_eq(feyre.bow_controller.selected, &"arrow_ash")
-	feyre.bow_controller.update_bow(0.5, true, false)
+	feyre.bow_controller.update_bow(0.5, true, true)
 	var arrow := feyre.bow_controller.release()
 	assert_not_null(arrow)
 	assert_eq(arrow.arrow_id, &"ash")
@@ -95,11 +95,13 @@ func test_arrows_break_on_stone_by_chance() -> void:
 	assert_true(b.stuck)
 
 
-func test_slow_time_while_aiming_a_draw_then_stamina_runs_out() -> void:
+func test_focus_slows_time_until_stamina_runs_out() -> void:
 	feyre.bow_controller.update_bow(0.5, true, false)
-	assert_eq(Engine.time_scale, BowController.SLOW_TIME_SCALE)
+	assert_eq(Engine.time_scale, 1.0, "raising the bow alone leaves time alone")
+	feyre.bow_controller.update_bow(0.1, true, false, true)
+	assert_eq(Engine.time_scale, feyre.bow_controller.tuning.focus_scale)
 	feyre.stamina = 0.0
-	feyre.bow_controller.update_bow(0.1, true, false)
+	feyre.bow_controller.update_bow(0.1, true, false, true)
 	assert_eq(Engine.time_scale, 1.0)
 
 
@@ -245,7 +247,7 @@ func test_loading_an_arrow_keeps_her_arms_in_front() -> void:
 func test_reticle_follows_the_predicted_impact() -> void:
 	var reticle := feyre.bow_controller.reticle
 	assert_not_null(reticle)
-	var guess := feyre.bow_controller.predict_impact(1.0)
+	var guess := feyre.bow_controller.predict_impact()
 	assert_true(guess.has("point"))
 	var aim := feyre.aim_point()
 	assert_lt(guess.point.distance_to(feyre.bow_controller.muzzle()), aim.distance_to(feyre.bow_controller.muzzle()) + 0.5,

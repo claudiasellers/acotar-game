@@ -25,7 +25,7 @@ func before_each() -> void:
 func after_each() -> void:
 	Input.action_release(&"aim")
 	Input.action_release(&"fire")
-	Engine.time_scale = 1.0
+	TimeScale.reset()
 
 
 func _visual() -> BowVisual:
@@ -68,6 +68,7 @@ func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
 	var aim := v.aim_direction()
 	assert_gt((grip - (feyre.global_position + Vector3.UP * 1.3)).dot(aim), 0.4, "the bow arm reaches down the aim")
 	Gameplay.inventory.add(&"arrow_wood", arrows)
+	Input.action_press(&"fire")
 	await wait_seconds(1.5)
 	assert_true(feyre.bow_controller.is_drawing)
 	var head := feyre.global_position + Vector3.UP * 1.45
@@ -76,31 +77,28 @@ func test_aiming_and_drawing_bring_the_string_hand_to_her_chin() -> void:
 	assert_lt(v.bow_root.global_position.distance_to(v.pose.bow_hand_world()), 0.2, "the bow is in her hand")
 	watch_signals(feyre)
 	var before := feyre.quiver
-	_click()
+	Input.action_release(&"fire")
 	await wait_physics_frames(3)
 	assert_signal_emitted(feyre, "arrow_fired")
 	assert_eq(feyre.quiver, before - 1, "she loosed one arrow")
 	await wait_seconds(0.4)
-	assert_lt(_visual().raised, 0.1, "the bow comes down after the shot (T096)")
+	assert_gt(_visual().raised, 0.9, "the bow stays up while aim is held")
 	Input.action_release(&"aim")
 
 
-## A fire press and release, as events (the bow reads the press, not the hold).
-func _click() -> void:
-	for down in [true, false]:
-		var e := InputEventAction.new()
-		e.action = &"fire"
-		e.pressed = down
-		Input.parse_input_event(e)
-		Input.flush_buffered_events()
+## Holds fire through a full draw and lets go: one arrow.
+func _draw_and_loose() -> void:
+	Input.action_press(&"fire")
+	await wait_seconds(feyre.bow_controller.bow.draw_time + 0.1)
+	Input.action_release(&"fire")
 
 
 ## F43: every draw logged "det == 0" inverting a degenerate bow transform.
 func test_ten_draws_log_no_errors() -> void:
 	for k in 10:
 		Input.action_press(&"aim")
-		await wait_seconds(0.4)
-		_click()
+		await wait_seconds(0.2)
+		await _draw_and_loose()
 		await wait_physics_frames(2)
 		Input.action_release(&"aim")
 		await wait_physics_frames(6)

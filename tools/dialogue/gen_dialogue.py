@@ -188,6 +188,9 @@ beat("wh_animal", "wait", "Animal. Just an animal.", canon="V", delivery="inner 
 # Nudges, only while she has never drawn; each once.
 beat("wh_nudge_draw", "nudge_draw", "The ash arrow. Three years in my quiver. Now.")
 beat("wh_nudge_loose", "nudge_loose", "Before he ruins the hide. His side.")
+# She has lost sight of him and he has given himself away twice (LostNudge).
+beat("wh_lost", "lost", "Where is he? Head clear. Breathing steady. Listen.",
+     delivery="inner voice, barely breathed, talking herself calm")
 # What her shots do.
 beat("wh_wood", "wood", "Bee stings, to a wolf that size. It has to be the ash.")
 beat("wh_miss", "miss", "Missed. I can't afford to miss.", delivery="inner voice, sharp with herself")

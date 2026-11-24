@@ -3,7 +3,7 @@
 class_name Prey
 extends Creature
 
-enum State { GRAZE, ALERT, FLEE }
+enum State { GRAZE, ALERT, FLEE, BED }
 
 ## How far from home it wanders while grazing.
 @export var home_radius: float = 18.0
@@ -62,6 +62,17 @@ func _on_lured(at: Vector3) -> void:
 	_graze_timer = 0.0
 
 
+## Wounded and at the end of what it can run (FollowLeash): it lies up where
+## it is, and only bolts again when she comes close enough to startle it.
+func bed_down() -> void:
+	if state == State.BED:
+		return
+	state = State.BED
+	home = global_position
+	_wander_target = home
+	senses.awareness = minf(senses.awareness, data.alert_threshold)
+
+
 func _start_flee(threat: Vector3) -> void:
 	state = State.FLEE
 	_flee_from = threat
@@ -84,6 +95,10 @@ func _think(delta: float) -> void:
 				state = State.GRAZE
 		State.FLEE:
 			_flee(delta)
+		State.BED:
+			gait_hint = &"graze"
+			move_speed = 0.0
+			move_direction = Vector3.ZERO
 
 
 func _graze(delta: float) -> void:
