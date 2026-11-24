@@ -172,9 +172,12 @@ func _play_opening_shot() -> void:
 		cam.global_transform = (frame as Node3D).global_transform
 		cam.current = true
 		StoryControl.set_mode(StoryControl.Mode.LOOK)
+		var cam_ref: WeakRef = weakref(cam)
 		get_tree().create_timer(opening_shot_seconds).timeout.connect(func() -> void:
 			feyre.camera.current = true
-			cam.queue_free()
+			var c := cam_ref.get_ref() as Node
+			if c:
+				c.queue_free()
 			StoryControl.release()
 			_first_thought.call_deferred())
 		return

@@ -65,14 +65,35 @@ if [ -n "$sha" ]; then
 	wt="$MQ_DIR/bisect/$slug-$$"; data="$wt-data"
 	mkdir -p "$MQ_DIR/bisect"
 	git -C "$MQ_REPO" worktree add -q --detach "$wt" "$sha" 2>/dev/null || { wt=""; gave_up "could not check out $sha"; }
-	# Copy-on-write clone of the import cache, as lane.sh does, so there is no reimport.
-	if [ -d "$MQ_REPO/.godot" ]; then
-		cp -cR "$MQ_REPO/.godot" "$wt/.godot" 2>/dev/null || cp -R "$MQ_REPO/.godot" "$wt/.godot"
+	# Copy-on-write clone of the import cache. The build worktree's cache is the
+	# one the gate just used; the play folder's only moves on make update, so it
+	# is stale (T128). Then refresh the class cache here if it still lacks a class.
+	src="$MQ_REPO/.godot"
+	[ -d "$MQ_BUILD/.godot" ] && src="$MQ_BUILD/.godot"
+	if [ -d "$src" ]; then
+		cp -cR "$src" "$wt/.godot" 2>/dev/null || cp -R "$src" "$wt/.godot"
 	fi
 	( cd "$wt" && "$here/levels.sh" ensure --cached-only ) >/dev/null 2>&1 || true
+	if ! ( cd "$wt" && "$here/class_cache.sh" stale ) >/dev/null 2>&1; then
+		( cd "$wt" && MQ_SCRATCH="$data" "$here/godot.sh" --import ) >/dev/null 2>&1 || true
+	fi
 else
 	data="$out/scratch/bisect"
 fi
+
+# The victim alone, in this environment. If it fails by itself the shared failure
+# says nothing about a leak: a stale cache or a broken test, not a leaker.
+victim_alone_fails() {
+	local rc=0 left=$(( deadline - $(date +%s) ))
+	[ "$left" -gt 5 ] || gave_up "out of time ($budget s)"
+	( cd "${wt:-.}" && MQ_SCRATCH="${data:-$out/scratch/bisect}" /usr/bin/perl "$here/mqtimeout.pl" "$left" /bin/bash -c \
+		"\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://${victim#gut:}" \
+		> "$out/logs/${slug}_victim.log" 2>&1 )
+	rc=$?
+	[ "$rc" != 125 ] || gave_up "engine vanished"
+	[ "$rc" != 124 ] || gave_up "the victim alone timed out"
+	[ "$rc" != 0 ]
+}
 
 red() { # red "<tests>": true when those tests plus the victim go red together
 	local list="" t left rc=0
@@ -88,6 +109,10 @@ red() { # red "<tests>": true when those tests plus the victim go red together
 	[ "$rc" != 0 ]
 }
 
+if victim_alone_fails; then
+	err=$(grep -m1 -E 'SCRIPT ERROR|Failed\]|ERROR' "$out/logs/${slug}_victim.log" 2>/dev/null | sed "s/$(printf '\033')\[[0-9;]*m//g")
+	gave_up "victim fails alone in bisect env: ${err:-no error line}"
+fi
 red "$cands" || gave_up "the tests before $victim did not break it again; may be timing"
 while [ "$(echo $cands | wc -w)" -gt 1 ]; do
 	set -- $cands

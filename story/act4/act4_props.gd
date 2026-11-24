@@ -153,13 +153,17 @@ static func cling_sparkles(on: Node3D, seconds: float = 9.0) -> void:
 	on.add_child(p)
 	p.position = Vector3.UP * 1.0
 	p.emitting = true
-	var t := on.get_tree().create_timer(seconds)
+	var tree := on.get_tree()
+	var pref: WeakRef = weakref(p)
+	var t := tree.create_timer(seconds)
 	t.timeout.connect(func() -> void:
-		if is_instance_valid(p):
-			p.emitting = false
-			on.get_tree().create_timer(2.0).timeout.connect(func() -> void:
-				if is_instance_valid(p):
-					p.queue_free()))
+		var live := pref.get_ref() as GPUParticles3D
+		if live:
+			live.emitting = false
+			tree.create_timer(2.0).timeout.connect(func() -> void:
+				var again := pref.get_ref() as GPUParticles3D
+				if again:
+					again.queue_free()))
 
 
 ## A soft camera-facing quad for droplets and motes (unshaded, additive glow

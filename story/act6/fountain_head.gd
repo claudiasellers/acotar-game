@@ -208,10 +208,14 @@ func _yank(_s: SceneSpace) -> void:
 	if drips:
 		drips.emitting = false
 	var tw := create_tween()
+	var head_ref: WeakRef = weakref(head)
+	var l_ref: WeakRef = weakref(l)
 	tw.tween_property(head, "global_position", hand, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func() -> void:
-		if is_instance_valid(head) and is_instance_valid(l):
-			head.reparent(l)
+		var h := head_ref.get_ref() as Node3D
+		var lu := l_ref.get_ref() as Node3D
+		if h and lu:
+			h.reparent(lu)
 		SoundDirector.cue(&"bow_hit_flesh", hand))
 
 

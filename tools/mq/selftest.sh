@@ -49,6 +49,8 @@ if [ -n "${g:-}" ]; then
 	for x in $(echo "$g" | tr , ' '); do
 		x=$(basename "$x" .gd); [ -f "fail_$x" ] && { echo "fake $x failed"; exit 1; }
 	done
+	# stale_in_bisect: a lone test fails in the bisect's throwaway worktree (a stale import cache there).
+	case "$g" in *,*) ;; *) if [ -f stale_in_bisect ]; then case "$PWD" in */mq/bisect/*) printf '\033[4m\n%s\n\033[0m* test_x\n\033[31m    [Failed]:  \033[0mUnresolved class\n' "$g"; exit 1 ;; esac; fi ;; esac
 	# leak: the second of test_zl and test_a to run sets off a leak, so it fails in the same engine.
 	if [ -f leak ]; then
 		leaked=0; bad=0
@@ -1157,6 +1159,19 @@ case_flaky_bisect() {
 	expect "the failing log is kept under .git/mq/flaky" grep -q 'failing log: .*/\.git/mq/flaky/.*shard_1\.log' .git/mq/events.log
 	expect "the kept log holds the shared failure and the bisect result" grep -q '== bisect: leaker' .git/mq/flaky/*shard_1.log
 	expect "and has a cleanup mark about 14 days out" grep -rq 'flaky/' .git/mq/cleanup/marks
+
+	# The victim fails alone in the bisect's own environment: no leaker is named, no task is made.
+	local tasks_before ev_before
+	tasks_before=$(ls .git/mq/tasks | wc -l); ev_before=$(wc -l < .git/mq/events.log)
+	commit_build 'touch stale_in_bisect'
+	gate stale; expect "red only together still passes the gate" test "$?" = 0
+	i=0
+	while [ "$i" -lt 150 ] && ! tail -n +"$((ev_before + 1))" .git/mq/events.log | grep -q 'could not isolate'; do
+		perl -e 'select(undef,undef,undef,0.2)'; i=$((i + 1))
+	done
+	expect "a victim that fails alone is reported as could-not-isolate" sh -c "tail -n +$((ev_before + 1)) .git/mq/events.log | grep -q 'could not isolate the leaker (victim fails alone in bisect env'"
+	expect "and no leaker is named" not sh -c "tail -n +$((ev_before + 1)) .git/mq/events.log | grep -q 'FLAKY shard:1 leaker'"
+	expect "and no task is made" test "$(ls .git/mq/tasks | wc -l)" = "$tasks_before"
 }
 
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict restacked restack_conflict flaky flaky_last \

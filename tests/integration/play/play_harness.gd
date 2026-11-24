@@ -8,17 +8,17 @@
 ## menus, the whistle and E listen to). Nothing here calls game methods to act;
 ## it only reads state to check what happened.
 ##
-## Timing is in frames and conditions, never wall-clock: the gate machine is
-## shared with heavy jobs. Engine.max_fps is held at 60 while a harness lives,
-## so a frame budget is about game time and real-time timers in the game
-## (create_timer) take the same number of frames on a fast or slow machine.
+## Timing is in physics ticks (60 per second of game time) and conditions,
+## never wall-clock: the gate machine is shared with heavy jobs. Every
+## max_frames budget here counts physics ticks. Process frames are NOT capped
+## headless (Engine.max_fps has no effect there; ~670 fps measured), so never
+## use them as a time budget; use wait_until or physics ticks.
 
 extends RefCounted
 
 const GAME_SCENE := "res://story/act1/act1_game.tscn"
-const FPS := 60
-## Frames to wait for control after the game scene is added (the World loads
-## inside the first frames; a busy gate has taken 15+ s).
+## Physics ticks (60 = 1 s) to wait for control after the game scene is added
+## (the World loads inside the first frames; a busy gate has taken 15+ s).
 const BOOT_FRAMES := 60 * 120
 const PAD_DEVICE := 0
 
@@ -28,20 +28,16 @@ var feyre: Feyre
 var _held: Dictionary = {}  ## action -> the pressed event we sent
 var _stick := Vector2.ZERO
 var _look := Vector2.ZERO
-var _old_max_fps: int = 0
 
 
 func _init(gut_test: GutTest) -> void:
 	test = gut_test
-	_old_max_fps = Engine.max_fps
-	Engine.max_fps = FPS
 
 
-## Undo everything the harness holds: keys up, stick centred, fps restored.
+## Undo everything the harness holds: keys up, stick centred.
 ## Call from after_each/after_all.
 func dispose() -> void:
 	release_all()
-	Engine.max_fps = _old_max_fps
 
 
 # --- booting -----------------------------------------------------------------
@@ -267,7 +263,8 @@ func look_stick(v: Vector2) -> void:
 ## stick is how a test looks around. Returns whether it got there.
 func look_toward(point: Vector3, tolerance: float = 0.08, max_frames: int = 240) -> bool:
 	var ok := false
-	for i in max_frames:
+	var end := Engine.get_physics_frames() + max_frames
+	while Engine.get_physics_frames() < end:
 		var to := point - feyre.global_position
 		var err := angle_difference(feyre.camera_yaw(), atan2(-to.x, -to.z))
 		if absf(err) < tolerance:
@@ -278,7 +275,7 @@ func look_toward(point: Vector3, tolerance: float = 0.08, max_frames: int = 240)
 		if absf(push) < 0.3:
 			push = 0.3 * signf(push)
 		look_stick(Vector2(push, 0.0))
-		await test.wait_process_frames(1)
+		await test.wait_physics_frames(1)
 	look_stick(Vector2.ZERO)
 	return ok
 
