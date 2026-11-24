@@ -64,3 +64,41 @@ signal travel_requested(region_id: StringName, anchor_id: StringName)
 ## Story to systems: a journal or map truth Feyre learned (Suriel answers,
 ## the Treaty, Amarantha's terms).
 signal journal_entry_added(entry_id: StringName)
+
+# --- Feyre's vitals (docs/contracts/vitals.md; owner's OK for L76, 2026-11-24).
+# Nothing calls Feyre directly: anything that hurts or frightens her emits the
+# inbound signals; the vitals lane announces the outbound ones.
+
+## A hit on Feyre. attack_id names an AttackData row (a family kind such as
+## &"naga" resolves to that family's default attack); scale multiplies its damage.
+## origin is the attacker's world position (Vector3.INF = "from in front of her").
+signal player_hit(source_id: StringName, attack_id: StringName, scale: float, origin: Vector3)
+## A timed status on Feyre (venom, drowsy, roar_shake...). magnitude 0..1, seconds > 0.
+signal player_status_applied(source_id: StringName, tag: StringName, magnitude: float, seconds: float)
+## A fright with no damage. amount 0..1 is added to dread, scaled by her dread gain.
+signal player_startled(source_id: StringName, amount: float)
+## A hold she breaks by mashing interact (each press costs stamina).
+signal player_grabbed(source_id: StringName, break_presses: int, hold_seconds: float)
+## The holder let go, or she broke free.
+signal player_released(source_id: StringName)
+## Health changed. delta < 0 is harm. source_id is &"" for food, rest or regen.
+signal player_health_changed(health: float, max_health: float, delta: float, source_id: StringName)
+## Health reached 0: she is down (dazed, seeing stars; never "dead"). cause = the attack id.
+signal player_knocked_down(source_id: StringName, cause: StringName, at: Vector3)
+## She came round at a rest point (or on the spot). 3 s grace follows.
+signal player_woke(rest_point_id: StringName, at: Vector3)
+## A status started, changed or ended (magnitude 0 = ended). For HUD and audio.
+signal player_status_changed(tag: StringName, magnitude: float, seconds_left: float)
+## Dread (0..1, fast) or ease (0..1, slow baseline) moved by more than 0.02. At most 10 Hz.
+signal player_mood_changed(dread: float, ease: float)
+## An item imbue started or ended (seconds_left 0 = ended). item_slot: &"cloak", &"boots"...
+signal player_imbue_changed(item_slot: StringName, imbue_id: StringName, seconds_left: float)
+
+# --- Hostile sites (L75) and crouch.
+
+## A hostile site calmed down after an alert.
+signal site_settled(site_id: StringName)
+## A hostile site noticed her; level 0..1 (curious to alerted).
+signal hostile_alerted(site_id: StringName, level: float)
+## Feyre crouched or stood.
+signal player_stance_changed(crouched: bool)

@@ -111,8 +111,7 @@ func _raise(at: Vector3) -> void:
 		if is_instance_valid(m) and m.alive and m.has_method(&"on_camp_alert"):
 			m.call(&"on_camp_alert", at)
 	alerted.emit(alert_level)
-	if EventBus.has_signal(&"hostile_alerted"):
-		EventBus.emit_signal(&"hostile_alerted", data.id, alert_level)
+	EventBus.hostile_alerted.emit(data.id, alert_level)
 
 
 func _spawn_member(index: int) -> void:
@@ -153,6 +152,5 @@ func settle() -> void:
 	WorldState.set_flag(settle_flag(data.id), Clock.day)
 	if EventBus.has_signal(&"celebration_requested"):
 		EventBus.emit_signal(&"celebration_requested", &"site_settled", global_position)
-	if EventBus.has_signal(&"site_settled"):
-		EventBus.emit_signal(&"site_settled", data.id)
+	EventBus.site_settled.emit(data.id)
 	settled.emit(data.id)

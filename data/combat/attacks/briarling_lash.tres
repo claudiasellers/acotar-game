@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_0tjni"]
+
+[resource]
+script = ExtResource("1_0tjni")
+id = &"briarling_lash"
+family = &"briarling"
+is_default = true
+damage = 8.0
+damage_kind = &"thorn"
+knockback_m = 0.5

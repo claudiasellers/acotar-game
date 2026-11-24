@@ -64,8 +64,7 @@ func _ready() -> void:
 	_ring_angle = float(member_index) * 1.7
 	_dread = DreadField.attach(self, 30.0, 10.0)
 	senses.sensed.connect(_on_sensed)
-	if EventBus.has_signal(&"player_knocked_down"):
-		EventBus.connect(&"player_knocked_down", _on_player_down)
+	EventBus.player_knocked_down.connect(_on_player_down)
 
 
 ## What the day asks of it: bask 10-15, hunt 17-21, nest otherwise.

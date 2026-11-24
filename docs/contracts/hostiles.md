@@ -82,8 +82,7 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
 
 ## Hits on Feyre (`HostileHits`, static)
 `strike(tree, source_id, attack_id, scale, origin)`: emits
-`EventBus.player_hit(source_id, attack_id, scale, origin)` when the vitals
-signal exists, else the legacy `player_struck(source_id, kind, scale)`.
+`EventBus.player_hit(source_id, attack_id, scale, origin)`.
 Senses read `Vitals.sight_scale/noise_scale/scent_scale` through
 `HostileVitals` (neutral 1.0 until `systems/vitals/vitals.gd` exists).
 

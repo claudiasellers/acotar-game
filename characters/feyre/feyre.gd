@@ -84,6 +84,8 @@ var is_drawing: bool:
 var bow_controller: BowController
 var interactor: Interactor
 var body_state: BodyState
+## Health, afflictions, dread and ease, knockdown (systems/vitals). Sets max_stamina.
+var vitals: VitalsState
 var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
@@ -245,6 +247,7 @@ func teleport(pos: Vector3) -> void:
 	velocity = Vector3.ZERO
 	steer_frame.release()
 	global_position = pos
+	vitals.forget_fall()
 	camera_control.snap_to(pos)
 	if _camera_fade:
 		_camera_fade.restore_all()
@@ -392,6 +395,11 @@ func _build_components() -> void:
 	body_state.name = "BodyState"
 	body_state.element_state = element_state
 	add_child(body_state)
+	vitals = VitalsState.new()
+	vitals.name = "Vitals"
+	vitals.player = self
+	body_state.vitals = vitals
+	add_child(vitals)
 	bow_controller = BowController.new()
 	bow_controller.name = "BowController"
 	add_child(bow_controller)

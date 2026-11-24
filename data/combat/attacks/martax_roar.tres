@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_w8fvv"]
+
+[resource]
+script = ExtResource("1_w8fvv")
+id = &"martax_roar"
+family = &"martax"
+damage = 0.0
+damage_kind = &"blunt"
+reaction = &"none"
+status_tag = &"roar_shake"
+status_magnitude = 0.8
+status_seconds = 6.0
+dread_spike = 0.25

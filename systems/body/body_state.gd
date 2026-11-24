@@ -12,9 +12,8 @@ const FAE_TOLL_DECAY := 0.002
 
 ## 0 = fed, 1 = starving. Feyre starts the game hungry.
 @export_range(0.0, 1.0) var hunger: float = 0.55
-var health: float = 1.0
 var fae_toll: float = 0.0
-## tag -> {"magnitude": float, "remaining": float seconds}
+## tag -> {"magnitude": float, "remaining": float seconds, "total": float seconds}
 var effects: Dictionary = {}
 ## Mirrors the owner's ElementState.cold each frame.
 var cold: float = 0.0
@@ -22,6 +21,12 @@ var cold: float = 0.0
 var exertion: float = 0.0
 
 var element_state: ElementState
+## Her vitals (health lives there): food heals and harms through it.
+var vitals: VitalsState
+## Set each frame by VitalsState from dread, ease, rest and afflictions.
+var vitals_regen_scale: float = 1.0
+var vitals_sway: float = 1.0
+var vitals_tremor: float = 0.0
 ## What magic smells like to her: &"metal" before the glamour lifts (ch5),
 ## &"flowers" after (ch23). Senses and forage hints read this.
 var magic_scent: StringName = &""
@@ -59,18 +64,28 @@ func step(delta: float) -> void:
 ## Eats a chemistry result (Chemistry.combine) or a raw ingredient's numbers.
 func eat(result: Dictionary) -> void:
 	hunger = clampf(hunger - float(result.get("hunger_relief", 0.0)), 0.0, 1.0)
-	health = clampf(health + float(result.get("heal", 0.0)) - float(result.get("harm", 0.0)), 0.0, 1.0)
+	if vitals:
+		vitals.eat_result(float(result.get("heal", 0.0)), float(result.get("harm", 0.0)))
+		if float(result.get("hunger_relief", 0.0)) > 0.0:
+			vitals.notify_meal(hunger)
 	fae_toll += float(result.get("fae_toll", 0.0))
 	var duration := float(result.get("duration", 0.0))
 	var given: Dictionary = result.get("effects", {})
 	for tag in given:
-		var key := StringName(tag)
-		var current: Dictionary = effects.get(key, {"magnitude": 0.0, "remaining": 0.0})
-		effects[key] = {
-			"magnitude": maxf(float(current.magnitude), float(given[tag])),
-			"remaining": maxf(float(current.remaining), duration),
-		}
+		add_effect(StringName(tag), float(given[tag]), duration)
 	changed.emit()
+
+
+## The same tag keeps the stronger and the longer. At most three distinct tags:
+## a fourth replaces the one with the least time left (plan §7a.4).
+func add_effect(tag: StringName, magnitude: float, duration: float) -> void:
+	if not effects.has(tag) and effects.size() >= StatusRules.MAX_BREW_TAGS:
+		var shortest: StringName = effects.keys()[0]
+		for other: StringName in effects:
+			if float(effects[other].remaining) < float(effects[shortest].remaining):
+				shortest = other
+		effects.erase(shortest)
+	effects[tag] = StatusRules.stack(tag, effects.get(tag, {}), magnitude, duration)
 
 
 func eat_raw(ingredient: IngredientData) -> void:
@@ -84,16 +99,17 @@ func effect(tag: StringName) -> float:
 ## Multiplies the bow's sway: hunger and cold make the aim wander; steady calms it.
 func sway_multiplier() -> float:
 	var m := 1.0 + hunger * 0.8 + cold * 1.4 + fae_toll * 0.5
-	return m * (1.0 - clampf(effect(&"steady") * 0.25, 0.0, 0.6))
+	return m * vitals_sway * (1.0 - clampf(effect(&"steady") * 0.25, 0.0, 0.6))
 
 
 ## Bow-hand shake in degrees, independent of the draw.
 func tremor_degrees() -> float:
-	return maxf(cold * 0.6 + hunger * 0.25 - effect(&"steady") * 0.15, 0.0)
+	return maxf(cold * 0.6 + hunger * 0.25 + vitals_tremor - effect(&"steady") * 0.15, 0.0)
 
 
 func stamina_regen_multiplier() -> float:
-	return clampf(1.0 - hunger * 0.4 - cold * 0.3 + effect(&"swift") * 0.2 + effect(&"strong") * 0.1, 0.3, 1.5)
+	var m := 1.0 - hunger * 0.4 - cold * 0.3 + effect(&"swift") * 0.2 + effect(&"strong") * 0.1
+	return clampf(m * vitals_regen_scale, 0.3, 1.8)
 
 
 ## Breaths per second: faster when cold, hungry or working hard.
@@ -107,13 +123,12 @@ func breath_intensity() -> float:
 
 
 func save_state() -> Dictionary:
-	return {"hunger": hunger, "health": health, "fae_toll": fae_toll, "effects": effects.duplicate(true),
+	return {"hunger": hunger, "fae_toll": fae_toll, "effects": effects.duplicate(true),
 		"magic_scent": String(magic_scent)}
 
 
 func load_state(data: Dictionary) -> void:
 	hunger = float(data.get("hunger", 0.55))
-	health = float(data.get("health", 1.0))
 	fae_toll = float(data.get("fae_toll", 0.0))
 	magic_scent = StringName(data.get("magic_scent", ""))
 	effects.clear()

@@ -1,0 +1,142 @@
+# CI、导出与测试框架
+
+下载 Godot 二进制、CI 配置、导出验证、GUT 与 gdUnit4 命令行。
+
+## 下载 Godot 二进制
+
+GitHub releases 上的资源名规律，4.7.2 逐个用 curl 验证过（HTTP 302 跳到 release-assets，最终 200）：
+
+| 用途 | 文件名 |
+|---|---|
+| 标准版 Linux | `Godot_v4.7.2-stable_linux.x86_64.zip` |
+| mono 版 Linux | `Godot_v4.7.2-stable_mono_linux_x86_64.zip` |
+| 标准版导出模板 | `Godot_v4.7.2-stable_export_templates.tpz` |
+| mono 版导出模板 | `Godot_v4.7.2-stable_mono_export_templates.tpz` |
+
+URL 前缀 `https://github.com/godotengine/godot/releases/download/4.7.2-stable/`。`godotengine/godot-builds` 仓库有同名资源。把版本号换成其他稳定版时目录名是 `<版本>-stable`，文件名里是 `v<版本>-stable`。
+
+zip 内容不同：
+
+- 标准版：一个文件 `Godot_v4.7.2-stable_linux.x86_64`
+- mono 版目录 `Godot_v4.7.2-stable_mono_linux_x86_64/`
+- 可执行文件 `Godot_v4.7.2-stable_mono_linux.x86_64`，下划线变点
+- 可执行文件必须与旁边的 `GodotSharp/` 目录同目录
+
+```bash
+V=4.7.2
+curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_linux.x86_64.zip"
+unzip -q godot.zip
+chmod +x "Godot_v${V}-stable_linux.x86_64"
+export GODOT_BIN="$PWD/Godot_v${V}-stable_linux.x86_64"
+"$GODOT_BIN" --version
+```
+
+`--version` 输出 `4.7.2.stable.official.ed1daf0bf`，mono 版是 `4.7.2.stable.mono.official.ed1daf0bf`，脚本里可以用后缀判断是否 mono。
+
+CI 里的顺序：下载，`--import`，`--check-only` 循环，冒烟脚本，失败时上传日志。下面的 YAML 外壳没有在 Actions 上实跑过，命令本身在本机验证过。
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - name: Fetch Godot
+    run: |
+      V=4.7.2
+      curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${V}-stable/Godot_v${V}-stable_linux.x86_64.zip"
+      unzip -q godot.zip
+      chmod +x "Godot_v${V}-stable_linux.x86_64"
+      echo "GODOT_BIN=$PWD/Godot_v${V}-stable_linux.x86_64" >> "$GITHUB_ENV"
+  - run: $GODOT_BIN --headless --no-header --path . --import
+  - run: timeout -s KILL 120 $GODOT_BIN --headless --no-header --path . -s tests/smoke_level.gd
+```
+
+## 导出
+
+```bash
+mkdir -p build
+godot --headless --no-header --path . --export-pack "Linux" build/game.pck
+godot --headless --no-header --path . --export-release "Linux" build/game.x86_64
+```
+
+- `export_presets.cfg` 必须在工程根目录，预设名与第一个参数完全一致。不存在时退出码 1
+- `--export-pack` 不需要导出模板，实测退出码 0，输出 `[ DONE ] savepack` 和一串 `Storing File:`
+- `--export-release` 与 `--export-debug` 需要模板
+- 缺模板输出 `No export template found at the expected path:` 加路径，退出码 1
+- 模板路径以报错里打印的为准，如 `~/.local/share/godot/export_templates/4.7.2.stable/`
+- 输出目录须已存在
+- 导出后场景变成 `.remap`，加载器透明处理
+- 用 `DirAccess` 扫目录的代码导出后失效，只有跑导出包才发现
+
+## C# 工程
+
+mono 版构建与运行的实测见 [csharp.md](csharp.md)。
+
+## 测试框架
+
+没有框架也能测，本 skill 的冒烟脚本够用。需要断言库、参数化、Mock 时再引入。
+
+| | GUT | gdUnit4 |
+|---|---|---|
+| 用途 | 用 GDScript 写测试的单元测试框架 | 支持 GDScript 与 C# 的测试框架，带编辑器内检视面板 |
+| 4.7 对应版本 | 9.7.1（README 里标 4.7.x，分支 godot_4_7），已在 4.7.2 实跑 | 6.2.x 的 README 兼容表含 4.7 与 4.7.1，6.2.2 已在 4.7.2 实跑 |
+| 安装 | 把 `addons/gut` 放进工程并启用插件，重启编辑器 | 同样放进 `addons/` 并启用插件 |
+| 命令行入口 | `addons/gut/gut_cmdln.gd` | `addons/gdUnit4/runtest.sh`，内部调 `res://addons/gdUnit4/bin/GdUnitCmdTool.gd` |
+
+两个框架都靠 `class_name`，新克隆的工程先跑一次 `godot --headless --import`。没导入时 GUT 9.7.1 只打印一行 `Some GUT class_names have not been imported`，一个测试都不跑，退出码 0。gdUnit4 报解析错误，退出码 1。
+
+GUT 命令行，选项来自其文档的 `-gh` 帮助输出：
+
+```bash
+godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://test -gexit
+```
+
+- `-gdir` 测试目录，`-ginclude_subdirs` 含子目录，`-gtest` 指定脚本，`-gselect` 按文件名过滤，`-gunit_test_name` 按测试名过滤
+- `-gexit` 跑完退出。`--headless` 下 9.7.1 不加也会退出，有窗口时不加会一直开着
+- 退出码：全过为 0，有失败为 1，只有 pending 为 0。测试函数里的运行时报错算失败
+- 选项也可以放 `res://.gutconfig.json`
+- 官方示例带 `-d`，无人值守时去掉
+- 实测 9.7.1 带 `-d` 且 stdin 为空：出错后不再跑后续测试，不打汇总，退出码 0
+
+gdUnit4 命令行，选项来自其文档的 `-help` 输出：
+
+```bash
+export GODOT_BIN=/path/to/godot
+./addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode -a ./test
+```
+
+- `runtest.sh` 不自带 `--headless`，无显示时退出码 1
+- 加 `--headless` 还要加 `--ignoreHeadlessMode`，否则退出码 103
+- headless 下不传递 InputEvent，模拟输入时用 `xvfb-run -a ./addons/gdUnit4/runtest.sh -a ./test`
+| 参数 | 作用 |
+|---|---|
+| `-a` | 测试目录或套件，可重复 |
+| `-i` | 忽略某套件或用例 |
+| `-c` | 失败后继续，默认首个失败即中止 |
+| `-conf` | 指定配置文件 |
+
+| 退出码 | 含义 |
+|---|---|
+| 0 | 全过 |
+| 100 | 有失败或运行时报错 |
+| 101 | 有 orphan 节点 |
+| 103 | headless 未放行 |
+| 105 | 发现测试时有脚本错误 |
+
+- 只认 0 的包装如 `gdrun` 要单独处理 101
+- `runtest.sh` 读 `GODOT_BIN` 或 `--godot_binary`，检测到 mono 版会先执行 `dotnet build --debug`
+- 它启动 Godot 时带 `-d --remote-debug tcp://127.0.0.1:0`
+- 这样解析错误时不陷入本地 `debug>` 循环，自己拼命令照抄
+- 因为端口 0，每次运行都会打印两行无害的 `ERROR:`：`The remote port number must be between 1 and 65535` 与 `Remote Debugger: Unable to connect to host`。套 `gdrun` 时具体排除这两行
+
+两个框架都把测试函数里的运行时报错计为失败。测试函数以外的报错靠 `gdrun` 的 grep 兜底，grep 照样要留。
+
+## 导出 API 文档与签名
+
+```bash
+mkdir -p out/doc
+godot --headless --no-header --path . --doctool out/doc
+godot --headless --no-header --path . --doctool out/doc --gdscript-docs res://scripts
+```
+
+第一条把引擎所有类写到 `out/doc/doc/classes/*.xml` 和 `out/doc/modules/*/doc_classes/`，约 1000 个 XML，约 1 秒，只有签名没有说明。第二条为带 `##` 注释的脚本生成 XML，类名文件如 `Unit.xml`，无 class_name 的脚本为 `scripts--player.gd.xml`，含 `brief_description`、参数与默认值。
+
+引擎源码里的 `doc/classes/<类名>.xml` 才带完整说明。
