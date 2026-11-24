@@ -61,7 +61,6 @@ func _init(owner_hud: WorldMapHud) -> void:
 
 
 func _ready() -> void:
-	layer = 18
 	_build()
 
 

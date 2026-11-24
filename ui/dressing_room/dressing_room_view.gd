@@ -176,12 +176,6 @@ func _gui_input(event: InputEvent) -> void:
 		_turn(event.relative.x * 0.012)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause"):
-		get_viewport().set_input_as_handled()
-		DressingRoom.close_room(feyre)
-
-
 ## Equip a variant: twirl, sparkle, chime.
 func wear(piece_id: StringName) -> void:
 	if Gameplay.wardrobe.equipped_in(WardrobeCatalog.piece(piece_id).slots[0]) == piece_id:
@@ -719,6 +713,6 @@ func _frame(face: float) -> void:
 func _hide_hud() -> void:
 	for layer in get_tree().root.find_children("*", "CanvasLayer", true, false):
 		var l := layer as CanvasLayer
-		if l.visible and l.layer < 20 and not l.is_ancestor_of(self):
+		if l.visible and l.layer < UiLayers.SCREEN and not l.is_ancestor_of(self):
 			l.visible = false
 			_hidden_layers.append(l)

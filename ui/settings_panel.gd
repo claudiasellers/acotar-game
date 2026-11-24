@@ -1,6 +1,7 @@
 ## The pause menu. Esc (or Start) pauses the game and opens it; Esc again or
-## Resume closes it. Camera, play, sound and text settings live in
-## GameSettings, the movement-keys switch in InputSettings; both save to
+## Resume closes it. It is one screen on ScreenStack, which pauses the game,
+## shows the mouse and answers Esc for it. Camera, play, sound and text
+## settings live in GameSettings, the movement-keys switch in InputSettings; both save to
 ## user://settings.cfg as soon as they change. Also: Wriggle free (unstuck),
 ## Return Home, Save & Title and Save & Quit, plus the controls hint.
 ##
@@ -31,13 +32,18 @@ var _controls: Dictionary = {}
 var _hint: ControlsHint
 var _sparkles: CPUParticles2D
 var _home_fallback: Vector3 = Vector3.ZERO
+## What ScreenStack does while this panel is open.
+var _screen_flags: int = ScreenStack.Flag.PAUSES | ScreenStack.Flag.MOUSE
+## Whether Esc with nothing open brings this panel up.
+var _opens_on_pause: bool = true
 
 
 func _ready() -> void:
-	layer = 20
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = UiLayers.SCREEN
 	_build()
 	_menu.visible = false
+	if _opens_on_pause:
+		ScreenStack.pause_requested.connect(open)
 	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: _sync())
 	GameSettings.changed.connect(func(_k: StringName) -> void: _sync())
 	_attach_to_player.call_deferred()
@@ -49,8 +55,6 @@ func is_open() -> bool:
 
 func open() -> void:
 	_menu.visible = true
-	get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_toast.text = ""
 	_sync()
 	_fit_to_screen()
@@ -58,26 +62,22 @@ func open() -> void:
 	_sparkles.amount = 10 if GameSettings.reduced_effects else 36
 	_sparkles.restart()
 	Juice.bounce_control(_card, 0.04)
-	_resume.grab_focus()
+	ScreenStack.push(self, _screen_flags)
 
 
 func close() -> void:
 	_menu.visible = false
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	ScreenStack.pop(self)
 	_hint.show_for(8.0)
 
 
-func _input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"pause"):
-		return
-	if is_open():
-		close()
-		get_viewport().set_input_as_handled()
-	elif not get_tree().paused:
-		# Another panel (collection book, dressing room) pausing the game owns Esc.
-		open()
-		get_viewport().set_input_as_handled()
+## Esc or B while the panel is the top screen.
+func screen_cancel() -> void:
+	close()
+
+
+func screen_focus() -> void:
+	_resume.grab_focus()
 
 
 func _player() -> Feyre:
@@ -126,8 +126,7 @@ func _save_then(after: Callable) -> void:
 
 
 func _to_title() -> void:
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.pop(self)
 	get_tree().change_scene_to_file(TITLE_SCENE)
 
 

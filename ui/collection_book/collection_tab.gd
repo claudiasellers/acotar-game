@@ -50,7 +50,6 @@ func _init() -> void:
 	tab_order = 2
 	shortcut = &"open_collection"
 	opens_in_story = true
-	layer = 20
 
 
 func _ready() -> void:

@@ -80,7 +80,6 @@ func _init(journal_book: JournalBook = null) -> void:
 
 
 func _ready() -> void:
-	layer = 19
 	add_to_group(GROUP)
 	ensure_action()
 	_build()

@@ -33,6 +33,7 @@ static var _triggers: Dictionary = {}
 
 
 func _enter_tree() -> void:
+	layer = UiLayers.PAGE
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	if not _shown_now:
 		visible = false

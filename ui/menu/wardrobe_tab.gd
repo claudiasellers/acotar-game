@@ -29,7 +29,6 @@ func _init() -> void:
 	tab_id = &"wardrobe"
 	tab_title = "Wardrobe"
 	tab_order = 1
-	layer = 20
 
 
 func available() -> bool:

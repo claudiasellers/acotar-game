@@ -30,6 +30,7 @@ here and from nowhere else.
 | `FILM` | 3 | the film player's own stack: inserts and grade at `FILM`, its veil at `FILM + 3`, its text at `FILM + 4` |
 | `HUD` | 10 | `HudLayout`, the only HUD layer |
 | `BACKDROP` | 17 | the dim behind an open screen |
+| `PAGE` | 19 | the book's pages, under its tab strip |
 | `SCREEN` | 20 | open screens; `ScreenStack` gives each `SCREEN + its depth` (depth 0 to 3) |
 | `LINE` | 25 | spoken lines, thoughts, whispers |
 | `VEIL` | 30 | story fades and blackouts |
@@ -45,7 +46,7 @@ A screen is any node that takes the player out of the world: the book, the
 pause panel, a station, the travel card, the title.
 
 ```gdscript
-enum Flag { PAUSES = 1, MOUSE = 2, BACKDROP = 4 }
+enum Flag { PAUSES = 1, MOUSE = 2 }
 
 signal changed(top: Node)          ## after every push and pop; null when empty
 signal pause_requested             ## Esc or Start with nothing open, in play
@@ -56,6 +57,7 @@ func top() -> Node
 func has(screen: Node) -> bool
 func is_empty() -> bool
 func layer_of(screen: Node) -> int ## UiLayers.SCREEN + depth
+func mouse_shown() -> bool         ## a screen wants the pointer, or no player exists
 ```
 
 Rules the stack keeps, each with a behaviour test in
@@ -70,9 +72,10 @@ Rules the stack keeps, each with a behaviour test in
    (alt-tab, web) recaptures through the stack.
 3. **Esc and cancel.** The stack alone handles `pause` and `ui_cancel`, in
    `_unhandled_input`, and marks the event handled. With screens open it calls
-   `screen_cancel()` on the top one only. With none open, and no film playing,
-   it emits `pause_requested`. Screens never read Esc themselves; a film's
-   skip never fires from a press that closed a screen.
+   `screen_cancel()` on the top one only. With none open it emits
+   `pause_requested`. Screens never read Esc themselves. A playing film takes
+   the press first (`FilmPlayer._input`), so a film's skip and the pause
+   panel never answer the same press.
 4. **Focus.** On push, the stack calls the screen's `screen_focus()` if it has
    one, otherwise focuses its first focusable control. On pop, focus returns
    to whatever the screen beneath had focused.
@@ -160,8 +163,8 @@ through the core lane), and this table gains a column.
 
 | Hand-in | Moves onto the frame | Deletes | Search test that switches on |
 |---|---|---|---|
-| 1a | `MenuShell` and its pages, `SettingsPanel` | their `paused`, `mouse_mode`, `_input` Esc code and layer numbers | none yet |
-| 1b | brew, market, mare, studio, travel card, title, title settings; `feyre.gd` hands over its mouse and Esc lines | the same in each; `ui/hearth_panel.gd`; `ui/painting/painting_ui.gd` | no `paused =` or `mouse_mode =` outside `ScreenStack` |
+| 1a | `MenuShell` and its pages, `SettingsPanel`, `TitleSettings` | their `paused`, `mouse_mode`, `_input` Esc code and layer numbers | none yet |
+| 1b | brew, market, mare, studio, travel card, title; `feyre.gd` hands over its mouse and Esc lines | the same in each; `ui/hearth_panel.gd`; `ui/painting/painting_ui.gd` | no `paused =` or `mouse_mode =` outside `ScreenStack` |
 | 1c | vitals HUD, quick strap, minimap, quiver card, prompts, find card, pickup log, thoughts card, milestone card, controls hint | each piece's layer, pixel positions and hide rule; `ui/celebration_gate.gd` | no `StoryControl` read and no `position =` in a HUD piece |
 | 1d | the story and system scripts that make their own layer (veils, captions, whisper, Suriel, film) | their literal numbers | no literal `layer =` number outside `UiLayers` |
 

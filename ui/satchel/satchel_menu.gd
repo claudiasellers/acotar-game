@@ -89,7 +89,6 @@ func _init(quick_bar: QuickBar = null) -> void:
 
 
 func _ready() -> void:
-	layer = 19
 	_build()
 	bar.changed.connect(_watch_new)
 	_watch_new()
