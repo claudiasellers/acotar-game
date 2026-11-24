@@ -51,13 +51,14 @@ enum Flag { PAUSES = 1, MOUSE = 2 }
 signal changed(top: Node)          ## after every push and pop; null when empty
 signal pause_requested             ## Esc or Start with nothing open, in play
 
-func push(screen: Node, flags: int = Flag.PAUSES | Flag.MOUSE) -> void
+func push(screen: Node, flags: int = Flag.PAUSES | Flag.MOUSE, cancel: Callable = Callable()) -> void
 func pop(screen: Node) -> void     ## any depth; a freed screen pops itself
 func top() -> Node
 func has(screen: Node) -> bool
 func is_empty() -> bool
 func layer_of(screen: Node) -> int ## UiLayers.SCREEN + depth
 func mouse_shown() -> bool         ## a screen wants the pointer, or no player exists
+func answers(event: InputEvent) -> bool  ## Esc, Start or B: a press the stack takes
 ```
 
 Rules the stack keeps, each with a behaviour test in
@@ -82,6 +83,11 @@ Rules the stack keeps, each with a behaviour test in
 5. **Running while paused.** `push` sets the screen's `process_mode` to
    `PROCESS_MODE_ALWAYS`; `pop` puts back what it had.
 6. **Layer.** A screen that is a `CanvasLayer` gets `layer_of(screen)` on push.
+
+A screen that swallows the rest of the input while it is open (the mare's
+tending screen, which does not pause) lets `answers(event)` presses through.
+A screen built without a script of its own (the easel's card) hands its
+cancel to `push` as the third argument.
 
 A screen implements, all optional:
 

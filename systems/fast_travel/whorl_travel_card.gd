@@ -32,14 +32,11 @@ static func open(tree: SceneTree, here: WhorlStoneDef, dests: Array[WhorlStoneDe
 	card.to = dests
 	tree.root.add_child(card)
 	_open = card
-	tree.paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.push(card)
 	return card
 
 
 func _ready() -> void:
-	layer = 20
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.theme = SatchelTheme.theme()
@@ -116,10 +113,9 @@ func _tab(text: String) -> Button:
 	return b
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"ui_cancel"):
-		get_viewport().set_input_as_handled()
-		close()
+## Esc or B while the card is the top screen.
+func screen_cancel() -> void:
+	close()
 
 
 ## Picks a destination: closes the card and rides there.
@@ -130,10 +126,7 @@ func choose(dest: WhorlStoneDef) -> WhorlRide:
 
 
 func close() -> void:
-	var tree := get_tree()
 	if _open == self:
 		_open = null
+	ScreenStack.pop(self)
 	queue_free()
-	if tree:
-		tree.paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

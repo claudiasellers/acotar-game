@@ -74,8 +74,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = 19
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = UiLayers.SCREEN
 	_build()
 
 
@@ -93,9 +92,7 @@ func open(who: Feyre, at: CookingStation) -> void:
 	_root.theme = SatchelTheme.theme()
 	_root.visible = true
 	_refresh()
-	if is_inside_tree():
-		get_tree().paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.push(self)
 	Juice.bounce_control(_card, 0.05)
 
 
@@ -103,10 +100,13 @@ func close() -> void:
 	if not is_open():
 		return
 	_root.visible = false
-	if is_inside_tree():
-		get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	ScreenStack.pop(self)
 	closed.emit()
+
+
+## Esc or B while the stillroom is the top screen.
+func screen_cancel() -> void:
+	close()
 
 
 ## Adds or removes one ingredient from the pot. Returns true if it changed.
@@ -177,10 +177,7 @@ func hunch() -> String:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
-	if event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel") \
-			or _pad(event, JOY_BUTTON_B):
-		close()
-	elif _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_Y):
+	if _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_Y):
 		brew()
 	else:
 		return

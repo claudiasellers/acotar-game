@@ -117,12 +117,12 @@ func test_wardrobe_station_opens_the_dressing_room() -> void:
 	assert_false(get_tree().paused)
 
 
-func test_campfire_opens_the_hearth_panel() -> void:
+func test_campfire_opens_the_brewing_screen() -> void:
 	var fire := hill.get_node("GameplaySandbox/Campfire") as Node3D
 	feyre.global_position = fire.global_position + Vector3(1.2, 0.1, 0)
 	assert_true(feyre.interactor.interact())
 	assert_not_null(get_tree().root.get_node_or_null("HearthPanel"))
-	load("res://ui/hearth_panel.gd")._close(feyre)
+	BrewMenu.find(get_tree()).close()
 	assert_false(get_tree().paused)
 
 

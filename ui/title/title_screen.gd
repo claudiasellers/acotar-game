@@ -39,8 +39,7 @@ var _ambience: AudioStreamPlayer
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	get_tree().paused = false
+	ScreenStack.push(self, ScreenStack.Flag.MOUSE)
 	backdrop = TitleBackdrop.new()
 	backdrop.name = "Backdrop"
 	add_child(backdrop)
@@ -66,6 +65,16 @@ static func new_story_from(args: PackedStringArray) -> String:
 		if arg.begins_with(NEW_STORY_ARG) and SaveSystem.SLOTS.has(arg.trim_prefix(NEW_STORY_ARG)):
 			return arg.trim_prefix(NEW_STORY_ARG)
 	return ""
+
+
+## Esc on the bare title closes nothing.
+func screen_cancel() -> void:
+	pass
+
+
+## The menu focuses its own first button once it has faded in.
+func screen_focus() -> void:
+	pass
 
 
 func _unhandled_input(event: InputEvent) -> void:
