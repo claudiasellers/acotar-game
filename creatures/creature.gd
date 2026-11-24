@@ -303,6 +303,11 @@ func winding_up() -> StringName:
 	return &""
 
 
+## Seconds left before the attack it is winding up makes contact (0 when none).
+func windup_left() -> float:
+	return 0.0
+
+
 ## Knocked off its feet for `seconds` (the bow bash, a knife wound): it
 ## stops where it is and loses any wind-up. Brains with their own fight state
 ## override this to cancel it.
