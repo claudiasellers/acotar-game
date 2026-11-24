@@ -95,6 +95,8 @@ func _ready() -> void:
 	HudLayout.of(get_tree()).place(reticle, HudLayout.Zone.WORLD, self)
 	visual = BowVisual.new(self)
 	add_child(visual)
+	# Her one thought about an early release (systems/dialogue/scene_guides/).
+	add_child(BowGuide.new())
 	quiver_card = QuiverCard.new(self)
 	add_child(quiver_card)
 	if Gameplay.inventory.count(&"bow_%s" % bow.id) == 0:
