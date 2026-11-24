@@ -11,6 +11,7 @@ extends CanvasLayer
 const TITLE_SCENE := "res://ui/title/title_screen.tscn"
 const CARD_WIDTH := 1000.0
 ## The guidance lane's "Feyre's thoughts" setting, shown once that lane lands.
+const HUD_ROW_FONT := 17
 const GUIDE_SETTINGS := "res://ui/guide/guide_settings.gd"
 ## The map lane's minimap switch and "open the map" (ui/map/).
 const MAP_SETTINGS := "res://ui/map/map_settings.gd"
@@ -152,6 +153,9 @@ func _sync() -> void:
 			var buttons := c.find_children("*", "Button", false, false)
 			for i in buttons.size():
 				(buttons[i] as Button).set_pressed_no_signal(i == int(v))
+		elif c is Button:
+			var labels: Array = c.get_meta(&"labels")
+			(c as Button).text = String(c.get_meta(&"format")) % labels[clampi(int(v), 0, labels.size() - 1)]
 	if _minimap_check:
 		_minimap_check.set_pressed_no_signal(bool(_map.call(&"minimap_shown")))
 	if _guide:
@@ -237,23 +241,20 @@ func _build() -> void:
 		row.add_child(b)
 		_scheme_buttons[scheme] = b
 
-	_build_guide(left)
-
-	var hud := _section(left, "Her health and status", PauseStyle.ROSE)
-	_choice(hud, &"hud_mode", "Meters", GameSettings.HUD_MODES)
-	_choice(hud, &"edge_fx", "Screen edges", GameSettings.EDGE_FX_LEVELS)
-	_check(hud, &"hit_marks", "Show where hits come from")
+	_build_map(left)
 
 	var play := _section(right, "Play", PauseStyle.ROSE)
 	_check(play, &"gentle_mode", "Gentle Mode")
 	play.add_child(_note("Sprinting lasts twice as long, and she catches\nhigher ledges from any direction."))
 	_check(play, &"reduced_effects", "Reduced effects")
 	play.add_child(_note("No camera shake; softer sparkles and bounces."))
+	_hud_row(play)
+
+	_build_guide(right)
 
 	var sound := _section(right, "Sound", Color(0.62, 0.90, 0.78))
 	_slider(sound, &"music_volume", "Music volume")
 	_slider(sound, &"sound_volume", "Sound volume")
-	_build_map(right)
 
 	var words := _section(right, "Text size", Color(1.0, 0.88, 0.55))
 	var sizes := HBoxContainer.new()
@@ -400,23 +401,50 @@ func _slider(parent: Control, key: StringName, text: String) -> void:
 	_controls[key] = s
 
 
-## A labelled row of toggle buttons, one per choice, writing its index to `key`.
-func _choice(parent: Control, key: StringName, text: String, labels: Array[String]) -> void:
+## Her HUD on one row: the meters' mode as a three-way chip, a button that
+## steps the screen edges through their levels, and the hit-marks toggle.
+func _hud_row(parent: Control) -> void:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
+	row.add_theme_constant_override(&"separation", 6)
 	parent.add_child(row)
 	var label := Label.new()
-	label.text = text
-	label.custom_minimum_size = Vector2(150, 0)
+	label.text = "HUD"
 	row.add_child(label)
+	var modes := HBoxContainer.new()
+	modes.add_theme_constant_override(&"separation", 2)
+	row.add_child(modes)
 	var group := ButtonGroup.new()
-	for i in labels.size():
-		var b := _button(labels[i], true)
+	for i in GameSettings.HUD_MODES.size():
+		var b := _button(GameSettings.HUD_MODES[i], true)
 		b.button_group = group
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.pressed.connect(func() -> void: GameSettings.set_value(key, i))
-		row.add_child(b)
-	_controls[key] = row
+		b.add_theme_font_size_override(&"font_size", HUD_ROW_FONT)
+		b.pressed.connect(func() -> void: GameSettings.set_value(&"hud_mode", i))
+		modes.add_child(b)
+		_compact(b)
+	_controls[&"hud_mode"] = modes
+	var edges := _button("")
+	edges.add_theme_font_size_override(&"font_size", HUD_ROW_FONT)
+	edges.set_meta(&"format", "Edges: %s")
+	edges.set_meta(&"labels", GameSettings.EDGE_FX_LEVELS)
+	edges.pressed.connect(func() -> void:
+		GameSettings.set_value(&"edge_fx", (int(GameSettings.get_value(&"edge_fx")) + 1) % GameSettings.EDGE_FX_LEVELS.size())
+		_sync())
+	row.add_child(edges)
+	_compact(edges)
+	_controls[&"edge_fx"] = edges
+	_check(row, &"hit_marks", "Hit marks")
+	(_controls[&"hit_marks"] as Control).add_theme_font_size_override(&"font_size", HUD_ROW_FONT)
+
+
+## Tighter side padding for the HUD row's buttons, so the row fits a column.
+func _compact(b: Button) -> void:
+	for state: StringName in [&"normal", &"hover", &"pressed", &"hover_pressed", &"focus", &"disabled"]:
+		var box := b.get_theme_stylebox(state)
+		if box:
+			box = box.duplicate()
+			box.content_margin_left = 10.0
+			box.content_margin_right = 10.0
+			b.add_theme_stylebox_override(state, box)
 
 
 func _check(parent: Control, key: StringName, text: String) -> void:

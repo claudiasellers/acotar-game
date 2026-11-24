@@ -1,8 +1,9 @@
 ## Her statuses, over the health bar: up to five round medallions, danger
 ## first, then "+n" (five keeps the row clear of the quick bar).
-## Each carries its icon and a ring: a timer ring that drains for timed effects
-## (blinking in the last 3 s), a creep ring for venom, a full ring for live
-## states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
+## Each sits on a disc of the satchel chip's look (theme paper in a gilt rim,
+## like the quick bar and the thought card) with its timer as the rim's inner arc: it
+## drains for timed effects (blinking in the last 3 s), creeps for venom and is
+## full for live states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
 class_name VitalsStatusRow
 extends Control
 
@@ -11,16 +12,22 @@ const STEP := 92.0
 const RADIUS := 38.0
 const ICON := 48.0
 const RING_W := 4.0
-const TRACK := Color(0.118, 0.086, 0.165, 0.3)
-const DEBUFF_TRACK := Color(0.071, 0.047, 0.063, 0.55)
-const DEBUFF_RING := Color("#D8CFC0")
+const TRACK := Color(0.227, 0.141, 0.267, 0.16)
+const DEBUFF_RING := Color("#7A1E2A")
 const VENOM_RING := Color("#6F7F3A")
+## Gilt rim width as a share of the radius, as on the satchel's enamel chip
+## (ui/satchel/crafted/chip_enamel.png), drawn smooth at medallion size.
+const RIM := 0.16
 const POP_SECONDS := 0.35
 
 ## What to draw this frame: [{tag, magnitude, seconds_left, total}].
 var shown: Array[Dictionary] = []
 var overflow: int = 0
-var ring_color: Color = Color(1.0, 0.97, 0.92)
+## The buff timer arc and the "+n" ink, the disc and its rim; the HUD sets
+## them from the theme (ink, paper, glow).
+var ring_color: Color = Color("#3A2444")
+var paper: Color = Color("#FBF3F5")
+var gilt: Color = Color("#E3C35A")
 var _icons: Dictionary = {}
 ## tag -> seconds since it appeared, for the pop and shudder.
 var _born: Dictionary = {}
@@ -75,7 +82,12 @@ func _draw() -> void:
 		if debuff and age < 0.45:
 			c.x += sin(age * 70.0) * 3.0 * (1.0 - age / 0.45)
 		var r := RADIUS * scale
-		draw_arc(c, r, 0.0, TAU, 48, DEBUFF_TRACK if debuff else TRACK, RING_W, true)
+		draw_circle(c, r, gilt.darkened(0.38), true, -1.0, true)
+		draw_circle(c, r - 1.5, gilt, true, -1.0, true)
+		draw_circle(c, r * (1.0 - RIM), paper, true, -1.0, true)
+		draw_arc(c, r * (1.0 - RIM), 0.0, TAU, 48, gilt.darkened(0.25), 1.2, true)
+		var ring_r := r * (1.0 - RIM) - RING_W * 0.5
+		draw_arc(c, ring_r, 0.0, TAU, 48, TRACK, RING_W, true)
 		var frac := 1.0
 		var col := DEBUFF_RING if debuff else ring_color
 		var total := float(s.total)
@@ -88,7 +100,7 @@ func _draw() -> void:
 			if left < 3.0 and fmod(left, 0.5) < 0.25:
 				col.a *= 0.35
 		if frac > 0.0:
-			draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * frac, maxi(int(48 * frac), 2), col, RING_W, true)
+			draw_arc(c, ring_r, -PI * 0.5, -PI * 0.5 + TAU * frac, maxi(int(48 * frac), 2), col, RING_W, true)
 		var tex := _icon(tag)
 		if tex:
 			var sz := ICON * scale
@@ -105,7 +117,7 @@ func _draw() -> void:
 		var font := get_theme_default_font()
 		var at := Vector2(8.0 + shown.size() * STEP + 8.0, RADIUS + 18.0)
 		var text := "+%d" % overflow
-		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color("#3A2444"))
+		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(1.0, 0.97, 0.92))
 		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ring_color)
 
 

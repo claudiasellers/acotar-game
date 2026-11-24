@@ -39,7 +39,7 @@ const WORLD_SUN_MIN_DISTANCE := 150.0
 ## Sensitivity sliders run 0..1 around this scale; 0.5 on the slider is 1.0x.
 const SENSITIVITY_MIN := 0.25
 const SENSITIVITY_MAX := 2.5
-const HUD_MODES: Array[String] = ["Contextual", "Always", "Off"]
+const HUD_MODES: Array[String] = ["Auto", "Always", "Off"]
 const EDGE_FX_LEVELS: Array[String] = ["Full", "Soft", "Off"]
 const TEXT_SIZES: Array[String] = ["Small", "Medium", "Large", "Largest"]
 const TEXT_SCALES: Array[float] = [0.9, 1.0, 1.15, 1.3]

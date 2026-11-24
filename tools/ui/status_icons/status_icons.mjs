@@ -17,7 +17,11 @@ const OUT = path.resolve(HERE, '../../../ui/theme/icons/status');
 const SIZE = 256;
 // The chosen settings (icon_style/README.md), with the plum line baked in like the item icons.
 const CUTEO = { set: 'cute', noDetail: true, goo: true, lw: 3.6, dk: 2.8, dkf: 2.4 };
+// The item icons' plum line. Medallion glyphs take it half again as heavy:
+// they read at 48 px on the paper disc mid-play, and the line carries the
+// silhouette's contrast. The rose's pieces keep the item weight.
 const PLUM = { color: '#3A2444', w: 0.8 };
+const PLUM_MEDALLION = { ...PLUM, w: 1.2 };
 
 const f = n => +n.toFixed(2);
 const R = deg => `rotate(${deg} 24 24)`;
@@ -36,10 +40,15 @@ const drop = 'M24 5C29 13 38 22 38 31C38 38.5 32 43.5 24 43.5C16 43.5 10 38.5 10
 const OLD_BLOOD = '#8E2A3A', MOTH = '#8A8299', ICE = '#9CCBEF';
 
 export const STATUS = {
+  // A bare foot planted flat: steadiness is her own body, not a direction.
   steady: { name: 'Steady', main: C.lilac, parts: [
-    B(rr(6, 20.5, 26, 7, 3.5), C.lilac),
-    B('M27 11.5C28 10.5 29.5 10.5 30.6 11.3L42.2 21.4C44 23 44 25 42.2 26.6L30.6 36.7C29.5 37.5 28 37.5 27 36.5C26 35.5 26 34 26.5 33L29.5 24L26.5 15C26 14 26 12.5 27 11.5Z', C.lilac),
-    sh(12, 24, 1.5),
+    B('M24.5 17C30.5 17 33 22.5 32 29C31 36 28.5 43.5 23 43.5C17.5 43.5 16 38 16.8 32C17.5 26 17.5 17 24.5 17Z', C.lilac),
+    Cc(18.6, 11.2, 3.3, C.lilac),
+    Cc(24.6, 9.2, 2.5, C.lilac),
+    Cc(29.2, 10.6, 2.2, C.lilac),
+    Cc(32.6, 13.6, 1.9, C.lilac),
+    Cc(34.8, 17.4, 1.6, C.lilac),
+    sh(21.5, 25, 1.5),
   ] },
   swift: CUTE.swift,
   strong: { name: 'Strong', main: C.gold, parts: [
@@ -139,7 +148,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: SIZE + 64, height: SIZE + 64 }, deviceScaleFactor: 1 });
 for (const id of Object.keys(STATUS)) {
   const pad = SIZE * 0.08;
-  const svg = icon(id, 'flat', { ...CUTEO, size: SIZE - 2 * pad, x: pad, y: pad, outline: PLUM });
+  const svg = icon(id, 'flat', { ...CUTEO, size: SIZE - 2 * pad, x: pad, y: pad, outline: id.startsWith('hud_') ? PLUM : PLUM_MEDALLION });
   const html = `<!doctype html><html><body style="margin:0;background:transparent">${FILTERS}<svg id="i" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></body></html>`;
   await page.setContent(html);
   await page.locator('#i').screenshot({ path: path.join(OUT, `${id}.png`), omitBackground: true });

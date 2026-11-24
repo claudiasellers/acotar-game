@@ -218,8 +218,7 @@ func test_settings_stay_on_screen_at_every_text_size() -> void:
 		assert_gt(h, 200.0, "settings area visible at %s" % GameSettings.TEXT_SIZES[i])
 		assert_lt(h, 1080.0 / GameSettings.TEXT_SCALES[i] - 300.0, "room left for title and buttons")
 		if i <= 1:
-			# Two columns of 13 settings since her health and status joined (L76).
-			assert_lt(h, 900.0, "no needless scrolling at %s" % GameSettings.TEXT_SIZES[i])
+			assert_lt(h, 760.0, "no needless scrolling at %s" % GameSettings.TEXT_SIZES[i])
 		menu.close()
 
 
