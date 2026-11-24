@@ -131,7 +131,6 @@ static func _sleep(interactor: Interactor, row: StationUse) -> bool:
 		return false
 	var hour := Clock.hour()
 	var night := is_night()
-	var rested := night and row.rested_phases.has(String(PhaseManager.current_phase))
 	var feyre := interactor.feyre
 	var at_dark := func() -> void:
 		if night:
@@ -140,11 +139,11 @@ static func _sleep(interactor: Interactor, row: StationUse) -> bool:
 			Clock.advance(row.minutes)
 		var vitals := Vitals.of(feyre)
 		if vitals:
-			vitals.rest(rested)
+			vitals.rest(night)
 	var woke := func() -> void:
 		_busy = false
 		if is_instance_valid(interactor):
-			_think(interactor, _any(row.day_lines if not night else (row.alt_lines if rested else row.lines)))
+			_think(interactor, _any(row.lines if night else row.day_lines))
 	_busy = true
 	SleepFade.run(feyre, at_dark, woke)
 	return true

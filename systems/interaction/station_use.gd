@@ -11,8 +11,9 @@
 ##   tend     binds her hurts with the supplies (heals her, draws out venom);
 ##            lines: tended; alt_lines: nothing needs mending
 ##   sleep    evening to morning, or a nap by day (`minutes`); calls
-##            VitalsState.rest(); lines: a fitful night; alt_lines: a peaceful
-##            night (phases in `rested_phases`); day_lines: the nap
+##            VitalsState.rest(): every night leaves her Well rested (the
+##            user, 2026-11-24), a nap doesn't; lines: on waking from a night,
+##            peaceful or a nightmare's echo, one at random; day_lines: the nap
 ##   soak     a hot bath for `minutes`: warms her through and eases her;
 ##            lines: a thought, one picked at random
 class_name StationUse
@@ -29,8 +30,6 @@ extends Resource
 @export var day_lines: PackedStringArray = PackedStringArray()
 ## PhaseManager phases it works in; empty = always.
 @export var phases: PackedStringArray = PackedStringArray()
-## sleep: the phases in which a night in this bed leaves her Well rested.
-@export var rested_phases: PackedStringArray = PackedStringArray()
 ## Game minutes that pass (soak, letters, tend, the daytime nap).
 @export var minutes: float = 0.0
 ## arrows: what she takes and how many she leaves with.
