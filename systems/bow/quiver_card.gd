@@ -5,6 +5,7 @@ class_name QuiverCard
 extends Node
 
 const SHOW_SECONDS := 2.2
+const GREW_LINE := "A bigger quiver. It holds %d arrows."
 
 var controller: BowController
 var text: String = ""
@@ -29,6 +30,7 @@ func _ready() -> void:
 	if controller:
 		controller.arrow_type_changed.connect(func(_id: StringName) -> void: show_card())
 	Gameplay.listen(&"story_item_granted", _on_granted)
+	Gameplay.inventory.quiver_grew.connect(_on_quiver_grew)
 
 
 ## An arrow the story hands her (the hunt's one given back) is named as it
@@ -36,6 +38,11 @@ func _ready() -> void:
 func _on_granted(item_id: StringName, _count: int) -> void:
 	if String(item_id).begins_with("arrow_"):
 		show_card.call_deferred(item_id)
+
+
+## A bigger quiver is something she got, so the pickup log says it.
+func _on_quiver_grew(arrows: int) -> void:
+	PickupLog.of(get_tree()).note(GREW_LINE % arrows)
 
 
 ## Shows the nocked arrow and its count, or those of `item_id` when given.

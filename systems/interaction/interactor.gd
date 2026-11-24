@@ -20,6 +20,11 @@ signal station_used(station_id: StringName)
 const REACH := 2.5
 ## Stuck arrows this close to a carcass come back when it is harvested.
 const CARCASS_ARROWS := 2.0
+## Each further arrow pulled in one press chimes this much higher, up to COMBO_MAX steps.
+const COMBO_PITCH := 0.06
+const COMBO_MAX := 8
+## Her thought when a steeped arrow comes back as a plain one.
+const SPENT_LINE := "The steeping's spent, but the shaft is good."
 const DRESSING_STATIONS: Array[StringName] = [&"wardrobe", &"dressing_mirror"]
 const DRESSING_ROOM := preload("res://ui/dressing_room/dressing_room.gd")
 const PAINTING_UI := preload("res://ui/studio/studio_ui.gd")
@@ -35,6 +40,7 @@ const COLLECTION_UI := preload("res://ui/collection_book/collection_book_ui.gd")
 const ORDER: Array[StringName] = [&"arrow", &"carcass", &"spot", &"field", &"station"]
 ## Her "no room" line waits this long before it is said again (ms).
 const NO_ROOM_GAP_MS := 4000
+var _spent_ms: int = -NO_ROOM_GAP_MS
 const NO_ROOM_LINES := {
 	Inventory.QUIVER: "My quiver's full.",
 	Inventory.BOWS: "I can't carry another bow.",
@@ -109,7 +115,7 @@ func interact() -> bool:
 		return true
 	match t.kind:
 		&"arrow":
-			return _collect_arrow(t.node)
+			return _collect_arrows(t.node)
 		&"carcass":
 			return _skin(t.node)
 		&"spot":
@@ -137,7 +143,38 @@ func pick_up_arrow() -> bool:
 	if not t.fits:
 		_no_room(t.item)
 		return true
-	return _collect_arrow(t.node)
+	return _collect_arrows(t.node)
+
+
+## Pulls the arrow, and with it every other arrow stuck in the same body
+## (bow design §8.3), each chime a little higher than the last. A full quiver
+## stops it there and says so.
+func _collect_arrows(node: Node) -> bool:
+	var body := _struck_body(node)
+	if not _collect_arrow(node):
+		return false
+	if body == null:
+		return true
+	var pulled := 1
+	for a in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
+		if a == node or not body.is_ancestor_of(a):
+			continue
+		if Gameplay.inventory.room_for(_arrow_item(a)) == 0:
+			_no_room(_arrow_item(a))
+			break
+		_collect_arrow(a, pulled)
+		pulled += 1
+	return true
+
+
+## The creature (alive or a carcass) an arrow is stuck in, or null.
+func _struck_body(node: Node) -> Node:
+	var up := node.get_parent()
+	while up != null:
+		if up is Creature or up.is_in_group(&"harvestable"):
+			return up
+		up = up.get_parent()
+	return null
 
 
 ## What E would do now: {"kind", "node", "verb", "fits", "item", ...}, or {}.
@@ -202,11 +239,17 @@ func _target_of(kind: StringName) -> Dictionary:
 	return {}
 
 
-func _collect_arrow(node: Node) -> bool:
+## `nth` is how many she has already pulled in this one press (0 for the first).
+func _collect_arrow(node: Node, nth: int = 0) -> bool:
 	var item := _arrow_item(node)
 	if Gameplay.inventory.add(item, 1) == 0:
 		return false
-	SoundDirector.cue(&"arrow_retrieve", (node as Node3D).global_position if node is Node3D else Vector3.INF)
+	if (node as Arrow) and (node as Arrow).data and (node as Arrow).data.steeped:
+		_spent()
+	var chime := SoundDirector.current.play(&"arrow_retrieve",
+			(node as Node3D).global_position if node is Node3D else Vector3.INF) if SoundDirector.current else null
+	if chime and nth > 0:
+		chime.set(&"pitch_scale", float(chime.get(&"pitch_scale")) * (1.0 + COMBO_PITCH * mini(nth, COMBO_MAX)))
 	node.remove_from_group(Arrow.STUCK_GROUP)
 	node.queue_free()
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())
@@ -216,12 +259,15 @@ func _collect_arrow(node: Node) -> bool:
 
 func _skin(carcass: Node3D) -> bool:
 	var got := false
+	var pulled := 0
 	for entry: Dictionary in carcass.harvest():
 		got = _take(StringName(entry.get("item_id", &"")), int(entry.get("qty", 1)), null) or got
 	# Skinning it, she pulls her arrows out of it too, so none leave with the body.
 	for a in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
 		if a is Node3D and (a as Node3D).global_position.distance_to(carcass.global_position) <= CARCASS_ARROWS:
-			got = _collect_arrow(a) or got
+			if _collect_arrow(a, pulled):
+				pulled += 1
+				got = true
 	return got
 
 
@@ -293,9 +339,18 @@ func _no_room(item: StringName) -> void:
 	PickupLog.of(get_tree()).note(NO_ROOM_LINES.get(Gameplay.inventory.container_for(item), NO_ROOM_LINES[Inventory.SATCHEL]))
 
 
+## A steeped arrow came back plain: the log says why, once in a few seconds.
+func _spent() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _spent_ms < NO_ROOM_GAP_MS or not is_inside_tree():
+		return
+	_spent_ms = now
+	PickupLog.of(get_tree()).note(SPENT_LINE)
+
+
 func _arrow_item(node: Node) -> StringName:
 	var arrow := node as Arrow
-	return arrow.data.item_id if arrow and arrow.data else &"arrow_wood"
+	return arrow.data.retrieved_item() if arrow and arrow.data else &"arrow_wood"
 
 
 func _item_name(id: StringName, fallback: String) -> String:

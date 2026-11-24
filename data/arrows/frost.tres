@@ -16,3 +16,4 @@ damage = 0.8
 effect = &"frost"
 shaft_color = Color(0.549, 0.416, 0.271, 1)
 fletching_color = Color(0.655, 0.847, 0.949, 1)
+steeped = true

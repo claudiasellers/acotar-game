@@ -387,7 +387,9 @@ func camera_rise() -> float:
 
 func _build_components() -> void:
 	CrouchMotor.ensure_action()
+	QUIVER_LOADOUTS.carry(Gameplay.inventory, PhaseManager.current_phase)
 	QUIVER_LOADOUTS.fill(Gameplay.inventory, PhaseManager.current_phase)
+	Gameplay.listen(&"phase_changed", _on_phase_changed)
 	Gameplay.register_save_providers()
 	element_state = ElementState.new()
 	element_state.name = "ElementState"
@@ -490,3 +492,9 @@ func _build_camera() -> void:
 	camera_control = FeyreCamera.new(self)
 	_camera_rig = camera_control.rig
 	camera = camera_control.camera
+
+
+## A new phase can bring a bigger quiver (the stableboy's, the armoury's).
+func _on_phase_changed(_from: StringName, to: StringName) -> void:
+	QUIVER_LOADOUTS.carry(Gameplay.inventory, to)
+

@@ -13,6 +13,8 @@ signal item_added(item_id: StringName, count: int, container: StringName)
 ## She reached for something and there was no room for it (nothing was taken).
 ## The satchel glyph bumps on it; her thought says so (Interactor).
 signal refused(item_id: StringName, container: StringName)
+## She swapped her quiver for a bigger one that holds `arrows`.
+signal quiver_grew(arrows: int)
 
 const QUIVER := &"quiver"
 const SATCHEL := &"satchel"
@@ -21,13 +23,19 @@ const KEEPSAKES := &"keepsakes"
 const BOWS := &"bows"
 
 ## Weight units each container holds (quiver counts arrows, keepsakes count items).
-const CAPACITY := {QUIVER: 30.0, SATCHEL: 40.0, POUCH: 12.0, KEEPSAKES: 60.0, BOWS: 5.0}
+const CAPACITY := {SATCHEL: 40.0, POUCH: 12.0, KEEPSAKES: 60.0, BOWS: 5.0}
+## Arrows the largest quiver holds (bow design §8.1).
+const FULL_QUIVER := 30
 ## Total carried weight units before Feyre slows down, and the floor.
 const ENCUMBRANCE_START := 30.0
 const ENCUMBRANCE_FULL := 60.0
 const MIN_SPEED_MULTIPLIER := 0.7
 
 var coin: int = 0
+## Arrows her quiver holds: three in her hand in chapter 1, then 10, 20 and 30
+## as she comes by bigger quivers (QuiverLoadouts). 0 until a game says which
+## she carries (a bare inventory: tests, sandboxes), which counts as the full one.
+var quiver_size: int = 0
 ## container -> {item_id: count}
 var _contents: Dictionary = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}, BOWS: {}}
 ## Cooked results: Array of Dictionary (see Chemistry.combine).
@@ -151,7 +159,26 @@ func used(container: StringName) -> float:
 
 
 func free_space(container: StringName) -> float:
-	return float(CAPACITY[container]) - used(container)
+	return capacity(container) - used(container)
+
+
+## What a container holds. The quiver's is the size of the one she carries.
+func capacity(container: StringName) -> float:
+	if container == QUIVER:
+		return float(quiver_size if quiver_size > 0 else FULL_QUIVER)
+	return float(CAPACITY[container])
+
+
+## She has a quiver that holds `arrows`. A smaller one than she carries changes nothing.
+func carry_quiver(arrows: int) -> void:
+	arrows = mini(arrows, FULL_QUIVER)
+	if arrows <= quiver_size:
+		return
+	var first := quiver_size == 0
+	quiver_size = arrows
+	if not first:
+		quiver_grew.emit(arrows)
+	changed.emit()
 
 
 ## Everything carried, in weight units (quiver and keepsakes are light).
@@ -229,11 +256,13 @@ func buy(item_id: StringName, price: int) -> bool:
 # --- Save -------------------------------------------------------------------
 
 func save_state() -> Dictionary:
-	return {"coin": coin, "contents": _contents.duplicate(true), "dishes": dishes.duplicate(true)}
+	return {"coin": coin, "contents": _contents.duplicate(true), "dishes": dishes.duplicate(true),
+		"quiver_size": quiver_size}
 
 
 func load_state(data: Dictionary) -> void:
 	coin = int(data.get("coin", 0))
+	quiver_size = int(data.get("quiver_size", 0))
 	_contents = {QUIVER: {}, SATCHEL: {}, POUCH: {}, KEEPSAKES: {}, BOWS: {}}
 	var saved: Dictionary = data.get("contents", {})
 	for container in saved:
