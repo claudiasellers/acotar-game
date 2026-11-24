@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ItemNotes" format=3]
+
+[ext_resource type="Script" path="res://data/satchel/item_notes.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ing_thornbriar_sap"
+labels = PackedStringArray("dark bead", "thorn chip")
+canon = "X"

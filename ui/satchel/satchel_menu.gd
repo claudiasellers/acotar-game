@@ -18,6 +18,13 @@ const SLOT := 124.0
 const ICON := 96.0
 const STUDY := 250.0
 const STUDY_ICON := 190.0
+## Her two notes beside the study, in study space: where each note's hairline
+## starts (the note sits outside it) and the spot on the picture it ends on.
+const CALLOUTS: Array[Array] = [
+	[Vector2(-18, 46), Vector2(78, 88)],
+	[Vector2(268, 196), Vector2(172, 164)],
+]
+const CALLOUT_WIDTH := 190.0
 
 var bar: QuickBar
 var pocket: StringName = SatchelEntries.ALL
@@ -32,6 +39,8 @@ var _empty: Label
 var _slots: Dictionary = {}
 var _study: Control
 var _study_icon: Control
+var _callouts: Control
+var _notes: Array[Label] = []
 var _detail: VBoxContainer
 var _name: Label
 var _line: Label
@@ -218,6 +227,21 @@ func _build() -> void:
 	_study.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_detail.add_child(_study)
 	_study.add_child(BookKit.wash(STUDY, 0))
+	_callouts = Control.new()
+	_callouts.name = "Callouts"
+	_callouts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_callouts.z_index = 1
+	_callouts.draw.connect(_draw_callouts)
+	_study.add_child(_callouts)
+	for i in CALLOUTS.size():
+		var note := BookKit.label("", &"SatchelWhere")
+		note.name = "Note%d" % i
+		note.size = Vector2(CALLOUT_WIDTH, 28)
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT if i == 0 else HORIZONTAL_ALIGNMENT_LEFT
+		var from: Vector2 = CALLOUTS[i][0]
+		note.position = from + Vector2(-CALLOUT_WIDTH - 8.0 if i == 0 else 8.0, -16.0)
+		_callouts.add_child(note)
+		_notes.append(note)
 	_name = BookKit.label("", &"SatchelHeading", true)
 	_detail.add_child(_name)
 	_detail.add_child(HSeparator.new())
@@ -380,6 +404,10 @@ func _show_detail() -> void:
 	_study_icon.position = Vector2.ONE * (STUDY - STUDY_ICON) * 0.5
 	_study.add_child(_study_icon)
 	(_study.get_child(0) as CanvasItem).modulate = JournalTheme.wash(hash(String(e.id)))
+	var written := ItemNotes.of(e.id)
+	for i in _notes.size():
+		_notes[i].text = written.labels[i] if written and i < written.labels.size() else ""
+	_callouts.queue_redraw()
 	_name.text = e.name
 	_line.text = e.description
 	_where.text = where_text(item)
@@ -403,6 +431,18 @@ func _show_detail() -> void:
 	_pin_row.visible = SatchelUse.can_pin(selected_id)
 	for i in _pin_buttons.size():
 		_pin_buttons[i].set_pressed_no_signal(bar.entry(i) == selected_id)
+
+
+## A hairline from each written note to the part of the picture it names.
+func _draw_callouts() -> void:
+	var ink := Color(JournalTheme.color(&"ink_soft"), 0.75)
+	for i in _notes.size():
+		if _notes[i].text == "":
+			continue
+		var from: Vector2 = CALLOUTS[i][0]
+		var to: Vector2 = CALLOUTS[i][1]
+		_callouts.draw_line(from, to, ink, 1.2, true)
+		_callouts.draw_circle(to, 2.5, ink, true, -1.0, true)
 
 
 ## Where and when it grows, from the catalogue: "The western fells, in
