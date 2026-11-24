@@ -7,7 +7,7 @@ extends GutTest
 
 const GRADES := "res://world/shared/grades/"
 ## Closed rooms use a flat ambient of their own (no GI, T117).
-const INTERIOR_GRADES: Array[StringName] = [&"manor_interior"]
+const INTERIOR_GRADES: Array[StringName] = [&"manor_interior", &"manor_interior_night"]
 
 
 func test_outdoor_grades_take_their_ambient_from_the_sky() -> void:
