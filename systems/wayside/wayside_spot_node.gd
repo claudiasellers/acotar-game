@@ -58,7 +58,7 @@ func complete(value: Variant = true, line_override: String = "") -> PackedString
 	Wayside.mark_found(spot.id, value)
 	var text := line_override if line_override != "" else spot.line
 	if text != "" and is_inside_tree():
-		FindCard.note(get_tree(), text)
+		PickupLog.of(get_tree()).note(text)
 	var given := give(spot.items)
 	var sketch: String = spot.param("sketch", "")
 	if sketch != "":

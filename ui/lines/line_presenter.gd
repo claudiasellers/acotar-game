@@ -63,6 +63,9 @@ const MIDDLE := Vector2(0.36, 0.5)
 const PAGE_AT := 0.46
 ## The widest a line's text runs before it wraps, in px.
 const TEXT_WIDTH := 860.0
+## A wrapped line's rows are this much wider than an even share of its words,
+## so a long word at a row's end does not push the line onto one row more.
+const BALANCE := 1.08
 const WHORL := 26.0
 ## Voice -> where it stands, its sheet (a PanelContainer variation) and its
 ## type (a Label variation); then what it wears and how it moves: the
@@ -351,10 +354,13 @@ class Stand:
 		whorl.ink = JournalTheme.color(&"line")
 		text_label.text = text
 		text_label.visible_ratio = 0.0 if _row.has("written") else 1.0
-		# A short line's sheet is as wide as its words; a long one wraps.
+		# A short line's sheet is as wide as its words; a long one wraps into
+		# rows of about the same length, so no last row is one word alone.
 		var words := text_label.get_theme_font(&"font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 				text_label.get_theme_font_size(&"font_size")).x
-		text_label.custom_minimum_size.x = minf(ceilf(words) + 2.0, _row.get("width", TEXT_WIDTH))
+		var widest: float = _row.get("width", TEXT_WIDTH)
+		var rows := maxf(1.0, ceilf(words / widest))
+		text_label.custom_minimum_size.x = minf(ceilf(words / rows * (1.0 if rows == 1.0 else BALANCE)) + 2.0, widest)
 		showing = text
 		_t = 0.0
 		_left = seconds if seconds > 0.0 else LinePresenter.reading_time(text) + LinePresenter.writing_time(in_voice, text)

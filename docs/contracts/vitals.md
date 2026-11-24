@@ -148,6 +148,8 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | `cold`, `hunger` (gauges) | always listed: magnitude = BodyState.cold / hunger, `stage` 0 calm, 1 uneasy, 2 danger (`StatusRules.stage`; cold 0.4/0.7, hunger 0.5/0.9) | live | warmth, food |
 | `stuffed` | timed, after a big meal | 3 min | — |
 
+Every tag's player-facing name and line live in `StatusRules.INFO` (`title(tag)`, `blurb(tag)`): the HUD teaches each chip once with it and names it on hover, and the Wardrobe stats page reads the same words.
+
 At most 3 distinct brew-effect tags are active at once; a fourth replaces the one with the least time left (venom, drowsy, roar_shake, well_rested and the hunger states don't use slots).
 
 Hostiles send only `venom`, `drowsy` and `roar_shake` (plus `revel` on creatures, which is theirs). A new tag is a contract change.

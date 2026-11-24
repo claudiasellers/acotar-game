@@ -1,6 +1,7 @@
 ## The dressing room, on the wardrobe page of Feyre's journal: the left sheet
 ## is cut away into an arched mirror she stands in, and the wardrobe hangs on
-## the right sheet. Pieces are grouped by garment (one card per gown, a row of
+## the right sheet, beside "How I am" (StatusPage): her health, stamina and
+## what is on her now. Pieces are grouped by garment (one card per gown, a row of
 ## colour swatches for its variants) and by category. Every change twirls
 ## her, sparkles and chimes while the game stays paused. Drag the mirror, or
 ## A / D, to turn her. Opened by DressingRoom.open().
@@ -43,7 +44,7 @@ const REMOVABLE: Array[StringName] = [&"outer", &"head", &"neck", &"mask", &"ear
 ## Tab -> how close the mirror comes: 1 = her face, 0 = full length.
 const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55, "Masks": 0.8}
 ## What she can change from her satchel, out in the world.
-const SATCHEL_TABS: Array[String] = ["Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
+const SATCHEL_TABS: Array[String] = [StatusPage.TAB, "Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
 const COLUMNS := 3
 const THUMB := 104.0
 const SWATCH := 30.0
@@ -144,8 +145,12 @@ func _ready() -> void:
 	for sw in _swatches:
 		if start == null and sw.is_visible_in_tree() and sw.button_pressed:
 			start = sw
-	if start == null and _swatches.size() > 0:
-		start = _swatches[0]
+	for sw in _swatches:
+		if start == null and sw.is_visible_in_tree():
+			start = sw
+	# A page with nothing to wear (how she is): the tabs take the focus.
+	if start == null:
+		start = _tab_row.get_child(tabs.current_tab) as Button
 	if start:
 		start.grab_focus.call_deferred()
 
@@ -342,6 +347,8 @@ func _build() -> void:
 		tabs.add_child(_makeup_tab())
 		names = ["Crowns", "Jewellery", "Masks"]
 	elif from_satchel:
+		# Out in the world the page opens on how she is.
+		tabs.add_child(StatusPage.of(feyre))
 		names = SATCHEL_TABS.filter(func(n: String) -> bool: return n != "Hair")
 	for n in names:
 		var here: Array[WardrobePiece] = owned.filter(func(p: WardrobePiece) -> bool: return category_of(p) == n)
@@ -355,12 +362,15 @@ func _build() -> void:
 	elif not mirror_only:
 		tabs.add_child(_hair_tab())
 		tabs.add_child(_makeup_tab())
+		tabs.add_child(StatusPage.of(feyre))
+	# One of the row is always down, and the pad can walk it.
+	var group := ButtonGroup.new()
 	for i in tabs.get_tab_count():
 		var t := Button.new()
+		t.button_group = group
 		t.text = String(tabs.get_tab_control(i).name)
 		t.theme_type_variation = &"SatchelTab"
 		t.toggle_mode = true
-		t.focus_mode = Control.FOCUS_NONE
 		var index := i
 		t.pressed.connect(func() -> void: tabs.current_tab = index)
 		_tab_row.add_child(t)
@@ -497,14 +507,10 @@ func _show(p: WardrobePiece, card: Control, preview: bool = true) -> void:
 		Icons.show_outfit(thumb, p)
 
 
-## The "New" pin on a card she hasn't looked at yet; it bounces in.
+## The NEW ribbon on a card she hasn't looked at yet; it bounces in.
 func _new_ribbon() -> Control:
-	var pill := PanelContainer.new()
+	var pill := BookKit.new_badge()
 	pill.name = "NewRibbon"
-	pill.theme_type_variation = &"SatchelChip"
-	var word := _label("New", &"SatchelPin")
-	word.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
-	pill.add_child(word)
 	pill.ready.connect(func() -> void:
 		pill.pivot_offset = pill.size * 0.5
 		Juice.bounce_control(pill, 0.3))
@@ -646,6 +652,8 @@ func _tab_changed(index: int) -> void:
 	for i in _tab_row.get_child_count():
 		(_tab_row.get_child(i) as Button).set_pressed_no_signal(i == index)
 	var tab := tabs.get_tab_control(index)
+	if tab is StatusPage:
+		about.text = ""
 	var face: float = CLOSE_UPS.get(String(tab.name), 0.0) if tab else 0.0
 	if _frame_tween and _frame_tween.is_valid():
 		_frame_tween.kill()
