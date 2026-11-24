@@ -150,6 +150,7 @@ func _stick(body: Node) -> void:
 	add_to_group(STUCK_GROUP)
 	if body is Node3D and is_instance_valid(body):
 		reparent(body, true)
+	ArrowGlimmer.attach(self, body)
 
 
 func _face(direction: Vector3) -> void:
