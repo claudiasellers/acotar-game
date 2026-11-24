@@ -21,6 +21,8 @@ var tile_region: NavigationRegion3D
 var tile_centre := Vector3.INF
 var _sources: Dictionary = {}  # region id -> NavigationMeshSourceGeometryData3D
 var _baking := false
+## The tile bake in flight: bake()'s job, [WorkerThreadPool task id], or [-1].
+var _bake_job: Array = [-1]
 
 
 ## A walker-sized navmesh (people, wolves, the beast squeezes through doors).
@@ -61,8 +63,16 @@ static func parse(root: Node, aabb: AABB = AABB()) -> NavigationMeshSourceGeomet
 
 
 ## Bakes `region` from `source` inside `aabb`; synchronous unless `threaded`.
+## Returns the job, [WorkerThreadPool task id] while a threaded bake may still
+## run, [-1] once it is claimed. join() it before the engine can shut down.
+##
+## The threaded bake runs on a pool task of ours, not the navigation server's
+## bake_from_source_geometry_data_async: that one can't be waited for (it only
+## reports done on a main-thread sync, a frame later), and one still on the
+## server's thread at quit aborted the process in the engine's shutdown with
+## "recursive_mutex lock failed: Invalid argument" (T146).
 static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometryData3D, aabb: AABB,
-		threaded: bool = false, done: Callable = Callable()) -> void:
+		threaded: bool = false, done: Callable = Callable()) -> Array:
 	var nm := make_mesh(aabb)
 	if not threaded:
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
@@ -70,22 +80,36 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 		region.navigation_mesh = nm
 		if done.is_valid():
 			done.call()
-		return
-	# The callback may come from the bake thread: hand the result to the main thread.
+		return [-1]
+	var job: Array = [-1]
+	# The bake runs on a pool thread: hand the result to the main thread.
 	# Hold the region weakly: a lambda capturing a freed node logs "Lambda capture
 	# at index 0 was freed" when the scene is freed before the bake lands (T110).
 	var region_ref: WeakRef = weakref(region)
 	var land := func() -> void:
+		NavBaker.join(job)
 		var r := region_ref.get_ref() as NavigationRegion3D
 		if r != null:
 			r.navigation_mesh = nm
 		if done.is_valid():
 			done.call()
-	# Clean the mesh here, where the bake finished (it touches only `nm`), so the
-	# main thread only assigns it.
-	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void:
+	# Clean the mesh on the same thread (it touches only `nm`), so the main
+	# thread only assigns it.
+	job[0] = WorkerThreadPool.add_task(func() -> void:
+		NavigationServer3D.bake_from_source_geometry_data(nm, source)
 		NavBaker.drop_overlapping_polygons(nm)
-		land.call_deferred())
+		land.call_deferred(), false, "nav_bake")
+	return job
+
+
+## Waits for a threaded bake() job to finish, once; later calls do nothing.
+## Main thread only.
+static func join(job: Array) -> void:
+	if job.is_empty() or int(job[0]) < 0:
+		return
+	var task := int(job[0])
+	job[0] = -1
+	WorkerThreadPool.wait_for_task_completion(task)
 
 
 ## Recast can leave three polygons on one edge where stepped terrain folds over
@@ -187,6 +211,13 @@ func _ready() -> void:
 	add_child(timer)
 
 
+## Leaving the tree (a scene change, New Game's relaunch, quitting, a test's
+## end): a tile still baking is waited for here, so no bake outlives the game
+## into the engine's shutdown (T146).
+func _exit_tree() -> void:
+	NavBaker.join(_bake_job)
+
+
 func region_unloaded(id: StringName) -> void:
 	_sources.erase(id)
 	tile_centre = Vector3.INF
@@ -250,7 +281,7 @@ func _bake_tile(at: Vector3) -> void:
 	_baking = true
 	tile_centre = at
 	var me: WeakRef = weakref(self)
-	bake(tile_region, source, aabb, true, func() -> void:
+	_bake_job = bake(tile_region, source, aabb, true, func() -> void:
 		var b := me.get_ref() as NavBaker
 		if b != null:
 			b._baking = false)
