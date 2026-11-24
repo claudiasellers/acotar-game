@@ -1,0 +1,4 @@
+from gait-lane
+quality look
+size 1920x1080
+shot gait res://tools/creatures/gait_strip_shot.tscn {out} great_wolf:1.0:stalk great_wolf:1.4 great_wolf:4.5 great_wolf:10.0 lucien:1.6 tamlin:1.6
