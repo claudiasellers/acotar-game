@@ -1,0 +1,3 @@
+from ui-frame
+quality look
+shot notices_spring res://tools/ui/notice_probe.tscn {out} p3_house
