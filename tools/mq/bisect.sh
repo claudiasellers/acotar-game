@@ -9,7 +9,7 @@
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/common.sh"
-out="$1"; shard="$2"; members="$3"
+out="$1"; shard="$2"; members="$3"; kept="${4:-}"
 if [ -n "${MQ_EVENTS:-}" ]; then
 	mq_event() { local k="$1"; shift; printf '%s %s %s\n' "$(mq_now)" "$k" "$*" >> "$MQ_EVENTS"; }
 fi
@@ -18,7 +18,9 @@ deadline=$(( $(date +%s) + budget ))
 slug=$(printf '%s' "$shard" | tr '/: ' '___')
 log="$out/logs/$slug.log"
 
-gave_up() { mq_event FLAKY "$shard could not isolate the leaker ($1); see its log: $log"; exit 0; }
+# The result also goes at the end of the kept log, so one file tells the story.
+note() { [ -n "$kept" ] && [ -f "$kept" ] && printf '\n== bisect: %s\n' "$*" >> "$kept"; return 0; }
+gave_up() { note "could not isolate the leaker ($1)"; mq_event FLAKY "$shard could not isolate the leaker ($1); failing log: ${kept:-$log}"; exit 0; }
 
 # The first test file with a [Failed] line under it.
 victim=""
@@ -73,5 +75,6 @@ while [ "$(echo $cands | wc -w)" -gt 1 ]; do
 	fi
 done
 
-"$here/task.sh" add "Fix test leak: $cands leaks state that breaks $victim when they share an engine (gate shard $shard went red together, green alone). Make $cands clean up after itself (autoloads, statics, globals, scene state), or mark it '# gate: alone'. Shared log: $log" >/dev/null || echo "bisect: could not make the task" >&2
-mq_event FLAKY "$shard leaker $cands breaks $victim"
+"$here/task.sh" add "Fix test leak: $cands leaks state that breaks $victim when they share an engine (gate shard $shard went red together, green alone). Make $cands clean up after itself (autoloads, statics, globals, scene state), or mark it '# gate: alone'. Failing log: ${kept:-$log}" >/dev/null || echo "bisect: could not make the task" >&2
+note "leaker $cands breaks $victim"
+mq_event FLAKY "$shard leaker $cands breaks $victim; failing log: ${kept:-$log}"

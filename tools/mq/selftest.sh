@@ -1147,6 +1147,9 @@ case_flaky_bisect() {
 	done
 	expect "the leaker is named with its victim" grep -qE 'FLAKY shard:1 leaker gut:tests/test_(zl|a).gd breaks gut:tests/test_(a|zl).gd' .git/mq/events.log
 	expect "a follow-up task is made" grep -rq 'leaks state that breaks gut:tests/test_' .git/mq/tasks
+	expect "the failing log is kept under .git/mq/flaky" grep -q 'failing log: .*/\.git/mq/flaky/.*shard_1\.log' .git/mq/events.log
+	expect "the kept log holds the shared failure and the bisect result" grep -q '== bisect: leaker' .git/mq/flaky/*shard_1.log
+	expect "and has a cleanup mark about 14 days out" grep -rq 'flaky/' .git/mq/cleanup/marks
 }
 
 for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean conflict restacked restack_conflict flaky flaky_last \
