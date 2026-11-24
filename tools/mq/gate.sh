@@ -365,7 +365,7 @@ for n in $splits; do
 		kept=$(keep_log "${names[$n]}" "$out/logs/$(slug "${names[$n]}").log")
 		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); members: ${mems[$n]}; failing log: $kept"
 		# Then name the leaker, off to the side: it never holds or fails the gate.
-		mq_detach "$out/bisect.log" /bin/bash "$here/bisect.sh" "$out" "${names[$n]}" "${mems[$n]}" "$kept"
+		mq_detach "$out/bisect.log" /bin/bash "$here/bisect.sh" "$out" "${names[$n]}" "${mems[$n]}" "$kept" "$(git rev-parse HEAD)"
 	fi
 done
 

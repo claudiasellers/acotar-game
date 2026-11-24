@@ -52,9 +52,13 @@ if [ -n "${g:-}" ]; then
 	# leak: the second of test_zl and test_a to run sets off a leak, so it fails in the same engine.
 	if [ -f leak ]; then
 		leaked=0; bad=0
+		# The shape of real GUT output (tools/mq/godot.sh, GUT 9.7.1, colour codes and all),
+		# with an engine error that merely names a script: that is not a header.
+		echo 'ERROR: Failed loading resource: res://ui/other_script.gd (res://ui/other_script.gd:61)'
 		for x in $(echo "$g" | tr , ' '); do
-			echo "$x"
-			case "$x" in *test_zl.gd|*test_a.gd) [ "$leaked" = 1 ] && { echo "  [Failed]:  saw the leak"; bad=1; }; leaked=1 ;; esac
+			printf '\033[4m\n%s\n\033[0m* test_x\n' "$x"
+			case "$x" in *test_zl.gd|*test_a.gd) [ "$leaked" = 1 ] && { printf '\033[31m    [Failed]:  \033[0msaw the leak\n      at line 5\n'; bad=1; }; leaked=1 ;; esac
+			printf '\033[1m1/1 passed.\n\033[0m'
 		done
 		[ "$bad" = 0 ] || exit 1
 	fi
@@ -1146,6 +1150,9 @@ case_flaky_bisect() {
 		perl -e 'select(undef,undef,undef,0.2)'; i=$((i + 1))
 	done
 	expect "the leaker is named with its victim" grep -qE 'FLAKY shard:1 leaker gut:tests/test_(zl|a).gd breaks gut:tests/test_(a|zl).gd' .git/mq/events.log
+	i=0; while [ "$i" -lt 50 ] && [ -n "$(ls .git/mq/bisect 2>/dev/null)" ]; do perl -e 'select(undef,undef,undef,0.2)'; i=$((i + 1)); done
+	expect "the bisect's own worktree is gone afterwards" test -z "$(ls .git/mq/bisect 2>/dev/null)"
+	expect "and git no longer lists it" not grep -q 'mq/bisect' <(git worktree list)
 	expect "a follow-up task is made" grep -rq 'leaks state that breaks gut:tests/test_' .git/mq/tasks
 	expect "the failing log is kept under .git/mq/flaky" grep -q 'failing log: .*/\.git/mq/flaky/.*shard_1\.log' .git/mq/events.log
 	expect "the kept log holds the shared failure and the bisect result" grep -q '== bisect: leaker' .git/mq/flaky/*shard_1.log
