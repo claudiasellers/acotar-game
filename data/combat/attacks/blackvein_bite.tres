@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_fca86"]
+
+[resource]
+script = ExtResource("1_fca86")
+id = &"blackvein_bite"
+family = &"blackvein"
+is_default = true
+status_tag = &"venom"
+status_magnitude = 0.35
+status_seconds = 1.0
+dread_spike = 0.2

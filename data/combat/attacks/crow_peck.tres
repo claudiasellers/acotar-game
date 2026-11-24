@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_tc4s0"]
+
+[resource]
+script = ExtResource("1_tc4s0")
+id = &"crow_peck"
+family = &"crow"
+is_default = true
+damage = 4.0
+damage_kind = &"claw"
+dread_spike = 0.05

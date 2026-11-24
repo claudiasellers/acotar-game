@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_efdms"]
+
+[resource]
+script = ExtResource("1_efdms")
+id = &"martax_charge"
+family = &"martax"
+damage = 35.0
+damage_kind = &"blunt"
+reaction = &"heavy"
+knockback_m = 6.0
+dread_spike = 0.25

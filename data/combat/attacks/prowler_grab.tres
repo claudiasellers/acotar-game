@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_5gm3y"]
+
+[resource]
+script = ExtResource("1_5gm3y")
+id = &"prowler_grab"
+family = &"prowler"
+is_default = true
+damage = 0.0
+damage_kind = &"blunt"
+reaction = &"none"
+dread_spike = 0.3

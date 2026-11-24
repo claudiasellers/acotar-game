@@ -12,6 +12,7 @@ const SECTIONS := {
 	&"invert_x": "camera", &"invert_y": "camera", &"camera_follow": "camera",
 	&"mouse_steers": "camera",
 	&"gentle_mode": "play", &"reduced_effects": "play",
+	&"hud_mode": "play", &"edge_fx": "play", &"hit_marks": "play",
 	&"music_volume": "audio", &"sound_volume": "audio",
 	&"text_size": "ui",
 }
@@ -22,6 +23,8 @@ const DEFAULTS := {
 	## camera only sets which way is "forward" when a direction is pressed.
 	&"mouse_steers": false,
 	&"gentle_mode": false, &"reduced_effects": false,
+	## Feyre's HUD (ui/hud/vitals): HUD_MODES index, EDGE_FX_LEVELS index, hit marks.
+	&"hud_mode": 0, &"edge_fx": 0, &"hit_marks": true,
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
 }
@@ -36,6 +39,8 @@ const WORLD_SUN_MIN_DISTANCE := 150.0
 ## Sensitivity sliders run 0..1 around this scale; 0.5 on the slider is 1.0x.
 const SENSITIVITY_MIN := 0.25
 const SENSITIVITY_MAX := 2.5
+const HUD_MODES: Array[String] = ["Contextual", "Always", "Off"]
+const EDGE_FX_LEVELS: Array[String] = ["Full", "Soft", "Off"]
 const TEXT_SIZES: Array[String] = ["Small", "Medium", "Large", "Largest"]
 const TEXT_SCALES: Array[float] = [0.9, 1.0, 1.15, 1.3]
 const MUSIC_BUS := &"Music"

@@ -23,6 +23,8 @@ var _scheme_buttons: Dictionary = {}
 var _scroll: ScrollContainer
 var _columns: HBoxContainer
 var _text_buttons: Array[Button] = []
+## key -> [Button] for the HUD's choice rows.
+var _choice_buttons: Dictionary = {}
 var _guide_buttons: Dictionary = {}
 var _guide: Script = null
 var _map: Script = null
@@ -156,6 +158,10 @@ func _sync() -> void:
 			(_guide_buttons[m] as Button).set_pressed_no_signal(m == mode)
 	for i in _text_buttons.size():
 		_text_buttons[i].set_pressed_no_signal(i == int(GameSettings.get_value(&"text_size")))
+	for key: StringName in _choice_buttons:
+		var buttons: Array = _choice_buttons[key]
+		for i in buttons.size():
+			(buttons[i] as Button).set_pressed_no_signal(i == int(GameSettings.get_value(key)))
 	_hint.refresh()
 
 
@@ -240,6 +246,13 @@ func _build() -> void:
 	play.add_child(_note("Sprinting lasts twice as long, and she catches\nhigher ledges from any direction."))
 	_check(play, &"reduced_effects", "Reduced effects")
 	play.add_child(_note("No camera shake; softer sparkles and bounces."))
+
+	var hud := _section(right, "Her health and status", PauseStyle.ROSE)
+	_choice(hud, &"hud_mode", GameSettings.HUD_MODES)
+	hud.add_child(_note("Contextual shows health and status only when they change."))
+	_choice(hud, &"edge_fx", GameSettings.EDGE_FX_LEVELS)
+	hud.add_child(_note("Screen-edge frost, fear, venom and hurt."))
+	_check(hud, &"hit_marks", "Show where hits come from")
 
 	var sound := _section(right, "Sound", Color(0.62, 0.90, 0.78))
 	_slider(sound, &"music_volume", "Music volume")
@@ -349,6 +362,23 @@ func _fit_to_screen() -> void:
 ## Notes in the settings columns break lines by hand: a wrapping label reports
 ## its minimum height one word per line until it is laid out, which would
 ## throw off _fit_to_screen.
+## A row of toggle buttons, one per label, writing the chosen index to `key`.
+func _choice(parent: Control, key: StringName, labels: Array[String]) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", 8)
+	parent.add_child(row)
+	var group := ButtonGroup.new()
+	var buttons: Array = []
+	for i in labels.size():
+		var b := _button(labels[i], true)
+		b.button_group = group
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(func() -> void: GameSettings.set_value(key, i))
+		row.add_child(b)
+		buttons.append(b)
+	_choice_buttons[key] = buttons
+
+
 func _note(text: String) -> Label:
 	var l := PauseStyle.note(text)
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF

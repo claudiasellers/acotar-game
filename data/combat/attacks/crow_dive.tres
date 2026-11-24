@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_xfflt"]
+
+[resource]
+script = ExtResource("1_xfflt")
+id = &"crow_dive"
+family = &"crow"
+damage = 8.0
+damage_kind = &"claw"
+knockback_m = 1.0
