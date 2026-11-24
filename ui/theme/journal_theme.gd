@@ -104,16 +104,15 @@ const LABELS := {
 	&"BowText": [20, "body", 700, &"paper"],
 	&"PickupText": [20, "body", 700, &"paper"],
 	&"VitalsFigure": [15, "body", 800, &"paper"],
-	&"NoticeKicker": [14, "body", 800, &"glow"],
-	&"NoticeTitle": [30, "display", 400, &"paper"],
-	&"NoticeBody": [17, "body", 600, &"paper"],
+	&"PickupKicker": [14, "body", 800, &"glow"],
+	&"PickupLine": [17, "body", 600, &"paper"],
 	&"ChapterTitle": [44, "display", 400, &"paper"],
 	&"CoverKicker": [22, "display", 400, &"foil"],
 	&"CoverTitle": [40, "display", 400, &"foil"],
 }
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
-	&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare", &"PickupRow",
+	&"PromptPill", &"BowCard", &"PickupRow",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
 ## An index tab along the top of the book. White, so each wears its own wash.
@@ -123,7 +122,7 @@ const RIBBON_TAB := &"BookRibbon"
 ## Side of a check box and of a slider's knob, in px.
 const CHECK_SIZE := 24
 const KNOB_SIZE := 22
-## How dark the pills that sit on the world are: notices and the bow card.
+## How dark the dark sheets that sit on the world are: the log, the bow card and the tin's name.
 const PILL_DEPTH := 0.88
 ## How dark the shadow under a key prompt is.
 const PROMPT_SHADOW := 0.45
@@ -252,7 +251,7 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
 	# What sits on the world. A key prompt is a slip of her paper with a brass
-	# rim and a shadow under it, so its edge holds on snow; notices and the bow
+	# rim and a shadow under it, so its edge holds on snow; the log and the bow
 	# card are dark pills.
 	var prompt := _pill(c.paper, c.line, 2, Vector2(12, 7))
 	prompt.shadow_color = Color(c.ink, PROMPT_SHADOW)
@@ -261,8 +260,6 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"PromptPill", prompt)
 	t.set_stylebox(&"panel", &"PickupRow", _trail(Color(c.ink, PILL_DEPTH)))
 	t.set_stylebox(&"panel", &"BowCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(18, 8)))
-	t.set_stylebox(&"panel", &"NoticeCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(22, 14), 20))
-	t.set_stylebox(&"panel", &"NoticeRare", _pill(Color(c.ink, PILL_DEPTH), c.glow, 3, Vector2(22, 14), 20))
 
 	for v in BUTTONS:
 		t.set_type_variation(v, &"Button")
@@ -582,7 +579,8 @@ static func _trail(tint: Color) -> StyleBoxTexture:
 	var gradient := Gradient.new()
 	gradient.set_color(0, tint)
 	gradient.set_color(1, Color(tint, 0.0))
-	gradient.set_offset(0, 0.6)
+	# Solid under the words, which stop short of the fade (the right margin).
+	gradient.set_offset(0, 0.82)
 	var tex := GradientTexture2D.new()
 	tex.gradient = gradient
 	tex.width = 64
@@ -590,7 +588,7 @@ static func _trail(tint: Color) -> StyleBoxTexture:
 	var box := StyleBoxTexture.new()
 	box.texture = tex
 	box.content_margin_left = 28
-	box.content_margin_right = 28
+	box.content_margin_right = 64
 	box.content_margin_top = 6
 	box.content_margin_bottom = 6
 	return box

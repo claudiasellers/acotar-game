@@ -137,7 +137,7 @@ func paint_mark() -> void:
 	later.start()
 	Gameplay.sketchbook.add(StringName("whorl_%s" % def.id), "Whorl stones: %s" % WhorlStones.place_label(def))
 	if is_inside_tree():
-		FindCard.note(get_tree(), WhorlStones.mark_line())
+		PickupLog.of(get_tree()).note(WhorlStones.mark_line())
 
 
 func _set_prompt(on: bool) -> void:

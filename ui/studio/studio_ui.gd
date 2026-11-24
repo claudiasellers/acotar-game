@@ -32,7 +32,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 		return
 	var tree := feyre.get_tree()
 	if not StudioDeeds.easel_open():
-		FindCard.note(tree, "A dust sheet over the easel, and over the empty canvases.")
+		PickupLog.of(tree).note("A dust sheet over the easel, and over the empty canvases.")
 		return
 	var s := StudioSession.new(Gameplay.inventory, easel, feyre)
 	_session = s

@@ -213,7 +213,9 @@ func _build_bar() -> void:
 	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bar_root.custom_minimum_size = bar_size()
 	HudLayout.of(get_tree()).place(_bar_root, HudLayout.Zone.STRAP, self)
-	pickups = PickupLog.make(self)
+	# A new scene's HUD starts with an empty log.
+	pickups = PickupLog.of(get_tree())
+	pickups.clear()
 	_tin = PaintTin.new()
 	_tin.position = Vector2(0, CHORD_LIFT)
 	_bar_root.add_child(_tin)

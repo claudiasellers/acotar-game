@@ -6,7 +6,7 @@ extends GutTest
 const VARIATIONS := {
 	&"PanelContainer": [
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
-		&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
+		&"PromptPill", &"BowCard",
 	],
 	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon", &"TitleChoice", &"PageChoice"],
 	&"Label": [

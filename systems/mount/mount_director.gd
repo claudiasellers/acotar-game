@@ -599,10 +599,10 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
-		FindCard.note(get_tree(), HINT)
+		PickupLog.of(get_tree()).note(HINT)
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
-		FindCard.note(get_tree(), TEND_HINT)
+		PickupLog.of(get_tree()).note(TEND_HINT)
 	dismounted.emit()
 
 

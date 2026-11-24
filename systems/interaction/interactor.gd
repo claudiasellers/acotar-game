@@ -57,7 +57,7 @@ func weave_crown() -> StringName:
 	if piece == &"":
 		# What she has, never what is left to find (R2): the recipe is in her
 		# book, on the wardrobe's page.
-		FindCard.note(get_tree(), "Not enough flowers here for a crown.")
+		PickupLog.of(get_tree()).note("Not enough flowers here for a crown.")
 		return &""
 	Juice.burst(feyre, &"outfit")
 	return piece
@@ -212,12 +212,12 @@ func _on_story_item_granted(item_id: StringName, count: int) -> void:
 
 func _on_discovered(entry_id: StringName, tab: StringName) -> void:
 	if is_inside_tree() and not COLLECTION_UI.is_open():
-		FindCard.show_find(get_tree(), entry_id, tab)
+		PickupLog.of(get_tree()).find(entry_id, tab)
 
 
 func _on_reward(reward: CollectionReward) -> void:
 	if is_inside_tree():
-		FindCard.show_reward(get_tree(), reward)
+		PickupLog.of(get_tree()).reward(reward)
 		Juice.burst(feyre, &"unlock")
 
 
