@@ -171,3 +171,21 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL)
 
 	assert_eq(PhaseManager.current_phase, &"p2_grounds")
+
+
+func test_the_hunt_waits_for_a_clear_line_to_the_doe() -> void:
+	var spot := wolf.global_transform * wolf.doe_offset
+	var from := spot + Vector3(0, 0, wolf.start_radius - 8.0)
+	feyre.global_position = from
+	# A fir halfway along her line to the doe.
+	wolf._trees_read = true
+	wolf._trees = [Vector3(spot.x, spot.z + 25.0, 1.7)]
+	assert_false(wolf._player_here(), "inside the radius, but a fir hides the doe's spot")
+	feyre.global_position = from + Vector3(12, 0, 0)
+	assert_true(wolf._player_here(), "a few steps aside she sees it")
+	feyre.global_position = spot + Vector3(0, 0, wolf.sure_radius - 1.0)
+	wolf._trees = [Vector3(spot.x, spot.z + 10.0, 1.7)]
+	assert_true(wolf._player_here(), "on the clearing's own ground it starts whatever stands between")
+	feyre.global_position = spot + Vector3(0, 0, wolf.start_radius + 5.0)
+	wolf._trees = []
+	assert_false(wolf._player_here(), "never from outside the radius")

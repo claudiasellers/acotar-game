@@ -141,7 +141,7 @@ static func rabbit_spot() -> Vector2:
 			# The trail's own direction first, out to a quarter turn either way.
 			var spot := from + ahead.rotated((a + 1) / 2 * (PI / 32.0) * (1.0 if a % 2 == 0 else -1.0)) \
 					* (RABBIT_AHEAD + further)
-			var open := minf(_sight_open(from, spot, obstacles), SIGHT_MARGIN)
+			var open := minf(Act1Wayfinding.sight_open(from, spot, obstacles), SIGHT_MARGIN)
 			var score := open + (SIGHT_MARGIN if _seen_over_snow(from, spot) >= SEEN_OVER else 0.0)
 			if score > best:
 				best = score
@@ -162,15 +162,6 @@ static func _seen_over_snow(a: Vector2, b: Vector2) -> float:
 		var p := a.lerp(b, t)
 		clear = minf(clear, lerpf(eye, body, t) - WorldHeight.height_at(p.x, p.y))
 	return clear
-
-
-## Metres from the line a to b to the nearest obstacle (Vector3(x, z, radius)).
-static func _sight_open(a: Vector2, b: Vector2, obstacles: Array[Vector3]) -> float:
-	var open := INF
-	for o in obstacles:
-		var at := Vector2(o.x, o.y)
-		open = minf(open, at.distance_to(Geometry2D.get_closest_point_to_segment(at, a, b)) - o.z)
-	return open
 
 
 static func _along_trail(metres: float, side: float) -> Vector2:

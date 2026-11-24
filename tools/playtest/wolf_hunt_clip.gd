@@ -99,6 +99,10 @@ func _enter_hunt() -> WolfKill:
 	if not await _until(func() -> bool: return hunt.running, 20.0):
 		_fail("the hunt never started")
 		return null
+	var spot := hunt.global_transform * hunt.doe_offset
+	var here := Vector2(feyre.global_position.x, feyre.global_position.z)
+	_note("hunt began %.0f m from the doe's spot; her line to it is %.1f m clear of the wood" % [_flat(spot),
+		Act1Wayfinding.sight_open(here, Vector2(spot.x, spot.z), hunt._trees)])
 	_t0 = Time.get_ticks_msec()
 	_rec = true
 	_pass()
