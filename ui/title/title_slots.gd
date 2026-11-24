@@ -101,6 +101,16 @@ func _show_list() -> void:
 	for slot in SaveSystem.SLOTS:
 		_slot_row(slot)
 	add_child(BookKit.spring())
+	if mode == Mode.NEW:
+		var hints := CheckBox.new()
+		hints.name = "KeyHints"
+		hints.text = "Show key hints"
+		hints.focus_mode = Control.FOCUS_ALL
+		hints.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		hints.button_pressed = bool(GameSettings.get_value(&"key_hints"))
+		hints.toggled.connect(func(on: bool) -> void: GameSettings.set_value(&"key_hints", on))
+		add_child(hints)
+		add_child(BookKit.gap(8))
 	var back_button := _button("Back", close)
 	back_button.name = "Back"
 	_focus_first()
