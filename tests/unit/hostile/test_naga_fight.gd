@@ -273,3 +273,11 @@ func test_every_move_has_its_wind_up_on_its_row() -> void:
 	assert_almost_eq(NagaRoamer.windup_of(NagaRoamer.LUNGE_ATTACK), 0.8, 0.001)
 	assert_almost_eq(NagaRoamer.windup_of(NagaRoamer.COIL), 0.6, 0.001)
 	assert_false(FileAccess.get_file_as_string("res://creatures/hostile/naga_roamer.gd").contains("const WINDUP"), "one home: the row")
+
+
+func test_a_naga_on_a_ledge_above_her_cant_reach_her() -> void:
+	her.global_position = Vector3(0, -2, 0)
+	var n := _naga(Vector3(0, 0, -1.2))
+	_run(n, 3.0)
+	assert_true(hits.is_empty(), "2 m of height between them: no claw lands")
+	assert_false(v.is_grabbed())
