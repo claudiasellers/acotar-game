@@ -92,8 +92,10 @@ func _restore_story(data: Dictionary) -> void:
 func _restore_providers(data: Dictionary) -> void:
 	var states: Dictionary = data.get("providers", {})
 	for key in _providers:
-		var provider: Object = _providers[key]
-		if is_instance_valid(provider) and states.has(key):
+		# Check before the typed assignment: a freed provider in an Object
+		# variable is a script error, not a null.
+		if is_instance_valid(_providers[key]) and states.has(key):
+			var provider: Object = _providers[key]
 			provider.load_state(states[key])
 	EventBus.phase_changed.emit(&"", PhaseManager.current_phase)
 
@@ -101,8 +103,10 @@ func _restore_providers(data: Dictionary) -> void:
 func _provider_states() -> Dictionary:
 	var states := {}
 	for key in _providers.keys():
-		var provider: Object = _providers[key]
-		if is_instance_valid(provider):
+		# A provider freed without unregistering (a HUD or Feyre gone with
+		# its scene) is dropped here; check before the typed assignment.
+		if is_instance_valid(_providers[key]):
+			var provider: Object = _providers[key]
 			states[key] = provider.save_state()
 		else:
 			_providers.erase(key)
@@ -122,9 +126,9 @@ func can_autosave() -> bool:
 
 
 func _feyre_placed() -> bool:
-	var placement: Object = _providers.get(PLACEMENT_KEY)
-	if placement == null or not is_instance_valid(placement):
+	if not is_instance_valid(_providers.get(PLACEMENT_KEY)):
 		return false
+	var placement: Object = _providers[PLACEMENT_KEY]
 	return not placement.save_state().is_empty()
 
 
