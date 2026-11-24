@@ -1,7 +1,7 @@
 ## Act I's contextual key prompts (no objectives, no markers; R2): a KeyPrompt
 ## in HudLayout's PROMPT zone that names a key only while it matters.
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
-##   RMB aim, LMB shoot  prey is near or the hunt is on, until her first shot
+##   RMB aim, LMB draw and let go  prey is near or the hunt is on, until her first shot
 ##   E  skin            standing over the great wolf's carcass
 ##   E  sell the pelt   at the fur stall with Andras's pelt
 ##   E  sleep           at the ironwood bed once the pelt is sold, by day
@@ -18,7 +18,7 @@ const REACH := 3.5
 ## Prompt -> its row of [action, what the key does]. No action is words alone.
 const PROMPTS := {
 	&"ash": [[&"cycle_arrow", "ash arrow"]],
-	&"draw": [[&"aim", "hold to aim"], [&"fire", "shoot"]],
+	&"draw": [[&"aim", "hold to aim"], [&"fire", "hold to draw, let go to shoot"]],
 	&"skin": [[&"interact", "skin"]],
 	&"sell": [[&"interact", "sell the pelt"]],
 	&"sleep": [[&"interact", "sleep until night"]],

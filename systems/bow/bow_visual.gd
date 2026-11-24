@@ -10,8 +10,7 @@ extends Node3D
 
 const ArrowModel := preload("res://systems/bow/arrow_model.gd")
 
-## Seconds the bow stays up after Q or F, with no aim held. After a shot it
-## comes straight down (T096).
+## Seconds the bow stays up after Q or F, with no aim held.
 const READY_HOLD := 2.5
 const SWING_SPEED := 6.0
 ## How far (rad) the bow arm may swing from the way she faces while she turns.

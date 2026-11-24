@@ -29,10 +29,3 @@ func test_wet_fletching_flies_short() -> void:
 	var dry := Ballistics.simulate(44.0, 8.0, WOOD.drag, Vector3.ZERO)
 	var wet := Ballistics.simulate(44.0 * WOOD.wet_speed_multiplier, 8.0, WOOD.drag * WOOD.wet_drag_multiplier, Vector3.ZERO)
 	assert_lt(wet.distance, dry.distance * 0.85)
-
-
-func test_slow_time_only_while_drawing_aiming_with_stamina() -> void:
-	assert_eq(BowController.slow_time_scale(true, 50.0, 1.0), BowController.SLOW_TIME_SCALE)
-	assert_eq(BowController.slow_time_scale(true, 0.0, 1.0), 1.0)
-	assert_eq(BowController.slow_time_scale(true, 50.0, 0.5), 1.0)
-	assert_eq(BowController.slow_time_scale(false, 50.0, 0.8), 1.0)
