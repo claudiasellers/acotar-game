@@ -191,13 +191,27 @@ func release(action: StringName) -> void:
 	Input.parse_input_event(event_for(action, false))
 
 
-## A tap: down, `frames` physics frames, up, then one frame for it to land.
-## Physics frames, so a tap always spans a tick _physics_process polls on.
+## Waits until input parsed so far has reached the game and a physics tick has
+## run on it (T139). Input.parse_input_event only buffers: the engine flushes
+## the buffer once per process frame, before that frame's physics ticks. A slow
+## frame (the Spring Court headless) runs many ticks, so counting physics frames
+## alone can press, release and assert before the game ever saw the event.
+## The process frame ends this iteration; the physics frame after it is in a
+## later iteration, so after a flush.
+func settle() -> void:
+	await test.get_tree().process_frame
+	await test.wait_physics_frames(1)
+
+
+## A tap: down, held for at least `frames` physics frames after it lands, up,
+## then settled so the game has seen the release too.
 func press(action: StringName, frames: int = 2) -> void:
 	hold(action)
-	await test.wait_physics_frames(maxi(frames, 1))
+	await settle()
+	if frames > 1:
+		await test.wait_physics_frames(frames - 1)
 	release(action)
-	await test.wait_physics_frames(1)
+	await settle()
 
 
 ## Holds `action` for `frames` physics frames, then lets go.
