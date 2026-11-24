@@ -56,4 +56,7 @@ static func turn_model(f: Feyre, direction: Vector3, camera_yaw: float, delta: f
 	elif direction.length_squared() > 0.01:
 		target_yaw = atan2(-direction.x, -direction.z)
 	var rate := f.turn_speed * (2.0 if moving.length() > 1.0 and not aiming else 1.0)
-	model.rotation.y = lerp_angle(model.rotation.y, target_yaw, minf(rate * delta, 1.0))
+	# With the bow up she turns with the camera on real seconds: Focus slows
+	# the world, not her.
+	var step := TimeScale.real(delta) if aiming else delta
+	model.rotation.y = lerp_angle(model.rotation.y, target_yaw, minf(rate * step, 1.0))

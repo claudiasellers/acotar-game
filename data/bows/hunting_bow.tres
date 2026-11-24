@@ -6,6 +6,7 @@
 script = ExtResource("1_bow")
 id = &"hunting_bow"
 display_name = "Hunting bow"
-nock_time = 0.3
+draw_time = 0.3
 max_speed = 48.0
 sway_degrees = 1.5
+kick_degrees = 0.35

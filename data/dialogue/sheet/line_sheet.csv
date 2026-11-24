@@ -41,6 +41,7 @@ wh_alone,feyre,,Is he alone?,A,yes,scene,wolf_kill.wait,,p0_winter p1_wolf_and_c
 wh_animal,feyre,,Animal. Just an animal.,V,yes,scene,wolf_kill.wait,,p0_winter p1_wolf_and_crossing,"inner voice, telling herself",audio/voice/wh_animal.ogg
 wh_nudge_draw,feyre,,The ash arrow. Three years in my quiver. Now.,A,yes,scene,wolf_kill.nudge_draw,,p0_winter p1_wolf_and_crossing,"inner voice: low, held breath, hunting",audio/voice/wh_nudge_draw.ogg
 wh_nudge_loose,feyre,,Before he ruins the hide. His side.,A,yes,scene,wolf_kill.nudge_loose,,p0_winter p1_wolf_and_crossing,"inner voice: low, held breath, hunting",audio/voice/wh_nudge_loose.ogg
+wh_lost,feyre,,Where is he? Head clear. Breathing steady. Listen.,A,yes,scene,wolf_kill.lost,,p0_winter p1_wolf_and_crossing,"inner voice, barely breathed, talking herself calm",audio/voice/wh_lost.ogg
 wh_wood,feyre,,"Bee stings, to a wolf that size. It has to be the ash.",A,yes,scene,wolf_kill.wood,,p0_winter p1_wolf_and_crossing,"inner voice: low, held breath, hunting",audio/voice/wh_wood.ogg
 wh_miss,feyre,,Missed. I can't afford to miss.,A,yes,scene,wolf_kill.miss,,p0_winter p1_wolf_and_crossing,"inner voice, sharp with herself",audio/voice/wh_miss.ogg
 wh_ash,feyre,,He's looking at me. Like he knows. Just in case... the eye.,A,yes,scene,wolf_kill.ash,,p0_winter p1_wolf_and_crossing,"inner voice, cold, very fast",audio/voice/wh_ash.ogg

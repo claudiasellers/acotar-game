@@ -14,7 +14,7 @@ const STATES := {
 	&"snow_pause": [0.0, 2.4, 0.1, 0.0],
 }
 
-@export var prints: SnowPrints
+@export var prints: TrackLayer
 @export var snowfall_node: Snowfall
 @export var wind: WindDriver
 

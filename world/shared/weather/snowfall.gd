@@ -1,12 +1,12 @@
 ## Falling snow that follows the camera, scaled by the snow_cover grade and
-## SnowPrints.snowfall. Off north of the Wall (petals and sparkles there are
+## TrackLayer.snowfall. Off north of the Wall (petals and sparkles there are
 ## the Spring Court lanes' ambient effects).
 class_name Snowfall
 extends GPUParticles3D
 
 @export var max_amount := 6000
 @export var area := Vector3(60.0, 24.0, 60.0)
-@export var prints: SnowPrints
+@export var prints: TrackLayer
 
 
 func _ready() -> void:

@@ -35,6 +35,9 @@ extends SceneSpace
 @export var creep_max_seconds: float = 16.0
 ## She grazes within this of her spot while he creeps (canon: she never knows).
 @export var doe_graze_radius: float = 2.0
+## The farthest the doe gets from Feyre if her own arrow sends her running
+## wounded (FollowLeash): inside the terrain's collision ring.
+@export var doe_leash: float = 45.0
 
 var doe: Node3D
 var wolf: Node3D
@@ -120,6 +123,8 @@ func _spawn_doe(_space: SceneSpace) -> void:
 	EventBus.story_item_granted.emit(&"arrow_ash", 1)
 	EventBus.weather_requested.emit(&"snow_heavy", 0.0)
 	doe = request_actor(&"doe", _at(doe_offset), StandIns.doe)
+	if doe is Creature and (doe as Creature).leash:
+		(doe as Creature).leash.metres = doe_leash
 
 
 func _spawn_wolf(_space: SceneSpace) -> void:

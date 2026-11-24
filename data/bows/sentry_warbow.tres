@@ -6,7 +6,8 @@
 script = ExtResource("1")
 id = &"sentry_warbow"
 display_name = "Sentry warbow"
-nock_time = 0.55
+draw_time = 0.55
 max_speed = 70.0
 sway_degrees = 1.8
 loudness = 0.7
+kick_degrees = 0.6
