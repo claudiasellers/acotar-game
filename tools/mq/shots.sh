@@ -705,15 +705,24 @@ poll() {
 # it pushed itself (recorded in done/ and still at the commit it pushed).
 prune_results() {
 	[ "$PUSH" = 1 ] || return 0
-	local f key mine cutoff
+	local f key mine cutoff remote_res
 	cutoff=$(($(shots_epoch) - KEEP_DAYS * 86400))
 	[ -f "$S/last_prune" ] && [ $(($(shots_epoch) - $(shots_mtime "$S/last_prune"))) -lt 3600 ] && return 0
 	touch "$S/last_prune"
+	# One listing for the whole prune. A branch already gone from origin (deleted
+	# elsewhere) can't be leased against, so its local refs are dropped without a push.
+	remote_res=$(git ls-remote "$REMOTE" "${SHOTS_RES_PREFIX}*" 2>/dev/null) || return 0
 	for f in "$S"/done/*; do
 		[ -f "$f" ] || continue
 		key=$(basename "$f")
 		[ "$(cut -d' ' -f3 "$f")" -lt "$cutoff" ] 2>/dev/null || continue
 		mine=$(git rev-parse -q --verify "refs/mq/shots/res/$key") || continue
+		if ! printf '%s\n' "$remote_res" | grep -q "[[:space:]]${SHOTS_RES_PREFIX}${key}\$"; then
+			git update-ref -d "refs/mq/shots/res/$key"
+			git update-ref -d "refs/mq/shots/req/$key" 2>/dev/null
+			event "PRUNED shots/res-$key (already gone from $REMOTE)"
+			continue
+		fi
 		if git push -q "$REMOTE" --force-with-lease="${SHOTS_RES_PREFIX}$key:$mine" ":${SHOTS_RES_PREFIX}$key" >>"$S/listener.log" 2>&1; then
 			git update-ref -d "refs/mq/shots/res/$key"
 			git update-ref -d "refs/mq/shots/req/$key" 2>/dev/null
