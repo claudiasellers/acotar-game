@@ -20,6 +20,10 @@ extends Node
 
 signal arrow_type_changed(arrow_item_id: StringName)
 signal bow_changed(bow: BowData)
+## She pressed the bow key: the bow now in her hand, changed or not.
+signal bow_shown(bow: BowData)
+## She tried to make an arrow and couldn't: `why` says what is short, in words.
+signal craft_failed(arrow_item_id: StringName, why: String)
 ## Released too early: the string came down and nothing flew.
 signal let_down
 ## An arrow has seated on the string: on the raise, and again after each
@@ -127,8 +131,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"cycle_bow") and not is_aiming:
 		cycle_bow()
 	elif event.is_action_pressed(&"craft_arrow"):
-		craft_selected()
-		arrow_type_changed.emit(selected)
+		if craft_selected():
+			arrow_type_changed.emit(selected)
 
 
 func _physics_process(delta: float) -> void:
@@ -267,6 +271,12 @@ func _update_focus(real: float, focus_held: bool) -> void:
 		focus_changed.emit(is_focused)
 
 
+## A sidestep keeps the bow up and half the draw (bow design §3).
+func sidestepped() -> void:
+	draw_amount *= tuning.draw_kept_when_sidestepping
+	_held_full = 0.0
+
+
 ## A blow breaks her Focus and costs her half the draw (bow design §5.6).
 func _on_player_hit(_source: StringName, _attack: StringName, _scale: float, _origin: Vector3) -> void:
 	draw_amount *= tuning.draw_kept_when_hit
@@ -391,11 +401,11 @@ func equip_bow(bow_id: StringName) -> bool:
 
 func cycle_bow() -> void:
 	var bows := owned_bows()
-	if bows.size() < 2:
-		return
-	var i := bows.map(func(b: BowData) -> StringName: return b.id).find(bow.id)
-	equip_bow(bows[(i + 1) % bows.size()].id)
-	Juice.burst(feyre, &"pickup")
+	if bows.size() >= 2:
+		var i := bows.map(func(b: BowData) -> StringName: return b.id).find(bow.id)
+		equip_bow(bows[(i + 1) % bows.size()].id)
+		Juice.burst(feyre, &"pickup")
+	bow_shown.emit(bow)
 
 
 ## The next type she has arrows of (`direction` -1 goes back).
@@ -413,12 +423,36 @@ func cycle_arrow(direction: int = 1) -> void:
 ## Crafts one of the selected arrow type if Feyre has the materials.
 func craft_selected() -> bool:
 	var recipe := Crafting.recipe(selected)
-	if recipe == null:
-		return false
-	var made := Crafting.craft(recipe, Gameplay.inventory) > 0
+	var made := recipe != null and Crafting.craft(recipe, Gameplay.inventory) > 0
 	if made:
 		Juice.burst(feyre, &"craft")
+	else:
+		craft_failed.emit(selected, why_not(recipe))
 	return made
+
+
+## Why `recipe` can't be made right now, for the quiver card: "needs 1 shaft,
+## 1 feather", "made at the fletching bench", "no room in the quiver".
+static func why_not(recipe: CraftRecipe) -> String:
+	if recipe == null:
+		return "not something she can make"
+	if recipe.station != &"":
+		return "made at the %s" % String(recipe.station).replace("_", " ")
+	var short := Crafting.missing(recipe, Gameplay.inventory)
+	if short.is_empty():
+		return "no room in the quiver"
+	var parts := PackedStringArray()
+	for key: String in short:
+		parts.append("%d %s" % [int(short[key]), _input_name(key)])
+	return "needs " + ", ".join(parts)
+
+
+## "tag:fletching" -> "fletching"; an item id -> its name, lower case.
+static func _input_name(key: String) -> String:
+	if key.begins_with("tag:"):
+		return key.substr(4).replace("_", " ")
+	var item := ItemCatalog.get_item(StringName(key))
+	return item.display_name.to_lower() if item else key.replace("_", " ")
 
 
 ## Where the muzzle sits right now.

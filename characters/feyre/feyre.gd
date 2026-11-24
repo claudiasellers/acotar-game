@@ -85,6 +85,7 @@ var bow_controller: BowController
 var interactor: Interactor
 ## Strike, V / pad Y: the bow bash or her boot knife (systems/strike).
 var strike: StrikeController
+var hit_stop: HitStop
 var body_state: BodyState
 ## Health, afflictions, dread and ease, knockdown (systems/vitals). Sets max_stamina.
 var vitals: VitalsState
@@ -92,6 +93,7 @@ var element_state: ElementState
 var notice_director: NoticeDirector
 var wardrobe_applier: WardrobeApplier
 var jump_motor := JumpMotor.new()
+var sidestep := SidestepMotor.new()
 ## The hunter's crouch: Left Ctrl / gamepad B, slower and quieter (CrouchMotor).
 var crouch := CrouchMotor.new()
 ## Running total of camera yaw turns the player didn't make (follow-behind,
@@ -149,6 +151,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look(event.relative.x * s, event.relative.y * s)
 	if event.is_action_pressed(&"camera_recenter") and StoryControl.can_look():
 		recenter_camera(deg_to_rad(recenter_max_turn))
+	# With the bow raised the jump key is the sidestep, so no stray jump throws off a shot.
+	if event.is_action_pressed(&"jump") and _bow_raised() and StoryControl.can_move():
+		sidestep.press()
 	if event.is_action_pressed(CrouchMotor.ACTION) and StoryControl.can_move() and not is_mantling:
 		crouch.toggle(is_on_floor())
 	if event.is_action_pressed(&"interact") and StoryControl.can_interact():
@@ -163,6 +168,7 @@ func _process(delta: float) -> void:
 		# mouse is event-based and already is).
 		var s := stick_sensitivity * GameSettings.stick_sensitivity * TimeScale.real(delta) * _aim_look_scale()
 		_look(look.x * s, look.y * s)
+	sidestep.wait(TimeScale.real(delta), hit_stop != null and hit_stop.active())
 	camera_control.update(delta)
 	if _breath:
 		_breath.update(delta)
@@ -183,8 +189,9 @@ func _physics_process(delta: float) -> void:
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
 	# With the bow raised the sprint key is Focus, and she stays down.
+	var raised := _bow_raised()
 	if crouch.crouched and ((Input.is_action_just_pressed(&"sprint") and not is_aiming)
-			or Input.is_action_just_pressed(&"jump")
+			or (Input.is_action_just_pressed(&"jump") and not raised)
 			or not StoryControl.can_move() or (jump_motor.airborne and not is_on_floor())):
 		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
@@ -207,18 +214,28 @@ func _physics_process(delta: float) -> void:
 
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	var can_jump := StoryControl.can_move()
-	var pressed := Input.is_action_just_pressed(&"jump") and can_jump
+	var pressed := Input.is_action_just_pressed(&"jump") and can_jump and not raised
 	if pressed and is_on_floor() and _try_mantle():
 		jump_motor.consume_buffer()
 		return
 	jump_motor.forgiving = _gentle_mode()
 	var jumps_before := jump_motor.jumps_used
 	velocity.y = jump_motor.step(delta, is_on_floor(), velocity.y, pressed,
-			Input.is_action_pressed(&"jump"), can_jump)
+			Input.is_action_pressed(&"jump") and not raised, can_jump)
 	if jump_motor.jumps_used > maxi(jumps_before, 1) and direction != Vector3.ZERO:
 		horizontal = horizontal.lerp(direction * maxf(horizontal.length(), speed), air_jump_redirect)
 
-	horizontal = GroundMotor.horizontal(self, horizontal, direction, speed, sprinting, delta)
+	if sidestep.wanted() and _can_sidestep():
+		_begin_sidestep(direction, yaw)
+	var stepping := sidestep.active
+	var side := sidestep.step(delta)
+	if sidestep.safe_now:
+		vitals.grant_iframes(sidestep.iframes(_gentle_mode()))
+	if stepping:
+		# The step is its whole distance and no more: she comes out of it at her aim walk.
+		horizontal = side if sidestep.active else side.limit_length(speed)
+	else:
+		horizontal = GroundMotor.horizontal(self, horizontal, direction, speed, sprinting, delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
@@ -243,6 +260,7 @@ func recenter_camera(max_turn: float = PI) -> void:
 ## the ledge), zeroes her velocity, and brings the camera and its fade with her.
 func teleport(pos: Vector3) -> void:
 	mantle.cancel()
+	sidestep.cancel()
 	velocity = Vector3.ZERO
 	steer_frame.release()
 	global_position = pos
@@ -314,6 +332,27 @@ func is_running() -> bool:
 
 
 ## Gentle Mode (pause menu setting) makes jumps more forgiving.
+func _bow_raised() -> bool:
+	return is_aiming or is_drawing
+
+
+## On her feet, bow up, free to move, with the breath to pay for it, and not
+## inside a hit-stop (a buffered press runs as the freeze ends).
+func _can_sidestep() -> bool:
+	return _bow_raised() and is_on_floor() and not is_mantling and StoryControl.can_move() \
+			and sidestep.ready() and stamina >= SidestepMotor.STAMINA \
+			and not (vitals and (vitals.is_down or vitals.is_grabbed())) \
+			and not (hit_stop and hit_stop.active())
+
+
+## The way the stick points, or straight back from her aim.
+func _begin_sidestep(direction: Vector3, camera_yaw: float) -> void:
+	sidestep.begin(direction if direction != Vector3.ZERO else Vector3.BACK.rotated(Vector3.UP, camera_yaw))
+	drain_stamina(SidestepMotor.STAMINA)
+	if bow_controller:
+		bow_controller.sidestepped()
+
+
 func _gentle_mode() -> bool:
 	var settings := get_node_or_null(^"/root/GameSettings")
 	return settings != null and bool(settings.get(&"gentle_mode"))
@@ -428,6 +467,11 @@ func _build_components() -> void:
 	strike = StrikeController.new()
 	strike.name = "Strike"
 	add_child(strike)
+	hit_stop = HitStop.new()
+	hit_stop.player = self
+	hit_stop.vitals = vitals
+	hit_stop.strike = strike
+	add_child(hit_stop)
 	_build_breath()
 
 
