@@ -347,7 +347,10 @@ def build_mouth(body, f, arm, z_line, y_line, teeth_rgb=(0.97, 0.95, 0.92), fang
     """Mouth bag, teeth and tongue as one skinned mesh "Mouth".  fangs: extra canine length (m)."""
     old = bpy.data.objects.get("Mouth")
     if old is not None:
+        old_me = old.data
         bpy.data.objects.remove(old, do_unlink=True)
+        if old_me is not None and old_me.users == 0:
+            bpy.data.meshes.remove(old_me)      # else the rebuild is named "Mouth.001" in the glb
     sh, sv = f.sh, f.sv
     hw = mouth_hw(f)
     me = bpy.data.meshes.new("Mouth")

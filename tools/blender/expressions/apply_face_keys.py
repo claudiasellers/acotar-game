@@ -99,7 +99,10 @@ def run(char):
     f, rep = face_keys.add_expression_keys(body)
     riders = []
     for o in bpy.data.objects:
-        if o.type == "MESH" and o not in (body, mouth_obj) and face_keys.transfer_keys(body, f, o):
+        # lashes are handled below; once a first run gives them blink_L they would pass this gate
+        # and pick up every expression key on a re-run
+        if (o.type == "MESH" and o not in (body, mouth_obj) and not o.name.startswith("Lashes")
+                and face_keys.transfer_keys(body, f, o)):
             riders.append(o.name)
     for o in bpy.data.objects:
         # strand lashes (L37, L41) ride the lids: blinks, wide eyes and squints carry them
