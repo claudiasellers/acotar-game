@@ -42,8 +42,7 @@ func after_all() -> void:
 
 
 func before_each() -> void:
-	if not booted:
-		pending("Continue never gave her control")
+	h.require_control(booted, "Continue never gave her control")
 	h.release_all()
 
 

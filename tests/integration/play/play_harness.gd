@@ -72,12 +72,25 @@ func boot_slot(slot: String) -> bool:
 
 
 func _boot() -> bool:
+	# Lets a run prove a failed setup fails (T123) without breaking the project.
+	if OS.get_environment("ACOTAR_PLAY_NO_CONTROL") == "1":
+		return false
 	game = (load(GAME_SCENE) as PackedScene).instantiate() as Node3D
 	test.add_child(game)
 	feyre = game.get(&"feyre") as Feyre
 	if feyre == null:
 		return false
 	return await wait_until(func() -> bool: return has_control(), BOOT_FRAMES)
+
+
+## Setup's verdict, for before_each: if the game never gave her control
+## (stale class cache, a scene that won't load, a boot timeout), the test
+## fails. Never pending: a pending test exits 0, so a broken setup would pass
+## the gate with no asserts at all (T123). Returns `booted`.
+func require_control(booted: bool, why: String = "the game never gave her control") -> bool:
+	if not booted:
+		test.fail_test("%s: setup failed, nothing was played" % why)
+	return booted
 
 
 ## Frees the game scene and puts the singletons back to a clean slate.
