@@ -127,8 +127,10 @@ def _feet(rig, shift=None):
     return {leg: (rig.foot[leg] + shift.get(leg, Vector()), 0.0) for leg in LEGS}
 
 
-def _arms(swing_l, swing_r, bend=0.18, out=0.06):
-    """Arm hang: forward swing per arm, a soft elbow, a little away from the body."""
+def _arms(swing_l, swing_r, bend=0.18, out=-0.03):
+    """Arm hang: forward swing per arm, a soft elbow. The rig binds with its arms
+    some 11 degrees out; `out` (rad) adds to that, so a small negative brings the
+    hands in beside the thighs."""
     return {
         "arm_l": (swing_l, 0.0, out), "arm_r": (swing_r, 0.0, -out),
         "forearm_l": (bend + max(swing_l, 0.0) * 0.6, 0.0, 0.0),

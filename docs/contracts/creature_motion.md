@@ -35,6 +35,26 @@ splice only the animations in:
 A re-export from another Blender build splits the mesh differently; the splice
 keeps every mesh, material and skin byte.
 
+### People: clips without a rebuild
+
+The cast (`characters/<id>/model/<id>.glb`) and the court and village people
+(`creatures/models/people/<id>.gltf`) are sculpted further after their build
+(expression keys, the mouth), so their clips change by splice too. Check the
+repo out a second time, change the clip code there, build there, then here:
+
+- cast and Feyre: `/opt/bpyenv/bin/python tools/blender/cast/refresh_clips.py <fresh_tree> <id> …`
+  (swaps the actions in `<id>.blend`, which the face pass re-exports from, and
+  splices `<id>.glb`);
+- people: `python3 tools/blender/splice_clips.py --rest <fresh_tree>/creatures/models/people/<id>.gltf creatures/models/people/<id>.gltf`
+  (`--rest`: these figures rest in the first frame of their idle, so the rest
+  pose goes with the clip).
+
+Standing arms hang beside the thighs: shoulder to hand is 5 to 8 degrees off
+straight down, set by `lower` in `feyre_anims.relaxed_arms` (cast, court,
+village), `arms` under `idle` in `retarget_moves.POSTURE` (the player's own
+move set) and `out` in `person_rig._arms` (the older fae figures). Values in
+`docs/tuning.md`.
+
 ## Game side (`creatures/anim/creature_animator.gd`)
 
 `Creature._ready` calls `CreatureAnimator.attach(self)`; it returns null for an
