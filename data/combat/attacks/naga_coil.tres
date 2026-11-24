@@ -10,3 +10,4 @@ damage = 0.0
 damage_kind = &"blunt"
 reaction = &"none"
 dread_spike = 0.25
+windup_s = 0.6

@@ -16,8 +16,9 @@ extends Resource
 @export var wet_speed_multiplier: float = 0.92
 ## Chance to break when it hits stone, 0 to 1.
 @export var stone_break_chance: float = 0.35
-## Ash is deadly to fae (lore canon-anchors). Ordinary arrows still hurt them.
-@export var fae_lethal: bool = false
+## Damage against one wood arrow (Creature.resolve_hit): wood 1.0, barbed 1.4,
+## sleep 0.4. Which arrows are lethal to what is the creature's own data
+## (CreatureData.lethal_arrow_ids: ash for fae).
 @export var damage: float = 1.0
 @export var shaft_color: Color = Color(0.55, 0.42, 0.28)
 @export var fletching_color: Color = Color(0.85, 0.82, 0.75)

@@ -60,7 +60,7 @@ func test_bus_declares_every_vitals_signal_with_its_arguments() -> void:
 
 func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
 	assert_gte(AttackTable.count(), 25)
-	assert_eq(AttackTable.resolve(&"naga").id, &"naga_bite", "a family resolves to its default row")
+	assert_eq(AttackTable.resolve(&"naga").id, &"naga_claw", "a family resolves to its default row")
 	assert_eq(AttackTable.resolve(&"martax_roar").status_tag, &"roar_shake")
 	assert_eq(AttackTable.resolve(&"no_such_attack").id, &"generic_hit")
 

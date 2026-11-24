@@ -24,4 +24,10 @@ extends Resource
 ## false: this row can't take her below floor_hp.
 @export var can_knock_down: bool = true
 @export var floor_hp: float = 0.0
+## Seconds from the start of the tell to contact: the one home for a move's
+## wind-up (bestiary §1, health-interactions §3.5 #4). The brain waits this
+## long, the telegraph clip lasts this long, and HF reads it for hit-stop and
+## flinch timing. Floors by reaction: light 0.4, medium 0.55, heavy 0.8, none
+## (grabs and status moves) 0.6. 0 for hazards, which have no tell.
+@export var windup_s: float = 0.0
 @export var canon: String = "X"
