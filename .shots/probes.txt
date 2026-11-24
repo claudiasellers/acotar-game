@@ -1,0 +1,4 @@
+from lane2
+quality look
+shot day res://tools/world_shot.tscn hunting_arrow {out}/day.png
+shot dusk res://tools/world_shot.tscn hunting_arrow_dusk {out}/dusk.png
