@@ -16,6 +16,8 @@ const FPS := 4.0
 const SAVE_SIZE := Vector2i(1280, 720)
 ## The longest she waits for the nudge before drawing anyway.
 const WAIT_FOR_NUDGE := 45.0
+## How far to the side of an animal she rests her view, as a share of its distance.
+const BESIDE := 0.16
 
 var _rec: bool = false
 var _rec_left: float = 0.0
@@ -157,7 +159,9 @@ func _hold_on(node: Callable, until: Callable, seconds: float) -> void:
 			return
 		var n: Node3D = node.call()
 		if is_instance_valid(n):
-			_turn_camera_to(n.global_position + Vector3.UP * 0.9)
+			# A little to the right of it, as a player holds the view: the animal sits beside her, not behind her head.
+			var to := n.global_position - feyre.global_position
+			_turn_camera_to(n.global_position + Vector3.UP * 0.9 + to.cross(Vector3.UP).normalized() * to.length() * BESIDE)
 		await get_tree().physics_frame
 		var before := t
 		t += get_physics_process_delta_time()

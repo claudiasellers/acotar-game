@@ -313,10 +313,21 @@ func test_the_rabbit_wears_a_brown_coat_that_reads_on_snow() -> void:
 	var meshes := hunt.rabbit.find_children("*", "MeshInstance3D", true, false)
 	for mesh: MeshInstance3D in meshes:
 		for i in mesh.get_surface_override_material_count():
-			var mat := mesh.get_active_material(i) as BaseMaterial3D
-			if mat and mat.albedo_color.get_luminance() > 0.45:
+			var albedo: Variant = mesh.get_active_material(i).get(&"albedo_color")
+			assert_true(albedo is Color, "a material whose colour can be read")
+			if albedo is Color and (albedo as Color).get_luminance() > 0.45:
 				pale += 1
 	assert_gt(meshes.size(), 0, "it has a model")
+	# The same on the candy material imported models wear on the GPU.
+	var candy := MeshInstance3D.new()
+	candy.mesh = BoxMesh.new()
+	var worn := CandyMaterial.new()
+	worn.albedo_color = Color(0.93, 0.92, 0.89)
+	candy.mesh.surface_set_material(0, worn)
+	hunt.rabbit.add_child(candy)
+	hunt._brown(hunt.rabbit)
+	assert_lt((candy.get_active_material(0).get(&"albedo_color") as Color).get_luminance(), 0.45, "candy coat browned")
+	assert_almost_eq(worn.albedo_color.r, 0.93, 0.01, "the shared material is left alone")
 	assert_eq(pale, 0, "no pale surface left on it")
 
 
