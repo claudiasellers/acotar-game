@@ -345,7 +345,7 @@ func _make_slot(e: Dictionary) -> Button:
 	var blot := BookKit.wash(SLOT * 0.86, hash(String(e.id)))
 	blot.position = Vector2.ONE * SLOT * 0.07
 	b.add_child(blot)
-	var icon := SatchelIcon.make(e, ICON)
+	var icon := Icons.item(e, ICON)
 	icon.position = Vector2.ONE * (SLOT - ICON) * 0.5
 	b.add_child(icon)
 	var count := BookKit.label("", &"SatchelCount")
@@ -400,7 +400,7 @@ func _show_detail() -> void:
 	var item := e.item as ItemData
 	if _study_icon:
 		_study_icon.queue_free()
-	_study_icon = SatchelIcon.make(e, STUDY_ICON)
+	_study_icon = Icons.item(e, STUDY_ICON)
 	_study_icon.position = Vector2.ONE * (STUDY - STUDY_ICON) * 0.5
 	_study.add_child(_study_icon)
 	(_study.get_child(0) as CanvasItem).modulate = JournalTheme.wash(hash(String(e.id)))

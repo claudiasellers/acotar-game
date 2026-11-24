@@ -1,11 +1,10 @@
-## What each status tag is (buff, debuff or half-buff), how it stacks and where
-## its icon lives (plans/feyre-vitals/plan.md §7, contract §4).
+## What each status tag is (buff, debuff or half-buff) and how it stacks
+## (plans/feyre-vitals/plan.md §7, contract §4). Its picture is
+## Icons.texture(Icons.STATUS, tag).
 class_name StatusRules
 extends RefCounted
 
 enum Kind { BUFF, HALF, DEBUFF }
-
-const ICON_DIR := "res://ui/theme/icons/status/"
 
 ## Debuffs first, then the half-buff, then buffs: the row reads danger first.
 const ORDER: Array[StringName] = [
@@ -34,10 +33,6 @@ static func kind(tag: StringName) -> Kind:
 
 static func is_debuff(tag: StringName) -> bool:
 	return DEBUFFS.has(tag)
-
-
-static func icon_path(tag: StringName) -> String:
-	return ICON_DIR + "%s.webp" % tag
 
 
 static func sort_key(tag: StringName) -> int:

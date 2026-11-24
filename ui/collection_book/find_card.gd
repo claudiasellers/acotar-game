@@ -81,7 +81,7 @@ static func _flush_recipes(tree: SceneTree) -> void:
 		return
 	var first := RecipeUnlocks.get_recipe(ids[0])
 	var card := {"shape": &"bowl", "color": first.color, "title": first.name, "line": RecipeUnlocks.how_to(first),
-		"banner": "Recipe unlocked", "gold": false, "shiny": false, "icon": BrewMenu.icon_for(first.id)}
+		"banner": "Recipe unlocked", "gold": false, "shiny": false, "icon": Icons.texture(Icons.BREWS, first.id)}
 	if ids.size() > 1:
 		var names := PackedStringArray()
 		for id: StringName in ids:

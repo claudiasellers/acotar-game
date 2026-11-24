@@ -143,6 +143,5 @@ func _slot(i: int) -> Vector2:
 
 func _icon(tag: StringName) -> Texture2D:
 	if not _icons.has(tag):
-		var path := StatusRules.icon_path(tag)
-		_icons[tag] = load(path) as Texture2D if ResourceLoader.exists(path) else null
+		_icons[tag] = Icons.texture(Icons.STATUS, tag)
 	return _icons[tag]

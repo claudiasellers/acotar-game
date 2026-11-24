@@ -21,8 +21,6 @@ const ICON := 52.0
 const COLUMNS := 6
 ## The scene-tree name, kept from the M1 panel (tests and tools look for it).
 const NODE_NAME := "HearthPanel"
-## One bottle per brew (tools/chemistry/render_brew_icons.gd).
-const BREW_ICONS := "res://ui/theme/icons/brews/"
 const REVEAL_ICON := 96.0
 ## Effect tag -> the word Feyre senses for it.
 const SENSE := {
@@ -279,7 +277,7 @@ func _refresh() -> void:
 		var item := ItemCatalog.get_item(id)
 		var pair := HBoxContainer.new()
 		pair.add_theme_constant_override(&"separation", 4)
-		pair.add_child(SatchelIcon.make({"id": id, "item": item}, ICON * 0.8))
+		pair.add_child(Icons.item({"id": id, "item": item}, ICON * 0.8))
 		var named := BookKit.label(item.display_name, &"SatchelSmall")
 		named.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		pair.add_child(named)
@@ -331,7 +329,7 @@ func _tile(id: StringName) -> Button:
 	row.offset_right = -6
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(row)
-	var icon := SatchelIcon.make({"id": id, "item": item}, ICON)
+	var icon := Icons.item({"id": id, "item": item}, ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(icon)
 	var count := BookKit.label("×%d" % maxi(left, 0), &"SatchelCount")
@@ -350,7 +348,7 @@ func _refresh_dishes() -> void:
 		var d: Dictionary = inv.dishes[i]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override(&"separation", 10)
-		var tex := icon_for(StringName(d.get("brew", &"")))
+		var tex := Icons.texture(Icons.BREWS, StringName(d.get("brew", &"")))
 		if tex:
 			var icon := TextureRect.new()
 			icon.texture = tex
@@ -395,18 +393,13 @@ func _show_result(r: Dictionary) -> void:
 		_reveal.visible = true
 		_reveal_name.text = String(r.name)
 		_reveal_note.text = "“%s”" % rule.note
-		_reveal_icon.texture = icon_for(rule.id)
+		_reveal_icon.texture = Icons.texture(Icons.BREWS, rule.id)
 		_outcome.text = describe(r)
 		Juice.bounce_control(_reveal, 0.18)
 		Juice.bounce_control(_found.get_parent() as Control, 0.25)
 	else:
 		_reveal.visible = false
 		_outcome.text = "%s. %s" % [r.name, describe(r)]
-
-
-static func icon_for(brew_id: StringName) -> Texture2D:
-	var path := BREW_ICONS + String(brew_id) + ".webp"
-	return load(path) as Texture2D if brew_id != &"" and ResourceLoader.exists(path) else null
 
 
 static func describe(r: Dictionary) -> String:

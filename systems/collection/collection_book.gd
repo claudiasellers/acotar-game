@@ -161,7 +161,7 @@ func entries(tab: StringName) -> Array[Dictionary]:
 			for r in RecipeUnlocks.all():
 				var e := _entry(r.id, r.name, r.color, ("%s %s" % [RecipeUnlocks.how_to(r), r.note]).strip_edges())
 				e.hint = RecipeUnlocks.hint(r)
-				e.icon = BrewMenu.icon_for(r.id) if r.brew else null
+				e.icon = Icons.texture(Icons.BREWS, r.id) if r.brew else null
 				out.append(e)
 		&"truths":
 			for id in truth_ids():

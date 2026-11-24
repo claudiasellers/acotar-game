@@ -184,7 +184,7 @@ func _row(i: int, offer: Dictionary) -> Button:
 	row.add_theme_constant_override(&"separation", 14)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(row)
-	var icon := SatchelIcon.make(offer.entry, ICON)
+	var icon := Icons.item(offer.entry, ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(icon)
 	var title := BookKit.label("%s  ×%d" % [offer.name, offer.count], &"SatchelBody")

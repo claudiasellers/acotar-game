@@ -111,3 +111,22 @@ is worn only by the `LineWhisper`, `LineDread` and `LineFlood` variations (R3:
 horror is never dressed up as the pretty UI) and by what frightens or hurts
 her on the HUD: the hush before the wolf, thorns, ichor, a bad status's pan.
 It is not in `COLORS`, and no page or card wears it.
+
+## Icons
+
+`Icons` (`ui/theme/icons.gd`) is the one lookup from a thing to its picture.
+The icon list is the folder `res://ui/theme/icons/<kind>/`, one `<id>.webp` a
+thing: `Icons.ITEMS` (`items/`), `Icons.OUTFITS` (`wardrobe/`), `Icons.BREWS`
+(`brews/`), `Icons.STATUS` (`status/`, which also holds the bow meter's
+layers). A new thing needs one file there; swapping the whole set touches no
+code.
+
+- `Icons.path(kind, id)` is the file ("" when there is none), `has(kind, id)`
+  and `texture(kind, id)` (null when none).
+- `Icons.item(entry, px)` is a Control for a `SatchelEntries` entry: its
+  picture (filed under `Icons.item_key(id)`: the canonical id, or `dish`),
+  else the collection book's drawn shape in the item's colour.
+- `Icons.outfit(piece, px)` is a holder for a wardrobe piece and
+  `Icons.show_outfit(holder, piece)` changes it.
+- No other script names the icons folder: `tests/unit/ui/test_icons.gd`
+  searches for it.

@@ -173,12 +173,12 @@ func test_statuses_list_danger_first_with_timers() -> void:
 	var steady: Dictionary = v.statuses().filter(func(s: Dictionary) -> bool: return s.tag == &"steady")[0]
 	assert_almost_eq(float(steady.total), 60.0, 0.01)
 	for s in v.statuses():
-		assert_true(ResourceLoader.exists(StatusRules.icon_path(s.tag)), "icon for %s" % s.tag)
+		assert_true(Icons.has(Icons.STATUS, s.tag), "icon for %s" % s.tag)
 
 
 func test_every_status_tag_has_an_icon() -> void:
 	for tag: StringName in StatusRules.ORDER:
-		assert_true(ResourceLoader.exists(StatusRules.icon_path(tag)), String(tag))
+		assert_true(Icons.has(Icons.STATUS, tag), String(tag))
 
 
 func test_knockdown_then_wake_on_the_spot_without_a_rest_point() -> void:

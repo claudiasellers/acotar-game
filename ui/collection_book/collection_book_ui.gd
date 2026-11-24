@@ -70,12 +70,12 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(holder)
 	var picture: Control
-	var item_art := SatchelIcon.path_for(e.id, PICTURE) if e.found else ""
+	var item_art := Icons.texture(Icons.ITEMS, Icons.item_key(e.id)) if e.found else null
 	if e.found and (String(e.image) != "" or e.get("icon") is Texture2D):
 		picture = BookKit.picture(e.icon if e.get("icon") is Texture2D else Gallery.load_texture({"path": e.image}), Vector2(PICTURE, PICTURE))
-	elif item_art != "":
+	elif item_art:
 		holder.add_child(BookKit.wash(PICTURE, hash(String(e.id))))
-		picture = BookKit.picture(load(item_art), Vector2(PICTURE, PICTURE))
+		picture = BookKit.picture(item_art, Vector2(PICTURE, PICTURE))
 	else:
 		picture = ItemIcon.make(e.shape, e.color, not e.found, e.shiny, PICTURE)
 	holder.add_child(picture)

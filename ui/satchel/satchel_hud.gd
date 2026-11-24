@@ -234,7 +234,7 @@ func _refresh() -> void:
 				var item := e.item as ItemData
 				if item:
 					e.icon = item.icon
-			icon = SatchelIcon.make(e, PaintTin.Pan.ICON_PX)
+			icon = Icons.item(e, PaintTin.Pan.ICON_PX)
 		_tin.pans[i].lit = _chord
 		_tin.fill(i, icon, bar.count(i), SLOT_PAD_GLYPHS[i] if pad_active else str(i + 1), hash(String(id)))
 

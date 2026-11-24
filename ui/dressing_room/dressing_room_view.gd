@@ -455,7 +455,7 @@ func _card(fam: Dictionary) -> Control:
 	pic.custom_minimum_size = Vector2(0, THUMB)
 	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(pic)
-	var thumb := WardrobeIcon.make(variants[0], THUMB)
+	var thumb := Icons.outfit(variants[0], THUMB)
 	thumb.name = "Thumb"
 	thumb.set_anchors_preset(Control.PRESET_FULL_RECT)
 	pic.add_child(thumb)
@@ -494,7 +494,7 @@ func _show(p: WardrobePiece, card: Control, preview: bool = true) -> void:
 	about.text = ("%s. %s" % [p.display_name, p.description]).strip_edges() if p.description != "" else p.display_name
 	var thumb := card.get_meta(&"thumb") as Control
 	if thumb and preview:
-		WardrobeIcon.show_piece(thumb, p)
+		Icons.show_outfit(thumb, p)
 
 
 ## The "New" pin on a card she hasn't looked at yet; it bounces in.
@@ -628,7 +628,7 @@ func _refresh() -> void:
 		sw.set_pressed_no_signal(on)
 		if on:
 			var thumb := (sw.get_meta(&"card") as Control).get_meta(&"thumb") as Control
-			WardrobeIcon.show_piece(thumb, WardrobeCatalog.piece(sw.get_meta(&"piece")))
+			Icons.show_outfit(thumb, WardrobeCatalog.piece(sw.get_meta(&"piece")))
 	var mk := Gameplay.wardrobe.makeup()
 	for b in find_children("*", "Button", true, false):
 		if b.has_meta(&"hair"):

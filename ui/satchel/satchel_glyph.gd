@@ -1,9 +1,7 @@
-## A small drawn satchel for the quick bar's badge, in the theme's ink and
-## accent colours (no texture until the UI look lane ships one).
+## A small drawn satchel beside her load on the satchel page, in the theme's
+## ink and accent: the bag bulges as it fills.
 class_name SatchelGlyph
 extends Control
-
-const ICON_PATH := "res://ui/theme/icons/satchel.png"
 
 ## How full she is, 0..1; the drawn bag bulges with it.
 var fill: float = 0.0:
@@ -14,18 +12,9 @@ var fill: float = 0.0:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if ResourceLoader.exists(ICON_PATH):
-		var tex := TextureRect.new()
-		tex.texture = load(ICON_PATH)
-		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tex.set_anchors_preset(Control.PRESET_FULL_RECT)
-		add_child(tex)
 
 
 func _draw() -> void:
-	if get_child_count() > 0:
-		return
 	var ink := JournalTheme.color(&"ink")
 	var accent := JournalTheme.color(&"accent")
 	var w := size.x

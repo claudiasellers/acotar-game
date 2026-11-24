@@ -8,7 +8,6 @@ class_name VitalsStaminaBow
 extends Control
 
 const SIZE := 100.0
-const DIR := "res://ui/theme/icons/status/"
 const PIECES := 5
 ## How far toward grey the lit pieces go when she is winded.
 const WINDED_GREY := 0.45
@@ -43,11 +42,11 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	_string = load(DIR + "hud_bow_string.webp") as Texture2D
-	_front = load(DIR + "hud_bow_front.webp") as Texture2D
+	_string = Icons.texture(Icons.STATUS, &"hud_bow_string")
+	_front = Icons.texture(Icons.STATUS, &"hud_bow_front")
 	for i in PIECES:
-		_lit.append(load(DIR + "hud_bow_piece%d_lit.webp" % i) as Texture2D)
-		_dark.append(load(DIR + "hud_bow_piece%d_dark.webp" % i) as Texture2D)
+		_lit.append(Icons.texture(Icons.STATUS, StringName("hud_bow_piece%d_lit" % i)))
+		_dark.append(Icons.texture(Icons.STATUS, StringName("hud_bow_piece%d_dark" % i)))
 	_player = AudioStreamPlayer.new()
 	_player.volume_db = -10.0
 	add_child(_player)
