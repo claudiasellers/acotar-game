@@ -9,22 +9,16 @@ extends Creature
 
 enum Fight { CHARGE, STRIKE, RECOVER }
 
-## Throat and head hits do this many times an arrow's damage (2 arrows, not 6).
-const THROAT_MULT := 3.0
-## Fraction of body height above which an arrow counts as a throat/head hit.
-const THROAT_HEIGHT := 0.78
 ## How long a smelled trail lets it run past the leash.
 const TRAIL_SECONDS := 6.0
-## A quiet brew this strong (BrewEffects.scent_scale at or under it) breaks the trail.
+## Her scent this thin (Vitals.scent_scale at or under it: a hush draught)
+## breaks the trail.
 const HUSH_SCALE := 0.5
-const FIRE_FLEE_RADIUS := 3.0
-const FIRE_BURN_RADIUS := 1.2
+## Burning ground near it (Creature._step_fire) sends it running this long.
 const FIRE_FLEE_SECONDS := 6.0
-const BURN_DPS := 6.0
 const FROST_SLOW_SECONDS := 10.0
 const LURE_SECONDS := 20.0
 const REPORT_EVERY := 2.0
-const FIRE_SCAN := 0.3
 ## How much of the camp's alert lands on a member's awareness (enough to search).
 const CAMP_ALERT := 0.45
 
@@ -45,15 +39,12 @@ var _fight_left: float = 0.0
 var _trail_left: float = 0.0
 var _flee_left: float = 0.0
 var _flee_from: Vector3 = Vector3.ZERO
-var _burn_left: float = 0.0
 var _lure_at: Vector3 = Vector3.INF
 var _lure_left: float = 0.0
 var _search_at: Vector3 = Vector3.INF
 var _report_left: float = 0.0
-var _fire_scan_left: float = 0.0
 var _last_awareness: float = 0.0
 var _ring_angle: float = 0.0
-var _hit_part_name: StringName = &"body"
 var _dread: DreadField
 
 
@@ -93,11 +84,6 @@ static func trail_holds(seconds_left: float, scent_scale: float) -> bool:
 	return seconds_left > 0.0 and scent_scale > HUSH_SCALE
 
 
-## Damage multiplier for where an arrow struck: `height` is above its feet.
-static func hit_mult(height: float, body_height: float) -> float:
-	return THROAT_MULT if height >= body_height * THROAT_HEIGHT else 1.0
-
-
 func is_on_watch() -> bool:
 	return member_index == 0
 
@@ -109,20 +95,10 @@ func _player() -> Node3D:
 func _think(delta: float) -> void:
 	var player := _player()
 	routine = NagaRoamer.routine_for(Clock.hour())
-	_tune_senses(player)
+	_tune_senses()
 	_amplify_while_wary()
 	_tick_timers(delta, player)
 
-	if _burn_left > 0.0:
-		_burn_left -= delta
-		health -= BURN_DPS * delta
-		if health <= 0.0:
-			die(&"fire")
-			return
-	_fire_scan_left -= delta
-	if _fire_scan_left <= 0.0:
-		_fire_scan_left = FIRE_SCAN
-		_scan_fire()
 	if _flee_left > 0.0:
 		_flee_left -= delta
 		move_direction = Creature.away_from(global_position, _flee_from) * 10.0
@@ -175,13 +151,12 @@ func _think(delta: float) -> void:
 			_routine(delta)
 
 
-## Sight follows the routine and her vitals (a hood, a dark cloak); hearing
-## follows her noise scale (soft boots). Ranges are set fresh each think.
-func _tune_senses(player: Node3D) -> void:
-	var sight := NagaRoamer.sight_mult(routine, is_on_watch())
+## Sight and hearing follow the routine (a basker squints, a sleeper half
+## hears). Her side (crouch, movement, brews, rain) is CreatureSenses' own.
+func _tune_senses() -> void:
 	var hear := 1.0 if routine != &"nest" or is_on_watch() else 0.6
-	senses.sight_range = data.sight_range * sight * HostileVitals.sight_scale(player)
-	senses.hearing_range = data.hearing_range * hear * HostileVitals.noise_scale(player)
+	senses.sight_range = data.sight_range * NagaRoamer.sight_mult(routine, is_on_watch())
+	senses.hearing_range = data.hearing_range * hear
 
 
 ## While wary, any new rise in awareness counts for wary_gain times as much.
@@ -194,7 +169,7 @@ func _amplify_while_wary() -> void:
 
 func _tick_timers(delta: float, player: Node3D) -> void:
 	_trail_left = maxf(_trail_left - delta, 0.0)
-	if player and not NagaRoamer.trail_holds(_trail_left, BrewEffects.scent_scale(player)):
+	if player and not NagaRoamer.trail_holds(_trail_left, Vitals.scent_scale(player)):
 		_trail_left = 0.0
 	_lure_left = maxf(_lure_left - delta, 0.0)
 
@@ -298,64 +273,19 @@ func _go_to(target: Vector3, speed: float, stop_at: float) -> void:
 	move_speed = speed
 
 
-## A burning ElementField cell within 3 m sends it fleeing; within 1.2 m it burns.
-func _scan_fire() -> void:
-	if not is_inside_tree():
-		return
-	var field := ElementField.find(get_tree())
-	if field == null:
-		return
-	if not _any_burning(field, global_position, FIRE_FLEE_RADIUS):
-		return
-	if _any_burning(field, global_position, FIRE_BURN_RADIUS):
-		_burn_left = maxf(_burn_left, FIRE_SCAN * 2.0)
-	# Which side the fire is on: sample four points and run from the hottest.
-	var from := global_position
-	for dir in [Vector3.FORWARD, Vector3.BACK, Vector3.LEFT, Vector3.RIGHT]:
-		var p: Vector3 = global_position + dir * 1.5
-		if _any_burning(field, p, 1.5):
-			from = p
-			break
-	_flee_from = from if from != global_position else global_position - global_basis.z
+## Burning ground or a fire arrow (Creature._step_fire): it runs from the flame.
+func _on_fire_near(from: Vector3) -> void:
+	_flee_from = from
 	_flee_left = FIRE_FLEE_SECONDS
 	_lure_left = 0.0
 
 
-static func _any_burning(field: ElementField, at: Vector3, radius: float) -> bool:
-	for id in field.cells_near(at, radius):
-		if field.is_burning(id):
-			return true
-	return false
-
-
-func on_arrow_hit(arrow: Node3D) -> void:
-	if not alive:
-		return
-	var mult := NagaRoamer.hit_mult(arrow.global_position.y - global_position.y, data.body_height)
-	_hit_part_name = &"throat" if mult > 1.0 else &"body"
-	var arrow_id := Creature.read_arrow_id(arrow)
-	if mult > 1.0 and not mortally_wounded and not (arrow_id in data.lethal_arrow_ids):
-		# The base hit takes one arrow's damage; the throat adds the rest.
-		health = maxf(health - data.arrow_damage * (mult - 1.0), 0.01)
-	super.on_arrow_hit(arrow)
-
-
-func _hit_part(_killing: bool) -> StringName:
-	return _hit_part_name
-
-
-## Frost slows it (Creature slow); a fire arrow in the body sets it burning
-## and running. Sleep, barbs and lures are the base's.
+## Frost slows it (Creature slow). Fire, sleep, barbs and lures are the base's.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 	if not alive:
 		return
-	match effect:
-		&"frost":
-			slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS)
-		&"fire":
-			_burn_left = maxf(_burn_left, 2.0)
-			_flee_from = arrow.global_position
-			_flee_left = FIRE_FLEE_SECONDS
+	if effect == &"frost":
+		slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS)
 	super.on_arrow_effect(effect, arrow)
 
 

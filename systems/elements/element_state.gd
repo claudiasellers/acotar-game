@@ -10,6 +10,11 @@ extends Node
 signal changed
 
 const HEAT_GROUP := &"heat_source"
+## Burning ground (ElementField) this close sets the player alight, unless
+## she's soaked (ignite refuses over 0.6 wet). Health-interactions §2.4.
+const FIELD_FIRE_RADIUS := 0.9
+const FIELD_FIRE_SCAN := 0.25
+const FIELD_FIRE_AMOUNT := 0.5
 
 @export var exposed: bool = true
 ## 0..1 protection from cold (clothing, a blanket).
@@ -22,6 +27,7 @@ var cold: float = 0.0
 var insulation_bonus: float = 0.0
 ## Last heat value this node felt (for readers such as the HUD or a cat).
 var heat: float = 0.0
+var _field_scan_left: float = 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -32,6 +38,25 @@ func _physics_process(delta: float) -> void:
 	var kind := weather.precipitation_kind if weather else &"rain"
 	heat = heat_at(get_tree(), host.global_position) if host else 0.0
 	step(delta, temp, precip if exposed else 0.0, kind, heat)
+	_catch_field_fire(delta, host)
+
+
+## Feyre walking into burning reeds or grass catches fire (the fire attack
+## row in Vitals then hurts her each half second while it burns).
+func _catch_field_fire(delta: float, host: Node3D) -> void:
+	if host == null or not host.is_in_group(&"player"):
+		return
+	_field_scan_left -= delta
+	if _field_scan_left > 0.0:
+		return
+	_field_scan_left = FIELD_FIRE_SCAN
+	var field := ElementField.find(get_tree())
+	if field == null:
+		return
+	for id in field.cells_near(host.global_position, FIELD_FIRE_RADIUS):
+		if field.is_burning(id):
+			ignite(FIELD_FIRE_AMOUNT)
+			return
 
 
 ## Advances the state by `delta` seconds. Pure, so tests can drive it.

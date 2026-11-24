@@ -5,10 +5,10 @@ Owner: the gameplay lane (`systems/`, `data/` except `data/phases/`). Written be
 ## Done means
 
 1. **Bow and arrows**
-   - `ArrowData` resources for wood and ash arrows (drag, wet drag, stone break chance, fae lethality).
+   - `ArrowData` resources for wood and ash arrows (drag, wet drag, stone break chance, damage).
    - Arrows fly with gravity, quadratic drag against the air *relative to the wind* (`Weather.wind_at`), and wet fletching flies measurably short. Unit tests prove: drag shortens range, crosswind drifts the arrow downwind, wet lands shorter than dry.
    - Arrows hitting stone (group `stone` or meta `surface == "stone"`) break by their data's chance (seeded, tested); intact arrows stick and are retrievable as the same arrow type.
-   - Every arrow carries `arrow_id` (property and meta), `data.fae_lethal`.
+   - Every arrow carries `arrow_id` (property and meta). Ash is lethal by the creature's `lethal_arrow_ids`, not by the arrow.
    - Slow time while drawing and aiming, draining stamina; normal time when stamina runs out or the draw ends (tested on the controller logic).
    - Crafting: wood arrow = shaft + fletching feather + arrowhead. Shafts are carved from hazel rods, heads knapped from flint or antler, or bought. The ash arrow is a rare item bought from a travelling peddler (mountain-ash shaft, iron head; Keeper, book-verified), never crafted. Tests prove inputs are consumed and outputs added, and missing inputs fail cleanly.
 2. **Inventory**: weight classes; quiver (arrows by type), satchel, forage pouch, keepsakes, sketchbook; routing by item kind and weight class with overflow; encumbrance as a speed multiplier; coin, buy and sell; save/load round trip. Tested.

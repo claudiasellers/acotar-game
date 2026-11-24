@@ -83,8 +83,20 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
 ## Hits on Feyre (`HostileHits`, static)
 `strike(tree, source_id, attack_id, scale, origin)`: emits
 `EventBus.player_hit(source_id, attack_id, scale, origin)`.
-Senses read `Vitals.sight_scale/noise_scale/scent_scale` through
-`HostileVitals` (neutral 1.0 until `systems/vitals/vitals.gd` exists).
+Senses read `Vitals.sight_scale/noise_scale/scent_scale` directly; speed and
+rain are the senses' own terms, so each counts once.
+
+## Hits on creatures (`Creature.apply_hit`, health-interactions §2.2)
+Every hit (arrow, knife, bow bash, fire) goes through
+`apply_hit(cause, weapon_id, weapon_mult, zone, at)`, which calls the pure
+`Creature.resolve_hit`. Damage is `arrow_damage x weapon_mult x zone`; the
+arrow's `ArrowData.damage` and the bow's speed (`Creature.bow_mult`, capped
+1.3) make up an arrow's `weapon_mult`. `weak_zone_height` marks the top of the
+body as the weak spot (`weak_zone_mult`, default 3). Ash (in
+`lethal_arrow_ids`) counts toward `ash_hits`; reaching it kills, or with
+`lethal_delay` leaves a mortal wound that any hit finishes. `burn_dps` makes a
+creature burn; `fire_fear_radius` makes it flee burning ground
+(`_on_fire_near`).
 
 ## EventBus requests (story/core, R14)
 `site_settled(site_id: StringName)`, `hostile_alerted(site_id: StringName, level: float)`.

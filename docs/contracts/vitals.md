@@ -72,8 +72,8 @@ static func is_hurt_scent(player: Node) -> bool     # health < 0.5: blood on her
 ```
 
 **What they fold in** (hostiles never re-apply these):
-- `sight_scale`: crouch (`CrouchMotor.sight_scale`), movement (still 0.7, walk 1.0, sprint 1.3), light at night (glow draught or held light ×2 vs night families, applied by the hostile with `Vitals.is_lit(player)`), gear perks, imbues.
-- `noise_scale`: crouch (`CrouchMotor.noise_scale`), movement (still 0.0, walk 0.4, run 0.8, sprint 1.0, plus landing spikes), dread > 0.7 adds +0.15 (her ragged breathing), gear perks, imbues. One-off loud events (bow release) keep their own emit path (`bow_released`).
+- `sight_scale`: crouch (`CrouchMotor.sight_scale`), gear perks, imbues. **Not her speed**: `CreatureSenses` scales sight by her speed itself (0.3 still to 1.0 at 4 m/s), so movement counts once (H0, 2026-11-24). Light at night (glow draught or held light ×2 vs night families) is applied by the hostile with `Vitals.is_lit(player)`.
+- `noise_scale`: crouch (`CrouchMotor.noise_scale`), dread > 0.7 adds +0.15 (her ragged breathing), gear perks, imbues. **Not her speed**: `CreatureSenses` makes her steps louder with speed itself. One-off loud events (bow release) keep their own emit path (`bow_released`). Rain (`ElementField.rain` > 0.3) is the senses' too: hearing ×0.7, scent ×0.5.
 - `scent_scale`: `BrewEffects.scent_scale`, wet (×0.6 when ElementState.wet > 0.5), hurt (×1.3), gear perks, imbues.
 - `dread_gain_scale`: ease baseline (×(1 − 0.3·ease)), steadying tea (×0.8), gear perks, imbues.
 - `damage_taken_scale`: Gentle Mode (×0.6), gear and imbue resistances by kind. There is **no flat armour**: resistances exist only for the kinds `thorn`, `fire`, `cold`, `venom`, `fall`. `bite`, `blunt` and `claw` always return 1.0 (×0.6 in Gentle Mode).

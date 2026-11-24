@@ -1,5 +1,5 @@
 ## NagaRoamer pure rules: routine by hour, senses by routine, the scent trail
-## and the hush draught, throat hits, arrows to kill (docs/contracts/hostiles.md).
+## and the hush draught, the throat, arrows to kill (docs/contracts/hostiles.md).
 extends GutTest
 
 const ROAMER_DATA := preload("res://data/creatures/hostile/naga_roamer.tres")
@@ -47,22 +47,34 @@ func test_hush_loses_the_pack_within_twenty_seconds() -> void:
 	assert_lte(t, 20.0, "lost her in %.1f s" % t)
 
 
-func test_throat_hits_count_three_times() -> void:
-	assert_almost_eq(NagaRoamer.hit_mult(1.8, 1.95), 3.0, 0.001)
-	assert_almost_eq(NagaRoamer.hit_mult(1.0, 1.95), 1.0, 0.001)
+func test_the_throat_is_the_top_fifth_and_counts_three_times() -> void:
+	assert_almost_eq(ROAMER_DATA.weak_zone_height, 0.78, 0.001)
+	assert_eq(ROAMER_DATA.weak_zone_name, &"throat")
+	assert_almost_eq(ROAMER_DATA.weak_zone_mult, 3.0, 0.001)
+	var r := Creature.resolve_hit(ROAMER_DATA, ROAMER_DATA.max_health, &"wood", ROAMER_DATA.weak_zone_mult)
+	assert_almost_eq(r.health, ROAMER_DATA.max_health - 24.0, 0.001)
 
 
 func test_six_body_arrows_kill_and_five_do_not() -> void:
 	var hp := ROAMER_DATA.max_health
 	for i in 5:
-		var r := Creature.resolve_arrow(ROAMER_DATA, hp, &"wood")
+		var r := Creature.resolve_hit(ROAMER_DATA, hp, &"wood")
 		assert_false(r.killed, "arrow %d" % (i + 1))
 		hp = r.health
-	assert_true(Creature.resolve_arrow(ROAMER_DATA, hp, &"wood").killed, "the sixth kills")
+	assert_true(Creature.resolve_hit(ROAMER_DATA, hp, &"wood").killed, "the sixth kills")
 
 
-func test_one_ash_arrow_kills() -> void:
-	assert_true(Creature.resolve_arrow(ROAMER_DATA, ROAMER_DATA.max_health, &"ash").killed)
+func test_one_ash_arrow_is_a_mortal_wound_and_any_next_hit_kills() -> void:
+	var r := Creature.resolve_hit(ROAMER_DATA, ROAMER_DATA.max_health, &"ash", 1.5)
+	assert_false(r.killed)
+	assert_true(r.mortal)
+	assert_eq(r.ash_taken, 1)
+	assert_almost_eq(ROAMER_DATA.lethal_delay, 4.0, 0.001)
+	assert_true(Creature.resolve_hit(ROAMER_DATA, r.health, &"wood", 1.0, 1, true).killed)
+
+
+func test_it_burns() -> void:
+	assert_almost_eq(ROAMER_DATA.burn_dps, 6.0, 0.001)
 
 
 func test_roamer_data_is_its_own_and_canon_naga_untouched() -> void:

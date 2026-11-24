@@ -11,6 +11,11 @@ const GROUP := &"creature_senses"
 const WORLD_MASK := 1 << 0
 ## Wind below this (m/s) counts as calm: scent pools around the source.
 const CALM_WIND := 0.4
+## Rain this heavy (ElementField.rain) dulls hearing and washes out scent
+## (health-interactions §2.1).
+const RAIN_AT := 0.3
+const RAIN_HEARING := 0.7
+const RAIN_SCENT := 0.5
 const TICK := 0.2
 
 @export var sight_range: float = 45.0
@@ -74,7 +79,10 @@ func stimulate(kind: StringName, at: Vector3, strength: float) -> void:
 	sensed.emit(kind, at, strength)
 
 
+## Her side of being noticed comes from Vitals (crouch, brews, wet, blood,
+## dread, later gear and imbues); her speed and the weather are read here.
 func _sense_player(player: Node3D, dt: float) -> void:
+	var rain := _raining()
 	var target := player.global_position + Vector3.UP * 1.2
 	var forward := -global_basis.z
 	var speed := 0.0
@@ -87,15 +95,16 @@ func _sense_player(player: Node3D, dt: float) -> void:
 		var closeness := 1.0 - global_position.distance_to(target) / sight_range
 		# Stillness is the hunter's cover: a motionless Feyre is hard to pick out.
 		var motion := 0.3 + 0.7 * clampf(speed / 4.0, 0.0, 1.0)
-		stimulate(&"sight", player.global_position, closeness * motion * dt * 2.5)
+		stimulate(&"sight", player.global_position, closeness * motion * Vitals.sight_scale(player) * dt * 2.5)
 
 	if speed > 0.5:
-		# Walking is ~0.25 loud, sprinting through snow ~0.8.
-		hear(player.global_position, clampf(speed / 10.0, 0.0, 1.0) * dt * 4.0)
+		# Walking is ~0.25 loud, sprinting through snow ~0.8; crouching softens it.
+		var loud := clampf(speed / 10.0, 0.0, 1.0) * Vitals.noise_scale(player) * (RAIN_HEARING if rain else 1.0)
+		hear(player.global_position, loud * dt * 4.0)
 
-	# L62: a quiet brew (lavender, hollow-root) masks her scent.
+	# A quiet brew masks her scent, wet thins it, blood strengthens it, rain washes it.
 	var scent := scent_strength(player.global_position, global_position, wind_at(global_position),
-			scent_range * BrewEffects.scent_scale(player))
+			scent_range * Vitals.scent_scale(player) * (RAIN_SCENT if rain else 1.0))
 	if scent > 0.0:
 		stimulate(&"scent", player.global_position, scent * dt * 1.5)
 
@@ -129,6 +138,13 @@ func _hook_player(player: Node3D) -> void:
 			if arrow.has_signal(&"hit"):
 				arrow.connect(&"hit", func(_c: Node, at: Vector3) -> void:
 					CreatureSenses.emit_noise(tree, at, 0.5)))
+
+
+func _raining() -> bool:
+	if not is_inside_tree():
+		return false
+	var field := ElementField.find(get_tree())
+	return field != null and field.rain > RAIN_AT
 
 
 ## Wind from the systems lane's weather (group "wind_source"), calm otherwise.
