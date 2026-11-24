@@ -128,8 +128,7 @@ func _strike(player: Node3D) -> void:
 	if player == null or global_position.distance_to(player.global_position) > strike_reach + 0.6:
 		return
 	struck_player.emit(self)
-	if EventBus.has_signal(&"player_struck"):
-		EventBus.emit_signal(&"player_struck", creature_id, data.kind, 1.0)
+	EventBus.player_hit.emit(creature_id, data.kind, 1.0, global_position)
 
 
 func _crouch(low: bool) -> void:

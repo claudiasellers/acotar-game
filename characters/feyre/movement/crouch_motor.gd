@@ -66,8 +66,7 @@ func set_crouched(value: bool) -> void:
 		return
 	crouched = value
 	changed.emit(crouched)
-	if EventBus.has_signal(&"player_stance_changed"):
-		EventBus.emit_signal(&"player_stance_changed", crouched)
+	EventBus.player_stance_changed.emit(crouched)
 
 
 ## Advances the eased blend. Call once per frame.

@@ -13,11 +13,8 @@ Not yet built (follow-ups, each its own slice): gear perks and imbues (§2's gea
 ### Inbound: anything that hurts or affects Feyre emits these. Nothing calls Feyre directly.
 
 ```gdscript
-## Legacy, kept for naga.gd: identical to player_hit(source_id, kind, amount, Vector3.INF).
-## `kind` resolves as an attack id; a family kind (&"naga") resolves to that family's default attack.
-signal player_struck(source_id: StringName, kind: StringName, amount: float)
-
-## A hit on Feyre. attack_id names an AttackData row (section 3). scale multiplies the
+## A hit on Feyre. attack_id names an AttackData row (section 3); a family kind
+## (&"naga") resolves to that family's default attack. scale multiplies the
 ## row's damage (1.0 = as authored). origin is the attacker's world position, used for
 ## knockback direction and the HUD hit-direction mark; Vector3.INF = "from in front of her".
 signal player_hit(source_id: StringName, attack_id: StringName, scale: float, origin: Vector3)
@@ -165,4 +162,4 @@ Hostiles send only `venom`, `drowsy` and `roar_shake` (plus `revel` on creatures
 
 ## 6. Contract test
 
-`tests/unit/vitals/test_vitals_contract.gd`: every signal in section 1 exists with these argument counts; `player_struck(&"naga_1", &"naga", 1.0)` takes 22 HP; a hit inside i-frames does nothing; 0 HP emits `player_knocked_down` once; every `Vitals.*` returns neutral with no player.
+`tests/unit/vitals/test_vitals_contract.gd`: every signal in section 1 exists with these argument counts; `player_hit(&"naga_1", &"naga", 1.0, Vector3.INF)` takes 22 HP; a hit inside i-frames does nothing; 0 HP emits `player_knocked_down` once; every `Vitals.*` returns neutral with no player.

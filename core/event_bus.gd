@@ -69,10 +69,8 @@ signal journal_entry_added(entry_id: StringName)
 # Nothing calls Feyre directly: anything that hurts or frightens her emits the
 # inbound signals; the vitals lane announces the outbound ones.
 
-## Legacy, kept for naga.gd: identical to player_hit(source_id, kind, amount, Vector3.INF).
-## `kind` resolves as an attack id; a family kind (&"naga") resolves to that family's default attack.
-signal player_struck(source_id: StringName, kind: StringName, amount: float)
-## A hit on Feyre. attack_id names an AttackData row; scale multiplies its damage.
+## A hit on Feyre. attack_id names an AttackData row (a family kind such as
+## &"naga" resolves to that family's default attack); scale multiplies its damage.
 ## origin is the attacker's world position (Vector3.INF = "from in front of her").
 signal player_hit(source_id: StringName, attack_id: StringName, scale: float, origin: Vector3)
 ## A timed status on Feyre (venom, drowsy, roar_shake...). magnitude 0..1, seconds > 0.
@@ -96,7 +94,7 @@ signal player_mood_changed(dread: float, ease: float)
 ## An item imbue started or ended (seconds_left 0 = ended). item_slot: &"cloak", &"boots"...
 signal player_imbue_changed(item_slot: StringName, imbue_id: StringName, seconds_left: float)
 
-# --- Hostile sites (L75) and crouch: declared so their guarded emits land.
+# --- Hostile sites (L75) and crouch.
 
 ## A hostile site calmed down after an alert.
 signal site_settled(site_id: StringName)

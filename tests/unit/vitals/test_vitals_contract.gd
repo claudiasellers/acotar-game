@@ -7,7 +7,7 @@ extends GutTest
 
 ## signal -> argument count (contract §1, plus the three L75/crouch seams).
 const BUS := {
-	&"player_struck": 3, &"player_hit": 4, &"player_status_applied": 4, &"player_startled": 2,
+	&"player_hit": 4, &"player_status_applied": 4, &"player_startled": 2,
 	&"player_grabbed": 3, &"player_released": 1, &"player_health_changed": 4,
 	&"player_knocked_down": 3, &"player_woke": 2, &"player_status_changed": 3,
 	&"player_mood_changed": 2, &"player_imbue_changed": 3,
@@ -80,8 +80,8 @@ func test_bus_hit_reaches_her() -> void:
 	assert_eq(v.last_hit_origin, Vector3(0, 0, 5))
 
 
-func test_legacy_struck_from_a_naga_takes_its_default_bite() -> void:
-	EventBus.player_struck.emit(&"naga_1", &"naga", 1.0)
+func test_a_family_kind_takes_its_default_attack() -> void:
+	EventBus.player_hit.emit(&"naga_1", &"naga", 1.0, Vector3.INF)
 	assert_almost_eq(v.health, 78.0, 0.01)
 
 

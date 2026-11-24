@@ -3,8 +3,8 @@
 ## "Vitals" (feyre.vitals). Plans: plans/feyre-vitals/plan.md §4–9; interface:
 ## docs/contracts/vitals.md.
 ##
-## Inbound hits arrive only as EventBus signals (player_hit, player_struck,
-## player_status_applied, player_startled, player_grabbed, player_released).
+## Inbound hits arrive only as EventBus signals (player_hit, player_status_applied,
+##, player_startled, player_grabbed, player_released).
 ## The outbound bus signals mirror this node's own signals, which the HUD uses.
 class_name VitalsState
 extends Node
@@ -108,7 +108,6 @@ func _ready() -> void:
 	if player == null:
 		player = get_parent() as Node3D
 	Gameplay.listen(&"player_hit", _on_player_hit)
-	Gameplay.listen(&"player_struck", _on_player_struck)
 	Gameplay.listen(&"player_status_applied", _on_status_applied)
 	Gameplay.listen(&"player_startled", _on_startled)
 	Gameplay.listen(&"player_grabbed", _on_grabbed)
@@ -217,10 +216,6 @@ func statuses() -> Array[Dictionary]:
 
 
 # --- Inbound ---------------------------------------------------------------
-
-func _on_player_struck(source_id: StringName, kind: StringName, amount: float) -> void:
-	_on_player_hit(source_id, kind, amount, Vector3.INF)
-
 
 func _on_player_hit(source_id: StringName, attack_id: StringName, scale: float, origin: Vector3) -> void:
 	take_hit(source_id, AttackTable.resolve(attack_id), scale, origin)
