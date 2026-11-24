@@ -21,7 +21,11 @@
 ## under Feyre's feet, and the strap steps aside while a line is there; in a
 ## film the lane stands on the letterbox instead. The middle is the whisper's,
 ## and a page is held at the centre.
-## Each place holds one line at a time. A line never outlives the scene that
+## Each place holds one line at a time, and no line is ever seen through
+## another: a page and the middle share the centre of the screen, so a line
+## in one takes the other's off at once, and Dread takes every other line off
+## ("alone"). The lane and the middle do stand together (Lucien talking while
+## the Bogge pleads). A line never outlives the scene that
 ## spoke it: it clears when that scene finishes or leaves the tree, on a phase
 ## change and on a load, and it steps aside while a screen pauses play.
 ## No choices, ever (R2). Lives under ScreenStack; reach it with
@@ -50,20 +54,23 @@ const WHORL := 26.0
 ## Voice -> where it stands, its sheet (a PanelContainer variation) and its
 ## type (a Label variation); then what it wears and how it moves: the
 ## speaker's name (and the type it is in), her whorl, a tremble in px, letters
-## written per second, how many fades it takes to leave, a narrower wrap, and
-## whether it is held until she puts it back.
+## written per second, how many fades it takes to leave, a narrower wrap,
+## whether it is held until she puts it back, and whether it stands alone.
 const VOICES := {
 	Voice.SAID: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineSaid", "named": true},
 	Voice.THOUGHT: {"place": Place.LANE, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true},
 	Voice.TOLD: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineTold"},
 	Voice.WHISPER: {"place": Place.MIDDLE, "sheet": &"LineBare", "type": &"LineWhisper", "tremble": 1.6,
 		"linger": 2.0},
-	Voice.DREAD: {"place": Place.LANE, "sheet": &"LineFlood", "type": &"LineDread", "tremble": 0.8, "written": 38.0},
+	Voice.DREAD: {"place": Place.LANE, "sheet": &"LineFlood", "type": &"LineDread", "tremble": 0.8, "written": 38.0,
+		"alone": true},
 	Voice.READ: {"place": Place.PAGE, "sheet": &"LoosePage", "type": &"ReadText", "named": true,
 		"name_type": &"PageSection", "width": 520.0, "held": true},
 }
 ## The key that puts a held page back.
 const PUT_BACK := &"interact"
+## The places that share the centre of the screen.
+const CENTRE: Array[Place] = [Place.MIDDLE, Place.PAGE]
 
 var _stands: Dictionary[Place, Stand] = {}
 
@@ -132,6 +139,9 @@ func say(in_voice: Voice, who: String, text: String, from: Node = null, seconds:
 	var row: Dictionary = VOICES[in_voice]
 	if row.place == Place.LANE:
 		_lay_lane()
+	for place: Place in _stands:
+		if place != row.place and (row.get("alone", false) or (place in CENTRE and row.place in CENTRE)):
+			_stands[place].cut()
 	return _stands[row.place].say(in_voice, who, text, from, seconds)
 
 
@@ -282,6 +292,15 @@ class Stand:
 		showing = ""
 		_left = 0.0
 		_fade_to(0.0, FADE * float(_row.get("linger", 1.0)))
+
+	## Takes the line off with no fade: another line needs the room.
+	func cut() -> void:
+		_set_source(null)
+		showing = ""
+		_left = 0.0
+		if _tween and _tween.is_valid():
+			_tween.kill()
+		modulate.a = 0.0
 
 	func scene_finished(id: StringName) -> void:
 		if _source != null and is_instance_valid(_source) and _source.space_id == id:

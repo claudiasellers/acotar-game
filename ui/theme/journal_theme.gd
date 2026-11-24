@@ -168,6 +168,19 @@ static func color(token: StringName) -> Color:
 	return BOOK[token] if BOOK.has(token) else HORROR[token]
 
 
+## How well `a` reads on `b`: the WCAG contrast ratio of two opaque colours
+## (4.5 is the floor for words, 3 for a rim or a large name).
+static func contrast(a: Color, b: Color) -> float:
+	var la := _luminance(a)
+	var lb := _luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+
+static func _luminance(c: Color) -> float:
+	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
+	return 0.2126 * float(lin.call(c.r)) + 0.7152 * float(lin.call(c.g)) + 0.0722 * float(lin.call(c.b))
+
+
 static func colors(of_act: Act) -> Dictionary:
 	return COLORS[of_act]
 

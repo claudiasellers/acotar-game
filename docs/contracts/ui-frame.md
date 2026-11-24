@@ -168,6 +168,12 @@ it). **The middle** (0.36 to 0.5 of the height) is the whisper's, so a whisper
 and her own thought can be up together. **The page** is held at the centre
 (0.46 of the height) and wraps at 520 px. Lane text wraps at 860 px.
 
+No line is seen through another. The middle and the page share the centre of
+the screen (`CENTRE`), so a line in one takes the other's off at once, with no
+fade (`Stand.cut()`); a voice marked `alone` (Dread) takes every other line
+off the same way. The lane and the middle do stand together.
+`tests/unit/ui/test_line_takes_over.gd` holds this.
+
 Calls: `say(voice, who, text, from, seconds)` returns the seconds the line
 stays; `clear()` and `clear_voice(voice)`; `showing` and `voice` are the
 lane's line ("" when none); `stand_of(voice)` is where a voice stands (its
