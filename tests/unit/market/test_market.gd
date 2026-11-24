@@ -35,6 +35,10 @@ func after_each() -> void:
 		m.free()
 	get_tree().paused = false
 	Gameplay.reset()
+	# PeltSale starts its moment and is freed mid-run, which leaves the
+	# controls narrowed and its mood set.
+	StoryControl.release()
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 
 
 func test_every_stall_has_one_distinct_trade_and_a_sign() -> void:

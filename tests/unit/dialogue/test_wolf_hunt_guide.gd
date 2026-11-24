@@ -30,6 +30,7 @@ var shown: Array = []
 
 func before_each() -> void:
 	WorldState.clear()
+	StoryControl.release()
 	PhaseManager.current_phase = &"p0_winter"
 	shown.clear()
 	director = DialogueDirector.new()
