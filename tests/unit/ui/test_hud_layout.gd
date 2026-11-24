@@ -8,7 +8,7 @@ const PIECES: Array[String] = [
 	"res://ui/hud/vitals/vitals_hud.gd", "res://ui/hud/vitals/grab_prompt.gd",
 	"res://ui/hud/vitals/edge_fx.gd", "res://ui/hud/vitals/status_row.gd",
 	"res://ui/hud/vitals/health_bar.gd", "res://ui/hud/vitals/stamina_bow.gd",
-	"res://ui/satchel/satchel_hud.gd", "res://ui/satchel/quick_strap.gd",
+	"res://ui/satchel/satchel_hud.gd", "res://ui/satchel/paint_tin.gd",
 	"res://ui/map/world_map_hud.gd", "res://ui/map/minimap.gd", "res://ui/map/pin_marker.gd",
 	"res://systems/bow/quiver_card.gd", "res://ui/aim_reticle.gd",
 	"res://ui/hud/key_prompt.gd",

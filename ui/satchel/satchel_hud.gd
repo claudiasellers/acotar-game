@@ -2,9 +2,9 @@
 ## satchel Feyre wears, and the little flight each pickup makes into her bag.
 ## Add one to an entry scene: add_child(SatchelHud.new()).
 ##
-## The bar is a leather strap with four brass rings hung from it, the satchel
-## itself at its left end; it lifts and the rings swing while LB is held. It
-## sits in HudLayout's STRAP zone.
+## The bar is her paint tin (PaintTin): the book at its left end and four
+## pans; it lifts and the pans stand proud while LB is held. It sits in
+## HudLayout's STRAP zone.
 ##
 ## Keys: I / Tab opens the satchel, 1–4 use the quick slots.
 ## Pad: tap LB to open the satchel; hold LB and press the d-pad
@@ -24,11 +24,7 @@ const SLOT_PAD: Array[JoyButton] = [JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_RIGHT, J
 const SLOT_PAD_GLYPHS: Array[String] = ["↑", "→", "↓", "←"]
 ## A shorter LB press than this, with no slot used, opens the satchel.
 const TAP_SECONDS := 0.3
-## Ring spacing along the strap, and where the first ring hangs.
-const RING_STEP := 96.0
-const RING_START := 132.0
-const BAG_PX := Vector2(64, 58)
-## How far the strap lifts while the chord is held.
+## How far the tin lifts while the chord is held.
 const CHORD_LIFT := 8.0
 const IDLE_SECONDS := 6.0
 const IDLE_ALPHA := 0.55
@@ -42,12 +38,7 @@ var menu: SatchelMenu
 var worn: SatchelWorn
 
 var _bar_root: Control
-var _row: Control
-var _strap: QuickStrap
-var _badge: Control
-var _badge_key: Label
-var _glyph: SatchelGlyph
-var _slot_panels: Array[QuickRing] = []
+var _tin: PaintTin
 var _chord: bool = false
 var _chord_time: float = 0.0
 var _chord_used: bool = false
@@ -96,7 +87,9 @@ func _ready() -> void:
 	_build_bar()
 	bar.changed.connect(_refresh)
 	bar.used.connect(_on_used)
-	bar.pinned.connect(func(slot: int, _id: StringName) -> void: _pop(slot, 0.22))
+	bar.pinned.connect(func(slot: int, id: StringName) -> void:
+		_pop(slot, 0.22)
+		_name(slot, id))
 	_refresh()
 	Gameplay.listen(&"phase_changed", func(_a: StringName, _b: StringName) -> void: _apply_theme())
 	_attach_worn.call_deferred()
@@ -178,8 +171,8 @@ func _can_play() -> bool:
 
 func _set_chord(on: bool) -> void:
 	if on and not _chord:
-		for i in _slot_panels.size():
-			_slot_panels[i].kick(0.9 * (1.0 if i % 2 else -1.0) * Juice.effects_scale)
+		for pan in _tin.pans:
+			pan.kick(60.0 * Juice.effects_scale)
 	_chord = on
 	_chord_time = 0.0
 	_chord_used = false
@@ -195,7 +188,7 @@ func _process(delta: float) -> void:
 	var target := 1.0 if _chord or _idle < IDLE_SECONDS else IDLE_ALPHA
 	_bar_root.modulate.a = move_toward(_bar_root.modulate.a, target, delta * 2.5)
 	var lift := -CHORD_LIFT if _chord else 0.0
-	_row.position.y = lerpf(_row.position.y, CHORD_LIFT + lift, 1.0 - pow(0.7, delta * 60.0))
+	_tin.position.y = lerpf(_tin.position.y, CHORD_LIFT + lift, 1.0 - pow(0.7, delta * 60.0))
 
 
 ## After Gameplay.reset (new game) the bar rebinds to the new inventory.
@@ -207,72 +200,30 @@ func _follow_inventory() -> void:
 
 # --- the bar -----------------------------------------------------------------
 
-## The room the strap and its rings take in the STRAP zone.
+## The room the tin takes in the STRAP zone.
 static func bar_size() -> Vector2:
-	return Vector2(RING_START + RING_STEP * QuickBar.SLOTS - RING_STEP * 0.5 + 20.0,
-			QuickStrap.BAND + QuickRing.TAB.y + QuickRing.RADIUS * 2.0 + 12.0 + CHORD_LIFT)
+	return PaintTin.TIN + Vector2(0, PaintTin.NAME_ROOM + CHORD_LIFT)
 
 
 func _build_bar() -> void:
-	var length := bar_size().x
-	var height := bar_size().y - CHORD_LIFT
 	_bar_root = Control.new()
 	_bar_root.name = "QuickBar"
 	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bar_root.custom_minimum_size = Vector2(length, height + CHORD_LIFT)
+	_bar_root.custom_minimum_size = bar_size()
 	HudLayout.of(get_tree()).place(_bar_root, HudLayout.Zone.STRAP, self)
-	_row = Control.new()
-	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_row.size = Vector2(length, height)
-	_row.position = Vector2(0, CHORD_LIFT)
-	_bar_root.add_child(_row)
-	_strap = QuickStrap.new()
-	_strap.size = Vector2(length, QuickStrap.BAND)
-	_strap.position = Vector2(0, BAG_PX.y * 0.35)
-	_row.add_child(_strap)
-	# The satchel hangs off the strap's left end; its key is stamped beneath.
-	_badge = Control.new()
-	_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_badge.size = BAG_PX
-	_badge.position = Vector2(8, 0)
-	_badge.pivot_offset = Vector2(BAG_PX.x * 0.5, 0)
-	_row.add_child(_badge)
-	_glyph = SatchelGlyph.new()
-	_glyph.size = BAG_PX
-	_badge.add_child(_glyph)
-	_badge_key = Label.new()
-	_badge_key.theme_type_variation = &"QuickBarKey"
-	_badge_key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_badge_key.size = Vector2(BAG_PX.x, 20)
-	_badge_key.position = Vector2(0, BAG_PX.y + 2)
-	_badge.add_child(_badge_key)
-	var rivets := PackedFloat32Array()
-	for i in QuickBar.SLOTS:
-		var ring := QuickRing.new()
-		var x := RING_START + RING_STEP * i
-		rivets.append(x)
-		ring.position = Vector2(x - ring.size.x * 0.5, _strap.position.y + QuickStrap.BAND - 4.0)
-		_row.add_child(ring)
-		_slot_panels.append(ring)
-	_strap.rivets = rivets
+	_tin = PaintTin.new()
+	_tin.position = Vector2(0, CHORD_LIFT)
+	_bar_root.add_child(_tin)
 
 
 func _refresh() -> void:
-	if _row == null:
+	if _tin == null:
 		return
 	var inv := bar.inventory
-	_glyph.fill = inv.used(Inventory.SATCHEL) / float(Inventory.CAPACITY[Inventory.SATCHEL])
-	_badge_key.text = "LB" if pad_active else "I"
-	_strap.queue_redraw()
-	for i in _slot_panels.size():
-		var ring := _slot_panels[i]
-		ring.lit = _chord
-		ring.queue_redraw()
-		for c in ring.get_children():
-			c.queue_free()
+	_tin.book_key.text = "LB" if pad_active else BookKit.key_word(ACTION_OPEN)
+	for i in _tin.pans.size():
 		var id := bar.entry(i)
-		var n := bar.count(i)
-		var at := ring.centre()
+		var icon: Control = null
 		if id != &"":
 			var e := SatchelEntries.find(inv, id)
 			if e.is_empty():
@@ -280,42 +231,34 @@ func _refresh() -> void:
 				var item := e.item as ItemData
 				if item:
 					e.icon = item.icon
-			var icon := SatchelIcon.make(e, QuickRing.ICON_PX)
-			icon.position = at - Vector2.ONE * QuickRing.ICON_PX * 0.5
-			icon.modulate.a = 1.0 if n > 0 else 0.35
-			ring.add_child(icon)
-			var count := Label.new()
-			count.theme_type_variation = &"QuickBarCount"
-			count.text = str(n)
-			count.position = at + Vector2(QuickRing.RADIUS * 0.45, QuickRing.RADIUS * 0.35)
-			ring.add_child(count)
-		# The key is stamped into the strap above the ring.
-		var key := Label.new()
-		key.theme_type_variation = &"QuickBarKey"
-		key.text = SLOT_PAD_GLYPHS[i] if pad_active else str(i + 1)
-		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		key.size = Vector2(ring.size.x, QuickStrap.BAND)
-		key.position = Vector2(0, -QuickStrap.BAND + 2.0)
-		key.add_theme_color_override(&"font_color", JournalTheme.color(&"paper"))
-		ring.add_child(key)
+			icon = SatchelIcon.make(e, PaintTin.Pan.ICON_PX)
+		_tin.pans[i].lit = _chord
+		_tin.fill(i, icon, bar.count(i), SLOT_PAD_GLYPHS[i] if pad_active else str(i + 1), hash(String(id)))
 
 
-func _on_used(slot: int, _id: StringName) -> void:
+func _on_used(slot: int, id: StringName) -> void:
 	_idle = 0.0
 	_pop(slot, 0.25)
-	_slot_panels[slot].kick(2.4 * Juice.effects_scale)
-	_sparkle(_slot_panels[slot])
+	_tin.pans[slot].kick(150.0 * Juice.effects_scale)
+	_sparkle(_tin.pans[slot])
+	_name(slot, id)
+
+
+## Names what is in a pan, above it, for a moment.
+func _name(slot: int, id: StringName) -> void:
+	var item := ItemCatalog.get_item(id)
+	_tin.name_pan(slot, item.display_name if item else "")
 
 
 func _pop(slot: int, amount: float) -> void:
 	_idle = 0.0
-	if slot >= 0 and slot < _slot_panels.size():
-		Juice.bounce_control(_slot_panels[slot], amount * Juice.effects_scale)
+	if slot >= 0 and slot < _tin.pans.size():
+		Juice.bounce_control(_tin.pans[slot], amount * Juice.effects_scale)
 
 
 func _shake(slot: int) -> void:
-	# An empty or unusable ring just jerks on its tab.
-	_slot_panels[slot].kick(-3.5 * Juice.effects_scale)
+	# An empty or unusable pan just dips in its seat.
+	_tin.pans[slot].kick(-90.0 * Juice.effects_scale)
 
 
 func _sparkle(target: Control) -> void:
@@ -337,7 +280,7 @@ func _sparkle(target: Control) -> void:
 	get_tree().create_timer(0.8, true).timeout.connect(s.queue_free)
 
 
-## A pickup flies from Feyre into the satchel badge, which bounces and sings.
+## A pickup flies from Feyre into the tin's book, which bounces and sings.
 func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	_idle = 0.0
 	_refresh()
@@ -353,7 +296,7 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	icon.top_level = true
 	_bar_root.add_child(icon)
 	icon.position = cam.unproject_position(feyre.global_position + Vector3.UP * 1.3) - Vector2(22, 22)
-	var to := _badge.global_position + _badge.size * 0.5 - Vector2(22, 22)
+	var to := _tin.book.global_position + _tin.book.size * 0.5 - Vector2(22, 22)
 	var from := icon.position
 	var arc := from.lerp(to, 0.5) + Vector2(0, -120)
 	_flights += 1
@@ -364,7 +307,7 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	t.tween_callback(func() -> void:
 		icon.queue_free()
 		_flights -= 1
-		Juice.bounce_control(_badge, 0.2 * Juice.effects_scale)
+		Juice.bounce_control(_tin.book, 0.2 * Juice.effects_scale)
 		_plus(count)
 		SatchelSounds.play(&"pickup", self))
 
@@ -374,12 +317,10 @@ func _quad(a: Vector2, b: Vector2, c: Vector2, k: float) -> Vector2:
 
 
 func _plus(count: int) -> void:
-	var l := Label.new()
-	l.theme_type_variation = &"QuickBarCount"
-	l.text = "+%d" % count
+	var l := BookKit.label("+%d" % count, &"TinName")
 	l.top_level = true
 	_bar_root.add_child(l)
-	l.position = _badge.global_position + Vector2(_badge.size.x * 0.5 - 10, -18)
+	l.position = _tin.book.global_position + Vector2(_tin.book.size.x * 0.5 - 10, -18)
 	var t := l.create_tween().set_parallel()
 	t.tween_property(l, ^"position:y", l.position.y - 30, 0.7).set_ease(Tween.EASE_OUT)
 	t.tween_property(l, ^"modulate:a", 0.0, 0.7).set_delay(0.25)

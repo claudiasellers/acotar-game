@@ -76,8 +76,6 @@ const LABELS := {
 	&"SatchelSmall": [16, "body", 700, &"ink"],
 	&"SatchelWhere": [20, "hand", 500, &"ink_soft"],
 	&"SatchelKeyLabel": [16, "body", 800, &"paper"],
-	&"QuickBarKey": [15, "body", 800, &"ink_soft"],
-	&"QuickBarCount": [15, "body", 800, &"ink"],
 	&"NotifyText": [20, "body", 600, &"ink"],
 	&"ThoughtText": [26, "hand", 600, &"ink"],
 	&"ReadText": [30, "hand", 600, &"ink"],
@@ -96,7 +94,6 @@ const LABELS := {
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
 	&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
-	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
 ## An index tab along the top of the book. White, so each wears its own wash.
@@ -219,8 +216,6 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"BowCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(18, 8)))
 	t.set_stylebox(&"panel", &"NoticeCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(22, 14), 20))
 	t.set_stylebox(&"panel", &"NoticeRare", _pill(Color(c.ink, PILL_DEPTH), c.glow, 3, Vector2(22, 14), 20))
-	t.set_stylebox(&"panel", &"QuickBarSlot", _pill(Color(c.paper, 0.92), c.line, 2, Vector2(6, 6)))
-	t.set_stylebox(&"panel", &"QuickBarSlotSelected", _pill(c.paper, c.glow, 3, Vector2(6, 6)))
 
 	for v in BUTTONS:
 		t.set_type_variation(v, &"Button")
@@ -322,6 +317,12 @@ static func build(of_act: Act) -> Theme:
 	t.set_constant(&"shadow_offset_x", &"LineWhisper", 0)
 	t.set_constant(&"shadow_offset_y", &"LineWhisper", 0)
 	t.set_constant(&"shadow_outline_size", &"LineWhisper", 18)
+	# What is in a pan, named above the tin on a dark tag.
+	t.set_type_variation(&"TinName", &"Label")
+	t.set_font(&"font", &"TinName", font("body", 800))
+	t.set_font_size(&"font_size", &"TinName", 14)
+	t.set_color(&"font_color", &"TinName", c.paper)
+	t.set_stylebox(&"normal", &"TinName", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(12, 2)))
 	# Count and pin sit on their own small chip.
 	for v in [&"SatchelCount", &"SatchelPin"]:
 		t.set_type_variation(v, &"Label")

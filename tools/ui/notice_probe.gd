@@ -1,7 +1,7 @@
 ## Saves one frame of each notice and key prompt over the brightest ground the
 ## act has (noon snow, a Spring path at noon), with Feyre in the follow camera
 ## and the in-play HUD: a find, a rare find, a note, a chapter heading, the
-## press prompt, the beast's row of keys and the quiver card.
+## press prompt, the beast's row of keys, the quiver card and the paint tin.
 ##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
 ##     res://tools/ui/notice_probe.tscn -- <dir> [phase]
 ## (A scene, not a -s script, so the autoloads exist.)
@@ -47,6 +47,10 @@ func _go() -> void:
 		await get_tree().process_frame
 
 	var tree := get_tree()
+	for id: StringName in [&"ing_bilberry", &"ing_primrose", &"ing_rose_hip"]:
+		Gameplay.inventory.add(id, 6)
+	var satchel := SatchelHud.new()
+	add_child(satchel)
 	var press := PressCard.find_or_make(self)
 	var keys := KeyPrompt.make(self)
 	var steps := {
@@ -61,6 +65,8 @@ func _go() -> void:
 		"quiver": func() -> void:
 			keys.clear()
 			feyre.bow_controller.quiver_card.show_card(),
+		"tin": func() -> void: satchel.bar.pinned.emit(1, satchel.bar.entry(1)),
+		"tin_chord": func() -> void: satchel._set_chord(true),
 	}
 	for label: String in steps:
 		FindCard.clear(tree)

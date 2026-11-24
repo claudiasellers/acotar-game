@@ -6,12 +6,12 @@ extends GutTest
 const VARIATIONS := {
 	&"PanelContainer": [
 		&"SatchelCard", &"LoosePage", &"NotifyCard", &"SatchelChip", &"SatchelKey",
-		&"QuickBarSlot", &"QuickBarSlotSelected",
+		&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
 	],
 	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
-		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"QuickBarKey", &"QuickBarCount",
+		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"TinName", &"PromptText", &"BowText", &"ChapterTitle",
 		&"NotifyText", &"ThoughtText",
 	],
 	&"ProgressBar": [&"SatchelMeter"],

@@ -55,9 +55,9 @@ deckled edge, tinted to a paper token. Made by
 
 | Variation | Base |
 |---|---|
-| SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, NoticeCard, NoticeRare, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
+| SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, NoticeCard, NoticeRare, SatchelChip, SatchelKey | PanelContainer |
 | SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle | Label |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle | Label |
 | SatchelMeter | ProgressBar |
 
 `CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
