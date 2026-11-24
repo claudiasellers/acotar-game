@@ -60,6 +60,7 @@ func test_every_setting_round_trips_through_the_file() -> void:
 		&"mouse_sensitivity": 1.8, &"stick_sensitivity": 0.4, &"invert_x": true,
 		&"invert_y": true, &"camera_follow": false, &"mouse_steers": true, &"gentle_mode": true,
 		&"reduced_effects": true, &"music_volume": 0.25, &"sound_volume": 0.6, &"text_size": 3,
+		&"hud_mode": 2, &"edge_fx": 1, &"hit_marks": false,
 	}
 	assert_eq(changed.size(), GameSettings.DEFAULTS.size(), "test covers every setting")
 	for key: StringName in changed:
@@ -217,7 +218,8 @@ func test_settings_stay_on_screen_at_every_text_size() -> void:
 		assert_gt(h, 200.0, "settings area visible at %s" % GameSettings.TEXT_SIZES[i])
 		assert_lt(h, 1080.0 / GameSettings.TEXT_SCALES[i] - 300.0, "room left for title and buttons")
 		if i <= 1:
-			assert_lt(h, 760.0, "no needless scrolling at %s" % GameSettings.TEXT_SIZES[i])
+			# Two columns of 13 settings since her health and status joined (L76).
+			assert_lt(h, 900.0, "no needless scrolling at %s" % GameSettings.TEXT_SIZES[i])
 		menu.close()
 
 
