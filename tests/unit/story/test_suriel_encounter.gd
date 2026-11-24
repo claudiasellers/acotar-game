@@ -261,9 +261,18 @@ func test_strikes_bring_tamlin_only_after_her_first_kill() -> void:
 	assert_true(WorldState.has_flag("fact.naga_escaped"))
 
 
+## Her boot knife is Strike's (StrikeController, HK): a naga in reach that
+## she has already cut takes the blade before a fresh one.
+func _strike() -> StrikeController:
+	var k := StrikeController.new()
+	feyre.add_child(k)
+	return k
+
+
 func test_the_knife_finishes_the_wounded_naga() -> void:
 	var a := _ambush()
 	a.start()
+	var k := _strike()
 	var near := NAGA.instantiate() as Naga
 	near.creature_id = &"naga_near"
 	root.add_child(near)
@@ -271,14 +280,15 @@ func test_the_knife_finishes_the_wounded_naga() -> void:
 	var cut := NAGA.instantiate() as Naga
 	cut.creature_id = &"naga_cut"
 	root.add_child(cut)
-	cut.global_position = Vector3(3.0, 0, 0)
-	cut.health -= NagaAmbush.KNIFE_DAMAGE
+	cut.global_position = Vector3(0, 0, 1.7)
+	cut.health -= cut.data.arrow_damage
 	a.naga[&"naga_near"] = near
 	a.naga[&"naga_cut"] = cut
 	var before := near.health
-	assert_true(a.knife())
-	assert_lt(cut.health, 16.0 - NagaAmbush.KNIFE_DAMAGE, "the wounded one takes the blade")
+	assert_true(k.strike())
+	assert_false(cut.alive, "the wounded one takes the blade: two stabs kill (16 health)")
 	assert_eq(near.health, before, "not the fresh one, though it is nearer")
+	assert_true(a.fought_back)
 
 
 func test_running_or_never_fighting_back_is_still_lethal() -> void:
@@ -336,16 +346,17 @@ func test_tether_shot_frees_the_suriel_and_the_knife_kills() -> void:
 	a.start()
 	a.arrow_landed(Vector3(0.5, 0, 0.5))
 	assert_true(a.freed)
+	var k := _strike()
 	var n := NAGA.instantiate() as Naga
 	n.creature_id = &"naga_k"
 	root.add_child(n)
-	n.global_position = Vector3(2, 0, 0)
+	n.global_position = Vector3(1.5, 0, 0)
 	a.naga[&"naga_k"] = n
-	assert_true(a.knife())
-	assert_false(a.knife(), "one stab at a time")
+	assert_true(k.strike())
+	assert_false(k.strike(), "one stab at a time")
 	assert_true(n.alive, "one stab wounds")
-	_run(a, 1.0)
-	assert_true(a.knife())
+	k.step(StrikeController.KNIFE_COOLDOWN + 0.1)
+	assert_true(k.strike())
 	assert_false(n.alive, "two stabs kill (16 health)")
 
 

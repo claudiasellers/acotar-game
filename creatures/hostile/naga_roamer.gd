@@ -280,6 +280,17 @@ func _on_fire_near(from: Vector3) -> void:
 	_lure_left = 0.0
 
 
+## A bow bash or a knife wound: the strike it was winding up is lost, and
+## when it has its feet again it backs off before it comes again.
+func stagger(seconds: float) -> void:
+	if not alive:
+		return
+	if fight == Fight.STRIKE or fight == Fight.CHARGE:
+		fight = Fight.RECOVER
+		_fight_left = strike_cooldown
+	super.stagger(seconds)
+
+
 ## Frost slows it (Creature slow). Fire, sleep, barbs and lures are the base's.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 	if not alive:

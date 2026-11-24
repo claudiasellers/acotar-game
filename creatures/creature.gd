@@ -52,6 +52,9 @@ var ash_taken: int = 0
 var burn_left: float = 0.0
 ## Where the last hit landed: &"weak" (its weak spot) or &"body".
 var last_zone: StringName = &"body"
+## Seconds left reeling from a bow bash or a knife: it stands, does nothing,
+## and whatever it was winding up is lost (stagger()).
+var stagger_left: float = 0.0
 var _fire_scan_left: float = 0.0
 static var _arrow_mults: Dictionary = {}
 static var _bow_mults: Dictionary = {}
@@ -131,6 +134,10 @@ func _physics_process(delta: float) -> void:
 		senses.awareness = 0.0
 		move_speed = 0.0
 		move_direction = Vector3.ZERO
+	elif stagger_left > 0.0:
+		stagger_left -= delta
+		move_speed = 0.0
+		move_direction = Vector3.ZERO
 	elif not scripted:
 		_think(delta)
 		if leash:
@@ -196,7 +203,8 @@ func apply_hit(cause: StringName, weapon_id: StringName, weapon_mult: float, zon
 		return {"health": 0.0, "killed": false, "mortal": false, "ash_taken": ash_taken}
 	var zone_mult := data.weak_zone_mult if zone == &"weak" else 1.0
 	var result := resolve_hit(data, health, weapon_id, weapon_mult * zone_mult, ash_taken, mortally_wounded)
-	var damaged := float(result.health) < health or bool(result.killed) or bool(result.mortal)
+	var damaged := float(result.health) < health or bool(result.killed) \
+			or (bool(result.mortal) and not mortally_wounded)
 	health = result.health
 	ash_taken = result.ash_taken
 	last_zone = zone
@@ -245,6 +253,14 @@ func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 		&"fire":
 			ignite(ARROW_BURN_SECONDS)
 			_on_fire_near(arrow.global_position)
+
+
+## Knocked off its feet for `seconds` (the bow bash, a knife wound): it
+## stops where it is and loses any wind-up. Brains with their own fight state
+## override this to cancel it.
+func stagger(seconds: float) -> void:
+	if alive:
+		stagger_left = maxf(stagger_left, seconds)
 
 
 ## Sets it burning for `seconds`, if fire takes hold on it (CreatureData.burn_dps).
@@ -416,11 +432,14 @@ static func bow_mult_of(bow_id: StringName) -> float:
 ## mortal, ash_taken}. Damage is data.arrow_damage x `mult` (the weapon, the bow
 ## and the zone). A lethal arrow (ash on fae) counts toward data.ash_hits; the
 ## hit that reaches it kills at once, or with a lethal_delay leaves a mortal
-## wound. Any hit on a mortally wounded creature kills it. With
-## only_lethal_kills nothing else takes it below 1.
+## wound. Any hit on a mortally wounded creature kills it, except one that
+## does no damage (mult 0: the bow bash). With only_lethal_kills nothing else
+## takes it below 1.
 static func resolve_hit(creature: CreatureData, current_health: float, weapon_id: StringName,
 		mult: float = 1.0, ash_so_far: int = 0, already_mortal: bool = false) -> Dictionary:
 	if already_mortal:
+		if mult <= 0.0:
+			return {"health": current_health, "killed": false, "mortal": true, "ash_taken": ash_so_far}
 		return {"health": 0.0, "killed": true, "mortal": true, "ash_taken": ash_so_far}
 	var remaining := current_health - creature.arrow_damage * maxf(mult, 0.0)
 	var ash := ash_so_far
