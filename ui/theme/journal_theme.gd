@@ -124,7 +124,10 @@ static func apply() -> void:
 	var live := ThemeDB.get_project_theme()
 	if live == null:
 		return
-	live.clear()
+	# No clear(): it drops the old fonts while Labels already on screen (the
+	# menu shell lives at root once opened) still hold them, and the engine
+	# logs 'Parameter "fd" is null' for each. Both acts set the same keys,
+	# so merging over the live theme replaces every one in place.
 	live.merge_with(build(act()))
 
 
