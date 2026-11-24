@@ -797,7 +797,7 @@ for _area, _l in LINES:
 # Lines a moment speaks itself (L77, step 7d): the script calls
 # DialogueDirector.line(self, id) at its own beat, so the line gets its voice
 # file, ducking and faces like any other. They were typed into the scripts
-# before; the words are unchanged. Canon tags to be confirmed by the Keeper.
+# before; the words are unchanged. Canon tags are the Keeper's.
 # =============================================================================
 A = "moments"
 
@@ -814,7 +814,7 @@ moment("triage_table", "summer_faerie_triage", "The table. Clear it off!", speak
        delivery="a roar, carrying him in")
 moment("triage_stumps", "summer_faerie_triage",
        "Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.", canon="A")
-moment("triage_tourniquet", "summer_faerie_triage", "A tourniquet. But there is nothing to tie it to, and no time.")
+moment("triage_tourniquet", "summer_faerie_triage", "A tourniquet. But there is nothing to tie it to, and no time.", canon="A")
 moment("triage_promise", "summer_faerie_triage", "You'll get your wings back. I promise.", inner=False, canon="A",
        delivery="low, a lie told kindly")
 moment("triage_wings", "summer_faerie_triage", "She took my wings.", speaker="summer_faerie", inner=False, canon="V",
@@ -822,15 +822,15 @@ moment("triage_wings", "summer_faerie_triage", "She took my wings.", speaker="su
 moment("triage_shelves", "summer_faerie_triage", "Herbs. The infirmary shelves, past the kitchens. If I run.")
 moment("triage_alone", "summer_faerie_triage",
        "I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.",
-       inner=False, canon="A", delivery="quiet, to Tamlin, not looking at him")
+       inner=False, canon="V", delivery="quiet, to Tamlin, not looking at him")
 moment("grave_hand", "summer_faerie_grave", "Someone should have held his hand. I should have.")
 
 # Her map of the halls (ch 12): why she maps at all, then one thought a mark.
-moment("hall_map_why", "hall_map", "If I'm going to be stuck here, I need to know my way around this house.")
+moment("hall_map_why", "hall_map", "If I'm going to be stuck here, I need to know my way around this house.", canon="A")
 for _n, _what, _shape in [(1, "The front doors", "An X"), (2, "The marble stairs", "A circle"),
                           (3, "The garden doors", "An X"), (4, "The kitchen door", "An X"),
                           (5, "The servants' stair", "A circle")]:
-    moment("hall_mark_%d" % _n, "hall_map", "%s. %s." % (_what, _shape))
+    moment("hall_mark_%d" % _n, "hall_map", "%s. %s." % (_what, _shape), canon="A")
 
 # The sentries' chest (Act IV): the tag she reads on its hasp. A "note" is read,
 # not heard: LinePresenter holds it up as a loose page until she puts it back.

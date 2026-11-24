@@ -330,16 +330,16 @@ d_nesta_truth,feyre,,Nesta went to the Wall for me. Nesta.,X,yes,deed,,nesta_tru
 d_beddor,feyre,,Clare Beddor. I gave him her name.,A,yes,deed,,beddor_fire_learned,p7_return_home,"inner voice, the floor dropping away",audio/voice/d_beddor.ogg
 triage_table,tamlin,Tamlin,The table. Clear it off!,A,,scene,summer_faerie_triage.triage_table,,,"a roar, carrying him in",audio/voice/triage_table.ogg
 triage_stumps,feyre,,"Black, velvety stumps, jagged, as if someone had sawed them off bit by bit.",A,yes,scene,summer_faerie_triage.triage_stumps,,,"inner voice: dry, quiet, close",audio/voice/triage_stumps.ogg
-triage_tourniquet,feyre,,"A tourniquet. But there is nothing to tie it to, and no time.",X,yes,scene,summer_faerie_triage.triage_tourniquet,,,"inner voice: dry, quiet, close",audio/voice/triage_tourniquet.ogg
+triage_tourniquet,feyre,,"A tourniquet. But there is nothing to tie it to, and no time.",A,yes,scene,summer_faerie_triage.triage_tourniquet,,,"inner voice: dry, quiet, close",audio/voice/triage_tourniquet.ogg
 triage_promise,feyre,Feyre,You'll get your wings back. I promise.,A,,scene,summer_faerie_triage.triage_promise,,,"low, a lie told kindly",audio/voice/triage_promise.ogg
 triage_wings,summer_faerie,Summer faerie,She took my wings.,V,,scene,summer_faerie_triage.triage_wings,,,"a whisper, fading",audio/voice/triage_wings.ogg
 triage_shelves,feyre,,"Herbs. The infirmary shelves, past the kitchens. If I run.",X,yes,scene,summer_faerie_triage.triage_shelves,,,"inner voice: dry, quiet, close",audio/voice/triage_shelves.ogg
-triage_alone,feyre,Feyre,"I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.",A,,scene,summer_faerie_triage.triage_alone,,,"quiet, to Tamlin, not looking at him",audio/voice/triage_alone.ogg
+triage_alone,feyre,Feyre,"I wouldn't want to die alone. I'd want someone to hold my hand until the end, and awhile after that.",V,,scene,summer_faerie_triage.triage_alone,,,"quiet, to Tamlin, not looking at him",audio/voice/triage_alone.ogg
 grave_hand,feyre,,Someone should have held his hand. I should have.,X,yes,scene,summer_faerie_grave.grave_hand,,,"inner voice: dry, quiet, close",audio/voice/grave_hand.ogg
-hall_map_why,feyre,,"If I'm going to be stuck here, I need to know my way around this house.",X,yes,scene,hall_map.hall_map_why,,,"inner voice: dry, quiet, close",audio/voice/hall_map_why.ogg
-hall_mark_1,feyre,,The front doors. An X.,X,yes,scene,hall_map.hall_mark_1,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_1.ogg
-hall_mark_2,feyre,,The marble stairs. A circle.,X,yes,scene,hall_map.hall_mark_2,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_2.ogg
-hall_mark_3,feyre,,The garden doors. An X.,X,yes,scene,hall_map.hall_mark_3,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_3.ogg
-hall_mark_4,feyre,,The kitchen door. An X.,X,yes,scene,hall_map.hall_mark_4,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_4.ogg
-hall_mark_5,feyre,,The servants' stair. A circle.,X,yes,scene,hall_map.hall_mark_5,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_5.ogg
+hall_map_why,feyre,,"If I'm going to be stuck here, I need to know my way around this house.",A,yes,scene,hall_map.hall_map_why,,,"inner voice: dry, quiet, close",audio/voice/hall_map_why.ogg
+hall_mark_1,feyre,,The front doors. An X.,A,yes,scene,hall_map.hall_mark_1,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_1.ogg
+hall_mark_2,feyre,,The marble stairs. A circle.,A,yes,scene,hall_map.hall_mark_2,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_2.ogg
+hall_mark_3,feyre,,The garden doors. An X.,A,yes,scene,hall_map.hall_mark_3,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_3.ogg
+hall_mark_4,feyre,,The kitchen door. An X.,A,yes,scene,hall_map.hall_mark_4,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_4.ogg
+hall_mark_5,feyre,,The servants' stair. A circle.,A,yes,scene,hall_map.hall_mark_5,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_5.ogg
 sentry_chest_tag,note,A tag on the hasp,For whoever puts an arrow in all three butts.,X,,scene,sentry_chest.sentry_chest_tag,,,not voiced: written,audio/voice/sentry_chest_tag.ogg
