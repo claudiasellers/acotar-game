@@ -61,8 +61,7 @@ func _beat(d: FirstDinner) -> String:
 
 
 func test_she_sits_at_the_first_dinner_and_stands_after() -> void:
-	if not booted:
-		pending("Continue never gave her control")
+	if not h.require_control(booted, "Continue never gave her control"):
 		return
 	var dinner := _dinner()
 	assert_not_null(dinner, "the first dinner hangs on the dining table")

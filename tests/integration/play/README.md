@@ -49,6 +49,9 @@ waits on the class cache). `h.dispose()` in `after_all`.
   the real Continue road.
 - A test that finds a real game bug marks itself `pending` with the reason,
   so the gate stays green, and the bug becomes a task.
+- Setup that never gives her control is not a game bug: `before_each` calls
+  `h.require_control(booted)`, which fails the test. Pending would exit 0 and
+  pass the gate with no asserts (T123). `ACOTAR_PLAY_NO_CONTROL=1` forces it.
 - Each file loads World: keep `# gate: needs:terrain` and the `when:` line.
 
 Run one: `tools/mq/godot.sh -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://tests/integration/play/test_play_court.gd`
