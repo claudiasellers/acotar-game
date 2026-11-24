@@ -141,7 +141,7 @@ static func open_card(tree: SceneTree, from: WhorlStoneDef, user: Node) -> void:
 		return
 	var to := destinations(from.id)
 	if to.is_empty():
-		FindCard.note(tree, "My rose, beside the whorl. The only stones I've marked.")
+		PickupLog.of(tree).note("My rose, beside the whorl. The only stones I've marked.")
 		return
 	WhorlTravelCard.open(tree, from, to, user)
 

@@ -57,10 +57,20 @@ func _go() -> void:
 	var press := PressCard.find_or_make(self)
 	var keys := KeyPrompt.make(self)
 	var steps := {
-		"find": func() -> void: FindCard.show_find(tree, &"ing_bilberry", &"ingredients"),
-		"find_rare": func() -> void: FindCard.show_find(tree, &"ing_rose_gold", &"ingredients"),
-		"note": func() -> void: FindCard.note(tree, "Two more flowers for a crown."),
-		"heading": func() -> void: FindCard.heading(tree, "The Wolf in the Snow"),
+		"find": func() -> void:
+			PickupLog.of(tree).add(&"ing_bilberry", 2)
+			PickupLog.of(tree).find(&"ing_bilberry", &"ingredients"),
+		"recipe": func() -> void: PickupLog.of(tree).find(&"brew_hush_draught", &"recipes"),
+		"reward": func() -> void:
+			var prize := CollectionReward.new()
+			prize.reward_id = &"ing_acorn"
+			prize.label = "A pouch of acorns"
+			prize.need = 5
+			prize.tab = &"ingredients"
+			PickupLog.of(tree).reward(prize),
+		"find_rare": func() -> void: PickupLog.of(tree).find(&"ing_rose_gold", &"ingredients"),
+		"note": func() -> void: PickupLog.of(tree).note("Two more flowers for a crown."),
+		"heading": func() -> void: ChapterHeading.show(tree, "The Wolf in the Snow"),
 		"prompt": func() -> void: press.show_text("step in"),
 		"prompt_row": func() -> void:
 			press.show_text("")
@@ -83,7 +93,8 @@ func _go() -> void:
 		"tin_chord": func() -> void: satchel._set_chord(true),
 	}
 	for label: String in steps:
-		FindCard.clear(tree)
+		ChapterHeading.clear(tree)
+		PickupLog.of(tree).clear()
 		await tree.process_frame
 		(steps[label] as Callable).call()
 		await tree.create_timer(CATCH_SECONDS).timeout

@@ -38,7 +38,7 @@ func build() -> void:
 
 func use(_user: Node) -> void:
 	if found():
-		FindCard.note(get_tree(), String(spot.param("empty", "Nothing else tucked away here.")))
+		PickupLog.of(get_tree()).note(String(spot.param("empty", "Nothing else tucked away here.")))
 		return
 	complete()
 	for g in glints:

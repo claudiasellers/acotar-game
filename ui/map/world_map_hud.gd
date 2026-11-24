@@ -436,13 +436,14 @@ func _celebrate(text: String, landmark_id: String, big: bool) -> void:
 	notice(get_tree(), text, big)
 
 
-## The name of what she found, on the notice queue.
+## The name of what she found: a place is a chapter heading, a landmark a
+## note in the log.
 func notice(tree: SceneTree, text: String, big: bool) -> void:
 	if big:
-		FindCard.heading(tree, text)
+		ChapterHeading.show(tree, text)
 	elif landmark_note_due():
 		_landmark_noted_at = Time.get_ticks_msec()
-		FindCard.note(tree, text)
+		PickupLog.of(tree).note(text)
 
 
 func landmark_note_due() -> bool:

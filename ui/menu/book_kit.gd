@@ -66,6 +66,30 @@ static func key_cap(key: String) -> PanelContainer:
 	return cap
 
 
+## How many of a thing: "×3" on a round paper chip.
+static func count_badge(text: String = "") -> Label:
+	return _badge(text, JournalTheme.COUNT_BADGE)
+
+
+## Which pan of the tin a thing is in, or the key that opens something: a
+## small ink key cap.
+static func slot_badge(text: String = "") -> Label:
+	return _badge(text, JournalTheme.SLOT_BADGE)
+
+
+## She has not looked at this yet: a gold ribbon that says NEW.
+static func new_badge() -> Label:
+	var badge := _badge("new", JournalTheme.NEW_BADGE)
+	badge.uppercase = true
+	return badge
+
+
+static func _badge(text: String, variation: StringName) -> Label:
+	var badge := label(text, variation)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return badge
+
+
 ## The stroke of night sky with its whorls of stars, her own mark, `width` wide.
 static func sky(width: float) -> TextureRect:
 	return picture(load(BookLayout.SKY), Vector2(width, width * 280.0 / 1222.0))

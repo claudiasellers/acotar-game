@@ -74,7 +74,7 @@ func has_news() -> bool:
 
 func _shown() -> void:
 	_watch()
-	FindCard.clear(get_tree())
+	PickupLog.of(get_tree()).clear()
 	show_page(_first_page())
 
 

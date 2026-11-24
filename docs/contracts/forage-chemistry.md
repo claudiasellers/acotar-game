@@ -34,7 +34,7 @@ station, and what comes out reaches the world through an element.
   already a brew's witness combo) with `needs`, `how_to()`, `hint()`.
   `CollectionBook.unlock_recipes()` runs on every `item_added` and marks a
   recipe found on the Recipes page the first time her bags hold all its
-  needs; `brew_discovered` marks it too. FindCard shows "Recipe unlocked"
+  needs; `brew_discovered` marks it too. The log (`PickupLog`) shows "Recipe unlocked"
   with the bottle and how to make it; unlocks in one frame share one card.
 - ArrowEffects: a fire arrow calls `ElementField.ignite_at(at, 1.2)`, a frost
   arrow `soak_at(at, 1.8)`.
