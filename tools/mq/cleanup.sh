@@ -173,12 +173,12 @@ do_lane() {
 	drop "$f"
 }
 
-# A plain file a producer marked: an old log or a gate baseline, only inside .git/mq.
+# A plain file a producer marked: an old log, a kept flaky log or a gate baseline, only inside .git/mq.
 # The baseline for main itself is never taken: the next gate needs it.
 do_file() {
 	local f="$1" t="$2" base
 	case "$t" in
-		"$MQ_DIR"/logs/*|"$MQ_DIR"/idlegate/logs/*|"$MQ_DIR"/baseline/*) ;;
+		"$MQ_DIR"/logs/*|"$MQ_DIR"/idlegate/logs/*|"$MQ_DIR"/baseline/*|"$MQ_DIR"/flaky/*) ;;
 		*) say "keep $t: not a log or baseline"; drop "$f"; return 0 ;;
 	esac
 	case "$t" in *..*) drop "$f"; return 0 ;; esac

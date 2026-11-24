@@ -209,6 +209,16 @@ running=""
 kill_running() { local p; for p in $running; do kill "$p" 2>/dev/null; done; wait 2>/dev/null; }
 trap 'kill_running; exit 143' TERM INT
 
+# A flaky line's failing log, kept where cleanup won't take it for two weeks.
+# keep_log NAME SRC: prints the kept path (the gate's own logs go with the batch).
+keep_log() {
+	local f="$MQ_DIR/flaky/$(date +%Y%m%d-%H%M%S)-$(slug "$1").log"
+	mkdir -p "$MQ_DIR/flaky"
+	cp "$2" "$f" 2>/dev/null || { echo "(the log was already gone)" > "$f"; }
+	"$here/mark.sh" add file "$f" 1209600 "flaky log kept for the worker who fixes it" >/dev/null 2>&1 || true
+	printf '%s' "$f"
+}
+
 # Decides a line that exited non-zero. Returns 0 if the gate carries on.
 judge() { # judge name cmd rc secs
 	local name="$1" cmd="$2" rc="$3" secs="$4" rest="$running"
@@ -216,11 +226,13 @@ judge() { # judge name cmd rc secs
 	if is_known "$name"; then record "$name" KNOWNRED "$secs"; return 0; fi
 	# A failure is retried once, alone: only a build other lines need may still
 	# be running beside it.
+	local first="$out/logs/$(slug "$name").first"
+	cp "$out/logs/$(slug "$name").log" "$first" 2>/dev/null
 	start_line "$name" "$cmd"
 	running="$started_pid $rest"; wait "$started_pid"; local again=$?; running="$rest"
 	if [ "$again" = 0 ]; then
 		record "$name" FLAKY "$secs"
-		mq_event FLAKY "$name"
+		mq_event FLAKY "$name passed on the rerun; its failing log: $(keep_log "$name" "$first")"
 		return 0
 	fi
 	record "$name" FAIL "$secs"
@@ -350,7 +362,10 @@ for n in $splits; do
 	done
 	if [ "$bad" = 0 ]; then
 		record "${names[$n]}" FLAKY 0
-		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); see its log: ${mems[$n]}"
+		kept=$(keep_log "${names[$n]}" "$out/logs/$(slug "${names[$n]}").log")
+		mq_event FLAKY "${names[$n]} red together, every test in it passed alone, so one leaks state into the next (fix it, or mark it '# gate: alone'); members: ${mems[$n]}; failing log: $kept"
+		# Then name the leaker, off to the side: it never holds or fails the gate.
+		mq_detach "$out/bisect.log" /bin/bash "$here/bisect.sh" "$out" "${names[$n]}" "${mems[$n]}" "$kept" "$(git rev-parse HEAD)"
 	fi
 done
 
