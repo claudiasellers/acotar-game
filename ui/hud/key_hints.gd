@@ -21,6 +21,7 @@ const NUDGE_SECONDS := 6.0
 ## Highest first.
 const ROWS := {
 	&"beast": [[&"interact", "throw the knife"], [&"fire", "the bracelets"], [&"", "or stand still"]],
+	&"sidestep": [[&"jump", "sidestep"]],
 	&"sell": [[&"interact", "sell the pelt"]],
 	&"skin": [[&"interact", "skin"]],
 	&"sleep": [[&"interact", "sleep until night"]],
