@@ -8,10 +8,11 @@
 ## menus, the whistle and E listen to). Nothing here calls game methods to act;
 ## it only reads state to check what happened.
 ##
-## Timing is in frames and conditions, never wall-clock: the gate machine is
-## shared with heavy jobs. Engine.max_fps is held at 60 while a harness lives,
-## so a frame budget is about game time and real-time timers in the game
-## (create_timer) take the same number of frames on a fast or slow machine.
+## Timing is in game ticks (physics frames) and conditions, never wall-clock
+## and never drawn frames: the gate machine is shared with heavy jobs, and it
+## has drawn 89 frames in 7 ticks with the fps cap set. Engine.max_fps is
+## still held at 60 while a harness lives, so where the cap holds a drawn
+## frame is a tick.
 
 extends RefCounted
 
@@ -198,11 +199,13 @@ func release(action: StringName) -> void:
 	Input.parse_input_event(event_for(action, false))
 
 
-## A tap: down, `frames` process frames, up, then one frame for it to land.
+## A tap: down, `frames` game ticks, up, then a tick and a drawn frame for it
+## to land (the game polls keys in its ticks; the screens hear them drawn).
 func press(action: StringName, frames: int = 2) -> void:
 	hold(action)
-	await test.wait_process_frames(maxi(frames, 1))
+	await test.wait_physics_frames(maxi(frames, 1))
 	release(action)
+	await test.wait_physics_frames(1)
 	await test.wait_process_frames(1)
 
 
@@ -280,7 +283,7 @@ func look_toward(point: Vector3, tolerance: float = 0.08, max_frames: int = 240)
 		if absf(push) < 0.3:
 			push = 0.3 * signf(push)
 		look_stick(Vector2(push, 0.0))
-		await test.wait_process_frames(1)
+		await test.wait_physics_frames(1)
 	look_stick(Vector2.ZERO)
 	return ok
 
@@ -295,19 +298,22 @@ func mouse_move(relative: Vector2) -> void:
 
 # --- waiting -----------------------------------------------------------------
 
-## Waits process frames until `cond` is true. Returns false if it never was.
+## Waits until `cond` is true, at most `max_frames` game ticks (physics
+## frames, 1/60 s of game time each). Returns false if it never was. Drawn
+## frames are no measure: a machine that ignores the fps cap draws ten of them
+## in one tick.
 func wait_until(cond: Callable, max_frames: int) -> bool:
 	var physics_before := Engine.get_physics_frames()
 	var drawn_before := Engine.get_process_frames()
 	var clock_before := Time.get_ticks_msec()
 	var ok := false
-	for i in max_frames:
+	while Engine.get_physics_frames() - physics_before < max_frames:
 		if cond.call():
 			ok = true
 			break
-		await test.wait_process_frames(1)
+		await test.wait_physics_frames(1)
 	ok = ok or bool(cond.call())
-	last_wait = "waited %d frames: %d physics ticks, %d engine frames, %d ms; fps cap %d, time x%.2f, paused %s, on floor %s" % [
+	last_wait = "waited up to %d ticks: %d physics ticks, %d engine frames, %d ms; fps cap %d, time x%.2f, paused %s, on floor %s" % [
 			max_frames, Engine.get_physics_frames() - physics_before, Engine.get_process_frames() - drawn_before,
 			Time.get_ticks_msec() - clock_before, Engine.max_fps, Engine.time_scale, test.get_tree().paused,
 			feyre.is_on_floor() if feyre != null and is_instance_valid(feyre) else false]

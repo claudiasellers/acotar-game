@@ -28,17 +28,22 @@ waits on the class cache). `h.dispose()` in `after_all`.
   `look_toward(point)`; `mouse_move(rel)`. `event_for(action)` builds the
   player's first binding: key, else mouse button, else pad button.
 - Waiting: `wait_until(cond, max_frames)`, `walk_to(point, radius, max_frames, sprint, amount)`,
-  `wait_still()`. Frames and conditions only, never wall-clock. After a wait,
-  `h.last_wait` says how many physics ticks and milliseconds its frames really
-  were and what could have held the game (fps cap, time scale, pause); put it
-  in the message of an assert that fails on a wait.
+  `wait_still()`. A frame budget is game ticks (physics frames, 1/60 s of
+  game time), never wall-clock and never drawn frames. After a wait,
+  `h.last_wait` says how many ticks, drawn frames and milliseconds it took and
+  what could have held the game (fps cap, time scale, pause); put it in the
+  message of an assert that fails on a wait.
 - Looking: `flat_speed()`, `flat_distance(a, b)`, `child_of(Type)`,
   `nearest_in_group(group)`, `ground_y(x, z, from_y)`, `on_solid_ground()`,
   `place_on_ground(x, z, drop, max_frames, from_y)`.
 
 ## Things that bite
 
-- The harness holds `Engine.max_fps` at 60, so frame budgets match game time.
+- Drawn frames are not game time. The harness holds `Engine.max_fps` at 60,
+  but the build machine has drawn 89 frames in 7 ticks with the cap set
+  (rejected/L77-10), so a budget counted in `wait_process_frames` can be a
+  tenth of a second there and most of a second in the cloud. Budget in ticks;
+  use `wait_process_frames` only to let a drawn frame happen.
 - `wait_physics_frames(1)` can return after two physics ticks on a busy
   machine. Count `Engine.get_physics_frames()` when ticks matter.
 - Headless the mouse is never captured: mouse look does nothing and the first

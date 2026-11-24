@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,ui/frame/screen_stack.gd,ui/frame/hud_layout.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the woods, from New Game, driven by real key and pad
 ## events (tests/integration/play/README.md). The cottage in the human realm:
 ## she wakes there, her family is in the room, the woods are outside the door.
@@ -200,7 +200,7 @@ func test_whistle_does_not_bring_the_mare_south_of_the_wall() -> void:
 	var on_whistle := func(ok: bool) -> void: answers.append(ok)
 	md.whistled.connect(on_whistle)
 	await h.press(&"call_mount")
-	await wait_process_frames(30)
+	await wait_physics_frames(30)
 	md.whistled.disconnect(on_whistle)
 	assert_eq(answers, [false] as Array[bool], "H whistles, and nobody answers in the human lands")
 	assert_true(md.mare == null or not is_instance_valid(md.mare), "no mare appears")

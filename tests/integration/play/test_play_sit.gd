@@ -102,7 +102,7 @@ func test_she_sits_at_the_first_dinner_and_stands_after() -> void:
 		if dinner.torte_gone:
 			break
 		await h.press(&"interact")
-		await wait_process_frames(24)
+		await wait_physics_frames(24)
 	assert_true(dinner.torte_gone, "E eats the plate clear and reaches for the torte (bites %d)" % dinner.bites)
 	# She stands: the controls come back and her body leaves the chair pose.
 	var stood := await h.wait_until(func() -> bool: return not dinner.seated and StoryControl.can_move(), 60 * 30)
