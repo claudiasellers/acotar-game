@@ -48,7 +48,7 @@ func test_reticle_follows_the_lens_the_player_sees() -> void:
 	assert_true(reticle.visible, "the reticle shows while aiming")
 	var shown := get_viewport().get_camera_3d()
 	assert_eq(shown, cine.camera, "the hunt's lens is what is on screen")
-	var want := shown.unproject_position(reticle.impact.point)
+	var want := shown.unproject_position(reticle.point)
 	assert_almost_eq(reticle._screen.distance_to(want), 0.0, 2.0,
 		"ring at %s, the arrow lands at %s on screen" % [reticle._screen, want])
 

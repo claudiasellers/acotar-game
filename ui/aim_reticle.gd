@@ -23,6 +23,9 @@ var _since := 0.0
 ## predictions the ring is turned by how far the sway has moved since.
 var _predicted_dir := Vector3.ZERO
 var _predicted_from := Vector3.ZERO
+## Where in the world the ring sits this frame: the predicted impact, moved
+## with the sway since that prediction.
+var point := Vector3.ZERO
 
 
 func _init(controller: BowController = null) -> void:
@@ -51,7 +54,7 @@ func _process(delta: float) -> void:
 	if cam == null:
 		cam = feyre.camera
 	# The sway since the last prediction, as a turn about the muzzle.
-	var point: Vector3 = impact.point
+	point = impact.point
 	if _predicted_dir != Vector3.ZERO and not _predicted_dir.is_equal_approx(dir):
 		point = _predicted_from + Quaternion(_predicted_dir, dir) * (point - _predicted_from)
 	if cam.is_position_behind(point):
