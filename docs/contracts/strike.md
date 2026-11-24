@@ -2,9 +2,8 @@
 
 Plan: `plans/hostile-fae/health-interactions.md` §2.2, §13 row 5 and §14.2; bow design §3.
 Code: `systems/strike/strike_controller.gd` (`StrikeController`, a child of
-Feyre named `Strike`). Input action `strike`: V on the keyboard. No pad button yet: all four
-face buttons are taken (A jump, B crouch, X interact, Y guide), so the pad
-layout is the owner's call. Strike shares no event with any other gameplay
+Feyre named `Strike`). Input action `strike`: V, pad Y (north; the owner's pick, 2026-11-24: the
+guide moved to D-pad down and crown weaving into the Collection page). Strike shares no event with any other gameplay
 action; `tests/unit/test_input_overlap.gd` fails if two do (allow-list:
 sprint/focus).
 

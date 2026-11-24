@@ -1,6 +1,6 @@
 ## No two gameplay actions share an input event (director, L75-3). A press
 ## that two actions hear does two things at once: F was craft_arrow and strike,
-## pad Y was the guide and strike. Only the pairs in SHARED_OK may share.
+## pad Y was the guide and strike (the guide is on D-pad down now). Only the pairs in SHARED_OK may share.
 ## Gameplay actions are every `input/*` in project.godot (not ui_*) plus every
 ## action a game script registers in code (RUNTIME), under both movement
 ## schemes (core/input_settings.gd).
@@ -25,7 +25,7 @@ const RUNTIME_SOURCES := [
 ]
 
 const RUNTIME_ACTIONS := [
-	&"crouch", &"debug_chemistry", &"open_collection", &"weave_crown",
+	&"crouch", &"debug_chemistry", &"open_collection",
 	&"call_mount", &"guide_open", &"journal_open", &"map_open", &"map_minimap",
 	&"satchel_open", &"quick_chord", &"quick_1", &"quick_2", &"quick_3", &"quick_4",
 ]

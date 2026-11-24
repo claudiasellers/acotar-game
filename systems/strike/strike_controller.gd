@@ -1,4 +1,4 @@
-## Strike (V; no pad button yet): one key, two contexts (bow design §3, health-interactions
+## Strike (V / pad Y): one key, two contexts (bow design §3, health-interactions
 ## §2.2, slice HK). Feyre's boot knife is always in her boot, so it's never a
 ## menu choice [C ch8-15].
 ##   - Held in a hold (a coil, a grab): the knife cuts her free at once, and
