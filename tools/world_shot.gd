@@ -16,6 +16,9 @@ const SHOTS := {
 	"village_market": [Vector3(345, 0, 2210), Vector3(385, 0, 2252), 0.5, &"human_winter"],
 	"wall_seam": [Vector3(-110, 0, 1470), Vector3(-100, 0, 1380), 0.62, &"human_winter"],
 	"hunting_forest": [Vector3(-380, 0, 1690), Vector3(-420, 0, 1722), 0.35, &"human_winter"],
+	# T121: a missed ash arrow in the first-hunt snow, 12 m ahead (see _land_ash_arrow).
+	"hunting_arrow": [Vector3(-380, 0, 1690), Vector3(-420, 0, 1722), 0.35, &"human_winter"],
+	"hunting_arrow_dusk": [Vector3(-380, 0, 1690), Vector3(-420, 0, 1722), 0.72, &"human_winter"],
 	"burnt_estate": [Vector3(-590, 0, 2290), Vector3(-640, 0, 2332), 0.7, &"human_winter"],
 	# These two use the regions' authored shot_frame markers once loaded.
 	"opening_dawn": [Vector3(-142, 0, 2186), Vector3(-160, 0, 2120), 0.27, &"human_winter"],
@@ -76,6 +79,8 @@ func _run() -> void:
 			cam.fov = (m as Node3D).get_meta(&"fov", 50.0)
 			if m.has_meta(&"time_of_day"):
 				Clock.time_of_day = m.get_meta(&"time_of_day")
+	if id.begins_with("hunting_arrow"):
+		_land_ash_arrow(world, eye, at)
 	if id == "opening_dawn":
 		# Feyre (placeholder model) at her start mark.
 		for a in get_tree().get_nodes_in_group(&"story_anchor"):
@@ -102,6 +107,18 @@ func _run() -> void:
 	var objs := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)
 	print("SHOT %s -> %s | draw_calls %d | primitives %d | objects %d" % [id, out, draw, prims, objs])
 	get_tree().quit(0)
+
+
+## An ash arrow stuck at a slant in the ground 12 m from the eye, toward `at`.
+func _land_ash_arrow(world: Node, eye: Vector3, at: Vector3) -> void:
+	var dir := Vector3(at.x - eye.x, 0.0, at.z - eye.z).normalized()
+	var p := eye + dir * 12.0
+	p.y = WorldHeight.height_at(p.x, p.z) + 0.1
+	var arrow := Arrow.create(load("res://data/arrows/ash.tres"))
+	world.add_child(arrow)
+	arrow.global_position = p
+	arrow.look_at(p + dir.rotated(Vector3.UP, 0.7) + Vector3.DOWN * 0.5)
+	arrow._stick(null)
 
 
 func _region_defs() -> Array[RegionDef]:
