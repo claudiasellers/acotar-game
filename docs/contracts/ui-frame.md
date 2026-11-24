@@ -127,8 +127,9 @@ may slide or a strap may lift inside its root.
 | `MINIMAP` | top right | minimap |
 | `VITALS` | bottom left | status chips over the bow and the health bar |
 | `PROMPT` | bottom centre, over the strap | what a key does here: every piece is a `KeyPrompt` (press card, pick card, brew, trade, Act I's key prompts) |
-| `STRAP` | bottom centre | the quick strap |
+| `STRAP` | bottom centre | the quick strap: her paint tin (`PaintTin`), the book and four pans |
 | `BOW` | right, low | the quiver card |
+| `PICKUPS` | left, mid-screen | the pickup log (`PickupLog`): what she just put in her bags; keeps left of the lane |
 | `CONTROLS` | bottom right corner, under `BOW` | the controls hint: three short lines, at least 24 px clear of the strap at every text size |
 
 Corner zones stack their pieces away from their corner, so two prompts at
@@ -246,6 +247,7 @@ every piece's script.
 | step 7c | Feyre's guide thoughts: `GuideJournal` shows them as Thought lines and keeps only the bookmark (her whorl and the G key, `ThoughtMark`) in the `THOUGHT` zone; a thought waits while another line has the lane, and the guide never clears a line that isn't its own | the card half of `guide_journal.gd`, `ui/guide/guide_vignette.gd`, `ui/guide/cartouche_style_box.gd` | `test_line_presenter.gd`: nothing names the card's parts |
 | step 7d | the lines scripts typed themselves (the triage, the grave, the hall map and its five marks, the sentries' tag) are rows of the line sheet, spoken with `DialogueDirector.line(self, id)`; a line whose speaker is `note` is Read | the typed strings; `HallMapPlan.first_thought` and each mark's `thought` | `test_line_presenter.gd`: no script under `story/` or `systems/` types a line into a `LinePresenter` call; every id a moment speaks is in the books and the sheet |
 | step 8a | notices and prompts. One `KeyPrompt` (`ui/hud/key_prompt.gd`) shows every key prompt: a slip of paper with a brass rim, an ink key cap named from the InputMap for the keyboard or the pad, and what the key does. One notice queue (`FindCard`) shows finds, rewards and notes as dark pills that wait out dread, and chapter headings (`FindCard.heading`) that do not wait. Act I's milestones are headings only: what a key does is `KeyPrompts`' to say (the beast's three choices are its row) and what to do next is never said (R2) | `ui/ui_style.gd`; the milestone card with its instruction lines, `Act1Milestones.CARDS`, `expand`, `key_name`; `PressCard.make_card`; the key rows `BrewPrompt`, `MarketPrompt` and `KeyPrompts` each built; the find card's system script fonts | `test_notices_and_prompts.gd`: only `key_prompt.gd` places in `PROMPT`, no notice or prompt script carries a colour, font or box of its own, type passes 7 to 1 in both acts and the slip's rim 3 to 1 on snow, a heading shows during a staged moment while a note waits; `test_loose_page.gd`: `UiStyle` is gone |
+| step 8b | the quick strap is her paint tin (`ui/satchel/paint_tin.gd`): the book and four pans, a pan named above the tin when used or pinned. The pickup log (`ui/hud/pickup_log.gd`, zone `PICKUPS`) names what went into her bags. A place found on the map is a chapter heading and a landmark seen is a note, through the notice queue | `ui/satchel/quick_strap.gd`, `ui/satchel/quick_ring.gd`; the `QuickBarSlot`, `QuickBarSlotSelected`, `QuickBarKey`, `QuickBarCount` variations; `SatchelHud._plus` (the "+n" over the bag); the minimap's toast | `test_paint_tin.gd`: the tin is no wider than the strap it replaces, pans show key and count, the log merges rows, drops the oldest and keeps left of the lane |
 
 ## Files outside `ui/` the frame edits
 

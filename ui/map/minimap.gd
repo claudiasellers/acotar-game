@@ -21,8 +21,6 @@ var _overlay: Control
 var _manor_disc: Control
 var _manor_plan: Control
 var _pill: Label
-var _toast: Label
-var _toast_tween: Tween
 var _sparkles: CPUParticles2D
 var _t: float = 0.0
 var _glow: Dictionary = {}
@@ -130,19 +128,6 @@ func _ready() -> void:
 	_pill.reset_size()
 	_pill.position = Vector2((DIAMETER - _pill.size.x) * 0.5, DIAMETER - 6.0)
 
-	_toast = Label.new()
-	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast.custom_minimum_size = Vector2(DIAMETER + 80.0, 0)
-	_toast.position = Vector2(-40.0, DIAMETER + 26.0)
-	_toast.add_theme_font_override(&"font", JournalTheme.font("display"))
-	_toast.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
-	_toast.add_theme_color_override(&"font_outline_color", Color(1.0, 0.96, 0.98))
-	_toast.add_theme_constant_override(&"outline_size", 8)
-	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast.modulate.a = 0.0
-	add_child(_toast)
-
 
 func _process(delta: float) -> void:
 	_t += delta
@@ -187,19 +172,12 @@ func to_local_point(xz: Vector2) -> Vector2:
 	return size * 0.5 + (xz - hud.player_xz) * scale
 
 
-## A found landmark or place: sparkles round the rim, a bounce, its name.
-func celebrate(text: String, landmark_id: String = "", big: bool = false) -> void:
+## A found landmark or place: its mark glows, sparkles round the rim and a
+## bounce. (Its name is a notice: WorldMapHud sends it to the notice queue.)
+func celebrate(landmark_id: String = "") -> void:
 	if not landmark_id.is_empty():
 		_glow[landmark_id] = 1.0
 	sparkle()
-	_toast.text = "✦  %s  ✦" % text
-	_toast.add_theme_font_size_override(&"font_size", 24 if big else 18)
-	if _toast_tween:
-		_toast_tween.kill()
-	_toast_tween = create_tween()
-	_toast_tween.tween_property(_toast, ^"modulate:a", 1.0, 0.35)
-	_toast_tween.tween_interval(3.2 if big else 2.4)
-	_toast_tween.tween_property(_toast, ^"modulate:a", 0.0, 0.9)
 
 
 ## Sparkles round the rim and a bounce (a find, or arriving at her pin).

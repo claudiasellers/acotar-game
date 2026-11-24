@@ -424,8 +424,14 @@ func _mark_seen(id: String, c: Dictionary, from_afar: bool) -> void:
 	_celebrate(String(c.label), id, false)
 
 
+## A place found is a chapter heading; a landmark seen is a note. Both go
+## through the one notice queue, and the minimap sparkles.
 func _celebrate(text: String, landmark_id: String, big: bool) -> void:
-	minimap.celebrate(text, landmark_id, big)
+	minimap.celebrate(landmark_id)
+	if big:
+		FindCard.heading(get_tree(), text)
+	else:
+		FindCard.note(get_tree(), text)
 
 
 # --- Stats -----------------------------------------------------------------------

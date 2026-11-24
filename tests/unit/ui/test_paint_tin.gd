@@ -80,3 +80,26 @@ func test_the_old_strap_and_rings_are_gone() -> void:
 		assert_false(FileAccess.file_exists(path), path)
 	var src := FileAccess.get_file_as_string("res://ui/satchel/satchel_hud.gd") + FileAccess.get_file_as_string("res://ui/satchel/paint_tin.gd")
 	assert_null(RegEx.create_from_string("QuickRing|QuickStrap|Color\\(\\s*[0-9]|Color\\(\"#").search(src), "no ring, strap or colour of its own")
+
+
+## The pickup log names what went into her bags: one row a thing, more of the
+## same adds to its row, and a row goes after a few seconds.
+func test_the_pickup_log_names_what_she_picked() -> void:
+	var log := satchel.pickups
+	assert_eq(log.get_parent(), HudLayout.of(get_tree()).zone(HudLayout.Zone.PICKUPS))
+	for row in log.get_children():
+		row.free()
+	Gameplay.inventory.add(&"ing_rose_hip", 2)
+	Gameplay.inventory.add(&"ing_bilberry", 3)
+	Gameplay.inventory.add(&"ing_rose_hip", 1)
+	var rose := ItemCatalog.get_item(&"ing_rose_hip").display_name
+	var bil := ItemCatalog.get_item(&"ing_bilberry").display_name
+	assert_eq(log.lines(), PackedStringArray(["%s  ×3" % rose, "%s  ×3" % bil]))
+	assert_eq((log.get_child(0) as Control).theme_type_variation, &"PickupRow")
+	for id: StringName in [&"ing_primrose", &"ing_lavender", &"ing_hazelnut"]:
+		Gameplay.inventory.add(id, 1)
+	assert_eq(log.get_child_count(), PickupLog.MAX_ROWS, "the oldest row makes room")
+	await wait_seconds(PickupLog.HOLD + PickupLog.FADE + 0.4)
+	assert_eq(log.lines().size(), 0, "rows go after a few seconds")
+	var right := HudLayout.CORNERS[HudLayout.Zone.PICKUPS][1].x + PickupLog.WIDTH as float
+	assert_lte(right, HudLayout.LANE_LEFT, "the log keeps left of the lane lines stand in")

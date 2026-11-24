@@ -20,6 +20,7 @@ enum Zone {
 	STRAP,  ## Bottom centre: the quick strap.
 	BOW,  ## Right, low: the quiver card.
 	CONTROLS,  ## Bottom right corner, under BOW: the controls hint.
+	PICKUPS,  ## Left, mid-screen: the pickup log.
 }
 
 const NODE := ^"ScreenStack/HudLayout"
@@ -51,6 +52,7 @@ const SHOWS := {
 	Zone.STRAP: _PLAY,
 	Zone.BOW: _PLAY | _STAGED | _HELD,
 	Zone.CONTROLS: _PLAY | _STAGED | _HELD,
+	Zone.PICKUPS: _PLAY,
 }
 ## Corner zones: [anchor preset, offset from that anchor]. The rest fill the
 ## screen.
@@ -63,6 +65,7 @@ const CORNERS := {
 	Zone.STRAP: [Control.PRESET_CENTER_BOTTOM, Vector2(0, -84)],
 	Zone.BOW: [Control.PRESET_BOTTOM_RIGHT, Vector2(-40, -230)],
 	Zone.CONTROLS: [Control.PRESET_BOTTOM_RIGHT, Vector2(-MARGIN, -MARGIN)],
+	Zone.PICKUPS: [Control.PRESET_CENTER_LEFT, Vector2(0, -90)],
 }
 
 var _zones: Dictionary[Zone, Control] = {}

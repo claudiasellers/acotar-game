@@ -1,5 +1,6 @@
 ## The quick bar along the bottom of the screen, the satchel page, the
-## satchel Feyre wears, and the little flight each pickup makes into her bag.
+## satchel Feyre wears, the little flight each pickup makes into her bag and
+## the pickup log that names it.
 ## Add one to an entry scene: add_child(SatchelHud.new()).
 ##
 ## The bar is her paint tin (PaintTin): the book at its left end and four
@@ -38,6 +39,7 @@ var menu: SatchelMenu
 var worn: SatchelWorn
 
 var _bar_root: Control
+var pickups: PickupLog
 var _tin: PaintTin
 var _chord: bool = false
 var _chord_time: float = 0.0
@@ -211,6 +213,7 @@ func _build_bar() -> void:
 	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bar_root.custom_minimum_size = bar_size()
 	HudLayout.of(get_tree()).place(_bar_root, HudLayout.Zone.STRAP, self)
+	pickups = PickupLog.make(self)
 	_tin = PaintTin.new()
 	_tin.position = Vector2(0, CHORD_LIFT)
 	_bar_root.add_child(_tin)
@@ -284,6 +287,7 @@ func _sparkle(target: Control) -> void:
 func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	_idle = 0.0
 	_refresh()
+	pickups.add(id, count)
 	if not _bar_root.is_visible_in_tree() or _flights >= MAX_FLIGHTS:
 		return
 	var feyre := _player()
@@ -308,20 +312,9 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 		icon.queue_free()
 		_flights -= 1
 		Juice.bounce_control(_tin.book, 0.2 * Juice.effects_scale)
-		_plus(count)
 		SatchelSounds.play(&"pickup", self))
 
 
 func _quad(a: Vector2, b: Vector2, c: Vector2, k: float) -> Vector2:
 	return a.lerp(b, k).lerp(b.lerp(c, k), k)
 
-
-func _plus(count: int) -> void:
-	var l := BookKit.label("+%d" % count, &"TinName")
-	l.top_level = true
-	_bar_root.add_child(l)
-	l.position = _tin.book.global_position + Vector2(_tin.book.size.x * 0.5 - 10, -18)
-	var t := l.create_tween().set_parallel()
-	t.tween_property(l, ^"position:y", l.position.y - 30, 0.7).set_ease(Tween.EASE_OUT)
-	t.tween_property(l, ^"modulate:a", 0.0, 0.7).set_delay(0.25)
-	t.chain().tween_callback(l.queue_free)

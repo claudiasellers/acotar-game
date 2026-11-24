@@ -86,6 +86,7 @@ const LABELS := {
 	&"LineDread": [28, "display", 400, &"bone"],
 	&"PromptText": [20, "body", 700, &"ink"],
 	&"BowText": [20, "body", 700, &"paper"],
+	&"PickupText": [20, "body", 700, &"paper"],
 	&"NoticeKicker": [14, "body", 800, &"glow"],
 	&"NoticeTitle": [30, "display", 400, &"paper"],
 	&"NoticeBody": [17, "body", 600, &"paper"],
@@ -93,7 +94,7 @@ const LABELS := {
 }
 const PANELS: Array[StringName] = [
 	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
-	&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare",
+	&"PromptPill", &"BowCard", &"NoticeCard", &"NoticeRare", &"PickupRow",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
 ## An index tab along the top of the book. White, so each wears its own wash.
@@ -213,6 +214,7 @@ static func build(of_act: Act) -> Theme:
 	prompt.shadow_size = 6
 	prompt.shadow_offset = Vector2(0, 2)
 	t.set_stylebox(&"panel", &"PromptPill", prompt)
+	t.set_stylebox(&"panel", &"PickupRow", _trail(Color(c.ink, PILL_DEPTH)))
 	t.set_stylebox(&"panel", &"BowCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(18, 8)))
 	t.set_stylebox(&"panel", &"NoticeCard", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(22, 14), 20))
 	t.set_stylebox(&"panel", &"NoticeRare", _pill(Color(c.ink, PILL_DEPTH), c.glow, 3, Vector2(22, 14), 20))
@@ -493,6 +495,26 @@ static func soft_dot(size: int = 32) -> GradientTexture2D:
 	tex.fill_from = Vector2(0.5, 0.5)
 	tex.fill_to = Vector2(0.5, 0.0)
 	return tex
+
+
+## The dark behind a row of the pickup log: solid at the screen's left edge,
+## gone by its right end.
+static func _trail(tint: Color) -> StyleBoxTexture:
+	var gradient := Gradient.new()
+	gradient.set_color(0, tint)
+	gradient.set_color(1, Color(tint, 0.0))
+	gradient.set_offset(0, 0.6)
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.width = 64
+	tex.height = 4
+	var box := StyleBoxTexture.new()
+	box.texture = tex
+	box.content_margin_left = 28
+	box.content_margin_right = 28
+	box.content_margin_top = 6
+	box.content_margin_bottom = 6
+	return box
 
 
 ## A clean flat shape: buttons, chips, key caps. No gradient, glow or bevel.
