@@ -72,3 +72,18 @@ func test_no_key_in_the_world_weaves_and_the_bookmark_has_the_dpad() -> void:
 	assert_eq(KeyPrompt.key(GuideJournal.ACTION), "G")
 	SatchelHud.pad_active = true
 	assert_eq(KeyPrompt.key(GuideJournal.ACTION), "↓", "named from the input map on the pad")
+
+
+## Weaving has no key in the world, so the journal says when she can: a dot
+## on the Wardrobe tab until she opens the page, and one on the Crowns tab.
+func test_the_wardrobe_tab_has_news_while_she_can_weave() -> void:
+	var tab := WardrobeTab.ensure(get_tree())
+	assert_false(tab.has_news(), "no blooms, no news")
+	Gameplay.inventory.add(&"ing_rose_red", 3)
+	Gameplay.inventory.add(&"ing_primrose", 2)
+	assert_true(tab.has_news())
+	var view: DressingRoomView = await _open()
+	assert_false(tab.has_news(), "seen once the page is open")
+	var marked := view.find_children("News", "", true, false)
+	assert_eq(marked.size(), 1)
+	assert_eq((marked[0].get_parent() as Button).text, DressingRoomView.WEAVE_TAB)
