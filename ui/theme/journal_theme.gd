@@ -61,6 +61,13 @@ const HORROR := {
 	&"blood": Color(0.25, 0.0, 0.02),
 }
 
+## What her body tells her (the vitals HUD and the screen's edges): her blood
+## is duller in the human realm, and frost is bluer in Spring's light.
+const VITALS := {
+	Act.HUMAN: {&"health": Color("#b8574f"), &"frost": Color(0.92, 0.97, 1.0), &"bile": Color("#6f7f3a")},
+	Act.SPRING: {&"health": Color("#f0668c"), &"frost": Color(0.86, 0.90, 1.0), &"bile": Color("#6f7f3a")},
+}
+
 ## The pastel washes she paints with: one per index tab of the book, and the
 ## blot behind a thing drawn on a page. The same in both acts.
 const WASHES: Array[Color] = [
@@ -87,6 +94,7 @@ const LABELS := {
 	&"PromptText": [20, "body", 700, &"ink"],
 	&"BowText": [20, "body", 700, &"paper"],
 	&"PickupText": [20, "body", 700, &"paper"],
+	&"VitalsFigure": [15, "body", 800, &"paper"],
 	&"NoticeKicker": [14, "body", 800, &"glow"],
 	&"NoticeTitle": [30, "display", 400, &"paper"],
 	&"NoticeBody": [17, "body", 600, &"paper"],
@@ -135,7 +143,10 @@ static func act() -> Act:
 ## A colour token: the act's own, or one that is the same in both acts.
 static func color(token: StringName) -> Color:
 	var of_act: Dictionary = COLORS[act()]
-	return of_act[token] if of_act.has(token) else HORROR[token]
+	if of_act.has(token):
+		return of_act[token]
+	var vitals: Dictionary = VITALS[act()]
+	return vitals[token] if vitals.has(token) else HORROR[token]
 
 
 static func colors(of_act: Act) -> Dictionary:

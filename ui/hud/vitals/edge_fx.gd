@@ -6,8 +6,6 @@ class_name VitalsEdgeFx
 extends ColorRect
 
 const SHADER := preload("res://ui/hud/vitals/edge_fx.gdshader")
-const FROST_SPRING := Color(0.86, 0.90, 1.0)
-const FROST_HUMAN := Color(0.92, 0.97, 1.0)
 const EASED: Array[StringName] = [&"dread", &"low_health", &"venom", &"cold", &"fae", &"ease", &"heal"]
 
 ## uniform -> wanted value.
@@ -29,7 +27,7 @@ func set_strength(value: float) -> void:
 
 
 func set_frost_human(human: bool) -> void:
-	var c := FROST_HUMAN if human else FROST_SPRING
+	var c: Color = JournalTheme.VITALS[JournalTheme.Act.HUMAN if human else JournalTheme.Act.SPRING].frost
 	_mat.set_shader_parameter(&"frost_color", Vector3(c.r, c.g, c.b))
 
 

@@ -57,7 +57,7 @@ deckled edge, tinted to a paper token. Made by
 |---|---|
 | SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, ThoughtMark, PromptPill, BowCard, NoticeCard, NoticeRare, PickupRow, SatchelChip, SatchelKey | PanelContainer |
 | SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle | Label |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, TinName, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread, PromptText, BowText, PickupText, VitalsFigure, NoticeKicker, NoticeTitle, NoticeBody, ChapterTitle | Label |
 | SatchelMeter | ProgressBar |
 
 `CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
@@ -84,6 +84,10 @@ axis name**: the engine ignores a string key without a word, and every label
 drew at Nunito's lightest cut (200) until step 7a found it.
 
 ## The horror palette
+
+`JournalTheme.VITALS` (`health`, `frost`, `bile`, one set an act) is what her
+body tells her: the vitals HUD and the screen's edges read it, and
+`JournalTheme.color()` answers for these and the horror tokens too.
 
 `JournalTheme.HORROR` (`bone`, `pall`, `blood`) is the same in both acts and
 is worn only by the `LineWhisper`, `LineDread` and `LineFlood` variations (R3:

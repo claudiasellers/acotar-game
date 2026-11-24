@@ -1,10 +1,10 @@
 ## Her statuses, over the health bar: up to five round medallions, danger
 ## first, then "+n". Three across and a second row above, so the chips stop
 ## short of the lane spoken lines use (HudLayout.LANE_LEFT).
-## Each sits on a disc of the satchel chip's look (theme paper in a gilt rim,
-## like the quick bar and the thought card) with its timer as the rim's inner arc: it
-## drains for timed effects (blinking in the last 3 s), creeps for venom and is
-## full for live states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
+## Each is a pan like the paint tin's (one shape for everything she carries or
+## feels): paper in a brass rim with a gold timer ring for a good status, and
+## the dark, cracked pan for a bad one. The ring drains for timed effects
+## (blinking in the last 3 s), creeps for venom and is full for live states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
 class_name VitalsStatusRow
 extends Control
 
@@ -15,21 +15,16 @@ const STEP := 80.0
 const RADIUS := 38.0
 const ICON := 48.0
 const RING_W := 4.0
-const TRACK := Color(0.227, 0.141, 0.267, 0.16)
-const DEBUFF_RING := Color("#7A1E2A")
-const VENOM_RING := Color("#6F7F3A")
-## Gilt rim width as a share of the radius.
-const RIM := 0.16
+## The rim's width as a share of the radius.
+const RIM := 0.1
+## Cracks across a bad status's dark pan: [from, to] as shares of the radius.
+const CRACKS := [[Vector2(-0.75, -0.3), Vector2(-0.2, 0.1)], [Vector2(-0.2, 0.1), Vector2(-0.35, 0.7)],
+	[Vector2(0.8, -0.15), Vector2(0.3, 0.25)], [Vector2(0.3, 0.25), Vector2(0.45, 0.72)]]
 const POP_SECONDS := 0.35
 
 ## What to draw this frame: [{tag, magnitude, seconds_left, total}].
 var shown: Array[Dictionary] = []
 var overflow: int = 0
-## The buff timer arc and the "+n" ink, the disc and its rim; the HUD sets
-## them from the theme (ink, paper, glow).
-var ring_color: Color = Color("#3A2444")
-var paper: Color = Color("#FBF3F5")
-var gilt: Color = Color("#E3C35A")
 var _icons: Dictionary = {}
 ## tag -> seconds since it appeared, for the pop and shudder.
 var _born: Dictionary = {}
@@ -71,6 +66,12 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	var ink := JournalTheme.color(&"ink")
+	var paper := JournalTheme.color(&"paper")
+	var line := JournalTheme.color(&"line")
+	var glow := JournalTheme.color(&"glow")
+	var danger := JournalTheme.color(&"danger")
+	var pall := JournalTheme.color(&"pall")
 	for i in shown.size():
 		var s: Dictionary = shown[i]
 		var tag: StringName = s.tag
@@ -84,19 +85,20 @@ func _draw() -> void:
 		if debuff and age < 0.45:
 			c.x += sin(age * 70.0) * 3.0 * (1.0 - age / 0.45)
 		var r := RADIUS * scale
-		draw_circle(c, r, gilt.darkened(0.38), true, -1.0, true)
-		draw_circle(c, r - 1.5, gilt, true, -1.0, true)
-		draw_circle(c, r * (1.0 - RIM), paper, true, -1.0, true)
-		draw_arc(c, r * (1.0 - RIM), 0.0, TAU, 48, gilt.darkened(0.25), 1.2, true)
+		draw_circle(c, r, danger if debuff else line, true, -1.0, true)
+		draw_circle(c, r * (1.0 - RIM), pall.lerp(ink, 0.5) if debuff else paper, true, -1.0, true)
+		if debuff:
+			for crack: Array in CRACKS:
+				draw_line(c + (crack[0] as Vector2) * r, c + (crack[1] as Vector2) * r, Color(danger, 0.8), 1.5, true)
 		var ring_r := r * (1.0 - RIM) - RING_W * 0.5
-		draw_arc(c, ring_r, 0.0, TAU, 48, TRACK, RING_W, true)
+		draw_arc(c, ring_r, 0.0, TAU, 48, Color(paper if debuff else ink, 0.16), RING_W, true)
 		var frac := 1.0
-		var col := DEBUFF_RING if debuff else ring_color
+		var col := danger.lightened(0.25) if debuff else glow
 		var total := float(s.total)
 		var left := float(s.seconds_left)
 		if tag == &"venom":
 			frac = clampf(float(s.magnitude), 0.0, 1.0)
-			col = VENOM_RING.lerp(Color("#120C10"), clampf(frac - 0.5, 0.0, 0.5))
+			col = (JournalTheme.color(&"bile") as Color).lightened(0.2)
 		elif total > 0.0:
 			frac = clampf(left / total, 0.0, 1.0)
 			if left < 3.0 and fmod(left, 0.5) < 0.25:
@@ -114,13 +116,13 @@ func _draw() -> void:
 				var p := c + Vector2(cos(a), sin(a)) * (r + 6.0 + 16.0 * k)
 				var pts := sparkle_points(p, 5.0 * (1.0 - k))
 				if pts.size() >= 3:
-					draw_colored_polygon(pts, Color(1.0, 0.93, 0.62, 1.0 - k))
+					draw_colored_polygon(pts, Color(glow.lightened(0.3), 1.0 - k))
 	if overflow > 0:
 		var font := get_theme_default_font()
 		var at := _slot(shown.size()) + Vector2(-RADIUS + 8.0, 10.0)
 		var text := "+%d" % overflow
-		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(1.0, 0.97, 0.92))
-		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ring_color)
+		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, paper)
+		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ink)
 
 
 ## The sparkle diamond at `p`, half-height `rs`. Empty when it is too small to

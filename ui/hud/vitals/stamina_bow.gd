@@ -10,9 +10,8 @@ extends Control
 const SIZE := 100.0
 const DIR := "res://ui/theme/icons/status/"
 const PIECES := 5
-const WINDED := Color(0.62, 0.6, 0.66)
-const BUD := Color("#E8C14A")
-const KEYLINE := Color("#24142C")
+## How far toward grey the lit pieces go when she is winded.
+const WINDED_GREY := 0.45
 const MAX_BUDS := 5
 ## The layers' 48 grid inside SIZE (bow_meter.mjs renders with an 8% pad).
 const PAD := 0.08
@@ -80,7 +79,7 @@ func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
 	var tint := Color.WHITE
 	if winded:
-		tint = WINDED
+		tint = Color.WHITE.lerp(JournalTheme.color(&"ink_soft"), WINDED_GREY)
 	elif fraction < 0.25:
 		tint.a = 0.6 + 0.4 * (0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.0126))
 	draw_texture_rect(_string, rect, false)
@@ -94,13 +93,13 @@ func _draw() -> void:
 	for b in buds:
 		var p := _grid(PIECES - 1 - b, ARC_OUTER + 2.4)
 		var rad := 2.4 + (_bloom * 2.4 if b == buds - 1 else 0.0)
-		draw_circle(p, rad + 1.1, KEYLINE, true, -1.0, true)
-		draw_circle(p, rad, BUD, true, -1.0, true)
+		draw_circle(p, rad + 1.1, JournalTheme.color(&"ink"), true, -1.0, true)
+		draw_circle(p, rad, JournalTheme.color(&"glow"), true, -1.0, true)
 	if _sparkle > 0.0 and buds > 0:
 		var c := _grid(PIECES - buds, ARC_OUTER + 2.4)
 		for i in 8:
 			var a := TAU * i / 8.0 + _sparkle
-			_star(c + Vector2(cos(a), sin(a)) * 18.0 * (1.0 - _sparkle), 5.0 * _sparkle, Color(1.0, 0.92, 0.6, _sparkle))
+			_star(c + Vector2(cos(a), sin(a)) * 18.0 * (1.0 - _sparkle), 5.0 * _sparkle, Color((JournalTheme.color(&"glow") as Color).lightened(0.3), _sparkle))
 
 
 ## The point at the middle of piece i's sweep, `radius` out from the arc centre,

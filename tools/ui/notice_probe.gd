@@ -11,6 +11,8 @@ const FEYRE := "res://characters/feyre/feyre.tscn"
 ## Notices and the quiver card come and go inside two seconds: catch them
 ## this long after they are asked for.
 const CATCH_SECONDS := 0.7
+## Two good statuses and two bad, for the vitals frame.
+const VITALS_SHOWN: Array[StringName] = [&"heal", &"at_ease", &"drowsy", &"chilled"]
 ## The brightest ground each act has: noon snow, and a Spring path at noon.
 const GROUND := {"p1": Color(0.97, 0.98, 1.0), "p3": Color(0.62, 0.93, 0.5)}
 
@@ -51,6 +53,7 @@ func _go() -> void:
 		Gameplay.inventory.add(id, 6)
 	var satchel := SatchelHud.new()
 	add_child(satchel)
+	add_child(VitalsHud.new())
 	var press := PressCard.find_or_make(self)
 	var keys := KeyPrompt.make(self)
 	var steps := {
@@ -70,6 +73,12 @@ func _go() -> void:
 			Gameplay.inventory.add(&"ing_bilberry", 3)
 			Gameplay.inventory.add(&"ing_lavender", 1)
 			Gameplay.inventory.add(&"ing_rose_hip", 1),
+		"vitals": func() -> void:
+			var v := Vitals.of(feyre)
+			v.health = 58.0
+			for tag: StringName in VITALS_SHOWN:
+				v.apply_status(&"probe", tag, 0.6, 40.0)
+			v.health_changed.emit(v.health, VitalsState.MAX_HEALTH, -1.0, &"probe"),
 		"tin": func() -> void: satchel.bar.pinned.emit(1, satchel.bar.entry(1)),
 		"tin_chord": func() -> void: satchel._set_chord(true),
 	}

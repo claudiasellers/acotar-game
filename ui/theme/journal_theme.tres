@@ -1094,11 +1094,17 @@ corner_radius_bottom_left = 999
 [sub_resource type="FontVariation" id="FontVariation_5dtnb"]
 base_font = ExtResource("1_pt4dc")
 variation_opentype = {
+2003265652: 800
+}
+
+[sub_resource type="FontVariation" id="FontVariation_iunaw"]
+base_font = ExtResource("1_pt4dc")
+variation_opentype = {
 2003265652: 500
 }
 
 [resource]
-default_font = SubResource("FontVariation_5dtnb")
+default_font = SubResource("FontVariation_iunaw")
 default_font_size = 20
 BookRibbon/base_type = &"Button"
 BookRibbon/colors/font_color = Color(0.9647059, 0.9411765, 0.8901961, 1)
@@ -1377,3 +1383,7 @@ VScrollBar/styles/grabber = SubResource("StyleBoxFlat_fpjhs")
 VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_o22ur")
 VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_sqcfv")
 VScrollBar/styles/scroll = SubResource("StyleBoxFlat_aveom")
+VitalsFigure/base_type = &"Label"
+VitalsFigure/colors/font_color = Color(0.9647059, 0.9411765, 0.8901961, 1)
+VitalsFigure/font_sizes/font_size = 15
+VitalsFigure/fonts/font = SubResource("FontVariation_5dtnb")
