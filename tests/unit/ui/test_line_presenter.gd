@@ -193,7 +193,7 @@ func test_a_whisper_stands_apart_and_does_not_take_the_lane() -> void:
 	lines.say(LinePresenter.Voice.WHISPER, "", "Look at me.", null, 30.0)
 	await wait_process_frames(2)
 	var whisper := lines.stand_of(LinePresenter.Voice.WHISPER)
-	assert_eq(lines.showing, "Bread. Think of bread.", "her thought stays in the lane")
+	assert_eq(lines.showing, "Bread. Think of bread.", "her thought stays up")
 	assert_eq(whisper.showing, "Look at me.")
 	assert_eq(whisper.theme_type_variation, &"LineBare", "no sheet at all")
 	var view := get_viewport().get_visible_rect().size

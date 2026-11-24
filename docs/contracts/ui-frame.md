@@ -122,7 +122,7 @@ may slide or a strap may lift inside its root.
 | `EDGE` | full screen, on `UiLayers.EDGE` under everything | screen-edge effects, Act I's hush vignette |
 | `WORLD` | full screen | aim reticle, grab ring, the dev overlay (F3) |
 | `WAY` | full screen | the player's own pin marker, and nothing the game sets (R2) |
-| `THOUGHT` | top left | Feyre's thought and its tab |
+| `THOUGHT` | top left | the bookmark of Feyre's thoughts (her whorl and the G key); a thought's slip comes out beside it, from `LinePresenter`'s corner |
 | `NOTICE` | top centre | the notice queue (`FindCard`): first finds, rewards and notes, and chapter headings |
 | `MINIMAP` | top right | minimap |
 | `VITALS` | bottom left | status chips over the bow and the health bar |
@@ -150,7 +150,7 @@ fired it, and each is one row of `LinePresenter.VOICES`:
 | Voice | When | Stands | Sheet | Type |
 |---|---|---|---|---|
 | `SAID` | anyone speaking aloud, Feyre included, in play and in films | lane | `LineBand`: a smear of shadow with no edge; the name over it in gold spaced capitals (`LineName`) | `LineSaid`, upright |
-| `THOUGHT` | everything in Feyre's head | lane | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
+| `THOUGHT` | everything in Feyre's head | corner | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
 | `TOLD` | a film's narration | lane | `LineBand`, no name | `LineTold`, her hand, large |
 | `WHISPER` | a voice in her head that is not hers (the Bogge) | middle | `LineBare`: none | `LineWhisper`: bone in a thin italic hand, red only as the bleed around it, trembling |
 | `DREAD` | a thing that should not speak (the Suriel) | lane | `LineFlood`: black that floods up from the foot of the screen, edge to edge, no sheet and no corner | `LineDread`: bone Marcellus, writing itself out at 38 letters a second, never still |
@@ -158,20 +158,32 @@ fired it, and each is one row of `LinePresenter.VOICES`:
 
 Whisper and Dread wear the horror palette (`JournalTheme.HORROR`) on purpose (R3).
 
-Three places, one line at a time in each. **The lane** runs between
+Four places, one line at a time in each. **The lane** runs between
 `HudLayout.LANE_LEFT` and its mirror and hangs from `LANE_TOP` (0.805 of the
 screen's height) downwards: under Feyre's feet in the follow camera and under
 the `PROMPT` zone. The strap sits there, so `HudLayout` fades the `STRAP` zone
 out while a line is in the lane (`in_lane()`) and back after. While a film
 plays the lane stands on the bottom letterbox bar instead (`FILM_LIFT` above
-it). **The middle** (0.36 to 0.5 of the height) is the whisper's, so a whisper
-and her own thought can be up together. **The page** is held at the centre
+it). **The corner** is her thoughts' (owner, 2026-11-24: a thought low in the
+lane went unseen, and it shared its spot with speech). A slip starts at
+`CORNER`, level with her bookmark in the `THOUGHT` zone and just clear of its
+tab (`GuideJournal.TAB_WIDTH`), reads left to right and wraps at
+`CORNER_WIDTH` (460 px), so it stays clear of the notices at the top centre.
+A new thought is seen arriving and makes no sound: the slip slides `ARRIVE`
+px out from the bookmark while its whorl inks itself in (`ARRIVE_SECONDS`);
+with reduced effects it only fades in. A thought is not in the lane, so the
+strap stays, and what she thinks and what is said can be up together. In a
+film the corner sits under the top letterbox bar. `showing` and `voice` are
+the newest of the lane's line and her thought.
+`tests/unit/ui/test_thought_corner.gd` holds this. **The middle** (0.36 to
+0.5 of the height) is the whisper's, so a whisper and her own thought can be
+up together. **The page** is held at the centre
 (0.46 of the height) and wraps at 520 px. Lane text wraps at 860 px.
 
 No line is seen through another. The middle and the page share the centre of
 the screen (`CENTRE`), so a line in one takes the other's off at once, with no
 fade (`Stand.cut()`); a voice marked `alone` (Dread) takes every other line
-off the same way. The lane and the middle do stand together.
+off the same way. The lane, the corner and the middle do stand together.
 `tests/unit/ui/test_line_takes_over.gd` holds this.
 
 Calls: `say(voice, who, text, from, seconds)` returns the seconds the line
