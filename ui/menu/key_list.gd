@@ -12,6 +12,7 @@ const ROWS: Array[Array] = [
 	[&"look_left", "Look around", "Mouse", "Right stick"],
 	[&"sprint", "Sprint", "", ""],
 	[&"jump", "Jump and climb", "", ""],
+	[&"jump", "Sidestep, bow raised", "", ""],
 	[&"crouch", "Crouch", "", ""],
 	[&"interact", "Use, pick up, talk", "", ""],
 	[&"aim", "Aim the bow", "", ""],
