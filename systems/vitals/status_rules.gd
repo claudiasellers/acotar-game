@@ -30,7 +30,7 @@ const INFO := {
 	&"venom": ["Venom", "Poison, creeping. My health won't mend while it's in me, and once it's strong it drains me. A salve or a night in a bed draws it out."],
 	&"drowsy": ["Drowsy", "My eyelids are heavy and my aim sways. It passes on its own; a keen brew clears it."],
 	&"roar_shake": ["Roar shake", "That roar went through me. My aim sways until it passes."],
-	&"giddy": ["Giddy", "Faerie wine went to my head. My aim wanders until it wears off."],
+	&"giddy": ["Giddy", "A faerie brew went to my head. My aim wanders until it wears off."],
 	&"heal": ["Healing", "Food is mending me over a few breaths, further than I'd mend on my own."],
 	&"steady": ["Steady", "My bow hand is steadier, and the fear sits lighter."],
 	&"swift": ["Swift", "My stamina comes back faster."],
