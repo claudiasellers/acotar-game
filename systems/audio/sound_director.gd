@@ -51,7 +51,9 @@ var _dread_bed: AudioStreamPlayer
 var _loops: Dictionary = {}
 var _dread_tween: Tween
 var _space_timer: float = 0.0
-var _story_spaces: int = 0
+## Open story spaces: space_id -> WeakRef of the node that opened it (null when
+## the id came from a bare signal). A node freed unfinished is pruned.
+var _spaces: Dictionary = {}
 var _wolf_hits: int = 0
 var _beast: Node3D
 var _great_wolf: Node3D
@@ -187,6 +189,7 @@ func space_at(point: Vector3) -> StringName:
 
 func _process(delta: float) -> void:
 	_space_timer -= delta
+	_prune_spaces()
 	if _space_timer <= 0.0:
 		_space_timer = SPACE_EVERY
 		if is_instance_valid(_feyre):
@@ -312,7 +315,7 @@ func _in_interior(point: Vector3) -> bool:
 
 func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	var target := clampf(intensity, 0.0, 1.0) if mood == &"dread" else 0.0
-	if mood == &"dread" and dread < 0.5 and target >= 0.5 and _story_spaces == 0:
+	if mood == &"dread" and dread < 0.5 and target >= 0.5 and _spaces.is_empty():
 		play(&"horror_wrong")
 	_set_dread(target, seconds)
 	if target < 0.3:
@@ -320,16 +323,32 @@ func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 
 
 func _on_space_started(space_id: StringName) -> void:
-	_story_spaces += 1
+	var owner_ref: WeakRef = null
+	for n in get_tree().get_nodes_in_group(&"story_space_live"):
+		if n.get_meta(&"story_space_id", &"") == space_id:
+			owner_ref = weakref(n)
+	_spaces[space_id] = owner_ref
 	if String(space_id).begins_with("film_"):
 		_films[space_id] = true
 		_tween_film(1.0)
 
 
 func _on_space_finished(space_id: StringName) -> void:
-	_story_spaces = maxi(_story_spaces - 1, 0)
+	_spaces.erase(space_id)
 	if _films.erase(space_id) and _films.is_empty():
 		_tween_film(0.0)
+
+
+## A space whose node was freed without finishing (save load, stream-out, skip)
+## never emits finished; drop it so the dread sting and the film duck recover.
+func _prune_spaces() -> void:
+	for id in _spaces.keys():
+		var ref: WeakRef = _spaces[id]
+		if ref == null:
+			continue
+		var n := ref.get_ref() as Node
+		if n == null or not n.is_inside_tree():
+			_on_space_finished(id)
 
 
 func _tween_film(target: float) -> void:
