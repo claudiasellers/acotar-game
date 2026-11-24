@@ -1,0 +1,3 @@
+from feyre-vitals
+quality look
+shot hud res://tools/vitals/vitals_hud_shot.tscn {out}
