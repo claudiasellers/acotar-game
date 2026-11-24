@@ -1,0 +1,3 @@
+from ui-frame
+quality look
+shot title res://tools/pause_menu_shot.tscn title {out}/title_shut.png
