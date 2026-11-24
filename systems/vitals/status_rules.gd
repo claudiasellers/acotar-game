@@ -25,7 +25,7 @@ const DEBUFFS: Array[StringName] = [&"venom", &"drowsy", &"roar_shake"]
 ## tag -> [name, what it does], in the words the HUD teaches and the Wardrobe
 ## stats page shows. Every tag in ORDER has a line.
 const INFO := {
-	&"cold": ["Cold", "How cold she is. Cold shakes her aim and slows her stamina; deep cold costs health. Warm clothes, a fire or a warm brew help."],
+	&"cold": ["Cold", "How cold she is. Cold shakes her aim and slows her stamina; deep cold costs health. A fire or a warm brew helps."],
 	&"hunger": ["Hunger", "How hungry she is. Hunger slows her stamina, and in the human lands it lowers how far her health heals on its own. Eat."],
 	&"venom": ["Venom", "Poison that creeps. Her health won't heal while it lasts, and from half strength it drains. A salve or a night in bed cures it."],
 	&"drowsy": ["Drowsy", "Heavy eyelids and a swaying aim. It fades on its own; a keen brew clears it."],
