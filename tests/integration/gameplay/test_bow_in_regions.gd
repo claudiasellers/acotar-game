@@ -53,6 +53,8 @@ func _start(game: Node) -> Feyre:
 	await wait_until(func() -> bool: return StoryControl.mode == StoryControl.Mode.FULL, 20.0)
 	await wait_physics_frames(5)
 	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
+	# A full quiver, whatever the chapter gives her: this is about the bow.
+	Gameplay.inventory.carry_quiver(Inventory.FULL_QUIVER)
 	if Gameplay.inventory.arrow_count() < 4:
 		Gameplay.inventory.add(&"arrow_wood", 3)
 	return feyre

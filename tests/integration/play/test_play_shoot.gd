@@ -73,6 +73,8 @@ func _draw_and_loose() -> void:
 func _play_the_bow() -> void:
 	var bc := _bow()
 	# Setup: arrows to spend, and a second type for Q to land on.
+	# A full quiver, whatever the chapter gives her: this is about the bow.
+	Gameplay.inventory.carry_quiver(Inventory.FULL_QUIVER)
 	Gameplay.inventory.add(&"arrow_wood", 6)
 	Gameplay.inventory.add(&"arrow_ash", 2)
 	bc.selected = &"arrow_wood"

@@ -10,6 +10,22 @@ extends Resource
 @export var otherwise: Dictionary = {}
 
 
+## Phase id -> arrows the quiver she has by then holds (§8.1): her hand in
+## chapter 1, the stableboy's quiver, the armoury's, then a full one.
+@export var size_by_phase: Dictionary = {}
+## For phase sets with no row of their own.
+@export var size_otherwise: int = Inventory.FULL_QUIVER
+
+
+func size(phase: StringName) -> int:
+	return int(size_by_phase.get(phase, size_otherwise))
+
+
+## She carries at least the quiver this phase gives her.
+func carry(inventory: Inventory, phase: StringName) -> void:
+	inventory.carry_quiver(size(phase))
+
+
 func loadout(phase: StringName) -> Dictionary:
 	return by_phase.get(phase, otherwise)
 
