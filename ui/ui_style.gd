@@ -50,12 +50,11 @@ static func label(text: String, size: int = 18) -> Label:
 	return l
 
 
-## A centred card on its own CanvasLayer that pauses the game while open.
+## A centred card on its own CanvasLayer. The caller pushes it on ScreenStack.
 static func modal(owner_name: String, width: float = 760.0) -> Array:
 	var layer := CanvasLayer.new()
 	layer.name = owner_name
-	layer.layer = 20
-	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	layer.layer = UiLayers.SCREEN
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(center)

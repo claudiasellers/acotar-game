@@ -178,19 +178,52 @@ func test_pushing_twice_is_one_entry() -> void:
 	assert_true(ScreenStack.is_empty())
 
 
-func test_only_the_stack_touches_pause_mouse_and_escape_in_what_it_holds() -> void:
-	# Hand-ins 1b to 1d widen this list until it is every script in the game.
-	var moved := [
-		"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd", "res://ui/menu/wardrobe_tab.gd",
-		"res://ui/satchel/satchel_menu.gd", "res://ui/journal/story_journal.gd", "res://ui/map/full_map.gd",
-		"res://ui/collection_book/collection_tab.gd", "res://ui/collection_book/collection_book_ui.gd",
-		"res://ui/dressing_room/dressing_room_view.gd", "res://ui/settings_panel.gd",
-		"res://ui/title/title_settings.gd",
-	]
-	var bad := RegEx.create_from_string("paused\\s*=[^=]|mouse_mode\\s*=[^=]|&\"pause\"|&\"ui_cancel\"|\\blayer\\s*=\\s*\\d")
-	for path: String in moved:
+func test_a_cancel_handed_in_with_the_push_answers_escape() -> void:
+	var plain := Plain.new()
+	add_child_autofree(plain)
+	var calls := [0]
+	ScreenStack.push(plain, ScreenStack.Flag.MOUSE, func() -> void:
+		calls[0] += 1
+		ScreenStack.pop(plain))
+	_press(&"ui_cancel")
+	assert_eq(calls[0], 1)
+	assert_true(plain.visible, "its own cancel decides what closing means")
+
+
+func test_answers_names_the_presses_the_stack_takes() -> void:
+	var esc := InputEventAction.new()
+	esc.action = &"ui_cancel"
+	esc.pressed = true
+	var other := InputEventAction.new()
+	other.action = &"interact"
+	other.pressed = true
+	assert_true(ScreenStack.answers(esc))
+	assert_false(ScreenStack.answers(other))
+
+
+## No script but the stack pauses the tree, moves the mouse mode or reads
+## Esc. (FilmSkip lists the skip presses of a playing film, which takes input
+## before any screen.)
+func test_only_the_stack_touches_pause_mouse_and_escape() -> void:
+	var allowed := ["res://ui/frame/screen_stack.gd", "res://story/film/film_skip.gd"]
+	var bad := RegEx.create_from_string("\\btree(\\(\\))?\\.paused\\s*=[^=]|mouse_mode\\s*=[^=]|&\"pause\"|&\"ui_cancel\"")
+	for path in _game_scripts("res://"):
+		if path in allowed:
+			continue
 		var hits: Array[String] = []
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s does a job the frame owns" % path)
+		assert_eq(hits, [], "%s does a job ScreenStack owns" % path)
+
+
+func _game_scripts(dir: String) -> PackedStringArray:
+	var found := PackedStringArray()
+	for file in DirAccess.get_files_at(dir):
+		if file.ends_with(".gd"):
+			found.append(dir.path_join(file))
+	for folder in DirAccess.get_directories_at(dir):
+		if (dir == "res://" and folder in ["addons", "tests", "tools"]) or folder.begins_with("."):
+			continue
+		found.append_array(_game_scripts(dir.path_join(folder)))
+	return found
