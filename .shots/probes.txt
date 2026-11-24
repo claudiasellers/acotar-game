@@ -1,0 +1,3 @@
+from door-probe
+quality layout
+shot door res://tools/vitals/_door.tscn {out}
