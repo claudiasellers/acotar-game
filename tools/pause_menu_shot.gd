@@ -38,7 +38,7 @@ func _run() -> void:
 		scene.call(&"_on_new_game")
 		var slots := scene.get_node(^"Slots") as TitleSlots
 		(slots.get_node(^"slot_0/Pick") as Button).pressed.emit()
-	if id.begins_with("title_"):
+	if id.begins_with("title"):
 		await get_tree().create_timer(3.5).timeout  # past the title's fade-in
 	await RenderingServer.frame_post_draw
 	var img := get_tree().root.get_texture().get_image()
