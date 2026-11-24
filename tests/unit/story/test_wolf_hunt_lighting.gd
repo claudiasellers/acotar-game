@@ -1,8 +1,7 @@
 extends GutTest
-## Lane L18-11: the ch1 wolf hunt is lit so it reads (WolfHuntLighting): a
-## shadowed break in the overcast over the doe's clearing and a cold rim on the
-## doe and the great wolf, behind each from the camera; lights only, opening as
-## the hunt runs and gone again after it.
+## Lane L18: the ch1 wolf hunt's rim light (WolfHuntLighting): a cold rim on
+## the doe and the great wolf, behind each from the camera, while the hunt
+## runs; nothing lights the clearing itself (L18-14).
 
 
 class FakeHuntSpace:
@@ -39,56 +38,52 @@ func before_each() -> void:
 
 func test_nothing_lit_before_the_hunt() -> void:
 	_rig._process(1.0)
-	assert_null(_rig.cloud_break, "no rig until the hunt runs")
+	assert_null(_rig.doe_rim, "no rig until the hunt runs")
 
 
-func test_the_cloud_breaks_over_the_doe_and_the_rims_sit_behind_them() -> void:
+func test_only_the_two_rims_and_they_sit_behind_the_actors() -> void:
 	_space.running = true
 	_rig._process(0.1)
-	_rig._process(WolfHuntLighting.OPEN_SECONDS)
+	_rig._process(WolfHuntLighting.FADE_IN)
 	assert_almost_eq(_rig.amount, 1.0, 0.001)
-	var brk := _rig.cloud_break
-	assert_not_null(brk)
-	assert_true(brk.shadow_enabled, "the trunks lay bars across the snow")
-	assert_almost_eq(brk.light_energy, WolfHuntLighting.BREAK_ENERGY, 0.001)
-	assert_gt(brk.global_position.y, _space.doe.global_position.y + 25.0, "from high in the overcast")
-	var down := -brk.global_basis.z
-	var to_doe := (_space.doe.global_position - brk.global_position).normalized()
-	assert_gt(down.dot(to_doe), 0.99, "aimed at the doe's clearing")
-	assert_gt(brk.spot_range, brk.global_position.distance_to(_space.doe.global_position), "reaches the snow")
+	var lights := _space.find_children("*", "Light3D", true, false)
+	assert_eq(lights.size(), 2, "no light on the clearing, only the rims")
 	for pair in [[_rig.doe_rim, _space.doe], [_rig.wolf_rim, _space.wolf]]:
 		var rim := pair[0] as SpotLight3D
 		var actor := pair[1] as Node3D
 		assert_true(rim.visible)
-		assert_gt(rim.light_energy, 0.0)
+		assert_almost_eq(rim.light_energy, WolfHuntLighting.RIM_ENERGY, 0.001)
+		assert_false(rim.shadow_enabled)
 		var cam_to_actor := actor.global_position - _cam.global_position
 		var actor_to_rim := rim.global_position - actor.global_position
 		cam_to_actor.y = 0.0
 		actor_to_rim.y = 0.0
-		assert_gt(cam_to_actor.normalized().dot(actor_to_rim.normalized()), 0.9, "%s's rim is behind it" % rim.name)
-		assert_gt(rim.spot_range, rim.global_position.distance_to(actor.global_position + Vector3.UP * WolfHuntLighting.BODY_UP))
+		assert_gt(cam_to_actor.normalized().dot(actor_to_rim.normalized()), 0.9, "%s is behind it" % rim.name)
+		var body := actor.global_position + Vector3.UP * WolfHuntLighting.BODY_UP
+		assert_gt(rim.spot_range, rim.global_position.distance_to(body))
+		assert_lt(rim.spot_range, 10.0, "a short rim that can't reach the snow far round it")
 
 
-func test_the_light_follows_the_actors_and_hides_without_them() -> void:
+func test_the_rims_follow_and_hide_without_their_actor() -> void:
 	_space.running = true
-	_rig._process(WolfHuntLighting.OPEN_SECONDS)
+	_rig._process(WolfHuntLighting.FADE_IN)
 	_space.doe.global_position += Vector3(5, 0, 0)
 	_rig._process(0.1)
-	assert_almost_eq(_rig.cloud_break.global_position.x, _space.doe.global_position.x + WolfHuntLighting.BREAK_FROM.x, 0.01)
+	assert_gt(_rig.doe_rim.global_position.x, 4.0, "the doe's rim went with her")
 	_space.wolf.free()
 	_rig._process(0.1)
 	assert_false(_rig.wolf_rim.visible, "no rim on a freed wolf")
 
 
-func test_the_cloud_closes_after_the_hunt() -> void:
+func test_the_rims_go_after_the_hunt() -> void:
 	_space.running = true
-	_rig._process(WolfHuntLighting.OPEN_SECONDS)
+	_rig._process(WolfHuntLighting.FADE_IN)
 	_space.running = false
-	_rig._process(WolfHuntLighting.CLOSE_SECONDS * 0.5)
-	assert_almost_eq(_rig.amount, 0.5, 0.01, "closes slowly")
-	_rig._process(WolfHuntLighting.CLOSE_SECONDS)
+	_rig._process(WolfHuntLighting.FADE_OUT * 0.5)
+	assert_almost_eq(_rig.amount, 0.5, 0.01, "fades slowly")
+	_rig._process(WolfHuntLighting.FADE_OUT)
 	await wait_process_frames(1)
-	assert_null(_rig.cloud_break, "all its lights are gone")
+	assert_null(_rig.doe_rim, "all its lights are gone")
 	assert_eq(_space.find_children("*", "SpotLight3D", true, false).size(), 0)
 
 

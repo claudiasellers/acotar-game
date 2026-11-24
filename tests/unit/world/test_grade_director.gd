@@ -255,9 +255,11 @@ func test_winter_day_dread_stays_readable_and_night_dread_is_unchanged() -> void
 	var winter := GradeDirector.load_preset(&"human_winter")
 	assert_eq(winter.dread_day_look, &"dread_winter_day")
 	var day := GradeDirector.with_mood(winter, 0.5, &"dread", 0.0)
-	assert_gt(day.exposure, 0.55, "by day the hunt keeps most of its light")
+	# L18-14: darken little, so no light has to be added back (a pool of light
+	# on the clearing blew the centre snow out).
+	assert_gt(day.exposure, winter.exposure * 0.9, "by day the hunt keeps its light")
 	assert_lt(day.exposure, winter.exposure, "but dread still takes some")
-	assert_lt(day.saturation, winter.saturation * 0.75, "colour drains")
+	assert_lt(day.saturation, winter.saturation * 0.85, "colour drains")
 	assert_gt(day.fog_density, winter.fog_density * 1.5, "the fog closes in")
 	assert_gt(day.sky_top.get_luminance(), 0.35, "a grey overcast, not a black sky")
 	assert_gt(day.volumetric_ambient_inject, 0.3, "the closing fog is pale, not a black wall")
