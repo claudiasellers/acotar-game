@@ -66,6 +66,7 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 	var nm := make_mesh(aabb)
 	if not threaded:
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
+		drop_overlapping_polygons(nm)
 		region.navigation_mesh = nm
 		if done.is_valid():
 			done.call()
@@ -80,7 +81,67 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 			r.navigation_mesh = nm
 		if done.is_valid():
 			done.call()
-	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void: land.call_deferred())
+	# Clean the mesh here, where the bake finished (it touches only `nm`), so the
+	# main thread only assigns it.
+	NavigationServer3D.bake_from_source_geometry_data_async(nm, source, func() -> void:
+		NavBaker.drop_overlapping_polygons(nm)
+		land.call_deferred())
+
+
+## Recast can leave three polygons on one edge where stepped terrain folds over
+## itself. The navigation server then logs "Navigation region synchronization had
+## N edge error(s)" (an error to GUT) and the edge connects wrongly (T129). Drops
+## the smallest polygon of any such edge, to 1 cm; returns how many it dropped.
+## Pure data on `nm`, so it is safe on the bake thread.
+static func drop_overlapping_polygons(nm: NavigationMesh) -> int:
+	var verts := nm.get_vertices()
+	var count := nm.get_polygon_count()
+	var polys: Array[PackedInt32Array] = []
+	var edges := {}  # sorted vertex-key pair -> polygon indices
+	for i in count:
+		var poly := nm.get_polygon(i)
+		polys.append(poly)
+		for j in poly.size():
+			var ka := Vector3i((verts[poly[j]] * 100.0).round())
+			var kb := Vector3i((verts[poly[(j + 1) % poly.size()]] * 100.0).round())
+			if ka == kb:
+				continue
+			var key := [ka, kb] if (ka.x < kb.x or (ka.x == kb.x and (ka.y < kb.y or (ka.y == kb.y and ka.z < kb.z)))) else [kb, ka]
+			if edges.has(key):
+				edges[key].append(i)
+			else:
+				edges[key] = [i]
+	var dropped := {}
+	for key: Array in edges:
+		var users: Array = edges[key]
+		while users.size() > 2:
+			var worst := -1
+			var worst_area := INF
+			for u: int in users:
+				if dropped.has(u):
+					continue
+				var a := _poly_area(verts, polys[u])
+				if a < worst_area:
+					worst_area = a
+					worst = u
+			if worst < 0:
+				break
+			dropped[worst] = true
+			users = users.filter(func(u: int) -> bool: return not dropped.has(u))
+	if dropped.is_empty():
+		return 0
+	nm.clear_polygons()
+	for i in count:
+		if not dropped.has(i):
+			nm.add_polygon(polys[i])
+	return dropped.size()
+
+
+static func _poly_area(verts: PackedVector3Array, poly: PackedInt32Array) -> float:
+	var sum := Vector3.ZERO
+	for j in range(1, poly.size() - 1):
+		sum += (verts[poly[j]] - verts[poly[0]]).cross(verts[poly[j + 1]] - verts[poly[0]])
+	return sum.length()
 
 
 ## The manor house's footprint and every level's floor-to-ceiling band, in
