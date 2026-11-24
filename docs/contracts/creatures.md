@@ -19,7 +19,7 @@ Owner: creatures lane (`creatures/`, `data/creatures/`, `tools/blender/creatures
 | `story_actor_<spawn_id>` | actors StorySpawner answered with | story lane's handshake |
 
 ## Reads from other lanes
-- Wind: first node in group `wind_source` with `wind_at(pos: Vector3) -> Vector3`; snowfall via `snowfall_at(pos) -> float` or property `snowfall` on the same node (0 if absent).
+- Wind: first node in group `wind_source` with `wind_at(pos: Vector3) -> Vector3`; snowfall is `TrackLayer.snowfall` (0 to 1), which the weather sets.
 - Arrow type: `arrow.arrow_id` (StringName), else meta `arrow_id`, else `&"wood"`. `&"ash"` is lethal to fae.
 - Player: group `player`; signals `bow_released(pos, loudness)` (optional), `arrow_fired(arrow)`.
 
@@ -27,7 +27,9 @@ Owner: creatures lane (`creatures/`, `data/creatures/`, `tools/blender/creatures
 - `CreatureSenses.emit_noise(tree, pos, loudness)`: loudness 1.0 carries full hearing range.
 - `Creature.on_arrow_hit(arrow)`, `Creature.die(cause)`, signals `wounded(cause)`, `died(cause)`. `scripted = true` pauses the brain.
 - `Harvestable.harvest() -> Array[{item_id: StringName, qty: int}]` (once), `Harvestable.nearest(tree, pos, reach)`.
-- `TrackLayer.leave(tree, kind, pos, heading, size)`; `marks_near(pos, radius)`.
+- `TrackLayer.leave(tree, kind, pos, heading, size, owner_id)`; `marks_near(pos, radius)`; `head_of(owner_id, blood)`. Fresh trail only: a walker's newest 24 prints (40 boots, 40 blood) are crisp, older ones fade over 8 s (`HEAD`, `FADE_S`). Feyre's boots are kind `boot`, stamped by the layer.
+- `FollowLeash` (`Creature.leash`, from `CreatureData.follow_leash_m` > 0): a followed creature never gets more than the leash from Feyre once she has been within 0.8 of it. Past 0.8 it walks to a spot on the 0.6 ring her camera can't see and holds until its brain heads back within reach; seen on the way it stands; outrun and unseen it gallops, and at the leash's end it is set down on a hidden spot. It writes only `move_direction`, `move_speed`, `gait_hint` (and position, unseen, at the leash's end). `leash.paused` turns it off (the great wolf looking at her or dying). `leash_wounded_only` species (deer, hares) are leashed only once wounded and bed down (`Prey.State.BED`) at the edge. `FollowLeash.sees(creature)` / `in_view(node, point)`: in her camera's frustum with nothing solid between.
+- `LostNudge` (`Creature.nudge`, same species): out of her view for 20 s (12 in Gentle Mode) and over 15 m away, it plays `CreatureData.lost_cue` in 3D and shakes snow loose above itself; again every 25 s, three times at most; seeing it resets. `cued(count)` is for the scene's guide (the wolf hunt says `wolf_kill.lost` after the second).
 - `GreatWolf`: `looked_at_player`, `took_prey(prey)`; export `kill_flag` (empty in the game; the story lane owns `wolf_killed`).
 - `BeastActor`: `begin_approach(door)`, `break_door()`, `hold_presence()`, `loom(pos)`, `speak()`, `lead(pos)`, `withdraw()`, `pressure_at(pos) -> float` (0 beyond 18 m).
 - `FamilyMember.set_scripted(bool)`, `go_to(pos)`.

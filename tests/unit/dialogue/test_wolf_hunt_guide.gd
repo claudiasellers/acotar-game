@@ -4,7 +4,7 @@
 ## ambient lines stay quiet while the guide holds the voice.
 extends GutTest
 
-const BEATS := [&"doe", &"eyes", &"size", &"wait", &"nudge_draw", &"nudge_loose", &"wood", &"miss", &"ash",
+const BEATS := [&"doe", &"eyes", &"size", &"wait", &"nudge_draw", &"nudge_loose", &"wood", &"miss", &"lost", &"ash",
 	&"kill"]
 
 
@@ -208,3 +208,22 @@ func test_the_heart_beats_only_under_a_draw_with_him_out() -> void:
 	assert_true(guide.heart and guide.drawn)
 	guide.note_draw(false)
 	assert_false(guide.heart)
+
+
+## The lost nudge (health-interactions.md §3.6): her "lost him" thought comes
+## only after his second cue, and once.
+func test_the_lost_thought_comes_only_after_his_second_cue() -> void:
+	_start()
+	_wolf_out()
+	_elapse(30.0)
+	var before := _texts().size()
+	guide.note_lost_cue(1)
+	_elapse(5.0)
+	assert_eq(_texts().size(), before, "one cue: she says nothing")
+	guide.note_lost_cue(2)
+	_elapse(5.0)
+	assert_eq(_texts().size(), before + 1, "the second cue: she has lost him")
+	assert_true(guide.said.has(&"lost"))
+	guide.note_lost_cue(3)
+	_elapse(5.0)
+	assert_eq(_texts().size(), before + 1, "said once")
