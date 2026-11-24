@@ -12,6 +12,9 @@ const KINDS := {
 	&"craft": {"colors": [Color(1.0, 0.9, 0.6), Color(0.85, 0.95, 1.0)], "notes": [1046.5, 1318.5, 1568.0], "amount": 26},
 	&"unlock": {"colors": [Color(0.85, 0.75, 1.0), Color(1.0, 0.8, 0.9)], "notes": [1174.7, 1480.0, 1760.0], "amount": 32},
 	&"outfit": {"colors": [Color(1.0, 0.7, 0.85), Color(1.0, 0.92, 0.6), Color(0.8, 0.85, 1.0)], "notes": [1046.5, 1318.5, 1568.0, 2093.0], "amount": 60},
+	# A few notes at the manor's instruments (StationUses "play"); a pitch step each press.
+	&"pianoforte": {"colors": [Color(1.0, 0.95, 0.85), Color(0.85, 0.8, 1.0)], "notes": [523.3, 659.3, 784.0], "amount": 14},
+	&"harp": {"colors": [Color(1.0, 0.9, 0.55), Color(1.0, 0.8, 0.92)], "notes": [784.0, 880.0, 1046.5, 1174.7, 1318.5], "amount": 20},
 }
 
 ## Pickups within this many ms of each other climb the scale (a combo).
