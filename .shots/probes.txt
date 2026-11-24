@@ -1,0 +1,4 @@
+from l18-wolf-hunt
+quality look
+shot lining res://tools/lighting/wolf_hunt_light_probe.tscn {out} shot=3
+shot wide res://tools/lighting/wolf_hunt_light_probe.tscn {out} shot=2
