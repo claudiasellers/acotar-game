@@ -105,8 +105,8 @@ static func face_toward(who: Node3D, at: Vector3) -> void:
 		who.look_at(p + d, Vector3.UP)
 
 
-## Slides an actor toward a point at `speed`, playing its walk when it has one.
-## Returns true on arrival.
+## Moves an actor toward a point at `speed` (a cast model walks by itself as it
+## is moved). Returns true on arrival.
 static func step_toward(who: Node3D, at: Vector3, speed: float, delta: float) -> bool:
 	if who == null:
 		return true
@@ -117,8 +117,6 @@ static func step_toward(who: Node3D, at: Vector3, speed: float, delta: float) ->
 	who.global_position = Vector3(at.x, at.y, at.z) if arrived else Vector3(p.x, at.y, p.z) + to.normalized() * step
 	if not arrived:
 		face_toward(who, at)
-	if who.has_method(&"play_locomotion"):
-		who.call(&"play_locomotion", 0.0 if arrived else speed, true, delta)
 	return arrived
 
 
@@ -160,8 +158,6 @@ class WalkBeat:
 		target.y = who.global_position.y
 		if CalanmaiSpace.step_toward(who, target, speed, delta):
 			index += 1
-		if index >= route.size() and who.has_method(&"play_locomotion"):
-			who.call(&"play_locomotion", 0.0, true, delta)
 		return index >= route.size()
 
 

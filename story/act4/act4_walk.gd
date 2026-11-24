@@ -1,7 +1,7 @@
 ## Walks a cast actor (a CastModel, or any Node3D) across the ground for the
 ## p4 scenes: a fixed pace towards a point, feet on whatever is below (a ray
-## from above, else the terrain height), facing where it goes, with the
-## model's own walk clip when it has one (feyre_model.play_locomotion).
+## from above, else the terrain height), facing where it goes. A cast model
+## walks by itself as it is moved (feyre_model.gd).
 class_name Act4Walk
 extends RefCounted
 
@@ -14,22 +14,13 @@ static func step(who: Node3D, target: Vector3, speed: float, delta: float) -> bo
 	var to := Vector3(target.x - here.x, 0.0, target.z - here.z)
 	var dist := to.length()
 	if dist <= 0.4:
-		idle(who)
 		return true
 	var move := to / dist * minf(speed * delta, dist)
 	var next := here + move
 	next.y = ground(who, next)
 	who.global_position = next
 	face(who, target)
-	if who.has_method(&"play_locomotion") and delta > 0.0:
-		who.call(&"play_locomotion", speed, true, delta)
 	return false
-
-
-## Stops the walk clip (idle).
-static func idle(who: Node3D) -> void:
-	if who and is_instance_valid(who) and who.has_method(&"play_locomotion"):
-		who.call(&"play_locomotion", 0.0, true, 0.016)
 
 
 ## Turns `who` (flat) toward a point.

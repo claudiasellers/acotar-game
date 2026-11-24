@@ -29,8 +29,6 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if model and model.has_method(&"play_locomotion"):
-		model.call(&"play_locomotion", 0.0, true, delta)
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre == null:
 		return
