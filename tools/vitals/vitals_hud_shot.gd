@@ -42,6 +42,8 @@ func _run() -> void:
 
 func _view(id: String, path: String) -> void:
 	var view: Array = VIEWS[id]
+	# Each view starts calm: a mood holds until a scene lifts it.
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 	PhaseManager.current_phase = view[0]
 	Clock.paused = true
 	Clock.time_of_day = view[3]
@@ -58,6 +60,7 @@ func _view(id: String, path: String) -> void:
 	StoryControl.set_mode(StoryControl.Mode.FULL)
 	var v := _feyre.vitals
 	var body := _feyre.body_state
+	v.dread = 0.0
 	v.load_state({})
 	body.effects.clear()
 	body.fae_toll = 0.0
