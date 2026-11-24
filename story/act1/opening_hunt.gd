@@ -245,11 +245,13 @@ func _spawn_rabbit() -> Prey:
 func _brown(r: Node) -> void:
 	for mesh: MeshInstance3D in r.find_children("*", "MeshInstance3D", true, false):
 		for i in mesh.get_surface_override_material_count():
-			var mat := mesh.get_active_material(i) as BaseMaterial3D
-			if mat == null or mat.albedo_color.get_luminance() < PALE:
+			# A BaseMaterial3D or the CandyMaterial an imported model wears: both carry albedo_color.
+			var mat := mesh.get_active_material(i)
+			var albedo: Variant = mat.get(&"albedo_color") if mat else null
+			if not albedo is Color or (albedo as Color).get_luminance() < PALE:
 				continue
-			var coat := mat.duplicate() as BaseMaterial3D
-			coat.albedo_color = RABBIT_DATA.belly_color if mat.albedo_color.get_luminance() > WHITE else RABBIT_DATA.coat_color
+			var coat := mat.duplicate()
+			coat.set(&"albedo_color", RABBIT_DATA.belly_color if (albedo as Color).get_luminance() > WHITE else RABBIT_DATA.coat_color)
 			mesh.set_surface_override_material(i, coat)
 
 
