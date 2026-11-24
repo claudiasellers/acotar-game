@@ -30,7 +30,18 @@ const STATION_ID := &"snare"
 ## to the side of it.
 const SNARE_ALONG := 80.0
 const SNARE_SIDE := 2.4
-const RABBIT_AHEAD := 20.0
+const RABBIT_AHEAD := 12.0
+## Metres further than RABBIT_AHEAD tried for the rabbit, nearest first.
+const RABBIT_TRIES: Array[float] = [0.0, 2.0, -2.0, 4.0]
+## Her eye and the rabbit's back above the snow, and how far her line to it
+## must clear the ground between them.
+const EYE_HEIGHT := 1.5
+const RABBIT_SEEN_AT := 0.2
+const SEEN_OVER := 0.15
+## Albedo luminance above which a surface of the model is its pale coat, and
+## above which it is the white of its belly and tail.
+const PALE := 0.5
+const WHITE := 0.85
 const RABBIT_SIDE := 3.5
 ## Metres either way of SNARE_ALONG tried for the snare, and how much open
 ## ground round it is enough (a snow-laden fir's boughs reach about 4 m).
@@ -114,27 +125,43 @@ static func _open_round(p: Vector2, obstacles: Array[Vector3]) -> float:
 	return open
 
 
-## Where the rabbit grazes: RABBIT_AHEAD metres from the snare, at the first
-## spot (the trail's own direction first) she can see from the snare with no
-## trunk, bough or rock near the line, so the shot she misses is hers to miss.
+## Where the rabbit grazes: about RABBIT_AHEAD metres from the snare, where
+## she sees it whole from the snare (no rise of snow in the way) and no
+## trunk, bough or rock stands near the line, so the shot she misses is hers.
 static func rabbit_spot() -> Vector2:
 	if _rabbit_spot != Vector2.INF:
 		return _rabbit_spot
 	var from := snare_spot()
 	var obstacles := Act1Wayfinding.trail_obstacles(PackedVector2Array([
-		_along_trail(SNARE_ALONG - 12.0, 0.0), _along_trail(SNARE_ALONG + RABBIT_AHEAD + 12.0, 0.0)]))
+		_along_trail(SNARE_ALONG - 12.0, 0.0), _along_trail(SNARE_ALONG + RABBIT_AHEAD + 16.0, 0.0)]))
+	var ahead := (_along_trail(SNARE_ALONG + RABBIT_AHEAD, 0.0) - from).normalized()
 	var best := -INF
-	for a in 32:
-		# Ahead of her at RABBIT_AHEAD, the trail's own direction first, out to a quarter turn either way.
-		var spot := from + (_along_trail(SNARE_ALONG + RABBIT_AHEAD, 0.0) - from).normalized().rotated(
-			(a + 1) / 2 * (PI / 32.0) * (1.0 if a % 2 == 0 else -1.0)) * RABBIT_AHEAD
-		var open := _sight_open(from, spot, obstacles)
-		if open > best:
-			best = open
-			_rabbit_spot = spot
-		if open >= SIGHT_MARGIN:
-			return spot
+	for further: float in RABBIT_TRIES:
+		for a in 32:
+			# The trail's own direction first, out to a quarter turn either way.
+			var spot := from + ahead.rotated((a + 1) / 2 * (PI / 32.0) * (1.0 if a % 2 == 0 else -1.0)) \
+					* (RABBIT_AHEAD + further)
+			var open := minf(_sight_open(from, spot, obstacles), SIGHT_MARGIN)
+			var score := open + (SIGHT_MARGIN if _seen_over_snow(from, spot) >= SEEN_OVER else 0.0)
+			if score > best:
+				best = score
+				_rabbit_spot = spot
+			if score >= SIGHT_MARGIN * 2.0:
+				return spot
 	return _rabbit_spot
+
+
+## How far (m) her line of sight from a to the animal at b clears the snow at
+## its lowest: negative when a rise hides it.
+static func _seen_over_snow(a: Vector2, b: Vector2) -> float:
+	var eye := WorldHeight.height_at(a.x, a.y) + EYE_HEIGHT
+	var body := WorldHeight.height_at(b.x, b.y) + RABBIT_SEEN_AT
+	var clear := INF
+	for i in range(1, 16):
+		var t := i / 16.0
+		var p := a.lerp(b, t)
+		clear = minf(clear, lerpf(eye, body, t) - WorldHeight.height_at(p.x, p.y))
+	return clear
 
 
 ## Metres from the line a to b to the nearest obstacle (Vector3(x, z, radius)).
@@ -213,10 +240,26 @@ func _spawn_rabbit() -> Prey:
 	r.global_position = _ground(spot)
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
 	if feyre:
-		r.look_at(Vector3(feyre.global_position.x, r.global_position.y, feyre.global_position.z), Vector3.UP, true)
+		# Side-on to her, where it shows its whole length.
+		var to_her := feyre.global_position - r.global_position
+		r.look_at(r.global_position + Vector3(-to_her.z, 0.0, to_her.x), Vector3.UP, true)
+	_brown(r)
 	r.home = r.global_position
 	_bolted_for = -1.0
 	return r
+
+
+## The model's pale winter coat is lost on snow at this range: its light
+## surfaces take the brown of this rabbit's data (coat above, belly below).
+func _brown(r: Node) -> void:
+	for mesh: MeshInstance3D in r.find_children("*", "MeshInstance3D", true, false):
+		for i in mesh.get_surface_override_material_count():
+			var mat := mesh.get_active_material(i) as BaseMaterial3D
+			if mat == null or mat.albedo_color.get_luminance() < PALE:
+				continue
+			var coat := mat.duplicate() as BaseMaterial3D
+			coat.albedo_color = RABBIT_DATA.belly_color if mat.albedo_color.get_luminance() > WHITE else RABBIT_DATA.coat_color
+			mesh.set_surface_override_material(i, coat)
 
 
 ## Calm until she's close or nocks; ears up on the nock; gone at the release.
@@ -236,6 +279,9 @@ func _steer_rabbit(feyre: Feyre, delta: float) -> void:
 		_bolted_for = maxf(_bolted_for, 0.0) + delta
 		if _bolted_for >= GONE_SECONDS or feyre.global_position.distance_to(rabbit.global_position) >= GONE_DISTANCE:
 			_rabbit_gone()
+	elif _bolted_for >= 0.0:
+		# It has run as far as it runs: it doesn't settle where she can walk up to it.
+		_rabbit_gone()
 
 
 ## Her bow release (hooked on first sight of her): the rabbit bolts.
