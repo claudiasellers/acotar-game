@@ -35,7 +35,9 @@ waits on the class cache). `h.dispose()` in `after_all`.
 
 ## Things that bite
 
-- The harness holds `Engine.max_fps` at 60, so frame budgets match game time.
+- Every `max_frames` budget counts physics ticks (60 = 1 s of game time). Process
+  frames are uncapped headless (~670 fps; `Engine.max_fps` does nothing there), so
+  never use them as a time budget.
 - `wait_physics_frames(1)` can return after two physics ticks on a busy
   machine. Count `Engine.get_physics_frames()` when ticks matter.
 - Headless the mouse is never captured: mouse look does nothing and the first
