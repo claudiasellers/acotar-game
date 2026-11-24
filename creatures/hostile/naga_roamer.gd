@@ -384,6 +384,11 @@ func _recover() -> void:
 	_fight_left = strike_cooldown
 
 
+## The strike or lunge it is telegraphing, until contact.
+func winding_up() -> StringName:
+	return _attack if alive and (fight == Fight.STRIKE or fight == Fight.LUNGE) else &""
+
+
 ## Every fight change goes through here so the token and a hold never outlive
 ## the move that took them. The token is kept through the recovery: a member's
 ## whole cycle is one turn.
