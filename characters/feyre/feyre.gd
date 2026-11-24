@@ -350,6 +350,7 @@ func _can_sidestep() -> bool:
 func _begin_sidestep(direction: Vector3, camera_yaw: float) -> void:
 	sidestep.begin(direction if direction != Vector3.ZERO else Vector3.BACK.rotated(Vector3.UP, camera_yaw))
 	drain_stamina(SidestepMotor.STAMINA)
+	KeyHints.of(get_tree()).learn(&"sidestep")
 	if bow_controller:
 		bow_controller.sidestepped()
 

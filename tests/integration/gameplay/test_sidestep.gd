@@ -57,6 +57,7 @@ func test_space_with_the_bow_raised_steps_her_back_and_does_not_jump() -> void:
 	assert_eq(feyre.jump_motor.jumps_used, 0, "no jump")
 	assert_almost_eq(feyre.stamina, stamina - SidestepMotor.STAMINA, 0.01)
 	assert_true(feyre.is_aiming, "the bow stays up")
+	assert_false(KeyHints.of(get_tree()).teaches(&"sidestep"), "and the hint for it has done its work")
 
 
 func test_it_goes_the_way_the_stick_points() -> void:
