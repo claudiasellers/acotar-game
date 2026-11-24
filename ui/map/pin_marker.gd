@@ -30,6 +30,13 @@ var shown: bool = false
 func _init(owner_hud: Node) -> void:
 	hud = owner_hud
 	name = "PinMarker"
+	if is_instance_valid(owner_hud):
+		owner_hud.tree_exiting.connect(_drop_hud, CONNECT_ONE_SHOT)
+
+
+## The hud is leaving (region change, save load): stop reading it.
+func _drop_hud() -> void:
+	hud = null
 
 
 func _ready() -> void:
@@ -67,7 +74,8 @@ static func place_on_screen(cam: Camera3D, world: Vector3, screen: Vector2, edge
 
 func _draw() -> void:
 	shown = false
-	if not hud.pin.active or not visible:
+	# A queued redraw can run after the hud is freed; the backup to _drop_hud.
+	if not is_instance_valid(hud) or not is_instance_valid(hud.pin) or not hud.pin.active or not visible:
 		return
 	var cam := get_viewport().get_camera_3d()
 	if cam == null:

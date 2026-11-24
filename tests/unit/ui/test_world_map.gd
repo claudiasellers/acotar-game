@@ -330,3 +330,24 @@ func test_stats_line_counts_in_words() -> void:
 	assert_eq(WorldMapHud._count(1, "place"), "1 place")
 	assert_eq(WorldMapHud._count(0, "landmark"), "0 landmarks")
 	assert_eq(WorldMapHud._count(3, "place"), "3 places")
+
+
+func test_marker_and_minimap_survive_a_freed_hud() -> void:
+	var hud := WorldMapHud.new()
+	add_child(hud)
+	await wait_physics_frames(2)
+	var marker := hud.marker
+	var minimap := hud.minimap
+	# The layout only frees the pieces at the end of the frame the hud leaves in,
+	# so for that frame they outlive it and may be asked to redraw.
+	hud.free()
+	assert_null(marker.hud, "the marker lets go of a hud that leaves")
+	assert_null(minimap.hud, "the minimap lets go of a hud that leaves")
+	marker.queue_redraw()
+	minimap._overlay.queue_redraw()
+	assert_false(minimap.in_manor())
+	minimap._draw_marks()
+	minimap._draw_manor()
+	assert_eq(minimap.to_local_point(Vector2(5, 5)), minimap.size * 0.5)
+	await wait_physics_frames(2)
+	assert_false(marker.shown if is_instance_valid(marker) else false)
