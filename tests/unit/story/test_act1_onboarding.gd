@@ -7,6 +7,7 @@ const PROMPTS_CFG := "user://test_prompts.cfg"
 
 func after_each() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PROMPTS_CFG))
+	KeyHints.of(get_tree()).use_settings("user://settings.cfg")
 	WorldState.clear()
 
 
@@ -50,8 +51,9 @@ func test_the_doe_grazes_before_the_scene_starts() -> void:
 
 
 func test_prompts_show_only_when_relevant_and_are_taught_once() -> void:
+	var hints := KeyHints.of(get_tree())
+	hints.use_settings(PROMPTS_CFG)
 	var prompts := KeyPrompts.new()
-	prompts.settings_path = PROMPTS_CFG
 	add_child_autofree(prompts)
 	var feyre: Feyre = load("res://characters/feyre/feyre.tscn").instantiate()
 	add_child_autofree(feyre)
@@ -68,10 +70,8 @@ func test_prompts_show_only_when_relevant_and_are_taught_once() -> void:
 	stall.use(null)
 	Gameplay.inventory.add(FurStall.PELT, 1)
 	assert_eq(prompts.want(), &"", "taught by the first sale")
-	var again := KeyPrompts.new()
-	again.settings_path = PROMPTS_CFG
-	add_child_autofree(again)
-	assert_true(again.taught.get(&"sell", false), "remembered across launches")
+	hints.use_settings(PROMPTS_CFG)
+	assert_true(hints.taught.get(&"sell", false), "remembered across launches")
 	Gameplay.inventory.remove(FurStall.PELT, Gameplay.inventory.count(FurStall.PELT))
 
 

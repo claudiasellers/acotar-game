@@ -10,8 +10,8 @@ const FADE := 0.2
 ## Space between one key's words and the next key.
 const BETWEEN := 34
 ## Actions other systems add in code once they are up (bow_controller.gd,
-## crouch_motor.gd).
-const UNBOUND := {&"cycle_arrow": "Q", &"crouch": "Ctrl"}
+## crouch_motor.gd, satchel_hud.gd).
+const UNBOUND := {&"cycle_arrow": "Q", &"crouch": "Ctrl", &"satchel_open": "I"}
 const PAD_BUTTONS := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
 	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
 	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_RIGHT: "→", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←",

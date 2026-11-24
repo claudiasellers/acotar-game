@@ -1,5 +1,5 @@
 ## "Show tips again" (Settings): everything that teaches itself once will do
-## so once more. That is the key prompts (KeyPrompts), the status chips' slips
+## so once more. That is the key hints (KeyHints), the status chips' slips
 ## (VitalsStatusRow), the journal pages' first-opening notes (TabNote) and her
 ## thought when her blooms would make a crown (SatchelHud).
 class_name Tips
@@ -12,7 +12,7 @@ const GROUP := &"teaches_once"
 static func show_again(tree: SceneTree, settings_path: String = "user://settings.cfg") -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(settings_path) == OK:
-		for section: String in [KeyPrompts.SECTION, VitalsStatusRow.TAUGHT_SECTION]:
+		for section: String in [KeyHints.SECTION, VitalsStatusRow.TAUGHT_SECTION]:
 			if cfg.has_section(section):
 				cfg.erase_section(section)
 		cfg.save(settings_path)

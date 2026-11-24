@@ -18,12 +18,13 @@ func _play() -> void:
 	if hunt == null or keys == null:
 		return _fail("no OpeningHunt or KeyPrompts in the game")
 	# A new player: nothing taught yet, whatever an earlier run left behind.
-	keys.taught.clear()
+	var hints := KeyHints.of(get_tree())
 	var cfg := ConfigFile.new()
-	cfg.load(keys.settings_path)
-	if cfg.has_section(KeyPrompts.SECTION):
-		cfg.erase_section(KeyPrompts.SECTION)
-		cfg.save(keys.settings_path)
+	cfg.load(hints.settings_path)
+	if cfg.has_section(KeyHints.SECTION):
+		cfg.erase_section(KeyHints.SECTION)
+		cfg.save(hints.settings_path)
+	hints.forget_taught()
 	_t0 = Time.get_ticks_msec()
 	_note("quiver at the start: %s; key hints %s" % [_quiver(), GameSettings.get_value(&"key_hints")])
 	if Gameplay.inventory.arrow_count() != 3 or Gameplay.inventory.count(&"arrow_ash") != 1:
@@ -40,7 +41,7 @@ func _play() -> void:
 	var watch := func() -> void:
 		if keys.current != &"" and not seen.has(keys.current):
 			seen.append(keys.current)
-			_note("%5.1f s  prompt: %s %s" % [_secs(), keys.current, KeyPrompts.row(keys.current)])
+			_note("%5.1f s  prompt: %s %s" % [_secs(), keys.current, KeyHints.row(keys.current)])
 	var journal := get_tree().get_first_node_in_group(GuideSettings.GROUP) as GuideJournal
 	var thoughts: Array = []
 	var think := func() -> void:
@@ -107,7 +108,7 @@ func _play() -> void:
 	get_tree().process_frame.disconnect(think)
 	_rec = false
 	_note("%5.1f s  quiver %s; prompts seen %s; taught %s; lines %s; frames %d" % [_secs(), _quiver(), seen,
-		keys.taught.keys().filter(func(k: StringName) -> bool: return keys.taught[k]), spoken, _rec_count])
+		hints.taught.keys(), spoken, _rec_count])
 	if journal and journal.mode == GuideSettings.Mode.AUTO:
 		for thought: StringName in [&"onboarding_snare", &"onboarding_rabbit_gone"]:
 			if not thoughts.has(thought):

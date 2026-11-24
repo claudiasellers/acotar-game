@@ -44,7 +44,7 @@ func test_a_prompt_is_a_key_cap_and_its_words_on_a_slip() -> void:
 
 
 func test_a_row_of_keys_and_words_alone() -> void:
-	prompt.says(KeyPrompts.row(&"beast"))
+	prompt.says(KeyHints.row(&"beast"))
 	assert_eq(prompt.text(), "E   throw the knife  ·  Left mouse   the bracelets  ·  or stand still")
 	var caps := 0
 	for c in prompt.get_node(^"Row").get_children():
@@ -65,10 +65,10 @@ func test_keys_are_named_as_bound_on_what_she_holds() -> void:
 	assert_eq(KeyPrompt.key(&"aim"), "LT")
 	assert_eq(KeyPrompt.key(&"fire"), "RT")
 	SatchelHud.pad_active = false
-	for id: StringName in KeyPrompts.PROMPTS:
-		for pair: Array in KeyPrompts.row(id):
+	for id: StringName in KeyHints.ROWS:
+		for pair: Array in KeyHints.row(id):
 			assert_ne(pair[1], "", "%s says what the key does" % id)
-		assert_ne(KeyPrompts.row(id)[0][0], "", "%s opens on a key" % id)
+		assert_ne(KeyHints.row(id)[0][0], "", "%s opens on a key" % id)
 
 
 func test_the_press_card_is_a_key_prompt_and_the_quiver_card_a_dark_pill() -> void:
