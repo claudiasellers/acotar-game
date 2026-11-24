@@ -85,12 +85,6 @@ export const STATUS = {
     B('M27.5 4.5C20 5.5 15 12 15.8 19.5C16.5 27 23 32 30.5 31.2C34.5 30.8 38 28.8 40 25.8C30.5 27 23.5 18.5 27.5 4.5Z', C.butter),
     sh(10, 33, 1.5),
   ] },
-  well_fed: { name: 'Well fed', main: C.tan, parts: [
-    B('M7 24C7 19 12 15.5 24 15.5C36 15.5 41 19 41 24L41 36C41 40 36 43 24 43C12 43 7 40 7 36Z', C.tan),
-    B('M7 23C7 18 12 14.5 24 14.5C36 14.5 41 18 41 23C41 26 38 26.5 37 25C36 27.5 32.5 28 31 25.5C29 28.5 24.5 28.5 23 25.5C21 28.5 16.5 28 15.5 25.5C14 27.5 10.5 27.5 10 25C8.5 26.5 7 26 7 23Z', C.butter),
-    Hh(24, 7.5, 5.2, C.rose),
-    sh(14, 33, 1.6),
-  ] },
   stuffed: { name: 'Stuffed', main: C.blush, parts: [
     B('M10 21.5C10 11 38 11 38 21.5Z', C.cream),
     B('M5 22L43 22C43 33 35 42.5 24 42.5C13 42.5 5 33 5 22Z', C.blush),
@@ -121,12 +115,12 @@ export const STATUS = {
     H('M14.5 17.5L18 17.5L16.25 23Z', C.bone, { ng: true }), H('M30 17.5L33.5 17.5L31.75 23Z', C.bone, { ng: true }),
     H('M18 30.5L21 30.5L19.5 26Z', C.bone, { ng: true }), H('M27 30.5L30 30.5L28.5 26Z', C.bone, { ng: true }),
   ] },
-  chilled: { name: 'Chilled', main: ICE, parts: [
+  cold: { name: 'Cold', main: ICE, parts: [
     ...[0, 60, 120].map(a => L('M24 5L24 43', ICE, { t: R(a), w: 1.25 })),
     Cc(24, 24, 7, ICE),
     Hc(24, 24, 2.6, WHITE),
   ] },
-  starving: { name: 'Starving', main: C.tan, parts: [
+  hunger: { name: 'Hunger', main: C.tan, parts: [
     L('M33 4L25 20', C.slate, { w: .8 }),
     B('M5 22L43 22C43 33 35 42.5 24 42.5C13 42.5 5 33 5 22Z', C.tan),
     B(rr(3.5, 19.5, 41, 5, 2.5), C.brown),

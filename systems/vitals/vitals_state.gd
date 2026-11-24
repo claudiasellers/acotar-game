@@ -196,16 +196,12 @@ func statuses() -> Array[Dictionary]:
 			var e: Dictionary = body.effects[tag]
 			out.append({"tag": tag, "magnitude": float(e.magnitude), "seconds_left": float(e.remaining),
 				"total": float(e.get("total", e.remaining))})
-		if body.cold >= 0.7:
-			out.append(_live(&"chilled", body.cold))
-		if in_human_realm() and body.hunger >= 0.9:
-			out.append(_live(&"starving", body.hunger))
+		out.append(_gauge(&"cold", body.cold))
+		out.append(_gauge(&"hunger", body.hunger))
 		if body.fae_toll >= 0.3:
 			out.append(_live(&"giddy", body.fae_toll))
 		if stuffed_left > 0.0:
 			out.append({"tag": &"stuffed", "magnitude": 1.0, "seconds_left": stuffed_left, "total": STUFFED_SECONDS})
-		elif body.hunger < 0.15:
-			out.append(_live(&"well_fed", 1.0 - body.hunger))
 	if _heal_pending > 0.0:
 		out.append({"tag": &"heal", "magnitude": 1.0, "seconds_left": _heal_pending / maxf(_heal_rate, 0.01),
 			"total": HEAL_SECONDS})
@@ -679,6 +675,12 @@ func _knockback(row: AttackData, origin: Vector3) -> void:
 
 func _live(tag: StringName, magnitude: float) -> Dictionary:
 	return {"tag": tag, "magnitude": magnitude, "seconds_left": -1.0, "total": -1.0}
+
+
+func _gauge(tag: StringName, magnitude: float) -> Dictionary:
+	var g := _live(tag, magnitude)
+	g["stage"] = StatusRules.stage(tag, magnitude)
+	return g
 
 
 func _body() -> BodyState:

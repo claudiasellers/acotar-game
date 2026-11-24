@@ -145,7 +145,8 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | brew tags (existing: steady, swift, strong, warm, quiet, bright, keen, cool, heal) | max magnitude, max time (unchanged) | timed | — |
 | `well_rested` | refresh | 1 game day | — |
 | `bandaged` | refresh | 10 game min, body tell only | — |
-| `well_fed`, `stuffed` | live (from hunger) | — | — |
+| `cold`, `hunger` (gauges) | always listed: magnitude = BodyState.cold / hunger, `stage` 0 calm, 1 uneasy, 2 danger (`StatusRules.stage`; cold 0.4/0.7, hunger 0.5/0.9) | live | warmth, food |
+| `stuffed` | timed, after a big meal | 3 min | — |
 
 At most 3 distinct brew-effect tags are active at once; a fourth replaces the one with the least time left (venom, drowsy, roar_shake, well_rested and the hunger states don't use slots).
 
