@@ -116,6 +116,9 @@ func _watch_and_shoot(hunt: WolfKill) -> void:
 			if not await _retrieve_arrow(&"ash"):
 				# Lost: the hunt gives one back after a few seconds.
 				await _until(func() -> bool: return Gameplay.inventory.count(&"arrow_ash") > 0, 8.0)
+		if hunt.ash_struck and Gameplay.inventory.arrow_count() == 0:
+			if not await _retrieve_arrow(&"wood"):
+				await _until(func() -> bool: return Gameplay.inventory.arrow_count() > 0, 8.0)
 		await _select_arrow(&"arrow_ash" if not hunt.ash_struck else &"arrow_wood")
 		if _flat(wolf.global_position) > 30.0:
 			await _walk_to(wolf.global_position, 22.0, Callable(), 20.0)

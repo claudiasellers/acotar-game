@@ -14,6 +14,8 @@ signal quiver_changed(count: int)
 signal bow_released(at: Vector3, loudness: float)
 
 const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
+## What an empty quiver holds when a game starts in a phase (bow design §8.2).
+const QUIVER_LOADOUTS: QuiverLoadouts = preload("res://data/bows/quiver_loadouts.tres")
 
 const PLAYER_LAYER := 1 << 1
 const WORLD_MASK := 1 << 0
@@ -47,8 +49,6 @@ const ROOM_PULL_IN := FeyreCamera.ROOM_PULL_IN
 @export var max_stamina: float = 100.0
 @export var stamina_regen: float = 16.0
 @export var stamina_regen_delay: float = 0.8
-## Wood arrows in the quiver at the start if it is empty.
-@export var starting_arrows: int = 12
 @export var max_quiver: int = 30
 @export var mouse_sensitivity: float = 0.0025
 @export var stick_sensitivity: float = 2.6
@@ -385,8 +385,7 @@ func camera_rise() -> float:
 
 func _build_components() -> void:
 	CrouchMotor.ensure_action()
-	if Gameplay.inventory.arrow_count() == 0 and starting_arrows > 0:
-		Gameplay.inventory.add(&"arrow_wood", starting_arrows)
+	QUIVER_LOADOUTS.fill(Gameplay.inventory, PhaseManager.current_phase)
 	Gameplay.register_save_providers()
 	element_state = ElementState.new()
 	element_state.name = "ElementState"

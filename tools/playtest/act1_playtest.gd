@@ -444,6 +444,10 @@ func _play() -> void:
 		if not wolf_kill.ash_struck and Gameplay.inventory.count(&"arrow_ash") == 0:
 			if not await _retrieve_arrow(&"ash"):
 				return _fail("the only ash arrow missed and can't be picked up again: soft-lock")
+		if wolf_kill.ash_struck and Gameplay.inventory.arrow_count() == 0:
+			# Three arrows is all she has: she fetches one she has shot.
+			if not await _retrieve_arrow(&"wood"):
+				await _until(func() -> bool: return Gameplay.inventory.arrow_count() > 0, 8.0)
 		await _select_arrow(&"arrow_ash" if not wolf_kill.ash_struck else &"arrow_wood")
 		if _flat(wolf.global_position) > 30.0:
 			await _walk_to(wolf.global_position, 22.0, Callable(), 20.0)
@@ -721,14 +725,15 @@ func _shoot_at(target: Node3D) -> bool:
 		Input.action_release(&"aim")
 		return false
 	# Aim held, let the sway settle; then fire held through the draw, and let go.
+	# From here she holds the ring on him, as a player does, not the screen's centre.
 	for i in 75:
 		if is_instance_valid(target):
-			_turn_camera_to(_lead(target))
+			_hold_ring_on(target)
 		await get_tree().physics_frame
 	Input.action_press(&"fire")
 	for i in 60:
 		if is_instance_valid(target):
-			_turn_camera_to(_lead(target))
+			_hold_ring_on(target)
 		await get_tree().physics_frame
 		if float(feyre.bow_controller.get(&"draw_amount")) >= 1.0:
 			break
@@ -737,6 +742,11 @@ func _shoot_at(target: Node3D) -> bool:
 	var bc: BowController = feyre.bow_controller
 	_note("loosing with %.2f deg of sway (unsettled %.2f, body x%.2f, tremor %.2f, dread %.2f)" % [bc.sway_degrees(),
 		bc.unsettled(), feyre.body_state.sway_multiplier(), feyre.body_state.tremor_degrees(), feyre.vitals.dread])
+	var ring := bc.predict_impact()
+	var on: Node = ring.get("collider") as Node
+	_note("ring on %s at %s; she %s, he %s moving %.1f m/s" % [on.name if on else "nothing", _v(ring.get("point", Vector3.ZERO)),
+		_v(feyre.global_position), _v(target.global_position),
+		(target.velocity as Vector3).length() if target is CharacterBody3D else 0.0])
 	Input.action_release(&"fire")
 	await get_tree().physics_frame
 	Input.action_release(&"aim")
@@ -763,6 +773,31 @@ func _lead(target: Node3D) -> Vector3:
 	var vel: Vector3 = target.velocity if target is CharacterBody3D else Vector3.ZERO
 	var g := float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 	return chest + Vector3(vel.x, 0, vel.z) * t + Vector3.UP * (0.5 * g * t * t)
+
+
+## Turns until the ring sits on his chest: where this arrow, loosed now, would
+## be when it reaches him (drop, sway and the bow's offset from her eye all in
+## it). That is how a player aims; the middle of the screen is not the shot.
+func _hold_ring_on(target: Node3D) -> void:
+	var bc: BowController = feyre.bow_controller
+	if not bc.is_nocked:
+		_turn_camera_to(_lead(target))
+		return
+	var from := bc.muzzle()
+	var speed := float(bc.bow.max_speed)
+	var chest := target.global_position + Vector3.UP * 0.9
+	var t := from.distance_to(chest) / maxf(speed, 1.0)
+	var vel: Vector3 = target.velocity if target is CharacterBody3D else Vector3.ZERO
+	chest += Vector3(vel.x, 0, vel.z) * t
+	var arrow := BowController.arrow_data().get(bc.selected) as ArrowData
+	var ring: Vector3 = BowController.predict_path(from, bc.shot_direction() * speed,
+		arrow.drag if arrow else 0.0022, null, [], null, t).point
+	var cam := feyre.camera
+	var want := (chest - cam.global_position).normalized()
+	var have := (ring - cam.global_position).normalized()
+	var dyaw := wrapf(atan2(-want.x, -want.z) - atan2(-have.x, -have.z), -PI, PI)
+	var dpitch := asin(clampf(want.y, -1, 1)) - asin(clampf(have.y, -1, 1))
+	feyre.nudge_camera(dyaw * 0.5, dpitch * 0.5)
 
 
 ## Returns the remaining aim error in degrees.
