@@ -50,6 +50,10 @@ var gait_hint: StringName = &""
 var animator: CreatureAnimator
 ## Its face, when data/faces/<kind>_face.tres exists (lane L36-3, docs/contracts/faces.md).
 var face: CreatureFace
+## Keeps it within reach of Feyre and cues when she has lost it, for species
+## whose data asks (CreatureData "Following"); null otherwise.
+var leash: FollowLeash
+var nudge: LostNudge
 ## Seconds left asleep (sleep arrow) and slowed (barbed arrow).
 var asleep_left: float = 0.0
 var slowed_left: float = 0.0
@@ -85,6 +89,10 @@ func _ready() -> void:
 	senses.scent_range = data.scent_range
 	senses.position = Vector3(0, data.body_height * 0.95, -data.body_length * 0.45)
 	add_child(senses)
+	if data.follow_leash_m > 0.0:
+		FollowLeash.on(self, data.follow_leash_m).wounded_only = data.leash_wounded_only
+		LostNudge.on(self).wounded_only = data.leash_wounded_only
+		nudge.cue = data.lost_cue
 
 
 func _physics_process(delta: float) -> void:
@@ -102,6 +110,8 @@ func _physics_process(delta: float) -> void:
 		move_direction = Vector3.ZERO
 	elif not scripted:
 		_think(delta)
+		if leash:
+			leash.steer(delta)
 	if slowed_left > 0.0:
 		slowed_left -= delta
 		move_speed *= SLOW_FACTOR
@@ -226,7 +236,7 @@ func die(cause: StringName) -> void:
 	harvestable.position = Vector3(0, 0.3, 0)
 	add_child(harvestable)
 	if is_inside_tree():
-		TrackLayer.leave(get_tree(), &"blood", global_position, rotation.y, data.print_size * 3.0)
+		TrackLayer.leave(get_tree(), &"blood", global_position, rotation.y, data.print_size * 3.0, get_instance_id())
 	died.emit(cause)
 	if EventBus.has_signal(&"creature_killed"):
 		EventBus.emit_signal(&"creature_killed", creature_id, data.kind, cause, global_position)
@@ -276,7 +286,7 @@ func _leave_tracks(delta: float) -> void:
 		_blood_left -= step
 		if _blood_left <= 0.0 and is_inside_tree():
 			_blood_left = 1.5
-			TrackLayer.leave(get_tree(), &"blood", global_position, rotation.y, data.print_size * 1.5)
+			TrackLayer.leave(get_tree(), &"blood", global_position, rotation.y, data.print_size * 1.5, get_instance_id())
 	if data.body_plan == CreatureData.BodyPlan.BIRD or not data.leaves_prints or not is_on_floor():
 		return
 	_stride_left -= step
@@ -285,7 +295,8 @@ func _leave_tracks(delta: float) -> void:
 	_stride_left = data.stride
 	_print_side = -_print_side
 	var side := global_basis.x * _print_side * data.body_width * 0.25
-	TrackLayer.leave(get_tree(), &"hoof" if data.hooved else &"print", global_position + side, rotation.y, data.print_size)
+	TrackLayer.leave(get_tree(), &"hoof" if data.hooved else &"print", global_position + side, rotation.y,
+			data.print_size, get_instance_id())
 	if move_speed > data.walk_speed * 2.0 and randf() < data.twig_chance:
 		TrackLayer.leave(get_tree(), &"twig", global_position + side * 2.0, rotation.y)
 

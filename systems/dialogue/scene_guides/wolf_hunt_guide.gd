@@ -14,6 +14,7 @@
 ##   nudge_draw   only if she has never drawn: the ash arrow, now
 ##   nudge_loose  only if she still hasn't, once he has the doe: his side
 ##   wood / miss  a wood arrow stings him; a shot that misses
+##   lost         she has lost sight of him and he has cued twice (LostNudge)
 ##   ash          the ash lands and he looks at her: the eye, just in case
 ##   kill         he should be dead, not dying; just a wolf
 ## Every beat is said at most once a hunt. The nudges stop for good the moment
@@ -113,6 +114,19 @@ func _on_finished(id: StringName) -> void:
 func _on_cue(actor: StringName, cue: StringName) -> void:
 	if actor == &"great_wolf" and cue == &"stalk" and running():
 		say(&"eyes")
+		_hook_nudge()
+
+
+## His second cue with her still not seeing him: she says she has lost him.
+func _hook_nudge() -> void:
+	var nudge: Variant = wolf().get(&"nudge") if wolf() else null
+	if nudge is LostNudge and not (nudge as LostNudge).cued.is_connected(note_lost_cue):
+		(nudge as LostNudge).cued.connect(note_lost_cue)
+
+
+func note_lost_cue(count: int) -> void:
+	if count >= 2 and running() and not bool(space.get(&"wolf_dead")):
+		say(&"lost")
 
 
 func _on_hit(_id: StringName, kind: StringName, cause: StringName, _part: StringName) -> void:
