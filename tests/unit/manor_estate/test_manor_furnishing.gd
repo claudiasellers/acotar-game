@@ -62,9 +62,13 @@ func test_window_rules_match_the_builder() -> void:
 	assert_eq(ManorFurnisher.WALL_FACE, ManorHouseBuilder.WALL)
 
 
-func test_ceilings_ignore_the_green_ambient() -> void:
-	var code: String = ManorRoomFinish.PLASTER_SHADER.code
-	assert_true(code.contains("ambient_light_disabled"), "plaster ignores ambient")
+func test_ceilings_are_lit_by_the_room_and_never_glow() -> void:
+	# L18-13: ceilings that ignored ambient and lit themselves were the
+	# brightest surface in a room by day; the interior ambient is flat now
+	# (no green from below), so they take it like the walls.
+	for shader: Shader in [ManorRoomFinish.PLASTER_SHADER, ManorRoomLook.SKY]:
+		assert_false(shader.code.contains("EMISSION"), "%s: no emission" % shader.resource_path)
+		assert_false(shader.code.contains("ambient_light_disabled"), "%s: takes the room's ambient" % shader.resource_path)
 	var plain := 0
 	for r in _ctx.index.interior_rooms():
 		if ManorRoomLook.is_coffered(r) or ManorRoomLook.has_sky(r):
@@ -77,8 +81,15 @@ func test_ceilings_ignore_the_green_ambient() -> void:
 			var c: Color = m.get_shader_parameter(&"color")
 			assert_true(maxf(c.r, maxf(c.g, c.b)) <= 0.85 + 1e-4, "%s: ceiling albedo under the glare cap" % r.id)
 	assert_gt(plain, 0)
-	assert_true(ManorRoomFinish.gilt().disable_ambient_light)
-	assert_true(ManorRoomFinish.timber().disable_ambient_light)
+	for m: CandyMaterial in [ManorRoomFinish.gilt(), ManorRoomFinish.timber()]:
+		assert_false(m.disable_ambient_light, "%s takes the room's ambient" % m.resource_name)
+		assert_false(m.emission_enabled, "%s doesn't glow" % m.resource_name)
+	for r in _ctx.index.interior_rooms():
+		if ManorRoomLook.is_coffered(r):
+			var c := ManorRoomLook.ceiling_material(r) as CandyMaterial
+			assert_false(c.emission_enabled, "%s: coffers don't glow" % r.id)
+			assert_false(c.disable_ambient_light)
+			break
 
 
 ## [C] Ivory and cream with pale green and gold.

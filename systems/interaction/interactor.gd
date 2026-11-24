@@ -44,25 +44,6 @@ func _ready() -> void:
 	add_child(forage_focus)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	# J itself is the menu shell's (the collection tab's shortcut).
-	if event.is_action_pressed(&"weave_crown") and feyre:
-		get_viewport().set_input_as_handled()
-		weave_crown()
-
-
-## Weaves a crown from picked blooms and puts it on (C / d-pad down).
-func weave_crown() -> StringName:
-	var piece := CrownWeaver.weave(Gameplay.inventory, Gameplay.wardrobe)
-	if piece == &"":
-		# What she has, never what is left to find (R2): the recipe is in her
-		# book, on the wardrobe's page.
-		PickupLog.of(get_tree()).note("Not enough flowers here for a crown.")
-		return &""
-	Juice.burst(feyre, &"outfit")
-	return piece
-
-
 ## Windowed finds (dawn, dusk, night, rain, mist, snow) in any lane's forage
 ## fields show only while their window is open, so nothing visible ever
 ## refuses E. Returns how many fields are hidden.
@@ -221,10 +202,9 @@ func _on_reward(reward: CollectionReward) -> void:
 		Juice.burst(feyre, &"unlock")
 
 
-## J / gamepad Back opens the collection book; C / d-pad down weaves a crown
-## (added in code, R14).
+## J / gamepad Back opens the collection book (added in code, R14).
 func _ensure_actions() -> void:
-	for spec in [[&"open_collection", KEY_J, JOY_BUTTON_BACK], [&"weave_crown", KEY_C, JOY_BUTTON_DPAD_DOWN]]:
+	for spec in [[&"open_collection", KEY_J, JOY_BUTTON_BACK]]:
 		if InputMap.has_action(spec[0]):
 			continue
 		InputMap.add_action(spec[0])

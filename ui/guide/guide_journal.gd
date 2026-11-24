@@ -4,8 +4,8 @@
 ## GuideDirector decides when; this node reads WorldState and EventBus, and
 ## keeps the bookmark. Thoughts wait out dread, staged moments and any other
 ## line (UiMode.quiet, the lane).
-## G / pad Y brings the current thought back; again while it shows, a plainer
-## one. The bookmark (her whorl and the G key) rests in HudLayout's THOUGHT
+## G / d-pad down brings the current thought back; again while it shows, a plainer
+## one. The bookmark (her whorl and its key, named from the input map) rests in HudLayout's THOUGHT
 ## zone, top left, and the thought's slip comes out beside it (LinePresenter), always findable and clickable, glowing softly when a thought is
 ## waiting unread.
 class_name GuideJournal
@@ -31,6 +31,8 @@ var line: String = ""
 var _voice: AudioStreamPlayer
 var _hold: float = 0.0
 var _input_seen: bool = false
+## The bookmark's key cap: G, or the pad's button once the pad is in use.
+var _key: Label
 var _last_pos: Vector3 = Vector3.INF
 var _taught_key: bool = false
 var _tab: Control
@@ -127,6 +129,7 @@ func _process(delta: float) -> void:
 	var request := director.tick(delta, moved, _input_seen, can_show())
 	_input_seen = false
 	_update_tab(delta)
+	_key.text = KeyPrompt.key(ACTION)
 	if not request.is_empty() and mode == GuideSettings.Mode.AUTO:
 		show_thought(request.thread, request.tier, false)
 	if showing:
@@ -201,8 +204,8 @@ func _on_deed(_flag: String) -> void:
 	director.note_progress()
 
 
-## G / pad Y (story lane's call: J and Back are the collection book), added in
-## code like interactor.gd does (R14).
+## G / d-pad down (the owner, 2026-11-24: pad Y is her knife), added in code
+## like interactor.gd does (R14).
 func _ensure_action() -> void:
 	if InputMap.has_action(ACTION):
 		return
@@ -211,17 +214,17 @@ func _ensure_action() -> void:
 	key.physical_keycode = KEY_G
 	InputMap.action_add_event(ACTION, key)
 	var pad := InputEventJoypadButton.new()
-	pad.button_index = JOY_BUTTON_Y
+	pad.button_index = JOY_BUTTON_DPAD_DOWN
 	InputMap.action_add_event(ACTION, pad)
 
 
 func _build() -> void:
-	# The zone places the bookmark: her whorl on a dark tab, the G key under it.
+	# The zone places the bookmark: her whorl on a dark tab, its key under it.
 	_tab = VBoxContainer.new()
 	_tab.name = "ThoughtBookmark"
 	_tab.add_theme_constant_override(&"separation", 4)
 	_tab.mouse_filter = Control.MOUSE_FILTER_STOP
-	_tab.tooltip_text = "Feyre's thoughts (G)"
+	_tab.tooltip_text = "Feyre's thoughts"
 	_tab.gui_input.connect(_on_tab_input)
 	_tab.modulate.a = 0.0
 	_tab.visible = false
@@ -237,9 +240,10 @@ func _build() -> void:
 	_mark.width = 3.0
 	plate.add_child(_mark)
 	LinePresenter.of(get_tree()).bookmark = _mark
-	var key := BookKit.key_cap("G")
+	var key := BookKit.key_cap(KeyPrompt.key(ACTION))
 	key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_tab.add_child(key)
+	_key = key.get_child(0) as Label
 
 	_voice = AudioStreamPlayer.new()
 	_voice.bus = &"Master"

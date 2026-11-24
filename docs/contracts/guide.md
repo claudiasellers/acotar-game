@@ -9,7 +9,7 @@ One row, "Feyre's thoughts", three choices from `GuideSettings.LABELS`:
 
 ## For the story lane
 - `GuideJournal.new()` is added by `story/act1/act1_game.gd` beside SettingsTab.
-- Input: `guide_open` = physical G + joypad Y, registered in code (J and Back belong to the collection book).
+- Input: `guide_open` = physical G + d-pad down, registered in code (J and Back belong to the collection book; pad Y is her knife strike, the owner, 2026-11-24). The bookmark's key cap is named from the input map (`KeyPrompt.key`).
 - Reads only: `WorldState.has_flag`, `StoryControl.mode`, `EventBus.flag_changed / deed_performed / mood_requested`. It never writes flags.
 - Silent while `StoryControl.mode != FULL` or after `mood_requested(&"dread", >0)` until a non-dread mood.
 
