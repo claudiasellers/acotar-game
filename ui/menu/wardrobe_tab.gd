@@ -1,4 +1,4 @@
-## The wardrobe page of the menu shell: the dressing room's mirror and rails
+## The wardrobe page of Feyre's journal: the dressing room's mirror and rails
 ## (DressingRoomView) on what she carries, beside her satchel. The manor's
 ## wardrobe and vanity stations open the same page on their own stock
 ## (DressingRoom.open). The view is made on show and let go on hide, since it
@@ -49,18 +49,20 @@ func _shown() -> void:
 		WardrobeStock.restock(Gameplay.wardrobe)
 	view = DressingRoomView.new()
 	view.setup(feyre, station)
-	add_child(view)
+	_book_root().add_child(view)
+	MenuShell.of(get_tree()).set_window(DressingRoomView.MIRROR)
 
 
 func _hidden() -> void:
 	station = DressingRoom.SATCHEL
 	who = null
+	MenuShell.of(get_tree()).set_window(Rect2())
 	if view == null or not is_instance_valid(view):
 		return
 	var feyre := view.feyre
 	# Out of the tree now (her pose and camera come back) before the game
 	# unpauses; freed at the frame's end, as a button may be mid-press.
-	remove_child(view)
+	view.get_parent().remove_child(view)
 	view.queue_free()
 	view = null
 	if is_instance_valid(feyre) and feyre.camera:

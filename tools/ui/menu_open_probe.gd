@@ -129,7 +129,7 @@ func _shots(dir: String) -> void:
 ## (0 = clear): every visible Control of the page smaller than the screen.
 func _check_overlap(page: StringName) -> void:
 	var shell := MenuShell.of(get_tree())
-	var strip := shell.get_node(^"ShellRoot/TabStrip") as Control
+	var strip := shell.get_node(^"ShellRoot/TabStrip/Tabs") as Control
 	var strip_rect := strip.get_global_rect()
 	var screen := get_viewport().get_visible_rect().size
 	var worst := 0.0

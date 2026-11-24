@@ -29,8 +29,7 @@ var hud: WorldMapHud
 var view_center: Vector2 = Vector2.ZERO
 var view_width: float = ZOOM_OPEN
 
-var _root: Control
-var _card: PanelContainer
+var _page: Control
 var _map: ColorRect
 var _overlay: Control
 var _stats: Label
@@ -74,7 +73,7 @@ func _shown() -> void:
 	manor_level = hud.manor.level
 	show_manor(hud.manor.inside)
 	_stats.text = hud.stats_line()
-	Juice.bounce_control(_card, 0.03)
+	Juice.bounce_control(_page, 0.02)
 
 
 ## The map's own keys (the shell has M, Esc and the page keys).
@@ -108,7 +107,7 @@ func toggle_pin_at(world: Vector2, point: Vector2) -> void:
 		hud.clear_pin()
 	else:
 		hud.set_pin(world)
-		Juice.bounce_control(_card, 0.015)
+		Juice.bounce_control(_page, 0.01)
 
 
 ## Swaps between the land and the manor page (only once she knows a room).
@@ -218,33 +217,15 @@ func _landmark_near(point: Vector2) -> String:
 
 
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	# The satchel's look (JournalTheme): framed paper, the serif. The shell
-	# dims the world behind it and keeps the strip above page_top().
-	add_child(_root)
-
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + side, 90)
-	margin.add_theme_constant_override(&"margin_top", int(page_top()))
-	margin.add_theme_constant_override(&"margin_bottom", 40)
-	_root.add_child(margin)
-	_card = PanelContainer.new()
-	_card.theme_type_variation = &"SatchelDetail"
-	margin.add_child(_card)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 8)
-	_card.add_child(col)
+	# One picture across both sheets of the journal: her map, pasted in.
+	var col := column(spread(), 8)
+	_page = col.get_parent()
+	_page.pivot_offset = _page.size * 0.5
 
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override(&"separation", 18)
 	col.add_child(head)
-	var title := Label.new()
-	title.text = "Feyre's Map"
-	title.theme_type_variation = &"SatchelHeading"
-	head.add_child(title)
+	head.add_child(BookKit.title("Map"))
 	_stats = Label.new()
 	_stats.theme_type_variation = &"SatchelSmall"
 	_stats.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -253,7 +234,7 @@ func _build() -> void:
 	_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	head.add_child(_stats)
 
-	# The painted sheet itself, clipped to its own edge on the framed card.
+	# The painted sheet itself, clipped to its own edge.
 	var frame := PanelContainer.new()
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	frame.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
@@ -292,13 +273,13 @@ func _build() -> void:
 
 ## The page's heading serif, for names written on the sheet.
 func _heading_font() -> Font:
-	return _root.get_theme_font(&"font", &"SatchelHeading")
+	return _map.get_theme_font(&"font", &"SatchelHeading")
 
 
 func _draw_marks() -> void:
 	var ci := _overlay
 	var font := _heading_font()
-	var body := _root.get_theme_font(&"font", &"SatchelBody")
+	var body := _map.get_theme_font(&"font", &"SatchelBody")
 	# Names of the places she has found.
 	for place: MapPlace in hud.found_places():
 		var p := to_map_point(place.label_at)

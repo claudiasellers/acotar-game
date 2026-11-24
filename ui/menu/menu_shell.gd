@@ -1,7 +1,8 @@
-## The one menu: every page Feyre keeps (satchel, wardrobe, collection book,
-## sketchbook, map) is a tab of this shell. Each page's own key opens the shell
-## on that page; from inside, any page's key jumps to it and the same key
-## again closes. Contract: docs/contracts/menu_shell.md.
+## Feyre's journal: the one menu. Every page she keeps (satchel, wardrobe,
+## collection, sketchbook, map) is a page of this book, behind its own index
+## tab. Each page's key opens the book on that page; from inside, any page's
+## key jumps to it and the same key again closes.
+## Contract: docs/contracts/menu_shell.md.
 ##
 ## Keys, the same on every page:
 ##   I / Tab, J, L, M (pad: LB tap, Back, RB)  open on that page / jump / close
@@ -10,14 +11,15 @@
 ## Pages keep their own keys inside (MenuTab._page_input runs before these).
 ##
 ## The shell is one screen on ScreenStack, which pauses the game, shows the
-## mouse and answers Esc for it. The shell owns what every page shares:
-## hiding the controls hint, the tab strip. Pages are built
-## once and only shown and hidden, and their slow first-time work (icons,
-## models, shader first draws) runs a slice per frame while the shell is
-## closed, so opening any page costs no frame hitch.
+## mouse and answers Esc for it. The shell draws what every page shares: the
+## dim over the world, the open book and its index tabs. A page writes on the
+## book's sheets (MenuTab.left_sheet / right_sheet). Pages are built once and
+## only shown and hidden, and their slow first-time work (icons, models,
+## shader first draws) runs a slice per frame while the book is closed, so
+## opening any page costs no frame hitch.
 ##
-## Look: the strip is a SatchelDetail panel of SatchelTab buttons
-## (JournalTheme, which carries L65's borders); no colours or fonts here.
+## Look: the book is one painted picture (BookLayout.ART); tabs, caps and
+## type are JournalTheme variations. No colours or fonts here.
 class_name MenuShell
 extends CanvasLayer
 
@@ -34,11 +36,7 @@ const WARM_BUDGET_MS := 4.0
 ## Alpha a page is drawn at for its warm-up frames (above the renderer's cull).
 const WARM_ALPHA := 0.01
 const WARM_FRAMES := 2
-## The strip's top edge, and where full-screen pages start below it.
-const STRIP_TOP := 14.0
-const PAGE_TOP := 140.0
-## The world dims behind the open shell.
-const BACKDROP_ALPHA := 0.4
+const WINDOW := preload("res://ui/menu/book_window.gdshader")
 
 var tabs: Array[MenuTab] = []
 var current: MenuTab = null
@@ -46,11 +44,13 @@ var current: MenuTab = null
 var _tree: SceneTree
 var _root: Control
 var _backdrop: CanvasLayer
-var _strip: PanelContainer
+var _book: TextureRect
+var _strip: Control
 var _row: HBoxContainer
 var _buttons: Dictionary = {}  # MenuTab -> Button
-var _prev_glyph: Label
-var _next_glyph: Label
+var _prev_cap: PanelContainer
+var _next_cap: PanelContainer
+var _window := ShaderMaterial.new()
 var _jobs: Array[Callable] = []
 var _render_queue: Array[MenuTab] = []
 var _rendering: MenuTab = null
@@ -314,95 +314,102 @@ func _end_render() -> void:
 	tab.warm_render(false)
 
 
-# --- the strip -----------------------------------------------------------------
+# --- the book ------------------------------------------------------------------
+
+## Cuts an arched window through the book and the dim, `rect` in book space,
+## so the world shows through it (the wardrobe's mirror). Rect2() closes it.
+func set_window(rect: Rect2) -> void:
+	if _book == null:
+		return
+	var at := rect.position + (_book.position + Vector2.ONE * BookLayout.ART_BLEED if rect.has_area() else Vector2.ZERO)
+	_window.set_shader_parameter(&"window", Vector4(at.x, at.y, rect.size.x, rect.size.y))
+
 
 func _build() -> void:
+	_backdrop = CanvasLayer.new()
+	_backdrop.name = "Backdrop"
+	_backdrop.layer = UiLayers.BACKDROP
+	add_child(_backdrop)
+	_window.shader = WINDOW
+	var dim := ColorRect.new()
+	dim.name = "Dim"
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dim.color = JournalTheme.color(&"scrim")
+	dim.material = _window
+	_backdrop.add_child(dim)
+	_book = TextureRect.new()
+	_book.name = "Book"
+	_book.texture = load(BookLayout.ART)
+	_book.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_book.size = BookLayout.SIZE + Vector2.ONE * BookLayout.ART_BLEED * 2.0
+	_book.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_book.material = _window
+	_backdrop.add_child(_book)
+
 	_root = Control.new()
 	_root.name = "ShellRoot"
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
-	_backdrop = CanvasLayer.new()
-	_backdrop.name = "Backdrop"
-	_backdrop.layer = UiLayers.BACKDROP
-	add_child(_backdrop)
-	var dim := ColorRect.new()
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dim.color = Color(JournalTheme.color(&"ink"), BACKDROP_ALPHA)
-	_backdrop.add_child(dim)
-	_strip = PanelContainer.new()
+	_strip = Control.new()
 	_strip.name = "TabStrip"
-	_strip.theme_type_variation = &"SatchelDetail"
-	_strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_strip.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_strip.offset_top = STRIP_TOP
+	_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(_strip)
 	_row = HBoxContainer.new()
 	_row.name = "Tabs"
-	_row.add_theme_constant_override(&"separation", 8)
-	_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_row.add_theme_constant_override(&"separation", 6)
+	_row.alignment = BoxContainer.ALIGNMENT_BEGIN
+	# The tabs stand on the book's top edge and grow upward.
+	_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_row.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_strip.add_child(_row)
-	_prev_glyph = _glyph("Q")
-	_row.add_child(_prev_glyph.get_parent())
-	_next_glyph = _glyph("E")
+	_prev_cap = BookKit.key_cap("Q")
+	_row.add_child(_prev_cap)
+	_next_cap = BookKit.key_cap("E")
+	_place()
+	get_viewport().size_changed.connect(_place)
 
 
-func _glyph(text: String) -> Label:
-	var box := PanelContainer.new()
-	box.theme_type_variation = &"SatchelKey"
-	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = &"SatchelKeyLabel"
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(l)
-	return l
+func _place() -> void:
+	var origin := BookLayout.origin(get_viewport().get_visible_rect().size)
+	_book.position = origin - Vector2.ONE * BookLayout.ART_BLEED
+	_strip.position = origin + BookLayout.TABS_AT
 
 
 func _sync_strip() -> void:
 	if _row == null:
 		return
 	var pad := SatchelHud.pad_active
-	_prev_glyph.text = "LB" if pad else "Q"
-	_next_glyph.text = "RB" if pad else "E"
+	(_prev_cap.get_node(^"Key") as Label).text = "LB" if pad else "Q"
+	(_next_cap.get_node(^"Key") as Label).text = "RB" if pad else "E"
 	var shown := _available()
 	for t in tabs:
 		if not _buttons.has(t):
 			var b := Button.new()
 			b.name = "Tab_%s" % t.tab_id
-			b.theme_type_variation = &"SatchelTab"
+			b.theme_type_variation = JournalTheme.INDEX_TAB
 			b.toggle_mode = true
 			b.focus_mode = Control.FOCUS_NONE
+			b.size_flags_vertical = Control.SIZE_SHRINK_END
 			b.pressed.connect(show_tab.bind(t))
 			b.add_child(NewsDot.new())
 			_row.add_child(b)
 			_buttons[t] = b
-	# Strip order: Z glyph, the tabs by tab_order, X glyph.
+	# Along the edge: the Q cap, the tabs by tab_order, the E cap.
 	var at := 1
 	for t in tabs:
 		var b := _buttons[t] as Button
 		_row.move_child(b, at)
-		at += 1
 		b.visible = t in shown
-		b.text = t.tab_title + ("   " + _key_word(t.shortcut) if t.shortcut != &"" else "")
+		b.text = t.tab_title.to_upper() + ("   " + BookKit.key_word(t.shortcut) if t.shortcut != &"" else "")
 		b.set_pressed_no_signal(t == current)
+		# Each tab wears its own wash; the page in front is the paper's colour.
+		b.self_modulate = Color.WHITE if t == current else JournalTheme.wash(at - 1)
 		(b.get_node(^"News") as Control).visible = t.has_news() and t != current
-	var next_box := _next_glyph.get_parent()
-	if next_box.get_parent() == null:
-		_row.add_child(next_box)
-	_row.move_child(next_box, -1)
-	_prev_glyph.get_parent().visible = shown.size() > 1
-	next_box.visible = shown.size() > 1
-
-
-## The first key bound to an action, as its label ("I", "M").
-func _key_word(action: StringName) -> String:
-	if not InputMap.has_action(action):
-		return ""
-	for e in InputMap.action_get_events(action):
-		if e is InputEventKey:
-			var k := e as InputEventKey
-			var code := k.physical_keycode if k.physical_keycode != KEY_NONE else k.keycode
-			return OS.get_keycode_string(code)
-	return ""
+		at += 1
+	if _next_cap.get_parent() == null:
+		_row.add_child(_next_cap)
+	_row.move_child(_next_cap, -1)
+	_prev_cap.visible = shown.size() > 1
+	_next_cap.visible = shown.size() > 1

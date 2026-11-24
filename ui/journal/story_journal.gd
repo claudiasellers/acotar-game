@@ -10,9 +10,8 @@
 ## asks: Enter / Space / F (pad A) or the "Think on it" tab. Nothing ahead of the current step
 ## is ever drawn.
 ##
-## Look: JournalTheme (L13's shared theme plus L50's crafted layer), so the
-## fonts, paper, leather tabs and keys match the satchel and the pause menu.
-## No colours or fonts are named here.
+## A page of Feyre's journal (MenuShell draws the book; this writes on its
+## two sheets). Look: JournalTheme variations only; no colours or fonts here.
 class_name StoryJournal
 extends MenuTab
 
@@ -21,8 +20,6 @@ signal hint_revealed(entry_id: StringName, index: int)
 const BOOK_PATH := "res://data/journal/story_journal.tres"
 const GROUP := &"story_journal"
 const ACTION_OPEN := &"journal_open"
-const PAGE := Vector2(660, 800)
-const SPINE := 6.0
 ## The most recent memories that fit the page without growing it.
 const MAX_MEMORIES := 4
 const SAVE_KEY := "story_journal"
@@ -37,21 +34,17 @@ var chapter: JournalChapter = null
 ## Ongoing steps beside the current one ("Still on my mind").
 var side: Array[JournalEntry] = []
 
-var _root: Control
-var _book_box: Control
-var _left: PanelContainer
-var _right: PanelContainer
 var _numeral: Label
 var _title: Label
 var _chapter_sketch: JournalSketch
 var _opener: Label
-var _memory_head: Label
+var _memory_head: Control
 var _memories: VBoxContainer
 var _after_sketch: JournalSketch
 var _after: Label
-var _hints_head: Label
+var _hints_head: Control
 var _hints: VBoxContainer
-var _side_head: Label
+var _side_head: Control
 var _side: VBoxContainer
 var _think: Button
 var _status: Label
@@ -138,11 +131,6 @@ static func ensure_action() -> void:
 
 func _shown() -> void:
 	refresh()
-	_book_box.modulate.a = 0.0
-	_book_box.position.y = 24.0
-	var tw := create_tween().set_parallel()
-	tw.tween_property(_book_box, ^"modulate:a", 1.0, 0.22)
-	tw.tween_property(_book_box, ^"position:y", 0.0, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_draw_in(_chapter_sketch, 0.0)
 	_draw_in(_after_sketch, 0.15)
 
@@ -332,46 +320,12 @@ func _draw_in(s: JournalSketch, delay: float) -> void:
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_root)
-	# The menu shell dims the world; the book sits below its tab strip.
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.offset_top = page_top()
-	_root.add_child(center)
-	var holder := Control.new()
-	holder.custom_minimum_size = Vector2(PAGE.x * 2.0 + SPINE, PAGE.y)
-	center.add_child(holder)
-	_book_box = Control.new()
-	_book_box.size = holder.custom_minimum_size
-	holder.add_child(_book_box)
-
-	# The board cover behind the pages, in the satchel's stitched leather.
-	var cover := PanelContainer.new()
-	cover.theme_type_variation = &"SatchelKey"
-	cover.position = Vector2(-26, -22)
-	cover.size = _book_box.size + Vector2(52, 50)
-	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_book_box.add_child(cover)
-	_left = _page(Vector2.ZERO, -0.5)
-	_right = _page(Vector2(PAGE.x + SPINE, 0), 0.5)
-	var spine := JournalSpine.new()
-	spine.position = Vector2(PAGE.x - JournalSpine.SHADE, 0)
-	spine.size = Vector2(SPINE + JournalSpine.SHADE * 2.0, PAGE.y)
-	_book_box.add_child(spine)
-	var tie := JournalTie.new()
-	tie.position = Vector2(_book_box.size.x - 4.0, PAGE.y * 0.5 - 92.0)
-	tie.size = tie.custom_minimum_size
-	_book_box.add_child(tie)
-
-	var lc := _column(_left)
-	lc.add_child(_label("Feyre's sketchbook", &"SatchelSmall"))
-	_numeral = _label("", &"SatchelSmall")
+	var lc := column(left_sheet(), 8)
+	lc.add_child(BookKit.title("Sketchbook"))
+	_numeral = _label("", &"PageSection")
 	_numeral.uppercase = true
 	lc.add_child(_numeral)
 	_title = _label("", &"SatchelHeading")
-	_title.add_theme_font_size_override(&"font_size", 38)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lc.add_child(_title)
 	_chapter_sketch = JournalSketch.new(&"rose", 170.0)
@@ -382,21 +336,14 @@ func _build() -> void:
 	_opener.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lc.add_child(_opener)
 	lc.add_child(_gap(10))
-	_memory_head = _label("Behind me", &"SatchelSmall")
-	_memory_head.uppercase = true
+	_memory_head = BookKit.section("Behind me")
 	lc.add_child(_memory_head)
 	_memories = VBoxContainer.new()
 	_memories.add_theme_constant_override(&"separation", 6)
 	lc.add_child(_memories)
-	var lfill := Control.new()
-	lfill.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	lc.add_child(lfill)
-	_build_prompts(lc)
 
-	var rc := _column(_right)
-	var head := _label("What I'm after", &"SatchelSmall")
-	head.uppercase = true
-	rc.add_child(head)
+	var rc := column(right_sheet(), 8)
+	rc.add_child(BookKit.section("What I'm after"))
 	var after_row := HBoxContainer.new()
 	after_row.add_theme_constant_override(&"separation", 16)
 	rc.add_child(after_row)
@@ -410,15 +357,13 @@ func _build() -> void:
 	_after.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	after_row.add_child(_after)
 	rc.add_child(_gap(18))
-	_hints_head = _label("Thinking it through", &"SatchelSmall")
-	_hints_head.uppercase = true
+	_hints_head = BookKit.section("Thinking it through")
 	rc.add_child(_hints_head)
 	_hints = VBoxContainer.new()
 	_hints.add_theme_constant_override(&"separation", 10)
 	rc.add_child(_hints)
 	rc.add_child(_gap(18))
-	_side_head = _label("Still on my mind", &"SatchelSmall")
-	_side_head.uppercase = true
+	_side_head = BookKit.section("Still on my mind")
 	rc.add_child(_side_head)
 	_side = VBoxContainer.new()
 	_side.add_theme_constant_override(&"separation", 6)
@@ -442,56 +387,12 @@ func _build() -> void:
 	think_row.add_child(_status)
 
 	_sparkles = _make_sparkles()
-	_root.add_child(_sparkles)
+	add_child(_sparkles)
+	set_hints([["Enter", "Think on it"], ["L", "Close"], ["Esc", "Back"]])
 	_chime = AudioStreamPlayer.new()
 	_chime.stream = Juice.chime(&"unlock")
 	_chime.volume_db = -10.0
 	add_child(_chime)
-
-
-func _page(at: Vector2, tilt_deg: float) -> PanelContainer:
-	var p := PanelContainer.new()
-	p.theme_type_variation = &"SatchelDetail"
-	p.position = at
-	p.size = PAGE
-	p.custom_minimum_size = PAGE
-	p.pivot_offset = PAGE * 0.5
-	p.rotation = deg_to_rad(tilt_deg)
-	_book_box.add_child(p)
-	return p
-
-
-func _column(page: PanelContainer) -> VBoxContainer:
-	var m := MarginContainer.new()
-	for side in [&"margin_left", &"margin_right"]:
-		m.add_theme_constant_override(side, 28)
-	m.add_theme_constant_override(&"margin_top", 22)
-	m.add_theme_constant_override(&"margin_bottom", 18)
-	page.add_child(m)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 8)
-	m.add_child(col)
-	return col
-
-
-## The key prompts, at the foot of the left page (on paper, so they read).
-func _build_prompts(parent: Control) -> void:
-	var prompts := HBoxContainer.new()
-	prompts.add_theme_constant_override(&"separation", 22)
-	parent.add_child(prompts)
-	for p in [["L", "Close"], ["Esc", "Back"]]:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 8)
-		var glyph := PanelContainer.new()
-		glyph.theme_type_variation = &"SatchelKey"
-		var key := _label(p[0], &"SatchelKeyLabel")
-		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		glyph.add_child(key)
-		row.add_child(glyph)
-		var word := _label(p[1], &"SatchelSmall")
-		word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(word)
-		prompts.add_child(row)
 
 
 func _make_sparkles() -> CPUParticles2D:

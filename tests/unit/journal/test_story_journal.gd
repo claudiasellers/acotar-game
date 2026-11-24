@@ -5,7 +5,7 @@ extends GutTest
 
 const BOOK := "res://data/journal/story_journal.tres"
 const PHASES := "res://data/phases/spring_court_phases.tres"
-const PANEL_SCRIPTS := ["res://ui/journal/story_journal.gd", "res://ui/journal/journal_sketch.gd", "res://ui/journal/journal_spine.gd", "res://ui/journal/journal_tie.gd"]
+const PANEL_SCRIPTS := ["res://ui/journal/story_journal.gd", "res://ui/journal/journal_sketch.gd"]
 ## Names she can't know before the phase she meets or learns them in.
 const NAMES := {
 	"tamlin": 2, "lucien": 2, "alis": 2, "high lord": 2, "andras": 2,

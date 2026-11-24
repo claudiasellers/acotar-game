@@ -1,10 +1,11 @@
-## The collection book (J): pastel tabs with progress bars, a swatch tile per
-## entry (a grey "?" until found), and a pink "new" badge that bounces once
-## and clears when the tab is viewed. The page is the menu shell's collection
-## tab (CollectionTab); these are its entry points and the parts it is built from.
+## The collection (J): a tile per entry (a lilac silhouette until found) and a
+## "new" badge that bounces once and clears when its tab is viewed. The page
+## is the journal's collection page (CollectionTab); these are its entry
+## points and the parts it is built from.
 extends RefCounted
 
-const TILE := Vector2(122, 132)
+const TILE := Vector2(128, 138)
+const PICTURE := 72.0
 
 
 static func is_open() -> bool:
@@ -51,7 +52,7 @@ static func _refresh_labels(buttons: Dictionary, book: CollectionBook) -> void:
 		(buttons[tab] as Button).text = text
 
 
-## One entry: a stitched slot with its picture (a lilac silhouette until
+## One entry: its picture over a blot of wash (a lilac silhouette until
 ## found), its name or where to look, and a "new" pin that bounces once.
 static func _tile(e: Dictionary, detail: Label) -> Control:
 	var slot := Button.new()
@@ -63,35 +64,30 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	col.set_anchors_preset(Control.PRESET_FULL_RECT)
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(col)
-	var swatch: Control
+	var holder := Control.new()
+	holder.custom_minimum_size = Vector2(PICTURE, PICTURE)
+	holder.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(holder)
+	var picture: Control
+	var item_art := SatchelIcon.path_for(e.id, PICTURE) if e.found else ""
 	if e.found and (String(e.image) != "" or e.get("icon") is Texture2D):
-		var tex := TextureRect.new()
-		tex.texture = e.icon if e.get("icon") is Texture2D else Gallery.load_texture({"path": e.image})
-		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		swatch = tex
+		picture = BookKit.picture(e.icon if e.get("icon") is Texture2D else Gallery.load_texture({"path": e.image}), Vector2(PICTURE, PICTURE))
+	elif item_art != "":
+		holder.add_child(BookKit.wash(PICTURE, hash(String(e.id))))
+		picture = BookKit.picture(load(item_art), Vector2(PICTURE, PICTURE))
 	else:
-		swatch = ItemIcon.make(e.shape, e.color, not e.found, e.shiny)
-	swatch.custom_minimum_size = Vector2(56, 56)
-	swatch.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_child(swatch)
-	var name_label := Label.new()
-	name_label.text = String(e.name) if e.found else String(e.hint)
-	name_label.theme_type_variation = &"SatchelSmall" if e.found else &"SatchelWhere"
+		picture = ItemIcon.make(e.shape, e.color, not e.found, e.shiny, PICTURE)
+	holder.add_child(picture)
+	var name_label := BookKit.label(String(e.name) if e.found else String(e.hint), &"SatchelSmall" if e.found else &"SatchelWhere", true)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_label.custom_minimum_size = Vector2(TILE.x - 16, 0)
-	name_label.add_theme_font_size_override(&"font_size", 15 if e.found else 13)
-	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.custom_minimum_size = Vector2(TILE.x - 12, 0)
+	name_label.add_theme_font_size_override(&"font_size", 14 if e.found else 13)
 	col.add_child(name_label)
 	if e.new:
-		var badge := Label.new()
-		badge.text = "new"
-		badge.theme_type_variation = &"SatchelPin"
-		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		col.add_child(badge)
+		var badge := BookKit.label("new", &"SatchelPin")
+		badge.position = Vector2(4, 4)
+		slot.add_child(badge)
 		slot.ready.connect(func() -> void:
 			slot.pivot_offset = TILE * 0.5
 			Juice.bounce_control(slot, 0.14), CONNECT_ONE_SHOT)

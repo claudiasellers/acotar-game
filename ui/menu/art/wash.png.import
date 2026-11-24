@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwom0od6pbpgj"
-path="res://.godot/imported/wash_bloom.png-ca9dc9b9f02fbb262e7d18500dac0a5d.ctex"
+uid="uid://c308ter8jn2iy"
+path="res://.godot/imported/wash.png-6e5a89551d7d07a9879a1ba1cad9967c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/satchel/crafted/wash_bloom.png"
-dest_files=["res://.godot/imported/wash_bloom.png-ca9dc9b9f02fbb262e7d18500dac0a5d.ctex"]
+source_file="res://ui/menu/art/wash.png"
+dest_files=["res://.godot/imported/wash.png-6e5a89551d7d07a9879a1ba1cad9967c.ctex"]
 
 [params]
 

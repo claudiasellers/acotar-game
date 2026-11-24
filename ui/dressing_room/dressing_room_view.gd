@@ -1,15 +1,17 @@
-## The dressing room screen: Feyre stands in a gilded mirror on the left, the
-## wardrobe hangs on the right. Pieces are grouped by garment (one card per
-## gown, a row of colour swatches for its variants) and by category tab. Every
-## change twirls her, sparkles and chimes while the game stays paused. Drag
-## the mirror, or A / D, to turn her. Opened by DressingRoom.open().
+## The dressing room, on the wardrobe page of Feyre's journal: the left sheet
+## is cut away into an arched mirror she stands in, and the wardrobe hangs on
+## the right sheet. Pieces are grouped by garment (one card per gown, a row of
+## colour swatches for its variants) and by category. Every change twirls
+## her, sparkles and chimes while the game stays paused. Drag the mirror, or
+## A / D, to turn her. Opened by DressingRoom.open().
 ## L64: pieces she hasn't seen yet wear a "New" ribbon and arrive with one
 ## sparkle; the header counts the collection; from the satchel only the small
 ## things she carries show (SATCHEL_TABS), never a gown.
 class_name DressingRoomView
 extends Control
 
-const PANEL_FRACTION := 0.42
+## The mirror: an arched window through the left sheet, in book space.
+const MIRROR := Rect2(110, 72, 670, 760)
 ## Full-body framing (metres of height visible above and below her middle) and
 ## the vanity close-up on her face.
 const BODY_HALF_HEIGHT := 1.12
@@ -36,8 +38,6 @@ const REMOVABLE: Array[StringName] = [&"outer", &"head", &"neck", &"mask", &"ear
 const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55, "Masks": 0.8}
 ## What she can change from her satchel, out in the world.
 const SATCHEL_TABS: Array[String] = ["Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
-## The gilt of the mirror's frame (the dressing room's own; the panel is the satchel's).
-const GILT := Color(0.83, 0.68, 0.38)
 const COLUMNS := 3
 const THUMB := 104.0
 const SWATCH := 30.0
@@ -116,7 +116,7 @@ func setup(who: Feyre, station_id: StringName) -> void:
 	mirror_only = station_id == &"dressing_mirror"
 	from_satchel = station_id == DressingRoom.SATCHEL
 	name = "DressingRoomView"
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	size = BookLayout.SIZE
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_face_the_room(station_id)
 	_build()
@@ -267,46 +267,24 @@ func _face_the_room(station_id: StringName) -> void:
 
 
 func _build() -> void:
-	# L64-3: the satchel's handmade look (JournalTheme, L50): paper, stitched
-	# tabs and slots, the serif. The gilt mirror stays the dressing room's own.
-	var mirror := Panel.new()
+	# The mirror's gilt rim, round the window the shell cuts in the left sheet.
+	var mirror := Control.new()
 	mirror.name = "MirrorFrame"
 	mirror.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	mirror.anchor_right = 1.0 - PANEL_FRACTION
-	mirror.anchor_bottom = 1.0
-	mirror.offset_left = 28
-	# Below the menu shell's tab strip.
-	mirror.offset_top = MenuTab.page_top()
-	mirror.offset_right = -18
-	mirror.offset_bottom = -28
-	var frame := StyleBoxFlat.new()
-	frame.draw_center = false
-	frame.border_color = GILT
-	frame.set_border_width_all(6)
-	frame.set_corner_radius_all(220)
-	frame.corner_detail = 16
-	frame.shadow_color = Color(1.0, 0.85, 0.95, 0.55)
-	frame.shadow_size = 18
-	mirror.add_theme_stylebox_override(&"panel", frame)
+	mirror.position = MIRROR.position
+	mirror.size = MIRROR.size
+	mirror.draw.connect(_draw_mirror_rim.bind(mirror))
 	add_child(mirror)
 
-	var panel := PanelContainer.new()
-	panel.name = "Wardrobe"
-	panel.theme_type_variation = &"SatchelDetail"
-	panel.anchor_left = 1.0 - PANEL_FRACTION
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left = 0
-	panel.offset_top = MenuTab.page_top()
-	panel.offset_right = -28
-	panel.offset_bottom = -28
-	add_child(panel)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 10)
-	panel.add_child(box)
+	box.name = "Wardrobe"
+	box.position = BookLayout.RIGHT.position
+	box.size = BookLayout.RIGHT.size
+	box.add_theme_constant_override(&"separation", 8)
+	add_child(box)
 
 	var head := HBoxContainer.new()
-	var title := _label("Her satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"), &"SatchelHeading")
+	var title := BookKit.title("In my satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"))
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
 	var chip := PanelContainer.new()
@@ -326,7 +304,7 @@ func _build() -> void:
 	wearing.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(wearing)
 
-	# Stitched leather tabs drive a page stack (the TabContainer keeps its API).
+	# Chips drive a page stack (the TabContainer keeps its API).
 	_tab_row = HFlowContainer.new()
 	_tab_row.add_theme_constant_override(&"h_separation", 6)
 	_tab_row.add_theme_constant_override(&"v_separation", 6)
@@ -381,8 +359,8 @@ func _build() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 18)
 	box.add_child(row)
-	row.add_child(_key_hint("A  D", "Turn"))
-	row.add_child(_key_hint("Esc", "Done"))
+	row.add_child(BookKit.key_hint("A  D", "Turn"))
+	row.add_child(BookKit.key_hint("Esc", "Done"))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
@@ -395,26 +373,21 @@ func _build() -> void:
 
 
 func _label(text: String, variation: StringName) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	return l
+	return BookKit.label(text, variation)
 
 
-## A leather key glyph and its word, like the satchel's footer.
-func _key_hint(key: String, word: String) -> Control:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
-	var glyph := PanelContainer.new()
-	glyph.theme_type_variation = &"SatchelKey"
-	var k := _label(key, &"SatchelKeyLabel")
-	k.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	glyph.add_child(k)
-	row.add_child(glyph)
-	var w := _label(word, &"SatchelSmall")
-	w.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(w)
-	return row
+## A thin gilt line round the arch.
+func _draw_mirror_rim(on: Control) -> void:
+	var w := on.size.x
+	var h := on.size.y
+	var r := w * 0.5
+	var pts := PackedVector2Array([Vector2(0, h), Vector2(0, r)])
+	for i in 49:
+		var a := PI + PI * i / 48.0
+		pts.append(Vector2(r + cos(a) * r, r + sin(a) * r))
+	pts.append_array([Vector2(w, h), Vector2(0, h)])
+	on.draw_polyline(pts, JournalTheme.color(&"line"), 5.0, true)
+	on.draw_polyline(pts, JournalTheme.color(&"glow"), 2.0, true)
 
 
 func _scroll(tab_name: String) -> Array:
@@ -447,9 +420,8 @@ func _piece_tab(tab_name: String, pieces: Array[WardrobePiece]) -> Control:
 			if REMOVABLE.has(s) and not slots.has(s):
 				slots.append(s)
 	if not slots.is_empty():
-		var off := Button.new()
-		off.text = "Take it off"
-		off.theme_type_variation = &"SatchelSlot"
+		var off := BookKit.chip("Take it off", false)
+		off.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		off.pressed.connect(func() -> void: take_off(slots))
 		col.add_child(off)
 	var grid := _grid(col)
@@ -700,18 +672,21 @@ func _frame(face: float) -> void:
 			PhysicsRayQueryParameters3D.create(target, target + dir * (dist + 0.3), 1, [feyre.get_rid()]))
 	if not hit.is_empty():
 		dist = maxf(0.6, target.distance_to(hit["position"]) - 0.3)
-	camera.fov = rad_to_deg(2.0 * atan(half / dist))
-	var view := get_viewport_rect().size if is_inside_tree() else Vector2(16, 9)
-	var aspect := view.x / maxf(view.y, 1.0)
-	# Centre her in the mirror (the left part of the screen), not the screen.
-	var mirror_centre := (1.0 - PANEL_FRACTION) * 0.5
-	camera.h_offset = (0.5 - mirror_centre) * 2.0 * half * aspect
+	# She stands in the mirror, not the screen: the view is sized so the
+	# mirror's height shows `half` above and below her middle, then shifted
+	# so its centre is the mirror's.
+	var view := get_viewport_rect().size if is_inside_tree() else Vector2(1920, 1080)
+	var centre := (BookLayout.origin(view) + MIRROR.get_center()) / view
+	var half_view := half * view.y / MIRROR.size.y
+	camera.fov = rad_to_deg(2.0 * atan(half_view / dist))
+	camera.h_offset = (0.5 - centre.x) * 2.0 * half_view * view.x / view.y
+	camera.v_offset = (centre.y - 0.5) * 2.0 * half_view
 	camera.look_at_from_position(target + dir * dist, target)
 
 
 func _hide_hud() -> void:
 	for layer in get_tree().root.find_children("*", "CanvasLayer", true, false):
 		var l := layer as CanvasLayer
-		if l.visible and l.layer < UiLayers.SCREEN and not l.is_ancestor_of(self):
+		if l.visible and l.layer < UiLayers.BACKDROP and not l.is_ancestor_of(self):
 			l.visible = false
 			_hidden_layers.append(l)
