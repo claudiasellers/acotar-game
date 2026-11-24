@@ -28,9 +28,9 @@ const FADE_SPEED := 3.0
 ## Her thought on waking after a knockdown, by how she wakes (wake_line).
 const WAKE_LINES := {
 	&"human": "Cold woke me. The light had moved; I'd lost hours I didn't have. Up.",
-	&"spring": "I came round in the grass, aching all over. Hours gone, by the sun.",
-	&"carried": "Someone had brought me in out of harm's way. My head still rang.",
-	&"gentle": "That knocked the breath out of me. Up, slowly.",
+	&"spring": "I came round on the ground, aching all over. Hours gone.",
+	&"carried": "Someone must have carried me in. My head still rang.",
+	&"gentle": "That knocked the air out of me. Up, slowly.",
 }
 const WAKE_LINE_SECONDS := 6.0
 const HIT_FADE := 1.2
