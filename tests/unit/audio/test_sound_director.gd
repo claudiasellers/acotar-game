@@ -269,3 +269,19 @@ func test_cutscene_scores_match_the_film_lengths() -> void:
 		assert_not_null(c, spec[0])
 		assert_true(c.music)
 		assert_almost_eq(c.streams[0].get_length(), spec[1], 0.5, spec[0])
+
+
+func test_a_space_freed_unfinished_stops_holding_the_film_duck_and_the_sting() -> void:
+	var d := _director()
+	var space := Node.new()
+	add_child(space)
+	space.add_to_group(&"story_space_live")
+	space.set_meta(&"story_space_id", &"film_leaky")
+	EventBus.scene_space_started.emit(&"film_leaky")
+	await wait_seconds(1.7)
+	assert_almost_eq(d.film_hold, 1.0, 0.01)
+	space.free()
+	await wait_seconds(3.4)
+	assert_almost_eq(d.film_hold, 0.0, 0.01, "the film duck returns when its node is gone")
+	EventBus.mood_requested.emit(&"dread", 0.8, 0.05)
+	assert_eq(int(d.played.get(&"horror_wrong", 0)), 1, "the sting plays again after the leak")

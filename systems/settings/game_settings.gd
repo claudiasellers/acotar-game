@@ -12,7 +12,7 @@ const SECTIONS := {
 	&"invert_x": "camera", &"invert_y": "camera", &"camera_follow": "camera",
 	&"mouse_steers": "camera",
 	&"gentle_mode": "play", &"reduced_effects": "play",
-	&"hud_mode": "play", &"edge_fx": "play", &"hit_marks": "play",
+	&"hud_mode": "play", &"edge_fx": "play", &"hit_marks": "play", &"key_hints": "play",
 	&"music_volume": "audio", &"sound_volume": "audio",
 	&"text_size": "ui",
 }
@@ -26,6 +26,8 @@ const DEFAULTS := {
 	## Feyre's HUD (ui/hud/vitals): HUD_MODES index, EDGE_FX_LEVELS index, hit marks.
 	## Always by default, so a new player sees her health and bow from the start.
 	&"hud_mode": 1, &"edge_fx": 0, &"hit_marks": true,
+	## Key prompts that teach a key the first time it matters (KeyPrompts).
+	&"key_hints": true,
 	&"music_volume": 0.8, &"sound_volume": 0.8,
 	&"text_size": 1,
 }

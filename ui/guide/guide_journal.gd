@@ -6,7 +6,7 @@
 ## line (UiMode.quiet, the lane).
 ## G / pad Y brings the current thought back; again while it shows, a plainer
 ## one. The bookmark (her whorl and the G key) rests in HudLayout's THOUGHT
-## zone, always findable and clickable, glowing softly when a thought is
+## zone, top left, and the thought's slip comes out beside it (LinePresenter), always findable and clickable, glowing softly when a thought is
 ## waiting unread.
 class_name GuideJournal
 extends Node
@@ -14,8 +14,10 @@ extends Node
 const BOOK_PATH := "res://data/guide/act1_guide.tres"
 const VOICE_DIR := "res://audio/voice/feyre/"
 const ACTION := &"guide_open"
-## The bookmark's whorl, in px.
+## The bookmark's whorl, in px, and how wide the tab it sits on is (the
+## whorl and ThoughtMark's padding): her thoughts start just past it.
 const MARK := 34.0
+const TAB_WIDTH := MARK + 24.0
 const SAVE_KEY := "guide"
 
 var director: GuideDirector
@@ -83,10 +85,10 @@ func on_mode_changed(new_mode: GuideSettings.Mode) -> void:
 		hide_thought()
 
 
-## Play is calm and the lane is free (or holds this thought already).
+## Play is calm and no other words are up (or only this thought already).
 func can_show() -> bool:
-	var in_lane := LinePresenter.of(get_tree()).showing
-	return not UiMode.quiet(get_tree()) and (in_lane == "" or in_lane == line)
+	var up := LinePresenter.of(get_tree()).showing
+	return not UiMode.quiet(get_tree()) and (up == "" or up == line)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -174,9 +176,9 @@ func hide_thought() -> void:
 	showing = false
 	if _voice.playing:
 		_voice.stop()
-	# Only her own thought: another line may have taken the lane since.
+	# Only her own thought: a thought of the story's may have taken its place.
 	var lines := LinePresenter.of(get_tree())
-	if lines.showing == line:
+	if lines.stand_of(LinePresenter.Voice.THOUGHT).showing == line:
 		lines.clear_voice(LinePresenter.Voice.THOUGHT)
 	line = ""
 
@@ -234,6 +236,7 @@ func _build() -> void:
 	_mark.pivot_offset = Vector2(MARK, MARK) * 0.5
 	_mark.width = 3.0
 	plate.add_child(_mark)
+	LinePresenter.of(get_tree()).bookmark = _mark
 	var key := BookKit.key_cap("G")
 	key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_tab.add_child(key)

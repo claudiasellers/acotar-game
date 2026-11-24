@@ -165,6 +165,8 @@ func start() -> bool:
 	running = true
 	beats = _build_beats()
 	beat_index = -1
+	add_to_group(&"story_space_live")
+	set_meta(&"story_space_id", space_id)
 	EventBus.scene_space_started.emit(space_id)
 	started.emit()
 	_advance()

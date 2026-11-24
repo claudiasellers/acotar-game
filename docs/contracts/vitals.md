@@ -132,7 +132,7 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | fire | 6 per 0.5 s | fire | light | — | — | 0.05 · floor 10 |
 | cold_exposure | 1 per 5 s | cold | none | — | — | 0 · floor 30 (Spring) / 15 (human realm) |
 | venom_drain | 0.4 per s | venom | none | — | — | 0 · floor 10 |
-| fall | (h − 4 m) × 8 | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
+| fall | (h − 4 m) × 8, h = drop below where she last stood | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
 | generic_hit | 10 | blunt | light | — | — | 0.1 |
 
 ## 4. Status tags (BodyState.effects, extended)
@@ -145,7 +145,8 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | brew tags (existing: steady, swift, strong, warm, quiet, bright, keen, cool, heal) | max magnitude, max time (unchanged) | timed | — |
 | `well_rested` | refresh | 1 game day | — |
 | `bandaged` | refresh | 10 game min, body tell only | — |
-| `well_fed`, `stuffed` | live (from hunger) | — | — |
+| `cold`, `hunger` (gauges) | always listed: magnitude = BodyState.cold / hunger, `stage` 0 calm, 1 uneasy, 2 danger (`StatusRules.stage`; cold 0.4/0.7, hunger 0.5/0.9) | live | warmth, food |
+| `stuffed` | timed, after a big meal | 3 min | — |
 
 At most 3 distinct brew-effect tags are active at once; a fourth replaces the one with the least time left (venom, drowsy, roar_shake, well_rested and the hunger states don't use slots).
 

@@ -5,6 +5,9 @@
 ## feels): paper in a brass rim with a gold timer ring for a good status, and
 ## the dark, cracked pan for a bad one. The ring drains for timed effects
 ## (blinking in the last 3 s), creeps for venom and is full for live states. Buffs pop in with a sparkle and a bounce; debuffs shudder (plan §15 B).
+## The cold and hunger gauges (StatusRules.GAUGES) are always there: a good pan
+## with the ring filled to the level, glow when calm and accent when uneasy,
+## turning to the dark cracked pan, with a shudder, when they reach danger.
 class_name VitalsStatusRow
 extends Control
 
@@ -28,6 +31,8 @@ var overflow: int = 0
 var _icons: Dictionary = {}
 ## tag -> seconds since it appeared, for the pop and shudder.
 var _born: Dictionary = {}
+## gauge tag -> seconds since it reached danger (stage 2), for its shudder.
+var _dire: Dictionary = {}
 var _chime: AudioStreamPlayer
 
 
@@ -48,13 +53,21 @@ func set_statuses(visible_list: Array[Dictionary]) -> void:
 		now[s.tag] = true
 		if not _born.has(s.tag):
 			_born[s.tag] = 0.0
-			if not StatusRules.is_debuff(s.tag):
+			if not StatusRules.is_debuff(s.tag) and StatusRules.kind(s.tag) != StatusRules.Kind.GAUGE:
 				_chime.stream = Juice.chime(&"pickup")
 				_chime.pitch_scale = 1.25
 				_chime.play()
+		if int(s.get("stage", 0)) >= 2:
+			if not _dire.has(s.tag):
+				_dire[s.tag] = 0.0
+		else:
+			_dire.erase(s.tag)
 	for tag: StringName in _born.keys():
 		if not now.has(tag):
 			_born.erase(tag)
+	for tag: StringName in _dire.keys():
+		if not now.has(tag):
+			_dire.erase(tag)
 	shown = visible_list.slice(0, MAX_SHOWN)
 	overflow = maxi(visible_list.size() - MAX_SHOWN, 0)
 
@@ -62,6 +75,8 @@ func set_statuses(visible_list: Array[Dictionary]) -> void:
 func _process(delta: float) -> void:
 	for tag: StringName in _born:
 		_born[tag] = float(_born[tag]) + delta
+	for tag: StringName in _dire:
+		_dire[tag] = float(_dire[tag]) + delta
 	queue_redraw()
 
 
@@ -77,13 +92,16 @@ func _draw() -> void:
 		var tag: StringName = s.tag
 		var c := _slot(i)
 		var age := float(_born.get(tag, 1.0))
-		var debuff := StatusRules.is_debuff(tag)
+		var gauge := StatusRules.kind(tag) == StatusRules.Kind.GAUGE
+		var stage := int(s.get("stage", 0))
+		var debuff := StatusRules.is_debuff(tag) or (gauge and stage >= 2)
 		var scale := 1.0
 		if age < POP_SECONDS:
 			var t := age / POP_SECONDS
 			scale = 0.6 + 0.4 * t + sin(t * PI) * 0.18
-		if debuff and age < 0.45:
-			c.x += sin(age * 70.0) * 3.0 * (1.0 - age / 0.45)
+		var shudder := float(_dire.get(tag, age)) if gauge else age
+		if debuff and shudder < 0.45:
+			c.x += sin(shudder * 70.0) * 3.0 * (1.0 - shudder / 0.45) * Juice.effects_scale
 		var r := RADIUS * scale
 		draw_circle(c, r, danger if debuff else line, true, -1.0, true)
 		draw_circle(c, r * (1.0 - RIM), pall.lerp(ink, 0.5) if debuff else paper, true, -1.0, true)
@@ -96,7 +114,11 @@ func _draw() -> void:
 		var col := danger.lightened(0.25) if debuff else glow
 		var total := float(s.total)
 		var left := float(s.seconds_left)
-		if tag == &"venom":
+		if gauge:
+			frac = clampf(float(s.magnitude), 0.0, 1.0)
+			if stage == 1:
+				col = JournalTheme.color(&"accent")
+		elif tag == &"venom":
 			frac = clampf(float(s.magnitude), 0.0, 1.0)
 			col = (JournalTheme.color(&"bile") as Color).lightened(0.2)
 		elif total > 0.0:
@@ -109,7 +131,7 @@ func _draw() -> void:
 		if tex:
 			var sz := ICON * scale
 			draw_texture_rect(tex, Rect2(c - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false)
-		if not debuff and age < 0.6:
+		if not debuff and not gauge and age < 0.6:
 			var k := age / 0.6
 			for j in 6:
 				var a := TAU * j / 6.0 + k * 1.5

@@ -25,7 +25,7 @@ func test_the_bar_and_the_pans_draw_without_error() -> void:
 	var row := VitalsStatusRow.new()
 	add_child_autofree(row)
 	var list: Array[Dictionary] = []
-	for tag: StringName in [&"heal", &"at_ease", &"drowsy", &"chilled", &"venom", &"warm", &"swift"]:
+	for tag: StringName in [&"heal", &"at_ease", &"drowsy", &"cold", &"venom", &"warm", &"swift"]:
 		list.append({"tag": tag, "magnitude": 0.6, "seconds_left": 2.0, "total": 40.0})
 	row.set_statuses(list)
 	assert_eq(row.shown.size(), VitalsStatusRow.MAX_SHOWN)

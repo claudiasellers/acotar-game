@@ -96,6 +96,8 @@ func _ready() -> void:
 	playing = true
 	_last_usec = Time.get_ticks_usec()
 	StoryControl.hold(self, StoryControl.Mode.NONE)
+	add_to_group(&"story_space_live")
+	set_meta(&"story_space_id", space_id())
 	EventBus.scene_space_started.emit(space_id())
 	if data.bars > 0.0:
 		Cine.of(get_tree()).bars_to(data.bars, 1.0)

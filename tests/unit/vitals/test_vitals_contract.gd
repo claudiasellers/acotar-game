@@ -163,17 +163,36 @@ func test_three_brew_effects_at_most() -> void:
 	assert_false(b.effects.has(&"swift"), "the one with least time left goes")
 
 
-func test_statuses_list_danger_first_with_timers() -> void:
+func test_statuses_list_gauges_then_danger_with_timers() -> void:
 	player.body_state.add_effect(&"steady", 1.0, 60.0)
 	v.apply_status(&"bv", &"venom", 0.4, 1.0)
 	player.body_state.cold = 0.8
-	var tags: Array = v.statuses().map(func(s: Dictionary) -> StringName: return s.tag)
-	assert_eq(tags[0], &"venom")
-	assert_true(tags.has(&"chilled"))
+	player.body_state.hunger = 0.1
+	var list := v.statuses()
+	var tags: Array = list.map(func(s: Dictionary) -> StringName: return s.tag)
+	assert_eq(tags.slice(0, 3), [&"cold", &"hunger", &"venom"], "the gauges hold the first slots")
+	assert_eq(int(list[0].stage), 2, "cold 0.8 is dangerous")
+	assert_eq(int(list[1].stage), 0, "fed is calm")
 	var steady: Dictionary = v.statuses().filter(func(s: Dictionary) -> bool: return s.tag == &"steady")[0]
 	assert_almost_eq(float(steady.total), 60.0, 0.01)
 	for s in v.statuses():
 		assert_true(Icons.has(Icons.STATUS, s.tag), "icon for %s" % s.tag)
+
+
+func test_gauges_escalate_and_always_show() -> void:
+	assert_eq(StatusRules.stage(&"cold", 0.2), 0)
+	assert_eq(StatusRules.stage(&"cold", 0.5), 1)
+	assert_eq(StatusRules.stage(&"cold", 0.7), 2)
+	assert_eq(StatusRules.stage(&"hunger", 0.89), 1)
+	assert_eq(StatusRules.stage(&"hunger", 0.9), 2)
+	player.body_state.cold = 0.0
+	player.body_state.hunger = 0.0
+	var tags: Array = v.statuses().map(func(s: Dictionary) -> StringName: return s.tag)
+	assert_true(tags.has(&"cold") and tags.has(&"hunger"), "calm gauges are still listed")
+	var hud := VitalsHud.new()
+	add_child_autofree(hud)
+	assert_true(hud._status_wanted({"tag": &"hunger", "seconds_left": -1.0, "total": -1.0, "stage": 0}),
+		"Auto shows a calm gauge")
 
 
 func test_every_status_tag_has_an_icon() -> void:
@@ -214,10 +233,11 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 
 
 func test_a_teleport_mid_fall_lands_her_unhurt() -> void:
-	v._fall_speed = 30.0
+	player.global_position = Vector3(0, 2, 0)
+	v._stood_y = 40.0
 	v._was_on_floor = false
 	v.forget_fall()
-	assert_eq(v._fall_speed, 0.0, "the drop she was in stays behind")
+	assert_eq(v._stood_y, 2.0, "the drop she was in stays behind")
 	assert_true(v._was_on_floor, "no landing is pending")
 
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnnr7y8e13fy2"
-path="res://.godot/imported/starving.webp-5f19bae0246a43f4cd1e7381067eaa78.ctex"
+uid="uid://d05hntewsuofu"
+path="res://.godot/imported/hunger.webp-3d6af3262d7dcf07bb31870115a1ddf5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/theme/icons/status/starving.webp"
-dest_files=["res://.godot/imported/starving.webp-5f19bae0246a43f4cd1e7381067eaa78.ctex"]
+source_file="res://ui/theme/icons/status/hunger.webp"
+dest_files=["res://.godot/imported/hunger.webp-3d6af3262d7dcf07bb31870115a1ddf5.ctex"]
 
 [params]
 

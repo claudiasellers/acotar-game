@@ -2,8 +2,11 @@
 ## by what kind of line it is and never by which script fired it:
 ##   SAID     anyone speaking aloud, Feyre included, in play and in films: a
 ##            smear of shadow, the name in gold capitals, plain upright type.
-##   THOUGHT  everything in Feyre's head: a slip of her page in the same spot,
-##            in her hand, marked with her whorl.
+##   THOUGHT  everything in Feyre's head: a slip of her page in her hand,
+##            in the top left corner beside her bookmark (the whorl and the
+##            G key). It slides out from the bookmark while the bookmark's
+##            whorl inks itself in, so a new one is seen. One whorl, never
+##            two: the slip draws its own only while the bookmark is hidden.
 ##   TOLD     a film's narration: her hand, large, on the smear, no name.
 ##   WHISPER  a voice inside her head that is not hers (the Bogge): bare bone
 ##            words in a thin hand, in the middle of her view, that tremble
@@ -17,15 +20,16 @@
 ## Whisper and Dread are the horror palette on purpose (R3: horror is never dressed
 ## up as the pretty UI). A new kind of line is one row in VOICES.
 ##
-## A line stands in one of three places. The lane runs low across the screen
+## A line stands in one of four places. The lane runs low across the screen
 ## under Feyre's feet, and the strap steps aside while a line is there; in a
-## film the lane stands on the letterbox instead. The middle is the whisper's,
-## and a page is held at the centre.
+## film the lane stands on the letterbox instead. The corner is her thoughts',
+## so what she thinks and what is said are never in the same spot. The middle
+## is the whisper's, and a page is held at the centre.
 ## Each place holds one line at a time, and no line is ever seen through
 ## another: a page and the middle share the centre of the screen, so a line
 ## in one takes the other's off at once, and Dread takes every other line off
-## ("alone"). The lane and the middle do stand together (Lucien talking while
-## the Bogge pleads). A line never outlives the scene that
+## ("alone"). The lane, the corner and the middle do stand together (Lucien
+## talking while the Bogge pleads, and what she thinks of it). A line never outlives the scene that
 ## spoke it: it clears when that scene finishes or leaves the tree, on a phase
 ## change and on a load, and it steps aside while a screen pauses play.
 ## No choices, ever (R2). Lives under ScreenStack; reach it with
@@ -35,7 +39,7 @@ class_name LinePresenter
 extends CanvasLayer
 
 enum Voice { SAID, THOUGHT, TOLD, WHISPER, DREAD, READ }
-enum Place { LANE, MIDDLE, PAGE }
+enum Place { LANE, CORNER, MIDDLE, PAGE }
 
 const NODE := ^"ScreenStack/LinePresenter"
 const FADE := 0.35
@@ -44,6 +48,15 @@ const FADE := 0.35
 const LANE_TOP := 0.805
 ## In a film the lane stands this far above the bottom letterbox bar.
 const FILM_LIFT := 40.0
+## Where a thought's slip starts: level with her bookmark in HudLayout's
+## THOUGHT zone, and just clear of it.
+const CORNER := Vector2(HudLayout.MARGIN + GuideJournal.TAB_WIDTH + 12.0, HudLayout.MARGIN)
+## A thought's wrap, in px: it keeps to its corner.
+const CORNER_WIDTH := 460.0
+## A new thought slides out this far from the bookmark, and its whorl inks
+## itself in, over this long.
+const ARRIVE := 36.0
+const ARRIVE_SECONDS := 0.6
 ## The whisper's band of the screen, top and bottom.
 const MIDDLE := Vector2(0.36, 0.5)
 ## Where a held page's middle sits (a share of the screen's height).
@@ -53,12 +66,14 @@ const TEXT_WIDTH := 860.0
 const WHORL := 26.0
 ## Voice -> where it stands, its sheet (a PanelContainer variation) and its
 ## type (a Label variation); then what it wears and how it moves: the
-## speaker's name (and the type it is in), her whorl, a tremble in px, letters
+## speaker's name (and the type it is in), her whorl, whether it slides in
+## from the bookmark, a tremble in px, letters
 ## written per second, how many fades it takes to leave, a narrower wrap,
 ## whether it is held until she puts it back, and whether it stands alone.
 const VOICES := {
 	Voice.SAID: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineSaid", "named": true},
-	Voice.THOUGHT: {"place": Place.LANE, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true},
+	Voice.THOUGHT: {"place": Place.CORNER, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true,
+		"width": CORNER_WIDTH, "arrives": true},
 	Voice.TOLD: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineTold"},
 	Voice.WHISPER: {"place": Place.MIDDLE, "sheet": &"LineBare", "type": &"LineWhisper", "tremble": 1.6,
 		"linger": 2.0},
@@ -73,14 +88,22 @@ const PUT_BACK := &"interact"
 const CENTRE: Array[Place] = [Place.MIDDLE, Place.PAGE]
 
 var _stands: Dictionary[Place, Stand] = {}
+var _latest: Place = Place.LANE
+var _arrival: Tween
+var _inking: WhorlInk
 
-## The line in the lane now ("" when none) and the voice it is in.
+## The whorl of her bookmark in HudLayout's THOUGHT zone (GuideJournal sets
+## it): while it shows, it is a thought's mark and the slip draws none.
+var bookmark: WhorlInk
+
+## The words on screen now, said or thought ("" when none), and the voice
+## they are in: the newest of the lane's line and her thought.
 var showing: String:
 	get:
-		return _stands[Place.LANE].showing
+		return _front().showing
 var voice: Voice:
 	get:
-		return _stands[Place.LANE].voice
+		return _front().voice
 
 
 static func of(tree: SceneTree) -> LinePresenter:
@@ -112,6 +135,11 @@ func _init() -> void:
 		var stand := Stand.new()
 		box.add_child(stand)
 		_stands[place] = stand
+	var corner := _stands[Place.CORNER].get_parent() as VBoxContainer
+	corner.offset_left = CORNER.x
+	corner.offset_top = CORNER.y
+	_stands[Place.CORNER].size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_stands[Place.CORNER].text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var middle := _stands[Place.MIDDLE].get_parent() as VBoxContainer
 	middle.anchor_top = MIDDLE.x
 	middle.anchor_bottom = MIDDLE.y
@@ -137,12 +165,18 @@ func _ready() -> void:
 ## line belongs to.
 func say(in_voice: Voice, who: String, text: String, from: Node = null, seconds: float = -1.0) -> float:
 	var row: Dictionary = VOICES[in_voice]
-	if row.place == Place.LANE:
-		_lay_lane()
+	_lay_lane()
+	if row.place in [Place.LANE, Place.CORNER]:
+		_latest = row.place
+	var arriving: bool = row.get("arrives", false) and _stands[row.place].showing != text
 	for place: Place in _stands:
 		if place != row.place and (row.get("alone", false) or (place in CENTRE and row.place in CENTRE)):
 			_stands[place].cut()
-	return _stands[row.place].say(in_voice, who, text, from, seconds)
+	var seconds_up := _stands[row.place].say(in_voice, who, text, from, seconds)
+	_mark_thought()
+	if arriving:
+		_arrive(_stands[row.place])
+	return seconds_up
 
 
 ## Takes every line off now (with the usual fade).
@@ -163,6 +197,43 @@ func stand_of(in_voice: Voice) -> Stand:
 	return _stands[VOICES[in_voice].place]
 
 
+## The newest of the lane's line and her thought that is still up.
+func _front() -> Stand:
+	var other: Place = Place.CORNER if _latest == Place.LANE else Place.LANE
+	return _stands[other] if _stands[_latest].showing == "" and _stands[other].showing != "" else _stands[_latest]
+
+
+## True while her bookmark is on screen.
+func bookmark_shown() -> bool:
+	return is_instance_valid(bookmark) and bookmark.is_visible_in_tree()
+
+
+## One whorl marks a thought: the bookmark's while it shows, else the slip's.
+func _mark_thought() -> void:
+	var stand := _stands[Place.CORNER]
+	stand.whorl.visible = stand.marked and not bookmark_shown()
+
+
+## A new thought slides out from her bookmark while the whorl that marks it
+## inks itself in: movement in the corner of the eye, and no sound. With
+## reduced effects it only fades in.
+func _arrive(stand: Stand) -> void:
+	if _arrival and _arrival.is_valid():
+		_arrival.kill()
+	if is_instance_valid(_inking):
+		_inking.progress = 1.0
+	var box := stand.get_parent() as Control
+	box.offset_left = CORNER.x
+	if GameSettings.reduced_effects or not is_inside_tree():
+		return
+	_inking = bookmark if bookmark_shown() else stand.whorl
+	box.offset_left = CORNER.x - ARRIVE
+	_inking.progress = 0.0
+	_arrival = create_tween().set_parallel()
+	_arrival.tween_property(box, ^"offset_left", CORNER.x, ARRIVE_SECONDS * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_arrival.tween_property(_inking, ^"progress", 1.0, ARRIVE_SECONDS)
+
+
 ## True while a line stands in the lane (the strap steps aside for it).
 func in_lane() -> bool:
 	return visible and _stands[Place.LANE].showing != ""
@@ -177,13 +248,17 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-## Hangs the lane under her feet, or stands it on a film's letterbox.
+## Hangs the lane under her feet, or stands it on a film's letterbox; a
+## thought in a film sits under the top bar.
 func _lay_lane() -> void:
 	var lane := _stands[Place.LANE].get_parent() as VBoxContainer
+	var corner := _stands[Place.CORNER].get_parent() as VBoxContainer
 	var film := FilmPlayer.current(get_tree()) if is_inside_tree() else null
+	corner.offset_top = CORNER.y
 	if film != null and film.playing:
 		var view := get_viewport().get_visible_rect().size
 		var bar := maxf(0.0, (view.y - view.x / Cine.BAR_ASPECT) * 0.5)
+		corner.offset_top = CORNER.y + bar
 		lane.anchor_top = 0.0
 		lane.anchor_bottom = 1.0
 		lane.offset_bottom = -(bar + FILM_LIFT)
@@ -199,6 +274,7 @@ func _process(delta: float) -> void:
 	# A screen (the book, a station) pauses the tree: the lines step aside and
 	# wait rather than sitting on top of it.
 	visible = not get_tree().paused
+	_mark_thought()
 	if visible:
 		for stand: Stand in _stands.values():
 			stand.tick(delta)
@@ -213,6 +289,8 @@ class Stand:
 	var whorl: WhorlInk
 	var showing: String = ""
 	var voice: Voice = Voice.SAID
+	## Whether this voice wears her whorl.
+	var marked: bool = false
 	## Scales the voice's own tremble (the Bogge's pleas grow more frantic).
 	var tremble: float = 1.0
 	var _row: Dictionary = {}
@@ -268,7 +346,8 @@ class Stand:
 		who_label.theme_type_variation = _row.get("name_type", &"LineName")
 		who_label.visible = _row.get("named", false) and who != ""
 		_hint.visible = _row.get("held", false)
-		whorl.visible = _row.get("whorl", false)
+		marked = _row.get("whorl", false)
+		whorl.visible = marked
 		whorl.ink = JournalTheme.color(&"line")
 		text_label.text = text
 		text_label.visible_ratio = 0.0 if _row.has("written") else 1.0

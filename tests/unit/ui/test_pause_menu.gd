@@ -60,7 +60,7 @@ func test_every_setting_round_trips_through_the_file() -> void:
 		&"mouse_sensitivity": 1.8, &"stick_sensitivity": 0.4, &"invert_x": true,
 		&"invert_y": true, &"camera_follow": false, &"mouse_steers": true, &"gentle_mode": true,
 		&"reduced_effects": true, &"music_volume": 0.25, &"sound_volume": 0.6, &"text_size": 3,
-		&"hud_mode": 2, &"edge_fx": 1, &"hit_marks": false,
+		&"hud_mode": 2, &"edge_fx": 1, &"hit_marks": false, &"key_hints": false,
 	}
 	assert_eq(changed.size(), GameSettings.DEFAULTS.size(), "test covers every setting")
 	for key: StringName in changed:
