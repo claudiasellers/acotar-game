@@ -679,7 +679,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _tap_interact() -> void:
 	var p := _player()
 	var interactor := p.get(&"interactor") as Interactor if p else null
-	if interactor and (interactor.pick_up_arrow() or interactor._harvest() or interactor._forage() or interactor._field()):
+	if interactor and interactor.pick_up():
 		return
 	# A station in reach: straight down to use it; otherwise the slide off.
 	var station := interactor != null and _station_near(p)

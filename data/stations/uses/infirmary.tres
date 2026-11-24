@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StationUse" format=3 uid="uid://dx07ossuvwaws"]
+
+[ext_resource type="Script" path="res://systems/interaction/station_use.gd" id="1_use"]
+
+[resource]
+script = ExtResource("1_use")
+station_id = &"infirmary"
+verb = "tend my hurts"
+kind = "tend"
+lines = PackedStringArray("Salve, clean linen and a tight knot. Better.")
+alt_lines = PackedStringArray("Nothing here that needs mending.")
+minutes = 20.0
+canon = "C"
