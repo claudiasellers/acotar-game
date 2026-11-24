@@ -83,11 +83,11 @@ const LABELS := {
 	&"LineSaid": [24, "body", 600, &"paper"],
 	&"LineName": [23, "display", 400, &"glow"],
 	&"LineTold": [34, "hand", 600, &"paper"],
-	&"LineWhisper": [34, "body", 500, &"bone"],
-	&"LineDread": [24, "body", 500, &"bone"],
+	&"LineWhisper": [40, "hand", 600, &"bone"],
+	&"LineDread": [28, "display", 400, &"bone"],
 }
 const PANELS: Array[StringName] = [
-	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"SatchelChip", &"SatchelKey",
+	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"ThoughtMark", &"SatchelChip", &"SatchelKey",
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
@@ -101,6 +101,10 @@ const KNOB_SIZE := 22
 ## How dark the smear behind a said line is, and how far its edge fades.
 const BAND_DEPTH := 0.8
 const SMEAR_EDGE := 40
+## How far the Suriel's black reaches past its words: off every screen.
+const FLOOD_REACH := 4000
+## How far above its words the black thins out, in px.
+const FLOOD_RISE := 90
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
@@ -185,10 +189,11 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"LoosePage", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
 	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 14))
 	t.set_stylebox(&"panel", &"LineBand", _smear(Color(c.ink, BAND_DEPTH)))
-	t.set_stylebox(&"panel", &"LineFlood", _smear(Color(c.pall, 0.9)))
+	t.set_stylebox(&"panel", &"LineFlood", _flood(c.pall))
 	var bare := StyleBoxEmpty.new()
 	bare.set_content_margin_all(12)
 	t.set_stylebox(&"panel", &"LineBare", bare)
+	t.set_stylebox(&"panel", &"ThoughtMark", _pill(c.ink, c.line, 2, Vector2(12, 12), 14))
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
 	t.set_stylebox(&"panel", &"QuickBarSlot", _pill(Color(c.paper, 0.92), c.line, 2, Vector2(6, 6)))
@@ -290,10 +295,10 @@ static func build(of_act: Act) -> Theme:
 		t.set_constant(&"shadow_offset_y", v, 1)
 		t.set_constant(&"shadow_outline_size", v, 4)
 	# The whisper has no sheet at all: it bleeds.
-	t.set_color(&"font_shadow_color", &"LineWhisper", Color(c.blood, 0.9))
+	t.set_color(&"font_shadow_color", &"LineWhisper", Color(c.blood, 0.55))
 	t.set_constant(&"shadow_offset_x", &"LineWhisper", 0)
 	t.set_constant(&"shadow_offset_y", &"LineWhisper", 0)
-	t.set_constant(&"shadow_outline_size", &"LineWhisper", 14)
+	t.set_constant(&"shadow_outline_size", &"LineWhisper", 18)
 	# Count and pin sit on their own small chip.
 	for v in [&"SatchelCount", &"SatchelPin"]:
 		t.set_type_variation(v, &"Label")
@@ -344,6 +349,30 @@ static func _smear(tint: Color) -> StyleBoxTexture:
 	box.set_content_margin_all(SMEAR_EDGE - 6)
 	box.content_margin_left = SMEAR_EDGE + 24
 	box.content_margin_right = SMEAR_EDGE + 24
+	return box
+
+
+## The black the Suriel's words write on: no sheet and no corners. It floods
+## up from the foot of the screen, edge to edge, and thins out above the words.
+static func _flood(pall: Color) -> StyleBoxTexture:
+	var rise := Gradient.new()
+	rise.offsets = PackedFloat32Array([0.0, 0.7, 1.0])
+	rise.colors = PackedColorArray([Color(pall, 0.0), Color(pall, 0.9), Color(pall, 0.96)])
+	var dark := GradientTexture2D.new()
+	dark.gradient = rise
+	dark.fill_from = Vector2(0.5, 0.0)
+	dark.fill_to = Vector2(0.5, 1.0)
+	dark.width = 8
+	dark.height = 128
+	var box := StyleBoxTexture.new()
+	box.texture = dark
+	# The fade is the top margin; everything under it is solid, however far.
+	box.set_texture_margin(SIDE_TOP, FLOOD_RISE)
+	box.set_content_margin_all(14)
+	box.set_expand_margin(SIDE_LEFT, FLOOD_REACH)
+	box.set_expand_margin(SIDE_RIGHT, FLOOD_REACH)
+	box.set_expand_margin(SIDE_TOP, FLOOD_RISE)
+	box.set_expand_margin(SIDE_BOTTOM, FLOOD_REACH)
 	return box
 
 

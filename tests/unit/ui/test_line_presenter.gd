@@ -130,6 +130,8 @@ func test_the_strap_steps_aside_for_a_line() -> void:
 	lines.say(LinePresenter.Voice.SAID, "Alis", "Hold still.", null, 30.0)
 	await wait_seconds(HudLayout.STRAP_FADE + 0.2)
 	assert_eq(strap.modulate.a, 0.0, "a line in the lane")
+	assert_true(strap.visible and strap.is_visible_in_tree(), "only faded: the strap and its keys stay live mid-line")
+	assert_eq(strap.process_mode, Node.PROCESS_MODE_PAUSABLE, "and it goes on running")
 	lines.clear()
 	lines.say(LinePresenter.Voice.WHISPER, "", "Look at me.", null, 30.0)
 	await wait_seconds(HudLayout.STRAP_FADE + 0.2)
@@ -210,6 +212,13 @@ func test_a_whisper_stands_apart_and_does_not_take_the_lane() -> void:
 	var at := whisper.text_label.position
 	await wait_process_frames(3)
 	assert_ne(whisper.text_label.position, at, "it trembles")
+	# Horror is never the pretty UI (R3): bone in a thin hand, red only as a bleed.
+	var t := JournalTheme.build(JournalTheme.Act.SPRING)
+	assert_eq(t.get_color(&"font_color", &"LineWhisper"), JournalTheme.HORROR[&"bone"])
+	assert_string_contains((t.get_font(&"font", &"LineWhisper") as FontVariation).base_font.resource_path, "Cormorant")
+	assert_string_contains(t.get_font(&"font", &"LineDread").resource_path, "Marcellus")
+	assert_true(t.get_stylebox(&"panel", &"LineFlood") is StyleBoxTexture, "the Suriel's black is a flood, not a box")
+	assert_gte((t.get_stylebox(&"panel", &"LineFlood") as StyleBoxTexture).get_expand_margin(SIDE_LEFT), 2000.0, "edge to edge")
 
 
 func test_dread_writes_itself_out_and_goes_when_told() -> void:
@@ -274,6 +283,35 @@ func test_line_still_times_out_and_hides_under_a_paused_screen() -> void:
 	assert_true(lines.visible)
 	await wait_seconds(0.5)
 	assert_eq(lines.showing, "", "times out once play resumes")
+
+
+## Her guide thoughts are Thought lines like any other, and her bookmark (the
+## whorl and the G key) rests in the THOUGHT zone. G brings the thought back.
+## The guide never takes down a line that isn't its own.
+func test_guide_thoughts_are_slips_and_the_bookmark_brings_them_back() -> void:
+	WorldState.clear()
+	var journal := GuideJournal.new(load("res://data/guide/act1_guide.tres") as GuideBook)
+	add_child_autofree(journal)
+	var mark := HudLayout.of(get_tree()).zone(HudLayout.Zone.THOUGHT).find_child("ThoughtBookmark", true, false)
+	assert_not_null(mark, "the bookmark is a piece of the THOUGHT zone")
+	assert_not_null(mark.find_child("Whorl", true, false))
+	journal.press()
+	assert_true(journal.showing)
+	assert_eq(lines.voice, LinePresenter.Voice.THOUGHT)
+	assert_eq(lines.showing, journal.line)
+	var first := journal.line
+	journal.hide_thought()
+	assert_eq(lines.showing, "", "put away")
+	journal.press()
+	assert_eq(lines.showing, first, "G brings it back")
+	lines.say(LinePresenter.Voice.SAID, "Nesta", "You're late.", null, 30.0)
+	assert_false(journal.can_show(), "someone is speaking: her thought waits")
+	journal.hide_thought()
+	assert_eq(lines.showing, "You're late.", "the guide leaves another's line alone")
+	var hits: Array[String] = []
+	for old in ["GuideVignette", "CartoucheStyleBox"]:
+		_grep("res://", old, hits)
+	assert_eq(hits, [], "the old card's parts are gone")
 
 
 ## The director sends her thoughts to the slip and speech to the band.

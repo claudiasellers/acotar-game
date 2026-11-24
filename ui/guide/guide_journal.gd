@@ -1,29 +1,21 @@
-## Feyre's Thoughts: a small painted card in HudLayout's THOUGHT zone (upper
-## left) with one line in her voice about the need in front of her (plans/guidance-journal.md).
-## Never a list, a marker or a distance. GuideDirector decides when; this
-## node reads WorldState and EventBus, and draws the card. Thoughts wait out
-## dread and staged moments (UiMode.quiet).
-## G / pad Y shows the current thought; again while it shows, a plainer one.
-## Between thoughts a small medallion tab stays in the corner (always findable,
-## clickable), glowing softly when a thought is waiting unread.
+## Feyre's Thoughts: one line in her voice about the need in front of her
+## (plans/guidance-journal.md), shown as a Thought through LinePresenter like
+## everything else in her head. Never a list, a marker or a distance.
+## GuideDirector decides when; this node reads WorldState and EventBus, and
+## keeps the bookmark. Thoughts wait out dread, staged moments and any other
+## line (UiMode.quiet, the lane).
+## G / pad Y brings the current thought back; again while it shows, a plainer
+## one. The bookmark (her whorl and the G key) rests in HudLayout's THOUGHT
+## zone, always findable and clickable, glowing softly when a thought is
+## waiting unread.
 class_name GuideJournal
 extends Node
 
 const BOOK_PATH := "res://data/guide/act1_guide.tres"
 const VOICE_DIR := "res://audio/voice/feyre/"
 const ACTION := &"guide_open"
-const SLIDE := 36.0
-const FADE_IN := 0.35
-const FADE_OUT := 0.6
-## The card's look: a gilt cameo cartouche in upright EB Garamond (R3).
-const FONT_PATH := "res://ui/title/fonts/EBGaramond-Medium.ttf"
-const INK := Color(0.29, 0.17, 0.29)
-const INK_SOFT := Color(0.61, 0.47, 0.56)
-const KEY_GOLD := Color(0.96, 0.86, 0.60)
-const KEY_EDGE := Color(0.78, 0.60, 0.24)
-const KEY_INK := Color(0.42, 0.29, 0.10)
-const MEDAL := 84.0
-const MEDAL_TOP := 18.0
+## The bookmark's whorl, in px.
+const MARK := 34.0
 const SAVE_KEY := "guide"
 
 var director: GuideDirector
@@ -32,19 +24,15 @@ var showing: bool = false
 var shown_thread: GuideThread = null
 var shown_tier: int = -1
 
-var _card: PanelContainer
-var _vignette: GuideVignette
-var _line: Label
-var _footer: Label
+## The line she is thinking now ("" when none).
+var line: String = ""
 var _voice: AudioStreamPlayer
-var _tween: Tween
 var _hold: float = 0.0
 var _input_seen: bool = false
 var _last_pos: Vector3 = Vector3.INF
 var _taught_key: bool = false
 var _tab: Control
-var _tab_icon: GuideVignette
-var _tab_key: Label
+var _mark: WhorlInk
 var _pulse: float = 0.0
 
 
@@ -95,8 +83,10 @@ func on_mode_changed(new_mode: GuideSettings.Mode) -> void:
 		hide_thought()
 
 
+## Play is calm and the lane is free (or holds this thought already).
 func can_show() -> bool:
-	return not UiMode.quiet(get_tree())
+	var in_lane := LinePresenter.of(get_tree()).showing
+	return not UiMode.quiet(get_tree()) and (in_lane == "" or in_lane == line)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -143,55 +133,32 @@ func _process(delta: float) -> void:
 			hide_thought()
 
 
-func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
+func show_thought(thread: GuideThread, tier: int, _asked: bool) -> void:
+	# The first thought of a session stays longer: it's how players learn of it.
 	var first := not _taught_key
-	# The card grows out of the tab: the tab steps aside at once.
-	_tab.modulate.a = 0.0
-	_tab.visible = false
+	_taught_key = true
 	shown_thread = thread
 	shown_tier = tier
-	_vignette.set_icon(thread.icon)
-	_line.text = thread.line(tier)
-	_footer.visible = false
-	if not _taught_key:
-		_footer.text = "recall a thought"
-		_footer.visible = true
-		_taught_key = true
-	elif asked and tier + 1 < thread.tier_count():
-		_footer.text = "think harder"
-		_footer.visible = true
-	# The first card of a session stays longer: it's how players learn it exists.
-	_hold = (12.0 if first else 7.0) + 0.05 * _line.text.length()
-	# Shrink-wrap to the new line (an autowrap label never shrinks a container).
-	_card.size = Vector2(500, 0)
-	_card.reset_size.call_deferred()
+	line = thread.line(tier)
+	_hold = (12.0 if first else 7.0) + 0.05 * line.length()
 	_play_voice(thread.voice_id(tier))
-	_kill_tween()
-	_card.visible = true
-	_card.modulate.a = 0.0 if not showing else _card.modulate.a
-	_card.position = Vector2(-SLIDE, 0) if not showing else Vector2.ZERO
+	LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", line, self, _hold)
 	showing = true
-	_tween = create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(_card, ^"modulate:a", 1.0, FADE_IN)
-	_tween.tween_property(_card, ^"position", Vector2.ZERO, FADE_IN)
-	Juice.bounce_control(_vignette, 0.12)
+	Juice.bounce_control(_mark, 0.12)
 
 
-## The resting tab: visible whenever thoughts are on and Feyre is free; a
-## gentle breathing glow while the current need's thought hasn't been seen.
+## The bookmark: there whenever thoughts are on and Feyre is free; a gentle
+## breathing glow while the current need's thought hasn't been seen.
 func _update_tab(delta: float) -> void:
-	var want := mode != GuideSettings.Mode.OFF and can_show() and not showing \
-		and director.thread != null
-	if want and director.thread.icon != _tab_icon.icon:
-		_tab_icon.set_icon(director.thread.icon)
-	var target := 1.0 if want else 0.0
-	_tab.modulate.a = move_toward(_tab.modulate.a, target, delta * 3.0)
+	var want := mode != GuideSettings.Mode.OFF and not UiMode.quiet(get_tree()) and director.thread != null
+	_tab.modulate.a = move_toward(_tab.modulate.a, 1.0 if want else 0.0, delta * 3.0)
 	_tab.visible = _tab.modulate.a > 0.01
-	var waiting := want and director.shown_tier < 0
+	var waiting := want and not showing and director.shown_tier < 0
 	_pulse += delta
 	var glow := 0.5 + 0.5 * sin(_pulse * 2.4) if waiting else 0.0
-	_tab_icon.scale = Vector2.ONE * (1.0 + 0.03 * glow)
-	_tab_icon.glow = glow
+	_mark.scale = Vector2.ONE * (1.0 + 0.08 * glow)
+	_mark.ink = JournalTheme.color(&"line").lerp(JournalTheme.color(&"glow"), glow)
+	_mark.queue_redraw()
 
 
 func _on_tab_input(event: InputEvent) -> void:
@@ -207,10 +174,11 @@ func hide_thought() -> void:
 	showing = false
 	if _voice.playing:
 		_voice.stop()
-	_kill_tween()
-	_tween = create_tween()
-	_tween.tween_property(_card, ^"modulate:a", 0.0, FADE_OUT)
-	_tween.tween_callback(func() -> void: _card.visible = showing)
+	# Only her own thought: another line may have taken the lane since.
+	var lines := LinePresenter.of(get_tree())
+	if lines.showing == line:
+		lines.clear_voice(LinePresenter.Voice.THOUGHT)
+	line = ""
 
 
 func _play_voice(voice_id: String) -> void:
@@ -220,11 +188,6 @@ func _play_voice(voice_id: String) -> void:
 	_voice.stream = load(path) as AudioStream
 	_voice.play()
 	_hold = maxf(_hold, _voice.stream.get_length() + 1.5)
-
-
-func _kill_tween() -> void:
-	if _tween and _tween.is_valid():
-		_tween.kill()
 
 
 func _on_flag_changed(_flag: String, _value: Variant) -> void:
@@ -251,108 +214,30 @@ func _ensure_action() -> void:
 
 
 func _build() -> void:
-	# The zone places this; the card slides and the tab rests inside it.
-	var piece := Control.new()
-	piece.name = "Thought"
-	piece.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	HudLayout.of(get_tree()).place(piece, HudLayout.Zone.THOUGHT, self)
-	_card = PanelContainer.new()
-	_card.name = "ThoughtCard"
-	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_card.custom_minimum_size = Vector2(560, 0)
-	# The cameo sits over the plaque's left edge, where the tab rests.
-	var box := CartoucheStyleBox.new()
-	box.medal_inset = MEDAL * 0.5
-	box.content_margin_left = 0.0
-	box.content_margin_top = MEDAL_TOP
-	box.content_margin_bottom = 20.0
-	box.content_margin_right = 30.0
-	_card.add_theme_stylebox_override(&"panel", box)
-	_card.visible = false
-	piece.add_child(_card)
-
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 30)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_card.add_child(row)
-	_vignette = GuideVignette.new()
-	_vignette.custom_minimum_size = Vector2(MEDAL, MEDAL)
-	_vignette.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_vignette.pivot_offset = _vignette.custom_minimum_size * 0.5
-	row.add_child(_vignette)
-
-	var col := VBoxContainer.new()
-	col.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col.custom_minimum_size = Vector2(360, 0)
-	row.add_child(col)
-	var garamond := load(FONT_PATH) as Font
-	_line = UiStyle.label("", 30)
-	_line.add_theme_font_override(&"font", garamond)
-	_line.add_theme_color_override(&"font_color", INK)
-	_line.add_theme_constant_override(&"line_spacing", -2)
-	_line.custom_minimum_size = Vector2(360, 0)
-	col.add_child(_line)
-	# Footer: letterspaced capitals after a gold G keycap (a child, so it
-	# shows and hides with the footer).
-	var caps := FontVariation.new()
-	caps.base_font = garamond
-	caps.spacing_glyph = 2
-	_footer = UiStyle.label("", 15)
-	_footer.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_footer.uppercase = true
-	_footer.add_theme_font_override(&"font", caps)
-	_footer.add_theme_color_override(&"font_color", INK_SOFT)
-	var indent := StyleBoxEmpty.new()
-	indent.content_margin_left = 32.0
-	indent.content_margin_top = 4.0
-	_footer.add_theme_stylebox_override(&"normal", indent)
-	_footer.visible = false
-	col.add_child(_footer)
-	var key := _keycap(garamond)
-	key.position = Vector2(0, 2)
-	_footer.add_child(key)
-
+	# The zone places the bookmark: her whorl on a dark tab, the G key under it.
 	_tab = VBoxContainer.new()
-	_tab.name = "ThoughtTab"
-	_tab.position = Vector2(0, MEDAL_TOP)
+	_tab.name = "ThoughtBookmark"
+	_tab.add_theme_constant_override(&"separation", 4)
 	_tab.mouse_filter = Control.MOUSE_FILTER_STOP
 	_tab.tooltip_text = "Feyre's thoughts (G)"
 	_tab.gui_input.connect(_on_tab_input)
 	_tab.modulate.a = 0.0
 	_tab.visible = false
-	piece.add_child(_tab)
-	_tab_icon = GuideVignette.new()
-	_tab_icon.custom_minimum_size = Vector2(MEDAL, MEDAL)
-	_tab_icon.pivot_offset = Vector2(MEDAL, MEDAL) * 0.5
-	_tab.add_child(_tab_icon)
-	_tab_key = _keycap(garamond)
-	_tab_key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_tab.add_child(_tab_key)
+	HudLayout.of(get_tree()).place(_tab, HudLayout.Zone.THOUGHT, self)
+	var plate := PanelContainer.new()
+	plate.theme_type_variation = &"ThoughtMark"
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tab.add_child(plate)
+	_mark = WhorlInk.new()
+	_mark.name = "Whorl"
+	_mark.custom_minimum_size = Vector2(MARK, MARK)
+	_mark.pivot_offset = Vector2(MARK, MARK) * 0.5
+	_mark.width = 3.0
+	plate.add_child(_mark)
+	var key := BookKit.key_cap("G")
+	key.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_tab.add_child(key)
 
 	_voice = AudioStreamPlayer.new()
 	_voice.bus = &"Master"
 	add_child(_voice)
-
-
-## A small gold "G" key, the card's one piece of control text.
-func _keycap(font: Font) -> Label:
-	var key := Label.new()
-	key.text = "G"
-	key.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	key.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	key.custom_minimum_size = Vector2(22, 22)
-	key.add_theme_font_override(&"font", font)
-	key.add_theme_font_size_override(&"font_size", 14)
-	key.add_theme_color_override(&"font_color", KEY_INK)
-	var cap := StyleBoxFlat.new()
-	cap.bg_color = KEY_GOLD
-	cap.border_color = KEY_EDGE
-	cap.set_border_width_all(1)
-	cap.set_corner_radius_all(5)
-	cap.shadow_color = Color(0.35, 0.14, 0.31, 0.25)
-	cap.shadow_size = 2
-	cap.shadow_offset = Vector2(0, 1)
-	key.add_theme_stylebox_override(&"normal", cap)
-	return key

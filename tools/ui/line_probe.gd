@@ -53,10 +53,18 @@ func _go() -> void:
 	for label: String in LINES:
 		lines.clear()
 		lines.say(LINES[label][0], LINES[label][1], LINES[label][2], null, 30.0)
-		for i in SETTLE_FRAMES + (120 if LINES[label][0] == LinePresenter.Voice.DREAD else 0):
+		# A voice that moves is caught early, while it is still writing.
+		for i in (12 if LinePresenter.VOICES[LINES[label][0]].has("tremble") else SETTLE_FRAMES):
 			await get_tree().process_frame
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/line_%s.png" % [dir, label])
+		# The horror voices move: two more frames, ten apart.
+		if LinePresenter.VOICES[LINES[label][0]].has("tremble"):
+			for n in [10, 20]:
+				for i in 10:
+					await get_tree().process_frame
+				await RenderingServer.frame_post_draw
+				get_viewport().get_texture().get_image().save_png("%s/line_%s_f%d.png" % [dir, label, n])
 		print("line_probe: saved ", label)
 	print("line_probe: done")
 	get_tree().quit()

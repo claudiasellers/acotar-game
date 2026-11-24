@@ -5,10 +5,12 @@
 ##   THOUGHT  everything in Feyre's head: a slip of her page in the same spot,
 ##            in her hand, marked with her whorl.
 ##   TOLD     a film's narration: her hand, large, on the smear, no name.
-##   WHISPER  a voice inside her head that is not hers (the Bogge): bare words
-##            in the middle of her view that tremble and bleed in and out.
-##   DREAD    a thing that should not speak (the Suriel): bone-white on a
-##            flood of black, writing itself out, never quite still.
+##   WHISPER  a voice inside her head that is not hers (the Bogge): bare bone
+##            words in a thin hand, in the middle of her view, that tremble
+##            and bleed red.
+##   DREAD    a thing that should not speak (the Suriel): bone capitals that
+##            write themselves out, never quite still, on black that floods
+##            up from the foot of the screen with no edge and no corner.
 ## The last two are the horror palette on purpose (R3: horror is never dressed
 ## up as the pretty UI). A new kind of line is one row in VOICES.
 ##
@@ -41,14 +43,14 @@ const TEXT_WIDTH := 860.0
 const WHORL := 26.0
 ## Voice -> where it stands, its sheet (a PanelContainer variation) and its
 ## type (a Label variation); then what it wears and how it moves: the
-## speaker's name, her whorl, a tremble in px, letters written per second,
-## how solid it gets and how many fades it takes to leave.
+## speaker's name, her whorl, a tremble in px, letters written per second and
+## how many fades it takes to leave.
 const VOICES := {
 	Voice.SAID: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineSaid", "named": true},
 	Voice.THOUGHT: {"place": Place.LANE, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true},
 	Voice.TOLD: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineTold"},
 	Voice.WHISPER: {"place": Place.MIDDLE, "sheet": &"LineBare", "type": &"LineWhisper", "tremble": 1.6,
-		"solid": 0.92, "linger": 2.0},
+		"linger": 2.0},
 	Voice.DREAD: {"place": Place.LANE, "sheet": &"LineFlood", "type": &"LineDread", "tremble": 0.8, "written": 38.0},
 }
 
@@ -243,7 +245,7 @@ class Stand:
 		_t = 0.0
 		_left = seconds if seconds > 0.0 else LinePresenter.reading_time(text) + LinePresenter.writing_time(in_voice, text)
 		_set_source(_space_of(from))
-		_fade_to(_row.get("solid", 1.0), FADE)
+		_fade_to(1.0, FADE)
 		return _left
 
 	func clear() -> void:

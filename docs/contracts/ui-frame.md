@@ -151,8 +151,8 @@ fired it, and each is one row of `LinePresenter.VOICES`:
 | `SAID` | anyone speaking aloud, Feyre included, in play and in films | lane | `LineBand`: a smear of shadow with no edge; the name over it in gold spaced capitals (`LineName`) | `LineSaid`, upright |
 | `THOUGHT` | everything in Feyre's head | lane | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
 | `TOLD` | a film's narration | lane | `LineBand`, no name | `LineTold`, her hand, large |
-| `WHISPER` | a voice in her head that is not hers (the Bogge) | middle | `LineBare`: none | `LineWhisper`: bone on a bleed of red, trembling |
-| `DREAD` | a thing that should not speak (the Suriel) | lane | `LineFlood`: a flood of black | `LineDread`: bone, writing itself out at 38 letters a second, never still |
+| `WHISPER` | a voice in her head that is not hers (the Bogge) | middle | `LineBare`: none | `LineWhisper`: bone in a thin italic hand, red only as the bleed around it, trembling |
+| `DREAD` | a thing that should not speak (the Suriel) | lane | `LineFlood`: black that floods up from the foot of the screen, edge to edge, no sheet and no corner | `LineDread`: bone Marcellus, writing itself out at 38 letters a second, never still |
 
 The last two wear the horror palette (`JournalTheme.HORROR`) on purpose (R3).
 
@@ -242,6 +242,7 @@ every piece's script.
 | step 6 | the stations she opens with E: the stillroom, a stall, the whorl stones' card and ride, the easel and the mare are loose pages laid by `LoosePage` (`ui/menu/loose_page.gd`) | each station's own scrim, card, footer, `_label`, `_key` and `_pad`; `UiStyle.modal` and `UiStyle.button`; the `SatchelDetail` variation (now `LoosePage`) | `test_loose_page.gd`: no station frames itself |
 | step 7a | lines said and thought: `LinePresenter` and its voice table; `DialogueDirector`, the scene spaces and the scripts that typed a line themselves all show through it | `story/act2/act2_caption.gd` and its test | `test_line_presenter.gd`: nothing names the old caption |
 | step 7b | a film's words (Told and Said), the Bogge's whisper and the Suriel's voice are rows of the same table; the lane moves under Feyre's feet and the strap steps aside for it; Feyre's questions to the Suriel are said aloud before each answer | `story/film/film_captions.gd`, `story/act2/act2_whisper.gd`, `story/act3/suriel/suriel_voice.gd`; `UiLayers.OVER_VEIL` | `test_line_presenter.gd`: nothing names the four old presenters |
+| step 7c | Feyre's guide thoughts: `GuideJournal` shows them as Thought lines and keeps only the bookmark (her whorl and the G key, `ThoughtMark`) in the `THOUGHT` zone; a thought waits while another line has the lane, and the guide never clears a line that isn't its own | the card half of `guide_journal.gd`, `ui/guide/guide_vignette.gd`, `ui/guide/cartouche_style_box.gd` | `test_line_presenter.gd`: nothing names the card's parts |
 
 ## Files outside `ui/` the frame edits
 

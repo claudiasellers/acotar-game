@@ -12,7 +12,7 @@ extends Resource
 @export var done_flags: PackedStringArray = []
 ## Higher wins when several threads are open at once.
 @export var priority: int = 0
-## Which painted vignette the card shows (GuideVignette.ICONS).
+## What the thought is about, as a picture (for the book's icon lookup).
 @export var icon: StringName = &"larder"
 @export var lines: PackedStringArray = []
 ## Keeper line ids (voice-lines-act1.md) per tier; also the voice file names:
