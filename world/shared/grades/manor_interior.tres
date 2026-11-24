@@ -18,7 +18,7 @@ sun_energy = 1.2
 ; windows, lamps and hero lights model the rooms, and at night the rooms blend
 ; to manor_interior_night.
 ambient_color = Color(0.92, 0.90, 0.88, 1)
-ambient_energy = 0.45
+ambient_energy = 0.25
 ambient_sky_contribution = 0.0
 fog_color = Color(0.92, 0.90, 0.88, 1)
 fog_density = 0.0

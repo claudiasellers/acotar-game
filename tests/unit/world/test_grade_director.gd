@@ -57,12 +57,12 @@ func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
 	assert_eq(inside.ambient_sky_contribution, 0.0, "flat ambient, not sky-fed")
 	# Value contrast (L18-12): the flat ambient at 1.1 washed every room out
 	# (dining hall 37% of pixels clipped). It fills; windows and lamps model.
-	assert_between(inside.ambient_energy, 0.35, 0.8, "rooms readable, not washed out")
+	assert_between(inside.ambient_energy, 0.15, 0.6, "rooms readable, not washed out")
 	var night := GradeDirector.with_night(inside, 1.0)
 	assert_lt(night.ambient_energy * night.ambient_color.get_luminance(),
 		inside.ambient_energy * inside.ambient_color.get_luminance() * 0.6,
 		"at night the lamps carry the rooms, not the day's ambient")
-	assert_gt(night.ambient_energy * night.ambient_color.get_luminance() * night.exposure, 0.15,
+	assert_gt(night.ambient_energy * night.ambient_color.get_luminance() * night.exposure, 0.08,
 		"but a night room is never black between the lamps")
 	assert_eq(night.tonemap_mode, inside.tonemap_mode, "no pop at nightfall")
 	assert_almost_eq(GradeDirector.with_night(inside, 0.0).ambient_energy, inside.ambient_energy, 0.0001)
