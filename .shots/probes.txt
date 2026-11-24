@@ -1,0 +1,4 @@
+from ui-frame
+quality look
+shot lines_human res://tools/ui/line_probe.tscn {out} p1_woods
+shot lines_spring res://tools/ui/line_probe.tscn {out} p3_house
