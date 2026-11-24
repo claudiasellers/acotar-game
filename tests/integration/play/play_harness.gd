@@ -8,11 +8,10 @@
 ## menus, the whistle and E listen to). Nothing here calls game methods to act;
 ## it only reads state to check what happened.
 ##
-## Timing is in game ticks (physics frames) and conditions, never wall-clock
-## and never drawn frames: the gate machine is shared with heavy jobs, and it
-## has drawn 89 frames in 7 ticks with the fps cap set. Engine.max_fps is
-## still held at 60 while a harness lives, so where the cap holds a drawn
-## frame is a tick.
+## Timing is in frames and conditions, never wall-clock: the gate machine is
+## shared with heavy jobs. Engine.max_fps is held at 60 while a harness lives,
+## so a frame budget is about game time and real-time timers in the game
+## (create_timer) take the same number of frames on a fast or slow machine.
 
 extends RefCounted
 
@@ -30,9 +29,6 @@ var _held: Dictionary = {}  ## action -> the pressed event we sent
 var _stick := Vector2.ZERO
 var _look := Vector2.ZERO
 var _old_max_fps: int = 0
-## What the last wait_until saw, for a failing assert's message: how much game
-## time its frames really were, and what could have held the game.
-var last_wait: String = ""
 
 
 func _init(gut_test: GutTest) -> void:
@@ -199,14 +195,13 @@ func release(action: StringName) -> void:
 	Input.parse_input_event(event_for(action, false))
 
 
-## A tap: down, `frames` game ticks, up, then a tick and a drawn frame for it
-## to land (the game polls keys in its ticks; the screens hear them drawn).
+## A tap: down, `frames` physics frames, up, then one frame for it to land.
+## Physics frames, so a tap always spans a tick _physics_process polls on.
 func press(action: StringName, frames: int = 2) -> void:
 	hold(action)
 	await test.wait_physics_frames(maxi(frames, 1))
 	release(action)
 	await test.wait_physics_frames(1)
-	await test.wait_process_frames(1)
 
 
 ## Holds `action` for `frames` physics frames, then lets go.
@@ -283,7 +278,7 @@ func look_toward(point: Vector3, tolerance: float = 0.08, max_frames: int = 240)
 		if absf(push) < 0.3:
 			push = 0.3 * signf(push)
 		look_stick(Vector2(push, 0.0))
-		await test.wait_physics_frames(1)
+		await test.wait_process_frames(1)
 	look_stick(Vector2.ZERO)
 	return ok
 
@@ -298,26 +293,19 @@ func mouse_move(relative: Vector2) -> void:
 
 # --- waiting -----------------------------------------------------------------
 
-## Waits until `cond` is true, at most `max_frames` game ticks (physics
-## frames, 1/60 s of game time each). Returns false if it never was. Drawn
-## frames are no measure: a machine that ignores the fps cap draws ten of them
-## in one tick.
+## Waits physics ticks (not process frames: movement, stopping and landing are
+## physics, and headless process frames can run ~10x faster than ticks) until
+## `cond` is true. `max_frames` ticks = max_frames / 60 s of game time.
+## Returns false if it never was.
 func wait_until(cond: Callable, max_frames: int) -> bool:
-	var physics_before := Engine.get_physics_frames()
-	var drawn_before := Engine.get_process_frames()
-	var clock_before := Time.get_ticks_msec()
-	var ok := false
-	while Engine.get_physics_frames() - physics_before < max_frames:
+	# Counted off Engine.get_physics_frames, not loop passes: GUT's
+	# wait_physics_frames(1) takes 2 ticks, so a pass count would double it.
+	var end := Engine.get_physics_frames() + max_frames
+	while Engine.get_physics_frames() < end:
 		if cond.call():
-			ok = true
-			break
+			return true
 		await test.wait_physics_frames(1)
-	ok = ok or bool(cond.call())
-	last_wait = "waited up to %d ticks: %d physics ticks, %d engine frames, %d ms; fps cap %d, time x%.2f, paused %s, on floor %s" % [
-			max_frames, Engine.get_physics_frames() - physics_before, Engine.get_process_frames() - drawn_before,
-			Time.get_ticks_msec() - clock_before, Engine.max_fps, Engine.time_scale, test.get_tree().paused,
-			feyre.is_on_floor() if feyre != null and is_instance_valid(feyre) else false]
-	return ok
+	return bool(cond.call())
 
 
 ## Steers her to `point` (flat distance under `radius`) with the stick, at most
@@ -367,7 +355,7 @@ static func flat_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
 
-## The game's node of a type (DialogueDirector, MountDirector, SettingsTab...).
+## The game's node of a type (DialogueDirector, MountDirector, SettingsPanel...).
 func child_of(type: Variant) -> Node:
 	for child in game.get_children():
 		if is_instance_of(child, type):

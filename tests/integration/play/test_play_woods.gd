@@ -114,7 +114,7 @@ func test_talking_to_her_family_shows_a_line_and_leaves_her_free() -> void:
 					dd.in_cottage(h.feyre.global_position), dd.in_cottage(n3.global_position),
 					dd.on_camera(n3), dd.face_to_face(n3, h.feyre.global_position), dd._node_speaker(n3),
 					dd.busy(), dd._greeted.get(n3.get_instance_id(), false)])
-	assert_true(spoke, "one of her family speaks when she comes up to them (heard %s; %s)" % [heard, h.last_wait])
+	assert_true(spoke, "one of her family speaks when she comes up to them (heard %s)" % [heard])
 	assert_true(h.has_control(), "a line never takes the controls")
 	var caption := get_tree().get_first_node_in_group(Act2Caption.GROUP) as Act2Caption
 	if caption:
@@ -158,7 +158,7 @@ func test_walk_run_sprint_move_her_and_letting_go_stops_her() -> void:
 		h.stick(Vector2.ZERO)
 		h.release(&"sprint")
 		assert_gt(PlayHarness.flat_distance(from, h.feyre.global_position), 0.5, "%s moves her" % mode[0])
-		assert_true(await h.wait_still(45), "%s: she stops within 45 frames of letting go (speed %.2f; %s)" % [mode[0], h.flat_speed(), h.last_wait])
+		assert_true(await h.wait_still(45), "%s: she stops within 45 frames of letting go (speed %.2f)" % [mode[0], h.flat_speed()])
 	assert_lt(speeds.walk, speeds.run, "a light stick walks, slower than a full run (%s)" % [speeds])
 	assert_lt(speeds.run, speeds.sprint, "sprint is faster than a run (%s)" % [speeds])
 	# The keyboard too: the arrow key moves her and letting go stops her.

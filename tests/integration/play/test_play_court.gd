@@ -239,7 +239,7 @@ func test_walk_run_sprint_move_her_and_letting_go_stops_her() -> void:
 		h.stick(Vector2.ZERO)
 		h.release(&"sprint")
 		assert_gt(PlayHarness.flat_distance(from, h.feyre.global_position), 0.5, "%s moves her" % mode[0])
-		assert_true(await h.wait_still(45), "%s: she stops within 45 frames of letting go (speed %.2f; %s)" % [mode[0], h.flat_speed(), h.last_wait])
+		assert_true(await h.wait_still(45), "%s: she stops within 45 frames of letting go (speed %.2f)" % [mode[0], h.flat_speed()])
 	assert_lt(speeds.walk, speeds.run, "a light stick walks, slower than a full run (%s)" % [speeds])
 	assert_lt(speeds.run, speeds.sprint, "sprint is faster than a run (%s)" % [speeds])
 
@@ -293,7 +293,7 @@ func test_whistle_brings_the_mare_and_she_mounts_rides_and_gets_down() -> void:
 	await h.press(&"interact")
 	var down := await h.wait_until(func() -> bool: return not md.riding, 30)
 	assert_true(down, "E with nothing in reach gets her down")
-	assert_true(await h.wait_until(func() -> bool: return h.has_control(), 60), "and she has her legs back (%s)" % h.last_wait)
+	assert_true(await h.wait_until(func() -> bool: return h.has_control(), 60), "and she has her legs back")
 	assert_true(await h.wait_still(120) and h.on_solid_ground(), "standing on the ground beside the mare")
 	var before := h.feyre.global_position
 	await h.hold_for(&"move_back", 30)
