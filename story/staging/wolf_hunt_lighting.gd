@@ -13,7 +13,8 @@ extends Node
 
 const RIM_COLOR := Color(0.74, 0.82, 1.0)
 const RIM_ENERGY := 12.0
-const RIM_RANGE := 6.0
+## Ends just past the body, so the rim never pools on the snow behind it.
+const RIM_RANGE := 3.0
 const RIM_ANGLE := 40.0
 ## Rim offset from the actor's body: past it, away from the camera, and up.
 const RIM_BACK := 1.6
