@@ -80,6 +80,12 @@ extends Resource
 ## on a winter day it turned the snow woods black (the wolf hunt, L18-11).
 ## Dread still takes the dread preset at night, so night scenes are unchanged.
 @export var dread_day_look: StringName = &""
+@export_group("Night")
+## A preset this grade blends toward as the sun goes down (empty = none: the
+## sun alone darkens it). For grades whose light isn't the sky's, like the
+## manor rooms, where the flat day ambient stayed on all night and the lamps
+## had nothing to light (L18-12): at night the room's own lamps carry it.
+@export var night_look: StringName = &""
 
 
 const _FLOATS := [&"sun_energy", &"ambient_energy", &"fog_density", &"volumetric_density", &"exposure",
@@ -103,5 +109,6 @@ static func mix(a: GradePreset, b: GradePreset, t: float) -> GradePreset:
 		out.set(c, (a.get(c) as Color).lerp(b.get(c), t))
 	out.lut = b.lut if t >= 0.5 else a.lut
 	out.dread_day_look = b.dread_day_look if t >= 0.5 else a.dread_day_look
+	out.night_look = b.night_look if t >= 0.5 else a.night_look
 	out.tonemap_mode = b.tonemap_mode if t >= 0.5 else a.tonemap_mode
 	return out
