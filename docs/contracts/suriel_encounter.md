@@ -38,7 +38,8 @@ the place is sketched and named, with no celebration (horror beat).
   she tries to rig the snare with none.
 - Wind: group `wind_source` `wind_at(pos)`; calm air falls back to the glade
   breeze `SurielSnare.GLADE_BREEZE`.
-- Input: `interact` (rig, bait, knife). Arrows through Feyre's `arrow_fired` ->
+- Input: `interact` (rig, bait); `strike` (V / pad Y) for the knife
+  (`StrikeController`, docs/contracts/strike.md). Arrows through Feyre's `arrow_fired` ->
   `Arrow.hit` (tether shot).
 
 ## The fight (NagaAmbush)
@@ -50,9 +51,10 @@ the place is sketched and named, with no celebration (horror beat).
   third strike (`TAMLIN_STRIKES`), or 15 s after her first kill, whichever is
   first. Running off or never fighting back stays lethal: five strikes fell her.
 - Pressure: the first naga moves alone, the second `ATTACK_GAP` (4 s) later,
-  the rest join at a kill or every `JOIN_EVERY` s. Her knife goes into the
-  naga in reach she has already cut, so a fighter finishes one instead of
-  spreading wounds (16 health, 8 a stab: two stabs kill). After a blow lands
+  the rest join at a kill or every `JOIN_EVERY` s. Her knife (Strike) goes into
+  the naga in reach she has already cut, so a fighter finishes one instead of
+  spreading wounds (16 health, one wood arrow's 8 a stab: two stabs kill; a
+  sneak or a finisher kills at once). After a blow lands
   on her, the next can't for `STRIKE_GRACE` (1.8 s).
 
 ## Creature cues (story_actor_cue)

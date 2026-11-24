@@ -12,33 +12,33 @@ static func of(player: Node) -> VitalsState:
 	return player.get_node_or_null(^"Vitals") as VitalsState
 
 
-## How visible she is. 1.0 neutral, band 0.4..2.0.
+## How visible she is, beyond her speed (CreatureSenses scales by speed
+## itself, so movement counts once): crouch, later gear and imbues. 1.0
+## neutral, band 0.4..2.0.
 static func sight_scale(player: Node) -> float:
-	if of(player) == null:
+	if player == null:
 		return 1.0
 	var crouch := player.get(&"crouch") as CrouchMotor
 	var s := crouch.sight_scale() if crouch else 1.0
-	s *= _movement(player, 0.7, 1.0, 1.3)
 	return clampf(s, 0.4, 2.0)
 
 
-## How loud her movement is. Band 0.2..2.0.
+## How loud her movement is, beyond her speed (CreatureSenses scales by speed
+## itself): crouch, ragged breathing in dread, later gear. Band 0.2..2.0.
 static func noise_scale(player: Node) -> float:
-	var v := of(player)
-	if v == null:
+	if player == null:
 		return 1.0
 	var crouch := player.get(&"crouch") as CrouchMotor
 	var s := crouch.noise_scale() if crouch else 1.0
-	s *= _movement(player, 0.2, 0.4, 1.0)
-	if v.dread > 0.7:
+	var v := of(player)
+	if v and v.dread > 0.7:
 		s += 0.15
 	return clampf(s, 0.2, 2.0)
 
 
 ## How far her scent carries. Band 0.35..1.5.
 static func scent_scale(player: Node) -> float:
-	var v := of(player)
-	if v == null:
+	if player == null:
 		return 1.0
 	var s := BrewEffects.scent_scale(player)
 	var body := player.get(&"body_state") as BodyState
@@ -85,14 +85,3 @@ static func is_lit(player: Node) -> bool:
 	var body := player.get(&"body_state") as BodyState if player else null
 	return body != null and body.effect(&"bright") > 0.0
 
-
-static func _movement(player: Node, still: float, walk: float, sprint: float) -> float:
-	var body3 := player as CharacterBody3D
-	if body3 == null:
-		return walk
-	var speed := Vector2(body3.velocity.x, body3.velocity.z).length()
-	if speed < 0.3:
-		return still
-	if player.has_method(&"is_running") and bool(player.call(&"is_running")):
-		return sprint
-	return walk

@@ -10,3 +10,4 @@ is_default = true
 damage = 8.0
 damage_kind = &"thorn"
 knockback_m = 0.5
+windup_s = 0.4

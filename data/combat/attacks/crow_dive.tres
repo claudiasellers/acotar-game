@@ -9,3 +9,4 @@ family = &"crow"
 damage = 8.0
 damage_kind = &"claw"
 knockback_m = 1.0
+windup_s = 0.45

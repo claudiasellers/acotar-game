@@ -33,9 +33,10 @@ func test_missing_input_fails_and_consumes_nothing() -> void:
 	assert_eq(inv.count(&"ing_hawk_feather"), 1)
 
 
-func test_ash_arrow_data_is_fae_lethal() -> void:
+## Ash is lethal to fae by the creature's lethal_arrow_ids, not by the arrow;
+## the arrow only hits harder and breaks less (health-interactions §2.2).
+func test_ash_arrow_hits_harder_and_breaks_less() -> void:
 	var ash := load("res://data/arrows/ash.tres") as ArrowData
 	var wood := load("res://data/arrows/wood.tres") as ArrowData
-	assert_true(ash.fae_lethal)
-	assert_false(wood.fae_lethal)
+	assert_gt(ash.damage, wood.damage)
 	assert_lt(ash.stone_break_chance, wood.stone_break_chance)
