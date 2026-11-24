@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bu2aavdrd6rug"
-path="res://.godot/imported/cloak_weave.png-4b4c5af1b4bb034337afa6062d4a16d0.ctex"
+uid="uid://bvmnw4dvulcvf"
+path="res://.godot/imported/book.webp-965ecd7c48941c816db9ac8b9e2688b1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/satchel/crafted/cloak_weave.png"
-dest_files=["res://.godot/imported/cloak_weave.png-4b4c5af1b4bb034337afa6062d4a16d0.ctex"]
+source_file="res://ui/menu/art/book.webp"
+dest_files=["res://.godot/imported/book.webp-965ecd7c48941c816db9ac8b9e2688b1.ctex"]
 
 [params]
 

@@ -45,6 +45,9 @@ Colours, read from theme type `Journal` or `JournalTheme.color(token)`:
 Fonts (`ui/theme/fonts/`, all SIL OFL): Marcellus for display, Nunito for
 body and buttons, Cormorant Garamond Italic for Feyre's hand.
 
+Washes: `JournalTheme.WASHES`, the five pastels of the index tabs and of the
+blot behind a thing drawn on a page (`JournalTheme.wash(i)`).
+
 Paper (`ui/theme/paper/`): `page.png` and `slip.png`, near-white canvas with a
 deckled edge, tinted to a paper token. Made by
 `tools/ui_theme/build_journal_paper.py`.
@@ -54,8 +57,8 @@ deckled edge, tinted to a paper token. Made by
 | Variation | Base |
 |---|---|
 | SatchelCard, SatchelDetail, NotifyCard, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
-| SatchelTab, MenuTab, SatchelSlot | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText | Label |
+| SatchelTab, MenuTab, SatchelSlot, BookTab | Button (all states, including focus) |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText | Label |
 | SatchelMeter | ProgressBar |
 
 ## Rules

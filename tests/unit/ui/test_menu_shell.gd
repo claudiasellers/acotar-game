@@ -1,13 +1,15 @@
-## Contract test for the menu shell (docs/contracts/menu_shell.md): one shell
-## owns the keys every page shares; each page keeps its own key. The shell is
-## one screen on ScreenStack, which pauses and answers Esc for it.
+## Contract test for Feyre's journal (docs/contracts/menu_shell.md): one book
+## owns the keys every page shares; each page keeps its own key and writes on
+## the book's two sheets. The book is one screen on ScreenStack, which pauses
+## and answers Esc for it.
 extends GutTest
 
 const PAGE_FILES := [
 	"res://ui/satchel/satchel_menu.gd", "res://ui/journal/story_journal.gd",
 	"res://ui/map/full_map.gd", "res://ui/collection_book/collection_tab.gd",
 	"res://ui/collection_book/collection_book_ui.gd", "res://ui/menu/wardrobe_tab.gd",
-	"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd",
+	"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd", "res://ui/menu/book_kit.gd",
+	"res://ui/satchel/satchel_icon.gd",
 ]
 ## One look: page chrome comes from JournalTheme only. (The wardrobe's gilt
 ## mirror and colour swatches in DressingRoomView are its own, by L64-3.)
@@ -154,6 +156,38 @@ func test_pages_wear_one_look() -> void:
 		assert_eq(hits, [], "%s styles itself outside JournalTheme" % path)
 
 
+func test_every_page_writes_on_the_books_sheets() -> void:
+	var menu := SatchelMenu.new(QuickBar.new(Inventory.new()))
+	add_child_autofree(menu)
+	var journal := StoryJournal.new()
+	add_child_autofree(journal)
+	await wait_process_frames(1)
+	var origin := BookLayout.origin(get_viewport().get_visible_rect().size)
+	for page: MenuTab in [menu, journal]:
+		assert_eq(page.left_sheet().global_position, origin + BookLayout.LEFT.position, "%s left sheet" % page.tab_id)
+		assert_eq(page.right_sheet().global_position, origin + BookLayout.RIGHT.position, "%s right sheet" % page.tab_id)
+		assert_gt(page.left_sheet().get_child_count(), 0, "%s writes on the left" % page.tab_id)
+		assert_gt(page.right_sheet().get_child_count(), 0, "%s writes on the right" % page.tab_id)
+	a.set_hints([["K", "Count"], ["Esc", "Back"]])
+	assert_eq(a.get_node(^"Book/Hints").get_child_count(), 2, "key hints sit at the foot of the right sheet")
+	assert_true(BookLayout.LEFT.end.x < BookLayout.SIZE.x * 0.5 and BookLayout.RIGHT.position.x > BookLayout.SIZE.x * 0.5,
+		"neither sheet crosses the gutter")
+
+
+func test_one_book_and_no_page_draws_its_own() -> void:
+	# The cover, the paper and the tabs are the shell's; a page that makes its
+	# own card or cover is a second book.
+	var bad := RegEx.create_from_string("\"SatchelDetail\"|JournalSpine|JournalTie|SatchelTable")
+	for path: String in PAGE_FILES:
+		if path.get_file() in ["menu_shell.gd", "menu_tab.gd", "book_kit.gd"]:
+			continue
+		var hits := []
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			if not line.strip_edges().begins_with("#") and bad.search(line):
+				hits.append(line.strip_edges())
+		assert_eq(hits, [], "%s frames itself instead of using the book's sheets" % path)
+
+
 func test_neither_the_shell_nor_a_page_pauses_for_itself() -> void:
 	for path: String in PAGE_FILES:
 		var src := FileAccess.get_file_as_string(path)
@@ -175,6 +209,6 @@ func test_real_pages_open_through_the_shell() -> void:
 	assert_true(journal.is_open())
 	journal.close()
 	assert_false(get_tree().paused)
-	var flaps := menu.get(&"_flaps") as HBoxContainer
+	var flaps := menu.get(&"_flaps") as Container
 	for f in flaps.get_children():
 		assert_false((f as Button).text in ["Map", "Sketchbook", "Wardrobe"], "those are shell tabs now")

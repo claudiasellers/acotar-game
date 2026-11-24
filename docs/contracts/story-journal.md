@@ -36,6 +36,6 @@ WorldState.has_flag, PhaseManager.current_phase, EventBus.flag_changed and
 scene_space_started. It sets no flags and emits no story signals. Hint state saves through SaveSystem as provider "story_journal".
 
 ## Look
-JournalTheme only: SatchelDetail paper
-pages, SatchelKey leather cover and key caps, SatchelTab button, Satchel*
-label variations, Satchel colours for the charcoal sketches, the sewn spine (JournalSpine) and the tie (JournalTie).
+A page of Feyre's journal (`docs/contracts/menu_shell.md`): the shell draws
+the book and the page writes on its two sheets. JournalTheme variations only,
+and Journal colours for the charcoal sketches.

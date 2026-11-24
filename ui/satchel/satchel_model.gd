@@ -1,8 +1,7 @@
 ## Finds the real 3D model of a satchel entry: the forage and keepsake glTFs
 ## the world scatters (art/forage for the human realm, the Spring Court's
 ## flora and props folders), so the page shows the same thing she picked up.
-## Used by the icon renderer (tools/ui/render_item_icons.gd) and by the page's
-## hero preview. Loads happen on the calling (main) thread only (F27/F37).
+## Used by the icon renderers (tools/ui/render_item_icons.gd and its kin). Loads happen on the calling (main) thread only (F27/F37).
 class_name SatchelModel
 extends RefCounted
 

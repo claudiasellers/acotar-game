@@ -11,7 +11,6 @@ const MOTIFS: Array[StringName] = [
 	&"bow", &"coin", &"house", &"moon", &"door", &"wave", &"flame", &"tree",
 	&"brush", &"feather", &"sun", &"rose", &"mask", &"mountain",
 ]
-const WASH_PATH := "res://ui/satchel/crafted/wash_bloom.png"
 
 var motif: StringName = &"rose"
 var seed_value: int = 1
@@ -32,7 +31,7 @@ func _init(kind: StringName = &"rose", size_px: float = 96.0) -> void:
 
 
 func _ready() -> void:
-	_wash = load(WASH_PATH)
+	_wash = load(BookLayout.WASH)
 
 
 func set_motif(kind: StringName) -> void:

@@ -1,82 +1,49 @@
-## The satchel page: her satchel tipped out onto her spread cloak, beside the
-## map as one menu. The cloak is a lit 3D surface seen at an angle
-## (SatchelTable); her things lie on it as painted cut-outs with real shadows,
-## and this 2D layer keeps the layout, focus and labels. Her things lie in a loose flat-lay (sized by weight, each
-## at its own fixed tilt); the one in focus lifts and a paper tag on twine
-## swings in, in its own column. Pockets are flaps along the top edge, and the map is the
-## last flap.
-##
-## L50: every cut-out is rendered from the thing's real model, and the one in
-## focus becomes the model itself, lifted and slowly turning over a painted
-## wash; the tag is a deckled paper label that also says where and when it
-## grows and what it is good for. Tabs and keys are stitched leather.
+## The satchel page of Feyre's journal: everything she carries, drawn on the
+## left sheet as specimens (each over its own blot of wash), and the one she is
+## looking at written up on the right: what it is, where and when it grows,
+## what it is good for, and whether it hangs on her strap.
 ##
 ## A page of the menu shell (MenuShell): I / Tab opens it; Z / X (pad LT / RT)
-## flip pockets (Dreamlight's filters on the triggers), W (pad Y) is the
-## wardrobe page, Enter / Space / F (pad A) uses, 1–4 (pad X) pins. The shell
-## owns Q / E (LB / RB) for pages and closes it.
-## The cut-outs and models are made once per thing and kept (warmed while the
-## shell is closed), so opening and flipping pockets re-lays, never rebuilds.
-## Silent by the user's call (T022). Look: theme variations from JournalTheme
+## flip pockets, W (pad Y) is the wardrobe page, Enter / Space / F (pad A)
+## uses, 1–4 (pad X) pins to the strap. The shell owns Q / E (LB / RB) for
+## pages and closes it. A thing's slot is made once and kept (warmed while
+## the book is closed), so opening and flipping pockets re-lays, never
+## rebuilds. Silent by the user's call (T022). Look: JournalTheme variations
 ## only; no colours or fonts here.
 class_name SatchelMenu
 extends MenuTab
 
-const MARGIN := Vector2(96, 64)
-const CELL := 220.0
-## Icon size by weight class (TINY..HEAVY); dishes use MEDIUM.
-const SIZES: Array[float] = [120.0, 140.0, 160.0, 190.0, 210.0]
-const TILT_DEG := 4.0
-const JITTER := 10.0
-const HERO_SCALE := 1.12
-const HERO_LIFT := 10.0
-## The hero rises this far off the cloth (metres) and turns this much of the
-## way up toward the eye; a dropped-in item falls from DROP_HEIGHT.
-const HERO_RISE := 0.16
-const HERO_FACE := 0.55
-const DROP_HEIGHT := 0.9
-## Lazy tween: each frame (at 60 fps) a value moves this share of the way to its target.
-const EASE := 0.3
-const OPEN_STAGGER := 0.02
-const TAG_GAP := 72.0
-const TAG_WIDTH := 360.0
-## The tag keeps its own column on the right; things lie to the left of it.
-const TAG_COLUMN := TAG_WIDTH + TAG_GAP * 2.0
+const COLUMNS := 5
+const SLOT := 124.0
+const ICON := 96.0
+const STUDY := 250.0
+const STUDY_ICON := 190.0
 
 var bar: QuickBar
 var pocket: StringName = SatchelEntries.ALL
 var selected_id: StringName = &""
 
-var _root: Control
-var _cloth: PanelContainer
-var _table: SatchelTable
-var _flaps: HBoxContainer
+var _flaps: HFlowContainer
 var _pocket_buttons: Dictionary = {}
 var _purse: Label
-var _lay: Control
+var _grid: GridContainer
 var _empty: Label
-var _items: Array[Dictionary] = []
-## Every thing's cut-out, kept across opens and pockets: id -> item.
-var _cache: Dictionary = {}
-## Something was made since the last warm-up draw.
-var _warm_dirty: bool = false
-var _tag: PanelContainer
-var _tag_name: Label
-var _tag_line: Label
-var _tag_meta: Label
-var _tag_where: Label
-var _tag_chips: HFlowContainer
+## Every thing's slot, kept across opens and pockets: id -> Button.
+var _slots: Dictionary = {}
+var _study: Control
+var _study_icon: Control
+var _detail: VBoxContainer
+var _name: Label
+var _line: Label
+var _where: Label
+var _chips: HFlowContainer
+var _stats: Dictionary = {}  # word -> Label
 var _use_button: Button
+var _pin_row: HBoxContainer
 var _pin_buttons: Array[Button] = []
-var _twine: Line2D
-var _tag_angle: float = 0.0
-var _tag_spin: float = 0.0
 var _load_glyph: SatchelGlyph
 var _load_label: Label
-var _prompts: HBoxContainer
-var _lay_slide: float = 0.0
 var _new_ids: Dictionary = {}
-var _tag_y: float = -1.0
 
 
 func _init(quick_bar: QuickBar = null) -> void:
@@ -100,62 +67,35 @@ static func open_from(tree: SceneTree) -> void:
 
 
 func _shown() -> void:
-	_apply_theme()
-	_refresh(true)
+	_load_glyph.queue_redraw()
+	_refresh()
 
 
 func _hidden() -> void:
 	_new_ids.clear()
-	_tag_y = -1.0
 
 
-## While the shell is closed: one thing's cut-out, then its model, a thing
-## per frame, so the satchel opens with everything already made.
+## While the book is closed: one thing's slot a frame, so the satchel opens
+## with every picture already loaded.
 func warm_jobs() -> Array[Callable]:
 	return [_warm_next]
 
 
 func _warm_next() -> void:
-	if _root == null or is_open():
+	if _grid == null or is_open():
 		return
 	for e in SatchelEntries.list(bar.inventory, SatchelEntries.ALL):
-		var it: Dictionary = _cache.get(e.id, {})
-		if it.is_empty():
-			it = _make_item(e)
-			_hide_item(it)
-		elif it.has("model_tried"):
-			continue
-		else:
-			it.model_tried = true
-			_table.hero_model(it.card, e.id)
-		MenuShell.of(get_tree()).queue_warm(self)
-		return
-	# All made: draw them once, so their first real draw is free too.
-	if _warm_dirty:
-		_warm_dirty = false
-		MenuShell.of(get_tree()).queue_render(self)
-
-
-## For the warm-up draw: every cut-out and model out on the cloth at once.
-func warm_render(on: bool) -> void:
-	if is_open():
-		return
-	var at := Vector2(_lay.size.x * 0.5, _lay.size.y * 0.5)
-	for it: Dictionary in _cache.values():
-		var card := it.card as Node3D
-		card.visible = on
-		if on:
-			_table.place(card, _lay.position + at, it.px, 0.0, 0.0, 0.0)
-		_table.place_model(card, 1.0 if on else 0.0, 0.0)
+		if not _slots.has(e.id):
+			_make_slot(e)
+			MenuShell.of(get_tree()).queue_warm(self)
+			return
 
 
 func set_pocket(p: StringName) -> void:
 	if p == pocket:
 		return
-	var step := signf(SatchelEntries.POCKETS.find(p) - SatchelEntries.POCKETS.find(pocket))
 	pocket = p
-	_lay_slide = 40.0 * step
-	_refresh(true)
+	_refresh()
 
 
 ## Next / previous pocket, wrapping round.
@@ -168,10 +108,10 @@ func select(id: StringName) -> void:
 	if id == selected_id:
 		return
 	selected_id = id
-	_tag_angle = deg_to_rad(9.0)
-	_tag_spin = 0.0
 	_show_detail()
-	_build_prompts()
+	_sync_hints()
+	if _study_icon:
+		Juice.bounce_control(_study, 0.05)
 
 
 func use_selected() -> bool:
@@ -179,7 +119,7 @@ func use_selected() -> bool:
 		return false
 	var ok := SatchelUse.use(bar.inventory, selected_id, get_tree().get_first_node_in_group(&"player"))
 	if ok:
-		_refresh(false)
+		_refresh()
 	return ok
 
 
@@ -220,407 +160,249 @@ func _watch_new() -> void:
 
 func _on_item_added(id: StringName, _n: int, _c: StringName) -> void:
 	_new_ids[id] = true
-	if not _cache.has(id) and is_inside_tree():
+	if not _slots.has(id) and is_inside_tree():
 		MenuShell.of(get_tree()).queue_warm(self)
 
 
 # --- build -------------------------------------------------------------------
 
-## Act I and the Spring Court wear different themes (JournalTheme).
-func _apply_theme() -> void:
-	_twine.default_color = JournalTheme.color(&"line")
-	_table.apply_theme()
-	_load_glyph.queue_redraw()
-
-
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_root)
-	# The cloak's cloth fills the screen: no card, no box.
-	_cloth = PanelContainer.new()
-	_cloth.theme_type_variation = &"SatchelCard"
-	_cloth.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_cloth.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.add_child(_cloth)
-	_table = SatchelTable.new()
-	_root.add_child(_table)
-	_root.add_child(_vignette())
-
-	_flaps = HBoxContainer.new()
-	# Below the menu shell's tab strip.
-	_flaps.position = Vector2(MARGIN.x, MenuShell.PAGE_TOP)
-	_flaps.add_theme_constant_override(&"separation", 8)
-	_root.add_child(_flaps)
+	var left := column(left_sheet())
+	var head := HBoxContainer.new()
+	left.add_child(head)
+	var title := BookKit.title("Satchel")
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	_purse = BookKit.label("", &"SatchelSmall")
+	_purse.size_flags_vertical = Control.SIZE_SHRINK_END
+	head.add_child(_purse)
+	_flaps = HFlowContainer.new()
+	_flaps.add_theme_constant_override(&"h_separation", 6)
+	_flaps.add_theme_constant_override(&"v_separation", 6)
+	left.add_child(_flaps)
 	for p: StringName in SatchelEntries.POCKETS:
-		var b := _button(SatchelEntries.POCKET_NAMES[p], &"SatchelTab")
-		b.toggle_mode = true
-		b.focus_mode = Control.FOCUS_NONE
+		var b := BookKit.chip(SatchelEntries.POCKET_NAMES[p])
 		b.pressed.connect(set_pocket.bind(p))
 		_flaps.add_child(b)
 		_pocket_buttons[p] = b
-	# The map, sketchbook and wardrobe are the shell's tabs above (MenuShell).
-
-	_purse = _label("", &"SatchelSmall")
-	_purse.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_purse.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_purse.offset_right = -MARGIN.x
-	_purse.offset_top = MenuShell.PAGE_TOP + 8
-	_root.add_child(_purse)
-
-	_lay = Control.new()
-	_lay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_lay.offset_left = MARGIN.x
-	_lay.offset_right = -(MARGIN.x + TAG_COLUMN)
-	_lay.offset_top = MenuShell.PAGE_TOP + 80
-	_lay.offset_bottom = -(MARGIN.y + 72)
-	_lay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.add_child(_lay)
-	_empty = _label("Nothing in this pocket yet.", &"SatchelBody")
+	left.add_child(HSeparator.new())
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	left.add_child(scroll)
+	_grid = GridContainer.new()
+	_grid.columns = COLUMNS
+	_grid.add_theme_constant_override(&"h_separation", 14)
+	_grid.add_theme_constant_override(&"v_separation", 14)
+	scroll.add_child(_grid)
+	_empty = BookKit.label("Nothing in this pocket yet.", &"SatchelWhere")
 	_empty.set_anchors_preset(Control.PRESET_CENTER)
-	_lay.add_child(_empty)
-
-	_twine = Line2D.new()
-	_twine.width = 2.0
-	_twine.default_color = JournalTheme.color(&"line")
-	_twine.antialiased = true
-	_root.add_child(_twine)
-	_build_tag()
-	_build_footer()
-
-
-func _build_tag() -> void:
-	_tag = PanelContainer.new()
-	_tag.theme_type_variation = &"SatchelDetail"
-	_tag.custom_minimum_size = Vector2(TAG_WIDTH, 0)
-	_root.add_child(_tag)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 6)
-	_tag.add_child(col)
-	_tag_name = _label("", &"SatchelHeading")
-	_tag_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_tag_name)
-	_tag_line = _label("", &"SatchelBody")
-	_tag_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_tag_line)
-	_tag_where = _label("", &"SatchelWhere")
-	_tag_where.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_tag_where)
-	_tag_chips = HFlowContainer.new()
-	_tag_chips.add_theme_constant_override(&"h_separation", 6)
-	_tag_chips.add_theme_constant_override(&"v_separation", 6)
-	col.add_child(_tag_chips)
-	_tag_meta = _label("", &"SatchelSmall")
-	_tag_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_tag_meta)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 6)
-	col.add_child(row)
-	_use_button = _button("Use", &"SatchelTab")
-	_use_button.focus_mode = Control.FOCUS_NONE
-	_use_button.pressed.connect(use_selected)
-	row.add_child(_use_button)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(spacer)
-	for i in QuickBar.SLOTS:
-		var b := _button(str(i + 1), &"SatchelTab")
-		b.toggle_mode = true
-		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(36, 36)
-		b.tooltip_text = "Pin to quick bar slot %d" % (i + 1)
-		b.pressed.connect(pin_selected.bind(i))
-		row.add_child(b)
-		_pin_buttons.append(b)
-
-
-func _build_footer() -> void:
-	var load_row := HBoxContainer.new()
-	load_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	load_row.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	load_row.offset_left = MARGIN.x
-	load_row.offset_bottom = -MARGIN.y
-	load_row.add_theme_constant_override(&"separation", 10)
-	_root.add_child(load_row)
+	_empty.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	left_sheet().add_child(_empty)
+	var foot := HBoxContainer.new()
+	foot.add_theme_constant_override(&"separation", 10)
+	left.add_child(foot)
 	_load_glyph = SatchelGlyph.new()
-	_load_glyph.custom_minimum_size = Vector2(52, 46)
-	load_row.add_child(_load_glyph)
-	_load_label = _label("", &"SatchelSmall")
+	_load_glyph.custom_minimum_size = Vector2(44, 40)
+	foot.add_child(_load_glyph)
+	_load_label = BookKit.label("", &"SatchelSmall")
 	_load_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	load_row.add_child(_load_label)
+	foot.add_child(_load_label)
 
-	_prompts = HBoxContainer.new()
-	_prompts.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_prompts.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_prompts.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_prompts.offset_right = -MARGIN.x
-	_prompts.offset_bottom = -MARGIN.y
-	_prompts.add_theme_constant_override(&"separation", 22)
-	_root.add_child(_prompts)
+	_detail = column(right_sheet(), 8)
+	_study = Control.new()
+	_study.custom_minimum_size = Vector2(STUDY, STUDY)
+	_study.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_study.pivot_offset = Vector2(STUDY, STUDY) * 0.5
+	_study.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_detail.add_child(_study)
+	_study.add_child(BookKit.wash(STUDY, 0))
+	_name = BookKit.label("", &"SatchelHeading", true)
+	_detail.add_child(_name)
+	_detail.add_child(HSeparator.new())
+	_line = BookKit.label("", &"SatchelBody", true)
+	_detail.add_child(_line)
+	_where = BookKit.label("", &"SatchelWhere", true)
+	_detail.add_child(_where)
+	_chips = HFlowContainer.new()
+	_chips.add_theme_constant_override(&"h_separation", 6)
+	_chips.add_theme_constant_override(&"v_separation", 6)
+	_detail.add_child(_chips)
+	_detail.add_child(BookKit.gap(6))
+	var stats := HBoxContainer.new()
+	stats.add_theme_constant_override(&"separation", 28)
+	_detail.add_child(stats)
+	for word in ["Carried", "On the strap", "Weight", "At market"]:
+		var stat := BookKit.section(word)
+		_stats[word] = BookKit.label("", &"SatchelBody")
+		stat.add_child(_stats[word])
+		stats.add_child(stat)
+	_detail.add_child(BookKit.gap(6))
+	var act := HBoxContainer.new()
+	act.add_theme_constant_override(&"separation", 8)
+	_detail.add_child(act)
+	_use_button = BookKit.chip("Use", false)
+	_use_button.pressed.connect(use_selected)
+	act.add_child(_use_button)
+	_pin_row = HBoxContainer.new()
+	_pin_row.add_theme_constant_override(&"separation", 6)
+	_pin_row.alignment = BoxContainer.ALIGNMENT_END
+	_pin_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	act.add_child(_pin_row)
+	var strap := BookKit.label("Strap", &"SatchelSmall")
+	strap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_pin_row.add_child(strap)
+	for i in QuickBar.SLOTS:
+		var b := BookKit.chip(str(i + 1))
+		b.tooltip_text = "Hang on strap ring %d" % (i + 1)
+		b.pressed.connect(pin_selected.bind(i))
+		_pin_row.add_child(b)
+		_pin_buttons.append(b)
+	_detail.add_child(BookKit.spring())
+	var sky := BookKit.sky(520.0)
+	sky.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_detail.add_child(sky)
 
 
-func _button(text: String, variation: StringName) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.theme_type_variation = variation
-	return b
+# --- the specimens -----------------------------------------------------------
 
-
-func _label(text: String, variation: StringName) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
-
-
-# --- the flat-lay ------------------------------------------------------------
-
-## Lays the current pocket out. `settle` replays the drop-in.
-func _refresh(settle: bool = false) -> void:
+## Lays the current pocket out on the left sheet.
+func _refresh() -> void:
 	var inv := bar.inventory
 	for p: StringName in _pocket_buttons:
 		(_pocket_buttons[p] as Button).set_pressed_no_signal(p == pocket)
 	var entries := SatchelEntries.list(inv, pocket)
-	var old := {}
-	for it in _items:
-		old[it.id] = it
-	var fresh: Array[Dictionary] = []
-	var layout := _layout(entries)
+	var here := {}
 	for i in entries.size():
 		var e := entries[i]
-		var it: Dictionary = _cache.get(e.id, {})
-		old.erase(e.id)
-		if it.is_empty():
-			it = _make_item(e)
-		(it.node as Control).visible = true
-		it.home = layout[i]
-		it.entry = e
-		_update_count(it, e)
-		if settle:
-			it.at = it.home + Vector2(_lay_slide, 0.0)
-			it.rot = it.tilt + deg_to_rad(10.0 * _seeded(e.id).x)
-			it.lift = DROP_HEIGHT
-			it.delay = OPEN_STAGGER * i
-			it.show = 0.0
-			(it.card as Node3D).visible = false
-		fresh.append(it)
-	for id in old:
-		_hide_item(old[id])
-	# Things no longer carried at all let go of their cut-out and model.
+		var slot: Button = _slots[e.id] if _slots.has(e.id) else _make_slot(e)
+		slot.visible = true
+		_grid.move_child(slot, i)
+		here[e.id] = true
+	# Off this pocket: kept for next time. No longer carried: let go.
 	var carried := {}
 	for e in SatchelEntries.list(inv, SatchelEntries.ALL):
 		carried[e.id] = true
-	for id in _cache.keys():
+	for id: StringName in _slots.keys():
+		var slot := _slots[id] as Button
 		if not carried.has(id):
-			_free_item(_cache[id])
-	_items = fresh
+			_slots.erase(id)
+			slot.queue_free()
+		elif not here.has(id):
+			slot.visible = false
 	_empty.visible = entries.is_empty()
-	if not entries.any(func(e: Dictionary) -> bool: return e.id == selected_id):
+	_detail.visible = not entries.is_empty()
+	if not here.has(selected_id):
 		selected_id = entries[0].id if entries.size() > 0 else &""
 	_show_detail()
-	_purse.text = "%d coppers" % inv.coin
+	_purse.text = _coppers(inv.coin)
 	var cap := float(Inventory.CAPACITY[Inventory.SATCHEL])
 	_load_glyph.fill = clampf(inv.used(Inventory.SATCHEL) / cap, 0.0, 1.0)
-	_load_glyph.queue_redraw()
 	_load_label.text = "%s / %d" % [_units(inv.used(Inventory.SATCHEL)), int(cap)]
 	if inv.speed_multiplier() < 1.0:
 		_load_label.text += "   heavy, she walks slower"
-	_build_prompts()
+	_sync_hints()
 	_focus_selected.call_deferred()
 
 
-## Loose rows centred in the lay area, each item nudged and tilted by a seed
-## from its id so it rests in the same place every time.
-func _layout(entries: Array[Dictionary]) -> Array[Vector2]:
-	var area := _lay.size.max(Vector2(CELL, CELL))
-	var n := entries.size()
-	# A block about as wide as the area is, not one long row.
-	var max_cols := maxi(1, int(area.x / CELL))
-	var base := clampi(ceili(sqrt(n * area.x / area.y)), 1, max_cols)
-	# Of the nearby widths, take the one that leaves the last row fullest.
-	var cols := base
-	for c in [base, base - 1, base + 1]:
-		if c >= 1 and c <= max_cols and ceili(float(n) / c) * c - n < ceili(float(n) / cols) * cols - n:
-			cols = c
-	var rows := ceili(float(n) / cols)
-	var top := maxf(0.0, (area.y - rows * CELL) * 0.42)
-	var out: Array[Vector2] = []
-	for i in n:
-		var r := _seeded(entries[i].id)
-		var row := i / cols
-		var in_row := mini(cols, n - row * cols)
-		var left := (area.x - in_row * CELL) * 0.5
-		# Alternate rows sit half a step over, like things tipped out, not shelved.
-		var stagger := CELL * 0.18 * (1.0 if row % 2 else -1.0)
-		var cell := Vector2(left + (i % cols + 0.5) * CELL + stagger, top + (row + 0.5) * CELL)
-		out.append(cell + Vector2(r.x, r.y) * JITTER)
-	return out
-
-
-func _seeded(id: StringName) -> Vector3:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash(String(id))
-	return Vector3(rng.randf_range(-1, 1), rng.randf_range(-1, 1), rng.randf_range(-1, 1))
-
-
-func _size_for(e: Dictionary) -> float:
-	var item := e.get("item") as ItemData
-	return SIZES[item.weight_class] if item else SIZES[2]
-
-
-func _make_item(e: Dictionary) -> Dictionary:
-	var px := _size_for(e)
+## One thing on the page: its picture over a blot of wash, how many, and
+## which strap ring it hangs on.
+func _make_slot(e: Dictionary) -> Button:
 	var b := Button.new()
-	b.flat = true
-	for s in [&"normal", &"hover", &"pressed", &"hover_pressed", &"focus", &"disabled"]:
-		b.add_theme_stylebox_override(s, StyleBoxEmpty.new())
-	b.custom_minimum_size = Vector2(px, px)
-	b.size = Vector2(px, px)
-	b.pivot_offset = Vector2(px, px) * 0.5
+	b.name = String(e.id).validate_node_name()
+	b.theme_type_variation = &"SatchelSlot"
+	b.toggle_mode = true
+	b.custom_minimum_size = Vector2(SLOT, SLOT)
+	b.pivot_offset = Vector2(SLOT, SLOT) * 0.5
 	b.focus_mode = Control.FOCUS_ALL
 	b.tooltip_text = e.name
-	# The button is only the hit area and focus; the picture is the cut-out
-	# on the cloth underneath.
-	var count := _label("", &"SatchelCount")
-	count.position = Vector2(px * 0.66, px * 0.66)
+	b.visible = false
+	var blot := BookKit.wash(SLOT * 0.86, hash(String(e.id)))
+	blot.position = Vector2.ONE * SLOT * 0.07
+	b.add_child(blot)
+	var icon := SatchelIcon.make(e, ICON)
+	icon.position = Vector2.ONE * (SLOT - ICON) * 0.5
+	b.add_child(icon)
+	var count := BookKit.label("", &"SatchelCount")
+	count.name = "Count"
+	count.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	count.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	count.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	count.offset_right = -4
+	count.offset_bottom = -4
 	b.add_child(count)
-	var pin := _label("", &"SatchelPin")
-	pin.position = Vector2(px * 0.12, px * 0.70)
+	var pin := BookKit.label("", &"SatchelPin")
+	pin.name = "Pin"
+	pin.position = Vector2(2, 2)
 	b.add_child(pin)
-	_lay.add_child(b)
-	var it := {"id": e.id, "node": b, "px": px, "count": count, "pin": pin, "entry": e,
-		"card": _table.add_card(e), "lift": 0.0, "face": 0.0,
-		"tilt": deg_to_rad(_seeded(e.id).z * TILT_DEG), "at": Vector2.ZERO, "rot": 0.0, "scale": 1.0,
-		"delay": 0.0, "home": Vector2.ZERO, "show": 0.0, "spin": 0.0}
-	_cache[e.id] = it
-	_warm_dirty = true
+	_grid.add_child(b)
+	_slots[e.id] = b
 	b.focus_entered.connect(select.bind(e.id))
-	b.mouse_entered.connect(func() -> void: b.grab_focus())
+	b.mouse_entered.connect(b.grab_focus)
+	# Pointing at a thing chooses it, so a press uses it.
 	b.pressed.connect(func() -> void:
-		if selected_id == e.id:
-			use_selected())
-	return it
+		select(e.id)
+		use_selected()
+		_mark_selected())
+	return b
 
 
-func _free_item(it: Dictionary) -> void:
-	_cache.erase(it.id)
-	(it.node as Node).queue_free()
-	(it.card as Node).queue_free()
+func _mark_selected() -> void:
+	for id: StringName in _slots:
+		(_slots[id] as Button).set_pressed_no_signal(id == selected_id)
 
 
-## Off this pocket: kept for next time, out of sight.
-func _hide_item(it: Dictionary) -> void:
-	(it.node as Control).visible = false
-	(it.card as Node3D).visible = false
-
-
-func _update_count(it: Dictionary, e: Dictionary) -> void:
-	(it.count as Label).text = "×%d" % e.count if int(e.count) > 1 else ""
-	(it.count as Label).visible = (it.count as Label).text != ""
+func _update_badges(e: Dictionary) -> void:
+	var slot := _slots.get(e.id) as Button
+	if slot == null:
+		return
+	var count := slot.get_node(^"Count") as Label
+	count.text = "×%d" % e.count
+	count.visible = int(e.count) > 1
+	var pin := slot.get_node(^"Pin") as Label
 	var at := bar.slot_of(e.id)
-	(it.pin as Label).text = "ring %d" % (at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
-	(it.pin as Label).visible = (it.pin as Label).text != ""
-
-
-func _process(delta: float) -> void:
-	if not is_open():
-		return
-	var k := 1.0 - pow(1.0 - EASE, delta * 60.0)
-	_lay_slide = lerpf(_lay_slide, 0.0, k)
-	var hero: Dictionary = {}
-	for it in _items:
-		var node := it.node as Control
-		var card := it.card as Node3D
-		if it.delay > 0.0:
-			it.delay -= delta
-			continue
-		card.visible = true
-		var is_hero: bool = it.id == selected_id
-		var target_at: Vector2 = it.home + (Vector2(0, -HERO_LIFT) if is_hero else Vector2.ZERO)
-		it.at = (it.at as Vector2).lerp(target_at, k)
-		it.rot = lerpf(it.rot, it.tilt, k)
-		it.scale = lerpf(it.scale, HERO_SCALE if is_hero else 1.0, k)
-		it.lift = lerpf(it.lift, HERO_RISE if is_hero else 0.0, k)
-		it.face = lerpf(it.face, HERO_FACE if is_hero else 0.0, k)
-		node.position = it.at - Vector2(it.px, it.px) * 0.5
-		node.rotation = it.rot
-		node.scale = Vector2.ONE * it.scale
-		_table.place(card, _lay.position + it.at, it.px * it.scale, it.rot, it.lift, it.face)
-		# The hero becomes its real model, turning slowly; the rest settle back
-		# to cut-outs facing the way they lay.
-		if is_hero and not it.has("model_tried"):
-			it.model_tried = true
-			_table.hero_model(card, it.id)
-		it.show = lerpf(it.show, 1.0 if is_hero else 0.0, k)
-		it.spin = it.spin + delta * SatchelTable.SPIN_SPEED if is_hero else lerp_angle(it.spin, -it.rot, k)
-		_table.place_model(card, it.show, it.spin)
-		if is_hero:
-			hero = it
-	_place_tag(hero, delta, k)
-
-
-## The tag hangs beside the hero on a sagging length of twine and swings in
-## like a pendulum (damped spring).
-func _place_tag(hero: Dictionary, delta: float, k: float) -> void:
-	_tag.visible = not hero.is_empty()
-	_twine.visible = _tag.visible
-	if hero.is_empty():
-		return
-	var px: float = hero.px * HERO_SCALE
-	var centre: Vector2 = _lay.position + hero.at
-	# The tag keeps its column and only drifts up or down to sit level with
-	# the hero, so the eye always finds it in the same place.
-	var x := _root.size.x - MARGIN.x - TAG_WIDTH
-	var y := clampf(centre.y - 40.0, _lay.position.y, maxf(_lay.position.y, _root.size.y - MARGIN.y - 96 - _tag.size.y))
-	_tag_y = y if _tag_y < 0.0 else lerpf(_tag_y, y, k)
-	_tag.position = Vector2(x, _tag_y)
-	_tag.pivot_offset = Vector2(24.0, 0.0)
-	_tag_spin += (-90.0 * _tag_angle - 9.0 * _tag_spin) * delta
-	_tag_angle += _tag_spin * delta
-	_tag.rotation = _tag_angle
-	# A loose loop of twine through the tag's hole, trailing off the top edge.
-	var tie := _tag.position + Vector2(24.0, 18.0).rotated(_tag_angle)
-	var pts := PackedVector2Array()
-	for i in 17:
-		var t := float(i) / 16.0 * TAU
-		pts.append(tie + Vector2(sin(t) * 9.0 - 6.0 * t / TAU, -16.0 + cos(t) * -16.0).rotated(_tag_angle))
-	pts.append(tie + Vector2(-26.0, -44.0).rotated(_tag_angle * 0.5))
-	pts.append(tie + Vector2(-40.0, -52.0).rotated(_tag_angle * 0.3))
-	_twine.points = pts
+	pin.text = str(at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
+	pin.visible = pin.text != ""
 
 
 func _show_detail() -> void:
+	for e in SatchelEntries.list(bar.inventory, pocket):
+		_update_badges(e)
+	_mark_selected()
 	var e := SatchelEntries.find(bar.inventory, selected_id) if selected_id != &"" else {}
 	if e.is_empty():
 		return
 	var item := e.item as ItemData
-	_tag_name.text = e.name
-	_tag_line.text = e.description
-	var meta: Array[String] = [String(SatchelEntries.POCKET_NAMES.get(e.pocket, "")).to_upper()]
-	if int(e.count) > 1:
-		meta.append("%d CARRIED" % e.count)
-	if item and item.base_price > 0:
-		meta.append("MARKET %d COPPERS" % item.base_price)
-	_tag_meta.text = "   ".join(meta)
-	_tag_where.text = where_text(item)
-	_tag_where.visible = _tag_where.text != ""
-	for c in _tag_chips.get_children():
+	if _study_icon:
+		_study_icon.queue_free()
+	_study_icon = SatchelIcon.make(e, STUDY_ICON)
+	_study_icon.position = Vector2.ONE * (STUDY - STUDY_ICON) * 0.5
+	_study.add_child(_study_icon)
+	(_study.get_child(0) as CanvasItem).modulate = JournalTheme.wash(hash(String(e.id)))
+	_name.text = e.name
+	_line.text = e.description
+	_where.text = where_text(item)
+	_where.visible = _where.text != ""
+	for c in _chips.get_children():
 		c.queue_free()
 	for word in trait_words(item):
 		var chip := PanelContainer.new()
 		chip.theme_type_variation = &"SatchelChip"
-		chip.add_child(_label(word, &"SatchelSmall"))
-		_tag_chips.add_child(chip)
-	_tag_chips.visible = _tag_chips.get_child_count() > 0
+		chip.add_child(BookKit.label(word, &"SatchelSmall"))
+		_chips.add_child(chip)
+	_chips.visible = not trait_words(item).is_empty()
+	var ring := bar.slot_of(selected_id)
+	(_stats["Carried"] as Label).text = str(e.count)
+	(_stats["On the strap"] as Label).text = "ring %d" % (ring + 1) if ring >= 0 else "no"
+	(_stats["Weight"] as Label).text = _units(item.weight_units()) if item else "light"
+	(_stats["At market"] as Label).text = _coppers(item.base_price) if item and item.base_price > 0 else "not sold"
 	var verb := SatchelUse.verb(selected_id)
 	_use_button.visible = verb != ""
 	_use_button.text = verb
+	_pin_row.visible = SatchelUse.can_pin(selected_id)
 	for i in _pin_buttons.size():
-		_pin_buttons[i].visible = SatchelUse.can_pin(selected_id)
 		_pin_buttons[i].set_pressed_no_signal(bar.entry(i) == selected_id)
-	for it in _items:
-		_update_count(it, it.entry)
 
 
 ## Where and when it grows, from the catalogue: "The western fells, in
@@ -654,8 +436,8 @@ static func where_text(item: ItemData) -> String:
 	return out.left(1).to_upper() + out.substr(1) + "."
 
 
-## Small enamel chips: its chemistry tags, whether she can eat it, and
-## how rare it is. Words come straight from the data (no invented lore).
+## Small chips: its chemistry tags, whether she can eat it, and how rare it
+## is. Words come straight from the data (no invented lore).
 static func trait_words(item: ItemData) -> Array[String]:
 	var out: Array[String] = []
 	if item == null:
@@ -675,61 +457,29 @@ static func trait_words(item: ItemData) -> Array[String]:
 	return out
 
 
-## Button glyphs, not a sentence: pad or keys, whichever was used last.
-func _build_prompts() -> void:
-	for c in _prompts.get_children():
-		c.queue_free()
+## Key caps, not a sentence: pad or keys, whichever was used last.
+func _sync_hints() -> void:
 	var pad := SatchelHud.pad_active
 	var pairs: Array = []
 	var verb := SatchelUse.verb(selected_id) if selected_id != &"" else ""
 	if verb != "":
 		pairs.append(["A" if pad else "Enter", verb])
-		pairs.append(["X" if pad else "1–4", "Pin"])
+		pairs.append(["X" if pad else "1–4", "Strap"])
 	pairs.append(["LT RT" if pad else "Z X", "Pocket"])
 	pairs.append(["Y" if pad else "W", "Wardrobe"])
 	pairs.append(["B" if pad else "Esc", "Back"])
-	for p in pairs:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 8)
-		var glyph := PanelContainer.new()
-		glyph.theme_type_variation = &"SatchelKey"
-		var key := _label(p[0], &"SatchelKeyLabel")
-		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		glyph.add_child(key)
-		row.add_child(glyph)
-		var word := _label(p[1], &"SatchelSmall")
-		word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(word)
-		_prompts.add_child(row)
+	set_hints(pairs)
 
 
 func _focus_selected() -> void:
-	for it in _items:
-		if it.id == selected_id:
-			(it.node as Control).grab_focus()
-			return
-
-
-## Edges of the cloak fall into shade, so the eye settles in the middle.
-func _vignette() -> TextureRect:
-	var g := Gradient.new()
-	var ink := JournalTheme.color(&"ink")
-	g.set_offset(0, 0.55)
-	g.set_color(0, Color(ink, 0.0))
-	g.set_color(1, Color(ink, 0.16))
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill = GradientTexture2D.FILL_RADIAL
-	t.fill_from = Vector2(0.5, 0.5)
-	t.fill_to = Vector2(1.0, 1.0)
-	var r := TextureRect.new()
-	r.texture = t
-	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	r.stretch_mode = TextureRect.STRETCH_SCALE
-	r.set_anchors_preset(Control.PRESET_FULL_RECT)
-	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return r
+	var slot := _slots.get(selected_id) as Button
+	if slot and slot.is_visible_in_tree():
+		slot.grab_focus()
 
 
 func _units(v: float) -> String:
 	return str(snappedf(v, 0.25)).trim_suffix(".0")
+
+
+func _coppers(n: int) -> String:
+	return "1 copper" if n == 1 else "%d coppers" % n

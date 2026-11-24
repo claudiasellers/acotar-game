@@ -1,7 +1,10 @@
-## One page of the menu shell (MenuShell): the satchel, the wardrobe, the
-## collection book, the sketchbook, the map. A page is built once, kept, and
-## only shown and hidden; the shell owns pausing, the mouse, the tab strip and
-## the keys every page shares. A page adds only what is its own:
+## One page of Feyre's journal (MenuShell): the satchel, the wardrobe, the
+## collection, the sketchbook, the map. The shell draws the open book and its
+## index tabs; a page writes on the book's two sheets, left_sheet() and
+## right_sheet() (or spread() for one picture across both), and names its keys
+## with set_hints(). A page is built once, kept, and only shown and hidden;
+## the shell owns pausing, the mouse and the keys every page shares. A page
+## adds only what is its own:
 ##   _page_input(event) -> bool  its keys (return true when it used one)
 ##   _shown() / _hidden()        refresh what may have changed / let go
 ##   warm_jobs() -> Array        slow first-time work, run a slice per frame
@@ -14,6 +17,9 @@ extends CanvasLayer
 
 signal opened
 signal closed
+
+## The foot of the right sheet kept for the key hints.
+const HINTS_HEIGHT := 44.0
 
 ## Stable id (MenuShell.open_tab(tree, id)).
 var tab_id: StringName = &""
@@ -28,6 +34,9 @@ var shortcut: StringName = &""
 var opens_in_story: bool = false
 
 var _shown_now: bool = false
+var _book: Control
+var _sheets: Dictionary = {}  # BookLayout rect -> Control
+var _key_hints: HBoxContainer
 
 static var _triggers: Dictionary = {}
 
@@ -63,10 +72,80 @@ func available() -> bool:
 	return true
 
 
-## Where the page's own frame may start: below the shell's tab strip. Every
-## page lays out from here, so the strip never covers a page's title or frame.
-static func page_top() -> float:
-	return MenuShell.PAGE_TOP
+# --- the book's sheets --------------------------------------------------------
+
+## The left-hand sheet's writing area.
+func left_sheet() -> Control:
+	return _sheet(BookLayout.LEFT, "Left")
+
+
+## The right-hand sheet's writing area. Its foot holds the key hints.
+func right_sheet() -> Control:
+	return _sheet(BookLayout.RIGHT, "Right")
+
+
+## Both sheets as one area, for a page that is a single picture.
+func spread() -> Control:
+	return _sheet(BookLayout.SPREAD, "Spread")
+
+
+## A column down a sheet, ready to add rows to.
+func column(sheet: Control, separation: int = 10) -> VBoxContainer:
+	var col := VBoxContainer.new()
+	col.set_anchors_preset(Control.PRESET_FULL_RECT)
+	col.add_theme_constant_override(&"separation", separation)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sheet.add_child(col)
+	return col
+
+
+## The keys this page answers, as caps at the foot of the right sheet:
+## [["Z X", "Pocket"], ["Esc", "Back"]].
+func set_hints(pairs: Array) -> void:
+	if _key_hints == null:
+		_key_hints = HBoxContainer.new()
+		_key_hints.name = "Hints"
+		_key_hints.alignment = BoxContainer.ALIGNMENT_END
+		_key_hints.add_theme_constant_override(&"separation", 22)
+		_key_hints.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_book_root().add_child(_key_hints)
+		var foot := BookLayout.RIGHT
+		_key_hints.position = Vector2(foot.position.x, foot.end.y - HINTS_HEIGHT)
+		_key_hints.size = Vector2(foot.size.x, HINTS_HEIGHT)
+	for c in _key_hints.get_children():
+		_key_hints.remove_child(c)
+		c.queue_free()
+	for p: Array in pairs:
+		_key_hints.add_child(BookKit.key_hint(p[0], p[1]))
+
+
+func _sheet(rect: Rect2, sheet_name: String) -> Control:
+	if not _sheets.has(rect):
+		var c := Control.new()
+		c.name = sheet_name
+		c.position = rect.position
+		c.size = rect.size - Vector2(0, HINTS_HEIGHT + 8.0 if rect == BookLayout.RIGHT else 0.0)
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_book_root().add_child(c)
+		_sheets[rect] = c
+	return _sheets[rect]
+
+
+## A Control the size and place of the book, that every sheet hangs from.
+func _book_root() -> Control:
+	if _book == null:
+		_book = Control.new()
+		_book.name = "Book"
+		_book.size = BookLayout.SIZE
+		_book.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_book)
+		_place_book()
+		get_viewport().size_changed.connect(_place_book)
+	return _book
+
+
+func _place_book() -> void:
+	_book.position = BookLayout.origin(get_viewport().get_visible_rect().size)
 
 
 ## Something new on the page she hasn't looked at yet (a mark on its tab).

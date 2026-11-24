@@ -8,9 +8,9 @@ const VARIATIONS := {
 		&"SatchelCard", &"SatchelDetail", &"NotifyCard", &"SatchelChip", &"SatchelKey",
 		&"QuickBarSlot", &"QuickBarSlotSelected",
 	],
-	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot"],
+	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab"],
 	&"Label": [
-		&"SatchelHeading", &"MenuTitle", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
+		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
 		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"QuickBarKey", &"QuickBarCount",
 		&"NotifyText", &"ThoughtText",
 	],
@@ -86,7 +86,7 @@ func test_it_is_the_project_theme() -> void:
 	var label := Label.new()
 	label.theme_type_variation = &"MenuTitle"
 	add_child_autofree(label)
-	assert_eq(label.get_theme_font_size(&"font_size"), 44, "a bare Control wears it with no code")
+	assert_eq(label.get_theme_font_size(&"font_size"), 40, "a bare Control wears it with no code")
 
 
 func test_the_project_theme_follows_the_story_across_the_wall() -> void:

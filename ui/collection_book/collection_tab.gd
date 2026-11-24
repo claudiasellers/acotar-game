@@ -1,16 +1,13 @@
-## The collection book as a page of the menu shell (MenuShell): built once,
-## its grid redrawn only when another of the book's tabs is shown or its
-## entries changed. J (pad Back) opens it; Z / X (pad LT / RT) flip the book's
-## own tabs, as the satchel's pockets. The look is the satchel's (JournalTheme:
-## framed paper, stitched tabs and slots, the serif); no colours or fonts here.
+## The collection page of Feyre's journal: built once, its grid redrawn only
+## when another of its own tabs is shown or its entries changed. J (pad Back)
+## opens it; Z / X (pad LT / RT) flip its tabs, as the satchel's pockets. The
+## left sheet says what she is collecting and how far along she is; the right
+## sheet is the things themselves. Look: JournalTheme variations only.
 class_name CollectionTab
 extends MenuTab
 
 const UI := preload("res://ui/collection_book/collection_book_ui.gd")
-const WIDTH := 1260.0
-const GRID_HEIGHT := 520.0
-## Clear space under the card.
-const BOTTOM := 40.0
+const COLUMNS := 5
 
 ## Always the live book (Gameplay.reset makes a new one).
 var book: CollectionBook:
@@ -18,8 +15,6 @@ var book: CollectionBook:
 		return Gameplay.collection
 var page: StringName = &""
 
-var _root: Control
-var _card: Control
 var _buttons: Dictionary = {}  # tab -> Button
 var _bar: ProgressBar
 var _count: Label
@@ -81,7 +76,6 @@ func _shown() -> void:
 	_watch()
 	FindCard.clear(get_tree())
 	show_page(_first_page())
-	Juice.bounce_control(_card, 0.03)
 
 
 func _hidden() -> void:
@@ -151,67 +145,44 @@ func _page_input(event: InputEvent) -> bool:
 
 
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_root)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.offset_top = page_top()
-	center.offset_bottom = -BOTTOM
-	_root.add_child(center)
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"SatchelDetail"
-	panel.custom_minimum_size = Vector2(WIDTH, 0)
-	center.add_child(panel)
-	_card = panel
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override(&"separation", 10)
-	panel.add_child(box)
-	box.add_child(_label("My collection", &"SatchelHeading"))
+	var left := column(left_sheet())
+	left.add_child(BookKit.title("Collection"))
 	var tabs := HFlowContainer.new()
-	tabs.add_theme_constant_override(&"h_separation", 8)
+	tabs.add_theme_constant_override(&"h_separation", 6)
 	tabs.add_theme_constant_override(&"v_separation", 6)
-	box.add_child(tabs)
+	left.add_child(tabs)
+	left.add_child(BookKit.gap(8))
 	_bar = ProgressBar.new()
 	_bar.theme_type_variation = &"SatchelMeter"
 	_bar.custom_minimum_size = Vector2(0, 16)
 	_bar.show_percentage = false
-	box.add_child(_bar)
-	var count_row := HBoxContainer.new()
-	box.add_child(count_row)
-	_count = _label("", &"SatchelSmall")
-	_count.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	count_row.add_child(_count)
-	_reward = _label("", &"SatchelWhere")
-	_reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	count_row.add_child(_reward)
+	left.add_child(_bar)
+	_count = BookKit.label("", &"SatchelSmall")
+	left.add_child(_count)
+	_reward = BookKit.label("", &"SatchelWhere", true)
+	left.add_child(_reward)
+	left.add_child(BookKit.spring())
+	_detail = BookKit.label("", &"SatchelBody", true)
+	_detail.custom_minimum_size = Vector2(0, 120)
+	left.add_child(_detail)
+	var sky := BookKit.sky(420.0)
+	sky.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	left.add_child(sky)
+
+	var right := column(right_sheet())
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, GRID_HEIGHT)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
+	right.add_child(scroll)
 	_grid = GridContainer.new()
-	_grid.columns = 8
-	_grid.add_theme_constant_override(&"h_separation", 10)
-	_grid.add_theme_constant_override(&"v_separation", 10)
+	_grid.columns = COLUMNS
+	_grid.add_theme_constant_override(&"h_separation", 12)
+	_grid.add_theme_constant_override(&"v_separation", 12)
 	scroll.add_child(_grid)
-	_detail = _label("", &"SatchelBody")
-	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_detail)
 	for tab in CollectionBook.TABS:
-		var b := Button.new()
-		b.theme_type_variation = &"SatchelTab"
-		b.toggle_mode = true
-		b.focus_mode = Control.FOCUS_NONE
+		var b := BookKit.chip("")
 		b.pressed.connect(show_page.bind(tab))
 		tabs.add_child(b)
 		_buttons[tab] = b
 	UI._refresh_labels(_buttons, book)
-
-
-func _label(text: String, variation: StringName) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
+	set_hints([["Z X", "Flip"], ["J", "Close"], ["Esc", "Back"]])

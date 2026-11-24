@@ -53,10 +53,17 @@ const COLORS := {
 	},
 }
 
+## The pastel washes she paints with: one per index tab of the book, and the
+## blot behind a thing drawn on a page. The same in both acts.
+const WASHES: Array[Color] = [
+	Color("#f4c6d4"), Color("#d9c9f4"), Color("#bfe6cf"), Color("#f3e2a4"), Color("#bcd3f0"),
+]
+
 ## Label variation -> [size, font: "display" | "body" | "hand", weight, colour token]
 const LABELS := {
-	&"SatchelHeading": [30, "display", 400, &"ink"],
-	&"MenuTitle": [44, "display", 400, &"ink"],
+	&"SatchelHeading": [34, "display", 400, &"ink"],
+	&"MenuTitle": [40, "display", 400, &"ink"],
+	&"PageSection": [18, "display", 400, &"line"],
 	&"SatchelBody": [20, "body", 500, &"ink"],
 	&"SatchelSmall": [16, "body", 600, &"ink_soft"],
 	&"SatchelWhere": [20, "hand", 500, &"ink_soft"],
@@ -71,6 +78,8 @@ const PANELS: Array[StringName] = [
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
+## An index tab along the top of the book. White, so each wears its own wash.
+const INDEX_TAB := &"BookTab"
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
@@ -92,6 +101,11 @@ static func color(token: StringName) -> Color:
 
 static func colors(of_act: Act) -> Dictionary:
 	return COLORS[of_act]
+
+
+## The wash for the nth thing in a row (tabs, slots), going round.
+static func wash(i: int) -> Color:
+	return WASHES[posmod(i, WASHES.size())]
 
 
 ## A font of the journal at a weight ("display" has one weight).
@@ -149,23 +163,43 @@ static func build(of_act: Act) -> Theme:
 
 	for v in BUTTONS:
 		t.set_type_variation(v, &"Button")
-		var pad := Vector2(8, 8) if v == &"SatchelSlot" else Vector2(20, 9)
-		var radius := 10 if v == &"SatchelSlot" else 999
-		t.set_stylebox(&"normal", v, _pill(Color(c.paper, 0.0 if v == &"SatchelSlot" else 1.0), Color(c.line, 0.55), 1, pad, radius))
-		t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.line, 1, pad, radius))
-		t.set_stylebox(&"pressed", v, _pill(c.ink, c.glow, 2, pad, radius))
-		t.set_stylebox(&"hover_pressed", v, _pill(c.ink, c.glow, 2, pad, radius))
-		t.set_stylebox(&"disabled", v, _pill(Color(c.paper, 0.4), Color(c.line, 0.2), 1, pad, radius))
-		var ring := _pill(Color(0, 0, 0, 0), c.glow, 2, pad, radius)
-		ring.draw_center = false
-		t.set_stylebox(&"focus", v, ring)
+		if v == &"SatchelSlot":
+			# A thing drawn on the page: no box until it is pointed at or chosen.
+			t.set_stylebox(&"normal", v, _arch(Color(c.paper, 0.0), Color(c.line, 0.0), 0))
+			t.set_stylebox(&"hover", v, _arch(Color(c.paper_deep, 0.6), Color(c.line, 0.5), 1))
+			t.set_stylebox(&"pressed", v, _arch(Color(c.glow, 0.16), c.glow, 3))
+			t.set_stylebox(&"hover_pressed", v, _arch(Color(c.glow, 0.22), c.glow, 3))
+			t.set_stylebox(&"disabled", v, _arch(Color(c.paper, 0.0), Color(c.line, 0.0), 0))
+			t.set_stylebox(&"focus", v, _arch(Color(c.glow, 0.0), c.glow, 3))
+		else:
+			var pad := Vector2(15, 7)
+			t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.55), 1, pad))
+			t.set_stylebox(&"hover", v, _pill(c.paper_deep, c.line, 1, pad))
+			t.set_stylebox(&"pressed", v, _pill(c.ink, c.glow, 2, pad))
+			t.set_stylebox(&"hover_pressed", v, _pill(c.ink, c.glow, 2, pad))
+			t.set_stylebox(&"disabled", v, _pill(Color(c.paper, 0.4), Color(c.line, 0.2), 1, pad))
+			var ring := _pill(Color(0, 0, 0, 0), c.glow, 2, pad)
+			ring.draw_center = false
+			t.set_stylebox(&"focus", v, ring)
 		t.set_font(&"font", v, font("body", 700))
-		t.set_font_size(&"font_size", v, 18)
+		t.set_font_size(&"font_size", v, 17)
 		for state in [&"font_color", &"font_hover_color", &"font_focus_color"]:
 			t.set_color(state, v, c.ink)
 		for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
 			t.set_color(state, v, c.paper)
 		t.set_color(&"font_disabled_color", v, Color(c.ink, 0.35))
+	for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
+		t.set_color(state, &"SatchelSlot", c.ink)
+
+	t.set_type_variation(INDEX_TAB, &"Button")
+	for state in BUTTON_STATES:
+		var on: bool = state in [&"pressed", &"hover_pressed"]
+		t.set_stylebox(state, INDEX_TAB, _index_tab(c.paper if on else Color.WHITE, 16.0 if on else (4.0 if state == &"hover" else 0.0)))
+	t.set_stylebox(&"focus", INDEX_TAB, StyleBoxEmpty.new())
+	t.set_font(&"font", INDEX_TAB, font("display"))
+	t.set_font_size(&"font_size", INDEX_TAB, 19)
+	for state in [&"font_color", &"font_hover_color", &"font_focus_color", &"font_pressed_color", &"font_hover_pressed_color"]:
+		t.set_color(state, INDEX_TAB, c.ink)
 
 	for v: StringName in LABELS:
 		var spec: Array = LABELS[v]
@@ -180,6 +214,18 @@ static func build(of_act: Act) -> Theme:
 		t.set_font_size(&"font_size", v, 16 if v == &"SatchelCount" else 14)
 		t.set_color(&"font_color", v, c.ink)
 		t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.8), 1, Vector2(9, 1)))
+
+	# Hairlines and slim scroll bars, everywhere.
+	var rule := StyleBoxLine.new()
+	rule.color = Color(c.line, 0.45)
+	rule.thickness = 1
+	t.set_stylebox(&"separator", &"HSeparator", rule)
+	t.set_constant(&"separation", &"HSeparator", 6)
+	for bar in [&"VScrollBar", &"HScrollBar"]:
+		t.set_stylebox(&"scroll", bar, _pill(Color(c.line, 0.12), Color(0, 0, 0, 0), 0, Vector2(4, 4)))
+		t.set_stylebox(&"grabber", bar, _pill(Color(c.line, 0.6), Color(0, 0, 0, 0), 0, Vector2(4, 4)))
+		t.set_stylebox(&"grabber_highlight", bar, _pill(c.line, Color(0, 0, 0, 0), 0, Vector2(4, 4)))
+		t.set_stylebox(&"grabber_pressed", bar, _pill(c.accent, Color(0, 0, 0, 0), 0, Vector2(4, 4)))
 
 	t.set_type_variation(&"SatchelMeter", &"ProgressBar")
 	t.set_stylebox(&"background", &"SatchelMeter", _pill(c.paper_deep, Color(c.line, 0.5), 1, Vector2(0, 4)))
@@ -196,6 +242,24 @@ static func _paper(path: String, tint: Color, edge: int, margin: int) -> StyleBo
 	box.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
 	box.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
 	box.modulate_color = tint
+	return box
+
+
+## A slot on a page: an arch, round at the top like a specimen window.
+static func _arch(fill: Color, rim: Color, width: int) -> StyleBoxFlat:
+	var box := _pill(fill, rim, width, Vector2(6, 6), 12)
+	box.corner_radius_top_left = 999
+	box.corner_radius_top_right = 999
+	return box
+
+
+## An index tab: round shoulders, no foot, and `rise` px taller when it is
+## the page in front.
+static func _index_tab(fill: Color, rise: float) -> StyleBoxFlat:
+	var box := _pill(fill, Color(0, 0, 0, 0), 0, Vector2(22, 12), 0)
+	box.corner_radius_top_left = 14
+	box.corner_radius_top_right = 14
+	box.expand_margin_top = rise
 	return box
 
 

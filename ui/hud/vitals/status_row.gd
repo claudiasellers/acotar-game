@@ -15,8 +15,7 @@ const RING_W := 4.0
 const TRACK := Color(0.227, 0.141, 0.267, 0.16)
 const DEBUFF_RING := Color("#7A1E2A")
 const VENOM_RING := Color("#6F7F3A")
-## Gilt rim width as a share of the radius, as on the satchel's enamel chip
-## (ui/satchel/crafted/chip_enamel.png), drawn smooth at medallion size.
+## Gilt rim width as a share of the radius.
 const RIM := 0.16
 const POP_SECONDS := 0.35
 

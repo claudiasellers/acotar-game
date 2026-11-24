@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bxces426kg0t6"
-path="res://.godot/imported/patch_linen.png-aee7428aa8cfe8560b2d0cd9f6461d49.ctex"
+uid="uid://cbs2nvcuvejrh"
+path="res://.godot/imported/sky.png-ff91422ae2e92f6d3e1bbc0379e8ff33.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/satchel/crafted/patch_linen.png"
-dest_files=["res://.godot/imported/patch_linen.png-aee7428aa8cfe8560b2d0cd9f6461d49.ctex"]
+source_file="res://ui/menu/art/sky.png"
+dest_files=["res://.godot/imported/sky.png-ff91422ae2e92f6d3e1bbc0379e8ff33.ctex"]
 
 [params]
 
