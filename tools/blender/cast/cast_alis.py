@@ -33,6 +33,7 @@ WARP = dict(height=HEIGHT, head=1.02, legs=0.95, arm_len=0.97, arm_thick=1.08,
             wx=((0.0, 1.06), (0.45, 1.10), (0.85, 1.16), (1.00, 1.18), (1.15, 1.14), (1.28, 1.08), (1.47, 1.0)),
             wy=((0.0, 1.04), (0.85, 1.10), (1.00, 1.16), (1.15, 1.12), (1.30, 1.04), (1.47, 1.0)))
 GAIT = "female"
+ARM_CLEAR = 8.0      # her apron stands out from the hip
 SKIN_LINEAR = (0.74, 0.49, 0.37)        # warm, ruddy, outdoorsy
 SKIN_SRGB = "E2B79C"
 IRIS = ((0.11, 0.065, 0.03), (0.33, 0.20, 0.09), (0.55, 0.38, 0.15))   # warm brown
