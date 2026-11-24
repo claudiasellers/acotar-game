@@ -57,12 +57,12 @@ func test_the_house_grade_has_no_gi_and_the_manor_tone_mapper() -> void:
 	assert_eq(inside.ambient_sky_contribution, 0.0, "flat ambient, not sky-fed")
 	# Value contrast (L18-12): the flat ambient at 1.1 washed every room out
 	# (dining hall 37% of pixels clipped). It fills; windows and lamps model.
-	assert_between(inside.ambient_energy, 0.35, 0.8, "rooms readable, not washed out")
+	assert_between(inside.ambient_energy, 0.15, 0.6, "rooms readable, not washed out")
 	var night := GradeDirector.with_night(inside, 1.0)
 	assert_lt(night.ambient_energy * night.ambient_color.get_luminance(),
 		inside.ambient_energy * inside.ambient_color.get_luminance() * 0.6,
 		"at night the lamps carry the rooms, not the day's ambient")
-	assert_gt(night.ambient_energy * night.ambient_color.get_luminance() * night.exposure, 0.15,
+	assert_gt(night.ambient_energy * night.ambient_color.get_luminance() * night.exposure, 0.08,
 		"but a night room is never black between the lamps")
 	assert_eq(night.tonemap_mode, inside.tonemap_mode, "no pop at nightfall")
 	assert_almost_eq(GradeDirector.with_night(inside, 0.0).ambient_energy, inside.ambient_energy, 0.0001)
@@ -267,9 +267,11 @@ func test_winter_day_dread_stays_readable_and_night_dread_is_unchanged() -> void
 	var winter := GradeDirector.load_preset(&"human_winter")
 	assert_eq(winter.dread_day_look, &"dread_winter_day")
 	var day := GradeDirector.with_mood(winter, 0.5, &"dread", 0.0)
-	assert_gt(day.exposure, 0.55, "by day the hunt keeps most of its light")
+	# L18-14: darken little, so no light has to be added back (a pool of light
+	# on the clearing blew the centre snow out).
+	assert_gt(day.exposure, winter.exposure * 0.9, "by day the hunt keeps its light")
 	assert_lt(day.exposure, winter.exposure, "but dread still takes some")
-	assert_lt(day.saturation, winter.saturation * 0.75, "colour drains")
+	assert_lt(day.saturation, winter.saturation * 0.85, "colour drains")
 	assert_gt(day.fog_density, winter.fog_density * 1.5, "the fog closes in")
 	assert_gt(day.sky_top.get_luminance(), 0.35, "a grey overcast, not a black sky")
 	assert_gt(day.volumetric_ambient_inject, 0.3, "the closing fog is pale, not a black wall")

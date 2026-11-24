@@ -43,6 +43,10 @@ var _settings: SettingsTab
 var _slots: TitleSlots
 var _leaving := false
 var _ambience: AudioStreamPlayer
+## Starts the fresh program a new game after a game needs (tests swap it).
+var relaunch: Callable = func(args: PackedStringArray) -> void:
+	OS.create_instance(args)
+	get_tree().quit()
 
 
 func _ready() -> void:
@@ -209,11 +213,22 @@ func _enter_game() -> void:
 
 func _load_game() -> void:
 	if PhaseManager.phase_set != null and GameSettings.pending_load_slot == "":
-		OS.create_instance(PackedStringArray(["--", NEW_STORY_ARG + SaveSystem.active_slot]))
-		get_tree().quit()
+		relaunch.call(relaunch_args(SaveSystem.active_slot))
 		return
 	# A new game opens with the opening film (L33), which goes on to GAME_SCENE.
 	get_tree().change_scene_to_file(OpeningFilm.route(GameSettings.pending_load_slot))
+
+
+## The fresh program's arguments. It is told where the project is: on a Mac the
+## engine starts it as a new app instance, which begins in "/" and, run from
+## the editor's engine rather than an export, finds no game there (T144: New
+## Game over a story closed the game and nothing came back).
+static func relaunch_args(slot: String) -> PackedStringArray:
+	var args := PackedStringArray()
+	if not OS.has_feature("template"):
+		args.append_array(["--path", ProjectSettings.globalize_path("res://")])
+	args.append_array(["--", NEW_STORY_ARG + slot])
+	return args
 
 
 func _lift() -> void:
