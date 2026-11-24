@@ -210,6 +210,7 @@ func _build_right(col: VBoxContainer) -> void:
 	col.add_child(BookKit.label("She sprints twice as long and catches higher ledges from any side.", &"SatchelSmall"))
 	_check(col, &"reduced_effects", "Reduced effects")
 	col.add_child(BookKit.label("No camera shake; softer sparkles and bounces.", &"SatchelSmall"))
+	_check(col, &"key_hints", "Key hints, the first time a key matters")
 
 	# Her HUD on one row: when the meters show, how strong the screen's edges
 	# are, and the hit marks.
