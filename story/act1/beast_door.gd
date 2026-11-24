@@ -64,7 +64,7 @@ func _build_beats() -> Array:
 		Beats.run(_break_door, "the door breaks"),
 		Beats.raise("fact.cottage_door_broken"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(beast), "it fills the room"),
 		Beats.wait(2.5),
 		Beats.cue(&"tamlin_beast", &"accuse"),
@@ -72,14 +72,14 @@ func _build_beats() -> Array:
 		# The knife is the interact press, which the space reads itself; leaving
 		# interact out keeps E from also using the bed behind her.
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["fire"])), "window"),
+			StoryControl.hold(self, StoryControl.Mode.LOOK, PackedStringArray(["fire"])), "window"),
 		Beats.decision([
 			{"action": &"interact", "fact": "fact.beast_door.threw_knife"},
 			{"action": &"fire", "fact": "fact.beast_door.threw_bracelets"},
 		], decision_seconds, "fact.beast_door.froze"),
 		Beats.cue(&"tamlin_beast", &"speak"),
 		Beats.cue(&"father", &"plead"),
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.set_mode(StoryControl.Mode.LOOK), "a life for a life"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.hold(self, StoryControl.Mode.LOOK), "a life for a life"),
 		Beats.wait(4.0),
 		Beats.raise("beast_claim_accepted"),
 		Beats.cue(&"tamlin_beast", &"snap_ash_arrow"),

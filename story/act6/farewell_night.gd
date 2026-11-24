@@ -32,7 +32,7 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			var t := cast(&"tamlin", &"door", &"bed_side")
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(t)
 			EventBus.face_requested.emit(&"tamlin", &"sad", 0.7, 20.0), "moonlight, a knock"),
 		say(&"moonlight_thought"),
@@ -41,12 +41,12 @@ func _build_beats() -> Array:
 		say(&"feyre_when"),
 		say(&"tamlin_at_dawn"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			aside(&"hand_prompt"), "his hand"),
 		press_near(func() -> Vector3: return actor(&"tamlin").global_position if actor(&"tamlin") else mark(&"near_bed"), 2.4, "E: take his hand"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			EventBus.face_requested.emit(&"tamlin", &"tender", 0.9, 4.0)
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(actor(&"tamlin")), "she draws him in"),
 		Beats.wait(1.4),
 	] + fade_time(DAWN, _dawn, "he stays") + [
@@ -62,7 +62,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"alis")
 			stamp("fact.travel_dressed")
-			StoryControl.release(), "downstairs"),
+			StoryControl.release(self), "downstairs"),
 	]
 
 

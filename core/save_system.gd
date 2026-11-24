@@ -206,6 +206,7 @@ func begin_load(slot: String = "slot_0") -> Error:
 	active_slot = slot
 	play_seconds = float(parsed.get("play_seconds", 0))
 	_restore_story(parsed)
+	_settle_story_control()
 	return OK
 
 
@@ -220,6 +221,7 @@ func finish_load(slot: String = "slot_0") -> void:
 	_restore_providers(_loading)
 	_loading = {}
 	_autosave_due = false  # what the restore announced is not news
+	_settle_story_control()
 	EventBus.game_loaded.emit(slot)
 
 
@@ -227,6 +229,14 @@ func finish_load(slot: String = "slot_0") -> void:
 func begin_new(slot: String) -> void:
 	active_slot = slot
 	play_seconds = 0.0
+	_settle_story_control()
+
+
+## A load or a new story starts in free play: no scene from before it still
+## narrows her controls, and no dread it raised lingers.
+func _settle_story_control() -> void:
+	StoryControl.release()
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 
 
 func delete_save(slot: String) -> void:

@@ -63,7 +63,7 @@ func _build_beats() -> Array:
 			var t := cast(&"tamlin", &"tamlin_sit", &"brook")
 			if t and a:
 				t.global_position = snap(a.global_transform * TAMLIN_SIT)
-			StoryControl.release()
+			StoryControl.release(self)
 			aside(&"glen_thought"), "the glen"),
 		Beats.until(func() -> bool: return player_within(5.0, _blanket()), "she comes to the blanket"),
 		say(&"tamlin_sit_with_me"),

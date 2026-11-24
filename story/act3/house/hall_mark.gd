@@ -94,7 +94,7 @@ func _near() -> bool:
 func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_look)
 			DialogueDirector.line(self, StringName("hall_mark_%d" % n)), "she looks"),
 		Beats.wait(1.0),
@@ -105,5 +105,5 @@ func _build_beats() -> Array:
 				HallMap.note_on_map(self), "the mark"),
 		Beats.wait(1.2),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.release(), "back to the halls"),
+			StoryControl.release(self), "back to the halls"),
 	]

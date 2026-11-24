@@ -122,7 +122,7 @@ func shift_time() -> void:
 	TimeShift.fade_to(self, to, func() -> void:
 		shifting_time = false
 		if not start():
-			StoryControl.release())
+			StoryControl.release(self))
 
 
 func _player_here() -> bool:
@@ -253,7 +253,7 @@ func _finish() -> void:
 	_must_leave = true
 	if _mood_set:
 		EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.scene_space_finished.emit(space_id)
 	finished.emit()
 

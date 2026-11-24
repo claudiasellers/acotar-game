@@ -90,12 +90,12 @@ func _build_beats() -> Array:
 	_dwell.clear()
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK)
+			StoryControl.hold(self, StoryControl.Mode.WALK)
 			aside(&"painter_eye"), "before the mural"),
 		Beats.until(_look_around, "until she has studied it"),
 		Beats.raise("fact.mural_studied"),
 		say(&"whole"),
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(), "she steps back"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(self), "she steps back"),
 	]
 
 

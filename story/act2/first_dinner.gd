@@ -53,7 +53,7 @@ func _build_beats() -> Array:
 		Beats.raise("fact.first_dinner_seen"),
 		Beats.run(_set_the_scene, "set the scene"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK)
+			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin")), "walk to her chair"),
 		say(&"sit"),
 		reach_nudged(&"feyre_chair", 1.3, &"chair_where", NUDGE_AFTER),
@@ -82,7 +82,7 @@ func _build_beats() -> Array:
 			unseat_feyre()
 			EventBus.celebration_requested.emit(&"meal", mark(&"plate"))
 			_use_seat_camera(false)
-			StoryControl.release(), "the bonds loosen"),
+			StoryControl.release(self), "the bonds loosen"),
 		say(&"thanks"),
 		say(&"stay_for_wine"),
 		say(&"go_rest"),
@@ -116,7 +116,7 @@ func _sit(_s: SceneSpace) -> void:
 	seated = true
 	_seen_presses = presses()
 	_seen_nudges = nudges()
-	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
+	StoryControl.hold(self, StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(actor(&"tamlin"))
 	EventBus.mood_requested.emit(&"calm", 0.0, 1.0)
 	_use_seat_camera(true)

@@ -31,7 +31,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			found.clear()
 			_since = 0.0
-			StoryControl.release()
+			StoryControl.release(self)
 			if not actor(&"tamlin"):
 				var t := get_tree().get_first_node_in_group(&"story_actor_tamlin") as Node3D
 				if t:

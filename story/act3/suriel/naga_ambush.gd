@@ -226,7 +226,7 @@ func strike() -> void:
 func _fall() -> void:
 	falls += 1
 	_falling = FALL_SECONDS
-	StoryControl.set_mode(StoryControl.Mode.NONE)
+	StoryControl.hold(self, StoryControl.Mode.NONE)
 	EventBus.mood_requested.emit(&"dread", 1.0, 0.6)
 
 
@@ -313,7 +313,7 @@ func _wake() -> void:
 	_fail = true
 	_rest = REST_SECONDS
 	running = false
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.mood_requested.emit(&"dread", 0.5, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 

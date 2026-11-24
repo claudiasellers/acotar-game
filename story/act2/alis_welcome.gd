@@ -46,7 +46,7 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"alis", &"alis_spot", &"feyre_start")
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"alis")), "Alis waits"),
 		say(&"alis_bath_drawn"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -67,7 +67,7 @@ func _build_beats() -> Array:
 		Beats.raise("fact.alis_bathed"),
 		say(&"alis_dinner"),
 	] + fade_time(DINNER_HOUR, _down_to_dinner, "down to dinner") + [
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(), "dinner"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(self), "dinner"),
 	]
 
 

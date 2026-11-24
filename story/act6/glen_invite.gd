@@ -25,7 +25,7 @@ func _build_beats() -> Array:
 			var t := cast(&"tamlin", &"tamlin_steps", &"feyre_door")
 			if t:
 				t.global_position = ground_mark(&"tamlin_steps")
-			StoryControl.release(), "Tamlin on the steps"),
+			StoryControl.release(self), "Tamlin on the steps"),
 		Beats.until(func() -> bool: return player_within(4.0, ground_mark(&"tamlin_steps")), "she walks out to him"),
 		say(&"tamlin_come"),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"press_go"), "her answer is to go"),

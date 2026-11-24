@@ -114,7 +114,7 @@ func abort(fail_fact: String = "") -> void:
 	failed.emit(fail_fact)
 	running = false
 	_must_leave = true
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 
@@ -163,7 +163,7 @@ func _beat_for(step: Dictionary) -> SceneBeat:
 			var focus_id := String(step.get("focus", ""))
 			var allow := PackedStringArray(step.get("allow", []))
 			return Beats.run(func(_sp: SceneSpace) -> void:
-				StoryControl.set_mode(mode, allow)
+				StoryControl.hold(self, mode, allow)
 				StoryControl.set_focus(actor(focus_id) if focus_id != "" else null), "control %s" % step.get("mode"))
 		"spawn":
 			return Beats.run(func(_sp: SceneSpace) -> void: _spawn(step), "spawn %s" % step.get("actor"))

@@ -110,7 +110,7 @@ func _foyer_beats() -> Array:
 	if not WorldState.has_flag("fact.hall_map_set_down"):
 		beats += [
 			Beats.run(func(_s: SceneSpace) -> void:
-				StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+				StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 				_show_glint(mark(&"foyer_map") + Vector3.UP * 0.25), "at the foyer table"),
 			_use_at(&"foyer_map", TABLE_REACH, "until she sets the map down"),
 			Beats.run(_set_map_down, "the map on the table"),
@@ -126,7 +126,7 @@ func _foyer_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			EventBus.mood_requested.emit(&"dread", 0.75, 2.5)
 			note_mood()
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_marker(&"garden_doors")), "a breeze"),
 		say(&"breeze"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -225,7 +225,7 @@ func _end_flash() -> void:
 func _walk_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK)
+			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(null)
 			_play(actor(&"tamlin"), &"walk"), "he leads"),
 		lead_along(&"tamlin", INFIRMARY_ROUTE, 6.0, 1.3),
@@ -244,7 +244,7 @@ func _walk_beats() -> Array:
 func _infirmary_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			EventBus.mood_requested.emit(&"calm", 0.0, 3.0), "the small infirmary"),
 		say(&"supplies"),
 		Beats.until(_gather, "until the supplies are on the table"),
@@ -266,7 +266,7 @@ func _infirmary_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"tamlin")
 			_hide_glint()
-			StoryControl.release(), "alone with the clean bowl"),
+			StoryControl.release(self), "alone with the clean bowl"),
 	]
 
 

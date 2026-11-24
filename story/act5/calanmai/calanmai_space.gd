@@ -75,7 +75,7 @@ func shift_time() -> void:
 	TimeShift.fade_to(self, shift_hour / 24.0, func() -> void:
 		shifting_time = false
 		if not start():
-			StoryControl.release())
+			StoryControl.release(self))
 
 
 ## A spoken line with the face its speaker wears for it. The director moves

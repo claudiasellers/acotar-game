@@ -52,7 +52,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			var l := cast(&"lucien", &"lucien_steps", &"stable_door")
 			l.global_position.y = ManorGrounds.ground(l.global_position.x, l.global_position.z)
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"lucien")), "Lucien in the stable yard"),
 		say(&"lucien_hunt"),
 		say(&"feyre_dressed"),

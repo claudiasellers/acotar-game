@@ -132,11 +132,11 @@ func _on_killed(_id: StringName, kind: StringName, _cause: StringName, _at: Vect
 ## The scene may end (and release her controls) while the kill still plays.
 func _on_space_finished(space_id: StringName) -> void:
 	if (stage == &"fall" or stage == &"breaths") and not _yielded and space_id == _own_id():
-		StoryControl.set_mode(StoryControl.Mode.NONE)
+		StoryControl.hold(self, StoryControl.Mode.NONE)
 
 
 ## Another scene starting owns her controls: the kill cuts back to her camera
-## and leaves StoryControl alone.
+## and lets go of only its own hold.
 func _on_space_started(space_id: StringName) -> void:
 	if (stage == &"fall" or stage == &"breaths") and space_id != _own_id():
 		_yielded = true
@@ -155,7 +155,7 @@ func _kill() -> void:
 	stage = &"fall"
 	_since = 0.0
 	_noticing = false
-	StoryControl.set_mode(StoryControl.Mode.NONE)
+	StoryControl.hold(self, StoryControl.Mode.NONE)
 	var anim := _animator()
 	if anim:
 		anim.slow(0.3, 0.45, 1.2)
@@ -184,8 +184,8 @@ func _end() -> void:
 		return
 	stage = &"release"
 	Cine.of(get_tree()).drop(self, RELEASE)
-	if not _yielded:
-		StoryControl.release()
+	# Only its own hold: a scene that took over keeps its own controls.
+	StoryControl.release(self)
 	await _real(RELEASE)
 	stage = &"done"
 

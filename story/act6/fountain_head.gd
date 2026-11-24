@@ -127,7 +127,7 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			_rim_time = 0.0
-			StoryControl.release()
+			StoryControl.release(self)
 			aside(&"irises_thought"), "she carries her paints out"),
 		DreadApproach.new(self),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"something_wrong"), "the heron"),
@@ -146,7 +146,7 @@ func _build_beats() -> Array:
 			t.look_at(Vector3(head_point().x, t.global_position.y, head_point().z), Vector3.UP)
 			var l := cast(&"lucien", &"lucien_behind", &"fountain")
 			l.global_position = snap(l.global_position)
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			EventBus.face_requested.emit(&"lucien", &"grim", 0.8, 6.0)
 			EventBus.face_requested.emit(&"tamlin", &"grim", 0.8, 6.0), "she backs into Tamlin"),
 		say(&"lucien_not_autumn"),
@@ -175,7 +175,7 @@ func _build_beats() -> Array:
 		say(&"paints_thought"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"tamlin")
-			StoryControl.release(), "the garden again"),
+			StoryControl.release(self), "the garden again"),
 	]
 
 
@@ -188,7 +188,7 @@ func _sting(_s: SceneSpace) -> void:
 	var p := player()
 	if p:
 		tins = prop(&"paint_tins_spilled", snap(p.global_position + p.global_transform.basis.z * -0.5), p.global_rotation.y)
-	StoryControl.set_mode(StoryControl.Mode.LOOK)
+	StoryControl.hold(self, StoryControl.Mode.LOOK)
 	StoryControl.set_focus(head)
 	_closeup()
 
@@ -292,7 +292,7 @@ class LookOrNudge:
 		if s.looking_at_point(s.head_point(), 14.0):
 			held += delta
 		if s._rim_time >= FountainHead.NUDGE_AFTER and s.head:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(s.head)
 			held += delta
 		return held >= FountainHead.LOOK

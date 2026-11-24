@@ -14,7 +14,6 @@ const HOLD := 0.7
 
 
 static func fade_to(owner: Node, to: float, then: Callable = Callable()) -> void:
-	StoryControl.set_mode(StoryControl.Mode.NONE)
 	var layer := CanvasLayer.new()
 	layer.name = "TimeShift"
 	layer.layer = UiLayers.VEIL
@@ -25,13 +24,15 @@ static func fade_to(owner: Node, to: float, then: Callable = Callable()) -> void
 	veil.modulate.a = 0.0
 	layer.add_child(veil)
 	owner.get_tree().root.add_child(layer)
+	# The veil owns the hold: freed early (a load), it lets go with it.
+	StoryControl.hold(layer, StoryControl.Mode.NONE)
 	var tween := layer.create_tween()
 	tween.set_ignore_time_scale(true)
 	tween.tween_property(veil, ^"modulate:a", 1.0, FADE)
 	tween.tween_callback(func() -> void: advance_to(to))
 	tween.tween_interval(HOLD)
 	tween.tween_callback(func() -> void:
-		StoryControl.release()
+		StoryControl.release(layer)
 		if then.is_valid():
 			then.call())
 	tween.tween_property(veil, ^"modulate:a", 0.0, FADE * 1.4)

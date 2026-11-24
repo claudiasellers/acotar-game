@@ -35,14 +35,14 @@ func _build_beats() -> Array:
 			cast(&"tamlin", &"tamlin_chair", &"table")
 			cast(&"lucien", &"lucien_chair", &"table")
 			EventBus.face_requested.emit(&"tamlin", &"grim", 0.6, 12.0)
-			StoryControl.release(), "lunch is laid"),
+			StoryControl.release(self), "lunch is laid"),
 		say(&"tamlin_letter"),
 		say(&"lucien_blight"),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"chair_prompt"), "her place"),
 		press_near(func() -> Vector3: return mark(&"feyre_chair"), 2.4, "E: sit down to lunch"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			place_feyre(mark(&"feyre_chair"))
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(actor(&"tamlin"))
 			stamp("fact.lunch_sat_down"), "she sits"),
 	]

@@ -352,7 +352,7 @@ func _give_up() -> void:
 	suriel = null
 	running = false
 	_must_leave = true
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.mood_requested.emit(&"calm", 0.0, 2.0)
 	EventBus.scene_space_finished.emit(space_id)
 

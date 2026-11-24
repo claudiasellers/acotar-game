@@ -27,7 +27,7 @@ func use(user: Node) -> void:
 
 func sleep() -> void:
 	sleeping = true
-	StoryControl.set_mode(StoryControl.Mode.NONE)
+	StoryControl.hold(self, StoryControl.Mode.NONE)
 	var layer := CanvasLayer.new()
 	layer.layer = UiLayers.VEIL
 	var veil := ColorRect.new()
@@ -44,7 +44,7 @@ func sleep() -> void:
 	tween.tween_property(veil, ^"modulate:a", 0.0, fade_seconds * 1.4)
 	tween.tween_callback(func() -> void:
 		layer.queue_free()
-		StoryControl.release()
+		StoryControl.release(self)
 		sleeping = false
 		SaveSystem.autosave())
 

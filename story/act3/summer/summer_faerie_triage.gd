@@ -237,7 +237,7 @@ func _read_line(wound: int) -> void:
 
 func _take_hand() -> void:
 	var can_hear := state.take_hand()
-	StoryControl.set_mode(StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
+	StoryControl.hold(self, StoryControl.Mode.LOOK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(faerie)
 	EventBus.story_actor_cue.emit(&"summer_faerie", &"hand_held")
 	if can_hear:
@@ -246,7 +246,7 @@ func _take_hand() -> void:
 
 func _let_go() -> void:
 	state.let_go()
-	StoryControl.release()
+	StoryControl.release(self)
 
 
 func _show_rag(on: bool) -> void:
@@ -308,7 +308,7 @@ func _at_death(_s: SceneSpace = null) -> void:
 	if with_him:
 		if not state.holding:
 			state.take_hand()
-		StoryControl.set_mode(StoryControl.Mode.NONE)
+		StoryControl.hold(self, StoryControl.Mode.NONE)
 		StoryControl.set_focus(faerie)
 		EventBus.story_actor_cue.emit(&"tamlin", &"holds_other_hand")
 		# Said while she still holds his hand ("awhile after"): it ends with the scene.
@@ -318,7 +318,7 @@ func _at_death(_s: SceneSpace = null) -> void:
 
 
 func _close(_s: SceneSpace = null) -> void:
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.story_actor_cue.emit(&"tamlin", &"prays")
 	if outcome == &"held":
 		EventBus.journal_entry_added.emit(&"summer_faerie_wings" if spoke else &"summer_faerie_held")

@@ -83,23 +83,23 @@ func _build_beats() -> Array:
 				PressCard.hide_on(self)
 			_sync_stripped()
 			var i := maxi(nearest_spot(), 0)
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_point(spots()[i]))
 			strip(i)
 			aside(&"trimmings"), "the curtain trimmings"),
 		Beats.wait(1.2),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "the other curtains"),
 		StripBeat.new(&"more_trimmings", NUDGE_AFTER),
 		Beats.run(func(s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			_make_rope(s)
 			StoryControl.set_focus(_marker(&"fixture"))
 			aside(&"rope_made"), "a rope from the trimmings"),
 		Beats.wait(1.5),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "to the door"),
 		reach_nudged(&"door_inside", 2.0, &"rig_now", NUDGE_AFTER),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -115,7 +115,7 @@ func _build_beats() -> Array:
 		say(&"locked"),
 	] + fade_time(DAWN, _before_dawn, "the night") + [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			cast(&"alis", &"alis_door", &"feyre_bed")
 			StoryControl.set_focus(actor(&"alis")), "the door unlocks"),
 		Beats.wait(0.8),
@@ -135,7 +135,7 @@ func _build_beats() -> Array:
 		say(&"alis_lucien"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"alis")
-			StoryControl.release(), "a new day"),
+			StoryControl.release(self), "a new day"),
 	]
 
 

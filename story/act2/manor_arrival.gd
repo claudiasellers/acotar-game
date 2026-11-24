@@ -39,14 +39,14 @@ func _ready() -> void:
 func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(_marker(&"front_door_glow"))
 			delight(&"unlock", &"front_door_glow")
 			aside(&"doors"), "the doors open by themselves"),
 		Beats.wait(2.0),
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"tamlin_beast", &"beast_start", &"dining_door")
-			StoryControl.set_mode(StoryControl.Mode.WALK)
+			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin_beast")), "the beast pads ahead"),
 		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0,
 			2.2, &"beast_waits", FOLLOW_NUDGE_AFTER),
@@ -68,7 +68,7 @@ func _build_beats() -> Array:
 		say(&"alis_bath"),
 		Beats.raise("fact.manor_arrived"),
 	] + fade_time(BATH_HOUR, _up_to_her_room, "up to her room") + [
-		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(), "her room"),
+		Beats.run(func(_s: SceneSpace) -> void: StoryControl.release(self), "her room"),
 	]
 
 
@@ -83,7 +83,7 @@ func _transform(_s: SceneSpace) -> void:
 		dismiss(&"tamlin_beast")
 	var tamlin := cast(&"tamlin", &"tamlin_seat", &"table")
 	sit(&"tamlin", &"chair_head_dining")
-	StoryControl.set_mode(StoryControl.Mode.LOOK)
+	StoryControl.hold(self, StoryControl.Mode.LOOK)
 	StoryControl.set_focus(tamlin)
 	StoryControl.shake = 0.0
 	if is_inside_tree():

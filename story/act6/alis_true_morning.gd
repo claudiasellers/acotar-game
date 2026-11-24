@@ -29,12 +29,12 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			var alis := cast(&"alis", &"alis_tray", &"bed_side")
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(alis), "Alis at the breakfast tray"),
 		Beats.wait(1.5),
 		say(&"bark_thought"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(null), "free to look"),
 		gaze_hold(func() -> Vector3: return _alis_face(), STARE, 16.0, "she stares at Alis"),
 		Beats.run(func(_s: SceneSpace) -> void:
@@ -50,7 +50,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void:
 			dismiss(&"alis")
 			stamp("fact.alis_true_seen")
-			StoryControl.release(), "Alis runs the bath"),
+			StoryControl.release(self), "Alis runs the bath"),
 		say(&"halls_thought"),
 	]
 

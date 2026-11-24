@@ -93,8 +93,8 @@ class ControlBeat:
 		allowed = a
 		label = "control %s" % StoryControl.Mode.keys()[m]
 
-	func enter(_space: SceneSpace) -> void:
-		StoryControl.set_mode(mode, allowed)
+	func enter(space: SceneSpace) -> void:
+		StoryControl.hold(space, mode, allowed)
 		StoryControl.set_focus(focus)
 
 

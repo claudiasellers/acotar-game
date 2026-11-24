@@ -55,23 +55,23 @@ func _build_beats() -> Array:
 		say(&"crowds_thought"),
 		say(&"lucien_wine_warning"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.release()
+			StoryControl.release(self)
 			aside(&"wine_prompt"), "the run of the party"),
 		PartyBeat.new(self),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"tamlin")), "the music ends"),
 		say(&"tamlin_come_away"),
 	] + fade_time(LATE, _night_falls, "later") + [
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.release()
+			StoryControl.release(self)
 			aside(&"follow_thought"), "she follows him"),
 		lead_over_ground(&"tamlin", [&"hollow_path", &"hollow_edge", &"hollow"], 6.0, 2.0),
 		Beats.run(_open_wisps, "the wisps"),
 		say(&"wisps_thought"),
 		DanceBeat.new(self),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(actor(&"tamlin"))
 			EventBus.face_requested.emit(&"tamlin", &"tender", 0.8, 4.0)
 			delight(&"unlock", &"", actor(&"tamlin")), "the kiss"),
@@ -85,7 +85,7 @@ func _build_beats() -> Array:
 		say(&"sunrise_thought"),
 		Beats.run(func(_s: SceneSpace) -> void:
 			_close()
-			StoryControl.release(), "morning"),
+			StoryControl.release(self), "morning"),
 	]
 
 
@@ -104,7 +104,7 @@ func _open_party(_s: SceneSpace) -> void:
 	_dress_party()
 	EventBus.grade_swap_requested.emit(PARTY_GRADE, 2.0)
 	SoundDirector.cue(&"music_spring_estate")
-	StoryControl.set_mode(StoryControl.Mode.LOOK)
+	StoryControl.hold(self, StoryControl.Mode.LOOK)
 	StoryControl.set_focus(t)
 
 

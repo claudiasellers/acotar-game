@@ -95,7 +95,7 @@ func _ready() -> void:
 	_load_score()
 	playing = true
 	_last_usec = Time.get_ticks_usec()
-	StoryControl.set_mode(StoryControl.Mode.NONE)
+	StoryControl.hold(self, StoryControl.Mode.NONE)
 	EventBus.scene_space_started.emit(space_id())
 	if data.bars > 0.0:
 		Cine.of(get_tree()).bars_to(data.bars, 1.0)
@@ -150,7 +150,7 @@ func _process(_delta: float) -> void:
 	if paused:
 		return
 	if StoryControl.mode != StoryControl.Mode.NONE:
-		StoryControl.set_mode(StoryControl.Mode.NONE)
+		StoryControl.hold(self, StoryControl.Mode.NONE)
 	if not _music_started and music.stream != null:
 		_music_started = true
 		music.play(time)
@@ -227,7 +227,7 @@ func _finish(was_skipped: bool) -> void:
 	LinePresenter.of(get_tree()).clear()
 	if data.bars > 0.0:
 		Cine.of(get_tree()).bars_to(0.0, 1.2)
-	StoryControl.release()
+	StoryControl.release(self)
 	EventBus.scene_space_finished.emit(space_id())
 	finished.emit(was_skipped)
 	var out := create_tween()
@@ -268,6 +268,6 @@ func _exit_tree() -> void:
 		ended = true
 		playing = false
 		_mark_seen()
-		StoryControl.release()
+		StoryControl.release(self)
 		EventBus.scene_space_finished.emit(space_id())
 		finished.emit(true)

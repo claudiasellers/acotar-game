@@ -36,7 +36,7 @@ func _build_beats() -> Array:
 			_build_carriage()
 			var l := cast(&"lucien", &"lucien_hall", &"feyre_door")
 			EventBus.face_requested.emit(&"lucien", &"angry", 0.8, 5.0)
-			StoryControl.set_mode(StoryControl.Mode.LOOK)
+			StoryControl.hold(self, StoryControl.Mode.LOOK)
 			StoryControl.set_focus(l), "Lucien in the hall"),
 		say(&"lucien_smarter"),
 		lead_along(&"lucien", [&"lucien_storms"], 0.0, 3.2),
@@ -44,7 +44,7 @@ func _build_beats() -> Array:
 			dismiss(&"lucien")
 			var t := cast(&"tamlin", &"tamlin_carriage", &"feyre_door")
 			t.global_position = ground_mark(&"tamlin_carriage")
-			StoryControl.release(), "out to the carriage"),
+			StoryControl.release(self), "out to the carriage"),
 		Beats.until(func() -> bool: return player_within(4.0, ground_mark(&"tamlin_carriage")), "she walks out to him"),
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"give_prompt"), "the paintings"),
 		press_near(func() -> Vector3: return ground_mark(&"tamlin_carriage"), 3.0, "E: give him the paintings"),
@@ -54,7 +54,7 @@ func _build_beats() -> Array:
 		Beats.run(func(_s: SceneSpace) -> void: aside(&"board_prompt"), "the carriage door"),
 		press_near(func() -> Vector3: return ground_mark(&"carriage_door"), 2.8, "E: get in"),
 		Beats.run(func(_s: SceneSpace) -> void:
-			StoryControl.set_mode(StoryControl.Mode.NONE)
+			StoryControl.hold(self, StoryControl.Mode.NONE)
 			note_mood()
 			EventBus.mood_requested.emit(&"enchanted_sleep", 1.0, 3.0)
 			stamp("fact.carriage_boarded"), "she gets in"),
@@ -64,7 +64,7 @@ func _build_beats() -> Array:
 		Beats.wait(1.5),
 		Beats.run(func(_s: SceneSpace) -> void:
 			EventBus.mood_requested.emit(&"calm", 0.0, 3.0)
-			StoryControl.release(), "she wakes"),
+			StoryControl.release(self), "she wakes"),
 	]
 
 
@@ -104,7 +104,7 @@ func _give(_s: SceneSpace) -> void:
 			n.reparent(t)
 			n.position = Vector3(0.0, 1.05, 0.3)
 	EventBus.face_requested.emit(&"tamlin", &"tender", 0.9, 6.0)
-	StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+	StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 	StoryControl.set_focus(t)
 
 

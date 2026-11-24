@@ -40,7 +40,7 @@ func _build_beats() -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			cast(&"alis", &"alis_tray", &"bed_side")
-			StoryControl.set_mode(StoryControl.Mode.WALK, PackedStringArray(["interact"]))
+			StoryControl.hold(self, StoryControl.Mode.WALK, PackedStringArray(["interact"]))
 			StoryControl.set_focus(actor(&"alis")), "Alis with news"),
 		say(&"ribbons_thought"),
 		say(&"alis_solstice"),
