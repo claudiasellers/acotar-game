@@ -112,15 +112,23 @@ func _draw() -> void:
 			for j in 6:
 				var a := TAU * j / 6.0 + k * 1.5
 				var p := c + Vector2(cos(a), sin(a)) * (r + 6.0 + 16.0 * k)
-				var rs := 5.0 * (1.0 - k)
-				draw_colored_polygon(PackedVector2Array([p + Vector2(0, -rs), p + Vector2(rs * 0.3, 0), p + Vector2(0, rs),
-					p + Vector2(-rs * 0.3, 0)]), Color(1.0, 0.93, 0.62, 1.0 - k))
+				var pts := sparkle_points(p, 5.0 * (1.0 - k))
+				if pts.size() >= 3:
+					draw_colored_polygon(pts, Color(1.0, 0.93, 0.62, 1.0 - k))
 	if overflow > 0:
 		var font := get_theme_default_font()
 		var at := _slot(shown.size()) + Vector2(-RADIUS + 8.0, 10.0)
 		var text := "+%d" % overflow
 		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(1.0, 0.97, 0.92))
 		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ring_color)
+
+
+## The sparkle diamond at `p`, half-height `rs`. Empty when it is too small to
+## triangulate: a zero-area polygon makes the engine log an error.
+static func sparkle_points(p: Vector2, rs: float) -> PackedVector2Array:
+	if rs < 0.5:
+		return PackedVector2Array()
+	return PackedVector2Array([p + Vector2(0, -rs), p + Vector2(rs * 0.3, 0), p + Vector2(0, rs), p + Vector2(-rs * 0.3, 0)])
 
 
 ## The centre of chip `i`: left to right along the bottom row, then the row

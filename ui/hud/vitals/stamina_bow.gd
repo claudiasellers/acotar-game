@@ -112,6 +112,8 @@ func _grid(i: int, radius: float) -> Vector2:
 
 
 func _star(p: Vector2, r: float, color: Color) -> void:
+	if r < 0.5:
+		return
 	draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r * 0.3, -r * 0.3), p + Vector2(r, 0),
 		p + Vector2(r * 0.3, r * 0.3), p + Vector2(0, r), p + Vector2(-r * 0.3, r * 0.3), p + Vector2(-r, 0),
 		p + Vector2(-r * 0.3, -r * 0.3)]), color)
