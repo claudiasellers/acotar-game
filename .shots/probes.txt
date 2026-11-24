@@ -1,0 +1,4 @@
+from L77
+quality look
+shot hud_human res://tools/ui/menu_open_probe.tscn shots {out}
+shot hud_spring res://tools/ui/menu_open_probe.tscn shots {out} p2_manor
