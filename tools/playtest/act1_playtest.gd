@@ -117,6 +117,8 @@ var _stand_ins: Array[Dictionary] = []
 var _actor_roots: Dictionary = {}
 var _primitives: Array[Dictionary] = []
 var _primitive_paths: Dictionary = {}
+## Clips set this: she holds her breath (Focus) through each shot.
+var focus_shots: bool = false
 
 
 func _ready() -> void:
@@ -726,6 +728,8 @@ func _shoot_at(target: Node3D) -> bool:
 		return false
 	# Aim held, let the sway settle; then fire held through the draw, and let go.
 	# From here she holds the ring on him, as a player does, not the screen's centre.
+	if focus_shots:
+		Input.action_press(&"focus")
 	for i in 75:
 		if is_instance_valid(target):
 			_hold_ring_on(target)
@@ -749,6 +753,7 @@ func _shoot_at(target: Node3D) -> bool:
 		(target.velocity as Vector3).length() if target is CharacterBody3D else 0.0])
 	Input.action_release(&"fire")
 	await get_tree().physics_frame
+	Input.action_release(&"focus")
 	Input.action_release(&"aim")
 	await _until(func() -> bool: return _last_landing != Vector3.INF, 2.0)
 	if not is_instance_valid(target):

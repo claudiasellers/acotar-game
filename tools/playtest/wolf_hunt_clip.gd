@@ -116,6 +116,7 @@ func _watch_and_shoot(hunt: WolfKill) -> void:
 	_pass()
 
 	_begin("shoot", "draw on him and hold; ash into his side; then the eye")
+	focus_shots = true
 	var wolf := hunt.wolf
 	for shot in 12:
 		if WorldState.has_flag("wolf_killed") or not is_instance_valid(wolf):

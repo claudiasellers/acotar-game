@@ -227,6 +227,10 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `aim_sensitivity` | bow_tuning.tres | 0.7 | 0.4–1.0 | Look speed while the bow is raised | L80 |
 | `kick_rise_s` / `kick_fall_s` | bow_tuning.tres | 0.06 / 0.15 | | Timing of the release kick | L80 |
 | `ring_unsettled_grow` | bow_tuning.tres | 0.3 | 0–0.5 | The reticle ring is this much larger while fully unsettled | L80 |
+| `draw_kept_when_hit` | bow_tuning.tres | 0.5 | 0–1 | Share of the draw she keeps when a blow lands (the arrow stays nocked) | L80 |
+| `draw_arc_gap` / `full_draw_catch_s` | bow_tuning.tres | 5 px / 0.18 s | 3–8 / 0.1–0.3 | The reticle's draw arc sits this far outside the ring and brightens this long when the draw closes: the cue for "now you can let go" | L80 |
+| `hit_pulse_s` | bow_tuning.tres | 0.22 s | 0.15–0.35 | The ring's one pulse (act accent) when her arrow finds a creature; off with Hit marks. Same pulse for every part of the body | L80 |
+| `hush_duck_db` / `hush_fade_s` | bow_tuning.tres | -12 dB / 0.12 s | -18–-6 / 0.08–0.3 | The Focus hush: the Ambience bus's amplify drops this far and its low-pass closes to 800 Hz, over this long | L80 |
 
 ## White mare saddle and seat (L47-8)
 
