@@ -77,7 +77,7 @@ func test_type_on_a_loose_page_reads() -> void:
 			assert_gte(_contrast(t.get_color(&"font_color", v), c[&"paper_deep"]), 4.5, "act %d: %s on the loose page" % [act, v])
 		# Thin strokes never reach their full colour on screen: small type is bold.
 		var small := t.get_font(&"font", &"SatchelSmall") as FontVariation
-		assert_gte(int(small.variation_opentype.get("wght", 0)), 700, "act %d: small type is bold" % act)
+		assert_gte(int(small.variation_opentype.get(TextServerManager.get_primary_interface().name_to_tag("wght"), 0)), 700, "act %d: small type is bold" % act)
 
 
 ## No two names on the stones' sketch touch, and none sits on another whorl.

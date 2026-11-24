@@ -57,7 +57,10 @@ var water_distance_fn: Callable = func(p: Vector3) -> float: return MacroHeight.
 var wind_fn: Callable = _default_wind
 var inventory: Inventory = Gameplay.inventory
 var answers: Array[SurielAnswer] = []
-var voice: SurielVoice
+## Feyre asks aloud first; its answer waits this long behind her question.
+const ASK_SECONDS := 2.4
+## The answer stays up until the next one, or until it is done with her.
+const ANSWER_HOLD := 600.0
 
 var _snare_node: Node3D
 var _bait_node: MeshInstance3D
@@ -65,6 +68,8 @@ var _bait_choices: Array[StringName] = []
 var _last_pos: Vector3 = Vector3.INF
 var _silenced: bool = false
 var _answer_t: float = 0.0
+var _pending: String = ""
+var _pending_in: float = 0.0
 var _answer_i: int = 0
 var _closing: float = -1.0
 
@@ -259,12 +264,20 @@ func _settle_quality() -> void:
 	quality = SnarePlan.score(setup).quality
 	answers_due = mini(SnarePlan.answers_for(quality), answers.size())
 	StoryControl.shake = 0.0
-	if voice == null:
-		voice = SurielVoice.new()
-		add_child(voice)
+
+
+## The Suriel's words, in the horror voice (R3), once her question has been said.
+func _answer(text: String) -> void:
+	if is_inside_tree():
+		LinePresenter.of(get_tree()).say(LinePresenter.Voice.DREAD, "", text, self, ANSWER_HOLD)
 
 
 func _listen(pos: Vector3, delta: float) -> bool:
+	if _pending != "":
+		_pending_in -= delta
+		if _pending_in <= 0.0:
+			_answer(_pending)
+			_pending = ""
 	if _closing >= 0.0:
 		_closing -= delta
 		if _closing < 0.0:
@@ -281,8 +294,8 @@ func _listen(pos: Vector3, delta: float) -> bool:
 		_say_next()
 		return false
 	# "We are not alone." (the cut blight answer already ends on it)
-	if voice and not answers_heard.is_empty() and not WorldState.has_flag("fact.%s_cut" % answers_heard[-1]):
-		voice.say("", "We are not alone.")
+	if not answers_heard.is_empty() and not WorldState.has_flag("fact.%s_cut" % answers_heard[-1]):
+		_answer("We are not alone.")
 	EventBus.story_actor_cue.emit(&"suriel", &"naga_are_coming")
 	_closing = 2.5
 	return false
@@ -292,9 +305,12 @@ func _say_next() -> void:
 	var a := answers[_answer_i]
 	var cut := _answer_i == answers.size() - 1 and not SnarePlan.blight_full(quality) and a.said_cut != ""
 	var text := a.said_cut if cut else a.said
-	if voice:
-		voice.say(a.asked, text)
-	_answer_t = maxf(5.5, text.length() / SurielVoice.CHARS_PER_SECOND + 2.5)
+	var lead := 0.0
+	if a.asked != "" and is_inside_tree():
+		lead = LinePresenter.of(get_tree()).say(LinePresenter.Voice.SAID, "Feyre", a.asked, self, ASK_SECONDS)
+	_pending = text
+	_pending_in = lead
+	_answer_t = lead + maxf(5.5, LinePresenter.writing_time(LinePresenter.Voice.DREAD, text) + 2.5)
 	answers_heard.append(a.id)
 	var entry := StringName("%s_cut" % a.id) if cut else a.id
 	WorldState.set_flag("fact.%s" % entry)
@@ -309,8 +325,9 @@ func _finish_answers() -> void:
 	StoryControl.set_focus(null)
 	WorldState.set_flag("fact.suriel_snare_quality", quality)
 	WorldState.set_flag("fact.suriel_scouted", scouted)
-	if voice:
-		voice.hide_voice()
+	_pending = ""
+	if is_inside_tree():
+		LinePresenter.of(get_tree()).clear_voice(LinePresenter.Voice.DREAD)
 
 
 ## Sketches a map place onto Feyre's map (WorldMapHud.reveal_place, L07).

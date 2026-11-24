@@ -59,7 +59,7 @@ gaze helpers (`view()`, `looking_at()`, `gaze_override` for tests),
 `summon()` (the real creature through `request_actor`, its own scene as the
 fallback), `place_player()`, `veil()`, looping `sound()`s from
 `Act2DreadAudio`, and `abort()` (ends without the deed). The Bogge's pleas go
-through `Act2Whisper` (a voice in her head, not the caption card).
+through `LinePresenter`'s Whisper voice (a voice in her head, bare and trembling in the middle of her view, not a said line).
 
 Creature calls they use (creature files owned by L25's behaviour work, never
 `creature.gd` or clips):

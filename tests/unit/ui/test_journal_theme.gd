@@ -61,7 +61,12 @@ func test_type_is_marcellus_nunito_and_cormorant() -> void:
 	assert_string_contains(JournalTheme.font("display").resource_path, "Marcellus")
 	var body := JournalTheme.font("body", 700) as FontVariation
 	assert_string_contains(body.base_font.resource_path, "Nunito")
-	assert_eq(body.variation_opentype, {"wght": 700})
+	# The weight is keyed by the axis tag's number; a name as the key is
+	# ignored by the engine and every label draws at the lightest cut.
+	assert_eq(body.variation_opentype, {TextServerManager.get_primary_interface().name_to_tag("wght"): 700})
+	var light := JournalTheme.font("body", 300)
+	assert_gt(body.get_string_size("The wood doesn't like strangers.").x,
+			light.get_string_size("The wood doesn't like strangers.").x, "a heavier weight really is heavier")
 	assert_string_contains((JournalTheme.font("hand") as FontVariation).base_font.resource_path, "CormorantI")
 	assert_same(JournalTheme.build(JournalTheme.Act.SPRING).default_font.get(&"base_font"), body.base_font)
 

@@ -65,3 +65,9 @@ the place is sketched and named, with no celebration (horror beat).
 rabbit, salt, 14 wood arrows and an ash arrow. Playtest:
 `tools/playtest/p3_suriel_playtest.tscn` (extends the Act I playtest);
 `--bait=ing_dead_chicken` runs the F21 A/B with the full-blight snare.
+
+## Its voice
+
+The answers show through `LinePresenter` (`docs/contracts/ui-frame.md`, "Line voices"): Feyre asks each
+question aloud in the Said voice for `ASK_SECONDS` (2.4 s), then the Suriel answers in the Dread voice,
+which stays up until the next answer or until it is done with her. No choices: she asks in book order (R2).

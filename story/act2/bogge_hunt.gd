@@ -242,9 +242,9 @@ func _on_begged(_line_id: StringName) -> void:
 	_plea_index += 1
 	pleas_shown.append(String(id))
 	if is_inside_tree() and stage:
-		var w := Act2Whisper.find_or_make(self)
-		w.tremble = 1.0 + 3.0 * acknowledged / MAX_LOOK
-		w.say(String(stage.line(id).get("text", "")), 3.0)
+		var lines := LinePresenter.of(get_tree())
+		lines.stand_of(LinePresenter.Voice.WHISPER).tremble = 1.0 + 3.0 * acknowledged / MAX_LOOK
+		lines.say(LinePresenter.Voice.WHISPER, "", String(stage.line(id).get("text", "")), self, 3.0)
 
 
 func _caption(line_id: StringName) -> void:

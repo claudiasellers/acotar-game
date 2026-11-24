@@ -55,9 +55,9 @@ deckled edge, tinted to a paper token. Made by
 
 | Variation | Base |
 |---|---|
-| SatchelCard, LoosePage, NotifyCard, LineBand, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
+| SatchelCard, LoosePage, NotifyCard, LineBand, LineFlood, LineBare, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
 | SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
-| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText, LineSaid, LineName | Label |
+| SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText, LineSaid, LineName, LineTold, LineWhisper, LineDread | Label |
 | SatchelMeter | ProgressBar |
 
 `CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
@@ -75,3 +75,17 @@ Their small pictures are drawn by `JournalTheme` when the theme is built.
 - After changing a token, run
   `tools/mq/godot.sh -s tools/ui_theme/build_journal_theme.gd` and commit
   `journal_theme.tres`. Don't hand-edit the `.tres`.
+
+## Font weights
+
+`JournalTheme.font(face, weight)` sets the weight axis by the tag's number
+(`TextServer.name_to_tag("wght")`). **Never key `variation_opentype` by the
+axis name**: the engine ignores a string key without a word, and every label
+drew at Nunito's lightest cut (200) until step 7a found it.
+
+## The horror palette
+
+`JournalTheme.HORROR` (`bone`, `pall`, `blood`) is the same in both acts and
+is worn only by the `LineWhisper`, `LineDread` and `LineFlood` variations (R3:
+horror is never dressed up as the pretty UI). It is not in `COLORS`, so
+`JournalTheme.color()` never hands it to a page.

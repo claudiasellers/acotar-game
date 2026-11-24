@@ -38,7 +38,6 @@ var playing: bool = false
 var skipped: bool = false
 var ended: bool = false
 var veil: ColorRect
-var captions: FilmCaptions
 var skip_control: FilmSkip
 var music: AudioStreamPlayer
 
@@ -83,8 +82,6 @@ func _ready() -> void:
 	veil.color = Color(0, 0, 0, 0)
 	_veil_layer.add_child(veil)
 	_text_layer = _layer(LAYER_TEXT, "FilmText")
-	captions = FilmCaptions.new()
-	_text_layer.add_child(captions)
 	skip_control = FilmSkip.new()
 	skip_control.skip.connect(skip)
 	_text_layer.add_child(skip_control)
@@ -183,7 +180,10 @@ func _fire_until(t: float) -> void:
 		var l := data.lines[_next_line]
 		_next_line += 1
 		if t - l.at < l.hold:
-			captions.show_line(l)
+			# Narration is told; a speaker's line is said, under their name.
+			LinePresenter.of(get_tree()).say(
+					LinePresenter.Voice.TOLD if l.speaker == &"" else LinePresenter.Voice.SAID,
+					String(l.speaker).capitalize(), l.text, self, l.hold - (t - l.at))
 			line_shown.emit(l)
 
 
@@ -224,7 +224,7 @@ func _finish(was_skipped: bool) -> void:
 		var fade := create_tween()
 		fade.tween_property(music, ^"volume_db", -40.0, 1.0)
 		fade.tween_callback(music.stop)
-	captions.clear(0.5)
+	LinePresenter.of(get_tree()).clear()
 	if data.bars > 0.0:
 		Cine.of(get_tree()).bars_to(0.0, 1.2)
 	StoryControl.release()

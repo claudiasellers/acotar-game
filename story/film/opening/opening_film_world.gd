@@ -166,7 +166,7 @@ func _on_beat(beat_name: StringName) -> void:
 			insert.cover_to(0.0, 0.0)
 			player.veil_to(1.0, 0.0)
 			title = FilmTitleCard.new()
-			player.captions.get_parent().add_child(title)
+			player.skip_control.get_parent().add_child(title)
 			title.play(6.0)
 		&"handover":
 			if title:

@@ -30,6 +30,8 @@ const LANE_LEFT := 384.0
 ## A dread mood with no renewal and no "calm" lapses after this long, so a
 ## scene that never sends calm can't hush the cards for good.
 const DREAD_LAPSE_MS := 30000
+## Seconds the strap takes to step aside for a line, and to come back.
+const STRAP_FADE := 0.25
 
 const _PLAY := 1 << UiMode.Mode.PLAY
 const _STAGED := 1 << UiMode.Mode.STAGED
@@ -94,8 +96,12 @@ func _ready() -> void:
 	_show_for(UiMode.current(get_tree()))
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_show_for(UiMode.current(get_tree()))
+	# A line in the lane hangs where the strap sits: the strap steps aside.
+	var strap := _zones[Zone.STRAP]
+	strap.modulate.a = move_toward(strap.modulate.a, 0.0 if LinePresenter.of(get_tree()).in_lane() else 1.0,
+			delta / STRAP_FADE)
 
 
 ## Puts `piece` in `zone`. With `keeper`, the piece is freed when the keeper

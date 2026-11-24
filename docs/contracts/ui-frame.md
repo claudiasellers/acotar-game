@@ -37,7 +37,6 @@ here and from nowhere else.
 | `SCREEN` | 20 | open screens; `ScreenStack` gives each `SCREEN + its depth` (depth 0 to 3) |
 | `LINE` | 25 | spoken lines, thoughts; a whisper at `LINE + 1`; a story page held up mid-scene at `LINE - 1` |
 | `VEIL` | 30 | story fades and blackouts; `VEIL - 1` for one that sits under another; `VEIL + 1` for travel cards drawn on the black |
-| `OVER_VEIL` | 40 | the few things that must read over a fade (the Suriel's voice) |
 | `LOADING` | 90 | the loading veil |
 
 `collision_layer`, render layers and `GlamourLayer` are not UI layers and are
@@ -144,25 +143,38 @@ across, then a second row above.
 
 `LinePresenter` (`ui/lines/line_presenter.gd`, under `ScreenStack`, reached
 with `LinePresenter.of(tree)`) is the only thing that puts a line of words on
-screen. It shows one line at a time in the lane, standing on
-`LANE_FOOT` (0.8 of the screen's height), wrapping at 860 px. The voice is
-chosen by what kind of line it is, never by which script fired it, and each is
-one row of `LinePresenter.VOICES`:
+screen. The voice is chosen by what kind of line it is, never by which script
+fired it, and each is one row of `LinePresenter.VOICES`:
 
-| Voice | When | Sheet | Type |
-|---|---|---|---|
-| `SAID` | anyone speaking aloud, Feyre included | `LineBand`: a smear of shadow with no edge; the name over it in gold spaced capitals (`LineName`) | `LineSaid`, upright |
-| `THOUGHT` | everything in Feyre's head | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
+| Voice | When | Stands | Sheet | Type |
+|---|---|---|---|---|
+| `SAID` | anyone speaking aloud, Feyre included, in play and in films | lane | `LineBand`: a smear of shadow with no edge; the name over it in gold spaced capitals (`LineName`) | `LineSaid`, upright |
+| `THOUGHT` | everything in Feyre's head | lane | `NotifyCard`: a slip of her page with her whorl; never a name | `ThoughtText`, her hand |
+| `TOLD` | a film's narration | lane | `LineBand`, no name | `LineTold`, her hand, large |
+| `WHISPER` | a voice in her head that is not hers (the Bogge) | middle | `LineBare`: none | `LineWhisper`: bone on a bleed of red, trembling |
+| `DREAD` | a thing that should not speak (the Suriel) | lane | `LineFlood`: a flood of black | `LineDread`: bone, writing itself out at 38 letters a second, never still |
+
+The last two wear the horror palette (`JournalTheme.HORROR`) on purpose (R3).
+
+Two places, one line at a time in each. **The lane** runs between
+`HudLayout.LANE_LEFT` and its mirror and hangs from `LANE_TOP` (0.805 of the
+screen's height) downwards: under Feyre's feet in the follow camera and under
+the `PROMPT` zone. The strap sits there, so `HudLayout` fades the `STRAP` zone
+out while a line is in the lane (`in_lane()`) and back after. While a film
+plays the lane stands on the bottom letterbox bar instead (`FILM_LIFT` above
+it). **The middle** (0.36 to 0.5 of the height) is the whisper's, so a whisper
+and her own thought can be up together. Text wraps at 860 px.
 
 Calls: `say(voice, who, text, from, seconds)` returns the seconds the line
 stays; `LinePresenter.line(from, who, text, seconds)` is the same for a
 scene's own sheet, where a line with a name is said and one without is her
-thought; `clear()`; `showing` is the text on screen ("" when none);
-`reading_time(text)`. `from` (or the `SceneSpace` above it) owns the line: it
-clears when that scene finishes or leaves the tree, on a phase change and on
-a load, and it hides while a screen pauses the tree. Told (film narration),
-Read (tags and notes) and the two horror voices join the table in the rest of
-step 7.
+thought; `clear()` and `clear_voice(voice)`; `showing` and `voice` are the
+lane's line ("" when none); `stand_of(voice)` is where a voice stands (its
+`showing`, labels and `tremble` scale); `reading_time(text)` and
+`writing_time(voice, text)`. `from` (or the `SceneSpace` above it) owns the
+line: it clears when that scene finishes or leaves the tree, on a phase change
+and on a load, and every line hides while a screen pauses the tree. Read (tags
+and notes) joins the table later in step 7.
 
 ## UiMode
 
@@ -229,6 +241,7 @@ every piece's script.
 | step 5 | her map of the halls: the Map tab's manor page draws her five marks, `WorldMapHud.note_sketch()` is the one "she drew something" signal, and the foyer table opens the book at the Map tab | `story/act3/house/hall_map_page.gd` (its own layer, colours, toast and full page) | none new |
 | step 6 | the stations she opens with E: the stillroom, a stall, the whorl stones' card and ride, the easel and the mare are loose pages laid by `LoosePage` (`ui/menu/loose_page.gd`) | each station's own scrim, card, footer, `_label`, `_key` and `_pad`; `UiStyle.modal` and `UiStyle.button`; the `SatchelDetail` variation (now `LoosePage`) | `test_loose_page.gd`: no station frames itself |
 | step 7a | lines said and thought: `LinePresenter` and its voice table; `DialogueDirector`, the scene spaces and the scripts that typed a line themselves all show through it | `story/act2/act2_caption.gd` and its test | `test_line_presenter.gd`: nothing names the old caption |
+| step 7b | a film's words (Told and Said), the Bogge's whisper and the Suriel's voice are rows of the same table; the lane moves under Feyre's feet and the strap steps aside for it; Feyre's questions to the Suriel are said aloud before each answer | `story/film/film_captions.gd`, `story/act2/act2_whisper.gd`, `story/act3/suriel/suriel_voice.gd`; `UiLayers.OVER_VEIL` | `test_line_presenter.gd`: nothing names the four old presenters |
 
 ## Files outside `ui/` the frame edits
 

@@ -1,6 +1,7 @@
-## One presenter shows every line (plan step 7): a said line is the band with
-## the speaker's name, a thought is the slip of her page with her whorl, both
-## in one lane. A line never outlives its scene (L24-10): it clears when the
+## One presenter shows every line (plan step 7): a said line is the smear with
+## the speaker's name, a thought is the slip of her page with her whorl, a
+## film's narration is told in her hand, and the two horror voices keep their
+## own palette. The lane hangs under Feyre's feet and the strap steps aside. A line never outlives its scene (L24-10): it clears when the
 ## scene that spoke it finishes or leaves the tree, on a phase change and on a
 ## load, and it steps aside while a screen pauses the tree.
 extends GutTest
@@ -29,20 +30,22 @@ func _space(id: StringName) -> SceneSpace:
 func test_a_said_line_is_the_band_with_the_name() -> void:
 	lines.say(LinePresenter.Voice.SAID, "Lucien", "You'll want to keep to the path, human.")
 	assert_eq(lines.voice, LinePresenter.Voice.SAID)
-	assert_eq(lines.sheet.theme_type_variation, &"LineBand")
-	assert_eq(lines.text_label.theme_type_variation, &"LineSaid")
-	assert_true(lines.who_label.visible)
-	assert_eq(lines.who_label.text, "Lucien")
-	assert_true(lines.who_label.uppercase, "the name is in capitals")
-	assert_false(lines.whorl.visible)
+	var stand := lines.stand_of(LinePresenter.Voice.SAID)
+	assert_eq(stand.theme_type_variation, &"LineBand")
+	assert_eq(stand.text_label.theme_type_variation, &"LineSaid")
+	assert_true(stand.who_label.visible)
+	assert_eq(stand.who_label.text, "Lucien")
+	assert_true(stand.who_label.uppercase, "the name is in capitals")
+	assert_false(stand.whorl.visible)
 
 
 func test_a_thought_is_her_page_slip_with_her_whorl_and_no_name() -> void:
 	lines.say(LinePresenter.Voice.THOUGHT, "Feyre", "Someone should have held his hand.")
-	assert_eq(lines.sheet.theme_type_variation, &"NotifyCard")
-	assert_eq(lines.text_label.theme_type_variation, &"ThoughtText")
-	assert_false(lines.who_label.visible, "a thought is never named")
-	assert_true(lines.whorl.visible)
+	var stand := lines.stand_of(LinePresenter.Voice.THOUGHT)
+	assert_eq(stand.theme_type_variation, &"NotifyCard")
+	assert_eq(stand.text_label.theme_type_variation, &"ThoughtText")
+	assert_false(stand.who_label.visible, "a thought is never named")
+	assert_true(stand.whorl.visible)
 
 
 func test_a_scene_line_with_no_name_is_a_thought() -> void:
@@ -62,19 +65,166 @@ func test_every_voice_has_a_whole_row_the_theme_knows() -> void:
 		assert_true(JournalTheme.LABELS.has(row.type), "%s is not a label of the theme" % row.type)
 
 
-func test_both_voices_share_the_lane_and_keep_clear_of_the_corners() -> void:
+func test_lane_voices_hang_in_the_lane_and_keep_clear_of_the_corners() -> void:
 	var view := get_viewport().get_visible_rect().size
+	var long := "A long line that runs on and on, past where a short one would stop, so that it has to wrap onto a second row of the lane before it is done, and then some more of it."
 	for v: LinePresenter.Voice in LinePresenter.Voice.values():
-		lines.say(v, "Tamlin", "A long line that runs on and on, past where a short one would stop, so that it has to wrap onto a second row of the lane before it is done, and then some more of it.")
+		if LinePresenter.VOICES[v].place != LinePresenter.Place.LANE:
+			continue
+		lines.say(v, "Tamlin", long)
 		await wait_process_frames(2)
-		var r := lines.sheet.get_global_rect()
+		var stand := lines.stand_of(v)
+		var r := stand.get_global_rect()
 		assert_gte(r.position.x, HudLayout.LANE_LEFT - 1.0, "voice %d starts in the lane" % v)
 		assert_lte(r.end.x, view.x - HudLayout.LANE_LEFT + 1.0, "voice %d ends in the lane" % v)
-		assert_almost_eq(r.end.y, view.y * LinePresenter.LANE_FOOT, 1.0, "voice %d stands on the lane's foot" % v)
-		assert_gt(lines.text_label.get_line_count(), 1, "a long line wraps")
+		assert_almost_eq(r.position.y, view.y * LinePresenter.LANE_TOP, 1.0, "voice %d hangs from the lane's top" % v)
+		assert_lte(r.end.y, view.y, "voice %d stays on the screen" % v)
+		assert_gt(stand.text_label.get_line_count(), 1, "voice %d: a long line wraps (%s)" % [v, stand.text_label.size])
 	lines.say(LinePresenter.Voice.THOUGHT, "", "Short.")
 	await wait_process_frames(2)
-	assert_lt(lines.sheet.size.x, 300.0, "a short line's slip is as wide as its words")
+	assert_lt(lines.stand_of(LinePresenter.Voice.THOUGHT).size.x, 300.0, "a short line's slip is as wide as its words")
+
+
+## The director's look pass on 7a: a line never sits on Feyre. Her whole body,
+## as the follow camera frames it standing and after a few steps, ends above
+## the lane.
+func test_the_lane_hangs_under_feyres_feet() -> void:
+	var floor := CSGBox3D.new()
+	floor.size = Vector3(80, 1, 80)
+	floor.position.y = -0.5
+	floor.use_collision = true
+	add_child_autofree(floor)
+	var feyre := (load("res://characters/feyre/feyre.tscn") as PackedScene).instantiate() as Node3D
+	add_child_autofree(feyre)
+	await wait_physics_frames(60)
+	var lane_top := get_viewport().get_visible_rect().size.y * LinePresenter.LANE_TOP
+	assert_lt(_on_screen(feyre).end.y, lane_top, "standing")
+	Input.action_press(&"move_forward")
+	await wait_physics_frames(90)
+	var walking := _on_screen(feyre).end.y
+	Input.action_release(&"move_forward")
+	assert_lt(walking, lane_top, "walking")
+
+
+func _on_screen(body: Node3D) -> Rect2:
+	var cam := get_viewport().get_camera_3d()
+	var r := Rect2()
+	var first := true
+	for v in body.find_children("*", "GeometryInstance3D", true, false):
+		var g := v as GeometryInstance3D
+		if not g.is_visible_in_tree():
+			continue
+		for i in 8:
+			var p := cam.unproject_position(g.global_transform * g.get_aabb().get_endpoint(i))
+			r = Rect2(p, Vector2.ZERO) if first else r.expand(p)
+			first = false
+	return r
+
+
+## The strap sits where the lane hangs, so it steps aside for a line and comes
+## back after it.
+func test_the_strap_steps_aside_for_a_line() -> void:
+	var strap := HudLayout.of(get_tree()).zone(HudLayout.Zone.STRAP)
+	await wait_seconds(HudLayout.STRAP_FADE + 0.2)
+	assert_eq(strap.modulate.a, 1.0, "no line, the strap is there")
+	lines.say(LinePresenter.Voice.SAID, "Alis", "Hold still.", null, 30.0)
+	await wait_seconds(HudLayout.STRAP_FADE + 0.2)
+	assert_eq(strap.modulate.a, 0.0, "a line in the lane")
+	lines.clear()
+	lines.say(LinePresenter.Voice.WHISPER, "", "Look at me.", null, 30.0)
+	await wait_seconds(HudLayout.STRAP_FADE + 0.2)
+	assert_eq(strap.modulate.a, 1.0, "a whisper is not in the lane")
+
+
+## Said type reads on the brightest ground there is (noon snow): the smear
+## under the words leaves white body type 4.5 to 1 and the gold name 3 to 1
+## even over pure white, in both acts. The name's capitals are 16 px tall.
+func test_said_type_reads_on_bright_ground() -> void:
+	for act: JournalTheme.Act in [JournalTheme.Act.HUMAN, JournalTheme.Act.SPRING]:
+		var c := JournalTheme.colors(act)
+		var under := Color.WHITE.lerp(Color(c[&"ink"], 1.0), JournalTheme.BAND_DEPTH)
+		assert_gte(_contrast(c[&"paper"], under), 4.5, "act %d: said type on snow" % act)
+		assert_gte(_contrast(c[&"glow"], under), 3.0, "act %d: the name on snow" % act)
+		var t := JournalTheme.build(act)
+		# Marcellus capitals stand 0.7 of the size tall.
+		assert_gte(t.get_font_size(&"font_size", &"LineName") * 0.7, 16.0, "act %d: the name's capitals" % act)
+		assert_gte(t.get_font_size(&"font_size", &"LineSaid"), 24)
+
+
+func _contrast(a: Color, b: Color) -> float:
+	var la := _luminance(a)
+	var lb := _luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+
+func _luminance(c: Color) -> float:
+	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
+	return 0.2126 * lin.call(c.r) + 0.7152 * lin.call(c.g) + 0.0722 * lin.call(c.b)
+
+
+## A film's words go through the same presenter: narration is told, a
+## speaker's line is said under their name, standing on the letterbox.
+func test_a_film_tells_and_says_on_the_letterbox() -> void:
+	var f := FilmScript.new()
+	f.id = &"line_probe"
+	f.length = 6.0
+	f.bars = 0.0
+	for spec: Array in [[&"n", 0.5, &"", "The forest had become a labyrinth."], [&"s", 2.0, &"alis", "Hold still."]]:
+		var l := FilmLine.new()
+		l.id = spec[0]
+		l.at = spec[1]
+		l.hold = 3.0
+		l.speaker = spec[2]
+		l.text = spec[3]
+		f.lines.append(l)
+	FilmPlayer.headless_opt_in = true
+	var p := FilmPlayer.start(get_tree(), f)
+	p.seek(0.6)
+	assert_eq(lines.voice, LinePresenter.Voice.TOLD)
+	assert_eq(lines.showing, "The forest had become a labyrinth.")
+	await wait_process_frames(2)
+	var view := get_viewport().get_visible_rect().size
+	var bar := maxf(0.0, (view.y - view.x / Cine.BAR_ASPECT) * 0.5)
+	var stand := lines.stand_of(LinePresenter.Voice.TOLD)
+	assert_almost_eq(stand.get_global_rect().end.y, view.y - bar - LinePresenter.FILM_LIFT, 1.0, "stands on the bar")
+	p.seek(2.1)
+	assert_eq(lines.voice, LinePresenter.Voice.SAID)
+	assert_eq(stand.who_label.text, "Alis")
+	p.free()
+	FilmPlayer.headless_opt_in = false
+	StoryControl.release()
+	WorldState.clear()
+
+
+func test_a_whisper_stands_apart_and_does_not_take_the_lane() -> void:
+	lines.say(LinePresenter.Voice.THOUGHT, "", "Bread. Think of bread.", null, 30.0)
+	lines.say(LinePresenter.Voice.WHISPER, "", "Look at me.", null, 30.0)
+	await wait_process_frames(2)
+	var whisper := lines.stand_of(LinePresenter.Voice.WHISPER)
+	assert_eq(lines.showing, "Bread. Think of bread.", "her thought stays in the lane")
+	assert_eq(whisper.showing, "Look at me.")
+	assert_eq(whisper.theme_type_variation, &"LineBare", "no sheet at all")
+	var view := get_viewport().get_visible_rect().size
+	var mid := whisper.get_global_rect().get_center().y / view.y
+	assert_between(mid, LinePresenter.MIDDLE.x, LinePresenter.MIDDLE.y, "in the middle of her view")
+	var at := whisper.text_label.position
+	await wait_process_frames(3)
+	assert_ne(whisper.text_label.position, at, "it trembles")
+
+
+func test_dread_writes_itself_out_and_goes_when_told() -> void:
+	var text := "Stay with the High Lord, human."
+	lines.say(LinePresenter.Voice.DREAD, "", text, null, 600.0)
+	var stand := lines.stand_of(LinePresenter.Voice.DREAD)
+	assert_eq(stand.theme_type_variation, &"LineFlood")
+	await wait_process_frames(2)
+	assert_lt(stand.text_label.visible_characters, text.length(), "not all at once")
+	await wait_seconds(LinePresenter.writing_time(LinePresenter.Voice.DREAD, text) + 0.3)
+	assert_eq(stand.text_label.visible_characters, text.length(), "written out")
+	lines.clear_voice(LinePresenter.Voice.SAID)
+	assert_eq(lines.showing, text, "clearing another voice leaves it")
+	lines.clear_voice(LinePresenter.Voice.DREAD)
+	assert_eq(lines.showing, "")
 
 
 func test_line_clears_when_its_scene_finishes() -> void:
@@ -137,12 +287,12 @@ func test_the_director_picks_the_voice_from_the_line() -> void:
 	assert_eq(lines.voice, LinePresenter.Voice.SAID)
 
 
-## No script but the presenter shows a scene's or the director's line.
-func test_the_old_caption_is_gone() -> void:
-	assert_false(ResourceLoader.exists("res://story/act2/act2_caption.gd"))
+## No script but the presenter shows a line: the four it replaced are gone.
+func test_the_old_presenters_are_gone() -> void:
 	var hits: Array[String] = []
-	_grep("res://", "Act2Caption", hits)
-	assert_eq(hits, [], "still names the old caption")
+	for old in ["Act2Caption", "Act2Whisper", "SurielVoice", "FilmCaptions"]:
+		_grep("res://", old, hits)
+	assert_eq(hits, [], "still names an old presenter")
 
 
 func _grep(dir: String, word: String, hits: Array[String]) -> void:

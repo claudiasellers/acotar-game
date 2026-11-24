@@ -1,45 +1,66 @@
-## Every line of words on screen, in one lane low on the screen over the
-## strap. One presenter with a table of voices, chosen by what kind of line it
-## is and never by which script fired it:
-##   SAID     anyone speaking aloud, Feyre included: a soft band, the name in
-##            gold capitals, plain upright type.
+## Every line of words on screen. One presenter with a table of voices, chosen
+## by what kind of line it is and never by which script fired it:
+##   SAID     anyone speaking aloud, Feyre included, in play and in films: a
+##            smear of shadow, the name in gold capitals, plain upright type.
 ##   THOUGHT  everything in Feyre's head: a slip of her page in the same spot,
 ##            in her hand, marked with her whorl.
-## A new kind of line is one row in VOICES. A line never outlives the scene
-## that spoke it: it clears when that scene finishes or leaves the tree, on a
-## phase change and on a load, and it steps aside while a screen pauses play.
+##   TOLD     a film's narration: her hand, large, on the smear, no name.
+##   WHISPER  a voice inside her head that is not hers (the Bogge): bare words
+##            in the middle of her view that tremble and bleed in and out.
+##   DREAD    a thing that should not speak (the Suriel): bone-white on a
+##            flood of black, writing itself out, never quite still.
+## The last two are the horror palette on purpose (R3: horror is never dressed
+## up as the pretty UI). A new kind of line is one row in VOICES.
+##
+## A line stands in one of two places. The lane runs low across the screen
+## under Feyre's feet, and the strap steps aside while a line is there; in a
+## film the lane stands on the letterbox instead. The middle is the whisper's.
+## Each place holds one line at a time. A line never outlives the scene that
+## spoke it: it clears when that scene finishes or leaves the tree, on a phase
+## change and on a load, and it steps aside while a screen pauses play.
 ## No choices, ever (R2). Lives under ScreenStack; reach it with
 ## LinePresenter.of(tree). Looks from JournalTheme only.
 ## Contract: docs/contracts/ui-frame.md ("Line voices").
 class_name LinePresenter
 extends CanvasLayer
 
-enum Voice { SAID, THOUGHT }
+enum Voice { SAID, THOUGHT, TOLD, WHISPER, DREAD }
+enum Place { LANE, MIDDLE }
 
 const NODE := ^"ScreenStack/LinePresenter"
 const FADE := 0.35
-## The lane: from HudLayout.LANE_LEFT to its mirror, its foot this far up.
-const LANE_FOOT := 0.8
+## In play the lane hangs from here (a share of the screen's height): under
+## Feyre's feet in the follow camera, and under the PROMPT zone.
+const LANE_TOP := 0.805
+## In a film the lane stands this far above the bottom letterbox bar.
+const FILM_LIFT := 40.0
+## The whisper's band of the screen, top and bottom.
+const MIDDLE := Vector2(0.36, 0.5)
 ## The widest a line's text runs before it wraps, in px.
 const TEXT_WIDTH := 860.0
 const WHORL := 26.0
-## Voice -> its sheet (a PanelContainer variation), its type (a Label
-## variation), and whether it names the speaker or wears her whorl.
+## Voice -> where it stands, its sheet (a PanelContainer variation) and its
+## type (a Label variation); then what it wears and how it moves: the
+## speaker's name, her whorl, a tremble in px, letters written per second,
+## how solid it gets and how many fades it takes to leave.
 const VOICES := {
-	Voice.SAID: {"sheet": &"LineBand", "type": &"LineSaid", "named": true, "whorl": false},
-	Voice.THOUGHT: {"sheet": &"NotifyCard", "type": &"ThoughtText", "named": false, "whorl": true},
+	Voice.SAID: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineSaid", "named": true},
+	Voice.THOUGHT: {"place": Place.LANE, "sheet": &"NotifyCard", "type": &"ThoughtText", "whorl": true},
+	Voice.TOLD: {"place": Place.LANE, "sheet": &"LineBand", "type": &"LineTold"},
+	Voice.WHISPER: {"place": Place.MIDDLE, "sheet": &"LineBare", "type": &"LineWhisper", "tremble": 1.6,
+		"solid": 0.92, "linger": 2.0},
+	Voice.DREAD: {"place": Place.LANE, "sheet": &"LineFlood", "type": &"LineDread", "tremble": 0.8, "written": 38.0},
 }
 
-var sheet: PanelContainer
-var who_label: Label
-var text_label: Label
-var whorl: WhorlInk
-## The line on screen now ("" when hidden) and the voice it is in.
-var showing: String = ""
-var voice: Voice = Voice.SAID
-var _left: float = 0.0
-var _source: SceneSpace
-var _tween: Tween
+var _stands: Dictionary[Place, Stand] = {}
+
+## The line in the lane now ("" when none) and the voice it is in.
+var showing: String:
+	get:
+		return _stands[Place.LANE].showing
+var voice: Voice:
+	get:
+		return _stands[Place.LANE].voice
 
 
 static func of(tree: SceneTree) -> LinePresenter:
@@ -56,54 +77,41 @@ static func reading_time(text: String) -> float:
 	return clampf(1.2 + text.split(" ", false).size() * 0.28, 1.8, 6.0)
 
 
+## Seconds a written-out line takes to finish writing.
+static func writing_time(in_voice: Voice, text: String) -> float:
+	var per_second: float = VOICES[in_voice].get("written", 0.0)
+	return text.length() / per_second if per_second > 0.0 else 0.0
+
+
 func _init() -> void:
 	name = "LinePresenter"
 	layer = UiLayers.LINE
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	var lane := VBoxContainer.new()
-	lane.alignment = BoxContainer.ALIGNMENT_END
-	lane.name = "Lane"
-	lane.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lane.anchor_right = 1.0
-	lane.anchor_bottom = LANE_FOOT
-	lane.offset_left = HudLayout.LANE_LEFT
-	lane.offset_right = -HudLayout.LANE_LEFT
-	add_child(lane)
-	sheet = PanelContainer.new()
-	sheet.name = "Sheet"
-	sheet.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	sheet.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	sheet.modulate.a = 0.0
-	lane.add_child(sheet)
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override(&"separation", 14)
-	sheet.add_child(row)
-	whorl = WhorlInk.new()
-	whorl.name = "Whorl"
-	whorl.custom_minimum_size = Vector2(WHORL, WHORL)
-	whorl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	whorl.width = 2.5
-	row.add_child(whorl)
-	var col := VBoxContainer.new()
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override(&"separation", 2)
-	row.add_child(col)
-	who_label = BookKit.label("", &"LineName")
-	who_label.name = "Who"
-	who_label.uppercase = true
-	who_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(who_label)
-	text_label = BookKit.label("", &"LineSaid", true)
-	text_label.name = "Text"
-	text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(text_label)
+	for place: Place in Place.values():
+		var box := VBoxContainer.new()
+		box.name = (Place.keys()[place] as String).capitalize()
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.anchor_right = 1.0
+		box.offset_left = HudLayout.LANE_LEFT
+		box.offset_right = -HudLayout.LANE_LEFT
+		add_child(box)
+		var stand := Stand.new()
+		box.add_child(stand)
+		_stands[place] = stand
+	var middle := _stands[Place.MIDDLE].get_parent() as VBoxContainer
+	middle.anchor_top = MIDDLE.x
+	middle.anchor_bottom = MIDDLE.y
+	middle.alignment = BoxContainer.ALIGNMENT_CENTER
+	_lay_lane()
 
 
 func _ready() -> void:
-	EventBus.scene_space_finished.connect(_on_space_finished)
+	EventBus.scene_space_finished.connect(func(id: StringName) -> void:
+		for stand: Stand in _stands.values():
+			stand.scene_finished(id))
 	EventBus.phase_changed.connect(func(_a: StringName, _b: StringName) -> void: clear())
 	EventBus.game_loaded.connect(func(_slot: String) -> void: clear())
+	get_viewport().size_changed.connect(_lay_lane)
 
 
 ## Shows one line in `in_voice` for about as long as it takes to read it, and
@@ -111,77 +119,184 @@ func _ready() -> void:
 ## line belongs to.
 func say(in_voice: Voice, who: String, text: String, from: Node = null, seconds: float = -1.0) -> float:
 	var row: Dictionary = VOICES[in_voice]
-	voice = in_voice
-	sheet.theme_type_variation = row.sheet
-	text_label.theme_type_variation = row.type
-	who_label.text = who
-	who_label.visible = row.named and who != ""
-	whorl.visible = row.whorl
-	whorl.ink = JournalTheme.color(&"line")
-	text_label.text = text
-	# A short line's sheet is as wide as its words; a long one wraps.
-	var words := text_label.get_theme_font(&"font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
-			text_label.get_theme_font_size(&"font_size")).x
-	text_label.custom_minimum_size.x = minf(ceilf(words) + 2.0, TEXT_WIDTH)
-	showing = text
-	_left = seconds if seconds > 0.0 else reading_time(text)
-	_set_source(_space_of(from))
-	_fade_to(1.0)
-	return _left
+	if row.place == Place.LANE:
+		_lay_lane()
+	return _stands[row.place].say(in_voice, who, text, from, seconds)
 
 
-## Takes the line off now (with the usual fade).
+## Takes every line off now (with the usual fade).
 func clear() -> void:
-	_set_source(null)
-	if showing == "" and _left <= 0.0:
-		return
-	showing = ""
-	_left = 0.0
-	_fade_to(0.0)
+	for stand: Stand in _stands.values():
+		stand.clear()
 
 
-static func _space_of(node: Node) -> SceneSpace:
-	while node != null:
-		if node is SceneSpace:
-			return node
-		node = node.get_parent()
-	return null
+## Takes the line off if it is in `in_voice`.
+func clear_voice(in_voice: Voice) -> void:
+	var stand := stand_of(in_voice)
+	if stand.showing != "" and stand.voice == in_voice:
+		stand.clear()
 
 
-func _set_source(space: SceneSpace) -> void:
-	if _source != null and is_instance_valid(_source) and _source.tree_exiting.is_connected(_on_source_gone):
-		_source.tree_exiting.disconnect(_on_source_gone)
-	_source = space
-	if _source != null:
-		_source.tree_exiting.connect(_on_source_gone, CONNECT_ONE_SHOT)
+## Where `in_voice` stands: its line, its sheet, its labels.
+func stand_of(in_voice: Voice) -> Stand:
+	return _stands[VOICES[in_voice].place]
 
 
-func _on_source_gone() -> void:
-	_source = null
-	clear()
+## True while a line stands in the lane (the strap steps aside for it).
+func in_lane() -> bool:
+	return visible and _stands[Place.LANE].showing != ""
 
 
-func _on_space_finished(id: StringName) -> void:
-	if _source != null and is_instance_valid(_source) and _source.space_id == id:
-		clear()
-
-
-func _fade_to(alpha: float) -> void:
-	if _tween and _tween.is_valid():
-		_tween.kill()
-	if not is_inside_tree():
-		sheet.modulate.a = alpha
-		return
-	_tween = create_tween()
-	_tween.tween_property(sheet, ^"modulate:a", alpha, FADE)
+## Hangs the lane under her feet, or stands it on a film's letterbox.
+func _lay_lane() -> void:
+	var lane := _stands[Place.LANE].get_parent() as VBoxContainer
+	var film := FilmPlayer.current(get_tree()) if is_inside_tree() else null
+	if film != null and film.playing:
+		var view := get_viewport().get_visible_rect().size
+		var bar := maxf(0.0, (view.y - view.x / Cine.BAR_ASPECT) * 0.5)
+		lane.anchor_top = 0.0
+		lane.anchor_bottom = 1.0
+		lane.offset_bottom = -(bar + FILM_LIFT)
+		lane.alignment = BoxContainer.ALIGNMENT_END
+	else:
+		lane.anchor_top = LANE_TOP
+		lane.anchor_bottom = 1.0
+		lane.offset_bottom = 0.0
+		lane.alignment = BoxContainer.ALIGNMENT_BEGIN
 
 
 func _process(delta: float) -> void:
-	# A screen (the book, a station) pauses the tree: the line steps aside and
-	# waits rather than sitting on top of it.
+	# A screen (the book, a station) pauses the tree: the lines step aside and
+	# wait rather than sitting on top of it.
 	visible = not get_tree().paused
-	if _left <= 0.0 or not visible:
-		return
-	_left -= delta
-	if _left <= 0.0:
+	if visible:
+		for stand: Stand in _stands.values():
+			stand.tick(delta)
+
+
+## One place a line stands: its sheet, the words on it and its clock.
+class Stand:
+	extends PanelContainer
+
+	var who_label: Label
+	var text_label: Label
+	var whorl: WhorlInk
+	var showing: String = ""
+	var voice: Voice = Voice.SAID
+	## Scales the voice's own tremble (the Bogge's pleas grow more frantic).
+	var tremble: float = 1.0
+	var _row: Dictionary = {}
+	var _left: float = 0.0
+	var _t: float = 0.0
+	var _shift: Vector2
+	var _source: SceneSpace
+	var _tween: Tween
+
+	func _init() -> void:
+		name = "Sheet"
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		modulate.a = 0.0
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_theme_constant_override(&"separation", 14)
+		add_child(row)
+		whorl = WhorlInk.new()
+		whorl.name = "Whorl"
+		whorl.custom_minimum_size = Vector2(WHORL, WHORL)
+		whorl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		whorl.width = 2.5
+		row.add_child(whorl)
+		var col := VBoxContainer.new()
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_theme_constant_override(&"separation", 2)
+		col.sort_children.connect(func() -> void: _shift = Vector2.ZERO)
+		row.add_child(col)
+		who_label = BookKit.label("", &"LineName")
+		who_label.name = "Who"
+		who_label.uppercase = true
+		who_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(who_label)
+		text_label = BookKit.label("", &"LineSaid", true)
+		text_label.name = "Text"
+		text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		# A line that writes itself out is laid out whole: its sheet doesn't grow.
+		text_label.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
+		col.add_child(text_label)
+
+	func say(in_voice: Voice, who: String, text: String, from: Node, seconds: float) -> float:
+		_row = VOICES[in_voice]
+		voice = in_voice
+		theme_type_variation = _row.sheet
+		text_label.theme_type_variation = _row.type
+		who_label.text = who
+		who_label.visible = _row.get("named", false) and who != ""
+		whorl.visible = _row.get("whorl", false)
+		whorl.ink = JournalTheme.color(&"line")
+		text_label.text = text
+		text_label.visible_ratio = 0.0 if _row.has("written") else 1.0
+		# A short line's sheet is as wide as its words; a long one wraps.
+		var words := text_label.get_theme_font(&"font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
+				text_label.get_theme_font_size(&"font_size")).x
+		text_label.custom_minimum_size.x = minf(ceilf(words) + 2.0, TEXT_WIDTH)
+		showing = text
+		_t = 0.0
+		_left = seconds if seconds > 0.0 else LinePresenter.reading_time(text) + LinePresenter.writing_time(in_voice, text)
+		_set_source(_space_of(from))
+		_fade_to(_row.get("solid", 1.0), FADE)
+		return _left
+
+	func clear() -> void:
+		_set_source(null)
+		if showing == "" and _left <= 0.0:
+			return
+		showing = ""
+		_left = 0.0
+		_fade_to(0.0, FADE * float(_row.get("linger", 1.0)))
+
+	func scene_finished(id: StringName) -> void:
+		if _source != null and is_instance_valid(_source) and _source.space_id == id:
+			clear()
+
+	func tick(delta: float) -> void:
+		if modulate.a <= 0.0:
+			return
+		_t += delta
+		if _row.has("written"):
+			text_label.visible_characters = mini(text_label.text.length(), int(_t * float(_row.written)))
+		# It shakes like breath through clenched teeth.
+		var shake := float(_row.get("tremble", 0.0)) * tremble
+		text_label.position -= _shift
+		_shift = Vector2(sin(_t * 37.0), cos(_t * 29.0) * 0.75) * shake
+		text_label.position += _shift
+		if _left > 0.0:
+			_left -= delta
+			if _left <= 0.0:
+				clear()
+
+	static func _space_of(node: Node) -> SceneSpace:
+		while node != null:
+			if node is SceneSpace:
+				return node
+			node = node.get_parent()
+		return null
+
+	func _set_source(space: SceneSpace) -> void:
+		if _source != null and is_instance_valid(_source) and _source.tree_exiting.is_connected(_on_source_gone):
+			_source.tree_exiting.disconnect(_on_source_gone)
+		_source = space
+		if _source != null:
+			_source.tree_exiting.connect(_on_source_gone, CONNECT_ONE_SHOT)
+
+	func _on_source_gone() -> void:
+		_source = null
 		clear()
+
+	func _fade_to(alpha: float, seconds: float) -> void:
+		if _tween and _tween.is_valid():
+			_tween.kill()
+		if not is_inside_tree():
+			modulate.a = alpha
+			return
+		_tween = create_tween()
+		_tween.tween_property(self, ^"modulate:a", alpha, seconds)

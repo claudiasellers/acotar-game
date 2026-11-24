@@ -53,6 +53,14 @@ const COLORS := {
 	},
 }
 
+## The horror palette (R3: horror is never dressed up as the pretty UI). The
+## same in both acts; only the Bogge's whisper and the Suriel's voice wear it.
+const HORROR := {
+	&"bone": Color(0.90, 0.88, 0.80),
+	&"pall": Color(0.03, 0.03, 0.04),
+	&"blood": Color(0.25, 0.0, 0.02),
+}
+
 ## The pastel washes she paints with: one per index tab of the book, and the
 ## blot behind a thing drawn on a page. The same in both acts.
 const WASHES: Array[Color] = [
@@ -73,10 +81,13 @@ const LABELS := {
 	&"NotifyText": [20, "body", 600, &"ink"],
 	&"ThoughtText": [26, "hand", 600, &"ink"],
 	&"LineSaid": [24, "body", 600, &"paper"],
-	&"LineName": [18, "display", 400, &"glow"],
+	&"LineName": [23, "display", 400, &"glow"],
+	&"LineTold": [34, "hand", 600, &"paper"],
+	&"LineWhisper": [34, "body", 500, &"bone"],
+	&"LineDread": [24, "body", 500, &"bone"],
 }
 const PANELS: Array[StringName] = [
-	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"SatchelChip", &"SatchelKey",
+	&"SatchelCard", &"LoosePage", &"NotifyCard", &"LineBand", &"LineFlood", &"LineBare", &"SatchelChip", &"SatchelKey",
 	&"QuickBarSlot", &"QuickBarSlotSelected",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
@@ -87,9 +98,15 @@ const RIBBON_TAB := &"BookRibbon"
 ## Side of a check box and of a slider's knob, in px.
 const CHECK_SIZE := 24
 const KNOB_SIZE := 22
+## How dark the smear behind a said line is, and how far its edge fades.
+const BAND_DEPTH := 0.8
+const SMEAR_EDGE := 40
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
+
+static var _smear_cache: ImageTexture
+
 
 static func is_human_realm() -> bool:
 	var pm := _autoload(^"PhaseManager")
@@ -154,7 +171,7 @@ static func _autoload(path: NodePath) -> Node:
 
 
 static func build(of_act: Act) -> Theme:
-	var c: Dictionary = COLORS[of_act]
+	var c: Dictionary = (COLORS[of_act] as Dictionary).merged(HORROR)
 	var t := Theme.new()
 	t.default_font = font("body", 500)
 	t.default_font_size = 20
@@ -167,7 +184,11 @@ static func build(of_act: Act) -> Theme:
 	t.set_stylebox(&"panel", &"SatchelCard", _paper(PAPER_PAGE, c.paper, 40, 28))
 	t.set_stylebox(&"panel", &"LoosePage", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
 	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 14))
-	t.set_stylebox(&"panel", &"LineBand", _band(c.ink))
+	t.set_stylebox(&"panel", &"LineBand", _smear(Color(c.ink, BAND_DEPTH)))
+	t.set_stylebox(&"panel", &"LineFlood", _smear(Color(c.pall, 0.9)))
+	var bare := StyleBoxEmpty.new()
+	bare.set_content_margin_all(12)
+	t.set_stylebox(&"panel", &"LineBare", bare)
 	t.set_stylebox(&"panel", &"SatchelChip", _pill(c.paper_deep, Color(c.line, 0.7), 1, Vector2(12, 3)))
 	t.set_stylebox(&"panel", &"SatchelKey", _pill(c.ink, c.line, 1, Vector2(12, 5), 8))
 	t.set_stylebox(&"panel", &"QuickBarSlot", _pill(Color(c.paper, 0.92), c.line, 2, Vector2(6, 6)))
@@ -263,11 +284,16 @@ static func build(of_act: Act) -> Theme:
 	spaced.base_font = font("display")
 	spaced.spacing_glyph = 3
 	t.set_font(&"font", &"LineName", spaced)
-	for v in [&"LineSaid", &"LineName"]:
+	for v in [&"LineSaid", &"LineName", &"LineTold"]:
 		t.set_color(&"font_shadow_color", v, Color(c.ink, 0.8))
 		t.set_constant(&"shadow_offset_x", v, 0)
 		t.set_constant(&"shadow_offset_y", v, 1)
 		t.set_constant(&"shadow_outline_size", v, 4)
+	# The whisper has no sheet at all: it bleeds.
+	t.set_color(&"font_shadow_color", &"LineWhisper", Color(c.blood, 0.9))
+	t.set_constant(&"shadow_offset_x", &"LineWhisper", 0)
+	t.set_constant(&"shadow_offset_y", &"LineWhisper", 0)
+	t.set_constant(&"shadow_outline_size", &"LineWhisper", 14)
 	# Count and pin sit on their own small chip.
 	for v in [&"SatchelCount", &"SatchelPin"]:
 		t.set_type_variation(v, &"Label")
@@ -306,27 +332,31 @@ static func _paper(path: String, tint: Color, edge: int, margin: int) -> StyleBo
 	return box
 
 
-## The band behind a line said aloud: a smear of shadow with no edge, so the
-## words read over any ground and nothing looks like a box.
-static func _band(ink: Color) -> StyleBoxTexture:
-	var fade := Gradient.new()
-	fade.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
-	fade.colors = PackedColorArray([Color(ink, 0.62), Color(ink, 0.5), Color(ink, 0.0)])
-	var smear := GradientTexture2D.new()
-	smear.gradient = fade
-	smear.fill = GradientTexture2D.FILL_RADIAL
-	smear.fill_from = Vector2(0.5, 0.5)
-	smear.fill_to = Vector2(1.0, 0.5)
-	smear.width = 128
-	smear.height = 64
+## The dark behind a line that stands on the world: a smear with no edge, so
+## the words read over any ground and nothing looks like a box. Solid under
+## the words, fading out past them, all within the sheet's own rect.
+static func _smear(tint: Color) -> StyleBoxTexture:
 	var box := StyleBoxTexture.new()
-	box.texture = smear
-	box.set_content_margin_all(10)
-	box.set_expand_margin(SIDE_LEFT, 110)
-	box.set_expand_margin(SIDE_RIGHT, 110)
-	box.set_expand_margin(SIDE_TOP, 26)
-	box.set_expand_margin(SIDE_BOTTOM, 30)
+	box.texture = _smear_texture()
+	box.set_texture_margin_all(SMEAR_EDGE)
+	box.modulate_color = tint
+	# The fade is inside the sheet, so the sheet's own rect is all it covers.
+	box.set_content_margin_all(SMEAR_EDGE - 6)
+	box.content_margin_left = SMEAR_EDGE + 24
+	box.content_margin_right = SMEAR_EDGE + 24
 	return box
+
+
+static func _smear_texture() -> ImageTexture:
+	if _smear_cache == null:
+		var side := SMEAR_EDGE * 2 + 8
+		var img := Image.create(side, side, false, Image.FORMAT_RGBA8)
+		for y in side:
+			for x in side:
+				var out := Vector2(maxf(0.0, SMEAR_EDGE - minf(x, side - 1 - x)), maxf(0.0, SMEAR_EDGE - minf(y, side - 1 - y)))
+				img.set_pixel(x, y, Color(1, 1, 1, 1.0 - smoothstep(0.0, 1.0, out.length() / SMEAR_EDGE)))
+		_smear_cache = ImageTexture.create_from_image(img)
+	return _smear_cache
 
 
 ## A slot on a page: an arch, round at the top like a specimen window.

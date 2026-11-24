@@ -72,7 +72,7 @@ func test_beats_and_lines_fire_in_order_and_control_is_held() -> void:
 	assert_eq(_started, [&"film_probe"] as Array[StringName], "scene space bracket opens")
 	p.seek(1.6)
 	assert_eq(beats, [&"first", &"second"] as Array[StringName])
-	assert_eq(p.captions.current.id, &"b", "the latest line is on screen")
+	assert_eq(LinePresenter.of(get_tree()).showing, p.data.lines[1].text, "the latest line is on screen")
 	assert_false(WorldState.has_flag("fact.film_probe_seen"))
 
 

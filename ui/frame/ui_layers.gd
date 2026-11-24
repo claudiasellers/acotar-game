@@ -23,7 +23,5 @@ const LINE := 25
 ## Story fades and blackouts (-1 for one that must sit under another; +1 for
 ## travel cards drawn on the black).
 const VEIL := 30
-## The few things that must read over a fade.
-const OVER_VEIL := 40
 ## The loading veil.
 const LOADING := 90
