@@ -82,6 +82,10 @@ func _row(id: String, path: String, img: Image, row: int) -> void:
 		if n.has_method(&"express") or n is AnimationPlayer or n is AnimationTree:
 			n.process_mode = Node.PROCESS_MODE_DISABLED
 	m.process_mode = Node.PROCESS_MODE_DISABLED
+	# Feyre brings her own follow camera; take the view back
+	for c in m.find_children("*", "Camera3D", true, false):
+		(c as Camera3D).current = false
+	_cam.make_current()
 	var meshes: Array[MeshInstance3D] = []
 	for n in m.find_children("*", "MeshInstance3D", true, false):
 		var mi := n as MeshInstance3D
