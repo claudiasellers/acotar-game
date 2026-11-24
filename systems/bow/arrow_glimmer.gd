@@ -11,15 +11,15 @@ const GROUP := &"arrow_glimmer"
 ## Warm gold with a deep amber rim: reads on white snow and in dusk shade.
 const CORE := Color(1.0, 0.82, 0.25)
 const RIM := Color(1.0, 0.42, 0.05)
-## Glint pixel_size with fixed_size on a 64 px texture: about 12 px on a 1080p screen
-## at any distance (0.00018 x 64 = 0.012 of the screen height). Colours stay <= 1.0, under the glow threshold.
-const ASH_GLINT := 0.00018
+## Glint pixel_size with fixed_size on a 64 px texture: about 20 px on a 1080p screen
+## at any distance (0.0003 x 64 = 0.02 of the screen height). Colours stay <= 1.0, under the glow threshold.
+const ASH_GLINT := 0.00030
 const WOOD_GLINT := 0.00008
 const PULSE_HZ := 1.1
 const LIGHT_ENERGY := 0.8
 const LIGHT_RANGE := 1.8
 const BEACON_HEIGHT := 4.0
-const BEACON_WIDTH := 0.06
+const BEACON_WIDTH := 0.10
 ## At most this many non-ash arrows glimmer at once; ash always does.
 const WOOD_CAP := 3
 
