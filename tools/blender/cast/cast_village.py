@@ -122,7 +122,7 @@ def _men(shirt, vest, trim, trousers, shoe, coat, lining, patch_a, patch_b):
 DESIGNS = {
     # -- a plump, pretty farmer's wife selling eggs, wealthy enough for "a full necklace of braided iron"
     #    (ch 3): peat-brown dress, undyed apron, a faded-madder capelet
-    "human_woman": dict(arm_clear=8.0, canon="C", body="v_plump", height=1.60, skin="EDC6AC", iris="6A5A3A", hair="7A5634",
+    "human_woman": dict(arm_clear=10.0, canon="C", body="v_plump", height=1.60, skin="EDC6AC", iris="6A5A3A", hair="7A5634",
                         brows="5A3E28", lips="B98078", style=("alis", "style_bun"),
                         outfit=[("dress", PEAT, PEAT_D), ("apron",), ("slippers", "3E3028"),
                                 ("shawl", MADDER, "74424A"), ("iron_braid",)]),
@@ -159,7 +159,7 @@ DESIGNS = {
                       outfit=[("robe", BLESSED_PALE), ("slippers", BLESSED_PALE), ("cord_belt",),
                               ("silver", "charm_bracelet")]),
     # -- the mercenary at the broken fountain: heavy peat coat with a rust lining, sword and long knife
-    "mercenary": dict(arm_clear=2.0, canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="3A2418", hair="241A16",
+    "mercenary": dict(arm_clear=10.0, canon="C", body="v_mountain", height=1.86, skin="C9946E", iris="3A2418", hair="241A16",
                       brows="1E1612", lips="A8705E", style=("village", "style_bob"),
                       outfit=[("layers", _men("BDB2A0", "3E3A36", "2E2A26", "3A3632", "2A2420", PEAT_D, RUST,
                                               "5A4A3E", "6A5A4A")),

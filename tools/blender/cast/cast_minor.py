@@ -123,7 +123,7 @@ DESIGNS = {
                                  outfit=[("tunic", "5E8A68", "E2C277", True), ("trousers", "F1EADA"),
                                          ("boots", "4A3A2E")],
                                  mask=("bird", "C9A14E", "E9CF88")),
-    "servant_cook_true": dict(arm_clear=2.0, canon="X", body="round", height=1.58, skin="9BAA84", iris="4A3018", hair="5A4630",
+    "servant_cook_true": dict(arm_clear=6.0, canon="X", body="round", height=1.58, skin="9BAA84", iris="4A3018", hair="5A4630",
                               brows="3E3020", lips="A87068", style=("alis", "style_bun"),
                               outfit=[("dress", "D9B26F", "B08C50"), ("apron",), ("slippers", "5E4632")],
                               mask=("bird", "B98E40", "DDBB70")),
@@ -177,7 +177,7 @@ DESIGNS = {
                            brows="2E1C12", lips="B86A70", style=("feyre", "crown_braid"),
                            outfit=[("gown", "gown_ball", "C9CED8", "F4F6FA"), ("slippers", "C9CED8")],
                            extras=[("earrings", "earrings_pearl")]),
-    "mortal_queen_2": dict(arm_clear=4.0, canon="X", body="human", height=1.74, skin="B98060", iris="4A3018", hair="1A1210",
+    "mortal_queen_2": dict(arm_clear=6.0, canon="X", body="human", height=1.74, skin="B98060", iris="4A3018", hair="1A1210",
                            brows="1A1210", lips="9A5A50", style=("feyre", "ballerina_bun"),
                            outfit=[("gown", "gown_dinner", "AEB6C6", "E6EAF2"), ("slippers", "AEB6C6")],
                            extras=[("earrings", "earrings_drop")]),
@@ -186,7 +186,7 @@ DESIGNS = {
                            outfit=[("gown", "gown_solstice", "D8DCE4", "9AA4B8"), ("slippers", "D8DCE4")]),
     # The Archerons' mother (ch 2, 4, 7, 30) [C]: Nesta's cold face and blue-grey eyes, Feyre's
     # straight nose, the sisters' gold-brown hair [X], dressed for the peerage she dazzled.
-    "archeron_mother": dict(arm_clear=4.0, canon="C", body="human", height=1.72, skin="EBCABC", iris="7E9098", hair="B08552",
+    "archeron_mother": dict(arm_clear=6.0, canon="C", body="human", height=1.72, skin="EBCABC", iris="7E9098", hair="B08552",
                             brows="7A5A38", lips="B07078", style=("nesta", "style_chignon"),
                             outfit=[("gown", "gown_dinner", "3E4A66", "C9CED8"), ("slippers", "3E4A66")],
                             extras=[("earrings", "earrings_pearl")]),

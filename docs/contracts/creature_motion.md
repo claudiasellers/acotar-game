@@ -52,8 +52,18 @@ repo out a second time, change the clip code there, build there, then here:
 Standing arms hang beside the thighs: shoulder to hand is 5 to 8 degrees off
 straight down, set by `lower` in `feyre_anims.relaxed_arms` (cast, court,
 village), `arms` under `idle` in `retarget_moves.POSTURE` (the player's own
-move set) and `out` in `person_rig._arms` (the older fae figures). Values in
-`docs/tuning.md`.
+move set) and `arm_out` in `person_rig.animate` (the older fae figures).
+A body that wears something wide at the hip (a bell skirt, an apron, a sword
+belt) hangs its arms further out by its own `ARM_CLEAR` (`cast_<id>.py`) or
+`arm_clear` (a `DESIGNS` row), in degrees; the father's seated `sit_carve`
+keeps the arm drop its lap pose was set on. Values in `docs/tuning.md`.
+
+Probe: `tools/mq/godot.sh --fixed-fps 60 -s tools/creatures/arm_clip_probe.gd`
+stands Feyre, the cast and every figure in their idle and prints how far each
+one's hands and forearms sit behind skirt, hip, cloak or satchel. A new or
+changed body gets the smallest clearance that keeps that under 5 mm, or no
+worse than it was where a cloak already covers the arm. By eye:
+`tools/creatures/stand_shot.tscn -- <out> [names]` (front and back lineup).
 
 ## Game side (`creatures/anim/creature_animator.gd`)
 
