@@ -83,13 +83,15 @@ Their small pictures are drawn by `JournalTheme` when the theme is built.
 axis name**: the engine ignores a string key without a word, and every label
 drew at Nunito's lightest cut (200) until step 7a found it.
 
-## The horror palette
+## What her body tells her
 
-`JournalTheme.VITALS` (`health`, `frost`, `bile`, one set an act) is what her
-body tells her: the vitals HUD and the screen's edges read it, and
-`JournalTheme.color()` answers for these and the horror tokens too.
+`JournalTheme.VITALS` (`health`, `frost`, `bile`, one set an act) is read by
+the vitals HUD and the screen's edges through `JournalTheme.color()`.
+
+## The horror palette
 
 `JournalTheme.HORROR` (`bone`, `pall`, `blood`) is the same in both acts and
 is worn only by the `LineWhisper`, `LineDread` and `LineFlood` variations (R3:
-horror is never dressed up as the pretty UI). It is not in `COLORS`, so
-`JournalTheme.color()` never hands it to a page.
+horror is never dressed up as the pretty UI) and by what frightens or hurts
+her on the HUD: the hush before the wolf, thorns, ichor, a bad status's pan.
+It is not in `COLORS`, and no page or card wears it.
