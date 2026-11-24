@@ -10,6 +10,10 @@
 class_name FeyreCamera
 extends RefCounted
 
+## Metres the arm sits over her right shoulder while she aims, or while a
+## scene's focus is at least FAR_FOCUS metres off outdoors.
+const AIM_SHOULDER := 0.55
+const FAR_FOCUS := 12.0
 const DEFAULT_PITCH := -0.2094  # -12 degrees
 ## Indoors (a roof or ceiling above her head) the camera stays in the room: it may
 ## rise at most this far above its pivot (her head height, 1.5 m), which keeps it
@@ -122,7 +126,7 @@ func update(delta: float) -> void:
 	var ease := minf(10.0 * TimeScale.real(delta), 1.0)
 	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, ease)
 	_clamp_indoor_pitch()
-	var shoulder := 0.55 if aiming else close_shoulder(_spring_arm.spring_length)
+	var shoulder := AIM_SHOULDER if aiming or _far_focus() else close_shoulder(_spring_arm.spring_length)
 	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, ease),
 			shoulder_clearance(shoulder))
 
@@ -265,6 +269,15 @@ func rise() -> float:
 func _auto_turn(new_yaw: float) -> void:
 	_feyre.camera_auto_yaw += angle_difference(rig.rotation.y, new_yaw)
 	rig.rotation.y = new_yaw
+
+
+## Outdoors, a scene's focus this far off (the doe across the clearing) sits on
+## the horizon straight behind her head from a centred camera: the camera
+## takes the aim's shoulder so what her eye has found is beside her, in view.
+func _far_focus() -> bool:
+	var focus := StoryControl.focus
+	return focus != null and is_instance_valid(focus) and indoor < 0.5 \
+			and focus.global_position.distance_to(rig.global_position) >= FAR_FOCUS
 
 
 ## During anchored moments the camera eases toward what the scene is about.

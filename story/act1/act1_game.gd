@@ -76,6 +76,7 @@ func _ready() -> void:
 	add_child(GuideJournal.new())
 	add_child(StoryJournal.new())
 	add_child(KeyPrompts.new())
+	add_child(OpeningHunt.new())
 	add_child(Act1Wayfinding.new())
 	add_child(Act1Milestones.new())
 	add_child(Act1LandmarkThoughts.new())

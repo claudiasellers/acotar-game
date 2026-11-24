@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GuideThread" format=3]
+
+[ext_resource type="Script" path="res://ui/guide/guide_thread.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"onboarding_snare"
+icon = &"trail"
+lines = PackedStringArray("Empty. Snow's buried every run for a mile.")
+voice_ids = PackedStringArray("O_snare")
+canon = "A"
