@@ -39,6 +39,9 @@ var _target: Node3D
 var _timer: float = 0.0
 var _focus: String = ""      # the region at the last update point: loads first
 var _queue: Array[String] = []  # wanted, not started; nearest first
+## Threaded loads nobody wants any more (their world left): collected when they
+## finish, so the loader lets them go.
+var _orphaned: Array[String] = []
 
 
 ## Sets the regions of the current world and where their scenes are added.
@@ -48,7 +51,22 @@ func configure(regions: Array, parent: Node3D) -> void:
 	for region in regions:
 		if region is RegionDef:
 			_regions[String(region.id)] = region
+	if _parent != null and is_instance_valid(_parent) and _parent.tree_exiting.is_connected(_on_parent_leaving):
+		_parent.tree_exiting.disconnect(_on_parent_leaving)
 	_parent = parent
+	if parent != null and not parent.tree_exiting.is_connected(_on_parent_leaving):
+		parent.tree_exiting.connect(_on_parent_leaving)
+
+
+## The world the regions hang under is leaving (Save & Title): its regions go
+## with it, so forget them, the loads in flight and Feyre, before a load lands
+## in a dead tree or a freed region is asked after (T144).
+func _on_parent_leaving() -> void:
+	unload_all()
+	_target = null
+	if _parent != null and is_instance_valid(_parent) and _parent.tree_exiting.is_connected(_on_parent_leaving):
+		_parent.tree_exiting.disconnect(_on_parent_leaving)
+	_parent = null
 
 
 ## Loads every RegionDef .tres in a folder (e.g. res://data/regions/human_realm).
@@ -104,7 +122,8 @@ func is_loaded(region_id: StringName) -> bool:
 
 ## Loaded and finished building: there is ground and house to stand on.
 func is_ready(region_id: StringName) -> bool:
-	var root: Node3D = _loaded.get(String(region_id))
+	# Untyped: a freed root in a typed variable is a script error, not a null.
+	var root: Variant = _loaded.get(String(region_id))
 	if root == null or not is_instance_valid(root):
 		return false
 	return not (&"stream_id" in root and root.is_in_group(BUSY_GROUP))
@@ -116,7 +135,8 @@ func in_focus(region_id: StringName) -> bool:
 
 
 func loaded_root(region_id: StringName) -> Node3D:
-	return _loaded.get(String(region_id))
+	var root: Variant = _loaded.get(String(region_id))
+	return root as Node3D if is_instance_valid(root) else null
 
 
 func loaded_ids() -> PackedStringArray:
@@ -183,6 +203,9 @@ func update_for(point: Vector3) -> void:
 func unload_all() -> void:
 	for id in _loaded.keys():
 		_unload(id)
+	for path: String in _pending.values():
+		if not _orphaned.has(path):
+			_orphaned.append(path)
 	_pending.clear()
 	_queue.clear()
 	_focus = ""
@@ -206,6 +229,7 @@ func _pump() -> void:
 
 
 func _process(delta: float) -> void:
+	_collect_orphans()
 	_poll_pending()
 	if _target == null or not is_instance_valid(_target):
 		return
@@ -228,6 +252,19 @@ func _begin_load(id: String) -> void:
 		push_error("WorldStreamer: cannot load '%s' (%s)" % [region.scene_path, error_string(err)])
 		return
 	_pending[id] = region.scene_path
+
+
+func _collect_orphans() -> void:
+	for path in _orphaned.duplicate():
+		if _pending.values().has(path):
+			_orphaned.erase(path)  # wanted again: _poll_pending takes it
+			continue
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			ResourceLoader.load_threaded_get(path)
+		_orphaned.erase(path)
 
 
 func _poll_pending() -> void:
@@ -261,8 +298,8 @@ func _finish_load(id: String, scene: PackedScene) -> void:
 
 
 func _unload(id: String) -> void:
-	var root: Node3D = _loaded.get(id)
+	var root: Variant = _loaded.get(id)
 	_loaded.erase(id)
-	if root and is_instance_valid(root):
-		root.queue_free()
+	if is_instance_valid(root):
+		(root as Node).queue_free()
 	region_unloaded.emit(StringName(id))

@@ -107,6 +107,9 @@ func _space_for(moment: StoryMoment) -> SceneSpace:
 
 
 func _on_region_loaded(region_id: StringName, root: Node3D) -> void:
+	# A region that landed in a world already leaving has nothing to hang on.
+	if not is_instance_valid(root) or not root.is_inside_tree():
+		return
 	WiderCourtAnchors.place(region_id, root)  # L44: p4 anchors beside other lanes' landmarks
 	attach_all(root)
 
