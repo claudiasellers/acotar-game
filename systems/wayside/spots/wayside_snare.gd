@@ -72,3 +72,7 @@ func _process(_delta: float) -> void:
 func _refresh() -> void:
 	if rabbit:
 		rabbit.visible = catch_on(Clock.day) > 0
+
+
+func prompt_verb() -> String:
+	return "check the snare" if set_day() >= 0 else "set the snare"

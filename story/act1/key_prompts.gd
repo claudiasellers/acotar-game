@@ -35,6 +35,7 @@ var _fire_hooked: bool = false
 
 
 func _ready() -> void:
+	add_to_group(Tips.GROUP)
 	_load()
 	_prompt = KeyPrompt.make(self)
 	EventBus.creature_harvested.connect(func(_id: StringName, kind: StringName, _items: PackedStringArray) -> void:
@@ -49,6 +50,11 @@ func _ready() -> void:
 	EventBus.item_sold.connect(func(item_id: StringName, _coin: int) -> void:
 		if item_id == FurStall.PELT:
 			teach(&"sell"))
+
+
+## Tips.show_again: every prompt teaches itself once more.
+func forget_taught() -> void:
+	taught.clear()
 
 
 ## Marks a prompt as learnt; it won't show again.

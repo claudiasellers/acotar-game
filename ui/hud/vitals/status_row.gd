@@ -60,6 +60,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	add_to_group(Tips.GROUP)
 	_chime = AudioStreamPlayer.new()
 	_chime.volume_db = -14.0
 	add_child(_chime)
@@ -129,6 +130,11 @@ func _step_teach(delta: float) -> void:
 	_slip.visible = teaching != &""
 	_slip.modulate.a = clampf(_teach_left / TEACH_FADE, 0.0, 1.0)
 	_slip.position = Vector2(0.0, _top() - _slip.size.y - 8.0)
+
+
+## Tips.show_again: every chip teaches itself once more.
+func forget_taught() -> void:
+	taught.clear()
 
 
 ## Shows `tag`'s slip now and remembers it is taught.

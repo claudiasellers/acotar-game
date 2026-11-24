@@ -62,7 +62,7 @@ const LOOK_GRACE := 0.8
 const TRIGGER_SWEEP := 0.1
 const PROMPT_RADIUS := 3.0
 const DELTAS := &"mount"
-const HINT := "Whistle for her with H (share on a pad), and she'll come."
+const HINT := "Whistle for her with %s, and she'll come."
 
 var data: MountData = DATA
 var mare: MareMount
@@ -80,7 +80,6 @@ var _since_look: float = 99.0
 var _sweep: float = 0.0
 var _inside: Dictionary = {}
 var _whistle: AudioStreamPlayer
-var _prompt: Label3D
 var _unlock: ActionTrigger
 var _wind: AudioStreamPlayer
 var _base_fov: float = -1.0
@@ -261,7 +260,6 @@ func spawn_mare(at: Vector3, yaw: float) -> MareMount:
 	mare.global_position = at
 	mare.rotation.y = yaw
 	mare.used.connect(_on_used)
-	_add_prompt()
 	return mare
 
 
@@ -271,7 +269,6 @@ func free_mare() -> void:
 	if mare and is_instance_valid(mare):
 		mare.queue_free()
 	mare = null
-	_prompt = null
 
 
 ## Ground height under (x, z), or NAN with nothing loaded there.
@@ -486,8 +483,6 @@ func open_tending() -> MareTendingView:
 		return null
 	if block_reason(p.global_position) in [&"scene", &"story"]:
 		return null
-	if _prompt and is_instance_valid(_prompt):
-		_prompt.visible = false
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
 		tending = null
@@ -521,8 +516,6 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 	mare.set_mountable(false)
 	pose = Saddle.seat(p)
 	_gesture_t = -1.0
-	if _prompt and is_instance_valid(_prompt):
-		_prompt.visible = false
 	if pose:
 		pose.clear_overrides()
 		pose.amount = 0.0
@@ -599,7 +592,7 @@ func _finish_dismount(at: Vector3, face_mare: bool = true) -> void:
 	# Taught once, kept with the world (not a story flag).
 	if unlocked() and not WorldDeltas.get_region_value(DELTAS, "whistle_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "whistle_taught", true)
-		PickupLog.of(get_tree()).note(HINT)
+		PickupLog.of(get_tree()).note(HINT % KeyPrompt.key(ACTION))
 	elif unlocked() and not WorldDeltas.get_region_value(DELTAS, "tend_taught", false):
 		WorldDeltas.set_region_value(DELTAS, "tend_taught", true)
 		PickupLog.of(get_tree()).note(TEND_HINT)
@@ -1008,22 +1001,10 @@ func _meet(p: Node3D, far: float) -> void:
 	mare.nicker()
 
 
-func _add_prompt() -> void:
-	_prompt = Label3D.new()
-	_prompt.text = "E"
-	_prompt.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_prompt.no_depth_test = true
-	_prompt.font_size = 40
-	_prompt.outline_size = 10
-	_prompt.modulate = Color(1.0, 0.96, 0.86, 0.9)
-	_prompt.outline_modulate = Color(0.42, 0.3, 0.45, 0.8)
-	_prompt.position = Vector3.UP * 2.3
-	_prompt.visible = false
-	mare.add_child(_prompt)
-
-
+## "E   ride": said by the one use prompt while she stands by the mare.
 func _update_prompt(p: Node3D) -> void:
-	if _prompt == null or not is_instance_valid(_prompt) or mare == null:
+	if mare == null or not is_instance_valid(mare):
 		return
 	var d := Vector2(mare.global_position.x - p.global_position.x, mare.global_position.z - p.global_position.z).length()
-	_prompt.visible = d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING
+	var on := d <= PROMPT_RADIUS and mare.state == MareMount.State.STANDING and not riding and not tending
+	UsePrompt.of(get_tree()).offer(self, "ride" if on else "")

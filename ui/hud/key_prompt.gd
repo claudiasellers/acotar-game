@@ -12,7 +12,9 @@ const BETWEEN := 34
 ## Actions other systems add in code once they are up (bow_controller.gd).
 const UNBOUND := {&"cycle_arrow": "Q"}
 const PAD_BUTTONS := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
-	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB"}
+	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
+	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_RIGHT: "→", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←",
+	JOY_BUTTON_BACK: "Back", JOY_BUTTON_START: "Start", JOY_BUTTON_LEFT_STICK: "L3", JOY_BUTTON_RIGHT_STICK: "R3", JOY_BUTTON_MISC1: "Share"}
 const PAD_AXES := {JOY_AXIS_TRIGGER_LEFT: "LT", JOY_AXIS_TRIGGER_RIGHT: "RT"}
 const MOUSE := {MOUSE_BUTTON_LEFT: "Left mouse", MOUSE_BUTTON_RIGHT: "Right mouse"}
 
@@ -28,18 +30,33 @@ static func make(keeper: Node, zone: HudLayout.Zone = HudLayout.Zone.PROMPT) -> 
 	return prompt
 
 
-## What an action's key is called on what she is holding: its first key or
-## mouse button, or its first pad button once the pad is in use.
+## What an action's key is called on what she is holding: the pad's button
+## once the pad is in use and the action has one, else its key or mouse button.
 static func key(action: StringName) -> String:
 	if not InputMap.has_action(action):
 		return UNBOUND.get(action, "")
-	var pad := SatchelHud.pad_active
+	var on_pad := pad_word(action) if SatchelHud.pad_active else ""
+	return on_pad if on_pad != "" else board_word(action)
+
+
+## An action's first pad button or trigger, by name; "" when it has none.
+static func pad_word(action: StringName) -> String:
+	if not InputMap.has_action(action):
+		return ""
 	for e in InputMap.action_get_events(action):
-		if pad and e is InputEventJoypadButton and PAD_BUTTONS.has((e as InputEventJoypadButton).button_index):
+		if e is InputEventJoypadButton and PAD_BUTTONS.has((e as InputEventJoypadButton).button_index):
 			return PAD_BUTTONS[(e as InputEventJoypadButton).button_index]
-		if pad and e is InputEventJoypadMotion and PAD_AXES.has((e as InputEventJoypadMotion).axis):
+		if e is InputEventJoypadMotion and PAD_AXES.has((e as InputEventJoypadMotion).axis):
 			return PAD_AXES[(e as InputEventJoypadMotion).axis]
-		if not pad and e is InputEventMouseButton and MOUSE.has((e as InputEventMouseButton).button_index):
+	return ""
+
+
+## An action's first mouse button or key, by name.
+static func board_word(action: StringName) -> String:
+	if not InputMap.has_action(action):
+		return UNBOUND.get(action, "")
+	for e in InputMap.action_get_events(action):
+		if e is InputEventMouseButton and MOUSE.has((e as InputEventMouseButton).button_index):
 			return MOUSE[(e as InputEventMouseButton).button_index]
 	return BookKit.key_word(action)
 
