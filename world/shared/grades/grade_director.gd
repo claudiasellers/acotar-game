@@ -23,6 +23,8 @@ var weather_fog := 0.0
 static var snow_cover_now := 1.0
 static var magic_now := 0.0
 static var _dread_preset: GradePreset
+## Daylight dread looks (GradePreset.dread_day_look) by id, loaded once.
+static var _day_looks: Dictionary = {}
 var _from: GradePreset
 var _to: GradePreset
 var _t := 1.0
@@ -123,7 +125,7 @@ func target_id() -> StringName:
 
 
 func apply(base: GradePreset) -> void:
-	var p := with_mood(with_true_sight(base, sight), mood_amount, mood)
+	var p := with_mood(with_true_sight(base, sight), mood_amount, mood, night)
 	snow_cover_now = p.snow_cover
 	magic_now = p.magic
 	RenderingServer.global_shader_parameter_set(&"snow_cover", p.snow_cover)
@@ -183,8 +185,11 @@ static func dread_weight(dread: float) -> float:
 	return 1.0 - (1.0 - d) * (1.0 - d)
 
 
-## `p` with a story mood applied at `dread` (0..1) strength.
-static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread") -> GradePreset:
+## `p` with a story mood applied at `dread` (0..1) strength. `night_weight`
+## (GradeDirector.night) picks the dread look: the grade's daylight one by day,
+## the dread preset at night.
+static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread",
+		night_weight: float = 0.0) -> GradePreset:
 	if dread <= 0.0:
 		return p
 	if kind == &"enchanted_sleep":
@@ -193,17 +198,29 @@ static func with_mood(p: GradePreset, dread: float, kind: StringName = &"dread")
 	dread *= p.dread_headroom
 	if dread <= 0.0:
 		return p
-	# §1.5: the pink world leaves. Blend toward the dread preset (horror
+	# §1.5: the pink world leaves. Blend toward the dread look (horror
 	# palette, ~2 stops down, saturation 0.4, dense low fog, no magic, no
 	# lilac shadows); snow stays where it lies.
-	if _dread_preset == null:
-		_dread_preset = load_preset(&"dread")
-	var cold := GradePreset.mix(p, _dread_preset, dread_weight(dread))
+	var cold := GradePreset.mix(p, dread_look(p, night_weight), dread_weight(dread))
 	cold.id = p.id
 	cold.lut = p.lut
+	cold.dread_day_look = p.dread_day_look
 	cold.tonemap_mode = p.tonemap_mode
 	cold.snow_cover = p.snow_cover
 	return cold
+
+
+## The preset dread blends `p` toward: the grade's daylight look while the sun
+## is up, easing into the dread preset as night falls.
+static func dread_look(p: GradePreset, night_weight: float) -> GradePreset:
+	if _dread_preset == null:
+		_dread_preset = load_preset(&"dread")
+	if p.dread_day_look == &"" or night_weight >= 1.0:
+		return _dread_preset
+	if not _day_looks.has(p.dread_day_look):
+		_day_looks[p.dread_day_look] = load_preset(p.dread_day_look)
+	var day: GradePreset = _day_looks[p.dread_day_look]
+	return day if night_weight <= 0.0 else GradePreset.mix(day, _dread_preset, night_weight)
 
 
 ## `p` as she sees it once the glamour on her senses is gone (canon ch23:
