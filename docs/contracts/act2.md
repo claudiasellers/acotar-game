@@ -16,7 +16,7 @@ every moment's data steps, so the chain p2 → p8 keeps passing.
 | `story/act2/act2_space.gd` `Act2Space` | Base class (extends `SceneSpace`). Copies the moment's gates in `_ready`, adds `stage.extra_require`. Helpers: `mark(name)`, `cast(actor, at_mark, face_mark)`, `actor(id)`, `dismiss(id)`, `say(line_id)` (a beat), `reach(mark, r)` (a beat), `delight(kind, mark)`, `presses()` / `press_interact()`, `nudges()` / `nudge()` (move presses while running). |
 | `story/act2/act2_stage.gd` `Act2Stage` | Staging data (`data/story/act2/*.tres`): `marks` (anchor-local offsets), `lines` (`{who, text}`), `extra_require`, `invented` (line ids tagged canon:"X"), `canon` note. |
 | `story/act2/act2_cast.gd` `Act2Cast` | Actor fallbacks: Tamlin and Lucien are L02's cast models (via `StandIns.figure`), Alis is a coloured placeholder at 1.6 m (R4) until she is modelled. |
-| `ui/lines/line_presenter.gd` `LinePresenter` | Lines on screen: `LinePresenter.line(self, who, text)`. With a name it is said, without one it is her thought. No choices, ever (R2). |
+| `systems/dialogue/dialogue_director.gd` `DialogueDirector.staged` | A scene's own lines: `say(line_id)` and `aside(line_id)` speak a row of the stage sheet through `DialogueDirector.staged(self, id, who, text)`, so it gets the voice, the ducking and the talking face any line gets. With a name it is said, without one it is her thought. A space whose sheet names someone by what Feyre calls them overrides `speaker_of(who)`. No choices, ever (R2). |
 
 `StoryDirector._space_for(moment)` asks `Act2Spaces.space_for(moment)` first
 and falls back to `MomentSpace`; `StoryDirector.attach_anchor()` also calls

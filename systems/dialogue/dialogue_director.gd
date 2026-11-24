@@ -260,14 +260,44 @@ static func line(from: Node, id: StringName, seconds: float = -1.0, speaker: Nod
 	return d.say_line(id, from, seconds, speaker) if d else 0.0
 
 
+## A staged scene speaks a line of its own sheet (an Act2Stage's `lines`)
+## through the same door, so it gets the voice, the ducking and the talking
+## face a line of the books gets: DialogueDirector.staged(self, id, who,
+## text). With a name it is said, without one it is her thought. `speaker` is
+## the actor whose face talks (the name in snake case when left out) and
+## `emotion` the face it wears. A scene run bare, with no director, still
+## shows its words. Returns the seconds on screen.
+static func staged(from: Node, id: StringName, who: String, text: String, seconds: float = -1.0,
+		speaker: StringName = &"", emotion: StringName = &"") -> float:
+	if text == "" or not from.is_inside_tree():
+		return 0.0
+	var d := of(from.get_tree())
+	if d == null:
+		return LinePresenter.of(from.get_tree()).say(
+				LinePresenter.Voice.SAID if who != "" else LinePresenter.Voice.THOUGHT, who, text, from, seconds)
+	var line := DialogueLine.new()
+	line.id = id
+	line.who = who
+	line.text = text
+	line.inner = who == ""
+	line.once = false
+	line.emotion = emotion
+	line.speaker = speaker if speaker != &"" else (StringName(who.to_snake_case()) if who != "" else &"feyre")
+	return d._say_now(line, from, seconds, null)
+
+
 func say_line(id: StringName, from: Node = null, seconds: float = -1.0, speaker: Node = null) -> float:
 	var found := by_id.get(id) as DialogueLine
 	if found == null:
 		push_warning("DialogueDirector: no line '%s' in the sheet" % id)
 		return 0.0
+	return _say_now(found, from, seconds, speaker)
+
+
+func _say_now(line: DialogueLine, from: Node, seconds: float, speaker: Node) -> float:
 	_from = from
 	_seconds = seconds
-	_speak(found, speaker)
+	_speak(line, speaker)
 	_from = null
 	_seconds = -1.0
 	return _busy_until - _now

@@ -307,7 +307,7 @@ func _say_next() -> void:
 	var text := a.said_cut if cut else a.said
 	var lead := 0.0
 	if a.asked != "" and is_inside_tree():
-		lead = LinePresenter.of(get_tree()).say(LinePresenter.Voice.SAID, "Feyre", a.asked, self, ASK_SECONDS)
+		lead = DialogueDirector.staged(self, StringName("%s_asked" % a.id), "Feyre", a.asked, ASK_SECONDS)
 	_pending = text
 	_pending_in = lead
 	_answer_t = lead + maxf(5.5, LinePresenter.writing_time(LinePresenter.Voice.DREAD, text) + 2.5)

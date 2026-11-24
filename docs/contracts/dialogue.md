@@ -33,6 +33,16 @@ there is no director (a moment run bare in a test). A line whose speaker is `not
 shows in the Read voice, a page held until she puts it back, with `who` as what it is ("A tag on the hasp").
 `DialogueDirector.of(tree)` finds the director.
 
+A staged scene whose lines are rows of its own stage sheet (`Act2Stage.lines`) speaks them through the same
+door: `DialogueDirector.staged(from, id, who, text, seconds = -1, speaker = &"", emotion = &"")`. With a name it
+is said, without one it is her thought. It goes the way a line of the books goes (`_speak`): the voice file
+`audio/voice/<id>.ogg` when there is one, the director's `line_spoken` for ducking, `EventBus.line_spoken` for
+the face (`speaker` is the actor id, the name in snake case when left out), and free-roam lines wait for it. A
+scene run bare, with no director, still shows its words. Nothing under `story/` or `systems/` shows a said or
+thought line any other way: a film (`FilmPlayer`, on its own clock) and the two horror voices (the Bogge's
+whisper, the Suriel's dread) are the only other callers of `LinePresenter.say`, and
+`tests/unit/dialogue/test_one_door.gd` keeps it so.
+
 ## When it stays quiet
 
 Staged scenes always win. Nothing is said while `StoryControl.mode` isn't `FULL` (staged moments

@@ -78,21 +78,21 @@ func shift_time() -> void:
 			StoryControl.release())
 
 
-## A spoken line: the caption, plus the speaker's face and mouth when they have one.
+## A spoken line with the face its speaker wears for it. The director moves
+## the mouth; the look is held from here.
 func speak(line_id: StringName, emotion: StringName = &"") -> Array:
 	return [
 		Beats.run(func(_s: SceneSpace) -> void:
 			var spoken: Dictionary = stage.line(line_id) if stage else {}
-			var actor_id: StringName = SPEAKERS.get(String(spoken.get("who", "")), &"")
-			if actor_id == &"" or not is_inside_tree():
-				return
-			var text := String(spoken.get("text", ""))
-			var secs := LinePresenter.reading_time(text)
-			if emotion != &"":
-				EventBus.face_requested.emit(actor_id, emotion, 0.8, secs)
-			EventBus.line_spoken.emit(actor_id, text, emotion, secs), "voice %s" % line_id),
-		say(line_id),
+			var actor_id := speaker_of(String(spoken.get("who", "")))
+			if actor_id != &"" and emotion != &"" and is_inside_tree():
+				EventBus.face_requested.emit(actor_id, emotion, 0.8, LinePresenter.reading_time(String(spoken.get("text", "")))), "face %s" % line_id),
+		say(line_id, emotion),
 	]
+
+
+func speaker_of(who: String) -> StringName:
+	return SPEAKERS.get(who, &"")
 
 
 ## An actor turns to face a point (flat).

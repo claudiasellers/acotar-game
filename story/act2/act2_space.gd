@@ -191,9 +191,17 @@ func dismiss(actor_id: StringName) -> void:
 		who.queue_free()
 
 
-## Shows a staged line and waits about as long as it takes to read.
-func say(line_id: StringName) -> SceneBeat:
-	return SayBeat.new(line_id)
+## Speaks a staged line and waits about as long as it takes to read.
+## `emotion` is the face its speaker wears for it.
+func say(line_id: StringName, emotion: StringName = &"") -> SceneBeat:
+	return SayBeat.new(line_id, emotion)
+
+
+## The actor whose face talks for a name on the stage sheet. &"" leaves it to
+## the director (the name in snake case); a space whose sheet names someone
+## by what Feyre calls them ("The stranger") says who that is.
+func speaker_of(_who: String) -> StringName:
+	return &""
 
 
 ## Waits until Feyre is within `radius` of a mark (on foot, any height).
@@ -311,7 +319,8 @@ func aside(line_id: StringName) -> void:
 	var spoken: Dictionary = stage.line(line_id) if stage else {}
 	if spoken.is_empty() or not is_inside_tree():
 		return
-	LinePresenter.line(self, String(spoken.get("who", "")), String(spoken.get("text", "")))
+	var who := String(spoken.get("who", ""))
+	DialogueDirector.staged(self, line_id, who, String(spoken.get("text", "")), -1.0, speaker_of(who))
 
 
 ## Beats: fade to dark, move the Clock to `to` (fraction of the day), run
@@ -429,13 +438,15 @@ class LeadBeat:
 class SayBeat:
 	extends SceneBeat
 	var line_id: StringName
+	var emotion: StringName
 	var _left: float
 
 	func consumes_time() -> bool:
 		return true
 
-	func _init(id: StringName) -> void:
+	func _init(id: StringName, face: StringName = &"") -> void:
 		line_id = id
+		emotion = face
 		label = "say %s" % id
 
 	func enter(space: SceneSpace) -> void:
@@ -447,8 +458,8 @@ class SayBeat:
 			_left = 0.0
 			return
 		_left = LinePresenter.reading_time(text)
-		if space.is_inside_tree():
-			LinePresenter.line(space, String(spoken.get("who", "")), text, _left)
+		var who := String(spoken.get("who", ""))
+		DialogueDirector.staged(space, line_id, who, text, _left, s.speaker_of(who), emotion)
 
 	func tick(_space: SceneSpace, delta: float) -> bool:
 		_left -= delta

@@ -80,12 +80,6 @@ static func of(tree: SceneTree) -> LinePresenter:
 	return tree.root.get_node(NODE) as LinePresenter
 
 
-## A line from a scene's own sheet: with a name it is said, without one it is
-## her thought. `from` (or the SceneSpace above it) is the scene it belongs to.
-static func line(from: Node, who: String, text: String, seconds: float = -1.0) -> float:
-	return of(from.get_tree()).say(Voice.SAID if who != "" else Voice.THOUGHT, who, text, from, seconds)
-
-
 static func reading_time(text: String) -> float:
 	return clampf(1.2 + text.split(" ", false).size() * 0.28, 1.8, 6.0)
 

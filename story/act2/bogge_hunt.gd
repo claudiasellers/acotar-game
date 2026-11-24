@@ -251,9 +251,7 @@ func _caption(line_id: StringName) -> void:
 	if not is_inside_tree() or stage == null:
 		return
 	var spoken := stage.line(line_id)
-	var text := String(spoken.get("text", ""))
-	if text != "":
-		LinePresenter.line(self, String(spoken.get("who", "")), text, 3.2)
+	DialogueDirector.staged(self, line_id, String(spoken.get("who", "")), String(spoken.get("text", "")), 3.2)
 
 
 func _move_lucien(delta: float) -> void:

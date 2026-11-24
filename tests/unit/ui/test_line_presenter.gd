@@ -50,9 +50,9 @@ func test_a_thought_is_her_page_slip_with_her_whorl_and_no_name() -> void:
 
 func test_a_scene_line_with_no_name_is_a_thought() -> void:
 	var s := _space(&"line_test_voice")
-	LinePresenter.line(s, "", "A thought.")
+	DialogueDirector.staged(s, &"line_test_thought", "", "A thought.")
 	assert_eq(lines.voice, LinePresenter.Voice.THOUGHT)
-	LinePresenter.line(s, "Alis", "Hold still.")
+	DialogueDirector.staged(s, &"line_test_said", "Alis", "Hold still.")
 	assert_eq(lines.voice, LinePresenter.Voice.SAID)
 	assert_eq(lines.showing, "Hold still.", "one line at a time: the newer takes the lane")
 
@@ -238,7 +238,7 @@ func test_dread_writes_itself_out_and_goes_when_told() -> void:
 
 func test_line_clears_when_its_scene_finishes() -> void:
 	var s := _space(&"line_test_a")
-	LinePresenter.line(s, "Tamlin", "The table. Clear it off!", 30.0)
+	DialogueDirector.staged(s, &"line_test_1", "Tamlin", "The table. Clear it off!", 30.0)
 	assert_eq(lines.showing, "The table. Clear it off!")
 	EventBus.scene_space_finished.emit(&"some_other_scene")
 	assert_ne(lines.showing, "", "another scene ending leaves it")
@@ -248,7 +248,7 @@ func test_line_clears_when_its_scene_finishes() -> void:
 
 func test_line_clears_when_its_scene_leaves_the_tree() -> void:
 	var s := _space(&"line_test_b")
-	LinePresenter.line(s, "", "A thought.", 30.0)
+	DialogueDirector.staged(s, &"line_test_2", "", "A thought.", 30.0)
 	remove_child(s)
 	assert_eq(lines.showing, "")
 	s.free()
@@ -258,22 +258,22 @@ func test_child_node_speaks_for_its_scene() -> void:
 	var s := _space(&"line_test_c")
 	var prop := Node3D.new()
 	s.add_child(prop)
-	LinePresenter.line(prop, "Lucien", "Polite.", 30.0)
+	DialogueDirector.staged(prop, &"line_test_3", "Lucien", "Polite.", 30.0)
 	EventBus.scene_space_finished.emit(&"line_test_c")
 	assert_eq(lines.showing, "")
 
 
 func test_phase_change_and_load_clear_it() -> void:
-	LinePresenter.line(self, "Tamlin", "One.", 30.0)
+	DialogueDirector.staged(self, &"line_test_4", "Tamlin", "One.", 30.0)
 	EventBus.phase_changed.emit(&"p3_house", &"p4_studio")
 	assert_eq(lines.showing, "", "phase change")
-	LinePresenter.line(self, "Tamlin", "Two.", 30.0)
+	DialogueDirector.staged(self, &"line_test_5", "Tamlin", "Two.", 30.0)
 	EventBus.game_loaded.emit("test")
 	assert_eq(lines.showing, "", "load")
 
 
 func test_line_still_times_out_and_hides_under_a_paused_screen() -> void:
-	LinePresenter.line(self, "", "Short.", 0.2)
+	DialogueDirector.staged(self, &"line_test_6", "", "Short.", 0.2)
 	get_tree().paused = true
 	lines._process(1.0)
 	assert_false(lines.visible, "hidden while a screen pauses the tree")
@@ -379,8 +379,8 @@ func _ids_in(dir: String, asked: RegEx, ids: Array[String], group: int = 1) -> v
 				ids.append(m.get_string(group))
 
 
-## No scene types a line into its script: LinePresenter.line and say are for
-## the director, a scene's own stage sheet, a film's sheet and the guide.
+## No scene types a line into its script: the words come from the line
+## sheet, a scene's own stage sheet or a film's sheet.
 func test_no_script_types_its_own_line() -> void:
 	var typed := RegEx.create_from_string("LinePresenter\\.(line|of\\([^)]*\\)\\.say)\\([^\\n]*\"[A-Z][^\"]*\\s[^\"]*\\s[^\"]*\"")
 	var hits: Array[String] = []
