@@ -1,7 +1,7 @@
 ## The brewing screen (lane L62): at any hearth, kitchen range, stillroom
 ## bench, potion room or the starlight pool, Feyre lays forage from her pouch
 ## and satchel into the pot, picks how to work it, and brews. Drawn on the
-## satchel's crafted look (L50; SatchelTheme only, no colours here).
+## satchel's crafted look (L50; JournalTheme only, no colours here).
 ##
 ## Discovery, not a recipe list: her hunch line only names a brew she has
 ## made before or unlocked (gathered all of; RecipeUnlocks), or the tags she
@@ -89,7 +89,6 @@ func open(who: Feyre, at: CookingStation) -> void:
 	method = at.station.methods[0] if at.station and not at.station.methods.is_empty() else &""
 	_reveal.visible = false
 	_outcome.text = ""
-	_root.theme = SatchelTheme.theme()
 	_root.visible = true
 	_refresh()
 	ScreenStack.push(self)
@@ -198,11 +197,10 @@ func _key(event: InputEvent, keys: Array) -> bool:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = SatchelTheme.theme()
 	_root.visible = false
 	add_child(_root)
 	var scrim := ColorRect.new()
-	scrim.color = SatchelTheme.color(&"scrim")
+	scrim.color = JournalTheme.color(&"scrim")
 	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(scrim)

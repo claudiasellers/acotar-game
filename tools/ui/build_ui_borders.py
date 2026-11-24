@@ -5,9 +5,7 @@ tools/ui/kenney_borders/License.txt) into the menus' frame textures (L65).
 The pack is crisp 1-bit line art at 48 px. Each chosen frame is blown up,
 blurred and re-thresholded so the square fretwork turns into rounded, piped
 lines (R3: rounded whimsical shapes), given a darker rim, and saved white so
-the game tints it from AcotarPalette `line` (gold in Spring, smoke grey in
-the human realm). Which frame dresses which panel lives in
-ui/theme/ui_borders.gd.
+the game tints it. ui/theme/ui_borders.gd draws it inside the pause card.
 
 Run:  python3 tools/ui/build_ui_borders.py [--sheet out.png]
 Source: tools/ui/kenney_borders/panel-border-NNN.png (copied from the pack)
@@ -25,7 +23,6 @@ OUT = os.path.join(HERE, "..", "..", "ui", "theme", "borders")
 
 # name -> Kenney Default/Border index. Keep in step with ui_borders.gd.
 FRAMES = {
-    "page": "012",     # corner knots: the satchel tag, journal pages, wardrobe, brew card
     "card": "002",     # scrolled double corners: the pause card
 }
 SUPER = 8      # work resolution per source pixel

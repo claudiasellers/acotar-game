@@ -44,10 +44,10 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var ink := SatchelTheme.color(&"ink")
-	var line := SatchelTheme.color(&"line")
-	var glow := SatchelTheme.color(&"glow")
-	var paper := SatchelTheme.color(&"paper")
+	var ink := JournalTheme.color(&"ink")
+	var line := JournalTheme.color(&"line")
+	var glow := JournalTheme.color(&"glow")
+	var paper := JournalTheme.color(&"paper")
 	var c := centre()
 	draw_rect(Rect2(Vector2(c.x - TAB.x * 0.5, 0), TAB + Vector2(0, 4)), ink.darkened(0.1))
 	draw_circle(c, RADIUS - 2.0, Color(paper, 0.82))

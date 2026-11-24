@@ -104,7 +104,6 @@ func _ready() -> void:
 
 
 func _apply_theme() -> void:
-	_bar_root.theme = SatchelTheme.theme()
 	_refresh()
 
 
@@ -214,7 +213,6 @@ func _build_bar() -> void:
 	_bar_root = Control.new()
 	_bar_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bar_root.theme = SatchelTheme.theme()
 	add_child(_bar_root)
 	var length := RING_START + RING_STEP * QuickBar.SLOTS - RING_STEP * 0.5 + 20.0
 	var height := QuickStrap.BAND + QuickRing.TAB.y + QuickRing.RADIUS * 2.0 + 12.0
@@ -300,7 +298,7 @@ func _refresh() -> void:
 		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		key.size = Vector2(ring.size.x, QuickStrap.BAND)
 		key.position = Vector2(0, -QuickStrap.BAND + 2.0)
-		key.add_theme_color_override(&"font_color", SatchelTheme.color(&"paper"))
+		key.add_theme_color_override(&"font_color", JournalTheme.color(&"paper"))
 		ring.add_child(key)
 
 
@@ -335,7 +333,7 @@ func _sparkle(target: Control) -> void:
 	s.gravity = Vector2(0, 120)
 	s.scale_amount_min = 2.0
 	s.scale_amount_max = 4.0
-	s.color = SatchelTheme.color(&"glow")
+	s.color = JournalTheme.color(&"glow")
 	s.position = target.size * 0.5
 	target.add_child(s)
 	get_tree().create_timer(0.8, true).timeout.connect(s.queue_free)
@@ -352,7 +350,7 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	if feyre == null or cam == null or cam.is_position_behind(feyre.global_position):
 		return
 	var item := ItemCatalog.get_item(id)
-	var icon := ItemIcon.make(item.icon if item else &"trinket", item.color if item else SatchelTheme.color(&"accent"),
+	var icon := ItemIcon.make(item.icon if item else &"trinket", item.color if item else JournalTheme.color(&"accent"),
 			false, item != null and item.rarity == &"shiny", 44.0)
 	_bar_root.add_child(icon)
 	icon.position = cam.unproject_position(feyre.global_position + Vector3.UP * 1.3) - Vector2(22, 22)

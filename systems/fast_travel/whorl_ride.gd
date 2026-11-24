@@ -4,7 +4,7 @@
 ## paper, the whorl is inked stroke by stroke, the place's name comes up in the
 ## serif, the mare's canter runs under it, and it fades into the arrival. She
 ## is held still by the stones until the ground there has loaded. Lives under
-## the root, since the region she leaves unloads. Look from SatchelTheme only.
+## the root, since the region she leaves unloads. Look from JournalTheme only.
 class_name WhorlRide
 extends CanvasLayer
 
@@ -51,7 +51,6 @@ func _ready() -> void:
 	_veil = Control.new()
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_veil.theme = SatchelTheme.theme()
 	_veil.modulate.a = 0.0
 	add_child(_veil)
 	var paper := PanelContainer.new()
@@ -66,7 +65,7 @@ func _ready() -> void:
 	center.add_child(col)
 	_whorl = WhorlInk.new()
 	_whorl.custom_minimum_size = Vector2(150, 150)
-	_whorl.ink = SatchelTheme.color(&"ink")
+	_whorl.ink = JournalTheme.color(&"ink")
 	_whorl.width = 5.0
 	_whorl.progress = 0.0
 	col.add_child(_whorl)

@@ -1,6 +1,6 @@
 ## The market sell screen (lane L53): Feyre steps up to a buyer and lays out
 ## what they would take, on the satchel's crafted look (L50: the deckled paper
-## tag, stitched leather keys, enamel chips; SatchelTheme only, no colours
+## tag, stitched leather keys, enamel chips; JournalTheme only, no colours
 ## here). One row per thing the buyer takes, with the coppers each; E sells
 ## one, R sells the lot, Esc steps away. Every sale chimes, sparkles at Feyre
 ## and bounces the purse. Selling goes through Inventory.sell, so the pelt's
@@ -59,7 +59,6 @@ func is_open() -> bool:
 func open(for_buyer: MarketBuyer, who: Node3D = null) -> void:
 	buyer = for_buyer
 	speaker = who
-	_root.theme = SatchelTheme.theme()
 	_root.visible = true
 	selected = 0
 	_refresh()
@@ -144,10 +143,9 @@ func _move(by: int) -> void:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	var scrim := ColorRect.new()
-	scrim.color = SatchelTheme.color(&"scrim")
+	scrim.color = JournalTheme.color(&"scrim")
 	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(scrim)

@@ -17,7 +17,7 @@
 ## owns Q / E (LB / RB) for pages and closes it.
 ## The cut-outs and models are made once per thing and kept (warmed while the
 ## shell is closed), so opening and flipping pockets re-lays, never rebuilds.
-## Silent by the user's call (T022). Look: theme variations from SatchelTheme
+## Silent by the user's call (T022). Look: theme variations from JournalTheme
 ## only; no colours or fonts here.
 class_name SatchelMenu
 extends MenuTab
@@ -226,10 +226,9 @@ func _on_item_added(id: StringName, _n: int, _c: StringName) -> void:
 
 # --- build -------------------------------------------------------------------
 
-## Act I and the Spring Court wear different themes (SatchelTheme).
+## Act I and the Spring Court wear different themes (JournalTheme).
 func _apply_theme() -> void:
-	_root.theme = SatchelTheme.theme()
-	_twine.default_color = SatchelTheme.color(&"line")
+	_twine.default_color = JournalTheme.color(&"line")
 	_table.apply_theme()
 	_load_glyph.queue_redraw()
 
@@ -237,7 +236,6 @@ func _apply_theme() -> void:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	# The cloak's cloth fills the screen: no card, no box.
 	_cloth = PanelContainer.new()
@@ -284,7 +282,7 @@ func _build() -> void:
 
 	_twine = Line2D.new()
 	_twine.width = 2.0
-	_twine.default_color = SatchelTheme.color(&"line")
+	_twine.default_color = JournalTheme.color(&"line")
 	_twine.antialiased = true
 	_root.add_child(_twine)
 	_build_tag()
@@ -715,7 +713,7 @@ func _focus_selected() -> void:
 ## Edges of the cloak fall into shade, so the eye settles in the middle.
 func _vignette() -> TextureRect:
 	var g := Gradient.new()
-	var ink := SatchelTheme.color(&"ink")
+	var ink := JournalTheme.color(&"ink")
 	g.set_offset(0, 0.55)
 	g.set_color(0, Color(ink, 0.0))
 	g.set_color(1, Color(ink, 0.16))

@@ -19,5 +19,5 @@ func _init() -> void:
 
 func _draw() -> void:
 	var c := Vector2(RADIUS, RADIUS)
-	draw_circle(c, RADIUS, SatchelTheme.color(&"accent"))
-	draw_arc(c, RADIUS, 0.0, TAU, 20, SatchelTheme.color(&"line"), 1.5, true)
+	draw_circle(c, RADIUS, JournalTheme.color(&"accent"))
+	draw_arc(c, RADIUS, 0.0, TAU, 20, JournalTheme.color(&"line"), 1.5, true)

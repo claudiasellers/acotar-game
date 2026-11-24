@@ -1,7 +1,7 @@
 ## The collection book as a page of the menu shell (MenuShell): built once,
 ## its grid redrawn only when another of the book's tabs is shown or its
 ## entries changed. J (pad Back) opens it; Z / X (pad LT / RT) flip the book's
-## own tabs, as the satchel's pockets. The look is the satchel's (SatchelTheme:
+## own tabs, as the satchel's pockets. The look is the satchel's (JournalTheme:
 ## framed paper, stitched tabs and slots, the serif); no colours or fonts here.
 class_name CollectionTab
 extends MenuTab
@@ -78,7 +78,6 @@ func has_news() -> bool:
 
 
 func _shown() -> void:
-	_root.theme = SatchelTheme.theme()
 	_watch()
 	FindCard.clear(get_tree())
 	show_page(_first_page())
@@ -155,7 +154,6 @@ func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)

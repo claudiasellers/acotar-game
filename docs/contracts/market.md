@@ -29,7 +29,7 @@ Grain, bread, roots, wool, tinker and salt stalls have signs but buy nothing fro
   fingerpost at the cottage fork. No glow, pulse or floating marker (R2).
 - `MarketStation` (group `station` + `market_station`): `use()` opens the sell screen.
 - `MarketMenu.open_for(tree, buyer, speaker := null) -> MarketMenu`: the sell screen
-  (SatchelTheme, L50 crafted look). It pauses the tree while open. `sold(item_id, count, coin)`.
+  (JournalTheme). It pauses the tree while open. `sold(item_id, count, coin)`.
   Every sale goes through `Inventory.sell` → `EventBus.item_sold`, so `PeltSale` raises
   `pelt_sold` whoever buys the pelt.
 - `FurStall` (L01): with the wolf pelt, E sells it directly at base price (unchanged, the L08

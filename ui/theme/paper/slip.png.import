@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cje4biogsvaay"
-path="res://.godot/imported/tab_leather_on.png-2786fdc523c8dabe8d58dd1f722447f6.ctex"
+uid="uid://cs1fag8rc177f"
+path="res://.godot/imported/slip.png-bc650ae8120b72475e70e974986361f3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/satchel/crafted/tab_leather_on.png"
-dest_files=["res://.godot/imported/tab_leather_on.png-2786fdc523c8dabe8d58dd1f722447f6.ctex"]
+source_file="res://ui/theme/paper/slip.png"
+dest_files=["res://.godot/imported/slip.png-bc650ae8120b72475e70e974986361f3.ctex"]
 
 [params]
 

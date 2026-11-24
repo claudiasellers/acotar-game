@@ -35,6 +35,7 @@ var _entries: Array[Entry] = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	JournalTheme.follow_story()
 
 
 ## `cancel` is for a screen built without a script of its own; a screen

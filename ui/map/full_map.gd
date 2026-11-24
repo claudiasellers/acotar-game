@@ -69,7 +69,6 @@ func map_rect() -> ColorRect:
 
 
 func _shown() -> void:
-	_root.theme = SatchelTheme.theme()
 	view_center = hud.player_xz
 	view_width = ZOOM_OPEN
 	manor_level = hud.manor.level
@@ -221,9 +220,8 @@ func _landmark_near(point: Vector2) -> String:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	# The satchel's look (SatchelTheme): framed paper, the serif. The shell
+	# The satchel's look (JournalTheme): framed paper, the serif. The shell
 	# dims the world behind it and keeps the strip above page_top().
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 
 	var margin := MarginContainer.new()

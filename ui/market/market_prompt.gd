@@ -25,7 +25,6 @@ func _ready() -> void:
 	anchor.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	anchor.position.y -= 150.0
 	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	anchor.theme = SatchelTheme.theme()
 	add_child(anchor)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override(&"separation", 10)

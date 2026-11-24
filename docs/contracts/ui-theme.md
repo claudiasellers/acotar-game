@@ -1,26 +1,70 @@
-# UI theme contract (L13)
+# UI theme contract (L77)
 
-Shared look for every UI lane. Owner: L13 (UI art direction). Changing a name here needs the director's OK.
+One look for every menu, card and HUD piece: Feyre's Journal. Owner: L77 (sole
+UI owner; owner's decision 2026-11-24). Changing a name here needs the
+director's OK.
 
-## Files
-- `res://ui/theme/acotar_theme.tres`: Spring Court theme (default after the Wall).
-- `res://ui/theme/acotar_theme_human.tres`: Act I human-realm theme.
-- `res://ui/theme/acotar_palette.gd` (`AcotarPalette`): colours per act; read them from here or from the theme, never hard-code.
-- `tools/ui_theme/build_acotar_theme.gd`: regenerates both `.tres` (`godot --headless -s tools/ui_theme/build_acotar_theme.gd`). Don't hand-edit the `.tres`.
-- `res://ui/theme/icons/notify/<name>.png` (coming): notification icons `thought, pickup, first_find, rare_find, recipe, truth, keepsake, sketch, painting, wardrobe, map, hunt`, 256 px plus `_128` versions.
+## The one theme
+
+`JournalTheme` (`ui/theme/journal_theme.gd`) holds every colour, font and size
+as a token and builds one `Theme` from them. That theme is the project theme
+(`project.godot`, `gui/theme/custom = res://ui/theme/journal_theme.tres`), so a
+`Control` anywhere in the game wears it with no code.
+
+- No script sets `.theme`, makes a `Theme` or touches `ThemeDB`. A search test
+  in `tests/unit/ui/test_journal_theme.gd` keeps that. (The pause panel keeps
+  its own until it joins the book, plan step 4; the test lists those files.)
+- A Control picks its look with `theme_type_variation`, never with a style
+  override of its own.
+- Code that draws by hand (`_draw`) reads colours with
+  `JournalTheme.color(&"ink")` and fonts with `JournalTheme.font("hand", 500)`.
+
+## Two acts, one theme
+
+The human realm (phases `p0_*`, `p1_*`) is sparse and worn; the Spring Court is
+ivory, plum and rose. `JournalTheme.apply()` rewrites the live project theme in
+place for the act the story is in. `ScreenStack` calls
+`JournalTheme.follow_story()` once at start, which applies it and again on
+every `EventBus.phase_changed`. Controls redraw on their own.
+
+## Tokens
+
+Colours, read from theme type `Journal` or `JournalTheme.color(token)`:
+
+| Token | Use |
+|---|---|
+| `paper`, `paper_deep` | the page; a page under a page |
+| `ink`, `ink_soft` | type; small type |
+| `accent` | the act's one strong colour (yellow paint; rose) |
+| `glow` | what is chosen or focused (a flat gold, not an effect) |
+| `rare`, `danger` | rare finds; harm |
+| `line` | brass: rules, rims, stitching |
+| `leather` | straps and covers |
+| `scrim` | the dim behind an open page |
+
+Fonts (`ui/theme/fonts/`, all SIL OFL): Marcellus for display, Nunito for
+body and buttons, Cormorant Garamond Italic for Feyre's hand.
+
+Paper (`ui/theme/paper/`): `page.png` and `slip.png`, near-white canvas with a
+deckled edge, tinted to a paper token. Made by
+`tools/ui_theme/build_journal_paper.py`.
 
 ## Type variations
+
 | Variation | Base |
 |---|---|
-| SatchelCard, SatchelDetail, QuickBarSlot, QuickBarSlotSelected, NotifyCard | PanelContainer |
-| SatchelTab, SatchelSlot, MenuTab | Button (all states, including focus) |
-| SatchelHeading, SatchelBody, SatchelSmall, SatchelCount, QuickBarKey, QuickBarCount, MenuTitle, NotifyText, ThoughtText | Label |
+| SatchelCard, SatchelDetail, NotifyCard, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
+| SatchelTab, MenuTab, SatchelSlot | Button (all states, including focus) |
+| SatchelHeading, MenuTitle, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText | Label |
 | SatchelMeter | ProgressBar |
 
-Colours under theme types `Satchel` and `Acotar`: `paper, paper_deep, ink, ink_soft, accent, glow, rare, danger, line`. (`glow` is a flat highlight; the direction uses no glow effects.)
-
 ## Rules
-- Type: EB Garamond (body Medium, display SemiBold, thoughts MediumItalic).
-- Flat fills and line ornament only: no gradients, outer glows or bevels in UI chrome. Juice (sparkle, chime, bounce) stays on events, per R3.
-- Swap the theme by act: Act I uses `_human`, from the wall crossing onward use the Spring theme.
-- The look is provisional until the user picks a direction (A painted drawer, B engraving, C herbarium; see /mnt/project-files/ui-direction/image-prompts.md). Names stay stable, and styleboxes will become textures.
+
+- Paper is a texture; buttons, chips and key caps are clean flat shapes. No
+  gradients, outer glows or bevels in UI chrome. Juice (sparkle, chime,
+  bounce) stays on events, per R3.
+- Item icons carry their own gilt rim, so a slot draws no outline of its own
+  round an icon.
+- After changing a token, run
+  `tools/mq/godot.sh -s tools/ui_theme/build_journal_theme.gd` and commit
+  `journal_theme.tres`. Don't hand-edit the `.tres`.

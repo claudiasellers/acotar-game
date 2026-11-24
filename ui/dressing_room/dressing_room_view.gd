@@ -267,9 +267,8 @@ func _face_the_room(station_id: StringName) -> void:
 
 
 func _build() -> void:
-	# L64-3: the satchel's handmade look (SatchelTheme, L50): paper, stitched
+	# L64-3: the satchel's handmade look (JournalTheme, L50): paper, stitched
 	# tabs and slots, the serif. The gilt mirror stays the dressing room's own.
-	theme = SatchelTheme.theme()
 	var mirror := Panel.new()
 	mirror.name = "MirrorFrame"
 	mirror.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -320,7 +319,7 @@ func _build() -> void:
 	box.add_child(head)
 	arrivals_label = _label("", &"SatchelBody")
 	arrivals_label.name = "Arrivals"
-	arrivals_label.add_theme_color_override(&"font_color", SatchelTheme.color(&"accent").darkened(0.35))
+	arrivals_label.add_theme_color_override(&"font_color", JournalTheme.color(&"accent").darkened(0.35))
 	arrivals_label.visible = false
 	box.add_child(arrivals_label)
 	wearing = _label("", &"SatchelSmall")
@@ -523,7 +522,7 @@ func _new_ribbon() -> Control:
 	pill.name = "NewRibbon"
 	pill.theme_type_variation = &"SatchelChip"
 	var word := _label("New", &"SatchelPin")
-	word.add_theme_color_override(&"font_color", SatchelTheme.color(&"ink"))
+	word.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
 	pill.add_child(word)
 	pill.ready.connect(func() -> void:
 		pill.pivot_offset = pill.size * 0.5
@@ -576,7 +575,7 @@ func _swatch_button(color: Color, tip: String) -> Button:
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = color
 	fill.set_corner_radius_all(SWATCH)
-	fill.border_color = Color(SatchelTheme.color(&"ink"), 0.35)
+	fill.border_color = Color(JournalTheme.color(&"ink"), 0.35)
 	fill.set_border_width_all(1)
 	fill.anti_aliasing = true
 	dot.add_theme_stylebox_override(&"panel", fill)

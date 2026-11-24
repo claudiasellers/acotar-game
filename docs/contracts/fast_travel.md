@@ -75,7 +75,7 @@ None in the sealed `autumn_foothills` or in `suriel_glade` (a dread place).
   canter, puts her 2.2 m south of the pair facing through it (physics held),
   streams the region in (`WorldStreamer.update_for`), waits for `is_ready` +
   0.4 s settled (≥ 1.3 s held, 45 s cap), then fades into the arrival.
-- **Look:** the card and the ride take everything from `SatchelTheme`
+- **Look:** the card and the ride take everything from `JournalTheme`
   (SatchelDetail paper with L65's framed edge, SatchelHeading/Small labels,
   SatchelTab buttons, the theme's ink and accent): no StyleBoxFlat and no
   fonts of their own.

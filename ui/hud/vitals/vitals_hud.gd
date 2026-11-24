@@ -62,7 +62,6 @@ func _ready() -> void:
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	status_row = VitalsStatusRow.new()
 	status_row.position = STATUS_AT
@@ -104,7 +103,7 @@ func _update_meters(delta: float, mode: int, play: bool) -> void:
 	var v := _vitals
 	var human := v.in_human_realm()
 	health_bar.human_realm = human
-	health_bar.line = SatchelTheme.color(&"ink")
+	health_bar.line = JournalTheme.color(&"ink")
 	health_bar.set_health(v.health_fraction())
 	health_bar.regen_cap = v.regen_cap() / VitalsState.MAX_HEALTH
 	health_bar.venom = v.affliction(&"venom")
@@ -155,9 +154,9 @@ func _update_statuses(delta: float, mode: int, play: bool) -> void:
 	for tag: StringName in _first_seen.keys():
 		if not seen.has(tag):
 			_first_seen.erase(tag)
-	status_row.ring_color = SatchelTheme.color(&"ink")
-	status_row.paper = SatchelTheme.color(&"paper")
-	status_row.gilt = SatchelTheme.color(&"glow")
+	status_row.ring_color = JournalTheme.color(&"ink")
+	status_row.paper = JournalTheme.color(&"paper")
+	status_row.gilt = JournalTheme.color(&"glow")
 	status_row.set_statuses(show if mode != Mode.OFF and play else ([] as Array[Dictionary]))
 	_status_alpha = move_toward(_status_alpha, 1.0 if not status_row.shown.is_empty() else 0.0, delta * FADE_SPEED)
 	status_row.modulate.a = _status_alpha

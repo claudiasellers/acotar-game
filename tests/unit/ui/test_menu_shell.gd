@@ -9,7 +9,7 @@ const PAGE_FILES := [
 	"res://ui/collection_book/collection_book_ui.gd", "res://ui/menu/wardrobe_tab.gd",
 	"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd",
 ]
-## One look: page chrome comes from SatchelTheme only. (The wardrobe's gilt
+## One look: page chrome comes from JournalTheme only. (The wardrobe's gilt
 ## mirror and colour swatches in DressingRoomView are its own, by L64-3.)
 const OFF_THEME := "StyleBoxFlat|add_theme_font_override|DISPLAY_FONT|body_font|SystemFont|FontFile|\\.ttf|PauseStyle\\.(title|note|theme|card_box)|UiStyle\\."
 
@@ -151,7 +151,7 @@ func test_pages_wear_one_look() -> void:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s styles itself outside SatchelTheme" % path)
+		assert_eq(hits, [], "%s styles itself outside JournalTheme" % path)
 
 
 func test_neither_the_shell_nor_a_page_pauses_for_itself() -> void:

@@ -3,7 +3,8 @@
 ## call, and the slowest of the next frames (the hitch the player sees).
 ##   xvfb-run -a -s "-screen 0 1920x1080x24" godot --audio-driver Dummy --path . \
 ##     res://tools/ui/menu_open_probe.tscn
-## With `-- shots <dir>` it saves one frame of each page in SHOT_PAGES instead.
+## With `-- shots <dir> [phase]` it saves one frame of the HUD and of each page
+## in SHOT_PAGES instead, in the look of that story phase (none: the human realm).
 ## (A scene, not a -s script, so the autoloads exist.)
 extends Node
 
@@ -48,6 +49,9 @@ func _go() -> void:
 		await get_tree().process_frame
 	var args := OS.get_cmdline_user_args()
 	if args.size() >= 2 and args[0] == "shots":
+		if args.size() >= 3:
+			PhaseManager.current_phase = StringName(args[2])
+			JournalTheme.apply()
 		await _shots(args[1])
 	else:
 		for page in _pages():
@@ -103,6 +107,10 @@ func _time(page: StringName, n: int) -> void:
 
 
 func _shots(dir: String) -> void:
+	for i in 30:
+		await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(dir.path_join("hud.png"))
 	for page in SHOT_PAGES:
 		_open(page)
 		for i in 90:

@@ -34,7 +34,7 @@ static func make(e: Dictionary, px: float) -> Control:
 		tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		return tex
 	var item := e.get("item") as ItemData
-	var color: Color = item.color if item else SatchelTheme.color(&"accent")
+	var color: Color = item.color if item else JournalTheme.color(&"accent")
 	var icon := ItemIcon.make(e.icon, color, false, item != null and item.rarity == &"shiny", px)
 	icon.size = Vector2(px, px)
 	return icon

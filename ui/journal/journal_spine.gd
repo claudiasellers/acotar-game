@@ -1,7 +1,7 @@
 ## The sketchbook's sewn spine (L54): the pages fold into a shadowed gutter
 ## and are sewn through it with thread, a running stitch down the fold and
 ## kettle stitches over five linen tapes, the way a bookbinder (or Feyre,
-## with Alis's needle) would bind loose sheets. Colours from SatchelTheme.
+## with Alis's needle) would bind loose sheets. Colours from JournalTheme.
 class_name JournalSpine
 extends Control
 
@@ -15,17 +15,14 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func _col(n: StringName, fallback: StringName = &"ink") -> Color:
-	return SatchelTheme.color(n) if SatchelTheme.theme().has_color(n, SatchelTheme.COLOR_TYPE) \
-			else SatchelTheme.color(fallback)
 
 
 func _draw() -> void:
-	var ink := SatchelTheme.color(&"ink")
+	var ink := JournalTheme.color(&"ink")
 	# Undyed linen and a plain brown thread (director, L54-2 note).
-	var thread := _col(&"ink_soft")
-	var shine := SatchelTheme.color(&"glow")
-	var tape := SatchelTheme.color(&"paper").darkened(0.1)
+	var thread := JournalTheme.color(&"ink_soft")
+	var shine := JournalTheme.color(&"glow")
+	var tape := JournalTheme.color(&"paper").darkened(0.1)
 	var cx := size.x * 0.5
 	# The fold: pages curving down into the gutter.
 	for i in int(SHADE):

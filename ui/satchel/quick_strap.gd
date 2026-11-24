@@ -1,6 +1,6 @@
 ## The quick bar's leather strap: a stitched band with a brass rivet where
-## each ring hangs. Colours from SatchelTheme (ink for the leather, line for
-## the stitching and brass).
+## each ring hangs. Colours from JournalTheme (leather, and line for the
+## stitching and brass).
 class_name QuickStrap
 extends Control
 
@@ -17,15 +17,15 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	var ink := SatchelTheme.color(&"ink")
-	var line := SatchelTheme.color(&"line")
+	var leather := JournalTheme.color(&"leather")
+	var line := JournalTheme.color(&"line")
 	var w := size.x
 	var r := BAND * 0.5
 	# Leather: a band with rounded ends.
-	draw_rect(Rect2(r, 0, w - BAND, BAND), ink)
-	draw_circle(Vector2(r, r), r, ink)
-	draw_circle(Vector2(w - r, r), r, ink)
-	draw_line(Vector2(r, 2), Vector2(w - r, 2), Color(ink.lightened(0.25), 0.6), 1.0)
+	draw_rect(Rect2(r, 0, w - BAND, BAND), leather)
+	draw_circle(Vector2(r, r), r, leather)
+	draw_circle(Vector2(w - r, r), r, leather)
+	draw_line(Vector2(r, 2), Vector2(w - r, 2), Color(leather.lightened(0.25), 0.6), 1.0)
 	# Saddle stitching along both edges.
 	for y in [STITCH_INSET, BAND - STITCH_INSET]:
 		var x := BAND

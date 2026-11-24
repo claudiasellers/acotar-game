@@ -17,7 +17,7 @@
 ## closed, so opening any page costs no frame hitch.
 ##
 ## Look: the strip is a SatchelDetail panel of SatchelTab buttons
-## (SatchelTheme, which carries L65's borders); no colours or fonts here.
+## (JournalTheme, which carries L65's borders); no colours or fonts here.
 class_name MenuShell
 extends CanvasLayer
 
@@ -210,7 +210,6 @@ func _open_shell() -> void:
 	for n in _tree.root.find_children("*", "ControlsHint", true, false):
 		(n as ControlsHint).hide_now()
 	if _root:
-		_root.theme = SatchelTheme.theme()
 		_root.visible = true
 		_backdrop.visible = true
 
@@ -322,7 +321,6 @@ func _build() -> void:
 	_root.name = "ShellRoot"
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	_backdrop = CanvasLayer.new()
 	_backdrop.name = "Backdrop"
@@ -331,7 +329,7 @@ func _build() -> void:
 	var dim := ColorRect.new()
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dim.color = Color(SatchelTheme.color(&"ink"), BACKDROP_ALPHA)
+	dim.color = Color(JournalTheme.color(&"ink"), BACKDROP_ALPHA)
 	_backdrop.add_child(dim)
 	_strip = PanelContainer.new()
 	_strip.name = "TabStrip"

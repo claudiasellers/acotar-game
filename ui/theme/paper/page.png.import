@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgb4hkspufkcv"
-path="res://.godot/imported/key_leather.png-17da0e6afe96f73f36ada634e8fafdb1.ctex"
+uid="uid://d347phif843b3"
+path="res://.godot/imported/page.png-dc4d0eb78a82eaabe70e1a9caa705604.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/satchel/crafted/key_leather.png"
-dest_files=["res://.godot/imported/key_leather.png-17da0e6afe96f73f36ada634e8fafdb1.ctex"]
+source_file="res://ui/theme/paper/page.png"
+dest_files=["res://.godot/imported/page.png-dc4d0eb78a82eaabe70e1a9caa705604.ctex"]
 
 [params]
 

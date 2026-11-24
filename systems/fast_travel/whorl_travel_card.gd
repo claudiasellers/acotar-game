@@ -39,10 +39,9 @@ static func open(tree: SceneTree, here: WhorlStoneDef, dests: Array[WhorlStoneDe
 func _ready() -> void:
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.theme = SatchelTheme.theme()
 	add_child(root)
 	var scrim := ColorRect.new()
-	scrim.color = SatchelTheme.color(&"scrim")
+	scrim.color = JournalTheme.color(&"scrim")
 	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(scrim)
 	var center := CenterContainer.new()

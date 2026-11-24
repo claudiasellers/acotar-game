@@ -122,19 +122,19 @@ static func draw_pin(ci: CanvasItem, at: Vector2, s: float, t: float, angle: flo
 	ci.draw_circle(centre - side * r * 0.3 + up * r * 0.3, r * 0.14, Color(1, 1, 1, 0.9))
 
 
-## Pin colours on the map, from the shared ACOTAR theme (L13). The map is a
+## Pin colours on the map, from the journal's tokens (JournalTheme). The map is a
 ## pastel keepsake in both realms, so its pin is always the Spring rose-gold.
 static func pin_colours() -> Dictionary:
-	return _theme(AcotarPalette.Act.SPRING)
+	return _theme(JournalTheme.Act.SPRING)
 
 
 ## The world beacon's colours follow the realm she stands in (muted gold
 ## among the mortals, rose and gold in Spring).
 static func beacon_colours() -> Dictionary:
-	return _theme(AcotarPalette.Act.SPRING if pin_in_spring else AcotarPalette.Act.HUMAN)
+	return _theme(JournalTheme.Act.SPRING if pin_in_spring else JournalTheme.Act.HUMAN)
 
 
-static func _theme(act: AcotarPalette.Act) -> Dictionary:
-	var c := AcotarPalette.colours(act)
-	return {"accent": c.get("accent", ROSE), "line": c.get("line", GOLD), "glow": c.get("glow", GOLD_LIGHT)}
+static func _theme(act: JournalTheme.Act) -> Dictionary:
+	var c := JournalTheme.colors(act)
+	return {"accent": c[&"accent"], "line": c[&"line"], "glow": c[&"glow"]}
 

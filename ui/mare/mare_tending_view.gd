@@ -55,7 +55,6 @@ static func open(parent: Node, p_mare: MareMount, p_feyre: Node3D, p_inventory: 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	theme = SatchelTheme.theme()
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_frame_camera()
 	if feyre:
@@ -499,8 +498,8 @@ func _draw() -> void:
 		return
 	# The brush: an oval back with soft bristles.
 	var c := _brush_at + Vector2(18, -14)
-	var ink := SatchelTheme.color(&"ink")
-	var glow := SatchelTheme.color(&"glow")
+	var ink := JournalTheme.color(&"ink")
+	var glow := JournalTheme.color(&"glow")
 	draw_set_transform(c, -0.5, Vector2(1.0, 0.55))
 	draw_circle(Vector2.ZERO, 22.0, glow)
 	draw_arc(Vector2.ZERO, 22.0, 0.0, TAU, 32, ink, 2.0)

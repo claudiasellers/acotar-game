@@ -3,7 +3,7 @@
 ## stands (laid out as the land lies, north up), a ring round the pair she
 ## stands at, and a dotted ride line to the one picked. Only marked stones are
 ## drawn, so it never shows land she hasn't walked. Colours and the font come
-## from SatchelTheme (the card's theme).
+## from JournalTheme (the card's theme).
 class_name WhorlSketch
 extends Control
 
@@ -53,8 +53,8 @@ func _all() -> Array[WhorlStoneDef]:
 
 
 func _draw() -> void:
-	var ink := SatchelTheme.color(&"ink")
-	var accent := SatchelTheme.color(&"accent")
+	var ink := JournalTheme.color(&"ink")
+	var accent := JournalTheme.color(&"accent")
 	# Place names in the satchel serif (the heading face) at the small size.
 	var font := get_theme_font(&"font", &"SatchelHeading")
 	var fsize := get_theme_font_size(&"font_size", &"SatchelSmall")

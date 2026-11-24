@@ -10,7 +10,7 @@
 ## asks: Enter / Space / F (pad A) or the "Think on it" tab. Nothing ahead of the current step
 ## is ever drawn.
 ##
-## Look: SatchelTheme (L13's shared theme plus L50's crafted layer), so the
+## Look: JournalTheme (L13's shared theme plus L50's crafted layer), so the
 ## fonts, paper, leather tabs and keys match the satchel and the pause menu.
 ## No colours or fonts are named here.
 class_name StoryJournal
@@ -137,7 +137,6 @@ static func ensure_action() -> void:
 
 
 func _shown() -> void:
-	_root.theme = SatchelTheme.theme()
 	refresh()
 	_book_box.modulate.a = 0.0
 	_book_box.position.y = 24.0
@@ -335,7 +334,6 @@ func _draw_in(s: JournalSketch, delay: float) -> void:
 func _build() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = SatchelTheme.theme()
 	add_child(_root)
 	# The menu shell dims the world; the book sits below its tab strip.
 	var center := CenterContainer.new()
@@ -512,8 +510,8 @@ func _make_sparkles() -> CPUParticles2D:
 	s.scale_amount_min = 0.4
 	s.scale_amount_max = 1.0
 	var ramp := Gradient.new()
-	ramp.set_color(0, SatchelTheme.color(&"glow"))
-	ramp.set_color(1, Color(SatchelTheme.color(&"accent"), 0.0))
+	ramp.set_color(0, JournalTheme.color(&"glow"))
+	ramp.set_color(1, Color(JournalTheme.color(&"accent"), 0.0))
 	s.color_ramp = ramp
 	return s
 

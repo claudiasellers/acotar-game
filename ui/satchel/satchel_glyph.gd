@@ -26,8 +26,8 @@ func _ready() -> void:
 func _draw() -> void:
 	if get_child_count() > 0:
 		return
-	var ink := SatchelTheme.color(&"ink")
-	var accent := SatchelTheme.color(&"accent")
+	var ink := JournalTheme.color(&"ink")
+	var accent := JournalTheme.color(&"accent")
 	var w := size.x
 	var h := size.y
 	# Strap, body, flap, buckle.

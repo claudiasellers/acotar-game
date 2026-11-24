@@ -36,6 +36,6 @@ WorldState.has_flag, PhaseManager.current_phase, EventBus.flag_changed and
 scene_space_started. It sets no flags and emits no story signals. Hint state saves through SaveSystem as provider "story_journal".
 
 ## Look
-SatchelTheme.theme() only (L13 theme + L50 crafted layer): SatchelDetail paper
+JournalTheme only: SatchelDetail paper
 pages, SatchelKey leather cover and key caps, SatchelTab button, Satchel*
 label variations, Satchel colours for the charcoal sketches, the sewn spine (JournalSpine) and the tie (JournalTie).

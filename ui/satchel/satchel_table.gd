@@ -4,11 +4,15 @@
 ## in focus is the real 3D model itself, lifted off the cloth and slowly
 ## turning over a watercolour wash. The page's 2D layer decides where things
 ## go (in screen pixels); this turns that into the scene. Colours and
-## textures come from SatchelTheme.
+## textures come from JournalTheme.
 class_name SatchelTable
 extends SubViewportContainer
 
 ## Cloth size in metres and how finely it is cut for the folds.
+## Cloak weave, watercolour wash and linen patch of the 3D cloth.
+const WEAVE_PATH := "res://ui/satchel/crafted/cloak_weave.png"
+const WASH_PATH := "res://ui/satchel/crafted/wash_bloom.png"
+const PATCH_PATH := "res://ui/satchel/crafted/patch_linen.png"
 const CLOTH := Vector2(14.0, 10.0)
 const CLOTH_CUTS := Vector2i(112, 80)
 const FOLD_HEIGHT := 0.16
@@ -80,15 +84,12 @@ func _ready() -> void:
 	_cloth_mat.normal_enabled = true
 	_cloth_mat.normal_texture = _weave()
 	_cloth_mat.normal_scale = 0.35
-	_cloth_mat.uv1_scale = Vector3(CLOTH.x * 6.0, CLOTH.y * 6.0, 1)
 	_cloth.material_override = _cloth_mat
 	viewport.add_child(_cloth)
-	var weave := SatchelTheme.texture(SatchelTheme.WEAVE_PATH)
-	if weave:
-		_cloth_mat.albedo_texture = weave
-		_cloth_mat.uv1_scale = Vector3(CLOTH.x * 1.5, CLOTH.y * 1.5, 1)
+	_cloth_mat.albedo_texture = load(WEAVE_PATH)
+	_cloth_mat.uv1_scale = Vector3(CLOTH.x * 1.5, CLOTH.y * 1.5, 1)
 	_build_wash()
-	var patch_tex := SatchelTheme.texture(SatchelTheme.PATCH_PATH)
+	var patch_tex := load(PATCH_PATH) as Texture2D
 	if patch_tex:
 		_patch_mesh = QuadMesh.new()
 		_patch_mesh.size = Vector2.ONE
@@ -100,19 +101,19 @@ func _ready() -> void:
 	apply_theme()
 
 
-## Act I and the Spring Court light the cloak differently (SatchelTheme).
+## Act I and the Spring Court light the cloak differently (JournalTheme).
 func apply_theme() -> void:
-	var paper := SatchelTheme.color(&"paper")
-	var glow := SatchelTheme.color(&"glow")
+	var paper := JournalTheme.color(&"paper")
+	var glow := JournalTheme.color(&"glow")
 	# Lit to land on the page's own paper tone where the light is full, and
 	# fall into the ink colour in the folds' shade.
 	_cloth_mat.albedo_color = paper
 	_env.background_color = paper.darkened(0.3)
-	_env.ambient_light_color = paper.lerp(SatchelTheme.color(&"ink"), 0.35)
+	_env.ambient_light_color = paper.lerp(JournalTheme.color(&"ink"), 0.35)
 	_env.ambient_light_energy = 0.42
 	_light.light_color = paper.lerp(glow, 0.3)
 	_light.light_energy = 0.62
-	_wash_mat.albedo_color = Color(SatchelTheme.color(&"accent"), 0.42)
+	_wash_mat.albedo_color = Color(JournalTheme.color(&"accent"), 0.42)
 
 
 ## The point on the cloth under a screen position (in this control's pixels).
@@ -275,7 +276,7 @@ func _build_wash() -> void:
 	_wash_mat = MaterialLibrary.surface()
 	_wash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_wash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_wash_mat.albedo_texture = SatchelTheme.texture(SatchelTheme.WASH_PATH)
+	_wash_mat.albedo_texture = load(WASH_PATH)
 	_wash_mat.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
 	_wash.material_override = _wash_mat
 	_wash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

@@ -3,7 +3,7 @@
 ## laid with uneven pressure (heavy in the middle, lifting at the ends), runs
 ## a little past where it should stop, wobbles, and is gone over once more
 ## lightly; shadows are hatched. Drawn from a few strokes, so no image files.
-## Colours from SatchelTheme only.
+## Colours from JournalTheme only.
 class_name JournalSketch
 extends Control
 
@@ -32,7 +32,7 @@ func _init(kind: StringName = &"rose", size_px: float = 96.0) -> void:
 
 
 func _ready() -> void:
-	_wash = SatchelTheme.texture(WASH_PATH)
+	_wash = load(WASH_PATH)
 
 
 func set_motif(kind: StringName) -> void:
@@ -227,11 +227,11 @@ func _draw() -> void:
 	var side := minf(size.x, size.y)
 	var origin := (size - Vector2(side, side)) * 0.5
 	if _wash:
-		var tint := SatchelTheme.color(wash_tint)
+		var tint := JournalTheme.color(wash_tint)
 		draw_texture_rect(_wash, Rect2(origin - Vector2.ONE * side * 0.08, Vector2.ONE * side * 1.16), false, Color(tint, 0.38 * reveal))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
-	var ink := SatchelTheme.color(&"ink")
+	var ink := JournalTheme.color(&"ink")
 	var base := maxf(1.1, side / 46.0)
 	var all := strokes(motif)
 	var total := all.size() + 1

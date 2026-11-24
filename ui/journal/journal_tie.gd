@@ -1,6 +1,6 @@
 ## The sketchbook's tie (L54): a leather thong from the back board, wound
 ## twice round a horn button and knotted, its tails hanging loose.
-## Colours from SatchelTheme.
+## Colours from JournalTheme.
 class_name JournalTie
 extends Control
 
@@ -11,9 +11,9 @@ func _init() -> void:
 
 
 func _draw() -> void:
-	var ink := SatchelTheme.color(&"ink")
-	var thong := ink.lerp(SatchelTheme.color(&"accent"), 0.35)
-	var glow := SatchelTheme.color(&"glow")
+	var ink := JournalTheme.color(&"ink")
+	var thong := ink.lerp(JournalTheme.color(&"accent"), 0.35)
+	var glow := JournalTheme.color(&"glow")
 	var c := Vector2(30, size.y * 0.42)
 	# Two wraps round the button.
 	for k in 2:
