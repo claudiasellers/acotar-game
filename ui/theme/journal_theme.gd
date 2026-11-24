@@ -29,7 +29,7 @@ const COLORS := {
 		&"paper": Color("#ebe5d8"),  # the page
 		&"paper_deep": Color("#dcd2bf"),  # a page under a page
 		&"ink": Color("#2f2a33"),  # type
-		&"ink_soft": Color("#6a6266"),  # small type
+		&"ink_soft": Color("#5a5256"),  # small type (6.0 to 1 on the page)
 		&"accent": Color("#b98a3a"),  # her one tin of yellow paint
 		&"glow": Color("#e3c35a"),  # what is chosen
 		&"rare": Color("#8e7aa8"),
@@ -42,7 +42,7 @@ const COLORS := {
 		&"paper": Color("#f6f0e3"),
 		&"paper_deep": Color("#ece2cc"),
 		&"ink": Color("#3a2f4a"),
-		&"ink_soft": Color("#6b5f7a"),
+		&"ink_soft": Color("#5b4f6b"),
 		&"accent": Color("#d9577f"),
 		&"glow": Color("#e8c14a"),
 		&"rare": Color("#cbbaf0"),
@@ -63,7 +63,7 @@ const WASHES: Array[Color] = [
 const LABELS := {
 	&"SatchelHeading": [34, "display", 400, &"ink"],
 	&"MenuTitle": [40, "display", 400, &"ink"],
-	&"PageSection": [18, "display", 400, &"line"],
+	&"PageSection": [18, "display", 400, &"ink_soft"],
 	&"SatchelBody": [20, "body", 500, &"ink"],
 	&"SatchelSmall": [16, "body", 600, &"ink_soft"],
 	&"SatchelWhere": [20, "hand", 500, &"ink_soft"],
@@ -214,7 +214,7 @@ static func build(of_act: Act) -> Theme:
 	for v in [&"SatchelCount", &"SatchelPin"]:
 		t.set_type_variation(v, &"Label")
 		t.set_font(&"font", v, font("body", 800))
-		t.set_font_size(&"font_size", v, 16 if v == &"SatchelCount" else 14)
+		t.set_font_size(&"font_size", v, 16)
 		t.set_color(&"font_color", v, c.ink)
 		t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.8), 1, Vector2(9, 1)))
 

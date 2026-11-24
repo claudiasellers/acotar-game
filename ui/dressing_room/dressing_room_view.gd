@@ -19,6 +19,12 @@ const BODY_LOOK_Y := 0.92
 const FACE_HALF_HEIGHT := 0.46
 const FACE_LOOK_Y := 1.46
 const CAMERA_DISTANCE := 3.2
+## The painted wall behind her in the mirror (metres), how far behind her it
+## stands, how far down it the floor line falls, and the lamp by the glass.
+const BACKDROP_WALL := Vector2(14.0, 5.0)
+const BACKDROP_BEHIND := 1.6
+const BACKDROP_FLOOR_AT := 0.72
+const LAMP_ENERGY := 1.6
 const TURN_SPEED := 2.4
 const TWIRL_SECONDS := 0.7
 
@@ -53,6 +59,7 @@ var found_label: Label
 var about: Label
 var _tab_row: HFlowContainer
 var camera: Camera3D
+var _backdrop: Node3D
 var tabs: TabContainer
 var wearing: Label
 
@@ -153,6 +160,8 @@ func _exit_tree() -> void:
 		feyre.model.scale = Vector3.ONE
 	if camera and is_instance_valid(camera):
 		camera.queue_free()
+	if _backdrop and is_instance_valid(_backdrop):
+		_backdrop.queue_free()
 	for layer in _hidden_layers:
 		if is_instance_valid(layer):
 			layer.visible = true
@@ -284,7 +293,7 @@ func _build() -> void:
 	add_child(box)
 
 	var head := HBoxContainer.new()
-	var title := BookKit.title("In my satchel" if from_satchel else ("The vanity" if mirror_only else "The dressing room"))
+	var title := BookKit.title("My clothes" if from_satchel else ("The vanity" if mirror_only else "The dressing room"))
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
 	var chip := PanelContainer.new()
@@ -651,8 +660,59 @@ func _enter_camera() -> void:
 	camera.process_mode = Node.PROCESS_MODE_ALWAYS
 	camera.near = 0.05
 	feyre.get_parent().add_child(camera)
+	_build_backdrop()
 	_frame(0.0)
 	camera.current = true
+
+
+## What the mirror shows behind her: a painted paper wall running down into a
+## paper floor, and a lamp by the glass, so she reads the same in a dark wood
+## and a bright hall.
+func _build_backdrop() -> void:
+	_backdrop = Node3D.new()
+	_backdrop.name = "VanityBackdrop"
+	feyre.get_parent().add_child(_backdrop)
+	var paper := JournalTheme.color(&"paper")
+	var floor_paper := JournalTheme.color(&"paper_deep")
+	var fade := Gradient.new()
+	fade.offsets = PackedFloat32Array([0.0, 0.55, BACKDROP_FLOOR_AT, 1.0])
+	fade.colors = PackedColorArray([JournalTheme.wash(1).darkened(0.45), paper, floor_paper, floor_paper])
+	var painted := GradientTexture2D.new()
+	painted.gradient = fade
+	painted.fill_from = Vector2(0.5, 0.0)
+	painted.fill_to = Vector2(0.5, 1.0)
+	var wall_paint := StandardMaterial3D.new()
+	wall_paint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	wall_paint.albedo_texture = painted
+	var wall_mesh := QuadMesh.new()
+	wall_mesh.size = BACKDROP_WALL
+	wall_mesh.material = wall_paint
+	var wall := MeshInstance3D.new()
+	wall.name = "Wall"
+	wall.mesh = wall_mesh
+	wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# The floor line sits BACKDROP_FLOOR_AT of the way down the wall.
+	wall.position = Vector3(0, BACKDROP_WALL.y * (BACKDROP_FLOOR_AT - 0.5), -BACKDROP_BEHIND)
+	_backdrop.add_child(wall)
+	var floor_paint := StandardMaterial3D.new()
+	floor_paint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	floor_paint.albedo_color = floor_paper
+	var floor_mesh := PlaneMesh.new()
+	floor_mesh.size = Vector2(BACKDROP_WALL.x, BACKDROP_WALL.x)
+	floor_mesh.material = floor_paint
+	var ground := MeshInstance3D.new()
+	ground.name = "Floor"
+	ground.mesh = floor_mesh
+	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ground.position = Vector3(0, 0.03, 0)
+	_backdrop.add_child(ground)
+	var lamp := OmniLight3D.new()
+	lamp.name = "Lamp"
+	lamp.light_color = Color(1.0, 0.96, 0.9)
+	lamp.light_energy = LAMP_ENERGY
+	lamp.omni_range = 9.0
+	lamp.position = Vector3(0.9, 1.9, CAMERA_DISTANCE * 0.8)
+	_backdrop.add_child(lamp)
 
 
 ## 0 = full length, 1 = her face. The camera stands in front of where she
@@ -682,6 +742,9 @@ func _frame(face: float) -> void:
 	camera.h_offset = (0.5 - centre.x) * 2.0 * half_view * view.x / view.y
 	camera.v_offset = (centre.y - 0.5) * 2.0 * half_view
 	camera.look_at_from_position(target + dir * dist, target)
+	# The backdrop stands behind her as the mirror sees her (its +Z to the glass).
+	_backdrop.global_position = feyre.global_position
+	_backdrop.global_rotation = Vector3(0, atan2(dir.x, dir.z), 0)
 
 
 func _hide_hud() -> void:

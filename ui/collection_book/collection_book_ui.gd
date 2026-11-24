@@ -82,7 +82,9 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 	var name_label := BookKit.label(String(e.name) if e.found else String(e.hint), &"SatchelSmall" if e.found else &"SatchelWhere", true)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.custom_minimum_size = Vector2(TILE.x - 12, 0)
-	name_label.add_theme_font_size_override(&"font_size", 14 if e.found else 13)
+	# Two lines at the page's small size; the whole hint shows in the detail line.
+	name_label.max_lines_visible = 2
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(name_label)
 	if e.new:
 		var badge := BookKit.label("new", &"SatchelPin")
@@ -92,7 +94,7 @@ static func _tile(e: Dictionary, detail: Label) -> Control:
 			slot.pivot_offset = TILE * 0.5
 			Juice.bounce_control(slot, 0.14), CONNECT_ONE_SHOT)
 	if not e.found:
-		col.modulate.a = 0.75
+		holder.modulate.a = 0.75
 	slot.mouse_entered.connect(func() -> void:
 		detail.text = ("%s. %s" % [e.name, e.note]).strip_edges() if e.found else "Not found yet. %s." % e.hint)
 	return slot
