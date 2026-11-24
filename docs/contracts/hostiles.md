@@ -93,8 +93,9 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   saves her and a step doesn't. Her knife uses the same rule.
   It then weaves back for `strike_cooldown` (1.65 s, so one cycle is ~2.2 s and
   a 4-naga camp needs ≥ 4 s to put her down) and comes again. A stagger
-  (bash, knife) cancels the tell or lets go of the hold; so do sleep, fire and
-  death. The animator hears `play_attack(id)` and `cancel_attack()` when it has
+  (bash, knife, or any weak-spot hit) cancels the tell or lets go of the hold;
+  so do sleep, fire and death. `Creature.winding_up()` names the attack being
+  telegraphed (&"" when none). The animator hears `play_attack(id)` and `cancel_attack()` when it has
   them (bestiary §1.5). A
   naga on a **scent trail** ignores the leash while it smelled her within the
   last 6 s; a hush draught (scent_scale ≤ 0.5) breaks the trail.

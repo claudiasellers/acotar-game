@@ -38,6 +38,14 @@ const FIRE_BURN_RADIUS := 1.2
 const FIRE_SCAN := 0.3
 ## A fire arrow in the body burns this long.
 const ARROW_BURN_SECONDS := 2.0
+## Hit reactions (health-interactions §3.5 item 7). Every hit flinches: the
+## additive hit_l/hit_r pose and, off the weak spot, a push of FLINCH_PUSH_M
+## away from where it struck, spread over FLINCH_SECONDS. The brain keeps
+## going, so a wind-up survives a flinch. A weak-spot hit staggers instead:
+## STAGGER_WEAK_SECONDS reeling, and the wind-up it had going is lost.
+const FLINCH_SECONDS := 0.25
+const FLINCH_PUSH_M := 0.3
+const STAGGER_WEAK_SECONDS := 0.8
 
 @export var data: CreatureData
 ## Stable id for saves and story events. Defaults to the node name.
@@ -59,6 +67,10 @@ var last_zone: StringName = &"body"
 ## Seconds left reeling from a bow bash or a knife: it stands, does nothing,
 ## and whatever it was winding up is lost (stagger()).
 var stagger_left: float = 0.0
+## Seconds left in the flinch from the last hit, and the flat push it carries
+## (m/s, zero on a weak-spot hit).
+var flinch_left: float = 0.0
+var _flinch_push: Vector3 = Vector3.ZERO
 var _fire_scan_left: float = 0.0
 static var _arrow_mults: Dictionary = {}
 static var _bow_mults: Dictionary = {}
@@ -152,6 +164,8 @@ func _physics_process(delta: float) -> void:
 		slowed_left -= delta
 		move_speed *= SLOW_FACTOR
 	_move(delta)
+	if flinch_left > 0.0:
+		flinch_left = maxf(flinch_left - delta, 0.0)
 	_leave_tracks(delta)
 
 
@@ -176,7 +190,12 @@ func _move(delta: float) -> void:
 		velocity.y -= _gravity * delta
 	if horizontal.length_squared() > 0.04:
 		face_towards(global_position + horizontal, delta)
+	# The flinch push rides on top for this step only, so it never builds up
+	# in the body's own velocity or turns it.
+	var push := _flinch_push if flinch_left > 0.0 else Vector3.ZERO
+	velocity += push
 	move_and_slide()
+	velocity -= push
 
 
 func face_towards(point: Vector3, delta: float) -> void:
@@ -226,6 +245,7 @@ func apply_hit(cause: StringName, weapon_id: StringName, weapon_mult: float, zon
 		_mortal_left = data.lethal_delay
 	if damaged:
 		bleeding = maxf(bleeding, 40.0)
+	react_to_hit(zone, at)
 	wounded.emit(cause)
 	_on_wounded(at, cause)
 	return result
@@ -257,6 +277,30 @@ func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 		&"fire":
 			ignite(ARROW_BURN_SECONDS)
 			_on_fire_near(arrow.global_position)
+
+
+## Every hit that leaves it alive: a flinch, and on the weak spot a stagger
+## that cancels its wind-up (§3.5 item 7). The flinch pushes it flat away
+## from `at` (where the blow landed) unless the blow landed dead centre.
+func react_to_hit(zone: StringName, at: Vector3) -> void:
+	if not alive:
+		return
+	flinch_left = FLINCH_SECONDS
+	_flinch_push = Vector3.ZERO
+	if zone == &"weak":
+		stagger(STAGGER_WEAK_SECONDS)
+		return
+	var away := global_position - at
+	away.y = 0.0
+	if away.length_squared() > 0.0025:
+		_flinch_push = away.normalized() * (FLINCH_PUSH_M / FLINCH_SECONDS)
+
+
+## The attack it is winding up (its AttackData id), or &"" when it is not. A
+## brain with telegraphed attacks overrides it; the wind-up's length is the
+## row's windup_s, kept in the brain's own fight timer.
+func winding_up() -> StringName:
+	return &""
 
 
 ## Knocked off its feet for `seconds` (the bow bash, a knife wound): it

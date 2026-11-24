@@ -84,6 +84,14 @@ unrigged model, which keeps the old `_topple`. With an animator:
   A stalk at speed 0 freezes mid-step.
 - `Creature.on_arrow_hit` → `animator.hit(arrow.global_position)` plays the
   flinch for the struck side. It never moves the creature toward the shooter.
+- Hit reactions (health-interactions §3.5 item 7), in `Creature.react_to_hit`
+  for every hit that leaves it alive: a flinch (`FLINCH_SECONDS` 0.25) and,
+  off the weak spot, a flat push of `FLINCH_PUSH_M` (0.3 m) away from where the
+  blow landed, never held in its velocity. The brain keeps thinking, so a
+  flinch never cancels a wind-up. A weak-spot hit is a stagger instead
+  (`STAGGER_WEAK_SECONDS` 0.8, no push), which cancels the wind-up through the
+  brain's `stagger()`. `creature_hit` and `creature_killed` are unchanged (one
+  emit per hit; HitStop listens).
 - `Creature.die` → `animator.die()` falls away from the last blow (struck on the
   right, it lies on its left flank). `animator.death_length()` is the clip time.
 - The model's basis is owned by the animator (slope pitch/roll, lean into
