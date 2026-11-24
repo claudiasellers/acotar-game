@@ -1,4 +1,5 @@
-## Weaves a flower crown from the blooms Feyre has picked (C / d-pad down) and
+## Weaves a flower crown from the blooms Feyre has picked (the wardrobe's
+## Crowns page, DressingRoomView) and
 ## puts it on at once (experience-bar §1.4.5). The colour follows the blooms:
 ## whichever family she holds most of.
 class_name CrownWeaver
