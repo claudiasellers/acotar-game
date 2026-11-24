@@ -497,14 +497,10 @@ func _show(p: WardrobePiece, card: Control, preview: bool = true) -> void:
 		Icons.show_outfit(thumb, p)
 
 
-## The "New" pin on a card she hasn't looked at yet; it bounces in.
+## The NEW ribbon on a card she hasn't looked at yet; it bounces in.
 func _new_ribbon() -> Control:
-	var pill := PanelContainer.new()
+	var pill := BookKit.new_badge()
 	pill.name = "NewRibbon"
-	pill.theme_type_variation = &"SatchelChip"
-	var word := _label("New", &"SatchelPin")
-	word.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
-	pill.add_child(word)
 	pill.ready.connect(func() -> void:
 		pill.pivot_offset = pill.size * 0.5
 		Juice.bounce_control(pill, 0.3))

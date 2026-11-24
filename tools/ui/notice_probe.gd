@@ -57,7 +57,17 @@ func _go() -> void:
 	var press := PressCard.find_or_make(self)
 	var keys := KeyPrompt.make(self)
 	var steps := {
-		"find": func() -> void: PickupLog.of(tree).find(&"ing_bilberry", &"ingredients"),
+		"find": func() -> void:
+			PickupLog.of(tree).add(&"ing_bilberry", 2)
+			PickupLog.of(tree).find(&"ing_bilberry", &"ingredients"),
+		"recipe": func() -> void: PickupLog.of(tree).find(&"brew_hush_draught", &"recipes"),
+		"reward": func() -> void:
+			var prize := CollectionReward.new()
+			prize.reward_id = &"ing_acorn"
+			prize.label = "A pouch of acorns"
+			prize.need = 5
+			prize.tab = &"ingredients"
+			PickupLog.of(tree).reward(prize),
 		"find_rare": func() -> void: PickupLog.of(tree).find(&"ing_rose_gold", &"ingredients"),
 		"note": func() -> void: PickupLog.of(tree).note("Two more flowers for a crown."),
 		"heading": func() -> void: ChapterHeading.show(tree, "The Wolf in the Snow"),

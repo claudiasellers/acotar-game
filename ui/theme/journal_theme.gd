@@ -115,6 +115,11 @@ const PANELS: Array[StringName] = [
 	&"PromptPill", &"BowCard", &"PickupRow",
 ]
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
+## The badges on a thing in her book: how many, which pan, and new.
+const COUNT_BADGE := &"SatchelCount"
+const SLOT_BADGE := &"SlotKey"
+const NEW_BADGE := &"NewTag"
+const BADGES: Array[StringName] = [COUNT_BADGE, SLOT_BADGE, NEW_BADGE]
 ## An index tab along the top of the book. White, so each wears its own wash.
 const INDEX_TAB := &"BookTab"
 ## The page that hangs from the book's ribbon, at its foot (settings).
@@ -241,7 +246,7 @@ static func build(of_act: Act) -> Theme:
 		t.set_type_variation(v, &"PanelContainer")
 	t.set_stylebox(&"panel", &"SatchelCard", _paper(PAPER_PAGE, c.paper, 40, 28))
 	t.set_stylebox(&"panel", &"LoosePage", _paper(PAPER_PAGE, c.paper_deep, 40, 26))
-	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 14))
+	t.set_stylebox(&"panel", &"NotifyCard", _paper(PAPER_SLIP, c.paper, 20, 16))
 	t.set_stylebox(&"panel", &"LineBand", _smear(Color(c.ink, BAND_DEPTH)))
 	t.set_stylebox(&"panel", &"LineFlood", _flood(c.pall))
 	var bare := StyleBoxEmpty.new()
@@ -401,13 +406,21 @@ static func build(of_act: Act) -> Theme:
 	t.set_font_size(&"font_size", &"TinName", 14)
 	t.set_color(&"font_color", &"TinName", c.paper)
 	t.set_stylebox(&"normal", &"TinName", _pill(Color(c.ink, PILL_DEPTH), Color(c.line, 0.8), 1, Vector2(12, 2)))
-	# Count and pin sit on their own small chip.
-	for v in [&"SatchelCount", &"SatchelPin"]:
+	# The three badges a thing in her book can wear, each its own shape so
+	# none is taken for another: how many (a round paper chip), which pan of
+	# the tin it is in (a small ink key cap, like every key in the game), and
+	# that it is new (a gold ribbon).
+	for v in BADGES:
 		t.set_type_variation(v, &"Label")
 		t.set_font(&"font", v, font("body", 800))
 		t.set_font_size(&"font_size", v, 16)
-		t.set_color(&"font_color", v, c.ink)
-		t.set_stylebox(&"normal", v, _pill(c.paper, Color(c.line, 0.8), 1, Vector2(9, 1)))
+	t.set_color(&"font_color", COUNT_BADGE, c.ink)
+	t.set_stylebox(&"normal", COUNT_BADGE, _pill(c.paper, Color(c.line, 0.8), 1, Vector2(9, 1)))
+	t.set_color(&"font_color", SLOT_BADGE, c.paper)
+	t.set_stylebox(&"normal", SLOT_BADGE, _pill(c.ink, c.line, 1, Vector2(8, 1), 7))
+	t.set_color(&"font_color", NEW_BADGE, c.ink)
+	t.set_font_size(&"font_size", NEW_BADGE, 14)
+	t.set_stylebox(&"normal", NEW_BADGE, _pill(c.glow, c.accent, 0, Vector2(8, 1), 3))
 
 	# Hairlines and slim scroll bars, everywhere.
 	var rule := StyleBoxLine.new()
