@@ -32,10 +32,12 @@ const SNARE_ALONG := 80.0
 const SNARE_SIDE := 2.4
 const RABBIT_AHEAD := 20.0
 const RABBIT_SIDE := 3.5
-## Metres either way of RABBIT_AHEAD tried for a spot in plain sight of the
-## snare, and how far a trunk or rock must stand off that line.
-const RABBIT_TRIES: Array[float] = [0.0, -1.0, 1.0, -2.0, 2.0]
-const SIGHT_MARGIN := 1.0
+## Metres either way of SNARE_ALONG tried for the snare, and how much open
+## ground round it is enough (a snow-laden fir's boughs reach about 4 m).
+const SNARE_TRIES: Array[float] = [0.0, -1.5, 1.5, -3.0, 3.0, -4.5, 4.5]
+const SNARE_OPEN := 5.0
+## How far a trunk or rock must stand off her line from the snare to the rabbit.
+const SIGHT_MARGIN := 3.0
 ## The snare is built once she's this close (inside the terrain's collision ring).
 const BUILD_RADIUS := 60.0
 ## The rabbit ignores her until she's this close or she nocks.
@@ -48,6 +50,7 @@ const WINDED_AT := 0.4
 const DONE_FLAG := "fact.wolf_spotted"
 const SAVE_KEY := "opening_hunt"
 
+static var _snare_spot := Vector2.INF
 static var _rabbit_spot := Vector2.INF
 
 var snare: Node3D
@@ -82,36 +85,65 @@ func load_state(data: Dictionary) -> void:
 	winded_shown = bool(data.get("winded", false))
 
 
-## Where the snare sits: SNARE_ALONG metres down the doe trail, to its side.
+## Where the snare sits: about SNARE_ALONG metres down the doe trail, to its
+## side, at the spot with the most open sky: a fir's boughs over the snare
+## swallow her camera as she bends to it.
 static func snare_spot() -> Vector2:
-	return _along_trail(SNARE_ALONG, SNARE_SIDE)
+	if _snare_spot != Vector2.INF:
+		return _snare_spot
+	var obstacles := Act1Wayfinding.trail_obstacles(PackedVector2Array([
+		_along_trail(SNARE_ALONG - 12.0, 0.0), _along_trail(SNARE_ALONG + RABBIT_AHEAD + 12.0, 0.0)]))
+	var best := -1.0
+	for along: float in SNARE_TRIES:
+		for side: float in [SNARE_SIDE, -SNARE_SIDE]:
+			var spot := _along_trail(SNARE_ALONG + along, side)
+			var open := _open_round(spot, obstacles)
+			if open > best:
+				best = open
+				_snare_spot = spot
+			if open >= SNARE_OPEN:
+				return spot
+	return _snare_spot
 
 
-## Where the rabbit grazes: about RABBIT_AHEAD metres past the snare, at the
-## first spot beside the trail she can see from the snare with no trunk or
-## rock on the line (so the shot she misses is hers to miss).
+## Metres from `p` to the nearest trunk or rock (its own radius taken off).
+static func _open_round(p: Vector2, obstacles: Array[Vector3]) -> float:
+	var open := INF
+	for o in obstacles:
+		open = minf(open, p.distance_to(Vector2(o.x, o.y)) - o.z)
+	return open
+
+
+## Where the rabbit grazes: RABBIT_AHEAD metres from the snare, at the first
+## spot (the trail's own direction first) she can see from the snare with no
+## trunk, bough or rock near the line, so the shot she misses is hers to miss.
 static func rabbit_spot() -> Vector2:
 	if _rabbit_spot != Vector2.INF:
 		return _rabbit_spot
 	var from := snare_spot()
-	var obstacles := Act1Wayfinding.trail_obstacles(PackedVector2Array([from, _along_trail(SNARE_ALONG + RABBIT_AHEAD, 0.0)]))
-	_rabbit_spot = _along_trail(SNARE_ALONG + RABBIT_AHEAD, -RABBIT_SIDE)
-	for ahead: float in RABBIT_TRIES:
-		for side: float in [-RABBIT_SIDE, RABBIT_SIDE]:
-			var spot := _along_trail(SNARE_ALONG + RABBIT_AHEAD + ahead, side)
-			if _sight_clear(from, spot, obstacles):
-				_rabbit_spot = spot
-				return spot
+	var obstacles := Act1Wayfinding.trail_obstacles(PackedVector2Array([
+		_along_trail(SNARE_ALONG - 12.0, 0.0), _along_trail(SNARE_ALONG + RABBIT_AHEAD + 12.0, 0.0)]))
+	var best := -INF
+	for a in 32:
+		# Ahead of her at RABBIT_AHEAD, the trail's own direction first, out to a quarter turn either way.
+		var spot := from + (_along_trail(SNARE_ALONG + RABBIT_AHEAD, 0.0) - from).normalized().rotated(
+			(a + 1) / 2 * (PI / 32.0) * (1.0 if a % 2 == 0 else -1.0)) * RABBIT_AHEAD
+		var open := _sight_open(from, spot, obstacles)
+		if open > best:
+			best = open
+			_rabbit_spot = spot
+		if open >= SIGHT_MARGIN:
+			return spot
 	return _rabbit_spot
 
 
-## No obstacle (Vector3(x, z, radius)) within SIGHT_MARGIN of the line a to b.
-static func _sight_clear(a: Vector2, b: Vector2, obstacles: Array[Vector3]) -> bool:
+## Metres from the line a to b to the nearest obstacle (Vector3(x, z, radius)).
+static func _sight_open(a: Vector2, b: Vector2, obstacles: Array[Vector3]) -> float:
+	var open := INF
 	for o in obstacles:
 		var at := Vector2(o.x, o.y)
-		if at.distance_to(Geometry2D.get_closest_point_to_segment(at, a, b)) < o.z + SIGHT_MARGIN:
-			return false
-	return true
+		open = minf(open, at.distance_to(Geometry2D.get_closest_point_to_segment(at, a, b)) - o.z)
+	return open
 
 
 static func _along_trail(metres: float, side: float) -> Vector2:

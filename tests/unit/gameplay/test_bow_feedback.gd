@@ -230,3 +230,27 @@ func test_a_hit_on_a_creature_pulses_the_ring_unless_hit_marks_are_off() -> void
 	EventBus.creature_hit.emit(&"deer_1", &"deer", &"arrow_wood", &"side")
 	assert_eq(reticle.pulse_left, 0.0, "off with hit marks")
 	GameSettings._values[&"hit_marks"] = was
+
+
+func test_her_first_early_release_gets_one_thought_ever() -> void:
+	var shown: Array = []
+	var director := DialogueDirector.new()
+	director.auto_tick = false
+	director.show_fn = func(_who: String, text: String, _inner: bool) -> float:
+		shown.append(text)
+		return 2.0
+	add_child_autofree(director)
+	var guide := bow.get_node(^"BowGuide") as BowGuide
+	assert_not_null(guide, "the bow carries its guide")
+	Gameplay.inventory.add(&"arrow_wood", 2)
+	_hold(0.1, true, false)
+	_hold(bow.bow.draw_time * 0.3, true, true)
+	_hold(0.05, true, false)
+	assert_eq(shown, ["Not yet. Draw the string farther back."], "her own words from the wolf shot")
+	director._process(10.0)
+	_hold(bow.bow.draw_time * 0.3, true, true)
+	_hold(0.05, true, false)
+	assert_eq(shown.size(), 1, "said once, not every time")
+	_hold(bow.bow.draw_time + 0.05, true, true)
+	_hold(0.05, true, false)
+	assert_eq(shown.size(), 1, "and never for a loosed arrow")
