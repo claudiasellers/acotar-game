@@ -12,8 +12,7 @@ as a token and builds one `Theme` from them. That theme is the project theme
 `Control` anywhere in the game wears it with no code.
 
 - No script sets `.theme`, makes a `Theme` or touches `ThemeDB`. A search test
-  in `tests/unit/ui/test_journal_theme.gd` keeps that. (The pause panel keeps
-  its own until it joins the book, plan step 4; the test lists those files.)
+  in `tests/unit/ui/test_journal_theme.gd` keeps that, with no exceptions.
 - A Control picks its look with `theme_type_variation`, never with a style
   override of its own.
 - Code that draws by hand (`_draw`) reads colours with
@@ -57,9 +56,14 @@ deckled edge, tinted to a paper token. Made by
 | Variation | Base |
 |---|---|
 | SatchelCard, SatchelDetail, NotifyCard, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
-| SatchelTab, MenuTab, SatchelSlot, BookTab | Button (all states, including focus) |
+| SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
 | SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText | Label |
 | SatchelMeter | ProgressBar |
+
+`CheckBox` and `HSlider` are themed as base types (an inked box that fills, a
+brass rule with a knob), so a setting anywhere wears them with no variation.
+Their small pictures are drawn by `JournalTheme` when the theme is built.
+`JournalTheme.soft_dot(px)` is the white mote sparkles and beacons tint.
 
 ## Rules
 

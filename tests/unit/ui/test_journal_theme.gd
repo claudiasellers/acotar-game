@@ -8,7 +8,7 @@ const VARIATIONS := {
 		&"SatchelCard", &"SatchelDetail", &"NotifyCard", &"SatchelChip", &"SatchelKey",
 		&"QuickBarSlot", &"QuickBarSlotSelected",
 	],
-	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab"],
+	&"Button": [&"SatchelTab", &"MenuTab", &"SatchelSlot", &"BookTab", &"BookRibbon"],
 	&"Label": [
 		&"SatchelHeading", &"MenuTitle", &"PageSection", &"SatchelBody", &"SatchelSmall", &"SatchelWhere",
 		&"SatchelKeyLabel", &"SatchelCount", &"SatchelPin", &"QuickBarKey", &"QuickBarCount",
@@ -19,10 +19,6 @@ const VARIATIONS := {
 const TOKENS: Array[StringName] = [
 	&"paper", &"paper_deep", &"ink", &"ink_soft", &"accent", &"glow", &"rare", &"danger",
 	&"line", &"leather", &"scrim",
-]
-## The pause panel's own theme, until the pause joins the book (plan step 4).
-const OWN_THEME_UNTIL_STEP_4 := [
-	"res://ui/pause_menu/pause_style.gd", "res://ui/pause_menu/controls_hint.gd", "res://ui/settings_panel.gd",
 ]
 const SKIP_DIRS := ["res://addons", "res://tests", "res://tools", "res://.godot", "res://.lanes"]
 
@@ -117,7 +113,7 @@ func _scan(dir: String, bad: RegEx, hits: Array[String]) -> void:
 			_scan(path, bad, hits)
 	for file in DirAccess.get_files_at(dir):
 		var path := dir.path_join(file)
-		if not file.ends_with(".gd") or path == "res://ui/theme/journal_theme.gd" or path in OWN_THEME_UNTIL_STEP_4:
+		if not file.ends_with(".gd") or path == "res://ui/theme/journal_theme.gd":
 			continue
 		var n := 0
 		for line in FileAccess.get_file_as_string(path).split("\n"):

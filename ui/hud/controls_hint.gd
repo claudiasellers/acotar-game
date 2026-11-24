@@ -1,8 +1,10 @@
-## A small pearl pill in HudLayout's CONTROLS zone naming the controls. It shows for the
-## first moments of play and briefly after the pause menu closes, then fades.
+## A slip of paper in HudLayout's CONTROLS zone naming the controls. It shows
+## for the first moments of a new game and briefly after the book closes on
+## its settings page, then fades. A loaded game does not teach them again.
 class_name ControlsHint
 extends PanelContainer
 
+const GROUP := &"controls_hint"
 const FIRST_SHOW_SECONDS := 25.0
 const FADE_SECONDS := 1.2
 
@@ -11,23 +13,14 @@ var _time_left: float = FIRST_SHOW_SECONDS
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	theme = PauseStyle.theme()
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color(1.0, 0.95, 0.97, 0.82)
-	box.border_color = Color(PauseStyle.GOLD, 0.7)
-	box.set_border_width_all(2)
-	box.set_corner_radius_all(20)
-	box.content_margin_left = 18
-	box.content_margin_right = 18
-	box.content_margin_top = 8
-	box.content_margin_bottom = 8
-	add_theme_stylebox_override(&"panel", box)
-	_label = Label.new()
-	_label.add_theme_font_size_override(&"font_size", 17)
+	theme_type_variation = &"NotifyCard"
+	_label = BookKit.label("", &"SatchelSmall")
 	add_child(_label)
 	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: refresh())
+	EventBus.game_loaded.connect(func(_slot: String) -> void: hide_now())
 	refresh()
 
 

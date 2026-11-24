@@ -14,6 +14,17 @@ func _init(player: Node3D) -> void:
 	_player = weakref(player)
 
 
+## Makes `player` the one the save places, and finishes a Continue that the
+## title began (GameSettings.pending_load_slot): every provider gets its
+## state now that the scene is built. Entry scenes call this deferred.
+static func attach(player: Node3D) -> void:
+	SaveSystem.register_provider(KEY, PlayerPlacement.new(player))
+	if GameSettings.pending_load_slot != "":
+		var slot := GameSettings.pending_load_slot
+		GameSettings.pending_load_slot = ""
+		SaveSystem.finish_load(slot)
+
+
 ## Where a saved state puts her, or Vector3.INF for none.
 static func saved_position(data: Dictionary) -> Vector3:
 	var pos: Array = data.get("position", [])

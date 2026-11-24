@@ -15,7 +15,7 @@ const PIECES: Array[String] = [
 	"res://story/act1/key_prompts.gd", "res://story/act1/act1_milestones.gd",
 	"res://ui/chemistry/brew_prompt.gd", "res://ui/market/market_prompt.gd",
 	"res://ui/collection_book/find_card.gd", "res://ui/guide/guide_journal.gd",
-	"res://ui/pause_menu/controls_hint.gd", "res://ui/debug_hud.gd",
+	"res://ui/hud/controls_hint.gd", "res://ui/debug_hud.gd",
 ]
 
 ## The scripts that make those pieces and hand them to HudLayout.
@@ -25,7 +25,7 @@ const KEEPERS: Array[String] = [
 	"res://systems/interaction/press_card.gd", "res://story/act1/key_prompts.gd",
 	"res://story/act1/act1_milestones.gd", "res://ui/chemistry/brew_prompt.gd",
 	"res://ui/market/market_prompt.gd", "res://ui/collection_book/find_card.gd",
-	"res://ui/guide/guide_journal.gd", "res://ui/settings_panel.gd", "res://ui/debug_hud.gd",
+	"res://ui/guide/guide_journal.gd", "res://ui/menu/settings_tab.gd", "res://ui/debug_hud.gd",
 ]
 
 var hud: HudLayout

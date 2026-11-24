@@ -187,41 +187,6 @@ func test_player_position_saves_and_loads() -> void:
 	assert_almost_eq(f.model.rotation.y, 1.1, 0.001)
 
 
-func test_menu_pauses_and_holds_every_option() -> void:
-	var menu := SettingsPanel.new()
-	add_child_autofree(menu)
-	menu.open()
-	assert_true(menu.is_open())
-	assert_true(get_tree().paused)
-	assert_eq(menu._controls.size(), GameSettings.DEFAULTS.size() - 1, "every setting but text size has a control")
-	assert_eq(menu._text_buttons.size(), GameSettings.TEXT_SIZES.size())
-	assert_eq(menu._scheme_buttons.size(), 2, "arrows / WASD switch kept")
-	var texts := []
-	for b in menu.find_children("*", "Button", true, false):
-		texts.append((b as Button).text)
-	for t in ["Resume", "Return Home", "Save & Title", "Save & Quit", "Wriggle free"]:
-		assert_has(texts, t)
-	(menu._controls[&"invert_y"] as CheckBox).button_pressed = true
-	assert_true(GameSettings.invert_y, "checkbox writes the setting")
-	menu.close()
-	assert_false(menu.is_open())
-	assert_false(get_tree().paused)
-
-
-func test_settings_stay_on_screen_at_every_text_size() -> void:
-	var menu := SettingsPanel.new()
-	add_child_autofree(menu)
-	for i in GameSettings.TEXT_SIZES.size():
-		GameSettings.set_value(&"text_size", i)
-		menu.open()
-		var h := menu._scroll.custom_minimum_size.y
-		assert_gt(h, 200.0, "settings area visible at %s" % GameSettings.TEXT_SIZES[i])
-		assert_lt(h, 1080.0 / GameSettings.TEXT_SCALES[i] - 300.0, "room left for title and buttons")
-		if i <= 1:
-			assert_lt(h, 760.0, "no needless scrolling at %s" % GameSettings.TEXT_SIZES[i])
-		menu.close()
-
-
 func test_title_screen_builds() -> void:
 	var title := (load("res://ui/title/title_screen.tscn") as PackedScene).instantiate()
 	add_child_autofree(title)

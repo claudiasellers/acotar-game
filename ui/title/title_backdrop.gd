@@ -565,7 +565,7 @@ func _particles(id: String, amount: int, lifetime: float, centre: Vector3, exten
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	mat.vertex_color_use_as_albedo = true
 	mat.albedo_color = color
-	mat.albedo_texture = PauseStyle.soft_dot(32)
+	mat.albedo_texture = JournalTheme.soft_dot(32)
 	if glow:
 		mat.emission_enabled = true
 		mat.emission = color

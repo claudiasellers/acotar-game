@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/*,data/mount/*,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/settings_panel.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/*,data/mount/*,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the Spring Court, through Continue from a save after the
 ## first dinner (the mare ridden once, so the whistle works), driven by real
 ## key and pad events (tests/integration/play/README.md). Indoors in the manor,
@@ -307,14 +307,14 @@ func test_pause_saves_and_continue_puts_her_back() -> void:
 	assert_true(await _to_the_stable_yard(), "out in the stable yard")
 	await h.hold_for(&"move_right", 20)
 	await h.wait_still()
-	var panel := h.child_of(SettingsPanel) as SettingsPanel
+	var page := h.child_of(SettingsTab) as SettingsTab
 	await h.press(&"pause")
-	assert_true(panel.is_open(), "Esc opens the pause menu")
+	assert_true(page.is_open(), "Esc opens the book at its settings page")
 	# The menu's Save buttons save then leave for the title, which would end
 	# this run, so the save is the button's own call; the load is real Continue.
 	assert_eq(SaveSystem.save_game(SAVED_SLOT), OK, "saved")
 	await h.press(&"pause")
-	assert_false(panel.is_open(), "Esc closes it")
+	assert_false(page.is_open(), "Esc closes it")
 	var at := h.feyre.global_position
 	var yaw := h.feyre.model.rotation.y
 	var flags := WorldState.all_flags().duplicate()

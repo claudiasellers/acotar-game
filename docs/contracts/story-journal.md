@@ -6,7 +6,6 @@ minimap or in the world.
 
 ## Opening it
 - Key **L** (`journal_open`, added at runtime by `StoryJournal.ensure_action()`; no project.godot change).
-- Pause menu: **Journal** button (ui/settings_panel.gd).
 - Satchel: **Sketchbook** flap (L50-3).
 - Any lane: `StoryJournal.open_from(get_tree())` (adds one to the root if the scene has none).
 - Pauses the tree while open, like the satchel. L / Esc / ui_cancel close it.

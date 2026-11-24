@@ -10,6 +10,9 @@ const SKY := "res://ui/menu/art/sky.png"
 const WASH := "res://ui/menu/art/wash.png"
 
 const SIZE := Vector2(1700, 900)
+## The screen the book is drawn for. On a smaller one (a larger text size
+## makes the screen smaller, in its own units) the whole book shrinks to fit.
+const SCREEN := Vector2(1920, 1080)
 ## The book's centre, from the screen's centre: room for the tabs above it.
 const DROP := Vector2(0, 38)
 ## The art carries the cover's shadow this far past the book on every side.
@@ -22,8 +25,22 @@ const RIGHT := Rect2(900, 64, 704, 776)
 const SPREAD := Rect2(104, 64, 1500, 776)
 ## The index tabs: their left end and their foot, in book space.
 const TABS_AT := Vector2(66, 4)
+## Where the ribbon leaves the book's foot: the top centre of its tab.
+const RIBBON_AT := Vector2(905, 898)
+
+
+## How much smaller than drawn the book is on a screen of `view` size.
+static func fit(view: Vector2) -> float:
+	return minf(1.0, minf(view.x / SCREEN.x, view.y / SCREEN.y))
 
 
 ## The book's top-left corner on a screen of `view` size.
 static func origin(view: Vector2) -> Vector2:
-	return ((view - SIZE) * 0.5 + DROP).round()
+	var scale := fit(view)
+	return ((view - SIZE * scale) * 0.5 + DROP * scale).round()
+
+
+## Where a rect of the book (LEFT, a page's window) lands on the screen.
+static func on_screen(view: Vector2, rect: Rect2) -> Rect2:
+	var scale := fit(view)
+	return Rect2(origin(view) + rect.position * scale, rect.size * scale)

@@ -402,7 +402,7 @@ func _make_sparkles() -> CPUParticles2D:
 	s.amount = 26
 	s.lifetime = 0.9
 	s.explosiveness = 0.85
-	s.texture = PauseStyle.soft_dot(18)
+	s.texture = JournalTheme.soft_dot(18)
 	s.direction = Vector2.UP
 	s.spread = 80.0
 	s.initial_velocity_min = 60.0

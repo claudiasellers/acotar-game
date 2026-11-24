@@ -286,7 +286,7 @@ func _draw_marks() -> void:
 		var fs := clampi(int(26.0 * 1500.0 / view_width), 14, 34)
 		var w := font.get_string_size(place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		ci.draw_string_outline(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Color(1.0, 0.97, 0.99, 0.9))
-		ci.draw_string(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, PauseStyle.PLUM)
+		ci.draw_string(font, p - Vector2(w * 0.5, 0), place.label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, JournalTheme.color(&"ink"))
 	# Landmarks she has seen, named when close enough to read.
 	for id: String in hud.seen_landmarks:
 		var lm: Dictionary = hud.seen_landmarks[id]
@@ -300,7 +300,7 @@ func _draw_marks() -> void:
 			var w := body.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x
 			var at := p + Vector2(-w * 0.5, 30)
 			ci.draw_string_outline(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 6, Color(1.0, 0.97, 0.99, 0.95))
-			ci.draw_string(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, PauseStyle.PLUM_SOFT)
+			ci.draw_string(body, at, label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, JournalTheme.color(&"ink_soft"))
 	# The whorl stones on ground she has sketched (L74).
 	var bounds := Rect2(Vector2.ZERO, _map.size).grow(20)
 	WhorlMapMarks.draw_all(ci, hud.reveal, to_map_point, func(p: Vector2) -> bool: return bounds.has_point(p), 12.0, _t,
@@ -327,17 +327,17 @@ func _draw_reticle(ci: CanvasItem, at: Vector2) -> void:
 
 func _draw_compass(ci: CanvasItem, at: Vector2) -> void:
 	ci.draw_circle(at, 34, Color(1.0, 0.97, 0.99, 0.85))
-	ci.draw_arc(at, 34, 0, TAU, 48, PauseStyle.GOLD, 2.0, true)
+	ci.draw_arc(at, 34, 0, TAU, 48, JournalTheme.color(&"line"), 2.0, true)
 	for i in 4:
 		var a := TAU * i / 4.0
 		var d := Vector2(sin(a), -cos(a))
 		var s := Vector2(-d.y, d.x)
 		var tip := at + d * 28.0
 		ci.draw_colored_polygon(PackedVector2Array([tip, at + s * 6.0, at - s * 6.0]),
-			PauseStyle.ROSE if i == 0 else PauseStyle.LILAC)
-	ci.draw_circle(at, 4, PauseStyle.GOLD)
+			JournalTheme.color(&"accent") if i == 0 else JournalTheme.wash(1))
+	ci.draw_circle(at, 4, JournalTheme.color(&"line"))
 	var font := _heading_font()
-	ci.draw_string(font, at + Vector2(-6, -40), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PauseStyle.PLUM)
+	ci.draw_string(font, at + Vector2(-6, -40), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, JournalTheme.color(&"ink"))
 
 
 # --- The manor page ---------------------------------------------------------------

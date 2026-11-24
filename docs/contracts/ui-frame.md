@@ -45,8 +45,8 @@ not covered.
 
 ## ScreenStack
 
-A screen is any node that takes the player out of the world: the book, the
-pause panel, a station, the travel card, the title.
+A screen is any node that takes the player out of the world: the book (its
+settings page is the pause), a station, the travel card, the title.
 
 ```gdscript
 enum Flag { PAUSES = 1, MOUSE = 2 }
@@ -201,6 +201,7 @@ every piece's script.
 | 1b | brew, market, mare, studio, travel card, title; `feyre.gd` hands over its mouse and Esc lines | the same in each; `ui/hearth_panel.gd`; `ui/painting/painting_ui.gd` | no `paused =` or `mouse_mode =` outside `ScreenStack` |
 | 1c | vitals HUD, quick strap, minimap and pin marker, quiver card, aim reticle, prompts, find card, thoughts card, milestone card, controls hint | each piece's layer, screen anchors and hide rule; `ui/celebration_gate.gd` | no `CanvasLayer`, `layer =`, self-anchoring, `StoryControl.mode` or pause read in a HUD piece |
 | 1d | the story and system scripts that make their own layer (veils, captions, whisper, Suriel, film, the loading veil, dev overlays) | their literal numbers | no literal `layer =` number outside `UiLayers` (in `test_hud_layout.gd`) |
+| step 4 | the pause and the settings: `SettingsTab`, a page of the book on its ribbon; the title opens the same page | `ui/settings_panel.gd`, `ui/title/title_settings.gd`, `ui/pause_menu/` (PauseStyle), `ui/theme/ui_borders.gd`, `framed_style_box.gd` and the two pause fonts | the theme search test has no exceptions left |
 
 ## Files outside `ui/` the frame edits
 

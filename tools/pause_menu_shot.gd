@@ -1,6 +1,6 @@
-## Milestone screenshots of the pause menu and title screen (needs a GPU or
+## Milestone screenshots of the book's settings page and the title screen (needs a GPU or
 ## lavapipe; not headless):
-##   xvfb-run godot --rendering-driver vulkan res://tools/pause_menu_shot.tscn -- <menu|menu_large|title|title_load|title_overwrite> [out.png]
+##   xvfb-run godot --rendering-driver vulkan res://tools/pause_menu_shot.tscn -- <menu|menu_large|title|title_settings|title_load|title_overwrite> [out.png]
 ## The title_load and title_overwrite views write sample saves into user://saves,
 ## so run them only with a scratch data folder (godot.sh, the shots lane).
 extends Node
@@ -27,11 +27,12 @@ func _run() -> void:
 	for i in 90:
 		await get_tree().process_frame
 	if id.begins_with("menu"):
-		var menu := scene.find_children("*", "SettingsPanel", true, false)
-		(menu[0] as SettingsPanel).open()
+		MenuShell.open_tab(get_tree(), &"settings")
 		for i in 30:
 			await get_tree().process_frame
-	if id == "title_load":
+	if id == "title_settings":
+		scene.call(&"_on_settings")
+	elif id == "title_load":
 		scene.call(&"_on_load")
 	elif id == "title_overwrite":
 		scene.call(&"_on_new_game")

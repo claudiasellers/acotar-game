@@ -2,13 +2,13 @@
 
 Design: `/mnt/project-files/plans/guidance-journal.md`.
 
-## For the pause menu
+## For the settings page
 One row, "Feyre's thoughts", three choices from `GuideSettings.LABELS`:
 - `GuideSettings.get_mode() -> GuideSettings.Mode` (AUTO, ASK, OFF)
 - `GuideSettings.set_mode(mode: GuideSettings.Mode) -> void`: saves to user://settings.cfg [guide] mode and updates the live card (group `guide_journal`, `on_mode_changed`).
 
 ## For the story lane
-- `GuideJournal.new()` is added by `story/act1/act1_game.gd` beside SettingsPanel.
+- `GuideJournal.new()` is added by `story/act1/act1_game.gd` beside SettingsTab.
 - Input: `guide_open` = physical G + joypad Y, registered in code (J and Back belong to the collection book).
 - Reads only: `WorldState.has_flag`, `StoryControl.mode`, `EventBus.flag_changed / deed_performed / mood_requested`. It never writes flags.
 - Silent while `StoryControl.mode != FULL` or after `mood_requested(&"dread", >0)` until a non-dread mood.

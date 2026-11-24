@@ -1,12 +1,14 @@
 ## Feyre's journal: the one menu. Every page she keeps (satchel, wardrobe,
 ## collection, sketchbook, map) is a page of this book, behind its own index
-## tab. Each page's key opens the book on that page; from inside, any page's
-## key jumps to it and the same key again closes.
+## tab, and settings hang from its ribbon. Each page's key opens the book on
+## that page; from inside, any page's key jumps to it and the same key again
+## closes. Esc in play opens the book at the ribbon.
 ## Contract: docs/contracts/menu_shell.md.
 ##
 ## Keys, the same on every page:
 ##   I / Tab, J, L, M (pad: LB tap, Back, RB)  open on that page / jump / close
 ##   Q / E (pad LB / RB)                        previous / next page
+##   Esc (pad Start)                            open at the ribbon (SettingsTab)
 ##   Esc (pad B)                                close (through ScreenStack)
 ## Pages keep their own keys inside (MenuTab._page_input runs before these).
 ##
@@ -47,6 +49,8 @@ var _backdrop: CanvasLayer
 var _book: TextureRect
 var _strip: Control
 var _row: HBoxContainer
+var _ribbon: Control
+var _ribbon_row: HBoxContainer
 var _buttons: Dictionary = {}  # MenuTab -> Button
 var _prev_cap: PanelContainer
 var _next_cap: PanelContainer
@@ -162,7 +166,7 @@ func show_tab(tab: MenuTab) -> void:
 	if current:
 		current.shell_hide()
 	if not was_open:
-		_open_shell()
+		_open_shell(tab)
 	current = tab
 	tab.shell_show()
 	_sync_strip()
@@ -205,10 +209,9 @@ func step(direction: int) -> void:
 	show_tab(shown[posmod(i + direction, shown.size())])
 
 
-func _open_shell() -> void:
-	ScreenStack.push(self)
-	for n in _tree.root.find_children("*", "ControlsHint", true, false):
-		(n as ControlsHint).hide_now()
+func _open_shell(on: MenuTab) -> void:
+	ScreenStack.push(self, ScreenStack.Flag.MOUSE | (ScreenStack.Flag.PAUSES if on.pauses else 0))
+	_tree.call_group(ControlsHint.GROUP, &"hide_now")
 	if _root:
 		_root.visible = true
 		_backdrop.visible = true
@@ -321,8 +324,8 @@ func _end_render() -> void:
 func set_window(rect: Rect2) -> void:
 	if _book == null:
 		return
-	var at := rect.position + (_book.position + Vector2.ONE * BookLayout.ART_BLEED if rect.has_area() else Vector2.ZERO)
-	_window.set_shader_parameter(&"window", Vector4(at.x, at.y, rect.size.x, rect.size.y))
+	var cut := BookLayout.on_screen(get_viewport().get_visible_rect().size, rect) if rect.has_area() else Rect2()
+	_window.set_shader_parameter(&"window", Vector4(cut.position.x, cut.position.y, cut.size.x, cut.size.y))
 
 
 func _build() -> void:
@@ -367,14 +370,29 @@ func _build() -> void:
 	_prev_cap = BookKit.key_cap("Q")
 	_row.add_child(_prev_cap)
 	_next_cap = BookKit.key_cap("E")
+	# The ribbon's tab hangs from the book's foot, centred on the ribbon.
+	_ribbon = Control.new()
+	_ribbon.name = "Ribbon"
+	_ribbon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(_ribbon)
+	_ribbon_row = HBoxContainer.new()
+	_ribbon_row.name = "Tabs"
+	_ribbon_row.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_ribbon_row.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_ribbon.add_child(_ribbon_row)
 	_place()
 	get_viewport().size_changed.connect(_place)
 
 
 func _place() -> void:
-	var origin := BookLayout.origin(get_viewport().get_visible_rect().size)
-	_book.position = origin - Vector2.ONE * BookLayout.ART_BLEED
-	_strip.position = origin + BookLayout.TABS_AT
+	var view := get_viewport().get_visible_rect().size
+	var origin := BookLayout.origin(view)
+	var fit := BookLayout.fit(view)
+	for part: Control in [_book, _strip, _ribbon]:
+		part.scale = Vector2.ONE * fit
+	_book.position = origin - Vector2.ONE * BookLayout.ART_BLEED * fit
+	_strip.position = origin + BookLayout.TABS_AT * fit
+	_ribbon.position = origin + BookLayout.RIBBON_AT * fit
 
 
 func _sync_strip() -> void:
@@ -388,25 +406,27 @@ func _sync_strip() -> void:
 		if not _buttons.has(t):
 			var b := Button.new()
 			b.name = "Tab_%s" % t.tab_id
-			b.theme_type_variation = JournalTheme.INDEX_TAB
+			b.theme_type_variation = JournalTheme.RIBBON_TAB if t.on_ribbon else JournalTheme.INDEX_TAB
 			b.toggle_mode = true
 			b.focus_mode = Control.FOCUS_NONE
 			b.size_flags_vertical = Control.SIZE_SHRINK_END
 			b.pressed.connect(show_tab.bind(t))
 			b.add_child(NewsDot.new())
-			_row.add_child(b)
+			(_ribbon_row if t.on_ribbon else _row).add_child(b)
 			_buttons[t] = b
 	# Along the edge: the Q cap, the tabs by tab_order, the E cap.
 	var at := 1
 	for t in tabs:
 		var b := _buttons[t] as Button
-		_row.move_child(b, at)
 		b.visible = t in shown
 		b.text = t.tab_title.to_upper() + ("   " + BookKit.key_word(t.shortcut) if t.shortcut != &"" else "")
 		b.set_pressed_no_signal(t == current)
+		(b.get_node(^"News") as Control).visible = t.has_news() and t != current
+		if t.on_ribbon:
+			continue
+		_row.move_child(b, at)
 		# Each tab wears its own wash; the page in front is the paper's colour.
 		b.self_modulate = Color.WHITE if t == current else JournalTheme.wash(at - 1)
-		(b.get_node(^"News") as Control).visible = t.has_news() and t != current
 		at += 1
 	if _next_cap.get_parent() == null:
 		_row.add_child(_next_cap)

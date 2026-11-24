@@ -8,12 +8,13 @@ const PAGE_FILES := [
 	"res://ui/satchel/satchel_menu.gd", "res://ui/journal/story_journal.gd",
 	"res://ui/map/full_map.gd", "res://ui/collection_book/collection_tab.gd",
 	"res://ui/collection_book/collection_book_ui.gd", "res://ui/menu/wardrobe_tab.gd",
+	"res://ui/menu/settings_tab.gd",
 	"res://ui/menu/menu_shell.gd", "res://ui/menu/menu_tab.gd", "res://ui/menu/book_kit.gd",
 	"res://ui/satchel/satchel_icon.gd",
 ]
 ## One look: page chrome comes from JournalTheme only. (The wardrobe's gilt
 ## mirror and colour swatches in DressingRoomView are its own, by L64-3.)
-const OFF_THEME := "StyleBoxFlat|add_theme_font_override|DISPLAY_FONT|body_font|SystemFont|FontFile|\\.ttf|PauseStyle\\.(title|note|theme|card_box)|UiStyle\\."
+const OFF_THEME := "StyleBoxFlat|add_theme_font_override|DISPLAY_FONT|body_font|SystemFont|FontFile|\\.ttf|UiStyle\\."
 
 
 class Page extends MenuTab:

@@ -80,6 +80,11 @@ const PANELS: Array[StringName] = [
 const BUTTONS: Array[StringName] = [&"SatchelTab", &"MenuTab", &"SatchelSlot"]
 ## An index tab along the top of the book. White, so each wears its own wash.
 const INDEX_TAB := &"BookTab"
+## The page that hangs from the book's ribbon, at its foot (settings).
+const RIBBON_TAB := &"BookRibbon"
+## Side of a check box and of a slider's knob, in px.
+const CHECK_SIZE := 24
+const KNOB_SIZE := 22
 const BUTTON_STATES: Array[StringName] = [
 	&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus",
 ]
@@ -204,6 +209,39 @@ static func build(of_act: Act) -> Theme:
 	for state in [&"font_color", &"font_hover_color", &"font_focus_color", &"font_pressed_color", &"font_hover_pressed_color"]:
 		t.set_color(state, INDEX_TAB, c.ink)
 
+	t.set_type_variation(RIBBON_TAB, &"Button")
+	for state in BUTTON_STATES:
+		var on: bool = state in [&"pressed", &"hover_pressed"]
+		t.set_stylebox(state, RIBBON_TAB, _ribbon_tab(c.paper if on else (c.leather.lightened(0.12) if state == &"hover" else c.leather), c.line))
+	t.set_stylebox(&"focus", RIBBON_TAB, StyleBoxEmpty.new())
+	t.set_font(&"font", RIBBON_TAB, font("display"))
+	t.set_font_size(&"font_size", RIBBON_TAB, 17)
+	for state in [&"font_color", &"font_hover_color", &"font_focus_color"]:
+		t.set_color(state, RIBBON_TAB, c.paper)
+	for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
+		t.set_color(state, RIBBON_TAB, c.ink)
+
+	# A setting on a page: an inked box that fills when it is on, and a brass
+	# rule with a knob. Focus is the same gold ring the chips wear.
+	var no_box := StyleBoxEmpty.new()
+	no_box.set_content_margin_all(4)
+	for state in [&"normal", &"pressed", &"hover", &"hover_pressed", &"disabled"]:
+		t.set_stylebox(state, &"CheckBox", no_box)
+	var check_ring := _pill(Color(0, 0, 0, 0), c.glow, 2, Vector2(4, 4), 10)
+	check_ring.draw_center = false
+	t.set_stylebox(&"focus", &"CheckBox", check_ring)
+	for state in [&"font_color", &"font_hover_color", &"font_focus_color", &"font_pressed_color", &"font_hover_pressed_color"]:
+		t.set_color(state, &"CheckBox", c.ink)
+	t.set_icon(&"unchecked", &"CheckBox", _check_box(false, c.ink, c.paper))
+	t.set_icon(&"checked", &"CheckBox", _check_box(true, c.ink, c.paper))
+	t.set_constant(&"h_separation", &"CheckBox", 10)
+	t.set_stylebox(&"slider", &"HSlider", _pill(Color(c.line, 0.3), Color(0, 0, 0, 0), 0, Vector2(0, 3)))
+	for area in [&"grabber_area", &"grabber_area_highlight"]:
+		t.set_stylebox(area, &"HSlider", _pill(c.accent, Color(0, 0, 0, 0), 0, Vector2(0, 3)))
+	t.set_icon(&"grabber", &"HSlider", _knob(c.paper, c.ink))
+	t.set_icon(&"grabber_highlight", &"HSlider", _knob(c.glow, c.ink))
+	t.set_icon(&"grabber_disabled", &"HSlider", _knob(c.paper_deep, c.ink_soft))
+
 	for v: StringName in LABELS:
 		var spec: Array = LABELS[v]
 		t.set_type_variation(v, &"Label")
@@ -264,6 +302,71 @@ static func _index_tab(fill: Color, rise: float) -> StyleBoxFlat:
 	box.corner_radius_top_right = 14
 	box.expand_margin_top = rise
 	return box
+
+
+## The ribbon's tab: hangs down from the book's foot, round at the bottom.
+static func _ribbon_tab(fill: Color, rim: Color) -> StyleBoxFlat:
+	var box := _pill(fill, rim, 1, Vector2(20, 8), 0)
+	box.border_width_top = 0
+	box.corner_radius_bottom_left = 12
+	box.corner_radius_bottom_right = 12
+	return box
+
+
+## A check box drawn in ink: an open square, or a filled one with a tick.
+static func _check_box(on: bool, ink: Color, paper: Color) -> ImageTexture:
+	var n := CHECK_SIZE
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	var half := n * 0.5 - 1.0
+	var tick := PackedVector2Array([Vector2(6.0, 12.5), Vector2(10.5, 17.0), Vector2(18.0, 7.5)])
+	for y in n:
+		for x in n:
+			var p := Vector2(x + 0.5, y + 0.5)
+			# Distance outside a rounded square (radius 5).
+			var q := (p - Vector2(n, n) * 0.5).abs() - Vector2(half - 5.0, half - 5.0)
+			var d := Vector2(maxf(q.x, 0.0), maxf(q.y, 0.0)).length() + minf(maxf(q.x, q.y), 0.0) - 5.0
+			var inside := clampf(0.5 - d, 0.0, 1.0)
+			var rim := inside * clampf(d + 2.5, 0.0, 1.0)
+			var col := Color(ink, rim)
+			if on:
+				var stroke := minf(_to_segment(p, tick[0], tick[1]), _to_segment(p, tick[1], tick[2]))
+				col = Color(ink, inside).lerp(Color(paper, inside), clampf(1.7 - stroke, 0.0, 1.0))
+			img.set_pixel(x, y, col)
+	return ImageTexture.create_from_image(img)
+
+
+## A slider's knob: a flat disc with an inked rim.
+static func _knob(fill: Color, rim: Color) -> ImageTexture:
+	var n := KNOB_SIZE
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	var r := n * 0.5 - 1.0
+	for y in n:
+		for x in n:
+			var d := Vector2(x + 0.5 - n * 0.5, y + 0.5 - n * 0.5).length()
+			var col := fill.lerp(rim, clampf(d - (r - 2.5), 0.0, 1.0))
+			img.set_pixel(x, y, Color(col, clampf(r - d + 0.5, 0.0, 1.0)))
+	return ImageTexture.create_from_image(img)
+
+
+static func _to_segment(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab := b - a
+	return p.distance_to(a + ab * clampf((p - a).dot(ab) / ab.length_squared(), 0.0, 1.0))
+
+
+## A soft round mote, white so a particle can tint it: sparkles and beacons.
+static func soft_dot(size: int = 32) -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.add_point(0.45, Color(1, 1, 1, 0.85))
+	g.set_color(g.get_point_count() - 1, Color(1, 1, 1, 0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.width = size
+	tex.height = size
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(0.5, 0.0)
+	return tex
 
 
 ## A clean flat shape: buttons, chips, key caps. No gradient, glow or bevel.

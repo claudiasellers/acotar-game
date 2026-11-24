@@ -1,6 +1,6 @@
 ## One page of Feyre's journal (MenuShell): the satchel, the wardrobe, the
-## collection, the sketchbook, the map. The shell draws the open book and its
-## index tabs; a page writes on the book's two sheets, left_sheet() and
+## collection, the sketchbook, the map, and settings on the ribbon. The
+## shell draws the open book and its index tabs; a page writes on the book's two sheets, left_sheet() and
 ## right_sheet() (or spread() for one picture across both), and names its keys
 ## with set_hints(). A page is built once, kept, and only shown and hidden;
 ## the shell owns pausing, the mouse and the keys every page shares. A page
@@ -32,6 +32,11 @@ var tab_order: int = 0
 var shortcut: StringName = &""
 ## Opens even while a story scene holds her controls (StoryControl not FULL).
 var opens_in_story: bool = false
+## Hangs from the book's ribbon, at its foot, not on the index strip.
+var on_ribbon: bool = false
+## Whether the game holds still when the book opens on this page (the title
+## has no game to hold, and its sky keeps drifting).
+var pauses: bool = true
 
 var _shown_now: bool = false
 var _book: Control
@@ -145,7 +150,9 @@ func _book_root() -> Control:
 
 
 func _place_book() -> void:
-	_book.position = BookLayout.origin(get_viewport().get_visible_rect().size)
+	var view := get_viewport().get_visible_rect().size
+	_book.scale = Vector2.ONE * BookLayout.fit(view)
+	_book.position = BookLayout.origin(view)
 
 
 ## Something new on the page she hasn't looked at yet (a mark on its tab).

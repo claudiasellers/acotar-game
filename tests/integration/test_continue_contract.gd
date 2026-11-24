@@ -88,8 +88,8 @@ func test_continue_replays_no_earlier_beat_and_keeps_to_its_budget() -> void:
 			"the opening need is long over")
 	assert_eq(journal.director.tick(60.0, 0.0, false, true), {}, "no opening thought on Continue")
 	assert_false(journal.showing)
-	var panel := _child_of(game, SettingsPanel) as SettingsPanel
-	assert_false(panel.get(&"_hint").visible, "the controls are taught on a new game only")
+	var page := _child_of(game, SettingsTab) as SettingsTab
+	assert_false(page.get(&"_hint").visible, "the controls are taught on a new game only")
 	var veil: Variant = game.get(&"veil")
 	assert_not_null(veil, "something on screen while it loads")
 	if veil != null:

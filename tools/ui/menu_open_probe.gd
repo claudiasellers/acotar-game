@@ -19,7 +19,7 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
-const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook"]
+const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"settings"]
 
 var feyre: Feyre
 
@@ -63,14 +63,14 @@ func _go() -> void:
 
 ## Override point for the scene under test: what to add before timing.
 func _setup() -> void:
-	add_child(SettingsPanel.new())
+	add_child(SettingsTab.new())
 	add_child(StoryJournal.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 
 
 func _pages() -> Array[StringName]:
-	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"map"]
+	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"map", &"settings"]
 
 
 ## &"none" times plain frames, the baseline the hitch is read against.

@@ -1,5 +1,5 @@
 # gate: needs:terrain
-# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/settings_panel.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
+# gate: when:characters/feyre/feyre.gd,story/act1/act1_game.gd,story/act1/cottage_door_latch.gd,systems/dialogue/dialogue_director.gd,systems/actor_body/*,systems/mount/mount_director.gd,ui/map/world_map_hud.gd,ui/map/map_settings.gd,ui/menu/settings_tab.gd,ui/menu/menu_shell.gd,core/save_system.gd,systems/player_assist/player_placement.gd,tests/integration/play/play_harness.gd
 ## Play test (T097): the woods, from New Game, driven by real key and pad
 ## events (tests/integration/play/README.md). The cottage in the human realm:
 ## she wakes there, her family is in the room, the woods are outside the door.
@@ -215,9 +215,9 @@ func test_pause_saves_and_continue_puts_her_back() -> void:
 	await h.place_on_ground(out.x, out.z)
 	await h.hold_for(&"move_right", 20)
 	await h.wait_still()
-	var panel := h.child_of(SettingsPanel) as SettingsPanel
+	var page := h.child_of(SettingsTab) as SettingsTab
 	await h.press(&"pause")
-	assert_true(panel.is_open(), "Esc opens the pause menu")
+	assert_true(page.is_open(), "Esc opens the book at its settings page")
 	assert_true(get_tree().paused, "and pauses the game")
 	# The menu's Save buttons save then leave for the title, which would end
 	# this test run, so the save is the button's own call; the load below is
@@ -225,7 +225,7 @@ func test_pause_saves_and_continue_puts_her_back() -> void:
 	SaveSystem.active_slot = SLOT
 	assert_eq(SaveSystem.save_game(SLOT), OK, "saved")
 	await h.press(&"pause")
-	assert_false(panel.is_open(), "Esc closes it")
+	assert_false(page.is_open(), "Esc closes it")
 	assert_false(get_tree().paused, "and play goes on")
 	var at := h.feyre.global_position
 	var yaw := h.feyre.model.rotation.y

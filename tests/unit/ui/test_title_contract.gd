@@ -44,7 +44,7 @@ func test_game_scene_is_act1_and_never_the_title() -> void:
 	assert_eq(game, "res://story/act1/act1_game.tscn")
 	assert_true(ResourceLoader.exists(game))
 	assert_ne(game, TITLE_SCENE)
-	assert_eq(SettingsPanel.TITLE_SCENE, TITLE_SCENE, "Save & Title lands on this title")
+	assert_eq(SettingsTab.TITLE_SCENE, TITLE_SCENE, "Save & Title lands on this title")
 
 
 func test_menu_without_a_save() -> void:
@@ -69,16 +69,18 @@ func test_title_settings_has_no_in_game_actions() -> void:
 	var t := _title()
 	t.call(&"_on_settings")
 	await wait_process_frames(2)
-	var settings := t.find_children("*", "TitleSettings", true, false)
+	var settings := t.find_children("*", "SettingsTab", true, false)
 	assert_eq(settings.size(), 1)
+	var page := settings[0] as SettingsTab
+	assert_true(page.is_open(), "the book opens on its settings page")
 	var texts := []
-	for b in (settings[0] as Node).find_children("*", "Button", true, false):
+	for b in page.find_children("*", "Button", true, false):
 		texts.append((b as Button).text)
 	assert_has(texts, "Back")
-	for banned in ["Save & Title", "Save & Quit", "Return Home", "Wriggle free"]:
+	for banned in ["Resume", "Save & Title", "Save & Quit", "Return Home", "Wriggle free"]:
 		assert_does_not_have(texts, banned)
 	assert_false(t.get_tree().paused, "title keeps running behind settings")
-	(settings[0] as TitleSettings).close()
+	page.close()
 	assert_true((t.get_node("Menu") as Control).visible)
 
 

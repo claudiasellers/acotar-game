@@ -91,7 +91,7 @@ func _ready() -> void:
 	_sparkles.gravity = Vector2(0, 30)
 	_sparkles.scale_amount_min = 2.0
 	_sparkles.scale_amount_max = 4.5
-	_sparkles.texture = PauseStyle.soft_dot(16)
+	_sparkles.texture = JournalTheme.soft_dot(16)
 	var ramp := Gradient.new()
 	ramp.set_color(0, Color(1.0, 0.92, 0.66, 1.0))
 	ramp.set_color(1, Color(1.0, 0.75, 0.88, 0.0))
@@ -101,12 +101,12 @@ func _ready() -> void:
 	_pill = Label.new()
 	_pill.text = "M   map"
 	_pill.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pill.add_theme_font_override(&"font", PauseStyle.body_font(700))
+	_pill.add_theme_font_override(&"font", JournalTheme.font("body", 700))
 	_pill.add_theme_font_size_override(&"font_size", 14)
-	_pill.add_theme_color_override(&"font_color", PauseStyle.PLUM)
+	_pill.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
 	var pill_box := StyleBoxFlat.new()
 	pill_box.bg_color = Color(1.0, 0.95, 0.97, 0.86)
-	pill_box.border_color = Color(PauseStyle.GOLD, 0.8)
+	pill_box.border_color = Color(JournalTheme.color(&"line"), 0.8)
 	pill_box.set_border_width_all(2)
 	pill_box.set_corner_radius_all(12)
 	pill_box.content_margin_left = 12
@@ -124,8 +124,8 @@ func _ready() -> void:
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast.custom_minimum_size = Vector2(DIAMETER + 80.0, 0)
 	_toast.position = Vector2(-40.0, DIAMETER + 26.0)
-	_toast.add_theme_font_override(&"font", PauseStyle.DISPLAY_FONT)
-	_toast.add_theme_color_override(&"font_color", PauseStyle.PLUM)
+	_toast.add_theme_font_override(&"font", JournalTheme.font("display"))
+	_toast.add_theme_color_override(&"font_color", JournalTheme.color(&"ink"))
 	_toast.add_theme_color_override(&"font_outline_color", Color(1.0, 0.96, 0.98))
 	_toast.add_theme_constant_override(&"outline_size", 8)
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -206,17 +206,17 @@ func _draw_marks() -> void:
 	var c := size * 0.5
 	var r := DIAMETER * 0.5
 	# Gold ring with a pearl bevel, like the guide's medallion.
-	ci.draw_arc(c, r - RING * 0.5, 0.0, TAU, 96, PauseStyle.GOLD, RING, true)
+	ci.draw_arc(c, r - RING * 0.5, 0.0, TAU, 96, JournalTheme.color(&"line"), RING, true)
 	ci.draw_arc(c, r - RING - 1.0, 0.0, TAU, 96, Color(1.0, 0.97, 0.99, 0.9), 2.0, true)
-	ci.draw_arc(c, r - 1.5, 0.0, TAU, 96, PauseStyle.GOLD_LIGHT, 1.5, true)
+	ci.draw_arc(c, r - 1.5, 0.0, TAU, 96, JournalTheme.color(&"glow"), 1.5, true)
 	# Little pearls round the ring, and a fleur at north.
 	for i in 12:
 		var a := TAU * i / 12.0
 		var p := c + Vector2(sin(a), -cos(a)) * (r - RING * 0.5)
 		ci.draw_circle(p, 2.6 if i % 3 else 3.4, Color(1.0, 0.97, 0.99))
 	var n := c + Vector2(0, -r + RING * 0.5)
-	ci.draw_colored_polygon(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2)]), PauseStyle.ROSE)
-	ci.draw_polyline(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2), n + Vector2(0, -15)]), PauseStyle.GOLD, 1.5, true)
+	ci.draw_colored_polygon(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2)]), JournalTheme.color(&"accent"))
+	ci.draw_polyline(PackedVector2Array([n + Vector2(0, -15), n + Vector2(9, 2), n + Vector2(0, -2), n + Vector2(-9, 2), n + Vector2(0, -15)]), JournalTheme.color(&"line"), 1.5, true)
 
 	# Landmarks she has seen, inside the disc.
 	var inner := r - RING - 10.0

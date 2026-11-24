@@ -137,7 +137,7 @@ func test_panel_opens_reveals_on_ask_and_closes() -> void:
 func test_look_comes_only_from_journal_theme() -> void:
 	# A literal colour (Color(0.5, ...), Color8, a hex string) or a font file is a miss;
 	# tinting a theme colour (Color(ink, 0.4)) is fine.
-	var bad := RegEx.create_from_string("Color\\(\\s*[0-9.]|Color8\\(|Color\\(\\s*\"|\\.ttf|\\.otf|PauseStyle\\.(PLUM|ROSE|GOLD|PEARL|BLUSH|LILAC)")
+	var bad := RegEx.create_from_string("Color\\(\\s*[0-9.]|Color8\\(|Color\\(\\s*\"|\\.ttf|\\.otf")
 	for path: String in PANEL_SCRIPTS:
 		var hits := []
 		for line in FileAccess.get_file_as_string(path).split("\n"):

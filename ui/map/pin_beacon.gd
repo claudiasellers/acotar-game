@@ -99,7 +99,7 @@ func _sparkles(count: int, life: float, one_shot: bool) -> CPUParticles3D:
 	# material drew hard white squares on the compatibility renderer).
 	var m := ShaderMaterial.new()
 	m.shader = GLINT
-	m.set_shader_parameter(&"dot", PauseStyle.soft_dot(32))
+	m.set_shader_parameter(&"dot", JournalTheme.soft_dot(32))
 	quad.material = m
 	p.mesh = quad
 	var ramp := Gradient.new()

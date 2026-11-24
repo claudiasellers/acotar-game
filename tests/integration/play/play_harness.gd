@@ -335,7 +335,7 @@ static func flat_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
 
-## The game's node of a type (DialogueDirector, MountDirector, SettingsPanel...).
+## The game's node of a type (DialogueDirector, MountDirector, SettingsTab...).
 func child_of(type: Variant) -> Node:
 	for child in game.get_children():
 		if is_instance_of(child, type):

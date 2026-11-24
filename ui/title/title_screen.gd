@@ -31,7 +31,7 @@ var _menu: VBoxContainer
 var _heading: Control
 var _marker: TextureRect
 var _veil: ColorRect
-var _settings: TitleSettings
+var _settings: SettingsTab
 var _slots: TitleSlots
 var _leaving := false
 var _ambience: AudioStreamPlayer
@@ -146,7 +146,8 @@ func _start_new(slot: String) -> void:
 
 func _on_settings() -> void:
 	if _settings == null:
-		_settings = TitleSettings.new()
+		_settings = SettingsTab.new()
+		_settings.in_game = false
 		_settings.closed.connect(_on_settings_closed)
 		add_child(_settings)
 	_menu.visible = false
@@ -224,7 +225,8 @@ func _build() -> void:
 
 	_marker = TextureRect.new()
 	_marker.name = "RoseMarker"
-	_marker.texture = PauseStyle.disc(30, Color("#f4a6c0"), Color("#e9c46f"), Color("#fad4dc"))
+	_marker.texture = JournalTheme.soft_dot(30)
+	_marker.modulate = Color("#f4a6c0")
 	_marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_marker.size = Vector2(30, 30)
 	add_child(_marker)

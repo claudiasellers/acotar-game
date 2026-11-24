@@ -736,8 +736,9 @@ func _frame(face: float) -> void:
 	# mirror's height shows `half` above and below her middle, then shifted
 	# so its centre is the mirror's.
 	var view := get_viewport_rect().size if is_inside_tree() else Vector2(1920, 1080)
-	var centre := (BookLayout.origin(view) + MIRROR.get_center()) / view
-	var half_view := half * view.y / MIRROR.size.y
+	var mirror := BookLayout.on_screen(view, MIRROR)
+	var centre := mirror.get_center() / view
+	var half_view := half * view.y / mirror.size.y
 	camera.fov = rad_to_deg(2.0 * atan(half_view / dist))
 	camera.h_offset = (0.5 - centre.x) * 2.0 * half_view * view.x / view.y
 	camera.v_offset = (centre.y - 0.5) * 2.0 * half_view
