@@ -1,0 +1,4 @@
+from l18-manor
+quality look
+shot day res://tools/manor_estate/room_shot.tscn dining_hall {out} 12
+shot night res://tools/manor_estate/room_shot.tscn dining_hall {out} 20
