@@ -1,0 +1,1 @@
+shot hunt res://tools/playtest/wolf_hunt_clip.tscn -- --out={out}/report.json
