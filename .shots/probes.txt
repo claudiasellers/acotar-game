@@ -1,0 +1,3 @@
+from ui-frame
+quality look
+shot pages_spring res://tools/ui/menu_open_probe.tscn shots {out} p3_house
