@@ -32,6 +32,13 @@ static func current() -> float:
 	return lowest
 
 
+## `delta` in real seconds: what a frame or tick took on the wall clock,
+## for anything of hers that must not slow with the world (aim, the bow, the
+## camera on the bow).
+static func real(delta: float) -> float:
+	return delta / maxf(Engine.time_scale, 0.01)
+
+
 ## Clears every request (tests, scene teardown).
 static func reset() -> void:
 	_requests.clear()

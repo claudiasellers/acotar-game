@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 	visible = show
 	if not show:
 		return
-	_since += delta / maxf(Engine.time_scale, 0.01)
+	_since += TimeScale.real(delta)
 	var dir := bow.shot_direction()
 	if _since >= REFRESH or impact.is_empty():
 		_since = 0.0

@@ -155,7 +155,7 @@ func _process(delta: float) -> void:
 		idle = 0.0
 		return
 	# Real seconds: Focus slows the world, not her thinking.
-	idle += delta / maxf(Engine.time_scale, 0.01)
+	idle += TimeScale.real(delta)
 	tick()
 
 

@@ -72,7 +72,7 @@ func _process(delta: float) -> void:
 	# bow's zoom runs on real time, so it arrives as fast inside the Focus hush.
 	var bow := _feyre.bow_controller
 	var bow_fov := bow.fov_offset() if bow else 0.0
-	var rate := BOW_FOV_RATE * delta / maxf(Engine.time_scale, 0.01) if bow_fov != 0.0 else 6.0 * delta
+	var rate := BOW_FOV_RATE * TimeScale.real(delta) if bow_fov != 0.0 else 6.0 * delta
 	_feyre.camera.fov = lerpf(_feyre.camera.fov, _base_fov + SPRINT_FOV * over_run + bow_fov, minf(rate, 1.0))
 
 	var yaw := _feyre.model.rotation.y

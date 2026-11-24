@@ -117,10 +117,13 @@ func update(delta: float) -> void:
 	var target_length := 1.7 if aiming else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
 	_update_room_arm(delta, target_length)
 	target_length = minf(target_length, _room_arm)
-	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, 10.0 * delta)
+	# The arm and the shoulder ease on real seconds, so the aim framing
+	# arrives as fast inside the Focus hush as outside it.
+	var ease := minf(10.0 * TimeScale.real(delta), 1.0)
+	_spring_arm.spring_length = lerpf(_spring_arm.spring_length, target_length, ease)
 	_clamp_indoor_pitch()
 	var shoulder := 0.55 if aiming else close_shoulder(_spring_arm.spring_length)
-	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, 10.0 * delta),
+	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, ease),
 			shoulder_clearance(shoulder))
 
 
@@ -140,7 +143,7 @@ func _update_kick(delta: float) -> void:
 	if _kick_t < 0.0:
 		return
 	# Real time: a kick in the Focus hush is as quick as any other.
-	_kick_t += delta / maxf(Engine.time_scale, 0.01)
+	_kick_t += TimeScale.real(delta)
 	var amount := 0.0
 	if _kick_t < _kick_rise:
 		amount = _kick_t / _kick_rise
