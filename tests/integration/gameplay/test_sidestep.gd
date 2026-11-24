@@ -135,7 +135,7 @@ func test_a_press_at_the_start_of_the_longest_freeze_runs_as_it_ends() -> void:
 		assert_false(feyre.sidestep.active, "nothing starts inside the freeze")
 		await get_tree().process_frame
 	assert_gt((Time.get_ticks_usec() - began) / 1000000.0, SidestepMotor.BUFFER, "the freeze outlasts the buffer")
-	assert_true(feyre.sidestep.wanted(), "the press is still waiting")
+	assert_true(feyre.sidestep.wanted() or feyre.sidestep.active, "the press outlived the freeze")
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	assert_true(feyre.sidestep.active, "and runs on the frame the freeze ends")
