@@ -33,7 +33,10 @@ const ROWS := {
 	&"walk": [[&"move", "walk"]],
 	&"look": [[&"look", "look around"]],
 	&"bow": [[&"cycle_bow", "change bow"]],
+	&"craft": [[&"craft_arrow", "make an arrow"]],
 	&"satchel": [[&"satchel_open", "open the satchel"]],
+	&"collection": [[&"open_collection", "open the collection"]],
+	&"thought": [[&"guide_open", "think on it again"]],
 }
 ## Never learnt and never off: a choice she has to see for as long as it waits.
 const ALWAYS: Array[StringName] = [&"beast"]
@@ -48,6 +51,9 @@ var _held: Dictionary = {}
 ## Nudged row -> seconds left.
 var _nudged: Dictionary = {}
 var _prompt: KeyPrompt
+## The collection whose first entry names its key (Gameplay makes a new one
+## with each story).
+var _book: CollectionBook
 
 
 ## The game's one table of hints, made on first asking.
@@ -158,6 +164,9 @@ func text() -> String:
 
 
 func _process(delta: float) -> void:
+	if _book != Gameplay.collection:
+		_book = Gameplay.collection
+		_book.discovered.connect(func(_entry: StringName, _tab: StringName) -> void: nudge(&"collection"))
 	current = wanted()
 	# A nudge's seconds run only while it is the row showing.
 	if _nudged.has(current):

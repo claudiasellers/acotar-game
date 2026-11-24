@@ -311,6 +311,11 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 			hints.nudge(&"bow")
 	elif not String(id).begins_with("arrow_"):
 		hints.nudge(&"satchel")
+	var archer := _player()
+	if archer != null and archer.bow_controller != null:
+		var arrow := Crafting.recipe(archer.bow_controller.selected)
+		if arrow != null and Crafting.can_craft(arrow, bar.inventory):
+			hints.nudge(&"craft")
 	if not _bar_root.is_visible_in_tree() or _flights >= MAX_FLIGHTS:
 		return
 	var feyre := _player()
