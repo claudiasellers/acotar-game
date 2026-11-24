@@ -348,7 +348,7 @@ func _make_slot(e: Dictionary) -> Button:
 	var icon := Icons.item(e, ICON)
 	icon.position = Vector2.ONE * (SLOT - ICON) * 0.5
 	b.add_child(icon)
-	var count := BookKit.label("", &"SatchelCount")
+	var count := BookKit.count_badge()
 	count.name = "Count"
 	count.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	count.grow_horizontal = Control.GROW_DIRECTION_BEGIN
@@ -356,10 +356,14 @@ func _make_slot(e: Dictionary) -> Button:
 	count.offset_right = -4
 	count.offset_bottom = -4
 	b.add_child(count)
-	var pin := BookKit.label("", &"SatchelPin")
+	var pin := BookKit.slot_badge()
 	pin.name = "Pin"
 	pin.position = Vector2(2, 2)
 	b.add_child(pin)
+	var fresh := BookKit.new_badge()
+	fresh.name = "New"
+	fresh.position = Vector2(2, 2)
+	b.add_child(fresh)
 	_grid.add_child(b)
 	_slots[e.id] = b
 	b.focus_entered.connect(select.bind(e.id))
@@ -386,8 +390,10 @@ func _update_badges(e: Dictionary) -> void:
 	count.visible = int(e.count) > 1
 	var pin := slot.get_node(^"Pin") as Label
 	var at := bar.slot_of(e.id)
-	pin.text = str(at + 1) if at >= 0 else ("new" if _new_ids.has(e.id) else "")
-	pin.visible = pin.text != ""
+	pin.text = str(at + 1) if at >= 0 else ""
+	pin.visible = at >= 0
+	# A thing in a pan has been handled: it wears its pan's key, not the ribbon.
+	(slot.get_node(^"New") as Label).visible = at < 0 and _new_ids.has(e.id)
 
 
 func _show_detail() -> void:

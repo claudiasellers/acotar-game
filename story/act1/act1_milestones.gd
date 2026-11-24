@@ -4,7 +4,7 @@
 ##     the wolf clearing (the forest going quiet before ch1's kill), gone once
 ##     the scene starts. (Her landmark thoughts carry the rest of the route.)
 ##   - Starting / done: a chapter heading at the top of the screen, through
-##     the notice queue (FindCard.heading). A heading is a title and nothing
+##     the top of the screen (ChapterHeading). A heading is a title and nothing
 ##     else: what a key does is KeyPrompts' to say, and what to do next is
 ##     never said (R2).
 ## The vignette sits in HudLayout's EDGE zone. Each heading shows once per
@@ -56,7 +56,7 @@ func trigger(id: StringName) -> bool:
 	if _quiet_for > 0.0 or shown.has(id) or not HEADINGS.has(id):
 		return false
 	shown[id] = true
-	FindCard.heading(get_tree(), HEADINGS[id])
+	ChapterHeading.show(get_tree(), HEADINGS[id])
 	return true
 
 

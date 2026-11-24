@@ -12,6 +12,8 @@ var shape: StringName = &"leaf"
 var color: Color = Color(0.8, 0.8, 0.8)
 var silhouette: bool = false
 var shiny: bool = false
+## A painted picture (a brew's bottle) that sits on the disc in place of a shape.
+var picture: Texture2D
 var _t: float = 0.0
 
 
@@ -24,6 +26,13 @@ static func make(icon_shape: StringName, icon_color: Color, unfound: bool = fals
 	i.shiny = is_shiny and not unfound
 	i.custom_minimum_size = Vector2(px, px)
 	i.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return i
+
+
+## A painted picture on the same disc every icon sits on.
+static func of_picture(texture: Texture2D, px: float = 56.0) -> ItemIcon:
+	var i := make(&"", Color.GRAY, false, false, px)
+	i.picture = texture
 	return i
 
 
@@ -58,6 +67,10 @@ func _draw() -> void:
 	draw_circle(c, r * 0.96, Color(1.0, 0.9, 0.94, 0.55) if silhouette else (Color(0.97, 0.82, 0.88) if pale else DISC))
 	if shiny:
 		draw_arc(c, r * 0.93, 0.0, TAU, 40, GOLD, 2.5, true)
+	if picture:
+		var half := Vector2.ONE * r * 0.74
+		draw_texture_rect(picture, Rect2(c - half, half * 2.0), false)
+		return
 	var fill := SILHOUETTE if silhouette else color
 	var line := SILHOUETTE.darkened(0.15) if silhouette else color.darkened(0.35)
 	var s := r * 0.62

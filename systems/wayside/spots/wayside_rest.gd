@@ -24,7 +24,7 @@ func use(user: Node) -> void:
 	if not found():
 		complete()
 	else:
-		FindCard.note(get_tree(), String(spot.param("again", "Still worth the looking.")))
+		PickupLog.of(get_tree()).note(String(spot.param("again", "Still worth the looking.")))
 
 
 func _process(delta: float) -> void:

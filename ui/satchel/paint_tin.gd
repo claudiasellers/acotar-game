@@ -34,7 +34,7 @@ func _init() -> void:
 	book = Book.new()
 	book.position = BOOK_AT + Vector2(0, NAME_ROOM)
 	add_child(book)
-	book_key = _chip("")
+	book_key = BookKit.slot_badge()
 	book_key.position = Vector2(-10, -10)
 	book.add_child(book_key)
 	for i in QuickBar.SLOTS:
@@ -94,12 +94,6 @@ func _draw() -> void:
 	WhorlInk.ink_whorl(self, Vector2(TIN.x - 22, NAME_ROOM + 22), 7.0, Color(JournalTheme.color(&"glow"), 0.8), 1.5)
 
 
-static func _chip(text: String) -> Label:
-	var chip := BookKit.label(text, &"SatchelCount")
-	chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	return chip
-
-
 ## The book: a closed journal, paper edge and leather spine, with her whorl.
 class Book extends Control:
 	func _init() -> void:
@@ -151,11 +145,11 @@ class Pan extends Control:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		size = Vector2.ONE * RADIUS * 2.0
 		pivot_offset = size * 0.5
-		_key = PaintTin._chip("")
+		_key = BookKit.slot_badge()
 		_key.name = "Key"
 		_key.position = Vector2(-8, -8)
 		add_child(_key)
-		_count = PaintTin._chip("")
+		_count = BookKit.count_badge()
 		_count.name = "Count"
 		add_child(_count)
 
