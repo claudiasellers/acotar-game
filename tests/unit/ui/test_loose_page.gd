@@ -32,7 +32,7 @@ func test_heading_and_key_caps() -> void:
 	assert_eq(head[0].theme_type_variation, &"SatchelHeading")
 	var dab := head[0].get_node_or_null(^"Dab") as TextureRect
 	assert_not_null(dab, "one dab of her paint under the page's name")
-	assert_eq(dab.modulate, JournalTheme.wash(2), "in the station's wash")
+	assert_eq(dab.modulate, Color(JournalTheme.wash(2), LoosePage.DAB_LIFT), "in the station's wash, laid on thick")
 	assert_true(dab.show_behind_parent, "under the letters, not over them")
 	page.set_hints([["E", "Brew"], ["Esc", "Step away"]])
 	var hints := page.column.get_node(^"Hints")
