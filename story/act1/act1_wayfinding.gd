@@ -234,6 +234,16 @@ static func is_clear(p: Vector2, obstacles: Array, margin: float) -> bool:
 	return true
 
 
+## Metres from the line a to b to the nearest obstacle (Vector3(x, z, radius)):
+## how clear a sight line is of trunks, boughs and rocks.
+static func sight_open(a: Vector2, b: Vector2, obstacles: Array[Vector3]) -> float:
+	var open := INF
+	for o in obstacles:
+		var at := Vector2(o.x, o.y)
+		open = minf(open, at.distance_to(Geometry2D.get_closest_point_to_segment(at, a, b)) - o.z)
+	return open
+
+
 static func _obstacle_radius(id: String) -> float:
 	for key: String in OBSTACLE_RADII:
 		if id.contains(key):
