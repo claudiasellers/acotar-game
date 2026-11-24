@@ -31,6 +31,17 @@ var _glow: Dictionary = {}
 func _init(owner_hud: WorldMapHud) -> void:
 	hud = owner_hud
 	name = "Minimap"
+	if is_instance_valid(owner_hud):
+		owner_hud.tree_exiting.connect(_drop_hud, CONNECT_ONE_SHOT)
+
+
+## The hud is leaving (region change, save load): stop reading it.
+func _drop_hud() -> void:
+	hud = null
+
+
+func _hud_alive() -> bool:
+	return is_instance_valid(hud)
 
 
 func _ready() -> void:
@@ -135,7 +146,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	if not visible or hud == null:
+	if not visible or not _hud_alive():
 		return
 	var mat := map_rect.material as ShaderMaterial
 	var map_size := WorldMap.MAP_RECT.size
@@ -155,11 +166,13 @@ func _process(delta: float) -> void:
 
 
 func in_manor() -> bool:
-	return hud.manor != null and hud.manor.inside
+	return _hud_alive() and hud.manor != null and hud.manor.inside
 
 
 ## Her plan of the floor she is on, centred on her.
 func _draw_manor() -> void:
+	if not _hud_alive() or hud.manor == null:
+		return
 	var plan := hud.manor
 	var c := size * 0.5
 	var ppm := (DIAMETER * 0.5 - RING) / MANOR_RADIUS
@@ -169,6 +182,8 @@ func _draw_manor() -> void:
 ## World XZ to a point on this control (may fall outside the disc).
 func to_local_point(xz: Vector2) -> Vector2:
 	var scale := (DIAMETER * 0.5) / VIEW_RADIUS
+	if not _hud_alive():
+		return size * 0.5
 	return size * 0.5 + (xz - hud.player_xz) * scale
 
 
@@ -202,6 +217,8 @@ func _on_click(event: InputEvent) -> void:
 
 
 func _draw_marks() -> void:
+	if not _hud_alive():
+		return
 	var ci := _overlay
 	var c := size * 0.5
 	var r := DIAMETER * 0.5
