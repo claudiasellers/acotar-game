@@ -32,7 +32,7 @@ and the newcomer critic). Data rows are written by `tools/film/gen_film_data.py`
 - Time follows the wall clock, pulled toward the score's playback position.
   `beat(name)` and `line_shown(line)` fire in order. `seek(t)` fires
   everything up to `t`.
-- `veil_to(alpha, s, color)`, `hide_ui_of(scene)` (restored at the end),
+- `veil_to(alpha, s, color)`,
   `take_input_lead()` (moves it to the last root child so it hears input
   before the scene's own menus).
 - `skip()` or reaching `length` ends it: `finished(skipped)`, the seen flag
@@ -131,7 +131,7 @@ is skipped, or can't play (headless: every fact is written at once).
 - beats and lines in order;
 - control held;
 - skip and finish write the seen fact exactly once, including when the player is freed early;
-- the HUD is hidden and restored;
+- the HUD is hidden and restored (`UiMode.FILM`, `docs/contracts/ui-frame.md`);
 - the skip inputs;
 - `take()` is false unless the film is armed;
 - New Game routing;

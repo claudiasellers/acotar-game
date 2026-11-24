@@ -17,7 +17,7 @@ static func fade_to(owner: Node, to: float, then: Callable = Callable()) -> void
 	StoryControl.set_mode(StoryControl.Mode.NONE)
 	var layer := CanvasLayer.new()
 	layer.name = "TimeShift"
-	layer.layer = 30
+	layer.layer = UiLayers.VEIL
 	var veil := ColorRect.new()
 	veil.color = Color(0.03, 0.02, 0.05)
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)

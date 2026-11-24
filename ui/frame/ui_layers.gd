@@ -6,8 +6,8 @@ extends RefCounted
 
 ## Screen-edge effects (venom, low health, frost, dread, stealth).
 const EDGE := 1
-## The film player's own stack: inserts and grade here, its veil at +3, its
-## text at +4.
+## The film stack: the grade at -1, inserts here, a staged lens's letterbox
+## at +1, the film's veil at +3, its text at +4.
 const FILM := 3
 ## HudLayout, the only HUD layer.
 const HUD := 10
@@ -17,9 +17,11 @@ const BACKDROP := 17
 const PAGE := 19
 ## Open screens. ScreenStack gives each SCREEN + its depth.
 const SCREEN := 20
-## Spoken lines, thoughts, whispers.
+## Spoken lines, thoughts, whispers (a whisper at +1, over a line). A story
+## page held up mid-scene sits at -1, over any screen.
 const LINE := 25
-## Story fades and blackouts.
+## Story fades and blackouts (-1 for one that must sit under another; +1 for
+## travel cards drawn on the black).
 const VEIL := 30
 ## The few things that must read over a fade.
 const OVER_VEIL := 40

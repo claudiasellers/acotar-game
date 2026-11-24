@@ -86,7 +86,7 @@ func _ready() -> void:
 	add_child(camera)
 	_layer = CanvasLayer.new()
 	_layer.name = "Letterbox"
-	_layer.layer = 4
+	_layer.layer = UiLayers.FILM + 1
 	add_child(_layer)
 	_top = _bar()
 	_bottom = _bar()

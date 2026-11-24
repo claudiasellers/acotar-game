@@ -35,7 +35,7 @@ static func go(tree: SceneTree, region: StringName, anchor: StringName, at: Vect
 
 
 func _ready() -> void:
-	layer = 31
+	layer = UiLayers.VEIL + 1
 	_veil = ColorRect.new()
 	_veil.color = Color(0.03, 0.02, 0.05)
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)

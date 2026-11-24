@@ -65,7 +65,7 @@ func _ready() -> void:
 	feyre = FEYRE_SCENE.instantiate()
 	feyre.position = Vector3(0, 0.2, 8)
 	add_child(feyre)
-	var hud := CanvasLayer.new()
+	var hud := Node.new()
 	hud.set_script(HUD_SCRIPT)
 	add_child(hud)
 	add_child(SettingsPanel.new())

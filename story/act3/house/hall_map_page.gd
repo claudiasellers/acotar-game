@@ -47,7 +47,7 @@ static func find_or_make(owner: Node) -> HallMapPage:
 
 func _init() -> void:
 	name = "HallMapPage"
-	layer = 24
+	layer = UiLayers.LINE - 1
 	add_to_group(GROUP)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_sheet = Control.new()

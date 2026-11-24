@@ -113,6 +113,7 @@ func _note(text: String) -> void:
 
 func _build_label() -> void:
 	var layer := CanvasLayer.new()
+	layer.layer = UiLayers.HUD
 	add_child(layer)
 	_label = Label.new()
 	_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)

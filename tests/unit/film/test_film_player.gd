@@ -109,15 +109,16 @@ func test_freed_early_still_never_leaves_the_story_waiting() -> void:
 
 func test_film_hides_the_game_hud_and_brings_it_back() -> void:
 	FilmPlayer.headless_opt_in = true
-	var scene := Node.new()
-	var hud := CanvasLayer.new()
-	scene.add_child(hud)
-	add_child_autofree(scene)
+	var hud := HudLayout.of(get_tree())
 	var p := FilmPlayer.start(get_tree(), _film())
-	p.hide_ui_of(scene)
-	assert_false(hud.visible)
+	assert_eq(UiMode.current(get_tree()), UiMode.Mode.FILM)
+	await wait_process_frames(2)
+	assert_false(hud.zone(HudLayout.Zone.VITALS).visible)
+	assert_false(hud.zone(HudLayout.Zone.NOTICE).visible)
 	p.skip()
-	assert_true(hud.visible)
+	await wait_process_frames(2)
+	assert_eq(UiMode.current(get_tree()), UiMode.Mode.PLAY)
+	assert_true(hud.zone(HudLayout.Zone.VITALS).visible)
 
 
 func test_a_skip_press_is_any_confirm_or_escape() -> void:

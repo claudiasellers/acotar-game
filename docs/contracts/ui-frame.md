@@ -7,7 +7,7 @@ here needs the director's OK.
 
 The frame moves jobs, not looks. The player sees three small differences,
 all from 1c: status chips sit three across in two rows so they stay out of
-the spoken-line lane, the controls hint sits on the right, and the E cards
+the spoken-line lane, the controls hint sits in the bottom right corner, and the E cards
 sit just above the strap. It lands in four hand-ins (1a to 1d
 below). Each hand-in moves its files over completely and deletes their old
 code in the same change (R18): nothing keeps a private copy of a job the frame
@@ -30,13 +30,13 @@ here and from nowhere else.
 | Constant | Value | What draws there |
 |---|---|---|
 | `EDGE` | 1 | screen-edge effects (venom, low health, frost, dread, stealth) |
-| `FILM` | 3 | the film player's own stack: inserts and grade at `FILM`, its veil at `FILM + 3`, its text at `FILM + 4` |
-| `HUD` | 10 | `HudLayout`, the only HUD layer |
+| `FILM` | 3 | the film stack: the grade at `FILM - 1`, inserts at `FILM`, a staged lens's letterbox at `FILM + 1`, the film's veil at `FILM + 3`, its text at `FILM + 4` |
+| `HUD` | 10 | `HudLayout`, the only HUD layer (the hunt demo's label shares the number) |
 | `BACKDROP` | 17 | the dim behind an open screen |
 | `PAGE` | 19 | the book's pages, under its tab strip |
 | `SCREEN` | 20 | open screens; `ScreenStack` gives each `SCREEN + its depth` (depth 0 to 3) |
-| `LINE` | 25 | spoken lines, thoughts, whispers |
-| `VEIL` | 30 | story fades and blackouts |
+| `LINE` | 25 | spoken lines, thoughts; a whisper at `LINE + 1`; a story page held up mid-scene at `LINE - 1` |
+| `VEIL` | 30 | story fades and blackouts; `VEIL - 1` for one that sits under another; `VEIL + 1` for travel cards drawn on the black |
 | `OVER_VEIL` | 40 | the few things that must read over a fade (the Suriel's voice) |
 | `LOADING` | 90 | the loading veil |
 
@@ -121,7 +121,7 @@ may slide or a strap may lift inside its root.
 | Zone | Where | Pieces |
 |---|---|---|
 | `EDGE` | full screen, on `UiLayers.EDGE` under everything | screen-edge effects, Act I's hush vignette |
-| `WORLD` | full screen | aim reticle, grab ring |
+| `WORLD` | full screen | aim reticle, grab ring, the dev overlay (F3) |
 | `WAY` | full screen | the player's own pin marker, and nothing the game sets (R2) |
 | `THOUGHT` | top left | Feyre's thought and its tab |
 | `NOTICE` | top centre | first finds, rewards, chapter cards |
@@ -130,7 +130,7 @@ may slide or a strap may lift inside its root.
 | `PROMPT` | bottom centre, over the strap | what a key does here: press card, forage card, brew, trade, Act I's key prompts |
 | `STRAP` | bottom centre | the quick strap |
 | `BOW` | right, low | the quiver card |
-| `CONTROLS` | right, over `BOW` | the controls hint |
+| `CONTROLS` | bottom right corner, under `BOW` | the controls hint |
 
 Corner zones stack their pieces away from their corner, so two prompts at
 once sit one above the other. Mouse clicks pass through a zone to its pieces.
@@ -200,7 +200,7 @@ every piece's script.
 | 1a | `MenuShell` and its pages, `SettingsPanel`, `TitleSettings` | their `paused`, `mouse_mode`, `_input` Esc code and layer numbers | none yet |
 | 1b | brew, market, mare, studio, travel card, title; `feyre.gd` hands over its mouse and Esc lines | the same in each; `ui/hearth_panel.gd`; `ui/painting/painting_ui.gd` | no `paused =` or `mouse_mode =` outside `ScreenStack` |
 | 1c | vitals HUD, quick strap, minimap and pin marker, quiver card, aim reticle, prompts, find card, thoughts card, milestone card, controls hint | each piece's layer, screen anchors and hide rule; `ui/celebration_gate.gd` | no `CanvasLayer`, `layer =`, self-anchoring, `StoryControl.mode` or pause read in a HUD piece |
-| 1d | the story and system scripts that make their own layer (veils, captions, whisper, Suriel, film) | their literal numbers | no literal `layer =` number outside `UiLayers` |
+| 1d | the story and system scripts that make their own layer (veils, captions, whisper, Suriel, film, the loading veil, dev overlays) | their literal numbers | no literal `layer =` number outside `UiLayers` (in `test_hud_layout.gd`) |
 
 ## Files outside `ui/` the frame edits
 

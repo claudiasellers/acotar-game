@@ -25,7 +25,7 @@ var _lifting: bool = false
 
 
 func _ready() -> void:
-	layer = 90
+	layer = UiLayers.LOADING
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_started_msec = Time.get_ticks_msec()
 	_fill = ColorRect.new()

@@ -30,7 +30,7 @@ static func find_or_make(owner: Node) -> Act2Whisper:
 
 func _init() -> void:
 	name = "Act2Whisper"
-	layer = 26
+	layer = UiLayers.LINE + 1
 	add_to_group(GROUP)
 	label = Label.new()
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE

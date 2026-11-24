@@ -15,7 +15,7 @@ const PIECES: Array[String] = [
 	"res://story/act1/key_prompts.gd", "res://story/act1/act1_milestones.gd",
 	"res://ui/chemistry/brew_prompt.gd", "res://ui/market/market_prompt.gd",
 	"res://ui/collection_book/find_card.gd", "res://ui/guide/guide_journal.gd",
-	"res://ui/pause_menu/controls_hint.gd",
+	"res://ui/pause_menu/controls_hint.gd", "res://ui/debug_hud.gd",
 ]
 
 ## The scripts that make those pieces and hand them to HudLayout.
@@ -25,7 +25,7 @@ const KEEPERS: Array[String] = [
 	"res://systems/interaction/press_card.gd", "res://story/act1/key_prompts.gd",
 	"res://story/act1/act1_milestones.gd", "res://ui/chemistry/brew_prompt.gd",
 	"res://ui/market/market_prompt.gd", "res://ui/collection_book/find_card.gd",
-	"res://ui/guide/guide_journal.gd", "res://ui/settings_panel.gd",
+	"res://ui/guide/guide_journal.gd", "res://ui/settings_panel.gd", "res://ui/debug_hud.gd",
 ]
 
 var hud: HudLayout
@@ -191,3 +191,27 @@ func test_no_piece_does_the_frames_job() -> void:
 func test_every_keeper_hands_its_piece_to_the_layout() -> void:
 	for path in KEEPERS:
 		assert_true(FileAccess.get_file_as_string(path).contains("HudLayout.of("), "%s places its piece" % path)
+
+
+## Every CanvasLayer number comes from UiLayers: no script in the game writes
+## a bare number into `layer`.
+func test_no_script_writes_a_bare_layer_number() -> void:
+	var bare := RegEx.new()
+	bare.compile("\\blayer\\s*=\\s*-?\\d")
+	var hits: Array[String] = []
+	_scan("res://", bare, hits)
+	assert_eq(hits, [] as Array[String], "bare layer numbers")
+
+
+func _scan(dir: String, bare: RegEx, hits: Array[String]) -> void:
+	for sub in DirAccess.get_directories_at(dir):
+		if dir == "res://" and sub in ["addons", "tests", "tools", ".godot", ".git", ".lanes"]:
+			continue
+		_scan(dir.path_join(sub), bare, hits)
+	for file in DirAccess.get_files_at(dir):
+		if not file.ends_with(".gd") or dir.path_join(file) == "res://ui/frame/ui_layers.gd":
+			continue
+		var lines := FileAccess.get_file_as_string(dir.path_join(file)).split("\n")
+		for i in lines.size():
+			if bare.search(lines[i]) and not lines[i].contains("collision_layer"):
+				hits.append("%s:%d" % [dir.path_join(file), i + 1])

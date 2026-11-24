@@ -118,7 +118,7 @@ func _sink(down: bool) -> void:
 		return
 	if down:
 		_veil_layer = CanvasLayer.new()
-		_veil_layer.layer = 29
+		_veil_layer.layer = UiLayers.VEIL - 1
 		_veil = ColorRect.new()
 		_veil.color = Color(0.02, 0.01, 0.04)
 		_veil.set_anchors_preset(Control.PRESET_FULL_RECT)

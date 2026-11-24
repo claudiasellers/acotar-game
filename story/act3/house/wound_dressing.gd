@@ -184,7 +184,7 @@ func _shift(_s: SceneSpace) -> void:
 	if not is_inside_tree():
 		return
 	var layer := CanvasLayer.new()
-	layer.layer = 30
+	layer.layer = UiLayers.VEIL
 	layer.name = "Flash"
 	_flash = ColorRect.new()
 	_flash.color = Color(1.0, 0.98, 0.92, 1.0)

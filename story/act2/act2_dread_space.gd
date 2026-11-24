@@ -105,7 +105,7 @@ func veil(alpha: float, seconds: float) -> void:
 	if _veil == null:
 		_veil_layer = CanvasLayer.new()
 		_veil_layer.name = "Veil"
-		_veil_layer.layer = 30
+		_veil_layer.layer = UiLayers.VEIL
 		add_child(_veil_layer)
 		_veil = ColorRect.new()
 		_veil.color = Color(0.0, 0.0, 0.0, 0.0)

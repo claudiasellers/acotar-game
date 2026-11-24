@@ -29,7 +29,7 @@ func sleep() -> void:
 	sleeping = true
 	StoryControl.set_mode(StoryControl.Mode.NONE)
 	var layer := CanvasLayer.new()
-	layer.layer = 30
+	layer.layer = UiLayers.VEIL
 	var veil := ColorRect.new()
 	veil.color = Color(0.03, 0.02, 0.05)
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)

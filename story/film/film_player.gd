@@ -25,9 +25,9 @@ signal finished(skipped: bool)
 
 const NODE_NAME := &"FilmPlayer"
 const BANK := "res://data/audio/act1_sound_bank.tres"
-const LAYER_INSERT := 3
-const LAYER_VEIL := 6
-const LAYER_TEXT := 7
+const LAYER_INSERT := UiLayers.FILM
+const LAYER_VEIL := UiLayers.FILM + 3
+const LAYER_TEXT := UiLayers.FILM + 4
 
 ## Tests set this to play films headless.
 static var headless_opt_in := false
@@ -50,8 +50,6 @@ var _last_usec: int = 0
 var _music_started: bool = false
 var _last_pos: float = -1.0
 var _veil_tween: Tween
-## The game's own HUD layers hidden for the film (weak refs), shown again after.
-var _hidden: Array[WeakRef] = []
 
 
 ## True where films may play: a real display, or a test that opted in.
@@ -209,28 +207,6 @@ func veil_to(alpha: float, seconds: float, color: Color = Color.BLACK) -> void:
 	_veil_tween.tween_property(veil, ^"color:a", alpha, seconds)
 
 
-## Hides the game scene's HUD (its CanvasLayer and Control children) for the
-## film; they come back however the film ends.
-func hide_ui_of(scene: Node) -> void:
-	for c in scene.get_children():
-		if c is CanvasLayer and (c as CanvasLayer).visible:
-			(c as CanvasLayer).visible = false
-			_hidden.append(weakref(c))
-		elif c is Control and (c as Control).visible:
-			(c as Control).visible = false
-			_hidden.append(weakref(c))
-
-
-func _restore_ui() -> void:
-	for w in _hidden:
-		var n: Object = w.get_ref()
-		if n is CanvasLayer:
-			(n as CanvasLayer).visible = true
-		elif n is Control:
-			(n as Control).visible = true
-	_hidden.clear()
-
-
 func skip() -> void:
 	if not playing:
 		return
@@ -244,7 +220,6 @@ func _finish(was_skipped: bool) -> void:
 	ended = true
 	playing = false
 	_mark_seen()
-	_restore_ui()
 	if was_skipped:
 		var fade := create_tween()
 		fade.tween_property(music, ^"volume_db", -40.0, 1.0)
@@ -293,7 +268,6 @@ func _exit_tree() -> void:
 		ended = true
 		playing = false
 		_mark_seen()
-		_restore_ui()
 		StoryControl.release()
 		EventBus.scene_space_finished.emit(space_id())
 		finished.emit(true)

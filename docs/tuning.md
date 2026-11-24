@@ -218,4 +218,4 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `REIN_GRIP` | `creatures/fae/white_horse.gd` | (±0.09, 2.15, -0.48) | — | where Feyre's hands hold the reins over the pommel | L47 |
 | `SAG_HELD` / `SAG_SLACK` | `systems/mount/mare_reins.gd` | 0.07 / 0.16 m | 0–0.3 | how much the reins droop held and lying loose | L47 |
 | `STEP` / `PER_ROW` | `ui/hud/vitals/status_row.gd` | 80 px / 3 | step 76–92; 2–3 across | spacing of the status chips and how many sit in a row before the next row starts above; three at 80 end at 382 px, short of the line lane (`HudLayout.LANE_LEFT`, 384) | L77 |
-| `CORNERS` | `ui/frame/hud_layout.gd` | see file | | where each HUD zone sits from its screen corner (vitals 56/70, strap 84 up, prompts 214 up, quiver card 40/230, controls hint 40/296, top margin 28) | L77 |
+| `CORNERS` | `ui/frame/hud_layout.gd` | see file | | where each HUD zone sits from its screen corner (vitals 56/70, strap 84 up, prompts 214 up, quiver card 40/230, controls hint 28/28, top margin 28) | L77 |

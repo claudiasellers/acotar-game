@@ -107,6 +107,7 @@ func _time(page: StringName, n: int) -> void:
 
 
 func _shots(dir: String) -> void:
+	_dress_hud()
 	for i in 30:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
@@ -146,3 +147,17 @@ func _check_overlap(page: StringName) -> void:
 			worst = hit.size.y
 			who = String(ctl.get_path()).get_file()
 	print("menu_open_probe: %-10s strip overlap %.0f px %s (screen %s)" % [page, worst, who, screen])
+
+
+## The in-play screen with everything on it at once, for the HUD frame: six
+## statuses (two rows and "+1"), two E cards, the controls hint.
+func _dress_hud() -> void:
+	add_child(VitalsHud.new())
+	var vitals := Vitals.of(feyre)
+	if vitals:
+		for tag: StringName in [&"venom", &"chilled", &"steady", &"swift", &"warm", &"well_fed"]:
+			vitals.apply_status(&"probe", tag, 0.6, 60.0)
+	for verb: String in ["step in", "the curtains"]:
+		var keeper := Node.new()
+		add_child(keeper)
+		PressCard.find_or_make(keeper).show_text(verb)

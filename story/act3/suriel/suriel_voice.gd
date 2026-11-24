@@ -15,7 +15,7 @@ var _full: String = ""
 
 
 func _init() -> void:
-	layer = 40
+	layer = UiLayers.OVER_VEIL
 	name = "SurielVoice"
 
 

@@ -68,7 +68,6 @@ func _begin(game_scene: Node, who: Feyre, after: Callable) -> void:
 	cine = Cine.of(get_tree())
 	cottage = _find_cottage()
 	player.take_input_lead()
-	player.hide_ui_of(game)
 	Clock.from_dict({"time_of_day": NIGHT, "day": Clock.day})
 	if feyre and feyre.model:
 		feyre.model.visible = false

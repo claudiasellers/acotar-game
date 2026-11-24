@@ -146,7 +146,7 @@ func _fade(alpha: float) -> void:
 	if veil == null or not is_instance_valid(veil):
 		var layer := CanvasLayer.new()
 		layer.name = "RideVeil"
-		layer.layer = 30
+		layer.layer = UiLayers.VEIL
 		veil = ColorRect.new()
 		veil.color = Color(0.03, 0.02, 0.05)
 		veil.set_anchors_preset(Control.PRESET_FULL_RECT)

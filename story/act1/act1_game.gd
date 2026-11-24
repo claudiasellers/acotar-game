@@ -68,7 +68,7 @@ func _ready() -> void:
 		spawner.name = "StorySpawner"
 		spawner.set_script(load(SPAWNER))
 		add_child(spawner)
-	var hud := CanvasLayer.new()
+	var hud := Node.new()
 	hud.set_script(HUD_SCRIPT)
 	add_child(hud)
 	add_child(SettingsPanel.new())

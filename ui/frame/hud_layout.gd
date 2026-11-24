@@ -19,7 +19,7 @@ enum Zone {
 	PROMPT,  ## Bottom centre, over the strap: what a key does here.
 	STRAP,  ## Bottom centre: the quick strap.
 	BOW,  ## Right, low: the quiver card.
-	CONTROLS,  ## Right, over BOW: the controls hint.
+	CONTROLS,  ## Bottom right corner, under BOW: the controls hint.
 }
 
 const NODE := ^"ScreenStack/HudLayout"
@@ -60,7 +60,7 @@ const CORNERS := {
 	Zone.PROMPT: [Control.PRESET_CENTER_BOTTOM, Vector2(0, -214)],
 	Zone.STRAP: [Control.PRESET_CENTER_BOTTOM, Vector2(0, -84)],
 	Zone.BOW: [Control.PRESET_BOTTOM_RIGHT, Vector2(-40, -230)],
-	Zone.CONTROLS: [Control.PRESET_BOTTOM_RIGHT, Vector2(-40, -296)],
+	Zone.CONTROLS: [Control.PRESET_BOTTOM_RIGHT, Vector2(-MARGIN, -MARGIN)],
 }
 
 var _zones: Dictionary[Zone, Control] = {}

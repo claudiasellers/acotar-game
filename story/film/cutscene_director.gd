@@ -45,9 +45,6 @@ func _ready() -> void:
 	player.beat.connect(_on_beat)
 	player.finished.connect(_on_finished)
 	player.take_input_lead()
-	var scene := get_tree().current_scene
-	if scene:
-		player.hide_ui_of(scene)
 	grade = FilmGrade.new()
 	player.add_child(grade)
 	frame = space.global_transform if space else Transform3D()

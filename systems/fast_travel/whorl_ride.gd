@@ -46,7 +46,7 @@ static func go(tree: SceneTree, dest: WhorlStoneDef) -> WhorlRide:
 
 
 func _ready() -> void:
-	layer = 31
+	layer = UiLayers.VEIL + 1
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_veil = Control.new()
 	_veil.set_anchors_preset(Control.PRESET_FULL_RECT)

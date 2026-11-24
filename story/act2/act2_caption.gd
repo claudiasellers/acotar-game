@@ -48,7 +48,7 @@ static func _space_of(node: Node) -> SceneSpace:
 
 func _init() -> void:
 	name = "Act2Caption"
-	layer = 25
+	layer = UiLayers.LINE
 	add_to_group(GROUP)
 	panel = PanelContainer.new()
 	panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
