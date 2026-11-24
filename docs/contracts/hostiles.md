@@ -88,8 +88,9 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
     free (`player_released(id)`, so the knife's finisher window opens on it).
     If her time runs out, `naga_claw` × 1.5;
   - otherwise `naga_claw` (22, claw, medium): 0.55 s tell.
-  Reach is flat distance, and a blow lands only with `REACH_HEIGHT` (1.2 m)
-  or less of height between them, so a ledge saves her and a step doesn't.
+  Reach is `Creature.within_reach`: flat distance, and a blow lands only with
+  `Creature.REACH_HEIGHT` (1.2 m) or less of height between them, so a ledge
+  saves her and a step doesn't. Her knife uses the same rule.
   It then weaves back for `strike_cooldown` (1.65 s, so one cycle is ~2.2 s and
   a 4-naga camp needs ≥ 4 s to put her down) and comes again. A stagger
   (bash, knife) cancels the tell or lets go of the hold; so do sleep, fire and

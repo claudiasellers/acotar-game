@@ -86,7 +86,8 @@ func strike() -> bool:
 	return _cut_nearby()
 
 
-## The creature Strike would hit: alive, within REACH, the most hurt first
+## The creature Strike would hit: alive, within REACH (Creature.within_reach:
+## flat, and no more than REACH_HEIGHT above or below her), the most hurt first
 ## (finish what she started), the nearest to break ties.
 func target() -> Creature:
 	if player == null or not player.is_inside_tree():
@@ -97,9 +98,9 @@ func target() -> Creature:
 		var c := node as Creature
 		if c == null or not c.alive or c.data == null:
 			continue
-		var d := c.global_position.distance_to(player.global_position)
-		if d > REACH:
+		if not Creature.within_reach(player.global_position, c.global_position, REACH):
 			continue
+		var d := Creature.flat_distance(player.global_position, c.global_position)
 		var key := c.health * 10.0 + d
 		if key < best_key:
 			best = c
@@ -114,7 +115,7 @@ static func knife_kind(c: Creature, from: Vector3, crouched: bool, freed_from: S
 	if c.asleep_left > 0.0 or c.mortally_wounded or (freed_from != &"" and c.creature_id == freed_from):
 		return &"finisher"
 	var unaware := c.senses == null or c.senses.awareness < UNAWARE_BELOW
-	if unaware and c.global_position.distance_to(from) <= SNEAK_REACH \
+	if unaware and Creature.within_reach(from, c.global_position, SNEAK_REACH) \
 			and (crouched or StrikeController.is_behind(c, from)):
 		return &"sneak"
 	return &"knife"

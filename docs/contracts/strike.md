@@ -12,7 +12,8 @@ One press, in this order:
    once. It emits `EventBus.player_released(source)`, so VitalsState and the
    holder end the hold. The holder is open to a finisher for `FREED_WINDOW`
    (2 s), and so is anything she broke free from by mashing.
-2. **A creature within `REACH` (1.8 m)**, the most hurt first, then the nearest:
+2. **A creature within `REACH` (1.8 m)** by `Creature.within_reach` (flat, and
+   no more than 1.2 m above or below her, the same rule as a naga's claw), the most hurt first, then the nearest:
    - `knife_kind()` is `&"finisher"` (asleep, mortally wounded, or just freed
      from) x6; `&"sneak"` (awareness under 0.4, within 1.5 m, and she's behind
      it or crouched) x4; otherwise `&"knife"` x1. The multiplier is a

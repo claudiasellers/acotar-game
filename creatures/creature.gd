@@ -12,6 +12,10 @@ signal died(cause: StringName)
 const TARGET_LAYER := 1 << 3
 const WORLD_MASK := 1 << 0
 const GROUP := &"creatures"
+## Melee reach is flat distance, but not across a ledge or bank: a blow lands
+## only with this much height or less between the two. One rule for both
+## sides: a creature's claw and her knife (within_reach).
+const REACH_HEIGHT := 1.2
 ## Creatures at least this tall (m) are solid to Feyre while alive (T092).
 const SOLID_HEIGHT := 0.6
 ## Special arrows (gameplay lane, Arrow.arrow_effect): how long each lasts.
@@ -454,6 +458,17 @@ static func resolve_hit(creature: CreatureData, current_health: float, weapon_id
 	if creature.only_lethal_kills:
 		return {"health": maxf(remaining, 1.0), "killed": false, "mortal": false, "ash_taken": ash}
 	return {"health": maxf(remaining, 0.0), "killed": remaining <= 0.0, "mortal": false, "ash_taken": ash}
+
+
+## Melee reach, the one rule for both sides: flat distance within `reach`
+## and no more than REACH_HEIGHT of height between them.
+static func within_reach(a: Vector3, b: Vector3, reach: float) -> bool:
+	return Vector2(b.x - a.x, b.z - a.z).length() <= reach and absf(b.y - a.y) <= REACH_HEIGHT
+
+
+## Flat distance (no height), for ranking targets in reach.
+static func flat_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(b.x - a.x, b.z - a.z).length()
 
 
 ## Points away from a threat on the ground plane.

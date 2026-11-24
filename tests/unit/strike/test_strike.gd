@@ -243,3 +243,15 @@ func test_one_knife() -> void:
 		assert_false(ambush.contains(gone), "%s is gone from the ambush" % gone)
 	var feyre := FileAccess.get_file_as_string("res://characters/feyre/feyre.gd")
 	assert_true(feyre.contains("StrikeController.new()"))
+
+
+## One reach rule for both sides (Creature.within_reach): a naga 2 m below
+## her on the bank is out of her knife's reach, though it's 1.2 m off flat.
+func test_she_cant_stab_a_naga_two_metres_below_her() -> void:
+	var n := _naga()
+	her.global_position = Vector3(0, 2, -1.2)
+	assert_null(k.target())
+	assert_false(k.strike())
+	assert_eq(n.health, ROAMER_DATA.max_health)
+	her.global_position = Vector3(0, 1.0, -1.2)
+	assert_eq(k.target(), n, "a step up is still in reach")

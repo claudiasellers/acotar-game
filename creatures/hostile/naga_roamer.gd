@@ -22,9 +22,6 @@ const LUNGE_MAX := 6.0
 ## The leap closes the gap in about this long; it lands if she comes within
 ## reach before it runs out, else it misses.
 const LEAP_SECONDS := 0.5
-## Reach is flat, but not across a ledge or bank: a blow lands only with
-## this much height or less between them.
-const REACH_HEIGHT := 1.2
 ## Without a token it circles her at this distance.
 const CIRCLE_MIN := 4.0
 const CIRCLE_MAX := 6.0
@@ -282,7 +279,7 @@ func _fight(player: Node3D, delta: float) -> void:
 			_fight_left -= delta
 			if _fight_left <= 0.0:
 				# Flat reach, capped in height: a step doesn't save her, a ledge does.
-				var in_reach := flat <= strike_reach + 0.6 and absf(to.y) <= REACH_HEIGHT
+				var in_reach := Creature.within_reach(global_position, player.global_position, strike_reach + 0.6)
 				if in_reach and _attack == COIL:
 					_coil(player)
 				else:
@@ -300,7 +297,7 @@ func _fight(player: Node3D, delta: float) -> void:
 			move_direction = to
 			move_speed = _leap_speed
 			_fight_left -= delta
-			if flat <= strike_reach and absf(to.y) <= REACH_HEIGHT:
+			if Creature.within_reach(global_position, player.global_position, strike_reach):
 				HostileHits.strike(creature_id, LUNGE_ATTACK, 1.0, global_position)
 				_recover()
 			elif _fight_left <= 0.0:
