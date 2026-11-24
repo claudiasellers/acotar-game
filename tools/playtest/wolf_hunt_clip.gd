@@ -45,11 +45,21 @@ func _secs() -> float:
 
 
 func _play() -> void:
+	var hunt := await _enter_hunt()
+	if hunt == null:
+		return
+	await _watch_and_shoot(hunt)
+
+
+## Spawns, walks to the clearing and starts recording as the hunt begins.
+## Null (the beat already failed) if any of that didn't happen.
+func _enter_hunt() -> WolfKill:
 	_frames_dir = out_path.get_base_dir()
 	DirAccess.make_dir_recursive_absolute(_frames_dir)
 	_begin("spawn", "Feyre at the cottage, controllable")
 	if not await _until(func() -> bool: return game.spawned, 30.0):
-		return _fail("never spawned")
+		_fail("never spawned")
+		return null
 	feyre = game.feyre
 	feyre.arrow_fired.connect(func(arrow: Node) -> void:
 		arrow.hit.connect(func(collider: Node, at: Vector3) -> void:
@@ -58,7 +68,8 @@ func _play() -> void:
 	await _until(func() -> bool: return StoryControl.mode == StoryControl.Mode.FULL, 10.0)
 	var director := get_tree().get_first_node_in_group(DialogueDirector.GROUP) as DialogueDirector
 	if director == null:
-		return _fail("no DialogueDirector in the game")
+		_fail("no DialogueDirector in the game")
+		return null
 	director.line_spoken.connect(func(id: StringName, _s: StringName, text: String, _at: Vector3, _inner: bool) -> void:
 		spoken.append(String(id))
 		_note("%5.1f s  [%s] %s" % [_secs(), id, text]))
@@ -70,17 +81,23 @@ func _play() -> void:
 		await _walk_region(&"hunting_forest")
 		clearing = _anchor(&"act1_wolf_clearing")
 	if clearing == null:
-		return _fail("no act1_wolf_clearing anchor")
+		_fail("no act1_wolf_clearing anchor")
+		return null
 	var hunt := clearing.get_node_or_null(^"WolfKill") as WolfKill
 	if hunt == null:
-		return _fail("no WolfKill under the clearing")
+		_fail("no WolfKill under the clearing")
+		return null
 	await _walk_to(clearing.global_position, 3.0, func() -> bool: return hunt.running)
 	if not await _until(func() -> bool: return hunt.running, 20.0):
-		return _fail("the hunt never started")
+		_fail("the hunt never started")
+		return null
 	_t0 = Time.get_ticks_msec()
 	_rec = true
 	_pass()
+	return hunt
 
+
+func _watch_and_shoot(hunt: WolfKill) -> void:
 	_begin("watch", "the doe, golden eyes, his size; she waits without drawing until nudged")
 	await _hold_on(func() -> Node3D: return hunt.doe, func() -> bool: return hunt.wolf != null, 20.0)
 	await _hold_on(func() -> Node3D: return hunt.wolf,

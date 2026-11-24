@@ -71,6 +71,17 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Chance per stride, while running, of snapping a twig.
 @export var twig_chance: float = 0.08
 
+@export_group("Following")
+## The farthest (m) this creature gets from Feyre once she is following it
+## (FollowLeash, docs/contracts/creatures.md). 0: no leash, it can be lost.
+@export var follow_leash_m: float = 0.0
+## The leash and the lost cue only hold once she has wounded it: a deer that
+## bolts unhurt is gone, a wounded one beds down inside the leash.
+@export var leash_wounded_only: bool = false
+## SoundDirector cue it gives from where it is when she has lost it
+## (LostNudge). The snow it shakes loose shows either way.
+@export var lost_cue: StringName = &""
+
 @export_group("Harvest")
 ## Item ids from the systems lane's catalogue (data/items/), with counts.
 @export var harvest_items: PackedStringArray = PackedStringArray()
