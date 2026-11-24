@@ -1126,7 +1126,8 @@ def _bag_follow(loop, m):
 def _bag_hold(follow, z_line, sv, lip_co, sh):
     """_keep_inside's collar rule for the bag; lip_co: each bag vertex's lip vertex in this shape."""
     return dict(collar=set(np.where(follow == 1.0)[0].tolist()), z_line=z_line, lips=0.004 * sv,
-                anchor=lip_co + np.array([0.0, 0.0006 * sh, 0.0]))
+                anchor=lip_co + np.array([0.0, 0.0006 * sh, 0.0]),
+                tether=(lip_co, np.roll(lip_co, 1, axis=0), np.roll(lip_co, -1, axis=0)))
 
 
 def fit_bag(body, f, z_line):
@@ -1200,7 +1201,19 @@ def _inside(bvh, p):
     return odd * 2 > len(_RAYS)
 
 
-def _keep_inside(co, idx, body_co, polys, sh, collar=(), z_line=0.0, lips=0.0, anchor=None):
+def _crosses(bvh, a, b):
+    """The segment a-b passes through the skin (not counting its ends)."""
+    a, b = Vector(a), Vector(b)
+    d = b - a
+    n = d.length
+    if n < 1e-7:
+        return False
+    d /= n
+    hit, _, _, dist = bvh.ray_cast(a + d * 1e-5, d, n - 2e-5)
+    return hit is not None
+
+
+def _keep_inside(co, idx, body_co, polys, sh, collar=(), z_line=0.0, lips=0.0, anchor=None, tether=None):
     """Pull the vertices idx of co back under the skin body_co (the Body in one key): the bag and tongue
     turn with the jaw as one piece while the chin's skin bends, so an open jaw would push the bag's floor
     out under the chin, and the mouth's materials are two-sided.  A vertex is outside when most rays
@@ -1208,8 +1221,9 @@ def _keep_inside(co, idx, body_co, polys, sh, collar=(), z_line=0.0, lips=0.0, a
     vertex, or one inside but nearer the skin than SKIN_CLEARANCE, goes to that depth under the nearest
     skin.  A collar vertex (one that rides the lip edge) only answers to skin more than `lips` from the
     lip line: near the slit the nearest skin can be the other lip, and pushing under it folds the collar
-    down across the teeth.  A collar vertex found outside goes to anchor[i] instead (just behind its lip
-    vertex), for the same reason."""
+    down across the teeth.  A collar vertex found outside, or whose way back to its lip vertex or either
+    neighbour of it (tether: arrays of those) crosses the skin (where the lip curls, the face between them would show through it: Alis's upper
+    left lip), goes to anchor[i] instead, just behind its lip vertex."""
     bvh = _skin_bvh(body_co, polys)
     clear = SKIN_CLEARANCE * sh
     moved = 0
@@ -1220,7 +1234,7 @@ def _keep_inside(co, idx, body_co, polys, sh, collar=(), z_line=0.0, lips=0.0, a
             continue
         inside = _inside(bvh, p)
         if i in collar and abs(hit.z - z_line) < lips:
-            if not inside and anchor is not None:
+            if anchor is not None and (not inside or any(_crosses(bvh, t[i], p) for t in tether)):
                 co[i] = anchor[i]
                 moved += 1
             continue

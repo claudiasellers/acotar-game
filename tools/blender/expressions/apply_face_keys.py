@@ -24,10 +24,11 @@ REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 import face_keys  # noqa: E402
 import mouth  # noqa: E402
 
-# Teeth per face: fangs = extra canine length (m) [C: Tamlin's fangs when furious, ch11];
+# Teeth per face: fangs = extra canine length at rest (m).  Tamlin's show only when furious [C ch11],
+# so at rest his canines are a shade long and pointed, no more (the fury fangs are a later key);
 # Lucien's grin is "too-white" [C ch8-9]; the father's are a poor man's.
 TEETH = {
-    "tamlin": dict(fangs=0.003, teeth_rgb=(0.97, 0.95, 0.90)),
+    "tamlin": dict(fangs=0.0008, teeth_rgb=(0.97, 0.95, 0.90)),
     "lucien": dict(teeth_rgb=(1.0, 1.0, 0.99)),
     "father": dict(teeth_rgb=(0.86, 0.80, 0.68)),
     "nesta": dict(teeth_rgb=(0.99, 0.98, 0.96)),
