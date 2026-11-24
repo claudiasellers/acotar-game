@@ -11,6 +11,11 @@ signal alerted(level: float)
 
 const GROUP := &"hostile_site"
 const ALERT_DECAY := 0.05
+## Attack tokens (health-interactions §3.2): at most this many members are in a
+## strike, lunge or hold at once; the rest circle. Martax take turns, crows are
+## tiny.
+const TOKENS := {&"martax": 1, &"crow": 3}
+const DEFAULT_TOKENS := 2
 
 @export var data: HostileSiteData
 
@@ -25,6 +30,8 @@ var last_known: Vector3 = Vector3.INF
 var is_settled: bool = false
 ## {member: Creature, at: Vector3, left: float}
 var _pending: Array[Dictionary] = []
+var _token_holders: Array[Creature] = []
+var _lunge_ready: bool = true
 
 
 func _ready() -> void:
@@ -83,6 +90,50 @@ func report(member: Creature, at: Vector3) -> void:
 	_pending.append({"member": member, "at": at, "left": data.report_delay if data else 0.8})
 
 
+func token_count() -> int:
+	return int(TOKENS.get(data.family, DEFAULT_TOKENS)) if data else DEFAULT_TOKENS
+
+
+## A member asks to attack. True if it holds a token (it may already).
+func take_token(member: Creature) -> bool:
+	_prune_tokens()
+	if _token_holders.has(member):
+		return true
+	if _token_holders.size() >= token_count():
+		return false
+	_token_holders.append(member)
+	return true
+
+
+## One lunge opens a camp's fight; the next waits until the camp has calmed.
+func lunge_ready() -> bool:
+	return _lunge_ready
+
+
+func claim_lunge() -> void:
+	_lunge_ready = false
+
+
+func release_token(member: Creature) -> void:
+	_token_holders.erase(member)
+
+
+func tokens_free() -> int:
+	_prune_tokens()
+	return token_count() - _token_holders.size()
+
+
+func token_holders() -> Array[Creature]:
+	_prune_tokens()
+	return _token_holders.duplicate()
+
+
+func _prune_tokens() -> void:
+	for i in range(_token_holders.size() - 1, -1, -1):
+		if not is_instance_valid(_token_holders[i]) or not _token_holders[i].alive:
+			_token_holders.remove_at(i)
+
+
 func living_count() -> int:
 	var n := 0
 	for m in members:
@@ -93,6 +144,8 @@ func living_count() -> int:
 
 func _physics_process(delta: float) -> void:
 	alert_level = maxf(alert_level - ALERT_DECAY * delta, 0.0)
+	if alert_level <= 0.0:
+		_lunge_ready = true
 	for i in range(_pending.size() - 1, -1, -1):
 		var p: Dictionary = _pending[i]
 		p.left -= delta

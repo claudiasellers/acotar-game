@@ -8,8 +8,8 @@ const OUT := "res://data/combat/attacks/"
 ## id, family, default, damage, kind, reaction, knockback, status, magnitude,
 ## seconds, dread, can_knock_down, floor
 const ROWS := [
-	[&"naga_bite", &"naga", true, 22.0, &"bite", &"medium", 2.0, &"", 0.0, 0.0, 0.15, true, 0.0],
-	[&"naga_lunge", &"naga", false, 30.0, &"claw", &"heavy", 4.0, &"", 0.0, 0.0, 0.2, true, 0.0],
+	[&"naga_claw", &"naga", true, 22.0, &"claw", &"medium", 2.0, &"", 0.0, 0.0, 0.15, true, 0.0],
+	[&"naga_lunge", &"naga", false, 30.0, &"blunt", &"heavy", 4.0, &"", 0.0, 0.0, 0.2, true, 0.0],
 	[&"naga_coil", &"naga", false, 0.0, &"blunt", &"none", 0.0, &"", 0.0, 0.0, 0.25, true, 0.0],
 	[&"puca_grab", &"puca", true, 0.0, &"blunt", &"none", 0.0, &"", 0.0, 0.0, 0.3, true, 0.0],
 	[&"briarling_lash", &"briarling", true, 8.0, &"thorn", &"light", 0.5, &"", 0.0, 0.0, 0.1, true, 0.0],

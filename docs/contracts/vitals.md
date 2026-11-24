@@ -87,7 +87,7 @@ static func is_lit(player: Node) -> bool  # a glow draught, a held faelight or a
 `class_name AttackData extends Resource` in `systems/vitals/attack_data.gd`. Rows live in `data/combat/attacks/<family>_<move>.tres`. Hostile-fae owns the rows for its families (files prefixed with its family ids) and may add or retune them without asking. The vitals lane owns the class and the hazard rows.
 
 ```gdscript
-@export var id: StringName              # &"naga_bite"
+@export var id: StringName              # &"naga_claw"
 @export var family: StringName          # &"naga"; a hit whose id equals a family resolves to that family's is_default row
 @export var is_default: bool = false
 @export var damage: float = 10.0        # health points (her max is 100)
@@ -109,8 +109,8 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 
 | id | dmg | kind | reaction | knockback | status | dread |
 |---|---|---|---|---|---|---|
-| naga_bite (default) | 22 | bite | medium | 2 m | — | 0.15 |
-| naga_lunge | 30 | claw | heavy | 4 m | — | 0.2 |
+| naga_claw (default) | 22 | claw | medium | 2 m | — | 0.15 |
+| naga_lunge | 30 | blunt | heavy | 4 m | — | 0.2 |
 | naga_coil | 0 | — | none (grab: 6 presses, 3 s) | — | — | 0.25 |
 | puca_grab (default) | 0 | — | none (grab: 5 presses, 4 s) | — | — | 0.3 |
 | briarling_lash (default) | 8 | thorn | light | 0.5 m | — | 0.1 |

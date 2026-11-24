@@ -7,7 +7,32 @@
 class_name NagaRoamer
 extends Creature
 
-enum Fight { CHARGE, STRIKE, RECOVER }
+## CHARGE runs at her; CIRCLE keeps 4-6 m off while it has no attack token
+## or another holds her; STRIKE winds up a claw or a coil; LUNGE winds up the
+## leap, LEAP is the leap; HOLD is the coil around her; RECOVER weaves back.
+enum Fight { CHARGE, STRIKE, RECOVER, CIRCLE, LUNGE, LEAP, HOLD }
+
+## The naga's three rows (data/combat/attacks; bestiary §2).
+const CLAW := &"naga_claw"
+const LUNGE_ATTACK := &"naga_lunge"
+const COIL := &"naga_coil"
+## Seconds from the start of the tell to contact (bestiary §2). HF moves these
+## onto AttackData.windup_s; until then they live here.
+const WINDUP := {&"naga_claw": 0.55, &"naga_lunge": 0.8, &"naga_coil": 0.6}
+## The lunge opens from this far, once per engagement (health-interactions §4).
+const LUNGE_MIN := 4.0
+const LUNGE_MAX := 6.0
+## The leap closes the gap in about this long; it lands if she comes within
+## reach before it runs out, else it misses.
+const LEAP_SECONDS := 0.5
+## Without a token it circles her at this distance.
+const CIRCLE_MIN := 4.0
+const CIRCLE_MAX := 6.0
+## The coil: only from behind her. Six presses or three seconds; if she
+## doesn't break it, a claw at COIL_FOLLOW_SCALE.
+const COIL_PRESSES := 6
+const COIL_SECONDS := 3.0
+const COIL_FOLLOW_SCALE := 1.5
 
 ## How long a smelled trail lets it run past the leash.
 const TRAIL_SECONDS := 6.0
@@ -23,8 +48,10 @@ const REPORT_EVERY := 2.0
 const CAMP_ALERT := 0.45
 
 @export var strike_reach: float = 1.7
-@export var strike_cooldown: float = 1.4
-@export var attack_id: StringName = &"naga_bite"
+## Wind-up plus this is one member's ~2.2 s cycle (health-interactions §3.4):
+## two tokens land a claw about every 1.1 s, so a camp needs ≥ 4 s to put her down.
+@export var strike_cooldown: float = 1.65
+@export var attack_id: StringName = CLAW
 
 ## Set by HostileSite before _ready.
 var site: HostileSite
@@ -46,6 +73,13 @@ var _report_left: float = 0.0
 var _last_awareness: float = 0.0
 var _ring_angle: float = 0.0
 var _dread: DreadField
+## The row the current wind-up ends in.
+var _attack: StringName = &""
+var _lunged: bool = false
+var _has_token: bool = false
+var _hold_left: float = 0.0
+var _leap_speed: float = 0.0
+var _circle_sign: float = 1.0
 
 
 func _ready() -> void:
@@ -56,6 +90,8 @@ func _ready() -> void:
 	_dread = DreadField.attach(self, 30.0, 10.0)
 	senses.sensed.connect(_on_sensed)
 	EventBus.player_knocked_down.connect(_on_player_down)
+	EventBus.player_released.connect(_on_player_released)
+	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
 
 
 ## What the day asks of it: bask 10-15, hunt 17-21, nest otherwise.
@@ -123,7 +159,7 @@ func _think(delta: float) -> void:
 			ladder.give_up()
 			senses.awareness = minf(senses.awareness, HostileLadder.CURIOUS_AT)
 			_last_awareness = senses.awareness
-			fight = Fight.CHARGE
+			_set_fight(Fight.CHARGE)
 			now = ladder.state
 		else:
 			_report_left -= delta
@@ -133,6 +169,8 @@ func _think(delta: float) -> void:
 			_fight(player, delta)
 			return
 
+	if fight != Fight.CHARGE:
+		_set_fight(Fight.CHARGE)
 	if _lure_left > 0.0 and _lure_at != Vector3.INF:
 		_go_to(_lure_at, data.walk_speed * 1.5, 1.0)
 		return
@@ -194,10 +232,12 @@ func _on_ladder_changed(_from: HostileLadder.State, to: HostileLadder.State, pla
 				_report(player.global_position)
 				HostileHits.startle(creature_id, 0.15)
 		HostileLadder.State.ENGAGED:
-			fight = Fight.CHARGE
+			_set_fight(Fight.CHARGE)
+			_lunged = false
 			_report_left = REPORT_EVERY
 		HostileLadder.State.LOST:
-			fight = Fight.CHARGE
+			_set_fight(Fight.CHARGE)
+			_lunged = false
 
 
 func _report(at: Vector3) -> void:
@@ -218,29 +258,196 @@ func _fight(player: Node3D, delta: float) -> void:
 	var flat := Vector2(to.x, to.z).length()
 	gait_hint = &""
 	match fight:
-		Fight.CHARGE:
-			move_direction = to
-			move_speed = data.run_speed
-			if flat <= strike_reach:
-				fight = Fight.STRIKE
-				_fight_left = 0.35
+		Fight.CHARGE, Fight.CIRCLE:
+			var held_by_other := _held_by_other(player)
+			if not held_by_other and _may_lunge() and flat >= LUNGE_MIN and flat <= LUNGE_MAX \
+					and _take_token():
+				_lunged = true
+				if site and is_instance_valid(site):
+					site.claim_lunge()
+				_wind_up(Fight.LUNGE, LUNGE_ATTACK)
+			elif not held_by_other and flat <= strike_reach and _take_token():
+				var coil := StrikeController.is_behind(NagaRoamer.facing_node(player), global_position) \
+						and not _is_held(player)
+				_wind_up(Fight.STRIKE, COIL if coil else attack_id)
+			elif flat <= CIRCLE_MAX and (held_by_other or not _token_free()):
+				fight = Fight.CIRCLE
+				_circle(player, to, flat, delta)
+			else:
+				fight = Fight.CHARGE
+				move_direction = to
+				move_speed = data.run_speed
 		Fight.STRIKE:
-			move_speed = 0.0
-			move_direction = Vector3.ZERO
-			face_towards(player.global_position, delta * 4.0)
+			_hold_still(player, delta)
 			_fight_left -= delta
 			if _fight_left <= 0.0:
-				if global_position.distance_to(player.global_position) <= strike_reach + 0.6:
-					HostileHits.strike(creature_id, attack_id, 1.0, global_position)
-				fight = Fight.RECOVER
-				_fight_left = strike_cooldown
+				var in_reach := global_position.distance_to(player.global_position) <= strike_reach + 0.6
+				if in_reach and _attack == COIL:
+					_coil(player)
+				else:
+					if in_reach:
+						HostileHits.strike(creature_id, _attack, 1.0, global_position)
+					_recover()
+		Fight.LUNGE:
+			_hold_still(player, delta)
+			_fight_left -= delta
+			if _fight_left <= 0.0:
+				fight = Fight.LEAP
+				_fight_left = LEAP_SECONDS
+				_leap_speed = maxf(flat, LUNGE_MIN) / LEAP_SECONDS * 1.5
+		Fight.LEAP:
+			move_direction = to
+			move_speed = _leap_speed
+			_fight_left -= delta
+			if flat <= strike_reach:
+				HostileHits.strike(creature_id, LUNGE_ATTACK, 1.0, global_position)
+				_recover()
+			elif _fight_left <= 0.0:
+				_recover()
+		Fight.HOLD:
+			_hold_still(player, delta)
+			_hold_left -= delta
+			if not _holds_her(player) or _hold_left <= 0.0:
+				# Her own timer ends the hold as ours does: that is the failure.
+				if _hold_left <= 0.1:
+					HostileHits.strike(creature_id, attack_id, COIL_FOLLOW_SCALE, global_position)
+				_recover()
 		Fight.RECOVER:
 			# Weave back a step, then come again.
 			move_direction = Creature.away_from(global_position, player.global_position).rotated(Vector3.UP, 0.9)
 			move_speed = data.walk_speed * 2.0
 			_fight_left -= delta
 			if _fight_left <= 0.0:
-				fight = Fight.CHARGE
+				_set_fight(Fight.CHARGE)
+
+
+## The lunge opens a fight: once per engagement, and once per camp until the
+## camp calms (HostileSite.claim_lunge), so one naga bursts out, not four.
+func _may_lunge() -> bool:
+	if _lunged:
+		return false
+	return site == null or not is_instance_valid(site) or site.lunge_ready()
+
+
+## The node whose -Z is the way she faces: her model (GroundMotor turns it),
+## else the body.
+static func facing_node(player: Node3D) -> Node3D:
+	var m: Node3D = player.get(&"model") as Node3D if &"model" in player else null
+	return m if m and m.is_inside_tree() else player
+
+
+func _wind_up(next: Fight, attack: StringName) -> void:
+	fight = next
+	_attack = attack
+	_fight_left = float(WINDUP.get(attack, 0.55))
+	_anim(&"play_attack", [attack])
+
+
+func _hold_still(player: Node3D, delta: float) -> void:
+	move_speed = 0.0
+	move_direction = Vector3.ZERO
+	face_towards(player.global_position, delta * 4.0)
+
+
+## No token: keep 4-6 m off and pace round her, facing her.
+func _circle(player: Node3D, to: Vector3, flat: float, delta: float) -> void:
+	var radial := Vector3(to.x, 0.0, to.z) / maxf(flat, 0.001)
+	var tangent := radial.cross(Vector3.UP) * _circle_sign
+	var pull := 0.0
+	if flat < CIRCLE_MIN:
+		pull = -1.0
+	elif flat > CIRCLE_MAX - 0.5:
+		pull = 1.0
+	move_direction = tangent + radial * pull
+	move_speed = data.walk_speed * 1.5
+	face_towards(player.global_position, delta * 3.0)
+	gait_hint = &"stalk"
+
+
+## The coil closes: Vitals takes the hold (one at a time) and we keep it until
+## she breaks it, cuts it, or her time runs out.
+func _coil(player: Node3D) -> void:
+	EventBus.player_grabbed.emit(creature_id, COIL_PRESSES, COIL_SECONDS)
+	if not _holds_her(player):
+		_recover()
+		return
+	fight = Fight.HOLD
+	_hold_left = COIL_SECONDS
+
+
+func _recover() -> void:
+	_set_fight(Fight.RECOVER)
+	_fight_left = strike_cooldown
+
+
+## Every fight change goes through here so the token and a hold never outlive
+## the move that took them. The token is kept through the recovery: a member's
+## whole cycle is one turn.
+func _set_fight(next: Fight) -> void:
+	if fight == Fight.HOLD and next != Fight.HOLD:
+		_free_her()
+	if next == Fight.CHARGE or next == Fight.CIRCLE:
+		_release_token()
+	fight = next
+
+
+func _take_token() -> bool:
+	if _has_token:
+		return true
+	if site == null or not is_instance_valid(site):
+		_has_token = true
+	else:
+		_has_token = site.take_token(self)
+	return _has_token
+
+
+func _token_free() -> bool:
+	return _has_token or site == null or not is_instance_valid(site) or site.tokens_free() > 0
+
+
+func _release_token() -> void:
+	if _has_token and site and is_instance_valid(site):
+		site.release_token(self)
+	_has_token = false
+
+
+func has_token() -> bool:
+	return _has_token
+
+
+func _is_held(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed()
+
+
+func _holds_her(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed() and v.grab_source == creature_id
+
+
+## Another holds her: the rest hold off (health-interactions §5.4).
+func _held_by_other(player: Node3D) -> bool:
+	var v := Vitals.of(player)
+	return v != null and v.is_grabbed() and v.grab_source != creature_id
+
+
+## We let go (stagger, sleep, death): she is free at once.
+func _free_her() -> void:
+	var player := _player()
+	if player and _holds_her(player):
+		EventBus.player_released.emit(creature_id)
+
+
+func _on_player_released(source_id: StringName) -> void:
+	if source_id == creature_id and fight == Fight.HOLD and alive:
+		# She broke the coil or cut it: it reels back.
+		fight = Fight.RECOVER
+		_fight_left = strike_cooldown
+
+
+func _anim(method: StringName, args: Array) -> void:
+	if animator and animator.has_method(method):
+		animator.callv(method, args)
 
 
 func _routine(delta: float) -> void:
@@ -275,6 +482,7 @@ func _go_to(target: Vector3, speed: float, stop_at: float) -> void:
 
 ## Burning ground or a fire arrow (Creature._step_fire): it runs from the flame.
 func _on_fire_near(from: Vector3) -> void:
+	_set_fight(Fight.CHARGE)
 	_flee_from = from
 	_flee_left = FIRE_FLEE_SECONDS
 	_lure_left = 0.0
@@ -285,16 +493,20 @@ func _on_fire_near(from: Vector3) -> void:
 func stagger(seconds: float) -> void:
 	if not alive:
 		return
-	if fight == Fight.STRIKE or fight == Fight.CHARGE:
-		fight = Fight.RECOVER
-		_fight_left = strike_cooldown
+	if fight != Fight.RECOVER:
+		if fight == Fight.STRIKE or fight == Fight.LUNGE or fight == Fight.LEAP:
+			_anim(&"cancel_attack", [])
+		_recover()
 	super.stagger(seconds)
 
 
 ## Frost slows it (Creature slow). Fire, sleep, barbs and lures are the base's.
+## Asleep, it lets her go.
 func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 	if not alive:
 		return
+	if effect == &"sleep" and fight != Fight.CHARGE:
+		_set_fight(Fight.CHARGE)
 	if effect == &"frost":
 		slowed_left = maxf(slowed_left, FROST_SLOW_SECONDS)
 	super.on_arrow_effect(effect, arrow)
@@ -318,10 +530,11 @@ func _on_player_down(_source_id: Variant = null, _cause: Variant = null, _at: Va
 	ladder.give_up()
 	senses.awareness = 0.0
 	_last_awareness = 0.0
-	fight = Fight.CHARGE
+	_set_fight(Fight.CHARGE)
 
 
 func die(cause: StringName) -> void:
+	_set_fight(Fight.CHARGE)
 	super.die(cause)
 	if _dread and is_instance_valid(_dread):
 		_dread.queue_free()
