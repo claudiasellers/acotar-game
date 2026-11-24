@@ -6,6 +6,7 @@
 extends GutTest
 
 const SITE_SCRIPT := preload("res://creatures/hostile/hostile_site.gd")
+const BodyTick := preload("res://tests/fixtures/body_tick.gd")
 const ROAMER := preload("res://creatures/hostile/naga_roamer.tscn")
 const DT := 1.0 / 30.0
 const ATTACKING := [NagaRoamer.Fight.STRIKE, NagaRoamer.Fight.LUNGE, NagaRoamer.Fight.LEAP, NagaRoamer.Fight.HOLD]
@@ -77,16 +78,17 @@ func _floor(at: Vector3) -> void:
 	ground.global_position = at + Vector3(0, -0.5, 0)
 
 
-## The Reed Marsh camp (4 members on an 8 m ring), with her at its core. The
-## camp is moved to the origin and its members take no collisions: at the real
-## core (1180, 330) a machine with the built world has terrain there, and these
-## ticks are about the brains, not the ground.
-func _camp() -> HostileSite:
+## The Reed Marsh camp (4 members on an 8 m ring), with her at its core. By
+## default the camp is moved to the origin; `at_core` keeps it at the real core
+## (1180, 330). Either way its members take no collisions and stand on a flat
+## height: these ticks are about the brains, not the ground.
+func _camp(at_core := false) -> HostileSite:
 	var d := (load("res://data/creatures/hostile_sites/naga_reed_marsh.tres") as HostileSiteData).duplicate() as HostileSiteData
-	d.core = Vector2.ZERO
+	if not at_core:
+		d.core = Vector2.ZERO
 	var site := SITE_SCRIPT.new() as HostileSite
 	site.data = d
-	site.snap_to_core = false
+	site.snap_to_core = at_core
 	site.height_func = func(_x: float, _z: float) -> float: return 0.0
 	add_child_autofree(site)
 	site.set_physics_process(false)
@@ -106,20 +108,13 @@ func _ground(c: Creature) -> void:
 	c.velocity.y = 0.0
 
 
-## One tick of the camp: every member knows where she is.
-## move_and_slide moves by the engine's delta, not ours: outside a physics frame
-## that is the process delta, which on a loaded run is up to 0.15 s (9x DT), so
-## every step overshoots and a naga slides out of reach mid wind-up. Collisions
-## are off here, so rescaling the step to DT is exact.
+## One tick of the camp: every member knows where she is. BodyTick steps each
+## by DT: move_and_slide alone would move it by the engine's delta.
 func _tick(site: HostileSite) -> void:
-	var engine_dt := get_physics_process_delta_time() if Engine.is_in_physics_frame() else get_process_delta_time()
 	for m in site.members:
 		if is_instance_valid(m) and m.alive:
 			m.senses.awareness = 1.0
-			var before := m.global_position
-			m._physics_process(DT)
-			if engine_dt > 0.0:
-				m.global_position = before + (m.global_position - before) * (DT / engine_dt)
+			BodyTick.tick(m, DT)
 			_ground(m)
 	v._iframes = maxf(v._iframes - DT, 0.0)
 	v._step_grab(DT)
@@ -188,6 +183,20 @@ func test_standing_still_takes_at_least_four_seconds() -> void:
 	assert_gte(t - first, 4.0, "from the first wound to the ground is at least 4 s")
 
 
+## The same camp at its real core in Reed Marsh fights the same: nothing about
+## the place (leash, ring, far-from-origin floats) keeps it off her.
+func test_the_real_reed_marsh_camp_fights_at_its_core() -> void:
+	var site := _camp(true)
+	assert_almost_eq(site.global_position.x, 1180.0, 0.01)
+	assert_almost_eq(site.global_position.z, 330.0, 0.01)
+	var ticks := 0
+	while ticks < int(40.0 / DT) and not v.is_down:
+		_tick(site)
+		ticks += 1
+	assert_gt(hits.size(), 4, "the real camp does fight: " + _why(site, ticks))
+	assert_true(v.is_down, "the real camp puts her down: health %.0f, " % v.health + _why(site, ticks))
+
+
 func test_the_lunge_opens_the_fight_once() -> void:
 	var site := _camp()
 	for i in int(20.0 / DT):
@@ -226,7 +235,7 @@ func _naga(at: Vector3) -> NagaRoamer:
 func _run(n: NagaRoamer, seconds: float) -> void:
 	for i in int(seconds / DT):
 		n.senses.awareness = 1.0
-		n._physics_process(DT)
+		BodyTick.tick(n, DT)
 		_ground(n)
 		v._iframes = maxf(v._iframes - DT, 0.0)
 		v._step_grab(DT)
