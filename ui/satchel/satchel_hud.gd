@@ -3,7 +3,8 @@
 ## Add one to an entry scene: add_child(SatchelHud.new()).
 ##
 ## The bar is a leather strap with four brass rings hung from it, the satchel
-## itself at its left end; it lifts and the rings swing while LB is held.
+## itself at its left end; it lifts and the rings swing while LB is held. It
+## sits in HudLayout's STRAP zone.
 ##
 ## Keys: I / Tab opens the satchel, 1–4 use the quick slots.
 ## Pad: tap LB to open the satchel; hold LB and press the d-pad
@@ -11,7 +12,7 @@
 ## actions (arrow, craft, bow, crown) are held off; A stays jump.
 ## Actions are added in code with a has_action guard (R14, L01's call).
 class_name SatchelHud
-extends CanvasLayer
+extends Node
 
 const ACTION_OPEN := &"satchel_open"
 const ACTION_CHORD := &"quick_chord"
@@ -52,7 +53,6 @@ var _chord_time: float = 0.0
 var _chord_used: bool = false
 var _idle: float = 0.0
 var _flights: int = 0
-var _row_y: float = 0.0
 
 
 func _init() -> void:
@@ -85,7 +85,6 @@ static func _add_action(action: StringName, keys: Array, buttons: Array) -> void
 
 
 func _ready() -> void:
-	layer = 12
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	ensure_actions()
 	bar = QuickBar.current()
@@ -146,7 +145,7 @@ func _input(event: InputEvent) -> void:
 	if menu.is_open():
 		return
 	# I / Tab itself is the menu shell's (MenuShell); the LB tap is read here.
-	if get_tree().paused or not _can_play():
+	if not _can_play():
 		return
 	if event.is_action(ACTION_CHORD) and not event.is_echo():
 		if event.is_pressed():
@@ -174,7 +173,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _can_play() -> bool:
-	return StoryControl.mode == StoryControl.Mode.FULL
+	return UiMode.current(get_tree()) == UiMode.Mode.PLAY
 
 
 func _set_chord(on: bool) -> void:
@@ -190,14 +189,13 @@ func _set_chord(on: bool) -> void:
 
 func _process(delta: float) -> void:
 	_follow_inventory()
-	_bar_root.visible = _can_play() and not get_tree().paused
 	if _chord:
 		_chord_time += delta
 	_idle += delta
 	var target := 1.0 if _chord or _idle < IDLE_SECONDS else IDLE_ALPHA
 	_bar_root.modulate.a = move_toward(_bar_root.modulate.a, target, delta * 2.5)
 	var lift := -CHORD_LIFT if _chord else 0.0
-	_row.position.y = lerpf(_row.position.y, _row_y + lift, 1.0 - pow(0.7, delta * 60.0))
+	_row.position.y = lerpf(_row.position.y, CHORD_LIFT + lift, 1.0 - pow(0.7, delta * 60.0))
 
 
 ## After Gameplay.reset (new game) the bar rebinds to the new inventory.
@@ -210,17 +208,18 @@ func _follow_inventory() -> void:
 # --- the bar -----------------------------------------------------------------
 
 func _build_bar() -> void:
-	_bar_root = Control.new()
-	_bar_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_bar_root)
 	var length := RING_START + RING_STEP * QuickBar.SLOTS - RING_STEP * 0.5 + 20.0
 	var height := QuickStrap.BAND + QuickRing.TAB.y + QuickRing.RADIUS * 2.0 + 12.0
+	_bar_root = Control.new()
+	_bar_root.name = "QuickBar"
+	_bar_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar_root.custom_minimum_size = Vector2(length, height + CHORD_LIFT)
+	HudLayout.of(get_tree()).place(_bar_root, HudLayout.Zone.STRAP, self)
 	_row = Control.new()
 	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_row.size = Vector2(length, height)
+	_row.position = Vector2(0, CHORD_LIFT)
 	_bar_root.add_child(_row)
-	_bar_root.resized.connect(_place_row)
 	_strap = QuickStrap.new()
 	_strap.size = Vector2(length, QuickStrap.BAND)
 	_strap.position = Vector2(0, BAG_PX.y * 0.35)
@@ -250,13 +249,6 @@ func _build_bar() -> void:
 		_row.add_child(ring)
 		_slot_panels.append(ring)
 	_strap.rivets = rivets
-	_place_row()
-
-
-## Centred along the bottom, clear of the controls hint.
-func _place_row() -> void:
-	_row_y = _bar_root.size.y - _row.size.y - 84.0
-	_row.position = Vector2((_bar_root.size.x - _row.size.x) * 0.5, _row_y)
 
 
 func _refresh() -> void:
@@ -343,7 +335,7 @@ func _sparkle(target: Control) -> void:
 func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	_idle = 0.0
 	_refresh()
-	if not _bar_root.visible or _flights >= MAX_FLIGHTS:
+	if not _bar_root.is_visible_in_tree() or _flights >= MAX_FLIGHTS:
 		return
 	var feyre := _player()
 	var cam := get_viewport().get_camera_3d()
@@ -352,6 +344,7 @@ func _on_item_added(id: StringName, count: int, _container: StringName) -> void:
 	var item := ItemCatalog.get_item(id)
 	var icon := ItemIcon.make(item.icon if item else &"trinket", item.color if item else JournalTheme.color(&"accent"),
 			false, item != null and item.rarity == &"shiny", 44.0)
+	icon.top_level = true
 	_bar_root.add_child(icon)
 	icon.position = cam.unproject_position(feyre.global_position + Vector3.UP * 1.3) - Vector2(22, 22)
 	var to := _badge.global_position + _badge.size * 0.5 - Vector2(22, 22)
@@ -378,6 +371,7 @@ func _plus(count: int) -> void:
 	var l := Label.new()
 	l.theme_type_variation = &"QuickBarCount"
 	l.text = "+%d" % count
+	l.top_level = true
 	_bar_root.add_child(l)
 	l.position = _badge.global_position + Vector2(_badge.size.x * 0.5 - 10, -18)
 	var t := l.create_tween().set_parallel()

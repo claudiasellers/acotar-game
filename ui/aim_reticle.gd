@@ -1,6 +1,7 @@
 ## The bow reticle (F5): a small gold ring where the arrow would actually land
 ## at the current draw, with a faint line down from the screen centre so the
-## drop reads at a glance. Shown while aiming or drawing.
+## drop reads at a glance. Shown while aiming or drawing. BowController puts
+## it in HudLayout's WORLD zone.
 class_name AimReticle
 extends Control
 
@@ -20,7 +21,6 @@ func _init(controller: BowController = null) -> void:
 	bow = controller
 	name = "Reticle"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 
 func _process(delta: float) -> void:

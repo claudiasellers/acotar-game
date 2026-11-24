@@ -35,7 +35,7 @@ func after_each() -> void:
 
 
 func _reticle() -> AimReticle:
-	return feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
+	return feyre.bow_controller.reticle
 
 
 ## The hunt tightens the lens while she lines up on the wolf (Cine.follow at

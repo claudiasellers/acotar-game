@@ -243,7 +243,7 @@ func test_loading_an_arrow_keeps_her_arms_in_front() -> void:
 
 
 func test_reticle_follows_the_predicted_impact() -> void:
-	var reticle := feyre.bow_controller.find_child("Reticle", true, false) as AimReticle
+	var reticle := feyre.bow_controller.reticle
 	assert_not_null(reticle)
 	var guess := feyre.bow_controller.predict_impact(1.0)
 	assert_true(guess.has("point"))

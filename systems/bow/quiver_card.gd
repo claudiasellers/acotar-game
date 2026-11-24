@@ -1,8 +1,8 @@
-## A small card above the bottom right corner naming the nocked arrow and how
+## A small card in HudLayout's BOW zone (low on the right) naming the nocked arrow and how
 ## many are left, for a moment after Q (or a shot), so changing arrows always
 ## answers. "No arrows" when the quiver is empty.
 class_name QuiverCard
-extends CanvasLayer
+extends Node
 
 const SHOW_SECONDS := 2.2
 
@@ -16,18 +16,13 @@ var _left: float = 0.0
 func _init(bow_controller: BowController = null) -> void:
 	controller = bow_controller
 	name = "QuiverCard"
-	layer = 12
 
 
 func _ready() -> void:
 	_panel = PanelContainer.new()
 	_panel.add_theme_stylebox_override(&"panel", UiStyle.panel_box())
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_panel.position = Vector2(-40, -230)
-	add_child(_panel)
+	HudLayout.of(get_tree()).place(_panel, HudLayout.Zone.BOW, self)
 	_label = UiStyle.label("", 22)
 	_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_panel.add_child(_label)

@@ -1,5 +1,6 @@
 ## Her statuses, over the health bar: up to five round medallions, danger
-## first, then "+n" (five keeps the row clear of the quick bar).
+## first, then "+n". Three across and a second row above, so the chips stop
+## short of the lane spoken lines use (HudLayout.LANE_LEFT).
 ## Each sits on a disc of the satchel chip's look (theme paper in a gilt rim,
 ## like the quick bar and the thought card) with its timer as the rim's inner arc: it
 ## drains for timed effects (blinking in the last 3 s), creeps for venom and is
@@ -8,7 +9,9 @@ class_name VitalsStatusRow
 extends Control
 
 const MAX_SHOWN := 5
-const STEP := 92.0
+const PER_ROW := 3
+const ROWS := 2
+const STEP := 80.0
 const RADIUS := 38.0
 const ICON := 48.0
 const RING_W := 4.0
@@ -35,7 +38,7 @@ var _chime: AudioStreamPlayer
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	size = Vector2(STEP * (MAX_SHOWN + 1), STEP + 8)
+	size = Vector2(STEP * PER_ROW + 16.0, STEP * ROWS + 20.0)
 
 
 func _ready() -> void:
@@ -71,7 +74,7 @@ func _draw() -> void:
 	for i in shown.size():
 		var s: Dictionary = shown[i]
 		var tag: StringName = s.tag
-		var c := Vector2(RADIUS + 8.0 + i * STEP, RADIUS + 8.0)
+		var c := _slot(i)
 		var age := float(_born.get(tag, 1.0))
 		var debuff := StatusRules.is_debuff(tag)
 		var scale := 1.0
@@ -114,10 +117,18 @@ func _draw() -> void:
 					p + Vector2(-rs * 0.3, 0)]), Color(1.0, 0.93, 0.62, 1.0 - k))
 	if overflow > 0:
 		var font := get_theme_default_font()
-		var at := Vector2(8.0 + shown.size() * STEP + 8.0, RADIUS + 18.0)
+		var at := _slot(shown.size()) + Vector2(-RADIUS + 8.0, 10.0)
 		var text := "+%d" % overflow
 		draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, 6, Color(1.0, 0.97, 0.92))
 		draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, ring_color)
+
+
+## The centre of chip `i`: left to right along the bottom row, then the row
+## above.
+func _slot(i: int) -> Vector2:
+	@warning_ignore("integer_division")
+	var row := i / PER_ROW
+	return Vector2(RADIUS + 8.0 + (i % PER_ROW) * STEP, size.y - RADIUS - 16.0 - row * STEP)
 
 
 func _icon(tag: StringName) -> Texture2D:

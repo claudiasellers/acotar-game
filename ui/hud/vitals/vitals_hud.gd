@@ -1,25 +1,24 @@
 ## Feyre's play HUD (plan §14, the chosen look in ui/icon-directions/
 ## CHOSEN_cute_thin_plum_line.png): one vitals block bottom left (status chips
-## over the health bar, Feyre's bow as its crest; the top left is her
-## thought card's), the grab ring in the centre, and her screen edges
-## under everything. It reads her VitalsState and shows only what matters:
-## meters stay (Always, the default), or appear when they change and fade
-## at rest (Auto), or go (Off: the grab ring and the edges stay). Nothing shows in
-## menus, staged story moments or while she is down. No words, no objectives.
+## over the health bar, Feyre's bow as its crest), the grab ring in the centre,
+## and her screen edges under everything. It reads her VitalsState and shows
+## only what matters: meters stay (Always, the default), or appear when they
+## change and fade at rest (Auto), or go (Off: the grab ring and the edges
+## stay). Nothing shows while she is down. No words, no objectives.
+## The block, the ring and the edges sit in HudLayout's VITALS, WORLD and EDGE
+## zones, which decide where they are and when they show.
 ## Add one to an entry scene: add_child(VitalsHud.new()).
 class_name VitalsHud
-extends CanvasLayer
+extends Node
 
 enum Mode { CONTEXTUAL, ALWAYS, OFF }
 
-## Clear of the controls pill (bottom left, y 1018 up) and the quick bar.
-## The bow's arrow points into the bar's start, level with it.
-const BOW_AT := Vector2(56, 910)
-const BAR_AT := Vector2(146, 950)
-## Chips sit on the bar, their left edge on its start.
-const STATUS_AT := Vector2(138, 856)
-## Screen centre (the low third is the dialogue lane).
-const GRAB_AT := Vector2(960, 540)
+## The block, top left to bottom right: two rows of chips, then the bow with
+## the bar running from its arrow.
+const BLOCK := Vector2(418, 234)
+const STATUS_AT := Vector2(82, 0)
+const BOW_AT := Vector2(0, 134)
+const BAR_AT := Vector2(90, 174)
 const HEALTH_SHOW_SECONDS := 4.0
 const HEALTH_FULL_LINGER := 3.0
 const STAMINA_FULL_LINGER := 1.2
@@ -49,20 +48,18 @@ var _clock: float = 0.0
 
 
 func _init() -> void:
-	layer = 11
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
 func _ready() -> void:
-	var edges := CanvasLayer.new()
-	edges.layer = 1
-	add_child(edges)
+	var hud := HudLayout.of(get_tree())
 	edge_fx = VitalsEdgeFx.new()
-	edges.add_child(edge_fx)
+	hud.place(edge_fx, HudLayout.Zone.EDGE, self)
 	_root = Control.new()
+	_root.name = "Vitals"
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_root)
+	_root.custom_minimum_size = BLOCK
+	hud.place(_root, HudLayout.Zone.VITALS, self)
 	status_row = VitalsStatusRow.new()
 	status_row.position = STATUS_AT
 	_root.add_child(status_row)
@@ -73,9 +70,8 @@ func _ready() -> void:
 	health_bar.position = BAR_AT
 	_root.add_child(health_bar)
 	grab_prompt = VitalsGrabPrompt.new()
-	grab_prompt.position = GRAB_AT - grab_prompt.size * 0.5
 	grab_prompt.visible = false
-	_root.add_child(grab_prompt)
+	hud.place(grab_prompt, HudLayout.Zone.WORLD, self)
 	for c: CanvasItem in [status_row, stamina_bow, health_bar]:
 		c.modulate.a = 0.0
 
@@ -88,8 +84,8 @@ func _process(delta: float) -> void:
 		_root.visible = false
 		edge_fx.target.clear()
 		return
-	var play := _can_play()
-	_root.visible = play or _vitals.is_grabbed()
+	var play := not _vitals.is_down
+	_root.visible = true
 	edge_fx.set_strength(EDGE_STRENGTH[clampi(_setting(&"edge_fx", 0), 0, 2)])
 	_update_meters(delta, mode, play)
 	_update_statuses(delta, mode, play)
@@ -253,12 +249,6 @@ func _attach() -> void:
 	v.health_changed.connect(_on_health_changed)
 	v.hit_taken.connect(_on_hit_taken)
 	v.grab_press.connect(func(_left: int) -> void: grab_prompt.press())
-
-
-func _can_play() -> bool:
-	var sc := Gameplay.autoload(&"StoryControl")
-	var full := sc == null or int(sc.get(&"mode")) == 0
-	return full and not get_tree().paused and not _vitals.is_down
 
 
 func _mode() -> int:

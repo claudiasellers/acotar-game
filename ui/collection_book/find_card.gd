@@ -1,14 +1,17 @@
-## The first-find card (experience-bar §1.4.2): a big card at the top of the
-## screen with the illustrated icon, the name in a script face and one line of
+## The first-find card (experience-bar §1.4.2): a big card in HudLayout's
+## NOTICE zone (top centre) with the illustrated icon, the name in a script face and one line of
 ## flavour, held 1.2 s. The game keeps running underneath. Cards queue, so a
 ## handful picked together show one after another. Page rewards and small
-## notes use the same queue.
+## notes use the same queue. Under dread or a staged moment the queue waits
+## (UiMode.quiet; R3: a pastel card never lands on the Suriel or the beast).
 class_name FindCard
 extends RefCounted
 
 const HOLD := 1.2
 const FADE := 0.18
 const GROUP := &"find_card"
+## How often a held queue asks again.
+const RECHECK := 0.5
 const SCRIPT_FONTS: Array[String] = ["Snell Roundhand", "Apple Chancery", "Brush Script MT",
 	"Z003", "URW Chancery L", "Lobster", "cursive"]
 
@@ -120,7 +123,6 @@ static func pending() -> int:
 static func _push(tree: SceneTree, card: Dictionary) -> void:
 	if tree == null:
 		return
-	CelebrationGate.watch()
 	_queue.append(card)
 	if not _showing:
 		_next(tree)
@@ -130,22 +132,21 @@ static func _next(tree: SceneTree) -> void:
 	if _queue.is_empty() or tree == null or tree.root == null:
 		_showing = false
 		return
-	# Under dread or a staged moment the card waits its turn (R3). Only the
-	# newest recheck acts, so a push while held never starts a second chain.
-	if CelebrationGate.hushed():
+	# Held cards wait their turn. Only the newest recheck acts, so a push
+	# while held never starts a second chain.
+	if UiMode.quiet(tree):
 		_showing = false
 		_held += 1
 		var ticket := _held
-		tree.create_timer(CelebrationGate.RECHECK).timeout.connect(func() -> void:
+		tree.create_timer(RECHECK).timeout.connect(func() -> void:
 			if ticket == _held and not _showing:
 				_next(tree))
 		return
 	_showing = true
 	var card: Dictionary = _queue.pop_front()
-	var layer := CanvasLayer.new()
-	layer.layer = 15
-	layer.add_to_group(GROUP)
 	var panel := PanelContainer.new()
+	panel.add_to_group(GROUP)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style := UiStyle.panel_box()
 	style.set_content_margin_all(14)
 	style.set_corner_radius_all(26)
@@ -154,9 +155,6 @@ static func _next(tree: SceneTree) -> void:
 		style.set_border_width_all(5)
 		style.bg_color = Color(1.0, 0.97, 0.88, 0.96)
 	panel.add_theme_stylebox_override(&"panel", style)
-	panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	panel.position.y = 36.0
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 16)
 	panel.add_child(row)
@@ -186,8 +184,7 @@ static func _next(tree: SceneTree) -> void:
 		var line := UiStyle.label(card.line, 16)
 		line.custom_minimum_size = Vector2(minf(420.0, 9.0 * String(card.line).length()), 0)
 		text.add_child(line)
-	layer.add_child(panel)
-	tree.root.add_child(layer)
+	HudLayout.of(tree).place(panel, HudLayout.Zone.NOTICE)
 	panel.pivot_offset = Vector2(panel.size.x * 0.5, 0)
 	panel.modulate.a = 0.0
 	panel.scale = Vector2.ONE * 0.85
@@ -197,7 +194,7 @@ static func _next(tree: SceneTree) -> void:
 	tween.tween_interval(HOLD)
 	tween.tween_property(panel, ^"modulate:a", 0.0, FADE)
 	tween.tween_callback(func() -> void:
-		layer.queue_free()
+		panel.queue_free()
 		_next(tree))
 
 

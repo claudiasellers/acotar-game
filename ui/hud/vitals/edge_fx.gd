@@ -18,7 +18,6 @@ var _mat: ShaderMaterial
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
 	color = Color.WHITE
 	_mat = ShaderMaterial.new()
 	_mat.shader = SHADER

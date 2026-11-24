@@ -1,10 +1,10 @@
 ## While something holds her: a ring of dark thorns round the interact key that
 ## loosens a step with every press, and a mash ring that fills as she breaks
-## free (plan §15 A3). No words: the key glyph is the whole prompt.
+## free (plan §15 A3). No words: the key glyph is the whole prompt. Drawn at
+## the centre of whatever rect it is given (HudLayout's WORLD zone: the screen).
 class_name VitalsGrabPrompt
 extends Control
 
-const SIZE := 200.0
 const THORN := Color("#120C10")
 const THORN_EDGE := Color("#7A1E2A")
 const KEY := Color("#3A2444")
@@ -17,8 +17,6 @@ var _shake: float = 0.0
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	size = Vector2(SIZE, SIZE)
-	pivot_offset = size * 0.5
 
 
 func press() -> void:

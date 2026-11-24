@@ -8,8 +8,8 @@
 ##   so a story moment ending underneath can't hand control back early), and
 ##   released at the end.
 ## - EventBus.scene_space_started/finished(&"film_<id>") bracket the film, so
-##   the dialogue, guidance and celebration layers stay quiet (CelebrationGate
-##   is hushed while StoryControl is not FULL).
+##   the dialogue, guidance and celebration layers stay quiet, and the HUD
+##   hides (UiMode.FILM).
 ## - Skippable (FilmSkip). Paused with the tree (the pause menu).
 ## - The script's seen_flag (a fact.* flag, never a phase deed) is written on
 ##   every way out: finished, skipped, or freed early.

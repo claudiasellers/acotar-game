@@ -28,7 +28,7 @@ static func think(tree: SceneTree, tier: int) -> bool:
 		return false
 	if _thread == null:
 		_thread = load(THREAD) as GuideThread
-	for node in tree.root.find_children("*", "CanvasLayer", true, false):
+	for node in tree.get_nodes_in_group(GuideSettings.GROUP):
 		var card := node as GuideJournal
 		if card and card.can_show():
 			card.show_thought(_thread, clampi(tier, 0, _thread.tier_count() - 1), false)

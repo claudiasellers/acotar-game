@@ -5,10 +5,11 @@
 ##     the scene starts. (Her landmark thoughts carry the rest of the route.)
 ##   - Starting / done: a chapter-style card at the top of the screen, a title
 ##     and one plain line on what to do now, with the keys as they're bound.
+## The card sits in HudLayout's NOTICE zone and the vignette in its EDGE zone.
 ## Each card shows once per play: they hang on scene starts and on deeds being
 ## raised, which only happen once.
 class_name Act1Milestones
-extends CanvasLayer
+extends Node
 
 const FONT_PATH := "res://ui/title/fonts/EBGaramond-Medium.ttf"
 const HOLD := 6.0
@@ -50,7 +51,6 @@ var _window_open: bool = false
 
 
 func _ready() -> void:
-	layer = 14
 	name = "Act1Milestones"
 	_build()
 	EventBus.scene_space_started.connect(func(id: StringName) -> void: trigger(StringName("scene:%s" % id)))
@@ -178,18 +178,13 @@ func _build() -> void:
 	_vignette = TextureRect.new()
 	_vignette.texture = tex
 	_vignette.stretch_mode = TextureRect.STRETCH_SCALE
-	_vignette.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_vignette.visible = false
-	add_child(_vignette)
+	var hud := HudLayout.of(get_tree())
+	hud.place(_vignette, HudLayout.Zone.EDGE, self)
 
 	var font: Font = load(FONT_PATH) if ResourceLoader.exists(FONT_PATH) else null
-	var top := Control.new()
-	top.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(top)
 	_card = PanelContainer.new()
-	_card.position = Vector2(-450, 48)
 	_card.custom_minimum_size = Vector2(900, 0)
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# A soft dusk wash behind the words so they read on snow and bright sky.
@@ -204,7 +199,7 @@ func _build() -> void:
 	wash.content_margin_right = 28
 	_card.add_theme_stylebox_override(&"panel", wash)
 	_card.visible = false
-	top.add_child(_card)
+	hud.place(_card, HudLayout.Zone.NOTICE, self)
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override(&"separation", 6)

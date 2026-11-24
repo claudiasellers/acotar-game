@@ -40,7 +40,7 @@ func _run() -> void:
 	var feyre: Node3D = game.get(&"feyre")
 	var hud := get_tree().root.find_child("WorldMapHud", true, false) as WorldMapHud
 	if hud == null:
-		for n in get_tree().root.find_children("*", "CanvasLayer", true, false):
+		for n in get_tree().root.find_children("*", "WorldMapHud", true, false):
 			if n is WorldMapHud:
 				hud = n
 	feyre.set_physics_process(false)

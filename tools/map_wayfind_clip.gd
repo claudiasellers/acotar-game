@@ -44,7 +44,7 @@ func _run() -> void:
 	# own pace between frames.
 	var capture_scale := 1.0 if args.has("realtime") else 0.04
 	var hud: WorldMapHud = null
-	for n in get_tree().root.find_children("*", "CanvasLayer", true, false):
+	for n in get_tree().root.find_children("*", "WorldMapHud", true, false):
 		if n is WorldMapHud:
 			hud = n
 	for beat: Array in BEATS:

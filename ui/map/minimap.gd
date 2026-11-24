@@ -1,13 +1,12 @@
-## The round minimap in the upper right: a pearl-and-gold medallion, the
-## partner of the guide's medallion in the upper left (same margin, same gold
-## ring, same key pill under it). North is up; Feyre's arrow turns as she
+## The round minimap (HudLayout's MINIMAP zone, upper right): a pearl-and-gold
+## medallion, the partner of the guide's medallion in the upper left (same
+## gold ring, same key pill under it). North is up; Feyre's arrow turns as she
 ## does. Shows what she has uncovered, the landmarks she has seen, and her.
 class_name Minimap
 extends Control
 
 const DIAMETER := 232.0
 const RING := 9.0
-const MARGIN := Vector2(28, 28)
 ## Metres from the centre to the rim.
 const VIEW_RADIUS := 170.0
 const SHADER := preload("res://ui/map/map_view.gdshader")
@@ -36,14 +35,8 @@ func _init(owner_hud: WorldMapHud) -> void:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	custom_minimum_size = Vector2(DIAMETER, DIAMETER)
 	size = custom_minimum_size
-	position = Vector2(-DIAMETER - MARGIN.x, MARGIN.y)
-	offset_left = -DIAMETER - MARGIN.x
-	offset_right = -MARGIN.x
-	offset_top = MARGIN.y
-	offset_bottom = MARGIN.y + DIAMETER
 	pivot_offset = size * 0.5
 
 	map_rect = ColorRect.new()

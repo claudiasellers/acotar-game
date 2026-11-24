@@ -46,6 +46,7 @@ var slowing: bool = false
 ## The bow you can see (on her back, up in her hands) and the arrow card.
 var visual: BowVisual
 var quiver_card: QuiverCard
+var reticle: AimReticle
 
 var _time: float = 0.0
 ## A shot was loosed with aim still held: the bow stays down until aim is let go.
@@ -60,10 +61,8 @@ func _ready() -> void:
 	feyre = get_parent() as Feyre
 	bow = feyre.bow
 	_ensure_actions()
-	var reticle_layer := CanvasLayer.new()
-	reticle_layer.name = "AimReticle"
-	reticle_layer.add_child(AimReticle.new(self))
-	add_child(reticle_layer)
+	reticle = AimReticle.new(self)
+	HudLayout.of(get_tree()).place(reticle, HudLayout.Zone.WORLD, self)
 	visual = BowVisual.new(self)
 	add_child(visual)
 	quiver_card = QuiverCard.new(self)

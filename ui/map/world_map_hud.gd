@@ -1,12 +1,12 @@
 ## The world map: uncovers the land around Feyre as she goes, notices the
 ## landmarks she actually sees and the places she walks into, and owns the
-## minimap (upper right) and the full map (M). Saved with the game under the
+## minimap (HudLayout's MINIMAP zone) and the full map (M). Saved with the game under the
 ## "world_map" provider key. Never marks where the story wants her (R2).
 ##
 ## Map art: ui/map/_generated/world_map.res (MapBake) from tools/generators/world_map.gd;
 ## if it is missing, a coarse copy is painted on a thread at start.
 class_name WorldMapHud
-extends CanvasLayer
+extends Node
 
 const SAVE_KEY := "world_map"
 # Preloaded rather than global classes, so a stale class cache (an un-imported
@@ -72,7 +72,6 @@ var _paint_cancel: Array = [false]
 
 
 func _ready() -> void:
-	layer = 14
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group(MapSettings.GROUP)
 	MapSettings.ensure_actions()
@@ -81,15 +80,15 @@ func _ready() -> void:
 	_load_bake()
 	manor = ManorPlan.new()
 
+	var hud := HudLayout.of(get_tree())
 	minimap = Minimap.new(self)
-	add_child(minimap)
+	hud.place(minimap, HudLayout.Zone.MINIMAP, self)
 	full_map = FullMap.new(self)
 	add_child(full_map)
 	beacon = PinBeacon.new()
 	add_child(beacon)
 	marker = PinMarker.new(self)
-	add_child(marker)
-	move_child(marker, 0)  # under the minimap and the full map
+	hud.place(marker, HudLayout.Zone.WAY, self)
 	wind = FaeWind.new()
 	add_child(wind)
 	_bind_textures()
@@ -108,7 +107,7 @@ func _exit_tree() -> void:
 
 ## MapSettings.set_minimap_shown calls this through the group.
 func on_minimap_setting(shown: bool) -> void:
-	minimap.visible = shown and _hud_allowed()
+	minimap.visible = shown
 
 
 func open_full_map() -> void:
@@ -116,7 +115,7 @@ func open_full_map() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if get_tree().paused or StoryControl.mode != StoryControl.Mode.FULL:
+	if UiMode.current(get_tree()) != UiMode.Mode.PLAY:
 		return
 	# M itself is the menu shell's (MenuShell, the map tab's shortcut).
 	if event.is_action_pressed(MapSettings.ACTION_MINIMAP):
@@ -124,21 +123,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		MapSettings.set_minimap_shown(not MapSettings.minimap_shown())
 
 
-func _hud_allowed() -> bool:
-	return StoryControl.mode == StoryControl.Mode.FULL and (not get_tree().paused or full_map.is_open())
-
-
 # --- Per frame -----------------------------------------------------------------
 
 func _process(delta: float) -> void:
 	var map_open := full_map.is_open()
-	minimap.visible = MapSettings.minimap_shown() and _hud_allowed() and not map_open
-	marker.visible = pin.active and _hud_allowed() and not map_open
+	minimap.visible = MapSettings.minimap_shown()
+	marker.visible = pin.active
 	if _map_was_open and not map_open and pin.active:
 		wind.gust()  # closing the map with a pin: show her the way at once
 	_map_was_open = map_open
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
-	if feyre == null or get_tree().paused:
+	if feyre == null or UiMode.current(get_tree()) == UiMode.Mode.SCREEN:
 		_upload_fog()
 		return
 	player_xz = Vector2(feyre.global_position.x, feyre.global_position.z)
@@ -152,7 +147,7 @@ func _process(delta: float) -> void:
 			beacon.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
 			wind.set_colours(MapMarks.beacon_colours().accent, MapMarks.beacon_colours().glow)
 	_update_pin()
-	if pin.active and StoryControl.mode == StoryControl.Mode.FULL:
+	if pin.active and UiMode.current(get_tree()) == UiMode.Mode.PLAY:
 		wind.follow(feyre.global_position, pin.xz, delta)
 	else:
 		wind.stop()

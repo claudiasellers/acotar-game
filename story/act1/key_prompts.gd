@@ -1,5 +1,5 @@
 ## Act I's contextual key prompts (no objectives, no markers; R2): a small card
-## at the bottom of the screen that names a key only while it matters.
+## in HudLayout's PROMPT zone that names a key only while it matters.
 ##   Q  ash arrow       the doe or the great wolf is near and the ash arrow isn't nocked
 ##   RMB aim, LMB shoot  prey is near or the hunt is on, until her first shot
 ##   E  skin            standing over the great wolf's carcass
@@ -8,7 +8,7 @@
 ## Each one is taught once: after its first use it never shows again (saved in
 ## user://settings.cfg under [prompts]).
 class_name KeyPrompts
-extends CanvasLayer
+extends Node
 
 const SECTION := "prompts"
 const NEAR_PREY := 90.0
@@ -34,7 +34,6 @@ var _fire_hooked: bool = false
 
 
 func _ready() -> void:
-	layer = 12
 	_load()
 	_build()
 	EventBus.creature_harvested.connect(func(_id: StringName, kind: StringName, _items: PackedStringArray) -> void:
@@ -76,7 +75,7 @@ func _process(delta: float) -> void:
 ## The prompt that applies right now, or &"" for none.
 func want() -> StringName:
 	var feyre := get_tree().get_first_node_in_group(&"player") as Feyre
-	if feyre == null or StoryControl.mode == StoryControl.Mode.NONE:
+	if feyre == null:
 		return &""
 	var at := feyre.global_position
 	if not _fire_hooked:
@@ -133,10 +132,6 @@ func _load() -> void:
 
 
 func _build() -> void:
-	var anchor := Control.new()
-	anchor.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(anchor)
 	_card = PanelContainer.new()
 	var box := UiStyle.panel_box()
 	box.set_content_margin_all(10)
@@ -144,11 +139,7 @@ func _build() -> void:
 	box.content_margin_right = 20
 	_card.add_theme_stylebox_override(&"panel", box)
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_card.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	# Above the satchel's quick bar (bottom centre).
-	_card.position = Vector2(-110, -215)
-	anchor.add_child(_card)
+	HudLayout.of(get_tree()).place(_card, HudLayout.Zone.PROMPT, self)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)
 	_card.add_child(row)

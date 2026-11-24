@@ -302,7 +302,7 @@ func _build() -> void:
 	_action(actions, "Save & Quit", func() -> void: _save_then(_quit))
 
 	_hint = ControlsHint.new()
-	add_child(_hint)
+	HudLayout.of(get_tree()).place(_hint, HudLayout.Zone.CONTROLS, self)
 
 
 func _build_guide(parent: Control) -> void:

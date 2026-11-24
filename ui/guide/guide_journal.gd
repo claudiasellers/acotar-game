@@ -1,17 +1,17 @@
-## Feyre's Thoughts: a small painted card in the upper left with one line in
-## her voice about the need in front of her (plans/guidance-journal.md).
+## Feyre's Thoughts: a small painted card in HudLayout's THOUGHT zone (upper
+## left) with one line in her voice about the need in front of her (plans/guidance-journal.md).
 ## Never a list, a marker or a distance. GuideDirector decides when; this
-## node reads WorldState, StoryControl and EventBus, and draws the card.
+## node reads WorldState and EventBus, and draws the card. Thoughts wait out
+## dread and staged moments (UiMode.quiet).
 ## G / pad Y shows the current thought; again while it shows, a plainer one.
 ## Between thoughts a small medallion tab stays in the corner (always findable,
 ## clickable), glowing softly when a thought is waiting unread.
 class_name GuideJournal
-extends CanvasLayer
+extends Node
 
 const BOOK_PATH := "res://data/guide/act1_guide.tres"
 const VOICE_DIR := "res://audio/voice/feyre/"
 const ACTION := &"guide_open"
-const MARGIN := Vector2(28, 28)
 const SLIDE := 36.0
 const FADE_IN := 0.35
 const FADE_OUT := 0.6
@@ -39,7 +39,6 @@ var _footer: Label
 var _voice: AudioStreamPlayer
 var _tween: Tween
 var _hold: float = 0.0
-var _dread: bool = false
 var _input_seen: bool = false
 var _last_pos: Vector3 = Vector3.INF
 var _taught_key: bool = false
@@ -56,16 +55,12 @@ func _init(book: GuideBook = null) -> void:
 
 
 func _ready() -> void:
-	layer = 15
 	add_to_group(GuideSettings.GROUP)
 	_ensure_action()
 	mode = GuideSettings.get_mode()
 	_build()
 	EventBus.flag_changed.connect(_on_flag_changed)
 	EventBus.deed_performed.connect(_on_deed)
-	EventBus.mood_requested.connect(_on_mood)
-	CelebrationGate.watch()
-	StoryControl.mode_changed.connect(_on_control_changed)
 	EventBus.game_loaded.connect(_on_game_loaded)
 	SaveSystem.register_provider(SAVE_KEY, self)
 	director.refresh(WorldState.has_flag)
@@ -101,7 +96,7 @@ func on_mode_changed(new_mode: GuideSettings.Mode) -> void:
 
 
 func can_show() -> bool:
-	return StoryControl.mode == StoryControl.Mode.FULL and not _dread
+	return not UiMode.quiet(get_tree())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -174,11 +169,11 @@ func show_thought(thread: GuideThread, tier: int, asked: bool) -> void:
 	_kill_tween()
 	_card.visible = true
 	_card.modulate.a = 0.0 if not showing else _card.modulate.a
-	_card.position = MARGIN - Vector2(SLIDE, 0) if not showing else MARGIN
+	_card.position = Vector2(-SLIDE, 0) if not showing else Vector2.ZERO
 	showing = true
 	_tween = create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tween.tween_property(_card, ^"modulate:a", 1.0, FADE_IN)
-	_tween.tween_property(_card, ^"position", MARGIN, FADE_IN)
+	_tween.tween_property(_card, ^"position", Vector2.ZERO, FADE_IN)
 	Juice.bounce_control(_vignette, 0.12)
 
 
@@ -241,15 +236,6 @@ func _on_deed(_flag: String) -> void:
 	director.note_progress()
 
 
-func _on_mood(mood: StringName, intensity: float, _seconds: float) -> void:
-	_dread = mood == &"dread" and intensity > 0.0
-
-
-func _on_control_changed(_mode: StoryControl.Mode) -> void:
-	if not can_show():
-		hide_thought()
-
-
 ## G / pad Y (story lane's call: J and Back are the collection book), added in
 ## code like interactor.gd does (R14).
 func _ensure_action() -> void:
@@ -265,10 +251,14 @@ func _ensure_action() -> void:
 
 
 func _build() -> void:
+	# The zone places this; the card slides and the tab rests inside it.
+	var piece := Control.new()
+	piece.name = "Thought"
+	piece.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	HudLayout.of(get_tree()).place(piece, HudLayout.Zone.THOUGHT, self)
 	_card = PanelContainer.new()
 	_card.name = "ThoughtCard"
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_card.position = MARGIN
 	_card.custom_minimum_size = Vector2(560, 0)
 	# The cameo sits over the plaque's left edge, where the tab rests.
 	var box := CartoucheStyleBox.new()
@@ -279,7 +269,7 @@ func _build() -> void:
 	box.content_margin_right = 30.0
 	_card.add_theme_stylebox_override(&"panel", box)
 	_card.visible = false
-	add_child(_card)
+	piece.add_child(_card)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 30)
@@ -325,13 +315,13 @@ func _build() -> void:
 
 	_tab = VBoxContainer.new()
 	_tab.name = "ThoughtTab"
-	_tab.position = MARGIN + Vector2(0, MEDAL_TOP)
+	_tab.position = Vector2(0, MEDAL_TOP)
 	_tab.mouse_filter = Control.MOUSE_FILTER_STOP
 	_tab.tooltip_text = "Feyre's thoughts (G)"
 	_tab.gui_input.connect(_on_tab_input)
 	_tab.modulate.a = 0.0
 	_tab.visible = false
-	add_child(_tab)
+	piece.add_child(_tab)
 	_tab_icon = GuideVignette.new()
 	_tab_icon.custom_minimum_size = Vector2(MEDAL, MEDAL)
 	_tab_icon.pivot_offset = Vector2(MEDAL, MEDAL) * 0.5

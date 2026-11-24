@@ -2,7 +2,8 @@
 ## a small pin sketched in charcoal, like the marks in her sketchbook, over
 ## the spot in the world with how far it is in her hand, sliding to the edge of the screen and pointing there when the spot is
 ## off screen or behind her. Player-placed only (the story never sets one, R2).
-## Lives under WorldMapHud; drawn every frame from its MapPin and the camera.
+## WorldMapHud puts it in HudLayout's WAY zone; drawn every frame from its
+## MapPin and the camera.
 extends Control
 
 ## Float the icon this far above the ground at the pin (metres).
@@ -33,7 +34,6 @@ func _init(owner_hud: Node) -> void:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 
 func _process(delta: float) -> void:

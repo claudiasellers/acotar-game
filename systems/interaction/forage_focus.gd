@@ -26,26 +26,8 @@ func _init(owner_interactor: Interactor = null) -> void:
 func _ready() -> void:
 	_glint = _make_glint()
 	add_child(_glint)
-	var layer := CanvasLayer.new()
-	layer.layer = 11
-	add_child(layer)
-	var anchor := Control.new()
-	anchor.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(anchor)
-	_card = PanelContainer.new()
-	var style := UiStyle.panel_box()
-	style.set_content_margin_all(8)
-	style.shadow_size = 4
-	_card.add_theme_stylebox_override(&"panel", style)
-	_label = UiStyle.label("", 17)
-	_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_card.add_child(_label)
-	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_card.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_card.position = Vector2(0, -150)
-	_card.visible = false
-	anchor.add_child(_card)
+	_card = PressCard.make_card(self)
+	_label = _card.get_node(^"Label") as Label
 
 
 func _process(delta: float) -> void:
@@ -68,8 +50,6 @@ func _process(delta: float) -> void:
 	if in_reach:
 		var item := ItemCatalog.get_item(focus.id)
 		_label.text = "E   pick %s" % (item.display_name.to_lower() if item else String(focus.id))
-		_card.reset_size()
-		_card.position.x = -_card.size.x * 0.5
 
 
 ## The nearest unpicked, in-window forage instance within `radius` of `at`.

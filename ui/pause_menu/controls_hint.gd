@@ -1,4 +1,4 @@
-## A small pearl pill in the lower left naming the controls. It shows for the
+## A small pearl pill in HudLayout's CONTROLS zone naming the controls. It shows for the
 ## first moments of play and briefly after the pause menu closes, then fades.
 class_name ControlsHint
 extends PanelContainer
@@ -14,11 +14,6 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	theme = PauseStyle.theme()
-	set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	grow_vertical = Control.GROW_DIRECTION_BEGIN
-	offset_left = 28.0
-	offset_top = -28.0
-	offset_bottom = -28.0
 	var box := StyleBoxFlat.new()
 	box.bg_color = Color(1.0, 0.95, 0.97, 0.82)
 	box.border_color = Color(PauseStyle.GOLD, 0.7)

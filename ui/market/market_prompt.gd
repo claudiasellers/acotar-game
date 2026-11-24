@@ -1,10 +1,11 @@
 ## "E  Trade with the clothier": the key hint by a market buyer (lane L53),
-## drawn like the satchel's leather keys. Shown only within reach of someone
+## drawn like the satchel's leather keys, in HudLayout's PROMPT zone. Shown
+## only within reach of someone
 ## who buys, never from afar (R2: a hint at arm's length, not a marker). At
 ## the fur stall with the wolf's pelt, Act I's own "sell the pelt" prompt
 ## (KeyPrompts) speaks instead.
 class_name MarketPrompt
-extends CanvasLayer
+extends Node
 
 const REACH := 2.5
 const FADE := 0.2
@@ -20,16 +21,12 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = 12
-	var anchor := Control.new()
-	anchor.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	anchor.position.y -= 150.0
-	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(anchor)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override(&"separation", 10)
+	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_row.modulate.a = 0.0
-	anchor.add_child(_row)
+	_row.visible = false
+	HudLayout.of(get_tree()).place(_row, HudLayout.Zone.PROMPT, self)
 	var chip := PanelContainer.new()
 	chip.theme_type_variation = &"SatchelKey"
 	_row.add_child(chip)
@@ -51,18 +48,15 @@ func _process(delta: float) -> void:
 		showing = _buyer_of(who).id
 	else:
 		showing = &""
-	_row.position.x = -_row.size.x * 0.5
 	_row.modulate.a = move_toward(_row.modulate.a, 1.0 if on else 0.0, delta / FADE)
+	_row.visible = _row.modulate.a > 0.01
 
 
 ## The buyer station Feyre is within reach of, or null.
 func target() -> Node3D:
 	var feyre := get_tree().get_first_node_in_group(&"player") as Node3D
-	if feyre == null or StoryControl.mode == StoryControl.Mode.NONE:
+	if feyre == null or not StoryControl.can_interact():
 		return null
-	for m in get_tree().root.find_children("*", "MarketMenu", true, false):
-		if (m as MarketMenu).is_open():
-			return null
 	var best: Node3D = null
 	var best_d := REACH
 	for st in get_tree().get_nodes_in_group(&"station"):

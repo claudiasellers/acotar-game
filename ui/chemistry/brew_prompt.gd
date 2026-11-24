@@ -1,9 +1,9 @@
 ## "E  Brew at the kitchen range": the key hint within arm's reach of any
-## station that brews (lane L62), drawn like the satchel's leather keys. A
-## hint at arm's length, never a marker (R2). It also gives Feyre her brew
+## station that brews (lane L62), drawn like the satchel's leather keys, in
+## HudLayout's PROMPT zone. A hint at arm's length, never a marker (R2). It also gives Feyre her brew
 ## tells (BrewTells), so a brew shows however she drank it.
 class_name BrewPrompt
-extends CanvasLayer
+extends Node
 
 const REACH := 2.5
 const FADE := 0.2
@@ -19,16 +19,12 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = 12
-	var anchor := Control.new()
-	anchor.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	anchor.position.y -= 150.0
-	anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(anchor)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override(&"separation", 10)
+	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_row.modulate.a = 0.0
-	anchor.add_child(_row)
+	_row.visible = false
+	HudLayout.of(get_tree()).place(_row, HudLayout.Zone.PROMPT, self)
 	var chip := PanelContainer.new()
 	chip.theme_type_variation = &"SatchelKey"
 	_row.add_child(chip)
@@ -49,16 +45,13 @@ func _process(delta: float) -> void:
 	if showing:
 		_glyph.text = "A" if SatchelHud.pad_active else "E"
 		_word.text = "Brew at the %s" % label_for(showing).to_lower()
-	_row.position.x = -_row.size.x * 0.5
 	_row.modulate.a = move_toward(_row.modulate.a, 1.0 if showing else 0.0, delta / FADE)
+	_row.visible = _row.modulate.a > 0.01
 
 
 ## The brewing station Feyre is within reach of, or null.
 func target(feyre: Node3D) -> Node3D:
-	if feyre == null or StoryControl.mode != StoryControl.Mode.FULL:
-		return null
-	var menu := BrewMenu.find(get_tree())
-	if menu and menu.is_open():
+	if feyre == null or not StoryControl.can_interact():
 		return null
 	var best: Node3D = null
 	var best_d := REACH
