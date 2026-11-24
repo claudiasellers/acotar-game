@@ -90,3 +90,11 @@ func _box(at: Vector3, size: Vector3) -> void:
 	body.add_child(col)
 	_root.add_child(body)
 	body.position = at
+
+
+## The server keys navmesh edges on a grid of map cell size x this scale. At
+## 1.0 (0.25 m) distinct terrain vertices a few cm apart share a key and every
+## dense bake logs "Navigation region synchronization had N edge error(s)" (T142).
+func test_edge_merge_grid_is_finer_than_the_bake() -> void:
+	var scale := float(ProjectSettings.get_setting("navigation/3d/merge_rasterizer_cell_scale", 1.0))
+	assert_lte(scale * 0.25, 0.01, "merge rasterizer cell at most 1 cm")
