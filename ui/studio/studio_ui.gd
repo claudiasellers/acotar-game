@@ -1,11 +1,16 @@
 ## Feyre's easel (L30): the canvas in the middle, her paints and six mixing
 ## wells on the left, brushes and the finish on the right. Pick a paint and
 ## paint, or pick a paint and tap a well to mix it in. Right-click a well to
-## wipe it. A screen on ScreenStack, which pauses the game while it is open.
+## wipe it. A loose page of her journal (LoosePage) on ScreenStack, which
+## pauses the game while it is open.
 ##   StudioUi.open(feyre, easel)   # interactor, station_id "easel"
 class_name StudioUi
 extends RefCounted
 
+## The paints, the canvas and the brushes side by side, with the paper's edge.
+const WIDTH := 1440.0
+## The pink wash: paint.
+const WASH := 0
 const DISPLAY_SCALE := 0.78
 const SWATCH := 34
 const WELL := 56
@@ -31,22 +36,16 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 		return
 	var s := StudioSession.new(Gameplay.inventory, easel, feyre)
 	_session = s
-	var parts := UiStyle.modal("StudioUI", 1560.0)
-	var layer: CanvasLayer = parts[0]
-	var box: VBoxContainer = parts[1]
+	var layer := CanvasLayer.new()
+	layer.name = "StudioUI"
+	var page := LoosePage.lay(layer, WIDTH, WASH, 10)
+	var box := page.column
 	_open = layer
 	s.layer = layer
 
-	var head := HBoxContainer.new()
-	box.add_child(head)
-	var title_label := UiStyle.label("The easel", 28)
-	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(title_label)
-	var found := UiStyle.label("", 18)
-	# One line: a wrapping label in a row gets no width and stacks its letters.
-	found.autowrap_mode = TextServer.AUTOWRAP_OFF
-	found.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(found)
+	var head := page.head()
+	head[0].text = "The easel"
+	var found := head[1]
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 18)
@@ -56,28 +55,26 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 	var left := VBoxContainer.new()
 	left.custom_minimum_size = Vector2(300, 0)
 	row.add_child(left)
-	left.add_child(UiStyle.label("Paints", 20))
+	left.add_child(BookKit.label("Paints", &"PageSection"))
 	var paints := GridContainer.new()
 	paints.columns = 6
 	left.add_child(paints)
-	var paint_name := UiStyle.label("", 15)
+	var paint_name := BookKit.label("", &"SatchelSmall")
 	left.add_child(paint_name)
-	left.add_child(UiStyle.label("Palette", 20))
+	left.add_child(BookKit.label("Palette", &"PageSection"))
 	var wells := GridContainer.new()
 	wells.columns = 3
 	wells.add_theme_constant_override(&"h_separation", 12)
 	wells.add_theme_constant_override(&"v_separation", 12)
 	left.add_child(wells)
-	left.add_child(UiStyle.label("Tap a well to mix the paint in. Right-click to wipe it.", 13))
+	left.add_child(BookKit.label("Tap a well to mix the paint in. Right-click to wipe it.", &"SatchelSmall", true))
 
 	# --- Centre: the canvas ------------------------------------------------
 	var frame := PanelContainer.new()
 	var frame_box := StyleBoxFlat.new()
-	frame_box.bg_color = Color(0.93, 0.78, 0.45)
+	frame_box.bg_color = JournalTheme.color(&"line")
 	frame_box.set_corner_radius_all(6)
 	frame_box.set_content_margin_all(8)
-	frame_box.shadow_color = Color(0.5, 0.3, 0.4, 0.3)
-	frame_box.shadow_size = 10
 	frame.add_theme_stylebox_override(&"panel", frame_box)
 	row.add_child(frame)
 	var tex := TextureRect.new()
@@ -96,26 +93,26 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 	right.custom_minimum_size = Vector2(230, 0)
 	right.add_theme_constant_override(&"separation", 8)
 	row.add_child(right)
-	right.add_child(UiStyle.label("Brushes", 20))
+	right.add_child(BookKit.label("Brushes", &"PageSection"))
 	var brush_group := ButtonGroup.new()
 	var brushes := StudioCanvas.brushes()
 	for i in brushes.size():
-		var b := UiStyle.button(brushes[i].display_name, true)
+		var b := _choice(brushes[i].display_name)
 		b.button_group = brush_group
 		b.button_pressed = i == 0
 		b.pressed.connect(func() -> void: s.canvas.brush = brushes[i])
 		right.add_child(b)
-	right.add_child(UiStyle.label("Size", 20))
+	right.add_child(BookKit.label("Size", &"PageSection"))
 	var sizes := HBoxContainer.new()
 	var size_group := ButtonGroup.new()
 	for i in StudioCanvas.SIZES.size():
-		var b := UiStyle.button(["S", "M", "L", "XL"][i], true)
+		var b := _choice(["S", "M", "L", "XL"][i])
 		b.button_group = size_group
 		b.button_pressed = i == s.canvas.size_index
 		b.pressed.connect(func() -> void: s.canvas.size_index = i)
 		sizes.add_child(b)
 	right.add_child(sizes)
-	var undo := UiStyle.button("Undo")
+	var undo := LoosePage.button("Undo")
 	undo.pressed.connect(func() -> void:
 		if s.canvas.undo():
 			s.dirty = true)
@@ -123,11 +120,11 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 	var title := LineEdit.new()
 	title.placeholder_text = "Title (or leave it)"
 	right.add_child(title)
-	var status := UiStyle.label("", 15)
+	var status := BookKit.label("", &"SatchelSmall", true)
 	right.add_child(status)
-	var finish := UiStyle.button("Finish and set it aside")
+	var finish := LoosePage.button("Finish and set it aside")
 	right.add_child(finish)
-	var leave := UiStyle.button("Leave it for now")
+	var leave := LoosePage.button("Leave it for now")
 	right.add_child(leave)
 
 	# --- Behaviour ----------------------------------------------------------
@@ -153,7 +150,7 @@ static func open(feyre: Node3D, easel: Node3D) -> void:
 		for i in StudioPalette.WELLS:
 			var w: Dictionary = s.palette.wells[i]
 			var empty := int(w.amount) <= 0
-			var well := _swatch(Color(0.97, 0.95, 0.93) if empty else w.color, WELL, s.selected_well == i, empty)
+			var well := _swatch(JournalTheme.color(&"paper_deep") if empty else w.color, WELL, s.selected_well == i, empty)
 			well.tooltip_text = "Empty" if empty else "%d strokes" % int(w.amount)
 			well.gui_input.connect(func(e: InputEvent) -> void:
 				if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_RIGHT:
@@ -227,6 +224,13 @@ static func close() -> void:
 	_session = null
 
 
+## One of a set of choices (a brush, a size): stays pressed.
+static func _choice(text: String) -> Button:
+	var b := LoosePage.button(text)
+	b.toggle_mode = true
+	return b
+
+
 ## A round paint blob (a button) in `color`.
 static func _swatch(color: Color, size: int, selected: bool, empty: bool = false) -> Button:
 	var b := Button.new()
@@ -237,9 +241,7 @@ static func _swatch(color: Color, size: int, selected: bool, empty: bool = false
 		var box := StyleBoxFlat.new()
 		box.bg_color = color
 		box.set_corner_radius_all(size)
-		box.border_color = UiStyle.BORDER if selected else (Color(0.85, 0.75, 0.8) if empty else Color(1, 1, 1, 0.9))
+		box.border_color = JournalTheme.color(&"accent") if selected else JournalTheme.color(&"line" if empty else &"paper")
 		box.set_border_width_all(4 if selected else 2)
-		box.shadow_color = Color(0.5, 0.3, 0.4, 0.25)
-		box.shadow_size = 4 if state == "hover" else 2
 		b.add_theme_stylebox_override(state, box)
 	return b

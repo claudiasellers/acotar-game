@@ -203,6 +203,7 @@ every piece's script.
 | 1d | the story and system scripts that make their own layer (veils, captions, whisper, Suriel, film, the loading veil, dev overlays) | their literal numbers | no literal `layer =` number outside `UiLayers` (in `test_hud_layout.gd`) |
 | step 4 | the pause and the settings: `SettingsTab`, a page of the book on its ribbon; the title opens the same page | `ui/settings_panel.gd`, `ui/title/title_settings.gd`, `ui/pause_menu/` (PauseStyle), `ui/theme/ui_borders.gd`, `framed_style_box.gd` and the two pause fonts | the theme search test has no exceptions left |
 | step 5 | her map of the halls: the Map tab's manor page draws her five marks, `WorldMapHud.note_sketch()` is the one "she drew something" signal, and the foyer table opens the book at the Map tab | `story/act3/house/hall_map_page.gd` (its own layer, colours, toast and full page) | none new |
+| step 6 | the stations she opens with E: the stillroom, a stall, the whorl stones' card and ride, the easel and the mare are loose pages laid by `LoosePage` (`ui/menu/loose_page.gd`) | each station's own scrim, card, footer, `_label`, `_key` and `_pad`; `UiStyle.modal` and `UiStyle.button`; the `SatchelDetail` variation (now `LoosePage`) | `test_loose_page.gd`: no station frames itself |
 
 ## Files outside `ui/` the frame edits
 

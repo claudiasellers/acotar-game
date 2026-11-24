@@ -12,6 +12,8 @@ signal sold(item_id: StringName, count: int, coin: int)
 signal closed
 
 const WIDTH := 620.0
+## The yellow wash: coppers.
+const WASH := 3
 const ICON := 64.0
 
 var buyer: MarketBuyer
@@ -20,12 +22,11 @@ var offers: Array[Dictionary] = []
 var selected: int = 0
 
 var _root: Control
-var _card: PanelContainer
+var _page: LoosePage
 var _who: Label
 var _says: Label
 var _purse: Label
 var _rows: VBoxContainer
-var _prompts: HBoxContainer
 var _buttons: Array[Button] = []
 
 
@@ -47,7 +48,6 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = UiLayers.SCREEN
 	_build()
 	_root.visible = false
 
@@ -65,7 +65,7 @@ func open(for_buyer: MarketBuyer, who: Node3D = null) -> void:
 	_says.text = "“%s”" % (buyer.greeting if not offers.is_empty() else buyer.nothing)
 	_talk(true)
 	ScreenStack.push(self)
-	Juice.bounce_control(_card, 0.05)
+	_page.settle()
 
 
 func close() -> void:
@@ -109,9 +109,9 @@ func sell_selected(count: int = 1) -> int:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
-	if _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_A):
+	if MenuTab.key_pressed(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or MenuTab.pad_pressed(event, JOY_BUTTON_A):
 		sell_selected(1)
-	elif _key(event, [KEY_R]) or _pad(event, JOY_BUTTON_Y):
+	elif MenuTab.key_pressed(event, [KEY_R]) or MenuTab.pad_pressed(event, JOY_BUTTON_Y):
 		sell_selected(0)
 	elif event.is_action_pressed(&"ui_down") or event.is_action_pressed(&"move_back"):
 		_move(1)
@@ -120,15 +120,6 @@ func _input(event: InputEvent) -> void:
 	else:
 		return
 	get_viewport().set_input_as_handled()
-
-
-func _pad(event: InputEvent, button: JoyButton) -> bool:
-	return event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == button
-
-
-func _key(event: InputEvent, keys: Array) -> bool:
-	return event is InputEventKey and event.pressed and not event.echo \
-			and (event as InputEventKey).physical_keycode in keys
 
 
 func _move(by: int) -> void:
@@ -141,39 +132,14 @@ func _move(by: int) -> void:
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_root)
-	var scrim := ColorRect.new()
-	scrim.color = JournalTheme.color(&"scrim")
-	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.add_child(scrim)
+	_page = LoosePage.lay(self, WIDTH, WASH, 14)
+	_root = _page.root
+	var col := _page.column
+	var head := _page.head()
+	_who = head[0]
+	_purse = head[1]
 
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(center)
-	_card = PanelContainer.new()
-	_card.theme_type_variation = &"SatchelDetail"
-	_card.custom_minimum_size = Vector2(WIDTH, 0)
-	center.add_child(_card)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 14)
-	_card.add_child(col)
-
-	var head := HBoxContainer.new()
-	col.add_child(head)
-	_who = _label("", &"SatchelHeading")
-	_who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(_who)
-	var purse_chip := PanelContainer.new()
-	purse_chip.theme_type_variation = &"SatchelChip"
-	purse_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(purse_chip)
-	_purse = _label("", &"SatchelCount")
-	purse_chip.add_child(_purse)
-
-	_says = _label("", &"SatchelBody")
+	_says = BookKit.label("", &"SatchelBody")
 	_says.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_says.custom_minimum_size = Vector2(WIDTH - 40.0, 0)
 	col.add_child(_says)
@@ -182,11 +148,6 @@ func _build() -> void:
 	_rows = VBoxContainer.new()
 	_rows.add_theme_constant_override(&"separation", 8)
 	col.add_child(_rows)
-
-	_prompts = HBoxContainer.new()
-	_prompts.add_theme_constant_override(&"separation", 22)
-	_prompts.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.add_child(_prompts)
 
 
 func _refresh() -> void:
@@ -198,7 +159,7 @@ func _refresh() -> void:
 		c.queue_free()
 	_buttons.clear()
 	if offers.is_empty():
-		var none := _label("Nothing in your satchel they'd buy.", &"SatchelSmall")
+		var none := BookKit.label("Nothing in your satchel they'd buy.", &"SatchelSmall")
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_rows.add_child(none)
 	for i in offers.size():
@@ -226,48 +187,27 @@ func _row(i: int, offer: Dictionary) -> Button:
 	var icon := SatchelIcon.make(offer.entry, ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(icon)
-	var title := _label("%s  ×%d" % [offer.name, offer.count], &"SatchelBody")
+	var title := BookKit.label("%s  ×%d" % [offer.name, offer.count], &"SatchelBody")
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(title)
-	var price := _label("%d %s each" % [offer.price, "copper" if offer.price == 1 else "coppers"], &"SatchelCount")
+	var price := BookKit.label("%d %s each" % [offer.price, "copper" if offer.price == 1 else "coppers"], &"SatchelCount")
 	price.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(price)
 	_buttons.append(b)
 	return b
 
 
-## Button glyphs, like the satchel's footer.
+## The keys along the foot, as the pad or the keyboard names them.
 func _build_prompts() -> void:
-	for c in _prompts.get_children():
-		c.queue_free()
 	var pad := SatchelHud.pad_active
 	var pairs: Array = []
 	if not offers.is_empty():
 		pairs.append(["A" if pad else "E", "Sell one"])
 		pairs.append(["Y" if pad else "R", "Sell all"])
 	pairs.append(["B" if pad else "Esc", "Step away"])
-	for p in pairs:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 8)
-		var glyph := PanelContainer.new()
-		glyph.theme_type_variation = &"SatchelKey"
-		var key := _label(p[0], &"SatchelKeyLabel")
-		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		glyph.add_child(key)
-		row.add_child(glyph)
-		var word := _label(p[1], &"SatchelSmall")
-		word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(word)
-		_prompts.add_child(row)
+	_page.set_hints(pairs)
 
-
-func _label(text: String, variation: StringName) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
 
 
 # --- feedback ----------------------------------------------------------------

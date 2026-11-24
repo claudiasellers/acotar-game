@@ -55,12 +55,12 @@ deckled edge, tinted to a paper token. Made by
 
 | Variation | Base |
 |---|---|
-| SatchelCard, SatchelDetail, NotifyCard, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
+| SatchelCard, LoosePage, NotifyCard, SatchelChip, SatchelKey, QuickBarSlot, QuickBarSlotSelected | PanelContainer |
 | SatchelTab, MenuTab, SatchelSlot, BookTab, BookRibbon | Button (all states, including focus) |
 | SatchelHeading, MenuTitle, PageSection, SatchelBody, SatchelSmall, SatchelWhere, SatchelKeyLabel, SatchelCount, SatchelPin, QuickBarKey, QuickBarCount, NotifyText, ThoughtText | Label |
 | SatchelMeter | ProgressBar |
 
-`CheckBox` and `HSlider` are themed as base types (an inked box that fills, a
+`CheckBox`, `HSlider` and `LineEdit` (the easel's title line) are themed as base types (an inked box that fills, a
 brass rule with a knob), so a setting anywhere wears them with no variation.
 Their small pictures are drawn by `JournalTheme` when the theme is built.
 `JournalTheme.soft_dot(px)` is the white mote sparkles and beacons tint.

@@ -70,13 +70,13 @@ None in the sealed `autumn_foothills` or in `suriel_glade` (a dread place).
 - **Allowed** only when `StoryControl.mode == FULL` and the phase is not
   `p7_return_home` or `p8_the_pass` (`WhorlStones.can_travel()`).
 - **Ride:** `WhorlRide` (a CanvasLayer under the root) is one beat of about
-  2.3 s: it fades to the satchel paper (SatchelDetail), inks the whorl
+  2.3 s: it fades to the satchel paper (LoosePage), inks the whorl
   (`WhorlInk`), brings up the place's name in the satchel serif over the mare's
   canter, puts her 2.2 m south of the pair facing through it (physics held),
   streams the region in (`WorldStreamer.update_for`), waits for `is_ready` +
   0.4 s settled (≥ 1.3 s held, 45 s cap), then fades into the arrival.
 - **Look:** the card and the ride take everything from `JournalTheme`
-  (SatchelDetail paper with L65's framed edge, SatchelHeading/Small labels,
+  (LoosePage paper with L65's framed edge, SatchelHeading/Small labels,
   SatchelTab buttons, the theme's ink and accent): no StyleBoxFlat and no
   fonts of their own.
 - **Map:** `WhorlMapMarks` draws a spiral pictogram on the minimap and full

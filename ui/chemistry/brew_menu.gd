@@ -15,6 +15,8 @@ signal brewed(result: Dictionary)
 signal closed
 
 const WIDTH := 780.0
+## The green wash: leaves in the pot.
+const WASH := 2
 const ICON := 52.0
 const COLUMNS := 6
 ## The scene-tree name, kept from the M1 panel (tests and tools look for it).
@@ -36,8 +38,8 @@ var method: StringName = &""
 ## The last brew result (empty before the first brew).
 var last: Dictionary = {}
 
+var _page: LoosePage
 var _root: Control
-var _card: PanelContainer
 var _title: Label
 var _found: Label
 var _grid: GridContainer
@@ -74,7 +76,6 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	layer = UiLayers.SCREEN
 	_build()
 
 
@@ -92,7 +93,7 @@ func open(who: Feyre, at: CookingStation) -> void:
 	_root.visible = true
 	_refresh()
 	ScreenStack.push(self)
-	Juice.bounce_control(_card, 0.05)
+	_page.settle()
 
 
 func close() -> void:
@@ -176,56 +177,23 @@ func hunch() -> String:
 func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
-	if _key(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or _pad(event, JOY_BUTTON_Y):
+	if MenuTab.key_pressed(event, [KEY_E, KEY_ENTER, KEY_KP_ENTER]) or MenuTab.pad_pressed(event, JOY_BUTTON_Y):
 		brew()
 	else:
 		return
 	get_viewport().set_input_as_handled()
 
 
-func _pad(event: InputEvent, button: JoyButton) -> bool:
-	return event is InputEventJoypadButton and event.pressed and (event as InputEventJoypadButton).button_index == button
-
-
-func _key(event: InputEvent, keys: Array) -> bool:
-	return event is InputEventKey and event.pressed and not event.echo \
-			and (event as InputEventKey).physical_keycode in keys
-
-
 # --- build -------------------------------------------------------------------
 
 func _build() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_page = LoosePage.lay(self, WIDTH, WASH)
+	_root = _page.root
 	_root.visible = false
-	add_child(_root)
-	var scrim := ColorRect.new()
-	scrim.color = JournalTheme.color(&"scrim")
-	scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_root.add_child(scrim)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(center)
-	_card = PanelContainer.new()
-	_card.theme_type_variation = &"SatchelDetail"
-	_card.custom_minimum_size = Vector2(WIDTH, 0)
-	center.add_child(_card)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 12)
-	_card.add_child(col)
-
-	var head := HBoxContainer.new()
-	col.add_child(head)
-	_title = _label("", &"SatchelHeading")
-	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(_title)
-	var chip := PanelContainer.new()
-	chip.theme_type_variation = &"SatchelChip"
-	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(chip)
-	_found = _label("", &"SatchelCount")
-	chip.add_child(_found)
+	var col := _page.column
+	var head := _page.head()
+	_title = head[0]
+	_found = head[1]
 
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(0, (ICON + 22.0) * 3.0)
@@ -242,7 +210,7 @@ func _build() -> void:
 	var pot_row := HBoxContainer.new()
 	pot_row.add_theme_constant_override(&"separation", 12)
 	col.add_child(pot_row)
-	pot_row.add_child(_label("In the pot", &"SatchelSmall"))
+	pot_row.add_child(BookKit.label("In the pot", &"PageSection"))
 	_pot = HBoxContainer.new()
 	_pot.add_theme_constant_override(&"separation", 6)
 	_pot.custom_minimum_size = Vector2(0, ICON)
@@ -251,12 +219,10 @@ func _build() -> void:
 	_methods = HBoxContainer.new()
 	_methods.add_theme_constant_override(&"separation", 6)
 	col.add_child(_methods)
-	_hunch = _label("", &"SatchelBody")
+	_hunch = BookKit.label("", &"SatchelBody")
 	_hunch.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_hunch)
-	_brew = Button.new()
-	_brew.theme_type_variation = &"SatchelTab"
-	_brew.text = "Brew"
+	_brew = LoosePage.button("Brew")
 	_brew.custom_minimum_size = Vector2(0, 44)
 	_brew.pressed.connect(func() -> void: brew())
 	col.add_child(_brew)
@@ -277,30 +243,21 @@ func _build() -> void:
 	var reveal_text := VBoxContainer.new()
 	reveal_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	reveal_row.add_child(reveal_text)
-	reveal_text.add_child(_label("A new brew", &"SatchelSmall"))
-	_reveal_name = _label("", &"SatchelHeading")
+	reveal_text.add_child(BookKit.label("A new brew", &"SatchelSmall"))
+	_reveal_name = BookKit.label("", &"SatchelHeading")
 	reveal_text.add_child(_reveal_name)
-	_reveal_note = _label("", &"SatchelBody")
+	_reveal_note = BookKit.label("", &"SatchelBody")
 	_reveal_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	reveal_text.add_child(_reveal_note)
-	_outcome = _label("", &"SatchelBody")
+	_outcome = BookKit.label("", &"SatchelBody")
 	_outcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_outcome)
 
-	col.add_child(_label("Made", &"SatchelSmall"))
+	col.add_child(BookKit.label("Made", &"PageSection"))
 	_dishes = VBoxContainer.new()
 	_dishes.add_theme_constant_override(&"separation", 4)
 	col.add_child(_dishes)
-	var footer := HBoxContainer.new()
-	footer.alignment = BoxContainer.ALIGNMENT_CENTER
-	footer.add_theme_constant_override(&"separation", 22)
-	col.add_child(footer)
-	for p in [["E", "Brew"], ["Esc", "Step away"]]:
-		var glyph := PanelContainer.new()
-		glyph.theme_type_variation = &"SatchelKey"
-		glyph.add_child(_label(p[0], &"SatchelKeyLabel"))
-		footer.add_child(glyph)
-		footer.add_child(_label(p[1], &"SatchelSmall"))
+	_page.set_hints([["E", "Brew"], ["Esc", "Step away"]])
 
 
 func _refresh() -> void:
@@ -313,7 +270,7 @@ func _refresh() -> void:
 		c.queue_free()
 	var ids := _pantry()
 	if ids.is_empty():
-		_grid.add_child(_label("Nothing to brew with. Forage first.", &"SatchelSmall"))
+		_grid.add_child(BookKit.label("Nothing to brew with. Forage first.", &"SatchelSmall"))
 	for id in ids:
 		_grid.add_child(_tile(id))
 	for c in _pot.get_children():
@@ -323,7 +280,7 @@ func _refresh() -> void:
 		var pair := HBoxContainer.new()
 		pair.add_theme_constant_override(&"separation", 4)
 		pair.add_child(SatchelIcon.make({"id": id, "item": item}, ICON * 0.8))
-		var named := _label(item.display_name, &"SatchelSmall")
+		var named := BookKit.label(item.display_name, &"SatchelSmall")
 		named.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		pair.add_child(named)
 		_pot.add_child(pair)
@@ -377,7 +334,7 @@ func _tile(id: StringName) -> Button:
 	var icon := SatchelIcon.make({"id": id, "item": item}, ICON)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(icon)
-	var count := _label("×%d" % maxi(left, 0), &"SatchelCount")
+	var count := BookKit.label("×%d" % maxi(left, 0), &"SatchelCount")
 	count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(count)
 	return b
@@ -388,7 +345,7 @@ func _refresh_dishes() -> void:
 		c.queue_free()
 	var inv := Gameplay.inventory
 	if inv.dishes.is_empty():
-		_dishes.add_child(_label("Nothing yet.", &"SatchelSmall"))
+		_dishes.add_child(BookKit.label("Nothing yet.", &"SatchelSmall"))
 	for i in inv.dishes.size():
 		var d: Dictionary = inv.dishes[i]
 		var row := HBoxContainer.new()
@@ -401,7 +358,7 @@ func _refresh_dishes() -> void:
 			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			row.add_child(icon)
-		var title := _label(String(d.get("name", "Dish")), &"SatchelBody")
+		var title := BookKit.label(String(d.get("name", "Dish")), &"SatchelBody")
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(title)
 		row.add_child(_small_button("Eat" if StringName(d.get("kind", &"")) == &"food" else "Drink", eat.bind(i)))
@@ -479,11 +436,3 @@ func _small_button(text: String, action: Callable) -> Button:
 	b.text = text
 	b.pressed.connect(action)
 	return b
-
-
-func _label(text: String, variation: StringName) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.theme_type_variation = variation
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l

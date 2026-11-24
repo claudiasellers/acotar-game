@@ -178,7 +178,7 @@ func test_every_page_writes_on_the_books_sheets() -> void:
 func test_one_book_and_no_page_draws_its_own() -> void:
 	# The cover, the paper and the tabs are the shell's; a page that makes its
 	# own card or cover is a second book.
-	var bad := RegEx.create_from_string("\"SatchelDetail\"|JournalSpine|JournalTie|SatchelTable")
+	var bad := RegEx.create_from_string("\"LoosePage\"|JournalSpine|JournalTie|SatchelTable")
 	for path: String in PAGE_FILES:
 		if path.get_file() in ["menu_shell.gd", "menu_tab.gd", "book_kit.gd"]:
 			continue

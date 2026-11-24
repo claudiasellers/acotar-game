@@ -53,8 +53,7 @@ func _ready() -> void:
 	_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_veil.modulate.a = 0.0
 	add_child(_veil)
-	var paper := PanelContainer.new()
-	paper.theme_type_variation = &"SatchelDetail"
+	var paper := LoosePage.paper()
 	paper.set_anchors_preset(Control.PRESET_FULL_RECT)
 	paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_veil.add_child(paper)
