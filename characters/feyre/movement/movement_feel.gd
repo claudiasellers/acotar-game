@@ -10,6 +10,8 @@ extends Node
 
 ## Extra camera FOV (degrees) at full sprint speed.
 const SPRINT_FOV := 9.0
+## How fast the FOV closes on the bow's zoom (1/s): there in about 0.18 s.
+const BOW_FOV_RATE := 18.0
 ## Max lean (radians) into a turn, and forward lean at full acceleration.
 const MAX_ROLL := 0.20
 const MAX_PITCH := 0.05
@@ -66,7 +68,12 @@ func _process(delta: float) -> void:
 	var v := _feyre.velocity
 	var speed := Vector2(v.x, v.z).length()
 	var over_run := clampf((speed - _feyre.run_speed) / maxf(_feyre.sprint_speed - _feyre.run_speed, 0.01), 0.0, 1.0)
-	_feyre.camera.fov = lerpf(_feyre.camera.fov, _base_fov + SPRINT_FOV * over_run, 6.0 * delta)
+	# The one FOV owner: the sprint's widening plus the bow's narrowing. The
+	# bow's zoom runs on real time, so it arrives as fast inside the Focus hush.
+	var bow := _feyre.bow_controller
+	var bow_fov := bow.fov_offset() if bow else 0.0
+	var rate := BOW_FOV_RATE * delta / maxf(Engine.time_scale, 0.01) if bow_fov != 0.0 else 6.0 * delta
+	_feyre.camera.fov = lerpf(_feyre.camera.fov, _base_fov + SPRINT_FOV * over_run + bow_fov, minf(rate, 1.0))
 
 	var yaw := _feyre.model.rotation.y
 	var yaw_rate := wrapf(yaw - _last_yaw, -PI, PI) / delta
