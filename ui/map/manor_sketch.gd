@@ -1,7 +1,8 @@
 ## Draws Feyre's plan of the manor (ManorPlan) the way she would: wobbly
 ## hand-drawn walls, an X at each door, little circles for windows, hatching
 ## for stairs and a few pictures (her bed with a rose over it, a tub, books,
-## a pot). Pencil until she has drawn the hall map, ink after. No words.
+## a pot), and the five places she marked, bigger and in rose. Pencil until
+## she has drawn the hall map, ink after. No words.
 ## `to_screen` maps house XZ to the canvas; `ppm` is pixels per metre.
 extends RefCounted
 
@@ -31,6 +32,13 @@ static func draw_plan(ci: CanvasItem, plan: RefCounted, l: int, to_screen: Calla
 		_cross(ci, to_screen.call(d.at), clampf(ppm * 0.5, 3.0, 8.0), line, w)
 	for r in rooms:
 		_picture(ci, r, to_screen.call(r.rect.get_center()), clampf(ppm * 2.2, 9.0, 30.0), line, w, inked)
+	for m: Dictionary in plan.marks_on(l):
+		var at: Vector2 = to_screen.call(Vector2(float(m.get("x", 0.0)), float(m.get("z", 0.0))))
+		var s := clampf(ppm * 0.9, 5.0, 12.0)
+		if String(m.get("shape", "x")) == "o":
+			ci.draw_arc(at, s, 0.0, TAU, 20, ROSE, w * 1.5, true)
+		else:
+			_cross(ci, at, s, ROSE, w * 1.5)
 
 
 ## Walls: each side a slightly bent stroke that runs past the corners, once in

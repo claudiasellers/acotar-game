@@ -104,7 +104,7 @@ func _build_beats() -> Array:
 			raise("fact.hall_x_%d" % n)
 			if is_inside_tree():
 				Juice.burst(player(), &"craft")
-				HallMapPage.find_or_make(self).sketch_mark(n), "the mark"),
+				HallMap.note_on_map(self), "the mark"),
 		Beats.wait(1.2),
 		Beats.run(func(_s: SceneSpace) -> void:
 			StoryControl.release(), "back to the halls"),

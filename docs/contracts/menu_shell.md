@@ -10,7 +10,7 @@ There is one menu. Every page Feyre keeps is a tab of `MenuShell` (`ui/menu/menu
 | 1 | `wardrobe` | WardrobeTab | none (W from the satchel; the manor's wardrobe and vanity stations) | A / D turn her |
 | 2 | `collection` | CollectionTab | J (Back) | Z / X (LT / RT) the book's tabs |
 | 3 | `sketchbook` | StoryJournal | L | Enter / Space / F (A) think on it |
-| 4 | `map` | FullMap | M (RB) | Tab land / manor, R finds her, W / S floors, A pin, X lift |
+| 4 | `map` | FullMap | M (RB) | Tab land / manor, R finds her, W / S floors, A pin, X lift. News mark after `WorldMapHud.note_sketch()`; it then opens on the manor page |
 | 9 | `settings` | SettingsTab | Esc (Start), through `ScreenStack.pause_requested` | focus moves with the arrows / stick; Enter / A presses |
 
 The settings page is the pause: Esc in play opens the book on it, and it hangs from the book's ribbon (`MenuTab.on_ribbon`), not the index strip. Left sheet: Resume, Wriggle free, Return Home, Save & Title, Save & Quit, then sound, text size, movement keys and the minimap. Right sheet: camera, play, her HUD, Feyre's thoughts. Its controls are a `CheckBox`, an `HSlider`, a `SatchelTab` chip or a `MenuTab` button, all from the theme. The title screen adds the same page with `in_game = false`: one button (Back), no pause (`MenuTab.pauses`), and no other page in the book. The page also keeps the `ControlsHint` in HudLayout's CONTROLS zone.

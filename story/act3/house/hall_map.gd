@@ -1,7 +1,8 @@
 ## Feyre's map of the halls (ch12, L28): from the morning Alis trips her rope
 ## (plan.start_flag; owner 2026-11-11), beside every other beat, each
-## room she walks into is inked onto her page (HallMapPage), with a little
-## picture instead of a name, since she can't write. From the four tower tops
+## room she walks into counts toward her page: the plan of the house in the
+## journal's Map tab and on the minimap (ManorPlan, drawn by ManorSketch),
+## pictures and marks and no names, since she can't write. From the four tower tops
 ## she sketches what she sees from the windows onto the world map
 ## (WorldMapHud.reveal_place). Hung on the hall_mark_1 anchor by Act3Anchors;
 ## the house is the anchor's parent (ManorHouseBuilder puts the anchors there),
@@ -87,7 +88,7 @@ func check_at(local: Vector3) -> StringName:
 	WorldState.set_flag(room_fact(room))
 	room_sketched.emit(id)
 	if is_inside_tree():
-		HallMapPage.find_or_make(self).sketch_room(id)
+		note_on_map(self)
 		if first and plan.first_thought != "":
 			Act2Caption.find_or_make(self).say("", plan.first_thought)
 	if sketched_count() >= plan.min_rooms and not WorldState.has_flag(ENOUGH_FACT):
@@ -109,7 +110,6 @@ func _sketch_view(id: StringName) -> void:
 	view_sketched.emit(id, drawn)
 	if is_inside_tree() and not drawn.is_empty():
 		Juice.burst(get_tree().get_first_node_in_group(&"player"), &"unlock")
-		HallMapPage.find_or_make(self).sketch_view(id)
 
 
 func sketched_count() -> int:
@@ -176,6 +176,13 @@ static func guess_pictogram(id: String) -> String:
 		if id.contains(String(pair[0])):
 			return String(pair[1])
 	return ""
+
+
+## Her quill on the plan of the house: a scratch, and news on the Map tab.
+static func note_on_map(from: Node) -> void:
+	for node in from.get_tree().get_nodes_in_group(MapSettings.GROUP):
+		if node is WorldMapHud:
+			(node as WorldMapHud).note_sketch()
 
 
 func _reveal_on_map(place_id: StringName) -> bool:

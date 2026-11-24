@@ -67,11 +67,17 @@ func map_rect() -> ColorRect:
 	return _map
 
 
+func has_news() -> bool:
+	return hud.plan_news
+
+
 func _shown() -> void:
 	view_center = hud.player_xz
 	view_width = ZOOM_OPEN
 	manor_level = hud.manor.level
-	show_manor(hud.manor.inside)
+	# Fresh ink on her plan of the house: the book opens on it.
+	show_manor(hud.manor.inside or hud.plan_news)
+	hud.plan_news = false
 	_stats.text = hud.stats_line()
 	Juice.bounce_control(_page, 0.02)
 
