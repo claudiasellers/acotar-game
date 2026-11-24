@@ -200,7 +200,7 @@ func test_whistle_does_not_bring_the_mare_south_of_the_wall() -> void:
 	var on_whistle := func(ok: bool) -> void: answers.append(ok)
 	md.whistled.connect(on_whistle)
 	await h.press(&"call_mount")
-	await wait_process_frames(30)
+	await wait_physics_frames(30)
 	md.whistled.disconnect(on_whistle)
 	assert_eq(answers, [false] as Array[bool], "H whistles, and nobody answers in the human lands")
 	assert_true(md.mare == null or not is_instance_valid(md.mare), "no mare appears")
