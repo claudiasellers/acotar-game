@@ -1,5 +1,6 @@
 ## Contract test for the menu shell (docs/contracts/menu_shell.md): one shell
-## owns pausing and the keys every page shares; each page keeps its own key.
+## owns the keys every page shares; each page keeps its own key. The shell is
+## one screen on ScreenStack, which pauses and answers Esc for it.
 extends GutTest
 
 const PAGE_FILES := [
@@ -106,7 +107,7 @@ func test_page_keys_step_and_wrap_and_escape_closes() -> void:
 	shell._input(_key(KEY_Q))
 	shell._input(_key(KEY_Q))
 	assert_same(shell.current, shown[posmod(i - 1, shown.size())], "Q steps back and wraps")
-	shell._input(_action(&"ui_cancel"))
+	ScreenStack._unhandled_input(_action(&"ui_cancel"))
 	assert_false(shell.is_open())
 	assert_false(get_tree().paused)
 
@@ -153,10 +154,8 @@ func test_pages_wear_one_look() -> void:
 		assert_eq(hits, [], "%s styles itself outside SatchelTheme" % path)
 
 
-func test_only_the_shell_pauses() -> void:
+func test_neither_the_shell_nor_a_page_pauses_for_itself() -> void:
 	for path: String in PAGE_FILES:
-		if path.begins_with("res://ui/menu/menu_"):
-			continue
 		var src := FileAccess.get_file_as_string(path)
 		assert_false(src.contains("paused ="), "%s sets pause itself" % path)
 		assert_false(src.contains("mouse_mode ="), "%s sets the mouse itself" % path)

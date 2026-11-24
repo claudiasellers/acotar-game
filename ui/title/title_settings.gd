@@ -8,6 +8,13 @@ extends SettingsPanel
 signal closed
 
 
+func _init() -> void:
+	# The Wall keeps drifting behind the panel, and Esc on the bare title
+	# opens nothing.
+	_screen_flags = ScreenStack.Flag.MOUSE
+	_opens_on_pause = false
+
+
 func _ready() -> void:
 	super._ready()
 	var col := _resume.get_parent().get_parent() as VBoxContainer
@@ -25,20 +32,7 @@ func _ready() -> void:
 	_resume.text = "Back"
 
 
-func open() -> void:
-	super.open()
-	# Keep the Wall drifting behind the panel.
-	get_tree().paused = false
-
-
 func close() -> void:
 	_menu.visible = false
-	get_tree().paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.pop(self)
 	closed.emit()
-
-
-func _input(event: InputEvent) -> void:
-	if is_open() and (event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel")):
-		close()
-		get_viewport().set_input_as_handled()

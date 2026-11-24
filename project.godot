@@ -23,6 +23,7 @@ WorldStreamer="*res://core/streaming/world_streamer.gd"
 StoryControl="*res://core/story_control.gd"
 StoryDirector="*res://story/story_director.gd"
 InputSettings="*res://core/input_settings.gd"
+ScreenStack="*res://ui/frame/screen_stack.gd"
 GameSettings="*res://systems/settings/game_settings.gd"
 
 [display]

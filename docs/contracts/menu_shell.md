@@ -12,17 +12,17 @@ There is one menu. Every page Feyre keeps is a tab of `MenuShell` (`ui/menu/menu
 | 3 | `sketchbook` | StoryJournal | L | Enter / Space / F (A) think on it |
 | 4 | `map` | FullMap | M (RB) | Tab land / manor, R finds her, W / S floors, A pin, X lift |
 
-The pause menu (Esc, `SettingsPanel`) stays its own system screen. Its Map and Journal buttons open the shell.
+The pause menu (Esc, `SettingsPanel`) stays its own system screen. Its Map and Journal buttons open the shell. The shell and the pause menu are both screens on `ScreenStack` (`docs/contracts/ui-frame.md`).
 
 ## Shell rules
 
-1. **Keys.** A page's key opens the shell on that page during play. Inside the shell, that key jumps to its page, and pressing it again closes the shell. **Q / E (LB / RB)** move to the previous or next page and wrap round. **Esc (B)** closes. A page's own `_page_input` runs before the shared keys, so a page can claim a key it needs. The page keys come before the shortcuts, so RB inside the shell means "next", not "map".
+1. **Keys.** A page's key opens the shell on that page during play. Inside the shell, that key jumps to its page, and pressing it again closes the shell. **Q / E (LB / RB)** move to the previous or next page and wrap round. **Esc (B)** closes: `ScreenStack` hears it and calls the shell's `screen_cancel()`; the shell and its pages never read Esc. A page's own `_page_input` runs before the shared keys, so a page can claim a key it needs. The page keys come before the shortcuts, so RB inside the shell means "next", not "map".
 2. **When it can open.** Shortcuts open the shell only while the game is unpaused and `StoryControl` is FULL. A page with `opens_in_story` (the sketchbook and the collection) also opens during story scenes.
-3. **Only the shell** sets `get_tree().paused`, sets `Input.mouse_mode`, hides the ControlsHint and draws the strip. Pages never do (this is tested).
+3. **Pause and mouse** belong to `ScreenStack`: the shell pushes itself when it opens and pops when it closes. Neither the shell nor a page sets `get_tree().paused` or `Input.mouse_mode` (this is tested). Only the shell hides the ControlsHint and draws the strip.
 4. **Built once.** Pages build in `_ready` and are only shown and hidden after that. `_shown()` refreshes and `_hidden()` lets go of anything that has to go back, such as the wardrobe returning her camera and pose. `open()`, `close()` and `is_open()` stay on every page and route through the shell.
 5. **Warm-up.** While the shell is closed, it runs each page's `warm_jobs()` within 4 ms per frame. It then draws each page once at alpha 0.01 (`warm_render(on)` lets a page show what's normally hidden) so shaders and textures are ready. A page re-asks with `queue_warm(self)`, for example when a new item lands in the satchel.
-6. **Node structure, for the theme and borders.** `MenuShell` (CanvasLayer 24) contains `ShellRoot` (Control, `SatchelTheme.theme()`), which contains `TabStrip` (PanelContainer, `SatchelDetail`, which carries L65's frame), which contains `Tabs` (HBox: a `SatchelKey` glyph, then `Tab_<id>` buttons with `SatchelTab` each holding a `NewsDot`, then a `SatchelKey` glyph). There is also a `Backdrop` (CanvasLayer 17, which dims the world in the palette's ink). Full-screen pages start below `MenuShell.PAGE_TOP` (140 px).
-7. **Adding a page.** Extend `MenuTab`, set `tab_id`, `tab_title`, `tab_order`, `shortcut` and `layer` in `_init`, and add it to the scene. It registers itself.
+6. **Node structure, for the theme and borders.** `MenuShell` (CanvasLayer `UiLayers.SCREEN` + its depth on the stack; every page is on `UiLayers.PAGE`, under the strip) contains `ShellRoot` (Control, `SatchelTheme.theme()`), which contains `TabStrip` (PanelContainer, `SatchelDetail`, which carries L65's frame), which contains `Tabs` (HBox: a `SatchelKey` glyph, then `Tab_<id>` buttons with `SatchelTab` each holding a `NewsDot`, then a `SatchelKey` glyph). There is also a `Backdrop` (CanvasLayer `UiLayers.BACKDROP`, which dims the world in the palette's ink). Full-screen pages start below `MenuShell.PAGE_TOP` (140 px).
+7. **Adding a page.** Extend `MenuTab`, set `tab_id`, `tab_title`, `tab_order` and `shortcut` in `_init`, and add it to the scene. It registers itself.
 
 ## One look (L66-2)
 
@@ -31,7 +31,7 @@ Every page lays out below `MenuTab.page_top()` (the strip's space), so the strip
 ## Done when (L66, measured)
 
 1. One shell holds all five pages, and each page keeps its key (I, J, L, M). Q/E and LB/RB step between pages, and Esc closes. Status: met, `tests/unit/ui/test_menu_shell.gd` 8/8.
-2. No page file sets the pause or the mouse. Status: met (tested).
+2. No page file and no shell file sets the pause or the mouse. Status: met (tested).
 3. **Open time:** every open after warm-up costs ≤ 35 ms of CPU (cloud), and the worst frame after opening is within one steady frame of that page (hitch ≤ one frame), measured with `tools/ui/menu_open_probe.tscn` on lavapipe. Status: met (see below).
 4. The satchel, journal, pause, manor map, dressing room and wearables tests pass, and act1_game loads headless for 900 frames with 0 errors. Status: met.
 

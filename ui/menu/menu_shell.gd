@@ -6,11 +6,12 @@
 ## Keys, the same on every page:
 ##   I / Tab, J, L, M (pad: LB tap, Back, RB)  open on that page / jump / close
 ##   Q / E (pad LB / RB)                        previous / next page
-##   Esc (pad B)                                close
+##   Esc (pad B)                                close (through ScreenStack)
 ## Pages keep their own keys inside (MenuTab._page_input runs before these).
 ##
-## The shell owns what every page used to do for itself: pausing the game,
-## showing the mouse, hiding the controls hint, the tab strip. Pages are built
+## The shell is one screen on ScreenStack, which pauses the game, shows the
+## mouse and answers Esc for it. The shell owns what every page shares:
+## hiding the controls hint, the tab strip. Pages are built
 ## once and only shown and hidden, and their slow first-time work (icons,
 ## models, shader first draws) runs a slice per frame while the shell is
 ## closed, so opening any page costs no frame hitch.
@@ -25,8 +26,6 @@ signal shell_opened
 signal shell_closed
 
 const GROUP := &"menu_shell"
-## Above every page (map 18, satchel and sketchbook 19, wardrobe 20).
-const LAYER := 24
 ## Previous / next page, as in Dreamlight Valley (ui-direction/dreamlight-reference.md).
 const STEP_KEYS: Array[Array] = [[KEY_Q], [KEY_E]]
 const STEP_PAD: Array[JoyButton] = [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER]
@@ -38,8 +37,7 @@ const WARM_FRAMES := 2
 ## The strip's top edge, and where full-screen pages start below it.
 const STRIP_TOP := 14.0
 const PAGE_TOP := 140.0
-## Under every page (the map is 18): the world dims behind the open shell.
-const BACKDROP_LAYER := 17
+## The world dims behind the open shell.
 const BACKDROP_ALPHA := 0.4
 
 var tabs: Array[MenuTab] = []
@@ -93,7 +91,7 @@ static func is_shell_open(tree: SceneTree) -> bool:
 
 func _init() -> void:
 	name = "MenuShell"
-	layer = LAYER
+	layer = UiLayers.SCREEN
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
@@ -184,9 +182,18 @@ func close() -> void:
 	if _root:
 		_root.visible = false
 		_backdrop.visible = false
-	_tree.paused = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	ScreenStack.pop(self)
 	shell_closed.emit()
+
+
+## Esc or B while the shell is the top screen.
+func screen_cancel() -> void:
+	close()
+
+
+## The pages take their own keys; no control holds focus in the shell.
+func screen_focus() -> void:
+	pass
 
 
 ## Next (+1) or previous (-1) page on the strip, wrapping round.
@@ -199,8 +206,7 @@ func step(direction: int) -> void:
 
 
 func _open_shell() -> void:
-	_tree.paused = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	ScreenStack.push(self)
 	for n in _tree.root.find_children("*", "ControlsHint", true, false):
 		(n as ControlsHint).hide_now()
 	if _root:
@@ -219,9 +225,7 @@ func _input(event: InputEvent) -> void:
 	if current == null:
 		_input_closed(event)
 		return
-	if event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel"):
-		close()
-	elif not current.shell_input(event):
+	if not current.shell_input(event):
 		# The page keys come before the shortcuts: RB is both "next" and the map's key.
 		var direction := _step_of(event)
 		var tab := _shortcut_tab(event) if direction == 0 else null
@@ -322,7 +326,7 @@ func _build() -> void:
 	add_child(_root)
 	_backdrop = CanvasLayer.new()
 	_backdrop.name = "Backdrop"
-	_backdrop.layer = BACKDROP_LAYER
+	_backdrop.layer = UiLayers.BACKDROP
 	add_child(_backdrop)
 	var dim := ColorRect.new()
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
