@@ -206,6 +206,7 @@ func _collect_arrow(node: Node) -> bool:
 	var item := _arrow_item(node)
 	if Gameplay.inventory.add(item, 1) == 0:
 		return false
+	SoundDirector.cue(&"arrow_retrieve", (node as Node3D).global_position if node is Node3D else Vector3.INF)
 	node.remove_from_group(Arrow.STUCK_GROUP)
 	node.queue_free()
 	feyre.quiver_changed.emit(Gameplay.inventory.arrow_count())

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GuideThread" format=3]
+
+[ext_resource type="Script" path="res://ui/guide/guide_thread.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"onboarding_rabbit_gone"
+icon = &"trail"
+lines = PackedStringArray("Gone. Get the arrow back. Two plain ones, and the one I can't spend.")
+voice_ids = PackedStringArray("O_hare_gone")
+canon = "A"

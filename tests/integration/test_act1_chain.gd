@@ -32,6 +32,11 @@ func _run(space: SceneSpace, seconds: float) -> void:
 		t += STEP
 
 
+func _empty_quiver() -> void:
+	for id: StringName in Gameplay.inventory.contents(Inventory.QUIVER):
+		Gameplay.inventory.remove(id, Gameplay.inventory.count(id))
+
+
 func before_each() -> void:
 	WorldState.clear()
 	WorldDeltas.clear()
@@ -63,6 +68,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	_empty_quiver()
 	EventBus.grade_swap_requested.disconnect(_on_grade)
 	EventBus.story_actor_cue.disconnect(_on_cue)
 	StoryControl.release()
@@ -90,9 +96,13 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(PhaseManager.current_phase, &"p0_winter")
 
 	# The wolf (ch1): wood alone never kills him; ash in the side, then the eye.
+	# She walks in with the chapter's own three arrows; the hunt grants none.
+	_empty_quiver()
+	Feyre.QUIVER_LOADOUTS.fill(Gameplay.inventory, PhaseManager.current_phase)
+	assert_eq(Gameplay.inventory.count(&"arrow_ash"), 1, "the ash is in her ch1 quiver")
+	assert_eq(Gameplay.inventory.count(&"arrow_wood"), 2, "with two plain arrows")
 	watch_signals(EventBus)
 	assert_true(wolf.start())
-	assert_signal_emitted_with_parameters(EventBus, "story_item_granted", [&"arrow_ash", 1])
 	# Her eye rests on the doe first (doe_look_seconds), then golden eyes.
 	_run(wolf, wolf.doe_look_seconds + 2.5)
 	assert_not_null(wolf.wolf, "a wolf (stand-in) is in the clearing")
@@ -104,6 +114,14 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	EventBus.creature_hit.emit(&"andras", &"great_wolf", &"arrow_ash", &"side")
 	_run(wolf, 1.0)
 	assert_true(cues.has([&"great_wolf", &"look_at_feyre"]))
+	assert_signal_not_emitted(EventBus, "story_item_granted", "nothing is given while she has what she needs")
+	# Out of arrows, with none lying where she could fetch one: one plain arrow comes back.
+	_empty_quiver()
+	wolf._keep_an_arrow(wolf.ash_regrant_seconds - 0.5)
+	assert_signal_not_emitted(EventBus, "story_item_granted", "not before she has gone without for a while")
+	wolf._keep_an_arrow(1.0)
+	assert_signal_emitted_with_parameters(EventBus, "story_item_granted", [&"arrow_wood", 1])
+	assert_signal_emit_count(EventBus, "story_item_granted", 1, "one arrow, once")
 	EventBus.creature_killed.emit(&"andras", &"great_wolf", &"arrow_wood", Vector3.ZERO)
 	_run(wolf, 6.0)
 	assert_true(WorldState.has_flag("wolf_killed"))
