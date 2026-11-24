@@ -36,7 +36,7 @@ func test_without_blooms_the_page_says_so() -> void:
 	var crowns := _crowns(view)
 	assert_not_null(crowns, "the Crowns page is there before she owns one")
 	assert_true((crowns.find_child("WeaveChip", true, false) as Button).disabled)
-	assert_eq((crowns.find_child("WeaveLine", true, false) as Label).text, "Not enough flowers for a crown.")
+	assert_eq((crowns.find_child("WeaveLine", true, false) as Label).text, DressingRoomView.WEAVE_NEEDS)
 	assert_eq(view.weave_crown(), &"")
 
 

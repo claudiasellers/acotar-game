@@ -47,6 +47,9 @@ const CLOSE_UPS := {"Hair": 1.0, "Makeup": 1.0, "Crowns": 0.7, "Jewellery": 0.55
 const SATCHEL_TABS: Array[String] = [StatusPage.TAB, "Cloaks", "Crowns", "Jewellery", "Masks", "Hair"]
 ## The tab she weaves a flower crown on.
 const WEAVE_TAB := "Crowns"
+## Said beside the chip while she lacks the blooms: what a crown takes, never
+## what is left to find (R2).
+const WEAVE_NEEDS := "A crown takes five blooms, three of one colour."
 const COLUMNS := 3
 const THUMB := 104.0
 const SWATCH := 30.0
@@ -468,7 +471,7 @@ func _weave_row() -> Control:
 	chip.disabled = not can
 	chip.pressed.connect(weave_crown)
 	row.add_child(chip)
-	var line := _label("" if can else "Not enough flowers for a crown.", &"SatchelSmall")
+	var line := _label("" if can else WEAVE_NEEDS, &"SatchelSmall")
 	line.name = "WeaveLine"
 	row.add_child(line)
 	return row
