@@ -25,6 +25,7 @@ Owner: creatures lane (`creatures/`, `data/creatures/`, `tools/blender/creatures
 
 ## API
 - `CreatureSenses.emit_noise(tree, pos, loudness)`: loudness 1.0 carries full hearing range.
+- The arrow passed to `on_arrow_hit` / `on_arrow_effect` carries meta `impact` (Vector3, global, where it really struck), `impact_normal`, `direction` (unit flight direction at the hit), `speed` (m/s off the bow) and `bow_id` (the BowData id); its type is the `arrow_id` property (`Arrow.launch`).
 - `Creature.on_arrow_hit(arrow)`, `Creature.die(cause)`, signals `wounded(cause)`, `died(cause)`. `scripted = true` pauses the brain.
 - `Harvestable.harvest() -> Array[{item_id: StringName, qty: int}]` (once), `Harvestable.nearest(tree, pos, reach)`.
 - `TrackLayer.leave(tree, kind, pos, heading, size, owner_id)`; `marks_near(pos, radius)`; `head_of(owner_id, blood)`. Fresh trail only: a walker's newest 24 prints (40 boots, 40 blood) are crisp, older ones fade over 8 s (`HEAD`, `FADE_S`). Feyre's boots are kind `boot`, stamped by the layer.
