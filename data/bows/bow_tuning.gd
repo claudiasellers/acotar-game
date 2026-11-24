@@ -55,6 +55,18 @@ extends Resource
 ## The ring is this much larger while the aim is fully unsettled.
 @export var ring_unsettled_grow: float = 0.3
 
+@export_group("Feedback")
+## The share of her draw she keeps when a blow lands on her.
+@export var draw_kept_when_hit: float = 0.5
+## The ring's draw arc: how far outside the ring it sits (px) and how long the
+## catch at full draw and the pulse on a creature hit last (real seconds).
+@export var draw_arc_gap: float = 5.0
+@export var full_draw_catch_s: float = 0.18
+@export var hit_pulse_s: float = 0.22
+## The Focus hush on the Ambience bus (dB), and how fast it comes and goes.
+@export var hush_duck_db: float = -12.0
+@export var hush_fade_s: float = 0.12
+
 @export_group("Camera")
 ## Mouse and stick look speed while the bow is raised.
 @export var aim_sensitivity: float = 0.7

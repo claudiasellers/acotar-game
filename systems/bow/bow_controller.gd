@@ -22,6 +22,13 @@ signal arrow_type_changed(arrow_item_id: StringName)
 signal bow_changed(bow: BowData)
 ## Released too early: the string came down and nothing flew.
 signal let_down
+## An arrow has seated on the string: on the raise, and again after each
+## shot's follow-through. The id is the arrow item on the string.
+signal nocked(arrow_item_id: StringName)
+## The draw has just reached the anchor: letting go now looses.
+signal full_draw
+## She reached for an arrow with the bow raised and the quiver empty.
+signal quiver_empty
 signal focus_changed(focused: bool)
 
 const ARROW_DIR := "res://data/arrows"
@@ -70,6 +77,9 @@ var _held_full: float = 0.0
 var _recover: float = 0.0
 ## Released inside the buffer: looses the moment the draw is full.
 var _loose_pending: bool = false
+## An arrow is seated on the string; fire was held last tick.
+var _seated: bool = false
+var _fire_was_held: bool = false
 ## Real seconds Focus holds after a Focused release.
 var _focus_linger: float = 0.0
 ## Focus ended (a shot, a hit, no breath) with its key still down: it needs a
@@ -136,6 +146,7 @@ func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool 
 	is_nocked = is_aiming and _available() != &""
 	if not is_nocked:
 		_loose_pending = false
+	_note_string(fire_held)
 	var arrow: Arrow = null
 	if not is_nocked or _recover > 0.0:
 		# Lowered, empty, or still in the follow-through: nothing on the draw.
@@ -144,7 +155,10 @@ func update_bow(delta: float, aim_held: bool, fire_held: bool, focus_held: bool 
 		_held_full = 0.0
 	elif fire_held and not _loose_pending:
 		is_drawing = true
+		var before := draw_amount
 		draw_amount = minf(draw_amount + real / maxf(bow.draw_time, 0.001), 1.0)
+		if draw_amount >= 1.0 and before < 1.0:
+			full_draw.emit()
 	elif is_drawing:
 		# She has let go of the string.
 		if _loose_pending:
@@ -186,6 +200,18 @@ func _loose() -> Arrow:
 	if feyre.camera_control:
 		feyre.camera_control.kick(bow.kick_degrees, tuning.kick_rise_s, tuning.kick_fall_s)
 	return arrow
+
+
+## What the string tells whoever listens (sound, the reticle): an arrow
+## seating, and her hand finding the quiver empty.
+func _note_string(fire_held: bool) -> void:
+	var seated := is_nocked and _recover <= 0.0
+	if seated and not _seated:
+		nocked.emit(_available())
+	_seated = seated
+	if is_aiming and not is_nocked and fire_held and not _fire_was_held:
+		quiver_empty.emit()
+	_fire_was_held = fire_held
 
 
 func _let_down() -> void:
@@ -239,8 +265,10 @@ func _update_focus(real: float, focus_held: bool) -> void:
 		focus_changed.emit(is_focused)
 
 
-## A blow breaks her Focus.
+## A blow breaks her Focus and costs her half the draw (bow design §5.6).
 func _on_player_hit(_source: StringName, _attack: StringName, _scale: float, _origin: Vector3) -> void:
+	draw_amount *= tuning.draw_kept_when_hit
+	_held_full = 0.0
 	_focus_linger = 0.0
 	if is_focused:
 		_focus_used = true
@@ -263,6 +291,14 @@ func unsettled() -> float:
 	return inverse_lerp(tuning.settle_floor, 1.0, _settle) if is_nocked else 1.0
 
 
+## How tired her draw arm is from holding at full draw: 0 until
+## fatigue_after_s, then rising to 1 at the sway's fatigue_max.
+func fatigue() -> float:
+	if _held_full <= tuning.fatigue_after_s or tuning.fatigue_max <= 1.0:
+		return 0.0
+	return minf((_held_full - tuning.fatigue_after_s) * tuning.fatigue_rate / (tuning.fatigue_max - 1.0), 1.0)
+
+
 ## Degrees of aim sway right now (design doc §5.2).
 func sway_degrees() -> float:
 	if not is_nocked:
@@ -270,9 +306,7 @@ func sway_degrees() -> float:
 	var body := feyre.body_state
 	var body_mult := body.sway_multiplier() if body else 1.0
 	var tremor := body.tremor_degrees() if body else 0.0
-	var fatigue := 1.0
-	if _held_full > tuning.fatigue_after_s:
-		fatigue = minf(1.0 + (_held_full - tuning.fatigue_after_s) * tuning.fatigue_rate, tuning.fatigue_max)
+	var tired := 1.0 + fatigue() * (tuning.fatigue_max - 1.0)
 	var crouched := feyre.crouch != null and feyre.crouch.crouched
 	var stance := tuning.stance_still
 	if _moving():
@@ -288,7 +322,7 @@ func sway_degrees() -> float:
 	var focus := 1.0
 	if is_focused:
 		focus = tuning.focus_sway_panic if _dread() > tuning.panic_dread else tuning.focus_sway
-	return bow.sway_degrees * _settle * fatigue * stance * breath * focus * body_mult + tremor
+	return bow.sway_degrees * _settle * tired * stance * breath * focus * body_mult + tremor
 
 
 ## Turns `v` by the current sway.

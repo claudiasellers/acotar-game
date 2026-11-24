@@ -26,7 +26,7 @@ func test_feyre_has_her_components_and_arrows() -> void:
 	assert_not_null(feyre.bow_controller)
 	assert_not_null(feyre.body_state)
 	assert_not_null(feyre.element_state)
-	assert_eq(feyre.quiver, feyre.starting_arrows)
+	assert_eq(feyre.quiver, 12, "a test hill has no phase row: the plain dozen")
 	assert_eq(Gameplay.wardrobe.equipped_in(&"top"), &"hunter_tunic")
 
 

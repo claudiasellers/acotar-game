@@ -24,9 +24,9 @@ extends SceneSpace
 ## terrain's 64 m collision ring round her: farther out, the doe and the wolf
 ## would drop through ground that has no collision yet.
 @export var start_radius: float = 58.0
-## Seconds with no ash arrow in her quiver or in the world (it broke on stone
-## or fell through the ground) before one is quietly given back, so wolf_killed
-## can always rise.
+## Seconds with the arrow she needs neither in her quiver nor in the world (it
+## broke on stone or fell through the ground) before one is quietly given back,
+## so wolf_killed can always rise.
 @export var ash_regrant_seconds: float = 4.0
 ## Seconds the camera rests on the doe before the eyes in the brush.
 @export var doe_look_seconds: float = 6.5
@@ -43,7 +43,7 @@ var doe: Node3D
 var wolf: Node3D
 var ash_struck: bool = false
 var wolf_dead: bool = false
-var _ash_gone_for: float = 0.0
+var _arrow_gone_for: float = 0.0
 var _creep_left: float = 0.0
 var _doe_shot: bool = false
 
@@ -105,8 +105,9 @@ func _build_beats() -> Array:
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
+	if running and not wolf_dead:
+		_keep_an_arrow(delta)
 	if running and not ash_struck and not wolf_dead:
-		_keep_an_ash_arrow(delta)
 		_creep_left -= delta
 		_keep_the_doe_calm()
 	if running:
@@ -120,7 +121,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _spawn_doe(_space: SceneSpace) -> void:
-	EventBus.story_item_granted.emit(&"arrow_ash", 1)
 	EventBus.weather_requested.emit(&"snow_heavy", 0.0)
 	doe = request_actor(&"doe", _at(doe_offset), StandIns.doe)
 	if doe is Creature and (doe as Creature).leash:
@@ -206,19 +206,30 @@ func _keep_on_the_ground(body: Node3D) -> void:
 		(body as CharacterBody3D).velocity = Vector3(v.x, maxf(v.y, 0.0), v.z)
 
 
-func _keep_an_ash_arrow(delta: float) -> void:
-	if Gameplay.inventory.count(&"arrow_ash") > 0 or _ash_in_world():
-		_ash_gone_for = 0.0
+## She carries three arrows (ch1): two plain and the ash. Until the ash has
+## struck him she must have the ash; after it, any arrow for his eye. If the
+## one she needs is neither in her quiver nor lying where she can fetch it
+## (it broke on stone, or fell through the ground) for ash_regrant_seconds,
+## one is quietly given back, so wolf_killed can always rise.
+func _keep_an_arrow(delta: float) -> void:
+	var need := &"arrow_wood" if ash_struck else &"arrow_ash"
+	var has := Gameplay.inventory.arrow_count() > 0 if ash_struck else Gameplay.inventory.count(need) > 0
+	if has or _in_world(&"" if ash_struck else &"ash"):
+		_arrow_gone_for = 0.0
 		return
-	_ash_gone_for += delta
-	if _ash_gone_for >= ash_regrant_seconds:
-		_ash_gone_for = 0.0
-		EventBus.story_item_granted.emit(&"arrow_ash", 1)
+	_arrow_gone_for += delta
+	if _arrow_gone_for >= ash_regrant_seconds:
+		_arrow_gone_for = 0.0
+		EventBus.story_item_granted.emit(need, 1)
 
 
-func _ash_in_world() -> bool:
+## An arrow of type `id` (any type for &"") is stuck somewhere she can pull
+## it from. One in the wolf himself doesn't count: he is still standing.
+func _in_world(id: StringName) -> bool:
 	for arrow in get_tree().get_nodes_in_group(Arrow.STUCK_GROUP):
-		if StringName(arrow.get_meta(&"arrow_id", &"")) == &"ash":
+		if is_instance_valid(wolf) and wolf.is_ancestor_of(arrow):
+			continue
+		if id == &"" or StringName(arrow.get_meta(&"arrow_id", &"")) == id:
 			return true
 	return false
 

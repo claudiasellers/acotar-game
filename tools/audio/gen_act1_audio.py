@@ -1029,6 +1029,10 @@ import cutscenes  # noqa: E402  (L33's three cutscene scores)
 
 SOUNDS.update(cutscenes.SOUNDS)
 CUES.update(cutscenes.CUES)
+import bow_feel  # noqa: E402  (the bow's feel sounds, bow design §5.8)
+
+SOUNDS.update(bow_feel.SOUNDS)
+CUES.update(bow_feel.CUES)
 
 SPRING = ["border_woods", "manor_estate", "eastern_woods", "suriel_glade", "blossom_vale", "rosewild",
           "solstice_meadow", "starlight_glen", "western_fells", "autumn_foothills", "hill_of_the_rite",
