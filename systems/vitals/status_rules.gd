@@ -25,24 +25,24 @@ const DEBUFFS: Array[StringName] = [&"venom", &"drowsy", &"roar_shake"]
 ## tag -> [name, what it does], in Feyre's own voice: the words the HUD
 ## teaches and the Wardrobe's "How I am" page shows. Every tag in ORDER has a line.
 const INFO := {
-	&"cold": ["Cold", "How cold I am. Cold shakes my aim and slows my breath coming back; deep cold costs me health. A fire or a warm brew helps."],
-	&"hunger": ["Hunger", "How hungry I am. Hunger slows my breath coming back, and at home it keeps my hurts from healing far. Bread would help."],
-	&"venom": ["Venom", "Poison, creeping. My hurts won't heal while it's in me, and once it's strong it drains me. A salve or a night in a bed draws it out."],
+	&"cold": ["Cold", "How cold I am. Cold shakes my aim and slows my stamina; deep cold costs me health. A fire or a warm brew helps."],
+	&"hunger": ["Hunger", "How hungry I am. Hunger slows my stamina, and at home it keeps my health from mending far. Bread would help."],
+	&"venom": ["Venom", "Poison, creeping. My health won't mend while it's in me, and once it's strong it drains me. A salve or a night in a bed draws it out."],
 	&"drowsy": ["Drowsy", "My eyelids are heavy and my aim sways. It passes on its own; a keen brew clears it."],
 	&"roar_shake": ["Roar shake", "That roar went through me. My aim sways until it passes."],
 	&"giddy": ["Giddy", "Fae food went to my head. My aim wanders until it wears off."],
-	&"heal": ["Healing", "Food is mending me over a few breaths, further than I'd heal on my own."],
+	&"heal": ["Healing", "Food is mending me over a few breaths, further than I'd mend on my own."],
 	&"steady": ["Steady", "My bow hand is steadier, and the fear sits lighter."],
-	&"swift": ["Swift", "My breath comes back faster."],
-	&"strong": ["Strong", "Fewer pulls to break a grip on me, and my breath comes back a little faster."],
+	&"swift": ["Swift", "My stamina comes back faster."],
+	&"strong": ["Strong", "Fewer pulls to break a grip on me, and my stamina comes back a little faster."],
 	&"warm": ["Warm", "The cold stays out, and the worst of it can't reach me."],
 	&"quiet": ["Quiet", "My scent is masked, so beasts and lesser faeries track me less."],
 	&"bright": ["Bright", "The world around me catches the light."],
 	&"keen": ["Keen", "My eyes are clear: drowsiness can't take hold."],
 	&"cool": ["Cool", "Fire hurts me less."],
-	&"well_rested": ["Well rested", "A good night's sleep. My hurts heal a little further on their own for a day."],
+	&"well_rested": ["Well rested", "A good night's sleep. My health mends a little further on its own for a day."],
 	&"stuffed": ["Stuffed", "As full as I've ever been."],
-	&"at_ease": ["At ease", "A good moment. Being at ease lets my hurts heal further on their own and gives me more breath."],
+	&"at_ease": ["At ease", "A good moment. Being at ease lets my health mend further on its own and gives me more stamina."],
 }
 const HALF: Array[StringName] = [&"giddy"]
 ## Brew tags that live in BodyState.effects (Chemistry results).
