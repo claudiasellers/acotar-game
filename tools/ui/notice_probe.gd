@@ -92,6 +92,12 @@ func _go() -> void:
 			for tag: StringName in VITALS_SHOWN:
 				v.apply_status(&"probe", tag, 0.6, 40.0)
 			v.health_changed.emit(v.health, VitalsState.MAX_HEALTH, -1.0, &"probe"),
+		"hidden": func() -> void: feyre.crouch.set_crouched(true),
+		"hidden_full": func() -> void: pass,
+		"warn_left": func() -> void:
+			feyre.crouch.set_crouched(false)
+			VitalsEdgeFx.warn(tree, -1.0, 4.0),
+		"warn_behind": func() -> void: VitalsEdgeFx.warn(tree, 0.0, 1.0),
 		"tin": func() -> void: satchel.bar.pinned.emit(1, satchel.bar.entry(1)),
 		"tin_chord": func() -> void: satchel._set_chord(true),
 	}

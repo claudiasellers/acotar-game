@@ -31,6 +31,7 @@ const ROWS := {
 	&"ash": [[&"cycle_arrow", "ash arrow"]],
 	&"draw": [[&"aim", "hold to aim"], [&"fire", "hold to draw, let go to shoot"]],
 	&"crouch": [[&"crouch", "crouch"]],
+	&"jump": [[&"jump", "jump"]],
 	&"walk": [[&"move", "walk"]],
 	&"look": [[&"look", "look around"]],
 	&"bow": [[&"cycle_bow", "change bow"]],
