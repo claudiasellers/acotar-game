@@ -10,7 +10,7 @@ extends Node3D
 const GROUP := &"arrow_glimmer"
 ## Warm gold with a deep amber rim: reads on white snow and in dusk shade.
 const CORE := Color(1.0, 0.82, 0.25)
-const RIM := Color(1.0, 0.42, 0.05)
+const RIM := Color(0.95, 0.38, 0.0)
 ## Glint pixel_size with fixed_size on a 64 px texture: about 32 px on a 1080p screen
 ## at any distance (0.0005 x 64 = 0.032 of the screen height). Colours stay <= 1.0, under the glow threshold.
 const ASH_GLINT := 0.00050
@@ -138,7 +138,7 @@ func _remove() -> void:
 static func _radial() -> GradientTexture2D:
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
-	grad.colors = PackedColorArray([Color(CORE, 0.55), Color(RIM, 0.3), Color(RIM, 0.0)])
+	grad.colors = PackedColorArray([Color(CORE, 0.8), Color(RIM, 0.55), Color(RIM, 0.0)])
 	var tex := GradientTexture2D.new()
 	tex.gradient = grad
 	tex.fill = GradientTexture2D.FILL_RADIAL
@@ -173,7 +173,7 @@ static func _beam_texture() -> ImageTexture:
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
 	for y in h:
 		var up := float(y) / (h - 1)   # 0 = top of the quad, 1 = foot
-		var fade := clampf(up * 1.15, 0.0, 1.0)
+		var fade := pow(clampf(up * 1.1, 0.0, 1.0), 0.5)
 		for x in w:
 			var across := absf((x + 0.5) / w * 2.0 - 1.0)   # 0 centre, 1 edge
 			var col := CORE.lerp(RIM, clampf(across * across * 1.2, 0.0, 1.0))
