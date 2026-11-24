@@ -41,7 +41,7 @@ export function geIcon(parts, size, o = {}) {
       body += thin ? `<g${m}${op}>${pe(p, `fill="none" stroke="${KEY}" stroke-width="${w + .8}"`)}${pe(p, `fill="none" stroke="${t.metal || lum01(t.flat) > .6 ? '#E7C56E' : t.flat}" stroke-width="${w}"`)}</g>`
         : `<g${m}${op}>${pe(p, `fill="none" stroke="${KEY}" stroke-width="${w + 2 * KEYW}"`)}${pe(p, `fill="none" stroke="#E2BC62" stroke-width="${w}"`)}${t.metal ? '' : pe(p, `fill="none" stroke="${t.flat}" stroke-width="${Math.max(.6, w - 2 * RIM)}"`)}</g>`; return; }
     if (p.hole && /^#fff(fff)?$/i.test(p.f)) { body += `<g${m}>${pe(p, 'fill="#FFFFFF" opacity=".5"')}</g>`; return; }
-    const small = p.hole || p.ng, rim = small ? RIM * .55 : RIM, key = small ? KEYW * .7 : KEYW, g = gooOf(p);
+    const small = (p.hole || p.ng) && !p.sharp, rim = small ? RIM * .55 : RIM, key = small ? KEYW * .7 : KEYW, g = gooOf(p);
     body += `<g${m}${op}><g${g}>${pe(p, `fill="${KEY}" stroke="${KEY}" stroke-width="${2 * (rim + key)}"`)}</g>` + (t.metal ? `<g${g}>${pe(p, `fill="${GOLDU}" stroke="${GOLDU}" stroke-width="${2 * rim}"`)}</g>` : `<g${g}>${pe(p, `fill="${GOLDU}" stroke="${GOLDU}" stroke-width="${2 * rim}"`)}</g><g${g}>${pe(p, `fill="${t.fill}"`)}</g>`) + `</g>`;
   });
   return `<svg width="${size}" height="${size}" viewBox="0 0 48 48" overflow="visible" stroke-linecap="round" stroke-linejoin="round">${defs ? `<defs>${defs}</defs>` : ''}${body}</svg>`;
