@@ -164,10 +164,11 @@ func in_lane() -> bool:
 	return visible and _stands[Place.LANE].showing != ""
 
 
-## A held page goes back on E (or Esc), and the key does nothing else.
+## A held page goes back on E, and the key does nothing else. (Esc is the
+## stack's: it opens the book, and the page waits behind it.)
 func _input(event: InputEvent) -> void:
 	var page := _stands[Place.PAGE]
-	if page.showing != "" and visible and (event.is_action_pressed(PUT_BACK) or event.is_action_pressed(&"ui_cancel")):
+	if page.showing != "" and visible and event.is_action_pressed(PUT_BACK):
 		page.clear()
 		get_viewport().set_input_as_handled()
 
