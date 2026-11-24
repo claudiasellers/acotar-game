@@ -18,6 +18,8 @@ func test_row_draws_through_end_of_pop() -> void:
 	row.size = Vector2(400, 200)
 	row.set_statuses([{"tag": &"swift", "total": 10, "seconds_left": 8, "magnitude": 1.0}] as Array[Dictionary])
 	row._born[&"swift"] = 0.595
-	for i in 4:
-		await get_tree().process_frame
+	# Fixed deltas: headless frames are uncapped, so frame counts don't age it.
+	row._process(0.01)
+	row._process(0.01)
+	await get_tree().process_frame
 	assert_gt(float(row._born[&"swift"]), 0.6)
