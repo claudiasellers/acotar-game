@@ -55,8 +55,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func weave_crown() -> StringName:
 	var piece := CrownWeaver.weave(Gameplay.inventory, Gameplay.wardrobe)
 	if piece == &"":
-		var missing := CrownWeaver.blooms_missing(Gameplay.inventory)
-		FindCard.note(get_tree(), "A crown needs five flowers, three of one colour. %d more to find." % missing)
+		# What she has, never what is left to find (R2): the recipe is in her
+		# book, on the wardrobe's page.
+		FindCard.note(get_tree(), "Not enough flowers here for a crown.")
 		return &""
 	Juice.burst(feyre, &"outfit")
 	return piece

@@ -22,7 +22,7 @@ const SOURCE_HINTS := {
 	&"cottage_chest": "In the cottage chest", &"manor_wardrobe": "The manor wardrobe, as the seasons turn",
 	&"alis": "Ask Alis", &"alis_gift": "A gift from Alis", &"calanmai": "Something for Calanmai night",
 	&"seamstress": "The manor seamstress", &"painting_room": "Left in the painting room",
-	&"stables": "Hanging in the stables", &"story": "It will come to her", &"woven": "Weave it from picked flowers (C)",
+	&"stables": "Hanging in the stables", &"story": "It will come to her", &"woven": "Weave it from five picked flowers, three of one colour (C)",
 }
 
 ## entry id -> {"tab": String, "day": int}

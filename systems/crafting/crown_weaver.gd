@@ -24,16 +24,6 @@ static func best_recipe(inventory: Inventory) -> CraftRecipe:
 	return best
 
 
-## Blooms still needed for any crown (0 when one can be woven).
-static func blooms_missing(inventory: Inventory) -> int:
-	if best_recipe(inventory) != null:
-		return 0
-	var have := 0
-	for id in inventory.ids_with_craft_tag(&"bloom"):
-		have += inventory.count(id)
-	return maxi(5 - have, 1)
-
-
 ## Weaves and equips a crown. Returns the piece id, or &"" when she lacks blooms.
 static func weave(inventory: Inventory, wardrobe: Wardrobe) -> StringName:
 	var r := best_recipe(inventory)

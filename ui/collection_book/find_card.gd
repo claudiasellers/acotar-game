@@ -106,7 +106,8 @@ static func show_reward(tree: SceneTree, reward: CollectionReward) -> void:
 		"banner": "Collection reward", "gold": true, "shiny": true})
 
 
-## A short line in the same place (no icon), e.g. "Two more flowers for a crown".
+## A short line in the same place (no icon): what she got or what she sees
+## ("A brace of rabbits."), never what is left to do (R2).
 static func note(tree: SceneTree, text: String) -> void:
 	_push(tree, {"shape": &"", "title": "", "line": text, "banner": "", "gold": false, "shiny": false})
 

@@ -93,7 +93,7 @@ func test_weave_a_crown_and_wear_it() -> void:
 	assert_eq(CrownWeaver.weave(inv, Gameplay.wardrobe), &"", "no blooms, no crown")
 	inv.add(&"ing_rose_red", 3)
 	inv.add(&"ing_primrose", 1)
-	assert_eq(CrownWeaver.blooms_missing(inv), 1)
+	assert_eq(CrownWeaver.weave(inv, Gameplay.wardrobe), &"", "four blooms are one short")
 	inv.add(&"ing_dandelion", 1)
 	var piece := CrownWeaver.weave(inv, Gameplay.wardrobe)
 	assert_eq(piece, &"woven_crown_rose", "coloured by the blooms she has most of")

@@ -149,6 +149,19 @@ func test_a_heading_is_a_title_that_does_not_wait_on_a_staged_moment() -> void:
 	assert_eq((_cards()[0] as PanelContainer).theme_type_variation, &"NoticeCard")
 
 
+## A note says what she got or what she sees, never what is left to do (R2):
+## no count of what remains, no "more ... for", no "to go".
+func test_no_note_counts_what_is_left_to_do() -> void:
+	var callers: Array[String] = []
+	_scan("res://", "FindCard.note(", callers)
+	assert_gt(callers.size(), 3)
+	var left := RegEx.create_from_string("(?i)%d|\\bmore\\b|\\bto go\\b|\\bleft to\\b|\\bstill need|\\bremaining\\b")
+	for path in callers:
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			if line.contains("FindCard.note(") and not line.strip_edges().begins_with("#"):
+				assert_null(left.search(line), "%s: %s" % [path, line.strip_edges()])
+
+
 ## Nothing but KeyPrompt puts a piece in the PROMPT zone, and no notice or
 ## prompt carries its own colours, fonts or boxes.
 func test_one_prompt_piece_and_no_looks_of_their_own() -> void:
