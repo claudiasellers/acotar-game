@@ -91,8 +91,9 @@ func _draw() -> void:
 	var font := get_theme_font(&"font", &"VitalsFigure")
 	var px := get_theme_font_size(&"font_size", &"VitalsFigure")
 	var text := "%d / %d" % [points, points_max]
-	var at := o + Vector2(BAR.x - font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x, -8.0)
-	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, 5, Color(ink, 0.85))
+	var at := (o + Vector2(BAR.x - font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x, -8.0)).round()
+	# One solid rim on whole pixels: a see-through rim off the pixel grid read as a second copy.
+	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, 4, ink)
 	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, paper)
 
 

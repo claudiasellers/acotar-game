@@ -268,8 +268,9 @@ func test_nearest_find_glints_and_names_itself() -> void:
 	assert_false(focus.focus.is_empty(), "something glints nearby")
 	assert_true((focus._glint.draw_pass_1.surface_get_material(0) as ShaderMaterial) != null, "soft star glints, not plain quads")
 	assert_true(focus._glint.get_node(^"GroundGlow").visible, "a glow on the ground under it")
-	assert_true(focus._card.visible, "a pick card shows in reach")
-	assert_string_contains(focus._card.text(), "pick")
+	var offer := UsePrompt.of(get_tree()).offered()
+	assert_false(offer.is_empty(), "the use prompt offers the pick in reach")
+	assert_string_contains(String(offer[0]) if not offer.is_empty() else "", "pick")
 	var id: StringName = focus.focus.id
 	var before := Gameplay.inventory.count(id)
 	assert_true(feyre.interactor.interact())

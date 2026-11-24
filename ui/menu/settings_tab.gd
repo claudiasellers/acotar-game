@@ -2,7 +2,8 @@
 ## in play opens the book here; Esc again closes it. Left sheet: what she can
 ## do from a pause (Resume, Wriggle free, Return Home, Save & Title, Save &
 ## Quit), then sound, text size, movement keys and the minimap. Right sheet:
-## camera, play, her HUD and Feyre's thoughts. Every control writes its
+## camera, play, her HUD and Feyre's thoughts, or every key (KeyList) while
+## "Every key" is down. Every control writes its
 ## setting as it changes (GameSettings, InputSettings, GuideSettings,
 ## MapSettings save themselves).
 ##
@@ -33,6 +34,11 @@ var _guide_buttons: Dictionary = {}  # GuideSettings.Mode -> Button
 var _minimap_check: CheckBox
 var _hint: ControlsHint
 var _home_fallback: Vector3 = Vector3.ZERO
+var _right: VBoxContainer
+var _recenter: Label
+## Every key, in place of the right sheet's settings while its chip is down.
+var keys: KeyList
+var keys_chip: Button
 
 
 func _init() -> void:
@@ -47,7 +53,11 @@ func _init() -> void:
 func _ready() -> void:
 	pauses = in_game
 	_build_left(column(left_sheet(), 8))
-	_build_right(column(right_sheet(), 6))
+	_right = column(right_sheet(), 6)
+	_build_right(_right)
+	keys = KeyList.new()
+	keys.visible = false
+	right_sheet().add_child(keys)
 	set_hints([["Q E", "Page"], ["Esc", "Resume"]] if in_game else [["Esc", "Back"]])
 	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: _sync())
 	GameSettings.changed.connect(func(_k: StringName) -> void: _sync())
@@ -144,6 +154,8 @@ func _sync() -> void:
 		(_guide_buttons[m] as Button).set_pressed_no_signal(m == mode)
 	for i in _text_buttons.size():
 		_text_buttons[i].set_pressed_no_signal(i == int(GameSettings.get_value(&"text_size")))
+	_recenter.text = "%s brings it back behind her." % KeyPrompt.key(&"camera_recenter")
+	keys.refresh()
 	if _hint:
 		_hint.refresh()
 
@@ -185,6 +197,11 @@ func _build_left(col: VBoxContainer) -> void:
 		var b := _chip(schemes, InputSettings.SCHEME_NAMES[scheme], scheme_group)
 		b.pressed.connect(func() -> void: InputSettings.set_scheme(scheme))
 		_scheme_buttons[scheme] = b
+	keys_chip = _chip(schemes, "Every key", null)
+	keys_chip.toggle_mode = true
+	keys_chip.toggled.connect(func(on: bool) -> void:
+		keys.visible = on
+		_right.visible = not on)
 
 	_section(col, "Map")
 	_minimap_check = _check_box(col, "Show the minimap (N)")
@@ -203,14 +220,22 @@ func _build_right(col: VBoxContainer) -> void:
 	_check(turns, &"invert_y", "Invert Y")
 	_check(turns, &"camera_follow", "Follows behind as she runs")
 	_check(turns, &"mouse_steers", "Turning it steers her")
-	col.add_child(BookKit.label("R (or a click of the right stick) brings it back behind her.", &"SatchelSmall"))
+	_recenter = BookKit.label("", &"SatchelSmall")
+	col.add_child(_recenter)
 
 	_section(col, "Play")
 	_check(col, &"gentle_mode", "Gentle Mode")
-	col.add_child(BookKit.label("She sprints twice as long and catches higher ledges from any side.", &"SatchelSmall"))
+	col.add_child(BookKit.label("Kinder jumps and ledges, less damage, and she wakes where she fell.", &"SatchelSmall"))
 	_check(col, &"reduced_effects", "Reduced effects")
 	col.add_child(BookKit.label("No camera shake; softer sparkles and bounces.", &"SatchelSmall"))
-	_check(col, &"key_hints", "Key hints, the first time a key matters")
+	var tips := _row(col)
+	_check(tips, &"key_hints", "Key hints, the first time a key matters")
+	var again := _chip(tips, "Show tips again", null)
+	again.name = "TipsAgain"
+	again.size_flags_horizontal = Control.SIZE_SHRINK_END | Control.SIZE_EXPAND
+	again.pressed.connect(func() -> void:
+		Tips.show_again(get_tree())
+		_note.text = "Every tip will show once more.")
 
 	# Her HUD on one row: when the meters show, how strong the screen's edges
 	# are, and the hit marks.
@@ -233,6 +258,7 @@ func _build_right(col: VBoxContainer) -> void:
 		GameSettings.set_value(&"edge_fx", (int(GameSettings.get_value(&"edge_fx")) + 1) % GameSettings.EDGE_FX_LEVELS.size()))
 	_controls[&"edge_fx"] = edges
 	_check(hud, &"hit_marks", "Hit marks")
+	col.add_child(BookKit.label("When her health and stamina show, how strongly the screen's edges warn of cold, hurt and fear, and a mark where a hit came from.", &"SatchelSmall", true))
 
 	_section(col, "Feyre's thoughts")
 	var thoughts := HFlowContainer.new()

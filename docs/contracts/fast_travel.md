@@ -61,7 +61,9 @@ None in the sealed `autumn_foothills` or in `suriel_glade` (a dread place).
 - **Mark:** the first E at a pair paints her mark: `WorldDeltas` region
   `"fast_travel"`, key = stone id (saves with the world), the mark grows on
   with a bounce, `Juice.burst(…, &"unlock")` sparkle + chime at the mark, a
-  bounce on her, a sketch `whorl_<id>`, and her line on the find card.
+  bounce on her, a sketch `whorl_<id>`, and her line on the find card. Marking the
+  second pair is also a thought (`WhorlStones.RIDE_THOUGHT`): there is now
+  somewhere to ride.
 - **Travel:** E at a marked pair opens `WhorlTravelCard` (pauses the game):
   her pictogram sketch of the marked stones (only marked ones are drawn, so no
   unexplored land is shown) and a button per destination. A destination is

@@ -1,5 +1,5 @@
 ## "How I am": the page of the wardrobe that says how Feyre is. Her health and
-## stamina as meters with their numbers, then every status on her now, each
+## stamina as meters with their numbers and the HUD's words for them, then every status on her now, each
 ## with the chip the HUD shows for it (VitalsStatusRow.draw_chip), its name and
 ## what it does (StatusRules.title and blurb: one wording, here and in play).
 ## Cold and hunger are always listed; the rest come and go.
@@ -33,14 +33,14 @@ func _init() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 6)
 	inset.add_child(col)
-	var h := _meter(col, "Health", &"HealthMeter")
+	var h := _meter(col, &"health", &"HealthMeter")
 	health = h[0]
 	health_count = h[1]
 	heals_to = BookKit.label("", &"SatchelSmall", true)
 	heals_to.name = "HealsTo"
 	col.add_child(heals_to)
 	col.add_child(BookKit.gap(6))
-	var s := _meter(col, "Stamina", &"StaminaMeter")
+	var s := _meter(col, &"stamina", &"StaminaMeter")
 	stamina = s[0]
 	stamina_count = s[1]
 	col.add_child(BookKit.gap(10))
@@ -64,7 +64,7 @@ func show_vitals(vitals: VitalsState, stamina_now: float, stamina_max: float) ->
 	health.max_value = VitalsState.MAX_HEALTH
 	health.value = vitals.health
 	health_count.text = "%d of %d" % [roundi(vitals.health), roundi(VitalsState.MAX_HEALTH)]
-	heals_to.text = "Heals on its own up to %d. Food, a salve or a bed does the rest." % roundi(vitals.regen_cap())
+	heals_to.text = "Right now it mends on its own up to %d." % roundi(vitals.regen_cap())
 	stamina.max_value = stamina_max
 	stamina.value = stamina_now
 	stamina_count.text = "%d of %d" % [roundi(stamina_now), roundi(stamina_max)]
@@ -87,7 +87,9 @@ static func state_of(s: Dictionary) -> String:
 	return "%d min left" % ceili(left / 60.0) if left >= 60.0 else "%d s left" % ceili(left)
 
 
-func _meter(col: VBoxContainer, title: String, variation: StringName) -> Array:
+## A meter named and explained in the HUD's own words (StatusRules.METERS).
+func _meter(col: VBoxContainer, meter: StringName, variation: StringName) -> Array:
+	var title := StatusRules.title(meter)
 	var head := HBoxContainer.new()
 	var label := BookKit.label(title, &"SatchelBody")
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -102,6 +104,9 @@ func _meter(col: VBoxContainer, title: String, variation: StringName) -> Array:
 	bar.show_percentage = false
 	bar.custom_minimum_size = Vector2(0, 14)
 	col.add_child(bar)
+	var blurb := BookKit.label(StatusRules.blurb(meter), &"SatchelSmall", true)
+	blurb.name = title + "Blurb"
+	col.add_child(blurb)
 	return [bar, count]
 
 

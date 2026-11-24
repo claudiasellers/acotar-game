@@ -50,3 +50,7 @@ func view_yaw(from: Vector3) -> float:
 func view_pitch(from: Vector3) -> float:
 	var to := spot.target - from
 	return clampf(atan2(to.y - 1.6, Vector2(to.x, to.z).length()), -0.35, 0.25)
+
+
+func prompt_verb() -> String:
+	return "sit a while"

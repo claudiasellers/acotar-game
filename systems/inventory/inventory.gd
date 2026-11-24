@@ -10,6 +10,9 @@ extends RefCounted
 
 signal changed
 signal item_added(item_id: StringName, count: int, container: StringName)
+## She reached for something and there was no room for it (nothing was taken).
+## The satchel glyph bumps on it; her thought says so (Interactor).
+signal refused(item_id: StringName, container: StringName)
 
 const QUIVER := &"quiver"
 const SATCHEL := &"satchel"
@@ -37,7 +40,7 @@ func add(item_id: StringName, count: int = 1) -> int:
 	var item := ItemCatalog.get_item(item_id)
 	var added := 0
 	for i in count:
-		var container := _route(item_id, item)
+		var container := _route(item_id, item, {})
 		if container == &"":
 			break
 		var bucket: Dictionary = _contents[container]
@@ -77,6 +80,44 @@ func count(item_id: StringName) -> int:
 
 func has(item_id: StringName, amount: int = 1) -> bool:
 	return count(item_id) >= amount
+
+
+## How many of `count` would fit now. Nothing is added.
+func room_for(item_id: StringName, count: int = 1) -> int:
+	item_id = ItemCatalog.canonical(item_id)
+	var item := ItemCatalog.get_item(item_id)
+	var pending := {}
+	for i in count:
+		var container := _route(item_id, item, pending)
+		if container == &"":
+			return i
+		pending[container] = float(pending.get(container, 0.0)) + _units(item_id, container)
+	return count
+
+
+## True when every entry ({item_id, qty}, as Harvestable.items) fits at once.
+func fits(entries: Array) -> bool:
+	var pending := {}
+	for entry: Dictionary in entries:
+		var id := ItemCatalog.canonical(StringName(entry.get("item_id", &"")))
+		var item := ItemCatalog.get_item(id)
+		for i in int(entry.get("qty", 1)):
+			var container := _route(id, item, pending)
+			if container == &"":
+				return false
+			pending[container] = float(pending.get(container, 0.0)) + _units(id, container)
+	return true
+
+
+## Where `item_id` would go first: QUIVER, BOWS, KEEPSAKES, POUCH or SATCHEL.
+func container_for(item_id: StringName) -> StringName:
+	item_id = ItemCatalog.canonical(item_id)
+	return _preferred(item_id, ItemCatalog.get_item(item_id))
+
+
+## Tells listeners she found no room for `item_id` (see `refused`).
+func refuse(item_id: StringName) -> void:
+	refused.emit(item_id, container_for(item_id))
 
 
 ## Item ids carrying a craft tag ("fletching"), most plentiful first.
@@ -209,11 +250,12 @@ func load_state(data: Dictionary) -> void:
 
 # --- Routing ----------------------------------------------------------------
 
-func _route(item_id: StringName, item: ItemData) -> StringName:
+## `pending` holds units already promised per container (room_for, fits).
+func _route(item_id: StringName, item: ItemData, pending: Dictionary) -> StringName:
 	var preferred := _preferred(item_id, item)
-	if free_space(preferred) >= _units(item_id, preferred):
+	if free_space(preferred) - float(pending.get(preferred, 0.0)) >= _units(item_id, preferred):
 		return preferred
-	if preferred == POUCH and free_space(SATCHEL) >= _units(item_id, SATCHEL):
+	if preferred == POUCH and free_space(SATCHEL) - float(pending.get(SATCHEL, 0.0)) >= _units(item_id, SATCHEL):
 		return SATCHEL
 	return &""
 

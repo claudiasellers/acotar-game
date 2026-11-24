@@ -19,6 +19,8 @@ signal pause_requested
 ## Screens open at once. The layer band above SCREEN starts at LINE.
 const MAX_DEPTH := UiLayers.LINE - UiLayers.SCREEN - 1
 const PLAYER_GROUP := &"player"
+## The action that asks for the pause page (KeyList names its key).
+const PAUSE := &"pause"
 
 
 class Entry:

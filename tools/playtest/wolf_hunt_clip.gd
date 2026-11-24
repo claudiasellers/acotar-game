@@ -160,8 +160,10 @@ func _hold_on(node: Callable, until: Callable, seconds: float) -> void:
 		var n: Node3D = node.call()
 		if is_instance_valid(n):
 			# A little to the right of it, as a player holds the view: the animal sits beside her, not behind her head.
+			# While the scene holds her eye on it the camera is already over her shoulder: straight at it then.
 			var to := n.global_position - feyre.global_position
-			_turn_camera_to(n.global_position + Vector3.UP * 0.9 + to.cross(Vector3.UP).normalized() * to.length() * BESIDE)
+			var aside := BESIDE if StoryControl.focus == null else 0.0
+			_turn_camera_to(n.global_position + Vector3.UP * 0.9 + to.cross(Vector3.UP).normalized() * to.length() * aside)
 		await get_tree().physics_frame
 		var before := t
 		t += get_physics_process_delta_time()

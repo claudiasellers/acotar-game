@@ -183,6 +183,16 @@ func test_the_hunt_waits_for_a_clear_line_to_the_doe() -> void:
 	assert_false(wolf._player_here(), "inside the radius, but a fir hides the doe's spot")
 	feyre.global_position = from + Vector3(12, 0, 0)
 	assert_true(wolf._player_here(), "a few steps aside she sees it")
+	# Clear line, but the lens stands against a birch: not yet.
+	var cam := Camera3D.new()
+	feyre.add_child(cam)
+	cam.position = Vector3(0.5, 1.6, 3.0)
+	cam.make_current()
+	var lens := cam.global_position
+	wolf._trees = [Vector3(lens.x + 1.0, lens.z, 0.4)]
+	assert_false(wolf._player_here(), "a trunk %.1f m from the lens would fill the frame" % 0.6)
+	wolf._trees = [Vector3(lens.x + 3.0, lens.z, 0.4)]
+	assert_true(wolf._player_here(), "the same trunk well clear of the lens is fine")
 	feyre.global_position = spot + Vector3(0, 0, wolf.sure_radius - 1.0)
 	wolf._trees = [Vector3(spot.x, spot.z + 10.0, 1.7)]
 	assert_true(wolf._player_here(), "on the clearing's own ground it starts whatever stands between")
