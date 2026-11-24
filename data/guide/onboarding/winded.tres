@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GuideThread" format=3]
+
+[ext_resource type="Script" path="res://ui/guide/guide_thread.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"onboarding_winded"
+icon = &"larder"
+lines = PackedStringArray("Easy. There's nothing in me to burn.")
+voice_ids = PackedStringArray("O_winded")
+canon = "X"
