@@ -109,6 +109,9 @@ func _exit_tree() -> void:
 		# Leaving mid-build (quit, teleport): stop the worker early, then join.
 		BuildCancel.request(content.region_id)
 		WorkerThreadPool.wait_for_task_completion(_task)
+		# The worker is joined: drop the flag, or every later scatter of this
+		# region (a map, a test, a tool) sees it and comes back empty.
+		BuildCancel.clear(content.region_id)
 		_task = -1
 		_layers.clear()
 
