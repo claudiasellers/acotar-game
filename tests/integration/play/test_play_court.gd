@@ -288,6 +288,10 @@ func test_whistle_brings_the_mare_and_she_mounts_rides_and_gets_down() -> void:
 	h.stick(Vector2.ZERO)
 	assert_gt(PlayHarness.flat_distance(from, md.mare.global_position), 5.0, "the stick rides her forward")
 	assert_gt(gallop, canter, "sprint gallops faster than the canter (%.1f vs %.1f m/s)" % [gallop, canter])
+	# She is placed in _process, the mare moves in physics: sample after a
+	# process frame, or a slow frame's extra physics ticks (~0.24 m each at a
+	# gallop) read as her lagging off the saddle (T151: really 0.9 m, the hip drop).
+	await wait_process_frames(1)
 	assert_lt(h.feyre.global_position.distance_to(md.seat_point()), 1.5, "Feyre rides along in the saddle")
 	await h.wait_until(func() -> bool: return md.mare.speed < 0.3, 60 * 6)
 	# A tap of E with nothing in reach gets her down.
