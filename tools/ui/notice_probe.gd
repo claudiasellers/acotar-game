@@ -96,8 +96,8 @@ func _go() -> void:
 		"hidden_full": func() -> void: pass,
 		"warn_left": func() -> void:
 			feyre.crouch.set_crouched(false)
-			VitalsEdgeFx.warn(tree, -1.0, 4.0),
-		"warn_behind": func() -> void: VitalsEdgeFx.warn(tree, 0.0, 1.0),
+			VitalsEdgeFx.warn(tree, -1.0, CATCH_SECONDS + 0.05),
+		"warn_behind": func() -> void: VitalsEdgeFx.warn(tree, 0.0, CATCH_SECONDS + 0.05),
 		"tin": func() -> void: satchel.bar.pinned.emit(1, satchel.bar.entry(1)),
 		"tin_chord": func() -> void: satchel._set_chord(true),
 	}
