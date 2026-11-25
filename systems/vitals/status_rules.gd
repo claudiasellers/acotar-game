@@ -31,7 +31,7 @@ const INFO := {
 	&"stamina": ["Stamina", "My stamina, the bow. Holding a drawn bow spends it, Focus spends it fast, and so does fighting free of a grip. It comes back quickly; if it runs dry, the bow greys until I catch my breath."],
 	&"cold": ["Cold", "How cold I am. Cold shakes my aim and slows my stamina; deep cold costs me health. A fire or a warm brew helps."],
 	&"hunger": ["Hunger", "How hungry I am. Hunger slows my stamina, and at home it keeps my health from mending far. Bread would help."],
-	&"venom": ["Venom", "Poison, creeping. My health won't mend while it's in me, and once it's strong it drains me. A salve draws it out."],
+	&"venom": ["Venom", "Poison, creeping. My health won't mend while it's in me, and once it's strong it drains me. A salve or a night in a bed draws it out."],
 	&"drowsy": ["Drowsy", "My eyelids are heavy and my aim sways. It passes on its own; a keen brew clears it."],
 	&"roar_shake": ["Roar shake", "That roar went through me. My aim sways until it passes."],
 	&"giddy": ["Giddy", "A faerie brew went to my head. My aim wanders until it wears off."],
