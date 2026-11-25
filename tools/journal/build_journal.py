@@ -31,9 +31,9 @@ CHAPTERS = [
         dict(id="night", guide="night", memory="A life for a life. I said I would go, and I went.", canon="V"),
         dict(id="ride", done="wall_crossed", req=["beast_claim_accepted"],
              after="Wherever it's taking me, there's no turning back now.",
-             hints=["The white horse knows the way. All I can do is hold on and look.",
-                    "Ride on through the woods. There's nothing to do but watch."],
-             memory="His magic put me under. I woke in the saddle, and it was spring.", canon="A"),
+             hints=["Keep close behind him. The mare won't carry me anywhere else.",
+                    "Follow him north. He won't let me run, and he won't explain."],
+             memory="He led and I followed: through our woods, through the Wall, into spring.", canon="A"),
     ]),
     ("p2_grounds", "Chapter Three", "Across the Wall", "Spring, in the dead of winter. Everything here is lovely, and none of it is safe.", [
         dict(id="arrive", done="fact.manor_arrived", req=["wall_crossed"],
