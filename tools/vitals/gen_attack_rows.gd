@@ -10,7 +10,7 @@ const OUT := "res://data/combat/attacks/"
 const ROWS := [
 	[&"naga_claw", &"naga", true, 22.0, &"claw", &"medium", 2.0, &"", 0.0, 0.0, 0.15, true, 0.0],
 	[&"naga_lunge", &"naga", false, 30.0, &"blunt", &"heavy", 4.0, &"", 0.0, 0.0, 0.2, true, 0.0],
-	[&"naga_coil", &"naga", false, 0.0, &"blunt", &"none", 0.0, &"", 0.0, 0.0, 0.25, true, 0.0],
+	[&"naga_coil", &"naga", false, 0.0, &"grab", &"none", 0.0, &"", 0.0, 0.0, 0.25, true, 0.0],
 	[&"puca_grab", &"puca", true, 0.0, &"blunt", &"none", 0.0, &"", 0.0, 0.0, 0.3, true, 0.0],
 	[&"briarling_lash", &"briarling", true, 8.0, &"thorn", &"light", 0.5, &"", 0.0, 0.0, 0.1, true, 0.0],
 	[&"briarling_snare", &"briarling", false, 0.0, &"thorn", &"none", 0.0, &"", 0.0, 0.0, 0.15, true, 0.0],

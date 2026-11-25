@@ -255,3 +255,4 @@ func test_she_cant_stab_a_naga_two_metres_below_her() -> void:
 	assert_eq(n.health, ROAMER_DATA.max_health)
 	her.global_position = Vector3(0, 1.0, -1.2)
 	assert_eq(k.target(), n, "a step up is still in reach")
+

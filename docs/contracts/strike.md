@@ -35,3 +35,10 @@ reels back, `NagaRoamer` drops its strike into RECOVER.
 
 Signal `struck(kind, target)`: `&"knife"`, `&"sneak"`, `&"finisher"`,
 `&"bash"`, `&"cut_free"`, `&"cut"`, for animation, sound and HitStop (HF).
+
+## Hints (L81 G20)
+
+Strike will nudge two KeyHints rows, the UI lane's to define: `strike_bash`
+the first time an engaged hostile is in reach while the bow is raised, and
+`strike_cut_free` on the first grab. The nudges land once those rows are in
+main, called with no check, so a missing row fails rather than passes.

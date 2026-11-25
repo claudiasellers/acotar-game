@@ -95,8 +95,16 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   a 4-naga camp needs ≥ 4 s to put her down) and comes again. A stagger
   (bash, knife, or any weak-spot hit) cancels the tell or lets go of the hold;
   so do sleep, fire and death. `Creature.winding_up()` names the attack being
-  telegraphed (&"" when none). The animator hears `play_attack(id)` and `cancel_attack()` when it has
-  them (bestiary §1.5). A
+  telegraphed (&"" when none). Every tell shows and sounds (L81 G19): `AttackTell` poses the
+  model by the row's `damage_kind` (claw rears back, blunt dips the head, grab
+  crouches), eased in over the brain's own wind-up timer (`windup_left()`) and
+  held to contact; the brain emits `EventBus.hostile_windup(id, kind, attack,
+  at, windup_s)` as it starts and `hostile_windup_cancelled(id)` if it ends
+  before contact. SoundDirector plays the family's wind-up cue where it starts
+  (`WINDUP_CUES`, naga: `naga_hiss`), on the Sound bus. The coil is a grab
+  row (vitals.md: a hold), so it crouches. The
+  procedural pose is the one tell; the rig lane's `windup_<damage_kind>` clips
+  replace it outright when they land (bestiary §1.5). A
   naga on a **scent trail** ignores the leash while it smelled her within the
   last 6 s; a hush draught (scent_scale ≤ 0.5) breaks the trail.
 - Fire: a burning ElementField cell within 3 m sends it fleeing for 6 s; inside
