@@ -58,6 +58,12 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   and `EventBus.site_settled(id)` when that signal exists, and frees its DreadField.
   A settled site spawns nothing. It re-seeds after `settle_days` only once
   `glamour_lifted` is set (P6, the blight spreading); before P6 settling is permanent.
+- **Settle swell** (`SettleSwell`, slice 2(d)): settling grows a swell at the
+  core: an `AmbientSwarm` (butterflies by day, faelights at `Clock.is_night()`)
+  that starts withdrawn and eases back over `SWELL_SECONDS` (16 s, ≤20) through
+  `AmbientSwarm.ease_rate`, a sparkle burst, and rose petals for `PETAL_SECONDS`.
+  The one chime is the site's `celebration_requested`; the swell is silent. A
+  site that loads settled grows its swarm at full with no petals, sparkle or chime.
 - Overlap rules (checked by the generator, which fails on a break): no leash
   ring reaches another site's core unless the pair is listed as a host/lookout
   or contested pair; every pair of cores keeps a ≥60 m corridor beyond both
