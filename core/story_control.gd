@@ -120,8 +120,10 @@ func can_look() -> bool:
 	return mode != Mode.NONE
 
 
+## The bow itself. A scene that only wants the fire button (the bracelets at
+## the beast door) allows "fire"; one that hands her the bow allows "shoot".
 func can_shoot() -> bool:
-	return mode == Mode.FULL or allowed_actions.has("fire")
+	return mode == Mode.FULL or allowed_actions.has("shoot")
 
 
 func can_interact() -> bool:

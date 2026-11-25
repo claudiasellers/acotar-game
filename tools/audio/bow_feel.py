@@ -4,7 +4,8 @@ partials, CC0, like the rest.
 
 What each one is for: the nock click says an arrow is on the string; the
 creak loop is a held full draw; the let-down is the string eased forward with
-nothing loosed; the pat is her hand on an empty quiver; each bow has its own
+nothing loosed; the pat is her hand on an empty quiver; a short gasp when
+she has no breath left for a sidestep; each bow has its own
 release and the ash arrow a deeper one with a chime tail; Focus is an inhale
 and, let go, an exhale, with her heartbeat under it; each arrow type has a
 short sound of its own, so what is nocked can be heard; an arrow pulled out
@@ -113,6 +114,11 @@ def focus_in():
 
 def focus_out():
     return normalize(fade(_breath(1321, 1.1, 1300, 500, False), 0.01, 0.3), -15)
+
+
+def winded():
+    # A short, sharp breath in through the teeth: she has nothing left to move on.
+    return normalize(fade(_breath(1322, 0.32, 1500, 3200, True), 0.01, 0.08), -12)
 
 
 def heartbeat():
@@ -227,6 +233,7 @@ SOUNDS = {
     "sfx/bow/release_ash": (release_ash, 4, "The ash arrow leaves: a deeper thrum with a faint chime tail"),
     "sfx/bow/focus_in": (focus_in, 4, "Focus: a steadying inhale"),
     "sfx/bow/focus_out": (focus_out, 4, "Focus let go: an exhale"),
+    "sfx/bow/winded": (winded, 4, "Out of breath: a short gasp when she can't sidestep"),
     "sfx/bow/heartbeat": (heartbeat, 4, "Her heartbeat in the hush, one slow beat (loop)"),
     "sfx/bow/retrieve": (retrieve, 4, "An arrow pulled out of what it stuck in"),
     "sfx/bow/bash": (bash, 4, "The bow limb as a club: a wooden thud"),
@@ -248,6 +255,7 @@ CUES = {
     "bow_release_ash": (["sfx/bow/release_ash"], -2, 0, False, False, 60),
     "bow_focus_in": (["sfx/bow/focus_in"], -10, 0.03, False, False, 0),
     "bow_focus_out": (["sfx/bow/focus_out"], -11, 0.03, False, False, 0),
+    "breath_winded": (["sfx/bow/winded"], -7, 0.04, False, False, 0),
     "bow_heartbeat": (["sfx/bow/heartbeat"], -8, 0, True, False, 0),
     "arrow_retrieve": (["sfx/bow/retrieve"], -8, 0.06, False, False, 20),
     "bow_bash": (["sfx/bow/bash"], -3, 0.06, False, False, 40),

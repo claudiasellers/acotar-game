@@ -71,6 +71,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/bow/release_warbow.ogg | Sentry warbow release: a heavy thwack | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/retrieve.ogg | An arrow pulled out of what it stuck in | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/whoosh.ogg | Arrow in flight | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/bow/winded.ogg | Out of breath: a short gasp when she can't sidestep | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_1.ogg | Footstep on grass, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_2.ogg | Footstep on grass, variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/foot/grass_3.ogg | Footstep on grass, variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

@@ -610,9 +610,9 @@ func _set_bow(on: bool) -> void:
 	var p := _player()
 	if p == null:
 		return
-	var bow := p.get(&"bow_controller") as Node
+	var bow := p.get(&"bow_controller") as BowController
 	if bow:
-		bow.set_physics_process(on)
+		bow.stow(not on)
 
 
 ## Where her hips sit: the saddle, riding the spine bone through each stride.

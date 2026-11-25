@@ -46,7 +46,7 @@ static func horizontal(f: Feyre, horizontal: Vector3, direction: Vector3, speed:
 ## to her path, else the keys; the camera while aiming or drawing.
 static func turn_model(f: Feyre, direction: Vector3, camera_yaw: float, delta: float) -> void:
 	var model := f.model
-	var aiming := f.is_aiming or f.is_drawing
+	var aiming := f.is_aiming
 	var target_yaw := model.rotation.y
 	var moving := Vector2(f.velocity.x, f.velocity.z)
 	if aiming:
