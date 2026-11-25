@@ -232,14 +232,11 @@ func test_loading_an_arrow_keeps_her_arms_in_front() -> void:
 	assert_gt((visual.pose.string_hand_world() - chest).dot(fwd), 0.0, "string hand in front too")
 
 
-func test_reticle_follows_the_predicted_impact() -> void:
-	var reticle := feyre.bow_controller.reticle
-	assert_not_null(reticle)
-	var guess := feyre.bow_controller.predict_impact()
-	assert_true(guess.has("point"))
-	var aim := feyre.aim_point()
-	assert_lt(guess.point.distance_to(feyre.bow_controller.muzzle()), aim.distance_to(feyre.bow_controller.muzzle()) + 0.5,
-		"the arrow never lands beyond the aim point")
+func test_the_shot_is_aimed_at_what_is_under_the_crosshair() -> void:
+	var bow := feyre.bow_controller
+	assert_not_null(bow.reticle)
+	var want := (feyre.aim_point() - bow.muzzle()).normalized()
+	assert_lt(rad_to_deg(bow.shot_direction().angle_to(want)), 0.01, "from the bow to the aim point")
 
 
 func test_nearest_find_glints_and_names_itself() -> void:

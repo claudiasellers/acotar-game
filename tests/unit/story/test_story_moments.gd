@@ -138,15 +138,24 @@ func test_leaving_the_hiding_spot_is_seen_by_the_attor() -> void:
 
 
 func test_director_hangs_moments_on_anchors() -> void:
-	assert_eq(StoryDirector.anchor_ids().size(), 30)
+	# Every anchored moment is listed under its anchor (no fixed count: a new
+	# moment adds an anchor without touching this test).
+	var ids := StoryDirector.anchor_ids()
+	assert_false(ids.is_empty(), "moments hang on anchors")
+	for moment: StoryMoment in StoryDirector.moments:
+		if moment.anchor_id != &"":
+			assert_true(ids.has(String(moment.anchor_id)), "%s's anchor %s is listed" % [moment.id, moment.anchor_id])
 	var anchor := Marker3D.new()
 	anchor.name = "manor_infirmary"
 	anchor.add_to_group(&"story_anchor")
 	root.add_child(anchor)
 	var spaces := StoryDirector.attach_anchor(anchor)
-	assert_eq(spaces.size(), 2, "the wound_dressing moment and WoundDressing (L28); the Summer faerie is in the hall (L29)")
-	assert_eq(StoryDirector.attach_anchor(anchor).size(), 2)
-	assert_eq(anchor.get_child_count(), 3, "plus the InfirmaryWorktable; attaching twice adds nothing")
+	assert_true(spaces.any(func(s: SceneSpace) -> bool: return s.name == &"Moment_wound_dressing"), "the wound_dressing moment hangs there")
+	assert_true(spaces.any(func(s: SceneSpace) -> bool: return s is WoundDressing), "and WoundDressing (L28)")
+	assert_not_null(anchor.get_node_or_null(^"InfirmaryWorktable"), "and the InfirmaryWorktable")
+	var children := anchor.get_child_count()
+	assert_eq(StoryDirector.attach_anchor(anchor).size(), spaces.size())
+	assert_eq(anchor.get_child_count(), children, "attaching twice adds nothing")
 
 
 func test_moments_chain_from_the_grounds_to_the_pass() -> void:

@@ -8,6 +8,7 @@ id = &"fae_recurve"
 display_name = "Fae recurve"
 draw_time = 0.2
 max_speed = 54.0
+true_range = 34.0
 sway_degrees = 1.1
 loudness = 0.25
 kick_degrees = 0.2

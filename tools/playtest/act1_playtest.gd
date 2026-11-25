@@ -762,11 +762,9 @@ func _shoot_at(target: Node3D) -> bool:
 	_last_landing = Vector3.INF
 	_shots += 1
 	var bc: BowController = feyre.bow_controller
-	_note("loosing with %.2f deg of sway (unsettled %.2f, body x%.2f, tremor %.2f, dread %.2f)" % [bc.sway_degrees(),
-		bc.unsettled(), feyre.body_state.sway_multiplier(), feyre.body_state.tremor_degrees(), feyre.vitals.dread])
-	var ring := bc.predict_impact()
-	var on: Node = ring.get("collider") as Node
-	_note("ring on %s at %s; she %s, he %s moving %.1f m/s" % [on.name if on else "nothing", _v(ring.get("point", Vector3.ZERO)),
+	_note("loosing with %.2f deg of sway (body x%.2f, tremor %.2f, dread %.2f)" % [bc.sway_degrees(),
+		feyre.body_state.sway_multiplier(), feyre.body_state.tremor_degrees(), feyre.vitals.dread])
+	_note("crosshair on %s; she %s, he %s moving %.1f m/s" % [_v(feyre.aim_point()),
 		_v(feyre.global_position), _v(target.global_position),
 		(target.velocity as Vector3).length() if target is CharacterBody3D else 0.0])
 	Input.action_release(&"fire")
@@ -798,9 +796,9 @@ func _lead(target: Node3D) -> Vector3:
 	return chest + Vector3(vel.x, 0, vel.z) * t + Vector3.UP * (0.5 * g * t * t)
 
 
-## Turns until the ring sits on his chest: where this arrow, loosed now, would
-## be when it reaches him (drop, sway and the bow's offset from her eye all in
-## it). That is how a player aims; the middle of the screen is not the shot.
+## Turns until this arrow, loosed now, would be at his chest when it reaches
+## him: the crosshair on him, led for his movement, and past the bow's true
+## range raised for the drop.
 func _hold_ring_on(target: Node3D) -> void:
 	var bc: BowController = feyre.bow_controller
 	if not bc.is_nocked:
@@ -814,7 +812,8 @@ func _hold_ring_on(target: Node3D) -> void:
 	chest += Vector3(vel.x, 0, vel.z) * t
 	var arrow := BowController.arrow_data().get(bc.selected) as ArrowData
 	var ring: Vector3 = BowController.predict_path(from, bc.shot_direction() * speed,
-		arrow.drag if arrow else 0.0022, null, [], null, t).point
+		arrow.drag if arrow else 0.0022, null, [], null, t, 1.0 / 60.0, bc.true_flight_s(),
+		bc.tuning.gravity_blend_s).point
 	var cam := feyre.camera
 	var want := (chest - cam.global_position).normalized()
 	var have := (ring - cam.global_position).normalized()

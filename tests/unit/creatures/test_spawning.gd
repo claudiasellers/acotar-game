@@ -60,7 +60,8 @@ func test_spawner_follows_the_clock() -> void:
 	Clock.time_of_day = 22.0 / 24.0
 	s.refresh()
 	assert_false(s.spawned.has(&"butterflies_roses"), "butterflies leave at dusk")
-	assert_eq((s.spawned[&"faelights_gardens"] as Array).size(), 4)
+	var lights: SpawnEntry = MANOR.entries.filter(func(e: SpawnEntry) -> bool: return e.id == &"faelights_gardens")[0]
+	assert_eq((s.spawned[&"faelights_gardens"] as Array).size(), lights.groups * lights.count, "every group the table asks for")
 	Clock.time_of_day = 0.3
 
 

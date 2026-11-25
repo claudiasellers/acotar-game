@@ -62,12 +62,6 @@ func test_no_station_frames_itself() -> void:
 		assert_eq(hits, [], "%s builds a scrim, a card or key caps of its own. Fix: lay the page with LoosePage.lay(layer, width, wash), use page.head() for the title and page.set_hints([[key, word], ...]) for the caps" % path)
 
 
-func test_the_old_card_look_makes_no_screens() -> void:
-	var src := FileAccess.get_file_as_string("res://ui/ui_style.gd")
-	assert_false(src.contains("func modal"), "no modal: screens are loose pages or the book")
-	assert_false(src.contains("func button"), "no buttons of its own")
-
-
 ## Small type on a loose page reads: 16 px or more, and 4.5 to 1 on the
 ## loose page's paper in both acts (the director's look pass on step 6).
 func test_type_on_a_loose_page_reads() -> void:

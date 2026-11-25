@@ -87,11 +87,12 @@ func test_ten_draws_log_no_errors() -> void:
 	Gameplay.inventory.add(&"arrow_wood", 12)
 	for k in 10:
 		var before := Gameplay.inventory.arrow_count()
-		for i in 30:
+		# Past the last shot's follow-through, then a full draw.
+		for i in 40:
 			bow.update_bow(1.0 / 60.0, true, true)
 			await get_tree().physics_frame
-		var arrow := bow.release()
-		assert_not_null(arrow, "an arrow leaves the bow")
+		var arrow := bow.update_bow(1.0 / 60.0, true, false)
+		assert_not_null(arrow, "letting go, an arrow leaves the bow")
 		assert_eq(Gameplay.inventory.arrow_count(), before - 1, "and costs one")
 		await wait_physics_frames(3)
 		bow.update_bow(1.0 / 60.0, false, false)

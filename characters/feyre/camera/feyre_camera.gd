@@ -14,9 +14,15 @@ extends RefCounted
 ## scene's focus is at least FAR_FOCUS metres off outdoors.
 const AIM_SHOULDER := 0.55
 ## The same with the bow up and no aim held: the arm is long there, so she is
-## moved farther aside and the ring and a low target in front of her stand
-## clear of her body (HIP_RING_CLEAR_PX in the framing test).
+## moved farther aside and the crosshair and a low target in front of her
+## stand clear of her body (HIP_RING_CLEAR_PX in the framing test).
 const HIP_SHOULDER := 0.85
+## While the bow comes up, is up, and for this long after (real seconds), a
+## change of shoulder turns the camera so the middle of the screen stays on
+## the same thing in the world: raising the bow never moves her aim.
+const AIM_KEEP_S := 0.6
+## The nearest (m) that thing is taken to be, so a wall at the lens can't swing the view.
+const AIM_KEEP_NEAR := 4.0
 const FAR_FOCUS := 12.0
 const DEFAULT_PITCH := -0.2094  # -12 degrees
 ## Indoors (a roof or ceiling above her head) the camera stays in the room: it may
@@ -80,6 +86,8 @@ var _kick_peak: float = 0.0
 var _kick_t: float = -1.0
 var _kick_rise: float = 0.06
 var _kick_fall: float = 0.15
+## Real seconds left of AIM_KEEP_S.
+var _aim_keep: float = 0.0
 
 
 ## Builds the rig under `feyre` (as her child, named CameraRig).
@@ -142,8 +150,32 @@ func update(delta: float) -> void:
 	elif bow_up:
 		# Scaled to the arm: indoors, on a short arm, the hip offset shrinks to the aim's.
 		shoulder = lerpf(AIM_SHOULDER, HIP_SHOULDER, clampf(inverse_lerp(1.7, 3.6, _spring_arm.spring_length), 0.0, 1.0))
-	_spring_arm.position.x = minf(lerpf(_spring_arm.position.x, shoulder, ease),
-			shoulder_clearance(shoulder))
+	var free := shoulder_clearance(shoulder)
+	var side := minf(lerpf(_spring_arm.position.x, shoulder, ease), free)
+	_aim_keep = AIM_KEEP_S if bow_up else maxf(_aim_keep - TimeScale.real(delta), 0.0)
+	# Beside a wall that holds the shoulder in, the arm stays parallel to it:
+	# a turn there would swing the lens into the wall.
+	if _aim_keep > 0.0 and free >= shoulder:
+		_shift_keeping_aim(side)
+	else:
+		_spring_arm.position.x = side
+
+
+## Moves the arm to `side` metres over her shoulder and turns the camera so
+## its centre line still passes through what it was on. A longer or shorter
+## arm slides the lens along that line and needs no turn.
+func _shift_keeping_aim(side: float) -> void:
+	if is_equal_approx(side, _spring_arm.position.x):
+		return
+	var from := camera.global_position
+	var forward := -camera.global_basis.z
+	var on := from + forward * maxf(from.distance_to(aim_point()), AIM_KEEP_NEAR)
+	_spring_arm.position.x = side
+	# Twice: the turn is about her head, not the lens, so one pass leaves a hair.
+	for i in 2:
+		var to := on - camera.global_position
+		var now := -camera.global_basis.z
+		nudge(angle_difference(atan2(-now.x, -now.z), atan2(-to.x, -to.z)), 0.0)
 
 
 ## The bow's release kick: the lens tips up `degrees` over `rise` seconds and
@@ -219,14 +251,24 @@ func look(x: float, y: float) -> void:
 	_recentering = false
 
 
+## The point in the world under the middle of the screen. A creature the
+## centre line passes within Arrow.CATCH_RADIUS of, in front of whatever the
+## line itself meets, is what it is on: the arrow would strike it.
 func aim_point(max_distance: float = 250.0) -> Vector3:
 	var from := camera.global_position
 	var to := from - camera.global_basis.z * max_distance
-	var query := PhysicsRayQueryParameters3D.create(from, to, Feyre.WORLD_MASK | (1 << 3), [_feyre.get_rid()])
-	var result := _feyre.get_world_3d().direct_space_state.intersect_ray(query)
-	if result:
+	var skip: Array[RID] = [_feyre.get_rid()]
+	var space := _feyre.get_world_3d().direct_space_state
+	var result := space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to, Feyre.WORLD_MASK | Arrow.MASK_TARGETS, skip))
+	var body := result.get("collider") as CollisionObject3D
+	if body != null and body.collision_layer & Arrow.MASK_TARGETS != 0:
 		return result.position
-	return to
+	if result:
+		to = result.position
+	# From her, not from the lens: nothing beside or behind her is aimed at.
+	var start := from + (to - from).normalized() * minf(_spring_arm.spring_length, from.distance_to(to))
+	var caught := Arrow.catch_creature(space, start, to, skip)
+	return caught.position if caught else to
 
 
 ## True under a roof or in a manor room: BowVisual stows the slung bow.
@@ -299,6 +341,9 @@ func _far_focus() -> bool:
 func _drift_toward_focus(delta: float) -> void:
 	var focus := StoryControl.focus
 	if focus == null or not is_instance_valid(focus):
+		return
+	# With the bow up the aim is hers alone.
+	if _feyre.bow_controller != null and _feyre.bow_controller.is_up():
 		return
 	var to := focus.global_position - rig.global_position
 	if Vector2(to.x, to.z).length() < 0.5:
