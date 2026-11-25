@@ -1,0 +1,33 @@
+# hollow_hob clips (creatures/models/fae/hollow_hob.gltf), 30 fps. Written by tools/blender/monsters/hollow_hob.py.
+# name native_speed_mps duration_s loop(0/1) contact_s travel_m   ('-' = does not apply)
+sleep - 9.000 1 - -
+eye_open - 1.000 0 - -
+wake - 3.600 0 - -
+sit_up - 2.000 0 - -
+sniff - 3.200 1 - -
+stand_roar - 2.000 0 - -
+idle - 8.000 1 - -
+idle_stand - 8.000 1 - -
+walk 1.000 2.000 1 - -
+run 4.000 0.900 1 - -
+wade 0.800 2.367 1 - -
+scratch - 3.300 0 - -
+count_charms - 6.400 1 - -
+hum - 4.000 1 - -
+search - 6.000 1 - -
+eat - 5.400 0 - -
+telegraph_hob_swat - 0.900 0 - -
+attack_hob_swat - 1.500 0 0.200 0.450
+telegraph_hob_stomp - 1.000 0 - -
+attack_hob_stomp - 1.100 0 0.133 -
+telegraph_hob_throw - 1.000 0 - -
+attack_hob_throw - 1.200 0 0.200 -
+charm_cut_stir - 3.500 0 - -
+sleep_fall - 2.400 0 - -
+burn - 1.600 1 - -
+hit_l - 0.400 0 - -
+hit_r - 0.400 0 - -
+stagger - 1.500 0 - -0.900
+death_l - 4.000 0 - -
+death_r - 4.000 0 - -
+death_charm - 4.600 0 - -

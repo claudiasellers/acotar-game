@@ -56,7 +56,7 @@ for _leg in LEGS:
 # Nose to the ground.
 SNIFF = dict(BASE, pitch=11.0, z=-0.09, neck_p=78.0, head_p=16.0, tail_p=6.0)
 # Head up, listening.
-ALERT = dict(BASE, neck_p=6.0, head_p=-6.0, ears=1.0, fronds=0.35, tail_p=22.0, z=0.01)
+ALERT = dict(BASE, neck_p=14.0, head_p=-10.0, ears=1.0, fronds=0.35, tail_p=22.0, z=0.01)
 # Lying like a log: on its breastbone, legs folded under, the neck and the long skull flat along the ground.
 LIE = dict(BASE, ground=1.0, neck_p=60.0, head_p=-50.0, tail_p=8.0, tail_curl=6.0, tail_yaw=40.0, ears=-0.6,
            **sym("fmix", "fl", 1.0), **sym("fmix", "hl", 1.0), **sym("fc", "fl", (0.0, 0.3, 0.6)), **sym("fc", "hl", (0.07, 0.19, 0.6)),
