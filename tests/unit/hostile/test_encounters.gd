@@ -6,6 +6,7 @@ extends GutTest
 
 const SITE_SCRIPT := preload("res://creatures/hostile/hostile_site.gd")
 const PUCA := preload("res://creatures/hostile/puca_roamer.tscn")
+const CAMP := &"encounter_test_camp"
 
 var ended: Array = []
 
@@ -28,7 +29,10 @@ func _on_ended(source: StringName, family: StringName, outcome: StringName) -> v
 
 func _site() -> HostileSite:
 	var site := SITE_SCRIPT.new() as HostileSite
-	site.data = load("res://data/creatures/hostile_sites/naga_stream_glen.tres") as HostileSiteData
+	# Its own id, so no live twin left by another test settles it at _ready.
+	var d := (load("res://data/creatures/hostile_sites/naga_stream_glen.tres") as HostileSiteData).duplicate() as HostileSiteData
+	d.id = CAMP
+	site.data = d
 	site.snap_to_core = false
 	site.height_func = func(_x: float, _z: float) -> float: return 0.0
 	add_child_autofree(site)
@@ -47,7 +51,7 @@ func test_clearing_a_camp_counts() -> void:
 	var site := _site()
 	for m in site.members:
 		m.die(&"arrow_ash")
-	assert_eq(ended, [[&"naga_stream_glen", &"naga", HostileEncounters.KILLED]])
+	assert_eq(ended, [[CAMP, &"naga", HostileEncounters.KILLED]])
 	assert_eq(HostileEncounters.plain_fights(), 1)
 
 
@@ -59,7 +63,7 @@ func test_slipping_away_counts() -> void:
 		site._step_encounter(0.5)
 	assert_eq(ended.size(), 0, "not over while it might still find her")
 	site._step_encounter(1.0)
-	assert_eq(ended, [[&"naga_stream_glen", &"naga", HostileEncounters.SLIPPED]])
+	assert_eq(ended, [[CAMP, &"naga", HostileEncounters.SLIPPED]])
 	assert_false(site.engaged)
 	assert_eq(HostileEncounters.plain_fights(), 1)
 
@@ -79,7 +83,7 @@ func test_a_knockdown_ends_it_and_doesnt_count() -> void:
 	var site := _site()
 	site.report(site.members[0], Vector3.ZERO)
 	EventBus.player_knocked_down.emit(site.members[1].creature_id, &"naga_claw", Vector3.ZERO)
-	assert_eq(ended, [[&"naga_stream_glen", &"naga", HostileEncounters.KNOCKDOWN]])
+	assert_eq(ended, [[CAMP, &"naga", HostileEncounters.KNOCKDOWN]])
 	assert_eq(HostileEncounters.plain_fights(), 0)
 	for m in site.members:
 		m.die(&"arrow_ash")

@@ -252,7 +252,11 @@ func test_ash_kills_it_and_it_leaves_nothing() -> void:
 
 func test_it_leads_her_into_a_camps_leash_and_is_gone() -> void:
 	var site := SITE_SCRIPT.new() as HostileSite
-	site.data = load("res://data/creatures/hostile_sites/naga_stream_glen.tres") as HostileSiteData
+	# Its own id: a site with a live twin of the same id (one another test or a
+	# loaded region left in the tree) settles itself at _ready and leads nowhere.
+	var d := (load("res://data/creatures/hostile_sites/naga_stream_glen.tres") as HostileSiteData).duplicate() as HostileSiteData
+	d.id = &"puca_test_camp"
+	site.data = d
 	site.snap_to_core = false
 	site.height_func = func(_x: float, _z: float) -> float: return 0.0
 	site.position = Vector3(0, 0, -150)
@@ -262,6 +266,7 @@ func test_it_leads_her_into_a_camps_leash_and_is_gone() -> void:
 	var her := _her(Vector3(0, 0, 10))
 	var p := _puca(her)
 	_think(p, DT)
+	assert_false(site.is_settled, "the test's camp is live")
 	assert_eq(p.lure_site, site, "it leads toward the nearest camp")
 	assert_gt(p.move_direction.normalized().dot(Vector3(0, 0, -1)), 0.9, "toward the camp, away from her")
 	watch_signals(p)
