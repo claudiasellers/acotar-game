@@ -28,7 +28,8 @@ signal player_status_applied(source_id: StringName, tag: StringName, magnitude: 
 signal player_startled(source_id: StringName, amount: float)
 
 ## A hold (puca, briarling snare, prowler, naga coil). She breaks it by mashing interact,
-## each press costs stamina; break_presses = presses needed; hold_seconds = how long before
+## each press costs stamina (with Hold to break free on, holding interact counts one press per
+## VitalsState.GRAB_HOLD_STEP, 0.18 s, and the ring sits steady); break_presses = presses needed; hold_seconds = how long before
 ## the hold resolves as the attacker's follow-up (the attacker decides what that is).
 signal player_grabbed(source_id: StringName, break_presses: int, hold_seconds: float)
 ## The holder let go (it was hit, scared, or finished).
