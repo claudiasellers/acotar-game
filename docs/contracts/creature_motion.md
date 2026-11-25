@@ -322,18 +322,5 @@ speed/lag metres. With `carried` it moves with the subject like a camera car,
 so the lag only smooths turns. Use `carried` for shots from behind, where
 trailing would let foliage with no collision come between.
 
-`RideNorthStaging` is a child of the RideNorth space, added by one line in
-the `_ready` of `ride_north.gd`. It is camera only:
-
-- On the `lead` cue: a tracking shot ahead of the horse, then her own view
-  (`follow(58°)`, half bars).
-- On `enchanted_sleep`: a slow rise behind and above.
-- On the spring grade swap: ahead on the path looking back as they pass the
-  wall, then her view.
-- When the veil is dark: her own camera, which goes with her to the gate.
-- On the fade in: behind and above up the drive.
-- On the `leave` cue (the dismount) or the space finishing: drop. It never
-  holds past the dismount.
-
-Probe: `tools/creatures/ride_north_film_shot.tscn -- <out> [numbers]`.
-Test: `tests/unit/story/test_ride_staging.gd`.
+The ride north has no staging: it is played, on the player's own camera
+(`story/act1/ride_north.gd`, the riding frame MountDirector uses).
