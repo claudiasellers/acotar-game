@@ -64,7 +64,6 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/bow/hit_stone.ogg | An arrow clatters off stone | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/hit_wood.ogg | Arrow hits wood, shaft quivering | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/let_down.ogg | The string eased forward, nothing loosed | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
-| audio/sfx/bow/nock.ogg | An arrow seats on the string: a wood click | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release.ogg | Bow release: string twang and slap | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release_ash.ogg | The ash arrow leaves: a deeper thrum with a faint chime tail | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bow/release_gilded.ogg | Gilded bow release: a ringing note | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

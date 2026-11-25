@@ -2,13 +2,13 @@
 gen_act1_audio.py's SOUNDS and CUES. Self-made from seeded noise and
 partials, CC0, like the rest.
 
-What each one is for: the nock click says an arrow is on the string; the
+What each one is for: the
 creak loop is a held full draw; the let-down is the string eased forward with
 nothing loosed; the pat is her hand on an empty quiver; a short gasp when
 she has no breath left for a sidestep; each bow has its own
 release and the ash arrow a deeper one with a chime tail; Focus is an inhale
 and, let go, an exhale, with her heartbeat under it; each arrow type has a
-short sound of its own, so what is nocked can be heard; an arrow pulled out
+short sound of its own, so what is chosen can be heard; an arrow pulled out
 of what it stuck in; the bow limb as a club; an arrow on stone. Two more for
 tracking: what a lost deer and a lost rabbit give away (CreatureData.lost_cue).
 """
@@ -23,15 +23,6 @@ ARROW_TYPES = ("wood", "ash", "fire", "frost", "sleep", "lure", "light", "barbed
 
 def _t(n):
     return np.arange(n) / SR
-
-
-def nock():
-    r = rng(1301)
-    s = 0.16
-    n = secs(s)
-    click = sum(g * reso(white(r, n), f, 18) for f, g in ((1900, 1.0), (3150, 0.5), (760, 0.4))) * env_exp(n, 0.012, 0.0003)
-    seat = thump(210, s, 0.015, 0.3) * 0.35
-    return normalize(fade(click + seat, 0.0003, 0.03), -8)
 
 
 def creak_loop():
@@ -223,7 +214,6 @@ def hare_lost():
 
 
 SOUNDS = {
-    "sfx/bow/nock": (nock, 4, "An arrow seats on the string: a wood click"),
     "sfx/bow/creak_loop": (creak_loop, 4, "A held full draw: string and limb creak (loop)"),
     "sfx/bow/let_down": (let_down, 4, "The string eased forward, nothing loosed"),
     "sfx/bow/empty_pat": (empty_pat, 4, "Her hand pats an empty quiver"),
@@ -245,7 +235,6 @@ SOUNDS.update({"sfx/arrow/select_%s" % k: (_selector(k), 4, "The %s arrow comes 
 
 # cue id: (files, volume_db, pitch_jitter, loop, music, max_distance)
 CUES = {
-    "bow_nock": (["sfx/bow/nock"], -8, 0.05, False, False, 20),
     "bow_creak": (["sfx/bow/creak_loop"], -10, 0, True, False, 20),
     "bow_let_down": (["sfx/bow/let_down"], -8, 0.05, False, False, 20),
     "bow_empty": (["sfx/bow/empty_pat"], -8, 0.05, False, False, 20),
