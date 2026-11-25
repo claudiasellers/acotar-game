@@ -359,3 +359,12 @@ Numbers the slice tests hold the game to, derived from the systems' own rates.
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | `FeyreBreath.PUFF_ALPHA` | characters/feyre/feyre_breath.gd | 0.35 | 0.2–0.6 | How solid a fresh cold-breath puff is (the color_ramp's start alpha; it fades to 0 over the puff's life). Each puff is a soft radial disc, albedo 0.85. | L76 |
+
+## Monster weapons and camp gear (L88)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `grim()` lift | tools/blender/monster_gear_kit.py | 0.62 | 0.55–0.75 | The power every grim palette colour is raised to before it is stored. Lower is lighter. At 1.0 the darks crush to black under the game's tonemap; under 0.55 bone and silk reach the 0.85 albedo cap. | L88 |
+| `Prop.add` `sharp_deg` | tools/blender/monster_gear_kit.py | 72 | 48–80 | Edges sharper than this shade hard. 72 keeps bone, root and stone rounded and leaves only a blade's edge and a cut end crisp. | L88 |
+| `lash()` sleeve | tools/blender/monster_gear_kit.py | r + 0.35 × cord | 0.2–0.6 | How far the solid binding under a wound cord stands off the shaft, so a gap between coils shows binding and not bare wood. | L88 |
+| Stolen-thing colours | tools/blender/monster_gear_kit.py `STOLEN_ROSE`, `STOLEN_PERI`, `STOLEN_MINT`, `SILVER`, `GILT` | court palette, not lifted | – | The one clean colour on a piece: what the gloamers and the Hob took from the court and from mortals. Everything else is the grim palette. | L88 |
