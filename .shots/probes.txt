@@ -1,0 +1,3 @@
+from L86 clarity lane
+quality look
+shot ride res://tools/creatures/ride_north_film_shot.tscn {out}
