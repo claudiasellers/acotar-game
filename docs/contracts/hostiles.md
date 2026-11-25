@@ -189,12 +189,46 @@ knife hit, and a box bigger than the body.
   FOLDING (1.0 s, at home with nothing to do by day). `is_bush()`.
 - The tell: its body is L83's rigged `creatures/models/fae/briarling.gltf` in
   its briar hide (`briarling_hide.tres`), which has no wind: as a bush it holds
-  its `bush` pose, shaped like the Rosewild's `flora_bush_rose`
+  its `bush` pose (`CreatureAnimator.hold`), shaped like the Rosewild's `flora_bush_rose`
   (`BriarlingRoamer.ROSE`) and coloured by the same leaf and petal swatches,
   and the real roses round it sway while it doesn't. It plays `unfold` and
   `fold` between forms (`_show_form`); a wind-up begun as a bush is called off
   while it unfolds. Its strikes wind up on `telegraph_briarling_lash` and
   `telegraph_briarling_snare`.
+
+## Gloamers (`GloamerRoamer`, bestiary §16)
+
+`creatures/hostile/gloamer_roamer.tscn`, data `data/creatures/hostile/gloamer_roamer.tres`
+(both from `gen_hostile_sites.py`). The common tier's wood-edge pack (packs
+of 3-5); no sites yet (plan §6.2, a later hand-in).
+
+- Body: L83's rigged `creatures/models/fae/gloamer.gltf`
+  (`data/animation/creatures/gloamer_gaits.txt`). 24 HP, 8 per wood arrow (3),
+  the throat (top 20% of 1.3 m) x3 (1), ash 1 at once; burns 6 HP/s. Walk 2,
+  run 6.5 m/s; sight 40.5, hearing 44, scent 70 m. No element row (the matrix
+  has no gloamer column): every element is normal.
+- `routine_at`: `hunt` 18:00-06:00, `rest` otherwise: at home it holds
+  `sleep` (`is_lying_up()`), at half sight and 0.7 hearing, and plays `wake`
+  as anything moves it or sets it on her.
+- Scene: `attack_id` gloamer_rake (claw 8, 0.45 s), and every third strike
+  `gloamer_shove` (`SHOVE`, blunt 12, 1 m knockback, 0.6 s); `strike_reach`
+  1.2; DreadField 20 m / 6 m; `call_clip` call, `rout_share` 0.5,
+  `glint_drawn` 2, `glint_clip` grab_shiny, `squabble_clip` squabble.
+
+## Pack behaviour (any family, by scene export)
+
+- **The call**: a member with a `call_clip` plays it as it engages.
+- **The rout**: once `rout_share` of a site's members are dead in one fight
+  (`ceil(count x share)`), `HostileSite` routs the rest
+  (`HostileRoamer.rout(from)`: it gives her up and runs for `ROUT_SECONDS`,
+  10 s, `is_fleeing()`), and the fight ends `driven_off`. Once a fight; the
+  next `report()` clears it. 0 (the naga, the briarling) fights to the last.
+- **The glint**: a light arrow coming to rest emits
+  `EventBus.arrow_light_landed(at)` (ArrowEffects). A site whose leash ring
+  holds `at` calls `glint(at)`: the members nearest it that `wants_glint()`,
+  up to their `glint_drawn`, `distract(at)`: they run to it, play
+  `glint_clip` within 1.2 m and then `squabble_clip` while it holds them
+  (`GLINT_SECONDS`, 8 s, `is_distracted()`). A wound ends it at once.
 
 ## The shared brain (`HostileRoamer`)
 
@@ -207,7 +241,9 @@ its own data:
 
 - scene exports: `strike_reach`, `strike_cooldown`, `attack_id` (strike row),
   `grab_attack` (grab row or empty), `lunge_attack` (lunge row or empty),
-  `dread_radius` (x 0: no DreadField), `taunt_clip` (empty: none);
+  `dread_radius` (x 0: no DreadField), `taunt_clip` (empty: none),
+  `call_clip`, `rout_share`, `glint_drawn`, `glint_clip`, `squabble_clip`
+  (pack behaviour above);
 - its rows: a grab row (`AttackData`) carries `grab_presses`, `grab_seconds`
   and `grab_fail_scale`, read through `grab_presses()`, `grab_seconds()`,
   `grab_fail_scale()`;
@@ -217,6 +253,7 @@ its own data:
 
 `NagaRoamer`: bask/hunt/nest day, watch member, coil only from behind.
 `BriarlingRoamer`: bush/hunt, forms, snare every third strike.
+`GloamerRoamer`: hunt by night, lie up asleep by day, shove every third strike.
 
 ## Encounters (`HostileEncounters`)
 
