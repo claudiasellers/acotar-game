@@ -131,6 +131,13 @@ func _play() -> void:
 	_pass()
 
 	_begin("the_beast", "the beast limps in from the garden doors, the flash, Tamlin; he knows she can't write")
+	# Setting it down opens her journal at the map; she closes it as a player
+	# does, with Esc (ui_cancel), and the night goes on.
+	if not await _until(func() -> bool: return MenuShell.is_shell_open(get_tree()), 15.0):
+		return _fail("her journal never opened at the map (beat '%s')" % wound.current_beat_label())
+	await _press(&"ui_cancel")
+	if not await _until(func() -> bool: return not MenuShell.is_shell_open(get_tree()), 3.0):
+		return _fail("Esc didn't close her journal (beat '%s')" % wound.current_beat_label())
 	if not await _until(func() -> bool: return WorldState.has_flag("fact.tamlin_knows_she_cannot_read"), 90.0):
 		return _fail("stuck at '%s'" % wound.current_beat_label())
 	_note("%d blood stains on the marble" % wound.stains.size())
@@ -140,12 +147,19 @@ func _play() -> void:
 	var t0 := _sim_seconds()
 	while _sim_seconds() - t0 < 180.0 and not wound.current_beat_label().begins_with("until the supplies"):
 		var t := wound.actor(&"tamlin")
-		if t and _flat(t.global_position) > 2.5:
-			await _walk_to(t.global_position, 2.0, Callable(), 8.0)
+		# Following, she keeps a step back; once he slumps against the table she
+		# goes right up to him at it, as a player does.
+		var close := 1.2 if wound.current_beat_label().begins_with("reach") else 2.0
+		if t and _flat(t.global_position) > close + 0.5:
+			await _walk_to(t.global_position, close, Callable(), 8.0)
 		else:
 			await _wait(0.3)
 	if not wound.current_beat_label().begins_with("until the supplies"):
-		return _fail("stuck at '%s'" % wound.current_beat_label())
+		var t := wound.actor(&"tamlin")
+		var work := wound.mark(&"feyre_work")
+		return _fail("stuck at '%s': Feyre at %s, %.1f m from feyre_work %s; Tamlin at %s" % [
+				wound.current_beat_label(), _v(feyre.global_position), _flat(work), _v(work),
+				_v(t.global_position) if t else "none"])
 	_pass()
 
 	_begin("wound_dressed", "supplies, water, clean, bind, empty the bowl: tamlin_wound_dressed")
