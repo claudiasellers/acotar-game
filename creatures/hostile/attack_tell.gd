@@ -4,8 +4,11 @@
 ## held to contact, then let go. One pose language for every family:
 ##   claw  - the striking side draws back and up (the body rears back);
 ##   blunt - head down (the body pitches forward and dips);
-##   grab  - a low crouch (the body squashes down and leans in).
-## Any other kind reads as a claw.
+##   grab  - a low crouch (the body squashes down and leans in);
+##   bite  - the head draws back to strike (a short rear, a little low);
+##   thorn - the lash draws back to one side (a rear and a twist).
+## Every telegraphed row's kind has a pose here; test_attack_tell fails one
+## that hasn't, rather than letting it borrow another's.
 ##
 ## It keeps no wind-up clock of its own: how far into the tell it is comes
 ## from the brain's timer (Creature.windup_left()) against the row's windup_s.
@@ -22,6 +25,8 @@ const POSES := {
 	&"claw": {"pitch": -0.32, "roll": 0.12, "squash": 1.0},
 	&"blunt": {"pitch": 0.38, "roll": 0.0, "squash": 0.94},
 	&"grab": {"pitch": 0.18, "roll": 0.0, "squash": 0.82},
+	&"bite": {"pitch": -0.22, "roll": 0.0, "squash": 0.95},
+	&"thorn": {"pitch": -0.2, "roll": 0.22, "squash": 1.0},
 }
 ## Share of the wind-up spent easing in; the rest is held.
 const EASE_IN := 0.6
@@ -46,11 +51,9 @@ static func on(c: Creature) -> AttackTell:
 	return t
 
 
-## The kind of pose for an attack row.
+## The kind of pose for an attack row: its damage_kind, as it is.
 static func pose_kind(attack_id: StringName) -> StringName:
-	var row := AttackTable.resolve(attack_id)
-	var k: StringName = row.damage_kind if row else &"claw"
-	return k if POSES.has(k) else &"claw"
+	return AttackTable.resolve(attack_id).damage_kind
 
 
 ## How far into its pose a tell is, from the wind-up's length and what is left.
@@ -63,7 +66,7 @@ static func weight_at(windup_s: float, left: float) -> float:
 
 ## The model's extra rotation and squash for `k` at `w`.
 static func pose_basis(k: StringName, w: float) -> Basis:
-	var p: Dictionary = POSES.get(k, POSES[&"claw"])
+	var p: Dictionary = POSES[k]
 	var squash := lerpf(1.0, float(p.squash), w)
 	return Basis.from_euler(Vector3(float(p.pitch) * w, 0.0, float(p.roll) * w)) \
 			* Basis.from_scale(Vector3(1.0, squash, 1.0))
@@ -82,8 +85,7 @@ func step(delta: float) -> void:
 	var attack := creature.winding_up() if creature.alive else &""
 	if attack != &"":
 		kind = AttackTell.pose_kind(attack)
-		var row := AttackTable.resolve(attack)
-		weight = AttackTell.weight_at(row.windup_s if row else 0.0, creature.windup_left())
+		weight = AttackTell.weight_at(AttackTable.resolve(attack).windup_s, creature.windup_left())
 	else:
 		weight = move_toward(weight, 0.0, delta / RELEASE_SECONDS)
 	_apply()
