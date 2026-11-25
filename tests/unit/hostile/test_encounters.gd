@@ -126,6 +126,19 @@ func test_killing_the_puca_counts() -> void:
 	assert_eq(HostileEncounters.plain_fights(), 1)
 
 
+func test_being_lured_into_a_camp_doesnt_count() -> void:
+	HostileEncounters.ended(&"puca_enc", &"puca", HostileEncounters.LURED)
+	assert_eq(ended, [[&"puca_enc", &"puca", HostileEncounters.LURED]], "it still ends")
+	assert_eq(HostileEncounters.plain_fights(), 0, "the puca won: not a plain fight")
+
+
+func test_only_the_listed_outcomes_count() -> void:
+	assert_eq(HostileEncounters.COUNTED,
+			[HostileEncounters.KILLED, HostileEncounters.DRIVEN_OFF, HostileEncounters.SLIPPED])
+	HostileEncounters.ended(&"x", &"naga", &"some_new_outcome")
+	assert_eq(HostileEncounters.plain_fights(), 0, "an outcome added later doesn't count by accident")
+
+
 func test_three_fights_open_the_way() -> void:
 	for i in 3:
 		HostileEncounters.ended(StringName("s%d" % i), &"naga", HostileEncounters.SLIPPED)

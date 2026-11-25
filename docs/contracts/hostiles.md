@@ -214,8 +214,11 @@ its own data:
 
 Every fight ends once through `HostileEncounters.ended(source_id, family, outcome)`:
 it emits `EventBus.hostile_encounter_ended(source_id, family, outcome)` and, for
-any outcome but `knockdown`, adds one to `fact.plain_fights` (a deed fact; the
-village's opening needs 3, progression §8a.1b).
+`killed`, `driven_off` or `slipped` only (`COUNTED`, an allow-list: she came out
+alive and the creature lost), adds one to `fact.plain_fights` (a deed fact; the
+village's opening needs 3, progression §8a.1b). `knockdown` and `lured` are the
+creature winning and don't count; nor does any outcome added later until it is
+listed.
 
 - A site's fight begins at its first `report()` (`engaged`). It ends `killed`
   when the site settles (engaged or not: a sneak clear counts), `knockdown`
