@@ -24,24 +24,25 @@ FILMS = {
             ("handover", 183.0),
         ],
         lines=[
-            ("op_01", 1.5, 7.8, "", "C", "Every human child learns the story the same way. In lullabies. In rhymes we chant before we can read."),
+            ("op_01", 1.5, 6.8, "", "C", "Every human child learns the story the same way. In lullabies. In rhymes we chant before we can read."),
             ("op_02", 11.0, 7.5, "", "C", "Once, the whole of this land belonged to the faeries."),
-            ("op_03", 21.0, 11.0, "", "C", "The greatest of them, the High Fae, were ageless, and so beautiful it hurt to look at them. Stronger than us, faster than us, with magic in their blood."),
+            ("op_03", 21.0, 10.0, "", "C", "The greatest of them, the High Fae, were ageless, and so beautiful it hurt to look at them. Stronger than us, faster than us, with magic in their blood."),
             ("op_04", 34.5, 6.5, "", "C", "But not every faerie looked like a lord. Some wore the shapes of beasts."),
             # Owner-approved narration (2026-11-25, Keeper): spoken throughout, never sung.
-            # Voice tags: /mnt/project-files/film/narration/opening-narration-voice-tags.md
-            ("op_05", 43.0, 10.0, "", "C", "For thousands of years, we were their slaves. We built their cities with our blood and sweat, and raised temples to their savage gods."),
-            ("op_06", 54.5, 3.0, "", "C", "Until, at last, we rose against them."),
-            ("op_07", 57.8, 6.0, "", "A/X", "Then one of them turned traitor, and told us their secret. Ash wood can kill them."),
-            ("op_08", 64.0, 4.6, "", "A/X", "Still the killing went on, on both sides, until the ground was red."),
-            ("op_09", 68.8, 6.6, "", "C", "Six human queens signed a Treaty with them, five hundred years ago. A promise."),
-            ("op_10", 75.7, 10.5, "", "C", "The faeries kept the north, and took their magic with them. They called it Prythian. We were given the south, and a Wall between us that no one can see."),
-            ("op_11", 86.5, 10.6, "", "A/X", "The war was so terrible that no one could bear to speak of it. So we turned it into songs, as warnings for our children. Songs are all we know of them now."),
-            ("op_12", 97.4, 8.0, "", "C", "Five hundred years on, we still wear iron to keep them away. We tell our children that ash wood can kill them."),
+            # Voice tags: /mnt/project-files/film/narration/opening-narration-voice-tags.md (v2:
+            # low and even, no pauses but the one before her name, so the holds are tight).
+            ("op_05", 43.0, 8.6, "", "C", "For thousands of years, we were their slaves. We built their cities with our blood and sweat, and raised temples to their savage gods."),
+            ("op_06", 54.5, 2.6, "", "C", "Until, at last, we rose against them."),
+            ("op_07", 57.8, 5.4, "", "A/X", "Then one of them turned traitor, and told us their secret. Ash wood can kill them."),
+            ("op_08", 64.0, 4.4, "", "A/X", "Still the killing went on, on both sides, until the ground was red."),
+            ("op_09", 68.8, 5.0, "", "C", "Six human queens signed a Treaty with them, five hundred years ago. A promise."),
+            ("op_10", 75.7, 9.8, "", "C", "The faeries kept the north, and took their magic with them. They called it Prythian. We were given the south, and a Wall between us that no one can see."),
+            ("op_11", 86.5, 10.2, "", "A/X", "The war was so terrible that no one could bear to speak of it. So we turned it into songs, as warnings for our children. Songs are all we know of them now."),
+            ("op_12", 97.4, 7.4, "", "C", "Five hundred years on, we still wear iron to keep them away. We tell our children that ash wood can kill them."),
             ("op_13", 107.0, 6.5, "", "C?", "My name is Feyre. I am nineteen, the youngest of three sisters."),
             ("op_14", 128.0, 8.5, "", "C", "My mother died when I was eight. Before she did, she made me promise to keep us together, and to look after them."),
             # Keeper 2026-11-25 [A], ch 18 and ch 2: "broke his leg" read as the creditor's own leg.
-            ("op_15", 137.5, 14.0, "", "A", "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."),
+            ("op_15", 137.5, 13.0, "", "A", "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."),
             ("op_16", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
             ("op_17", 166.4, 2.2, "", "C", "So I hunt."),
             ("op_18", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
