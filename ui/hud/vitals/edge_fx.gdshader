@@ -1,6 +1,7 @@
 // Feyre's screen edges in one full-screen pass (plan §14.5, §15 D): fear,
 // low health, venom veins, frost, fae-toll colour bleed, the ease bloom, the
-// heal burst, the hit-direction bruise, drowsy eyelids, and the knockdown's
+// heal burst, the hit-direction bruise, the paper edge of hiding, the beat of
+// an unseen attack, drowsy eyelids, and the knockdown's
 // stars, rose-black iris and white-gold wake. Horror layers use the horror
 // palette and are never pretty; the Spring layers are candy and gold.
 shader_type canvas_item;
@@ -18,6 +19,10 @@ uniform float ease = 0.0;
 uniform float heal = 0.0;
 uniform vec2 hit_dir = vec2(0.0, -1.0);
 uniform float hit_amount = 0.0;
+uniform float hidden = 0.0;
+uniform vec3 paper_color = vec3(0.92, 0.90, 0.85);
+uniform float warn = 0.0;
+uniform float warn_side = 0.0;
 uniform float drowsy_lid = 0.0;
 uniform float stars = 0.0;
 uniform float iris = 0.0;
@@ -121,6 +126,18 @@ void fragment() {
 		float m = facing * smoothstep(0.55, 1.05, v);
 		over(acc, mix(BRUISE, OLD_BLOOD, 0.4), m * hit_amount * 0.85);
 		over(acc, ICHOR, m * hair * hit_amount * 0.6);
+	}
+	// Hidden: the page's own edge draws in, torn and soft, while she is hard to see.
+	if (hidden > 0.0) {
+		float tear = fbm(vec2(atan(p.y, p.x) * 5.0, v * 2.0)) - 0.5;
+		float m = smoothstep(0.88 - hidden * 0.1, 1.1, v + tear * 0.2);
+		over(acc, paper_color, m * hidden * 0.55 * s);
+	}
+	// An attack she cannot see winding up: that side's edge beats (the bottom for behind her).
+	if (warn > 0.0) {
+		float beat = 0.55 + 0.45 * sin(TIME * 11.0);
+		float side = abs(warn_side) < 0.2 ? smoothstep(0.6, 1.0, uv.y) : smoothstep(0.7, 1.0, 0.5 + (uv.x - 0.5) * sign(warn_side));
+		over(acc, mix(OLD_BLOOD, BRUISE, 0.3), side * side * warn * beat * 0.7);
 	}
 	// Drowsy: heavy eyelids closing from top and bottom.
 	if (drowsy_lid > 0.0) {
