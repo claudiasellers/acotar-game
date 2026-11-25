@@ -87,7 +87,7 @@ victim_alone_fails() {
 	local rc=0 left=$(( deadline - $(date +%s) ))
 	[ "$left" -gt 5 ] || gave_up "out of time ($budget s)"
 	( cd "${wt:-.}" && MQ_SCRATCH="${data:-$out/scratch/bisect}" /usr/bin/perl "$here/mqtimeout.pl" "$left" /bin/bash -c \
-		"\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=res://${victim#gut:}" \
+		"\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gpre_run_script=res://tests/fixtures/reset_hook.gd -gtest=res://${victim#gut:}" \
 		> "$out/logs/${slug}_victim.log" 2>&1 )
 	rc=$?
 	[ "$rc" != 125 ] || gave_up "engine vanished"
@@ -101,7 +101,7 @@ red() { # red "<tests>": true when those tests plus the victim go red together
 	left=$(( deadline - $(date +%s) ))
 	[ "$left" -gt 5 ] || gave_up "out of time ($budget s)"
 	( cd "${wt:-.}" && MQ_SCRATCH="${data:-$out/scratch/bisect}" /usr/bin/perl "$here/mqtimeout.pl" "$left" /bin/bash -c \
-		"\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gtest=${list#,}" \
+		"\"\$MQ_BIN/godot.sh\" -s addons/gut/gut_cmdln.gd -gconfig= -gexit -gpre_run_script=res://tests/fixtures/reset_hook.gd -gtest=${list#,}" \
 		> "$out/logs/${slug}_bisect.log" 2>&1 )
 	rc=$?
 	[ "$rc" != 125 ] || gave_up "engine vanished"
