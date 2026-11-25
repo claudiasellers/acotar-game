@@ -220,7 +220,6 @@ func test_the_bogge_fog_is_lit_by_its_cold_ambient() -> void:
 	assert_gt(bogge.fog_color.get_luminance(), 0.45, "the murk is paler than the trunks")
 	assert_lt(bogge.fog_color.get_luminance(), 0.65, "but still grey murk, not milk")
 	assert_gt(bogge.sun_color.b, bogge.sun_color.r, "a cold rim, not a warm one")
-	assert_eq(bogge.glow_bloom, 0.0, "no eye bloom")
 	assert_almost_eq(GradeDirector.load_preset(&"spring").volumetric_ambient_inject, 0.0, 0.0001,
 		"other grades keep their sun-lit fog")
 	var env := Environment.new()

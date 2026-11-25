@@ -21,8 +21,6 @@ exposure = 0.85
 saturation = 0.35
 contrast = 1.12
 brightness = 0.9
-glow_intensity = 0.2
-glow_bloom = 0.0
 snow_cover = 0.0
 magic = 0.0
 ; Already the horror grade: the woods dread mood would stack two stops
