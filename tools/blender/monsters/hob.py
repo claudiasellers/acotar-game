@@ -613,6 +613,35 @@ VIEWS = {
     "chest": ((1.2, 4.6, 3.3), (0, 0.5, 3.15), 70),
 }
 
+SCALE = 1.6     # the owner's size: Feyre (1.7 m) comes to its knee. Built at 4.2 m, shipped at 6.7 m standing.
+
+
+def enlarge(gltf_path, gaits_path, k):
+    """Scales the exported creature: the rig's root node carries the scale (so
+    every bone, socket and charm goes with it), and the gaits table's speeds
+    and travel distances grow by the same factor so its feet still grip."""
+    import json
+    with open(gltf_path) as f:
+        g = json.load(f)
+    for i in g["scenes"][g.get("scene", 0)]["nodes"]:
+        g["nodes"][i]["scale"] = [k, k, k]
+    with open(gltf_path, "w") as f:
+        json.dump(g, f, separators=(",", ":"))
+    rows = []
+    with open(gaits_path) as f:
+        for line in f:
+            c = line.split()
+            if line.startswith("#") or len(c) != 6:
+                rows.append(line.replace("monsters/hollow_hob.py", "monsters/hob.py"))
+                continue
+            for j in (1, 5):
+                if c[j] != "-":
+                    c[j] = f"{float(c[j]) * k:.3f}"
+            rows.append(" ".join(c) + "\n")
+    with open(gaits_path, "w") as f:
+        f.writelines(rows)
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     fast = "--fast" in args
@@ -647,5 +676,6 @@ if __name__ == "__main__":
         for o in hide:
             bpy.data.objects.remove(o, do_unlink=True)
         path = kit.export_gltf(NAME, [low] + charm_objs + [arm], OUT)
-        rig.write_gaits(NAME, r, "creatures/models/fae/hollow_hob.gltf")
+        gaits = rig.write_gaits(NAME, r, "creatures/models/fae/hollow_hob.gltf")
+        enlarge(path, gaits, SCALE)
         print(f"{NAME}: {kit.tris(low) + sum(kit.tris(o) for o in charm_objs)} tris -> {path}")
