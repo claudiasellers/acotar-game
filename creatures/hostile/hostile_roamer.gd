@@ -145,13 +145,11 @@ func _arm() -> void:
 		carried_weapon = table.carried_by(member_index, count)
 	if carried_weapon == &"" or animator == null:
 		return
-	var w := WeaponTable.get_weapon(carried_weapon)
-	if w == null or not w.has_model():
+	if not GearModel.exists(carried_weapon):
 		return
 	var hand := animator.socket(&"hand_r")
-	var scene := load(w.model_path()) as PackedScene
-	if hand and scene:
-		var m := scene.instantiate()
+	var m: Node3D = GearModel.instance(carried_weapon) if hand else null
+	if m:
 		m.name = "Weapon"
 		hand.add_child(m)
 

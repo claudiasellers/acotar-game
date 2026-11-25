@@ -250,8 +250,10 @@ func test_hush_builds_to_sleep() -> void:
 
 
 func test_a_sweep_catches_the_next_one_in_front() -> void:
-	var a := _gloamer(Vector3(0, 0, -1.6), &"gear_a")
-	var b := _gloamer(Vector3(0.8, 0, -1.8), &"gear_b")
+	# The one she strikes is the nearest in front (target(): the most hurt, then
+	# the nearest), so the arc is the half in front of it.
+	var a := _gloamer(Vector3(0, 0, -1.2), &"gear_a")
+	var b := _gloamer(Vector3(0.8, 0, -1.6), &"gear_b")
 	var behind := _gloamer(Vector3(0, 0, 1.5), &"gear_behind")
 	rack.add(&"wpn_gloamer_scythe_glaive")
 	k.strike()
@@ -338,3 +340,31 @@ func test_a_camp_refills_only_after_the_blight() -> void:
 	assert_false(CampContainer.is_full(3, 40, 7, false), "before the blight, empty for good")
 	assert_false(CampContainer.is_full(3, 8, 7, true))
 	assert_true(CampContainer.is_full(3, 10, 7, true), "after it, full again a week on")
+
+
+# --- L88's models -------------------------------------------------------------------
+
+## A weapon's model: `<id>_worn` in place of `<id>` when worn, `_lod1` hidden.
+func test_the_model_shows_its_worn_mesh_when_worn() -> void:
+	var root := Node3D.new()
+	autofree(root)
+	var names := ["wpn_x", "wpn_x_worn", "wpn_x_lod1"]
+	for n: String in names:
+		var mi := MeshInstance3D.new()
+		mi.name = n
+		mi.mesh = BoxMesh.new()
+		root.add_child(mi)
+	GearModel.set_worn(root, &"wpn_x", false)
+	assert_true((root.get_node("wpn_x") as MeshInstance3D).visible)
+	assert_false((root.get_node("wpn_x_worn") as MeshInstance3D).visible)
+	assert_false((root.get_node("wpn_x_lod1") as MeshInstance3D).visible)
+	GearModel.set_worn(root, &"wpn_x", true)
+	assert_false((root.get_node("wpn_x") as MeshInstance3D).visible)
+	assert_true((root.get_node("wpn_x_worn") as MeshInstance3D).visible)
+	assert_false((root.get_node("wpn_x_lod1") as MeshInstance3D).visible)
+
+
+func test_no_file_no_model_and_the_rest_pose_falls_back() -> void:
+	assert_null(GearModel.instance(&"wpn_not_modelled"), "never a stand-in")
+	assert_eq(GearModel.rest_rotation(&"wpn_not_modelled", Vector3(1, 2, 3)), Vector3(1, 2, 3))
+	assert_eq(GearModel.rest_lift(&"wpn_not_modelled", 0.04), 0.04)

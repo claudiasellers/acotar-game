@@ -46,10 +46,9 @@ static func place(site: HostileSite) -> CampContainer:
 
 func _ready() -> void:
 	add_to_group(GROUP)
-	if table and table.camp_container != &"" and ResourceLoader.exists(MODEL % table.camp_container):
-		var scene := load(MODEL % table.camp_container) as PackedScene
-		if scene:
-			add_child(scene.instantiate())
+	var m: Node3D = GearModel.instance(table.camp_container) if table else null
+	if m:
+		add_child(m)
 	var glint := OmniLight3D.new()
 	glint.name = "Glint"
 	glint.light_color = Color(1.0, 0.86, 0.62)

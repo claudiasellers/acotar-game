@@ -45,15 +45,13 @@ static func spawn(parent: Node, at: Vector3, id: StringName, wear_left: float = 
 
 func _ready() -> void:
 	add_to_group(GROUP)
-	var w := WeaponTable.get_weapon(weapon_id)
-	if w and w.has_model():
-		var scene := load(w.model_path()) as PackedScene
-		if scene:
-			var m := scene.instantiate() as Node3D
-			if m:
-				m.rotation = REST_ROTATION
-				m.position.y = REST_HEIGHT
-				add_child(m)
+	# L88's model, worn if it is (below WeaponRack.WORN_BELOW), laid as its
+	# manifest row says.
+	var m := GearModel.instance(weapon_id, wear < WeaponRack.WORN_BELOW)
+	if m:
+		m.rotation = GearModel.rest_rotation(weapon_id, REST_ROTATION)
+		m.position.y = GearModel.rest_lift(weapon_id, REST_HEIGHT)
+		add_child(m)
 	# A small warm glint so it reads as something to take, model or not.
 	var glint := OmniLight3D.new()
 	glint.name = "Glint"

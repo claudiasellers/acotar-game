@@ -3,7 +3,12 @@
 The catalogue (names, stats, looks, canon) is `plans/hostile-fae/monster-gear.md`
 in the project files. The models are L88's (`docs/contracts/monster_gear_models.md`):
 one `art/monster_gear/<id>.glb` per item id. The game loads a model when its
-file exists and never builds a stand-in.
+file exists and never builds a stand-in. `GearModel` (`systems/weapons/gear_model.gd`)
+is the one setup: `_lod1` hidden, `<id>_worn` shown instead of `<id>` when worn,
+PropFinishes on the "opaque" and "clear" surfaces, and a drop laid by the
+manifest's `rest_deg` and `rest_lift_m`. The manifest's `reach_m` is the
+model's grip-to-tip length; `WeaponData.reach_m` is the game's reach from her
+centre, and the two are separate on purpose.
 
 ## Data
 - `WeaponData` (`systems/weapons/weapon_data.gd`), rows in `data/combat/weapons/<id>.tres`.
