@@ -397,3 +397,9 @@ hall_mark_3,feyre,,The garden doors. An X.,A,yes,scene,hall_map.hall_mark_3,,,"i
 hall_mark_4,feyre,,The kitchen door. An X.,A,yes,scene,hall_map.hall_mark_4,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_4.ogg
 hall_mark_5,feyre,,The servants' stair. A circle.,A,yes,scene,hall_map.hall_mark_5,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_5.ogg
 sentry_chest_tag,note,A tag on the hasp,For whoever puts an arrow in all three butts.,X,,scene,sentry_chest.sentry_chest_tag,,,not voiced: written,audio/voice/sentry_chest_tag.ogg
+hostile_element_weak,feyre,,That hurt it. Remember what did that.,X,yes,scene,hostile_elements.hostile_element_weak,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak.ogg
+hostile_element_weak_ember,feyre,,"Fire, then. Even they burn.",X,yes,scene,hostile_elements.hostile_element_weak_ember,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_ember.ogg
+hostile_element_weak_rime,feyre,,The cold bit deep. It hated that.,X,yes,scene,hostile_elements.hostile_element_weak_rime,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_rime.ogg
+hostile_element_weak_glimmer,feyre,,It flinched from the light like something out of a cellar.,X,yes,scene,hostile_elements.hostile_element_weak_glimmer,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_glimmer.ogg
+hostile_element_weak_hush,feyre,,Its eyes went heavy. It's fighting sleep.,X,yes,scene,hostile_elements.hostile_element_weak_hush,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_hush.ogg
+hostile_element_resisted,feyre,,"Like shooting a stone. Not that, then.",X,yes,scene,hostile_elements.hostile_element_resisted,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_resisted.ogg
