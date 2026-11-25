@@ -136,11 +136,13 @@ func speak() -> void:
 	_set_stage(Stage.SPEAK)
 
 
-## The ride north: he walks ahead, the pressure low, and keeps going.
+## The ride north: he walks ahead, the pressure low, and keeps going. Called
+## again while leading (the ride's escort, every tick), it only moves the goal.
 func lead(toward: Vector3) -> void:
 	visible = true
 	_destination = toward
-	_set_stage(Stage.LEAD)
+	if stage != Stage.LEAD:
+		_set_stage(Stage.LEAD)
 
 
 ## Night patrol (BeastPatrol): walks `points` in a loop until withdrawn.

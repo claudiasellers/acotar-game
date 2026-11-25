@@ -40,6 +40,10 @@ func _ready() -> void:
 		PhaseManager.start(load(PHASES_PATH), preview_phase)
 	if build_terrain and not ManorTerrain.world_terrain_active(get_tree()):
 		ManorTerrain.build_fallback(self)
+	# The look is there the moment the estate is: an arrival (the ride's fade
+	# at the sentry gate) never waits on the gardens to finish building.
+	if get_node_or_null(^"ManorGrade") == null:
+		add_child(make_grade())
 	if stream_id != &"":
 		add_to_group(BUSY_GROUP)
 		_build_paced(weakref(self), get_tree(), BuildPace.new(get_tree(), stream_id))
@@ -54,6 +58,17 @@ func _ready() -> void:
 	if standalone:
 		_add_preview_environment()
 		_spawn_feyre()
+
+
+## The estate's RegionGrade: the manor look anywhere inside its bounds (the
+## house's ManorInteriorGrade outranks it in the rooms).
+static func make_grade() -> RegionGrade:
+	var grade := RegionGrade.new()
+	grade.name = "ManorGrade"
+	grade.grade = &"manor"
+	grade.bounds = ManorSitePlan.BOUNDS
+	grade.blend_seconds = 4.0
+	return grade
 
 
 ## Static, and off-tree until the end: the estate can be streamed out mid-build.

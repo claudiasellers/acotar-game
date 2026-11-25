@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SoundBank" load_steps=218 format=3]
+[gd_resource type="Resource" script_class="SoundBank" load_steps=220 format=3]
 
 [ext_resource type="Script" path="res://systems/audio/sound_bank.gd" id="1"]
 [ext_resource type="Script" path="res://systems/audio/sound_cue.gd" id="2"]
@@ -40,86 +40,87 @@
 [ext_resource type="AudioStream" path="res://audio/sfx/beast/roar.ogg" id="a35"]
 [ext_resource type="AudioStream" path="res://audio/sfx/beast/snap_arrow.ogg" id="a36"]
 [ext_resource type="AudioStream" path="res://audio/sfx/beast/snarl_loop.ogg" id="a37"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bogge/passed.ogg" id="a38"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bogge/presence.ogg" id="a39"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_1.ogg" id="a40"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_2.ogg" id="a41"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_3.ogg" id="a42"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/bash.ogg" id="a43"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/break.ogg" id="a44"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/creak_loop.ogg" id="a45"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/draw.ogg" id="a46"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/empty_pat.ogg" id="a47"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/focus_in.ogg" id="a48"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/focus_out.ogg" id="a49"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/heartbeat.ogg" id="a50"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_flesh.ogg" id="a51"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_snow.ogg" id="a52"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_stone.ogg" id="a53"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_wood.ogg" id="a54"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/let_down.ogg" id="a55"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/nock.ogg" id="a56"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/release.ogg" id="a57"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_ash.ogg" id="a58"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_gilded.ogg" id="a59"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_recurve.ogg" id="a60"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_warbow.ogg" id="a61"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/retrieve.ogg" id="a62"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/whoosh.ogg" id="a63"]
-[ext_resource type="AudioStream" path="res://audio/sfx/bow/winded.ogg" id="a64"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_1.ogg" id="a65"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_2.ogg" id="a66"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_3.ogg" id="a67"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_4.ogg" id="a68"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/jump.ogg" id="a69"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/land_snow.ogg" id="a70"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_1.ogg" id="a71"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_2.ogg" id="a72"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_3.ogg" id="a73"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_4.ogg" id="a74"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_5.ogg" id="a75"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_1.ogg" id="a76"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_2.ogg" id="a77"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_3.ogg" id="a78"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_4.ogg" id="a79"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_1.ogg" id="a80"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_2.ogg" id="a81"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_3.ogg" id="a82"]
-[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_4.ogg" id="a83"]
-[ext_resource type="AudioStream" path="res://audio/sfx/horror/wrong.ogg" id="a84"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/attack.ogg" id="a85"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/death.ogg" id="a86"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_1.ogg" id="a87"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_2.ogg" id="a88"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_3.ogg" id="a89"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/hurt.ogg" id="a90"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/strike.ogg" id="a91"]
-[ext_resource type="AudioStream" path="res://audio/sfx/naga/throat_tear.ogg" id="a92"]
-[ext_resource type="AudioStream" path="res://audio/sfx/prey/deer_lost.ogg" id="a93"]
-[ext_resource type="AudioStream" path="res://audio/sfx/prey/hare_lost.ogg" id="a94"]
-[ext_resource type="AudioStream" path="res://audio/sfx/puca/dart.ogg" id="a95"]
-[ext_resource type="AudioStream" path="res://audio/sfx/puca/ripple.ogg" id="a96"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/scream.ogg" id="a97"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_creak.ogg" id="a98"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_release.ogg" id="a99"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_snap.ogg" id="a100"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/sniff.ogg" id="a101"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_1.ogg" id="a102"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_2.ogg" id="a103"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_3.ogg" id="a104"]
-[ext_resource type="AudioStream" path="res://audio/sfx/suriel/warning.ogg" id="a105"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wolf/bark_pain.ogg" id="a106"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wolf/death.ogg" id="a107"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wolf/growl_low.ogg" id="a108"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wolf/pack_growl.ogg" id="a109"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wolf/seize.ogg" id="a110"]
-[ext_resource type="AudioStream" path="res://audio/ui/celebrate.ogg" id="a111"]
-[ext_resource type="AudioStream" path="res://audio/ui/click.ogg" id="a112"]
-[ext_resource type="AudioStream" path="res://audio/ui/close.ogg" id="a113"]
-[ext_resource type="AudioStream" path="res://audio/ui/deny.ogg" id="a114"]
-[ext_resource type="AudioStream" path="res://audio/ui/hover.ogg" id="a115"]
-[ext_resource type="AudioStream" path="res://audio/ui/open.ogg" id="a116"]
-[ext_resource type="AudioStream" path="res://audio/ui/satchel_pickup.ogg" id="a117"]
+[ext_resource type="AudioStream" path="res://audio/sfx/beast/throw_glance.ogg" id="a38"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bogge/passed.ogg" id="a39"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bogge/presence.ogg" id="a40"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_1.ogg" id="a41"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_2.ogg" id="a42"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bogge/whisper_3.ogg" id="a43"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/bash.ogg" id="a44"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/break.ogg" id="a45"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/creak_loop.ogg" id="a46"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/draw.ogg" id="a47"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/empty_pat.ogg" id="a48"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/focus_in.ogg" id="a49"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/focus_out.ogg" id="a50"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/heartbeat.ogg" id="a51"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_flesh.ogg" id="a52"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_snow.ogg" id="a53"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_stone.ogg" id="a54"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/hit_wood.ogg" id="a55"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/let_down.ogg" id="a56"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/nock.ogg" id="a57"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release.ogg" id="a58"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_ash.ogg" id="a59"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_gilded.ogg" id="a60"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_recurve.ogg" id="a61"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/release_warbow.ogg" id="a62"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/retrieve.ogg" id="a63"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/whoosh.ogg" id="a64"]
+[ext_resource type="AudioStream" path="res://audio/sfx/bow/winded.ogg" id="a65"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_1.ogg" id="a66"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_2.ogg" id="a67"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_3.ogg" id="a68"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/grass_4.ogg" id="a69"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/jump.ogg" id="a70"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/land_snow.ogg" id="a71"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_1.ogg" id="a72"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_2.ogg" id="a73"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_3.ogg" id="a74"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_4.ogg" id="a75"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/snow_5.ogg" id="a76"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_1.ogg" id="a77"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_2.ogg" id="a78"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_3.ogg" id="a79"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/stone_4.ogg" id="a80"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_1.ogg" id="a81"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_2.ogg" id="a82"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_3.ogg" id="a83"]
+[ext_resource type="AudioStream" path="res://audio/sfx/foot/wood_4.ogg" id="a84"]
+[ext_resource type="AudioStream" path="res://audio/sfx/horror/wrong.ogg" id="a85"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/attack.ogg" id="a86"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/death.ogg" id="a87"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_1.ogg" id="a88"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_2.ogg" id="a89"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/hiss_3.ogg" id="a90"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/hurt.ogg" id="a91"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/strike.ogg" id="a92"]
+[ext_resource type="AudioStream" path="res://audio/sfx/naga/throat_tear.ogg" id="a93"]
+[ext_resource type="AudioStream" path="res://audio/sfx/prey/deer_lost.ogg" id="a94"]
+[ext_resource type="AudioStream" path="res://audio/sfx/prey/hare_lost.ogg" id="a95"]
+[ext_resource type="AudioStream" path="res://audio/sfx/puca/dart.ogg" id="a96"]
+[ext_resource type="AudioStream" path="res://audio/sfx/puca/ripple.ogg" id="a97"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/scream.ogg" id="a98"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_creak.ogg" id="a99"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_release.ogg" id="a100"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/snare_snap.ogg" id="a101"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/sniff.ogg" id="a102"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_1.ogg" id="a103"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_2.ogg" id="a104"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/voice_3.ogg" id="a105"]
+[ext_resource type="AudioStream" path="res://audio/sfx/suriel/warning.ogg" id="a106"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/bark_pain.ogg" id="a107"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/death.ogg" id="a108"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/growl_low.ogg" id="a109"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/pack_growl.ogg" id="a110"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wolf/seize.ogg" id="a111"]
+[ext_resource type="AudioStream" path="res://audio/ui/celebrate.ogg" id="a112"]
+[ext_resource type="AudioStream" path="res://audio/ui/click.ogg" id="a113"]
+[ext_resource type="AudioStream" path="res://audio/ui/close.ogg" id="a114"]
+[ext_resource type="AudioStream" path="res://audio/ui/deny.ogg" id="a115"]
+[ext_resource type="AudioStream" path="res://audio/ui/hover.ogg" id="a116"]
+[ext_resource type="AudioStream" path="res://audio/ui/open.ogg" id="a117"]
+[ext_resource type="AudioStream" path="res://audio/ui/satchel_pickup.ogg" id="a118"]
 
 [sub_resource type="Resource" id="c0"]
 script = ExtResource("2")
@@ -194,7 +195,7 @@ max_distance = 40.0
 [sub_resource type="Resource" id="c7"]
 script = ExtResource("2")
 id = &"arrow_retrieve"
-streams = Array[AudioStream]([ExtResource("a62")])
+streams = Array[AudioStream]([ExtResource("a63")])
 volume_db = -8.0
 pitch_jitter = 0.06
 loop = false
@@ -413,99 +414,99 @@ max_distance = 60.0
 
 [sub_resource type="Resource" id="c29"]
 script = ExtResource("2")
-id = &"bogge_passed"
+id = &"beast_throw_glance"
 streams = Array[AudioStream]([ExtResource("a38")])
+volume_db = -2.0
+pitch_jitter = 0.04
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c30"]
+script = ExtResource("2")
+id = &"bogge_passed"
+streams = Array[AudioStream]([ExtResource("a39")])
 volume_db = -4.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c30"]
+[sub_resource type="Resource" id="c31"]
 script = ExtResource("2")
 id = &"bogge_presence"
-streams = Array[AudioStream]([ExtResource("a39")])
+streams = Array[AudioStream]([ExtResource("a40")])
 volume_db = -2.0
 pitch_jitter = 0.00
 loop = true
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c31"]
+[sub_resource type="Resource" id="c32"]
 script = ExtResource("2")
 id = &"bogge_whisper"
-streams = Array[AudioStream]([ExtResource("a40"), ExtResource("a41"), ExtResource("a42")])
+streams = Array[AudioStream]([ExtResource("a41"), ExtResource("a42"), ExtResource("a43")])
 volume_db = -3.0
 pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c32"]
+[sub_resource type="Resource" id="c33"]
 script = ExtResource("2")
 id = &"bow_bash"
-streams = Array[AudioStream]([ExtResource("a43")])
+streams = Array[AudioStream]([ExtResource("a44")])
 volume_db = -3.0
 pitch_jitter = 0.06
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c33"]
+[sub_resource type="Resource" id="c34"]
 script = ExtResource("2")
 id = &"bow_break"
-streams = Array[AudioStream]([ExtResource("a44")])
+streams = Array[AudioStream]([ExtResource("a45")])
 volume_db = -4.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 50.0
 
-[sub_resource type="Resource" id="c34"]
+[sub_resource type="Resource" id="c35"]
 script = ExtResource("2")
 id = &"bow_creak"
-streams = Array[AudioStream]([ExtResource("a45")])
+streams = Array[AudioStream]([ExtResource("a46")])
 volume_db = -10.0
 pitch_jitter = 0.00
 loop = true
 music = false
 max_distance = 20.0
 
-[sub_resource type="Resource" id="c35"]
+[sub_resource type="Resource" id="c36"]
 script = ExtResource("2")
 id = &"bow_draw"
-streams = Array[AudioStream]([ExtResource("a46")])
+streams = Array[AudioStream]([ExtResource("a47")])
 volume_db = -6.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c36"]
+[sub_resource type="Resource" id="c37"]
 script = ExtResource("2")
 id = &"bow_empty"
-streams = Array[AudioStream]([ExtResource("a47")])
+streams = Array[AudioStream]([ExtResource("a48")])
 volume_db = -8.0
 pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 20.0
 
-[sub_resource type="Resource" id="c37"]
-script = ExtResource("2")
-id = &"bow_focus_in"
-streams = Array[AudioStream]([ExtResource("a48")])
-volume_db = -10.0
-pitch_jitter = 0.03
-loop = false
-music = false
-max_distance = 40.0
-
 [sub_resource type="Resource" id="c38"]
 script = ExtResource("2")
-id = &"bow_focus_out"
+id = &"bow_focus_in"
 streams = Array[AudioStream]([ExtResource("a49")])
-volume_db = -11.0
+volume_db = -10.0
 pitch_jitter = 0.03
 loop = false
 music = false
@@ -513,67 +514,67 @@ max_distance = 40.0
 
 [sub_resource type="Resource" id="c39"]
 script = ExtResource("2")
-id = &"bow_heartbeat"
+id = &"bow_focus_out"
 streams = Array[AudioStream]([ExtResource("a50")])
+volume_db = -11.0
+pitch_jitter = 0.03
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c40"]
+script = ExtResource("2")
+id = &"bow_heartbeat"
+streams = Array[AudioStream]([ExtResource("a51")])
 volume_db = -8.0
 pitch_jitter = 0.00
 loop = true
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c40"]
+[sub_resource type="Resource" id="c41"]
 script = ExtResource("2")
 id = &"bow_hit_flesh"
-streams = Array[AudioStream]([ExtResource("a51")])
+streams = Array[AudioStream]([ExtResource("a52")])
 volume_db = -2.0
 pitch_jitter = 0.06
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c41"]
+[sub_resource type="Resource" id="c42"]
 script = ExtResource("2")
 id = &"bow_hit_snow"
-streams = Array[AudioStream]([ExtResource("a52")])
+streams = Array[AudioStream]([ExtResource("a53")])
 volume_db = -4.0
 pitch_jitter = 0.10
 loop = false
 music = false
 max_distance = 50.0
 
-[sub_resource type="Resource" id="c42"]
+[sub_resource type="Resource" id="c43"]
 script = ExtResource("2")
 id = &"bow_hit_stone"
-streams = Array[AudioStream]([ExtResource("a53")])
+streams = Array[AudioStream]([ExtResource("a54")])
 volume_db = -3.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 70.0
 
-[sub_resource type="Resource" id="c43"]
+[sub_resource type="Resource" id="c44"]
 script = ExtResource("2")
 id = &"bow_hit_wood"
-streams = Array[AudioStream]([ExtResource("a54")])
+streams = Array[AudioStream]([ExtResource("a55")])
 volume_db = -2.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c44"]
-script = ExtResource("2")
-id = &"bow_let_down"
-streams = Array[AudioStream]([ExtResource("a55")])
-volume_db = -8.0
-pitch_jitter = 0.05
-loop = false
-music = false
-max_distance = 20.0
-
 [sub_resource type="Resource" id="c45"]
 script = ExtResource("2")
-id = &"bow_nock"
+id = &"bow_let_down"
 streams = Array[AudioStream]([ExtResource("a56")])
 volume_db = -8.0
 pitch_jitter = 0.05
@@ -583,99 +584,99 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="c46"]
 script = ExtResource("2")
-id = &"bow_release"
+id = &"bow_nock"
 streams = Array[AudioStream]([ExtResource("a57")])
-volume_db = -2.0
-pitch_jitter = 0.04
+volume_db = -8.0
+pitch_jitter = 0.05
 loop = false
 music = false
-max_distance = 60.0
+max_distance = 20.0
 
 [sub_resource type="Resource" id="c47"]
 script = ExtResource("2")
-id = &"bow_release_ash"
+id = &"bow_release"
 streams = Array[AudioStream]([ExtResource("a58")])
 volume_db = -2.0
-pitch_jitter = 0.00
+pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 60.0
 
 [sub_resource type="Resource" id="c48"]
 script = ExtResource("2")
+id = &"bow_release_ash"
+streams = Array[AudioStream]([ExtResource("a59")])
+volume_db = -2.0
+pitch_jitter = 0.00
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c49"]
+script = ExtResource("2")
 id = &"bow_release_fae_recurve"
-streams = Array[AudioStream]([ExtResource("a60")])
+streams = Array[AudioStream]([ExtResource("a61")])
 volume_db = -4.0
 pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 50.0
 
-[sub_resource type="Resource" id="c49"]
+[sub_resource type="Resource" id="c50"]
 script = ExtResource("2")
 id = &"bow_release_gilded_bow"
-streams = Array[AudioStream]([ExtResource("a59")])
+streams = Array[AudioStream]([ExtResource("a60")])
 volume_db = -3.0
 pitch_jitter = 0.02
 loop = false
 music = false
 max_distance = 60.0
 
-[sub_resource type="Resource" id="c50"]
+[sub_resource type="Resource" id="c51"]
 script = ExtResource("2")
 id = &"bow_release_sentry_warbow"
-streams = Array[AudioStream]([ExtResource("a61")])
+streams = Array[AudioStream]([ExtResource("a62")])
 volume_db = -1.0
 pitch_jitter = 0.03
 loop = false
 music = false
 max_distance = 70.0
 
-[sub_resource type="Resource" id="c51"]
+[sub_resource type="Resource" id="c52"]
 script = ExtResource("2")
 id = &"bow_whoosh"
-streams = Array[AudioStream]([ExtResource("a63")])
+streams = Array[AudioStream]([ExtResource("a64")])
 volume_db = -6.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c52"]
+[sub_resource type="Resource" id="c53"]
 script = ExtResource("2")
 id = &"breath_winded"
-streams = Array[AudioStream]([ExtResource("a64")])
+streams = Array[AudioStream]([ExtResource("a65")])
 volume_db = -7.0
 pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c53"]
+[sub_resource type="Resource" id="c54"]
 script = ExtResource("2")
 id = &"deer_lost"
-streams = Array[AudioStream]([ExtResource("a93")])
+streams = Array[AudioStream]([ExtResource("a94")])
 volume_db = -2.0
 pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 90.0
 
-[sub_resource type="Resource" id="c54"]
-script = ExtResource("2")
-id = &"foot_grass"
-streams = Array[AudioStream]([ExtResource("a65"), ExtResource("a66"), ExtResource("a67"), ExtResource("a68")])
-volume_db = -8.0
-pitch_jitter = 0.08
-loop = false
-music = false
-max_distance = 30.0
-
 [sub_resource type="Resource" id="c55"]
 script = ExtResource("2")
-id = &"foot_jump"
-streams = Array[AudioStream]([ExtResource("a69")])
-volume_db = -10.0
+id = &"foot_grass"
+streams = Array[AudioStream]([ExtResource("a66"), ExtResource("a67"), ExtResource("a68"), ExtResource("a69")])
+volume_db = -8.0
 pitch_jitter = 0.08
 loop = false
 music = false
@@ -683,38 +684,38 @@ max_distance = 30.0
 
 [sub_resource type="Resource" id="c56"]
 script = ExtResource("2")
-id = &"foot_land_snow"
+id = &"foot_jump"
 streams = Array[AudioStream]([ExtResource("a70")])
-volume_db = -4.0
-pitch_jitter = 0.05
+volume_db = -10.0
+pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 30.0
 
 [sub_resource type="Resource" id="c57"]
 script = ExtResource("2")
-id = &"foot_snow"
-streams = Array[AudioStream]([ExtResource("a71"), ExtResource("a72"), ExtResource("a73"), ExtResource("a74"), ExtResource("a75")])
-volume_db = -8.0
-pitch_jitter = 0.08
+id = &"foot_land_snow"
+streams = Array[AudioStream]([ExtResource("a71")])
+volume_db = -4.0
+pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 30.0
 
 [sub_resource type="Resource" id="c58"]
 script = ExtResource("2")
-id = &"foot_stone"
-streams = Array[AudioStream]([ExtResource("a76"), ExtResource("a77"), ExtResource("a78"), ExtResource("a79")])
+id = &"foot_snow"
+streams = Array[AudioStream]([ExtResource("a72"), ExtResource("a73"), ExtResource("a74"), ExtResource("a75"), ExtResource("a76")])
 volume_db = -8.0
-pitch_jitter = 0.06
+pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 30.0
 
 [sub_resource type="Resource" id="c59"]
 script = ExtResource("2")
-id = &"foot_wood"
-streams = Array[AudioStream]([ExtResource("a80"), ExtResource("a81"), ExtResource("a82"), ExtResource("a83")])
+id = &"foot_stone"
+streams = Array[AudioStream]([ExtResource("a77"), ExtResource("a78"), ExtResource("a79"), ExtResource("a80")])
 volume_db = -8.0
 pitch_jitter = 0.06
 loop = false
@@ -723,25 +724,35 @@ max_distance = 30.0
 
 [sub_resource type="Resource" id="c60"]
 script = ExtResource("2")
+id = &"foot_wood"
+streams = Array[AudioStream]([ExtResource("a81"), ExtResource("a82"), ExtResource("a83"), ExtResource("a84")])
+volume_db = -8.0
+pitch_jitter = 0.06
+loop = false
+music = false
+max_distance = 30.0
+
+[sub_resource type="Resource" id="c61"]
+script = ExtResource("2")
 id = &"hare_lost"
-streams = Array[AudioStream]([ExtResource("a94")])
+streams = Array[AudioStream]([ExtResource("a95")])
 volume_db = -4.0
 pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 70.0
 
-[sub_resource type="Resource" id="c61"]
+[sub_resource type="Resource" id="c62"]
 script = ExtResource("2")
 id = &"horror_wrong"
-streams = Array[AudioStream]([ExtResource("a84")])
+streams = Array[AudioStream]([ExtResource("a85")])
 volume_db = -6.0
 pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c62"]
+[sub_resource type="Resource" id="c63"]
 script = ExtResource("2")
 id = &"music_cottage"
 streams = Array[AudioStream]([ExtResource("a7")])
@@ -751,7 +762,7 @@ loop = true
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c63"]
+[sub_resource type="Resource" id="c64"]
 script = ExtResource("2")
 id = &"music_film_eyes_open"
 streams = Array[AudioStream]([ExtResource("a8")])
@@ -761,7 +772,7 @@ loop = false
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c64"]
+[sub_resource type="Resource" id="c65"]
 script = ExtResource("2")
 id = &"music_film_night_court"
 streams = Array[AudioStream]([ExtResource("a9")])
@@ -771,7 +782,7 @@ loop = false
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c65"]
+[sub_resource type="Resource" id="c66"]
 script = ExtResource("2")
 id = &"music_film_silent_manor"
 streams = Array[AudioStream]([ExtResource("a10")])
@@ -781,7 +792,7 @@ loop = false
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c66"]
+[sub_resource type="Resource" id="c67"]
 script = ExtResource("2")
 id = &"music_opening_film"
 streams = Array[AudioStream]([ExtResource("a11")])
@@ -791,7 +802,7 @@ loop = false
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c67"]
+[sub_resource type="Resource" id="c68"]
 script = ExtResource("2")
 id = &"music_spring_estate"
 streams = Array[AudioStream]([ExtResource("a12")])
@@ -801,7 +812,7 @@ loop = true
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c68"]
+[sub_resource type="Resource" id="c69"]
 script = ExtResource("2")
 id = &"music_village"
 streams = Array[AudioStream]([ExtResource("a13")])
@@ -811,7 +822,7 @@ loop = true
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c69"]
+[sub_resource type="Resource" id="c70"]
 script = ExtResource("2")
 id = &"music_winter_forest"
 streams = Array[AudioStream]([ExtResource("a14")])
@@ -821,71 +832,61 @@ loop = true
 music = true
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c70"]
+[sub_resource type="Resource" id="c71"]
 script = ExtResource("2")
 id = &"naga_attack"
-streams = Array[AudioStream]([ExtResource("a85")])
+streams = Array[AudioStream]([ExtResource("a86")])
 volume_db = 0.0
 pitch_jitter = 0.06
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c71"]
+[sub_resource type="Resource" id="c72"]
 script = ExtResource("2")
 id = &"naga_death"
-streams = Array[AudioStream]([ExtResource("a86")])
+streams = Array[AudioStream]([ExtResource("a87")])
 volume_db = 0.0
 pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c72"]
+[sub_resource type="Resource" id="c73"]
 script = ExtResource("2")
 id = &"naga_hiss"
-streams = Array[AudioStream]([ExtResource("a87"), ExtResource("a88"), ExtResource("a89")])
+streams = Array[AudioStream]([ExtResource("a88"), ExtResource("a89"), ExtResource("a90")])
 volume_db = 0.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 70.0
 
-[sub_resource type="Resource" id="c73"]
+[sub_resource type="Resource" id="c74"]
 script = ExtResource("2")
 id = &"naga_hurt"
-streams = Array[AudioStream]([ExtResource("a90")])
+streams = Array[AudioStream]([ExtResource("a91")])
 volume_db = 0.0
 pitch_jitter = 0.08
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c74"]
+[sub_resource type="Resource" id="c75"]
 script = ExtResource("2")
 id = &"naga_strike"
-streams = Array[AudioStream]([ExtResource("a91")])
+streams = Array[AudioStream]([ExtResource("a92")])
 volume_db = 0.0
 pitch_jitter = 0.05
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c75"]
-script = ExtResource("2")
-id = &"puca_dart"
-streams = Array[AudioStream]([ExtResource("a95")])
-volume_db = -4.0
-pitch_jitter = 0.05
-loop = false
-music = false
-max_distance = 60.0
-
 [sub_resource type="Resource" id="c76"]
 script = ExtResource("2")
-id = &"puca_ripple"
+id = &"puca_dart"
 streams = Array[AudioStream]([ExtResource("a96")])
-volume_db = -6.0
+volume_db = -4.0
 pitch_jitter = 0.05
 loop = false
 music = false
@@ -893,27 +894,27 @@ max_distance = 60.0
 
 [sub_resource type="Resource" id="c77"]
 script = ExtResource("2")
+id = &"puca_ripple"
+streams = Array[AudioStream]([ExtResource("a97")])
+volume_db = -6.0
+pitch_jitter = 0.05
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c78"]
+script = ExtResource("2")
 id = &"snare_creak"
-streams = Array[AudioStream]([ExtResource("a98")])
+streams = Array[AudioStream]([ExtResource("a99")])
 volume_db = -4.0
 pitch_jitter = 0.00
 loop = true
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c78"]
-script = ExtResource("2")
-id = &"snare_release"
-streams = Array[AudioStream]([ExtResource("a99")])
-volume_db = -2.0
-pitch_jitter = 0.03
-loop = false
-music = false
-max_distance = 60.0
-
 [sub_resource type="Resource" id="c79"]
 script = ExtResource("2")
-id = &"snare_snap"
+id = &"snare_release"
 streams = Array[AudioStream]([ExtResource("a100")])
 volume_db = -2.0
 pitch_jitter = 0.03
@@ -923,89 +924,89 @@ max_distance = 60.0
 
 [sub_resource type="Resource" id="c80"]
 script = ExtResource("2")
+id = &"snare_snap"
+streams = Array[AudioStream]([ExtResource("a101")])
+volume_db = -2.0
+pitch_jitter = 0.03
+loop = false
+music = false
+max_distance = 60.0
+
+[sub_resource type="Resource" id="c81"]
+script = ExtResource("2")
 id = &"suriel_scream"
-streams = Array[AudioStream]([ExtResource("a97")])
+streams = Array[AudioStream]([ExtResource("a98")])
 volume_db = 2.0
 pitch_jitter = 0.02
 loop = false
 music = false
 max_distance = 250.0
 
-[sub_resource type="Resource" id="c81"]
+[sub_resource type="Resource" id="c82"]
 script = ExtResource("2")
 id = &"suriel_sniff"
-streams = Array[AudioStream]([ExtResource("a101")])
+streams = Array[AudioStream]([ExtResource("a102")])
 volume_db = -2.0
 pitch_jitter = 0.03
 loop = false
 music = false
 max_distance = 50.0
 
-[sub_resource type="Resource" id="c82"]
+[sub_resource type="Resource" id="c83"]
 script = ExtResource("2")
 id = &"suriel_voice"
-streams = Array[AudioStream]([ExtResource("a102"), ExtResource("a103"), ExtResource("a104")])
+streams = Array[AudioStream]([ExtResource("a103"), ExtResource("a104"), ExtResource("a105")])
 volume_db = -2.0
 pitch_jitter = 0.03
 loop = false
 music = false
 max_distance = 30.0
 
-[sub_resource type="Resource" id="c83"]
+[sub_resource type="Resource" id="c84"]
 script = ExtResource("2")
 id = &"suriel_warning"
-streams = Array[AudioStream]([ExtResource("a105")])
+streams = Array[AudioStream]([ExtResource("a106")])
 volume_db = -1.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 30.0
 
-[sub_resource type="Resource" id="c84"]
+[sub_resource type="Resource" id="c85"]
 script = ExtResource("2")
 id = &"tamlin_throat_tear"
-streams = Array[AudioStream]([ExtResource("a92")])
+streams = Array[AudioStream]([ExtResource("a93")])
 volume_db = 2.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 120.0
 
-[sub_resource type="Resource" id="c85"]
+[sub_resource type="Resource" id="c86"]
 script = ExtResource("2")
 id = &"ui_celebrate"
-streams = Array[AudioStream]([ExtResource("a111")])
+streams = Array[AudioStream]([ExtResource("a112")])
 volume_db = -3.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c86"]
+[sub_resource type="Resource" id="c87"]
 script = ExtResource("2")
 id = &"ui_click"
-streams = Array[AudioStream]([ExtResource("a112")])
+streams = Array[AudioStream]([ExtResource("a113")])
 volume_db = -4.0
 pitch_jitter = 0.02
 loop = false
 music = false
 max_distance = 40.0
 
-[sub_resource type="Resource" id="c87"]
-script = ExtResource("2")
-id = &"ui_close"
-streams = Array[AudioStream]([ExtResource("a113")])
-volume_db = -4.0
-pitch_jitter = 0.00
-loop = false
-music = false
-max_distance = 40.0
-
 [sub_resource type="Resource" id="c88"]
 script = ExtResource("2")
-id = &"ui_deny"
+id = &"ui_close"
 streams = Array[AudioStream]([ExtResource("a114")])
-volume_db = -6.0
+volume_db = -4.0
 pitch_jitter = 0.00
 loop = false
 music = false
@@ -1013,78 +1014,88 @@ max_distance = 40.0
 
 [sub_resource type="Resource" id="c89"]
 script = ExtResource("2")
-id = &"ui_hover"
+id = &"ui_deny"
 streams = Array[AudioStream]([ExtResource("a115")])
 volume_db = -6.0
-pitch_jitter = 0.03
+pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 40.0
 
 [sub_resource type="Resource" id="c90"]
 script = ExtResource("2")
-id = &"ui_open"
+id = &"ui_hover"
 streams = Array[AudioStream]([ExtResource("a116")])
-volume_db = -4.0
-pitch_jitter = 0.00
+volume_db = -6.0
+pitch_jitter = 0.03
 loop = false
 music = false
 max_distance = 40.0
 
 [sub_resource type="Resource" id="c91"]
 script = ExtResource("2")
-id = &"ui_pickup"
+id = &"ui_open"
 streams = Array[AudioStream]([ExtResource("a117")])
 volume_db = -4.0
-pitch_jitter = 0.03
+pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 40.0
 
 [sub_resource type="Resource" id="c92"]
 script = ExtResource("2")
+id = &"ui_pickup"
+streams = Array[AudioStream]([ExtResource("a118")])
+volume_db = -4.0
+pitch_jitter = 0.03
+loop = false
+music = false
+max_distance = 40.0
+
+[sub_resource type="Resource" id="c93"]
+script = ExtResource("2")
 id = &"wolf_bark_pain"
-streams = Array[AudioStream]([ExtResource("a106")])
+streams = Array[AudioStream]([ExtResource("a107")])
 volume_db = 0.0
 pitch_jitter = 0.04
 loop = false
 music = false
 max_distance = 120.0
 
-[sub_resource type="Resource" id="c93"]
+[sub_resource type="Resource" id="c94"]
 script = ExtResource("2")
 id = &"wolf_death"
-streams = Array[AudioStream]([ExtResource("a107")])
+streams = Array[AudioStream]([ExtResource("a108")])
 volume_db = -2.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 60.0
 
-[sub_resource type="Resource" id="c94"]
+[sub_resource type="Resource" id="c95"]
 script = ExtResource("2")
 id = &"wolf_growl_low"
-streams = Array[AudioStream]([ExtResource("a108")])
+streams = Array[AudioStream]([ExtResource("a109")])
 volume_db = 0.0
 pitch_jitter = 0.00
 loop = false
 music = false
 max_distance = 80.0
 
-[sub_resource type="Resource" id="c95"]
+[sub_resource type="Resource" id="c96"]
 script = ExtResource("2")
 id = &"wolf_pack_growl"
-streams = Array[AudioStream]([ExtResource("a109")])
+streams = Array[AudioStream]([ExtResource("a110")])
 volume_db = -2.0
 pitch_jitter = 0.10
 loop = false
 music = false
 max_distance = 60.0
 
-[sub_resource type="Resource" id="c96"]
+[sub_resource type="Resource" id="c97"]
 script = ExtResource("2")
 id = &"wolf_seize"
-streams = Array[AudioStream]([ExtResource("a110")])
+streams = Array[AudioStream]([ExtResource("a111")])
 volume_db = 0.0
 pitch_jitter = 0.00
 loop = false
@@ -1093,7 +1104,7 @@ max_distance = 120.0
 
 [resource]
 script = ExtResource("1")
-cues = Array[ExtResource("2")]([SubResource("c0"), SubResource("c1"), SubResource("c2"), SubResource("c3"), SubResource("c4"), SubResource("c5"), SubResource("c6"), SubResource("c7"), SubResource("c8"), SubResource("c9"), SubResource("c10"), SubResource("c11"), SubResource("c12"), SubResource("c13"), SubResource("c14"), SubResource("c15"), SubResource("c16"), SubResource("c17"), SubResource("c18"), SubResource("c19"), SubResource("c20"), SubResource("c21"), SubResource("c22"), SubResource("c23"), SubResource("c24"), SubResource("c25"), SubResource("c26"), SubResource("c27"), SubResource("c28"), SubResource("c29"), SubResource("c30"), SubResource("c31"), SubResource("c32"), SubResource("c33"), SubResource("c34"), SubResource("c35"), SubResource("c36"), SubResource("c37"), SubResource("c38"), SubResource("c39"), SubResource("c40"), SubResource("c41"), SubResource("c42"), SubResource("c43"), SubResource("c44"), SubResource("c45"), SubResource("c46"), SubResource("c47"), SubResource("c48"), SubResource("c49"), SubResource("c50"), SubResource("c51"), SubResource("c52"), SubResource("c53"), SubResource("c54"), SubResource("c55"), SubResource("c56"), SubResource("c57"), SubResource("c58"), SubResource("c59"), SubResource("c60"), SubResource("c61"), SubResource("c62"), SubResource("c63"), SubResource("c64"), SubResource("c65"), SubResource("c66"), SubResource("c67"), SubResource("c68"), SubResource("c69"), SubResource("c70"), SubResource("c71"), SubResource("c72"), SubResource("c73"), SubResource("c74"), SubResource("c75"), SubResource("c76"), SubResource("c77"), SubResource("c78"), SubResource("c79"), SubResource("c80"), SubResource("c81"), SubResource("c82"), SubResource("c83"), SubResource("c84"), SubResource("c85"), SubResource("c86"), SubResource("c87"), SubResource("c88"), SubResource("c89"), SubResource("c90"), SubResource("c91"), SubResource("c92"), SubResource("c93"), SubResource("c94"), SubResource("c95"), SubResource("c96")])
+cues = Array[ExtResource("2")]([SubResource("c0"), SubResource("c1"), SubResource("c2"), SubResource("c3"), SubResource("c4"), SubResource("c5"), SubResource("c6"), SubResource("c7"), SubResource("c8"), SubResource("c9"), SubResource("c10"), SubResource("c11"), SubResource("c12"), SubResource("c13"), SubResource("c14"), SubResource("c15"), SubResource("c16"), SubResource("c17"), SubResource("c18"), SubResource("c19"), SubResource("c20"), SubResource("c21"), SubResource("c22"), SubResource("c23"), SubResource("c24"), SubResource("c25"), SubResource("c26"), SubResource("c27"), SubResource("c28"), SubResource("c29"), SubResource("c30"), SubResource("c31"), SubResource("c32"), SubResource("c33"), SubResource("c34"), SubResource("c35"), SubResource("c36"), SubResource("c37"), SubResource("c38"), SubResource("c39"), SubResource("c40"), SubResource("c41"), SubResource("c42"), SubResource("c43"), SubResource("c44"), SubResource("c45"), SubResource("c46"), SubResource("c47"), SubResource("c48"), SubResource("c49"), SubResource("c50"), SubResource("c51"), SubResource("c52"), SubResource("c53"), SubResource("c54"), SubResource("c55"), SubResource("c56"), SubResource("c57"), SubResource("c58"), SubResource("c59"), SubResource("c60"), SubResource("c61"), SubResource("c62"), SubResource("c63"), SubResource("c64"), SubResource("c65"), SubResource("c66"), SubResource("c67"), SubResource("c68"), SubResource("c69"), SubResource("c70"), SubResource("c71"), SubResource("c72"), SubResource("c73"), SubResource("c74"), SubResource("c75"), SubResource("c76"), SubResource("c77"), SubResource("c78"), SubResource("c79"), SubResource("c80"), SubResource("c81"), SubResource("c82"), SubResource("c83"), SubResource("c84"), SubResource("c85"), SubResource("c86"), SubResource("c87"), SubResource("c88"), SubResource("c89"), SubResource("c90"), SubResource("c91"), SubResource("c92"), SubResource("c93"), SubResource("c94"), SubResource("c95"), SubResource("c96"), SubResource("c97")])
 space_beds = {
 &"autumn_foothills": &"amb_spring_arrival",
 &"blighted_reaches": &"amb_spring_arrival",

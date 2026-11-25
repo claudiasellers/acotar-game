@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="DialogueBook" format=3]
+
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_line.gd" id="1"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_place.gd" id="2"]
+[ext_resource type="Script" path="res://systems/dialogue/dialogue_book.gd" id="3"]
+
+[sub_resource type="Resource" id="L0"]
+script = ExtResource("1")
+id = &"H1_metal"
+speaker = &"feyre"
+who = ""
+text = "The air tastes like metal."
+canon = "A"
+trigger = 6
+where = &"ride_north.smell_metal"
+deed = &""
+phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[resource]
+script = ExtResource("3")
+area = &"ride_north"
+lines = Array[ExtResource("1")]([SubResource("L0")])
+places = Array[ExtResource("2")]([])

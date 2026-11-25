@@ -46,14 +46,27 @@ const THREADS: Array[Dictionary] = [
 		"forbid": ["wall", "mercenary", "scars"],
 	},
 	{
+		# The evening at home (CottageEvening): table, fire, clothes, supper.
 		"id": &"home", "priority": 10, "icon": &"hearth", "canon": "V",
-		"require": ["pelt_sold"], "done": ["beast_claim_accepted"],
+		"require": ["pelt_sold"], "done": ["fact.evening.supper_eaten"],
 		"lines": [
 			"Stay together. Look after them.",
-			"They'll be by the fire tonight, waiting on what I bring home.",
-			"Home to the cottage before dark, and stay the night with them.",
+			"They'll be by the fire tonight, waiting on what I bring home. Meat on the table, a log on the fire, these clothes off.",
+			"Home to the cottage: the meat on the table, a log from the basket on the fire, a change at the dresser, then sit to supper.",
 		],
 		"voice": ["H1_promise", "", ""],
+		"forbid": ["door", "wall", "bracelet", "claim"],
+	},
+	{
+		# "Rest, Feyre": the ironwood bed, and the night comes.
+		"id": &"rest", "priority": 10, "icon": &"hearth", "canon": "X",
+		"require": ["fact.evening.supper_eaten"], "done": ["fact.evening.slept"],
+		"lines": [
+			"Father's right. I'm asleep on my feet.",
+			"Our room, behind the partition. The big bed we three share.",
+			"Lie down in the ironwood bed in the sisters' room.",
+		],
+		"voice": ["", "", ""],
 		"forbid": ["door", "wall", "bracelet", "claim"],
 	},
 	{

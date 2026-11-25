@@ -8,7 +8,9 @@
 ##
 ## Hangs on manor_dining_table (Act2Spaces.EXTRA); every mark is in that
 ## anchor's frame, the front door included. Starts when Feyre comes within
-## 6 m of the front door after the ride (the hand-off agreed with L16).
+## 6 m of the front door after the ride (the hand-off agreed with L16): the
+## ride stops at the steps so she gets down inside that radius, and the beast
+## waits on the steps ("beast_steps") to pad in ahead of her.
 ## Fact: fact.manor_arrived (no phase deed here).
 class_name ManorArrival
 extends Act2Space
@@ -45,7 +47,8 @@ func _build_beats() -> Array:
 			aside(&"doors"), "the doors open by themselves"),
 		Beats.wait(2.0),
 		Beats.run(func(_s: SceneSpace) -> void:
-			cast(&"tamlin_beast", &"beast_start", &"dining_door")
+			# He waits on the front steps, where the ride left him (RideNorth.beast_steps).
+			cast(&"tamlin_beast", &"beast_steps", &"hall_mid")
 			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin_beast")), "the beast pads ahead"),
 		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0,
