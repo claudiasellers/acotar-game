@@ -131,6 +131,56 @@ ROAMERS = {
             ("dread_radius", "Vector2(14, 5)"),
         ],
     },
+    # Gloamers (bestiary §16): L83's knuckle-loping pack scavengers, the
+    # common tier on the wood edges, out from dusk to dawn.
+    "gloamer_roamer": {
+        "script": "res://creatures/hostile/gloamer_roamer.gd",
+        "node": "GloamerRoamer",
+        "model": "res://creatures/models/fae/gloamer.gltf",
+        "fields": [
+            ("kind", '&"gloamer"'),
+            ("display_name", '"Gloamer"'),
+            ("fae", "true"),
+            ("canon", '"X"'),
+            # 1.6 m standing, 1.1 m on the lope.
+            ("body_length", "0.7"),
+            ("body_height", "1.3"),
+            ("body_width", "0.6"),
+            ("walk_speed", "2.0"),
+            ("run_speed", "6.5"),
+            ("turn_speed", "8.0"),
+            # Sight x0.9, hearing x1.1, scent x1.0 of the shared 45/40/70.
+            ("sight_range", "40.5"),
+            ("hearing_range", "44.0"),
+            ("scent_range", "70.0"),
+            # 3 wood arrows (24 HP, 8 each), 1 to the throat (x3), ash 1.
+            ("max_health", "24.0"),
+            ("arrow_damage", "8.0"),
+            ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
+            ("lethal_delay", "0.0"),
+            ("weak_zone_height", "0.8"),
+            ("weak_zone_name", '&"throat"'),
+            # Burns at 6 HP/s and flees fire.
+            ("burn_dps", "6.0"),
+            ("leaves_prints", "true"),
+            ("stride", "0.6"),
+            ("print_size", "0.1"),
+        ],
+        "scene_fields": [
+            ("strike_reach", "1.2"),
+            ("strike_cooldown", "1.65"),
+            ("attack_id", '&"gloamer_rake"'),
+            ("dread_radius", "Vector2(20, 6)"),
+            # The chitter that becomes a shriek and sets the pack off.
+            ("call_clip", '&"call"'),
+            # Half the pack down, the rest scatter into the trees.
+            ("rout_share", "0.5"),
+            # A glint thrown the other way pulls two off to fight over it.
+            ("glint_drawn", "2"),
+            ("glint_clip", '&"grab_shiny"'),
+            ("squabble_clip", '&"squabble"'),
+        ],
+    },
 }
 
 # id, family, display name, region (whose spawn table carries it), core (x, z),
