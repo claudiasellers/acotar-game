@@ -31,7 +31,7 @@ func _run() -> void:
 	get_tree().root.add_child(estate)
 	get_tree().current_scene = estate
 	if estate.get(&"feyre") == null:
-		ShotLook.dress(estate, &"manor_interior")
+		ShotLook.dress(estate, StringName(args[3]) if args.size() > 3 else &"manor_interior")
 	var feyre = estate.get(&"feyre")
 	if feyre is Node3D:
 		(feyre as Node3D).visible = false
@@ -78,6 +78,12 @@ func _run() -> void:
 			var path := out.path_join("room_%s_L%d_%s.png" % [r.id, r.level, tag])
 			get_tree().root.get_texture().get_image().save_png(path)
 			print("saved ", path)
+			var env := (estate.get_node("WorldEnvironment") as WorldEnvironment).environment
+			env.glow_enabled = false
+			await _frames(10)
+			await RenderingServer.frame_post_draw
+			get_tree().root.get_texture().get_image().save_png(path.replace(".png", "_noglow.png"))
+			env.glow_enabled = true
 	get_tree().quit()
 
 

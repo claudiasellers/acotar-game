@@ -108,6 +108,7 @@ func _run() -> void:
 			await get_tree().process_frame
 	var img := root.get_texture().get_image()
 	img.save_png(out)
+	await _diag_variants(world.get_node("WorldEnvironment").environment, out)
 	var draw := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 	var prims := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
 	var objs := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)
@@ -167,3 +168,20 @@ func _wait_regions_built(world: World, cap_s: float) -> void:
 			return
 		await get_tree().process_frame
 	push_warning("world_shot: regions still building after %d s" % int(cap_s))
+
+
+func _diag_variants(env: Environment, out: String) -> void:
+	env.glow_enabled = false
+	for i in 10:
+		await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	get_tree().root.get_texture().get_image().save_png(out.replace(".png", "_noglow.png"))
+	env.fog_enabled = false
+	env.volumetric_fog_enabled = false
+	for i in 10:
+		await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	get_tree().root.get_texture().get_image().save_png(out.replace(".png", "_noglow_nofog.png"))
+	env.glow_enabled = true
+	env.fog_enabled = true
+	env.volumetric_fog_enabled = true
