@@ -90,6 +90,7 @@ func test_a_lost_ash_arrow_comes_back_once() -> void:
 func test_the_knife_press_does_not_use_the_bed() -> void:
 	WorldState.set_flag("wolf_killed")
 	WorldState.set_flag("pelt_sold")
+	WorldState.set_flag(CottageEvening.SLEPT)
 	Clock.paused = true
 	Clock.from_dict({"time_of_day": 0.9, "day": 1})
 	var door := BeastDoor.new()

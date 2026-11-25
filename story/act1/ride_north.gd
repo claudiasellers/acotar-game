@@ -94,8 +94,10 @@ func _build_beats() -> Array:
 			_mount(s)
 			WorldStreamer.update_for(_pose_at(0.0).origin)
 			deadline[0] = Engine.get_physics_frames() + LOAD_WAIT_SECONDS * Engine.physics_ticks_per_second, "mount"),
+		# Only where a streamed region holds the road (none in a greybox or a test).
 		Beats.until(func() -> bool:
-			return _ground_under(_rider) or Engine.get_physics_frames() > deadline[0], "until the road is there"),
+			return WorldStreamer.region_at(_pose_at(0.0).origin) == null or _ground_under(_rider) \
+					or Engine.get_physics_frames() > deadline[0], "until the road is there"),
 		Beats.run(func(_s: SceneSpace) -> void: _fade(0.0), "fade in"),
 		# The opening shot (staging) is cut once the dark has begun to lift.
 		Beats.wait(fade_seconds * 0.25),
