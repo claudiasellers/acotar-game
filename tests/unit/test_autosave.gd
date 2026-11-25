@@ -104,9 +104,13 @@ func test_finishing_a_load_is_not_news() -> void:
 
 
 func test_the_hitch_is_small() -> void:
-	var t := Time.get_ticks_usec()
-	for i in 20:
+	# Median of several saves: one load spike can't fail it, a real hitch does.
+	var times: Array[float] = []
+	for i in 7:
+		var t := Time.get_ticks_usec()
 		SaveSystem.autosave()
-	var ms := (Time.get_ticks_usec() - t) / 20000.0
-	gut.p("autosave: %.2f ms each (test state)" % ms)
-	assert_lt(ms, 100.0, "no runaway hitch (%.1f ms; one frame is 16 ms on an idle machine)" % ms)
+		times.append((Time.get_ticks_usec() - t) / 1000.0)
+	times.sort()
+	var ms: float = times[times.size() / 2]
+	gut.p("autosave: median %.2f ms of %d (test state)" % [ms, times.size()])
+	assert_lt(ms, 33.0, "median save stays within two frames (%.1f ms)" % ms)
