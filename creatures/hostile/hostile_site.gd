@@ -28,6 +28,8 @@ var members: Array[Creature] = []
 var alert_level: float = 0.0
 var last_known: Vector3 = Vector3.INF
 var is_settled: bool = false
+## The life that comes back once it settles (SettleSwell); null until then.
+var swell: SettleSwell
 ## {member: Creature, at: Vector3, left: float}
 var _pending: Array[Dictionary] = []
 var _token_holders: Array[Creature] = []
@@ -52,6 +54,7 @@ func _ready() -> void:
 	if HostileSite.stays_settled(WorldState.get_flag(settle_flag(data.id)), Clock.day,
 			data.settle_days, WorldState.has_flag("glamour_lifted")):
 		is_settled = true
+		swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), false)
 		return
 	for i in data.count:
 		_spawn_member(i)
@@ -198,10 +201,12 @@ func _on_member_died(_cause: StringName, member: Creature) -> void:
 		settle()
 
 
-## Every member is gone: the place settles. Birdsong and sparkle come back
-## (DreadFields leave with their members; the celebration is the chime).
+## Every member is gone: the place settles. Birdsong comes back as the
+## DreadFields leave with their members; the swell (SettleSwell) brings the
+## fliers, petals and sparkle back over 20 s; the celebration is the one chime.
 func settle() -> void:
 	is_settled = true
+	swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), true)
 	WorldState.set_flag(settle_flag(data.id), Clock.day)
 	if EventBus.has_signal(&"celebration_requested"):
 		EventBus.emit_signal(&"celebration_requested", &"site_settled", global_position)

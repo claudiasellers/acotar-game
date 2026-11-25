@@ -303,6 +303,12 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `WOOD_CAP`, `CORE`, `RIM` | ash: glint 0.05 (fixed screen size), one unshadowed gold light 2.5 energy / 6 m, 6 m beacon, pulse 1.1 Hz; wood: glint 0.02 only, at most 3 at once | glint 0.02-0.1, energy 1-4, beacon 3-10 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. | T121 |
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `BEACON_WIDTH`, `WOOD_CAP`, `CORE`, `RIM` | ash: crisp glint a four-point star about 32 px on screen (pixel_size 0.0005, fixed size), one unshadowed gold light 0.8 energy / 1.8 m, beam 0.22 m wide (about 8 px at 12 m) and 7 m tall, saturated gold with amber edges, fading upward, plus a 3 m warm amber pool on the snow, pulse 1.1 Hz; wood: glint 0.00008 only, at most 3 at once; all colours <= 1.0 so nothing blooms | glint 0.00005-0.0004, energy 0.4-1.5, range 1-3 m, beam 5-8 m, pool 2-4 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. First version was a haze; now a point and a thin beam. | T121 |
 
+## Settled sites (L75, hostile plan §3.3, slice 2(d))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Settle swell | creatures/hostile/settle_swell.gd `SWELL_SECONDS`, `PETAL_SECONDS`, `SWARM_SHARE`, `SWARM_RADIUS` | fliers fill back over 16 s; rose petals fall 12 s; swarm radius half the territory, kept to 4-12 m; one sparkle burst at the core | swell 8-20 s (the plan's limit is 20), petals 6-16 s | The payoff for settling a site is the place coming back to life, not loot (plan §2.5). Slow enough to watch it happen from the fight's end, inside the plan's 20 s. | L75 |
+
 ## Wolf hunt light (L18-11)
 
 | Tunable | Where | Default | Range | What it does | Lane |
@@ -334,3 +340,12 @@ over (`docs/contracts/creature_motion.md`, "People: clips without a rebuild").
 | `SoftAim.CONE_DEG`, `RANGE` | systems/bow/soft_aim.gd | 4°, 35 m | 3–6°, 25–45 m | How close her aim must be to a hostile that is hunting her, and how far off it may be, for soft aim to help (pad only; health-interactions §3.5 #14). | L80 |
 | `SoftAim.MODES` light / strong | systems/bow/soft_aim.gd | turn speed kept 0.6 / 0.45; bend 1.5° / 3.5° | 0.4–0.8; 1–4° | The stick's turn speed kept inside the cone, and the most a shot that would miss may bend toward the body (never the weak spot). Light helps without aiming for her (72% of 50 seeded shots at 25 m against 18% off); strong is the nine-in-ten setting. | L80 |
 | `SoftAim.NEAR`, `PULL_BACK` | systems/bow/soft_aim.gd | 12 m, 0.6 m | — | A hostile after her this close steps the camera back by this much. | L80 |
+
+## Hostile checks (L75, hostile-fae plan §8.4)
+
+Numbers the slice tests hold the game to, derived from the systems' own rates.
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| `REED_FIRE_CLEAR_S` | tests/unit/hostile/test_naga_slice1.gd | 3.0 s | 2.5–5 s | Slice 1 (c): after a fire arrow lights a lured camp's reed bed, every naga has fled or died within this. From the fire's numbers: a lured naga stands within 1 m of the lure (`_go_to` stop) and fears flame within `fire_fear_radius` 3 m, so it sees it on its first `Creature.FIRE_SCAN` (0.3 s); one that wandered to 5 m waits for the front to cross 2 m at about 1 / `ElementField.HEAT_RATE` (1.1 s) a metre at calm: 0.3 + 2.2 = 2.5 s, rounded up. | L75 |
+| `LOSE_WITHIN_S` | tests/unit/hostile/test_naga_slice1.gd | 20 s, 9 of 10 seeded runs | — | Slice 1 (b): a pack trailing her by scent past the leash loses her once she drinks a hush draught (quiet 2, scent_scale 0.5 = `NagaRoamer.HUSH_SCALE`), and keeps her without it. | L75 |
