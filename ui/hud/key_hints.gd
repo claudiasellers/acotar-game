@@ -37,7 +37,7 @@ const ROWS := {
 	&"ride_leap": [[&"jump", "leap"]],
 	&"ride_off": [[&"interact", "get down"]],
 	&"whistle": [[&"call_mount", "whistle for her"]],
-	&"tend": [[&"interact", "hold beside her to tend her"]],
+	&"tend": [[&"tend_mount", "tend her"]],
 	&"crouch": [[&"crouch", "crouch"]],
 	&"jump": [[&"jump", "jump"]],
 	&"walk": [[&"move", "walk"]],
