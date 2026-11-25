@@ -34,8 +34,8 @@ var _story_hold := false
 var _region_grade: StringName = &""
 var _region: RegionGrade
 ## Story mood overlay (EventBus.mood_requested): "dread" drops the light about
-## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft dark blur (the ride
-## north); "calm" eases whatever is on back to 0.
+## two stops, drains colour and pools low fog (experience bar §1.5); "enchanted_sleep" fades to a soft, foggy dark (the carriage
+## farewell, the solstice night); "calm" eases whatever is on back to 0.
 var mood: StringName = &"dread"
 var mood_amount := 0.0
 var _mood_target := 0.0
