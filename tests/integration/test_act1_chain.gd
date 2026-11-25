@@ -204,7 +204,9 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	ride.mount(feyre)
 	_run(ride, 0.2)
 	assert_eq(ride.step, RideNorth.Step.RIDING, "up in the saddle")
-	var along := 0.0
+	# From where the mare waits on his road (RideNorth.MARE_AT): a jump back
+	# along it would read as her turning back, and he would turn on her.
+	var along := ride.progress
 	while ride.running and ride.step == RideNorth.Step.RIDING and along < ride.path_length():
 		along += 2.0
 		ride.horse.global_transform = ride.pose_at(along)
