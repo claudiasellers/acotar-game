@@ -9,9 +9,21 @@ id = &"hunt"
 require_flags = PackedStringArray()
 done_flags = PackedStringArray("wolf_killed")
 priority = 40
-lines = PackedStringArray("Last loaf\'s gone. If I come back with nothing, we don\'t eat.", "Deer come down the trail past our door at first light. Quiet feet. Patience.", "Up the deer trail from the door and into the trees, before the snow fills the tracks.")
+lines = PackedStringArray("Last loaf\'s gone. If I come back with nothing, we don\'t eat.", "Deer come down the trail past our door at first light. Quiet feet. Patience.", "Up the deer trail from the door, then the fresh tracks into the trees, before the snow fills them.")
 voice_ids = PackedStringArray("H1_hunger", "", "")
 forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "wolf", "wall", "mercenary", "village")
+
+[sub_resource type="Resource" id="thread_shoot"]
+script = ExtResource("2_cij3k")
+id = &"shoot"
+require_flags = PackedStringArray("fact.wolf_spotted")
+done_flags = PackedStringArray("wolf_killed")
+priority = 50
+icon = &"trail"
+lines = PackedStringArray("Too big for a wolf, and too quiet. If it\'s one of them, only ash will do.", "The ash arrow first, into its side, before it runs off with the doe.", "Ash on the string. Draw slow, hold my breath, and let it fly.")
+voice_ids = PackedStringArray("", "", "")
+forbidden_words = PackedStringArray("beast", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "mercenary", "village")
+canon = "V"
 
 [sub_resource type="Resource" id="thread_skin"]
 script = ExtResource("2_cij3k")
@@ -58,6 +70,18 @@ lines = PackedStringArray("Father\'s right. I\'m asleep on my feet.", "Our room,
 voice_ids = PackedStringArray("", "", "")
 forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "door", "wall", "bracelet", "claim")
 
+[sub_resource type="Resource" id="thread_night"]
+script = ExtResource("2_cij3k")
+id = &"night"
+require_flags = PackedStringArray("fact.evening.slept")
+done_flags = PackedStringArray("beast_claim_accepted")
+priority = 10
+icon = &"hearth"
+lines = PackedStringArray("The quiet hour before bed. All four of us by the fire, for once.", "Father\'s dozing in his chair. Sit with them while the fire lasts.", "Stay by the fire with them. The night isn\'t over yet.")
+voice_ids = PackedStringArray("", "", "")
+forbidden_words = PackedStringArray("beast", "faerie", "fae", "tamlin", "lucien", "prythian", "murderer", "high lord", "spring court", "door", "wall", "bracelet", "claim")
+canon = "A"
+
 [sub_resource type="Resource" id="thread_quiet"]
 script = ExtResource("2_cij3k")
 id = &"quiet"
@@ -72,4 +96,4 @@ canon = "A"
 
 [resource]
 script = ExtResource("1_r43ay")
-threads = Array[ExtResource("2_cij3k")]([SubResource("thread_hunt"), SubResource("thread_skin"), SubResource("thread_sell"), SubResource("thread_home"), SubResource("thread_rest"), SubResource("thread_quiet")])
+threads = Array[ExtResource("2_cij3k")]([SubResource("thread_hunt"), SubResource("thread_shoot"), SubResource("thread_skin"), SubResource("thread_sell"), SubResource("thread_home"), SubResource("thread_rest"), SubResource("thread_night"), SubResource("thread_quiet")])

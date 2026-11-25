@@ -6,8 +6,8 @@ const SETTINGS_PATH := "user://test_guide_settings.cfg"
 const LADDER: Array[String] = ["wolf_killed", "fact.wolf_skinned", "pelt_sold",
 	"fact.evening.supper_eaten", "fact.evening.slept", "beast_claim_accepted", "wall_crossed", "first_dinner_eaten"]
 ## The thread each prefix of LADDER should resolve to ("" = deliberate silence:
-## asleep, the beast comes; the ride).
-const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "rest", "", "", "quiet", ""]
+## the ride).
+const EXPECTED: Array[String] = ["hunt", "skin", "sell", "home", "rest", "night", "", "quiet", ""]
 
 var _flags: Dictionary = {}
 
