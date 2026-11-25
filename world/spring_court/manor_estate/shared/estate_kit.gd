@@ -59,14 +59,19 @@ static func mat(color: Color, roughness: float = 0.85, metallic: float = 0.0, ke
 	return m
 
 
-## Glossy pearlescent material: a soft rim glow over a clearcoat (R3).
+## Glossy pearlescent material: a clearcoat with a faint rim (R3). The rim was
+## 0.6 and outlined every white frame, column and trim in light, so the rooms
+## read as glowing (owner, 2026-11-25: "normal"); 0.15 keeps the sheen.
+const PEARL_RIM := 0.15
+
+
 static func pearl(color: Color = PEARL, key: String = "") -> CandyMaterial:
 	var k := key if key != "" else "pearl|" + color.to_html()
 	if _materials.has(k):
 		return _materials[k]
 	var m := mat(color, 0.18, 0.15, k + "|base").duplicate() as CandyMaterial
 	m.rim_enabled = true
-	m.rim = 0.6
+	m.rim = PEARL_RIM
 	m.rim_tint = 0.7
 	_materials[k] = m
 	return m
