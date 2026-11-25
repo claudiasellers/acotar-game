@@ -210,3 +210,26 @@ its own data:
 `NagaRoamer`: bask/hunt/nest day, watch member, coil only from behind.
 `BriarlingRoamer`: bush/hunt, forms, snare every third strike.
 
+## Encounters (`HostileEncounters`)
+
+Every fight ends once through `HostileEncounters.ended(source_id, family, outcome)`:
+it emits `EventBus.hostile_encounter_ended(source_id, family, outcome)` and, for
+any outcome but `knockdown`, adds one to `fact.plain_fights` (a deed fact; the
+village's opening needs 3, progression §8a.1b).
+
+- A site's fight begins at its first `report()` (`engaged`). It ends `killed`
+  when the site settles (engaged or not: a sneak clear counts), `knockdown`
+  when one of its members puts her down, and `slipped` after
+  `ENCOUNTER_CALM_S` (8 s) with no member hostile or searching.
+- The puca's begins when it startles her, or when she hits it. It ends
+  `driven_off` when it flees, `killed` when ash kills it (from any distance),
+  `lured` when she follows it into a camp's leash, and `slipped` when she walks
+  out of its sight or dawn comes.
+
+## Held sites
+
+`briarling_rose_garden_edge` (3 briarlings, core (-60, -560), 12 m, from
+`naga_survived`; design reconciliation C19) is generated and overlap-checked but
+on `HELD` in `gen_hostile_sites.py`, so no spawn table carries it until L83's
+briarling rig and rose-bush swap land; that hand-in takes it off the list.
+

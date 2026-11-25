@@ -106,5 +106,9 @@ signal player_imbue_changed(item_slot: StringName, imbue_id: StringName, seconds
 signal site_settled(site_id: StringName)
 ## A hostile site noticed her; level 0..1 (curious to alerted).
 signal hostile_alerted(site_id: StringName, level: float)
+## A fight with a hostile is over (HostileEncounters): `source_id` is the site
+## or the lone roamer, `outcome` one of killed, driven_off, slipped, lured,
+## knockdown. Any outcome but knockdown counts toward fact.plain_fights.
+signal hostile_encounter_ended(source_id: StringName, family: StringName, outcome: StringName)
 ## Feyre crouched or stood.
 signal player_stance_changed(crouched: bool)

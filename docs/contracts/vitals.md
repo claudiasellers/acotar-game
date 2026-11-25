@@ -114,7 +114,6 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | naga_claw (default) | 22 | claw | medium | 2 m | — | 0.15 |
 | naga_lunge | 30 | blunt | heavy | 4 m | — | 0.2 |
 | naga_coil | 0 | — | none (grab: 6 presses, 3 s) | — | — | 0.25 |
-| puca_grab (default) | 0 | — | none (grab: 5 presses, 4 s) | — | — | 0.3 |
 | briarling_lash (default) | 8 | thorn | light | 0.5 m | — | 0.1 |
 | briarling_snare | 0 | — | none (grab: 4 presses, 2.5 s) | — | — | 0.15 |
 | lampwing_swarm (default) | 0 | — | none | — | drowsy +0.15 / 6 s per tick | 0.05 |
@@ -136,6 +135,10 @@ An unknown attack id logs `push_warning` once and uses the hazard row `generic_h
 | venom_drain | 0.4 per s | venom | none | — | — | 0 · floor 10 |
 | fall | (h − 4 m) × 8, h = drop below where she last stood | fall | heavy above 8 m | — | — | 0.1 · knocks down above 16 m |
 | generic_hit | 10 | blunt | light | — | — | 0.1 |
+
+The puca has no row: it never touches her (the Keeper, health-interactions §4.2;
+design reconciliation C6). A grab row's presses, seconds and fail scale are its
+`grab_presses`, `grab_seconds` and `grab_fail_scale`.
 
 ## 4. Status tags (BodyState.effects, extended)
 

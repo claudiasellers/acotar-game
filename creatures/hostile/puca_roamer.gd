@@ -83,6 +83,8 @@ var day_func: Callable = func() -> int: return Clock.day
 var player_func: Callable
 
 var _startled: bool = false
+## She has met it this appearance: its encounter is on (HostileEncounters).
+var _met: bool = false
 var _away: Vector3 = Vector3.FORWARD
 var _layer: int = 0
 ## The night it last vanished (night_of), so it rests until the next one.
@@ -209,19 +211,24 @@ func appear() -> void:
 ## is gone, and be gone once she is inside the camp's leash.
 func _lure(player: Node3D) -> void:
 	if player == null:
+		_end_encounter(HostileEncounters.SLIPPED)
 		_go_home()
 		return
 	var to_her := player.global_position - global_position
 	to_her.y = 0.0
 	var gap := to_her.length()
 	if gap > data.sight_range:
+		# She walked away from it: refusing it is a counter (plan §5.2).
+		_end_encounter(HostileEncounters.SLIPPED)
 		_go_home()
 		return
 	if not _startled and gap <= NOTICE_M:
 		_startled = true
+		_met = true
 		EventBus.player_startled.emit(creature_id, STARTLE)
 	lure_site = nearest_site()
 	if lure_site and lure_site.in_leash(player.global_position):
+		_end_encounter(HostileEncounters.LURED)
 		vanish()
 		return
 	face_towards(player.global_position, get_physics_process_delta_time())
@@ -290,6 +297,8 @@ func update_tell(player: Node3D) -> void:
 func apply_hit(cause: StringName, weapon_id: StringName, weapon_mult: float, zone: StringName,
 		at: Vector3) -> Dictionary:
 	var result := super.apply_hit(cause, weapon_id, weapon_mult, zone, at)
+	if alive and state != State.HIDDEN:
+		_met = true
 	if alive and state == State.LURING:
 		hits_taken += 1
 		if hits_taken >= FLEE_HITS:
@@ -309,6 +318,7 @@ func on_arrow_effect(effect: StringName, arrow: Node3D) -> void:
 func reveal() -> void:
 	if not alive or state == State.HIDDEN:
 		return
+	_met = true
 	state = State.REVEALED
 	state_left = REVEAL_SECONDS
 	_show(TRUE_FORM)
@@ -323,6 +333,7 @@ func flee(from: Vector3) -> void:
 	_away = _away.normalized() if _away.length_squared() > 0.0001 else -global_basis.z
 	state = State.FLEEING
 	state_left = FLEE_SECONDS
+	_end_encounter(HostileEncounters.DRIVEN_OFF)
 	darted.emit()
 
 
@@ -336,12 +347,22 @@ func vanish() -> void:
 
 
 func _hide() -> void:
+	# Dawn (or any hiding) while she is still with it: she outlasted it.
+	_end_encounter(HostileEncounters.SLIPPED)
 	state = State.HIDDEN
 	showing = &""
 	tell = 0.0
 	if model:
 		model.visible = false
 	collision_layer = 0
+
+
+## Its encounter ends once per meeting, however it ends.
+func _end_encounter(outcome: StringName) -> void:
+	if not _met:
+		return
+	_met = false
+	HostileEncounters.ended(creature_id, FAMILY, outcome)
 
 
 func _show(image: StringName) -> void:
@@ -353,6 +374,9 @@ func _show(image: StringName) -> void:
 
 ## What it leaves is nothing: it's gone.
 func die(cause: StringName) -> void:
+	# A kill is a fight won, however far off it was made.
+	_met = true
+	_end_encounter(HostileEncounters.KILLED)
 	super.die(cause)
 	if harvestable and is_instance_valid(harvestable):
 		harvestable.queue_free()

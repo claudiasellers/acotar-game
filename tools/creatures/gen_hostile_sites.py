@@ -142,13 +142,24 @@ SITES = [
     # Suriel Glade has no spawn table of its own; Border Woods carries it.
     ("naga_backwater", "naga", "The Backwater", "border_woods", (-790.0, 735.0), 45.0,
      "naga_roamer", 3, ["naga_survived"], "X"),
+    # The weakest folk first (design reconciliation C19, progression §8a.1b):
+    # one small brake at the rose garden's outer edge, from naga_survived.
+    ("briarling_rose_garden_edge", "briarling", "Rose Garden Brake", "manor_grounds", (-60.0, -560.0), 12.0,
+     "briarling_roamer", 3, ["naga_survived"], "X"),
 ]
+
+# Sites placed and checked but carried by no spawn table yet. The rose-garden
+# brake waits for L83's briarling rig and rose-bush swap (C19); that hand-in
+# takes it off this list.
+HELD = {"briarling_rose_garden_edge"}
 
 # Pairs allowed to overlap (host/lookout, shifts, contested borders).
 PAIRS = set()
 
 SPAWN = {}
 for _s in SITES:
+    if _s[0] in HELD:
+        continue
     SPAWN.setdefault(_s[3], []).append({
         "id": "site_" + _s[0],
         "scene": f"res://creatures/hostile/sites/{_s[0]}.tscn",
