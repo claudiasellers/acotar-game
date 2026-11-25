@@ -224,6 +224,23 @@ func _animate(moving: bool) -> void:
 	_moving = moving
 
 
+## Walking over rising or falling ground (the ride's road, the estate's
+## drive), his feet stay on it: the ground just under him (a short ray, so a
+## roof or ceiling overhead is never taken for it), else the height of where
+## he is going, eased by the distance walked.
+func _keep_to_ground(step: float) -> void:
+	# Outdoors only: in the cottage he keeps to the floor he was put on.
+	if not is_inside_tree() or not stage in [Stage.LEAD, Stage.PATROL]:
+		return
+	var from := global_position + Vector3.UP * 0.8
+	var hit := get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * 3.0, 1))
+	if not hit.is_empty():
+		global_position.y = (hit["position"] as Vector3).y
+	else:
+		global_position.y = move_toward(global_position.y, _destination.y, step)
+
+
 func _process(delta: float) -> void:
 	var goal: float = STAGE_INTENSITY[stage]
 	# The break is a spike; everything else eases.
@@ -238,6 +255,7 @@ func _process(delta: float) -> void:
 		var dir := NavMover.on(self).steer(_destination) if to.length() >= NavMover.MIN_DISTANCE else to
 		var step := minf((burst_speed if _bursting else walk_speed) * delta, to.length())
 		global_position += dir.normalized() * step
+		_keep_to_ground(step)
 		rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), 4.0 * delta)
 	elif _bursting:
 		_bursting = false

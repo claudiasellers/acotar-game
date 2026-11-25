@@ -294,8 +294,13 @@ func _escort() -> void:
 		beast.global_transform = pose
 		return
 	var to := pose.origin
-	if ahead > path_length() and path and path.name == "Drive":
-		to = beast_steps()
+	if ahead > path_length():
+		# Past the end he keeps ahead of the horse, never under it: on the
+		# manor steps, or on along the line's last heading.
+		var heading := pose.origin - _pose_at(maxf(path_length() - 1.0, 0.0)).origin
+		heading.y = 0.0
+		to = beast_steps() if path and path.name == "Drive" \
+				else pose.origin + heading.normalized() * (ahead - path_length())
 	(beast as BeastActor).lead(to)
 
 
