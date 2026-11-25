@@ -6,7 +6,7 @@
 script = ExtResource("1")
 marks = {
 "alis_door": Vector3(-11.5, 0, -6.5),
-"beast_start": Vector3(-21, 0, -2),
+"beast_steps": Vector3(-21, 0, 6),
 "dining_door": Vector3(-11, 0, -6.5),
 "dining_inside": Vector3(-8.5, 0, -6.5),
 "feyre_wall": Vector3(-10.3, 0, -5),

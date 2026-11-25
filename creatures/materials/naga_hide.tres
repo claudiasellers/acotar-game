@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=7 format=3]
+
+[ext_resource type="Shader" path="res://creatures/materials/monster_hide.gdshader" id="1_hide"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/naga_albedo.webp" id="2_albedo"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/naga_normal.webp" id="3_normal"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/naga_orm.webp" id="4_orm"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/naga_emit.webp" id="5_emit"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/naga_mask.webp" id="6_mask"]
+
+[resource]
+shader = ExtResource("1_hide")
+shader_parameter/albedo_tex = ExtResource("2_albedo")
+shader_parameter/normal_tex = ExtResource("3_normal")
+shader_parameter/orm_tex = ExtResource("4_orm")
+shader_parameter/emit_tex = ExtResource("5_emit")
+shader_parameter/mask_tex = ExtResource("6_mask")
+shader_parameter/normal_depth = 0.8
+shader_parameter/roughness_scale = 1.0
+shader_parameter/specular = 0.35
+shader_parameter/rim_color = Color(0.55, 0.66, 0.7, 1)
+shader_parameter/rim_amount = 0.25
+shader_parameter/rim_power = 3.5
+shader_parameter/seam_amount = 0.85
+shader_parameter/scar_color = Color(0.33, 0.25, 0.24, 1)
+shader_parameter/glint_color = Color(0.9, 0.95, 1, 1)
+shader_parameter/glint_strength = 2.5

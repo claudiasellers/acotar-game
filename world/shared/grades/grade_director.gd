@@ -299,15 +299,17 @@ func _on_grade_swap_requested(to_grade: StringName, seconds: float) -> void:
 func _update_region_grade() -> void:
 	if focus == null or _story_hold or is_blending():
 		return
+	# The highest-priority area she is in (the first of equals) owns the look.
+	var rg: RegionGrade = null
 	for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
-		var rg := node as RegionGrade
-		if rg.contains(focus.global_position):
-			if rg.grade != _region_grade:
-				var leaving := _region.leave_seconds if is_instance_valid(_region) else 0.0
-				_region_grade = rg.grade
-				_region = rg
-				swap_to(rg.grade, leaving if leaving > 0.0 else rg.blend_seconds)
-			return
+		var here := node as RegionGrade
+		if (rg == null or here.priority > rg.priority) and here.contains(focus.global_position):
+			rg = here
+	if rg and rg.grade != _region_grade:
+		var leaving := _region.leave_seconds if is_instance_valid(_region) else 0.0
+		_region_grade = rg.grade
+		_region = rg
+		swap_to(rg.grade, leaving if leaving > 0.0 else rg.blend_seconds)
 
 
 ## Story swaps hold until the story (or a test) releases them.

@@ -129,8 +129,11 @@ func test_ambient_life_has_day_and_dusk_effects() -> void:
 func test_no_sky_or_sun_in_the_region_and_a_manor_grade() -> void:
 	assert_eq(grounds.find_children("*", "WorldEnvironment", true, false).size(), 0)
 	assert_eq(grounds.find_children("*", "DirectionalLight3D", true, false).size(), 0)
-	var grade := grounds.get_node("ManorGrade") as RegionGrade
+	assert_null(grounds.get_node_or_null("ManorGrade"), "the grade is the estate's, there before the gardens")
+	var grade := ManorEstate.make_grade()
 	assert_eq(grade.grade, &"manor")
+	assert_eq(grade.bounds, ManorSitePlan.BOUNDS)
+	grade.free()
 	assert_eq(GradeDirector.load_preset(&"manor").id, &"manor")
 
 

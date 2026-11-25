@@ -144,51 +144,28 @@ emotion = &"guarded"
 
 [sub_resource type="Resource" id="L6"]
 script = ExtResource("1")
-id = &"A1_03_nesta_beast"
+id = &"n_stink"
 speaker = &"nesta"
 who = "Nesta"
-text = "You're just a half-wild beast with the nerve to bark orders at all hours of the day and night."
+text = "You stink like a pig covered in its own filth. Can't you at least try to pretend that you're not an ignorant peasant? Take those disgusting clothes off."
 canon = "V"
 trigger = 3
 where = &""
 deed = &""
 phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
-require_flags = PackedStringArray("wolf_killed")
-forbid_flags = PackedStringArray()
+require_flags = PackedStringArray("pelt_sold")
+forbid_flags = PackedStringArray("fact.evening.changed", "beast_claim_accepted")
 hour_from = -1.0
 hour_to = -1.0
 once = true
 cooldown = 240.0
 priority = 5
 inner = false
-follow_up = &"A1_04_nesta_forget"
-delivery = "cold, quick, cutting; not shouted (Keeper, voice-lines-act1)"
+follow_up = &""
+delivery = "disgusted, imperious"
 emotion = &"contempt"
 
 [sub_resource type="Resource" id="L7"]
-script = ExtResource("1")
-id = &"A1_04_nesta_forget"
-speaker = &"nesta"
-who = "Nesta"
-text = "Someday, Feyre, you'll have no one left to remember you."
-canon = "A"
-trigger = 5
-where = &""
-deed = &""
-phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = true
-cooldown = 240.0
-priority = 0
-inner = false
-follow_up = &""
-delivery = "quieter, meaner"
-emotion = &"contempt"
-
-[sub_resource type="Resource" id="L8"]
 script = ExtResource("1")
 id = &"n_tomas"
 speaker = &"nesta"
@@ -211,7 +188,7 @@ follow_up = &""
 delivery = "defensive, chin up"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L9"]
+[sub_resource type="Resource" id="L8"]
 script = ExtResource("1")
 id = &"n_cloak"
 speaker = &"nesta"
@@ -234,7 +211,7 @@ follow_up = &""
 delivery = ""
 emotion = &"contempt"
 
-[sub_resource type="Resource" id="L10"]
+[sub_resource type="Resource" id="L9"]
 script = ExtResource("1")
 id = &"n_hale"
 speaker = &"nesta"
@@ -257,7 +234,7 @@ follow_up = &""
 delivery = ""
 emotion = &"contempt"
 
-[sub_resource type="Resource" id="L11"]
+[sub_resource type="Resource" id="L10"]
 script = ExtResource("1")
 id = &"n_ribbon"
 speaker = &"nesta"
@@ -280,7 +257,7 @@ follow_up = &""
 delivery = ""
 emotion = &"contempt"
 
-[sub_resource type="Resource" id="L12"]
+[sub_resource type="Resource" id="L11"]
 script = ExtResource("1")
 id = &"n_door"
 speaker = &"nesta"
@@ -303,7 +280,7 @@ follow_up = &""
 delivery = ""
 emotion = &"contempt"
 
-[sub_resource type="Resource" id="L13"]
+[sub_resource type="Resource" id="L12"]
 script = ExtResource("1")
 id = &"n_hands"
 speaker = &"nesta"
@@ -326,7 +303,7 @@ follow_up = &""
 delivery = ""
 emotion = &"contempt"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L13"]
 script = ExtResource("1")
 id = &"A1_02_elain_cloak"
 speaker = &"elain"
@@ -349,7 +326,7 @@ follow_up = &""
 delivery = "soft, wistful, almost apologetic"
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L15"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"e_doe"
 speaker = &"elain"
@@ -372,7 +349,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L15"]
 script = ExtResource("1")
 id = &"e_snowdrops"
 speaker = &"elain"
@@ -395,7 +372,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("1")
 id = &"e_seeds"
 speaker = &"elain"
@@ -418,7 +395,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
 id = &"e_bird"
 speaker = &"elain"
@@ -441,7 +418,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"e_fire"
 speaker = &"elain"
@@ -464,7 +441,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("1")
 id = &"e_hum"
 speaker = &"elain"
@@ -487,30 +464,7 @@ follow_up = &""
 delivery = ""
 emotion = &"tender"
 
-[sub_resource type="Resource" id="L21"]
-script = ExtResource("1")
-id = &"A1_05_father_hope"
-speaker = &"father"
-who = "Father"
-text = "We need hope, or else we cannot endure."
-canon = "V"
-trigger = 4
-where = &""
-deed = &"fact.father_hearth_sat"
-phases = PackedStringArray("p0_winter", "p1_wolf_and_crossing")
-require_flags = PackedStringArray()
-forbid_flags = PackedStringArray()
-hour_from = -1.0
-hour_to = -1.0
-once = true
-cooldown = 240.0
-priority = 5
-inner = false
-follow_up = &""
-delivery = "tired, then a rare clarity; gentle"
-emotion = &"tender"
-
-[sub_resource type="Resource" id="L22"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("1")
 id = &"f_sorry"
 speaker = &"father"
@@ -533,7 +487,7 @@ follow_up = &""
 delivery = ""
 emotion = &"weary"
 
-[sub_resource type="Resource" id="L23"]
+[sub_resource type="Resource" id="L21"]
 script = ExtResource("1")
 id = &"f_ships"
 speaker = &"father"
@@ -556,7 +510,7 @@ follow_up = &""
 delivery = ""
 emotion = &"weary"
 
-[sub_resource type="Resource" id="L24"]
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"f_wolf"
 speaker = &"father"
@@ -579,7 +533,7 @@ follow_up = &""
 delivery = ""
 emotion = &"weary"
 
-[sub_resource type="Resource" id="L25"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"f_pine"
 speaker = &"father"
@@ -602,7 +556,7 @@ follow_up = &""
 delivery = ""
 emotion = &"weary"
 
-[sub_resource type="Resource" id="L26"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"f_knee"
 speaker = &"father"
@@ -625,7 +579,7 @@ follow_up = &""
 delivery = ""
 emotion = &"weary"
 
-[sub_resource type="Resource" id="L27"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"A1_06_mother_vow"
 speaker = &"mother"
@@ -648,7 +602,7 @@ follow_up = &""
 delivery = "memory: a whisper in her head, feverish and fading"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L28"]
+[sub_resource type="Resource" id="L26"]
 script = ExtResource("1")
 id = &"d_wolf_killed"
 speaker = &"feyre"
@@ -671,7 +625,7 @@ follow_up = &""
 delivery = "inner voice, breath coming back, practical"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L29"]
+[sub_resource type="Resource" id="L27"]
 script = ExtResource("1")
 id = &"d_wolf_skinned"
 speaker = &"feyre"
@@ -694,7 +648,7 @@ follow_up = &"d_wolf_wrap"
 delivery = "inner voice, just after the deed"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L30"]
+[sub_resource type="Resource" id="L28"]
 script = ExtResource("1")
 id = &"d_wolf_wrap"
 speaker = &"feyre"
@@ -727,5 +681,5 @@ radius = 6.0
 [resource]
 script = ExtResource("3")
 area = &"cottage"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28")])
 places = Array[ExtResource("2")]([SubResource("P0")])

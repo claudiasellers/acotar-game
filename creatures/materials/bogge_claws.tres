@@ -1,0 +1,21 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://creatures/materials/bogge_part.gdshader" id="1_part"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/bogge_claws_albedo.webp" id="2_albedo"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/bogge_claws_normal.webp" id="3_normal"]
+[ext_resource type="Texture2D" path="res://creatures/models/fae/bogge_claws_orm.webp" id="4_orm"]
+
+[resource]
+shader = ExtResource("1_part")
+shader_parameter/albedo_tex = ExtResource("2_albedo")
+shader_parameter/normal_tex = ExtResource("3_normal")
+shader_parameter/orm_tex = ExtResource("4_orm")
+shader_parameter/normal_depth = 1.0
+shader_parameter/specular = 0.6
+shader_parameter/rim_color = Color(0.55, 0.68, 0.8, 1)
+shader_parameter/rim_amount = 0.35
+shader_parameter/rim_power = 3.0
+shader_parameter/emit_base = 0.0
+shader_parameter/edge_depth = 0.06
+shader_parameter/edge_color = Color(0.6, 0.72, 0.85, 1)
+shader_parameter/edge_glow = 0.35

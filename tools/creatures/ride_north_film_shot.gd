@@ -88,6 +88,12 @@ func _grab(label: String) -> void:
 	print("  frame %d (%s): fov %.1f, cam at %s, rider at %s, rider in frame %s" % [_frame, label,
 			cam.fov, cam.global_position, aim, not cam.is_position_behind(aim) and
 			Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).has_point(cam.unproject_position(aim))])
+	# The opening shot is "the beast leading": he should be in it, ahead of the horse.
+	var beast := get_tree().get_first_node_in_group(BeastActor.GROUP) as Node3D
+	if beast:
+		var at := beast.global_position + Vector3.UP * 1.4
+		print("  beast at %s, %.1f m from the rider, in frame %s" % [at, at.distance_to(aim), not cam.is_position_behind(at)
+				and Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size).has_point(cam.unproject_position(at))])
 	if not _numbers:
 		await RenderingServer.frame_post_draw
 		var img := get_viewport().get_texture().get_image()

@@ -19,6 +19,12 @@ static func attach(anchor: Node3D, director: Node) -> Array[SceneSpace]:
 			var size: Vector3 = anchor.get_meta(&"size", Vector3(7.0, 3.0, 5.5))
 			spaces.append(_add(anchor, "BeastDoor", BeastDoor.new(), size))
 			_add_keepsakes(anchor)
+			var evening := anchor.get_node_or_null(^"CottageEvening") as CottageEvening
+			if evening == null:
+				evening = CottageEvening.new()
+				evening.name = "CottageEvening"
+				anchor.add_child(evening)
+			spaces.append(evening.build(anchor))
 		&"act1_cottage_door":
 			if anchor.get_node_or_null(^"CottageDoorLatch") == null and CottageDoorLatch.find_leaf(anchor):
 				anchor.add_child(CottageDoorLatch.new())

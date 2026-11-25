@@ -18,10 +18,23 @@ const THREADS: Array[Dictionary] = [
 		"lines": [
 			"Last loaf's gone. If I come back with nothing, we don't eat.",
 			"Deer come down the trail past our door at first light. Quiet feet. Patience.",
-			"Up the deer trail from the door and into the trees, before the snow fills the tracks.",
+			"Up the deer trail from the door, then the fresh tracks into the trees, before the snow fills them.",
 		],
 		"voice": ["H1_hunger", "", ""],
 		"forbid": ["wolf", "wall", "mercenary", "village"],
+	},
+	{
+		# Once the wolf is seen (WolfHunt): the ash first. She suspects what it is.
+		"id": &"shoot", "priority": 50, "icon": &"trail", "canon": "V",
+		"require": ["fact.wolf_spotted"], "done": ["wolf_killed"],
+		"lines": [
+			"Too big for a wolf, and too quiet. If it's one of them, only ash will do.",
+			"The ash arrow first, into its side, before it runs off with the doe.",
+			"Ash on the string. Draw slow, hold my breath, and let it fly.",
+		],
+		"voice": ["", "", ""],
+		"allow": ["faerie", "fae"],
+		"forbid": ["mercenary", "village"],
 	},
 	{
 		"id": &"skin", "priority": 30, "icon": &"knife", "canon": "X",
@@ -46,14 +59,39 @@ const THREADS: Array[Dictionary] = [
 		"forbid": ["wall", "mercenary", "scars"],
 	},
 	{
+		# The evening at home (CottageEvening): table, fire, clothes, supper.
 		"id": &"home", "priority": 10, "icon": &"hearth", "canon": "V",
-		"require": ["pelt_sold"], "done": ["beast_claim_accepted"],
+		"require": ["pelt_sold"], "done": ["fact.evening.supper_eaten"],
 		"lines": [
 			"Stay together. Look after them.",
-			"They'll be by the fire tonight, waiting on what I bring home.",
-			"Home to the cottage before dark, and stay the night with them.",
+			"They'll be by the fire tonight, waiting on what I bring home. Meat on the table, a log on the fire, these clothes off.",
+			"Home to the cottage: the meat on the table, a log from the basket on the fire, a change at the dresser, then sit to supper.",
 		],
 		"voice": ["H1_promise", "", ""],
+		"forbid": ["door", "wall", "bracelet", "claim"],
+	},
+	{
+		# "Rest, Feyre": the ironwood bed, and the night comes.
+		"id": &"rest", "priority": 10, "icon": &"hearth", "canon": "X",
+		"require": ["fact.evening.supper_eaten"], "done": ["fact.evening.slept"],
+		"lines": [
+			"Father's right. I'm asleep on my feet.",
+			"Our room, behind the partition. The big bed we three share.",
+			"Lie down in the ironwood bed in the sisters' room.",
+		],
+		"voice": ["", "", ""],
+		"forbid": ["door", "wall", "bracelet", "claim"],
+	},
+	{
+		# The quiet hour at the fire after she has slept, until the beast comes.
+		"id": &"night", "priority": 10, "icon": &"hearth", "canon": "A",
+		"require": ["fact.evening.slept"], "done": ["beast_claim_accepted"],
+		"lines": [
+			"The quiet hour before bed. All four of us by the fire, for once.",
+			"Father's dozing in his chair. Sit with them while the fire lasts.",
+			"Stay by the fire with them. The night isn't over yet.",
+		],
+		"voice": ["", "", ""],
 		"forbid": ["door", "wall", "bracelet", "claim"],
 	},
 	{
@@ -84,7 +122,10 @@ func _init() -> void:
 		t.done_flags = PackedStringArray(spec.done)
 		t.lines = PackedStringArray(spec.lines)
 		t.voice_ids = PackedStringArray(spec.voice)
-		var forbid := PackedStringArray(NOT_YET_MET)
+		var forbid := PackedStringArray()
+		for word in NOT_YET_MET:
+			if not word in spec.get("allow", []):
+				forbid.append(word)
 		forbid.append_array(PackedStringArray(spec.forbid))
 		t.forbidden_words = forbid
 		book.threads.append(t)
