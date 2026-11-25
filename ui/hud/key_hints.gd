@@ -121,9 +121,11 @@ func use_settings(path: String) -> void:
 			taught[id] = true
 
 
-## Tips.show_again: every hint teaches itself once more.
+## Tips.show_again: every hint teaches itself once more. A nudge still running
+## from before goes too, so none is left over from what she had already learnt.
 func forget_taught() -> void:
 	taught.clear()
+	_nudged.clear()
 
 
 ## Whether a row is still to be taught: hints are on and she hasn't used it.

@@ -191,7 +191,8 @@ func test_corner_tips_teach_the_stones_once() -> void:
 	hints.forget_taught()
 	_player.global_position = s.global_position + Vector3(0.0, 0.0, WhorlStone.TIP_RADIUS + 10.0)
 	await wait_process_frames(2)
-	assert_eq(hints.wanted(), &"", "nothing once she walks away")
+	# A nudge from a neighbour's discovery is not a stone tip: only the stone rows must be gone.
+	assert_false([WhorlStone.TIP_MARK, WhorlStone.TIP_RIDE].has(hints.wanted()), "no stone tip once she walks away")
 	for path in ["user://test_whorl_tips.cfg", "user://test_whorl_tips_settings.cfg"]:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	hints.use_settings(saved_hints)
