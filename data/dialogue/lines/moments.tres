@@ -349,8 +349,146 @@ follow_up = &""
 delivery = "not voiced: written"
 emotion = &"neutral"
 
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"hostile_element_weak"
+speaker = &"feyre"
+who = ""
+text = "That hurt it. Remember what did that."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_weak"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"hostile_element_weak_ember"
+speaker = &"feyre"
+who = ""
+text = "Fire, then. Even they burn."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_weak_ember"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("1")
+id = &"hostile_element_weak_rime"
+speaker = &"feyre"
+who = ""
+text = "The cold bit deep. It hated that."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_weak_rime"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L18"]
+script = ExtResource("1")
+id = &"hostile_element_weak_glimmer"
+speaker = &"feyre"
+who = ""
+text = "It flinched from the light like something out of a cellar."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_weak_glimmer"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("1")
+id = &"hostile_element_weak_hush"
+speaker = &"feyre"
+who = ""
+text = "Its eyes went heavy. It's fighting sleep."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_weak_hush"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("1")
+id = &"hostile_element_resisted"
+speaker = &"feyre"
+who = ""
+text = "Like shooting a stone. Not that, then."
+canon = "X"
+trigger = 6
+where = &"hostile_elements.hostile_element_resisted"
+deed = &""
+phases = PackedStringArray()
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = true
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: dry, quiet, close"
+emotion = &"guarded"
+
 [resource]
 script = ExtResource("3")
 area = &"moments"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20")])
 places = Array[ExtResource("2")]([])

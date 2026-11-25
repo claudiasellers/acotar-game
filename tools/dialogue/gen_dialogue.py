@@ -943,11 +943,11 @@ for _area, _l in LINES:
 A = "moments"
 
 
-def moment(lid, scene, text, speaker="feyre", inner=True, canon="X", who=None, delivery="", **kw):
+def moment(lid, scene, text, speaker="feyre", inner=True, canon="X", who=None, delivery="", once=False, **kw):
     if inner and not delivery:
         delivery = "inner voice: dry, quiet, close"
     line(A, lid, speaker, text, "scene", scene + "." + lid, (), inner=inner, canon=canon, who=who,
-         delivery=delivery, once=False, cd=0.0, **kw)
+         delivery=delivery, once=once, cd=0.0, **kw)
 
 
 # The Summer faerie on the dining table (ch 17).
@@ -977,6 +977,19 @@ for _n, _what, _shape in [(1, "The front doors", "An X"), (2, "The marble stairs
 # not heard: LinePresenter holds it up as a loose page until she puts it back.
 moment("sentry_chest_tag", "sentry_chest", "For whoever puts an arrow in all three butts.", speaker="note",
        inner=False, who="A tag on the hasp", delivery="not voiced: written")
+
+# A steeped arrow meets a monster's weakness, or is shrugged off (L75, L81 G24;
+# HostileElements.react speaks them). Once per save each: the Director records
+# dlg.<id> only when she has heard it. The Keeper's lines, canon X
+# (lore/04-creatures/lesser-fae-and-ambient.md).
+for _lid, _text in [
+        ("hostile_element_weak", "That hurt it. Remember what did that."),
+        ("hostile_element_weak_ember", "Fire, then. Even they burn."),
+        ("hostile_element_weak_rime", "The cold bit deep. It hated that."),
+        ("hostile_element_weak_glimmer", "It flinched from the light like something out of a cellar."),
+        ("hostile_element_weak_hush", "Its eyes went heavy. It's fighting sleep."),
+        ("hostile_element_resisted", "Like shooting a stone. Not that, then.")]:
+    moment(_lid, "hostile_elements", _text, canon="X", once=True)
 
 # =============================================================================
 # Who stands where (CastPresence). House spots are in house space (x, z) on the

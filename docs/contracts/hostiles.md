@@ -250,11 +250,14 @@ normal) scales a steeped arrow (fire, frost, light, sleep): its damage
 - Resisted: a dull grey puff, a flat tick, no damage, no effect, no reaction.
 - Every one emits `EventBus.hostile_element_reacted(creature_id, kind,
   element, reaction)`.
-- Her thought (L81 G24; the Keeper's lines): the first weak hit of each
-  element (`WEAK_THOUGHTS`: ember, rime, glimmer, hush; `WEAK_THOUGHT` for any
-  other) and the first resisted hit of any element (`RESISTED_THOUGHT`), each
-  once per save (WorldState `thought.<line id>`), as her inner voice through
-  `DialogueDirector.staged` (`HostileElements.think`). Normal says nothing.
+- Her thought (L81 G24; the Keeper's lines, canon X): once-lines of the books
+  (`moments`, `tools/dialogue/gen_dialogue.py`): the first weak hit of each
+  element (`WEAK_LINES`: `hostile_element_weak_ember`, `_rime`, `_glimmer`,
+  `_hush`; `hostile_element_weak` for any other) and the first resisted hit of
+  any element (`hostile_element_resisted`). `react` says it with
+  `DialogueDirector.line` only while `dlg.<id>` is unset and the Director is
+  not busy, so one that lands during a scene or caption waits for the next
+  hit; the Director records `dlg.<id>` when it is heard. Normal says nothing.
 - Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
   its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
 

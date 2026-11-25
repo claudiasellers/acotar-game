@@ -29,20 +29,18 @@ const RESISTED_COLOR := Color(0.62, 0.6, 0.58)
 const AMOUNTS := {&"weak": 56, &"normal": 14, &"resisted": 6}
 ## How long a weak element sends it thrashing away from where it struck.
 const WEAK_FLEE_SECONDS := 3.0
-## Her thought the first time (once per save) each element finds a weakness,
-## and the first time one is resisted (L81 G24; the Keeper's lines, canon X,
-## lore/04-creatures/lesser-fae-and-ambient.md). An element with no line of
-## its own takes WEAK_THOUGHT.
-const WEAK_THOUGHTS := {
-	&"fire": [&"hostile_element_weak_ember", "Fire, then. Even they burn."],
-	&"frost": [&"hostile_element_weak_rime", "The cold bit deep. It hated that."],
-	&"light": [&"hostile_element_weak_glimmer", "It flinched from the light like something out of a cellar."],
-	&"sleep": [&"hostile_element_weak_hush", "Its eyes went heavy. It's fighting sleep."],
+## Her thought the first time a steeped arrow finds each element's weakness,
+## and the first time one is resisted (L81 G24): once-lines of the books
+## (data/dialogue/lines/moments.tres, tools/dialogue/gen_dialogue.py; the
+## Keeper's, canon X). An element with no line of its own takes WEAK_LINE.
+const WEAK_LINES := {
+	&"fire": &"hostile_element_weak_ember",
+	&"frost": &"hostile_element_weak_rime",
+	&"light": &"hostile_element_weak_glimmer",
+	&"sleep": &"hostile_element_weak_hush",
 }
-const WEAK_THOUGHT := [&"hostile_element_weak", "That hurt it. Remember what did that."]
-const RESISTED_THOUGHT := [&"hostile_element_resisted", "Like shooting a stone. Not that, then."]
-## WorldState flag a thought sets once said: this prefix and its line id.
-const THOUGHT_FLAG := "thought.%s"
+const WEAK_LINE := &"hostile_element_weak"
+const RESISTED_LINE := &"hostile_element_resisted"
 
 ## Off in tests that count nodes; on in play.
 static var show_fx: bool = true
@@ -91,7 +89,7 @@ static func arrow_hit(creature: Creature, arrow: Node3D) -> bool:
 
 
 ## The element hit `creature` at `at`: shows the reaction, tells the world
-## (EventBus.hostile_element_reacted), says her first-time thought (think)
+## (EventBus.hostile_element_reacted), says her first-time thought (_say_thought)
 ## and returns the multiplier for the effect it should take.
 static func react(creature: Creature, element: StringName, at: Vector3) -> float:
 	var mult := mult_of(creature.data, element)
@@ -99,34 +97,30 @@ static func react(creature: Creature, element: StringName, at: Vector3) -> float
 	EventBus.hostile_element_reacted.emit(creature.creature_id, creature.data.kind, element, reaction)
 	if show_fx and creature.is_inside_tree():
 		burst(creature, element, reaction, at)
-	think(creature, element, reaction)
+	_say_thought(creature, element, reaction)
 	return mult
 
 
-## The thought for `element` meeting `reaction`: [line id, text], or [] when
-## a normal hit has none.
-static func thought_for(element: StringName, reaction: StringName) -> Array:
+## Her line for `element` meeting `reaction`, or &"" when a normal hit has none.
+static func thought_for(element: StringName, reaction: StringName) -> StringName:
 	if reaction == &"weak":
-		return WEAK_THOUGHTS.get(element, WEAK_THOUGHT)
+		return WEAK_LINES.get(element, WEAK_LINE)
 	if reaction == &"resisted":
-		return RESISTED_THOUGHT
-	return []
+		return RESISTED_LINE
+	return &""
 
 
-## Says her thought for this reaction as her inner voice, once per save (a
-## WorldState flag), through the one door (DialogueDirector.staged). Returns
-## the line id it said, or &"" when there was none to say.
-static func think(from: Node, element: StringName, reaction: StringName) -> StringName:
-	var t := thought_for(element, reaction)
-	if t.is_empty():
-		return &""
-	var flag := THOUGHT_FLAG % t[0]
-	if WorldState.has_flag(flag):
-		return &""
-	WorldState.set_flag(flag)
-	if from.is_inside_tree():
-		DialogueDirector.staged(from, t[0], "", t[1])
-	return t[0]
+## Says her line through the one door while she hasn't heard it yet and the
+## Director is free: it records dlg.<id> only when the line is heard, so a
+## reaction that lands while a scene or caption holds the screen tries again
+## on the next one.
+static func _say_thought(creature: Node, element: StringName, reaction: StringName) -> void:
+	var id := thought_for(element, reaction)
+	if id == &"" or not creature.is_inside_tree() or WorldState.has_flag("dlg.%s" % id):
+		return
+	var d := DialogueDirector.of(creature.get_tree())
+	if d and not d.busy():
+		DialogueDirector.line(creature, id)
 
 
 ## The burst and the sound, at `at` (or on the creature when `at` is zero).

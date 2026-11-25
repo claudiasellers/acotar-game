@@ -157,38 +157,74 @@ func test_a_weak_burst_is_big_and_a_resisted_one_dull() -> void:
 
 # --- G24: her first-time thoughts ------------------------------------------------
 
+func _director() -> DialogueDirector:
+	var d := DialogueDirector.new()
+	d.auto_tick = false
+	add_child_autofree(d)
+	return d
+
+
 func _thought() -> String:
 	return LinePresenter.of(get_tree()).stand_of(LinePresenter.Voice.THOUGHT).showing
 
 
+func test_her_lines_are_once_lines_of_the_books() -> void:
+	var d := _director()
+	var ids: Array[StringName] = [HostileElements.WEAK_LINE, HostileElements.RESISTED_LINE]
+	for e: StringName in HostileElements.ELEMENTS:
+		ids.append(HostileElements.thought_for(e, &"weak"))
+	for id in ids:
+		var line := d.by_id.get(id) as DialogueLine
+		assert_not_null(line, "%s is in the sheet" % id)
+		if line:
+			assert_true(line.once, "%s: once per save" % id)
+			assert_true(line.inner, "%s: her thought" % id)
+			assert_eq(line.canon, "X", "%s: the Keeper's, invented" % id)
+	for e: StringName in HostileElements.ELEMENTS:
+		assert_ne(HostileElements.thought_for(e, &"weak"), HostileElements.WEAK_LINE, "%s has a line of its own" % e)
+	assert_eq(HostileElements.thought_for(&"no_such", &"weak"), HostileElements.WEAK_LINE, "anything else: the fallback")
+	assert_eq(HostileElements.thought_for(&"fire", &"normal"), &"", "a normal hit thinks nothing")
+
+
 func test_the_first_weakness_is_her_thought_once() -> void:
+	var d := _director()
 	var n := _naga()
 	n.on_arrow_effect(&"frost", _arrow(&"frost", n.global_position))
-	assert_eq(_thought(), "The cold bit deep. It hated that.", "the rime's own line, in her inner voice")
-	assert_true(WorldState.has_flag(HostileElements.THOUGHT_FLAG % &"hostile_element_weak_rime"), "kept with the save")
-	assert_eq(HostileElements.think(n, &"frost", &"weak"), &"", "and never again")
-	assert_eq(HostileElements.think(n, &"fire", &"weak"), &"hostile_element_weak_ember", "each element has its own first time")
+	assert_eq(d.spoken_log, [&"hostile_element_weak_rime"] as Array[StringName], "the rime's own line")
+	assert_eq(_thought(), "The cold bit deep. It hated that.", "in her inner voice")
+	assert_true(WorldState.has_flag("dlg.hostile_element_weak_rime"), "heard, and kept with the save")
+	d._now += 30.0
+	n.on_arrow_effect(&"frost", _arrow(&"frost", n.global_position))
+	assert_eq(d.spoken_log.size(), 1, "never again")
+	n.on_arrow_effect(&"fire", _arrow(&"fire", n.global_position))
+	assert_eq(d.spoken_log.back(), &"hostile_element_weak_ember", "each element has its own first time")
 
 
-func test_every_element_has_its_own_weak_line() -> void:
-	for e: StringName in HostileElements.ELEMENTS:
-		var t := HostileElements.thought_for(e, &"weak")
-		assert_eq(t.size(), 2, String(e))
-		assert_ne(t[0], HostileElements.WEAK_THOUGHT[0], "%s has a line of its own" % e)
-		assert_false(String(t[1]).is_empty())
-	assert_eq(HostileElements.thought_for(&"no_such", &"weak"), HostileElements.WEAK_THOUGHT, "anything else: the fallback")
-	assert_eq(HostileElements.thought_for(&"fire", &"normal"), [], "a normal hit thinks nothing")
+func test_a_busy_director_keeps_it_for_the_next_hit() -> void:
+	var d := _director()
+	var n := _naga()
+	d._busy_until = d._now + 10.0
+	n.on_arrow_effect(&"frost", _arrow(&"frost", n.global_position))
+	assert_eq(d.spoken_log.size(), 0, "a caption holds the screen: not now")
+	assert_false(WorldState.has_flag("dlg.hostile_element_weak_rime"), "and not marked heard")
+	d._now += 30.0
+	n.on_arrow_effect(&"frost", _arrow(&"frost", n.global_position))
+	assert_eq(d.spoken_log, [&"hostile_element_weak_rime"] as Array[StringName], "she thinks it on the next one")
 
 
 func test_the_first_resist_is_her_thought_once() -> void:
+	var d := _director()
 	var n := _naga({&"fire": 0.0, &"frost": 0.0})
 	var at := n.global_position + Vector3.UP * 0.8
 	n.on_arrow_effect(&"fire", _arrow(&"fire", at))
 	assert_eq(_thought(), "Like shooting a stone. Not that, then.")
-	assert_eq(HostileElements.think(n, &"frost", &"resisted"), &"", "one resist line per save, any element")
+	d._now += 30.0
+	n.on_arrow_effect(&"frost", _arrow(&"frost", at))
+	assert_eq(d.spoken_log, [&"hostile_element_resisted"] as Array[StringName], "one resist line per save, any element")
 
 
 func test_a_normal_hit_says_nothing() -> void:
+	var d := _director()
 	var n := _naga()
 	n.on_arrow_effect(&"light", _arrow(&"light", n.global_position))
-	assert_eq(_thought(), "", "light is normal on a naga: no thought")
+	assert_eq(d.spoken_log.size(), 0, "light is normal on a naga: no thought")
