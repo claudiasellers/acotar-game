@@ -170,6 +170,7 @@ func _process(delta: float) -> void:
 				* _stick_friction()
 		_look(look.x * s, look.y * s)
 	sidestep.wait(TimeScale.real(delta), hit_stop != null and hit_stop.active())
+	_hold_sidestep_hint()
 	camera_control.update(delta)
 	if _breath:
 		_breath.update(delta)
@@ -344,6 +345,15 @@ func _can_sidestep() -> bool:
 			and sidestep.ready() and stamina >= SidestepMotor.STAMINA \
 			and not (vitals and (vitals.is_down or vitals.is_grabbed())) \
 			and not (hit_stop and hit_stop.active())
+
+
+## The sidestep's key is named while it would save her: bow up, and a hostile
+## close by is after her. Held for the fight, since a wind-up alone is too
+## short to read by.
+func _hold_sidestep_hint() -> void:
+	var hints := KeyHints.of(get_tree())
+	var wanted := hints.teaches(&"sidestep") and _bow_raised() and SoftAim.engaged_near(get_tree(), global_position)
+	hints.hold(self, &"sidestep" if wanted else &"")
 
 
 ## The way the stick points, or straight back from her aim.

@@ -139,3 +139,27 @@ func test_a_press_at_the_start_of_the_longest_freeze_runs_as_it_ends() -> void:
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	assert_true(feyre.sidestep.active, "and runs on the frame the freeze ends")
+
+
+func test_its_key_is_named_while_the_bow_is_up_and_one_is_after_her() -> void:
+	var hints := KeyHints.of(get_tree())
+	hints.forget_taught()
+	GameSettings.set_value(&"key_hints", true)
+	var naga: NagaRoamer = preload("res://creatures/hostile/naga_roamer.tscn").instantiate()
+	hill.add_child(naga)
+	naga.set_physics_process(false)
+	naga.global_position = feyre.global_position + Vector3(6, 0, 0)
+	naga.ladder.state = HostileLadder.State.ENGAGED
+	await wait_frames(3)
+	assert_ne(hints.wanted(), &"sidestep", "not with the bow down")
+	await _raise()
+	await wait_frames(2)
+	assert_eq(hints.wanted(), &"sidestep")
+	naga.ladder.state = HostileLadder.State.ROUTINE
+	await wait_frames(2)
+	assert_ne(hints.wanted(), &"sidestep", "and not once it has lost her")
+	naga.ladder.state = HostileLadder.State.ENGAGED
+	feyre.sidestep.press()
+	await wait_until(func() -> bool: return feyre.sidestep.active, 1.0)
+	await wait_frames(2)
+	assert_ne(hints.wanted(), &"sidestep", "used once, it is learnt")
