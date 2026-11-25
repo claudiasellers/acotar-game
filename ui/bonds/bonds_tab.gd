@@ -145,6 +145,7 @@ func _row(bond: Dictionary, i: int, group: ButtonGroup) -> Button:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(row)
 	var dab := BookKit.wash(DAB, i)
+	dab.modulate.a = LoosePage.DAB_LIFT
 	dab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(dab)
 	var words := VBoxContainer.new()
@@ -173,7 +174,9 @@ func _write_page(bond: Dictionary, i: int) -> void:
 		_name.text = ""
 		_days.text = ""
 		return
-	_dab_holder.add_child(BookKit.wash(PAGE_DAB, i))
+	var dab := BookKit.wash(PAGE_DAB, i)
+	dab.modulate.a = LoosePage.DAB_LIFT
+	_dab_holder.add_child(dab)
 	_name.text = BondBook.called(bond)
 	_days.text = BondBook.these_days(bond)
 	for m in BondBook.moments(bond):

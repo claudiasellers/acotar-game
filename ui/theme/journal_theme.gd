@@ -80,7 +80,7 @@ const BOOK := {
 ## The pastel washes she paints with: one per index tab of the book, and the
 ## blot behind a thing drawn on a page. The same in both acts.
 const WASHES: Array[Color] = [
-	Color("#f4c6d4"), Color("#d9c9f4"), Color("#bfe6cf"), Color("#f3e2a4"), Color("#bcd3f0"),
+	Color("#f4c6d4"), Color("#d9c9f4"), Color("#bfe6cf"), Color("#f3e2a4"), Color("#bcd3f0"), Color("#f6cdb0"),
 ]
 
 ## Label variation -> [size, font: "display" | "body" | "hand", weight, colour token]
