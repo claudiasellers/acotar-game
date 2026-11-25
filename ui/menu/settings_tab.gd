@@ -60,7 +60,7 @@ func _ready() -> void:
 	keys.visible = false
 	right_sheet().add_child(keys)
 	set_hints([["Q E", "Page"], ["Esc", "Resume"]] if in_game else [["Esc", "Back"]])
-	InputSettings.scheme_changed.connect(func(_s: InputSettings.Scheme) -> void: _sync())
+	InputSettings.keys_changed.connect(_sync)
 	GameSettings.changed.connect(func(_k: StringName) -> void: _sync())
 	if in_game:
 		ScreenStack.pause_requested.connect(open)
@@ -194,7 +194,7 @@ func _build_left(col: VBoxContainer) -> void:
 	_section(col, "Movement keys")
 	var schemes := _row(col)
 	var scheme_group := ButtonGroup.new()
-	for scheme: InputSettings.Scheme in [InputSettings.Scheme.ARROWS, InputSettings.Scheme.WASD]:
+	for scheme: InputSettings.Scheme in [InputSettings.Scheme.WASD, InputSettings.Scheme.ARROWS]:
 		var b := _chip(schemes, InputSettings.SCHEME_NAMES[scheme], scheme_group)
 		b.pressed.connect(func() -> void: InputSettings.set_scheme(scheme))
 		_scheme_buttons[scheme] = b

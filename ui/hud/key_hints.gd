@@ -31,7 +31,7 @@ const ROWS := {
 	&"retrieve": [[&"interact", "pick up the arrow"]],
 	&"focus": [[&"focus", "steady your breath"]],
 	&"ash": [[&"cycle_arrow", "ash arrow"]],
-	&"draw": [[&"aim", "hold to aim"], [&"fire", "hold to draw, let go to shoot"]],
+	&"draw": [[&"fire", "hold to draw, let go to shoot"], [&"aim", "steady your aim"]],
 	&"crouch": [[&"crouch", "crouch"]],
 	&"jump": [[&"jump", "jump"]],
 	&"walk": [[&"move", "walk"]],
