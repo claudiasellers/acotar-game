@@ -8,9 +8,9 @@
 class_name BondsTab
 extends MenuTab
 
-## Their portrait beside a name in the list, and on the open page.
-const FACE := 48.0
-const PAGE_FACE := 160.0
+## The dab of paint beside a name in the list, and on the open page.
+const DAB := 34.0
+const PAGE_DAB := 64.0
 const ROW_HEIGHT := 62.0
 
 ## The bond the right sheet shows.
@@ -18,7 +18,7 @@ var showing: StringName = &""
 
 var _list: VBoxContainer
 var _name: Label
-var _face: TextureRect
+var _dab_holder: Control
 var _days: Label
 var _past: VBoxContainer
 var _rows: Dictionary = {}  # bond id -> Button
@@ -87,8 +87,9 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override(&"separation", 14)
 	right.add_child(head)
-	_face = BookKit.picture(null, Vector2(PAGE_FACE, PAGE_FACE))
-	head.add_child(_face)
+	_dab_holder = Control.new()
+	_dab_holder.custom_minimum_size = Vector2(PAGE_DAB, PAGE_DAB)
+	head.add_child(_dab_holder)
 	_name = BookKit.label("", &"SatchelHeading")
 	_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(_name)
@@ -118,15 +119,15 @@ func _refresh() -> void:
 	_rows.clear()
 	var group := ButtonGroup.new()
 	for i in known.size():
-		var row := _row(known[i], group)
+		var row := _row(known[i], i, group)
 		_rows[known[i].id] = row
 		_list.add_child(row)
-	_write_page(BondBook.get_bond(showing))
+	_write_page(BondBook.get_bond(showing), known.find(BondBook.get_bond(showing)))
 
 
-## One of the people she knows: the portrait, the name, and the last thing
+## One of the people she knows: a dab of paint, the name, and the last thing
 ## that passed.
-func _row(bond: Dictionary, group: ButtonGroup) -> Button:
+func _row(bond: Dictionary, i: int, group: ButtonGroup) -> Button:
 	var b := Button.new()
 	b.name = String(bond.id)
 	b.theme_type_variation = &"SatchelSlot"
@@ -143,9 +144,10 @@ func _row(bond: Dictionary, group: ButtonGroup) -> Button:
 	row.add_theme_constant_override(&"separation", 12)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(row)
-	var face := BookKit.picture(Icons.texture(Icons.BONDS, BondBook.face(bond)), Vector2(FACE, FACE))
-	face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(face)
+	var dab := BookKit.wash(DAB, i)
+	dab.modulate.a = LoosePage.DAB_LIFT
+	dab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(dab)
 	var words := VBoxContainer.new()
 	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -161,15 +163,20 @@ func _row(bond: Dictionary, group: ButtonGroup) -> Button:
 	return b
 
 
-func _write_page(bond: Dictionary) -> void:
+func _write_page(bond: Dictionary, i: int) -> void:
+	for c in _dab_holder.get_children():
+		_dab_holder.remove_child(c)
+		c.queue_free()
 	for c in _past.get_children():
 		_past.remove_child(c)
 		c.queue_free()
-	_face.texture = Icons.texture(Icons.BONDS, BondBook.face(bond)) if not bond.is_empty() else null
 	if bond.is_empty():
 		_name.text = ""
 		_days.text = ""
 		return
+	var dab := BookKit.wash(PAGE_DAB, i)
+	dab.modulate.a = LoosePage.DAB_LIFT
+	_dab_holder.add_child(dab)
 	_name.text = BondBook.called(bond)
 	_days.text = BondBook.these_days(bond)
 	for m in BondBook.moments(bond):

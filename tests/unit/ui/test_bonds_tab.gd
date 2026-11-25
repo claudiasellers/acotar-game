@@ -83,26 +83,6 @@ func test_the_mare_keeps_her_own_pages_memories() -> void:
 	assert_eq(BondBook.these_days(mare), page.now[MareBond.tier()])
 
 
-func test_everyone_has_a_portrait_and_it_changes_with_what_she_sees() -> void:
-	for b in BondBook.BONDS:
-		assert_true(Icons.has(Icons.BONDS, StringName(b.get("face", b.id))), "%s has a first portrait" % b.id)
-		for m: Dictionary in BondBook.all_moments(b):
-			if m.has("face"):
-				assert_true(Icons.has(Icons.BONDS, m.face), "%s is drawn" % m.face)
-	_raise("beast_claim_accepted", 2)
-	assert_eq(BondBook.face(BondBook.get_bond(&"tamlin")), &"tamlin_beast")
-	_raise("first_dinner_eaten", 3)
-	assert_eq(BondBook.face(BondBook.get_bond(&"tamlin")), &"tamlin")
-	assert_eq(BondBook.face(BondBook.get_bond(&"alis")), &"alis")
-	_raise("glamour_lifted", 20)
-	assert_eq(BondBook.face(BondBook.get_bond(&"alis")), &"alis_true", "her true face, once the glamour lifts")
-	var tab := BondsTab.new()
-	add_child_autofree(tab)
-	await wait_process_frames(2)
-	tab._shown()
-	assert_eq(tab._face.texture, Icons.texture(Icons.BONDS, &"tamlin"))
-
-
 func test_no_line_is_a_number_and_every_story_flag_is_a_real_one() -> void:
 	var phases := FileAccess.get_file_as_string("res://data/phases/spring_court_phases.tres")
 	var digits := RegEx.create_from_string("[0-9]")

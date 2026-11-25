@@ -3,9 +3,7 @@
 ## them down. There is no number anywhere (R2): a bond is told as moments, each
 ## one a story flag or a `fact.` flag that some deed raised, with the day it
 ## happened. A moment says what passed (`then`) and may say how they are with
-## her since (`now`), what she calls them from then on (`called`) and which
-## portrait is theirs from then on (`face`, an Icons.BONDS id; their own id
-## until a moment says otherwise). Nobody
+## her since (`now`) and what she calls them from then on (`called`). Nobody
 ## is listed before the flag that brings them into her life (`met`).
 ##
 ## This only reads flags and keeps the day each moment came (WorldDeltas
@@ -27,12 +25,12 @@ const MARE_PAGE := "res://data/mount/mare_page.tres"
 
 const BONDS: Array[Dictionary] = [
 	{
-		"id": &"tamlin", "kind": PERSON, "met": "beast_claim_accepted", "called": "The beast", "face": &"tamlin_beast",
+		"id": &"tamlin", "kind": PERSON, "met": "beast_claim_accepted", "called": "The beast",
 		"moments": [
 			{"flag": "beast_claim_accepted", "canon": "C4",
 				"then": "A beast with horns broke down our door and called me murderer. A life for a life. I went with him.",
 				"now": "My captor. I watch his claws."},
-			{"flag": "first_dinner_eaten", "canon": "C6-9", "called": "Tamlin", "face": &"tamlin",
+			{"flag": "first_dinner_eaten", "canon": "C6-9", "called": "Tamlin",
 				"then": "He is a High Lord, and he wears a mask he cannot take off. He fed me at his table, and every polite word seemed to pain him.",
 				"now": "Stiff and gruff, and gone all day. He says he keeps no slaves."},
 			{"flag": "puca_resisted", "canon": "C11",
@@ -106,7 +104,7 @@ const BONDS: Array[Dictionary] = [
 			{"flag": "gallery_opened", "canon": "C19",
 				"then": "She took me to a room stocked with paints, all for me.",
 				"now": "She looks after what matters to me without my asking."},
-			{"flag": "glamour_lifted", "canon": "C24", "face": &"alis_true",
+			{"flag": "glamour_lifted", "canon": "C24",
 				"then": "I saw her true face, skin like bark. She has always looked so.",
 				"now": "Herself, at last, to my eyes."},
 			{"flag": "solstice_danced", "canon": "C25",
@@ -223,15 +221,6 @@ static func called(bond: Dictionary) -> String:
 	for m in all_moments(bond):
 		if m.has("called") and _up(m.flag):
 			out = String(m.called)
-	return out
-
-
-## Their portrait now (Icons.BONDS): the last one a reached moment gave.
-static func face(bond: Dictionary) -> StringName:
-	var out := StringName(bond.get("face", bond.id))
-	for m in all_moments(bond):
-		if m.has("face") and _up(m.flag):
-			out = m.face
 	return out
 
 

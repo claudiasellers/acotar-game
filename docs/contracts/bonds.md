@@ -32,11 +32,7 @@ It is told as **moments** in Feyre's hand, each with the day it happened.
   `data/mount/mare_page.tres`'s `memory` lines, shown once
   `fact.mare_did_<id>` is up, and her "These days" is that page's `now` line
   for `MareBond.tier()`. She has no name.
-- Portraits are `ui/theme/icons/bonds/<id>.webp` (icon lane), found through
-  `Icons` (`Icons.BONDS`). `BondBook.face(bond)` is the bond's id until a
-  reached moment's `face` says otherwise: `tamlin_beast` until
-  `first_dinner_eaten`, `alis_true` from `glamour_lifted`.
-- `known()`, `moments(bond)`, `called(bond)`, `face(bond)`, `these_days(bond)`, `count()`.
+- `known()`, `moments(bond)`, `called(bond)`, `these_days(bond)`, `count()`.
 
 ## Canon locks (plan section 10)
 
@@ -56,7 +52,8 @@ since she last opened the page (WorldDeltas `bonds/seen`).
 
 ## Not built yet
 
-- Sketchbook portraits (plan section 1.4), the drawn-in event pages, are
-  the story journal's and are not this page's.
+- Sketchbook portraits (plan section 1.4) are the story journal's, not this
+  page's. When a portrait exists for a person, this page shows it in place
+  of the dab of paint.
 - Regard and mood (plan section 1.1) have no engine yet. When one exists it
   raises `fact.` flags; this page only ever reads flags.
