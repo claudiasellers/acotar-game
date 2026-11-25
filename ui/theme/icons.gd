@@ -17,6 +17,7 @@ const ITEMS := &"items"
 const OUTFITS := &"wardrobe"
 const BREWS := &"brews"
 const STATUS := &"status"
+const BONDS := &"bonds"
 ## Every cooked dish shares one picture.
 const DISH := &"dish"
 
