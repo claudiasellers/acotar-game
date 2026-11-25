@@ -9,6 +9,8 @@ extends Control
 var presses_total: int = 1
 var presses_left: int = 1
 var key_text: String = "E"
+## Hold to break free: the key is held, not mashed, so the ring sits steady.
+var steady: bool = false
 var _shake: float = 0.0
 
 
@@ -17,7 +19,8 @@ func _init() -> void:
 
 
 func press() -> void:
-	_shake = 1.0
+	if not steady:
+		_shake = 1.0
 
 
 func _process(delta: float) -> void:
@@ -32,7 +35,7 @@ func _draw() -> void:
 	var broken := 1.0 - float(presses_left) / maxf(float(presses_total), 1.0)
 	var ring := 58.0 + broken * 20.0
 	var spikes := 16
-	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.012)
+	var pulse := 1.0 if steady else 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.012)
 	for i in spikes:
 		var a := TAU * i / spikes + broken * 0.6
 		var dir := Vector2(cos(a), sin(a))

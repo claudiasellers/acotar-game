@@ -287,6 +287,26 @@ func test_grab_breaks_free_with_presses_that_cost_stamina() -> void:
 	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01)
 
 
+func test_hold_to_break_free_counts_a_held_key_as_a_steady_mash() -> void:
+	var saved := GameSettings.settings_path
+	GameSettings.settings_path = "user://test_vitals_hold.cfg"
+	GameSettings.load_settings()
+	EventBus.player_grabbed.emit(&"puca", 3, 4.0)
+	Input.action_press(&"interact")
+	v.step(VitalsState.GRAB_HOLD_STEP * 3.5)
+	assert_true(v.is_grabbed(), "setting off: holding does nothing")
+	GameSettings.set_value(&"break_free_hold", true)
+	v.step(VitalsState.GRAB_HOLD_STEP * 1.5)
+	assert_eq(v.grab_presses_left, 2, "one press per step held")
+	v.step(VitalsState.GRAB_HOLD_STEP * 2.0)
+	assert_false(v.is_grabbed(), "held long enough, she breaks free")
+	assert_almost_eq(player.presses_paid, 3.0 * VitalsState.GRAB_PRESS_STAMINA, 0.01, "each held press costs what a mash does")
+	Input.action_release(&"interact")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(GameSettings.settings_path))
+	GameSettings.settings_path = saved
+	GameSettings.load_settings()
+
+
 func test_a_teleport_mid_fall_lands_her_unhurt() -> void:
 	player.global_position = Vector3(0, 2, 0)
 	v._stood_y = 40.0
