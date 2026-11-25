@@ -66,9 +66,9 @@ const GATE_INSIDE := 8.0
 const BEAST_STEPS_OUT := 2.5
 const WAYSIDE_DIR := "res://data/wayside/"
 ## How far beside a wayside crossing (stones, a footbridge) his road fords.
-const CROSSING_CLEAR := 4.5
+const CROSSING_CLEAR := 7.0
 ## How close to the end of the drive the mare stops by herself.
-const STOP_REACH := 2.5
+const STOP_REACH := 1.0
 ## Her thoughts, in road order: [beat, world x/z they come at]. Marks past the
 ## Wall are measured on from the gap. Each comes once, never over another line.
 const THOUGHTS_SOUTH := [
@@ -89,11 +89,10 @@ const THOUGHTS_NORTH := [
 	[&"paint", Vector2(5.0, 40.0)],
 ]
 
-## Her first time in the saddle: the riding key hints, the mare lane's
-## (RideTips holds the first row she hasn't used and learns it as she does).
-const RIDE_TIPS := "res://systems/mount/ride_tips.gd"
-## The hour on the far side of the Wall ("The sun was already high", ch5).
-const SPRING_HOUR := 10.0
+## The hour on the far side of the Wall ("The sun was already high", ch5): the
+## ride on from the Wall takes about 1 h 45 m of game time, so she reaches the
+## steps near midday (Keeper; the lighting lane grades the arrival for noon).
+const SPRING_HOUR := 10.25
 
 @export var grade_seconds: float = 2.0
 
@@ -131,7 +130,7 @@ var _steer := SteerFrame.new()
 var _cam_tween: Tween
 var _estate: bool = false
 var _off_at: Vector3
-var _tips: Node
+var _tips: RideTips
 
 
 func _init() -> void:
@@ -235,10 +234,8 @@ static func _beside_crossings(points: PackedVector2Array) -> PackedVector2Array:
 			var on := Geometry2D.get_closest_point_to_segment(p, a, b)
 			if p.distance_to(on) >= CROSSING_CLEAR:
 				continue
-			var side := (b - a).orthogonal().normalized()
-			if (p - on).dot(side) < 0.0:
-				side = -side
-			p = on + side * CROSSING_CLEAR
+			# Always the same side of one crossing: never zigzag through the stones.
+			p = on + (b - a).orthogonal().normalized() * CROSSING_CLEAR
 		out.append(p)
 	return out
 
@@ -437,15 +434,17 @@ func _seated() -> void:
 		_pose.amount = 1.0
 	_place_rider()
 	_say(&"mounted")
-	if ResourceLoader.exists(RIDE_TIPS) and is_inside_tree():
-		_tips = load(RIDE_TIPS).call(&"attach", self, false) as Node
+	# Her first time in the saddle: the riding key hints (the mare lane's
+	# RideTips holds the first row she hasn't used and learns it as she does).
+	if is_inside_tree():
+		_tips = RideTips.attach(self, false)
 
 
 ## The mare stops at the foot of the stairs by herself and won't move again.
 func _at_the_stairs() -> void:
 	step = Step.AT_STEPS
 	if _tips and is_instance_valid(_tips):
-		_tips.set(&"get_down", true)
+		_tips.get_down = true
 	horse.stand()
 	horse.speed = 0.0
 	_say(&"stairs", true)
@@ -656,6 +655,13 @@ func _steer_mare(here: Vector2, delta: float) -> void:
 			if away > 0.0:
 				want -= out * away
 			want = want.normalized() * maxf(want.length(), 0.5) if want.length() > 0.05 else road * 0.5
+	# Up the drive she gathers herself: a canter round the fountain, a walk
+	# for the last strides to the stairs, where she stops by herself.
+	var left := path_length() - progress
+	if left < 40.0:
+		gallop = false
+	if left < 12.0:
+		want = want.limit_length(0.45)
 	# She won't pass him on his own road.
 	if progress > beast_at - 3.0:
 		gallop = false

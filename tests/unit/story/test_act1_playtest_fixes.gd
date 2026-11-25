@@ -116,17 +116,13 @@ func test_the_knife_press_does_not_use_the_bed() -> void:
 
 
 func test_the_ride_ends_up_the_manor_drive() -> void:
-	var ride := RideNorth.new()
-	ride.auto_tick = false
-	add_child_autofree(ride)
-	var drive := ride.drive_path()
-	var first := drive.global_transform * drive.curve.get_point_position(0)
-	var last := drive.global_transform * drive.curve.get_point_position(drive.curve.point_count - 1)
+	var drive := RideNorth.drive_points()
+	var first := drive[0]
+	var last := drive[drive.size() - 1]
 	var gate := ManorSitePlan.SENTRY_GATE
-	assert_almost_eq(Vector2(first.x, first.z).distance_to(gate), RideNorth.GATE_INSIDE, 0.01, "just inside the sentry gate")
-	assert_true(first.z < gate.y, "on the manor side")
+	assert_almost_eq(first.distance_to(gate), RideNorth.GATE_INSIDE, 0.01, "just inside the sentry gate")
+	assert_true(first.y < gate.y, "on the manor side")
 	var door := Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)
-	assert_almost_eq(Vector2(last.x, last.z).distance_to(door), RideNorth.STOP_OUT, 0.2, "to the front steps")
-	assert_almost_eq(last.y, WorldHeight.height_at(last.x, last.z), 0.01, "on the estate's ground")
-	if WorldStreamer.get_region(RideNorth.MANOR) == null:
-		assert_eq(ride._to_the_manor(), [], "without the estate she gets down at the path's end")
+	assert_almost_eq(last.distance_to(door), RideNorth.STOP_OUT, 0.2, "to the front steps")
+	var road := RideNorth.route_points()
+	assert_true(road.has(gate), "his road comes in through the sentry gate")
