@@ -1,0 +1,4 @@
+from ui-frame
+quality look
+shot brew_recipes res://tools/chemistry/brew_shot.tscn recipes {out}/brew_recipes.png
+shot brew_discover res://tools/chemistry/brew_shot.tscn discover {out}/brew_discover.png
