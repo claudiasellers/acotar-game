@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackData" format=3]
+
+[ext_resource type="Script" path="res://systems/vitals/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+id = &"gloamer_rake"
+family = &"gloamer"
+is_default = true
+damage = 8.0
+damage_kind = &"claw"
+reaction = &"light"
+knockback_m = 0.5
+dread_spike = 0.1
+windup_s = 0.45

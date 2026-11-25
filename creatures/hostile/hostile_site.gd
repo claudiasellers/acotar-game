@@ -40,6 +40,8 @@ var swell: SettleSwell
 var _pending: Array[Dictionary] = []
 var _token_holders: Array[Creature] = []
 var _lunge_ready: bool = true
+## The camp broke and ran this fight (rout_share); cleared when the next begins.
+var _routed: bool = false
 
 
 func _ready() -> void:
@@ -65,6 +67,7 @@ func _ready() -> void:
 	for i in data.count:
 		_spawn_member(i)
 	EventBus.player_knocked_down.connect(_on_player_knocked_down)
+	EventBus.arrow_light_landed.connect(_on_light_landed)
 
 
 static func settle_flag(site_id: StringName) -> String:
@@ -95,6 +98,7 @@ func in_leash(pos: Vector3) -> bool:
 func report(member: Creature, at: Vector3) -> void:
 	if not engaged:
 		engaged = true
+		_routed = false
 	_calm_left = ENCOUNTER_CALM_S
 	for p in _pending:
 		if p.member == member:
@@ -241,6 +245,54 @@ func _on_member_died(_cause: StringName, member: Creature) -> void:
 			_pending.remove_at(i)
 	if living_count() == 0 and not is_settled:
 		settle()
+		return
+	_maybe_rout(member)
+
+
+## Once rout_share of the camp is dead in a fight, the rest give her up and
+## run (HostileRoamer.rout): the fight ends driven off. 0 fights to the last.
+func _maybe_rout(dead: Creature) -> void:
+	if _routed or not engaged or is_settled:
+		return
+	var share := float(dead.get(&"rout_share")) if &"rout_share" in dead else 0.0
+	if share <= 0.0 or members.is_empty():
+		return
+	var fallen := members.size() - living_count()
+	if fallen < int(ceil(members.size() * share)):
+		return
+	_routed = true
+	var from := last_known if last_known != Vector3.INF else dead.global_position
+	for m in members:
+		if is_instance_valid(m) and m.alive and m.has_method(&"rout"):
+			m.call(&"rout", from)
+	end_encounter(HostileEncounters.DRIVEN_OFF)
+
+
+## A glint fell at `at` (a light arrow's glow): the members nearest it that
+## care (wants_glint), up to their glint_drawn, go for it and forget her.
+## Returns how many went.
+func glint(at: Vector3) -> int:
+	if is_settled:
+		return 0
+	var keen: Array[Creature] = []
+	var drawn := 0
+	for m in members:
+		if is_instance_valid(m) and m.alive and m.has_method(&"wants_glint") and bool(m.call(&"wants_glint")):
+			keen.append(m)
+			drawn = maxi(drawn, int(m.get(&"glint_drawn")))
+	if keen.is_empty():
+		return 0
+	keen.sort_custom(func(a: Creature, b: Creature) -> bool:
+		return a.global_position.distance_squared_to(at) < b.global_position.distance_squared_to(at))
+	var n := mini(drawn, keen.size())
+	for i in n:
+		keen[i].call(&"distract", at)
+	return n
+
+
+func _on_light_landed(at: Vector3) -> void:
+	if data and Vector2(at.x - global_position.x, at.z - global_position.z).length() <= leash_radius():
+		glint(at)
 
 
 ## Every member is gone: the place settles. Birdsong comes back as the

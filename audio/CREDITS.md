@@ -114,6 +114,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/suriel/voice_2.ogg | The Suriel answers (wordless rasp), variant 2 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/suriel/voice_3.ogg | The Suriel answers (wordless rasp), variant 3 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/suriel/warning.ogg | The Suriel: 'We are not alone', a hiss far off | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/tamlin/blood_drip.ogg | Three drops of his blood onto the infirmary marble | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/bark_pain.ogg | The great wolf barks in pain (ash arrow) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/death.ogg | The great wolf dies: whine, whimper, slowing breaths | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/wolf/growl_low.ogg | The great wolf's low reverberating growl | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

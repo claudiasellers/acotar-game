@@ -117,16 +117,33 @@ def skin(mesh, arm, fix=None):
     """Heat weights for the skinned body (call before hard parts are joined),
     then `fix(P, weights)` may overrule regions (jaws, lids): it gets vertex
     positions and a dict name -> weight array and edits it in place."""
-    kit.activate(arm, [mesh])
-    bpy.ops.object.parent_set(type="ARMATURE_AUTO")
-    n = len(mesh.data.vertices)
-    W = {vg.name: np.zeros(n) for vg in mesh.vertex_groups}
-    index = {vg.index: vg.name for vg in mesh.vertex_groups}
-    for v in mesh.data.vertices:
-        for g in v.groups:
-            W[index[g.group]][v.index] = g.weight
-    total = sum(W.values())
-    unweighted = int((total < 1e-4).sum())
+    # The heat solver gives up on the whole mesh over one bad spot (it says
+    # "failed to find solution"). A shake too small to see usually cures it.
+    rng = np.random.RandomState(5)
+    for attempt in range(4):
+        if attempt:
+            for vg in list(mesh.vertex_groups):
+                mesh.vertex_groups.remove(vg)
+            mesh.parent = None
+            for m in list(mesh.modifiers):
+                if m.type == "ARMATURE":
+                    mesh.modifiers.remove(m)
+            for v in mesh.data.vertices:
+                v.co = v.co + Vector(rng.normal(size=3) * 2e-5 * attempt)
+            mesh.data.update()
+        kit.activate(arm, [mesh])
+        bpy.ops.object.parent_set(type="ARMATURE_AUTO")
+        n = len(mesh.data.vertices)
+        W = {vg.name: np.zeros(n) for vg in mesh.vertex_groups}
+        index = {vg.index: vg.name for vg in mesh.vertex_groups}
+        for v in mesh.data.vertices:
+            for g in v.groups:
+                W[index[g.group]][v.index] = g.weight
+        total = sum(W.values())
+        unweighted = int((total < 1e-4).sum())
+        if not unweighted:
+            break
+        print(f"{mesh.name}: heat weighting left {unweighted} vertices unweighted (attempt {attempt + 1})")
     if unweighted:
         raise RuntimeError(f"{mesh.name}: heat weighting left {unweighted} vertices unweighted")
     if fix is not None:

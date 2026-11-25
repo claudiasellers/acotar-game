@@ -1,6 +1,6 @@
 extends GutTest
 ## Contract test for fast travel by the whorl stones (L74, docs/contracts/fast_travel.md).
-# gate: when:systems/fast_travel/*,data/fast_travel/*,art/fast_travel/*,tools/fast_travel/*,tools/blender/whorl_stones.py,story/act1/act1_game.gd,data/map/map_places.tres,data/phases/*,ui/map/full_map.gd,ui/map/minimap.gd,ui/map/map_reveal.gd
+# gate: when:systems/fast_travel/*,data/fast_travel/*,art/fast_travel/*,tools/fast_travel/*,tools/blender/whorl_stones.py,story/act1/act1_game.gd,data/map/map_places.tres,data/phases/*,ui/map/full_map.gd,ui/map/minimap.gd,ui/map/map_reveal.gd,ui/hud/key_hints.gd,ui/hud/key_prompt.gd,ui/hud/use_prompt.gd
 
 const PLACER := preload("res://tools/fast_travel/place_whorl_stones.gd")
 ## Every open Spring Court region gets one pair; the sealed Autumn border and
@@ -162,3 +162,37 @@ func test_map_shows_pairs_on_sketched_ground_and_marks_differ() -> void:
 	await wait_until(func() -> bool: return not drawn.is_empty(), 2.0)
 	assert_eq(drawn, [2], "draws each shown pair (inside the canvas's draw)")
 	assert_eq(WorldState.all_flags(), flags_before, "R2: drawing writes no flag")
+
+
+func test_corner_tips_teach_the_stones_once() -> void:
+	var saved_settings := GameSettings.settings_path
+	GameSettings.settings_path = "user://test_whorl_tips_settings.cfg"
+	GameSettings.set_value(&"key_hints", true)
+	var hints := KeyHints.of(get_tree())
+	var saved_hints := hints.settings_path
+	hints.use_settings("user://test_whorl_tips.cfg")
+	hints.forget_taught()
+	_unlock(["manor_estate", "rosewild"])
+	WhorlStones.mark(&"manor_drive")
+	var root := _root()
+	WhorlStones.spawn_for(&"rosewild", root)
+	var s := root.get_child(0) as WhorlStone
+	_player.global_position = s.global_position + Vector3(0.0, 0.0, 8.0)
+	await wait_process_frames(2)
+	assert_eq(hints.wanted(), WhorlStone.TIP_MARK, "in sight of an unmarked pair: what tracing does")
+	s.use(_player)
+	assert_false(hints.teaches(WhorlStone.TIP_MARK), "taught once she has painted a mark")
+	await wait_process_frames(2)
+	assert_eq(hints.wanted(), WhorlStone.TIP_RIDE, "at a marked pair with somewhere to go: how to ride")
+	s.use(_player)
+	assert_true(WhorlTravelCard.is_open())
+	assert_false(hints.teaches(WhorlStone.TIP_RIDE), "taught once she has opened the stones")
+	WhorlTravelCard.current().close()
+	hints.forget_taught()
+	_player.global_position = s.global_position + Vector3(0.0, 0.0, WhorlStone.TIP_RADIUS + 10.0)
+	await wait_process_frames(2)
+	assert_eq(hints.wanted(), &"", "nothing once she walks away")
+	for path in ["user://test_whorl_tips.cfg", "user://test_whorl_tips_settings.cfg"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	hints.use_settings(saved_hints)
+	GameSettings.settings_path = saved_settings

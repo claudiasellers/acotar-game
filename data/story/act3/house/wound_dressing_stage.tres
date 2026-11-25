@@ -52,7 +52,10 @@ lines = {
 "tamlin_adept": {"text": "No wonder you became so adept at other things.", "who": "Tamlin"},
 "tamlin_cant_write": {"text": "You can't write, can you.", "who": "Tamlin"},
 "tamlin_infirmary": {"text": "There's a small infirmary.", "who": "Tamlin"},
-"tamlin_yes": {"text": "Yes.", "who": "Tamlin"}
+"tamlin_yes": {"text": "Yes.", "who": "Tamlin"},
+"wait_cabinet": {"text": "The bandages are in the cabinet.", "who": "Tamlin"},
+"wait_drip": {"text": "Drip, drip, drip.", "who": ""},
+"wait_healing": {"text": "It isn't healing. It should be healing.", "who": ""}
 }
-invented = PackedStringArray("breeze", "carry", "drip", "fill", "set_down", "supplies")
+invented = PackedStringArray("breeze", "carry", "drip", "fill", "set_down", "supplies", "wait_cabinet", "wait_healing")
 canon = "Ch12 (Keeper 2026-11-01, [C]): sleepless, she creeps barefoot down the moonlit stairs to the foyer, sets her little map on the foyer table and draws a few Xs and circles for the doors, the windows, the marble stairs. A breeze; he comes in through the open glass garden doors in beast form, eyes glowing, limping, dark shining stains on the marble; the beast fills the hall like a cage. Between one step and the next he changes forms (blinding flash, her eyes shut); fae, still and weary, no glow, clothes in shreds, only the hand bleeds. Lines as given. The infirmary: more of a supply closet with a worktable, cabinets, drawers, a deep sink at the back; she sorts supplies, cleans the blood and dirt in a bowl of water, binds and wraps his hand (a few vicious cuts, none needing stitches), carries the bowl of bloody water to the sink; he is silent, claws retracted. No salve in the book (dropped). Foyer table spot, route and props: X."

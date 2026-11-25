@@ -229,6 +229,15 @@ func reach_nudged(mark_name: StringName, radius: float, nudge: StringName, after
 	return nudged(r.condition, nudge, after, r.label)
 
 
+## reach(), with nudges that climb: `ladder[0]` after `after` seconds, each
+## next line after twice as long again, each said once (short, medium, long).
+func reach_nudged_ladder(mark_name: StringName, radius: float, ladder: Array[StringName], after: float) -> SceneBeat:
+	var r := reach(mark_name, radius) as Beats.UntilBeat
+	var beat := NudgeBeat.new(r.condition, ladder[0], after, r.label)
+	beat.ladder = ladder
+	return beat
+
+
 ## Waits for her next E press, showing the "E   <verb>" card (the forage
 ## card's look) while she's within `card_radius` of `at_mark`, or anywhere
 ## when `at_mark` is empty; `nudge` comes after `after` quiet seconds.
@@ -251,6 +260,9 @@ class NudgeBeat:
 	var waited: float = 0.0
 	## How many times the nudge has been said this wait (at most twice).
 	var said: int = 0
+	## When set, each nudge is the next line here, once each, in place of
+	## `nudge` twice (reach_nudged_ladder).
+	var ladder: Array[StringName] = []
 
 	func _init(d: Callable, n: StringName, a: float, l: String) -> void:
 		done = d
@@ -267,9 +279,11 @@ class NudgeBeat:
 			return true
 		waited += delta
 		var due := after * (1.0 + 2.0 * said)
-		if said < 2 and waited >= due:
+		var most := ladder.size() if not ladder.is_empty() else 2
+		if said < most and waited >= due:
+			var line := ladder[said] if not ladder.is_empty() else nudge
 			said += 1
-			(space as Act2Space).aside(nudge)
+			(space as Act2Space).aside(line)
 		return false
 
 	func is_done(_space: SceneSpace) -> bool:
