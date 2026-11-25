@@ -23,14 +23,14 @@ const BAITING := &"baiting"
 const NEUTRAL := &"neutral"
 const WARM := &"warm"
 
-## Raises a fact. RelationshipDirector points it at its ActionTriggers; with no
-## director (a bare test) the deed is raised on WorldState directly.
-static var raise: Callable
-## Called with (bond, stage) when a stage opens.
-static var on_stage: Array[Callable] = []
-## Called with (bond, deed) when a deed is done.
-static var on_deed: Array[Callable] = []
+## The RelationshipDirector's group. A fact is raised through its ActionTrigger
+## when one is in the tree; with none (a bare test) on WorldState directly.
+## Nothing else listens to the core: a stage or deed is news only as its fact,
+## through EventBus.flag_changed (R8).
+const DIRECTOR_GROUP := &"relationship_director"
 
+## The only static state: the BondDefs as loaded (read-only data), and the
+## bonds being checked now (empty whenever check() isn't running).
 static var _defs: Dictionary = {}
 ## Bonds being checked now: a fact raised inside check() comes back through
 ## flag_changed, and the outer pass already handles it.
@@ -83,9 +83,6 @@ static func deed(bond: StringName, deed_id: StringName) -> bool:
 	if dd == null or done(bond, deed_id) or stage(bond) < dd.from_stage:
 		return false
 	_raise(d.did_fact(deed_id))
-	for c in on_deed:
-		if c.is_valid():
-			c.call(bond, deed_id)
 	check(bond)
 	return true
 
@@ -117,9 +114,6 @@ static func check(bond: StringName) -> int:
 		if not s.raised_elsewhere:
 			_raise(s.fact)
 		reached = now
-		for c in on_stage:
-			if c.is_valid():
-				c.call(bond, now)
 	var r := _regard(d)
 	for i in range(0, now + 1):
 		var s := d.stages[i]
@@ -209,7 +203,9 @@ static func _regard(d: BondDef) -> int:
 
 
 static func _raise(fact: String) -> void:
-	if raise.is_valid():
-		raise.call(fact)
+	var tree := Engine.get_main_loop() as SceneTree
+	var director := tree.get_first_node_in_group(DIRECTOR_GROUP) if tree else null
+	if director:
+		director.call(&"fire", fact)
 	if not WorldState.has_flag(fact):
 		WorldState.raise_deed(fact)

@@ -162,8 +162,8 @@ func _ready() -> void:
 	add_child(_unlock)
 	if not MareCare.on_care.has(MareBond.on_care):
 		MareCare.on_care.append(MareBond.on_care)
-	if not Relationships.on_stage.has(_on_tier):
-		Relationships.on_stage.append(_on_tier)
+	if not EventBus.flag_changed.is_connected(_on_flag):
+		EventBus.flag_changed.connect(_on_flag)
 	_gust = AudioStreamPlayer.new()
 	_gust.stream = WIND
 	_gust.volume_db = -14.0
@@ -303,10 +303,14 @@ func _too_far() -> void:
 		WorldState.set_flag(MareBond.TOO_FAR_FACT, true)
 
 
-## A new step of her bond (Relationships.on_stage): her moment plays when Feyre is next by her.
-func _on_tier(bond: StringName, tier: int) -> void:
-	if bond == MareBond.BOND:
-		_moment = tier
+## A new step of her bond past the first ride (its fact rises): her moment
+## plays when Feyre is next by her.
+func _on_flag(flag: String, value: Variant) -> void:
+	if not WorldState.truthy(value):
+		return
+	for i in range(2, MareBond.TIERS.size()):
+		if String(MareBond.TIERS[i]["fact"]) == flag:
+			_moment = i
 
 
 ## Feyre's bond thoughts join the free-roam dialogue (its DEED lines on the facts).
@@ -900,7 +904,8 @@ func _ride_camera(p: Node, on: bool) -> void:
 
 
 func _exit_tree() -> void:
-	Relationships.on_stage.erase(_on_tier)
+	if EventBus.flag_changed.is_connected(_on_flag):
+		EventBus.flag_changed.disconnect(_on_flag)
 	MareCare.on_care.erase(MareBond.on_care)
 	# Never leave her camera lifted if the director goes while she rides.
 	var p := _player()

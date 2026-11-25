@@ -6,7 +6,7 @@
 class_name RelationshipDirector
 extends Node
 
-const GROUP := &"relationship_director"
+const GROUP := Relationships.DIRECTOR_GROUP
 ## How often (s) it looks at where she is.
 const LOOK_EVERY := 0.5
 
@@ -37,18 +37,12 @@ func _ready() -> void:
 				(_by_flag.get_or_add(dd.on_flag, []) as Array).append([bond, dd.id])
 			if dd.on_cue != "":
 				(_by_cue.get_or_add(dd.on_cue, []) as Array).append([bond, dd.id])
-	Relationships.raise = _fire
 	EventBus.flag_changed.connect(_on_flag)
 	EventBus.story_actor_cue.connect(_on_cue)
 	EventBus.day_started.connect(_on_dawn)
 	EventBus.player_health_changed.connect(_on_health)
 	EventBus.game_loaded.connect(_on_loaded)
 	catch_up()
-
-
-func _exit_tree() -> void:
-	if Relationships.raise == _fire:
-		Relationships.raise = Callable()
 
 
 ## Counts every deed whose flag is already up and opens what is due (a load, or
@@ -69,7 +63,8 @@ func _on_loaded(_slot: String) -> void:
 	catch_up()
 
 
-func _fire(fact: String) -> void:
+## Raises a bond fact through its ActionTrigger (Relationships calls it).
+func fire(fact: String) -> void:
 	var t := _triggers.get(fact) as ActionTrigger
 	if t and not t.fired:
 		t.fire()

@@ -126,13 +126,18 @@ Lines and presence spots in `tools/dialogue/gen_dialogue.py` read these facts in
 | `mood(bond) -> StringName` | the mood on now, or `&""` |
 | `attitude(bond) -> StringName` | `cool` while a cool mood is on, `warm` once the current stage is warm, else the stage's `attitude`. `neutral` for an id with no BondDef |
 | `start_mood(bond, mood, today)`, `dawn(day)` | a mood starts (only past stage 0) and lasts until the `days`-th dawn after `today` |
-| `on_stage: Array[Callable]` | called with `(bond, stage)` when a stage opens (MountDirector plays the mare's moment) |
-| `on_deed: Array[Callable]` | called with `(bond, deed)` when a deed is done (MountDirector chimes) |
 
 There is no regard getter. Regard is a private sum of the done deeds' weights.
 
+The core has no callbacks and no hooks (R8). A stage or a deed is news only as
+its fact, through `EventBus.flag_changed`: MountDirector plays the mare's moment
+when one of her `fact.mare_bond_*` stage facts rises. Its only static state is
+the loaded BondDefs (read-only) and the guard `check` clears before it returns,
+so nothing one run did leaks into the next (F51); the contract test asserts it.
+
 `RelationshipDirector` (`systems/relationships/relationship_director.gd`, a node
-added by the game scene, group `relationship_director`): owns the triggers,
+added by the game scene, group `Relationships.DIRECTOR_GROUP`): owns the
+triggers (the core finds it by that group and raises through its `fire`),
 counts `on_flag` and `on_cue` deeds, watches Feyre's region and health for
 moods, ends moods on `EventBus.day_started`, and runs `check` for every bond on
 load.

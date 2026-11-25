@@ -22,13 +22,16 @@ func before_each() -> void:
 	WorldDeltas.clear()
 	raised.clear()
 	MarePage.reset()
-	Relationships.raise = func(fact: String) -> void:
-		raised.append(fact)
-		WorldState.set_flag(fact, true)
+	EventBus.flag_changed.connect(_seen)
 
 
 func after_each() -> void:
-	Relationships.raise = Callable()
+	EventBus.flag_changed.disconnect(_seen)
+
+
+func _seen(flag: String, value: Variant) -> void:
+	if WorldState.truthy(value) and flag.begins_with("fact."):
+		raised.append(flag)
 
 
 func test_nothing_counts_before_she_is_ridden() -> void:

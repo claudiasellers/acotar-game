@@ -9,20 +9,9 @@ const LINES_DIR := "res://data/dialogue/lines/"
 const ROSTER := "res://data/dialogue/presence.tres"
 const BOND_FACT := "^fact\\.(tam|luc|mare)_(bond|warm|did|mood)_"
 
-var raised: Array[String] = []
-
-
 func before_each() -> void:
 	WorldState.clear()
 	WorldDeltas.clear()
-	raised.clear()
-	Relationships.raise = func(fact: String) -> void:
-		raised.append(fact)
-		WorldState.raise_deed(fact)
-
-
-func after_each() -> void:
-	Relationships.raise = Callable()
 
 
 func _at_manor() -> void:
@@ -33,7 +22,6 @@ func _at_manor() -> void:
 func _director() -> RelationshipDirector:
 	var d := RelationshipDirector.new()
 	add_child_autofree(d)
-	Relationships.raise = d._fire
 	return d
 
 
@@ -236,3 +224,26 @@ func test_the_mares_ladder_is_her_own_table() -> void:
 		assert_eq(d.stages[i].fact, String(MareBond.TIERS[i]["fact"]))
 		assert_eq(d.stages[i].needs, MareBond.MILESTONES.get(i, []) as Array, "tier %d needs" % i)
 	assert_eq(d.did_fact(&"gleam"), MareBond.DID_PREFIX + "gleam")
+
+
+## Nothing the last run did survives into the next (F51): the core keeps no
+## callbacks and no state of its own, only the loaded defs and a check guard
+## that is empty between calls; its facts reach other systems as flags.
+func test_a_fresh_run_starts_clean() -> void:
+	var src := (load("res://systems/relationships/relationships.gd") as Script).source_code
+	var statics := PackedStringArray()
+	for m in RegEx.create_from_string("(?m)^static var (\\w+)").search_all(src):
+		statics.append(m.get_string(1))
+	assert_eq(statics, PackedStringArray(["_defs", "_checking"]), "no callbacks, no hooks, no counts")
+	assert_true(Relationships._checking.is_empty(), "no check left half-done")
+	var d := _director()
+	_at_manor()
+	assert_true(WorldState.has_flag("fact.tam_bond_host"))
+	remove_child(d)
+	d.free()
+	WorldState.clear()
+	assert_eq(Relationships.stage(&"tamlin"), -1, "a cleared world is a fresh bond")
+	assert_false(Relationships.deed(&"tamlin", &"ate_at_table"), "and no deed counts before its stage")
+	_at_manor()
+	Relationships.check(&"tamlin")
+	assert_eq(Relationships.stage_id(&"tamlin"), &"host", "with no director the core still raises on WorldState")
