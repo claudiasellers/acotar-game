@@ -57,6 +57,7 @@ func _run() -> void:
 	for shot: Array in SHOTS:
 		await _shoot(shot[0], shot[1], shot[2])
 		await _wait(2.5)
+	await _low_and_close()
 	# Two arrows as fast as the bow allows, from the hip.
 	_label = "follow_up"
 	_frame = 0
@@ -72,6 +73,32 @@ func _run() -> void:
 	print("follow_up: two full arrows in %d ms" % (_ms() - began))
 	_label = ""
 	get_tree().quit()
+
+
+## A hare low and close in front of her, drawn on from the hip: it and the
+## ring must stand clear of her body (L80-25).
+func _low_and_close() -> void:
+	var hare := preload("res://creatures/prey/hare.tscn").instantiate() as Node3D
+	add_child(hare)
+	hare.set_physics_process(false)
+	var ahead := -feyre.camera.global_basis.z
+	ahead.y = 0.0
+	# On the ground on the lens's own line, 4 m past her.
+	var at := feyre.camera.global_position + ahead.normalized() * (feyre.camera.global_position.distance_to(feyre.global_position) + 4.0)
+	hare.global_position = Vector3(at.x, feyre.global_position.y, at.z)
+	_label = "low_close"
+	_frame = 0
+	Input.action_press(&"fire")
+	await _wait(1.0)
+	var ring := bow.reticle._screen
+	var body := feyre.camera.unproject_position(feyre.global_position + Vector3.UP)
+	print("low_close: ring at %s, her middle at %s, hare at %s" % [ring, body,
+		feyre.camera.unproject_position(hare.global_position)])
+	Input.action_release(&"fire")
+	await _wait(0.5)
+	_label = ""
+	hare.queue_free()
+	await _wait(2.0)
 
 
 func _shoot(label: String, aim: bool, held: float) -> void:
