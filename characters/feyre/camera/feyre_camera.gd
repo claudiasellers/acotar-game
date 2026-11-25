@@ -150,9 +150,12 @@ func update(delta: float) -> void:
 	elif bow_up:
 		# Scaled to the arm: indoors, on a short arm, the hip offset shrinks to the aim's.
 		shoulder = lerpf(AIM_SHOULDER, HIP_SHOULDER, clampf(inverse_lerp(1.7, 3.6, _spring_arm.spring_length), 0.0, 1.0))
-	var side := minf(lerpf(_spring_arm.position.x, shoulder, ease), shoulder_clearance(shoulder))
+	var free := shoulder_clearance(shoulder)
+	var side := minf(lerpf(_spring_arm.position.x, shoulder, ease), free)
 	_aim_keep = AIM_KEEP_S if bow_up else maxf(_aim_keep - TimeScale.real(delta), 0.0)
-	if _aim_keep > 0.0:
+	# Beside a wall that holds the shoulder in, the arm stays parallel to it:
+	# a turn there would swing the lens into the wall.
+	if _aim_keep > 0.0 and free >= shoulder:
 		_shift_keeping_aim(side)
 	else:
 		_spring_arm.position.x = side
