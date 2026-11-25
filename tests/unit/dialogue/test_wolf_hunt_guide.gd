@@ -51,6 +51,26 @@ func _texts() -> Array:
 	return shown.duplicate()
 
 
+## The Keeper's lines for one beat, in the data's order. Tests ask for a beat's
+## lines, never the words, so a rewrite in the line sheet doesn't break them.
+func _beat(beat: StringName) -> Array[String]:
+	var out: Array[String] = []
+	var key := StringName("%s.%s" % [WolfHuntGuide.SCENE, beat])
+	for line: DialogueLine in director.lines:
+		if line.where == key:
+			out.append(line.text)
+	assert_false(out.is_empty(), "the data has lines for %s" % beat)
+	return out
+
+
+## Whether any of `beat`'s lines was shown.
+func _heard(beat: StringName) -> bool:
+	for text in _beat(beat):
+		if shown.has(text):
+			return true
+	return false
+
+
 ## Lets the director say what it has queued, with `seconds` passing.
 func _elapse(seconds: float) -> void:
 	var t := 0.0
@@ -97,13 +117,15 @@ func test_the_hunt_in_order_and_once_each() -> void:
 	assert_true(director.held(), "the guide holds the voice")
 	assert_eq(_texts().size(), 1, "the doe, first line")
 	_elapse(10.0)
-	assert_true(_texts()[1].begins_with("Her skin"), "the doe's two lines in order")
+	var doe := _beat(&"doe")
+	for i in doe.size():
+		assert_eq(String(_texts()[i]) if i < _texts().size() else "", doe[i], "the doe's lines in order")
 	_wolf_out()
 	_elapse(10.0)
-	assert_true(_texts()[2].begins_with("Golden eyes"))
+	assert_true(_heard(&"eyes"))
 	_quiet(1.5)
 	_elapse(20.0)
-	assert_true(_texts().has("The size of a pony. No animal that big should be so quiet."))
+	assert_true(_heard(&"size"))
 	var n := _texts().size()
 	EventBus.story_actor_cue.emit(&"great_wolf", &"stalk")
 	_elapse(5.0)
@@ -118,7 +140,7 @@ func test_nudges_only_until_she_draws() -> void:
 	_quiet(8.0)  # nudge_draw
 	_elapse(5.0)
 	assert_true(guide.said.has(&"nudge_draw"))
-	assert_true(_texts().has("The ash arrow. Three years in my quiver. Now."))
+	assert_true(_heard(&"nudge_draw"))
 	_quiet(20.0)
 	assert_false(guide.said.has(&"nudge_loose"), "the hide nudge waits until he has the doe")
 	(hunt.doe as FakeDoe).alive = false
@@ -137,7 +159,7 @@ func test_the_loose_nudge_comes_once_he_has_her() -> void:
 	(hunt.doe as FakeDoe).alive = false
 	_quiet(10.0)
 	_elapse(5.0)
-	assert_true(_texts().has("Before he ruins the hide. His side."))
+	assert_true(_heard(&"nudge_loose"))
 
 
 func test_what_her_shots_do() -> void:
@@ -145,10 +167,10 @@ func test_what_her_shots_do() -> void:
 	_wolf_out()
 	EventBus.creature_hit.emit(&"w", &"great_wolf", &"arrow_wood", &"side")
 	_elapse(5.0)
-	assert_true(_texts().has("Bee stings, to a wolf that size. It has to be the ash."))
+	assert_true(_heard(&"wood"))
 	guide.note_landing(null)
 	_elapse(5.0)
-	assert_true(_texts().has("Missed. I can't afford to miss."))
+	assert_true(_heard(&"miss"))
 	var n := _texts().size()
 	guide.note_landing(hunt.wolf)
 	guide.note_landing(null)
@@ -157,15 +179,15 @@ func test_what_her_shots_do() -> void:
 	hunt.ash_struck = true
 	EventBus.creature_hit.emit(&"w", &"great_wolf", &"arrow_ash", &"side")
 	_elapse(5.0)
-	assert_true(_texts().has("He's looking at me. Like he knows. Just in case... the eye."))
+	assert_true(_heard(&"ash"))
 	_quiet(30.0)
 	assert_false(guide.said.has(&"wait"), "no waiting thoughts once the ash is in him")
 	EventBus.creature_killed.emit(&"w", &"great_wolf", &"arrow_wood", Vector3.ZERO)
 	# The scene ends while he still breathes: the last thought still comes.
 	EventBus.scene_space_finished.emit(&"wolf_kill")
 	_elapse(10.0)
-	assert_true(_texts().has("He should be dead, not dying."))
-	assert_true(_texts().has("Wolf. Definitely just a wolf."))
+	for text in _beat(&"kill"):
+		assert_true(_texts().has(text), "the last thought: %s" % text)
 
 
 func test_a_new_beat_cuts_off_the_last() -> void:
@@ -174,9 +196,10 @@ func test_a_new_beat_cuts_off_the_last() -> void:
 	assert_eq(director._scene_queue.size(), 1, "the downwind line is waiting")
 	hunt.ash_struck = true
 	EventBus.creature_hit.emit(&"w", &"great_wolf", &"arrow_ash", &"side")
-	assert_true(_texts().back().begins_with("He's looking at me"), "the ash cuts straight in")
+	assert_true(_beat(&"ash").has(_texts().back()), "the ash cuts straight in")
 	_elapse(10.0)
-	assert_false(_texts().has("He's downwind of her. She can't see or smell him."))
+	for text in _beat(&"eyes").slice(1):
+		assert_false(_texts().has(text), "the eyes beat's later lines are cut off")
 
 
 func test_ambient_lines_wait_while_the_guide_holds() -> void:

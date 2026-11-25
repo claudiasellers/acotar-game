@@ -35,7 +35,8 @@ func test_canvas_is_linen_with_a_weave() -> void:
 
 func test_every_brush_lays_paint() -> void:
 	var brushes := StudioCanvas.brushes()
-	assert_eq(brushes.size(), 5)
+	assert_eq(brushes.size(), StudioCanvas.BRUSH_ORDER.size(), "every listed brush loads")
+	assert_false(brushes.has(null), "no brush is missing its data")
 	for b in brushes:
 		var c := StudioCanvas.new()
 		c.brush = b
