@@ -938,7 +938,7 @@ def baked_material(low, name, out_dir):
     return mat, paths
 
 
-def bake(sources, low, name, out_dir, size=2048, extrusion=0.02, ao_samples=48, ao_strength=0.6, masks=None):
+def bake(sources, low, name, out_dir, size=2048, extrusion=0.02, ao_samples=48, ao_strength=0.6, masks=None, paint=None):
     """Bakes the sources (sculpt + hard parts, with their procedural materials)
     onto `low`'s UVs: <name>_albedo.webp, <name>_normal.webp, <name>_orm.webp
     (occlusion, roughness, metallic), <name>_emit.webp when anything glows,
@@ -1016,6 +1016,8 @@ def bake(sources, low, name, out_dir, size=2048, extrusion=0.02, ao_samples=48, 
     print(f"bake {name}: {100.0 * hit.mean():.1f}% of the atlas reached")
     _fill_misses(maps, hit, size)
     bpy.data.images.remove(cover)
+    if paint is not None:                       # a creature may paint parts of the atlas itself (shared swatches)
+        paint(dict(albedo=albedo, normal=normal, rough=rough, ao=ao, emit=emit), size)
 
     n = size * size * 4
     A = np.empty(n, dtype=np.float32)
@@ -1050,25 +1052,33 @@ def bake(sources, low, name, out_dir, size=2048, extrusion=0.02, ao_samples=48, 
 
 # ------------------------------------------------------------------ export
 
-def export_gltf(name, objs, out_dir):
+def export_gltf(name, objs, out_dir, vertex_color=None):
     """<out_dir>/<name>.gltf with its buffer inlined (the repo's convention:
     one .gltf per model) and its textures left as the .webp files beside it.
-    Skins, shape keys and one animation per NLA track."""
+    Skins, shape keys and one animation per NLA track. `vertex_color` names a
+    colour attribute to write as COLOR_0 (for materials that read vertex colour)."""
     import base64
     import json
     os.makedirs(out_dir, exist_ok=True)
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
         o.select_set(True)
+        if vertex_color and o.type == "MESH" and vertex_color in o.data.color_attributes:
+            o.data.color_attributes.active_color = o.data.color_attributes[vertex_color]
+            o.data.color_attributes.render_color_index = o.data.color_attributes.find(vertex_color)
     bpy.context.view_layer.objects.active = objs[0]
     path = os.path.join(out_dir, f"{name}.gltf")
     animated = any(o.type == "ARMATURE" for o in objs)
     extra = dict(export_animations=True, export_animation_mode="NLA_TRACKS", export_skins=True,
                  export_force_sampling=True, export_optimize_animation_size=True,
                  export_morph=True, export_morph_normal=False) if animated else {}
+    if vertex_color:
+        extra.update(export_vertex_color="ACTIVE", export_active_vertex_color_when_no_material=True)
+    else:
+        extra.update(export_vertex_color="NONE")
     bpy.ops.export_scene.gltf(filepath=path, use_selection=True, export_format="GLTF_SEPARATE", export_yup=True,
                               export_apply=False, export_materials="EXPORT", export_image_format="NONE",
-                              export_tangents=True, export_vertex_color="NONE", export_attributes=False, **extra)
+                              export_tangents=True, export_attributes=False, **extra)
     with open(path) as f:
         doc = json.load(f)
     for buf in doc["buffers"]:

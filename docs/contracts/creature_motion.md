@@ -107,6 +107,84 @@ walks creatures and cast models over flat ground at set speeds, headless, and
 prints how far a planted foot drifts per metre travelled (0 = nailed down,
 1 = no steps at all). Run it after any change to clips, speeds or animators.
 
+## Monsters (`tools/blender/monsters/`, lane L83)
+
+The hostile fae of the bestiary (`plans/hostile-fae/bestiary.md`) are built by
+one generator each on a shared kit and drive the same `CreatureAnimator`:
+
+- `kit.py`: clay forms blended into one skin, carved and displaced, cut down
+  to a game mesh (15k triangles at most), with the fine surface baked to
+  `<name>_albedo|normal|orm|emit|mask.webp` beside the model.
+- `rig.py`, `biped.py`: bones, skinning, key-pose clips, planted feet. A gait's
+  native speed is the distance its planted foot travels, so nothing slides.
+- `<monster>.py`, `<monster>_body.py`, `<monster>_rig.py`, `<monster>_clips.py`:
+  the creature itself. `naga.py` is the first.
+
+Regenerate: `/opt/bpyenv/bin/python tools/blender/monsters/naga.py` (about
+25 minutes; `--fast --nobake --noexport --preview <dir> <view or clip>...` for a look).
+
+Biped monster bones: `root`, `body` (carriers), `pelvis`, `spine`, `spine2`,
+`chest`, `neck`, `neck2`, `head`, `jaw`, `tongue0..2`, `clav_l|r`, `arm_l|r`,
+`forearm_l|r`, `hand_l|r`, `finger_<i>_l|r`, `finger_<i>b_l|r`, and per leg
+(`leg_l`, `leg_r`) `upper_<leg>`, `lower_<leg>`, `foot_<leg>`, `paw_<leg>`.
+Sockets are bones with no skin: `throat`, `mouth`, `grab_point`, `talon_l`,
+`talon_r`; `animator.socket(name)` gives a `BoneAttachment3D` on one.
+
+Clip names are the bestiary's (1.4, 1.5): `idle`, `walk`, `run`, `stalk`,
+`alert`, `startle`, `call`, `telegraph_<attack id>`, `attack_<attack id>`,
+`recover`, `hit_l|r`, `stagger`, `sleep_fall`, `sleep`, `wake`, `burn`,
+`death_l|r`, `death_<weak spot>`, plus each family's own. The gaits file has
+two more columns for them: `name speed duration loop contact_s travel_m`.
+`contact_s` is when an attack's blow lands; `travel_m` is how far the clip
+expects the code to carry the body (a lunge, a stagger back). `-` = none.
+
+What the animator adds for them (all no-ops on a model without the clip):
+
+- The gait ladder (`animator.loco`) comes from the gaits file: every clip with
+  a native speed except `idle`, `stalk` and `swim`, slowest first (`walk`,
+  `lope`, `run` for the naga). Gait choice, cadence and planted feet work as above.
+- `play_attack(id) -> float`: `telegraph_<id>` then `attack_<id>` with no
+  dip between; returns seconds until the blow lands, or -1.
+  `cancel_attack()` eases out of it. `is_acting()` is true meanwhile.
+- `play_windup(id, seconds)`: `telegraph_<id>` alone, stretched to `seconds`
+  (the row's `windup_s`) and held on its last pose until `play_strike`,
+  `play_attack` or `cancel_attack`. One name scheme: every attack row has a
+  `telegraph_<row id>` clip. A family that calls it has no other tell (no
+  procedural pose beside it): a model without the clip is a `push_error`, and
+  each family's test checks every attack row it uses has its clip.
+- `play_strike(id) -> float`: `attack_<id>` alone; returns its `contact_s`.
+- `play_oneshot(clip) -> float`: one clip once; returns its length.
+- `set_alert(on)`: the looping `alert` layer, while standing.
+- `die(variant)`: `die(&"throat")` plays `death_throat` when the model has it.
+- `clip_contact`, `clip_travel`: the two new columns, by clip name.
+
+The hide (`creatures/materials/monster_hide.gdshader`, one `.tres` per
+monster) has per-instance parameters, set with
+`GeometryInstance3D.set_instance_shader_parameter`: `glint` (0..1, the tell on
+the talons before an attack), `seam_tint` (the individual's undertone), `scar`
+(0 or 1), `dull` (0..1, an ash wound) and `eye_glow` (0 by default: nothing
+glows by day unless the code says so).
+
+Cloth (`rig.Rig` spec `cloth`, `kit.ribbon`): loose strips (a veil's ends, a
+torn hem) are chains of bones that hang by themselves in every pose and lie
+along the ground where they reach it; a clip only blows on them
+(`Pose.blow`). The motion is in the clips, never the game's wind.
+
+The Suriel (`suriel.py`, bestiary 3) is a story actor, not a `Creature`: its
+model has no animator, and `creatures/fae/suriel.gd` plays the clips on the
+model's own `AnimationPlayer`. `CreatureAnimator.apply_loops(player,
+"res://data/animation/creatures/suriel_gaits.txt")` marks the looping ones.
+Clips: `idle`, `stalk` (0.6 m/s), `snared`, `scream`, `sit_down`, `sit_idle`,
+`notice`, `warn`, `burst`, `hit_l|r`, and three additive ones that move only
+what they name from the rest pose, to lay over `sit_idle` with an `Add2`:
+`head_cock` (ends cocked; fade it out), `speak` (the jaw, and a finger click
+every 0.5 s, hands alternating), `laugh`. Sockets: `ankle_l` (the snare),
+`mouth`, `eyes`. Cloth bones: `veil_fl|fr_<n>`, `veil_b<i>_<n>`,
+`sleeve_l|r_<n>`, `hem_<i>_<n>`. Shape keys: `threat`, `speak_open`,
+`eyes_wide`. Its eyes glow by canon: `suriel_hide.tres` sets `emit_base`.
+
+Test: `tests/unit/creatures/test_monster_animator.gd`.
+
 ## People (`tools/blender/fae_people.py` + `tools/blender/person_rig.py`)
 
 Every villager and court figure built by `fae_people.py` (not the main cast,
