@@ -218,9 +218,10 @@ def _ngon(r, n, squash=1.0):
     return [(r * math.cos(2 * math.pi * k / n), r * squash * math.sin(2 * math.pi * k / n)) for k in range(n)]
 
 
-def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4):
+def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4, gap=0.0):
     """A blade of grass or a fern frond: a flat, two-sided, pointed strip that
-    bends over under its own weight. `zig` notches the edges (a fern)."""
+    bends over under its own weight. `zig` notches the edges (a fern); `gap`
+    holds the two sides that far apart, so a bake can tell them from each other."""
     root, d, face = (np.asarray(v, dtype=np.float64) for v in (root, d, face))
     d = d / np.linalg.norm(d)
     across = np.cross(d, face)
@@ -240,7 +241,8 @@ def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4):
     front.append((2 * rings - 2, 2 * rings - 1, 2 * rings))
     n = len(verts)
     faces = front + [tuple(n + k for k in reversed(f)) for f in front]
-    return _mesh(name, verts + verts, faces, grad + grad)
+    nrm = np.cross(across, d) * (gap * 0.5)
+    return _mesh(name, [v + nrm for v in verts] + [v - nrm for v in verts], faces, grad + grad)
 
 
 def box(name, centre, size, rot_z=0.0):

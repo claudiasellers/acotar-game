@@ -32,12 +32,12 @@ J = {
     "ribs": _v(0, -0.08, 0.9),
     "chest": _v(0, 0.2, 0.89),
     "chest_end": _v(0, 0.44, 0.9),
-    "neck2": _v(0, 0.6, 1.05),
-    "neck3": _v(0, 0.76, 1.19),
-    "head": _v(0, 0.9, 1.31),
-    "head_end": _v(0, 1.33, 1.25),
-    "jaw": _v(0, 0.98, 1.283),
-    "jaw_end": _v(0, 1.31, 1.215),
+    "neck2": _v(0, 0.6, 0.975),
+    "neck3": _v(0, 0.76, 1.045),
+    "head": _v(0, 0.9, 1.11),
+    "head_end": _v(0, 1.33, 1.05),
+    "jaw": _v(0, 0.98, 1.083),
+    "jaw_end": _v(0, 1.31, 1.015),
     "tail": [_v(0, -0.72, 0.88), _v(0, -0.87, 0.82), _v(0, -1.01, 0.73), _v(0, -1.13, 0.62), _v(0, -1.23, 0.5)],
     # front leg: shoulder, elbow, wrist, ball, toe end
     "f_upper": _v(0.17, 0.4, 0.8), "f_lower": _v(0.185, 0.29, 0.52), "f_foot": _v(0.185, 0.35, 0.235),
@@ -52,9 +52,9 @@ TORSO = ((-0.76, 0.08, 0.87, 0.08), (-0.62, 0.15, 0.85, 0.14), (-0.36, 0.105, 0.
          (0.2, 0.185, 0.77, 0.235), (0.4, 0.165, 0.81, 0.21), (0.54, 0.11, 0.93, 0.13))
 RIB_Y = (0.36, 0.25, 0.14, 0.03, -0.08, -0.18)
 
-EYE = _v(0.038, 1.012, 1.343)
+EYE = _v(0.038, 1.012, 1.143)
 EYE_R = 0.0085
-KNOT = _v(0.0, 1.085, 1.342)                 # the weak spot: a pale burl of bone between its eyes
+KNOT = _v(0.0, 1.085, 1.142)                 # the weak spot: a pale burl of bone between its eyes
 
 
 def _section(y):
@@ -72,7 +72,7 @@ def rib_path(y, s=1):
 
 def mouth_z(y):
     """Height of the lip line at depth y."""
-    return float(np.interp(y, (1.0, 1.14, 1.27, 1.34), (1.283, 1.2515, 1.229, 1.226)))
+    return float(np.interp(y, (1.0, 1.14, 1.27, 1.34), (1.083, 1.0515, 1.029, 1.026)))
 
 
 def jaw_half_width(y):
@@ -109,19 +109,19 @@ def forms():
     mid.append(e("keel", (0, 0.3, 0.6), (0.08, 0.17, 0.08), k=0.06))                      # the breastbone
     mid.append(e("withers", (0, 0.36, 0.99), (0.08, 0.13, 0.06), k=0.06))
     # the neck: long, thin, carried forward and up
-    mid.append(t("neck", [(0, 0.42, 0.9), (0, 0.6, 1.05), (0, 0.76, 1.19), (0, 0.9, 1.3), (0, 0.97, 1.33)],
+    mid.append(t("neck", [(0, 0.42, 0.9), (0, 0.6, 0.975), (0, 0.76, 1.045), (0, 0.9, 1.1), (0, 0.97, 1.13)],
                  [(0.12, 0.15), (0.085, 0.105), (0.068, 0.082), (0.06, 0.07), (0.058, 0.06)], segs=20, k=0.04, rings_per_m=R))
     # the skull: a long narrow snout of bare bone, the jaw too long under it
-    mid.append(e("cranium", (0, 0.985, 1.33), (0.068, 0.095, 0.062), k=0.02))
-    mid.append(t("snout", [(0, 1.0, 1.326), (0, 1.14, 1.298), (0, 1.27, 1.269), (0, 1.335, 1.257)],
+    mid.append(e("cranium", (0, 0.985, 1.13), (0.068, 0.095, 0.062), k=0.02))
+    mid.append(t("snout", [(0, 1.0, 1.126), (0, 1.14, 1.098), (0, 1.27, 1.069), (0, 1.335, 1.057)],
                  [(0.06, 0.05), (0.047, 0.047), (0.036, 0.04), (0.027, 0.03)], segs=18, k=0.015, rings_per_m=120))
-    mid.append(t("lower_jaw", [(0, 0.97, 1.264), (0, 1.12, 1.228), (0, 1.26, 1.208), (0, 1.32, 1.209)],
+    mid.append(t("lower_jaw", [(0, 0.97, 1.064), (0, 1.12, 1.028), (0, 1.26, 1.008), (0, 1.32, 1.009)],
                  [(0.052, 0.026), (0.04, 0.022), (0.03, 0.018), (0.021, 0.015)], segs=16, k=0.01, rings_per_m=120))
     mid.append(e("knot", tuple(KNOT), (0.03, 0.036, 0.02), k=0.01))
-    mid.append(e("crest", (0, 0.93, 1.385), (0.02, 0.07, 0.022), k=0.015))
-    side.append(e("brow", (0.05, 1.02, 1.375), (0.026, 0.045, 0.016), rot=(0, 0, 12), k=0.012))
-    side.append(e("cheek", (0.058, 1.0, 1.305), (0.02, 0.05, 0.02), k=0.012))
-    side.append(e("jaw_hinge", (0.05, 0.975, 1.275), (0.018, 0.03, 0.03), k=0.012))
+    mid.append(e("crest", (0, 0.93, 1.185), (0.02, 0.07, 0.022), k=0.015))
+    side.append(e("brow", (0.05, 1.02, 1.175), (0.026, 0.045, 0.016), rot=(0, 0, 12), k=0.012))
+    side.append(e("cheek", (0.058, 1.0, 1.105), (0.02, 0.05, 0.02), k=0.012))
+    side.append(e("jaw_hinge", (0.05, 0.975, 1.075), (0.018, 0.03, 0.03), k=0.012))
     # the tail: a stiff knotted root
     tl = J["tail"]
     mid.append(t("tail", [(0, -0.66, 0.88)] + [tuple(p) for p in tl], [0.06, 0.048, 0.04, 0.03, 0.02, 0.01], segs=12, k=0.03, rings_per_m=R))
@@ -165,7 +165,7 @@ def ridge(f):
     """Vertebrae standing out of the back and the top of the neck (`f` is the body's distance field)."""
     pts = [(0.0, y, 1.25) for y in np.linspace(-0.68, 0.38, 12)]
     for u in np.linspace(0.12, 0.92, 7):
-        p = _v(0, 0.44, 0.9) + (_v(0, 0.9, 1.31) - _v(0, 0.44, 0.9)) * u
+        p = _v(0, 0.44, 0.9) + (_v(0, 0.9, 1.11) - _v(0, 0.44, 0.9)) * u
         pts.append((0.0, p[1] - 0.14, p[2] + 0.2))
     P, N = _onto(f, np.array(pts))
     P[:, 0] = 0.0
@@ -190,9 +190,9 @@ def cutters():
     out.append(kit.tube("gullet", [(0, 1.24, mouth_z(1.24)), (0, 1.13, mouth_z(1.13)), (0, 1.02, mouth_z(1.02))],
                         [(0.014, 0.008), (0.022, 0.012), (0.03, 0.012)], segs=12))
     for s in (1, -1):
-        out.append(kit.ellipsoid(f"socket{s}", (0.05 * s, 1.03, 1.345), (0.02, 0.034, 0.022), rot=(0, 0, 10 * s)))
-        out.append(kit.ellipsoid(f"nose{s}", (0.012 * s, 1.335, 1.262), (0.008, 0.02, 0.008), rot=(-10, 0, 0)))
-        out.append(kit.ellipsoid(f"temple{s}", (0.07 * s, 0.95, 1.325), (0.012, 0.03, 0.02)))
+        out.append(kit.ellipsoid(f"socket{s}", (0.05 * s, 1.03, 1.145), (0.02, 0.034, 0.022), rot=(0, 0, 10 * s)))
+        out.append(kit.ellipsoid(f"nose{s}", (0.012 * s, 1.335, 1.062), (0.008, 0.02, 0.008), rot=(-10, 0, 0)))
+        out.append(kit.ellipsoid(f"temple{s}", (0.07 * s, 0.95, 1.125), (0.012, 0.03, 0.02)))
     return out
 
 
@@ -211,7 +211,7 @@ def zones(P, N):
     z_["up"] = up
     z_["moss"] = np.clip(kit.ss((N[:, 2] + 0.25) / 0.6) * kit.ss((z - 0.7) / 0.2) * kit.ss((0.95 - y) / 0.08), 0, 1)
     # bone: the skull and jaw, the ribs, the vertebrae, the joints' burls, the tail's tip
-    bone = kit.ss((y - 0.94) / 0.05) * kit.ss((z - 1.15) / 0.04)
+    bone = kit.ss((y - 0.94) / 0.05) * kit.ss((z - 0.95) / 0.04)
     for ry in RIB_Y:
         d = kit.path_dist(Pm, rib_path(ry))
         bone = np.maximum(bone, kit.ss((0.024 - d) / 0.012))
@@ -221,7 +221,7 @@ def zones(P, N):
         bone = np.maximum(bone, 0.8 * kit.ss((r * 0.95 - np.linalg.norm(Pm - c, axis=1)) / 0.02))
     bone = np.maximum(bone, kit.ss((0.72 - z) / 0.1) * kit.ss((-0.98 - y) / 0.08))
     z_["bone"] = np.clip(bone, 0, 1)
-    in_head = (y > 0.99) & (z > 1.19) & (z < 1.3) & (x < 0.06)
+    in_head = (y > 0.99) & (z > 0.99) & (z < 1.1) & (x < 0.06)
     dz = z - np.array([mouth_z(v) for v in y])
     inside = (y < 1.31) & (x < np.interp(y, (1.0, 1.14, 1.27, 1.325), (0.042, 0.033, 0.024, 0.011)) - 0.003)
     z_["mouth"] = (in_head & inside & (np.abs(dz) < 0.02) & (N[:, 2] * np.sign(dz) < -0.5)).astype(float)
@@ -244,5 +244,5 @@ def bark_field(P, N):
     x, y, z = P[:, 0], P[:, 1], P[:, 2]
     plate = np.sin(x * 23.0 + y * 8.0 + 1.0) * np.sin(y * 13.0 - z * 17.0 + 0.4) * np.sin(z * 27.0 + x * 7.0)
     fine = np.sin(x * 63.0 + y * 31.0) * np.sin(y * 57.0 - z * 47.0) * np.sin(z * 71.0 + x * 23.0)
-    head = kit.ss((y - 0.94) / 0.05) * kit.ss((z - 1.15) / 0.04)
+    head = kit.ss((y - 0.94) / 0.05) * kit.ss((z - 0.95) / 0.04)
     return (0.006 * plate + 0.002 * fine) * (1.0 - 0.9 * head)

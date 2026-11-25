@@ -48,15 +48,15 @@ def sym(prefix, pair, v):
 BASE = dict(x=0.0, y=0.0, z=0.0, pitch=0.0, yaw=0.0, roll=0.0, arch=0.0, swing=0.0, twist=0.0,
             neck_p=0.0, neck_yaw=0.0, neck_roll=0.0, head_p=0.0, head_yaw=0.0, head_roll=0.0, reach=0.0, jaw=0.0,
             tail_p=0.0, tail_curl=0.0, tail_yaw=0.0, fronds=0.0, ears=0.0, ground=0.0)
-STAND = dict(neck_p=20.0, head_p=-12.0)       # how it carries its head: forward, hardly above its back
+STAND = dict(neck_p=30.0, head_p=-16.0)       # how it carries its head: forward, hardly above its back
 for _leg in LEGS:
     BASE.update({f"f_{_leg}": (0.0, 0.0, 0.0), f"fc_{_leg}": (0.0, 0.0, 0.0), f"fmix_{_leg}": 0.0,
                  f"heel_{_leg}": HEEL_F if _leg[0] == "f" else HEEL_H, f"toe_{_leg}": 0.0, f"knee_{_leg}": None})
 
 # Nose to the ground.
-SNIFF = dict(BASE, pitch=8.0, z=-0.06, neck_p=78.0, head_p=16.0, tail_p=6.0)
+SNIFF = dict(BASE, pitch=11.0, z=-0.09, neck_p=78.0, head_p=16.0, tail_p=6.0)
 # Head up, listening.
-ALERT = dict(BASE, neck_p=-10.0, head_p=4.0, ears=1.0, fronds=0.35, tail_p=22.0, z=0.01)
+ALERT = dict(BASE, neck_p=6.0, head_p=-6.0, ears=1.0, fronds=0.35, tail_p=22.0, z=0.01)
 # Lying like a log: on its breastbone, legs folded under, the neck and the long skull flat along the ground.
 LIE = dict(BASE, ground=1.0, neck_p=60.0, head_p=-50.0, tail_p=8.0, tail_curl=6.0, tail_yaw=40.0, ears=-0.6,
            **sym("fmix", "fl", 1.0), **sym("fmix", "hl", 1.0), **sym("fc", "fl", (0.0, 0.3, 0.6)), **sym("fc", "hl", (0.07, 0.19, 0.6)),
@@ -91,6 +91,9 @@ def mirrored(d):
     return out
 
 
+NECK_SET = 18.0     # the postures below were written for a neck carried this much higher than it is modelled
+
+
 def pose(r, d, feet=True):
     p = rig.Pose()
     arch, swing = d["arch"], d["swing"]
@@ -98,8 +101,8 @@ def pose(r, d, feet=True):
     p.spine(SPINE, pitch=arch, yaw=swing)
     if d["twist"]:
         p.turn("chest", roll=d["twist"])
-    p.spine(NECK, pitch=d["neck_p"] - 0.5 * arch, yaw=d["neck_yaw"], roll=d["neck_roll"])
-    p.turn("head", pitch=d["head_p"], yaw=d["head_yaw"], roll=d["head_roll"])
+    p.spine(NECK, pitch=d["neck_p"] - NECK_SET - 0.5 * arch, yaw=d["neck_yaw"], roll=d["neck_roll"])
+    p.turn("head", pitch=d["head_p"] + NECK_SET, yaw=d["head_yaw"], roll=d["head_roll"])
     if d["reach"]:
         for b in ("neck2", "neck3", "head"):
             par = r.parent[b]
@@ -187,14 +190,14 @@ def idle(r):
         d["neck_roll"] += 10.0 * k * wave(t, 0.16, 0.2)
         d["ears"] += 0.4 * k * wave(t, 0.16, 0.4)
     keyclip(r, "idle", BASE, [
-        (0.0, dict(neck_p=20.0, head_p=-12.0, x=0.012, tail_p=2.0)),
-        (1.3, dict(neck_p=21.0, x=0.014)),
-        (1.5, dict(neck_p=-4.0, head_p=0.0, neck_yaw=34.0, head_yaw=10.0, head_roll=-10.0, ears=0.8, fronds=0.15), "snap"),       # what was that
-        (2.7, dict(neck_p=-5.0, neck_yaw=36.0, x=-0.012)),
-        (3.1, dict(neck_p=32.0, head_p=-12.0, neck_yaw=6.0, head_yaw=0.0, head_roll=0.0, ears=0.0, fronds=0.0, jaw=5.0)),              # nothing
-        (4.2, dict(neck_p=26.0, neck_yaw=-4.0, jaw=0.0)),
-        (5.2, dict(neck_p=20.0, neck_yaw=0.0)),
-        (T, dict(neck_p=20.0, head_p=-12.0, x=0.012, tail_p=2.0)),
+        (0.0, dict(neck_p=30.0, head_p=-16.0, x=0.012, tail_p=2.0)),
+        (1.3, dict(neck_p=31.0, x=0.014)),
+        (1.5, dict(neck_p=10.0, head_p=-8.0, neck_yaw=34.0, head_yaw=10.0, head_roll=-10.0, ears=0.8, fronds=0.15), "snap"),       # what was that
+        (2.7, dict(neck_p=9.0, neck_yaw=36.0, x=-0.012)),
+        (3.1, dict(neck_p=40.0, head_p=-16.0, neck_yaw=6.0, head_yaw=0.0, head_roll=0.0, ears=0.0, fronds=0.0, jaw=5.0)),              # nothing
+        (4.2, dict(neck_p=36.0, neck_yaw=-4.0, jaw=0.0)),
+        (5.2, dict(neck_p=30.0, neck_yaw=0.0)),
+        (T, dict(neck_p=30.0, head_p=-16.0, x=0.012, tail_p=2.0)),
     ], loop=True, breath=1.0, more=more)
 
 
@@ -239,8 +242,8 @@ def startle(r):
     keyclip(r, "startle", BASE, [
         (0.0, dict(STAND)),
         (0.1, dict(z=-0.1, arch=7.0, neck_p=24.0, head_p=-14.0, ears=-1.0, fronds=0.7, tail_p=-10.0), "snap"),
-        (0.38, dict(ALERT, neck_p=-16.0, fronds=0.6, x=-0.02, y=-0.02), "out"),
-        (0.55, dict(f_fl_r=up, heel_fl_r=HEEL_F + 34.0, toe_fl_r=-30.0, neck_p=-10.0, fronds=0.35)),
+        (0.38, dict(ALERT, neck_p=2.0, fronds=0.6, x=-0.02, y=-0.02), "out"),
+        (0.55, dict(f_fl_r=up, heel_fl_r=HEEL_F + 34.0, toe_fl_r=-30.0, neck_p=6.0, fronds=0.35)),
         (0.7, dict(neck_yaw=8.0, head_roll=6.0)),
     ])
 
@@ -316,7 +319,7 @@ def walk(r):
         c = math.cos(2 * math.pi * (ph - 0.08))
         d.update(z=-0.055 + 0.012 * math.cos(4 * math.pi * (ph - 0.06)), x=0.014 * math.sin(2 * math.pi * (ph + 0.1)),
                  swing=4.5 * c, twist=3.0 * math.sin(2 * math.pi * ph), roll=-1.2 * math.sin(2 * math.pi * ph),
-                 neck_p=30.0 + 5.0 * math.cos(4 * math.pi * (ph - 0.15)), head_p=-10.0 - 3.0 * math.cos(4 * math.pi * (ph - 0.2)),
+                 neck_p=38.0 + 5.0 * math.cos(4 * math.pi * (ph - 0.15)), head_p=-14.0 - 3.0 * math.cos(4 * math.pi * (ph - 0.2)),
                  neck_yaw=-2.5 * c, tail_p=4.0, tail_yaw=10.0 * math.sin(2 * math.pi * (ph - 0.1)), jaw=3.0)
     return r.gait("walk", speed=1.6, stride=1.0, duty=0.62, phases={"hl_l": 0.0, "fl_l": 0.25, "hl_r": 0.5, "fl_r": 0.75}, lift=0.065,
                   upper=_upper(r, up), stance_y=_stance(r, 0.0, 0.03), heel_off=18.0, swing_heel=22.0, toe_swing=-14.0, yaw=0.0)
@@ -339,7 +342,7 @@ def trot(r):
     def up(t, ph, d):
         b = math.cos(4 * math.pi * (ph - 0.12))
         d.update(z=-0.07 + 0.022 * b, pitch=1.2 * math.sin(4 * math.pi * ph), swing=3.0 * math.cos(2 * math.pi * (ph - 0.05)),
-                 twist=2.5 * math.sin(2 * math.pi * ph), neck_p=24.0 - 3.0 * b, head_p=-12.0 + 2.5 * b, jaw=7.0 + 2.0 * b,
+                 twist=2.5 * math.sin(2 * math.pi * ph), neck_p=34.0 - 3.0 * b, head_p=-16.0 + 2.5 * b, jaw=7.0 + 2.0 * b,
                  tail_p=20.0 + 4.0 * b, tail_curl=3.0, tail_yaw=6.0 * math.sin(2 * math.pi * ph), ears=-0.3 - 0.25 * b, fronds=0.1 - 0.1 * b)
     return r.gait("trot", speed=4.0, stride=1.6, duty=0.42, phases={"hl_l": 0.0, "fl_r": 0.0, "hl_r": 0.5, "fl_l": 0.5}, lift=0.11,
                   upper=_upper(r, up), stance_y=_stance(r, 0.0, 0.04), heel_off=22.0, swing_heel=34.0, toe_swing=-20.0, yaw=0.0)

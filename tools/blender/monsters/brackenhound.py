@@ -92,7 +92,7 @@ def skin_material():
         col = g.mix_rgb(bfac, col, bcol)
         # moss: thick on the back, creeping down the furrows and onto the bone's ledges
         edge_n = g.math("MULTIPLY", g.math("SUBTRACT", g.noise(P, 11.0, 4.0, 0.7), 0.5), 1.2)
-        mfac = g.smooth(g.math("ADD", moss, edge_n), 0.45, 0.7)
+        mfac = g.smooth(g.math("ADD", moss, edge_n), 0.62, 0.85)
         creep = g.math("MULTIPLY", g.math("MULTIPLY", furrow, g.smooth(up, 0.1, 0.5)), g.math("SUBTRACT", 1.0, bfac))
         mfac = g.math("MAXIMUM", mfac, g.math("MULTIPLY", creep, 0.9))
         mfac = g.math("MULTIPLY", mfac, g.math("SUBTRACT", 1.0, knot))
@@ -208,7 +208,7 @@ def hard_parts():
                 face = np.cross(d, (0.0, 1.0, 0.3))
                 L, wdt = 0.24 + 0.14 * rng.rand(), 0.1
             root = head + np.array((0.03 * fan * (0 if ear else 1), 0.02 * rng.randn(), -0.02))
-            o = blade(f"frond{k}_{j}", root, d, L, wdt, face, droop=0.3 + 0.3 * rng.rand(), zig=0.32, rings=6)
+            o = blade(f"frond{k}_{j}", root, d, L, wdt, face, droop=0.3 + 0.3 * rng.rand(), zig=0.32, rings=6, gap=0.004)
             add(o, 60 + k, dry if (j + k) % 4 == 3 else fern)
     return out
 
@@ -231,7 +231,7 @@ def build(fast=False, bake=True):
     low = kit.join([low] + pieces, NAME)
     kit.triangulate(low)          # the engine's tangents then match the bake's
     if bake:
-        kit.unwrap(low, boost=lambda P: 1.0 + 0.9 * kit.ss((P[:, 1] - 0.9) / 0.06), centre=(0.0, 1.1, 1.3))
+        kit.unwrap(low, boost=lambda P: 1.0 + 0.9 * kit.ss((P[:, 1] - 0.9) / 0.06), centre=(0.0, 1.1, 1.1))
     rig.attach(low, arm)
     paths = {}
     kept = kit.baked_material(low, NAME, OUT) if bake == "keep" else None
@@ -251,8 +251,8 @@ VIEWS = {
     "front34": ((2.6, 4.4, 1.3), (0, 0.1, 0.75), 50),
     "side": ((5.2, 0.1, 0.9), (0, 0.05, 0.75), 50),
     "back34": ((-2.6, -4.4, 1.6), (0, 0, 0.75), 50),
-    "face": ((0.5, 2.0, 1.4), (0, 1.1, 1.28), 70),
-    "face_side": ((1.1, 1.15, 1.32), (0, 1.12, 1.28), 85),
+    "face": ((0.5, 2.0, 1.2), (0, 1.1, 1.08), 70),
+    "face_side": ((1.1, 1.15, 1.12), (0, 1.12, 1.08), 85),
     "foot": ((0.9, 1.1, 0.3), (0.18, 0.4, 0.08), 70),
     "top": ((0.3, 0.0, 4.5), (0, 0.1, 0.8), 50),
 }

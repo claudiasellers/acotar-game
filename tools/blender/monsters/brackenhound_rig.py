@@ -15,8 +15,8 @@ import kit
 J = bb.J
 LEGS = ("fl_l", "fl_r", "hl_l", "hl_r")
 FRONDS = {            # bone -> (parent, head, tail)
-    "frond_0": ("head", (0.055, 0.94, 1.38), (0.13, 0.84, 1.47)),
-    "frond_1": ("head", (-0.055, 0.94, 1.38), (-0.13, 0.84, 1.47)),
+    "frond_0": ("head", (0.055, 0.94, 1.18), (0.13, 0.84, 1.27)),
+    "frond_1": ("head", (-0.055, 0.94, 1.18), (-0.13, 0.84, 1.27)),
     "frond_2": ("chest", (0, 0.36, 1.03), (0, 0.27, 1.17)),
     "frond_3": ("ribs", (0, 0.08, 0.99), (0, -0.01, 1.13)),
     "frond_4": ("spine", (0, -0.22, 0.975), (0, -0.31, 1.11)),
@@ -43,7 +43,7 @@ def bones():
         ("head", tuple(J["head"]), tuple(J["head_end"]), "neck3", True),
         ("jaw", tuple(J["jaw"]), tuple(J["jaw_end"]), "head", True),
         ("skull_knot", tuple(bb.KNOT + (0, 0, 0.02)), tuple(bb.KNOT + (0, 0, 0.07)), "head", False),
-        ("mouth", (0, 1.33, 1.228), (0, 1.38, 1.228), "head", False),
+        ("mouth", (0, 1.33, 1.028), (0, 1.38, 1.028), "head", False),
         ("keel", (0, 0.16, 0.6), (0, 0.38, 0.66), "chest", False),     # the breastbone, for lying on it
     ]
     tl = J["tail"]
@@ -98,7 +98,7 @@ def fix_weights(P, W):
             W[k] = np.zeros(n)
     x, y, z = np.abs(P[:, 0]), P[:, 1], P[:, 2]
     lip = np.array([bb.mouth_z(v) for v in y])
-    in_head = (y > 0.96) & (z > 1.17) & (x < 0.08)
+    in_head = (y > 0.96) & (z > 0.97) & (x < 0.08)
     front = kit.ss((y - 0.98) / 0.05)                  # 0 at the hinge, 1 along the jaws
     lower = (z < lip).astype(float)
     skull_w = np.where(in_head, (1.0 - lower) * front, 0.0)
