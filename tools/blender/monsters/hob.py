@@ -613,20 +613,76 @@ VIEWS = {
     "chest": ((1.2, 4.6, 3.3), (0, 0.5, 3.15), 70),
 }
 
-SCALE = 1.6     # the owner's size: Feyre (1.7 m) comes to its knee. Built at 4.2 m, shipped at 6.7 m standing.
+SCALE = 1.6     # the owner's size: Feyre (1.7 m) comes to its knee. Sculpted 4.2 m tall, shipped 6.7 m.
 
 
-def enlarge(gltf_path, gaits_path, k):
-    """Scales the exported creature: the rig's root node carries the scale (so
-    every bone, socket and charm goes with it), and the gaits table's speeds
-    and travel distances grow by the same factor so its feet still grip."""
+def bake_scale(gltf_path, k):
+    """Makes the exported creature k times bigger in its data, with no scale
+    left on any node: vertex positions, every node's translation, the skin's
+    bind matrices and the clips' translation keys are multiplied."""
+    import base64
     import json
     with open(gltf_path) as f:
         g = json.load(f)
-    for i in g["scenes"][g.get("scene", 0)]["nodes"]:
-        g["nodes"][i]["scale"] = [k, k, k]
+    bufs = []
+    for b in g["buffers"]:
+        uri = b["uri"]
+        if uri.startswith("data:"):
+            bufs.append(bytearray(base64.b64decode(uri.split(",", 1)[1])))
+        else:
+            with open(os.path.join(os.path.dirname(gltf_path), uri), "rb") as f:
+                bufs.append(bytearray(f.read()))
+    comps = dict(SCALAR=1, VEC2=2, VEC3=3, VEC4=4, MAT4=16)
+
+    def view(i):
+        a = g["accessors"][i]
+        bv = g["bufferViews"][a["bufferView"]]
+        assert a["componentType"] == 5126 and "byteStride" not in bv and "sparse" not in a, a
+        n = a["count"] * comps[a["type"]]
+        off = bv.get("byteOffset", 0) + a.get("byteOffset", 0)
+        return a, np.frombuffer(bufs[bv["buffer"]], dtype="<f4", count=n, offset=off).reshape(a["count"], -1)
+
+    done = set()
+
+    def grow(i, cols=slice(None)):
+        if i in done:
+            return
+        done.add(i)
+        a, arr = view(i)
+        arr[:, cols] *= k
+        for key in ("min", "max"):
+            if key in a and cols == slice(None):
+                a[key] = [v * k for v in a[key]]
+
+    for m in g["meshes"]:
+        for prim in m["primitives"]:
+            grow(prim["attributes"]["POSITION"])
+            for t in prim.get("targets", []):
+                if "POSITION" in t:
+                    grow(t["POSITION"])
+    for sk in g.get("skins", []):
+        grow(sk["inverseBindMatrices"], slice(12, 15))
+    for n in g["nodes"]:
+        assert "matrix" not in n, n.get("name")
+        assert all(abs(v - 1.0) < 1e-4 for v in n.pop("scale", [1.0])), n.get("name")
+        if "translation" in n:
+            n["translation"] = [v * k for v in n["translation"]]
+    for an in g.get("animations", []):
+        for ch in an["channels"]:
+            if ch["target"]["path"] == "translation":
+                grow(an["samplers"][ch["sampler"]]["output"])
+    for b, data in zip(g["buffers"], bufs):
+        if b["uri"].startswith("data:"):
+            b["uri"] = b["uri"].split(",", 1)[0] + "," + base64.b64encode(bytes(data)).decode()
+        else:
+            with open(os.path.join(os.path.dirname(gltf_path), b["uri"]), "wb") as f:
+                f.write(bytes(data))
     with open(gltf_path, "w") as f:
         json.dump(g, f, separators=(",", ":"))
+
+
+def scale_gaits(gaits_path, k):
+    """The gaits table's speeds and travel distances grow with the creature, so its feet still grip."""
     rows = []
     with open(gaits_path) as f:
         for line in f:
@@ -640,6 +696,11 @@ def enlarge(gltf_path, gaits_path, k):
             rows.append(" ".join(c) + "\n")
     with open(gaits_path, "w") as f:
         f.writelines(rows)
+
+
+def enlarge(gltf_path, gaits_path, k):
+    bake_scale(gltf_path, k)
+    scale_gaits(gaits_path, k)
 
 
 if __name__ == "__main__":
