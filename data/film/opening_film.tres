@@ -136,7 +136,7 @@ id = &"op_15"
 at = 137.5
 hold = 13.0
 speaker = &""
-text = "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."
+text = "We were rich once. Three years after she died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."
 canon = "A"
 
 [sub_resource type="Resource" id="L15"]
