@@ -619,7 +619,7 @@ func _play() -> void:
 		if bolting:
 			var road := ride.pose_at(ride.progress)
 			return [road.basis.x.normalized(), true]
-		var to := ride.pose_at(ride.progress + 9.0).origin - at
+		var to := ride.heading() - at
 		to.y = 0.0
 		return [to.normalized() if to.length() > 0.1 else Vector3.ZERO, ride.progress < ride.beast_at - 6.0]
 	var t_ride := _sim_seconds()
