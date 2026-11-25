@@ -67,16 +67,12 @@ static func row(id: StringName) -> Dictionary:
 	return r
 
 
-## How a weapon lies on the ground: the manifest's rest_deg and rest_lift_m,
-## or the fallbacks (radians, metres) for a row that has none.
-static func rest_rotation(id: StringName, fallback: Vector3) -> Vector3:
-	var deg: Variant = GearModel.row(id).get("rest_deg")
-	if deg is Array and (deg as Array).size() == 3:
-		var a := deg as Array
-		return Vector3(deg_to_rad(float(a[0])), deg_to_rad(float(a[1])), deg_to_rad(float(a[2])))
-	return fallback
+## How a weapon lies on the ground: the manifest's rest_deg and rest_lift_m.
+## Every weapon has its row (test_monster_gear checks it).
+static func rest_rotation(id: StringName) -> Vector3:
+	var a: Array = GearModel.row(id).get("rest_deg", [0.0, 0.0, 0.0])
+	return Vector3(deg_to_rad(float(a[0])), deg_to_rad(float(a[1])), deg_to_rad(float(a[2])))
 
 
-static func rest_lift(id: StringName, fallback: float) -> float:
-	var lift: Variant = GearModel.row(id).get("rest_lift_m")
-	return float(lift) if lift is float or lift is int else fallback
+static func rest_lift(id: StringName) -> float:
+	return float(GearModel.row(id).get("rest_lift_m", 0.0))

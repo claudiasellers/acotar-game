@@ -8,8 +8,6 @@ extends Node3D
 const GROUP := &"station"
 const STATION_ID := &"weapon_drop"
 ## Lying flat on the ground (the models' business end is +Y).
-const REST_ROTATION := Vector3(-PI * 0.5, 0.0, 0.0)
-const REST_HEIGHT := 0.04
 ## Families that talk [C: the naga call each other "brothers"]: the first
 ## trophy she takes from one gets her line (catalogue §2.2, the Keeper's).
 const SPEAKING_FAMILIES: Array[StringName] = [&"naga"]
@@ -33,6 +31,10 @@ static func spawn(parent: Node, at: Vector3, id: StringName, wear_left: float = 
 		slots: ImbueSlots = null) -> WeaponDrop:
 	if parent == null or not WeaponTable.has(id):
 		return null
+	# Every weapon row has L88's model: one missing is a bug, not a stand-in.
+	if not GearModel.exists(id):
+		push_error("WeaponDrop: %s has no model at %s" % [id, GearModel.MODEL % id])
+		return null
 	var d := WeaponDrop.new()
 	d.name = "Drop_%s" % id
 	d.weapon_id = id
@@ -46,20 +48,13 @@ static func spawn(parent: Node, at: Vector3, id: StringName, wear_left: float = 
 func _ready() -> void:
 	add_to_group(GROUP)
 	# L88's model, worn if it is (below WeaponRack.WORN_BELOW), laid as its
-	# manifest row says.
+	# manifest row says. It reads as takeable the way every pickup does (the
+	# Interactor's prompt in reach); no light of its own.
 	var m := GearModel.instance(weapon_id, wear < WeaponRack.WORN_BELOW)
 	if m:
-		m.rotation = GearModel.rest_rotation(weapon_id, REST_ROTATION)
-		m.position.y = GearModel.rest_lift(weapon_id, REST_HEIGHT)
+		m.rotation = GearModel.rest_rotation(weapon_id)
+		m.position.y = GearModel.rest_lift(weapon_id)
 		add_child(m)
-	# A small warm glint so it reads as something to take, model or not.
-	var glint := OmniLight3D.new()
-	glint.name = "Glint"
-	glint.light_color = Color(1.0, 0.86, 0.62)
-	glint.light_energy = 0.35
-	glint.omni_range = 1.2
-	glint.position.y = 0.25
-	add_child(glint)
 
 
 func open_now() -> bool:

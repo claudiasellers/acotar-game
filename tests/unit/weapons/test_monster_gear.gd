@@ -364,7 +364,17 @@ func test_the_model_shows_its_worn_mesh_when_worn() -> void:
 	assert_false((root.get_node("wpn_x_lod1") as MeshInstance3D).visible)
 
 
-func test_no_file_no_model_and_the_rest_pose_falls_back() -> void:
-	assert_null(GearModel.instance(&"wpn_not_modelled"), "never a stand-in")
-	assert_eq(GearModel.rest_rotation(&"wpn_not_modelled", Vector3(1, 2, 3)), Vector3(1, 2, 3))
-	assert_eq(GearModel.rest_lift(&"wpn_not_modelled", 0.04), 0.04)
+## L88 built every weapon and camp container: each has its model and its
+## manifest row (a missing one is a bug, not a stand-in).
+func test_every_weapon_and_camp_container_has_its_model_and_row() -> void:
+	for id: StringName in WeaponTable.ids():
+		assert_true(GearModel.exists(id), "%s has its model" % id)
+		assert_false(GearModel.row(id).is_empty(), "%s has its manifest row" % id)
+		assert_true(GearModel.row(id).has("rest_deg") and GearModel.row(id).has("rest_lift_m"),
+				"%s says how it lies" % id)
+	for f in DirAccess.get_files_at("res://data/combat/loot/"):
+		if not f.ends_with(".tres"):
+			continue
+		var t := load("res://data/combat/loot/" + f) as LootTable
+		if t.camp_container != &"":
+			assert_true(GearModel.exists(t.camp_container), "%s has its model" % t.camp_container)
