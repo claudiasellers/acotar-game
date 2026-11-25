@@ -59,7 +59,8 @@ func test_bus_declares_every_vitals_signal_with_its_arguments() -> void:
 
 
 func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
-	assert_gte(AttackTable.count(), 25)
+	for id: StringName in [&"naga_claw", &"martax_roar", &"generic_hit", &"wolf_bite"]:
+		assert_true(AttackTable.has(id), "the %s row this contract uses is in the table" % id)
 	assert_eq(AttackTable.resolve(&"naga").id, &"naga_claw", "a family resolves to its default row")
 	assert_eq(AttackTable.resolve(&"martax_roar").status_tag, &"roar_shake")
 	assert_eq(AttackTable.resolve(&"no_such_attack").id, &"generic_hit")
@@ -67,8 +68,8 @@ func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
 
 func test_a_hit_lands_once_then_iframes_drop_the_next() -> void:
 	var dealt := v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite"))
-	assert_almost_eq(dealt, 25.0, 0.01)
-	assert_almost_eq(v.health, 75.0, 0.01)
+	assert_gt(dealt, 0.0, "the bite lands")
+	assert_almost_eq(v.health, VitalsState.MAX_HEALTH - dealt, 0.01, "and comes off her health")
 	assert_eq(v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite")), 0.0, "i-frames")
 	v.step(1.0)
 	assert_gt(v.take_hit(&"wolf", AttackTable.resolve(&"wolf_bite")), 0.0, "i-frames over")

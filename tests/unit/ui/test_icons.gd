@@ -42,7 +42,7 @@ func test_no_script_builds_an_icon_path_of_its_own() -> void:
 	var own := RegEx.create_from_string("theme/icons/")
 	var hits: Array[String] = []
 	_scan("res://", own, hits)
-	assert_eq(hits, [] as Array[String], "an icon path outside Icons")
+	assert_eq(hits, [] as Array[String], "an icon path written outside Icons. Fix: use Icons.texture(kind, id) or Icons.item(entry, px) / Icons.path(kind, id) instead of spelling theme/icons/...")
 	for gone in ["res://ui/satchel/satchel_icon.gd", "res://ui/dressing_room/wardrobe_icon.gd"]:
 		assert_false(FileAccess.file_exists(gone), gone)
 
