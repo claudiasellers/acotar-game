@@ -134,7 +134,9 @@ rain are the senses' own terms, so each counts once.
 ## Hits on creatures (`Creature.apply_hit`, health-interactions §2.2)
 Every hit (arrow, knife, bow bash, fire) goes through
 `apply_hit(cause, weapon_id, weapon_mult, zone, at)`, which calls the pure
-`Creature.resolve_hit`. Damage is `arrow_damage x weapon_mult x zone`; the
+`Creature.resolve_hit`. Damage is `arrow_damage x weapon_mult x zone`, and
+for the knife (weapon_id `knife`) also `x CreatureData.knife_scale` (default
+1; the one per-family knife value); the
 arrow's `ArrowData.damage` and the bow's speed (`Creature.bow_mult`, capped
 1.3) make up an arrow's `weapon_mult`. `weak_zone_height` marks the top of the
 body as the weak spot (`weak_zone_mult`, default 3). Ash (in
@@ -204,9 +206,9 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
 
 - Body: L83's rigged `creatures/models/fae/gloamer.gltf`
   (`data/animation/creatures/gloamer_gaits.txt`). 24 HP, 8 per wood arrow (3),
-  the throat (top 20% of 1.3 m) x3 (1), ash 1 at once; burns 6 HP/s. Walk 2,
-  run 6.5 m/s; sight 40.5, hearing 44, scent 70 m. No element row (the matrix
-  has no gloamer column): every element is normal.
+  the throat (top 20% of 1.3 m) x3 (1), ash 1 at once, 2 knife hits
+  (`knife_scale` 1.5); burns 6 HP/s. Walk 2, run 6.5 m/s; sight 40.5,
+  hearing 44, scent 70 m. Element row: fire, light and sleep 1.5, frost 1.0.
 - `routine_at`: `hunt` 18:00-06:00, `rest` otherwise: at home it holds
   `sleep` (`is_lying_up()`), at half sight and 0.7 hearing, and plays `wake`
   as anything moves it or sets it on her.
@@ -214,6 +216,30 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
   `gloamer_shove` (`SHOVE`, blunt 12, 1 m knockback, 0.6 s); `strike_reach`
   1.2; DreadField 20 m / 6 m; `call_clip` call, `rout_share` 0.5,
   `glint_drawn` 2, `glint_clip` grab_shiny, `squabble_clip` squabble.
+
+## The Hollow Hob (`HobRoamer`, bestiary §10)
+- One at `hob_silent_hollow` (-1300, 900, western fells) from `starlight_pool_found`
+  (P4). L83's `hollow_hob.gltf`, its size in the data (6.7 m standing).
+- 30 wood (300 HP, 10 each), `ash_hits` 3; the throat charm is the weak zone
+  (`charm`, ×3). Sight 27, hearing 52, scent 56; asleep, sight ×0.5. Fire ×1.5,
+  the rest plain. `reach_margin` 1.6: the knife and the sneak reach past its
+  origin (StrikeController `target()`, `knife_kind`).
+- `routine_for`: `rest` 09:00-22:00 (asleep at home holding `sleep`; curious
+  plays `eye_open` once; searching plays `sit_up` then holds `sniff`), else
+  `awake` (at home holding `count_charms`). The rest→awake turn plays `wake`
+  and counts: more charms gone than `fact.hob_charms_counted` holds sets it
+  searching (`search`) for `SEARCH_SECONDS`.
+- **Robbing it**: StrikeController asks `take_strike(kind, by)` before any
+  blow. A `sneak` or `finisher` while `is_sleeping()` (its routine sleep not
+  roused, or a sleep arrow) cuts the next charm: `fact.hob_charm.<1..8>`, the
+  `charm_N` mesh hides, `charm_cut_stir` plays, awareness rises under curious,
+  a pickup-log note, and her once-line `hob_charm_cut`. No damage. The eighth
+  cut settles the site. The charms aren't collectibles yet (item rows next).
+- **The fight**: `call_clip` `stand_roar`; `hob_swat` (strike_reach 4 m), and
+  `hob_stomp` when she's within 3 m; `hob_throw` from 6 to 25 m every 8 s,
+  aimed where she stood at the tell and landing only within 2.5 m of it.
+- Not yet: the stream it won't cross (its leash is the territory), eating a
+  sheep, `death_charm`, the snore.
 
 ## Pack behaviour (any family, by scene export)
 
@@ -223,6 +249,12 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
   (`HostileRoamer.rout(from)`: it gives her up and runs for `ROUT_SECONDS`,
   10 s, `is_fleeing()`), and the fight ends `driven_off`. Once a fight; the
   next `report()` clears it. 0 (the naga, the briarling) fights to the last.
+  The rout has an ending (`_close_rout`): the first runner plays its
+  `call_clip`, each routed member's dread eases to `ROUT_DREAD` (0.3) until it
+  takes her up again, a quiet `SettleSwell` (no sparkle or petals) grows if
+  none is there, `fact.site_routed.<id>` holds the day, and her once-line
+  `hostile_rout` plays. A later settle replaces that swell with its own.
+  The first glint grab plays her once-line `hostile_glint_grab`.
 - **The glint**: a light arrow coming to rest emits
   `EventBus.arrow_light_landed(at)` (ArrowEffects). A site whose leash ring
   holds `at` calls `glint(at)`: the members nearest it that `wants_glint()`,
@@ -296,7 +328,8 @@ normal) scales a steeped arrow (fire, frost, light, sleep): its damage
   not busy, so one that lands during a scene or caption waits for the next
   hit; the Director records `dlg.<id>` when it is heard. Normal says nothing.
 - Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
-  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
+  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0; gloamer fire/light/sleep 1.5,
+  frost 1.0.
 
 ## Held sites
 

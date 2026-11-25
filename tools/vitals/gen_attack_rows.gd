@@ -18,6 +18,8 @@ const ROWS := [
 	[&"crow_dive", &"crow", false, 8.0, &"claw", &"light", 1.0, &"", 0.0, 0.0, 0.1, true, 0.0],
 	[&"hob_swat", &"hob", true, 55.0, &"blunt", &"heavy", 6.0, &"", 0.0, 0.0, 0.3, true, 0.0],
 	[&"hob_stomp", &"hob", false, 35.0, &"blunt", &"heavy", 3.0, &"", 0.0, 0.0, 0.25, true, 0.0],
+	# A rock thrown at range (plan §5.7 "thrown rocks"; L75). It lands where she stood.
+	[&"hob_throw", &"hob", false, 30.0, &"blunt", &"heavy", 3.0, &"", 0.0, 0.0, 0.25, true, 0.0],
 	[&"blackvein_bite", &"blackvein", true, 10.0, &"bite", &"light", 0.0, &"venom", 0.35, 1.0, 0.2, true, 0.0],
 	[&"blackvein_drop", &"blackvein", false, 18.0, &"claw", &"medium", 2.0, &"venom", 0.2, 1.0, 0.35, true, 0.0],
 	[&"martax_maul", &"martax", true, 45.0, &"claw", &"heavy", 5.0, &"", 0.0, 0.0, 0.3, true, 0.0],
@@ -52,6 +54,7 @@ const WINDUP := {
 	&"crow_dive": 0.45,
 	&"hob_swat": 0.9,
 	&"hob_stomp": 1.0,
+	&"hob_throw": 1.0,
 	&"blackvein_bite": 0.45,
 	&"blackvein_drop": 0.6,
 	&"martax_maul": 0.85,

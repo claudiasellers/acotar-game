@@ -71,10 +71,18 @@ enum BodyPlan { QUADRUPED, BIRD }
 @export var weak_zone_mult: float = 3.0
 ## What story beats and sound call the weak spot (EventBus.creature_hit part).
 @export var weak_zone_name: StringName = &"weak"
+## Her knife on this family, as a multiple of arrow_damage on top of the
+## strike's own (StrikeController.knife_mult): 1 cuts like a wood arrow. The
+## one per-family knife value (Creature.resolve_hit); the common tier's 1.5
+## lands "2 knife hits" on 24 HP.
+@export var knife_scale: float = 1.0
 
 ## Small means fragile and easy to hit (owner, 2026-11-25): above 1 the box
 ## arrows and the knife find is this much bigger than the body.
 @export var hit_box_scale: float = 1.0
+## A body too big to stand at the middle of (the Hollow Hob): the knife's
+## reach, and the sneak's, are measured this much past its origin.
+@export var reach_margin: float = 0.0
 ## A hostile family's element row (HostileElements; hostile plan §7):
 ## element (fire, frost, light, sleep) -> multiplier, 1.5 weak, 1.0 normal,
 ## 0 resisted. An element with no entry is normal.

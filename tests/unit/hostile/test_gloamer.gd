@@ -1,9 +1,10 @@
 ## Gloamers (bestiary §16): the common tier's wood-edge pack. L83's rigged
 ## body with every clip its brain names; 3 wood arrows or 1 to the throat, ash
-## 1; out from 18:00 to 06:00 and lying up asleep by day; the first to see her
-## calls; the rake, and every third blow the shove; half the pack down and the
-## rest scatter (the fight ends driven off); a light arrow's glow pulls two off
-## to grab at it and squabble, and a wound brings one back.
+## 1, 2 knife hits; Ember, Glimmer and Hush weak; out from 18:00 to 06:00 and
+## lying up asleep by day; the first to see her calls; the rake, and every
+## third blow the shove; half the pack down and the rest scatter (the fight
+## ends driven off); a light arrow's glow pulls two off to grab at it and
+## squabble, and a wound brings one back.
 extends GutTest
 
 const GLOAMER := preload("res://creatures/hostile/gloamer_roamer.tscn")
@@ -111,6 +112,35 @@ func test_three_wood_arrows_or_one_to_the_throat_or_one_ash() -> void:
 	assert_false(a.alive, "one ash")
 
 
+## The owner's 2 knife hits: knife_scale 1.5 makes each cut 12 of its 24.
+func test_two_knife_hits() -> void:
+	var g := _gloamer()
+	assert_eq(g.data.knife_scale, 1.5)
+	g.apply_hit(&"knife", &"knife", StrikeController.KNIFE_MULT, &"body", g.global_position)
+	assert_true(g.alive, "one cut leaves it standing")
+	assert_almost_eq(g.health, 12.0, 0.01)
+	g.apply_hit(&"knife", &"knife", StrikeController.KNIFE_MULT, &"body", g.global_position)
+	assert_false(g.alive, "the second drops it")
+
+
+## A wood arrow is still 8: the scale is the knife's only.
+func test_the_knife_scale_leaves_arrows_alone() -> void:
+	var g := _gloamer()
+	g.apply_hit(&"arrow_wood", &"wood", 1.0, &"body", g.global_position)
+	assert_almost_eq(g.health, 16.0, 0.01)
+	var naga := load("res://data/creatures/hostile/naga_roamer.tres") as CreatureData
+	assert_eq(naga.knife_scale, 1.0, "every other family cuts as before")
+
+
+## Its element row (plan §7): Ember, Glimmer and Hush work; frost is plain.
+func test_its_element_row() -> void:
+	var d := load("res://data/creatures/hostile/gloamer_roamer.tres") as CreatureData
+	assert_eq(HostileElements.mult_of(d, &"fire"), HostileElements.WEAK)
+	assert_eq(HostileElements.mult_of(d, &"light"), HostileElements.WEAK)
+	assert_eq(HostileElements.mult_of(d, &"sleep"), HostileElements.WEAK)
+	assert_eq(HostileElements.mult_of(d, &"frost"), HostileElements.NORMAL)
+
+
 func test_out_from_dusk_to_dawn_and_lying_up_by_day() -> void:
 	assert_eq(GloamerRoamer.routine_for(18.0), &"hunt")
 	assert_eq(GloamerRoamer.routine_for(2.0), &"hunt")
@@ -170,6 +200,15 @@ func test_half_the_pack_down_and_the_rest_scatter() -> void:
 	assert_eq(_ended, [[&"gloamer_test_pack", &"gloamer", HostileEncounters.DRIVEN_OFF]],
 			"the fight ends driven off, once")
 	assert_false(site.is_settled, "the camp isn't cleared")
+	# G25: the rout has an ending: the day is kept, a small swell comes back.
+	assert_eq(WorldState.get_flag(HostileSite.ROUTED_FLAG % &"gloamer_test_pack"), Clock.day)
+	assert_not_null(site.swell, "the place comes back for the night")
+	if site.swell:
+		assert_null(site.swell.sparkle, "the quiet swell, not the settle's")
+	var r2 := site.members[2] as HostileRoamer
+	assert_not_null(r2._dread)
+	if r2._dread:
+		assert_eq(r2._dread.max_intensity, HostileRoamer.ROUT_DREAD, "the dread eases")
 
 
 func test_a_naga_camp_fights_to_the_last() -> void:

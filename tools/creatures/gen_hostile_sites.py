@@ -153,9 +153,11 @@ ROAMERS = {
             ("sight_range", "40.5"),
             ("hearing_range", "44.0"),
             ("scent_range", "70.0"),
-            # 3 wood arrows (24 HP, 8 each), 1 to the throat (x3), ash 1.
+            # 3 wood arrows (24 HP, 8 each), 1 to the throat (x3), ash 1;
+            # 2 knife hits (12 each, knife_scale 1.5).
             ("max_health", "24.0"),
             ("arrow_damage", "8.0"),
+            ("knife_scale", "1.5"),
             ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
             ("lethal_delay", "0.0"),
             ("weak_zone_height", "0.8"),
@@ -165,6 +167,8 @@ ROAMERS = {
             ("leaves_prints", "true"),
             ("stride", "0.6"),
             ("print_size", "0.1"),
+            # Element row (plan §7): fire, light and sleep weak, frost normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"light": 1.5,\n&"sleep": 1.5\n}'),
         ],
         "scene_fields": [
             ("strike_reach", "1.2"),
@@ -179,6 +183,56 @@ ROAMERS = {
             ("glint_drawn", "2"),
             ("glint_clip", '&"grab_shiny"'),
             ("squabble_clip", '&"squabble"'),
+        ],
+    },
+    "hob_roamer": {
+        "script": "res://creatures/hostile/hob_roamer.gd",
+        "node": "HobRoamer",
+        "model": "res://creatures/models/fae/hollow_hob.gltf",
+        "fields": [
+            ("kind", '&"hob"'),
+            ("display_name", '"Hollow Hob"'),
+            ("fae", "true"),
+            ("canon", '"X"'),
+            # About 6.7 m standing, 3.7 m hunched (the box), 3 m lying
+            # (bestiary §10.3); the size is in the model's data (L83-9).
+            ("body_length", "3.0"),
+            ("body_height", "3.7"),
+            ("body_width", "2.4"),
+            ("walk_speed", "1.0"),
+            ("run_speed", "4.0"),
+            ("turn_speed", "1.5"),
+            # Sight x0.6, hearing x1.3, scent x0.8 of the shared 45/40/70
+            # (plan §4 table); asleep it half sees again (HobRoamer).
+            ("sight_range", "27.0"),
+            ("hearing_range", "52.0"),
+            ("scent_range", "56.0"),
+            # 30 wood arrows (300 HP, 10 each), 3 ash; the throat charm x3.
+            ("max_health", "300.0"),
+            ("arrow_damage", "10.0"),
+            ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
+            ("lethal_delay", "0.0"),
+            ("ash_hits", "3"),
+            ("weak_zone_height", "3.2"),
+            ("weak_zone_name", '&"charm"'),
+            # She can't stand at its middle: the knife and the sneak reach
+            # past its origin by this.
+            ("reach_margin", "1.6"),
+            # Fire sends it into the river (plan §7: fire strong, the rest plain).
+            ("burn_dps", "4.0"),
+            ("fire_fear_radius", "6.0"),
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"light": 1.0,\n&"sleep": 1.0\n}'),
+            ("leaves_prints", "true"),
+            ("stride", "1.8"),
+            ("print_size", "0.45"),
+        ],
+        "scene_fields": [
+            ("strike_reach", "4.0"),
+            ("strike_cooldown", "3.0"),
+            ("attack_id", '&"hob_swat"'),
+            ("dread_radius", "Vector2(35, 12)"),
+            # It stands, roaring.
+            ("call_clip", '&"stand_roar"'),
         ],
     },
 }
@@ -203,6 +257,33 @@ SITES = [
     # one small brake at the rose garden's outer edge, from naga_survived.
     ("briarling_rose_garden_edge", "briarling", "Rose Garden Brake", "manor_grounds", (-60.0, -560.0), 12.0,
      "briarling_roamer", 3, ["naga_survived"], "X"),
+    # The common tier's gloamer packs (plan §6.2; bestiary §16): few from
+    # naga_survived, more from P4 (starlight_pool_found) and stranger_met, most
+    # once the glamour lifts. The brackenhound packs follow with their brain.
+    ("gloamer_hollow_log_edge", "gloamer", "Hollow Log Edge", "border_woods", (-380.0, 520.0), 35.0,
+     "gloamer_roamer", 3, ["naga_survived"], "X"),
+    ("gloamer_woodcutters_edge", "gloamer", "Woodcutter's Edge", "eastern_woods", (820.0, 200.0), 35.0,
+     "gloamer_roamer", 4, ["naga_survived"], "X"),
+    ("gloamer_ash_ride", "gloamer", "Ash Ride", "eastern_woods", (1550.0, 260.0), 35.0,
+     "gloamer_roamer", 4, ["stranger_met"], "X"),
+    ("gloamer_orchard_wall", "gloamer", "Orchard Wall", "blossom_vale", (1150.0, 1000.0), 35.0,
+     "gloamer_roamer", 4, ["starlight_pool_found"], "X"),
+    ("gloamer_hedge_lane", "gloamer", "Hedge Lane", "blossom_vale", (500.0, 1000.0), 35.0,
+     "gloamer_roamer", 3, ["stranger_met"], "X"),
+    ("gloamer_shepherds_rocks", "gloamer", "Shepherd's Rocks", "western_fells", (-1250.0, 400.0), 35.0,
+     "gloamer_roamer", 4, ["starlight_pool_found"], "X"),
+    ("gloamer_fell_gate_edge", "gloamer", "Fell Gate Edge", "western_fells", (-1050.0, 750.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_steading_fields", "gloamer", "Steading Fields", "blighted_reaches", (600.0, -1550.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_grey_hedgerow", "gloamer", "Grey Hedgerow", "blighted_reaches", (-500.0, -1600.0), 35.0,
+     "gloamer_roamer", 5, ["glamour_lifted"], "X"),
+    ("gloamer_ash_pits", "gloamer", "Ash Pits", "blighted_reaches", (1200.0, -1450.0), 35.0,
+     "gloamer_roamer", 4, ["glamour_lifted"], "X"),
+    # The giant (plan §5.7, bestiary §10): one Hollow Hob asleep in the
+    # Silent Hollow from P4.
+    ("hob_silent_hollow", "hob", "Silent Hollow", "western_fells", (-1300.0, 900.0), 35.0,
+     "hob_roamer", 1, ["starlight_pool_found"], "X"),
 ]
 
 # Sites placed and checked but carried by no spawn table yet. The rose-garden

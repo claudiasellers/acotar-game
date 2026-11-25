@@ -494,6 +494,8 @@ static func resolve_hit(creature: CreatureData, current_health: float, weapon_id
 		if mult <= 0.0:
 			return {"health": current_health, "killed": false, "mortal": true, "ash_taken": ash_so_far}
 		return {"health": 0.0, "killed": true, "mortal": true, "ash_taken": ash_so_far}
+	if weapon_id == &"knife":
+		mult *= creature.knife_scale
 	var remaining := current_health - creature.arrow_damage * maxf(mult, 0.0)
 	var ash := ash_so_far
 	if weapon_id in creature.lethal_arrow_ids:

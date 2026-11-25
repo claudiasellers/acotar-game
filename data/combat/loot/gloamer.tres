@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LootTable" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+family = &"gloamer"
+carried = Array[StringName]([&"wpn_gloamer_hookknife", &"wpn_gloamer_knuckleclub", &"wpn_gloamer_hookknife", &"wpn_gloamer_trinket_flail"])
+leader_at = 5
+leader_weapon = &"wpn_gloamer_scythe_glaive"
+carried_wear = Vector2(0.5, 0.9)
+trophies = Array[StringName]([])
+trophy_chances = PackedFloat32Array()
+camp_weapon = &"wpn_gloamer_hookknife"
+camp_coins = Vector2i(3, 8)
+camp_container = &"camp_gloamer_hoard_log"

@@ -41,6 +41,13 @@ const CAMP_ALERT := 0.45
 const TAUNT_EVERY := Vector2(6.0, 10.0)
 ## A routed member runs from the fight this long, having given her up.
 const ROUT_SECONDS := 10.0
+## A routed member's dread eases to this share until it takes her up again
+## (G25: the fight reads as over).
+const ROUT_DREAD := 0.3
+## Her line the first time one grabs at a glint (G26: the lure is taught).
+const GLINT_LINE := &"hostile_glint_grab"
+## Her line the first time a pack scatters (G25).
+const ROUT_LINE := &"hostile_rout"
 ## A glint holds a member that went for it this long (unless it is hurt).
 const GLINT_SECONDS := 8.0
 ## Within this of the glint it stops to grab it and squabble.
@@ -102,6 +109,10 @@ var _has_token: bool = false
 var _hold_left: float = 0.0
 var _leap_speed: float = 0.0
 var _circle_sign: float = 1.0
+## The looted weapon it carries in its hand and drops when it dies (its
+## family's LootTable picks it by member_index; &"" for none).
+var carried_weapon: StringName = &""
+var _loot_dropped: bool = false
 var _glint_at: Vector3 = Vector3.INF
 var _glint_left: float = 0.0
 var _glint_grabbed: bool = false
@@ -120,6 +131,64 @@ func _ready() -> void:
 	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
 	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
 	_grow_hit_box()
+	_arm()
+
+
+## Its weapon (catalogue §1.6): the family's LootTable picks it by its place in
+## the pack, and its model rides the hand_r socket once L88's file exists.
+func _arm() -> void:
+	if data == null:
+		return
+	var table := LootTable.for_family(data.kind)
+	if table and carried_weapon == &"":
+		var count := site.data.count if site and is_instance_valid(site) and site.data else 1
+		carried_weapon = table.carried_by(member_index, count)
+	if carried_weapon == &"" or animator == null:
+		return
+	if not GearModel.exists(carried_weapon):
+		return
+	var hand := animator.socket(&"hand_r")
+	var m: Node3D = GearModel.instance(carried_weapon) if hand else null
+	if m:
+		m.name = "Weapon"
+		hand.add_child(m)
+
+
+## What it leaves when it dies (catalogue §1.6): the weapon in its hand at
+## part of its durability, and each trophy at its chance. Rolls are seeded by
+## the creature and the day; a unique trophy drops once a save.
+func _drop_loot() -> void:
+	if _loot_dropped or not is_inside_tree():
+		return
+	_loot_dropped = true
+	var table := LootTable.for_family(data.kind)
+	if table == null:
+		return
+	var parent := get_parent()
+	var key := "%s:%d" % [creature_id, Clock.day]
+	var n := 0
+	if carried_weapon != &"":
+		var wear := lerpf(table.carried_wear.x, table.carried_wear.y, LootTable.roll(key + ":wear"))
+		WeaponDrop.spawn(parent, _loot_spot(n), carried_weapon, wear)
+		n += 1
+	for i in table.trophies.size():
+		var id := table.trophies[i]
+		var chance := table.trophy_chances[i] if i < table.trophy_chances.size() else 0.0
+		var w := WeaponTable.get_weapon(id)
+		if w == null or LootTable.roll("%s:%s" % [key, id]) >= chance:
+			continue
+		if w.unique:
+			if WeaponRack.unique_dropped(id):
+				continue
+			WeaponRack.mark_unique_dropped(id)
+		WeaponDrop.spawn(parent, _loot_spot(n), id, 1.0)
+		n += 1
+
+
+## Where the `n`th thing it leaves lies: round the body, on its ground.
+func _loot_spot(n: int) -> Vector3:
+	var a := float(n) * 2.1 + float(member_index)
+	return global_position + Vector3(cos(a), 0.0, sin(a)) * (0.5 + 0.25 * float(n))
 
 
 ## The trail holds while she was smelled in the last TRAIL_SECONDS, unless a
@@ -269,6 +338,8 @@ func _may_chase(target: Vector3) -> bool:
 
 
 func _on_ladder_changed(_from: HostileLadder.State, to: HostileLadder.State, player: Node3D) -> void:
+	if _dread and (to == HostileLadder.State.ENGAGED or to == HostileLadder.State.STARTLE):
+		_dread.max_intensity = 1.0
 	match to:
 		HostileLadder.State.STARTLE:
 			_lure_left = 0.0
@@ -662,6 +733,8 @@ func rout(from: Vector3) -> void:
 	_flee_from = from
 	_flee_left = ROUT_SECONDS
 	_lure_left = 0.0
+	if _dread:
+		_dread.max_intensity = ROUT_DREAD
 
 
 ## True while it runs from a fight (a rout, a flame, a hard element hit).
@@ -707,8 +780,19 @@ func _at_glint(delta: float) -> void:
 		_glint_grabbed = true
 		if glint_clip != &"":
 			animator.play_oneshot(glint_clip)
+		HostileRoamer.say_once(get_tree(), GLINT_LINE)
 	elif squabble_clip != &"":
 		animator.play_oneshot(squabble_clip)
+
+
+## Her once-line `id` (DialogueDirector), when nothing else is speaking.
+static func say_once(tree: SceneTree, id: StringName) -> void:
+	if tree == null or WorldState.has_flag("dlg.%s" % id):
+		return
+	var d := DialogueDirector.of(tree)
+	var her := tree.get_first_node_in_group(&"player") as Node3D
+	if d and her and not d.busy():
+		DialogueDirector.line(her, id)
 
 
 func _on_lured(at: Vector3) -> void:
@@ -730,6 +814,7 @@ func _on_player_down(_source_id: Variant = null, _cause: Variant = null, _at: Va
 func die(cause: StringName) -> void:
 	_set_fight(Fight.CHARGE)
 	super.die(cause)
+	_drop_loot()
 	if _dread and is_instance_valid(_dread):
 		_dread.queue_free()
 		_dread = null

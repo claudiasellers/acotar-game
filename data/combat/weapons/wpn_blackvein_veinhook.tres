@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_blackvein_veinhook"
+display_name = "Veinhook"
+family = &"blackvein"
+kind = &"sickle"
+power = 1.2
+swing_s = 0.55
+reach_m = 2.0
+stagger_s = 1.0
+durability = 14
+imbue_slots = 1
+two_handed = false
+trait_id = &"hamstring"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A long hooked finger, pearl-white with a black vein through it, its knuckle wrapped in silk."

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_hob_tooth_cleaver"
+display_name = "Hob-tooth Cleaver"
+family = &"hob"
+kind = &"axe"
+power = 2.2
+swing_s = 0.9
+reach_m = 1.9
+stagger_s = 1.8
+durability = 28
+imbue_slots = 2
+two_handed = false
+trait_id = &"stun"
+trait_count = 0
+unique = true
+canon = "X"
+description = "One of the Hob's blunt teeth, split and bound to a stone-heavy handle. It hums when swung."

@@ -40,10 +40,14 @@ func test_wider_court_tables_name_their_species() -> void:
 			assert_true(scenes.has(want), "%s spawns %s" % [region, want])
 
 
+## The blight's wildlife: crows only, and few. Its hostile camps (the gloamer
+## packs, hostile plan §6.2) ride the same table but aren't wildlife.
 func test_blight_is_crows_only_and_sparse() -> void:
 	var table := load("res://data/creatures/spawn/blighted_reaches.tres") as CreatureSpawnTable
 	var total := 0
 	for e in table.entries:
+		if e.scene.resource_path.begins_with("res://creatures/hostile/sites/"):
+			continue
 		assert_eq(e.scene.resource_path.get_file(), "crow.tscn")
 		total += e.count * e.groups
 	assert_lte(total, 6)

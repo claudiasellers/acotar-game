@@ -1,34 +1,22 @@
-[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=21 format=3]
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
-[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="11"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="13"]
 [ext_resource type="PackedScene" path="res://creatures/prey/deer.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/faelights.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/rabbit.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_reed_marsh.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_stream_glen.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="8"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/water_sprites.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_ash_ride.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_woodcutters_edge.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_reed_marsh.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_stream_glen.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/water_sprites.tscn" id="12"]
 
 [sub_resource type="Resource" id="e0"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"songbirds_blue"
-scene = ExtResource("7")
-count = 3
-cluster_radius = 5.0
-groups = 2
-start_hour = 5.0
-end_hour = 20.5
-on_water = false
-canon = "C"
-glamour = 0
-near_group = &""
-
-[sub_resource type="Resource" id="e1"]
-script = ExtResource("11")
-id = &"songbirds_rose"
 scene = ExtResource("9")
 count = 3
 cluster_radius = 5.0
@@ -40,10 +28,24 @@ canon = "C"
 glamour = 0
 near_group = &""
 
+[sub_resource type="Resource" id="e1"]
+script = ExtResource("13")
+id = &"songbirds_rose"
+scene = ExtResource("11")
+count = 3
+cluster_radius = 5.0
+groups = 2
+start_hour = 5.0
+end_hour = 20.5
+on_water = false
+canon = "C"
+glamour = 0
+near_group = &""
+
 [sub_resource type="Resource" id="e2"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"songbirds_gold"
-scene = ExtResource("8")
+scene = ExtResource("10")
 count = 3
 cluster_radius = 5.0
 groups = 1
@@ -55,7 +57,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e3"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"faelights_woods"
 scene = ExtResource("3")
 count = 1
@@ -69,7 +71,7 @@ glamour = 0
 near_group = &"landmark"
 
 [sub_resource type="Resource" id="e4"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"deer"
 scene = ExtResource("2")
 count = 3
@@ -83,7 +85,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e5"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"rabbits"
 scene = ExtResource("4")
 count = 2
@@ -97,9 +99,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e6"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"water_sprites_marsh"
-scene = ExtResource("10")
+scene = ExtResource("12")
 count = 1
 cluster_radius = 0.0
 groups = 2
@@ -111,9 +113,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e7"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"site_naga_reed_marsh"
-scene = ExtResource("5")
+scene = ExtResource("7")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -126,8 +128,23 @@ require_flags = PackedStringArray("naga_survived")
 near_group = &""
 
 [sub_resource type="Resource" id="e8"]
-script = ExtResource("11")
+script = ExtResource("13")
 id = &"site_naga_stream_glen"
+scene = ExtResource("8")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e9"]
+script = ExtResource("13")
+id = &"site_gloamer_woodcutters_edge"
 scene = ExtResource("6")
 count = 1
 cluster_radius = 0.0
@@ -140,7 +157,22 @@ glamour = 0
 require_flags = PackedStringArray("naga_survived")
 near_group = &""
 
+[sub_resource type="Resource" id="e10"]
+script = ExtResource("13")
+id = &"site_gloamer_ash_ride"
+scene = ExtResource("5")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("stranger_met")
+near_group = &""
+
 [resource]
 script = ExtResource("1")
 region_id = &"eastern_woods"
-entries = Array[ExtResource("11")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7"), SubResource("e8")])
+entries = Array[ExtResource("13")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7"), SubResource("e8"), SubResource("e9"), SubResource("e10")])
