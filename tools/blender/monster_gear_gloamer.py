@@ -192,9 +192,9 @@ def woodcutter_hatchet(p, worn):
         z = -0.10 + 0.035 * i + 0.01 * h1(i, 2.0)
         a = math.radians(60 + 240 * h1(i, 3.0))
         p.add(U.sphere(0.006, 5, 4), K.lighter(OAK, 0.4), "matte", T(0.0105 * math.cos(a), 0.0145 * math.sin(a), z) @ S(0.45, 0.45, 2.2) @ R("X", 25))
-    p.add(G.lash(0.0165, 0.14, 0.165, 2.5, 0.004, 4, 1.3), G.STOLEN_PERI, "fabric")
+    p.add(G.lash(0.0165, 0.14, 0.165, 2.5, 0.004, 4, 1.3), FADED_PERI, "fabric")
     for i in range(2):
-        p.add(G.rag(0.10 + 0.03 * i, 0.014, 3.0 + i, 0.35, 6, 0.0012), G.STOLEN_PERI, "fabric", T(0.012, -0.012, 0.15) @ R("Z", 200 + 50 * i))
+        p.add(G.rag(0.10 + 0.03 * i, 0.014, 3.0 + i, 0.35, 6, 0.0012), FADED_PERI, "fabric", T(0.012, -0.012, 0.15) @ R("Z", 200 + 50 * i))
     if worn:
         G.crack(p, (0.0115, 0.01, 0.0), (0.0118, -0.004, 0.17), 2.0, 0.0015)
         G.crack(p, (0.0125, 0.03, 0.25), (0.0075, 0.075, 0.225), 3.0, 0.0012)
