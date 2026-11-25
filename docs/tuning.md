@@ -28,6 +28,7 @@ each shader, chosen to reproduce the look each one had before T2.
 | `rim_power` | candy_lit.gdshaderinc | 3.0 | 0.5–8 | Rim falloff (`candy_fresnel`, the one fresnel curve; skin, fur, bark, water and FX call it too). | L58 |
 | `specular` | candy_lit.gdshaderinc | 0.5 | 0–1 | Dielectric reflectance (StandardMaterial3D `metallic_specular`). | L58 |
 | `albedo_cap` | candy_surface.gdshaderinc (`CandyMaterial.MAX_ALBEDO`) | 0.85 (hex D9) | 0–1 | Glare rule (L18-4): the most a lit candy surface reflects per channel, applied after texture and vertex colour. Unshaded FX are exempt. | L58 |
+| `NEUTRAL_MAX` (estate whites and stones) | world/spring_court/manor_estate/shared/estate_kit.gd | 0.85 per channel: PEARL, MARBLE, WARM_STONE, STONE_DARK, GRAVEL, CREAM, hue kept | ≤ 0.85 | Manor glare (owner, 2026-11-24): only the whites and stones are capped; ROSE, BLUSH, BUTTER, GOLD, MINT, LILAC, PERIWINKLE stay bright. Baked .glb props pick it up on re-export. test_estate_palette holds it. | L82 |
 | `pearl` | candy_surface.gdshaderinc | 0.0 | 0–1 | Pearlescent sheen at grazing angles (CandyMaterial surfaces). | L58 |
 | `glitter` | candy_surface.gdshaderinc | 0.0 | 0–1 | Twinkling glitter cells; scaled by `magic_amount`. | L58 |
 | `glitter_scale` | candy_surface.gdshaderinc | 18.0 | >0 | Glitter cells per metre. | L58 |

@@ -211,6 +211,7 @@ func _update_grab() -> void:
 	if grabbed:
 		grab_prompt.presses_total = _vitals.grab_presses_total
 		grab_prompt.presses_left = _vitals.grab_presses_left
+		grab_prompt.steady = _vitals.break_free_hold()
 		grab_prompt.key_text = "A" if SatchelHud.pad_active else _key_label(&"interact")
 
 
