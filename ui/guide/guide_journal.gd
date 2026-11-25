@@ -38,6 +38,12 @@ var _taught_key: bool = false
 var _tab: Control
 var _mark: WhorlInk
 var _pulse: float = 0.0
+## What she last thought, for G when no need is open; and where the no-need
+## press has got to (1 = last thought up, 2 = a wider one).
+var _last_line: String = ""
+var _last_voice: String = ""
+var _free_stage: int = 0
+var _reflect_i: int = -1
 
 
 func _init(book: GuideBook = null) -> void:
@@ -93,11 +99,18 @@ func can_show() -> bool:
 	return not UiMode.quiet(get_tree()) and (up == "" or up == line)
 
 
+## G and the tab only need Feyre to be free: dread in the air doesn't take
+## them away (it only holds back thoughts that arrive on their own).
+func is_free() -> bool:
+	var up := LinePresenter.of(get_tree()).showing
+	return UiMode.current(get_tree()) == UiMode.Mode.PLAY and (up == "" or up == line)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton \
 			or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.3):
 		_input_seen = true
-	if not event.is_action_pressed(ACTION) or mode == GuideSettings.Mode.OFF or not can_show():
+	if not event.is_action_pressed(ACTION) or mode == GuideSettings.Mode.OFF or not is_free():
 		return
 	get_viewport().set_input_as_handled()
 	press()
@@ -105,6 +118,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## What G does: show the thought, or think harder while it shows.
 func press() -> void:
+	if director.thread == null:
+		_press_without_need()
+		return
 	if showing and shown_thread == director.thread:
 		var next := director.think_harder(shown_tier)
 		if next.is_empty():
@@ -115,6 +131,29 @@ func press() -> void:
 	var request := director.on_demand()
 	if not request.is_empty():
 		show_thought(request.thread, request.tier, true)
+
+
+## No need is open (the court between moments): G brings back her last thought,
+## then a wider one, then closes.
+func _press_without_need() -> void:
+	if showing and _free_stage == 1 and not book_reflections().is_empty():
+		_present(_next_reflection(), "", 2)
+	elif showing:
+		hide_thought()
+	elif _last_line != "":
+		_present(_last_line, _last_voice, 1)
+	elif not book_reflections().is_empty():
+		_present(_next_reflection(), "", 2)
+
+
+func book_reflections() -> PackedStringArray:
+	return director.book.reflections if director.book else PackedStringArray()
+
+
+func _next_reflection() -> String:
+	var all := book_reflections()
+	_reflect_i = (_reflect_i + 1) % all.size()
+	return all[_reflect_i]
 
 
 func _process(delta: float) -> void:
@@ -134,19 +173,26 @@ func _process(delta: float) -> void:
 		show_thought(request.thread, request.tier, false)
 	if showing:
 		_hold -= delta
-		if _hold <= 0.0 or not can_show():
+		if _hold <= 0.0 or not is_free():
 			hide_thought()
 
 
 func show_thought(thread: GuideThread, tier: int, _asked: bool) -> void:
 	# The first thought of a session stays longer: it's how players learn of it.
-	var first := not _taught_key
-	_taught_key = true
 	shown_thread = thread
 	shown_tier = tier
-	line = thread.line(tier)
+	_present(thread.line(tier), thread.voice_id(tier), 0)
+
+
+func _present(text: String, voice_id: String, stage: int) -> void:
+	var first := not _taught_key
+	_taught_key = true
+	_free_stage = stage
+	line = text
+	_last_line = text
+	_last_voice = voice_id
 	_hold = (12.0 if first else 7.0) + 0.05 * line.length()
-	_play_voice(thread.voice_id(tier))
+	_play_voice(voice_id)
 	LinePresenter.of(get_tree()).say(LinePresenter.Voice.THOUGHT, "", line, self, _hold)
 	showing = true
 	Juice.bounce_control(_mark, 0.12)
@@ -156,10 +202,10 @@ func show_thought(thread: GuideThread, tier: int, _asked: bool) -> void:
 ## The bookmark: there whenever thoughts are on and Feyre is free; a gentle
 ## breathing glow while the current need's thought hasn't been seen.
 func _update_tab(delta: float) -> void:
-	var want := mode != GuideSettings.Mode.OFF and not UiMode.quiet(get_tree()) and director.thread != null
+	var want := mode != GuideSettings.Mode.OFF and UiMode.current(get_tree()) == UiMode.Mode.PLAY
 	_tab.modulate.a = move_toward(_tab.modulate.a, 1.0 if want else 0.0, delta * 3.0)
 	_tab.visible = _tab.modulate.a > 0.01
-	var waiting := want and not showing and director.shown_tier < 0
+	var waiting := want and director.thread != null and not showing and director.shown_tier < 0
 	_pulse += delta
 	var glow := 0.5 + 0.5 * sin(_pulse * 2.4) if waiting else 0.0
 	_mark.scale = Vector2.ONE * (1.0 + 0.08 * glow)
@@ -169,7 +215,7 @@ func _update_tab(delta: float) -> void:
 
 func _on_tab_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
-			and mode != GuideSettings.Mode.OFF and can_show():
+			and mode != GuideSettings.Mode.OFF and is_free():
 		get_viewport().set_input_as_handled()
 		press()
 
@@ -178,6 +224,7 @@ func hide_thought() -> void:
 	if not showing:
 		return
 	showing = false
+	_free_stage = 0
 	if _voice.playing:
 		_voice.stop()
 	# Only her own thought: a thought of the story's may have taken its place.

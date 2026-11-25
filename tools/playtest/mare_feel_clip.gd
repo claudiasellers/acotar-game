@@ -3,7 +3,7 @@
 ## side-on), the vault into the saddle, a canter and gallop with turns past the
 ## stables, reining in, and the slide down. Frames at 24 fps for a clip.
 ##   Mac: shot marefeel res://tools/playtest/mare_feel_clip.tscn -- --out={out}/report.json
-##   Writes {out}/<whistle|mount|ride|dismount>_####.jpg (1280x720) and numbers.
+##   Writes {out}/<whistle|mount|tips|ride|dismount>_####.jpg (1280x720) and numbers.
 extends "res://tools/playtest/mount_ride_clip.gd"
 
 const CLIP_FPS := 24.0
@@ -122,6 +122,34 @@ func _play() -> void:
 			prev = h
 	_stop_recording()
 	_note("vault %.2f s, peak hip speed %.1f m/s, largest frame step %.2f m" % [mm.t if mm else -1.0, mm.max_hip_speed if mm else -1.0, mm.max_hip_step if mm else -1.0])
+	_pass()
+
+	_begin("tips", "first time up: the riding key hints, each gone once its key is used (KeyHints)")
+	var hints := KeyHints.of(get_tree())
+	hints.forget_taught()
+	_record("tips")
+	var shown: Array[String] = []
+	await _wait(2.0)
+	shown.append(String(hints.current))
+	Input.action_press(&"move_forward", 0.6)
+	await _wait(1.6)
+	shown.append(String(hints.current))
+	Input.action_press(&"sprint")
+	await _wait(1.6)
+	Input.action_release(&"sprint")
+	shown.append(String(hints.current))
+	var jump := InputEventAction.new()
+	jump.action = &"jump"
+	jump.pressed = true
+	Input.parse_input_event(jump)
+	await _wait(1.6)
+	Input.action_release(&"move_forward")
+	shown.append(String(hints.current))
+	await _wait(1.0)
+	_stop_recording()
+	_note("hints in turn: %s (text now: %s)" % [shown, hints.text()])
+	if shown != ["ride_steer", "ride_gallop", "ride_leap", "ride_off"]:
+		return _fail("riding hints out of order: %s" % [shown])
 	_pass()
 
 	_begin("ride", "a canter then a gallop with turns past the stables, Feyre's own chase camera")
