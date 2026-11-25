@@ -304,6 +304,23 @@ def puca_dart():
     return normalize(fade(reverb(w, reverb_ir(r, 1.2, 0.8), 0.4), 0.002, 0.2), -8)
 
 
+def blood_drip():
+    """Ch12's dripping of blood, in the quiet infirmary: three slow drops off
+    his hand onto marble, each a small wet plink with a stone-room tail."""
+    r = rng(951)
+    s = 2.6
+    n = secs(s)
+    x = np.zeros(n)
+    for at in (0.05, 0.85, 1.75):
+        d = secs(0.12)
+        f = np.geomspace(r.uniform(900, 1100), r.uniform(2100, 2600), d)
+        plink = np.sin(osc_phase(f)) * env_exp(d, 0.035, 0.001)
+        tick = hp(white(r, secs(0.01)), 3000) * env_exp(secs(0.01), 0.002, 0.0005) * 0.4
+        place(x, plink * r.uniform(0.8, 1.0), at)
+        place(x, tick, at)
+    return normalize(fade(reverb_mono(x, reverb_ir(r, 1.4, 0.5), 0.35), 0.002, 0.3), -10)
+
+
 SOUNDS = {
     "sfx/suriel/sniff": (suriel_sniff, 4, "The Suriel's wheezing sniffing as it nears"),
     "sfx/suriel/scream": (suriel_scream, 4, "The Suriel screams as the snare takes it"),
@@ -329,6 +346,7 @@ SOUNDS = {
     "sfx/bogge/passed": (bogge_passed, 4, "The Bogge passes: the cold lets go"),
     "sfx/puca/ripple": (puca_ripple, 4, "The puca's image ripples like water"),
     "sfx/puca/dart": (puca_dart, 4, "The puca darts away in a shimmer"),
+    "sfx/tamlin/blood_drip": (blood_drip, 4, "Three drops of his blood onto the infirmary marble"),
 }
 
 # cue id: (files, volume_db, pitch_jitter, loop, music, max_distance)
@@ -351,4 +369,5 @@ CUES = {
     "bogge_passed": (["sfx/bogge/passed"], -4, 0, False, False, 0),
     "puca_ripple": (["sfx/puca/ripple"], -6, 0.05, False, False, 60),
     "puca_dart": (["sfx/puca/dart"], -4, 0.05, False, False, 60),
+    "blood_drip": (["sfx/tamlin/blood_drip"], -4, 0.04, False, False, 15),
 }

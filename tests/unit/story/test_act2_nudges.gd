@@ -140,6 +140,24 @@ func test_every_press_wait_and_every_evening_wait_has_a_nudge() -> void:
 		assert_false(trap_stage.line(StringName(id)).is_empty(), "the window pull's %s is in the stage" % id)
 
 
+## Act III's one wait on her at the infirmary door (L86-10) climbs, like the
+## Act II waits: his blood drips, her thought, then his tired word (Keeper).
+func test_the_infirmary_door_wait_has_its_nudges() -> void:
+	var wound := WoundDressing.new()
+	wound.stage = load(WoundDressing.STAGE_PATH) as Act2Stage
+	var reach_door: Act2Space.NudgeBeat = null
+	for beat: SceneBeat in wound._walk_beats():
+		if beat.label == "reach feyre_work":
+			reach_door = beat as Act2Space.NudgeBeat
+	assert_not_null(reach_door, "the doorway wait nudges")
+	if reach_door:
+		assert_eq(reach_door.ladder, WoundDressing.DOORWAY_NUDGES, "short, medium, long")
+		for id in reach_door.ladder:
+			assert_ne(_line(wound, id), "", "%s is in the stage" % id)
+		assert_eq(String(wound.stage.line(&"wait_cabinet").get("who", "")), "Tamlin", "he speaks last")
+	wound.free()
+
+
 func _act2_entries() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for id: StringName in Act2Spaces.CODED:
@@ -157,8 +175,8 @@ func test_the_beast_waits_for_her_and_she_notices() -> void:
 	_start_arrival()
 	# She stays on the steps: he pads in from the steps beside her (where the
 	# ride left him, L86) to the middle of the hall, waits, and after a while
-	# she notices. The walk in is 2.2 m/s, ManorArrival's lead speed.
-	var walk_in := arrival().mark(&"beast_steps").distance_to(arrival().mark(&"hall_mid")) / 2.2
+	# she notices.
+	var walk_in := arrival().mark(&"beast_steps").distance_to(arrival().mark(&"hall_mid")) / ManorArrival.LEAD_SPEED
 	_tick_all(walk_in + ManorArrival.FOLLOW_NUDGE_AFTER + 4.0)
 	assert_true(heard.has(_line(arrival(), &"beast_waits")), "the beast waits for her: %s" % [heard])
 

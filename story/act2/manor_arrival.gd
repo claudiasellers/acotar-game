@@ -21,6 +21,8 @@ const DOOR_RADIUS := 6.0
 
 ## Seconds the beast waits on her down the hall before she notices (L34-6).
 const FOLLOW_NUDGE_AFTER := 15.0
+## The beast's pace down the hall to the dining room (m/s).
+const LEAD_SPEED := 2.2
 
 var flash: OmniLight3D
 
@@ -52,7 +54,7 @@ func _build_beats() -> Array:
 			StoryControl.hold(self, StoryControl.Mode.WALK)
 			StoryControl.set_focus(actor(&"tamlin_beast")), "the beast pads ahead"),
 		lead_along(&"tamlin_beast", [&"hall_mid", &"hall_east", &"dining_door", &"dining_inside", &"head_chair"], 8.0,
-			2.2, &"beast_waits", FOLLOW_NUDGE_AFTER),
+			LEAD_SPEED, &"beast_waits", FOLLOW_NUDGE_AFTER),
 		reach_nudged(&"dining_inside", 3.5, &"beast_waits", FOLLOW_NUDGE_AFTER),
 		Beats.run(_transform, "a flash of white light"),
 		say(&"transform"),
