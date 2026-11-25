@@ -1001,6 +1001,11 @@ moment("loot_first_trophy", "monster_gear", "Like the pelt. I know what this mak
 moment("hostile_rout", "hostile_packs", "Let them run. They'll come back hungrier.", canon="X", once=True)
 moment("hostile_glint_grab", "hostile_packs", "Greedy things. Anything that shines.", canon="X", once=True)
 
+# The first charm she cuts from the sleeping Hollow Hob's necklace (bestiary
+# §10; the first on the cord is an iron horseshoe [C: iron does nothing to
+# them]). Canon X, once per save; the Keeper's to tune.
+moment("hob_charm_cut", "hollow_hob", "Iron. Someone thought this would keep them safe.", canon="X", once=True)
+
 # =============================================================================
 # Who stands where (CastPresence). House spots are in house space (x, z) on the
 # room's storey; cottage spots are relative to the act1_cottage_interior anchor.

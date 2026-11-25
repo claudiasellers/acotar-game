@@ -80,6 +80,9 @@ enum BodyPlan { QUADRUPED, BIRD }
 ## Small means fragile and easy to hit (owner, 2026-11-25): above 1 the box
 ## arrows and the knife find is this much bigger than the body.
 @export var hit_box_scale: float = 1.0
+## A body too big to stand at the middle of (the Hollow Hob): the knife's
+## reach, and the sneak's, are measured this much past its origin.
+@export var reach_margin: float = 0.0
 ## A hostile family's element row (HostileElements; hostile plan §7):
 ## element (fire, frost, light, sleep) -> multiplier, 1.5 weak, 1.0 normal,
 ## 0 resisted. An element with no entry is normal.

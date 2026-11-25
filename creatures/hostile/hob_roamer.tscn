@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hob_roamer.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile/hob_roamer.tres" id="2"]
+
+[node name="HobRoamer" type="CharacterBody3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+strike_reach = 4.0
+strike_cooldown = 3.0
+attack_id = &"hob_swat"
+dread_radius = Vector2(35, 12)
+call_clip = &"stand_roar"

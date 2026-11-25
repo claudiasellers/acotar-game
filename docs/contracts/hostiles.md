@@ -217,6 +217,30 @@ of 3-5); no sites yet (plan §6.2, a later hand-in).
   1.2; DreadField 20 m / 6 m; `call_clip` call, `rout_share` 0.5,
   `glint_drawn` 2, `glint_clip` grab_shiny, `squabble_clip` squabble.
 
+## The Hollow Hob (`HobRoamer`, bestiary §10)
+- One at `hob_silent_hollow` (-1300, 900, western fells) from `starlight_pool_found`
+  (P4). L83's `hollow_hob.gltf`, its size in the data (6.7 m standing).
+- 30 wood (300 HP, 10 each), `ash_hits` 3; the throat charm is the weak zone
+  (`charm`, ×3). Sight 27, hearing 52, scent 56; asleep, sight ×0.5. Fire ×1.5,
+  the rest plain. `reach_margin` 1.6: the knife and the sneak reach past its
+  origin (StrikeController `target()`, `knife_kind`).
+- `routine_for`: `rest` 09:00-22:00 (asleep at home holding `sleep`; curious
+  plays `eye_open` once; searching plays `sit_up` then holds `sniff`), else
+  `awake` (at home holding `count_charms`). The rest→awake turn plays `wake`
+  and counts: more charms gone than `fact.hob_charms_counted` holds sets it
+  searching (`search`) for `SEARCH_SECONDS`.
+- **Robbing it**: StrikeController asks `take_strike(kind, by)` before any
+  blow. A `sneak` or `finisher` while `is_sleeping()` (its routine sleep not
+  roused, or a sleep arrow) cuts the next charm: `fact.hob_charm.<1..8>`, the
+  `charm_N` mesh hides, `charm_cut_stir` plays, awareness rises under curious,
+  a pickup-log note, and her once-line `hob_charm_cut`. No damage. The eighth
+  cut settles the site. The charms aren't collectibles yet (item rows next).
+- **The fight**: `call_clip` `stand_roar`; `hob_swat` (strike_reach 4 m), and
+  `hob_stomp` when she's within 3 m; `hob_throw` from 6 to 25 m every 8 s,
+  aimed where she stood at the tell and landing only within 2.5 m of it.
+- Not yet: the stream it won't cross (its leash is the territory), eating a
+  sheep, `death_charm`, the snore.
+
 ## Pack behaviour (any family, by scene export)
 
 - **The call**: a member with a `call_clip` plays it as it engages.

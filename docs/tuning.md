@@ -320,6 +320,14 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Knife scale | `CreatureData.knife_scale` (gloamer_roamer in tools/creatures/gen_hostile_sites.py) | 1.0; gloamer 1.5 (12 a cut on 24 HP) | 1.0-2.0 | Her knife on that family as a multiple of its arrow damage, on top of the strike's own (Creature.resolve_hit). The common tier dies to 2 knife hits (owner's numbers) without touching the knife itself. | L75 |
 | Pack rout and glint | gloamer_roamer.tscn `rout_share`, `glint_drawn`; hostile_roamer.gd `ROUT_SECONDS`, `GLINT_SECONDS`, `GLINT_REACH` | half the pack down routs the rest for 10 s; a light arrow pulls the 2 nearest off for 8 s, grabbing within 1.2 m | share 0.3-0.7; drawn 1-2; glint 5-12 s | The pack's two outs: break half and the rest run; a glint thrown the other way buys time to pick them off. | L75 |
 
+## The Hollow Hob (L75, bestiary §10, hostile plan §5.7)
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Reach margin | `CreatureData.reach_margin` (hob_roamer in tools/creatures/gen_hostile_sites.py) | 0; Hob 1.6 m | 0-2.5 | The knife's and the sneak's reach measured past the origin of a body too big to stand in. | L75 |
+| Charm cut | hob_roamer.gd `STIR_AWARENESS`, `SEARCH_SECONDS` | a cut stirs it 0.1 (under curious); it searches 40 s at dusk for a charm gone | stir 0-0.14; search 20-90 s | Robbing it asleep is a sneak blow per charm; it never wakes from a clean cut. | L75 |
+| Rock throw | hob_roamer.gd `THROW_RANGE`, `THROW_COOLDOWN`, `THROW_SPLASH`; row `hob_throw` | 6-25 m, every 8 s, lands where she stood and hits within 2.5 m; 30 blunt, 1.0 s tell | range 15-35; cooldown 5-12 s; splash 1.5-4 m | Distance isn't safety, but moving after the boulder goes up is. | L75 |
+
 ## Wolf hunt light (L18-11)
 
 | Tunable | Where | Default | Range | What it does | Lane |

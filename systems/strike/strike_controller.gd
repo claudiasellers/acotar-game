@@ -106,6 +106,11 @@ func strike() -> bool:
 	var c := target()
 	if c:
 		var kind := StrikeController.knife_kind(c, player.global_position, _crouched(), _freed_from)
+		# A family that takes some blows its own way (the Hob's charms).
+		if c.has_method(&"take_strike") and bool(c.call(&"take_strike", kind, player)):
+			_cooldown = KNIFE_COOLDOWN
+			struck.emit(&"charm", c)
+			return true
 		if kind == &"knife" and _bow_raised():
 			return _bash(c)
 		return _knife(c, kind)
@@ -124,7 +129,7 @@ func target() -> Creature:
 		var c := node as Creature
 		if c == null or not c.alive or c.data == null:
 			continue
-		if not Creature.within_reach(player.global_position, c.global_position, reach()):
+		if not Creature.within_reach(player.global_position, c.global_position, reach() + c.data.reach_margin):
 			continue
 		var d := Creature.flat_distance(player.global_position, c.global_position)
 		var key := c.health * 10.0 + d
@@ -141,7 +146,8 @@ static func knife_kind(c: Creature, from: Vector3, crouched: bool, freed_from: S
 	if c.asleep_left > 0.0 or c.mortally_wounded or (freed_from != &"" and c.creature_id == freed_from):
 		return &"finisher"
 	var unaware := c.senses == null or c.senses.awareness < UNAWARE_BELOW
-	if unaware and Creature.within_reach(from, c.global_position, SNEAK_REACH) \
+	var margin := c.data.reach_margin if c.data else 0.0
+	if unaware and Creature.within_reach(from, c.global_position, SNEAK_REACH + margin) \
 			and (crouched or StrikeController.is_behind(c, from)):
 		return &"sneak"
 	return &"knife"
