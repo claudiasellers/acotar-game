@@ -1,0 +1,3 @@
+from soft-light-lane
+quality look
+shot rooms_night res://tools/manor_estate/room_shot.tscn dining_hall {out} 21
