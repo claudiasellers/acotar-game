@@ -6,11 +6,13 @@
 ##           holds the row its checks pick, and lets go when she has learnt it
 ##   nudged  something just happened that a key answers (`nudge`): the row
 ##           shows for a few seconds, once
-## The first row in ROWS that is wanted is the one shown. What she has learnt
+## The rows are data: one KeyHintSet per feature in data/key_hints/, each row
+## with its own priority, so a lane adding a hint touches only its own file.
+## The wanted row with the lowest priority is the one shown. What she has learnt
 ## is saved in user://settings.cfg under [prompts]; Show tips again (Tips)
 ## forgets it. A key the use prompt is naming for the thing in her reach is
 ## left to it (`shown`), so no key is on screen twice. Key hints off (GameSettings' key_hints, on the Settings page
-## and at New Game) leaves only the ALWAYS rows.
+## and at New Game) leaves only the rows marked always.
 class_name KeyHints
 extends Node
 
@@ -18,44 +20,35 @@ const NODE := "KeyHints"
 const SECTION := "prompts"
 ## Seconds a nudged row stays up.
 const NUDGE_SECONDS := 6.0
-## Hint -> its row of [action, what the key does]. No action is words alone.
-## Highest first.
-const ROWS := {
-	&"beast": [[&"interact", "throw the knife"], [&"fire", "the bracelets"], [&"", "or stand still"]],
-	&"strike_cut_free": [[&"strike", "cut free"]],
-	&"sidestep": [[&"jump", "sidestep"]],
-	&"strike_bash": [[&"strike", "bash"]],
-	&"sell": [[&"interact", "sell the pelt"]],
-	&"skin": [[&"interact", "skin"]],
-	&"sleep": [[&"interact", "sleep until night"]],
-	&"snare": [[&"interact", "check the snare"]],
-	&"retrieve": [[&"interact", "pick up the arrow"]],
-	&"whorl_mark": [[&"interact", "trace the whorl and paint your mark"], [&"", "marked stones carry you to one another"]],
-	&"whorl_ride": [[&"interact", "ride to another pair you have marked"], [&"map_open", "marked stones show on the map"]],
-	&"wolf_ash": [[&"cycle_arrow", "nock the ash arrow"]],
-	&"wolf_draw": [[&"fire", "hold to draw, let go to shoot"]],
-	&"focus": [[&"focus", "steady your breath"]],
-	&"ash": [[&"cycle_arrow", "ash arrow"]],
-	&"draw": [[&"fire", "hold to draw, let go to shoot"], [&"aim", "a closer view"]],
-	&"ride_steer": [[&"move", "steer her (lightly to walk)"]],
-	&"ride_gallop": [[&"sprint", "gallop"]],
-	&"ride_leap": [[&"jump", "leap"]],
-	&"ride_off": [[&"interact", "get down"]],
-	&"whistle": [[&"call_mount", "whistle for her"]],
-	&"tend": [[&"tend_mount", "tend her"]],
-	&"crouch": [[&"crouch", "crouch"]],
-	&"jump": [[&"jump", "jump"]],
-	&"walk": [[&"move", "walk"]],
-	&"look": [[&"look", "look around"]],
-	&"bow": [[&"cycle_bow", "change bow"]],
-	&"craft": [[&"craft_arrow", "make an arrow"]],
-	&"satchel": [[&"satchel_open", "open the satchel"]],
-	&"collection": [[&"open_collection", "open the collection"]],
-	&"map": [[&"map_open", "open the map"]],
-	&"thought": [[&"guide_open", "think on it again"]],
-}
-## Never learnt and never off: a choice she has to see for as long as it waits.
-const ALWAYS: Array[StringName] = [&"beast"]
+const DIR := "res://data/key_hints"
+
+## Hint -> its row of [action, what the key does], first to show first. Read
+## once from every KeyHintSet in DIR.
+static var _rows: Dictionary = {}
+static var _always: Array[StringName] = []
+
+
+## Every hint in the game: id -> [[action, words], ...], in the order they
+## win (KeyHintRow.priority, lowest first). No action is words alone.
+static func rows() -> Dictionary:
+	if _rows.is_empty():
+		var all: Array[KeyHintRow] = []
+		for file in ResourceLoader.list_directory(DIR):
+			if file.ends_with(".tres"):
+				all.append_array((load(DIR.path_join(file)) as KeyHintSet).rows)
+		all.sort_custom(func(a: KeyHintRow, b: KeyHintRow) -> bool: return a.priority < b.priority)
+		for r in all:
+			_rows[r.id] = r.pairs()
+			if r.always:
+				_always.append(r.id)
+	return _rows
+
+
+## Whether a row is never learnt and never off: a choice she has to see for
+## as long as it waits.
+static func always(id: StringName) -> bool:
+	rows()
+	return _always.has(id)
 
 var settings_path: String = "user://settings.cfg"
 var taught: Dictionary = {}
@@ -86,7 +79,7 @@ static func of(tree: SceneTree) -> KeyHints:
 ## A hint's row with each action named as its key is bound.
 static func row(id: StringName) -> Array:
 	var out: Array = []
-	for pair: Array in ROWS.get(id, []):
+	for pair: Array in rows().get(id, []):
 		out.append([cap(pair[0]), pair[1]])
 	return out
 
@@ -123,7 +116,7 @@ func use_settings(path: String) -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(settings_path) != OK:
 		return
-	for id: StringName in ROWS:
+	for id: StringName in rows():
 		if bool(cfg.get_value(SECTION, String(id), false)):
 			taught[id] = true
 
@@ -135,12 +128,12 @@ func forget_taught() -> void:
 
 ## Whether a row is still to be taught: hints are on and she hasn't used it.
 func teaches(id: StringName) -> bool:
-	return ALWAYS.has(id) or (bool(GameSettings.get_value(&"key_hints")) and not taught.get(id, false))
+	return always(id) or (bool(GameSettings.get_value(&"key_hints")) and not taught.get(id, false))
 
 
 ## She has used the key: the row won't show again.
 func learn(id: StringName) -> void:
-	if taught.get(id, false) or ALWAYS.has(id):
+	if taught.get(id, false) or always(id):
 		return
 	taught[id] = true
 	var cfg := ConfigFile.new()
@@ -160,19 +153,19 @@ func hold(holder: Node, id: StringName) -> void:
 ## Something just happened that row `id`'s key answers: it shows for a few
 ## seconds, this once. Not while a scene holds her hands.
 func nudge(id: StringName) -> void:
-	if ALWAYS.has(id) or not teaches(id) or not StoryControl.can_interact():
+	if always(id) or not teaches(id) or not StoryControl.can_interact():
 		return
 	_nudged[id] = NUDGE_SECONDS
 	learn(id)
 
 
-## The row to show now: the first in ROWS that is held or nudged.
+## The row to show now: the first of rows() that is held or nudged.
 func wanted() -> StringName:
 	for holder: int in _held.keys():
 		if not is_instance_id_valid(holder) or not (instance_from_id(holder) as Node).is_inside_tree():
 			_held.erase(holder)
 	var held := _held.values()
-	for id: StringName in ROWS:
+	for id: StringName in rows():
 		if _nudged.has(id) or (held.has(id) and teaches(id)):
 			return id
 	return &""
@@ -181,13 +174,13 @@ func wanted() -> StringName:
 ## Row `id` as it shows now. While the use prompt names a key for the thing
 ## in her reach, a pair on that key is left out: the key is on screen once,
 ## with the verb of the thing itself, and the row keeps what else it says.
-## The ALWAYS rows are a choice and are never cut.
+## A row marked always is a choice and are never cut.
 func shown(id: StringName) -> Array:
 	var offered := UsePrompt.of(get_tree()).offered()
-	if offered.is_empty() or ALWAYS.has(id):
+	if offered.is_empty() or always(id):
 		return row(id)
 	var out: Array = []
-	for pair: Array in ROWS.get(id, []):
+	for pair: Array in rows().get(id, []):
 		if pair[0] != offered[1]:
 			out.append([cap(pair[0]), pair[1]])
 	return out

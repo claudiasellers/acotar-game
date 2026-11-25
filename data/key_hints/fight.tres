@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="strike_cut_free"]
+script = ExtResource("1")
+id = &"strike_cut_free"
+priority = 20
+keys = Array[StringName]([&"strike"])
+says = PackedStringArray("cut free")
+always = false
+
+[sub_resource type="Resource" id="sidestep"]
+script = ExtResource("1")
+id = &"sidestep"
+priority = 30
+keys = Array[StringName]([&"jump"])
+says = PackedStringArray("sidestep")
+always = false
+
+[sub_resource type="Resource" id="strike_bash"]
+script = ExtResource("1")
+id = &"strike_bash"
+priority = 40
+keys = Array[StringName]([&"strike"])
+says = PackedStringArray("bash")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("strike_cut_free"), SubResource("sidestep"), SubResource("strike_bash")])

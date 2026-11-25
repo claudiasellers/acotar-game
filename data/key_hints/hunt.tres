@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="sell"]
+script = ExtResource("1")
+id = &"sell"
+priority = 50
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("sell the pelt")
+always = false
+
+[sub_resource type="Resource" id="skin"]
+script = ExtResource("1")
+id = &"skin"
+priority = 60
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("skin")
+always = false
+
+[sub_resource type="Resource" id="sleep"]
+script = ExtResource("1")
+id = &"sleep"
+priority = 70
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("sleep until night")
+always = false
+
+[sub_resource type="Resource" id="snare"]
+script = ExtResource("1")
+id = &"snare"
+priority = 80
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("check the snare")
+always = false
+
+[sub_resource type="Resource" id="retrieve"]
+script = ExtResource("1")
+id = &"retrieve"
+priority = 90
+keys = Array[StringName]([&"interact"])
+says = PackedStringArray("pick up the arrow")
+always = false
+
+[sub_resource type="Resource" id="focus"]
+script = ExtResource("1")
+id = &"focus"
+priority = 120
+keys = Array[StringName]([&"focus"])
+says = PackedStringArray("steady your breath")
+always = false
+
+[sub_resource type="Resource" id="ash"]
+script = ExtResource("1")
+id = &"ash"
+priority = 130
+keys = Array[StringName]([&"cycle_arrow"])
+says = PackedStringArray("ash arrow")
+always = false
+
+[sub_resource type="Resource" id="draw"]
+script = ExtResource("1")
+id = &"draw"
+priority = 140
+keys = Array[StringName]([&"fire", &"aim"])
+says = PackedStringArray("hold to draw, let go to shoot", "a closer view")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("sell"), SubResource("skin"), SubResource("sleep"), SubResource("snare"), SubResource("retrieve"), SubResource("focus"), SubResource("ash"), SubResource("draw")])

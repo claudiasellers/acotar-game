@@ -233,7 +233,7 @@ func test_meeting_the_wolf_names_ash_then_the_shot_then_her_breath() -> void:
 	assert_eq(prompts.want(), &"", "each of the three, once")
 	EventBus.scene_space_finished.emit(&"wolf_kill")
 	for row: StringName in [&"wolf_ash", &"wolf_draw"]:
-		assert_eq((KeyHints.ROWS[row] as Array).size(), 1, "one key at a time")
+		assert_eq((KeyHints.rows()[row] as Array).size(), 1, "one key at a time")
 
 
 func test_hints_off_hides_every_taught_key() -> void:
@@ -251,9 +251,9 @@ func test_hints_off_hides_every_taught_key() -> void:
 
 
 func test_every_prompt_names_a_key() -> void:
-	for id: StringName in KeyHints.ROWS:
+	for id: StringName in KeyHints.rows():
 		for pair: Array in KeyHints.row(id):
-			if (KeyHints.ROWS[id] as Array).size() == 1:
+			if (KeyHints.rows()[id] as Array).size() == 1:
 				assert_ne(pair[0], "", "%s has a key cap" % id)
 	assert_eq(KeyHints.cap(&"move"), String(InputSettings.SCHEME_NAMES[InputSettings.scheme]), "the keys she chose")
 	assert_eq(KeyHints.cap(&"look"), "Mouse")

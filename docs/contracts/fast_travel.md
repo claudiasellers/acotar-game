@@ -6,7 +6,7 @@ Owner: the fast-travel lane (L74). Paths: `systems/fast_travel/`,
 Outside: `add_child(WhorlStones.new())` in `story/act1/act1_game.gd`, and
 one `WhorlMapMarks.draw_all(...)` call each in L07's `ui/map/full_map.gd` and
 `ui/map/minimap.gd` (owner ask, 2026-11-17: "set a marker for them on the map"),
-and two rows, `whorl_mark` and `whorl_ride`, in the UI lane's `KeyHints.ROWS`
+and two rows, `whorl_mark` and `whorl_ride`, in `data/key_hints/whorl.tres` (the UI lane's `KeyHints` table)
 (`ui/hud/key_hints.gd`; owner ask, 2026-11-25: "i need another tip set for
 when im around those").
 
