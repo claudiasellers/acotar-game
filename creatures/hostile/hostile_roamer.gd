@@ -146,6 +146,7 @@ func _arm() -> void:
 	if carried_weapon == &"" or animator == null:
 		return
 	if not GearModel.exists(carried_weapon):
+		push_error("%s carries %s, which has no model" % [name, carried_weapon])
 		return
 	var hand := animator.socket(&"hand_r")
 	var m: Node3D = GearModel.instance(carried_weapon) if hand else null

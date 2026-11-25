@@ -9,7 +9,6 @@ extends Node3D
 
 const STATION_ID := &"camp_loot"
 const GROUP := &"station"
-const MODEL := "res://art/monster_gear/%s.glb"
 ## WorldState fact: the Clock.day this site's container was last emptied.
 const TAKEN_FLAG := "fact.camp_loot_taken.%s"
 
@@ -46,16 +45,14 @@ static func place(site: HostileSite) -> CampContainer:
 
 func _ready() -> void:
 	add_to_group(GROUP)
-	var m: Node3D = GearModel.instance(table.camp_container) if table else null
+	if table == null or table.camp_container == &"":
+		return
+	# L88's model (every camp container has one); no light of its own.
+	var m := GearModel.instance(table.camp_container)
 	if m:
 		add_child(m)
-	var glint := OmniLight3D.new()
-	glint.name = "Glint"
-	glint.light_color = Color(1.0, 0.86, 0.62)
-	glint.light_energy = 0.3
-	glint.omni_range = 1.5
-	glint.position.y = 0.4
-	add_child(glint)
+	else:
+		push_error("CampContainer: %s has no model" % table.camp_container)
 
 
 func open_now() -> bool:

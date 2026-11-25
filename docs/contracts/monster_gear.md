@@ -6,7 +6,10 @@ one `art/monster_gear/<id>.glb` per item id. The game loads a model when its
 file exists and never builds a stand-in. `GearModel` (`systems/weapons/gear_model.gd`)
 is the one setup: `_lod1` hidden, `<id>_worn` shown instead of `<id>` when worn,
 PropFinishes on the "opaque" and "clear" surfaces, and a drop laid by the
-manifest's `rest_deg` and `rest_lift_m`. The manifest's `reach_m` is the
+manifest's `rest_deg` and `rest_lift_m` (required: every weapon and camp
+container has its model and row, and a missing one is a `push_error`, with no
+drop spawned). Drops and containers carry no light; they read as takeable
+through the Interactor's prompt, like every pickup. The manifest's `reach_m` is the
 model's grip-to-tip length; `WeaponData.reach_m` is the game's reach from her
 centre, and the two are separate on purpose.
 
