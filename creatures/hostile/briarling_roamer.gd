@@ -65,8 +65,28 @@ static func wind_of(m: Material) -> float:
 		return 0.0
 	var v: Variant = sm.get_shader_parameter(&"wind_amount")
 	if v == null:
+		# The shader's own default, from its source: a headless renderer keeps none.
+		v = BriarlingRoamer.source_default(sm.shader.code, "wind_amount")
+	if v == null:
 		v = RenderingServer.shader_get_parameter_default(sm.shader.get_rid(), &"wind_amount")
 	return float(v) if v != null else 0.0
+
+
+## A float uniform's default as written in shader source, following its
+## #include files; null when it isn't there.
+static func source_default(code: String, uniform: String) -> Variant:
+	var re := RegEx.create_from_string("uniform\\s+float\\s+%s\\b[^=;]*=\\s*([-0-9.]+)" % uniform)
+	var hit := re.search(code)
+	if hit:
+		return hit.get_string(1).to_float()
+	var inc := RegEx.create_from_string("#include\\s+\"([^\"]+)\"")
+	for h in inc.search_all(code):
+		var si := load(h.get_string(1)) as ShaderInclude
+		if si:
+			var v: Variant = BriarlingRoamer.source_default(si.code, uniform)
+			if v != null:
+				return v
+	return null
 
 
 static func is_active(hour: float) -> bool:

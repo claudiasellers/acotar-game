@@ -18,6 +18,8 @@ func before_each() -> void:
 	hour = 22.0
 	day = 5
 	startles.clear()
+	# A camp another test settled would stay settled and lead nowhere.
+	WorldState.clear()
 	EventBus.player_startled.connect(_on_startled)
 
 
