@@ -46,7 +46,7 @@ func test_blight_is_crows_only_and_sparse() -> void:
 	var table := load("res://data/creatures/spawn/blighted_reaches.tres") as CreatureSpawnTable
 	var total := 0
 	for e in table.entries:
-		if e.scene.resource_path.begins_with("res://creatures/hostile/sites/"):
+		if _is_hostile_site(e.scene):
 			continue
 		assert_eq(e.scene.resource_path.get_file(), "crow.tscn")
 		total += e.count * e.groups
@@ -64,3 +64,12 @@ func test_owls_by_night_fireflies_at_dusk() -> void:
 		if e.id == &"fireflies":
 			assert_true(e.active_at(21.0))
 			assert_false(e.active_at(14.0))
+
+
+## A hostile camp's entry: its scene's root is a HostileSite (out of the
+## tree, so no members are raised).
+func _is_hostile_site(scene: PackedScene) -> bool:
+	var root := scene.instantiate()
+	var site := root is HostileSite
+	root.free()
+	return site
