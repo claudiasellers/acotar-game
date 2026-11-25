@@ -138,8 +138,8 @@ func _change_form(next: Form, seconds: float) -> void:
 
 
 ## The body's clip for its form: `unfold` and `fold` once, and the `bush`
-## pose for as long as it is a bush (played again whenever it runs out, so a
-## flinch or a fold gives way back to it).
+## pose held (CreatureAnimator.hold) for as long as it is a bush; a flinch
+## that takes the action layer gives way back to it.
 func _show_form() -> void:
 	if animator == null or not alive:
 		return
@@ -150,7 +150,7 @@ func _show_form() -> void:
 			animator.play_oneshot(FOLD_CLIP)
 		Form.BUSH:
 			if animator.action_clip() != BUSH_CLIP:
-				animator.play_oneshot(BUSH_CLIP)
+				animator.hold(BUSH_CLIP)
 
 
 func _at_home() -> bool:

@@ -25,6 +25,11 @@ const ROWS := [
 	[&"martax_roar", &"martax", false, 0.0, &"blunt", &"none", 0.0, &"roar_shake", 0.8, 6.0, 0.25, true, 0.0],
 	[&"prowler_grab", &"prowler", true, 0.0, &"grab", &"none", 0.0, &"", 0.0, 0.0, 0.3, true, 0.0],
 	[&"wolf_bite", &"wolf", true, 25.0, &"bite", &"medium", 2.0, &"", 0.0, 0.0, 0.2, true, 0.0],
+	# The common tier (bestiary §16, §17): gloamer packs, brackenhound packs.
+	[&"gloamer_rake", &"gloamer", true, 8.0, &"claw", &"light", 0.5, &"", 0.0, 0.0, 0.1, true, 0.0],
+	[&"gloamer_shove", &"gloamer", false, 12.0, &"blunt", &"medium", 1.0, &"", 0.0, 0.0, 0.12, true, 0.0],
+	[&"brackenhound_bite", &"brackenhound", true, 10.0, &"claw", &"medium", 1.0, &"", 0.0, 0.0, 0.12, true, 0.0],
+	[&"brackenhound_pounce", &"brackenhound", false, 16.0, &"blunt", &"heavy", 3.0, &"", 0.0, 0.0, 0.2, true, 0.0],
 	# Hazard rows (vitals lane).
 	[&"thorns", &"", false, 3.0, &"thorn", &"light", 0.0, &"", 0.0, 0.0, 0.0, false, 25.0],
 	[&"fire", &"", false, 6.0, &"fire", &"light", 0.0, &"", 0.0, 0.0, 0.05, false, 10.0],
@@ -54,6 +59,10 @@ const WINDUP := {
 	&"martax_roar": 0.6,
 	&"prowler_grab": 0.6,
 	&"wolf_bite": 0.55,
+	&"gloamer_rake": 0.45,
+	&"gloamer_shove": 0.6,
+	&"brackenhound_bite": 0.55,
+	&"brackenhound_pounce": 0.8,
 }
 
 ## Grab rows: [presses to break, seconds it holds, fail strike scale]
