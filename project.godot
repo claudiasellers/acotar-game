@@ -148,6 +148,46 @@ map_minimap={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":78)]
 }
+crouch={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":4194326), Object(InputEventJoypadButton,"device":-1,"button_index":1)]
+}
+open_collection={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":74), Object(InputEventJoypadButton,"device":-1,"button_index":4)]
+}
+call_mount={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":72), Object(InputEventJoypadButton,"device":-1,"button_index":15)]
+}
+debug_chemistry={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":4194339)]
+}
+satchel_open={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":73), Object(InputEventKey,"device":-1,"physical_keycode":4194306)]
+}
+quick_chord={
+"deadzone": 0.2,
+"events": [Object(InputEventJoypadButton,"device":-1,"button_index":9)]
+}
+quick_1={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":49)]
+}
+quick_2={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":50)]
+}
+quick_3={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":51)]
+}
+quick_4={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":52)]
+}
 
 [navigation]
 

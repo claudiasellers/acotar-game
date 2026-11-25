@@ -103,7 +103,6 @@ static func find(tree: SceneTree) -> ElementField:
 func _ready() -> void:
 	add_to_group(GROUP)
 	top_level = true
-	_ensure_action()
 	_fx = FireFx.new()
 	_fx.name = "FireFx"
 	add_child(_fx)
@@ -642,12 +641,3 @@ func debug_cells() -> Array:
 			c = Color(0.35, 0.55, 1.0)
 		out.append([_pos[id], c])
 	return out
-
-
-func _ensure_action() -> void:
-	if InputMap.has_action(DEBUG_ACTION):
-		return
-	InputMap.add_action(DEBUG_ACTION)
-	var key := InputEventKey.new()
-	key.physical_keycode = KEY_F8
-	InputMap.action_add_event(DEBUG_ACTION, key)

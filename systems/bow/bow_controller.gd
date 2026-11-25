@@ -103,7 +103,6 @@ var _last_aim: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
-	SatchelHud.ensure_actions()
 	feyre = get_parent() as Feyre
 	bow = feyre.bow
 	reticle = AimReticle.new(self)
