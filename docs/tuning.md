@@ -214,6 +214,8 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `min_power` | bow_tuning.tres | 0.35 | 0.25–0.5 | The share of the bow's speed an arrow leaves at with no draw; a full draw is 1.0 | L80 |
 | `short_draw` | bow_tuning.tres | 0.5 | 0.3–0.7 | A shot let go under this much draw counts as short (her one thought about drawing farther) | L80 |
 | `stay_up_s` | bow_tuning.tres | 1.6 | 1–3 | Seconds the bow stays in her hands after the last shot or hold | L80 |
+| `BowVisual.SWING_SPEED` | systems/bow/bow_visual.gd | 6 per second (about 0.17 s up or down) | 4–10 | How fast the bow comes up into her hands and goes back down, on real time | L80 |
+| `BowVisual.READY_HOLD` | systems/bow/bow_visual.gd | 2.5 s | 1.5–4 | Seconds the bow stays in her hands after she changes or makes an arrow without drawing | L80 |
 | `hip_sway` | bow_tuning.tres | 1.3 | 1.2–2.5 | Sway without aim held, against 1.0 with it | L80 |
 | `FeyreCamera.HIP_SHOULDER` | characters/feyre/camera/feyre_camera.gd | 0.85 m (aim held: `AIM_SHOULDER` 0.55) | 0.7–1.1 | How far over her right shoulder the lens sits with the bow up and no aim held, on the full arm; it shrinks to the aim offset on a short arm. Sets how far the ring stands from her body | L80 |
 | `HIP_RING_CLEAR_PX` | tests/unit/characters/test_hip_framing.gd | 64 px at 1080 high (measured 93–104; was 41–47 at 0.55) | 48–96 | The least distance on screen between her capsule's right edge and the ring from the hip, at rest, at full draw and looking down | L80 |
