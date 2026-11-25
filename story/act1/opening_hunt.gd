@@ -21,6 +21,7 @@ const THOUGHTS := {
 	&"snare": "res://data/guide/onboarding/snare.tres",
 	&"rabbit_gone": "res://data/guide/onboarding/rabbit_gone.tres",
 	&"winded": "res://data/guide/onboarding/winded.tres",
+	&"three_arrows": "res://data/guide/onboarding/three_arrows.tres",
 }
 const GROUP := &"opening_hunt"
 const SNARE_GROUP := &"opening_snare"
@@ -69,6 +70,7 @@ var rabbit: Prey
 var snare_checked: bool = false
 var rabbit_done: bool = false
 var winded_shown: bool = false
+var arrows_shown: bool = false
 var _bolted_for: float = -1.0
 var _was_nocked: bool = false
 var _release_hooked: bool = false
@@ -87,13 +89,14 @@ func _exit_tree() -> void:
 
 
 func save_state() -> Dictionary:
-	return {"snare": snare_checked, "rabbit": rabbit_done, "winded": winded_shown}
+	return {"snare": snare_checked, "rabbit": rabbit_done, "winded": winded_shown, "arrows": arrows_shown}
 
 
 func load_state(data: Dictionary) -> void:
 	snare_checked = bool(data.get("snare", false))
 	rabbit_done = bool(data.get("rabbit", false)) or snare_checked
 	winded_shown = bool(data.get("winded", false))
+	arrows_shown = bool(data.get("arrows", false))
 
 
 ## Where the snare sits: about SNARE_ALONG metres down the doe trail, to its
@@ -186,6 +189,7 @@ func _process(delta: float) -> void:
 		_release_hooked = true
 		feyre.bow_released.connect(func(at: Vector3, _loudness: float) -> void: on_release(at))
 	_watch_winded(feyre)
+	_watch_first_nock(feyre)
 	var at := Vector2(feyre.global_position.x, feyre.global_position.z)
 	if not snare_checked and snare == null and at.distance_to(snare_spot()) <= BUILD_RADIUS:
 		snare = _build_snare()
@@ -313,6 +317,16 @@ func _watch_winded(feyre: Feyre) -> void:
 	if feyre.stamina < feyre.max_stamina * WINDED_AT:
 		winded_shown = true
 		_think(&"winded")
+
+
+## The first arrow she ever puts to the string: what she carries, and which
+## one matters (UX review O6). Only while the ash arrow is still hers.
+func _watch_first_nock(feyre: Feyre) -> void:
+	if arrows_shown or feyre.bow_controller == null or not feyre.bow_controller.is_nocked:
+		return
+	arrows_shown = true
+	if Gameplay.inventory.arrow_count(&"arrow_ash") > 0:
+		_think(&"three_arrows")
 
 
 func _think(id: StringName) -> void:
