@@ -8,7 +8,8 @@
 ##           shows for a few seconds, once
 ## The first row in ROWS that is wanted is the one shown. What she has learnt
 ## is saved in user://settings.cfg under [prompts]; Show tips again (Tips)
-## forgets it. Key hints off (GameSettings' key_hints, on the Settings page
+## forgets it. A key the use prompt is naming for the thing in her reach is
+## left to it (`shown`), so no key is on screen twice. Key hints off (GameSettings' key_hints, on the Settings page
 ## and at New Game) leaves only the ALWAYS rows.
 class_name KeyHints
 extends Node
@@ -170,6 +171,21 @@ func wanted() -> StringName:
 	return &""
 
 
+## Row `id` as it shows now. While the use prompt names a key for the thing
+## in her reach, a pair on that key is left out: the key is on screen once,
+## with the verb of the thing itself, and the row keeps what else it says.
+## The ALWAYS rows are a choice and are never cut.
+func shown(id: StringName) -> Array:
+	var offered := UsePrompt.of(get_tree()).offered()
+	if offered.is_empty() or ALWAYS.has(id):
+		return row(id)
+	var out: Array = []
+	for pair: Array in ROWS.get(id, []):
+		if pair[0] != offered[1]:
+			out.append([cap(pair[0]), pair[1]])
+	return out
+
+
 func text() -> String:
 	return _prompt.text()
 
@@ -179,9 +195,10 @@ func _process(delta: float) -> void:
 		_book = Gameplay.collection
 		_book.discovered.connect(func(_entry: StringName, _tab: StringName) -> void: nudge(&"collection"))
 	current = wanted()
+	var showing := shown(current)
 	# A nudge's seconds run only while it is the row showing.
-	if _nudged.has(current):
+	if _nudged.has(current) and not showing.is_empty():
 		_nudged[current] -= delta
 		if _nudged[current] <= 0.0:
 			_nudged.erase(current)
-	_prompt.says(row(current))
+	_prompt.says(showing)
