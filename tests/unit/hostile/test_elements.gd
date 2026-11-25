@@ -1,6 +1,7 @@
 ## Element rows (design reconciliation §3 item 4; hostile plan §7; progression
 ## §8b.5): each family's row scales a steeped arrow's damage and effect.
 ## Weak bursts big and sends it thrashing away; resisted does nothing at all.
+## The first weakness per element, and the first resist, is her thought (G24).
 extends GutTest
 
 const NAGA := preload("res://creatures/hostile/naga_roamer.tscn")
@@ -15,11 +16,14 @@ func before_each() -> void:
 	_fx = HostileElements.show_fx
 	HostileElements.show_fx = false
 	WorldState.clear()
+	LinePresenter.of(get_tree()).clear()
 	EventBus.hostile_element_reacted.connect(_on_reacted)
 
 
 func after_each() -> void:
 	HostileElements.show_fx = _fx
+	LinePresenter.of(get_tree()).clear()
+	WorldState.clear()
 	if EventBus.hostile_element_reacted.is_connected(_on_reacted):
 		EventBus.hostile_element_reacted.disconnect(_on_reacted)
 
@@ -149,3 +153,42 @@ func test_a_weak_burst_is_big_and_a_resisted_one_dull() -> void:
 			HostileElements.sound(&"fire", &"resisted").get_length() * 4.0, "a whoomph, not a tick")
 	for p in after:
 		p.queue_free()
+
+
+# --- G24: her first-time thoughts ------------------------------------------------
+
+func _thought() -> String:
+	return LinePresenter.of(get_tree()).stand_of(LinePresenter.Voice.THOUGHT).showing
+
+
+func test_the_first_weakness_is_her_thought_once() -> void:
+	var n := _naga()
+	n.on_arrow_effect(&"frost", _arrow(&"frost", n.global_position))
+	assert_eq(_thought(), "The cold bit deep. It hated that.", "the rime's own line, in her inner voice")
+	assert_true(WorldState.has_flag(HostileElements.THOUGHT_FLAG % &"hostile_element_weak_rime"), "kept with the save")
+	assert_eq(HostileElements.think(n, &"frost", &"weak"), &"", "and never again")
+	assert_eq(HostileElements.think(n, &"fire", &"weak"), &"hostile_element_weak_ember", "each element has its own first time")
+
+
+func test_every_element_has_its_own_weak_line() -> void:
+	for e: StringName in HostileElements.ELEMENTS:
+		var t := HostileElements.thought_for(e, &"weak")
+		assert_eq(t.size(), 2, String(e))
+		assert_ne(t[0], HostileElements.WEAK_THOUGHT[0], "%s has a line of its own" % e)
+		assert_false(String(t[1]).is_empty())
+	assert_eq(HostileElements.thought_for(&"no_such", &"weak"), HostileElements.WEAK_THOUGHT, "anything else: the fallback")
+	assert_eq(HostileElements.thought_for(&"fire", &"normal"), [], "a normal hit thinks nothing")
+
+
+func test_the_first_resist_is_her_thought_once() -> void:
+	var n := _naga({&"fire": 0.0, &"frost": 0.0})
+	var at := n.global_position + Vector3.UP * 0.8
+	n.on_arrow_effect(&"fire", _arrow(&"fire", at))
+	assert_eq(_thought(), "Like shooting a stone. Not that, then.")
+	assert_eq(HostileElements.think(n, &"frost", &"resisted"), &"", "one resist line per save, any element")
+
+
+func test_a_normal_hit_says_nothing() -> void:
+	var n := _naga()
+	n.on_arrow_effect(&"light", _arrow(&"light", n.global_position))
+	assert_eq(_thought(), "", "light is normal on a naga: no thought")
