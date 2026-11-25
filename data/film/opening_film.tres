@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FilmScript" load_steps=52 format=3]
+[gd_resource type="Resource" script_class="FilmScript" load_steps=54 format=3]
 
 [ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
 [ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
@@ -134,41 +134,59 @@ canon = "C"
 script = ExtResource("2_line")
 id = &"op_15"
 at = 133.8
-hold = 25.8
+hold = 7.0
 speaker = &""
-text = "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich. Three years after she died, he spent every coin we had sending three ships across the sea to trade for spices and cloth. All three sank. The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."
+text = "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich."
 canon = "A"
 
 [sub_resource type="Resource" id="L15"]
 script = ExtResource("2_line")
 id = &"op_16"
+at = 141.0
+hold = 8.4
+speaker = &""
+text = "Three years after she died, he spent every coin we had sending three ships across the sea to trade for spices and cloth. All three sank."
+canon = "A"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("2_line")
+id = &"op_17"
+at = 149.6
+hold = 10.0
+speaker = &""
+text = "The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."
+canon = "A"
+
+[sub_resource type="Resource" id="L17"]
+script = ExtResource("2_line")
+id = &"op_18"
 at = 160.0
 hold = 6.0
 speaker = &""
 text = "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."
 canon = "C"
 
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("2_line")
-id = &"op_17"
+id = &"op_19"
 at = 166.4
 hold = 2.2
 speaker = &""
 text = "So I hunt."
 canon = "C"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L19"]
 script = ExtResource("2_line")
-id = &"op_18"
+id = &"op_20"
 at = 168.4
 hold = 3.0
 speaker = &""
 text = "They say some of them are getting through the Wall now, into these woods. Out of Prythian."
 canon = "C"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L20"]
 script = ExtResource("2_line")
-id = &"op_19"
+id = &"op_21"
 at = 171.3
 hold = 2.0
 speaker = &""
@@ -327,5 +345,5 @@ length = 185.0
 music_cue = &"music_opening_film"
 seen_flag = ""
 bars = 1.0
-lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18")])
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20")])
 beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16"), SubResource("B17"), SubResource("B18"), SubResource("B19"), SubResource("B20"), SubResource("B21"), SubResource("B22"), SubResource("B23"), SubResource("B24"), SubResource("B25"), SubResource("B26"), SubResource("B27"), SubResource("B28")])
