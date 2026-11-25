@@ -120,6 +120,20 @@ func _process(delta: float) -> void:
 
 ## Shows the next untaught status's slip, one at a time, while its chip is up.
 func _step_teach(delta: float) -> void:
+	if _hushed():
+		# A staged moment or dread: a slip mid-showing goes back to wait its
+		# turn, untaught, so the player reads only what the moment needs.
+		if teaching != &"" and _teach_left > TEACH_FADE:
+			_unteach(teaching)
+			teach_queue.push_front(teaching)
+			teaching = &""
+		_slip.visible = teaching != &""
+		if teaching != &"":
+			_teach_left -= delta
+			_slip.modulate.a = clampf(_teach_left / TEACH_FADE, 0.0, 1.0)
+			if _teach_left <= 0.0:
+				teaching = &""
+		return
 	if teaching != &"":
 		_teach_left -= delta
 		if _teach_left <= 0.0 or not _is_up(teaching):
@@ -144,6 +158,21 @@ func forget_taught() -> void:
 func offer(tag: StringName) -> void:
 	if not taught.has(tag) and tag != teaching and not teach_queue.has(tag):
 		teach_queue.append(tag)
+
+
+## Slips wait out what UiMode calls quiet: any staged or held moment, a film,
+## an open screen, or dread in the air.
+func _hushed() -> bool:
+	return is_inside_tree() and UiMode.quiet(get_tree())
+
+
+func _unteach(tag: StringName) -> void:
+	taught.erase(tag)
+	var cfg := ConfigFile.new()
+	cfg.load(settings_path)
+	if cfg.has_section_key(TAUGHT_SECTION, String(tag)):
+		cfg.erase_section_key(TAUGHT_SECTION, String(tag))
+	cfg.save(settings_path)
 
 
 ## A slip only shows while what it names is on screen.

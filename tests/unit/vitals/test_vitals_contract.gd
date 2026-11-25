@@ -205,6 +205,7 @@ func test_every_status_tag_has_a_name_and_a_line() -> void:
 
 func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 	var path := "user://test_status_taught.cfg"
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -225,6 +226,7 @@ func test_a_chip_is_taught_once_then_named_on_hover() -> void:
 
 func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	var path := "user://test_gauge_taught.cfg"
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var row := VitalsStatusRow.new()
 	row.settings_path = path
@@ -243,6 +245,33 @@ func test_a_gauge_is_taught_when_it_bites_and_meters_on_offer() -> void:
 	assert_eq(row.teaching, &"health", "a meter is taught on offer")
 	assert_ne(StatusRules.blurb(&"stamina"), "")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func test_slips_wait_out_a_staged_moment_and_dread_ends_ease() -> void:
+	var path := "user://test_status_hushed.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+	var row := VitalsStatusRow.new()
+	row.settings_path = path
+	add_child_autofree(row)
+	var list: Array[Dictionary] = [{"tag": &"steady", "magnitude": 1.0, "seconds_left": 30.0, "total": 60.0}]
+	row.set_statuses(list)
+	row._process(0.1)
+	assert_eq(row.teaching, &"steady")
+	StoryControl.set_mode(StoryControl.Mode.WALK)
+	row._process(0.1)
+	assert_eq(row.teaching, &"", "a staged moment sends the slip back")
+	assert_false(row.taught.has(&"steady"), "untaught, so it comes again")
+	StoryControl.set_mode(StoryControl.Mode.FULL)
+	row._process(0.1)
+	assert_eq(row.teaching, &"steady", "taught once she is free")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	v.ease_pulse = 0.8
+	assert_true(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
+	EventBus.mood_requested.emit(&"dread", 0.6, 0.0)
+	assert_eq(v.ease_pulse, 0.0, "fear ends the moment of ease")
+	assert_false(v.statuses().any(func(s: Dictionary) -> bool: return s.tag == &"at_ease"))
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
 
 
 func test_she_has_a_thought_on_waking() -> void:
