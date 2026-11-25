@@ -51,6 +51,13 @@ const GRASS_CLUMP := "grass_clump"
 
 var _task := -1
 var _layers := {}
+## The threaded build's main-thread half, one small step per entry, run under
+## FrameBudget a few a frame (T161: built in one go, a neighbour streaming in
+## cost the ride a 60-220 ms frame). build_now() runs what is left at once.
+var _steps: Array[Callable] = []
+## Bumped whenever a paced warm-up or build is abandoned (left the tree).
+var _gen := 0
+var _warming := false
 
 
 func _ready() -> void:
@@ -58,10 +65,31 @@ func _ready() -> void:
 		push_error("CourtRegion '%s' has no content" % name)
 		return
 	if threaded:
-		prewarm(content)
-		_start()
+		_begin()
 	else:
 		build()
+
+
+## The threaded path: warm the caches on the main thread a model at a time,
+## then generate on a worker.
+func _begin() -> void:
+	_gen += 1
+	_warming = true
+	_warm_then_start(weakref(self), _gen, BuildPace.new(get_tree(), content.region_id))
+
+
+static func _warm_then_start(ref: WeakRef, gen: int, pace: BuildPace) -> void:
+	var r := ref.get_ref() as CourtRegion
+	if r == null:
+		return
+	for step in prewarm_steps(r.content):
+		step.call()
+		await pace.tick()
+		r = ref.get_ref() as CourtRegion
+		if r == null or r._gen != gen:
+			return
+	r._warming = false
+	r._start()
 
 
 ## Loads every model and fills the static caches on the main thread, so the
@@ -70,19 +98,25 @@ func _ready() -> void:
 ## forage_layers / decor_layers ask for, places included
 ## (tests/unit/landscape/test_place_composition.gd checks that).
 static func prewarm(c: CourtRegionContent) -> void:
-	CourtHeight.prewarm()
-	WorldHeight.height_at(0.0, 0.0)
+	for step in prewarm_steps(c):
+		step.call()
+
+
+## prewarm() as separate steps (one model each), for a paced warm-up.
+static func prewarm_steps(c: CourtRegionContent) -> Array[Callable]:
+	var out: Array[Callable] = [CourtHeight.prewarm, WorldHeight.height_at.bind(0.0, 0.0)]
 	for e in c.forage:
-		CourtAssets.mesh(e.model_id())
+		out.append(CourtAssets.mesh.bind(e.model_id()))
 	for d in c.decor:
-		CourtAssets.mesh(d.mesh_id)
+		out.append(CourtAssets.mesh.bind(d.mesh_id))
 		if d.is_tree:
-			CourtAssets.mesh(d.mesh_id, true)
+			out.append(CourtAssets.mesh.bind(d.mesh_id, true))
 			# The tree set: every build and step the scatter splits them over.
-			CourtTreeSet.prewarm([d.mesh_id])
-	PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), c.bounding_rect()))
+			out.append(CourtTreeSet.prewarm.bind([d.mesh_id]))
+	out.append(func() -> void: PlaceComposer.prewarm(PlaceComposer.in_rect(PlaceComposer.table(), c.bounding_rect())))
 	if c.place_planting != &"":
-		CourtPlacePlants.prewarm()
+		out.append(CourtPlacePlants.prewarm)
+	return out
 
 
 func _start() -> void:
@@ -90,21 +124,41 @@ func _start() -> void:
 	_task = WorkerThreadPool.add_task(_generate, false, "court_region_%s" % content.region_id)
 
 
-## Back in the tree after leaving mid-build (the cancelled worker's partial
-## layers were dropped): generate again.
+## Back in the tree after leaving mid-build: a paced build carries on where
+## it stopped; a cancelled worker's partial layers were dropped, so generate again.
 func _enter_tree() -> void:
-	if is_node_ready() and content != null and threaded and not is_built and _task < 0 and _layers.is_empty():
-		_start()
+	if not is_node_ready() or content == null or not threaded or is_built:
+		return
+	if not _steps.is_empty():
+		_gen += 1
+		_run_paced(weakref(self), _gen, BuildPace.new(get_tree(), content.region_id))
+	elif _task < 0 and _layers.is_empty():
+		_begin()
 
 
 func _process(_delta: float) -> void:
 	if _task >= 0 and WorkerThreadPool.is_task_completed(_task):
 		WorkerThreadPool.wait_for_task_completion(_task)
 		_task = -1
-		_finish()
+		_plan_finish()
+		_gen += 1
+		_run_paced(weakref(self), _gen, BuildPace.new(get_tree(), content.region_id))
+
+
+static func _run_paced(ref: WeakRef, gen: int, pace: BuildPace) -> void:
+	while true:
+		var r := ref.get_ref() as CourtRegion
+		if r == null or r._gen != gen or r._steps.is_empty():
+			return
+		r._steps.pop_front().call()
+		r = null
+		await pace.tick()
 
 
 func _exit_tree() -> void:
+	# A paced warm-up or build pauses here; _enter_tree picks it up again.
+	_gen += 1
+	_warming = false
 	if _task >= 0:
 		# Leaving mid-build (quit, teleport): stop the worker early, then join.
 		BuildCancel.request(content.region_id)
@@ -179,7 +233,14 @@ func build_now() -> void:
 		WorkerThreadPool.wait_for_task_completion(_task)
 		_task = -1
 		_finish()
+	elif not _steps.is_empty():
+		_gen += 1
+		while not _steps.is_empty():
+			_steps.pop_front().call()
 	else:
+		if _warming:
+			_gen += 1
+			_warming = false
 		build()
 
 
@@ -235,14 +296,6 @@ func _generate() -> void:
 	var terrain := CourtTerrainFallback.compute(content)
 	if BuildCancel.requested(content.region_id):
 		return  # partial; _exit_tree drops it
-	_layers = {"forage": forage, "decor": decor, "terrain": terrain}
-
-
-func _finish() -> void:
-	var forage: Array[ScatterLayer] = _layers["forage"]
-	var decor: Array[ScatterLayer] = _layers["decor"]
-	var terrain: Array[Dictionary] = _layers["terrain"]
-	CourtTerrainFallback.build_nodes(self, terrain)
 	var small: Array[ScatterLayer] = []
 	var trees: Array[ScatterLayer] = []
 	var near_trees: Array[ScatterLayer] = []
@@ -256,34 +309,73 @@ func _finish() -> void:
 			trees.append(layer)
 		else:
 			small.append(layer)
-	forage_field = _field("Forage", forage, SMALL_CHUNK)
-	decor_field = _field("Decor", small, SMALL_CHUNK)
-	if not DRAW_GRASS_CLUMPS:
-		_hide_grass_clumps(decor_field)
-	tree_field = _field("Trees", trees, CourtScatterGenerator.TREE_CHUNK)
-	# the near step in smaller chunks (each tree switches step at its own distance)
-	near_tree_field = _field("TreesNear", near_trees, CourtScatterGenerator.NEAR_CHUNK)
+	# Each field: [node name, layers, chunk size, per layer its chunk plan].
+	var fields := [["Forage", forage, SMALL_CHUNK], ["Decor", small, SMALL_CHUNK],
+		["Trees", trees, CourtScatterGenerator.TREE_CHUNK],
+		# the near step in smaller chunks (each tree switches step at its own distance)
+		["TreesNear", near_trees, CourtScatterGenerator.NEAR_CHUNK]]
 	if content.place_planting != &"":
-		# a place's own small plants, by the small chunk, and its grass round the player
-		place_field = _field("PlacePlants", fine, CourtGlenPlanting.FINE_CHUNK)
-		sward = CourtSward.new()
-		sward.name = "Sward"
-		sward.content = content
-		sward.trunks = CourtGlenPlanting.trunks(content.region_id)
-		add_child(sward)
-		CourtMotes.build(self, content)
-	_build_landmarks()
-	_build_places()
-	_build_magnets()
-	_build_anchors()
-	_build_water()
-	_build_fx()
-	_build_grade()
-	_build_creatures()
-	_build_gates()
+		# a place's own small plants, by the small chunk
+		fields.append(["PlacePlants", fine, CourtGlenPlanting.FINE_CHUNK])
+	for f: Array in fields:
+		var plans := []
+		for layer: ScatterLayer in f[1]:
+			var drawn := layer != null and layer.count() > 0 and layer.draw_mesh() != null
+			plans.append(ScatterField.chunk_plan(layer, f[2]) if drawn else [])
+		f.append(plans)
+	_layers = {"terrain": terrain, "fields": fields}
+
+
+## Builds everything _generate prepared, now.
+func _finish() -> void:
+	_plan_finish()
+	while not _steps.is_empty():
+		_steps.pop_front().call()
+
+
+## The main-thread build as small steps: the fallback terrain, the scatter
+## fields a chunk at a time, then each kind of set dressing.
+func _plan_finish() -> void:
+	var terrain: Array[Dictionary] = _layers["terrain"]
+	_steps.clear()
+	_steps.append(CourtTerrainFallback.build_nodes.bind(self, terrain))
+	for f: Array in _layers["fields"]:
+		var field := _field(f[0], f[1], f[2], true)
+		match String(f[0]):
+			"Forage": forage_field = field
+			"Decor": decor_field = field
+			"Trees": tree_field = field
+			"TreesNear": near_tree_field = field
+			"PlacePlants": place_field = field
+		var layers: Array[ScatterLayer] = f[1]
+		var plans: Array = f[3]
+		for i in layers.size():
+			for chunk: Array in plans[i]:
+				_steps.append(field.build_chunk.bind(layers[i], chunk[0], chunk[1]))
+		if field == decor_field and not DRAW_GRASS_CLUMPS:
+			_steps.append(_hide_grass_clumps.bind(field))
+	if content.place_planting != &"":
+		_steps.append(_build_sward)
+	for step: Callable in [_build_landmarks, _build_places, _build_magnets, _build_anchors, _build_water,
+			_build_fx, _build_grade, _build_creatures, _build_gates, _built]:
+		_steps.append(step)
+
+
+## Its grass round the player, and the motes.
+func _build_sward() -> void:
+	sward = CourtSward.new()
+	sward.name = "Sward"
+	sward.content = content
+	sward.trunks = CourtGlenPlanting.trunks(content.region_id)
+	add_child(sward)
+	CourtMotes.build(self, content)
+
+
+func _built() -> void:
 	_layers.clear()
 	is_built = true
 	built.emit()
+
 
 
 ## Hides the grass clumps' chunks (see DRAW_GRASS_CLUMPS); the layers stay fuel.
@@ -297,12 +389,14 @@ static func _hide_grass_clumps(field: ScatterField) -> void:
 			child.visible = false
 
 
-func _field(node_name: String, layers: Array[ScatterLayer], chunk: float) -> ScatterField:
+func _field(node_name: String, layers: Array[ScatterLayer], chunk: float, chunked: bool = false) -> ScatterField:
 	var field := ScatterField.new()
 	field.name = node_name
 	field.region_id = content.region_id
 	field.chunk_size = chunk
 	field.layers = layers
+	# Its chunks come a step at a time (_plan_finish), not all in _ready.
+	field.prebuilt = chunked
 	add_child(field)
 	return field
 

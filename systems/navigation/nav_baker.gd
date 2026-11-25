@@ -16,6 +16,9 @@ const TILE_HEIGHT := 160.0
 const WORLD_LAYER := 1 << 0
 ## Main-thread parsing per frame while a region's colliders are read.
 const PARSE_BUDGET_US := 4000
+## The tile's terrain faces are read a strip this wide at a time, under
+## FrameBudget (T161: the whole tile in one call held a frame ~80-110 ms).
+const TERRAIN_STRIP := 8.0
 
 var tile_region: NavigationRegion3D
 var tile_centre := Vector3.INF
@@ -71,10 +74,14 @@ static func parse(root: Node, aabb: AABB = AABB()) -> NavigationMeshSourceGeomet
 ## reports done on a main-thread sync, a frame later), and one still on the
 ## server's thread at quit aborted the process in the engine's shutdown with
 ## "recursive_mutex lock failed: Invalid argument" (T146).
+## `parts` (more source geometry) and `faces` (world-space triangles) are
+## merged into `source` first, on the bake's own thread when threaded.
 static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometryData3D, aabb: AABB,
-		threaded: bool = false, done: Callable = Callable()) -> Array:
+		threaded: bool = false, done: Callable = Callable(), parts: Array = [],
+		faces: PackedVector3Array = PackedVector3Array()) -> Array:
 	var nm := make_mesh(aabb)
 	if not threaded:
+		_assemble(source, parts, faces)
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
 		drop_overlapping_polygons(nm)
 		region.navigation_mesh = nm
@@ -96,10 +103,19 @@ static func bake(region: NavigationRegion3D, source: NavigationMeshSourceGeometr
 	# Clean the mesh on the same thread (it touches only `nm`), so the main
 	# thread only assigns it.
 	job[0] = WorkerThreadPool.add_task(func() -> void:
+		NavBaker._assemble(source, parts, faces)
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
 		NavBaker.drop_overlapping_polygons(nm)
 		land.call_deferred(), false, "nav_bake")
 	return job
+
+
+## Pure data (the parts are cached and never changed once made), so it is safe on the bake thread.
+static func _assemble(source: NavigationMeshSourceGeometryData3D, parts: Array, faces: PackedVector3Array) -> void:
+	for data: NavigationMeshSourceGeometryData3D in parts:
+		source.merge(data)
+	if not faces.is_empty():
+		source.add_faces(faces, Transform3D.IDENTITY)
 
 
 ## Waits for a threaded bake() job to finish, once; later calls do nothing.
@@ -265,26 +281,54 @@ func _parse_paced(id: StringName, root: Node3D) -> void:
 		tile_centre = Vector3.INF
 
 
+## Reads the tile's terrain a strip a frame (paced), then bakes on a worker,
+## which also merges the regions' cached sources in.
 func _bake_tile(at: Vector3) -> void:
-	var source := NavigationMeshSourceGeometryData3D.new()
-	for data: Variant in _sources.values():
-		if data is NavigationMeshSourceGeometryData3D:
-			source.merge(data)
-	var aabb := AABB(Vector3(at.x - TILE * 0.5, at.y - TILE_HEIGHT * 0.5, at.z - TILE * 0.5), Vector3(TILE, TILE_HEIGHT, TILE))
-	var terrain := _terrain()
-	if terrain and terrain.has_method(&"generate_nav_mesh_source_geometry"):
-		var faces: PackedVector3Array = terrain.call(&"generate_nav_mesh_source_geometry", aabb, false)
-		if not faces.is_empty():
-			source.add_faces(faces, Transform3D.IDENTITY)
-	if not source.has_data():
-		return
 	_baking = true
-	tile_centre = at
-	var me: WeakRef = weakref(self)
-	_bake_job = bake(tile_region, source, aabb, true, func() -> void:
-		var b := me.get_ref() as NavBaker
-		if b != null:
-			b._baking = false)
+	_gather_paced(weakref(self), at, BuildPace.new(get_tree()))
+
+
+static func _gather_paced(me: WeakRef, at: Vector3, pace: BuildPace) -> void:
+	var b := me.get_ref() as NavBaker
+	if b == null:
+		return
+	var parts: Array = []
+	for data: Variant in b._sources.values():
+		if data is NavigationMeshSourceGeometryData3D and (data as NavigationMeshSourceGeometryData3D).has_data():
+			parts.append(data)
+	var aabb := AABB(Vector3(at.x - TILE * 0.5, at.y - TILE_HEIGHT * 0.5, at.z - TILE * 0.5), Vector3(TILE, TILE_HEIGHT, TILE))
+	var terrain := b._terrain()
+	var faces := PackedVector3Array()
+	if terrain and terrain.has_method(&"generate_nav_mesh_source_geometry"):
+		var tref: WeakRef = weakref(terrain)
+		b = null
+		var x := aabb.position.x
+		while x < aabb.end.x:
+			# Strips overlap a metre each side, so no row of quads falls between two.
+			var strip := AABB(Vector3(x - 1.0, aabb.position.y, aabb.position.z), Vector3(TERRAIN_STRIP + 2.0, aabb.size.y, aabb.size.z))
+			faces.append_array(terrain.call(&"generate_nav_mesh_source_geometry", strip, false))
+			x += TERRAIN_STRIP
+			terrain = null
+			await pace.tick()
+			b = me.get_ref() as NavBaker
+			terrain = tref.get_ref() as Node
+			if b == null:
+				return
+			if terrain == null:
+				b._baking = false
+				return
+			b = null
+		b = me.get_ref() as NavBaker
+	if b == null:
+		return
+	if parts.is_empty() and faces.is_empty():
+		b._baking = false
+		return
+	b.tile_centre = at
+	b._bake_job = bake(b.tile_region, NavigationMeshSourceGeometryData3D.new(), aabb, true, func() -> void:
+		var nb := me.get_ref() as NavBaker
+		if nb != null:
+			nb._baking = false, parts, faces)
 
 
 func _terrain() -> Node:

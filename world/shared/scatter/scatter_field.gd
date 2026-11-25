@@ -67,48 +67,65 @@ static func set_instance_hidden(chunk: MultiMeshInstance3D, i: int, hidden: bool
 
 
 func _build_layer(layer: ScatterLayer) -> void:
+	for chunk: Array in chunk_plan(layer, chunk_size):
+		build_chunk(layer, chunk[0], chunk[1])
+
+
+## Which of `layer`'s instances fall in which chunk: Array of [key: Vector2i,
+## ids: PackedInt32Array]. Pure data, so a worker thread can plan a field
+## that the main thread then builds a chunk at a time (CourtRegion, T161).
+static func chunk_plan(layer: ScatterLayer, size: float) -> Array:
 	var buckets := {}
+	if layer == null or layer.count() == 0:
+		return []
 	for i in layer.count():
-		var key := chunk_key(layer.position_of(i))
+		var p := layer.position_of(i)
+		var key := Vector2i(floori(p.x / size), floori(p.z / size))
 		if not buckets.has(key):
 			buckets[key] = PackedInt32Array()
 		buckets[key].append(i)
+	var out := []
 	for key: Vector2i in buckets:
-		var ids: PackedInt32Array = buckets[key]
-		var origin := Vector3((key.x + 0.5) * chunk_size, 0.0, (key.y + 0.5) * chunk_size)
-		var mm := MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = layer.draw_mesh()
-		mm.instance_count = ids.size()
+		out.append([key, buckets[key]])
+	return out
+
+
+## Builds one chunk of `layer` (and its impostor chunk), as build() does.
+func build_chunk(layer: ScatterLayer, key: Vector2i, ids: PackedInt32Array) -> void:
+	var origin := Vector3((key.x + 0.5) * chunk_size, 0.0, (key.y + 0.5) * chunk_size)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = layer.draw_mesh()
+	mm.instance_count = ids.size()
+	for j in ids.size():
+		var t := layer.transform_of(ids[j])
+		t.origin -= origin
+		mm.set_instance_transform(j, t)
+	var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], mm, origin)
+	node.visibility_range_end = layer.draw_distance
+	node.visibility_range_end_margin = 8.0
+	if layer.draw_from > 0.0:
+		node.visibility_range_begin = layer.draw_from
+		node.visibility_range_begin_margin = 8.0
+	if layer.is_forage():
+		node.add_to_group(FORAGE_GROUP)
+		node.set_meta(&"ingredient_id", layer.ingredient_id)
+		node.set_meta(&"scatter_id", layer.id)
+		node.set_meta(&"region_id", region_id)
+		node.set_meta(&"instance_ids", ids)
+		node.set_meta(&"layer", layer)
+	if layer.resolve_impostor() != null:
+		var far_mm := MultiMesh.new()
+		far_mm.transform_format = MultiMesh.TRANSFORM_3D
+		far_mm.mesh = layer.impostor_mesh
+		far_mm.instance_count = ids.size()
 		for j in ids.size():
-			var t := layer.transform_of(ids[j])
-			t.origin -= origin
-			mm.set_instance_transform(j, t)
-		var node := _make_instance(layer, "%s_%d_%d" % [layer.id, key.x, key.y], mm, origin)
-		node.visibility_range_end = layer.draw_distance
-		node.visibility_range_end_margin = 8.0
-		if layer.draw_from > 0.0:
-			node.visibility_range_begin = layer.draw_from
-			node.visibility_range_begin_margin = 8.0
-		if layer.is_forage():
-			node.add_to_group(FORAGE_GROUP)
-			node.set_meta(&"ingredient_id", layer.ingredient_id)
-			node.set_meta(&"scatter_id", layer.id)
-			node.set_meta(&"region_id", region_id)
-			node.set_meta(&"instance_ids", ids)
-			node.set_meta(&"layer", layer)
-		if layer.resolve_impostor() != null:
-			var far_mm := MultiMesh.new()
-			far_mm.transform_format = MultiMesh.TRANSFORM_3D
-			far_mm.mesh = layer.impostor_mesh
-			far_mm.instance_count = ids.size()
-			for j in ids.size():
-				far_mm.set_instance_transform(j, mm.get_instance_transform(j))
-			var far := _make_instance(layer, "%s_%d_%d_far" % [layer.id, key.x, key.y], far_mm, origin)
-			far.visibility_range_begin = layer.draw_distance
-			far.visibility_range_begin_margin = 8.0
-			far.visibility_range_end = layer.impostor_distance
-			far.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			far_mm.set_instance_transform(j, mm.get_instance_transform(j))
+		var far := _make_instance(layer, "%s_%d_%d_far" % [layer.id, key.x, key.y], far_mm, origin)
+		far.visibility_range_begin = layer.draw_distance
+		far.visibility_range_begin_margin = 8.0
+		far.visibility_range_end = layer.impostor_distance
+		far.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _make_instance(layer: ScatterLayer, node_name: String, mm: MultiMesh, origin: Vector3) -> MultiMeshInstance3D:
