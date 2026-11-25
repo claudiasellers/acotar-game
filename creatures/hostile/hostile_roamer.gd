@@ -1,7 +1,8 @@
 ## The shared brain of a hostile camp's members (docs/contracts/hostiles.md):
 ## the perception ladder, the leash (chase only inside it unless on her
 ## scent), the camp blackboard reports, attack tokens, the fight timer and its
-## tell (AttackTell, EventBus.hostile_windup), holds, fire, frost and lures.
+## tell (the model's own telegraph clips, EventBus.hostile_windup), holds,
+## fire, frost and lures.
 ## A family is a thin subclass plus its own data: its CreatureData, its rows
 ## (data/combat/attacks; a grab row carries its presses, seconds and fail
 ## scale) and the values on its scene (strike_reach, strike_cooldown,
@@ -36,6 +37,8 @@ const LURE_SECONDS := 20.0
 const REPORT_EVERY := 2.0
 ## How much of the camp's alert lands on a member's awareness (enough to search).
 const CAMP_ALERT := 0.45
+## Seconds between taunts while it circles (a random span).
+const TAUNT_EVERY := Vector2(6.0, 10.0)
 
 ## The family's values, set on its own scene (one .tscn per family).
 @export var strike_reach: float = 1.5
@@ -49,6 +52,8 @@ const CAMP_ALERT := 0.45
 @export var lunge_attack: StringName = &""
 ## Its DreadField's radius and inner radius; x 0 for none.
 @export var dread_radius: Vector2 = Vector2.ZERO
+## The clip it plays now and then while it circles her (&"" for none).
+@export var taunt_clip: StringName = &""
 
 ## Set by HostileSite before _ready.
 var site: HostileSite
@@ -72,8 +77,8 @@ var _ring_angle: float = 0.0
 var _dread: DreadField
 ## The row the current wind-up ends in.
 var _attack: StringName = &""
-## Poses the model through each wind-up (AttackTell).
-var tell: AttackTell
+## Seconds until a circling member next plays its taunt_clip.
+var _taunt_left: float = 0.0
 var _lunged: bool = false
 var _has_token: bool = false
 var _hold_left: float = 0.0
@@ -92,7 +97,7 @@ func _ready() -> void:
 	EventBus.player_knocked_down.connect(_on_player_down)
 	EventBus.player_released.connect(_on_player_released)
 	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
-	tell = AttackTell.on(self)
+	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
 	_grow_hit_box()
 
 
@@ -294,6 +299,9 @@ func _fight(player: Node3D, delta: float) -> void:
 			if _fight_left <= 0.0:
 				# Flat reach, capped in height: a step doesn't save her, a ledge does.
 				var in_reach := Creature.within_reach(global_position, player.global_position, strike_reach + 0.6)
+				# The blow plays whether or not she is still there to take it.
+				if animator:
+					animator.play_strike(_attack)
 				if in_reach and grab_attack != &"" and _attack == grab_attack:
 					_coil(player)
 				else:
@@ -305,6 +313,8 @@ func _fight(player: Node3D, delta: float) -> void:
 			_fight_left -= delta
 			if _fight_left <= 0.0:
 				fight = Fight.LEAP
+				if animator:
+					animator.play_strike(lunge_attack)
 				_fight_left = LEAP_SECONDS
 				_leap_speed = maxf(flat, LUNGE_MIN) / LEAP_SECONDS * 1.5
 		Fight.LEAP:
@@ -365,6 +375,12 @@ func _wind_up(next: Fight, attack: StringName) -> void:
 	_attack = attack
 	_fight_left = HostileRoamer.windup_of(attack)
 	EventBus.hostile_windup.emit(creature_id, data.kind, attack, global_position, _fight_left)
+	# Its own telegraph clip, stretched to the row's windup_s and held to
+	# contact. No fallback: a member without the rig or the clip is an error.
+	if animator:
+		animator.play_windup(attack, _fight_left)
+	else:
+		push_error("%s has no rig to telegraph %s" % [name, attack])
 
 
 func _hold_still(player: Node3D, delta: float) -> void:
@@ -386,6 +402,17 @@ func _circle(player: Node3D, to: Vector3, flat: float, delta: float) -> void:
 	move_speed = data.walk_speed * 1.5
 	face_towards(player.global_position, delta * 3.0)
 	gait_hint = &"stalk"
+	_taunt(delta)
+
+
+## Now and then while it circles, its taunt (the family's `taunt_clip`).
+func _taunt(delta: float) -> void:
+	_taunt_left -= delta
+	if _taunt_left > 0.0:
+		return
+	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
+	if taunt_clip != &"" and animator and not animator.is_acting():
+		animator.play_oneshot(taunt_clip)
 
 
 ## The coil closes: Vitals takes the hold (one at a time) and we keep it until
@@ -421,6 +448,8 @@ func _set_fight(next: Fight) -> void:
 	# A tell that ends before contact (stagger, sleep, death) is called off.
 	if (fight == Fight.STRIKE or fight == Fight.LUNGE) and _fight_left > 0.0 and next != fight:
 		EventBus.hostile_windup_cancelled.emit(creature_id)
+		if animator:
+			animator.cancel_attack()
 	if fight == Fight.HOLD and next != Fight.HOLD:
 		_free_her()
 	if next == Fight.CHARGE or next == Fight.CIRCLE:

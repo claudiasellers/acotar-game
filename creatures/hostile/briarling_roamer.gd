@@ -7,11 +7,13 @@
 ## ankle, 4 presses in 2.5 s; failing it takes two lashes). It burns fast and
 ## flees fire; it folds back into a bush when it is home with nothing to do.
 ##
-## The tell (slice 2(c)): its body is the flora table's own rose bush
-## (CreatureData.flora_id, CourtAssets), in the real roses' own material
-## (CourtAssets.material_for) with `wind_amount` 0, so the roses round it sway
-## and it doesn't. Nothing else gives it away. A flora swap of that rose
-## reaches it with no edit. Its values are on briarling_roamer.tscn and in its rows.
+## The tell (slice 2(c)): its body is L83's rigged briarling
+## (creatures/models/fae/briarling.gltf). As a bush it holds its `bush` pose,
+## shaped like the Rosewild's rose bush (ROSE) and coloured by the same leaf
+## and petal swatches, in its briar hide, which has no wind: the roses round
+## it sway and it doesn't. Nothing else gives it away. It plays `unfold` and
+## `fold` between the two forms, and its wind-ups are its own telegraph clips
+## (HostileRoamer). Its values are on briarling_roamer.tscn and in its rows.
 class_name BriarlingRoamer
 extends HostileRoamer
 
@@ -29,32 +31,21 @@ const FOLD_SECONDS := 1.0
 ## Active 18:00 to 07:00; a bush otherwise.
 const ACTIVE_FROM := 18.0
 const ACTIVE_TO := 7.0
-## The mimic layer's wind (plan §5.3): none.
-const MIMIC_WIND := 0.0
+## The flora table's rose bush it stands among and copies (CourtAssets id).
+const ROSE := &"flora_bush_rose"
+## Its clips for the two forms (data/animation/creatures/briarling_gaits.txt).
+const BUSH_CLIP := &"bush"
+const UNFOLD_CLIP := &"unfold"
+const FOLD_CLIP := &"fold"
 
 var form: Form = Form.BUSH
-## The bush's material: the real roses' own, with no wind.
-var mimic_material: Material
 var _form_left: float = 0.0
 var _strikes: int = 0
 
 
 func _ready() -> void:
 	super._ready()
-	mimic_material = BriarlingRoamer.bush_material(data.flora_id)
-	for g in model.find_children("*", "GeometryInstance3D", true, false):
-		(g as GeometryInstance3D).material_override = mimic_material
-
-
-## The real plant's material with the wind taken out: the only tell.
-static func bush_material(flora_id: StringName) -> Material:
-	var real := CourtAssets.material_for(flora_id)
-	if real == null:
-		return null
-	var m := real.duplicate() as Material
-	if m is ShaderMaterial:
-		(m as ShaderMaterial).set_shader_parameter(&"wind_amount", MIMIC_WIND)
-	return m
+	_show_form()
 
 
 ## How much a material sways in the shared wind (its `wind_amount`, or the
@@ -114,10 +105,16 @@ func _think(delta: float) -> void:
 		_form_left -= delta
 		if _form_left <= 0.0:
 			form = Form.CREATURE if form == Form.UNFOLDING else Form.BUSH
+			_show_form()
 		return
+	if form == Form.BUSH:
+		_show_form()
 	super._think(delta)
 	if form == Form.BUSH and (ladder.is_hostile() or move_speed > 0.0):
-		# It wakes, or its night begins: the bush unfolds before it moves.
+		# It wakes, or its night begins: the bush unfolds before it moves, and
+		# before it strikes (a wind-up begun as a bush is called off).
+		if winding_up() != &"":
+			_set_fight(Fight.CHARGE)
 		_change_form(Form.UNFOLDING, UNFOLD_SECONDS)
 	elif form == Form.CREATURE and routine == &"bush" and not ladder.is_hostile() \
 			and move_speed == 0.0 and _at_home():
@@ -137,6 +134,23 @@ func _change_form(next: Form, seconds: float) -> void:
 	_form_left = seconds
 	move_speed = 0.0
 	move_direction = Vector3.ZERO
+	_show_form()
+
+
+## The body's clip for its form: `unfold` and `fold` once, and the `bush`
+## pose for as long as it is a bush (played again whenever it runs out, so a
+## flinch or a fold gives way back to it).
+func _show_form() -> void:
+	if animator == null or not alive:
+		return
+	match form:
+		Form.UNFOLDING:
+			animator.play_oneshot(UNFOLD_CLIP)
+		Form.FOLDING:
+			animator.play_oneshot(FOLD_CLIP)
+		Form.BUSH:
+			if animator.action_clip() != BUSH_CLIP:
+				animator.play_oneshot(BUSH_CLIP)
 
 
 func _at_home() -> bool:

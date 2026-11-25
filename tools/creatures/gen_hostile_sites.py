@@ -81,14 +81,16 @@ ROAMERS = {
             ("grab_attack", '&"naga_coil"'),
             ("lunge_attack", '&"naga_lunge"'),
             ("dread_radius", "Vector2(30, 10)"),
+            # Circling on stalk, it laughs now and then (L81 G21).
+            ("taunt_clip", '&"laugh"'),
         ],
     },
-    # Briarlings (bestiary §7): a rose bush from the flora table by id, so a
-    # flora swap of that rose reaches it (no model file).
+    # Briarlings (bestiary §7): L83's rigged thorn-folk, whose bush pose and
+    # leaf swatches match the court's rose bush (and never sway).
     "briarling_roamer": {
         "script": "res://creatures/hostile/briarling_roamer.gd",
         "node": "BriarlingRoamer",
-        "model": None,
+        "model": "res://creatures/models/fae/briarling.gltf",
         "fields": [
             ("kind", '&"briarling"'),
             ("display_name", '"Briarling"'),
@@ -117,7 +119,6 @@ ROAMERS = {
             ("leaves_prints", "true"),
             ("stride", "0.3"),
             ("print_size", "0.05"),
-            ("flora_id", '&"flora_bush_rose"'),
             ("hit_box_scale", "1.5"),
             # Element row (plan §7): fire and sleep weak, frost normal.
             ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"sleep": 1.5\n}'),

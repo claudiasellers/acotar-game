@@ -1,6 +1,6 @@
 ## Slice 2(c) (hostile plan §5.3, health-interactions §4.3, bestiary §7): a
-## briarling stands among the Rosewild's real roses in their own material, and
-## the only tell is that it doesn't sway. It is a bush by day, walks its brake
+## briarling stands among the Rosewild's real roses in its rigged bush pose,
+## and the only tell is that it doesn't sway. It is a bush by day, walks its brake
 ## from 18:00, unfolds before it moves, lashes, snares every third strike, and
 ## one wood arrow or one knife hit kills it.
 extends GutTest
@@ -38,9 +38,9 @@ func _think(b: BriarlingRoamer, seconds: float) -> void:
 
 # --- 2(c): the bush doesn't sway; the real roses do ------------------------------
 
-## The flora table id the briarling copies, from its own data.
+## The flora table id the briarling copies.
 func _rose() -> StringName:
-	return (load("res://data/creatures/hostile/briarling_roamer.tres") as CreatureData).flora_id
+	return BriarlingRoamer.ROSE
 
 
 func test_the_real_roses_sway() -> void:
@@ -55,33 +55,49 @@ func test_the_real_roses_sway() -> void:
 			"and their material moves in the wind")
 
 
+## Every surface of the bush, leaf and bloom, has wind 0: nothing on it sways.
 func test_a_briarling_bush_has_wind_0() -> void:
 	var b := _briarling()
 	assert_true(b.is_bush())
-	assert_not_null(b.mimic_material)
-	assert_eq(BriarlingRoamer.wind_of(b.mimic_material), 0.0, "the mimic layer's wind is 0")
-	var geoms := b.model.find_children("*", "GeometryInstance3D", true, false)
-	assert_gt(geoms.size(), 0)
-	for g in geoms:
-		assert_eq((g as GeometryInstance3D).material_override, b.mimic_material, "every leaf and bloom wears it")
+	var seen := 0
+	for g in b.model.find_children("*", "MeshInstance3D", true, false):
+		var mi := g as MeshInstance3D
+		if mi.mesh == null:
+			continue
+		for i in mi.mesh.get_surface_count():
+			var m := mi.get_active_material(i)
+			assert_not_null(m, "%s surface %d has a material" % [mi.name, i])
+			if m:
+				seen += 1
+				assert_eq(BriarlingRoamer.wind_of(m), 0.0, "%s surface %d doesn't sway" % [mi.name, i])
+	assert_gt(seen, 0, "the bush's surfaces were read")
 
 
-func test_the_bush_wears_the_roses_own_look() -> void:
+## Its body is L83's rigged briarling, holding the bush pose by day.
+func test_the_bush_is_the_rigged_briarling_in_its_bush_pose() -> void:
 	var b := _briarling()
-	var real := CourtAssets.material_for(_rose()) as ShaderMaterial
-	var mimic := b.mimic_material as ShaderMaterial
-	assert_not_null(real)
-	assert_not_null(mimic)
-	if real and mimic:
-		assert_eq(mimic.shader, real.shader, "the same shader as the real roses")
-		assert_ne(mimic, real, "its own copy: the real roses keep their wind")
-		assert_gt(BriarlingRoamer.wind_of(real), 0.0)
-	assert_eq(b.data.flora_id, &"flora_bush_rose", "the Rosewild's rose bush, by its flora id")
-	assert_null(b.data.model_scene, "no file path: a flora swap of the rose reaches it")
-	var mi := b.model.find_children("*", "MeshInstance3D", true, false)
-	assert_false(mi.is_empty())
-	if not mi.is_empty():
-		assert_eq((mi[0] as MeshInstance3D).mesh, CourtAssets.mesh(_rose()), "the flora table's own mesh")
+	assert_eq(b.data.model_scene.resource_path, "res://creatures/models/fae/briarling.gltf")
+	assert_not_null(b.animator, "rigged: its clips drive it")
+	if b.animator == null:
+		return
+	for clip in [BriarlingRoamer.BUSH_CLIP, BriarlingRoamer.UNFOLD_CLIP, BriarlingRoamer.FOLD_CLIP]:
+		assert_true(b.animator.anim.has_animation(clip), "it has its %s clip" % clip)
+	assert_eq(b.animator.action_clip(), BriarlingRoamer.BUSH_CLIP, "a bush from the start")
+	_think(b, 2.5)
+	assert_eq(b.animator.action_clip(), BriarlingRoamer.BUSH_CLIP, "and it stays one")
+
+
+func test_it_plays_unfold_and_fold() -> void:
+	Clock.time_of_day = 19.0 / 24.0
+	var b := _briarling()
+	b.home = b.global_position
+	_think(b, DT)
+	assert_eq(b.animator.action_clip(), BriarlingRoamer.UNFOLD_CLIP)
+	b.form = BriarlingRoamer.Form.CREATURE
+	Clock.time_of_day = 12.0 / 24.0
+	_think(b, DT)
+	assert_eq(b.form, BriarlingRoamer.Form.FOLDING)
+	assert_eq(b.animator.action_clip(), BriarlingRoamer.FOLD_CLIP)
 
 
 # --- the brain -------------------------------------------------------------------
@@ -134,8 +150,9 @@ func test_its_rows() -> void:
 	assert_eq(b.lunge_attack, &"", "knee-high: no lunge row")
 	assert_almost_eq(NagaRoamer.windup_of(BriarlingRoamer.LASH), 0.4, 0.001)
 	assert_almost_eq(NagaRoamer.windup_of(BriarlingRoamer.SNARE), 0.6, 0.001)
-	assert_eq(AttackTell.pose_kind(BriarlingRoamer.LASH), &"thorn")
-	assert_eq(AttackTell.pose_kind(BriarlingRoamer.SNARE), &"grab")
+	for row in [BriarlingRoamer.LASH, BriarlingRoamer.SNARE]:
+		assert_true(b.animator.anim.has_animation(StringName("telegraph_%s" % row)), "%s winds up on its own clip" % row)
+		assert_true(b.animator.anim.has_animation(StringName("attack_%s" % row)), "and strikes on its own clip")
 	assert_false(b._may_lunge(), "knee-high: no lunge")
 
 

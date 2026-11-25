@@ -101,16 +101,20 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   a 4-naga camp needs ≥ 4 s to put her down) and comes again. A stagger
   (bash, knife, or any weak-spot hit) cancels the tell or lets go of the hold;
   so do sleep, fire and death. `Creature.winding_up()` names the attack being
-  telegraphed (&"" when none). Every tell shows and sounds (L81 G19): `AttackTell` poses the
-  model by the row's `damage_kind` (claw rears back, blunt dips the head, grab
-  crouches), eased in over the brain's own wind-up timer (`windup_left()`) and
-  held to contact; the brain emits `EventBus.hostile_windup(id, kind, attack,
+  telegraphed (&"" when none). Every tell shows and sounds (L81 G19): the
+  model plays its own `telegraph_<row id>` clip (`CreatureAnimator.play_windup`),
+  stretched to the row's `windup_s` and its last pose held to contact; at
+  contact it plays `attack_<row id>` (`play_strike`, the lunge's as the leap
+  starts), whether or not she is still in reach; a tell called off before
+  contact lets the clip go (`cancel_attack`). No fallback: a member without a
+  rig, or a row without its clip, is a `push_error` and a failing test
+  (`tests/unit/hostile/test_windups.gd`). The brain emits `EventBus.hostile_windup(id, kind, attack,
   at, windup_s)` as it starts and `hostile_windup_cancelled(id)` if it ends
   before contact. SoundDirector plays the family's wind-up cue where it starts
   (`WINDUP_CUES`, naga: `naga_hiss`), on the Sound bus. The coil is a grab
-  row (vitals.md: a hold), so it crouches. The
-  procedural pose is the one tell; the rig lane's `telegraph_<row id>` clips
-  replace it outright when they land (bestiary §1.5). A
+  row (vitals.md: a hold). While it circles (no token, 4-6 m off) it moves on
+  the `stalk` gait and every 6-10 s plays its scene's `taunt_clip` once
+  (naga: `laugh`, L81 G21; &"" for none). A
   naga on a **scent trail** ignores the leash while it smelled her within the
   last 6 s; a hush draught (scent_scale ≤ 0.5) breaks the trail.
 - Fire: a burning ElementField cell within 3 m sends it fleeing for 6 s; inside
@@ -183,25 +187,27 @@ knife hit, and a box bigger than the body.
 - `routine_at`: `bush` 07:00-18:00 (still at home), `hunt` otherwise (the
   naga's ring walk). `form`: BUSH, UNFOLDING (1.2 s, no movement), CREATURE,
   FOLDING (1.0 s, at home with nothing to do by day). `is_bush()`.
-- The tell: every GeometryInstance3D of its model wears `mimic_material`,
-  `CourtAssets.material_for(&"flora_bush_rose")` duplicated with `wind_amount` 0.
-  The Rosewild's real `flora_bush_rose` layers keep their wind. Its body comes
-  from the flora table by id (`CreatureData.flora_id` = `flora_bush_rose`, built
-  by `PlaceholderBody.flora` from `CourtAssets.mesh`), never a file path, so a
-  flora swap of that rose reaches it with no edit; the rig replaces it later.
+- The tell: its body is L83's rigged `creatures/models/fae/briarling.gltf` in
+  its briar hide (`briarling_hide.tres`), which has no wind: as a bush it holds
+  its `bush` pose, shaped like the Rosewild's `flora_bush_rose`
+  (`BriarlingRoamer.ROSE`) and coloured by the same leaf and petal swatches,
+  and the real roses round it sway while it doesn't. It plays `unfold` and
+  `fold` between forms (`_show_form`); a wind-up begun as a bush is called off
+  while it unfolds. Its strikes wind up on `telegraph_briarling_lash` and
+  `telegraph_briarling_snare`.
 
 ## The shared brain (`HostileRoamer`)
 
 `creatures/hostile/hostile_roamer.gd` holds everything a camp member does
 whatever its family: the ladder, the leash and scent trail, camp reports,
 attack tokens, the fight states (`Fight`) and timer, the tell
-(`AttackTell`, `hostile_windup`/`_cancelled`), holds, fire, frost, sleep and
+(its telegraph clips, `hostile_windup`/`_cancelled`), the circling taunt, holds, fire, frost, sleep and
 lures. It names no family (a test checks). A family is a thin subclass plus
 its own data:
 
 - scene exports: `strike_reach`, `strike_cooldown`, `attack_id` (strike row),
   `grab_attack` (grab row or empty), `lunge_attack` (lunge row or empty),
-  `dread_radius` (x 0: no DreadField);
+  `dread_radius` (x 0: no DreadField), `taunt_clip` (empty: none);
 - its rows: a grab row (`AttackData`) carries `grab_presses`, `grab_seconds`
   and `grab_fail_scale`, read through `grab_presses()`, `grab_seconds()`,
   `grab_fail_scale()`;

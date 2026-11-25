@@ -12,3 +12,4 @@ attack_id = &"naga_claw"
 grab_attack = &"naga_coil"
 lunge_attack = &"naga_lunge"
 dread_radius = Vector2(30, 10)
+taunt_clip = &"laugh"
