@@ -27,6 +27,11 @@ const VOICE_DUCK_DB := -7.0
 ## The beds' own bus (it sends to Sound). The Focus hush is two effects on it:
 ## an amplify that drops and a low-pass that closes (bow design §5.3).
 const AMBIENCE_BUS := &"Ambience"
+## Wind-up sounds by family (health-interactions §3.5 items 4, 5, 13): played
+## where the tell starts, so a coil from behind is heard behind her. Plays on
+## the WindUp bus once the mixer has one (the Ambience sidechain), else the default.
+const WINDUP_CUES := {&"naga": &"naga_hiss"}
+const WINDUP_BUS := &"WindUp"
 const HUSH_OPEN_HZ := 20000.0
 const HUSH_CLOSED_HZ := 800.0
 
@@ -103,6 +108,7 @@ func _ready() -> void:
 	EventBus.mood_requested.connect(_on_mood)
 	EventBus.story_actor_cue.connect(_on_actor_cue)
 	EventBus.creature_hit.connect(_on_creature_hit)
+	EventBus.hostile_windup.connect(_on_hostile_windup)
 	EventBus.creature_killed.connect(_on_creature_killed)
 	EventBus.celebration_requested.connect(_on_celebration)
 	EventBus.journal_entry_added.connect(_on_journal_entry)
@@ -668,6 +674,15 @@ func _on_creature_hit(id: StringName, kind: StringName, _cause: StringName, _par
 		# Canon: he faces her with a low growl, and the snow begins falling again.
 		_later(0.8, func() -> void: play(&"wolf_growl_low", _kind_position(kind)))
 		_set_dread(minf(dread, 0.45), 3.0)
+
+
+func _on_hostile_windup(_id: StringName, kind: StringName, _attack: StringName, at: Vector3, _seconds: float) -> void:
+	var cue_id: StringName = WINDUP_CUES.get(kind, &"")
+	if cue_id == &"":
+		return
+	var p := play(cue_id, at)
+	if p and AudioServer.get_bus_index(WINDUP_BUS) != -1:
+		p.set(&"bus", WINDUP_BUS)
 
 
 func _on_creature_killed(_id: StringName, kind: StringName, _cause: StringName, at: Vector3) -> void:

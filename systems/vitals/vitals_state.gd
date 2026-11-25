@@ -168,6 +168,12 @@ func affliction(tag: StringName) -> float:
 	return float(afflictions[tag]["magnitude"]) if afflictions.has(tag) else 0.0
 
 
+## Nothing lands on her for `seconds` (the sidestep). The one i-frame clock:
+## a longer spell already running is kept.
+func grant_iframes(seconds: float) -> void:
+	_iframes = maxf(_iframes, seconds)
+
+
 func is_invulnerable() -> bool:
 	return is_down or _iframes > 0.0 or _grace > 0.0
 

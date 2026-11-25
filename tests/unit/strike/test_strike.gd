@@ -255,3 +255,18 @@ func test_she_cant_stab_a_naga_two_metres_below_her() -> void:
 	assert_eq(n.health, ROAMER_DATA.max_health)
 	her.global_position = Vector3(0, 1.0, -1.2)
 	assert_eq(k.target(), n, "a step up is still in reach")
+
+
+## L81 G20: Strike asks for its hint rows (bash in reach, cut free on a grab),
+## but only once the KeyHints table has them, so none is marked learnt before
+## it can show.
+func test_strike_hints_wait_for_their_rows() -> void:
+	var n := _naga()
+	assert_false(StrikeController.is_hostile(n), "an unaware naga isn't engaged")
+	var hints := KeyHints.of(get_tree())
+	for id in [StrikeController.HINT_BASH, StrikeController.HINT_CUT_FREE]:
+		if KeyHints.ROWS.has(id):
+			continue
+		k._hint(id)
+		assert_false(hints.taught.get(id, false), "%s isn't learnt before its row exists" % id)
+		assert_ne(hints.wanted(), id)

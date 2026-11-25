@@ -204,7 +204,7 @@ func test_a_blow_breaks_focus() -> void:
 	assert_true(bow.is_focused)
 	EventBus.player_hit.emit(&"test", &"bite", 1.0, Vector3.ZERO)
 	assert_false(bow.is_focused)
-	assert_eq(Engine.time_scale, 1.0)
+	assert_false(TimeScale.is_requested(BowController.SLOW_ID), "the hush is gone; only the hit-stop holds time now")
 
 
 ## Shift and L3 are sprint and Focus both: with the bow raised they are Focus,

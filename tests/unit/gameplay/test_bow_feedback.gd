@@ -267,3 +267,56 @@ func test_an_arrow_the_story_hands_her_is_named_on_the_quiver_card() -> void:
 	assert_string_contains(card.text, "×%d" % (before + 1))
 	var ash: ArrowData = BowController.arrow_data().get(&"arrow_ash")
 	assert_string_contains(card.text, ash.display_name)
+
+
+## UX review G12 and the L81 note on L80-17: no bow key is silent, and the
+## card shows the quiver's size beside the count.
+func test_the_card_shows_her_arrows_of_what_the_quiver_holds() -> void:
+	var inv := Gameplay.inventory
+	inv.remove(&"arrow_wood", 999)
+	inv.remove(&"arrow_ash", 999)
+	inv.quiver_size = 10
+	inv.add(&"arrow_wood", 2)
+	inv.add(&"arrow_ash", 1)
+	assert_string_ends_with(bow.quiver_card.describe(&"arrow_wood"), "×2 · 3 of 10")
+
+
+func test_an_arrow_she_cannot_make_says_what_is_short() -> void:
+	var inv := Gameplay.inventory
+	for id: StringName in [&"mat_shaft", &"mat_arrowhead"]:
+		inv.remove(id, 999)
+	for id in inv.ids_with_craft_tag(&"fletching"):
+		inv.remove(id, 999)
+	bow.selected = &"arrow_wood"
+	watch_signals(bow)
+	assert_false(bow.craft_selected())
+	assert_signal_emitted(bow, "craft_failed")
+	var wood: ArrowData = BowController.arrow_data().get(&"arrow_wood")
+	assert_string_starts_with(bow.quiver_card.text, wood.display_name + ": needs ")
+	assert_string_contains(bow.quiver_card.text, "1 fletching")
+	assert_string_contains(bow.quiver_card.text, "1 " + ItemCatalog.get_item(&"mat_shaft").display_name.to_lower())
+	inv.add(&"mat_shaft", 1)
+	assert_false(bow.craft_selected())
+	assert_does_not_have(Array(bow.quiver_card.text.split(", ")), "1 " + ItemCatalog.get_item(&"mat_shaft").display_name.to_lower(),
+			"only what is still short")
+
+
+func test_a_full_quiver_is_why_and_nothing_is_spent() -> void:
+	var inv := Gameplay.inventory
+	inv.add(&"mat_shaft", 1)
+	inv.add(&"mat_arrowhead", 1)
+	inv.add(&"ing_crow_feather", 1)
+	inv.quiver_size = maxi(inv.arrow_count(), 1)
+	inv.add(&"arrow_wood", 99)
+	bow.selected = &"arrow_wood"
+	assert_eq(Crafting.missing(Crafting.recipe(&"arrow_wood"), inv), {})
+	assert_false(bow.craft_selected())
+	assert_string_ends_with(bow.quiver_card.text, "no room in the quiver")
+	assert_eq(inv.count(&"mat_shaft"), 1, "the shaft is still hers")
+
+
+func test_the_bow_key_with_one_bow_names_the_bow() -> void:
+	assert_eq(bow.owned_bows().size(), 1)
+	bow.cycle_bow()
+	assert_eq(bow.quiver_card.text, bow.bow.display_name)
+	assert_true(bow.quiver_card._panel.visible)
