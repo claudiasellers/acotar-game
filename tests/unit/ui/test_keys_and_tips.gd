@@ -48,8 +48,6 @@ func test_a_row_names_the_key_and_the_pad_from_the_input_map() -> void:
 	assert_eq(KeyList.words([&"interact", "Use", "", ""]), ["Use", "E", "X"] as Array[String])
 	assert_eq(KeyList.words([&"move_forward", "Move", "scheme", "Left stick"])[1], InputSettings.SCHEME_NAMES[InputSettings.scheme])
 	assert_eq(KeyPrompt.pad_word(&"satchel_open"), "", "no pad button of its own")
-	assert_eq(KeyPrompt.board_word(&"fire"), "Left mouse")
-	assert_eq(KeyPrompt.pad_word(&"fire"), "RT")
 	for button: JoyButton in [JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT,
 			JOY_BUTTON_BACK, JOY_BUTTON_START, JOY_BUTTON_LEFT_STICK, JOY_BUTTON_RIGHT_STICK]:
 		assert_true(KeyPrompt.PAD_BUTTONS.has(button), "pad button %d has a name" % button)

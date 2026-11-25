@@ -7,10 +7,6 @@ extends GutTest
 const FEYRE := preload("res://characters/feyre/feyre.tscn")
 
 
-func after_each() -> void:
-	Input.action_release(&"aim")
-
-
 func _slab(center: Vector3, size: Vector3) -> void:
 	var body := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
@@ -32,7 +28,8 @@ func _aiming_feyre(face: float, thick: float) -> Feyre:
 	add_child_autofree(f)
 	f.global_position = Vector3(0, 0.05, 0)
 	# Aiming puts the arm 0.55 m over her right shoulder, the widest offset.
-	Input.action_press(&"aim")
+	f.bow_controller.set_physics_process(false)
+	f.bow_controller.update_bow(0.016, true, false)
 	await wait_seconds(1.0)
 	return f
 

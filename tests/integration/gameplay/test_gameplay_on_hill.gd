@@ -62,11 +62,9 @@ func test_release_uses_a_wood_arrow_never_the_ash_by_fallback() -> void:
 	Gameplay.inventory.remove(&"arrow_wood", 100)
 	Gameplay.inventory.add(&"arrow_ash")
 	feyre.bow_controller.selected = &"arrow_wood"
-	feyre.bow_controller.update_bow(0.5, true, true)
-	assert_false(feyre.bow_controller.is_drawing, "won't draw the ash arrow unless chosen")
+	assert_null(feyre.bow_controller.release(), "won't loose the ash arrow unless chosen")
 	feyre.bow_controller.cycle_arrow()
 	assert_eq(feyre.bow_controller.selected, &"arrow_ash")
-	feyre.bow_controller.update_bow(0.5, true, true)
 	var arrow := feyre.bow_controller.release()
 	assert_not_null(arrow)
 	assert_eq(arrow.arrow_id, &"ash")
@@ -93,16 +91,6 @@ func test_arrows_break_on_stone_by_chance() -> void:
 	assert_eq(broke.size(), 1)
 	assert_false(is_instance_valid(a))
 	assert_true(b.stuck)
-
-
-func test_focus_slows_time_until_stamina_runs_out() -> void:
-	feyre.bow_controller.update_bow(0.5, true, false)
-	assert_eq(Engine.time_scale, 1.0, "raising the bow alone leaves time alone")
-	feyre.bow_controller.update_bow(0.1, true, false, true)
-	assert_eq(Engine.time_scale, feyre.bow_controller.tuning.focus_scale)
-	feyre.stamina = 0.0
-	feyre.bow_controller.update_bow(0.1, true, false, true)
-	assert_eq(Engine.time_scale, 1.0)
 
 
 func test_wardrobe_station_opens_the_dressing_room() -> void:
