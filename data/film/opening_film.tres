@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FilmScript" load_steps=53 format=3]
+[gd_resource type="Resource" script_class="FilmScript" load_steps=52 format=3]
 
 [ext_resource type="Script" path="res://story/film/film_script.gd" id="1_script"]
 [ext_resource type="Script" path="res://story/film/film_line.gd" id="2_line"]
@@ -124,60 +124,51 @@ canon = "C?"
 [sub_resource type="Resource" id="L13"]
 script = ExtResource("2_line")
 id = &"op_14"
-at = 121.5
-hold = 5.5
-speaker = &""
-text = "We were rich once. My father was a merchant, and we lived in a fine house."
-canon = "C"
-
-[sub_resource type="Resource" id="L14"]
-script = ExtResource("2_line")
-id = &"op_15"
-at = 127.4
+at = 125.0
 hold = 8.4
 speaker = &""
 text = "When I was eight, my mother died. On her deathbed, she made me promise to keep our family together, and to look after them."
 canon = "C"
 
+[sub_resource type="Resource" id="L14"]
+script = ExtResource("2_line")
+id = &"op_15"
+at = 133.8
+hold = 25.8
+speaker = &""
+text = "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich. Three years after she died, he spent every coin we had sending three ships across the sea to trade for spices and cloth. All three sank. The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."
+canon = "A"
+
 [sub_resource type="Resource" id="L15"]
 script = ExtResource("2_line")
 id = &"op_16"
-at = 137.5
-hold = 19.5
-speaker = &""
-text = "Three years later, my father sent everything we owned out on three trading ships, and all three sank. The men he owed money took our house and everything in it, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."
-canon = "A"
-
-[sub_resource type="Resource" id="L16"]
-script = ExtResource("2_line")
-id = &"op_17"
 at = 160.0
 hold = 6.0
 speaker = &""
 text = "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."
 canon = "C"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L16"]
 script = ExtResource("2_line")
-id = &"op_18"
+id = &"op_17"
 at = 166.4
 hold = 2.2
 speaker = &""
 text = "So I hunt."
 canon = "C"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("2_line")
-id = &"op_19"
+id = &"op_18"
 at = 168.4
 hold = 3.0
 speaker = &""
 text = "They say some of them are getting through the Wall now, into these woods. Out of Prythian."
 canon = "C"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("2_line")
-id = &"op_20"
+id = &"op_19"
 at = 171.3
 hold = 2.0
 speaker = &""
@@ -272,7 +263,7 @@ at = 115.0
 [sub_resource type="Resource" id="B17"]
 script = ExtResource("3_beat")
 name = &"mother"
-at = 121.0
+at = 124.5
 
 [sub_resource type="Resource" id="B18"]
 script = ExtResource("3_beat")
@@ -282,22 +273,22 @@ at = 137.0
 [sub_resource type="Resource" id="B19"]
 script = ExtResource("3_beat")
 name = &"fall_ships"
-at = 140.5
+at = 144.5
 
 [sub_resource type="Resource" id="B20"]
 script = ExtResource("3_beat")
 name = &"fall_men"
-at = 145.5
+at = 149.5
 
 [sub_resource type="Resource" id="B21"]
 script = ExtResource("3_beat")
 name = &"cane"
-at = 152.5
+at = 156.0
 
 [sub_resource type="Resource" id="B22"]
 script = ExtResource("3_beat")
 name = &"foxglove"
-at = 155.5
+at = 158.0
 
 [sub_resource type="Resource" id="B23"]
 script = ExtResource("3_beat")
@@ -336,5 +327,5 @@ length = 185.0
 music_cue = &"music_opening_film"
 seen_flag = ""
 bars = 1.0
-lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19")])
+lines = Array[ExtResource("2_line")]([SubResource("L00"), SubResource("L01"), SubResource("L02"), SubResource("L03"), SubResource("L04"), SubResource("L05"), SubResource("L06"), SubResource("L07"), SubResource("L08"), SubResource("L09"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18")])
 beats = Array[ExtResource("3_beat")]([SubResource("B00"), SubResource("B01"), SubResource("B02"), SubResource("B03"), SubResource("B04"), SubResource("B05"), SubResource("B06"), SubResource("B07"), SubResource("B08"), SubResource("B09"), SubResource("B10"), SubResource("B11"), SubResource("B12"), SubResource("B13"), SubResource("B14"), SubResource("B15"), SubResource("B16"), SubResource("B17"), SubResource("B18"), SubResource("B19"), SubResource("B20"), SubResource("B21"), SubResource("B22"), SubResource("B23"), SubResource("B24"), SubResource("B25"), SubResource("B26"), SubResource("B27"), SubResource("B28")])
