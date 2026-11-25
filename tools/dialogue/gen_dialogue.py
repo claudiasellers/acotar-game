@@ -639,6 +639,25 @@ chat(A, "l_glare", "lucien", "If you're going to glare, at least do it from the 
 deed(A, "d_bogge_lucien", "bogge_survived", "Breathe. It's gone. You did well.", speaker="lucien",
      phases=COURT, pr=5)
 
+# Lucien as his bond with her stands (L90, docs/contracts/relationships.md):
+# the facts are the bond engine's, raised by her deeds; lines only read them.
+say(A, "l_bond_keep_you", "lucien", "Don't let me keep you.", ph(2, 3), forbid=["fact.luc_bond_patrol"],
+    canon="X", delivery="baiting, a curled lip, already turning back to what he was doing; true sarcasm")
+say(A, "l_bond_patrol", "lucien", "Andras's old patrol. If you're coming, come.", ph(2, 3),
+    req=["fact.luc_warm_patrol"], canon="A", delivery="brisk, by the doors, already pulling on his gloves")
+chat(A, "l_bond_seat", "lucien", "You ride like a sack of grain. Less of one than last time.", ph(2, 4),
+    req=["fact.luc_did_rode_out"], canon="X")
+say(A, "l_bond_help", "lucien", "I wish I could have been there to help.", ph(3, 4), req=["fact.luc_bond_debt"],
+    canon="V", delivery="half-hearted, not meeting her eye")
+say(A, "l_bond_suriel", "lucien", "Tam told me that your first shot was to save the Suriel's life. Not your own.",
+    ph(3, 4), req=["fact.luc_did_freed_suriel_first"], canon="V", pr=5)
+say(A, "l_bond_faerie", "lucien", "Tam says you held him still to the end. Better you than me.", ph(3, 4),
+    req=["fact.luc_did_held_him_still"], canon="A", delivery="light, covering; he won't admit he ran (ch17)")
+say(A, "l_bond_friend", "lucien", "Ride out with me tomorrow. I'll even let you choose the way.", WIDER,
+    req=["fact.luc_warm_friend"], canon="X")
+deed(A, "d_luc_warm_patrol", "fact.luc_warm_patrol", "He's started waiting for me in the mornings.", COURT,
+     canon="X")
+
 # --- Tamlin: terse, gruff, gentle under it -----------------------------------
 A = "tamlin"
 say(A, "t_grounds", "tamlin", "Go where you like on the grounds. Not the woods after dark.", ph(2), canon="A")
@@ -669,6 +688,29 @@ chat(A, "t_hungry", "tamlin", "Are you hungry? You're always hungry. Come and ea
 chat(A, "t_thorns", "tamlin", "Mind the thorns.", COURT, where="manor_grounds")
 chat(A, "t_light", "tamlin", "The light's good today. For painting, I mean.", WIDER, req=["first_painting"])
 deed(A, "d_naga_tamlin", "naga_survived", "You're safe. I've got you.", speaker="tamlin", phases=COURT, pr=5)
+# Tamlin as his bond with her stands (L90). On a cool day he is withdrawn,
+# never menacing (director, 11-25): absent from his evening study, short with
+# her when they do meet (Keeper, 11-25).
+say(A, "t_bond_gate", "tamlin", "Stay inside the gate after dark. Whatever you hear calling.", ph(2, 3),
+    req=["fact.tam_warm_host"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_lucien_says", "tamlin", "Lucien says you didn't look. Good.", ph(2, 3),
+    req=["fact.tam_did_didnt_look"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_map", "tamlin", "Leave your map where it is. No one here will touch it.", ph(3, 4),
+    req=["fact.tam_did_mapped_house"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_letters", "tamlin", "Someone's been at the study desk. Keep the candles lit as long as you like.",
+    ph(3, 4), req=["fact.tam_did_practised_letters"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_bond_late", "tamlin", "Can't sleep either?", ph(3, 4), req=["fact.tam_warm_wounded"],
+    forbid=["fact.tam_mood_cool"], hours=(22.0, 2.0), canon="X", delivery="low, tired, glad of the company")
+chat(A, "t_bond_quiet", "tamlin", "The house is quiet at this hour. I like it.", ph(3, 4),
+    req=["fact.tam_warm_wounded"], forbid=["fact.tam_mood_cool"], hours=(22.0, 2.0), canon="X")
+say(A, "t_bond_show", "tamlin", "There's another place I'd like to show you. When you're ready.", WIDER,
+    req=["fact.tam_warm_guide"], forbid=["fact.tam_mood_cool"], canon="A")
+say(A, "t_cool_talk", "tamlin", "Not tonight, Feyre.", COURT, req=["fact.tam_mood_cool"], once=False, cd=600.0,
+    canon="X", delivery="withdrawn, tired, not angry; he doesn't look up")
+chat(A, "t_cool_eat", "tamlin", "Eat something. Then rest.", COURT, req=["fact.tam_mood_cool"], canon="X",
+     delivery="quiet, short, still looking after her")
+deed(A, "d_tam_warm_wounded", "fact.tam_warm_wounded", "He walks the halls at night too. I'm not the only one.",
+     COURT, canon="X")
 
 # --- Alis: brisk, practical, sly ---------------------------------------------
 A = "alis"
@@ -1129,7 +1171,7 @@ spot("lucien_drawing", "lucien", CAST % ("lucien", "lucien"), "manor_estate", -1
 spot("tamlin_armory", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -36.0, -34.5, ph(2, 3),
      room="armory", hours=(7.0, 10.0), canon="A", notes="a warrior; arms before he rides out")
 spot("tamlin_study", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -15.0, -66.0, COURT,
-     room="tamlin_study", hours=(17.0, 21.0), canon="X")
+     room="tamlin_study", hours=(17.0, 21.0), forbid=["fact.tam_mood_cool"], canon="X")
 spot("tamlin_garden", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", 18.0, -160.0, WIDER,
      hours=(9.0, 13.0), canon="A", notes="the rose garden his father planted (ch19)")
 spot("sentry_gate_w", "sentry", PEOPLE % "sentry_1", "manor_estate", -7.0, 292.0, COURT, yaw=0.0, canon="C",
@@ -1188,6 +1230,13 @@ for i, (near, dx, dz) in enumerate([("long_tables", -6, 3), ("long_tables", 6, -
     spot("reveler_solstice_%d" % (i + 1), "reveler", PEOPLE % ("reveler_%d" % (i + 1)), "solstice_meadow",
          x + dx, z + dz, ph(6), wander=3.0, canon="C")
 
+# Where they are because of her (L90, docs/contracts/relationships.md): bond facts only.
+spot("lucien_doors_waiting", "lucien", CAST % ("lucien", "lucien"), "manor_estate", 4.5, -33.0, ph(2, 3),
+     room="entrance_hall", yaw=180.0, hours=(6.5, 8.0), req=["fact.luc_warm_patrol"], canon="A",
+     notes="waits by the front doors for her before Andras's old patrol (ch11)")
+spot("tamlin_halls_late", "tamlin", CAST % ("tamlin", "tamlin"), "manor_estate", -4.0, -34.0, ph(3, 4),
+     room="entrance_hall", yaw=90.0, hours=(22.0, 2.0), req=["fact.tam_warm_wounded"],
+     forbid=["fact.tam_mood_cool"], canon="A", notes="late at night in the halls, as she is (ch12)")
 
 # =============================================================================
 # Writing

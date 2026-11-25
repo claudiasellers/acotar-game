@@ -129,7 +129,6 @@ const BALK_HOLD := 1.5
 const MEET_NEAR := 16.0
 const MEET_PACE := 5.0
 
-var _tier_triggers: Dictionary = {}
 var _moment: int = -1
 var _last_ride_at: Vector3 = Vector3.INF
 var _region_t: float = 0.0
@@ -161,19 +160,10 @@ func _ready() -> void:
 	_unlock.fire_on_body_enter = false
 	_unlock.monitoring = false
 	add_child(_unlock)
-	for t in MareBond.TIERS.slice(2):
-		var trig := ActionTrigger.new()
-		trig.name = "MareBondTrigger_%s" % String(t["fact"]).get_slice(".", 1)
-		trig.flag = t["fact"]
-		trig.fire_on_body_enter = false
-		trig.monitoring = false
-		add_child(trig)
-		_tier_triggers[t["fact"]] = trig
-	MareBond.raise = _raise_fact
 	if not MareCare.on_care.has(MareBond.on_care):
 		MareCare.on_care.append(MareBond.on_care)
-	if not MareBond.on_tier.has(_on_tier):
-		MareBond.on_tier.append(_on_tier)
+	if not Relationships.on_stage.has(_on_tier):
+		Relationships.on_stage.append(_on_tier)
 	_gust = AudioStreamPlayer.new()
 	_gust.stream = WIND
 	_gust.volume_db = -14.0
@@ -313,16 +303,10 @@ func _too_far() -> void:
 		WorldState.set_flag(MareBond.TOO_FAR_FACT, true)
 
 
-func _raise_fact(fact: String) -> void:
-	var t := _tier_triggers.get(fact) as ActionTrigger
-	if t:
-		t.fire()
-	else:
-		WorldState.set_flag(fact, true)
-
-
-func _on_tier(_tier: int) -> void:
-	_moment = _tier
+## A new step of her bond (Relationships.on_stage): her moment plays when Feyre is next by her.
+func _on_tier(bond: StringName, tier: int) -> void:
+	if bond == MareBond.BOND:
+		_moment = tier
 
 
 ## Feyre's bond thoughts join the free-roam dialogue (its DEED lines on the facts).
@@ -916,10 +900,8 @@ func _ride_camera(p: Node, on: bool) -> void:
 
 
 func _exit_tree() -> void:
-	MareBond.on_tier.erase(_on_tier)
+	Relationships.on_stage.erase(_on_tier)
 	MareCare.on_care.erase(MareBond.on_care)
-	if MareBond.raise == _raise_fact:
-		MareBond.raise = Callable()
 	# Never leave her camera lifted if the director goes while she rides.
 	var p := _player()
 	if riding and p and &"camera_lift" in p:

@@ -3,7 +3,8 @@ extends GutTest
 ## each step opens on one-off deeds behind a barrier, never on days, the steps
 ## widen how far she hears the whistle and carries Feyre, her page says what to
 ## try, and the bond only ever raises `fact.mare_*` facts, never a phase flag
-## (R2). Also the saddle and reins she wears for it.
+## (R2). Also the saddle and reins she wears for it. The bond runs on the one
+## engine (docs/contracts/relationships.md): her milestones are her facts.
 
 const HORSE := preload("res://creatures/fae/white_horse.tscn")
 const FEYRE_MODEL := preload("res://characters/feyre/model/feyre_model.tscn")
@@ -21,13 +22,13 @@ func before_each() -> void:
 	WorldDeltas.clear()
 	raised.clear()
 	MarePage.reset()
-	MareBond.raise = func(fact: String) -> void:
+	Relationships.raise = func(fact: String) -> void:
 		raised.append(fact)
 		WorldState.set_flag(fact, true)
 
 
 func after_each() -> void:
-	MareBond.raise = Callable()
+	Relationships.raise = Callable()
 
 
 func test_nothing_counts_before_she_is_ridden() -> void:
@@ -120,6 +121,30 @@ func test_her_page_says_what_to_try_and_remembers() -> void:
 				assert_eq(n.hints.size(), 3, "%s: three hints, gentle to plain" % id)
 				assert_ne(n.memory, "")
 	assert_eq(d.now.size(), MareBond.TIERS.size())
+
+
+func test_her_page_and_the_bonds_tab_read_the_same_facts() -> void:
+	WorldState.set_flag("wall_crossed", true)
+	WorldState.set_flag("first_dinner_eaten", true)
+	WorldState.set_flag("fact.mare_ridden", true)
+	MareBond.answered()
+	MareBond.on_care(&"brushed", 1)
+	MareBond.on_care(&"honeyplum", 1)
+	var mare: Dictionary = {}
+	for b in BondBook.known():
+		if b.kind == BondBook.MARE:
+			mare = b
+	assert_false(mare.is_empty(), "she is in the Bonds tab")
+	var shown: Array[String] = []
+	for m in BondBook.moments(mare):
+		shown.append(String(m.flag))
+	for step: int in MareBond.MILESTONES:
+		for id: StringName in MareBond.MILESTONES[step]:
+			var fact := MareBond.DID_PREFIX + String(id)
+			assert_eq(shown.has(fact), MareBond.done(id), "%s: the tab shows it exactly when it's done" % fact)
+	assert_eq(MarePage.memories().size(), 3, "her page remembers the same three")
+	assert_eq(BondBook.these_days(mare), MarePage.data().now[2], "and both say she trusts Feyre")
+	assert_false("bond_done" in str(WorldDeltas.to_dict()), "the old store is gone")
 
 
 func test_each_step_reaches_farther() -> void:

@@ -17,11 +17,13 @@ of the plan's people later. It replaces:
 
 - **MareBond's own tier store.** The WorldDeltas `mount/bond_done` list is
   deleted. A deed is done when its `fact.<prefix>_did_<deed>` flag is up, and
-  nothing else records it. `MareBond.TIERS` and `MareBond.MILESTONES` become the
-  mare's `BondDef` (`data/relationships/mare.tres`). `MareBond` keeps only what
-  is the mare's own: the whistle and carry ranges, the bareback run, the regions
-  reached on her back, the balm and the blight. It reports deeds to the core
-  with `Relationships.deed(&"mare", id)`.
+  nothing else records it. `MareBond.TIERS` and `MareBond.MILESTONES` stay her
+  own table (with the whistle and carry ranges), and `gen_bonds.gd` writes them
+  into the mare's `BondDef` (`data/relationships/mare.tres`); the contract test
+  keeps the two equal. `MareBond` keeps only what is the mare's own: the ranges,
+  the bareback run, the regions reached on her back, the balm and the blight.
+  It reports deeds to the core with `Relationships.deed(&"mare", id)`, and its
+  old `raise`, `on_tier` and `on_milestone` hooks are gone.
 - **MountDirector's per-tier ActionTriggers.** `RelationshipDirector` owns one
   ActionTrigger per bond fact for every bond, the mare's included.
 
@@ -68,7 +70,7 @@ Never hand-edit the `.tres`.
 | `floor` | regard needed |
 | `canon_floor` | canon flag that opens the stage without the regard (`""`: the floor is strict) |
 | `warm_at` | regard at which this stage turns warm (0: never). Raises `fact.<prefix>_warm_<stage>` |
-| `attitude` | `cool`, `neutral` or `warm`: how they hold themselves at this stage before it turns warm |
+| `attitude` | `cool`, `baiting`, `neutral` or `warm`: how they hold themselves at this stage before it turns warm |
 
 `BondDeed`:
 
@@ -85,7 +87,7 @@ Never hand-edit the `.tres`.
 
 | field | what |
 |---|---|
-| `id` | `cool` for now. Raises `fact.<prefix>_mood_<id>`; set back to false when it ends |
+| `id` | `cool` for now. Raises `fact.<prefix>_mood_<id>`; set back to false when it ends. Several triggers may share one id |
 | `kind` | `region` (she walks into `region` while `unless_flag` is down) or `hurt_home` (she comes into `manor_estate` below `health_below` of her health) |
 | `region`, `unless_flag`, `health_below` | as above |
 | `days` | how many dawns it lasts (1: the evening and the next morning are cool, the dawn after that ends it) |
@@ -123,6 +125,7 @@ Lines and presence spots in `tools/dialogue/gen_dialogue.py` read these facts in
 | `warm(bond) -> bool` | the current stage's warm fact is up |
 | `mood(bond) -> StringName` | the mood on now, or `&""` |
 | `attitude(bond) -> StringName` | `cool` while a cool mood is on, `warm` once the current stage is warm, else the stage's `attitude`. `neutral` for an id with no BondDef |
+| `start_mood(bond, mood, today)`, `dawn(day)` | a mood starts (only past stage 0) and lasts until the `days`-th dawn after `today` |
 | `on_stage: Array[Callable]` | called with `(bond, stage)` when a stage opens (MountDirector plays the mare's moment) |
 | `on_deed: Array[Callable]` | called with `(bond, deed)` when a deed is done (MountDirector chimes) |
 
@@ -136,13 +139,17 @@ load.
 
 ### Who reads what
 
-- `PresenceActor` (L34's) asks `Relationships.attitude(speaker)`: `cool` turns his
-  back while she is near, `neutral` turns to her within 6 m, `warm` within 12 m.
-  It only turns. No prompt, mark or text (R2).
+- `PresenceActor` (L34's) asks `Relationships.attitude(speaker)`: `neutral` turns
+  to her within 6 m, `warm` within 12 m; `baiting` watches her and, if she
+  lingers past `LINGER` (4 s), goes back to facing his own business (Lucien
+  before the patrol: chatty and baiting, never turning his back, Keeper ch6-9);
+  `cool` turns away from her (a cool mood: Tamlin's way). It only turns. No
+  prompt, mark or text (R2).
 - `CastPresence` and `DialogueDirector` read the facts through their spots' and
   lines' `req` and `forbid`.
-- `BondBook` has a moment row for each stage and warm fact of a person, so the
-  Bonds tab tells what changed in her words. It never reads regard.
+- `BondBook` has a moment row for each warm fact and each reported deed of a
+  person (the stages already share their canon flags' rows), so the Bonds tab
+  tells what changed in her words. It never reads regard.
 - `MareBond`, `MarePage`, `MountDirector` and `MareTendingView` keep calling
   `MareBond`, which reads the core.
 
@@ -153,6 +160,22 @@ counted from flags and cues that already exist, two cool moods for Tamlin (into
 `suriel_glade` alone before `naga_survived`, home below half health), and the
 white mare. The rest of the plan's stages, Alis and the family are later
 slices on the same tables.
+
+What the player sees (lines and spots in `gen_dialogue.py`, Keeper-checked
+2026-11-25, `plans/relationship-loops/l90-keeper-answers.md`):
+- Lucien before the patrol watches her and turns back to his business if she
+  lingers. Once she has ridden out with him (`fact.luc_warm_patrol`) he waits
+  by the front doors in the mornings (06:30–08:00) and turns to her from across
+  the hall.
+- Tamlin, once his wounded stage is warm (`fact.tam_warm_wounded`: her letters,
+  the Suriel freed first or the Summer faerie held still, on top of the deeds
+  every run passes), stands in the entrance hall late at night (22:00–02:00, P3–P4).
+- On a cool day Tamlin is absent from his evening study and turns away from
+  her when they meet, withdrawn and never menacing.
+- Reported deeds come back as lines: "Lucien says you didn't look." "Tam told me
+  that your first shot was to save the Suriel's life."
+
+Proof: `tools/relationships/bond_shot.tscn` (three stills in the entrance hall).
 
 Tests: `tests/unit/relationships/test_relationships.gd`,
 `tests/unit/mount/test_mare_bond.gd`.

@@ -1,0 +1,97 @@
+[gd_resource type="Resource" script_class="BondDef" format=3]
+
+[ext_resource type="Script" path="res://systems/relationships/bond_deed.gd" id="1_yfgkf"]
+[ext_resource type="Script" path="res://systems/relationships/bond_mood.gd" id="2_4tq2l"]
+[ext_resource type="Script" path="res://systems/relationships/bond_def.gd" id="3_2rway"]
+[ext_resource type="Script" path="res://systems/relationships/bond_stage.gd" id="4_3ferv"]
+
+[sub_resource type="Resource" id="Resource_d8g4u"]
+script = ExtResource("1_yfgkf")
+id = &"answered"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_hhqht"]
+script = ExtResource("1_yfgkf")
+id = &"gleam"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_xrsg6"]
+script = ExtResource("1_yfgkf")
+id = &"honeyplum"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_be4y8"]
+script = ExtResource("1_yfgkf")
+id = &"edge"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_8s0vj"]
+script = ExtResource("1_yfgkf")
+id = &"places"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_keqhy"]
+script = ExtResource("1_yfgkf")
+id = &"bareback_run"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_cqaii"]
+script = ExtResource("1_yfgkf")
+id = &"balked"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_qtem2"]
+script = ExtResource("1_yfgkf")
+id = &"blight_ride"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_b6jhj"]
+script = ExtResource("1_yfgkf")
+id = &"reunion"
+weight = 0
+from_stage = 1
+
+[sub_resource type="Resource" id="Resource_eoyk6"]
+script = ExtResource("4_3ferv")
+id = &"tier0"
+fact = "first_dinner_eaten"
+raised_elsewhere = true
+
+[sub_resource type="Resource" id="Resource_j0bag"]
+script = ExtResource("4_3ferv")
+id = &"tier1"
+fact = "fact.mare_ridden"
+raised_elsewhere = true
+
+[sub_resource type="Resource" id="Resource_l7c87"]
+script = ExtResource("4_3ferv")
+id = &"tier2"
+fact = "fact.mare_bond_trusted"
+needs = Array[StringName]([&"answered", &"gleam", &"honeyplum"])
+
+[sub_resource type="Resource" id="Resource_rabdo"]
+script = ExtResource("4_3ferv")
+id = &"tier3"
+fact = "fact.mare_bond_bareback"
+needs = Array[StringName]([&"edge", &"places", &"bareback_run"])
+
+[sub_resource type="Resource" id="Resource_v4ocw"]
+script = ExtResource("4_3ferv")
+id = &"tier4"
+fact = "fact.mare_bond_heart"
+needs = Array[StringName]([&"balked", &"blight_ride", &"reunion"])
+
+[resource]
+script = ExtResource("3_2rway")
+id = &"mare"
+prefix = "mare"
+stages = Array[ExtResource("4_3ferv")]([SubResource("Resource_eoyk6"), SubResource("Resource_j0bag"), SubResource("Resource_l7c87"), SubResource("Resource_rabdo"), SubResource("Resource_v4ocw")])
+deeds = Array[ExtResource("1_yfgkf")]([SubResource("Resource_d8g4u"), SubResource("Resource_hhqht"), SubResource("Resource_xrsg6"), SubResource("Resource_be4y8"), SubResource("Resource_8s0vj"), SubResource("Resource_keqhy"), SubResource("Resource_cqaii"), SubResource("Resource_qtem2"), SubResource("Resource_b6jhj")])

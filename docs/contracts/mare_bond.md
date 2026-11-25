@@ -56,16 +56,18 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
 
 ## The bond (L47-8, redesigned 2026-11-18)
 
-`MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story and never
-touches a phase flag (R2). It grows on what Feyre and the mare do together,
+`MareBond` (`systems/mount/mare_bond.gd`) runs beside the main story on the one
+bond engine (`docs/contracts/relationships.md`, L90) and never touches a phase
+flag (R2). It grows on what Feyre and the mare do together,
 never on days: there are no points, no daily caps and no time gates. Each step
 opens when its milestones are done (`MareBond.MILESTONES`), one-off deeds of
 which the last is a threshold behind a real barrier. A milestone can be done
 early, but a step still needs the one before it. Bond facts are WorldState
-keys under `fact.mare_bond_*`, raised through the director's ActionTriggers
-(`MareBondTrigger_*`); each milestone also raises `fact.mare_did_<id>`. State
-lives in WorldDeltas region `mount` (`bond_done`, `bond_regions`,
-`bareback_run_m`, `balks`, `balm`, `blight_m`, `page_hints`).
+keys under `fact.mare_bond_*`, raised through RelationshipDirector's
+ActionTriggers (`BondTrigger_*`); each milestone is done when its
+`fact.mare_did_<id>` is up, and nothing else records it. Her own state
+lives in WorldDeltas region `mount` (`bond_regions`, `bareback_run_m`, `balks`,
+`balm`, `blight_m`, `page_hints`).
 
 | tier | fact | milestones (the last is the barrier) | hears the whistle from | carries Feyre out to |
 |---|---|---|---|---|

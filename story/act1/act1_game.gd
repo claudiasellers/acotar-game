@@ -93,6 +93,7 @@ func _ready() -> void:
 	add_child(SoundDirector.new())
 	add_child(Wayside.new())
 	add_child(MountDirector.new())
+	add_child(RelationshipDirector.new())
 	add_child(WhorlStones.new())
 
 

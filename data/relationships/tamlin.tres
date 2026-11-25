@@ -1,0 +1,120 @@
+[gd_resource type="Resource" script_class="BondDef" format=3]
+
+[ext_resource type="Script" path="res://systems/relationships/bond_deed.gd" id="1_jx8rt"]
+[ext_resource type="Script" path="res://systems/relationships/bond_mood.gd" id="2_pmr85"]
+[ext_resource type="Script" path="res://systems/relationships/bond_def.gd" id="3_vidf2"]
+[ext_resource type="Script" path="res://systems/relationships/bond_stage.gd" id="4_3rcxk"]
+
+[sub_resource type="Resource" id="Resource_n5dt1"]
+script = ExtResource("1_jx8rt")
+id = &"ate_at_table"
+on_flag = "first_dinner_eaten"
+canon = "C9"
+
+[sub_resource type="Resource" id="Resource_vs1hd"]
+script = ExtResource("1_jx8rt")
+id = &"resisted_puca"
+on_flag = "puca_resisted"
+canon = "C11"
+
+[sub_resource type="Resource" id="Resource_em6tx"]
+script = ExtResource("1_jx8rt")
+id = &"didnt_look"
+on_flag = "bogge_survived"
+how = &"reported"
+canon = "A10"
+
+[sub_resource type="Resource" id="Resource_mb2hg"]
+script = ExtResource("1_jx8rt")
+id = &"bound_hand"
+weight = 2
+on_flag = "fact.tamlin_hand_bound"
+canon = "C12"
+
+[sub_resource type="Resource" id="Resource_ig5m3"]
+script = ExtResource("1_jx8rt")
+id = &"mapped_house"
+on_flag = "fact.hall_map_set_down"
+how = &"found"
+canon = "C12"
+
+[sub_resource type="Resource" id="Resource_cktl0"]
+script = ExtResource("1_jx8rt")
+id = &"practised_letters"
+on_flag = "fact.letters_practised"
+how = &"found"
+canon = "C16"
+
+[sub_resource type="Resource" id="Resource_eaonx"]
+script = ExtResource("1_jx8rt")
+id = &"freed_suriel_first"
+weight = 2
+on_cue = "suriel:freed"
+canon = "C18"
+
+[sub_resource type="Resource" id="Resource_6kt1g"]
+script = ExtResource("1_jx8rt")
+id = &"held_him_still"
+weight = 2
+on_flag = "fact.summer_faerie_held"
+canon = "C17"
+
+[sub_resource type="Resource" id="Resource_or7at"]
+script = ExtResource("1_jx8rt")
+id = &"painted"
+on_flag = "first_painting"
+how = &"found"
+canon = "C16"
+
+[sub_resource type="Resource" id="Resource_cpkfe"]
+script = ExtResource("2_pmr85")
+region = &"suriel_glade"
+unless_flag = "naga_survived"
+canon = "A16"
+
+[sub_resource type="Resource" id="Resource_k2ckt"]
+script = ExtResource("2_pmr85")
+kind = &"hurt_home"
+
+[sub_resource type="Resource" id="Resource_eikee"]
+script = ExtResource("4_3rcxk")
+id = &"beast"
+fact = "beast_claim_accepted"
+raised_elsewhere = true
+canon = "C4"
+
+[sub_resource type="Resource" id="Resource_xx817"]
+script = ExtResource("4_3rcxk")
+id = &"host"
+fact = "fact.tam_bond_host"
+gate = "first_dinner_eaten"
+warm_at = 3
+canon = "C9"
+
+[sub_resource type="Resource" id="Resource_wlnkx"]
+script = ExtResource("4_3rcxk")
+id = &"wounded"
+fact = "fact.tam_bond_wounded"
+gate = "tamlin_wound_dressed"
+floor = 4
+canon_floor = "study_mural_seen"
+warm_at = 7
+canon = "C12-13"
+
+[sub_resource type="Resource" id="Resource_cl4v7"]
+script = ExtResource("4_3rcxk")
+id = &"guide"
+fact = "fact.tam_bond_guide"
+gate = "starlight_pool_found"
+floor = 8
+canon_floor = "gallery_opened"
+warm_at = 10
+canon = "C18-19"
+
+[resource]
+script = ExtResource("3_vidf2")
+id = &"tamlin"
+prefix = "tam"
+stages = Array[ExtResource("4_3rcxk")]([SubResource("Resource_eikee"), SubResource("Resource_xx817"), SubResource("Resource_wlnkx"), SubResource("Resource_cl4v7")])
+deeds = Array[ExtResource("1_jx8rt")]([SubResource("Resource_n5dt1"), SubResource("Resource_vs1hd"), SubResource("Resource_em6tx"), SubResource("Resource_mb2hg"), SubResource("Resource_ig5m3"), SubResource("Resource_cktl0"), SubResource("Resource_eaonx"), SubResource("Resource_6kt1g"), SubResource("Resource_or7at")])
+moods = Array[ExtResource("2_pmr85")]([SubResource("Resource_cpkfe"), SubResource("Resource_k2ckt")])

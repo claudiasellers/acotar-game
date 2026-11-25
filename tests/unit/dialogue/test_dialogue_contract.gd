@@ -53,6 +53,10 @@ func _known_flags() -> Dictionary:
 		known[m.get_string(1)] = true
 	for f in FACTS:
 		known[f] = true
+	# Bond facts are the bond engine's (docs/contracts/relationships.md).
+	for bond: StringName in Relationships.defs():
+		for f in Relationships.def(bond).facts():
+			known[f] = true
 	return known
 
 

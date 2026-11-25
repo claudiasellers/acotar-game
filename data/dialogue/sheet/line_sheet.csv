@@ -244,6 +244,14 @@ l_alis,lucien,Lucien,Alis is looking for you. That's never good.,X,,near,,,p2_gr
 l_nursemaid,lucien,Lucien,Walk with me or don't. I'm not your nursemaid.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_nursemaid.ogg
 l_glare,lucien,Lucien,"If you're going to glare, at least do it from the shade.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_glare.ogg
 d_bogge_lucien,lucien,Lucien,Breathe. It's gone. You did well.,X,,deed,,bogge_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/d_bogge_lucien.ogg
+l_bond_keep_you,lucien,Lucien,Don't let me keep you.,X,,near,,,p2_grounds p3_house_and_woods,"baiting, a curled lip, already turning back to what he was doing; true sarcasm",audio/voice/l_bond_keep_you.ogg
+l_bond_patrol,lucien,Lucien,"Andras's old patrol. If you're coming, come.",A,,near,,,p2_grounds p3_house_and_woods,"brisk, by the doors, already pulling on his gloves",audio/voice/l_bond_patrol.ogg
+l_bond_seat,lucien,Lucien,You ride like a sack of grain. Less of one than last time.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court,,audio/voice/l_bond_seat.ogg
+l_bond_help,lucien,Lucien,I wish I could have been there to help.,V,,near,,,p3_house_and_woods p4_wider_court,"half-hearted, not meeting her eye",audio/voice/l_bond_help.ogg
+l_bond_suriel,lucien,Lucien,Tam told me that your first shot was to save the Suriel's life. Not your own.,V,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/l_bond_suriel.ogg
+l_bond_faerie,lucien,Lucien,Tam says you held him still to the end. Better you than me.,A,,near,,,p3_house_and_woods p4_wider_court,"light, covering; he won't admit he ran (ch17)",audio/voice/l_bond_faerie.ogg
+l_bond_friend,lucien,Lucien,Ride out with me tomorrow. I'll even let you choose the way.,X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/l_bond_friend.ogg
+d_luc_warm_patrol,feyre,,He's started waiting for me in the mornings.,X,yes,deed,,fact.luc_warm_patrol,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_luc_warm_patrol.ogg
 t_grounds,tamlin,Tamlin,Go where you like on the grounds. Not the woods after dark.,A,,near,,,p2_grounds,,audio/voice/t_grounds.ogg
 t_eating,tamlin,Tamlin,You're eating more. Good.,X,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_eating.ogg
 t_border,tamlin,Tamlin,I'll be at the border tonight. Lucien stays.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_border.ogg
@@ -263,6 +271,16 @@ t_hungry,tamlin,Tamlin,Are you hungry? You're always hungry. Come and eat.,X,,ne
 t_thorns,tamlin,Tamlin,Mind the thorns.,X,,near,manor_grounds,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_thorns.ogg
 t_light,tamlin,Tamlin,"The light's good today. For painting, I mean.",X,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_light.ogg
 d_naga_tamlin,tamlin,Tamlin,You're safe. I've got you.,X,,deed,,naga_survived,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/d_naga_tamlin.ogg
+t_bond_gate,tamlin,Tamlin,Stay inside the gate after dark. Whatever you hear calling.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_bond_gate.ogg
+t_bond_lucien_says,tamlin,Tamlin,Lucien says you didn't look. Good.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/t_bond_lucien_says.ogg
+t_bond_map,tamlin,Tamlin,Leave your map where it is. No one here will touch it.,A,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_bond_map.ogg
+t_bond_letters,tamlin,Tamlin,Someone's been at the study desk. Keep the candles lit as long as you like.,A,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_bond_letters.ogg
+t_bond_late,tamlin,Tamlin,Can't sleep either?,X,,near,,,p3_house_and_woods p4_wider_court,"low, tired, glad of the company",audio/voice/t_bond_late.ogg
+t_bond_quiet,tamlin,Tamlin,The house is quiet at this hour. I like it.,X,,near,,,p3_house_and_woods p4_wider_court,,audio/voice/t_bond_quiet.ogg
+t_bond_show,tamlin,Tamlin,There's another place I'd like to show you. When you're ready.,A,,near,,,p4_wider_court p5_calanmai p6_blight_tightens,,audio/voice/t_bond_show.ogg
+t_cool_talk,tamlin,Tamlin,"Not tonight, Feyre.",X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"withdrawn, tired, not angry; he doesn't look up",audio/voice/t_cool_talk.ogg
+t_cool_eat,tamlin,Tamlin,Eat something. Then rest.,X,,near,,,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"quiet, short, still looking after her",audio/voice/t_cool_eat.ogg
+d_tam_warm_wounded,feyre,,He walks the halls at night too. I'm not the only one.,X,yes,deed,,fact.tam_warm_wounded,p2_grounds p3_house_and_woods p4_wider_court p5_calanmai p6_blight_tightens,"inner voice, just after the deed",audio/voice/d_tam_warm_wounded.ogg
 a_trousers,alis,Alis,Trousers again? Fine. One day you'll wear a gown and like it.,A,,near,,,p2_grounds p3_house_and_woods p4_wider_court,,audio/voice/a_trousers.ogg
 a_curtain,alis,Alis,"Next time you string up a curtain to catch me, use the ugly ones.",A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/a_curtain.ogg
 a_lucien,alis,Alis,Don't let Lucien bully you. Bite back. He likes it better.,A,,near,,,p2_grounds p3_house_and_woods,,audio/voice/a_lucien.ogg

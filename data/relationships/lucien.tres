@@ -1,0 +1,99 @@
+[gd_resource type="Resource" script_class="BondDef" format=3]
+
+[ext_resource type="Script" path="res://systems/relationships/bond_deed.gd" id="1_e10vf"]
+[ext_resource type="Script" path="res://systems/relationships/bond_mood.gd" id="2_sqc5u"]
+[ext_resource type="Script" path="res://systems/relationships/bond_def.gd" id="3_odtkd"]
+[ext_resource type="Script" path="res://systems/relationships/bond_stage.gd" id="4_w61lt"]
+
+[sub_resource type="Resource" id="Resource_1wrup"]
+script = ExtResource("1_e10vf")
+id = &"said_yes_to_hunt"
+on_flag = "fact.hunt_invited"
+canon = "C9"
+
+[sub_resource type="Resource" id="Resource_pies4"]
+script = ExtResource("1_e10vf")
+id = &"didnt_look"
+weight = 2
+on_flag = "bogge_survived"
+canon = "C10"
+
+[sub_resource type="Resource" id="Resource_stuqg"]
+script = ExtResource("1_e10vf")
+id = &"rode_out"
+on_flag = "fact.mare_ridden"
+canon = "C11"
+
+[sub_resource type="Resource" id="Resource_chl4p"]
+script = ExtResource("1_e10vf")
+id = &"asked_after_suriel"
+on_flag = "fact.suriel_method_known"
+canon = "C13"
+
+[sub_resource type="Resource" id="Resource_shy5w"]
+script = ExtResource("1_e10vf")
+id = &"freed_suriel_first"
+weight = 2
+on_cue = "suriel:freed"
+how = &"reported"
+canon = "C18"
+
+[sub_resource type="Resource" id="Resource_4ekhh"]
+script = ExtResource("1_e10vf")
+id = &"held_him_still"
+on_flag = "fact.summer_faerie_held"
+how = &"reported"
+canon = "A17"
+
+[sub_resource type="Resource" id="Resource_xlruj"]
+script = ExtResource("4_w61lt")
+id = &"hostile"
+fact = "first_dinner_eaten"
+raised_elsewhere = true
+attitude = &"baiting"
+canon = "C6-9"
+
+[sub_resource type="Resource" id="Resource_s4srx"]
+script = ExtResource("4_w61lt")
+id = &"patrol"
+fact = "fact.luc_bond_patrol"
+gate = "bogge_survived"
+floor = 3
+canon_floor = "puca_resisted"
+warm_at = 4
+canon = "C9-11"
+
+[sub_resource type="Resource" id="Resource_ri2bk"]
+script = ExtResource("4_w61lt")
+id = &"trap"
+fact = "fact.luc_bond_trap"
+gate = "study_mural_seen"
+floor = 3
+canon_floor = "fact.suriel_method_known"
+canon = "C13"
+
+[sub_resource type="Resource" id="Resource_7o83l"]
+script = ExtResource("4_w61lt")
+id = &"debt"
+fact = "fact.luc_bond_debt"
+gate = "naga_survived"
+floor = 5
+canon_floor = "summer_faerie_comforted"
+canon = "C16-17"
+
+[sub_resource type="Resource" id="Resource_20gjc"]
+script = ExtResource("4_w61lt")
+id = &"friend"
+fact = "fact.luc_bond_friend"
+gate = "starlight_pool_found"
+floor = 7
+canon_floor = "gallery_opened"
+warm_at = 8
+canon = "C18"
+
+[resource]
+script = ExtResource("3_odtkd")
+id = &"lucien"
+prefix = "luc"
+stages = Array[ExtResource("4_w61lt")]([SubResource("Resource_xlruj"), SubResource("Resource_s4srx"), SubResource("Resource_ri2bk"), SubResource("Resource_7o83l"), SubResource("Resource_20gjc")])
+deeds = Array[ExtResource("1_e10vf")]([SubResource("Resource_1wrup"), SubResource("Resource_pies4"), SubResource("Resource_stuqg"), SubResource("Resource_chl4p"), SubResource("Resource_shy5w"), SubResource("Resource_4ekhh")])
