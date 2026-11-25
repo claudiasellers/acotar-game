@@ -1,6 +1,6 @@
 ## Do the feet plant? Walks rigged creatures and cast models over flat ground
 ## at set speeds and measures how far each foot slides while it is down.
-##   tools/mq/godot.sh --fixed-fps 60 res://tools/creatures/gait_plant_probe.tscn -- [great_wolf|wolf|deer|hare|lucien|tamlin|...]
+##   tools/mq/godot.sh --fixed-fps 60 res://tools/creatures/gait_plant_probe.tscn -- [great_wolf|wolf|deer|hare|naga|lucien|tamlin|...]
 ## With no names it runs the great wolf and Lucien. Runs headless: it reads
 ## bone poses, no pictures. --fixed-fps keeps frames and physics in step, so
 ## the numbers repeat exactly. One row per body and speed:
@@ -28,12 +28,15 @@ const CREATURES := {
 	&"wolf": "res://creatures/wolves/wolf.tscn",
 	&"deer": "res://creatures/prey/deer.tscn",
 	&"hare": "res://creatures/prey/hare.tscn",
+	&"naga": "res://creatures/fae/naga.tscn",
 }
 ## [speed m/s, gait hint]
 const CREATURE_RUNS := [[1.0, &"stalk"], [1.4, &""], [2.0, &""], [3.0, &""], [4.5, &""], [7.2, &""], [9.0, &""], [12.0, &""]]
 ## Ground speeds; a negative one backs away.
 const CAST_RUNS := [0.8, 1.2, 1.6, -0.9, 2.4, 3.2, 5.0]
 const PAWS: Array[String] = ["paw_fl_l", "paw_fl_r", "paw_hl_l", "paw_hl_r"]
+## The balls of a biped monster's feet (tools/blender/monsters).
+const BIPED_PAWS: Array[String] = ["paw_leg_l", "paw_leg_r"]
 const FEET: Array[String] = ["LeftFoot", "RightFoot"]
 
 var _worst := 0.0
@@ -83,7 +86,8 @@ func _creature(kind: StringName, speed: float, hint: StringName) -> void:
 		c.move_direction = Vector3.FORWARD
 		c.move_speed = speed
 		c.gait_hint = hint
-	var slide := await _measure(c, c.animator.skeleton, PAWS, speed, drive)
+	var paws := BIPED_PAWS if c.animator.skeleton.find_bone(BIPED_PAWS[0]) >= 0 else PAWS
+	var slide := await _measure(c, c.animator.skeleton, paws, speed, drive)
 	_row(kind, speed, hint, slide, c.animator.gait_rate())
 	c.free()
 
