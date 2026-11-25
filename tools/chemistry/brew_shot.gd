@@ -1,5 +1,5 @@
 ## Milestone shot of the brewing screen (lane L62), UI only (no Feyre, F46):
-##   xvfb-run godot --rendering-driver vulkan res://tools/chemistry/brew_shot.tscn -- [discover|hunch] [out.png]
+##   xvfb-run godot --rendering-driver vulkan res://tools/chemistry/brew_shot.tscn -- [discover|hunch|recipes] [out.png]
 extends Node
 
 
@@ -33,10 +33,17 @@ func _run() -> void:
 	get_tree().root.add_child(station)
 	var menu := BrewMenu.new()
 	get_tree().root.add_child(menu)
+	if mode == "recipes":
+		# Some she can make here, one she lacks something for, one worked elsewhere.
+		for id in [&"brew_healing_salve", &"brew_hush_draught", &"brew_glow_draught", &"brew_steadying_tea", &"brew_hearty_stew", &"brew_burn_salve"]:
+			Gameplay.collection.mark(id, &"recipes", false)
 	menu.open(null, station)
-	menu.toggle(&"ing_lavender")
-	menu.toggle(&"ing_wild_hyacinth")
-	menu.set_method(&"distill")
+	if mode == "recipes":
+		menu.pick(&"brew_healing_salve")
+	else:
+		menu.toggle(&"ing_lavender")
+		menu.toggle(&"ing_wild_hyacinth")
+		menu.set_method(&"distill")
 	if mode == "discover":
 		menu.brew()
 	for i in 40:

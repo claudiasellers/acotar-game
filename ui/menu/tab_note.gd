@@ -12,6 +12,7 @@ const LINES := {
 	&"collection": "Things worth remembering.",
 	&"sketchbook": "Colours I want to keep.",
 	&"map": "Where I've been, as best I can draw it.",
+	&"bonds": "Who's in my life, for better or worse.",
 }
 const FLAG := "journal_note_%s"
 const FADE := 0.4
