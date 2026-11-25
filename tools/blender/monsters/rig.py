@@ -325,6 +325,7 @@ def two_bone(a, target, l1, l2, pole):
 class Rig:
     """Bone tables and the solver. `spec`:
         legs:  {side: (upper, lower, foot, paw)}   foot may be None (plantigrade)
+        pole_space: bone                           what carries the knees' bend direction ("pelvis")
         arms:  {side: (clav, arm, forearm, hand)}
         fingers: {side: [[bone, bone, ...], ...]}  chains that curl
         palm:  {side: Vector}                      toward which the fingers curl (rest, creature axes)
@@ -504,7 +505,8 @@ class Rig:
                     need = max(need, hip.z - math.sqrt(reach * reach - horiz * horiz) - hock.z)
             if dry:
                 continue
-            pole = (M["pelvis"] @ self.rest["pelvis"].inverted()).to_3x3() @ (f["knee"] or Vector((0.12 * side_sign(side), 1.0, 0.1)))
+            core = self.spec.get("pole_space", "pelvis")           # the bone the knees' bend direction rides on
+            pole = (M[core] @ self.rest[core].inverted()).to_3x3() @ (f["knee"] or Vector((0.12 * side_sign(side), 1.0, 0.1)))
             knee, hock_ = self._bend_clear(hip, hock, l1, l2, pole, 0.06, g)
             self._aim(M, up, hip, knee - hip)
             self._aim(M, lo, knee, hock_ - knee)
@@ -684,7 +686,8 @@ class Rig:
              heel=None, heel_off=25.0, swing_heel=20.0, toe_swing=-25.0, yaw=6.0):
         """A looping gait at `speed` m/s with `stride` metres per cycle.
         phases: {side: 0..1} when each foot lands. duty: the share of the cycle
-        a foot is planted. upper(t, phase, pose): the author adds the body.
+        a foot is planted. stance_y: where the middle of a step falls, one
+        number or {side: y} (many legs, each under its own hip). upper(t, phase, pose): the author adds the body.
         Returns the measured slide of planted feet in metres (should be ~0)."""
         T = stride / speed
         frames = max(int(round(T * FPS)), 2)
@@ -695,15 +698,16 @@ class Rig:
         def foot(side, ph):
             ball0 = self.rest_ball(side)
             x = ball0.x if width is None else width * side_sign(side)
+            mid_y = stance_y[side] if isinstance(stance_y, dict) else stance_y
             u = (ph - phases[side]) % 1.0
             base_heel = self.rest_heel.get(side, 0.0) if heel is None else heel
             if u < duty:                          # planted: back at ground speed
                 k = u / duty
-                y = stance_y + sweep / 2 - sweep * k
+                y = mid_y + sweep / 2 - sweep * k
                 return dict(ball=(x, y, ball0.z), heel=base_heel + heel_off * smooth(seg(k, 0.55, 1.0)),
                             toe=0.0, yaw=yaw), True
             s = (u - duty) / (1.0 - duty)
-            y = stance_y - sweep / 2 + sweep * (smooth(s) * 0.85 + s * 0.15)
+            y = mid_y - sweep / 2 + sweep * (smooth(s) * 0.85 + s * 0.15)
             z = ball0.z + lift * math.sin(math.pi * s) ** 0.8
             h = base_heel + heel_off * (1.0 - smooth(seg(s, 0.0, 0.35))) + swing_heel * math.sin(math.pi * s)
             return dict(ball=(x, y, z), heel=h, toe=toe_swing * math.sin(math.pi * smooth(s)) + 16.0 * pulse(s, 0.55, 0.85, 1.0),
