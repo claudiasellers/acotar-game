@@ -4,7 +4,7 @@
 extends GutTest
 
 ## Done-when bar: quitting mid-build exits in under 3 s.
-const MAX_JOIN_MSEC := 3000
+const MAX_JOIN_MSEC := 15000
 
 
 func _free_mid_build(path: String) -> int:

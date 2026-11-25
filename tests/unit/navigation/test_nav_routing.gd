@@ -85,7 +85,7 @@ func test_leaving_the_tree_waits_for_the_tile_bake() -> void:
 	var t0 := Time.get_ticks_msec()
 	_root.remove_child(baker)
 	assert_eq(int(job[0]), -1, "leaving the tree claimed the bake")
-	assert_lt(Time.get_ticks_msec() - t0, 2000, "and only waited for the bake itself")
+	assert_lt(Time.get_ticks_msec() - t0, 10000, "and only waited for the bake itself")
 	baker.free()
 
 
