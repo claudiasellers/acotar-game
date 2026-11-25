@@ -10,7 +10,7 @@ It is modelled standing with its wings spread. Each wing is three bones
 (`wing_0..2_<side>`), and the flight feathers of each ride a fan bone
 (`wing_fan_0..2_<side>`) so they can swing back along the arm as it folds.
 
-    /opt/bpyenv/bin/python tools/blender/monsters/crow.py [--preview DIR] [--fast] [--nobake]
+    /opt/bpyenv/bin/python tools/blender/monsters/hollow_crow.py [--preview DIR] [--fast] [--nobake]
 """
 
 import math
