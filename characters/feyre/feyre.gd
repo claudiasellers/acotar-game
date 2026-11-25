@@ -12,8 +12,6 @@ signal arrow_fired(arrow: Arrow)
 signal quiver_changed(count: int)
 ## For creature hearing: where the bow was released and how loud (0..1).
 signal bow_released(at: Vector3, loudness: float)
-## She pressed the sidestep with no breath left for it.
-signal sidestep_refused
 
 const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
 ## What an empty quiver holds when a game starts in a phase (bow design §8.2).
@@ -377,11 +375,11 @@ func _hold_jump_hint() -> void:
 
 
 ## No breath for it: the press is spent on a gasp, so it never fails in silence
-## (UX review G22). The stamina meter hears `sidestep_refused`.
+## (UX review G22), and the stamina bow shakes its head.
 func _refuse_sidestep() -> void:
 	sidestep.cancel()
 	SoundDirector.cue(&"breath_winded", global_position)
-	sidestep_refused.emit()
+	VitalsHud.stamina_refused(get_tree())
 
 
 ## The way the stick points, or straight back from her aim.
