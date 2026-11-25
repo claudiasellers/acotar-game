@@ -29,7 +29,7 @@ FILMS = {
             ("op_03", 21.0, 10.0, "", "C", "The greatest of them, the High Fae, were ageless, and so beautiful it hurt to look at them. Stronger than us, faster than us, with magic in their blood."),
             ("op_04", 34.5, 6.5, "", "C", "But not every faerie looked like a lord. Some wore the shapes of beasts."),
             # Owner-approved narration (2026-11-25, Keeper): spoken throughout, never sung.
-            # Voice tags: /mnt/project-files/film/narration/opening-narration-voice-tags.md (v2:
+            # Voice tags, every line: /mnt/project-files/film/narration/opening-narration-voice-tags.md (v3;
             # low and even, no pauses but the one before her name, so the holds are tight).
             ("op_05", 43.0, 8.6, "", "C", "For thousands of years, we were their slaves. We built their cities with our blood and sweat, and raised temples to their savage gods."),
             ("op_06", 54.5, 2.6, "", "C", "Until, at last, we rose against them."),
@@ -42,7 +42,7 @@ FILMS = {
             ("op_13", 107.0, 6.5, "", "C?", "My name is Feyre. I am nineteen, the youngest of three sisters."),
             ("op_14", 128.0, 8.5, "", "C", "My mother died when I was eight. Before she did, she made me promise to keep us together, and to look after them."),
             # Keeper 2026-11-25 [A], ch 18 and ch 2: "broke his leg" read as the creditor's own leg.
-            ("op_15", 137.5, 13.0, "", "A", "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."),
+            ("op_15", 137.5, 13.0, "", "A", "We were rich once. Three years after she died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."),
             ("op_16", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
             ("op_17", 166.4, 2.2, "", "C", "So I hunt."),
             ("op_18", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
