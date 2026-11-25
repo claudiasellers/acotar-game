@@ -95,6 +95,14 @@ func is_empty() -> bool:
 	return _entries.is_empty()
 
 
+## Whether a screen holds the player's hands: any screen open, pausing or not.
+## While it does, nothing in the world may act on play keys polled straight
+## from Input (StoryControl.can_shoot asks; the mare's tending screen doesn't
+## pause, and the click that brushes her must not loose an arrow).
+func takes_play() -> bool:
+	return not _entries.is_empty()
+
+
 ## Whether the pointer shows: a screen wants it, or there is no one to steer.
 func mouse_shown() -> bool:
 	return _any(Flag.MOUSE) or get_tree().get_first_node_in_group(PLAYER_GROUP) == null

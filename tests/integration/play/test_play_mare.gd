@@ -5,8 +5,8 @@
 ## moments that wait on deeds all act (the hall marks, the manor map) are
 ## running, as they are from fact.alis_tripped on; they hold nothing and must
 ## never stop her. Real key and pad events: E mounts her the first time (and
-## teaches the whistle), the stick rides, E gets down, H brings her, holding E
-## opens tending, the pad's brush (hold A, move the stick) brings her to a gleam (a bond deed).
+## teaches the whistle), the stick rides, E gets down, H brings her, T (her own
+## key, tend_mount) opens tending, the pad's brush (hold A, move the stick) brings her to a gleam (a bond deed).
 extends GutTest
 
 const PlayHarness := preload("res://tests/integration/play/play_harness.gd")
@@ -107,14 +107,14 @@ func test_2_the_whistle_brings_her() -> void:
 	assert_true(MareBond.done(&"answered"), "coming to the whistle is a bond deed")
 
 
-func test_3_hold_e_tends_her_and_brushing_bonds() -> void:
+func test_3_t_tends_her_and_brushing_bonds() -> void:
 	if not booted or not _mare_standing_near(8.0):
 		return
 	await _up_to_her()
-	h.hold(&"interact")
+	await h.press(MountDirector.TEND_ACTION)
 	var opened := await h.wait_until(func() -> bool: return md.tending != null, 120)
-	h.release(&"interact")
-	assert_true(opened, "holding E beside her opens tending (blocked: %s)" % md.block_reason(h.feyre.global_position))
+	assert_true(opened, "T beside her opens tending (can_tend %s, blocked: %s)"
+			% [md.can_tend(), md.block_reason(h.feyre.global_position)])
 	if not opened:
 		return
 	# The pad's brush (hold A, move the stick), the road MareTendingView reads
