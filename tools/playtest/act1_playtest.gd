@@ -628,6 +628,17 @@ func _play() -> void:
 	await _until(func() -> bool: return grade.target_id() == &"manor", 8.0)
 	_note("grade on arrival: %s" % grade.target_id())
 	if grade.target_id() != &"manor":
+		# Why: is the estate there, and which areas' grades hold her?
+		var holding: PackedStringArray = []
+		for node in get_tree().get_nodes_in_group(RegionGrade.GROUP):
+			var rg := node as RegionGrade
+			if rg.contains(feyre.global_position):
+				holding.append("%s %s p%d" % [rg.get_path(), rg.grade, rg.priority])
+		_note("estate loaded %s, ready %s; grades holding her: %s; story hold %s, blending %s, focus %s" % [
+			WorldStreamer.is_loaded(&"manor_estate"), WorldStreamer.is_ready(&"manor_estate"), holding,
+			grade.get(&"_story_hold"), grade.is_blending(), grade.get(&"focus")])
+		_note("streamer: focus '%s', loaded %s, pending %s, queue %s" % [WorldStreamer.get(&"_focus"),
+			(WorldStreamer.get(&"_loaded") as Dictionary).keys(), WorldStreamer.get(&"_pending"), WorldStreamer.get(&"_queue")])
 		return _fail("the ride left the look on '%s', not the manor's grade" % grade.target_id())
 	await _wait(1.0)
 	var ground := _ground_at(feyre.global_position + Vector3.UP * 3.0, 3.0)

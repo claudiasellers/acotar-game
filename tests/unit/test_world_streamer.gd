@@ -87,3 +87,19 @@ func test_threaded_loads_hold_neighbors_until_the_current_region_lands() -> void
 	assert_true(seen.has(&"a"), "her region landed")
 	assert_eq(seen.get(&"a", {}), {"b_loaded": false, "b_pending": false}, "the neighbor waited for it")
 	assert_true(WorldStreamer.is_loaded(&"b"), "then the neighbor follows")
+
+
+## The ride north holds the manor (L86-7): a held region streams in wherever
+## she is, stays while she is far off, and goes once let go and out of reach.
+func test_a_held_region_loads_from_afar_and_stays_until_let_go() -> void:
+	WorldStreamer.update_for(Vector3(10, 0, 10))
+	assert_false(WorldStreamer.is_loaded(&"c"))
+	WorldStreamer.hold(&"c")
+	assert_true(WorldStreamer.is_loaded(&"c"), "streamed in from 1 km off")
+	WorldStreamer.update_for(Vector3(0, 0, -10))
+	assert_true(WorldStreamer.is_loaded(&"c"), "kept while held, however far she is")
+	WorldStreamer.let_go(&"c")
+	WorldStreamer.update_for(Vector3(0, 0, -10))
+	assert_false(WorldStreamer.is_loaded(&"c"), "let go and out of reach: unloaded")
+	WorldStreamer.hold(&"nowhere")
+	assert_false(WorldStreamer.is_loaded(&"nowhere"), "an unknown region is ignored")
