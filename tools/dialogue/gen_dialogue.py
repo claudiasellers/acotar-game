@@ -367,12 +367,27 @@ ride("rn_lamb", "lamb", "A lamb in a kingdom of wolves.", canon="V", delivery="i
 # it off (Keeper 2026-11-25).
 ride("H1_metal", "smell_metal", "The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.", canon="A",
      delivery="inner voice: dry and close, slurring, then a sharp pull back")
+# Through the Wall (owner 2026-11-25; Keeper's wording): no way back, what she
+# sees, how she feels, and the human rules she carries to his table.
+ride("rn_through", "through", "Through the Wall. No way back now. My family can never find me.", canon="A",
+     delivery="inner voice: hollow, the gap closing behind her")
 ride("rn_birds", "birds", "Birds. In winter.", delivery="inner voice: disbelief, almost a whisper")
 ride("rn_warm", "warm", "Too warm for winter wool. It's spring here.",
      delivery="inner voice: sweating, wary")
+ride("rn_beautiful", "beautiful", "Prythian. It has no right to be this beautiful.",
+     delivery="inner voice: awe, resenting it")
+ride("rn_reins", "reins", "I clench the reins to keep my hands from shaking.", canon="A",
+     delivery="inner voice: tight, holding herself together")
 ride("rn_name", "name", "Do you have a name?", canon="V", inner=False, delivery="aloud, careful, to his back")
 ride("rn_name_beast", "name", "Does it even matter to you, human?", canon="V", speaker="tamlin_beast",
      who=BEAST, beast_delivery="a low growl of annoyance; he doesn't turn")
+# Her beliefs, not the game's facts: "the Fae can't lie" is what humans think (Keeper).
+ride("rn_lore_food", "lore_food", "Never eat their food. Never drink their wine. The first rule they teach us.",
+     canon="A", delivery="inner voice: reciting it like a child, steadying")
+ride("rn_lore_lie", "lore_lie",
+     "They can't lie. Everyone knows that. But they can twist the truth until it strangles you.",
+     delivery="inner voice: wary, certain of it")
+ride("rn_lore_promise", "lore_promise", "And never make them a promise.", delivery="inner voice: low, a warning to herself")
 ride("rn_gate", "gate", "My prison or my salvation—I couldn't decide which.", canon="V",
      delivery="inner voice: as the gate swings open on its own")
 ride("rn_magic", "magic", "Of course it would be magic, because it was spring here.", canon="V",

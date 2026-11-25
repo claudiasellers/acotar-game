@@ -282,6 +282,29 @@ emotion = &"guarded"
 
 [sub_resource type="Resource" id="L12"]
 script = ExtResource("1")
+id = &"rn_through"
+speaker = &"feyre"
+who = ""
+text = "Through the Wall. No way back now. My family can never find me."
+canon = "A"
+trigger = 6
+where = &"ride_north.through"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: hollow, the gap closing behind her"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L13"]
+script = ExtResource("1")
 id = &"rn_birds"
 speaker = &"feyre"
 who = ""
@@ -303,7 +326,7 @@ follow_up = &""
 delivery = "inner voice: disbelief, almost a whisper"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L13"]
+[sub_resource type="Resource" id="L14"]
 script = ExtResource("1")
 id = &"rn_warm"
 speaker = &"feyre"
@@ -326,7 +349,53 @@ follow_up = &""
 delivery = "inner voice: sweating, wary"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L14"]
+[sub_resource type="Resource" id="L15"]
+script = ExtResource("1")
+id = &"rn_beautiful"
+speaker = &"feyre"
+who = ""
+text = "Prythian. It has no right to be this beautiful."
+canon = "X"
+trigger = 6
+where = &"ride_north.beautiful"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: awe, resenting it"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L16"]
+script = ExtResource("1")
+id = &"rn_reins"
+speaker = &"feyre"
+who = ""
+text = "I clench the reins to keep my hands from shaking."
+canon = "A"
+trigger = 6
+where = &"ride_north.reins"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: tight, holding herself together"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L17"]
 script = ExtResource("1")
 id = &"rn_name"
 speaker = &"feyre"
@@ -349,7 +418,7 @@ follow_up = &""
 delivery = "aloud, careful, to his back"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L15"]
+[sub_resource type="Resource" id="L18"]
 script = ExtResource("1")
 id = &"rn_name_beast"
 speaker = &"tamlin_beast"
@@ -372,7 +441,76 @@ follow_up = &""
 delivery = "a low growl of annoyance; he doesn't turn"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L16"]
+[sub_resource type="Resource" id="L19"]
+script = ExtResource("1")
+id = &"rn_lore_food"
+speaker = &"feyre"
+who = ""
+text = "Never eat their food. Never drink their wine. The first rule they teach us."
+canon = "A"
+trigger = 6
+where = &"ride_north.lore_food"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: reciting it like a child, steadying"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L20"]
+script = ExtResource("1")
+id = &"rn_lore_lie"
+speaker = &"feyre"
+who = ""
+text = "They can't lie. Everyone knows that. But they can twist the truth until it strangles you."
+canon = "X"
+trigger = 6
+where = &"ride_north.lore_lie"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: wary, certain of it"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L21"]
+script = ExtResource("1")
+id = &"rn_lore_promise"
+speaker = &"feyre"
+who = ""
+text = "And never make them a promise."
+canon = "X"
+trigger = 6
+where = &"ride_north.lore_promise"
+deed = &""
+phases = PackedStringArray("p1_wolf_and_crossing", "p2_grounds")
+require_flags = PackedStringArray()
+forbid_flags = PackedStringArray()
+hour_from = -1.0
+hour_to = -1.0
+once = false
+cooldown = 0.0
+priority = 0
+inner = true
+follow_up = &""
+delivery = "inner voice: low, a warning to herself"
+emotion = &"guarded"
+
+[sub_resource type="Resource" id="L22"]
 script = ExtResource("1")
 id = &"rn_gate"
 speaker = &"feyre"
@@ -395,7 +533,7 @@ follow_up = &""
 delivery = "inner voice: as the gate swings open on its own"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L17"]
+[sub_resource type="Resource" id="L23"]
 script = ExtResource("1")
 id = &"rn_magic"
 speaker = &"feyre"
@@ -418,7 +556,7 @@ follow_up = &""
 delivery = "inner voice: wonder and dread together"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L18"]
+[sub_resource type="Resource" id="L24"]
 script = ExtResource("1")
 id = &"rn_paint"
 speaker = &"feyre"
@@ -441,7 +579,7 @@ follow_up = &""
 delivery = "inner voice: soft, overwhelmed"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L19"]
+[sub_resource type="Resource" id="L25"]
 script = ExtResource("1")
 id = &"rn_fool"
 speaker = &"feyre"
@@ -464,7 +602,7 @@ follow_up = &""
 delivery = "inner voice: the mare won't move; reasoning herself down"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L20"]
+[sub_resource type="Resource" id="L26"]
 script = ExtResource("1")
 id = &"rn_food"
 speaker = &"feyre"
@@ -487,7 +625,7 @@ follow_up = &""
 delivery = "inner voice: decided, low"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L21"]
+[sub_resource type="Resource" id="L27"]
 script = ExtResource("1")
 id = &"rn_stray_mare"
 speaker = &"feyre"
@@ -510,7 +648,7 @@ follow_up = &""
 delivery = "inner voice: the reins useless, rising fear"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L22"]
+[sub_resource type="Resource" id="L28"]
 script = ExtResource("1")
 id = &"rn_stray_growl"
 speaker = &"feyre"
@@ -533,7 +671,7 @@ follow_up = &""
 delivery = "inner voice: a whisper, frozen"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L23"]
+[sub_resource type="Resource" id="L29"]
 script = ExtResource("1")
 id = &"rn_stray_roar"
 speaker = &"feyre"
@@ -556,7 +694,7 @@ follow_up = &""
 delivery = "inner voice: shaking, after the roar"
 emotion = &"guarded"
 
-[sub_resource type="Resource" id="L24"]
+[sub_resource type="Resource" id="L30"]
 script = ExtResource("1")
 id = &"rn_stray_block"
 speaker = &"tamlin_beast"
@@ -579,7 +717,7 @@ follow_up = &""
 delivery = "very close, fangs at her face; quiet menace"
 emotion = &"neutral"
 
-[sub_resource type="Resource" id="L25"]
+[sub_resource type="Resource" id="L31"]
 script = ExtResource("1")
 id = &"rn_stray_not_here"
 speaker = &"feyre"
@@ -605,5 +743,5 @@ emotion = &"guarded"
 [resource]
 script = ExtResource("3")
 area = &"ride_north"
-lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25")])
+lines = Array[ExtResource("1")]([SubResource("L0"), SubResource("L1"), SubResource("L2"), SubResource("L3"), SubResource("L4"), SubResource("L5"), SubResource("L6"), SubResource("L7"), SubResource("L8"), SubResource("L9"), SubResource("L10"), SubResource("L11"), SubResource("L12"), SubResource("L13"), SubResource("L14"), SubResource("L15"), SubResource("L16"), SubResource("L17"), SubResource("L18"), SubResource("L19"), SubResource("L20"), SubResource("L21"), SubResource("L22"), SubResource("L23"), SubResource("L24"), SubResource("L25"), SubResource("L26"), SubResource("L27"), SubResource("L28"), SubResource("L29"), SubResource("L30"), SubResource("L31")])
 places = Array[ExtResource("2")]([])

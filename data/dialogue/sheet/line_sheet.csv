@@ -111,10 +111,16 @@ rn_ash,feyre,,No ash. Not one.,X,yes,scene,ride_north.ash,,p1_wolf_and_crossing 
 rn_what,feyre,Feyre,What manner of faerie are you?,V,,scene,ride_north.faerie,,p1_wolf_and_crossing p2_grounds,"aloud, to his back; no answer comes",audio/voice/rn_what.ogg
 rn_lamb,feyre,,A lamb in a kingdom of wolves.,V,yes,scene,ride_north.lamb,,p1_wolf_and_crossing p2_grounds,"inner voice: small, bitter",audio/voice/rn_lamb.ogg
 H1_metal,feyre,,The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.,A,yes,scene,ride_north.smell_metal,,p1_wolf_and_crossing p2_grounds,"inner voice: dry and close, slurring, then a sharp pull back",audio/voice/H1_metal.ogg
+rn_through,feyre,,Through the Wall. No way back now. My family can never find me.,A,yes,scene,ride_north.through,,p1_wolf_and_crossing p2_grounds,"inner voice: hollow, the gap closing behind her",audio/voice/rn_through.ogg
 rn_birds,feyre,,Birds. In winter.,X,yes,scene,ride_north.birds,,p1_wolf_and_crossing p2_grounds,"inner voice: disbelief, almost a whisper",audio/voice/rn_birds.ogg
 rn_warm,feyre,,Too warm for winter wool. It's spring here.,X,yes,scene,ride_north.warm,,p1_wolf_and_crossing p2_grounds,"inner voice: sweating, wary",audio/voice/rn_warm.ogg
+rn_beautiful,feyre,,Prythian. It has no right to be this beautiful.,X,yes,scene,ride_north.beautiful,,p1_wolf_and_crossing p2_grounds,"inner voice: awe, resenting it",audio/voice/rn_beautiful.ogg
+rn_reins,feyre,,I clench the reins to keep my hands from shaking.,A,yes,scene,ride_north.reins,,p1_wolf_and_crossing p2_grounds,"inner voice: tight, holding herself together",audio/voice/rn_reins.ogg
 rn_name,feyre,Feyre,Do you have a name?,V,,scene,ride_north.name,,p1_wolf_and_crossing p2_grounds,"aloud, careful, to his back",audio/voice/rn_name.ogg
 rn_name_beast,tamlin_beast,The beast,"Does it even matter to you, human?",V,,scene,ride_north.name,,p1_wolf_and_crossing p2_grounds,a low growl of annoyance; he doesn't turn,audio/voice/rn_name_beast.ogg
+rn_lore_food,feyre,,Never eat their food. Never drink their wine. The first rule they teach us.,A,yes,scene,ride_north.lore_food,,p1_wolf_and_crossing p2_grounds,"inner voice: reciting it like a child, steadying",audio/voice/rn_lore_food.ogg
+rn_lore_lie,feyre,,They can't lie. Everyone knows that. But they can twist the truth until it strangles you.,X,yes,scene,ride_north.lore_lie,,p1_wolf_and_crossing p2_grounds,"inner voice: wary, certain of it",audio/voice/rn_lore_lie.ogg
+rn_lore_promise,feyre,,And never make them a promise.,X,yes,scene,ride_north.lore_promise,,p1_wolf_and_crossing p2_grounds,"inner voice: low, a warning to herself",audio/voice/rn_lore_promise.ogg
 rn_gate,feyre,,My prison or my salvation—I couldn't decide which.,V,yes,scene,ride_north.gate,,p1_wolf_and_crossing p2_grounds,inner voice: as the gate swings open on its own,audio/voice/rn_gate.ogg
 rn_magic,feyre,,"Of course it would be magic, because it was spring here.",V,yes,scene,ride_north.magic,,p1_wolf_and_crossing p2_grounds,inner voice: wonder and dread together,audio/voice/rn_magic.ogg
 rn_paint,feyre,,To paint it would be useless.,A,yes,scene,ride_north.paint,,p1_wolf_and_crossing p2_grounds,"inner voice: soft, overwhelmed",audio/voice/rn_paint.ogg

@@ -98,9 +98,16 @@ const THOUGHTS_SOUTH := [
 	[&"smell_metal", Vector2(-82.0, 1475.0)],
 ]
 const THOUGHTS_NORTH := [
+	[&"through", Vector2(-90.0, 1390.0)],
 	[&"birds", Vector2(-92.0, 1330.0)],
 	[&"warm", Vector2(-45.0, 1150.0)],
+	[&"beautiful", Vector2(-50.0, 1050.0)],
+	[&"reins", Vector2(0.0, 930.0)],
 	[&"name", Vector2(30.0, 800.0)],
+	# What every human child is taught, for the manor's table and its people.
+	[&"lore_food", Vector2(5.0, 700.0)],
+	[&"lore_lie", Vector2(2.0, 560.0)],
+	[&"lore_promise", Vector2(0.0, 430.0)],
 	[&"gate", Vector2(0.0, 315.0)],
 	[&"magic", Vector2(0.0, 200.0)],
 	[&"paint", Vector2(5.0, 40.0)],

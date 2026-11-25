@@ -172,10 +172,12 @@ func test_the_ride_is_played_from_the_cottage_road_to_the_steps() -> void:
 		assert_lt(at[i], at[i + 1], "%s before %s" % [ride._marks[i][0], ride._marks[i + 1][0]])
 	assert_lt(ride._mark(&"smell_metal"), ride.seam_at())
 	assert_gt(ride._mark(&"birds"), ride.seam_at())
+	assert_gt(ride._mark(&"through"), ride.seam_at(), "no way back, said once she is through")
 	for beat: StringName in [&"mounted", &"still", &"village", &"live", &"ash", &"faerie", &"lamb", &"smell_metal",
 			&"birds", &"warm", &"name", &"gate", &"magic", &"paint", &"stairs",
 			&"stray_mare", &"stray_growl", &"stray_roar", &"stray_block",
-			&"follow", &"mount_order", &"mare_waits", &"mount_now"]:
+			&"follow", &"mount_order", &"mare_waits", &"mount_now",
+			&"through", &"beautiful", &"reins", &"lore_food", &"lore_lie", &"lore_promise"]:
 		assert_false(director._of(DialogueLine.Trigger.SCENE, StringName("ride_north.%s" % beat)).is_empty(), "lines for %s" % beat)
 	assert_eq((director.by_id[&"rn_stray_block"] as DialogueLine).speaker, &"tamlin_beast", "the block is his line")
 	assert_eq((director.by_id[&"rn_mount_order"] as DialogueLine).speaker, &"tamlin_beast", "outside, he sends her to the mare")
