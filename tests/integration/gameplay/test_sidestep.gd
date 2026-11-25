@@ -114,9 +114,15 @@ func test_without_the_bow_up_space_is_still_a_jump() -> void:
 func test_no_breath_no_step_and_no_two_in_a_row() -> void:
 	await _raise()
 	feyre.stamina = SidestepMotor.STAMINA - 1.0
+	var sound := SoundDirector.new()
+	add_child_autofree(sound)
+	watch_signals(feyre)
 	feyre.sidestep.press()
 	await wait_physics_frames(3)
 	assert_false(feyre.sidestep.active, "not enough stamina")
+	assert_signal_emit_count(feyre, "sidestep_refused", 1, "said once for the press, not every frame")
+	assert_has(sound.played, &"breath_winded", "and heard: a gasp, never silence")
+	assert_false(feyre.sidestep.wanted(), "the press is spent")
 	feyre.stamina = feyre.max_stamina
 	feyre.sidestep.press()
 	await wait_until(func() -> bool: return feyre.sidestep.active, 1.0)

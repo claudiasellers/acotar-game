@@ -12,6 +12,8 @@ signal arrow_fired(arrow: Arrow)
 signal quiver_changed(count: int)
 ## For creature hearing: where the bow was released and how loud (0..1).
 signal bow_released(at: Vector3, loudness: float)
+## She pressed the sidestep with no breath left for it.
+signal sidestep_refused
 
 const MODEL_SCENE := "res://characters/feyre/model/feyre_model.tscn"
 ## What an empty quiver holds when a game starts in a phase (bow design §8.2).
@@ -228,8 +230,11 @@ func _physics_process(delta: float) -> void:
 	if jump_motor.jumps_used > maxi(jumps_before, 1) and direction != Vector3.ZERO:
 		horizontal = horizontal.lerp(direction * maxf(horizontal.length(), speed), air_jump_redirect)
 
-	if sidestep.wanted() and _can_sidestep():
-		_begin_sidestep(direction, yaw)
+	if sidestep.wanted() and _free_to_sidestep():
+		if stamina >= SidestepMotor.STAMINA:
+			_begin_sidestep(direction, yaw)
+		else:
+			_refuse_sidestep()
 	var stepping := sidestep.active
 	var side := sidestep.step(delta)
 	if sidestep.safe_now:
@@ -339,11 +344,11 @@ func _bow_raised() -> bool:
 	return is_aiming or is_drawing
 
 
-## On her feet, bow up, free to move, with the breath to pay for it, and not
-## inside a hit-stop (a buffered press runs as the freeze ends).
-func _can_sidestep() -> bool:
+## On her feet, bow up, free to move, and not inside a hit-stop (a buffered
+## press runs as the freeze ends). Whether she has the breath is asked after.
+func _free_to_sidestep() -> bool:
 	return _bow_raised() and is_on_floor() and not is_mantling and StoryControl.can_move() \
-			and sidestep.ready() and stamina >= SidestepMotor.STAMINA \
+			and sidestep.ready() \
 			and not (vitals and (vitals.is_down or vitals.is_grabbed())) \
 			and not (hit_stop and hit_stop.active())
 
@@ -369,6 +374,14 @@ func _hold_jump_hint() -> void:
 		return
 	var ledge := is_on_floor() and not _bow_raised() and StoryControl.can_move() and not mantle.find_ledge().is_empty()
 	hints.hold(movement_feel, &"jump" if ledge else &"")
+
+
+## No breath for it: the press is spent on a gasp, so it never fails in silence
+## (UX review G22). The stamina meter hears `sidestep_refused`.
+func _refuse_sidestep() -> void:
+	sidestep.cancel()
+	SoundDirector.cue(&"breath_winded", global_position)
+	sidestep_refused.emit()
 
 
 ## The way the stick points, or straight back from her aim.
