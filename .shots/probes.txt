@@ -1,0 +1,6 @@
+from hostile-fae-L75
+quality look
+size 1920x1080
+timeout 600
+shot reed_marsh_20m res://tools/world_shot.tscn reed_marsh_dusk_20m {out}/reed_marsh_dusk_20m.png
+shot reed_marsh_5m res://tools/world_shot.tscn reed_marsh_dusk_5m {out}/reed_marsh_dusk_5m.png
