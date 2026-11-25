@@ -127,16 +127,16 @@ id = &"op_14"
 at = 128.0
 hold = 8.5
 speaker = &""
-text = "My mother died when I was eight. Before she did, she made me promise to keep us together, and to look after them."
+text = "My mother died when I was eight. On her deathbed, she made me promise to keep our family together, and to look after them."
 canon = "C"
 
 [sub_resource type="Resource" id="L14"]
 script = ExtResource("2_line")
 id = &"op_15"
 at = 137.5
-hold = 13.0
+hold = 21.5
 speaker = &""
-text = "We were rich once. Three years after she died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."
+text = "We were rich once. My father was a merchant. Three years after she died, he sent everything we owned out on three trading ships, and all three sank. The men he owed money took our house and everything in it, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."
 canon = "A"
 
 [sub_resource type="Resource" id="L15"]
@@ -273,22 +273,22 @@ at = 137.0
 [sub_resource type="Resource" id="B19"]
 script = ExtResource("3_beat")
 name = &"fall_ships"
-at = 139.6
+at = 142.5
 
 [sub_resource type="Resource" id="B20"]
 script = ExtResource("3_beat")
 name = &"fall_men"
-at = 146.0
+at = 148.0
 
 [sub_resource type="Resource" id="B21"]
 script = ExtResource("3_beat")
 name = &"cane"
-at = 149.6
+at = 154.8
 
 [sub_resource type="Resource" id="B22"]
 script = ExtResource("3_beat")
 name = &"foxglove"
-at = 152.0
+at = 156.8
 
 [sub_resource type="Resource" id="B23"]
 script = ExtResource("3_beat")
