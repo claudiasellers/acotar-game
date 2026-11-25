@@ -1,0 +1,5 @@
+from clarity-lane L86-25
+quality look
+size 1920x1080
+timeout 900
+shot exit res://tools/creatures/cottage_exit_shot.tscn {out}
