@@ -302,6 +302,13 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 |---|---|---|---|---|---|
 | Settle swell | creatures/hostile/settle_swell.gd `SWELL_SECONDS`, `PETAL_SECONDS`, `SWARM_SHARE`, `SWARM_RADIUS` | fliers fill back over 16 s; rose petals fall 12 s; swarm radius half the territory, kept to 4-12 m; one sparkle burst at the core | swell 8-20 s (the plan's limit is 20), petals 6-16 s | The payoff for settling a site is the place coming back to life, not loot (plan §2.5). Slow enough to watch it happen from the fight's end, inside the plan's 20 s. | L75 |
 
+## Puca (L75, hostile plan §5.2, slice 2(b))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Puca tell reach | creatures/hostile/puca_roamer.gd `TELL_RANGE`, `KEEN_TELL_RANGE`, `TELL_FULL`, `TELL_SHOWN` | bare eyes 8 m, a full keen brew 40 m; full strength inside 40% of that reach; 0.25 is readable | bare 5-12 m, keen 30-45 m (the plan's floor is 30) | How far its wrongness (wrong colour, rippling edges) shows. Without keen it is only what she wants until she is nearly on it; with keen she can refuse it from far off. The disguise material reads it as `puca_tell`. | L75 |
+| Puca lure distances | creatures/hostile/puca_roamer.gd `KEEP_M`, `CLOSE_M`, `FOLLOW_M`, `NOTICE_M` | keeps 9 m ahead, slips away inside 4 m, waits past 25 m, startles at 30 m | keep 6-12 m | Just out of reach, never caught, never touching her (the Keeper, ch11). | L75 |
+
 ## Wolf hunt light (L18-11)
 
 | Tunable | Where | Default | Range | What it does | Lane |

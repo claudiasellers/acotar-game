@@ -142,3 +142,27 @@ creature burn; `fire_fear_radius` makes it flee burning ground
 ## EventBus requests (story/core, R14)
 `site_settled(site_id: StringName)`, `hostile_alerted(site_id: StringName, level: float)`.
 Both are used only when present (`has_signal`).
+
+## The roaming puca (`PucaRoamer`, slice 2(a)/(b))
+
+`creatures/hostile/puca_roamer.tscn`, data `data/creatures/hostile/puca_roamer.tres`.
+Not placed in any spawn table yet (the disguise material and the true-form card
+come first); the spawn rows will be gated on `puca_resisted`, at most one per region.
+
+- Night only (`is_night`: 20:00-05:00). By day it is HIDDEN: no model, collision layer 0.
+- `pick_lure(wants_of(inventory, collection, wardrobe, night))` picks what it
+  wears, one of `LURES`: `quiver` (under a third of her quiver), else
+  `gold_rose` (missing from her book), else on every third night with the
+  wardrobe unfinished `gown`, else `father` on odd nights and `sisters` on even.
+  `image_changed(image)` fires with it; `TRUE_FORM` (`true_form`) when revealed.
+- `tell` (0-1) is how strongly its wrongness shows to her: `tell_strength(distance,
+  keen)` reaches 8 m bare and 40 m at keen 1.0. The disguise material reads it as
+  the instance uniform `puca_tell`. It casts no shadow and leaves no prints.
+- No contact rows: it never touches her. It keeps `KEEP_M` ahead toward the
+  nearest standing camp (`nearest_site()`, 400 m), slips away inside `CLOSE_M`,
+  waits beyond `FOLLOW_M`, startles her once (`player_startled`, 0.1) inside
+  `NOTICE_M`, and is gone (`gone`) once she is inside that camp's leash.
+- Two hits: it flees (`darted`) and is gone for the night. A light arrow
+  (`on_arrow_effect(&"light")`) holds `true_form` for 3 s, then it flees. Ash
+  kills it; it leaves nothing.
+
