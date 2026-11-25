@@ -106,7 +106,7 @@ rn_live,feyre,,"Live with him. Live, not die.",V,yes,scene,ride_north.live,,p1_w
 rn_ash,feyre,,No ash. Not one.,X,yes,scene,ride_north.ash,,p1_wolf_and_crossing p2_grounds,"inner voice: searching the trees, flat",audio/voice/rn_ash.ogg
 rn_what,feyre,Feyre,What manner of faerie are you?,V,,scene,ride_north.faerie,,p1_wolf_and_crossing p2_grounds,"aloud, to his back; no answer comes",audio/voice/rn_what.ogg
 rn_lamb,feyre,,A lamb in a kingdom of wolves.,V,yes,scene,ride_north.lamb,,p1_wolf_and_crossing p2_grounds,"inner voice: small, bitter",audio/voice/rn_lamb.ogg
-H1_metal,feyre,,The air tastes like metal.,A,yes,scene,ride_north.smell_metal,,p1_wolf_and_crossing p2_grounds,"inner voice: dry, quiet, close",audio/voice/H1_metal.ogg
+H1_metal,feyre,,The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.,A,yes,scene,ride_north.smell_metal,,p1_wolf_and_crossing p2_grounds,"inner voice: dry and close, slurring, then a sharp pull back",audio/voice/H1_metal.ogg
 rn_birds,feyre,,Birds. In winter.,X,yes,scene,ride_north.birds,,p1_wolf_and_crossing p2_grounds,"inner voice: disbelief, almost a whisper",audio/voice/rn_birds.ogg
 rn_warm,feyre,,Too warm for winter wool. It's spring here.,X,yes,scene,ride_north.warm,,p1_wolf_and_crossing p2_grounds,"inner voice: sweating, wary",audio/voice/rn_warm.ogg
 rn_name,feyre,Feyre,Do you have a name?,V,,scene,ride_north.name,,p1_wolf_and_crossing p2_grounds,"aloud, careful, to his back",audio/voice/rn_name.ogg

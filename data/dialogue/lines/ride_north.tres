@@ -170,7 +170,7 @@ script = ExtResource("1")
 id = &"H1_metal"
 speaker = &"feyre"
 who = ""
-text = "The air tastes like metal."
+text = "The air tastes like metal. Heavy—everything's going heavy. No. Stay awake."
 canon = "A"
 trigger = 6
 where = &"ride_north.smell_metal"
@@ -185,7 +185,7 @@ cooldown = 0.0
 priority = 0
 inner = true
 follow_up = &""
-delivery = "inner voice: dry, quiet, close"
+delivery = "inner voice: dry and close, slurring, then a sharp pull back"
 emotion = &"guarded"
 
 [sub_resource type="Resource" id="L8"]

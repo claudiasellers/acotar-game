@@ -356,8 +356,10 @@ ride("rn_ash", "ash", "No ash. Not one.", delivery="inner voice: searching the t
 ride("rn_what", "faerie", "What manner of faerie are you?", canon="V", inner=False,
      delivery="aloud, to his back; no answer comes")
 ride("rn_lamb", "lamb", "A lamb in a kingdom of wolves.", canon="V", delivery="inner voice: small, bitter")
-ride("H1_metal", "smell_metal", "The air tastes like metal.", canon="A",
-     delivery="inner voice: dry, quiet, close")
+# The tang is his magic putting her under (ch5); awake on the ride she fights
+# it off (Keeper 2026-11-25).
+ride("H1_metal", "smell_metal", "The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.", canon="A",
+     delivery="inner voice: dry and close, slurring, then a sharp pull back")
 ride("rn_birds", "birds", "Birds. In winter.", delivery="inner voice: disbelief, almost a whisper")
 ride("rn_warm", "warm", "Too warm for winter wool. It's spring here.",
      delivery="inner voice: sweating, wary")
