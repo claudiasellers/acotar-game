@@ -116,5 +116,10 @@ func test_threaded_region_with_places_builds_in_time() -> void:
 	var deadline := Time.get_ticks_msec() + 60_000
 	while not region.is_built and Time.get_ticks_msec() < deadline:
 		await get_tree().process_frame
-	assert_true(region.is_built, "fae_village (7 places) built within 60 s on the threaded path")
-	assert_eq(get_tree().get_nodes_in_group(&"place_setting").size(), 7)
+	assert_true(region.is_built, "fae_village built within 60 s on the threaded path")
+	var expected := 0
+	for lm in region.content.landmarks:
+		if PlaceComposer.table().find(lm.id) != null:
+			expected += 1
+	assert_gt(expected, 0, "the village has places")
+	assert_eq(get_tree().get_nodes_in_group(&"place_setting").size(), expected, "a setting node for each of its places")

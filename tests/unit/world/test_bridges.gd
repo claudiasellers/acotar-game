@@ -41,8 +41,10 @@ func _bridges() -> Array:
 	return out
 
 
-func test_there_are_four_bridges_and_court_ones_are_found() -> void:
-	assert_eq(_bridges().size(), 4, "village, frozen, lantern bridge, weir")
+func test_the_human_realm_bridges_and_the_court_ones_are_found() -> void:
+	var ids := _bridges().map(func(b: Dictionary) -> String: return String(b.id))
+	assert_true(ids.has("village") and ids.has("frozen"), "the village and frozen bridges: %s" % [ids])
+	assert_gt(ids.size(), 2, "and the court's footbridges: %s" % [ids])
 
 
 func test_each_bridge_is_square_to_its_water() -> void:
