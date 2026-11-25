@@ -28,6 +28,22 @@ func _init(body: CharacterBody3D, facing: Node3D) -> void:
 
 ## Climbs onto a ledge in front of her between knee and reach height.
 func try_climb() -> bool:
+	var ledge := find_ledge()
+	if ledge.is_empty():
+		return false
+	var b := _body
+	climbing = true
+	b.velocity = Vector3.ZERO
+	_tween = b.create_tween()
+	_tween.tween_property(b, ^"global_position:y", float(ledge.top) + 0.05, 0.28)
+	_tween.tween_property(b, ^"global_position", ledge.landing, 0.16)
+	_tween.finished.connect(func() -> void: climbing = false)
+	return true
+
+
+## The ledge a jump press would climb now: {"top": its height, "landing":
+## where she ends up}, or {} for none. Looks only; moves nothing.
+func find_ledge() -> Dictionary:
 	var b := _body
 	var mask := Feyre.WORLD_MASK
 	var space := b.get_world_3d().direct_space_state
@@ -40,27 +56,21 @@ func try_climb() -> bool:
 		wall = space.intersect_ray(PhysicsRayQueryParameters3D.create(
 				knee, knee + forward * 0.8, mask, [b.get_rid()]))
 	if not wall:
-		return false
+		return {}
 	var probe: Vector3 = wall.position + forward * 0.35 + Vector3.UP * 1.6
 	var top := space.intersect_ray(PhysicsRayQueryParameters3D.create(
 			probe, probe + Vector3.DOWN * 2.4, mask, [b.get_rid()]))
 	if not top or top.normal.dot(Vector3.UP) < 0.7:
-		return false
+		return {}
 	if RegionGate.owns(wall.collider) or RegionGate.owns(top.collider):
-		return false
+		return {}
 	var rise: float = top.position.y - b.global_position.y
 	if rise < 0.6 or rise > (2.8 if GameSettings.gentle_mode else 2.3):
-		return false
+		return {}
 	var landing: Vector3 = top.position + forward * 0.25 + Vector3.UP * 0.05
 	if not _climb_is_clear(landing):
-		return false
-	climbing = true
-	b.velocity = Vector3.ZERO
-	_tween = b.create_tween()
-	_tween.tween_property(b, ^"global_position:y", top.position.y + 0.05, 0.28)
-	_tween.tween_property(b, ^"global_position", landing, 0.16)
-	_tween.finished.connect(func() -> void: climbing = false)
-	return true
+		return {}
+	return {"top": float(top.position.y), "landing": landing}
 
 
 ## Stops a climb in progress (a teleport): its tween would otherwise carry her

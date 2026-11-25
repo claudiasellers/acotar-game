@@ -5,7 +5,8 @@
 ##   - a shot that would miss its body bends a little toward the body, never
 ##     toward the weak spot and never by more than the mode's limit, so the
 ##     throat shot stays the player's own.
-## A mouse gets none of it. The setting &"soft_aim" is off, light or strong.
+## A mouse gets none of it. The setting &"soft_aim" (GameSettings.SOFT_AIM_LEVELS)
+## is off, light or strong.
 ## Pure sums over the creatures in the tree, so tests call it directly.
 class_name SoftAim
 extends RefCounted
@@ -14,6 +15,8 @@ const SETTING := &"soft_aim"
 const CONE_DEG := 4.0
 const RANGE := 35.0
 ## mode -> [share of the stick's turn speed kept, most a shot may bend (degrees)].
+## By GameSettings.SOFT_AIM_LEVELS index.
+const LEVELS: Array[StringName] = [&"off", &"light", &"strong"]
 const MODES := {&"light": [0.6, 1.5], &"strong": [0.45, 3.5]}
 ## The body's middle band, as shares of its height: clear of the ground, and
 ## under the weak spot (or under the head where it has none).
@@ -28,7 +31,7 @@ const PULL_BACK := 0.6
 static func mode() -> StringName:
 	if not SatchelHud.pad_active:
 		return &"off"
-	return StringName(GameSettings.get_value(SETTING))
+	return LEVELS[clampi(int(GameSettings.get_value(SETTING)), 0, LEVELS.size() - 1)]
 
 
 ## Every living hostile that is searching for her, startled or engaged.

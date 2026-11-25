@@ -1,47 +1,58 @@
 ## Watches the hostiles near her for wind-ups (health-interactions §3.5 #5:
 ## no unseen hits). When one that is outside the camera's view starts to wind
-## up an attack, `warned` says which side it is on and how long until contact,
-## so the HUD's edge can pulse there (L77).
+## up an attack, the HUD's edge on that side beats until it lands
+## (VitalsEdgeFx.warn: side -1 hard left .. +1 hard right, 0 straight behind;
+## seconds until contact, the attack row's windup_s). A wind-up cut short (a
+## stagger, a kill) calls the warning off.
 class_name OffscreenWarning
 extends Node
 
-## side: -1 hard left .. +1 hard right of the camera, 0 straight behind.
-## seconds: until the blow lands (the attack row's windup_s).
-signal warned(side: float, seconds: float)
-
-const NODE := "OffscreenWarning"
 ## Wind-ups further off than this are nobody's business yet.
 const RADIUS := 12.0
 
 var player: Node3D
 ## Creature instance id -> the attack it was winding up when last looked at.
 var _seen: Dictionary = {}
+## Creature instance id -> game seconds its warned blow lands at.
+var _warned: Dictionary = {}
+var _clock: float = 0.0
 
 
-static func of(tree: SceneTree) -> OffscreenWarning:
-	var found := tree.root.get_node_or_null(NODE) as OffscreenWarning
-	if found == null:
-		found = OffscreenWarning.new()
-		found.name = NODE
-		tree.root.add_child(found)
-	return found
+func _init() -> void:
+	name = "OffscreenWarning"
 
 
-func _physics_process(_delta: float) -> void:
-	watch()
+func _physics_process(delta: float) -> void:
+	watch(delta)
 
 
-## One look at every hostile near her. Emits `warned` for each wind-up that
-## began since the last look and can't be seen.
-func watch() -> void:
+## One look at every hostile near her: warns of each wind-up that began since
+## the last look and can't be seen, and calls off one that stopped early.
+func watch(delta: float = 0.0) -> void:
+	_clock += delta
 	var now := {}
 	for c in winding(RADIUS):
+		var id := c.get_instance_id()
 		var attack := c.winding_up()
-		now[c.get_instance_id()] = attack
-		if _seen.get(c.get_instance_id(), &"") != attack and not _in_view(c):
+		now[id] = attack
+		if _seen.get(id, &"") != attack and not _in_view(c):
 			var row := AttackTable.resolve(attack)
-			warned.emit(side_of(c.global_position), row.windup_s if row else 0.0)
+			var seconds := row.windup_s if row else 0.0
+			_warned[id] = _clock + seconds
+			warn(side_of(c.global_position), seconds)
+	for id: int in _warned.keys():
+		if now.has(id):
+			continue
+		# Gone quiet well before its blow was due: it was stopped.
+		if _clock < float(_warned[id]) - 0.1:
+			warn(0.0, 0.0)
+		_warned.erase(id)
 	_seen = now
+
+
+## The one call to the HUD's edge.
+func warn(side: float, seconds: float) -> void:
+	VitalsEdgeFx.warn(get_tree(), side, seconds)
 
 
 ## The living creatures within `radius` of her that are winding up an attack.

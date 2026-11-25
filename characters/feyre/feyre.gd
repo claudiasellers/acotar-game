@@ -171,6 +171,7 @@ func _process(delta: float) -> void:
 		_look(look.x * s, look.y * s)
 	sidestep.wait(TimeScale.real(delta), hit_stop != null and hit_stop.active())
 	_hold_sidestep_hint()
+	_hold_jump_hint()
 	camera_control.update(delta)
 	if _breath:
 		_breath.update(delta)
@@ -356,6 +357,20 @@ func _hold_sidestep_hint() -> void:
 	hints.hold(self, &"sidestep" if wanted else &"")
 
 
+## The jump key is named while a ledge she could climb is in reach, until
+## she has jumped once.
+func _hold_jump_hint() -> void:
+	var hints := KeyHints.of(get_tree())
+	if not hints.teaches(&"jump"):
+		hints.hold(jump_hint, &"")
+		return
+	if jump_motor.jumps_used > 0 or is_mantling:
+		hints.learn(&"jump")
+		return
+	var ledge := is_on_floor() and not _bow_raised() and StoryControl.can_move() and not mantle.find_ledge().is_empty()
+	hints.hold(jump_hint, &"jump" if ledge else &"")
+
+
 ## The way the stick points, or straight back from her aim.
 func _begin_sidestep(direction: Vector3, camera_yaw: float) -> void:
 	sidestep.begin(direction if direction != Vector3.ZERO else Vector3.BACK.rotated(Vector3.UP, camera_yaw))
@@ -491,6 +506,9 @@ func _build_components() -> void:
 	hit_stop.vitals = vitals
 	hit_stop.strike = strike
 	add_child(hit_stop)
+	var warning := OffscreenWarning.new()
+	warning.player = self
+	add_child(warning)
 	_build_breath()
 
 

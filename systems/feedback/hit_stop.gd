@@ -3,13 +3,16 @@
 ## landing on her. It holds TimeScale at SCALE under &"hit_stop" for a few
 ## frames of real time, counted on the unscaled clock so the freeze can't
 ## stretch itself, then lets go so time returns to whatever else asked
-## (Focus, the quiver wheel). Reduced Effects halves it. A blow she can't see
+## (Focus, the quiver wheel). The Hit-stop setting is Full, Half or Off, and
+## Reduced Effects halves it again. A blow she can't see
 ## coming gets none: the HUD edge speaks for that one.
 class_name HitStop
 extends Node
 
 const ID := &"hit_stop"
 const SCALE := 0.05
+## GameSettings.HIT_STOP_LEVELS index: 0 full, 1 half, 2 off.
+const SETTING := &"hit_stop"
 ## Frames at 60 a second, by how hard the hit is.
 const FRAMES := {&"light": 4, &"medium": 6, &"heavy": 9}
 const WEAK_SPOT_FRAMES := 3
@@ -60,6 +63,11 @@ func hit(reaction: StringName, weak_spot: bool = false, killed: bool = false) ->
 
 
 func hold(frame_count: int) -> void:
+	match int(GameSettings.get_value(SETTING)):
+		1:
+			frame_count = frame_count / 2
+		2:
+			frame_count = 0
 	if GameSettings.reduced_effects:
 		frame_count = frame_count / 2
 	if frame_count <= 0:
