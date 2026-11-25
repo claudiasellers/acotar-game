@@ -404,5 +404,5 @@ hostile_element_weak_glimmer,feyre,,It flinched from the light like something ou
 hostile_element_weak_hush,feyre,,Its eyes went heavy. It's fighting sleep.,X,yes,scene,hostile_elements.hostile_element_weak_hush,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_hush.ogg
 hostile_element_resisted,feyre,,"Like shooting a stone. Not that, then.",X,yes,scene,hostile_elements.hostile_element_resisted,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_resisted.ogg
 loot_first_trophy,feyre,,Like the pelt. I know what this makes me.,X,yes,scene,monster_gear.loot_first_trophy,,,"inner voice: dry, quiet, close",audio/voice/loot_first_trophy.ogg
-hostile_rout,feyre,,"Run, then. They'll be back hungrier.",X,yes,scene,hostile_packs.hostile_rout,,,"inner voice: dry, quiet, close",audio/voice/hostile_rout.ogg
+hostile_rout,feyre,,Let them run. They'll come back hungrier.,X,yes,scene,hostile_packs.hostile_rout,,,"inner voice: dry, quiet, close",audio/voice/hostile_rout.ogg
 hostile_glint_grab,feyre,,Greedy things. Anything that shines.,X,yes,scene,hostile_packs.hostile_glint_grab,,,"inner voice: dry, quiet, close",audio/voice/hostile_glint_grab.ogg

@@ -998,7 +998,7 @@ moment("loot_first_trophy", "monster_gear", "Like the pelt. I know what this mak
 
 # Gloamer packs (G25, G26): the first pack that scatters from her, and the
 # first one she sees grab at a light arrow's glow. Canon X, once per save.
-moment("hostile_rout", "hostile_packs", "Run, then. They'll be back hungrier.", canon="X", once=True)
+moment("hostile_rout", "hostile_packs", "Let them run. They'll come back hungrier.", canon="X", once=True)
 moment("hostile_glint_grab", "hostile_packs", "Greedy things. Anything that shines.", canon="X", once=True)
 
 # =============================================================================
