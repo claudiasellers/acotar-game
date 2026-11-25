@@ -88,6 +88,7 @@ var _action_left: float = 0.0
 var _action_mix: float = 0.0
 var _action_on: bool = false
 var _action_hold: bool = false
+var _action_loop: bool = false
 var _death_clip: StringName = &"death_l"
 var _stalk: float = 0.0
 var _graze: float = 0.0
@@ -380,6 +381,7 @@ func cancel_attack() -> void:
 	_action_left = 0.0
 	_action_on = false
 	_action_hold = false
+	_action_loop = false
 
 
 ## Plays one clip once on the action layer (startle, call, recover, stagger,
@@ -388,6 +390,18 @@ func play_oneshot(clip: StringName) -> float:
 	if dead or tree == null or not anim.has_animation(clip):
 		return 0.0
 	_start_actions([clip])
+	return _length(clip)
+
+
+## Keeps one clip on the action layer, looping, until another play_*, a
+## wind-up or cancel_attack replaces it (a briarling's day-long bush pose, a
+## sleeper). A clip that does not loop by itself starts over each time it
+## ends. Returns its length, or 0 when the model does not have it.
+func hold(clip: StringName) -> float:
+	if dead or tree == null or not anim.has_animation(clip):
+		return 0.0
+	_start_actions([clip])
+	_action_loop = true
 	return _length(clip)
 
 
@@ -422,13 +436,18 @@ func _next_action() -> void:
 	_action_left = _length(clip)
 	_action_on = true
 	_action_hold = false
+	_action_loop = false
 	tree.set(&"parameters/action_scale/scale", 1.0)
 
 
 func _drive_action(delta: float) -> void:
 	if _action_on:
 		_action_left -= delta
-		if _action_left <= 0.0:
+		if _action_left <= 0.0 and _action_loop:
+			_action_left += _length(_action_node.animation)
+			if anim.get_animation(_action_node.animation).loop_mode == Animation.LOOP_NONE:
+				tree.set(&"parameters/action_seek/seek_request", 0.0)
+		elif _action_left <= 0.0:
 			if _action_queue.is_empty():
 				_action_on = _action_hold
 			else:
