@@ -45,6 +45,9 @@ const DROWSY_DECAY := 0.08
 const DREAD_RISE := 0.25
 const DREAD_FALL := 0.06
 const GRAB_PRESS_STAMINA := 12.0
+## Fear this strong ends the last moment of ease at once, so "At ease" never
+## sits beside dread.
+const EASE_HUSHED_BY_DREAD := 0.3
 ## With Hold to break free on, holding interact counts one press this often,
 ## about a steady mash.
 const GRAB_HOLD_STEP := 0.18
@@ -341,6 +344,8 @@ func _end_grab() -> void:
 func _on_mood_requested(mood: StringName, intensity: float, _seconds: float) -> void:
 	if mood == &"dread":
 		dread_target = clampf(intensity, 0.0, 1.0)
+		if intensity > 0.0:
+			ease_pulse = 0.0
 	elif mood == &"calm":
 		dread_target = 0.0
 
@@ -554,7 +559,7 @@ func _step_mood(delta: float) -> void:
 	elif dread > dread_target:
 		var fall := DREAD_FALL * (2.0 if ease >= 0.5 else 1.0)
 		dread = maxf(dread - fall * delta, dread_target)
-	ease_pulse = maxf(ease_pulse - 0.02 * delta, 0.0)
+	ease_pulse = 0.0 if dread >= EASE_HUSHED_BY_DREAD else maxf(ease_pulse - 0.02 * delta, 0.0)
 	_mood_clock -= delta
 	if _mood_clock <= 0.0 and (absf(dread - _mood_sent.x) > 0.02 or absf(ease - _mood_sent.y) > 0.02):
 		_mood_clock = 0.1
