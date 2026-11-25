@@ -145,8 +145,9 @@ func test_the_scene_speaks_in_the_keepers_order() -> void:
 			["raise beast_claim_accepted", "say when"], ["say when", "raise fact.ash_arrow_burned"],
 			["raise fact.ash_arrow_burned", "say now"], ["say now", "say goodbye"]]:
 		assert_lt(at.call(pair[0]), at.call(pair[1]), "%s before %s" % pair)
-		assert_eq(labels[at.call(pair[0]) + 1], "until %s is said" % String(pair[0]).trim_prefix("say "),
-				"%s is waited on" % pair[0])
+		if String(pair[0]).begins_with("say "):
+			assert_eq(labels[at.call(pair[0]) + 1], "until %s is said" % String(pair[0]).trim_prefix("say "),
+					"%s is waited on" % pair[0])
 	assert_false(labels.has("wait 4.0"), "no fixed wait cuts the terms short")
 
 
