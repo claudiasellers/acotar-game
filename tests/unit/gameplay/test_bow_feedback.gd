@@ -248,7 +248,7 @@ func test_her_first_early_release_gets_one_thought_ever() -> void:
 	_hold(0.1, true, false)
 	_hold(bow.bow.draw_time * 0.3, true, true)
 	_hold(0.05, true, false)
-	assert_eq(shown, ["Not yet. Draw the string farther back."], "her own words from the wolf shot")
+	assert_eq(shown, ["Too soon. Draw the string farther back."], "her own words from the wolf shot")
 	director._process(10.0)
 	_hold(bow.bow.draw_time * 0.3, true, true)
 	_hold(0.05, true, false)

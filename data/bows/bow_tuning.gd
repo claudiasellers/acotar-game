@@ -32,7 +32,7 @@ extends Resource
 ## Stamina per second while the trembling arm lasts.
 @export var hold_drain: float = 6.0
 ## Sway without aim held (shooting from the hip), against 1.0 with it.
-@export var hip_sway: float = 1.6
+@export var hip_sway: float = 1.3
 @export var stance_still: float = 1.0
 @export var stance_crouched: float = 0.8
 @export var stance_walking: float = 1.6

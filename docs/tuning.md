@@ -213,7 +213,7 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `min_power` | bow_tuning.tres | 0.35 | 0.25–0.5 | The share of the bow's speed an arrow leaves at with no draw; a full draw is 1.0 | L80 |
 | `short_draw` | bow_tuning.tres | 0.5 | 0.3–0.7 | A shot let go under this much draw counts as short (her one thought about drawing farther) | L80 |
 | `stay_up_s` | bow_tuning.tres | 1.6 | 1–3 | Seconds the bow stays in her hands after the last shot or hold | L80 |
-| `hip_sway` | bow_tuning.tres | 1.6 | 1.2–2.5 | Sway without aim held, against 1.0 with it | L80 |
+| `hip_sway` | bow_tuning.tres | 1.3 | 1.2–2.5 | Sway without aim held, against 1.0 with it | L80 |
 | `settle_s` / `settle_floor` | bow_tuning.tres | 0.6 / 0.35 | 0.3–1.0 / 0.2–0.6 | Sway falls from 1.0 to the floor over this long held still: the reward for patience | L80 |
 | `settle_reset_turn_dps` / `unsettle_rate` | bow_tuning.tres | 30 / 3.0 | 15–60 / 1–6 | Turning faster than this (deg/s) or moving unsettles the aim, at this rate per second | L80 |
 | `settle_after_shot` | bow_tuning.tres | 0.7 | 0.35–1.0 | A shot's recoil leaves the aim at least this unsettled | L80 |
