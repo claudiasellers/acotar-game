@@ -130,6 +130,7 @@ var _last_ride_at: Vector3 = Vector3.INF
 var _region_t: float = 0.0
 var _at_edge: bool = false
 var _balking: bool = false
+var _tips: RideTips
 var _balk_t: float = 0.0
 var _away: bool = false
 var _met: bool = false
@@ -487,6 +488,7 @@ func mount(user: Node = null, instant: bool = false) -> bool:
 		return false
 	feyre = p
 	riding = true
+	_tips = RideTips.attach(self)  # the riding keys she hasn't used yet (KeyHints)
 	var first := not unlocked()
 	if p is CharacterBody3D:
 		(p as CharacterBody3D).velocity = Vector3.ZERO
@@ -530,6 +532,9 @@ func dismount(instant: bool = false) -> void:
 	if not riding:
 		return
 	riding = false
+	if _tips:
+		_tips.queue_free()
+		_tips = null
 	var p := _player()
 	if motion:
 		motion.restore_mare()
