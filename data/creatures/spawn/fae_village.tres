@@ -1,19 +1,23 @@
-[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=17 format=3]
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
-[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="9"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="13"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/butterflies.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/cat.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/faelights.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/hen.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_briar_dell.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_sealed_road_bend.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_border_markers.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_village_mill.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_blue.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_gold.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://creatures/ambient/scenes/songbird_rose.tscn" id="12"]
 
 [sub_resource type="Resource" id="e0"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"songbirds_blue"
-scene = ExtResource("6")
+scene = ExtResource("10")
 count = 3
 cluster_radius = 5.0
 groups = 3
@@ -25,9 +29,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e1"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"songbirds_rose"
-scene = ExtResource("8")
+scene = ExtResource("12")
 count = 3
 cluster_radius = 5.0
 groups = 3
@@ -39,9 +43,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e2"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"songbirds_gold"
-scene = ExtResource("7")
+scene = ExtResource("11")
 count = 3
 cluster_radius = 5.0
 groups = 2
@@ -53,7 +57,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e3"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"cats"
 scene = ExtResource("3")
 count = 1
@@ -67,7 +71,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e4"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"hens"
 scene = ExtResource("5")
 count = 4
@@ -81,7 +85,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e5"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"butterflies_gardens"
 scene = ExtResource("2")
 count = 1
@@ -95,7 +99,7 @@ glamour = 0
 near_group = &"landmark"
 
 [sub_resource type="Resource" id="e6"]
-script = ExtResource("9")
+script = ExtResource("13")
 id = &"faelights_lanes"
 scene = ExtResource("4")
 count = 1
@@ -108,7 +112,67 @@ canon = "X"
 glamour = 0
 near_group = &"landmark"
 
+[sub_resource type="Resource" id="e7"]
+script = ExtResource("13")
+id = &"site_naga_border_markers"
+scene = ExtResource("8")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e8"]
+script = ExtResource("13")
+id = &"site_naga_village_mill"
+scene = ExtResource("9")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e9"]
+script = ExtResource("13")
+id = &"site_gloamer_sealed_road_bend"
+scene = ExtResource("7")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e10"]
+script = ExtResource("13")
+id = &"site_gloamer_briar_dell"
+scene = ExtResource("6")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("stranger_met")
+near_group = &""
+
 [resource]
 script = ExtResource("1")
 region_id = &"fae_village"
-entries = Array[ExtResource("9")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6")])
+entries = Array[ExtResource("13")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7"), SubResource("e8"), SubResource("e9"), SubResource("e10")])

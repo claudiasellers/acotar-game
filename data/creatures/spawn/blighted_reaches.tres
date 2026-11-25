@@ -1,14 +1,18 @@
-[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
-[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="6"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="10"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/crow.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_ash_pits.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_grey_hedgerow.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_steading_fields.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_blight_heart.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_blight_heart_scrape.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_grey_hedgerow.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_steading_fields.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_still_hollow_ride.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_still_hollow_run.tscn" id="9"]
 
 [sub_resource type="Resource" id="e0"]
-script = ExtResource("6")
+script = ExtResource("10")
 id = &"crows"
 scene = ExtResource("2")
 count = 2
@@ -22,9 +26,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e1"]
-script = ExtResource("6")
+script = ExtResource("10")
 id = &"site_gloamer_steading_fields"
-scene = ExtResource("5")
+scene = ExtResource("7")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -37,9 +41,9 @@ require_flags = PackedStringArray("glamour_lifted")
 near_group = &""
 
 [sub_resource type="Resource" id="e2"]
-script = ExtResource("6")
+script = ExtResource("10")
 id = &"site_gloamer_grey_hedgerow"
-scene = ExtResource("4")
+scene = ExtResource("6")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -52,9 +56,69 @@ require_flags = PackedStringArray("glamour_lifted")
 near_group = &""
 
 [sub_resource type="Resource" id="e3"]
-script = ExtResource("6")
+script = ExtResource("10")
 id = &"site_gloamer_ash_pits"
 scene = ExtResource("3")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("glamour_lifted")
+near_group = &""
+
+[sub_resource type="Resource" id="e4"]
+script = ExtResource("10")
+id = &"site_gloamer_still_hollow_ride"
+scene = ExtResource("8")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("stranger_met")
+near_group = &""
+
+[sub_resource type="Resource" id="e5"]
+script = ExtResource("10")
+id = &"site_gloamer_blight_heart"
+scene = ExtResource("4")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("glamour_lifted")
+near_group = &""
+
+[sub_resource type="Resource" id="e6"]
+script = ExtResource("10")
+id = &"site_gloamer_still_hollow_run"
+scene = ExtResource("9")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("glamour_lifted")
+near_group = &""
+
+[sub_resource type="Resource" id="e7"]
+script = ExtResource("10")
+id = &"site_gloamer_blight_heart_scrape"
+scene = ExtResource("5")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -69,4 +133,4 @@ near_group = &""
 [resource]
 script = ExtResource("1")
 region_id = &"blighted_reaches"
-entries = Array[ExtResource("6")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3")])
+entries = Array[ExtResource("10")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7")])

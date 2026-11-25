@@ -1,18 +1,21 @@
-[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=19 format=3]
+[gd_resource type="Resource" script_class="CreatureSpawnTable" load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://creatures/spawning/creature_spawn_table.gd" id="1"]
-[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="10"]
+[ext_resource type="Script" path="res://creatures/spawning/spawn_entry.gd" id="13"]
 [ext_resource type="PackedScene" path="res://creatures/prey/deer.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/hawk.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/lamb.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/rabbit.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://creatures/ambient/scenes/sheep.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_fell_gate_edge.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_shepherds_rocks.tscn" id="8"]
-[ext_resource type="PackedScene" path="res://creatures/hostile/sites/hob_silent_hollow.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_fells_sentry_range.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_fern_cleft.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/gloamer_shepherds_rocks.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/hob_silent_hollow.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/sites/naga_watchers_ledge.tscn" id="12"]
 
 [sub_resource type="Resource" id="e0"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"hares"
 scene = ExtResource("5")
 count = 2
@@ -26,7 +29,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e1"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"hawks"
 scene = ExtResource("3")
 count = 1
@@ -40,7 +43,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e2"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"sheep"
 scene = ExtResource("6")
 count = 5
@@ -54,7 +57,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e3"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"lambs"
 scene = ExtResource("4")
 count = 2
@@ -68,7 +71,7 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e4"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"deer"
 scene = ExtResource("2")
 count = 3
@@ -82,9 +85,9 @@ glamour = 0
 near_group = &""
 
 [sub_resource type="Resource" id="e5"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"site_gloamer_shepherds_rocks"
-scene = ExtResource("8")
+scene = ExtResource("10")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -97,7 +100,7 @@ require_flags = PackedStringArray("starlight_pool_found")
 near_group = &""
 
 [sub_resource type="Resource" id="e6"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"site_gloamer_fell_gate_edge"
 scene = ExtResource("7")
 count = 1
@@ -112,9 +115,9 @@ require_flags = PackedStringArray("glamour_lifted")
 near_group = &""
 
 [sub_resource type="Resource" id="e7"]
-script = ExtResource("10")
+script = ExtResource("13")
 id = &"site_hob_silent_hollow"
-scene = ExtResource("9")
+scene = ExtResource("11")
 count = 1
 cluster_radius = 0.0
 groups = 1
@@ -126,7 +129,52 @@ glamour = 0
 require_flags = PackedStringArray("starlight_pool_found")
 near_group = &""
 
+[sub_resource type="Resource" id="e8"]
+script = ExtResource("13")
+id = &"site_naga_watchers_ledge"
+scene = ExtResource("12")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e9"]
+script = ExtResource("13")
+id = &"site_gloamer_fern_cleft"
+scene = ExtResource("9")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("naga_survived")
+near_group = &""
+
+[sub_resource type="Resource" id="e10"]
+script = ExtResource("13")
+id = &"site_gloamer_fells_sentry_range"
+scene = ExtResource("8")
+count = 1
+cluster_radius = 0.0
+groups = 1
+start_hour = 0.0
+end_hour = 0.0
+on_water = false
+canon = "X"
+glamour = 0
+require_flags = PackedStringArray("stranger_met")
+near_group = &""
+
 [resource]
 script = ExtResource("1")
 region_id = &"western_fells"
-entries = Array[ExtResource("10")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7")])
+entries = Array[ExtResource("13")]([SubResource("e0"), SubResource("e1"), SubResource("e2"), SubResource("e3"), SubResource("e4"), SubResource("e5"), SubResource("e6"), SubResource("e7"), SubResource("e8"), SubResource("e9"), SubResource("e10")])

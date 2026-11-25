@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="HostileSiteData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/gloamer_roamer.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"gloamer_still_hollow"
+family = &"gloamer"
+display_name = "Still Hollow Edge"
+region_id = &"eastern_woods"
+core = Vector2(1209.1, -640.4)
+territory_radius = 35.0
+leash_scale = 1.6
+member_scene = ExtResource("2")
+count = 5
+require_flags = PackedStringArray("glamour_lifted")
+canon = "X"

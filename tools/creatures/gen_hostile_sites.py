@@ -294,18 +294,6 @@ HELD = {"briarling_rose_garden_edge"}
 # Pairs allowed to overlap (host/lookout, shifts, contested borders).
 PAIRS = set()
 
-SPAWN = {}
-for _s in SITES:
-    if _s[0] in HELD:
-        continue
-    SPAWN.setdefault(_s[3], []).append({
-        "id": "site_" + _s[0],
-        "scene": f"res://creatures/hostile/sites/{_s[0]}.tscn",
-        "require_flags": list(_s[8]),
-        "canon": _s[9],
-    })
-
-
 def _floats(text):
     return [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", text)]
 
@@ -382,6 +370,30 @@ def check_overlap(sites, roads, anchors, stones):
     return errors
 
 
+# The seeded layout (lane L91, tools/creatures/site_layout.py): the authored
+# sites above stay as they are; the layout adds the rest of the court's camps
+# around them, each anchored to a reason, under the same overlap rules.
+try:
+    import site_layout
+except ImportError:
+    sys.path.insert(0, os.path.dirname(__file__))
+    import site_layout
+AUTHORED = list(SITES)
+PLACED, REASONS = site_layout.plan(AUTHORED, read_roads(), read_anchors(), read_whorl_stones())
+SITES = AUTHORED + PLACED
+
+SPAWN = {}
+for _s in SITES:
+    if _s[0] in HELD:
+        continue
+    SPAWN.setdefault(_s[3], []).append({
+        "id": "site_" + _s[0],
+        "scene": f"res://creatures/hostile/sites/{_s[0]}.tscn",
+        "require_flags": list(_s[8]),
+        "canon": _s[9],
+    })
+
+
 def write_roamer(rid, spec):
     os.makedirs(DATA_ROAMERS, exist_ok=True)
     model = spec.get("model")
@@ -424,12 +436,113 @@ def write_site(site):
     with open(os.path.join(DATA_SITES, f"{sid}.tres"), "w") as f:
         f.write("\n".join(lines))
     node = "".join(p.capitalize() for p in sid.split("_"))
-    scene = ["[gd_scene load_steps=3 format=3]", "",
+    ids, offs, yaws = DRESSING.get(sid, ([], [], []))
+    scene = [f"[gd_scene load_steps={4 if ids else 3} format=3]", "",
              '[ext_resource type="Script" path="res://creatures/hostile/hostile_site.gd" id="1"]',
-             f'[ext_resource type="Resource" path="res://data/creatures/hostile_sites/{sid}.tres" id="2"]', "",
-             f'[node name="{node}" type="Node3D"]', 'script = ExtResource("1")', 'data = ExtResource("2")', ""]
+             f'[ext_resource type="Resource" path="res://data/creatures/hostile_sites/{sid}.tres" id="2"]']
+    if ids:
+        scene.append('[ext_resource type="Script" path="res://creatures/hostile/camp_dressing.gd" id="3"]')
+    scene += ["", f'[node name="{node}" type="Node3D"]', 'script = ExtResource("1")', 'data = ExtResource("2")', ""]
+    if ids:
+        scene += ['[node name="CampDressing" type="Node3D" parent="."]', 'script = ExtResource("3")',
+                  "pieces = Array[StringName]([%s])" % ", ".join(f'&"{i}"' for i in ids),
+                  "offsets = PackedVector2Array(%s)" % ", ".join(f"{x}, {z}" for x, z in offs),
+                  "yaws = PackedFloat32Array(%s)" % ", ".join(str(y) for y in yaws), ""]
     with open(os.path.join(SCENE_SITES, f"{sid}.tscn"), "w") as f:
         f.write("\n".join(scene))
+
+
+# Camp gear per site (lane L91): its family's kit turned to its approach.
+_ROADS_ALL = site_layout.all_roads(read_roads())
+_WATERS = site_layout.waters()
+DRESSING = {s[0]: site_layout.kit_for(s, _ROADS_ALL, _WATERS) for s in SITES}
+
+
+def remove_stale():
+    """Deletes site outputs whose id is no longer in SITES (R18: one layout)."""
+    keep = {s[0] for s in SITES}
+    for folder, ext in ((DATA_SITES, ".tres"), (SCENE_SITES, ".tscn")):
+        if not os.path.isdir(folder):
+            continue
+        for name in os.listdir(folder):
+            if name.endswith(ext) and name[: -len(ext)] not in keep:
+                os.remove(os.path.join(folder, name))
+
+
+def report():
+    """Per region: camps by tier, members, and the camp gear's draw-call cost."""
+    tiers = {"gloamer": "common", "naga": "bigger", "hob": "giant", "briarling": "small"}
+    rows = {}
+    for s in SITES:
+        r = rows.setdefault(s[3], {"common": 0, "bigger": 0, "giant": 0, "small": 0, "members": 0, "pieces": 0})
+        r[tiers.get(s[1], "small")] += 1
+        r["members"] += s[7]
+        r["pieces"] += len(DRESSING.get(s[0], ([],))[0])
+    total = {k: sum(r[k] for r in rows.values()) for k in ("common", "bigger", "giant", "small", "members", "pieces")}
+    n = sum(total[k] for k in ("common", "bigger", "giant", "small"))
+    print("region               common bigger giant small members gear")
+    for region in sorted(rows):
+        r = rows[region]
+        print(f"{region:20s} {r['common']:6d} {r['bigger']:6d} {r['giant']:5d} {r['small']:5d} {r['members']:7d} {r['pieces']:4d}")
+    print(f"{'total':20s} {total['common']:6d} {total['bigger']:6d} {total['giant']:5d} {total['small']:5d} "
+          f"{total['members']:7d} {total['pieces']:4d}")
+    print("ladder: common %.0f%%, bigger %.0f%%, small %.0f%%, giant %d" % (
+        100.0 * total["common"] / n, 100.0 * total["bigger"] / n, 100.0 * total["small"] / n, total["giant"]))
+    budget()
+    for sid, why in REASONS:
+        print(f"  {sid}: {why}")
+
+
+# Draw calls per member (its model's primitives) and per camp piece (the
+# prop_kit's two surfaces). Members draw wherever they are loaded; gear only
+# inside CampDressing.VISIBLE_TO (120 m). Shadows are counted for every member
+# and every tall piece, which overstates both (the sun's shadows end at 220 m).
+MEMBER_DRAWS = {"gloamer": 1, "naga": 1, "briarling": 1, "hob": 9}
+PIECE_DRAWS = 2
+GEAR_RANGE = 120.0
+# Members stop drawing past CreatureData.draw_distance (180 m for the roamers):
+# the worst view sees every member within that of the eye, so a pair of camps
+# up to twice it apart.
+MEMBER_RANGE = 120.0
+BUDGET = 1500
+
+
+def budget():
+    """R9: each region's scatter report plus every camp loaded with it."""
+    regions_dir = os.path.join(ROOT, "data", "regions", "spring_court")
+    tall = {r["id"] for r in _manifest() if r.get("size_m", [0, 0, 0])[1] >= 1.0}
+    worst = (0, "")
+    print("R9 draw calls (scatter report + camps with neighbours loaded; gear within 120 m):")
+    for region in sorted({s[3] for s in SITES}):
+        path = os.path.join(regions_dir, f"{region}.tres")
+        text = open(path).read() if os.path.exists(path) else ""
+        m = re.search(r'neighbors = PackedStringArray\((.*?)\)', text)
+        loaded = {region} | set(re.findall(r'"(\w+)"', m.group(1) if m else ""))
+        rp = re.search(r'report_path = "res://(.*?)"', text)
+        base = None
+        if rp and os.path.exists(os.path.join(ROOT, rp.group(1))):
+            import json
+            base = json.load(open(os.path.join(ROOT, rp.group(1)))).get("draw_calls")
+        sites = [s for s in SITES if s[3] in loaded and s[0] not in HELD]
+        members, gear = 0, 0
+        for a in sites:
+            near = [b for b in sites if math.hypot(a[4][0] - b[4][0], a[4][1] - b[4][1]) <= GEAR_RANGE]
+            g = sum(PIECE_DRAWS * (2 if pid in tall else 1) for b in near for pid in DRESSING.get(b[0], ([],))[0])
+            gear = max(gear, g)
+            seen = [b for b in sites if math.hypot(a[4][0] - b[4][0], a[4][1] - b[4][1]) <= MEMBER_RANGE * 2]
+            members = max(members, sum(b[7] * MEMBER_DRAWS.get(b[1], 1) * 2 for b in seen))
+        total = (base or 0) + members + gear
+        note = "" if base is not None else " (no scatter report in the tree: a generated one)"
+        print(f"  {region:18s} scatter {base if base is not None else '-':>5} + members {members:3d} + gear {gear:3d} = {total:5d}{note}")
+        if base is not None and total > worst[0]:
+            worst = (total, region)
+    print(f"  worst: {worst[1]} {worst[0]} of {BUDGET}")
+
+
+def _manifest():
+    import json
+    path = os.path.join(ROOT, "art", "monster_gear", "monster_gear_manifest.json")
+    return json.load(open(path)).get("assets", []) if os.path.exists(path) else []
 
 
 def main():
@@ -442,9 +555,10 @@ def main():
         sys.exit(1)
     for rid, spec in ROAMERS.items():
         write_roamer(rid, spec)
+    remove_stale()
     for s in SITES:
         write_site(s)
-        print(s[0], s[3], s[7], "members")
+    report()
 
 
 if __name__ == "__main__":

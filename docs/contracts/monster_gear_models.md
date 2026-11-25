@@ -105,3 +105,7 @@ gear, and every skull and bone is a beast's.
 
 The four `camp_*` pieces marked "extra" are not in the spec: generic camp
 dressing for any family, free to use or leave.
+
+In the game, the containers are placed by `CampContainer` and every other camp
+piece by `CampDressing` (lane L91, `docs/contracts/hostiles.md` "Camp gear"),
+from the kits in `tools/creatures/site_layout.py`. Nothing else places camp gear.

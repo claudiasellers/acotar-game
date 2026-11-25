@@ -36,6 +36,22 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
 - Fields: `id`, `family`, `region_id`, `core` (world x, z), `territory_radius`,
   `leash_scale` (1.6), `member_scene`, `count`, `require_flags`, `settle_days` (7),
   `report_delay` (0.8 s), `canon`.
+- **Layout (L91):** the hand-listed SITES are kept, and `tools/creatures/site_layout.py`
+  (fixed `SEED`) adds the rest of the court's camps to the same table: per-region
+  quotas on the size ladder (about half gloamer packs, a third naga, a fifth
+  briarlings, the one Hob), each anchored to a reason (naga 8–35 m from a named
+  water, gloamers at a nook, a landmark's outskirts or a ride 62–180 m off a road,
+  briarlings in a rose brake), gated on timeline flags in waves, and kept out
+  of the ward, the village green, the Bogge's ground, the Suriel's glade, the
+  story stages and the sealed border. The generator prints a per-region tier
+  report and an R9 draw-call budget. `tools/creatures/site_ground_probe.tscn`
+  checks the ground (no home point over 35°, no non-naga camp in a bed).
+- **Camp gear:** each site scene carries a `CampDressing` child
+  (`creatures/hostile/camp_dressing.gd`), the one path that lays L88's camp
+  pieces; the kits are `site_layout.KITS`. Pieces are snapped to the ground
+  once the site has snapped to its core, kept `CHEST_CLEAR` (2.4 m) from the loot
+  container, stop drawing at 120 m, and the tall ones (≥1 m) cast shadows and
+  carry a collision post. The loot container itself stays `CampContainer`'s.
 - The site is spawned by its region's `CreatureSpawner` (one `SpawnEntry`
   per site, appended by `gen_spawn_tables.py` from `gen_hostile_sites.SPAWN`),
   moves itself to `core` on the terrain and spawns `count` members on a home ring.

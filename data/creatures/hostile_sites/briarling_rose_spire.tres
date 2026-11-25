@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="HostileSiteData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/hostile_site_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://creatures/hostile/briarling_roamer.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"briarling_rose_spire"
+family = &"briarling"
+display_name = "Rose Spire Brake"
+region_id = &"rosewild"
+core = Vector2(-403.2, -588.3)
+territory_radius = 14.0
+leash_scale = 1.6
+member_scene = ExtResource("2")
+count = 3
+require_flags = PackedStringArray("glamour_lifted")
+canon = "X"
