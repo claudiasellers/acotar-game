@@ -33,6 +33,9 @@ const GROUP := &"ambient_swarm"
 
 ## 0 normal, 1 fully withdrawn near horror (DreadField); eased.
 var withdrawn: float = 0.0
+## How fast `withdrawn` eases, per second. A settling site (SettleSwell) starts
+## its swarm withdrawn and slows this so the fliers come back over its swell.
+var ease_rate: float = 0.5
 
 var multimesh: MultiMesh
 
@@ -85,7 +88,7 @@ func _process(delta: float) -> void:
 		_dread_left = 1.0
 		set_withdrawn_target(DreadField.withdrawal_at(get_tree(), global_position))
 	if not is_equal_approx(withdrawn, _withdrawn_target):
-		withdrawn = move_toward(withdrawn, _withdrawn_target, delta * 0.5)
+		withdrawn = move_toward(withdrawn, _withdrawn_target, delta * ease_rate)
 		multimesh.visible_instance_count = int(round(count * (1.0 - withdrawn)))
 	_update_left -= delta
 	if _update_left > 0.0:

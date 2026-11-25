@@ -286,7 +286,7 @@ place(A, "lost_estate", "workshop", -640.0, 2330.0, 22.0)
 place(A, "fathers_workshop", "workshop", -560.0, 2240.0, 10.0)
 # The first time she lets the string down short of a full draw, anywhere, ever
 # (BowGuide; Keeper: "I gripped my bow and drew the string farther back", ch1).
-line(A, "bow_let_down", "feyre", "Not yet. Draw the string farther back.", "scene", "bow.let_down",
+line(A, "bow_let_down", "feyre", "Too soon. Draw the string farther back.", "scene", "bow.let_down",
      inner=True, canon="A", cd=0.0, delivery="inner voice: patient with herself, under her breath")
 think(A, "hf_snow", "The snow's already covering the blood. Good.", "region", "hunting_forest", HUMAN,
       req=["wolf_killed"])

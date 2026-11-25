@@ -103,7 +103,8 @@ func test_the_knife_press_does_not_use_the_bed() -> void:
 		guard += 1
 	assert_true(door.current_beat_label().begins_with("decision"), "at the window")
 	assert_false(StoryControl.can_interact(), "E doesn't reach the stations")
-	assert_true(StoryControl.can_shoot(), "the bracelets (fire) still can")
+	assert_true(StoryControl.allowed_actions.has("fire"), "the bracelets (fire) still can")
+	assert_false(StoryControl.can_shoot(), "and the button is never the bow")
 	var press := InputEventAction.new()
 	press.action = &"interact"
 	press.pressed = true
