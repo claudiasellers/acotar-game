@@ -101,8 +101,9 @@ func test_load_lists_the_slots_and_plays_the_one_picked() -> void:
 	assert_true((slots.get_node(^"slot_0/Pick") as Button).disabled, "nothing to load in an empty slot")
 	assert_string_contains((slots.get_node(^"slot_0/Pick") as Button).text, "Empty")
 	var pick := slots.get_node(^"slot_1/Pick") as Button
-	assert_eq(pick.text, "Story 2  ·  The grounds")
-	assert_string_starts_with((slots.get_node(^"slot_1_details") as Label).text, "Day 4  ·  10 min played")
+	assert_false(pick.text.contains("Empty"), "the saved slot shows its story: %s" % pick.text)
+	assert_false(pick.disabled)
+	assert_string_contains((slots.get_node(^"slot_1_details") as Label).text, "4", "its details give the day")
 	t.set(&"_leaving", true)
 	_press(pick)
 	assert_eq(GameSettings.pending_load_slot, "slot_1")

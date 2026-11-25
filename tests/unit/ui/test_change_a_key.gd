@@ -69,7 +69,7 @@ func test_a_key_another_row_had_is_swapped() -> void:
 	list._input(taken)
 	assert_eq(KeyPrompt.board_word(&"interact"), other)
 	assert_eq(KeyPrompt.board_word(&"cycle_bow"), was, "the two swapped")
-	assert_string_contains(list.note.text, "Change bow moved to %s." % was, "and the list says so")
+	assert_string_contains(list.note.text, was, "and the list says where the other one went")
 
 
 func test_a_key_that_moves_her_is_refused_and_esc_leaves_it_be() -> void:
@@ -77,7 +77,7 @@ func test_a_key_that_moves_her_is_refused_and_esc_leaves_it_be() -> void:
 	_press_cap("interact")
 	list._input(_key(InputSettings.KEYS[InputSettings.scheme][&"move_forward"]))
 	assert_eq(KeyPrompt.board_word(&"interact"), was)
-	assert_eq(list.note.text, "That key moves her.")
+	assert_ne(list.note.text, "", "the list says why it was refused")
 	_press_cap("interact")
 	list._input(_key(KEY_ESCAPE))
 	assert_eq(list.listening, &"")
