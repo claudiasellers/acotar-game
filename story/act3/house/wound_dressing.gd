@@ -30,6 +30,9 @@ const BEAST_ROUTE: Array = [&"saloon_mid", &"saloon_in", &"hall_door", &"beast_s
 const INFIRMARY_ROUTE: Array = [&"r1", &"r2", &"r3", &"r4", &"r5", &"r6", &"r7", &"r8", &"r9", &"r10", &"tamlin_lean"]
 const EXIT_ROUTE: Array = [&"r10", &"exit"]
 const BLOOD_EVERY := 0.55
+## If she lingers at the infirmary door: seconds to the first nudge (then 3x, 5x).
+const DOORWAY_NUDGE_AFTER := 8.0
+const DOORWAY_NUDGES: Array[StringName] = [&"wait_drip", &"wait_healing", &"wait_cabinet"]
 const STEPS_CLEAN := 3
 const STEPS_BIND := 3
 
@@ -235,7 +238,9 @@ func _walk_beats() -> Array:
 			if t:
 				t.look_at(Vector3(mark(&"table").x, t.global_position.y, mark(&"table").z), Vector3.UP)
 			_bleeding = &"", "he slumps against the table"),
-		reach(&"feyre_work", 3.0),
+		# She stands in the doorway: his blood drips, her thought, then his
+		# tired word (Keeper, lore/02-locations/spring-manor-house.md).
+		reach_nudged_ladder(&"feyre_work", 3.0, DOORWAY_NUDGES, DOORWAY_NUDGE_AFTER),
 	]
 
 
@@ -268,6 +273,18 @@ func _infirmary_beats() -> Array:
 			_hide_glint()
 			StoryControl.release(self), "alone with the clean bowl"),
 	]
+
+
+## The doorway's first nudge is heard before it is thought: a drop of his
+## blood on the marble under his hand.
+func aside(line_id: StringName) -> void:
+	if line_id == &"wait_drip" and is_inside_tree() and stage:
+		SoundDirector.cue(&"blood_drip", mark(&"hand"))
+		var drop := HouseProps.blood_drop(0.05)
+		add_child(drop)
+		drop.global_position = Vector3(mark(&"hand").x, mark(&"tamlin_lean").y + 0.01, mark(&"hand").z)
+		stains.append(drop)
+	super.aside(line_id)
 
 
 ## E presses since the last check (input, or press_interact() in tests).
