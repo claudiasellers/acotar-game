@@ -2,7 +2,8 @@
 ## §13 B1). Fire alone raises the bow and draws; letting go looses, weaker the
 ## earlier it is let go; aim is an optional steadier, closer view; the bow
 ## stays up a moment after a draw for the next arrow; Focus slows the world
-## through TimeScale only while held, at a known stamina cost.
+## through TimeScale only while held, at a known stamina cost. Drives the bow's
+## own code (update_bow), never a key or button.
 extends GutTest
 
 const TEST_SET := preload("res://data/phases/m0_test_phases.tres")
@@ -35,8 +36,6 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-	for action in [&"aim", &"fire", &"focus", &"sprint", &"move_forward"]:
-		Input.action_release(action)
 	StoryControl.release()
 	TimeScale.reset()
 
@@ -255,62 +254,6 @@ func test_a_blow_breaks_focus() -> void:
 
 ## Shift and L3 are sprint and Focus both: with the bow raised they are Focus,
 ## and she neither sprints nor stands up from her crouch.
-func test_the_sprint_key_is_focus_while_the_bow_is_raised() -> void:
-	bow.set_physics_process(true)
-	feyre.crouch.set_crouched(true)
-	Input.action_press(&"aim")
-	await wait_physics_frames(12)
-	Input.action_press(&"move_forward")
-	Input.action_press(&"sprint")
-	Input.action_press(&"focus")
-	await wait_physics_frames(12)
-	assert_true(bow.is_aiming)
-	assert_false(feyre.is_running(), "no sprint with the bow up")
-	assert_true(feyre.crouch.crouched, "and she stays in her crouch")
-	assert_true(bow.is_focused, "the key is Focus here")
-
-
-func _wheel(button: MouseButton) -> void:
-	var e := InputEventMouseButton.new()
-	e.button_index = button
-	e.pressed = true
-	e.position = Vector2(320, 240)
-	e.global_position = e.position
-	Input.parse_input_event(e)
-	Input.flush_buffered_events()
-
-
-func test_the_mouse_wheel_changes_arrows_only_while_raised() -> void:
-	Gameplay.inventory.add(&"arrow_ash", 1)
-	bow.selected = &"arrow_wood"
-	_tick(false, false)
-	_wheel(MOUSE_BUTTON_WHEEL_DOWN)
-	await wait_physics_frames(2)
-	assert_eq(bow.selected, &"arrow_wood", "the wheel is free when the bow is down")
-	_tick(true, false)
-	_wheel(MOUSE_BUTTON_WHEEL_DOWN)
-	await wait_physics_frames(2)
-	assert_eq(bow.selected, &"arrow_ash", "raised, it chooses the arrow")
-	_wheel(MOUSE_BUTTON_WHEEL_UP)
-	await wait_physics_frames(2)
-	assert_eq(bow.selected, &"arrow_wood", "and back")
-
-
-func _pad_buttons(action: StringName) -> Array[int]:
-	var out: Array[int] = []
-	for e in InputMap.action_get_events(action):
-		if e is InputEventJoypadButton:
-			out.append((e as InputEventJoypadButton).button_index)
-	return out
-
-
-func test_the_bow_actions_live_in_the_input_map() -> void:
-	for action in [&"focus", &"cycle_arrow", &"arrow_next", &"arrow_prev", &"cycle_bow", &"craft_arrow"]:
-		assert_true(ProjectSettings.has_setting("input/%s" % action), "%s is in project.godot" % action)
-	assert_eq(_pad_buttons(&"cycle_arrow"), [JOY_BUTTON_DPAD_LEFT] as Array[int], "arrows on D-pad left")
-	assert_eq(_pad_buttons(&"cycle_bow"), [JOY_BUTTON_DPAD_RIGHT] as Array[int], "bows on D-pad right")
-
-
 ## One version of the bow: none of the old one's parts are left, and only
 ## TimeScale writes Engine.time_scale.
 func test_the_old_bow_is_gone() -> void:
