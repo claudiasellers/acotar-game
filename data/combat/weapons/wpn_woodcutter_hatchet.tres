@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_woodcutter_hatchet"
+display_name = "Woodcutter's Hatchet"
+family = &""
+kind = &"axe"
+power = 1.5
+swing_s = 0.8
+reach_m = 1.8
+stagger_s = 1.3
+durability = 20
+imbue_slots = 1
+two_handed = false
+trait_id = &""
+trait_count = 0
+unique = false
+canon = "X"
+description = "A plain mortal hatchet, the handle gnawed, a ribbon tied on."

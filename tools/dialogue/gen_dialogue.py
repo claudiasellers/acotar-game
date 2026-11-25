@@ -991,6 +991,11 @@ for _lid, _text in [
         ("hostile_element_resisted", "Like shooting a stone. Not that, then.")]:
     moment(_lid, "hostile_elements", _text, canon="X", once=True)
 
+# The first trophy taken from a speaking family (the naga talk and call each
+# other "brothers" [C]): her sentence began with skinning a fae (L75 monster
+# gear §2.2; the Keeper's line, canon X). Once per save.
+moment("loot_first_trophy", "monster_gear", "Like the pelt. I know what this makes me.", canon="X", once=True)
+
 # =============================================================================
 # Who stands where (CastPresence). House spots are in house space (x, z) on the
 # room's storey; cottage spots are relative to the act1_cottage_interior anchor.

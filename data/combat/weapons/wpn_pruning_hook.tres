@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_pruning_hook"
+display_name = "Pruning Hook"
+family = &""
+kind = &"sickle"
+power = 1.3
+swing_s = 0.65
+reach_m = 2.3
+stagger_s = 1.1
+durability = 18
+imbue_slots = 1
+two_handed = false
+trait_id = &"hamstring"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A long orchard pruning hook with blossom twigs caught in the binding."

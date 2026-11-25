@@ -12,6 +12,10 @@
 ##     just broken free from), x1 otherwise.
 ##   - Nothing to strike, but a cuttable thing in reach (group
 ##     &"knife_cuttable": snares, the Hob's charm): the knife cuts it.
+## A looted weapon she holds (WeaponRack) takes the boot knife's place in the
+## knife blows: its power, swing, reach, stagger and trait, its imbues through
+## the family's element rows, and wear until it breaks (catalogue
+## plans/hostile-fae/monster-gear.md §1). Cutting free is always the boot knife.
 ## Strike shares its key with no other gameplay action (tests/unit/test_input_overlap.gd).
 ## A press that does nothing is left unhandled.
 class_name StrikeController
@@ -44,6 +48,15 @@ const FREED_WINDOW := 2.0
 ## long as she is grabbed and learnt the first time she cuts herself free.
 const HINT_BASH := &"strike_bash"
 const HINT_CUT_FREE := &"strike_cut_free"
+## Weapon traits (catalogue §1.3).
+const BLEED := 60.0
+const HAMSTRING_SECONDS := 4.0
+const STUN_SCALE := 1.5
+## An imbued hit's effect lasts this many seconds per point of share (Tier III
+## Ember, 0.3: a 3 s burn; on a weak family x1.5).
+const IMBUE_SECONDS := 10.0
+## Hush builds sleep on the creature: at 1 it drops (a sleep arrow's effect).
+const HUSH_META := &"hush_build"
 
 var player: Node3D
 var _cooldown: float = 0.0
@@ -55,6 +68,7 @@ var _bash_hinted: bool = false
 func _ready() -> void:
 	if player == null:
 		player = get_parent() as Node3D
+	_ensure_rack.call_deferred()
 	if EventBus.has_signal(&"player_released"):
 		EventBus.player_released.connect(_on_released)
 	EventBus.player_grabbed.connect(_on_grabbed)
@@ -110,7 +124,7 @@ func target() -> Creature:
 		var c := node as Creature
 		if c == null or not c.alive or c.data == null:
 			continue
-		if not Creature.within_reach(player.global_position, c.global_position, REACH):
+		if not Creature.within_reach(player.global_position, c.global_position, reach()):
 			continue
 		var d := Creature.flat_distance(player.global_position, c.global_position)
 		var key := c.health * 10.0 + d
@@ -150,7 +164,30 @@ static func knife_mult(kind: StringName) -> float:
 	return KNIFE_MULT
 
 
+## Her weapon rack, made beside her the first frame.
+func _ensure_rack() -> void:
+	if player and is_instance_valid(player):
+		WeaponRack.of(player)
+
+
+## How far her blows reach: the held weapon's, or the boot knife's REACH.
+func reach() -> float:
+	var w := held_weapon()
+	return w.reach_m if w else REACH
+
+
+## The looted weapon she holds, or null (the boot knife).
+func held_weapon() -> WeaponData:
+	if player == null:
+		return null
+	var rack := player.get_node_or_null(WeaponRack.NODE_NAME) as WeaponRack
+	return rack.held_weapon() if rack else null
+
+
 func _knife(c: Creature, kind: StringName) -> bool:
+	var w := held_weapon()
+	if w:
+		return _weapon_strike(c, kind, w)
 	_cooldown = KNIFE_COOLDOWN
 	var at := c.global_position + Vector3.UP * (c.data.body_height * 0.5)
 	var result := c.apply_hit(&"knife", &"knife", StrikeController.knife_mult(kind), &"body", at)
@@ -158,6 +195,101 @@ func _knife(c: Creature, kind: StringName) -> bool:
 		c.stagger(KNIFE_STAGGER)
 	struck.emit(kind, c)
 	return true
+
+
+## A blow with the held weapon: the target, and with `sweep` the others in the
+## arc in front of her. Only the first hit wears it.
+func _weapon_strike(c: Creature, kind: StringName, w: WeaponData) -> bool:
+	var rack := player.get_node(WeaponRack.NODE_NAME) as WeaponRack
+	_cooldown = w.swing_s
+	var broke := _weapon_hit(c, kind, w, rack, true)
+	if w.trait_id == &"sweep":
+		for other in _in_arc(c, w.reach_m, maxi(w.trait_count - 1, 0)):
+			_weapon_hit(other, StrikeController.knife_kind(other, player.global_position, _crouched(), _freed_from),
+					w, rack, false)
+	struck.emit(kind, c)
+	if broke:
+		struck.emit(&"weapon_broke", c)
+	return true
+
+
+## One creature struck by `w`. True when this hit broke it.
+func _weapon_hit(c: Creature, kind: StringName, w: WeaponData, rack: WeaponRack, wears: bool) -> bool:
+	if not c.alive:
+		return false
+	var at := c.global_position + Vector3.UP * (c.data.body_height * 0.5)
+	var zone := &"body"
+	if w.trait_id == &"weakspot" and c.data.weak_zone_height > 0.0 \
+			and not StrikeController.is_behind(c, player.global_position):
+		zone = &"weak"
+	var resisted := false
+	var shares := rack.held_shares()
+	for element: StringName in shares:
+		var hostile: StringName = ImbueSlots.HOSTILE_ELEMENT.get(element, &"")
+		if hostile == &"" or float(shares[element]) <= 0.0:
+			continue
+		var m := HostileElements.react(c, hostile, at)
+		if m <= HostileElements.RESISTED:
+			resisted = true
+		else:
+			StrikeController.imbue_effect(c, hostile, float(shares[element]) * m)
+	var mult := StrikeController.knife_mult(kind) * w.power
+	if wears and rack.last_hit(resisted):
+		mult *= WeaponRack.BREAK_MULT
+	var result := c.apply_hit(&"knife", w.id, mult, zone, at)
+	if not bool(result.killed) and c.alive:
+		var stun := w.trait_id == &"stun" or (w.trait_id == &"glint" and c.get(&"glint_drawn") is int \
+				and int(c.get(&"glint_drawn")) > 0)
+		c.stagger(w.stagger_s * (STUN_SCALE if stun else 1.0))
+		match w.trait_id:
+			&"bleed":
+				c.bleeding = maxf(c.bleeding, BLEED)
+			&"hamstring":
+				c.slowed_left = maxf(c.slowed_left, HAMSTRING_SECONDS)
+	return rack.wear_held(resisted) if wears else false
+
+
+## The others a sweep catches: alive, in reach and in the half in front of her
+## that `first` is in, nearest first.
+func _in_arc(first: Creature, weapon_reach: float, most: int) -> Array[Creature]:
+	var out: Array[Creature] = []
+	if most <= 0:
+		return out
+	var ahead := first.global_position - player.global_position
+	ahead.y = 0.0
+	for node in player.get_tree().get_nodes_in_group(Creature.GROUP):
+		var c := node as Creature
+		if c == null or c == first or not c.alive or c.data == null:
+			continue
+		if not Creature.within_reach(player.global_position, c.global_position, weapon_reach):
+			continue
+		var to := c.global_position - player.global_position
+		to.y = 0.0
+		if ahead.length_squared() > 0.0001 and ahead.dot(to) < 0.0:
+			continue
+		out.append(c)
+	out.sort_custom(func(a: Creature, b: Creature) -> bool:
+		return a.global_position.distance_squared_to(player.global_position) \
+				< b.global_position.distance_squared_to(player.global_position))
+	return out.slice(0, most)
+
+
+## An imbued hit's effect, `strength` its share times the family's row: Ember
+## burns and Rime slows for IMBUE_SECONDS x strength, Hush builds sleep (a
+## sleep arrow's drop at 1), Glimmer's burst and reveal are the reaction's.
+static func imbue_effect(c: Creature, element: StringName, strength: float) -> void:
+	match element:
+		&"fire":
+			c.ignite(IMBUE_SECONDS * strength)
+		&"frost":
+			c.slowed_left = maxf(c.slowed_left, IMBUE_SECONDS * strength)
+		&"sleep":
+			var built := float(c.get_meta(HUSH_META, 0.0)) + strength
+			if built >= 1.0:
+				c.set_meta(HUSH_META, 0.0)
+				c.on_arrow_effect(&"sleep", null)
+			else:
+				c.set_meta(HUSH_META, built)
 
 
 func _bash(c: Creature) -> bool:

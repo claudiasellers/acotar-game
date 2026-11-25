@@ -36,6 +36,8 @@ var engaged: bool = false
 var _calm_left: float = 0.0
 ## The life that comes back once it settles (SettleSwell); null until then.
 var swell: SettleSwell
+## Its camp's loot container (CampContainer), or null when the family's camps hold nothing.
+var camp_loot: CampContainer
 ## {member: Creature, at: Vector3, left: float}
 var _pending: Array[Dictionary] = []
 var _token_holders: Array[Creature] = []
@@ -59,6 +61,8 @@ func _ready() -> void:
 			return
 	if snap_to_core:
 		global_position = Vector3(data.core.x, float(height_func.call(data.core.x, data.core.y)), data.core.y)
+	# Its loot container (catalogue §1.6), there whether the camp is settled or not.
+	camp_loot = CampContainer.place(self)
 	if HostileSite.stays_settled(WorldState.get_flag(settle_flag(data.id)), Clock.day,
 			data.settle_days, WorldState.has_flag("glamour_lifted")):
 		is_settled = true

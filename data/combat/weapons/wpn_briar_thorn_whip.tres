@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_briar_thorn_whip"
+display_name = "Thorn Whip"
+family = &"briarling"
+kind = &"whip"
+power = 0.9
+swing_s = 0.65
+reach_m = 3.0
+stagger_s = 0.8
+durability = 12
+imbue_slots = 1
+two_handed = false
+trait_id = &"sweep"
+trait_count = 2
+unique = false
+canon = "X"
+description = "A living briar cane, still leafing, its thorns rose-red at the tips."

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_gloamer_knuckleclub"
+display_name = "Knuckle-club"
+family = &"gloamer"
+kind = &"club"
+power = 1.8
+swing_s = 1.0
+reach_m = 2.0
+stagger_s = 1.6
+durability = 22
+imbue_slots = 1
+two_handed = false
+trait_id = &"stun"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A knotted root studded with bent nails, a horseshoe hammered round its head."

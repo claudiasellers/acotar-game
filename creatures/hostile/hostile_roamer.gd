@@ -102,6 +102,10 @@ var _has_token: bool = false
 var _hold_left: float = 0.0
 var _leap_speed: float = 0.0
 var _circle_sign: float = 1.0
+## The looted weapon it carries in its hand and drops when it dies (its
+## family's LootTable picks it by member_index; &"" for none).
+var carried_weapon: StringName = &""
+var _loot_dropped: bool = false
 var _glint_at: Vector3 = Vector3.INF
 var _glint_left: float = 0.0
 var _glint_grabbed: bool = false
@@ -120,6 +124,66 @@ func _ready() -> void:
 	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
 	_taunt_left = randf_range(TAUNT_EVERY.x, TAUNT_EVERY.y)
 	_grow_hit_box()
+	_arm()
+
+
+## Its weapon (catalogue §1.6): the family's LootTable picks it by its place in
+## the pack, and its model rides the hand_r socket once L88's file exists.
+func _arm() -> void:
+	if data == null:
+		return
+	var table := LootTable.for_family(data.kind)
+	if table and carried_weapon == &"":
+		var count := site.data.count if site and is_instance_valid(site) and site.data else 1
+		carried_weapon = table.carried_by(member_index, count)
+	if carried_weapon == &"" or animator == null:
+		return
+	var w := WeaponTable.get_weapon(carried_weapon)
+	if w == null or not w.has_model():
+		return
+	var hand := animator.socket(&"hand_r")
+	var scene := load(w.model_path()) as PackedScene
+	if hand and scene:
+		var m := scene.instantiate()
+		m.name = "Weapon"
+		hand.add_child(m)
+
+
+## What it leaves when it dies (catalogue §1.6): the weapon in its hand at
+## part of its durability, and each trophy at its chance. Rolls are seeded by
+## the creature and the day; a unique trophy drops once a save.
+func _drop_loot() -> void:
+	if _loot_dropped or not is_inside_tree():
+		return
+	_loot_dropped = true
+	var table := LootTable.for_family(data.kind)
+	if table == null:
+		return
+	var parent := get_parent()
+	var key := "%s:%d" % [creature_id, Clock.day]
+	var n := 0
+	if carried_weapon != &"":
+		var wear := lerpf(table.carried_wear.x, table.carried_wear.y, LootTable.roll(key + ":wear"))
+		WeaponDrop.spawn(parent, _loot_spot(n), carried_weapon, wear)
+		n += 1
+	for i in table.trophies.size():
+		var id := table.trophies[i]
+		var chance := table.trophy_chances[i] if i < table.trophy_chances.size() else 0.0
+		var w := WeaponTable.get_weapon(id)
+		if w == null or LootTable.roll("%s:%s" % [key, id]) >= chance:
+			continue
+		if w.unique:
+			if WeaponRack.unique_dropped(id):
+				continue
+			WeaponRack.mark_unique_dropped(id)
+		WeaponDrop.spawn(parent, _loot_spot(n), id, 1.0)
+		n += 1
+
+
+## Where the `n`th thing it leaves lies: round the body, on its ground.
+func _loot_spot(n: int) -> Vector3:
+	var a := float(n) * 2.1 + float(member_index)
+	return global_position + Vector3(cos(a), 0.0, sin(a)) * (0.5 + 0.25 * float(n))
 
 
 ## The trail holds while she was smelled in the last TRAIL_SECONDS, unless a
@@ -730,6 +794,7 @@ func _on_player_down(_source_id: Variant = null, _cause: Variant = null, _at: Va
 func die(cause: StringName) -> void:
 	_set_fight(Fight.CHARGE)
 	super.die(cause)
+	_drop_loot()
 	if _dread and is_instance_valid(_dread):
 		_dread.queue_free()
 		_dread = null

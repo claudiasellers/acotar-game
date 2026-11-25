@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="Script" path="res://systems/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wpn_naga_talon_hook"
+display_name = "Talon Hook"
+family = &"naga"
+kind = &"sickle"
+power = 1.5
+swing_s = 0.7
+reach_m = 2.0
+stagger_s = 1.2
+durability = 18
+imbue_slots = 1
+two_handed = false
+trait_id = &"hamstring"
+trait_count = 0
+unique = false
+canon = "X"
+description = "A single hooked talon bound to a reed haft with sinew."
