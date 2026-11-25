@@ -39,6 +39,7 @@ static func apply(arrow: Arrow, target: Node, at: Vector3) -> void:
 			_to_field(arrow, at, &"water")
 		&"light":
 			_light(arrow, at, Color(1.0, 0.95, 0.75), 1.6, 9.0, LIGHT_SECONDS)
+			Gameplay.emit(&"arrow_light_landed", [at])
 		&"signal":
 			_flare(arrow, at)
 			Gameplay.emit(&"signal_flare", [at])

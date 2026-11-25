@@ -134,3 +134,26 @@ func test_act_one_holds_its_rows_through_the_table() -> void:
 	for gone: String in ["KeyPrompt.make", "ConfigFile", "const PROMPTS", "GameSettings"]:
 		assert_false(src.contains(gone), "KeyPrompts still has %s" % gone)
 	assert_true(src.contains("_hints.hold(self, current)"))
+
+
+func test_a_key_the_use_prompt_names_is_not_said_twice() -> void:
+	var use := UsePrompt.of(get_tree())
+	var thing := _holder()
+	hints.hold(thing, &"skin")
+	hints.nudge(&"draw")
+	await wait_process_frames(2)
+	assert_string_contains(hints.text(), "skin")
+	use.offer(thing, "skin the doe")
+	await wait_process_frames(2)
+	assert_eq(hints.text(), "", "the use prompt has E: the hint leaves it alone")
+	assert_eq(use.text(), "E   skin the doe")
+	assert_almost_eq(float(hints._nudged[&"draw"]), KeyHints.NUDGE_SECONDS, 0.001, "a nudge behind it does not run down unseen")
+	use.offer(thing, "loose", &"fire")
+	assert_eq(hints.shown(&"draw").size(), 1, "the rest of a row stays")
+	assert_eq(String(hints.shown(&"draw")[0][0]), KeyHints.cap(&"aim"))
+	hints.hold(thing, &"beast")
+	use.offer(thing, "step in")
+	assert_eq(hints.shown(&"beast").size(), 3, "a choice she must see is never cut")
+	use.offer(thing, "")
+	await wait_process_frames(2)
+	assert_string_contains(hints.text(), "throw the knife")

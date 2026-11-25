@@ -58,6 +58,9 @@ signal creature_hit(creature_id: StringName, kind: StringName, cause: StringName
 signal hostile_windup(creature_id: StringName, kind: StringName, attack_id: StringName, at: Vector3, seconds: float)
 ## The tell was called off before contact (stagger, sleep, death).
 signal hostile_windup_cancelled(creature_id: StringName)
+## A light arrow came to rest glowing at `at` (ArrowEffects). Shiny-greedy
+## hostiles nearby go for it (HostileSite.glint, the gloamers).
+signal arrow_light_landed(at: Vector3)
 ## Story to world: change the weather now (&"snow_heavy", &"snow_slow",
 ## &"snow_pause", &"clear"), blended over `seconds`.
 signal weather_requested(weather: StringName, seconds: float)
