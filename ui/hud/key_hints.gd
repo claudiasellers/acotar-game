@@ -128,6 +128,14 @@ func forget_taught() -> void:
 	_nudged.clear()
 
 
+## Back to a fresh game's state: nothing taught, nothing nudged or held. The
+## test reset hook calls it so one script's hints can't reach the next.
+func reset_state() -> void:
+	forget_taught()
+	_held.clear()
+	current = &""
+
+
 ## Whether a row is still to be taught: hints are on and she hasn't used it.
 func teaches(id: StringName) -> bool:
 	return always(id) or (bool(GameSettings.get_value(&"key_hints")) and not taught.get(id, false))

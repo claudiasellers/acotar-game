@@ -15,3 +15,8 @@ static func all() -> void:
 		control.release()
 	# Gameplay inventory, journal and the rest.
 	Gameplay.reset()
+	# Key hints: taught flags, nudges and holds (the node only if a test made it).
+	var hud: Node = Engine.get_main_loop().root.get_node_or_null("HudLayout")
+	var hints: Node = hud.get_node_or_null(KeyHints.NODE) if hud != null else null
+	if hints != null:
+		(hints as KeyHints).reset_state()
