@@ -333,11 +333,26 @@ func _in_interior(point: Vector3) -> bool:
 
 func _on_mood(mood: StringName, intensity: float, seconds: float) -> void:
 	var target := clampf(intensity, 0.0, 1.0) if mood == &"dread" else 0.0
-	if mood == &"dread" and dread < 0.5 and target >= 0.5 and _spaces.is_empty():
+	if mood == &"dread" and dread < 0.5 and target >= 0.5 and not _scene_running():
 		play(&"horror_wrong")
 	_set_dread(target, seconds)
 	if target < 0.3:
 		_stop_loop(&"beast_heartbeat", 3.0)
+
+
+## True while a story scene that takes control is running. A background moment
+## (the hall marks, the manor map: they wait on deeds all act and hold nothing)
+## is not a scene. A space with no live node to ask counts, as a film does.
+func _scene_running() -> bool:
+	var holders := StoryControl.holders()
+	for id in _spaces:
+		var ref: WeakRef = _spaces[id]
+		if ref == null:
+			return true
+		var n := ref.get_ref() as Object
+		if n != null and holders.has(n):
+			return true
+	return false
 
 
 func _on_space_started(space_id: StringName) -> void:

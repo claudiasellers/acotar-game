@@ -35,25 +35,25 @@ func _has_joypad(action: StringName) -> bool:
 	return false
 
 
-func test_arrows_are_the_default() -> void:
+func test_wasd_is_the_default() -> void:
 	InputSettings.load_settings()
-	assert_eq(InputSettings.scheme, InputSettings.Scheme.ARROWS)
-	assert_eq(_keys(&"move_forward"), [KEY_UP])
-	assert_eq(_keys(&"move_left"), [KEY_LEFT])
-
-
-func test_switching_to_wasd_rebinds_keys_and_keeps_the_gamepad() -> void:
-	InputSettings.set_scheme(InputSettings.Scheme.WASD)
+	assert_eq(InputSettings.scheme, InputSettings.Scheme.WASD)
 	assert_eq(_keys(&"move_forward"), [KEY_W])
-	assert_eq(_keys(&"move_back"), [KEY_S])
 	assert_eq(_keys(&"move_left"), [KEY_A])
-	assert_eq(_keys(&"move_right"), [KEY_D])
+
+
+func test_switching_to_arrows_rebinds_keys_and_keeps_the_gamepad() -> void:
+	InputSettings.set_scheme(InputSettings.Scheme.ARROWS)
+	assert_eq(_keys(&"move_forward"), [KEY_UP])
+	assert_eq(_keys(&"move_back"), [KEY_DOWN])
+	assert_eq(_keys(&"move_left"), [KEY_LEFT])
+	assert_eq(_keys(&"move_right"), [KEY_RIGHT])
 	assert_true(_has_joypad(&"move_forward"), "stick binding survives the remap")
 
 
 func test_the_choice_survives_a_relaunch() -> void:
-	InputSettings.set_scheme(InputSettings.Scheme.WASD)
-	InputSettings.scheme = InputSettings.Scheme.ARROWS
+	InputSettings.set_scheme(InputSettings.Scheme.ARROWS)
+	InputSettings.scheme = InputSettings.Scheme.WASD
 	InputSettings.load_settings()
-	assert_eq(InputSettings.scheme, InputSettings.Scheme.WASD)
-	assert_eq(_keys(&"move_right"), [KEY_D])
+	assert_eq(InputSettings.scheme, InputSettings.Scheme.ARROWS)
+	assert_eq(_keys(&"move_right"), [KEY_RIGHT])
