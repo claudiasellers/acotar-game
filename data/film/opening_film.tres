@@ -145,7 +145,7 @@ id = &"op_16"
 at = 141.0
 hold = 8.4
 speaker = &""
-text = "Three years after she died, he spent every coin we had on three ships full of fine goods to sell. All three sank before they ever reached land."
+text = "Three years after she died, he bet everything we had on three trading ships with fine goods he could sell. All three sank, and our entire fortune went down with them."
 canon = "A"
 
 [sub_resource type="Resource" id="L16"]
