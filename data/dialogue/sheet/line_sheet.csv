@@ -25,7 +25,7 @@ f_wolf,father,Father,"A wolf that size, this near the village? Be careful in tho
 f_pine,father,Father,"Hand me that bit of pine, would you? The good piece.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_pine.ogg
 f_knee,father,Father,The damp's in my leg again. It'll pass.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_knee.ogg
 A1_06_mother_vow,mother,Mother,"Stay together, and look after them.",V,yes,deed,,fact.mother_bed_seen,p0_winter p1_wolf_and_crossing,"memory: a whisper in her head, feverish and fading",audio/voice/A1_06_mother_vow.ogg
-d_wolf_killed,feyre,,I can carry only one. But it's a shame to leave the wolf.,A,yes,deed,,wolf_killed,p0_winter p1_wolf_and_crossing,"inner voice, breath coming back, practical",audio/voice/d_wolf_killed.ogg
+d_wolf_killed,feyre,,The doe's all I can carry. His pelt comes with me.,A,yes,deed,,wolf_killed,p0_winter p1_wolf_and_crossing,"inner voice, breath coming back, practical",audio/voice/d_wolf_killed.ogg
 d_wolf_skinned,feyre,,Heavy. Heavier than any pelt has a right to be.,X,yes,deed,,fact.wolf_skinned,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_wolf_skinned.ogg
 d_wolf_wrap,feyre,,His pelt over her wound. No blood trail home.,A,yes,follow,,,p0_winter p1_wolf_and_crossing,"inner voice, quiet, careful",audio/voice/d_wolf_wrap.ogg
 wh_doe,feyre,,A doe. A deer like that could feed my family for a week or more.,A,yes,scene,wolf_kill.doe,,p0_winter p1_wolf_and_crossing,"inner voice: low, held breath, hunting",audio/voice/wh_doe.ogg
