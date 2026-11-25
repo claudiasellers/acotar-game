@@ -23,7 +23,7 @@ needs the director's OK (R13). The riding itself is `docs/contracts/mount.md`.
 
 ## Tending (L47-7)
 
-- **Hold E** (0.4 s) beside her while she stands opens the tending screen
+- **T** (`MountDirector.TEND_ACTION` = `tend_mount` in project.godot) beside her while she stands opens the tending screen; E only rides. On a pad there is no free button, so a tap of X mounts and a hold (`HOLD_TEND`, 0.4 s) tends (director, 2026-11-25); the `tend` row shows "Hold X" there. The KeyHints row `tend` names the key beside the ride prompt until it's used. T, E or Esc closes the screen. While it's open the screen is on ScreenStack, and no shot is allowed while any screen is open (`ScreenStack.takes_play()`, read by `StoryControl.can_shoot()`), so the click that brushes her never reaches the bow
   (`MareTendingView`, `ui/mare/`); a tap of E still mounts. It's taught once
   after a dismount (a card note, WorldDeltas `mount/tend_taught`).
 - The screen keeps the world running (no pause): Feyre's physics is off, a

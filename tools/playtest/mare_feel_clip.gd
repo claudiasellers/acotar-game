@@ -174,20 +174,41 @@ func _play() -> void:
 	_note("slide off %.2f s, peak hip speed %.1f m/s" % [dm.t if dm else -1.0, dm.max_hip_speed if dm else -1.0])
 	_pass()
 
-	_begin("tend", "hold E: brush her to a gleam, feed her, make and put on a garland, bows and a lilac saddle cloth")
+	_begin("tend", "T (her own key): brush her to a gleam, feed her, make and put on a garland, bows and a lilac saddle cloth")
 	for id: String in ["ing_lilac", "ing_lavender", "ing_crocus", "ing_heather"]:
 		Gameplay.inventory.add(StringName(id), 3)
 	Gameplay.inventory.add(&"ing_spider_silk", 6)
 	Gameplay.inventory.add(&"ing_manor_fruit", 2)
-	var v := director.open_tending()
-	if v == null:
-		return _fail("tending would not open (mare state %s)" % director.mare.state)
+	# Her own key, as a player presses it (not E, which rides).
 	_record("tend")
-	await _wait(0.8)
+	await _wait(0.6)
+	var tkey := InputEventAction.new()
+	tkey.action = MountDirector.TEND_ACTION
+	tkey.pressed = true
+	Input.parse_input_event(tkey)
+	await _wait(0.3)
+	var v := director.tending
+	if v == null:
+		_stop_recording()
+		return _fail("T beside her did not open tending (mare state %s, can_tend %s)" % [director.mare.state, director.can_tend()])
+	await _wait(0.5)
+	# Brush with the mouse held: the click that brushes must not raise or draw the bow.
+	var bc := feyre.get(&"bow_controller") as BowController
+	var bow_moved := false
+	Input.action_press(&"fire")
+	Input.action_press(&"aim")
 	for i in 48:
 		v._brush_at = Vector2(v.size.x * (0.18 + 0.12 * sin(i * 0.4)), v.size.y * 0.45)
 		v._stroke(0.2)
-		await get_tree().process_frame
+		await get_tree().physics_frame
+		if bc and (bc.is_aiming or bc.is_drawing):
+			bow_moved = true
+	Input.action_release(&"fire")
+	Input.action_release(&"aim")
+	_note("brushing with fire and aim held: bow raised or drawn = %s" % bow_moved)
+	if bow_moved:
+		_stop_recording()
+		return _fail("the brushing click reached the bow")
 	await _wait(0.6)
 	v._feed(&"ing_manor_fruit", null)
 	await _wait(1.6)

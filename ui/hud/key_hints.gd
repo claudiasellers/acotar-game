@@ -97,6 +97,9 @@ static func cap(action: StringName) -> String:
 			return "Right stick" if pad else "Mouse"
 		SatchelHud.ACTION_OPEN:
 			return "LB" if pad else KeyPrompt.key(action)
+		&"tend_mount":
+			# No pad button of its own: a hold of interact there (MountDirector).
+			return "Hold " + KeyPrompt.key(&"interact") if pad else KeyPrompt.key(action)
 	return KeyPrompt.key(action)
 
 

@@ -47,8 +47,8 @@ always = false
 script = ExtResource("1")
 id = &"tend"
 priority = 200
-keys = Array[StringName]([&"interact"])
-says = PackedStringArray("hold beside her to tend her")
+keys = Array[StringName]([&"tend_mount"])
+says = PackedStringArray("tend her")
 always = false
 
 [resource]

@@ -29,6 +29,7 @@ const ROWS: Array[Array] = [
 	[&"craft_arrow", "Make an arrow", "", ""],
 	[&"cycle_bow", "Change bow", "", ""],
 	[&"call_mount", "Whistle for the mare", "", ""],
+	[&"tend_mount", "Tend the mare, beside her", "", "Hold X"],
 	[&"camera_recenter", "Camera behind her", "", ""],
 	[&"guide_open", "Her thought, again", "", ""],
 	[&"satchel_open", "Satchel", "", "LB"],

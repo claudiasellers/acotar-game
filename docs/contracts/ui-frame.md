@@ -88,6 +88,9 @@ Rules the stack keeps, each with a behaviour test in
 
 A screen that swallows the rest of the input while it is open (the mare's
 tending screen, which does not pause) lets `answers(event)` presses through.
+`takes_play()` is true while any screen is open; `StoryControl.can_shoot()`
+reads it, so input polled from `Input` (the bow's fire and aim) never acts
+under a screen, paused or not.
 A screen built without a script of its own (the easel's card) hands its
 cancel to `push` as the third argument.
 
