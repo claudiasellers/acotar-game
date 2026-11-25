@@ -1,0 +1,3 @@
+from shots-src/maretips-frames
+quality look
+shot marefeel res://tools/playtest/mare_feel_clip.tscn -- --out={out}/report.json
