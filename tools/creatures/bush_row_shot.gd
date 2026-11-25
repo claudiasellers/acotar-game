@@ -24,6 +24,7 @@ func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(out)
 	get_tree().root.size = SIZE
 	var cam := _stage()
+	RenderingServer.global_shader_parameter_set(&"snow_cover", 0.0)   # spring: the project default is a winter value
 	var mat := CourtAssets.material_for(&"flora_bush_rose")
 	for b in BUSHES:
 		var n := (load(BUSH) as PackedScene).instantiate() as Node3D

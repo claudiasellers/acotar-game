@@ -1,0 +1,9 @@
+# lampwing poses (creatures/models/fae/lampwing.gltf, creatures/materials/lampwing.gdshader). Written by tools/blender/monsters/lampwing.py.
+# name fold rate mouth light duration_s   # what it shows   ('-' = holds or loops)
+roost 1.00 0.00 0.00 0.00 -   # wings shut upright over the back, grey undersides out, light out
+feed 0.00 0.12 0.00 1.00 -   # wings slowly opening and closing
+flutter 0.00 1.00 0.00 1.00 -   # the ordinary flight
+swarm 0.00 1.80 0.00 1.00 -   # fast flutter
+bite 0.00 1.80 1.00 1.00 0.3   # mouth 0 to 1 by 0.12 s and back to 0 by 0.3 s, while the swarm darts it in
+scatter 0.00 2.40 0.00 1.00 -   # a burst away; the swarm tumbles it
+fall 0.60 0.00 0.00 0.00 -   # wings half shut and still, light out; the swarm spirals it down

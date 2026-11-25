@@ -163,7 +163,7 @@ def rose_bush(m: Mesh, rng: random.Random, core: str = "leaf_deep") -> None:
 			c = cols[loop.vert.index]
 			loop[m.col] = (float(c[0]), float(c[1]), float(c[2]), 0.0)
 	cc = tuple(x * 0.45 for x in _c(core))
-	L.ellipsoid(m, V((0.0, 0.0, 0.15 - min(low, 0.0))), (0.2, 0.24, 0.17), cc, seg=7, rings=4, rng=rng, noise=0.08, flat_bottom=True)
+	L.ellipsoid(m, V((0.0, 0.0, 0.15 - min(low, 0.0))), (0.13, 0.17, 0.12), cc, seg=7, rings=4, rng=rng, noise=0.08, flat_bottom=True)
 
 
 def berry_shrub(m: Mesh, rng: random.Random, height: float = 0.5, radius: float = 0.35, leaf_color: str = "leaf",

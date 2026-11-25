@@ -36,6 +36,14 @@ func _run() -> void:
 			anim.play(row[3])
 			anim.seek(0.0, true)
 			anim.pause()
+	# a few lampwings at her shoulder
+	var moth_path := FAE + "lampwing.gltf"
+	if ResourceLoader.exists(moth_path):
+		for i in 5:
+			var moth := (load(moth_path) as PackedScene).instantiate() as Node3D
+			add_child(moth)
+			moth.position = Vector3(0.55 + 0.16 * (i % 3), 1.25 + 0.14 * (i / 3) + 0.05 * (i % 2), -0.1)
+			moth.rotation = Vector3(0.5, 0.5 * i, 0.0)
 	cam.global_position = Vector3(0.2, 1.25, -9.6)
 	cam.look_at(Vector3(0.2, 1.05, 0.0))
 	cam.fov = 33.0
