@@ -150,7 +150,7 @@ chat(A, "f_knee", "father", "The damp's in my knee again. It'll pass.", HUMAN, c
 deed(A, "A1_06_mother_vow", "fact.mother_bed_seen", "Stay together, and look after them.", speaker="mother",
      phases=HUMAN, pr=5, canon="V", inner=True, who="Mother",
      delivery="memory: a whisper in her head, feverish and fading")
-deed(A, "d_wolf_killed", "wolf_killed", "I can carry only one. But it's a shame to leave the wolf.",
+deed(A, "d_wolf_killed", "wolf_killed", "The doe's all I can carry. His pelt comes with me.",
      phases=HUMAN, canon="A", delivery="inner voice, breath coming back, practical")
 deed(A, "d_wolf_skinned", "fact.wolf_skinned", "Heavy. Heavier than any pelt has a right to be.",
      phases=HUMAN, follow="d_wolf_wrap")
