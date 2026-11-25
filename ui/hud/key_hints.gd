@@ -40,7 +40,7 @@ const ROWS := {
 	&"ride_leap": [[&"jump", "leap"]],
 	&"ride_off": [[&"interact", "get down"]],
 	&"whistle": [[&"call_mount", "whistle for her"]],
-	&"tend": [[&"interact", "hold beside her to tend her"]],
+	&"tend": [[&"tend_mount", "tend her"]],
 	&"crouch": [[&"crouch", "crouch"]],
 	&"jump": [[&"jump", "jump"]],
 	&"walk": [[&"move", "walk"]],
@@ -102,6 +102,9 @@ static func cap(action: StringName) -> String:
 			return "Right stick" if pad else "Mouse"
 		SatchelHud.ACTION_OPEN:
 			return "LB" if pad else KeyPrompt.key(action)
+		&"tend_mount":
+			# No pad button of its own: a hold of interact there (MountDirector).
+			return "Hold " + KeyPrompt.key(&"interact") if pad else KeyPrompt.key(action)
 	return KeyPrompt.key(action)
 
 

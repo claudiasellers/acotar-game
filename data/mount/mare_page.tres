@@ -17,7 +17,7 @@ script = ExtResource("1")
 id = &"gleam"
 require_flags = PackedStringArray()
 after = "Her coat's dull from the paddock. I'd like to see it shine."
-hints = PackedStringArray("A brush, and patience.", "Beside her, I can take up the brush and work her coat until it gleams.", "Hold E beside her, then drag over her coat (or hold A and move the stick) until it reads Gleaming.")
+hints = PackedStringArray("A brush, and patience.", "Beside her, I can take up the brush and work her coat until it gleams.", "Press {tend} beside her, then drag over her coat (or hold A and move the stick) until it reads Gleaming.")
 memory = "I brushed her until she shone like snow under the moon."
 canon = "X"
 
@@ -26,7 +26,7 @@ script = ExtResource("1")
 id = &"honeyplum"
 require_flags = PackedStringArray()
 after = "Alis swears she'd do anything for a honeyplum. They grow only in Blossom Vale, south and east, farther than she'll carry me yet."
-hints = PackedStringArray("She'll take me part of the way. I can walk the rest.", "Ride her south-east until she turns for home, then walk on into Blossom Vale and look in the orchards.", "Pick a honeyplum in Blossom Vale, bring it back, hold E beside her and feed it to her on the Care tab.")
+hints = PackedStringArray("She'll take me part of the way. I can walk the rest.", "Ride her south-east until she turns for home, then walk on into Blossom Vale and look in the orchards.", "Pick a honeyplum in Blossom Vale, bring it back, press {tend} beside her and feed it to her on the Care tab.")
 memory = "She ate a honeyplum from my palm and nosed my hand for more. She knows me now."
 canon = "X"
 
@@ -53,7 +53,7 @@ script = ExtResource("1")
 id = &"bareback_run"
 require_flags = PackedStringArray("fact.mare_bond_trusted")
 after = "Tamlin says to take the saddle off: I'll feel what she means to do before she does it."
-hints = PackedStringArray("No saddle. Just her back and my knees.", "Take the saddle off her, then ride a good long way without getting down.", "Hold E beside her, choose Ride bareback on the Tack tab, then ride 300 m in one go without dismounting.")
+hints = PackedStringArray("No saddle. Just her back and my knees.", "Take the saddle off her, then ride a good long way without getting down.", "Press {tend} beside her, choose Ride bareback on the Tack tab, then ride 300 m in one go without dismounting.")
 memory = "No saddle, a long way, and she never once let me slip."
 canon = "X"
 
@@ -71,7 +71,7 @@ script = ExtResource("1")
 id = &"blight_ride"
 require_flags = PackedStringArray()
 after = "It's the smell of whatever's loose in there she hates. If I could hide it from her nose, she might carry me in."
-hints = PackedStringArray("Something strong-smelling on her muzzle. Lavender, honey to bind it, and something stronger.", "Mugwort grows only up on the Western Fells. Mugwort, lavender and honey, mixed at her side.", "Hold E beside her and make the Sweetbalm on the Care tab (mugwort, lavender, honey), then ride 200 m into the Blighted Reaches.")
+hints = PackedStringArray("Something strong-smelling on her muzzle. Lavender, honey to bind it, and something stronger.", "Mugwort grows only up on the Western Fells. Mugwort, lavender and honey, mixed at her side.", "Press {tend} beside her and make the Sweetbalm on the Care tab (mugwort, lavender, honey), then ride 200 m into the Blighted Reaches.")
 memory = "With the balm on, she carried me onto the grey ground and never balked."
 canon = "X"
 

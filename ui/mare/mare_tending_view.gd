@@ -1,4 +1,4 @@
-## Tending the white mare (lane L47-7, docs/contracts/mare_bond.md): hold E
+## Tending the white mare (lane L47-7, docs/contracts/mare_bond.md): T (her own key)
 ## beside her and the camera draws round to her near side. On the left, her;
 ## stroke her coat with the brush (hold the mouse, or A and the stick) and it
 ## comes up gleaming with a sparkle where the brush passes. On the right, in the
@@ -439,7 +439,7 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"interact"):
+	if event.is_action_pressed(MountDirector.TEND_ACTION) or event.is_action_pressed(&"interact"):
 		get_viewport().set_input_as_handled()
 		close()
 		return
