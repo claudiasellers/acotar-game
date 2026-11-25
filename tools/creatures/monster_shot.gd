@@ -164,29 +164,31 @@ func _run_model(m: Node3D, stills: String) -> void:
 		for s in mi.mesh.get_surface_count():
 			tris += mi.mesh.surface_get_array_index_len(s) / 3
 	var point := func(bone: StringName) -> Vector3:
-		return sk.global_transform * sk.get_bone_global_pose(sk.find_bone(bone)).origin
+		return sk.global_transform * sk.get_bone_global_pose(maxi(sk.find_bone(bone), 0)).origin
 	var head: Vector3 = point.call(&"head")
 	var h := head.y * 1.1
+	# a small creature is looked at from closer
+	var near := clampf(h / 2.0, 0.22, 1.0)
 	print("%s: %d triangles, %d clips" % [_name, tris, anim.get_animation_list().size() if anim else 0])
 	var sheet := Image.create(SIZE.x, SIZE.y, false, Image.FORMAT_RGB8)
 	var third := Vector2i(SIZE.x / 3, SIZE.y)
 	for i in 3:
 		var yaw: float = [0.6, PI * 0.5, PI - 0.5][i]
-		_look(Vector3(sin(yaw), 0.0, -cos(yaw)) * h * 2.3 + Vector3.UP * h * 0.62, Vector3.UP * h * 0.52, 34.0)
+		_look(Vector3(sin(yaw), 0.0, -cos(yaw)) * maxf(h, 0.56) * 2.3 + Vector3.UP * h * 0.62, Vector3.UP * h * 0.52, 34.0)
 		var img := await _grab()
 		sheet.blit_rect(img, Rect2i(Vector2i((SIZE.x - third.x) / 2, 0), third), Vector2i(i * third.x, 0))
 	sheet.save_png("%s/%s_turn.png" % [_out, _name])
 	var close := Image.create(SIZE.x, SIZE.y, false, Image.FORMAT_RGB8)
-	var hand: Vector3 = point.call(&"hand_r")
-	var views: Array[Array] = [[head + Vector3(0.32, 0.06, -0.8), head + Vector3(0.0, 0.06, -0.12), 30.0],
-			[hand + Vector3(-0.5, 0.2, -0.75), hand + Vector3(0.0, -0.1, 0.0), 30.0]]
+	var hand: Vector3 = point.call(&"hand_r" if sk.find_bone(&"hand_r") >= 0 else &"paw_leg_r")
+	var views: Array[Array] = [[head + Vector3(0.32, 0.06, -0.8) * near, head + Vector3(0.0, 0.06, -0.12) * near, 30.0],
+			[hand + Vector3(-0.5, 0.2, -0.75) * near, hand + Vector3(0.0, -0.1, 0.0) * near, 30.0]]
 	for i in 2:
 		_look(views[i][0], views[i][1], views[i][2])
 		var img := await _grab()
 		close.blit_rect(img, Rect2i(Vector2i(SIZE.x / 4, 0), Vector2i(SIZE.x / 2, SIZE.y)), Vector2i(i * SIZE.x / 2, 0))
 	close.save_png("%s/%s_close.png" % [_out, _name])
 	var clips := Image.create(TILE.x * 4, TILE.y * 2, false, Image.FORMAT_RGB8)
-	_look(Vector3(2.9, 1.0, -3.6) * h * 0.72, Vector3(0.0, h * 0.56, 0.25), 28.0)
+	_look(Vector3(2.9, 1.0, -3.6) * maxf(h, 0.44) * 0.72, Vector3(0.0, h * 0.56, 0.25), 28.0)
 	var n := 0
 	for still in list:
 		if n >= 8 or anim == null or not anim.has_animation(still[0]):

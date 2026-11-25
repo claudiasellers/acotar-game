@@ -1,0 +1,23 @@
+# hollow_crow clips (creatures/models/fae/hollow_crow.gltf), 30 fps. Written by tools/blender/monsters/hollow_crow.py.
+# name native_speed_mps duration_s loop(0/1) contact_s travel_m   ('-' = does not apply)
+perch_idle - 4.000 1 - -
+head_cock - 0.300 0 - -
+caw - 0.800 0 - -
+shriek - 1.000 0 - -
+mimic - 1.500 1 - -
+peck - 1.200 1 - -
+walk 0.450 0.433 1 - -
+hop 1.200 0.333 1 - -
+fly 9.000 0.300 1 - -
+glide - 2.000 1 - -
+take_off - 0.600 0 - -
+land - 0.600 0 - -
+telegraph_crow_peck - 0.400 0 - -
+attack_crow_peck - 0.333 0 0.100 -
+telegraph_crow_dive - 0.467 0 - -
+attack_crow_dive - 0.600 0 0.400 4.000
+hit_l - 0.267 0 - -
+death_l - 1.200 0 - -
+hit_r - 0.267 0 - -
+death_r - 1.200 0 - -
+death_air - 1.200 0 - -

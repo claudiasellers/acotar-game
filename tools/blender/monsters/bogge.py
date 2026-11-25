@@ -153,31 +153,6 @@ def eye_material():
 
 # ------------------------------------------------------------------ rigging
 
-def bind_soft(obj, arm, bones, sigma=0.01, weights=None):
-    """Bone weights by nearness: each vertex follows the bones it lies along,
-    shared smoothly where two meet. `weights(P)` -> {bone: array} overrules."""
-    P = kit.co(obj)
-    if weights is not None:
-        W = weights(P)
-        names = list(W)
-        M = np.stack([W[k] for k in names], axis=1)
-    else:
-        names = list(bones)
-        M = np.zeros((len(P), len(names)))
-        for i, b in enumerate(names):
-            d, _ = kit.seg_dist(P, np.array(arm.data.bones[b].head_local), np.array(arm.data.bones[b].tail_local))
-            M[:, i] = d
-        M = np.exp(-((M - M.min(axis=1, keepdims=True)) / sigma) ** 2)
-    if M.shape[1] > 4:
-        cut = np.sort(M, axis=1)[:, -4][:, None]
-        M = np.where(M >= cut, M, 0.0)
-    M /= np.maximum(M.sum(axis=1, keepdims=True), 1e-9)
-    for j, k in enumerate(names):
-        vg = obj.vertex_groups.new(name=k)
-        for i in np.nonzero(M[:, j] > 1e-3)[0]:
-            vg.add([int(i)], float(M[i, j]), "REPLACE")
-
-
 BASE = [("root", (0, 0, 0), (0, 0.1, 0), None, False),
         ("body", (0, -0.1, 0), (0, 0.0, 0), "root", False)]
 
@@ -563,11 +538,11 @@ def build(which, fast=False, bake=True):
         def weights(P):
             w = kit.ss((upper(P) - lower(P)) / 0.012 + 0.5)
             return dict(upper=1.0 - w, jaw=w)
-        bind_soft(low, arm, None, weights=weights)
+        rig.bind_near(low, arm, None, weights=weights)
     elif which == "eye":
         rig.bind_rigid(low, "stalk")
     else:
-        bind_soft(low, arm, part.skin_bones(), sigma=0.008)
+        rig.bind_near(low, arm, part.skin_bones(), sigma=0.008)
     pieces = []
     for o, bone in hard:
         g = kit.duplicate(o, o.name + "_g")

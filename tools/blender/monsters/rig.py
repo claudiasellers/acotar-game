@@ -178,6 +178,31 @@ def bind_chain(obj, arm, bones):
             vg.add([int(j)], float(W[j, i]), "REPLACE")
 
 
+def bind_near(obj, arm, bones, sigma=0.01, weights=None):
+    """Bone weights by nearness: each vertex follows the bones it lies along,
+    shared smoothly where two meet. `weights(P)` -> {bone: array} overrules."""
+    P = kit.co(obj)
+    if weights is not None:
+        W = weights(P)
+        names = list(W)
+        M = np.stack([W[k] for k in names], axis=1)
+    else:
+        names = list(bones)
+        M = np.zeros((len(P), len(names)))
+        for i, b in enumerate(names):
+            d, _ = kit.seg_dist(P, np.array(arm.data.bones[b].head_local), np.array(arm.data.bones[b].tail_local))
+            M[:, i] = d
+        M = np.exp(-((M - M.min(axis=1, keepdims=True)) / sigma) ** 2)
+    if M.shape[1] > 4:
+        cut = np.sort(M, axis=1)[:, -4][:, None]
+        M = np.where(M >= cut, M, 0.0)
+    M /= np.maximum(M.sum(axis=1, keepdims=True), 1e-9)
+    for j, k in enumerate(names):
+        vg = obj.vertex_groups.new(name=k)
+        for i in np.nonzero(M[:, j] > 1e-3)[0]:
+            vg.add([int(i)], float(M[i, j]), "REPLACE")
+
+
 def attach(mesh, arm):
     mesh.parent = arm
     mod = next((m for m in mesh.modifiers if m.type == "ARMATURE"), None) or mesh.modifiers.new("Armature", "ARMATURE")
