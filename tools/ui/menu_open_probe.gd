@@ -19,7 +19,14 @@ const STOCK := {
 const FRAMES_AFTER := 12
 const OPENS := 3
 const WARM_FRAMES := 120
-const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"settings"]
+const SHOT_PAGES: Array[StringName] = [&"collection", &"map", &"satchel", &"wardrobe", &"sketchbook", &"bonds", &"settings"]
+## What has happened by the time of the shots, and on which day, so the
+## Bonds page has people on it.
+const SHOT_PAST := {
+	"beast_claim_accepted": 2, "wall_crossed": 2, "first_dinner_eaten": 3, "fact.alis_tripped": 4,
+	"bogge_survived": 5, "puca_resisted": 6, "fact.mare_ridden": 6, "tamlin_wound_dressed": 9,
+	"fact.mare_did_answered": 10, "suriel_bound": 12, "naga_survived": 12, "starlight_pool_found": 16,
+}
 
 var feyre: Feyre
 
@@ -52,6 +59,9 @@ func _go() -> void:
 		if args.size() >= 3:
 			PhaseManager.current_phase = StringName(args[2])
 			JournalTheme.apply()
+		for flag: String in SHOT_PAST:
+			Clock.day = SHOT_PAST[flag]
+			WorldState.set_flag(flag, true)
 		await _shots(args[1])
 	else:
 		for page in _pages():
@@ -65,12 +75,13 @@ func _go() -> void:
 func _setup() -> void:
 	add_child(SettingsTab.new())
 	add_child(StoryJournal.new())
+	add_child(BondsTab.new())
 	add_child(WorldMapHud.new())
 	add_child(SatchelHud.new())
 
 
 func _pages() -> Array[StringName]:
-	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"map", &"settings"]
+	return [&"none", &"satchel", &"wardrobe", &"collection", &"sketchbook", &"bonds", &"map", &"settings"]
 
 
 ## &"none" times plain frames, the baseline the hitch is read against.

@@ -151,24 +151,39 @@ func test_the_scene_speaks_in_the_keepers_order() -> void:
 	assert_false(labels.has("wait 4.0"), "no fixed wait cuts the terms short")
 
 
-func test_the_ride_fades_from_the_cottage_and_ends_at_the_steps() -> void:
+func test_the_ride_is_played_from_the_cottage_road_to_the_steps() -> void:
 	var ride := RideNorth.new()
 	ride.auto_tick = false
 	add_child_autofree(ride)
 	var labels: Array = ride._build_beats().map(func(b: SceneBeat) -> String: return b.label)
-	assert_lt(labels.find("fade out"), labels.find("mount"), "dark before the horse")
-	assert_lt(labels.find("mount"), labels.find("fade in"))
-	assert_lt(labels.find("fade in"), labels.find("cue tamlin_beast lead"))
-	assert_true(labels.has("the air tastes like metal"))
-	assert_false(labels.has("cue tamlin_beast leave"), "he isn't sent back to the cottage")
-	var drive := ride.drive_path()
-	var last := drive.global_transform * drive.curve.get_point_position(drive.curve.point_count - 1)
+	assert_eq(labels, ["the mare waits at the trees", "cue tamlin_beast lead", "follow the beast", "she is down at the stairs"],
+			"no fade, no sleep, no drive cut: she rides it")
+	var road := RideNorth.route_points()
+	assert_lt(road[0].distance_to(HumanRealmLayout.COTTAGE), 1.0, "from the cottage")
+	var gap := Vector2(WorldMap.WALL_GAP_X, WorldMap.WALL_Z)
+	var through := false
+	for i in road.size() - 1:
+		var on := Geometry2D.get_closest_point_to_segment(gap, road[i], road[i + 1])
+		through = through or on.distance_to(gap) < 3.0
+	assert_true(through, "through the gap in the Wall")
+	# Her thoughts come in road order, the metal just before the Wall, birds just after.
+	var at: Array = ride._marks.map(func(m: Array) -> float: return m[1])
+	for i in at.size() - 1:
+		assert_lt(at[i], at[i + 1], "%s before %s" % [ride._marks[i][0], ride._marks[i + 1][0]])
+	assert_lt(ride._mark(&"smell_metal"), ride.seam_at())
+	assert_gt(ride._mark(&"birds"), ride.seam_at())
+	for beat: StringName in [&"mounted", &"still", &"village", &"live", &"ash", &"faerie", &"lamb", &"smell_metal",
+			&"birds", &"warm", &"name", &"gate", &"magic", &"paint", &"stairs",
+			&"stray_mare", &"stray_growl", &"stray_roar", &"stray_block"]:
+		assert_false(director._of(DialogueLine.Trigger.SCENE, StringName("ride_north.%s" % beat)).is_empty(), "lines for %s" % beat)
+	assert_eq((director.by_id[&"rn_stray_block"] as DialogueLine).speaker, &"tamlin_beast", "the block is his one line")
+	var drive := RideNorth.drive_points()
+	var last := drive[drive.size() - 1]
 	var door := Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)
-	assert_almost_eq(Vector2(last.x, last.z).distance_to(door), RideNorth.STOP_OUT, 0.2,
-			"in the saddle just outside the doors' radius")
-	for i in drive.curve.point_count:
-		var p := drive.global_transform * drive.curve.get_point_position(i)
-		assert_gt(Vector2(p.x, p.z).distance_to(ManorSitePlan.FORECOURT_CENTER), 15.0, "on gravel, round the fountain")
-		assert_gt(Vector2(p.x, p.z).distance_to(door), ManorArrival.DOOR_RADIUS, "never inside the radius mounted")
+	assert_almost_eq(road[road.size() - 1].distance_to(last), 0.0, 0.01, "the road ends where the drive does")
+	assert_almost_eq(last.distance_to(door), RideNorth.STOP_OUT, 0.2, "in the saddle just outside the doors' radius")
+	for p in drive:
+		assert_gt(p.distance_to(ManorSitePlan.FORECOURT_CENTER), 15.0, "on gravel, round the fountain")
+		assert_gt(p.distance_to(door), ManorArrival.DOOR_RADIUS, "never inside the radius mounted")
 	var steps := RideNorth.beast_steps()
 	assert_lt(Vector2(steps.x, steps.z).distance_to(door), ManorArrival.DOOR_RADIUS, "he waits at the doors")

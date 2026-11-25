@@ -581,7 +581,7 @@ func _play() -> void:
 		return
 
 	# 9. The ride north and the wall.
-	_begin("crossing", "ride starts by itself; wall_crossed; phase p2_grounds")
+	_begin("crossing", "out to the mare (E), ride behind him; stray once and he stops her; wall_crossed; p2_grounds")
 	var ride := _find_named(&"RideNorth") as RideNorth
 	if ride == null:
 		var found := _find_named(&"RideNorth")
@@ -599,11 +599,39 @@ func _play() -> void:
 		return _fail("no RideNorth; StoryDirector children: %s; wall_crossed %s" % [", ".join(names), WorldState.has_flag("wall_crossed")])
 	if not await _until(func() -> bool: return ride.running or WorldState.has_flag("wall_crossed"), 15.0):
 		return _fail("ride never started")
-	_note("ride path: %s, %.0f m" % [ride.path.get_path() if ride.path else "none", ride.path_length()])
-	if not await _until(func() -> bool: return not ride.running, 240.0):
-		return _fail("ride never ended (beat '%s', progress %.0f)" % [ride.current_beat_label(), ride.progress])
-	if not WorldState.has_flag("wall_crossed"):
-		return _fail("ride ended without wall_crossed")
+	_note("ride road: %s, %.0f m, the Wall at %.0f m" % [ride.path.get_path() if ride.path else "none", ride.path_length(), ride.seam_at()])
+	if not await _until(func() -> bool: return ride.horse != null, 5.0):
+		return _fail("no mare waiting (beat '%s')" % ride.current_beat_label())
+	# Out of the broken door to the mare, and up (E), as a player does.
+	await _walk_to(ride.horse.global_position, 1.6, Callable(), 40.0)
+	await _press(&"interact")
+	if not await _until(func() -> bool: return ride.step == RideNorth.Step.RIDING, 8.0):
+		return _fail("E at the mare didn't put her up (step %s, %.1f m from her)" % [ride.step, _flat(ride.horse.global_position)])
+	# Rides behind him; once, past the village, she tries to break away east.
+	var bolt := {"from": ride._mark(&"live"), "until": -1.0, "max": 0.0, "tier": 0}
+	ride.autopilot = func() -> Array:
+		var at := ride.horse.global_position
+		if ride.progress >= float(bolt["from"]) and float(bolt["until"]) < 0.0:
+			bolt["until"] = _sim_seconds() + 9.0
+		var bolting := float(bolt["until"]) > 0.0 and _sim_seconds() < float(bolt["until"])
+		bolt["max"] = maxf(float(bolt["max"]), ride.stray)
+		bolt["tier"] = maxi(int(bolt["tier"]), ride.tier)
+		if bolting:
+			var road := ride.pose_at(ride.progress)
+			return [road.basis.x.normalized(), true]
+		var to := ride.pose_at(ride.progress + 9.0).origin - at
+		to.y = 0.0
+		return [to.normalized() if to.length() > 0.1 else Vector3.ZERO, ride.progress < ride.beast_at - 6.0]
+	var t_ride := _sim_seconds()
+	if not await _until(func() -> bool: return WorldState.has_flag("wall_crossed"), 420.0):
+		return _fail("never through the Wall: %.0f of %.0f m, step %s, stray %.1f, tier %d, mare at %s" % [ride.progress,
+				ride.seam_at(), ride.step, ride.stray, ride.tier, _v(ride.horse.global_position)])
+	_note("through the Wall in %.0f s; strayed at most %.1f m (tier %d); said %s" % [_sim_seconds() - t_ride, bolt["max"],
+			bolt["tier"], ride.said])
+	if int(bolt["tier"]) < 3:
+		return _fail("she bolted and he never turned on her (tier %d, %.1f m out)" % [bolt["tier"], bolt["max"]])
+	if float(bolt["max"]) > RideNorth.HARD + 4.0:
+		return _fail("the mare carried her %.1f m off his road" % bolt["max"])
 	await _until(func() -> bool: return PhaseManager.current_phase == &"p2_grounds", 3.0)
 	if PhaseManager.current_phase != &"p2_grounds":
 		return _fail("wall crossed but phase is %s" % PhaseManager.current_phase)
@@ -612,7 +640,22 @@ func _play() -> void:
 		return
 
 	# 10. Arrival at the manor.
-	_begin("manor_arrival", "after the ride Feyre is on the manor estate, free to walk")
+	_begin("manor_arrival", "ride on to the stairs, the mare stops; E gets her down on the estate")
+	var t_on := _sim_seconds()
+	var last_note := t_on
+	while _sim_seconds() - t_on < 300.0 and ride.step != RideNorth.Step.AT_STEPS:
+		await get_tree().physics_frame
+		if _sim_seconds() - last_note >= 20.0:
+			last_note = _sim_seconds()
+			_note("  riding: %s" % _ride_state(ride))
+	if ride.step != RideNorth.Step.AT_STEPS:
+		return _fail("never reached the stairs: %s" % _ride_state(ride))
+	_note("at the stairs at %02d:%02d" % [int(Clock.hour()), int(fmod(Clock.hour(), 1.0) * 60.0)])
+	await _until(func() -> bool: return not ride._speaking(), 15.0)
+	await _press(&"interact")
+	if not await _until(func() -> bool: return not ride.running, 10.0):
+		return _fail("E at the stairs didn't get her down (step %s)" % ride.step)
+	ride.autopilot = Callable()
 	await _wait(2.0)
 	var manor := WorldStreamer.get_region(&"manor_estate")
 	_note("dismounted at %s in %s, control %s" % [_v(feyre.global_position), _region(), _mode()])
@@ -662,6 +705,18 @@ func _play() -> void:
 
 
 ## 14-16 (L25), then p3 and p4's painting in the same run (P3P4Chain).
+func _ride_state(ride: RideNorth) -> String:
+	var m := ride.horse
+	var wall := "none"
+	if m and m.get_slide_collision_count() > 0:
+		var c := m.get_slide_collision(0)
+		wall = "%s n%s" % [(c.get_collider() as Node).get_path() if c.get_collider() is Node else "?", _v(c.get_normal())]
+	return "%.0f of %.0f m, step %s, stray %.1f, tier %d; mare at %s speed %.1f steer %s, touching %s; beast at %s (his place %.0f m, %s)" % [
+		ride.progress, ride.path_length(), ride.step, ride.stray, ride.tier, _v(m.global_position) if m else "none",
+		m.speed if m else 0.0, _v(m.steer) if m else "", wall, _v(ride.beast.global_position) if ride.beast else "none",
+		ride.beast_at, _v(ride.pose_at(ride.beast_at).origin)]
+
+
 func _act2_grounds_then_chain() -> void:
 	var ok: bool = await Act2GroundsBeats.new(self).play()
 	if not ok or _beat.status != "pass" or _beat.id == stop_after:

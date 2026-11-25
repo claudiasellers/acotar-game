@@ -55,6 +55,11 @@ var _cast: Node3D
 ## Blocks Feyre (world layer) while he is visible.
 var body: AnimatableBody3D
 var _moving: bool = false
+## Where he looks while he stands (menace, block); INF to look where he goes.
+var _face: Vector3 = Vector3.INF
+## Out on the road (the ride north): his feet keep to the ground whatever he is
+## doing, not only while he leads.
+var outdoors: bool = false
 
 
 func _ready() -> void:
@@ -141,6 +146,44 @@ func speak() -> void:
 func lead(toward: Vector3) -> void:
 	visible = true
 	_destination = toward
+	_face = Vector3.INF
+	if stage != Stage.LEAD:
+		_set_stage(Stage.LEAD)
+
+
+## The ride north when she strays (Keeper's tiers, lore/02-locations/the-wall.md):
+## he stops where he is and turns on her. 1: a low growl, hot breath. 2: hackles
+## up and the roar, the field at its height. The next lead() sends him on.
+func menace(level: int, toward: Vector3) -> void:
+	visible = true
+	_destination = global_position
+	_face = toward
+	if level <= 1:
+		_set_stage(Stage.SPEAK)
+		return
+	_set_stage(Stage.LOOM)
+	_play_once(&"roar")
+	if is_inside_tree():
+		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
+
+
+## The last tier: he circles round in front of her and blocks the road, horns
+## low and fangs at her face, roaring, as at the cottage.
+func block(at: Vector3, toward: Vector3) -> void:
+	visible = true
+	_destination = at
+	_face = toward
+	_set_stage(Stage.LOOM)
+	_play_once(&"roar")
+	if is_inside_tree():
+		CreatureSenses.emit_noise(get_tree(), global_position, 1.0)
+
+
+## Leading, he stops and looks back for her where she has fallen behind.
+func wait_for(toward: Vector3) -> void:
+	visible = true
+	_destination = global_position
+	_face = toward
 	if stage != Stage.LEAD:
 		_set_stage(Stage.LEAD)
 
@@ -230,7 +273,7 @@ func _animate(moving: bool) -> void:
 ## he is going, eased by the distance walked.
 func _keep_to_ground(step: float) -> void:
 	# Outdoors only: in the cottage he keeps to the floor he was put on.
-	if not is_inside_tree() or not stage in [Stage.LEAD, Stage.PATROL]:
+	if not is_inside_tree() or not (outdoors or stage in [Stage.LEAD, Stage.PATROL]):
 		return
 	var from := global_position + Vector3.UP * 0.8
 	var hit := get_world_3d().direct_space_state.intersect_ray(
@@ -257,6 +300,10 @@ func _process(delta: float) -> void:
 		global_position += dir.normalized() * step
 		_keep_to_ground(step)
 		rotation.y = lerp_angle(rotation.y, atan2(-dir.x, -dir.z), 4.0 * delta)
+	elif _face != Vector3.INF:
+		var look := _face - global_position
+		if Vector2(look.x, look.z).length() > 0.3:
+			rotation.y = lerp_angle(rotation.y, atan2(-look.x, -look.z), 6.0 * delta)
 	elif _bursting:
 		_bursting = false
 	elif stage == Stage.PATROL:

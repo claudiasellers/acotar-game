@@ -35,7 +35,8 @@ FILMS = {
             ("op_09", 92.0, 9.0, "", "C", "Five hundred years on, we still wear iron to keep them away. We still tell our children that ash wood can kill them."),
             ("op_10", 107.0, 6.5, "", "C?", "My name is Feyre. I am nineteen, the youngest of three sisters."),
             ("op_11", 128.0, 8.5, "", "C", "My mother died when I was eight. Before she did, she made me promise to keep us together, and to look after them."),
-            ("op_12", 137.5, 14.0, "", "C", "We were rich once. My father was a merchant. Three years after she died, he put every coin we had on three ships, and the sea took all three. The men he owed took everything else. Later, one of them found us here, and broke his leg."),
+            # Keeper 2026-11-25 [A], ch 18 and ch 2: "broke his leg" read as the creditor's own leg.
+            ("op_12", 137.5, 14.0, "", "A", "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."),
             ("op_13", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
             ("op_14", 166.4, 2.2, "", "C", "So I hunt."),
             ("op_15", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),

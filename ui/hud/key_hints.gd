@@ -32,15 +32,17 @@ const ROWS := {
 	&"retrieve": [[&"interact", "pick up the arrow"]],
 	&"whorl_mark": [[&"interact", "trace the whorl and paint your mark"], [&"", "marked stones carry you to one another"]],
 	&"whorl_ride": [[&"interact", "ride to another pair you have marked"], [&"map_open", "marked stones show on the map"]],
+	&"wolf_ash": [[&"cycle_arrow", "nock the ash arrow"]],
+	&"wolf_draw": [[&"fire", "hold to draw, let go to shoot"]],
 	&"focus": [[&"focus", "steady your breath"]],
 	&"ash": [[&"cycle_arrow", "ash arrow"]],
-	&"draw": [[&"fire", "hold to draw, let go to shoot"], [&"aim", "steady your aim"]],
+	&"draw": [[&"fire", "hold to draw, let go to shoot"], [&"aim", "a closer view"]],
 	&"ride_steer": [[&"move", "steer her (lightly to walk)"]],
 	&"ride_gallop": [[&"sprint", "gallop"]],
 	&"ride_leap": [[&"jump", "leap"]],
 	&"ride_off": [[&"interact", "get down"]],
 	&"whistle": [[&"call_mount", "whistle for her"]],
-	&"tend": [[&"interact", "hold beside her to tend her"]],
+	&"tend": [[&"tend_mount", "tend her"]],
 	&"crouch": [[&"crouch", "crouch"]],
 	&"jump": [[&"jump", "jump"]],
 	&"walk": [[&"move", "walk"]],
@@ -102,6 +104,9 @@ static func cap(action: StringName) -> String:
 			return "Right stick" if pad else "Mouse"
 		SatchelHud.ACTION_OPEN:
 			return "LB" if pad else KeyPrompt.key(action)
+		&"tend_mount":
+			# No pad button of its own: a hold of interact there (MountDirector).
+			return "Hold " + KeyPrompt.key(&"interact") if pad else KeyPrompt.key(action)
 	return KeyPrompt.key(action)
 
 

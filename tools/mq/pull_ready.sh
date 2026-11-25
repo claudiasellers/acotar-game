@@ -108,6 +108,11 @@ Start the next slice from $REMOTE/main, not from this branch."
 	elif [ -n "$entry" ] && [ -f "$MQ_DIR/done/rejected/$entry.entry" ]; then
 		msg="$(kv_get "$MQ_DIR/done/rejected/$entry.entry" reason)
 Merge origin/main, fix it, and push the next number; tags are never reused."
+		if [ -s "$MQ_DIR/done/rejected/$entry.diag" ]; then
+			msg="$(cat "$MQ_DIR/done/rejected/$entry.diag")
+
+$msg"
+		fi
 		if [ -f "$MQ_DIR/done/rejected/$entry.log" ]; then
 			msg="$msg
 

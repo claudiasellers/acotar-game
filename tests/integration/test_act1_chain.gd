@@ -1,6 +1,6 @@
 ## Drives Act I end to end through the signals other lanes will emit: food
 ## tally -> wolf -> skinning -> pelt sale -> the evening at home (deeds,
-## supper, the bed) -> beast at the door -> ride and wall crossing, and checks
+## supper, the bed) -> beast at the door -> the ride, played, and the wall crossing, and checks
 ## the ladder lands in p2_grounds.
 extends GutTest
 
@@ -66,6 +66,10 @@ func before_each() -> void:
 	path.curve.add_point(Vector3.ZERO)
 	path.curve.add_point(Vector3(0, 0, -120))
 	ride.add_child(path)
+	var seam := Marker3D.new()
+	seam.name = "Seam"
+	seam.position = Vector3(0, 0, -60)
+	ride.add_child(seam)
 
 
 func after_each() -> void:
@@ -192,15 +196,29 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_true(WorldState.has_flag("fact.ash_arrow_burned"))
 	assert_eq(Gameplay.inventory.count(&"arrow_ash"), 0, "he burns her ash arrow")
 
-	# The ride and the wall.
+	# The ride and the wall: no cut. She walks out to the mare, gets up (E) and
+	# rides behind him; the test moves the mare along his road as she would.
 	assert_true(ride.start())
-	assert_eq(StoryControl.mode, StoryControl.Mode.NONE, "the cottage fades to the horse")
-	_run(ride, 60.0)
-	assert_true(cues.has([&"feyre", &"smell_metal"]))
+	assert_eq(StoryControl.mode, StoryControl.Mode.WALK, "she walks out to the mare herself")
+	assert_not_null(ride.horse, "the mare waits")
+	ride.mount(feyre)
+	_run(ride, 0.2)
+	assert_eq(ride.step, RideNorth.Step.RIDING, "up in the saddle")
+	# From where the mare waits on his road (RideNorth.MARE_AT): a jump back
+	# along it would read as her turning back, and he would turn on her.
+	var along := ride.progress
+	while ride.running and ride.step == RideNorth.Step.RIDING and along < ride.path_length():
+		along += 2.0
+		ride.horse.global_transform = ride.pose_at(along)
+		ride.tick(STEP)
+	assert_true(cues.has([&"feyre", &"smell_metal"]), "her thoughts on the road, the metal at the Wall")
 	assert_eq(grade_requests, [[&"spring", 2.0]])
 	assert_true(WorldState.has_flag("wall_crossed"))
+	assert_eq(ride.step, RideNorth.Step.AT_STEPS, "the mare stops at the end of his road")
+	ride.get_down()
+	_run(ride, 1.0)
 	assert_false(ride.running)
-	assert_almost_eq(feyre.global_position.z, -120.0, 0.5, "she rode to the end of the line")
+	assert_almost_eq(feyre.global_position.z, -120.0, 2.0, "she got down at the end of the road")
 	assert_eq(StoryControl.mode, StoryControl.Mode.FULL)
 
 	assert_eq(PhaseManager.current_phase, &"p2_grounds")
