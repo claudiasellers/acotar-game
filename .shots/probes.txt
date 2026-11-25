@@ -1,0 +1,3 @@
+from feyre-vitals
+quality look
+shot bowfeel res://tools/playtest/bow_feel_probe.tscn -- --out={out}
