@@ -18,8 +18,8 @@ FILMS = {
             ("eye_open", 39.0), ("slaves", 42.0), ("war", 54.0), ("war_crack", 63.0),
             ("treaty", 68.0), ("seal", 72.5), ("wall", 78.0), ("wash", 87.5), ("ripple", 93.0),
             ("to_world", 101.0), ("change_scene", 103.0), ("cottage_ext", 105.0),
-            ("interior", 115.0), ("mother", 127.0), ("fall_house", 137.0), ("fall_ships", 142.5),
-            ("fall_men", 148.0), ("cane", 154.8), ("foxglove", 156.8), ("larder", 159.0),
+            ("interior", 115.0), ("mother", 121.0), ("fall_house", 137.0), ("fall_ships", 140.5),
+            ("fall_men", 145.5), ("cane", 152.5), ("foxglove", 155.5), ("larder", 159.0),
             ("dawn", 166.0), ("shoulder", 168.4), ("wolf_eye", 172.0), ("title", 176.0),
             ("handover", 183.0),
         ],
@@ -40,15 +40,16 @@ FILMS = {
             ("op_11", 86.5, 10.2, "", "A/X", "The war was so terrible that no one could bear to speak of it. So we turned it into songs, as warnings for our children. Songs are all we know of them now."),
             ("op_12", 97.4, 7.4, "", "C", "Five hundred years on, we still wear iron to keep them away. We tell our children that ash wood can kill them."),
             ("op_13", 107.0, 6.5, "", "C?", "My name is Feyre. I am nineteen, the youngest of three sisters."),
-            ("op_14", 128.0, 8.5, "", "C", "My mother died when I was eight. On her deathbed, she made me promise to keep our family together, and to look after them."),
-            # Keeper 2026-11-25 [A], ch 2 and ch 18, the owner's clearer telling: the fall's
-            # beats (ships, men, cane) follow the words through the longer hold.
-            ("op_15", 137.5, 21.5, "", "A", "We were rich once. My father was a merchant. Three years after she died, he sent everything we owned out on three trading ships, and all three sank. The men he owed money took our house and everything in it, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."),
-            ("op_16", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
-            ("op_17", 166.4, 2.2, "", "C", "So I hunt."),
-            ("op_18", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
+            # Keeper 2026-11-25, the owner's order (v3 file): the fine house, the
+            # mother, then the fall [A], ch 2 and ch 18; the fall's beats follow the words.
+            ("op_14", 121.5, 5.5, "", "C", "We were rich once. My father was a merchant, and we lived in a fine house."),
+            ("op_15", 127.4, 8.4, "", "C", "When I was eight, my mother died. On her deathbed, she made me promise to keep our family together, and to look after them."),
+            ("op_16", 137.5, 19.5, "", "A", "Three years later, my father sent everything we owned out on three trading ships, and all three sank. The men he owed money took our house and everything in it, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."),
+            ("op_17", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
+            ("op_18", 166.4, 2.2, "", "C", "So I hunt."),
+            ("op_19", 168.4, 3.0, "", "C", "They say some of them are getting through the Wall now, into these woods. Out of Prythian."),
             # Carried over the cut to the dark wood: the eye opens under it.
-            ("op_19", 171.3, 2.0, "", "C", "If I meet one, I'll kill it."),
+            ("op_20", 171.3, 2.0, "", "C", "If I meet one, I'll kill it."),
         ],
     ),
     # Cutscene A (scripts.md section 2): the glamour lifts in the glen (ch 23).
