@@ -23,6 +23,8 @@ uniform float hidden = 0.0;
 uniform vec3 paper_color = vec3(0.92, 0.90, 0.85);
 uniform float warn = 0.0;
 uniform float warn_side = 0.0;
+uniform float warn_opacity = 0.85;
+uniform float warn_rate = 11.0;
 uniform float drowsy_lid = 0.0;
 uniform float stars = 0.0;
 uniform float iris = 0.0;
@@ -135,9 +137,9 @@ void fragment() {
 	}
 	// An attack she cannot see winding up: that side's edge beats (the bottom for behind her).
 	if (warn > 0.0) {
-		float beat = 0.55 + 0.45 * sin(TIME * 11.0);
+		float beat = 0.55 + 0.45 * sin(TIME * warn_rate);
 		float side = abs(warn_side) < 0.2 ? smoothstep(0.6, 1.0, uv.y) : smoothstep(0.7, 1.0, 0.5 + (uv.x - 0.5) * sign(warn_side));
-		over(acc, mix(OLD_BLOOD, BRUISE, 0.3), side * side * warn * beat * 0.7);
+		over(acc, mix(OLD_BLOOD, BRUISE, 0.3), side * side * warn * beat * warn_opacity);
 	}
 	// Drowsy: heavy eyelids closing from top and bottom.
 	if (drowsy_lid > 0.0) {

@@ -37,6 +37,9 @@ const HIT_FADE := 1.2
 const EDGE_STRENGTH: Array[float] = [1.0, 0.5, 0.0]
 ## Vitals.sight_scale at which the hidden edge is fully drawn in.
 const HIDDEN_FULL := 0.5
+const GROUP := &"vitals_hud"
+## Degrees the stamina bow shakes when she asks for more than she has.
+const REFUSED_SHAKE := 9.0
 
 var health_bar: VitalsHealthBar
 var stamina_bow: VitalsStaminaBow
@@ -63,6 +66,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	var hud := HudLayout.of(get_tree())
+	add_to_group(GROUP)
 	edge_fx = VitalsEdgeFx.new()
 	hud.place(edge_fx, HudLayout.Zone.EDGE, self)
 	_root = Control.new()
@@ -106,6 +110,19 @@ func _process(delta: float) -> void:
 	_update_statuses(delta, mode, play)
 	_update_grab()
 	_update_edges(delta)
+
+
+## She asked for something her stamina can't pay for (a sidestep, winded):
+## the bow shows itself and shakes its head.
+static func stamina_refused(tree: SceneTree) -> void:
+	for hud: VitalsHud in tree.get_nodes_in_group(GROUP):
+		hud._stamina_timer = STAMINA_FULL_LINGER
+		var bow := hud.stamina_bow
+		var turn := deg_to_rad(REFUSED_SHAKE) * Juice.effects_scale
+		var t := bow.create_tween()
+		for side: float in [-1.0, 1.0, -0.5]:
+			t.tween_property(bow, ^"rotation", turn * side, 0.06)
+		t.tween_property(bow, ^"rotation", 0.0, 0.1)
 
 
 # --- Meters ------------------------------------------------------------------

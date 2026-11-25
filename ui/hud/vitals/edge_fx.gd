@@ -7,6 +7,11 @@ extends ColorRect
 
 const SHADER := preload("res://ui/hud/vitals/edge_fx.gdshader")
 const GROUP := &"vitals_edge_fx"
+## The unseen-attack beat: how solid it is at its peak, how fast it beats
+## (radians a second), and how strong it starts before rising to full.
+const WARN_OPACITY := 0.85
+const WARN_RATE := 11.0
+const WARN_START := 0.4
 const EASED: Array[StringName] = [&"dread", &"low_health", &"venom", &"cold", &"fae", &"ease", &"heal", &"hidden"]
 
 ## uniform -> wanted value.
@@ -25,6 +30,8 @@ func _init() -> void:
 	_mat.shader = SHADER
 	material = _mat
 	add_to_group(GROUP)
+	_mat.set_shader_parameter(&"warn_opacity", WARN_OPACITY)
+	_mat.set_shader_parameter(&"warn_rate", WARN_RATE)
 	var paper := JournalTheme.color(&"paper")
 	_mat.set_shader_parameter(&"paper_color", Vector3(paper.r, paper.g, paper.b))
 
@@ -54,7 +61,7 @@ static func warn(tree: SceneTree, side: float, seconds: float) -> void:
 func _process(delta: float) -> void:
 	_warn_left = maxf(_warn_left - delta, 0.0)
 	# Rises as the blow nears.
-	target[&"warn"] = (1.0 - 0.6 * _warn_left / _warn_for) if _warn_left > 0.0 else 0.0
+	target[&"warn"] = lerpf(1.0, WARN_START, _warn_left / _warn_for) if _warn_left > 0.0 else 0.0
 	var view := get_viewport_rect().size
 	_mat.set_shader_parameter(&"aspect", view.x / maxf(view.y, 1.0))
 	for key: StringName in target:

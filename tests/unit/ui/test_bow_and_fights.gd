@@ -84,3 +84,16 @@ func test_the_page_edge_draws_in_while_she_is_hard_to_see() -> void:
 	assert_eq(VitalsHud.HIDDEN_FULL, 0.5)
 	assert_almost_eq(clampf(inverse_lerp(1.0, VitalsHud.HIDDEN_FULL, CrouchMotor.SIGHT_CROUCHED), 0.0, 1.0), 0.9, 0.001, "crouched is nearly all the way")
 	assert_true(VitalsEdgeFx.EASED.has(&"hidden"), "it eases in and out")
+
+
+func test_the_stamina_bow_shakes_when_she_has_too_little() -> void:
+	var hud := VitalsHud.new()
+	add_child_autofree(hud)
+	await wait_process_frames(2)
+	assert_eq(hud.stamina_bow.rotation, 0.0)
+	VitalsHud.stamina_refused(get_tree())
+	assert_gt(hud._stamina_timer, 0.0, "the bow shows itself")
+	await wait_seconds(0.1)
+	assert_ne(hud.stamina_bow.rotation, 0.0, "shaking its head")
+	await wait_seconds(0.4)
+	assert_almost_eq(hud.stamina_bow.rotation, 0.0, 0.001, "and still again")
