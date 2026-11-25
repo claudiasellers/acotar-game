@@ -1,0 +1,4 @@
+from lane/bow-hunt
+quality look
+shot wolf res://tools/playtest/wolf_hunt_clip.tscn -- --out={out}/report.json
+shot bowfeel res://tools/playtest/bow_feel_probe.tscn -- --out={out} --stages=DF
