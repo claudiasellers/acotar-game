@@ -147,12 +147,19 @@ func _play() -> void:
 	var t0 := _sim_seconds()
 	while _sim_seconds() - t0 < 180.0 and not wound.current_beat_label().begins_with("until the supplies"):
 		var t := wound.actor(&"tamlin")
-		if t and _flat(t.global_position) > 2.5:
-			await _walk_to(t.global_position, 2.0, Callable(), 8.0)
+		# Following, she keeps a step back; once he slumps against the table she
+		# goes right up to him at it, as a player does.
+		var close := 1.2 if wound.current_beat_label().begins_with("reach") else 2.0
+		if t and _flat(t.global_position) > close + 0.5:
+			await _walk_to(t.global_position, close, Callable(), 8.0)
 		else:
 			await _wait(0.3)
 	if not wound.current_beat_label().begins_with("until the supplies"):
-		return _fail("stuck at '%s'" % wound.current_beat_label())
+		var t := wound.actor(&"tamlin")
+		var work := wound.mark(&"feyre_work")
+		return _fail("stuck at '%s': Feyre at %s, %.1f m from feyre_work %s; Tamlin at %s" % [
+				wound.current_beat_label(), _v(feyre.global_position), _flat(work), _v(work),
+				_v(t.global_position) if t else "none"])
 	_pass()
 
 	_begin("wound_dressed", "supplies, water, clean, bind, empty the bowl: tamlin_wound_dressed")
