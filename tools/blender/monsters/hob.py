@@ -218,9 +218,10 @@ def _ngon(r, n, squash=1.0):
     return [(r * math.cos(2 * math.pi * k / n), r * squash * math.sin(2 * math.pi * k / n)) for k in range(n)]
 
 
-def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4):
+def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4, gap=0.0):
     """A blade of grass or a fern frond: a flat, two-sided, pointed strip that
-    bends over under its own weight. `zig` notches the edges (a fern)."""
+    bends over under its own weight. `zig` notches the edges (a fern); `gap`
+    holds the two sides that far apart, so a bake can tell them from each other."""
     root, d, face = (np.asarray(v, dtype=np.float64) for v in (root, d, face))
     d = d / np.linalg.norm(d)
     across = np.cross(d, face)
@@ -240,7 +241,8 @@ def blade(name, root, d, length, width, face, droop=0.25, zig=0.0, rings=4):
     front.append((2 * rings - 2, 2 * rings - 1, 2 * rings))
     n = len(verts)
     faces = front + [tuple(n + k for k in reversed(f)) for f in front]
-    return _mesh(name, verts + verts, faces, grad + grad)
+    nrm = np.cross(across, d) * (gap * 0.5)
+    return _mesh(name, [v + nrm for v in verts] + [v - nrm for v in verts], faces, grad + grad)
 
 
 def box(name, centre, size, rot_z=0.0):
@@ -611,6 +613,35 @@ VIEWS = {
     "chest": ((1.2, 4.6, 3.3), (0, 0.5, 3.15), 70),
 }
 
+SCALE = 1.6     # the owner's size: Feyre (1.7 m) comes to its knee. Built at 4.2 m, shipped at 6.7 m standing.
+
+
+def enlarge(gltf_path, gaits_path, k):
+    """Scales the exported creature: the rig's root node carries the scale (so
+    every bone, socket and charm goes with it), and the gaits table's speeds
+    and travel distances grow by the same factor so its feet still grip."""
+    import json
+    with open(gltf_path) as f:
+        g = json.load(f)
+    for i in g["scenes"][g.get("scene", 0)]["nodes"]:
+        g["nodes"][i]["scale"] = [k, k, k]
+    with open(gltf_path, "w") as f:
+        json.dump(g, f, separators=(",", ":"))
+    rows = []
+    with open(gaits_path) as f:
+        for line in f:
+            c = line.split()
+            if line.startswith("#") or len(c) != 6:
+                rows.append(line.replace("monsters/hollow_hob.py", "monsters/hob.py"))
+                continue
+            for j in (1, 5):
+                if c[j] != "-":
+                    c[j] = f"{float(c[j]) * k:.3f}"
+            rows.append(" ".join(c) + "\n")
+    with open(gaits_path, "w") as f:
+        f.writelines(rows)
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     fast = "--fast" in args
@@ -645,5 +676,6 @@ if __name__ == "__main__":
         for o in hide:
             bpy.data.objects.remove(o, do_unlink=True)
         path = kit.export_gltf(NAME, [low] + charm_objs + [arm], OUT)
-        rig.write_gaits(NAME, r, "creatures/models/fae/hollow_hob.gltf")
+        gaits = rig.write_gaits(NAME, r, "creatures/models/fae/hollow_hob.gltf")
+        enlarge(path, gaits, SCALE)
         print(f"{NAME}: {kit.tris(low) + sum(kit.tris(o) for o in charm_objs)} tris -> {path}")
