@@ -1,0 +1,3 @@
+from l82-palette
+quality look
+shot hall_before res://tools/manor_estate/room_shot.tscn entrance_hall {out} 12
