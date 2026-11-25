@@ -11,7 +11,6 @@ const ROWS := [
 	[&"naga_claw", &"naga", true, 22.0, &"claw", &"medium", 2.0, &"", 0.0, 0.0, 0.15, true, 0.0],
 	[&"naga_lunge", &"naga", false, 30.0, &"blunt", &"heavy", 4.0, &"", 0.0, 0.0, 0.2, true, 0.0],
 	[&"naga_coil", &"naga", false, 0.0, &"grab", &"none", 0.0, &"", 0.0, 0.0, 0.25, true, 0.0],
-	[&"puca_grab", &"puca", true, 0.0, &"grab", &"none", 0.0, &"", 0.0, 0.0, 0.3, true, 0.0],
 	[&"briarling_lash", &"briarling", true, 8.0, &"thorn", &"light", 0.5, &"", 0.0, 0.0, 0.1, true, 0.0],
 	[&"briarling_snare", &"briarling", false, 0.0, &"grab", &"none", 0.0, &"", 0.0, 0.0, 0.15, true, 0.0],
 	[&"lampwing_swarm", &"lampwing", true, 0.0, &"blunt", &"none", 0.0, &"drowsy", 0.15, 6.0, 0.05, true, 0.0],
@@ -41,7 +40,6 @@ const WINDUP := {
 	&"naga_claw": 0.55,
 	&"naga_lunge": 0.8,
 	&"naga_coil": 0.6,
-	&"puca_grab": 0.6,
 	&"briarling_lash": 0.4,
 	&"briarling_snare": 0.6,
 	&"lampwing_swarm": 0.6,
@@ -56,6 +54,14 @@ const WINDUP := {
 	&"martax_roar": 0.6,
 	&"prowler_grab": 0.6,
 	&"wolf_bite": 0.55,
+}
+
+## Grab rows: [presses to break, seconds it holds, fail strike scale]
+## (health-interactions §4: the coil 6 / 3 s then a claw ×1.5; the snare
+## 4 / 2.5 s then two lashes).
+const GRABS := {
+	&"naga_coil": [6, 3.0, 1.5],
+	&"briarling_snare": [4, 2.5, 2.0],
 }
 
 
@@ -78,6 +84,10 @@ func _init() -> void:
 		row.can_knock_down = r[11]
 		row.floor_hp = r[12]
 		row.windup_s = float(WINDUP.get(row.id, 0.0))
+		if GRABS.has(row.id):
+			row.grab_presses = int(GRABS[row.id][0])
+			row.grab_seconds = float(GRABS[row.id][1])
+			row.grab_fail_scale = float(GRABS[row.id][2])
 		if ResourceSaver.save(row, OUT + "%s.tres" % row.id) == OK:
 			written += 1
 	print("gen_attack_rows: wrote %d rows to %s" % [written, OUT])

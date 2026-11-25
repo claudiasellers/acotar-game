@@ -9,10 +9,25 @@ static func build(data: CreatureData) -> Node3D:
 		var model := data.model_scene.instantiate() as Node3D
 		model.scale = Vector3.ONE * data.model_scale
 		return model
+	if data.flora_id != &"":
+		return flora(data.flora_id, data.model_scale)
 	stand_in("creature %s" % data.resource_path)
 	if data.body_plan == CreatureData.BodyPlan.BIRD:
 		return _bird(data)
 	return _quadruped(data)
+
+
+## A body that is a court plant (CreatureData.flora_id): its CourtAssets mesh,
+## in the material the real plant wears.
+static func flora(flora_id: StringName, model_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Flora_%s" % flora_id
+	var mi := MeshInstance3D.new()
+	mi.name = "Mesh"
+	mi.mesh = CourtAssets.mesh(flora_id)
+	root.add_child(mi)
+	root.scale = Vector3.ONE * model_scale
+	return root
 
 
 ## Lane L61 (render program T4): a code-built body in place of a real model
