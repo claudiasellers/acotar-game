@@ -47,8 +47,7 @@ static func use(inv: Inventory, id: StringName, who: Object) -> bool:
 			var bow: BowController = who.get(&"bow_controller") as BowController if who else null
 			if bow == null:
 				return false
-			bow.selected = id
-			bow.arrow_type_changed.emit(id)
+			bow.select_arrow(id)
 			return true
 		FOOD:
 			if inv.remove(id, 1) == 0:

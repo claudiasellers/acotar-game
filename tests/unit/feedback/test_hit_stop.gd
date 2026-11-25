@@ -138,10 +138,10 @@ func test_a_longer_freeze_is_not_cut_short_by_a_shorter_one() -> void:
 	await _held(9, "heavy then light")
 
 
-func test_reduced_effects_halves_it() -> void:
+func test_only_its_own_setting_changes_it() -> void:
 	GameSettings.set_value(&"reduced_effects", true)
 	stop.hit(&"medium")
-	await _held(3, "half of six")
+	await _held(6, "Reduced Effects leaves it alone")
 
 
 func test_the_setting_is_full_half_or_off() -> void:

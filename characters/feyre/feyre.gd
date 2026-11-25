@@ -188,7 +188,7 @@ func _physics_process(delta: float) -> void:
 	if not StoryControl.can_move():
 		input = Vector2.ZERO
 	var yaw := _camera_rig.rotation.y
-	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming or is_drawing)
+	var steer := steer_frame.yaw(input, yaw, steer_exclusion(), is_aiming)
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, steer)
 	# Sprint or jump stands her up from a crouch, and so does a cutscene or a fall.
 	# With the bow raised the sprint key is Focus, and she stays down.
@@ -199,12 +199,12 @@ func _physics_process(delta: float) -> void:
 		crouch.set_crouched(false)
 	# Holding sprint runs at sprint_speed until released: stamina no longer limits it.
 	var sprinting := Input.is_action_pressed(&"sprint") and direction != Vector3.ZERO \
-			and not is_drawing and not is_aiming and not crouch.crouched
+			and not is_aiming and not crouch.crouched
 	_running = sprinting
 	_update_stamina(delta)
 
 	var speed := run_speed
-	if is_aiming or is_drawing:
+	if is_aiming:
 		speed = aim_speed
 	elif sprinting:
 		speed = sprint_speed
@@ -339,7 +339,7 @@ func is_running() -> bool:
 
 ## Gentle Mode (pause menu setting) makes jumps more forgiving.
 func _bow_raised() -> bool:
-	return is_aiming or is_drawing
+	return is_aiming
 
 
 ## On her feet, bow up, free to move, and not inside a hit-stop (a buffered
@@ -421,7 +421,7 @@ func _try_mantle() -> bool:
 
 ## Look speed is lower with the bow raised (BowTuning.aim_sensitivity).
 func _aim_look_scale() -> float:
-	return bow_controller.tuning.aim_sensitivity if is_aiming else 1.0
+	return bow_controller.tuning.aim_sensitivity if bow_controller and bow_controller.is_precise else 1.0
 
 
 ## On a pad with the bow raised, her aim slows as it crosses a hostile (SoftAim).

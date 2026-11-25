@@ -85,7 +85,7 @@ func wants_raised() -> bool:
 	if controller == null or not controller.can_shoot():
 		return false
 	var feyre := controller.feyre
-	return feyre.is_aiming or controller.is_drawing or ready_timer > 0.0
+	return controller.is_aiming or ready_timer > 0.0
 
 
 func _attach_pose() -> void:
@@ -114,7 +114,7 @@ func _process(delta: float) -> void:
 
 
 ## Where the arrow would go: from her chest toward the camera's aim point,
-## kept within AIM_CONE of the way she faces. Only aiming or drawing turns her
+## kept within AIM_CONE of the way she faces. Only aiming (the draw is aiming too) turns her
 ## to the camera; when Q, F or a shot just lifts the bow she may face anywhere,
 ## and aiming straight at the camera's point swung her arms out behind her.
 ## Then the bow comes up along her own facing.
@@ -125,7 +125,7 @@ func aim_direction() -> Vector3:
 	var fwd := -feyre.model.global_basis.z
 	fwd.y = 0.0
 	fwd = fwd.normalized() if fwd.length() > 0.001 else Vector3.FORWARD
-	if not (feyre.is_aiming or controller.is_drawing):
+	if not controller.is_aiming:
 		return (fwd + Vector3.DOWN * 0.08).normalized()
 	var chest := feyre.global_position + Vector3.UP * 1.4
 	var d := feyre.aim_point() - chest

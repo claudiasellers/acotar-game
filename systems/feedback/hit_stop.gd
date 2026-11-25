@@ -3,8 +3,8 @@
 ## landing on her. It holds TimeScale at SCALE under &"hit_stop" for a few
 ## frames of real time, counted on the unscaled clock so the freeze can't
 ## stretch itself, then lets go so time returns to whatever else asked
-## (Focus, the quiver wheel). The Hit-stop setting is Full, Half or Off, and
-## Reduced Effects halves it again. A blow she can't see
+## (Focus, the quiver wheel). The Hit-stop setting (Full, Half or Off) is
+## the one thing that shortens it. A blow she can't see
 ## coming gets none: the HUD edge speaks for that one.
 class_name HitStop
 extends Node
@@ -68,8 +68,6 @@ func hold(frame_count: int) -> void:
 			frame_count = frame_count / 2
 		2:
 			frame_count = 0
-	if GameSettings.reduced_effects:
-		frame_count = frame_count / 2
 	if frame_count <= 0:
 		return
 	_until_usec = maxi(_until_usec, Time.get_ticks_usec() + int(frame_count * FRAME_USEC))

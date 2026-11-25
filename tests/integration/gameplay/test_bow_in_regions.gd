@@ -55,8 +55,8 @@ func _start(game: Node) -> Feyre:
 	feyre.arrow_fired.connect(func(a: Arrow) -> void: fired.append(a))
 	# A full quiver, whatever the chapter gives her: this is about the bow.
 	Gameplay.inventory.carry_quiver(Inventory.FULL_QUIVER)
-	if Gameplay.inventory.arrow_count() < 4:
-		Gameplay.inventory.add(&"arrow_wood", 3)
+	if Gameplay.inventory.arrow_count() < 5:
+		Gameplay.inventory.add(&"arrow_wood", 4)
 	return feyre
 
 
@@ -87,10 +87,11 @@ func _shoot_and_check(feyre: Feyre, where: String) -> void:
 	await wait_physics_frames(2)
 	_mouse(MOUSE_BUTTON_LEFT, false)
 	await wait_physics_frames(full_draw)
-	assert_eq(fired.size(), 3, "%s: a tap is a let-down, not a weak shot" % where)
+	assert_eq(fired.size(), 4, "%s: a tap is a weak shot, never nothing" % where)
+	assert_lt((fired[3] as Arrow).get_meta(&"speed"), bow.bow.max_speed * 0.8, "%s: and a short one" % where)
 	_mouse(MOUSE_BUTTON_RIGHT, false)
 	await wait_physics_frames(3)
-	assert_eq(fired.size(), 3, "%s: letting go of aim fires nothing" % where)
+	assert_eq(fired.size(), 4, "%s: letting go of aim fires nothing" % where)
 	assert_false(feyre.is_aiming, "%s: and lowers the bow" % where)
 
 

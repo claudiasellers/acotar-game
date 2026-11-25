@@ -87,11 +87,14 @@ func _play_the_bow() -> void:
 	assert_false(bc.is_drawing, "the string waits for left mouse")
 	assert_eq(fired.size(), 0, "nothing has been loosed by raising")
 
-	# A quick tap is an early release: the string comes down, no weak shot.
+	# A quick tap is an early release: a weak arrow, never nothing.
 	await h.press(&"fire", 2)
 	await wait_physics_frames(30)
-	assert_eq(fired.size(), 0, "a tap looses nothing")
-	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start, "and costs nothing")
+	assert_eq(fired.size(), 1, "a tap looses a weak arrow")
+	if fired.size() > 0:
+		assert_lt(fired[0], bc.bow.max_speed * 0.8, "well short of full power")
+	fired.clear()
+	start = Gameplay.inventory.arrow_count(&"arrow_wood")
 
 	# Hold to full draw, let go: one full-power arrow.
 	await _draw_and_loose()
@@ -117,6 +120,16 @@ func _play_the_bow() -> void:
 	assert_false(bc.is_aiming, "letting go of aim lowers the bow")
 	assert_eq(fired.size(), 2, "and looses nothing")
 	assert_eq(Gameplay.inventory.arrow_count(&"arrow_wood"), start - 2, "no arrow spent")
+
+	# Left mouse alone, aim never touched: the bow comes up, draws and shoots.
+	h.hold(&"fire")
+	await h.wait_until(func() -> bool: return bc.draw_amount >= 1.0, 120)
+	assert_true(bc.is_aiming and not bc.is_precise, "up and drawn from the hip")
+	h.release(&"fire")
+	await h.settle()
+	await wait_physics_frames(2)
+	assert_eq(fired.size(), 3, "left mouse alone shoots")
+	await wait_physics_frames(30)
 
 	# Q cycles to the next arrow type she owns, and round again.
 	var first := bc.selected

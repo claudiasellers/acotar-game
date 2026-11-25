@@ -117,8 +117,11 @@ func update(delta: float) -> void:
 	camera.v_offset = randf_range(-0.03, 0.03) * shake
 	_update_kick(delta)
 	_update_indoor(delta)
+	# Aim held brings the lens in over her shoulder; a draw from the hip only
+	# moves her off the middle of the frame, so the arrow's line is clear.
 	var aiming := f.is_aiming
-	var target_length := 1.7 if aiming else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
+	var precise := f.bow_controller != null and f.bow_controller.is_precise
+	var target_length := 1.7 if precise else lerpf(3.6 + f.camera_arm_extra, INDOOR_ARM, indoor)
 	# A hostile after her and close: a step back, so she sees what is coming.
 	if f.is_inside_tree() and SoftAim.engaged_near(f.get_tree(), f.global_position):
 		target_length += SoftAim.PULL_BACK
