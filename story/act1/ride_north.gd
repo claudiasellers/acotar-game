@@ -371,7 +371,9 @@ func _cottage_busy() -> bool:
 	if not is_inside_tree():
 		return false
 	for n in get_tree().get_nodes_in_group(&"story_space_live"):
-		if n != self and StringName(n.get_meta(&"story_space_id", &"")) == &"beast_door":
+		# A finished space stays in the group, so only a running one counts.
+		if n != self and StringName(n.get_meta(&"story_space_id", &"")) == &"beast_door" \
+				and bool(n.get(&"running")):
 			return true
 	return false
 

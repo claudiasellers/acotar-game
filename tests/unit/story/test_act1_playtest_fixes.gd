@@ -132,10 +132,13 @@ func test_the_ride_waits_until_the_cottage_scene_is_over() -> void:
 	ride.auto_tick = false
 	add_child(ride)  # after_each frees the ride
 	WorldState.set_flag("beast_claim_accepted")
-	var cottage := Node.new()
+	var cottage := SceneSpace.new()
+	cottage.auto_tick = false
+	add_child_autofree(cottage)
 	cottage.set_meta(&"story_space_id", &"beast_door")
 	cottage.add_to_group(&"story_space_live")
-	add_child_autofree(cottage)
+	cottage.running = true
 	assert_false(ride.can_start(), "not while he says 'Now' and her father says goodbye")
-	cottage.remove_from_group(&"story_space_live")
+	# A finished space stays in the live group; only running counts.
+	cottage.running = false
 	assert_true(ride.can_start(), "then out to the mare")
