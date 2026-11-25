@@ -16,7 +16,8 @@
 ## emits when the tell starts.
 ##
 ## This procedural pose is the only tell path. When the rig lane delivers
-## windup_<damage_kind> clips, that hand-in replaces this pose outright.
+## telegraph_<row id> clips for a family, that hand-in swaps the family to
+## CreatureAnimator.play_windup outright; the last family's swap deletes this.
 class_name AttackTell
 extends Node
 
