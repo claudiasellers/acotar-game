@@ -45,7 +45,7 @@ FILMS = {
             ("op_14", 125.0, 8.4, "", "C", "When I was eight, my mother died. On her deathbed, she made me promise to keep our family together, and to look after them."),
             # Three captions, so each can be read (40 words or fewer): the loss, the ships, the creditors.
             ("op_15", 133.8, 7.0, "", "A", "She never lived to see us lose everything. My father was a merchant, and when she was alive, we were rich."),
-            ("op_16", 141.0, 8.4, "", "A", "Three years after she died, he spent every coin we had on three ships full of fine goods to sell. All three sank before they ever reached land."),
+            ("op_16", 141.0, 8.4, "", "A", "Three years after she died, he bet everything we had on three trading ships with fine goods he could sell. All three sank, and our entire fortune went down with them."),
             ("op_17", 149.6, 10.0, "", "A", "The men he owed money took our house, and we fled to a cottage in a poor village. One of them found us there anyway. His men smashed my father's knee. He has walked with a cane ever since."),
             ("op_18", 160.0, 6.0, "", "C", "This winter is the worst yet. We are starving. My father can't hunt. My sisters won't."),
             ("op_19", 166.4, 2.2, "", "C", "So I hunt."),
