@@ -233,7 +233,7 @@ func test_meeting_the_wolf_names_ash_then_the_shot_then_her_breath() -> void:
 	assert_eq(prompts.want(), &"", "each of the three, once")
 	EventBus.scene_space_finished.emit(&"wolf_kill")
 	for row: StringName in [&"wolf_ash", &"wolf_draw"]:
-		assert_eq((KeyHints.ROWS[row] as Array).size(), 1, "one key at a time")
+		assert_eq((KeyHints.rows()[row] as Array).size(), 1, "one key at a time")
 
 
 func test_hints_off_hides_every_taught_key() -> void:
