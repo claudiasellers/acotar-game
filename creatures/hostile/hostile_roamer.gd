@@ -39,6 +39,12 @@ const REPORT_EVERY := 2.0
 const CAMP_ALERT := 0.45
 ## Seconds between taunts while it circles (a random span).
 const TAUNT_EVERY := Vector2(6.0, 10.0)
+## A routed member runs from the fight this long, having given her up.
+const ROUT_SECONDS := 10.0
+## A glint holds a member that went for it this long (unless it is hurt).
+const GLINT_SECONDS := 8.0
+## Within this of the glint it stops to grab it and squabble.
+const GLINT_REACH := 1.2
 
 ## The family's values, set on its own scene (one .tscn per family).
 @export var strike_reach: float = 1.5
@@ -54,6 +60,18 @@ const TAUNT_EVERY := Vector2(6.0, 10.0)
 @export var dread_radius: Vector2 = Vector2.ZERO
 ## The clip it plays now and then while it circles her (&"" for none).
 @export var taunt_clip: StringName = &""
+## The clip it plays once as it engages her, the cry that sets the camp off
+## (&"" for none).
+@export var call_clip: StringName = &""
+## Once this share of the camp's members is dead, the rest scatter
+## (HostileSite routs them; 0: they fight to the last).
+@export var rout_share: float = 0.0
+## How many of the camp a glint pulls away (a light arrow's spark; 0: none
+## care). They go to it, grab at it and squabble, forgetting her.
+@export var glint_drawn: int = 0
+## Its clips at the glint: the grab, then the squabble while it lasts.
+@export var glint_clip: StringName = &""
+@export var squabble_clip: StringName = &""
 
 ## Set by HostileSite before _ready.
 var site: HostileSite
@@ -84,6 +102,9 @@ var _has_token: bool = false
 var _hold_left: float = 0.0
 var _leap_speed: float = 0.0
 var _circle_sign: float = 1.0
+var _glint_at: Vector3 = Vector3.INF
+var _glint_left: float = 0.0
+var _glint_grabbed: bool = false
 
 
 func _ready() -> void:
@@ -151,6 +172,11 @@ func _think(delta: float) -> void:
 		move_direction = Creature.away_from(global_position, _flee_from) * 10.0
 		move_speed = data.run_speed
 		gait_hint = &""
+		return
+
+	if _glint_left > 0.0:
+		_glint_left -= delta
+		_at_glint(delta)
 		return
 
 	var before := ladder.state
@@ -253,6 +279,8 @@ func _on_ladder_changed(_from: HostileLadder.State, to: HostileLadder.State, pla
 			_set_fight(Fight.CHARGE)
 			_lunged = false
 			_report_left = REPORT_EVERY
+			if call_clip != &"" and animator:
+				animator.play_oneshot(call_clip)
 		HostileLadder.State.LOST:
 			_set_fight(Fight.CHARGE)
 			_lunged = false
@@ -617,6 +645,70 @@ func _thrash_away(from: Vector3) -> void:
 func _on_wounded(from: Vector3, _cause: StringName) -> void:
 	senses.stimulate(&"pain", from, 1.0)
 	_search_at = from
+	# A wound ends a squabble over a glint: she is the thing that matters again.
+	_glint_left = 0.0
+
+
+## The camp has lost too many: it gives her up and runs from `from` for
+## ROUT_SECONDS (HostileSite, at rout_share), then goes home.
+func rout(from: Vector3) -> void:
+	if not alive:
+		return
+	_set_fight(Fight.CHARGE)
+	_glint_left = 0.0
+	ladder.give_up()
+	senses.awareness = 0.0
+	_last_awareness = 0.0
+	_flee_from = from
+	_flee_left = ROUT_SECONDS
+	_lure_left = 0.0
+
+
+## True while it runs from a fight (a rout, a flame, a hard element hit).
+func is_fleeing() -> bool:
+	return _flee_left > 0.0
+
+
+## True while it would go for a glint (its family cares and it isn't busy
+## running or dying).
+func wants_glint() -> bool:
+	return alive and glint_drawn > 0 and _flee_left <= 0.0 and _glint_left <= 0.0
+
+
+## A glint fell at `at` (HostileSite.glint): it forgets her, goes for it,
+## grabs at it and squabbles over it for GLINT_SECONDS.
+func distract(at: Vector3) -> void:
+	if not alive:
+		return
+	_set_fight(Fight.CHARGE)
+	_glint_at = at
+	_glint_left = GLINT_SECONDS
+	_glint_grabbed = false
+
+
+## True while a glint holds it.
+func is_distracted() -> bool:
+	return _glint_left > 0.0
+
+
+func _at_glint(delta: float) -> void:
+	var to := _glint_at - global_position
+	gait_hint = &""
+	if Vector2(to.x, to.z).length() > GLINT_REACH:
+		move_direction = to
+		move_speed = data.run_speed
+		return
+	move_speed = 0.0
+	move_direction = Vector3.ZERO
+	face_towards(_glint_at, delta * 4.0)
+	if animator == null or animator.is_acting():
+		return
+	if not _glint_grabbed:
+		_glint_grabbed = true
+		if glint_clip != &"":
+			animator.play_oneshot(glint_clip)
+	elif squabble_clip != &"":
+		animator.play_oneshot(squabble_clip)
 
 
 func _on_lured(at: Vector3) -> void:

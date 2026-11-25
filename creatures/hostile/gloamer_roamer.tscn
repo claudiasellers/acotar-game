@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://creatures/hostile/gloamer_roamer.gd" id="1"]
+[ext_resource type="Resource" path="res://data/creatures/hostile/gloamer_roamer.tres" id="2"]
+
+[node name="GloamerRoamer" type="CharacterBody3D"]
+script = ExtResource("1")
+data = ExtResource("2")
+strike_reach = 1.2
+strike_cooldown = 1.65
+attack_id = &"gloamer_rake"
+dread_radius = Vector2(20, 6)
+call_clip = &"call"
+rout_share = 0.5
+glint_drawn = 2
+glint_clip = &"grab_shiny"
+squabble_clip = &"squabble"
