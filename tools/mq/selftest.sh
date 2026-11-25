@@ -475,6 +475,35 @@ case_ready_merged() {
 	expect "ready branch untouched" test "$(git ls-remote origin refs/heads/lead/ready-T9-1 | cut -f1)" = "$a"
 }
 
+# A rejection tells the lane why: the class, what to do, and a clean log.
+case_reject_notes() {
+	newrepo notes
+	local a b c d e1 p q note
+	git checkout -q --detach origin/main
+	mkdir -p tests; : > tests/test_old.gd; echo "@gut tests" >> tools/mq/gate.conf
+	git add -A; git commit -q -m "a test on main"; git push -q origin HEAD:main
+	git fetch -q origin; git checkout -q --detach origin/main
+	a=$(change new tests/test_new.gd tests/test_new.gd.uid fail_test_new); git push -q origin "$a:refs/heads/lead/ready-T21-1"
+	b=$(change old fail_test_old); git push -q origin "$b:refs/heads/lead/ready-T22-1"
+	c=$(change clash1 same); d=$(change clash2 same)
+	git push -q origin "$c:refs/heads/lead/ready-T23-1"; git push -q origin "$d:refs/heads/lead/ready-T24-1"
+	p=$(change carry1 pfile fail_a); git push -q origin "$p:refs/heads/lead/ready-T25-1"
+	git checkout -q --no-track -b ch/carry2 "$p"; echo q >> qfile; git add -A; git commit -q -m carry2
+	q=$(git rev-parse HEAD); git checkout -q --detach origin/main
+	git push -q origin "$q:refs/heads/lead/ready-T26-1"
+	tools/mq/pull_ready.sh; tools/mq/pull_ready.sh
+	start_lane; drain; stop_lane
+	tools/mq/pull_ready.sh
+	note() { git cat-file -p "refs/tags/rejected/$1" 2>/dev/null; }
+	expect "own new test: says so" sh -c "git cat-file -p refs/tags/rejected/T21-1 | grep -q 'Your new test\|your new test fails'"
+	expect "own new test: the feature doesn't do what the test says" sh -c "git cat-file -p refs/tags/rejected/T21-1 | grep -q \"doesn't do what your test says\""
+	expect "existing test: says it is on main" sh -c "git cat-file -p refs/tags/rejected/T22-1 | grep -q 'existing test on main fails'"
+	expect "conflict: names the file and the cleanup advice" sh -c "git cat-file -p refs/tags/rejected/T24-1 | grep -q 'conflicts with main in: same' && git cat-file -p refs/tags/rejected/T24-1 | grep -q 'accept the deletion'"
+	expect "carried work: names the other task" sh -c "git cat-file -p refs/tags/rejected/T26-1 | grep -q 'unmerged work from T25'"
+	expect "the stacked first slice is not blamed for its follower" not sh -c "git cat-file -p refs/tags/rejected/T25-1 | grep -q 'unmerged work'"
+	expect "the event carries the class" grep -q 'REJECTED T21 failed gut:tests/test_new.gd. \[own-new-test\]' .git/mq/events.log
+}
+
 case_ready_tag_and_moved() {
 	newrepo readytag
 	local a m n
@@ -1179,7 +1208,7 @@ for c in task_deps bad_first bad_middle bad_last two_bad pair known_red clean co
 		ready_tag_and_moved not_home idle_gate idle_gate_red_and_killed cleanup standing play_folder_on_main lost_race \
 		network_failure push_off_holds build_line_order build_fail_fast build_fail_narrowed \
 		build_known_red needs_nothing marker_check script_uid union_log merge_retry builder_recipe miss_message stamp_without_output \
-		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards flaky_bisect marks_from_levels marks_from_baselines; do
+		import_before_build stale_class_cache parse_error_fails_fast test_when gut_shards flaky_bisect marks_from_levels marks_from_baselines reject_notes; do
 	[ -n "$ONLY" ] && [ "$ONLY" != "$c" ] && continue
 	# bash 3.2 has no wait -n: poll for a free slot.
 	while [ "$(jobs -pr | wc -l)" -ge "$JOBS" ]; do perl -e 'select(undef,undef,undef,0.2)'; done
