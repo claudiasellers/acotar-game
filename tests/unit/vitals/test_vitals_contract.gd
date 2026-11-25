@@ -61,6 +61,7 @@ func test_bus_declares_every_vitals_signal_with_its_arguments() -> void:
 func test_attack_rows_resolve_by_id_family_and_unknown() -> void:
 	# 24 since the puca_grab row went (the puca never touches her; design reconciliation C6).
 	assert_gte(AttackTable.count(), 24)
+	assert_eq(AttackTable.resolve(&"puca_grab").id, &"generic_hit", "the puca has no row: it never touches her (C6)")
 	assert_eq(AttackTable.resolve(&"naga").id, &"naga_claw", "a family resolves to its default row")
 	assert_eq(AttackTable.resolve(&"martax_roar").status_tag, &"roar_shake")
 	assert_eq(AttackTable.resolve(&"no_such_attack").id, &"generic_hit")
