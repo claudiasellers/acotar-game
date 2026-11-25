@@ -39,11 +39,17 @@ const BASH_COOLDOWN := 0.35
 ## After she breaks free (or cuts free), the one that held her is open to a
 ## finisher this long.
 const FREED_WINDOW := 2.0
+## KeyHints rows Strike asks for (L81 G20; the rows are the UI lane's): the
+## first time a hostile is in reach with the bow raised, and the first grab.
+## Asked only once the table has the row, so nothing is marked learnt early.
+const HINT_BASH := &"strike_bash"
+const HINT_CUT_FREE := &"strike_cut_free"
 
 var player: Node3D
 var _cooldown: float = 0.0
 var _freed_from: StringName = &""
 var _freed_left: float = 0.0
+var _bash_hinted: bool = false
 
 
 func _ready() -> void:
@@ -51,6 +57,7 @@ func _ready() -> void:
 		player = get_parent() as Node3D
 	if EventBus.has_signal(&"player_released"):
 		EventBus.player_released.connect(_on_released)
+	EventBus.player_grabbed.connect(_on_grabbed)
 
 
 func _physics_process(delta: float) -> void:
@@ -67,6 +74,11 @@ func step(delta: float) -> void:
 	_freed_left = maxf(_freed_left - delta, 0.0)
 	if _freed_left <= 0.0:
 		_freed_from = &""
+	if not _bash_hinted and _bow_raised():
+		var c := target()
+		if c and StrikeController.is_hostile(c):
+			_bash_hinted = true
+			_hint(HINT_BASH)
 
 
 ## One press of Strike. True if it did something.
@@ -190,6 +202,21 @@ func _cut_nearby() -> bool:
 	_cooldown = KNIFE_COOLDOWN
 	struck.emit(&"cut", best)
 	return true
+
+
+## Engaged with her: a hostile brain's ladder says so.
+static func is_hostile(c: Creature) -> bool:
+	var ladder: Variant = c.get(&"ladder")
+	return ladder is HostileLadder and (ladder as HostileLadder).is_hostile()
+
+
+func _on_grabbed(_source_id: StringName, _presses: int, _seconds: float) -> void:
+	_hint(HINT_CUT_FREE)
+
+
+func _hint(id: StringName) -> void:
+	if KeyHints.ROWS.has(id) and is_inside_tree():
+		KeyHints.of(get_tree()).nudge(id)
 
 
 func _on_released(source_id: StringName) -> void:

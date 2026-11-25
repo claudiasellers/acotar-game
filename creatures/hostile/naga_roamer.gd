@@ -72,6 +72,8 @@ var _ring_angle: float = 0.0
 var _dread: DreadField
 ## The row the current wind-up ends in.
 var _attack: StringName = &""
+## Poses the model through each wind-up (AttackTell).
+var tell: AttackTell
 var _lunged: bool = false
 var _has_token: bool = false
 var _hold_left: float = 0.0
@@ -89,6 +91,7 @@ func _ready() -> void:
 	EventBus.player_knocked_down.connect(_on_player_down)
 	EventBus.player_released.connect(_on_player_released)
 	_circle_sign = 1.0 if member_index % 2 == 0 else -1.0
+	tell = AttackTell.on(self)
 
 
 ## What the day asks of it: bask 10-15, hunt 17-21, nest otherwise.
@@ -344,7 +347,7 @@ func _wind_up(next: Fight, attack: StringName) -> void:
 	fight = next
 	_attack = attack
 	_fight_left = NagaRoamer.windup_of(attack)
-	_anim(&"play_attack", [attack])
+	EventBus.hostile_windup.emit(creature_id, data.kind, attack, global_position, _fight_left)
 
 
 func _hold_still(player: Node3D, delta: float) -> void:
@@ -389,10 +392,18 @@ func winding_up() -> StringName:
 	return _attack if alive and (fight == Fight.STRIKE or fight == Fight.LUNGE) else &""
 
 
+## The wind-up's one timer is the fight timer, set from the row's windup_s.
+func windup_left() -> float:
+	return maxf(_fight_left, 0.0) if winding_up() != &"" else 0.0
+
+
 ## Every fight change goes through here so the token and a hold never outlive
 ## the move that took them. The token is kept through the recovery: a member's
 ## whole cycle is one turn.
 func _set_fight(next: Fight) -> void:
+	# A tell that ends before contact (stagger, sleep, death) is called off.
+	if (fight == Fight.STRIKE or fight == Fight.LUNGE) and _fight_left > 0.0 and next != fight:
+		EventBus.hostile_windup_cancelled.emit(creature_id)
 	if fight == Fight.HOLD and next != Fight.HOLD:
 		_free_her()
 	if next == Fight.CHARGE or next == Fight.CIRCLE:
@@ -454,9 +465,6 @@ func _on_player_released(source_id: StringName) -> void:
 		_fight_left = strike_cooldown
 
 
-func _anim(method: StringName, args: Array) -> void:
-	if animator and animator.has_method(method):
-		animator.callv(method, args)
 
 
 func _routine(delta: float) -> void:
@@ -503,8 +511,6 @@ func stagger(seconds: float) -> void:
 	if not alive:
 		return
 	if fight != Fight.RECOVER:
-		if fight == Fight.STRIKE or fight == Fight.LUNGE or fight == Fight.LEAP:
-			_anim(&"cancel_attack", [])
 		_recover()
 	super.stagger(seconds)
 
