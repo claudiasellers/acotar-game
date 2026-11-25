@@ -11,7 +11,9 @@
 ## of the Wall, or into dread: she balks at the Bogge's DreadField and won't
 ## enter the Suriel glade or the naga reeds. Riding never skips a deed
 ## trigger: every ActionTrigger the mare passes through fires as if Feyre
-## walked it.
+## walked it. A story scene is one that holds StoryControl; the background
+## moments that only wait on deeds (the hall marks, the manor map) leave her
+## free and never stop the mare (T148).
 ##
 ## Getting on and off is one motion (MountMotion, L47-6): a vault up from her
 ## near side and a slide down it, never a teleport. The whistle is a gesture
@@ -74,7 +76,6 @@ var last_block: StringName = &""
 ## Probes and clips steer without input: returns [Vector3 world direction, bool gallop].
 var autopilot: Callable
 
-var _spaces: Dictionary = {}
 var _e_down: float = -1.0
 var _since_look: float = 99.0
 var _sweep: float = 0.0
@@ -138,11 +139,6 @@ var _gust: AudioStreamPlayer
 func _ready() -> void:
 	name = "MountDirector"
 	_ensure_action()
-	EventBus.scene_space_started.connect(func(id: StringName) -> void:
-		_spaces[id] = true
-		if riding or motion:
-			dismount(true))
-	EventBus.scene_space_finished.connect(func(id: StringName) -> void: _spaces.erase(id))
 	_whistle = AudioStreamPlayer.new()
 	_whistle.stream = WHISTLE
 	_whistle.volume_db = -6.0
@@ -217,8 +213,6 @@ func dread_at(at: Vector3) -> float:
 func block_reason(at: Vector3) -> StringName:
 	if not available():
 		return &"not_yet"
-	if not _spaces.is_empty():
-		return &"scene"
 	if StoryControl.mode != StoryControl.Mode.FULL:
 		return &"story"
 	if not WorldMap.is_in_prythian(at) or WorldMap.distance_to_wall(at) < 12.0:
@@ -481,7 +475,7 @@ func open_tending() -> MareTendingView:
 	var p := _player()
 	if p == null or mare == null or riding or motion or tending or mare.state != MareMount.State.STANDING:
 		return null
-	if block_reason(p.global_position) in [&"scene", &"story"]:
+	if block_reason(p.global_position) == &"story":
 		return null
 	tending = MareTendingView.open(self, mare, p, Gameplay.inventory)
 	tending.closed.connect(func() -> void:
@@ -725,7 +719,7 @@ func _process(delta: float) -> void:
 				_finish_dismount(_off_at, false)
 			else:
 				_last_yaw = NAN
-		elif riding and block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		elif riding and block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 		return
 	if riding:
@@ -735,7 +729,7 @@ func _process(delta: float) -> void:
 				_e_down = -1.0
 				dismount()
 				return
-		if block_reason(p.global_position) in [&"scene", &"story", &"realm"]:
+		if block_reason(p.global_position) in [&"story", &"realm"]:
 			dismount(true)
 			return
 		_steer()
