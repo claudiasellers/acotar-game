@@ -256,3 +256,34 @@ func test_she_cant_stab_a_naga_two_metres_below_her() -> void:
 	her.global_position = Vector3(0, 1.0, -1.2)
 	assert_eq(k.target(), n, "a step up is still in reach")
 
+
+
+## L81 G20: "cut free" is held for the whole grab and learnt by the first cut;
+## the rows are KeyHints' own (no check, so a missing row fails here).
+func test_cut_free_is_held_while_grabbed_and_learnt_by_the_cut() -> void:
+	assert_true(KeyHints.ROWS.has(StrikeController.HINT_CUT_FREE))
+	assert_true(KeyHints.ROWS.has(StrikeController.HINT_BASH))
+	her.body_state = BodyState.new()
+	her.body_state.name = "BodyState"
+	her.add_child(her.body_state)
+	var v := VitalsState.new()
+	v.name = "Vitals"
+	v.player = her
+	her.body_state.vitals = v
+	her.add_child(v)
+	her.body_state.set_physics_process(false)
+	v.set_physics_process(false)
+	var hints := KeyHints.of(get_tree())
+	hints.taught.erase(StrikeController.HINT_CUT_FREE)
+	EventBus.player_grabbed.emit(&"naga_coil", 6, 10.0)
+	assert_true(hints._held.values().has(StrikeController.HINT_CUT_FREE), "held while she is grabbed")
+	assert_true(k.strike())
+	assert_true(hints.taught.get(StrikeController.HINT_CUT_FREE, false), "learnt the first time she cuts free")
+	assert_false(hints._held.values().has(StrikeController.HINT_CUT_FREE), "let go with the grab")
+
+
+func test_an_engaged_naga_counts_as_hostile_and_an_unaware_one_doesnt() -> void:
+	var n := _naga()
+	assert_false(StrikeController.is_hostile(n))
+	n.ladder.state = HostileLadder.State.ENGAGED
+	assert_true(StrikeController.is_hostile(n))
