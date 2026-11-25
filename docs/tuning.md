@@ -296,6 +296,12 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `WOOD_CAP`, `CORE`, `RIM` | ash: glint 0.05 (fixed screen size), one unshadowed gold light 2.5 energy / 6 m, 6 m beacon, pulse 1.1 Hz; wood: glint 0.02 only, at most 3 at once | glint 0.02-0.1, energy 1-4, beacon 3-10 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. | T121 |
 | Arrow glimmer | systems/bow/arrow_glimmer.gd `ASH_GLINT`, `WOOD_GLINT`, `PULSE_HZ`, `LIGHT_ENERGY`, `LIGHT_RANGE`, `BEACON_HEIGHT`, `BEACON_WIDTH`, `WOOD_CAP`, `CORE`, `RIM` | ash: crisp glint a four-point star about 32 px on screen (pixel_size 0.0005, fixed size), one unshadowed gold light 0.8 energy / 1.8 m, beam 0.22 m wide (about 8 px at 12 m) and 7 m tall, saturated gold with amber edges, fading upward, plus a 3 m warm amber pool on the snow, pulse 1.1 Hz; wood: glint 0.00008 only, at most 3 at once; all colours <= 1.0 so nothing blooms | glint 0.00005-0.0004, energy 0.4-1.5, range 1-3 m, beam 5-8 m, pool 2-4 m | A landed arrow glimmers until picked up so a missed ash arrow is never lost in the snow (owner, 2026-11-24, first hunt). Gold with an amber rim so it reads on white. First version was a haze; now a point and a thin beam. | T121 |
 
+## Settled sites (L75, hostile plan §3.3, slice 2(d))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Settle swell | creatures/hostile/settle_swell.gd `SWELL_SECONDS`, `PETAL_SECONDS`, `SWARM_SHARE`, `SWARM_RADIUS` | fliers fill back over 16 s; rose petals fall 12 s; swarm radius half the territory, kept to 4-12 m; one sparkle burst at the core | swell 8-20 s (the plan's limit is 20), petals 6-16 s | The payoff for settling a site is the place coming back to life, not loot (plan §2.5). Slow enough to watch it happen from the fight's end, inside the plan's 20 s. | L75 |
+
 ## Wolf hunt light (L18-11)
 
 | Tunable | Where | Default | Range | What it does | Lane |
