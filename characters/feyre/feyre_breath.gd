@@ -4,6 +4,9 @@
 class_name FeyreBreath
 extends GPUParticles3D
 
+## How solid a fresh puff is (docs/tuning.md, Feyre's breath); it fades to 0.
+const PUFF_ALPHA := 0.35
+
 var _body_state: BodyState
 var _phase: float = 0.0
 
@@ -24,7 +27,7 @@ func _init(body_state: BodyState) -> void:
 	mat.scale_min = 0.6
 	mat.scale_max = 1.4
 	var grad := Gradient.new()
-	grad.set_color(0, Color(1, 1, 1, 0.35))
+	grad.set_color(0, Color(1, 1, 1, PUFF_ALPHA))
 	grad.set_color(1, Color(1, 1, 1, 0))
 	var ramp := GradientTexture1D.new()
 	ramp.gradient = grad
