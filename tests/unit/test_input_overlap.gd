@@ -39,7 +39,9 @@ func test_no_two_gameplay_actions_share_an_event() -> void:
 			if actions.size() < 2:
 				continue
 			actions.sort_custom(func(a, b): return String(a) < String(b))
-			assert_true(SHARED_OK.has(actions), "%s is bound to %s (scheme %s)" % [sig, actions, InputSettings.SCHEME_NAMES[scheme]])
+			assert_true(SHARED_OK.has(actions), ("%s is bound to %s (scheme %s): one press would do both. Fix: give one "
+					+ "of them another key in project.godot / core/input_settings.gd, or, if they can never be live at "
+					+ "once, add the sorted pair to SHARED_OK here with why.") % [sig, actions, InputSettings.SCHEME_NAMES[scheme]])
 
 
 func test_strike_is_checked_and_on_its_own() -> void:

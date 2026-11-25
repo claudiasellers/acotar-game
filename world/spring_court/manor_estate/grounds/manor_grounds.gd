@@ -1,5 +1,5 @@
-## Everything outside the house: gardens, structures, ambient life and the
-## manor grade. Called from ManorEstate._ready(). Each part builds itself from
+## Everything outside the house: gardens, structures and ambient life (the
+## manor grade is the estate's own, ManorEstate.make_grade). Called from ManorEstate._ready(). Each part builds itself from
 ## code with fixed seeds (R15) through a GroundsBatch, so a part is a handful of
 ## merged meshes, prop multimeshes and one StaticBody3D on layer 1.
 class_name ManorGrounds
@@ -37,12 +37,6 @@ static func _fill(root: Node3D, pace: BuildPace) -> void:
 		await part.call(root)
 		if pace:
 			await pace.tick()
-	var grade := RegionGrade.new()
-	grade.name = "ManorGrade"
-	grade.grade = &"manor"
-	grade.bounds = ManorSitePlan.BOUNDS
-	grade.blend_seconds = 4.0
-	root.add_child(grade)
 
 
 ## Marks a node as a named landmark (counted by the coverage report).

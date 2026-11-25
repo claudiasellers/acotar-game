@@ -288,7 +288,13 @@ func test_the_knife_finishes_the_wounded_naga() -> void:
 	a.naga[&"naga_cut"] = cut
 	var before := near.health
 	assert_true(k.strike())
-	assert_false(cut.alive, "the wounded one takes the blade: two stabs kill (16 health)")
+	# A few stabs finish it, however the knife is tuned; the point is which one she cuts.
+	for _i in 3:
+		if not cut.alive:
+			break
+		k.step(StrikeController.KNIFE_COOLDOWN + 0.01)
+		k.strike()
+	assert_false(cut.alive, "the wounded one takes the blade and dies within a few stabs")
 	assert_eq(near.health, before, "not the fresh one, though it is nearer")
 	assert_true(a.fought_back)
 

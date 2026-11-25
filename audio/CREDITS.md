@@ -45,6 +45,7 @@ Licence: CC0 1.0 (public domain dedication). Rebuild any file with
 | audio/sfx/beast/roar.ogg | The beast's roar at the door | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snap_arrow.ogg | The beast snaps the ash arrow | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/beast/snarl_loop.ogg | The beast's continuous snarl (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
+| audio/sfx/beast/throw_glance.ogg | Her knife or iron bracelets glance off the beast's hide | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/passed.ogg | The Bogge passes: the cold lets go | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/presence.ogg | The Bogge near: sub throb, icy whine, chattering teeth (loop) | self-made, `tools/audio/gen_act1_audio.py` | CC0 |
 | audio/sfx/bogge/whisper_1.ogg | The Bogge begs inside her head, variant 1 | self-made, `tools/audio/gen_act1_audio.py` | CC0 |

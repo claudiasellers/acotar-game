@@ -87,7 +87,7 @@ func test_one_rigged_horse_under_budget() -> void:
 			var arrays := mi.mesh.surface_get_arrays(s)
 			var idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
 			tris += idx.size() / 3 if idx.size() > 0 else (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
-	assert_between(tris, 4000, 15000, "R4 creature budget")
+	assert_between(tris, 4000, 15000, "R4 creature budget is 15k triangles (docs/contracts/creatures.md): decimate in the horse's generator, not by hand")
 	var gaits := CreatureAnimator.read_gaits(GAITS)
 	assert_gt(float(gaits[&"gallop"][0]), 14.0, "a horse's gallop clip, long-striding")
 	assert_eq(h.animator.gait_for(0.0)[0], &"idle")

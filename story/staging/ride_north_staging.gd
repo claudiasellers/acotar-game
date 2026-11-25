@@ -11,7 +11,8 @@
 ##   own view as she wakes.
 ## - The fade: her own camera through the dark and the move to the sentry gate.
 ## - The drive: behind and above as they ride up toward the house, the house
-##   held in frame, until she gets down. It never holds past the dismount.
+##   held in frame, until she gets down: the dismount ends the ride, and the
+##   shot is released with it.
 class_name RideNorthStaging
 extends Node
 
@@ -66,8 +67,6 @@ func _on_cue(actor: StringName, cue: StringName) -> void:
 		return
 	if actor == &"tamlin_beast" and cue == &"lead" and shot_name == &"":
 		_open()
-	elif actor == &"tamlin_beast" and cue == &"leave":
-		_release(1.2)
 
 
 func _on_mood(mood: StringName, _intensity: float, _seconds: float) -> void:

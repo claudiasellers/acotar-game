@@ -34,8 +34,9 @@ func _reticle() -> AimReticle:
 
 
 ## The hunt tightens the lens while she lines up on the wolf (Cine.follow at
-## 40 degrees over her 70): the ring must still sit on the landing spot as seen.
-func test_reticle_follows_the_lens_the_player_sees() -> void:
+## 40 degrees over her 70): the crosshair is still in the middle of what is
+## seen, and what is under it there is what the arrow is aimed at.
+func test_the_crosshair_is_true_through_the_lens_the_player_sees() -> void:
 	var cine := Cine.of(get_tree())
 	cine.claim(self)
 	cine.follow(WolfKillStaging.AIM_FOV, 0.0)
@@ -45,12 +46,14 @@ func test_reticle_follows_the_lens_the_player_sees() -> void:
 		feyre.bow_controller.update_bow(1.0 / 60.0, true, false)
 		await get_tree().physics_frame
 	var reticle := _reticle()
-	assert_true(reticle.visible, "the reticle shows while aiming")
+	assert_true(reticle.visible, "the crosshair shows while aiming")
 	var shown := get_viewport().get_camera_3d()
 	assert_eq(shown, cine.camera, "the hunt's lens is what is on screen")
-	var want := shown.unproject_position(reticle.point)
-	assert_almost_eq(reticle._screen.distance_to(want), 0.0, 2.0,
-		"ring at %s, the arrow lands at %s on screen" % [reticle._screen, want])
+	assert_almost_eq(reticle.at.distance_to(reticle.size * 0.5), 0.0, 0.5, "in the middle of the screen")
+	var want := shown.unproject_position(feyre.aim_point())
+	var centre := get_viewport().get_visible_rect().size * 0.5
+	assert_almost_eq(want.distance_to(centre), 0.0, 2.0,
+		"her aim point is at %s on screen, the middle is %s" % [want, centre])
 
 
 ## The scene takes the bow (the kill's cut, a staged moment) while she holds it

@@ -30,4 +30,10 @@ extends Resource
 ## flinch timing. Floors by reaction: light 0.4, medium 0.55, heavy 0.8, none
 ## (grabs and status moves) 0.6. 0 for hazards, which have no tell.
 @export var windup_s: float = 0.0
+## A grab row (damage_kind grab): presses to break it, seconds it holds, and
+## the scale of the family's default strike that lands if she fails it.
+## 0 on any other row.
+@export var grab_presses: int = 0
+@export var grab_seconds: float = 0.0
+@export var grab_fail_scale: float = 0.0
 @export var canon: String = "X"

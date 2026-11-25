@@ -90,6 +90,7 @@ func test_a_lost_ash_arrow_comes_back_once() -> void:
 func test_the_knife_press_does_not_use_the_bed() -> void:
 	WorldState.set_flag("wolf_killed")
 	WorldState.set_flag("pelt_sold")
+	WorldState.set_flag(CottageEvening.SLEPT)
 	Clock.paused = true
 	Clock.from_dict({"time_of_day": 0.9, "day": 1})
 	var door := BeastDoor.new()
@@ -124,7 +125,8 @@ func test_the_ride_ends_up_the_manor_drive() -> void:
 	var gate := ManorSitePlan.SENTRY_GATE
 	assert_almost_eq(Vector2(first.x, first.z).distance_to(gate), RideNorth.GATE_INSIDE, 0.01, "just inside the sentry gate")
 	assert_true(first.z < gate.y, "on the manor side")
-	assert_almost_eq(last.z, ManorSitePlan.SPAWN.z, 0.01, "to where the house first shows")
+	var door := Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)
+	assert_almost_eq(Vector2(last.x, last.z).distance_to(door), RideNorth.STOP_OUT, 0.2, "to the front steps")
 	assert_almost_eq(last.y, WorldHeight.height_at(last.x, last.z), 0.01, "on the estate's ground")
 	if WorldStreamer.get_region(RideNorth.MANOR) == null:
 		assert_eq(ride._to_the_manor(), [], "without the estate she gets down at the path's end")

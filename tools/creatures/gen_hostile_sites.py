@@ -70,6 +70,65 @@ ROAMERS = {
             ("leaves_prints", "true"),
             ("stride", "0.9"),
             ("print_size", "0.12"),
+            # Element row (plan §7): fire, frost and sleep weak, light normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.5,\n&"light": 1.0,\n&"sleep": 1.5\n}'),
+        ],
+        # The family's values on the shared brain (HostileRoamer exports).
+        "scene_fields": [
+            ("strike_reach", "1.7"),
+            ("strike_cooldown", "1.65"),
+            ("attack_id", '&"naga_claw"'),
+            ("grab_attack", '&"naga_coil"'),
+            ("lunge_attack", '&"naga_lunge"'),
+            ("dread_radius", "Vector2(30, 10)"),
+            # Circling on stalk, it laughs now and then (L81 G21).
+            ("taunt_clip", '&"laugh"'),
+        ],
+    },
+    # Briarlings (bestiary §7): L83's rigged thorn-folk, whose bush pose and
+    # leaf swatches match the court's rose bush (and never sway).
+    "briarling_roamer": {
+        "script": "res://creatures/hostile/briarling_roamer.gd",
+        "node": "BriarlingRoamer",
+        "model": "res://creatures/models/fae/briarling.gltf",
+        "fields": [
+            ("kind", '&"briarling"'),
+            ("display_name", '"Briarling"'),
+            ("fae", "true"),
+            ("canon", '"X"'),
+            ("body_length", "0.8"),
+            ("body_height", "0.7"),
+            ("body_width", "0.8"),
+            ("coat_color", "Color(0.93, 0.66, 0.74, 1)"),
+            ("walk_speed", "1.5"),
+            ("run_speed", "6.0"),
+            ("turn_speed", "8.0"),
+            # Sight x0.7, hearing x1.2, scent x0.5 of the shared 45/40/70.
+            ("sight_range", "31.5"),
+            ("hearing_range", "48.0"),
+            ("scent_range", "35.0"),
+            # Small means fragile (owner, 2026-11-25): one wood arrow or one
+            # knife hit (8 into 8), ash 1, burns 8 HP/s; a box 1.5x its body.
+            ("max_health", "8.0"),
+            ("arrow_damage", "8.0"),
+            ("lethal_arrow_ids", "Array[StringName]([&\"ash\"])"),
+            ("lethal_delay", "0.0"),
+            ("weak_zone_height", "0.5"),
+            ("weak_zone_name", '&"heart_knot"'),
+            ("burn_dps", "8.0"),
+            ("leaves_prints", "true"),
+            ("stride", "0.3"),
+            ("print_size", "0.05"),
+            ("hit_box_scale", "1.5"),
+            # Element row (plan §7): fire and sleep weak, frost normal.
+            ("element_rows", '{\n&"fire": 1.5,\n&"frost": 1.0,\n&"sleep": 1.5\n}'),
+        ],
+        "scene_fields": [
+            ("strike_reach", "1.3"),
+            ("strike_cooldown", "1.65"),
+            ("attack_id", '&"briarling_lash"'),
+            ("grab_attack", '&"briarling_snare"'),
+            ("dread_radius", "Vector2(14, 5)"),
         ],
     },
 }
@@ -90,13 +149,24 @@ SITES = [
     # Suriel Glade has no spawn table of its own; Border Woods carries it.
     ("naga_backwater", "naga", "The Backwater", "border_woods", (-790.0, 735.0), 45.0,
      "naga_roamer", 3, ["naga_survived"], "X"),
+    # The weakest folk first (design reconciliation C19, progression §8a.1b):
+    # one small brake at the rose garden's outer edge, from naga_survived.
+    ("briarling_rose_garden_edge", "briarling", "Rose Garden Brake", "manor_grounds", (-60.0, -560.0), 12.0,
+     "briarling_roamer", 3, ["naga_survived"], "X"),
 ]
+
+# Sites placed and checked but carried by no spawn table yet. The rose-garden
+# brake waits for L83's briarling rig and rose-bush swap (C19); that hand-in
+# takes it off this list.
+HELD = {"briarling_rose_garden_edge"}
 
 # Pairs allowed to overlap (host/lookout, shifts, contested borders).
 PAIRS = set()
 
 SPAWN = {}
 for _s in SITES:
+    if _s[0] in HELD:
+        continue
     SPAWN.setdefault(_s[3], []).append({
         "id": "site_" + _s[0],
         "scene": f"res://creatures/hostile/sites/{_s[0]}.tscn",
@@ -183,19 +253,25 @@ def check_overlap(sites, roads, anchors, stones):
 
 def write_roamer(rid, spec):
     os.makedirs(DATA_ROAMERS, exist_ok=True)
-    lines = ['[gd_resource type="Resource" script_class="CreatureData" load_steps=3 format=3]', "",
-             '[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]',
-             f'[ext_resource type="PackedScene" path="{spec["model"]}" id="2"]', "",
-             "[resource]", 'script = ExtResource("1")']
+    model = spec.get("model")
+    lines = [f'[gd_resource type="Resource" script_class="CreatureData" load_steps={3 if model else 2} format=3]', "",
+             '[ext_resource type="Script" path="res://creatures/creature_data.gd" id="1"]']
+    if model:
+        lines.append(f'[ext_resource type="PackedScene" path="{model}" id="2"]')
+    lines += ["", "[resource]", 'script = ExtResource("1")']
     lines += [f"{k} = {v}" for k, v in spec["fields"]]
-    lines += ['model_scene = ExtResource("2")', ""]
+    if model:
+        lines.append('model_scene = ExtResource("2")')
+    lines.append("")
     with open(os.path.join(DATA_ROAMERS, f"{rid}.tres"), "w") as f:
         f.write("\n".join(lines))
     scene = ["[gd_scene load_steps=3 format=3]", "",
              f'[ext_resource type="Script" path="{spec["script"]}" id="1"]',
              f'[ext_resource type="Resource" path="res://data/creatures/hostile/{rid}.tres" id="2"]', "",
              f'[node name="{spec["node"]}" type="CharacterBody3D"]',
-             'script = ExtResource("1")', 'data = ExtResource("2")', ""]
+             'script = ExtResource("1")', 'data = ExtResource("2")']
+    scene += [f"{k} = {v}" for k, v in spec.get("scene_fields", [])]
+    scene.append("")
     with open(os.path.join(SCENE_ROAMERS, f"{rid}.tscn"), "w") as f:
         f.write("\n".join(scene))
 

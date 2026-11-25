@@ -6,3 +6,10 @@
 [node name="NagaRoamer" type="CharacterBody3D"]
 script = ExtResource("1")
 data = ExtResource("2")
+strike_reach = 1.7
+strike_cooldown = 1.65
+attack_id = &"naga_claw"
+grab_attack = &"naga_coil"
+lunge_attack = &"naga_lunge"
+dread_radius = Vector2(30, 10)
+taunt_clip = &"laugh"

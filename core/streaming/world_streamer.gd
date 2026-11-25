@@ -42,6 +42,9 @@ var _queue: Array[String] = []  # wanted, not started; nearest first
 ## Threaded loads nobody wants any more (their world left): collected when they
 ## finish, so the loader lets them go.
 var _orphaned: Array[String] = []
+## Regions a scene is heading for (the ride's manor): loaded now, ahead of her,
+## and kept wherever she is until let go.
+var _held: Dictionary = {}
 
 
 ## Sets the regions of the current world and where their scenes are added.
@@ -193,11 +196,30 @@ func update_for(point: Vector3) -> void:
 		_begin_load(_focus)
 	_pump()
 	for id in _loaded.keys():
-		if wanted.has(id):
+		if wanted.has(id) or _held.has(id):
 			continue
 		var region: RegionDef = _regions.get(id)
 		if region == null or region.edge_distance(point) > unload_margin:
 			_unload(id)
+
+
+## Streams `region_id` in now, wherever she is, and keeps it until let_go():
+## a scene that knows where it is taking her (the ride north to the manor)
+## starts the load while the road is quiet, not as she arrives beside a
+## neighbour that is still building.
+func hold(region_id: StringName) -> void:
+	var id := String(region_id)
+	if not _regions.has(id):
+		return
+	_held[id] = true
+	if not _loaded.has(id) and not _pending.has(id):
+		_queue.erase(id)
+		_begin_load(id)
+
+
+## Ends a hold(); the region then stays only while she is near it.
+func let_go(region_id: StringName) -> void:
+	_held.erase(String(region_id))
 
 
 func unload_all() -> void:
@@ -208,6 +230,7 @@ func unload_all() -> void:
 			_orphaned.append(path)
 	_pending.clear()
 	_queue.clear()
+	_held.clear()
 	_focus = ""
 
 
@@ -290,7 +313,7 @@ func _collect_orphans() -> void:
 
 func _poll_pending() -> void:
 	for id in _pending.keys():
-		if id != _focus and _focus_waiting():
+		if id != _focus and not _held.has(id) and _focus_waiting():
 			continue  # a finished neighbour waits: instancing it would slow hers
 		var path: String = _pending[id]
 		match ResourceLoader.load_threaded_get_status(path):

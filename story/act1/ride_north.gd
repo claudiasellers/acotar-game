@@ -1,15 +1,18 @@
 ## The ride north and the wall crossing, ch5 (Keeper's chapter spine).
 ##
-## Straight after the claim: Feyre rides the beast's white horse through the
-## woods along the ride line (the world lane's WallSeamPath, or this space's
-## RidePath child). She can only look. She smells metal (magic, under the
-## glamour) and falls into an enchanted sleep; she wakes as they pass through
-## a gate at the seam, into spring: the cold-to-spring grade swap (2 s, the
-## single most important visual beat) and wall_crossed. Past the seam the
+## Straight after the claim: the cottage fades out and in again on the white
+## horse at the start of the ride line (the world lane's WallSeamPath, or this
+## space's RidePath child), the beast just ahead of her. He leads all the way
+## (escort). She can only look. She smells metal (magic, under the glamour; her
+## thought H1_metal) and falls into an enchanted sleep; she wakes as they pass
+## through a gate at the seam, into spring: the cold-to-spring grade swap (2 s,
+## the single most important visual beat) and wall_crossed. Past the seam the
 ## horse's road fades out and in again at the manor's sentry gate (canon: she
-## arrives at the manor), and they ride up the drive to where the house first
-## shows (ManorSitePlan.SPAWN) before she gets down. Without a manor_estate
-## region (greybox, tests) she gets down at the end of the path.
+## arrives at the manor), and they ride up the drive, round the fountain on the
+## forecourt's gravel ring, to the front steps. She gets down there, inside
+## ManorArrival's door radius, and the beast waits on the steps to lead her in.
+## Without a manor_estate region (greybox, tests) she gets down at the end of
+## the path.
 class_name RideNorth
 extends SceneSpace
 
@@ -19,6 +22,18 @@ const MANOR := &"manor_estate"
 ## for the estate to stream in.
 const GATE_INSIDE := 8.0
 const LOAD_WAIT_SECONDS := 45.0
+## Metres ahead of the horse, along the ride, that the beast keeps.
+const LEAD_AHEAD := 4.5
+## He runs this much faster than the horse, so he always holds his place.
+const LEAD_SPEED_GAIN := 1.2
+## The drive rounds the fountain on the forecourt's gravel ring (ManorFrontGarden:
+## turf to 15 m, gravel to 25 m) and stops in front of the steps with the
+## saddle just outside ManorArrival's door radius, facing along the facade, so
+## she gets down (Saddle side, toward the door) inside it and the doors open.
+const STOP_OUT := ManorArrival.DOOR_RADIUS + 0.3
+const STOP_X := -1.0
+## Where the beast waits for her, on the steps: ManorArrival's "beast_steps" mark.
+const BEAST_STEPS_OUT := 2.5
 
 @export var ride_speed: float = 6.0
 ## Metres along the path where the wall is. Negative: use a "Seam" child
@@ -34,7 +49,9 @@ var veil: ColorRect
 var path: Path3D
 var horse: Node3D
 var progress: float = 0.0
+var beast: Node3D
 var _rider: Node3D
+var _beast_walk: float = -1.0
 
 
 func _init() -> void:
@@ -67,12 +84,31 @@ func seam_at() -> float:
 func _build_beats() -> Array:
 	path = _find_path()
 	progress = 0.0
+	var deadline := [0.0]
 	return [
-		Beats.run(_mount, "mount"),
+		# From the broken cottage door to the horse, through the dark.
+		Beats.control(StoryControl.Mode.NONE, null),
+		Beats.run(func(_s: SceneSpace) -> void: _fade(1.0), "fade out"),
+		Beats.wait(fade_seconds),
+		Beats.run(func(s: SceneSpace) -> void:
+			_mount(s)
+			WorldStreamer.update_for(_pose_at(0.0).origin)
+			deadline[0] = Engine.get_physics_frames() + LOAD_WAIT_SECONDS * Engine.physics_ticks_per_second, "mount"),
+		# Only where a streamed region holds the road (none in a greybox or a test).
+		Beats.until(func() -> bool:
+			return WorldStreamer.region_at(_pose_at(0.0).origin) == null or _ground_under(_rider) \
+					or Engine.get_physics_frames() > deadline[0], "until the road is there"),
+		Beats.run(func(_s: SceneSpace) -> void: _fade(0.0), "fade in"),
+		# The opening shot (staging) is cut once the dark has begun to lift.
+		Beats.wait(fade_seconds * 0.25),
 		Beats.cue(&"tamlin_beast", &"lead"),
 		Beats.control(StoryControl.Mode.LOOK, null),
 		RideBeat.new(func() -> float: return seam_at() * sleep_at),
 		Beats.cue(&"feyre", &"smell_metal"),
+		Beats.run(func(_s: SceneSpace) -> void:
+			var d := DialogueDirector.of(get_tree())
+			if d:
+				d.say_beat(space_id, &"smell_metal"), "the air tastes like metal"),
 		Beats.mood(&"enchanted_sleep", 1.0, 2.5),
 		Beats.control(StoryControl.Mode.NONE, null),
 		RideBeat.new(func() -> float: return seam_at()),
@@ -84,7 +120,6 @@ func _build_beats() -> Array:
 		RideBeat.new(func() -> float: return path_length()),
 	] + _to_the_manor() + [
 		Beats.run(_dismount, "dismount"),
-		Beats.cue(&"tamlin_beast", &"leave"),
 	]
 
 
@@ -101,6 +136,7 @@ func _to_the_manor() -> Array:
 			path = drive_path()
 			progress = 0.0
 			_place(0.0)
+			_place_beast()
 			# Spring was the crossing's; on the estate the manor grade takes over.
 			GradeDirector.release_story_holds(get_tree())
 			WorldStreamer.update_for(path.global_transform * path.curve.get_point_position(0))
@@ -114,7 +150,8 @@ func _to_the_manor() -> Array:
 	]
 
 
-## The drive from just inside the sentry gate to where the house first shows,
+## The drive from just inside the sentry gate up to the forecourt, round the
+## fountain's east side on the gravel ring, to the front steps (see STOP_OUT),
 ## on the estate's ground. Added under this space.
 func drive_path() -> Path3D:
 	var drive := get_node_or_null(^"Drive") as Path3D
@@ -124,14 +161,31 @@ func drive_path() -> Path3D:
 		add_child(drive)
 		drive.global_transform = Transform3D.IDENTITY
 	var curve := Curve3D.new()
+	var centre := ManorSitePlan.FORECOURT_CENTER
+	var ring := centre.distance_to(Vector2(ManorSitePlan.FRONT_DOOR.x, ManorSitePlan.FRONT_DOOR.z)) - STOP_OUT
 	var from := ManorSitePlan.SENTRY_GATE + Vector2(0.0, -GATE_INSIDE)
-	var to := Vector2(ManorSitePlan.SPAWN.x, ManorSitePlan.SPAWN.z)
-	var steps := maxi(2, ceili(from.distance_to(to) / 8.0))
-	for i in steps + 1:
-		var p := from.lerp(to, float(i) / steps)
+	var onto := centre + Vector2(0.0, ring)
+	var points: Array[Vector2] = []
+	var steps := maxi(2, ceili(from.distance_to(onto) / 8.0))
+	for i in steps:
+		points.append(from.lerp(onto, float(i) / steps))
+	# Anticlockwise from above: south, east, then north to just past the door.
+	var end := PI + asin(clampf(-STOP_X / ring, -1.0, 1.0))
+	var arc := maxi(4, ceili(ring * end / 4.0))
+	for i in arc + 1:
+		var a := end * float(i) / arc
+		points.append(centre + Vector2(sin(a), cos(a)) * ring)
+	for p in points:
 		curve.add_point(Vector3(p.x, WorldHeight.height_at(p.x, p.y), p.y))
 	drive.curve = curve
 	return drive
+
+
+## Where the beast waits on the front steps (ManorArrival's "beast_steps").
+static func beast_steps() -> Vector3:
+	var at := ManorSitePlan.FRONT_DOOR + Vector3(0.0, 0.0, BEAST_STEPS_OUT)
+	at.y = WorldHeight.height_at(at.x, at.z)
+	return at
 
 
 func _ground_under(node: Node3D) -> bool:
@@ -171,6 +225,10 @@ func _find_path() -> Path3D:
 
 
 func _mount(_space: SceneSpace) -> void:
+	# The manor is where the ride ends: it streams in while she rides, not
+	# when she reaches its gate beside a neighbour still building.
+	if WorldStreamer.get_region(MANOR):
+		WorldStreamer.hold(MANOR)
 	_rider = player()
 	if _rider:
 		_rider.set_physics_process(false)
@@ -178,9 +236,20 @@ func _mount(_space: SceneSpace) -> void:
 	# Seated astride, as on the mount (L47): legs on the barrel, hands on the reins.
 	if _rider and horse is WhiteHorse:
 		Saddle.seat(_rider)
+	_place(0.0)
+	# He leads from just ahead, not from the cottage he broke into.
+	beast = request_actor(&"tamlin_beast", _pose_at(LEAD_AHEAD), StandIns.beast)
+	if beast is BeastActor:
+		var actor := beast as BeastActor
+		# The cottage is behind them: nothing sends him back to its latch.
+		actor.door = null
+		_beast_walk = actor.walk_speed
+		actor.walk_speed = ride_speed * LEAD_SPEED_GAIN
+	_place_beast()
 
 
 func _dismount(_space: SceneSpace) -> void:
+	WorldStreamer.let_go(MANOR)
 	if _rider and is_instance_valid(_rider):
 		if _rider is CharacterBody3D:
 			(_rider as CharacterBody3D).velocity = Vector3.ZERO
@@ -190,6 +259,12 @@ func _dismount(_space: SceneSpace) -> void:
 		if seated and horse and is_instance_valid(horse):
 			_rider.global_position.y = horse.global_position.y + 0.1
 		_rider.set_physics_process(true)
+	# He goes on up to the steps and waits there to lead her in (ManorArrival).
+	if beast is BeastActor and is_instance_valid(beast):
+		var actor := beast as BeastActor
+		if _beast_walk > 0.0:
+			actor.walk_speed = _beast_walk
+		actor.lead(beast_steps() if WorldStreamer.get_region(MANOR) else actor.global_position)
 
 
 ## World transform `offset` metres along the ride line, facing along it.
@@ -204,6 +279,34 @@ func _pose_at(offset: float) -> Transform3D:
 	if not origin.is_equal_approx(target):
 		xform = xform.looking_at(Vector3(target.x, origin.y, target.z), Vector3.UP)
 	return xform
+
+
+## Straight onto his place ahead of the horse (after a cut).
+func _place_beast() -> void:
+	if beast and is_instance_valid(beast):
+		beast.global_transform = _pose_at(minf(progress + LEAD_AHEAD, path_length()))
+		_escort()
+
+
+## Keeps him LEAD_AHEAD metres on along the ride; past the drive's end, on
+## the steps.
+func _escort() -> void:
+	if beast == null or not is_instance_valid(beast):
+		return
+	var ahead := progress + LEAD_AHEAD
+	var pose := _pose_at(minf(ahead, path_length()))
+	if not (beast is BeastActor):
+		beast.global_transform = pose
+		return
+	var to := pose.origin
+	if ahead > path_length():
+		# Past the end he keeps ahead of the horse, never under it: on the
+		# manor steps, or on along the line's last heading.
+		var heading := pose.origin - _pose_at(maxf(path_length() - 1.0, 0.0)).origin
+		heading.y = 0.0
+		to = beast_steps() if path and path.name == "Drive" \
+				else pose.origin + heading.normalized() * (ahead - path_length())
+	(beast as BeastActor).lead(to)
 
 
 func _place(offset: float) -> void:
@@ -234,4 +337,5 @@ class RideBeat:
 		var stop := float(until.call())
 		ride.progress = minf(ride.progress + ride.ride_speed * delta, stop)
 		ride._place(ride.progress)
+		ride._escort()
 		return ride.progress >= stop

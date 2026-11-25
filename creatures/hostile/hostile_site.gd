@@ -16,6 +16,9 @@ const ALERT_DECAY := 0.05
 ## tiny.
 const TOKENS := {&"martax": 1, &"crow": 3}
 const DEFAULT_TOKENS := 2
+## An encounter ends as "slipped" once no member has been hostile or
+## searching for this long (she got away, or they lost her).
+const ENCOUNTER_CALM_S := 8.0
 
 @export var data: HostileSiteData
 
@@ -28,6 +31,9 @@ var members: Array[Creature] = []
 var alert_level: float = 0.0
 var last_known: Vector3 = Vector3.INF
 var is_settled: bool = false
+## A fight is on: a member reported her, and it hasn't ended (HostileEncounters).
+var engaged: bool = false
+var _calm_left: float = 0.0
 ## The life that comes back once it settles (SettleSwell); null until then.
 var swell: SettleSwell
 ## {member: Creature, at: Vector3, left: float}
@@ -58,6 +64,7 @@ func _ready() -> void:
 		return
 	for i in data.count:
 		_spawn_member(i)
+	EventBus.player_knocked_down.connect(_on_player_knocked_down)
 
 
 static func settle_flag(site_id: StringName) -> String:
@@ -86,6 +93,9 @@ func in_leash(pos: Vector3) -> bool:
 ## A member saw her at `at`: the rest of the camp hears in report_delay seconds,
 ## unless the member dies first.
 func report(member: Creature, at: Vector3) -> void:
+	if not engaged:
+		engaged = true
+	_calm_left = ENCOUNTER_CALM_S
 	for p in _pending:
 		if p.member == member:
 			p.at = at
@@ -147,6 +157,7 @@ func living_count() -> int:
 
 func _physics_process(delta: float) -> void:
 	alert_level = maxf(alert_level - ALERT_DECAY * delta, 0.0)
+	_step_encounter(delta)
 	if alert_level <= 0.0:
 		_lunge_ready = true
 	for i in range(_pending.size() - 1, -1, -1):
@@ -158,6 +169,37 @@ func _physics_process(delta: float) -> void:
 		var m := p.member as Creature
 		if is_instance_valid(m) and m.alive:
 			_raise(p.at)
+
+
+## While a fight is on, any member still hostile or searching keeps it on;
+## ENCOUNTER_CALM_S with none and she slipped away.
+func _step_encounter(delta: float) -> void:
+	if not engaged:
+		return
+	for m in members:
+		if is_instance_valid(m) and m.alive:
+			var ladder := m.get(&"ladder") as HostileLadder
+			if ladder and (ladder.is_hostile() or ladder.state == HostileLadder.State.SEARCHING):
+				_calm_left = ENCOUNTER_CALM_S
+				return
+	_calm_left -= delta
+	if _calm_left <= 0.0:
+		end_encounter(HostileEncounters.SLIPPED)
+
+
+## The fight is over, one way or another; it ends once.
+func end_encounter(outcome: StringName) -> void:
+	engaged = false
+	HostileEncounters.ended(data.id, data.family, outcome)
+
+
+func _on_player_knocked_down(source_id: Variant = null, _cause: Variant = null, _at: Variant = null) -> void:
+	if not engaged or source_id == null:
+		return
+	for m in members:
+		if is_instance_valid(m) and m.creature_id == StringName(source_id):
+			end_encounter(HostileEncounters.KNOCKDOWN)
+			return
 
 
 func _raise(at: Vector3) -> void:
@@ -206,6 +248,8 @@ func _on_member_died(_cause: StringName, member: Creature) -> void:
 ## fliers, petals and sparkle back over 20 s; the celebration is the one chime.
 func settle() -> void:
 	is_settled = true
+	# A camp cleared is a fight won, met head-on or not.
+	end_encounter(HostileEncounters.KILLED)
 	swell = SettleSwell.grow(self, data.territory_radius, Clock.is_night(), true)
 	WorldState.set_flag(settle_flag(data.id), Clock.day)
 	if EventBus.has_signal(&"celebration_requested"):

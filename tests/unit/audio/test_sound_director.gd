@@ -23,6 +23,12 @@ func before_each() -> void:
 	bank = load(SoundDirector.BANK_PATH) as SoundBank
 
 
+## Dread moods are held by HudLayout (30 s lapse) and outlive the director;
+## left on, they hush the pickup log for the next test in the same engine.
+func after_each() -> void:
+	EventBus.mood_requested.emit(&"calm", 0.0, 0.0)
+
+
 func _director() -> SoundDirector:
 	director = SoundDirector.new()
 	add_child_autofree(director)

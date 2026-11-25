@@ -1,7 +1,7 @@
 ## Contract for the bow's feedback (plans/combat/bow-combat-design.md §13 B3):
 ## every sound of §5.8 is a cue in the bank and plays on its own event, the
-## reticle shows the draw closing and catches at full draw, an early release
-## is heard, an empty quiver is heard and nocks nothing, the Focus hush is a
+## crosshair catches at full draw and pulses on a hit, an empty quiver is
+## heard and nocks nothing, the Focus hush is a
 ## bus effect on Ambience, and a blow costs her half the draw.
 extends GutTest
 # gate: when:systems/bow/*,systems/audio/*,data/audio/*,data/bows/*,ui/aim_reticle.gd,characters/feyre/*,systems/interaction/*

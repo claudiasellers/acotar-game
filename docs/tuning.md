@@ -208,36 +208,33 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
-| `draw_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds of holding fire (LMB / RT) to draw the string. Releasing at full draw looses a full-power arrow; earlier lets the string down. No weak shots | L80 |
+| `draw_time` | data/bows/*.tres (BowData) | hunting 0.3 s; fae 0.2, gilded 0.25, yew 0.4, warbow 0.55 | 0.1–0.8 s | Seconds from the press of fire (LMB / RT) to a full draw. Every arrow leaves at full power: on letting go at full draw, or, if she let go sooner (a quick click), the moment the draw completes. A click during the follow-through is the next arrow. Measured: a 0.05 s click looses at 300 ms at 48 m/s | L80 |
+| `true_range` | data/bows/*.tres (BowData) | hunting 30 m; fae 34, yew 38, gilded 40, warbow 45 | 20–60 m | Metres the arrow flies dead straight to the crosshair (gravity and wind have no share for `true_range / max_speed` seconds); past it the arrow drops and the crosshair shows a bar where it will fall | L80 |
+| `gravity_blend_s` | bow_tuning.tres | 0.4 s | 0.2–0.8 | Past the true range, gravity and wind ease in over this long, so the drop begins gently | L80 |
 | `kick_degrees` | data/bows/*.tres (BowData) | hunting 0.35; yew 0.35, fae 0.2, warbow 0.6, gilded 0.3 | 0–1 | Camera kick on release; off under Reduced Effects | L80 |
 | `follow_through_s` | data/bows/bow_tuning.tres (BowTuning) | 0.25 | 0.15–0.4 | Seconds after a shot before the next draw can start: shot-to-shot rhythm | L80 |
-| `min_power` | bow_tuning.tres | 0.35 | 0.25–0.5 | The share of the bow's speed an arrow leaves at with no draw; a full draw is 1.0 | L80 |
-| `short_draw` | bow_tuning.tres | 0.5 | 0.3–0.7 | A shot let go under this much draw counts as short (her one thought about drawing farther) | L80 |
 | `stay_up_s` | bow_tuning.tres | 1.6 | 1–3 | Seconds the bow stays in her hands after the last shot or hold | L80 |
 | `BowVisual.SWING_SPEED` | systems/bow/bow_visual.gd | 6 per second (about 0.17 s up or down) | 4–10 | How fast the bow comes up into her hands and goes back down, on real time | L80 |
 | `BowVisual.READY_HOLD` | systems/bow/bow_visual.gd | 2.5 s | 1.5–4 | Seconds the bow stays in her hands after she changes or makes an arrow without drawing | L80 |
-| `hip_sway` | bow_tuning.tres | 1.3 | 1.2–2.5 | Sway without aim held, against 1.0 with it | L80 |
+| `steady_body` / `steady_tremor` | bow_tuning.tres | 2.2 / 0.45° | 1.6–3.0 / 0.3–0.8 | Her hands are steady, and the arrow goes exactly to the crosshair, until BodyState's sway multiplier passes `steady_body` or its tremor passes `steady_tremor`. Hungry (0.55) and cold (0.5) in the winter wood is inside both; frozen and starving, venom or a roar are not. Walking, turning and shooting from the hip never add sway | L80 |
+| `Arrow.CATCH_RADIUS` | systems/bow/arrow.gd | 0.15 m | 0.08–0.25 | How near a creature's body the arrow's line may pass and still strike it; the crosshair's aim point reaches for creatures by the same margin. World geometry still stops only the arrow's point | L80 |
+| `FeyreCamera.AIM_KEEP_S` | characters/feyre/camera/feyre_camera.gd | 0.6 s | 0.4–1.0 | While the bow is up and this long after, a shoulder change turns the camera so the middle of the screen stays on the same thing (measured: 0.007 m of drift at 35 m from press to full draw) | L80 |
+| `CreatureSenses.RELEASE_HEAD_START` / `RELEASE_ARROW_PACE` | creatures/senses/creature_senses.gd | 0.15 s / 30 m/s | 0–0.4 / 20–45 | A creature hears the bow's release this long after it plus its distance at this pace, so an arrow aimed at unaware prey arrives first. The chapter 1 rabbit keeps its own staged bolt (OpeningHunt) | L80 (L75's file) |
 | `FeyreCamera.HIP_SHOULDER` | characters/feyre/camera/feyre_camera.gd | 0.85 m (aim held: `AIM_SHOULDER` 0.55) | 0.7–1.1 | How far over her right shoulder the lens sits with the bow up and no aim held, on the full arm; it shrinks to the aim offset on a short arm. Sets how far the ring stands from her body | L80 |
-| `HIP_RING_CLEAR_PX` | tests/unit/characters/test_hip_framing.gd | 64 px at 1080 high (measured 93–104; was 41–47 at 0.55) | 48–96 | The least distance on screen between her capsule's right edge and the ring from the hip, at rest, at full draw and looking down | L80 |
-| `settle_s` / `settle_floor` | bow_tuning.tres | 0.6 / 0.35 | 0.3–1.0 / 0.2–0.6 | Sway falls from 1.0 to the floor over this long held still: the reward for patience | L80 |
-| `settle_reset_turn_dps` / `unsettle_rate` | bow_tuning.tres | 30 / 3.0 | 15–60 / 1–6 | Turning faster than this (deg/s) or moving unsettles the aim, at this rate per second | L80 |
-| `settle_after_shot` | bow_tuning.tres | 0.7 | 0.35–1.0 | A shot's recoil leaves the aim at least this unsettled | L80 |
-| `fatigue_after_s` / `fatigue_rate` / `fatigue_max` | bow_tuning.tres | 3.0 / 0.25 / 2.0 | | How long a full draw holds before the arm trembles, how fast, and the cap | L80 |
+| `HIP_RING_CLEAR_PX` | tests/unit/characters/test_hip_framing.gd | 64 px at 1080 high (measured 93–104; was 41–47 at 0.55) | 48–96 | The least distance on screen between her capsule's right edge and the crosshair from the hip, at rest, at full draw and looking down | L80 |
+| `fatigue_after_s` / `fatigue_rate` / `fatigue_max` | bow_tuning.tres | 3.0 / 0.25 / 2.0 |  | How long a full draw holds before the arm trembles, how fast, and the cap: up to (max − 1) of the bow's own sway | L80 |
 | `hold_drain` | bow_tuning.tres | 6/s | 0–10 | Stamina per second while the arm trembles | L80 |
-| `stance_*` | bow_tuning.tres | still 1.0, crouched 0.8, walking 1.6, crouch-walking 1.3 | | Sway multiplier by stance | L80 |
-| `breath_low` / `breath_winded` (+tremor) | bow_tuning.tres | 1.5 below 25% stamina / 2.0 + 0.4° winded | | Stamina's tie to aim | L80 |
+| `breath_low` / `breath_winded` (+tremor) | bow_tuning.tres | 1.5 below 25% stamina / 2.0 + 0.4° winded |  | Stamina's tie to aim: each adds (value − 1) of the bow's own `sway_degrees` (hunting 1.5°: 0.75° low, 1.5° + 0.4° winded) | L80 |
 | `focus_scale` | bow_tuning.tres | 0.4 | 0.25–0.6 | Time scale while Focus is held (TimeScale request `bow_slow`) | L80 |
 | `focus_drain` / `focus_dread_drain` | bow_tuning.tres | 28/s real / 0.5 | 18–40 | Stamina per real second of Focus, times (1 + 0.5 × dread) | L80 |
 | `focus_sway` / `focus_sway_panic` / `panic_dread` | bow_tuning.tres | 0.4 / 0.6 / 0.6 | | How steady Focus is, and above what dread it's the shakier kind | L80 |
-| `focus_settle_speed` | bow_tuning.tres | 2.0 | 1–3 | Settle runs this much faster in Focus | L80 |
 | `focus_hold_after_release_s` | bow_tuning.tres | 0.3 | 0–0.5 | The hush holds this long after a Focused shot | L80 |
 | `fov_raised` / `fov_focus` | bow_tuning.tres | −10 / −16 | | FOV change from 70 while raised and while Focused (MovementFeel applies it) | L80 |
 | `aim_sensitivity` | bow_tuning.tres | 0.7 | 0.4–1.0 | Look speed while the bow is raised | L80 |
 | `kick_rise_s` / `kick_fall_s` | bow_tuning.tres | 0.06 / 0.15 | | Timing of the release kick | L80 |
-| `ring_unsettled_grow` | bow_tuning.tres | 0.3 | 0–0.5 | The reticle ring is this much larger while fully unsettled | L80 |
 | `draw_kept_when_hit` | bow_tuning.tres | 0.5 | 0–1 | Share of the draw she keeps when a blow lands (the arrow stays nocked) | L80 |
-| `draw_arc_gap` / `full_draw_catch_s` | bow_tuning.tres | 5 px / 0.18 s | 3–8 / 0.1–0.3 | The reticle's draw arc sits this far outside the ring and brightens this long when the draw closes: the cue for "now you can let go" | L80 |
-| `hit_pulse_s` | bow_tuning.tres | 0.22 s | 0.15–0.35 | The ring's one pulse (act accent) when her arrow finds a creature; off with Hit marks. Same pulse for every part of the body | L80 |
+| `full_draw_catch_s` | bow_tuning.tres | 0.18 s | 0.1–0.3 | The crosshair's ring, which closes from 13 px to 7 px as she draws (`AimReticle.RADIUS_OPEN` / `RADIUS_DRAWN`), thickens this long when the draw is full | L80 |
+| `hit_pulse_s` | bow_tuning.tres | 0.22 s | 0.15–0.35 | The crosshair's one pulse (act accent) when her arrow finds a creature; off with Hit marks. Same pulse for every part of the body | L80 |
 | `hush_duck_db` / `hush_fade_s` | bow_tuning.tres | -12 dB / 0.12 s | -18–-6 / 0.08–0.3 | The Focus hush: the Ambience bus's amplify drops this far and its low-pass closes to 800 Hz, over this long | L80 |
 
 ## White mare saddle and seat (L47-8)
@@ -276,7 +273,7 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | `TitleChoice` / `PageChoice` | `ui/theme/journal_theme.gd` | 40 px Marcellus `paper`, `glow` in focus, 6 px `ink` edge / 28 px Marcellus `ink`, `accent` in focus | 34–44 / 24–30 | the title's menu; a story on the first page | L77 |
 | `ClosedBook.SIZE` / `LIFT_SECONDS` / `ROSE_REACH` / `WHORLS` | `ui/title/closed_book.gd` | 700 x 800 px / 1.1 s / 136 px / 64 | / 0.8–1.5 / 110–150 / 40–90 | the shut book's boards, how long the cover takes to lift, the rose's ring of thorns, the stars on the endpaper | L77 |
 | `TitleScreen.BAND_PAD` | `ui/title/title_screen.gd` | 64 x 44 px | 40–90 / 30–60 | how far the smear under the title's menu reaches past the type | L77 |
-| `AimReticle.RING` / `RING_MISS` / `LINE` | `ui/aim_reticle.gd` | `glow` at 0.95 / `paper` at 0.45 / first wash at 0.35 | | the ring where the arrow lands, where it won't, and the line down to it | L77 |
+| `AimReticle.RING_OPEN` / `RING_DRAWN` / `RING_BLOCKED` | `ui/aim_reticle.gd` | `glow` at 0.6 / `glow` at 0.95 / `paper` at 0.35 | | the crosshair before the draw, at full draw, and dimmed when the arrow can't reach what it is on (something in the way of the bow, or no arrow) | L80 |
 | `TitleScreen.WASH_SECONDS` / `INTRO_SECONDS` | `ui/title/title_screen.gd` | 0.9 s / 2.2 s | 0.6–1.4 / 1.5–3 | the first page washing up over the screen; the fade in from dark | L77 |
 | `ChapterHeading.HOLD` / `FADE` | `ui/hud/chapter_heading.gd` | 3.2 s / 0.6 s | 2.5–4.5 / 0.4–0.9 | how long a chapter heading stays and how slowly it comes | L77 |
 | `PaintTin.TIN` / `PAN_STEP` / `Pan.RADIUS` / `Pan.PROUD` / `NAME_SECONDS` | `ui/satchel/paint_tin.gd` | 468 x 84 px (38 px above it for a pan's name) / 86 px / 32 px / 9 px / 2.2 s | tin no wider than 488 | the tin's size, the pans' spacing and size, how far a pan stands proud while LB is held, how long a pan's name shows | L77 |
@@ -308,6 +305,13 @@ The Starlight Glen is planted this way in the game (CourtGlenPlanting, CourtSwar
 | Tunable | Where | Default | Range | What it does | Lane |
 |---|---|---|---|---|---|
 | Settle swell | creatures/hostile/settle_swell.gd `SWELL_SECONDS`, `PETAL_SECONDS`, `SWARM_SHARE`, `SWARM_RADIUS` | fliers fill back over 16 s; rose petals fall 12 s; swarm radius half the territory, kept to 4-12 m; one sparkle burst at the core | swell 8-20 s (the plan's limit is 20), petals 6-16 s | The payoff for settling a site is the place coming back to life, not loot (plan §2.5). Slow enough to watch it happen from the fight's end, inside the plan's 20 s. | L75 |
+
+## Puca (L75, hostile plan §5.2, slice 2(b))
+
+| Tunable | Where | Default | Range | What it does | Lane |
+|---|---|---|---|---|---|
+| Puca tell reach | creatures/hostile/puca_roamer.gd `TELL_RANGE`, `KEEN_TELL_RANGE`, `TELL_FULL`, `TELL_SHOWN` | bare eyes 8 m, a full keen brew 40 m; full strength inside 40% of that reach; 0.25 is readable | bare 5-12 m, keen 30-45 m (the plan's floor is 30) | How far its wrongness (wrong colour, rippling edges) shows. Without keen it is only what she wants until she is nearly on it; with keen she can refuse it from far off. The disguise material reads it as `puca_tell`. | L75 |
+| Puca lure distances | creatures/hostile/puca_roamer.gd `KEEP_M`, `CLOSE_M`, `FOLLOW_M`, `NOTICE_M` | keeps 9 m ahead, slips away inside 4 m, waits past 25 m, startles at 30 m | keep 6-12 m | Just out of reach, never caught, never touching her (the Keeper, ch11). | L75 |
 
 ## Wolf hunt light (L18-11)
 

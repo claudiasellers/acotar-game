@@ -5,8 +5,7 @@ c_home_coin,feyre,,Coin in my pocket for once. It still doesn't feel like enough
 c_home_return,feyre,,So small. The cottage had been so small.,V,yes,region,cottage,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/c_home_return.ogg
 c_snowdrops,feyre,,"Elain's garden, asleep under the snow. She'll be out here the first mild day.",A,yes,place,elain_garden,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/c_snowdrops.ogg
 c_snowdrops_return,feyre,,Her old garden's a wild tangle of weeds and blooms now.,A,yes,place,elain_garden,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/c_snowdrops_return.ogg
-A1_03_nesta_beast,nesta,Nesta,You're just a half-wild beast with the nerve to bark orders at all hours of the day and night.,V,,near,,,p0_winter p1_wolf_and_crossing,"cold, quick, cutting; not shouted (Keeper, voice-lines-act1)",audio/voice/A1_03_nesta_beast.ogg
-A1_04_nesta_forget,nesta,Nesta,"Someday, Feyre, you'll have no one left to remember you.",A,,follow,,,p0_winter p1_wolf_and_crossing,"quieter, meaner",audio/voice/A1_04_nesta_forget.ogg
+n_stink,nesta,Nesta,You stink like a pig covered in its own filth. Can't you at least try to pretend that you're not an ignorant peasant? Take those disgusting clothes off.,V,,near,,,p0_winter p1_wolf_and_crossing,"disgusted, imperious",audio/voice/n_stink.ogg
 n_tomas,nesta,Nesta,Tomas Mandray walked me halfway home. Don't look at me like that.,X,,near,,,p0_winter p1_wolf_and_crossing,"defensive, chin up",audio/voice/n_tomas.ogg
 n_cloak,nesta,Nesta,I'll get the cloak for Elain first. Nobody's buying me the boots I need.,A,,near,,,p0_winter,,audio/voice/n_cloak.ogg
 n_hale,nesta,Nesta,Going to see the Hale boy again? Don't pretend you aren't.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/n_hale.ogg
@@ -20,14 +19,13 @@ e_seeds,elain,Elain,"If we ever had a little money, I'd buy seeds. Real ones, fr
 e_bird,elain,Elain,Father carved a little bird today. It looks like it's about to sing.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_bird.ogg
 e_fire,elain,Elain,You look frozen through. Sit by the fire a moment.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_fire.ogg
 e_hum,elain,Elain,I was thinking about summer. Do you remember summer?,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/e_hum.ogg
-A1_05_father_hope,father,Father,"We need hope, or else we cannot endure.",V,,deed,,fact.father_hearth_sat,p0_winter p1_wolf_and_crossing,"tired, then a rare clarity; gentle",audio/voice/A1_05_father_hope.ogg
 f_sorry,father,Father,"You shouldn't have to do all this, Feyre. I know that.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_sorry.ogg
 f_ships,father,Father,I had three ships at sea once. I thought that was the worst a man could lose.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_ships.ogg
 f_wolf,father,Father,"A wolf that size, this near the village? Be careful in those woods.",X,,near,,,p0_winter,,audio/voice/f_wolf.ogg
 f_pine,father,Father,"Hand me that bit of pine, would you? The good piece.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_pine.ogg
 f_knee,father,Father,The damp's in my leg again. It'll pass.,A,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/f_knee.ogg
 A1_06_mother_vow,mother,Mother,"Stay together, and look after them.",V,yes,deed,,fact.mother_bed_seen,p0_winter p1_wolf_and_crossing,"memory: a whisper in her head, feverish and fading",audio/voice/A1_06_mother_vow.ogg
-d_wolf_killed,feyre,,I can carry only one. But it's a shame to leave the wolf.,A,yes,deed,,wolf_killed,p0_winter p1_wolf_and_crossing,"inner voice, breath coming back, practical",audio/voice/d_wolf_killed.ogg
+d_wolf_killed,feyre,,The doe's all I can carry. His pelt comes with me.,A,yes,deed,,wolf_killed,p0_winter p1_wolf_and_crossing,"inner voice, breath coming back, practical",audio/voice/d_wolf_killed.ogg
 d_wolf_skinned,feyre,,Heavy. Heavier than any pelt has a right to be.,X,yes,deed,,fact.wolf_skinned,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_wolf_skinned.ogg
 d_wolf_wrap,feyre,,His pelt over her wound. No blood trail home.,A,yes,follow,,,p0_winter p1_wolf_and_crossing,"inner voice, quiet, careful",audio/voice/d_wolf_wrap.ogg
 wh_doe,feyre,,A doe. A deer like that could feed my family for a week or more.,A,yes,scene,wolf_kill.doe,,p0_winter p1_wolf_and_crossing,"inner voice: low, held breath, hunting",audio/voice/wh_doe.ogg
@@ -47,6 +45,61 @@ wh_miss,feyre,,Missed. I can't afford to miss.,A,yes,scene,wolf_kill.miss,,p0_wi
 wh_ash,feyre,,He's looking at me. Like he knows. Just in case... the eye.,A,yes,scene,wolf_kill.ash,,p0_winter p1_wolf_and_crossing,"inner voice, cold, very fast",audio/voice/wh_ash.ogg
 wh_dying,feyre,,"He should be dead, not dying.",A,yes,scene,wolf_kill.kill,,p0_winter p1_wolf_and_crossing,"inner voice, shaken",audio/voice/wh_dying.ogg
 wh_still,feyre,,Wolf. Definitely just a wolf.,V,yes,scene,wolf_kill.kill,,p0_winter p1_wolf_and_crossing,"inner voice, relief she doesn't trust",audio/voice/wh_still.ogg
+ce_father_luck,father,Father,What luck you had today—in bringing us such a feast.,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"warm, from the hearth; Nesta snorts",audio/voice/ce_father_luck.ogg
+ce_elain_where,elain,Elain,Where did you get that?,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"wide-eyed, soft",audio/voice/ce_elain_where.ogg
+ce_feyre_where,feyre,Feyre,Where do you think I got it?,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"dry, tired",audio/voice/ce_feyre_where.ogg
+ce_elain_clean,elain,Elain,Will it take you long to clean it?,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"hopeful, careful",audio/voice/ce_elain_clean.ogg
+ce_feyre_half,feyre,Feyre,We can eat half the meat this week. We can dry the other half.,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"practical, brisk",audio/voice/ce_feyre_half.ogg
+ce_father_silver,father,Father,Feyre. Where did you get this?,A,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"quiet, turning the silver over in his hands",audio/voice/ce_father_silver.ogg
+ce_feyre_same,feyre,Feyre,The same place I got the deer.,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,flat,audio/voice/ce_feyre_same.ogg
+ce_father_risk,father,Father,Feyre … the risk …,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"pained, trailing off",audio/voice/ce_father_risk.ogg
+ce_feyre_choice,feyre,Feyre,I had no other choice.,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"hard, final",audio/voice/ce_feyre_choice.ogg
+ce_feyre_knives,feyre,Feyre,Get the knives ready. I'll be out soon.,V,,scene,cottage_evening.table,,p0_winter p1_wolf_and_crossing,"practical, already turning away",audio/voice/ce_feyre_knives.ogg
+ce_feyre_wood,feyre,Feyre,I thought you were going to chop wood today.,V,,scene,cottage_evening.fire,,p0_winter p1_wolf_and_crossing,"tired, pointed",audio/voice/ce_feyre_wood.ogg
+ce_nesta_splinters,nesta,Nesta,I hate chopping wood. I always get splinters.,V,,scene,cottage_evening.fire,,p0_winter p1_wolf_and_crossing,"bored, cutting",audio/voice/ce_nesta_splinters.ogg
+ce_nesta_rough,nesta,Nesta,"Besides, Feyre, you're so much better at it! Your hands are suited for it—they're already so rough.",V,,scene,cottage_evening.fire,,p0_winter p1_wolf_and_crossing,sweet as poison,audio/voice/ce_nesta_rough.ogg
+ce_feyre_dawn,feyre,Feyre,Please get up at dawn to chop that wood. Or we'll be eating a cold breakfast.,V,,scene,cottage_evening.fire,,p0_winter p1_wolf_and_crossing,"through her teeth, controlled",audio/voice/ce_feyre_dawn.ogg
+ce_nesta_no,nesta,Nesta,I will do no such thing!,V,,scene,cottage_evening.fire,,p0_winter p1_wolf_and_crossing,"scandalised, loud",audio/voice/ce_nesta_no.ogg
+ce_drawers,feyre,,Violets and roses for Elain. Flames for Nesta. A night sky of yellow stars for me.,A,yes,scene,cottage_evening.changed,,p0_winter p1_wolf_and_crossing,"inner voice: quiet, a little proud of the paint",audio/voice/ce_drawers.ogg
+ce_wait_table,feyre,,"The meat on the table first, or there's no supper to sit to.",X,yes,scene,cottage_evening.wait_table,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ce_wait_table.ogg
+ce_wait_fire,feyre,,"The fire's sinking. A log on it, or we eat in the cold.",X,yes,scene,cottage_evening.wait_fire,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ce_wait_fire.ogg
+ce_wait_clothes,feyre,,Not in these. I'm still wearing half the forest.,X,yes,scene,cottage_evening.wait_clothes,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ce_wait_clothes.ogg
+ce_wait_bed,feyre,,Not yet. They're waiting on supper.,X,yes,scene,cottage_evening.wait_bed,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/ce_wait_bed.ogg
+ce_nesta_decline,nesta,Nesta,"If you think you can just ask me so nonchalantly, sir, I'm going to decline!",V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"mocking, mimicking a suitor",audio/voice/ce_nesta_decline.ogg
+ce_feyre_tomas,feyre,Feyre,Tomas Mandray? The woodcutter's second son?,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,flat disbelief,audio/voice/ce_feyre_tomas.ogg
+ce_elain_marry,elain,Elain,He wants to marry her.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"soft, a little thrilled",audio/voice/ce_elain_marry.ogg
+ce_nesta_problem,nesta,Nesta,"Is there a problem, Feyre?",V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"cold, daring her",audio/voice/ce_nesta_problem.ogg
+ce_feyre_woodcutter,feyre,Feyre,"You can't chop wood for us, but you want to marry a woodcutter's son?",V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,sharp,audio/voice/ce_feyre_woodcutter.ogg
+ce_feyre_not,feyre,Feyre,But you're not going to marry Tomas.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"low, certain",audio/voice/ce_feyre_not.ogg
+ce_nesta_scraps,nesta,Nesta,There's nothing you can do. And then I'll never have to eat these scraps again.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"triumphant, cruel",audio/voice/ce_nesta_scraps.ogg
+ce_feyre_love,feyre,Feyre,Love won't feed a hungry belly.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,hard,audio/voice/ce_feyre_love.ogg
+ce_feyre_burden,feyre,Feyre,We have nothing to offer them. You're a burden.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"too far, and she knows it",audio/voice/ce_feyre_burden.ogg
+A1_03_nesta_beast,nesta,Nesta,You're just a half-wild beast with the nerve to bark orders at all hours of the day and night.,V,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"cold, quick, cutting; not shouted (Keeper, voice-lines-act1)",audio/voice/A1_03_nesta_beast.ogg
+A1_04_nesta_forget,nesta,Nesta,"Someday, Feyre, you'll have no one left to remember you.",A,,scene,cottage_evening.supper,,p0_winter p1_wolf_and_crossing,"quieter, meaner",audio/voice/A1_04_nesta_forget.ogg
+ce_feyre_sense,feyre,Feyre,You should talk some sense into her.,V,,scene,cottage_evening.father,,p0_winter p1_wolf_and_crossing,"tired, low",audio/voice/ce_feyre_sense.ogg
+ce_father_love,father,Father,What can I say? If it's love—,V,,scene,cottage_evening.father,,p0_winter p1_wolf_and_crossing,"helpless, gentle",audio/voice/ce_father_love.ogg
+A1_05_father_hope,father,Father,"We need hope, or else we cannot endure.",V,,scene,cottage_evening.father,,p0_winter p1_wolf_and_crossing,"tired, then a rare clarity; gentle",audio/voice/A1_05_father_hope.ogg
+ce_feyre_no_hope,feyre,Feyre,There is no such thing.,V,,scene,cottage_evening.father,,p0_winter p1_wolf_and_crossing,"flat, final",audio/voice/ce_feyre_no_hope.ogg
+ce_father_rest,father,Father,"Rest, Feyre. The meat will keep till morning.",X,,scene,cottage_evening.rest,,p0_winter p1_wolf_and_crossing,"gentle, tired, a hand toward the bedroom",audio/voice/ce_father_rest.ogg
+bd_treaty,feyre,,"Five hundred years, and the Treaty's all that keeps them on their side of the wall.",A,yes,scene,beast_door.fire,,p0_winter p1_wolf_and_crossing,"inner voice: quiet, by the fire",audio/voice/bd_treaty.ogg
+bd_tomas,feyre,Feyre,Nesta. About Tomas Mandray—,A,,scene,beast_door.tomas,,p0_winter p1_wolf_and_crossing,turning to her sister; cut off by the roar,audio/voice/bd_tomas.ogg
+A1_10_beast_murderers,tamlin_beast,The beast,MURDERERS!,V,,scene,beast_door.accuse,,p0_winter p1_wolf_and_crossing,an animal roar that forms a word; raw throat,audio/voice/A1_10_beast_murderers.ogg
+H1_anything,feyre,,Bracelets. Knife. Anything.,X,yes,scene,beast_door.anything,,p0_winter p1_wolf_and_crossing,"inner voice, a whisper, frozen",audio/voice/H1_anything.ogg
+H1_chin,feyre,,Better to die with my chin held high than groveling like a cowering worm.,V,yes,scene,beast_door.chin,,p0_winter p1_wolf_and_crossing,"inner voice, defiant, gritted",audio/voice/H1_chin.ogg
+A1_11_beast_who,tamlin_beast,The beast,Who killed the wolf?,V,,scene,beast_door.who,,p0_winter p1_wolf_and_crossing,"menacing, low, each word forced out through a snarl",audio/voice/A1_11_beast_who.ogg
+A1_12_feyre_idid,feyre,Feyre,I did.,V,,scene,beast_door.confess,,p0_winter p1_wolf_and_crossing,"short, steady, chin up; terrified underneath",audio/voice/A1_12_feyre_idid.ogg
+A1_13_beast_provoked,tamlin_beast,The beast,Did it attack you? Were you provoked?,V,,scene,beast_door.provoked,,p0_winter p1_wolf_and_crossing,"cold, measured, a judge",audio/voice/A1_13_beast_provoked.ogg
+A1_14_feyre_deserved,feyre,Feyre,"No. But considering all that your kind has done to us, it was deserved.",A,,scene,beast_door.deserved,,p0_winter p1_wolf_and_crossing,"defiance through clenched teeth, low, building contempt",audio/voice/A1_14_feyre_deserved.ogg
+A1_15_beast_life,tamlin_beast,The beast,A life for a life. Any unprovoked attacks on faerie-kind by humans are to be paid only by a human life in exchange.,V,,scene,beast_door.life,,p0_winter p1_wolf_and_crossing,"grave, formal: the Treaty speaking through him, slow and clear",audio/voice/A1_15_beast_life.ogg
+A1_16_beast_choice,tamlin_beast,The beast,"You can either come live at my home in Prythian, or you can walk outside right now and be shredded to ribbons. Your choice.",A,,scene,beast_door.life,,p0_winter p1_wolf_and_crossing,"quiet menace, very close to her throat",audio/voice/A1_16_beast_choice.ogg
+A1_16a_father_spare,father,Father,"Please, good sir—Feyre is my youngest. I beseech you to spare her. She is all … she is all …",V,,scene,beast_door.plead,,p0_winter p1_wolf_and_crossing,"trembling, begging, gripping her shoulder; cut off by a roar",audio/voice/A1_16a_father_spare.ogg
+A1_16b_beast_silence,tamlin_beast,The beast,Silence.,V,,scene,beast_door.silence,,p0_winter p1_wolf_and_crossing,"one word, a growl, final",audio/voice/A1_16b_beast_silence.ogg
+A1_16c_father_gold,father,Father,I can get gold—,V,,scene,beast_door.gold,,p0_winter p1_wolf_and_crossing,"desperate, fast; cut off",audio/voice/A1_16c_father_gold.ogg
+A1_17_beast_worth,tamlin_beast,The beast,How much is your daughter's life worth to you?,V,,scene,beast_door.worth,,p0_winter p1_wolf_and_crossing,"contempt for the father, a scoff before it",audio/voice/A1_17_beast_worth.ogg
+A1_18_feyre_when,feyre,Feyre,When do we go?,V,,scene,beast_door.when,,p0_winter p1_wolf_and_crossing,"quiet, resigned, steady, drained",audio/voice/A1_18_feyre_when.ogg
+A1_19_beast_now,tamlin_beast,The beast,Now.,V,,scene,beast_door.now,,p0_winter p1_wolf_and_crossing,"one low word, flat, final",audio/voice/A1_19_beast_now.ogg
+A1_22_father_name,father,Father,"You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself.",A,,scene,beast_door.goodbye,,p0_winter p1_wolf_and_crossing,"trembling, tender, too late; voice cracking",audio/voice/A1_22_father_name.ogg
+H1_metal,feyre,,The air tastes like metal.,A,yes,scene,ride_north.smell_metal,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/H1_metal.ogg
 v_market,feyre,,Market day. Everyone watching everyone else's purse.,X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_market.ogg
 v_silver,feyre,,"Silver in my pocket. Just once, I could buy something that isn't food.",X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_silver.ogg
 v_return,feyre,,They don't know me in this dress. Good.,X,yes,region,village,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/v_return.ogg
@@ -82,7 +135,6 @@ peddler_ash,peddler,,"Ash, cut at the border. The one wood they fear, so the sto
 peddler_border,peddler,,Border towns are emptying. Folk say things come over the Wall at night.,X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_border.ogg
 peddler_trinkets,peddler,,"Ribbons, needles, a mirror that only lies a little. For you, a bargain.",X,,near,,,p0_winter p1_wolf_and_crossing,,audio/voice/peddler_trinkets.ogg
 d_pelt_sold,feyre,,"She paid more than it was worth. Someone did the same for her once, she said.",A,yes,deed,,pelt_sold,p0_winter p1_wolf_and_crossing,"inner voice, just after the deed",audio/voice/d_pelt_sold.ogg
-bow_let_down,feyre,,Too soon. Draw the string farther back.,A,yes,scene,bow.let_down,,,"inner voice: patient with herself, under her breath",audio/voice/bow_let_down.ogg
 hf_snow,feyre,,The snow's already covering the blood. Good.,X,yes,region,hunting_forest,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_snow.ogg
 hf_oak,feyre,,My oak. I've waited out half a winter in those branches.,X,yes,place,waiting_oak,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_oak.ogg
 hf_ash,feyre,,"Ash trees. If the stories are true, this is all they fear.",A,yes,place,ash_grove,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/hf_ash.ogg
@@ -345,3 +397,9 @@ hall_mark_3,feyre,,The garden doors. An X.,A,yes,scene,hall_map.hall_mark_3,,,"i
 hall_mark_4,feyre,,The kitchen door. An X.,A,yes,scene,hall_map.hall_mark_4,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_4.ogg
 hall_mark_5,feyre,,The servants' stair. A circle.,A,yes,scene,hall_map.hall_mark_5,,,"inner voice: dry, quiet, close",audio/voice/hall_mark_5.ogg
 sentry_chest_tag,note,A tag on the hasp,For whoever puts an arrow in all three butts.,X,,scene,sentry_chest.sentry_chest_tag,,,not voiced: written,audio/voice/sentry_chest_tag.ogg
+hostile_element_weak,feyre,,That hurt it. Remember what did that.,X,yes,scene,hostile_elements.hostile_element_weak,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak.ogg
+hostile_element_weak_ember,feyre,,"Fire, then. Even they burn.",X,yes,scene,hostile_elements.hostile_element_weak_ember,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_ember.ogg
+hostile_element_weak_rime,feyre,,The cold bit deep. It hated that.,X,yes,scene,hostile_elements.hostile_element_weak_rime,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_rime.ogg
+hostile_element_weak_glimmer,feyre,,It flinched from the light like something out of a cellar.,X,yes,scene,hostile_elements.hostile_element_weak_glimmer,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_glimmer.ogg
+hostile_element_weak_hush,feyre,,Its eyes went heavy. It's fighting sleep.,X,yes,scene,hostile_elements.hostile_element_weak_hush,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_weak_hush.ogg
+hostile_element_resisted,feyre,,"Like shooting a stone. Not that, then.",X,yes,scene,hostile_elements.hostile_element_resisted,,,"inner voice: dry, quiet, close",audio/voice/hostile_element_resisted.ogg

@@ -56,19 +56,32 @@ func _feyre() -> Feyre:
 
 
 func test_every_setting_round_trips_through_the_file() -> void:
-	var changed := {
+	var picked := {
 		&"mouse_sensitivity": 1.8, &"stick_sensitivity": 0.4, &"invert_x": true,
 		&"invert_y": true, &"camera_follow": false, &"mouse_steers": true, &"gentle_mode": true,
 		&"reduced_effects": true, &"music_volume": 0.25, &"sound_volume": 0.6, &"text_size": 3,
 		&"hud_mode": 2, &"edge_fx": 1, &"hit_marks": false, &"key_hints": false,
 		&"soft_aim": 2, &"hit_stop": 1, &"break_free_hold": true,
 	}
-	assert_eq(changed.size(), GameSettings.DEFAULTS.size(), "test covers every setting")
+	# Every setting is checked, the list taken from GameSettings.DEFAULTS: a
+	# hand-picked value where there is one, any other value than the default
+	# for a setting added since.
+	var changed := {}
+	for key: StringName in GameSettings.DEFAULTS:
+		changed[key] = picked[key] if picked.has(key) else _not_default(GameSettings.DEFAULTS[key])
 	for key: StringName in changed:
 		GameSettings.set_value(key, changed[key])
 	GameSettings.load_settings()
 	for key: StringName in changed:
 		assert_almost_eq(float(GameSettings.get_value(key)), float(changed[key]), 0.0001, String(key))
+
+
+func _not_default(v: Variant) -> Variant:
+	if v is bool:
+		return not v
+	if v is int:
+		return v + 1
+	return float(v) * 0.5 + 0.1
 
 
 func test_settings_are_applied() -> void:

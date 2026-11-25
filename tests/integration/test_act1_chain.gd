@@ -1,6 +1,7 @@
 ## Drives Act I end to end through the signals other lanes will emit: food
-## tally -> wolf -> skinning -> pelt sale -> beast at the door -> ride and
-## wall crossing, and checks the ladder lands in p2_grounds.
+## tally -> wolf -> skinning -> pelt sale -> the evening at home (deeds,
+## supper, the bed) -> beast at the door -> ride and wall crossing, and checks
+## the ladder lands in p2_grounds.
 extends GutTest
 
 const PHASES := preload("res://data/phases/spring_court_phases.tres")
@@ -139,12 +140,44 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 	assert_eq(PhaseManager.current_phase, &"p1_wolf_and_crossing")
 	assert_true(PhaseManager.is_region_unlocked(&"border_woods"))
 
-	# The beast: only at night, only with Feyre home.
+	# The evening at home (CottageEvening): three deeds, then supper, then the bed.
+	var evening := CottageEvening.new()
+	root.add_child(evening)
+	var stations := {}
+	for spec in CottageEvening.DEEDS:
+		var station := EveningStation.new()
+		station.fact = spec[2]
+		if spec[2] == CottageEvening.SAT:
+			station.needs = PackedStringArray([CottageEvening.TABLE, CottageEvening.FIRE, CottageEvening.CHANGED])
+			station.wait_beats = PackedStringArray(["wait_table", "wait_fire", "wait_clothes"])
+		root.add_child(station)
+		stations[spec[2]] = station
+	var supper := _space(CottageSupper.new(), Vector3.ZERO) as CottageSupper
+	var bed := CottageBed.new()
+	bed.fact = "fact.mother_bed_seen"
+	root.add_child(bed)
+	assert_false(bed.can_sleep(), "supper first")
+	stations[CottageEvening.SAT].use(null)
+	assert_false(WorldState.has_flag(CottageEvening.SAT), "the table, the fire and her clothes first")
+	for fact in [CottageEvening.TABLE, CottageEvening.FIRE, CottageEvening.CHANGED, CottageEvening.SAT]:
+		stations[fact].use(null)
+		assert_true(WorldState.has_flag(fact), fact)
+	assert_true(supper.start())
+	_run(supper, 10.0)
+	assert_true(WorldState.has_flag(CottageEvening.SUPPER))
+	assert_true(bed.can_sleep())
+	bed.use(null)
+	await wait_seconds(bed.fade_seconds * 2.4 + bed.hold_seconds + 0.3)
+	assert_true(WorldState.has_flag(CottageEvening.SLEPT))
+
+	# The beast: only at night, only with Feyre home, once she has slept.
 	beast.set_player_inside(true)
+	Clock.from_dict({"time_of_day": 0.45, "day": 2})
 	assert_false(beast.can_start(), "daytime")
 	Clock.from_dict({"time_of_day": 0.92, "day": 2})
 	assert_true(beast.start())
-	_run(beast, 5.0)
+	# The fire thought, Tomas, the door, his "Murderers!": about 6 s to the window.
+	_run(beast, 8.0)
 	assert_true(WorldState.has_flag("fact.cottage_door_broken"))
 	assert_eq(WorldDeltas.get_region_value(&"cottage", "door"), "broken")
 	assert_true(cues.has([&"family", &"gather"]))
@@ -161,7 +194,7 @@ func test_act_one_plays_through_to_the_grounds() -> void:
 
 	# The ride and the wall.
 	assert_true(ride.start())
-	assert_eq(StoryControl.mode, StoryControl.Mode.LOOK)
+	assert_eq(StoryControl.mode, StoryControl.Mode.NONE, "the cottage fades to the horse")
 	_run(ride, 60.0)
 	assert_true(cues.has([&"feyre", &"smell_metal"]))
 	assert_eq(grade_requests, [[&"spring", 2.0]])

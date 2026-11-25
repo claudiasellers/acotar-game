@@ -82,7 +82,7 @@ func test_the_fur_stall_sells_andras_pelt() -> void:
 	assert_eq(Gameplay.inventory.count(&"obj_wolf_pelt"), 0)
 
 
-func test_the_bed_sleeps_to_night_only_after_the_sale() -> void:
+func test_the_bed_sleeps_to_night_only_after_the_sale_and_supper() -> void:
 	WorldState.clear()
 	var saved := Clock.to_dict()
 	var bed := CottageBed.new()
@@ -91,9 +91,14 @@ func test_the_bed_sleeps_to_night_only_after_the_sale() -> void:
 	Clock.from_dict({"time_of_day": 0.5, "day": 3})
 	assert_false(bed.can_sleep(), "not before the pelt is sold")
 	WorldState.set_flag("pelt_sold")
+	assert_false(bed.can_sleep(), "not before supper (CottageSupper)")
+	WorldState.set_flag(CottageEvening.SUPPER)
 	assert_true(bed.can_sleep())
 	CottageBed.skip_to_night()
 	assert_true(Clock.is_night())
 	assert_eq(Clock.day, 3, "the same night, not the next day")
-	assert_false(bed.can_sleep(), "already night")
+	CottageBed.skip_to_night()
+	assert_eq(Clock.day, 3, "already night: the Clock stays")
+	WorldState.set_flag(CottageEvening.SLEPT)
+	assert_false(bed.can_sleep(), "she sleeps the evening once")
 	Clock.from_dict(saved)
