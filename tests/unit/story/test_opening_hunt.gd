@@ -221,9 +221,9 @@ func test_hints_off_hides_every_taught_key() -> void:
 
 
 func test_every_prompt_names_a_key() -> void:
-	for id: StringName in KeyHints.ROWS:
+	for id: StringName in KeyHints.rows():
 		for pair: Array in KeyHints.row(id):
-			if (KeyHints.ROWS[id] as Array).size() == 1:
+			if (KeyHints.rows()[id] as Array).size() == 1:
 				assert_ne(pair[0], "", "%s has a key cap" % id)
 	assert_eq(KeyHints.cap(&"move"), String(InputSettings.SCHEME_NAMES[InputSettings.scheme]), "the keys she chose")
 	assert_eq(KeyHints.cap(&"look"), "Mouse")

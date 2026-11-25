@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="KeyHintSet" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/key_hint_row.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/key_hint_set.gd" id="2"]
+
+[sub_resource type="Resource" id="whorl_mark"]
+script = ExtResource("1")
+id = &"whorl_mark"
+priority = 100
+keys = Array[StringName]([&"interact", &""])
+says = PackedStringArray("trace the whorl and paint your mark", "marked stones carry you to one another")
+always = false
+
+[sub_resource type="Resource" id="whorl_ride"]
+script = ExtResource("1")
+id = &"whorl_ride"
+priority = 110
+keys = Array[StringName]([&"interact", &"map_open"])
+says = PackedStringArray("ride to another pair you have marked", "marked stones show on the map")
+always = false
+
+[resource]
+script = ExtResource("2")
+rows = Array[ExtResource("1")]([SubResource("whorl_mark"), SubResource("whorl_ride")])

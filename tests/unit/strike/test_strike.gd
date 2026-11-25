@@ -261,8 +261,8 @@ func test_she_cant_stab_a_naga_two_metres_below_her() -> void:
 ## L81 G20: "cut free" is held for the whole grab and learnt by the first cut;
 ## the rows are KeyHints' own (no check, so a missing row fails here).
 func test_cut_free_is_held_while_grabbed_and_learnt_by_the_cut() -> void:
-	assert_true(KeyHints.ROWS.has(StrikeController.HINT_CUT_FREE))
-	assert_true(KeyHints.ROWS.has(StrikeController.HINT_BASH))
+	assert_true(KeyHints.rows().has(StrikeController.HINT_CUT_FREE))
+	assert_true(KeyHints.rows().has(StrikeController.HINT_BASH))
 	her.body_state = BodyState.new()
 	her.body_state.name = "BodyState"
 	her.add_child(her.body_state)
