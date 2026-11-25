@@ -49,6 +49,15 @@ const CAMP_ALERT := 0.45
 ## two tokens land a claw about every 1.1 s, so a camp needs ≥ 4 s to put her down.
 @export var strike_cooldown: float = 1.65
 @export var attack_id: StringName = CLAW
+## The hold it closes with (the naga's coil), its presses and seconds, and
+## how hard the follow-up strike lands when she fails it. A family built on
+## this brain (BriarlingRoamer) sets its own.
+var grab_attack: StringName = COIL
+var grab_presses: int = COIL_PRESSES
+var grab_seconds: float = COIL_SECONDS
+var grab_follow_scale: float = COIL_FOLLOW_SCALE
+## Its DreadField's radius and inner radius; x 0 for none.
+var dread_radius: Vector2 = Vector2(30.0, 10.0)
 
 ## Set by HostileSite before _ready.
 var site: HostileSite
@@ -86,7 +95,8 @@ func _ready() -> void:
 	if home == Vector3.INF:
 		home = global_position
 	_ring_angle = float(member_index) * 1.7
-	_dread = DreadField.attach(self, 30.0, 10.0)
+	if dread_radius.x > 0.0:
+		_dread = DreadField.attach(self, dread_radius.x, dread_radius.y)
 	senses.sensed.connect(_on_sensed)
 	EventBus.player_knocked_down.connect(_on_player_down)
 	EventBus.player_released.connect(_on_player_released)
@@ -120,6 +130,11 @@ static func trail_holds(seconds_left: float, scent_scale: float) -> bool:
 	return seconds_left > 0.0 and scent_scale > HUSH_SCALE
 
 
+## This family's routine at `hour` (the naga's day by default).
+func routine_at(hour: float) -> StringName:
+	return NagaRoamer.routine_for(hour)
+
+
 func is_on_watch() -> bool:
 	return member_index == 0
 
@@ -130,7 +145,7 @@ func _player() -> Node3D:
 
 func _think(delta: float) -> void:
 	var player := _player()
-	routine = NagaRoamer.routine_for(Clock.hour())
+	routine = routine_at(Clock.hour())
 	_tune_senses()
 	_amplify_while_wary()
 	_tick_timers(delta, player)
@@ -267,9 +282,7 @@ func _fight(player: Node3D, delta: float) -> void:
 					site.claim_lunge()
 				_wind_up(Fight.LUNGE, LUNGE_ATTACK)
 			elif not held_by_other and flat <= strike_reach and _take_token():
-				var coil := StrikeController.is_behind(NagaRoamer.facing_node(player), global_position) \
-						and not _is_held(player)
-				_wind_up(Fight.STRIKE, COIL if coil else attack_id)
+				_wind_up(Fight.STRIKE, pick_strike(player))
 			elif flat <= CIRCLE_MAX and (held_by_other or not _token_free()):
 				fight = Fight.CIRCLE
 				_circle(player, to, flat, delta)
@@ -283,7 +296,7 @@ func _fight(player: Node3D, delta: float) -> void:
 			if _fight_left <= 0.0:
 				# Flat reach, capped in height: a step doesn't save her, a ledge does.
 				var in_reach := Creature.within_reach(global_position, player.global_position, strike_reach + 0.6)
-				if in_reach and _attack == COIL:
+				if in_reach and _attack == grab_attack:
 					_coil(player)
 				else:
 					if in_reach:
@@ -311,7 +324,7 @@ func _fight(player: Node3D, delta: float) -> void:
 			if not _holds_her(player) or _hold_left <= 0.0:
 				# Her own timer ends the hold as ours does: that is the failure.
 				if _hold_left <= 0.1:
-					HostileHits.strike(creature_id, attack_id, COIL_FOLLOW_SCALE, global_position)
+					HostileHits.strike(creature_id, attack_id, grab_follow_scale, global_position)
 				_recover()
 		Fight.RECOVER:
 			# Weave back a step, then come again.
@@ -320,6 +333,14 @@ func _fight(player: Node3D, delta: float) -> void:
 			_fight_left -= delta
 			if _fight_left <= 0.0:
 				_set_fight(Fight.CHARGE)
+
+
+## Which row a strike in reach winds up: the coil from behind her (when she
+## isn't already held), the claw otherwise.
+func pick_strike(player: Node3D) -> StringName:
+	var behind := StrikeController.is_behind(NagaRoamer.facing_node(player), global_position) \
+			and not _is_held(player)
+	return grab_attack if behind else attack_id
 
 
 ## The lunge opens a fight: once per engagement, and once per camp until the
@@ -374,12 +395,12 @@ func _circle(player: Node3D, to: Vector3, flat: float, delta: float) -> void:
 ## The coil closes: Vitals takes the hold (one at a time) and we keep it until
 ## she breaks it, cuts it, or her time runs out.
 func _coil(player: Node3D) -> void:
-	EventBus.player_grabbed.emit(creature_id, COIL_PRESSES, COIL_SECONDS)
+	EventBus.player_grabbed.emit(creature_id, grab_presses, grab_seconds)
 	if not _holds_her(player):
 		_recover()
 		return
 	fight = Fight.HOLD
-	_hold_left = COIL_SECONDS
+	_hold_left = grab_seconds
 
 
 func _recover() -> void:

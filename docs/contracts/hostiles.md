@@ -166,3 +166,24 @@ come first); the spawn rows will be gated on `puca_resisted`, at most one per re
   (`on_arrow_effect(&"light")`) holds `true_form` for 3 s, then it flees. Ash
   kills it; it leaves nothing.
 
+## Briarlings (`BriarlingRoamer`, slice 2(c))
+
+`creatures/hostile/briarling_roamer.tscn`, data `data/creatures/hostile/briarling_roamer.tres`
+(16 HP, 8 per wood arrow, ash kills, burn 8 HP/s, sight 31.5 m, hearing 48 m,
+scent 35 m, walk 1.5, run 6). Not in any site or spawn table yet.
+
+- Built on the naga's brain (`extends NagaRoamer`), which now has these hooks
+  with the naga's values as defaults: `grab_attack`, `grab_presses`,
+  `grab_seconds`, `grab_follow_scale`, `dread_radius`, `routine_at(hour)`,
+  `pick_strike(player)`.
+- Rows: `briarling_lash` (thorn, 0.4 s) and, every third strike in reach,
+  `briarling_snare` (grab, 0.6 s; 4 presses in 2.5 s; failing it takes two
+  lashes). No lunge. DreadField 14 m / 5 m.
+- `routine_at`: `bush` 07:00-18:00 (still at home), `hunt` otherwise (the
+  naga's ring walk). `form`: BUSH, UNFOLDING (1.2 s, no movement), CREATURE,
+  FOLDING (1.0 s, at home with nothing to do by day). `is_bush()`.
+- The tell: every GeometryInstance3D of its model wears `mimic_material`,
+  `CourtAssets.material_for(&"flora_bush_rose")` duplicated with `wind_amount` 0.
+  The Rosewild's real `flora_bush_rose` layers keep their wind. Placeholder body
+  is that rose bush model until the rig lands (bestiary §7.4/7.5).
+
