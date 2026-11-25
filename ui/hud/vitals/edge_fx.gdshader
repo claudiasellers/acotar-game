@@ -130,13 +130,13 @@ void fragment() {
 	// Hidden: the page's own edge draws in, torn and soft, while she is hard to see.
 	if (hidden > 0.0) {
 		float tear = fbm(vec2(atan(p.y, p.x) * 5.0, v * 2.0)) - 0.5;
-		float m = smoothstep(0.78 - hidden * 0.12, 1.02, v + tear * 0.22);
-		over(acc, paper_color, m * hidden * 0.7 * s);
+		float m = smoothstep(0.88 - hidden * 0.1, 1.1, v + tear * 0.2);
+		over(acc, paper_color, m * hidden * 0.55 * s);
 	}
 	// An attack she cannot see winding up: that side's edge beats (the bottom for behind her).
 	if (warn > 0.0) {
 		float beat = 0.55 + 0.45 * sin(TIME * 11.0);
-		float side = abs(warn_side) < 0.2 ? smoothstep(0.72, 1.0, uv.y) : smoothstep(0.7, 1.0, 0.5 + (uv.x - 0.5) * sign(warn_side));
+		float side = abs(warn_side) < 0.2 ? smoothstep(0.6, 1.0, uv.y) : smoothstep(0.7, 1.0, 0.5 + (uv.x - 0.5) * sign(warn_side));
 		over(acc, mix(OLD_BLOOD, BRUISE, 0.3), side * side * warn * beat * 0.7);
 	}
 	// Drowsy: heavy eyelids closing from top and bottom.
