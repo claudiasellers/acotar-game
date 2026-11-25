@@ -8,5 +8,6 @@ id = &"hunting_bow"
 display_name = "Hunting bow"
 draw_time = 0.3
 max_speed = 48.0
+true_range = 30.0
 sway_degrees = 1.5
 kick_degrees = 0.35

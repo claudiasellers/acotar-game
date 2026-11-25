@@ -1,11 +1,11 @@
 ## Contract (L80-25): with the bow up and no aim held (the main way to shoot)
-## the ring always stands clear of Feyre's own body on screen, at rest and at
+## the crosshair always stands clear of Feyre's own body on screen, at rest and at
 ## full draw, so a target low and close in front of her is never behind her.
 ## Her capsule's screen bounds are projected through the camera on screen.
 extends GutTest
 
 const FEYRE := preload("res://characters/feyre/feyre.tscn")
-## Pixels (at 1080 high) between her capsule's edge and the ring's centre.
+## Pixels (at 1080 high) between her capsule's edge and the crosshair.
 const HIP_RING_CLEAR_PX := 64.0
 const DT := 1.0 / 60.0
 
@@ -51,9 +51,9 @@ func _body_right_edge() -> float:
 
 func _clear_px() -> float:
 	var reticle := feyre.bow_controller.reticle
-	assert_true(reticle.visible, "the ring is on screen from the hip")
-	var scale := get_viewport().get_visible_rect().size.y / 1080.0
-	return (reticle._screen.x - _body_right_edge()) / scale
+	assert_true(reticle.visible, "the crosshair is on screen from the hip")
+	var view := get_viewport().get_visible_rect().size
+	return (view.x * 0.5 - _body_right_edge()) / (view.y / 1080.0)
 
 
 func _hold(seconds: float, fire: bool) -> void:
@@ -62,12 +62,12 @@ func _hold(seconds: float, fire: bool) -> void:
 		await get_tree().physics_frame
 
 
-func test_the_ring_stands_clear_of_her_at_full_draw_from_the_hip() -> void:
+func test_the_crosshair_stands_clear_of_her_at_full_draw_from_the_hip() -> void:
 	await _hold(1.2, true)
 	assert_eq(feyre.bow_controller.draw_amount, 1.0)
 	assert_false(feyre.bow_controller.is_precise)
 	var clear := _clear_px()
-	assert_gt(clear, HIP_RING_CLEAR_PX, "ring %.0f px clear of her body" % clear)
+	assert_gt(clear, HIP_RING_CLEAR_PX, "crosshair %.0f px clear of her body" % clear)
 
 
 func test_and_at_rest_with_the_bow_still_up_after_a_shot() -> void:
@@ -76,11 +76,11 @@ func test_and_at_rest_with_the_bow_still_up_after_a_shot() -> void:
 	assert_true(feyre.bow_controller.is_up(), "still up for the next arrow")
 	assert_false(feyre.bow_controller.is_aiming)
 	var clear := _clear_px()
-	assert_gt(clear, HIP_RING_CLEAR_PX, "ring %.0f px clear of her body" % clear)
+	assert_gt(clear, HIP_RING_CLEAR_PX, "crosshair %.0f px clear of her body" % clear)
 
 
 func test_looking_down_at_something_low_and_close_keeps_it_clear() -> void:
 	feyre.nudge_camera(0.0, -0.35)
 	await _hold(1.2, true)
 	var clear := _clear_px()
-	assert_gt(clear, HIP_RING_CLEAR_PX, "ring %.0f px clear of her body" % clear)
+	assert_gt(clear, HIP_RING_CLEAR_PX, "crosshair %.0f px clear of her body" % clear)
