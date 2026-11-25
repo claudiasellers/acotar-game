@@ -42,4 +42,4 @@ func test_only_time_scale_writes_the_engine_clock() -> void:
 			if write.search(FileAccess.get_file_as_string(path)):
 				writers.append(path)
 	assert_gt(scripts, 300, "the walk covered the game's scripts")
-	assert_eq(writers, [] as Array[String], "only TimeScale sets Engine.time_scale")
+	assert_eq(writers, [] as Array[String], "only TimeScale sets Engine.time_scale. Fix: TimeScale.request(&\"<your_id>\", scale) to slow the clock and TimeScale.release(&\"<your_id>\") to let go; the lowest request wins")

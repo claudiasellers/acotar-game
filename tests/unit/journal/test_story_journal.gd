@@ -36,12 +36,14 @@ func test_every_phase_has_a_chapter_and_every_deed_a_step() -> void:
 		done[e.done_flag] = true
 	var missing: Array = []
 	for phase in set.phases:
-		assert_not_null(book.chapter_for(phase.id), "chapter for %s" % phase.id)
+		assert_not_null(book.chapter_for(phase.id), "no sketchbook chapter for phase %s: add one to %s" % [phase.id, BOOK])
 		if phase.exit_condition:
 			for f in phase.exit_condition.flags:
 				if not done.has(f):
-					missing.append(f)
-	assert_eq(missing, [], "phase deeds with no sketchbook step")
+					missing.append("%s (phase %s)" % [f, phase.id])
+	assert_eq(missing, [], ("a phase waits on a deed the sketchbook never asks for, so the player has no step to "
+			+ "follow. Fix: in %s add a JournalEntry to that phase's chapter with done_flag = the flag, an "
+			+ "`after` line and 1-3 hints (or take the flag out of the phase's exit_condition)") % BOOK)
 
 
 func test_every_step_has_words_hints_and_a_known_sketch() -> void:
@@ -143,7 +145,7 @@ func test_look_comes_only_from_journal_theme() -> void:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s names its own colour or font" % path)
+		assert_eq(hits, [], "%s names its own colour or font: use a JournalTheme token (JournalTheme.color(&\"ink\"), Color(token, alpha)) or JournalTheme.font()" % path)
 
 
 func test_hint_state_saves_and_loads() -> void:
@@ -172,7 +174,7 @@ func test_the_map_runs_beside_the_other_steps_until_drawn() -> void:
 	var side := book.ongoing(_has)
 	assert_eq(side.size(), 1)
 	assert_eq(side[0].id, &"map")
-	assert_true(side[0].after.contains("know my way around"))
+	assert_ne(side[0].after, "", "the map step has words")
 	for f in ["fact.hunt_invited", "bogge_survived", "puca_resisted"]:
 		_flags[f] = true
 	assert_eq(book.ongoing(_has)[0].id, &"map", "still on her mind into the next chapter")

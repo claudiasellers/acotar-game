@@ -33,4 +33,6 @@ func test_generator_output_equals_committed_files() -> void:
 	for rel in generated:
 		var want := FileAccess.get_file_as_string(COMMITTED.path_join(rel))
 		var got := FileAccess.get_file_as_string(out.path_join(rel))
-		assert_true(want == got, "%s differs from the generator: edit tools/dialogue/gen_dialogue.py, not the .tres" % rel)
+		assert_true(want == got, ("data/dialogue/%s differs from what the generator writes. It is a built file: make the change in "
+				+ "tools/dialogue/gen_dialogue.py, run `python3 tools/dialogue/gen_dialogue.py` to rewrite data/dialogue, "
+				+ "and commit both. A hand edit to the .tres is lost on the next regeneration.") % rel)

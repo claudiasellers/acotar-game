@@ -203,10 +203,13 @@ func test_answers_names_the_presses_the_stack_takes() -> void:
 
 ## No script but the stack pauses the tree, moves the mouse mode or reads
 ## Esc. (FilmSkip lists the skip presses of a playing film, which takes input
-## before any screen.)
+## before any screen.) Naming the action as data (a row of the key list, a
+## remap entry) is fine: only reading the press is the stack's job.
 func test_only_the_stack_touches_pause_mouse_and_escape() -> void:
 	var allowed := ["res://ui/frame/screen_stack.gd", "res://story/film/film_skip.gd"]
-	var bad := RegEx.create_from_string("\\btree(\\(\\))?\\.paused\\s*=[^=]|mouse_mode\\s*=[^=]|&\"pause\"|&\"ui_cancel\"")
+	var bad := RegEx.create_from_string("\\btree(\\(\\))?\\.paused\\s*=[^=]|mouse_mode\\s*=[^=]"
+			+ "|is_action[a-z_]*\\([^)]*&?\"(pause|ui_cancel)\""
+			+ "|\\b(const|var)\\s+\\w+\\s*(:\\s*\\w+\\s*)?:?=\\s*&?\"(pause|ui_cancel)\"")
 	for path in _game_scripts("res://"):
 		if path in allowed:
 			continue
@@ -214,7 +217,10 @@ func test_only_the_stack_touches_pause_mouse_and_escape() -> void:
 		for line in FileAccess.get_file_as_string(path).split("\n"):
 			if not line.strip_edges().begins_with("#") and bad.search(line):
 				hits.append(line.strip_edges())
-		assert_eq(hits, [], "%s does a job ScreenStack owns" % path)
+		assert_eq(hits, [], ("%s does a job ScreenStack owns (docs/contracts/ui-frame.md). Fix: open the screen with "
+				+ "ScreenStack.push(self) and close it with ScreenStack.pop(self); the stack pauses the tree and "
+				+ "frees the mouse. For Esc/B, give the screen a screen_cancel() method (or pass a cancel Callable "
+				+ "to push()) instead of reading ui_cancel or pause yourself.") % path)
 
 
 func _game_scripts(dir: String) -> PackedStringArray:

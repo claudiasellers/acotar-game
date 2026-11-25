@@ -32,6 +32,10 @@ const SHOTS := {
 	"eastern_bogge": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.45, &"bogge"],
 	"eastern_bogge_dusk": [Vector3(1500, 0, -380), Vector3(1560, 0, -430), 0.74, &"bogge"],
 	"wall_crossing_spring": [Vector3(-100, 0, 1420), Vector3(-100, 0, 1300), 0.55, &"spring"],
+	# Hostile plan R3 check (L75): the Reed Marsh naga camp at dusk, from about
+	# 20 m and about 5 m off its core (1180, 330), the camp raised as play does.
+	"reed_marsh_dusk_20m": [Vector3(1192, 0, 346), Vector3(1180, 0, 330), 0.74, &"spring"],
+	"reed_marsh_dusk_5m": [Vector3(1183, 0, 334), Vector3(1180, 0, 330), 0.74, &"spring"],
 }
 
 
@@ -81,6 +85,8 @@ func _run() -> void:
 				Clock.time_of_day = m.get_meta(&"time_of_day")
 	if id.begins_with("hunting_arrow"):
 		_land_ash_arrow(world, eye, at)
+	if id.begins_with("reed_marsh"):
+		_raise_camp(world, &"naga_reed_marsh")
 	if id == "opening_dawn":
 		# Feyre (placeholder model) at her start mark.
 		for a in get_tree().get_nodes_in_group(&"story_anchor"):
@@ -107,6 +113,18 @@ func _run() -> void:
 	var objs := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME)
 	print("SHOT %s -> %s | draw_calls %d | primitives %d | objects %d" % [id, out, draw, prims, objs])
 	get_tree().quit(0)
+
+
+## A hostile camp as play raises it once naga_survived is set (HostileSite),
+## its members held still where they rise so the frame shows them at home.
+func _raise_camp(world: Node, site_id: StringName) -> void:
+	WorldState.set_flag("naga_survived", true)
+	var site := HostileSite.new()
+	site.data = load("res://data/creatures/hostile_sites/%s.tres" % site_id) as HostileSiteData
+	world.add_child(site)
+	for m in site.members:
+		m.set_physics_process(false)
+	print("SHOT camp %s: %d members at %s" % [site_id, site.members.size(), site.global_position])
 
 
 ## An ash arrow stuck at a slant in the ground 12 m from the eye, toward `at`.

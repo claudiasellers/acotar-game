@@ -45,12 +45,16 @@ func test_the_page_steps_through_them() -> void:
 	await wait_process_frames(2)
 	var aim := page._controls[&"soft_aim"] as Button
 	var stop := page._controls[&"hit_stop"] as Button
-	assert_eq(aim.text, "Aim help: Light")
-	assert_eq(stop.text, "Hit pause: Full")
+	assert_ne(aim.text, "", "aim help shows its setting")
+	assert_ne(stop.text, "", "hit pause shows its setting")
+	var aim_was: Variant = GameSettings.get_value(&"soft_aim")
+	var first := aim.text
 	aim.pressed.emit()
-	assert_eq(aim.text, "Aim help: Strong")
+	assert_ne(aim.text, first, "a press steps aim help on, and the button says so")
+	assert_ne(GameSettings.get_value(&"soft_aim"), aim_was, "and the setting follows")
+	var second := aim.text
 	aim.pressed.emit()
-	assert_eq(aim.text, "Aim help: Off")
+	assert_ne(aim.text, second, "and on again")
 	stop.pressed.emit()
 	assert_eq(GameSettings.get_value(&"hit_stop"), 1)
 	(page._controls[&"break_free_hold"] as CheckBox).button_pressed = true

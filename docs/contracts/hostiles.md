@@ -69,7 +69,7 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   or contested pair; every pair of cores keeps a ≥60 m corridor beyond both
   territories; no leash ring covers a listed road point or whorl stone.
 
-## Naga roamers (`NagaRoamer` extends `Creature`)
+## Naga roamers (`NagaRoamer` extends `HostileRoamer`)
 - Data `data/creatures/hostile/naga_roamer.tres` (written by the generator):
   kind `naga` (shares the family's face, voice and bestiary; the canon ambush
   only counts kills while it runs, before `naga_survived`), walk 2 / run 8 m/s,
@@ -101,16 +101,20 @@ Driven by `CreatureSenses.awareness` (0..1). One `step(awareness, delta)` per th
   a 4-naga camp needs ≥ 4 s to put her down) and comes again. A stagger
   (bash, knife, or any weak-spot hit) cancels the tell or lets go of the hold;
   so do sleep, fire and death. `Creature.winding_up()` names the attack being
-  telegraphed (&"" when none). Every tell shows and sounds (L81 G19): `AttackTell` poses the
-  model by the row's `damage_kind` (claw rears back, blunt dips the head, grab
-  crouches), eased in over the brain's own wind-up timer (`windup_left()`) and
-  held to contact; the brain emits `EventBus.hostile_windup(id, kind, attack,
+  telegraphed (&"" when none). Every tell shows and sounds (L81 G19): the
+  model plays its own `telegraph_<row id>` clip (`CreatureAnimator.play_windup`),
+  stretched to the row's `windup_s` and its last pose held to contact; at
+  contact it plays `attack_<row id>` (`play_strike`, the lunge's as the leap
+  starts), whether or not she is still in reach; a tell called off before
+  contact lets the clip go (`cancel_attack`). No fallback: a member without a
+  rig, or a row without its clip, is a `push_error` and a failing test
+  (`tests/unit/hostile/test_windups.gd`). The brain emits `EventBus.hostile_windup(id, kind, attack,
   at, windup_s)` as it starts and `hostile_windup_cancelled(id)` if it ends
   before contact. SoundDirector plays the family's wind-up cue where it starts
   (`WINDUP_CUES`, naga: `naga_hiss`), on the Sound bus. The coil is a grab
-  row (vitals.md: a hold), so it crouches. The
-  procedural pose is the one tell; the rig lane's `telegraph_<row id>` clips
-  replace it outright when they land (bestiary §1.5). A
+  row (vitals.md: a hold). While it circles (no token, 4-6 m off) it moves on
+  the `stalk` gait and every 6-10 s plays its scene's `taunt_clip` once
+  (naga: `laugh`, L81 G21; &"" for none). A
   naga on a **scent trail** ignores the leash while it smelled her within the
   last 6 s; a hush draught (scent_scale ≤ 0.5) breaks the trail.
 - Fire: a burning ElementField cell within 3 m sends it fleeing for 6 s; inside
@@ -142,3 +146,117 @@ creature burn; `fire_fear_radius` makes it flee burning ground
 ## EventBus requests (story/core, R14)
 `site_settled(site_id: StringName)`, `hostile_alerted(site_id: StringName, level: float)`.
 Both are used only when present (`has_signal`).
+
+## The roaming puca (`PucaRoamer`, slice 2(a)/(b))
+
+`creatures/hostile/puca_roamer.tscn`, data `data/creatures/hostile/puca_roamer.tres`.
+Not placed in any spawn table yet (the disguise material and the true-form card
+come first); the spawn rows will be gated on `puca_resisted`, at most one per region.
+
+- Night only (`is_night`: 20:00-05:00). By day it is HIDDEN: no model, collision layer 0.
+- `pick_lure(wants_of(inventory, collection, wardrobe, night))` picks what it
+  wears, one of `LURES`: `quiver` (under a third of her quiver), else
+  `gold_rose` (missing from her book), else on every third night with the
+  wardrobe unfinished `gown`, else `father` on odd nights and `sisters` on even.
+  `image_changed(image)` fires with it; `TRUE_FORM` (`true_form`) when revealed.
+- `tell` (0-1) is how strongly its wrongness shows to her: `tell_strength(distance,
+  keen)` reaches 8 m bare and 40 m at keen 1.0. The disguise material reads it as
+  the instance uniform `puca_tell`. It casts no shadow and leaves no prints.
+- No contact rows: it never touches her. It keeps `KEEP_M` ahead toward the
+  nearest standing camp (`nearest_site()`, 400 m), slips away inside `CLOSE_M`,
+  waits beyond `FOLLOW_M`, startles her once (`player_startled`, 0.1) inside
+  `NOTICE_M`, and is gone (`gone`) once she is inside that camp's leash.
+- Two hits: it flees (`darted`) and is gone for the night. A light arrow
+  (`on_arrow_effect(&"light")`) holds `true_form` for 3 s, then it flees. Ash
+  kills it; it leaves nothing.
+
+## Briarlings (`BriarlingRoamer`, slice 2(c))
+
+`creatures/hostile/briarling_roamer.tscn`, data `data/creatures/hostile/briarling_roamer.tres`
+(8 HP, 8 per wood arrow and per knife hit, so one of either kills; ash kills;
+burn 8 HP/s; `hit_box_scale` 1.5; sight 31.5 m, hearing 48 m, scent 35 m,
+walk 1.5, run 6). Small means fragile (owner, 2026-11-25): one arrow or one
+knife hit, and a box bigger than the body.
+
+- A thin subclass of `HostileRoamer` (below). Its values are on
+  `briarling_roamer.tscn` (`attack_id` briarling_lash, `grab_attack`
+  briarling_snare, no `lunge_attack`, `strike_reach` 1.3, `dread_radius` 14/5).
+- Rows: `briarling_lash` (thorn, 0.4 s) and, every third strike in reach,
+  `briarling_snare` (grab, 0.6 s; 4 presses in 2.5 s; failing it takes two
+  lashes). No lunge. DreadField 14 m / 5 m.
+- `routine_at`: `bush` 07:00-18:00 (still at home), `hunt` otherwise (the
+  naga's ring walk). `form`: BUSH, UNFOLDING (1.2 s, no movement), CREATURE,
+  FOLDING (1.0 s, at home with nothing to do by day). `is_bush()`.
+- The tell: its body is L83's rigged `creatures/models/fae/briarling.gltf` in
+  its briar hide (`briarling_hide.tres`), which has no wind: as a bush it holds
+  its `bush` pose, shaped like the Rosewild's `flora_bush_rose`
+  (`BriarlingRoamer.ROSE`) and coloured by the same leaf and petal swatches,
+  and the real roses round it sway while it doesn't. It plays `unfold` and
+  `fold` between forms (`_show_form`); a wind-up begun as a bush is called off
+  while it unfolds. Its strikes wind up on `telegraph_briarling_lash` and
+  `telegraph_briarling_snare`.
+
+## The shared brain (`HostileRoamer`)
+
+`creatures/hostile/hostile_roamer.gd` holds everything a camp member does
+whatever its family: the ladder, the leash and scent trail, camp reports,
+attack tokens, the fight states (`Fight`) and timer, the tell
+(its telegraph clips, `hostile_windup`/`_cancelled`), the circling taunt, holds, fire, frost, sleep and
+lures. It names no family (a test checks). A family is a thin subclass plus
+its own data:
+
+- scene exports: `strike_reach`, `strike_cooldown`, `attack_id` (strike row),
+  `grab_attack` (grab row or empty), `lunge_attack` (lunge row or empty),
+  `dread_radius` (x 0: no DreadField), `taunt_clip` (empty: none);
+- its rows: a grab row (`AttackData`) carries `grab_presses`, `grab_seconds`
+  and `grab_fail_scale`, read through `grab_presses()`, `grab_seconds()`,
+  `grab_fail_scale()`;
+- overrides where it differs: `routine_at(hour)` (default `hunt`, the ring
+  walk), `_routine`, `sight_scale()`, `hearing_scale()`, `is_on_watch()`,
+  `pick_strike(player)` (default its strike row).
+
+`NagaRoamer`: bask/hunt/nest day, watch member, coil only from behind.
+`BriarlingRoamer`: bush/hunt, forms, snare every third strike.
+
+## Encounters (`HostileEncounters`)
+
+Every fight ends once through `HostileEncounters.ended(source_id, family, outcome)`:
+it emits `EventBus.hostile_encounter_ended(source_id, family, outcome)` and, for
+`killed`, `driven_off` or `slipped` only (`COUNTED`, an allow-list: she came out
+alive and the creature lost), adds one to `fact.plain_fights` (a deed fact; the
+village's opening needs 3, progression §8a.1b). `knockdown` and `lured` are the
+creature winning and don't count; nor does any outcome added later until it is
+listed.
+
+- A site's fight begins at its first `report()` (`engaged`). It ends `killed`
+  when the site settles (engaged or not: a sneak clear counts), `knockdown`
+  when one of its members puts her down, and `slipped` after
+  `ENCOUNTER_CALM_S` (8 s) with no member hostile or searching.
+- The puca's begins when it startles her, or when she hits it. It ends
+  `driven_off` when it flees, `killed` when ash kills it (from any distance),
+  `lured` when she follows it into a camp's leash, and `slipped` when she walks
+  out of its sight or dawn comes.
+
+## Element rows (`HostileElements`)
+
+Each family's `CreatureData.element_rows` (element -> multiplier, from the
+hostile plan's §7 matrix: ✔ 1.5 weak, ◐ 1.0 normal, ✖ 0 resisted; no entry is
+normal) scales a steeped arrow (fire, frost, light, sleep): its damage
+(`HostileElements.arrow_hit`) and its effect (burn, frost slow, sleep).
+
+- Weak: a big burst in the element's colour, its own bright sound, the effect
+  ×1.5, and it thrashes away from the wound for `WEAK_FLEE_SECONDS` (3 s).
+- Normal: a small burst; the plain effect.
+- Resisted: a dull grey puff, a flat tick, no damage, no effect, no reaction.
+- Every one emits `EventBus.hostile_element_reacted(creature_id, kind,
+  element, reaction)` (her first-time thought, L54, listens).
+- Rows today: naga fire/frost/sleep 1.5, light 1.0; puca light 1.5 (it shows
+  its true form), fire 1.0; briarling fire/sleep 1.5, frost 1.0.
+
+## Held sites
+
+`briarling_rose_garden_edge` (3 briarlings, core (-60, -560), 12 m, from
+`naga_survived`; design reconciliation C19) is generated and overlap-checked but
+on `HELD` in `gen_hostile_sites.py`, so no spawn table carries it until L83's
+briarling rig and rose-bush swap land; that hand-in takes it off the list.
+

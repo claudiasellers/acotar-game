@@ -28,4 +28,10 @@ burn_dps = 6.0
 leaves_prints = true
 stride = 0.9
 print_size = 0.12
+element_rows = {
+&"fire": 1.5,
+&"frost": 1.5,
+&"light": 1.0,
+&"sleep": 1.5
+}
 model_scene = ExtResource("2")

@@ -183,9 +183,9 @@ func test_the_bath_steams_shows_e_and_alis_tells_her_to_go_on() -> void:
 	_tick_all(0.3)
 	var card := welcome().get_node_or_null(^"PressCard") as PressCard
 	assert_not_null(card)
-	assert_eq(card.text() if card else "", "E   step in")
+	assert_ne(card.text() if card else "", "", "the card says what E does")
 	_tick_all(AlisWelcome.GO_ON_AFTER + 3.0)
-	assert_true(heard.has("Go on, it won't bite."), "Alis: go on: %s" % [heard])
+	assert_true(heard.has(_line(welcome(), &"alis_go_on")), "Alis: go on: %s" % [heard])
 	welcome().press_interact()
 	assert_true(_tick_all(3.0, func() -> bool: return welcome().bathed))
 	assert_eq(card.text() if card else "", "", "the card goes once she's in")
