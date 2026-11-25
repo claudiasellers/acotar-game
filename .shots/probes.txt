@@ -1,0 +1,7 @@
+from soft-light-lane
+quality look
+shot rooms res://tools/manor_estate/room_shot.tscn entrance_hall,dining_hall,feyre_bedroom {out} 12
+shot rooms_spring res://tools/manor_estate/room_shot.tscn entrance_hall,dining_hall {out} 12 spring
+shot drive res://tools/world_shot.tscn manor_drive {out}/manor_drive.png
+shot spring res://tools/world_shot.tscn wall_crossing_spring {out}/spring.png
+shot dusk res://tools/world_shot.tscn reed_marsh_dusk_20m {out}/marsh_dusk.png
