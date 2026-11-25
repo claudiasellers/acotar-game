@@ -1,7 +1,9 @@
 ## The monsters in a row beside Feyre (1.7 m), so their sizes can be judged
 ## (lane L83). Renders in the cloud under xvfb:
-##   xvfb-run -a godot --path . res://tools/creatures/scale_shot.tscn -- <out_dir>
-## Writes monster_scale.png.
+##   xvfb-run -a godot --path . res://tools/creatures/scale_shot.tscn -- <out_dir> [model clip height]
+## Writes monster_scale.png, or with a model (its file name under
+## creatures/models/fae, a clip to stand in and its height in metres)
+## <model>_scale.png: that one creature beside her.
 extends Node
 
 const SIZE := Vector2i(1920, 1080)
@@ -24,7 +26,12 @@ func _run() -> void:
 	var cam := _stage()
 	var feyre := (load(FEYRE) as PackedScene).instantiate() as Node3D
 	add_child(feyre)
-	for row in ROW:
+	var one := args.size() >= 4
+	var tall := float(args[3]) if one else 2.0
+	var rows: Array[Array] = ROW
+	if one:
+		rows = [[args[1], -(0.9 + tall * 0.45), 0.0, StringName(args[2])]]
+	for row in rows:
 		var path: String = FAE + row[0] + ".gltf"
 		if not ResourceLoader.exists(path):
 			continue
@@ -38,7 +45,7 @@ func _run() -> void:
 			anim.pause()
 	# a few lampwings at her shoulder
 	var moth_path := FAE + "lampwing.gltf"
-	if ResourceLoader.exists(moth_path):
+	if not one and ResourceLoader.exists(moth_path):
 		for i in 5:
 			var moth := (load(moth_path) as PackedScene).instantiate() as Node3D
 			add_child(moth)
@@ -47,13 +54,17 @@ func _run() -> void:
 	cam.global_position = Vector3(0.2, 1.25, -9.6)
 	cam.look_at(Vector3(0.2, 1.05, 0.0))
 	cam.fov = 33.0
+	if one:
+		var mid := -(0.9 + tall * 0.45) * 0.5
+		cam.global_position = Vector3(mid + tall * 0.5, maxf(tall * 0.5, 1.2), -(3.5 + tall * 2.3))
+		cam.look_at(Vector3(mid, tall * 0.46, 0.0))
 	var t0 := Time.get_ticks_msec()
 	while Time.get_ticks_msec() - t0 < 800:
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	img.convert(Image.FORMAT_RGB8)
-	img.save_png(out + "/monster_scale.png")
+	img.save_png(out + ("/%s_scale.png" % args[1] if one else "/monster_scale.png"))
 	get_tree().quit()
 
 
