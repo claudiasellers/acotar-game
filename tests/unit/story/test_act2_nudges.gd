@@ -155,8 +155,11 @@ func _act2_entries() -> Array[Dictionary]:
 
 func test_the_beast_waits_for_her_and_she_notices() -> void:
 	_start_arrival()
-	# She stays on the steps: he waits, and after a while she notices.
-	_tick_all(ManorArrival.FOLLOW_NUDGE_AFTER + 4.0)
+	# She stays on the steps: he pads in from the steps beside her (where the
+	# ride left him, L86) to the middle of the hall, waits, and after a while
+	# she notices. The walk in is 2.2 m/s, ManorArrival's lead speed.
+	var walk_in := arrival().mark(&"beast_steps").distance_to(arrival().mark(&"hall_mid")) / 2.2
+	_tick_all(walk_in + ManorArrival.FOLLOW_NUDGE_AFTER + 4.0)
 	assert_true(heard.has(_line(arrival(), &"beast_waits")), "the beast waits for her: %s" % [heard])
 
 
