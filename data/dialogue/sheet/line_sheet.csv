@@ -99,7 +99,28 @@ A1_17_beast_worth,tamlin_beast,The beast,How much is your daughter's life worth 
 A1_18_feyre_when,feyre,Feyre,When do we go?,V,,scene,beast_door.when,,p0_winter p1_wolf_and_crossing,"quiet, resigned, steady, drained",audio/voice/A1_18_feyre_when.ogg
 A1_19_beast_now,tamlin_beast,The beast,Now.,V,,scene,beast_door.now,,p0_winter p1_wolf_and_crossing,"one low word, flat, final",audio/voice/A1_19_beast_now.ogg
 A1_22_father_name,father,Father,"You were always too good for here, Feyre. You go somewhere new, and you make a name for yourself.",A,,scene,beast_door.goodbye,,p0_winter p1_wolf_and_crossing,"trembling, tender, too late; voice cracking",audio/voice/A1_22_father_name.ogg
-H1_metal,feyre,,The air tastes like metal.,A,yes,scene,ride_north.smell_metal,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/H1_metal.ogg
+rn_look_back,feyre,,I didn't dare look back.,A,yes,scene,ride_north.mounted,,p1_wolf_and_crossing p2_grounds,"inner voice: quiet, close, riding",audio/voice/rn_look_back.ogg
+rn_still,feyre,,I'd never seen the forest so still.,V,yes,scene,ride_north.still,,p1_wolf_and_crossing p2_grounds,"inner voice: quiet, close, riding",audio/voice/rn_still.ogg
+rn_father,feyre,,"I could see my father limping through town, pleading for coppers.",A,yes,scene,ride_north.village,,p1_wolf_and_crossing p2_grounds,"inner voice: aching, past the dark houses",audio/voice/rn_father.ogg
+rn_live,feyre,,"Live with him. Live, not die.",V,yes,scene,ride_north.live,,p1_wolf_and_crossing p2_grounds,"inner voice: a vow, steadying",audio/voice/rn_live.ogg
+rn_ash,feyre,,No ash. Not one.,X,yes,scene,ride_north.ash,,p1_wolf_and_crossing p2_grounds,"inner voice: searching the trees, flat",audio/voice/rn_ash.ogg
+rn_what,feyre,Feyre,What manner of faerie are you?,V,,scene,ride_north.faerie,,p1_wolf_and_crossing p2_grounds,"aloud, to his back; no answer comes",audio/voice/rn_what.ogg
+rn_lamb,feyre,,A lamb in a kingdom of wolves.,V,yes,scene,ride_north.lamb,,p1_wolf_and_crossing p2_grounds,"inner voice: small, bitter",audio/voice/rn_lamb.ogg
+H1_metal,feyre,,The air tastes like metal. Heavy—everything's going heavy. No. Stay awake.,A,yes,scene,ride_north.smell_metal,,p1_wolf_and_crossing p2_grounds,"inner voice: dry and close, slurring, then a sharp pull back",audio/voice/H1_metal.ogg
+rn_birds,feyre,,Birds. In winter.,X,yes,scene,ride_north.birds,,p1_wolf_and_crossing p2_grounds,"inner voice: disbelief, almost a whisper",audio/voice/rn_birds.ogg
+rn_warm,feyre,,Too warm for winter wool. It's spring here.,X,yes,scene,ride_north.warm,,p1_wolf_and_crossing p2_grounds,"inner voice: sweating, wary",audio/voice/rn_warm.ogg
+rn_name,feyre,Feyre,Do you have a name?,V,,scene,ride_north.name,,p1_wolf_and_crossing p2_grounds,"aloud, careful, to his back",audio/voice/rn_name.ogg
+rn_name_beast,tamlin_beast,The beast,"Does it even matter to you, human?",V,,scene,ride_north.name,,p1_wolf_and_crossing p2_grounds,a low growl of annoyance; he doesn't turn,audio/voice/rn_name_beast.ogg
+rn_gate,feyre,,My prison or my salvation—I couldn't decide which.,V,yes,scene,ride_north.gate,,p1_wolf_and_crossing p2_grounds,inner voice: as the gate swings open on its own,audio/voice/rn_gate.ogg
+rn_magic,feyre,,"Of course it would be magic, because it was spring here.",V,yes,scene,ride_north.magic,,p1_wolf_and_crossing p2_grounds,inner voice: wonder and dread together,audio/voice/rn_magic.ogg
+rn_paint,feyre,,To paint it would be useless.,A,yes,scene,ride_north.paint,,p1_wolf_and_crossing p2_grounds,"inner voice: soft, overwhelmed",audio/voice/rn_paint.ogg
+rn_fool,feyre,,"Only a fool would run with no food, no strength.",V,yes,scene,ride_north.stairs,,p1_wolf_and_crossing p2_grounds,inner voice: the mare won't move; reasoning herself down,audio/voice/rn_fool.ogg
+rn_food,feyre,,Food first. Then run.,A,yes,scene,ride_north.stairs,,p1_wolf_and_crossing p2_grounds,"inner voice: decided, low",audio/voice/rn_food.ogg
+rn_stray_mare,feyre,,She won't go. She's his.,X,yes,scene,ride_north.stray_mare,,p1_wolf_and_crossing p2_grounds,"inner voice: the reins useless, rising fear",audio/voice/rn_stray_mare.ogg
+rn_stray_growl,feyre,,"Live, not die.",V,yes,scene,ride_north.stray_growl,,p1_wolf_and_crossing p2_grounds,"inner voice: a whisper, frozen",audio/voice/rn_stray_growl.ogg
+rn_stray_roar,feyre,,I wouldn't get half a mile before he caught me.,A,yes,scene,ride_north.stray_roar,,p1_wolf_and_crossing p2_grounds,"inner voice: shaking, after the roar",audio/voice/rn_stray_roar.ogg
+rn_stray_block,tamlin_beast,The beast,"Shredded to ribbons, human. Your choice.",A,,scene,ride_north.stray_block,,p1_wolf_and_crossing p2_grounds,"very close, fangs at her face; quiet menace",audio/voice/rn_stray_block.ogg
+rn_stray_not_here,feyre,,Not here. Not like this.,X,yes,scene,ride_north.stray_block,,p1_wolf_and_crossing p2_grounds,"inner voice: breathless, giving in",audio/voice/rn_stray_not_here.ogg
 v_market,feyre,,Market day. Everyone watching everyone else's purse.,X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_market.ogg
 v_silver,feyre,,"Silver in my pocket. Just once, I could buy something that isn't food.",X,yes,region,village,,p0_winter p1_wolf_and_crossing,"inner voice: dry, quiet, close",audio/voice/v_silver.ogg
 v_return,feyre,,They don't know me in this dress. Good.,X,yes,region,village,,p7_return_home,"inner voice: dry, quiet, close",audio/voice/v_return.ogg

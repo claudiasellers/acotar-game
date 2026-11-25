@@ -98,14 +98,19 @@ landed_sha() { # entry-file
 	echo "$s"
 }
 
-reject() { # entry-file reason [logfile]
-	local e="$1" reason="$2" log="${3:-}" task id
-	task=$(kv_get "$e" task); id=$(basename "$e" .entry)
+reject() { # entry-file reason [logfile] [kind detail]: kind is conflict, gate or built
+	local e="$1" reason="$2" log="${3:-}" kind="${4:-}" detail="${5:-}" task id sha cls=""
+	task=$(kv_get "$e" task); id=$(basename "$e" .entry); sha=$(kv_get "$e" sha)
 	kv_set "$e" reason "$reason"
-	[ -n "$log" ] && [ -f "$log" ] && tail -40 "$log" > "$MQ_DIR/done/rejected/$id.log"
+	if [ -n "$kind" ]; then
+		# The diagnosis rides with the entry: the Mac's event line and the cloud tag both use it.
+		"$here/diagnose.sh" note "$kind" "$sha" "$task" "$detail" > "$MQ_DIR/done/rejected/$id.diag" 2>/dev/null
+		cls=$("$here/diagnose.sh" class "$kind" "$sha" "$task" "$detail" 2>/dev/null)
+	fi
+	[ -n "$log" ] && [ -f "$log" ] && "$here/diagnose.sh" clean "$log" > "$MQ_DIR/done/rejected/$id.log"
 	mv "$e" "$MQ_DIR/done/rejected/"
 	[ -d "$MQ_DIR/tasks/$task" ] && kv_set "$MQ_DIR/tasks/$task/meta" status rejected
-	mq_event REJECTED "$task $reason"
+	mq_event REJECTED "$task $reason${cls:+ [$cls]}"
 	"$here/mark.sh" done "$MQ_DIR/done/rejected/$id.entry" rejected
 	kick_ready
 }
@@ -221,7 +226,7 @@ build_chain() { # base batch-dir
 		conf="$MQ_BUILD/tools/mq/generated.conf"; [ -f "$conf" ] || conf="$here/generated.conf"
 		hits=$(git diff --name-only --diff-filter=ACMR "$(git merge-base "$sha" "$base")" "$sha" | mq_generated_hits "$conf")
 		if [ -n "$hits" ]; then
-			reject "$e" "changes built files ($(printf '%s' "$hits" | cut -f1 | head -3 | tr '\n' ' ')). Those are rebuilt from generated.conf: change the recipe or its inputs instead."
+			reject "$e" "changes built files ($(printf '%s' "$hits" | cut -f1 | head -3 | tr '\n' ' ')). Those are rebuilt from generated.conf: change the recipe or its inputs instead." "" built "$(printf '%s' "$hits" | cut -f1 | head -3 | tr '\n' ' ')"
 			continue
 		fi
 		kv_set "$e" landed ""; kv_set "$e" dropped ""
@@ -233,7 +238,7 @@ build_chain() { # base batch-dir
 				restack "$e"; rc=$?
 				[ "$rc" = 3 ] && return 3
 				if [ "$rc" != 0 ]; then
-					reject "$e" "conflicts with main in: $paths. Rebase on main, fix it, and submit again."
+					reject "$e" "conflicts with main in: $paths." "" conflict "$paths"
 					continue
 				fi
 			else
@@ -370,7 +375,7 @@ run_batch() {
 			continue
 		fi
 		log="$b/gate/logs/$(printf '%s' "$name" | tr '/: ' '___').log"
-		reject "${entries[$culprit]}" "failed $name. Rebase on main, fix it, and submit again." "$log"
+		reject "${entries[$culprit]}" "failed $name." "$log" gate "$name"
 		# Every round removes one change or excuses one line, so this ends.
 	done
 }

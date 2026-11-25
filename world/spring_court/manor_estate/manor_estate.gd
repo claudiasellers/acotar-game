@@ -167,7 +167,8 @@ func _spawn_feyre() -> void:
 	add_child(interactor)
 
 
-## Preview lighting only (R3 princess grade: warm, pink, bloomy). The World
+## Preview lighting only (R3 princess grade: warm and pink; the game's one
+## light-source glow). The World
 ## scene's GradeDirector replaces this when the region is streamed in.
 func _add_preview_environment() -> void:
 	var env := Environment.new()
@@ -183,9 +184,7 @@ func _add_preview_environment() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_energy = 1.2
 	env.tonemap_mode = Environment.TONE_MAPPER_AGX
-	env.glow_enabled = true
-	env.glow_intensity = 1.1
-	env.glow_bloom = 0.25
+	GradeDirector.light_source_glow(env)
 	env.ssao_enabled = true
 	env.sdfgi_enabled = true
 	env.fog_enabled = true

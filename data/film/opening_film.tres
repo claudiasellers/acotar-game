@@ -109,8 +109,8 @@ id = &"op_12"
 at = 137.5
 hold = 14.0
 speaker = &""
-text = "We were rich once. My father was a merchant. Three years after she died, he put every coin we had on three ships, and the sea took all three. The men he owed took everything else. Later, one of them found us here, and broke his leg."
-canon = "C"
+text = "We were rich once. Three years after my mother died, my father staked everything on three ships, and the sea took all three. His creditors took the rest. Later, one of them found our cottage, and his men smashed Father's knee."
+canon = "A"
 
 [sub_resource type="Resource" id="L12"]
 script = ExtResource("2_line")
