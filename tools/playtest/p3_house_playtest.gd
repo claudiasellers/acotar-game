@@ -131,6 +131,13 @@ func _play() -> void:
 	_pass()
 
 	_begin("the_beast", "the beast limps in from the garden doors, the flash, Tamlin; he knows she can't write")
+	# Setting it down opens her journal at the map; she closes it as a player
+	# does, with Esc (ui_cancel), and the night goes on.
+	if not await _until(func() -> bool: return MenuShell.is_shell_open(get_tree()), 15.0):
+		return _fail("her journal never opened at the map (beat '%s')" % wound.current_beat_label())
+	await _press(&"ui_cancel")
+	if not await _until(func() -> bool: return not MenuShell.is_shell_open(get_tree()), 3.0):
+		return _fail("Esc didn't close her journal (beat '%s')" % wound.current_beat_label())
 	if not await _until(func() -> bool: return WorldState.has_flag("fact.tamlin_knows_she_cannot_read"), 90.0):
 		return _fail("stuck at '%s'" % wound.current_beat_label())
 	_note("%d blood stains on the marble" % wound.stains.size())
